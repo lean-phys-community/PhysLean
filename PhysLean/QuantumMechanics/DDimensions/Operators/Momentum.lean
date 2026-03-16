@@ -100,11 +100,6 @@ lemma momentumOperatorSqr_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
 
 open SpaceDHilbertSpace MeasureTheory
 
-/-- The spatial derivative of a Schwartz function as a Schwartz function. -/
-private def derivSchwartz (j : Fin d) (f : 𝓢(Space d, ℂ)) : 𝓢(Space d, ℂ) :=
-  (SchwartzMap.evalCLM ℂ (Space d) ℂ (basis j))
-    ((SchwartzMap.fderivCLM ℂ (Space d) ℂ) f)
-
 /-- The momentum operators defined on the Schwartz submodule. -/
 def momentumOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
   schwartzEquiv.toLinearMap ∘ₗ 𝐩[i].toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
@@ -132,6 +127,9 @@ lemma momentumOperatorSchwartz_isSymmetric :
     fun x => by ring]
   rw [integral_const_mul, integral_const_mul, neg_mul_eq_mul_neg]
   congr 1
+  let derivS (j : Fin d) (g : 𝓢(Space d, ℂ)) : 𝓢(Space d, ℂ) :=
+    (SchwartzMap.evalCLM ℂ (Space d) ℂ (basis j))
+      ((SchwartzMap.fderivCLM ℂ (Space d) ℂ) g)
   have hstar_fderiv : ∀ x : Space d,
       (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x =
       fderiv ℝ (fun y => star (f y)) x (basis i) * f' x := by
@@ -149,22 +147,22 @@ lemma momentumOperatorSchwartz_isSymmetric :
     (SchwartzMap.differentiable f')
   · rw [ibp, neg_neg]
   · have h : ∀ x, (fderiv ℝ (fun x => star (f x)) x)
-        (basis i) = star ((derivSchwartz i f) x) := by
-      intro x; rw [fderiv_star (𝕜 := ℝ)]; simp [derivSchwartz]
+        (basis i) = star ((derivS i f) x) := by
+      intro x; rw [fderiv_star (𝕜 := ℝ)]; simp [derivS]
     simp_rw [h]
     exact Integrable.mul_of_top_left
       ((ContinuousLinearEquiv.integrable_comp_iff
         (starL' ℝ : ℂ ≃L[ℝ] ℂ)).mpr
-        (SchwartzMap.integrable (derivSchwartz i f)))
+        (SchwartzMap.integrable (derivS i f)))
       (SchwartzMap.memLp_top f' volume)
   · have h : ∀ x, (fderiv ℝ (⇑f') x) (basis i) =
-        (derivSchwartz i f') x := fun _ => rfl
+        (derivS i f') x := fun _ => rfl
     simp_rw [h]
     exact Integrable.mul_of_top_left
       ((ContinuousLinearEquiv.integrable_comp_iff
         (starL' ℝ : ℂ ≃L[ℝ] ℂ)).mpr
         (SchwartzMap.integrable f))
-      (SchwartzMap.memLp_top (derivSchwartz i f') volume)
+      (SchwartzMap.memLp_top (derivS i f') volume)
   · exact Integrable.mul_of_top_left
       ((ContinuousLinearEquiv.integrable_comp_iff
         (starL' ℝ : ℂ ≃L[ℝ] ℂ)).mpr
