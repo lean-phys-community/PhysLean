@@ -45,6 +45,7 @@ of the input function with respect to each spatial coordinate.
   - B.3. The gradient as a sum over basis vectors
   - B.4. The underlying function of the gradient distribution
   - B.5. The gradient applied to a Schwartz function
+  - B.6. The gradident of a Schwartz map
 
 ## iv. References
 
@@ -501,5 +502,39 @@ lemma distGrad_apply {d} (f : (Space d) →d[ℝ] ℝ) (ε : 𝓢(Space d, ℝ))
     (distGrad f) ε = fun i => distDeriv i f ε := by
   change (distGrad f).toFun ε = fun i => distDeriv i f ε
   rw [distGrad_toFun_eq_distDeriv]
+
+/-!
+
+### B.6. The gradident of a Schwartz map
+
+-/
+
+/-- The gradient on Scwhwartz maps. -/
+noncomputable def gradSchwartz {d} : 𝓢(Space d, ℝ) →ₗ[ℝ] 𝓢(Space d, EuclideanSpace ℝ (Fin d)) where
+  toFun η :=
+    let smulCLM : ℝ →L[ℝ] EuclideanSpace ℝ (Fin d) →L[ℝ] EuclideanSpace ℝ (Fin d) := {
+      toFun a := {
+        toFun v := a • v
+        map_add' v1 v2 := by simp
+        map_smul' a v := by rw [smul_comm]; simp
+        cont := by fun_prop}
+      map_add' v1 v2 := by ext1 v; simp [add_smul]
+      map_smul' a v := by ext1 v; simp [smul_smul]
+      cont := continuous_clm_apply.mpr <| fun y => by
+        simp only [ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
+        fun_prop }
+    ∑ i, SchwartzMap.bilinLeftCLM smulCLM (.const (EuclideanSpace.single i 1))
+      (.evalCLM ℝ (Space d) ℝ (basis i) (.fderivCLM ℝ (E := _) (F := ℝ) η))
+  map_add' η1 η2 := by
+    ext x i
+    simp [Finset.sum_add_distrib]
+  map_smul' a η := by
+    ext x i
+    simp [Finset.smul_sum, smul_smul]
+
+lemma gradSchwartz_apply_eq_grad {d} (η : 𝓢(Space d, ℝ)) (x : Space d):
+    gradSchwartz η x = grad η x := by
+  simp [gradSchwartz, grad_eq_sum]
+  rfl
 
 end Space
