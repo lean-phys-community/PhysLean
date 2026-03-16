@@ -222,9 +222,7 @@ lemma adjoint_ge_adjoint_of_le {U₁ U₂ : UnboundedOperator H H'} (h : U₁ �
     apply mem_adjoint_domain_of_exists v
     use U₂† ⟨v, hv⟩
     exact fun x ↦ heq x ⟨v, hv⟩
-  · intro u v huv
-    refine (adjoint_apply_eq U₁.dense_domain v ?_).symm
-    exact fun x ↦ huv ▸ heq x u
+  · exact fun u v huv ↦ (adjoint_apply_eq U₁.dense_domain v <| fun x ↦ huv ▸ heq x u).symm
 
 lemma closure_mono {U₁ U₂ : UnboundedOperator H H'} (h : U₁ ≤ U₂) : U₁.closure ≤ U₂.closure := by
   repeat rw [← adjoint_adjoint_eq_closure]
@@ -267,9 +265,7 @@ lemma inner_map_polarization (x y : T.domain) :
   simp only [LinearPMap.map_add, coe_add, inner_add_right, inner_add_left, LinearPMap.map_sub,
     AddSubgroupClass.coe_sub, inner_sub_right, inner_sub_left, LinearPMap.map_smul,
     SetLike.val_smul, inner_smul_left, Complex.conj_I, inner_smul_right]
-  ring_nf
-  rw [Complex.I_sq]
-  ring
+  grind [Complex.I_sq]
 
 lemma inner_map_polarization' (x y : T.domain) :
     ⟪↑x, T y⟫_ℂ = (⟪↑(x + y), T (x + y)⟫_ℂ - ⟪↑(x - y), T (x - y)⟫_ℂ
@@ -278,15 +274,12 @@ lemma inner_map_polarization' (x y : T.domain) :
   simp only [coe_add, LinearPMap.map_add, inner_add_right, inner_add_left, AddSubgroupClass.coe_sub,
     LinearPMap.map_sub, inner_sub_right, inner_sub_left, SetLike.val_smul, LinearPMap.map_smul,
     inner_smul_left, Complex.conj_I, inner_smul_right]
-  ring_nf
-  rw [Complex.I_sq]
-  ring
+  grind [Complex.I_sq]
 
 lemma isSymmetric_iff_inner_map_self_real :
     IsSymmetric T ↔ ∀ x : T.domain, (starRingEnd ℂ) ⟪T x, x⟫_ℂ = ⟪T x, x⟫_ℂ := by
   simp only [inner_conj_symm]
-  refine ⟨fun hT x ↦ (hT x x).symm, ?_⟩
-  intro h x y
+  refine ⟨fun hT x ↦ (hT x x).symm, fun h x y ↦ ?_⟩
   rw [inner_map_polarization, inner_map_polarization']
   rw [h (x + y), h (x - y), h (x + Complex.I • y), h (x - Complex.I • y)]
 
