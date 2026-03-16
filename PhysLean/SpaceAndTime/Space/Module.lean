@@ -7,6 +7,7 @@ module
 
 public import PhysLean.SpaceAndTime.Space.Basic
 public import Mathlib.Geometry.Manifold.Diffeomorph
+public import Mathlib.Analysis.Distribution.TemperateGrowth
 /-!
 
 # The structure of a module on Space
@@ -691,5 +692,58 @@ lemma basis_eq_mfderiv_modelDiffeo_single (d : ℕ) (μ : Fin d) (x : Space d) :
   simp [basis_apply]
   congr 1
   exact Eq.propIntro (fun a => Eq.symm a) fun a => (Eq.symm a)
+
+
+/-!
+
+## Properties of vadd with module structure
+
+-/
+
+lemma norm_vadd_le_add {d} (v : EuclideanSpace ℝ (Fin d)) (s : Space d) :
+    ‖v +ᵥ s‖ ≤ ‖v‖ + ‖s‖ := by
+  trans ‖s - (-v +ᵥ (0 : Space d))‖
+  · apply le_of_eq
+    congr
+    ext i
+    simp only [vadd_apply, sub_apply, PiLp.neg_apply, zero_apply, add_zero, sub_neg_eq_add]
+    ring
+  · apply (norm_sub_le _ _).trans <| le_of_eq _
+    simp only [norm_vadd_zero, norm_neg]
+    ring
+
+@[fun_prop]
+lemma differentiable_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
+    Differentiable ℝ (fun (s : Space d) => v +ᵥ s) :=
+  mk_differentiable.comp <| by fun_prop
+
+@[simp]
+lemma fderiv_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
+    fderiv ℝ (fun s => v +ᵥ s) = fun (_ : Space d) => ContinuousLinearMap.id ℝ _ := by
+  ext s ds i
+  change fderiv ℝ (fun s => v +ᵥ s) s ds i = _
+  rw [fderiv_space_components]
+  simp
+  trans fderiv ℝ (coordCLM i) s ds
+  · congr
+    ext j
+    simp [coordCLM, coord_apply]
+  · rw [ContinuousLinearMap.fderiv]
+    simp [coordCLM, coord_apply]
+  · fun_prop
+
+@[fun_prop]
+lemma vadd_hasTemperateGrowth {d} (v : EuclideanSpace ℝ (Fin d)) :
+    Function.HasTemperateGrowth (fun s : Space d => v +ᵥ s) := by
+  apply Function.HasTemperateGrowth.of_fderiv (k := 1) (C := 1 + ‖v‖)
+  · rw [fderiv_vadd]
+    simp
+  · fun_prop
+  · intro x
+    simp
+    apply (norm_vadd_le_add _ _).trans
+    have : 0 ≤ ‖v‖ := by positivity
+    have : 0 ≤ ‖x‖ := by positivity
+    nlinarith
 
 end Space
