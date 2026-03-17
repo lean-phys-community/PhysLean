@@ -32,12 +32,13 @@ Definitions:
 ## iii. Table of contents
 
 - A. Definition
-- B. Partial order
-- C. Closure
-- D. Adjoint
-- E. Symmetric operators
-- F. Self-adjoint operators
-- G. Generalized eigenvectors
+- B. Basic identities
+- C. Partial order
+- D. Closure
+- E. Adjoint
+- F. Symmetric operators
+- G. Self-adjoint operators
+- H. Generalized eigenvectors
 
 ## iv. References
 
@@ -86,7 +87,32 @@ instance : CoeFun (UnboundedOperator H H') (fun U ↦ U.domain → H') :=
   ⟨fun U ↦ U.toLinearPMap.toFun'⟩
 
 /-!
-## B. Partial order
+## B. Basic identities
+-/
+
+section
+open Complex
+
+lemma inner_map_polarization {T : UnboundedOperator H H} (x y : T.domain) :
+    ⟪T x, ↑y⟫_ℂ = (⟪T (x + y), ↑(x + y)⟫_ℂ - ⟪T (x - y), ↑(x - y)⟫_ℂ
+    - I * ⟪T (x + I • y), ↑(x + I • y)⟫_ℂ + I * ⟪T (x - I • y), ↑(x - I • y)⟫_ℂ) / 4 := by
+  simp only [LinearPMap.map_add, coe_add, inner_add_right, inner_add_left, LinearPMap.map_sub,
+    AddSubgroupClass.coe_sub, inner_sub_right, inner_sub_left, LinearPMap.map_smul,
+    SetLike.val_smul, inner_smul_left, conj_I, inner_smul_right]
+  grind [I_sq]
+
+lemma inner_map_polarization' {T : UnboundedOperator H H} (x y : T.domain) :
+    ⟪↑x, T y⟫_ℂ = (⟪↑(x + y), T (x + y)⟫_ℂ - ⟪↑(x - y), T (x - y)⟫_ℂ
+    - I * ⟪↑(x + I • y), T (x + I • y)⟫_ℂ + I * ⟪↑(x - I • y), T (x - I • y)⟫_ℂ) / 4 := by
+  simp only [coe_add, LinearPMap.map_add, inner_add_right, inner_add_left, AddSubgroupClass.coe_sub,
+    LinearPMap.map_sub, inner_sub_right, inner_sub_left, SetLike.val_smul, LinearPMap.map_smul,
+    inner_smul_left, conj_I, inner_smul_right]
+  grind [I_sq]
+
+end
+
+/-!
+## C. Partial order
 
 Unbounded operators inherit the structure of a poset from `LinearPMap`,
 but *not* that of a `SemilatticeInf` because `U₁.domain ⊓ U₂.domain` may not be dense.
@@ -99,7 +125,7 @@ instance partialOrder : PartialOrder (UnboundedOperator H H') where
   le_antisymm _ _ h h' := ext <| le_antisymm h h'
 
 /-!
-## C. Closure
+## D. Closure
 -/
 
 section
@@ -123,8 +149,7 @@ def IsClosed : Prop := U.toLinearPMap.IsClosed
 lemma closure_isClosed : U.closure.IsClosed := IsClosable.closure_isClosed U.is_closable
 
 lemma isClosed_def : IsClosed U ↔ U.closure = U := by
-  refine ⟨?_, fun h ↦ h ▸ closure_isClosed U⟩
-  intro h
+  refine ⟨fun h ↦ ?_, fun h ↦ h ▸ closure_isClosed U⟩
   rw [UnboundedOperator.ext_iff, closure_toLinearPMap]
   apply eq_of_eq_graph
   rw [← IsClosable.graph_closure_eq_closure_graph U.is_closable]
@@ -133,7 +158,7 @@ lemma isClosed_def : IsClosed U ↔ U.closure = U := by
 end
 
 /-!
-## D. Adjoint
+## E. Adjoint
 -/
 
 section
@@ -231,7 +256,7 @@ lemma closure_mono {U₁ U₂ : UnboundedOperator H H'} (h : U₁ ≤ U₂) : U�
 end
 
 /-!
-## E. Symmetric operators
+## F. Symmetric operators
 -/
 
 section
@@ -258,24 +283,6 @@ lemma ofSymmetric_apply (ψ : E) : (ofSymmetric hE hf) ψ = E.subtype (f ψ) := 
 /-- `T` is symmetric if `⟪T x, y⟫ = ⟪x, T y⟫` for all `x,y ∈ T.domain`. -/
 def IsSymmetric : Prop := ∀ x y : T.domain, ⟪T x, y⟫_ℂ = ⟪(x : H), T y⟫_ℂ
 
-lemma inner_map_polarization (x y : T.domain) :
-    ⟪T x, ↑y⟫_ℂ = (⟪T (x + y), ↑(x + y)⟫_ℂ - ⟪T (x - y), ↑(x - y)⟫_ℂ
-    - Complex.I * ⟪T (x + Complex.I • y), ↑(x + Complex.I • y)⟫_ℂ
-    + Complex.I * ⟪T (x - Complex.I • y), ↑(x - Complex.I • y)⟫_ℂ) / 4 := by
-  simp only [LinearPMap.map_add, coe_add, inner_add_right, inner_add_left, LinearPMap.map_sub,
-    AddSubgroupClass.coe_sub, inner_sub_right, inner_sub_left, LinearPMap.map_smul,
-    SetLike.val_smul, inner_smul_left, Complex.conj_I, inner_smul_right]
-  grind [Complex.I_sq]
-
-lemma inner_map_polarization' (x y : T.domain) :
-    ⟪↑x, T y⟫_ℂ = (⟪↑(x + y), T (x + y)⟫_ℂ - ⟪↑(x - y), T (x - y)⟫_ℂ
-    - Complex.I * ⟪↑(x + Complex.I • y), T (x + Complex.I • y)⟫_ℂ
-    + Complex.I * ⟪↑(x - Complex.I • y), T (x - Complex.I • y)⟫_ℂ) / 4 := by
-  simp only [coe_add, LinearPMap.map_add, inner_add_right, inner_add_left, AddSubgroupClass.coe_sub,
-    LinearPMap.map_sub, inner_sub_right, inner_sub_left, SetLike.val_smul, LinearPMap.map_smul,
-    inner_smul_left, Complex.conj_I, inner_smul_right]
-  grind [Complex.I_sq]
-
 lemma isSymmetric_iff_inner_map_self_real :
     IsSymmetric T ↔ ∀ x : T.domain, (starRingEnd ℂ) ⟪T x, x⟫_ℂ = ⟪T x, x⟫_ℂ := by
   simp only [inner_conj_symm]
@@ -295,7 +302,7 @@ lemma isSymmetric_iff_le_adjoint : IsSymmetric T ↔ T ≤ T† := by
 end
 
 /-!
-## F. Self-adjoint operators
+## G. Self-adjoint operators
 -/
 
 section
@@ -333,7 +340,7 @@ lemma isSelfAdjoint_isEssentiallySelfAdjoint {T : UnboundedOperator H H} (hT : I
 end
 
 /-!
-## G. Generalized eigenvectors
+## H. Generalized eigenvectors
 -/
 
 section
