@@ -146,30 +146,26 @@ lemma angularMomentum_commutation_lrl (ε : ℝˣ) (i j k : Fin H.d) :
     angularMomentum_commutation_radiusRegPow,
     angularMomentum_commutation_position]
   dsimp only [kroneckerDelta]
-  simp only [comp_sub, comp_smul, sub_comp, smul_comp, comp_zero, zero_comp, add_zero,
-    smul_sub, smul_add, smul_smul, comp_add, neg_comp, comp_neg, smul_neg]
+  simp only [comp_sub, comp_smul, zero_comp, add_zero,
+    smul_sub, smul_add, smul_smul]
   simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib]
   simp only [Nat.cast_ite, Nat.cast_one, CharP.cast_eq_zero, mul_ite, mul_one, mul_zero,
     ite_smul, zero_smul, smul_ite, smul_zero,
-    Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+    Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
   rw [angularMomentumOperator_antisymm k i, angularMomentumOperator_antisymm k j]
-  simp only [neg_comp, comp_neg, smul_neg, neg_neg]
+  simp only [neg_comp, smul_neg]
   have ite_comp_right : ∀ (p : Prop) [Decidable p]
       (A B : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ)),
       (if p then A else 0).comp B = if p then A.comp B else 0 :=
     fun p _ A B ↦ by split_ifs <;> simp
-  have neg_ite_zero : ∀ (p : Prop) [Decidable p]
-      (A : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ)),
-      -(if p then A else 0) = if p then -A else 0 :=
-    fun p _ A ↦ by split_ifs <;> simp
-  simp only [ite_comp_right, neg_ite_zero,
-    sub_comp, add_comp, smul_comp, zero_comp, neg_comp,
+  simp only [ite_comp_right,
+    sub_comp, add_comp, smul_comp,
     Finset.sum_add_distrib, Finset.sum_sub_distrib,
-    Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+    Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
   rw [angularMomentumOperator_antisymm i k, angularMomentumOperator_antisymm j k]
-  simp only [neg_comp, comp_neg, smul_neg, neg_neg, angularMomentumOperator_eq_zero, zero_comp]
+  simp only [neg_comp, smul_neg, neg_neg]
   split_ifs with hik hjk <;>
-    simp_all only [smul_zero, sub_zero, zero_sub, zero_smul, mul_zero, zero_mul,
+    simp_all only [smul_zero, sub_zero, zero_sub, zero_smul, zero_mul,
       Finset.sum_const_zero, add_zero, sub_self, neg_zero, neg_neg,
       ← Finset.smul_sum, angularMomentumOperator_eq_zero, zero_comp] <;>
     (try simp only [smul_comm (H.m * H.k) (Complex.I * ↑↑ℏ)]) <;>
