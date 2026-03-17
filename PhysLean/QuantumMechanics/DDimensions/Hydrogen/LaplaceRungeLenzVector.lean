@@ -496,42 +496,43 @@ private lemma xL_Lx_eq {d : ℕ} (ε : ℝˣ) (i : Fin d) : ∑ j, (𝐱[j] ∘L
           Function.comp_apply, SchwartzMap.add_apply, SchwartzMap.sub_apply]
         ring
       _ = 𝐱[j] ∘L 𝐩[j] ∘L 𝐱[i] + 𝐱[i] ∘L 𝐱[j] ∘L 𝐩[j] - (2 : ℝ) • 𝐱[j] ∘L 𝐱[j] ∘L 𝐩[i]
-          + (2 * Complex.I * ℏ * δ[i,j]) • 𝐱[j] - (Complex.I * ℏ) • 𝐱[i] := by
+          + (2 * Complex.I * ℏ) • δ[i,j] • 𝐱[j] - (Complex.I * ℏ) • 𝐱[i] := by
         rw [comp_eq_comp_add_commute 𝐱[i] 𝐩[j], position_commutation_momentum]
         rw [comp_eq_comp_sub_commute 𝐩[i] 𝐱[j], position_commutation_momentum]
         rw [comp_eq_comp_add_commute 𝐱[j] 𝐩[j], position_commutation_momentum]
         rw [symm j i, eq_one_of_same]
-        ext ψ x
-        sorry
+        ext
+        simp only [nsmul_eq_mul, comp_add, comp_smulₛₗ, RingHom.id_apply, comp_sub, coe_sub',
+          coe_comp', coe_smul', coe_mul, coe_id', CompTriple.comp_eq, Pi.sub_apply,
+          ContinuousLinearMap.add_apply, Function.comp_apply, Pi.smul_apply, natCast_apply,
+          map_smul_of_tower, SchwartzMap.sub_apply, SchwartzMap.add_apply, positionOperator_apply,
+          momentumOperator_apply, neg_mul, mul_neg, SchwartzMap.smul_apply, smul_eq_mul,
+          sub_neg_eq_add, one_smul, comp_id, smul_neg, real_smul, ofReal_ofNat]
+        ring
       _ = 𝐱[j] ∘L 𝐩[j] ∘L 𝐱[i] + 𝐱[j] ∘L 𝐱[i] ∘L 𝐩[j] - (2 : ℝ) • 𝐱[j] ∘L 𝐱[j] ∘L 𝐩[i]
-          + (2 * Complex.I * ℏ * δ[i,j]) • 𝐱[j] - (Complex.I * ℏ) • 𝐱[i] := by
+          + (2 * Complex.I * ℏ) • δ[i,j] • 𝐱[j] - (Complex.I * ℏ) • 𝐱[i] := by
         nth_rw 2 [← comp_assoc]
         rw [position_comp_commute i j, comp_assoc]
       _ = (2 : ℝ) • (𝐱[j] ∘L 𝐩[j]) ∘L 𝐱[i] - (2 : ℝ) • (𝐱[j] ∘L 𝐱[j]) ∘L 𝐩[i]
-          + (3 * Complex.I * ℏ * δ[i,j]) • 𝐱[j] - (Complex.I * ℏ) • 𝐱[i] := by
+          + (3 * Complex.I * ℏ) • δ[i,j] • 𝐱[j] - (Complex.I * ℏ) • 𝐱[i] := by
         rw [comp_eq_comp_add_commute 𝐱[i] 𝐩[j], position_commutation_momentum]
-        ext ψ x
-        sorry
+        ext
+        simp only [nsmul_eq_mul, comp_add, comp_smulₛₗ, RingHom.id_apply, coe_sub', coe_smul',
+          Pi.sub_apply, ContinuousLinearMap.add_apply, coe_comp', Function.comp_apply, coe_mul,
+          coe_id', CompTriple.comp_eq, Pi.smul_apply, natCast_apply, map_smul_of_tower,
+          SchwartzMap.sub_apply, SchwartzMap.add_apply, positionOperator_apply,
+          momentumOperator_apply, neg_mul, mul_neg, SchwartzMap.smul_apply, smul_eq_mul, smul_neg,
+          real_smul, ofReal_ofNat, sub_neg_eq_add, sub_left_inj]
+        ring
   simp only [Finset.sum_sub_distrib, Finset.sum_add_distrib, ← Finset.smul_sum, ← finset_sum_comp]
-  rw [positionOperatorSqr_eq ε, sub_comp, smul_comp]
-
-  unfold kroneckerDelta
-  ext ψ x
-  simp only [ContinuousLinearMap.sub_apply, ContinuousLinearMap.add_apply,
-    ContinuousLinearMap.smul_apply, ContinuousLinearMap.sum_apply, SchwartzMap.sub_apply,
-    SchwartzMap.add_apply, SchwartzMap.smul_apply, SchwartzMap.sum_apply]
-  simp only [coe_comp', coe_sum', Function.comp_apply, Finset.sum_apply, SchwartzMap.sum_apply,
-    positionOperator_apply, momentumOperator_apply, neg_mul, mul_neg, Finset.sum_neg_distrib,
-    smul_neg, Complex.real_smul, Complex.ofReal_ofNat, radiusRegPowOperator_apply, ne_eq,
-    OfNat.ofNat_ne_zero, not_false_eq_true, div_self, Real.rpow_one, Complex.ofReal_add,
-    Complex.ofReal_pow, id_comp, sub_neg_eq_add, smul_add, Nat.cast_ite, Nat.cast_one,
-    CharP.cast_eq_zero, mul_ite, mul_one, mul_zero, smul_eq_mul, ite_mul, zero_mul,
-    Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Finset.sum_const, Finset.card_univ,
-    Fintype.card_fin, nsmul_eq_mul, Complex.ofReal_mul]
+  rw [positionOperatorSqr_eq ε, sub_comp, smul_comp, sum_smul, id_comp]
+  simp only [smul_sub, ← sub_add, smul_smul, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+    ← Nat.cast_smul_eq_nsmul ℂ]
+  simp only [sub_eq_add_neg, add_assoc, ← neg_smul, ← add_smul]
+  congr
   ring
 
 /-- `⁅𝐇(ε), 𝐀(ε)ᵢ⁆ = iℏkε²(¾𝐫(ε)⁻⁵(𝐱ⱼ𝐋ᵢⱼ + 𝐋ᵢⱼ𝐱ⱼ) + 3iℏ/2 𝐫(ε)⁻⁵𝐱ᵢ + 𝐫(ε)⁻³𝐩ᵢ)` -/
-@[sorryful]
 lemma hamiltonianReg_commutation_lrl (ε : ℝˣ) (i : Fin H.d) :
     ⁅H.hamiltonianReg ε, H.lrlOperator ε i⁆ = (Complex.I * ℏ * H.k * ε.1 ^ 2) •
     ((3 * 4⁻¹ : ℝ) • 𝐫[ε,-5] ∘L ∑ j, (𝐱[j] ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐱[j])
