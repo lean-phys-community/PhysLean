@@ -65,18 +65,20 @@ lemma trans (h12 : Perm φsΛ₁ φsΛ₂) (h23 : Perm φsΛ₂ φsΛ₃) :
   rw [Perm] at h12 h23 ⊢
   exact h12.trans h23
 
-/-- If `Perm φsΛ₁ φsΛ₂` then if `φsΛ₁` is a full Wick contraction
-  then `φsΛ₂` is a full Wick contraction..
-
-Implementation note: Please contact JTS before attempting this. -/
+/-- If `Perm φsΛ₁ φsΛ₂` and both contractions are grading-compliant,
+  then if `φsΛ₁` is a full Wick contraction, so is `φsΛ₂`. -/
 @[sorryful]
-lemma isFull_of_isFull (h : Perm φsΛ₁ φsΛ₂) (hf : IsFull φsΛ₁) : IsFull φsΛ₂ := by
+lemma isFull_of_isFull (h : Perm φsΛ₁ φsΛ₂)
+    (h₁ : GradingCompliant φs φsΛ₁) (h₂ : GradingCompliant φs φsΛ₂)
+    (hf : IsFull φsΛ₁) : IsFull φsΛ₂ := by
   sorry
 
-/-- If `Perm φsΛ₁ φsΛ₂` then the uncontracted lists of
-  `φsΛ₁` and `φsΛ₂` are permutations of each other. -/
+/-- If `Perm φsΛ₁ φsΛ₂` and both contractions are grading-compliant,
+  then their uncontracted lists are permutations of each other. -/
 @[sorryful]
-lemma perm_uncontractedList (h : Perm φsΛ₁ φsΛ₂) : [φsΛ₁]ᵘᶜ.Perm [φsΛ₂]ᵘᶜ := by
+lemma perm_uncontractedList (h : Perm φsΛ₁ φsΛ₂)
+    (h₁ : GradingCompliant φs φsΛ₁) (h₂ : GradingCompliant φs φsΛ₂) :
+    [φsΛ₁]ᵘᶜ.Perm [φsΛ₂]ᵘᶜ := by
   sorry
 
 end Perm
