@@ -310,10 +310,10 @@ lemma isSelfAdjoint_iff : IsSelfAdjoint T ↔ IsSelfAdjoint T.toLinearPMap := by
   rw [isSelfAdjoint_def, LinearPMap.isSelfAdjoint_def, ← adjoint_toLinearPMap,
     UnboundedOperator.ext_iff]
 
-lemma isSelfAdjoint_isClosed {T : UnboundedOperator H H} (hT : IsSelfAdjoint T) : IsClosed T :=
+lemma isClosed_of_isSelfAdjoint {T : UnboundedOperator H H} (hT : IsSelfAdjoint T) : IsClosed T :=
   hT ▸ adjoint_isClosed T
 
-lemma isSelfAdjoint_isSymmetric {T : UnboundedOperator H H} (hT : IsSelfAdjoint T) :
+lemma isSymmetric_of_isSelfAdjoint {T : UnboundedOperator H H} (hT : IsSelfAdjoint T) :
     IsSymmetric T := by
   rw [isSymmetric_iff_le_adjoint]
   exact ge_of_eq hT
