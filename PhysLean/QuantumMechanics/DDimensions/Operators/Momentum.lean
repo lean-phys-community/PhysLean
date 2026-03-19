@@ -116,57 +116,38 @@ lemma momentumOperatorSchwartz_isSymmetric :
     Complex.conj_ofReal, neg_neg, mul_neg]
   rw [integral_neg]
   simp_rw [show ∀ x : Space d, Complex.I * ↑↑ℏ *
-    (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x =
-    (Complex.I * ↑↑ℏ) *
-    ((starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x) from
-    fun x => by ring]
-  simp_rw [show ∀ x : Space d, (starRingEnd ℂ) (f x) *
-    (Complex.I * ↑↑ℏ * Space.deriv i (⇑f') x) =
-    (Complex.I * ↑↑ℏ) *
-    ((starRingEnd ℂ) (f x) * Space.deriv i (⇑f') x) from
-    fun x => by ring]
-  rw [integral_const_mul, integral_const_mul, neg_mul_eq_mul_neg]
-  congr 1
-  let derivS (j : Fin d) (g : 𝓢(Space d, ℂ)) : 𝓢(Space d, ℂ) :=
-    (SchwartzMap.evalCLM ℂ (Space d) ℂ (basis j))
-      ((SchwartzMap.fderivCLM ℂ (Space d) ℂ) g)
-  have hstar_fderiv : ∀ x : Space d,
-      (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x =
-      fderiv ℝ (fun y => star (f y)) x (basis i) * f' x := by
-    intro x; congr 1
-    change star (fderiv ℝ (⇑f) x (basis i)) = _
+    (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x = (Complex.I * ↑↑ℏ) *
+    ((starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x) from fun x => by ring,
+    show ∀ x : Space d, (starRingEnd ℂ) (f x) *
+    (Complex.I * ↑↑ℏ * Space.deriv i (⇑f') x) = (Complex.I * ↑↑ℏ) *
+    ((starRingEnd ℂ) (f x) * Space.deriv i (⇑f') x) from fun x => by ring]
+  rw [integral_const_mul, integral_const_mul, neg_mul_eq_mul_neg]; congr 1
+  let dS (g : 𝓢(Space d, ℂ)) :=
+    (SchwartzMap.evalCLM ℂ _ ℂ (basis i)) ((SchwartzMap.fderivCLM ℂ _ ℂ) g)
+  have hsd : ∀ x, (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x =
+      fderiv ℝ (fun y => star (f y)) x (basis i) * f' x := fun x => by
+    congr 1; change star (fderiv ℝ (⇑f) x (basis i)) = _
     rw [fderiv_star (𝕜 := ℝ)]; simp
-  simp_rw [hstar_fderiv]
-  change ∫ x, fderiv ℝ (fun y => star (f y)) x (basis i) *
-    f' x = -(∫ x, star (f x) *
-    fderiv ℝ (⇑f') x (basis i))
+  simp_rw [hsd]
+  change ∫ x, fderiv ℝ (fun y => star (f y)) x (basis i) * f' x =
+    -(∫ x, star (f x) * fderiv ℝ (⇑f') x (basis i))
   have ibp := integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable
-    (f := fun x => star (f x)) (g := ⇑f') (v := basis i)
-    (μ := volume) (hf'g := ?_) (hfg' := ?_) (hfg := ?_)
-    (Differentiable.star (SchwartzMap.differentiable f))
-    (SchwartzMap.differentiable f')
+    (f := fun x => star (f x)) (g := ⇑f') (v := basis i) (μ := volume)
+    (hf'g := ?_) (hfg' := ?_) (hfg := ?_)
+    (.star (SchwartzMap.differentiable f)) (SchwartzMap.differentiable f')
   · rw [ibp, neg_neg]
-  · have h : ∀ x, (fderiv ℝ (fun x => star (f x)) x)
-        (basis i) = star ((derivS i f) x) := by
-      intro x; rw [fderiv_star (𝕜 := ℝ)]; simp [derivS]
-    simp_rw [h]
-    exact Integrable.mul_of_top_left
-      ((ContinuousLinearEquiv.integrable_comp_iff
-        (starL' ℝ : ℂ ≃L[ℝ] ℂ)).mpr
-        (SchwartzMap.integrable (derivS i f)))
+  · have h : ∀ x, (fderiv ℝ (fun x => star (f x)) x) (basis i) =
+        star ((dS f) x) := fun x => by
+      rw [fderiv_star (𝕜 := ℝ)]; simp [dS]
+    simp_rw [h]; exact .mul_of_top_left
+      (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable _))
       (SchwartzMap.memLp_top f' volume)
-  · have h : ∀ x, (fderiv ℝ (⇑f') x) (basis i) =
-        (derivS i f') x := fun _ => rfl
-    simp_rw [h]
-    exact Integrable.mul_of_top_left
-      ((ContinuousLinearEquiv.integrable_comp_iff
-        (starL' ℝ : ℂ ≃L[ℝ] ℂ)).mpr
-        (SchwartzMap.integrable f))
-      (SchwartzMap.memLp_top (derivS i f') volume)
-  · exact Integrable.mul_of_top_left
-      ((ContinuousLinearEquiv.integrable_comp_iff
-        (starL' ℝ : ℂ ≃L[ℝ] ℂ)).mpr
-        (SchwartzMap.integrable f))
+  · have h : ∀ x, (fderiv ℝ (⇑f') x) (basis i) = (dS f') x := fun _ => rfl
+    simp_rw [h]; exact .mul_of_top_left
+      (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable f))
+      (SchwartzMap.memLp_top _ volume)
+  · exact .mul_of_top_left
+      (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable f))
       (SchwartzMap.memLp_top f' volume)
 
 /-- The symmetric momentum unbounded operators with domain the Schwartz
