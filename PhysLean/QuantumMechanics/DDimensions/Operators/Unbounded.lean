@@ -230,6 +230,33 @@ noncomputable instance : AddZeroClass (UnboundedOperator H H') where
     rw [← add_zero U.toLinearPMap]
     exact add_toLinearPMap_of_dense_closable (by simp [U.dense_domain]) (by simp [U.is_closable])
 
+lemma add_assoc {U₁ U₂ U₃ : UnboundedOperator H H'}
+    (hD : Dense (U₁.domain ⊓ U₂.domain ⊓ U₃.domain : Set H)) (hC₁₂ : (U₁.1 + U₂.1).IsClosable)
+    (hC₂₃ : (U₂.1 + U₃.1).IsClosable) : U₁ + U₂ + U₃ = U₁ + (U₂ + U₃) := by
+  have hD' : Dense (U₁.domain ⊓ (U₂.domain ⊓ U₃.domain) : Set H) := by simp_all [Set.inter_assoc]
+  have hD₁₂ : Dense (U₁.domain ⊓ U₂.domain : Set H) := Dense.mono Set.inter_subset_left hD
+  have hD₂₃ : Dense (U₂.domain ⊓ U₃.domain : Set H) := Dense.mono Set.inter_subset_right hD'
+  have hD₁₂' : (U₁ + U₂).domain = U₁.domain ⊓ U₂.domain := add_domain_of_dense hD₁₂
+  have hD₂₃' : (U₂ + U₃).domain = U₂.domain ⊓ U₃.domain := add_domain_of_dense hD₂₃
+  have hD₁₂'' : Dense ((U₁ + U₂).domain ⊓ U₃.domain : Set H) := hD₁₂' ▸ hD
+  have hD₂₃'' : Dense (U₁.domain ⊓ (U₂ + U₃).domain : Set H) := hD₂₃' ▸ hD'
+  have h₁₂ : (U₁ + U₂).1 = U₁.1 + U₂.1 := add_toLinearPMap_of_dense_closable hD₁₂ hC₁₂
+  have h₂₃ : (U₂ + U₃).1 = U₂.1 + U₃.1 := add_toLinearPMap_of_dense_closable hD₂₃ hC₂₃
+  apply UnboundedOperator.ext
+  by_cases hC : (U₁.1 + U₂.1 + U₃.1).IsClosable
+  · have hC' : (U₁.1 + (U₂.1 + U₃.1)).IsClosable := by grind
+    have h12 := add_toLinearPMap_of_dense_closable hD₁₂ hC₁₂ ▸ hC
+    have h23 := add_toLinearPMap_of_dense_closable hD₂₃ hC₂₃ ▸ hC'
+    rw [add_toLinearPMap_of_dense_closable hD₁₂'' h12]
+    rw [add_toLinearPMap_of_dense_closable hD₂₃'' h23]
+    grind
+  · have hC' : ¬(U₁.1 + (U₂.1 + U₃.1)).IsClosable := by grind
+    rw [add_toLinearPMap_of_dense_not_closable hD₁₂'' (h₁₂ ▸ hC)]
+    rw [add_toLinearPMap_of_dense_not_closable hD₂₃'' (h₂₃ ▸ hC')]
+    ext
+    · simp [hD₁₂', hD₂₃', and_assoc]
+    · simp
+
 end
 
 /-!
