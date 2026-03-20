@@ -76,7 +76,7 @@ syntax num : indexExpr
 /-- Notation to describe the jiggle of a tensor index. -/
 syntax "τ(" ident ")" : indexExpr
 
-/-- Notation to describe the evaulation of a tensor index. -/
+/-- Notation to describe the evaluation of a tensor index. -/
 syntax "[" ident "]" : indexExpr
 
 /-- Bool which is true if an index is a num. -/
