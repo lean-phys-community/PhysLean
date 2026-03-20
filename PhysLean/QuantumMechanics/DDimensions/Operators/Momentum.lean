@@ -113,35 +113,26 @@ lemma momentumOperatorSchwartz_isSymmetric :
     ContinuousLinearMap.coe_coe, Function.comp_apply, LinearEquiv.symm_apply_apply,
     schwartzEquiv_inner, momentumOperator_apply, neg_mul, map_neg, map_mul, Complex.conj_I,
     Complex.conj_ofReal, neg_neg, mul_neg, integral_neg]
-  simp_rw [show ∀ x : Space d, Complex.I * ↑↑ℏ *
-    (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x = (Complex.I * ↑↑ℏ) *
-    ((starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x) from fun x => by ring,
-    show ∀ x : Space d, (starRingEnd ℂ) (f x) *
-    (Complex.I * ↑↑ℏ * Space.deriv i (⇑f') x) = (Complex.I * ↑↑ℏ) *
-    ((starRingEnd ℂ) (f x) * Space.deriv i (⇑f') x) from fun x => by ring]
-  rw [integral_const_mul, integral_const_mul, neg_mul_eq_mul_neg]; congr 1
+  field_simp
+  simp only [Space.deriv_eq, mul_assoc, integral_const_mul, neg_mul_eq_mul_neg, ]
+  congr 2
   let dS (g : 𝓢(Space d, ℂ)) :=
     (SchwartzMap.evalCLM ℂ _ ℂ (basis i)) ((SchwartzMap.fderivCLM ℂ _ ℂ) g)
-  have hsd : ∀ x, (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x =
-      fderiv ℝ (fun y => star (f y)) x (basis i) * f' x := fun x => by
-    congr 1; change star (fderiv ℝ (⇑f) x (basis i)) = _
-    rw [fderiv_star (𝕜 := ℝ)]; simp
-  simp_rw [hsd]
-  change ∫ x, fderiv ℝ (fun y => star (f y)) x (basis i) * f' x =
-    -(∫ x, star (f x) * fderiv ℝ (⇑f') x (basis i))
-  have ibp := integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable
-    (f := fun x => star (f x)) (g := ⇑f') (v := basis i) (μ := volume)
-    (hf'g := ?_) (hfg' := ?_) (hfg := ?_)
-    (.star (SchwartzMap.differentiable f)) (SchwartzMap.differentiable f')
-  · rw [ibp, neg_neg]
+  simp only [starRingEnd_apply]
+  rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable _ _ _
+    (.star (SchwartzMap.differentiable f))  (SchwartzMap.differentiable f'), neg_neg]
+  · simp only [fderiv_star]
+    rfl
   · have h : ∀ x, (fderiv ℝ (fun x => star (f x)) x) (basis i) =
         star ((dS f) x) := fun x => by
       rw [fderiv_star (𝕜 := ℝ)]; simp [dS]
-    simp_rw [h]; exact .mul_of_top_left
+    simp_rw [h]
+    exact .mul_of_top_left
       (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable _))
       (SchwartzMap.memLp_top f' volume)
   · have h : ∀ x, (fderiv ℝ (⇑f') x) (basis i) = (dS f') x := fun _ => rfl
-    simp_rw [h]; exact .mul_of_top_left
+    simp_rw [h]
+    exact .mul_of_top_left
       (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable f))
       (SchwartzMap.memLp_top _ volume)
   · exact .mul_of_top_left
