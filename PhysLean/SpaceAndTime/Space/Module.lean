@@ -723,7 +723,7 @@ lemma fderiv_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
   ext s ds i
   change fderiv ℝ (fun s => v +ᵥ s) s ds i = _
   rw [fderiv_space_components]
-  simp
+  simp only [vadd_apply, fderiv_const_add, ContinuousLinearMap.coe_id', id_eq]
   trans fderiv ℝ (coordCLM i) s ds
   · congr
     ext j
@@ -740,7 +740,7 @@ lemma vadd_hasTemperateGrowth {d} (v : EuclideanSpace ℝ (Fin d)) :
     simp
   · fun_prop
   · intro x
-    simp
+    simp only [pow_one]
     apply (norm_vadd_le_add _ _).trans
     have : 0 ≤ ‖v‖ := by positivity
     have : 0 ≤ ‖x‖ := by positivity
