@@ -114,12 +114,10 @@ lemma momentumOperatorSchwartz_isSymmetric :
     schwartzEquiv_inner, momentumOperator_apply, neg_mul, map_neg, map_mul, Complex.conj_I,
     Complex.conj_ofReal, neg_neg, mul_neg, integral_neg]
   field_simp
-  simp only [Space.deriv_eq, mul_assoc, integral_const_mul, neg_mul_eq_mul_neg]
+  simp only [Space.deriv_eq, mul_assoc, integral_const_mul, neg_mul_eq_mul_neg, starRingEnd_apply]
   congr 2
-  simp only [starRingEnd_apply]
-  rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable _ _ _
-    (.star f.differentiable) f'.differentiable, neg_neg]
-  · simp only [fderiv_star]
+  rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable _ _ _ (by fun_prop) (by fun_prop)]
+  · simp only [neg_neg, fderiv_star]
     rfl
   · simp only [fderiv_star]
     exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr
