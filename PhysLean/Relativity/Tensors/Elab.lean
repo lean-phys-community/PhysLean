@@ -85,6 +85,7 @@ def indexExprIsNum (stx : Syntax) : Bool :=
   | `(indexExpr|$_:num) => true
   | _ => false
 
+/-- Bool which is true if an index is evaluated bracket `[μ]`. -/
 def indexExprIsBracketEval(stx : Syntax) : Bool :=
   match stx with
   | `(indexExpr|[$_]) => true
@@ -154,6 +155,13 @@ def getEvalPos (ind : List (TSyntax `indexExpr)) : TermElabM (List (ℕ × ℕ))
   let pos := evalAdjustPos (evals.map (fun x => x.2))
   return List.zip pos evals2
 
+/-- For list of `indexExpr` e.g. `[α, 3, β, 2, [γ]]`, `getEvalPos`
+  returns a list of pairs `ℕ × Term` related to indices which are evaluated
+  e.g. `[μ]`.
+  The second element of each pair is the value corresponding to that index.
+  The first element is the position of that number in the list of indices when
+  all other numbered indices before it are removed. Thus for the example given
+  `getEvalBracketPos` outputs `[(4, γ)]`. -/
 def getEvalBracketPos (ind : List (TSyntax `indexExpr)) : TermElabM (List (ℕ × Term)) := do
   let indEnum := ind.zipIdx
   let evals := indEnum.filter (fun x => indexExprIsBracketEval x.1)
@@ -406,6 +414,16 @@ def evalTermMap (l : List (ℕ × ℕ)) (T : Term) : Term :=
   l.foldl (fun T' (x1, x2) => Syntax.mkApp (mkIdent ``Tensor.evalT)
     #[Syntax.mkNumLit (toString x1), Syntax.mkNumLit (toString x2), T']) T
 
+/-- Given a list `l` of pairs `ℕ × Term` and a term `T` corresponding to a tensor tree,
+  for each `(a, b)` in `l`, `evalSyntax` applies `TensorTree.eval a b` to `T` recursively.
+  Here `a` is the position of the index to be evaluated and
+  `b` is the value it is evaluated to from the `[μ]` syntax.
+
+  For example, if `l` is `[(1, μ), (1, ν)]` and `T` is a tensor tree then `evalSyntax l T`
+  is `TensorTree.eval 1 ν (TensorTree.eval 1 μ T)`.
+
+  The list `l` is expected to be the output of `getEvalBracketPos`.
+-/
 def evalTermBracketMap (l : List (ℕ × Term)) (T : Term) : Term :=
   l.foldl (fun T' (x1, x2) => Syntax.mkApp (mkIdent ``Tensor.evalT)
     #[Syntax.mkNumLit (toString x1), x2, T']) T
