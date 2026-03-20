@@ -114,30 +114,21 @@ lemma momentumOperatorSchwartz_isSymmetric :
     schwartzEquiv_inner, momentumOperator_apply, neg_mul, map_neg, map_mul, Complex.conj_I,
     Complex.conj_ofReal, neg_neg, mul_neg, integral_neg]
   field_simp
-  simp only [Space.deriv_eq, mul_assoc, integral_const_mul, neg_mul_eq_mul_neg, ]
+  simp only [Space.deriv_eq, mul_assoc, integral_const_mul, neg_mul_eq_mul_neg]
   congr 2
-  let dS (g : 𝓢(Space d, ℂ)) :=
-    (SchwartzMap.evalCLM ℂ _ ℂ (basis i)) ((SchwartzMap.fderivCLM ℂ _ ℂ) g)
   simp only [starRingEnd_apply]
   rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable _ _ _
-    (.star (SchwartzMap.differentiable f))  (SchwartzMap.differentiable f'), neg_neg]
+    (.star f.differentiable) f'.differentiable, neg_neg]
   · simp only [fderiv_star]
     rfl
-  · have h : ∀ x, (fderiv ℝ (fun x => star (f x)) x) (basis i) =
-        star ((dS f) x) := fun x => by
-      rw [fderiv_star (𝕜 := ℝ)]; simp [dS]
-    simp_rw [h]
-    exact .mul_of_top_left
-      (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable _))
+  · simp only [fderiv_star]
+    exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr
+        ((f.fderivCLM ℂ _ ℂ).evalCLM ℂ _ ℂ (basis i)).integrable)
       (SchwartzMap.memLp_top f' volume)
-  · have h : ∀ x, (fderiv ℝ (⇑f') x) (basis i) = (dS f') x := fun _ => rfl
-    simp_rw [h]
-    exact .mul_of_top_left
-      (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable f))
-      (SchwartzMap.memLp_top _ volume)
-  · exact .mul_of_top_left
-      (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr (SchwartzMap.integrable f))
-      (SchwartzMap.memLp_top f' volume)
+  · exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr f.integrable)
+      (((f'.fderivCLM ℂ _ ℂ).evalCLM ℂ _ ℂ (basis i)).memLp_top volume)
+  · exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr f.integrable)
+      (f'.memLp_top volume)
 
 /-- The symmetric momentum unbounded operators with domain the Schwartz
   submodule of the Hilbert space. -/
