@@ -33,6 +33,9 @@ Definitions:
 
 - A. Definition
 - B. Basic identities
+- C. Instances
+  - C.1. Partial order
+  - C.2. Zero
 - C. Partial order
 - D. Closure
 - E. Adjoint
@@ -112,17 +115,49 @@ lemma inner_map_polarization' {T : UnboundedOperator H H} (x y : T.domain) :
 end
 
 /-!
-## C. Partial order
+## C. Instances
+-/
+
+section
+
+open Classical
+
+/-!
+### C.1. Partial order
 
 Unbounded operators inherit the structure of a poset from `LinearPMap`,
 but *not* that of a `SemilatticeInf` because `U₁.domain ⊓ U₂.domain` may not be dense.
 -/
 
-instance partialOrder : PartialOrder (UnboundedOperator H H') where
+instance : PartialOrder (UnboundedOperator H H') where
   le U₁ U₂ := U₁.toLinearPMap ≤ U₂.toLinearPMap
   le_refl _ := le_refl _
   le_trans _ _ _ h₁₂ h₂₃ := le_trans h₁₂ h₂₃
   le_antisymm _ _ h h' := ext <| le_antisymm h h'
+
+/-!
+### C.2. Zero
+-/
+
+-- A zero LinearPMap (any domain) is closable
+lemma isClosable_of_zero {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    [NormedAddCommGroup F] [InnerProductSpace ℂ F] {f : LinearPMap ℂ E F} (hf : f.toFun' = 0) :
+    f.IsClosable := by
+  use f.graph.topologicalClosure.toLinearPMap
+  refine Eq.symm <| toLinearPMap_graph_eq f.graph.topologicalClosure fun x hx _ ↦ ?_
+  obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp hx
+  have (n : ℕ) : (b n).2 = 0 := by specialize hb n; simp_all
+  rw [nhds_prod_eq, Filter.tendsto_prod_iff'] at hb'
+  simp_all
+
+instance : Zero (UnboundedOperator H H') := ⟨0, by simp, isClosable_of_zero rfl⟩
+
+@[simp]
+lemma zero_toLinearPMap : (0 : UnboundedOperator H H').toLinearPMap = 0 := rfl
+
+instance : Inhabited (UnboundedOperator H H') := ⟨instZero.zero⟩
+
+end
 
 /-!
 ## D. Closure
