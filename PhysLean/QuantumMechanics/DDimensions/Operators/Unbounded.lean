@@ -175,6 +175,7 @@ noncomputable instance : Add (UnboundedOperator H H') where
       else ⟨⟨U₁.domain ⊓ U₂.domain, 0⟩, hD, isClosable_of_zero rfl⟩
     else 0
 
+/-- The domain of `U₁ + U₂` is `D(U₁) ∩ D(U₂)` when it is dense. -/
 lemma add_domain_of_dense {U₁ U₂ : UnboundedOperator H H'}
     (hD : Dense (U₁.domain ⊓ U₂.domain : Set H)) : (U₁ + U₂).domain = U₁.domain ⊓ U₂.domain := by
   rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
@@ -182,6 +183,7 @@ lemma add_domain_of_dense {U₁ U₂ : UnboundedOperator H H'}
   · simp only [hD, hC, ↓reduceDIte, LinearPMap.add_domain]
   · simp only [hD, hC, ↓reduceDIte]
 
+/-- The junk value for `U₁ + U₂` has domain all of `H` when `D(U₁) ∩ D(U₂)` is not dense. -/
 lemma add_domain_of_not_dense {U₁ U₂ : UnboundedOperator H H'}
     (hD : ¬Dense (U₁.domain ⊓ U₂.domain : Set H)) : (U₁ + U₂).domain = ⊤ := by
   rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
@@ -192,6 +194,8 @@ lemma mem_domain_of_dense {U₁ U₂ : UnboundedOperator H H'}
     ↑ψ ∈ U₁.domain ∧ ↑ψ ∈ U₂.domain :=
   mem_inf.mp <| (add_domain_of_dense hD) ▸ ψ.2
 
+/-- `U₁ + U₂` is the unbounded operator corresponding to `U₁.toLinearPMap + U₂.toLinearPMap`,
+  provided it is both densely defined and closable. -/
 lemma add_toLinearPMap_of_dense_closable {U₁ U₂ : UnboundedOperator H H'}
     (hD : Dense (U₁.domain ⊓ U₂.domain : Set H))
     (hC : (U₁.toLinearPMap + U₂.toLinearPMap).IsClosable) :
@@ -199,6 +203,7 @@ lemma add_toLinearPMap_of_dense_closable {U₁ U₂ : UnboundedOperator H H'}
   rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
   simp only [hD, hC, ↓reduceDIte]
 
+/-- The junk value for `U₁ + U₂` when `D(U₁) ∩ D(U₂)` is dense and `U₁ + U₂` is not closable. -/
 lemma add_toLinearPMap_of_dense_not_closable {U₁ U₂ : UnboundedOperator H H'}
     (hD : Dense (U₁.domain ⊓ U₂.domain : Set H))
     (hC : ¬(U₁.toLinearPMap + U₂.toLinearPMap).IsClosable) :
@@ -206,11 +211,13 @@ lemma add_toLinearPMap_of_dense_not_closable {U₁ U₂ : UnboundedOperator H H'
   rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
   simp only [hD, hC, ↓reduceDIte]
 
+/-- The junk value for `U₁ + U₂` when `D(U₁) ∩ D(U₂)` is not dense. -/
 lemma add_toLinearPMap_of_not_dense {U₁ U₂ : UnboundedOperator H H'}
     (hD : ¬Dense (U₁.domain ⊓ U₂.domain : Set H)) : (U₁ + U₂).toLinearPMap = 0 := by
   rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
   simp only [hD, ↓reduceDIte, zero_toLinearPMap]
 
+/-- `(U₁ + U₂)ψ = U₁ψ + U₂ψ` provided `U₁ + U₂` is not given by a junk value. -/
 lemma add_apply_of_dense_closable {U₁ U₂ : UnboundedOperator H H'}
     (hD : Dense (U₁.domain ⊓ U₂.domain : Set H))
     (hC : (U₁.toLinearPMap + U₂.toLinearPMap).IsClosable) (ψ : (U₁ + U₂).domain) :
@@ -230,6 +237,8 @@ noncomputable instance : AddZeroClass (UnboundedOperator H H') where
     rw [← add_zero U.toLinearPMap]
     exact add_toLinearPMap_of_dense_closable (by simp [U.dense_domain]) (by simp [U.is_closable])
 
+/-- Addition of unbounded operators is associative when neither of the intermediate additions,
+  `U₁ + U₂` and `U₂ + U₃`, is given by a junk value. -/
 lemma add_assoc {U₁ U₂ U₃ : UnboundedOperator H H'}
     (hD₁₂ : Dense (U₁.domain ⊓ U₂.domain : Set H)) (hC₁₂ : (U₁.1 + U₂.1).IsClosable)
     (hD₂₃ : Dense (U₂.domain ⊓ U₃.domain : Set H)) (hC₂₃ : (U₂.1 + U₃.1).IsClosable) :
