@@ -9,6 +9,7 @@ public import PhysLean.QuantumMechanics.DDimensions.Operators.Unbounded
 public import PhysLean.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
 public import PhysLean.QuantumMechanics.PlanckConstant
 public import PhysLean.SpaceAndTime.Space.Derivatives.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Star
 /-!
 
 # Momentum operators
@@ -97,31 +98,42 @@ lemma momentumOperatorSqr_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
 
 -/
 
-open SpaceDHilbertSpace
+open SpaceDHilbertSpace MeasureTheory
 
 /-- The momentum operators defined on the Schwartz submodule. -/
 def momentumOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
   schwartzEquiv.toLinearMap ∘ₗ 𝐩[i].toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
-@[sorryful]
-lemma momentumOperatorSchwartz_isSymmetric : (momentumOperatorSchwartz i).IsSymmetric := by
+lemma momentumOperatorSchwartz_isSymmetric :
+    (momentumOperatorSchwartz i).IsSymmetric := by
   intro ψ ψ'
   obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
   obtain ⟨f', rfl⟩ := schwartzEquiv.surjective ψ'
-  unfold momentumOperatorSchwartz
-  simp only [LinearMap.coe_comp, LinearEquiv.coe_coe, ContinuousLinearMap.coe_coe,
-    Function.comp_apply, LinearEquiv.symm_apply_apply, schwartzEquiv_inner, momentumOperator_apply,
-    neg_mul, map_neg, map_mul, Complex.conj_I, Complex.conj_ofReal, neg_neg, mul_neg]
-  -- Need integration by parts and `starRingEnd ∂[i] = ∂[i] starRingEnd`:
-  -- ⊢ ∫ (x : Space d), Complex.I * ↑↑ℏ * (starRingEnd ℂ) (Space.deriv i (⇑f) x) * f' x =
-  -- ∫ (x : Space d), -((starRingEnd ℂ) (f x) * (Complex.I * ↑↑ℏ * Space.deriv i (⇑f') x))
-  sorry
+  simp only [momentumOperatorSchwartz, LinearMap.coe_comp, LinearEquiv.coe_coe,
+    ContinuousLinearMap.coe_coe, Function.comp_apply, LinearEquiv.symm_apply_apply,
+    schwartzEquiv_inner, momentumOperator_apply, neg_mul, map_neg, map_mul, Complex.conj_I,
+    Complex.conj_ofReal, neg_neg, mul_neg, integral_neg]
+  field_simp
+  simp only [Space.deriv_eq, mul_assoc, integral_const_mul, neg_mul_eq_mul_neg, starRingEnd_apply]
+  congr 2
+  rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable _ _ _ (by fun_prop) (by fun_prop)]
+  · simp only [neg_neg, fderiv_star]
+    rfl
+  · simp only [fderiv_star]
+    exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr
+        ((f.fderivCLM ℂ _ ℂ).evalCLM ℂ _ ℂ (basis i)).integrable)
+      (SchwartzMap.memLp_top f' volume)
+  · exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr f.integrable)
+      (((f'.fderivCLM ℂ _ ℂ).evalCLM ℂ _ ℂ (basis i)).memLp_top volume)
+  · exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr f.integrable)
+      (f'.memLp_top volume)
 
-/-- The symmetric momentum unbounded operators with domain the Schwartz submodule
-  of the Hilbert space. -/
-@[sorryful]
-def momentumUnboundedOperator : UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
-  UnboundedOperator.ofSymmetric (schwartzSubmodule_dense d) (momentumOperatorSchwartz_isSymmetric i)
+/-- The symmetric momentum unbounded operators with domain the Schwartz
+  submodule of the Hilbert space. -/
+def momentumUnboundedOperator :
+    UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
+  UnboundedOperator.ofSymmetric (schwartzSubmodule_dense d)
+    (momentumOperatorSchwartz_isSymmetric i)
 
 end
 end QuantumMechanics

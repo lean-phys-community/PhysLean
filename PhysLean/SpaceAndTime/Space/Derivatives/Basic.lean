@@ -79,6 +79,10 @@ lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
     deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
 
+lemma deriv_eq_fderiv_fun  [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
+    (μ : Fin d) (f : Space d → M) :
+    deriv μ f = fun x => fderiv ℝ (fun x => f x) x (basis μ) := by rfl
+
 lemma deriv_eq_fderiv_basis [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
     deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
@@ -99,6 +103,45 @@ lemma deriv_eq_mfderiv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     deriv μ f x = mfderiv 𝓘(ℝ, Space d) 𝓘(ℝ, M) f x (basis μ) := by
   rw [deriv_eq_fderiv_basis, ← mfderiv_eq_fderiv]
   rfl
+
+open Manifold in
+lemma mdifferentiable_manifoldStructure_iff_differentiable {M d} [NormedAddCommGroup M]
+    [NormedSpace ℝ M] {f : Space d → M} {x : Space d} :
+    MDifferentiableAt (Space.manifoldStructure d) 𝓘(ℝ, M) f x ↔ DifferentiableAt ℝ f x := by
+  constructor
+  · intro h
+    rw [← mdifferentiableAt_iff_differentiableAt]
+    apply h.comp (I' := Space.manifoldStructure d)
+    exact (modelDiffeo.symm.mdifferentiable  (WithTop.top_ne_zero)).mdifferentiableAt
+  · intro h
+    apply (mdifferentiableAt_iff_differentiableAt.mpr h).comp (I' := 𝓘(ℝ, Space d))
+    exact (modelDiffeo.mdifferentiable  (WithTop.top_ne_zero)).mdifferentiableAt
+
+
+TODO "3XMN6" "Make the version of the derivative described through
+  `deriv_eq_mfderiv_manifoldStructure` the definition of `deriv` and prove the
+  equivalence with the current definition, under suitable conditions."
+
+open Manifold in
+/-- The spatial-derivative in terms of the derivative of functions between
+  manifolds with the manifold structure `Space.manifoldStructure d`. -/
+lemma deriv_eq_mfderiv_manifoldStructure {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (μ : Fin d) (f : Space d → M) (x : Space d) :
+    deriv μ f x = mfderiv (Space.manifoldStructure d) 𝓘(ℝ, M) f x (EuclideanSpace.single μ 1) := by
+  by_cases hf : DifferentiableAt ℝ f x
+  · rw [deriv_eq_mfderiv]
+    change _ = mfderiv (Space.manifoldStructure d) 𝓘(ℝ, M)
+      (f ∘ modelDiffeo) x (EuclideanSpace.single μ 1)
+    rw [mfderiv_comp (I' := 𝓘(ℝ, Space d)) _ hf.mdifferentiableAt
+      (modelDiffeo.mdifferentiable WithTop.top_ne_zero).mdifferentiableAt]
+    simp only [Function.comp_apply, modelDiffeo_apply, mfderiv_eq_fderiv,
+      ContinuousLinearMap.coe_comp']
+    rw [basis_eq_mfderiv_modelDiffeo_single]
+    rfl
+  · rw [deriv_eq, fderiv_zero_of_not_differentiableAt hf,
+      mfderiv_zero_of_not_mdifferentiableAt <|
+      mdifferentiable_manifoldStructure_iff_differentiable.mp.mt hf]
+    simp
 
 /-!
 
@@ -122,7 +165,7 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) (μ : Fin d
 lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
-  unfold deriv
+  rw [deriv_eq_fderiv_fun]
   ext x
   rw [fderiv_add]
   rfl
@@ -133,7 +176,7 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     (∂[u] (fun x => f1 x i + f2 x i)) =
       (∂[u] (fun x => f1 x i)) + (∂[u] (fun x => f2 x i)) := by
-  unfold deriv
+  rw [deriv_eq_fderiv_fun, deriv_eq_fderiv_fun, deriv_eq_fderiv_fun]
   simp only
   ext x
   rw [fderiv_fun_add]
@@ -151,26 +194,23 @@ lemma deriv_smul [NormedAddCommGroup M] [NormedSpace ℝ M] [NontriviallyNormedF
     [NormedAlgebra ℝ 𝕜] [NormedSpace 𝕜 M] {c : Space d → 𝕜} {f : Space d → M}
     (hc : DifferentiableAt ℝ c x) (hf : DifferentiableAt ℝ f x) :
     ∂[u] (c • f) x = c x • ∂[u] f x + ∂[u] c x • f x := by
-  unfold deriv
-  rw [fderiv_smul hc hf]
+  rw [deriv_eq_fderiv_basis, deriv_eq_fderiv_basis, deriv_eq_fderiv_basis, fderiv_smul hc hf]
   rfl
 
 /-- Space derivatives on scalar times function. -/
 lemma deriv_const_smul [NormedAddCommGroup M] [NormedSpace ℝ M] [Semiring R]
     [Module R M] [SMulCommClass ℝ R M] [ContinuousConstSMul R M] {f : Space d → M} (c : R)
     (h : Differentiable ℝ f) : ∂[u] (c • f) = c • ∂[u] f := by
-  unfold deriv
+  rw [deriv_eq_fderiv_fun, deriv_eq_fderiv_fun]
   ext x
-  rw [fderiv_const_smul]
-  rw [ContinuousLinearMap.coe_smul', Pi.smul_apply, Pi.smul_apply]
+  rw [fderiv_const_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply, Pi.smul_apply]
   fun_prop
 
 /-- Coordinate-wise scalar multiplication on space derivatives. -/
 lemma deriv_coord_smul (f : Space d → EuclideanSpace ℝ (Fin d)) (k : ℝ)
     (hf : Differentiable ℝ f) :
     ∂[u] (fun x => k * f x i) x = k * ∂[u] (fun x => f x i) x := by
-  unfold deriv
-  rw [fderiv_const_mul]
+  rw [deriv_eq_fderiv_basis, deriv_eq_fderiv_basis, fderiv_const_mul]
   simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
   fun_prop
 
@@ -183,7 +223,7 @@ lemma deriv_coord_smul (f : Space d → EuclideanSpace ℝ (Fin d)) (k : ℝ)
 /-- Derivatives on space commute with one another. -/
 lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Space d → M) (hf : ContDiff ℝ 2 f) : ∂[u] (∂[v] f) = ∂[v] (∂[u] f) := by
-  unfold deriv
+  rw [deriv_eq_fderiv_fun, deriv_eq_fderiv_fun, deriv_eq_fderiv_fun, deriv_eq_fderiv_fun]
   ext x
   rw [fderiv_clm_apply, fderiv_clm_apply]
   simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,

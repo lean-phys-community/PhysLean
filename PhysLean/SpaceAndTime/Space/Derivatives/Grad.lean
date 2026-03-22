@@ -45,6 +45,7 @@ of the input function with respect to each spatial coordinate.
   - B.3. The gradient as a sum over basis vectors
   - B.4. The underlying function of the gradient distribution
   - B.5. The gradient applied to a Schwartz function
+  - B.6. The gradident of a Schwartz map
 
 ## iv. References
 
@@ -501,5 +502,23 @@ lemma distGrad_apply {d} (f : (Space d) →d[ℝ] ℝ) (ε : 𝓢(Space d, ℝ))
     (distGrad f) ε = fun i => distDeriv i f ε := by
   change (distGrad f).toFun ε = fun i => distDeriv i f ε
   rw [distGrad_toFun_eq_distDeriv]
+
+/-!
+
+### B.6. The gradident of a Schwartz map
+
+-/
+
+/-- The gradient on Scwhwartz maps. -/
+noncomputable def gradSchwartz {d} : 𝓢(Space d, ℝ) →L[ℝ] 𝓢(Space d, EuclideanSpace ℝ (Fin d)) :=
+    ∑ i, SchwartzMap.bilinLeftCLM (ContinuousLinearMap.lsmul ℝ ℝ)
+          (.const (EuclideanSpace.single i (1 : ℝ)))
+      ∘L SchwartzMap.evalCLM ℝ (Space d) ℝ (basis i)
+      ∘L SchwartzMap.fderivCLM ℝ (Space d) ℝ
+
+lemma gradSchwartz_apply_eq_grad {d} (η : 𝓢(Space d, ℝ)) (x : Space d):
+    gradSchwartz η x = grad η x := by
+  simp [gradSchwartz, grad_eq_sum]
+  rfl
 
 end Space
