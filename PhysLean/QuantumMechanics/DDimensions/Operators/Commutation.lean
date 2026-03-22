@@ -301,23 +301,17 @@ lemma angularMomentumSqr_commutation_momentumSqr :
 
 -/
 
-@[sorryful]
-lemma angularMomentum_commutation_angularMomentum {d : ℕ} (i j k l : Fin d) : ⁅𝐋[i,j], 𝐋[k,l]⁆ =
-    (Complex.I * ℏ * δ[i,k]) • 𝐋[j,l] - (Complex.I * ℏ * δ[i,l]) • 𝐋[j,k]
-    - (Complex.I * ℏ * δ[j,k]) • 𝐋[i,l] + (Complex.I * ℏ * δ[j,l]) • 𝐋[i,k] := by
+lemma angularMomentum_commutation_angularMomentum : ⁅𝐋[i,j], 𝐋[k,l]⁆ =
+    (I * ℏ) • (δ[i,k] • 𝐋[j,l] - δ[i,l] • 𝐋[j,k] - δ[j,k] • 𝐋[i,l] + δ[j,l] • 𝐋[i,k]) := by
   nth_rw 2 [angularMomentumOperator]
-  rw [lie_sub]
-  rw [lie_leibniz, lie_leibniz]
-  rw [angularMomentum_commutation_momentum, angularMomentum_commutation_position]
-  rw [angularMomentum_commutation_momentum, angularMomentum_commutation_position]
-  dsimp only [angularMomentumOperator, kroneckerDelta]
-  simp only [ContinuousLinearMap.comp_sub, ContinuousLinearMap.sub_comp,
-    ContinuousLinearMap.comp_smul, ContinuousLinearMap.smul_comp]
-  ext ψ x
-  simp only [coe_sub', Pi.sub_apply, ContinuousLinearMap.add_apply, SchwartzMap.sub_apply,
-    SchwartzMap.add_apply, smul_sub]
-  ring_nf
-  sorry
+  simp only [angularMomentum_commutation_position, angularMomentum_commutation_momentum,
+    lie_sub, lie_leibniz, comp_smul, smul_comp, comp_sub, sub_comp, ← smul_add, ← smul_sub]
+  dsimp [angularMomentumOperator]
+  ext
+  simp only [nsmul_eq_mul, coe_smul', coe_sub', Pi.smul_apply, Pi.sub_apply,
+    ContinuousLinearMap.add_apply, coe_mul, SchwartzMap.smul_apply, SchwartzMap.sub_apply,
+    SchwartzMap.add_apply, smul_eq_mul, map_comp_sub]
+  ring
 
 private lemma angularMomentum_comp_antisymm_sum {d : ℕ} (a b : Fin d) :
     ∑ x : Fin d, 𝐋[x,a] ∘L 𝐋[b,x] = ∑ x : Fin d, 𝐋[a,x] ∘L 𝐋[x,b] := by
@@ -334,8 +328,7 @@ lemma angularMomentumSqr_commutation_angularMomentum {d : ℕ} (i j : Fin d) :
     smul_add, smul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib,
     ← Finset.smul_sum]
   dsimp only [kroneckerDelta]
-  simp only [Nat.cast_ite, Nat.cast_one, CharP.cast_eq_zero, mul_ite, mul_one, mul_zero,
-    ite_smul, zero_smul]
+  simp only [ite_smul, zero_smul]
   simp_rw [Finset.sum_ite_eq' Finset.univ, Finset.mem_univ, if_true]
   rw [angularMomentum_comp_antisymm_sum i j, angularMomentum_comp_antisymm_sum j i]
   abel
