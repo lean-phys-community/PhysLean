@@ -63,10 +63,6 @@ variable {d : ℕ} (i j k l : Fin d) (ε : ℝˣ) (s t : ℝ)
 
 -/
 
-private lemma ite_cond_symm (i j : Fin d) :
-    (if i = j then A else B) = (if j = i then A else B) :=
-  ite_cond_congr (Eq.propIntro Eq.symm Eq.symm)
-
 lemma leibniz_lie (A B C : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ)) :
     ⁅A ∘L B, C⁆ = A ∘L ⁅B, C⁆ + ⁅A, C⁆ ∘L B := by
   dsimp only [Bracket.bracket]
@@ -185,44 +181,24 @@ lemma position_commutation_momentumSqr : ⁅𝐱[i], 𝐩²⁆ = (2 * I * ℏ) �
 
 lemma radiusRegPow_commutation_momentum :
     ⁅𝐫[d,ε,s], 𝐩[i]⁆ = (s * I * ℏ) • 𝐫[ε,s-2] ∘L 𝐱[i] := by
-  dsimp only [Bracket.bracket]
   ext ψ x
-  simp only [coe_sub', coe_mul, Pi.sub_apply, Function.comp_apply, SchwartzMap.sub_apply, coe_smul',
-    coe_comp', Pi.smul_apply, SchwartzMap.smul_apply, smul_eq_mul]
-  simp only [momentumOperator_apply, positionOperator_apply, radiusRegPowOperator_apply_fun]
-
-  have hne : ∀ x : Space d, ‖x‖ ^ 2 + ε ^ 2 ≠ 0 := by
-    intro x
-    apply ne_of_gt
-    exact add_pos_of_nonneg_of_pos (sq_nonneg _) (sq_pos_iff.mpr <| Units.ne_zero ε)
-
-  have h : (fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x) =
-    (fun (x : Space d) ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)) • ψ := rfl
-  have h' : ∂[i] (fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)) =
-      fun x ↦ s * (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2 - 1) * x i := by
-    trans ∂[i] ((fun x ↦ x ^ (s / 2)) ∘ (fun x ↦ ‖x‖ ^ 2 + ε ^ 2))
-    · congr
-    ext x
-    rw [Space.deriv_eq, fderiv_comp]
-    · simp only [fderiv_add_const, fderiv_norm_sq_apply, comp_smul, coe_smul', coe_comp',
-        coe_innerSL_apply, Pi.smul_apply, Function.comp_apply, Space.inner_basis,
-        fderiv_eq_smul_deriv, smul_eq_mul, nsmul_eq_mul, Nat.cast_ofNat]
-      rw [deriv_rpow_const]
-      · simp only [deriv_id'', one_mul]
-        ring
-      · fun_prop
-      · left
-        exact hne _
-    · exact Real.differentiableAt_rpow_const_of_ne (s / 2) (hne x)
-    · exact Differentiable.differentiableAt (by fun_prop)
-
-  rw [h, Space.deriv_smul]
-  · rw [h']
-    simp only [neg_mul, smul_neg, Complex.real_smul, Complex.ofReal_mul, sub_neg_eq_add]
-    ring_nf
-  · refine DifferentiableAt.rpow ?_ (by fun_prop) (hne _)
+  have hne := Ne.symm (ne_of_lt <| norm_sq_add_unit_sq_pos ε x)
+  have hdiff1 : DifferentiableAt ℝ (fun x => (‖x‖ ^ 2 + ↑ε ^ 2) ^ (s / 2)) x := by
+    refine DifferentiableAt.rpow_const ?_ (Or.intro_left _ hne)
     exact Differentiable.differentiableAt (by fun_prop)
-  · fun_prop
+  have hdiff2 := Real.differentiableAt_rpow_const_of_ne (s / 2) hne
+  have hdiff3 : DifferentiableAt ℝ (fun x ↦ ‖x‖ ^ 2 + ε ^ 2) x :=
+    Differentiable.differentiableAt (by fun_prop)
+  show 𝐫[ε,s] (𝐩[i] ψ) x - 𝐩[i] (𝐫[ε,s] ψ) x = (s * I * ℏ) * 𝐫[ε,s-2] (𝐱[i] ψ) x
+  simp only [momentumOperator_apply, positionOperator_apply, radiusRegPowOperator_apply_fun]
+  rw [← Pi.smul_def', Space.deriv_smul hdiff1 (by fun_prop)]
+  suffices ∂[i] (fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)) x =
+      s * (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2 - 1) * x i by
+    simp only [this, real_smul, ofReal_mul]
+    ring_nf
+  change ∂[i] ((fun r ↦ r ^ (s / 2)) ∘ (fun x ↦ ‖x‖ ^ 2 + ε ^ 2)) x = _
+  rw [Space.deriv_eq, fderiv_comp x hdiff2 hdiff3, fderiv_add_const, fderiv_norm_sq_apply]
+  simp [Real.deriv_rpow_const, mul_comm, ← mul_assoc, mul_div_cancel₀ s (NeZero.ne' 2).symm]
 
 lemma momentum_comp_radiusRegPow_eq :
     𝐩[i] ∘L 𝐫[ε,s] = 𝐫[ε,s] ∘L 𝐩[i] - (s * I * ℏ) • 𝐫[ε,s-2] ∘L 𝐱[i] := by
