@@ -319,7 +319,6 @@ lemma angularMomentum_commutation_angularMomentum {d : ℕ} (i j k l : Fin d) : 
   ring_nf
   sorry
 
-@[sorryful]
 lemma angularMomentumSqr_commutation_angularMomentum {d : ℕ} (i j : Fin d) :
     ⁅angularMomentumOperatorSqr (d := d), 𝐋[i,j]⁆ = 0 := by
   sorry
