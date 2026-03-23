@@ -100,7 +100,6 @@ TODO "4DK2M" "Create a new file for the geometric model which properly models th
     configuration space and  velocity as its tangent space, then show explicitly how this
     coordinate model is a simplification of the geometric model."
 
-
 /-!
 
 ## A. The input data
