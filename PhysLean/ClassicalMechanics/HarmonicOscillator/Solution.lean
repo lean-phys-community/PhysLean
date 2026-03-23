@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Analysis.CStarAlgebra.Classes
 public import PhysLean.ClassicalMechanics.HarmonicOscillator.Basic
-public import PhysLean.Units.Basic
 /-!
 
 # Solutions to the classical harmonic oscillator
@@ -85,9 +84,9 @@ We start by defining the type of initial conditions for the harmonic oscillator.
   and an initial velocity. -/
 structure InitialConditions where
   /-- The initial position of the harmonic oscillator. -/
-  x₀ : ConfigurationSpace
+  x₀ : EuclideanSpace ℝ (Fin 1)
   /-- The initial velocity of the harmonic oscillator. -/
-  v₀ : ConfigurationSpace
+  v₀ : EuclideanSpace ℝ (Fin 1)
 
 /-!
 
@@ -153,9 +152,9 @@ structure InitialConditionsAtTime where
   /-- The time at which the initial conditions are specified. -/
   t₀ : Time
   /-- The position at time t₀. -/
-  x_t₀ : ConfigurationSpace
+  x_t₀ : EuclideanSpace ℝ (Fin 1)
   /-- The velocity at time t₀. -/
-  v_t₀ : ConfigurationSpace
+  v_t₀ : EuclideanSpace ℝ (Fin 1)
 
 /-!
 
@@ -272,7 +271,7 @@ namespace InitialConditions
 -/
 
 /-- Given initial conditions, the solution to the classical harmonic oscillator. -/
-noncomputable def trajectory (IC : InitialConditions) : Time → ConfigurationSpace := fun t =>
+noncomputable def trajectory (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
   cos (S.ω * t) • IC.x₀ + (sin (S.ω * t)/S.ω) • IC.v₀
 
 /-!
@@ -437,7 +436,7 @@ for the given initial conditions. This is currently a TODO.
   Semiformal implementation:
   - One may needed the added condition of smoothness on `x` here.
   - `EquationOfMotion` needs defining before this can be proved. -/
-lemma trajectories_unique (IC : InitialConditions) (x : Time → ConfigurationSpace)
+lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace ℝ (Fin 1))
     (hx : ContDiff ℝ ∞ x) :
     S.EquationOfMotion x ∧ x 0 = IC.x₀ ∧ ∂ₜ x 0 = IC.v₀ →
     x = IC.trajectory S := by
@@ -460,7 +459,7 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → ConfigurationSp
       (trajectory_equationOfMotion S IC)
 
   -- Define the difference y = x - traj
-  set y : Time → ConfigurationSpace := fun t => x t - IC.trajectory S t with hydef
+  set y : Time → EuclideanSpace ℝ (Fin 1) := fun t => x t - IC.trajectory S t with hydef
 
   have hyContDiff : ContDiff ℝ ∞ y := by
     -- ContDiff closed under subtraction
@@ -648,12 +647,14 @@ lemma toInitialConditions_trajectory_at_t₀ (S : HarmonicOscillator)
     (IC : InitialConditionsAtTime) :
     (IC.toInitialConditions S).trajectory S IC.t₀ = IC.x_t₀ := by
   rw [InitialConditions.trajectory_eq, toInitialConditions]
-  ext
-  simp only [ConfigurationSpace.add_val, ConfigurationSpace.smul_val, ConfigurationSpace.sub_val]
+  ext i
+  simp only [smul_add, PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
   have h1 : cos (S.ω * IC.t₀.val) ^ 2 + sin (S.ω * IC.t₀.val) ^ 2 = 1 :=
     cos_sq_add_sin_sq (S.ω * IC.t₀.val)
   field_simp [S.ω_ne_zero]
-  linear_combination S.ω * IC.x_t₀.val * h1
+  nth_rw 2 [← mul_one (S.ω * IC.x_t₀.ofLp i)]
+  rw [← h1]
+  ring
 
 /-- The trajectory resulting from `toInitialConditions` has the specified
   velocity `v_t₀` at time `t₀`. -/
@@ -662,13 +663,15 @@ lemma toInitialConditions_velocity_at_t₀ (S : HarmonicOscillator)
     (IC : InitialConditionsAtTime) :
     ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₀ = IC.v_t₀ := by
   rw [InitialConditions.trajectory_velocity, toInitialConditions]
-  ext
-  simp only [ConfigurationSpace.add_val, ConfigurationSpace.smul_val, ConfigurationSpace.sub_val,
-    neg_mul]
+  ext i
+  simp only [neg_smul, smul_add, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, PiLp.sub_apply,
+    smul_eq_mul]
   have h1 : cos (S.ω * IC.t₀.val) ^ 2 + sin (S.ω * IC.t₀.val) ^ 2 = 1 :=
     cos_sq_add_sin_sq (S.ω * IC.t₀.val)
   field_simp [S.ω_ne_zero]
-  linear_combination IC.v_t₀.val * h1
+  nth_rw 3 [← mul_one (IC.v_t₀.ofLp i)]
+  rw [← h1]
+  ring
 
 /-- The energy of the trajectory at time `t₀` equals the energy computed from the
   initial conditions at `t₀`. -/
@@ -716,7 +719,8 @@ lemma tan_time_eq_of_trajectory_velocity_eq_zero (IC : InitialConditions) (t : T
   have h1' : IC.x₀ 0 ≠ 0 := by
     intro hn
     apply h1
-    ext
+    ext i
+    fin_cases i
     simp [hn]
   have hcos : cos (S.ω * t.val) ≠ 0 := by
     by_contra hn
@@ -728,9 +732,9 @@ lemma tan_time_eq_of_trajectory_velocity_eq_zero (IC : InitialConditions) (t : T
   trans (sin (S.ω * t.val) * (S.ω * IC.x₀ 0)) +
     (-(S.ω • sin (S.ω * t.val) • IC.x₀) + cos (S.ω * t.val) • IC.v₀) 0
   · rw [h]
-    simp only [ConfigurationSpace.zero_val]
+    simp only [Fin.isValue, PiLp.zero_apply, add_zero]
     ring_nf
-  · simp only [ConfigurationSpace.add_val, ConfigurationSpace.smul_val, ConfigurationSpace.neg_val]
+  · simp only [Fin.isValue, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul]
     ring_nf
   simp at h2
   rw [h2] at h ⊢
@@ -757,18 +761,21 @@ lemma trajectory_velocity_eq_zero_at_arctan (IC : InitialConditions) (hx : IC.x�
   have hx' : S.ω ≠ 0 := by exact ω_ne_zero S
   field_simp
   rw [Real.sin_arctan, Real.cos_arctan]
-  ext
+  ext i
   simp [one_div]
   trans (-(S.ω * (IC.v₀ 0 / (S.ω * IC.x₀ 0) * IC.x₀ 0)) + IC.v₀ 0) *
     (√(1 + (IC.v₀ 0 / (S.ω * IC.x₀ 0)) ^ 2))⁻¹
-  · ring
+  · fin_cases i
+    simp only [Fin.isValue, Fin.zero_eta]
+    ring
   simp [mul_eq_zero, inv_eq_zero]
   left
   field_simp
   have hx : IC.x₀ 0 ≠ 0 := by
     intro hn
     apply hx
-    ext
+    ext i
+    fin_cases i
     simp [hn]
   field_simp
   ring
