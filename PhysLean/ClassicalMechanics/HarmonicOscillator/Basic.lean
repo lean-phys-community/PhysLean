@@ -98,7 +98,9 @@ TODO "6VZHC" "Create a new folder for the damped harmonic oscillator, initially 
 
 TODO "4DK2M" "Create a new file for the geometric model which properly models the position as a
     configuration space and  velocity as its tangent space, then show explicitly how this
-    coordinate model is a simplification of the geometric model."
+    coordinate model is a simplification of the geometric model.
+    A nice reference for such an analysis is:
+    https://web.williams.edu/Mathematics/it3/texts/var_noether.pdf"
 
 /-!
 
