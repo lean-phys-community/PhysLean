@@ -16,6 +16,55 @@ The key took in variational calculus is:
 ```
 which allows use to go from reasoning about integrals to reasoning about functions.
 
+## Overview of variational calculus
+
+The variational calculus API in PhysLib is designed to match and formalize the physicists intuition
+of variational calculus. It is not designed to be a general API for variational calculus.
+
+Within variational caclulus we are interested in function transformations, `F : (X → U) → (Y → V)`.
+In physics this functional is often of the form `L : (Time → U) → (Time → ℝ)`,
+which represents the Lagrangian of a system. We will use this to explain the formalization
+within this API.
+
+The action is nominally given by `S u = ∫ (L (u t) t) dt`, however it is convenient to
+introduce another function `φ` and define the action as `S u = ∫ φ t * (L (u t) t)  dt`.
+In the end we will set `φ := fun _ => 1`.
+
+We now consider `∂ (S (u + s * δu)) / ∂ s` at `s = 0`,
+which is the variational derivative of `S` at `u` in the direction `δu`.
+This is equal to
+```
+∫ φ t * (∂ L (u + s * δ u) t / ∂ s)|_{s = 0} dt
+```
+Let us denote `δu t ↦ (∂ L (u + s * δ u) t / ∂ s)|_{s = 0}` as `Lᵤ : (Time → U) → (Time → ℝ)`.
+Then the variational derivative is `∫ φ t * Lᵤ (δu) t dt`.
+
+It may then be possible to find a function `Gᵤ : (Time → ℝ) → (Time → U)`
+such that
+```
+∫ φ t * Lᵤ (δu) t dt = ∫ ⟪Gᵤ (φ t), δu t⟫ dt
+```
+This is usually done by integration by parts.
+
+We now set `φ := fun _ => 1` and get `grad u := Gᵤ (fun _ => 1)`, which is the
+variational gradient at `u`. The Euler–Lagrange equations, for example, are then `grad u = 0`.
+
+In our API, the relationship between
+- `Lᵤ` and `Gᵤ` is captured by the `HasVarAdjoint`.
+- `L` and  `Gᵤ` by `HasVarAdjDeriv`.
+- `L` and `grad u` by `HasVarGradientAt`.
+
+In practice we assume that `L` has a certain locality property
+`IsLocalizedFunctionTransform`, which allows us to work with functions
+`φ` and `δu` which have compact support.
+
+This API assumes that `U` is an inner-product space. This can be considered as the full
+configuration space, or a local chart thereof.
+
+## References
+
+- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/Variational.20Calculus/with/529022834
+
 -/
 
 @[expose] public section
