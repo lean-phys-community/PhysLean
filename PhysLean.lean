@@ -42,6 +42,7 @@ public import PhysLean.Electromagnetism.Kinematics.VectorPotential
 public import PhysLean.Electromagnetism.PointParticle.OneDimension
 public import PhysLean.Electromagnetism.PointParticle.ThreeDimension
 public import PhysLean.Electromagnetism.ThreeDimension.Basic
+public import PhysLean.Electromagnetism.ThreeDimension.MaxwellEquations
 public import PhysLean.Electromagnetism.Vacuum.Constant
 public import PhysLean.Electromagnetism.Vacuum.HarmonicWave
 public import PhysLean.Electromagnetism.Vacuum.IsPlaneWave
