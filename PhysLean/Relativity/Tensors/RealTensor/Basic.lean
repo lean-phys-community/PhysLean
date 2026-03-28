@@ -145,6 +145,26 @@ lemma repDim_eq_one_plus_dim {d : ℕ} {c : realLorentzTensor.Color} :
 
 /-!
 
+## Basis and discrete functor objects
+
+These re-express fields of `realLorentzTensor d` in terms of `Lorentz` data.
+
+-/
+
+lemma basis_eq_contrBasisFin {d : ℕ} :
+    (realLorentzTensor d).basis Color.up = Lorentz.contrBasisFin (d := d) := rfl
+
+lemma basis_eq_coBasisFin {d : ℕ} :
+    (realLorentzTensor d).basis Color.down = Lorentz.coBasisFin (d := d) := rfl
+
+lemma FD_obj_up {d : ℕ} :
+    (realLorentzTensor d).FD.obj { as := Color.up } = Lorentz.Contr d := rfl
+
+lemma FD_obj_down {d : ℕ} :
+    (realLorentzTensor d).FD.obj { as := Color.down } = Lorentz.Co d := rfl
+
+/-!
+
 ## Simplifying τ
 
 -/

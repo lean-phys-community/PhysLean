@@ -101,18 +101,6 @@ lemma colorToComplex_match_down {n} {c : Fin n → realLorentzTensor.Color} {j}
       = complexLorentzTensor.Color.down := by
   rw [hc]
 
-lemma basis_eq_contrBasisFin :
-    realLorentzTensor.basis realLorentzTensor.Color.up = Lorentz.contrBasisFin (d := 3) := rfl
-
-lemma basis_eq_coBasisFin :
-    realLorentzTensor.basis realLorentzTensor.Color.down = Lorentz.coBasisFin (d := 3) := rfl
-
-lemma FD_obj_up :
-    realLorentzTensor.FD.obj { as := realLorentzTensor.Color.up } = Lorentz.Contr 3 := rfl
-
-lemma FD_obj_down :
-    realLorentzTensor.FD.obj { as := realLorentzTensor.Color.down } = Lorentz.Co 3 := rfl
-
 /-- The complexification of the component index of a real Lorentz tensor to
   a complex Lorentz tensor. -/
 def _root_.TensorSpecies.Tensor.ComponentIdx.complexify {n} {c : Fin n → realLorentzTensor.Color} :
