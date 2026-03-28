@@ -43,14 +43,10 @@ lemma slot_repr_up (k : Fin n) (h : c k = Color.up) (Λ : SL(2, ℂ))
           rfl) (b k))) := by
   rw [repr_ρ_basis_FDTransport (S := complexLorentzTensor) (c := c k) (c₁ := Color.up) h Λ (i k)
     (b k)]
-  simp only [complexLorentzTensor.basis_up_eq, Lorentz.complexContrBasisFin4]
-  erw [show
-      (Lorentz.complexContrBasis.reindex finSumFinEquiv)
-        (Fin.cast _ (b k)) =
-      Lorentz.complexContrBasisFin4 (Fin.cast _ (b k)) from rfl]
-  simp_rw [complexLorentzTensor.basis_eq_complexContrBasisFin4]
-  simp_rw [(show Lorentz.complexContrBasisFin4 =
-      Lorentz.complexContrBasis.reindex finSumFinEquiv from rfl)]
+  simp only [complexLorentzTensor.basis_up_eq]
+  erw [Lorentz.complexContrBasis_reindex_apply_eq_fin4]
+  simp_rw [complexLorentzTensor.basis_eq_complexContrBasisFin4,
+    Lorentz.complexContrBasisFin4_eq_reindex]
   rw [Basis.repr_reindex_apply, Basis.reindex_apply]
   simp_rw [complexLorentzTensor.FD_obj_up]
   conv_lhs => erw [← LinearMap.toMatrix_apply]
@@ -74,14 +70,9 @@ lemma slot_repr_down (k : Fin n) (h : c k = Color.down) (Λ : SL(2, ℂ))
           rfl) (i k))) := by
   rw [repr_ρ_basis_FDTransport (S := complexLorentzTensor) (c := c k) (c₁ := Color.down) h Λ (i k)
     (b k)]
-  simp only [complexLorentzTensor.basis_down_eq, Lorentz.complexCoBasisFin4]
-  erw [show
-      (Lorentz.complexCoBasis.reindex finSumFinEquiv)
-        (Fin.cast _ (b k)) =
-      Lorentz.complexCoBasisFin4 (Fin.cast _ (b k)) from rfl]
-  simp_rw [complexLorentzTensor.basis_eq_complexCoBasisFin4]
-  simp_rw [(show Lorentz.complexCoBasisFin4 =
-      Lorentz.complexCoBasis.reindex finSumFinEquiv from rfl)]
+  simp only [complexLorentzTensor.basis_down_eq]
+  erw [Lorentz.complexCoBasis_reindex_apply_eq_fin4]
+  simp_rw [complexLorentzTensor.basis_eq_complexCoBasisFin4, Lorentz.complexCoBasisFin4_eq_reindex]
   rw [Basis.repr_reindex_apply, Basis.reindex_apply]
   simp_rw [complexLorentzTensor.FD_obj_down]
   conv_lhs => erw [← LinearMap.toMatrix_apply]

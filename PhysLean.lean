@@ -291,13 +291,13 @@ public import PhysLean.Relativity.Tensors.Color.Basic
 public import PhysLean.Relativity.Tensors.Color.Discrete
 public import PhysLean.Relativity.Tensors.Color.Lift
 public import PhysLean.Relativity.Tensors.ComplexTensor.Basic
-public import PhysLean.Relativity.Tensors.ComplexTensor.SlotRepr
 public import PhysLean.Relativity.Tensors.ComplexTensor.Lemmas
 public import PhysLean.Relativity.Tensors.ComplexTensor.Matrix.Pre
 public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Basic
 public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Lemmas
 public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Pre
 public import PhysLean.Relativity.Tensors.ComplexTensor.OfRat
+public import PhysLean.Relativity.Tensors.ComplexTensor.SlotRepr
 public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Basic
 public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Pre
 public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Symm

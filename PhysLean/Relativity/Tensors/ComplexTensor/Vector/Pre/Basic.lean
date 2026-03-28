@@ -61,6 +61,14 @@ lemma complexContrBasis_ρ_val (M : SL(2,ℂ)) (v : complexContr) :
 def complexContrBasisFin4 : Basis (Fin 4) ℂ complexContr :=
   Basis.reindex complexContrBasis finSumFinEquiv
 
+lemma complexContrBasisFin4_eq_reindex :
+    complexContrBasisFin4 = complexContrBasis.reindex finSumFinEquiv :=
+  rfl
+
+lemma complexContrBasis_reindex_apply_eq_fin4 (j : Fin 4) :
+    (complexContrBasis.reindex finSumFinEquiv) j = complexContrBasisFin4 j :=
+  rfl
+
 @[simp]
 lemma complexContrBasisFin4_apply_zero :
     complexContrBasisFin4 0 = complexContrBasis (Sum.inl 0) := by
@@ -113,6 +121,14 @@ lemma complexCoBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
 /-- The standard basis of complex covariant Lorentz vectors indexed by `Fin 4`. -/
 def complexCoBasisFin4 : Basis (Fin 4) ℂ complexCo :=
   Basis.reindex complexCoBasis finSumFinEquiv
+
+lemma complexCoBasisFin4_eq_reindex :
+    complexCoBasisFin4 = complexCoBasis.reindex finSumFinEquiv :=
+  rfl
+
+lemma complexCoBasis_reindex_apply_eq_fin4 (j : Fin 4) :
+    (complexCoBasis.reindex finSumFinEquiv) j = complexCoBasisFin4 j :=
+  rfl
 
 @[simp]
 lemma complexCoBasisFin4_apply_zero :
