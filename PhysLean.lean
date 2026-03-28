@@ -291,6 +291,7 @@ public import PhysLean.Relativity.Tensors.Color.Basic
 public import PhysLean.Relativity.Tensors.Color.Discrete
 public import PhysLean.Relativity.Tensors.Color.Lift
 public import PhysLean.Relativity.Tensors.ComplexTensor.Basic
+public import PhysLean.Relativity.Tensors.ComplexTensor.SlotRepr
 public import PhysLean.Relativity.Tensors.ComplexTensor.Lemmas
 public import PhysLean.Relativity.Tensors.ComplexTensor.Matrix.Pre
 public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Basic

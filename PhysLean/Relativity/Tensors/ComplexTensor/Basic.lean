@@ -253,6 +253,28 @@ lemma basis_up_eq {i : Fin 4} :
 lemma basis_down_eq {i : Fin 4} :
     complexLorentzTensor.basis Color.down i = Lorentz.complexCoBasisFin4 i := rfl
 
+@[simp]
+lemma basis_eq_complexContrBasisFin4 :
+    complexLorentzTensor.basis Color.up = Lorentz.complexContrBasisFin4 := by
+  ext i
+  exact basis_up_eq
+
+@[simp]
+lemma basis_eq_complexCoBasisFin4 :
+    complexLorentzTensor.basis Color.down = Lorentz.complexCoBasisFin4 := by
+  ext i
+  exact basis_down_eq
+
+@[simp]
+lemma FD_obj_up (Λ : SL(2, ℂ)) :
+    (complexLorentzTensor.FD.obj { as := Color.up }).ρ Λ = Lorentz.complexContr.ρ Λ :=
+  rfl
+
+@[simp]
+lemma FD_obj_down (Λ : SL(2, ℂ)) :
+    (complexLorentzTensor.FD.obj { as := Color.down }).ρ Λ = Lorentz.complexCo.ρ Λ :=
+  rfl
+
 lemma basis_upL_eq {i : Fin 2} :
     complexLorentzTensor.basis Color.upL i = Fermion.leftBasis i := rfl
 

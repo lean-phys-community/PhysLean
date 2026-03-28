@@ -113,6 +113,19 @@ lemma FD_map_basis {c c1 : C} (h : c = c1) (i : Fin (S.repDim c)) :
   subst h
   simp
 
+/-- Categorical bookkeeping: relate `basis.repr` of `ρ g` on a basis vector before and after
+  identifying slot colors `c` and `c₁` via `Discrete.eqToHom` (`basis_congr_repr`, `hom_comm`,
+  `FD_map_basis` chained). Not a physical statement; use for component calculations. -/
+lemma repr_ρ_basis_FDTransport {c c₁ : C} (h : c = c₁) (g : G) (i : Fin (S.repDim c))
+    (b : Fin (S.repDim c)) :
+    (S.basis c).repr (((S.FD.obj { as := c }).ρ g) (S.basis c b)) i =
+      (S.basis c₁).repr
+        (((S.FD.obj { as := c₁ }).ρ g) (S.basis c₁ (Fin.cast (by simp [h]) b)))
+        (Fin.cast (by simp [h]) i) := by
+  rw [S.basis_congr_repr h i (((S.FD.obj { as := c }).ρ g) (S.basis c b))]
+  erw [Rep.hom_comm_apply (S.FD.map (Discrete.eqToHom h)) g (S.basis c b)]
+  erw [S.FD_map_basis h b]
+
 /-- The lift of the functor `S.F` to functor. -/
 def F : Functor (OverColor C) (Rep k G) := ((OverColor.lift).obj S.FD).toFunctor
 
