@@ -39,6 +39,7 @@ of the input function with respect to each spatial coordinate.
   - A.11. Gradient of the norm squared function
   - A.12. Gradient of the inner product function
   - A.13. Integrability with bounded functions
+  - A.14. Differentiability of gradient
 - B. Gradient of distributions
   - B.1. The definition
   - B.2. The gradient of inner products
@@ -392,6 +393,21 @@ lemma integrable_isDistBounded_inner_grad_schwartzMap_spherical{dm1 : ℕ}
   convert h1
   simp only [Nat.succ_eq_add_one, Function.comp_apply, Homeomorph.symm_apply_apply]
   exact Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space dm1.succ))
+
+/-!
+
+### A.14. Differentiability of gradient
+
+-/
+
+open ContDiff
+
+lemma contDiff_grad {f : Space → ℝ} (hf : ContDiff ℝ ∞ f) :
+    ContDiff ℝ ∞ (fun x => ∇ f x) := by
+  unfold grad
+  apply ContDiff.fun_comp
+  · fun_prop
+  · exact deriv_contDiff hf
 
 /-!
 

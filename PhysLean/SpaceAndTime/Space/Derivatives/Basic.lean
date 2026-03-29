@@ -460,6 +460,13 @@ lemma deriv_differentiable {M} [NormedAddCommGroup M]
   suffices h1 : Differentiable ℝ (fun x => fderiv ℝ f x (basis i)) by exact h1
   fun_prop
 
+open ContDiff
+
+lemma deriv_contDiff {d} {f : Space d → ℝ} (hf : ContDiff ℝ ∞ f) :
+    ContDiff ℝ ∞ fun x i => deriv i f x := by
+  unfold deriv
+  fun_prop
+
 /-!
 
 ## B. Derivatives of distributions on `Space d`

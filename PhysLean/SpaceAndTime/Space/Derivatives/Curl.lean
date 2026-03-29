@@ -29,11 +29,11 @@ We also prove some basic vector-identities involving of the curl operator.
 - A. The curl on functions
   - A.1. The curl on the zero function
   - A.2. The curl on a constant function
-  - A.3. The curl distributes over addition
-  - A.4. The curl distributes over scalar multiplication
-  - A.5. The curl of a linear map is a linear map
-  - A.6. Preliminary lemmas about second derivatives
-  - A.7. The div of a curl is zero
+  - A.3. Basic operations on curl
+  - A.4. The curl of a linear map is a linear map
+  - A.5. Preliminary lemmas about second derivatives
+  - A.6. The div of a curl is zero
+  - A.7. The curl of a grad is zero
   - A.8. The curl of a curl
 - B. The curl on distributions
   - B.1. The components of the curl
@@ -69,7 +69,7 @@ noncomputable def curl (f : Space → EuclideanSpace ℝ (Fin 3)) :
     | 2 => df 1 0 x - df 0 1 x
 
 @[inherit_doc curl]
-macro (name := curlNotation) "∇" "×" f:term:100 : term => `(curl $f)
+macro (name := curlNotation) "∇" "⨯" f:term:100 : term => `(curl $f)
 
 /-!
 
@@ -78,7 +78,7 @@ macro (name := curlNotation) "∇" "×" f:term:100 : term => `(curl $f)
 -/
 
 @[simp]
-lemma curl_zero : ∇ × (0 : Space → EuclideanSpace ℝ (Fin 3)) = 0 := by
+lemma curl_zero : ∇ ⨯ (0 : Space → EuclideanSpace ℝ (Fin 3)) = 0 := by
   unfold curl Space.deriv
   simp only [Fin.isValue, Pi.ofNat_apply, fderiv_fun_const, ContinuousLinearMap.zero_apply,
     sub_self]
@@ -93,7 +93,7 @@ lemma curl_zero : ∇ × (0 : Space → EuclideanSpace ℝ (Fin 3)) = 0 := by
 -/
 
 @[simp]
-lemma curl_const : ∇ × (fun _ : Space => v₃) = 0 := by
+lemma curl_const : ∇ ⨯ (fun _ : Space => v₃) = 0 := by
   unfold curl Space.deriv
   simp only [Fin.isValue, fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.zero_apply,
     sub_self]
@@ -103,13 +103,13 @@ lemma curl_const : ∇ × (fun _ : Space => v₃) = 0 := by
 
 /-!
 
-### A.3. The curl distributes over addition
+### A.3. Basic operations on curl
 
 -/
 
 lemma curl_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
-    ∇ × (f1 + f2) = ∇ × f1 + ∇ × f2 := by
+    ∇ ⨯ (f1 + f2) = ∇ ⨯ f1 + ∇ ⨯ f2 := by
   unfold curl
   ext x i
   fin_cases i <;>
@@ -119,15 +119,9 @@ lemma curl_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
     ring
     repeat assumption
 
-/-!
-
-### A.4. The curl distributes over scalar multiplication
-
--/
-
 lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
     (hf : Differentiable ℝ f) :
-    ∇ × (k • f) = k • ∇ × f := by
+    ∇ ⨯ (k • f) = k • ∇ ⨯ f := by
   unfold curl
   ext x i
   fin_cases i <;>
@@ -135,9 +129,20 @@ lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
     rw [deriv_coord_smul, deriv_coord_smul, mul_sub]
     repeat fun_prop
 
+lemma curl_neg (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f) :
+    ∇ ⨯ (-f) = -∇ ⨯ f := by
+  rw [← neg_one_smul ℝ, curl_smul, neg_one_smul]
+  · exact hf
+
+lemma curl_sub (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
+    (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+    ∇ ⨯ (f1 - f2) = ∇ ⨯ f1 - ∇ ⨯ f2 := by
+  rw [sub_eq_add_neg, curl_add, curl_neg, sub_eq_add_neg]
+  repeat fun_prop
+
 /-!
 
-### A.5. The curl of a linear map is a linear map
+### A.4. The curl of a linear map is a linear map
 
 -/
 
@@ -146,7 +151,7 @@ variable {W} [NormedAddCommGroup W] [NormedSpace ℝ W]
 lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     (hf : ∀ w, Differentiable ℝ (f w))
     (hf' : IsLinearMap ℝ f) :
-    IsLinearMap ℝ (fun w => ∇ × (f w)) := by
+    IsLinearMap ℝ (fun w => ∇ ⨯ (f w)) := by
   constructor
   · intro w w'
     rw [hf'.map_add]
@@ -159,7 +164,7 @@ lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
 
 /-!
 
-### A.6. Preliminary lemmas about second derivatives
+### A.5. Preliminary lemmas about second derivatives
 
 -/
 
@@ -188,12 +193,12 @@ lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 /-!
 
-### A.7. The div of a curl is zero
+### A.6. The div of a curl is zero
 
 -/
 
 lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
-    ∇ ⬝ (∇ × f) = 0 := by
+    ∇ ⬝ (∇ ⨯ f) = 0 := by
   unfold div curl Finset.sum
   ext x
   simp only [Fin.isValue, Fin.univ_val_map, List.ofFn_succ, Fin.succ_zero_eq_one,
@@ -210,12 +215,28 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 /-!
 
+### A.7. The curl of a grad is zero
+
+-/
+
+lemma curl_of_grad_eq_zero (f : Space → ℝ) (hf : ContDiff ℝ 2 f) :
+    ∇ ⨯ (∇ f) = 0 := by
+  unfold curl grad
+  ext x i
+  fin_cases i <;>
+  simp only [Fin.isValue, Pi.ofNat_apply, Fin.zero_eta, PiLp.zero_apply] <;>
+  · rw [deriv_commute]
+    simp
+    · exact hf
+
+/-!
+
 ### A.8. The curl of a curl
 
 -/
 
 lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
-    ∇ × (∇ × f) = ∇ (∇ ⬝ f) - Δ f := by
+    ∇ ⨯ (∇ ⨯ f) = ∇ (∇ ⬝ f) - Δ f := by
   unfold laplacianVec laplacian div grad curl Finset.sum
   simp only [Fin.isValue, Fin.univ_val_map, List.ofFn_succ, Fin.succ_zero_eq_one,
     Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]

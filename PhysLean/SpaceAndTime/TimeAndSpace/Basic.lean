@@ -194,7 +194,7 @@ lemma time_deriv_differentiable_space {d } {M} [NormedAddCommGroup M] [NormedSpa
 lemma curl_differentiable_time
     (fₜ : Time → Space → EuclideanSpace ℝ (Fin 3))
     (hf : ContDiff ℝ 2 ↿fₜ) (x : Space) :
-    Differentiable ℝ (fun t => (∇ × fₜ t) x) := by
+    Differentiable ℝ (fun t => (∇ ⨯ fₜ t) x) := by
   rw [differentiable_euclidean]
   intro i
   fin_cases i
@@ -212,7 +212,7 @@ open Time
 /-- Curl and time derivative commute. -/
 lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin 3))
     (t : Time) (x : Space) (hf : ContDiff ℝ 2 ↿fₜ) :
-    ∂ₜ (fun t => (∇ × fₜ t) x) t = (∇ × fun x => (∂ₜ (fun t => fₜ t x) t)) x:= by
+    ∂ₜ (fun t => (∇ ⨯ fₜ t) x) t = (∇ ⨯ fun x => (∂ₜ (fun t => fₜ t x) t)) x:= by
   ext i
   rw [← Time.deriv_euclid]
   · fin_cases i

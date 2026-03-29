@@ -13,7 +13,7 @@ public import PhysLean.Electromagnetism.Kinematics.ElectricField
 ## i. Overview
 
 In 3-spatial dimensions from the electromagnetic potential we can define the magnetic field
-` \vec B` as `(∇ × (A.vectorPotential t)) x`.
+` \vec B` as `(∇ ⨯ (A.vectorPotential t)) x`.
 In this module we define this magnetic field from the electromagnetic potential.
 
 In general dimensions we define the magnetic field matrix from the spatial components of the
@@ -81,10 +81,10 @@ open Space Time
 /-- The magnetic field from the electromagnetic potential. -/
 noncomputable def magneticField (c : SpeedOfLight := 1) (A : ElectromagneticPotential) :
     MagneticField :=
-  fun t x => (∇ × (A.vectorPotential c t)) x
+  fun t x => (∇ ⨯ (A.vectorPotential c t)) x
 
 lemma magneticField_eq {c : SpeedOfLight} (A : ElectromagneticPotential) :
-    A.magneticField c = fun t x => (∇ × (A.vectorPotential c t)) x := rfl
+    A.magneticField c = fun t x => (∇ ⨯ (A.vectorPotential c t)) x := rfl
 
 /-!
 
@@ -311,7 +311,7 @@ lemma magneticField_eq_magneticFieldMatrix {c : SpeedOfLight} (A : Electromagnet
 
 lemma magneticField_curl_eq_magneticFieldMatrix{c : SpeedOfLight} (A : ElectromagneticPotential)
     (hA : ContDiff ℝ 2 A) (t : Time) :
-    (∇ × A.magneticField c t) x i = ∑ j, Space.deriv j (A.magneticFieldMatrix c t · (j, i)) x:= by
+    (∇ ⨯ A.magneticField c t) x i = ∑ j, Space.deriv j (A.magneticFieldMatrix c t · (j, i)) x:= by
   rw [magneticField_eq_magneticFieldMatrix A (hA.differentiable (by simp))]
   simp only [curl, Fin.isValue]
   fin_cases i

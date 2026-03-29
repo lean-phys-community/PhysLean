@@ -111,6 +111,12 @@ lemma deriv_contDiff_of_contDiff {M : Type}
   · fun_prop
   · fun_prop
 
+lemma deriv_contDiff_of_space {M : Type}
+    [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → Space d → M) (hf : ContDiff ℝ ∞ ↿f) :
+    ContDiff ℝ ∞ fun (x : Space d) => (∂ₜ fun t => f t x) t := by
+  unfold deriv
+  fun_prop
+
 /-!
 
 ## E. Derivatives of components
