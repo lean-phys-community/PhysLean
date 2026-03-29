@@ -402,8 +402,8 @@ lemma integrable_isDistBounded_inner_grad_schwartzMap_spherical{dm1 : ℕ}
 
 open ContDiff
 
-lemma contDiff_grad {f : Space → ℝ} (hf : ContDiff ℝ ∞ f) :
-    ContDiff ℝ ∞ (fun x => ∇ f x) := by
+lemma contDiff_grad {f : Space → ℝ} (hf : ContDiff ℝ (n + 1) f) :
+    ContDiff ℝ n (fun x => ∇ f x) := by
   unfold grad
   apply ContDiff.fun_comp
   · fun_prop

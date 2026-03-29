@@ -462,8 +462,8 @@ lemma deriv_differentiable {M} [NormedAddCommGroup M]
 
 open ContDiff
 
-lemma deriv_contDiff {d} {f : Space d → ℝ} (hf : ContDiff ℝ ∞ f) :
-    ContDiff ℝ ∞ fun x i => deriv i f x := by
+lemma deriv_contDiff {d} {f : Space d → ℝ} (hf : ContDiff ℝ (n + 1) f) :
+    ContDiff ℝ n fun x i => deriv i f x := by
   unfold deriv
   fun_prop
 
