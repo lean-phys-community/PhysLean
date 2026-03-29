@@ -226,7 +226,7 @@ lemma curl_of_grad_eq_zero (f : Space → ℝ) (hf : ContDiff ℝ 2 f) :
   fin_cases i <;>
   simp only [Fin.isValue, Pi.ofNat_apply, Fin.zero_eta, PiLp.zero_apply] <;>
   · rw [deriv_commute]
-    simp
+    simp only [Fin.isValue, sub_self]
     · exact hf
 
 /-!
