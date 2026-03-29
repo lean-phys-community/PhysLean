@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Zhi Kai Pong. All rights reserved.
+Copyright (c) 2026 Zhi Kai Pong. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Zhi Kai Pong
 -/
@@ -19,6 +19,8 @@ scalar and vector potentials, electric and magnetic fields, and spatial
 derivatives.
 
 -/
+
+@[expose] public section
 
 namespace Electromagnetism
 namespace ThreeDimension
@@ -50,9 +52,9 @@ theorem electricField_eq_3D :
 
 local notation "B" => V.magneticField c
 
-/-- The magnetic field written as the curl of the vector potential as `∇ × A`. -/
+/-- The magnetic field written as the curl of the vector potential as `∇ ⨯ A`. -/
 theorem magneticField_eq_3D :
-    B = fun t x => (∇ × (A t)) x := by
+    B = fun t x => (∇ ⨯ (A t)) x := by
   rw [magneticField_eq]
 
 end ThreeDimension
