@@ -479,7 +479,7 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
             (((realLorentzTensor.FD.obj { as := c k}).ρ (Lorentz.SL2C.toLorentzGroup Λ))
               ((realLorentzTensor.basis (c k)) (b k))))
           (ComponentIdx.complexify.symm i k))
-      rw [complexLorentzTensor.slot_repr_up (c := colorToComplex ∘ c) k hcΛ Λ
+      rw [complexLorentzTensor.repr_ρ_basis_vector_up (c := colorToComplex ∘ c) k hcΛ Λ
         (ComponentIdx.complexify b) i]
       exact (toComplex_equivariant_slot_repr_up k h Λ b i).symm
     · simp only [Pure.actionP_eq (S := complexLorentzTensor),
@@ -495,7 +495,7 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
             (((realLorentzTensor.FD.obj { as := c k}).ρ (Lorentz.SL2C.toLorentzGroup Λ))
               ((realLorentzTensor.basis (c k)) (b k))))
           (ComponentIdx.complexify.symm i k))
-      rw [complexLorentzTensor.slot_repr_down (c := colorToComplex ∘ c) k hcΛ Λ
+      rw [complexLorentzTensor.repr_ρ_basis_vector_down (c := colorToComplex ∘ c) k hcΛ Λ
         (ComponentIdx.complexify b) i]
       exact (toComplex_equivariant_slot_repr_down k h Λ b i).symm
   · simp [P]

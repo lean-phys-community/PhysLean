@@ -45,7 +45,7 @@ the standard complex Lorentz matrix `LorentzGroup.toComplex (SL2C.toLorentzGroup
 This is the coefficient-level identification of an `up` slot of `complexLorentzTensor` with
 the usual contravariant Lorentz 4-vector representation.
 -/
-lemma slot_repr_up (k : Fin n) (h : c k = Color.up) (Λ : SL(2, ℂ))
+lemma repr_ρ_basis_vector_up (k : Fin n) (h : c k = Color.up) (Λ : SL(2, ℂ))
     (b i : ComponentIdx (S := complexLorentzTensor) c) :
     ((complexLorentzTensor.basis (c k)).repr
         (((complexLorentzTensor.FD.obj { as := c k }).ρ Λ)
@@ -81,7 +81,7 @@ the inverse complex Lorentz matrix, in the same convention as `Lorentz.complexCo
 This is the coefficient-level identification of a `down` slot of `complexLorentzTensor` with
 the usual covariant Lorentz 4-covector representation.
 -/
-lemma slot_repr_down (k : Fin n) (h : c k = Color.down) (Λ : SL(2, ℂ))
+lemma repr_ρ_basis_vector_down (k : Fin n) (h : c k = Color.down) (Λ : SL(2, ℂ))
     (b i : ComponentIdx (S := complexLorentzTensor) c) :
     ((complexLorentzTensor.basis (c k)).repr
         (((complexLorentzTensor.FD.obj { as := c k }).ρ Λ)
