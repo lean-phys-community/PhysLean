@@ -46,8 +46,9 @@ private lemma npow_indicator_rpow_eq {n : ℕ} {s : Set ℝ} (hs : 0 ∉ s) (p :
   · grind [Set.indicator_of_mem, smul_eq_mul, add_comm, Real.rpow_add_natCast]
   · simp [hr]
 
-private lemma integrableOn_indicator_iff {s : Set ℝ} (hs : MeasurableSet s) (t : Set ℝ)
-    (f : ℝ → ℝ) : IntegrableOn (s.indicator f) t volume ↔ IntegrableOn f (s ∩ t) volume := by
+private lemma root.MeasureTheory.integrableOn_indicator_iff {s : Set ℝ} (hs : MeasurableSet s)
+    (t : Set ℝ) (f : ℝ → ℝ) :
+    IntegrableOn (s.indicator f) t volume ↔ IntegrableOn f (s ∩ t) volume := by
   refine and_congr ?_ ?_
   · rw [← Measure.restrict_restrict hs]
     constructor <;> intro ⟨g, hg, hg'⟩
@@ -83,7 +84,7 @@ lemma integrableOn_norm_rpow_ball_iff {d : ℕ} (hd : 0 < d) {b : ℝ} (hb : 0 <
   · have hInter : Set.Ioo 0 b ∩ Set.Ioi 0 = Set.Ioo 0 b := by ext; grind
     simp_rw [integrable_fun_norm_addHaar, g, Space.finrank_eq_dim,
       npow_indicator_rpow_eq (Set.left_notMem_Ioo 0 b),
-      integrableOn_indicator_iff measurableSet_Ioo, hInter, Nat.cast_pred hd]
+      root.MeasureTheory.integrableOn_indicator_iff measurableSet_Ioo, hInter, Nat.cast_pred hd]
   rw [intervalIntegral.integrableOn_Ioo_rpow_iff hb, neg_lt_iff_pos_add']
   ring_nf
 
@@ -103,8 +104,8 @@ lemma integrableOn_norm_rpow_ball_compl_iff {d : ℕ} (hd : 0 < d) {a : ℝ} (ha
   trans IntegrableOn (fun r => r ^ (d - 1 + p)) (Set.Ici a)
   · have hInter : Set.Ici a ∩ Set.Ioi 0 = Set.Ici a := by ext; grind
     simp_rw [integrable_fun_norm_addHaar, g, Space.finrank_eq_dim,
-      npow_indicator_rpow_eq (Set.notMem_Ici.mpr ha), integrableOn_indicator_iff measurableSet_Ici,
-      hInter, Nat.cast_pred hd]
+      npow_indicator_rpow_eq (Set.notMem_Ici.mpr ha),
+      root.MeasureTheory.integrableOn_indicator_iff measurableSet_Ici, hInter, Nat.cast_pred hd]
   rw [integrableOn_Ici_iff_integrableOn_Ioi, integrableOn_Ioi_rpow_iff ha, lt_neg_iff_add_neg]
   ring_nf
 
