@@ -9,13 +9,20 @@ public import PhysLean.Relativity.Tensors.ComplexTensor.Basic
 public import PhysLean.Relativity.Tensors.Basic
 /-!
 
-## Component formula for the Lorentz action on a vector slot
+## Component formulas for the standard vector slots of `complexLorentzTensor`
 
-`slot_repr_up` and `slot_repr_down` express the basis coefficients of
-`ρ Λ` on a single `up` / `down` slot of `complexLorentzTensor` in terms of
-`LorentzGroup.toComplex (SL2C.toLorentzGroup Λ)` (contravariant case) and its
-inverse (covariant case). These are reusable facts for complex Lorentz tensors,
-independent of `realLorentzTensor` or `toComplex`.
+In `complexLorentzTensor`, the colors `Color.up` and `Color.down` are the standard Lorentz
+vector colors: they are represented by the canonical contravariant and covariant 4-dimensional
+complex Lorentz representations.
+
+This file provides the corresponding component formulas for the action of `SL(2, ℂ)` on such slots.
+Concretely, it rewrites basis coefficients for the action on a color-indexed slot
+`(complexLorentzTensor.FD.obj { as := c k })` in terms of the usual matrix entries of the standard
+complex Lorentz matrix.
+
+These lemmas are meant as reusable API for later componentwise proofs with complex Lorentz tensors:
+they let one pass directly from an `up`/`down` slot of `complexLorentzTensor`
+to the standard 4-vector / 4-covector formulas.
 
 -/
 
@@ -27,8 +34,17 @@ open TensorSpecies Tensor Lorentz Lorentz.SL2C Matrix MatrixGroups Complex Categ
 
 variable {n : ℕ} {c : Fin n → complexLorentzTensor.Color}
 
-/-- Basis coefficient for the Lorentz action on a contravariant (`up`) vector slot,
-  as a matrix entry of `LorentzGroup.toComplex (SL2C.toLorentzGroup Λ)`. -/
+/--
+Component formula for the standard contravariant vector color `Color.up`.
+
+If the `k`-th slot of a complex Lorentz tensor has color `up`, then the `(i k)`-coordinate
+of the image of the basis vector `(basis (c k)) (b k)` under the slot action
+`((complexLorentzTensor.FD.obj { as := c k }).ρ Λ)` is exactly the corresponding entry of
+the standard complex Lorentz matrix `LorentzGroup.toComplex (SL2C.toLorentzGroup Λ)`.
+
+This is the coefficient-level identification of an `up` slot of `complexLorentzTensor` with
+the usual contravariant Lorentz 4-vector representation.
+-/
 lemma slot_repr_up (k : Fin n) (h : c k = Color.up) (Λ : SL(2, ℂ))
     (b i : ComponentIdx (S := complexLorentzTensor) c) :
     ((complexLorentzTensor.basis (c k)).repr
@@ -54,8 +70,17 @@ lemma slot_repr_up (k : Fin n) (h : c k = Color.up) (Λ : SL(2, ℂ))
     (i := finSumFinEquiv.symm (Fin.cast (by rw [h]; rfl) (i k)))
     (j := finSumFinEquiv.symm (Fin.cast (by rw [h]; rfl) (b k))))
 
-/-- Basis coefficient for the Lorentz action on a covariant (`down`) vector slot,
-  using the inverse matrix in the same convention as `complexCoBasis_ρ_apply`. -/
+/--
+Component formula for the standard covariant vector color `Color.down`.
+
+If the `k`-th slot of a complex Lorentz tensor has color `down`, then the `(i k)`-coordinate of
+the image of the basis vector `(basis (c k)) (b k)` under the slot action
+`((complexLorentzTensor.FD.obj { as := c k }).ρ Λ)` is the corresponding entry of
+the inverse complex Lorentz matrix, in the same convention as `Lorentz.complexCoBasis_ρ_apply`.
+
+This is the coefficient-level identification of a `down` slot of `complexLorentzTensor` with
+the usual covariant Lorentz 4-covector representation.
+-/
 lemma slot_repr_down (k : Fin n) (h : c k = Color.down) (Λ : SL(2, ℂ))
     (b i : ComponentIdx (S := complexLorentzTensor) c) :
     ((complexLorentzTensor.basis (c k)).repr
