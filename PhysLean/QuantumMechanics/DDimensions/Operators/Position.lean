@@ -189,12 +189,6 @@ lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 
   simp only [h]
   exact ContDiffAt.rpow_const_of_ne (by fun_prop) (inner_self_ne_zero.mpr hx)
 
-/-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
-@[fun_prop]
-lemma radiusPowOperator_apply_contDiffOn {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (n : ℕ∞) :
-    ContDiffOn ℝ n (𝐫[s] ψ) (⊤ \ {0}) :=
-  fun _ hx ↦ contDiffWithinAt_diff_singleton.mpr <| radiusPowOperator_apply_contDiffAt s n ψ hx.2
-
 /-- `x ↦ ‖x‖ˢψ(x)` is a.e. strongly measurable. -/
 @[fun_prop]
 lemma radiusPowOperator_apply_AEStronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
