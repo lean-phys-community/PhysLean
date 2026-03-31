@@ -200,10 +200,9 @@ lemma radiusPowOperator_apply_contDiffOn {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d,
 lemma radiusPowOperator_apply_AEStronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     AEStronglyMeasurable (𝐫[s] ψ) := by
   change AEStronglyMeasurable ((fun x ↦ (‖x‖.rpow s : ℂ)) * ⇑ψ)
-  refine AEStronglyMeasurable.mul ?_ (by measurability)
+  refine AEStronglyMeasurable.mul ?_ (by fun_prop)
   refine Continuous.comp_aestronglyMeasurable (by fun_prop) ?_
-  refine StronglyMeasurable.aestronglyMeasurable ?_
-  measurability
+  exact StronglyMeasurable.aestronglyMeasurable (by measurability)
 
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2 * s)
@@ -218,12 +217,12 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2
     rw [← lintegral_add_compl _ (measurableSet_ball (x := 0) (ε := 1)), ENNReal.add_lt_top]
     constructor
     · -- `‖x‖ < 1`: bound `‖ψ x‖` by a constant
-      obtain ⟨C, hC, hCbound⟩ := ψ.decay 0 0
-      simp only [pow_zero, norm_iteratedFDeriv_zero, one_mul] at hCbound
+      obtain ⟨C, hC_pos, hC⟩ := ψ.decay 0 0
+      simp only [pow_zero, norm_iteratedFDeriv_zero, one_mul] at hC
       have hbound (x : Space d) : ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * s)‖ₑ := by
         simp_rw [← enorm_mul, enorm_le_iff_norm_le, norm_mul, norm_pow, Real.norm_eq_abs, sq_abs]
         refine mul_le_mul_of_nonneg_right ?_ (abs_nonneg _)
-        exact (sq_le_sq₀ (norm_nonneg _) hC.le).mpr (hCbound x)
+        exact (sq_le_sq₀ (norm_nonneg _) hC_pos.le).mpr (hC x)
       calc
         _ ≤ ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * s)‖ₑ :=
           setLIntegral_mono' measurableSet_ball (fun x _ ↦ hbound x)
@@ -233,8 +232,8 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2
       have := (integrableOn_norm_rpow_ball_iff hd Real.zero_lt_one _).mpr (h.resolve_left hd.ne')
       exact this.hasFiniteIntegral
     · -- `1 ≤ ‖x‖`: bound `‖ψ x‖` by a suitable power of `‖x‖`
-      obtain ⟨C, hC, hCbound⟩ := ψ.decay (⌈s⌉.toNat + d) 0
-      simp only [norm_iteratedFDeriv_zero, ← Real.rpow_natCast, Nat.cast_add] at hCbound
+      obtain ⟨C, hC_pos, hC⟩ := ψ.decay (⌈s⌉.toNat + d) 0
+      simp only [norm_iteratedFDeriv_zero, ← Real.rpow_natCast, Nat.cast_add] at hC
       have hbound (x : Space d) (hx : x ∈ (Metric.ball 0 1)ᶜ) :
           ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (-2 * d : ℝ)‖ₑ := by
         simp only [Set.mem_compl_iff, Metric.mem_ball, dist_zero_right, not_lt] at hx
@@ -243,7 +242,7 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2
         have hx' : 0 < ‖x‖ := by linarith
         have hψ : ‖ψ x‖ ≤ C * ‖x‖ ^ (-(⌈s⌉.toNat + d) : ℝ) := by
           rw [Real.rpow_neg hx'.le]
-          exact (le_mul_inv_iff₀' <| Real.rpow_pos_of_pos hx' _).mpr (hCbound x)
+          exact (le_mul_inv_iff₀' <| Real.rpow_pos_of_pos hx' _).mpr (hC x)
         calc
           _ ≤ (C * ‖x‖ ^ (-(⌈s⌉.toNat + d) : ℝ)) ^ 2 * ‖x‖ ^ (2 * s) := by
             refine mul_le_mul_of_nonneg_right ?_ (Real.rpow_nonneg hx'.le _)
@@ -253,7 +252,7 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2
             ring_nf
         suffices s ≤ ⌈s⌉.toNat by
           have h' : 0 < C ^ 2 * ‖x‖ ^ (-2 * d : ℝ) :=
-            mul_pos (sq_pos_of_pos hC) (Real.rpow_pos_of_pos hx' _)
+            mul_pos (sq_pos_of_pos hC_pos) (Real.rpow_pos_of_pos hx' _)
           apply (mul_le_iff_le_one_right h').mpr
           exact Real.rpow_le_one_of_one_le_of_nonpos hx (by linarith)
         rcases lt_or_ge 0 s with (hs | hs)
