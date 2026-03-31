@@ -158,6 +158,24 @@ lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
 ### A.3. Radius powers
 -/
 
+/-- The radius operator to power `s` is the linear map from `𝓢(Space d, ℂ)` to `Space d → ℂ` that
+  maps `ψ` to `x ↦ ‖x‖ˢψ(x)` (which is 'nearly' Schwartz for general `s`). -/
+def radiusPowOperator {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space d → ℂ where
+  toFun ψ := (fun x : Space d ↦ ‖x‖ ^ s) • ψ
+  map_add' _ _ := by rw [← smul_add]; rfl
+  map_smul' _ _ := by rw [smul_comm]; rfl
+
+@[inherit_doc radiusPowOperator]
+notation "𝐫[" s "]" => radiusPowOperator s
+
+lemma radiusPowOperator_apply_fun {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+    𝐫[s] ψ = fun x ↦ ‖x‖ ^ s • ψ x := rfl
+
+@[simp]
+lemma radiusPowOperator_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
+    𝐫[s] ψ x = ‖x‖ ^ s • ψ x := by
+  rw [radiusPowOperator_apply_fun]
+
 
 end
 
