@@ -36,10 +36,13 @@ Notation:
 
 ## iii. Table of contents
 
-- A. Position vector operator
-- B. Regularized radius operator
-- C. Unbounded position vector operator
-- D. Unbounded regularized radius operator
+- A. Schwartz operators
+  - A.1. Position vector
+  - A.2. Radius powers (regularized)
+  - A.3. Radius powers
+- B. Unbounded operators
+  - B.1. Position vector
+  - B.2. Radius powers (regularized)
 
 ## iv. References
 
@@ -48,16 +51,19 @@ Notation:
 @[expose] public section
 
 namespace QuantumMechanics
-noncomputable section
-open Space
-open Function SchwartzMap ContDiff
 
 variable {d : ℕ} (i : Fin d)
 
 /-!
+## A. Schwartz operators
+-/
 
-## A. Position vector operator
+noncomputable section
+open Space Function
+open SchwartzMap
 
+/-!
+### A.1. Position vector
 -/
 
 /-- Component `i` of the position operator is the continuous linear map
@@ -78,9 +84,7 @@ lemma positionOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐱[i] �
   simp [positionOperator_apply_fun]
 
 /-!
-
-## B. Regularized radius operator
-
+### A.2. Radius powers (regularized)
 -/
 TODO "ZGCNP" "Incorporate normRegularizedPow into Space.Norm"
 
@@ -151,12 +155,23 @@ lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
   simp [Space.norm_sq_eq, add_mul, ← mul_assoc, ← pow_two, Finset.sum_mul]
 
 /-!
-
-## C. Unbounded position vector operator
-
+### A.3. Radius powers
 -/
 
+
+end
+
+/-!
+## B. Unbounded operators
+-/
+
+noncomputable section
+
 open SpaceDHilbertSpace
+
+/-!
+### B.1. Position vector
+-/
 
 /-- The position operators defined on the Schwartz submodule. -/
 def positionOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
@@ -167,7 +182,7 @@ lemma positionOperatorSchwartz_isSymmetric : (positionOperatorSchwartz i).IsSymm
   obtain ⟨_, rfl⟩ := schwartzEquiv.surjective ψ
   obtain ⟨_, rfl⟩ := schwartzEquiv.surjective ψ'
   unfold positionOperatorSchwartz
-  simp only [LinearMap.coe_comp, LinearEquiv.coe_coe, comp_apply, schwartzEquiv_inner]
+  simp only [LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply, schwartzEquiv_inner]
   congr with x
   simp only [LinearEquiv.symm_apply_apply, ContinuousLinearMap.coe_coe,
     positionOperator_apply, map_mul, Complex.conj_ofReal]
@@ -179,9 +194,7 @@ def positionUnboundedOperator : UnboundedOperator (SpaceDHilbertSpace d) (SpaceD
   UnboundedOperator.ofSymmetric (schwartzSubmodule_dense d) (positionOperatorSchwartz_isSymmetric i)
 
 /-!
-
-## D. Unbounded regularized radius operator
-
+### B.2. Radius powers (regularized)
 -/
 
 /-- The (regularized) radius operators defined on the Schwartz submodule. -/
@@ -194,8 +207,8 @@ lemma radiusRegPowOperatorSchwartz_isSymmetric {d : ℕ} (ε : ℝˣ) (s : ℝ) 
   intro ψ ψ'
   obtain ⟨_, rfl⟩ := schwartzEquiv.surjective ψ
   obtain ⟨_, rfl⟩ := schwartzEquiv.surjective ψ'
-  simp only [radiusRegPowOperatorSchwartz, LinearMap.coe_comp, LinearEquiv.coe_coe, comp_apply,
-    schwartzEquiv_inner]
+  simp only [radiusRegPowOperatorSchwartz, LinearMap.coe_comp, LinearEquiv.coe_coe,
+    Function.comp_apply, schwartzEquiv_inner]
   congr with x -- match integrands
   simp only [LinearEquiv.symm_apply_apply, ContinuousLinearMap.coe_coe, radiusRegPowOperator_apply,
     Complex.real_smul, map_mul, Complex.conj_ofReal]
