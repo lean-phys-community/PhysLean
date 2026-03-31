@@ -8,6 +8,7 @@ module
 public import PhysLean.QuantumMechanics.DDimensions.Operators.Unbounded
 public import PhysLean.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
 public import PhysLean.SpaceAndTime.Space.Derivatives.Basic
+public import PhysLean.SpaceAndTime.Space.Integrals.NormPow
 /-!
 
 # Position operators
@@ -159,6 +160,7 @@ lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
 -/
 
 open MeasureTheory
+open SpaceDHilbertSpace
 
 /-- The radius operator to power `s` is the linear map from `𝓢(Space d, ℂ)` to `Space d → ℂ` that
   maps `ψ` to `x ↦ ‖x‖ˢψ(x)` (which is 'nearly' Schwartz for general `s`). -/
@@ -203,6 +205,74 @@ lemma radiusPowOperator_apply_AEStronglyMeasurable {d : ℕ} (s : ℝ) (ψ : �
   refine Continuous.comp_aestronglyMeasurable (by fun_prop) ?_
   refine StronglyMeasurable.aestronglyMeasurable ?_
   measurability
+
+/-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
+lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2 * s)
+    (ψ : 𝓢(Space d, ℂ)) : MemHS (𝐫[s] ψ) := by
+  rcases Nat.eq_zero_or_pos d with (rfl | hd)
+  · simp only [MemHS, MemLp.of_discrete]
+  · refine (MeasureTheory.memLp_two_iff_integrable_sq_norm (by fun_prop)).mpr ⟨by fun_prop, ?_⟩
+    suffices ∫⁻ (a : Space d), ‖‖ψ a‖ ^ 2 * ‖a‖ ^ (2 * s)‖ₑ < ⊤ by
+      have hInt (x : Space d) : ‖𝐫[s] ψ x‖ ^ 2 = ‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s) := by
+        simp [radiusPowOperator, mul_pow, mul_comm, Real.rpow_mul]
+      simpa only [HasFiniteIntegral, hInt]
+    rw [← lintegral_add_compl _ (measurableSet_ball (x := 0) (ε := 1)), ENNReal.add_lt_top]
+    constructor
+    · -- `‖x‖ < 1`: bound `‖ψ x‖` by a constant
+      obtain ⟨C, hC, hCbound⟩ := ψ.decay 0 0
+      simp only [pow_zero, norm_iteratedFDeriv_zero, one_mul] at hCbound
+      have hbound (x : Space d) : ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * s)‖ₑ := by
+        simp_rw [← enorm_mul, enorm_le_iff_norm_le, norm_mul, norm_pow, Real.norm_eq_abs, sq_abs]
+        refine mul_le_mul_of_nonneg_right ?_ (abs_nonneg _)
+        exact (sq_le_sq₀ (norm_nonneg _) hC.le).mpr (hCbound x)
+      calc
+        _ ≤ ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * s)‖ₑ :=
+          setLIntegral_mono' measurableSet_ball (fun x _ ↦ hbound x)
+        _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖‖x‖ ^ (2 * s)‖ₑ :=
+          lintegral_const_mul _ (by fun_prop)
+      apply ENNReal.mul_lt_top enorm_lt_top
+      have := (integrableOn_norm_rpow_ball_iff hd Real.zero_lt_one _).mpr (h.resolve_left hd.ne')
+      exact this.hasFiniteIntegral
+    · -- `1 ≤ ‖x‖`: bound `‖ψ x‖` by a suitable power of `‖x‖`
+      obtain ⟨C, hC, hCbound⟩ := ψ.decay (⌈s⌉.toNat + d) 0
+      simp only [norm_iteratedFDeriv_zero, ← Real.rpow_natCast, Nat.cast_add] at hCbound
+      have hbound (x : Space d) (hx : x ∈ (Metric.ball 0 1)ᶜ) :
+          ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (-2 * d : ℝ)‖ₑ := by
+        simp only [Set.mem_compl_iff, Metric.mem_ball, dist_zero_right, not_lt] at hx
+        simp_rw [← enorm_mul, enorm_le_iff_norm_le, norm_mul, norm_pow, Real.norm_eq_abs, sq_abs,
+          Real.abs_rpow_of_nonneg (norm_nonneg _), abs_norm]
+        have hx' : 0 < ‖x‖ := by linarith
+        have hψ : ‖ψ x‖ ≤ C * ‖x‖ ^ (-(⌈s⌉.toNat + d) : ℝ) := by
+          rw [Real.rpow_neg hx'.le]
+          exact (le_mul_inv_iff₀' <| Real.rpow_pos_of_pos hx' _).mpr (hCbound x)
+        calc
+          _ ≤ (C * ‖x‖ ^ (-(⌈s⌉.toNat + d) : ℝ)) ^ 2 * ‖x‖ ^ (2 * s) := by
+            refine mul_le_mul_of_nonneg_right ?_ (Real.rpow_nonneg hx'.le _)
+            exact pow_le_pow_left₀ (norm_nonneg _) hψ 2
+          _ = C ^ 2 * ‖x‖ ^ (-2 * d : ℝ) * ‖x‖ ^ (2 * (s - ⌈s⌉.toNat) : ℝ) := by
+            simp_rw [mul_pow, ← Real.rpow_mul_natCast hx'.le, mul_assoc, ← Real.rpow_add hx']
+            ring_nf
+        suffices s ≤ ⌈s⌉.toNat by
+          have h' : 0 < C ^ 2 * ‖x‖ ^ (-2 * d : ℝ) :=
+            mul_pos (sq_pos_of_pos hC) (Real.rpow_pos_of_pos hx' _)
+          apply (mul_le_iff_le_one_right h').mpr
+          exact Real.rpow_le_one_of_one_le_of_nonpos hx (by linarith)
+        rcases lt_or_ge 0 s with (hs | hs)
+        · have hs' : ⌈s⌉.toNat = (⌈s⌉ : ℝ) :=
+            Int.cast_inj.mpr <| Int.toNat_of_nonneg <| Int.ceil_nonneg hs.le
+          exact hs' ▸ Int.le_ceil s
+        · have hs' : ⌈s⌉.toNat = (0 : ℝ) :=
+            Nat.cast_eq_zero.mpr <| Int.toNat_of_nonpos <| Int.ceil_le.mpr (by rwa [Int.cast_zero])
+          exact hs' ▸ hs
+      calc
+        _ ≤ ∫⁻ (x : Space d) in (Metric.ball 0 1)ᶜ, ‖C ^ 2‖ₑ * ‖‖x‖ ^ (-2 * d: ℝ)‖ₑ :=
+          setLIntegral_mono' (by measurability) hbound
+        _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1)ᶜ, ‖‖x‖ ^ (-2 * d : ℝ)‖ₑ :=
+          lintegral_const_mul _ (by fun_prop)
+      apply ENNReal.mul_lt_top enorm_lt_top
+      have hd' : (d + -2 * d : ℝ) < 0 := by aesop
+      have := (integrableOn_norm_rpow_ball_compl_iff hd Real.zero_lt_one _).mpr hd'
+      exact this.hasFiniteIntegral
 
 end
 
