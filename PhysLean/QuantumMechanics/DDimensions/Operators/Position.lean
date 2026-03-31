@@ -189,14 +189,12 @@ lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 
   simp only [h]
   exact ContDiffAt.rpow_const_of_ne (by fun_prop) (inner_self_ne_zero.mpr hx)
 
-/-- `x ↦ ‖x‖ˢψ(x)` is a.e. strongly measurable. -/
+/-- `x ↦ ‖x‖ˢψ(x)` is strongly measurable. -/
 @[fun_prop]
-lemma radiusPowOperator_apply_AEStronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
-    AEStronglyMeasurable (𝐫[s] ψ) := by
-  change AEStronglyMeasurable ((fun x ↦ (‖x‖.rpow s : ℂ)) * ⇑ψ)
-  refine AEStronglyMeasurable.mul ?_ (by fun_prop)
-  refine Continuous.comp_aestronglyMeasurable (by fun_prop) ?_
-  exact StronglyMeasurable.aestronglyMeasurable (by measurability)
+lemma radiusPowOperator_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+    StronglyMeasurable (𝐫[s] ψ) := by
+  change StronglyMeasurable ((fun x ↦ (‖x‖.rpow s : ℂ)) * ⇑ψ)
+  exact StronglyMeasurable.mul (by measurability) ψ.continuous.stronglyMeasurable
 
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2 * s)
