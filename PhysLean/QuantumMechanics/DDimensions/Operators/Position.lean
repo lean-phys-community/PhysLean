@@ -197,7 +197,7 @@ lemma radiusPowOperator_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(
   exact StronglyMeasurable.mul (by measurability) ψ.continuous.stronglyMeasurable
 
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
-lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2 * s)
+lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : 0 < d + 2 * s)
     (ψ : 𝓢(Space d, ℂ)) : MemHS (𝐫[s] ψ) := by
   rcases Nat.eq_zero_or_pos d with (rfl | hd)
   · simp only [MemHS, MemLp.of_discrete]
@@ -221,8 +221,7 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2
         _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖‖x‖ ^ (2 * s)‖ₑ :=
           lintegral_const_mul _ (by fun_prop)
       apply ENNReal.mul_lt_top enorm_lt_top
-      have := (integrableOn_norm_rpow_ball_iff hd Real.zero_lt_one _).mpr (h.resolve_left hd.ne')
-      exact this.hasFiniteIntegral
+      exact ((integrableOn_norm_rpow_ball_iff hd Real.zero_lt_one _).mpr h).hasFiniteIntegral
     · -- `1 ≤ ‖x‖`: bound `‖ψ x‖` by a suitable power of `‖x‖`
       obtain ⟨C, hC_pos, hC⟩ := ψ.decay (⌈s⌉.toNat + d) 0
       simp only [norm_iteratedFDeriv_zero, ← Real.rpow_natCast, Nat.cast_add] at hC
@@ -261,8 +260,7 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : d = 0 ∨ 0 < d + 2
           lintegral_const_mul _ (by fun_prop)
       apply ENNReal.mul_lt_top enorm_lt_top
       have hd' : (d + -2 * d : ℝ) < 0 := by aesop
-      have := (integrableOn_norm_rpow_ball_compl_iff hd Real.zero_lt_one _).mpr hd'
-      exact this.hasFiniteIntegral
+      exact ((integrableOn_norm_rpow_ball_compl_iff hd zero_lt_one _).mpr hd').hasFiniteIntegral
 
 end
 
