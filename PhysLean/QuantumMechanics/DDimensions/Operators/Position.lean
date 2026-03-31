@@ -158,6 +158,8 @@ lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
 ### A.3. Radius powers
 -/
 
+open MeasureTheory
+
 /-- The radius operator to power `s` is the linear map from `𝓢(Space d, ℂ)` to `Space d → ℂ` that
   maps `ψ` to `x ↦ ‖x‖ˢψ(x)` (which is 'nearly' Schwartz for general `s`). -/
 def radiusPowOperator {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space d → ℂ where
@@ -176,6 +178,31 @@ lemma radiusPowOperator_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x :
     𝐫[s] ψ x = ‖x‖ ^ s • ψ x := by
   rw [radiusPowOperator_apply_fun]
 
+/-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
+@[fun_prop]
+lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
+    (hx : x ≠ 0) : ContDiffAt ℝ n (𝐫[s] ψ) x := by
+  refine ContDiffAt.smul ?_ (ψ.contDiffAt n)
+  have h (x : Space d) : ‖x‖ ^ s = (inner ℝ x x) ^ (s / 2) := by
+    simp [← Real.rpow_natCast_mul, mul_div_cancel₀]
+  simp only [h]
+  exact ContDiffAt.rpow_const_of_ne (by fun_prop) (inner_self_ne_zero.mpr hx)
+
+/-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
+@[fun_prop]
+lemma radiusPowOperator_apply_contDiffOn {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (n : ℕ∞) :
+    ContDiffOn ℝ n (𝐫[s] ψ) (⊤ \ {0}) :=
+  fun _ hx ↦ contDiffWithinAt_diff_singleton.mpr <| radiusPowOperator_apply_contDiffAt s n ψ hx.2
+
+/-- `x ↦ ‖x‖ˢψ(x)` is a.e. strongly measurable. -/
+@[fun_prop]
+lemma radiusPowOperator_apply_AEStronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+    AEStronglyMeasurable (𝐫[s] ψ) := by
+  change AEStronglyMeasurable ((fun x ↦ (‖x‖.rpow s : ℂ)) * ⇑ψ)
+  refine AEStronglyMeasurable.mul ?_ (by measurability)
+  refine Continuous.comp_aestronglyMeasurable (by fun_prop) ?_
+  refine StronglyMeasurable.aestronglyMeasurable ?_
+  measurability
 
 end
 
