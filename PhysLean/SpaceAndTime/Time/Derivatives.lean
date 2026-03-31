@@ -111,6 +111,7 @@ lemma deriv_contDiff_of_contDiff {M : Type}
   · fun_prop
   · fun_prop
 
+@[fun_prop]
 lemma deriv_contDiff_of_space {n} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Time → Space d → M) (hf : ContDiff ℝ (n + 1) ↿f) :
     ContDiff ℝ n fun (x : Space d) => (∂ₜ fun t => f t x) t := by
