@@ -22,28 +22,35 @@ The variational calculus API in PhysLib is designed to match and formalize the p
 of variational calculus. It is not designed to be a general API for variational calculus.
 
 Within variational caclulus we are interested in function transformations, `F : (X → U) → (Y → V)`.
-In physics this functional is often of the form `L : (Time → U) → (Time → ℝ)`,
+In physics this functional is often of the form `L : (Time → U) → Time → ℝ`,
 which represents the Lagrangian of a system. We will use this to explain the formalization
 within this API.
 
-The action is nominally given by `S u = ∫ (L (u t) t) dt`, however it is convenient to
-introduce another function `φ` and define the action as `S u = ∫ φ t * (L (u t) t)  dt`.
+The action is nominally given by
+$$S[u] = \int L(u, t) dt,$$
+however it is convenient to
+introduce another function `φ` and define the action as
+$$S[u] = \int φ(t)  L(u, t) dt.$$
 In the end we will set `φ := fun _ => 1`.
 
-We now consider `∂ (S (u + s * δu)) / ∂ s` at `s = 0`,
+We now consider $$\frac{\partial}{\partial s} S[u + s * \delta u]$$ at `s = 0`,
 which is the variational derivative of `S` at `u` in the direction `δu`.
 This is equal to
-```
-∫ φ t * (∂ L (u + s * δ u) t / ∂ s)|_{s = 0} dt
-```
-Let us denote `δu t ↦ (∂ L (u + s * δ u) t / ∂ s)|_{s = 0}` as `Lᵤ : (Time → U) → (Time → ℝ)`.
-Then the variational derivative is `∫ φ t * Lᵤ (δu) t dt`.
+$$
+\int φ(t) * \left. \frac{\partial}{\partial s} L(u + s * \delta u, t)\right|_{s = 0}dt
+$$
+Let us denote the function
+$$
+\delta u,\, t \mapsto \left. \frac{\partial}{\partial s} L(u + s * \delta u, t)\right|_{s = 0}
+$$ as `Lᵤ : (Time → U) → (Time → ℝ)`.
+Then the variational derivative is
+$$\int φ (t) Lᵤ(δu, t) dt.$$
 
-It may then be possible to find a function `Gᵤ : (Time → ℝ) → (Time → U)`
+It may then be possible to find a function `Gᵤ : (Time → ℝ) → Time → U`
 such that
-```
-∫ φ t * Lᵤ (δu) t dt = ∫ ⟪Gᵤ (φ t), δu t⟫ dt
-```
+$$
+\int φ(t) Lᵤ(δu, t) dt = \int \langle Gᵤ(φ, t), δu(t)\rangle dt
+$$
 This is usually done by integration by parts.
 
 We now set `φ := fun _ => 1` and get `grad u := Gᵤ (fun _ => 1)`, which is the
