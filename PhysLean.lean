@@ -297,13 +297,13 @@ public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Basic
 public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Lemmas
 public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Pre
 public import PhysLean.Relativity.Tensors.ComplexTensor.OfRat
-public import PhysLean.Relativity.Tensors.ComplexTensor.SlotRepr
 public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Basic
 public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Pre
 public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Symm
 public import PhysLean.Relativity.Tensors.ComplexTensor.Vector.Pre.Basic
 public import PhysLean.Relativity.Tensors.ComplexTensor.Vector.Pre.Contraction
 public import PhysLean.Relativity.Tensors.ComplexTensor.Vector.Pre.Modules
+public import PhysLean.Relativity.Tensors.ComplexTensor.Vector.SlotRepr
 public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Basic
 public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Contraction
 public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Metric
