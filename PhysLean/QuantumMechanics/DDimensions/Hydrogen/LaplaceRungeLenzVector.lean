@@ -191,30 +191,29 @@ private lemma positionCompMomentumSqr_comm {d : ℕ} (i j : Fin d) :
       rw [angularMomentumOperator_antisymm j i, neg_comp, smul_neg, ← neg_smul, ← neg_mul,
         ← neg_mul, momentumSqr_comp_angularMomentum_commute]
 
-private lemma positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add {d} (i j : Fin d) :
-    ⁅positionCompMomentumSqr (d := d) i, positionDotMomentumCompMomentum j⁆ +
-    ⁅positionDotMomentumCompMomentum i, positionCompMomentumSqr j⁆ =
-    (-Complex.I * ℏ) • 𝐩² ∘L 𝐋[i,j] := by
-  unfold positionCompMomentumSqr positionDotMomentumCompMomentum
-  nth_rw 2 [← lie_skew]
-  repeat rw [leibniz_lie, lie_leibniz, lie_leibniz]
-  repeat rw [← lie_skew _ (positionDotMomentum d)]
-  repeat rw [position_commutation_momentum]
-  repeat rw [momentumSqr_commutation_momentum]
-  repeat rw [positionDotMomentum_commutation_position]
-  repeat rw [positionDotMomentum_commutation_momentumSqr]
-  simp only [neg_comp, smul_comp, add_comp, comp_zero, zero_add, comp_smul, id_comp, comp_assoc]
-  repeat rw [comp_eq_comp_add_commute 𝐩² 𝐩[_], momentumSqr_commutation_momentum]
-  rw [symm j i]
-  trans (-Complex.I * ℏ) • 𝐋[i,j] ∘L 𝐩²
-  · ext ψ x
-    unfold angularMomentumOperator
-    simp only [add_zero, comp_neg, comp_smulₛₗ, RingHom.id_apply, neg_mul, neg_smul, neg_neg,
-      coe_sub', Pi.sub_apply, ContinuousLinearMap.add_apply, ContinuousLinearMap.neg_apply,
-      coe_smul', coe_comp', Pi.smul_apply, Function.comp_apply, SchwartzMap.sub_apply,
-      SchwartzMap.add_apply, SchwartzMap.neg_apply, SchwartzMap.smul_apply, smul_eq_mul, sub_comp]
-    ring
-  rw [comp_eq_comp_sub_commute 𝐩² _, angularMomentum_commutation_momentumSqr, sub_zero]
+private lemma positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add
+    {d : ℕ} (i j : Fin d) : ⁅positionCompMomentumSqr i, positionDotMomentumCompMomentum j⁆ +
+    ⁅positionDotMomentumCompMomentum i, positionCompMomentumSqr j⁆ = (-I * ℏ) • 𝐩² ∘L 𝐋[i,j] := by
+  suffices ∀ k l : Fin d, ⁅positionCompMomentumSqr k, positionDotMomentumCompMomentum l⁆
+      = (-I * ℏ) • (𝐱[k] ∘L 𝐩[l] - δ[k,l] • positionDotMomentum d) ∘L 𝐩² by
+    nth_rw 2 [← lie_skew]
+    simp_rw [this, ← sub_eq_add_neg, ← smul_sub, ← sub_comp, symm j i, sub_sub_sub_cancel_right,
+      momentumSqr_comp_angularMomentum_commute, angularMomentumOperator]
+  intro k l
+  calc
+    _ = (positionDotMomentum d) ∘L ⁅𝐱[k], 𝐩[l]⁆ ∘L 𝐩²
+        + 𝐱[k] ∘L ⁅momentumOperatorSqr (d := d), positionDotMomentum d⁆ ∘L 𝐩[l]
+        + ⁅𝐱[k], positionDotMomentum d⁆ ∘L 𝐩² ∘L 𝐩[l] := by
+      simp [positionCompMomentumSqr, positionDotMomentumCompMomentum, lie_leibniz, leibniz_lie,
+        add_assoc, comp_assoc]
+    _ = (positionDotMomentum d) ∘L ⁅𝐱[k], 𝐩[l]⁆ ∘L 𝐩² + (-I * ℏ) • 𝐱[k] ∘L 𝐩[l] ∘L 𝐩² := by
+      simp only [← lie_skew _ (positionDotMomentum d), positionDotMomentum_commutation_position,
+        positionDotMomentum_commutation_momentumSqr, momentumSqr_comp_momentum_commute,
+        ← neg_smul, ← neg_mul, smul_comp, comp_smul, add_assoc, ← add_smul]
+      ring_nf
+    _ = (-I * ℏ) • (𝐱[k] ∘L 𝐩[l] - δ[k,l] • positionDotMomentum d) ∘L 𝐩² := by
+      simp_rw [add_comm, position_commutation_momentum, sub_comp, smul_sub, smul_comp, comp_smul,
+        id_comp, sub_eq_add_neg, ← neg_smul, neg_mul, neg_neg, comp_assoc]
 
 private lemma positionDotMomentumCompMomentum_comm {d : ℕ} (i j : Fin d) :
     ⁅positionDotMomentumCompMomentum i, positionDotMomentumCompMomentum j⁆ = 0 := by
