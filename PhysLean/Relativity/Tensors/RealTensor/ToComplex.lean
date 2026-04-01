@@ -7,7 +7,6 @@ module
 
 public import PhysLean.Meta.Linters.Sorry
 public import PhysLean.Relativity.Tensors.ComplexTensor.Basic
-public import PhysLean.Relativity.Tensors.ComplexTensor.Vector.SlotRepr
 /-!
 
 # Complex Lorentz tensors from real Lorentz tensors
@@ -479,7 +478,7 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
             (((realLorentzTensor.FD.obj { as := c k}).ρ (Lorentz.SL2C.toLorentzGroup Λ))
               ((realLorentzTensor.basis (c k)) (b k))))
           (ComponentIdx.complexify.symm i k))
-      rw [complexLorentzTensor.repr_ρ_basis_vector_up_of_eq (c₀ := (colorToComplex ∘ c) k) hcΛ Λ
+      rw [repr_ρ_basis_vector_up_of_eq (c₀ := (colorToComplex ∘ c) k) hcΛ Λ
         (ComponentIdx.complexify b k) (i k)]
       exact (toComplex_equivariant_slot_repr_up k h Λ b i).symm
     · simp only [Pure.actionP_eq (S := complexLorentzTensor),
@@ -495,7 +494,7 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
             (((realLorentzTensor.FD.obj { as := c k}).ρ (Lorentz.SL2C.toLorentzGroup Λ))
               ((realLorentzTensor.basis (c k)) (b k))))
           (ComponentIdx.complexify.symm i k))
-      rw [complexLorentzTensor.repr_ρ_basis_vector_down_of_eq (c₀ := (colorToComplex ∘ c) k) hcΛ Λ
+      rw [repr_ρ_basis_vector_down_of_eq (c₀ := (colorToComplex ∘ c) k) hcΛ Λ
         (ComponentIdx.complexify b k) (i k)]
       exact (toComplex_equivariant_slot_repr_down k h Λ b i).symm
   · simp [P]
