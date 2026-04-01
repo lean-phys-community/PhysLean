@@ -90,8 +90,9 @@ lemma vectorPotential_contDiff {n} {d} {c : SpeedOfLight} (A : ElectromagneticPo
 
 open ContDiff
 @[fun_prop]
-lemma vectorPotential_contDiff_of_smooth {n : ℕ} {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
-    (hA : ContDiff ℝ ∞ A) : ContDiff ℝ n ↿(A.vectorPotential c) := by
+lemma vectorPotential_contDiff_of_smooth {n : ℕ} {d} {c : SpeedOfLight}
+    (A : ElectromagneticPotential d) (hA : ContDiff ℝ ∞ A) :
+    ContDiff ℝ n ↿(A.vectorPotential c) := by
   apply vectorPotential_contDiff
   exact hA.of_le (ENat.LEInfty.out)
 
