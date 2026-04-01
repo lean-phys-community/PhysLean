@@ -216,34 +216,25 @@ private lemma positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add {
     ring
   rw [comp_eq_comp_sub_commute 𝐩² _, angularMomentum_commutation_momentumSqr, sub_zero]
 
-private lemma positionDotMomentumCompMomentum_comm {d} (i j : Fin d) :
+private lemma positionDotMomentumCompMomentum_comm {d : ℕ} (i j : Fin d) :
     ⁅positionDotMomentumCompMomentum i, positionDotMomentumCompMomentum j⁆ = 0 := by
-  unfold positionDotMomentumCompMomentum
-  rw [leibniz_lie, lie_leibniz, lie_leibniz, lie_self,
-    ← lie_skew _ (positionDotMomentum d)]
-  ext ψ x
-  simp [momentum_commutation_momentum, positionDotMomentum_commutation_momentum,
-    momentum_comp_commute i j]
+  simp [positionDotMomentumCompMomentum, lie_leibniz, leibniz_lie, momentum_comp_commute,
+    ← lie_skew 𝐩[_] (positionDotMomentum d), positionDotMomentum_commutation_momentum, comp_assoc]
 
-private lemma positionCompMomentumSqr_comm_constMomentum_add {d} (i j : Fin d) :
+private lemma positionCompMomentumSqr_comm_constMomentum_add {d : ℕ} (i j : Fin d) :
     ⁅positionCompMomentumSqr i, constMomentum j⁆ +
     ⁅constMomentum i, positionCompMomentumSqr j⁆ = 0 := by
-  unfold positionCompMomentumSqr constMomentum
   nth_rw 2 [← lie_skew]
-  repeat rw [lie_smul, leibniz_lie, momentumSqr_commutation_momentum, comp_zero, zero_add,
-    position_commutation_momentum, smul_comp, smul_comp, id_comp]
-  rw [symm j i, add_neg_eq_zero]
+  simp [positionCompMomentumSqr, constMomentum, leibniz_lie, position_commutation_momentum, symm j]
 
-private lemma positionDotMomentumCompMomentum_comm_constMomentum_add {d} (i j : Fin d) :
-    ⁅positionDotMomentumCompMomentum (d := d) i, constMomentum j⁆ +
+private lemma positionDotMomentumCompMomentum_comm_constMomentum_add {d : ℕ} (i j : Fin d) :
+    ⁅positionDotMomentumCompMomentum i, constMomentum j⁆ +
     ⁅constMomentum i, positionDotMomentumCompMomentum j⁆ = 0 := by
-  unfold positionDotMomentumCompMomentum constMomentum
   nth_rw 2 [← lie_skew]
-  repeat rw [lie_smul, leibniz_lie, momentum_commutation_momentum, comp_zero, zero_add,
-    positionDotMomentum_commutation_momentum, smul_comp]
-  rw [momentum_comp_commute, add_neg_eq_zero]
+  simp [positionDotMomentumCompMomentum, constMomentum, leibniz_lie,
+    positionDotMomentum_commutation_momentum, momentum_comp_commute]
 
-private lemma constMomentum_comm_constMomentum {d : ℕ} (i j : Fin d) :
+private lemma constMomentum_comm {d : ℕ} (i j : Fin d) :
     ⁅constMomentum i, constMomentum j⁆ = 0 := by
   simp [constMomentum]
 
@@ -370,7 +361,7 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) : ⁅H.lrlOperator ε i, 
   rw [positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add]
   rw [positionCompMomentumSqr_comm_constMomentum_add]
   rw [positionDotMomentumCompMomentum_comm_constMomentum_add]
-  rw [constMomentum_comm_constMomentum]
+  rw [constMomentum_comm]
   rw [positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add H]
   rw [positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition_add H]
   rw [constMomentum_comm_constRadiusRegInvCompPosition_add H]
