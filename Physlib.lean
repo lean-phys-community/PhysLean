@@ -51,6 +51,7 @@ public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.Mathematics.DataStructures.FourTree.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
+public import Physlib.Mathematics.DataStructures.MultiIndex
 public import Physlib.Mathematics.Distribution.Basic
 public import Physlib.Mathematics.Distribution.PowMul
 public import Physlib.Mathematics.FDerivCurry
