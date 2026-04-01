@@ -68,7 +68,7 @@ lemma electricField_apply_x_boost_zero {d : ℕ} {c : SpeedOfLight} (β : ℝ) (
     let x' : Space d.succ := ⟨fun
       | 0 => γ β * (x 0 + c * β * t.val)
       | ⟨Nat.succ n, ih⟩ => x ⟨Nat.succ n, ih⟩⟩
-    electricField c (fun x => Λ • A (Λ⁻¹ • x)) t x 0 =
+    electricField c ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ t x 0 =
     A.electricField c t' x' 0 := by
   dsimp
   rw [electricField_eq_fieldStrengthMatrix, fieldStrengthMatrix_equivariant]
@@ -94,7 +94,8 @@ lemma electricField_apply_x_boost_zero {d : ℕ} {c : SpeedOfLight} (β : ℝ) (
   rfl
   exact hA
   exact hA
-  · apply Differentiable.comp
+  · simp only
+    apply Differentiable.comp
     · change Differentiable ℝ (Lorentz.Vector.actionCLM (boost 0 β hβ))
       exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM (boost 0 β hβ))
     · apply Differentiable.comp
@@ -115,7 +116,7 @@ lemma electricField_apply_x_boost_succ {d : ℕ} {c : SpeedOfLight} (β : ℝ) (
     let x' : Space d.succ := ⟨fun
       | 0 => γ β * (x 0 + c * β * t.val)
       | ⟨Nat.succ n, ih⟩ => x ⟨Nat.succ n, ih⟩⟩
-    electricField c (fun x => Λ • A (Λ⁻¹ • x)) t x i.succ =
+    electricField c ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ t x i.succ =
     γ β * (A.electricField c t' x' i.succ + c * β * A.magneticFieldMatrix c t' x' (0, i.succ)) := by
   dsimp
   rw [electricField_eq_fieldStrengthMatrix,
@@ -133,7 +134,8 @@ lemma electricField_apply_x_boost_succ {d : ℕ} {c : SpeedOfLight} (β : ℝ) (
   field_simp
   rfl
   exact hA
-  · apply Differentiable.comp
+  · simp only
+    apply Differentiable.comp
     · change Differentiable ℝ (Lorentz.Vector.actionCLM (boost 0 β hβ))
       exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM (boost 0 β hβ))
     · apply Differentiable.comp
@@ -160,7 +162,7 @@ lemma magneticFieldMatrix_apply_x_boost_zero_succ {d : ℕ} {c : SpeedOfLight} (
     let x' : Space d.succ := ⟨fun
       | 0 => γ β * (x 0 + c * β * t.val)
       | ⟨Nat.succ n, ih⟩ => x ⟨Nat.succ n, ih⟩⟩
-    magneticFieldMatrix c (fun x => Λ • A (Λ⁻¹ • x)) t x (0, i.succ) =
+    magneticFieldMatrix c ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ t x (0, i.succ) =
     γ β * (A.magneticFieldMatrix c t' x' (0, i.succ) + β / c * A.electricField c t' x' i.succ) := by
   dsimp
   rw [magneticFieldMatrix_eq]
@@ -194,7 +196,7 @@ lemma magneticFieldMatrix_apply_x_boost_succ_succ {d : ℕ} {c : SpeedOfLight} (
     let x' : Space d.succ := ⟨fun
       | 0 => γ β * (x 0 + c * β * t.val)
       | ⟨Nat.succ n, ih⟩ => x ⟨Nat.succ n, ih⟩⟩
-    magneticFieldMatrix c (fun x => Λ • A (Λ⁻¹ • x)) t x (i.succ, j.succ) =
+    magneticFieldMatrix c ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ t x (i.succ, j.succ) =
     A.magneticFieldMatrix c t' x' (i.succ, j.succ) := by
   dsimp
   rw [magneticFieldMatrix_eq]

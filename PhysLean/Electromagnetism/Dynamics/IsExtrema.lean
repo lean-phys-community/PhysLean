@@ -179,12 +179,12 @@ lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J)
     (Λ : LorentzGroup d) :
-    IsExtrema 𝓕 (fun x => Λ • A (Λ⁻¹ • x)) (fun x => Λ • J (Λ⁻¹ • x)) ↔
+    IsExtrema 𝓕 ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ (fun x => Λ • J (Λ⁻¹ • x)) ↔
     IsExtrema 𝓕 A J := by
   rw [isExtrema_iff_tensors]
   conv_lhs =>
     enter [x, 1, 1, 2, 2, 2]
-    change tensorDeriv (fun x => toFieldStrength (fun x => Λ • A (Λ⁻¹ • x)) x) x
+    change tensorDeriv (fun x => toFieldStrength ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ x) x
     enter [1,x]
     rw [toFieldStrength_equivariant _ _ (hA.differentiable (by simp))]
   conv_lhs =>

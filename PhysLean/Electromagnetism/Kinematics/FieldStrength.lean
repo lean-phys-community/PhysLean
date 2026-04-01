@@ -369,7 +369,7 @@ as taking the field strength and then transforming the resulting tensor.
 
 lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) (x : SpaceTime d) :
-    toFieldStrength (fun x => Λ • A (Λ⁻¹ • x)) x =
+    toFieldStrength ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ x =
       Λ • toFieldStrength A (Λ⁻¹ • x) := by
   rw [toFieldStrength, deriv_equivariant A Λ hf, ← actionT_contrMetric Λ, toFieldStrength]
   simp only [Tensorial.toTensor_smul, prodT_equivariant, contrT_equivariant, map_neg,
@@ -378,7 +378,7 @@ lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : Lor
 lemma fieldStrengthMatrix_equivariant {d} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d) (hf : Differentiable ℝ A) (x : SpaceTime d)
     (μ : (Fin 1 ⊕ Fin d)) (ν : Fin 1 ⊕ Fin d) :
-    fieldStrengthMatrix (fun x => Λ • A (Λ⁻¹ • x)) x (μ, ν) =
+    fieldStrengthMatrix ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ x (μ, ν) =
     ∑ κ, ∑ ρ, (Λ.1 μ κ * Λ.1 ν ρ) * A.fieldStrengthMatrix (Λ⁻¹ • x) (κ, ρ) := by
   rw [fieldStrengthMatrix, toFieldStrength_equivariant A Λ hf x]
   conv_rhs =>
@@ -429,6 +429,7 @@ lemma toFieldStrength_add {d} (A1 A2 : ElectromagneticPotential d)
   rw [← Finset.sum_add_distrib]
   apply Finset.sum_congr rfl (fun κ _ => ?_)
   repeat rw [SpaceTime.deriv_eq]
+  simp only [add_val]
   rw [fderiv_add]
   simp only [ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add]
   ring
@@ -453,6 +454,7 @@ lemma toFieldStrength_smul {d} (c : ℝ) (A : ElectromagneticPotential d)
   rw [Finset.mul_sum]
   apply Finset.sum_congr rfl (fun κ _ => ?_)
   repeat rw [SpaceTime.deriv_eq]
+  simp only [smul_val]
   rw [fderiv_const_smul]
   simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, Lorentz.Vector.apply_smul]
   ring

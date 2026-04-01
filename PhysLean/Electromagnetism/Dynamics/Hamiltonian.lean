@@ -78,9 +78,9 @@ noncomputable def canonicalMomentum (𝓕 : FreeSpace) (A : ElectromagneticPoten
     (J : LorentzCurrentDensity d) :
     SpaceTime d → Lorentz.Vector d := fun x =>
   gradient (fun (v : Lorentz.Vector d) =>
-    lagrangian 𝓕 (fun x => A x + x (Sum.inl 0) • v) J x) 0
+    lagrangian 𝓕 ⟨fun x => A x + x (Sum.inl 0) • v⟩ J x) 0
   - x (Sum.inl 0) • gradient (fun (v : Lorentz.Vector d) =>
-    lagrangian 𝓕 (fun x => A x + v) J x) 0
+    lagrangian 𝓕 ⟨fun x => A x + v⟩ J x) 0
 
 /-!
 
@@ -92,7 +92,7 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
     (hA : ContDiff ℝ 2 A) (J : LorentzCurrentDensity d) :
     A.canonicalMomentum 𝓕 J = fun x =>
     gradient (fun (v : Lorentz.Vector d) =>
-    kineticTerm 𝓕 (fun x => A x + x (Sum.inl 0) • v) x) 0:= by
+    kineticTerm 𝓕 ⟨fun x => A x + x (Sum.inl 0) • v⟩ x) 0:= by
   funext x
   apply ext_inner_right (𝕜 := ℝ)
   intro v
@@ -103,7 +103,7 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
   conv_lhs =>
     enter [2]
     simp [lagrangian_add_const]
-  have hx : DifferentiableAt ℝ (fun v => kineticTerm 𝓕 (fun x => A x + x (Sum.inl 0) • v) x) 0 := by
+  have hx : DifferentiableAt ℝ (fun v => kineticTerm 𝓕 ⟨fun x => A x + x (Sum.inl 0) • v⟩ x) 0 := by
     apply Differentiable.differentiableAt _
     conv =>
       enter [2, v]

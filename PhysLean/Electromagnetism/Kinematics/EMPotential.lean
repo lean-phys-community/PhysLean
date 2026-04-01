@@ -66,8 +66,10 @@ contravariant Lorentz vectors, and prove some simple results about it.
 
 -/
 /-- The electromagnetic potential is a tensor `A^μ`. -/
-noncomputable abbrev ElectromagneticPotential (d : ℕ := 3) :=
-  SpaceTime d → Lorentz.Vector d
+structure ElectromagneticPotential (d : ℕ := 3) where
+  /-- The underlying map from `SpaceTime d` to `Lorentz.Vector d` associated
+    with an electromagnetic potential. -/
+  val : SpaceTime d → Lorentz.Vector d
 
 namespace ElectromagneticPotential
 
@@ -78,6 +80,37 @@ open TensorProduct
 open minkowskiMatrix
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
+
+/-!
+
+## A.1. Basic instances on the type of electromagnetic potentials
+
+-/
+
+instance {d} : CoeFun (ElectromagneticPotential d)
+    (fun _ => SpaceTime d → Lorentz.Vector d) where
+  coe A := A.val
+
+instance {d} : Add (ElectromagneticPotential d) where
+  add A B := ⟨fun x => A x + B x⟩
+
+@[simp]
+lemma add_val {d} (A B : ElectromagneticPotential d) :
+    (A + B).val = A.val + B.val := rfl
+
+lemma add_apply {d} (A B : ElectromagneticPotential d) (x : SpaceTime d) :
+    (A + B) x = A x + B x := by simp
+
+noncomputable instance {d} : SMul ℝ (ElectromagneticPotential d) where
+  smul r A := ⟨fun x => r • A x⟩
+
+@[simp]
+lemma smul_val {d} (r : ℝ) (A : ElectromagneticPotential d) :
+    (r • A).val = r • A.val := rfl
+
+lemma smul_apply {d} (r : ℝ) (A : ElectromagneticPotential d) (x : SpaceTime d) :
+    (r • A) x = r • A x := by simp
+
 /-!
 
 ### A.1. The action on the space-time derivatives
@@ -156,6 +189,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
 We show that the components of field strength tensor are differentiable if the potential is.
 -/
 
+@[fun_prop]
 lemma differentiable_component {d : ℕ}
     (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) (μ : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => A x μ) := by
@@ -246,7 +280,7 @@ as taking the derivative and then applying the Lorentz transformation to the res
 -/
 lemma deriv_equivariant {d} {x : SpaceTime d} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d)
-    (hf : Differentiable ℝ A) : deriv (fun x => Λ • A (Λ⁻¹ • x)) x = Λ • (deriv A (Λ⁻¹ • x)) := by
+    (hf : Differentiable ℝ A) : deriv ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ x = Λ • (deriv A (Λ⁻¹ • x)) := by
     calc _
       _ = ∑ μ, ∑ ν, ∑ κ, ∑ ρ, (Λ.1 ν κ * (Λ⁻¹.1 ρ μ • ∂_ ρ A (Λ⁻¹ • x) κ)) •
           (Lorentz.CoVector.basis μ) ⊗ₜ[ℝ]

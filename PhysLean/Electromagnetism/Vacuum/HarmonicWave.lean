@@ -74,12 +74,26 @@ open InnerProductSpace
 /-- The electromagnetic potential for a Harmonic wave travelling in the `x`-direction
   with wave number `k`. -/
 noncomputable def harmonicWaveX (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → ℝ)
-  (φ : Fin d → ℝ) : ElectromagneticPotential d.succ := fun x μ =>
+  (φ : Fin d → ℝ) : ElectromagneticPotential d.succ where
+  val := fun x μ =>
   match μ with
   | Sum.inl 0 => 0
   | Sum.inr 0 => 0
   | Sum.inr ⟨Nat.succ i, h⟩ => -E₀ ⟨i, Nat.succ_lt_succ_iff.mp h⟩ * 1 / (𝓕.c * k) *
       Real.sin (k * (𝓕.c * x.time 𝓕.c - x.space 0) + φ ⟨i, Nat.succ_lt_succ_iff.mp h⟩)
+
+@[simp]
+lemma harmonicWaveX_inl_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → ℝ) (φ : Fin d → ℝ)
+    (x : SpaceTime d.succ) :
+    harmonicWaveX 𝓕 k E₀ φ x (Sum.inl 0) = 0 := by
+  simp [harmonicWaveX]
+
+@[simp]
+lemma harmonicWaveX_inr_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → ℝ) (φ : Fin d → ℝ)
+    (x : SpaceTime d.succ) :
+    harmonicWaveX 𝓕 k E₀ φ x (Sum.inr 0) = 0 := by
+  simp [harmonicWaveX]
+  rfl
 
 /-!
 
@@ -93,8 +107,8 @@ lemma harmonicWaveX_differentiable {d} (𝓕 : FreeSpace) (k : ℝ)
   rw [← Lorentz.Vector.differentiable_apply]
   intro μ
   match μ with
-  | Sum.inl 0 => simp [harmonicWaveX]
-  | Sum.inr ⟨0, h⟩ => simp [harmonicWaveX]
+  | Sum.inl 0 => simp
+  | Sum.inr ⟨0, h⟩ => simp
   | Sum.inr ⟨Nat.succ i, h⟩ =>
     simp [harmonicWaveX]
     apply Differentiable.const_mul

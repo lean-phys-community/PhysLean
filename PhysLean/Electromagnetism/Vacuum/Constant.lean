@@ -69,8 +69,8 @@ set_option linter.unusedVariables false
 @[nolint unusedArguments]
 noncomputable def constantEB {d : ℕ} (c : SpeedOfLight)
     (E₀ : EuclideanSpace ℝ (Fin d)) (B₀ : Fin d × Fin d → ℝ)
-    (B₀_antisymm : ∀ i j, B₀ (i, j) = - B₀ (j, i)) : ElectromagneticPotential d :=
-  fun x μ =>
+    (B₀_antisymm : ∀ i j, B₀ (i, j) = - B₀ (j, i)) : ElectromagneticPotential d where
+  val := fun x μ =>
   match μ with
   | Sum.inl _ => - (1/c) * ⟪E₀, Space.basis.repr x.space⟫_ℝ
   | Sum.inr i => (1/2) * ∑ j, B₀ (i, j) * x.space j

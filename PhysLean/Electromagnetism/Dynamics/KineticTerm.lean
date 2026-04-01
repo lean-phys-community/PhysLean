@@ -104,7 +104,7 @@ We show that the kinetic energy is Lorentz invariant.
 lemma kineticTerm_equivariant {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) (x : SpaceTime d) :
-    kineticTerm 𝓕 (fun x => Λ • A (Λ⁻¹ • x)) x = kineticTerm 𝓕 A (Λ⁻¹ • x) := by
+    kineticTerm 𝓕 ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ x = kineticTerm 𝓕 A (Λ⁻¹ • x) := by
   rw [kineticTerm, kineticTerm]
   conv_lhs =>
     enter [2]
@@ -385,7 +385,7 @@ lemma kineticTerm_eq_electricMatrix_magneticFieldMatrix {𝓕 : FreeSpace}
 -/
 
 lemma kineticTerm_const {d} {𝓕 : FreeSpace} (A₀ : Lorentz.Vector d) :
-    kineticTerm 𝓕 (fun _ : SpaceTime d => A₀) = 0 := by
+    kineticTerm 𝓕 ⟨fun _ : SpaceTime d => A₀⟩ = 0 := by
   funext x
   rw [kineticTerm_eq_sum_potential]
   conv_lhs =>
@@ -396,7 +396,7 @@ lemma kineticTerm_const {d} {𝓕 : FreeSpace} (A₀ : Lorentz.Vector d) :
 
 lemma kineticTerm_add_const {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (A₀ : Lorentz.Vector d) :
-    kineticTerm 𝓕 (fun x => A x + A₀) = kineticTerm 𝓕 A := by
+    kineticTerm 𝓕 ⟨fun x => A x + A₀⟩ = kineticTerm 𝓕 A := by
   funext x
   rw [kineticTerm_eq_sum_potential, kineticTerm_eq_sum_potential]
   congr
@@ -448,7 +448,7 @@ This result is used in finding the canonical momentum.
 lemma kineticTerm_add_time_mul_const {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (ha : Differentiable ℝ A)
     (c : Lorentz.Vector d) (x : SpaceTime d) :
-    kineticTerm 𝓕 (fun x => A x + x (Sum.inl 0) • c) x = A.kineticTerm 𝓕 x +
+    kineticTerm 𝓕 ⟨fun x => A x + x (Sum.inl 0) • c⟩ x = A.kineticTerm 𝓕 x +
         (-1 / (2 * 𝓕.μ₀) * ∑ ν, ((2 * c ν * η ν ν * ∂_ (Sum.inl 0) A x ν + η ν ν * c ν ^ 2 -
         2 * c ν * (∂_ ν A x (Sum.inl 0)))) + 1/(2 * 𝓕.μ₀) * c (Sum.inl 0) ^2) := by
   have diff_a : ∂_ (Sum.inl 0) (fun x => A x + x (Sum.inl 0) • c) =
@@ -587,7 +587,7 @@ of Gauss's law and Ampère's law in vacuum.
 /-- The variational gradient of the kinetic term of an electromagnetic potential. -/
 noncomputable def gradKineticTerm {d} (𝓕 : FreeSpace) (A : ElectromagneticPotential d) :
     SpaceTime d → Lorentz.Vector d :=
-  (δ (q':=A), ∫ x, kineticTerm 𝓕 q' x)
+  (δ (q':=A), ∫ x, kineticTerm 𝓕 ⟨q'⟩ x)
 
 /-!
 
@@ -614,7 +614,7 @@ lemma gradKineticTerm_eq_sum_fderiv {d} {𝓕 : FreeSpace} (A : ElectromagneticP
           Lorentz.Vector.basis μν.1))
     A.gradKineticTerm 𝓕 = fun x => ∑ μν, F' μν (fun x' => -1/(2 * 𝓕.μ₀) * (fun _ => 1) x') x := by
   apply HasVarGradientAt.varGradient
-  change HasVarGradientAt (fun A' x => ElectromagneticPotential.kineticTerm 𝓕 A' x) _ A
+  change HasVarGradientAt (fun A' x => ElectromagneticPotential.kineticTerm 𝓕 ⟨A'⟩ x) _ A
   conv =>
     enter [1, A', x]
     rw [kineticTerm_eq_sum_potential]
@@ -964,9 +964,9 @@ lemma gradKineticTerm_smul {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
 -/
 
 lemma kineticTerm_hasVarGradientAt {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
-    (hA : ContDiff ℝ ∞ A) : HasVarGradientAt (kineticTerm 𝓕) (A.gradKineticTerm 𝓕) A := by
+    (hA : ContDiff ℝ ∞ A) : HasVarGradientAt (fun A => kineticTerm 𝓕 ⟨A⟩) (A.gradKineticTerm 𝓕) A := by
   rw [gradKineticTerm_eq_sum_fderiv A hA]
-  change HasVarGradientAt (fun A' x => ElectromagneticPotential.kineticTerm 𝓕 A' x) _ A
+  change HasVarGradientAt (fun A' x => ElectromagneticPotential.kineticTerm 𝓕 ⟨A'⟩ x) _ A
   conv =>
     enter [1, A', x]
     rw [kineticTerm_eq_sum_potential]
