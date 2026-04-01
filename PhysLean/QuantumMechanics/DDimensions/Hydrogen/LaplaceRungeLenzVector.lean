@@ -48,8 +48,7 @@ def lrlOperatorSqr (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d,
 lemma lrlOperator_eq (ε : ℝˣ) (i : Fin H.d) :
     H.lrlOperator ε i = 𝐱[i] ∘L 𝐩² - (∑ j, 𝐱[j] ∘L 𝐩[j]) ∘L 𝐩[i]
     + (2⁻¹ * I * ℏ * (H.d - 1)) • 𝐩[i] - (H.m * H.k) • 𝐫[ε,-1] ∘L 𝐱[i] := by
-  dsimp [lrlOperator]
-  rw [sub_left_inj] -- mk·r⁻¹x terms match exactly
+  rw [lrlOperator, sub_left_inj] -- mk·r⁻¹x terms match exactly
   calc
     _ = (2 : ℂ)⁻¹ • ∑ j, ((𝐩[j] ∘L 𝐱[i]) ∘L 𝐩[j] + 𝐱[i] ∘L 𝐩[j] ∘L 𝐩[j]
         - ((𝐩[j] ∘L 𝐱[j]) ∘L 𝐩[i] + 𝐱[j] ∘L 𝐩[j] ∘L 𝐩[i])) := by
@@ -61,14 +60,14 @@ lemma lrlOperator_eq (ε : ℝˣ) (i : Fin H.d) :
         comp_assoc, two_smul, eq_one_of_same, one_smul]
     _ = (2 : ℂ)⁻¹ • ∑ j, ((2 : ℂ) • 𝐱[i] ∘L 𝐩[j] ∘L 𝐩[j] - (2 : ℂ) • (𝐱[j] ∘L 𝐩[j]) ∘L 𝐩[i]
         + (I * ℏ) • 𝐩[i] - (I * ℏ) • δ[i,j] • 𝐩[j]) := by
-      conv_lhs =>
-        enter [2, 2, j]
-        rw [sub_sub_sub_comm, sub_sub_eq_add_sub]
-  simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum, ← comp_finset_sum,
-    ← finset_sum_comp, sum_smul, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_sub,
-    smul_add, ← add_sub]
-  simp only [momentumOperatorSqr, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, ← sub_smul]
-  grind [one_smul]
+      simp_rw [sub_sub_sub_comm, sub_sub_eq_add_sub]
+    _ = 𝐱[i] ∘L ∑ j, 𝐩[j] ∘L 𝐩[j] - (∑ j, 𝐱[j] ∘L 𝐩[j]) ∘L 𝐩[i] + ((2⁻¹ * I * ℏ) • H.d • 𝐩[i]
+        - (2⁻¹ * I * ℏ) • 𝐩[i]) := by
+      simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum, sum_smul,
+        smul_add, smul_sub, smul_smul, comp_finset_sum, finset_sum_comp, mul_assoc, add_sub_assoc]
+      norm_num
+  rw [momentumOperatorSqr, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, ← sub_smul]
+  ring_nf
 
 /-- `𝐀(ε)ᵢ = 𝐋ᵢⱼ𝐩ⱼ + ½iℏ(d-1)𝐩ᵢ - mk·𝐫(ε)⁻¹𝐱ᵢ` -/
 lemma lrlOperator_eq' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i = ∑ j, 𝐋[i,j] ∘L 𝐩[j]
