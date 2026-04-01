@@ -97,7 +97,7 @@ lemma harmonicWaveX_inr_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → 
 
 /-!
 
-### A.1. Differentiability of the electromagnetic potential
+### A.2. Differentiability of the electromagnetic potential
 
 -/
 
@@ -116,7 +116,7 @@ lemma harmonicWaveX_differentiable {d} (𝓕 : FreeSpace) (k : ℝ)
 
 /-!
 
-### A.2. Smoothness of the electromagnetic potential
+### A.3. Smoothness of the electromagnetic potential
 
 -/
 

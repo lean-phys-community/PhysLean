@@ -30,10 +30,11 @@ spacetime to contravariant Lorentz vectors.
 ## iii. Table of contents
 
 - A. The electromagnetic potential
-  - A.1. The action on the space-time derivatives
-  - A.2. Differentiability
-  - A.3. Variational adjoint derivative of component
-  - A.4. Variational adjoint derivative of derivatives of the potential
+  - A.1. Basic instances on the type of electromagnetic potentials
+  - A.2. The action on the space-time derivatives
+  - A.3. Differentiability
+  - A.4. Variational adjoint derivative of component
+  - A.5. Variational adjoint derivative of derivatives of the potential
 - B. The derivative tensor of the electromagnetic potential
   - B.1. Equivariance of the derivative tensor
   - B.2. The elements of the derivative tensor in terms of the basis
@@ -113,7 +114,7 @@ lemma smul_apply {d} (r : ℝ) (A : ElectromagneticPotential d) (x : SpaceTime d
 
 /-!
 
-### A.1. The action on the space-time derivatives
+### A.2. The action on the space-time derivatives
 
 Given a ElectromagneticPotential `A^μ`, we can consider its derivative `∂_μ A^ν`.
 Under a Lorentz transformation `Λ`, this transforms as
@@ -184,7 +185,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
 
 /-!
 
-### A.2. Differentiability
+### A.3. Differentiability
 
 We show that the components of field strength tensor are differentiable if the potential is.
 -/
@@ -199,7 +200,7 @@ lemma differentiable_component {d : ℕ}
 
 /-!
 
-### A.3. Variational adjoint derivative of component
+### A.4. Variational adjoint derivative of component
 
 We find the variational adjoint derivative of the components of the potential.
 This will be used to find e.g. the variational derivative of the kinetic term,
@@ -231,7 +232,7 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
 
 /-!
 
-### A.4. Variational adjoint derivative of derivatives of the potential
+### A.5. Variational adjoint derivative of derivatives of the potential
 
 We find the variational adjoint derivative of the derivatives of the components of the potential.
 This will again be used to find the variational derivative of the kinetic term,
