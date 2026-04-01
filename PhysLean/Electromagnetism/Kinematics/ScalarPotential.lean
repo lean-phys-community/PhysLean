@@ -86,6 +86,7 @@ lemma scalarPotential_contDiff {n} {d} (c : SpeedOfLight) (A : ElectromagneticPo
   · fun_prop
   exact h1 (Sum.inl 0)
 
+@[fun_prop]
 lemma scalarPotential_contDiff_space {n} {d} (c : SpeedOfLight)
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ n A) (t : Time) : ContDiff ℝ n (A.scalarPotential c t) := by
@@ -93,6 +94,15 @@ lemma scalarPotential_contDiff_space {n} {d} (c : SpeedOfLight)
   refine ContDiff.comp ?_ ?_
   · exact scalarPotential_contDiff c A hA
   · fun_prop
+
+open ContDiff
+
+@[fun_prop]
+lemma scalarPotential_contDiff_space_of_smooth {n : ℕ} {d} (c : SpeedOfLight)
+    (A : ElectromagneticPotential d)
+    (hA : ContDiff ℝ ∞ A) (t : Time) : ContDiff ℝ n (A.scalarPotential c t) := by
+  apply scalarPotential_contDiff_space
+  exact hA.of_le (ENat.LEInfty.out)
 
 lemma scalarPotential_contDiff_time {n} {d} (c : SpeedOfLight) (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ n A) (x : Space d) : ContDiff ℝ n (A.scalarPotential c · x) := by

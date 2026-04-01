@@ -43,10 +43,8 @@ theorem gaussLawElectric (t : Time) (x : Space)
 /-- Gauss's law for the magnetic field. -/
 theorem gaussLawMagnetic (t : Time) (x : Space) (hV : ContDiff ℝ ∞ V) :
     (∇ ⬝ B t) x = 0 := by
-  rw [magneticField_eq_3D, div_of_curl_eq_zero]
+  rw [magneticField_eq_3D, div_of_curl_eq_zero _ (by fun_prop)]
   simp only [Pi.zero_apply]
-  · apply vectorPotential_contDiff_space
-    exact hV.of_le ENat.LEInfty.out
 
 /-- Ampère's law. -/
 theorem ampereLaw (t : Time) (x : Space)
@@ -66,24 +64,7 @@ theorem faradayLaw (t : Time) (x : Space) (hV : ContDiff ℝ ∞ V) :
       (fun t x => ∂ₜ (fun t => vectorPotential 𝓕.c V t x) t) t)) x = _
   rw [curl_sub, curl_neg, curl_of_grad_eq_zero, time_deriv_curl_commute]
   simp only [neg_zero, Pi.sub_apply, Pi.zero_apply, zero_sub]
-  · apply vectorPotential_contDiff
-    exact hV.of_le ENat.LEInfty.out
-  · apply scalarPotential_contDiff_space
-    exact hV.of_le ENat.LEInfty.out
-  · refine ContDiff.differentiable ?_ (show ((⊤ : ℕ∞) : WithTop ℕ∞) ≠ 0 by simp)
-    apply contDiff_grad
-    apply scalarPotential_contDiff_space
-    exact hV.of_le (le_of_eq ENat.coe_top_add_one)
-  · refine ContDiff.differentiable ?_ (show ((⊤ : ℕ∞) : WithTop ℕ∞) ≠ 0 by simp)
-    apply ContDiff.neg
-    apply contDiff_grad
-    apply scalarPotential_contDiff_space
-    exact hV.of_le (le_of_eq ENat.coe_top_add_one)
-  · refine ContDiff.differentiable ?_ (show ((⊤ : ℕ∞) : WithTop ℕ∞) ≠ 0 by simp)
-    change ContDiff ℝ ∞ fun x => (∂ₜ (fun t => vectorPotential 𝓕.c V t x) t)
-    apply deriv_contDiff_of_space
-    apply vectorPotential_contDiff
-    exact hV.of_le (le_of_eq ENat.coe_top_add_one)
+  all_goals fun_prop
 
 end ThreeDimension
 end Electromagnetism

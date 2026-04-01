@@ -77,6 +77,7 @@ the smoothness of the electromagnetic potential.
 
 -/
 
+@[fun_prop]
 lemma vectorPotential_contDiff {n} {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ n A) : ContDiff ℝ n ↿(A.vectorPotential c) := by
   simp [vectorPotential]
@@ -86,6 +87,13 @@ lemma vectorPotential_contDiff {n} {d} {c : SpeedOfLight} (A : ElectromagneticPo
     rw [SpaceTime.contDiff_vector]
     exact hA
   exact fun i => h1 (Sum.inr i)
+
+open ContDiff
+@[fun_prop]
+lemma vectorPotential_contDiff_of_smooth {n : ℕ} {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
+    (hA : ContDiff ℝ ∞ A) : ContDiff ℝ n ↿(A.vectorPotential c) := by
+  apply vectorPotential_contDiff
+  exact hA.of_le (ENat.LEInfty.out)
 
 lemma vectorPotential_apply_contDiff {n} {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ n A) (i : Fin d) : ContDiff ℝ n ↿(fun t x => A.vectorPotential c t x i) := by
