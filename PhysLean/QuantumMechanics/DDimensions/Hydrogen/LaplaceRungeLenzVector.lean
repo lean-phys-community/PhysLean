@@ -94,20 +94,19 @@ lemma lrlOperator_eq'' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i = ∑ j, 
   ring
 
 /-- The operator `𝐱ᵢ𝐩ᵢ` on Schwartz maps. -/
-private def positionDotMomentum {d} := ∑ i : Fin d, 𝐱[i] ∘L 𝐩[i]
+private def positionDotMomentum (d : ℕ) := ∑ i : Fin d, 𝐱[i] ∘L 𝐩[i]
 
 /-- The operator `𝐱ᵢ𝐩²` on Schwartz maps. -/
-private def positionCompMomentumSqr {d} (i : Fin d) := 𝐱[i] ∘L 𝐩²
+private def positionCompMomentumSqr {d : ℕ} (i : Fin d) := 𝐱[i] ∘L 𝐩²
 
 /-- The operator `(𝐱ⱼ𝐩ⱼ)𝐱ᵢ` on Schwartz maps. -/
-private def positionDotMomentumCompMomentum {d} (i : Fin d) := positionDotMomentum ∘L 𝐩[i]
+private def positionDotMomentumCompMomentum {d : ℕ} (i : Fin d) := positionDotMomentum d ∘L 𝐩[i]
 
 /-- The operator `½iℏ(d-1)𝐩ᵢ` on Schwartz maps. -/
-private def constMomentum {d} (i : Fin d) := (2⁻¹ * Complex.I * ℏ * (d - 1)) • 𝐩[i]
+private def constMomentum {d : ℕ} (i : Fin d) := (2⁻¹ * I * ℏ * (d - 1)) • 𝐩[i]
 
 /-- The operator `mk·𝐫(ε)⁻¹𝐱ᵢ` on Schwartz maps. -/
-private def constRadiusRegInvCompPosition (ε : ℝˣ) (i : Fin H.d) :=
-  (H.m * H.k) • 𝐫[ε,-1] ∘L 𝐱[i]
+private def constRadiusRegInvCompPosition (ε : ℝˣ) (i : Fin H.d) := (H.m * H.k) • 𝐫[ε,-1] ∘L 𝐱[i]
 
 /-
 ## Angular momentum / LRL vector commutators
@@ -219,7 +218,7 @@ private lemma positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add {
   unfold positionCompMomentumSqr positionDotMomentumCompMomentum
   nth_rw 2 [← lie_skew]
   repeat rw [leibniz_lie, lie_leibniz, lie_leibniz]
-  repeat rw [← lie_skew _ positionDotMomentum]
+  repeat rw [← lie_skew _ (positionDotMomentum d)]
   repeat rw [position_commutation_momentum]
   repeat rw [momentumSqr_commutation_momentum]
   repeat rw [positionDotMomentum_commutation_position]
@@ -241,7 +240,7 @@ private lemma positionDotMomentumCompMomentum_comm {d} (i j : Fin d) :
     ⁅positionDotMomentumCompMomentum i, positionDotMomentumCompMomentum j⁆ = 0 := by
   unfold positionDotMomentumCompMomentum
   rw [leibniz_lie, lie_leibniz, lie_leibniz, lie_self,
-    ← lie_skew _ positionDotMomentum]
+    ← lie_skew _ (positionDotMomentum d)]
   ext ψ x
   simp [momentum_commutation_momentum, positionDotMomentum_commutation_momentum,
     momentum_comp_commute i j]
@@ -286,7 +285,7 @@ private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
 
   simp only [zero_comp, comp_zero, add_zero, comp_smul, comp_add, comp_neg, smul_sub, smul_add,
     smul_neg, neg_comp, add_comp, smul_comp, comp_assoc, sub_comp, comp_sub]
-  repeat rw [comp_eq_comp_add_commute positionDotMomentum 𝐱[_],
+  repeat rw [comp_eq_comp_add_commute (positionDotMomentum H.d) 𝐱[_],
     positionDotMomentum_commutation_position]
 
   have hxr : ∀ i : Fin H.d, ∀ s, ∀ (A : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ)),
@@ -297,7 +296,8 @@ private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
   simp only [comp_add, comp_smul]
   rw [position_comp_commute j i]
 
-  have hxx_xp : 𝐱[j] ∘L 𝐱[i] ∘L positionDotMomentum = 𝐱[i] ∘L 𝐱[j] ∘L positionDotMomentum := by
+  have hxx_xp :
+      𝐱[j] ∘L 𝐱[i] ∘L positionDotMomentum H.d = 𝐱[i] ∘L 𝐱[j] ∘L positionDotMomentum H.d := by
     rw [← comp_assoc, position_comp_commute, comp_assoc]
   rw [hxx_xp]
 
