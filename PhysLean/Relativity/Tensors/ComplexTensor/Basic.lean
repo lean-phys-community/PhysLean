@@ -293,11 +293,11 @@ lemma basis_downR_eq {i : Fin 2} :
 ## Vector slot component formulas (`Color.up` / `Color.down`)
 
 The colors `Color.up` and `Color.down` are the standard Lorentz vector colors. The lemmas
-`repr_ρ_basis_vector_up` and `repr_ρ_basis_vector_down` are stated for `Fin 4` indices (definitionally
-`Fin (repDim Color.up)` and `Fin (repDim Color.down)`).
+`repr_ρ_basis_vector_up` and `repr_ρ_basis_vector_down` are stated for `Fin 4` indices
+(definitionally `Fin (repDim Color.up)` and `Fin (repDim Color.down)`).
 
-When a slot is only known up to `c₀ = Color.up` or `Color.down`, use `repr_ρ_basis_vector_up_of_eq` /
-`repr_ρ_basis_vector_down_of_eq`.
+When a slot is only known up to `c₀ = Color.up` or `Color.down`, use
+`repr_ρ_basis_vector_up_of_eq` / `repr_ρ_basis_vector_down_of_eq`.
 
 -/
 
