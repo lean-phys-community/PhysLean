@@ -964,7 +964,8 @@ lemma gradKineticTerm_smul {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
 -/
 
 lemma kineticTerm_hasVarGradientAt {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
-    (hA : ContDiff ℝ ∞ A) : HasVarGradientAt (fun A => kineticTerm 𝓕 ⟨A⟩) (A.gradKineticTerm 𝓕) A := by
+    (hA : ContDiff ℝ ∞ A) :
+    HasVarGradientAt (fun A => kineticTerm 𝓕 ⟨A⟩) (A.gradKineticTerm 𝓕) A := by
   rw [gradKineticTerm_eq_sum_fderiv A hA]
   change HasVarGradientAt (fun A' x => ElectromagneticPotential.kineticTerm 𝓕 ⟨A'⟩ x) _ A
   conv =>
