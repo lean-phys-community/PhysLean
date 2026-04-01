@@ -31,10 +31,11 @@ spacetime to contravariant Lorentz vectors.
 
 - A. The electromagnetic potential
   - A.1. Basic instances on the type of electromagnetic potentials
-  - A.2. The action on the space-time derivatives
+  - A.2. The group action on the ElectromagneticPotential
   - A.3. Differentiability
-  - A.4. Variational adjoint derivative of component
-  - A.5. Variational adjoint derivative of derivatives of the potential
+  - A.4. The action on the space-time derivatives
+  - A.5. Variational adjoint derivative of component
+  - A.6. Variational adjoint derivative of derivatives of the potential
 - B. The derivative tensor of the electromagnetic potential
   - B.1. Equivariance of the derivative tensor
   - B.2. The elements of the derivative tensor in terms of the basis
@@ -82,6 +83,12 @@ open minkowskiMatrix
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
+@[ext]
+lemma eq_of_val_eq (A B : ElectromagneticPotential d) (h : A.val = B.val) : A = B := by
+  cases A; cases B
+  simp at h
+  rw [h]
+
 /-!
 
 ## A.1. Basic instances on the type of electromagnetic potentials
@@ -114,19 +121,63 @@ lemma smul_apply {d} (r : ℝ) (A : ElectromagneticPotential d) (x : SpaceTime d
 
 /-!
 
-### A.2. The action on the space-time derivatives
+## A.2. The group action on the ElectromagneticPotential
+
+-/
+
+noncomputable instance {d} : SMul (LorentzGroup d) (ElectromagneticPotential d) where
+  smul Λ A := ⟨fun x => Λ • A (Λ⁻¹ • x)⟩
+
+lemma action_val {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d) :
+    (Λ • A).val = fun x => Λ • A (Λ⁻¹ • x) := rfl
+
+noncomputable instance {d} : MulAction (LorentzGroup d) (ElectromagneticPotential d) where
+  mul_smul Λ₁ Λ₂ A := by
+    ext i
+    simp [action_val, mul_smul]
+  one_smul A := by
+    ext i
+    simp [action_val, one_smul]
+
+/-!
+
+### A.3. Differentiability
+
+We show that the components of field strength tensor are differentiable if the potential is.
+-/
+
+@[fun_prop]
+lemma differentiable_component {d : ℕ}
+    (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) (μ : Fin 1 ⊕ Fin d) :
+    Differentiable ℝ (fun x => A x μ) := by
+  revert μ
+  rw [SpaceTime.differentiable_vector]
+  exact hA
+
+
+@[fun_prop]
+lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
+    (hA : Differentiable ℝ A) : Differentiable ℝ (fun x => Λ • A (Λ⁻¹ • x)) := by
+  apply Differentiable.comp
+  · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ)
+  · apply Differentiable.comp
+    · exact hA
+    · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)
+
+/-!
+
+### A.4. The action on the space-time derivatives
 
 Given a ElectromagneticPotential `A^μ`, we can consider its derivative `∂_μ A^ν`.
 Under a Lorentz transformation `Λ`, this transforms as
-`∂_ μ (fun x => Λ • A (Λ⁻¹ • x))`, we write an expression for this in terms of the tensor.
+`∂_ μ (Λ • A)`, we write an expression for this in terms of the tensor.
 `∂_ ρ A (Λ⁻¹ • x) κ`.
 
 -/
 
 lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime d}
     (Λ : LorentzGroup d) (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) :
-    ∂_ μ (fun x => Λ • A (Λ⁻¹ • x)) x ν =
-    ∑ κ, ∑ ρ, (Λ.1 ν κ * Λ⁻¹.1 ρ μ) * ∂_ ρ A (Λ⁻¹ • x) κ := by
+    ∂_ μ (Λ • A) x ν = ∑ κ, ∑ ρ, (Λ.1 ν κ * Λ⁻¹.1 ρ μ) * ∂_ ρ A (Λ⁻¹ • x) κ := by
   calc _
     _ = ((Λ • (∂_ μ (fun x => A (Λ⁻¹ • x)) x)) ν) := by
       have hdif : ∀ i, DifferentiableAt ℝ (fun x => A (Λ⁻¹ • x) i) x := by
@@ -140,14 +191,8 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
           exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)
       trans ∂_ μ (fun x => (Λ • A (Λ⁻¹ • x)) ν) x
       · rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, SpaceTime.fderiv_vector]
-        intro ν
-        conv =>
-          enter [2, x]; rw [← Lorentz.Vector.actionCLM_apply, ← Lorentz.Vector.actionCLM_apply]
-        apply Differentiable.comp
-        · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ)
-        · apply Differentiable.comp
-          · exact hA
-          · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)
+        simp only [action_val]
+        fun_prop
       conv_lhs =>
         enter [2, x]
         rw [Lorentz.Vector.smul_eq_sum]
@@ -185,22 +230,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
 
 /-!
 
-### A.3. Differentiability
-
-We show that the components of field strength tensor are differentiable if the potential is.
--/
-
-@[fun_prop]
-lemma differentiable_component {d : ℕ}
-    (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) (μ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => A x μ) := by
-  revert μ
-  rw [SpaceTime.differentiable_vector]
-  exact hA
-
-/-!
-
-### A.4. Variational adjoint derivative of component
+### A.5. Variational adjoint derivative of component
 
 We find the variational adjoint derivative of the components of the potential.
 This will be used to find e.g. the variational derivative of the kinetic term,
@@ -232,7 +262,7 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
 
 /-!
 
-### A.5. Variational adjoint derivative of derivatives of the potential
+### A.6. Variational adjoint derivative of derivatives of the potential
 
 We find the variational adjoint derivative of the derivatives of the components of the potential.
 This will again be used to find the variational derivative of the kinetic term,
@@ -281,7 +311,7 @@ as taking the derivative and then applying the Lorentz transformation to the res
 -/
 lemma deriv_equivariant {d} {x : SpaceTime d} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d)
-    (hf : Differentiable ℝ A) : deriv ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ x = Λ • (deriv A (Λ⁻¹ • x)) := by
+    (hf : Differentiable ℝ A) : deriv (Λ • A) x = Λ • (deriv A (Λ⁻¹ • x)) := by
     calc _
       _ = ∑ μ, ∑ ν, ∑ κ, ∑ ρ, (Λ.1 ν κ * (Λ⁻¹.1 ρ μ • ∂_ ρ A (Λ⁻¹ • x) κ)) •
           (Lorentz.CoVector.basis μ) ⊗ₜ[ℝ]
