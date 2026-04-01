@@ -238,48 +238,36 @@ private lemma constMomentum_comm {d : ℕ} (i j : Fin d) :
   simp [constMomentum]
 
 private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
-    (ε : ℝˣ) (i j : Fin H.d) :
-    ⁅positionCompMomentumSqr i, constRadiusRegInvCompPosition H ε j⁆ +
-    ⁅constRadiusRegInvCompPosition H ε i, positionCompMomentumSqr j⁆ =
-    - (2 * H.m * H.k * Complex.I * ℏ) • 𝐫[ε,-1] ∘L 𝐋[i,j] := by
-  unfold positionCompMomentumSqr constRadiusRegInvCompPosition
-  nth_rw 2 [← lie_skew]
-  repeat rw [lie_smul, leibniz_lie, lie_leibniz, lie_leibniz]
-  repeat rw [position_commutation_position]
-  repeat rw [position_commutation_radiusRegPow]
-  repeat rw [← lie_skew 𝐩² _]
-  repeat rw [position_commutation_momentumSqr]
-  rw [radiusRegPow_commutation_momentumSqr]
-  rw [← positionDotMomentum]
-
-  simp only [zero_comp, comp_zero, add_zero, comp_smul, comp_add, comp_neg, smul_sub, smul_add,
-    smul_neg, neg_comp, add_comp, smul_comp, comp_assoc, sub_comp, comp_sub]
-  repeat rw [comp_eq_comp_add_commute (positionDotMomentum H.d) 𝐱[_],
-    positionDotMomentum_commutation_position]
-
-  have hxr : ∀ i : Fin H.d, ∀ s, ∀ (A : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ)),
-      𝐱[i] ∘L 𝐫[ε,s] ∘L A = 𝐫[ε,s] ∘L 𝐱[i] ∘L A := by
-    intro i p A
-    rw [← comp_assoc, position_comp_radiusRegPow_commute, comp_assoc]
-  repeat rw [hxr]
-  simp only [comp_add, comp_smul]
-  rw [position_comp_commute j i]
-
-  have hxx_xp :
-      𝐱[j] ∘L 𝐱[i] ∘L positionDotMomentum H.d = 𝐱[i] ∘L 𝐱[j] ∘L positionDotMomentum H.d := by
-    rw [← comp_assoc, position_comp_commute, comp_assoc]
-  rw [hxx_xp]
-
-  unfold angularMomentumOperator
-  ext ψ x
-  simp only [Complex.ofReal_neg, Complex.ofReal_one, mul_neg, mul_one, neg_mul, neg_smul, smul_add,
-    smul_neg, neg_neg, one_mul, sub_neg_eq_add, neg_add_rev, ContinuousLinearMap.add_apply,
-    ContinuousLinearMap.neg_apply, coe_smul', coe_comp', Pi.smul_apply, Function.comp_apply,
-    SchwartzMap.add_apply, SchwartzMap.neg_apply, SchwartzMap.smul_apply, smul_eq_mul,
-    Complex.real_smul, Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_sub,
-    Complex.ofReal_ofNat, Complex.ofReal_add, Complex.ofReal_natCast, comp_sub, coe_sub',
-    Pi.sub_apply, SchwartzMap.sub_apply]
-  ring
+    (ε : ℝˣ) (i j : Fin H.d) : ⁅positionCompMomentumSqr i, constRadiusRegInvCompPosition H ε j⁆
+    + ⁅constRadiusRegInvCompPosition H ε i, positionCompMomentumSqr j⁆
+    = (-2 * I * ℏ * H.m * H.k) • 𝐫[ε,-1] ∘L 𝐋[i,j] := by
+  let A := ⁅momentumOperatorSqr (d := H.d), radiusRegPowOperator (d := H.d) ε (-1)⁆
+  have hA : 𝐱[i] ∘L A ∘L 𝐱[j] = 𝐱[j] ∘L A ∘L 𝐱[i] := by
+    suffices A = (2 * I * ℏ) • 𝐫[ε,-3] ∘L positionDotMomentum H.d
+        + ((H.d - 3) * ℏ ^ 2 : ℝ) • 𝐫[ε,-3] + (3 * ε.1 ^ 2 * ℏ ^ 2) • 𝐫[ε,-5] by
+      simp_rw [this, add_comp, comp_add, smul_comp, comp_smul, ← comp_assoc,
+        position_comp_radiusRegPow_commute, comp_assoc,
+        comp_eq_comp_add_commute (positionDotMomentum _), positionDotMomentum_commutation_position,
+        comp_add, comp_smul, ← comp_assoc 𝐱[_] 𝐱[_] _, position_comp_commute j i]
+    simp_rw [A, ← lie_skew 𝐩² _, radiusRegPow_commutation_momentumSqr, neg_sub, ← sub_sub,
+      positionDotMomentum, sub_eq_add_neg, ← neg_smul, ← neg_mul, neg_neg, ofReal_neg, ofReal_one,
+      ← add_rotate]
+    ring_nf
+  let B (i : Fin H.d) := ⁅momentumOperatorSqr (d := H.d), 𝐱[i]⁆
+  have hB (k : Fin H.d) : B k = (-2 * I * ℏ) • 𝐩[k] := by
+    simp [B, ← lie_skew 𝐩² _, position_commutation_momentumSqr]
+  calc
+    _ = (H.m * H.k) • (𝐫[ε,-1] ∘L 𝐱[i] ∘L B j + 𝐱[i] ∘L A ∘L 𝐱[j]
+        - (𝐫[ε,-1] ∘L 𝐱[j] ∘L B i + 𝐱[j] ∘L A ∘L 𝐱[i])) := by
+      nth_rw 2 [← lie_skew]
+      simp_rw [← sub_eq_add_neg, positionCompMomentumSqr, constRadiusRegInvCompPosition, lie_smul,
+        ← smul_sub, lie_leibniz, leibniz_lie, ← sub_sub]
+      simp [A, B, comp_assoc]
+    _ = (H.m * H.k) • 𝐫[ε,-1] ∘L (𝐱[i] ∘L B j - 𝐱[j] ∘L B i) := by simp [hA]
+    _ = (-2 * I * ℏ * H.m * H.k) • 𝐫[ε,-1] ∘L 𝐋[i,j] := by
+      simp_rw [hB, comp_smul, ← smul_sub, comp_smul, angularMomentumOperator, ← Complex.coe_smul,
+        smul_smul, ofReal_mul]
+      ring_nf
 
 private lemma positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition_add
     (ε : ℝˣ) (i j : Fin H.d) :
