@@ -263,10 +263,9 @@ private lemma positionDotMomentumCompMomentum_comm_constMomentum_add {d} (i j : 
     positionDotMomentum_commutation_momentum, smul_comp]
   rw [momentum_comp_commute, add_neg_eq_zero]
 
-private lemma constMomentum_comm_constMomentum {d} (i j : Fin d) :
+private lemma constMomentum_comm_constMomentum {d : ℕ} (i j : Fin d) :
     ⁅constMomentum i, constMomentum j⁆ = 0 := by
-  unfold constMomentum
-  simp [momentum_commutation_momentum]
+  simp [constMomentum]
 
 private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
     (ε : ℝˣ) (i j : Fin H.d) :
@@ -356,16 +355,9 @@ private lemma constMomentum_comm_constRadiusRegInvCompPosition_add (ε : ℝˣ) 
     ContinuousLinearMap.zero_apply, SchwartzMap.zero_apply]
   ring
 
-private lemma constRadiusRegInvCompPosition_comm_constRadiusRegInvCompPosition
-    (ε : ℝˣ) (i j : Fin H.d) :
+private lemma constRadiusRegInvCompPosition_comm (ε : ℝˣ) (i j : Fin H.d) :
     ⁅constRadiusRegInvCompPosition H ε i, constRadiusRegInvCompPosition H ε j⁆ = 0 := by
-  unfold constRadiusRegInvCompPosition
-  rw [lie_smul, smul_lie, leibniz_lie, lie_leibniz, lie_leibniz]
-  rw [← lie_skew 𝐫[ε,-1] _]
-  rw [position_commutation_position]
-  rw [radiusRegPow_commutation_radiusRegPow]
-  repeat rw [position_commutation_radiusRegPow]
-  simp only [comp_zero, zero_comp, add_zero, neg_zero, smul_zero]
+  simp [constRadiusRegInvCompPosition, lie_leibniz, leibniz_lie, ← lie_skew 𝐫[_,_] 𝐱[_]]
 
 /-- `⁅𝐀(ε)ᵢ, 𝐀(ε)ⱼ⁆ = -iℏ 2m 𝐇(ε)𝐋ᵢⱼ` -/
 lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) : ⁅H.lrlOperator ε i, H.lrlOperator ε j⁆
@@ -402,7 +394,7 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) : ⁅H.lrlOperator ε i, 
   rw [positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add H]
   rw [positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition_add H]
   rw [constMomentum_comm_constRadiusRegInvCompPosition_add H]
-  rw [constRadiusRegInvCompPosition_comm_constRadiusRegInvCompPosition H]
+  rw [constRadiusRegInvCompPosition_comm H]
 
   unfold hamiltonianReg
   ext ψ x
@@ -417,22 +409,13 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) : ⁅H.lrlOperator ε i, 
 ## Hamiltonian / LRL vector commutators
 -/
 
-private lemma pSqr_comm_pL_Lp (i : Fin H.d) :
-    ⁅momentumOperatorSqr (d := H.d), ∑ j, (𝐩[j] ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐩[j])⁆ = 0 := by
-  rw [lie_sum]
-  conv_lhs =>
-    enter [2, j]
-    rw [lie_add, lie_leibniz, lie_leibniz]
-    rw [momentumSqr_commutation_momentum]
-    rw [← lie_skew, angularMomentum_commutation_momentumSqr]
-  simp only [neg_zero, comp_zero, zero_comp, add_zero, Finset.sum_const_zero]
+private lemma pSqr_comm_pL_Lp {d : ℕ} (i : Fin d) :
+    ⁅momentumOperatorSqr (d := d), ∑ j, (𝐩[j] ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐩[j])⁆ = 0 := by
+  simp [lie_sum, lie_leibniz, ← lie_skew 𝐩² 𝐋[_,_]]
 
 private lemma rr_comm_rx {d : ℕ} (ε : ℝˣ) (i : Fin d) :
     ⁅𝐫[d,ε,-1] + (2⁻¹ * ε.1 ^ 2) • 𝐫[ε,-3], 𝐫[ε,-1] ∘L 𝐱[i]⁆ = 0 := by
-  rw [add_lie, smul_lie, lie_leibniz, lie_leibniz]
-  repeat rw [radiusRegPow_commutation_radiusRegPow]
-  repeat rw [← lie_skew, position_commutation_radiusRegPow]
-  simp only [neg_zero, comp_zero, zero_comp, add_zero, smul_zero]
+  simp [lie_leibniz, ← lie_skew 𝐫[_,_] 𝐱[_]]
 
 private lemma pSqr_comm_rx (ε : ℝˣ) (i : Fin H.d) :
     ⁅momentumOperatorSqr (d := H.d), 𝐫[ε,-1] ∘L 𝐱[i]⁆ =
