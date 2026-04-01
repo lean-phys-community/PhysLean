@@ -85,6 +85,8 @@ def momentumOperatorSqr : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) := ∑
 @[inherit_doc momentumOperatorSqr]
 notation "𝐩²" => momentumOperatorSqr
 
+lemma momentumOperatorSqr_eq : 𝐩² = ∑ i : Fin d, 𝐩[i] ∘L 𝐩[i] := rfl
+
 lemma momentumOperatorSqr_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
     𝐩² ψ x = ∑ i, 𝐩[i] (𝐩[i] ψ) x := by
   dsimp only [momentumOperatorSqr]

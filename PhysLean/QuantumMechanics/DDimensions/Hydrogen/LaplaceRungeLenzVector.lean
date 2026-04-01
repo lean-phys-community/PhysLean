@@ -151,31 +151,23 @@ To compute the commutator `⁅𝐀ᵢ(ε), 𝐀ⱼ(ε)⁆` we take the following
 
 -/
 
-private lemma positionDotMomentum_commutation_position {d} (i : Fin d) :
-    ⁅positionDotMomentum (d := d), 𝐱[i]⁆ = (-Complex.I * ℏ) • 𝐱[i] := by
-  unfold positionDotMomentum
-  simp only [← lie_skew 𝐩[_] _, position_commutation_position, position_commutation_momentum,
-    leibniz_lie, kroneckerDelta, sum_lie, comp_neg, comp_smul]
-  simp
+private lemma positionDotMomentum_commutation_position {d : ℕ} (i : Fin d) :
+    ⁅positionDotMomentum d, 𝐱[i]⁆ = (-I * ℏ) • 𝐱[i] := by
+  trans ∑ j, 𝐱[j] ∘L ⁅𝐩[j], 𝐱[i]⁆
+  · simp [positionDotMomentum, sum_lie, leibniz_lie]
+  simp_rw [← lie_skew 𝐩[_] 𝐱[_], position_commutation_momentum, ← neg_smul, ← neg_mul, comp_smul,
+    comp_id, ← Finset.smul_sum, sum_smul]
 
-private lemma positionDotMomentum_commutation_momentum {d} (i : Fin d) :
-    ⁅positionDotMomentum (d := d), 𝐩[i]⁆ = (Complex.I * ℏ) • 𝐩[i] := by
-  unfold positionDotMomentum
-  simp only [momentum_commutation_momentum, position_commutation_momentum, kroneckerDelta,
-    sum_lie, leibniz_lie, smul_comp]
-  simp
+private lemma positionDotMomentum_commutation_momentum {d : ℕ} (i : Fin d) :
+    ⁅positionDotMomentum d, 𝐩[i]⁆ = (I * ℏ) • 𝐩[i] := by
+  trans ∑ j, ⁅𝐱[j], 𝐩[i]⁆ ∘L 𝐩[j]
+  · simp [positionDotMomentum, sum_lie, leibniz_lie]
+  simp_rw [position_commutation_momentum, smul_comp, id_comp, ← Finset.smul_sum, symm _ i, sum_smul]
 
-private lemma positionDotMomentum_commutation_momentumSqr {d} :
-    ⁅positionDotMomentum (d := d), momentumOperatorSqr (d := d)⁆ = (2 * Complex.I * ℏ) • 𝐩² := by
-  unfold momentumOperatorSqr
-  simp only [positionDotMomentum_commutation_momentum, lie_sum, lie_leibniz, comp_smul,
-    smul_comp]
-  rw [Finset.smul_sum]
-  congr
-  ext i ψ x
-  simp only [ContinuousLinearMap.add_apply, coe_smul', coe_comp', Pi.smul_apply,
-    Function.comp_apply, SchwartzMap.add_apply, SchwartzMap.smul_apply, smul_eq_mul]
-  ring
+private lemma positionDotMomentum_commutation_momentumSqr {d : ℕ} :
+    ⁅positionDotMomentum d, momentumOperatorSqr (d := d)⁆ = (2 * I * ℏ) • 𝐩² := by
+  simp [positionDotMomentum, sum_lie, leibniz_lie, ← lie_skew 𝐩[_] 𝐩²,
+    position_commutation_momentumSqr, ← Finset.smul_sum, ← momentumOperatorSqr_eq]
 
 private lemma positionDotMomentum_commutation_radiusRegPow {d} (ε : ℝˣ) :
     ⁅positionDotMomentum (d := d), radiusRegPowOperator (d := d) ε s⁆ =
