@@ -163,7 +163,7 @@ private lemma positionDotMomentum_commutation_momentum {d : ℕ} (i : Fin d) :
   · simp [positionDotMomentum, sum_lie, leibniz_lie]
   simp_rw [position_commutation_momentum, smul_comp, id_comp, ← Finset.smul_sum, symm _ i, sum_smul]
 
-private lemma positionDotMomentum_commutation_momentumSqr {d : ℕ} :
+private lemma positionDotMomentum_commutation_momentumSqr (d : ℕ) :
     ⁅positionDotMomentum d, momentumOperatorSqr (d := d)⁆ = (2 * I * ℏ) • 𝐩² := by
   simp [positionDotMomentum, sum_lie, leibniz_lie, ← lie_skew 𝐩[_] 𝐩²,
     position_commutation_momentumSqr, ← Finset.smul_sum, ← momentumOperatorSqr_eq]
