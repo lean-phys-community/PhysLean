@@ -24,7 +24,7 @@ Other results relating to notes are in other files.
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 open Lean
 
 /-- The information from a `note ...` command. To be used in a note file-/

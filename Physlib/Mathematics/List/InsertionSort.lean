@@ -14,7 +14,7 @@ import all Mathlib.Data.List.Sort
 
 @[expose] public section
 
-namespace PhysLean.List
+namespace Physlib.List
 
 open Fin
 open PhysLean

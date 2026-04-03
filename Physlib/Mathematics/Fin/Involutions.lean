@@ -21,7 +21,7 @@ These involutions are used in e.g. proving results about Wick contractions.
 -/
 
 @[expose] public section
-namespace PhysLean.Fin
+namespace Physlib.Fin
 
 open Nat
 

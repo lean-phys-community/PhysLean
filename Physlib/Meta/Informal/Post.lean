@@ -63,7 +63,7 @@ unsafe def getTag (c : ConstantInfo) : CoreM String := do
 
 end Informal
 
-namespace PhysLean
+namespace Physlib
 
 /-- The number of informal lemmas in PhysLean. -/
 def noInformalLemmas : CoreM Nat := do

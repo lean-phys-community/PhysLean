@@ -19,7 +19,7 @@ the tree has no duplicates).
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 
 namespace FourTree
 

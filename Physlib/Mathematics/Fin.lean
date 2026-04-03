@@ -20,7 +20,7 @@ in Mathlib.
 -/
 
 @[expose] public section
-namespace PhysLean.Fin
+namespace Physlib.Fin
 
 open Fin
 variable {n : Nat}

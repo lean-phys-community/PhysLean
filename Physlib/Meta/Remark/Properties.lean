@@ -13,7 +13,7 @@ public import Physlib.Meta.Remark.Basic
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 open Lean
 variable {m} [Monad m] [MonadEnv m] [MonadError m]
 

@@ -168,7 +168,7 @@ def getDeclStringNoDoc (name : Name) : CoreM String := do
 
 end Lean.Name
 
-namespace PhysLean
+namespace Physlib
 
 /-- Number of definitions. -/
 def noDefs : CoreM Nat := do

@@ -15,7 +15,7 @@ public import Physlib.Meta.Notes.NoteFile
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 open Lean System Meta
 
 namespace NoteFile

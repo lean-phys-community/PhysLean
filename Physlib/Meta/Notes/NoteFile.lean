@@ -16,7 +16,7 @@ A note file is a structure which contains the information to go into a note.
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 open Lean
 
 /-- A note consists of a title and a list of Lean files which make up the note. -/

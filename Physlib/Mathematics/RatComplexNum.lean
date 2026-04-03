@@ -13,7 +13,7 @@ public import Mathlib.Analysis.Complex.Basic
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 
 /-- Rational complex numbers. This type is mainly used when decidability is needed. -/
 structure RatComplexNum where

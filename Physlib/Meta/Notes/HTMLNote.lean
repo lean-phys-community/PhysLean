@@ -17,7 +17,7 @@ public import Physlib.Meta.Informal.Basic
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 open Lean
 
 /-- A `HTMLNote` is a structure containing the html information from

@@ -15,7 +15,7 @@ public import Mathlib.Logic.Equiv.Defs
 -/
 public section
 
-namespace PhysLean.List
+namespace Physlib.List
 
 open Fin
 open PhysLean

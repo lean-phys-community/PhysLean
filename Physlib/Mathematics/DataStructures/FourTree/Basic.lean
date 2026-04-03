@@ -25,7 +25,7 @@ It is defined recursively, with the following structure:
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 
 namespace FourTree
 

@@ -14,7 +14,7 @@ public meta import Lean.Elab.Command
 
 @[expose] public section
 
-namespace PhysLean
+namespace Physlib
 open Lean
 
 /-- The information from a `TODO ...` command. -/

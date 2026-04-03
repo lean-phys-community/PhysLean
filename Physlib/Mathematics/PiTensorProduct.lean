@@ -18,7 +18,7 @@ in Mathlib.
 -/
 
 @[expose] public section
-namespace PhysLean.PiTensorProduct
+namespace Physlib.PiTensorProduct
 
 noncomputable section tmulEquiv
 
