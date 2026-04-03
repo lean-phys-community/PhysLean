@@ -8,7 +8,7 @@ body:
     label: Version bump
     description: Please do not modify this text.
     value: |
-      This issue is a tracker issue for bumping PhysLean to new versions of Lean.
+      This issue is a tracker issue for bumping Physlib to new versions of Lean.
       The checklist below should be used to ensure that the bump is done correctly.
   validations:
     required: true
@@ -56,7 +56,7 @@ body:
     description: Please check off these items as you complete them
     options:
       - label: Create a tag for the new version.
-      - label: Put a bump notice on this [thread](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/Bumps.20of.20PhysLean.2E/with/572707099).
+      - label: Put a bump notice on this [thread](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/Bumps.20of.20PhysLean.2E/with/572707099).
   validations:
     required: false
 - type: textarea
