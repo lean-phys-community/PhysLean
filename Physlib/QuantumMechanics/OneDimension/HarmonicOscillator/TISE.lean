@@ -21,7 +21,7 @@ namespace HarmonicOscillator
 
 variable (Q : HarmonicOscillator)
 
-open Nat PhysLean HilbertSpace Constants
+open Nat Physlib HilbertSpace Constants
 
 /-- The `n`th eigenvalues for a Harmonic oscillator is defined as `(n + 1/2) * ℏ * ω`. -/
 noncomputable def eigenValue (n : ℕ) : ℝ := (n + 1/2) * ℏ * Q.ω
