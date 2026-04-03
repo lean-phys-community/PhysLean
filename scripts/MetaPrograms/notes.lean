@@ -7,7 +7,7 @@ import Physlib.Meta.Basic
 import Physlib.Meta.Remark.Properties
 import Physlib.Meta.Notes.ToHTML
 import Mathlib.Lean.CoreM
-import PhysLean
+import Physlib
 /-!
 
 # Extracting notes from Lean files
