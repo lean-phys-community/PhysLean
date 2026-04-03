@@ -1,10 +1,10 @@
-# This is a workflow that is triggered manually to create a treemap (in docs folder) of physlean directories
+# This is a workflow that is triggered manually to create a treemap (in docs folder) of Physlib directories
 
-name: Physlean treemap
+name: Physlib treemap
 
 on:
   workflow_dispatch:
-  
+
 permissions:
   contents: write
   pages: write
@@ -27,4 +27,3 @@ jobs:
           git add "docs/treemap.png"
           git commit -m "Update treemap image [skip ci]" || echo "No changes to commit"
           git push
-
