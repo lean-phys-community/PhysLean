@@ -26,7 +26,7 @@ def lintStyleCli (args : Cli.Parsed) : IO UInt32 := do
     | (false, true) => OutputSetting.print ErrorFormat.github
     | (false, false) => OutputSetting.print ErrorFormat.humanReadable
   let mut allModules := #[]
-  for s in ["PhysLean.lean"] do
+  for s in ["Physlib.lean"] do
     allModules := allModules.append ((← IO.FS.lines s).filter (!·.containsSubstr "Batteries")
       |>.map (·.stripPrefix "import "))
   let numberErrorFiles ← lintModules allModules mode

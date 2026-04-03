@@ -107,31 +107,31 @@ instance : ToString PhysLeanCategory where
   toString := PhysLeanCategory.string
 
 def PhysLeanCategory.ofFileName (n : Name) : PhysLeanCategory :=
-  if n.toString.startsWith "PhysLean.ClassicalMechanics"  then
+  if n.toString.startsWith "Physlib.ClassicalMechanics"  then
     PhysLeanCategory.ClassicalMechanics
-  else if n.toString.startsWith "PhysLean.CondensedMatter" then
+  else if n.toString.startsWith "Physlib.CondensedMatter" then
     PhysLeanCategory.CondensedMatter
-  else if n.toString.startsWith "PhysLean.Cosmology" then
+  else if n.toString.startsWith "Physlib.Cosmology" then
     PhysLeanCategory.Cosmology
-  else if n.toString.startsWith "PhysLean.Electromagnetism" then
+  else if n.toString.startsWith "Physlib.Electromagnetism" then
     PhysLeanCategory.Elctromagnetism
-  else if n.toString.startsWith "PhysLean.Mathematics" then
+  else if n.toString.startsWith "Physlib.Mathematics" then
     PhysLeanCategory.Mathematics
-  else if n.toString.startsWith "PhysLean.Meta" then
+  else if n.toString.startsWith "Physlib.Meta" then
     PhysLeanCategory.Meta
-  else if n.toString.startsWith "PhysLean.Optics" then
+  else if n.toString.startsWith "Physlib.Optics" then
     PhysLeanCategory.Optics
-  else if n.toString.startsWith "PhysLean.Particles" then
+  else if n.toString.startsWith "Physlib.Particles" then
     PhysLeanCategory.Particles
-  else if n.toString.startsWith "PhysLean.QFT" then
+  else if n.toString.startsWith "Physlib.QFT" then
     PhysLeanCategory.QFT
-  else if n.toString.startsWith "PhysLean.QuantumMechanics" then
+  else if n.toString.startsWith "Physlib.QuantumMechanics" then
     PhysLeanCategory.QuantumMechanics
-  else if n.toString.startsWith "PhysLean.Relativity" then
+  else if n.toString.startsWith "Physlib.Relativity" then
     PhysLeanCategory.Relativity
-  else if n.toString.startsWith "PhysLean.StatisticalMechanics" then
+  else if n.toString.startsWith "Physlib.StatisticalMechanics" then
     PhysLeanCategory.StatisticalMechanics
-  else if n.toString.startsWith "PhysLean.Thermodynamics" then
+  else if n.toString.startsWith "Physlib.Thermodynamics" then
     PhysLeanCategory.Thermodynamics
   else
     PhysLeanCategory.Other
