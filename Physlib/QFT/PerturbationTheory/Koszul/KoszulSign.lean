@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSignInsert
 public import Physlib.Mathematics.List.InsertionSort
-import all PhysLean.Mathematics.List
+import all Physlib.Mathematics.List
 import all Mathlib.Data.List.Sort
 /-!
 
