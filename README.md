@@ -5,7 +5,7 @@
 
 
 <div align="center">
-<img src="./docs/PhysLib-logo.jpeg" alt="PhysLean logo" width="500">
+<img src="./docs/PhysLib-logo.jpeg" alt="Physlib logo" width="500">
 </div>
 
 
@@ -18,11 +18,9 @@
 [![](https://img.shields.io/badge/Getting-Started-darkgreen)](https://physlib.io/GettingStarted.html)
 [![](https://img.shields.io/badge/The-Website-darkgreen)](https://physlib.io)
 [![](https://img.shields.io/badge/How_To-Get_Involved-darkgreen)](https://physlib.io/GetInvolved.html)
-[![](https://img.shields.io/badge/PhysLean_Zulip-Discussion-darkgreen)](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/)
+[![](https://img.shields.io/badge/Physlib_Zulip-Discussion-darkgreen)](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/)
 [![](https://img.shields.io/badge/TODO-List-darkgreen)](https://physlib.io/TODOList)
 
-[![](https://img.shields.io/badge/PhysLean-Search-purple)](https://loogle.physlib.io)
-[![](https://img.shields.io/badge/PhysLean-Online-purple)](https://live.physlib.io)
 
 [![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlib.io/Stats)
 [![](https://img.shields.io/badge/Lean-v4.28.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.28.0)
@@ -57,9 +55,9 @@
 🎯 The project shall be for **mainstream** physics only.
 
 
-## Contributing to PhysLib
+## Contributing to Physlib
 
-PhysLib is open-source and community run, and we welcome contributions from anyone.
+Physlib is open-source and community run, and we welcome contributions from anyone.
 All you need to do is open a pull-request with your changes
 and our team of maintainers will review it and iterate with you on feedback until it
 can be merged.
@@ -70,7 +68,7 @@ If you unsure where you would like to contribute, you may find ideas on:
 - our [Get Involved page](https://physlib.io/GetInvolved.html)
 - the [quantumInfo todo page](./QuantumInfo/WildeTODO.md)
 > [!NOTE]
-> If stuck at any point there are lots of people happly to help on the [PhysLib zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib)
+> If stuck at any point there are lots of people happly to help on the [Physlib zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib)
 
 ### Installing Lean 4
 
@@ -82,7 +80,7 @@ or
 
 - https://leanprover-community.github.io/get_started.html
 
-### Installing PhysLib
+### Installing Physlib
 
 - Clone this repository (or download the repository as a Zip file)
 - Open a terminal at the top-level in the corresponding directory.
@@ -90,13 +88,13 @@ or
 - Run `lake build`.
 - Open the directory (not a single file) in Visual Studio Code (or another Lean compatible code editor).
 
-At the moment PhysLib is divided into two essentially disjoint halves, `PhysLean` and `QuantumInfo`.
+At the moment Physlib is divided into two essentially disjoint halves, `Physlib` and `QuantumInfo`.
 These were two repositories that merged in an effort to create a more cohesive ecosystem for physics
 in Lean. There is ongoing effort to integrate them more deeply and share code, but at the moment
-they offer two separate _build targets_: `PhysLean` and `QuantumInfo`, as specified in `lakefile.lean`.
+they offer two separate _build targets_: `Physlib` and `QuantumInfo`, as specified in `lakefile.lean`.
 They are both default targets, so `lake build` will build both.
 
-If you only want to build one, `lake build PhysLean` or `lake build QuantumInfo` will target just one
+If you only want to build one, `lake build Physlib` or `lake build QuantumInfo` will target just one
 or the other. This could be useful if you're working on one part or the other and want to see that
 all your changes worked, or if you're only interested in having one or the other as a dependency in
 your project.
@@ -105,14 +103,14 @@ your project.
 
 There are lots of guides on how to make a pull-request on GitHub. The first thing you
 need to do is fork the repository. Once you've made your pull request we will review it:
-- Guide to [PhysLib reviews](https://github.com/leanprover-community/physlib/blob/master/docs/ReviewGuidelines.md).
+- Guide to [Physlib reviews](https://github.com/leanprover-community/physlib/blob/master/docs/ReviewGuidelines.md).
 It will also undergo a number of automated checks called linters. Sometimes these are easier
 to run locally:
 - Guide to [linters and running them locally](https://github.com/leanprover-community/physlib/blob/master/scripts/README.md).
 
 Most importantly:
 > [!NOTE]
-> When making contributing to PhysLib it is much better to do it with small steps. This makes it easier for us to review, and allows you to get feedback sooner.
+> When making contributing to Physlib it is much better to do it with small steps. This makes it easier for us to review, and allows you to get feedback sooner.
 
 ## Maintainers
 
