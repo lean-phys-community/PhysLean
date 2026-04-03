@@ -32,7 +32,7 @@ open Lean
 
 -/
 
-/-- Gets all imports within PhysLean. -/
+/-- Gets all imports within Physlib. -/
 def Physlib.allImports : IO (Array Import) := do
   initSearchPath (← findSysroot)
   let mods := `Physlib
@@ -42,7 +42,7 @@ def Physlib.allImports : IO (Array Import) := do
   let (hepLeanMod, _) ← readModuleData mFile
   hepLeanMod.imports.filterM fun c => return c.module != `Init
 
-/-- Number of files within PhysLean. -/
+/-- Number of files within Physlib. -/
 def Physlib.noImports : IO Nat := do
   let imports ← allImports
   return imports.size
@@ -182,7 +182,7 @@ def noLemmas : CoreM Nat := do
   let x ← imports.mapM Physlib.Imports.getUserConsts
   x.flatFilterSizeM fun c => return !c.isDef && (← c.name.hasPos)
 
-/-- All docstrings present in PhysLean. -/
+/-- All docstrings present in Physlib. -/
 def allDocStrings : CoreM (Array String) := do
   let imports ← Physlib.allImports
   let x ← imports.mapM Physlib.Imports.getUserConsts
@@ -204,7 +204,7 @@ def noLemmasNoDocString : CoreM Nat := do
   x.flatFilterSizeM fun c =>
     return !c.isDef && (← c.name.hasPos) && !(← c.name.hasDocString)
 
-/-- The number of lines in PhysLean. -/
+/-- The number of lines in Physlib. -/
 def noLines : IO Nat := do
   let imports ← Physlib.allImports
   let x ← imports.mapM Physlib.Imports.getLines

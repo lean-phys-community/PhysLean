@@ -12,7 +12,7 @@ import LLM.GPT.Json
 import LLM.GPT.API
 /-!
 
-# PhysLean OpenAI doc check
+# Physlib OpenAI doc check
 
 This file uses the openAI API to check the doc strings of definitions and theorems in a
 Lean 4 file.

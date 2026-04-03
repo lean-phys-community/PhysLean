@@ -7,13 +7,13 @@ import Physlib.Meta.Informal.Post
 import Mathlib.Lean.CoreM
 /-!
 
-# PhysLean Stats
+# Physlib Stats
 
-This file concerns with statistics of PhysLean.
+This file concerns with statistics of Physlib.
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 def getStats : MetaM String := do
   let noDefsVal ← noDefs
@@ -49,7 +49,7 @@ layout: default
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stats for PhysLean</title>
+    <title>Stats for Physlib</title>
      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
      <style>
         /* Style the progress bar to be wider and take up more space */
@@ -79,7 +79,7 @@ layout: default
 </head>
 <body>"
   let body := s!"
-<h1>Stats for PhysLean</h1>
+<h1>Stats for Physlib</h1>
 <h3>Number of Files 📄: {noImportsVal}</h3>
 <h3>Number of lines 💻: {noLinesVal}</h3>
 <h3>Number of Definitions (incl. instances): {noDefsVal - noInformalLemmasVal}</h3>

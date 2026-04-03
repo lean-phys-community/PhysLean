@@ -87,7 +87,7 @@ def checkMissingImports (modData : ModuleData) (reqImports : Array Name) :
       none)
   if nameArray.size ≠ 0  then
     let nameArraySort := nameArray.qsort (·.toString < ·.toString)
-    IO.print s!"Files are not imported add the following to the `PhysLean` file: \n"
+    IO.print s!"Files are not imported add the following to the `Physlib` file: \n"
     for name in nameArraySort do
       IO.print s!"import {name}\n"
     warned := true

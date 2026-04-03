@@ -11,7 +11,7 @@ import Lean
 
 This file checks that all definitions which form types start with a capital letter
 (or some non-latin character). This linter is not currently strictly enforced
-in PhysLean.
+in Physlib.
 
 
 -/

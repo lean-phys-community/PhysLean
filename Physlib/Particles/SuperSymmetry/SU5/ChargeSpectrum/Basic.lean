@@ -54,7 +54,7 @@ of the charge spectrum, which can help in searching for viable theories.
 ## iv. References
 
 There are no known references for charge spectra in the literature.
-They were created specifically for the purpose of PhysLean.
+They were created specifically for the purpose of Physlib.
 
 -/
 

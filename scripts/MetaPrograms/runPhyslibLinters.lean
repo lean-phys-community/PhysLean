@@ -3,7 +3,7 @@ import Batteries.Data.Array.Basic
 import Lake.CLI.Main
 /-!
 
-A minimized version of the Batteries script runLinter dedicated to PhysLean.
+A minimized version of the Batteries script runLinter dedicated to Physlib.
 
 Made as an attempt to overcome issues outline here:
 https://leanprover.zulipchat.com/#narrow/channel/113488-general/topic/runLinter.20in.20github.20workflow.20not.20terminating/with/546421343

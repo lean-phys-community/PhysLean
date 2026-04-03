@@ -10,7 +10,7 @@ import Cli.Basic
 # Text based style linters from Mathlib
 
 This file is a copy of the `./scripts/lint_style.lean` executable from mathlib, adapted
-to run text-based style linters from mathlib on PhysLean.
+to run text-based style linters from mathlib on Physlib.
 
 That file is copyright Michael Rothgang, and is released under the Apache 2.0 license.
 It is authored by Michael Rothgang.
@@ -36,7 +36,7 @@ def lintStyleCli (args : Cli.Parsed) : IO UInt32 := do
 -- so far, no help options or so: perhaps that is fine?
 def heplean_lint_style : Cmd := `[Cli|
   lint_style VIA lintStyleCli; ["0.0.1"]
-  "Run text-based style linters on every Lean file in PhysLean (adapted from mathlib's lint_style).
+  "Run text-based style linters on every Lean file in Physlib (adapted from mathlib's lint_style).
   Print errors about any unexpected style errors to standard output."
 
   FLAGS:

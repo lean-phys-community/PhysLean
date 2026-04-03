@@ -24,12 +24,12 @@ The scope of this module is to define on `Space d` basic instances related trans
 the metric. We do not here define the structure of a `Module` on `Space d`, as this is done in
 `Physlib.SpaceAndTime.Space.Module`.
 
-PhysLean sits downstream of Mathlib, and above we import the necessary Mathlib modules
+Physlib sits downstream of Mathlib, and above we import the necessary Mathlib modules
 which contain (perhaps transitively through imports) the definitions and theorems we need.
 
 ## Implementation details
 
-The exact implementation of `Space d` into PhysLean is discussed in numerous places
+The exact implementation of `Space d` into Physlib is discussed in numerous places
 on the Lean Zulip, including:
 
 - https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/Space.20vs.20EuclideanSpace/with/575332888

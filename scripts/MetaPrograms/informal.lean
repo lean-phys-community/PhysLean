@@ -193,7 +193,7 @@ layout: default
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Informal dependency graph for PhysLean</title>
+    <title>Informal dependency graph for Physlib</title>
     <style>
         /* Optional styling for the message display */
         #message {
@@ -218,10 +218,10 @@ layout: default
     <script src=\"https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js\"></script>
 
     <!-- Add a title to the page -->
-    <h1 style=\"text-align: center;\">Informal dependency graph for PhysLean</h1>
+    <h1 style=\"text-align: center;\">Informal dependency graph for Physlib</h1>
     <p style=\"text-align: center;\">Click on a node to display the text associated with it.</p>
     <p style=\"text-align: center;\">This graph only shows informal results (gray) and their direct formal dependencies (blue).
-    It does not show all results formalised into PhysLean.</p>
+    It does not show all results formalised into Physlib.</p>
     <!-- Div to display the graph -->
     <div id=\"graph\" style=\"width: 75vw; height: 75vh; border: 1px solid black\"></div>
 

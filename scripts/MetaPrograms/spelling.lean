@@ -15,7 +15,7 @@ import Physlib.Meta.AllFilePaths
 # Script to help checking spelling of results
 
 This script collects all words in doc-strings of definitions, theorems and lemmas
-in PhysLean, as well as module doc-strings, and compares them to a custom dictionary
+in Physlib, as well as module doc-strings, and compares them to a custom dictionary
 of correctly spelled words. It then outputs all words which are not in the dictionary,
 so that the user can either correct them or add them to the dictionary file.
 
@@ -26,7 +26,7 @@ all unknown words found.
 
 open Lean
 
-/-- The strings appearing as documentation within PhysLean. -/
+/-- The strings appearing as documentation within Physlib. -/
 def moduleDocs : MetaM (Array String) := do
   let env ← getEnv
   let allModules ← allPhyslibModules

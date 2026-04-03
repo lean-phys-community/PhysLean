@@ -8,7 +8,7 @@ module
 public import Physlib.Meta.TODO.Basic
 /-!
 
-## Getting an array of all file paths in PhysLean.
+## Getting an array of all file paths in Physlib.
 
 -/
 
@@ -27,11 +27,11 @@ partial def allFilePaths.go (prev : Array FilePath)
       pure (acc.push (root ++ "/" ++ entry.fileName))
   pure result
 
-/-- Gets an array of all file paths in `PhysLean`. -/
+/-- Gets an array of all file paths in `Physlib`. -/
 partial def allFilePaths : IO (Array FilePath) := do
   allFilePaths.go (#[] : Array FilePath) "./Physlib" ("./Physlib" : FilePath)
 
-/-- Gets an array of all module names in `PhysLean`. -/
+/-- Gets an array of all module names in `Physlib`. -/
 def allPhyslibModules : IO (Array Lean.Name) := do
   let paths ← allFilePaths
   let moduleNames := paths.map fun path =>

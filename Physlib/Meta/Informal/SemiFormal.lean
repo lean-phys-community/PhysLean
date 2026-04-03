@@ -54,7 +54,7 @@ Semiformal results cannot be used in further code. They are essentially
 forgot about after made.
 
 With minor modification they act in a similar way to `proof_wanted`, however
-they appear in PhysLean's TODO list and must be tagged accordingly.
+they appear in Physlib's TODO list and must be tagged accordingly.
 They must also always have a doc-string. -/
 @[command_parser]
 meta def «semiformal_result» := leading_parser

@@ -65,13 +65,13 @@ end Informal
 
 namespace Physlib
 
-/-- The number of informal lemmas in PhysLean. -/
+/-- The number of informal lemmas in Physlib. -/
 def noInformalLemmas : CoreM Nat := do
   let imports ← allImports
   let x ← imports.mapM Imports.getUserConsts
   x.flatFilterSizeM fun c => return Informal.isInformalLemma c
 
-/-- The number of informal definitions in PhysLean. -/
+/-- The number of informal definitions in Physlib. -/
 def noInformalDefs : CoreM Nat := do
   let imports ← allImports
   let x ← imports.mapM Imports.getUserConsts

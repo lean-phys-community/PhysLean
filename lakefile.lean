@@ -116,7 +116,7 @@ lean_exe no_docs where
 -- Optional inclusion of LeanCopilot
 -- require LeanCopilot from git "https://github.com/lean-dojo/LeanCopilot.git" @ "v1.4.1"
 
--- lean_exe commands defined specifically for PhysLean.
+-- lean_exe commands defined specifically for Physlib.
 
 -- Optional inclusion of openAI_doc_check. Needs `llm` above.
 -- lean_exe openAI_doc_check where

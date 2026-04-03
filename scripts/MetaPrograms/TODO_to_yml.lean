@@ -29,7 +29,7 @@ open Lean System Meta Physlib
 
 /-!
 
-## PhysLean categories.
+## Physlib categories.
 
 To be moved.
 

@@ -34,7 +34,7 @@ From these fundamental choices one can construct all other units and dimensions.
 
 ## Implementation details
 
-Units within PhysLean are implemented with the following convention:
+Units within Physlib are implemented with the following convention:
 - The fundamental units, and the choices they correspond to, are defined within the
   appropriate physics directory, in particular:
   - `Physlib/SpaceAndTime/Time/TimeUnit.lean`
@@ -64,7 +64,7 @@ There are other implementations of units in Lean, in particular:
 Each of these have their own advantages and specific use-cases.
 For example both (1) and (3) allow for or work in Floats, allowing computability and the use
 of `#eval`. This is currently not possible with the more theoretical implementation here
-in PhysLean which is based exclusively on Reals.
+in Physlib which is based exclusively on Reals.
 
 -/
 

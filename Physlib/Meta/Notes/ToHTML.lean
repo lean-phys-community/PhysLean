@@ -171,7 +171,7 @@ meta def leanNote : String := "
   prover called <a href=\"https://lean-lang.org\">Lean</a>.
   Lean formally checks definitions, theorems and proofs for correctness.
   These notes are part of a much larger project called
-  <a href=\"https://github.com/leanprover-community/physlib\">PhysLean</a>, which aims to digitalize
+  <a href=\"https://github.com/leanprover-community/physlib\">Physlib</a>, which aims to digitalize
   high energy physics into Lean. Please consider contributing to this project.
   <br><br>
   Please provide feedback or suggestions for improvements by creating a GitHub issue

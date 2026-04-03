@@ -8,9 +8,9 @@ import Mathlib.Tactic.Linter.TextBased
 import Batteries.Data.Array.Merge
 /-!
 
-# PhysLean style linter
+# Physlib style linter
 
-A number of linters on PhysLean to enforce a consistent style.
+A number of linters on Physlib to enforce a consistent style.
 
 There are currently not enforced at the GitHub action level.
 

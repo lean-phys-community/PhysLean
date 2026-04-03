@@ -149,7 +149,7 @@ def perturbationTheory : Note where
     .name `FieldSpecification.wicks_theorem_context .incomplete,
     .p "In this note we walk through the important parts of the proof of the three versions of
       Wick's theorem for field operators containing carrying both fermionic and bosonic statistics,
-      as it appears in PhysLean. Not every lemma or definition is covered here.
+      as it appears in Physlib. Not every lemma or definition is covered here.
       The aim is to give just enough that the story can be understood.",
     .p "
      Before proceeding with the steps in the proof, we review some basic terminology
@@ -299,7 +299,7 @@ def harmonicOscillator : Note where
       quantum mechanical system. It is often one of the first models encountered by undergraduate
       students studying quantum mechanics.",
     .p " This note presents the formalization of the quantum harmonic oscillator in the theorem prover
-     Lean 4, as part of the larger project PhysLean.
+     Lean 4, as part of the larger project Physlib.
      What this means is that every definition and theorem in this note has been formally checked
      for mathematical correctness for by a computer. There are a number of
      motivations for doing this which are discussed <a href = 'https://heplean.com'>here</a>.",
@@ -380,7 +380,7 @@ def tensors : Note where
     .warning "This note is a work in progress. (5th March 2025)",
     .h1 "Introduction",
     .p "This note is related to: https://arxiv.org/pdf/2411.07667, and concerns the
-      implementation of tensors and index notation into PhysLean, and
+      implementation of tensors and index notation into Physlib, and
       its mathematical structure.",
     .p  "This note is not intended to be a first-introduction to tensors and index notation.",
     .h1 "Tensor Species",

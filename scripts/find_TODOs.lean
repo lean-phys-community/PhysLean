@@ -10,7 +10,7 @@ import Mathlib.Data.Nat.Notation
 
 # TODO finder
 
-This program finds all instances of `/<!> TODO: ...` (without the `<>`) in PhysLean files.
+This program finds all instances of `/<!> TODO: ...` (without the `<>`) in Physlib files.
 
 ## Note
 
@@ -67,7 +67,7 @@ def hepLeanLintFile (path : FilePath) : IO String := do
 def todoFileHeader : String := s!"
 # TODO List
 
-This is an automatically generated list of TODOs appearing as `/-! TODO:...` in PhysLean.
+This is an automatically generated list of TODOs appearing as `/-! TODO:...` in Physlib.
 
 Please feel free to contribute to the completion of these tasks.
 

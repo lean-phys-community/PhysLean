@@ -8,9 +8,9 @@ module
 public import Physlib.Units.WithDim.Speed
 /-!
 
-# Examples of units in PhysLean
+# Examples of units in Physlib
 
-In this module we give some examples of how to use the units system in PhysLean.
+In this module we give some examples of how to use the units system in Physlib.
 This module should not be imported into any other module, and the results here
 should not be used in the proofs of any other results other then those in this file.
 

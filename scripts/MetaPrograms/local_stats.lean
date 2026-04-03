@@ -8,7 +8,7 @@ import Mathlib.Lean.CoreM
 import Physlib.Meta.AllFilePaths
 /-!
 
-# Local stats within PhysLean
+# Local stats within Physlib
 
 Given a directory this script returns the statistics of
 the lean files contained within.
