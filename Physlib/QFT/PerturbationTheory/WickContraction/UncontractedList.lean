@@ -19,8 +19,8 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
-open PhysLean.Fin
+open Physlib.List
+open Physlib.Fin
 
 /-!
 

@@ -19,7 +19,7 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
-open PhysLean.List
+open Physlib.List
 
 /-- Given a Wick contraction `φsΛ`, and a subset of `φsΛ.1`, the Wick contraction
   consisting of contracted pairs within that subset. -/

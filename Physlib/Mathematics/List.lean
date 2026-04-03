@@ -18,7 +18,7 @@ public section
 namespace Physlib.List
 
 open Fin
-open PhysLean
+open Physlib
 variable {n : Nat}
 
 lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :

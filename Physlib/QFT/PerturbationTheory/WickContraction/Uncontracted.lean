@@ -18,7 +18,7 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
+open Physlib.List
 
 /-- For a Wick contraction `c`, `c.uncontracted` is defined as the finset of elements of `Fin n`
   which are not in any contracted pair. -/

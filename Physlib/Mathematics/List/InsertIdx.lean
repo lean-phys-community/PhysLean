@@ -16,7 +16,7 @@ public import Mathlib.Algebra.Order.Ring.Nat
 namespace Physlib.List
 
 open Fin
-open PhysLean
+open Physlib
 variable {n : Nat}
 
 lemma insertIdx_map {I J : Type} (f : I → J) : (i : ℕ) → (r : List I) → (r0 : I) →

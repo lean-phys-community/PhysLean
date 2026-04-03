@@ -52,7 +52,7 @@ open SuperSymmetry.SU5
 open SuperSymmetry.SU5.ChargeSpectrum
 open PotentialTerm
 open CodimensionOneConfig
-open PhysLean
+open Physlib
 
 /-!
 

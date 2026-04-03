@@ -17,7 +17,7 @@ public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.TimeOrder
 
 namespace FieldSpecification
 open Module FieldOpFreeAlgebra
-open PhysLean.List
+open Physlib.List
 open FieldStatistic
 
 namespace WickAlgebra

@@ -20,7 +20,7 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
+open Physlib.List
 open FieldStatistic
 
 /-- Given a Wick contraction `c : WickContraction n` and `i1 i2 : Fin n` the finite set

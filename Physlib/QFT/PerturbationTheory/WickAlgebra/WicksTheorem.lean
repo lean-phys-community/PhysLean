@@ -23,7 +23,7 @@ namespace FieldSpecification
 variable {𝓕 : FieldSpecification}
 open FieldOpFreeAlgebra
 open WickAlgebra
-open PhysLean.List
+open Physlib.List
 open WickContraction
 open FieldStatistic
 

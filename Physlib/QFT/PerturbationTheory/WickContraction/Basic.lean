@@ -30,7 +30,7 @@ def WickContraction (n : ℕ) : Type :=
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
+open Physlib.List
 
 /-- Wick contractions are decidable. -/
 instance : DecidableEq (WickContraction n) := Subtype.instDecidableEq

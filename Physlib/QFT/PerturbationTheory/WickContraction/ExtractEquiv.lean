@@ -21,8 +21,8 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
-open PhysLean.Fin
+open Physlib.List
+open Physlib.Fin
 
 lemma extractEquiv_equiv {c1 c2 : (c : WickContraction n) × Option c.uncontracted}
     (h : c1.1 = c2.1) (ho : c1.2 = uncontractedCongr (by rw [h]) c2.2) : c1 = c2 := by

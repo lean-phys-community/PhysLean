@@ -18,7 +18,7 @@ open FieldSpecification
 variable {𝓕 : FieldSpecification}
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
+open Physlib.List
 open FieldStatistic
 
 /-- The involution of `Fin n` associated with a Wick contraction `c : WickContraction n` as follows.

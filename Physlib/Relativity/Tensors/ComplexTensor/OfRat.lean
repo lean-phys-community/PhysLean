@@ -22,8 +22,8 @@ open MonoidalCategory
 
 namespace complexLorentzTensor
 open OverColor
-open PhysLean.RatComplexNum
-open PhysLean
+open Physlib.RatComplexNum
+open Physlib
 
 open TensorSpecies
 open Tensor

@@ -21,7 +21,7 @@ It satisfies the appropriate universality conditions with respect to the operato
 
 namespace FieldSpecification
 open FieldOpFreeAlgebra
-open PhysLean.List
+open Physlib.List
 open FieldStatistic
 
 variable (𝓕 : FieldSpecification)

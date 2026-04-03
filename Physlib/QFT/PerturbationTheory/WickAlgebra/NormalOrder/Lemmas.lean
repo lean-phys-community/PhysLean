@@ -17,7 +17,7 @@ public import Physlib.QFT.PerturbationTheory.WickAlgebra.SuperCommute
 
 namespace FieldSpecification
 open FieldOpFreeAlgebra
-open PhysLean.List
+open Physlib.List
 open FieldStatistic
 
 namespace WickAlgebra

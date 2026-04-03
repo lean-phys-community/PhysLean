@@ -18,7 +18,7 @@ import all Mathlib.Data.List.Sort
 
 namespace Wick
 
-open PhysLean.List
+open Physlib.List
 open FieldStatistic
 
 variable {𝓕 : Type} (q : 𝓕 → FieldStatistic) (le : 𝓕 → 𝓕 → Prop) [DecidableRel le]

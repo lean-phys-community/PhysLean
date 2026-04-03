@@ -20,7 +20,7 @@ namespace QuantumMechanics
 
 namespace OneDimension
 
-open PhysLean HilbertSpace Constants
+open Physlib HilbertSpace Constants
 
 private lemma fun_add {α : Type*} (f g : α → ℂ) :
   (fun x ↦ f x) + (fun x ↦ g x) = fun x ↦ f x + g x := by

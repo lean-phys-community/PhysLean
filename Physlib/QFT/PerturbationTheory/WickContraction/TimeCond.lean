@@ -19,7 +19,7 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
+open Physlib.List
 open WickAlgebra
 
 /-- The condition on a Wick contraction which is true iff and only if every contraction

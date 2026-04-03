@@ -20,8 +20,8 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
-open PhysLean.Fin
+open Physlib.List
+open Physlib.Fin
 
 /-- Given a Wick contraction `WickContraction n.succ` and a `i : Fin n.succ` the
   Wick contraction associated with `n` obtained by removing `i`.

@@ -256,7 +256,7 @@ lemma ofList_pair (s : 𝓕 → FieldStatistic) (φ1 φ2 : 𝓕) :
 -/
 
 section ofListTake
-open PhysLean.List
+open Physlib.List
 variable (q : 𝓕 → FieldStatistic)
 lemma ofList_take_insert (n : ℕ) (φ : 𝓕) (φs : List 𝓕) :
     ofList q (List.take n φs) = ofList q (List.take n (List.insertIdx φs n φ)) := by

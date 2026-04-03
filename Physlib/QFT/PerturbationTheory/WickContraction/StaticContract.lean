@@ -20,7 +20,7 @@ variable {𝓕 : FieldSpecification}
 
 namespace WickContraction
 variable {n : ℕ} (c : WickContraction n)
-open PhysLean.List
+open Physlib.List
 open WickAlgebra
 
 /-- For a list `φs` of `𝓕.FieldOp` and a Wick contraction `φsΛ`, the

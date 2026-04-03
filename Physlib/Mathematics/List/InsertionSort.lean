@@ -17,7 +17,7 @@ import all Mathlib.Data.List.Sort
 namespace Physlib.List
 
 open Fin
-open PhysLean
+open Physlib
 variable {n : Nat}
 
 lemma insertionSortMin_lt_length_succ {α : Type} (r : α → α → Prop) [DecidableRel r]

@@ -66,7 +66,7 @@ instance : IsTrans 𝓕.FieldOp 𝓕.timeOrderRel where
 noncomputable section
 
 open FieldStatistic
-open PhysLean.List
+open Physlib.List
 
 /-- Given a list `φ :: φs` of states, the (zero-based) position of the state which is
   of maximum time. For example
