@@ -32,7 +32,7 @@ partial def allFilePaths : IO (Array FilePath) := do
   allFilePaths.go (#[] : Array FilePath) "./Physlib" ("./Physlib" : FilePath)
 
 /-- Gets an array of all module names in `PhysLean`. -/
-def allPhysLeanModules : IO (Array Lean.Name) := do
+def allPhyslibModules : IO (Array Lean.Name) := do
   let paths ← allFilePaths
   let moduleNames := paths.map fun path =>
     let relativePath := path.toString.replace "./Physlib/" "Physlib."

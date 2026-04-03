@@ -29,7 +29,7 @@ open Lean
 /-- The strings appearing as documentation within PhysLean. -/
 def moduleDocs : MetaM (Array String) := do
   let env ← getEnv
-  let allModules ← allPhysLeanModules
+  let allModules ← allPhyslibModules
   let modDocs := allModules.filterMap fun c =>
     Lean.getModuleDoc? env c
   let modDocs := modDocs.flatten
