@@ -18,7 +18,7 @@ It can be run from the terminal using
 
 The functions
 
-`addModulesIn`, `expectedPhysLeanImports`, and `checkMissingImports`
+`addModulesIn`, `expectedPhyslibImports`, and `checkMissingImports`
 
 are adapted from `batteries.scripts.check_imports.lean` authored by Joe Hendrix.
 
@@ -40,7 +40,7 @@ partial def addModulesIn (recurse : Bool) (prev : Array Name) (root : Name := .a
   pure r
 
 /-- Compute imports expected by `Physlib.lean` by looking at file structure. -/
-def expectedPhysLeanImports : IO (Array Name) := do
+def expectedPhyslibImports : IO (Array Name) := do
   let mut needed := #[]
   for top in ← FilePath.readDir "Physlib" do
       let nm := `PhysLean
@@ -101,7 +101,7 @@ def main (_ : List String) : IO UInt32 := do
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
   let (hepLeanMod, _) ← readModuleData mFile
-  let ePhysLeanImports ← expectedPhysLeanImports
+  let ePhysLeanImports ← expectedPhyslibImports
   let sortedWarned ← arrayImportSorted hepLeanMod.imports
   let warned ← checkMissingImports hepLeanMod ePhysLeanImports
   if (warned ∨ sortedWarned) then
