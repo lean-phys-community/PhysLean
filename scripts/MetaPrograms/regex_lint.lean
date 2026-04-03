@@ -28,10 +28,10 @@ Parts of this file are adapted from `Mathlib.Tactic.Linter.TextBased`,
 open Lean System Meta
 
 /-- Given a list of lines, outputs an error message and a line number. -/
-def PhysLeanTextLinter : Type := Array String → Array (String × ℕ × ℕ)
+def PhyslibTextLinter : Type := Array String → Array (String × ℕ × ℕ)
 
 /-- Unneeded parentheses. -/
-def unneededParentheses : PhysLeanTextLinter := fun lines ↦ Id.run do
+def unneededParentheses : PhyslibTextLinter := fun lines ↦ Id.run do
   let regex := re! r" \([a-zA-Z0-9_]*\) "
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap fun (l, lno) => (
@@ -45,7 +45,7 @@ def unneededParentheses : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Checks if there are two consecutive empty lines. -/
-def doubleEmptyLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
+def doubleEmptyLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let pairLines := List.zip enumLines (List.tail! enumLines)
   let errors := pairLines.filterMap (fun ((l1, lno1), l2, _) ↦
@@ -55,7 +55,7 @@ def doubleEmptyLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Checks if there is a double space in the line, which is not at the start. -/
-def doubleSpaceLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
+def doubleSpaceLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if String.containsSubstr l.trimLeft "  " then
@@ -67,7 +67,7 @@ def doubleSpaceLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
     else none)
   errors.toArray
 
-def longLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
+def longLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if l.length > 100 ∧ ¬ String.containsSubstr l "http" then
@@ -76,7 +76,7 @@ def longLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Substring linter. -/
-def substringLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
+def substringLinter (s : String) : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if String.containsSubstr l s then
@@ -88,7 +88,7 @@ def substringLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
     else none)
   errors.toArray
 
-def endLineLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
+def endLineLinter (s : String) : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if l.endsWith s then
@@ -97,7 +97,7 @@ def endLineLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Number of space at new line must be even. -/
-def numInitialSpacesEven : PhysLeanTextLinter := fun lines ↦ Id.run do
+def numInitialSpacesEven : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     let numSpaces := (l.takeWhile (· == ' ')).length
