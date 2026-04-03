@@ -45,7 +45,7 @@ def printTODO (todos : Array TODOContext) : IO Unit := do
     IO.println (s!"{e.path}:{e.lineNumber}: {e.statement}")
 
 def filePathToGitPath (S : FilePath) (n : ℕ) : String :=
-  "https://github.com/HEPLean/PhysLean/blob/master/"++
+  "https://github.com/leanprover-community/physlib/blob/master/"++
   (S.toString.replace "." "/").replace "/lean" ".lean"
   ++ "#L" ++ toString n
 

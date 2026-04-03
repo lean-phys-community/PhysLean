@@ -94,7 +94,7 @@ def toRelativeFilePath (c : Name) : System.FilePath :=
 
 /-- Turns a name, which represents a module, into a link to github. -/
 def toGitHubLink (c : Name) (line : Nat) : String :=
-  s!"https://github.com/HEPLean/PhysLean/blob/master/{c.toFilePath}#L{line}"
+  s!"https://github.com/leanprover-community/physlib/blob/master/{c.toFilePath}#L{line}"
 
 /-- Given a name, returns the line number. -/
 def lineNumber (c : Name) : m Nat := do
