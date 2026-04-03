@@ -37,11 +37,11 @@ From these fundamental choices one can construct all other units and dimensions.
 Units within PhysLean are implemented with the following convention:
 - The fundamental units, and the choices they correspond to, are defined within the
   appropriate physics directory, in particular:
-  - `PhysLean/SpaceAndTime/Time/TimeUnit.lean`
-  - `PhysLean/SpaceAndTime/Space/LengthUnit.lean`
-  - `PhysLean/ClassicalMechanics/Mass/MassUnit.lean`
-  - `PhysLean/Electromagnetism/Charge/ChargeUnit.lean`
-  - `PhysLean/Thermodynamics/Temperature/TemperatureUnit.lean`
+  - `Physlib/SpaceAndTime/Time/TimeUnit.lean`
+  - `Physlib/SpaceAndTime/Space/LengthUnit.lean`
+  - `Physlib/ClassicalMechanics/Mass/MassUnit.lean`
+  - `Physlib/Electromagnetism/Charge/ChargeUnit.lean`
+  - `Physlib/Thermodynamics/Temperature/TemperatureUnit.lean`
 - In this `Units` directory, we define the necessary structures and properties
   to work derived units and dimensions.
 

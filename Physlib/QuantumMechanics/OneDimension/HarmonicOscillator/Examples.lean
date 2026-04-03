@@ -17,7 +17,7 @@ not be imported into other modules.
 
 To run it from the command line:
 ```
-lake env lean PhysLean/QuantumMechanics/OneDimension/HarmonicOscillator/Examples.lean
+lake env lean Physlib/QuantumMechanics/OneDimension/HarmonicOscillator/Examples.lean
 ```
 -/
 
