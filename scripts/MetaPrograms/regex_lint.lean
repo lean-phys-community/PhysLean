@@ -106,7 +106,7 @@ def numInitialSpacesEven : PhyslibTextLinter := fun lines ↦ Id.run do
     else none)
   errors.toArray
 
-structure PhysLeanErrorContext where
+structure PhyslibErrorContext where
   /-- The underlying `message`. -/
   error : String
   /-- The line number -/
@@ -116,14 +116,14 @@ structure PhysLeanErrorContext where
   /-- The file path -/
   path : FilePath
 
-def printErrors (errors : Array PhysLeanErrorContext) : IO Unit := do
+def printErrors (errors : Array PhyslibErrorContext) : IO Unit := do
   for e in errors do
     IO.println (s!"error: {e.path}:{e.lineNumber}:{e.columnNumber}: {e.error}")
 
-def hepLeanLintFile (path : FilePath) : IO (Array PhysLeanErrorContext) := do
+def hepLeanLintFile (path : FilePath) : IO (Array PhyslibErrorContext) := do
   let lines ← IO.FS.lines path
   let allOutput := (Array.map (fun lint ↦
-    (Array.map (fun (e, n, c) ↦ PhysLeanErrorContext.mk e n c path)) (lint lines)))
+    (Array.map (fun (e, n, c) ↦ PhyslibErrorContext.mk e n c path)) (lint lines)))
     #[doubleEmptyLineLinter, doubleSpaceLinter, numInitialSpacesEven, longLineLinter,
     unneededParentheses,
     substringLinter ".-/", substringLinter " )",
