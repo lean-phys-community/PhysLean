@@ -15,20 +15,20 @@
 
 
 
-[![](https://img.shields.io/badge/Getting-Started-darkgreen)](https://physlean.com/GettingStarted.html)
-[![](https://img.shields.io/badge/The-Website-darkgreen)](https://physlean.com)
-[![](https://img.shields.io/badge/How_To-Get_Involved-darkgreen)](https://physlean.com/GetInvolved.html)
+[![](https://img.shields.io/badge/Getting-Started-darkgreen)](https://physlib.io/GettingStarted.html)
+[![](https://img.shields.io/badge/The-Website-darkgreen)](https://physlib.io)
+[![](https://img.shields.io/badge/How_To-Get_Involved-darkgreen)](https://physlib.io/GetInvolved.html)
 [![](https://img.shields.io/badge/PhysLean_Zulip-Discussion-darkgreen)](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/)
-[![](https://img.shields.io/badge/TODO-List-darkgreen)](https://physlean.com/TODOList)
+[![](https://img.shields.io/badge/TODO-List-darkgreen)](https://physlib.io/TODOList)
 
-[![](https://img.shields.io/badge/PhysLean-Search-purple)](https://loogle.physlean.com)
-[![](https://img.shields.io/badge/PhysLean-Online-purple)](https://live.physlean.com)
+[![](https://img.shields.io/badge/PhysLean-Search-purple)](https://loogle.physlib.io)
+[![](https://img.shields.io/badge/PhysLean-Online-purple)](https://live.physlib.io)
 
-[![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlean.com/Stats)
+[![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlib.io/Stats)
 [![](https://img.shields.io/badge/Lean-v4.28.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.28.0)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/HEPLean/HepLean)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HEPLean/PhysLean)
-[![api_docs](https://img.shields.io/badge/doc-API_docs-blue)](https://physlean.com/docs/)
+[![api_docs](https://img.shields.io/badge/doc-API_docs-blue)](https://physlib.io/docs/)
 
 </div>
 
@@ -66,8 +66,8 @@ can be merged.
 
 If you unsure where you would like to contribute, you may find ideas on:
 - our [open issues](https://github.com/leanprover-community/physlib/issues).
-- our [todo list](https://physlean.com/TODOList)
-- our [Get Involved page](https://physlean.com/GetInvolved.html)
+- our [todo list](https://physlib.io/TODOList)
+- our [Get Involved page](https://physlib.io/GetInvolved.html)
 - the [quantumInfo todo page](./QuantumInfo/WildeTODO.md)
 > [!NOTE]
 > If stuck at any point there are lots of people happly to help on the [PhysLib zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib)
