@@ -18,7 +18,7 @@ of lemmas.
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 
 def numDefs (dir : String) : CoreM Nat := do

@@ -13,7 +13,7 @@ import Mathlib.Lean.CoreM
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 
 def Imports.RedundantImports (imp : Import) : MetaM UInt32 := do

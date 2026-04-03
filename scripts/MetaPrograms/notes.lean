@@ -14,7 +14,7 @@ import PhysLean
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 inductive NameStatus
   | complete : NameStatus

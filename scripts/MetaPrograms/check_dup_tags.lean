@@ -14,7 +14,7 @@ import Physlib.Meta.Informal.SemiFormal
 
 -/
 
-open Lean System Meta PhysLean Core
+open Lean System Meta Physlib Core
 
 
 def tagsFromTODOs : MetaM (Array String) := do
