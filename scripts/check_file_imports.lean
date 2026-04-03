@@ -42,7 +42,7 @@ partial def addModulesIn (recurse : Bool) (prev : Array Name) (root : Name := .a
 /-- Compute imports expected by `Physlib.lean` by looking at file structure. -/
 def expectedPhysLeanImports : IO (Array Name) := do
   let mut needed := #[]
-  for top in ← FilePath.readDir "PhysLean" do
+  for top in ← FilePath.readDir "Physlib" do
       let nm := `PhysLean
       let rootname := FilePath.withExtension top.fileName ""
       let root :=  nm.mkStr rootname.toString
