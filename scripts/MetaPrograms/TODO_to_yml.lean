@@ -24,7 +24,7 @@ It collects the following TODO items:
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 
 /-!
