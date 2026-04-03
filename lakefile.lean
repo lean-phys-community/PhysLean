@@ -1,14 +1,14 @@
 import Lake
 open System Lake DSL
 
-package «PhysLib»
+package «Physlib»
 
 require "mathlib" from git "https://github.com/leanprover-community/mathlib4.git" @ "v4.28.0"
 
 require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "v4.28.0"
 
 @[default_target]
-lean_lib PhysLean where
+lean_lib Physlib where
   moreLeanArgs := #[
     "-Dwarn.sorry=false"
   ]
