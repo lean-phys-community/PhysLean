@@ -696,4 +696,4 @@ lemma insertionSort_of_takeWhile_filter {α : Type} (r : α → α → Prop) [De
   simp only [decide_not, Bool.decide_and, List.append_nil, List.append_assoc]
   simp
 
-end PhysLean.List
+end Physlib.List

@@ -66,4 +66,4 @@ meta def elabRemark : Elab.Command.CommandElab := fun stx =>
     | none => throwError "Invalid syntax for `note` command"
   | _ => throwError "Invalid syntax for `note` command"
 
-end PhysLean
+end Physlib

@@ -84,4 +84,4 @@ def AllInformal : CoreM (Array ConstantInfo) := do
   let y := x.flatten.filter fun c => Informal.isInformal c
   return y
 
-end PhysLean
+end Physlib

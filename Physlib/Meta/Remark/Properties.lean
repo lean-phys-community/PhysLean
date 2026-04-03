@@ -42,4 +42,4 @@ meta def RemarkInfo.getRemarkInfo (n : Name) : m RemarkInfo := do
   | some r => return r
   | none => throwError s!"No remark named {n}"
 
-end PhysLean
+end Physlib

@@ -190,4 +190,4 @@ meta unsafe def toHTMLString : MetaM String := do
   pure (headerHTML ++ N.titleHTML ++ leanNote ++ string ++ footerHTML)
 
 end NoteFile
-end PhysLean
+end Physlib

@@ -59,4 +59,4 @@ meta def elabTODO : Elab.Command.CommandElab := fun stx =>
     | none => throwError "Invalid syntax for `TODO` command"
   | _ => throwError "Invalid syntax for `TODO` command"
 
-end PhysLean
+end Physlib

@@ -109,4 +109,4 @@ meta initialize noteInformalAttribute : Unit ←
       modifyEnv fun env => noteInformalDeclExtension.addEntry env declName
   }
 
-end PhysLean
+end Physlib

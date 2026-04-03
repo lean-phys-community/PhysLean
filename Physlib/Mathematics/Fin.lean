@@ -423,4 +423,4 @@ lemma equivCons_succ {n m : ℕ} (e : Fin n ≃ Fin m) (i : ℕ) (hi : i + 1 < n
   rw [hi, Fin.cons_succ]
   rfl
 
-end PhysLean.Fin
+end Physlib.Fin

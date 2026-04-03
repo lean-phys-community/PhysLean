@@ -558,4 +558,4 @@ lemma cos_mem_physHermite_span_topologicalClosure (c : ℝ) :
     exact hy ▸ polynomial_mem_physHermite_span P
   exact mem_closure_of_tendsto h1 (Filter.Eventually.of_forall h2)
 
-end PhysLean
+end Physlib

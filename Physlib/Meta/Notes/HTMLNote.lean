@@ -79,4 +79,4 @@ unsafe def HTMLNote.ofInformal (name : Name) : CoreM HTMLNote := do
 </div>"
   return { content, fileName, line }
 
-end PhysLean
+end Physlib

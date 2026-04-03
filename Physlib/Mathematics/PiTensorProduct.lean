@@ -297,4 +297,4 @@ lemma tmulEquiv_tmul_tprod (p : (i : ι1) → s1 i) (q : (i : ι2) → s2 i) :
     LinearMap.coe_mk, AddHom.coe_mk, PiTensorProduct.lift.tprod, MultilinearMap.coe_mk]
 
 end tmulEquiv
-end PhysLean.PiTensorProduct
+end Physlib.PiTensorProduct

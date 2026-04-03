@@ -536,4 +536,4 @@ lemma involutionNoFixed_card_odd : (n : ℕ) → (ho : Odd n) →
   subst hr
   exact involutionNoFixed_card_mul_two_plus_one r
 
-end PhysLean.Fin
+end Physlib.Fin

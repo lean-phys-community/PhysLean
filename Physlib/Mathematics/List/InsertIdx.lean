@@ -192,4 +192,4 @@ lemma take_insert_let {I : Type} (i : I) :
     refine List.Perm.cons a ?_
     exact take_insert_let i n m (Nat.le_of_succ_le_succ h) as (Nat.le_of_succ_le_succ hm)
 
-end PhysLean.List
+end Physlib.List

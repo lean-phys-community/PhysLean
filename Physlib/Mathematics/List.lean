@@ -817,4 +817,4 @@ lemma mem_take_finrange : (n m : ℕ) → (a : Fin n) → a ∈ List.take m (Lis
       rw [mem_take_finrange n m ⟨i, Nat.succ_lt_succ_iff.mp h⟩]
       exact h1
 
-end PhysLean.List
+end Physlib.List

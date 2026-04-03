@@ -228,4 +228,4 @@ def allUserConsts : CoreM (Array ConstantInfo) := do
   let imports ← PhysLean.allImports
   return (← imports.flatMapM PhysLean.Imports.getUserConsts)
 
-end PhysLean
+end Physlib

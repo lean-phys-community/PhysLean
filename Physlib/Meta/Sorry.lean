@@ -216,4 +216,4 @@ unsafe def sorryfulPseudoTest : MetaM Unit := do
   {attributedNotWithPseudoAxiom}"
   println! "\x1b[32mSorryful/pseudo results are all correctly attributed test passed.\x1b[0m"
 
-end PhysLean
+end Physlib

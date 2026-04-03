@@ -303,4 +303,4 @@ lemma mem_of_parts {T : FourTree α1 α2 α3 α4} {C : α1 × α2 × α3 × α4}
 
 end FourTree
 
-end PhysLean
+end Physlib

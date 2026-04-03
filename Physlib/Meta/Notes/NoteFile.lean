@@ -39,4 +39,4 @@ def imports : Array Import := (N.files.map fun f => {module := f}).toArray
 
 end NoteFile
 
-end PhysLean
+end Physlib
