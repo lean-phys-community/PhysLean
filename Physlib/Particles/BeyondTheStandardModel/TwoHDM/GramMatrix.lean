@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.BeyondTheStandardModel.TwoHDM.Basic
+public import Physlib.Particles.BeyondTheStandardModel.TwoHDM.Basic
 /-!
 
 # The gram matrix for the two Higgs doublet model

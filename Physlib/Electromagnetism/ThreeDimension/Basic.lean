@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong
 -/
 module
 
-public import PhysLean.Electromagnetism.Kinematics.MagneticField
+public import Physlib.Electromagnetism.Kinematics.MagneticField
 /-!
 
 # Three-Dimensional Electromagnetism

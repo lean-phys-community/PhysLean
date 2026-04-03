@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Basic
+public import Physlib.SpaceAndTime.Space.Basic
 /-!
 # Time
 

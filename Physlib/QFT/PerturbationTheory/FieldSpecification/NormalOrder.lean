@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.Filters
-public import PhysLean.QFT.PerturbationTheory.Koszul.KoszulSign
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.Filters
+public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSign
 import all Mathlib.Data.List.Sort
 /-!
 

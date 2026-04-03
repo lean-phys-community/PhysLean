@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Meta.Basic
-public import PhysLean.Meta.Informal.Basic
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.Basic
+public import Physlib.Meta.Informal.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 ## Informal definitions and lemmas

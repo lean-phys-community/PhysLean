@@ -5,11 +5,11 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Color.Basic
+public import Physlib.Relativity.Tensors.Color.Basic
 public import Mathlib.RepresentationTheory.Rep
-public import PhysLean.Mathematics.PiTensorProduct
+public import Physlib.Mathematics.PiTensorProduct
 public import Mathlib.Algebra.Lie.OfAssociative
-public import PhysLean.Meta.Informal.Basic
+public import Physlib.Meta.Informal.Basic
 /-!
 
 ## Lifting functors.

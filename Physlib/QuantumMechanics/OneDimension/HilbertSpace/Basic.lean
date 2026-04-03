@@ -7,7 +7,7 @@ module
 
 public import Mathlib.MeasureTheory.Function.L2Space
 public import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
-public import PhysLean.Meta.Linters.Sorry
+public import Physlib.Meta.Linters.Sorry
 public import Mathlib.Analysis.InnerProductSpace.Dual
 /-!
 

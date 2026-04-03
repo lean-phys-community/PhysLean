@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.FlavorPhysics.CKMMatrix.Rows
-public import PhysLean.Particles.FlavorPhysics.CKMMatrix.Invariants
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Rows
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Invariants
 /-!
 # Standard parameterization for the CKM Matrix
 

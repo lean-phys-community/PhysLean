@@ -5,7 +5,7 @@ Authors: Rein Zustand
 -/
 module
 
-public import PhysLean.Mathematics.VariationalCalculus.HasVarGradient
+public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
 /-!
 
 # Equivalent Lagrangians under Total Derivatives

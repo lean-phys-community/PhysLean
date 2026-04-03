@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Time.Derivatives
-public import PhysLean.SpaceAndTime.Time.TimeUnit
+public import Physlib.SpaceAndTime.Time.Derivatives
+public import Physlib.SpaceAndTime.Time.TimeUnit
 /-!
 
 # The time manifold with a transitive action of `ℝ`

@@ -5,7 +5,7 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.VariationalCalculus.Basic
+public import Physlib.Mathematics.VariationalCalculus.Basic
 /-!
 
 # Localized function transforms

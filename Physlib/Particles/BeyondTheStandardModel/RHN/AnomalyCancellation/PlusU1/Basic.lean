@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Permutations
-public import PhysLean.QFT.AnomalyCancellation.GroupActions
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Permutations
+public import Physlib.QFT.AnomalyCancellation.GroupActions
 /-!
 # ACC system for SM with RHN
 

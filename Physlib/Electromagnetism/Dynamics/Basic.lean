@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Basic
+public import Physlib.Electromagnetism.Basic
 /-!
 
 # Free space

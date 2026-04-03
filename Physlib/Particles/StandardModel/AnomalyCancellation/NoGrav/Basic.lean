@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.StandardModel.AnomalyCancellation.Basic
+public import Physlib.Particles.StandardModel.AnomalyCancellation.Basic
 /-!
 # Anomaly Cancellation in the Standard Model without Gravity
 

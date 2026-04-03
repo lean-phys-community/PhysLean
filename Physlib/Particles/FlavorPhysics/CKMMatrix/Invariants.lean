@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.FlavorPhysics.CKMMatrix.Basic
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Basic
 public import Mathlib.Analysis.Complex.Basic
 /-!
 # Invariants of the CKM Matrix

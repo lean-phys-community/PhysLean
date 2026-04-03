@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public meta import PhysLean.Meta.Notes.HTMLNote
-public import PhysLean.Meta.Notes.NoteFile
+public meta import Physlib.Meta.Notes.HTMLNote
+public import Physlib.Meta.Notes.NoteFile
 /-!
 
 ## Turns a declaration into a html note structure.

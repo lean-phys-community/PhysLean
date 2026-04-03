@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.PauliMatrices.Basic
-public import PhysLean.Relativity.MinkowskiMatrix
+public import Physlib.Relativity.PauliMatrices.Basic
+public import Physlib.Relativity.MinkowskiMatrix
 /-!
 
 ## Interaction of Pauli matrices with self-adjoint matrices

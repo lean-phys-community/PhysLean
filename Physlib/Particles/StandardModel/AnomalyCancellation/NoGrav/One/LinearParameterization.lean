@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.StandardModel.AnomalyCancellation.NoGrav.Basic
+public import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.Basic
 public import Mathlib.NumberTheory.FLT.Three
 /-!
 # Parameterizations for solutions to the linear ACCs for 1 family

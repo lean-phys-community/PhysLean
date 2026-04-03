@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Singleton
+public import Physlib.QFT.PerturbationTheory.WickContraction.Singleton
 /-!
 
 # Join of contractions

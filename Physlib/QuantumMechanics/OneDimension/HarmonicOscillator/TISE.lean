@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
 /-!
 
 # The time-independent Schrodinger equation

@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.WickTerm
-public import PhysLean.QFT.PerturbationTheory.WickContraction.IsFull
-public import PhysLean.Meta.Informal.SemiFormal
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.WickTerm
+public import Physlib.QFT.PerturbationTheory.WickContraction.IsFull
+public import Physlib.Meta.Informal.SemiFormal
 /-!
 
 # Permutations of Wick contractions

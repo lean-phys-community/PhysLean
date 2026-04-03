@@ -7,7 +7,7 @@ module
 
 public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 public import Mathlib.Analysis.Calculus.Gradient.Basic
-public import PhysLean.SpaceAndTime.Space.DistOfFunction
+public import Physlib.SpaceAndTime.Space.DistOfFunction
 public import Mathlib.Geometry.Manifold.MFDeriv.FDeriv
 /-!
 

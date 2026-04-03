@@ -5,9 +5,9 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.RealTensor.Metrics.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 public import Mathlib.Geometry.Manifold.IsManifold.Basic
-public import PhysLean.Relativity.Tensors.Elab
+public import Physlib.Relativity.Tensors.Elab
 /-!
 
 # Lorentz co vectors

@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoClosed
-public import PhysLean.StringTheory.FTheory.SU5.Charges.OfRationalSection
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoClosed
+public import Physlib.StringTheory.FTheory.SU5.Charges.OfRationalSection
 /-!
 
 # Charges which are not pheno-constrained and do not regenerate dangerous couplings with Yukawas

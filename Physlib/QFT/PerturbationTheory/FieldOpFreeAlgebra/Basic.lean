@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.CrAnSection
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.CrAnSection
 /-!
 
 # Creation and annihilation free-algebra

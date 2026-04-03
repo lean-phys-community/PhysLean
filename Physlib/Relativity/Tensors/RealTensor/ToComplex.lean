@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith, Nikolai Kashcheev
 -/
 module
 
-public import PhysLean.Meta.Linters.Sorry
-public import PhysLean.Relativity.Tensors.ComplexTensor.Basic
+public import Physlib.Meta.Linters.Sorry
+public import Physlib.Relativity.Tensors.ComplexTensor.Basic
 /-!
 
 # Complex Lorentz tensors from real Lorentz tensors

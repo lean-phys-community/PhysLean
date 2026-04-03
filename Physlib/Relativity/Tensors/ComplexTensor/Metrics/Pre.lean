@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Pre
+public import Physlib.Relativity.Tensors.ComplexTensor.Units.Pre
 /-!
 
 # Metric for complex Lorentz vectors

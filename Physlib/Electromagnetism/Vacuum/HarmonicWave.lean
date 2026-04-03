@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Vacuum.IsPlaneWave
+public import Physlib.Electromagnetism.Vacuum.IsPlaneWave
 /-!
 
 # Harmonic Wave in Vacuum

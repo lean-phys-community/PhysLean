@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.HilbertSpace.Basic
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
 /-!
 

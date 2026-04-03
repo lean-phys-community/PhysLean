@@ -5,7 +5,7 @@ Authors: Tomas Skrivan
 -/
 module
 
-public import PhysLean.Mathematics.InnerProductSpace.Basic
+public import Physlib.Mathematics.InnerProductSpace.Basic
 public import Mathlib.Analysis.InnerProductSpace.Adjoint
 /-!
 

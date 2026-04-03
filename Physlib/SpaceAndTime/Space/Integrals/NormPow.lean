@@ -5,7 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Norm
 /-!
 
 # Integrability of norm powers on subsets of Space

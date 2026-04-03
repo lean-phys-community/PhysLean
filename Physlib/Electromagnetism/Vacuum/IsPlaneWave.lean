@@ -5,8 +5,8 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.ClassicalMechanics.WaveEquation.Basic
-public import PhysLean.Electromagnetism.Dynamics.IsExtrema
+public import Physlib.ClassicalMechanics.WaveEquation.Basic
+public import Physlib.Electromagnetism.Dynamics.IsExtrema
 /-!
 
 # Electromagnetic wave equation

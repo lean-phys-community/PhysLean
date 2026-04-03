@@ -5,8 +5,8 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import PhysLean.Mathematics.KroneckerDelta
-public import PhysLean.QuantumMechanics.DDimensions.Operators.AngularMomentum
+public import Physlib.Mathematics.KroneckerDelta
+public import Physlib.QuantumMechanics.DDimensions.Operators.AngularMomentum
 /-!
 
 # Commutation relations

@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.LorentzGroup.Boosts.Basic
-public import PhysLean.Meta.Informal.SemiFormal
-public import PhysLean.Mathematics.FDerivCurry
+public import Physlib.Relativity.LorentzGroup.Boosts.Basic
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Mathematics.FDerivCurry
 /-!
 
 # Boosts of space time

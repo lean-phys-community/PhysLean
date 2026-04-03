@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
 /-!
 # Minimal super set
 

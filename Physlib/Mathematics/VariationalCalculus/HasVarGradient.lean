@@ -5,7 +5,7 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.VariationalCalculus.HasVarAdjDeriv
+public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
 /-!
 
 # Variational gradient

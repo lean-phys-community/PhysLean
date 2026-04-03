@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 meta import Mathlib.Data.Fintype.Sigma
-meta import PhysLean.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
+meta import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
 import all Init.Data.Fin.Fold
-public import PhysLean.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
+public import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
 /-!
 
 # Equivalence extracting element from contraction

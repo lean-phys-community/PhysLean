@@ -5,9 +5,9 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import PhysLean.QuantumMechanics.DDimensions.Operators.Unbounded
-public import PhysLean.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
-public import PhysLean.SpaceAndTime.Space.Integrals.NormPow
+public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 /-!
 
 # Position operators

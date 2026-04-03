@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.SpaceTime.Basic
-public import PhysLean.Units.WithDim.Momentum
-public import PhysLean.QFT.PerturbationTheory.FieldStatistics.OfFinset
+public import Physlib.SpaceAndTime.SpaceTime.Basic
+public import Physlib.Units.WithDim.Momentum
+public import Physlib.QFT.PerturbationTheory.FieldStatistics.OfFinset
 /-!
 
 # Field specification

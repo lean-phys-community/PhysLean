@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Units.UnitDependent
+public import Physlib.Units.UnitDependent
 /-!
 
 # Dimensional invariance of the integral

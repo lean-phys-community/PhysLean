@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.StringTheory.FTheory.SU5.Fluxes.NoExotics.ChiralIndices
-public import PhysLean.StringTheory.FTheory.SU5.Fluxes.NoExotics.Elems
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.ChiralIndices
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Elems
 /-!
 
 # Completeness of `Elems` with regard to the `NoExotics` condition

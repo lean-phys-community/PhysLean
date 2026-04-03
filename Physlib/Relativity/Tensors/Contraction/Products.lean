@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Contraction.Basic
-public import PhysLean.Relativity.Tensors.Product
+public import Physlib.Relativity.Tensors.Contraction.Basic
+public import Physlib.Relativity.Tensors.Product
 /-!
 
 # The interaction of contractions and products

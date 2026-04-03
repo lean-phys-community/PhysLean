@@ -8,7 +8,7 @@ module
 public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.Data.Matrix.Reflection
 public import Mathlib.LinearAlgebra.CliffordAlgebra.Basic
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 # The Clifford Algebra
 

@@ -6,7 +6,7 @@ Authors: Kenny Lau, Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Distribution.TemperedDistribution
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Distributions

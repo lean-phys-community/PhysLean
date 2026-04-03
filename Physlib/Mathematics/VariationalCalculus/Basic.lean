@@ -5,7 +5,7 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.VariationalCalculus.IsTestFunction
+public import Physlib.Mathematics.VariationalCalculus.IsTestFunction
 /-!
 
 # Fundamental lemma of the calculus of variations

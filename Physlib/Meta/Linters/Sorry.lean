@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public meta import PhysLean.Meta.Basic
+public meta import Physlib.Meta.Basic
 /-!
 
 # The linter for `sorry` declarations and the sorryful attribute

@@ -5,8 +5,8 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.RealTensor.Metrics.Basic
-public import PhysLean.Relativity.Tensors.Elab
+public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
+public import Physlib.Relativity.Tensors.Elab
 public import Mathlib.Geometry.Manifold.IsManifold.Basic
 /-!
 

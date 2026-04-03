@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.RealTensor.Metrics.Pre
-public import PhysLean.Relativity.Tensors.Contraction.Basis
+public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
+public import Physlib.Relativity.Tensors.Contraction.Basis
 /-!
 
 ## Real Lorentz tensors

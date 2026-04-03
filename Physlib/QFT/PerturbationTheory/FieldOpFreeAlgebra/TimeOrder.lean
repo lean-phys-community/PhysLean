@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.TimeOrder
-public import PhysLean.QFT.PerturbationTheory.FieldOpFreeAlgebra.SuperCommute
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.TimeOrder
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.SuperCommute
 /-!
 
 # Time Ordering in the FieldOpFreeAlgebra

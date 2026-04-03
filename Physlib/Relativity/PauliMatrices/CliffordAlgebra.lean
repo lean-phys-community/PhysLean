@@ -5,7 +5,7 @@ Authors: Eric Wieser
 -/
 module
 
-public import PhysLean.Relativity.PauliMatrices.Basic
+public import Physlib.Relativity.PauliMatrices.Basic
 public import Mathlib.LinearAlgebra.CliffordAlgebra.Basic
 
 /-!

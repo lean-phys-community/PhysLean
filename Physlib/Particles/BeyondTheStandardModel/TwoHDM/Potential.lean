@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.BeyondTheStandardModel.TwoHDM.GramMatrix
+public import Physlib.Particles.BeyondTheStandardModel.TwoHDM.GramMatrix
 /-!
 
 # The potential of the Two Higgs doublet model

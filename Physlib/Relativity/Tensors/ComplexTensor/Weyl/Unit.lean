@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Two
-public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Contraction
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Two
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Contraction
 /-!
 
 # Units of Weyl fermions

@@ -5,7 +5,7 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.RealTensor.Vector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 /-!
 
 # Minkowski product on Lorentz vectors

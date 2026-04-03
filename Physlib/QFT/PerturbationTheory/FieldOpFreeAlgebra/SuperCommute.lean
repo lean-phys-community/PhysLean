@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldOpFreeAlgebra.Grading
-public import PhysLean.QFT.PerturbationTheory.FieldStatistics.ExchangeSign
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.Grading
+public import Physlib.QFT.PerturbationTheory.FieldStatistics.ExchangeSign
 /-!
 
 # Super Commute

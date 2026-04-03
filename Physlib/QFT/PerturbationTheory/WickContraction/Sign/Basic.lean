@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Basic
-public import PhysLean.QFT.PerturbationTheory.Koszul.KoszulSign
+public import Physlib.QFT.PerturbationTheory.WickContraction.Basic
+public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSign
 /-!
 
 # Sign associated with a contraction

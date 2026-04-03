@@ -6,13 +6,13 @@ Authors: Joseph Tooby-Smith
 module
 
 meta import Mathlib.Data.ZMod.Defs
-meta import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
-meta import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
+meta import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
+meta import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
 public import Mathlib.Data.Fintype.Prod
 public import Mathlib.Data.ZMod.Defs
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
-public import PhysLean.Meta.Linters.Sorry
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
+public import Physlib.Meta.Linters.Sorry
 /-!
 
 # Charge spectra with values in `ZMod n`

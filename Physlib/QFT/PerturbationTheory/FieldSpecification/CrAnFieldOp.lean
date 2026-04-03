@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.Basic
-public import PhysLean.QFT.PerturbationTheory.CreateAnnihilate
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.Basic
+public import Physlib.QFT.PerturbationTheory.CreateAnnihilate
 /-!
 
 # Creation and annihilation states

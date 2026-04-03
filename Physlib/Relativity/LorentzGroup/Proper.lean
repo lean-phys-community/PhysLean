@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.LorentzGroup.Basic
+public import Physlib.Relativity.LorentzGroup.Basic
 public import Mathlib.Topology.Connected.PathConnected
 public import Mathlib.Tactic.Cases
 /-!

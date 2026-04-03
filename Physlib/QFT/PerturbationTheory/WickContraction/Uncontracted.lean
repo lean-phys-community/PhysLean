@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Basic
+public import Physlib.QFT.PerturbationTheory.WickContraction.Basic
 /-!
 
 # Uncontracted elements

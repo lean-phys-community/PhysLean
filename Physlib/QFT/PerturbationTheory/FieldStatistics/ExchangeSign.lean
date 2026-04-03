@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldStatistics.Basic
+public import Physlib.QFT.PerturbationTheory.FieldStatistics.Basic
 public import Mathlib.Analysis.Complex.Basic
 /-!
 

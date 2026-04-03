@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.BasisLinear
-public import PhysLean.QFT.QED.AnomalyCancellation.VectorLike
+public import Physlib.QFT.QED.AnomalyCancellation.BasisLinear
+public import Physlib.QFT.QED.AnomalyCancellation.VectorLike
 /-!
 
 # Splitting the linear solutions in the even case into two ACC-satisfying planes

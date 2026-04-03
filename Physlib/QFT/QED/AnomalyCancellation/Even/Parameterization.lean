@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.Even.LineInCubic
+public import Physlib.QFT.QED.AnomalyCancellation.Even.LineInCubic
 /-!
 # Parameterization in even case
 

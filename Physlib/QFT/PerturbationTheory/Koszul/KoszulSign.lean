@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 module
-public import PhysLean.QFT.PerturbationTheory.Koszul.KoszulSignInsert
-public import PhysLean.Mathematics.List.InsertionSort
+public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSignInsert
+public import Physlib.Mathematics.List.InsertionSort
 import all PhysLean.Mathematics.List
 import all Mathlib.Data.List.Sort
 /-!

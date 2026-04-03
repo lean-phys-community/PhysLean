@@ -5,11 +5,11 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Thermodynamics.Temperature.Basic
+public import Physlib.Thermodynamics.Temperature.Basic
 public import Mathlib.MeasureTheory.Measure.ProbabilityMeasure
 public import Mathlib.Analysis.Calculus.ParametricIntegral
-public import PhysLean.Meta.Informal.SemiFormal
-public import PhysLean.Meta.Linters.Sorry
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Meta.Linters.Sorry
 public import Mathlib.Analysis.SpecialFunctions.Log.Summable
 public import Mathlib.MeasureTheory.Integral.Prod
 /-!

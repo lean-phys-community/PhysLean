@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.StaticWickTerm
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.StaticWickTerm
 /-!
 
 # Static Wick's theorem

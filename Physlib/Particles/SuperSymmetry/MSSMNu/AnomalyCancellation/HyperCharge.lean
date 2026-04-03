@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Basic
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Basic
 /-!
 # Hypercharge in MSSM.
 

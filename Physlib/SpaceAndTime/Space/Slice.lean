@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Calculus.ContDiff.FiniteDimension
-public import PhysLean.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 /-!
 
 # Slices of space

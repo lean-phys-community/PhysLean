@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Derivatives.Laplacian
+public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
 /-!
 
 # Curl on Space

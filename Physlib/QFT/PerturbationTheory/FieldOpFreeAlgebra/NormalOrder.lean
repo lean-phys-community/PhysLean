@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.NormalOrder
-public import PhysLean.QFT.PerturbationTheory.FieldOpFreeAlgebra.SuperCommute
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.NormalOrder
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.SuperCommute
 /-!
 
 # Normal Ordering in the FieldOpFreeAlgebra

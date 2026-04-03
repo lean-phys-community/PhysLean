@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.PauliMatrices.ToTensor
+public import Physlib.Relativity.PauliMatrices.ToTensor
 /-!
 
 ## Bispinors

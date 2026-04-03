@@ -6,7 +6,7 @@ Authors: Nicola Bernini
 module
 
 public import Mathlib.Geometry.Manifold.Diffeomorph
-public import PhysLean.SpaceAndTime.Time.Basic
+public import Physlib.SpaceAndTime.Time.Basic
 /-!
 # Configuration space of the harmonic oscillator
 

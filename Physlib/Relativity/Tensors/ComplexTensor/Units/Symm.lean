@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Units.Basic
 /-!
 
 ## Symmetry lemmas relating to units

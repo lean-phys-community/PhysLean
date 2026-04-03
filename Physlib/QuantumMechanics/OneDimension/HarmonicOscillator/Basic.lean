@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Parity
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Momentum
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Position
+public import Physlib.QuantumMechanics.OneDimension.Operators.Parity
+public import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
+public import Physlib.QuantumMechanics.OneDimension.Operators.Position
 
 /-!
 

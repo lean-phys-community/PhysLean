@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
-public import PhysLean.QuantumMechanics.OneDimension.HilbertSpace.Gaussians
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Gaussians
 /-!
 
 # Completeness of the eigenfunctions of the Harmonic Oscillator

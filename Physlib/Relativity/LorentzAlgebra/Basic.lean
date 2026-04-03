@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.MinkowskiMatrix
+public import Physlib.Relativity.MinkowskiMatrix
 /-!
 # The Lorentz Algebra
 

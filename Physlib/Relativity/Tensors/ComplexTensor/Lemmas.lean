@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Basic
 /-!
 
 ## Lemmas related to complex Lorentz tensors.

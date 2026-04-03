@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Kinematics.VectorPotential
-public import PhysLean.Electromagnetism.Kinematics.ScalarPotential
-public import PhysLean.Electromagnetism.Kinematics.FieldStrength
+public import Physlib.Electromagnetism.Kinematics.VectorPotential
+public import Physlib.Electromagnetism.Kinematics.ScalarPotential
+public import Physlib.Electromagnetism.Kinematics.FieldStrength
 /-!
 
 # The Electric Field

@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.Fin.Involutions
-public import PhysLean.QFT.PerturbationTheory.WickContraction.ExtractEquiv
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Involutions
+public import Physlib.Mathematics.Fin.Involutions
+public import Physlib.QFT.PerturbationTheory.WickContraction.ExtractEquiv
+public import Physlib.QFT.PerturbationTheory.WickContraction.Involutions
 /-!
 
 # Full contraction

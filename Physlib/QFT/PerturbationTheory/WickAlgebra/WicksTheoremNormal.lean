@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.StaticWickTheorem
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.WicksTheorem
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Sign.Join
-public import PhysLean.QFT.PerturbationTheory.WickContraction.TimeCond
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.StaticWickTheorem
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.WicksTheorem
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.Join
+public import Physlib.QFT.PerturbationTheory.WickContraction.TimeCond
 /-!
 
 # Wick's theorem for normal ordered lists

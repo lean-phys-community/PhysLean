@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Unbounded
+public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
 /-!
 
 # Momentum operator

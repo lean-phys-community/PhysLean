@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Contraction.Basic
-public import PhysLean.Relativity.Tensors.Evaluation
-public import PhysLean.Relativity.Tensors.Tensorial
+public import Physlib.Relativity.Tensors.Contraction.Basic
+public import Physlib.Relativity.Tensors.Evaluation
+public import Physlib.Relativity.Tensors.Tensorial
 /-!
 
 # Elaboration of tensor expressions

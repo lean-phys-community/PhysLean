@@ -5,11 +5,11 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Dynamics.IsExtrema
-public import PhysLean.SpaceAndTime.Space.Norm
-public import PhysLean.SpaceAndTime.Space.Translations
-public import PhysLean.SpaceAndTime.Space.ConstantSliceDist
-public import PhysLean.SpaceAndTime.TimeAndSpace.ConstantTimeDist
+public import Physlib.Electromagnetism.Dynamics.IsExtrema
+public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Translations
+public import Physlib.SpaceAndTime.Space.ConstantSliceDist
+public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 /-!
 
 # The magnetic field around a infinite wire

@@ -6,7 +6,7 @@ Authors: Gregory J. Loges
 module
 
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
-public import PhysLean.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 /-!
 
 # Schwartz submodule of the Hilbert space

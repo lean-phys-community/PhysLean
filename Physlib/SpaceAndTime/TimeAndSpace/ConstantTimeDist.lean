@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.TimeAndSpace.Basic
+public import Physlib.SpaceAndTime.TimeAndSpace.Basic
 public import Mathlib.Analysis.Calculus.ContDiff.FiniteDimension
 /-!
 

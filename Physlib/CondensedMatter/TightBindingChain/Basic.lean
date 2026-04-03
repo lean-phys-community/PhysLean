@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Meta.Informal.Basic
-public import PhysLean.Meta.Informal.SemiFormal
-public import PhysLean.Meta.Linters.Sorry
-public import PhysLean.QuantumMechanics.FiniteTarget.HilbertSpace
+public import Physlib.Meta.Informal.Basic
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Meta.Linters.Sorry
+public import Physlib.QuantumMechanics.FiniteTarget.HilbertSpace
 /-!
 
 # The tight binding chain

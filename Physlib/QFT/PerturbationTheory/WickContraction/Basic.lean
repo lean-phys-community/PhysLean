@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.Basic
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.Basic
 /-!
 
 # Wick contractions

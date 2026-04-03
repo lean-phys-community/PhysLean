@@ -3,9 +3,9 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Basic
-import PhysLean.Meta.Remark.Properties
-import PhysLean.Meta.Notes.ToHTML
+import Physlib.Meta.Basic
+import Physlib.Meta.Remark.Properties
+import Physlib.Meta.Notes.ToHTML
 import Mathlib.Lean.CoreM
 import PhysLean
 /-!

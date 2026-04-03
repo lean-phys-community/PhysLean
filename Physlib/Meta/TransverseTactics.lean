@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Lean
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 This file enables us to transverse tactics and test for conditions.

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.LineY3B3
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.LineY3B3
 /-!
 # The type of solutions perpendicular to `Y₃` and `B₃`
 

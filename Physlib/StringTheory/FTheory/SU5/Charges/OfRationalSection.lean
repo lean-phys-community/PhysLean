@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Basic
 public import Mathlib.Data.Fintype.Sets
 public import Mathlib.Algebra.BigOperators.Group.List.Basic
 /-!

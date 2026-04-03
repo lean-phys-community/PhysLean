@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Basic
-public import PhysLean.Mathematics.RatComplexNum
-public import PhysLean.Relativity.Tensors.Dual
+public import Physlib.Relativity.Tensors.ComplexTensor.Basic
+public import Physlib.Mathematics.RatComplexNum
+public import Physlib.Relativity.Tensors.Dual
 /-!
 
 # Basis for tensors in a tensor species

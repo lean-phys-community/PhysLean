@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.FlavorPhysics.CKMMatrix.Rows
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Rows
 /-!
 # Relations for the CKM Matrix
 

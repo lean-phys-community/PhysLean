@@ -6,9 +6,9 @@ Authors: Matteo Cipollina
 module
 
 public import Mathlib.Analysis.Normed.Field.Instances
-public import PhysLean.Mathematics.DataStructures.Matrix.LieTrace
-public import PhysLean.Relativity.LorentzAlgebra.Basic
-public import PhysLean.Relativity.LorentzGroup.Restricted.Basic
+public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
+public import Physlib.Relativity.LorentzAlgebra.Basic
+public import Physlib.Relativity.LorentzGroup.Restricted.Basic
 
 /-!
 # Exponential map from the Lorentz algebra to the restricted Lorentz group

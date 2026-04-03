@@ -5,7 +5,7 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.StatisticalMechanics.CanonicalEnsemble.Basic
+public import Physlib.StatisticalMechanics.CanonicalEnsemble.Basic
 /-!
 # Canonical Ensemble: Thermodynamic Identities and Relations
 

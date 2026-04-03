@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Contraction.Products
+public import Physlib.Relativity.Tensors.Contraction.Products
 /-!
 
 # Constructors of tensors.

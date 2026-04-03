@@ -5,7 +5,7 @@ Authors: Gordon Hsu
 -/
 module
 
-public import PhysLean.Mathematics.SchurTriangulation
+public import Physlib.Mathematics.SchurTriangulation
 public import Mathlib.LinearAlgebra.Matrix.Hermitian
 /-! # Extra lemmas regarding `Lorentz.SL2C.toSelfAdjointMap`
 

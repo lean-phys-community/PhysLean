@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.RealTensor.Basic
-public import PhysLean.Relativity.Tensors.MetricTensor
+public import Physlib.Relativity.Tensors.RealTensor.Basic
+public import Physlib.Relativity.Tensors.MetricTensor
 /-!
 
 ## Metrics as real Lorentz tensors

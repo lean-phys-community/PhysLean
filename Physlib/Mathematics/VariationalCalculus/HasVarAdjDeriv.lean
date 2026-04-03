@@ -5,7 +5,7 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.VariationalCalculus.HasVarAdjoint
+public import Physlib.Mathematics.VariationalCalculus.HasVarAdjoint
 /-!
 # Variational adjoint derivative
 

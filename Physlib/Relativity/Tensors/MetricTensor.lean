@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.UnitTensor
+public import Physlib.Relativity.Tensors.UnitTensor
 /-!
 
 # The metric tensors

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.AnomalyCancellation.Basic
+public import Physlib.QFT.AnomalyCancellation.Basic
 public import Mathlib.RepresentationTheory.Basic
 /-!
 # Group actions on ACC systems.

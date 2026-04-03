@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldOpFreeAlgebra.NormalOrder
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.Basic
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.NormalOrder
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.Basic
 /-!
 
 # Normal Ordering on Field operator algebra

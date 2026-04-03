@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.MinkowskiMatrix
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Relativity.MinkowskiMatrix
+public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.Topology.Instances.Matrix
 /-!

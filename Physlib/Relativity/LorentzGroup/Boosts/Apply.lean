@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.LorentzGroup.Boosts.Basic
+public import Physlib.Relativity.LorentzGroup.Boosts.Basic
 /-!
 
 ## Boosts applied to Lorentz vectors

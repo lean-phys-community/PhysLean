@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Basic
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Basic
 /-!
 # Family maps for the Standard Model for RHN ACCs
 

@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Basic
-public import PhysLean.Relativity.Tensors.ComplexTensor.Units.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Units.Basic
 /-!
 
 ## Basic lemmas regarding metrics

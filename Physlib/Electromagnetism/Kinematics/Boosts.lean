@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Kinematics.MagneticField
-public import PhysLean.SpaceAndTime.SpaceTime.Boosts
+public import Physlib.Electromagnetism.Kinematics.MagneticField
+public import Physlib.SpaceAndTime.SpaceTime.Boosts
 /-!
 
 # Boosts on the electric and magnetic fields

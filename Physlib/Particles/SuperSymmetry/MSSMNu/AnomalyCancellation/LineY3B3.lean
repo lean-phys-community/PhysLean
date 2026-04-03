@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Y3
-public import PhysLean.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.B3
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Y3
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.B3
 /-!
 # The line through B₃ and Y₃
 

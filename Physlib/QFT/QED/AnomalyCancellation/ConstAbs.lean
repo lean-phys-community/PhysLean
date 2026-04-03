@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.VectorLike
+public import Physlib.QFT.QED.AnomalyCancellation.VectorLike
 /-!
 # Charges assignments with constant abs
 

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.AnomalyCancellation.Basic
+public import Physlib.QFT.AnomalyCancellation.Basic
 /-!
 
 # Anomaly cancellation conditions for the Standard Model with right-handed neutrinos

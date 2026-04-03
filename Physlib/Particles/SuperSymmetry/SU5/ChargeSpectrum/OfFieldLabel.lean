@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
 /-!
 
 # Charges associated with a field label

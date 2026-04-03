@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Special.ProperTime
+public import Physlib.Relativity.Special.ProperTime
 /-!
 # Twin Paradox
 

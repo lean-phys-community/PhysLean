@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Scattering off a perfectly rigid sphere

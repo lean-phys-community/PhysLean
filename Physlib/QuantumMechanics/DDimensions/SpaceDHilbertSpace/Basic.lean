@@ -7,7 +7,7 @@ module
 
 public import Mathlib.Analysis.InnerProductSpace.Dual
 public import Mathlib.MeasureTheory.Function.L2Space
-public import PhysLean.SpaceAndTime.Space.Module
+public import Physlib.SpaceAndTime.Space.Module
 /-!
 
 # Hilbert space for quantum mechanics on Space d

@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.LinearMaps
+public import Physlib.Mathematics.LinearMaps
 public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-public import PhysLean.Meta.Linters.Sorry
+public import Physlib.Meta.Linters.Sorry
 public import Mathlib.Tactic.Cases
 /-!
 # Anomaly cancellation conditions

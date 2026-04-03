@@ -5,12 +5,12 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Time.TimeUnit
-public import PhysLean.SpaceAndTime.Space.LengthUnit
-public import PhysLean.ClassicalMechanics.Mass.MassUnit
-public import PhysLean.Electromagnetism.Charge.ChargeUnit
-public import PhysLean.Thermodynamics.Temperature.TemperatureUnits
-public import PhysLean.Units.Dimension
+public import Physlib.SpaceAndTime.Time.TimeUnit
+public import Physlib.SpaceAndTime.Space.LengthUnit
+public import Physlib.ClassicalMechanics.Mass.MassUnit
+public import Physlib.Electromagnetism.Charge.ChargeUnit
+public import Physlib.Thermodynamics.Temperature.TemperatureUnits
+public import Physlib.Units.Dimension
 /-!
 
 # Dimensions and unit

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
+public import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
 /-!
 
 # Vectors from Lorentz group elements

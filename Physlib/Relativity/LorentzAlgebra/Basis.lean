@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.LorentzAlgebra.Basic
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Relativity.LorentzAlgebra.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 # Generators of the Lorentz Algebra
 

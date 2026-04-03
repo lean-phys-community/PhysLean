@@ -5,7 +5,7 @@ Authors: Luis Gabriel C. Bariuan, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Basic
+public import Physlib.SpaceAndTime.Space.Basic
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 /-!
 

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Kinematics.ElectricField
+public import Physlib.Electromagnetism.Kinematics.ElectricField
 /-!
 
 # The Magnetic Field

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.Basic
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.Basic
 /-!
 # Dimension 7 plane
 

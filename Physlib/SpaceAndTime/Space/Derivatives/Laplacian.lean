@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.SpaceAndTime.Space.Derivatives.Div
 /-!
 
 # The Laplacian operator on `Space d`

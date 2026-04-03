@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Uncontracted
-public import PhysLean.Mathematics.Fin
+public import Physlib.QFT.PerturbationTheory.WickContraction.Uncontracted
+public import Physlib.Mathematics.Fin
 /-!
 
 # Erasing an element from a contraction

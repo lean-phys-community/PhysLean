@@ -5,9 +5,9 @@ Authors: Nicola Bernini
 -/
 module
 
-public import PhysLean.Meta.Informal.SemiFormal
-public import PhysLean.ClassicalMechanics.EulerLagrange
-public import PhysLean.ClassicalMechanics.HamiltonsEquations
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.ClassicalMechanics.EulerLagrange
+public import Physlib.ClassicalMechanics.HamiltonsEquations
 /-!
 
 # The Damped Harmonic Oscillator

@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.Distribution.Basic
-public import PhysLean.SpaceAndTime.Space.Integrals.Basic
+public import Physlib.Mathematics.Distribution.Basic
+public import Physlib.SpaceAndTime.Space.Integrals.Basic
 /-!
 
 # The radial angular measure on Space

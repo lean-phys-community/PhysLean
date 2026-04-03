@@ -5,8 +5,8 @@ Authors: Ammar Husain
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Momentum
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Position
+public import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
+public import Physlib.QuantumMechanics.OneDimension.Operators.Position
 
 /-!
 

@@ -5,7 +5,7 @@ Authors: Matteo Cipollina
 -/
 module
 
-public import PhysLean.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
+public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
 public import Mathlib.Algebra.Lie.OfAssociative
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 /-!

@@ -5,8 +5,8 @@ Authors: Zhi Kai Pong
 -/
 module
 
-public import PhysLean.Electromagnetism.ThreeDimension.Basic
-public import PhysLean.Electromagnetism.Dynamics.IsExtrema
+public import Physlib.Electromagnetism.ThreeDimension.Basic
+public import Physlib.Electromagnetism.Dynamics.IsExtrema
 /-!
 
 # Maxwell equations in three dimensions

@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.SpaceTime.Derivatives
-public import PhysLean.SpaceAndTime.TimeAndSpace.Basic
-public import PhysLean.Meta.Informal.SemiFormal
-public import PhysLean.Mathematics.FDerivCurry
+public import Physlib.SpaceAndTime.SpaceTime.Derivatives
+public import Physlib.SpaceAndTime.TimeAndSpace.Basic
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Mathematics.FDerivCurry
 /-!
 # Time slice
 

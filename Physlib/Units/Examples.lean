@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Units.WithDim.Speed
+public import Physlib.Units.WithDim.Speed
 /-!
 
 # Examples of units in PhysLean

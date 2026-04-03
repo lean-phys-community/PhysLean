@@ -5,7 +5,7 @@ Authors: Shlok Vaibhav Singh
 -/
 module
 
-public import PhysLean.Meta.Sorry
+public import Physlib.Meta.Sorry
 /-!
 # Sliding Pendulum
 ### Tag: LnL_1.5.2

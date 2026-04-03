@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Kinematics.MagneticField
-public import PhysLean.Electromagnetism.Dynamics.Basic
+public import Physlib.Electromagnetism.Kinematics.MagneticField
+public import Physlib.Electromagnetism.Dynamics.Basic
 /-!
 
 # The kinetic term

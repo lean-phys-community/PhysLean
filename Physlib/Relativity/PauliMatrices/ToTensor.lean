@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Basic
-public import PhysLean.Relativity.PauliMatrices.AsTensor
-public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Basic
+public import Physlib.Relativity.PauliMatrices.AsTensor
+public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Basic
 /-!
 
 # Pauli matrices as a tensor

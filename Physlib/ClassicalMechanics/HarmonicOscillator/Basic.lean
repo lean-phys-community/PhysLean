@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
-public import PhysLean.ClassicalMechanics.EulerLagrange
-public import PhysLean.ClassicalMechanics.HamiltonsEquations
+public import Physlib.ClassicalMechanics.EulerLagrange
+public import Physlib.ClassicalMechanics.HamiltonsEquations
 /-!
 
 # The Classical Harmonic Oscillator

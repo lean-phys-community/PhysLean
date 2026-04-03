@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Dynamics.IsExtrema
+public import Physlib.Electromagnetism.Dynamics.IsExtrema
 /-!
 
 # The constant electric and magnetic fields

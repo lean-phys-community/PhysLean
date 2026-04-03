@@ -5,8 +5,8 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import PhysLean.QuantumMechanics.DDimensions.Hydrogen.Basic
-public import PhysLean.QuantumMechanics.DDimensions.Operators.Commutation
+public import Physlib.QuantumMechanics.DDimensions.Hydrogen.Basic
+public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
 /-!
 
 # Laplace-Runge-Lenz vector

@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimalSuperSet
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimalSuperSet
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Phenomenologically closed sets of charge spectra

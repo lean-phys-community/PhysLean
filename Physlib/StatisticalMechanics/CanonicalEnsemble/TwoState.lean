@@ -5,8 +5,8 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.StatisticalMechanics.CanonicalEnsemble.Finite
-public import PhysLean.Meta.Informal.Basic
+public import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite
+public import Physlib.Meta.Informal.Basic
 /-!
 
 # Two-state canonical ensemble

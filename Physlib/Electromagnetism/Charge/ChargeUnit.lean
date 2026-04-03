@@ -8,7 +8,7 @@ module
 public import Mathlib.Algebra.EuclideanDomain.Basic
 public import Mathlib.Algebra.EuclideanDomain.Field
 public import Mathlib.Analysis.RCLike.Basic
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # The units of charge

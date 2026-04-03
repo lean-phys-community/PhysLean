@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoConstrained
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoConstrained
 /-!
 
 # Yukawa charges

@@ -6,8 +6,8 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Geometry.Manifold.Instances.Real
-public import PhysLean.Meta.Informal.SemiFormal
-public import PhysLean.SpaceAndTime.SpaceTime.Basic
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.SpaceAndTime.SpaceTime.Basic
 /-!
 # The Standard Model
 

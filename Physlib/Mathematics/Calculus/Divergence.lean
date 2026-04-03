@@ -6,8 +6,8 @@ Authors: Tomas Skrivan
 module
 
 public import Mathlib.Analysis.InnerProductSpace.Trace
-public import PhysLean.Mathematics.Calculus.AdjFDeriv
-public import PhysLean.SpaceAndTime.TimeAndSpace.Basic
+public import Physlib.Mathematics.Calculus.AdjFDeriv
+public import Physlib.SpaceAndTime.TimeAndSpace.Basic
 /-!
 
 # Divergence

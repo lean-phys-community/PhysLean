@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.LorentzGroup.Rotations
+public import Physlib.Relativity.LorentzGroup.Rotations
 /-!
 # The construction of an element of the Lorentz group from a boost and a rotation
 

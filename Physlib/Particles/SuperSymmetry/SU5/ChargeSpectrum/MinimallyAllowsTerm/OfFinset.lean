@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.Basic
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoConstrained
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.Basic
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoConstrained
 /-!
 
 # The set of charges which minimally allows a potential term

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.StandardModel.AnomalyCancellation.NoGrav.One.LinearParameterization
+public import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.One.LinearParameterization
 /-!
 # Lemmas for 1 family SM Accs
 

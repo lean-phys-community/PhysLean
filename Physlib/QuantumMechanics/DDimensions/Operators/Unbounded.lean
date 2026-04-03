@@ -5,7 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import PhysLean.Mathematics.InnerProductSpace.Submodule
+public import Physlib.Mathematics.InnerProductSpace.Submodule
 /-!
 
 # Unbounded operators

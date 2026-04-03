@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Meta.Remark.Basic
+public import Physlib.Meta.Remark.Basic
 /-!
 
 ## Underlying structure for remarks

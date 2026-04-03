@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.DataStructures.FourTree.Basic
+public import Physlib.Mathematics.DataStructures.FourTree.Basic
 /-!
 
 ## Unique maps for `FourTree`

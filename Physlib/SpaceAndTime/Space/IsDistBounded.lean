@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Integrals.RadialAngularMeasure
-public import PhysLean.SpaceAndTime.Time.Derivatives
+public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
+public import Physlib.SpaceAndTime.Time.Derivatives
 public import Mathlib.Tactic.Cases
 /-!
 

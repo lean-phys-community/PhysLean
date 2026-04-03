@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.StringTheory.FTheory.SU5.Quanta.Basic
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Map
+public import Physlib.StringTheory.FTheory.SU5.Quanta.Basic
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Map
 /-!
 
 # Anomaly cancellation

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Dynamics.Lagrangian
+public import Physlib.Electromagnetism.Dynamics.Lagrangian
 /-!
 
 # The Hamiltonian in electromagnetism

@@ -8,7 +8,7 @@ module
 public import Mathlib.CategoryTheory.Core
 public import Mathlib.CategoryTheory.Comma.Over.Basic
 public import Mathlib.CategoryTheory.Monoidal.Braided.Basic
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Color

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Kinematics.EMPotential
+public import Physlib.Electromagnetism.Kinematics.EMPotential
 /-!
 
 # The Scalar Potential

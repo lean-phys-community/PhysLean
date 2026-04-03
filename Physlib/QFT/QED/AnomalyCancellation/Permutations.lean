@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.Basic
-public import PhysLean.QFT.AnomalyCancellation.GroupActions
+public import Physlib.QFT.QED.AnomalyCancellation.Basic
+public import Physlib.QFT.AnomalyCancellation.GroupActions
 /-!
 # Permutations of Pure U(1) ACC
 

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Basic
+public import Physlib.Relativity.Tensors.Basic
 /-!
 
 # Basis for tensors in a tensor species

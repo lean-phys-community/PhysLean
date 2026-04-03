@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Electromagnetism.Dynamics.IsExtrema
-public import PhysLean.SpaceAndTime.Space.Norm
-public import PhysLean.SpaceAndTime.Space.Translations
-public import PhysLean.SpaceAndTime.TimeAndSpace.ConstantTimeDist
+public import Physlib.Electromagnetism.Dynamics.IsExtrema
+public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Translations
+public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 /-!
 
 # The electrostatics of a stationary point particle in 1d

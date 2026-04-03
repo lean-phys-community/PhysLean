@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldOpFreeAlgebra.Basic
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.Basic
 public import Mathlib.RingTheory.GradedAlgebra.Basic
 /-!
 

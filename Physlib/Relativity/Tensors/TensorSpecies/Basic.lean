@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Color.Discrete
-public import PhysLean.Relativity.Tensors.Color.Lift
+public import Physlib.Relativity.Tensors.Color.Discrete
+public import Physlib.Relativity.Tensors.Color.Lift
 /-!
 
 # Tensor species

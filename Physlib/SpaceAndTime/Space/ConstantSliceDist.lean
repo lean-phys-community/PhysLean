@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Slice
+public import Physlib.SpaceAndTime.Space.Slice
 /-!
 
 # Constant slice distributions

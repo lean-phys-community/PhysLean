@@ -6,9 +6,9 @@ Authors: Tomas Skrivan
 module
 
 public import Mathlib.Analysis.Calculus.Gradient.Basic
-public import PhysLean.Mathematics.FDerivCurry
-public import PhysLean.Mathematics.InnerProductSpace.Adjoint
-public import PhysLean.Mathematics.InnerProductSpace.Calculus
+public import Physlib.Mathematics.FDerivCurry
+public import Physlib.Mathematics.InnerProductSpace.Adjoint
+public import Physlib.Mathematics.InnerProductSpace.Calculus
 /-!
 
 # Adjoint Fréchet derivative

@@ -7,8 +7,8 @@ module
 
 public import Mathlib.Analysis.Calculus.Deriv.Inv
 public import Mathlib.Analysis.InnerProductSpace.Basic
-public import PhysLean.StatisticalMechanics.BoltzmannConstant
-public import PhysLean.Meta.TODO.Basic
+public import Physlib.StatisticalMechanics.BoltzmannConstant
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Temperature

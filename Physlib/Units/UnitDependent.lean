@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Units.Basic
+public import Physlib.Units.Basic
 /-!
 
 ## Types which depend on dimensions

@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.InsertAndContract
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Lemmas
+public import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContract
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Lemmas
 /-!
 
 # Time contractions

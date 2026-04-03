@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Units.WithDim.Basic
+public import Physlib.Units.WithDim.Basic
 /-!
 
 # Pressure

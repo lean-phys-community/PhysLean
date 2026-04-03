@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Basic
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.SuperCommute
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Basic
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.SuperCommute
 /-!
 
 # Basic properties of normal ordering

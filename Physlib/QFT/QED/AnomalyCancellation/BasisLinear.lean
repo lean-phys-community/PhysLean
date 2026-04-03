@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.Basic
+public import Physlib.QFT.QED.AnomalyCancellation.Basic
 public import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 /-!
 # Basis of `LinSols`

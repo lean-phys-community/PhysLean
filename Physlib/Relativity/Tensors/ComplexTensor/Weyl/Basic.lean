@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Modules
-public import PhysLean.Relativity.SL2C.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Modules
+public import Physlib.Relativity.SL2C.Basic
 /-!
 
 # Weyl fermions

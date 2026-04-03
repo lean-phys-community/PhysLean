@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith, Nikolai Kashcheev
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Metrics.Pre
-public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Metric
-public import PhysLean.Relativity.Tensors.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Pre
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Metric
+public import Physlib.Relativity.Tensors.Basic
 /-!
 
 ## Complex Lorentz tensors

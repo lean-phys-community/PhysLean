@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Derivatives.Grad
+public import Physlib.SpaceAndTime.Space.Derivatives.Grad
 /-!
 
 # Divergence on Space

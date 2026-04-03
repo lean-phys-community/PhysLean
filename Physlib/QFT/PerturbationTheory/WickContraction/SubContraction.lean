@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.UncontractedList
+public import Physlib.QFT.PerturbationTheory.WickContraction.UncontractedList
 /-!
 
 # Sub contractions

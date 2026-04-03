@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.BeyondTheStandardModel.PatiSalam.Basic
-public import PhysLean.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
+public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
+public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 /-!
 
 # The Spin(10) Model

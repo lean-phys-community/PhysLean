@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.ComplexTensor.Weyl.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Basic
 /-!
 
 # Contraction of Weyl fermions

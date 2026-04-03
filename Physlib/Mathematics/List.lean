@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 module
-public import PhysLean.Mathematics.Fin
+public import Physlib.Mathematics.Fin
 public import Mathlib.Data.Nat.Lattice
 public import Mathlib.Data.List.TakeWhile
 import all Mathlib.Data.List.Sort

@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.FlavorPhysics.CKMMatrix.PhaseFreedom
-public import PhysLean.Particles.FlavorPhysics.CKMMatrix.StandardParameterization.Basic
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.PhaseFreedom
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.StandardParameterization.Basic
 /-!
 # Standard parameters for the CKM Matrix
 

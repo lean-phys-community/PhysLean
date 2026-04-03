@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.HarmonicOscillator.Basic
-public import PhysLean.Mathematics.SpecialFunctions.PhysHermite
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Basic
+public import Physlib.Mathematics.SpecialFunctions.PhysHermite
 /-!
 
 # Eigenfunction of the Harmonic Oscillator

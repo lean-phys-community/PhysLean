@@ -5,9 +5,9 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.SpaceTime.Basic
-public import PhysLean.Relativity.Tensors.RealTensor.Vector.Causality.LightLike
-public import PhysLean.Relativity.Tensors.RealTensor.Vector.Causality.TimeLike
+public import Physlib.SpaceAndTime.SpaceTime.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.LightLike
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.TimeLike
 /-!
 # Proper Time
 

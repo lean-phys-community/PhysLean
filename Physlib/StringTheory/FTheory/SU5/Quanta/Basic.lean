@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.StringTheory.FTheory.SU5.Quanta.FiveQuanta
-public import PhysLean.StringTheory.FTheory.SU5.Quanta.TenQuanta
-public import PhysLean.StringTheory.FTheory.SU5.Charges.Viable
+public import Physlib.StringTheory.FTheory.SU5.Quanta.FiveQuanta
+public import Physlib.StringTheory.FTheory.SU5.Quanta.TenQuanta
+public import Physlib.StringTheory.FTheory.SU5.Charges.Viable
 /-!
 
 # Quanta of representations

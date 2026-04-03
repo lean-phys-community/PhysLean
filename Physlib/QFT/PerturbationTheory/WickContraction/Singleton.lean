@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.SubContraction
-public import PhysLean.QFT.PerturbationTheory.WickContraction.StaticContract
-public import PhysLean.QFT.PerturbationTheory.WickContraction.TimeContract
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Sign.Basic
+public import Physlib.QFT.PerturbationTheory.WickContraction.SubContraction
+public import Physlib.QFT.PerturbationTheory.WickContraction.StaticContract
+public import Physlib.QFT.PerturbationTheory.WickContraction.TimeContract
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.Basic
 /-!
 
 # Singleton of contractions

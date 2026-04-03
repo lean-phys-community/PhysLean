@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.SpaceTime.LorentzAction
-public import PhysLean.Relativity.Tensors.RealTensor.CoVector.Basic
+public import Physlib.SpaceAndTime.SpaceTime.LorentzAction
+public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
 public import Mathlib.Analysis.InnerProductSpace.TensorProduct
 /-!
 

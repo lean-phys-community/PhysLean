@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.Even.BasisLinear
-public import PhysLean.QFT.QED.AnomalyCancellation.LineInPlaneCond
+public import Physlib.QFT.QED.AnomalyCancellation.Even.BasisLinear
+public import Physlib.QFT.QED.AnomalyCancellation.LineInPlaneCond
 /-!
 
 # Line In Cubic Even case

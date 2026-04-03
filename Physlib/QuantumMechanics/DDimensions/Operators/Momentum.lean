@@ -5,10 +5,10 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import PhysLean.QuantumMechanics.DDimensions.Operators.Unbounded
-public import PhysLean.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
-public import PhysLean.QuantumMechanics.PlanckConstant
-public import PhysLean.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.PlanckConstant
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Star
 /-!
 

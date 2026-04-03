@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.HilbertSpace.PlaneWaves
-public import PhysLean.QuantumMechanics.PlanckConstant
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PlaneWaves
+public import Physlib.QuantumMechanics.PlanckConstant
 public import Mathlib.Analysis.Calculus.FDeriv.Star
 /-!
 

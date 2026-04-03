@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.ClassicalMechanics.RigidBody.Basic
+public import Physlib.ClassicalMechanics.RigidBody.Basic
 /-!
 
 # The solid sphere as a rigid body

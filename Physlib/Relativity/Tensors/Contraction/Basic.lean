@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Contraction.Pure
+public import Physlib.Relativity.Tensors.Contraction.Pure
 /-!
 
 # Contractions on tensors

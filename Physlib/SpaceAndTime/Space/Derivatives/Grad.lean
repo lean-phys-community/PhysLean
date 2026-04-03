@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 /-!
 
 # Gradient of functions and distributions on `Space d`

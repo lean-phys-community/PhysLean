@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.NormalOrder.WickContractions
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Sign.InsertNone
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Sign.InsertSome
-public import PhysLean.QFT.PerturbationTheory.WickContraction.StaticContract
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.WickContractions
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.InsertNone
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.InsertSome
+public import Physlib.QFT.PerturbationTheory.WickContraction.StaticContract
 /-!
 
 # Static Wick's terms

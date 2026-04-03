@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.OfFinset
-public import PhysLean.StringTheory.FTheory.SU5.Fluxes.NoExotics.Completeness
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.OfFinset
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Completeness
 /-!
 
 # Quanta of 5-d representations

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.Tensors.Constructors
+public import Physlib.Relativity.Tensors.Constructors
 /-!
 
 # The unit tensors

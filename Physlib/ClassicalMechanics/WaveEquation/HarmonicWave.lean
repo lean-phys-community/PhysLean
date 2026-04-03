@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong
 -/
 module
 
-public import PhysLean.ClassicalMechanics.WaveEquation.Basic
+public import Physlib.ClassicalMechanics.WaveEquation.Basic
 /-!
 
 # Harmonic Wave

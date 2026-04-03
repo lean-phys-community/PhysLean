@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith, Lode Vermeulen
 module
 
 public import Mathlib.Analysis.CStarAlgebra.Classes
-public import PhysLean.ClassicalMechanics.HarmonicOscillator.Basic
+public import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
 /-!
 
 # Solutions to the classical harmonic oscillator

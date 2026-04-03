@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.Distribution.Basic
+public import Physlib.Mathematics.Distribution.Basic
 public import Mathlib.MeasureTheory.Constructions.HaarToSphere
 /-!
 

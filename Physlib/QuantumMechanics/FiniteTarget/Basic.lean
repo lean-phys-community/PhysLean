@@ -7,8 +7,8 @@ module
 
 public import Mathlib.Analysis.InnerProductSpace.Adjoint
 public import Mathlib.Analysis.Normed.Algebra.Exponential
-public import PhysLean.Meta.TODO.Basic
-public import PhysLean.QuantumMechanics.PlanckConstant
+public import Physlib.Meta.TODO.Basic
+public import Physlib.QuantumMechanics.PlanckConstant
 /-!
 
 # Finite target quantum mechanics

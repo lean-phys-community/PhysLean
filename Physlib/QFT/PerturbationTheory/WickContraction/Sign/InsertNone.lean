@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.Sign.Basic
-public import PhysLean.QFT.PerturbationTheory.WickContraction.InsertAndContract
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.Basic
+public import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContract
 
 /-!
 

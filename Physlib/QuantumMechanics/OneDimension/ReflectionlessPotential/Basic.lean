@@ -5,11 +5,11 @@ Authors: Afiq Hatta
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Parity
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Momentum
-public import PhysLean.QuantumMechanics.OneDimension.Operators.Position
-public import PhysLean.SpaceAndTime.Time.Basic
-public import PhysLean.Mathematics.Trigonometry.Tanh
+public import Physlib.QuantumMechanics.OneDimension.Operators.Parity
+public import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
+public import Physlib.QuantumMechanics.OneDimension.Operators.Position
+public import Physlib.SpaceAndTime.Time.Basic
+public import Physlib.Mathematics.Trigonometry.Tanh
 /-!
 
 # 1d Reflectionless Potential

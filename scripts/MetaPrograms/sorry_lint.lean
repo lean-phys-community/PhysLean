@@ -3,10 +3,10 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Informal.Post
+import Physlib.Meta.Informal.Post
 import Mathlib.Lean.CoreM
-import PhysLean.Meta.Linters.Sorry
-import PhysLean.Meta.Sorry
+import Physlib.Meta.Linters.Sorry
+import Physlib.Meta.Sorry
 /-!
 
 # Script to check sorryful/pseudo attribution

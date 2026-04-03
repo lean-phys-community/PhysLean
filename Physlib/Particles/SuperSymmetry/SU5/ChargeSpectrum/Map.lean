@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
 /-!
 
 # Mapping charge spectra values

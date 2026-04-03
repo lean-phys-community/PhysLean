@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.Sorts
+public import Physlib.QFT.QED.AnomalyCancellation.Sorts
 /-!
 # Vector like charges
 

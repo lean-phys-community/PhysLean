@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.SL2C.Basic
+public import Physlib.Relativity.SL2C.Basic
 /-!
 
 ## Modules associated with complex Lorentz vectors

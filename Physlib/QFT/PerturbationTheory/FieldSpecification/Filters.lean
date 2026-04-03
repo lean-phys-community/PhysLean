@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
 /-!
 
 # Filters of lists of CrAnFieldOp

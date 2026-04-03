@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
 public import Mathlib.Analysis.Distribution.TemperedDistribution
 /-!
 

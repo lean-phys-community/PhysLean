@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickContraction.ExtractEquiv
+public import Physlib.QFT.PerturbationTheory.WickContraction.ExtractEquiv
 /-!
 
 # List of uncontracted elements of a Wick contraction

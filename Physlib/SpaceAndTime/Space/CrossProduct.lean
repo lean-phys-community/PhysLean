@@ -6,7 +6,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith
 module
 
 public import Mathlib.LinearAlgebra.CrossProduct
-public import PhysLean.SpaceAndTime.Time.Derivatives
+public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
 # The cross product on Euclidean vectors in three dimensions

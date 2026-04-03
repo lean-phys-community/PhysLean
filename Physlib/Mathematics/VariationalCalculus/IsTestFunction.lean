@@ -5,7 +5,7 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Mathematics.Calculus.Divergence
+public import Physlib.Mathematics.Calculus.Divergence
 /-!
 
 # Test functions

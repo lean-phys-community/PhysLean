@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 module
-public import PhysLean.Mathematics.List
+public import Physlib.Mathematics.List
 import all PhysLean.Mathematics.List
 import all Mathlib.Data.List.Sort
 /-!

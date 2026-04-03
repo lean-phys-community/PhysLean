@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.Permutations
+public import Physlib.QFT.QED.AnomalyCancellation.Permutations
 public import Mathlib.Data.Fin.Tuple.Sort
 /-!
 # Sort for Pure U(1) charges

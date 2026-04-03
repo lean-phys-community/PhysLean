@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.QED.AnomalyCancellation.ConstAbs
+public import Physlib.QFT.QED.AnomalyCancellation.ConstAbs
 /-!
 # Line in plane condition
 

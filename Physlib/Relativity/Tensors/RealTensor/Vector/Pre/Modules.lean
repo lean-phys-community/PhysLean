@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.PauliMatrices.SelfAdjoint
+public import Physlib.Relativity.PauliMatrices.SelfAdjoint
 public import Mathlib.RepresentationTheory.Basic
-public import PhysLean.Relativity.LorentzGroup.Basic
+public import Physlib.Relativity.LorentzGroup.Basic
 public import Mathlib.Analysis.InnerProductSpace.PiL2
 /-!
 

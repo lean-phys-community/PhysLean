@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
-public import PhysLean.Mathematics.List
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
+public import Physlib.Mathematics.List
 /-!
 
 # Creation and annihilation sections

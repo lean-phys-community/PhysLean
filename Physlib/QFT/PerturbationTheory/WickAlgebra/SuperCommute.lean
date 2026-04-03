@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.Basic
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.Basic
 /-!
 
 # SuperCommute on Field operator algebra

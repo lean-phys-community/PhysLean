@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Units.WithDim.Velocity
-public import PhysLean.Units.WithDim.Mass
-public import PhysLean.Units.WithDim.Basic
+public import Physlib.Units.WithDim.Velocity
+public import Physlib.Units.WithDim.Mass
+public import Physlib.Units.WithDim.Basic
 /-!
 # Momentum
 

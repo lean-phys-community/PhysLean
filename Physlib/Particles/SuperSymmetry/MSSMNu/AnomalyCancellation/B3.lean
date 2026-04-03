@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Basic
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Basic
 public import Mathlib.Tactic.LinearCombination
 /-!
 # The definition of the solution B₃ and properties thereof

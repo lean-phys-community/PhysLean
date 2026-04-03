@@ -6,9 +6,9 @@ Authors: Joseph Tooby-Smith
 -- import DocGen4.Output.DocString
 module
 
-public import PhysLean.Meta.Basic
-public import PhysLean.Meta.Notes.Basic
-public import PhysLean.Meta.Informal.Basic
+public import Physlib.Meta.Basic
+public import Physlib.Meta.Notes.Basic
+public import Physlib.Meta.Informal.Basic
 /-!
 
 ## Turns a declaration into a html note structure.

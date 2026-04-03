@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.StringTheory.FTheory.SU5.Fluxes.Basic
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.Basic
 public import Mathlib.Tactic.FinCases
 /-!
 

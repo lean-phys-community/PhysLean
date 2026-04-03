@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.FlavorPhysics.CKMMatrix.Relations
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Relations
 /-!
 # Phase freedom of the CKM Matrix
 

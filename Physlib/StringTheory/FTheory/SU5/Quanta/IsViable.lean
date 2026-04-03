@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.StringTheory.FTheory.SU5.Charges.AnomalyFree
-public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.ZMod
+public import Physlib.StringTheory.FTheory.SU5.Charges.AnomalyFree
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.ZMod
 /-!
 
 # Viable Quanta with Yukawa

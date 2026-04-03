@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Particles.StandardModel.HiggsBoson.Potential
+public import Physlib.Particles.StandardModel.HiggsBoson.Potential
 public import Mathlib.Analysis.Matrix.Normed
 public import Mathlib.Analysis.Matrix.Order
 /-!

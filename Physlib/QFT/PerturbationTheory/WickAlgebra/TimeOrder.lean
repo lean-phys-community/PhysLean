@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.QFT.PerturbationTheory.WickAlgebra.SuperCommute
-public import PhysLean.QFT.PerturbationTheory.FieldOpFreeAlgebra.TimeOrder
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.SuperCommute
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.TimeOrder
 /-!
 
 # Time Ordering on Field operator algebra

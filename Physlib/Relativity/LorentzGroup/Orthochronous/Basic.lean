@@ -5,9 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Relativity.LorentzGroup.Proper
-public import PhysLean.Relativity.LorentzGroup.ToVector
-public import PhysLean.Relativity.Tensors.RealTensor.Velocity.Basic
+public import Physlib.Relativity.LorentzGroup.Proper
+public import Physlib.Relativity.LorentzGroup.ToVector
+public import Physlib.Relativity.Tensors.RealTensor.Velocity.Basic
 /-!
 # The Orthochronous Lorentz Group
 

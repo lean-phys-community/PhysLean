@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Meta.Informal.SemiFormal
-public import PhysLean.Relativity.LorentzGroup.Orthochronous.Basic
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Relativity.LorentzGroup.Orthochronous.Basic
 /-!
 # The Restricted Lorentz Group
 

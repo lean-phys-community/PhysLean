@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.IsDistBounded
+public import Physlib.SpaceAndTime.Space.IsDistBounded
 public import Mathlib.MeasureTheory.SpecificCodomains.WithLp
 /-!
 
