@@ -136,7 +136,7 @@ def hepLeanLintFile (path : FilePath) : IO (Array PhyslibErrorContext) := do
 
 def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let mods : Name :=  `PhysLean
+  let mods : Name :=  `Physlib
   let imp : Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do

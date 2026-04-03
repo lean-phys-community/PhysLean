@@ -53,7 +53,7 @@ def main (args : List String) : IO UInt32 := do
   | some x => do
     let mut imp : Import := Import.mk x.toName false
     if x == "random" then
-      let mods : Name :=  `PhysLean
+      let mods : Name :=  `Physlib
       let imps :  Import := {module := mods}
       let mFile ← findOLean imps.module
       unless (← mFile.pathExists) do

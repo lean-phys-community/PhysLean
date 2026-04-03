@@ -46,7 +46,7 @@ unsafe def tagDuplicateTest : MetaM Unit := do
 unsafe def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
   println! "Checking for duplicate tags."
-  let env ← importModules (loadExts := true) #[`PhysLean] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }

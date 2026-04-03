@@ -76,7 +76,7 @@ Please feel free to contribute to the completion of these tasks.
 
 def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let mods : Name :=  `PhysLean
+  let mods : Name :=  `Physlib
   let imp :  Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do

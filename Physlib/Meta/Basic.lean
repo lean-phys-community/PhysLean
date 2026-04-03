@@ -35,7 +35,7 @@ open Lean
 /-- Gets all imports within PhysLean. -/
 def Physlib.allImports : IO (Array Import) := do
   initSearchPath (← findSysroot)
-  let mods := `PhysLean
+  let mods := `Physlib
   let mFile ← findOLean mods
   unless ← mFile.pathExists do
     throw <| IO.userError s!"object file '{mFile}' of module {mods} does not exist"

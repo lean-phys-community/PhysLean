@@ -105,10 +105,10 @@ layout: default
 
 unsafe def main (args  : List String) : IO UInt32 := do
   let _ ← noImports
-  let statString ← CoreM.withImportModules #[`PhysLean] (getStats).run'
+  let statString ← CoreM.withImportModules #[`Physlib] (getStats).run'
   println! statString
   if "mkHTML" ∈ args then
-    let html ← CoreM.withImportModules #[`PhysLean] (Stats.toHtml).run'
+    let html ← CoreM.withImportModules #[`Physlib] (Stats.toHtml).run'
     let htmlFile : System.FilePath := {toString := "./docs/Stats.html"}
     IO.FS.writeFile htmlFile html
     IO.println (s!"HTML file made.")

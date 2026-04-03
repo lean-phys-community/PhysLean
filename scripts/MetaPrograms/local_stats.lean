@@ -53,7 +53,7 @@ unsafe def main (args  : List String) : IO UInt32 := do
   | [dir] => do
   let files ← allFilePaths.go (#[] : Array FilePath) dir (dir : FilePath)
   let noFiles := files.size
-  let statString ← CoreM.withImportModules #[`PhysLean] (getStats dir).run'
+  let statString ← CoreM.withImportModules #[`Physlib] (getStats dir).run'
   println! statString
 
   println! s!"Number of files: {noFiles}"

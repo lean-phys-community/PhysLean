@@ -43,7 +43,7 @@ partial def addModulesIn (recurse : Bool) (prev : Array Name) (root : Name := .a
 def expectedPhyslibImports : IO (Array Name) := do
   let mut needed := #[]
   for top in ← FilePath.readDir "Physlib" do
-      let nm := `PhysLean
+      let nm := `Physlib
       let rootname := FilePath.withExtension top.fileName ""
       let root :=  nm.mkStr rootname.toString
       if ← top.path.isDir then
@@ -95,7 +95,7 @@ def checkMissingImports (modData : ModuleData) (reqImports : Array Name) :
 
 def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let mods : Name := `PhysLean
+  let mods : Name := `Physlib
   let imp : Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do

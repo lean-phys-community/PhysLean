@@ -62,7 +62,7 @@ def dictionary : MetaM (Array String) := do
 unsafe def main (_ : List String) : IO Unit := do
   initSearchPath (← findSysroot)
   println! "Checking spelling."
-  let env ← importModules (loadExts := true) #[`PhysLean] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }

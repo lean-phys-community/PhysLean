@@ -403,7 +403,7 @@ def notesToMake : List (Note × String) := [
 def makeYML (nt : Note × String) : IO UInt32 := do
   let n := nt.1
   let s := nt.2
-  let ymlString ← CoreM.withImportModules #[`PhysLean] (n.toYML).run'
+  let ymlString ← CoreM.withImportModules #[`Physlib] (n.toYML).run'
   let fileOut : System.FilePath := {toString := s!"./docs/_data/{s}.yml"}
   IO.FS.writeFile fileOut ymlString
   IO.println (s!"YML file made for {n.title}.")
