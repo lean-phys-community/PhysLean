@@ -48,7 +48,7 @@ Units within PhysLean are implemented with the following convention:
 ## References
 
 Zulip chats discussing units:
-- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/physical.20units
+- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/physical.20units
 - https://leanprover.zulipchat.com/#narrow/channel/116395-maths/topic/Dimensional.20Analysis.20Revisited/with/530238303
 
 ## Note
@@ -197,7 +197,7 @@ lemma dimScale_pos (u1 u2 : UnitChoices) (d : Dimension) :
 
 TODO "LCSAY" "Make SI : UnitChoices computable, probably by
   replacing the axioms defining the units. See here:
-  https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/physical.20units/near/534914807"
+  https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/physical.20units/near/534914807"
 /-- The choice of units corresponding to SI units, that is
 - meters,
 - seconds,

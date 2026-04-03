@@ -32,7 +32,7 @@ extracts the `i`th coordinate on `Space d.succ`.
 
 ## iv. References
 
-- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/API.20around.20.60Space.20.28d1.20.2B.20d2.29.60.20to.20.60Space.20d1.20x.20Space.20d2.60/with/556754634
+- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/API.20around.20.60Space.20.28d1.20.2B.20d2.29.60.20to.20.60Space.20d1.20x.20Space.20d2.60/with/556754634
 
 -/
 

@@ -45,7 +45,7 @@ TODO "6V2UZ" "Charge density and current density should be generalized to signed
   in such a way
   that they are still easy to work with and can be integrated with with tensor notation.
   See here:
-  https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/Maxwell's.20Equations"
+  https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/Maxwell's.20Equations"
 
 /-- The charge density. -/
 abbrev ChargeDensity := Time → Space → ℝ

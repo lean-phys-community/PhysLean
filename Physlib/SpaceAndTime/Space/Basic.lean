@@ -32,7 +32,7 @@ which contain (perhaps transitively through imports) the definitions and theorem
 The exact implementation of `Space d` into PhysLean is discussed in numerous places
 on the Lean Zulip, including:
 
-- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/Space.20vs.20EuclideanSpace/with/575332888
+- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/Space.20vs.20EuclideanSpace/with/575332888
 
 There is a choice between defining `Space d` as an `abbrev` of `EuclideanSpace ℝ (Fin d)`,
 as a `def` of a type with value `EuclideanSpace ℝ (Fin d)` or as a structure
