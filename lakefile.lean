@@ -44,7 +44,7 @@ lean_exe sorry_lint where
   supportInterpreter := true
   srcDir := "scripts/MetaPrograms"
 
-lean_exe runPhysLeanLinters where
+lean_exe runPhyslibLinters where
   supportInterpreter := true
   srcDir := "scripts/MetaPrograms"
 
