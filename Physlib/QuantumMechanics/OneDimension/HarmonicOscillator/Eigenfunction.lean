@@ -22,7 +22,7 @@ namespace HarmonicOscillator
 
 variable (Q : HarmonicOscillator)
 
-open Nat PhysLean HilbertSpace MeasureTheory Constants
+open Nat Physlib HilbertSpace MeasureTheory Constants
 
 /-- The `n`th eigenfunction of the Harmonic oscillator is defined as the function `ℝ → ℂ`
   taking `x : ℝ` to
