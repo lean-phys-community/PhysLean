@@ -29,13 +29,13 @@ partial def allFilePaths.go (prev : Array FilePath)
 
 /-- Gets an array of all file paths in `PhysLean`. -/
 partial def allFilePaths : IO (Array FilePath) := do
-  allFilePaths.go (#[] : Array FilePath) "./PhysLean" ("./PhysLean" : FilePath)
+  allFilePaths.go (#[] : Array FilePath) "./Physlib" ("./Physlib" : FilePath)
 
 /-- Gets an array of all module names in `PhysLean`. -/
 def allPhysLeanModules : IO (Array Lean.Name) := do
   let paths ← allFilePaths
   let moduleNames := paths.map fun path =>
-    let relativePath := path.toString.replace "./PhysLean/" "PhysLean."
+    let relativePath := path.toString.replace "./Physlib/" "PhysLean."
     let noExt := relativePath.replace ".lean" ""
     let nameStr := noExt.replace "/" "."
     String.toName nameStr
