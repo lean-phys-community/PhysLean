@@ -35,7 +35,7 @@ partial def allFilePaths : IO (Array FilePath) := do
 def allPhysLeanModules : IO (Array Lean.Name) := do
   let paths ← allFilePaths
   let moduleNames := paths.map fun path =>
-    let relativePath := path.toString.replace "./Physlib/" "PhysLean."
+    let relativePath := path.toString.replace "./Physlib/" "Physlib."
     let noExt := relativePath.replace ".lean" ""
     let nameStr := noExt.replace "/" "."
     String.toName nameStr
