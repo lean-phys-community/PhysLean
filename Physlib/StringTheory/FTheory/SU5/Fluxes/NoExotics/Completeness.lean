@@ -15,7 +15,7 @@ public import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Elems
 
 In the module:
 
-- `PhysLean.StringTheory.FTheory.SU5.Fluxes.NoExotics.Elems`
+- `Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Elems`
 
 we define finite sets of elements of `FluxesFive` and `FluxesTen` which satisfy the
 `NoExotics` and `HasNoZero` conditions.

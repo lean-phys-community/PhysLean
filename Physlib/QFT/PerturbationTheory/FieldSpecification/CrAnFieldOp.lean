@@ -14,7 +14,7 @@ public import Physlib.QFT.PerturbationTheory.CreateAnnihilate
 Called `CrAnFieldOp` for short here.
 
 Given a field specification, in addition to defining states
-(see: `PhysLean.QFT.PerturbationTheory.FieldSpecification.Basic`),
+(see: `Physlib.QFT.PerturbationTheory.FieldSpecification.Basic`),
 we can also define creation and annihilation states.
 These are similar to states but come with an additional specification of whether they correspond to
 creation or annihilation operators.

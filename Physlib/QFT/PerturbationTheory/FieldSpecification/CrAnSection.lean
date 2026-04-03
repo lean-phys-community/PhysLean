@@ -12,9 +12,9 @@ public import Physlib.Mathematics.List
 # Creation and annihilation sections
 
 In the module
-`PhysLean.QFT.PerturbationTheory.FieldSpecification.Basic`
+`Physlib.QFT.PerturbationTheory.FieldSpecification.Basic`
 we defined states for a field specification, and in the module
-`PhysLean.QFT.PerturbationTheory.FieldStatistics.CrAnFieldOp`
+`Physlib.QFT.PerturbationTheory.FieldStatistics.CrAnFieldOp`
 we defined a refinement of states called `CrAnFieldOp` which distinguishes between the
 creation and annihilation components of states.
 There exists, in particular, a map from `CrAnFieldOp` to `FieldOp` called `crAnFieldOpToFieldOp`.

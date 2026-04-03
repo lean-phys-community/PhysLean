@@ -12,7 +12,7 @@ module
 This module contains the details of F-theory with a SU(5) gauge group, with possible
 additional charges. This should be compared to the directory:
 
-- `PhysLean.Particles.SuperSymmetry.SU5`
+- `Physlib.Particles.SuperSymmetry.SU5`
 
 which contains the details of the SUSY SU(5) gauge group not in F-theory. Many of the
 results here use results from that directory.
@@ -22,10 +22,10 @@ results here use results from that directory.
 The main data structures part of this theory are:
 - `PotentialTerm`: An inductive type containing the terms in the super and
   Kahler potential of the theory. This can be found in
-  `PhysLean.Particles.SuperSymmetry.SU5.Potential`, as not specific to F-theory.
+  `Physlib.Particles.SuperSymmetry.SU5.Potential`, as not specific to F-theory.
 - `Fluxes`: Contains the fluxes associated with each representation present in the theory.
 - `Charges`: Contains the charges associated with each representation present in the theory.
-  This can be found in `PhysLean.Particles.SuperSymmetry.SU5.Potential`, as not specific to
+  This can be found in `Physlib.Particles.SuperSymmetry.SU5.Potential`, as not specific to
   F-theory.
 - `Quanta`: Contains the fluxes and charges of each representation present in the theory.
 

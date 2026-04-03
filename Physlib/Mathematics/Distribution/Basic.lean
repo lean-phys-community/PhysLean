@@ -36,7 +36,7 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 
 ## iv. Implementation notes
 
-- In this file we will define distributions generally, in `PhysLean.SpaceAndTime.Distributions`
+- In this file we will define distributions generally, in `Physlib.SpaceAndTime.Distributions`
   we define properties of distributions directly related to `Space`.
 
 -/

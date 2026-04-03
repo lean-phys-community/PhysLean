@@ -52,7 +52,7 @@ open Lean.Parser.Term
 
 /-- A placeholder for definitions to be formalized in the future. Docstrings of informal definitions
 should outline its mathematical or physical content and specify useful references. Use the attribute
-`note_attr_informal` from `PhysLean.Meta.Notes.Basic` to mark the informal definition as a note.
+`note_attr_informal` from `Physlib.Meta.Notes.Basic` to mark the informal definition as a note.
 -/
 macro (name := informalDefinitionDecl)
 doc?:(docComment)? attrs?:(attributes)? "informal_definition " name:ident body:declVal : command =>
@@ -60,7 +60,7 @@ doc?:(docComment)? attrs?:(attributes)? "informal_definition " name:ident body:d
 
 /-- A placeholder for lemmas to be formalized in the future. Docstrings of informal lemmas
 should outline its mathematical or physical content and specify useful references. Use the attribute
-`note_attr_informal` from `PhysLean.Meta.Notes.Basic` to mark the informal definition as a note.
+`note_attr_informal` from `Physlib.Meta.Notes.Basic` to mark the informal definition as a note.
 -/
 macro (name := informalLemmaDecl)
 doc?:(docComment)? attrs?:(attributes)? "informal_lemma " name:ident body:declVal : command =>

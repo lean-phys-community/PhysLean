@@ -29,7 +29,7 @@ One can view the dependencies of this module with:
 
 ```
 lake exe graph --from
-  PhysLean.StringTheory.FTheory.SU5.Fluxes.Basic,PhysLean.Particles.SuperSymmetry.SU5.FieldLabels
+  Physlib.StringTheory.FTheory.SU5.Fluxes.Basic,Physlib.Particles.SuperSymmetry.SU5.FieldLabels
   my_graph.pdf
 ```
 

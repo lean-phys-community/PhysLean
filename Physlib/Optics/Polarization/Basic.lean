@@ -18,7 +18,7 @@ More general definitions that can be applied to a wider range of situations will
 be equivalent to the definitions in this file where appropriate.
 
 The material that was in this file has been moved to
-`PhysLean.Electromagnetism.Vacuum.HarmonicWave` for better organization.
+`Physlib.Electromagnetism.Vacuum.HarmonicWave` for better organization.
 This file is kept because there is still some material to be added here in the future.
 
 -/

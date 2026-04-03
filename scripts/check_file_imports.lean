@@ -9,7 +9,7 @@ import Lean
 
 # Check file imports
 
-This file checks that the imports in `PhysLean.lean` are sorted and complete.
+This file checks that the imports in `Physlib.lean` are sorted and complete.
 
 It can be run from the terminal using
 `lake exe check_file_imports`.
@@ -39,7 +39,7 @@ partial def addModulesIn (recurse : Bool) (prev : Array Name) (root : Name := .a
       r := r.push (root.mkStr mod)
   pure r
 
-/-- Compute imports expected by `PhysLean.lean` by looking at file structure. -/
+/-- Compute imports expected by `Physlib.lean` by looking at file structure. -/
 def expectedPhysLeanImports : IO (Array Name) := do
   let mut needed := #[]
   for top in ← FilePath.readDir "PhysLean" do
@@ -105,7 +105,7 @@ def main (_ : List String) : IO UInt32 := do
   let sortedWarned ← arrayImportSorted hepLeanMod.imports
   let warned ← checkMissingImports hepLeanMod ePhysLeanImports
   if (warned ∨ sortedWarned) then
-    throw <| IO.userError s!"\x1b[31mThe PhysLean.lean file is not sorted, or has missing imports.\x1b[0m"
+    throw <| IO.userError s!"\x1b[31mThe Physlib.lean file is not sorted, or has missing imports.\x1b[0m"
   else
-    IO.println s!"\x1b[32mAll files are imported correctly into PhysLean.lean.\x1b[0m"
+    IO.println s!"\x1b[32mAll files are imported correctly into Physlib.lean.\x1b[0m"
   pure 0

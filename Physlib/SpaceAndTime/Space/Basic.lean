@@ -22,7 +22,7 @@ to `d`-dimensional flat Euclidean space and prove some properties about it.
 
 The scope of this module is to define on `Space d` basic instances related translations and
 the metric. We do not here define the structure of a `Module` on `Space d`, as this is done in
-`PhysLean.SpaceAndTime.Space.Module`.
+`Physlib.SpaceAndTime.Space.Module`.
 
 PhysLean sits downstream of Mathlib, and above we import the necessary Mathlib modules
 which contain (perhaps transitively through imports) the definitions and theorems we need.
@@ -59,7 +59,7 @@ and a `MetricSpace`. These physically correspond to the statement that
 you can add a vector to a point in space, and that there is a notion of distance between
 points in space. This notion of distance corresponds to a choice of length unit.
 
-In `PhysLean.SpaceAndTime.Space.Module` we give `Space d` the structure of a `Module`
+In `Physlib.SpaceAndTime.Space.Module` we give `Space d` the structure of a `Module`
 (aka vector space), a `Norm` and an `InnerProductSpace`. These require certain choices, for example
 the choice of a zero in `Space d`.
 

@@ -12,7 +12,7 @@ public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.SuperCommute
 # Normal Ordering in the FieldOpFreeAlgebra
 
 In the module
-`PhysLean.QFT.PerturbationTheory.FieldSpecification.NormalOrder`
+`Physlib.QFT.PerturbationTheory.FieldSpecification.NormalOrder`
 we defined the normal ordering of a list of `CrAnFieldOp`.
 In this module we extend the normal ordering to a linear map on `FieldOpFreeAlgebra`.
 
