@@ -327,7 +327,7 @@ lemma normalOrderList_swap_create_annihilate (φc φa : 𝓕.CrAnFieldOp)
   - For `[φ1c, φ1a, φ2c, φ2a]` this equivalence sends `0 ↦ 0`, `1 ↦ 2`, `2 ↦ 1`, `3 ↦ 3`.
 -/
 def normalOrderEquiv {φs : List 𝓕.CrAnFieldOp} : Fin φs.length ≃ Fin (normalOrderList φs).length :=
-  PhysLean.List.insertionSortEquiv 𝓕.normalOrderRel φs
+  Physlib.List.insertionSortEquiv 𝓕.normalOrderRel φs
 
 lemma sum_normalOrderList_length {M : Type} [AddCommMonoid M]
     (φs : List 𝓕.CrAnFieldOp) (f : Fin (normalOrderList φs).length → M) :
@@ -339,7 +339,7 @@ lemma normalOrderList_get_normalOrderEquiv {φs : List 𝓕.CrAnFieldOp} (n : Fi
     (normalOrderList φs)[(normalOrderEquiv n).val] = φs[n.val] := by
   change (normalOrderList φs).get (normalOrderEquiv n) = _
   simp only [normalOrderList, normalOrderEquiv]
-  erw [← PhysLean.List.insertionSortEquiv_get]
+  erw [← Physlib.List.insertionSortEquiv_get]
   simp
 
 @[simp]
@@ -347,7 +347,7 @@ lemma normalOrderList_eraseIdx_normalOrderEquiv {φs : List 𝓕.CrAnFieldOp} (n
     (normalOrderList φs).eraseIdx (normalOrderEquiv n).val =
     normalOrderList (φs.eraseIdx n.val) := by
   simp only [normalOrderList, normalOrderEquiv]
-  rw [PhysLean.List.eraseIdx_insertionSort_fin]
+  rw [Physlib.List.eraseIdx_insertionSort_fin]
 
 /-- For a field specification `𝓕`, a list `φs = φ₀…φₙ` of `𝓕.CrAnFieldOp` and an `i < φs.length`,
   then

@@ -22,8 +22,8 @@ open Lean System Meta PhysLean
 
 
 def numDefs (dir : String) : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   let dirName := dir.replace "./" ""
   let dirName := dirName.replace ".lean" ""
   let dirName := dirName.replace "/" "."
@@ -31,8 +31,8 @@ def numDefs (dir : String) : CoreM Nat := do
    && (← Lean.Name.fileName c.name).toString.startsWith dirName
 
 def numLemmas (dir : String) : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   let dirName := dir.replace "./" ""
   let dirName := dirName.replace ".lean" ""
   let dirName := dirName.replace "/" "."

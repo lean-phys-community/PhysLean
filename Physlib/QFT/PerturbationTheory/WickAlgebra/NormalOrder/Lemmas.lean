@@ -396,7 +396,7 @@ lemma ofFieldOpList_normalOrder_insert (φ : 𝓕.FieldOp) (φs : List 𝓕.Fiel
     (k : Fin φs.length.succ) : 𝓝(ofFieldOpList (φ :: φs)) =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs.take k) • 𝓝(ofFieldOpList (φs.insertIdx k φ)) := by
   have hl : φs.insertIdx k φ = φs.take k ++ [φ] ++ φs.drop k := by
-    rw [PhysLean.List.insertIdx_eq_take_drop]
+    rw [Physlib.List.insertIdx_eq_take_drop]
     simp
   rw [hl]
   rw [ofFieldOpList_append, ofFieldOpList_append]

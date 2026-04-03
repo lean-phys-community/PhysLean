@@ -196,10 +196,10 @@ lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>
   repeat rw [basis_eq_ofRat]
   simp only [Fin.isValue, map_sub, map_add, _root_.map_smul, Finsupp.coe_sub, Finsupp.coe_add,
     Finsupp.coe_smul, Pi.sub_apply, Pi.add_apply, ofRat_basis_repr_apply, Pi.smul_apply,
-    smul_eq_mul, PhysLean.RatComplexNum.I_mul_toComplexNum, mul_ite, ne_eq, cons_val_two,
+    smul_eq_mul, Physlib.RatComplexNum.I_mul_toComplexNum, mul_ite, ne_eq, cons_val_two,
     Nat.succ_eq_add_one, Nat.reduceAdd]
   simp only [Fin.isValue, ← map_add, ← map_sub]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   revert b
   decide +kernel
 
@@ -264,11 +264,11 @@ lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
     rw [contr_basis_ratComplexNum]
     rw [prodT_basis_repr_apply]
     simp only [coMetric_eq_ofRat, ofRat_basis_repr_apply, toTensor_eq_ofRat]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-  rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+  rw [← map_sum Physlib.RatComplexNum.toComplexNum]
   rw [ofRat_basis_repr_apply]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   revert b
   decide +kernel
 
@@ -297,16 +297,16 @@ lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
     rw [prodT_basis_repr_apply]
     simp only [coMetric_eq_ofRat, ofRat_basis_repr_apply, pauliCo_eq_ofRat,
       altRightMetric_eq_ofRat]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   conv_lhs =>
     enter [2, x]
-    rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-  rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
+    rw [← map_sum Physlib.RatComplexNum.toComplexNum]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+  rw [← map_sum Physlib.RatComplexNum.toComplexNum]
   rw [ofRat_basis_repr_apply]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   revert b
   decide +kernel
 
@@ -335,16 +335,16 @@ lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
     rw [prodT_basis_repr_apply]
     simp only [coMetric_eq_ofRat,ofRat_basis_repr_apply, toTensor_eq_ofRat,
       altRightMetric_eq_ofRat]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   conv_lhs =>
     enter [2, x]
-    rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-  rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
+    rw [← map_sum Physlib.RatComplexNum.toComplexNum]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+  rw [← map_sum Physlib.RatComplexNum.toComplexNum]
   rw [ofRat_basis_repr_apply]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   revert b
   decide +kernel
 

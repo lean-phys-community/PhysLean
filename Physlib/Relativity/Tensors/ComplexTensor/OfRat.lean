@@ -133,8 +133,8 @@ lemma contrT_ofRat_eq_sum_dropPairSection {n : ℕ} {c : Fin (n + 1 + 1) → com
     simp only [Nat.succ_eq_add_one, Finset.univ_eq_attach,
     ofRat_basis_repr_apply, Fin.val_cast, mul_one,
     mul_zero, Function.comp_apply]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-  rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+  rw [← map_sum Physlib.RatComplexNum.toComplexNum]
   erw [ofRat_basis_repr_apply]
 
 open ComponentIdx

@@ -51,9 +51,9 @@ lemma pauliCo_contr_pauliContr :
     rw [leftMetric_eq_ofRat, rightMetric_eq_ofRat]
     simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, Fin.succAbove_zero,
       Function.comp_apply, cons_val_zero, cons_val_one, head_cons, ofRat_basis_repr_apply]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
     change (2 : ℕ) * _
-    rw [PhysLean.RatComplexNum.ofNat_mul_toComplexNum 2]
+    rw [Physlib.RatComplexNum.ofNat_mul_toComplexNum 2]
   rw [contrT_basis_repr_apply]
   conv_lhs =>
     enter [2, x]
@@ -64,16 +64,16 @@ lemma pauliCo_contr_pauliContr :
       Action.FunctorCategoryEquivalence.functor_obj_obj, Functor.comp_obj,
       Discrete.functor_obj_eq_as, Fin.cast_eq_self]
     left
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   conv_lhs =>
     enter [2, x]
     right
     rw (transparency := .instances) [contr_basis_ratComplexNum]
   conv_lhs =>
     enter [2, x]
-    rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-  rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+    rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
+  rw [← map_sum Physlib.RatComplexNum.toComplexNum]
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   revert b
   decide +kernel
 
@@ -89,7 +89,7 @@ lemma pauliCoDown_trace_pauliCo : {(σ___ | μ β α ⊗ σ_^^ | ν α β) = (2 
   ext b
   conv_rhs => rw [permT_basis_repr_symm_apply]
   simp only [ofRat_basis_repr_apply]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   revert b
   decide +kernel
 
@@ -106,7 +106,7 @@ lemma pauliCo_trace_pauliCoDown: {σ_^^ | μ α β ⊗ σ___ | ν β α = 2 •�
   ext b
   conv_rhs => rw [permT_basis_repr_symm_apply]
   simp only [ofRat_basis_repr_apply]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   decide +revert +kernel
 
 lemma pauliContr_mul_pauliContrDown_add :
@@ -122,7 +122,7 @@ lemma pauliContr_mul_pauliContrDown_add :
   apply (Tensor.basis _).repr.injective
   ext b
   simp only [ofRat_basis_repr_apply]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   decide +revert +kernel
 
 lemma auliContrDown_pauliContr_mul_add :
@@ -138,7 +138,7 @@ lemma auliContrDown_pauliContr_mul_add :
   apply (Tensor.basis _).repr.injective
   ext b
   simp only [ofRat_basis_repr_apply]
-  apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
+  apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   decide +revert +kernel
 
 end PauliMatrix

@@ -541,7 +541,7 @@ lemma uncontractedList_succAboveEmb_eraseIdx_toFinset (c : WickContraction n) (i
 
 lemma uncontractedList_succAboveEmb_eraseIdx_sorted (c : WickContraction n) (i : Fin n.succ)
     (k: ℕ) : ((List.map i.succAboveEmb c.uncontractedList).eraseIdx k).Pairwise (· ≤ ·) := by
-  apply PhysLean.List.eraseIdx_sorted
+  apply Physlib.List.eraseIdx_sorted
   exact uncontractedList_succAboveEmb_sorted c i
 
 lemma uncontractedList_succAboveEmb_eraseIdx_nodup (c : WickContraction n) (i : Fin n.succ) (k: ℕ) :

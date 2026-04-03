@@ -33,7 +33,7 @@ open Lean
 -/
 
 /-- Gets all imports within PhysLean. -/
-def PhysLean.allImports : IO (Array Import) := do
+def Physlib.allImports : IO (Array Import) := do
   initSearchPath (← findSysroot)
   let mods := `PhysLean
   let mFile ← findOLean mods
@@ -43,18 +43,18 @@ def PhysLean.allImports : IO (Array Import) := do
   hepLeanMod.imports.filterM fun c => return c.module != `Init
 
 /-- Number of files within PhysLean. -/
-def PhysLean.noImports : IO Nat := do
+def Physlib.noImports : IO Nat := do
   let imports ← allImports
   return imports.size
 
 /-- Gets all constants from an import. -/
-def PhysLean.Imports.getConsts (imp : Import) : IO (Array ConstantInfo) := do
+def Physlib.Imports.getConsts (imp : Import) : IO (Array ConstantInfo) := do
   let mFile ← findOLean imp.module
   let (modData, _) ← readModuleData mFile
   return modData.constants
 
 /-- Gets all user defined constants from an import. -/
-def PhysLean.Imports.getUserConsts (imp : Import) : CoreM (Array ConstantInfo) := do
+def Physlib.Imports.getUserConsts (imp : Import) : CoreM (Array ConstantInfo) := do
   let env ← getEnv
   let consts ← Imports.getConsts imp
   consts.filterM fun c =>
@@ -76,7 +76,7 @@ def Lean.Name.toFilePath (c : Name) : System.FilePath :=
   System.mkFilePath (c.toString.splitOn ".") |>.addExtension "lean"
 
 /-- Lines from import. -/
-def PhysLean.Imports.getLines (imp : Import) : IO (Array String) := do
+def Physlib.Imports.getLines (imp : Import) : IO (Array String) := do
   IO.FS.lines imp.module.toFilePath
 
 namespace Lean.Name
@@ -172,60 +172,60 @@ namespace Physlib
 
 /-- Number of definitions. -/
 def noDefs : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   x.flatFilterSizeM fun c => return c.isDef && (← c.name.hasPos)
 
 /-- Number of definitions. -/
 def noLemmas : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   x.flatFilterSizeM fun c => return !c.isDef && (← c.name.hasPos)
 
 /-- All docstrings present in PhysLean. -/
 def allDocStrings : CoreM (Array String) := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   let x' := x.flatten
   let docString ← x'.mapM fun c => Lean.Name.getDocString c.name
   return docString
 
 /-- Number of definitions without a doc-string. -/
 def noDefsNoDocString : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   x.flatFilterSizeM fun c =>
     return c.isDef && (← c.name.hasPos) && !(← c.name.hasDocString)
 
 /-- Number of definitions without a doc-string. -/
 def noLemmasNoDocString : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   x.flatFilterSizeM fun c =>
     return !c.isDef && (← c.name.hasPos) && !(← c.name.hasDocString)
 
 /-- The number of lines in PhysLean. -/
 def noLines : IO Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getLines
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getLines
   return x.flatSize
 
 /-- The number of TODO items. -/
 def noTODOs : IO Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getLines
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getLines
   x.flatFilterSizeM fun l => return l.startsWith "TODO "
 
 /-- The number of files with a TODO item. -/
 def noFilesWithTODOs : IO Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getLines
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getLines
   let x := x.filter fun bs => bs.any fun l => l.startsWith "TODO "
   return x.size
 
 /-- All user defined declarations. -/
 def allUserConsts : CoreM (Array ConstantInfo) := do
-  let imports ← PhysLean.allImports
-  return (← imports.flatMapM PhysLean.Imports.getUserConsts)
+  let imports ← Physlib.allImports
+  return (← imports.flatMapM Physlib.Imports.getUserConsts)
 
 end Physlib

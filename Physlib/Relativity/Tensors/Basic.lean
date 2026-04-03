@@ -176,7 +176,7 @@ lemma μ_toTensor_tmul_toTensor {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
   simp only [lift.toRep_V_carrier, Functor.id_obj]
   rw [LinearEquiv.trans_apply]
   rw [toTensor, toTensor]
-  rw [PhysLean.PiTensorProduct.tmulEquiv_tmul_tprod]
+  rw [Physlib.PiTensorProduct.tmulEquiv_tmul_tprod]
   simp only [tensorObj_of_left, tensorObj_of_hom, PiTensorProduct.congr_tprod]
   congr
   funext i

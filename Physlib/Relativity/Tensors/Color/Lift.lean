@@ -294,20 +294,20 @@ open TensorProduct in
 /-- The equivalence of modules corresponding to the tensor. -/
 def μModEquiv (X Y : OverColor C) :
     ((toRep F X).V ⊗[k] (toRep F Y).V) ≃ₗ[k] toRep F (X ⊗ Y) :=
-  PhysLean.PiTensorProduct.tmulEquiv ≪≫ₗ PiTensorProduct.congr (discreteSumEquiv F)
+  Physlib.PiTensorProduct.tmulEquiv ≪≫ₗ PiTensorProduct.congr (discreteSumEquiv F)
 
 lemma μModEquiv_tmul_tprod {X Y : OverColor C}
     (p : (i : X.left) → F.obj (Discrete.mk (X.hom i)))
     (q : (i : Y.left) → F.obj (Discrete.mk (Y.hom i))) :
     μModEquiv F X Y (PiTensorProduct.tprod k p ⊗ₜ[k] PiTensorProduct.tprod k q) =
     PiTensorProduct.tprod k fun i =>
-    (discreteSumEquiv F i) (PhysLean.PiTensorProduct.elimPureTensor p q i) := by
+    (discreteSumEquiv F i) (Physlib.PiTensorProduct.elimPureTensor p q i) := by
   rw [μModEquiv]
   simp only [toRep_V_carrier]
   rw [LinearEquiv.trans_apply]
-  rw [PhysLean.PiTensorProduct.tmulEquiv_tmul_tprod]
+  rw [Physlib.PiTensorProduct.tmulEquiv_tmul_tprod]
   change PiTensorProduct.congr (discreteSumEquiv F)
-    (PiTensorProduct.tprod k (PhysLean.PiTensorProduct.elimPureTensor p q)) = _
+    (PiTensorProduct.tprod k (Physlib.PiTensorProduct.elimPureTensor p q)) = _
   rw [PiTensorProduct.congr_tprod]
 
 /-- The natural isomorphism corresponding to the tensor. -/
@@ -315,7 +315,7 @@ def μ (X Y : OverColor C) : toRep F X ⊗ toRep F Y ≅ toRep F (X ⊗ Y) :=
   Action.mkIso (μModEquiv F X Y).toModuleIso
   (fun M => by
     refine ModuleCat.hom_ext ?_
-    refine PhysLean.PiTensorProduct.induction_tmul (fun p q => ?_)
+    refine Physlib.PiTensorProduct.induction_tmul (fun p q => ?_)
     change (μModEquiv F X Y)
       ((toRep F X).ρ M (PiTensorProduct.tprod k p) ⊗ₜ[k]
       (toRep F Y).ρ M (PiTensorProduct.tprod k q)) = (toRep F (X ⊗ Y)).ρ M
@@ -337,7 +337,7 @@ lemma μ_tmul_tprod {X Y : OverColor C} (p : (i : X.left) → F.obj (Discrete.mk
     (q : (i : Y.left) → (F.obj <| Discrete.mk (Y.hom i))) :
     (μ F X Y).hom.hom (PiTensorProduct.tprod k p ⊗ₜ[k] PiTensorProduct.tprod k q) =
     (PiTensorProduct.tprod k) fun i =>
-    discreteSumEquiv F i (PhysLean.PiTensorProduct.elimPureTensor p q i) :=
+    discreteSumEquiv F i (Physlib.PiTensorProduct.elimPureTensor p q i) :=
   μModEquiv_tmul_tprod F p q
 
 lemma μ_tmul_tprod_mk {X Y : Type} {cX : X → C} {cY : Y → C}
@@ -346,7 +346,7 @@ lemma μ_tmul_tprod_mk {X Y : Type} {cX : X → C} {cY : Y → C}
     (μ F (OverColor.mk cX) (OverColor.mk cY)).hom.hom
     (PiTensorProduct.tprod k p ⊗ₜ[k] PiTensorProduct.tprod k q)
     = (PiTensorProduct.tprod k) fun i =>
-    discreteSumEquiv F i (PhysLean.PiTensorProduct.elimPureTensor p q i) :=
+    discreteSumEquiv F i (Physlib.PiTensorProduct.elimPureTensor p q i) :=
   μModEquiv_tmul_tprod F _ _
 
 lemma μ_natural_left {X Y : OverColor C} (f : X ⟶ Y) (Z : OverColor C) :
@@ -354,7 +354,7 @@ lemma μ_natural_left {X Y : OverColor C} (f : X ⟶ Y) (Z : OverColor C) :
     (μ F X Z).hom ≫ homToRepHom F (MonoidalCategory.whiskerRight f Z) := by
   ext1
   refine ModuleCat.hom_ext ?_
-  refine PhysLean.PiTensorProduct.induction_tmul (fun p q => ?_)
+  refine Physlib.PiTensorProduct.induction_tmul (fun p q => ?_)
   simp only [toRep_V_carrier, tensorObj_of_left, tensorObj_of_hom, Action.tensorObj_V,
     CategoryStruct.comp, Action.Hom.comp_hom, Action.whiskerRight_hom]
   change _ = (homToRepHom F (MonoidalCategory.whiskerRight f Z)).hom
@@ -362,7 +362,7 @@ lemma μ_natural_left {X Y : OverColor C} (f : X ⟶ Y) (Z : OverColor C) :
   rw [μ_tmul_tprod]
   change _ = (homToRepHom F (f ▷ Z)).hom
     (PiTensorProduct.tprod k fun i => discreteSumEquiv F i
-    (PhysLean.PiTensorProduct.elimPureTensor p q i))
+    (Physlib.PiTensorProduct.elimPureTensor p q i))
   rw [homToRepHom_tprod]
   change ((μ F Y Z).hom.hom.hom' ∘ₗ ((homToRepHom F f).hom ▷ (toRep F Z).V).hom') _ = _
   simp only [toRep_V_carrier,
@@ -389,13 +389,13 @@ lemma μ_natural_right {X Y : OverColor C} (X' : OverColor C) (f : X ⟶ Y) :
     (μ F X' X).hom ≫ homToRepHom F (MonoidalCategory.whiskerLeft X' f) := by
   ext1
   refine ModuleCat.hom_ext ?_
-  refine PhysLean.PiTensorProduct.induction_tmul (fun p q => ?_)
+  refine Physlib.PiTensorProduct.induction_tmul (fun p q => ?_)
   simp only [toRep_V_carrier, CategoryStruct.comp, Action.Hom.comp_hom]
   change _ = (homToRepHom F (X' ◁ f)).hom ((μ F X' X).hom.hom
     ((PiTensorProduct.tprod k) p ⊗ₜ[k] (PiTensorProduct.tprod k) q))
   rw [μ_tmul_tprod]
   change _ = (homToRepHom F (X' ◁ f)).hom ((PiTensorProduct.tprod k) fun i =>
-    (discreteSumEquiv F i) (PhysLean.PiTensorProduct.elimPureTensor p q i))
+    (discreteSumEquiv F i) (Physlib.PiTensorProduct.elimPureTensor p q i))
   rw [homToRepHom_tprod]
   rw [ModuleCat.Hom.hom, ConcreteCategory.hom]
   simp only [ModuleCat.instConcreteCategoryLinearMapIdCarrier, LinearMap.coe_comp,
@@ -424,7 +424,7 @@ lemma associativity (X Y Z : OverColor C) :
     whiskerLeft (toRep F X) (μ F Y Z).hom ≫ (μ F X (Y ⊗ Z)).hom := by
   ext1
   refine ModuleCat.hom_ext ?_
-  refine PhysLean.PiTensorProduct.induction_assoc' (fun p q m => ?_)
+  refine Physlib.PiTensorProduct.induction_assoc' (fun p q m => ?_)
   simp only [toRep_V_carrier, CategoryStruct.comp, Action.Hom.comp_hom]
   change (homToRepHom F (α_ X Y Z).hom).hom ((μ F (X ⊗ Y) Z).hom.hom
     ((((μ F X Y).hom.hom ((PiTensorProduct.tprod k) p ⊗ₜ[k]
@@ -434,9 +434,9 @@ lemma associativity (X Y Z : OverColor C) :
   rw [μ_tmul_tprod, μ_tmul_tprod]
   change (homToRepHom F (α_ X Y Z).hom).hom ((μ F (X ⊗ Y) Z).hom.hom
     (((PiTensorProduct.tprod k) fun i => (discreteSumEquiv F i)
-    (PhysLean.PiTensorProduct.elimPureTensor p q i)) ⊗ₜ[k] (PiTensorProduct.tprod k) m)) =
+    (Physlib.PiTensorProduct.elimPureTensor p q i)) ⊗ₜ[k] (PiTensorProduct.tprod k) m)) =
     (μ F X (Y ⊗ Z)).hom.hom ((PiTensorProduct.tprod k) p ⊗ₜ[k] (PiTensorProduct.tprod k) fun i =>
-    (discreteSumEquiv F i) (PhysLean.PiTensorProduct.elimPureTensor q m i))
+    (discreteSumEquiv F i) (Physlib.PiTensorProduct.elimPureTensor q m i))
   rw [μ_tmul_tprod, μ_tmul_tprod]
   erw [homToRepHom_tprod]
   apply congrArg
@@ -464,7 +464,7 @@ lemma left_unitality (X : OverColor C) : (leftUnitor (toRep F X)).hom =
     (μ F (𝟙_ (OverColor C)) X).hom ≫ homToRepHom F (leftUnitor X).hom := by
   ext1
   refine ModuleCat.hom_ext ?_
-  apply PhysLean.PiTensorProduct.induction_mod_tmul (fun x q => ?_)
+  apply Physlib.PiTensorProduct.induction_mod_tmul (fun x q => ?_)
   simp only [toRep_V_carrier, Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
     Action.FunctorCategoryEquivalence.functor_obj_obj, Action.tensorUnit_V, Action.tensorObj_V,
     Action.leftUnitor_hom_hom, CategoryStruct.comp, Action.Hom.comp_hom, tensorObj_of_left,
@@ -493,7 +493,7 @@ lemma right_unitality (X : OverColor C) : (rightUnitor (toRep F X)).hom =
     (μ F X (𝟙_ (OverColor C))).hom ≫ homToRepHom F (rightUnitor X).hom := by
   ext1
   refine ModuleCat.hom_ext ?_
-  apply PhysLean.PiTensorProduct.induction_tmul_mod (fun p x => ?_)
+  apply Physlib.PiTensorProduct.induction_tmul_mod (fun p x => ?_)
   simp only [Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
     Action.FunctorCategoryEquivalence.functor_obj_obj, CategoryStruct.comp, Action.Hom.comp_hom]
   change TensorProduct.rid k (toRep F X) ((PiTensorProduct.tprod k) p ⊗ₜ[k] x) =
@@ -516,7 +516,7 @@ lemma braided' (X Y : OverColor C) : (μ F X Y).hom ≫ (homToRepHom F) (β_ X Y
     (β_ (toRep F X) (toRep F Y)).hom ≫ (μ F Y X).hom := by
   ext1
   refine ModuleCat.hom_ext ?_
-  apply PhysLean.PiTensorProduct.induction_tmul (fun p q => ?_)
+  apply Physlib.PiTensorProduct.induction_tmul (fun p q => ?_)
   simp only [toRep_V_carrier, CategoryStruct.comp, Action.Hom.comp_hom]
   change (homToRepHom F (β_ X Y).hom).hom ((μ F X Y).hom.hom
     ((PiTensorProduct.tprod k) p ⊗ₜ[k] (PiTensorProduct.tprod k) q)) = (μ F Y X).hom.hom
@@ -683,7 +683,7 @@ lemma repNatTransOfColorApp_tensor (X Y : OverColor C) :
     (Functor.LaxMonoidal.μ (toRepFunc F')) X Y := by
   ext1
   refine ModuleCat.hom_ext ?_
-  refine PhysLean.PiTensorProduct.induction_tmul (fun p q => ?_)
+  refine Physlib.PiTensorProduct.induction_tmul (fun p q => ?_)
   simp only [toRepFunc, toRep_V_carrier, CategoryStruct.comp, Action.Hom.comp_hom]
   rw [ModuleCat.Hom.hom, ConcreteCategory.hom, ModuleCat.Hom.hom, ConcreteCategory.hom]
   simp only [ModuleCat.instConcreteCategoryLinearMapIdCarrier, LinearMap.coe_comp,
@@ -787,7 +787,7 @@ lemma obj_μ_tprod_tmul (F : Discrete C ⥤ Rep k G) (X Y : OverColor C)
     (Functor.LaxMonoidal.μ (lift.obj F).toFunctor X Y).hom
     (PiTensorProduct.tprod k p ⊗ₜ[k] PiTensorProduct.tprod k q) =
     (PiTensorProduct.tprod k) fun i =>
-    discreteSumEquiv F i (PhysLean.PiTensorProduct.elimPureTensor p q i) := by
+    discreteSumEquiv F i (Physlib.PiTensorProduct.elimPureTensor p q i) := by
   exact μ_tmul_tprod F p q
 
 lemma μIso_inv_tprod (F : Discrete C ⥤ Rep k G) (X Y : OverColor C)

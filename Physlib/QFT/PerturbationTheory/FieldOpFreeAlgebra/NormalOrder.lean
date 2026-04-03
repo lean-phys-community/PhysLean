@@ -96,7 +96,7 @@ lemma normalOrderF_normalOrderF_mid (a b c : 𝓕.FieldOpFreeAlgebra) :
           rw [Wick.koszulSign_of_append_eq_insertionSort, mul_comm]
         · congr 1
           simp only [normalOrderList]
-          rw [PhysLean.List.insertionSort_append_insertionSort_append]
+          rw [Physlib.List.insertionSort_append_insertionSort_append]
       · simp [pa]
       · intro x y hx hy h1 h2
         simp_all [pa, add_mul]

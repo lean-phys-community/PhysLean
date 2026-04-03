@@ -381,7 +381,7 @@ lemma eraseIdxEquiv_symm_eq_take_cons_drop {n : ℕ} (φs : List 𝓕.FieldOp) (
     (a : 𝓕.fieldOpToCrAnType φs[n]) (s : CrAnSection (φs.eraseIdx n)) :
     (eraseIdxEquiv n φs hn).symm ⟨a, s⟩ =
     congr (by
-    rw [PhysLean.List.take_eraseIdx_same, PhysLean.List.drop_eraseIdx_succ]
+    rw [Physlib.List.take_eraseIdx_same, Physlib.List.drop_eraseIdx_succ]
     conv_rhs => rw [← List.take_append_drop n φs]) (append (take n s) (cons a (drop n s))) := by
   simp only [eraseIdxEquiv, appendEquiv, Equiv.symm_trans_apply, congr_symm, Equiv.prodCongr_symm,
     Equiv.refl_symm, Equiv.prodCongr_apply, Prod.map_apply, Equiv.symm_symm, Equiv.coe_fn_mk,
@@ -407,7 +407,7 @@ lemma eraseIdxEquiv_symm_getElem {n : ℕ} (φs : List 𝓕.FieldOp) (hn : n < �
     List.length_take, length_eq, inf_le_left, List.getElem_append_right]
   have h0 : n ⊓ (φs.eraseIdx n).length = n := by
     simp only [inf_eq_left]
-    rw [← PhysLean.List.eraseIdx_length _ ⟨n, hn⟩] at hn
+    rw [← Physlib.List.eraseIdx_length _ ⟨n, hn⟩] at hn
     exact Nat.le_of_lt_succ hn
   simp [h0]
 

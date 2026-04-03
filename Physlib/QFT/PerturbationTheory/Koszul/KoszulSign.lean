@@ -106,7 +106,7 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
     trans koszulSign q le (φ1 :: φs) * koszulSignInsert q le φ (φ1 :: φs)
     · ring
     simp only [insertionSortEquiv, List.length_cons, Nat.succ_eq_add_one, orderedInsertEquiv,
-      PhysLean.Fin.equivCons_trans, Equiv.trans_apply, PhysLean.Fin.equivCons_zero]
+      Physlib.Fin.equivCons_trans, Equiv.trans_apply, Physlib.Fin.equivCons_zero]
     conv_rhs =>
       enter [2,2, 2, 2]
       rw [orderedInsert_eq_insertIdx_orderedInsertPos]
@@ -127,7 +127,7 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
       rhs
       simp only [List.insertIdx_succ_cons]
       simp only [List.insertionSort_cons, List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one,
-        Equiv.trans_apply, PhysLean.Fin.equivCons_succ]
+        Equiv.trans_apply, Physlib.Fin.equivCons_succ]
       erw [orderedInsertEquiv_fin_succ]
       simp only [Fin.eta, Fin.val_cast]
       rhs

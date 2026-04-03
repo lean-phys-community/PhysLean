@@ -719,7 +719,7 @@ lemma eraseIdx_insertionSort {I : Type} (le1 : I → I → Prop) [DecidableRel l
 
 lemma eraseIdx_insertionSort_fin {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
     [Std.Total le1] [IsTrans I le1] (r : List I) (n : Fin r.length) :
-    (List.insertionSort le1 r).eraseIdx ↑((PhysLean.List.insertionSortEquiv le1 r) n)
+    (List.insertionSort le1 r).eraseIdx ↑((Physlib.List.insertionSortEquiv le1 r) n)
     = List.insertionSort le1 (r.eraseIdx n) :=
   eraseIdx_insertionSort le1 n.val r (Fin.prop n)
 

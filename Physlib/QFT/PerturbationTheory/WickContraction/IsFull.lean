@@ -56,13 +56,13 @@ def isFullInvolutionEquiv : {c : WickContraction n // IsFull c} ≃
 theorem card_of_isfull_even (he : Even n) :
     Fintype.card {c : WickContraction n // IsFull c} = (n - 1)‼ := by
   rw [Fintype.card_congr (isFullInvolutionEquiv)]
-  exact PhysLean.Fin.involutionNoFixed_card_even n he
+  exact Physlib.Fin.involutionNoFixed_card_even n he
 
 /-- If `n` is odd then there are no full contractions. This is because
   there will always be at least one element unpaired. -/
 theorem card_of_isfull_odd (ho : Odd n) :
     Fintype.card {c : WickContraction n // IsFull c} = 0 := by
   rw [Fintype.card_congr (isFullInvolutionEquiv)]
-  exact PhysLean.Fin.involutionNoFixed_card_odd n ho
+  exact Physlib.Fin.involutionNoFixed_card_odd n ho
 
 end WickContraction

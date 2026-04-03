@@ -39,7 +39,7 @@ def moduleDocs : MetaM (Array String) := do
 /-- All the words in either module doc-strings or doc-strings of definitions, theorems
   and lemmas. -/
 def allWords : MetaM (Array String) := do
-  let allConstants ← PhysLean.allUserConsts
+  let allConstants ← Physlib.allUserConsts
   let allModuleDocs ← moduleDocs
   let allDocStrings ← allConstants.mapM fun c => Lean.Name.getDocString c.name
   let allDocStrings := allDocStrings ++ allModuleDocs

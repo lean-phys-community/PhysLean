@@ -26,4 +26,4 @@ unsafe def main (_ : List String) : IO Unit := do
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }
   let state := {env}
-  let _ ← (Lean.Core.CoreM.toIO · ctx state) do (PhysLean.sorryfulPseudoTest).run'
+  let _ ← (Lean.Core.CoreM.toIO · ctx state) do (Physlib.sorryfulPseudoTest).run'

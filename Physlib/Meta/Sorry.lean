@@ -187,8 +187,8 @@ unsafe def allPseudoAttributed : CoreM (Array Name) := do
 /-- Checks whether all results attributed `sorryful` depend on the ```sorryAx`
   axiom and vice versa. -/
 unsafe def sorryfulPseudoTest : MetaM Unit := do
-  let (allWithSorry, allWithPseudo) ← PhysLean.allWithSorryPseudo
-  let allConst ← PhysLean.allUserConsts
+  let (allWithSorry, allWithPseudo) ← Physlib.allWithSorryPseudo
+  let allConst ← Physlib.allUserConsts
   let allConst := allConst.map fun c => c.name
   let allWithSorry := allWithSorry.filter fun n => n ∈ allConst
   let allWithPseudo := allWithPseudo.filter fun n => n ∈ allConst

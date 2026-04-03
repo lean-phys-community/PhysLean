@@ -22,7 +22,7 @@ open FieldStatistic
 namespace FieldOpFreeAlgebra
 
 noncomputable section
-open Module PhysLean.List
+open Module Physlib.List
 
 /-!
 
