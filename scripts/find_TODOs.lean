@@ -21,10 +21,10 @@ Parts of this file are adapted from `Mathlib.Tactic.Linter.TextBased`,
 open Lean System Meta
 
 /-- Given a list of lines, outputs an error message and a line number. -/
-def PhysLeanTODOItem : Type := Array String → Array (String × ℕ)
+def PhyslibTODOItem : Type := Array String → Array (String × ℕ)
 
 /-- Checks if a . -/
-def TODOFinder : PhysLeanTODOItem := fun lines ↦ Id.run do
+def TODOFinder : PhyslibTODOItem := fun lines ↦ Id.run do
   let enumLines := (lines.toList.enumFrom 1)
   let todos := enumLines.filterMap (fun (lno1, l1) ↦
     if l1.startsWith "/-! TODO:"   then
