@@ -99,7 +99,7 @@ lean_exe notes where
   supportInterpreter := true
   srcDir := "scripts/MetaPrograms"
 
-lean_exe mathlib_textLint_on_hepLean where
+lean_exe mathlib_textLint_on_physlib where
   srcDir := "scripts"
 
 lean_exe no_docs where

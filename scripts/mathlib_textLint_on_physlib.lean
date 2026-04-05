@@ -45,5 +45,5 @@ def heplean_lint_style : Cmd := `[Cli|
     update;     "Print errors solely for the style exceptions file"
 ]
 
-/-- The entry point to the `lake exe mathlib_textLint_on_hepLean` command. -/
+/-- The entry point to the `lake exe mathlib_textLint_on_physlib` command. -/
 def main (args : List String) : IO UInt32 := do heplean_lint_style.validate args
