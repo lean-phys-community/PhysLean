@@ -55,7 +55,7 @@ def docTODO  (todos : Array TODOContext) : IO String := do
     out := out ++ (s!" - [{e.statement}]("++ filePathToGitPath e.path e.lineNumber ++ ")\n")
   return out
 
-def hepLeanLintFile (path : FilePath) : IO String := do
+def physlibLintFile (path : FilePath) : IO String := do
   let lines ← IO.FS.lines path
   let allOutput := (Array.map (fun lint ↦
     (Array.map (fun (e, n) ↦ TODOContext.mk e n path)) (lint lines)))
@@ -81,12 +81,12 @@ def main (args : List String) : IO UInt32 := do
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
-  let (hepLeanMod, _) ← readModuleData mFile
+  let (physlibMod, _) ← readModuleData mFile
   let mut out :  String :=  ""
-  for imp in hepLeanMod.imports do
+  for imp in physlibMod.imports do
     if imp.module == `Init then continue
     let filePath := (mkFilePath (imp.module.toString.split (· == '.'))).addExtension "lean"
-    let l ← hepLeanLintFile filePath
+    let l ← physlibLintFile filePath
     if l != "" then
       out := out ++ "\n### " ++ imp.module.toString ++ "\n"
       out := out ++ l
