@@ -4,8 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
 import QuantumInfo.ForMathlib.Superadditive
-import Mathlib.Order.LiminfLimsup
-import Mathlib.Topology.Order.MonotoneConvergence
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.RCLike.Basic
+import Mathlib.Analysis.Subadditive
 
 /-! Definition of "Regularized quantities" as are common in information theory,
 from one-shot versions, and good properties coming from Fekete's lemma.
@@ -120,7 +121,9 @@ variable {fn : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀
 
 theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
-  sorry
+  have liminf_neg : Filter.liminf fn Filter.atTop = -(Filter.limsup (-fn) Filter.atTop) := by
+    simp [Filter.limsup_eq, Filter.liminf_eq, Real.sInf_def]
+  exact Real.ext_cauchy (congrArg Real.cauchy liminf_neg)
 
 theorem SupRegularized.to_InfRegularized : SupRegularized fn hl hu = -InfRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
@@ -159,6 +162,9 @@ theorem InfRegularized.of_Subadditive (hf : Subadditive (fun n ↦ fn n * n))
       convert Or.inr (hl (n+1))
       field_simp
   )
-  apply tendsto_nhds_unique h₁
-  have := InfRegularized.anti_tendsto (fn := fn) (hl := hl) (hu := hu) (sorry)
-  sorry
+  have h₂ : Filter.Tendsto fn .atTop (nhds hf.lim) := by
+    refine h₁.congr' ?_
+    filter_upwards [Filter.eventually_ne_atTop 0] with n hn
+    have : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn
+    field_simp
+  exact h₂.liminf_eq.symm
