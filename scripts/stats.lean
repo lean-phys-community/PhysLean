@@ -85,15 +85,15 @@ layout: default
 <h3>Number of Definitions (incl. instances): {noDefsVal - noInformalLemmasVal}</h3>
 <p>- Of which {noDefsVal - noDefsNoDocVal- noInformalLemmasVal} have doc-strings:</p>
 <progress value=\"{noDefsVal - noDefsNoDocVal- noInformalLemmasVal}\" max=\"{noDefsVal- noInformalLemmasVal}\"></progress>
-<p>- Of which {noDefsVal - noInformalLemmasVal - noInformalDefsVal} are not <a href=\"https://heplean.github.io/HepLean/InformalGraph.html\">informal definitions</a>:</p>
+<p>- Of which {noDefsVal - noInformalLemmasVal - noInformalDefsVal} are not <a href=\"https://physlib.io/InformalGraph.html\">informal definitions</a>:</p>
 <progress value=\"{noDefsVal - noInformalLemmasVal - noInformalDefsVal}\" max=\"{noDefsVal - noInformalLemmasVal}\"></progress>
 
 <h3>Number of Lemmas: {noLemmasVal + noInformalLemmasVal}</h3>
 <p>- Of which {noLemmasVal - noLemmasNoDocVal + noInformalLemmasVal} have doc-strings:</p>
 <progress value=\"{noLemmasVal - noLemmasNoDocVal + noInformalLemmasVal}\" max=\"{noLemmasVal + noInformalLemmasVal}\"></progress>
-<p>- Of which {noLemmasVal} are not <a href=\"https://heplean.github.io/HepLean/InformalGraph.html\">informal lemmas</a>:</p>
+<p>- Of which {noLemmasVal} are not <a href=\"https://physlib.io/InformalGraph.html\">informal lemmas</a>:</p>
 <progress value=\"{noLemmasVal}\" max=\"{noLemmasVal + noInformalLemmasVal}\"></progress>
-<h3>Number of <a href=\"https://heplean.github.io/HepLean/TODOList\">TODOs</a>: {noTODOsVal}</h3>
+<h3>Number of <a href=\"https://physlib.io/TODOList\">TODOs</a>: {noTODOsVal}</h3>
 <p>- There are {noImportsVal - noFilesWithTODOsVal} (of {noImportsVal}) files which are TODO free:</p>
 <progress value=\"{noImportsVal - noFilesWithTODOsVal}\" max=\"{noImportsVal}\"></progress>
    "
