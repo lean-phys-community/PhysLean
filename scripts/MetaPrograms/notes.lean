@@ -302,7 +302,7 @@ def harmonicOscillator : Note where
      Lean 4, as part of the larger project Physlib.
      What this means is that every definition and theorem in this note has been formally checked
      for mathematical correctness for by a computer. There are a number of
-     motivations for doing this which are discussed <a href = 'https://heplean.com'>here</a>.",
+     motivations for doing this which are discussed <a href = 'https://physlib.io'>here</a>.",
     .p "Note that we do not give every definition and theorem which is part of
       the formalization.
      Our goal is give key aspects, in such a way that we hope this note will be useful

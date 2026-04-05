@@ -39,8 +39,8 @@ def Physlib.allImports : IO (Array Import) := do
   let mFile ← findOLean mods
   unless ← mFile.pathExists do
     throw <| IO.userError s!"object file '{mFile}' of module {mods} does not exist"
-  let (hepLeanMod, _) ← readModuleData mFile
-  hepLeanMod.imports.filterM fun c => return c.module != `Init
+  let (physlibMod, _) ← readModuleData mFile
+  physlibMod.imports.filterM fun c => return c.module != `Init
 
 /-- Number of files within Physlib. -/
 def Physlib.noImports : IO Nat := do
