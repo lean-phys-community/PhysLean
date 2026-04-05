@@ -5,7 +5,7 @@
 
 
 <div align="center">
-<img src="./docs/PhysLib-logo.jpeg" alt="Physlib logo" width="500">
+<img src="./docs/Physlib-logo.jpeg" alt="Physlib logo" width="500">
 </div>
 
 
