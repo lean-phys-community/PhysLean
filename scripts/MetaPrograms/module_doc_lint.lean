@@ -215,7 +215,7 @@ def noLintArray : IO (Array FilePath) := do
 
 def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let mods : Name :=  `Physlib
+  let mods : Name := `Physlib
   let imp : Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
