@@ -105,7 +105,7 @@ def printErrors (errors : Array PhyslibErrorContext) : IO Unit := do
   for e in errors do
     IO.println (s!"error: {e.path}:{e.lineNumber}:{e.columnNumber}: {e.error}")
 
-def hepLeanLintFile (path : FilePath) : IO (Array PhyslibErrorContext) := do
+def physlibLintFile (path : FilePath) : IO (Array PhyslibErrorContext) := do
   let lines ← IO.FS.lines path
   let allOutput := (Array.map (fun lint ↦
     (Array.map (fun (e, n, c) ↦ PhyslibErrorContext.mk e n c path)) (lint lines)))
@@ -126,12 +126,13 @@ def main (_ : List String) : IO UInt32 := do
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
   let (hepLeanMod, _) ← readModuleData mFile
-  let filePaths := hepLeanMod.imports.filterMap (fun imp ↦
+let (physlibMod, _) ← readModuleData mFile
+let filePaths := physlibMod.imports.filterMap (fun imp ↦
     if imp.module == `Init then
       none
     else
       some ((mkFilePath (imp.module.toString.splitToList (· == '.'))).addExtension "lean"))
-  let errors := (← filePaths.mapM hepLeanLintFile).flatten
+  let errors := (← filePaths.mapM physlibLintFile).flatten
   let errorMessagesPresent := (errors.map (fun e => e.error)).sortDedup
   for eM in errorMessagesPresent do
     IO.println s!"\n\n\x1b[31mError: {eM}\x1b[0m"
