@@ -33,7 +33,7 @@ jobs:
         run: |
           lake exe cache get
 
-      - name: build PhysLib
+      - name: build Physlib
         id: build
         uses: liskin/gh-problem-matcher-wrap@v3
         with:
