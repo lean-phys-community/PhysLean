@@ -18,7 +18,7 @@
 [![](https://img.shields.io/badge/Getting-Started-darkgreen)](https://physlib.io/GettingStarted.html)
 [![](https://img.shields.io/badge/The-Website-darkgreen)](https://physlib.io)
 [![](https://img.shields.io/badge/How_To-Get_Involved-darkgreen)](https://physlib.io/GetInvolved.html)
-[![](https://img.shields.io/badge/Physlib_Zulip-Discussion-darkgreen)](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/)
+[![](https://img.shields.io/badge/Physlib_Zulip-Discussion-darkgreen)](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/)
 [![](https://img.shields.io/badge/TODO-List-darkgreen)](https://physlib.io/TODOList)
 
 
@@ -68,7 +68,7 @@ If you unsure where you would like to contribute, you may find ideas on:
 - our [Get Involved page](https://physlib.io/GetInvolved.html)
 - the [quantumInfo todo page](./QuantumInfo/WildeTODO.md)
 > [!NOTE]
-> If stuck at any point there are lots of people happly to help on the [Physlib zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib)
+> If stuck at any point there are lots of people happly to help on the [Physlib zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib)
 
 ### Installing Lean 4
 
@@ -115,7 +115,7 @@ Most importantly:
 ## Maintainers
 
 Below are the maintainers of the project, however the best way to reach them is by posting
-on the [Lean Zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib)
+on the [Lean Zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib)
 
 - Léo Lessa (@Megaleo)
 - Alex Meiburg (@Timeroot)
