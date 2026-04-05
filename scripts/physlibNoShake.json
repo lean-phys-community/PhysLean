@@ -2,10 +2,10 @@
   "ignoreImport": [
     "Lean.Parser.Term",
     "Mathlib.Tactic.FinCases",
-    "PhysLean.Meta.Informal.Basic",
-    "PhysLean.Meta.Informal.SemiFormal",
-    "PhysLean.Meta.TODO.Basic",
-    "PhysLean.Relativity.Tensors.Elab",
+    "Physlib.Meta.Informal.Basic",
+    "Physlib.Meta.Informal.SemiFormal",
+    "Physlib.Meta.TODO.Basic",
+    "Physlib.Relativity.Tensors.Elab",
     "Aesop",
     "Batteries.Classes.SetNotation",
     "Batteries.CodeAction",
@@ -203,7 +203,7 @@
     "Batteries.Tactic.Basic",
     "Mathlib.Mathport.Syntax",
     "Mathlib.Tactic.Linter",
-    "PhysLean.Relativity.Tensors.Elab"
+    "Physlib.Relativity.Tensors.Elab"
   ],
   "ignore": {
     "Mathlib.Util.Notation3": [
