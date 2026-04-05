@@ -24,8 +24,8 @@
 
 [![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlib.io/Stats)
 [![](https://img.shields.io/badge/Lean-v4.28.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.28.0)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/HEPLean/HepLean)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HEPLean/PhysLean)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/leanprover-community/physlib)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/leanprover-community/physlib)
 [![api_docs](https://img.shields.io/badge/doc-API_docs-blue)](https://physlib.io/docs/)
 
 </div>
@@ -131,8 +131,8 @@ If you want to cite the project as a whole please cite:
 
 ```
 @misc{physlib,
-  author = {The PhysLib community},
-  title = {PhysLib: The Lean Physics Library},
+  author = {The Physlib community},
+  title = {Physlib: The Lean Physics Library},
   year = {2024},
   publisher = {GitHub},
   journal = {GitHub repository},
@@ -140,7 +140,7 @@ If you want to cite the project as a whole please cite:
 }
 ```
 
-PhysLib was formed by merging the general physics Lean library PhysLean (formerly called HepLean)
+Physlib was formed by merging the general physics Lean library PhysLean (formerly called HepLean)
 with the quantum-information library Lean-QuantumInfo. Where appropriate please also consider
 citing the papers associated with the origin of these projects. For the former please use:
 ```
