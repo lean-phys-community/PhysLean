@@ -220,7 +220,7 @@ def main (_ : List String) : IO UInt32 := do
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
-  let (hepLeanMod, _) ← readModuleData mFile
+  let (physlibMod, _) ← readModuleData mFile
   let filePaths := hepLeanMod.imports.filterMap (fun imp ↦
     if imp.module == `Init then
       none
