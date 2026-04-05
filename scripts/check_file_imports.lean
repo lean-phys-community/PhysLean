@@ -100,10 +100,10 @@ def main (_ : List String) : IO UInt32 := do
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
-  let (hepLeanMod, _) ← readModuleData mFile
+  let (physlibMod, _) ← readModuleData mFile
   let ePhyslibImports ← expectedPhyslibImports
-  let sortedWarned ← arrayImportSorted hepLeanMod.imports
-  let warned ← checkMissingImports hepLeanMod ePhyslibImports
+  let sortedWarned ← arrayImportSorted physlibMod.imports
+  let warned ← checkMissingImports physlibMod ePhyslibImports
   if (warned ∨ sortedWarned) then
     throw <| IO.userError s!"\x1b[31mThe Physlib.lean file is not sorted, or has missing imports.\x1b[0m"
   else
