@@ -18,7 +18,7 @@ which allows use to go from reasoning about integrals to reasoning about functio
 
 ## Overview of variational calculus
 
-The variational calculus API in PhysLib is designed to match and formalize the physicists intuition
+The variational calculus API in Physlib is designed to match and formalize the physicists intuition
 of variational calculus. It is not designed to be a general API for variational calculus.
 
 Within variational caclulus we are interested in function transformations, `F : (X → U) → (Y → V)`.

@@ -1,6 +1,6 @@
 # Review guidelines
 
-Below we give guidelines to what reviews of pull-requests (PRs) to PhysLib are looking for.
+Below we give guidelines to what reviews of pull-requests (PRs) to Physlib are looking for.
 This list is not exhaustive and reviews are within the judgement of the reviewer.
 
 A good place to start for both authors and reviewers is:
