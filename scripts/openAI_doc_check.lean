@@ -58,8 +58,8 @@ def main (args : List String) : IO UInt32 := do
       let mFile ← findOLean imps.module
       unless (← mFile.pathExists) do
             throw <| IO.userError s!"object file '{mFile}' of module {imps.module} does not exist"
-      let (hepLeanMod, _) ← readModuleData mFile
-      let imports := hepLeanMod.imports
+      let (physlibMod, _) ← readModuleData mFile
+      let imports := physlibMod.imports
       let y ← IO.rand 0 (imports.size -1)
       imp := imports.get! y
     let mFile ← findOLean imp.module
