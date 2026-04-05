@@ -56,7 +56,7 @@ body:
     description: Please check off these items as you complete them
     options:
       - label: Create a tag for the new version.
-      - label: Put a bump notice on this [thread](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/Bumps.20of.20PhysLean.2E/with/572707099).
+      - label: Put a bump notice on this [thread](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/Bumps.20of.20PhysLean.2E/with/572707099).
   validations:
     required: false
 - type: textarea
