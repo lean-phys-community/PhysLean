@@ -34,7 +34,7 @@ def lintStyleCli (args : Cli.Parsed) : IO UInt32 := do
 
 /-- Setting up command line options and help text for `lake exe lint_style`. -/
 -- so far, no help options or so: perhaps that is fine?
-def heplean_lint_style : Cmd := `[Cli|
+def physlib_lint_style : Cmd := `[Cli|
   lint_style VIA lintStyleCli; ["0.0.1"]
   "Run text-based style linters on every Lean file in Physlib (adapted from mathlib's lint_style).
   Print errors about any unexpected style errors to standard output."
