@@ -46,4 +46,4 @@ def physlib_lint_style : Cmd := `[Cli|
 ]
 
 /-- The entry point to the `lake exe mathlib_textLint_on_physlib` command. -/
-def main (args : List String) : IO UInt32 := do heplean_lint_style.validate args
+def main (args : List String) : IO UInt32 := do physlib_lint_style.validate args
