@@ -112,14 +112,45 @@ private def constRadiusRegInvCompPosition (ε : ℝˣ) (i : Fin H.d) := (H.m * H
 -/
 
 /-- `⁅𝐋ᵢⱼ, 𝐀(ε)ₖ⁆ = iℏ(δᵢₖ𝐀(ε)ⱼ - δⱼₖ𝐀(ε)ᵢ)` -/
-@[sorryful]
 lemma angularMomentum_commutation_lrl (ε : ℝˣ) (i j k : Fin H.d) :
     ⁅𝐋[i,j], H.lrlOperator ε k⁆ = (Complex.I * ℏ * δ[i,k]) • H.lrlOperator ε j
     - (Complex.I * ℏ * δ[j,k]) • H.lrlOperator ε i := by
-  sorry
+  simp only [lrlOperator_eq' H ε]
+  simp only [lie_sub, lie_add, lie_sum, lie_smul, lie_leibniz]
+  simp only [angularMomentum_commutation_angularMomentum,
+    angularMomentum_commutation_momentum,
+    angularMomentum_commutation_radiusRegPow,
+    angularMomentum_commutation_position]
+  dsimp only [kroneckerDelta]
+  simp only [comp_sub, comp_smul, zero_comp, add_zero,
+    smul_sub, smul_add, smul_smul]
+  simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib]
+  simp only [Nat.cast_ite, Nat.cast_one, CharP.cast_eq_zero, mul_ite, mul_one, mul_zero,
+    ite_smul, zero_smul, smul_ite, smul_zero,
+    Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+  rw [angularMomentumOperator_antisymm k i, angularMomentumOperator_antisymm k j]
+  simp only [neg_comp, smul_neg]
+  have ite_comp_right : ∀ (p : Prop) [Decidable p]
+      (A B : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ)),
+      (if p then A else 0).comp B = if p then A.comp B else 0 :=
+    fun p _ A B ↦ by split_ifs <;> simp
+  simp only [ite_comp_right,
+    sub_comp, add_comp, smul_comp,
+    Finset.sum_add_distrib, Finset.sum_sub_distrib,
+    Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+  rw [angularMomentumOperator_antisymm i k, angularMomentumOperator_antisymm j k]
+  simp only [neg_comp, smul_neg, neg_neg]
+  split_ifs with hik hjk <;>
+    simp_all only [smul_zero, sub_zero, zero_sub, zero_smul, zero_mul,
+      Finset.sum_const_zero, add_zero, sub_self, neg_zero, neg_neg,
+      ← Finset.smul_sum, angularMomentumOperator_eq_zero, zero_comp] <;>
+    (try simp only [smul_comm (H.m * H.k) (Complex.I * ↑↑ℏ)]) <;>
+    (try conv_lhs => rw [show
+      2⁻¹ * Complex.I * ↑↑ℏ * (↑H.d - 1) * (Complex.I * ↑↑ℏ) =
+      Complex.I * ↑↑ℏ * (2⁻¹ * Complex.I * ↑↑ℏ * (↑H.d - 1)) from by ring]) <;>
+    abel
 
 /-- `⁅𝐋ᵢⱼ, 𝐀(ε)²⁆ = 0` -/
-@[sorryful]
 lemma angularMomentum_commutation_lrlSqr (ε : ℝˣ) (i j : Fin H.d) :
     ⁅𝐋[i,j], H.lrlOperatorSqr ε⁆ = 0 := by
   unfold lrlOperatorSqr
@@ -129,7 +160,6 @@ lemma angularMomentum_commutation_lrlSqr (ε : ℝˣ) (i j : Fin H.d) :
   simp [Finset.sum_add_distrib, Finset.sum_sub_distrib]
 
 /-- `⁅𝐋², 𝐀(ε)²⁆ = 0` -/
-@[sorryful]
 lemma angularMomentumSqr_commutation_lrlSqr (ε : ℝˣ) :
     ⁅angularMomentumOperatorSqr (d := H.d), H.lrlOperatorSqr ε⁆ = 0 := by
   unfold angularMomentumOperatorSqr
