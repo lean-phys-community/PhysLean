@@ -15,13 +15,13 @@ public import Mathlib.Algebra.BigOperators.Pi
 
 This module defines the basic type of multi-indices used to index iterated partial derivatives.
 
-A multi-index on `n` source coordinates is represented as a structure with an underlying function
-`Fin n → ℕ`, together with the first basic operations needed later in the local Classical Field
+A multi-index on `d` source coordinates is represented as a structure with an underlying function
+`Fin d → ℕ`, together with the first basic operations needed later in the local Classical Field
 Theory development.
 
 ## ii. Key results
 
-- `Physlib.MultiIndex` : multi-indices on `n` coordinates.
+- `Physlib.MultiIndex` : multi-indices on `d` coordinates.
 - `MultiIndex.order` : the order `|I|` of a multi-index.
 - `MultiIndex.increment` : increment a single coordinate of a multi-index.
 
@@ -46,21 +46,21 @@ namespace Physlib
 
 -/
 
-/-- A multi-index on `n` source coordinates. -/
-structure MultiIndex (n : ℕ) where
+/-- A multi-index on `d` source coordinates. -/
+structure MultiIndex (d : ℕ) where
   /-- The coordinates of the multi-index. -/
-  toFun : Fin n → ℕ
+  toFun : Fin d → ℕ
 deriving DecidableEq
 
 namespace MultiIndex
 
-variable {n : ℕ}
+variable {d : ℕ}
 
-instance : CoeFun (MultiIndex n) (fun _ => Fin n → ℕ) := ⟨MultiIndex.toFun⟩
+instance : CoeFun (MultiIndex d) (fun _ => Fin d → ℕ) := ⟨MultiIndex.toFun⟩
 
-instance : Zero (MultiIndex n) := ⟨⟨0⟩⟩
+instance : Zero (MultiIndex d) := ⟨⟨0⟩⟩
 
-instance : Add (MultiIndex n) := ⟨fun I J => ⟨I.toFun + J.toFun⟩⟩
+instance : Add (MultiIndex d) := ⟨fun I J => ⟨I.toFun + J.toFun⟩⟩
 
 /-!
 ### A.1. Basic operations
@@ -68,10 +68,10 @@ instance : Add (MultiIndex n) := ⟨fun I J => ⟨I.toFun + J.toFun⟩⟩
 -/
 
 /-- The order `|I|` of a multi-index `I`, defined as the sum of its components. -/
-def order (I : MultiIndex n) : Nat := ∑ i, I i
+def order (I : MultiIndex d) : Nat := ∑ i, I i
 
 /-- Increment the `i`-th coordinate of a multi-index by one. -/
-def increment (I : MultiIndex n) (i : Fin n) : MultiIndex n := ⟨I.toFun + Pi.single i 1⟩
+def increment (I : MultiIndex d) (i : Fin d) : MultiIndex d := ⟨I.toFun + Pi.single i 1⟩
 
 /-!
 ### A.2. Basic lemmas
@@ -79,7 +79,7 @@ def increment (I : MultiIndex n) (i : Fin n) : MultiIndex n := ⟨I.toFun + Pi.s
 -/
 
 @[ext]
-lemma ext {I J : MultiIndex n} (h : ∀ i, I i = J i) : I = J := by
+lemma ext {I J : MultiIndex d} (h : ∀ i, I i = J i) : I = J := by
   cases I
   cases J
   simp only at h
@@ -88,30 +88,30 @@ lemma ext {I J : MultiIndex n} (h : ∀ i, I i = J i) : I = J := by
   exact h i
 
 @[simp]
-lemma zero_apply (i : Fin n) : (0 : MultiIndex n) i = 0 := rfl
+lemma zero_apply (i : Fin d) : (0 : MultiIndex d) i = 0 := rfl
 
 @[simp]
-lemma add_apply (I J : MultiIndex n) (i : Fin n) : (I + J) i = I i + J i := rfl
+lemma add_apply (I J : MultiIndex d) (i : Fin d) : (I + J) i = I i + J i := rfl
 
 @[simp]
-lemma increment_apply_same (I : MultiIndex n) (i : Fin n) :
+lemma increment_apply_same (I : MultiIndex d) (i : Fin d) :
     increment I i i = I i + 1 := by
   simp [increment]
 
 @[simp]
-lemma increment_apply_ne (I : MultiIndex n) {i j : Fin n} (h : j ≠ i) :
+lemma increment_apply_ne (I : MultiIndex d) {i j : Fin d} (h : j ≠ i) :
     increment I i j = I j := by
   simp [increment, Pi.single_eq_of_ne h]
 
 @[simp]
-lemma order_zero : order (0 : MultiIndex n) = 0 := by
+lemma order_zero : order (0 : MultiIndex d) = 0 := by
   simp [order]
 
-lemma order_add (I J : MultiIndex n) : order (I + J) = order I + order J := by
+lemma order_add (I J : MultiIndex d) : order (I + J) = order I + order J := by
   simp [order, Finset.sum_add_distrib]
 
 @[simp]
-lemma order_single (i : Fin n) : order (⟨Pi.single i 1⟩ : MultiIndex n) = 1 := by
+lemma order_single (i : Fin d) : order (⟨Pi.single i 1⟩ : MultiIndex d) = 1 := by
   classical
   unfold order
   rw [Finset.sum_eq_single i]
@@ -122,7 +122,7 @@ lemma order_single (i : Fin n) : order (⟨Pi.single i 1⟩ : MultiIndex n) = 1 
     simp at hi
 
 @[simp]
-lemma order_increment (I : MultiIndex n) (i : Fin n) :
+lemma order_increment (I : MultiIndex d) (i : Fin d) :
     order (increment I i) = order I + 1 := by
   simp [increment, order, Finset.sum_add_distrib]
 
