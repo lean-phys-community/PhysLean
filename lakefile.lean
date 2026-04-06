@@ -1,14 +1,14 @@
 import Lake
 open System Lake DSL
 
-package «PhysLib»
+package «Physlib»
 
 require "mathlib" from git "https://github.com/leanprover-community/mathlib4.git" @ "v4.28.0"
 
 require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "v4.28.0"
 
 @[default_target]
-lean_lib PhysLean where
+lean_lib Physlib where
   moreLeanArgs := #[
     "-Dwarn.sorry=false"
   ]
@@ -44,7 +44,7 @@ lean_exe sorry_lint where
   supportInterpreter := true
   srcDir := "scripts/MetaPrograms"
 
-lean_exe runPhysLeanLinters where
+lean_exe runPhyslibLinters where
   supportInterpreter := true
   srcDir := "scripts/MetaPrograms"
 
@@ -99,7 +99,7 @@ lean_exe notes where
   supportInterpreter := true
   srcDir := "scripts/MetaPrograms"
 
-lean_exe mathlib_textLint_on_hepLean where
+lean_exe mathlib_textLint_on_physlib where
   srcDir := "scripts"
 
 lean_exe no_docs where
@@ -116,7 +116,7 @@ lean_exe no_docs where
 -- Optional inclusion of LeanCopilot
 -- require LeanCopilot from git "https://github.com/lean-dojo/LeanCopilot.git" @ "v1.4.1"
 
--- lean_exe commands defined specifically for PhysLean.
+-- lean_exe commands defined specifically for Physlib.
 
 -- Optional inclusion of openAI_doc_check. Needs `llm` above.
 -- lean_exe openAI_doc_check where

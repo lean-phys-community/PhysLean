@@ -14,7 +14,7 @@ The role of the maintainer team is to:
 ## Becoming a maintainer
 
 Maintainers have research-level knowledge of physics or mathematics, and have
-experience with either the PhysLean or Mathlib review process.
+experience with either the Physlib or Mathlib review process.
 
 To become a maintainer, you either need an invitation from current maintainers, or
 need to nominate yourself to a current maintainer.

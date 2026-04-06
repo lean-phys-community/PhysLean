@@ -11,16 +11,16 @@ import Lean
 
 This file checks that all definitions which form types start with a capital letter
 (or some non-latin character). This linter is not currently strictly enforced
-in PhysLean.
+in Physlib.
 
 
 -/
 open Lean System Meta
 
 
-/-- A rough definition of Upper Camal, checking that if a string starts with a
+/-- A rough definition of Upper Camel, checking that if a string starts with a
 latin letter then that letter is capital.  -/
-def IsUpperCamal (s : String) : Bool :=
+def IsUpperCamel (s : String) : Bool :=
   let parts := s.splitOn "."
   let lastPart := parts.get! (parts.length - 1)
   lastPart = "noConfusionType" ∨
@@ -29,22 +29,22 @@ def IsUpperCamal (s : String) : Bool :=
 
 def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let mods : Name :=  `PhysLean
+  let mods : Name :=  `Physlib
   let imp :  Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
-  let (hepLeanMod, _) ← readModuleData mFile
+  let (physlibMod, _) ← readModuleData mFile
   let mut warned := false
-  for imp in hepLeanMod.imports do
+  for imp in physlibMod.imports do
     let mFile ← findOLean imp.module
     let (modData, _) ← readModuleData mFile
     let cons := modData.constants
     for c in cons do
       if c.hasValue ∧ ¬ Lean.Name.isInternal c.name ∧ Lean.Compiler.LCNF.isTypeFormerType c.type
-        ∧ ¬ IsUpperCamal c.name.toString then
+        ∧ ¬ IsUpperCamel c.name.toString then
           warned := true
           IO.println s!"name: #{c.name}"
   if warned then
-    throw <| IO.userError s!"There are type former definitions not in upper camal style."
+    throw <| IO.userError s!"There are type former definitions not in upper camel style."
   pure 0

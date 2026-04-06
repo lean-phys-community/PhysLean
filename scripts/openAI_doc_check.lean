@@ -12,7 +12,7 @@ import LLM.GPT.Json
 import LLM.GPT.API
 /-!
 
-# PhysLean OpenAI doc check
+# Physlib OpenAI doc check
 
 This file uses the openAI API to check the doc strings of definitions and theorems in a
 Lean 4 file.
@@ -53,13 +53,13 @@ def main (args : List String) : IO UInt32 := do
   | some x => do
     let mut imp : Import := Import.mk x.toName false
     if x == "random" then
-      let mods : Name :=  `PhysLean
+      let mods : Name :=  `Physlib
       let imps :  Import := {module := mods}
       let mFile ← findOLean imps.module
       unless (← mFile.pathExists) do
             throw <| IO.userError s!"object file '{mFile}' of module {imps.module} does not exist"
-      let (hepLeanMod, _) ← readModuleData mFile
-      let imports := hepLeanMod.imports
+      let (physlibMod, _) ← readModuleData mFile
+      let imports := physlibMod.imports
       let y ← IO.rand 0 (imports.size -1)
       imp := imports.get! y
     let mFile ← findOLean imp.module

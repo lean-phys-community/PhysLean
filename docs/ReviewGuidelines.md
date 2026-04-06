@@ -1,6 +1,6 @@
 # Review guidelines
 
-Below we give guidelines to what reviews of pull-requests (PRs) to PhysLib are looking for.
+Below we give guidelines to what reviews of pull-requests (PRs) to Physlib are looking for.
 This list is not exhaustive and reviews are within the judgement of the reviewer.
 
 A good place to start for both authors and reviewers is:
@@ -81,6 +81,6 @@ understand where in the process PRs are.
 - PRs marked with a `awaiting-author` tag will also not be reviewed until the author
   as addressed any reviewer comments and has removed this tag.
 - If your PR is not getting reviewed and you would like to draw attention to it, please
-  post [here](https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLib/topic/PR.20reviews/with/577663418).
+  post [here](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/PR.20reviews/with/577663418).
 - Once a PR is marked with a `ready-to-merge` the author does not need to do anything else,
   the maintainers will make sure it gets merged into the project.

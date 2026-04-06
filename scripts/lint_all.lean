@@ -37,7 +37,7 @@ def main (args : List String) : IO UInt32 := do
     println! "\x1b[2mExpect this linter to take a while to run, it can be skipped with
       lake exe lint_all --fast"
     println! "You can manually perform this linter by placing `#lint` at the end of the files you have modified.\x1b[0m"
-    let leanCheck ← IO.Process.output {cmd := "lake", args := #["exe", "runPhysLeanLinters", "PhysLean"]}
+    let leanCheck ← IO.Process.output {cmd := "lake", args := #["exe", "runPhyslibLinters", "Physlib"]}
     println! leanCheck.stdout
 
     println! "\x1b[36m(7/7) Transitive imports \x1b[0m"

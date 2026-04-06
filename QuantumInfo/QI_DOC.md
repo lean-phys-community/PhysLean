@@ -1,7 +1,7 @@
 # QuantumInfo Documentation
 
 This document provides a comprehensive overview of mathematical and physical definitions in the
-QuantumInfo part of PhysLib, explaining the exact conventions adopted, their motivations,
+QuantumInfo part of Physlib, explaining the exact conventions adopted, their motivations,
 and highlighting key theorems.
 
 ---
