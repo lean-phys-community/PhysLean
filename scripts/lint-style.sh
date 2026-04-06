@@ -10,7 +10,7 @@ set -exo pipefail
 
 touch scripts/style-exceptions.txt
 
-git ls-files 'PhysLean/*.lean' | xargs ./scripts/lint-style.py "$@"
+git ls-files 'Physlib/*.lean' | xargs ./scripts/lint-style.py "$@"
 
 # 2. Global checks on the mathlib repository
 

@@ -28,10 +28,10 @@ Parts of this file are adapted from `Mathlib.Tactic.Linter.TextBased`,
 open Lean System Meta
 
 /-- Given a list of lines, outputs an error message and a line number. -/
-def PhysLeanTextLinter : Type := Array String → Array (String × ℕ × ℕ)
+def PhyslibTextLinter : Type := Array String → Array (String × ℕ × ℕ)
 
 /-- Unneeded parentheses. -/
-def unneededParentheses : PhysLeanTextLinter := fun lines ↦ Id.run do
+def unneededParentheses : PhyslibTextLinter := fun lines ↦ Id.run do
   let regex := re! r" \([a-zA-Z0-9_]*\) "
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap fun (l, lno) => (
@@ -45,7 +45,7 @@ def unneededParentheses : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Checks if there are two consecutive empty lines. -/
-def doubleEmptyLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
+def doubleEmptyLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let pairLines := List.zip enumLines (List.tail! enumLines)
   let errors := pairLines.filterMap (fun ((l1, lno1), l2, _) ↦
@@ -55,7 +55,7 @@ def doubleEmptyLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Checks if there is a double space in the line, which is not at the start. -/
-def doubleSpaceLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
+def doubleSpaceLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if String.containsSubstr l.trimLeft "  " then
@@ -67,7 +67,7 @@ def doubleSpaceLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
     else none)
   errors.toArray
 
-def longLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
+def longLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if l.length > 100 ∧ ¬ String.containsSubstr l "http" then
@@ -76,7 +76,7 @@ def longLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Substring linter. -/
-def substringLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
+def substringLinter (s : String) : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if String.containsSubstr l s then
@@ -88,7 +88,7 @@ def substringLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
     else none)
   errors.toArray
 
-def endLineLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
+def endLineLinter (s : String) : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if l.endsWith s then
@@ -97,7 +97,7 @@ def endLineLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 /-- Number of space at new line must be even. -/
-def numInitialSpacesEven : PhysLeanTextLinter := fun lines ↦ Id.run do
+def numInitialSpacesEven : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     let numSpaces := (l.takeWhile (· == ' ')).length
@@ -106,7 +106,7 @@ def numInitialSpacesEven : PhysLeanTextLinter := fun lines ↦ Id.run do
     else none)
   errors.toArray
 
-structure PhysLeanErrorContext where
+structure PhyslibErrorContext where
   /-- The underlying `message`. -/
   error : String
   /-- The line number -/
@@ -116,14 +116,14 @@ structure PhysLeanErrorContext where
   /-- The file path -/
   path : FilePath
 
-def printErrors (errors : Array PhysLeanErrorContext) : IO Unit := do
+def printErrors (errors : Array PhyslibErrorContext) : IO Unit := do
   for e in errors do
     IO.println (s!"error: {e.path}:{e.lineNumber}:{e.columnNumber}: {e.error}")
 
-def hepLeanLintFile (path : FilePath) : IO (Array PhysLeanErrorContext) := do
+def physlibLintFile (path : FilePath) : IO (Array PhyslibErrorContext) := do
   let lines ← IO.FS.lines path
   let allOutput := (Array.map (fun lint ↦
-    (Array.map (fun (e, n, c) ↦ PhysLeanErrorContext.mk e n c path)) (lint lines)))
+    (Array.map (fun (e, n, c) ↦ PhyslibErrorContext.mk e n c path)) (lint lines)))
     #[doubleEmptyLineLinter, doubleSpaceLinter, numInitialSpacesEven, longLineLinter,
     unneededParentheses,
     substringLinter ".-/", substringLinter " )",
@@ -136,18 +136,18 @@ def hepLeanLintFile (path : FilePath) : IO (Array PhysLeanErrorContext) := do
 
 def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let mods : Name :=  `PhysLean
+  let mods : Name :=  `Physlib
   let imp : Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
-  let (hepLeanMod, _) ← readModuleData mFile
-  let filePaths := hepLeanMod.imports.filterMap (fun imp ↦
+  let (physlibMod, _) ← readModuleData mFile
+  let filePaths := physlibMod.imports.filterMap (fun imp ↦
     if imp.module == `Init then
       none
     else
       some ((mkFilePath (imp.module.toString.split (· == '.'))).addExtension "lean"))
-  let errors := (← filePaths.mapM hepLeanLintFile).flatten
+  let errors := (← filePaths.mapM physlibLintFile).flatten
   let errorMessagesPresent := (errors.map (fun e => e.error)).sortDedup
   for eM in errorMessagesPresent do
     IO.println s!"\n\nError: {eM}"

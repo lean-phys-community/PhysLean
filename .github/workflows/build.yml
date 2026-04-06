@@ -33,7 +33,7 @@ jobs:
         run: |
           lake exe cache get
 
-      - name: build PhysLean
+      - name: build Physlib
         id: build
         uses: liskin/gh-problem-matcher-wrap@v3
         with:
@@ -53,14 +53,14 @@ jobs:
         run: |
           bash -o pipefail -c "env LEAN_ABORT_ON_PANIC=1 lake exe sorry_lint"
 
-      - name: runLinter on PhysLean
+      - name: runLinter on Physlib
         if: ${{ always() && steps.build.outcome == 'success' || steps.build.outcome == 'failure' }}
         id: lint
         uses: liskin/gh-problem-matcher-wrap@v3
         timeout-minutes: 4
         with:
           linters: gcc
-          run: env LEAN_ABORT_ON_PANIC=1 lake exe runPhysLeanLinters
+          run: env LEAN_ABORT_ON_PANIC=1 lake exe runPhyslibLinters
 
   style_lint:
     name: Python based style linter
@@ -97,5 +97,5 @@ jobs:
       - uses: actions/checkout@v6
       - uses: codespell-project/actions-codespell@v2
         with:
-          exclude_file: scripts/MetaPrograms/spellingWords.txt,scripts/physleanNoShake.json
+          exclude_file: scripts/MetaPrograms/spellingWords.txt,scripts/physlibNoShake.json
           ignore_words_file: .codespellignore

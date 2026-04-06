@@ -3,18 +3,18 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Basic
-import PhysLean.Meta.Remark.Properties
-import PhysLean.Meta.Notes.ToHTML
+import Physlib.Meta.Basic
+import Physlib.Meta.Remark.Properties
+import Physlib.Meta.Notes.ToHTML
 import Mathlib.Lean.CoreM
-import PhysLean
+import Physlib
 /-!
 
 # Extracting notes from Lean files
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 inductive NameStatus
   | complete : NameStatus
@@ -149,7 +149,7 @@ def perturbationTheory : Note where
     .name `FieldSpecification.wicks_theorem_context .incomplete,
     .p "In this note we walk through the important parts of the proof of the three versions of
       Wick's theorem for field operators containing carrying both fermionic and bosonic statistics,
-      as it appears in PhysLean. Not every lemma or definition is covered here.
+      as it appears in Physlib. Not every lemma or definition is covered here.
       The aim is to give just enough that the story can be understood.",
     .p "
      Before proceeding with the steps in the proof, we review some basic terminology
@@ -299,10 +299,10 @@ def harmonicOscillator : Note where
       quantum mechanical system. It is often one of the first models encountered by undergraduate
       students studying quantum mechanics.",
     .p " This note presents the formalization of the quantum harmonic oscillator in the theorem prover
-     Lean 4, as part of the larger project PhysLean.
+     Lean 4, as part of the larger project Physlib.
      What this means is that every definition and theorem in this note has been formally checked
      for mathematical correctness for by a computer. There are a number of
-     motivations for doing this which are discussed <a href = 'https://heplean.com'>here</a>.",
+     motivations for doing this which are discussed <a href = 'https://physlib.io'>here</a>.",
     .p "Note that we do not give every definition and theorem which is part of
       the formalization.
      Our goal is give key aspects, in such a way that we hope this note will be useful
@@ -321,7 +321,7 @@ def harmonicOscillator : Note where
     .name ``QuantumMechanics.OneDimension.HarmonicOscillator.schrodingerOperator .complete,
     .name ``QuantumMechanics.OneDimension.HarmonicOscillator.schrodingerOperator_parity .complete,
     .h1 "The eigenfunctions of the Schrodinger Operator",
-    .name ``PhysLean.physHermite .complete,
+    .name ``Physlib.physHermite .complete,
     .name ``QuantumMechanics.OneDimension.HarmonicOscillator.eigenfunction .complete,
     .h2 "Properties of the eigenfunctions",
     .name ``QuantumMechanics.OneDimension.HarmonicOscillator.eigenfunction_integrable .complete,
@@ -380,7 +380,7 @@ def tensors : Note where
     .warning "This note is a work in progress. (5th March 2025)",
     .h1 "Introduction",
     .p "This note is related to: https://arxiv.org/pdf/2411.07667, and concerns the
-      implementation of tensors and index notation into PhysLean, and
+      implementation of tensors and index notation into Physlib, and
       its mathematical structure.",
     .p  "This note is not intended to be a first-introduction to tensors and index notation.",
     .h1 "Tensor Species",
@@ -403,7 +403,7 @@ def notesToMake : List (Note × String) := [
 def makeYML (nt : Note × String) : IO UInt32 := do
   let n := nt.1
   let s := nt.2
-  let ymlString ← CoreM.withImportModules #[`PhysLean] (n.toYML).run'
+  let ymlString ← CoreM.withImportModules #[`Physlib] (n.toYML).run'
   let fileOut : System.FilePath := {toString := s!"./docs/_data/{s}.yml"}
   IO.FS.writeFile fileOut ymlString
   IO.println (s!"YML file made for {n.title}.")

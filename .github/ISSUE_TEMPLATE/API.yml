@@ -27,7 +27,7 @@ body:
 
         ## Corresponding file system
 
-        If it exists, the part of the PhysLean which corresponds to this API.
+        If it exists, the part of the Physlib which corresponds to this API.
 
     validations:
       required: false
