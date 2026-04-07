@@ -497,9 +497,6 @@ private lemma sum_Lprx (d : ℕ) (ε : ℝˣ) :
         simp [momentum_comp_position_eq, symm j i, angularMomentumOperator]
   rw [← angularMomentumSqr_comp_radiusRegPow_commute, angularMomentumOperatorSqr]
 
-private lemma sum_rxp (d : ℕ) (ε : ℝˣ) :
-    ∑ i, 𝐫[d,ε,-1] ∘L 𝐱[i] ∘L 𝐩[i] = 𝐫[ε,-1] ∘L ∑ i, 𝐱[i] ∘L 𝐩[i] := by rw [comp_finset_sum]
-
 private lemma sum_rxpL (d : ℕ) (ε : ℝˣ) :
     ∑ i, ∑ j, 𝐫[d,ε,-1] ∘L 𝐱[i] ∘L 𝐩[j] ∘L 𝐋[i,j] = 𝐫[ε,-1] ∘L 𝐋² := by
   simp_rw [← comp_finset_sum 𝐫[_,_]]
@@ -531,6 +528,9 @@ private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
       ring_nf
       simp_rw [← add_sub_assoc, add_assoc, ← add_smul, sub_eq_add_neg, ← neg_smul]
       ring_nf
+
+private lemma sum_rxp (d : ℕ) (ε : ℝˣ) :
+    ∑ i, 𝐫[d,ε,-1] ∘L 𝐱[i] ∘L 𝐩[i] = 𝐫[ε,-1] ∘L ∑ i, 𝐱[i] ∘L 𝐩[i] := by rw [comp_finset_sum]
 
 private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫[d,ε,-1] ∘L 𝐱[i] ∘L 𝐫[ε,-1] ∘L 𝐱[i] =
     ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) - (ε.1 ^ 2) • 𝐫[ε,-2] := by
