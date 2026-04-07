@@ -54,7 +54,7 @@ macro "∂^[" I:term "]" : term => `(iteratedDeriv $I)
 
 @[simp]
 lemma iteratedDeriv_zero [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
-    (f : Space d → M) : iteratedDeriv (0 : MultiIndex d) f = f := by
+    (f : Space d → M) : ∂^[0] f = f := by
   simp [iteratedDeriv, Physlib.MultiIndex.toList_zero]
 
 @[simp]
