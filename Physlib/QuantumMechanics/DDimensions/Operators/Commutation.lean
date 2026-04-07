@@ -268,6 +268,9 @@ lemma angularMomentumSqr_commutation_radiusRegPow :
     ⁅angularMomentumOperatorSqr (d := d), 𝐫[d,ε,s]⁆ = 0 := by
   simp [angularMomentumOperatorSqr, sum_lie, leibniz_lie]
 
+lemma angularMomentumSqr_comp_radiusRegPow_commute : 𝐋² ∘L 𝐫[d,ε,s] = 𝐫[ε,s] ∘L 𝐋² := by
+  rw [comp_eq_comp_add_commute, angularMomentumSqr_commutation_radiusRegPow, add_zero]
+
 /-!
 
 ### B.5. Angular momentum / momentum
