@@ -830,10 +830,12 @@ lemma quarticTermReduced_nonneg_of_potentialIsStable (P : PotentialParameters)
     use c + c1
   rintro ⟨c, hc⟩
   by_contra hn
-  suffices hs : ∀ x, x ^ 2 ≤ c/b from not_lt_of_ge (hs √(|c/b| + 1)) (by grind)
+  suffices hs : ∀ x, x ^ 2 ≤ c/b from not_lt_of_ge (hs √(|c/b| + 1)) <| by
+    rw [sq_sqrt (by positivity)]
+    grind
   suffices hs : ∀ x, 0 < x → (x + d) ^ 2 ≤ c/b from
     fun x => le_trans ((Real.sqrt_le_left (by grind)).mp
-      (by grind [Real.sqrt_sq_eq_abs])) (hs (|x| + |d| + 1) (by positivity))
+      (by rw [sqrt_sq_eq_abs]; grind)) (hs (|x| + |d| + 1) (by positivity))
   exact fun x hx => (le_div_iff_of_neg (by grind)).mpr (by grind)
 
 set_option backward.isDefEq.respectTransparency false in

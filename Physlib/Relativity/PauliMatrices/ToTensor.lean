@@ -139,7 +139,8 @@ lemma toTensor_basis_expand : σ^^^ =
 open Lorentz in
 set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_eq_asConsTensor :
-    σ^^^ = fromConstTriple PauliMatrix.asConsTensor := by
+    σ^^^ = fromConstTriple (S := complexLorentzTensor)
+      (c1 := Color.up) (c2 := Color.upL) (c3 := Color.upR) PauliMatrix.asConsTensor := by
   symm
   trans fromTripleT PauliMatrix.asTensor
   · rw [fromConstTriple, congrArg fromTripleT PauliMatrix.asConsTensor_apply_one]

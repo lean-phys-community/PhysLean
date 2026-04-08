@@ -47,8 +47,7 @@ lemma contrMetricVal_expand_tmul : contrMetricVal =
 set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ηᵃᵃ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexContr`,
   making its invariance under the action of `SL(2,ℂ)`. -/
-def contrMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexContr where
-  hom := ModuleCat.ofHom {
+def contrMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexContr := Rep.ofHom {
     toFun := fun a =>
       let a' : ℂ := a
       a' • contrMetricVal,
@@ -56,19 +55,18 @@ def contrMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexContr wh
       simp only [add_smul],
     map_smul' := fun m x => by
       simp only [smul_smul]
-      rfl}
-  comm M := by
-    refine ModuleCat.hom_ext ?_
-    refine LinearMap.ext fun x : ℂ => ?_
-    simp only [ModuleCat.hom_comp]
-    change x • contrMetricVal =
-      (TensorProduct.map (complexContr.ρ M) (complexContr.ρ M)) (x • contrMetricVal)
-    simp only [map_smul]
-    apply congrArg
-    simp only [contrMetricVal]
-    rw [contrContrToMatrix_ρ_symm]
-    apply congrArg
-    simp only [LorentzGroup.toComplex_mul_minkowskiMatrix_mul_transpose]
+      rfl
+    isIntertwining' M := by
+      refine LinearMap.ext fun x : ℂ => ?_
+      change x • contrMetricVal =
+        (TensorProduct.map (complexContr.ρ M) (complexContr.ρ M)) (x • contrMetricVal)
+      simp only [map_smul]
+      apply congrArg
+      simp only [contrMetricVal]
+      rw [contrContrToMatrix_ρ_symm]
+      apply congrArg
+      simp only [LorentzGroup.toComplex_mul_minkowskiMatrix_mul_transpose]
+}
 
 lemma contrMetric_apply_one : contrMetric.hom (1 : ℂ) = contrMetricVal := by
   change (1 : ℂ) • contrMetricVal = contrMetricVal
@@ -99,8 +97,7 @@ lemma coMetricVal_expand_tmul : coMetricVal =
 set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ηᵢᵢ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexCo`,
   making its invariance under the action of `SL(2,ℂ)`. -/
-def coMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexCo where
-  hom := ModuleCat.ofHom {
+def coMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexCo := Rep.ofHom {
     toFun := fun a =>
       let a' : ℂ := a
       a' • coMetricVal,
@@ -108,21 +105,20 @@ def coMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexCo where
       simp only [add_smul],
     map_smul' := fun m x => by
       simp only [smul_smul]
-      rfl}
-  comm M := by
-    refine ModuleCat.hom_ext ?_
-    refine LinearMap.ext fun x : ℂ => ?_
-    simp only [ModuleCat.hom_comp]
-    change x • coMetricVal =
-      (TensorProduct.map (complexCo.ρ M) (complexCo.ρ M)) (x • coMetricVal)
-    simp only [map_smul]
-    apply congrArg
-    simp only [coMetricVal]
-    rw [coCoToMatrix_ρ_symm]
-    apply congrArg
-    rw [LorentzGroup.toComplex_inv]
-    simp only [LorentzGroup.inv_eq_dual, SL2C.toLorentzGroup_apply_coe,
-      LorentzGroup.toComplex_transpose_mul_minkowskiMatrix_mul_self]
+      rfl
+    isIntertwining' M := by
+      refine LinearMap.ext fun x : ℂ => ?_
+      change x • coMetricVal =
+        (TensorProduct.map (complexCo.ρ M) (complexCo.ρ M)) (x • coMetricVal)
+      simp only [map_smul]
+      apply congrArg
+      simp only [coMetricVal]
+      rw [coCoToMatrix_ρ_symm]
+      apply congrArg
+      rw [LorentzGroup.toComplex_inv]
+      simp only [LorentzGroup.inv_eq_dual, SL2C.toLorentzGroup_apply_coe,
+        LorentzGroup.toComplex_transpose_mul_minkowskiMatrix_mul_self]
+}
 
 lemma coMetric_apply_one : coMetric.hom (1 : ℂ) = coMetricVal := by
   change (1 : ℂ) • coMetricVal = coMetricVal
@@ -136,55 +132,38 @@ lemma coMetric_apply_one : coMetric.hom (1 : ℂ) = coMetricVal := by
 
 set_option backward.isDefEq.respectTransparency false in
 lemma contrCoContraction_apply_metric : (β_ complexContr complexCo).hom.hom
-    ((complexContr.V ◁ (λ_ complexCo.V).hom)
-    ((complexContr.V ◁ contrCoContraction.hom ▷ complexCo.V)
-    ((complexContr.V ◁ (α_ complexContr.V complexCo.V complexCo.V).inv)
-    ((α_ complexContr.V complexContr.V (complexCo.V ⊗ complexCo.V)).hom
+    ((complexContr ◁ (λ_ complexCo).hom)
+    ((complexContr ◁ contrCoContraction ▷ complexCo)
+    ((complexContr ◁ (α_ complexContr complexCo complexCo).inv)
+    ((α_ complexContr complexContr (complexCo ⊗ complexCo)).hom
     (contrMetric.hom (1 : ℂ) ⊗ₜ[ℂ] coMetric.hom (1 : ℂ)))))) =
     coContrUnit.hom (1 : ℂ) := by
   rw [contrMetric_apply_one, coMetric_apply_one]
   rw [contrMetricVal_expand_tmul, coMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub]
-  have h1 (x1 x2 : complexContr) (y1 y2 :complexCo) :
-    (complexContr.V ◁ (λ_ complexCo.V).hom)
-    ((complexContr.V ◁ contrCoContraction.hom ▷ complexCo.V) (((complexContr.V ◁
-    (α_ complexContr.V complexCo.V complexCo.V).inv)
-    ((α_ complexContr.V complexContr.V (complexCo.V ⊗ complexCo.V)).hom
-    ((x1 ⊗ₜ[ℂ] x2) ⊗ₜ[ℂ] (y1 ⊗ₜ[ℂ] y2))))))
-      = x1 ⊗ₜ[ℂ] ((λ_ complexCo.V).hom ((contrCoContraction.hom (x2 ⊗ₜ[ℂ] y1)) ⊗ₜ[ℂ] y2)) := rfl
-  repeat rw [h1]
-  repeat rw [contrCoContraction_basis']
-  simp only [Fin.isValue, ↓reduceIte, ModuleCat.MonoidalCategory.leftUnitor_hom_apply, one_smul,
-    reduceCtorEq, zero_tmul, map_zero, tmul_zero, sub_zero, zero_sub, Sum.inr.injEq, one_ne_zero,
-    Fin.reduceEq, sub_neg_eq_add, zero_ne_one, sub_self]
-  rw [coContrUnit_apply_one, coContrUnitVal_expand_tmul]
-  rfl
+  simp [← Representation.IntertwiningMap.toLinearMap_apply]
+  repeat erw [contrCoContraction_basis']
+  simp only [Fin.isValue, ↓reduceIte, one_smul, reduceCtorEq, zero_smul, sub_zero, zero_sub,
+    Sum.inr.injEq, one_ne_zero, Fin.reduceEq, sub_neg_eq_add, zero_ne_one, sub_self]
+  erw [coContrUnit_apply_one, coContrUnitVal_expand_tmul]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma coContrContraction_apply_metric : (β_ complexCo complexContr).hom.hom
-    ((complexCo.V ◁ (λ_ complexContr.V).hom)
-    ((complexCo.V ◁ coContrContraction.hom ▷ complexContr.V)
-    ((complexCo.V ◁ (α_ complexCo.V complexContr.V complexContr.V).inv)
-    ((α_ complexCo.V complexCo.V (complexContr.V ⊗ complexContr.V)).hom
+    ((complexCo ◁ (λ_ complexContr).hom)
+    ((complexCo ◁ coContrContraction ▷ complexContr)
+    ((complexCo ◁ (α_ complexCo complexContr complexContr).inv)
+    ((α_ complexCo complexCo (complexContr ⊗ complexContr)).hom
     (coMetric.hom (1 : ℂ) ⊗ₜ[ℂ] contrMetric.hom (1 : ℂ)))))) =
     contrCoUnit.hom (1 : ℂ) := by
   rw [coMetric_apply_one, contrMetric_apply_one]
   rw [coMetricVal_expand_tmul, contrMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub]
-  have h1 (x1 x2 : complexCo) (y1 y2 :complexContr) :
-    (complexCo.V ◁ (λ_ complexContr.V).hom)
-    ((complexCo.V ◁ coContrContraction.hom ▷ complexContr.V) (((complexCo.V ◁
-    (α_ complexCo.V complexContr.V complexContr.V).inv)
-    ((α_ complexCo.V complexCo.V (complexContr.V ⊗ complexContr.V)).hom
-    ((x1 ⊗ₜ[ℂ] x2) ⊗ₜ[ℂ] (y1 ⊗ₜ[ℂ] y2))))))
-      = x1 ⊗ₜ[ℂ] ((λ_ complexContr.V).hom ((coContrContraction.hom (x2 ⊗ₜ[ℂ] y1)) ⊗ₜ[ℂ] y2)) := rfl
-  repeat rw [h1]
-  repeat rw [coContrContraction_basis']
-  simp only [Fin.isValue, ↓reduceIte, ModuleCat.MonoidalCategory.leftUnitor_hom_apply, one_smul,
-    reduceCtorEq, zero_tmul, map_zero, tmul_zero, sub_zero, zero_sub, Sum.inr.injEq, one_ne_zero,
-    Fin.reduceEq, sub_neg_eq_add, zero_ne_one, sub_self]
-  rw [contrCoUnit_apply_one, contrCoUnitVal_expand_tmul]
-  rfl
+  simp [← Representation.IntertwiningMap.toLinearMap_apply]
+  repeat erw [coContrContraction_basis']
+  simp only [Fin.isValue, ↓reduceIte, one_smul, reduceCtorEq, Sum.inr.injEq, one_ne_zero,
+    Fin.reduceEq, zero_ne_one]
+  erw [contrCoUnit_apply_one, contrCoUnitVal_expand_tmul]
+  module
 
 end Lorentz
 end
