@@ -144,24 +144,24 @@ def bijection : linearParameters ≃ (SMNoGrav 1).LinSols where
     erw [speciesVal]
     have h1 := SU3Sol S
     simp only [accSU3, SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero,
-      Fin.isValue, toSpecies_apply, Nat.reduceMul, Finset.sum_singleton, Prod.mk_zero_zero,
+      Fin.isValue, toSpecies_apply, Finset.sum_singleton,
       LinearMap.coe_mk, AddHom.coe_mk] at h1
     have h2 := SU2Sol S
     simp only [accSU2, SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero,
-      Fin.isValue, toSpecies_apply, Nat.reduceMul, Finset.sum_singleton, Prod.mk_zero_zero,
+      Fin.isValue, toSpecies_apply, Finset.sum_singleton,
       LinearMap.coe_mk, AddHom.coe_mk] at h2
     match i with
     | 0 => rfl
     | 1 =>
-      simp only [asCharges, Nat.reduceMul, Fin.isValue, toSpecies_apply]
+      simp only [asCharges, Fin.isValue, toSpecies_apply]
       field_simp
       linear_combination -(1 * h1)
     | 2 =>
-      simp only [asCharges, Nat.reduceMul, Fin.isValue, neg_add_rev, toSpecies_apply]
+      simp only [asCharges, Fin.isValue, neg_add_rev, toSpecies_apply]
       field_simp
       linear_combination -(1 * h1)
     | 3 =>
-      simp only [asCharges, Nat.reduceMul, Fin.isValue, neg_mul, toSpecies_apply]
+      simp only [asCharges, Fin.isValue, neg_mul, toSpecies_apply]
       field_simp
       linear_combination -(1 * h2)
     | 4 => rfl
@@ -286,7 +286,7 @@ lemma cubic (S : linearParametersQENeqZero) :
   field_simp
   simp [hQ]
   ring_nf
-  have h1 : -216 + (-(S.v ^ 3 * 216) - S.w ^ 3 * 216) = - 216 *(S.v ^3 + S.w ^3 +1) := by
+  have h1 : -216 - S.v ^ 3 * 216 - S.w ^ 3 * 216  = - 216 *(S.v ^3 + S.w ^3 +1) := by
     ring
   rw [h1]
   simp_all

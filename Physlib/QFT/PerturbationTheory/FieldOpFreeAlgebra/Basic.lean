@@ -195,7 +195,7 @@ lemma ofFieldOpF_eq_crPartF_add_anPartF (φ : 𝓕.FieldOp) :
   rw [ofFieldOpF]
   cases φ with
   | inAsymp φ => simp [fieldOpToCrAnType]
-  | position φ => simp [fieldOpToCrAnType, CreateAnnihilate.sum_eq]
+  | position φ => simp [fieldOpToCrAnType]; erw [CreateAnnihilate.sum_eq]
   | outAsymp φ => simp [fieldOpToCrAnType]
 
 /-!

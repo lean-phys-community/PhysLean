@@ -446,7 +446,7 @@ instance [i : Nonempty n] : FaithfulSMul ℝ (HermitianMat n 𝕜) where
     simpa [RCLike.smul_re, -mat_apply] using congr(RCLike.re ($(h 1).val i.some i.some))
 
 /-- The continuous linear map associated with a Hermitian matrix. -/
-def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n where
+noncomputable def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n where
   toLinearMap := A.mat.toEuclideanLin
   cont := LinearMap.continuous_of_finiteDimensional _
 
@@ -468,7 +468,7 @@ noncomputable def eigenspace (μ : 𝕜) : Submodule 𝕜 (EuclideanSpace 𝕜 n
 
 /-- The kernel of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
 `LinearMap.ker A.toMat.toEuclideanLin`. Equivalently, the zero-eigenspace. -/
-def ker : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+noncomputable def ker : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   LinearMap.ker A.lin.toLinearMap
 
 theorem mem_ker_iff_mulVec_zero (x : EuclideanSpace 𝕜 n) : x ∈ A.ker ↔ A.mat.mulVec x = 0 := by
@@ -493,7 +493,7 @@ theorem ker_pos_smul {c : ℝ} (hc : c ≠ 0) : (c • A).ker = A.ker := by
 
 /-- The support of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
 `LinearMap.range A.toMat.toEuclideanLin`. Equivalently, the sum of all nonzero eigenspaces. -/
-def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+noncomputable def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   LinearMap.range A.lin.toLinearMap
 
 /-- The support of a Hermitian matrix is the sum of its nonzero eigenspaces. -/

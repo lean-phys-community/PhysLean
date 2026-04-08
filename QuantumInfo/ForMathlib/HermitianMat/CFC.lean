@@ -655,6 +655,7 @@ The proof uses the resolvent approach and compactness.
 Note: we need to connect spectrum ℝ B.mat (the real spectrum) to IsUnit in the complex matrix ring. Use that for self-adjoint elements, t ∈ spectrum ℝ A.mat iff algebraMap ℝ (Matrix d d ℂ) t ∈ spectrum ℂ A.mat, and the resolvent set is open. We can use spectrum.isOpen_resolventSet or the characterization via IsUnit.
 -/
 set_option backward.isDefEq.respectTransparency false in
+set_option maxHeartbeats 400000 in
 lemma spectrum_subset_of_isOpen (A₀ : HermitianMat d ℂ) (U : Set ℝ)
     (hU : IsOpen U) (hAU : spectrum ℝ A₀.mat ⊆ U) :
     ∀ᶠ B in nhds A₀, spectrum ℝ B.mat ⊆ U := by

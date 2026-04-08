@@ -333,6 +333,7 @@ theorem iSup_mono_bot {α : Type*} {ι ι' : Sort*} [CompleteLattice α]
   · refine iSup_mono' (fun i ↦ ?_)
     rcases h i with h | h <;> simp [h]
 
+@[reducible]
 noncomputable def Commute.isSymmetric_directSumDecomposition  {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] {A B : E →ₗ[𝕜] E} [FiniteDimensional 𝕜 E]
   (hA : A.IsSymmetric) (hB : B.IsSymmetric) (hAB : Commute A B) :
@@ -379,7 +380,7 @@ theorem LinearMap.IsSymmetric.directSum_isInternal_of_commute' {𝕜 E : Type*} 
     simp only [DirectSum.coeAddMonoidHom_eq_dfinsuppSum, ZeroMemClass.coe_zero, implies_true,
       DFinsupp.sum_eq_sum_fintype, DFinsupp.equivFunOnFintype_apply]
     -- Since the decomposition is orthogonal, the inner product of x μ₁₂ with any other component is zero. Therefore, the sum simplifies to just the inner product of x μ₁₂ with itself.
-    rw [inner_sum, Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ μ₁₂)]
+    rw [inner_sum, Finset.sum_eq_add_sum_diff_singleton _ _ (by simp)]
     rw [Finset.sdiff_singleton_eq_erase, left_eq_add]
     apply Finset.sum_eq_zero
     intro μ hμ
@@ -553,7 +554,7 @@ theorem star_shared_mul_B_mul_IsDiag : IsDiag
   apply (EuclideanSpace.basisFun d 𝕜).toBasis.ext
   intro i
   simp only [toLpLin_apply, OrthonormalBasis.coe_toBasis, EuclideanSpace.basisFun_apply,
-    EuclideanSpace.ofLp_single, ← mulVec_mulVec, sharedEigenvectorUnitary_mulVec, ← mulVec_mulVec,
+    PiLp.ofLp_single, ← mulVec_mulVec, sharedEigenvectorUnitary_mulVec, ← mulVec_mulVec,
     Matrix.diagonal_mulVec_single, mul_one]
   apply PiLp.ext
   intro j
