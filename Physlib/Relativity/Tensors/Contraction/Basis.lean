@@ -174,11 +174,8 @@ lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (
         simp [Pure.basisVector]
         rw [S.basis_congr (h.2 : S.τ (c i) = c j)]
         simp
-        rfl
       · intro b'' _ hb
-        simp only [Basis.repr_self, Monoidal.tensorUnit_obj, Equivalence.symm_inverse,
-          Action.functorCategoryEquivalence_functor,
-          Action.FunctorCategoryEquivalence.functor_obj_obj, Functor.comp_obj,
+        simp only [Basis.repr_self, Monoidal.tensorUnit_obj, Functor.comp_obj,
           Discrete.functor_obj_eq_as, Function.comp_apply]
         apply mul_eq_zero_of_left
         rw [@MonoidAlgebra.single_apply]

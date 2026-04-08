@@ -92,6 +92,7 @@ variable {k : Type} [CommRing k] {C : Type} [Group G] (S : TensorSpecies k C G)
 /-- The field `repDim` of a `TensorSpecies` is non-zero for all colors. -/
 instance (c : C) : NeZero (S.repDim c) := S.repDim_neZero c
 
+
 @[simp]
 lemma τ_τ_apply (c : C) : S.τ (S.τ c) = c := S.τ_involution c
 

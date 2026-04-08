@@ -39,9 +39,9 @@ lemma unit_app_eq_dual_unit_app (c : C) :
       (β_ (S.FD.obj ({ as := S.τ (S.τ c) })) (S.FD.obj ({ as := S.τ c }))).hom ≫
       ((S.FD.obj ({ as := S.τ c } : Discrete C) ◁ S.FD.map (Discrete.eqToHom (by simp)))) := by
   ext
-  change (ConcreteCategory.hom (S.unit.app { as := c }).hom) (1 : k) = _
+  change ((S.unit.app { as := c }).hom) (1 : k) = _
   rw [S.unit_symm c]
-  simp only [Action.β_hom_hom, Monoidal.tensorUnit_obj, Action.comp_hom]
+  simp only [Monoidal.tensorUnit_obj]
   rfl
 
 set_option backward.isDefEq.respectTransparency false in

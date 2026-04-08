@@ -162,14 +162,13 @@ def ComponentIdx.prodEquiv {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} 
     simp only
     · rw [ComponentIdx.prodIndexEquiv]
       rw [Equiv.piCongr_symm_apply]
-      simp only [Sum.elim_inl, finCongr_symm, finCongr_apply, Fin.val_cast]
+      simp only [Sum.elim_inl, finCongr_symm]
       rw [prod_apply_finSumFinEquiv]
       rfl
     · rw [ComponentIdx.prodIndexEquiv]
       simp only
       erw [Equiv.piCongr_symm_apply]
-      simp only [Sum.elim_inr, finCongr_symm,
-        finCongr_apply, Fin.val_cast]
+      simp only [Sum.elim_inr, finCongr_symm]
       rw [prod_apply_finSumFinEquiv]
       rfl
 
@@ -191,7 +190,7 @@ def Pure.prodIndexEquiv {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     Pure S (Fin.append c c1) ≃
     Π (i : Fin n1 ⊕ Fin n2), S.FD.obj (Discrete.mk ((Sum.elim c c1) i)) :=
   (Equiv.piCongr finSumFinEquiv
-  (fun x => ((Action.forget _ _).mapIso
+  (fun x => (Representation.equivOfIso
     (S.FD.mapIso (Discrete.eqToIso (by cases x <;> simp)))).toLinearEquiv.toEquiv)).symm
 
 /-!
@@ -331,17 +330,11 @@ lemma Pure.prodP_equivariant {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
   | Sum.inl i =>
     simp only [finSumFinEquiv_apply_left, prodP_apply_castAdd]
     generalize_proofs h
-    have h1 := (S.FD.map (eqToHom h)).comm g
-    have h1' := congrFun (congrArg (fun x => x.hom) h1) (p i)
-    simp only [Function.comp_apply, ModuleCat.hom_comp, Rep.ρ_hom, LinearMap.coe_comp] at h1'
-    exact h1'
+    exact LinearMap.congr_fun ((S.FD.map (eqToHom h)).hom.isIntertwining' g) (p i)
   | Sum.inr i =>
     simp only [finSumFinEquiv_apply_right, prodP_apply_natAdd]
     generalize_proofs h
-    have h1 := (S.FD.map (eqToHom h)).comm g
-    have h1' := congrFun (congrArg (fun x => x.hom) h1) (p1 i)
-    simp only [Function.comp_apply, ModuleCat.hom_comp, Rep.ρ_hom, LinearMap.coe_comp] at h1'
-    exact h1'
+    exact LinearMap.congr_fun ((S.FD.map (eqToHom h)).hom.isIntertwining' g) (p1 i)
 
 /-!
 
@@ -657,7 +650,7 @@ lemma Pure.prodP_assoc' {n n1 n2} {c : Fin n → C}
   `S.Tensor (Fin.append c c1)`. -/
 noncomputable def prodIndexEquiv {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     S.F.obj (OverColor.mk (Sum.elim c c1)) ≃ₗ[k] S.Tensor (Fin.append c c1) :=
-  ((Action.forget _ _).mapIso (S.F.mapIso
+  (Representation.equivOfIso (S.F.mapIso
     ((OverColor.equivToIso finSumFinEquiv).trans
     (OverColor.mkIso (by
       funext x
