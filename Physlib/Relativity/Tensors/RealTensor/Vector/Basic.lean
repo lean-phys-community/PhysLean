@@ -81,15 +81,16 @@ lemma abs_component_le_norm {d : ℕ} (v : Vector d) (i : Fin 1 ⊕ Fin d) :
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) where
   dist_self x := by simp [norm_eq_equivEuclid]
   dist_comm x y := by
-    simpa [norm_eq_equivEuclid] using dist_comm ((equivEuclid d) x) _
+    simpa [norm_eq_equivEuclid, dist_eq_norm_neg_add] using dist_comm ((equivEuclid d) x) _
   dist_triangle x y z := by
-    simpa [norm_eq_equivEuclid] using dist_triangle
+    simpa [norm_eq_equivEuclid, dist_eq_norm_neg_add] using dist_triangle
       ((equivEuclid d) x) ((equivEuclid d) y) ((equivEuclid d) z)
   eq_of_dist_eq_zero {x y} := by
-    simp only [norm_eq_equivEuclid, map_sub]
+    simp only [norm_eq_equivEuclid, map_add]
     intro h
     apply (equivEuclid d).injective
-    exact (eq_of_dist_eq_zero h)
+    simp at h
+    grind
 
 set_option backward.isDefEq.respectTransparency false in
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (Vector d) where

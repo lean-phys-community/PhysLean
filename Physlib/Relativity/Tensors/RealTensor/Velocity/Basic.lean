@@ -32,7 +32,7 @@ namespace Velocity
 variable {d : ℕ}
 
 /-- The instance of a topological space on `Velocity d` defined as the subspace topology. -/
-instance : TopologicalSpace (Velocity d) := instTopologicalSpaceSubtype
+noncomputable instance : TopologicalSpace (Velocity d) := instTopologicalSpaceSubtype
 
 @[ext]
 lemma ext {v w : Velocity d} (h : v.1 = w.1) : v = w := by

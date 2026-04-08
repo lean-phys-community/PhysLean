@@ -65,18 +65,21 @@ instance (d : ℕ) : Norm (CoVector d) where
 lemma norm_eq_equivEuclid (d : ℕ) (v : CoVector d) :
     ‖v‖ = ‖equivEuclid d v‖ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (CoVector d) where
   dist_self x := by simp [norm_eq_equivEuclid]
   dist_comm x y := by
-    simpa [norm_eq_equivEuclid] using dist_comm ((equivEuclid d) x) _
+    simpa [norm_eq_equivEuclid, ← dist_eq_norm_neg_add] using
+      dist_comm (equivEuclid d x) (equivEuclid d y)
   dist_triangle x y z := by
-    simpa [norm_eq_equivEuclid] using dist_triangle
+    simpa [norm_eq_equivEuclid, ← dist_eq_norm_neg_add] using dist_triangle
       ((equivEuclid d) x) ((equivEuclid d) y) ((equivEuclid d) z)
   eq_of_dist_eq_zero {x y} := by
-    simp only [norm_eq_equivEuclid, map_sub]
+    simp only [norm_eq_equivEuclid, map_add]
     intro h
     apply (equivEuclid d).injective
-    exact (eq_of_dist_eq_zero h)
+    simp at h
+    grind
 
 set_option backward.isDefEq.respectTransparency false in
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (CoVector d) where

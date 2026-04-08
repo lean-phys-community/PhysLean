@@ -46,6 +46,14 @@ lemma ofCliffordAlgebra_ι_single (i : Fin 3) (r : ℝ) :
     ofCliffordAlgebra (CliffordAlgebra.ι _ (Pi.single i r)) =
         r • ⟨![σ1, σ2, σ3] i, Algebra.subset_adjoin <| by fin_cases i <;> simp⟩ :=
   CliffordAlgebra.lift_ι_apply _ _ _ |>.trans <| Subtype.ext <| by
-    simp +contextual [Fintype.sum_eq_single i]
+    simp only [Fin.isValue, Nat.succ_eq_add_one, Nat.reduceAdd, LinearMap.coe_sum,
+      LinearMap.coe_smulRight, LinearMap.coe_proj, Function.eval, SetLike.mk_smul_mk,
+      Finset.sum_apply, AddSubmonoidClass.coe_finset_sum]
+    rw [Finset.sum_eq_single i]
+    · simp
+    · intro b _ hb
+      simp [Pi.single_eq_of_ne hb]
+      module
+    · simp
 
 end PauliMatrix

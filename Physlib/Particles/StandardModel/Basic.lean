@@ -77,7 +77,7 @@ instance : InvolutiveStar GaugeGroupI where
     ext1 <;> simp
 
 /-- The inclusion of a U(1) subgroup. -/
-def ofU1Subgroup (u1 : unitary ℂ) : GaugeGroupI :=
+noncomputable def ofU1Subgroup (u1 : unitary ℂ) : GaugeGroupI :=
   (1,
   ⟨!![star (u1 ^ 3 : unitary ℂ), 0;0, (u1 ^ 3 : unitary ℂ)], by
     simp only [SetLike.mem_coe]
