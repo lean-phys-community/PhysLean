@@ -690,7 +690,11 @@ lemma spectrum_subset_of_isOpen (A₀ : HermitianMat d ℂ) (U : Set ℝ)
     generalize_proofs at *; (
     have := Metric.isOpen_iff.mp ( h_unitary_open.preimage h_unitary_cont ) ( A₀, t ) h_unitary
     generalize_proofs at *; (
-    obtain ⟨ ε, ε_pos, hε ⟩ := this; exact ⟨ ε, ε_pos, ε, ε_pos, fun B hB s hs => hε ( show ( B, s ) ∈ Metric.ball ( A₀, t ) ε from by simpa [ Prod.dist_eq ] using max_lt hB hs ) ⟩ ;))))
+    obtain ⟨ ε, ε_pos, hε ⟩ := this; exact ⟨ ε, ε_pos, ε, ε_pos, fun B hB s hs => hε ( show ( B, s ) ∈ Metric.ball ( A₀, t ) ε from by
+      simp only [Metric.mem_ball, Prod.dist_eq,]
+      refine max_lt ?_ ?_
+      · simpa [dist_eq_norm] using hB
+      · simpa [dist_eq_norm] using hs) ⟩ ;))))
   generalize_proofs at *; (
   -- By compactness of $K$, finitely many $\epsilon$-balls cover $K$. Take $\delta = \min(1, \min_j \delta_j)$.
   obtain ⟨δ, hδ_pos, hδ⟩ : ∃ δ > 0, ∀ t ∈ K, ∃ ε_t > 0, ∀ B : HermitianMat d ℂ, ‖B - A₀‖ < δ → ∀ s : ℝ, |s - t| < ε_t → IsUnit (B.mat - algebraMap ℝ (Matrix d d ℂ) s) := by
@@ -720,7 +724,10 @@ lemma spectrum_subset_of_isOpen (A₀ : HermitianMat d ℂ) (U : Set ℝ)
     generalize_proofs at *; (
     exact ht ( by simpa [ sub_eq_iff_eq_add ] using h_unit.neg ))
   generalize_proofs at *; (
-  filter_upwards [ Metric.ball_mem_nhds A₀ ( show 0 < Min.min δ 1 by positivity ) ] with B hB using fun t ht => Classical.not_not.1 fun h => h_not_in_K B ( lt_of_lt_of_le hB ( min_le_left _ _ ) ) t ht ⟨ hM B ( lt_of_lt_of_le hB ( min_le_right _ _ ) ) ht, h ⟩)))))
+  filter_upwards [ Metric.ball_mem_nhds A₀ ( show 0 < Min.min δ 1 by positivity ) ] with B hB using fun t ht =>
+      Classical.not_not.1 fun h => h_not_in_K B
+      ( lt_of_lt_of_le (by simpa [dist_eq_norm] using hB) ( min_le_left _ _ ) ) t ht
+      ⟨ hM B ( lt_of_lt_of_le (by simpa [dist_eq_norm] using hB) ( min_le_right _ _ ) ) ht, h ⟩)))))
 
 /-
 PROBLEM
