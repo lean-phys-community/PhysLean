@@ -47,22 +47,6 @@ private lemma npow_indicator_rpow_eq {n : ℕ} {s : Set ℝ} (hs : 0 ∉ s) (p :
   · simp [hr]
 
 set_option backward.isDefEq.respectTransparency false in
-private lemma _root_.MeasureTheory.integrableOn_indicator_iff {s : Set ℝ} (hs : MeasurableSet s)
-    (t : Set ℝ) (f : ℝ → ℝ) :
-    IntegrableOn (s.indicator f) t volume ↔ IntegrableOn f (s ∩ t) volume := by
-  refine and_congr ?_ ?_
-  · rw [← Measure.restrict_restrict hs]
-    constructor <;> intro ⟨g, hg, hg'⟩
-    · use g
-      refine ⟨hg, (ae_eq_restrict_iff_indicator_ae_eq hs).mpr ?_⟩
-      grind [hg'.indicator (s := s), Set.indicator_indicator, Set.inter_self]
-    · use s.indicator g
-      exact ⟨StronglyMeasurable.indicator hg hs, (ae_eq_restrict_iff_indicator_ae_eq hs).mp hg'⟩
-  · have hInt : (fun r ↦ ‖s.indicator f r‖ₑ) = s.indicator (fun r ↦ ‖f r‖ₑ) := by
-      ext r; by_cases hr : r ∈ s <;> simp [hr]
-    simp only [HasFiniteIntegral, hInt, lintegral_indicator hs, Measure.restrict_restrict hs]
-
-set_option backward.isDefEq.respectTransparency false in
 /-- The function `x ↦ ‖x‖ᵖ` is integrable on `{x : Space d | 0 ≤ ‖x‖ < b}` iff `0 < d + p`. -/
 lemma integrableOn_norm_rpow_ball_iff {d : ℕ} (hd : 0 < d) {b : ℝ} (hb : 0 < b) (p : ℝ) :
     IntegrableOn (fun x : Space d ↦ ‖x‖ ^ p) (Metric.ball 0 b) ↔ 0 < d + p := by

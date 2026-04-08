@@ -510,8 +510,10 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
         simp [mul_assoc]
         fun_prop
       · fun_prop
-      · exact η.differentiable
       · fun_prop
+      · intro _ _
+        apply Differentiable.differentiableAt
+        fun_prop
     _ = ∫ (x : Space d), η x *
         (m * ⟪(basis.repr.symm y), x⟫_ℝ * (normPowerSeries n x) ^ (m - 2)) := by
       congr
@@ -736,8 +738,10 @@ lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
         conv => enter [1, x]; rw [fderiv_log_normPowerSeries]
         fun_prop
       · fun_prop
-      · exact η.differentiable
       · fun_prop
+      · intro _ _
+        apply Differentiable.differentiableAt
+        fun_prop
     _ = ∫ (x : Space d), η x * (⟪basis.repr.symm y, x⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ)) := by
       congr
       funext x

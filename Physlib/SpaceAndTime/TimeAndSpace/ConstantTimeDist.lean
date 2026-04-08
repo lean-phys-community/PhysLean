@@ -1102,9 +1102,7 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
       · simp
         exact integrable_time_integral η x
       · fun_prop
-      · apply Differentiable.comp
-        · exact η.smooth'.differentiable (by simp)
-        · fun_prop
+      · fun_prop
   simp
 
 end Space

@@ -298,7 +298,7 @@ lemma deriv_euclid {d ν μ} {f : Space d → EuclideanSpace ℝ (Fin n)}
   rw [deriv_eq_fderiv_basis]
   change fderiv ℝ (EuclideanSpace.proj μ ∘ fun x => f x) x (basis ν) = _
   rw [fderiv_comp]
-  · simp
+  · simp [-EuclideanSpace.coe_proj]
     rw [← deriv_eq_fderiv_basis]
   · fun_prop
   · fun_prop

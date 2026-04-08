@@ -690,9 +690,7 @@ lemma distDeriv_constantSliceDist_same {M : Type} [NormedAddCommGroup M] [Normed
       · simp
         exact schwartzMap_integrable_slice_symm i η x
       · fun_prop
-      · apply Differentiable.comp
-        · exact η.smooth'.differentiable (by simp)
-        · fun_prop
+      · fun_prop
   simp
 
 lemma distDeriv_constantSliceDist_succAbove {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]

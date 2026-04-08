@@ -136,7 +136,8 @@ lemma deriv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
   rw [deriv_eq]
   change fderiv ℝ (EuclideanSpace.proj μ ∘ fun x => f x) t 1 = _
   rw [fderiv_comp]
-  · simp
+  · simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+    PiLp.proj_apply]
     rw [← deriv_eq]
   · fun_prop
   · fun_prop
@@ -146,7 +147,7 @@ lemma fderiv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
     fderiv ℝ (fun t => f t μ) t dt = fderiv ℝ (fun t => f t) t dt μ := by
   change fderiv ℝ (EuclideanSpace.proj μ ∘ fun x => f x) t dt = _
   rw [fderiv_comp]
-  · simp
+  · simp [-EuclideanSpace.coe_proj]
   · fun_prop
   · fun_prop
 

@@ -328,8 +328,8 @@ lemma integrable_time_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
       · fun_prop
       · refine fun x => (norm_sub_le _ _).trans (le_of_sub_nonneg ?_)
         ring_nf
-        simp only [Prod.norm_mk, norm_zero, norm_nonneg, sup_of_le_right,
-          add_add_sub_cancel]
+        simp only [Prod.norm_mk, norm_zero, norm_nonneg, sup_of_le_right]
+        ring_nf
         positivity
     · refine ⟨1, (1 + ‖((0, c) : Time × Space d)‖),
         fun x => (norm_le_norm_add_norm_sub' x (0,c)).trans (le_of_sub_nonneg ?_)⟩

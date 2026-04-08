@@ -132,7 +132,9 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
       intros x hx
     -- hx : x ∈ ball x₀ δ₂, so dist x x₀ < δ₂, hence
     -- this is |⟪u,v⟫| ≤ ‖u‖ * ‖v‖, in the genuine InnerProductSpace on WithLp 2 V
-      have hclose : ‖f₂ x - x₂‖ < ‖x₂‖ / 2 := hδ₂ hx
+      have hclose : ‖f₂ x - x₂‖ < ‖x₂‖ / 2 := by
+        convert hδ₂ hx using 1
+        exact mem_sphere_iff_norm.mp rfl
       have hself : ⟪x₂, x₂⟫_ℝ = ‖x₂‖^2 := real_inner_self_eq_norm_sq (x₂ : WithLp 2 V)
 
       let u := f₂ x - x₂
