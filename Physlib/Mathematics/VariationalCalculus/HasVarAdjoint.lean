@@ -519,7 +519,9 @@ lemma fderiv_apply {dx}
           (by
             simp only [one_mul]
             apply IsTestFunction.integrable
-            fun_prop) (by fun_prop) (IsTestFunction.differentiable (by fun_prop))
+            fun_prop) (by fun_prop) (fun _ _ => by
+            apply Differentiable.differentiableAt
+            fun_prop)
         simpa using h1
     · apply IsTestFunction.integrable
       fun_prop
@@ -642,9 +644,13 @@ lemma adjFDeriv_apply
               · apply IsTestFunction.inner_left
                 · fun_prop
                 · exact hφ
-            · change Differentiable ℝ fun y => f' i (ψ y)
+            · intro _ _
+              apply Differentiable.differentiableAt
+              change Differentiable ℝ fun y => f' i (ψ y)
               fun_prop
-            · fun_prop
+            · intro _ _
+              apply Differentiable.differentiableAt
+              fun_prop
         _ = ∫ (y : X), - (∑ i, fderiv ℝ (fun y' => bX.repr (ψ y') i) y (bX i)) * ⟪dy, φ y⟫_ℝ := by
             rw [← MeasureTheory.integral_finset_sum]
             · congr

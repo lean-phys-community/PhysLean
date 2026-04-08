@@ -476,7 +476,7 @@ private lemma xL_Lx_eq {d : ℕ} (ε : ℝˣ) (i : Fin d) : ∑ j, (𝐱[j] ∘L
         rw [symm j i, eq_one_of_same]
         ext
         simp only [nsmul_eq_mul, comp_add, comp_smulₛₗ, RingHom.id_apply, comp_sub, coe_sub',
-          coe_comp', coe_smul', coe_mul, coe_id', CompTriple.comp_eq, Pi.sub_apply,
+          coe_comp', coe_smul', coe_mul', coe_id', CompTriple.comp_eq, Pi.sub_apply,
           ContinuousLinearMap.add_apply, Function.comp_apply, Pi.smul_apply, natCast_apply,
           map_smul_of_tower, SchwartzMap.sub_apply, SchwartzMap.add_apply, positionOperator_apply,
           momentumOperator_apply, neg_mul, mul_neg, SchwartzMap.smul_apply, smul_eq_mul,
@@ -491,7 +491,7 @@ private lemma xL_Lx_eq {d : ℕ} (ε : ℝˣ) (i : Fin d) : ∑ j, (𝐱[j] ∘L
         rw [comp_eq_comp_add_commute 𝐱[i] 𝐩[j], position_commutation_momentum]
         ext
         simp only [nsmul_eq_mul, comp_add, comp_smulₛₗ, RingHom.id_apply, coe_sub', coe_smul',
-          Pi.sub_apply, ContinuousLinearMap.add_apply, coe_comp', Function.comp_apply, coe_mul,
+          Pi.sub_apply, ContinuousLinearMap.add_apply, coe_comp', Function.comp_apply, coe_mul',
           coe_id', CompTriple.comp_eq, Pi.smul_apply, natCast_apply, map_smul_of_tower,
           SchwartzMap.sub_apply, SchwartzMap.add_apply, positionOperator_apply,
           momentumOperator_apply, neg_mul, mul_neg, SchwartzMap.smul_apply, smul_eq_mul, smul_neg,

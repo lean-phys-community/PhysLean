@@ -289,14 +289,12 @@ lemma ι_timeOrderF_superCommuteF_eq_time {φ ψ : 𝓕.CrAnFieldOp}
           Subalgebra.center ℂ 𝓕.WickAlgebra := by
         apply ι_superCommuteF_ofCrAnOpF_ofCrAnOpF_mem_center
       rw [Subalgebra.mem_center_iff] at hc
-      repeat rw [← mul_assoc]
       rw [hc]
       repeat rw [mul_assoc]
       rw [← map_mul, ← map_mul, ← map_mul]
       rw [← ofCrAnListF_append, ← ofCrAnListF_append, ← ofCrAnListF_append]
       have h1 := insertionSort_of_takeWhile_filter 𝓕.crAnTimeOrderRel φ φs' φs
-      simp  [decide_not, Bool.decide_and, List.append_assoc, List.cons_append,
-        Algebra.mul_smul_comm, map_mul] at h1 ⊢
+      simp  [decide_not, Bool.decide_and, List.append_assoc, List.cons_append] at h1 ⊢
       rw [← h1]
       rw [← crAnTimeOrderList]
       by_cases hq : (𝓕 |>ₛ φ) ≠ (𝓕 |>ₛ ψ)

@@ -194,8 +194,8 @@ lemma oneDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : Spa
 @[simp]
 lemma oneDimPointParticle_electricField_timeDeriv (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     Space.distTimeDeriv ((oneDimPointParticle 𝓕 q r₀).electricField 𝓕.c) = 0 := by
-  rw [oneDimPointParticle_electricField]
-  simp
+  rw [oneDimPointParticle_electricField, map_smul, constantTime_distTimeDeriv]
+  module
 
 /-!
 

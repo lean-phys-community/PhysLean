@@ -41,8 +41,6 @@ lemma B₀_cubic (S T : (SM 3).Charges) : cubeTriLin B₀ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, zero_mul, Nat.reduceMod,
-    Fin.mk_eq_zero, Nat.div_eq_zero_iff, OfNat.ofNat_ne_zero, false_or, imp_false, isEmpty_Prop,
-    not_lt, le_add_iff_nonneg_left, self_le_add_left, IsEmpty.forall_iff, Fin.mk_eq_one,
     Nat.mod_succ, Fin.sum_univ_three, Fin.zero_eta, one_mul, Fin.mk_one, neg_mul, mul_neg,
     Fin.reduceFinMk]
   ring

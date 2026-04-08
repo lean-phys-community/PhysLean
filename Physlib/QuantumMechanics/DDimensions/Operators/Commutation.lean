@@ -337,8 +337,9 @@ lemma angularMomentum_commutation_angularMomentum : ⁅𝐋[i,j], 𝐋[k,l]⁆ =
   dsimp [angularMomentumOperator]
   ext
   simp only [nsmul_eq_mul, coe_smul', coe_sub', Pi.smul_apply, Pi.sub_apply,
-    ContinuousLinearMap.add_apply, coe_mul, SchwartzMap.smul_apply, SchwartzMap.sub_apply,
-    SchwartzMap.add_apply, smul_eq_mul, map_comp_sub]
+    ContinuousLinearMap.add_apply, coe_mul', coe_comp', Function.comp_apply, natCast_apply,
+    SchwartzMap.smul_apply, SchwartzMap.sub_apply, SchwartzMap.add_apply, smul_eq_mul, smul_add,
+    map_comp_sub]
   ring
 
 set_option backward.isDefEq.respectTransparency false in

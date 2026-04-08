@@ -34,8 +34,7 @@ def sort {n : ℕ} (S : (PureU1 n).Charges) : (PureU1 n).Charges :=
   ((FamilyPermutations n).rep (Tuple.sort S).symm S)
 
 lemma sort_sorted {n : ℕ} (S : (PureU1 n).Charges) : Sorted (sort S) := by
-  simp only [Sorted, PureU1_numberCharges, sort, FamilyPermutations, PermGroup, permCharges,
-    MonoidHom.coe_mk, OneHom.coe_mk, chargeMap_apply]
+  simp only [Sorted, PureU1_numberCharges, sort, FamilyPermutations, PermGroup, permCharges]
   intro i j hij
   exact Tuple.monotone_sort S hij
 

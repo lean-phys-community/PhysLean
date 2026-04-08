@@ -69,7 +69,7 @@ lemma integrableOn_norm_rpow_ball_iff {d : ℕ} (hd : 0 < d) {b : ℝ} (hb : 0 <
   trans IntegrableOn (fun r => r ^ (d - 1 + p)) (Set.Ioo 0 b)
   · have hInter : Set.Ioo 0 b ∩ Set.Ioi 0 = Set.Ioo 0 b := by ext; grind
     simp_rw [integrable_fun_norm_addHaar, g, Space.finrank_eq_dim,
-      npow_indicator_rpow_eq (Set.left_notMem_Ioo 0 b),
+      npow_indicator_rpow_eq (Set.left_notMem_Ioo),
       _root_.MeasureTheory.integrableOn_indicator_iff measurableSet_Ioo, hInter, Nat.cast_pred hd]
   rw [intervalIntegral.integrableOn_Ioo_rpow_iff hb, neg_lt_iff_pos_add']
   ring_nf

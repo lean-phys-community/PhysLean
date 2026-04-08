@@ -250,8 +250,8 @@ lemma threeDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : S
 @[simp]
 lemma threeDimPointParticle_electricField_timeDeriv (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     Space.distTimeDeriv ((threeDimPointParticle 𝓕 q r₀).electricField 𝓕.c) = 0 := by
-  rw [threeDimPointParticle_electricField]
-  simp
+  rw [threeDimPointParticle_electricField, map_smul, constantTime_distTimeDeriv]
+  module
 
 /-!
 

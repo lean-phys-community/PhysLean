@@ -357,7 +357,7 @@ lemma generalizedBoost_continuous_snd (u : Velocity d) : Continuous (generalized
     refine continuous_matrix ?_
     intro i j
     simp only [generalizedBoost_apply_eq_minkowskiProduct]
-    refine (continuous_mul_left (η i i)).comp' (?_)
+    refine (continuous_const_mul (η i i)).comp' (?_)
     refine Continuous.sub (by fun_prop) (?_)
     refine .mul (by fun_prop) ?_
     · refine .inv₀ (by fun_prop) ?_
@@ -371,7 +371,7 @@ lemma generalizedBoost_continuous_fst (u : Velocity d) : Continuous (generalized
     refine continuous_matrix ?_
     intro i j
     simp only [generalizedBoost_apply_eq_minkowskiProduct]
-    refine (continuous_mul_left (η i i)).comp' (?_)
+    refine (continuous_const_mul (η i i)).comp' (?_)
     refine Continuous.sub (by fun_prop) (?_)
     refine .mul (by fun_prop) ?_
     · refine .inv₀ (by fun_prop) ?_

@@ -586,7 +586,7 @@ lemma integrable_energy_add (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)]
     (h : Integrable 𝓒.energy (𝓒.μProd T)) (h1 : Integrable 𝓒1.energy (𝓒1.μProd T)) :
     Integrable (𝓒 + 𝓒1).energy ((𝓒 + 𝓒1).μProd T) := by
   rw [μProd_add]
-  refine Integrable.add'' ?_ ?_
+  refine MeasureTheory.Integrable.fun_add ?_ ?_
   · have h1 : (fun (i : ι × ι1) => 𝓒.energy i.1)
       = fun (i : ι × ι1) => 𝓒.energy i.1 * (fun (i : ι1) => 1) i.2 := by
       funext i

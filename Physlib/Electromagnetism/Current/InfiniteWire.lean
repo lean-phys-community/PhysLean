@@ -198,7 +198,9 @@ lemma infiniteWire_vectorPotential_distTimeDeriv (𝓕 : FreeSpace) (I : ℝ) :
     distTimeDeriv ((infiniteWire 𝓕 I).vectorPotential 𝓕.c) = 0 := by
   ext1 η
   ext i
-  simp [infiniteWire_vectorPotential _ I]
+  simp only [ContinuousLinearMap.zero_apply, PiLp.zero_apply]
+  rw [infiniteWire_vectorPotential _ I, constantTime_distTimeDeriv]
+  simp
 
 @[simp]
 lemma infiniteWire_vectorPotential_distSpaceDeriv_0 (𝓕 : FreeSpace) (I : ℝ) :
