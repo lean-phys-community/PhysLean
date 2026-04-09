@@ -349,7 +349,9 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 public import Physlib.SpaceAndTime.Space.Derivatives.Curl
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
 public import Physlib.SpaceAndTime.Space.Derivatives.Grad
+public import Physlib.SpaceAndTime.Space.Derivatives.Iterated
 public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
+public import Physlib.SpaceAndTime.Space.Derivatives.MultiIndex
 public import Physlib.SpaceAndTime.Space.DistConst
 public import Physlib.SpaceAndTime.Space.DistOfFunction
 public import Physlib.SpaceAndTime.Space.Integrals.Basic

@@ -18,11 +18,9 @@ a mass `m > 0` and constant `k` appearing in the potential `V = -k/r`.
 The standard hydrogen atom has `d=3`, `m = mₑmₚ/(mₑ + mₚ) ≈ mₑ` and `k = e²/4πε₀`.
 
 The potential `V = -k/r` is singular at the origin. To address this we define a regularized
-Hamiltonian in which the potential is replaced by `-k(r(ε)⁻¹ + ½ε²r(ε)⁻³)`, where
-`r(ε)² = ‖x‖² + ε²`. The `ε²/r³` term limits to the zero distribution for `ε → 0`
-but is convenient to include for two reasons:
-- It improves the convergence: `r(ε)⁻¹ + ½ε²r(ε)⁻³ = r⁻¹(1 + O(ε⁴/r⁴))` with no `O(ε²/r²)` term.
-- It is what appears in the commutators of the (regularized) LRL vector components.
+Hamiltonian in which the potential is replaced by `-k·r(ε)⁻¹`, where `r(ε)² = ‖x‖² + ε²`.
+This goes by several names including "soft-core" and "truncated" Coulomb potential.
+e.g. see https://doi.org/10.1103/PhysRevA.80.032507 and https://doi.org/10.1063/1.3290740.
 
 -/
 
@@ -54,9 +52,9 @@ lemma m_ne_zero : H.m ≠ 0 := by linarith [H.hm]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The hydrogen atom Hamiltonian regularized by `ε ≠ 0` is defined to be
-  `𝐇(ε) ≔ (2m)⁻¹𝐩² - k(𝐫(ε)⁻¹ + ½ε²𝐫(ε)⁻³)`. -/
+  `𝐇(ε) ≔ (2m)⁻¹𝐩² - k·𝐫(ε)⁻¹`. -/
 def hamiltonianReg (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=
-  (2 * H.m)⁻¹ • 𝐩² - H.k • (𝐫[ε,-1] + (2⁻¹ * ε.1 ^ 2) • 𝐫[ε,-3])
+  (2 * H.m)⁻¹ • 𝐩² - H.k • 𝐫[ε,-1]
 
 end
 end HydrogenAtom

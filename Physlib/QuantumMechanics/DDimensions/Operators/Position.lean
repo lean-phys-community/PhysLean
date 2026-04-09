@@ -40,6 +40,7 @@ Notation:
   - A.1. Position vector
   - A.2. Radius powers (regularized)
   - A.3. Radius powers
+    - A.3.1. As limit of regularized operators
 - B. Unbounded operators
   - B.1. Position vector
   - B.2. Radius powers (regularized)
@@ -272,6 +273,80 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : 0 < d + 2 * s) (ψ 
       · have hs' : ⌈s⌉.toNat = (0 : ℝ) :=
           Nat.cast_eq_zero.mpr <| Int.toNat_of_nonpos <| Int.ceil_le.mpr (by rwa [Int.cast_zero])
         exact hs' ▸ hs
+
+/-!
+#### A.3.1. As limit of regularized operators
+-/
+
+open Filter
+
+/-- Neighborhoods of "0" in the non-zero reals, i.e. those sets containing `(-ε,0) ∪ (0,ε) ⊆ ℝˣ`
+  for some `ε > 0`. -/
+abbrev nhdsZeroUnits : Filter ℝˣ := comap (Units.coeHom ℝ) (nhds 0)
+
+instance : NeBot nhdsZeroUnits := by
+  refine comap_neBot fun t ht ↦ ?_
+  obtain ⟨ε, hε_pos, hε⟩ := Metric.mem_nhds_iff.mp ht
+  use Units.mk0 (ε / 2) (by linarith)
+  apply hε
+  simp [abs_of_pos, hε_pos]
+
+/-- `𝐫[ε,s] ψ` converges pointwise to `𝐫[s] ψ` as `ε → 0` except perhaps at `x = 0`. -/
+lemma radiusRegPow_tendsto_radiusPow {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
+    (hx : x ≠ 0) : Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (𝐫[s] ψ x)) := by
+  have hpow : ‖x‖ ^ s = (‖x‖ ^ 2 + 0 ^ 2) ^ (s / 2) := by
+    simp [← Real.rpow_natCast_mul, mul_div_cancel₀]
+  simp only [radiusRegPowOperator_apply, radiusPowOperator_apply, Complex.real_smul, hpow]
+  refine Tendsto.mul_const (ψ x) <| Tendsto.ofReal ?_
+  refine Tendsto.rpow_const ?_ (Or.inl <| by simp [hx])
+  exact Tendsto.const_add _ <| Tendsto.pow tendsto_comap 2
+
+/-- `𝐫[ε,s] ψ` converges pointwise to `𝐫[s] ψ` as `ε → 0` provided `𝐫[ε,s] ψ 0` is bounded. -/
+lemma radiusRegPow_tendsto_radiusPow' {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (h : 0 ≤ s ∨ ψ 0 = 0) :
+    Tendsto (fun ε ↦ ⇑(𝐫[ε,s] ψ)) nhdsZeroUnits (nhds (𝐫[s] ψ)) := by
+  refine tendsto_pi_nhds.mpr fun x ↦ ?_
+  rcases eq_zero_or_neZero x with (rfl | hx)
+  · rcases h with (hs | hψ)
+    · simp only [radiusRegPowOperator_apply, radiusPowOperator_apply, Complex.real_smul, norm_zero,
+        ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_add]
+      have : (0 : ℝ) ^ s = (0 ^ 2) ^ (s / 2) := by
+        rw [← Real.rpow_natCast_mul (le_refl 0), Nat.cast_ofNat, mul_div_cancel₀ s (by norm_num)]
+      rw [this]
+      refine Tendsto.mul_const (ψ 0) <| Tendsto.ofReal ?_
+      exact Tendsto.rpow_const (Tendsto.pow tendsto_comap 2) (Or.inr <| by linarith)
+    · simp [hψ]
+  · exact radiusRegPow_tendsto_radiusPow s ψ hx.ne
+
+/-- a.e. version of `radiusRegPow_tendsto_radiusPow` -/
+lemma radiusRegPow_ae_tendsto_radiusPow {d : ℕ} (hd : 0 < d) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+    ∀ᵐ x, Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (𝐫[s] ψ x)) := by
+  apply ae_iff.mpr
+  suffices h : {x | ¬Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (𝐫[s] ψ x))} ⊆ {0} by
+    rcases Set.subset_singleton_iff_eq.mp h with (h' | h')
+    · exact h' ▸ measure_empty
+    · have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
+      exact h' ▸ measure_singleton 0
+  intro x hx
+  by_contra hx'
+  exact hx <| radiusRegPow_tendsto_radiusPow s ψ hx'
+
+lemma radiusRegPow_ae_tendsto_iff {d : ℕ} (hd : 0 < d) {s : ℝ} {ψ : 𝓢(Space d, ℂ)}
+    {φ : Space d → ℂ} : (∀ᵐ x, Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (φ x)))
+    ↔ φ =ᵐ[volume] 𝐫[s] ψ := by
+  let t₁ := {x | ¬Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (φ x))}
+  let t₂ := {x | φ x ≠ 𝐫[s] ψ x}
+  show volume t₁ = 0 ↔ volume t₂ = 0
+  suffices heq : t₁ ∪ {0} = t₂ ∪ {0} by
+    have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
+    have hUnion : ∀ t : Set (Space d), volume t = 0 ↔ volume (t ∪ {0}) = 0 :=
+      fun _ ↦ by simp only [measure_union_null_iff, measure_singleton, and_true]
+    rw [hUnion t₁, hUnion t₂, heq]
+  ext x
+  rcases eq_zero_or_neZero x with (rfl | hx)
+  · simp
+  · simp only [Set.union_singleton, Set.mem_insert_iff, hx.ne, false_or]
+    have hLim := radiusRegPow_tendsto_radiusPow s ψ hx.ne
+    exact not_congr ⟨fun h ↦ tendsto_nhds_unique h hLim, fun h ↦ h ▸ hLim⟩
 
 end
 
