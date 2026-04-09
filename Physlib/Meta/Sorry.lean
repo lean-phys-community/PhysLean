@@ -104,7 +104,7 @@ partial def collect (c : Name) (parents : NameSet) : M Unit := do
     | some (ConstantInfo.axiomInfo v) =>
         if v.name == ``sorryAx then
             modify fun s => { s with containsSorry := s.containsSorry.append (parents.insert c) }
-        if v.name == ``Lean.ofReduceBool then
+        if v.name == ``Lean.ofReduceBool || (toString v.name).contains "native_decide" then
             modify fun s => { s with containsOfReduceBool :=
               s.containsOfReduceBool.append (parents.insert c)}
         collectExpr v.type
@@ -210,9 +210,11 @@ unsafe def sorryfulPseudoTest : MetaM Unit := do
   {withSorryAxiomNotAttributed}
   The following names are attributed `sorryful` but do not depend on `sorryAx`:
   {attributedNotWithSorryAxiom}
-  The following names depend on `Lean.ofReduceBool` but are not attributed `pseudo`:
+  The following names depend on `Lean.ofReduceBool` or `native_decide`
+  but are not attributed `pseudo`:
   {withPseudoAxiomNotAttributed}
-  The following names are attributed `pseudo` but do not depend on `Lean.ofReduceBool`:
+  The following names are attributed `pseudo` but do not depend on `Lean.ofReduceBool`
+  or `native_decide`:
   {attributedNotWithPseudoAxiom}"
   println! "\x1b[32mSorryful/pseudo results are all correctly attributed test passed.\x1b[0m"
 

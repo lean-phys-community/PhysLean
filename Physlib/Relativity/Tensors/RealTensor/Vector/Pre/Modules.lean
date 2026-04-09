@@ -258,8 +258,9 @@ lemma toSelfAdjoint_stdBasis (i : Fin 1 ⊕ Fin 3) :
   match i with
   | Sum.inl 0 =>
     simp only [stdBasis, Fin.isValue, Basis.coe_ofEquivFun, LinearEquiv.apply_symm_apply,
-      Pi.single_eq_same, MulAction.one_smul, ne_eq, reduceCtorEq, not_false_eq_true, Pi.single_eq_of_ne,
-      MulActionWithZero.zero_smul, sub_zero, PauliMatrix.pauliBasis', Basis.coe_mk, PauliMatrix.pauliSelfAdjoint']
+      Pi.single_eq_same, MulAction.one_smul, ne_eq, reduceCtorEq, not_false_eq_true,
+      Pi.single_eq_of_ne, MulActionWithZero.zero_smul, sub_zero, PauliMatrix.pauliBasis',
+      Basis.coe_mk, PauliMatrix.pauliSelfAdjoint']
   | Sum.inr 0 =>
     simp only [stdBasis, Fin.isValue, Basis.coe_ofEquivFun, LinearEquiv.apply_symm_apply, ne_eq,
       reduceCtorEq, not_false_eq_true, Pi.single_eq_of_ne, zero_smul, Pi.single_eq_same, one_smul,

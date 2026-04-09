@@ -43,7 +43,7 @@ lemma contrCoUnitVal_expand_tmul : contrCoUnitVal =
 
 lemma contrCoUnitVal_eq_sum_tmul : contrCoUnitVal =
     ∑ i, complexContrBasis i ⊗ₜ[ℂ] complexCoBasis i := by
-  simp  [contrCoUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
+  simp [contrCoUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
   module
 
 set_option backward.isDefEq.respectTransparency false in
@@ -96,7 +96,7 @@ lemma coContrUnitVal_expand_tmul : coContrUnitVal =
 
 lemma coContrUnitVal_eq_sum_tmul : coContrUnitVal =
     ∑ i, complexCoBasis i ⊗ₜ[ℂ] complexContrBasis i := by
-  simp  [coContrUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
+  simp [coContrUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
   module
 
 set_option backward.isDefEq.respectTransparency false in
@@ -146,7 +146,7 @@ lemma contr_contrCoUnit (x : complexCo) :
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span complexCoBasis x)
   subst hc
   rw [contrCoUnit_apply_one, contrCoUnitVal_eq_sum_tmul]
-  simp  [- Fintype.sum_sum_type, tmul_sum, sum_tmul, map_sum, Representation.TensorProduct.assoc,
+  simp [- Fintype.sum_sum_type, tmul_sum, sum_tmul, map_sum, Representation.TensorProduct.assoc,
     ← Representation.IntertwiningMap.toLinearMap_apply, smul_tmul]
   conv_lhs =>
     enter [2,x, 2, y]
@@ -164,7 +164,7 @@ lemma contr_coContrUnit (x : complexContr) :
     (Basis.mem_span complexContrBasis x)
   subst hc
   rw [coContrUnit_apply_one, coContrUnitVal_eq_sum_tmul]
-  simp  [- Fintype.sum_sum_type, tmul_sum, sum_tmul, map_sum, Representation.TensorProduct.assoc,
+  simp [- Fintype.sum_sum_type, tmul_sum, sum_tmul, map_sum, Representation.TensorProduct.assoc,
     ← Representation.IntertwiningMap.toLinearMap_apply, smul_tmul]
   conv_lhs =>
     enter [2,x, 2, y]

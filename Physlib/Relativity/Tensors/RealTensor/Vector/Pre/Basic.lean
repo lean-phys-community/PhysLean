@@ -120,7 +120,7 @@ open CategoryTheory.MonoidalCategory
 
 /-- The morphism of representations from `Contr d` to `Co d` defined by multiplication
   with the metric. -/
-def Contr.toCo (d : ℕ) : Contr d ⟶ Co d :=  Rep.ofHom <|
+def Contr.toCo (d : ℕ) : Contr d ⟶ Co d := Rep.ofHom <|
   {
     toFun := fun ψ => CoMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ),
     map_add' := by
@@ -137,10 +137,9 @@ def Contr.toCo (d : ℕ) : Contr d ⟶ Co d :=  Rep.ofHom <|
       rfl
   }
 
-
 /-- The morphism of representations from `Co d` to `Contr d` defined by multiplication
   with the metric. -/
-def Co.toContr (d : ℕ) : Co d ⟶ Contr d :=  Rep.ofHom <|
+def Co.toContr (d : ℕ) : Co d ⟶ Contr d := Rep.ofHom <|
     {
       toFun := fun ψ => ContrMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)
       map_add' := by

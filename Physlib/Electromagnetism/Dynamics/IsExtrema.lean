@@ -777,7 +777,7 @@ lemma isExterma_equivariant {𝓕 : FreeSpace}
     enter [x]
     rw [smul_comm]
     rw [Tensorial.toTensor_smul, lorentzGroup_smul_dist_apply, Tensorial.toTensor_smul]
-    simp only [ one_div, map_smul, actionT_smul,
+    simp only [one_div, map_smul, actionT_smul,
       contrT_equivariant, map_neg, permT_equivariant]
     rw [smul_comm, ← Tensor.actionT_neg, ← Tensor.actionT_add]
   apply Iff.intro

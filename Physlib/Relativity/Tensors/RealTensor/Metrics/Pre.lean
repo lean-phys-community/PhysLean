@@ -80,7 +80,6 @@ def preContrMetric (d : ℕ := 3) : 𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ Contr d
       simp
     }
 
-
 lemma preContrMetric_apply_one {d : ℕ} : (preContrMetric d).hom (1 : ℝ) = preContrMetricVal d:= by
   change (1 : ℝ) • preContrMetricVal d = preContrMetricVal d
   rw [one_smul]
@@ -123,7 +122,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ηᵢᵢ` as a morphism `𝟙_ (Rep ℂ (LorentzGroup d))) ⟶ Co d ⊗ Co d`,
   making its invariance under the action of `LorentzGroup d`. -/
 def preCoMetric (d : ℕ := 3) : 𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ Co d ⊗ Co d := Rep.ofHom
- {
+  {
     toFun := fun a => a • preCoMetricVal d,
     map_add' := fun x y => by
       simp only [add_smul],
@@ -184,7 +183,8 @@ lemma contrCoContract_apply_metric {d : ℕ} :
         rw [mul_comm]
     _ = ((β_ (Contr d) (Co d)).hom.hom <| ((Contr d) ◁ (λ_ (Co d)).hom).hom <|
       ∑ i, ∑ j, (minkowskiMatrix i i * minkowskiMatrix j j) •
-        (contrBasis d i ⊗ₜ[ℝ] (contrCoContract (contrBasis d i ⊗ₜ[ℝ] coBasis d j) ⊗ₜ[ℝ] coBasis d j))) := by
+        (contrBasis d i ⊗ₜ[ℝ] (contrCoContract (contrBasis d i ⊗ₜ[ℝ] coBasis d j)
+          ⊗ₜ[ℝ] coBasis d j))) := by
         congr
         simp only [map_sum, map_smul]
         rfl
@@ -218,7 +218,7 @@ lemma coContrContract_apply_metric {d : ℕ} :
     (((Co d) ◁ (α_ ((Co d)) (Contr d) (Contr d)).inv).hom
     ((α_ ((Co d)) ((Co d)) ((Contr d) ⊗ (Contr d))).hom.hom
     ((preCoMetric d).hom (1 : ℝ) ⊗ₜ[ℝ] (preContrMetric d).hom (1 : ℝ))))))
-    = (preContrCoUnit d).hom (1 : ℝ)  := by
+    = (preContrCoUnit d).hom (1 : ℝ) := by
   calc _
     _ = ((β_ (Co d) (Contr d)).hom.hom <| ((Co d) ◁ (λ_ (Contr d)).hom).hom <|
       (((Co d) ◁ coContrContract ▷ (Contr d))).hom <|
@@ -239,7 +239,8 @@ lemma coContrContract_apply_metric {d : ℕ} :
         rw [mul_comm]
     _ = ((β_ (Co d) (Contr d)).hom.hom <| ((Co d) ◁ (λ_ (Contr d)).hom).hom <|
       ∑ i, ∑ j, (minkowskiMatrix i i * minkowskiMatrix j j) •
-        (coBasis d i ⊗ₜ[ℝ] (coContrContract (coBasis d i ⊗ₜ[ℝ] contrBasis d j) ⊗ₜ[ℝ] contrBasis d j))) := by
+        (coBasis d i ⊗ₜ[ℝ] (coContrContract (coBasis d i ⊗ₜ[ℝ] contrBasis d j)
+          ⊗ₜ[ℝ] contrBasis d j))) := by
         congr
         simp only [map_sum, map_smul]
         rfl

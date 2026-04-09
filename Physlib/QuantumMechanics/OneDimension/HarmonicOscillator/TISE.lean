@@ -234,7 +234,8 @@ lemma deriv_deriv_eigenfunction (n : ℕ) (x : ℝ) :
         simp only [nsmul_eq_mul, cast_ofNat, derivative_physHermite, map_sub, map_mul,
           Polynomial.aeval_X, map_natCast, Complex.ofReal_sub, Complex.ofReal_mul,
           Complex.ofReal_natCast]
-        rw [show (Polynomial.aeval (x / Q.ξ)) 2 = 2 by simp [Polynomial.aevalEquiv, Polynomial.aeval]]
+        rw [show (Polynomial.aeval (x / Q.ξ)) 2 = 2 by
+          simp [Polynomial.aevalEquiv, Polynomial.aeval]]
         simp only [one_div, Complex.ofReal_ofNat, Complex.ofReal_div]
         field_simp
       ring

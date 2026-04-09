@@ -80,7 +80,6 @@ lemma nsmul_val {d : ℕ} (n : ℕ) (a : Space d) :
 lemma nsmul_apply {d : ℕ} (n : ℕ) (a : Space d) (i : Fin d) :
     (n • a) i = n • (a i) := by rfl
 
-
 lemma eq_vadd_zero {d} (s : Space d) :
     ∃ v : EuclideanSpace ℝ (Fin d), s = v +ᵥ (0 : Space d) := by
   obtain ⟨v, h⟩ := vadd_transitive 0 s
@@ -138,7 +137,6 @@ instance {d} : Module ℝ (Space d) where
   zero_smul x := by
     ext i
     simp
-
 
 /-!
 
@@ -220,7 +218,6 @@ lemma vadd_zero_sub_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
     (v1 +ᵥ (0 : Space d)) - (v2 +ᵥ (0 : Space d)) = (v1 - v2) +ᵥ (0 : Space d) := by
   ext i
   simp [sub_apply, vadd_apply]
-
 
 @[simp]
 lemma dist_eq_norm {d} (p q : Space d) :
@@ -502,7 +499,7 @@ lemma mk_differentiable {d : ℕ} :
     Differentiable ℝ (fun (f : Fin d → ℝ) => (⟨f⟩ : Space d)) := (equivPi d).symm.differentiable
 
 @[fun_prop]
-lemma mk_contDiff {d  : ℕ} {n : WithTop ℕ∞}:
+lemma mk_contDiff {d : ℕ} {n : WithTop ℕ∞}:
     ContDiff ℝ n (fun (f : Fin d → ℝ) => (⟨f⟩ : Space d)) := (equivPi d).symm.contDiff
 
 @[simp]
@@ -541,8 +538,8 @@ lemma vsub_differentiable {d} (s1 : Space d) :
   (PiLp.contDiff_toLp.differentiable (NeZero.ne' 2).symm).comp (by fun_prop)
 
 lemma fderiv_space_components {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
-    (μ : Fin d) (f : M → Space d) (hf : Differentiable ℝ f) (m dm : M):
-    fderiv ℝ f m dm μ  = fderiv ℝ (fun m' => f m' μ) m dm := by
+    (μ : Fin d) (f : M → Space d) (hf : Differentiable ℝ f) (m dm : M) :
+    fderiv ℝ f m dm μ = fderiv ℝ (fun m' => f m' μ) m dm := by
   trans fderiv ℝ (Space.coordCLM μ ∘ fun m' => f m') m dm
   · rw [fderiv_comp _ (by fun_prop) (by fun_prop), ContinuousLinearMap.fderiv,
       ContinuousLinearMap.coe_comp', Function.comp_apply]
@@ -669,8 +666,8 @@ set_option backward.isDefEq.respectTransparency false in
   that equivalent to `manifoldStructure d` and that equivalent to `𝓘(ℝ, Space d)` -/
 noncomputable def modelDiffeo {d} :
     Diffeomorph (manifoldStructure d) 𝓘(ℝ, Space d) (Space d) (Space d) ⊤ where
-  toFun p :=  p
-  invFun p :=  p
+  toFun p := p
+  invFun p := p
   left_inv _ := rfl
   right_inv _ := rfl
   contMDiff_toFun := by
@@ -704,7 +701,6 @@ lemma basis_eq_mfderiv_modelDiffeo_single (d : ℕ) (μ : Fin d) (x : Space d) :
   simp only [basis_apply, ContinuousLinearMap.fderiv, PiLp.proj_apply, PiLp.single_apply]
   congr 1
   exact Eq.propIntro (fun a => Eq.symm a) fun a => (Eq.symm a)
-
 
 /-!
 

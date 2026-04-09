@@ -99,7 +99,6 @@ a universal manner. -/
 def familyUniversal (n : ℕ) : (SMνCharges 1).Charges →ₗ[ℚ] (SMνCharges n).Charges :=
   chargesMapOfSpeciesMap (speciesFamilyUniversial n)
 
-
 lemma toSpecies_familyUniversal {n : ℕ} (j : Fin 6) (S : (SMνCharges 1).Charges)
     (i : Fin n) : toSpecies j (familyUniversal n S) i = toSpecies j S ⟨0, by simp⟩ := by
   erw [chargesMapOfSpeciesMap_toSpecies]

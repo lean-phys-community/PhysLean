@@ -26,7 +26,6 @@ open BigOperators
 
 namespace PlaneSeven
 
-
 /-- A charge assignment forming one of the basis elements of the plane. -/
 def B₀ : (SM 3).Charges := toSpeciesEquiv.invFun (fun s => fun i =>
   match s, i with

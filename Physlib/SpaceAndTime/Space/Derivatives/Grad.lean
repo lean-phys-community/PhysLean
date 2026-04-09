@@ -538,7 +538,7 @@ noncomputable def gradSchwartz {d} : 𝓢(Space d, ℝ) →L[ℝ] 𝓢(Space d, 
       ∘L SchwartzMap.evalCLM ℝ (Space d) ℝ (basis i)
       ∘L SchwartzMap.fderivCLM ℝ (Space d) ℝ
 
-lemma gradSchwartz_apply_eq_grad {d} (η : 𝓢(Space d, ℝ)) (x : Space d):
+lemma gradSchwartz_apply_eq_grad {d} (η : 𝓢(Space d, ℝ)) (x : Space d) :
     gradSchwartz η x = grad η x := by
   simp [gradSchwartz, grad_eq_sum]
   rfl

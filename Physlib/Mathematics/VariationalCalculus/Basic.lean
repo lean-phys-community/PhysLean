@@ -30,7 +30,7 @@ The action is nominally given by
 $$S[u] = \int L(u, t) dt,$$
 however it is convenient to
 introduce another function `φ` and define the action as
-$$S[u] = \int φ(t)  L(u, t) dt.$$
+$$S[u] = \int φ(t) L(u, t) dt.$$
 In the end we will set `φ := fun _ => 1`.
 
 We now consider $$\frac{\partial}{\partial s} S[u + s * \delta u]$$ at `s = 0`,
@@ -58,7 +58,7 @@ variational gradient at `u`. The Euler–Lagrange equations, for example, are th
 
 In our API, the relationship between
 - `Lᵤ` and `Gᵤ` is captured by the `HasVarAdjoint`.
-- `L` and  `Gᵤ` by `HasVarAdjDeriv`.
+- `L` and `Gᵤ` by `HasVarAdjDeriv`.
 - `L` and `grad u` by `HasVarGradientAt`.
 
 In practice we assume that `L` has a certain locality property

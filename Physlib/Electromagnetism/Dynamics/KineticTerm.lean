@@ -1083,7 +1083,6 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
       decide
     · rfl
 
-
 end ElectromagneticPotential
 
 /-!

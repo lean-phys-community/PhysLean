@@ -43,7 +43,7 @@ unsafe def tagDuplicateTest : MetaM Unit := do
     panic! s!"Duplicate tags found: {duplicates}"
   pure ()
 
-unsafe def main (args : List String) : IO UInt32 := do
+unsafe def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
   println! "Checking for duplicate tags."
   let env ← importModules (loadExts := true) #[`Physlib] {} 0

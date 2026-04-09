@@ -134,7 +134,7 @@ def getDocString (c : Name) : CoreM String := do
   let env ← getEnv
   match ← findInternalDocString? env c with
   | some (.inl s) => return s
-  | some (.inr _) => return ""   -- Verso docstring, ignore for now
+  | some (.inr _) => return "" -- Verso docstring, ignore for now
   | none => return ""
 
 /-- Given a name, returns the source code defining that name, including doc strings. -/

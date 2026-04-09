@@ -662,7 +662,8 @@ lemma contrPCoeff_update_snd_add {n : ℕ} [inst : DecidableEq (Fin n)] {c : Fin
     contrPCoeff i j hij (p.update j x) + contrPCoeff i j hij (p.update j y) := by
   simp only [contrPCoeff, Monoidal.tensorUnit_obj,
     Functor.comp_obj, Discrete.functor_obj_eq_as, Function.comp_apply, update, Function.update_self]
-  change ((S.contr.app { as := c i })).hom.toLinearMap _ = ((S.contr.app { as := c i })).hom.toLinearMap _
+  change ((S.contr.app { as := c i })).hom.toLinearMap _ =
+    ((S.contr.app { as := c i })).hom.toLinearMap _
     + ((S.contr.app { as := c i })).hom.toLinearMap _
   rw [Function.update_of_ne hij.1, Function.update_of_ne hij.1,
     Function.update_of_ne hij.1]
@@ -685,7 +686,8 @@ lemma contrPCoeff_update_fst_smul {n : ℕ} [inst : DecidableEq (Fin n)] {c : Fi
   change ((S.contr.app { as := c i })).hom.toLinearMap _ = r * _
   simp only [Monoidal.tensorUnit_obj, LinearMap.map_smul, smul_eq_mul]
   congr 1
-  change ((S.contr.app { as := c i })).hom.toLinearMap _ = ((S.contr.app { as := c i })).hom.toLinearMap _
+  change ((S.contr.app { as := c i })).hom.toLinearMap _ =
+    ((S.contr.app { as := c i })).hom.toLinearMap _
   rw [Function.update_of_ne (Ne.symm hij.1), Function.update_of_ne (Ne.symm hij.1)]
 
 set_option backward.isDefEq.respectTransparency false in

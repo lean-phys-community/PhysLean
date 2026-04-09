@@ -81,9 +81,10 @@ def contrContrCoBi : complexCo →ₗ[ℂ] complexContr →ₗ[ℂ] ℂ where
 def contrCoContraction : complexContr ⊗ complexCo ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) := Rep.ofHom
   {
     toLinearMap := TensorProduct.lift contrCoContrBi,
-    isIntertwining' M :=  TensorProduct.ext' fun ψ φ => by
+    isIntertwining' M := TensorProduct.ext' fun ψ φ => by
       change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) ⬝ᵥ
-        ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ
+        ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) =
+          ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ
       rw [dotProduct_mulVec, vecMul_transpose, mulVec_mulVec]
       rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
       simp
@@ -121,7 +122,7 @@ lemma contrCoContraction_basis' (i j : Fin 1 ⊕ Fin 3) :
 def coContrContraction : complexCo ⊗ complexContr ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) := Rep.ofHom
   {
   toLinearMap := TensorProduct.lift contrContrCoBi,
-  isIntertwining' M :=  TensorProduct.ext' fun φ ψ => by
+  isIntertwining' M := TensorProduct.ext' fun φ ψ => by
     change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) ⬝ᵥ
       ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ
     rw [dotProduct_mulVec, mulVec_transpose, vecMul_vecMul]

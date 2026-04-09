@@ -68,8 +68,6 @@ def preContrCoUnit (d : ℕ := 3) : 𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ Contr d
       simp
   }
 
-
-
 lemma preContrCoUnit_apply_one {d : ℕ} : (preContrCoUnit d).hom (1 : ℝ) = preContrCoUnitVal d := by
   change (1 : ℝ) • preContrCoUnitVal d = preContrCoUnitVal d
   rw [one_smul]
@@ -123,7 +121,6 @@ def preCoContrUnit (d : ℕ) : 𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ Co d ⊗ Con
       symm
       refine transpose_eq_one.mp ?h.h.h.a
       simp}
-
 
 lemma preCoContrUnit_apply_one {d : ℕ} : (preCoContrUnit d).hom (1 : ℝ) = preCoContrUnitVal d := by
   change (1 : ℝ) • preCoContrUnitVal d = preCoContrUnitVal d

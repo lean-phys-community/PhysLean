@@ -68,7 +68,6 @@ instance: Ring (𝓕.WickAlgebra) := inferInstanceAs <| Ring <|
 instance : Coe (𝓕.FieldOpFreeAlgebra) (𝓕.WickAlgebra) :=
   ⟨(TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.toQuotient⟩
 
-
 /-- The instance of a setoid on `FieldOpFreeAlgebra` from the ideal `TwoSidedIdeal`. -/
 instance : Setoid (FieldOpFreeAlgebra 𝓕) := (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.toSetoid
 

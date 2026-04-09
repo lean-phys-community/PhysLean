@@ -600,7 +600,6 @@ lemma actionT_fromConstPair {c1 c2 : C}
   rw [fromConstPair, actionT_fromPairT]
   exact congrArg _ (LinearMap.congr_fun (v.hom.isIntertwining' g) 1).symm
 
-
 @[simp]
 lemma fromConstPair_whiskerLeft {c1 c2 c2' : C} (h : c2 = c2')
     (v : 𝟙_ (Rep k G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2)) :
@@ -847,7 +846,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma actionT_fromConst {n : ℕ} {c : Fin n → C} (T : 𝟙_ (Rep k G) ⟶ S.F.obj (OverColor.mk c))
     (g : G) : g • fromConst T = fromConst T:= by
   simp only [actionT_eq, fromConst_eq]
-  exact (LinearMap.congr_fun (T.hom.isIntertwining' g) 1 ).symm
+  exact (LinearMap.congr_fun (T.hom.isIntertwining' g) 1).symm
 
 end Tensor
 

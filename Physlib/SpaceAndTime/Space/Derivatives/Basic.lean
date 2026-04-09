@@ -79,7 +79,7 @@ lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
     deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
 
-lemma deriv_eq_fderiv_fun  [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
+lemma deriv_eq_fderiv_fun [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) :
     deriv μ f = fun x => fderiv ℝ (fun x => f x) x (basis μ) := by rfl
 
@@ -112,11 +112,10 @@ lemma mdifferentiable_manifoldStructure_iff_differentiable {M d} [NormedAddCommG
   · intro h
     rw [← mdifferentiableAt_iff_differentiableAt]
     apply h.comp (I' := Space.manifoldStructure d)
-    exact (modelDiffeo.symm.mdifferentiable  (WithTop.top_ne_zero)).mdifferentiableAt
+    exact (modelDiffeo.symm.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt
   · intro h
     apply (mdifferentiableAt_iff_differentiableAt.mpr h).comp (I' := 𝓘(ℝ, Space d))
-    exact (modelDiffeo.mdifferentiable  (WithTop.top_ne_zero)).mdifferentiableAt
-
+    exact (modelDiffeo.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt
 
 TODO "3XMN6" "Make the version of the derivative described through
   `deriv_eq_mfderiv_manifoldStructure` the definition of `deriv` and prove the

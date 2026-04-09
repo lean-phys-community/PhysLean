@@ -286,7 +286,7 @@ lemma cubic (S : linearParametersQENeqZero) :
   field_simp
   simp [hQ]
   ring_nf
-  have h1 : -216 - S.v ^ 3 * 216 - S.w ^ 3 * 216  = - 216 *(S.v ^3 + S.w ^3 +1) := by
+  have h1 : -216 - S.v ^ 3 * 216 - S.w ^ 3 * 216 = - 216 *(S.v ^3 + S.w ^3 +1) := by
     ring
   rw [h1]
   simp_all

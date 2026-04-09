@@ -557,10 +557,11 @@ lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • (distTensorDeriv A.fieldStrength ε) | κ κ ν') +
     - (J ε | ν')}ᵀ)) ν := by
   rw [gradLagrangian]
-  simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply, apply_sub, one_div, map_smul, map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add,
+  simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply, apply_sub, one_div,
+    map_smul, map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add,
     apply_smul, Lorentz.Vector.neg_apply]
   rw [gradKineticTerm_eq_distTensorDeriv, gradFreeCurrentPotential_eq_tensor J ε ν]
-  simp only [ one_div, map_smul, apply_smul,
+  simp only [one_div, map_smul, apply_smul,
     permT_id_self, LinearEquiv.symm_apply_apply]
   ring_nf
   congr

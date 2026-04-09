@@ -110,7 +110,8 @@ lemma colorToComplex_comp_eq_match {n} (c : Fin n → realLorentzTensor.Color) (
 
 /-- The complexification of the component index of a real Lorentz tensor to
   a complex Lorentz tensor. -/
-noncomputable def _root_.TensorSpecies.Tensor.ComponentIdx.complexify {n} {c : Fin n → realLorentzTensor.Color} :
+noncomputable def _root_.TensorSpecies.Tensor.ComponentIdx.complexify {n}
+    {c : Fin n → realLorentzTensor.Color} :
     ComponentIdx (S := realLorentzTensor) c ≃
       ComponentIdx (S := complexLorentzTensor) (colorToComplex ∘ c) where
   toFun i := fun j => Fin.cast (by
@@ -509,7 +510,6 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     dsimp [P] at h1 h2 ⊢
     rw [map_add, Tensor.actionT_add (S := complexLorentzTensor), h1, h2,
       Tensor.actionT_add (S := realLorentzTensor), map_add]
-
 
 /-!
 

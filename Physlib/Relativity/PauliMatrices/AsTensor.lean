@@ -148,7 +148,8 @@ def asConsTensor : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ leftHanded ⊗
               (Finset.sum_congr rfl (fun j _ => ?_)))))
             rw [smul_tmul, smul_smul, tmul_smul]
         _ = ∑ i, ∑ x, ∑ j, ((SL2C.toLorentzGroup M).1 i x * (SL2C.toLorentzGroup M⁻¹).1 x j)
-            • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) := Finset.sum_comm
+            • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) :=
+              Finset.sum_comm
         _ = ∑ i, ∑ j, ∑ x, ((SL2C.toLorentzGroup M).1 i x * (SL2C.toLorentzGroup M⁻¹).1 x j)
             • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) :=
               Finset.sum_congr rfl (fun x _ => Finset.sum_comm)

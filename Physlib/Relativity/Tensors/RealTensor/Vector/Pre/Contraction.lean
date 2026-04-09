@@ -94,7 +94,6 @@ def contrCoContract : Contr d ⊗ Co d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) := R
       rfl
   }
 
-
 /-- Notation for `contrCoContract` acting on a tmul. -/
 local notation "⟪" ψ "," φ "⟫ₘ" => contrCoContract.hom (ψ ⊗ₜ φ)
 
@@ -117,7 +116,6 @@ def coContrContract : Co d ⊗ Contr d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) := R
       simp only [vecMul_one]
       rfl
   }
-
 
 /-- Notation for `coContrContract` acting on a tmul. -/
 local notation "⟪" φ "," ψ "⟫ₘ" => coContrContract.hom (φ ⊗ₜ ψ)
@@ -191,7 +189,7 @@ variable (x y : Contr d)
 
 @[simp]
 lemma action_tmul (g : LorentzGroup d) : ⟪(Contr d).ρ g x, (Contr d).ρ g y⟫ₘ = ⟪x, y⟫ₘ :=
-  LinearMap.congr_fun (contrContrContract.hom.isIntertwining' g)  (x ⊗ₜ[ℝ] y)
+  LinearMap.congr_fun (contrContrContract.hom.isIntertwining' g) (x ⊗ₜ[ℝ] y)
 
 lemma as_sum : ⟪x, y⟫ₘ = x.val (Sum.inl 0) * y.val (Sum.inl 0) -
     ∑ i, x.val (Sum.inr i) * y.val (Sum.inr i) := by

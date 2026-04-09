@@ -58,7 +58,6 @@ lemma normalOrder_ofCrAnList_nil : normalOrder (𝓕 := 𝓕) (ofCrAnList []) = 
   simp only [normalOrderSign_nil, normalOrderList_nil, ofCrAnList_nil]
   module
 
-
 lemma ofCrAnList_eq_normalOrder (φs : List 𝓕.CrAnFieldOp) :
     ofCrAnList (normalOrderList φs) = normalOrderSign φs • 𝓝(ofCrAnList φs) := by
   erw [normalOrder_ofCrAnList, smul_smul, normalOrderSign, Wick.koszulSign_mul_self,

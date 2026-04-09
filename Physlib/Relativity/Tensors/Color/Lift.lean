@@ -174,7 +174,7 @@ set_option backward.isDefEq.respectTransparency false in
   the morphism `(toRep F f) ⟶ (toRep F g)` formed by reindexing. -/
 def homToRepHom {f g : OverColor C} (m : f ⟶ g) : toRep F f ⟶ toRep F g := Rep.ofHom <|
   {
-    toLinearMap :=  (linearIsoOfHom F m).toLinearMap
+    toLinearMap := (linearIsoOfHom F m).toLinearMap
     isIntertwining' M := by
       apply LinearMap.ext
       intro x
@@ -279,7 +279,7 @@ This is made manifest in the result
 /-- The unit isomorphism between `𝟙_ (Rep k G)` and `toRep F (𝟙_ (OverColor C))`
   generated using `PiTensorProduct.isEmptyEquiv`. -/
 def toRepUnitIso : 𝟙_ (Rep k G) ≅ toRep F (𝟙_ (OverColor C)) :=
-  Rep.mkIso <| Representation.Equiv.mk (PiTensorProduct.isEmptyEquiv Empty).symm <|  by
+  Rep.mkIso <| Representation.Equiv.mk (PiTensorProduct.isEmptyEquiv Empty).symm <| by
     intro g
     refine LinearMap.ext (fun x => ?_)
     simp only [LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply]
@@ -321,7 +321,7 @@ lemma μModEquiv_tmul_tprod {X Y : OverColor C}
 set_option backward.isDefEq.respectTransparency false in
 /-- The natural isomorphism corresponding to the tensor. -/
 def μ (X Y : OverColor C) : toRep F X ⊗ toRep F Y ≅ toRep F (X ⊗ Y) :=
-  Rep.mkIso <| Representation.Equiv.mk  (μModEquiv F X Y) <| fun M => by
+  Rep.mkIso <| Representation.Equiv.mk (μModEquiv F X Y) <| fun M => by
     refine Physlib.PiTensorProduct.induction_tmul (fun p q => ?_)
     change (μModEquiv F X Y)
       ((toRep F X).ρ M (PiTensorProduct.tprod k p) ⊗ₜ[k]
@@ -581,8 +581,8 @@ set_option backward.isDefEq.respectTransparency false in
   and an `X : OverColor C`, the `(toRepFunc F).obj X ⟶ (toRepFunc F').obj X` in `Rep k G`
   constructed by the tensor product of the morphisms in `η` with corresponding color. -/
 def repNatTransOfColorApp (X : OverColor C) : (toRepFunc F).obj X ⟶ (toRepFunc F').obj X :=
-   Rep.ofHom <|
-   {
+  Rep.ofHom <|
+  {
     toLinearMap := PiTensorProduct.map (fun x => (η.app (Discrete.mk (X.hom x))).hom.toLinearMap)
     isIntertwining' M := by
       apply LinearMap.ext
@@ -610,8 +610,7 @@ def repNatTransOfColorApp (X : OverColor C) : (toRepFunc F).obj X ⟶ (toRepFunc
       funext i
       have h := ((η.app (Discrete.mk (X.hom i))).hom.isIntertwining' M)
       simpa using LinearMap.congr_fun h (x i)
-   }
-
+}
 
 lemma repNatTransOfColorApp_tprod (X : OverColor C)
     (p : (i : X.left) → F.obj (Discrete.mk (X.hom i))) :
@@ -864,7 +863,7 @@ between the objects obtained by applying the lift of `F` and that obtained by ap
 `F`. -/
 def forgetLiftApp (c : C) : (lift.obj F).obj (OverColor.mk (fun (_ : Fin 1) => c))
     ≅ F.obj (Discrete.mk c) :=
-    Rep.mkIso <| Representation.Equiv.mk  (forgetLiftAppV F c) <|  fun g => by
+    Rep.mkIso <| Representation.Equiv.mk (forgetLiftAppV F c) <| fun g => by
     refine LinearMap.ext (fun x => ?_)
     simp
     simp only [forgetLiftAppV, Fin.isValue]

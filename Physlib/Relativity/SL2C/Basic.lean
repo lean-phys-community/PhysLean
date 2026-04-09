@@ -73,7 +73,7 @@ def toSelfAdjointMap (M : SL(2, ℂ)) :
 
 lemma toSelfAdjointMap_apply (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
     toSelfAdjointMap M A = ⟨M.1 * A.1 * Matrix.conjTranspose M, by
-       noncomm_ring [selfAdjoint.mem_iff, star_eq_conjTranspose,
+        noncomm_ring [selfAdjoint.mem_iff, star_eq_conjTranspose,
         conjTranspose_mul, conjTranspose_conjTranspose,
         (star_eq_conjTranspose A.1).symm.trans $ selfAdjoint.mem_iff.mp A.2]⟩ := rfl
 
