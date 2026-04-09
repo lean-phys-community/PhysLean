@@ -1036,7 +1036,15 @@ private theorem EquationS88 (ρ : MState (H i)) (σ : (n : ℕ) → ↑IsFree) {
   ring_nf
   rw [← ENNReal.toReal_eq_toReal_iff' (by finiteness) (by finiteness)]
   rw [ENNReal.toReal_ofReal]; swap
-  · apply add_nonneg
+  · trans  (R1 ρ ε).toReal - (R1 ρ ε).toReal * ⟪↑((ℰ n) (ρ ⊗ᵣ^[n])), P1 ε2 n⟫_ℝ +
+            ⟪↑((ℰ n) (ρ ⊗ᵣ^[n])), P1 ε2 n⟫_ℝ * (R2 ρ σ).toReal +
+          ⟪↑((ℰ n) (ρ ⊗ᵣ^[n])), P1 ε2 n⟫_ℝ * ε₀ +
+        (ε2 - ε2 * ⟪↑((ℰ n) (ρ ⊗ᵣ^[n])), P2 ε2 n⟫_ℝ) +
+      (-(⟪↑((ℰ n) (ρ ⊗ᵣ^[n])), P2 ε2 n⟫_ℝ * (R2 ρ σ).toReal) - ⟪↑((ℰ n) (ρ ⊗ᵣ^[n])), P2 ε2 n⟫_ℝ * ε₀) +
+    ⟪↑((ℰ n) (ρ ⊗ᵣ^[n])), P2 ε2 n⟫_ℝ * c' ε2 n; swap
+    · ring_nf
+      rfl
+    apply add_nonneg
     · rw [← mul_one_sub, ← mul_one_sub, add_assoc, add_assoc, add_assoc]
       apply add_nonneg
       · apply mul_nonneg
@@ -1093,7 +1101,7 @@ private theorem EquationS88 (ρ : MState (H i)) (σ : (n : ℕ) → ↑IsFree) {
   repeat rw [ENNReal.toReal_ofReal (by positivity)]
   ring
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 1000000 in
 set_option backward.isDefEq.respectTransparency false in
 private theorem EquationS62
     (ρ : MState (H i)) (σ : (n : ℕ) → IsFree (i := i ^ n))
@@ -1549,7 +1557,16 @@ private theorem EquationS62
         unfold E1 E2 E3
         simp [inner_sub_right]
         ring_nf
-        apply EquationS88 <;> assumption
+        have h1 := EquationS88 ρ σ (ε := ε) (ε' := ε') (by assumption)
+          (by assumption) (by assumption) (by assumption) m
+          (by assumption) (by assumption) (by assumption)
+          (by assumption) (by assumption) (by assumption) (by assumption)
+          (by assumption) (by assumption) (by assumption) (by assumption)
+        convert h1 using 1
+        simp [P1, P2]
+        grind
+
+
 
   clear hE_pos
 
