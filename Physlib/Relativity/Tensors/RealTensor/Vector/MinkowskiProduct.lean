@@ -53,7 +53,7 @@ lemma minkowskiProductMap_toCoord {d : ℕ} (p q : Vector d) :
     rw [prodT_basis_repr_apply]
     enter [1]
     erw [coMetric_repr_apply_eq_minkowskiMatrix]
-  simp only [Fin.isValue, Function.comp_apply, Fin.cast_eq_self]
+  simp only [Fin.isValue, Function.comp_apply]
   conv_lhs =>
     enter [2, x, 1, 2, y, 1]
     simp only [Fin.isValue]

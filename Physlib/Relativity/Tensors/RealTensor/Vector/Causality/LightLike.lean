@@ -125,12 +125,12 @@ lemma lightlike_spatial_parallel_implies_proportional {d : ℕ} {v w : Vector d}
       intros a b ha hb h_eq
       apply le_antisymm
       · by_contra h_not_le
-        push_neg at h_not_le
+        push Not at h_not_le
         have : a^2 > b^2 := by
           exact (sq_lt_sq₀ hb ha).mpr h_not_le
         linarith
       · by_contra h_not_ge
-        push_neg at h_not_ge
+        push Not at h_not_ge
         have : a^2 < b^2 := by
           exact (sq_lt_sq₀ ha hb).mpr h_not_ge
         linarith

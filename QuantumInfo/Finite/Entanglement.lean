@@ -81,7 +81,7 @@ theorem convex_roof_ne_top : ∀ ρ, convex_roof_ENNReal g ρ ≠ ∞ := fun ρ 
     exact Fintype.equivFin d
   use (congrPEnsemble ed) <| spectral_ensemble ρ
   rw [mix_congrPEnsemble_eq_mix ed]
-  push_neg
+  push Not
   convert spectral_ensemble_mix
 
 omit [Nonempty d] in
@@ -89,7 +89,7 @@ omit [Nonempty d] in
 theorem mixed_convex_roof_ne_top : ∀ ρ, mixed_convex_roof_ENNReal f ρ ≠ ∞ := fun ρ => by
   simp only [mixed_convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall]
   use 1, trivial_mEnsemble ρ 0
-  push_neg
+  push Not
   exact trivial_mEnsemble_mix ρ 0
 
 /-- Convex roof extension of a function `g : KetUpToPhase d → ℝ≥0`, defined as the infimum of all pure-state

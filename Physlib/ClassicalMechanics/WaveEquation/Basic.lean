@@ -333,7 +333,7 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
   rw [hdi']
   simp only [PiLp.inner_apply, fderiv_fun_const, Pi.zero_apply,
     ContinuousLinearMap.zero_apply, inner_zero_right, PiLp.smul_apply, smul_eq_mul,
-    EuclideanSpace.single_apply, zero_add]
+    PiLp.single_apply, zero_add]
   change DifferentiableAt ℝ ((fun x' => f₀' x' (s.unit u)) ∘
       (fun x => (inner ℝ x s.unit - c * t))) x
   apply DifferentiableAt.comp

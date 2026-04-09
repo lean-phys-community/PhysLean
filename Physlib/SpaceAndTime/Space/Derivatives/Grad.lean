@@ -510,7 +510,7 @@ lemma distGrad_toFun_eq_distDeriv {d} (f : (Space d) →d[ℝ] ℝ) :
   simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom, ContinuousLinearMap.coe_coe]
   rw [distGrad_eq_sum_basis]
   simp only [neg_smul, Finset.sum_neg_distrib, PiLp.neg_apply, WithLp.ofLp_sum, WithLp.ofLp_smul,
-    EuclideanSpace.ofLp_single, Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul,
+    PiLp.ofLp_single, Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul,
     mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
   rfl
 

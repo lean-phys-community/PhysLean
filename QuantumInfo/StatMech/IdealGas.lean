@@ -147,7 +147,7 @@ theorem PartitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
         (if ¬∃ x y, V ^ (3⁻¹ : ℝ) / 2 < |a (x, y)| then 1 else 0) =
         (∏ xy, if |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0 : ℝ) := by
       intro a
-      push_neg
+      push Not
       simp_rw [← Prod.forall (p := fun xy ↦ |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2)]
       exact Fintype.prod_boole.symm
     simp only [not_exists, not_lt] at h_integrand_prod

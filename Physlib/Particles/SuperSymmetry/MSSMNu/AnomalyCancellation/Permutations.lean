@@ -61,7 +61,7 @@ lemma chargeMap_toSpecies (f : PermGroup) (S : MSSMCharges.Charges) (j : Fin 6) 
 def repCharges : Representation ℚ PermGroup (MSSMCharges).Charges where
   toFun f := chargeMap f⁻¹
   map_mul' f g := by
-    simp only [PermGroup, mul_inv_rev]
+    simp only [PermGroup]
     apply LinearMap.ext
     intro S
     rw [charges_eq_toSpecies_eq]
@@ -69,7 +69,7 @@ def repCharges : Representation ℚ PermGroup (MSSMCharges).Charges where
     intro i
     simp only [Module.End.mul_apply]
     rw [chargeMap_toSpecies, chargeMap_toSpecies]
-    simp only [Pi.mul_apply, Pi.inv_apply]
+    simp only [Pi.inv_apply]
     rw [chargeMap_toSpecies]
     rfl
   map_one' := by

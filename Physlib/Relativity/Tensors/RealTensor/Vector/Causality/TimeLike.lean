@@ -113,7 +113,7 @@ lemma timelike_spatial_lt_time_squared {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     ⟪spatialPart v, spatialPart v⟫_ℝ < (timeComponent v)^2 := by
   rw [timeLike_iff_norm_sq_pos, minkowskiProduct_toCoord] at hv
-  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  simp only [PiLp.inner_apply]
   have h_time : timeComponent v = v (Sum.inl 0) := rfl
   simp [h_time, pow_two]
   have h_norm_pos : 0 < v (Sum.inl 0) * v (Sum.inl 0) -

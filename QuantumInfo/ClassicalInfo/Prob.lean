@@ -323,6 +323,7 @@ end pi
 
 /-- Mixable instances on subtypes (of other mixable types), assuming that they
  have the correct closure properties. -/
+@[reducible]
 def instSubtype {T : Type*} {P : T → Prop} (inst : Mixable U T)
     (h : ∀{x y:T},
       ∀⦃a b : ℝ⦄, (ha : 0 ≤ a) → (hb : 0 ≤ b) → (hab : a + b = 1) →

@@ -649,11 +649,11 @@ theorem sInf_spectrum_prod (ρ : MState d) (σ : MState d₂) :
   rcases isEmpty_or_nonempty d₂ with _ | _; · simp
   rw [MState.m, MState.prod, HermitianMat.spectrum_prod, ← MState.m, ← MState.m]
   apply csInf_mul_nonneg
-  · exact IsSelfAdjoint.spectrum_nonempty ρ.M.H
+  · exact ContinuousFunctionalCalculus.spectrum_nonempty _ ρ.M.H
   · rw [MState.m, ρ.M.H.spectrum_real_eq_range_eigenvalues]
     rintro _ ⟨i, rfl⟩
     apply ρ.eigenvalue_nonneg
-  · exact IsSelfAdjoint.spectrum_nonempty σ.M.H
+  · exact ContinuousFunctionalCalculus.spectrum_nonempty _ σ.M.H
   · rw [MState.m, σ.M.H.spectrum_real_eq_range_eigenvalues]
     rintro _ ⟨i, rfl⟩
     apply σ.eigenvalue_nonneg

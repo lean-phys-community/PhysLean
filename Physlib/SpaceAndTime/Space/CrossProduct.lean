@@ -115,8 +115,7 @@ lemma inner_self_cross (v w : EuclideanSpace ℝ (Fin 3)) :
     inner ℝ v (v ⨯ₑ₃ w) = 0 := by
   cases v using WithLp.rec with | _ v =>
   cases w using WithLp.rec with | _ w =>
-  simp only [WithLp.equiv_apply, WithLp.equiv_symm_apply, PiLp.inner_apply, RCLike.inner_apply,
-    conj_trivial]
+  simp only [WithLp.equiv_apply, WithLp.equiv_symm_apply, PiLp.inner_apply]
   change (crossProduct v) w ⬝ᵥ v = _
   rw [dotProduct_comm, dot_self_cross]
 

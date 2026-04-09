@@ -277,7 +277,7 @@ private theorem inner_zero_iff_aux_lemma [DecidableEq n] (hA₁ : A.mat.PosSemid
       have h1 := hAB_zero
       simp only [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mulVec_mulVec] at h1
       have h2 := congr_fun (congrArg WithLp.ofLp h1) i
-      simp only [WithLp.ofLp_toLp, WithLp.ofLp_zero, EuclideanSpace.single] at h2
+      simp only [WithLp.ofLp_zero, EuclideanSpace.single] at h2
       simpa [Matrix.mul_apply, Matrix.mulVec, dotProduct, Pi.single_apply] using h2
     rw [h_herm, hBA_zero, Matrix.conjTranspose_zero]
   simp_all only
@@ -352,6 +352,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- We define the Hermitian inner product as our "canonical" inner product, which does induce a norm.
 This disagrees slightly with Mathlib convention on the `Matrix` type, which avoids asserting one norm
 as there are several reasonable ones; for Hermitian matrices, though, this seem to be the right choice. -/
+@[reducible]
 noncomputable def InnerProductCore : InnerProductSpace.Core ℝ (HermitianMat d 𝕜) :=
    {
     inner A B := ⟪A, B⟫
@@ -427,13 +428,13 @@ noncomputable instance : NormedAddCommGroup (HermitianMat d ℂ) :=
 
 --PR'ed in #35056
 open ComplexOrder in
+@[reducible]
 def _root_.RCLike.instOrderClosed : OrderClosedTopology 𝕜 where
   isClosed_le' := by
     conv => enter [1, 1, p]; rw [RCLike.le_iff_re_im]
     simp_rw [Set.setOf_and]
     refine IsClosed.inter (isClosed_le ?_ ?_) (isClosed_eq ?_ ?_) <;> continuity
 
-attribute [reducible] RCLike.instOrderClosed
 scoped[ComplexOrder] attribute [instance] RCLike.instOrderClosed
 
 variable (A B : HermitianMat d 𝕜)

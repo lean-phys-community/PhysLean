@@ -197,7 +197,7 @@ theorem LemmaS2liminf {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
   (Filter.atTop.liminf (fun (n : ℕ) ↦ ⟪{(ρ n).M ≥ₚ (Real.exp (n * (Rinf + ε4))) • (σ n).M}, (ρ n).M⟫) ≤ 1 - ε3)
   := by
   by_contra h
-  push_neg at h
+  push Not at h
   replace h := Filter.eventually_lt_of_lt_liminf h ?_
   · replace h := Filter.eventually_atTop.mp h
     obtain ⟨n₀, h⟩ := h
@@ -266,7 +266,7 @@ theorem LemmaS2limsup {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
   (Filter.atTop.limsup (fun (n : ℕ) ↦ ⟪{ρ n ≥ₚ (Real.exp (n * (Rsup + ε4))) • (σ n).M}, ρ n⟫) ≤ 1 - ε3)
   := by
   by_contra h
-  push_neg at h
+  push Not at h
   replace h := Filter.frequently_lt_of_lt_limsup ?_ h
   · replace h := Filter.frequently_atTop.mp h
     let T (n : ℕ) := {(ρ n).M ≥ₚ (Real.exp (n * (Rsup + ε4))) • (σ n).M}
@@ -1566,8 +1566,6 @@ private theorem EquationS62
         simp [P1, P2]
         grind
 
-
-
   clear hE_pos
 
   -- (S91)
@@ -1878,13 +1876,13 @@ private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1)
     rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
     rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
     rw [HermitianMat.val_eq_coe, HermitianMat.mat_smul]
-    rw [spectrum.smul_eq_smul _ _ (CFC.spectrum_nonempty ℝ _ ((σ₁ i) ⊗ᵣ^[n]).M.H)]
+    rw [spectrum.smul_eq_smul _ _ (ContinuousFunctionalCalculus.spectrum_nonempty _ ((σ₁ i) ⊗ᵣ^[n]).M.H)]
     rw [Real.sInf_smul_of_nonneg (by norm_num)]
     simp [MState.mat_M, div_eq_inv_mul, sInf_spectrum_spacePow]
 
   have hdpos n : 0 < Fintype.card (spectrum ℝ (σ'' ρ ε m σ n).m) := by
     rw [Fintype.card_pos_iff, Set.nonempty_coe_sort]
-    apply IsSelfAdjoint.spectrum_nonempty
+    apply ContinuousFunctionalCalculus.spectrum_nonempty
     exact (σ'' ρ ε m σ n).M.H
 
   -- Eq. (S60)
@@ -1985,7 +1983,7 @@ theorem Lemma7_gap (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) {ε
   dsimp [SteinsLemma.Lemma7_improver]
   split_ifs with h
   · exact (SteinsLemma.Lemma7 ρ hε σ h ε' hε').choose_spec
-  · push_neg at h
+  · push Not at h
     rw [tsub_eq_zero_of_le h.le]
     exact zero_le _
 

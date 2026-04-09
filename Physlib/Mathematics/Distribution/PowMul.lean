@@ -66,7 +66,7 @@ lemma norm_iteratedFDeriv_ofRealCLM {x} (i : ℕ) :
       simp only [Nat.succ_eq_add_one, Function.comp_apply, LinearIsometryEquiv.norm_map]
       have h1 : iteratedFDeriv ℝ i (0 : ℝ → ℝ →L[ℝ] ℝ →L[ℝ] 𝕜) x = 0 := by
         change iteratedFDeriv ℝ i (fun x => 0) x = 0
-        rw [iteratedFDeriv_zero_fun]
+        rw [iteratedFDeriv_fun_zero]
         rfl
       rw [h1]
       exact ContinuousMultilinearMap.opNorm_zero

@@ -1262,7 +1262,7 @@ lemma iInf_eigenvalues_le_of_posSemidef
   · simp
   contrapose! hAB
   rw [posSemidef_iff_dotProduct_mulVec]
-  push_neg
+  simp only [not_and, not_forall]
   intro _
   apply exists_lt_of_ciInf_lt at hAB
   rcases hAB with ⟨i, hi⟩
@@ -1448,7 +1448,7 @@ theorem IsHermitian.spectrum_subset_Iic_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
     convert h
     rw [iInf, iSup, ← spectrum_real_eq_range_eigenvalues, ← spectrum_real_eq_range_eigenvalues]
     rw [← spectrum.neg_eq, csInf_neg ?_ (A.finite_real_spectrum.bddAbove), neg_neg]
-    exact IsSelfAdjoint.spectrum_nonempty hA
+    exact ContinuousFunctionalCalculus.spectrum_nonempty _ hA
   · convert hl using 1
     abel
 

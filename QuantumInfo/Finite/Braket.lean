@@ -331,7 +331,7 @@ def Ket.MES (d) [Fintype d] [Nonempty d] : Ket (d × d) where
 theorem Ket.MES_isEntangled [Nontrivial d] : (Ket.MES d).IsEntangled := by
   obtain ⟨x, y, h⟩ := @Nontrivial.exists_pair_ne d _
   rw [IsEntangled, MES, IsProd_iff_mul_eq_mul]
-  push_neg
+  push Not
   use x, y, x, y
   simp [apply, h]
 

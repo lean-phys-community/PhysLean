@@ -1188,7 +1188,7 @@ theorem sandwichedRelRentropy_nonneg {α : ℝ} (hα : 0 < α) (h : σ.M.ker ≤
   · exact inner_log_sub_log_nonneg h
   by_cases hα₂ : α > 1
   · exact sandwichedRelRentropy_nonneg_α_gt_1 h hα₂
-  · have : α < 1 := by push_neg at hα₂; exact lt_of_le_of_ne hα₂ h1
+  · have : α < 1 := by push Not at hα₂; exact lt_of_le_of_ne hα₂ h1
     exact sandwichedRelRentropy_nonneg_α_lt_1 h hα this
 
 section additivity
@@ -1268,7 +1268,7 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
           simp_all
           convert h_top using 1;
           erw [ Matrix.toLpLin_apply ]
-          simp_all only [MState.mat_M, EuclideanSpace.ofLp_single, Matrix.mulVec_single,
+          simp_all only [MState.mat_M, PiLp.ofLp_single, Matrix.mulVec_single,
             MulOpposite.op_one, Pi.smul_apply, Matrix.col_apply, one_smul]
         exact σ₂.pos.ne' h_contra;
       · have h_contra : ρ₂.M = 0 := by
@@ -1356,7 +1356,7 @@ lemma ker_le_of_ker_kron_le_right (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSt
       have h_z : ∀ (U V : Submodule ℂ (EuclideanSpace ℂ d₁)), U ≠ ⊤ → V ≠ ⊤ → ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∉ V := by
         intro U V hU hV
         by_contra h_contra
-        push_neg at h_contra;
+        push Not at h_contra;
         have h_union : ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∈ V := by
           exact Exists.elim ( show ∃ u : EuclideanSpace ℂ d₁, u ∉ U from by simpa [ Submodule.eq_top_iff' ] using hU ) fun u hu => ⟨ u, hu, h_contra u hu ⟩;
         obtain ⟨ u, hu₁, hu₂ ⟩ := h_union;
@@ -1915,7 +1915,7 @@ lemma inner_log_bounded_near (hx : σ.M.ker ≤ ρ.M.ker) {y : ℝ} (hy : ⟪ρ.
   have h_tendsto := tendsto_inner_cfc_approxLog ρ σ hx
   obtain ⟨N, hN⟩ : ∃ N : ℕ, ⟪ρ.M, σ.M.cfc (approxLog N)⟫ < y := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact absurd (lt_of_lt_of_le hy (ge_of_tendsto h_tendsto (Filter.Eventually.of_forall h)))
       (lt_irrefl _)
   have h_cont := continuous_inner_cfc_approxLog ρ N
