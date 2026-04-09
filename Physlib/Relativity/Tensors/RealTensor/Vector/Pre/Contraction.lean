@@ -429,7 +429,7 @@ lemma same_eq_det_toSelfAdjoint (x : ContrMod 3) :
     cons_val', cons_val_zero, cons_val_fin_one, sub_zero, cons_val_one, sub_neg_eq_add, ne_eq,
     zero_ne_one, not_false_eq_true, one_apply_ne, zero_sub, one_ne_zero]
   ring_nf
-  simp
+  simp only [Fin.isValue, I_sq, mul_neg, mul_one, sub_left_inj]
   ring
 
 end contrContrContractField

@@ -216,7 +216,7 @@ lemma ι_timeOrderF_superCommuteF_eq_time {φ ψ : 𝓕.CrAnFieldOp}
               superCommuteF_ofCrAnListF_ofCrAnListF]
             simp [mul_sub, sub_mul, ← ofCrAnListF_append]
             rw [timeOrderF_ofCrAnListF, timeOrderF_ofCrAnListF]
-          simp
+          simp only [map_smul, sub_right_inj]
           module
         /- Simplify the signs. -/
         _ = crAnTimeOrderSign (φs' ++ φ :: ψ :: φs) •
