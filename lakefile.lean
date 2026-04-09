@@ -10,13 +10,15 @@ require "mathlib" from git "https://github.com/leanprover-community/mathlib4.git
 @[default_target]
 lean_lib Physlib where
   moreLeanArgs := #[
-    "-Dwarn.sorry=false"
+    "-Dwarn.sorry=false",
+    "-Dweak.says.verify=true"
   ]
 
 @[default_target]
 lean_lib QuantumInfo where
   moreLeanArgs := #[
-    "-Dwarn.sorry=false"
+    "-Dwarn.sorry=false",
+    "-Dweak.says.verify=true"
   ]
 
 -- These were their own lean_lib in Lean-QuantumInfo, we should move them to appropriate directories.

@@ -5,8 +5,6 @@ Authors: Alex Meiburg
 -/
 import QuantumInfo.Finite.Entropy.VonNeumann
 
-import QuantumInfo.ForMathlib.HermitianMat.Unitary
-
 noncomputable section
 
 variable {d d₁ d₂ d₃ : Type*}
@@ -1596,7 +1594,7 @@ theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
   --TODO: Maybe SandwichedRelRentropy should actually be defined differently for α = 0?
     D̃_ α(ρ‖ρ) = 0 := by
   simp? [SandwichedRelRentropy, NNReal.eq_iff, hα] says
-    simp only [SandwichedRelRentropy, hα, ↓reduceDIte, le_refl, sub_self, inner_zero_right,
+    simp only [SandwichedRelRentropy, hα, ↓reduceDIte, Std.le_refl, sub_self, inner_zero_right,
       ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_mk, NNReal.coe_zero, ite_eq_left_iff,
       div_eq_zero_iff, Real.log_eq_zero]
   intro hα
