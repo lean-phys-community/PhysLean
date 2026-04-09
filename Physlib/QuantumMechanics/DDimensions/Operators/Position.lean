@@ -122,13 +122,13 @@ def radiusRegPowOperator {d : ℕ} (ε : ℝˣ) (s : ℝ) : 𝓢(Space d, ℂ) �
   SchwartzMap.smulLeftCLM ℂ (Complex.ofReal ∘ normRegularizedPow d ε s)
 
 @[inherit_doc radiusRegPowOperator]
-notation "𝐫[" ε "," s "]" => radiusRegPowOperator ε s
+notation "𝐫₀" => radiusRegPowOperator
 
 @[inherit_doc radiusRegPowOperator]
-notation "𝐫[" d "," ε "," s "]" => radiusRegPowOperator (d := d) ε s
+notation "𝐫₀[" d' "]" => radiusRegPowOperator (d := d')
 
 lemma radiusRegPowOperator_apply_fun {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
-    𝐫[d,ε,s] ψ = fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
+    𝐫₀ ε s ψ = fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
   ext x
   dsimp [radiusRegPowOperator]
   refine smulLeftCLM_apply_apply ?_ ψ x
@@ -136,23 +136,23 @@ lemma radiusRegPowOperator_apply_fun {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢
 
 @[simp]
 lemma radiusRegPowOperator_apply {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐫[ε,s] ψ x = (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
+    𝐫₀ ε s ψ x = (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
   rw [radiusRegPowOperator_apply_fun]
 
 @[simp]
 lemma radiusRegPowOperator_comp_eq {d : ℕ} (ε : ℝˣ) (s t : ℝ) :
-    𝐫[d,ε,s] ∘L 𝐫[ε,t] = 𝐫[ε,s+t] := by
+    𝐫₀[d] ε s ∘L 𝐫₀ ε t = 𝐫₀ ε (s+t) := by
   ext ψ x
   simp [add_div, Real.rpow_add (norm_sq_add_unit_sq_pos ε x), mul_assoc]
 
 @[simp]
 lemma radiusRegPowOperator_zero {d : ℕ} (ε : ℝˣ) :
-    𝐫[d,ε,0] = ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
+    𝐫₀ ε 0 = ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
   simp
 
 lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
-    ∑ i, 𝐱 i ∘L 𝐱 i = 𝐫[d,ε,2] - ε.1 ^ 2 • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
+    ∑ i, 𝐱 i ∘L 𝐱 i = 𝐫₀ ε 2 - ε.1 ^ 2 • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
   simp [Space.norm_sq_eq, add_mul, ← mul_assoc, ← pow_two, Finset.sum_mul]
 
@@ -171,20 +171,20 @@ def radiusPowOperator {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space
   map_smul' _ _ := by rw [smul_comm]; rfl
 
 @[inherit_doc radiusPowOperator]
-notation "𝐫[" s "]" => radiusPowOperator s
+notation "𝐫" => radiusPowOperator
 
 lemma radiusPowOperator_apply_fun {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
-    𝐫[s] ψ = fun x ↦ ‖x‖ ^ s • ψ x := rfl
+    𝐫 s ψ = fun x ↦ ‖x‖ ^ s • ψ x := rfl
 
 @[simp]
 lemma radiusPowOperator_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐫[s] ψ x = ‖x‖ ^ s • ψ x := by
+    𝐫 s ψ x = ‖x‖ ^ s • ψ x := by
   rw [radiusPowOperator_apply_fun]
 
 /-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
 @[fun_prop]
 lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
-    (hx : x ≠ 0) : ContDiffAt ℝ n (𝐫[s] ψ) x := by
+    (hx : x ≠ 0) : ContDiffAt ℝ n (𝐫 s ψ) x := by
   refine ContDiffAt.smul ?_ (ψ.contDiffAt n)
   have h (x : Space d) : ‖x‖ ^ s = (inner ℝ x x) ^ (s / 2) := by
     simp [← Real.rpow_natCast_mul, mul_div_cancel₀]
@@ -194,18 +194,18 @@ lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 
 /-- `x ↦ ‖x‖ˢψ(x)` is strongly measurable. -/
 @[fun_prop]
 lemma radiusPowOperator_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
-    StronglyMeasurable (𝐫[s] ψ) := by
+    StronglyMeasurable (𝐫 s ψ) := by
   rw [radiusPowOperator_apply_fun]
   exact StronglyMeasurable.smul (by measurability) ψ.continuous.stronglyMeasurable
 
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : 0 < d + 2 * s) (ψ : 𝓢(Space d, ℂ)) :
-    MemHS (𝐫[s] ψ) := by
+    MemHS (𝐫 s ψ) := by
   rcases Nat.eq_zero_or_pos d with (rfl | hd)
   · simp only [MemHS, MemLp.of_discrete]
   · refine (MeasureTheory.memLp_two_iff_integrable_sq_norm (by fun_prop)).mpr ⟨by fun_prop, ?_⟩
     suffices ∫⁻ (a : Space d), ‖‖ψ a‖ ^ 2 * ‖a‖ ^ (2 * s)‖ₑ < ⊤ by
-      have hInt (x : Space d) : ‖𝐫[s] ψ x‖ ^ 2 = ‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s) := by
+      have hInt (x : Space d) : ‖𝐫 s ψ x‖ ^ 2 = ‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s) := by
         simp [radiusPowOperator, mul_pow, mul_comm, Real.rpow_mul]
       simpa only [HasFiniteIntegral, hInt]
     rw [← lintegral_add_compl _ (measurableSet_ball (x := 0) (ε := 1)), ENNReal.add_lt_top]
@@ -285,7 +285,7 @@ instance : NeBot nhdsZeroUnits := by
 
 /-- `𝐫[ε,s] ψ` converges pointwise to `𝐫[s] ψ` as `ε → 0` except perhaps at `x = 0`. -/
 lemma radiusRegPow_tendsto_radiusPow {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
-    (hx : x ≠ 0) : Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (𝐫[s] ψ x)) := by
+    (hx : x ≠ 0) : Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x)) := by
   have hpow : ‖x‖ ^ s = (‖x‖ ^ 2 + 0 ^ 2) ^ (s / 2) := by
     simp [← Real.rpow_natCast_mul, mul_div_cancel₀]
   simp only [radiusRegPowOperator_apply, radiusPowOperator_apply, Complex.real_smul, hpow]
@@ -295,7 +295,7 @@ lemma radiusRegPow_tendsto_radiusPow {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ
 
 /-- `𝐫[ε,s] ψ` converges pointwise to `𝐫[s] ψ` as `ε → 0` provided `𝐫[ε,s] ψ 0` is bounded. -/
 lemma radiusRegPow_tendsto_radiusPow' {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (h : 0 ≤ s ∨ ψ 0 = 0) :
-    Tendsto (fun ε ↦ ⇑(𝐫[ε,s] ψ)) nhdsZeroUnits (nhds (𝐫[s] ψ)) := by
+    Tendsto (fun ε ↦ ⇑(𝐫₀ ε s ψ)) nhdsZeroUnits (nhds (𝐫 s ψ)) := by
   refine tendsto_pi_nhds.mpr fun x ↦ ?_
   rcases eq_zero_or_neZero x with (rfl | hx)
   · rcases h with (hs | hψ)
@@ -311,9 +311,9 @@ lemma radiusRegPow_tendsto_radiusPow' {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, �
 
 /-- a.e. version of `radiusRegPow_tendsto_radiusPow` -/
 lemma radiusRegPow_ae_tendsto_radiusPow {d : ℕ} (hd : 0 < d) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
-    ∀ᵐ x, Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (𝐫[s] ψ x)) := by
+    ∀ᵐ x, Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x)) := by
   apply ae_iff.mpr
-  suffices h : {x | ¬Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (𝐫[s] ψ x))} ⊆ {0} by
+  suffices h : {x | ¬Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x))} ⊆ {0} by
     rcases Set.subset_singleton_iff_eq.mp h with (h' | h')
     · exact h' ▸ measure_empty
     · have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
@@ -323,10 +323,10 @@ lemma radiusRegPow_ae_tendsto_radiusPow {d : ℕ} (hd : 0 < d) (s : ℝ) (ψ : �
   exact hx <| radiusRegPow_tendsto_radiusPow s ψ hx'
 
 lemma radiusRegPow_ae_tendsto_iff {d : ℕ} (hd : 0 < d) {s : ℝ} {ψ : 𝓢(Space d, ℂ)}
-    {φ : Space d → ℂ} : (∀ᵐ x, Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (φ x)))
-    ↔ φ =ᵐ[volume] 𝐫[s] ψ := by
-  let t₁ := {x | ¬Tendsto (fun ε ↦ 𝐫[ε,s] ψ x) nhdsZeroUnits (nhds (φ x))}
-  let t₂ := {x | φ x ≠ 𝐫[s] ψ x}
+    {φ : Space d → ℂ} : (∀ᵐ x, Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (φ x)))
+    ↔ φ =ᵐ[volume] 𝐫 s ψ := by
+  let t₁ := {x | ¬Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (φ x))}
+  let t₂ := {x | φ x ≠ 𝐫 s ψ x}
   show volume t₁ = 0 ↔ volume t₂ = 0
   suffices heq : t₁ ∪ {0} = t₂ ∪ {0} by
     have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
@@ -381,7 +381,7 @@ def positionUnboundedOperator : UnboundedOperator (SpaceDHilbertSpace d) (SpaceD
 /-- The (regularized) radius operators defined on the Schwartz submodule. -/
 def radiusRegPowOperatorSchwartz {d : ℕ} (ε : ℝˣ) (s : ℝ) :
     schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
-  schwartzEquiv.toLinearMap ∘ₗ 𝐫[ε,s].toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
+  schwartzEquiv.toLinearMap ∘ₗ (𝐫₀ ε s).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
 lemma radiusRegPowOperatorSchwartz_isSymmetric {d : ℕ} (ε : ℝˣ) (s : ℝ) :
     (radiusRegPowOperatorSchwartz (d := d) ε s).IsSymmetric := by
