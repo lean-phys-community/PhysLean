@@ -56,16 +56,16 @@ open ContDiff SchwartzMap
 /-- Component `i j` of the angular momentum operator is the continuous linear map
 from `𝓢(Space d, ℂ)` to itself defined by `𝐋ᵢⱼ ≔ 𝐱ᵢ∘𝐩ⱼ - 𝐱ⱼ∘𝐩ᵢ`. -/
 def angularMomentumOperator {d : ℕ} (i j : Fin d) : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
-  𝐱[i] ∘L 𝐩[j] - 𝐱[j] ∘L 𝐩[i]
+  𝐱 i ∘L 𝐩 j - 𝐱 j ∘L 𝐩 i
 
 @[inherit_doc angularMomentumOperator]
 notation "𝐋[" i "," j "]" => angularMomentumOperator i j
 
 lemma angularMomentumOperator_apply_fun {d : ℕ} (i j : Fin d) (ψ : 𝓢(Space d, ℂ)) :
-    𝐋[i,j] ψ = 𝐱[i] (𝐩[j] ψ) - 𝐱[j] (𝐩[i] ψ) := rfl
+    𝐋[i,j] ψ = 𝐱 i (𝐩 j ψ) - 𝐱 j (𝐩 i ψ) := rfl
 
 lemma angularMomentumOperator_apply {d : ℕ} (i j : Fin d) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐋[i,j] ψ x = 𝐱[i] (𝐩[j] ψ) x - 𝐱[j] (𝐩[i] ψ) x := rfl
+    𝐋[i,j] ψ x = 𝐱 i (𝐩 j ψ) x - 𝐱 j (𝐩 i ψ) x := rfl
 
 /-!
 
