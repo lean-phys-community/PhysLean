@@ -31,8 +31,9 @@ Definitions:
     use the same domain for all `s`.
 
 Notation:
-- `𝐱[i]` for `positionOperator i`
-- `𝐫[ε,s]` for `radiusRegPowOperator ε s`
+- `𝐱` for `positionOperator`
+- `𝐫₀` for `radiusRegPowOperator`
+- `𝐫` for `radiusPowOperator`
 
 ## iii. Table of contents
 
@@ -73,15 +74,15 @@ def positionOperator : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
   SchwartzMap.smulLeftCLM ℂ (Complex.ofRealCLM ∘L coordCLM i)
 
 @[inherit_doc positionOperator]
-notation "𝐱[" i "]" => positionOperator i
+notation "𝐱" => positionOperator
 
-lemma positionOperator_apply_fun (ψ : 𝓢(Space d, ℂ)) : 𝐱[i] ψ = (fun x : Space d ↦ x i) • ⇑ψ := by
+lemma positionOperator_apply_fun (ψ : 𝓢(Space d, ℂ)) : 𝐱 i ψ = (fun x : Space d ↦ x i) • ⇑ψ := by
   ext
   simp [positionOperator, coordCLM_apply, coord_apply,
     smulLeftCLM_apply_apply (g := Complex.ofRealCLM ∘ (coordCLM i)) (by fun_prop)]
 
 @[simp]
-lemma positionOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐱[i] ψ x = x i * ψ x := by
+lemma positionOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐱 i ψ x = x i * ψ x := by
   simp [positionOperator_apply_fun]
 
 /-!
@@ -151,7 +152,7 @@ lemma radiusRegPowOperator_zero {d : ℕ} (ε : ℝˣ) :
   simp
 
 lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
-    ∑ i, 𝐱[i] ∘L 𝐱[i] = 𝐫[d,ε,2] - ε.1 ^ 2 • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
+    ∑ i, 𝐱 i ∘L 𝐱 i = 𝐫[d,ε,2] - ε.1 ^ 2 • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
   simp [Space.norm_sq_eq, add_mul, ← mul_assoc, ← pow_two, Finset.sum_mul]
 
@@ -355,7 +356,7 @@ open SpaceDHilbertSpace
 
 /-- The position operators defined on the Schwartz submodule. -/
 def positionOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
-  schwartzEquiv.toLinearMap ∘ₗ 𝐱[i].toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
+  schwartzEquiv.toLinearMap ∘ₗ (𝐱 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
 lemma positionOperatorSchwartz_isSymmetric : (positionOperatorSchwartz i).IsSymmetric := by
   intro ψ ψ'
