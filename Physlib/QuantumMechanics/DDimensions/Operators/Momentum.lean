@@ -66,6 +66,9 @@ def momentumOperator : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
 @[inherit_doc momentumOperator]
 notation "𝐩" => momentumOperator
 
+@[inherit_doc momentumOperator]
+notation "𝐩[" d' "]" => momentumOperator (d := d')
+
 lemma momentumOperator_apply_fun (ψ : 𝓢(Space d, ℂ)) : 𝐩 i ψ = (-I * ℏ) • ∂[i] ψ := rfl
 
 @[simp]

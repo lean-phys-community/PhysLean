@@ -76,6 +76,9 @@ def positionOperator : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
 @[inherit_doc positionOperator]
 notation "𝐱" => positionOperator
 
+@[inherit_doc positionOperator]
+notation "𝐱[" d' "]" => positionOperator (d := d')
+
 lemma positionOperator_apply_fun (ψ : 𝓢(Space d, ℂ)) : 𝐱 i ψ = (fun x : Space d ↦ x i) • ⇑ψ := by
   ext
   simp [positionOperator, coordCLM_apply, coord_apply,
