@@ -28,7 +28,7 @@ Definitions:
     of the Hilbert space `SpaceDHilbertSpace d`.
 
 Notation:
-- `𝐩[i]` for `momentumOperator i`
+- `𝐩` for `momentumOperator`
 - `𝐩²` for `momentumOperatorSqr`
 
 ## iii. Table of contents
@@ -45,7 +45,7 @@ Notation:
 
 namespace QuantumMechanics
 noncomputable section
-open Constants
+open Constants Complex
 open Space
 open ContDiff SchwartzMap
 
@@ -64,14 +64,13 @@ def momentumOperator : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
     (SchwartzMap.fderivCLM ℂ (Space d) ℂ)
 
 @[inherit_doc momentumOperator]
-notation "𝐩[" i "]" => momentumOperator i
+notation "𝐩" => momentumOperator
 
-lemma momentumOperator_apply_fun (ψ : 𝓢(Space d, ℂ)) :
-    𝐩[i] ψ = (- Complex.I * ℏ) • ∂[i] ψ := rfl
+lemma momentumOperator_apply_fun (ψ : 𝓢(Space d, ℂ)) : 𝐩 i ψ = (-I * ℏ) • ∂[i] ψ := rfl
 
 @[simp]
-lemma momentumOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐩[i] ψ x = - Complex.I * ℏ * ∂[i] ψ x := rfl
+lemma momentumOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐩 i ψ x = -I * ℏ * ∂[i] ψ x :=
+  rfl
 
 /-!
 
@@ -80,15 +79,15 @@ lemma momentumOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
 -/
 
 /-- The square of the momentum operator, `𝐩² ≔ ∑ᵢ 𝐩ᵢ∘𝐩ᵢ`. -/
-def momentumOperatorSqr : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) := ∑ i, 𝐩[i] ∘L 𝐩[i]
+def momentumOperatorSqr : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) := ∑ i, 𝐩 i ∘L 𝐩 i
 
 @[inherit_doc momentumOperatorSqr]
 notation "𝐩²" => momentumOperatorSqr
 
-lemma momentumOperatorSqr_eq : 𝐩² = ∑ i : Fin d, 𝐩[i] ∘L 𝐩[i] := rfl
+lemma momentumOperatorSqr_eq : 𝐩² = ∑ i : Fin d, 𝐩 i ∘L 𝐩 i := rfl
 
 lemma momentumOperatorSqr_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐩² ψ x = ∑ i, 𝐩[i] (𝐩[i] ψ) x := by
+    𝐩² ψ x = ∑ i, 𝐩 i (𝐩 i ψ) x := by
   dsimp only [momentumOperatorSqr]
   rw [← SchwartzMap.coe_coeHom]
   simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_comp', Finset.sum_apply,
@@ -104,7 +103,7 @@ open SpaceDHilbertSpace MeasureTheory
 
 /-- The momentum operators defined on the Schwartz submodule. -/
 def momentumOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
-  schwartzEquiv.toLinearMap ∘ₗ 𝐩[i].toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
+  schwartzEquiv.toLinearMap ∘ₗ (𝐩 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
 lemma momentumOperatorSchwartz_isSymmetric :
     (momentumOperatorSchwartz i).IsSymmetric := by
