@@ -129,7 +129,7 @@ on the [Lean Zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-Phys
 
 If you want to cite the project as a whole please cite:
 
-```
+```bibtex
 @misc{physlib,
   author = {The Physlib community},
   title = {Physlib: The Lean Physics Library},
@@ -143,7 +143,7 @@ If you want to cite the project as a whole please cite:
 Physlib was formed by merging the general physics Lean library PhysLean (formerly called HepLean)
 with the quantum-information library Lean-QuantumInfo. Where appropriate please also consider
 citing the papers associated with the origin of these projects. For the former please use:
-```
+```bibtex
 @article{Tooby-Smith:2024vqu,
     author = "Tooby-Smith, Joseph",
     title = "{HepLean: Digitalising high energy physics}",
@@ -159,7 +159,7 @@ citing the papers associated with the origin of these projects. For the former p
 ```
 and for the latter please use:
 
-```
+```bibtex
 @article{Meiburg:2025mwn,
     author = "Meiburg, Alex and Lessa, Leonardo A. and Soldati, Rodolfo R.",
     title = "{A Formalization of the Generalized Quantum Stein's Lemma in Lean}",
