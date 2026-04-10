@@ -14,13 +14,12 @@ public import Physlib.Mathematics.VariationalCalculus.IsTestFunction
 This module packages the admissible variations used in the local first-variation problem.
 
 For the first local stage, a variation is admissible if it is a smooth compactly supported map
-`Space n → Space m`. This reuses the existing `IsTestFunction` predicate rather than introducing a
-second support calculus.
+`Space n → U` for a real normed vector space `U`. This reuses the existing `IsTestFunction`
+predicate rather than introducing a second support calculus.
 
 ## ii. Key results
 
 - `ClassicalFieldTheory.Local.AdmissibleVariation` : compactly supported smooth variations.
-- `ClassicalFieldTheory.Local.IsAdmissibleVariation` : predicate form of the same notion.
 
 ## iii. Table of contents
 
@@ -44,89 +43,80 @@ namespace Local
 
 -/
 
-/-- Predicate form of admissible local variations. -/
-abbrev IsAdmissibleVariation (η : Space n → Space m) : Prop := IsTestFunction η
-
-/-- An admissible local variation is a smooth compactly supported map `Space n → Space m`. -/
-structure AdmissibleVariation (n m : ℕ) where
-  toFun : Space n → Space m
-  isAdmissible : IsAdmissibleVariation toFun
+/-- An admissible local variation is a smooth compactly supported map `Space n → U`. -/
+structure AdmissibleVariation (n : ℕ) (U : Type*) [NormedAddCommGroup U] [NormedSpace ℝ U] where
+  /-- The underlying variation function. -/
+  toFun : Space n → U
+  /-- Smoothness and compact support of the variation. -/
+  isTestFunction : IsTestFunction toFun
 
 namespace AdmissibleVariation
 
-variable {n m : ℕ}
+variable {n : ℕ} {U : Type*} [NormedAddCommGroup U] [NormedSpace ℝ U]
 
 /-!
 ## B. Basic operations on admissible variations
 
 -/
 
-instance : CoeFun (AdmissibleVariation n m) (fun _ => Space n → Space m) where
+instance : CoeFun (AdmissibleVariation n U) (fun _ => Space n → U) where
   coe η := η.toFun
 
-/-- The underlying test-function property of an admissible variation. -/
-lemma isTestFunction (η : AdmissibleVariation n m) : IsTestFunction (η.toFun) := η.isAdmissible
+attribute [fun_prop] AdmissibleVariation.isTestFunction
 
-lemma hasCompactSupport (η : AdmissibleVariation n m) : HasCompactSupport (η.toFun) :=
+/-- An admissible variation has compact support. -/
+lemma hasCompactSupport (η : AdmissibleVariation n U) : HasCompactSupport (η.toFun) :=
   η.isTestFunction.supp
 
-noncomputable def toCompactlySupportedContinuousMap (η : AdmissibleVariation n m) :
-    CompactlySupportedContinuousMap (Space n) (Space m) :=
+/-- View an admissible variation as a compactly supported continuous map. -/
+noncomputable def toCompactlySupportedContinuousMap (η : AdmissibleVariation n U) :
+    CompactlySupportedContinuousMap (Space n) U :=
   η.isTestFunction.toCompactlySupportedContinuousMap
 
-/-- The zero admissible variation. -/
-noncomputable def zero : AdmissibleVariation n m where
-  toFun := fun _ => 0
-  isAdmissible := IsTestFunction.zero
-
-noncomputable instance : Zero (AdmissibleVariation n m) := ⟨zero⟩
+noncomputable instance : Zero (AdmissibleVariation n U) where
+  zero :=
+    { toFun := fun _ => 0
+      isTestFunction := IsTestFunction.zero }
 
 @[simp]
-lemma zero_apply (x : Space n) : (0 : AdmissibleVariation n m) x = 0 := rfl
+lemma zero_apply (x : Space n) : (0 : AdmissibleVariation n U) x = 0 := rfl
 
-/-- Negation of admissible variations. -/
-noncomputable def neg (η : AdmissibleVariation n m) : AdmissibleVariation n m where
-  toFun := fun x => -η x
-  isAdmissible := η.isTestFunction.neg
-
-noncomputable instance : Neg (AdmissibleVariation n m) := ⟨neg⟩
+noncomputable instance : Neg (AdmissibleVariation n U) where
+  neg η :=
+    { toFun := fun x => -η x
+      isTestFunction := η.isTestFunction.neg }
 
 @[simp]
-lemma neg_apply (η : AdmissibleVariation n m) (x : Space n) : (-η) x = -η x := rfl
+lemma neg_apply (η : AdmissibleVariation n U) (x : Space n) : (-η) x = -η x := rfl
 
-/-- Sum of admissible variations. -/
-noncomputable def add (η ξ : AdmissibleVariation n m) : AdmissibleVariation n m where
-  toFun := fun x => η x + ξ x
-  isAdmissible := η.isTestFunction.add ξ.isTestFunction
-
-noncomputable instance : Add (AdmissibleVariation n m) := ⟨add⟩
+noncomputable instance : Add (AdmissibleVariation n U) where
+  add η ξ :=
+    { toFun := fun x => η x + ξ x
+      isTestFunction := η.isTestFunction.add ξ.isTestFunction }
 
 @[simp]
-lemma add_apply (η ξ : AdmissibleVariation n m) (x : Space n) : (η + ξ) x = η x + ξ x := rfl
+lemma add_apply (η ξ : AdmissibleVariation n U) (x : Space n) : (η + ξ) x = η x + ξ x := rfl
 
-/-- Difference of admissible variations. -/
-noncomputable def sub (η ξ : AdmissibleVariation n m) : AdmissibleVariation n m where
-  toFun := fun x => η x - ξ x
-  isAdmissible := η.isTestFunction.sub ξ.isTestFunction
-
-noncomputable instance : Sub (AdmissibleVariation n m) := ⟨sub⟩
+noncomputable instance : Sub (AdmissibleVariation n U) where
+  sub η ξ :=
+    { toFun := fun x => η x - ξ x
+      isTestFunction := η.isTestFunction.sub ξ.isTestFunction }
 
 @[simp]
-lemma sub_apply (η ξ : AdmissibleVariation n m) (x : Space n) : (η - ξ) x = η x - ξ x := rfl
+lemma sub_apply (η ξ : AdmissibleVariation n U) (x : Space n) : (η - ξ) x = η x - ξ x := rfl
 
-/-- Scalar multiples of admissible variations by real constants are admissible. -/
-noncomputable def smul (c : ℝ) (η : AdmissibleVariation n m) : AdmissibleVariation n m where
-  toFun := fun x => c • η x
-  isAdmissible := IsTestFunction.smul_left (f := fun _ : Space n => c) (g := η.toFun)
-    (by fun_prop) η.isTestFunction
-
-noncomputable instance : SMul ℝ (AdmissibleVariation n m) := ⟨smul⟩
+noncomputable instance : SMul ℝ (AdmissibleVariation n U) where
+  smul c η :=
+    { toFun := fun x => c • η x
+      isTestFunction := IsTestFunction.smul_left (f := fun _ : Space n => c) (g := η.toFun)
+        (by fun_prop) η.isTestFunction }
 
 @[simp]
-lemma smul_apply (c : ℝ) (η : AdmissibleVariation n m) (x : Space n) :
+lemma smul_apply (c : ℝ) (η : AdmissibleVariation n U) (x : Space n) :
     (c • η) x = c • η x := rfl
 
-lemma coord (η : AdmissibleVariation n m) (a : Fin m) :
+@[fun_prop]
+lemma coord {m : ℕ} (η : AdmissibleVariation n (Space m)) (a : Fin m) :
     IsTestFunction (fun x => (η.toFun x).coord a) := by
   simpa [Space.coord] using IsTestFunction.coord η.isTestFunction a
 

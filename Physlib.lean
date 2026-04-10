@@ -1,5 +1,6 @@
 module
 
+public import Physlib.ClassicalFieldTheory.Local.Variation
 public import Physlib.ClassicalMechanics.Basic
 public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Basic
 public import Physlib.ClassicalMechanics.EulerLagrange
@@ -18,7 +19,6 @@ public import Physlib.ClassicalMechanics.Scattering.RigidSphere
 public import Physlib.ClassicalMechanics.Vibrations.LinearTriatomic
 public import Physlib.ClassicalMechanics.WaveEquation.Basic
 public import Physlib.ClassicalMechanics.WaveEquation.HarmonicWave
-public import Physlib.ClassicalFieldTheory.Local.Variation
 public import Physlib.CondensedMatter.Basic
 public import Physlib.CondensedMatter.TightBindingChain.Basic
 public import Physlib.Cosmology.Basic
