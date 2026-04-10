@@ -3,11 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.SpecialFunctions.Log.Base
+module
 
-import QuantumInfo.Finite.Entropy
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.Finite.Distance
+public import Mathlib.Analysis.SpecialFunctions.Log.Base
+
+public import QuantumInfo.Finite.Entropy
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.Finite.Distance
 
 
 /-! # Quantum Capacity
@@ -53,6 +55,8 @@ The only notion of "capacity" here currently is "quantum capacity" in the usual 
 
 And other important theorems like superdense coding, nonadditivity, superactivation
 -/
+
+@[expose] public section
 
 namespace CPTPMap
 

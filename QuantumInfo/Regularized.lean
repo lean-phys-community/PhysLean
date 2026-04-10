@@ -3,13 +3,17 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.Superadditive
-import Mathlib.Order.LiminfLimsup
-import Mathlib.Topology.Order.MonotoneConvergence
+module
+
+public import QuantumInfo.ForMathlib.Superadditive
+public import Mathlib.Order.LiminfLimsup
+public import Mathlib.Topology.Order.MonotoneConvergence
 
 /-! Definition of "Regularized quantities" as are common in information theory,
 from one-shot versions, and good properties coming from Fekete's lemma.
 -/
+
+@[expose] public section
 
 variable {T : Type*} [ConditionallyCompleteLattice T]
 

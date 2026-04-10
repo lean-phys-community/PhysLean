@@ -3,12 +3,16 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap.Bundled
-import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+module
+
+public import QuantumInfo.Finite.CPTPMap.Bundled
+public import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
 
 /-! # Duals of matrix map
 
 Definitions and theorems about the dual of a matrix map. -/
+
+@[expose] public section
 
 noncomputable section
 open ComplexOrder

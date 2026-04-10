@@ -3,10 +3,12 @@ Copyright (c) 2025 Leonardo A Lessa. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Leonardo A Lessa
 -/
-import QuantumInfo.Finite.Braket
-import QuantumInfo.Finite.Ensemble
-import QuantumInfo.Finite.Entropy
-import QuantumInfo.ClassicalInfo.Entropy
+module
+
+public import QuantumInfo.Finite.Braket
+public import QuantumInfo.Finite.Ensemble
+public import QuantumInfo.Finite.Entropy
+public import QuantumInfo.ClassicalInfo.Entropy
 
 /-!
 Entanglement measures. (Mixed) convex roof extensions. Definition of product / separable / entangled states
@@ -38,6 +40,8 @@ TODO:
       the mixed state is separable
    For other properties, see Sec. IV.F of [2] above.
 -/
+
+@[expose] public section
 
 noncomputable section
 

@@ -3,9 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Inner
-import QuantumInfo.ForMathlib.HermitianMat.NonSingular
-import QuantumInfo.ForMathlib.Isometry
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Inner
+public import QuantumInfo.ForMathlib.HermitianMat.NonSingular
+public import QuantumInfo.ForMathlib.Isometry
+
+@[expose] public section
 
 notation "𝐔[" n "]" => Matrix.unitaryGroup n ℂ
 

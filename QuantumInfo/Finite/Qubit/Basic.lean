@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap
+module
+
+public import QuantumInfo.Finite.CPTPMap
 
 /-!
 Quantum theory and operations specific to qubits.
@@ -13,6 +15,8 @@ Quantum theory and operations specific to qubits.
  - Fidelity for qubits: `F(ρ,σ) = 2√(ρ.det * σ.det)`.
  - The singlet/triplet split.
 -/
+
+@[expose] public section
 
 abbrev Qubit := Fin 2
 

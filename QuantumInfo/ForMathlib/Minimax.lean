@@ -3,14 +3,18 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.SionMinimax
+module
+
+public import QuantumInfo.ForMathlib.SionMinimax
 
 --minimize these imports?
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.GroupTheory.MonoidLocalization.Basic
-import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-import Mathlib.Topology.Algebra.Module.StrongTopology
-import Mathlib.Topology.Algebra.Module.FiniteDimension
+public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Mathlib.GroupTheory.MonoidLocalization.Basic
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+public import Mathlib.Topology.Algebra.Module.StrongTopology
+public import Mathlib.Topology.Algebra.Module.FiniteDimension
+
+@[expose] public section
 
 --TODO go elsewhere
 attribute [fun_prop] LowerSemicontinuous --UpperSemicontinuous

@@ -3,7 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Leonardo A. Lessa, Rodolfo R. Soldati
 -/
-import QuantumInfo.Finite.ResourceTheory.FreeState
+module
+
+public import QuantumInfo.Finite.ResourceTheory.FreeState
+
+@[expose] public section
 
 /-- A quantum resource theory extends a `FreeStateTheory` with a collection of free operations. It is
 required that any state we can always prepare for free must be free, and this is all then the resource

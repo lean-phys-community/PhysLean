@@ -3,10 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap.Unbundled
-import QuantumInfo.Finite.MState
+module
 
-import Mathlib.Topology.Order.Hom.Basic
+public import QuantumInfo.Finite.CPTPMap.Unbundled
+public import QuantumInfo.Finite.MState
+
+public import Mathlib.Topology.Order.Hom.Basic
 
 /-! # Classes of Matrix Maps
 
@@ -19,6 +21,8 @@ The combinations `PTPMap` (positive trace-preserving), `CPTPMap`, and `CPUMap`
 The majority of quantum theory revolves around `CPTPMap`s, so those are explored more
 thoroughly in their file CPTP.lean.
 -/
+
+@[expose] public section
 
 
 variable (dIn dOut R : Type*) (𝕜 : Type := ℂ)

@@ -3,15 +3,17 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Leonardo A. Lessa, Rodolfo R. Soldati
 -/
-import Mathlib.Algebra.Module.Submodule.Lattice
-import Mathlib.Analysis.Subadditive
-import Mathlib.CategoryTheory.Functor.FullyFaithful
-import Mathlib.CategoryTheory.Monoidal.Braided.Basic
-import Mathlib.Data.EReal.Basic
+module
 
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.Finite.Entropy
-import QuantumInfo.Finite.POVM
+public import Mathlib.Algebra.Module.Submodule.Lattice
+public import Mathlib.Analysis.Subadditive
+public import Mathlib.CategoryTheory.Functor.FullyFaithful
+public import Mathlib.CategoryTheory.Monoidal.Braided.Basic
+public import Mathlib.Data.EReal.Basic
+
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.Finite.Entropy
+public import QuantumInfo.Finite.POVM
 
 /-!
 Defines `OptimalHypothesisRate`, the optimal rate of distinguishing an `MState` ρ from a set of other
@@ -30,6 +32,8 @@ We make this accessible through the notation `β_ ε(ρ‖S)`.
 See [The tangled state of quantum hypothesis testing](https://doi.org/10.1038/s41567-023-02289-9) by
 Mario Berta et al. for a broader overview.
 -/
+
+@[expose] public section
 
 open NNReal
 open ComplexOrder

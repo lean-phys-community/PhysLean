@@ -3,11 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Leonardo A. Lessa
 -/
-import QuantumInfo.ForMathlib
-import QuantumInfo.ClassicalInfo.Distribution
-import QuantumInfo.Finite.Braket
+module
 
-import Mathlib.Logic.Equiv.Basic
+public import QuantumInfo.ForMathlib
+public import QuantumInfo.ClassicalInfo.Distribution
+public import QuantumInfo.Finite.Braket
+
+public import Mathlib.Logic.Equiv.Basic
 
 /-!
 Finite dimensional quantum mixed states, ρ.
@@ -32,6 +34,8 @@ Important definitions:
  * `mix`: The total state corresponding to an ensemble
  * `average`: Averages a function over an ensemble, with appropriate weights
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -82,7 +86,7 @@ open Lean Meta Mathlib.Meta.Positivity in
 Note: we must not call `whnfR` on `e` because `MState.M` is a structure
 projection (reducible), so `whnfR` would reduce it and destroy the pattern. -/
 @[positivity MState.M _]
-def evalMStateM : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalMStateM : PositivityExt where eval {_u _α} _zα _pα e := do
   let ρ := e.appArg!
   pure (.positive (← mkAppM ``MState.pos #[ρ]))
 

@@ -3,9 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.Braket
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.ClassicalInfo.Entropy
+module
+
+public import QuantumInfo.Finite.Braket
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.ClassicalInfo.Entropy
 
 /-!
 Quantum notions of information and entropy.
@@ -17,6 +19,8 @@ We start with quantities of _entropy_, namely the von Neumann entropy and its de
  * Quantum conditional mutual information, `qcmi`.
 and then prove facts about them.
 -/
+
+@[expose] public section
 
 /- # TODO / Goals:
 
@@ -177,7 +181,7 @@ section partial_trace_pure
 /--
 Convert a vector on a product space to a matrix.
 -/
-private def vecToMat {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] (v : d₁ × d₂ → ℂ) : Matrix d₁ d₂ ℂ :=
+def vecToMat {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] (v : d₁ × d₂ → ℂ) : Matrix d₁ d₂ ℂ :=
   Matrix.of (fun i j => v (i, j))
 
 /--

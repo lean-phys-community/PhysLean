@@ -3,8 +3,10 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap.Bundled
-import QuantumInfo.Finite.Unitary
+module
+
+public import QuantumInfo.Finite.CPTPMap.Bundled
+public import QuantumInfo.Finite.Unitary
 
 /-! # Completely Positive Trace Preserving maps
 
@@ -33,6 +35,8 @@ This file also defines several important examples of, classes of, and operations
     operations on states. These correspond directly to `MState.SWAP`, `MState.assoc`, `MState.assoc'`,
     `MState.traceLeft`, and `MState.traceRight`.
 -/
+
+@[expose] public section
 
 variable {dIn dOut dOut₂ : Type*} [Fintype dIn] [Fintype dOut] [Fintype dOut₂]
 

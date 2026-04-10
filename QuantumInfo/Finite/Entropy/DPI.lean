@@ -3,8 +3,12 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.Entropy.Relative
-import QuantumInfo.ForMathlib.HermitianMat.Sqrt
+module
+
+public import QuantumInfo.Finite.Entropy.Relative
+public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
+
+@[expose] public section
 
 noncomputable section
 
@@ -423,11 +427,14 @@ theorem sandwichedRenyiEntropy_DPI (hα : 1 ≤ α) (ρ σ : MState d) (Φ : CPT
 --Helps us track this one sorry for the GQSL
 axiom sandwichedRenyiEntropy_DPI_ax : type_of% @sandwichedRenyiEntropy_DPI
 
-/--
+/-
 info: 'sandwichedRenyiEntropy_DPI_ax' depends on axioms: [propext,
  sandwichedRenyiEntropy_DPI_ax,
  Classical.choice,
  Quot.sound]
 -/
+
+/- Removed due to module system.
 #guard_msgs in
 #print axioms sandwichedRenyiEntropy_DPI_ax
+-/

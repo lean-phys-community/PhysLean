@@ -3,9 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.LinearAlgebra.Matrix.Kronecker
-import Mathlib.LinearAlgebra.Matrix.PosDef
-import QuantumInfo.ForMathlib.HermitianMat.Unitary
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Kronecker
+public import Mathlib.LinearAlgebra.Matrix.PosDef
+public import QuantumInfo.ForMathlib.HermitianMat.Unitary
+
+@[expose] public section
 
 open BigOperators
 open Classical

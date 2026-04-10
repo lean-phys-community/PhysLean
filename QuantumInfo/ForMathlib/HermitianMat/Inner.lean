@@ -3,9 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Order
-import Mathlib.Analysis.Convex.Contractible
-import Mathlib.Topology.Instances.Real.Lemmas
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Order
+public import Mathlib.Analysis.Convex.Contractible
+public import Mathlib.Topology.Instances.Real.Lemmas
 
 /-! # Inner product of Hermitian Matrices
 
@@ -24,6 +26,8 @@ topology that HermitianMat inherits from the topology on Matrix. This can be don
 `InnerProductSpace.ofCoreOfTopology`.
 
 -/
+
+@[expose] public section
 
 namespace HermitianMat
 

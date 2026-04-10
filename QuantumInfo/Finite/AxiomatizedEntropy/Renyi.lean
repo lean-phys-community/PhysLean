@@ -3,9 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.Entropy.Defs
+module
+
+public import QuantumInfo.Finite.Entropy.Defs
 
 /-! # Quantum Relative Entropy and α-Renyi Entropy -/
+
+@[expose] public section
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
 

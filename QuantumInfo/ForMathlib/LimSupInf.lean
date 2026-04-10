@@ -3,20 +3,24 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.Normed.Ring.Lemmas
-import Mathlib.Data.Finset.Attr
-import Mathlib.Data.Int.Star
-import Mathlib.Data.Real.StarOrdered
-import Mathlib.Tactic.Bound
-import Mathlib.Tactic.Peel
-import Mathlib.Tactic.Common
-import Mathlib.Tactic.Continuity
-import Mathlib.Tactic.Finiteness.Attr
-import Mathlib.Tactic.SetLike
-import Mathlib.Util.CompileInductive
-import Mathlib.Topology.Instances.ENNReal.Lemmas
-import Mathlib.Topology.Instances.Nat
+module
+
+public import Mathlib.Algebra.Order.Ring.Star
+public import Mathlib.Analysis.Normed.Ring.Lemmas
+public import Mathlib.Data.Finset.Attr
+public import Mathlib.Data.Int.Star
+public import Mathlib.Data.Real.StarOrdered
+public import Mathlib.Tactic.Bound
+public import Mathlib.Tactic.Peel
+public import Mathlib.Tactic.Common
+public import Mathlib.Tactic.Continuity
+public import Mathlib.Tactic.Finiteness.Attr
+public import Mathlib.Tactic.SetLike
+public import Mathlib.Util.CompileInductive
+public import Mathlib.Topology.Instances.ENNReal.Lemmas
+public import Mathlib.Topology.Instances.Nat
+
+@[expose] public section
 
 open scoped NNReal
 open scoped ENNReal

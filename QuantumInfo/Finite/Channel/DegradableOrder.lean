@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap
+module
+
+public import QuantumInfo.Finite.CPTPMap
 
 /-! # The Degradable Order
 
@@ -26,6 +28,8 @@ Technical notes: to model "channels of different output types", the preorder is 
 type of channels parameterized by their output type. And since the output type needs to be a
 Fintype and DecidableEq, the argument is also a Sigma to bring this along.
 -/
+
+@[expose] public section
 
 section
 

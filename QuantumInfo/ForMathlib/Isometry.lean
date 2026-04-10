@@ -3,14 +3,18 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.InnerProductSpace.JointEigenspace
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
-import Mathlib.LinearAlgebra.Matrix.Permutation
-import Mathlib.LinearAlgebra.Matrix.IsDiag
-import Mathlib.Tactic.NormNum.GCD
+module
 
-import QuantumInfo.ForMathlib.Matrix
+public import Mathlib.Analysis.InnerProductSpace.JointEigenspace
+public import Mathlib.Analysis.SpecialFunctions.Bernstein
+public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+public import Mathlib.LinearAlgebra.Matrix.Permutation
+public import Mathlib.LinearAlgebra.Matrix.IsDiag
+public import Mathlib.Tactic.NormNum.GCD
+
+public import QuantumInfo.ForMathlib.Matrix
+
+@[expose] public section
 
 open scoped Matrix
 

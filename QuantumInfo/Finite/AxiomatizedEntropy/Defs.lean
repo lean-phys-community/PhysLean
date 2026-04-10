@@ -3,9 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ClassicalInfo.Entropy
-import QuantumInfo.Finite.MState
-import QuantumInfo.Finite.CPTPMap
+module
+
+public import QuantumInfo.ClassicalInfo.Entropy
+public import QuantumInfo.Finite.MState
+public import QuantumInfo.Finite.CPTPMap
 
 /-! # Generalized quantum entropy and relative entropy
 
@@ -38,6 +40,8 @@ by Marco Tomamichel
  - [StackExchange](https://quantumcomputing.stackexchange.com/a/12953/10115)
 
 -/
+
+@[expose] public section
 
 noncomputable section
 universe u

@@ -3,15 +3,19 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ClassicalInfo.Prob
+module
 
-import Mathlib.Analysis.Convex.Combination
+public import QuantumInfo.ClassicalInfo.Prob
+
+public import Mathlib.Analysis.Convex.Combination
 
 /-! # Distributions on finite sets
 
 We define the type `Distribution α` on a `Fintype α`. By restricting ourselves to distributoins on finite types,
 a lot of notation and casts are greatly simplified. This suffices for (most) finite-dimensional quantum theory.
 -/
+
+@[expose] public section
 
 noncomputable section
 open NNReal

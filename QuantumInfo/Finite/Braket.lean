@@ -3,8 +3,10 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Rodolfo Soldati
 -/
-import QuantumInfo.ForMathlib
-import QuantumInfo.ClassicalInfo.Distribution
+module
+
+public import QuantumInfo.ForMathlib
+public import QuantumInfo.ClassicalInfo.Distribution
 
 /-!
 Finite dimensional quantum pure states, bra and kets. Mixed states are `MState` in that file.
@@ -18,6 +20,8 @@ mostly focus on the basis-dependent notion of `Matrix`, which has the added bene
 "classical" interpretation (as the basis elements, or diagonal elements of a mixed state). In that
 sense, this quantum theory comes with the a particular classical theory always preferred.
 -/
+
+@[expose] public section
 
 noncomputable section
 

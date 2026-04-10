@@ -3,15 +3,19 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.StatMech.Hamiltonian
-import Mathlib.Analysis.SpecialFunctions.Log.Deriv
-import Mathlib.Data.Real.StarOrdered
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.MeasureTheory.Integral.Bochner.Basic
-import Mathlib.MeasureTheory.Integral.Bochner.L1
-import Mathlib.MeasureTheory.Integral.Bochner.VitaliCaratheodory
-import Mathlib.MeasureTheory.Measure.Haar.OfBasis
-import Mathlib.Order.CompletePartialOrder
+module
+
+public import QuantumInfo.StatMech.Hamiltonian
+public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+public import Mathlib.Data.Real.StarOrdered
+public import Mathlib.MeasureTheory.Constructions.Pi
+public import Mathlib.MeasureTheory.Integral.Bochner.Basic
+public import Mathlib.MeasureTheory.Integral.Bochner.L1
+public import Mathlib.MeasureTheory.Integral.Bochner.VitaliCaratheodory
+public import Mathlib.MeasureTheory.Measure.Haar.OfBasis
+public import Mathlib.Order.CompletePartialOrder
+
+@[expose] public section
 
 noncomputable section
 namespace MicroHamiltonian

@@ -3,10 +3,12 @@ Copyright (c) 2025 Leonardo A Lessa. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Leonardo A Lessa, Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.CFC
+module
 
-import Mathlib.Analysis.CStarAlgebra.Classes
-import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.PosPart.Basic
+public import QuantumInfo.ForMathlib.HermitianMat.CFC
+
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.PosPart.Basic
 
 /-!
 
@@ -23,6 +25,8 @@ import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.PosPart.Ba
    onto its positive (resp. negative) eigenvalues; equivalently, it's nonnegative (resp.
    nonpositive) eigenvalues.
 -/
+
+@[expose] public section
 
 noncomputable section
 namespace HermitianMat

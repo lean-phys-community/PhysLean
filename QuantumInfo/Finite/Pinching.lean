@@ -3,10 +3,12 @@ Copyright (c) 2025 Leonardo A Lessa. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Leonardo A Lessa, Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.Finite.MState
-import QuantumInfo.Finite.Entropy
-import QuantumInfo.ForMathlib.HermitianMat.CFC
+module
+
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.Finite.MState
+public import QuantumInfo.Finite.Entropy
+public import QuantumInfo.ForMathlib.HermitianMat.CFC
 
 /-! # Pinching channels
 A pinching channel decoheres in the eigenspaces of a given state.
@@ -16,6 +18,8 @@ where the P_i are the projectors onto the i-th eigenspaces of ρ = ∑ᵢ pᵢ P
 
 TODO: Generalize to pinching with respect to arbitrary P(O)VM.
 -/
+
+@[expose] public section
 
 noncomputable section
 open scoped Matrix RealInnerProductSpace

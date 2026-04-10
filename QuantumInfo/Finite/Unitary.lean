@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Rodolfo Soldati
 -/
-import QuantumInfo.Finite.MState
+module
+
+public import QuantumInfo.Finite.MState
 
 /-! # Unitary operators on quantum state
 
@@ -12,6 +14,8 @@ This file is intended for lemmas about unitary matrices (`Matrix.unitaryGroup`) 
 
 This is imported by `CPTPMap` to define things like unitary channels, Kraus operators, and
 complementary channels, so this file itself does not discuss channels yet. -/
+
+@[expose] public section
 
 noncomputable section
 

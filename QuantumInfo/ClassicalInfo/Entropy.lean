@@ -3,10 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ClassicalInfo.Distribution
-import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
-import Mathlib.Analysis.SpecialFunctions.BinaryEntropy
-import QuantumInfo.ClassicalInfo.ForMathlib.Analysis.SpecialFunctions.Log.NegMulLog
+module
+
+public import QuantumInfo.ClassicalInfo.Distribution
+public import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
+public import Mathlib.Analysis.SpecialFunctions.BinaryEntropy
+public import QuantumInfo.ClassicalInfo.ForMathlib.Analysis.SpecialFunctions.Log.NegMulLog
 
 /-! # Shannon entropy
 
@@ -15,6 +17,8 @@ variable and on a distribution.
 
 There is significant overlap with `Real.negMulLog` and `Real.binEntropy` in Mathlib,
 and probably these files could be combined in some form. -/
+
+@[expose] public section
 
 noncomputable section
 open NNReal

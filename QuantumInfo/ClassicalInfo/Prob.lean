@@ -3,13 +3,15 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.Convex.Mul
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
-import Mathlib.Data.NNReal.Basic
-import Mathlib.Data.EReal.Basic
-import Mathlib.Tactic.Finiteness
-import Mathlib.Topology.UnitInterval
+module
+
+public import Mathlib.Analysis.Convex.Mul
+public import Mathlib.Analysis.SpecialFunctions.Log.Basic
+public import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
+public import Mathlib.Data.NNReal.Basic
+public import Mathlib.Data.EReal.Basic
+public import Mathlib.Tactic.Finiteness
+public import Mathlib.Topology.UnitInterval
 
 /-! # Probabilities
 
@@ -20,6 +22,8 @@ functions that only make sense on probabilities.
 A significant application is in the `Mixable` typeclass, also in this file, which is a general notion
 of convex combination that applies to types as opposed to sets; elements are `Mixable.mix`ed using `Prob`s.
 -/
+
+@[expose] public section
 
 noncomputable section
 open NNReal

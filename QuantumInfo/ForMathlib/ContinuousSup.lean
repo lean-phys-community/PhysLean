@@ -3,10 +3,14 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.Normed.Module.FiniteDimension
-import Mathlib.Data.Real.StarOrdered
-import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
+module
+
+public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Mathlib.Analysis.Normed.Module.FiniteDimension
+public import Mathlib.Data.Real.StarOrdered
+public import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
+
+@[expose] public section
 
 variable {α β γ : Type*} {S : Set β} {f : γ → β → α}
 variable [ConditionallyCompleteLinearOrder α] [TopologicalSpace α] [OrderTopology α]

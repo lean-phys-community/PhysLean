@@ -3,15 +3,19 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Leonardo A. Lessa, Rodolfo R. Soldati
 -/
-import Mathlib.Algebra.Module.Submodule.Lattice
-import Mathlib.Analysis.Subadditive
-import Mathlib.CategoryTheory.Functor.FullyFaithful
-import Mathlib.CategoryTheory.Monoidal.Braided.Basic
-import Mathlib.Data.EReal.Basic
-import Mathlib.Tactic
+module
 
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.Finite.Entropy
+public import Mathlib.Algebra.Module.Submodule.Lattice
+public import Mathlib.Analysis.Subadditive
+public import Mathlib.CategoryTheory.Functor.FullyFaithful
+public import Mathlib.CategoryTheory.Monoidal.Braided.Basic
+public import Mathlib.Data.EReal.Basic
+public import Mathlib.Tactic
+
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.Finite.Entropy
+
+@[expose] public section
 
 open scoped Topology
 

@@ -3,20 +3,24 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Algebra.Algebra.Spectrum.Quasispectrum
-import Mathlib.Algebra.Order.Group.Pointwise.CompleteLattice
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.Matrix.Order
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
-import Mathlib.Data.Multiset.Functor --Can't believe I'm having to import this
-import Mathlib.LinearAlgebra.Matrix.Kronecker
-import Mathlib.LinearAlgebra.Matrix.PosDef
-import Mathlib.LinearAlgebra.Matrix.IsDiag
-import Mathlib.Tactic.Bound
-import Mathlib.Tactic.NormNum.GCD
+module
 
-import QuantumInfo.ForMathlib.Misc
+public import Mathlib.Algebra.Algebra.Spectrum.Quasispectrum
+public import Mathlib.Algebra.Order.Group.Pointwise.CompleteLattice
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import Mathlib.Analysis.Matrix.Order
+public import Mathlib.Analysis.SpecialFunctions.Bernstein
+public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+public import Mathlib.Data.Multiset.Functor --Can't believe I'm having to import this
+public import Mathlib.LinearAlgebra.Matrix.Kronecker
+public import Mathlib.LinearAlgebra.Matrix.PosDef
+public import Mathlib.LinearAlgebra.Matrix.IsDiag
+public import Mathlib.Tactic.Bound
+public import Mathlib.Tactic.NormNum.GCD
+
+public import QuantumInfo.ForMathlib.Misc
+
+@[expose] public section
 
 noncomputable section
 

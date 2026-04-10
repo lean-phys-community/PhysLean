@@ -3,13 +3,15 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.LinearAlgebra.TensorProduct.Matrix
-import Mathlib.LinearAlgebra.PiTensorProduct
-import Mathlib.Data.Set.Card
-import Mathlib.Algebra.Module.LinearMap.Basic
-import QuantumInfo.ForMathlib
-import QuantumInfo.Finite.Braket
-import QuantumInfo.Finite.MState
+module
+
+public import Mathlib.LinearAlgebra.TensorProduct.Matrix
+public import Mathlib.LinearAlgebra.PiTensorProduct
+public import Mathlib.Data.Set.Card
+public import Mathlib.Algebra.Module.LinearMap.Basic
+public import QuantumInfo.ForMathlib
+public import QuantumInfo.Finite.Braket
+public import QuantumInfo.Finite.MState
 
 /-! # Linear maps of matrices
 
@@ -25,6 +27,8 @@ concepts that specifically make sense in this context.
 We provide simp lemmas for relating these facts, prove basic facts e.g. composition and identity, and some facts
 about `IsTracePreserving` maps.
 -/
+
+@[expose] public section
 
 /-- A `MatrixMap` is a linear map between squares matrices of size A to size B, over R. -/
 abbrev MatrixMap (A B R : Type*) [Semiring R] := Matrix A A R →ₗ[R] Matrix B B R

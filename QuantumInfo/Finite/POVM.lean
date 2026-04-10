@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap
+module
+
+public import QuantumInfo.Finite.CPTPMap
 
 /-! # Positive Operator-Valued Measures
 
@@ -18,6 +20,8 @@ are the route to get back to classical information (a `ProbDistribution` of outc
 TODO: They can also evolve under CPTP maps themselves (the Heisenberg picture of quantum evolution), they might commute
 with each other or not, they might be projective or not.
 -/
+
+@[expose] public section
 noncomputable section
 open BigOperators
 open ComplexOrder

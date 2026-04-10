@@ -3,8 +3,12 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Rpow
-import QuantumInfo.ForMathlib.Majorization
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Rpow
+public import QuantumInfo.ForMathlib.Majorization
+
+@[expose] public section
 
 variable {d d₂ 𝕜 : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
 variable [RCLike 𝕜]

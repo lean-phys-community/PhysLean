@@ -3,8 +3,10 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib
-import QuantumInfo.ForMathlib.Matrix
+module
+
+public import Mathlib
+public import QuantumInfo.ForMathlib.Matrix
 
 /-! # Majorization and weak log-majorization
 
@@ -18,6 +20,8 @@ the key singular value inequality needed for the Schatten–Hölder inequality.
 * `holder_step_for_singularValues`: the Hölder step giving
   `∑ σ↓ᵢ(A)^r · σ↓ᵢ(B)^r ≤ (∑ σᵢ(A)^p)^{r/p} · (∑ σᵢ(B)^q)^{r/q}`.
 -/
+
+@[expose] public section
 
 open Finset BigOperators Matrix
 

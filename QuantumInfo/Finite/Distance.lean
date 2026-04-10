@@ -3,8 +3,10 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.Distance.Fidelity
-import QuantumInfo.Finite.Distance.TraceDistance
+module
+
+public import QuantumInfo.Finite.Distance.Fidelity
+public import QuantumInfo.Finite.Distance.TraceDistance
 
 /-!
 Distances between quantum states.
@@ -16,3 +18,5 @@ Distances between quantum states.
 
 All share some axioms: https://quantiki.org/wiki/distance-measures-between-states
 -/
+
+@[expose] public section

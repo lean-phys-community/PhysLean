@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Reindex
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Reindex
 
 /-! # Trace of Hermitian Matrices
 
@@ -19,6 +21,8 @@ The `IsMaximalSelfAdjoint` class is used so that (for example) for matrices over
 `HermitianMat.trace` works as well and is in fact defeq to `Matrix.trace`. For ℂ or `RCLike`,
 it uses the real part.
 -/
+
+@[expose] public section
 
 namespace HermitianMat
 

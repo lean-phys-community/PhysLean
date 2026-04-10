@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap.MatrixMap
+module
+
+public import QuantumInfo.Finite.CPTPMap.MatrixMap
 
 /-! # Properties of Matrix Maps
 
@@ -15,6 +17,8 @@ These are the *unbundled* versions, which just state the relevant properties of 
 The bundled versions are `HPMap`, `UnitalMap`, `TPMap`, `PMap`, and `CPMap` respectively, given
 in Bundled.lean.
 -/
+
+@[expose] public section
 
 namespace MatrixMap
 

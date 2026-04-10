@@ -3,9 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ClassicalInfo.Entropy
-import Mathlib.Data.Finset.Fin
-import Mathlib.Data.Fintype.Fin
+module
+
+public import QuantumInfo.ClassicalInfo.Entropy
+public import Mathlib.Data.Finset.Fin
+public import Mathlib.Data.Fintype.Fin
+
+@[expose] public section
 
 --Classical capacity
 -- * Define "code"

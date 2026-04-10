@@ -3,8 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.StatMech.ThermoQuantities
-import Mathlib.Analysis.SpecialFunctions.Gaussian.FourierTransform
+module
+
+public import QuantumInfo.StatMech.ThermoQuantities
+public import Mathlib.Analysis.SpecialFunctions.Gaussian.FourierTransform
+
+@[expose] public section
 
 noncomputable section
 

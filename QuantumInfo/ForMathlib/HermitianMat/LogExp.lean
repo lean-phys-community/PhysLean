@@ -3,7 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Proj
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Proj
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 
 /-! # Properties of the matrix logarithm and exponential
 
@@ -11,6 +15,8 @@ In particular, operator monotonicity and concavity of the matrix logarithm.
 These are proved using `inv_antitone`, so, first showing that the matrix inverse
 is operator antitone for positive definite matrices.
 -/
+
+@[expose] public section
 
 variable {d d₂ 𝕜 : Type*}
 variable [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
@@ -79,7 +85,7 @@ TODO: We could add a fallback to give `nonnegative` if `Nonempty d` is not avail
 possibly also print a warning. (Users might often not have `Nonempty d` in context, and
 they probably want to.) -/
 @[positivity HermitianMat.exp _]
-def evalHermitianMatExp : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatExp : PositivityExt where eval {_u _α} _zα _pα e := do
   let .app _exp (A : Expr) ← whnfR e | throwError "not HermitianMat.exp"
   pure (.positive (← mkAppM ``HermitianMat.exp_pos #[A]))
 

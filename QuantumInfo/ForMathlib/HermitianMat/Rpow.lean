@@ -3,12 +3,16 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.LogExp
-import QuantumInfo.ForMathlib.HermitianMat.Sqrt
-import QuantumInfo.ForMathlib.HermitianMat.Unitary
-import Mathlib.Analysis.SpecialFunctions.Integrability.Basic
-import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
-import Mathlib.MeasureTheory.Integral.IntegralEqImproper
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.LogExp
+public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
+public import QuantumInfo.ForMathlib.HermitianMat.Unitary
+public import Mathlib.Analysis.SpecialFunctions.Integrability.Basic
+public import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
+public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
+
+@[expose] public section
 
 variable {d d₂ 𝕜 : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
 variable [RCLike 𝕜]

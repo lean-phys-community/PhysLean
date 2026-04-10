@@ -3,10 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Algebra.Jordan.Basic
+module
 
-import QuantumInfo.ForMathlib.HermitianMat.CFC
-import QuantumInfo.ForMathlib.HermitianMat.Order
+public import Mathlib.Algebra.Jordan.Basic
+
+public import QuantumInfo.ForMathlib.HermitianMat.CFC
+public import QuantumInfo.ForMathlib.HermitianMat.Order
 
 /-!
 Hermitian matrices have a Jordan algebra structure given by
@@ -14,6 +16,8 @@ Hermitian matrices have a Jordan algebra structure given by
 `HermitianMat.symmMul`, but it's available as `*` multiplication scoped under
 `HermMul`. When `A` and `B` commute, this reduces to standard matrix multiplication.
 -/
+
+@[expose] public section
 
 noncomputable section
 

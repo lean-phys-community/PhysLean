@@ -4,12 +4,16 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
 --For the first three lemmas
-import Mathlib.Topology.Algebra.Module.LinearMap
+module
+
+public import Mathlib.Topology.Algebra.Module.LinearMap
 
 --For the third lemma
-import Mathlib.Analysis.CStarAlgebra.Classes
-import Mathlib.Analysis.InnerProductSpace.Spectrum
-import Mathlib.Order.CompletePartialOrder
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
+public import Mathlib.Order.CompletePartialOrder
+
+@[expose] public section
 
 namespace ContinuousLinearMap
 

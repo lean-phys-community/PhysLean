@@ -3,15 +3,19 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Leonardo A. Lessa, Rodolfo R. Soldati
 -/
-import QuantumInfo.Finite.ResourceTheory.FreeState
-import QuantumInfo.Finite.ResourceTheory.HypothesisTesting
-import QuantumInfo.Finite.Pinching
-import QuantumInfo.ForMathlib.Matrix
-import QuantumInfo.ForMathlib.LimSupInf
-import QuantumInfo.ForMathlib.HermitianMat
-import QuantumInfo.ForMathlib.HermitianMat.Jordan
+module
 
-import Mathlib.Tactic.Bound
+public import QuantumInfo.Finite.ResourceTheory.FreeState
+public import QuantumInfo.Finite.ResourceTheory.HypothesisTesting
+public import QuantumInfo.Finite.Pinching
+public import QuantumInfo.ForMathlib.Matrix
+public import QuantumInfo.ForMathlib.LimSupInf
+public import QuantumInfo.ForMathlib.HermitianMat
+public import QuantumInfo.ForMathlib.HermitianMat.Jordan
+
+public import Mathlib.Tactic.Bound
+
+@[expose] public section
 
 open NNReal
 open scoped ENNReal
@@ -412,10 +416,10 @@ private theorem LemmaS3_sup {ε : Prob}
 
 -- This is not exactly how R_{1, ε} is defined in Eq. (17), but it should be equal due to
 -- the monotonicity of log and Lemma 3.
-private noncomputable def R1 (ρ : MState (H i)) (ε : Prob) : ℝ≥0∞ :=
+noncomputable def R1 (ρ : MState (H i)) (ε : Prob) : ℝ≥0∞ :=
   Filter.atTop.liminf fun n ↦ —log β_ ε(ρ ⊗ᵣ^[n]‖IsFree) / n
 
-private noncomputable def R2 (ρ : MState (H i)) : ((n : ℕ) → IsFree (i := i ^ n)) → ℝ≥0∞ :=
+noncomputable def R2 (ρ : MState (H i)) : ((n : ℕ) → IsFree (i := i ^ n)) → ℝ≥0∞ :=
   fun σ ↦ Filter.atTop.liminf fun n ↦ 𝐃(ρ ⊗ᵣ^[n]‖σ n) / n
 
 open MatrixOrder
@@ -679,14 +683,14 @@ section σ₁_c_and_f --Stuff that has variable (i) explicit because it only dep
 
 variable (i)
 
-private def σ₁ : MState (H i) :=
+def σ₁ : MState (H i) :=
   Classical.choose (FreeStateTheory.free_fullRank i)
 
-private def σ₁_mineig := ⨅ k, (σ₁ i).M.H.eigenvalues k
+def σ₁_mineig := ⨅ k, (σ₁ i).M.H.eigenvalues k
 
 /-- The sequence c_n given in (S44). In order to handle when c = 0, we've replaced the
  (Real.log 3) / n term with (Real.log 3) / (max n 1). -/
-private def σ₁_c (n : ℕ) : ℝ :=
+def σ₁_c (n : ℕ) : ℝ :=
   Real.log (1 / σ₁_mineig i) + (Real.log 3) / (max n 1)
 
 /-- The function f_n(λ) in (S45). -/
@@ -1765,7 +1769,7 @@ private theorem EquationS62
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Lemma 7 from the paper. We write `ε'` for their `\tilde{ε}`. -/
-private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (n : ℕ) → IsFree (i := i ^ n)) :
+theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (n : ℕ) → IsFree (i := i ^ n)) :
     (R2 ρ σ ≥ R1 ρ ε) →
     ∀ ε' : Prob, (hε' : 0 < ε' ∧ ε' < ε) → -- ε' is written as \tilde{ε} in the paper.
     ∃ σ' : (n : ℕ) → IsFree (i := i ^ n),
@@ -1964,7 +1968,7 @@ private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1)
 /-- Lemma 7 gives us a way to repeatedly "improve" a sequence σ to one with a smaller gap between R2 and R1.
 The paper paints this as pretty much immediate from Lemma7, but we need to handle the case where R2 is below
 R1. -/
-private noncomputable def Lemma7_improver (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) {ε' : Prob} (hε' : 0 < ε' ∧ ε' < ε) :
+noncomputable def Lemma7_improver (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) {ε' : Prob} (hε' : 0 < ε' ∧ ε' < ε) :
     --The parameters above are the "fixed" parameters that we'll improve
     --It takes one sequence of free states, `(n : ℕ) → IsFree (i := i ^ n)`, and gives a new one
     ((n : ℕ) → IsFree (i := i ^ n)) → ((n : ℕ) → IsFree (i := i ^ n)) :=
@@ -2134,11 +2138,14 @@ theorem limit_hypotesting_eq_limit_rel_entropy (ρ : MState (H i)) (ε : Prob) (
   · exact GeneralizedQSteinsLemma ρ hε -- Theorem 1 in Hayashi & Yamasaki
   · exact RelativeEntResource.tendsto_ennreal ρ -- The regularized relative entropy of resource is not infinity
 
-/--
+/-
 info: 'SteinsLemma.limit_hypotesting_eq_limit_rel_entropy' depends on axioms: [propext,
  sandwichedRenyiEntropy_DPI_ax,
  Classical.choice,
  Quot.sound]
 -/
+/-
+Commented out because of module system.
 #guard_msgs in
 #print axioms limit_hypotesting_eq_limit_rel_entropy
+-/
