@@ -21,6 +21,7 @@ open Fin
 open Physlib
 variable {n : Nat}
 
+set_option backward.isDefEq.respectTransparency false in
 lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.takeWhile P (List.eraseIdx l i) = (List.takeWhile P l).eraseIdx i
@@ -61,6 +62,7 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
         simpa using h (Fin.succ i) (Fin.succ j) (by simpa using hij) (by simpa using hP)
     · simp [hPa]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.dropWhile P (List.eraseIdx l i) =
@@ -191,6 +193,7 @@ lemma orderedInsertPos_sigma {I : Type} {f : I → Type}
     next x heq => simp_all
     next x heq => simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_get_lt {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
     (r : List I) (r0 : I) (i : ℕ)
     (hi : i < orderedInsertPos le1 r r0) :
@@ -362,6 +365,7 @@ lemma orderedInsertEquiv_zero {I : Type} (le1 : I → I → Prop) [DecidableRel 
     (r0 : I) : orderedInsertEquiv le1 r r0 0 = orderedInsertPos le1 r r0 := by
   simp [orderedInsertEquiv]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
     (r0 : I) (n : ℕ) (hn : Nat.succ n < (r0 :: r).length) :
     orderedInsertEquiv le1 r r0 ⟨Nat.succ n, hn⟩ =
@@ -380,6 +384,7 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
     rfl
     exact ne_of_beq_false rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
     (r0 : I) (n : Fin r.length) :
     orderedInsertEquiv le1 r r0 n.succ = Fin.cast (List.orderedInsert_length le1 r r0).symm
@@ -450,6 +455,7 @@ lemma get_eq_orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRe
       simp only [hr, add_tsub_cancel_right]
       omega
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsertEquiv_get {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
     (r0 : I) :
     (r0 :: r).get ∘ (orderedInsertEquiv le1 r r0).symm = (List.orderedInsert le1 r0 r).get := by
@@ -462,6 +468,7 @@ lemma orderedInsert_eraseIdx_orderedInsertEquiv_zero
     (List.orderedInsert le1 r0 r).eraseIdx (orderedInsertEquiv le1 r r0 ⟨0, by simp⟩) = r := by
   simp [orderedInsertEquiv]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_eraseIdx_orderedInsertEquiv_succ
     {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) (n : ℕ)
     (hn : Nat.succ n < (r0 :: r).length)
@@ -575,6 +582,7 @@ def insertionSortEquiv {α : Type} (r : α → α → Prop) [DecidableRel r] : (
   | a :: l =>
     (Fin.equivCons (insertionSortEquiv r l)).trans (orderedInsertEquiv r (List.insertionSort r l) a)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_get {α : Type} {r : α → α → Prop} [DecidableRel r] : (l : List α) →
     l.get ∘ (insertionSortEquiv r l).symm = (List.insertionSort r l).get
   | [] => by rfl
@@ -619,6 +627,7 @@ lemma insertionSort_eq_ofFn {α : Type} {r : α → α → Prop} [DecidableRel r
   rw [insertionSortEquiv_get (r := r)]
   exact (List.ofFn_get (List.insertionSort r l)).symm
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRel r] :
     (l : List α) → (i : Fin l.length) → (j : Fin l.length) → (hij : i < j)
     → (hij' : insertionSortEquiv r l j < insertionSortEquiv r l i) →
@@ -689,6 +698,7 @@ lemma eraseIdx_get {I : Type} (l : List I) (i : Fin l.length) :
     have hn : ¬ x.val < i.val := by omega
     simp [hn]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma eraseIdx_insertionSort {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
     [Std.Total le1] [IsTrans I le1] :
     (n : ℕ) → (r : List I) → (hn : n < r.length) →

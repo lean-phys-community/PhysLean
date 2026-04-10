@@ -183,8 +183,7 @@ lemma gradFreeCurrentPotential_eq_chargeDensity_currentDensity {d}
   rw [gradFreeCurrentPotential_eq_sum_basis A hA J hJ]
   rw [Fintype.sum_sum_type]
   simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, Finset.sum_singleton,
-    inl_0_inl_0, one_mul, inr_i_inr_i, neg_mul, _root_.neg_smul, Pi.add_apply, Finset.sum_apply,
-    Finset.sum_neg_distrib]
+    inl_0_inl_0, one_mul, inr_i_inr_i, neg_mul, _root_.neg_smul, Pi.add_apply, Finset.sum_apply]
   congr
   · simp [LorentzCurrentDensity.chargeDensity]
   · simp [LorentzCurrentDensity.currentDensity]
@@ -316,6 +315,7 @@ lemma lagrangian_hasVarGradientAt_gradLagrangian {𝓕 : FreeSpace}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_sum_fieldStrengthMatrix {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J) :
     A.gradLagrangian 𝓕 J = fun x => ∑ ν,
@@ -339,6 +339,7 @@ lemma gradLagrangian_eq_sum_fieldStrengthMatrix {𝓕 : FreeSpace} (A : Electrom
 -/
 
 open Time LorentzCurrentDensity
+set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_electricField_magneticField {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
@@ -380,7 +381,8 @@ lemma gradLagrangian_eq_electricField_magneticField {𝓕 : FreeSpace}
 ### C.7. The lagrangian gradient in tensor notation
 
 -/
-
+attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue in
+set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
@@ -390,11 +392,11 @@ lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
     - (J x | ν')}ᵀ)) ν := by
   rw [gradLagrangian_eq_kineticTerm_sub _ hA _ hJ]
-  simp only [Pi.sub_apply, apply_sub, Nat.reduceSucc, Nat.reduceAdd, Fin.isValue, one_div, map_smul,
+  simp only [Pi.sub_apply, apply_sub, one_div, map_smul,
     map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul, neg_apply]
   rw [gradKineticTerm_eq_tensorDeriv A x hA]
   rw [gradFreeCurrentPotential_eq_tensor A hA J hJ x ν]
-  simp only [Nat.reduceSucc, Nat.reduceAdd, Fin.isValue, one_div, map_smul, apply_smul,
+  simp only [one_div, map_smul, apply_smul,
     permT_id_self, LinearEquiv.symm_apply_apply]
   ring_nf
   congr
@@ -458,6 +460,7 @@ lemma gradFreeCurrentPotential_eq_sum_basis {d}
     (gradFreeCurrentPotential J) ε =
     (∑ μ, (η μ μ • (J ε μ) • Lorentz.Vector.basis μ)) := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gradFreeCurrentPotential_sum_inl_0 (𝓕 : FreeSpace) {d}
     (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ)) :
     (gradFreeCurrentPotential J) ε (Sum.inl 0) =
@@ -472,6 +475,7 @@ lemma gradFreeCurrentPotential_sum_inl_0 (𝓕 : FreeSpace) {d}
   rw [← distTimeSlice_symm_apply]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gradFreeCurrentPotential_sum_inr_i (𝓕 : FreeSpace) {d}
     (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ)) (i : Fin d) :
     (gradFreeCurrentPotential J) ε (Sum.inr i) =
@@ -525,6 +529,7 @@ lemma gradLagrangian_sum_inl_0 {𝓕 : FreeSpace}
     - 𝓕.c * (distTimeSlice 𝓕.c).symm (J.chargeDensity 𝓕.c) ε := by
   simp [gradLagrangian, gradKineticTerm_sum_inl_eq, gradFreeCurrentPotential_sum_inl_0 𝓕]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_sum_inr_i {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (J : DistLorentzCurrentDensity d)
     (ε : 𝓢(SpaceTime d, ℝ)) (i : Fin d) :
@@ -542,19 +547,21 @@ lemma gradLagrangian_sum_inr_i {𝓕 : FreeSpace}
 
 -/
 
+attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue in
+set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (J : DistLorentzCurrentDensity d)
     (ε : 𝓢(SpaceTime d, ℝ)) (ν : Fin 1 ⊕ Fin d) :
     A.gradLagrangian 𝓕 J ε ν =
     η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength ε | κ κ ν') +
+    (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • (distTensorDeriv A.fieldStrength ε) | κ κ ν') +
     - (J ε | ν')}ᵀ)) ν := by
   rw [gradLagrangian]
-  simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply, apply_sub, Nat.reduceSucc, Nat.reduceAdd,
-    Fin.isValue, one_div, map_smul, map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add,
+  simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply, apply_sub, one_div,
+    map_smul, map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add,
     apply_smul, Lorentz.Vector.neg_apply]
   rw [gradKineticTerm_eq_distTensorDeriv, gradFreeCurrentPotential_eq_tensor J ε ν]
-  simp only [Nat.reduceSucc, Nat.reduceAdd, Fin.isValue, one_div, map_smul, apply_smul,
+  simp only [one_div, map_smul, apply_smul,
     permT_id_self, LinearEquiv.symm_apply_apply]
   ring_nf
   congr

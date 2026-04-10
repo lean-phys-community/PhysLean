@@ -56,6 +56,7 @@ lemma fderiv_isDimensionallyCorrect (f : M1 → M2) (hf : IsDimensionallyCorrect
   rw [fderiv_apply_scaleUnit u1 u2 m (scaleUnit u2 u1 m') f hf f_diff]
   simp [HasDim.scaleUnit_apply, smul_smul]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The expression `fderiv ℝ f x dm = v.1` for a fixed `dm` and for
   `v` with dimension `d M2 * (d M1)⁻¹` is dimensionally correct. This is the
   ordinary manifestation of dimensions of a derivative, usually `dm` is taken as e.g. `1`.

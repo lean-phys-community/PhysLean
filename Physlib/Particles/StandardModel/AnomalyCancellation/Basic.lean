@@ -236,6 +236,7 @@ def quadBiLin : BiLinearSymm (SMCharges n).Charges := BiLinearSymm.mk₂
 def accQuad : HomogeneousQuadratic (SMCharges n).Charges :=
   (@quadBiLin n).toHomogeneousQuad
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accQuad`. -/
 lemma accQuad_ext {S T : (SMCharges n).Charges}
     (h : ∀ j, ∑ i, ((fun a => a^2) ∘ toSpecies j S) i =
@@ -294,6 +295,7 @@ def cubeTriLin : TriLinearSymm (SMCharges n).Charges := TriLinearSymm.mk₃
 @[simp]
 def accCube : HomogeneousCubic (SMCharges n).Charges := cubeTriLin.toCubic
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accCube`. -/
 lemma accCube_ext {S T : (SMCharges n).Charges}
     (h : ∀ j, ∑ i, ((fun a => a^3) ∘ toSpecies j S) i =

@@ -69,6 +69,7 @@ open MeasureTheory Real
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma schwartzMap_slice_bound {n m} {d : ℕ} (i : Fin d.succ) :
     ∃ rt, ∀ (η : 𝓢(Space d.succ, ℝ)), ∃ k,
     Integrable (fun x : ℝ => ‖((1 + ‖x‖) ^ rt)⁻¹‖) volume ∧
@@ -170,6 +171,7 @@ lemma schwartzMap_integrable_slice_symm {d : ℕ} (i : Fin d.succ) (η : 𝓢(Sp
   · fun_prop
   · simp
 
+set_option backward.isDefEq.respectTransparency false in
 set_option maxSynthPendingDepth 10000 in
 lemma schwartzMap_fderiv_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ, ℝ)) (x : Space d)
     (i : Fin d.succ) :
@@ -279,6 +281,7 @@ lemma continuous_schwartzMap_slice_integral {d} (i : Fin d.succ) (η : 𝓢(Spac
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, ℝ)) (i : Fin d.succ)
     (x₀ : Space d) :
     HasFDerivAt (fun x => ∫ (r : ℝ), η ((slice i).symm (r, x)))
@@ -523,6 +526,7 @@ lemma schwartzMap_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n : ℕ) (η 
   refine mul_le_mul ?_ (by rfl) (by positivity) (by positivity)
   exact norm_integral_le_integral_norm fun a => iteratedFDeriv ℝ n ⇑η _
 
+set_option backward.isDefEq.respectTransparency false in
 lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) (i : Fin d.succ) :
     ∃ rt, ∀ (η : 𝓢(Space d.succ, ℝ)),∀ (x : Space d),
     Integrable (fun x : ℝ => ‖((1 + ‖x‖) ^ rt)⁻¹‖) volume ∧
@@ -589,6 +593,7 @@ lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map taking a Schwartz map and integrating over the `i`th component,
   to give a Schwartz map of one dimension lower. -/
 def sliceSchwartz {d : ℕ} (i : Fin d.succ) :
@@ -685,9 +690,7 @@ lemma distDeriv_constantSliceDist_same {M : Type} [NormedAddCommGroup M] [Normed
       · simp
         exact schwartzMap_integrable_slice_symm i η x
       · fun_prop
-      · apply Differentiable.comp
-        · exact η.smooth'.differentiable (by simp)
-        · fun_prop
+      · fun_prop
   simp
 
 lemma distDeriv_constantSliceDist_succAbove {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]

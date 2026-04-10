@@ -107,6 +107,7 @@ variable (g : RiemannianMetric I n M) (x : M)
     This provides the properties of an inner product: symmetry,
     non-negativity, linearity, and definiteness.
     Each `gₓ` is an inner product on `TₓM` (O'Neill, p. 55). -/
+@[reducible]
 noncomputable def tangentInnerCore (g : RiemannianMetric I n M) (x : M) :
     InnerProductSpace.Core ℝ (TangentSpace I x) where
   inner := λ v w => g.inner x v w
@@ -137,18 +138,21 @@ or might be studied with an indefinite (pseudo-Riemannian) metric where these
 standard norm structures are not appropriate. -/
 
 /-- Creates a `NormedAddCommGroup` structure on `TₓM` from a Riemannian metric `g`. -/
+@[reducible]
 noncomputable def TangentSpace.metricNormedAddCommGroup (g : RiemannianMetric I n M) (x : M) :
     NormedAddCommGroup (TangentSpace I x) :=
   @InnerProductSpace.Core.toNormedAddCommGroup ℝ (TangentSpace I x) _ _ _ (tangentInnerCore g x)
 
 /-- Creates an `InnerProductSpace` structure on `TₓM` from a Riemannian metric `g`.
     Alternative implementation using `letI`. -/
+@[reducible]
 noncomputable def TangentSpace.metricInnerProductSpace' (g : RiemannianMetric I n M) (x : M) :
     letI := TangentSpace.metricNormedAddCommGroup g x
     InnerProductSpace ℝ (TangentSpace I x) :=
   InnerProductSpace.ofCore (tangentInnerCore g x).toCore
 
 /-- Creates an `InnerProductSpace` structure on `TₓM` from a Riemannian metric `g`. -/
+@[reducible]
 noncomputable def TangentSpace.metricInnerProductSpace (g : RiemannianMetric I n M) (x : M) :
     let _ := TangentSpace.metricNormedAddCommGroup g x
     InnerProductSpace ℝ (TangentSpace I x) :=

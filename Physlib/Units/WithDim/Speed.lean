@@ -109,6 +109,7 @@ lemma oneKilometerPerHour_eq_mul_oneKnot:
   ext
   norm_num
 
+set_option backward.isDefEq.respectTransparency false in
 lemma oneMeterPerSecond_eq_mul_oneMilePerHour :
     oneMeterPerSecond = (3125/1397 : ℝ≥0) • oneMilePerHour := by
   apply (toDimensionful SI).symm.injective

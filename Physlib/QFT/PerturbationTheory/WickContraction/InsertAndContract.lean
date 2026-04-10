@@ -68,6 +68,7 @@ lemma insertAndContract_sndFieldOfContract (φ : 𝓕.FieldOp) (φs : List 𝓕.
     finCongr (insertIdx_length_fin φ φs i).symm (i.succAbove (φsΛ.sndFieldOfContract a)) := by
   simp [insertAndContract]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma insertAndContract_fstFieldOfContract_some_incl (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (j : φsΛ.uncontracted) :
@@ -183,6 +184,7 @@ lemma insertAndContract_none_getDual?_get_eq (φ : 𝓕.FieldOp) (φs : List �
   simp [insertAndContract, getDual?_congr_get]
 
 /-........................................... -/
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma insertAndContract_sndFieldOfContract_some_incl (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (j : φsΛ.uncontracted) :
@@ -228,6 +230,7 @@ lemma insertAndContract_none_prod_contractions (φ : 𝓕.FieldOp) (φs : List �
   rw [← e1.prod_comp]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertAndContract_some_prod_contractions (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (j : φsΛ.uncontracted)
     (f : (φsΛ ↩Λ φ i (some j)).1 → M) [CommMonoid M] :

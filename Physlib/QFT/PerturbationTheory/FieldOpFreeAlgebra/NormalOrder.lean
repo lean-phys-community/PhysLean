@@ -220,7 +220,7 @@ lemma normalOrderF_swap_create_annihilate_ofCrAnListF (φc φa : 𝓕.CrAnFieldO
     mulLinearMap (ofCrAnListF φs * ofCrAnOpF φa * ofCrAnOpF φc)) a
   refine LinearMap.congr_fun (ofCrAnListFBasis.ext fun l ↦ ?_) a
   simp only [mulLinearMap, LinearMap.coe_mk, AddHom.coe_mk, ofListBasis_eq_ofList,
-    LinearMap.coe_comp, Function.comp_apply, instCommGroup.eq_1]
+    LinearMap.coe_comp, Function.comp_apply]
   rw [normalOrderF_swap_create_annihilate_ofCrAnListF_ofCrAnListF φc φa hφc hφa]
   rfl
 
@@ -235,7 +235,7 @@ lemma normalOrderF_swap_create_annihilate (φc φa : 𝓕.CrAnFieldOp)
     normalOrderF ∘ₗ mulLinearMap.flip (ofCrAnOpF φa * (ofCrAnOpF φc * b))) a
   refine LinearMap.congr_fun (ofCrAnListFBasis.ext fun l ↦ ?_) _
   simp only [mulLinearMap, ofListBasis_eq_ofList, LinearMap.coe_comp, Function.comp_apply,
-    LinearMap.flip_apply, LinearMap.coe_mk, AddHom.coe_mk, instCommGroup.eq_1, ← mul_assoc,
+    LinearMap.flip_apply, LinearMap.coe_mk, AddHom.coe_mk, ← mul_assoc,
       normalOrderF_swap_create_annihilate_ofCrAnListF φc φa hφc hφa]
   rfl
 
@@ -243,7 +243,7 @@ lemma normalOrderF_superCommuteF_create_annihilate (φc φa : 𝓕.CrAnFieldOp)
     (hφc : 𝓕 |>ᶜ φc = CreateAnnihilate.create) (hφa : 𝓕 |>ᶜ φa = CreateAnnihilate.annihilate)
     (a b : 𝓕.FieldOpFreeAlgebra) :
     𝓝ᶠ(a * [ofCrAnOpF φc, ofCrAnOpF φa]ₛF * b) = 0 := by
-  simp only [superCommuteF_ofCrAnOpF_ofCrAnOpF, instCommGroup.eq_1, Algebra.smul_mul_assoc]
+  simp only [superCommuteF_ofCrAnOpF_ofCrAnOpF, Algebra.smul_mul_assoc]
   rw [mul_sub, sub_mul, map_sub, ← smul_mul_assoc, ← mul_assoc, ← mul_assoc,
     normalOrderF_swap_create_annihilate φc φa hφc hφa]
   simp
@@ -253,7 +253,7 @@ lemma normalOrderF_superCommuteF_annihilate_create (φc φa : 𝓕.CrAnFieldOp)
     (a b : 𝓕.FieldOpFreeAlgebra) :
     𝓝ᶠ(a * [ofCrAnOpF φa, ofCrAnOpF φc]ₛF * b) = 0 := by
   rw [superCommuteF_ofCrAnOpF_ofCrAnOpF_symm]
-  simp only [instCommGroup.eq_1, neg_smul, mul_neg, Algebra.mul_smul_comm, neg_mul,
+  simp only [neg_smul, mul_neg, Algebra.mul_smul_comm, neg_mul,
     Algebra.smul_mul_assoc, map_neg, map_smul, neg_eq_zero, smul_eq_zero]
   exact Or.inr (normalOrderF_superCommuteF_create_annihilate φc φa hφc hφa ..)
 
@@ -265,24 +265,24 @@ lemma normalOrderF_swap_crPartF_anPartF (φ φ' : 𝓕.FieldOp) (a b : FieldOpFr
   | _, .inAsymp φ' => simp
   | .outAsymp φ, _ => simp
   | .position φ, .position φ' =>
-    simp only [crPartF_position, anPartF_position, instCommGroup.eq_1]
+    simp only [crPartF_position, anPartF_position]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [instCommGroup.eq_1, crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
+    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
     rfl; rfl
   | .inAsymp φ, .outAsymp φ' =>
-    simp only [crPartF_negAsymp, anPartF_posAsymp, instCommGroup.eq_1]
+    simp only [crPartF_negAsymp, anPartF_posAsymp]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [instCommGroup.eq_1, crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
+    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
     rfl; rfl
   | .inAsymp φ, .position φ' =>
-    simp only [crPartF_negAsymp, anPartF_position, instCommGroup.eq_1]
+    simp only [crPartF_negAsymp, anPartF_position]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [instCommGroup.eq_1, crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
+    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
     rfl; rfl
   | .position φ, .outAsymp φ' =>
-    simp only [crPartF_position, anPartF_posAsymp, instCommGroup.eq_1]
+    simp only [crPartF_position, anPartF_posAsymp]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [instCommGroup.eq_1, crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
+    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
     rfl; rfl
 
 /-!
@@ -391,7 +391,7 @@ lemma normalOrderF_ofFieldOpF_mul_ofFieldOpF (φ φ' : 𝓕.FieldOp) :
   rw [ofFieldOpF_eq_crPartF_add_anPartF, ofFieldOpF_eq_crPartF_add_anPartF, mul_add, add_mul,
     add_mul]
   simp only [map_add, normalOrderF_crPartF_mul_crPartF, normalOrderF_anPartF_mul_crPartF,
-    instCommGroup.eq_1, normalOrderF_crPartF_mul_anPartF, normalOrderF_anPartF_mul_anPartF]
+    normalOrderF_crPartF_mul_anPartF, normalOrderF_anPartF_mul_anPartF]
   abel
 
 /-!
@@ -402,6 +402,7 @@ lemma normalOrderF_ofFieldOpF_mul_ofFieldOpF (φ φ' : 𝓕.FieldOp) :
 
 TODO "6V2JJ" "Split the following two lemmas up into smaller parts."
 
+set_option backward.isDefEq.respectTransparency false in
 lemma normalOrderF_superCommuteF_ofCrAnListF_create_create_ofCrAnListF
     (φc φc' : 𝓕.CrAnFieldOp) (hφc : 𝓕 |>ᶜ φc = CreateAnnihilate.create)
     (hφc' : 𝓕 |>ᶜ φc' = CreateAnnihilate.create) (φs φs' : List 𝓕.CrAnFieldOp) :
@@ -423,7 +424,7 @@ lemma normalOrderF_superCommuteF_ofCrAnListF_create_create_ofCrAnListF
       annihilateFilter_singleton_create _ hφc, annihilateFilter_singleton_create _ hφc']
     enter [2, 1, 2]
     simp only [List.singleton_append, List.append_assoc, List.cons_append, List.append_nil,
-      instCommGroup.eq_1, Algebra.smul_mul_assoc, Algebra.mul_smul_comm, map_smul]
+      Algebra.smul_mul_assoc, Algebra.mul_smul_comm, map_smul]
     rw [← annihilateFilter_append]
   conv_lhs =>
     rhs; rhs
@@ -441,7 +442,7 @@ lemma normalOrderF_superCommuteF_ofCrAnListF_create_create_ofCrAnListF
     rw [annihilateFilter_append, annihilateFilter_append, annihilateFilter_append,
       annihilateFilter_singleton_create _ hφc, annihilateFilter_singleton_create _ hφc']
     enter [2, 1, 2]
-    simp only [List.singleton_append, List.append_assoc, List.cons_append, instCommGroup.eq_1,
+    simp only [List.singleton_append, List.append_assoc, List.cons_append,
       List.append_nil, Algebra.smul_mul_assoc]
     rw [← annihilateFilter_append]
   conv_lhs =>
@@ -461,6 +462,7 @@ lemma normalOrderF_superCommuteF_ofCrAnListF_create_create_ofCrAnListF
     ofCrAnListF_singleton]
   rw [ofCrAnListF_append, ofCrAnListF_singleton, ofCrAnListF_singleton, smul_mul_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma normalOrderF_superCommuteF_ofCrAnListF_annihilate_annihilate_ofCrAnListF
     (φa φa' : 𝓕.CrAnFieldOp)
     (hφa : 𝓕 |>ᶜ φa = CreateAnnihilate.annihilate)
@@ -485,7 +487,7 @@ lemma normalOrderF_superCommuteF_ofCrAnListF_annihilate_annihilate_ofCrAnListF
       annihilateFilter_singleton_annihilate _ hφa, annihilateFilter_singleton_annihilate _ hφa']
     enter [2, 1, 1]
     simp only [List.singleton_append, List.append_assoc, List.cons_append, List.append_nil,
-      instCommGroup.eq_1, Algebra.smul_mul_assoc, Algebra.mul_smul_comm, map_smul]
+      Algebra.smul_mul_assoc, Algebra.mul_smul_comm, map_smul]
     rw [← createFilter_append]
   conv_lhs =>
     rhs; rhs
@@ -504,7 +506,7 @@ lemma normalOrderF_superCommuteF_ofCrAnListF_annihilate_annihilate_ofCrAnListF
     rw [annihilateFilter_append, annihilateFilter_append, annihilateFilter_append,
       annihilateFilter_singleton_annihilate _ hφa, annihilateFilter_singleton_annihilate _ hφa']
     enter [2, 1, 1]
-    simp only [List.singleton_append, List.append_assoc, List.cons_append, instCommGroup.eq_1,
+    simp only [List.singleton_append, List.append_assoc, List.cons_append,
       List.append_nil, Algebra.smul_mul_assoc]
     rw [← createFilter_append]
   conv_lhs =>
@@ -540,7 +542,7 @@ lemma ofCrAnListF_superCommuteF_normalOrderF_ofCrAnListF (φs φs' : List 𝓕.C
     ofCrAnListF φs * 𝓝ᶠ(ofCrAnListF φs') -
     𝓢(𝓕 |>ₛ φs, 𝓕 |>ₛ φs') • 𝓝ᶠ(ofCrAnListF φs') * ofCrAnListF φs := by
   simp only [normalOrderF_ofCrAnListF, map_smul, superCommuteF_ofCrAnListF_ofCrAnListF,
-    ofCrAnListF_append, instCommGroup.eq_1, normalOrderList_statistics, smul_sub, smul_smul,
+    ofCrAnListF_append, normalOrderList_statistics, smul_sub, smul_smul,
     Algebra.mul_smul_comm, mul_comm, Algebra.smul_mul_assoc]
 
 lemma ofCrAnListF_superCommuteF_normalOrderF_ofFieldOpListF (φs : List 𝓕.CrAnFieldOp)

@@ -64,6 +64,7 @@ def B₃ : MSSMACC.Sols :=
 lemma B₃_val : B₃.val = B₃AsCharge := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) : cubeTriLin B₃.val B₃.val R.val = 0 := by
   simp only [cubeTriLin, TriLinearSymm.mk₃_toFun_apply_apply, cubeTriLinToFun,
     MSSMSpecies_numberCharges]
@@ -82,6 +83,6 @@ lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) : cubeTriLin B₃.val B₃.val
   simp only [Fin.isValue, Fin.sum_univ_three, Prod.mk_zero_zero, Prod.mk_one_one, LinearMap.coe_mk,
     AddHom.coe_mk] at h0 h2
   linear_combination (norm := ring_nf) 9 * (h0) - 24 * (h2)
-  simp only [Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one, add_add_sub_cancel, add_neg_cancel]
+  simp [Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
 
 end MSSMACC

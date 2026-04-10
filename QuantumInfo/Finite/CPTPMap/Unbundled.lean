@@ -117,6 +117,7 @@ theorem kron {M₁ : MatrixMap A B R} {M₂ : MatrixMap C D R} (h₁ : M₁.IsTr
   simp [h_simp]
 
 variable {S : Type*} [CommSemiring S] [Star S] [DecidableEq A] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The channel X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ formed by Kraus operators M, N : κ → Matrix B A R
 is trace-preserving if ∑ k : κ, (N k)ᴴ * (M k) = 1 -/
 theorem of_kraus_isTracePreserving
@@ -348,6 +349,7 @@ variable {d : Type*} [Fintype d]
 
 open MatrixOrder
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely positive map. -/
 theorem kron_kronecker_const {C : Matrix d d R} (h : C.PosSemidef) {h₁ h₂ : _} : IsCompletelyPositive
     (⟨⟨fun M => M ⊗ₖ C, h₁⟩, h₂⟩ : MatrixMap A (A × d) R) := by
@@ -561,6 +563,7 @@ theorem conj_eq_mulRightLinearMap_comp_mulRightLinearMap (y : Matrix B A R) :
     conj y = mulRightLinearMap B R y.conjTranspose ∘ₗ mulLeftLinearMap A R y := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The act of conjugating (not necessarily by a unitary, just by any matrix at all) is completely positive. -/
 theorem conj_isCompletelyPositive (M : Matrix B A R) : (conj M).IsCompletelyPositive := by
   --TODO: This is identical to congruence_CP

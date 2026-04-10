@@ -92,6 +92,7 @@ Gamma_map is the conjugation by the square root of sigma.
 noncomputable def Gamma_map (σ : MState d) : MatrixMap d d ℂ :=
   MatrixMap.conj (σ.M.cfc (fun x => x ^ (1/2 : ℝ))).mat
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Gamma_map_eq (σ : MState d) (X : Matrix d d ℂ) :
     Gamma_map σ X = Gamma σ X := by
   ext; simp [ Gamma_map, Gamma ];
@@ -110,6 +111,7 @@ Gamma_inv_map is the conjugation by the inverse square root of sigma.
 noncomputable def Gamma_inv_map (σ : MState d) : MatrixMap d d ℂ :=
   MatrixMap.conj (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Gamma_inv_map_eq (σ : MState d) (X : Matrix d d ℂ) :
     Gamma_inv_map σ X = Gamma_inv σ X := by
   simp [Gamma_inv_map, Gamma_inv];
@@ -196,6 +198,7 @@ lemma HermitianMat.cfc_mul {d : Type*} [Fintype d] [DecidableEq d]
 /-
 Gamma of identity is sigma.
 -/
+set_option backward.isDefEq.respectTransparency false in
 lemma Gamma_one (σ : MState d) : Gamma σ 1 = σ.M.mat := by
   have h_gamma_one : (σ.M.cfc (fun x => x^(1/2 : ℝ))).mat * (σ.M.cfc (fun x => x^(1/2 : ℝ))).mat = σ.M.cfc (fun x => x^(1/2 : ℝ) * x^(1/2 : ℝ)) := by
     symm
@@ -289,6 +292,7 @@ theorem T_map_is_CP_proof (σ : MState d) (Φ : CPTPMap d d₂) :
 /-
 Gamma composed with Gamma inverse is identity.
 -/
+set_option backward.isDefEq.respectTransparency false in
 lemma Gamma_Gamma_inv (σ : MState d) (hσ : σ.m.PosDef) (X : Matrix d d ℂ) :
     Gamma σ (Gamma_inv σ X) = X := by
   -- By definition of Gamma and Gamma_inv, we can simplify the expression.
@@ -322,6 +326,7 @@ lemma Gamma_Gamma_inv (σ : MState d) (hσ : σ.m.PosDef) (X : Matrix d d ℂ) :
 /-
 If a Hermitian matrix is bounded by M*I, then all its eigenvalues are at most M.
 -/
+set_option backward.isDefEq.respectTransparency false in
 theorem HermitianMat.le_smul_one_imp_eigenvalues_le (A : HermitianMat d ℂ) (M : ℝ)
     (h : A ≤ M • (1 : HermitianMat d ℂ)) (i : d) :
     A.H.eigenvalues i ≤ M := by
@@ -381,12 +386,13 @@ theorem HermitianMat.eigenvalues_le_imp_le_smul_one (A : HermitianMat d ℂ) (M 
     have := HermitianMat.conj_mono (M := U) hD_le
     simp only [conj, AddMonoidHom.coe_mk, ZeroHom.coe_mk] at this
     replace this := Subtype.coe_le_coe.mpr this
-    simp only [mat_smul, mat_one] at this
+    simp only [mat_smul] at this
     exact this
   rw [ ← hA_eq ] at hA_le
   simp only [Algebra.mul_smul_comm, mul_one, Algebra.smul_mul_assoc, hU_unitary] at hA_le
   exact hA_le
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The block matrix [[1, X], [X†, X†X]] is positive semidefinite. -/
 theorem block_matrix_posSemidef {m n k : Type*} [Fintype m] [Fintype n] [Fintype k]
     (X : Matrix k n ℂ) (Y : Matrix k m ℂ):

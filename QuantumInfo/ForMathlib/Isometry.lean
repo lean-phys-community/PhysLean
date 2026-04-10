@@ -221,6 +221,7 @@ theorem Matrix.IsHermitian.cfc_eq_any_unitary {n 𝕜 : Type*} [RCLike 𝕜] [Fi
     hA.cfc f = U.val * diagonal (RCLike.ofReal ∘ f ∘ D) * star U.val :=
   Matrix.IsHermitian.cfc_eq_any_isometry hA U.2.2 U.2.1 hUD f
 
+set_option backward.isDefEq.respectTransparency false in
 private theorem Matrix.cfc_conj_isometry' (hA : A.IsHermitian) (f : ℝ → ℝ) {u : Matrix d₂ d 𝕜}
   (hu₁ : u.Isometry) (hu₂ : uᴴ.Isometry) :
     cfc f (u * A * uᴴ) = u * (cfc f A) * uᴴ := by
@@ -248,6 +249,7 @@ private theorem Matrix.cfc_conj_isometry' (hA : A.IsHermitian) (f : ℝ → ℝ)
   simp only [Matrix.mul_assoc, conjTranspose_mul, star_eq_conjTranspose, U', D]
   exact isHermitian_mul_mul_conjTranspose _ hA
 
+set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_conj_isometry (f : ℝ → ℝ) {u : Matrix d₂ d 𝕜}
   (hu₁ : u.Isometry) (hu₂ : uᴴ.Isometry) :
     cfc f (u * A * uᴴ) = u * (cfc f A) * uᴴ := by
@@ -262,16 +264,19 @@ theorem Matrix.cfc_conj_isometry (f : ℝ → ℝ) {u : Matrix d₂ d 𝕜}
     simp only [Matrix.mul_assoc, hu₃]
     simp [← Matrix.mul_assoc, hu₃]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_conj_unitary (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
     cfc f (u * A * u⁻¹) = u * (cfc f A) * u⁻¹ := by
   have hu := u.prop
   rw [mem_unitaryGroup_iff_isometry] at hu
   exact Matrix.cfc_conj_isometry f hu.left hu.right
 
+set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_conj_unitary' (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
     cfc f (uᴴ * A * u.val) = uᴴ * (cfc f A) * u.val := by
   simpa only [inv_inv] using cfc_conj_unitary f u⁻¹
 
+set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_reindex (f : ℝ → ℝ) (e : d ≃ d₂) :
     cfc f (reindex e e A) = reindex e e (cfc f A) := by
   rw [reindex_eq_conj, reindex_eq_conj]
@@ -328,6 +333,7 @@ theorem iSup_mono_bot {α : Type*} {ι ι' : Sort*} [CompleteLattice α]
   · refine iSup_mono' (fun i ↦ ?_)
     rcases h i with h | h <;> simp [h]
 
+@[reducible]
 noncomputable def Commute.isSymmetric_directSumDecomposition  {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] {A B : E →ₗ[𝕜] E} [FiniteDimensional 𝕜 E]
   (hA : A.IsSymmetric) (hB : B.IsSymmetric) (hAB : Commute A B) :
@@ -374,7 +380,7 @@ theorem LinearMap.IsSymmetric.directSum_isInternal_of_commute' {𝕜 E : Type*} 
     simp only [DirectSum.coeAddMonoidHom_eq_dfinsuppSum, ZeroMemClass.coe_zero, implies_true,
       DFinsupp.sum_eq_sum_fintype, DFinsupp.equivFunOnFintype_apply]
     -- Since the decomposition is orthogonal, the inner product of x μ₁₂ with any other component is zero. Therefore, the sum simplifies to just the inner product of x μ₁₂ with itself.
-    rw [inner_sum, Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ μ₁₂)]
+    rw [inner_sum, Finset.sum_eq_add_sum_diff_singleton _ _ (by simp)]
     rw [Finset.sdiff_singleton_eq_erase, left_eq_add]
     apply Finset.sum_eq_zero
     intro μ hμ
@@ -548,7 +554,7 @@ theorem star_shared_mul_B_mul_IsDiag : IsDiag
   apply (EuclideanSpace.basisFun d 𝕜).toBasis.ext
   intro i
   simp only [toLpLin_apply, OrthonormalBasis.coe_toBasis, EuclideanSpace.basisFun_apply,
-    EuclideanSpace.ofLp_single, ← mulVec_mulVec, sharedEigenvectorUnitary_mulVec, ← mulVec_mulVec,
+    PiLp.ofLp_single, ← mulVec_mulVec, sharedEigenvectorUnitary_mulVec, ← mulVec_mulVec,
     Matrix.diagonal_mulVec_single, mul_one]
   apply PiLp.ext
   intro j
@@ -603,6 +609,7 @@ instance instInvertibleUnitaryGroup (U : Matrix.unitaryGroup d 𝕜) : Invertibl
 instance (U : Matrix.unitaryGroup d 𝕜) : Invertible U.val :=
   ⟨star U.val, U.2.1, U.2.2⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If a matrix is diagonalized by a unitary matrix, then it can be written as a
 CFC of a (particular, canonical) diagonal matrix. -/
 theorem Matrix.IsDiag.exists_cfc {U : Matrix.unitaryGroup d 𝕜} {M : Matrix d d 𝕜}
@@ -634,6 +641,7 @@ theorem Matrix.IsDiag.exists_cfc {U : Matrix.unitaryGroup d 𝕜} {M : Matrix d 
     symm; convert Classical.choose_eq _
     exact Fin.val_inj)
 
+set_option backward.isDefEq.respectTransparency false in
 --TODO: Make Iff version.
 /-- If two Hermitian matrices commute, there exists a common matrix that they are both a CFC of. -/
 theorem Commute.exists_cfc (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : Commute A B) :

@@ -69,6 +69,7 @@ lemma on_quadBiLin (S : (PlusU1 n).Charges) :
 lemma on_quadBiLin_AFL (S : (PlusU1 n).LinSols) : quadBiLin (Y n).val S.val = 0 := by
   rw [on_quadBiLin, YYsol S]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accQuad (a • S.val + b • (Y n).val) = a ^ 2 * accQuad S.val := by
   erw [BiLinearSymm.toHomogeneousQuad_add, quadSol (b • (Y n)).1]
@@ -113,6 +114,7 @@ lemma on_cubeTriLin'_ALQ (S : (PlusU1 n).QuadSols) :
   rw [on_cubeTriLin', quadSol S]
   with_unfolding_all rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma add_AFL_cube (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accCube (a • S.val + b • (Y n).val) =
     a ^ 2 * (a * accCube S.val + 3 * b * cubeTriLin S.val S.val (Y n).val) := by

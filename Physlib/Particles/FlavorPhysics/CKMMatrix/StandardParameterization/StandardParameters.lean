@@ -70,6 +70,7 @@ def δ₁₃ (V : Quotient CKMMatrixSetoid) : ℝ :=
 
 section sines
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a CKM matrix `sin θ₁₂` is non-negative. -/
 lemma S₁₂_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₁₂ V := by
   rw [S₁₂, div_nonneg_iff]
@@ -79,6 +80,7 @@ lemma S₁₂_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₁₂ V := by
 lemma S₁₃_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₁₃ V :=
   VAbs_ge_zero 0 2 V
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a CKM matrix `sin θ₂₃` is non-negative. -/
 lemma S₂₃_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₂₃ V := by
   by_cases ha : VubAbs V = 1
@@ -315,6 +317,7 @@ lemma VtbAbs_eq_C₂₃_mul_C₁₃ (V : Quotient CKMMatrixSetoid) : VtbAbs V = 
   · rw [C₂₃_of_Vub_ne_one ha, C₁₃_eq_add_sq, mul_comm]
     exact (mul_div_cancel₀ (VtbAbs V) (VAbsub_ne_zero_sqrt_Vud_Vus_ne_zero ha)).symm
 
+set_option backward.isDefEq.respectTransparency false in
 lemma VubAbs_of_cos_θ₁₃_zero {V : Quotient CKMMatrixSetoid} (h1 : Real.cos (θ₁₃ V) = 0) :
     VubAbs V = 1 := by
   rw [θ₁₃, Real.cos_arcsin, ← VubAbs_eq_S₁₃, Real.sqrt_eq_zero] at h1

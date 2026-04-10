@@ -45,6 +45,7 @@ lemma planeY₃B₃_eq (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (h : a = a' �
     (planeY₃B₃ R a b c) = (planeY₃B₃ R a' b' c') := by
   rw [h.1, h.2.1, h.2.2]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R.val ≠ 0)
     (h : (planeY₃B₃ R a b c).val = (planeY₃B₃ R a' b' c').val) :
     a = a' ∧ b = b' ∧ c = c' := by
@@ -90,6 +91,7 @@ lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R
   rw [ha, hb, hc]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeY₃B₃_quad (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
     accQuad (planeY₃B₃ R a b c).val = c * (2 * a * quadBiLin Y₃.val R.val
     + 2 * b * quadBiLin B₃.val R.val + c * quadBiLin R.val R.val) := by
@@ -102,6 +104,7 @@ lemma planeY₃B₃_quad (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
   rw [show (BiLinearSymm.toHomogeneousQuad quadBiLin) R.val = quadBiLin R.val R.val by rfl]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeY₃B₃_cubic (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
     accCube (planeY₃B₃ R a b c).val = c ^ 2 *
     (3 * a * cubeTriLin R.val R.val Y₃.val

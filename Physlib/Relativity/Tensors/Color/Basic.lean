@@ -180,6 +180,7 @@ symmetric monoidal category.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The category `OverColor C` carries an instance of a Monoidal category structure. -/
 @[simps!]
 instance (C : Type) : MonoidalCategoryStruct (OverColor C) where

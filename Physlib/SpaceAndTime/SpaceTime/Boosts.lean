@@ -58,7 +58,6 @@ lemma boost_x_smul (β : ℝ) (hβ : |β| < 1) (x : SpaceTime) :
           | Sum.inr 0 => γ β * (x (Sum.inr 0) - β * x (Sum.inl 0))
           | Sum.inr 1=> x (Sum.inr 1)
           | Sum.inr 2=> x (Sum.inr 2) := by
-  dsimp
   funext i
   rw [Lorentz.Vector.smul_eq_sum]
   simp [Fin.sum_univ_three]

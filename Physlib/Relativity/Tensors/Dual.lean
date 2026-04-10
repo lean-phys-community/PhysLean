@@ -59,6 +59,7 @@ lemma toDualMap_apply {c : C} (t : S.Tensor ![c]) :
       simp) (prodT (metricTensor (S.τ c)) t)) := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toDualMap_fromDualMap {c : C} (t : S.Tensor ![S.τ c]) :
     toDualMap (fromDualMap t) = t := by

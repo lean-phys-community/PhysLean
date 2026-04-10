@@ -68,6 +68,7 @@ lemma hamiltonEqOp_eq_zero_iff_hamiltons_equations (H : Time → X → X → ℝ
   · intro a x
     simp_all only [add_neg_cancel, neg_neg, and_self]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem hamiltons_equations_varGradient
     (H : Time → X → X → ℝ) (pq : Time → X × X) (hp : ContDiff ℝ ∞ pq)
     (hL : ContDiff ℝ ∞ ↿H) :

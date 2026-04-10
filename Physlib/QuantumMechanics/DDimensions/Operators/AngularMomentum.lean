@@ -53,6 +53,7 @@ open ContDiff SchwartzMap
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Component `i j` of the angular momentum operator is the continuous linear map
 from `𝓢(Space d, ℂ)` to itself defined by `𝐋ᵢⱼ ≔ 𝐱ᵢ∘𝐩ⱼ - 𝐱ⱼ∘𝐩ᵢ`. -/
 def angularMomentumOperator {d : ℕ} (i j : Fin d) : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
@@ -86,6 +87,7 @@ lemma angularMomentumOperator_eq_zero {d : ℕ} (i : Fin d) : 𝐋[i,i] = 0 := s
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The square of the angular momentum operator, `𝐋² ≔ ½ ∑ᵢⱼ 𝐋ᵢⱼ∘𝐋ᵢⱼ`. -/
 def angularMomentumOperatorSqr {d : ℕ} : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
   (2 : ℂ)⁻¹ • ∑ i, ∑ j, 𝐋[i,j] ∘L 𝐋[i,j]
@@ -93,6 +95,7 @@ def angularMomentumOperatorSqr {d : ℕ} : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Spa
 @[inherit_doc angularMomentumOperatorSqr]
 notation "𝐋²" => angularMomentumOperatorSqr
 
+set_option backward.isDefEq.respectTransparency false in
 lemma angularMomentumOperatorSqr_apply_fun {d : ℕ} (ψ : 𝓢(Space d, ℂ)) :
     𝐋² ψ = (2 : ℂ)⁻¹ • ∑ i, ∑ j, 𝐋[i,j] (𝐋[i,j] ψ) := by
   dsimp only [angularMomentumOperatorSqr]
@@ -124,9 +127,11 @@ lemma angularMomentumOperator1D_trivial (i j : Fin 1) : 𝐋[i,j] = 0 := by
   fin_cases i, j
   exact angularMomentumOperator_eq_zero 0
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The angular momentum (pseudo)scalar operator in two dimensions, `𝐋 ≔ 𝐋₀₁`. -/
 def angularMomentumOperator2D : 𝓢(Space 2, ℂ) →L[ℂ] 𝓢(Space 2, ℂ) := 𝐋[0,1]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The angular momentum (pseudo)vector operator in three dimension, `𝐋ᵢ ≔ ½ ∑ⱼₖ εᵢⱼₖ 𝐋ⱼₖ`. -/
 def angularMomentumOperator3D (i : Fin 3) : 𝓢(Space 3, ℂ) →L[ℂ] 𝓢(Space 3, ℂ) :=
   match i with

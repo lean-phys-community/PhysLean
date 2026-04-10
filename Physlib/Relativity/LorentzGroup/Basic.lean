@@ -80,7 +80,7 @@ lemma mem_iff_transpose : Λ ∈ LorentzGroup d ↔ Λᵀ ∈ LorentzGroup d := 
 
 lemma mem_iff_neg_mem : Λ ∈ LorentzGroup d ↔ -Λ ∈ LorentzGroup d := by
   rw [mem_iff_self_mul_dual, mem_iff_self_mul_dual]
-  simp [dual]
+  simp [dual, SubtractionMonoid.neg_neg]
 
 lemma mem_mul (hΛ : Λ ∈ LorentzGroup d) (hΛ' : Λ' ∈ LorentzGroup d) : Λ * Λ' ∈ LorentzGroup d := by
   rw [mem_iff_dual_mul_self, dual_mul]
@@ -294,6 +294,7 @@ lemma toProd_embedding : IsEmbedding (@toProd d) where
     (isInducing_iff ⇑toProd).mp (IsInducing.of_comp toProd_continuous continuous_fst
       ((isInducing_iff (Prod.fst ∘ ⇑toProd)).mpr rfl))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The embedding from the Lorentz Group into `GL (Fin 4) ℝ`. -/
 lemma toGL_embedding : IsEmbedding (@toGL d).toFun where
   injective := toGL_injective

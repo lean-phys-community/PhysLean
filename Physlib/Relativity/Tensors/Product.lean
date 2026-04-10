@@ -162,14 +162,13 @@ def ComponentIdx.prodEquiv {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} 
     simp only
     · rw [ComponentIdx.prodIndexEquiv]
       rw [Equiv.piCongr_symm_apply]
-      simp only [Sum.elim_inl, finCongr_symm, finCongr_apply, Fin.val_cast]
+      simp only [Sum.elim_inl, finCongr_symm]
       rw [prod_apply_finSumFinEquiv]
       rfl
     · rw [ComponentIdx.prodIndexEquiv]
       simp only
       erw [Equiv.piCongr_symm_apply]
-      simp only [Sum.elim_inr, finCongr_symm,
-        finCongr_apply, Fin.val_cast]
+      simp only [Sum.elim_inr, finCongr_symm]
       rw [prod_apply_finSumFinEquiv]
       rfl
 
@@ -191,7 +190,7 @@ def Pure.prodIndexEquiv {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     Pure S (Fin.append c c1) ≃
     Π (i : Fin n1 ⊕ Fin n2), S.FD.obj (Discrete.mk ((Sum.elim c c1) i)) :=
   (Equiv.piCongr finSumFinEquiv
-  (fun x => ((Action.forget _ _).mapIso
+  (fun x => (Representation.equivOfIso
     (S.FD.mapIso (Discrete.eqToIso (by cases x <;> simp)))).toLinearEquiv.toEquiv)).symm
 
 /-!
@@ -229,6 +228,7 @@ lemma Pure.prodP_apply_finSumFinEquiv {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 �
   | Sum.inr i =>
     rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.prodP_apply_castAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n1) :
@@ -239,6 +239,7 @@ lemma Pure.prodP_apply_castAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
   rw [Pure.prodP_apply_finSumFinEquiv]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.prodP_apply_natAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n2) :
@@ -329,17 +330,11 @@ lemma Pure.prodP_equivariant {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
   | Sum.inl i =>
     simp only [finSumFinEquiv_apply_left, prodP_apply_castAdd]
     generalize_proofs h
-    have h1 := (S.FD.map (eqToHom h)).comm g
-    have h1' := congrFun (congrArg (fun x => x.hom) h1) (p i)
-    simp only [Function.comp_apply, ModuleCat.hom_comp, Rep.ρ_hom, LinearMap.coe_comp] at h1'
-    exact h1'
+    exact LinearMap.congr_fun ((S.FD.map (eqToHom h)).hom.isIntertwining' g) (p i)
   | Sum.inr i =>
     simp only [finSumFinEquiv_apply_right, prodP_apply_natAdd]
     generalize_proofs h
-    have h1 := (S.FD.map (eqToHom h)).comm g
-    have h1' := congrFun (congrArg (fun x => x.hom) h1) (p1 i)
-    simp only [Function.comp_apply, ModuleCat.hom_comp, Rep.ρ_hom, LinearMap.coe_comp] at h1'
-    exact h1'
+    exact LinearMap.congr_fun ((S.FD.map (eqToHom h)).hom.isIntertwining' g) (p1 i)
 
 /-!
 
@@ -389,6 +384,7 @@ lemma prodSwapMap_permCond {n1 n2 : ℕ} {c : Fin n1 → C} {c2 : Fin n2 → C} 
   · rw [Fin.forall_fin_add]
     simp [prodSwapMap]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_swap {n n1} {c : Fin n → C}
     {c1 : Fin n1 → C}
     (p : Pure S c) (p1 : Pure S c1) :
@@ -433,6 +429,7 @@ lemma prodLeftMap_permCond {σ : Fin n' → Fin n} (c2 : Fin n2 → C) (h : Perm
     · exact Function.bijective_id
   · simp [Fin.forall_fin_add, prodLeftMap, h.2]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.prodP_permP_left {n n'} {c : Fin n → C} {c' : Fin n' → C}
     (σ : Fin n' → Fin n) (h : PermCond c c' σ) (p : Pure S c) (p2 : Pure S c2) :
@@ -545,6 +542,7 @@ lemma prodAssocMap_permCond {n1 n2 n3 : ℕ} {c : Fin n1 → C} {c2 : Fin n2 →
     exact (finCongr _).bijective
   · simp [Fin.forall_fin_add]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_assoc {n n1 n2} {c : Fin n → C}
     {c1 : Fin n1 → C} {c2 : Fin n2 → C}
     (p : Pure S c) (p1 : Pure S c1) (p2 : Pure S c2) :
@@ -611,6 +609,7 @@ lemma prodAssocMap'_permCond {n1 n2 n3 : ℕ} {c : Fin n1 → C} {c2 : Fin n2 �
     exact (finCongr _).bijective
   · simp [Fin.forall_fin_add]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_assoc' {n n1 n2} {c : Fin n → C}
     {c1 : Fin n1 → C} {c2 : Fin n2 → C}
     (p : Pure S c) (p1 : Pure S c1) (p2 : Pure S c2) :
@@ -651,7 +650,7 @@ lemma Pure.prodP_assoc' {n n1 n2} {c : Fin n → C}
   `S.Tensor (Fin.append c c1)`. -/
 noncomputable def prodIndexEquiv {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     S.F.obj (OverColor.mk (Sum.elim c c1)) ≃ₗ[k] S.Tensor (Fin.append c c1) :=
-  ((Action.forget _ _).mapIso (S.F.mapIso
+  (Representation.equivOfIso (S.F.mapIso
     ((OverColor.equivToIso finSumFinEquiv).trans
     (OverColor.mkIso (by
       funext x
@@ -659,6 +658,7 @@ noncomputable def prodIndexEquiv {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} 
       rw [Fin.forall_fin_add]
       simp))))).toLinearEquiv
 
+set_option backward.isDefEq.respectTransparency false in
 lemma prodIndexEquiv_symm_pure {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p : Pure S (Fin.append c c1)) :
     prodIndexEquiv.symm p.toTensor = PiTensorProduct.tprod k (Pure.prodIndexEquiv p) := by
@@ -675,6 +675,7 @@ lemma prodIndexEquiv_symm_pure {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor product of two tensors as a bi-linear map from
   `S.Tensor c` and `S.Tensor c1` to `S.Tensor (Fin.append c c1)`. -/
 noncomputable def prodT {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
@@ -738,6 +739,7 @@ lemma prodT_basis {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The linear equivalence between `S.Tensor c ⊗[k] S.Tensor c1` and
     `S.Tensor (Fin.append c c1)`. -/
 noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 → C} :
@@ -817,6 +819,7 @@ noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 �
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Rewriting basis for the product in terms of the tensor product basis. -/
 lemma basis_prod_eq {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     basis (S := S) (Fin.append c c1) =
@@ -866,6 +869,7 @@ lemma prodT_basis_repr_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma prodT_equivariant {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (g : G) (t : S.Tensor c) (t1 : S.Tensor c1) :
@@ -896,6 +900,7 @@ lemma prodT_equivariant {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma prodT_default_right {n} {c : Fin n → C}
     {c1 : Fin 0 → C} (t : S.Tensor c) :
     prodT t (Pure.toTensor default : S.Tensor c1) =
@@ -920,6 +925,7 @@ lemma prodT_default_right {n} {c : Fin n → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma prodT_swap {n n1} {c : Fin n → C}
     {c1 : Fin n1 → C}
     (t : S.Tensor c) (t1 : S.Tensor c1) :
@@ -951,6 +957,7 @@ lemma prodT_swap {n n1} {c : Fin n → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma prodT_permT_left {n n'} {c : Fin n → C} {c' : Fin n' → C}
     (σ : Fin n' → Fin n) (h : PermCond c c' σ) (t : S.Tensor c) (t2 : S.Tensor c2) :
@@ -1007,6 +1014,7 @@ lemma prodT_permT_right {n n'} {c : Fin n → C} {c' : Fin n' → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma prodT_assoc {n n1 n2} {c : Fin n → C}
     {c1 : Fin n1 → C} {c2 : Fin n2 → C}
     (t : S.Tensor c) (t1 : S.Tensor c1) (t2 : S.Tensor c2) :
@@ -1046,6 +1054,7 @@ lemma prodT_assoc {n n1 n2} {c : Fin n → C}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma prodT_assoc' {n n1 n2} {c : Fin n → C}
     {c1 : Fin n1 → C} {c2 : Fin n2 → C}
     (t : S.Tensor c) (t1 : S.Tensor c1) (t2 : S.Tensor c2) :

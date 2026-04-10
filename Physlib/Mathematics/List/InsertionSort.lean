@@ -65,6 +65,7 @@ lemma insertionSortEquiv_gt_zero_of_ne_insertionSortMinPos {α : Type} (r : α �
   simp only [Fin.ext_iff]
   omega
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α → α → Prop)
     [DecidableRel r] (a : α) (l : List α)
     (i : Fin (insertionSortDropMinPos r a l).length)
@@ -224,6 +225,7 @@ lemma takeWhile_orderedInsert' {α : Type} (r : α → α → Prop) [DecidableRe
         List.length_cons, add_left_inj]
         exact takeWhile_orderedInsert' r a b hr l
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_commute {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (a b : α) (hr : ¬ r a b) (n : ℕ) : (l : List α) →
     (hn : n + 2 < (a :: b :: l).length) →
@@ -337,6 +339,7 @@ lemma insertionSortEquiv_commute {α : Type} (r : α → α → Prop) [Decidable
   rw [← hb]
   exact ha1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (a a2 : α) : (l1 l2 : List α) →
     (insertionSortEquiv r (List.orderedInsert r a l1 ++ a2 :: l2) ⟨l1.length + 1, by
@@ -383,6 +386,7 @@ lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Pro
       simp
       rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_insertionSort_append {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (a : α) : (l1 l2 : List α) →
     (insertionSortEquiv r (List.insertionSort r l1 ++ a :: l2) ⟨l1.length, by simp⟩)

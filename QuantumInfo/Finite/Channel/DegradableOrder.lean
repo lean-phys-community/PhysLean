@@ -29,6 +29,7 @@ Fintype and DecidableEq, the argument is also a Sigma to bring this along.
 
 section
 
+@[reducible]
 def DegradablePreorder (dIn : Type*) [Fintype dIn] [DecidableEq dIn] : Preorder
     (Σ dOut : (Σ t, Fintype t × DecidableEq t), let _ := dOut.snd.1; CPTPMap dIn dOut.fst) where
   le Λ₁ Λ₂ :=

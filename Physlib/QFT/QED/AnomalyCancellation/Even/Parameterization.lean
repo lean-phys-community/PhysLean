@@ -46,6 +46,7 @@ lemma parameterizationAsLinear_val (g : Fin n.succ → ℚ) (f : Fin n → ℚ) 
   change a • (_ • (P' g).val + _ • (P!' f).val) = _
   rw [P'_val, P!'_val]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma parameterizationCharge_cube (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (a : ℚ) :
     accCube (2* n.succ) (parameterizationAsLinear g f a).val = 0 := by
   change accCubeTriLinSymm.toCubic _ = 0
@@ -128,6 +129,7 @@ theorem generic_case {S : (PureU1 (2 * n.succ)).Sols} (h : GenericCase S) :
     simp only [Nat.succ_eq_add_one, accCubeTriLinSymm_toFun_apply_apply, ne_eq, neg_eq_zero] at h
     exact h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma special_case_lineInCubic {S : (PureU1 (2 * n.succ)).Sols}
     (h : SpecialCase S) : LineInCubic S.1.1 := by
   intro g f hS a b

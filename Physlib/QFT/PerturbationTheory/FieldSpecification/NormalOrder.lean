@@ -115,7 +115,7 @@ lemma koszulSignInsert_annihilate_cons_create (φc φa : 𝓕.CrAnFieldOp)
     = FieldStatistic.exchangeSign (𝓕.crAnStatistics φc) (𝓕.crAnStatistics φa) *
     Wick.koszulSignInsert 𝓕.crAnStatistics normalOrderRel φa φs := by
   rw [Wick.koszulSignInsert_cons]
-  simp only [FieldStatistic.instCommGroup.eq_1, mul_eq_mul_right_iff]
+  simp only [mul_eq_mul_right_iff]
   apply Or.inl
   rw [Wick.koszulSignCons, if_neg, FieldStatistic.exchangeSign_symm,
     FieldStatistic.exchangeSign_eq_if]
@@ -153,7 +153,7 @@ lemma normalOrderSign_swap_create_annihilate (φc φa : 𝓕.CrAnFieldOp)
     dsimp only [List.cons_append, Wick.koszulSign, FieldStatistic.instCommGroup.eq_1]
     rw [← normalOrderSign, normalOrderSign_swap_create_annihilate φc φa hφc hφa φs φs']
     rw [← mul_assoc, mul_comm _ (FieldStatistic.exchangeSign _ _), mul_assoc]
-    simp only [FieldStatistic.instCommGroup.eq_1, mul_eq_mul_left_iff]
+    simp only [mul_eq_mul_left_iff]
     apply Or.inl
     conv_rhs => rw [normalOrderSign, Wick.koszulSign, ← normalOrderSign]
     simp only [mul_eq_mul_right_iff]
@@ -334,6 +334,7 @@ lemma sum_normalOrderList_length {M : Type} [AddCommMonoid M]
     ∑ (n : Fin (normalOrderList φs).length), f n = ∑ (n : Fin φs.length), f (normalOrderEquiv n) :=
   Eq.symm (Equiv.sum_comp normalOrderEquiv f)
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma normalOrderList_get_normalOrderEquiv {φs : List 𝓕.CrAnFieldOp} (n : Fin φs.length) :
     (normalOrderList φs)[(normalOrderEquiv n).val] = φs[n.val] := by
@@ -342,6 +343,7 @@ lemma normalOrderList_get_normalOrderEquiv {φs : List 𝓕.CrAnFieldOp} (n : Fi
   erw [← Physlib.List.insertionSortEquiv_get]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma normalOrderList_eraseIdx_normalOrderEquiv {φs : List 𝓕.CrAnFieldOp} (n : Fin φs.length) :
     (normalOrderList φs).eraseIdx (normalOrderEquiv n).val =

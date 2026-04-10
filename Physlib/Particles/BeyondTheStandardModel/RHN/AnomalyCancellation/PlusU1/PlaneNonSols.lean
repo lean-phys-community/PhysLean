@@ -81,6 +81,7 @@ lemma Bi_Bj_quad {i j : Fin 11} (hi : i ≠ j) : quadBiLin (B i) (B j) = 0 := by
   any_goals with_unfolding_all rfl
   all_goals simp at hi
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Bi_sum_quad (i : Fin 11) (f : Fin 11 → ℚ) :
     quadBiLin (B i) (∑ k, f k • B k) = f i * quadBiLin (B i) (B i) := by
   rw [quadBiLin.map_sum₂, Fintype.sum_eq_single i]
@@ -97,6 +98,7 @@ lemma quadCoeff_eq_bilinear (i : Fin 11) : quadCoeff i = quadBiLin (B i) (B i) :
   fin_cases i
   all_goals with_unfolding_all rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_accQuad (f : Fin 11 → ℚ) :
     accQuad (∑ i, f i • B i) = ∑ i, quadCoeff i * (f i)^2 := by
   change quadBiLin _ _ = _
@@ -105,6 +107,7 @@ lemma on_accQuad (f : Fin 11 → ℚ) :
   rw [quadBiLin.map_smul₁, Bi_sum_quad, quadCoeff_eq_bilinear]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma isSolution_quadCoeff_f_sq_zero (f : Fin 11 → ℚ) (hS : (PlusU1 3).IsSolution (∑ i, f i • B i))
     (k : Fin 11) : quadCoeff k * (f k)^2 = 0 := by
   obtain ⟨S, hS⟩ := hS
@@ -168,6 +171,7 @@ lemma isSolution_sum_part (f : Fin 11 → ℚ) (hS : (PlusU1 3).IsSolution (∑ 
   simp only [Fin.isValue, zero_smul, add_zero, zero_add]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma isSolution_grav (f : Fin 11 → ℚ) (hS : (PlusU1 3).IsSolution (∑ i, f i • B i)) :
     f 10 = - 3 * f 9 := by
   have hx := isSolution_sum_part f hS
@@ -183,6 +187,7 @@ lemma isSolution_sum_part' (f : Fin 11 → ℚ) (hS : (PlusU1 3).IsSolution (∑
     ∑ i, f i • B i = f 9 • B₉ + (- 3 * f 9) • B₁₀ := by
   rw [isSolution_sum_part f hS, isSolution_grav f hS]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma isSolution_f9 (f : Fin 11 → ℚ) (hS : (PlusU1 3).IsSolution (∑ i, f i • B i)) :
     f 9 = 0 := by
   have hx := isSolution_sum_part' f hS
@@ -229,6 +234,7 @@ lemma isSolution_only_if_zero (f : Fin 11 → ℚ) (hS : (PlusU1 3).IsSolution (
   rw [isSolution_sum_part f hS, isSolution_grav f hS, isSolution_f9 f hS]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 theorem basis_linear_independent : LinearIndependent ℚ B :=
   Fintype.linearIndependent_iff.mpr fun f h ↦ isSolution_f_zero f
     ⟨chargeToAF 0 (by with_unfolding_all rfl) (by with_unfolding_all rfl)

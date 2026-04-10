@@ -46,21 +46,7 @@ private lemma npow_indicator_rpow_eq {n : ℕ} {s : Set ℝ} (hs : 0 ∉ s) (p :
   · grind [Set.indicator_of_mem, smul_eq_mul, add_comm, Real.rpow_add_natCast]
   · simp [hr]
 
-private lemma _root_.MeasureTheory.integrableOn_indicator_iff {s : Set ℝ} (hs : MeasurableSet s)
-    (t : Set ℝ) (f : ℝ → ℝ) :
-    IntegrableOn (s.indicator f) t volume ↔ IntegrableOn f (s ∩ t) volume := by
-  refine and_congr ?_ ?_
-  · rw [← Measure.restrict_restrict hs]
-    constructor <;> intro ⟨g, hg, hg'⟩
-    · use g
-      refine ⟨hg, (ae_eq_restrict_iff_indicator_ae_eq hs).mpr ?_⟩
-      grind [hg'.indicator (s := s), Set.indicator_indicator, Set.inter_self]
-    · use s.indicator g
-      exact ⟨StronglyMeasurable.indicator hg hs, (ae_eq_restrict_iff_indicator_ae_eq hs).mp hg'⟩
-  · have hInt : (fun r ↦ ‖s.indicator f r‖ₑ) = s.indicator (fun r ↦ ‖f r‖ₑ) := by
-      ext r; by_cases hr : r ∈ s <;> simp [hr]
-    simp only [HasFiniteIntegral, hInt, lintegral_indicator hs, Measure.restrict_restrict hs]
-
+set_option backward.isDefEq.respectTransparency false in
 /-- The function `x ↦ ‖x‖ᵖ` is integrable on `{x : Space d | 0 ≤ ‖x‖ < b}` iff `0 < d + p`. -/
 lemma integrableOn_norm_rpow_ball_iff {d : ℕ} (hd : 0 < d) {b : ℝ} (hb : 0 < b) (p : ℝ) :
     IntegrableOn (fun x : Space d ↦ ‖x‖ ^ p) (Metric.ball 0 b) ↔ 0 < d + p := by
@@ -83,7 +69,7 @@ lemma integrableOn_norm_rpow_ball_iff {d : ℕ} (hd : 0 < d) {b : ℝ} (hb : 0 <
   trans IntegrableOn (fun r => r ^ (d - 1 + p)) (Set.Ioo 0 b)
   · have hInter : Set.Ioo 0 b ∩ Set.Ioi 0 = Set.Ioo 0 b := by ext; grind
     simp_rw [integrable_fun_norm_addHaar, g, Space.finrank_eq_dim,
-      npow_indicator_rpow_eq (Set.left_notMem_Ioo 0 b),
+      npow_indicator_rpow_eq (Set.left_notMem_Ioo),
       _root_.MeasureTheory.integrableOn_indicator_iff measurableSet_Ioo, hInter, Nat.cast_pred hd]
   rw [intervalIntegral.integrableOn_Ioo_rpow_iff hb, neg_lt_iff_pos_add']
   ring_nf
@@ -109,6 +95,7 @@ lemma integrableOn_norm_rpow_ball_compl_iff {d : ℕ} (hd : 0 < d) {a : ℝ} (ha
   rw [integrableOn_Ici_iff_integrableOn_Ioi, integrableOn_Ioi_rpow_iff ha, lt_neg_iff_add_neg]
   ring_nf
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The function `x ↦ ‖x‖ᵖ` is integrable on the shell `{x : Space d | 0 < a ≤ ‖x‖ ∧ ‖x‖ < b}`. -/
 lemma integrableOn_norm_rpow_shell {d : ℕ} {a : ℝ} (ha : 0 < a) (b p : ℝ) :
     IntegrableOn (fun x : Space d ↦ ‖x‖ ^ p) ((Metric.ball 0 b) ∩ (Metric.ball 0 a)ᶜ) := by

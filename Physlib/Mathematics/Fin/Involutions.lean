@@ -220,6 +220,7 @@ def involutionAddEquiv {n : ℕ} (f : {f : Fin n → Fin n // Function.Involutiv
     simp [s]
   refine e1.trans (Equiv.optionCongr (e2'.trans (e2)))
 
+set_option backward.isDefEq.respectTransparency false in
 lemma involutionAddEquiv_none_image_zero {n : ℕ} :
     {f : {f : Fin n.succ → Fin n.succ // Function.Involutive f}}
     → involutionAddEquiv (involutionCons n f).1 (involutionCons n f).2 = none
@@ -519,7 +520,7 @@ lemma involutionNoFixed_card_mul_two_plus_one : (n : ℕ) →
   | 0 => rfl
   | Nat.succ n => by
     erw [involutionNoFixed_card_succ, involutionNoFixed_card_mul_two_plus_one n]
-    rfl
+    ring
 
 lemma involutionNoFixed_card_even : (n : ℕ) → (he : Even n) →
     Fintype.card {f : Fin n → Fin n // Function.Involutive f ∧ (∀ i, f i ≠ i)} = (n - 1)‼ := by

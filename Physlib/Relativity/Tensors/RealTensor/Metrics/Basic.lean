@@ -105,6 +105,7 @@ lemma actionT_contrMetric {d} (g : LorentzGroup d) : g • η d = η d := by
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.down, Color.down]) :
     (Tensor.basis _).repr (coMetric d) b =
@@ -141,6 +142,7 @@ lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     simp at hy
   · simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.up, Color.up]) :
     (Tensor.basis _).repr (contrMetric d) b =

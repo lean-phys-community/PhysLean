@@ -8,7 +8,7 @@ module
 public import Mathlib.Analysis.InnerProductSpace.Calculus
 public import Mathlib.Analysis.InnerProductSpace.Completion
 public import Mathlib.Analysis.InnerProductSpace.ProdL2
-public import Mathlib.Data.Real.CompleteField
+public import Mathlib.Data.Real.Hom
 public import Mathlib.Data.Real.StarOrdered
 /-!
 
@@ -91,6 +91,7 @@ instance [inst : InnerProductSpace' 𝕜 E] : InnerProductSpace.Core 𝕜 E := i
 
 instance [inst : InnerProductSpace' 𝕜 E] : Inner 𝕜 E := inst.core.toInner
 
+set_option backward.isDefEq.respectTransparency false in
 instance {𝕜 : Type*} {E : Type*} [RCLike 𝕜] [NormedAddCommGroup E] [inst : InnerProductSpace 𝕜 E] :
     InnerProductSpace' 𝕜 E where
   norm₂ x := ‖x‖
@@ -390,6 +391,7 @@ local instance : Inner 𝕜 (E×F) := ⟨fun (x,y) (x',y') => ⟪x,x'⟫ + ⟪y,
 lemma prod_inner_apply' (x y : (E × F)) : ⟪x, y⟫ = ⟪x.fst, y.fst⟫ + ⟪x.snd, y.snd⟫ := rfl
 
 open InnerProductSpace' in
+set_option backward.isDefEq.respectTransparency false in
 noncomputable
 instance : InnerProductSpace' 𝕜 (E × F) where
   norm₂ x := (WithLp.instProdNormedAddCommGroup 2 (WithLp 2 E) (WithLp 2 F)).toNorm.norm
@@ -420,7 +422,7 @@ instance : InnerProductSpace' 𝕜 (E × F) where
     have : 0 ≤ re ⟪y,y⟫ := PreInnerProductSpace.Core.re_inner_nonneg (𝕜:=𝕜) (F:=F) _ y
     simp only [norm, OfNat.ofNat_ne_zero, ↓reduceDIte, ENNReal.ofNat_ne_top, ↓reduceIte,
       WithLp.toLp_fst, WithLp.equiv_apply, ENNReal.toReal_ofNat, Real.rpow_ofNat, WithLp.toLp_snd,
-      one_div, WithLp.prod_inner_apply, prod_inner_apply', map_add]
+      one_div, prod_inner_apply', map_add]
     repeat rw [Real.sq_sqrt (by assumption)]
     norm_num
     rw[← Real.rpow_mul_natCast (by linarith)]
@@ -460,6 +462,7 @@ instance : InnerProductSpace' 𝕜 (E × F) where
               _ ≤ d₁ * ‖x‖ ^ 2 + d₁ * ‖x‖ ^ 2 := by gcongr <;> exact h₁₂ x
               _ ≤ _ := by ring_nf; gcongr <;> simp
 
+set_option backward.isDefEq.respectTransparency false in
 open InnerProductSpace' in
 noncomputable
 instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
@@ -492,7 +495,8 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
     simp only [norm, OfNat.ofNat_ne_zero, ↓reduceIte, ENNReal.ofNat_ne_top, ENNReal.toReal_ofNat,
       Real.rpow_two, one_div]
     conv_rhs => rw [inner]
-    simp [InnerProductSpace.toInner, PiLp.innerProductSpace]
+    simp only [WithLp.equiv_apply, PiLp.inner_apply, inner_self_eq_norm_sq_to_K, map_sum,
+      re_ofReal_pow]
     rw [← Real.rpow_two, ← Real.rpow_mul]
     swap
     · apply Finset.sum_nonneg
@@ -501,7 +505,6 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
     simp only [isUnit_iff_ne_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
       IsUnit.inv_mul_cancel, Real.rpow_one]
     rfl
-
   inner_top_equiv_norm := by
     rename_i i1 i2 i3 i4 i5 i6 i7 i8
     by_cases hnEmpty : Nonempty ι
@@ -539,24 +542,17 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
           refine Real.sq_sqrt ?_
           exact InnerProductSpace.Core.inner_self_nonneg
         · apply le_of_eq
-          simp only [norm, OfNat.ofNat_ne_zero, ↓reduceIte, ENNReal.ofNat_ne_top,
-            WithLp.equiv_apply, ENNReal.toReal_ofNat, Real.rpow_ofNat, one_div]
-          rw [← Real.rpow_ofNat, ← Real.rpow_mul]
-          simp
-          rfl
-          · positivity
+          conv_rhs => rw [inner]
+          simp [PiLp.inner_apply]
       · have h2 := (h (x i)).2
         trans ∑ j, re ⟪x j, x j⟫
         · apply le_of_eq
-          simp only [norm, OfNat.ofNat_ne_zero, ↓reduceIte, ENNReal.ofNat_ne_top,
-            WithLp.equiv_apply, ENNReal.toReal_ofNat, Real.rpow_ofNat, one_div]
-          rw [← Real.rpow_ofNat, ← Real.rpow_mul]
-          simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, inv_mul_cancel₀, Real.rpow_one]
+          conv_lhs => rw [inner]
+          simp only [PiLp.inner_apply, inner_self_eq_norm_sq_to_K, map_sum, re_ofReal_pow]
           congr
           funext j
           refine Real.sq_sqrt ?_
-          · exact InnerProductSpace.Core.inner_self_nonneg
-          · positivity
+          exact InnerProductSpace.Core.inner_self_nonneg
         trans ∑ j, d * ‖x j‖ ^ 2
         · refine Finset.sum_le_sum ?_
           intro j _
@@ -584,6 +580,8 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
         exact False.elim (hn hnEmpty)
       subst h1
       simp [norm]
+      conv_rhs => rw [inner]
+      simp [PiLp.inner_apply]
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [hE : InnerProductSpace' ℝ E]
 local notation "⟪" x ", " y "⟫" => inner ℝ x y

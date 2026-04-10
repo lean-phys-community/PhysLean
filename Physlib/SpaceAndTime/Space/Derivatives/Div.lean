@@ -160,6 +160,7 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
 
 open MeasureTheory SchwartzMap InnerProductSpace Distribution
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The divergence of a distribution `(Space d) →d[ℝ] (EuclideanSpace ℝ (Fin d))` as a distribution
   `(Space d) →d[ℝ] ℝ`. -/
 noncomputable def distDiv {d} :
@@ -190,6 +191,7 @@ noncomputable def distDiv {d} :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma distDiv_apply_eq_sum_fderivD {d}
     (f : (Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) (η : 𝓢(Space d, ℝ)) :
     distDiv f η = ∑ i, fderivD ℝ f η (basis i) i := by
@@ -207,6 +209,7 @@ lemma distDiv_apply_eq_sum_distDeriv {d}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The divergence of a distribution from a bounded function. -/
 lemma distDiv_ofFunction {dm1 : ℕ} {f : Space dm1.succ → EuclideanSpace ℝ (Fin dm1.succ)}
     {hf : IsDistBounded f} (η : 𝓢(Space dm1.succ, ℝ)) :

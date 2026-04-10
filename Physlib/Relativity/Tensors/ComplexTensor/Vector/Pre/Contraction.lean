@@ -23,6 +23,7 @@ open TensorProduct
 open CategoryTheory.MonoidalCategory
 namespace Lorentz
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The bi-linear map corresponding to contraction of a contravariant Lorentz vector with a
   covariant Lorentz vector. -/
 def contrCoContrBi : complexContr →ₗ[ℂ] complexCo →ₗ[ℂ] ℂ where
@@ -47,6 +48,7 @@ def contrCoContrBi : complexContr →ₗ[ℂ] complexCo →ₗ[ℂ] ℂ where
     rw [smul_dotProduct]
     rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The bi-linear map corresponding to contraction of a covariant Lorentz vector with a
   contravariant Lorentz vector. -/
 def contrContrCoBi : complexCo →ₗ[ℂ] complexContr →ₗ[ℂ] ℂ where
@@ -76,14 +78,17 @@ def contrContrCoBi : complexCo →ₗ[ℂ] complexContr →ₗ[ℂ] ℂ where
     covariant Lorentz vector in the
     standard basis (i.e. the dot product).
     In terms of index notation this is the contraction is ψⁱ φᵢ. -/
-def contrCoContraction : complexContr ⊗ complexCo ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) where
-  hom := ModuleCat.ofHom <| TensorProduct.lift contrCoContrBi
-  comm M := ModuleCat.hom_ext <| TensorProduct.ext' fun ψ φ => by
-    change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) ⬝ᵥ
-      ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ
-    rw [dotProduct_mulVec, vecMul_transpose, mulVec_mulVec]
-    rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
-    simp
+def contrCoContraction : complexContr ⊗ complexCo ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) := Rep.ofHom
+  {
+    toLinearMap := TensorProduct.lift contrCoContrBi,
+    isIntertwining' M := TensorProduct.ext' fun ψ φ => by
+      change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) ⬝ᵥ
+        ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) =
+          ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ
+      rw [dotProduct_mulVec, vecMul_transpose, mulVec_mulVec]
+      rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
+      simp
+  }
 
 lemma contrCoContraction_hom_tmul (ψ : complexContr) (φ : complexCo) :
     contrCoContraction.hom (ψ ⊗ₜ φ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ := by
@@ -114,14 +119,16 @@ lemma contrCoContraction_basis' (i j : Fin 1 ⊕ Fin 3) :
     contravariant Lorentz vector in the
     standard basis (i.e. the dot product).
     In terms of index notation this is the contraction is φᵢ ψⁱ. -/
-def coContrContraction : complexCo ⊗ complexContr ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) where
-  hom := ModuleCat.ofHom <| TensorProduct.lift contrContrCoBi
-  comm M := ModuleCat.hom_ext <| TensorProduct.ext' fun φ ψ => by
+def coContrContraction : complexCo ⊗ complexContr ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) := Rep.ofHom
+  {
+  toLinearMap := TensorProduct.lift contrContrCoBi,
+  isIntertwining' M := TensorProduct.ext' fun φ ψ => by
     change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) ⬝ᵥ
       ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ
     rw [dotProduct_mulVec, mulVec_transpose, vecMul_vecMul]
     rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
     simp
+  }
 
 lemma coContrContraction_hom_tmul (φ : complexCo) (ψ : complexContr) :
     coContrContraction.hom (φ ⊗ₜ ψ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ := by

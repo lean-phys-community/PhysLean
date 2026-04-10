@@ -291,6 +291,7 @@ lemma smul_mem_graph_of_mem_smul_graph {E F : Type*} [NormedAddCommGroup E] [Inn
   · rw [nhds_smul₀ (inv_ne_zero hc), ← Pi.smul_def, Filter.smul_tendsto_smul_iff₀ (inv_ne_zero hc)]
     exact hb'.2
 
+set_option backward.isDefEq.respectTransparency false in
 lemma smul_isClosable_of_isClosable {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
     [NormedAddCommGroup F] [InnerProductSpace ℂ F] {f : LinearPMap ℂ E F} (hf : f.IsClosable)
     (c : ℂ) : (c • f).IsClosable := by
@@ -316,6 +317,7 @@ lemma smul_toLinearPMap (c : ℂ) : (c • U).toLinearPMap = c • U.toLinearPMa
 
 lemma zero_smul_le_zero : (0 : ℂ) • U ≤ 0 := ⟨by simp, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 noncomputable instance : DistribSMul ℂ (UnboundedOperator H H') where
   smul_zero _ := ext <| by ext <;> simp
   smul_add c U₁ U₂ := by

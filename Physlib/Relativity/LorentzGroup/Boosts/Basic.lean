@@ -27,6 +27,7 @@ variable (Λ : LorentzGroup d)
 /-- The Lorentz factor (aka gamma factor or Lorentz term). -/
 def γ (β : ℝ) : ℝ := 1 / Real.sqrt (1 - β^2)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma γ_sq (β : ℝ) (hβ : |β| < 1) : (γ β)^2 = 1 / (1 - β^2) := by
   simp only [γ, one_div, inv_pow, _root_.inv_inj]
   refine Real.sq_sqrt ?_
@@ -47,6 +48,7 @@ lemma γ_det_not_zero (β : ℝ) (hβ : |β| < 1) : (1 - β^2) ≠ 0 := by
   simp at h1
   aesop
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Lorentz boost with in the space direction `i` with speed `β` with
   `|β| < 1`. -/
 def boost (i : Fin d) (β : ℝ) (hβ : |β| < 1) : LorentzGroup d :=

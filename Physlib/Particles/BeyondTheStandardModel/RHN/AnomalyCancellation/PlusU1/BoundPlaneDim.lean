@@ -28,6 +28,7 @@ in which each point is a solution. -/
 def ExistsPlane (n : ℕ) : Prop := ∃ (B : Fin n → (PlusU1 3).Charges),
   LinearIndependent ℚ B ∧ ∀ (f : Fin n → ℚ), (PlusU1 3).IsSolution (∑ i, f i • B i)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma exists_plane_exists_basis {n : ℕ} (hE : ExistsPlane n) :
     ∃ (B : Fin 11 ⊕ Fin n → (PlusU1 3).Charges), LinearIndependent ℚ B := by
   obtain ⟨E, hE1, hE2⟩ := hE

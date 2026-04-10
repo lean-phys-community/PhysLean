@@ -39,7 +39,7 @@ structure RigidBody (d : ℕ) where
 namespace RigidBody
 
 /-- The total mass of the rigid body. -/
-def mass {d : ℕ} (R : RigidBody d) : ℝ := R.ρ ⟨fun _ => 1, contMDiff_const⟩
+noncomputable def mass {d : ℕ} (R : RigidBody d) : ℝ := R.ρ ⟨fun _ => 1, contMDiff_const⟩
 
 /-- The center of mass of the rigid body. -/
 noncomputable def centerOfMass {d : ℕ} (R : RigidBody d) : Space d := ⟨fun i =>

@@ -69,6 +69,7 @@ lemma memHS_iff {f : Space d → ℂ} : MemHS f ↔
     AEStronglyMeasurable.pow (AEStronglyMeasurable.norm h) 2
   simp [Integrable, h', HasFiniteIntegral]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma zero_memHS : MemHS (d := d) 0 := by
   rw [memHS_iff]
@@ -125,6 +126,7 @@ lemma inner_mk_mk {f g : Space d → ℂ} (hf : MemHS f) (hg : MemHS g) :
 lemma eLpNorm_mk {f : Space d → ℂ} {hf : MemHS f} : eLpNorm (mk hf) 2 = eLpNorm f 2 :=
   eLpNorm_congr_ae (coe_mk_ae hf)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma mem_iff {f : Space d → ℂ} (hf : AEStronglyMeasurable f volume) :
     AEEqFun.mk f hf ∈ SpaceDHilbertSpace d ↔ Integrable (fun x ↦ ‖f x‖ ^ 2) := by
   rw [Lp.mem_Lp_iff_memLp, MemLp, eLpNorm_aeeqFun]

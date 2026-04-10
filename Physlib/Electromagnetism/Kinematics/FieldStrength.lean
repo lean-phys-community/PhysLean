@@ -82,6 +82,7 @@ noncomputable def toFieldStrength {d} (A : ElectromagneticPotential d) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     toFieldStrength A x =
     Tensorial.toTensor.symm (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
@@ -259,6 +260,7 @@ lemma fieldStrengthMatrix_differentiable {d} {A : ElectromagneticPotential d}
   apply Differentiable.const_mul
   · exact diff_partial _ _
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_differentiable {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ 2 A) :
     Differentiable ℝ (toFieldStrength A) := by
@@ -339,7 +341,7 @@ lemma toFieldStrength_antisymmetric {d} (A : ElectromagneticPotential d) (x : Sp
   rw [toTensor_toFieldStrength_basis_repr]
   rw [← Finset.sum_neg_distrib]
   apply Finset.sum_congr rfl (fun κ _ => ?_)
-  simp only [Fin.isValue, Fin.cast_eq_self, neg_sub]
+  simp only [Fin.isValue, neg_sub]
   rfl
 
 lemma fieldStrengthMatrix_antisymm {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
@@ -367,6 +369,7 @@ as taking the field strength and then transforming the resulting tensor.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) (x : SpaceTime d) :
     toFieldStrength ⟨fun x => Λ • A (Λ⁻¹ • x)⟩ x =
@@ -375,6 +378,7 @@ lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : Lor
   simp only [Tensorial.toTensor_smul, prodT_equivariant, contrT_equivariant, map_neg,
     permT_equivariant, map_add, ← Tensorial.smul_toTensor_symm, smul_add, smul_neg]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fieldStrengthMatrix_equivariant {d} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d) (hf : Differentiable ℝ A) (x : SpaceTime d)
     (μ : (Fin 1 ⊕ Fin d)) (ν : Fin 1 ⊕ Fin d) :
@@ -419,6 +423,7 @@ We show that the field strength tensor is linear in the potential.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_add {d} (A1 A2 : ElectromagneticPotential d)
     (x : SpaceTime d) (hA1 : Differentiable ℝ A1) (hA2 : Differentiable ℝ A2) :
     toFieldStrength (A1 + A2) x = toFieldStrength A1 x + toFieldStrength A2 x := by
@@ -436,6 +441,7 @@ lemma toFieldStrength_add {d} (A1 A2 : ElectromagneticPotential d)
   · exact hA1.differentiableAt
   · exact hA2.differentiableAt
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fieldStrengthMatrix_add {d} (A1 A2 : ElectromagneticPotential d)
     (x : SpaceTime d) (hA1 : Differentiable ℝ A1) (hA2 : Differentiable ℝ A2) :
     (A1 + A2).fieldStrengthMatrix x =
@@ -444,6 +450,7 @@ lemma fieldStrengthMatrix_add {d} (A1 A2 : ElectromagneticPotential d)
   conv_rhs => rw [fieldStrengthMatrix, fieldStrengthMatrix]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_smul {d} (c : ℝ) (A : ElectromagneticPotential d)
     (x : SpaceTime d) (hA : Differentiable ℝ A) :
     toFieldStrength (c • A) x = c • toFieldStrength A x := by
@@ -460,6 +467,7 @@ lemma toFieldStrength_smul {d} (c : ℝ) (A : ElectromagneticPotential d)
   ring
   exact hA.differentiableAt
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fieldStrengthMatrix_smul {d} (c : ℝ) (A : ElectromagneticPotential d)
     (x : SpaceTime d) (hA : Differentiable ℝ A) :
     (c • A).fieldStrengthMatrix x = c • A.fieldStrengthMatrix x := by
@@ -499,6 +507,7 @@ noncomputable def fieldStrengthAux {d} (A : DistElectromagneticPotential d)
       (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv ε | μ' ν) + -
       (η d | ν ν' ⊗ A.deriv ε | ν' μ)}ᵀ)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fieldStrengthAux_eq_add {d} (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) :
     fieldStrengthAux A ε =
     Tensorial.toTensor.symm (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv ε | μ' ν)}ᵀ)
@@ -629,6 +638,7 @@ lemma fieldStrengthAux_eq_basis {d} (A : DistElectromagneticPotential d)
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The field strength of an electromagnetic potential which is a distribution. -/
 noncomputable def fieldStrength {d} :
     DistElectromagneticPotential d →ₗ[ℝ]
@@ -697,6 +707,7 @@ lemma fieldStrength_diag_zero {d} (A : DistElectromagneticPotential d)
   rw [fieldStrength_basis_repr_eq_single]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma distDeriv_fieldStrength_diag_zero {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) (μ ν : Fin 1 ⊕ Fin d) :
@@ -719,6 +730,7 @@ lemma fieldStrength_antisymmetric_basis {d} (A : DistElectromagneticPotential d)
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fieldStrength_equivariant {d} (A : DistElectromagneticPotential d)
     (Λ : LorentzGroup d) :
     (Λ • A).fieldStrength = Λ • A.fieldStrength := by

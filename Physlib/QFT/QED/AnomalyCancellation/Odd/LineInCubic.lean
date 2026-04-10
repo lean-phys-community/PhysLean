@@ -38,6 +38,7 @@ def LineInCubic (S : (PureU1 (2 * n + 1)).LinSols) : Prop :=
   ∀ (g f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ),
   accCube (2 * n + 1) (a • P g + b • P! f) = 0
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The condition that a linear solution sits on a line between the two planes
   within the cubic expands into a on `accCubeTriLinSymm` applied to the points
   within the planes. -/
@@ -77,6 +78,7 @@ lemma lineInCubicPerm_permute {S : (PureU1 (2 * n + 1)).LinSols}
     LineInCubicPerm ((FamilyPermutations (2 * n + 1)).linSolRep M' S) :=
   fun M => hS (M * M')
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ + 1)).LinSols}
     (LIC : LineInCubicPerm S) :
     ∀ (j : Fin n.succ) (g f : Fin n.succ → ℚ) (_ : S.val = Pa g f),

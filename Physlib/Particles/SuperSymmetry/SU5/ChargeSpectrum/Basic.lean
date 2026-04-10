@@ -223,9 +223,11 @@ lemma subset_antisymm {x y : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyx : y ⊆ x
 instance emptyInst : EmptyCollection (ChargeSpectrum 𝓩) where
   emptyCollection := ⟨none, none, {}, {}⟩
 
+lemma empty_eq : (∅ : ChargeSpectrum 𝓩) = ⟨none, none, {}, {}⟩ := rfl
+
 @[simp]
 lemma empty_subset (x : ChargeSpectrum 𝓩) : ∅ ⊆ x := by
-  simp [Subset, emptyInst]
+  simp [Subset, empty_eq]
 
 @[simp]
 lemma subset_of_empty_iff_empty {x : ChargeSpectrum 𝓩} :
@@ -241,19 +243,19 @@ lemma subset_of_empty_iff_empty {x : ChargeSpectrum 𝓩} :
 
 @[simp]
 lemma empty_qHd : (∅ : ChargeSpectrum 𝓩).qHd = none := by
-  simp [emptyInst]
+  simp [empty_eq]
 
 @[simp]
 lemma empty_qHu : (∅ : ChargeSpectrum 𝓩).qHu = none := by
-  simp [emptyInst]
+  simp [empty_eq]
 
 @[simp]
 lemma empty_Q5 : (∅ : ChargeSpectrum 𝓩).Q5 = ∅ := by
-  simp [emptyInst]
+  simp [empty_eq]
 
 @[simp]
 lemma empty_Q10 : (∅ : ChargeSpectrum 𝓩).Q10 = ∅ := by
-  simp [emptyInst]
+  simp [empty_eq]
 
 /-!
 
@@ -268,10 +270,10 @@ def card (x : ChargeSpectrum 𝓩) : Nat :=
 
 @[simp]
 lemma card_empty : card (∅ : ChargeSpectrum 𝓩) = 0 := by
-  simp [card, emptyInst]
+  simp [card, empty_eq]
 
 lemma card_mono {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) : card x ≤ card y := by
-  simp [hasSubset] at h
+  simp [subset_def] at h
   have h1 := Finset.card_le_card h.1
   have h2 := Finset.card_le_card h.2.1
   have h3 := Finset.card_le_card h.2.2.1

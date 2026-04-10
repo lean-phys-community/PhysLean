@@ -593,6 +593,7 @@ lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n.succ)) (basis!AsCharges j) 
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis!_accCube (j : Fin n) :
     accCube (2 * n.succ) (basis!AsCharges j) = 0 := by
   rw [accCube_explicit, sum_evenShift]
@@ -670,6 +671,7 @@ lemma P!_evenShiftLast (f : Fin n → ℚ) : P! f evenShiftLast = 0 := by
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n.succ) (P! f) = 0 := by
   rw [accCube_explicit, sum_evenShift, P!_evenShiftZero, P!_evenShiftLast]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero, Function.comp_apply,
@@ -777,6 +779,7 @@ lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     accCubeTriLinSymm (P g) (P g) (basis!AsCharges j)
     = g (j.succ) ^ 2 - g (j.castSucc) ^ 2 := by
@@ -793,6 +796,7 @@ lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     simp only [mul_zero, add_zero]
   · simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma P_P!_P!_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
     accCubeTriLinSymm (P! g) (P! g) (basisAsCharges j)
     = (P! g (evenFst j))^2 - (P! g (evenSnd j))^2 := by
@@ -872,6 +876,7 @@ lemma Pa_evenShiftLast (f : Fin n.succ → ℚ) (g : Fin n → ℚ) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_zero (f : Fin n.succ → ℚ) (g : Fin n → ℚ) (h : Pa f g = 0) :
     ∀ i, f i = 0 := by
   have h₃ := Pa_evenShitZero f g

@@ -47,6 +47,7 @@ lemma mem_singleton_iff {i j : Fin n} (hij : i < j) {a : Finset (Fin n)} :
     a ∈ (singleton hij).1 ↔ a = {i, j} := by
   simp [singleton]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma of_singleton_eq {i j : Fin n} (hij : i < j) (a : (singleton hij).1) :
     a = ⟨{i, j}, mem_singleton hij⟩ := by
   have ha2 := a.2
@@ -86,6 +87,7 @@ lemma singleton_getDual?_eq_none_iff_neq {i j : Fin n} (hij : i < j) (a : Fin n)
   simp only [singleton, Finset.mem_singleton, forall_eq, Finset.mem_insert, not_or, ne_eq]
   omega
 
+set_option backward.isDefEq.respectTransparency false in
 lemma singleton_uncontractedEmd_ne_left {φs : List 𝓕.FieldOp} {i j : Fin φs.length} (hij : i < j)
     (a : Fin [singleton hij]ᵘᶜ.length) :
     (singleton hij).uncontractedListEmd a ≠ i := by
@@ -97,6 +99,7 @@ lemma singleton_uncontractedEmd_ne_left {φs : List 𝓕.FieldOp} {i j : Fin φs
     simp [singleton]
   simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 lemma singleton_uncontractedEmd_ne_right {φs : List 𝓕.FieldOp} {i j : Fin φs.length} (hij : i < j)
     (a : Fin [singleton hij]ᵘᶜ.length) :
     (singleton hij).uncontractedListEmd a ≠ j := by
@@ -118,6 +121,7 @@ lemma mem_signFinset {i j : Fin n} (hij : i < j) (a : Fin n) :
   apply Or.inl
   omega
 
+set_option backward.isDefEq.respectTransparency false in
 lemma subContraction_singleton_eq_singleton {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
     (a : φsΛ.1) : φsΛ.subContraction {a.1} (by simp) =

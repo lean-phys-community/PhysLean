@@ -96,6 +96,7 @@ lemma HasAdjoint.comp {f : F → G} {g : E → F} {f' g'}
     HasAdjoint 𝕜 (fun x : E => f (g x)) (fun x => g' (f' x)) := by
   constructor; intros; simp[hf.adjoint_inner_left, hg.adjoint_inner_left]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma HasAdjoint.prodMk {f : E → F} {g : E → G} {f' g'}
     (hf : HasAdjoint 𝕜 f f') (hg : HasAdjoint 𝕜 g g') :
     HasAdjoint 𝕜 (fun x : E => (f x, g x)) (fun yz => f' yz.1 + g' yz.2) := by
@@ -103,11 +104,13 @@ lemma HasAdjoint.prodMk {f : E → F} {g : E → G} {f' g'}
   simp [inner_add_left',
       hf.adjoint_inner_left, hg.adjoint_inner_left]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma HasAdjoint.fst {f : E → F×G} {f'} (hf : HasAdjoint 𝕜 f f') :
     HasAdjoint 𝕜 (fun x : E => (f x).1) (fun y => f' (y, 0)) := by
   constructor; intros
   simp[hf.adjoint_inner_left]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma HasAdjoint.snd {f : E → F×G} {f'} (hf : HasAdjoint 𝕜 f f') :
     HasAdjoint 𝕜 (fun x : E => (f x).2) (fun z => f' (0, z)) := by
   constructor; intros
@@ -139,6 +142,7 @@ lemma HasAdjoint.smul_left {f : E → F} {f'} (c : 𝕜)
   constructor; intros
   simp[inner_smul_left', inner_smul_right', hf.adjoint_inner_left]
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexConjugate in
 lemma HasAdjoint.smul_right {f : E → 𝕜} {f'} (v : F)
     (hf : HasAdjoint 𝕜 f f') :

@@ -143,6 +143,7 @@ lemma pureInl_update_right (f : (i : ι1 ⊕ ι2) → Sum.elim s1 s2 i) (x : ι2
 
 end
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The multilinear map from `(Sum.elim s1 s2)` to `((⨂[R] i : ι1, s1 i) ⊗[R] ⨂[R] i : ι2, s2 i)`
   defined by splitting elements of `(Sum.elim s1 s2)` into two parts. -/
 def domCoprod :
@@ -228,6 +229,7 @@ lemma elimPureTensor_update_left (p : (i : ι1) → s1 i) (q : (i : ι2) → s2 
 
 end
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The multilinear map valued in multilinear maps defined by combining
   `(i : ι1) → s1 i` and `q : (i : ι2) → s2 i` into a PiTensorProduct. -/
 def elimPureTensorMulLin : MultilinearMap R s1

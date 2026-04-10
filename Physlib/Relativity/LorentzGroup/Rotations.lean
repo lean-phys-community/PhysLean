@@ -64,7 +64,7 @@ def ofSpecialOrthogonal {d} :
     simp only [minkowskiMatrix.dual, minkowskiMatrix.as_block, Matrix.fromBlocks_transpose,
       Matrix.transpose_one, Matrix.transpose_zero, Matrix.fromBlocks_multiply, mul_one,
       Matrix.mul_zero, add_zero, Matrix.zero_mul, Matrix.mul_one, neg_mul, one_mul, zero_add,
-      Matrix.mul_neg, neg_zero, mul_neg, neg_neg]
+      Matrix.mul_neg, neg_zero, mul_neg, SubtractionMonoid.neg_neg]
     have ha := A.2
     rw [Matrix.mem_specialOrthogonalGroup_iff, Matrix.mem_orthogonalGroup_iff'] at ha
     rw [ha.1]
@@ -109,7 +109,8 @@ def ofSpecialOrthogonal {d} :
         rw [mem_iff_self_mul_dual, ← h1] at hΛ
         simp [minkowskiMatrix.dual] at hΛ
         rw [minkowskiMatrix.as_block] at hΛ
-        simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply] at hΛ
+        simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply,
+          SubtractionMonoid.neg_neg] at hΛ
         ext i j
         trans (Matrix.fromBlocks (1 : Matrix (Fin 1) (Fin 1) ℝ) 0 0 (M * M.transpose))
           (Sum.inr i) (Sum.inr j)

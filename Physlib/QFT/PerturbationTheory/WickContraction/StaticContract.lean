@@ -50,6 +50,7 @@ lemma staticContract_insert_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
   ext a
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /--
   For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of
   `𝓕.FieldOp`, a `i ≤ φs.length` and a `k` in `φsΛ.uncontracted`, then
@@ -80,6 +81,7 @@ lemma staticContract_insert_some
 
 open FieldStatistic
 
+set_option backward.isDefEq.respectTransparency false in
 lemma staticContract_insert_some_of_lt
     (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (k : φsΛ.uncontracted)
@@ -89,7 +91,7 @@ lemma staticContract_insert_some_of_lt
     • (contractStateAtIndex φ [φsΛ]ᵘᶜ ((uncontractedFieldOpEquiv φs φsΛ) (some k)) *
       φsΛ.staticContract) := by
   rw [staticContract_insert_some]
-  simp only [Nat.succ_eq_add_one, Fin.getElem_fin, ite_mul, instCommGroup.eq_1,
+  simp only [Nat.succ_eq_add_one, Fin.getElem_fin, ite_mul,
     contractStateAtIndex, uncontractedFieldOpEquiv, Equiv.optionCongr_apply,
     Equiv.coe_trans, Option.map_some, Function.comp_apply, finCongr_apply, Fin.val_cast,
     List.getElem_map, uncontractedList_getElem_uncontractedIndexEquiv_symm, List.get_eq_getElem,
@@ -111,6 +113,7 @@ lemma staticContract_insert_some_of_lt
     rw [h1]
     simp only [exchangeSign_mul_self]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma staticContract_of_not_gradingCompliant (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (h : ¬ GradingCompliant φs φsΛ) :
     φsΛ.staticContract = 0 := by

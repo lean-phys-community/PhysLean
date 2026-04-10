@@ -60,6 +60,7 @@ lemma bosonicProjF_ofCrAnListF (φs : List 𝓕.CrAnFieldOp) :
   conv_lhs =>
     rw [← ofListBasis_eq_ofList, bosonicProjF, Basis.constr_basis]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma bosonicProjF_of_mem_bosonic (a : 𝓕.FieldOpFreeAlgebra) (h : a ∈ statisticSubmodule bosonic) :
     bosonicProjF a = ⟨a, h⟩ := by
   let p (a : 𝓕.FieldOpFreeAlgebra) (hx : a ∈ statisticSubmodule bosonic) : Prop :=
@@ -132,6 +133,7 @@ lemma fermionicProjF_ofCrAnListF_if_bosonic (φs : List 𝓕.CrAnFieldOp) :
     simp only [neq_fermionic_iff_eq_bosonic] at h1
     simp [h1]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fermionicProjF_of_mem_fermionic (a : 𝓕.FieldOpFreeAlgebra)
     (h : a ∈ statisticSubmodule fermionic) :
     fermionicProjF a = ⟨a, h⟩ := by
@@ -240,6 +242,7 @@ lemma directSum_eq_bosonic_plus_fermionic
     conv_lhs => rw [hx, hy]
     abel
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a field specification `𝓕`, the algebra `𝓕.FieldOpFreeAlgebra` is graded by `FieldStatistic`.
   Those `ofCrAnListF φs` for which `φs` has an overall `bosonic` statistic
   (i.e. `𝓕 |>ₛ φs = bosonic`) span `bosonic`
@@ -348,7 +351,7 @@ lemma bosonicProjF_mul (a b : 𝓕.FieldOpFreeAlgebra) :
     rw [bosonicProjF_of_mem_bosonic _
       (by
       have h1 : bosonic = fermionic + fermionic := by
-        simp only [add_eq_mul, instCommGroup, mul_self]
+        simp only [add_eq_mul, mul_self]
         rfl
       conv_lhs => rw [h1]
       apply fieldOpFreeAlgebraGrade.mul_mem
@@ -356,7 +359,7 @@ lemma bosonicProjF_mul (a b : 𝓕.FieldOpFreeAlgebra) :
       simp)]
   simp only [ZeroMemClass.coe_zero, add_zero, zero_add]
   · have h1 : bosonic = bosonic + bosonic := by
-      simp only [add_eq_mul, instCommGroup, mul_self]
+      simp only [add_eq_mul, mul_self]
       rfl
     conv_lhs => rw [h1]
     apply fieldOpFreeAlgebraGrade.mul_mem
@@ -376,7 +379,7 @@ lemma fermionicProjF_mul (a b : 𝓕.FieldOpFreeAlgebra) :
     rw [fermionicProjF_of_mem_bosonic _
       (by
       have h1 : bosonic = bosonic + bosonic := by
-        simp only [add_eq_mul, instCommGroup, mul_self]
+        simp only [add_eq_mul, mul_self]
         rfl
       conv_lhs => rw [h1]
       apply fieldOpFreeAlgebraGrade.mul_mem
@@ -408,7 +411,7 @@ lemma fermionicProjF_mul (a b : 𝓕.FieldOpFreeAlgebra) :
     rw [fermionicProjF_of_mem_bosonic _
       (by
       have h1 : bosonic = fermionic + fermionic := by
-        simp only [add_eq_mul, instCommGroup, mul_self]
+        simp only [add_eq_mul, mul_self]
         rfl
       conv_lhs => rw [h1]
       apply fieldOpFreeAlgebraGrade.mul_mem

@@ -331,10 +331,9 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
       fun_prop
     · exact wave_differentiable
   rw [hdi']
-  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, fderiv_fun_const, Pi.zero_apply,
+  simp only [PiLp.inner_apply, fderiv_fun_const, Pi.zero_apply,
     ContinuousLinearMap.zero_apply, inner_zero_right, PiLp.smul_apply, smul_eq_mul,
-    EuclideanSpace.single_apply, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ,
-    ↓reduceIte, zero_add]
+    PiLp.single_apply, zero_add]
   change DifferentiableAt ℝ ((fun x' => f₀' x' (s.unit u)) ∘
       (fun x => (inner ℝ x s.unit - c * t))) x
   apply DifferentiableAt.comp
@@ -345,6 +344,7 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
   · exact wave_differentiable
   · fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If `f₀` is a function of `(inner ℝ x s - c * t)`, the fderiv of its components
 with respect to spatial coordinates is equal to the corresponding component of
 the propagation direction `s` times time derivative. -/

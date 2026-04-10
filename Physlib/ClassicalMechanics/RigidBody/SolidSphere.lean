@@ -22,6 +22,7 @@ open MeasureTheory
 namespace RigidBody
 open NNReal
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The solid sphere as a rigid body. -/
 noncomputable def solidSphere (d : ℕ) (m R : ℝ≥0) : RigidBody d where
   ρ := ⟨⟨fun f => m / volume.real (Metric.closedBall (0 : Space d) R) *
@@ -66,8 +67,7 @@ lemma solidSphere_centerOfMass {d : ℕ} (m R : ℝ≥0) : (solidSphere d.succ m
   suffices ∫ x in Metric.closedBall (0 : Space d.succ) R, x i ∂MeasureSpace.volume
     = -∫ x in Metric.closedBall (0 : Space d.succ) R, x i ∂MeasureSpace.volume by linarith
   rw [← integral_neg]
-  simp only [← integral_indicator measurableSet_closedBall, Set.indicator, Metric.mem_closedBall,
-    dist_zero_right]
+  simp only [← integral_indicator measurableSet_closedBall, Set.indicator, Metric.mem_closedBall]
   rw [← integral_neg_eq_self]
   norm_num
 

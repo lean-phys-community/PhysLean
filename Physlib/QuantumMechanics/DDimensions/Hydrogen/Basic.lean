@@ -50,6 +50,7 @@ variable (H : HydrogenAtom)
 @[simp]
 lemma m_ne_zero : H.m ≠ 0 := by linarith [H.hm]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The hydrogen atom Hamiltonian regularized by `ε ≠ 0` is defined to be
   `𝐇(ε) ≔ (2m)⁻¹𝐩² - k·𝐫(ε)⁻¹`. -/
 def hamiltonianReg (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=

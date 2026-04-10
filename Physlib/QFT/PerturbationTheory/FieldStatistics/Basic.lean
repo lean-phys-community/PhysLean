@@ -166,6 +166,7 @@ lemma ofList_eq_prod (s : 𝓕 → FieldStatistic) : (φs : List 𝓕) →
   | φ :: φs => by
     rw [ofList_cons_eq_mul, List.map_cons, List.prod_cons, ofList_eq_prod]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma ofList_singleton (s : 𝓕 → FieldStatistic) (φ : 𝓕) : ofList s [φ] = s φ := by
   simp only [ofList]
@@ -178,6 +179,7 @@ lemma ofList_freeMonoid (s : 𝓕 → FieldStatistic) (φ : 𝓕) : ofList s (Fr
 @[simp]
 lemma ofList_empty (s : 𝓕 → FieldStatistic) : ofList s [] = bosonic := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma ofList_append (s : 𝓕 → FieldStatistic) (φs φs' : List 𝓕) :
     ofList s (φs ++ φs') = if ofList s φs = ofList s φs' then bosonic else fermionic := by
@@ -212,6 +214,7 @@ lemma ofList_insertionSort (s : 𝓕 → FieldStatistic) (le1 : 𝓕 → 𝓕 �
     (φs : List 𝓕) : ofList s (List.insertionSort le1 φs) = ofList s φs :=
   ofList_perm s (List.perm_insertionSort le1 φs)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma ofList_map_eq_finset_prod (s : 𝓕 → FieldStatistic) :
     (φs : List 𝓕) → (l : List (Fin φs.length)) → (hl : l.Nodup) →
     ofList s (l.map φs.get) = ∏ (i : Fin φs.length), if i ∈ l then s φs[i] else 1
@@ -222,8 +225,7 @@ lemma ofList_map_eq_finset_prod (s : 𝓕 → FieldStatistic) :
       Finset.prod_const_one]
     rfl
   | φ :: φs, i :: l, hl => by
-    simp only [List.length_cons, List.map_cons, List.get_eq_getElem, List.mem_cons, instCommGroup,
-      Fin.getElem_fin]
+    simp only [List.length_cons, List.map_cons, List.get_eq_getElem, List.mem_cons, Fin.getElem_fin]
     rw [ofList_cons_eq_mul]
     rw [ofList_map_eq_finset_prod s (φ :: φs) l]
     have h1 : s (φ :: φs)[↑i] = ∏ (j : Fin (φ :: φs).length),
@@ -233,7 +235,7 @@ lemma ofList_map_eq_finset_prod (s : 𝓕 → FieldStatistic) :
     rw [← Finset.prod_mul_distrib]
     congr
     funext a
-    simp only [instCommGroup, List.length_cons, mul_ite, ite_mul, one_mul, mul_one]
+    simp only [List.length_cons, mul_ite, ite_mul, one_mul, mul_one]
     by_cases ha : a = i
     · simp only [ha, ↓reduceIte, mul_self, true_or]
       rw [if_neg]
@@ -275,7 +277,7 @@ lemma ofList_take_zero (φs : List 𝓕) :
 
 lemma ofList_take_succ_cons (n : ℕ) (φ1 : 𝓕) (φs : List 𝓕) :
     ofList q ((φ1 :: φs).take (n + 1)) = q φ1 * ofList q (φs.take n) := by
-  simp only [List.take_succ_cons, instCommGroup]
+  simp only [List.take_succ_cons]
   rw [ofList_cons_eq_mul]
 
 lemma ofList_take_insertIdx_gt (n m : ℕ) (φ1 : 𝓕) (φs : List 𝓕) (hn : n < m) :
@@ -302,17 +304,16 @@ instance : AddMonoid FieldStatistic where
   add a b := a * b
   nsmul n a := ∏ (i : Fin n), a
   zero_add a := by
-    cases a <;> simp only [instCommGroup] <;> rfl
+    cases a <;> rfl
   add_zero a := by
-    cases a <;>
-      simp only [instCommGroup] <;> rfl
+    cases a <;> rfl
   add_assoc a b c := by
-    cases a <;> cases b <;> cases c <;> simp only [instCommGroup] <;> rfl
+    cases a <;> cases b <;> cases c <;> rfl
   nsmul_zero a := by
-    simp only [Finset.univ_eq_empty, Finset.prod_const, instCommGroup, Finset.card_empty, pow_zero]
+    simp only [Finset.univ_eq_empty, Finset.prod_const, Finset.card_empty, pow_zero]
     rfl
   nsmul_succ a n := by
-    simp only [instCommGroup, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+    simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     rfl
 
 @[simp]

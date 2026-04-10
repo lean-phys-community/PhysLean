@@ -123,6 +123,7 @@ lemma finset_sum_smul (s : Finset α) (i : α) (f : α → M) :
     ∑ j ∈ s, δ[i,j] • f j = if i ∈ s then f i else 0 := by
   simp [kroneckerDelta, one_nsmul]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma finset_sum_sum_smul_eq_zero {s s' : Finset α} {f : α → α → M}
     (hf : ∀ i ∈ s ∩ s', f i i = 0) : ∑ i ∈ s, ∑ j ∈ s', δ[i,j] • f i j = 0 := by
   simp only [finset_sum_smul, Finset.sum_ite_mem]

@@ -37,6 +37,7 @@ lemma physHermite_succ (n : ℕ) :
     physHermite (n + 1) = 2 • X * physHermite n - derivative (physHermite n) := by
   simp [physHermite]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_eq_iterate (n : ℕ) :
     physHermite n = (fun p => 2 * X * p - derivative p)^[n] 1 := by
   induction n with
@@ -46,8 +47,10 @@ lemma physHermite_eq_iterate (n : ℕ) :
 @[simp]
 lemma physHermite_zero : physHermite 0 = C 1 := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_one : physHermite 1 = 2 * X := by simp [physHermite_succ]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma derivative_physHermite_succ : (n : ℕ) →
     derivative (physHermite (n + 1)) = 2 * (n + 1) • physHermite n
   | 0 => by
@@ -144,7 +147,7 @@ lemma physHermite_ne_zero {n : ℕ} : physHermite n ≠ 0 := by
   refine leadingCoeff_ne_zero.mp ?_
   simp
 
-instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ)where
+noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ)where
   coe p := fun x => p.aeval x
 
 lemma physHermite_eq_aeval (n : ℕ) (x : ℝ) :
@@ -155,18 +158,20 @@ lemma physHermite_zero_apply (x : ℝ) : physHermite 0 x = 1 := by simp
 lemma physHermite_pow (n m : ℕ) (x : ℝ) : physHermite n x ^ m = aeval x (physHermite n ^ m) := by
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_succ_fun (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) = 2 • (fun x => x) *
     (physHermite n : ℝ → ℝ)- (2 * n : ℝ) • (physHermite (n - 1) : ℝ → ℝ) := by
   ext x
-  simp [physHermite_succ', aeval, mul_assoc]
+  simp [physHermite_succ', aevalEquiv, aeval, mul_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_succ_fun' (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) = fun x => 2 • x *
     physHermite n x -
     (2 * n : ℝ) • physHermite (n - 1) x := by
   ext x
-  simp [physHermite_succ', aeval, mul_assoc]
+  simp [physHermite_succ', aevalEquiv, aeval, mul_assoc]
 
 lemma iterated_deriv_physHermite_eq_aeval (n : ℕ) : (m : ℕ) →
     deriv^[m] (physHermite n) = fun x => (derivative^[m] (physHermite n)).aeval x
@@ -187,12 +192,14 @@ lemma deriv_physHermite_differentiableAt (n m : ℕ) (x : ℝ) :
   rw [iterated_deriv_physHermite_eq_aeval]
   exact Polynomial.differentiableAt_aeval _
 
+set_option backward.isDefEq.respectTransparency false in
 lemma deriv_physHermite (n : ℕ) :
     deriv (physHermite n) = 2 * n * (physHermite (n - 1)) := by
   ext x
   rw [Polynomial.deriv_aeval (physHermite n), derivative_physHermite]
-  simp [aeval, mul_assoc]
+  simp [aeval, aevalEquiv, mul_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fderiv_physHermite
     {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (x : E)
     (f : E → ℝ) (hf : DifferentiableAt ℝ f x) (n : ℕ) :
@@ -205,7 +212,8 @@ lemma fderiv_physHermite
   simp only [h, Polynomial.fderiv_aeval, derivative_physHermite, nsmul_eq_mul, map_mul, map_natCast,
     ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.smulRight_apply,
     ContinuousLinearMap.one_apply, smul_eq_mul, ContinuousLinearMap.coe_smul', Pi.smul_apply]
-  rw [aeval, eval₂AlgHom'_apply, eval₂_ofNat]
+  simp only [aeval, aevalEquiv, Equiv.coe_fn_mk, eval₂AlgHom_apply, Algebra.toRingHom_ofId,
+    algebraMap_int_eq, eval₂_ofNat]
   ring
 
 @[simp]
@@ -221,7 +229,7 @@ lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
     physHermite n (-x) = (-1)^n * physHermite n x
   | 0, x => by simp
   | 1, x => by
-    simp [physHermite_one, aeval]
+    simp [physHermite_one, aeval, aevalEquiv]
   | n + 2, x => by
     rw [physHermite_succ_fun']
     have h1 := physHermite_parity (n + 1) x
@@ -236,6 +244,7 @@ lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma deriv_gaussian_eq_physHermite_mul_gaussian (n : ℕ) (x : ℝ) :
     deriv^[n] (fun y => Real.exp (- y ^ 2)) x =
     (-1 : ℝ) ^ n * physHermite n x * Real.exp (- x ^ 2) := by
@@ -255,7 +264,8 @@ lemma deriv_gaussian_eq_physHermite_mul_gaussian (n : ℕ) (x : ℝ) :
       simp only [neg_mul, mul_neg, mul_one, nsmul_eq_mul, cast_ofNat]
       simp only [Polynomial.deriv_aeval, derivative_physHermite, nsmul_eq_mul, map_mul, map_natCast,
         map_sub, aeval_X]
-      simp only [aeval, eval₂AlgHom'_apply, eval₂_ofNat]
+      simp only [aeval, aevalEquiv, Equiv.coe_fn_mk, eval₂AlgHom_apply, Algebra.toRingHom_ofId,
+        algebraMap_int_eq, eval₂_ofNat]
       ring
     · exact Polynomial.differentiable_aeval ..
     · simp [DifferentiableAt.exp]
@@ -273,6 +283,7 @@ lemma physHermite_eq_deriv_gaussian' (n : ℕ) (x : ℝ) :
   rw [physHermite_eq_deriv_gaussian, Real.exp_neg]
   field_simp [Real.exp_ne_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma guassian_integrable_polynomial {b : ℝ} (hb : 0 < b) (P : Polynomial ℤ) :
     MeasureTheory.Integrable fun x : ℝ => (P.aeval x) * Real.exp (-b * x ^ 2) := by
@@ -302,7 +313,7 @@ lemma guassian_integrable_polynomial_cons {b c : ℝ} (hb : 0 < b) (P : Polynomi
   have h2 : (fun a => P.coeff i • (c * a) ^ i * Real.exp (-b * a ^ 2)) =
       (c ^ i * P.coeff i : ℝ) • (fun x => (x ^ (i : ℝ) * Real.exp (-b * x ^ 2))) := by
     funext x
-    simp only [zsmul_eq_mul, neg_mul, mul_assoc, Real.rpow_natCast, Pi.smul_apply, smul_eq_mul]
+    simp only [neg_mul, mul_assoc, Real.rpow_natCast, Pi.smul_apply, smul_eq_mul]
     ring
   refine h2 ▸ MeasureTheory.Integrable.smul (c ^ i * P.coeff i : ℝ) ?_
   apply integrable_rpow_mul_exp_neg_mul_sq (s := i)
@@ -375,7 +386,7 @@ lemma integral_physHermite_mul_physHermite_eq_integral_deriv_inductive (n m : �
         - ∫ (x : ℝ), deriv (deriv^[p] (physHermite n)) x *
         deriv^[m - (p + 1)] (fun x => Real.exp (-x ^ 2)) x := by
       apply MeasureTheory.integral_mul_deriv_eq_deriv_mul_of_integrable
-      · exact fun _ ↦ DifferentiableAt.hasDerivAt (deriv_physHermite_differentiableAt n p _)
+      · exact fun _ _ ↦ DifferentiableAt.hasDerivAt (deriv_physHermite_differentiableAt n p _)
       · intro x
         simp only [hasDerivAt_deriv_iff]
         have h1 : (deriv^[m - (p + 1)] fun x => Real.exp (-x ^ 2)) =
@@ -426,6 +437,7 @@ lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
   rw [physHermite_orthogonal hnm]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 theorem physHermite_norm (n : ℕ) :
     ∫ x : ℝ, (physHermite n x * physHermite n x) * Real.exp (- x ^ 2) =
     ↑n ! * 2 ^ n * √Real.pi := by
@@ -456,6 +468,7 @@ lemma physHermite_norm_cons (n : ℕ) (c : ℝ) :
     (fun x => physHermite n x * physHermite n x * Real.exp (-x ^ 2)) c]
   rw [physHermite_norm]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ) →
     (hn : P.natDegree = n) →
     (P : ℝ → ℝ) ∈ Submodule.span ℝ (Set.range (fun n => (physHermite n : ℝ → ℝ)))
@@ -491,7 +504,7 @@ lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ)
       simp only [coeff_physHermite_self_succ, zsmul_eq_mul, Int.cast_pow, Int.cast_ofNat, map_sub,
         map_mul, map_pow, map_intCast, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, sub_left_inj,
         mul_eq_mul_right_iff]
-      simp [aeval]
+      simp [aeval, aevalEquiv]
     rw [hl] at hP'mem
     rw [Submodule.sub_mem_iff_left] at hP'mem
     · rw [Submodule.smul_mem_iff] at hP'mem

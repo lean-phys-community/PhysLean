@@ -75,6 +75,7 @@ lemma exp_mul_gaussian_integrable (b c : ℝ) (hb : 0 < b) :
   apply Integrable.comp_sub_right (f := (fun x => Real.exp (- b * x ^ 2)))
   exact integrable_exp_neg_mul_sq hb
 
+set_option backward.isDefEq.respectTransparency false in
 lemma exp_abs_mul_gaussian_integrable (b c : ℝ) (hb : 0 < b) :
     MeasureTheory.Integrable (fun x => Real.exp (|c * x|) * Real.exp (- b * x ^ 2)) := by
   rw [← MeasureTheory.integrableOn_univ]
@@ -170,6 +171,7 @@ lemma exp_mul_abs_mul_gaussian_integrable (f : ℝ → ℂ) (hf : MemHS f)
   rw [h1]
   exact MeasureTheory.Integrable.const_mul (abs_mul_gaussian_integrable f hf b (c / (2 * b)) hb) ..
 
+set_option backward.isDefEq.respectTransparency false in
 lemma exp_abs_mul_abs_mul_gaussian_integrable (f : ℝ → ℂ) (hf : MemHS f) (b c : ℝ) (hb : 0 < b) :
     MeasureTheory.Integrable
     (fun x => Real.exp (|c * x|) * norm (f x) * Real.exp (- b * x ^ 2)) := by

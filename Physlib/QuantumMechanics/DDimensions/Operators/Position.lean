@@ -68,6 +68,7 @@ open SchwartzMap
 ### A.1. Position vector
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Component `i` of the position operator is the continuous linear map
   from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `xᵢψ`. -/
 def positionOperator : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
@@ -119,6 +120,7 @@ lemma normRegularizedPow_hasTemperateGrowth (d : ℕ) (ε : ℝˣ) (s : ℝ) :
   rw [h123]
   fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The radius operator to power `s`, regularized by `ε ≠ 0`, is the continuous linear map
   from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `(‖x‖² + ε²)^(s/2) • ψ`. -/
 def radiusRegPowOperator {d : ℕ} (ε : ℝˣ) (s : ℝ) : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
@@ -142,18 +144,21 @@ lemma radiusRegPowOperator_apply {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Spa
     𝐫₀ ε s ψ x = (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
   rw [radiusRegPowOperator_apply_fun]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma radiusRegPowOperator_comp_eq {d : ℕ} (ε : ℝˣ) (s t : ℝ) :
     𝐫₀[d] ε s ∘L 𝐫₀ ε t = 𝐫₀ ε (s+t) := by
   ext ψ x
   simp [add_div, Real.rpow_add (norm_sq_add_unit_sq_pos ε x), mul_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma radiusRegPowOperator_zero {d : ℕ} (ε : ℝˣ) :
     𝐫₀ ε 0 = ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
     ∑ i, 𝐱 i ∘L 𝐱 i = 𝐫₀ ε 2 - ε.1 ^ 2 • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
@@ -166,6 +171,7 @@ lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
 open MeasureTheory
 open SpaceDHilbertSpace
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The radius operator to power `s` is the linear map from `𝓢(Space d, ℂ)` to `Space d → ℂ` that
   maps `ψ` to `x ↦ ‖x‖ˢψ(x)` (which is 'nearly' Schwartz for general `s`). -/
 def radiusPowOperator {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space d → ℂ where
@@ -184,6 +190,7 @@ lemma radiusPowOperator_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x :
     𝐫 s ψ x = ‖x‖ ^ s • ψ x := by
   rw [radiusPowOperator_apply_fun]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
 @[fun_prop]
 lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
@@ -194,6 +201,7 @@ lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 
   simp only [h]
   exact ContDiffAt.rpow_const_of_ne (by fun_prop) (inner_self_ne_zero.mpr hx)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is strongly measurable. -/
 @[fun_prop]
 lemma radiusPowOperator_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
@@ -201,6 +209,7 @@ lemma radiusPowOperator_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(
   rw [radiusPowOperator_apply_fun]
   exact StronglyMeasurable.smul (by measurability) ψ.continuous.stronglyMeasurable
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : 0 < d + 2 * s) (ψ : 𝓢(Space d, ℂ)) :
     MemHS (𝐫 s ψ) := by
@@ -357,10 +366,12 @@ open SpaceDHilbertSpace
 ### B.1. Position vector
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The position operators defined on the Schwartz submodule. -/
 def positionOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
   schwartzEquiv.toLinearMap ∘ₗ (𝐱 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
+set_option backward.isDefEq.respectTransparency false in
 lemma positionOperatorSchwartz_isSymmetric : (positionOperatorSchwartz i).IsSymmetric := by
   intro ψ ψ'
   obtain ⟨_, rfl⟩ := schwartzEquiv.surjective ψ
@@ -381,11 +392,13 @@ def positionUnboundedOperator : UnboundedOperator (SpaceDHilbertSpace d) (SpaceD
 ### B.2. Radius powers (regularized)
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The (regularized) radius operators defined on the Schwartz submodule. -/
 def radiusRegPowOperatorSchwartz {d : ℕ} (ε : ℝˣ) (s : ℝ) :
     schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
   schwartzEquiv.toLinearMap ∘ₗ (𝐫₀ ε s).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
+set_option backward.isDefEq.respectTransparency false in
 lemma radiusRegPowOperatorSchwartz_isSymmetric {d : ℕ} (ε : ℝˣ) (s : ℝ) :
     (radiusRegPowOperatorSchwartz (d := d) ε s).IsSymmetric := by
   intro ψ ψ'

@@ -282,6 +282,7 @@ theorem traceRight_eq_MState_traceRight (ρ : MState (d₁ × d₂)) :
 
 end trace
 
+set_option backward.isDefEq.respectTransparency false in
 /--The replacement channel that maps all inputs to a given state. -/
 def replacement [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) : CPTPMap dIn dOut :=
   traceLeft ∘ₘ {
@@ -296,8 +297,9 @@ def replacement [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) : CPTPMap d
 @[simp]
 theorem replacement_apply [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) (ρ₀ : MState dIn) :
     replacement ρ ρ₀ = ρ := by
-  simp [replacement, instMFunLike, PTPMap.instMFunLike, HPMap.instFunLike, HPMap.map,
-    MState.traceLeft]
+  simp only [replacement, compose_eq, traceLeft_eq_MState_traceLeft]
+  simp only [apply_mState_eq_toPTPMap, PTPMap.apply_mstate_eq, HPMap.apply_hermitianMat_eq,
+    HPMap.map, HermitianMat.val_eq_coe, MState.mat_M, LinearMap.coe_mk, AddHom.coe_mk]
   --This should be simp...
   ext i j
   simp
@@ -559,7 +561,7 @@ private lemma purify_MState_pure_basis_default_entry (i j : dOut × dOut) :
     if i = default ∧ j = default then 1 else 0 := by
   change (MState.pure (Ket.basis (default : dOut × dOut))).M.val i j = _
   simp only [MState.pure, Matrix.vecMulVec_apply, Ket.basis, Ket.to_bra,
-    Braket.instFunLikeKet, Braket.instFunLikeBra]
+    Ket.coe_fun_eq, Bra.coe_fun_eq]
   split_ifs <;> simp_all [eq_comm]
 
 omit [Inhabited dOut] in

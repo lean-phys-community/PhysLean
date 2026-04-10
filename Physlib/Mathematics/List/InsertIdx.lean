@@ -94,6 +94,7 @@ lemma insertIdx_length_fin {I : Type} (i : I) :
     simp only [List.insertIdx_succ_cons, List.length_cons, Nat.succ_eq_add_one, add_left_inj]
     exact insertIdx_length_fin i as ⟨n, Nat.succ_lt_succ_iff.mp h⟩
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma insertIdx_getElem_fin {I : Type} (i : I) :
     (r : List I) → (k : Fin r.length.succ) → (m : Fin r.length) →

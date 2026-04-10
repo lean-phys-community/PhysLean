@@ -619,6 +619,7 @@ due to the conservation of energy. Here we show it's value.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma trajectory_energy (IC : InitialConditions) : S.energy (IC.trajectory S) =
     fun _ => 1/2 * (S.m * ‖IC.v₀‖ ^2 + S.k * ‖IC.x₀‖ ^ 2) := by
   funext t
@@ -673,6 +674,7 @@ lemma toInitialConditions_velocity_at_t₀ (S : HarmonicOscillator)
   rw [← h1]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The energy of the trajectory at time `t₀` equals the energy computed from the
   initial conditions at `t₀`. -/
 lemma toInitialConditions_energy_at_t₀ (S : HarmonicOscillator)
@@ -789,6 +791,7 @@ the velocity is zero.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma trajectory_velocity_eq_zero_iff (IC : InitialConditions) (t : Time) :
     ∂ₜ (IC.trajectory S) t = 0 ↔
     ‖(IC.trajectory S) t‖ = √(‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2) := by

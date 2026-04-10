@@ -32,7 +32,7 @@ namespace Velocity
 variable {d : ℕ}
 
 /-- The instance of a topological space on `Velocity d` defined as the subspace topology. -/
-instance : TopologicalSpace (Velocity d) := instTopologicalSpaceSubtype
+noncomputable instance : TopologicalSpace (Velocity d) := instTopologicalSpaceSubtype
 
 @[ext]
 lemma ext {v w : Velocity d} (h : v.1 = w.1) : v = w := by
@@ -72,6 +72,7 @@ lemma norm_spatialPart_sq_eq (v : Velocity d) :
   rw [minkowskiProduct_self_eq_timeComponent_spatialPart]
   simp [timeComponent]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma zero_le_minkowskiProduct (u v : Velocity d) :
     0 ≤ ⟪u.1, v.1⟫ₘ := by
   trans ‖u.1.timeComponent‖ * ‖v.1.timeComponent‖ - ‖u.1.spatialPart‖ * ‖v.1.spatialPart‖
@@ -121,6 +122,7 @@ lemma zero_timeComponent : (0 : Velocity d).1.timeComponent = 1 := by
   change (Vector.basis (Sum.inl 0)).timeComponent = 1
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A continuous path from a velocity `u` to the zero velocity. -/
 noncomputable def pathFromZero (u : Velocity d) : Path zero u where
   toFun t := ⟨(√(1 + t ^ 2 * ‖u.1.spatialPart‖ ^ 2) - u.1 (Sum.inl 0) * t) •

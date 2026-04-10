@@ -1179,6 +1179,7 @@ lemma anomalyCoefficient_of_map {𝓩 𝓩1 : Type} [CommRing 𝓩] [CommRing �
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma anomalyCoefficient_of_reduce [DecidableEq 𝓩] (F : TenQuanta 𝓩) :
     F.reduce.anomalyCoefficient = F.anomalyCoefficient := by
   simp [anomalyCoefficient]

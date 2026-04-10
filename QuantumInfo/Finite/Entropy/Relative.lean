@@ -5,8 +5,6 @@ Authors: Alex Meiburg
 -/
 import QuantumInfo.Finite.Entropy.VonNeumann
 
-import QuantumInfo.ForMathlib.HermitianMat.Unitary
-
 noncomputable section
 
 variable {d d₁ d₂ d₃ : Type*}
@@ -50,6 +48,7 @@ lemma weighted_jensen_rpow (b w : d → ℝ) (q : ℝ)
     (∑ j, w j * b j) ^ q ≤ ∑ j, w j * b j ^ q :=
   Real.rpow_arith_mean_le_arith_mean_rpow Finset.univ _ _ (fun i _ ↦ hw i) hsum (fun i _ ↦ hb i) hq
 
+set_option backward.isDefEq.respectTransparency false in
 omit [DecidableEq d] in
 /--
 Doubly stochastic Hölder inequality: for nonneg a, b, doubly stochastic w,
@@ -136,6 +135,7 @@ lemma MState.rpow_le_one' {r : ℝ} (hσ : 0 < r) : σ.M ^ r ≤ 1 := by
   have hle : σ.M.H.eigenvalues i ≤ 1 := σ.eigenvalue_le_one i
   linarith [Real.rpow_le_one hge hle hσ.le]
 
+set_option backward.isDefEq.respectTransparency false in
 --PULLOUT
 /-- If A ≥ 0 and A ≤ 1, then each eigenvalue of A is in [0, 1]. -/
 lemma HermitianMat.eigenvalues_le_one_of_le_one
@@ -185,6 +185,7 @@ lemma HermitianMat.trace_rpow_le_trace_of_le_one
     · exact A.eigenvalues_le_one_of_le_one hA1 i
     · exact hp
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma trace_conj_rpow_eq_inner (hα₀ : 0 < α) (hα : α < 1) :
     ((ρ.M ^ α).conj (σ.M ^ ((1 - α) / (2 * α) * α)).mat).trace = ⟪ρ.M ^ α, σ.M ^ (1 - α)⟫_ℝ := by
   convert congr_arg _ ( HermitianMat.inner_eq_trace_rc _ _ ) using 2;
@@ -296,6 +297,7 @@ lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
     exact congr(WithLp.ofLp $(h_supportProj_mul_A _ h_range))
   exact Matrix.toLin'.injective ( LinearMap.ext fun v => by simpa using h_supportProj_mul_A v )
 
+set_option backward.isDefEq.respectTransparency false in
 lemma HermitianMat.inner_supportProj_self (A : HermitianMat d ℂ) :
     ⟪A, A.supportProj⟫ = A.trace := by
   simp only [trace, IsMaximalSelfAdjoint.RCLike_selfadjMap, Matrix.trace, Matrix.diag_apply,
@@ -355,6 +357,7 @@ lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   rw [← Matrix.conjTranspose_inj]
   simp_all only [Matrix.mulVec_mulVec, Matrix.conjTranspose_mul, conjTranspose_mat, implies_true]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma HermitianMat.inner_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
     ⟪A, B.supportProj⟫ = A.trace := by
@@ -365,6 +368,7 @@ lemma supportProj_inner_density (h : σ.M.ker ≤ ρ.M.ker) :
   rw [HermitianMat.inner_comm, HermitianMat.inner_supportProj_of_ker_le h]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-
 ⟪ρ.M.conj (σ.M ^ t).mat, σ.M ^ (-2 * t)⟫_ℝ = 1 for density matrices ρ, σ with ker(σ) ≤ ker(ρ).
 -/
@@ -442,6 +446,7 @@ private lemma sandwichedRelRentropy.trace_at_one (ρ σ : MState d) :
 /-
 For fixed PSD B, the derivative of α ↦ Tr[B^α] at α = 1 is ⟪B, B.log⟫ = Tr[B log B].
 -/
+set_option backward.isDefEq.respectTransparency false in
 private lemma hasDerivAt_trace_rpow_at_one (B : HermitianMat d ℂ) (hB : 0 ≤ B) :
     HasDerivAt (fun α : ℝ => (B ^ α).trace) ⟪B, B.log⟫ 1 := by
   have h_inner : ⟪B, B.log⟫ = ∑ i, (B.H.eigenvalues i) * Real.log (B.H.eigenvalues i) := by
@@ -556,6 +561,7 @@ private lemma eigenWeight_nonneg (ρ σ : MState d) (i : d) : 0 ≤ eigenWeight 
   have := (Matrix.posSemidef_iff_dotProduct_mulVec.mp h₁).2 v;
   exact this.1.trans (by simp [w])
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma eigenWeight_zero_of_eigenvalue_zero {i : d} (hσ : σ.M.ker ≤ ρ.M.ker)
   (hei : σ.M.H.eigenvalues i = 0) :
     eigenWeight ρ σ i = 0 := by
@@ -575,6 +581,7 @@ The derivative of u ↦ ⟪ρ, σ^u⟫ at u = 0 is ⟪ρ, σ.log⟫.
     Use inner_cfc_eq_sum_eigenWeight to write ⟪ρ, σ^u⟫ = ∑ i, q_i^u * eigenWeight ρ σ i,
     differentiate term by term using HasDerivAt.sum.
 -/
+set_option backward.isDefEq.respectTransparency false in
 private lemma hasDerivAt_inner_rpow_at_zero (h : σ.M.ker ≤ ρ.M.ker) :
     HasDerivAt (fun u : ℝ => ⟪ρ.M, σ.M ^ u⟫) ⟪ρ.M, σ.M.log⟫ 0 := by
   convert HasDerivAt.congr_of_eventuallyEq ?_ ?_;
@@ -601,6 +608,7 @@ private lemma hasDerivAt_inner_rpow_at_zero (h : σ.M.ker ≤ ρ.M.ker) :
 /-  The derivative of α ↦ Tr[ρ σ^((1-α)/α)] at α = 1 is -⟪ρ, log σ⟫.
     Uses trace cyclic: Tr[σ^t ρ σ^t] = Tr[ρ σ^(2t)].
     With 2t(α) = (1-α)/α, d/dα (2t) = -1/α², and d/dε σ^ε|_{ε=0} = log σ. -/
+set_option backward.isDefEq.respectTransparency false in
 private lemma hasDerivAt_trace_conj_at_one {ρ σ : MState d}
     (h : σ.M.ker ≤ ρ.M.ker) :
     HasDerivAt
@@ -667,6 +675,7 @@ Scalar rpow cross term with just continuity: for a continuous function b with
   c * log c at α = 1. The key insight is that ∂/∂x(x^α - x)|_{α=1} = 0,
   so the derivative of b doesn't matter.
 -/
+set_option backward.isDefEq.respectTransparency false in
 private lemma scalar_rpow_cross_term_of_continuous {b : ℝ → ℝ} {c : ℝ}
     (hb_cont : ContinuousAt b 1) (hc : b 1 = c) (hc_pos : 0 < c)
     (hb_pos : ∀ᶠ α in nhds 1, 0 < b α) :
@@ -705,6 +714,7 @@ Scalar rpow cross term for the zero case: for continuous b with b(1) = 0,
   0 ≤ b(α) near 1, the function α ↦ b(α)^α - b(α) has derivative 0 at α = 1.
   Uses the convention 0 * log 0 = 0.
 -/
+set_option backward.isDefEq.respectTransparency false in
 private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
     (hb_cont : ContinuousAt b 1) (hc : b 1 = 0)
     (hb_nonneg : ∀ᶠ α in nhds 1, 0 ≤ b α) :
@@ -797,6 +807,7 @@ private lemma rpow_tendsto_supportProj
     convert h_cfc_g_conv.tendsto 0 using 2 ; simp [ HermitianMat.supportProj_eq_cfc ];
   exact Filter.Tendsto.congr' ( Filter.eventuallyEq_of_mem self_mem_nhdsWithin fun x hx => by aesop ) ( h_cfc_g_conv.mono_left inf_le_left )
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For PSD matrices A, ρ with A.ker ≤ ρ.ker, the function r ↦ ρ.conj (A ^ r).mat
     is continuous at r = 0. Even though A ^ r is discontinuous at r = 0 when A
     has zero eigenvalues, the kernel condition ensures the conj "kills" the
@@ -861,6 +872,7 @@ Uniform convergence of (x^{1+h} - x)/h to x * log x on [0, K] as h → 0.
 This is the uniform version of the derivative of s ↦ x^s at s = 1.
 -/
 set_option maxHeartbeats 800000 in
+set_option backward.isDefEq.respectTransparency false in
 private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
     ∀ ε > 0, ∃ δ > 0, ∀ h : ℝ, 0 < |h| → |h| < δ →
     ∀ x ∈ Set.Icc 0 K, |(x ^ (1 + h) - x) / h - x * Real.log x| < ε := by
@@ -937,7 +949,11 @@ private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
           by_cases hh : h = 0 <;> aesop;
         · simp [ sq, mul_assoc, mul_comm, mul_left_comm, h_pos.ne' ];
       convert mul_le_mul_of_nonneg_left h_mean_value ( show 0 ≤ x by linarith [ hx.1 ] ) using 1 <;> ring_nf
-      rw [ show x ^ ( 1 + h ) * h⁻¹ + ( - ( x * h⁻¹ ) - x * Real.log x ) = x * ( -h⁻¹ + ( h⁻¹ * x ^ h - Real.log x ) ) by rw [ Real.rpow_add ( by linarith [ hx.1 ] ), Real.rpow_one ] ; ring ] ; rw [ abs_mul, abs_of_nonneg ( by linarith [ hx.1 ] : 0 ≤ x ) ] ;
+
+      rw [ show x ^ (1 + h) * h⁻¹ - x * h⁻¹ - x * Real.log x = x * ( -h⁻¹ + ( h⁻¹ * x ^ h - Real.log x ) ) by rw [ Real.rpow_add ( by linarith [ hx.1 ] ), Real.rpow_one ] ; ring ]
+      rw [ abs_mul, abs_of_nonneg ( by linarith [ hx.1 ] : 0 ≤ x ) ]
+      ring_nf
+
     -- Choose δ₂ such that |h| * x * (Real.log x) ^ 2 * Real.exp (|h| * |Real.log x|) < ε / 4 for all x ∈ [δ₁, K] and |h| < δ₂.
     obtain ⟨δ₂, δ₂_pos, hδ₂⟩ : ∃ δ₂ > 0, ∀ x ∈ Set.Icc δ₁ K, ∀ h, 0 < |h| → |h| < δ₂ → |h| * x * (Real.log x) ^ 2 * Real.exp (|h| * |Real.log x|) < ε / 4 := by
       -- Since $x * (\log x)^2 * \exp(|h| * |\log x|)$ is continuous on the compact interval $[\delta₁, K]$, it is bounded.
@@ -990,6 +1006,7 @@ The remainder term r(1+h)/h → 0 where
 `r(α) = Tr[M(α)^α] - Tr[M(α)] - Tr[ρ.M^α] + Tr[ρ.M]`
 -/
 set_option maxHeartbeats 800000 in
+set_option backward.isDefEq.respectTransparency false in
 private lemma cross_term_slope_tendsto_zero
     {M : ℝ → HermitianMat d ℂ}
     (hM_nonneg : ∀ᶠ α in nhds 1, 0 ≤ M α)
@@ -1107,6 +1124,7 @@ private lemma rpow_trace_cross_term_vanishes {ρ σ : MState d}
   convert HasDerivAt.add ( HasDerivAt.sub h_cross_term.1 h_cross_term.2 ) ( hasDerivAt_const _ _ ) using 1
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 private theorem sandwichedRelRentropy.hasDerivAt_trace_at_one {ρ σ : MState d}
     (h : σ.M.ker ≤ ρ.M.ker) :
     HasDerivAt
@@ -1124,6 +1142,7 @@ private theorem sandwichedRelRentropy.hasDerivAt_trace_at_one {ρ σ : MState d}
   · simp only [inner_sub_right]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The key limit: as α → 1, log(Tr[(ρ.conj σ^t)^α]) / (α-1) → ⟪ρ, log ρ - log σ⟫,
     where t = (1-α)/(2α). Derived from hasDerivAt_trace_at_one via L'Hôpital
@@ -1167,7 +1186,7 @@ theorem sandwichedRelRentropy_nonneg {α : ℝ} (hα : 0 < α) (h : σ.M.ker ≤
   · exact inner_log_sub_log_nonneg h
   by_cases hα₂ : α > 1
   · exact sandwichedRelRentropy_nonneg_α_gt_1 h hα₂
-  · have : α < 1 := by push_neg at hα₂; exact lt_of_le_of_ne hα₂ h1
+  · have : α < 1 := by push Not at hα₂; exact lt_of_le_of_ne hα₂ h1
     exact sandwichedRelRentropy_nonneg_α_lt_1 h hα this
 
 section additivity
@@ -1247,7 +1266,7 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
           simp_all
           convert h_top using 1;
           erw [ Matrix.toLpLin_apply ]
-          simp_all only [MState.mat_M, EuclideanSpace.ofLp_single, Matrix.mulVec_single,
+          simp_all only [MState.mat_M, PiLp.ofLp_single, Matrix.mulVec_single,
             MulOpposite.op_one, Pi.smul_apply, Matrix.col_apply, one_smul]
         exact σ₂.pos.ne' h_contra;
       · have h_contra : ρ₂.M = 0 := by
@@ -1335,7 +1354,7 @@ lemma ker_le_of_ker_kron_le_right (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSt
       have h_z : ∀ (U V : Submodule ℂ (EuclideanSpace ℂ d₁)), U ≠ ⊤ → V ≠ ⊤ → ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∉ V := by
         intro U V hU hV
         by_contra h_contra
-        push_neg at h_contra;
+        push Not at h_contra;
         have h_union : ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∈ V := by
           exact Exists.elim ( show ∃ u : EuclideanSpace ℂ d₁, u ∉ U from by simpa [ Submodule.eq_top_iff' ] using hU ) fun u hu => ⟨ u, hu, h_contra u hu ⟩;
         obtain ⟨ u, hu₁, hu₂ ⟩ := h_union;
@@ -1398,6 +1417,7 @@ lemma ker_prod_le_iff (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂) :
 
 --TODO: Generalize to RCLike.
 omit [DecidableEq d₁] [DecidableEq d₂] in
+set_option backward.isDefEq.respectTransparency false in
 lemma HermitianMat.inner_kron
     (A : HermitianMat d₁ ℂ) (B : HermitianMat d₂ ℂ) (C : HermitianMat d₁ ℂ) (D : HermitianMat d₂ ℂ) :
     ⟪A ⊗ₖ B, C ⊗ₖ D⟫ = ⟪A, C⟫ * ⟪B, D⟫ := by
@@ -1443,6 +1463,7 @@ lemma continuousOn_rpow_uniform {K : Set ℝ} (hK : IsCompact K) :
   · have : |r - n| < δ := abs_lt.mpr ⟨by linarith, by linarith⟩
     simpa
 
+set_option backward.isDefEq.respectTransparency false in
 theorem sandwichedRelRentropy_additive_alpha_one_aux (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂)
   (h1 : σ₁.M.ker ≤ ρ₁.M.ker) (h2 : σ₂.M.ker ≤ ρ₂.M.ker) :
     ⟪(ρ₁ ⊗ᴹ ρ₂).M, (ρ₁ ⊗ᴹ ρ₂).M.log - (σ₁ ⊗ᴹ σ₂).M.log⟫ =
@@ -1563,16 +1584,17 @@ theorem qRelativeEnt_additive (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState 
 theorem sandwichedRelRentropy_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
     D̃_ α(ρ.relabel e‖σ.relabel e) = D̃_ α(ρ‖σ) := by
   simp only [SandwichedRelRentropy, MState.relabel_M]
-  rw! [HermitianMat.ker_reindex_le_iff] --Why doesn't this `simp`? Because it's an if condition, I'm guessing
-  simp [HermitianMat.conj_submatrix]
+  have := HermitianMat.ker_reindex_le_iff  (σ : HermitianMat d ℂ ) ↑ρ e.symm
+  split_ifs <;> simp_all [HermitianMat.conj_submatrix]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
   --Technically this holds for all α except for `-1` and `0`. But those are stupid.
   --TODO: Maybe SandwichedRelRentropy should actually be defined differently for α = 0?
     D̃_ α(ρ‖ρ) = 0 := by
   simp? [SandwichedRelRentropy, NNReal.eq_iff, hα] says
-    simp only [SandwichedRelRentropy, hα, ↓reduceDIte, le_refl, sub_self, inner_zero_right,
+    simp only [SandwichedRelRentropy, hα, ↓reduceDIte, Std.le_refl, sub_self, inner_zero_right,
       ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_mk, NNReal.coe_zero, ite_eq_left_iff,
       div_eq_zero_iff, Real.log_eq_zero]
   intro hα
@@ -1762,6 +1784,7 @@ theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
   simp [qRelativeEnt, SandwichedRelRentropy, h, EReal.coe_nnreal_eq_coe_real]
 
 open Classical in
+set_option backward.isDefEq.respectTransparency false in
 theorem qRelativeEnt_eq_neg_Sᵥₙ_add (ρ σ : MState d) :
     (qRelativeEnt ρ σ).toEReal = -(Sᵥₙ ρ : EReal) +
       if σ.M.ker ≤ ρ.M.ker then (-⟪ρ.M, σ.M.log⟫ : EReal) else (⊤ : EReal) := by
@@ -1776,6 +1799,7 @@ theorem qRelativeEnt_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
     𝐃(ρ.relabel e‖σ.relabel e) = 𝐃(ρ‖σ) := by
   simp [qRelativeEnt]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_of_unique [Unique d] (ρ σ : MState d) :
     D̃_α(ρ‖σ) = 0 := by
@@ -1889,7 +1913,7 @@ lemma inner_log_bounded_near (hx : σ.M.ker ≤ ρ.M.ker) {y : ℝ} (hy : ⟪ρ.
   have h_tendsto := tendsto_inner_cfc_approxLog ρ σ hx
   obtain ⟨N, hN⟩ : ∃ N : ℕ, ⟪ρ.M, σ.M.cfc (approxLog N)⟫ < y := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact absurd (lt_of_lt_of_le hy (ge_of_tendsto h_tendsto (Filter.Eventually.of_forall h)))
       (lt_irrefl _)
   have h_cont := continuous_inner_cfc_approxLog ρ N
@@ -1947,6 +1971,7 @@ private lemma eigenWeight_eq_zero_iff (ρ x : MState d) (i : d) :
     simp [ dotProduct ]
   exact congr_arg Complex.re h_zero
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
     x.M.ker ≤ ρ.M.ker ↔ ∀ i, x.M.H.eigenvalues i = 0 → eigenWeight ρ x i = 0 := by
   constructor
@@ -2010,6 +2035,7 @@ private lemma inner_cfc_approxLog_tendsto_bot (ρ x : MState d) (hx : ¬(x.M.ker
 end lowerSemicontinuous_2
 
 open Classical in
+set_option backward.isDefEq.respectTransparency false in
 theorem qRelativeEnt_lowerSemicontinuous_2 (ρ x : MState d) (hx : ¬(x.M.ker ≤ ρ.M.ker)) (y : ENNReal) (hy : y < ⊤) :
     ∀ᶠ (x' : MState d) in nhds x,
       y < (if x'.M.ker ≤ ρ.M.ker then ⟪ρ.M, ρ.M.log - x'.M.log⟫ else ⊤ : EReal) := by
@@ -2050,6 +2076,7 @@ Relative entropy is lower semicontinuous (in each argument, actually, but we onl
 latter here). Will need the fact that all the cfc / eigenvalue stuff is continuous, plus
 carefully handling what happens with the kernel subspace, which will make this a pain.
 -/
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous fun σ => 𝐃(ρ‖σ) := by
   simp_rw [qRelativeEnt, SandwichedRelRentropy, if_true, lowerSemicontinuous_iff]
@@ -2112,6 +2139,7 @@ Helper: If σ₂ ≤ α • σ₁ for density matrices, then α > 0.
    Proof: σ₂ has trace 1, so it's nonzero. If α ≤ 0, then α • σ₁ ≤ 0 (since σ₁ ≥ 0),
    but σ₂ ≤ α • σ₁ ≤ 0 with σ₂ ≥ 0 forces σ₂ = 0, contradicting trace = 1.
 -/
+set_option backward.isDefEq.respectTransparency false in
 private lemma pos_of_MState_le_smul {σ₁ σ₂ : MState d} (hσ : σ₂.M ≤ α • σ₁.M) : 0 < α := by
   by_contra! h_nonpos
   apply σ₂.pos.ne'
@@ -2128,6 +2156,7 @@ private lemma HermitianMat.inner_log_mono_of_posDef_of_le {A B C : HermitianMat 
     ⟪C, A.log⟫ ≤ ⟪C, B.log⟫ := by
   exact inner_mono hC (log_mono hA hAB)
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 private lemma posDef_add_eps {A : HermitianMat d ℂ} (hA : 0 ≤ A) {ε : ℝ} (hε : 0 < ε) :
     (A + ε • 1).mat.PosDef := by
@@ -2213,6 +2242,7 @@ private lemma HermitianMat.inner_log_mono_of_psd_of_le {A B C : HermitianMat d �
   · apply inner_log_shift_tendsto
     exact (ker_antitone hA hAB).trans hker
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma HermitianMat.inner_log_sub_le_log_alpha (ρ : MState d) {σ₁ σ₂ : MState d} {α : ℝ}
     (hσ : σ₂.M ≤ α • σ₁.M)
     (hker₁ : σ₁.M.ker ≤ ρ.M.ker) (hker₂ : σ₂.M.ker ≤ ρ.M.ker) :
@@ -2231,6 +2261,7 @@ private lemma HermitianMat.inner_log_sub_le_log_alpha (ρ : MState d) {σ₁ σ�
     rw [HermitianMat.inner_supportProj_of_ker_le hker₁, ρ.tr]
   simp_all [← add_assoc, inner_add_right, inner_smul_right]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem qRelEntropy_le_add_of_le_smul (ρ : MState d) {σ₁ σ₂ : MState d} (hσ : σ₂.M ≤ α • σ₁.M) :
     𝐃(ρ‖σ₁) ≤ 𝐃(ρ‖σ₂) + ENNReal.ofReal (Real.log α)
     := by

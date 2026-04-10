@@ -44,6 +44,7 @@ lemma divergence_eq_sum_fderiv {s : Finset E} (b : Basis s 𝕜 E) {f : E → E}
   simp only [Matrix.trace, Matrix.diag, LinearMap.toMatrix_apply]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma divergence_eq_sum_fderiv' {ι} [Fintype ι] (b : Basis ι 𝕜 E) {f : E → E} :
     divergence 𝕜 f = fun x => ∑ i, b.repr (fderiv 𝕜 f x (b i)) i := by
   let s : Finset E := Finset.univ.map ⟨b, Basis.injective b⟩
@@ -132,6 +133,7 @@ lemma divergence_const_smul {f : E → E} {x : E} {c : 𝕜}
   unfold divergence
   simp [fderiv_fun_const_smul hf]
 
+set_option backward.isDefEq.respectTransparency false in
 open InnerProductSpace' in
 lemma divergence_smul [InnerProductSpace' 𝕜 E] {f : E → 𝕜} {g : E → E} {x : E}
     (hf : DifferentiableAt 𝕜 f x) (hg : DifferentiableAt 𝕜 g x)

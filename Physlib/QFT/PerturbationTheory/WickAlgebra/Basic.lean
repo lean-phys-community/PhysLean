@@ -52,10 +52,21 @@ def fieldOpIdealSet : Set (FieldOpFreeAlgebra 𝓕) :=
   when combined with the conditions above, that the super-commutator is in the center
   of the algebra.
 -/
-abbrev WickAlgebra : Type := (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.Quotient
+def WickAlgebra : Type := (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.Quotient
 
 namespace WickAlgebra
 variable {𝓕 : FieldSpecification}
+instance : Semiring (𝓕.WickAlgebra) := inferInstanceAs <| Semiring <|
+  (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.Quotient
+
+instance : Algebra ℂ (𝓕.WickAlgebra) := inferInstanceAs <| Algebra ℂ <|
+  (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.Quotient
+
+instance: Ring (𝓕.WickAlgebra) := inferInstanceAs <| Ring <|
+  (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.Quotient
+
+instance : Coe (𝓕.FieldOpFreeAlgebra) (𝓕.WickAlgebra) :=
+  ⟨(TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.toQuotient⟩
 
 /-- The instance of a setoid on `FieldOpFreeAlgebra` from the ideal `TwoSidedIdeal`. -/
 instance : Setoid (FieldOpFreeAlgebra 𝓕) := (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).ringCon.toSetoid
@@ -171,7 +182,9 @@ lemma ι_superCommuteF_superCommuteF_ofCrAnOpF_ofCrAnOpF_ofCrAnListF (φ1 φ2 : 
   · rw [superCommuteF_bosonic_ofCrAnListF_eq_sum _ _ h]
     simp [ofCrAnListF_singleton, ι_superCommuteF_superCommuteF_ofCrAnOpF_ofCrAnOpF_ofCrAnOpF]
   · rw [superCommuteF_fermionic_ofCrAnListF_eq_sum _ _ h]
-    simp [ofCrAnListF_singleton, ι_superCommuteF_superCommuteF_ofCrAnOpF_ofCrAnOpF_ofCrAnOpF]
+    simp only [ofCrAnListF_singleton, List.get_eq_getElem, Algebra.smul_mul_assoc, map_sum,
+      map_smul, map_mul, ι_superCommuteF_superCommuteF_ofCrAnOpF_ofCrAnOpF_ofCrAnOpF, mul_zero,
+      zero_mul, MulActionWithZero.smul_zero, Finset.sum_const_zero]
 
 @[simp]
 lemma ι_superCommuteF_superCommuteF_ofCrAnOpF_ofCrAnOpF_fieldOpFreeAlgebra (φ1 φ2 : 𝓕.CrAnFieldOp)
@@ -281,6 +294,7 @@ lemma fermionicProjF_mem_fieldOpIdealSet_or_zero (x : FieldOpFreeAlgebra 𝓕)
 TODO "7ERJ3" "The lemma `bosonicProjF_mem_ideal` has a proof which is really long.
   We should either 1) split it up into smaller lemmas or 2) Put more comments into the proof."
 
+set_option backward.isDefEq.respectTransparency false in
 lemma bosonicProjF_mem_ideal (x : FieldOpFreeAlgebra 𝓕)
     (hx : x ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet) :
     x.bosonicProjF.1 ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
@@ -489,6 +503,10 @@ def ofCrAnList (φs : List 𝓕.CrAnFieldOp) : 𝓕.WickAlgebra := ι (ofCrAnLis
 
 lemma ofCrAnList_eq_ι_ofCrAnListF (φs : List 𝓕.CrAnFieldOp) :
     ofCrAnList φs = ι (ofCrAnListF φs) := rfl
+
+lemma ofCrAnList_nil : ofCrAnList (𝓕 := 𝓕) [] = 1 := by
+  simp only [ofCrAnList, ofCrAnListF_nil]
+  simp
 
 lemma ofCrAnList_append (φs ψs : List 𝓕.CrAnFieldOp) :
     ofCrAnList (φs ++ ψs) = ofCrAnList φs * ofCrAnList ψs := by

@@ -88,6 +88,7 @@ lemma contrT_metricTensor_metricTensor_eq_dual_unit {c : C} :
   · decide
   · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma contrT_dual_metricTensor_metricTensor {c : C} :
     contrT 2 1 2 (by change _ ∧ S.τ (S.τ c) = c; simp)

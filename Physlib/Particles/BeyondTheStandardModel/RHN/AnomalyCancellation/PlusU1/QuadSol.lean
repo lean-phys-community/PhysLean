@@ -32,6 +32,7 @@ namespace QuadSol
 variable {n : ℕ}
 variable (C : (PlusU1 n).QuadSols)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accQuad (a • S.val + b • C.val) =
     a * (a * accQuad S.val + 2 * b * quadBiLin S.val C.val) := by
@@ -58,8 +59,7 @@ lemma accQuad_α₁_α₂_zero (S : (PlusU1 n).LinSols) (h1 : α₁ C S = 0)
     (h2 : α₂ S = 0) (a b : ℚ) : accQuad (a • S + b • C.1).val = 0 := by
   erw [add_AFL_quad]
   simp only [α₁, quadBiLin_toFun_apply, Fin.isValue, neg_mul, neg_eq_zero, mul_eq_zero,
-    OfNat.ofNat_ne_zero, false_or, α₂, HomogeneousQuadratic.eq_1, accQuad,
-    BiLinearSymm.toHomogeneousQuad_apply] at h1 h2
+    OfNat.ofNat_ne_zero, false_or, α₂, HomogeneousQuadratic.eq_1, accQuad] at h1 h2
   simp [h1, h2]
 
 /-- The construction of a `QuadSol` from a `LinSols` in the generic case. -/
@@ -74,6 +74,7 @@ lemma genericToQuad_on_quad (S : (PlusU1 n).QuadSols) :
   rw [α₂_AFQ]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma genericToQuad_ne_zero (S : (PlusU1 n).QuadSols) (h : α₁ C S.1 ≠ 0) :
     (α₁ C S.1)⁻¹ • genericToQuad C S.1 = S := by
   rw [genericToQuad_on_quad, smul_smul, Rat.inv_mul_cancel _ h, one_smul]
@@ -84,6 +85,7 @@ def specialToQuad (S : (PlusU1 n).LinSols) (a b : ℚ) (h1 : α₁ C S = 0)
     (h2 : α₂ S = 0) : (PlusU1 n).QuadSols :=
   linearToQuad (a • S + b • C.1) (accQuad_α₁_α₂_zero C S h1 h2 a b)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma special_on_quad (S : (PlusU1 n).QuadSols) (h1 : α₁ C S.1 = 0) :
     specialToQuad C S.1 1 0 h1 (α₂_AFQ S) = S := by
   apply ACCSystemQuad.QuadSols.ext

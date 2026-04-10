@@ -173,11 +173,9 @@ lemma superCommute_anPart_ofFieldOpF_diff_grade_zero (φ ψ : 𝓕.FieldOp)
   | FieldOp.inAsymp _ =>
     simp
   | FieldOp.position φ =>
-    simp only
     apply superCommute_ofCrAnOp_ofFieldOp_diff_stat_zero _ _ _
     simpa [crAnStatistics] using h
   | FieldOp.outAsymp _ =>
-    simp only
     apply superCommute_ofCrAnOp_ofFieldOp_diff_stat_zero _ _
     simpa [crAnStatistics] using h
 
@@ -493,7 +491,7 @@ lemma superCommute_ofCrAnOp_ofCrAnList_eq_sum (φ : 𝓕.CrAnFieldOp)
     rw [← ofCrAnList_singleton, superCommute_ofCrAnList_ofCrAnList_eq_sum]
   congr
   funext n
-  simp only [instCommGroup.eq_1, ofList_singleton, List.get_eq_getElem, Algebra.smul_mul_assoc]
+  simp only [ofList_singleton, List.get_eq_getElem, Algebra.smul_mul_assoc]
   congr 1
   rw [ofCrAnList_singleton, superCommute_ofCrAnOp_ofCrAnOp_commute]
   rw [mul_assoc, ← ofCrAnList_append]
@@ -519,7 +517,7 @@ lemma superCommute_ofCrAnOp_ofFieldOpList_eq_sum (φ : 𝓕.CrAnFieldOp) (φs' :
     rw [← ofCrAnList_singleton, superCommute_ofCrAnList_ofFieldOpList_eq_sum]
   congr
   funext n
-  simp only [instCommGroup.eq_1, ofList_singleton, List.get_eq_getElem, Algebra.smul_mul_assoc]
+  simp only [ofList_singleton, List.get_eq_getElem, Algebra.smul_mul_assoc]
   congr 1
   rw [ofCrAnList_singleton, superCommute_ofCrAnOp_ofFieldOp_commute]
   rw [mul_assoc, ← ofFieldOpList_append]

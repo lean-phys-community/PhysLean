@@ -69,6 +69,7 @@ noncomputable def wireCurrentDensity (c : SpeedOfLight) :
   map_add' I1 I2 := by simp [add_smul]
   map_smul' r I := by simp [smul_smul]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma wireCurrentDensity_chargeDesnity (c : SpeedOfLight) (I : ℝ) :
     (wireCurrentDensity c I).chargeDensity c = 0 := by
@@ -76,6 +77,7 @@ lemma wireCurrentDensity_chargeDesnity (c : SpeedOfLight) (I : ℝ) :
   simp [DistLorentzCurrentDensity.chargeDensity, wireCurrentDensity, constantTime_apply,
   constantSliceDist_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma wireCurrentDensity_currentDensity_fst (c : SpeedOfLight) (I : ℝ)
     (η : 𝓢(Time × Space 3, ℝ)) :
     (wireCurrentDensity c I).currentDensity c η 0 =
@@ -85,6 +87,7 @@ lemma wireCurrentDensity_currentDensity_fst (c : SpeedOfLight) (I : ℝ)
   simp [wireCurrentDensity, DistLorentzCurrentDensity.currentDensity,
     constantTime_apply, constantSliceDist_apply, diracDelta'_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma wireCurrentDensity_currentDensity_snd (c : SpeedOfLight) (I : ℝ)
     (ε : 𝓢(Time × Space 3, ℝ)) :
@@ -92,6 +95,7 @@ lemma wireCurrentDensity_currentDensity_snd (c : SpeedOfLight) (I : ℝ)
   simp [wireCurrentDensity, DistLorentzCurrentDensity.currentDensity,
     constantTime_apply, constantSliceDist_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma wireCurrentDensity_currentDensity_thrd (c : SpeedOfLight) (I : ℝ)
     (ε : 𝓢(Time × Space 3, ℝ)) :
@@ -129,6 +133,7 @@ $$V(t, x, y, z) = 0.$$
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma infiniteWire_scalarPotential (𝓕 : FreeSpace) (I : ℝ) :
     (infiniteWire 𝓕 I).scalarPotential 𝓕.c = 0 := by
@@ -149,6 +154,7 @@ a system with translational symmetry along the x-axis.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma infiniteWire_vectorPotential (𝓕 : FreeSpace) (I : ℝ) :
     (infiniteWire 𝓕 I).vectorPotential 𝓕.c =
     (constantTime <|
@@ -192,7 +198,9 @@ lemma infiniteWire_vectorPotential_distTimeDeriv (𝓕 : FreeSpace) (I : ℝ) :
     distTimeDeriv ((infiniteWire 𝓕 I).vectorPotential 𝓕.c) = 0 := by
   ext1 η
   ext i
-  simp [infiniteWire_vectorPotential _ I]
+  simp only [ContinuousLinearMap.zero_apply, PiLp.zero_apply]
+  rw [infiniteWire_vectorPotential _ I, constantTime_distTimeDeriv]
+  simp
 
 @[simp]
 lemma infiniteWire_vectorPotential_distSpaceDeriv_0 (𝓕 : FreeSpace) (I : ℝ) :

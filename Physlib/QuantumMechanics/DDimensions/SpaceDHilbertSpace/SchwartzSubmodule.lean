@@ -26,9 +26,11 @@ open SchwartzMap
 
 variable {d : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map including Schwartz functions into `SpaceDHilbertSpace d`. -/
 def schwartzIncl : 𝓢(Space d, ℂ) →L[ℂ] SpaceDHilbertSpace d := toLpCLM ℂ (E := Space d) ℂ 2
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The submodule of `SpaceDHilbertSpace d` consisting of Schwartz functions. -/
 abbrev schwartzSubmodule (d : ℕ) := (schwartzIncl (d := d)).range
 
@@ -41,6 +43,7 @@ lemma schwartzSubmodule_dense (d : ℕ) :
     Dense (schwartzSubmodule d : Set (SpaceDHilbertSpace d)) :=
   denseRange_toLpCLM ENNReal.top_ne_ofNat.symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The linear equivalence between the Schwartz functions `𝓢(Space d, ℂ)`
   and the Schwartz submodule of `SpaceDHilbertSpace d`. -/
 def schwartzEquiv : 𝓢(Space d, ℂ) ≃ₗ[ℂ] schwartzSubmodule d :=

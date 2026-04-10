@@ -29,7 +29,8 @@ namespace complexLorentzTensor
 open TensorSpecies
 open Tensor
 
-set_option maxHeartbeats 400000 in
+set_option backward.isDefEq.respectTransparency false in
+set_option maxHeartbeats 450000 in
 lemma antiSymm_contr_symm {A : ℂT[.up, .up]} {S : ℂT[.down, .down]}
     (hA : {A | μ ν = - (A | ν μ)}ᵀ) (hs : {S | μ ν = S | ν μ}ᵀ) :
     {A | μ ν ⊗ S | μ ν = - A | μ ν ⊗ S | μ ν}ᵀ := by
@@ -47,7 +48,7 @@ lemma antiSymm_contr_symm {A : ℂT[.up, .up]} {S : ℂT[.down, .down]}
   rw [permT_permT, permT_permT, permT_permT, permT_permT]
   apply permT_congr
   · decide
-  · simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, id_eq, map_neg,
+  · simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, id_eq, LinearMap.map_neg,
     LinearMap.neg_apply]
 
 end complexLorentzTensor

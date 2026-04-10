@@ -113,6 +113,7 @@ lemma toTensor_symm_basis (b : (x : Fin (Nat.succ 0).succ.succ) →
 /-- The Pauli matrices as a tensor `toTensor pauliMatrix` in `ℂT[.up, .upL, .upR]`. -/
 scoped[PauliMatrix] notation "σ^^^" => toTensor pauliMatrix
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_basis_expand : σ^^^ =
     Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 0 | 1 => 0 | 2 => 0)
     + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => 0 | 1 => 1 | 2 => 1)
@@ -136,13 +137,15 @@ lemma toTensor_basis_expand : σ^^^ =
     simp [pauliMatrix]
 
 open Lorentz in
+set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_eq_asConsTensor :
-    σ^^^ = fromConstTriple PauliMatrix.asConsTensor := by
+    σ^^^ = fromConstTriple (S := complexLorentzTensor)
+      (c1 := Color.up) (c2 := Color.upL) (c3 := Color.upR) PauliMatrix.asConsTensor := by
   symm
   trans fromTripleT PauliMatrix.asTensor
   · rw [fromConstTriple, congrArg fromTripleT PauliMatrix.asConsTensor_apply_one]
   rw [PauliMatrix.asTensor_expand, toTensor_basis_expand]
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Equivalence.symm_inverse, Fin.isValue, map_sub,
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, map_sub,
     map_add, _root_.map_smul]
   rw [show complexContrBasis (Sum.inl 0) = complexContrBasisFin4 0 by {simp}]
   rw [show complexContrBasis (Sum.inr 0) = complexContrBasisFin4 1 by {simp}]
@@ -203,11 +206,13 @@ lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>
   revert b
   decide +kernel
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma smul_eq_self (Λ : SL(2,ℂ)) : Λ • pauliMatrix = pauliMatrix := by
   rw [smul_eq, toTensor_eq_asConsTensor, actionT_fromConstTriple, ← toTensor_eq_asConsTensor]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_smul_eq_self (Λ : SL(2,ℂ)) : Λ • σ^^^ = σ^^^ := by
   rw [toTensor_eq_asConsTensor]
@@ -354,6 +359,7 @@ lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `pauliCo` is invariant under the action of `SL(2,ℂ)`. -/
 lemma smul_pauliCo (g : SL(2,ℂ)) : g • pauliCo = pauliCo := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant]
@@ -361,6 +367,7 @@ lemma smul_pauliCo (g : SL(2,ℂ)) : g • pauliCo = pauliCo := by
   rw [toTensor_smul_eq_self, actionT_coMetric]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 set_option maxRecDepth 2000 in
 /-- The tensor `pauliCoDown` is invariant under the action of `SL(2,ℂ)`. -/
 lemma smul_pauliCoDown (g : SL(2,ℂ)) : g • pauliCoDown = pauliCoDown := by
@@ -370,6 +377,7 @@ lemma smul_pauliCoDown (g : SL(2,ℂ)) : g • pauliCoDown = pauliCoDown := by
   rw [smul_pauliCo, actionT_altLeftMetric, actionT_altRightMetric]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `pauliContrDown` is invariant under the action of `SL(2,ℂ)`. -/
 lemma smul_pauliContrDown (g : SL(2,ℂ)) : g • pauliContrDown = pauliContrDown := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant,

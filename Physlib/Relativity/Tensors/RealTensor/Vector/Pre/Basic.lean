@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Modules
-public import Mathlib.RepresentationTheory.Rep
+public import Mathlib.RepresentationTheory.Rep.Basic
 /-!
 
 # Real Lorentz vectors
@@ -67,6 +67,7 @@ lemma continuous_contr {T : Type} [TopologicalSpace T] (f : T → Contr d)
     (h : Continuous (fun i => (f i).toFin1dℝ)) : Continuous f := by
   exact continuous_induced_rng.mpr h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contr_continuous {T : Type} [TopologicalSpace T] (f : Contr d → T)
     (h : Continuous (f ∘ (@ContrMod.toFin1dℝEquiv d).symm)) : Continuous f := by
   let x := Equiv.toHomeomorphOfIsInducing (@ContrMod.toFin1dℝEquiv d).toEquiv
@@ -119,41 +120,41 @@ open CategoryTheory.MonoidalCategory
 
 /-- The morphism of representations from `Contr d` to `Co d` defined by multiplication
   with the metric. -/
-def Contr.toCo (d : ℕ) : Contr d ⟶ Co d where
-  hom := ModuleCat.ofHom {
+def Contr.toCo (d : ℕ) : Contr d ⟶ Co d := Rep.ofHom <|
+  {
     toFun := fun ψ => CoMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ),
     map_add' := by
       intro ψ ψ'
       simp only [map_add, mulVec_add]
     map_smul' := by
       intro r ψ
-      simp only [_root_.map_smul, mulVec_smul, RingHom.id_apply]}
-  comm g := by
-    ext ψ : 2
-    simp only [ModuleCat.hom_comp]
-    conv_lhs =>
-      change CoMod.toFin1dℝEquiv.symm (η *ᵥ (g.1 *ᵥ ψ.toFin1dℝ))
-      rw [mulVec_mulVec, LorentzGroup.minkowskiMatrix_comm, ← mulVec_mulVec]
-    rfl
+      simp only [_root_.map_smul, mulVec_smul, RingHom.id_apply]
+    isIntertwining' g := by
+      ext1 ψ
+      conv_lhs =>
+        change CoMod.toFin1dℝEquiv.symm (η *ᵥ (g.1 *ᵥ ψ.toFin1dℝ))
+        rw [mulVec_mulVec, LorentzGroup.minkowskiMatrix_comm, ← mulVec_mulVec]
+      rfl
+  }
 
 /-- The morphism of representations from `Co d` to `Contr d` defined by multiplication
   with the metric. -/
-def Co.toContr (d : ℕ) : Co d ⟶ Contr d where
-  hom := ModuleCat.ofHom {
-    toFun := fun ψ => ContrMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ),
-    map_add' := by
-      intro ψ ψ'
-      simp only [map_add, mulVec_add]
-    map_smul' := by
-      intro r ψ
-      simp only [_root_.map_smul, mulVec_smul, RingHom.id_apply]}
-  comm g := by
-    ext ψ : 2
-    simp only [ModuleCat.hom_comp]
-    conv_lhs =>
-      change ContrMod.toFin1dℝEquiv.symm (η *ᵥ ((LorentzGroup.transpose g⁻¹).1 *ᵥ ψ.toFin1dℝ))
-      rw [mulVec_mulVec, ← LorentzGroup.comm_minkowskiMatrix, ← mulVec_mulVec]
-    rfl
+def Co.toContr (d : ℕ) : Co d ⟶ Contr d := Rep.ofHom <|
+    {
+      toFun := fun ψ => ContrMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)
+      map_add' := by
+        intro ψ ψ'
+        simp only [map_add, mulVec_add]
+      map_smul' := by
+        intro r ψ
+        simp only [_root_.map_smul, mulVec_smul, RingHom.id_apply]
+      isIntertwining' g := by
+        ext1 ψ
+        conv_lhs =>
+          change ContrMod.toFin1dℝEquiv.symm (η *ᵥ ((LorentzGroup.transpose g⁻¹).1 *ᵥ ψ.toFin1dℝ))
+          rw [mulVec_mulVec, ← LorentzGroup.comm_minkowskiMatrix, ← mulVec_mulVec]
+        rfl
+    }
 
 /-- The isomorphism between `Contr d` and `Co d` induced by multiplication with the
   Minkowski metric. -/
@@ -162,16 +163,18 @@ def contrIsoCo (d : ℕ) : Contr d ≅ Co d where
   inv := Co.toContr d
   hom_inv_id := by
     ext ψ
-    simp only [Action.comp_hom, ModuleCat.hom_comp, Action.id_hom,
-      ModuleCat.id_apply]
+    simp only [Rep.hom_comp, Representation.IntertwiningMap.comp_toLinearMap, LinearMap.coe_comp,
+      Representation.IntertwiningMap.coe_toLinearMap, Function.comp_apply, Rep.hom_id,
+      Representation.IntertwiningMap.toLinearMap_id, LinearMap.id_coe, id_eq]
     conv_lhs => change ContrMod.toFin1dℝEquiv.symm (η *ᵥ
       CoMod.toFin1dℝEquiv (CoMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)))
     rw [LinearEquiv.apply_symm_apply, mulVec_mulVec, minkowskiMatrix.sq]
     simp
   inv_hom_id := by
     ext ψ
-    simp only [Action.comp_hom, ModuleCat.hom_comp, Action.id_hom,
-      ModuleCat.id_apply]
+    simp only [Rep.hom_comp, Representation.IntertwiningMap.comp_toLinearMap, LinearMap.coe_comp,
+      Representation.IntertwiningMap.coe_toLinearMap, Function.comp_apply, Rep.hom_id,
+      Representation.IntertwiningMap.toLinearMap_id, LinearMap.id_coe, id_eq]
     conv_lhs => change CoMod.toFin1dℝEquiv.symm (η *ᵥ
       ContrMod.toFin1dℝEquiv (ContrMod.toFin1dℝEquiv.symm (η *ᵥ ψ.toFin1dℝ)))
     rw [LinearEquiv.apply_symm_apply, mulVec_mulVec, minkowskiMatrix.sq]

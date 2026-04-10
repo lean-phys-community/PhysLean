@@ -6,6 +6,7 @@ Authors: Afiq Hatta
 module
 
 public import Mathlib.Topology.Algebra.Polynomial
+public import Mathlib.Analysis.Calculus.Deriv.Polynomial
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
 /-!
@@ -153,6 +154,7 @@ lemma tanh_hasTemperateGrowth : Function.HasTemperateGrowth Real.tanh := by
     simp only [pow_zero, mul_one]
     exact hC x
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Iterated derivative for scaled tanh is differentiable -/
 lemma iteratedDeriv_tanh_differentiable (n : ℕ) : Differentiable ℝ (iteratedDeriv n tanh) := by
   have h : ContDiff ℝ (n + 1) tanh := by
@@ -169,6 +171,7 @@ lemma tanh_const_mul_iteratedDeriv_norm_eq_iteratedFDeriv_norm (n : ℕ) (x : �
   rw [← iteratedFDerivWithin_univ, ← iteratedDerivWithin_univ, ← norm_eq_abs,
       norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Iterated derivative for scaled tanh -/
 lemma iteratedDeriv_tanh_const_mul (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
     iteratedDeriv n (fun y => Real.tanh (κ * y)) x = κ^n * (iteratedDeriv n Real.tanh) (κ * x) := by

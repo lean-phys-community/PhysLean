@@ -178,6 +178,7 @@ def ubOnePhaseCond (U : CKMMatrix) : Prop :=
     [U]ud = 0 ∧ [U]us = 0 ∧ [U]cb = 0 ∧ [U]ub = 1 ∧ [U]t = conj [U]u ⨯₃ conj [U]c
     ∧ [U]cd = - VcdAbs ⟦U⟧ ∧ [U]cs = √(1 - VcdAbs ⟦U⟧ ^ 2)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fstRowThdColRealCond_shift_solution {V : CKMMatrix} (h1 : a + d = - arg [V]ud)
     (h2 : a + e = - arg [V]us) (h3 : b + f = - arg [V]cb)
     (h4 : c + f = - arg [V]tb) (h5 : τ = - a - b - c - d - e - f) :
@@ -208,6 +209,7 @@ lemma fstRowThdColRealCond_shift_solution {V : CKMMatrix} (h1 : a + d = - arg [V
   ring_nf
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma ubOnePhaseCond_shift_solution {V : CKMMatrix} (h1 : a + f = - arg [V]ub)
     (h2 : 0 = - a - b - c - d - e - f)
     (h3 : b + d = Real.pi - arg [V]cd) (h5 : b + e = - arg [V]cs) :

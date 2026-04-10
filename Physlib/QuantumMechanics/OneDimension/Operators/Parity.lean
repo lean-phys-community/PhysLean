@@ -46,6 +46,7 @@ def parityOperator : (ℝ → ℂ) →ₗ[ℂ] (ℝ → ℂ) where
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The parity operator on the Schwartz maps is defined as the linear map from
   `𝓢(ℝ, ℂ)` to itself, such that `ψ` is taken to `fun x => ψ (-x)`. -/
 def parityOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
@@ -78,6 +79,7 @@ def parityOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
     intro x
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The unbounded parity operator, whose domain is Schwartz maps. -/
 def parityOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_injective :=
   UnboundedOperator.ofSelfCLM parityOperatorSchwartz
@@ -96,6 +98,7 @@ lemma parityOperatorSchwartz_parityOperatorSchwartz (ψ : 𝓢(ℝ, ℂ)) :
 
 open InnerProductSpace
 
+set_option backward.isDefEq.respectTransparency false in
 lemma parityOperatorUnbounded_isSelfAdjoint :
     parityOperatorUnbounded.IsSelfAdjoint := by
   intro ψ1 ψ2

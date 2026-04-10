@@ -22,6 +22,7 @@ instance : PartialOrder (HermitianMat n 𝕜) :=
   inferInstanceAs (PartialOrder (selfAdjoint _))
 
 open MatrixOrder in
+set_option backward.isDefEq.respectTransparency false in
 instance : IsOrderedAddMonoid (HermitianMat n 𝕜) :=
   inferInstanceAs (IsOrderedAddMonoid (selfAdjoint _))
 
@@ -46,6 +47,7 @@ omit [Fintype n] in
 theorem lt_iff_posdef : A < B ↔ (B - A).mat.PosSemidef ∧ A ≠ B :=
   lt_iff_le_and_ne
 
+set_option backward.isDefEq.respectTransparency false in
 instance : IsStrictOrderedModule ℝ (HermitianMat n 𝕜) where
   smul_lt_smul_of_pos_left a ha b b₂ hb := by
     rw [HermitianMat.lt_iff_posdef] at hb ⊢
@@ -98,7 +100,10 @@ def evalHermitianMatTrace : PositivityExt where eval {_u _α} _zα _pα e := do
     pure (.nonnegative (← mkAppM ``HermitianMat.trace_nonneg #[pfA]))
 
 --Without these shortcut instances, `gcongr` fails to close certain goals...? Why? TODO
+set_option backward.isDefEq.respectTransparency false in
 instance : PosSMulMono ℝ (HermitianMat n 𝕜) := inferInstance
+
+set_option backward.isDefEq.respectTransparency false in
 instance : SMulPosMono ℝ (HermitianMat n 𝕜) := inferInstance
 
 --Without explicitly giving this instance, Lean times out trying to find it sometimes.
@@ -332,11 +337,13 @@ example (hA : A.mat.PosSemidef) : 0 ≤ A := by
 example [Nonempty n] (hA : A.mat.PosDef) : 0 < A := by
   positivity
 
+set_option backward.isDefEq.respectTransparency false in
 example [DecidableEq n] [DecidableEq m] [Nonempty n] [Nonempty m]
   (A B : HermitianMat n ℂ) (hA : 0 ≤ A) (hB : 0 ≤ B) (M : Matrix m n ℂ) :
     0 < (2 : HermitianMat (n × m) ℂ) + (3 • A) ⊗ₖ (Real.pi • B).conj M := by
   positivity
 
+set_option backward.isDefEq.respectTransparency false in
 example (A B : HermitianMat n ℂ) (hA : 0 < A) (hB : 0 < B) :
     0 < ((37 • A) ⊗ₖ ((38 : ℝ) • B)).trace := by
   positivity

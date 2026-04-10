@@ -25,6 +25,7 @@ namespace TrDistance
 
 variable {d d₂ : Type*} [Fintype d] [Fintype d₂] (ρ σ : MState d)
 
+set_option backward.isDefEq.respectTransparency false in
 theorem ge_zero : 0 ≤ TrDistance ρ σ := by
   rw [TrDistance]
   simp [Matrix.traceNorm_nonneg]

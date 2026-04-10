@@ -87,7 +87,7 @@ TODO "HB6RR" "In the above documentation describe the notion of a type, and
 TODO "HB6VC" "Convert `Space` from an `abbrev` to a `def`."
 
 /-- The type `Space d` is the world-volume which corresponds to
- `d` dimensional (flat) Euclidean space with a given (but arbitrary)
+`d` dimensional (flat) Euclidean space with a given (but arbitrary)
 choice of length unit, and a given (but arbitrary) choice of zero.
 
 The default value of `d` is `3`. Thus `Space = Space 3`-/
@@ -143,7 +143,7 @@ instance {d} : Nonempty (Space d) := Nonempty.intro
   ⟨fun _ => Classical.choice instNonemptyOfInhabited⟩
 
 instance : Subsingleton (Space 0) := Subsingleton.intro <| fun _ _ =>
-   eq_of_apply <| fun i => Fin.elim0 i
+  eq_of_apply <| fun i => Fin.elim0 i
 
 /-!
 
@@ -168,7 +168,6 @@ lemma vadd_transitive {d} (s1 s2 : Space d) :
   use WithLp.toLp 2 fun i => s2 i - s1 i
   ext i
   simp
-
 
 noncomputable instance : AddAction (EuclideanSpace ℝ (Fin d)) (Space d) where
   zero_vadd s := by
@@ -307,8 +306,9 @@ lemma range_manifoldStructure {d : ℕ} :
   simpa using ⟨(manifoldStructure d).symm x, manifoldStructure_comp_manifoldStructure_symm_apply x⟩
 
 open Manifold in
+set_option backward.isDefEq.respectTransparency false in
 lemma contMDiff_vaddConst (d : ℕ) : ContMDiff
-    (manifoldStructure d) (𝓘(ℝ, EuclideanSpace ℝ (Fin d)))  ⊤ (manifoldStructure d).toFun := by
+    (manifoldStructure d) (𝓘(ℝ, EuclideanSpace ℝ (Fin d))) ⊤ (manifoldStructure d).toFun := by
   rw [contMDiff_iff]
   refine ⟨(manifoldStructure d).continuous_toFun, fun x y ↦ ?_⟩
   simp only [extChartAt, OpenPartialHomeomorph.extend, OpenPartialHomeomorph.refl_partialEquiv,

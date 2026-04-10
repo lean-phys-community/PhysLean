@@ -57,6 +57,7 @@ lemma mul_eigenfunction_integrable (f : ℝ → ℂ) (hf : MemHS f) :
     funext x
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma mul_physHermite_integrable (f : ℝ → ℂ) (hf : MemHS f) (n : ℕ) :
     MeasureTheory.Integrable (fun x => physHermite n (x/Q.ξ) *
       (f x * ↑(Real.exp (- x ^ 2 / (2 * Q.ξ^2))))) := by
@@ -154,6 +155,7 @@ local notation "hm" => Q.hm
 local notation "hℏ" => Q.hℏ
 local notation "hω" => Q.hω
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orthogonal_physHermite_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (n : ℕ) : ∫ (x : ℝ), (physHermite n (x / Q.ξ)) * (f x * ↑(Real.exp (- x ^ 2 / (2 * Q.ξ ^ 2))))
@@ -184,6 +186,7 @@ lemma orthogonal_physHermite_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_ofNat]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (P : Polynomial ℤ) :
@@ -219,6 +222,7 @@ lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       ring
     exact hf' ▸ (MeasureTheory.Integrable.smul _ (Q.mul_physHermite_integrable f hf i))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then it is orthogonal to
 
@@ -256,6 +260,7 @@ lemma orthogonal_power_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
 
 open Finset
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then it is orthogonal to
 
@@ -423,6 +428,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
 open FourierTransform MeasureTheory Real Lp MemLp Filter Complex Topology
   ComplexInnerProductSpace ComplexConjugate
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then the fourier transform of
 

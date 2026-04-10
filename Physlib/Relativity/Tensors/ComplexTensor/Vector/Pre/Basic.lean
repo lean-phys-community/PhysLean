@@ -160,6 +160,7 @@ lemma complexCoBasisFin4_apply_three :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The semilinear map including real Lorentz vectors into complex contravariant
   lorentz vectors. -/
 def inclCongrRealLorentz : ContrMod 3 →ₛₗ[Complex.ofRealHom] complexContr where
@@ -203,6 +204,7 @@ lemma inclCongrRealLorentz_ρ (M : SL(2, ℂ)) (v : ContrMod 3) :
   rw [LorentzGroup.toComplex_mulVec_ofReal]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma SL2CRep_ρ_basis (M : SL(2, ℂ)) (i : Fin 1 ⊕ Fin 3) :
     (complexContr.ρ M) (complexContrBasis i) =
     ∑ j, (SL2C.toLorentzGroup M).1 j i •

@@ -165,6 +165,7 @@ lemma eventually_pos_ofβ : ∀ᶠ b : ℝ≥0 in atTop, ((Temperature.ofβ b : 
   have : 0 < (1 : ℝ) / (kB * (b : ℝ)) := one_div_pos.mpr hden
   simpa [Temperature.ofβ, one_div, Temperature.toReal] using this
 
+set_option backward.isDefEq.respectTransparency false in
 /-- General helper: for any `a > 0`, we have `1 / (a * b) → 0` as `b → ∞` in `ℝ≥0`. -/
 private lemma tendsto_const_inv_mul_atTop (a : ℝ) (ha : 0 < a) :
     Tendsto (fun b : ℝ≥0 => (1 : ℝ) / (a * (b : ℝ))) atTop (𝓝 (0 : ℝ)) := by

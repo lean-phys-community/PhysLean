@@ -91,6 +91,7 @@ where $q$ is the charge of the particle and $r₀$ is the position of the partic
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma threeDimPointParticleCurrentDensity_chargeDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticleCurrentDensity c q r₀).chargeDensity c =
@@ -115,6 +116,7 @@ In other words, there is no current flow for a point particle at rest.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma threeDimPointParticleCurrentDensity_currentDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticleCurrentDensity c q r₀).currentDensity c = 0 := by
@@ -173,6 +175,7 @@ $$V(r) = \frac{q}{4 π \epsilon_0 |r - r_0|}.$$
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma threeDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticle 𝓕 q r₀).scalarPotential 𝓕.c =
     Space.constantTime (distOfFunction (fun x => (q/ (4 * π * 𝓕.ε₀))• ‖x - r₀‖⁻¹)
@@ -204,6 +207,7 @@ $$\vec A(r) = 0.$$
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma threeDimPointParticle_vectorPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticle 𝓕 q r₀).vectorPotential 𝓕.c = 0 := by
@@ -246,8 +250,8 @@ lemma threeDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : S
 @[simp]
 lemma threeDimPointParticle_electricField_timeDeriv (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     Space.distTimeDeriv ((threeDimPointParticle 𝓕 q r₀).electricField 𝓕.c) = 0 := by
-  rw [threeDimPointParticle_electricField]
-  simp
+  rw [threeDimPointParticle_electricField, map_smul, constantTime_distTimeDeriv]
+  module
 
 /-!
 
@@ -275,6 +279,7 @@ satisfies Maxwell's equations for a point particle at rest.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma threeDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 3) :
     distSpaceDiv ((threeDimPointParticle 𝓕 q r₀).electricField 𝓕.c) =
     (1/𝓕.ε₀) • constantTime (q • diracDelta ℝ r₀) := by
@@ -298,6 +303,7 @@ lemma threeDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 3) 
   ring_nf
   field_simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma threeDimPointParticle_isExterma (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 3) :
     (threeDimPointParticle 𝓕 q r₀).IsExtrema 𝓕 (threeDimPointParticleCurrentDensity 𝓕.c q r₀) := by
   rw [isExtrema_iff_components]

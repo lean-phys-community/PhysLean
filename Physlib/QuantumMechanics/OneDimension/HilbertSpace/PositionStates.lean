@@ -26,6 +26,7 @@ noncomputable section
 namespace HilbertSpace
 open MeasureTheory SchwartzMap
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Position state as a member of the dual of the
   Schwartz submodule of the Hilbert space. -/
 def positionState (x : ℝ) : 𝓢(ℝ, ℂ) →L[ℂ] ℂ := TemperedDistribution.delta x

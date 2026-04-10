@@ -586,7 +586,7 @@ lemma integrable_energy_add (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)]
     (h : Integrable 𝓒.energy (𝓒.μProd T)) (h1 : Integrable 𝓒1.energy (𝓒1.μProd T)) :
     Integrable (𝓒 + 𝓒1).energy ((𝓒 + 𝓒1).μProd T) := by
   rw [μProd_add]
-  refine Integrable.add'' ?_ ?_
+  refine MeasureTheory.Integrable.fun_add ?_ ?_
   · have h1 : (fun (i : ι × ι1) => 𝓒.energy i.1)
       = fun (i : ι × ι1) => 𝓒.energy i.1 * (fun (i : ι1) => 1) i.2 := by
       funext i
@@ -708,6 +708,7 @@ lemma probability_nonneg
   have hpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
   simp [CanonicalEnsemble.probability, div_nonneg, Real.exp_nonneg, hpos.le]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Probabilities are strictly positive. -/
 lemma probability_pos
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
@@ -767,6 +768,7 @@ lemma partitionFunction_def (𝓒 : CanonicalEnsemble ι) (T : Temperature) :
     𝓒.partitionFunction T =
       𝓒.mathematicalPartitionFunction T / (𝓒.phaseSpaceunit ^ 𝓒.dof) := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma partitionFunction_pos
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
@@ -984,6 +986,7 @@ lemma integral_probability
           𝓒.mathematicalPartitionFunction T := by simp [hZ]
     _ = 1 := by simp [hZpos.ne']
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Normalization of the dimensionless physical probability density over the base measure. -/
 lemma integral_physicalProbability_base
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)

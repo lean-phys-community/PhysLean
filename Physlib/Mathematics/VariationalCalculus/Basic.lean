@@ -30,7 +30,7 @@ The action is nominally given by
 $$S[u] = \int L(u, t) dt,$$
 however it is convenient to
 introduce another function `φ` and define the action as
-$$S[u] = \int φ(t)  L(u, t) dt.$$
+$$S[u] = \int φ(t) L(u, t) dt.$$
 In the end we will set `φ := fun _ => 1`.
 
 We now consider $$\frac{\partial}{\partial s} S[u + s * \delta u]$$ at `s = 0`,
@@ -58,7 +58,7 @@ variational gradient at `u`. The Euler–Lagrange equations, for example, are th
 
 In our API, the relationship between
 - `Lᵤ` and `Gᵤ` is captured by the `HasVarAdjoint`.
-- `L` and  `Gᵤ` by `HasVarAdjDeriv`.
+- `L` and `Gᵤ` by `HasVarAdjDeriv`.
 - `L` and `grad u` by `HasVarGradientAt`.
 
 In practice we assume that `L` has a certain locality property
@@ -83,6 +83,7 @@ variable
   {V} [NormedAddCommGroup V] [NormedSpace ℝ V] [InnerProductSpace' ℝ V]
   {Y} [NormedAddCommGroup Y] [InnerProductSpace ℝ Y] [FiniteDimensional ℝ Y][MeasurableSpace Y]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A version of `fundamental_theorem_of_variational_calculus'` for `Continuous f`.
 The proof uses assumption that source of `f` is finite-dimensional
 inner-product space, so that a bump function with compact support exists via
@@ -95,7 +96,6 @@ and `⟪f x, g x⟫ > 0` on a neighborhood of x₀.
 Using `Y` for the theorem below to make use of bump functions in InnerProductSpaces. `Y` is
 a finite dimensional measurable space over `ℝ` with (standard) inner product.
 -/
-
 lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
     (μ : Measure Y) [IsFiniteMeasureOnCompacts μ] [μ.IsOpenPosMeasure]
     [OpensMeasurableSpace Y]
@@ -132,7 +132,9 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
       intros x hx
     -- hx : x ∈ ball x₀ δ₂, so dist x x₀ < δ₂, hence
     -- this is |⟪u,v⟫| ≤ ‖u‖ * ‖v‖, in the genuine InnerProductSpace on WithLp 2 V
-      have hclose : ‖f₂ x - x₂‖ < ‖x₂‖ / 2 := hδ₂ hx
+      have hclose : ‖f₂ x - x₂‖ < ‖x₂‖ / 2 := by
+        convert hδ₂ hx using 1
+        exact mem_sphere_iff_norm.mp rfl
       have hself : ⟪x₂, x₂⟫_ℝ = ‖x₂‖^2 := real_inner_self_eq_norm_sq (x₂ : WithLp 2 V)
 
       let u := f₂ x - x₂

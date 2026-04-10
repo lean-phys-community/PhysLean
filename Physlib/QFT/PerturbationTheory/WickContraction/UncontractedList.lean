@@ -29,7 +29,7 @@ open Physlib.Fin
 -/
 
 lemma fin_list_sorted_monotone_sorted {n m : ℕ} (l: List (Fin n)) (hl : l.Pairwise (· ≤ ·))
-    (f : Fin n → Fin m) (hf : StrictMono f) : ((List.map f l)).Pairwise (· ≤ ·) := by
+    (f : Fin n → Fin m) (hf : StrictMono f) : (List.map f l).Pairwise (· ≤ ·) := by
   induction l with
   | nil => simp
   | cons a l ih =>
@@ -133,8 +133,8 @@ lemma fin_list_sorted_indexOf_mem :
   intro l hl i hi
   conv_lhs => rw [fin_list_sorted_split l hl i]
   rw [List.idxOf_append_of_notMem]
-  erw [fin_list_sorted_indexOf_filter_le_mem l hl i hi]
-  · simp
+  · erw [fin_list_sorted_indexOf_filter_le_mem l hl i hi]
+    simp
   · simp
 
 lemma orderedInsert_of_fin_list_sorted :
@@ -383,6 +383,7 @@ lemma uncontractedListEmd_toFun_eq_get (φs : List 𝓕.FieldOp) (φsΛ : WickCo
     φsΛ.uncontractedList.get ∘ (finCongr (by simp [uncontractedListGet])) := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma uncontractedListEmd_strictMono {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {i j : Fin [φsΛ]ᵘᶜ.length} (h : i < j) : uncontractedListEmd i < uncontractedListEmd j := by
   simp only [uncontractedListEmd, uncontractedIndexEquiv, List.get_eq_getElem,
@@ -392,10 +393,12 @@ lemma uncontractedListEmd_strictMono {φs : List 𝓕.FieldOp} {φsΛ : WickCont
   exact φsΛ.uncontractedList_sorted_lt.sortedLT
   exact h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma uncontractedListEmd_mem_uncontracted {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     (i : Fin [φsΛ]ᵘᶜ.length) : uncontractedListEmd i ∈ φsΛ.uncontracted := by
   simp [uncontractedListEmd]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma uncontractedListEmd_surjective_mem_uncontracted {φs : List 𝓕.FieldOp}
     {φsΛ : WickContraction φs.length} (i : Fin φs.length) (hi : i ∈ φsΛ.uncontracted) :
     ∃ j, φsΛ.uncontractedListEmd j = i := by
@@ -439,6 +442,7 @@ lemma getElem_uncontractedListEmd {φs : List 𝓕.FieldOp} {φsΛ : WickContrac
   simp only [uncontractedListGet, List.getElem_map, List.get_eq_getElem]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma uncontractedListEmd_empty {φs : List 𝓕.FieldOp} :
     (empty (n := φs.length)).uncontractedListEmd = (finCongr (by simp)).toEmbedding := by

@@ -38,6 +38,7 @@ def standParamAsMatrix (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) : Matrix (Fin
 
 open CKMMatrix
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The standard parameterization forms a unitary matrix. -/
 lemma standParamAsMatrix_unitary (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) :
     ((standParamAsMatrix θ₁₂ θ₁₃ θ₂₃ δ₁₃)ᴴ * standParamAsMatrix θ₁₂ θ₁₃ θ₂₃ δ₁₃) = 1 := by
@@ -119,6 +120,7 @@ def standParam (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) : CKMMatrix :=
 
 namespace standParam
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The top-row of the standard parameterization is the cross product of the conjugate of the
   up and charm rows. -/
 lemma cross_product_t (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) :

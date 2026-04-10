@@ -36,6 +36,7 @@ noncomputable section
 def wickTerm {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) : 𝓕.WickAlgebra :=
   φsΛ.sign • φsΛ.timeContract * 𝓝(ofFieldOpList [φsΛ]ᵘᶜ)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For the empty list `[]` of `𝓕.FieldOp`, the `wickTerm` of the Wick contraction
   corresponding to the empty set `∅` (the only Wick contraction of `[]`) is `1`. -/
 @[simp]
@@ -63,7 +64,7 @@ lemma wickTerm_insert_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
   rw [wickTerm]
   by_cases hg : GradingCompliant φs φsΛ
   · rw [normalOrder_uncontracted_none, sign_insert_none _ _ _ _ hg]
-    simp only [Nat.succ_eq_add_one, timeContract_insert_none, instCommGroup.eq_1,
+    simp only [Nat.succ_eq_add_one, timeContract_insert_none,
       Algebra.mul_smul_comm, Algebra.smul_mul_assoc, smul_smul]
     congr 1
     rw [← mul_assoc]
@@ -90,12 +91,12 @@ lemma wickTerm_insert_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
       simp only [Bool.not_eq_true, Bool.eq_false_or_eq_true_self, true_and]
       intro h1 h2
       simp_all
-  · simp only [Nat.succ_eq_add_one, timeContract_insert_none, Algebra.smul_mul_assoc,
-    instCommGroup.eq_1]
+  · simp only [Nat.succ_eq_add_one, timeContract_insert_none, Algebra.smul_mul_assoc]
     rw [timeContract_of_not_gradingCompliant]
     simp only [ZeroMemClass.coe_zero, zero_mul, smul_zero]
     exact hg
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of
   `𝓕.FieldOp`, `i ≤ φs.length` and a `k` in `φsΛ.uncontracted`,
   such that all `𝓕.FieldOp` in `φ₀…φᵢ₋₁` have time strictly less than `φ` and
@@ -132,7 +133,7 @@ lemma wickTerm_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
       swap
       · exact hn _ hk
       · rw [normalOrder_uncontracted_some, sign_insert_some_of_lt φ φs φsΛ i k hk hg]
-        simp only [instCommGroup.eq_1, smul_smul, Algebra.smul_mul_assoc]
+        simp only [smul_smul, Algebra.smul_mul_assoc]
         congr 1
         rw [mul_assoc, mul_assoc, mul_comm, mul_assoc, mul_assoc]
         simp
@@ -143,7 +144,7 @@ lemma wickTerm_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
       · exact hlt _
       · rw [normalOrder_uncontracted_some]
         rw [sign_insert_some_of_not_lt φ φs φsΛ i k hk hg]
-        simp only [instCommGroup.eq_1, smul_smul, Algebra.smul_mul_assoc]
+        simp only [smul_smul, Algebra.smul_mul_assoc]
         congr 1
         rw [mul_assoc, mul_assoc, mul_comm, mul_assoc, mul_assoc]
         simp
@@ -153,7 +154,7 @@ lemma wickTerm_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     by_cases hg' : GradingCompliant φs φsΛ
     · have hg := hg hg'
       simp only [Nat.succ_eq_add_one, Fin.getElem_fin, ite_mul, Algebra.smul_mul_assoc,
-        instCommGroup.eq_1, contractStateAtIndex, uncontractedFieldOpEquiv, Equiv.optionCongr_apply,
+        contractStateAtIndex, uncontractedFieldOpEquiv, Equiv.optionCongr_apply,
         Equiv.coe_trans, Option.map_some, Function.comp_apply, finCongr_apply, Fin.val_cast,
         List.getElem_map, uncontractedList_getElem_uncontractedIndexEquiv_symm, List.get_eq_getElem,
         uncontractedListGet]
@@ -174,7 +175,7 @@ lemma wickTerm_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
         exact fun a => hg (id (Eq.symm a))
     · rw [timeContract_of_not_gradingCompliant]
       simp only [Nat.succ_eq_add_one, Fin.getElem_fin, mul_zero, ZeroMemClass.coe_zero, smul_zero,
-        zero_mul, instCommGroup.eq_1]
+        zero_mul]
       exact hg'
 
 /--
@@ -205,15 +206,14 @@ lemma mul_wickTerm_eq_sum (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (i : Fin
     rw [← mul_assoc, ht, mul_assoc]
   rw [ofFieldOp_mul_normalOrder_ofFieldOpList_eq_sum, Finset.mul_sum,
     uncontractedFieldOpEquiv_list_sum, Finset.smul_sum]
-  simp only [instCommGroup.eq_1, Nat.succ_eq_add_one]
+  simp only [Nat.succ_eq_add_one]
   congr 1
   funext n
   match n with
   | none =>
     rw [wickTerm_insert_none]
     simp only [contractStateAtIndex, uncontractedFieldOpEquiv, Equiv.optionCongr_apply,
-      Equiv.coe_trans, Option.map_none, one_mul, Algebra.smul_mul_assoc, instCommGroup.eq_1,
-      smul_smul]
+      Equiv.coe_trans, Option.map_none, one_mul, Algebra.smul_mul_assoc, smul_smul]
     congr 1
     rw [← mul_assoc, exchangeSign_mul_self]
     simp
@@ -221,7 +221,7 @@ lemma mul_wickTerm_eq_sum (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (i : Fin
     rw [wickTerm_insert_some _ _ _ _ _
       (fun k => hlt k) (fun k a => hn k a)]
     simp only [uncontractedFieldOpEquiv, Equiv.optionCongr_apply, Equiv.coe_trans, Option.map_some,
-      Function.comp_apply, finCongr_apply, Algebra.smul_mul_assoc, instCommGroup.eq_1, smul_smul]
+      Function.comp_apply, finCongr_apply, Algebra.smul_mul_assoc, smul_smul]
     congr 1
     · rw [← mul_assoc, exchangeSign_mul_self]
       rw [one_mul]

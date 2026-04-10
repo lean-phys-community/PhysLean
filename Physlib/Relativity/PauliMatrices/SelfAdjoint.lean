@@ -82,6 +82,7 @@ noncomputable section
 def pauliSelfAdjoint (i : Fin 1 ⊕ Fin 3) : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) :=
   ⟨pauliMatrix i, pauliMatrix_selfAdjoint i⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Pauli matrices are linearly independent. -/
 lemma pauliSelfAdjoint_linearly_independent : LinearIndependent ℝ pauliSelfAdjoint := by
   apply Fintype.linearIndependent_iff.mpr
@@ -96,6 +97,7 @@ lemma pauliSelfAdjoint_linearly_independent : LinearIndependent ℝ pauliSelfAdj
     trace_add, trace_smul, ZeroMemClass.coe_zero, mul_zero, trace_zero] at h1
   fin_cases i <;> simpa [pauliMatrix] using h1
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Pauli matrices span all self-adjoint matrices. -/
 lemma pauliSelfAdjoint_span : ⊤ ≤ Submodule.span ℝ (Set.range pauliSelfAdjoint) := by
   refine (Submodule.top_le_span_range_iff_forall_exists_fun ℝ).mpr ?_
@@ -144,10 +146,11 @@ def pauliBasis : Basis (Fin 1 ⊕ Fin 3) ℝ (selfAdjoint (Matrix (Fin 2) (Fin 2
 def pauliSelfAdjoint' (i : Fin 1 ⊕ Fin 3) : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) :=
   match i with
   | Sum.inl 0 => ⟨σ0, pauliMatrix_selfAdjoint _⟩
-  | Sum.inr 0 => ⟨-σ1, by rw [neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
-  | Sum.inr 1 => ⟨-σ2, by rw [neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
-  | Sum.inr 2 => ⟨-σ3, by rw [neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
+  | Sum.inr 0 => ⟨-σ1, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
+  | Sum.inr 1 => ⟨-σ2, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
+  | Sum.inr 2 => ⟨-σ3, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Pauli matrices where `σi` are negated are linearly independent. -/
 lemma pauliSelfAdjoint'_linearly_independent : LinearIndependent ℝ pauliSelfAdjoint' := by
   apply Fintype.linearIndependent_iff.mpr
@@ -161,6 +164,7 @@ lemma pauliSelfAdjoint'_linearly_independent : LinearIndependent ℝ pauliSelfAd
   simp [-real_smul, mul_add] at h1
   fin_cases i <;> simpa [pauliMatrix] using h1
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Pauli matrices where `σi` are negated span all Self-adjoint matrices. -/
 lemma pauliSelfAdjoint'_span : ⊤ ≤ Submodule.span ℝ (Set.range pauliSelfAdjoint') := by
   refine (Submodule.top_le_span_range_iff_forall_exists_fun ℝ).mpr ?_
@@ -209,6 +213,7 @@ lemma pauliSelfAdjoint'_span : ⊤ ≤ Submodule.span ℝ (Set.range pauliSelfAd
 def pauliBasis' : Basis (Fin 1 ⊕ Fin 3) ℝ (selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :=
   Basis.mk pauliSelfAdjoint'_linearly_independent pauliSelfAdjoint'_span
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The decomposition of a self-adjoint matrix into the Pauli matrices (where `σi` are negated). -/
 lemma pauliBasis'_decomp (M : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
     M = (1/2 * (Matrix.trace (σ0 * M.1)).re) • pauliBasis' (Sum.inl 0)
@@ -245,6 +250,7 @@ lemma pauliBasis'_decomp (M : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
     one_im, zero_div, ofReal_im, mul_zero, sub_zero, re_ofNat, mul_im, zero_mul, im_ofNat]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The component of a self-adjoint matrix in the direction `σ0` under
   the basis formed by the covariant Pauli matrices. -/
 @[simp]
@@ -263,6 +269,7 @@ lemma pauliBasis'_repr_inl_0 (M : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
   linear_combination (norm := ring_nf) -h0
   simp [pauliBasis']
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The component of a self-adjoint matrix in the direction `-σ1` under
   the basis formed by the covariant Pauli matrices. -/
 @[simp]
@@ -281,6 +288,7 @@ lemma pauliBasis'_repr_inr_0 (M : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
   linear_combination (norm := ring_nf) -h0
   simp [pauliBasis']
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The component of a self-adjoint matrix in the direction `-σ2` under
   the basis formed by the covariant Pauli matrices. -/
 @[simp]
@@ -299,6 +307,7 @@ lemma pauliBasis'_repr_inr_1 (M : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
   linear_combination (norm := ring_nf) -h0
   simp [pauliBasis']
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The component of a self-adjoint matrix in the direction `-σ3` under
   the basis formed by the covariant Pauli matrices. -/
 @[simp]
@@ -317,6 +326,7 @@ lemma pauliBasis'_repr_inr_2 (M : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
   linear_combination (norm := ring_nf) -h0
   simp only [pauliBasis', Basis.mk_repr, Fin.isValue, sub_self]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The relationship between the basis `pauliBasis` of contravariant Pauli-matrices and the basis
   `pauliBasis'` of covariant Pauli matrices is by multiplication by the Minkowski matrix. -/
 lemma pauliBasis_minkowskiMetric_pauliBasis' (i : Fin 1 ⊕ Fin 3) :

@@ -23,7 +23,7 @@
 
 
 [![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlib.io/Stats)
-[![](https://img.shields.io/badge/Lean-v4.28.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.28.0)
+[![](https://img.shields.io/badge/Lean-v4.29.0-blue)](https://github.com/leanprover/lean4/releases/tag/v4.29.0)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/leanprover-community/physlib)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/leanprover-community/physlib)
 [![api_docs](https://img.shields.io/badge/doc-API_docs-blue)](https://physlib.io/docs/)
@@ -129,7 +129,7 @@ on the [Lean Zulip](https://leanprover.zulipchat.com/#narrow/channel/479953-Phys
 
 If you want to cite the project as a whole please cite:
 
-```
+```bibtex
 @misc{physlib,
   author = {The Physlib community},
   title = {Physlib: The Lean Physics Library},
@@ -143,7 +143,7 @@ If you want to cite the project as a whole please cite:
 Physlib was formed by merging the general physics Lean library PhysLean (formerly called HepLean)
 with the quantum-information library Lean-QuantumInfo. Where appropriate please also consider
 citing the papers associated with the origin of these projects. For the former please use:
-```
+```bibtex
 @article{Tooby-Smith:2024vqu,
     author = "Tooby-Smith, Joseph",
     title = "{HepLean: Digitalising high energy physics}",
@@ -159,7 +159,7 @@ citing the papers associated with the origin of these projects. For the former p
 ```
 and for the latter please use:
 
-```
+```bibtex
 @article{Meiburg:2025mwn,
     author = "Meiburg, Alex and Lessa, Leonardo A. and Soldati, Rodolfo R.",
     title = "{A Formalization of the Generalized Quantum Stein's Lemma in Lean}",

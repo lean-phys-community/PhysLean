@@ -112,6 +112,7 @@ lemma bosonicProjFree_zero_of_ι_zero (a : 𝓕.FieldOpFreeAlgebra) (h : ι a = 
   rw [bosonicProjFree_eq_ι_bosonicProjF]
   exact h.1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma bosonicProjFree_eq_of_equiv (a b : 𝓕.FieldOpFreeAlgebra) (h : a ≈ b) :
     bosonicProjFree a = bosonicProjFree b := by
   rw [equiv_iff_sub_mem_ideal, ← ι_eq_zero_iff_mem_ideal] at h
@@ -158,6 +159,7 @@ lemma fermionicProjFree_zero_of_ι_zero (a : 𝓕.FieldOpFreeAlgebra) (h : ι a 
   rw [fermionicProjFree_eq_ι_fermionicProjF]
   exact h.2
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fermionicProjFree_eq_of_equiv (a b : 𝓕.FieldOpFreeAlgebra) (h : a ≈ b) :
     fermionicProjFree a = fermionicProjFree b := by
   rw [equiv_iff_sub_mem_ideal, ← ι_eq_zero_iff_mem_ideal] at h
@@ -197,6 +199,7 @@ lemma bosonicProj_add_fermionicProj (a : 𝓕.WickAlgebra) :
   rw [bosonicProjFree_eq_ι_bosonicProjF, fermionicProjFree_eq_ι_fermionicProjF]
   rw [← map_add, bosonicProjF_add_fermionicProjF]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma bosonicProj_mem_bosonic (a : 𝓕.WickAlgebra) (ha : a ∈ statSubmodule .bosonic) :
     bosonicProj a = ⟨a, ha⟩ := by
   let p (a : 𝓕.WickAlgebra) (hx : a ∈ statSubmodule bosonic) : Prop :=
@@ -220,6 +223,7 @@ lemma bosonicProj_mem_bosonic (a : 𝓕.WickAlgebra) (ha : a ∈ statSubmodule .
   · intro a x hx hy
     simp_all [p]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fermionicProj_mem_fermionic (a : 𝓕.WickAlgebra) (ha : a ∈ statSubmodule .fermionic) :
     fermionicProj a = ⟨a, ha⟩ := by
   let p (a : 𝓕.WickAlgebra) (hx : a ∈ statSubmodule fermionic) : Prop :=
@@ -387,6 +391,7 @@ lemma directSum_eq_bosonic_plus_fermionic
     conv_lhs => rw [hx, hy]
     abel
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a field statistic `𝓕`, the algebra `𝓕.WickAlgebra` is graded by `FieldStatistic`.
   Those `ofCrAnList φs` for which `φs` has an overall `bosonic` statistic
   (i.e. `𝓕 |>ₛ φs = bosonic`) span `bosonic`

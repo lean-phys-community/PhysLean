@@ -129,6 +129,9 @@ $$\frac{1}{\mu_0} \partial_\mu F^{\mu \nu} - J^{\nu} = 0.$$
 
 -/
 
+attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue
+
+set_option backward.isDefEq.respectTransparency false in
 lemma isExtrema_iff_tensors {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J) :
@@ -144,16 +147,16 @@ lemma isExtrema_iff_tensors {𝓕 : FreeSpace}
       funext ν
       have h2 : gradLagrangian 𝓕 A J x ν = 0 := by simp [h]
       rw [gradLagrangian_eq_tensor A hA J hJ] at h2
-      simp only [Nat.reduceSucc, Nat.reduceAdd, Fin.isValue, one_div, map_smul, map_neg, map_add,
+      simp only [one_div, map_smul, map_neg, map_add,
         permT_permT, CompTriple.comp_eq, apply_add, apply_smul, Lorentz.Vector.neg_apply,
         mul_eq_zero] at h2
       have hn : η ν ν ≠ 0 := η_diag_ne_zero
-      simp_all only [Fin.isValue, false_or, ne_eq, Nat.reduceSucc, Nat.reduceAdd, one_div, map_smul,
+      simp_all only [false_or, ne_eq, one_div, map_smul,
         map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul,
         Lorentz.Vector.neg_apply, Lorentz.Vector.zero_apply]
     generalize {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
         - (J x | ν')}ᵀ = V at *
-    simp only [Nat.reduceSucc, Nat.reduceAdd, Fin.isValue, EmbeddingLike.map_eq_zero_iff] at h1
+    simp only [EmbeddingLike.map_eq_zero_iff] at h1
     rw [permT_eq_zero_iff] at h1
     exact h1
   · intro h
@@ -175,6 +178,8 @@ the speed with which an electromagnetic wave propagates is invariant under Loren
 
 -/
 
+set_option maxHeartbeats 600000 in
+set_option backward.isDefEq.respectTransparency false in
 lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J)
@@ -194,7 +199,7 @@ lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
       exact hA.of_le ENat.LEInfty.out)]
     rw [smul_comm]
     rw [Tensorial.toTensor_smul, Tensorial.toTensor_smul]
-    simp only [Nat.reduceAdd, Nat.reduceSucc, Fin.isValue, one_div, map_smul, actionT_smul,
+    simp only [one_div, map_smul, actionT_smul,
       contrT_equivariant, map_neg, permT_equivariant]
     rw [smul_comm, ← Tensor.actionT_neg, ← Tensor.actionT_add]
   apply Iff.intro
@@ -202,7 +207,7 @@ lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
     rw [isExtrema_iff_tensors A hA J hJ]
     intro x
     apply MulAction.injective Λ
-    simp only [Nat.reduceAdd, Nat.reduceSucc, Fin.isValue, one_div, map_smul, map_neg,
+    simp only [one_div, map_smul, map_neg,
       _root_.smul_add, actionT_smul, _root_.smul_neg, _root_.smul_zero]
     simpa using h (Λ • x)
   · intro h x
@@ -613,6 +618,7 @@ Here $\mathbf{B}$ is the magnetic field matrix.
 
 -/
 open Space
+set_option backward.isDefEq.respectTransparency false in
 lemma isExtrema_iff_space_time {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d)
     (J : DistLorentzCurrentDensity d) :
@@ -716,6 +722,8 @@ holds.
 
 -/
 open SpaceTime minkowskiMatrix
+set_option maxHeartbeats 600000 in
+set_option backward.isDefEq.respectTransparency false in
 lemma isExterma_iff_tensor {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d)
     (J : DistLorentzCurrentDensity d) :
@@ -755,6 +763,7 @@ A natural consequence of this is that the speed of light is the same in all iner
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma isExterma_equivariant {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d)
     (J : DistLorentzCurrentDensity d) (Λ : LorentzGroup d) :
@@ -768,7 +777,7 @@ lemma isExterma_equivariant {𝓕 : FreeSpace}
     enter [x]
     rw [smul_comm]
     rw [Tensorial.toTensor_smul, lorentzGroup_smul_dist_apply, Tensorial.toTensor_smul]
-    simp only [Nat.reduceAdd, Nat.reduceSucc, Fin.isValue, one_div, map_smul, actionT_smul,
+    simp only [one_div, map_smul, actionT_smul,
       contrT_equivariant, map_neg, permT_equivariant]
     rw [smul_comm, ← Tensor.actionT_neg, ← Tensor.actionT_add]
   apply Iff.intro
@@ -776,13 +785,14 @@ lemma isExterma_equivariant {𝓕 : FreeSpace}
     rw [isExterma_iff_tensor A J]
     intro x
     apply MulAction.injective Λ
-    simp only [Nat.reduceAdd, Nat.reduceSucc, Fin.isValue, one_div, map_smul, map_neg,
+    simp only [one_div, map_smul, map_neg,
       _root_.smul_add, actionT_smul, _root_.smul_neg, _root_.smul_zero]
-    simpa [schwartzAction_mul_apply] using h (schwartzAction Λ x)
+    simpa only [Fin.isValue, schwartzAction_mul_apply, inv_mul_cancel, map_one,
+      ContinuousLinearMap.one_apply, smul_add, actionT_smul, smul_neg] using h (schwartzAction Λ x)
   · intro h x
     rw [isExterma_iff_tensor A J] at h
     specialize h (schwartzAction Λ⁻¹ x)
-    simp at h
+    simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, one_div, map_smul, map_neg] at h
     rw [h]
     simp
 

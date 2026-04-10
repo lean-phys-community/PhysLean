@@ -176,6 +176,7 @@ open minkowskiMatrix SchwartzMap
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The vector potential of an electromagnetic potential which is a distribution. -/
 noncomputable def vectorPotential {d} (c : SpeedOfLight) :
     DistElectromagneticPotential d →ₗ[ℝ]

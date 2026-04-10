@@ -57,6 +57,7 @@ open ContDiff
 
 open SchwartzMap
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The parity operator on the Schwartz maps is defined as the linear map from
   `𝓢(ℝ, ℂ)` to itself, such that `ψ` is taken to `fun x => x * ψ x`. -/
 def positionOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := Distribution.powOneMul ℂ
@@ -72,6 +73,7 @@ lemma positionOperatorSchwartz_apply (ψ : 𝓢(ℝ, ℂ)) (x : ℝ) :
   simp [positionOperatorSchwartz]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The unbounded position operator, whose domain is Schwartz maps. -/
 def positionOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_injective :=
   UnboundedOperator.ofSelfCLM positionOperatorSchwartz
@@ -82,6 +84,7 @@ def positionOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_inje
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma positionStates_generalized_eigenvector_positionOperatorUnbounded (x : ℝ) :
     positionOperatorUnbounded.IsGeneralizedEigenvector (positionState x) x := by
   dsimp [positionOperatorUnbounded]
@@ -95,6 +98,7 @@ lemma positionStates_generalized_eigenvector_positionOperatorUnbounded (x : ℝ)
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma positionOperatorUnbounded_isSelfAdjoint :
     positionOperatorUnbounded.IsSelfAdjoint := by
   intro ψ1 ψ2

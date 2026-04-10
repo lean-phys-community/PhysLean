@@ -38,6 +38,7 @@ instance : DecidableEq (WickContraction n) := Subtype.instDecidableEq
 /-- The contraction consisting of no contracted pairs. -/
 def empty : WickContraction n := ⟨∅, by simp, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma card_zero_iff_empty (c : WickContraction n) : c.1.card = 0 ↔ c = empty := by
   rw [Subtype.ext_iff, Finset.card_eq_zero, empty]
 
@@ -71,6 +72,7 @@ lemma card_congr {n m : ℕ} (h : n = m) (c : WickContraction n) :
   subst h
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma congr_contractions {n m : ℕ} (h : n = m) (c : WickContraction n) :
     ((congr h) c).1 = Finset.map (Finset.mapEmbedding (finCongr h)).toEmbedding c.1 := by
   subst h
@@ -277,6 +279,7 @@ lemma getDual?_getDual?_get_not_none (i : Fin n) (h : (c.getDual? i).isSome) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The smallest of the two positions in a contracted pair given a Wick contraction. -/
 def fstFieldOfContract (c : WickContraction n) (a : c.1) : Fin n :=
   (a.1.sort (· ≤ ·)).head (by
@@ -290,6 +293,7 @@ lemma fstFieldOfContract_congr {n m : ℕ} (h : n = m) (c : WickContraction n) (
   subst h
   simp [congr]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The largest of the two positions in a contracted pair given a Wick contraction. -/
 def sndFieldOfContract (c : WickContraction n) (a : c.1) : Fin n :=
   (a.1.sort (· ≤ ·)).tail.head (by
@@ -374,6 +378,7 @@ lemma fstFieldOfContract_getDual?_isSome (c : WickContraction n) (a : c.1) :
   rw [getDual?_isSome_iff]
   exact ⟨a, fstFieldOfContract_mem ..⟩
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma fstFieldOfContract_getDual? (c : WickContraction n) (a : c.1) :
     c.getDual? (c.fstFieldOfContract a) = some (c.sndFieldOfContract a) := by
@@ -435,6 +440,7 @@ lemma eq_sndFieldOfContract_of_mem (c : WickContraction n) (a : c.1) (i j : Fin 
     subst hi hj
     simp at hij
 
+set_option backward.isDefEq.respectTransparency false in
 /-- As a type, any pair of contractions is equivalent to `Fin 2`
   with `0` being associated with `c.fstFieldOfContract a` and `1` being associated with
   `c.sndFieldOfContract`. -/
@@ -484,6 +490,7 @@ lemma gradingCompliant_congr {φs φs' : List 𝓕.FieldOp} (h : φs = φs')
   subst h
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- An equivalence from the sigma type `(a : c.1) × a` to the subtype of `Fin n` consisting of
   those positions which are contracted. -/
 def sigmaContractedEquiv : (a : c.1) × a ≃ {x : Fin n // (c.getDual? x).isSome} where

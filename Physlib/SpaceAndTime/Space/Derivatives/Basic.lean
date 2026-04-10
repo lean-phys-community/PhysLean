@@ -79,7 +79,7 @@ lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
     deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
 
-lemma deriv_eq_fderiv_fun  [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
+lemma deriv_eq_fderiv_fun [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) :
     deriv μ f = fun x => fderiv ℝ (fun x => f x) x (basis μ) := by rfl
 
@@ -112,17 +112,17 @@ lemma mdifferentiable_manifoldStructure_iff_differentiable {M d} [NormedAddCommG
   · intro h
     rw [← mdifferentiableAt_iff_differentiableAt]
     apply h.comp (I' := Space.manifoldStructure d)
-    exact (modelDiffeo.symm.mdifferentiable  (WithTop.top_ne_zero)).mdifferentiableAt
+    exact (modelDiffeo.symm.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt
   · intro h
     apply (mdifferentiableAt_iff_differentiableAt.mpr h).comp (I' := 𝓘(ℝ, Space d))
-    exact (modelDiffeo.mdifferentiable  (WithTop.top_ne_zero)).mdifferentiableAt
-
+    exact (modelDiffeo.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt
 
 TODO "3XMN6" "Make the version of the derivative described through
   `deriv_eq_mfderiv_manifoldStructure` the definition of `deriv` and prove the
   equivalence with the current definition, under suitable conditions."
 
 open Manifold in
+set_option backward.isDefEq.respectTransparency false in
 /-- The spatial-derivative in terms of the derivative of functions between
   manifolds with the manifold structure `Space.manifoldStructure d`. -/
 lemma deriv_eq_mfderiv_manifoldStructure {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
@@ -297,11 +297,12 @@ lemma deriv_euclid {d ν μ} {f : Space d → EuclideanSpace ℝ (Fin n)}
   rw [deriv_eq_fderiv_basis]
   change fderiv ℝ (EuclideanSpace.proj μ ∘ fun x => f x) x (basis ν) = _
   rw [fderiv_comp]
-  · simp
+  · simp [-EuclideanSpace.coe_proj]
     rw [← deriv_eq_fderiv_basis]
   · fun_prop
   · fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma deriv_lorentz_vector {d ν μ} {f : Space d → Lorentz.Vector d}
     (hf : Differentiable ℝ f) (x : Space d) :
     deriv ν (fun x => f x μ) x = deriv ν (fun x => f x) x μ := by

@@ -261,6 +261,7 @@ lemma accYY_ext {S T : MSSMCharges.Charges}
   rw [hd, hu]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The symmetric bilinear function used to define the quadratic ACC. -/
 @[simps!]
 def quadBiLin : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
@@ -311,6 +312,7 @@ def quadBiLin : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
 @[simp]
 def accQuad : HomogeneousQuadratic MSSMCharges.Charges := quadBiLin.toHomogeneousQuad
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accQuad`. -/
 lemma accQuad_ext {S T : (MSSMCharges).Charges}
     (h : ∀ j, ∑ i, ((fun a => a^2) ∘ toSMSpecies j S) i =
@@ -372,6 +374,7 @@ lemma cubeTriLinToFun_map_add₁ (S T R L : MSSMCharges.Charges) :
   · rw [Hd.map_add, Hu.map_add]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cubeTriLinToFun_swap1 (S T R : MSSMCharges.Charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (T, S, R) := by
   simp only [cubeTriLinToFun, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply,
@@ -382,6 +385,7 @@ lemma cubeTriLinToFun_swap1 (S T R : MSSMCharges.Charges) :
     ring
   · ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cubeTriLinToFun_swap2 (S T R : MSSMCharges.Charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (S, R, T) := by
   simp only [cubeTriLinToFun, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply,
@@ -405,6 +409,7 @@ def cubeTriLin : TriLinearSymm MSSMCharges.Charges := TriLinearSymm.mk₃
 @[simp]
 def accCube : HomogeneousCubic MSSMCharges.Charges := cubeTriLin.toCubic
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accCube`. -/
 lemma accCube_ext {S T : MSSMCharges.Charges}
     (h : ∀ j, ∑ i, ((fun a => a^3) ∘ toSMSpecies j S) i =
@@ -506,6 +511,7 @@ lemma AnomalyFreeMk''_val (S : MSSMACC.QuadSols)
     (AnomalyFreeMk'' S hcube).val = S.val := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The dot product on the vector space of charges. -/
 @[simps!]
 def dot : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂

@@ -41,7 +41,7 @@ lemma stat_ofFinset_eq_one_of_gradingCompliant (φs : List 𝓕.FieldOp)
   let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} := by
     exact (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
   rw [← e2.symm.prod_comp]
-  simp only [Fin.getElem_fin, Fintype.prod_sum_type, instCommGroup]
+  simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_lhs =>
     enter [2, 2, x]
     simp only [Equiv.symm_symm, Equiv.sumCompl_apply_inl, Equiv.sumCompl_apply_inr, e2]
@@ -68,6 +68,7 @@ lemma stat_ofFinset_eq_one_of_gradingCompliant (φs : List 𝓕.FieldOp)
     exact False.elim (h1 hsom')
     rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma signFinset_insertAndContract_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (i1 i2 : Fin φs.length)
     (j : φsΛ.uncontracted) :
@@ -225,6 +226,7 @@ def signInsertSomeProd (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : Wi
     else
       1
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Given a Wick contraction `φsΛ` the sign defined in the following way,
 related to inserting a field `φ` at position `i` and contracting it with `j : φsΛ.uncontracted`.
 - If `j < i`, for each field `φₐ` in `φⱼ₊₁…φᵢ₋₁` without a dual at position `< j`
@@ -247,6 +249,7 @@ def signInsertSome (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : WickCo
     (i : Fin φs.length.succ) (j : φsΛ.uncontracted) : ℂ :=
   signInsertSomeCoef φ φs φsΛ i j * signInsertSomeProd φ φs φsΛ i j
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sign_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : WickContraction φs.length)
     (i : Fin φs.length.succ) (j : φsΛ.uncontracted) :
     (φsΛ ↩Λ φ i (some j)).sign = (φsΛ.signInsertSome φ φs i j) * φsΛ.sign := by
@@ -254,7 +257,7 @@ lemma sign_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : Wi
   rw [insertAndContract_some_prod_contractions]
   congr
   funext a
-  simp only [instCommGroup, Nat.succ_eq_add_one, insertAndContract_sndFieldOfContract,
+  simp only [Nat.succ_eq_add_one, insertAndContract_sndFieldOfContract,
     finCongr_apply, Fin.getElem_fin, Fin.val_cast, insertIdx_getElem_fin,
     insertAndContract_fstFieldOfContract, not_lt, ite_mul, one_mul]
   erw [signFinset_insertAndContract_some]
@@ -262,9 +265,9 @@ lemma sign_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : Wi
   · rename_i h
     simp only [Nat.succ_eq_add_one, finCongr_apply]
     rw [ofFinset_insert]
-    simp only [instCommGroup, Fin.getElem_fin, Fin.val_cast, List.getElem_insertIdx_self, map_mul]
+    simp only [Fin.getElem_fin, Fin.val_cast, List.getElem_insertIdx_self, map_mul]
     rw [stat_ofFinset_of_insertAndContractLiftFinset]
-    simp only [exchangeSign_symm, instCommGroup.eq_1]
+    simp only [exchangeSign_symm]
     simp
   · rename_i h
     split
@@ -272,9 +275,9 @@ lemma sign_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : Wi
       simp only [Nat.succ_eq_add_one, finCongr_apply, h1, true_and]
       rw [if_pos]
       rw [ofFinset_erase]
-      simp only [instCommGroup, Fin.getElem_fin, Fin.val_cast, insertIdx_getElem_fin, map_mul]
+      simp only [Fin.getElem_fin, Fin.val_cast, insertIdx_getElem_fin, map_mul]
       rw [stat_ofFinset_of_insertAndContractLiftFinset]
-      simp only [exchangeSign_symm, instCommGroup.eq_1]
+      simp only [exchangeSign_symm]
       · rw [succAbove_mem_insertAndContractLiftFinset]
         simp only [signFinset, Finset.mem_filter, Finset.mem_univ, true_and]
         simp_all only [Nat.succ_eq_add_one, and_true, false_and, not_false_eq_true, not_lt,
@@ -304,17 +307,17 @@ lemma signInsertSomeProd_eq_one_if (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
   funext a
   split
   · rename_i h
-    simp only [instCommGroup.eq_1, Fin.getElem_fin, h, Nat.succ_eq_add_one, and_self,
+    simp only [Fin.getElem_fin, h, Nat.succ_eq_add_one, and_self,
       not_true_eq_false, and_false, or_false, ↓reduceIte]
   · rename_i h
     split
     · rename_i h1
-      simp only [instCommGroup.eq_1, Fin.getElem_fin, h1, Nat.succ_eq_add_one, false_and,
+      simp only [Fin.getElem_fin, h1, Nat.succ_eq_add_one, false_and,
         not_false_eq_true, and_self, or_true, ↓reduceIte]
       congr 1
       exact congrArg (⇑exchangeSign) (id (Eq.symm hφj))
     · rename_i h1
-      simp only [Nat.succ_eq_add_one, not_lt, instCommGroup.eq_1, Fin.getElem_fin]
+      simp only [Nat.succ_eq_add_one, not_lt, Fin.getElem_fin]
       rw [if_neg]
       simp_all only [Fin.getElem_fin, Nat.succ_eq_add_one, not_and, not_lt, not_le, not_or,
         implies_true, and_true]
@@ -338,7 +341,7 @@ lemma signInsertSomeProd_eq_prod_prod (φ : 𝓕.FieldOp) (φs : List 𝓕.Field
   funext a
   rw [prod_finset_eq_mul_fst_snd]
   nth_rewrite 3 [if_neg]
-  · simp only [Nat.succ_eq_add_one, not_lt, instCommGroup.eq_1, Fin.getElem_fin,
+  · simp only [Nat.succ_eq_add_one, not_lt, Fin.getElem_fin,
     fstFieldOfContract_getDual?, Option.get_some, mul_one]
     congr 1
     rw [hg a]
@@ -371,7 +374,7 @@ lemma signInsertSomeProd_eq_prod_fin (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldO
   let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} := by
     exact (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
   rw [← e2.symm.prod_comp]
-  simp only [instCommGroup.eq_1, Fin.getElem_fin, Fintype.prod_sum_type]
+  simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_rhs =>
     rhs
     enter [2, a]
@@ -402,7 +405,7 @@ lemma signInsertSomeProd_eq_finset (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
   funext x
   split
   · rename_i h
-    simp only [Nat.succ_eq_add_one, not_lt, instCommGroup.eq_1, Finset.mem_filter, Finset.mem_univ,
+    simp only [Nat.succ_eq_add_one, not_lt, Finset.mem_filter, Finset.mem_univ,
       h, forall_true_left, true_and, Fin.getElem_fin]
     split
     · rename_i h1
@@ -426,7 +429,7 @@ lemma signInsertSomeCoef_if (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ
       signFinset (φsΛ ↩Λ φ i (some j))
       (finCongr (insertIdx_length_fin φ φs i).symm (i.succAbove j))
       (finCongr (insertIdx_length_fin φ φs i).symm i)⟩) := by
-  simp only [signInsertSomeCoef, instCommGroup.eq_1, Nat.succ_eq_add_one,
+  simp only [signInsertSomeCoef, Nat.succ_eq_add_one,
     insertAndContract_sndFieldOfContract_some_incl, finCongr_apply, Fin.getElem_fin,
     insertAndContract_fstFieldOfContract_some_incl]
   split
@@ -605,6 +608,7 @@ lemma signInsertSomeCoef_eq_finset (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     stat_signFinset_insert_some_self_fst]
   simp [hφj]
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The following two signs are equal for `i.succAbove k < i`. The sign `signInsertSome φ φs φsΛ i k`
 which is constructed as follows:
@@ -733,6 +737,7 @@ lemma signInsertSome_mul_filter_contracted_of_lt (φ : 𝓕.FieldOp) (φs : List
         or_true, imp_self]
         omega
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The following two signs are equal for `i < i.succAbove k`.
 The sign `signInsertSome φ φs φsΛ i k` which is constructed

@@ -119,6 +119,7 @@ theorem entropy_A_eq_entropy_Z (T β : ℝ) (hβT : T * β = 1) (hi : H.ZIntegra
     have := (DifferentiableAt_Z_if_ZIntegrable hi).differentiableAt WithTop.top_ne_zero
     fun_prop (disch := assumption)
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The "definition of temperature from entropy":
 1/T = (∂S/∂U), when the derivative is at constant extrinsic d (typically N/V).
@@ -156,6 +157,7 @@ theorem β_eq_deriv_S_U {β : ℝ} (hi : H.ZIntegrable d β) : β = (deriv (H.En
   · fun_prop (disch := assumption)
   · fun_prop (disch := assumption)
 
+set_option backward.isDefEq.respectTransparency false in
 open scoped ContDiff in
 example (x : ℝ) (f : ℝ → ℝ) (hf : ContDiffAt ℝ ω f x) : DifferentiableAt ℝ (deriv f) x := by
   have := (hf.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt WithTop.top_ne_zero

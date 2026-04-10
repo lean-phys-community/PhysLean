@@ -482,6 +482,7 @@ protected lemma deriv (F : (ℝ → U) → (ℝ → V)) (F') (u) (hF : HasVarAdj
     (fun ψ x => F' (fun x' => - deriv ψ x') x) u :=
   comp (F:=deriv) (G:=F) (hF := deriv' (F u) hF.apply_smooth_self) (hG := hF)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fmap
     {U} [NormedAddCommGroup U] [NormedSpace ℝ U] [InnerProductSpace' ℝ U]
     {V} [NormedAddCommGroup V] [NormedSpace ℝ V] [InnerProductSpace' ℝ V]

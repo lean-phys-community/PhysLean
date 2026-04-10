@@ -26,6 +26,7 @@ theorem star_kron (a : Matrix α α ℂ) (b : Matrix β β ℂ) : star (a ⊗ₖ
   ext _ _
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 open Kronecker in
 theorem kron_unitary (a : 𝐔[α]) (b : 𝐔[β]) : a.val ⊗ₖ b.val ∈ 𝐔[α × β] := by
   simp [Matrix.mem_unitaryGroup_iff, ← Matrix.mul_kronecker_mul]

@@ -80,7 +80,6 @@ lemma nsmul_val {d : ℕ} (n : ℕ) (a : Space d) :
 lemma nsmul_apply {d : ℕ} (n : ℕ) (a : Space d) (i : Fin d) :
     (n • a) i = n • (a i) := by rfl
 
-
 lemma eq_vadd_zero {d} (s : Space d) :
     ∃ v : EuclideanSpace ℝ (Fin d), s = v +ᵥ (0 : Space d) := by
   obtain ⟨v, h⟩ := vadd_transitive 0 s
@@ -138,7 +137,6 @@ instance {d} : Module ℝ (Space d) where
   zero_smul x := by
     ext i
     simp
-
 
 /-!
 
@@ -221,18 +219,28 @@ lemma vadd_zero_sub_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
   ext i
   simp [sub_apply, vadd_apply]
 
-noncomputable instance {d} : SeminormedAddCommGroup (Space d) where
-
 @[simp]
 lemma dist_eq_norm {d} (p q : Space d) :
     dist p q = ‖p - q‖ := rfl
 
-noncomputable instance : NormedAddCommGroup (Space d) where
+noncomputable instance {d} : SeminormedAddCommGroup (Space d) where
+  dist_eq x y := by
+    simp [dist_eq_norm, norm_eq]
+    congr
+    funext i
+    ring
 
+noncomputable instance : NormedAddCommGroup (Space d) where
+  dist_eq x y := by
+    simp [dist_eq_norm, norm_eq]
+    congr
+    funext i
+    ring
 
 instance {d} : Inner ℝ (Space d) where
   inner p q := ∑ i, p i * q i
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma inner_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
     inner ℝ (v1 +ᵥ (0 : Space d)) (v2 +ᵥ (0 : Space d)) = Inner.inner ℝ v1 v2 := by
@@ -275,7 +283,7 @@ instance {d} : InnerProductSpace ℝ (Space d) where
 
 -/
 
-instance {d : ℕ} : MeasurableSpace (Space d) := borel (Space d)
+noncomputable instance {d : ℕ} : MeasurableSpace (Space d) := borel (Space d)
 
 instance {d : ℕ} : BorelSpace (Space d) where
   measurable_eq := by rfl
@@ -467,7 +475,7 @@ lemma eval_contDiff {d n} (i : Fin d) :
   simp [coordCLM_apply, coord]
 
 /-- The continuous linear equivalence between `Space d` and the corresponding `Pi` type. -/
-def equivPi (d : ℕ) :
+noncomputable def equivPi (d : ℕ) :
     Space d ≃L[ℝ] Π (_ : Fin d), ℝ := LinearEquiv.toContinuousLinearEquiv <|
   {
     toFun := fun p i => p i
@@ -491,7 +499,7 @@ lemma mk_differentiable {d : ℕ} :
     Differentiable ℝ (fun (f : Fin d → ℝ) => (⟨f⟩ : Space d)) := (equivPi d).symm.differentiable
 
 @[fun_prop]
-lemma mk_contDiff {d  : ℕ} {n : WithTop ℕ∞}:
+lemma mk_contDiff {d : ℕ} {n : WithTop ℕ∞}:
     ContDiff ℝ n (fun (f : Fin d → ℝ) => (⟨f⟩ : Space d)) := (equivPi d).symm.contDiff
 
 @[simp]
@@ -530,8 +538,8 @@ lemma vsub_differentiable {d} (s1 : Space d) :
   (PiLp.contDiff_toLp.differentiable (NeZero.ne' 2).symm).comp (by fun_prop)
 
 lemma fderiv_space_components {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
-    (μ : Fin d) (f : M → Space d) (hf : Differentiable ℝ f) (m dm : M):
-    fderiv ℝ f m dm μ  = fderiv ℝ (fun m' => f m' μ) m dm := by
+    (μ : Fin d) (f : M → Space d) (hf : Differentiable ℝ f) (m dm : M) :
+    fderiv ℝ f m dm μ = fderiv ℝ (fun m' => f m' μ) m dm := by
   trans fderiv ℝ (Space.coordCLM μ ∘ fun m' => f m') m dm
   · rw [fderiv_comp _ (by fun_prop) (by fun_prop), ContinuousLinearMap.fderiv,
       ContinuousLinearMap.coe_comp', Function.comp_apply]
@@ -653,12 +661,13 @@ lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume v
 -/
 
 open Manifold in
+set_option backward.isDefEq.respectTransparency false in
 /-- A diffeomorphism between the two different manifold structures on `Space d`,
   that equivalent to `manifoldStructure d` and that equivalent to `𝓘(ℝ, Space d)` -/
 noncomputable def modelDiffeo {d} :
     Diffeomorph (manifoldStructure d) 𝓘(ℝ, Space d) (Space d) (Space d) ⊤ where
-  toFun p :=  p
-  invFun p :=  p
+  toFun p := p
+  invFun p := p
   left_inv _ := rfl
   right_inv _ := rfl
   contMDiff_toFun := by
@@ -689,10 +698,9 @@ lemma basis_eq_mfderiv_modelDiffeo_single (d : ℕ) (μ : Fin d) (x : Space d) :
   rw [fderiv_space_components _ _ (by fun_prop)]
   simp only [vadd_apply, fderiv_add_const]
   change _ = fderiv ℝ (EuclideanSpace.proj i) (x -ᵥ Classical.choice _) (EuclideanSpace.single μ 1)
-  simp [basis_apply]
+  simp only [basis_apply, ContinuousLinearMap.fderiv, PiLp.proj_apply, PiLp.single_apply]
   congr 1
   exact Eq.propIntro (fun a => Eq.symm a) fun a => (Eq.symm a)
-
 
 /-!
 

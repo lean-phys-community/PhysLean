@@ -41,11 +41,17 @@ lemma contrCoUnitVal_expand_tmul : contrCoUnitVal =
     one_ne_zero]
   rfl
 
+lemma contrCoUnitVal_eq_sum_tmul : contrCoUnitVal =
+    ∑ i, complexContrBasis i ⊗ₜ[ℂ] complexCoBasis i := by
+  simp [contrCoUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
+  module
+
+set_option backward.isDefEq.respectTransparency false in
 /-- The contra-co unit for complex lorentz vectors as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexCo`, manifesting the invariance under
   the `SL(2, ℂ)` action. -/
-def contrCoUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexCo where
-  hom := ModuleCat.ofHom {
+def contrCoUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexCo := Rep.ofHom
+{
     toFun := fun a =>
       let a' : ℂ := a
       a' • contrCoUnitVal,
@@ -53,19 +59,18 @@ def contrCoUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexCo where
       simp only [add_smul],
     map_smul' := fun m x => by
       simp only [smul_smul]
-      rfl}
-  comm M := by
-    refine ModuleCat.hom_ext ?_
-    refine LinearMap.ext fun x : ℂ => ?_
-    simp only [ModuleCat.hom_comp]
-    change x • contrCoUnitVal =
-      (TensorProduct.map (complexContr.ρ M) (complexCo.ρ M)) (x • contrCoUnitVal)
-    simp only [map_smul]
-    apply congrArg
-    simp only [contrCoUnitVal]
-    rw [contrCoToMatrix_ρ_symm]
-    apply congrArg
-    simp
+      rfl
+    isIntertwining' M := by
+      refine LinearMap.ext fun x : ℂ => ?_
+      change x • contrCoUnitVal =
+        (TensorProduct.map (complexContr.ρ M) (complexCo.ρ M)) (x • contrCoUnitVal)
+      simp only [map_smul]
+      apply congrArg
+      simp only [contrCoUnitVal]
+      rw [contrCoToMatrix_ρ_symm]
+      apply congrArg
+      simp
+}
 
 lemma contrCoUnit_apply_one : contrCoUnit.hom (1 : ℂ) = contrCoUnitVal := by
   change (1 : ℂ) • contrCoUnitVal = contrCoUnitVal
@@ -89,11 +94,16 @@ lemma coContrUnitVal_expand_tmul : coContrUnitVal =
     one_ne_zero]
   rfl
 
+lemma coContrUnitVal_eq_sum_tmul : coContrUnitVal =
+    ∑ i, complexCoBasis i ⊗ₜ[ℂ] complexContrBasis i := by
+  simp [coContrUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
+  module
+
+set_option backward.isDefEq.respectTransparency false in
 /-- The co-contra unit for complex lorentz vectors as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexContr`, manifesting the invariance under
   the `SL(2, ℂ)` action. -/
-def coContrUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexContr where
-  hom := ModuleCat.ofHom {
+def coContrUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexContr := Rep.ofHom {
     toFun := fun a =>
       let a' : ℂ := a
       a' • coContrUnitVal,
@@ -101,21 +111,20 @@ def coContrUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexContr where
       simp only [add_smul],
     map_smul' := fun m x => by
       simp only [smul_smul]
-      rfl}
-  comm M := by
-    refine ModuleCat.hom_ext ?_
-    refine LinearMap.ext fun x : ℂ => ?_
-    simp only [ModuleCat.hom_comp]
-    change x • coContrUnitVal =
-      (TensorProduct.map (complexCo.ρ M) (complexContr.ρ M)) (x • coContrUnitVal)
-    simp only [map_smul]
-    apply congrArg
-    simp only [coContrUnitVal]
-    rw [coContrToMatrix_ρ_symm]
-    apply congrArg
-    symm
-    refine transpose_eq_one.mp ?h.h.h.a
-    simp
+      rfl
+    isIntertwining' M := by
+      refine LinearMap.ext fun x : ℂ => ?_
+      change x • coContrUnitVal =
+        (TensorProduct.map (complexCo.ρ M) (complexContr.ρ M)) (x • coContrUnitVal)
+      simp only [map_smul]
+      apply congrArg
+      simp only [coContrUnitVal]
+      rw [coContrToMatrix_ρ_symm]
+      apply congrArg
+      symm
+      refine transpose_eq_one.mp ?h.h.h.a
+      simp
+}
 
 lemma coContrUnit_apply_one : coContrUnit.hom (1 : ℂ) = coContrUnitVal := by
   change (1 : ℂ) • coContrUnitVal = coContrUnitVal
@@ -127,6 +136,7 @@ lemma coContrUnit_apply_one : coContrUnit.hom (1 : ℂ) = coContrUnitVal := by
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `contrCoUnit` does nothing. -/
 lemma contr_contrCoUnit (x : complexCo) :
     (λ_ complexCo).hom.hom
@@ -135,25 +145,15 @@ lemma contr_contrCoUnit (x : complexCo) :
     (x ⊗ₜ[ℂ] contrCoUnit.hom (1 : ℂ)))) = x := by
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span complexCoBasis x)
   subst hc
-  rw [contrCoUnit_apply_one, contrCoUnitVal_expand_tmul]
-  simp only [Action.tensorObj_V, Action.tensorUnit_V, Action.leftUnitor_hom_hom,
-    Action.whiskerRight_hom, Action.associator_inv_hom, CategoryTheory.Equivalence.symm_inverse,
-    Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj,
-    Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-    Finset.sum_singleton, Fin.sum_univ_three, tmul_add, add_tmul, smul_tmul, tmul_smul, map_add,
-    map_smul, ModuleCat.MonoidalCategory.associator_inv_apply]
-  have h1'' (y : complexCo.V)
-    (z : complexCo.V ⊗[ℂ] complexContr.V) :
-    (coContrContraction.hom ▷ complexCo.V) (z ⊗ₜ[ℂ] y) = (coContrContraction.hom z) ⊗ₜ[ℂ] y := rfl
-  repeat rw (config := { transparency := .instances }) [h1'']
-  repeat rw [coContrContraction_basis']
-  simp only [Fin.isValue, Action.tensorUnit_V, ↓reduceIte, reduceCtorEq, zero_tmul, map_zero,
-    smul_zero, add_zero, Sum.inr.injEq, one_ne_zero, Fin.reduceEq, zero_add, zero_ne_one]
-  erw [TensorProduct.lid_tmul, TensorProduct.lid_tmul, TensorProduct.lid_tmul,
-    TensorProduct.lid_tmul]
-  simp only [Fin.isValue, one_smul]
-  repeat rw [add_assoc]
+  rw [contrCoUnit_apply_one, contrCoUnitVal_eq_sum_tmul]
+  simp [- Fintype.sum_sum_type, tmul_sum, sum_tmul, map_sum, Representation.TensorProduct.assoc,
+    ← Representation.IntertwiningMap.toLinearMap_apply, smul_tmul]
+  conv_lhs =>
+    enter [2,x, 2, y]
+    erw [coContrContraction_basis']
+  simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `coContrUnit`. -/
 lemma contr_coContrUnit (x : complexContr) :
     (λ_ complexContr).hom.hom
@@ -163,26 +163,13 @@ lemma contr_coContrUnit (x : complexContr) :
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp
     (Basis.mem_span complexContrBasis x)
   subst hc
-  rw [coContrUnit_apply_one, coContrUnitVal_expand_tmul]
-  simp only [Action.tensorObj_V, Action.tensorUnit_V, Action.leftUnitor_hom_hom,
-    Action.whiskerRight_hom, Action.associator_inv_hom, CategoryTheory.Equivalence.symm_inverse,
-    Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj,
-    Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-    Finset.sum_singleton, Fin.sum_univ_three, tmul_add, add_tmul, smul_tmul, tmul_smul, map_add,
-    map_smul, ModuleCat.MonoidalCategory.associator_inv_apply]
-  have h1'' (y : complexContr.V)
-    (z : complexContr.V ⊗[ℂ] complexCo.V) :
-    (contrCoContraction.hom ▷ complexContr.V) (z ⊗ₜ[ℂ] y) =
-    (contrCoContraction.hom z) ⊗ₜ[ℂ] y := rfl
-  repeat rw (config := { transparency := .instances }) [h1'']
-  repeat rw [contrCoContraction_basis']
-  simp only [Fin.isValue, Action.tensorUnit_V, ↓reduceIte, reduceCtorEq,
-    zero_tmul, map_zero, smul_zero, add_zero, Sum.inr.injEq, one_ne_zero, Fin.reduceEq, zero_add,
-    zero_ne_one]
-  erw [TensorProduct.lid_tmul, TensorProduct.lid_tmul, TensorProduct.lid_tmul,
-    TensorProduct.lid_tmul]
-  simp only [Fin.isValue, one_smul]
-  repeat rw [add_assoc]
+  rw [coContrUnit_apply_one, coContrUnitVal_eq_sum_tmul]
+  simp [- Fintype.sum_sum_type, tmul_sum, sum_tmul, map_sum, Representation.TensorProduct.assoc,
+    ← Representation.IntertwiningMap.toLinearMap_apply, smul_tmul]
+  conv_lhs =>
+    enter [2,x, 2, y]
+    erw [contrCoContraction_basis']
+  simp
 
 /-!
 

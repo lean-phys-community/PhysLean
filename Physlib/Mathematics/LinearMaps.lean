@@ -130,6 +130,7 @@ def toHomogeneousQuad {V : Type} [AddCommMonoid V] [Module ℚ V]
     simp only [τ.map_smul₁, τ.map_smul₂, smul_eq_mul]
     grind
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toHomogeneousQuad_add {V : Type} [AddCommMonoid V] [Module ℚ V]
     (τ : BiLinearSymm V) (S T : V) :
     τ.toHomogeneousQuad (S + T) = τ.toHomogeneousQuad S +
@@ -280,6 +281,7 @@ def toCubic {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
     rw [τ.map_smul₁, τ.map_smul₂, τ.map_smul₃]
     grind
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toCubic_add {charges : Type} [AddCommMonoid charges] [Module ℚ charges]
     (τ : TriLinearSymm charges) (S T : charges) :
     τ.toCubic (S + T) = τ.toCubic S +

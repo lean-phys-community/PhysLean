@@ -96,6 +96,7 @@ lemma diag_pow_of_blockTriangular_id {A : Matrix m m 𝕂}
     have h_pow_k : BlockTriangular (A ^ k) id := blockTriangular.pow hA k
     rw [pow_succ, pow_succ, diag_mul_of_blockTriangular_id h_pow_k hA, ih]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The exponential of an upper-triangular matrix is upper-triangular. -/
 lemma blockTriangular_exp_of_blockTriangular_id
     {A : Matrix m m 𝕂} (hA : BlockTriangular A id) :
@@ -137,6 +138,7 @@ lemma matrix_exp_series_diag_eq_scalar_series {A : Matrix m m 𝕂} (hA : BlockT
     (∑' n, ((n.factorial : 𝕂)⁻¹ • (A ^ n)) i i) = ∑' n, (n.factorial : 𝕂)⁻¹ • (A i i) ^ n := by
   exact tsum_congr (exp_series_diag_term_eq hA · i)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The diagonal of the exponential of an upper-triangular matrix `A` consists of the
 exponentials of the diagonal entries of `A`. -/
 theorem diag_exp_of_blockTriangular_id
@@ -148,6 +150,7 @@ theorem diag_exp_of_blockTriangular_id
   rw [matrix_exp_series_diag_eq_scalar_series hA i]
   rw [NormedSpace.exp_eq_tsum 𝕂]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Lie's trace formula for upper triangular matrices. -/
 lemma det_exp_of_blockTriangular_id {A : Matrix m m 𝕂} (hA : BlockTriangular A id) :
     (NormedSpace.exp A).det = NormedSpace.exp A.trace := by
@@ -175,6 +178,7 @@ lemma det_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
   rw [det_mul_right_comm]
   simp_all only [SetLike.coe_mem, Unitary.mul_star_self_of_mem, one_mul]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The exponential of a matrix commutes with unitary conjugation. -/
 lemma exp_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
     NormedSpace.exp ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂)) =
@@ -187,11 +191,13 @@ lemma exp_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
   have h_units := Matrix.exp_units_conj Uu A
   simpa [Uu] using h_units
 
+set_option backward.isDefEq.respectTransparency false in
 lemma det_exp_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
     (NormedSpace.exp ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂))).det =
     (NormedSpace.exp A).det := by
   rw [exp_unitary_conj, det_unitary_conj]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The determinant of the exponential of a matrix is the exponential of its trace.
 This is also known as **Lie's trace formula**. -/
 theorem det_exp {𝕂 m : Type*} [RCLike 𝕂] [IsAlgClosed 𝕂] [Fintype m] [LinearOrder m]
@@ -229,6 +235,7 @@ end Matrix
 
 namespace NormedSpace
 
+set_option backward.isDefEq.respectTransparency false in
 lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
     (A : Matrix n n ℝ) :
     (exp A).map (algebraMap ℝ ℂ) = exp (A.map (algebraMap ℝ ℂ)) := by
@@ -253,6 +260,7 @@ end NormedSpace
 
 section DetExp
 namespace Matrix
+set_option backward.isDefEq.respectTransparency false in
 /--
 Lie's trace formula over ℝ: det(exp(A)) = exp(tr(A)) for any real matrix A.
 This is proved by transferring the result from ℂ using the naturality of polynomial identities.

@@ -64,13 +64,14 @@ lemma on_quadBiLin (S : (PlusU1 n).Charges) :
   erw [familyUniversal_quadBiLin]
   rw [accYY_decomp, accSU2_decomp, accSU3_decomp]
   simp only [Fin.isValue, BL₁_val, SMνSpecies_numberCharges, toSpecies_apply, one_mul, mul_neg,
-    mul_one, neg_mul, sub_neg_eq_add, one_div]
+    mul_one, neg_mul, sub_neg_eq_add]
   ring
 
 lemma on_quadBiLin_AFL (S : (PlusU1 n).LinSols) : quadBiLin (BL n).val S.val = 0 := by
   rw [on_quadBiLin, YYsol S, SU2Sol S, SU3Sol S]
   with_unfolding_all rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accQuad (a • S.val + b • (BL n).val) = a ^ 2 * accQuad S.val := by
   erw [BiLinearSymm.toHomogeneousQuad_add, quadSol (b • (BL n)).1]
@@ -104,6 +105,7 @@ lemma on_cubeTriLin_AFL (S : (PlusU1 n).LinSols) :
   rw [on_cubeTriLin, gravSol S, SU3Sol S]
   with_unfolding_all rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma add_AFL_cube (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accCube (a • S.val + b • (BL n).val) =
     a ^ 2 * (a * accCube S.val + 3 * b * cubeTriLin S.val S.val (BL n).val) := by

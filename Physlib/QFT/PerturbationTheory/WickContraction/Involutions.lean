@@ -70,6 +70,7 @@ def fromInvolution (f : {f : Fin n → Fin n // Function.Involutive f}) : WickCo
           exact fun a => h (id (Eq.symm a))
           exact Function.Involutive.injective f.2⟩
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma fromInvolution_getDual?_isSome (f : {f : Fin n → Fin n // Function.Involutive f})
     (i : Fin n) : ((fromInvolution f).getDual? i).isSome ↔ f.1 i ≠ i := by

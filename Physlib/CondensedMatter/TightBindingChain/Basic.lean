@@ -223,6 +223,7 @@ noncomputable def hamiltonian : T.HilbertSpace →ₗ[ℂ] T.HilbertSpace :=
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The hamiltonian of the tight binding chain is hermitian. -/
 lemma hamiltonian_hermitian (ψ φ : T.HilbertSpace) :
     ⟪T.hamiltonian ψ, φ⟫_ℂ = ⟪ψ, T.hamiltonian φ⟫_ℂ := by
@@ -253,6 +254,7 @@ lemma hamiltonian_hermitian (ψ φ : T.HilbertSpace) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Hamiltonian applied to the localized state `|n⟩` gives
   `T.E0 • |n⟩ - T.t • (|n + 1⟩ + |n - 1⟩)`. -/
 lemma hamiltonian_apply_localizedState (n : Fin T.N) :
@@ -338,6 +340,7 @@ def QuantaWaveNumber : Set ℝ := {x | (∃ n : Fin T.N,
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The quantized wavenumbers form a subset of the `BrillouinZone`. -/
 lemma quantaWaveNumber_subset_brillouinZone : T.QuantaWaveNumber ⊆ T.BrillouinZone := by
   intro x hx
@@ -594,6 +597,7 @@ noncomputable def energyEigenvalue (k : T.QuantaWaveNumber) : ℝ :=
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The energy eigenstates satisfy the time-independent Schrodinger equation. -/
 lemma hamiltonian_energyEigenstate (k : T.QuantaWaveNumber) :
     T.hamiltonian (T.energyEigenstate k) = T.energyEigenvalue k• T.energyEigenstate k := by

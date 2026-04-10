@@ -88,6 +88,7 @@ lemma koszulSign_erase_boson {𝓕 : Type} (q : 𝓕 → FieldStatistic) (le : �
     congr 1
     rw [koszulSignInsert_erase_boson q le φ φs ⟨n, Nat.succ_lt_succ_iff.mp h⟩ h']
 
+set_option backward.isDefEq.respectTransparency false in
 lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
     (φs : List 𝓕) → (n : ℕ) → (hn : n ≤ φs.length) →
     koszulSign q le (List.insertIdx φs n φ) = 𝓢(q φ, ofList q (φs.take n)) * koszulSign q le φs *
@@ -205,6 +206,7 @@ lemma insertIdx_eraseIdx {I : Type} : (n : ℕ) → (r : List I) → (hn : n < r
       List.eraseIdx_cons_succ, List.insertIdx_succ_cons, List.cons.injEq, true_and]
     exact insertIdx_eraseIdx n r _
 
+set_option backward.isDefEq.respectTransparency false in
 lemma koszulSign_eraseIdx [Std.Total le] [IsTrans 𝓕 le] (φs : List 𝓕) (n : Fin φs.length) :
     koszulSign q le (φs.eraseIdx n) = koszulSign q le φs * 𝓢(q (φs.get n), ofList q (φs.take n)) *
     𝓢(q (φs.get n), ofList q (List.take (↑(insertionSortEquiv le φs n))
@@ -226,7 +228,7 @@ lemma koszulSign_eraseIdx [Std.Total le] [IsTrans 𝓕 le] (φs : List 𝓕) (n 
   conv_rhs =>
     enter [1, 1, 2, 2, 2, 1, 1]
     rw [insertionSortEquiv_congr _ _ hφs]
-  simp only [instCommGroup.eq_1, List.get_eq_getElem]
+  simp only [List.get_eq_getElem]
   trans koszulSign q le (φs.eraseIdx ↑n) *
     (𝓢(q φs[↑n], ofList q ((φs.eraseIdx ↑n).take n)) * 𝓢(q φs[↑n], ofList q (List.take (↑n) φs))) *
     (𝓢(q φs[↑n], ofList q ((List.insertionSort le φs).take (↑((insertionSortEquiv le φs) n)))) *
@@ -234,13 +236,13 @@ lemma koszulSign_eraseIdx [Std.Total le] [IsTrans 𝓕 le] (φs : List 𝓕) (n 
   swap
   · simp only [Fin.getElem_fin]
     rw [Equiv.trans_apply, Equiv.trans_apply]
-    simp only [instCommGroup.eq_1, Fin.castOrderIso,
+    simp only [Fin.castOrderIso,
       Equiv.coe_fn_mk, Fin.cast_mk, Fin.eta, Fin.val_cast]
     ring
   conv_rhs =>
     rhs
     rw [exchangeSign_mul_self]
-  simp only [instCommGroup.eq_1, Fin.getElem_fin, mul_one]
+  simp only [Fin.getElem_fin, mul_one]
   conv_rhs =>
     rhs
     rw [ofList_take_eraseIdx, exchangeSign_mul_self]
@@ -256,7 +258,7 @@ lemma koszulSign_eraseIdx_insertionSortMinPos [Std.Total le] [IsTrans 𝓕 le] (
     lhs
     simp [insertionSortMinPos]
   erw [Equiv.apply_symm_apply]
-  simp only [instCommGroup.eq_1, List.get_eq_getElem, List.length_cons, List.insertionSort,
+  simp only [List.get_eq_getElem, List.length_cons, List.insertionSort,
     List.take_zero, ofList_empty, exchangeSign_bosonic, mul_one, mul_eq_mul_left_iff]
   apply Or.inl
   rfl
@@ -341,9 +343,9 @@ lemma koszulSign_of_append_eq_insertionSort_left [Std.Total le] [IsTrans 𝓕 le
       rw [insertIdx_length_fst_append]
     rw [h1, h2]
     rw [koszulSign_insertIdx _ _ _ _ _ (by simp)]
-    simp only [instCommGroup.eq_1, List.take_left', List.length_insertionSort]
+    simp only [List.take_left', List.length_insertionSort]
     rw [koszulSign_insertIdx _ _ _ _ _ (by simp)]
-    simp only [mul_assoc, instCommGroup.eq_1, List.length_insertionSort, List.take_left',
+    simp only [mul_assoc, List.length_insertionSort, List.take_left',
       ofList_insertionSort, mul_eq_mul_left_iff]
     left
     rw [koszulSign_of_append_eq_insertionSort_left φs φs']

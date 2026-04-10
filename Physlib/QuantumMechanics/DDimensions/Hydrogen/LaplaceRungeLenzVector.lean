@@ -78,6 +78,7 @@ lemma lrlOperator_eq' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i = ∑ j, �
   · simp [angularMomentumOperator, comp_assoc, momentum_comp_commute]
   simp [← comp_finset_sum, ← finset_sum_comp, momentumOperatorSqr]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `𝐀(ε)ᵢ = 𝐩ⱼ𝐋ᵢⱼ - ½iℏ(d-1)𝐩ᵢ - mk·𝐫(ε)⁻¹𝐱ᵢ` -/
 lemma lrlOperator_eq'' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i = ∑ j, 𝐩 j ∘L 𝐋[i,j]
     - (2⁻¹ * I * ℏ * (H.d - 1)) • 𝐩 i - (H.m * H.k) • 𝐫₀ ε (-1) ∘L 𝐱 i := by
@@ -236,6 +237,7 @@ private lemma constMomentum_comm {d : ℕ} (i j : Fin d) :
     ⁅constMomentum i, constMomentum j⁆ = 0 := by
   simp [constMomentum]
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
     (ε : ℝˣ) (i j : Fin H.d) : ⁅positionCompMomentumSqr i, constRadiusRegInvCompPosition H ε j⁆
     + ⁅constRadiusRegInvCompPosition H ε i, positionCompMomentumSqr j⁆
@@ -273,6 +275,7 @@ private lemma momentum_comm_radiusRegPow_position_symm {d : ℕ} (ε : ℝˣ) (s
   simp [← lie_skew (𝐩 _), leibniz_lie, position_commutation_momentum, symm j i,
     radiusRegPow_commutation_momentum, position_comp_commute j i, comp_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition_add
     (ε : ℝˣ) (i j : Fin H.d) :
     ⁅positionDotMomentumCompMomentum i, constRadiusRegInvCompPosition H ε j⁆ +
@@ -297,12 +300,14 @@ private lemma positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition
       simp only [← Complex.coe_smul, ofReal_pow, ofReal_mul, smul_smul]
       ring_nf
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma constMomentum_comm_constRadiusRegInvCompPosition_add (ε : ℝˣ) (i j : Fin H.d) :
     ⁅constMomentum i, constRadiusRegInvCompPosition H ε j⁆ +
     ⁅constRadiusRegInvCompPosition H ε i, constMomentum j⁆ = 0 := by
   nth_rw 2 [← lie_skew]
   simp [constMomentum, constRadiusRegInvCompPosition, momentum_comm_radiusRegPow_position_symm]
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma constRadiusRegInvCompPosition_comm (ε : ℝˣ) (i j : Fin H.d) :
     ⁅constRadiusRegInvCompPosition H ε i, constRadiusRegInvCompPosition H ε j⁆ = 0 := by
   simp [constRadiusRegInvCompPosition, lie_leibniz, leibniz_lie, ← lie_skew (𝐫₀ _ _) (𝐱 _)]
@@ -376,6 +381,7 @@ private lemma xL_Lx_eq {d : ℕ} (ε : ℝˣ) (i : Fin d) :
     ← Complex.coe_smul, smul_smul, ofReal_neg, ofReal_mul, ofReal_pow, ofReal_ofNat, neg_neg]
   ring_nf
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma pSqr_comm_rx (ε : ℝˣ) (i : Fin H.d) :
     ⁅momentumOperatorSqr (d := H.d), 𝐫₀ ε (-1) ∘L 𝐱 i⁆
     = (I * ℏ) • 𝐫₀ ε (-3) ∘L ∑ j, (𝐱 j ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐱 j)
@@ -408,6 +414,7 @@ private lemma r_comm_pL_Lp {d : ℕ} (ε : ℝˣ) (i : Fin d) :
     _ = -((I * ℏ) • 𝐫₀ ε (-3) ∘L ∑ j, (𝐱 j ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐱 j)) := by
       simp_rw [angularMomentum_comp_radiusRegPow_commute, comp_assoc, ← comp_add, ← comp_finset_sum]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `⁅𝐇(ε), 𝐀(ε)ᵢ⁆ = iℏk·ε²𝐫(ε)⁻³𝐩ᵢ - 3ℏ²k/2·ε²𝐫(ε)⁻⁵𝐱ᵢ` -/
 lemma hamiltonianReg_commutation_lrl (ε : ℝˣ) (i : Fin H.d) :
     ⁅H.hamiltonianReg ε, H.lrlOperator ε i⁆ = (I * ℏ * H.k * ε.1 ^ 2) • 𝐫₀ ε (-3) ∘L 𝐩 i
@@ -532,6 +539,7 @@ private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
 private lemma sum_rxp (d : ℕ) (ε : ℝˣ) :
     ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐩 i = 𝐫₀ ε (-1) ∘L ∑ i, 𝐱 i ∘L 𝐩 i := by rw [comp_finset_sum]
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐫₀ ε (-1) ∘L 𝐱 i =
     ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) - (ε.1 ^ 2) • 𝐫₀ ε (-2) := by
   simp_rw [← comp_finset_sum, ← comp_assoc, position_comp_radiusRegPow_commute, comp_assoc,
@@ -539,6 +547,7 @@ private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫₀[d] ε (-1) ∘L �
   ring_nf
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The square of the (regularized) LRL vector operator is related to the (regularized) Hamiltonian
   `𝐇(ε)` of the hydrogen atom, square of the angular momentum `𝐋²` and powers of `𝐫(ε)` as
   `𝐀(ε)² = 2m·𝐇(ε)(𝐋² + ¼ℏ²(d-1)²) + m²k²(𝟙 - ε²·𝐫(ε)⁻²) - ½(d-1)mkℏ²ε²𝐫(ε)⁻³`. -/

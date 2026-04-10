@@ -123,12 +123,14 @@ lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : Decidable
   rw [Function.update_of_ne]
   exact Fin.ne_succAbove i j
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (x y : S.FD.obj (Discrete.mk (c i))) :
     (update p i (x + y)).toTensor = (update p i x).toTensor + (update p i y).toTensor := by
   simp [toTensor, update]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_smul {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (r : k) (y : S.FD.obj (Discrete.mk (c i))) :
@@ -167,6 +169,7 @@ lemma update_drop_self {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fi
   rw [Function.update_of_ne]
   exact Fin.succAbove_ne i k
 
+set_option backward.isDefEq.respectTransparency false in
 lemma μ_toTensor_tmul_toTensor {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (t : Pure S c) (t1 : Pure S c1) :
     ((Functor.LaxMonoidal.μ S.F _ _).hom (t.toTensor ⊗ₜ t1.toTensor)) =
@@ -327,6 +330,7 @@ lemma componentMap_ofComponents {n : ℕ} (c : Fin n → C) (f : ComponentIdx c 
   ext b
   simp [ofComponents]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma ofComponents_componentMap {n : ℕ} (c : Fin n → C) (t : S.Tensor c) :
     ofComponents c (componentMap c t) = t := by
@@ -418,7 +422,7 @@ instance {k : Type} [Field k] {C G : Type} [Group G] (S : TensorSpecies k C G)
     {c : Fin n → C} : FiniteDimensional k (S.Tensor c) :=
   Module.Basis.finiteDimensional_of_finite (Tensor.basis c)
 
-instance {k : Type} [RCLike k] {C G : Type} [Group G] (S : TensorSpecies k C G)
+noncomputable instance {k : Type} [RCLike k] {C G : Type} [Group G] (S : TensorSpecies k C G)
     {c : Fin n → C} : TopologicalSpace (S.Tensor c) :=
   moduleTopology k (S.Tensor c)
 
@@ -475,6 +479,7 @@ noncomputable instance actionT : MulAction G (S.Tensor c) where
 
 lemma actionT_eq {g : G} {t : S.Tensor c} : g • t = (S.F.obj (OverColor.mk c)).ρ g t := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma actionT_pure {g : G} {p : Pure S c} :
     g • p.toTensor = Pure.toTensor (g • p) := by
   rw [actionT_eq, Pure.toTensor]
@@ -663,12 +668,13 @@ lemma Pure.permP_basisVector {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   and a tensor `t`, `permT σ h t` is the tensor tensor permuted according to `σ`. -/
 noncomputable def permT {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (σ : Fin m → Fin n) (h : PermCond c c1 σ) : S.Tensor c →ₗ[k] S.Tensor c1 where
-  toFun t := (ConcreteCategory.hom (S.F.map h.toHom).hom) t
+  toFun t := (S.F.map h.toHom).hom t
   map_add' t1 t2 := by
     simp
   map_smul' r t := by
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (p : Pure S c) :
     permT σ h p.toTensor = (p.permP σ h).toTensor := by
@@ -676,6 +682,7 @@ lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   rw [OverColor.lift.map_tprod]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_id_self {n : ℕ} {c : Fin n → C} (p : Pure S c) :
     Pure.permP (id : Fin n → Fin n) (by simp : PermCond c c id) p = p := by
@@ -734,6 +741,7 @@ lemma permT_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   subst hmap htensor
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_permP {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fin m2 → C}
     {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : PermCond c c1 σ) (h2 : PermCond c1 c2 σ2)
@@ -816,6 +824,7 @@ lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 ## field
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The linear map between tensors with zero indices and the underlying field
   `k`. -/
 noncomputable def toField {c : Fin 0 → C} : S.Tensor c →ₗ[k] k :=

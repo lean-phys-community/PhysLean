@@ -74,7 +74,7 @@ lemma statistics_eq_state_statistics (ψs : CrAnSection φs) :
 lemma take_statistics_eq_take_state_statistics (ψs : CrAnSection φs) n :
     (𝓕 |>ₛ (ψs.1.take n)) = 𝓕 |>ₛ (φs.take n) := by
   erw [FieldStatistic.ofList_eq_prod, FieldStatistic.ofList_eq_prod, crAnStatistics]
-  simp only [instCommGroup, List.map_take]
+  simp only [List.map_take]
   rw [← List.map_comp_map, Function.comp_apply, ψs.2]
 
 /-- The head of a section for `φ :: φs` as an element in `𝓕.fieldOpToCreateAnnihilateType φ`. -/
@@ -173,7 +173,8 @@ lemma card_eq_mul : {φs : List 𝓕.FieldOp} → Fintype.card (CrAnSection φs)
       simp only [statesIsPosition, List.countP_cons_of_pos]
       rw [card_cons_eq]
       rw [card_eq_mul]
-      simp only [fieldOpToCrAnType, CreateAnnihilate.CreateAnnihilate_card_eq_two]
+      simp only [fieldOpToCrAnType]
+      erw [CreateAnnihilate.CreateAnnihilate_card_eq_two]
       ring
   | FieldOp.inAsymp x_ :: φs => by
       simp only [statesIsPosition, Bool.false_eq_true, not_false_eq_true, List.countP_cons_of_neg]
@@ -377,6 +378,7 @@ lemma eraseIdxEquiv_apply_snd {n : ℕ} (ψs : CrAnSection φs) (hn : n < φs.le
   simp only [Nat.succ_eq_add_one, le_add_iff_nonneg_right, zero_le, inf_of_le_left]
   exact Eq.symm (List.eraseIdx_eq_take_drop_succ ψs.1 n)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma eraseIdxEquiv_symm_eq_take_cons_drop {n : ℕ} (φs : List 𝓕.FieldOp) (hn : n < φs.length)
     (a : 𝓕.fieldOpToCrAnType φs[n]) (s : CrAnSection (φs.eraseIdx n)) :
     (eraseIdxEquiv n φs hn).symm ⟨a, s⟩ =

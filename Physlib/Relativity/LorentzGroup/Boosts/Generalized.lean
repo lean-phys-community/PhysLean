@@ -69,6 +69,7 @@ def genBoostAux₂ (u v : Velocity d) : Vector d →ₗ[ℝ] Vector d where
     dsimp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
     rw [smul_smul, mul_div_assoc, neg_mul_eq_mul_neg]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma genBoostAux₂_self (u : Velocity d) : genBoostAux₂ u u = - genBoostAux₁ u u := by
   ext1 x
   simp only [genBoostAux₂, LinearMap.coe_mk, AddHom.coe_mk, genBoostAux₁, LinearMap.neg_apply]
@@ -290,6 +291,7 @@ lemma generalizedBoost_apply_snd (u v : Velocity d) :
     ring
   · rw [smul_comm]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- This lemma states that for a given four-velocity `u`, the general boost
   transformation `genBoost u u` is equal to the identity linear map `LinearMap.id`.
 -/
@@ -348,26 +350,28 @@ lemma generalizedBoost_apply_eq_toCoord (u v : Velocity d) (μ ν : Fin 1 ⊕ Fi
     simp only [neg_add_rev]
     ring_nf
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma generalizedBoost_continuous_snd (u : Velocity d) : Continuous (generalizedBoost u) := by
   have : Continuous (fun v => (generalizedBoost u v).1) := by
     refine continuous_matrix ?_
     intro i j
     simp only [generalizedBoost_apply_eq_minkowskiProduct]
-    refine (continuous_mul_left (η i i)).comp' (?_)
+    refine (continuous_const_mul (η i i)).comp' (?_)
     refine Continuous.sub (by fun_prop) (?_)
     refine .mul (by fun_prop) ?_
     · refine .inv₀ (by fun_prop) ?_
       exact fun x => Velocity.one_add_minkowskiProduct_ne_zero u x
   refine Continuous.subtype_mk this _
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma generalizedBoost_continuous_fst (u : Velocity d) : Continuous (generalizedBoost · u) := by
   have : Continuous (fun v => (generalizedBoost v u).1) := by
     refine continuous_matrix ?_
     intro i j
     simp only [generalizedBoost_apply_eq_minkowskiProduct]
-    refine (continuous_mul_left (η i i)).comp' (?_)
+    refine (continuous_const_mul (η i i)).comp' (?_)
     refine Continuous.sub (by fun_prop) (?_)
     refine .mul (by fun_prop) ?_
     · refine .inv₀ (by fun_prop) ?_
@@ -400,6 +404,7 @@ lemma generalizedBoost_mem_restricted (u v : Velocity d) :
   · exact generalizedBoost_isProper u v
   · exact generalizedBoost_isOrthochronous u v
 
+set_option backward.isDefEq.respectTransparency false in
 lemma generalizedBoost_inv (u v : Velocity d) :
     (generalizedBoost u v)⁻¹ = generalizedBoost v u := by
   rw [← mul_eq_one_iff_inv_eq']
@@ -473,9 +478,9 @@ lemma generalizedBoost_timeComponent_eq (u v : Velocity d) :
   simp only [timeComponent, minkowskiProduct_eq_timeComponent_spatialPart] at *
   field_simp [h]
   nlinarith [mul_pow (u.1 (Sum.inl 0)) (‖v.1.spatialPart‖) 2,
-             mul_pow (v.1 (Sum.inl 0)) (‖u.1.spatialPart‖) 2,
-             Velocity.norm_spatialPart_sq_eq u, Velocity.norm_spatialPart_sq_eq v,
-             real_inner_comm (u.1.spatialPart) (v.1.spatialPart)]
+            mul_pow (v.1 (Sum.inl 0)) (‖u.1.spatialPart‖) 2,
+            Velocity.norm_spatialPart_sq_eq u, Velocity.norm_spatialPart_sq_eq v,
+            real_inner_comm (u.1.spatialPart) (v.1.spatialPart)]
 
 end LorentzGroup
 

@@ -79,6 +79,7 @@ informal_lemma ageGap_nonneg where
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The twin paradox in which:
 - Twin A starts at `0` and travels at constant
   speed to `[15, 0, 0, 0]`.

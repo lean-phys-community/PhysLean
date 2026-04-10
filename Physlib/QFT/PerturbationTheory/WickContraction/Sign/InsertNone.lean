@@ -100,16 +100,16 @@ lemma sign_insert_none_eq_signInsertNone_mul_sign (φ : 𝓕.FieldOp) (φs : Lis
   rw [insertAndContract_none_prod_contractions]
   congr
   funext a
-  simp only [instCommGroup, Nat.succ_eq_add_one, insertAndContract_sndFieldOfContract,
+  simp only [Nat.succ_eq_add_one, insertAndContract_sndFieldOfContract,
     finCongr_apply, Fin.getElem_fin, Fin.val_cast, insertIdx_getElem_fin,
     insertAndContract_fstFieldOfContract, ite_mul, one_mul]
   rw [signFinset_insertAndContract_none]
   split
   · rw [ofFinset_insert]
-    simp only [instCommGroup, Nat.succ_eq_add_one, finCongr_apply, Fin.getElem_fin, Fin.val_cast,
+    simp only [Nat.succ_eq_add_one, finCongr_apply, Fin.getElem_fin, Fin.val_cast,
       List.getElem_insertIdx_self, map_mul]
     rw [stat_ofFinset_of_insertAndContractLiftFinset]
-    simp only [exchangeSign_symm, instCommGroup.eq_1]
+    simp only [exchangeSign_symm]
     simp
   · rw [stat_ofFinset_of_insertAndContractLiftFinset]
 
@@ -127,14 +127,14 @@ lemma signInsertNone_eq_mul_fst_snd (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp
   funext a
   split
   · rename_i h
-    simp only [instCommGroup.eq_1, Fin.getElem_fin, h.1, ↓reduceIte, mul_ite, exchangeSign_mul_self,
+    simp only [Fin.getElem_fin, h.1, ↓reduceIte, mul_ite, exchangeSign_mul_self,
       mul_one]
     rw [if_neg]
     omega
   · rename_i h
     simp only [Nat.succ_eq_add_one, not_and, not_lt] at h
     split <;> rename_i h1
-    · simp_all only [forall_const, instCommGroup.eq_1, Fin.getElem_fin, mul_ite,
+    · simp_all only [forall_const, Fin.getElem_fin, mul_ite,
       exchangeSign_mul_self, mul_one]
       rw [if_pos]
       have h1 :i.succAbove (φsΛ.sndFieldOfContract a) ≠ i :=
@@ -175,7 +175,7 @@ lemma signInsertNone_eq_prod_getDual?_Some (φ : 𝓕.FieldOp) (φs : List 𝓕.
   let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} := by
     exact (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
   rw [← e2.symm.prod_comp]
-  simp only [instCommGroup.eq_1, Fin.getElem_fin, Fintype.prod_sum_type]
+  simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_rhs =>
     rhs
     enter [2, a]
@@ -198,7 +198,7 @@ lemma signInsertNone_eq_filter_map (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
   rw [map_prod]
   congr
   funext a
-  simp only [instCommGroup.eq_1, Bool.decide_and, Bool.decide_eq_true, List.mem_filter,
+  simp only [Bool.decide_and, Bool.decide_eq_true, List.mem_filter,
     List.mem_finRange, Bool.and_eq_true, decide_eq_true_eq, true_and, Fin.getElem_fin]
   split
   · rename_i h
@@ -231,7 +231,7 @@ lemma signInsertNone_eq_filterset (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
   rw [ofFinset_eq_prod, signInsertNone_eq_prod_getDual?_Some, map_prod]
   congr
   funext a
-  simp only [instCommGroup.eq_1, Finset.mem_filter, Finset.mem_univ, true_and, Fin.getElem_fin]
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and, Fin.getElem_fin]
   split
   · rename_i h
     simp only [h, true_and]

@@ -191,6 +191,7 @@ lemma constantEB_vectorPotential_space_deriv {c : SpeedOfLight}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma constantEB_electricField {c : SpeedOfLight}
     {E₀ : EuclideanSpace ℝ (Fin d)} {B₀ : Fin d × Fin d → ℝ}

@@ -71,11 +71,18 @@ def toSelfAdjointMap (M : SL(2, ℂ)) :
     noncomm_ring [selfAdjoint.val_smul, Algebra.mul_smul_comm, Algebra.smul_mul_assoc,
       RingHom.id_apply]
 
+lemma toSelfAdjointMap_apply (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    toSelfAdjointMap M A = ⟨M.1 * A.1 * Matrix.conjTranspose M, by
+        noncomm_ring [selfAdjoint.mem_iff, star_eq_conjTranspose,
+        conjTranspose_mul, conjTranspose_conjTranspose,
+        (star_eq_conjTranspose A.1).symm.trans $ selfAdjoint.mem_iff.mp A.2]⟩ := rfl
+
 lemma toSelfAdjointMap_apply_det (M : SL(2, ℂ)) (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
     det ((toSelfAdjointMap M) A).1 = det A.1 := by
   simp only [toSelfAdjointMap, LinearMap.coe_mk, AddHom.coe_mk, det_mul, det_conjTranspose]
   simp only [SpecialLinearGroup.det_coe, one_mul, star_one, mul_one]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toSelfAdjointMap_apply_pauliBasis'_inl (M : SL(2, ℂ)) :
     toSelfAdjointMap M (PauliMatrix.pauliBasis' (Sum.inl 0)) =
     ((‖M.1 0 0‖ ^ 2 + ‖M.1 0 1‖ ^ 2 + ‖M.1 1 0‖ ^ 2 + ‖M.1 1 1‖ ^ 2) / 2) •
@@ -118,7 +125,7 @@ lemma toSelfAdjointMap_apply_pauliBasis'_inl (M : SL(2, ℂ)) :
       ofReal_re, mul_re, I_re, mul_zero, ofReal_im, I_im, mul_one, sub_self, add_zero, add_im,
       mul_im, zero_add]
     ring_nf
-    simp only [Fin.isValue, I_sq, mul_neg, mul_one, neg_mul, neg_neg, one_mul, sub_neg_eq_add]
+    simp only [Fin.isValue, I_sq, mul_neg, mul_one, neg_mul, one_mul, sub_neg_eq_add]
     ring
   | 1, 0 =>
     simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one,
@@ -129,7 +136,7 @@ lemma toSelfAdjointMap_apply_pauliBasis'_inl (M : SL(2, ℂ)) :
       ofReal_re, mul_re, I_re, mul_zero, ofReal_im, I_im, mul_one, sub_self, add_zero, add_im,
       mul_im, zero_add]
     ring_nf
-    simp only [Fin.isValue, I_sq, mul_neg, mul_one, neg_mul, neg_neg, one_mul, sub_neg_eq_add]
+    simp only [Fin.isValue, I_sq, mul_neg, mul_one, neg_mul, one_mul, sub_neg_eq_add]
     ring
   | 1, 1 =>
     simp only [Fin.isValue, cons_val', cons_val_one, cons_val_fin_one, empty_val']
@@ -147,8 +154,10 @@ def toMatrix : SL(2, ℂ) →* Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ wh
     rw [← LinearMap.toMatrix_mul]
     apply congrArg
     ext1 x
-    simp only [toSelfAdjointMap, SpecialLinearGroup.coe_mul, conjTranspose_mul,
-      LinearMap.coe_mk, AddHom.coe_mk, Module.End.mul_apply, Subtype.mk.injEq]
+    erw [Module.End.mul_apply]
+    simp only [toSelfAdjointMap_apply, SpecialLinearGroup.coe_mul, conjTranspose_mul,
+      Subtype.mk.injEq]
+    ext1
     noncomm_ring
 
 open Lorentz in
@@ -269,15 +278,7 @@ lemma toLorentzGroup_isOrthochronous (M : SL(2, ℂ)) :
     LorentzGroup.IsOrthochronous (toLorentzGroup M) := by
   rw [LorentzGroup.IsOrthochronous]
   rw [toLorentzGroup_inl_inl]
-  apply div_nonneg
-  · apply add_nonneg
-    · apply add_nonneg
-      · apply add_nonneg
-        · exact sq_nonneg _
-        · exact sq_nonneg _
-      · exact sq_nonneg _
-    · exact sq_nonneg _
-  · exact zero_le_two
+  positivity
 
 /-!
 

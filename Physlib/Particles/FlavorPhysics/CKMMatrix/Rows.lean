@@ -205,6 +205,7 @@ noncomputable def rowBasis (V : CKMMatrix) : Basis (Fin 3) ℂ (Fin 3 → ℂ) :
   basisOfLinearIndependentOfCardEqFinrank (rows_linearly_independent V)
     (Module.finrank_fin_fun ℂ).symm
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cRow_cross_tRow_eq_uRow (V : CKMMatrix) :
     ∃ (κ : ℝ), [V]u = cexp (κ * I) • (conj [V]c ⨯₃ conj [V]t) := by
   obtain ⟨g, hg⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span (rowBasis V)
@@ -247,6 +248,7 @@ lemma cRow_cross_tRow_eq_uRow (V : CKMMatrix) :
     have h4 : (0 : ℝ) < 1 := by norm_num
     exact False.elim (lt_iff_not_ge.mp h4 h3)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma uRow_cross_cRow_eq_tRow (V : CKMMatrix) :
     ∃ (τ : ℝ), [V]t = cexp (τ * I) • (conj ([V]u) ⨯₃ conj ([V]c)) := by
   obtain ⟨g, hg⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span (rowBasis V)

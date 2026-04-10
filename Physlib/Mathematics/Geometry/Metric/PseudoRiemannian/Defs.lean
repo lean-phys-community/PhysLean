@@ -105,6 +105,7 @@ lemma QuadraticMap.weightedSumSquares_basis_vector {E : Type*} [AddCommGroup E]
   · simp only [Finset.mem_univ, not_true_eq_false, smul_eq_mul, mul_eq_zero, or_self,
     IsEmpty.forall_iff]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- When a quadratic form is equivalent to a weighted sum of squares,
     negative weights correspond to vectors where the form takes negative values.
     This is a concrete realization of a 1-dimensional negative definite subspace,

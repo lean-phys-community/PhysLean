@@ -118,6 +118,11 @@ instance : SeminormedAddCommGroup ConfigurationSpace where
     simpa [dist_eq_val, Real.dist_eq] using (dist_comm x.val y.val)
   dist_triangle x y z := by
     simpa [dist_eq_val, Real.dist_eq] using (dist_triangle x.val y.val z.val)
+  dist_eq x y := by
+    simp [dist_eq_val, norm]
+    refine abs_eq_abs.mpr ?_
+    ring_nf
+    simp
 
 instance : NormedAddCommGroup ConfigurationSpace where
   eq_of_dist_eq_zero := by
@@ -126,6 +131,11 @@ instance : NormedAddCommGroup ConfigurationSpace where
     have h' : dist a.val b.val = 0 := by
       simpa [dist_eq_val, Real.dist_eq] using h
     exact dist_eq_zero.mp h'
+  dist_eq x y := by
+    simp [dist_eq_val, norm]
+    refine abs_eq_abs.mpr ?_
+    ring_nf
+    simp
 
 instance : NormedSpace ℝ ConfigurationSpace where
   norm_smul_le r x := by

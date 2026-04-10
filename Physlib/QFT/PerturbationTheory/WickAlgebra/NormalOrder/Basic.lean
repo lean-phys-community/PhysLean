@@ -104,7 +104,7 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnOpF_eq_zero_mul (φa : �
     (φs : List 𝓕.CrAnFieldOp) (a b : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓝ᶠ(a * [ofCrAnListF φs, ofCrAnOpF φa]ₛF * b) = 0 := by
   rw [← ofCrAnListF_singleton, superCommuteF_ofCrAnListF_ofCrAnListF_symm, ofCrAnListF_singleton]
-  simp only [instCommGroup.eq_1, ofList_singleton, Algebra.mul_smul_comm, Algebra.smul_mul_assoc,
+  simp only [ofList_singleton, Algebra.mul_smul_comm, Algebra.smul_mul_assoc,
     map_smul]
   rw [ι_normalOrderF_superCommuteF_ofCrAnOpF_ofCrAnListF_eq_zero_mul]
   simp

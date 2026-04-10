@@ -58,9 +58,13 @@ instance instFunLikeKet : FunLike (Ket d) d ℂ where
   coe ψ := ψ.vec
   coe_injective' _ _ h := by rwa [Ket.mk.injEq]
 
+lemma _root_.Ket.coe_fun_eq (ψ : Ket d) : (ψ : d → ℂ) = ψ.vec := rfl
+
 instance instFunLikeBra : FunLike (Bra d) d ℂ where
   coe ψ := ψ.vec
   coe_injective' _ _ h := by rwa [Bra.mk.injEq]
+
+lemma _root_.Bra.coe_fun_eq (ψ : Bra d) : (ψ : d → ℂ) = ψ.vec := rfl
 
 def dot (ξ : Bra d) (ψ : Ket d) : ℂ := ∑ x, (ξ x) * (ψ x)
 
@@ -194,10 +198,12 @@ Here, we use the uniform superposition -/
 instance instInhabited [Nonempty d] : Inhabited (Ket d) where
   default := uniform_superposition
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Construct the Ket corresponding to a basis vector, with a +1 phase. -/
 def Ket.basis (i : d) : Ket d :=
   ⟨fun j ↦ if i = j then 1 else 0, by simp [apply_ite]⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Construct the Bra corresponding to a basis vector, with a +1 phase. -/
 def Bra.basis (i : d) : Bra d :=
   ⟨fun j ↦ if i = j then 1 else 0, by simp [apply_ite]⟩
@@ -312,6 +318,7 @@ theorem Ket.IsProd_iff_mul_eq_mul (ψ : Ket (d₁ × d₂)) : ψ.IsProd ↔
 end prod
 
 section mes
+set_option backward.isDefEq.respectTransparency false in
 /-- The Maximally Entangled State, or MES, on a d×d system. In principle there are many, this
 is specifically the MES with an all-positive phase. For instance on `d := Fin 2`, this is the
 Bell state. -/
@@ -324,7 +331,7 @@ def Ket.MES (d) [Fintype d] [Nonempty d] : Ket (d × d) where
 theorem Ket.MES_isEntangled [Nontrivial d] : (Ket.MES d).IsEntangled := by
   obtain ⟨x, y, h⟩ := @Nontrivial.exists_pair_ne d _
   rw [IsEntangled, MES, IsProd_iff_mul_eq_mul]
-  push_neg
+  push Not
   use x, y, x, y
   simp [apply, h]
 

@@ -110,7 +110,8 @@ lemma colorToComplex_comp_eq_match {n} (c : Fin n → realLorentzTensor.Color) (
 
 /-- The complexification of the component index of a real Lorentz tensor to
   a complex Lorentz tensor. -/
-def _root_.TensorSpecies.Tensor.ComponentIdx.complexify {n} {c : Fin n → realLorentzTensor.Color} :
+noncomputable def _root_.TensorSpecies.Tensor.ComponentIdx.complexify {n}
+    {c : Fin n → realLorentzTensor.Color} :
     ComponentIdx (S := realLorentzTensor) c ≃
       ComponentIdx (S := complexLorentzTensor) (colorToComplex ∘ c) where
   toFun i := fun j => Fin.cast (by
@@ -182,7 +183,7 @@ lemma toComplex_eq_sum_basis {n} (c : Fin n → realLorentzTensor.Color) (v : �
     toComplex v = ∑ i, (Tensor.basis (S := realLorentzTensor) c).repr v
       (ComponentIdx.complexify.symm i) •
       Tensor.basis (S := complexLorentzTensor) (colorToComplex ∘ c) i := by
-  simp only [toComplex, LinearMap.coe_mk, AddHom.coe_mk, Function.comp_apply]
+  simp only [toComplex, LinearMap.coe_mk, AddHom.coe_mk]
   rw [← Equiv.sum_comp ComponentIdx.complexify]
   rfl
 
@@ -307,6 +308,7 @@ open CategoryTheory
 open complexLorentzTensor
 open Lorentz.SL2C
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Local lemma for `toComplex_equivariant`: isolates the heavy matrix step
   for a contravariant slot. -/
 lemma toComplex_equivariant_slot_repr_up {n} {c : Fin n → realLorentzTensor.Color}
@@ -364,6 +366,7 @@ lemma toComplex_equivariant_slot_repr_up {n} {c : Fin n → realLorentzTensor.Co
   rw [← hs]
   congr 1
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Local lemma for `toComplex_equivariant`: isolates the heavy matrix step for a covariant slot. -/
 lemma toComplex_equivariant_slot_repr_down {n} {c : Fin n → realLorentzTensor.Color}
     (k : Fin n) (h : c k = realLorentzTensor.Color.down) (Λ : SL(2, ℂ))
@@ -432,6 +435,7 @@ Finally we record that `toComplex` is equivariant for the natural action of
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` is equivariant. -/
 lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     (v : ℝT(3, c)) (Λ : SL(2, ℂ)) :
@@ -507,7 +511,6 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     rw [map_add, Tensor.actionT_add (S := complexLorentzTensor), h1, h2,
       Tensor.actionT_add (S := realLorentzTensor), map_add]
 
-
 /-!
 
 ## C. Compatibility with permutations: `permT`
@@ -555,6 +558,7 @@ by the operator `permT`.
   classical
   simp [Tensor.basis_apply, permT_pure, Pure.permP_basisVector]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with permT. -/
 lemma permT_toComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color}
@@ -701,6 +705,7 @@ lemma complexify_prod {n m : ℕ}
         (ComponentIdx.complexify b1) (Sum.inr j)]
     congr 1
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with prodT. -/
 lemma prodT_toComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color}
@@ -873,6 +878,7 @@ lemma toComplex_contrP_basisVector {n : ℕ} {c : Fin (n + 1 + 1) → realLorent
       (b := fun m => (ComponentIdx.complexify b) (Pure.dropPairEmb i j m))]
     refine congr_arg _ (funext fun m => ComponentIdx.complexify_comp_dropPairEmb b m)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with `contrT`. -/
 lemma contrT_toComplex {n : ℕ}
     {c : Fin (n + 1 + 1) → realLorentzTensor.Color} {i j : Fin (n + 1 + 1)}
@@ -971,7 +977,7 @@ lemma complex_repDim_down :
     (complexLorentzTensor).repDim complexLorentzTensor.Color.down = 4 := rfl
 
 /-- Convert an evaluation index from the real repDim to the complex repDim. -/
-def evalIdxToComplex {n : ℕ}
+noncomputable def evalIdxToComplex {n : ℕ}
     {c : Fin (n + 1) → realLorentzTensor.Color} (i : Fin (n + 1))
     (b : Fin ((realLorentzTensor).repDim (c i))) :
     Fin ((complexLorentzTensor).repDim ((colorToComplex ∘ c) i)) :=
@@ -996,6 +1002,7 @@ noncomputable def evalTColorToComplex {n : ℕ}
       ((TensorSpecies.Tensor.evalT (S := complexLorentzTensor) (c := (colorToComplex ∘ c))
           i (evalIdxToComplex (c := c) i b)) t)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a real basis vector, `toComplex(evalP(basisVector c b))` equals
   `evalP(basisVector (colorToComplex ∘ c) (complexify b))` (complex species). -/
 lemma toComplex_evalP_basisVector {n : ℕ} {c : Fin (n + 1) → realLorentzTensor.Color}
@@ -1031,6 +1038,7 @@ lemma toComplex_evalP_basisVector {n : ℕ} {c : Fin (n + 1) → realLorentzTens
               (i.succAbove k)))).toTensor)).symm
       · simp [h]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with `evalT`. -/
 lemma evalT_toComplex {n : ℕ}
     {c : Fin (n + 1) → realLorentzTensor.Color}

@@ -85,6 +85,7 @@ lemma 𝓵_neg : P.neg.𝓵 = - P.𝓵 := by rfl
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toFun_zero (x : SpaceTime) : P.toFun 0 x = 0 := by
   simp [toFun]
@@ -170,6 +171,7 @@ lemma quadDiscrim_eq_zero_iff_normSq (h : P.𝓵 ≠ 0) (φ : HiggsField) (x : S
     field_simp
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For an element `P` of `Potential`, if `l < 0` then the following upper bound for the potential
   exists
 
@@ -212,12 +214,14 @@ lemma neg_𝓵_toFun_neg (h : P.𝓵 < 0) (φ : HiggsField) (x : SpaceTime) :
   exact mul_nonpos_of_nonpos_of_nonneg (mul_nonpos_of_nonpos_of_nonneg (le_of_lt h)
     (sq_nonneg ‖φ x‖)) (sq_nonneg ‖φ x‖)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If `P.𝓵` is bigger then zero, then if `P.μ2` is less than zero, for all space-time points,
   the potential is positive `0 ≤ P.toFun φ x`. -/
 lemma pos_𝓵_toFun_pos (h : 0 < P.𝓵) (φ : HiggsField) (x : SpaceTime) :
     (P.μ2 < 0 ∧ 0 ≤ P.toFun φ x) ∨ 0 ≤ P.μ2 := by
   simpa using P.neg.neg_𝓵_toFun_neg (by simpa using h) φ x
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For an element `P` of `Potential` with `l < 0` and a real `c : ℝ`, there exists
   a Higgs field `φ` and a spacetime point `x` such that `P.toFun φ x = c` iff one of the
   following two conditions hold:
@@ -280,6 +284,7 @@ lemma neg_𝓵_sol_exists_iff (h𝓵 : P.𝓵 < 0) (c : ℝ) : (∃ φ x, P.toFu
     refine (quadratic_eq_zero_iff (ne_of_gt h𝓵).symm hdd _).mpr ?_
     simp only [neg_neg, or_true, a]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For an element `P` of `Potential` with `0 < l` and a real `c : ℝ`, there exists
   a Higgs field `φ` and a spacetime point `x` such that `P.toFun φ x = c` iff one of the
   following two conditions hold:
@@ -390,6 +395,7 @@ lemma eq_zero_iff_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤
   have hx' : ‖φ‖_H^2 x = 0 := by linarith
   simpa using hx'
 
+set_option backward.isDefEq.respectTransparency false in
 lemma isMinOn_iff_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤ 0) (φ : HiggsField)
     (x : SpaceTime) : IsMinOn (fun (φ, x) => P.toFun φ x) Set.univ (φ, x)
     ↔ P.toFun φ x = 0 := by
@@ -465,6 +471,7 @@ lemma isMaxOn_iff_isMinOn_neg (φ : HiggsField) (x : SpaceTime) :
   rw [isMaxOn_univ_iff, isMinOn_univ_iff]
   simp_all only [Prod.forall, neg_le_neg_iff]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Given an element `P` of `Potential` with `l < 0`, then the Higgs field `φ` and
   spacetime point `x` maximizes the potential if and only if one of the following conditions
   holds

@@ -32,6 +32,7 @@ structure AnomalyFreePerp extends MSSMACC.LinSols where
   perpY₃ : dot Y₃.val val = 0
   perpB₃ : dot B₃.val val = 0
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The projection of an object in `MSSMACC.AnomalyFreeLinear` onto the subspace
   orthogonal to `Y₃` and`B₃`. -/
 def proj (T : MSSMACC.LinSols) : MSSMACC.AnomalyFreePerp :=
@@ -69,6 +70,7 @@ lemma Y₃_plus_B₃_plus_proj (T : MSSMACC.LinSols) (a b c : ℚ) :
   rw [DistribMulAction.smul_add, DistribMulAction.smul_add]
   module
 
+set_option backward.isDefEq.respectTransparency false in
 lemma quad_Y₃_proj (T : MSSMACC.LinSols) :
     quadBiLin Y₃.val (proj T).val = dot Y₃.val B₃.val * quadBiLin Y₃.val T.val := by
   rw [proj_val]
@@ -78,6 +80,7 @@ lemma quad_Y₃_proj (T : MSSMACC.LinSols) :
   rw [show quadBiLin Y₃.val Y₃.val = 0 by with_unfolding_all rfl]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma quad_B₃_proj (T : MSSMACC.LinSols) :
     quadBiLin B₃.val (proj T).val = dot Y₃.val B₃.val * quadBiLin B₃.val T.val := by
   rw [proj_val]
@@ -87,6 +90,7 @@ lemma quad_B₃_proj (T : MSSMACC.LinSols) :
   rw [show quadBiLin B₃.val B₃.val = 0 by with_unfolding_all rfl]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma quad_self_proj (T : MSSMACC.Sols) :
     quadBiLin T.val (proj T.1.1).val =
     (dot B₃.val T.val - dot Y₃.val T.val) * quadBiLin Y₃.val T.val +
@@ -98,6 +102,7 @@ lemma quad_self_proj (T : MSSMACC.Sols) :
   rw [quadBiLin.swap T.val Y₃.val, quadBiLin.swap T.val B₃.val]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma quad_proj (T : MSSMACC.Sols) :
     quadBiLin (proj T.1.1).val (proj T.1.1).val = 2 * dot Y₃.val B₃.val *
     ((dot B₃.val T.val - dot Y₃.val T.val) * quadBiLin Y₃.val T.val +
@@ -108,6 +113,7 @@ lemma quad_proj (T : MSSMACC.Sols) :
   rw [quad_Y₃_proj, quad_B₃_proj, quad_self_proj]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cube_proj_proj_Y₃ (T : MSSMACC.LinSols) :
     cubeTriLin (proj T).val (proj T).val Y₃.val =
     (dot Y₃.val B₃.val)^2 * cubeTriLin T.val T.val Y₃.val := by
@@ -133,6 +139,7 @@ lemma cube_proj_proj_Y₃ (T : MSSMACC.LinSols) :
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cube_proj_proj_B₃ (T : MSSMACC.LinSols) :
     cubeTriLin (proj T).val (proj T).val B₃.val =
     (dot Y₃.val B₃.val)^2 * cubeTriLin T.val T.val B₃.val := by
@@ -149,6 +156,7 @@ lemma cube_proj_proj_B₃ (T : MSSMACC.LinSols) :
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cube_proj_proj_self (T : MSSMACC.Sols) :
     cubeTriLin (proj T.1.1).val (proj T.1.1).val T.val =
     2 * dot Y₃.val B₃.val *
@@ -166,6 +174,7 @@ lemma cube_proj_proj_self (T : MSSMACC.Sols) :
   rw [cubeTriLin.swap₁ B₃.val T.val T.val, cubeTriLin.swap₂ T.val B₃.val T.val]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cube_proj (T : MSSMACC.Sols) :
     cubeTriLin (proj T.1.1).val (proj T.1.1).val (proj T.1.1).val =
     3 * dot Y₃.val B₃.val ^ 2 *

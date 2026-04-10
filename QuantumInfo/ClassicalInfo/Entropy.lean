@@ -35,6 +35,7 @@ def H₁_zero_eq_zero : H₁ 0 = 0 := by
 def H₁_one_eq_zero : H₁ 1 = 0 := by
   simp [H₁]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Entropy is nonnegative. -/
 theorem H₁_nonneg (p : Prob) : 0 ≤ H₁ p := by
   rw [H₁, Real.negMulLog, neg_mul, Left.nonneg_neg_iff]

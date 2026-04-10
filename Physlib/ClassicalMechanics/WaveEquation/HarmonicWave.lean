@@ -53,6 +53,7 @@ noncomputable def transverseHarmonicPlaneWave (k : WaveVector) (f₀x f₀y ω �
     let fy := harmonicWave (fun _ _ => f₀y) (fun _ r => ⟪k, basis.repr r⟫_ℝ - δy) (fun _ => ω) k
     fun t r => fx t r • EuclideanSpace.single 0 1 + fy t r • EuclideanSpace.single 1 1
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The transverse harmonic planewave representation is equivalent to the general planewave
   expression with `‖k‖ = ω/c`. -/
 lemma transverseHarmonicPlaneWave_eq_planeWave {c : ℝ} {k : WaveVector} {f₀x f₀y ω δx δy : ℝ}

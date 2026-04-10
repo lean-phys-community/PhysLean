@@ -28,6 +28,7 @@ namespace HilbertSpace
 open MeasureTheory
 open SchwartzMap InnerProductSpace
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map including Schwartz functions into the hilbert space. -/
 def schwartzIncl : 𝓢(ℝ, ℂ) →L[ℂ] HilbertSpace :=
   SchwartzMap.toLpCLM ℂ (E := ℝ) ℂ 2 MeasureTheory.volume

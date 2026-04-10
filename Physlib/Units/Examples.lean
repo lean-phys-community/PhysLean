@@ -111,6 +111,7 @@ def EnergyMassWithDimNot (m : WithDim M𝓭 ℝ) (E : WithDim (M𝓭 * L𝓭 * L
     (c : WithDim (L𝓭 * T𝓭⁻¹) ℝ) : Prop :=
   E.1 = m.1 * c.1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma energyMassWithDimNot_not_isDimensionallyCorrect :
     ¬ IsDimensionallyCorrect EnergyMassWithDimNot := by
   simp only [isDimensionallyCorrect_fun_iff, not_forall, funext_iff, scaleUnit_apply_fun]
@@ -202,7 +203,8 @@ lemma example2_energyMass (u : UnitChoices) :
     (scaleUnit SI u ⟨2⟩))
     (scaleUnit SI u ⟨2 * 299792458 ^ 2⟩)) (scaleUnit SI u SI)
   rw [← h1]
-  simp [instUnitDependentTwoSided, instUnitDependentForall_1]
+  simp only [scaleUnit_apply_fst, scaleUnit_apply_fun, scaleUnit_symm_apply,
+    scaleUnit_apply_fun_left]
   exact example1_energyMass
 
 /-!

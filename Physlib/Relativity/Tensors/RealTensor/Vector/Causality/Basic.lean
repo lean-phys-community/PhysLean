@@ -45,7 +45,7 @@ def causalCharacter {d : ℕ} (p : Vector d) : CausalCharacter :=
 /-- `causalCharacter` are invariant under an action of the Lorentz group. -/
 lemma causalCharacter_invariant {d : ℕ} (p : Vector d) (Λ : LorentzGroup d) :
     causalCharacter (Λ • p) = causalCharacter p := by
-  simp only [causalCharacter, Nat.succ_eq_add_one, Nat.reduceAdd]
+  simp only [causalCharacter]
   rw [minkowskiProduct_invariant]
 
 lemma spaceLike_iff_norm_sq_neg {d : ℕ} (p : Vector d) :

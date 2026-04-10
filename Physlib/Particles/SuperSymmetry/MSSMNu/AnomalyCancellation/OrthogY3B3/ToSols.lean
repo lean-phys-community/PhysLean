@@ -264,6 +264,7 @@ lemma inLineEqTo_smul (R : InLineEq) (c₁ c₂ c₃ d : ℚ) :
   rw [lineQuad_smul]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma inLineEqToSol_proj (T : InLineEqSol) : inLineEqToSol (inLineEqProj T) = T.val := by
   rw [inLineEqProj, inLineEqTo_smul]
   apply ACCSystem.Sols.ext

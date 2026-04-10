@@ -75,6 +75,7 @@ lemma rep_linSolRep_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : 
     (S : χ.LinSols) : χ.linSolsIncl (G.linSolRep g S) =
     G.rep g (χ.linSolsIncl S) := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A multiplicative action of `G.group` on `quadSols`. -/
 instance quadSolAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
     MulAction G.group χ.QuadSols where

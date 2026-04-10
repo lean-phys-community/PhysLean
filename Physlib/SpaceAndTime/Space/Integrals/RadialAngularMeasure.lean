@@ -103,6 +103,7 @@ lemma integral_radialAngularMeasure {d : ℕ} (f : Space d → F) :
   refine Eq.symm (Mathlib.Tactic.LinearCombination.smul_eq_const ?_ (f x))
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lintegral_radialMeasure {d : ℕ} (f : Space d → ENNReal) (hf : Measurable f) :
     ∫⁻ x, f x ∂radialAngularMeasure = ∫⁻ x, ENNReal.ofReal (1 / ‖x‖ ^ (d - 1)) * f x := by
   dsimp [radialAngularMeasure]

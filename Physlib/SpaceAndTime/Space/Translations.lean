@@ -47,7 +47,6 @@ noncomputable def translateSchwartz {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :
         · have hx : (fderiv ℝ (fun (x : Space d) => (x - basis.repr.symm a: Space d))) =
               fun _ => ContinuousLinearMap.id ℝ (Space d) := by
             funext x
-            simp only
             erw [fderiv_sub]
             simp only [fderiv_id', fderiv_fun_const, Pi.zero_apply, sub_zero]
             fun_prop

@@ -126,6 +126,7 @@ protected lemma HasAdjFDerivAt.contDiffAt_deriv
     · apply ContinuousLinearMap.adjoint.isBoundedBilinearMap_real.contDiff
     · fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gradient_eq_adjFDeriv
     {f : U → 𝕜} {x : U} (hf : DifferentiableAt 𝕜 f x) :
     gradient f x = adjFDeriv 𝕜 f x 1 := by
@@ -323,7 +324,8 @@ lemma adjFDeriv_smul [CompleteSpace E] [CompleteSpace F]
   apply hf.hasAdjFDerivAt
   apply hg.hasAdjFDerivAt
 
-open InnerProductSpace
+set_option backward.isDefEq.respectTransparency false in
+open InnerProductSpace in
 lemma HasAdjFDerivAt.inner {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     [InnerProductSpace' ℝ E] (x : E × E) :
     HasAdjFDerivAt ℝ (fun (x : E × E) => ⟪x.1, x.2⟫_ℝ) (fun y => y • (x.2, x.1)) x where
@@ -343,6 +345,7 @@ lemma HasAdjFDerivAt.inner {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E
       rw [real_inner_comm']
     ring
 
+open InnerProductSpace in
 lemma adjFDeriv_inner {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [InnerProductSpace' ℝ E]
     (x : E × E) :
     adjFDeriv ℝ (fun (x : E × E) => ⟪x.1, x.2⟫_ℝ) x =

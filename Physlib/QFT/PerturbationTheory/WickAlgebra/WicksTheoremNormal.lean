@@ -111,6 +111,7 @@ lemma normalOrder_timeOrder_ofFieldOpList_eq_eqTimeOnly_empty (φs : List 𝓕.F
   rw [timeOrder_ofFieldOpList_eq_eqTimeOnly_empty]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 For a list `φs` of `𝓕.FieldOp`, then `𝓣(φs)` is equal to the sum of
 
@@ -182,9 +183,9 @@ lemma normalOrder_timeOrder_ofFieldOpList_eq_not_haveEqTime_sub_inductive (φs :
   rw [← Finset.sum_sub_distrib]
   congr 1
   funext x
-  simp only
   rw [← smul_sub, ← mul_sub]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma wicks_theorem_normal_order_empty : 𝓣(𝓝(ofFieldOpList [])) =
     ∑ (φsΛ : {φsΛ : WickContraction ([] : List 𝓕.FieldOp).length // ¬ HaveEqTime φsΛ}),
     φsΛ.1.wickTerm := by
@@ -219,6 +220,7 @@ lemma wicks_theorem_normal_order_empty : 𝓣(𝓝(ofFieldOpList [])) =
   rw [timeOrderF_ofCrAnListF]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /--For a list `φs` of `𝓕.FieldOp`, the normal-ordered version of Wick's theorem states that
 
 `𝓣(𝓝(φs)) = ∑ φsΛ, φsΛ.wickTerm`

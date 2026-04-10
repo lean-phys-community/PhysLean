@@ -55,6 +55,7 @@ lemma Pure.dropPairEmb_apply_lt_lt {n : ℕ}
     Fin.val_succ]
     omega
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.dropPairEmb_natAdd_apply_castAdd {n n1 : ℕ}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j)
     (m : Fin n1) :
@@ -86,6 +87,7 @@ lemma Pure.dropPairEmb_natAdd_image_range_castAdd {n n1 : ℕ}
     use ⟨a, by omega⟩
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.dropPairEmb_comm_natAdd {n n1 : ℕ}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j)
     (m : Fin n) :
@@ -174,6 +176,7 @@ lemma Pure.dropPairEmb_permCond_prod {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     rw [dropPairEmb_comm_natAdd i j hij.1]
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.contrPCoeff_natAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -181,9 +184,8 @@ lemma Pure.contrPCoeff_natAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     contrPCoeff (Fin.natAdd n1 i) (Fin.natAdd n1 j)
     (by simp_all [Fin.ext_iff]) (p1.prodP p)
     = contrPCoeff i j hij p := by
-  simp only [contrPCoeff, Function.comp_apply, Monoidal.tensorUnit_obj, Equivalence.symm_inverse,
-    Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj,
-    Functor.comp_obj, Discrete.functor_obj_eq_as, prodP_apply_natAdd]
+  simp only [contrPCoeff, Monoidal.tensorUnit_obj, Functor.comp_obj, Discrete.functor_obj_eq_as,
+    Function.comp_apply, prodP_apply_natAdd]
   conv_lhs => erw [S.contr_congr _ ((c i)) (by simp)]
   apply congrArg
   congr 1
@@ -194,6 +196,7 @@ lemma Pure.contrPCoeff_natAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
       ((ConcreteCategory.hom (S.FD.map (eqToHom _))) _) = _
     simp [map_map_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.contrPCoeff_castAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -201,9 +204,8 @@ lemma Pure.contrPCoeff_castAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     contrPCoeff (Fin.castAdd n1 i) (Fin.castAdd n1 j)
     (by simp_all [Fin.ext_iff]) (p.prodP p1)
     = contrPCoeff i j hij p := by
-  simp only [contrPCoeff, Function.comp_apply, Monoidal.tensorUnit_obj, Equivalence.symm_inverse,
-    Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj,
-    Functor.comp_obj, Discrete.functor_obj_eq_as, prodP_apply_castAdd]
+  simp only [contrPCoeff, Monoidal.tensorUnit_obj, Functor.comp_obj, Discrete.functor_obj_eq_as,
+    Function.comp_apply, prodP_apply_castAdd]
   conv_lhs => erw [S.contr_congr _ ((c i)) (by simp)]
   apply congrArg
   congr 1
@@ -214,6 +216,7 @@ lemma Pure.contrPCoeff_castAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
       ((ConcreteCategory.hom (S.FD.map (eqToHom _))) _) = _
     simp [map_map_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_dropPair {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -238,6 +241,7 @@ lemma Pure.prodP_dropPair {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
       (by rw [dropPairEmb_comm_natAdd i j hij.1])]
     simp [map_map_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_contrP_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -256,6 +260,7 @@ lemma Pure.prodP_contrP_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   congr
   rw [prodP_dropPair _ _ hij]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma prodT_contrT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -299,6 +304,7 @@ lemma prodT_contrT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   rw [Pure.prodP_contrP_snd, prodT_pure, contrT_pure]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrT_prodT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)

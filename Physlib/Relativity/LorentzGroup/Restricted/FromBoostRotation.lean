@@ -83,7 +83,7 @@ def toBoostRotation {d} : LorentzGroup.restricted d ≃ₜ Lorentz.Velocity d ×
     simp [toVelocity]
     have h0 : toVector (generalizedBoost 0 ⟨v, hv⟩ * (ofSpecialOrthogonal R).1) = v := by
       rw [toVector_mul]
-      simp only [Nat.succ_eq_add_one, Nat.reduceAdd, toVector_rotation, Fin.isValue]
+      simp only [toVector_rotation, Fin.isValue]
       change generalizedBoost 0 ⟨v, hv⟩ • (0 : Lorentz.Velocity d).1 = _
       rw [generalizedBoost_apply_fst]
     apply And.intro h0

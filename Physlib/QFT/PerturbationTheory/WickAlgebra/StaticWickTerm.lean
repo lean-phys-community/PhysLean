@@ -35,6 +35,7 @@ noncomputable section
 def staticWickTerm {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) : 𝓕.WickAlgebra :=
   φsΛ.sign • φsΛ.staticContract * 𝓝(ofFieldOpList [φsΛ]ᵘᶜ)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For the empty list `[]` of `𝓕.FieldOp`, the `staticWickTerm` of the Wick contraction
   corresponding to the empty set `∅` (the only Wick contraction of `[]`) is `1`. -/
 @[simp]
@@ -62,6 +63,7 @@ lemma staticWickTerm_insert_zero_none (φ : 𝓕.FieldOp) (φs : List 𝓕.Field
   simp only [staticContract_insert_none, insertAndContract_uncontractedList_none_zero,
     Algebra.smul_mul_assoc]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of
   `𝓕.FieldOp`, and a `k` in `φsΛ.uncontracted`, `(φsΛ ↩Λ φ 0 (some k)).wickTerm` is equal
   to the product of
@@ -101,13 +103,13 @@ lemma staticWickTerm_insert_zero_some (φ : 𝓕.FieldOp) (φs : List 𝓕.Field
   · simp only [Fin.getElem_fin, not_and] at hn
     by_cases h0 : ¬ GradingCompliant φs φsΛ
     · rw [staticContract_of_not_gradingCompliant]
-      simp only [ZeroMemClass.coe_zero, zero_mul, smul_zero, instCommGroup.eq_1, mul_zero]
+      simp only [ZeroMemClass.coe_zero, zero_mul, smul_zero, mul_zero]
       exact h0
-    · simp_all only [not_not, instCommGroup.eq_1, forall_const]
+    · simp_all only [not_not, forall_const]
       have h1 : contractStateAtIndex φ [φsΛ]ᵘᶜ (uncontractedFieldOpEquiv φs φsΛ k) = 0 := by
         simp only [contractStateAtIndex, uncontractedFieldOpEquiv, Equiv.optionCongr_apply,
           Equiv.coe_trans, Option.map_some, Function.comp_apply, finCongr_apply,
-          instCommGroup.eq_1, Fin.val_cast, Fin.getElem_fin, smul_eq_zero]
+          Fin.val_cast, Fin.getElem_fin, smul_eq_zero]
         right
         simp only [uncontractedListGet, List.getElem_map,
           uncontractedList_getElem_uncontractedIndexEquiv_symm, List.get_eq_getElem]
@@ -116,6 +118,7 @@ lemma staticWickTerm_insert_zero_some (φ : 𝓕.FieldOp) (φs : List 𝓕.Field
       rw [h1]
       simp
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, the following relation
 holds

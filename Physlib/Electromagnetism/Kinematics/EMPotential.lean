@@ -123,6 +123,7 @@ Under a Lorentz transformation `Λ`, this transforms as
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime d}
     (Λ : LorentzGroup d) (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) :
     ∂_ μ (fun x => Λ • A (Λ⁻¹ • x)) x ν =
@@ -156,7 +157,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
       conv_lhs =>
         enter [1, 2, i]
         rw [fderiv_const_mul (hdif i)]
-      simp only [Nat.reduceSucc, ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_smul',
+      simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_smul',
         Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
       rw [Lorentz.Vector.smul_eq_sum]
       congr
@@ -180,7 +181,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
   apply Finset.sum_congr rfl (fun κ _ => ?_)
   rw [Finset.mul_sum]
   apply Finset.sum_congr rfl (fun ρ _ => ?_)
-  simp only [Nat.reduceSucc, smul_eq_mul]
+  simp only [smul_eq_mul]
   ring
 
 /-!
@@ -209,6 +210,7 @@ and derive the equations of motion.
 -/
 
 open ContDiff
+set_option backward.isDefEq.respectTransparency false in
 lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime d → Lorentz.Vector d)
     (hA : ContDiff ℝ ∞ A) :
         HasVarAdjDerivAt (fun (A' : SpaceTime d → Lorentz.Vector d) x => A' x μ)
@@ -294,7 +296,7 @@ lemma deriv_equivariant {d} {x : SpaceTime d} (A : ElectromagneticPotential d)
         rw [Finset.sum_smul]
         apply Finset.sum_congr rfl (fun ρ _ => ?_)
         congr 1
-        simp only [Nat.succ_eq_add_one, Nat.reduceAdd, smul_eq_mul]
+        simp only [smul_eq_mul]
         ring
       _ = ∑ μ, ∑ ν, ∑ κ, ∑ ρ, (∂_ ρ A (Λ⁻¹ • x) κ) •
           (Λ⁻¹.1 ρ μ • (Lorentz.CoVector.basis μ)) ⊗ₜ[ℝ]
@@ -305,7 +307,7 @@ lemma deriv_equivariant {d} {x : SpaceTime d} (A : ElectromagneticPotential d)
         refine Finset.sum_congr rfl (fun ρ _ => ?_)
         rw [smul_tmul, tmul_smul, tmul_smul, smul_smul, smul_smul]
         congr 1
-        simp only [Nat.reduceSucc, smul_eq_mul]
+        simp only [smul_eq_mul]
         ring
       _ = ∑ κ, ∑ ρ, ∑ μ, ∑ ν, (∂_ ρ A (Λ⁻¹ • x) κ) •
           (Λ⁻¹.1 ρ μ • (Lorentz.CoVector.basis μ)) ⊗ₜ[ℝ]
@@ -417,10 +419,12 @@ attribute [-simp] Nat.succ_eq_add_one
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The derivative of a electromagnetic potential, which is a distribution. -/
 noncomputable def deriv {d} : DistElectromagneticPotential d →ₗ[ℝ]
     (SpaceTime d) →d[ℝ] Lorentz.CoVector d ⊗[ℝ] Lorentz.Vector d := distTensorDeriv
 
+set_option backward.isDefEq.respectTransparency false in
 lemma deriv_eq_sum_sum {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
     deriv A ε =∑ μ, ∑ ν, (SpaceTime.distDeriv μ A ε ν) •
@@ -490,6 +494,7 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : DistElectromagneticPotential d)
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma deriv_equivariant {d} {A : DistElectromagneticPotential d}
     (Λ : LorentzGroup d) : deriv (Λ • A) = Λ • deriv A := by
   rw [deriv, distTensorDeriv_equivariant]

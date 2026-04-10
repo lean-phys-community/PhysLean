@@ -101,6 +101,7 @@ theorem Sᵥₙ_of_pure_zero (ψ : Ket d) : Sᵥₙ (MState.pure ψ) = 0 := by
   obtain ⟨i, hi⟩ := MState.spectrum_pure_eq_constant ψ
   rw [Sᵥₙ, hi, Hₛ_constant_eq_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem Sᵥₙ_eq_neg_trace_log (ρ : MState d) : Sᵥₙ ρ = -⟪ρ.M.log, ρ.M⟫ := by
   open HermitianMat in
   rw [log, inner_eq_re_trace]
@@ -112,6 +113,7 @@ theorem Sᵥₙ_eq_neg_trace_log (ρ : MState d) : Sᵥₙ ρ = -⟪ρ.M.log, ρ
   apply Finset.sum_equiv e.symm (by simp)
   simp [MState.spectrum, ProbDistribution.mk', he, mul_comm]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Von Neumann entropy is the trace of the matrix function `x ↦ -x log x`. -/
 theorem Sᵥₙ_eq_trace_cfc_negMulLog (ρ : MState d) :
     Sᵥₙ ρ = (ρ.M.cfc Real.negMulLog).trace := by
@@ -258,6 +260,7 @@ private lemma multiset_filter_map_ofReal_eq {R : Type*} [RCLike R] (M : Multiset
     (M.map (RCLike.ofReal : ℝ → R)).filter (· ≠ 0) = (M.filter (· ≠ 0)).map RCLike.ofReal := by
   simp [Multiset.filter_map]
 
+set_option backward.isDefEq.respectTransparency false in
 /-
 The non-zero roots of the characteristic polynomial are the non-zero eigenvalues mapped
 to complex numbers.

@@ -79,15 +79,20 @@ def coModContrModBi (d : ℕ) : CoMod d →ₗ[ℝ] ContrMod d →ₗ[ℝ] ℝ w
     covariant Lorentz vector in the
     standard basis (i.e. the dot product).
     In terms of index notation this is the contraction is ψⁱ φᵢ. -/
-def contrCoContract : Contr d ⊗ Co d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) where
-  hom := ModuleCat.ofHom <| TensorProduct.lift (contrModCoModBi d)
-  comm M := ModuleCat.hom_ext <| TensorProduct.ext' fun ψ φ => by
-    change (M.1 *ᵥ ψ.toFin1dℝ) ⬝ᵥ ((LorentzGroup.transpose M⁻¹).1 *ᵥ φ.toFin1dℝ) = _
-    rw [dotProduct_mulVec, LorentzGroup.transpose_val,
-      vecMul_transpose, mulVec_mulVec, LorentzGroup.coe_inv, inv_mul_of_invertible M.1]
-    simp only [one_mulVec, CategoryTheory.Equivalence.symm_inverse,
-      Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj]
-    rfl
+def contrCoContract : Contr d ⊗ Co d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) := Rep.ofHom <|
+  {
+    toLinearMap := TensorProduct.lift (contrModCoModBi d)
+    isIntertwining' Λ := by
+      ext ψ φ
+      simp only [Representation.tprod_apply, AlgebraTensorModule.curry_apply,
+        LinearMap.restrictScalars_self, curry_apply, LinearMap.coe_comp, Function.comp_apply,
+        map_tmul, lift.tmul, Representation.isTrivial_def, LinearMap.id_comp]
+      change (Λ.1 *ᵥ ψ.toFin1dℝ) ⬝ᵥ ((LorentzGroup.transpose Λ⁻¹).1 *ᵥ φ.toFin1dℝ) = _
+      rw [dotProduct_mulVec, LorentzGroup.transpose_val,
+        vecMul_transpose, mulVec_mulVec, LorentzGroup.coe_inv, inv_mul_of_invertible Λ.1]
+      simp only [one_mulVec]
+      rfl
+  }
 
 /-- Notation for `contrCoContract` acting on a tmul. -/
 local notation "⟪" ψ "," φ "⟫ₘ" => contrCoContract.hom (ψ ⊗ₜ φ)
@@ -100,15 +105,17 @@ lemma contrCoContract_hom_tmul (ψ : Contr d) (φ : Co d) : ⟪ψ, φ⟫ₘ = ψ
     covariant Lorentz vector in the
     standard basis (i.e. the dot product).
     In terms of index notation this is the contraction is ψⁱ φᵢ. -/
-def coContrContract : Co d ⊗ Contr d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) where
-  hom := ModuleCat.ofHom <| TensorProduct.lift (coModContrModBi d)
-  comm M := ModuleCat.hom_ext <| TensorProduct.ext' fun ψ φ => by
-    change ((LorentzGroup.transpose M⁻¹).1 *ᵥ ψ.toFin1dℝ) ⬝ᵥ (M.1 *ᵥ φ.toFin1dℝ) = _
-    rw [dotProduct_mulVec, LorentzGroup.transpose_val, mulVec_transpose, vecMul_vecMul,
-      LorentzGroup.coe_inv, inv_mul_of_invertible M.1]
-    simp only [vecMul_one, CategoryTheory.Equivalence.symm_inverse,
-      Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj]
-    rfl
+def coContrContract : Co d ⊗ Contr d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) := Rep.ofHom <|
+  {
+    toLinearMap := TensorProduct.lift (coModContrModBi d)
+    isIntertwining' Λ := by
+      ext ψ φ
+      change ((LorentzGroup.transpose Λ⁻¹).1 *ᵥ ψ.toFin1dℝ) ⬝ᵥ (Λ.1 *ᵥ φ.toFin1dℝ) = _
+      rw [dotProduct_mulVec, LorentzGroup.transpose_val, mulVec_transpose, vecMul_vecMul,
+        LorentzGroup.coe_inv, inv_mul_of_invertible Λ.1]
+      simp only [vecMul_one]
+      rfl
+  }
 
 /-- Notation for `coContrContract` acting on a tmul. -/
 local notation "⟪" φ "," ψ "⟫ₘ" => coContrContract.hom (φ ⊗ₜ ψ)
@@ -144,7 +151,7 @@ def contrContrContract : Contr d ⊗ Contr d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)
 /-- The linear map from Contr d ⊗ Contr d to ℝ induced by the homomorphism
   `Contr.toCo` and the contraction `contrCoContract`. -/
 def contrContrContractField : (Contr d).V ⊗[ℝ] (Contr d).V →ₗ[ℝ] ℝ :=
-  contrContrContract.hom.hom
+  contrContrContract.hom.toLinearMap
 
 /-- Notation for `contrContrContractField` acting on a tmul. -/
 local notation "⟪" ψ "," φ "⟫ₘ" => contrContrContractField (ψ ⊗ₜ φ)
@@ -165,8 +172,7 @@ local notation "⟪" ψ "," φ "⟫ₘ" => coCoContract.hom (ψ ⊗ₜ φ)
 
 lemma coCoContract_hom_tmul (φ : Co d) (ψ : Co d) :
     ⟪φ, ψ⟫ₘ = φ.toFin1dℝ ⬝ᵥ η *ᵥ ψ.toFin1dℝ:= by
-  simp only [Action.tensorUnit_V, Action.tensorObj_V, Equivalence.symm_inverse,
-    Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj]
+  simp only [Rep.tensorUnit_V, Rep.tensor_V, Rep.tensor_ρ, Rep.tensorUnit_ρ]
   erw [coContrContract_hom_tmul]
   rfl
 
@@ -183,7 +189,7 @@ variable (x y : Contr d)
 
 @[simp]
 lemma action_tmul (g : LorentzGroup d) : ⟪(Contr d).ρ g x, (Contr d).ρ g y⟫ₘ = ⟪x, y⟫ₘ :=
-  congrFun (congrArg (DFunLike.coe ∘ ModuleCat.Hom.hom) (contrContrContract.comm g)) (x ⊗ₜ[ℝ] y)
+  LinearMap.congr_fun (contrContrContract.hom.isIntertwining' g) (x ⊗ₜ[ℝ] y)
 
 lemma as_sum : ⟪x, y⟫ₘ = x.val (Sum.inl 0) * y.val (Sum.inl 0) -
     ∑ i, x.val (Sum.inr i) * y.val (Sum.inr i) := by
@@ -269,6 +275,7 @@ lemma nondegenerate : (∀ (x : Contr d), ⟪x, y⟫ₘ = 0) ↔ y = 0 := by
   · exact (self_parity_eq_zero_iff _).mp ((symm _ _).trans $ h _)
   · simp [h]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma matrix_apply_eq_iff_sub : ⟪x, Λ *ᵥ y⟫ₘ = ⟪x, Λ' *ᵥ y⟫ₘ ↔ ⟪x, (Λ - Λ') *ᵥ y⟫ₘ = 0 := by
   rw [← sub_eq_zero, ← LinearMap.map_sub, ← tmul_sub, ← ContrMod.sub_mulVec Λ Λ' y]
 
@@ -310,6 +317,7 @@ lemma _root_.LorentzGroup.mem_iff_invariant : Λ ∈ LorentzGroup d ↔
     rw [← matrix_eq_id_iff] at h
     exact LorentzGroup.mem_iff_dual_mul_self.mpr h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma _root_.LorentzGroup.mem_iff_norm : Λ ∈ LorentzGroup d ↔
     ∀ (w : Contr d), ⟪Λ *ᵥ w, Λ *ᵥ w⟫ₘ = ⟪w, w⟫ₘ := by
   rw [LorentzGroup.mem_iff_invariant]
@@ -325,11 +333,10 @@ lemma _root_.LorentzGroup.mem_iff_norm : Λ ∈ LorentzGroup d ↔
   apply e.injective
   have hp' := e.injective.eq_iff.mpr hp
   have hn' := e.injective.eq_iff.mpr hn
-  simp only [Action.tensorUnit_V, map_add, map_sub] at hp' hn'
+  simp only [map_add, map_sub] at hp' hn'
   linear_combination (norm := ring_nf) (1 / 4) * hp' + (-1/ 4) * hn'
   rw [symm (Λ *ᵥ y) (Λ *ᵥ x), symm y x]
-  simp only [Action.tensorUnit_V]
-  ring
+  simp
 
 /-!
 
@@ -409,6 +416,7 @@ lemma matrix_apply_stdBasis (ν μ : Fin 1 ⊕ Fin d) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma same_eq_det_toSelfAdjoint (x : ContrMod 3) :
     ⟪x, x⟫ₘ = det (ContrMod.toSelfAdjoint x).1 := by
   rw [ContrMod.toSelfAdjoint_apply_coe, as_sum_toSpace, det_fin_two,
@@ -421,7 +429,8 @@ lemma same_eq_det_toSelfAdjoint (x : ContrMod 3) :
     cons_val', cons_val_zero, cons_val_fin_one, sub_zero, cons_val_one, sub_neg_eq_add, ne_eq,
     zero_ne_one, not_false_eq_true, one_apply_ne, zero_sub, one_ne_zero]
   ring_nf
-  simp
+  simp only [Fin.isValue, I_sq, mul_neg, mul_one, sub_left_inj]
+  ring
 
 end contrContrContractField
 
@@ -434,7 +443,7 @@ end contrContrContractField
 lemma contrCoContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
     contrCoContract.hom (contrBasis d i ⊗ₜ coBasis d j) = if i = j then (1 : ℝ) else 0 := by
   rw [contrCoContract_hom_tmul]
-  simp only [Action.tensorUnit_V, contrBasis_toFin1dℝ, coBasis_toFin1dℝ, dotProduct_single, mul_one]
+  simp only [contrBasis_toFin1dℝ, coBasis_toFin1dℝ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   congr 1
   simp [eq_comm]
@@ -442,7 +451,7 @@ lemma contrCoContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
 lemma coContrContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
     coContrContract.hom (coBasis d i ⊗ₜ[ℝ] contrBasis d j) = if i = j then (1 : ℝ) else 0 := by
   rw [coContrContract_hom_tmul]
-  simp only [Action.tensorUnit_V, coBasis_toFin1dℝ, contrBasis_toFin1dℝ, dotProduct_single, mul_one]
+  simp only [coBasis_toFin1dℝ, contrBasis_toFin1dℝ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   congr 1
   simp [eq_comm]

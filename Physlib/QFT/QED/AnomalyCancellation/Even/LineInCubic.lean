@@ -39,6 +39,7 @@ def LineInCubic (S : (PureU1 (2 * n.succ)).LinSols) : Prop :=
   ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ),
   accCube (2 * n.succ) (a • P g + b • P! f) = 0
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lineInCubic_expand {S : (PureU1 (2 * n.succ)).LinSols} (h : LineInCubic S) :
     ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f) (a b : ℚ),
     3 * a * b * (a * accCubeTriLinSymm (P g) (P g) (P! f)
@@ -94,6 +95,7 @@ lemma lineInCubicPerm_permute {S : (PureU1 (2 * n.succ)).LinSols}
   erw [← (FamilyPermutations (2 * n.succ)).linSolRep.map_mul M M']
   exact hS (M * M')
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ)).LinSols}
     (LIC : LineInCubicPerm S) :
     ∀ (j : Fin n) (g : Fin n.succ → ℚ) (f : Fin n → ℚ) (_ : S.val = Pa g f),

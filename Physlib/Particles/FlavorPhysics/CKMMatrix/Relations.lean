@@ -80,6 +80,7 @@ lemma normSq_Vud_plus_normSq_Vus (V : CKMMatrix) :
 lemma VudAbs_sq_add_VusAbs_sq : VudAbs V ^ 2 + VusAbs V ^2 = 1 - VubAbs V ^2 := by
   linear_combination VAbs_sum_sq_row_eq_one V 0
 
+set_option backward.isDefEq.respectTransparency false in
 lemma ud_us_ne_zero_iff_ub_ne_one (V : CKMMatrix) :
     [V]ud ≠ 0 ∨ [V]us ≠ 0 ↔ norm [V]ub ≠ 1 := by
   have h2 := V.fst_row_normalized_abs
@@ -304,6 +305,7 @@ lemma thd_col_normalized_normSq (V : CKMMatrix) :
   repeat rw [Complex.sq_norm] at h1
   exact h1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cb_eq_zero_of_ud_us_zero {V : CKMMatrix} (h : [V]ud = 0 ∧ [V]us = 0) :
     [V]cb = 0 := by
   have h1 := fst_row_normalized_abs V
@@ -317,6 +319,7 @@ lemma cb_eq_zero_of_ud_us_zero {V : CKMMatrix} (h : [V]ud = 0 ∧ [V]us = 0) :
     norm_eq_zero] at h1
   exact h1.1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cs_of_ud_us_zero {V : CKMMatrix} (ha : ¬ ([V]ud ≠ 0 ∨ [V]us ≠ 0)) :
     VcsAbs ⟦V⟧ = √(1 - VcdAbs ⟦V⟧ ^ 2) := by
   have h1 := snd_row_normalized_abs V
@@ -342,6 +345,7 @@ lemma VcbAbs_sq_add_VtbAbs_sq (V : Quotient CKMMatrixSetoid) :
     VcbAbs V ^ 2 + VtbAbs V ^ 2 = 1 - VubAbs V ^2 := by
   linear_combination (VAbs_sum_sq_col_eq_one V 2)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cb_tb_ne_zero_iff_ub_ne_one (V : CKMMatrix) :
     [V]cb ≠ 0 ∨ [V]tb ≠ 0 ↔ norm [V]ub ≠ 1 := by
   have h2 := V.thd_col_normalized_abs

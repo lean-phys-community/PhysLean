@@ -130,6 +130,7 @@ lemma V_rho_conj_mul_self_eq (ρAB : HermitianMat (dA × dB) ℂ) (hρ : ρAB.ma
   simp_all [ mul_assoc, Matrix.mul_assoc ];
   simp [ ← Matrix.mul_assoc, ← map_to_tensor_MES_prop ]
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The partial trace (left) of a positive definite matrix is positive definite.
 -/
@@ -304,7 +305,7 @@ theorem isometry_mul_conjTranspose_le_one {m n : Type*} [Fintype m] [Fintype n]
     simp_all [ Matrix.conjTranspose_sub, Matrix.conjTranspose_one, Matrix.conjTranspose_mul ];
   have h_pos : Matrix.PosSemidef (1 - V * Vᴴ) := by
     rw [ h_pos ] at *; apply Matrix.posSemidef_conjTranspose_mul_self;
-  grind
+  exact Matrix.le_iff.mpr h_pos
 
 /-
 If `A†A = I` and `B†B = I` (both isometries into the same space), then `||(A†B)|| ≤ 1`,
@@ -873,7 +874,8 @@ private lemma inner_one_kron_eq_inner_traceLeft
   refine' congr_arg ( fun x : ℂ => x.re ) _;
   refine' Finset.sum_bij ( fun x y => ( x.2, x.1 ) ) _ _ _ _ <;> simp [ Matrix.mul_apply ];
   intro a b; rw [ ← Equiv.sum_comp ( Equiv.prodComm d₁ d₂ ) ]
-  simp [ Matrix.one_apply, mul_comm ]
+  simp [mul_comm]
+  rfl
 
 open HermitianMat in
 private lemma hermitianMat_log_inv_eq_neg
@@ -896,6 +898,7 @@ private lemma PosDef_assoc'_traceRight
   apply PosDef_traceRight
   convert hρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪(-ρ.assoc'.traceRight.M.traceRight.log) ⊗ₖ (1 : HermitianMat (d₂ × d₃) ℂ) +
@@ -913,6 +916,7 @@ private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
   · rw [ Sᵥₙ_eq_neg_trace_log ];
     simp [ inner_one_kron_eq_inner_traceLeft ]
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma wm_inner_rhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪((-ρ.assoc'.traceRight.M.log) ⊗ₖ (1 : HermitianMat d₃ ℂ) +
@@ -957,6 +961,7 @@ private lemma Sᵥₙ_wm_pd [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
   rw [wm_inner_lhs ρ, wm_inner_rhs ρ] at h_inner
   linarith
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma MState.approx_by_pd
     (ρ : MState d₁) :
     ∃ (ρn : ℕ → MState d₁), (∀ n, (ρn n).M.mat.PosDef) ∧
@@ -996,6 +1001,7 @@ private lemma MState.approx_by_pd
     ext n; simp [ρn, Mixable.mix];
     congr! 1
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 private lemma MState.traceLeft_continuous :
     Continuous (MState.traceLeft : MState (d₁ × d₂) → MState d₂) := by
@@ -1008,6 +1014,7 @@ private lemma MState.traceLeft_continuous :
     · fun_prop;
   exact continuous_induced_rng.mpr ( by continuity )
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 private lemma MState.traceRight_continuous :
     Continuous (MState.traceRight : MState (d₁ × d₂) → MState d₁) := by
@@ -1096,6 +1103,7 @@ private def perm_AB_CR' (dA dB dC : Type*) :
   left_inv := by intro x; simp
   right_inv := by intro x; simp
 
+set_option backward.isDefEq.respectTransparency false in
 /- The CR-marginal of ρBCR equals the traceLeft of the AB|CR-relabeled purification. -/
 private lemma BCR_traceLeft_eq_purify_traceLeft (ρ : MState (dA × dB × dC)) :
     (ρBCR ρ).traceLeft =

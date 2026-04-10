@@ -52,6 +52,7 @@ lemma asCharges_ne_castSucc {k j : Fin n} (h : k ≠ j) :
       simp_all
     · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The basis elements as `LinSols`. -/
 @[simps!]
 def asLinSols (j : Fin n) : (PureU1 n.succ).LinSols :=

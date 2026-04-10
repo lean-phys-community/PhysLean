@@ -74,6 +74,7 @@ lemma memHS_iff {f : ℝ → ℂ} : MemHS f ↔
     MeasureTheory.AEStronglyMeasurable.pow (continuous_norm.comp_aestronglyMeasurable h1) ..
   simp [h0, HasFiniteIntegral]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma zero_memHS : MemHS 0 := by
   change MemHS (fun x => (0 : ℂ))

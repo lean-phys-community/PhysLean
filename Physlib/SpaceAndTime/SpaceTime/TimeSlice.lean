@@ -93,6 +93,7 @@ lemma timeSliceLinearEquiv_symm_apply {d : ℕ} {M : Type} [AddCommGroup M] [Mod
 -/
 open Distribution SchwartzMap
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The time slice of a distribution on `SpaceTime d` to form a distribution
   on `Time × Space d`. -/
 noncomputable def distTimeSlice {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
@@ -137,6 +138,7 @@ lemma distTimeSlice_symm_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma distTimeSlice_distDeriv_inl {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {c : SpeedOfLight}
     (f : (SpaceTime d) →d[ℝ] M) :
@@ -182,6 +184,7 @@ lemma distTimeSlice_symm_distTimeDeriv_eq {M d} [NormedAddCommGroup M] [NormedSp
   rw [distDeriv_inl_distTimeSlice_symm]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma distTimeSlice_distDeriv_inr {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {c : SpeedOfLight}
     (i : Fin d) (f : (SpaceTime d) →d[ℝ] M) :

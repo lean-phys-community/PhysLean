@@ -4,7 +4,7 @@ Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
 import Physlib.Meta.Basic
-import ImportGraph.Imports
+import ImportGraph
 import Mathlib.Lean.CoreM
 
 /-!

@@ -304,7 +304,7 @@ lemma exists_minimalSuperSet (S5 S10 : Finset 𝓩) {x y : ChargeSpectrum 𝓩}
     · have h0 := (some_qHd_mem_minimalSuperSet_of_none (S5 := S5) (S10 := S10) y1
         (by simp_all [mem_ofFinset_iff]) (x2 := (x2, x3, x4)))
       simpa using h0
-    · simp_all [hasSubset]
+    · simp_all [subset_def]
   | x1, y1, some x2, none =>
     simp at hsubset
   | x1, y1, none, some y2 =>
@@ -314,7 +314,7 @@ lemma exists_minimalSuperSet (S5 S10 : Finset 𝓩) {x y : ChargeSpectrum 𝓩}
     · have h0 := (some_qHu_mem_minimalSuperSet_of_none (x1 := x1) (S5 := S5) (S10 := S10) y2
         (by simp_all [mem_ofFinset_iff]) (x2 := (x3, x4)))
       simpa using h0
-    · simp_all [hasSubset]
+    · simp_all [subset_def]
   | none, none, none, none =>
     simp_all
   | some x1, some y1, none, none =>

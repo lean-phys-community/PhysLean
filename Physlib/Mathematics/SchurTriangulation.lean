@@ -65,6 +65,7 @@ end Equiv
 /-- The type family parameterized by `Bool` is finite if each type variant is finite. -/
 instance [M : Fintype m] [N : Fintype n] (b : Bool) : Fintype (cond b m n) := b.rec N M
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The type family parameterized by `Bool` has decidable equality if each type variant is
 decidable. -/
 instance [DecidableEq m] [DecidableEq n] : DecidableEq (Σ b, cond b m n)
@@ -136,6 +137,7 @@ variable [IsAlgClosed 𝕜]
 
 set_option maxHeartbeats 800000 in
 set_option maxRecDepth 2000 in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Don't use this definition directly.** This is the key algorithm behind
 `Matrix.schur_triangulation`. -/
 protected noncomputable def SchurTriangulationAux.of

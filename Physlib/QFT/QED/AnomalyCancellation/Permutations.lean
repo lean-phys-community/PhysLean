@@ -48,8 +48,7 @@ def permCharges {n : ℕ} : Representation ℚ (PermGroup n) (PureU1 n).Charges 
 
 lemma accGrav_invariant {n : ℕ} (f : (PermGroup n)) (S : (PureU1 n).Charges) :
     PureU1.accGrav n (permCharges f S) = accGrav n S := by
-  simp only [accGrav, PermGroup, permCharges, MonoidHom.coe_mk, OneHom.coe_mk, LinearMap.coe_mk,
-    AddHom.coe_mk, chargeMap_apply]
+  simp only [accGrav, PermGroup, permCharges, LinearMap.coe_mk, AddHom.coe_mk]
   apply (Equiv.Perm.sum_comp _ _ _ ?_)
   simp
 

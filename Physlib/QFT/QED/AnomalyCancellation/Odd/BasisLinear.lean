@@ -174,7 +174,7 @@ lemma sum_oddShift (S : Fin (2 * n + 1) → ℚ) :
 
 /-!
 
-### A.3. The shifte shifted split: Spltting the charges up via `((1+n)+1) + n.succ`
+### A.3. The shifted shifted split: Spltting the charges up via `((1+n)+1) + n.succ`
 
 -/
 
@@ -244,6 +244,26 @@ lemma oddSnd_eq_oddShiftSnd (j : Fin n) : oddSnd j = oddShiftSnd j := by
   rw [Fin.ext_iff]
   simp only [oddSnd, Fin.val_cast, Fin.val_natAdd, oddShiftSnd, add_left_inj]
   exact Nat.add_comm n 1
+
+lemma oddShiftZero_eq_oddFst : oddShiftZero = oddFst (0 : Fin n.succ) := by
+  ext
+  simp [oddShiftZero, oddFst]
+
+lemma oddShiftFst_castSucc_eq_oddFst_succ (j : Fin n) :
+    oddShiftFst j.castSucc = oddFst j.succ := by
+  rw [Fin.ext_iff]
+  simp only [oddShiftFst, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, oddFst, Fin.val_succ]
+  exact Nat.add_comm 1 ↑j
+
+lemma oddShiftFst_last_eq_oddMid : oddShiftFst (Fin.last n) = oddMid := by
+  rw [Fin.ext_iff]
+  simp only [oddShiftFst, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, oddMid, Fin.val_last]
+  exact Nat.add_comm 1 n
+
+lemma oddShiftSnd_eq_oddSnd (j : Fin n) : oddShiftSnd j = oddSnd j := by
+  rw [Fin.ext_iff]
+  simp only [oddShiftSnd, Fin.val_cast, Fin.val_natAdd, oddSnd, add_left_inj]
+  ring
 
 end theDeltas
 
@@ -424,6 +444,7 @@ lemma P_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P f) = 0 := by
   rw [sum_odd]
   simp [P_oddSnd, P_oddFst, P_oddMid]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma P_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P f) = 0 := by
   rw [accCube_explicit, sum_odd, P_oddMid]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, Function.comp_apply, zero_add]
@@ -671,6 +692,7 @@ lemma P!_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P! f) = 0 := by
   rw [sum_oddShift]
   simp [P!_oddShiftSnd, P!_oddShiftFst, P!_oddShiftZero]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P! f) = 0 := by
   rw [accCube_explicit, sum_oddShift, P!_oddShiftZero]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, Function.comp_apply, zero_add]
@@ -729,6 +751,7 @@ theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma P_P_P!_accCube (g : Fin n → ℚ) (j : Fin n) :
     accCubeTriLinSymm (P g) (P g) (basis!AsCharges j)
     = (P g (oddShiftFst j))^2 - (g j)^2 := by
@@ -781,7 +804,7 @@ lemma Pa_oddShiftShiftZero (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftZero
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
   nth_rewrite 1 [oddShiftShiftZero_eq_oddFst_zero]
   rw [oddShiftShiftZero_eq_oddShiftZero]
-  rw [P_oddFst, P!_oddShiftZero]
+  rw [P!_oddShiftZero, oddShiftZero_eq_oddFst, P_oddFst]
   exact Rat.add_zero (f 0)
 
 lemma Pa_oddShiftShiftFst (f g : Fin n.succ → ℚ) (j : Fin n) :
@@ -790,14 +813,14 @@ lemma Pa_oddShiftShiftFst (f g : Fin n.succ → ℚ) (j : Fin n) :
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
   nth_rewrite 1 [oddShiftShiftFst_eq_oddFst_succ]
   rw [oddShiftShiftFst_eq_oddShiftFst_castSucc]
-  rw [P_oddFst, P!_oddShiftFst]
+  rw [P!_oddShiftFst, oddShiftFst_castSucc_eq_oddFst_succ, P_oddFst]
 
 lemma Pa_oddShiftShiftMid (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftMid = g (Fin.last n) := by
   rw [Pa]
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
   nth_rewrite 1 [oddShiftShiftMid_eq_oddMid]
   rw [oddShiftShiftMid_eq_oddShiftFst_last]
-  rw [P_oddMid, P!_oddShiftFst]
+  rw [P!_oddShiftFst, oddShiftFst_last_eq_oddMid, P_oddMid]
   exact Rat.zero_add (g (Fin.last n))
 
 lemma Pa_oddShiftShiftSnd (f g : Fin n.succ → ℚ) (j : Fin n.succ) :
@@ -806,7 +829,7 @@ lemma Pa_oddShiftShiftSnd (f g : Fin n.succ → ℚ) (j : Fin n.succ) :
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
   nth_rewrite 1 [oddShiftShiftSnd_eq_oddSnd]
   rw [oddShiftShiftSnd_eq_oddShiftSnd]
-  rw [P_oddSnd, P!_oddShiftSnd]
+  rw [P!_oddShiftSnd, oddShiftSnd_eq_oddSnd, P_oddSnd]
   ring
 
 /-!
@@ -815,6 +838,7 @@ lemma Pa_oddShiftShiftSnd (f g : Fin n.succ → ℚ) (j : Fin n.succ) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_zero (f g : Fin n.succ → ℚ) (h : Pa f g = 0) :
     ∀ i, f i = 0 := by
   have h₃ := Pa_oddShiftShiftZero f g

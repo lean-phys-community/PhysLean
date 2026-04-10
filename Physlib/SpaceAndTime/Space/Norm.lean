@@ -132,6 +132,7 @@ lemma normPowerSeries_tendsto {d} (x : Space d) (hx : x ≠ 0) :
   · left
     simpa using hx
 
+set_option backward.isDefEq.respectTransparency false in
 lemma normPowerSeries_inv_tendsto {d} (x : Space d) (hx : x ≠ 0) :
     Filter.Tendsto (fun n => (normPowerSeries n x)⁻¹) Filter.atTop (𝓝 (‖x‖⁻¹)) := by
   apply Filter.Tendsto.inv₀
@@ -509,8 +510,10 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
         simp [mul_assoc]
         fun_prop
       · fun_prop
-      · exact η.differentiable
       · fun_prop
+      · intro _ _
+        apply Differentiable.differentiableAt
+        fun_prop
     _ = ∫ (x : Space d), η x *
         (m * ⟪(basis.repr.symm y), x⟫_ℝ * (normPowerSeries n x) ^ (m - 2)) := by
       congr
@@ -589,6 +592,7 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} (m : �
         simpa using hx
     simpa using h1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.succ - 1 : ℕ) + 1 ≤ m)
     (η : 𝓢(Space d.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ)) :
     Filter.Tendsto (fun n =>
@@ -734,8 +738,10 @@ lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
         conv => enter [1, x]; rw [fderiv_log_normPowerSeries]
         fun_prop
       · fun_prop
-      · exact η.differentiable
       · fun_prop
+      · intro _ _
+        apply Differentiable.differentiableAt
+        fun_prop
     _ = ∫ (x : Space d), η x * (⟪basis.repr.symm y, x⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ)) := by
       congr
       funext x
@@ -944,6 +950,7 @@ The proof
 -/
 open Distribution
 
+set_option backward.isDefEq.respectTransparency false in
 lemma distDiv_inv_pow_eq_dim {d : ℕ} :
     distDiv (distOfFunction (fun x : Space d.succ => ‖x‖ ^ (- d.succ : ℤ) • basis.repr x)
       (IsDistBounded.zpow_smul_repr_self (- d.succ : ℤ) (by omega))) =

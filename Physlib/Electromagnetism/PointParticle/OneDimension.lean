@@ -70,6 +70,7 @@ lemma oneDimPointParticleCurrentDensity_eq_distTranslate (c : SpeedOfLight) (q :
   ext η
   simp [distTranslate_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneDimPointParticleCurrentDensity_currentDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticleCurrentDensity c q r₀).currentDensity c = 0 := by
@@ -77,6 +78,7 @@ lemma oneDimPointParticleCurrentDensity_currentDensity (c : SpeedOfLight) (q : �
   simp [oneDimPointParticleCurrentDensity, DistLorentzCurrentDensity.currentDensity,
     Lorentz.Vector.spatialCLM, constantTime_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneDimPointParticleCurrentDensity_chargeDensity (c : SpeedOfLight) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticleCurrentDensity c q r₀).chargeDensity c =
@@ -126,6 +128,7 @@ lemma oneDimPointParticle_eq_distTranslate (𝓕 : FreeSpace) (q : ℝ) (r₀ : 
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma oneDimPointParticle_vectorPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticle 𝓕 q r₀).vectorPotential 𝓕.c = 0 := by
@@ -139,6 +142,7 @@ lemma oneDimPointParticle_vectorPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : S
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma oneDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticle 𝓕 q r₀).scalarPotential 𝓕.c =
     Space.constantTime (distOfFunction (fun x =>
@@ -190,8 +194,8 @@ lemma oneDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : Spa
 @[simp]
 lemma oneDimPointParticle_electricField_timeDeriv (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     Space.distTimeDeriv ((oneDimPointParticle 𝓕 q r₀).electricField 𝓕.c) = 0 := by
-  rw [oneDimPointParticle_electricField]
-  simp
+  rw [oneDimPointParticle_electricField, map_smul, constantTime_distTimeDeriv]
+  module
 
 /-!
 
@@ -238,6 +242,7 @@ lemma oneDimPointParticle_div_electricField {𝓕} (q : ℝ) (r₀ : Space 1) :
   · simp
   · simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma oneDimPointParticle_isExterma (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space 1) :
     (oneDimPointParticle 𝓕 q r₀).IsExtrema 𝓕 (oneDimPointParticleCurrentDensity 𝓕.c q r₀) := by
   rw [isExtrema_iff_components]

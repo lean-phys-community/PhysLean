@@ -67,6 +67,7 @@ lemma evalPCoeff_update_succAbove (i : Fin (n + 1)) [inst : DecidableEq (Fin (n 
 noncomputable def evalP (i : Fin (n + 1)) (b : Fin (S.repDim (c i))) (p : Pure S c) :
   Tensor S (c ∘ i.succAbove) := evalPCoeff i b p • (drop p i).toTensor
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma evalP_update_add [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
     (b : Fin (S.repDim (c i))) (p : Pure S c)
@@ -78,6 +79,7 @@ lemma evalP_update_add [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
   · simp [add_smul]
   · simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma evalP_update_smul [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
     (b : Fin (S.repDim (c i))) (p : Pure S c)
@@ -96,6 +98,7 @@ lemma evalP_update_smul [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The multi-linear map formed by evaluation of an index of pure tensors. -/
 noncomputable def evalPMultilinear {n : ℕ} {c : Fin (n + 1)→ C}
     (i : Fin (n + 1)) (b : Fin (S.repDim (c i))) :

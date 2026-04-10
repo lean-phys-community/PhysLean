@@ -73,6 +73,7 @@ noncomputable def reflectionlessPotential (x : ℝ) : ℝ :=
 noncomputable def tanhOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   fun x => Real.tanh (Q.κ * x) * ψ x
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Pointwise multiplication by a function of temperate growth -/
 noncomputable def mulByTemperateGrowth {g : ℝ → ℂ} (hg : g.HasTemperateGrowth) :
     𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
@@ -83,6 +84,7 @@ lemma scaled_tanh_hasTemperateGrowth (κ : ℝ) :
     Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x))) := by
   exact tanh_const_mul_hasTemperateGrowth κ
 
+set_option backward.isDefEq.respectTransparency false in
 /-- This is a helper lemma to show that the embedding of a real function with temperate growth in ℂ
   also has temperate growth -/
 private lemma complex_embedding_of_temperate_growth (f : ℝ → ℝ)
@@ -109,6 +111,7 @@ lemma scaled_tanh_complex_hasTemperateGrowth (κ : ℝ) :
   apply complex_embedding_of_temperate_growth
   apply scaled_tanh_hasTemperateGrowth
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Define tanh(κ X) multiplication pointwise as a Schwartz map -/
 noncomputable def tanhOperatorSchwartz (Q : ReflectionlessPotential) :
     𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
@@ -130,11 +133,13 @@ noncomputable def annihilationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   let factor : ℝ := 1 / Real.sqrt (2 * Q.m)
   fun x => factor * (momentumOperator ψ x - Complex.I * Q.ℏ * Q.κ * Q.tanhOperator ψ x)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- creation operator defined as a Schwartz map -/
 noncomputable def creationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
 (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz +
     ((Complex.I * Q.ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz
 
+set_option backward.isDefEq.respectTransparency false in
 /-- annihilation operator defined as a Schwartz map -/
 noncomputable def annihilationOperatorSchwartz (Q : ReflectionlessPotential) :
   𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=

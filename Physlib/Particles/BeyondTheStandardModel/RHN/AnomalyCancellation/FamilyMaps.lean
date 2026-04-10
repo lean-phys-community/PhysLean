@@ -53,6 +53,7 @@ def speciesFamilyProj {m n : ℕ} (h : n ≤ m) :
 def familyProjection {m n : ℕ} (h : n ≤ m) : (SMνCharges m).Charges →ₗ[ℚ] (SMνCharges n).Charges :=
   chargesMapOfSpeciesMap (speciesFamilyProj h)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For species, the embedding of the `m`-family charges onto the `n`-family charges, with all
 other charges zero. -/
 @[simps!]
@@ -103,11 +104,12 @@ lemma toSpecies_familyUniversal {n : ℕ} (j : Fin 6) (S : (SMνCharges 1).Charg
   erw [chargesMapOfSpeciesMap_toSpecies]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sum_familyUniversal {n : ℕ} (m : ℕ) (S : (SMνCharges 1).Charges) (j : Fin 6) :
     ∑ i, ((fun a => a ^ m) ∘ toSpecies j (familyUniversal n S)) i =
     n * (toSpecies j S ⟨0, by simp⟩) ^ m := by
-  simp only [SMνSpecies_numberCharges, Function.comp_apply, toSpecies_apply, Fin.zero_eta,
-    Fin.isValue]
+  simp only [SMνSpecies_numberCharges, Function.comp_apply, toSpecies_apply, toSpeciesEquiv_apply,
+    Fin.zero_eta, Fin.isValue, Nat.reduceMul]
   have h1 : (n : ℚ) * (toSpecies j S ⟨0, by simp⟩) ^ m =
       ∑ _i : Fin n, (toSpecies j S ⟨0, by simp⟩) ^ m := by
     rw [Fin.sum_const]
@@ -120,27 +122,32 @@ lemma sum_familyUniversal_one {n : ℕ} (S : (SMνCharges 1).Charges) (j : Fin 6
     ∑ i, toSpecies j (familyUniversal n S) i = n * (toSpecies j S ⟨0, by simp⟩) := by
   simpa using @sum_familyUniversal n 1 S j
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sum_familyUniversal_two {n : ℕ} (S : (SMνCharges 1).Charges)
     (T : (SMνCharges n).Charges) (j : Fin 6) :
     ∑ i, (toSpecies j (familyUniversal n S) i * toSpecies j T i) =
     (toSpecies j S ⟨0, by simp⟩) * ∑ i, toSpecies j T i := by
-  simp only [SMνSpecies_numberCharges, toSpecies_apply, Fin.zero_eta, Fin.isValue]
+  simp only [SMνSpecies_numberCharges, toSpecies_apply, toSpeciesEquiv_apply, Fin.zero_eta,
+    Fin.isValue, Nat.reduceMul]
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   erw [toSpecies_familyUniversal]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sum_familyUniversal_three {n : ℕ} (S : (SMνCharges 1).Charges)
     (T L : (SMνCharges n).Charges) (j : Fin 6) :
     ∑ i, (toSpecies j (familyUniversal n S) i * toSpecies j T i * toSpecies j L i) =
     (toSpecies j S ⟨0, by simp⟩) * ∑ i, toSpecies j T i * toSpecies j L i := by
-  simp only [SMνSpecies_numberCharges, toSpecies_apply, Fin.zero_eta, Fin.isValue]
+  simp only [SMνSpecies_numberCharges, toSpecies_apply, toSpeciesEquiv_apply, Fin.zero_eta,
+    Fin.isValue, Nat.reduceMul]
   rw [Finset.mul_sum]
   apply Finset.sum_congr
   · rfl
   · intro i _
     erw [toSpecies_familyUniversal]
-    simp only [SMνSpecies_numberCharges, Fin.zero_eta, Fin.isValue, toSpecies_apply]
+    simp only [SMνSpecies_numberCharges, Fin.zero_eta, Fin.isValue, toSpecies_apply,
+      toSpeciesEquiv_apply, Nat.reduceMul]
     ring
 
 lemma familyUniversal_accGrav (S : (SMνCharges 1).Charges) :

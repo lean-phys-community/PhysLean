@@ -30,6 +30,7 @@ open HilbertSpace SchwartzMap
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma positionOperatorSchwartz_commutation_momentumOperatorSchwartz
     (ψ : 𝓢(ℝ, ℂ)) : positionOperatorSchwartz (momentumOperatorSchwartz ψ)
     - momentumOperatorSchwartz (positionOperatorSchwartz ψ)
@@ -47,6 +48,7 @@ lemma positionOperatorSchwartz_commutation_momentumOperatorSchwartz
     fun_prop
   · exact SchwartzMap.differentiableAt ψ
 
+set_option backward.isDefEq.respectTransparency false in
 lemma positionOperatorSchwartz_momentumOperatorSchwartz_eq (ψ : 𝓢(ℝ, ℂ)) :
     positionOperatorSchwartz (momentumOperatorSchwartz ψ)
     = momentumOperatorSchwartz (positionOperatorSchwartz ψ)
@@ -54,6 +56,7 @@ lemma positionOperatorSchwartz_momentumOperatorSchwartz_eq (ψ : 𝓢(ℝ, ℂ))
   rw [← positionOperatorSchwartz_commutation_momentumOperatorSchwartz]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma momentumOperatorSchwartz_positionOperatorSchwartz_eq (ψ : 𝓢(ℝ, ℂ)) :
     momentumOperatorSchwartz (positionOperatorSchwartz ψ)
     = positionOperatorSchwartz (momentumOperatorSchwartz ψ)

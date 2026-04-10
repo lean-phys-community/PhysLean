@@ -47,6 +47,7 @@ lemma continuous_momentumOperator (ψ : ℝ → ℂ) (hψ : ContDiff ℝ 1 ψ) :
   rw [momentumOperator_eq_smul]
   fun_prop
 
+set_option backward.isDefEq.respectTransparency false in
 lemma momentumOperator_smul {ψ : ℝ → ℂ} (hψ : Differentiable ℝ ψ) (c : ℂ) :
     momentumOperator (c • ψ) = c • momentumOperator ψ := by
   rw [momentumOperator_eq_smul, momentumOperator_eq_smul]
@@ -75,6 +76,7 @@ lemma momentumOperator_add {ψ1 ψ2 : ℝ → ℂ}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The parity operator on the Schwartz maps is defined as the linear map from
   `𝓢(ℝ, ℂ)` to itself, such that `ψ` is taken to `fun x => - I ℏ * ψ' x`. -/
 def momentumOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) where
@@ -92,6 +94,7 @@ lemma momentumOperatorSchwartz_apply (ψ : 𝓢(ℝ, ℂ))
   rw [momentumOperatorSchwartz]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The unbounded momentum operator, whose domain is Schwartz maps. -/
 def momentumOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_injective :=
   UnboundedOperator.ofSelfCLM momentumOperatorSchwartz
@@ -102,6 +105,7 @@ def momentumOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_inje
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeWaveFunctional_generalized_eigenvector_momentumOperatorUnbounded (k : ℝ) :
     momentumOperatorUnbounded.IsGeneralizedEigenvector
       (planewaveFunctional k) (2 * Real.pi * ℏ * k) := by
@@ -131,6 +135,7 @@ lemma planeWaveFunctional_generalized_eigenvector_momentumOperatorUnbounded (k :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma momentumOperatorUnbounded_isSelfAdjoint : momentumOperatorUnbounded.IsSelfAdjoint := by
   intro ψ1 ψ2
   dsimp [momentumOperatorUnbounded]
@@ -180,9 +185,10 @@ lemma momentumOperatorUnbounded_isSelfAdjoint : momentumOperatorUnbounded.IsSelf
       rw [ContinuousLinearEquiv.integrable_comp_iff]
       exact SchwartzMap.integrable (ψ1)
     · exact SchwartzMap.memLp_top (ψ2) MeasureTheory.volume
-  · apply Differentiable.star
+  · intro _ _
+    apply Differentiable.star
     exact SchwartzMap.differentiable (ψ1)
-  · exact SchwartzMap.differentiable (ψ2)
+  · fun_prop
 
 end
 end OneDimension

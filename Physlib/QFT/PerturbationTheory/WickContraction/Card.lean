@@ -65,6 +65,7 @@ lemma finset_succAbove_succ_disjoint (a : Finset (Fin n)) (i : Fin n.succ) :
   · exact fun x hx => Fin.succ_ne_zero (i.succAbove x)
   · exact fun x hx => Fin.succAbove_ne i x
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Wick contraction in `WickContraction n.succ.succ` formed by a Wick contraction
   `WickContraction n` by inserting at the `0` and `i.succ` and contracting these two. -/
 def consAddContract (i : Fin n.succ) (c : WickContraction n) :
@@ -120,6 +121,7 @@ lemma consAddContract_getDual?_self_succ (i : Fin n.succ) (c : WickContraction n
   rw [getDual?_eq_some_iff_mem]
   simp [consAddContract, Finset.pair_comm]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma mem_consAddContract_of_mem_iff (i : Fin n.succ) (c : WickContraction n) (a : Finset (Fin n)) :
     a ∈ c.1 ↔ (a.map i.succAboveEmb).map (Fin.succEmb n.succ) ∈ (consAddContract i c).1 := by
   simp only [succ_eq_add_one, consAddContract, Finset.le_eq_subset, Finset.mem_union,
@@ -159,6 +161,7 @@ lemma consAddContract_injective (i : Fin n.succ) : Function.Injective (consAddCo
     rw [← mem_consAddContract_of_mem_iff] at ha'
     exact ha'
 
+set_option backward.isDefEq.respectTransparency false in
 lemma consAddContract_surjective_on_zero_contract (i : Fin n.succ)
     (c : WickContraction n.succ.succ)
     (h : (c.getDual? 0).isSome) (h2 : (c.getDual? 0).get h = i.succ) :

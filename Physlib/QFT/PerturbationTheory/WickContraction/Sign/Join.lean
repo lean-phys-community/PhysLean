@@ -309,7 +309,7 @@ lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
     {x // ¬ (((singleton h).join φsucΛ).getDual? x).isSome} := by
     exact (Equiv.sumCompl fun a => (((singleton h).join φsucΛ).getDual? a).isSome = true).symm
   rw [joinSignLeftExtra, ofFinset_eq_prod, map_prod, ← e2.symm.prod_comp]
-  simp only [Fin.getElem_fin, Fintype.prod_sum_type, instCommGroup]
+  simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_lhs =>
     enter [2, 2, x]
     simp only [Equiv.symm_symm, Equiv.sumCompl_apply_inl, Equiv.sumCompl_apply_inr, e2]
@@ -345,7 +345,7 @@ lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
   · have hi1 : ¬ uncontractedListEmd (φsucΛ.fstFieldOfContract a) < i := by omega
     simp [hj1, hi1]
   · have hj1 : uncontractedListEmd (φsucΛ.fstFieldOfContract a) < j := by omega
-    simp only [hj1, and_true, instCommGroup, Fin.getElem_fin, true_and]
+    simp only [hj1, and_true, Fin.getElem_fin, true_and]
     by_cases hi2 : ¬ i < uncontractedListEmd (φsucΛ.sndFieldOfContract a)
     · have hi1 : ¬ i < uncontractedListEmd (φsucΛ.fstFieldOfContract a) := by omega
       have hj2 : ¬ j < uncontractedListEmd (φsucΛ.sndFieldOfContract a) := by omega
@@ -372,7 +372,7 @@ lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
           have hj2 : ¬ uncontractedListEmd (φsucΛ.sndFieldOfContract a) < j := by omega
           simp only [hj2, ↓reduceIte, map_one]
           rw [← ofFinset_union_disjoint]
-          simp only [instCommGroup, ofFinset_singleton, List.get_eq_getElem]
+          simp only [ofFinset_singleton, List.get_eq_getElem]
           erw [hs]
           simp only [Fin.getElem_fin, mul_self, map_one]
           simp only [Finset.disjoint_singleton_right, Finset.mem_singleton]
@@ -388,7 +388,7 @@ lemma join_sign_singleton {φs : List 𝓕.FieldOp}
   have h1 : (joinSignRightExtra h φsucΛ * joinSignRightExtra h φsucΛ) = 1 := by
     rw [← joinSignLeftExtra_eq_joinSignRightExtra h hs φsucΛ]
     simp [joinSignLeftExtra]
-  simp only [instCommGroup, Fin.getElem_fin, h1, mul_one]
+  simp only [Fin.getElem_fin, h1, mul_one]
   rw [sign, prod_join]
   congr
   · rw [singleton_prod]
@@ -433,6 +433,7 @@ lemma join_sign {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (join φsΛ φsucΛ).sign = φsΛ.sign * φsucΛ.sign :=
   join_sign_induction φsΛ φsucΛ hc (φsΛ).1.card rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a list `φs` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`,
   and a Wick contraction `φsucΛ` of `[φsΛ]ᵘᶜ`,
   `(join φsΛ φsucΛ).sign • (join φsΛ φsucΛ).timeContract` is equal to the product of

@@ -33,6 +33,7 @@ open complexLorentzTensor
 open TensorSpecies
 open Tensor
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The statement that ` σᵥᵃᵇ σᵛᵃ'ᵇ' = 2 εᵃᵃ' εᵇᵇ'`. -/
 lemma pauliCo_contr_pauliContr :
     {σ_^^ | ν α β ⊗ σ^^^ | ν α' β' = (2 : ℂ) •ₜ εL | α α' ⊗ εR | β β'}ᵀ := by

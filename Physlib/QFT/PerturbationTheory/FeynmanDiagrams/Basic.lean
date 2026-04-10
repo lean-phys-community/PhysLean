@@ -9,7 +9,6 @@ public import Mathlib.Tactic.FinCases
 public import Mathlib.CategoryTheory.Comma.Over.Basic
 public import Mathlib.CategoryTheory.IsomorphismClasses
 public import Mathlib.Data.Fintype.Perm
-public import Mathlib.Combinatorics.SimpleGraph.Connectivity.WalkCounting
 /-!
 # Feynman diagrams
 

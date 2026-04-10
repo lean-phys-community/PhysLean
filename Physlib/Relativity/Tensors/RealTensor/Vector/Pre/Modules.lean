@@ -183,12 +183,14 @@ lemma mulVec_mulVec (M N : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : 
 
 /-- A `NormedAddCommGroup` structure on `ContrMod`. This is not an instance, as we
   don't want it to be applied always. -/
+@[reducible]
 def norm : NormedAddCommGroup (ContrMod d) where
   norm v := ‖v.val‖₊
   dist_self x := Pi.normedAddCommGroup.dist_self x.val
   dist_triangle x y z := Pi.normedAddCommGroup.dist_triangle x.val y.val z.val
   dist_comm x y := Pi.normedAddCommGroup.dist_comm x.val y.val
   eq_of_dist_eq_zero {x y} := fun h => ext (MetricSpace.eq_of_dist_eq_zero h)
+  dist_eq x y := Pi.normedAddCommGroup.dist_eq x.val y.val
 
 /-- The underlying space part of a `ContrMod` formed by removing the first element.
   A better name for this might be `tail`. -/
@@ -223,6 +225,7 @@ def toSelfAdjoint : ContrMod 3 ≃ₗ[ℝ] selfAdjoint (Matrix (Fin 2) (Fin 2) �
   PauliMatrix.pauliBasis'.repr.symm
 
 open PauliMatrix in
+set_option backward.isDefEq.respectTransparency false in
 lemma toSelfAdjoint_apply (x : ContrMod 3) : toSelfAdjoint x =
     x.toFin1dℝ (Sum.inl 0) • ⟨pauliMatrix (Sum.inl 0), pauliMatrix_selfAdjoint _⟩
     - x.toFin1dℝ (Sum.inr 0) • ⟨pauliMatrix (Sum.inr 0), pauliMatrix_selfAdjoint _⟩
@@ -248,14 +251,16 @@ lemma toSelfAdjoint_apply_coe (x : ContrMod 3) : (toSelfAdjoint x).1 =
   rw [toSelfAdjoint_apply]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toSelfAdjoint_stdBasis (i : Fin 1 ⊕ Fin 3) :
     toSelfAdjoint (stdBasis i) = PauliMatrix.pauliBasis' i := by
   rw [toSelfAdjoint_apply]
   match i with
   | Sum.inl 0 =>
     simp only [stdBasis, Fin.isValue, Basis.coe_ofEquivFun, LinearEquiv.apply_symm_apply,
-      Pi.single_eq_same, one_smul, ne_eq, reduceCtorEq, not_false_eq_true, Pi.single_eq_of_ne,
-      zero_smul, sub_zero, PauliMatrix.pauliBasis', Basis.coe_mk, PauliMatrix.pauliSelfAdjoint']
+      Pi.single_eq_same, MulAction.one_smul, ne_eq, reduceCtorEq, not_false_eq_true,
+      Pi.single_eq_of_ne, MulActionWithZero.zero_smul, sub_zero, PauliMatrix.pauliBasis',
+      Basis.coe_mk, PauliMatrix.pauliSelfAdjoint']
   | Sum.inr 0 =>
     simp only [stdBasis, Fin.isValue, Basis.coe_ofEquivFun, LinearEquiv.apply_symm_apply, ne_eq,
       reduceCtorEq, not_false_eq_true, Pi.single_eq_of_ne, zero_smul, Pi.single_eq_same, one_smul,

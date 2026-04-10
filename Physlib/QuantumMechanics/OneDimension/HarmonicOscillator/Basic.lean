@@ -196,6 +196,7 @@ lemma schrodingerOperator_add (ψ φ : ℝ → ℂ)
   simp only [Pi.add_apply]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Schrodinger operator is homogeneous. -/
 lemma schrodingerOperator_smul (c : ℂ) (ψ : ℝ → ℂ)
     (hψ : Differentiable ℝ ψ) (hψ' : Differentiable ℝ (deriv ψ)) :

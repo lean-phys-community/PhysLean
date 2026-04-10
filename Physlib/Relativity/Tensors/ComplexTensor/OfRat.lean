@@ -118,6 +118,7 @@ lemma prodT_ofRat_ofRat {n n1 : ℕ} {c : Fin n → complexLorentzTensor.Color}
   rw [prodT_basis_repr_apply]
   simp only [ofRat_basis_repr_apply, map_mul]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrT_ofRat_eq_sum_dropPairSection {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color}
     {i j : Fin (n + 1 + 1)} {h : i ≠ j ∧ complexLorentzTensor.τ (c i) = c j }
     (f : (ComponentIdx c) → RatComplexNum) :
@@ -138,6 +139,7 @@ lemma contrT_ofRat_eq_sum_dropPairSection {n : ℕ} {c : Fin (n + 1 + 1) → com
   erw [ofRat_basis_repr_apply]
 
 open ComponentIdx
+set_option backward.isDefEq.respectTransparency false in
 lemma contrT_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color}
     {i j : Fin (n + 1 + 1)} {h : i ≠ j ∧ complexLorentzTensor.τ (c i) = c j }
     (f : (ComponentIdx c) → RatComplexNum) :

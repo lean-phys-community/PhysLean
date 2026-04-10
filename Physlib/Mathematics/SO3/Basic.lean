@@ -92,6 +92,7 @@ lemma toProd_embedding : IsEmbedding toProd where
   eq_induced := (isInducing_iff ⇑toProd).mp (IsInducing.of_comp toProd_continuous
     continuous_fst ((isInducing_iff (Prod.fst ∘ ⇑toProd)).mpr rfl))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The embedding of `SO(3)` into `GL (Fin 3) ℝ`. -/
 lemma toGL_embedding : IsEmbedding toGL.toFun where
   injective := toGL_injective

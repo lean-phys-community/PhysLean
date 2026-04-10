@@ -117,6 +117,7 @@ on the size of `u` applied to `η`.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The construction of a distribution from the following data:
 1. We take a finite set `s` of pairs `(k, n) ∈ ℕ × ℕ` that will be explained later.
 2. We take a linear map `u` that evaluates the given Schwartz function `η`. At this stage we don't
@@ -300,6 +301,7 @@ variable (E : Type) [NormedAddCommGroup E]
   [NormedSpace 𝕜 F] [SMulCommClass ℝ 𝕜 F]
   [MeasureSpace E] [BorelSpace E] [SecondCountableTopology E]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The constant distribution `E →d[𝕜] F`, for a given `c : F` this corresponds
   to the integral `∫ x, η x • c ∂MeasureTheory.volume`. -/
 def const [hμ : Measure.HasTemperateGrowth (volume (α := E))] (c : F) : E →d[𝕜] F := by
@@ -372,7 +374,7 @@ lemma fderivD_const [hμ : Measure.IsAddHaarMeasure (volume (α := E))]
   · simp
   · apply MeasureTheory.Integrable.smul_const
     exact integrable η
-  · exact SchwartzMap.differentiable η
+  · fun_prop
   · simp
 
 end
@@ -426,6 +428,7 @@ upper-half plane (determined by the last coordinate in `EuclideanSpace ℝ (Fin 
 -/
 open MeasureTheory
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Heaviside step distribution defined on `(EuclideanSpace ℝ (Fin d.succ)) `
   equal to `1` in the positive `z`-direction and `0` in the negative `z`-direction. -/
 def heavisideStep (d : ℕ) : (EuclideanSpace ℝ (Fin d.succ)) →d[ℝ] ℝ := by

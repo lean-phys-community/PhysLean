@@ -305,6 +305,7 @@ section vectorSlotRepr
 
 open TensorSpecies Tensor Lorentz Lorentz.SL2C Module
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 Component formula for the standard contravariant vector slot `Color.up`.
 
@@ -340,6 +341,7 @@ lemma repr_ρ_basis_vector_up_of_eq (c₀ : Color) (h : c₀ = Color.up) (Λ : S
   subst h
   simpa using repr_ρ_basis_vector_up Λ b i
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 Component formula for the standard covariant vector slot `Color.down`.
 

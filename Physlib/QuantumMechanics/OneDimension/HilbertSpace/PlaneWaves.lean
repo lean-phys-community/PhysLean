@@ -27,6 +27,7 @@ noncomputable section
 namespace HilbertSpace
 open MeasureTheory SchwartzMap TemperedDistribution
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Plane waves as a member of the dual of the
   Schwartz submodule of the Hilbert space.
 
@@ -35,10 +36,12 @@ open MeasureTheory SchwartzMap TemperedDistribution
 def planewaveFunctional (k : ℝ) : 𝓢(ℝ, ℂ) →L[ℂ] ℂ :=
   (TemperedDistribution.delta k : SchwartzMap ℝ ℂ →L[ℂ] ℂ) ∘L (SchwartzMap.fourierTransformCLM ℂ)
 
+set_option backward.isDefEq.respectTransparency false in
 open FourierTransform in
 lemma planewaveFunctional_apply (k : ℝ) (ψ : 𝓢(ℝ, ℂ)) :
     planewaveFunctional k ψ = 𝓕 ψ k := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Two elements of the Schwartz submodule are equal if and only if they are equal on
   all applications of `planewaveFunctional`. -/
 lemma eq_of_eq_planewaveFunctional {ψ1 ψ2 : 𝓢(ℝ, ℂ)}

@@ -75,6 +75,7 @@ def special (S : (PlusU1 n).QuadSols) (a b : ℚ) (h1 : α₁ S = 0) (h2 : α₂
     (PlusU1 n).Sols :=
   quadToAF (BL.addQuad S a b) (cube_α₁_α₂_zero S a b h1 h2)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma special_on_AF (S : (PlusU1 n).Sols) (h1 : α₁ S.1 = 0) :
     special S.1 1 0 h1 (α₂_AF S) = S := by
   apply ACCSystem.Sols.ext

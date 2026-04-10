@@ -31,6 +31,7 @@ open BigOperators
 /-- The line through $Y_3$ and $B_3$ as `LinSols`. -/
 def lineY₃B₃Charges (a b : ℚ) : MSSMACC.LinSols := a • Y₃.1.1 + b • B₃.1.1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lineY₃B₃Charges_quad (a b : ℚ) : accQuad (lineY₃B₃Charges a b).val = 0 := by
   change accQuad (a • Y₃.val + b • B₃.val) = 0
   rw [accQuad]
@@ -43,6 +44,7 @@ lemma lineY₃B₃Charges_quad (a b : ℚ) : accQuad (lineY₃B₃Charges a b).v
   apply Or.inr ∘ Or.inr
   with_unfolding_all rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lineY₃B₃Charges_cubic (a b : ℚ) : accCube (lineY₃B₃Charges a b).val = 0 := by
   change accCube (a • Y₃.val + b • B₃.val) = 0
   rw [accCube]
@@ -60,6 +62,7 @@ lemma lineY₃B₃Charges_cubic (a b : ℚ) : accCube (lineY₃B₃Charges a b).
 def lineY₃B₃ (a b : ℚ) : MSSMACC.Sols :=
   AnomalyFreeMk' (lineY₃B₃Charges a b) (lineY₃B₃Charges_quad a b) (lineY₃B₃Charges_cubic a b)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma doublePoint_Y₃_B₃ (R : MSSMACC.LinSols) :
     cubeTriLin Y₃.val B₃.val R.val = 0 := by
   simp only [cubeTriLin, TriLinearSymm.mk₃_toFun_apply_apply, cubeTriLinToFun,
@@ -78,8 +81,10 @@ lemma doublePoint_Y₃_B₃ (R : MSSMACC.LinSols) :
   simp only [Fin.isValue, Fin.sum_univ_three, Prod.mk_zero_zero, LinearMap.coe_mk, AddHom.coe_mk,
     Prod.mk_one_one] at h1 h2 h3
   linear_combination (norm := ring_nf) -(12 * h2) + 9 * h1 + 3 * h3
-  simp only [Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one, add_add_sub_cancel, add_neg_cancel]
+  simp only [Nat.reduceMul, Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one, add_sub_cancel_left,
+    sub_self]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lineY₃B₃_doublePoint (R : MSSMACC.LinSols) (a b : ℚ) :
     cubeTriLin (lineY₃B₃ a b).val (lineY₃B₃ a b).val R.val = 0 := by
   change cubeTriLin (a • Y₃.val + b • B₃.val) (a • Y₃.val + b • B₃.val) R.val = 0

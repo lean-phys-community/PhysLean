@@ -43,11 +43,11 @@ def doubleEmptyLineLinter : PhyslibTextLinter := fun lines ↦ Id.run do
 def doubleSpaceLinter : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
-    if String.containsSubstr l.trimLeft "  " then
-      let k := (Substring.findAllSubstr l "  ").toList.getLast?
+    if String.containsSubstr l.trimAsciiStart.copy "  " then
+      let k := (Substring.Raw.findAllSubstr l "  ").toList.getLast?
       let col := match k with
         | none => 1
-        | some k => String.offsetOfPos l k.stopPos
+        | some k => String.Pos.Raw.offsetOfPos l k.stopPos
       some (s!" Non-initial double space in line.", lno, col)
     else none)
   errors.toArray
@@ -65,10 +65,10 @@ def substringLinter (s : String) : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
     if String.containsSubstr l s then
-      let k := (Substring.findAllSubstr l s).toList.getLast?
+      let k := (Substring.Raw.findAllSubstr l s).toList.getLast?
       let col := match k with
         | none => 1
-        | some k => String.offsetOfPos l k.stopPos
+        | some k => String.Pos.Raw.offsetOfPos l k.stopPos
       some (s!" Found instance of substring `{s}`.", lno, col)
     else none)
   errors.toArray
@@ -85,7 +85,7 @@ def endLineLinter (s : String) : PhyslibTextLinter := fun lines ↦ Id.run do
 def numInitialSpacesEven : PhyslibTextLinter := fun lines ↦ Id.run do
   let enumLines := (lines.toList.zipIdx 1)
   let errors := enumLines.filterMap (fun (l, lno) ↦
-    let numSpaces := (l.takeWhile (· == ' ')).length
+    let numSpaces := (l.takeWhile (· == ' ')).positions.length
     if numSpaces % 2 != 0 then
       some (s!"Number of initial spaces is not even.", lno, 1)
     else none)

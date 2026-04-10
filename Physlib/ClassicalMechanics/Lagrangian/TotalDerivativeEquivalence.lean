@@ -89,6 +89,7 @@ When δL depends only on velocity (the free particle case), the condition simpli
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A velocity-only function that is a total time derivative must be linear in velocity.
 
     If δL depends only on velocity and equals d/dt F(r, t) for some F,

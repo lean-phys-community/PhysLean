@@ -603,6 +603,7 @@ open minkowskiMatrix SchwartzMap Lorentz
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The magnetic field matrix of an electromagnetic potential which is a distribution. -/
 noncomputable def magneticFieldMatrix {d} (c : SpeedOfLight) :
     DistElectromagneticPotential d →ₗ[ℝ]
@@ -624,6 +625,7 @@ noncomputable def magneticFieldMatrix {d} (c : SpeedOfLight) :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma magneticFieldMatrix_eq_vectorPotential {c : SpeedOfLight}
     (A : DistElectromagneticPotential d)
     (ε : 𝓢(Time × Space d, ℝ)) :
@@ -667,6 +669,7 @@ lemma magneticFieldMatrix_distSpaceDeriv_basis_repr_eq_vector_potential {c : Spe
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma magneticFieldMatrix_basis_repr_eq_fieldStrength {c : SpeedOfLight}
     (A : DistElectromagneticPotential d)
     (ε : 𝓢(Time × Space d, ℝ)) (i j : Fin d) :
@@ -676,7 +679,7 @@ lemma magneticFieldMatrix_basis_repr_eq_fieldStrength {c : SpeedOfLight}
         (distTimeSlice c A.fieldStrength ε) (Sum.inr i, Sum.inr j) := by
   simp only [magneticFieldMatrix_eq_vectorPotential, EuclideanSpace.basisFun_apply, map_sum,
     map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul, Finset.sum_apply, Pi.smul_apply,
-    Basis.tensorProduct_repr_tmul_apply, PiLp.basisFun_repr, EuclideanSpace.single_apply,
+    Basis.tensorProduct_repr_tmul_apply, PiLp.basisFun_repr, PiLp.single_apply,
     smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel, Finset.sum_ite_eq,
     Finset.mem_univ, ↓reduceIte, Finset.sum_const_zero, distTimeSlice_apply,
     fieldStrength_basis_repr_eq_single, inr_i_inr_i, neg_mul, one_mul, sub_neg_eq_add]

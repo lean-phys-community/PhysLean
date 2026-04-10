@@ -147,7 +147,7 @@ lemma timeOrderSign_pair_ordered {φ ψ : 𝓕.FieldOp} (h : timeOrderRel φ ψ)
 
 lemma timeOrderSign_pair_not_ordered {φ ψ : 𝓕.FieldOp} (h : ¬ timeOrderRel φ ψ) :
     timeOrderSign [φ, ψ] = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ψ) := by
-  simp only [timeOrderSign, Wick.koszulSign, Wick.koszulSignInsert, mul_one, instCommGroup.eq_1]
+  simp only [timeOrderSign, Wick.koszulSign, Wick.koszulSignInsert, mul_one]
   rw [if_neg h]
   simp [FieldStatistic.exchangeSign_eq_if]
 
@@ -249,7 +249,7 @@ lemma crAnTimeOrderSign_pair_ordered {φ ψ : 𝓕.CrAnFieldOp} (h : crAnTimeOrd
 
 lemma crAnTimeOrderSign_pair_not_ordered {φ ψ : 𝓕.CrAnFieldOp} (h : ¬ crAnTimeOrderRel φ ψ) :
     crAnTimeOrderSign [φ, ψ] = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ψ) := by
-  simp only [crAnTimeOrderSign, Wick.koszulSign, Wick.koszulSignInsert, mul_one, instCommGroup.eq_1]
+  simp only [crAnTimeOrderSign, Wick.koszulSign, Wick.koszulSignInsert, mul_one]
   rw [if_neg h]
   simp [FieldStatistic.exchangeSign_eq_if]
 
@@ -432,6 +432,7 @@ def crAnSectionTimeOrder (φs : List 𝓕.FieldOp) (ψs : CrAnSection φs) :
     CrAnSection (timeOrderList φs) :=
   ⟨crAnTimeOrderList ψs.1, crAnTimeOrderList_crAnSection_is_crAnSection ψs⟩
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_crAnTimeOrderRel_injective {ψ ψ' : 𝓕.CrAnFieldOp} (h : ψ.1 = ψ'.1) :
     {φs : List 𝓕.FieldOp} → (ψs ψs' : 𝓕.CrAnSection φs) →
     (ho : List.orderedInsert crAnTimeOrderRel ψ ψs.1 =
@@ -469,6 +470,7 @@ lemma orderedInsert_crAnTimeOrderRel_injective {ψ ψ' : 𝓕.CrAnFieldOp} (h : 
         rw [Subtype.ext_iff] at ih'
         exact ih'.2
 
+set_option backward.isDefEq.respectTransparency false in
 lemma crAnSectionTimeOrder_injective : {φs : List 𝓕.FieldOp} →
     Function.Injective (𝓕.crAnSectionTimeOrder φs)
   | [], ⟨[], _⟩, ⟨[], _⟩ => by

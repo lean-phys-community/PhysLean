@@ -27,6 +27,7 @@ variable [RCLike 𝕜] [DecidableEq n]
 
 namespace Matrix
 
+set_option backward.isDefEq.respectTransparency false in
 theorem zero_rank_eq_zero {A : Matrix n n 𝕜} [Fintype n] (hA : A.rank = 0) : A = 0 := by
   have h : ∀ v, A.mulVecLin v = 0 := by
     intro v
@@ -58,6 +59,7 @@ theorem smul_real (c : ℝ) : (c • A).IsHermitian := by
   ext
   simp only [smul_apply, smul_eq_mul, RCLike.real_smul_eq_coe_mul]
 
+set_option backward.isDefEq.respectTransparency false in
 def HermitianSubspace (n 𝕜 : Type*) [Fintype n] [RCLike 𝕜] : Subspace ℝ (Matrix n n 𝕜) where
   carrier := { A : Matrix n n 𝕜 | A.IsHermitian }
   add_mem' _ _ := by simp_all only [Set.mem_setOf_eq, IsHermitian.add]
@@ -276,6 +278,7 @@ theorem zero_dotProduct_zero_iff : (∀ x : m → 𝕜, 0 = star x ⬝ᵥ A.mulV
   · rintro rfl
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 omit [Fintype m] in
 theorem pos_smul {c : 𝕜} (hA : (c • A).PosSemidef) (hc : 0 < c) : A.PosSemidef := by
   have : 0 < 1/c := by
@@ -715,6 +718,7 @@ theorem PosDef.reindex_iff {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq 
   convert h.reindex e.symm
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 theorem PosSemidef.rsmul {n : Type*} [Fintype n] {M : Matrix n n ℂ} (hM : M.PosSemidef) {c : ℝ} (hc : 0 ≤ c) :
     (c • M).PosSemidef := by
   rw [Matrix.posSemidef_iff_dotProduct_mulVec] at hM ⊢
@@ -746,6 +750,7 @@ theorem PosDef_iff_eigenvalues' (M : Matrix d d 𝕜) :
   ⟨fun h ↦ ⟨h.left, h.left.posDef_iff_eigenvalues_pos.mp h⟩,
     fun ⟨w, h⟩ ↦ w.posDef_iff_eigenvalues_pos.mpr h⟩
 
+set_option backward.isDefEq.respectTransparency false in
 --These is disgusting atm. There's cleaner versions of them headed to Mathlib. See #29526 and follow-ups
 theorem IsHermitian.cfc_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) (f : ℝ → ℝ) :
     ∃ (e : d ≃ d), Matrix.IsHermitian.eigenvalues (cfc_predicate f M) = f ∘ hM.eigenvalues ∘ e := by
@@ -855,6 +860,7 @@ open ComplexOrder
 
 variable {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem cfc_diagonal (g : d → ℝ) (f : ℝ → ℝ) :
     cfc f (Matrix.diagonal (fun x ↦ (g x : 𝕜))) = diagonal (RCLike.ofReal ∘ f ∘ g) := by
@@ -893,11 +899,13 @@ theorem PosSemidef.pos_of_mem_spectrum {A : Matrix d d 𝕜} (hA : A.PosSemidef)
   rcases hr with ⟨i, rfl⟩
   exact hA.eigenvalues_nonneg i
 
+set_option backward.isDefEq.respectTransparency false in
 theorem PosSemidef.pow_add {A : Matrix d d 𝕜} (hA : A.PosSemidef) {x y : ℝ} (hxy : x + y ≠ 0) :
     cfc (· ^ (x + y) : ℝ → ℝ) A = cfc (fun r ↦ r ^ x * r ^ y : ℝ → ℝ) A := by
   refine cfc_congr fun r hr ↦ ?_
   exact Real.rpow_add' (hA.pos_of_mem_spectrum r hr) hxy
 
+set_option backward.isDefEq.respectTransparency false in
 theorem PosSemidef.pow_mul {A : Matrix d d 𝕜} {x y : ℝ} (hA : A.PosSemidef) :
     cfc (· ^ (x * y) : ℝ → ℝ) A = cfc (fun r ↦ (r ^ x) ^ y : ℝ → ℝ) A := by
   refine cfc_congr fun r hr ↦ ?_
@@ -1134,6 +1142,7 @@ theorem spectrum_prod {d d₂ : Type*}
 
 end spectrum_kron
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 open MatrixOrder in
 theorem PosDef.zero_lt {n : Type*} [Nonempty n] [Fintype n] {A : Matrix n n ℂ} (hA : A.PosDef) : 0 < A := by
@@ -1245,6 +1254,7 @@ lemma iInf_eigenvalues_le_dotProduct_mulVec (hA : A.IsHermitian) (v : d → ℂ)
   rw [Matrix.posSemidef_iff_dotProduct_mulVec] at hA
   exact hA.right v
 
+set_option backward.isDefEq.respectTransparency false in
 lemma iInf_eigenvalues_le_of_posSemidef
   (hAB : (B - A).PosSemidef) (hA : A.IsHermitian) (hB : B.IsHermitian) :
     iInf hA.eigenvalues ≤ iInf hB.eigenvalues := by
@@ -1252,7 +1262,7 @@ lemma iInf_eigenvalues_le_of_posSemidef
   · simp
   contrapose! hAB
   rw [posSemidef_iff_dotProduct_mulVec]
-  push_neg
+  simp only [not_and, not_forall]
   intro _
   apply exists_lt_of_ciInf_lt at hAB
   rcases hAB with ⟨i, hi⟩
@@ -1288,9 +1298,11 @@ open MatrixOrder
 
 variable {d : Type*} [Fintype d]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma _shortcut_posSMulMono : PosSMulMono ℝ (Matrix d d ℂ) :=
   inferInstance
 
+set_option backward.isDefEq.respectTransparency false in
 lemma _shortcut_posSmulReflectLE : PosSMulReflectLE ℝ (Matrix d d ℂ) :=
   inferInstance
 
@@ -1421,6 +1433,7 @@ theorem IsHermitian.spectrum_subset_Ici_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
   norm_cast at this;
   nlinarith
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 theorem IsHermitian.spectrum_subset_Iic_of_sub {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
   {A x : Matrix d d 𝕜} (hA : A.IsHermitian) (hl : (A - x).PosSemidef) :
@@ -1435,7 +1448,7 @@ theorem IsHermitian.spectrum_subset_Iic_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
     convert h
     rw [iInf, iSup, ← spectrum_real_eq_range_eigenvalues, ← spectrum_real_eq_range_eigenvalues]
     rw [← spectrum.neg_eq, csInf_neg ?_ (A.finite_real_spectrum.bddAbove), neg_neg]
-    exact IsSelfAdjoint.spectrum_nonempty hA
+    exact ContinuousFunctionalCalculus.spectrum_nonempty _ hA
   · convert hl using 1
     abel
 
@@ -1541,6 +1554,7 @@ theorem trace_piProd [CommSemiring R] :
   symm
   simp [trace, piProd, Fintype.prod_sum]
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder MatrixOrder in
 theorem PosSemidef.piProd [RCLike R] (hA : ∀ i, (A i).PosSemidef) :
     (piProd A).PosSemidef := by

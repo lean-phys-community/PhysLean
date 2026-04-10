@@ -57,6 +57,7 @@ variable {d : ℕ} (i : Fin d)
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Component `i` of the momentum operator is the continuous linear map
 from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `-iℏ ∂ᵢψ`. -/
 def momentumOperator : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
@@ -81,12 +82,14 @@ lemma momentumOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐩 i ψ
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The square of the momentum operator, `𝐩² ≔ ∑ᵢ 𝐩ᵢ∘𝐩ᵢ`. -/
 def momentumOperatorSqr : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) := ∑ i, 𝐩 i ∘L 𝐩 i
 
 @[inherit_doc momentumOperatorSqr]
 notation "𝐩²" => momentumOperatorSqr
 
+set_option backward.isDefEq.respectTransparency false in
 lemma momentumOperatorSqr_eq : 𝐩² = ∑ i : Fin d, 𝐩 i ∘L 𝐩 i := rfl
 
 lemma momentumOperatorSqr_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
@@ -104,10 +107,12 @@ lemma momentumOperatorSqr_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
 
 open SpaceDHilbertSpace MeasureTheory
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The momentum operators defined on the Schwartz submodule. -/
 def momentumOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
   schwartzEquiv.toLinearMap ∘ₗ (𝐩 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
+set_option backward.isDefEq.respectTransparency false in
 lemma momentumOperatorSchwartz_isSymmetric :
     (momentumOperatorSchwartz i).IsSymmetric := by
   intro ψ ψ'

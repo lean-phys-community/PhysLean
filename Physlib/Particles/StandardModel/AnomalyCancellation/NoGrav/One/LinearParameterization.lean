@@ -81,6 +81,7 @@ def asLinear (S : linearParameters) : (SMNoGrav 1).LinSols :=
 lemma asLinear_val (S : linearParameters) : S.asLinear.val = S.asCharges := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cubic (S : linearParameters) :
     accCube (S.asCharges) = - 54 * S.Q'^3 - 18 * S.Q' * S.Y ^ 2 + S.E'^3 := by
   simp only [HomogeneousCubic, accCube, cubeTriLin, TriLinearSymm.toCubic_apply,
@@ -91,11 +92,13 @@ lemma cubic (S : linearParameters) :
   simp only [asCharges, neg_add_rev, neg_mul, mul_neg, neg_neg]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cubic_zero_Q'_zero (S : linearParameters) (hc : accCube (S.asCharges) = 0)
     (h : S.Q' = 0) : S.E' = 0 := by
   rw [cubic, h] at hc
   simpa using hc
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cubic_zero_E'_zero (S : linearParameters) (hc : accCube (S.asCharges) = 0)
     (h : S.E' = 0) : S.Q' = 0 := by
   rw [cubic, h] at hc
@@ -111,6 +114,7 @@ lemma cubic_zero_E'_zero (S : linearParameters) (hc : accCube (S.asCharges) = 0)
     exact h2.1
   · exact hc
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The bijection between the type of linear parameters and `(SMNoGrav 1).LinSols`. -/
 def bijection : linearParameters ≃ (SMNoGrav 1).LinSols where
   toFun S := S.asLinear
@@ -140,24 +144,24 @@ def bijection : linearParameters ≃ (SMNoGrav 1).LinSols where
     erw [speciesVal]
     have h1 := SU3Sol S
     simp only [accSU3, SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero,
-      Fin.isValue, toSpecies_apply, Nat.reduceMul, Finset.sum_singleton, Prod.mk_zero_zero,
+      Fin.isValue, toSpecies_apply, Finset.sum_singleton,
       LinearMap.coe_mk, AddHom.coe_mk] at h1
     have h2 := SU2Sol S
     simp only [accSU2, SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero,
-      Fin.isValue, toSpecies_apply, Nat.reduceMul, Finset.sum_singleton, Prod.mk_zero_zero,
+      Fin.isValue, toSpecies_apply, Finset.sum_singleton,
       LinearMap.coe_mk, AddHom.coe_mk] at h2
     match i with
     | 0 => rfl
     | 1 =>
-      simp only [asCharges, Nat.reduceMul, Fin.isValue, toSpecies_apply]
+      simp only [asCharges, Fin.isValue, toSpecies_apply]
       field_simp
       linear_combination -(1 * h1)
     | 2 =>
-      simp only [asCharges, Nat.reduceMul, Fin.isValue, neg_add_rev, toSpecies_apply]
+      simp only [asCharges, Fin.isValue, neg_add_rev, toSpecies_apply]
       field_simp
       linear_combination -(1 * h1)
     | 3 =>
-      simp only [asCharges, Nat.reduceMul, Fin.isValue, neg_mul, toSpecies_apply]
+      simp only [asCharges, Fin.isValue, neg_mul, toSpecies_apply]
       field_simp
       linear_combination -(1 * h2)
     | 4 => rfl
@@ -229,6 +233,7 @@ def tolinearParametersQNeqZero (S : {S : linearParameters // S.Q' ≠ 0 ∧ S.E'
       simp only [neg_eq_zero, mul_eq_zero, OfNat.ofNat_ne_zero, or_false]
       simpa using S.2⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A bijection between the type `linearParametersQENeqZero` and linear parameters
   with `Q'` and `E'` non-zero. -/
 @[simps!]
@@ -281,7 +286,7 @@ lemma cubic (S : linearParametersQENeqZero) :
   field_simp
   simp [hQ]
   ring_nf
-  have h1 : -216 + (-(S.v ^ 3 * 216) - S.w ^ 3 * 216) = - 216 *(S.v ^3 + S.w ^3 +1) := by
+  have h1 : -216 - S.v ^ 3 * 216 - S.w ^ 3 * 216 = - 216 *(S.v ^3 + S.w ^3 +1) := by
     ring
   rw [h1]
   simp_all
@@ -298,6 +303,7 @@ lemma cubic_v_or_w_zero (S : linearParametersQENeqZero) (h : accCube (bijection 
   have h2 := FLTThree S.v S.w (-1) hn.1 hn.2 (Ne.symm (ne_of_beq_false (by rfl)))
   exact h2 h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cubic_v_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.val = 0)
     (hv : S.v = 0) : S.w = -1 := by
   rw [S.cubic, hv] at h
@@ -316,6 +322,7 @@ lemma cubic_v_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.
   simp_all
   exact eq_neg_of_add_eq_zero_left h'
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cube_w_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.val = 0)
     (hw : S.w = 0) : S.v = -1 := by
   rw [S.cubic, hw] at h
@@ -334,6 +341,7 @@ lemma cube_w_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.v
   simp_all only [one_mul, neg_mul, mul_eq_zero, ne_eq, or_false]
   exact eq_neg_of_add_eq_zero_left h'
 
+set_option backward.isDefEq.respectTransparency false in
 lemma cube_w_v (S : linearParametersQENeqZero) (h : accCube (bijection S).1.val = 0) :
     (S.v = -1 ∧ S.w = 0) ∨ (S.v = 0 ∧ S.w = -1) := by
   have h' := cubic_v_or_w_zero S h

@@ -103,10 +103,8 @@ def realLorentzTensor (d : ℕ := 3) : TensorSpecies ℝ realLorentzTensor.Color
     | Color.down => Lorentz.preContrCoUnit_symm
   contr_metric := fun c =>
     match c with
-    | Color.up => by
-      simpa using Lorentz.contrCoContract_apply_metric
-    | Color.down => by
-      simpa using Lorentz.coContrContract_apply_metric
+    | Color.up => Lorentz.contrCoContract_apply_metric
+    | Color.down => Lorentz.coContrContract_apply_metric
 
 namespace realLorentzTensor
 
@@ -183,6 +181,7 @@ lemma τ_down_eq_up {d : ℕ} : (realLorentzTensor d).τ Color.down = Color.up :
 
 open TensorSpecies
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contr_basis {d : ℕ} {c : realLorentzTensor.Color}
     (i : Fin ((realLorentzTensor d).repDim c))
     (j : Fin ((realLorentzTensor d).repDim ((realLorentzTensor d).τ c))) :
@@ -241,7 +240,6 @@ lemma contrT_basis_repr_apply_eq_fin {n d: ℕ} {c : Fin (n + 1 + 1) → realLor
   rw [← e.symm.sum_comp]
   congr
   funext x
-  simp only
   rw [Finset.sum_eq_single (Fin.cast (by simp) x)]
   · erw [contr_basis]
     simp [e]

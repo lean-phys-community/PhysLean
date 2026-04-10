@@ -148,6 +148,7 @@ lemma altRightMetric_eq_fromPairT : εR' = fromPairT (Fermion.altRightMetricVal)
 -/
 
 open Lorentz in
+set_option backward.isDefEq.respectTransparency false in
 lemma coMetric_eq_complexCoBasis : η' =
     fromPairT (complexCoBasis (Sum.inl 0) ⊗ₜ[ℂ] complexCoBasis (Sum.inl 0))
     - fromPairT (complexCoBasis (Sum.inr 0) ⊗ₜ[ℂ] complexCoBasis (Sum.inr 0))
@@ -167,6 +168,7 @@ lemma coMetric_eq_complexCoBasisFin4 : η' =
   rfl
 
 open Lorentz in
+set_option backward.isDefEq.respectTransparency false in
 lemma contrMetric_eq_complexContrBasis : η =
     fromPairT (complexContrBasis (Sum.inl 0) ⊗ₜ[ℂ] complexContrBasis (Sum.inl 0))
     - fromPairT (complexContrBasis (Sum.inr 0) ⊗ₜ[ℂ] complexContrBasis (Sum.inr 0))
@@ -186,12 +188,14 @@ lemma contrMetric_eq_complexContrBasisFin4 : η =
   rfl
 
 open Fermion in
+set_option backward.isDefEq.respectTransparency false in
 lemma leftMetric_eq_leftBasis : εL =
     - fromPairT (leftBasis 0 ⊗ₜ[ℂ] leftBasis 1)
     + fromPairT (leftBasis 1 ⊗ₜ[ℂ] leftBasis 0) := by
   rw [leftMetric_eq_fromPairT, leftMetricVal_expand_tmul]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 open Fermion in
 lemma altLeftMetric_eq_altLeftBasis : εL' =
     fromPairT (altLeftBasis 0 ⊗ₜ[ℂ] altLeftBasis 1)
@@ -200,6 +204,7 @@ lemma altLeftMetric_eq_altLeftBasis : εL' =
   simp
 
 open Fermion in
+set_option backward.isDefEq.respectTransparency false in
 lemma rightMetric_eq_rightBasis : εR =
     - fromPairT (rightBasis 0 ⊗ₜ[ℂ] rightBasis 1)
     + fromPairT (rightBasis 1 ⊗ₜ[ℂ] rightBasis 0) := by
@@ -207,6 +212,7 @@ lemma rightMetric_eq_rightBasis : εR =
   simp
 
 open Fermion in
+set_option backward.isDefEq.respectTransparency false in
 lemma altRightMetric_eq_altRightBasis : εR' =
     fromPairT (altRightBasis 0 ⊗ₜ[ℂ] altRightBasis 1)
     - fromPairT (altRightBasis 1 ⊗ₜ[ℂ] altRightBasis 0) := by
@@ -400,26 +406,32 @@ lemma altRightMetric_eq_ofRat : εR' = ofRat fun f =>
 
 open TensorSpecies
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `coMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_coMetric (g : SL(2,ℂ)) : g • η' = η' := by
   rw [metricTensor_invariant]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `contrMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_contrMetric (g : SL(2,ℂ)) : g • η = η := by
   rw [metricTensor_invariant]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `leftMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_leftMetric (g : SL(2,ℂ)) : g • εL = εL := by
   rw [metricTensor_invariant]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `rightMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_rightMetric (g : SL(2,ℂ)) : g • εR = εR := by
   rw [metricTensor_invariant]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `altLeftMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_altLeftMetric (g : SL(2,ℂ)) : g • εL' = εL' := by
   rw [metricTensor_invariant]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `altRightMetric` is invariant under the action of `SL(2,ℂ)`. -/
 lemma actionT_altRightMetric (g : SL(2,ℂ)) : g • εR' = εR' := by
   rw [metricTensor_invariant]

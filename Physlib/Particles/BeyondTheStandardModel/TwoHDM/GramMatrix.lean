@@ -92,6 +92,7 @@ lemma gramMatrix_det_eq_real (H : TwoHiggsDoublet) :
   rw [gramMatrix_det_eq]
   simp [← Complex.ofReal_pow, Complex.ofReal_im]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gramMatrix_det_nonneg (H : TwoHiggsDoublet) :
     0 ≤ H.gramMatrix.det.re := by
   rw [gramMatrix_det_eq_real]
@@ -113,6 +114,7 @@ lemma gramMatrix_tr_nonneg (H : TwoHiggsDoublet) :
   · rw [← Complex.ofReal_pow, Complex.ofReal_re]
     exact sq_nonneg ‖H.Φ2‖
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gaugeGroupI_exists_fst_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
     ∃ g : StandardModel.GaugeGroupI,
       g • H.Φ1 = (!₂[‖H.Φ1‖, 0] : HiggsVec) ∧
@@ -185,6 +187,7 @@ lemma gaugeGroupI_exists_fst_eq_snd_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) 
       rw [h1, h_snd_1]
       simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
     H1 ∈ MulAction.orbit GaugeGroupI H2 ↔ H1.gramMatrix = H2.gramMatrix := by
   apply Iff.intro
@@ -249,6 +252,7 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
 
 open ComplexConjugate
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gramMatrix_surjective_det_tr (K : Matrix (Fin 2) (Fin 2) ℂ)
     (hKs : IsSelfAdjoint K) (hKdet : 0 ≤ K.det.re) (hKtr : 0 ≤ K.trace.re) :
     ∃ H : TwoHiggsDoublet, H.gramMatrix = K := by
@@ -338,6 +342,7 @@ lemma gaugeGroupI_smul_fst_gramVector (g : StandardModel.GaugeGroupI)
   congr 1
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gramMatrix_eq_gramVector_sum_pauliMatrix (H : TwoHiggsDoublet) :
     gramMatrix H = (1 / 2 : ℝ) • ∑ μ, H.gramVector μ • PauliMatrix.pauliMatrix μ := by
   have h1 := congrArg (fun x => x.1) <|
@@ -365,6 +370,7 @@ lemma gramMatrix_eq_component_gramVector (H : TwoHiggsDoublet) :
   ring_nf
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gramVector_inl_eq_trace_gramMatrix (H : TwoHiggsDoublet) :
     H.gramVector (Sum.inl 0) = H.gramMatrix.trace.re := by
   rw [gramMatrix_eq_component_gramVector, Matrix.trace_fin_two]

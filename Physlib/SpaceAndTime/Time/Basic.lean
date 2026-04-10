@@ -282,6 +282,9 @@ instance : Module ℝ Time where
 instance : Norm Time where
   norm t := ‖t.val‖
 
+lemma norm_eq_val (t : Time) :
+    ‖t‖ = ‖t.val‖ := rfl
+
 instance : Dist Time where
   dist t1 t2 := ‖t1 - t2‖
 
@@ -295,6 +298,10 @@ instance : SeminormedAddCommGroup Time where
   dist_self t := by simp [dist_eq_real_dist]
   dist_comm t1 t2 := by simp [dist_eq_real_dist, dist_comm]
   dist_triangle := by simp [dist_eq_real_dist, dist_triangle]
+  dist_eq t1 t2 := by
+    simp [dist_eq_val, norm_eq_val]
+    rw [abs_eq_iff_mul_self_eq]
+    ring
 
 instance : NormedAddCommGroup Time where
   eq_of_dist_eq_zero := by
@@ -303,6 +310,10 @@ instance : NormedAddCommGroup Time where
     ext
     rw [sub_eq_zero] at h
     exact h
+  dist_eq t1 t2 := by
+    simp [dist_eq_val, norm_eq_val]
+    rw [abs_eq_iff_mul_self_eq]
+    ring
 
 instance : NormedSpace ℝ Time where
   norm_smul_le k t := by simp [abs_mul, norm]
@@ -354,6 +365,7 @@ instance : BorelSpace Time where
 -/
 open MeasureTheory
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The orthonomral basis on `Time` defined by `1`. -/
 noncomputable def basis : OrthonormalBasis (Fin 1) ℝ Time where
   repr := {

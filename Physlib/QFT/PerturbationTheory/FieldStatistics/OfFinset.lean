@@ -56,7 +56,7 @@ lemma ofFinset_finset_map {n m : ℕ}
 lemma ofFinset_insert (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finset (Fin φs.length))
     (i : Fin φs.length) (h : i ∉ a) :
     ofFinset q φs.get (Insert.insert i a) = (q φs[i]) * ofFinset q φs.get a := by
-  simp only [ofFinset, instCommGroup, Fin.getElem_fin]
+  simp only [ofFinset, Fin.getElem_fin]
   rw [← ofList_cons_eq_mul]
   have h1 : (φs[↑i] :: List.map φs.get (a.sort (fun x1 x2 => x1 ≤ x2)))
       = List.map φs.get (i :: a.sort (fun x1 x2 => x1 ≤ x2)) := by
@@ -79,7 +79,7 @@ lemma ofFinset_erase (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finset
   conv_rhs => rw [ha]
   rw [ofFinset_insert]
   rw [← mul_assoc]
-  simp only [instCommGroup, Fin.getElem_fin, mul_self, one_mul]
+  simp only [Fin.getElem_fin, mul_self, one_mul]
   simp
 
 lemma ofFinset_eq_prod (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finset (Fin φs.length)) :
@@ -97,7 +97,7 @@ lemma ofFinset_union (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a b : Fins
   rw [← Finset.prod_mul_distrib]
   congr
   funext x
-  simp only [instCommGroup, Fin.getElem_fin, mul_ite, ite_mul, mul_self, one_mul, mul_one,
+  simp only [Fin.getElem_fin, mul_ite, ite_mul, mul_self, one_mul, mul_one,
     Finset.mem_sdiff, Finset.mem_union, Finset.mem_inter, not_and]
   split
   · rename_i h
