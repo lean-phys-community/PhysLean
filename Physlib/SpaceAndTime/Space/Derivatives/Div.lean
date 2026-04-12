@@ -6,6 +6,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Grad
+public import Physlib.SpaceAndTime.Space.DistOfFunction
 /-!
 
 # Divergence on Space

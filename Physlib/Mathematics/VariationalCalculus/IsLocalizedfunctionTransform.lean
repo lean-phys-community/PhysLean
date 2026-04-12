@@ -5,7 +5,8 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Mathematics.VariationalCalculus.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.Mathematics.Calculus.AdjFDeriv
 /-!
 
 # Localized function transforms

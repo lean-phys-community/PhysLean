@@ -7,6 +7,7 @@ module
 
 public import Physlib.StringTheory.FTheory.SU5.Quanta.Basic
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Map
+public import Physlib.StringTheory.FTheory.SU5.Charges.Viable
 /-!
 
 # Anomaly cancellation

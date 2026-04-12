@@ -5,7 +5,11 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
+public import Mathlib.Analysis.Calculus.FDeriv.Star
 public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.PlanckConstant
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PlaneWaves
 /-!
 
 # Momentum operator

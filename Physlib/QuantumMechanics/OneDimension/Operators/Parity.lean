@@ -5,8 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PositionStates
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
 public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
+public import Mathlib.MeasureTheory.Measure.Haar.Unique
 /-!
 
 # Parity operator

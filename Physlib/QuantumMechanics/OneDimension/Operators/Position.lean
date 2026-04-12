@@ -8,6 +8,7 @@ module
 public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PositionStates
 public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
 public import Physlib.Mathematics.Distribution.PowMul
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
 /-!
 
 # Position operator
@@ -26,7 +27,6 @@ namespace QuantumMechanics
 
 namespace OneDimension
 noncomputable section
-open Constants
 open HilbertSpace
 
 /-!

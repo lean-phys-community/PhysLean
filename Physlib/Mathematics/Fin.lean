@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Tactic.Polyrith
-public import Mathlib.Tactic.Linarith
+public import Mathlib.Algebra.Order.Group.Nat
+public import Mathlib.Algebra.Order.Monoid.NatCast
 public import Mathlib.Logic.Equiv.Fin.Basic
 /-!
 # Fin lemmas

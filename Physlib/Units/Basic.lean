@@ -11,6 +11,7 @@ public import Physlib.ClassicalMechanics.Mass.MassUnit
 public import Physlib.Electromagnetism.Charge.ChargeUnit
 public import Physlib.Thermodynamics.Temperature.TemperatureUnits
 public import Physlib.Units.Dimension
+public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 /-!
 
 # Dimensions and unit

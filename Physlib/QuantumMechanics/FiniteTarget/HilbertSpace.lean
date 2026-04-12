@@ -5,8 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Analysis.CStarAlgebra.Classes
-public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.InnerProductSpace.PiL2
 /-!
 

@@ -10,6 +10,7 @@ public import Mathlib.Tactic.FinCases
 public import Mathlib.Algebra.BigOperators.Group.Finset.Piecewise
 public import Mathlib.Data.Fintype.Card
 public import Mathlib.Algebra.FreeMonoid.Basic
+public import Mathlib.Data.List.Sort
 /-!
 
 # Field statistics

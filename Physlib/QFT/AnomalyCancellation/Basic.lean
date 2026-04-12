@@ -7,7 +7,6 @@ module
 
 public import Physlib.Mathematics.LinearMaps
 public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-public import Physlib.Meta.Linters.Sorry
 public import Mathlib.Tactic.Cases
 /-!
 # Anomaly cancellation conditions

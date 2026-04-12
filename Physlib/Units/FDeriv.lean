@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Units.WithDim.Basic
+public import Mathlib.Analysis.Calculus.FDeriv.Equiv
 /-!
 
 # Dimensional invariance of fderiv

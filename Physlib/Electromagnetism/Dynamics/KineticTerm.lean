@@ -7,6 +7,7 @@ module
 
 public import Physlib.Electromagnetism.Kinematics.MagneticField
 public import Physlib.Electromagnetism.Dynamics.Basic
+public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
 /-!
 
 # The kinetic term

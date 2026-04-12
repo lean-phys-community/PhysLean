@@ -7,6 +7,7 @@ module
 
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
+public import Mathlib.Tactic.FinCases
 /-!
 
 # Mapping charge spectra values

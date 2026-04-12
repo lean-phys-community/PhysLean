@@ -7,8 +7,6 @@ module
 
 public import Physlib.SpaceAndTime.SpaceTime.Derivatives
 public import Physlib.SpaceAndTime.TimeAndSpace.Basic
-public import Physlib.Meta.Informal.SemiFormal
-public import Physlib.Mathematics.FDerivCurry
 /-!
 # Time slice
 

@@ -5,6 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
+public import Mathlib.Analysis.Calculus.ContDiff.FiniteDimension
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 public import Physlib.SpaceAndTime.Space.Slice
 /-!
 

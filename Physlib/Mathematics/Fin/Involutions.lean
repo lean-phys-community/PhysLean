@@ -5,12 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Tactic.Polyrith
-public import Mathlib.Tactic.Linarith
-public import Mathlib.Data.Nat.Factorial.DoubleFactorial
 public import Mathlib.Data.Finset.Sort
 public import Mathlib.Data.Fintype.Pi
 public import Mathlib.Data.Fintype.Prod
+public import Mathlib.Data.Nat.Factorial.DoubleFactorial
 /-!
 # Fin involutions
 

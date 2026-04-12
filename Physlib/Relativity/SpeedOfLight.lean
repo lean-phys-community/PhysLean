@@ -5,8 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Algebra.Lie.Classical
-public import Mathlib.Analysis.Normed.Ring.Lemmas
+public import Mathlib.Data.Real.Basic
 /-!
 
 # The Speed of Light
@@ -33,7 +32,6 @@ and should be thought of as the speed of light in some chosen but arbitrary syst
 -/
 
 @[expose] public section
-open Matrix
 
 /-!
 

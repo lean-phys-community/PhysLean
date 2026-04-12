@@ -6,7 +6,6 @@ Authors: Tomas Skrivan
 module
 
 public import Physlib.Mathematics.InnerProductSpace.Basic
-public import Mathlib.Analysis.InnerProductSpace.Adjoint
 /-!
 
 # Generalization of calculus results to `InnerProductSpace'`

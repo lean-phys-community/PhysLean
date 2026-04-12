@@ -5,10 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.MeasureTheory.Function.L2Space
-public import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
-public import Physlib.Meta.Linters.Sorry
 public import Mathlib.Analysis.InnerProductSpace.Dual
+public import Mathlib.MeasureTheory.Function.L2Space
+public import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 /-!
 
 # Hilbert space for one dimension quantum mechanics

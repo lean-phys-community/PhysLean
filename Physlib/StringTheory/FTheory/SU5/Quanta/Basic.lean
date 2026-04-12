@@ -7,7 +7,6 @@ module
 
 public import Physlib.StringTheory.FTheory.SU5.Quanta.FiveQuanta
 public import Physlib.StringTheory.FTheory.SU5.Quanta.TenQuanta
-public import Physlib.StringTheory.FTheory.SU5.Charges.Viable
 /-!
 
 # Quanta of representations

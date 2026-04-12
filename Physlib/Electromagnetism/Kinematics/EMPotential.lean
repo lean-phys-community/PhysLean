@@ -5,9 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Electromagnetism.Basic
-public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
-public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
+public import Physlib.SpaceAndTime.SpaceTime.Derivatives
+public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
 /-!
 
 # The Electromagnetic Potential

@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Particles.StandardModel.Basic
-public import Mathlib.Analysis.InnerProductSpace.Adjoint
 public import Mathlib.Geometry.Manifold.VectorBundle.SmoothSection
 /-!
 

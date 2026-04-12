@@ -6,7 +6,6 @@ Authors: Matteo Cipollina
 module
 
 public import Mathlib.Analysis.InnerProductSpace.Basic
-public import Mathlib.Analysis.RCLike.Lemmas
 public import Mathlib.Geometry.Manifold.MFDeriv.Defs
 public import Mathlib.LinearAlgebra.BilinearForm.Properties
 public import Mathlib.LinearAlgebra.QuadraticForm.Real

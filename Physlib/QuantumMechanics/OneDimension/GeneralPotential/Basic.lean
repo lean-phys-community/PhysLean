@@ -6,7 +6,6 @@ Authors: Ammar Husain
 module
 
 public import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
-public import Physlib.QuantumMechanics.OneDimension.Operators.Position
 
 /-!
 
@@ -20,7 +19,7 @@ namespace QuantumMechanics
 
 namespace OneDimension
 
-open Physlib HilbertSpace Constants
+open HilbertSpace Constants
 
 private lemma fun_add {α : Type*} (f g : α → ℂ) :
   (fun x ↦ f x) + (fun x ↦ g x) = fun x ↦ f x + g x := by

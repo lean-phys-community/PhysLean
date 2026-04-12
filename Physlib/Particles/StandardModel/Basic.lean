@@ -5,9 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Geometry.Manifold.Instances.Real
-public import Physlib.Meta.Informal.SemiFormal
 public import Physlib.SpaceAndTime.SpaceTime.Basic
+public import Physlib.Meta.Linters.Sorry
 /-!
 # The Standard Model
 

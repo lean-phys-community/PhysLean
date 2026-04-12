@@ -5,8 +5,7 @@ Authors: Shlok Vaibhav Singh
 -/
 module
 
-public import Physlib.Meta.Informal.Basic
-public import Physlib.Meta.Sorry
+public import Physlib.Meta.Linters.Sorry
 /-!
 # Coplanar Double Pendulum
 ### Tag: LnL_1.5.1

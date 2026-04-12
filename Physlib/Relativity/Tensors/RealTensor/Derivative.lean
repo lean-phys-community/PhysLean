@@ -5,7 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.ComplexTensor.Basic
+public import Mathlib.Analysis.Calculus.FDeriv.Prod
+public import Physlib.Relativity.Tensors.Product
+public import Physlib.Relativity.Tensors.RealTensor.Basic
 /-!
 
 ## Derivative of Real Lorentz tensors

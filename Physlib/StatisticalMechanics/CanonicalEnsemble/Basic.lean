@@ -5,13 +5,9 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Thermodynamics.Temperature.Basic
-public import Mathlib.MeasureTheory.Measure.ProbabilityMeasure
-public import Mathlib.Analysis.Calculus.ParametricIntegral
-public import Physlib.Meta.Informal.SemiFormal
-public import Physlib.Meta.Linters.Sorry
-public import Mathlib.Analysis.SpecialFunctions.Log.Summable
 public import Mathlib.MeasureTheory.Integral.Prod
+public import Mathlib.Topology.MetricSpace.Polish
+public import Physlib.Thermodynamics.Temperature.Basic
 /-!
 # Canonical Ensemble: Core Definitions
 

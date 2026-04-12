@@ -7,7 +7,6 @@ module
 
 public import Physlib.Meta.TODO.Basic
 public import Mathlib.Data.Fintype.Sets
-public import Mathlib.Algebra.BigOperators.Group.List.Basic
 /-!
 
 # Allowed charges

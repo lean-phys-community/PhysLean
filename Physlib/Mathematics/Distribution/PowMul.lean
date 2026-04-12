@@ -5,8 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Mathematics.Distribution.Basic
-public import Mathlib.MeasureTheory.Constructions.HaarToSphere
+public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 /-!
 
 ## The multiple of a Schwartz map by `x`

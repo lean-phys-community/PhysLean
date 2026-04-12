@@ -7,6 +7,7 @@ module
 
 public import Physlib.QuantumMechanics.DDimensions.Hydrogen.Basic
 public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
+public import Physlib.Meta.Linters.Sorry
 /-!
 
 # Laplace-Runge-Lenz vector

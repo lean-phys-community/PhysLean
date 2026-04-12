@@ -5,11 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Electromagnetism.Dynamics.IsExtrema
-public import Physlib.SpaceAndTime.Space.Norm
-public import Physlib.SpaceAndTime.Space.Translations
-public import Physlib.SpaceAndTime.Space.ConstantSliceDist
-public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
+public import Physlib.Meta.TODO.Basic
 /-!
 # The electrostatics of a circular coil
 
@@ -38,8 +34,7 @@ TODO "TCGIW" "Copying the structure of the electrostatics of an infinite wire,
 
 namespace Electromagnetism
 namespace DistElectromagneticPotential
-open minkowskiMatrix SpaceTime SchwartzMap Lorentz
-attribute [-simp] Fintype.sum_sum_type
+
 attribute [-simp] Nat.succ_eq_add_one
 /-!
 

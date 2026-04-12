@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.OfFieldLabel
+public import Physlib.Particles.SuperSymmetry.SU5.Potential
 public import Mathlib.Tactic.Abel
 /-!
 

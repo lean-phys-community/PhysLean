@@ -5,9 +5,9 @@ Authors: Tomas Skrivan
 -/
 module
 
-public import Mathlib.Analysis.InnerProductSpace.Trace
+public import Mathlib.LinearAlgebra.Trace
 public import Physlib.Mathematics.Calculus.AdjFDeriv
-public import Physlib.SpaceAndTime.TimeAndSpace.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Div
 /-!
 
 # Divergence

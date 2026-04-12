@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith, Nikolai Kashcheev
 -/
 module
 
-public import Physlib.Meta.Linters.Sorry
 public import Physlib.Relativity.Tensors.ComplexTensor.Basic
 /-!
 

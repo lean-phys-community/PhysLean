@@ -6,7 +6,6 @@ Authors: Juan Jose Fernandez Morales
 
 module
 
-public import Mathlib.Algebra.BigOperators.Pi
 public import Mathlib.Algebra.BigOperators.Fin
 
 /-!

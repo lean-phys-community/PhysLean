@@ -5,7 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Electromagnetism.Basic
+public import Physlib.Relativity.SpeedOfLight
+public import Mathlib.Data.Real.Sqrt
 /-!
 
 # Free space

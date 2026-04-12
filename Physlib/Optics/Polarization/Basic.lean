@@ -5,7 +5,6 @@ Authors: Zhi Kai Pong
 -/
 module
 
-public import Physlib.Electromagnetism.Vacuum.HarmonicWave
 /-!
 
 # Polarization

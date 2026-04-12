@@ -6,10 +6,7 @@ Authors: Tomas Skrivan
 module
 
 public import Mathlib.Analysis.InnerProductSpace.Calculus
-public import Mathlib.Analysis.InnerProductSpace.Completion
 public import Mathlib.Analysis.InnerProductSpace.ProdL2
-public import Mathlib.Data.Real.Hom
-public import Mathlib.Data.Real.StarOrdered
 /-!
 
 # Inner product space

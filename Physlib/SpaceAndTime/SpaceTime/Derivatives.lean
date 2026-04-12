@@ -8,6 +8,8 @@ module
 public import Physlib.SpaceAndTime.SpaceTime.LorentzAction
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
 public import Mathlib.Analysis.InnerProductSpace.TensorProduct
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
 # Derivatives on SpaceTime

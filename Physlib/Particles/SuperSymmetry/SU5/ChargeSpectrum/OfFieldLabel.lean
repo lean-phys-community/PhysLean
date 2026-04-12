@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
+public import Physlib.Particles.SuperSymmetry.SU5.FieldLabels
 /-!
 
 # Charges associated with a field label

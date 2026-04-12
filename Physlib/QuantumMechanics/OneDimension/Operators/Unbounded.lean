@@ -5,9 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PlaneWaves
-public import Physlib.QuantumMechanics.PlanckConstant
-public import Mathlib.Analysis.Calculus.FDeriv.Star
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
 /-!
 
 # Unbounded operators
@@ -25,7 +23,6 @@ namespace QuantumMechanics
 
 namespace OneDimension
 noncomputable section
-open Constants
 open HilbertSpace
 
 /-- An unbounded operator on the one-dimensional Hilbert space,

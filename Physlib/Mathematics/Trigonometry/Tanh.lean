@@ -8,7 +8,7 @@ module
 public import Mathlib.Topology.Algebra.Polynomial
 public import Mathlib.Analysis.Calculus.Deriv.Polynomial
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-public import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
+public import Mathlib.Analysis.Distribution.TemperateGrowth
 /-!
 # Properties of Tanh
 We want to prove that the reflectionless potential is a Schwartz map.

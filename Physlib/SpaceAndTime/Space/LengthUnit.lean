@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Geometry.Manifold.Diffeomorph
-public import Physlib.SpaceAndTime.Time.Basic
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Units on Length

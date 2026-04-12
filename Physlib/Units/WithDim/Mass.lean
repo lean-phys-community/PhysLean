@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Units.Basic
 /-!
 # Mass
 
@@ -15,5 +14,3 @@ in an arbitrary (but given) set of units.
 -/
 
 @[expose] public section
-open Dimension
-open NNReal

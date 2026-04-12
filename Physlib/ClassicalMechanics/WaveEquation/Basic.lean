@@ -6,7 +6,7 @@ Authors: Zhi Kai Pong
 module
 
 public import Physlib.SpaceAndTime.Space.CrossProduct
-public import Physlib.SpaceAndTime.TimeAndSpace.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
 /-!
 
 # Wave equation

@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
-public import Mathlib.Analysis.CStarAlgebra.Classes
 public import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
 /-!
 

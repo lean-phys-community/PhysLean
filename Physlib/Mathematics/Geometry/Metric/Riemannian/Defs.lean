@@ -6,7 +6,6 @@ Authors: Matteo Cipollina
 module
 
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
-public import Mathlib.Algebra.Lie.OfAssociative
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 /-!
 # Riemannian Metric Definitions

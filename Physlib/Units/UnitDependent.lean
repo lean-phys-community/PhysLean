@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Units.Basic
+public import Mathlib.Topology.Algebra.Module.StrongTopology
 /-!
 
 ## Types which depend on dimensions

@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Analysis.Calculus.ContDiff.FiniteDimension
-public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.Module
+public import Mathlib.MeasureTheory.Constructions.Polish.Basic
 /-!
 
 # Slices of space
@@ -37,7 +37,7 @@ extracts the `i`th coordinate on `Space d.succ`.
 -/
 
 @[expose] public section
-open SchwartzMap NNReal
+open NNReal
 noncomputable section
 
 variable (𝕜 : Type) {E F F' : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]

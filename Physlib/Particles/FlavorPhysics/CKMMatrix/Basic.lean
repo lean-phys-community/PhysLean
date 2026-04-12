@@ -7,7 +7,6 @@ module
 
 public import Mathlib.LinearAlgebra.UnitaryGroup
 public import Mathlib.Analysis.Complex.Trigonometric
-public import Mathlib.Tactic.Polyrith
 /-!
 # The CKM Matrix
 

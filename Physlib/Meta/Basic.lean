@@ -6,8 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Lean.Expr.Basic
-public import ImportGraph.Imports.RequiredModules
-public import Lean.Elab.DocString
 /-!
 
 ## Basic Lean meta programming commands

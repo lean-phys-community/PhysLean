@@ -7,6 +7,7 @@ module
 
 public import Physlib.SpaceAndTime.Space.IsDistBounded
 public import Mathlib.MeasureTheory.SpecificCodomains.WithLp
+public import Physlib.Mathematics.Distribution.Basic
 /-!
 
 # Distributions from functions on space

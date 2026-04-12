@@ -5,8 +5,9 @@ Authors: Kenny Lau, Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Analysis.Distribution.TemperedDistribution
 public import Physlib.Meta.TODO.Basic
+public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
+public import Mathlib.Topology.Algebra.Module.PointwiseConvergence
 /-!
 
 # Distributions
@@ -392,7 +393,7 @@ outputs `η a • v`.
 
 section DiracDelta
 
-open TemperedDistribution ContinuousLinearMap
+open ContinuousLinearMap
 
 variable [NormedSpace ℝ E] [NormedSpace 𝕜 F]
 

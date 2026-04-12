@@ -5,9 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Particles.StandardModel.HiggsBoson.Potential
-public import Mathlib.Analysis.Matrix.Normed
-public import Mathlib.Analysis.Matrix.Order
+public import Physlib.Particles.StandardModel.HiggsBoson.Basic
 /-!
 
 # The Two Higgs Doublet Model

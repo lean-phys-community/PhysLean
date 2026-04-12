@@ -7,6 +7,7 @@ module
 
 public import Physlib.ClassicalMechanics.EulerLagrange
 public import Physlib.ClassicalMechanics.HamiltonsEquations
+public import Mathlib.Data.Real.Hom
 /-!
 
 # The Classical Harmonic Oscillator

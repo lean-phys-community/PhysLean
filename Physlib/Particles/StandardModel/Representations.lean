@@ -5,7 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Geometry.Manifold.Instances.Real
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.LinearAlgebra.UnitaryGroup
 /-!
 # Representations appearing in the Standard Model
 
@@ -17,7 +18,6 @@ This file defines the basic representations which appear in the Standard Model.
 
 namespace StandardModel
 
-open Manifold
 open Matrix
 open Complex
 open ComplexConjugate

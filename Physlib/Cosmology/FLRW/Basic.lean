@@ -5,8 +5,10 @@ Authors: Luis Gabriel C. Bariuan, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Basic
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Physlib.Meta.Linters.Sorry
+public import Physlib.Meta.Informal.Basic
 /-!
 
 # The Friedmann-Lemaître-Robertson-Walker metric

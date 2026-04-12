@@ -7,7 +7,7 @@ module
 
 public import Physlib.QFT.PerturbationTheory.WickAlgebra.WickTerm
 public import Physlib.QFT.PerturbationTheory.WickContraction.IsFull
-public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Meta.Linters.Sorry
 /-!
 
 # Permutations of Wick contractions

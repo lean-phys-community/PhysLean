@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 module
-meta import Mathlib.Data.Fintype.Sigma
+
 meta import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
 import all Init.Data.Fin.Fold
 public import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat

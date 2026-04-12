@@ -5,7 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.SpaceTime.Basic
+public import Physlib.Mathematics.Distribution.Basic
 /-!
 
 # Lorentz group actions related to SpaceTime

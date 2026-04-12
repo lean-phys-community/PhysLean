@@ -5,8 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Data.List.Sort
-public import Mathlib.Algebra.Order.Ring.Nat
+public import Mathlib.Algebra.GroupWithZero.Nat
+public import Mathlib.Algebra.Order.Group.Nat
+public import Mathlib.Algebra.Order.ZeroLEOne
+public import Mathlib.Data.Fin.SuccPred
 /-!
 # List lemmas
 

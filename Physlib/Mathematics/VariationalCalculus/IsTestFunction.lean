@@ -6,6 +6,7 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 module
 
 public import Physlib.Mathematics.Calculus.Divergence
+public import Mathlib.Topology.ContinuousMap.CompactlySupported
 /-!
 
 # Test functions

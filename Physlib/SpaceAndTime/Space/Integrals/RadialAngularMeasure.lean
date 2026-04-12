@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Mathematics.Distribution.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.Basic
 /-!
 
@@ -40,7 +39,7 @@ This file is equivalent to `invPowMeasure`, which will slowly be deprecated.
 -/
 
 @[expose] public section
-open SchwartzMap NNReal Real
+open NNReal Real
 noncomputable section
 
 variable (𝕜 : Type) {E F F' : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]

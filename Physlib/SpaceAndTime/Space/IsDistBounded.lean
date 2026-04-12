@@ -6,7 +6,9 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
-public import Physlib.SpaceAndTime.Time.Derivatives
+public import Physlib.SpaceAndTime.Time.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
+public import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
 public import Mathlib.Tactic.Cases
 /-!
 

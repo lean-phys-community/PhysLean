@@ -5,7 +5,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Algebra.Lie.OfAssociative
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Lemmas
 /-!
 # Finite Canonical Ensemble

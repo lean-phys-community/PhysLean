@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Lean.Environment
+public import Lean.Setup
 /-!
 
 # Note file

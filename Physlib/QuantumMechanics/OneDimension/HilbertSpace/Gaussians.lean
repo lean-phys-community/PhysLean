@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
+public import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 /-!
 
 # Gaussians and the hilbert space

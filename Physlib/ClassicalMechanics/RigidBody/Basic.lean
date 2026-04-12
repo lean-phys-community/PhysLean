@@ -5,7 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Derivatives.Curl
+public import Physlib.SpaceAndTime.Space.Module
+public import Physlib.Meta.Informal.Basic
 public import Mathlib.Geometry.Manifold.Algebra.SmoothFunctions
 /-!
 

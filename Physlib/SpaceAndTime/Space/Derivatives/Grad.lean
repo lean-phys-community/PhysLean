@@ -6,6 +6,8 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.IsDistBounded
+public import Mathlib.Analysis.Calculus.Gradient.Basic
 /-!
 
 # Gradient of functions and distributions on `Space d`

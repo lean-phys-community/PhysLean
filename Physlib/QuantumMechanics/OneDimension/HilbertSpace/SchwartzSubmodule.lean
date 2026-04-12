@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
-public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
+public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 /-!
 
 # Schwartz submodule of the Hilbert space

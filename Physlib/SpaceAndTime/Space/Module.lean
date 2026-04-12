@@ -8,6 +8,7 @@ module
 public import Physlib.SpaceAndTime.Space.Basic
 public import Mathlib.Geometry.Manifold.Diffeomorph
 public import Mathlib.Analysis.Distribution.TemperateGrowth
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 /-!
 
 # The structure of a module on Space

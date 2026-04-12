@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoConstrained
+public import Mathlib.Tactic.FinCases
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.Basic
 /-!
 

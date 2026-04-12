@@ -6,8 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
-public import Mathlib.Analysis.InnerProductSpace.NormPow
-public import Mathlib.Analysis.Calculus.FDeriv.Norm
 /-!
 
 # The norm on space

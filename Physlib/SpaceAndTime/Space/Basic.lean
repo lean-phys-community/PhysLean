@@ -5,14 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Meta.Informal.Basic
 public import Physlib.Meta.TODO.Basic
-public import Physlib.Meta.Linters.Sorry
-public import Mathlib.Topology.ContinuousMap.CompactlySupported
-public import Mathlib.Geometry.Manifold.IsManifold.Basic
-public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
-public import Mathlib.Analysis.InnerProductSpace.Calculus
-public import Mathlib.Geometry.Manifold.Diffeomorph
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Geometry.Manifold.ContMDiff.Defs
 /-!
 
 # Space

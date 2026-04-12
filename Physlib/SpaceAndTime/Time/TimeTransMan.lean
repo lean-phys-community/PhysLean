@@ -5,7 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Time.Derivatives
+public import Mathlib.Geometry.Manifold.Diffeomorph
+public import Physlib.SpaceAndTime.Time.Basic
 public import Physlib.SpaceAndTime.Time.TimeUnit
 /-!
 

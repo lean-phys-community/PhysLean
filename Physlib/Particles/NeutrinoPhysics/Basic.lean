@@ -6,8 +6,7 @@ Authors: Prabhoda Chandra Sarjapur
 module
 
 public import Mathlib.LinearAlgebra.UnitaryGroup
-public import Mathlib.Analysis.Complex.Trigonometric
-public import Mathlib.Tactic.Polyrith
+public import Mathlib.Analysis.Complex.Exponential
 /-!
 
 # The PMNS matrix

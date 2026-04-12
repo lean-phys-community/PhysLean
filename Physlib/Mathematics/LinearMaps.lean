@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Tactic.Polyrith
 public import Mathlib.Algebra.Module.LinearMap.Defs
 public import Mathlib.Data.Fintype.BigOperators
 public import Physlib.Meta.TODO.Basic

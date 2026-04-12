@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Units.UnitDependent
+public import Mathlib.MeasureTheory.Integral.Bochner.Basic
 /-!
 
 # Dimensional invariance of the integral

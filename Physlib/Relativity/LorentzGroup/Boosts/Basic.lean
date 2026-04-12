@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.SpaceTime.Basic
+public import Physlib.Relativity.LorentzGroup.Basic
 /-!
 # Boosts in the Lorentz group
 

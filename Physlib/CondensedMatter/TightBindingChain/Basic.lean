@@ -5,9 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Meta.Informal.Basic
-public import Physlib.Meta.Informal.SemiFormal
-public import Physlib.Meta.Linters.Sorry
 public import Physlib.QuantumMechanics.FiniteTarget.HilbertSpace
 /-!
 

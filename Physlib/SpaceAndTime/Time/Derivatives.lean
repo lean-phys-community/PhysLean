@@ -5,7 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.SpaceTime.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
+public import Physlib.SpaceAndTime.Space.Module
+public import Physlib.SpaceAndTime.Time.Basic
 /-!
 
 # Time Derivatives

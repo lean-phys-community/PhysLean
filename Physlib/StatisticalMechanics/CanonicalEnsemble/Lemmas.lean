@@ -6,6 +6,7 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 module
 
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Basic
+public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 /-!
 # Canonical Ensemble: Thermodynamic Identities and Relations
 

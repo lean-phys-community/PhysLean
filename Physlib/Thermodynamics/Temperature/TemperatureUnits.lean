@@ -5,8 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Geometry.Manifold.Diffeomorph
-public import Physlib.SpaceAndTime.Time.Basic
+public import Mathlib.Analysis.RCLike.Basic
 /-!
 
 # Units on Temperature

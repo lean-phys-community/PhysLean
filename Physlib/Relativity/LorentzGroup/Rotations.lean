@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.LorentzGroup.Boosts.Generalized
+public import Physlib.Relativity.LorentzGroup.Restricted.Basic
 /-!
 # Rotations
 

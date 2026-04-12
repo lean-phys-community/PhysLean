@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.QFT.PerturbationTheory.WickContraction.Basic
-public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSign
+public import Physlib.QFT.PerturbationTheory.FieldStatistics.ExchangeSign
 /-!
 
 # Sign associated with a contraction

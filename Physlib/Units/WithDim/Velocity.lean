@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Units.Basic
 /-!
 # Velocity
 
@@ -15,4 +14,3 @@ in `d`-dimensional space, in an arbitrary (but given) set of units.
 -/
 
 @[expose] public section
-open Dimension

@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
 public import Physlib.Relativity.SpeedOfLight
-public import Physlib.SpaceAndTime.Time.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.Basic
+public import Physlib.SpaceAndTime.Time.Basic
 /-!
 # Spacetime
 

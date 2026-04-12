@@ -71,7 +71,7 @@ structure HarmonicOscillator where
 
 namespace HarmonicOscillator
 open Constants
-open Physlib HilbertSpace
+open HilbertSpace
 open MeasureTheory
 
 variable (Q : HarmonicOscillator)

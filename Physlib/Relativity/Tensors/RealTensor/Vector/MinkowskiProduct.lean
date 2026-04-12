@@ -6,6 +6,8 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
+public import Physlib.Relativity.Tensors.Elab
+public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 /-!
 
 # Minkowski product on Lorentz vectors

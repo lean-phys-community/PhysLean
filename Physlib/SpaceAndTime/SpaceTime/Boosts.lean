@@ -6,8 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.LorentzGroup.Boosts.Basic
-public import Physlib.Meta.Informal.SemiFormal
-public import Physlib.Mathematics.FDerivCurry
+public import Physlib.SpaceAndTime.SpaceTime.Basic
 /-!
 
 # Boosts of space time

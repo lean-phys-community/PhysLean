@@ -5,7 +5,6 @@ Authors: Matteo Cipollina
 -/
 module
 
-public import Mathlib.Analysis.Normed.Field.Instances
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
 public import Physlib.Relativity.LorentzAlgebra.Basic
 public import Physlib.Relativity.LorentzGroup.Restricted.Basic

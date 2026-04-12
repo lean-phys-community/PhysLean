@@ -5,7 +5,8 @@ Authors: Rein Zustand
 -/
 module
 
-public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
+public import Physlib.Mathematics.InnerProductSpace.Basic
+public import Mathlib.Analysis.InnerProductSpace.Dual
 /-!
 
 # Equivalent Lagrangians under Total Derivatives

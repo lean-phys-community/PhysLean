@@ -5,10 +5,7 @@ Authors: Afiq Hatta
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDimension.Operators.Parity
 public import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
-public import Physlib.QuantumMechanics.OneDimension.Operators.Position
-public import Physlib.SpaceAndTime.Time.Basic
 public import Physlib.Mathematics.Trigonometry.Tanh
 /-!
 
@@ -30,7 +27,6 @@ annihilation operators
 
 namespace QuantumMechanics
 open Real
-open Space
 open SchwartzMap
 open HilbertSpace
 open NNReal

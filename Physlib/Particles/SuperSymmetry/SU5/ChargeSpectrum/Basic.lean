@@ -9,7 +9,6 @@ public import Mathlib.Data.Finset.Powerset
 public import Mathlib.Data.Finset.Prod
 public import Mathlib.Data.Finset.Sort
 public import Mathlib.Data.Finset.Option
-public import Physlib.Particles.SuperSymmetry.SU5.Potential
 /-!
 
 # Charge Spectrum

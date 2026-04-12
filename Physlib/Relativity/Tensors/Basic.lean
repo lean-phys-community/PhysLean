@@ -8,6 +8,7 @@ module
 public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Tensors
