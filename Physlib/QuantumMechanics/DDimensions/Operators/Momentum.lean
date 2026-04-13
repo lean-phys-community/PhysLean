@@ -23,19 +23,16 @@ In this module we introduce several momentum operators for quantum mechanics on 
 Definitions:
 - `momentumOperator` : (components of) the momentum vector operator acting on Schwartz maps
     `𝓢(Space d, ℂ)` as `-iℏ∂ᵢ`.
-- `momentumOperatorSqr` : operator acting on Schwartz maps `𝓢(Space d, ℂ)` as `∑ᵢ 𝐩[i]∘𝐩[i]`.
 - `momentumUnboundedOperator` : a symmetric unbounded operator acting on the Schwartz submodule
     of the Hilbert space `SpaceDHilbertSpace d`.
 
 Notation:
 - `𝐩` for `momentumOperator`
-- `𝐩²` for `momentumOperatorSqr`
 
 ## iii. Table of contents
 
 - A. Momentum vector operator
-- B. Momentum-squared operator
-- C. Unbounded momentum vector operator
+- B. Unbounded momentum vector operator
 
 ## iv. References
 
@@ -78,30 +75,7 @@ lemma momentumOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐩 i ψ
 
 /-!
 
-## B. Momentum-squared operator
-
--/
-
-set_option backward.isDefEq.respectTransparency false in
-/-- The square of the momentum operator, `𝐩² ≔ ∑ᵢ 𝐩ᵢ∘𝐩ᵢ`. -/
-def momentumOperatorSqr : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) := ∑ i, 𝐩 i ∘L 𝐩 i
-
-@[inherit_doc momentumOperatorSqr]
-notation "𝐩²" => momentumOperatorSqr
-
-set_option backward.isDefEq.respectTransparency false in
-lemma momentumOperatorSqr_eq : 𝐩² = ∑ i : Fin d, 𝐩 i ∘L 𝐩 i := rfl
-
-lemma momentumOperatorSqr_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐩² ψ x = ∑ i, 𝐩 i (𝐩 i ψ) x := by
-  dsimp only [momentumOperatorSqr]
-  rw [← SchwartzMap.coe_coeHom]
-  simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_comp', Finset.sum_apply,
-    Function.comp_apply, map_sum]
-
-/-!
-
-## C. Unbounded momentum vector operator
+## B. Unbounded momentum vector operator
 
 -/
 
