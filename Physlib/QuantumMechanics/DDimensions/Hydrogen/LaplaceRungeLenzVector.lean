@@ -15,7 +15,6 @@ public import Physlib.Meta.Linters.Sorry
 In this file we define
 - The (regularized) LRL vector operator for the quantum mechanical hydrogen atom,
   `𝐀(ε)ᵢ ≔ ½(𝐩ⱼ𝐋ᵢⱼ + 𝐋ᵢⱼ𝐩ⱼ) - mk·𝐫(ε)⁻¹𝐱ᵢ`.
-- The square of the LRL vector operator, `𝐀(ε)² ≔ 𝐀(ε)ᵢ𝐀(ε)ᵢ`.
 
 The main results are
 - The commutators `⁅𝐋ᵢⱼ, 𝐀(ε)ₖ⁆ = iℏ(δᵢₖ𝐀(ε)ⱼ - δⱼₖ𝐀(ε)ᵢ)` in `angularMomentum_commutation_lrl`
@@ -90,9 +89,6 @@ lemma lrlOperator_eq'' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i = ∑ j, 
     Pi.smul_apply, SchwartzMap.sub_apply, SchwartzMap.add_apply, SchwartzMap.smul_apply, real_smul,
     ofReal_mul, ofReal_ofNat]
   ring
-
-/-- The operator `𝐱ᵢ𝐩²` on Schwartz maps. -/
-private def positionCompMomentumSqr {d : ℕ} (i : Fin d) := 𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩)
 
 /-- The operator `(𝐱ⱼ𝐩ⱼ)𝐱ᵢ` on Schwartz maps. -/
 private def positionDotMomentumCompMomentum {d : ℕ} (i : Fin d) := (𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 i
@@ -176,10 +172,10 @@ private lemma positionDotMomentum_commutation_radiusRegPow (d : ℕ) (ε : ℝˣ
     _ = (-s * I * ℏ) • (𝐫₀ ε s - ε.1 ^ 2 • 𝐫₀ ε (s-2)) := by simp [positionOperatorSqr_eq ε]
 
 private lemma positionCompMomentumSqr_comm {d : ℕ} (i j : Fin d) :
-    ⁅positionCompMomentumSqr i, positionCompMomentumSqr j⁆ = (-2 * I * ℏ) • (𝐩 ⬝ᵥ 𝐩) ∘L 𝐋[i,j] := by
+    ⁅𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩), 𝐱 j ∘L (𝐩 ⬝ᵥ 𝐩)⁆ = (-2 * I * ℏ) • (𝐩 ⬝ᵥ 𝐩) ∘L 𝐋[i,j] := by
   calc
     _ = (𝐱 j ∘L ⁅𝐱 i, 𝐩[d] ⬝ᵥ 𝐩⁆ + 𝐱 i ∘L ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐱 j⁆) ∘L (𝐩 ⬝ᵥ 𝐩) := by
-      simp [positionCompMomentumSqr, lie_leibniz, leibniz_lie, comp_assoc]
+      simp [lie_leibniz, leibniz_lie, comp_assoc]
     _ = (2 * I * ℏ) • 𝐋[j,i] ∘L (𝐩 ⬝ᵥ 𝐩) := by
       simp_rw [← lie_skew (𝐩 ⬝ᵥ 𝐩) _, position_commutation_momentumSqr, comp_neg, comp_smul,
         ← sub_eq_add_neg, ← smul_sub, smul_comp, angularMomentumOperator]
@@ -188,9 +184,9 @@ private lemma positionCompMomentumSqr_comm {d : ℕ} (i j : Fin d) :
         ← neg_mul, momentumSqr_comp_angularMomentum_commute]
 
 private lemma positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add
-    {d : ℕ} (i j : Fin d) : ⁅positionCompMomentumSqr i, positionDotMomentumCompMomentum j⁆ +
-    ⁅positionDotMomentumCompMomentum i, positionCompMomentumSqr j⁆ = (-I * ℏ) • (𝐩 ⬝ᵥ 𝐩) ∘L 𝐋[i,j] := by
-  suffices ∀ k l : Fin d, ⁅positionCompMomentumSqr k, positionDotMomentumCompMomentum l⁆
+    {d : ℕ} (i j : Fin d) : ⁅𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩), positionDotMomentumCompMomentum j⁆ +
+    ⁅positionDotMomentumCompMomentum i, 𝐱 j ∘L (𝐩 ⬝ᵥ 𝐩)⁆ = (-I * ℏ) • (𝐩 ⬝ᵥ 𝐩) ∘L 𝐋[i,j] := by
+  suffices ∀ k l : Fin d, ⁅𝐱 k ∘L (𝐩 ⬝ᵥ 𝐩), positionDotMomentumCompMomentum l⁆
       = (-I * ℏ) • (𝐱 k ∘L 𝐩 l - δ[k,l] • (𝐱 ⬝ᵥ 𝐩)) ∘L (𝐩 ⬝ᵥ 𝐩) by
     nth_rw 2 [← lie_skew]
     simp_rw [this, ← sub_eq_add_neg, ← smul_sub, ← sub_comp, symm j i, sub_sub_sub_cancel_right,
@@ -199,8 +195,7 @@ private lemma positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add
   calc
     _ = (𝐱 ⬝ᵥ 𝐩) ∘L ⁅𝐱 k, 𝐩 l⁆ ∘L (𝐩 ⬝ᵥ 𝐩) + 𝐱 k ∘L ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐱[d] ⬝ᵥ 𝐩⁆ ∘L 𝐩 l
         + ⁅𝐱 k, 𝐱[d] ⬝ᵥ 𝐩⁆ ∘L (𝐩 ⬝ᵥ 𝐩) ∘L 𝐩 l := by
-      simp [positionCompMomentumSqr, positionDotMomentumCompMomentum, lie_leibniz, leibniz_lie,
-        add_assoc, comp_assoc]
+      simp [positionDotMomentumCompMomentum, lie_leibniz, leibniz_lie, add_assoc, comp_assoc]
     _ = (𝐱 ⬝ᵥ 𝐩) ∘L ⁅𝐱 k, 𝐩 l⁆ ∘L (𝐩 ⬝ᵥ 𝐩) + (-I * ℏ) • 𝐱 k ∘L 𝐩 l ∘L (𝐩 ⬝ᵥ 𝐩) := by
       simp only [← lie_skew _ (𝐱 ⬝ᵥ 𝐩), positionDotMomentum_commutation_position,
         positionDotMomentum_commutation_momentumSqr, momentumSqr_comp_momentum_commute,
@@ -216,10 +211,9 @@ private lemma positionDotMomentumCompMomentum_comm {d : ℕ} (i j : Fin d) :
     ← lie_skew (𝐩 _) (𝐱 ⬝ᵥ 𝐩), positionDotMomentum_commutation_momentum, comp_assoc]
 
 private lemma positionCompMomentumSqr_comm_constMomentum_add {d : ℕ} (i j : Fin d) :
-    ⁅positionCompMomentumSqr i, constMomentum j⁆ +
-    ⁅constMomentum i, positionCompMomentumSqr j⁆ = 0 := by
+    ⁅𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩), constMomentum j⁆ + ⁅constMomentum i, 𝐱 j ∘L (𝐩 ⬝ᵥ 𝐩)⁆ = 0 := by
   nth_rw 2 [← lie_skew]
-  simp [positionCompMomentumSqr, constMomentum, leibniz_lie, position_commutation_momentum, symm j]
+  simp [constMomentum, leibniz_lie, position_commutation_momentum, symm j]
 
 private lemma positionDotMomentumCompMomentum_comm_constMomentum_add {d : ℕ} (i j : Fin d) :
     ⁅positionDotMomentumCompMomentum i, constMomentum j⁆ +
@@ -234,8 +228,8 @@ private lemma constMomentum_comm {d : ℕ} (i j : Fin d) :
 
 set_option backward.isDefEq.respectTransparency false in
 private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
-    (ε : ℝˣ) (i j : Fin H.d) : ⁅positionCompMomentumSqr i, constRadiusRegInvCompPosition H ε j⁆
-    + ⁅constRadiusRegInvCompPosition H ε i, positionCompMomentumSqr j⁆
+    (ε : ℝˣ) (i j : Fin H.d) : ⁅𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩), constRadiusRegInvCompPosition H ε j⁆
+    + ⁅constRadiusRegInvCompPosition H ε i, 𝐱 j ∘L (𝐩 ⬝ᵥ 𝐩)⁆
     = (-2 * I * ℏ * H.m * H.k) • 𝐫₀ ε (-1) ∘L 𝐋[i,j] := by
   let A := ⁅𝐩[H.d] ⬝ᵥ 𝐩, radiusRegPowOperator (d := H.d) ε (-1)⁆
   have hA : 𝐱 i ∘L A ∘L 𝐱 j = 𝐱 j ∘L A ∘L 𝐱 i := by
@@ -256,7 +250,7 @@ private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
     _ = (H.m * H.k) • (𝐫₀ ε (-1) ∘L 𝐱 i ∘L B j + 𝐱 i ∘L A ∘L 𝐱 j
         - (𝐫₀ ε (-1) ∘L 𝐱 j ∘L B i + 𝐱 j ∘L A ∘L 𝐱 i)) := by
       nth_rw 2 [← lie_skew]
-      simp_rw [← sub_eq_add_neg, positionCompMomentumSqr, constRadiusRegInvCompPosition, lie_smul,
+      simp_rw [← sub_eq_add_neg, constRadiusRegInvCompPosition, lie_smul,
         ← smul_sub, lie_leibniz, leibniz_lie, ← sub_sub]
       simp [A, B, comp_assoc]
     _ = (H.m * H.k) • 𝐫₀ ε (-1) ∘L (𝐱 i ∘L B j - 𝐱 j ∘L B i) := by simp [hA]
@@ -312,7 +306,7 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) :
     ⁅H.lrlOperator ε i, H.lrlOperator ε j⁆ = ((-2 * I * ℏ * H.m) • H.hamiltonianReg ε
     + (I * ℏ * H.m * H.k * ε.1 ^ 2) • 𝐫₀ ε (-3)) ∘L 𝐋[i,j] := by
   repeat rw [lrlOperator_eq]
-  let f_x_p_sqr := positionCompMomentumSqr (d := H.d)
+  let f_x_p_sqr (k : Fin H.d) := 𝐱 k ∘L (𝐩 ⬝ᵥ 𝐩)
   let f_xdotp_p := positionDotMomentumCompMomentum (d := H.d)
   let f_const_p := constMomentum (d := H.d)
   let f_c_rinvx := constRadiusRegInvCompPosition H ε
@@ -324,7 +318,7 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) :
       - (⁅f_xdotp_p i, f_const_p j⁆ + ⁅f_const_p i, f_xdotp_p j⁆)
       + (⁅f_xdotp_p i, f_c_rinvx j⁆ + ⁅f_c_rinvx i, f_xdotp_p j⁆)
       - (⁅f_const_p i, f_c_rinvx j⁆ + ⁅f_c_rinvx i, f_const_p j⁆)
-  · dsimp [f_x_p_sqr, f_xdotp_p, f_const_p, f_c_rinvx, positionCompMomentumSqr,
+  · dsimp [f_x_p_sqr, f_xdotp_p, f_const_p, f_c_rinvx,
       positionDotMomentumCompMomentum, constMomentum, constRadiusRegInvCompPosition]
     simp only [lie_add, lie_sub, add_lie, sub_lie]
     ext ψ x
