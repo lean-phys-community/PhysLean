@@ -54,7 +54,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The hydrogen atom Hamiltonian regularized by `ε ≠ 0` is defined to be
   `𝐇(ε) ≔ (2m)⁻¹𝐩² - k·𝐫(ε)⁻¹`. -/
 def hamiltonianReg (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=
-  (2 * H.m)⁻¹ • 𝐩² - H.k • 𝐫₀ ε (-1)
+  (2 * H.m)⁻¹ • (𝐩 ⬝ᵥ 𝐩) - H.k • 𝐫₀ ε (-1)
 
 end
 end HydrogenAtom
