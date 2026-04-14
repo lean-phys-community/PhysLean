@@ -18,7 +18,7 @@ In this file we define
 
 The main results are
 - The commutators `⁅𝐋ᵢⱼ, 𝐀(ε)ₖ⁆ = iℏ(δᵢₖ𝐀(ε)ⱼ - δⱼₖ𝐀(ε)ᵢ)` in `angularMomentum_commutation_lrl`
-- The commutators `⁅𝐀(ε)ᵢ, 𝐀(ε)ⱼ⁆ = -iℏ 2m 𝐇(ε)𝐋ᵢⱼ` in `lrl_commutation_lrl`
+- The commutators `⁅𝐀(ε)ᵢ, 𝐀(ε)ⱼ⁆ = (-2iℏm·𝐇(ε) + iℏmkε²·𝐫(ε)⁻³))𝐋ᵢⱼ` in `lrl_commutation_lrl`
 - The commutators `⁅𝐇(ε), 𝐀(ε)ᵢ⁆ = iℏε²(⋯)` in `hamiltonianReg_commutation_lrl`
 - The relation `𝐀(ε)² = 2m 𝐇(ε)(𝐋² + ¼ℏ²(d-1)²) + m²k² + ε²(⋯)` in `lrlOperatorSqr_eq`
 
@@ -41,9 +41,8 @@ def lrlOperator (ε : ℝˣ) (i : Fin H.d) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢
   (2 : ℝ)⁻¹ • ∑ j, (𝐩 j ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐩 j) - (H.m * H.k) • 𝐫₀ ε (-1) ∘L 𝐱 i
 
 /-- `𝐀(ε)ᵢ = 𝐱ᵢ𝐩² - (𝐱ⱼ𝐩ⱼ)𝐩ᵢ + ½iℏ(d-1)𝐩ᵢ - mk·𝐫(ε)⁻¹𝐱ᵢ` -/
-lemma lrlOperator_eq (ε : ℝˣ) (i : Fin H.d) :
-    H.lrlOperator ε i = 𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩) - (𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 i
-    + (2⁻¹ * I * ℏ * (H.d - 1)) • 𝐩 i - (H.m * H.k) • 𝐫₀ ε (-1) ∘L 𝐱 i := by
+lemma lrlOperator_eq (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i = 𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩)
+    - (𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 i + (2⁻¹ * I * ℏ * (H.d - 1)) • 𝐩 i - (H.m * H.k) • 𝐫₀ ε (-1) ∘L 𝐱 i := by
   rw [lrlOperator, sub_left_inj] -- mk·r⁻¹x terms match exactly
   calc
     _ = (2 : ℂ)⁻¹ • ∑ j, ((𝐩 j ∘L 𝐱 i) ∘L 𝐩 j + 𝐱 i ∘L 𝐩 j ∘L 𝐩 j
@@ -211,7 +210,7 @@ private lemma positionDotMomentumCompMomentum_comm_momentum_add {d : ℕ} (i j :
   simp [leibniz_lie, positionDotMomentum_commutation_momentum, momentum_comp_commute]
 
 set_option backward.isDefEq.respectTransparency false in
-private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
+private lemma positionCompMomentumSqr_comm_radiusRegInvCompPosition_add
     {d : ℕ} (ε : ℝˣ) (i j : Fin d) : ⁅𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩), 𝐫₀ ε (-1) ∘L 𝐱 j⁆
     + ⁅𝐫₀ ε (-1) ∘L 𝐱 i, 𝐱 j ∘L (𝐩 ⬝ᵥ 𝐩)⁆ = (-2 * I * ℏ) • 𝐫₀ ε (-1) ∘L 𝐋[i,j] := by
   let A := ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐫₀[d] ε (-1)⁆
@@ -226,18 +225,16 @@ private lemma positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add
       sub_eq_add_neg, ← neg_smul, ← neg_mul, neg_neg, ofReal_neg, ofReal_one, dotProduct, mul_def]
     ring_nf
     rw [add_rotate]
-  let B (i : Fin d) := ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐱 i⁆
-  have hB (k : Fin d) : B k = (-2 * I * ℏ) • 𝐩 k := by
-    simp [B, ← lie_skew (𝐩 ⬝ᵥ 𝐩) _, position_commutation_momentumSqr]
   calc
-    _ = 𝐫₀ ε (-1) ∘L 𝐱 i ∘L B j + 𝐱 i ∘L A ∘L 𝐱 j
-        - (𝐫₀ ε (-1) ∘L 𝐱 j ∘L B i + 𝐱 j ∘L A ∘L 𝐱 i) := by
+    _ = 𝐫₀ ε (-1) ∘L 𝐱 i ∘L ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐱 j⁆ + 𝐱 i ∘L A ∘L 𝐱 j
+        - (𝐫₀ ε (-1) ∘L 𝐱 j ∘L ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐱 i⁆ + 𝐱 j ∘L A ∘L 𝐱 i) := by
       nth_rw 2 [← lie_skew]
       simp_rw [← sub_eq_add_neg, lie_leibniz, leibniz_lie, ← sub_sub]
-      simp [A, B, comp_assoc]
-    _ = 𝐫₀ ε (-1) ∘L (𝐱 i ∘L B j - 𝐱 j ∘L B i) := by simp [hA]
+      simp [A, comp_assoc]
+    _ = 𝐫₀ ε (-1) ∘L (𝐱 i ∘L ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐱 j⁆ - 𝐱 j ∘L ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐱 i⁆) := by simp [hA]
     _ = (-2 * I * ℏ) • 𝐫₀ ε (-1) ∘L 𝐋[i,j] := by
-      simp_rw [hB, comp_smul, ← smul_sub, comp_smul, angularMomentumOperator]
+      simp_rw [← lie_skew _ (𝐱 _), position_commutation_momentumSqr, comp_neg, comp_smul,
+        ← neg_smul, ← neg_mul, ← smul_sub, comp_smul, angularMomentumOperator]
 
 private lemma momentum_comm_radiusRegPow_position_symm {d : ℕ} (ε : ℝˣ) (s : ℝ) (i j : Fin d) :
     ⁅𝐩 i, 𝐫₀ ε s ∘L 𝐱 j⁆ = ⁅𝐩 j, 𝐫₀ ε s ∘L 𝐱 i⁆ := by
@@ -245,7 +242,7 @@ private lemma momentum_comm_radiusRegPow_position_symm {d : ℕ} (ε : ℝˣ) (s
     radiusRegPow_commutation_momentum, position_comp_commute j i, comp_assoc]
 
 set_option backward.isDefEq.respectTransparency false in
-private lemma positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition_add
+private lemma positionDotMomentumCompMomentum_comm_radiusRegInvCompPosition_add
     {d : ℕ} (ε : ℝˣ) (i j : Fin d) : ⁅(𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 i, 𝐫₀ ε (-1) ∘L 𝐱 j⁆ +
     ⁅𝐫₀ ε (-1) ∘L 𝐱 i, (𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 j⁆ = (I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) ∘L 𝐋[i,j] := by
   suffices ∀ k, ⁅𝐱[d] ⬝ᵥ 𝐩, 𝐫₀[d] ε (-1) ∘L 𝐱 k⁆ = (-I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) ∘L 𝐱 k by
@@ -264,12 +261,12 @@ private lemma positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition
       ring_nf
 
 set_option backward.isDefEq.respectTransparency false in
-private lemma momentum_comm_constRadiusRegInvCompPosition_add {d : ℕ} (ε : ℝˣ) (i j : Fin d) :
+private lemma momentum_comm_radiusRegInvCompPosition_add {d : ℕ} (ε : ℝˣ) (i j : Fin d) :
     ⁅𝐩 i, 𝐫₀ ε (-1) ∘L 𝐱 j⁆ + ⁅𝐫₀ ε (-1) ∘L 𝐱 i, 𝐩 j⁆ = 0 := by
   rw [← lie_skew _ (𝐩 _), momentum_comm_radiusRegPow_position_symm, add_neg_cancel]
 
 set_option backward.isDefEq.respectTransparency false in
-private lemma constRadiusRegInvCompPosition_comm {d : ℕ} (ε : ℝˣ) (i j : Fin d) :
+private lemma radiusRegInvCompPosition_comm {d : ℕ} (ε : ℝˣ) (i j : Fin d) :
     ⁅𝐫₀ ε (-1) ∘L 𝐱 i, 𝐫₀ ε (-1) ∘L 𝐱 j⁆ = 0 := by
   simp [lie_leibniz, leibniz_lie, ← lie_skew (𝐫₀ _ _) (𝐱 _)]
 
@@ -300,10 +297,10 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) :
   rw [positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add]
   rw [positionCompMomentumSqr_comm_momentum_add]
   rw [positionDotMomentumCompMomentum_comm_momentum_add]
-  rw [positionCompMomentumSqr_comm_constRadiusRegInvCompPosition_add]
-  rw [positionDotMomentumCompMomentum_comm_constRadiusRegInvCompPosition_add]
-  rw [momentum_comm_constRadiusRegInvCompPosition_add]
-  rw [constRadiusRegInvCompPosition_comm]
+  rw [positionCompMomentumSqr_comm_radiusRegInvCompPosition_add]
+  rw [positionDotMomentumCompMomentum_comm_radiusRegInvCompPosition_add]
+  rw [momentum_comm_radiusRegInvCompPosition_add]
+  rw [radiusRegInvCompPosition_comm]
   subst c₁ c₂
   simp_rw [hamiltonianReg, smul_zero, add_zero, sub_zero, ← sub_smul, ← Complex.coe_smul,
     ofReal_inv, ofReal_mul, ofReal_ofNat, smul_sub, smul_smul, add_comp, sub_comp, smul_comp]
@@ -341,12 +338,13 @@ private lemma xL_Lx_eq {d : ℕ} (ε : ℝˣ) (i : Fin d) :
   ring_nf
 
 set_option backward.isDefEq.respectTransparency false in
-private lemma pSqr_comm_rx (ε : ℝˣ) (i : Fin H.d) :
-    ⁅𝐩[H.d] ⬝ᵥ 𝐩, 𝐫₀ ε (-1) ∘L 𝐱 i⁆
+private lemma pSqr_comm_rx {d : ℕ} (ε : ℝˣ) (i : Fin d) :
+    ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐫₀ ε (-1) ∘L 𝐱 i⁆
     = (I * ℏ) • 𝐫₀ ε (-3) ∘L ∑ j, (𝐱 j ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐱 j)
-    + ((-2 * I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) ∘L 𝐩 i + (3 * ℏ ^ 2 * ε.1 ^ 2) • 𝐫₀ ε (-5) ∘L 𝐱 i) := by
+    + ((-2 * I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) ∘L 𝐩 i
+      + (3 * ℏ ^ 2 * ε.1 ^ 2) • 𝐫₀ ε (-5) ∘L 𝐱 i) := by
   trans (-2 * I * ℏ) • 𝐫₀ ε (-1) ∘L 𝐩 i + (2 * I * ℏ) • 𝐫₀ ε (-3) ∘L (𝐱 ⬝ᵥ 𝐩) ∘L 𝐱 i
-      + (ℏ ^ 2 * (H.d - 3) : ℝ) • 𝐫₀ ε (-3) ∘L 𝐱 i + (3 * ℏ ^ 2 * ε.1 ^ 2) • 𝐫₀ ε (-5) ∘L 𝐱 i
+      + (ℏ ^ 2 * (d - 3) : ℝ) • 𝐫₀ ε (-3) ∘L 𝐱 i + (3 * ℏ ^ 2 * ε.1 ^ 2) • 𝐫₀ ε (-5) ∘L 𝐱 i
   · rw [← lie_skew]
     simp_rw [leibniz_lie, position_commutation_momentumSqr, radiusRegPow_commutation_momentumSqr,
       sub_comp, add_comp, smul_comp, comp_smul, comp_assoc, neg_add, neg_sub', neg_add,
@@ -378,7 +376,7 @@ lemma hamiltonianReg_commutation_lrl (ε : ℝˣ) (i : Fin H.d) :
     ⁅H.hamiltonianReg ε, H.lrlOperator ε i⁆ = (I * ℏ * H.k * ε.1 ^ 2) • 𝐫₀ ε (-3) ∘L 𝐩 i
     - (3 / 2 * ℏ ^ 2 * H.k * ε.1 ^ 2) • 𝐫₀ ε (-5) ∘L 𝐱 i := by
   trans (-2⁻¹ * H.k) • (⁅𝐩[H.d] ⬝ᵥ 𝐩, 𝐫₀ ε (-1) ∘L 𝐱 i⁆
-      + ⁅radiusRegPowOperator (d := H.d) ε (-1), ∑ j, (𝐩 j ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐩 j)⁆)
+      + ⁅𝐫₀[H.d] ε (-1), ∑ j, (𝐩 j ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐩 j)⁆)
   · have h : H.m * H.k * (H.m⁻¹ * 2⁻¹) = 2⁻¹ * H.k := by grind [m_ne_zero]
     simp [hamiltonianReg, lrlOperator, pSqr_comm_pL_Lp, r_comm_rx, h, smul_smul, sub_eq_neg_add]
   simp_rw [pSqr_comm_rx, r_comm_pL_Lp, add_neg_cancel_comm, smul_add, sub_eq_add_neg, ← neg_smul,
@@ -473,7 +471,7 @@ private lemma sum_rxpL (d : ℕ) (ε : ℝˣ) :
   rw [angularMomentumOperatorSqr]
 
 private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
-    ∑ i, 𝐩 i ∘L 𝐫₀[d] ε (-1) ∘L 𝐱 i = 𝐫₀ ε (-1) ∘L ∑ i, 𝐱 i ∘L 𝐩 i
+    ∑ i, 𝐩 i ∘L 𝐫₀[d] ε (-1) ∘L 𝐱 i = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩)
     - (I * ℏ * (d - 1)) • 𝐫₀ ε (-1) - (I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) := by
   calc
     _ = ∑ i, (𝐫₀ ε (-1) ∘L 𝐩 i ∘L 𝐱 i + (I * ℏ) • 𝐫₀ ε (-3) ∘L 𝐱 i ∘L 𝐱 i) := by
@@ -486,16 +484,16 @@ private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
         + (I * ℏ) • 𝐫₀ ε (-3) ∘L ∑ i, 𝐱 i ∘L 𝐱 i := by
       simp [Finset.sum_add_distrib, ← comp_finset_sum, ← Finset.smul_sum,
         ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, mul_assoc, sub_eq_add_neg]
-    _ = 𝐫₀ ε (-1) ∘L ∑ i, 𝐱 i ∘L 𝐩 i
-        - (I * ℏ * (d - 1)) • 𝐫₀ ε (-1) - (I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) := by
-      simp only [positionOperatorSqr_eq ε, comp_sub, comp_smul, comp_id,
+    _ = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩) - (I * ℏ * (d - 1)) • 𝐫₀ ε (-1)
+        - (I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) := by
+      simp only [dotProduct, mul_def, positionOperatorSqr_eq ε, comp_sub, comp_smul, comp_id,
         radiusRegPowOperator_comp_eq, smul_sub, ← Complex.coe_smul, ofReal_pow, smul_smul]
       ring_nf
       simp_rw [← add_sub_assoc, add_assoc, ← add_smul, sub_eq_add_neg, ← neg_smul]
       ring_nf
 
 private lemma sum_rxp (d : ℕ) (ε : ℝˣ) :
-    ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐩 i = 𝐫₀ ε (-1) ∘L ∑ i, 𝐱 i ∘L 𝐩 i := by rw [comp_finset_sum]
+    ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐩 i = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩) := by rw [← comp_finset_sum]; rfl
 
 set_option backward.isDefEq.respectTransparency false in
 private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐫₀ ε (-1) ∘L 𝐱 i =
