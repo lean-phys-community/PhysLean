@@ -41,10 +41,6 @@ variable (H : HydrogenAtom)
 def lrlOperator (ε : ℝˣ) (i : Fin H.d) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=
   (2 : ℝ)⁻¹ • ∑ j, (𝐩 j ∘L 𝐋[i,j] + 𝐋[i,j] ∘L 𝐩 j) - (H.m * H.k) • 𝐫₀ ε (-1) ∘L 𝐱 i
 
-/-- The square of the LRL vector operator, `𝐀(ε)² ≔ 𝐀(ε)ᵢ𝐀(ε)ᵢ`. -/
-def lrlOperatorSqr (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=
-  ∑ i, (H.lrlOperator ε i) ∘L (H.lrlOperator ε i)
-
 /-- `𝐀(ε)ᵢ = 𝐱ᵢ𝐩² - (𝐱ⱼ𝐩ⱼ)𝐩ᵢ + ½iℏ(d-1)𝐩ᵢ - mk·𝐫(ε)⁻¹𝐱ᵢ` -/
 lemma lrlOperator_eq (ε : ℝˣ) (i : Fin H.d) :
     H.lrlOperator ε i = 𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩) - (𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 i
@@ -122,21 +118,20 @@ lemma angularMomentum_commutation_lrl (ε : ℝˣ) (i j k : Fin H.d) :
   sorry
 
 /-- `⁅𝐋ᵢⱼ, 𝐀(ε)²⁆ = 0` -/
-@[sorryful]
+@[sorryful, simp]
 lemma angularMomentum_commutation_lrlSqr (ε : ℝˣ) (i j : Fin H.d) :
-    ⁅𝐋[i,j], H.lrlOperatorSqr ε⁆ = 0 := by
-  unfold lrlOperatorSqr
-  simp only [lie_sum, lie_leibniz, H.angularMomentum_commutation_lrl]
+    ⁅𝐋[i,j], H.lrlOperator ε ⬝ᵥ H.lrlOperator ε⁆ = 0 := by
+  simp only [dotProduct, mul_def, lie_sum, lie_leibniz, H.angularMomentum_commutation_lrl]
   simp only [comp_sub, comp_smul, sub_comp, smul_comp]
   dsimp only [kroneckerDelta]
   simp [Finset.sum_add_distrib, Finset.sum_sub_distrib]
 
 /-- `⁅𝐋², 𝐀(ε)²⁆ = 0` -/
-@[sorryful]
+@[sorryful, simp]
 lemma angularMomentumSqr_commutation_lrlSqr (ε : ℝˣ) :
-    ⁅angularMomentumOperatorSqr (d := H.d), H.lrlOperatorSqr ε⁆ = 0 := by
+    ⁅angularMomentumOperatorSqr (d := H.d), H.lrlOperator ε ⬝ᵥ H.lrlOperator ε⁆ = 0 := by
   unfold angularMomentumOperatorSqr
-  simp [sum_lie, leibniz_lie, H.angularMomentum_commutation_lrlSqr]
+  simp [sum_lie, leibniz_lie]
 
 /-
 
@@ -556,19 +551,19 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The square of the (regularized) LRL vector operator is related to the (regularized) Hamiltonian
   `𝐇(ε)` of the hydrogen atom, square of the angular momentum `𝐋²` and powers of `𝐫(ε)` as
   `𝐀(ε)² = 2m·𝐇(ε)(𝐋² + ¼ℏ²(d-1)²) + m²k²(𝟙 - ε²·𝐫(ε)⁻²) - ½(d-1)mkℏ²ε²𝐫(ε)⁻³`. -/
-lemma lrlOperatorSqr_eq (ε : ℝˣ) : H.lrlOperatorSqr ε =
+lemma lrlOperatorSqr_eq (ε : ℝˣ) : H.lrlOperator ε ⬝ᵥ H.lrlOperator ε =
     (2 * H.m) • (H.hamiltonianReg ε) ∘L
       (𝐋² + (4⁻¹ * ℏ ^ 2 * (H.d - 1) ^ 2 : ℝ) • ContinuousLinearMap.id ℂ 𝓢(Space H.d, ℂ))
     + (H.m ^ 2 * H.k ^ 2) • (ContinuousLinearMap.id ℂ 𝓢(Space H.d, ℂ) - ε.1 ^ 2 • 𝐫₀ ε (-2))
     - (2⁻¹ * ℏ^2 * H.m * H.k * (H.d - 1) * ε.1 ^ 2) • 𝐫₀ ε (-3) := by
-  dsimp [lrlOperatorSqr]
+  simp_rw [dotProduct, mul_def]
   conv_lhs => enter [2, i, 1]; rw [lrlOperator_eq']
   conv_lhs => enter [2, i, 2]; rw [lrlOperator_eq'']
   simp_rw [sub_eq_add_neg, ← neg_smul, add_comp, comp_add, smul_comp, comp_smul, finset_sum_comp,
     comp_finset_sum, Finset.sum_add_distrib, ← Finset.smul_sum, comp_assoc, sum_LppL, sum_Lpp,
     sum_Lprx, sum_ppL, sum_prx, sum_rxpL, sum_rxp, sum_rxrx, hamiltonianReg]
   simp only [sub_eq_add_neg, ← neg_smul, smul_zero, zero_add, add_zero, ← neg_mul, smul_smul,
-    ← momentumOperatorSqr_eq, ← Complex.coe_smul, ofReal_mul, ofReal_neg, ofReal_inv, ofReal_pow,
+    dotProduct, mul_def, ← Complex.coe_smul, ofReal_mul, ofReal_neg, ofReal_inv, ofReal_pow,
     smul_add, ofReal_ofNat]
   ring_nf
   ext
