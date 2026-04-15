@@ -49,6 +49,7 @@ scoped[OptimalHypothesisRate] notation "β_" ε " (" ρ "‖" S ")" =>  OptimalH
 
 namespace OptimalHypothesisRate
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The space of strategies `T` in `OptimalHypothesisRate` is inhabited, we always have some valid strategy. -/
 instance iInf_Inhabited (ρ : MState d) (ε : Prob) :
     Inhabited { m // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } :=
@@ -68,6 +69,7 @@ theorem iInf_IsCompact (ρ : MState d) (ε : Prob) : IsCompact { m | ρ.exp_val 
     fun_prop
   exact hC₁.inter_left hC₂
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The space of strategies `T` in `OptimalHypothesisRate` is convex. -/
 theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
   --We *could* get this from a more general fact that any linear subspace is convex,
@@ -92,6 +94,7 @@ theorem of_empty {ρ : MState d} (ε : Prob) : β_ ε(ρ‖∅) = 0 := by
   simp [OptimalHypothesisRate]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 theorem le_sup_exp_val {ρ : MState d} (ε : Prob) {S : Set (MState d)}
     (m : HermitianMat d ℂ) (hExp : ρ.exp_val (1 - m) ≤ ε) (hm : 0 ≤ m ∧ m ≤ 1) :
     β_ ε(ρ‖S) ≤ ⨆ σ ∈ S, ⟨_, σ.exp_val_prob hm⟩ := by
@@ -116,6 +119,7 @@ theorem negLog_le_singleton (ρ : MState d) (ε : Prob) (S : Set (MState d))
   apply le_of_subset
   exact Set.singleton_subset_iff.mpr h
 
+set_option backward.isDefEq.respectTransparency false in
 theorem singleton_le_exp_val {ρ σ : MState d} {ε : Prob} (m : HermitianMat d ℂ)
     (hExp : ρ.exp_val (1 - m) ≤ ε) (hm : 0 ≤ m ∧ m ≤ 1) :
   β_ ε(ρ‖{σ}) ≤ ⟨_, σ.exp_val_prob hm⟩ := by
@@ -123,6 +127,7 @@ theorem singleton_le_exp_val {ρ σ : MState d} {ε : Prob} (m : HermitianMat d 
   apply iInf_le_of_le ⟨m, ⟨hExp, hm⟩⟩ _
   simp only [le_refl]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- There exists an optimal T for the hypothesis testing, that is, it's a minimum
 and not just an infimum. This states we have `1 - ε ≤ ρ.exp_val T`, but we can always
 "worsen" T to make that bound tight, which is `exists_min`. -/
@@ -166,6 +171,7 @@ theorem exists_min' (ρ : MState d) (ε : Prob) (S : Set (MState d)):
 -- #synth AddCommMonoid Prob
 -- #synth OrderedSub Prob
 
+set_option backward.isDefEq.respectTransparency false in
 /-- There exists an optimal T for the hypothesis testing, that is, it's a minimum and
 not just an infimum. This tightens the `T` from `exists_min'` to a `⟪ρ,T⟫ = 1 - ε` bound. -/
 theorem exists_min (ρ : MState d) (ε : Prob) (S : Set (MState d)):
@@ -218,6 +224,7 @@ theorem exists_min (ρ : MState d) (ε : Prob) (S : Set (MState d)):
     · exact iInf_le_iff.mpr fun _ a ↦ a ⟨T', hT'⟩
   · simp [MState.exp_val_sub, ← hρT']
 
+set_option backward.isDefEq.respectTransparency false in
 /-- When the allowed Type I error `ε` is less than 1 (so, we have some limit on our errors),
 and the kernel of the state `ρ` contains the kernel of some element in `S`, then the optimal
 hypothesis rate is positive - there is some lower bound on the type II errors we'll see. In
@@ -248,6 +255,7 @@ theorem pos_of_lt_one {ρ : MState d} (S : Set (MState d))
     · simp
   · exact sub_le_self 1 hT₂
 
+set_option backward.isDefEq.respectTransparency false in
 --Lemma 3 from Hayashi
 theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompact S)
     (hS₂ : Convex ℝ (MState.M '' S)) : ⨆ σ ∈ S, β_ ε(ρ‖{σ}) = β_ ε(ρ‖S) := by
@@ -331,6 +339,7 @@ theorem optimalHypothesisRate_antitone (ρ σ : MState d) (ℰ : CPTPMap d d₂)
 
 open scoped HermitianMat in
 open scoped Prob in
+set_option backward.isDefEq.respectTransparency false in
 /-- This is from [Strong converse exponents for a quantum channel discrimination problem
 and quantum-feedback-assisted communication](https://doi.org/10.1007/s00220-016-2645-4), Lemma 5.
 
@@ -504,6 +513,7 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
     · exact sub_nonneg_of_le p.2.2
     · exact sub_nonneg_of_le q.2.2
 
+set_option backward.isDefEq.respectTransparency false in
 theorem rate_pos_of_smul_pos {ε : Prob} {d : Type*} [Fintype d] [DecidableEq d] {ρ σ₁ σ₂ : MState d}
     (hσ₂ : 0 < β_ ε(ρ‖{σ₂})) {c : ℝ} (hc : 0 < c) (hσ : c • σ₂ ≤ σ₁.M) : 0 < β_ ε(ρ‖{σ₁}) := by
   simp only [of_singleton, lt_iInf_iff] at hσ₂ ⊢
@@ -521,6 +531,7 @@ theorem rate_pos_of_smul_pos {ε : Prob} {d : Type*} [Fintype d] [DecidableEq d]
   grw [min_le_left]
   refine hb.trans (HermitianMat.inner_mono' i.2.2.1 hσ)
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 theorem rate_Continuous_singleton {ε : Prob} {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) :
     Continuous fun σ ↦ β_ ε(ρ‖{σ}) := by
@@ -531,6 +542,7 @@ theorem rate_Continuous_singleton {ε : Prob} {d : Type*} [Fintype d] [Decidable
   conv => enter [1, σ]; rw [subtype_val_iInf']
   exact Continuous.subtype_mk (h.comp MState.Continuous_HermitianMat) _
 
+set_option backward.isDefEq.respectTransparency false in
 /-- On the 1D Hilbert space, the optimal hypothesis testing rate is simply 1 - ε,
 since there's nothing to learn. (More generally this would hold whenever ρ=σ.) --/
 theorem optimalHypothesisRate_unique {d : Type*} [Fintype d] [DecidableEq d]

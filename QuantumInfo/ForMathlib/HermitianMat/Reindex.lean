@@ -46,6 +46,7 @@ theorem reindex_reindex (A : HermitianMat d 𝕜) (e : d ≃ d₂) (f : d₂ ≃
 theorem reindex_zero : (0 : HermitianMat d 𝕜).reindex e = 0 := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem reindex_one [DecidableEq d] [DecidableEq d₂] :
     (1 : HermitianMat d 𝕜).reindex e = 1 := by

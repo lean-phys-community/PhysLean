@@ -4,11 +4,11 @@ from git import Repo           # gitpython to analyze the repo
 import numpy as np
 import pandas as pd
 
-repo = Repo(".")               
-physlean_path = os.path.join(repo.working_tree_dir, "PhysLean")   # to analyze folders in the PhysLean folder in main branch (other folders like docs, scripts are ignored)
+repo = Repo(".")
+physlib_path = os.path.join(repo.working_tree_dir, "physlib")   # to analyze folders in the Physlib folder in main branch (other folders like docs, scripts are ignored)
 
-# all folders in Physlean are named after a branch of physics, we assign a number to each branch to generate colors on treemap based on categories (Stats mech is 1, classical mech is 2 ..)
-folders = [name for name in os.listdir(physlean_path) if os.path.isdir(os.path.join(physlean_path, name))]
+# all folders in Physlib are named after a branch of physics, we assign a number to each branch to generate colors on treemap based on categories (Stats mech is 1, classical mech is 2 ..)
+folders = [name for name in os.listdir(physlib_path) if os.path.isdir(os.path.join(physlib_path, name))]
 folder_map = {folder: idx + 1 for idx, folder in enumerate(folders)}
 
 #debugging
@@ -27,9 +27,9 @@ blobs = [{
     #'commits': len(commits := list(repo.iter_commits(paths=blob.path))),
     'value': (
         folder_map.get(blob.path.split("/")[1], 0)
-        if len(blob.path.split("/")) > 1 and blob.path.startswith("PhysLean/")
+        if len(blob.path.split("/")) > 1 and blob.path.startswith("Physlib/")
         else 0
-    )} for blob in repo.tree().traverse() if "PhysLean" in blob.path.rsplit("/", 1)[0]]
+    )} for blob in repo.tree().traverse() if "Physlib" in blob.path.rsplit("/", 1)[0]]
 
 print(blobs[-1])
 

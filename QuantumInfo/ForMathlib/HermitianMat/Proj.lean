@@ -52,6 +52,7 @@ theorem projector_add_orthogonal : projector S + projector Sᗮ = 1 := by
   erw [ Subtype.mk_eq_mk ];
   ext i j; simp [ LinearMap.toMatrix_apply, Matrix.one_apply ] ;
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem trace_projector : (projector S).trace = (Module.finrank 𝕜 S : ℝ) := by
   suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by
@@ -86,6 +87,7 @@ theorem kerProj_of_nonSingular [NonSingular A] : A.kerProj = 0 := by
 theorem supportProj_of_nonSingular [NonSingular A] : A.supportProj = 1 := by
   simpa using A.kerProj_add_supportProj
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The projector onto a submodule S is the sum of the outer products of the vectors in an orthonormal basis of S.
 -/
@@ -106,6 +108,7 @@ theorem projector_eq_sum_rankOne (b : OrthonormalBasis ι 𝕜 S) :
   convert congr_arg ( fun x : EuclideanSpace ( _ ) n => x i ) ( h_proj j ) using 1
   simp [ Matrix.sum_apply, mul_comm ]
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The projector onto the support of A is the sum of the projections onto the eigenvectors with non-zero eigenvalues.
 -/
@@ -217,6 +220,7 @@ theorem projLE_zero_cfc : {0 ≤ₚ A} = A.cfc (fun x ↦ if 0 ≤ x then 1 else
 theorem projLT_zero_cfc : {0 <ₚ A} = A.cfc (fun x ↦ if 0 < x then 1 else 0) := by
   simp only [projLT_def, sub_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem projLE_zero_cfc' : {A ≤ₚ 0} = A.cfc (fun x ↦ if x ≤ 0 then 1 else 0) := by
   simp only [projLE_def, zero_sub]
   --TODO: Should do a `HermitianMat.cfc_comp_neg`?
@@ -225,6 +229,7 @@ theorem projLE_zero_cfc' : {A ≤ₚ 0} = A.cfc (fun x ↦ if x ≤ 0 then 1 els
   congr! 2 with x
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 theorem projLT_zero_cfc' : {A <ₚ 0} = A.cfc (fun x ↦ if x < 0 then 1 else 0) := by
   simp only [projLT_def, zero_sub]
   --TODO: Should do a `HermitianMat.cfc_comp_neg`?
@@ -243,6 +248,7 @@ theorem projLT_nonneg : 0 ≤ {A <ₚ B} := by
   intro i
   apply ite_nonneg <;> norm_num
 
+set_option backward.isDefEq.respectTransparency false in
 theorem projLE_le_one : {A ≤ₚ B} ≤ 1 := by
   --The whole `rw` line is a defeq, i.e. `change _root_.cfc _ (B - A).mat ≤ 1` works too.
   --TODO better API.
@@ -251,6 +257,7 @@ theorem projLE_le_one : {A ≤ₚ B} ≤ 1 := by
   apply cfc_le_one (f := fun x ↦ if 0 ≤ x then 1 else 0)
   intros; split <;> norm_num
 
+set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder in
 theorem projLE_mul_nonneg : 0 ≤ {A ≤ₚ B}.mat * (B - A).mat := by
   rw [projLE_def]
@@ -259,6 +266,7 @@ theorem projLE_mul_nonneg : 0 ≤ {A ≤ₚ B}.mat * (B - A).mat := by
   apply cfc_nonneg
   aesop
 
+set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder in
 theorem projLE_mul_le : {A ≤ₚ B}.mat * A.mat ≤ {A ≤ₚ B}.mat * B.mat := by
   rw [← sub_nonneg, ← mul_sub_left_distrib]
@@ -312,12 +320,14 @@ theorem negPart_eq_cfc_ite : A⁻ = A.cfc (fun x ↦ if x ≤ 0 then -x else 0) 
   congr; ext
   split <;> split <;> grind
 
+set_option backward.isDefEq.respectTransparency false in
 /-- There is an existing (very slow) `PosPart` instance on `Matrix n n 𝕜`, this shows
 that this is equal. -/
 theorem posPart_eq_posPart_toMat : A⁺ = A.mat⁺ := by
   rw [CFC.posPart_def, cfcₙ_eq_cfc]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- There is an existing (very slow) `PosPart` instance on `Matrix n n 𝕜`, this shows
 that this is equal. -/
 theorem negPart_eq_negPart_toMat : A⁻ = A.mat⁻ := by
@@ -355,6 +365,7 @@ theorem negPart_nonneg : 0 ≤ A⁻ := by
   rw [negPart_eq_cfc_ite, cfc_nonneg_iff]
   intro; split <;> grind
 
+set_option backward.isDefEq.respectTransparency false in
 theorem posPart_le : A ≤ A⁺ := by
   nth_rw 1 [← cfc_id A]
   rw [posPart_eq_cfc_ite, ← sub_nonneg, ← cfc_sub, cfc_nonneg_iff]
@@ -372,6 +383,7 @@ theorem projLE_inner_nonneg  : 0 ≤ ⟪{A ≤ₚ B}, (B - A)⟫ :=
   --This inner is equal to `(B - A)⁺.trace`, could be better way to describe it
   inner_mul_nonneg (projLE_mul_nonneg A B)
 
+set_option backward.isDefEq.respectTransparency false in
 theorem projLE_inner_le : ⟪{A ≤ₚ B}, A⟫ ≤ ⟪{A ≤ₚ B}, B⟫ := by
   rw [← sub_nonneg, ← inner_sub_right]
   exact projLE_inner_nonneg A B
@@ -423,6 +435,7 @@ proof_wanted posPart_eq_zero_iff : A⁺ = 0 ↔ A ≤ 0
 theorem one_sub_projLT : 1 - {B ≤ₚ A} = {A <ₚ B} := by
   rw [sub_eq_iff_eq_add, proj_le_add_lt]
 
+set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder ComplexOrder in
 theorem projLT_mul_nonneg : 0 ≤ {A <ₚ B}.mat * (B - A).mat := by
   rw [projLT_def]
@@ -433,11 +446,13 @@ theorem projLT_mul_nonneg : 0 ≤ {A <ₚ B}.mat * (B - A).mat := by
   simp only [Pi.mul_apply, id_eq, ite_mul, one_mul, zero_mul]
   split <;> order
 
+set_option backward.isDefEq.respectTransparency false in
 open MatrixOrder ComplexOrder in
 theorem proj_lt_mul_lt : {A <ₚ B}.mat * A.mat ≤ {A <ₚ B}.mat * B.mat := by
   rw [← sub_nonneg, ← mul_sub_left_distrib]
   exact A.projLT_mul_nonneg B
 
+set_option backward.isDefEq.respectTransparency false in
 theorem inner_negPart_nonpos : ⟪A, A⁻⟫ ≤ 0 := by
   rw [← neg_le_neg_iff, neg_zero, ← inner_neg_right]
   apply inner_mul_nonneg
@@ -460,6 +475,7 @@ theorem posPart_inner_negPart_zero : ⟪A⁺, A⁻⟫ = 0 := by
   rw [posPart_mul_negPart, Matrix.trace_zero] at hi
   simpa only [map_eq_zero] using hi
 
+set_option backward.isDefEq.respectTransparency false in
 theorem inner_negPart_zero_iff : ⟪A, A⁻⟫ = 0 ↔ 0 ≤ A := by
   constructor
   · intro h

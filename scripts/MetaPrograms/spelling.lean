@@ -3,19 +3,19 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Informal.Post
+import Physlib.Meta.Informal.Post
 import Mathlib.Lean.CoreM
-import PhysLean.Meta.Linters.Sorry
-import PhysLean.Meta.Sorry
+import Physlib.Meta.Linters.Sorry
+import Physlib.Meta.Sorry
 import Mathlib.Data.List.Defs
 import Lean.DocString.Extension
-import PhysLean.Meta.AllFilePaths
+import Physlib.Meta.AllFilePaths
 /-!
 
 # Script to help checking spelling of results
 
 This script collects all words in doc-strings of definitions, theorems and lemmas
-in PhysLean, as well as module doc-strings, and compares them to a custom dictionary
+in Physlib, as well as module doc-strings, and compares them to a custom dictionary
 of correctly spelled words. It then outputs all words which are not in the dictionary,
 so that the user can either correct them or add them to the dictionary file.
 
@@ -26,10 +26,10 @@ all unknown words found.
 
 open Lean
 
-/-- The strings appearing as documentation within PhysLean. -/
+/-- The strings appearing as documentation within Physlib. -/
 def moduleDocs : MetaM (Array String) := do
   let env ← getEnv
-  let allModules ← allPhysLeanModules
+  let allModules ← allPhyslibModules
   let modDocs := allModules.filterMap fun c =>
     Lean.getModuleDoc? env c
   let modDocs := modDocs.flatten
@@ -39,7 +39,7 @@ def moduleDocs : MetaM (Array String) := do
 /-- All the words in either module doc-strings or doc-strings of definitions, theorems
   and lemmas. -/
 def allWords : MetaM (Array String) := do
-  let allConstants ← PhysLean.allUserConsts
+  let allConstants ← Physlib.allUserConsts
   let allModuleDocs ← moduleDocs
   let allDocStrings ← allConstants.mapM fun c => Lean.Name.getDocString c.name
   let allDocStrings := allDocStrings ++ allModuleDocs
@@ -62,7 +62,7 @@ def dictionary : MetaM (Array String) := do
 unsafe def main (_ : List String) : IO Unit := do
   initSearchPath (← findSysroot)
   println! "Checking spelling."
-  let env ← importModules (loadExts := true) #[`PhysLean] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }

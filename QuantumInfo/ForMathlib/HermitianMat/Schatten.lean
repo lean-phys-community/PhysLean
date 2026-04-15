@@ -170,6 +170,7 @@ lemma conjTranspose_half_mul_eq_conj
   have := HermitianMat.pow_half_mul hA; simp_all [ ← mul_assoc ] ;
   simp only [mul_assoc, this]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma schattenNorm_half_mul_rpow_eq_trace_conj
     {A B : HermitianMat d ℂ} (hA : 0 ≤ A)
     {α : ℝ} (hα : 0 < α) :

@@ -3,18 +3,18 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Basic
-import PhysLean.Meta.TODO.Basic
+import Physlib.Meta.Basic
+import Physlib.Meta.TODO.Basic
 import Mathlib.Lean.CoreM
-import PhysLean.Meta.Informal.Post
-import PhysLean.Meta.Informal.SemiFormal
+import Physlib.Meta.Informal.Post
+import Physlib.Meta.Informal.SemiFormal
 /-!
 
 # Checks for duplicate TODO tags
 
 -/
 
-open Lean System Meta PhysLean Core
+open Lean System Meta Physlib Core
 
 
 def tagsFromTODOs : MetaM (Array String) := do
@@ -43,10 +43,10 @@ unsafe def tagDuplicateTest : MetaM Unit := do
     panic! s!"Duplicate tags found: {duplicates}"
   pure ()
 
-unsafe def main (args : List String) : IO UInt32 := do
+unsafe def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
   println! "Checking for duplicate tags."
-  let env ← importModules (loadExts := true) #[`PhysLean] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }

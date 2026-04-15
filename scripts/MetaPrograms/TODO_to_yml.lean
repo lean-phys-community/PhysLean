@@ -3,12 +3,12 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Basic
-import PhysLean.Meta.TODO.Basic
+import Physlib.Meta.Basic
+import Physlib.Meta.TODO.Basic
 import Mathlib.Lean.CoreM
-import PhysLean.Meta.Informal.Post
-import PhysLean.Meta.Informal.SemiFormal
-import PhysLean.Meta.Linters.Sorry
+import Physlib.Meta.Informal.Post
+import Physlib.Meta.Informal.SemiFormal
+import Physlib.Meta.Linters.Sorry
 /-!
 
 # Creates TODO yml file from the TODO items.
@@ -24,17 +24,17 @@ It collects the following TODO items:
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 
 /-!
 
-## PhysLean categories.
+## Physlib categories.
 
 To be moved.
 
 -/
-inductive PhysLeanCategory
+inductive PhyslibCategory
   | ClassicalMechanics
   | CondensedMatter
   | Cosmology
@@ -52,7 +52,7 @@ inductive PhysLeanCategory
   | Other
 deriving BEq, DecidableEq
 
-def PhysLeanCategory.string :  PhysLeanCategory → String
+def PhyslibCategory.string :  PhyslibCategory → String
   | ClassicalMechanics => "Classical Mechanics"
   | CondensedMatter => "Condensed Matter"
   | Cosmology => "Cosmology"
@@ -69,7 +69,7 @@ def PhysLeanCategory.string :  PhysLeanCategory → String
   | Thermodynamics => "Thermodynamics"
   | Other => "Other"
 
-def PhysLeanCategory.emoji : PhysLeanCategory → String
+def PhyslibCategory.emoji : PhyslibCategory → String
   | ClassicalMechanics => "⚙️"
   | CondensedMatter => "🧊"
   | Cosmology => "🌌"
@@ -86,55 +86,55 @@ def PhysLeanCategory.emoji : PhysLeanCategory → String
   | Thermodynamics => "🔥"
   | Other => "❓"
 
-def PhysLeanCategory.List :  List PhysLeanCategory :=
-  [ PhysLeanCategory.ClassicalMechanics,
-    PhysLeanCategory.CondensedMatter,
-    PhysLeanCategory.Cosmology,
-    PhysLeanCategory.Elctromagnetism,
-    PhysLeanCategory.Mathematics,
-    PhysLeanCategory.Meta,
-    PhysLeanCategory.Optics,
-    PhysLeanCategory.Particles,
-    PhysLeanCategory.QFT,
-    PhysLeanCategory.QuantumMechanics,
-    PhysLeanCategory.Relativity,
-    PhysLeanCategory.StringTheory,
-    PhysLeanCategory.StatisticalMechanics,
-    PhysLeanCategory.Thermodynamics,
-    PhysLeanCategory.Other]
+def PhyslibCategory.List :  List PhyslibCategory :=
+  [ PhyslibCategory.ClassicalMechanics,
+    PhyslibCategory.CondensedMatter,
+    PhyslibCategory.Cosmology,
+    PhyslibCategory.Elctromagnetism,
+    PhyslibCategory.Mathematics,
+    PhyslibCategory.Meta,
+    PhyslibCategory.Optics,
+    PhyslibCategory.Particles,
+    PhyslibCategory.QFT,
+    PhyslibCategory.QuantumMechanics,
+    PhyslibCategory.Relativity,
+    PhyslibCategory.StringTheory,
+    PhyslibCategory.StatisticalMechanics,
+    PhyslibCategory.Thermodynamics,
+    PhyslibCategory.Other]
 
-instance : ToString PhysLeanCategory where
-  toString := PhysLeanCategory.string
+instance : ToString PhyslibCategory where
+  toString := PhyslibCategory.string
 
-def PhysLeanCategory.ofFileName (n : Name) : PhysLeanCategory :=
-  if n.toString.startsWith "PhysLean.ClassicalMechanics"  then
-    PhysLeanCategory.ClassicalMechanics
-  else if n.toString.startsWith "PhysLean.CondensedMatter" then
-    PhysLeanCategory.CondensedMatter
-  else if n.toString.startsWith "PhysLean.Cosmology" then
-    PhysLeanCategory.Cosmology
-  else if n.toString.startsWith "PhysLean.Electromagnetism" then
-    PhysLeanCategory.Elctromagnetism
-  else if n.toString.startsWith "PhysLean.Mathematics" then
-    PhysLeanCategory.Mathematics
-  else if n.toString.startsWith "PhysLean.Meta" then
-    PhysLeanCategory.Meta
-  else if n.toString.startsWith "PhysLean.Optics" then
-    PhysLeanCategory.Optics
-  else if n.toString.startsWith "PhysLean.Particles" then
-    PhysLeanCategory.Particles
-  else if n.toString.startsWith "PhysLean.QFT" then
-    PhysLeanCategory.QFT
-  else if n.toString.startsWith "PhysLean.QuantumMechanics" then
-    PhysLeanCategory.QuantumMechanics
-  else if n.toString.startsWith "PhysLean.Relativity" then
-    PhysLeanCategory.Relativity
-  else if n.toString.startsWith "PhysLean.StatisticalMechanics" then
-    PhysLeanCategory.StatisticalMechanics
-  else if n.toString.startsWith "PhysLean.Thermodynamics" then
-    PhysLeanCategory.Thermodynamics
+def PhyslibCategory.ofFileName (n : Name) : PhyslibCategory :=
+  if n.toString.startsWith "Physlib.ClassicalMechanics"  then
+    PhyslibCategory.ClassicalMechanics
+  else if n.toString.startsWith "Physlib.CondensedMatter" then
+    PhyslibCategory.CondensedMatter
+  else if n.toString.startsWith "Physlib.Cosmology" then
+    PhyslibCategory.Cosmology
+  else if n.toString.startsWith "Physlib.Electromagnetism" then
+    PhyslibCategory.Elctromagnetism
+  else if n.toString.startsWith "Physlib.Mathematics" then
+    PhyslibCategory.Mathematics
+  else if n.toString.startsWith "Physlib.Meta" then
+    PhyslibCategory.Meta
+  else if n.toString.startsWith "Physlib.Optics" then
+    PhyslibCategory.Optics
+  else if n.toString.startsWith "Physlib.Particles" then
+    PhyslibCategory.Particles
+  else if n.toString.startsWith "Physlib.QFT" then
+    PhyslibCategory.QFT
+  else if n.toString.startsWith "Physlib.QuantumMechanics" then
+    PhyslibCategory.QuantumMechanics
+  else if n.toString.startsWith "Physlib.Relativity" then
+    PhyslibCategory.Relativity
+  else if n.toString.startsWith "Physlib.StatisticalMechanics" then
+    PhyslibCategory.StatisticalMechanics
+  else if n.toString.startsWith "Physlib.Thermodynamics" then
+    PhyslibCategory.Thermodynamics
   else
-    PhysLeanCategory.Other
+    PhyslibCategory.Other
 
 /-########################-/
 
@@ -153,7 +153,7 @@ structure FullTODOInfo where
   isInformalLemma : Bool
   isSemiFormalResult : Bool
   isSorryfulResult : Bool := false
-  category : PhysLeanCategory
+  category : PhyslibCategory
   tag : String
 
 /-- Converts a `FullTODOInfo` to an entry in a YAML code. -/
@@ -183,7 +183,7 @@ def FullTODOInfo.toYAML (todo : FullTODOInfo) : MetaM String := do
 def FullTODOInfo.ofTODO (t : todoInfo) : FullTODOInfo :=
   {content := t.content, fileName := t.fileName, line := t.line, name := t.fileName,
    isInformalDef := false, isInformalLemma := false,
-   isSemiFormalResult := false, category := PhysLeanCategory.ofFileName t.fileName,
+   isSemiFormalResult := false, category := PhyslibCategory.ofFileName t.fileName,
    tag := t.tag}
 
 unsafe def getTodoInfo : MetaM (Array FullTODOInfo) := do
@@ -206,7 +206,7 @@ unsafe def informalTODO (x : ConstantInfo) : CoreM FullTODOInfo := do
   let file ← Name.fileName name
   let isInformalDef := Informal.isInformalDef x
   let isInformalLemma := Informal.isInformalLemma x
-  let category := PhysLeanCategory.ofFileName file
+  let category := PhyslibCategory.ofFileName file
   return {content := docString, fileName := file, line := lineNo, name := name,
           isInformalDef := isInformalDef, isInformalLemma := isInformalLemma,
           isSemiFormalResult := false, category := category,
@@ -225,7 +225,7 @@ unsafe def allInformalTODO : CoreM (Array FullTODOInfo) := do
 def FullTODOInfo.ofSemiFormal (t : WantedInfo) : FullTODOInfo :=
   {content := t.content, fileName := t.fileName, line := t.line, name := t.name,
    isInformalDef := false, isInformalLemma := false,
-   isSemiFormalResult := true, category := PhysLeanCategory.ofFileName t.fileName,
+   isSemiFormalResult := true, category := PhyslibCategory.ofFileName t.fileName,
    tag := t.tag}
 
 unsafe def allSemiInformal  : CoreM (Array FullTODOInfo) := do
@@ -247,7 +247,7 @@ def SorryfulInfo.toFullTODOInfo (s : SorryfulInfo) : FullTODOInfo where
   isInformalLemma := false
   isSemiFormalResult := false
   isSorryfulResult := true
-  category := PhysLeanCategory.ofFileName s.fileName
+  category := PhyslibCategory.ofFileName s.fileName
   tag := s.name.toString
 
 unsafe def allSorryfulResults  : CoreM (Array FullTODOInfo) := do
@@ -281,7 +281,7 @@ unsafe def allTODOs : MetaM (List FullTODOInfo) := do
 unsafe def categoriesToYML : MetaM String := do
   let todos ← allTODOs
   let mut cat := "Category:\n"
-  for c in PhysLeanCategory.List do
+  for c in PhyslibCategory.List do
     let num := (todos.filter (fun x => x.category == c)).length
     cat := cat ++
     s!"
@@ -316,7 +316,7 @@ unsafe def fullTODOYML : MetaM String := do
 unsafe def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
   println! "Generating TODO list."
-  let env ← importModules (loadExts := true) #[`PhysLean] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }

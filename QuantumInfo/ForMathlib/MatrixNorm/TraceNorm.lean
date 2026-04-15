@@ -18,6 +18,7 @@ variable {m n R : Type*}
 variable [Fintype m] [Fintype n]
 variable [RCLike R]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm of a matrix: Tr[√(A† A)]. -/
 def traceNorm (A : Matrix m n R) : ℝ :=
   open MatrixOrder in
@@ -35,7 +36,9 @@ theorem traceNorm_eq_neg_self (A : Matrix m n R) : traceNorm (-A) = traceNorm A 
   rw [Matrix.conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg]
   exact neg_neg _
 
-open scoped MatrixOrder Isometry
+
+open MatrixOrder Isometry
+set_option backward.isDefEq.respectTransparency false in
 lemma cfc_sqrt_isometry_conj {A : Matrix n n R} (hA : 0 ≤ A)
   {u : Matrix m n R} (hu₁ : u.Isometry) :
     CFC.sqrt (u * A * uᴴ) = u * CFC.sqrt A * uᴴ := by
@@ -81,6 +84,7 @@ theorem traceNorm_unitary_conj {A : Matrix n n R} {U : Matrix.unitaryGroup n R} 
 
 --More generally sum of abs of singular values.
 --Proposition 9.1.1 in Wilde
+set_option backward.isDefEq.respectTransparency false in
 theorem traceNorm_Hermitian_eq_sum_abs_eigenvalues {A : Matrix n n R} (hA : A.IsHermitian) :
     A.traceNorm = ∑ i, abs (hA.eigenvalues i) := by
   obtain ⟨U, D, hD, hA_eq, h_eig⟩ : ∃ U : Matrix.unitaryGroup n R, ∃ D : Matrix n n R, D.IsDiag ∧ A = U.val * D * U.valᴴ ∧ ∀ i, D i i = hA.eigenvalues i := by
@@ -100,12 +104,14 @@ theorem traceNorm_Hermitian_eq_sum_abs_eigenvalues {A : Matrix n n R} (hA : A.Is
     rw [Matrix.posSemidef_diagonal_iff]
     exact_mod_cast fun i => sq_nonneg (hA.eigenvalues i)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm is nonnegative. Property 9.1.1 in Wilde -/
 theorem traceNorm_nonneg (A : Matrix m n R) : 0 ≤ A.traceNorm :=
   open MatrixOrder in
   And.left $ RCLike.nonneg_iff.1
     (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg (Aᴴ * A))).trace_nonneg
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm is zero iff. the matrix is zero. -/
 theorem traceNorm_zero_iff (A : Matrix m n R) : A.traceNorm = 0 ↔ A = 0 := by
   open MatrixOrder in
@@ -135,6 +141,7 @@ theorem traceNorm_zero_iff (A : Matrix m n R) : A.traceNorm = 0 ↔ A = 0 := by
   · rintro rfl
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Trace norm is linear under scalar multiplication. Property 9.1.2 in Wilde -/
 theorem traceNorm_smul (A : Matrix m n R) (c : R) : (c • A).traceNorm = ‖c‖ * A.traceNorm := by
   have h : (c • A)ᴴ * (c • A) = (‖c‖^2:R) • (Aᴴ * A) := by
@@ -185,6 +192,7 @@ theorem traceNorm_triangleIneq' (A B : Matrix n n R) : (A - B).traceNorm ≤ A.t
   rw [sub_eq_add_neg A B, ←traceNorm_eq_neg_self B]
   exact traceNorm_triangleIneq A (-B)
 
+set_option backward.isDefEq.respectTransparency false in
 theorem PosSemidef.traceNorm_PSD_eq_trace {A : Matrix m m R} (hA : A.PosSemidef) : A.traceNorm = A.trace := by
   have : Aᴴ * A = A^2 := by rw [hA.1, pow_two]
   open MatrixOrder in

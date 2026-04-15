@@ -49,6 +49,7 @@ theorem IsHermitianPreserving.dual (h : M.IsHermitianPreserving) : M.dual.IsHerm
   sorry
 
 open MatrixOrder
+set_option backward.isDefEq.respectTransparency false in
 --TODO Cleanup, find home, abstract out to HermitianMats...?
 theorem _root_.Matrix.PosSemidef.trace_mul_nonneg {n : Type*} [Fintype n] [DecidableEq n]
     {A B : Matrix n n 𝕜} (hA : A.PosSemidef) (hB : B.PosSemidef) :
@@ -152,6 +153,7 @@ lemma dual_id : (MatrixMap.id dIn 𝕜).dual = MatrixMap.id dIn 𝕜 := by
   exact dual_unique (id dIn 𝕜) (id dIn 𝕜) fun A_1 => congrFun rfl
 
 set_option maxHeartbeats 600000 in
+set_option backward.isDefEq.respectTransparency false in
 /--
 The dual of a Kronecker product of maps is the Kronecker product of their duals.
 -/
@@ -249,6 +251,7 @@ lemma Module.Basis.toDualEquiv_symm_comp_dualMap_toDualEquiv {ι R M : Type*} [F
   simp [ Module.Basis.toDual ];
   ac_rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem dual_dual : M.dual.dual = M := by
   rw [dual, dual]
@@ -324,6 +327,7 @@ end CPTPMap
 
 section hermDual
 
+set_option backward.isDefEq.respectTransparency false in
 --PULLOUT to Bundled.lean. Also use this to improve the definitions in POVM.lean.
 def HPMap.ofHermitianMat {dOut : Type*} (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) : HPMap dIn dOut where
   toFun x := f (realPart x) + Complex.I • f (imaginaryPart x)
@@ -359,6 +363,7 @@ def HPMap.ofHermitianMat {dOut : Type*} (f : HermitianMat dIn ℂ →ₗ[ℝ] He
     · apply HermitianMat.H
     · simp [IsSelfAdjoint.imaginaryPart h]
 
+set_option backward.isDefEq.respectTransparency false in
 --PULLOUT
 @[simp]
 theorem HPMap.linearMap_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
@@ -366,12 +371,13 @@ theorem HPMap.linearMap_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] Her
   ext1 ⟨x, hx⟩
   ext1
   simp only [ofHermitianMat, LinearMap.coe_coe]
-  simp only [HPMap.instFunLike, HPMap.map, HermitianMat.mat_mk,
+  simp only [HPMap.apply_hermitianMat_eq, HPMap.map, HermitianMat.mat_mk,
     LinearMap.coe_mk, AddHom.coe_mk]
   conv => enter [2, 1, 2, 1]; rw [← realPart_add_I_smul_imaginaryPart x]
   suffices imaginaryPart x = 0 by simp [this]
   simp [imaginaryPart, skewAdjoint.negISMul, show star x = x from hx]
 
+set_option backward.isDefEq.respectTransparency false in
 --PULLOUT
 omit [Fintype dOut] in
 @[simp]
@@ -404,6 +410,7 @@ theorem HPMap.hermDual_hermDual : f.hermDual.hermDual = f := by
 
 open RealInnerProductSpace
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The defining property of a dual map: inner products are preserved on the opposite argument. -/
 theorem HPMap.inner_hermDual (B : HermitianMat dOut ℂ) :
     ⟪f A, B⟫ = ⟪A, f.hermDual B⟫ := by
@@ -433,6 +440,7 @@ theorem MatrixMap.IsPositive.hermDual (h : MatrixMap.IsPositive f.map) : f.hermD
   rw [HPMap.inner_hermDual, HPMap.hermDual_hermDual]
   apply HermitianMat.inner_ge_zero hx h
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
 theorem HPMap.hermDual_Unital [DecidableEq dIn] [DecidableEq dOut] (h : MatrixMap.IsTracePreserving f.map) :
     f.hermDual.map.Unital := by

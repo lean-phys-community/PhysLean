@@ -140,6 +140,7 @@ def extend_right (d : ProbDistribution α) : ProbDistribution (α ⊕ β) :=
 def extend_left (d : ProbDistribution α) : ProbDistribution (β ⊕ α) :=
   ⟨fun x ↦ Sum.casesOn x (Function.const _ 0) d.val, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Make a convex mixture of two distributions on the same set. -/
 instance instMixable : Mixable (α → ℝ) (ProbDistribution α) :=
   Mixable.instSubtype (inferInstance) (fun _ _ hab hx hy ↦ by

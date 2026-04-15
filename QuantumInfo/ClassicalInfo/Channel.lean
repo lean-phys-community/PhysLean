@@ -49,7 +49,7 @@ def product : Channel (A × C) (B × D) :=
  output distribution `Distribution O`, and this process is applied
  independently on each symbol in the list. -/
 structure DMChannel where
-  symb_dist : I → Distribution O
+  symb_dist : I → ProbDistribution O
 
 namespace DMChannel
 
@@ -65,6 +65,6 @@ def on_fin (C : DMChannel I O) {n : ℕ} (is : Fin n → I) : ProbDistribution (
 
 /-- Apply a discrete memoryless channel to a list. -/
 def on_list (C : DMChannel I O) (is : List I) : ProbDistribution (Fin (is.length) → O) :=
-  C.on_fin is.get
+  C.on_fin _ _ (fun k => is.get k)
 
 end DMChannel

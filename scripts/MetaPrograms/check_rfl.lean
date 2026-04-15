@@ -6,8 +6,8 @@ Authors: Joseph Tooby-Smith
 import Batteries.Lean.HashSet
 import Batteries.Data.List.Basic
 import Lean
-import PhysLean.Meta.AllFilePaths
-import PhysLean.Meta.TransverseTactics
+import Physlib.Meta.AllFilePaths
+import Physlib.Meta.TransverseTactics
 /-!
 
 This file produces a list of places where `rfl` will complete the goal.

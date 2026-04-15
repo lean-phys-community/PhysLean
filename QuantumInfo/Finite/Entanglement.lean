@@ -71,6 +71,7 @@ variable [DecidableEq d] [DecidableEq d₁] [DecidableEq d₂]
 variable (f : MState d → ℝ≥0)
 variable (g : KetUpToPhase d → ℝ≥0)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The convex roof extension `convex_roof_ENNReal` is never ∞. -/
 theorem convex_roof_ne_top : ∀ ρ, convex_roof_ENNReal g ρ ≠ ∞ := fun ρ => by
   simp only [convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall]
@@ -80,7 +81,7 @@ theorem convex_roof_ne_top : ∀ ρ, convex_roof_ENNReal g ρ ≠ ∞ := fun ρ 
     exact Fintype.equivFin d
   use (congrPEnsemble ed) <| spectral_ensemble ρ
   rw [mix_congrPEnsemble_eq_mix ed]
-  push_neg
+  push Not
   convert spectral_ensemble_mix
 
 omit [Nonempty d] in
@@ -88,7 +89,7 @@ omit [Nonempty d] in
 theorem mixed_convex_roof_ne_top : ∀ ρ, mixed_convex_roof_ENNReal f ρ ≠ ∞ := fun ρ => by
   simp only [mixed_convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall]
   use 1, trivial_mEnsemble ρ 0
-  push_neg
+  push Not
   exact trivial_mEnsemble_mix ρ 0
 
 /-- Convex roof extension of a function `g : KetUpToPhase d → ℝ≥0`, defined as the infimum of all pure-state
@@ -111,6 +112,7 @@ def convex_roof_of_MState_fun : MState d → ℝ≥0 := convex_roof (f ∘ pureQ
 
 -- TODO: make `le_convex_roof`, `convex_roof_le`, `le_mixed_convex_roof` and `mixed_convex_roof_le` if-and-only-if statements.
 
+set_option backward.isDefEq.respectTransparency false in
 omit [Nonempty d] in
 theorem le_mixed_convex_roof (ρ : MState d) :
   (∀ n > 0, ∀ e : MEnsemble d (Fin n), mix e = ρ → c ≤ average_NNReal f e) → (c ≤ mixed_convex_roof f ρ) := fun h => by
@@ -120,6 +122,7 @@ theorem le_mixed_convex_roof (ρ : MState d) :
   rw [some_eq_coe', ENNReal.coe_le_coe]
   exact h n hnpos e hmix
 
+set_option backward.isDefEq.respectTransparency false in
 theorem le_convex_roof (ρ : MState d) :
   (∀ n > 0, ∀ e : PEnsemble d (Fin n), mix (toMEnsemble e) = ρ → c ≤ pure_average_NNReal (g ∘ KetUpToPhase.mk) e) → (c ≤ convex_roof g ρ) := fun h => by
   unfold convex_roof
@@ -128,6 +131,7 @@ theorem le_convex_roof (ρ : MState d) :
   rw [some_eq_coe', ENNReal.coe_le_coe]
   exact h n hnpos e hmix
 
+set_option backward.isDefEq.respectTransparency false in
 theorem convex_roof_le (ρ : MState d):
 (∃ n > 0, ∃ e : PEnsemble d (Fin n), mix (toMEnsemble e) = ρ ∧ pure_average_NNReal (g ∘ KetUpToPhase.mk) e ≤ c) → (convex_roof g ρ ≤ c) := fun h => by
   obtain ⟨n, hnpos, e, hmix, h⟩ := h
@@ -137,6 +141,7 @@ theorem convex_roof_le (ρ : MState d):
   rw [some_eq_coe', ENNReal.coe_le_coe]
   exact h
 
+set_option backward.isDefEq.respectTransparency false in
 omit [Nonempty d] in
 theorem mixed_convex_roof_le (ρ : MState d):
 (∃ n > 0, ∃ e : MEnsemble d (Fin n), mix e = ρ ∧ average_NNReal f e ≤ c) → (mixed_convex_roof f ρ ≤ c) := fun h => by
