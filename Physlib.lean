@@ -1,5 +1,6 @@
 module
 
+public import Physlib.ClassicalFieldTheory.Local.LocalJet
 public import Physlib.ClassicalFieldTheory.Local.Variation
 public import Physlib.ClassicalMechanics.Basic
 public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Basic
