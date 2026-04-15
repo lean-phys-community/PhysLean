@@ -5,7 +5,8 @@ Authors: Juan Jose Fernandez Morales
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Derivatives.Iterated
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.MultiIndex
 /-!
 # Local jets
 
