@@ -300,6 +300,31 @@ noncomputable def deriv {d} (A : ElectromagneticPotential d) :
     SpaceTime d → Lorentz.CoVector d ⊗[ℝ] Lorentz.Vector d := fun x =>
   ∑ μ, ∑ ν, (∂_ μ A x ν) • Lorentz.CoVector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν
 
+lemma deriv_eq_tensorDeriv {d} (A : ElectromagneticPotential d)
+    (hA : Differentiable ℝ A) (x : SpaceTime d) :
+    A.deriv x = tensorDeriv A.val x := by
+  rw [deriv, tensorDeriv_eq_sum_tensor_basis (by fun_prop)]
+  /- Match the basis sum. -/
+  let e :  ComponentIdx (Fin.append ![Color.down] ![Color.up])
+      ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prodEquiv.trans <|
+    Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
+  rw [← e.symm.sum_comp, Fintype.sum_prod_type]
+  /- Getting rid of the sums -/
+  refine Finset.sum_congr rfl (fun μ _ => Finset.sum_congr rfl (fun ν _ => ?_))
+  congr
+  /- The coefficents. -/
+  · simp [e]
+    rw [deriv_apply_eq _ _ _ (by fun_prop)]
+    congr
+    simp [Lorentz.Vector.tensor_basis_repr_toTensor_apply]
+  /- The basis elements. -/
+  · change _ = ((Tensor.basis (S := realLorentzTensor d) (Fin.append ![Color.down] ![Color.up])).map
+      (Tensorial.toTensor (M := (Lorentz.CoVector d) ⊗[ℝ] (Lorentz.Vector d))).symm) (e.symm (μ, ν))
+    rw [Tensorial.basis_map_prod, ← Lorentz.Vector.toTensor_symm_basis,
+      ← Lorentz.CoVector.toTensor_symm_basis]
+    simp [e]
+
+
 /-!
 
 ### B.1. Equivariance of the derivative tensor
@@ -313,60 +338,9 @@ as taking the derivative and then applying the Lorentz transformation to the res
 lemma deriv_equivariant {d} {x : SpaceTime d} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) : deriv (Λ • A) x = Λ • (deriv A (Λ⁻¹ • x)) := by
-    calc _
-      _ = ∑ μ, ∑ ν, ∑ κ, ∑ ρ, (Λ.1 ν κ * (Λ⁻¹.1 ρ μ • ∂_ ρ A (Λ⁻¹ • x) κ)) •
-          (Lorentz.CoVector.basis μ) ⊗ₜ[ℝ]
-          Lorentz.Vector.basis ν := by
-        refine Finset.sum_congr rfl (fun μ _ => ?_)
-        refine Finset.sum_congr rfl (fun ν _ => ?_)
-        rw [spaceTime_deriv_action_eq_sum Λ A hf]
-        rw [Finset.sum_smul]
-        apply Finset.sum_congr rfl (fun κ _ => ?_)
-        rw [Finset.sum_smul]
-        apply Finset.sum_congr rfl (fun ρ _ => ?_)
-        congr 1
-        simp only [smul_eq_mul]
-        ring
-      _ = ∑ μ, ∑ ν, ∑ κ, ∑ ρ, (∂_ ρ A (Λ⁻¹ • x) κ) •
-          (Λ⁻¹.1 ρ μ • (Lorentz.CoVector.basis μ)) ⊗ₜ[ℝ]
-          (Λ.1 ν κ • Lorentz.Vector.basis ν) := by
-        refine Finset.sum_congr rfl (fun μ _ => ?_)
-        refine Finset.sum_congr rfl (fun ν _ => ?_)
-        refine Finset.sum_congr rfl (fun κ _ => ?_)
-        refine Finset.sum_congr rfl (fun ρ _ => ?_)
-        rw [smul_tmul, tmul_smul, tmul_smul, smul_smul, smul_smul]
-        congr 1
-        simp only [smul_eq_mul]
-        ring
-      _ = ∑ κ, ∑ ρ, ∑ μ, ∑ ν, (∂_ ρ A (Λ⁻¹ • x) κ) •
-          (Λ⁻¹.1 ρ μ • (Lorentz.CoVector.basis μ)) ⊗ₜ[ℝ]
-          (Λ.1 ν κ • Lorentz.Vector.basis ν) := by
-        conv_lhs => enter [2, μ]; rw [Finset.sum_comm]
-        conv_lhs => rw [Finset.sum_comm]
-        conv_lhs => enter [2, κ, 2, μ]; rw [Finset.sum_comm]
-        conv_lhs => enter [2, κ]; rw [Finset.sum_comm]
-      _ = ∑ κ, ∑ ρ, (∂_ ρ A (Λ⁻¹ • x) κ) • (∑ μ, Λ⁻¹.1 ρ μ • (Lorentz.CoVector.basis μ)) ⊗ₜ[ℝ]
-          (∑ ν, Λ.1 ν κ • Lorentz.Vector.basis ν) := by
-        conv_rhs =>
-          enter [2, κ,2, ρ]; rw [sum_tmul, Finset.smul_sum]
-          enter [2, μ]; rw [tmul_sum, Finset.smul_sum];
-      _ = ∑ κ, ∑ ρ, (∂_ ρ A (Λ⁻¹ • x) κ) • (Λ • (Lorentz.CoVector.basis ρ)) ⊗ₜ[ℝ]
-          (Λ • Lorentz.Vector.basis κ) := by
-        apply Finset.sum_congr rfl (fun κ _ => ?_)
-        apply Finset.sum_congr rfl (fun ρ _ => ?_)
-        congr 2
-        · rw [Lorentz.CoVector.smul_basis]
-        · rw [Lorentz.Vector.smul_basis]
-      _ = ∑ κ, ∑ ρ, (∂_ ρ A (Λ⁻¹ • x) κ) • Λ • ((Lorentz.CoVector.basis ρ) ⊗ₜ[ℝ]
-        Lorentz.Vector.basis κ) := by
-        apply Finset.sum_congr rfl (fun κ _ => ?_)
-        apply Finset.sum_congr rfl (fun ρ _ => ?_)
-        rw [Tensorial.smul_prod]
-    rw [deriv]
-    conv_rhs => rw [← Tensorial.smulLinearMap_apply]
-    rw [Finset.sum_comm]
-    simp
-    rfl
+  rw [deriv_eq_tensorDeriv, deriv_eq_tensorDeriv]
+  rw [action_val, tensorDeriv_equivariant]
+  all_goals fun_prop
 
 /-!
 

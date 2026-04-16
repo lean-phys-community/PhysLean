@@ -472,6 +472,18 @@ lemma tensorDeriv_toTensor_basis_repr
     grind
   · simp
 
+open TensorSpecies.Tensorial Lorentz Tensor
+/-- The expansion of `tensorDeriv` in terms of the tensor basis vector. -/
+lemma tensorDeriv_eq_sum_tensor_basis
+    {f : SpaceTime d → M} (hf : Differentiable ℝ f) (x : SpaceTime d) :
+    tensorDeriv f x = ∑ b, ∂_ (CoVector.indexEquiv (ComponentIdx.prodEquiv b).1)
+      (fun x => (Tensor.basis _).repr (toTensor (f x)) (ComponentIdx.prodEquiv b).2) x •
+    toTensor.symm (Tensor.basis _ b) := by
+  apply Tensorial.toTensor.injective
+  apply (Tensor.basis (Fin.append _ _)).repr.injective
+  ext b
+  simp [Finsupp.single_apply, tensorDeriv_toTensor_basis_repr hf]
+
 /-!
 
 ### C.1. Derivatives of tensors for distributions

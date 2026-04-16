@@ -85,6 +85,20 @@ noncomputable def toFieldStrength {d} (A : ElectromagneticPotential d) :
 
 -/
 
+lemma toFieldStrength_eq_deriv {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
+    toFieldStrength A x =
+    Tensorial.toTensor.symm (permT id PermCond.auto {(η d | μ μ' ⊗ A.deriv x | μ' ν)
+    + - (η d | ν ν' ⊗ A.deriv x | ν' μ)}ᵀ) := by
+  rw [toFieldStrength]
+
+lemma toFieldStrength_eq_tensorDeriv {d} {A : ElectromagneticPotential d}
+    (hA : Differentiable ℝ A) (x : SpaceTime d) :
+    toFieldStrength A x =
+    Tensorial.toTensor.symm (permT id PermCond.auto {(η d | μ μ' ⊗ tensorDeriv A x | μ' ν)
+    + - (η d | ν ν' ⊗ tensorDeriv A x | ν' μ)}ᵀ) := by
+  rw [toFieldStrength_eq_deriv, deriv_eq_tensorDeriv _ hA]
+
+
 set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     toFieldStrength A x =
