@@ -422,7 +422,6 @@ lemma fromPairTContr_tmul_tmul {c c1 c2 : C}
   simp
 
 set_option backward.isDefEq.respectTransparency false in
-set_option maxHeartbeats 400000 in
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : C)
     (x1 : (S.FD.obj (Discrete.mk c1)).V)
     (x2 : (S.FD.obj (Discrete.mk c)).V)
@@ -478,7 +477,6 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : C)
   simp only [permT_permT, map_smul]
 
 set_option backward.isDefEq.respectTransparency false in
-set_option maxHeartbeats 400000 in
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : C)
     (x : (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c)).V)
     (y : (S.FD.obj (Discrete.mk (S.τ c))).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V) :
