@@ -312,7 +312,7 @@ lemma deriv_eq_tensorDeriv {d} (A : ElectromagneticPotential d)
   /- Getting rid of the sums -/
   refine Finset.sum_congr rfl (fun μ _ => Finset.sum_congr rfl (fun ν _ => ?_))
   congr
-  /- The coefficents. -/
+  /- The coefficients. -/
   · simp [e]
     rw [deriv_apply_eq _ _ _ (by fun_prop)]
     congr
@@ -323,7 +323,6 @@ lemma deriv_eq_tensorDeriv {d} (A : ElectromagneticPotential d)
     rw [Tensorial.basis_map_prod, ← Lorentz.Vector.toTensor_symm_basis,
       ← Lorentz.CoVector.toTensor_symm_basis]
     simp [e]
-
 
 /-!
 
