@@ -5,6 +5,7 @@ Authors: Hannah Dawe
 -/
 
 import Mathlib.Data.Real.Basic
+import Mathlib.Data.Real.Sqrt
 
 /-!
 # Circular Orbit Vis Viva
@@ -30,8 +31,7 @@ def speedCircular (sys : VisViva) (cfg : ConfigurationSpace) : ℝ :=
 /-- Lemma: the square of the circular orbit speed equals G M / r. -/
 lemma speedCircular_sq (sys : VisViva) (cfg : ConfigurationSpace) (hr : cfg.r > 0) :
     (speedCircular sys cfg)^2 = sys.G * sys.M / cfg.r := by
-  simp [speedCircular, Real.sqrt_sq hr.le]
+  simp [speedCircular, Real.sqrt_sq (by linarith : 0 ≤ sys.G * sys.M / cfg.r)]
 
 end VisViva
 end ClassicalMechanics
-
