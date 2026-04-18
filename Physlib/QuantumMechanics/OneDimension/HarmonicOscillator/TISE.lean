@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Mathlib.Analysis.Calculus.Deriv.Polynomial
 public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
 /-!
 

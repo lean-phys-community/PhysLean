@@ -8,7 +8,6 @@ public import Physlib.Mathematics.Fin
 public import Mathlib.Data.Nat.Lattice
 public import Mathlib.Data.List.TakeWhile
 import all Mathlib.Data.List.Sort
-public import Mathlib.Logic.Equiv.Defs
 /-!
 # List lemmas
 

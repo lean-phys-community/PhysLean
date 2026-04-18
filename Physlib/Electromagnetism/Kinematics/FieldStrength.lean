@@ -98,7 +98,6 @@ lemma toFieldStrength_eq_tensorDeriv {d} {A : ElectromagneticPotential d}
     + - (η d | ν ν' ⊗ tensorDeriv A x | ν' μ)}ᵀ) := by
   rw [toFieldStrength_eq_deriv, deriv_eq_tensorDeriv _ hA]
 
-
 set_option backward.isDefEq.respectTransparency false in
 lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     toFieldStrength A x =

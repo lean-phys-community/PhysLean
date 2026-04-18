@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.StringTheory.FTheory.SU5.Fluxes.Basic
-public import Mathlib.Tactic.FinCases
 /-!
 
 # Constraints on chiral indices from the condition of no chiral exotics
