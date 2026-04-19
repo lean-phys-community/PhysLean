@@ -111,8 +111,8 @@ lemma prodT_ofRat_ofRat {n n1 : ℕ} {c : Fin n → complexLorentzTensor.Color}
     {c1 : Fin n1 → complexLorentzTensor.Color}
     (f1 : (ComponentIdx c1) → RatComplexNum) :
     (prodT (ofRat f) (ofRat f1)) =
-    ((ofRat (fun b => f (ComponentIdx.prodEquiv b).1 *
-      f1 (ComponentIdx.prodEquiv b).2))) := by
+    ((ofRat (fun b => f (ComponentIdx.prod b).1 *
+      f1 (ComponentIdx.prod b).2))) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [prodT_basis_repr_apply]
