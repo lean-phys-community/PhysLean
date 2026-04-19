@@ -35,9 +35,7 @@ The following results exist for both `prodP` and `prodT` :
 ## iii. Table of contents
 
 - A. Products of index components
-  - A.1. Indexing components by `Fin n1 ⊕ Fin n2` rather than `Fin (n1 + n2)`
-  - A.2. The product of two index components
-  - A.3. The product of component indices as an equivalence
+  - A.1. The product of component indices as an equivalence
 - B. Products of pure tensors
   - B.1. Indexing pure tensors by `Fin n1 ⊕ Fin n2` rather than `Fin (n1 + n2)`
   - B.2. The product of two pure tensors
@@ -95,82 +93,24 @@ variable {k C G : Type} [CommRing k] [Group G]
 
 /-!
 
-### A.1. Indexing components by `Fin n1 ⊕ Fin n2` rather than `Fin (n1 + n2)`
-
--/
-
-/-- The equivalence between `ComponentIdx (Fin.append c c1)` and
-  `Π (i : Fin n1 ⊕ Fin n2), Fin (S.repDim (Sum.elim c c1 i))`. -/
-def ComponentIdx.prodIndexEquiv {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
-    ComponentIdx (S := S) (Fin.append c c1) ≃
-    Π (i : Fin n1 ⊕ Fin n2), Fin (S.repDim (Sum.elim c c1 i)) :=
-  (Equiv.piCongr finSumFinEquiv (fun x => finCongr (by cases x <;> simp))).symm
-
-/-!
-
-### A.2. The product of two index components
-
--/
-/-- The product of two component indices. -/
-def ComponentIdx.prod {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C}
-    (b : ComponentIdx (S := S) c) (b1 : ComponentIdx (S := S) c1) :
-    ComponentIdx (S := S) (Fin.append c c1) :=
-  ComponentIdx.prodIndexEquiv.symm fun | Sum.inl i => b i | Sum.inr i => b1 i
-
-lemma ComponentIdx.prod_apply_finSumFinEquiv {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C}
-    (b : ComponentIdx c) (b1 : ComponentIdx (S := S) c1) (i : Fin n1 ⊕ Fin n2) :
-    ComponentIdx.prod b b1 (finSumFinEquiv i) =
-    match i with
-    | Sum.inl i => Fin.cast (by simp) (b i)
-    | Sum.inr i => Fin.cast (by simp) (b1 i) := by
-  rw [ComponentIdx.prod]
-  rw [ComponentIdx.prodIndexEquiv]
-  simp only [Equiv.symm_symm]
-  rw [Equiv.piCongr_apply_apply]
-  match i with
-  | Sum.inl i =>
-    rfl
-  | Sum.inr i =>
-    rfl
-
-/-!
-
-### A.3. The product of component indices as an equivalence
+### A.1 The product of component indices as an equivalence
 
 -/
 
 /-- The equivalence between `ComponentIdx (Fin.append c c1)` and
   `ComponentIdx c × ComponentIdx c1` formed by products. -/
-def ComponentIdx.prodEquiv {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
+def ComponentIdx.prod {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     ComponentIdx (S := S) (Fin.append c c1) ≃
       ComponentIdx (S := S) c × ComponentIdx (S := S) c1 where
-  toFun p := (fun i => (ComponentIdx.prodIndexEquiv p) (Sum.inl i),
-    fun i => (ComponentIdx.prodIndexEquiv p) (Sum.inr i))
-  invFun p := ComponentIdx.prod (p.1) (p.2)
+  toFun p := (fun i => Fin.cast (by simp) (p (Fin.castAdd n2 i)),
+    fun i => Fin.cast (by simp) (p (Fin.natAdd n1 i)))
+  invFun p := Fin.addCases (fun i => Fin.cast (by simp) (p.1 i))
+    (fun i => Fin.cast (by simp) (p.2 i))
   left_inv p := by
-    simp only
-    funext i
-    obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective i
-    rw [prod_apply_finSumFinEquiv]
-    match i with
-    | Sum.inl i =>
-      rfl
-    | Sum.inr i =>
-      rfl
-  right_inv p := by
-    ext i
-    simp only
-    · rw [ComponentIdx.prodIndexEquiv]
-      rw [Equiv.piCongr_symm_apply]
-      simp only [Sum.elim_inl, finCongr_symm]
-      rw [prod_apply_finSumFinEquiv]
-      rfl
-    · rw [ComponentIdx.prodIndexEquiv]
-      simp only
-      erw [Equiv.piCongr_symm_apply]
-      simp only [Sum.elim_inr, finCongr_symm]
-      rw [prod_apply_finSumFinEquiv]
-      rfl
+    ext1 i
+    revert i
+    simp [Fin.forall_fin_add]
+  right_inv p := by simp
 
 /-!
 
@@ -259,7 +199,7 @@ lemma Pure.prodP_apply_natAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 lemma Pure.prodP_basisVector {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C}
     (b : ComponentIdx c) (b1 : ComponentIdx (S := S) c1) :
     Pure.prodP (Pure.basisVector c b) (Pure.basisVector c1 b1) =
-    Pure.basisVector _ (b.prod b1) := by
+    Pure.basisVector _ (ComponentIdx.prod.symm (b, b1)) := by
   ext i
   obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective i
   rw [Pure.prodP_apply_finSumFinEquiv]
@@ -273,12 +213,12 @@ lemma Pure.prodP_basisVector {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C}
   | Sum.inl i =>
     simp only [basisVector]
     apply basis_congr
-    · rw [ComponentIdx.prod_apply_finSumFinEquiv]
+    · simp [ComponentIdx.prod]
     · simp
   | Sum.inr i =>
     simp only [basisVector]
     apply basis_congr
-    · rw [ComponentIdx.prod_apply_finSumFinEquiv]
+    · simp [ComponentIdx.prod]
     · simp
 
 /-!
@@ -290,8 +230,8 @@ lemma Pure.prodP_basisVector {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C}
 lemma Pure.prodP_component {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (p : Pure S c) (p1 : Pure S c1)
     (b : ComponentIdx (Fin.append c c1)) :
-    (p.prodP p1).component b = p.component (ComponentIdx.prodEquiv b).1 *
-    p1.component (ComponentIdx.prodEquiv b).2 := by
+    (p.prodP p1).component b = p.component (ComponentIdx.prod b).1 *
+    p1.component (ComponentIdx.prod b).2 := by
   simp only [component]
   rw [← finSumFinEquiv.prod_comp]
   conv_lhs =>
@@ -728,7 +668,7 @@ open TensorProduct
 lemma prodT_basis {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (b : ComponentIdx c) (b1 : ComponentIdx (S := S) c1) :
     (basis c b).prodT (basis c1 b1) =
-    (Pure.basisVector _ (b.prod b1)).toTensor := by
+    (Pure.basisVector _ (ComponentIdx.prod.symm (b, b1))).toTensor := by
   rw [basis_apply, basis_apply, prodT_pure]
   congr
   rw [Pure.prodP_basisVector]
@@ -746,14 +686,14 @@ noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 �
     S.Tensor c ⊗[k] S.Tensor c1 ≃ₗ[k] S.Tensor (Fin.append c c1) where
   toLinearMap := TensorProduct.lift prodT
   invFun := (Tensor.basis (Fin.append c c1)).constr k (fun b =>
-    (Tensor.basis c) (ComponentIdx.prodEquiv b).1 ⊗ₜ[k]
-    (Tensor.basis c1) (ComponentIdx.prodEquiv b).2)
+    (Tensor.basis c) (ComponentIdx.prod b).1 ⊗ₜ[k]
+    (Tensor.basis c1) (ComponentIdx.prod b).2)
   left_inv x := by
     let f : S.Tensor (Fin.append c c1) →ₗ[k]
       S.Tensor c ⊗[k] S.Tensor c1 :=
       (Tensor.basis (Fin.append c c1)).constr k (fun b =>
-        (Tensor.basis c) (ComponentIdx.prodEquiv b).1 ⊗ₜ[k]
-        (Tensor.basis c1) (ComponentIdx.prodEquiv b).2)
+        (Tensor.basis c) (ComponentIdx.prod b).1 ⊗ₜ[k]
+        (Tensor.basis c1) (ComponentIdx.prod b).2)
     let P (x : S.Tensor c ⊗[k] S.Tensor c1) := f (TensorProduct.lift prodT x) = x
     change P x
     apply TensorProduct.induction_on
@@ -766,11 +706,6 @@ noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 �
           dsimp [P]
           rw [prodT_basis]
           simp [f]
-          congr
-          · change (ComponentIdx.prodEquiv (ComponentIdx.prodEquiv.symm (b1, b2))).1 = _
-            simp
-          · change (ComponentIdx.prodEquiv (ComponentIdx.prodEquiv.symm (b1, b2))).2 = _
-            simp
           · simp [P]
           · intro r t h
             simp [tmul_smul, P] at *
@@ -792,8 +727,8 @@ noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 �
     let f : S.Tensor (Fin.append c c1) →ₗ[k]
       S.Tensor c ⊗[k] S.Tensor c1 :=
       (Tensor.basis (Fin.append c c1)).constr k (fun b =>
-        (Tensor.basis c) (ComponentIdx.prodEquiv b).1 ⊗ₜ[k]
-        (Tensor.basis c1) (ComponentIdx.prodEquiv b).2)
+        (Tensor.basis c) (ComponentIdx.prod b).1 ⊗ₜ[k]
+        (Tensor.basis c1) (ComponentIdx.prod b).2)
     let P (x : _) := (TensorProduct.lift prodT (f x)) = x
     change P x
     apply induction_on_basis (t := x)
@@ -803,7 +738,7 @@ noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 �
       rw [prodT_basis]
       rw [basis_apply]
       congr
-      change (ComponentIdx.prodEquiv.symm (ComponentIdx.prodEquiv b)) = _
+      change (ComponentIdx.prod.symm (ComponentIdx.prod b)) = _
       simp
     · simp [P]
     · intro r t h
@@ -824,25 +759,25 @@ set_option backward.isDefEq.respectTransparency false in
 lemma basis_prod_eq {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     basis (S := S) (Fin.append c c1) =
     (((Tensor.basis (S := S) c).tensorProduct (Tensor.basis (S := S) c1)).reindex
-    (ComponentIdx.prodEquiv.symm)).map tensorEquivProd := by
+    (ComponentIdx.prod.symm)).map tensorEquivProd := by
   ext b
-  simp [ComponentIdx.prodEquiv, tensorEquivProd]
+  simp [ComponentIdx.prod, tensorEquivProd]
   rw [prodT_basis]
   rw [← basis_apply]
   congr
   funext i
   obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective i
-  rw [ComponentIdx.prod_apply_finSumFinEquiv]
+  rw [ComponentIdx.prod]
   match i with
-  | Sum.inl i => rfl
-  | Sum.inr i => rfl
+  | Sum.inl i => simp
+  | Sum.inr i => simp
 
 lemma prodT_basis_repr_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (t : Tensor S c) (t1 : Tensor S c1)
     (b : ComponentIdx (Fin.append c c1)) :
     (basis (Fin.append c c1)).repr (prodT t t1) b =
-    (basis c).repr t (ComponentIdx.prodEquiv b).1 *
-    (basis c1).repr t1 (ComponentIdx.prodEquiv b).2 := by
+    (basis c).repr t (ComponentIdx.prod b).1 *
+    (basis c1).repr t1 (ComponentIdx.prod b).2 := by
   apply induction_on_pure (t := t)
   · apply induction_on_pure (t := t1)
     · intro p p1

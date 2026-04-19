@@ -667,42 +667,20 @@ lemma complexify_prod {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color}
     (b : ComponentIdx (S := realLorentzTensor) c)
     (b1 : ComponentIdx (S := realLorentzTensor) c1) :
-    ComponentIdx.complexify (c := Fin.append c c1) (b.prod b1)
+    ComponentIdx.complexify (c := Fin.append c c1) (ComponentIdx.prod.symm (b, b1))
       =
     cast (congr_arg ComponentIdx (colorToComplex_append c c1).symm)
-      ((ComponentIdx.complexify (c := c) b).prod (ComponentIdx.complexify (c := c1) b1)) := by
+      (ComponentIdx.prod.symm (ComponentIdx.complexify (c := c) b,
+        ComponentIdx.complexify (c := c1) b1)) := by
   ext x
   obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective x
   cases i with
   | inl i =>
-    rw [ComponentIdx.complexify_apply, ComponentIdx.prod_apply_finSumFinEquiv b b1 (Sum.inl i)]
-    have cast_apply_rhs : (cast (congr_arg ComponentIdx (colorToComplex_append c c1).symm)
-        ((ComponentIdx.complexify b).prod (ComponentIdx.complexify b1)))
-          (finSumFinEquiv (Sum.inl i)) =
-          Fin.cast (congr_arg (fun c =>
-            complexLorentzTensor.repDim (c (finSumFinEquiv (Sum.inl i))))
-              (colorToComplex_append c c1).symm)
-            (((ComponentIdx.complexify b).prod (ComponentIdx.complexify b1))
-              (finSumFinEquiv (Sum.inl i))) :=
-      cast_componentIdx_apply (colorToComplex_append c c1).symm _ _
-    rw [cast_apply_rhs,
-      ComponentIdx.prod_apply_finSumFinEquiv (ComponentIdx.complexify b)
-        (ComponentIdx.complexify b1) (Sum.inl i)]
-    congr 1
+    rw [ComponentIdx.complexify_apply]
+    simp [ComponentIdx.prod]
   | inr j =>
-    rw [ComponentIdx.complexify_apply, ComponentIdx.prod_apply_finSumFinEquiv b b1 (Sum.inr j)]
-    have cast_apply_rhs : (cast (congr_arg ComponentIdx (colorToComplex_append c c1).symm)
-        ((ComponentIdx.complexify b).prod (ComponentIdx.complexify b1)))
-          (finSumFinEquiv (Sum.inr j)) =
-        Fin.cast (congr_arg (fun c => complexLorentzTensor.repDim
-          (c (finSumFinEquiv (Sum.inr j)))) (colorToComplex_append c c1).symm)
-          (((ComponentIdx.complexify b).prod (ComponentIdx.complexify b1))
-          (finSumFinEquiv (Sum.inr j))) :=
-      cast_componentIdx_apply (colorToComplex_append c c1).symm _ _
-    rw [cast_apply_rhs,
-      ComponentIdx.prod_apply_finSumFinEquiv (ComponentIdx.complexify b)
-        (ComponentIdx.complexify b1) (Sum.inr j)]
-    congr 1
+    rw [ComponentIdx.complexify_apply]
+    simp [ComponentIdx.prod]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with prodT. -/

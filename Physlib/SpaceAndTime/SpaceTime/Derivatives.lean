@@ -436,24 +436,25 @@ lemma tensorDeriv_equivariant (f : SpaceTime d → M) (Λ : LorentzGroup d) (x :
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, map_sum]
   simp [TensorSpecies.Tensorial.smulLinearMap_apply]
 
-set_option backward.isDefEq.respectTransparency false in
+open TensorSpecies.Tensorial Lorentz Tensor
+
 lemma tensorDeriv_toTensor_basis_repr
     {f : SpaceTime d → M}
     (hf : Differentiable ℝ f) (x : SpaceTime d)
     (b : Tensor.ComponentIdx (Fin.append ![realLorentzTensor.Color.down] c)) :
     (Tensor.basis _).repr (Tensorial.toTensor (tensorDeriv f x)) b =
-    ∂_ (Lorentz.CoVector.indexEquiv (Tensor.ComponentIdx.prodEquiv b).1)
+    ∂_ (Lorentz.CoVector.indexEquiv (ComponentIdx.prod b).1)
       (fun x => (Tensor.basis _).repr (Tensorial.toTensor (f x))
-        (Tensor.ComponentIdx.prodEquiv b).2) x := by
+        (ComponentIdx.prod b).2) x := by
   simp [tensorDeriv]
   conv_lhs =>
     enter [2, μ]
     rw [Tensorial.toTensor_tprod, Tensor.prodT_basis_repr_apply]
     simp [Lorentz.CoVector.toTensor_basis_eq_tensor_basis, Finsupp.single_apply]
-  rw [Finset.sum_eq_single (Lorentz.CoVector.indexEquiv (Tensor.ComponentIdx.prodEquiv b).1)]
+  rw [Finset.sum_eq_single (Lorentz.CoVector.indexEquiv (ComponentIdx.prod b).1)]
   · simp
-    generalize (Lorentz.CoVector.indexEquiv (Tensor.ComponentIdx.prodEquiv b).1) = μ at *
-    generalize (Tensor.ComponentIdx.prodEquiv b).2 = ν at *
+    generalize (Lorentz.CoVector.indexEquiv (ComponentIdx.prod b).1) = μ at *
+    generalize (ComponentIdx.prod b).2 = ν at *
     have h1 (x : SpaceTime d) : ((Tensor.basis c).repr (Tensorial.toTensor (f x))) ν =
         (ContinuousLinearMap.proj ν ∘L ((Tensor.basis c).map
         (Tensorial.toTensor).symm).equivFunL.toContinuousLinearMap) (f x) := by
@@ -472,12 +473,11 @@ lemma tensorDeriv_toTensor_basis_repr
     grind
   · simp
 
-open TensorSpecies.Tensorial Lorentz Tensor
 /-- The expansion of `tensorDeriv` in terms of the tensor basis vector. -/
 lemma tensorDeriv_eq_sum_tensor_basis
     {f : SpaceTime d → M} (hf : Differentiable ℝ f) (x : SpaceTime d) :
-    tensorDeriv f x = ∑ b, ∂_ (CoVector.indexEquiv (ComponentIdx.prodEquiv b).1)
-      (fun x => (Tensor.basis _).repr (toTensor (f x)) (ComponentIdx.prodEquiv b).2) x •
+    tensorDeriv f x = ∑ b, ∂_ (CoVector.indexEquiv (ComponentIdx.prod b).1)
+      (fun x => (Tensor.basis _).repr (toTensor (f x)) (ComponentIdx.prod b).2) x •
     toTensor.symm (Tensor.basis _ b) := by
   apply Tensorial.toTensor.injective
   apply (Tensor.basis (Fin.append _ _)).repr.injective
@@ -561,14 +561,14 @@ lemma distTensorDeriv_toTensor_basis_repr {M : Type} [NormedAddCommGroup M]
     (b : Tensor.ComponentIdx (Fin.append ![realLorentzTensor.Color.down] c)) :
     (Tensor.basis _).repr (Tensorial.toTensor (distTensorDeriv f ε)) b =
     (Tensor.basis _).repr (Tensorial.toTensor
-    (distDeriv (Lorentz.CoVector.indexEquiv (Tensor.ComponentIdx.prodEquiv b).1) f ε))
-    (Tensor.ComponentIdx.prodEquiv b).2 := by
+    (distDeriv (Lorentz.CoVector.indexEquiv (ComponentIdx.prod b).1) f ε))
+    (ComponentIdx.prod b).2 := by
   simp [distTensorDeriv]
   conv_lhs =>
     enter [2, μ]
     rw [Tensorial.toTensor_tprod, Tensor.prodT_basis_repr_apply]
     simp [Lorentz.CoVector.toTensor_basis_eq_tensor_basis, Finsupp.single_apply]
-  rw [Finset.sum_eq_single (Lorentz.CoVector.indexEquiv (Tensor.ComponentIdx.prodEquiv b).1)]
+  rw [Finset.sum_eq_single (Lorentz.CoVector.indexEquiv (ComponentIdx.prod b).1)]
   · simp
   · intro b' _ hb
     simp only [ite_eq_right_iff]

@@ -1054,8 +1054,7 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
     funext j
     fin_cases j
     simp only [Fin.zero_eta, Matrix.cons_val_zero, Fin.cast_eq_self,
-      ComponentIdx.prodEquiv, ComponentIdx.prodIndexEquiv, Equiv.piCongr_symm_apply,
-      Sum.elim_inl, finCongr_symm, finCongr_apply, Sum.elim_inr, Equiv.coe_fn_mk]
+      ComponentIdx.prod, Equiv.coe_fn_mk]
     simp only [ComponentIdx.DropPairSection.ofFinEquiv, Equiv.coe_fn_mk,
       ComponentIdx.DropPairSection.ofFin, Fin.cast_eq_self, Function.comp_apply, left_eq_dite_iff]
     intro h
@@ -1065,7 +1064,7 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
   congr
   · apply finSumFinEquiv.injective
     simp only [Function.comp_apply, Fin.cast_eq_self, Equiv.apply_symm_apply]
-    simp [ComponentIdx.prodEquiv, ComponentIdx.prodIndexEquiv]
+    simp [ComponentIdx.prod]
     simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
     intro _ h
     apply False.elim
@@ -1073,7 +1072,7 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
     decide
   · apply finSumFinEquiv.injective
     simp only [Function.comp_apply, Fin.cast_eq_self, Equiv.apply_symm_apply]
-    simp [ComponentIdx.prodEquiv, ComponentIdx.prodIndexEquiv]
+    simp [ComponentIdx.prod]
     simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
     split_ifs
     · rename_i h
@@ -1269,7 +1268,7 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
     rw [hb]
     rw [Module.Basis.repr_reindex_apply]
     congr 1
-    simp [ComponentIdx.prodEquiv,ComponentIdx.prodIndexEquiv, Vector.indexEquiv]
+    simp [ComponentIdx.prod, Vector.indexEquiv]
     apply And.intro
     · rw [@Equiv.eq_symm_apply]
       rfl
@@ -1283,7 +1282,7 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
     simp [Lorentz.CoVector.indexEquiv]
     funext j
     fin_cases j
-    simp [ComponentIdx.prodEquiv, ComponentIdx.prodIndexEquiv]
+    simp [ComponentIdx.prod]
     simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
     intro h
     change ¬ 0 = 0 at h
@@ -1291,14 +1290,14 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
   funext x
   fin_cases x
   · simp only [Function.comp_apply, Fin.cast_eq_self]
-    simp [ComponentIdx.prodEquiv, ComponentIdx.prodIndexEquiv]
+    simp [ComponentIdx.prod]
     simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
     intro _ h
     apply False.elim
     apply h
     decide
   · simp only [Function.comp_apply, Fin.cast_eq_self]
-    simp [ComponentIdx.prodEquiv, ComponentIdx.prodIndexEquiv]
+    simp [ComponentIdx.prod]
     simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
     split_ifs
     · rename_i h

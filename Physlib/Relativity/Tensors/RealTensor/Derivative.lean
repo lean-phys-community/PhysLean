@@ -44,9 +44,9 @@ noncomputable def derivative {d n m : ℕ} {cm : Fin m → realLorentzTensor.Col
   /- evaluated at the point `y` in `ℝT(d, cm)` -/
     (Finsupp.equivFunOnFinite ((basis cm).repr y))
   /- In the direction of `(splitEquiv b).1` -/
-    (Finsupp.single (fun i => Fin.cast (by simp) ((ComponentIdx.prodEquiv b).1 i)) (1 : ℝ))
+    (Finsupp.single (fun i => Fin.cast (by simp) ((ComponentIdx.prod b).1 i)) (1 : ℝ))
   /- The `(splitEquiv b).2` component of that derivative. -/
-    (ComponentIdx.prodEquiv b).2
+    (ComponentIdx.prod b).2
 
 @[inherit_doc realLorentzTensor.derivative]
 scoped[realLorentzTensor] notation "∂" => realLorentzTensor.derivative
@@ -59,9 +59,9 @@ lemma derivative_repr {d n m : ℕ} {cm : Fin m → realLorentzTensor.Color}
     (h1 : DifferentiableAt ℝ (mapToBasis f)
       (Finsupp.equivFunOnFinite ((basis cm).repr y))) :
     (Tensor.basis _).repr (∂ f y) b =
-    fderiv ℝ (fun y => mapToBasis f y (ComponentIdx.prodEquiv b).2)
+    fderiv ℝ (fun y => mapToBasis f y (ComponentIdx.prod b).2)
       ((basis cm).repr y)
-      (Finsupp.single (fun i => Fin.cast (by simp) ((ComponentIdx.prodEquiv b).1 i)) (1 : ℝ)) := by
+      (Finsupp.single (fun i => Fin.cast (by simp) ((ComponentIdx.prod b).1 i)) (1 : ℝ)) := by
   simp [derivative]
   rw [fderiv_pi]
   · simp

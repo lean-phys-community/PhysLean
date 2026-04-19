@@ -263,7 +263,7 @@ lemma smul_prod {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
+open Tensor in
 lemma basis_map_prod {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
     [Tensorial S c M] [AddCommMonoid M₂] [Module k M₂]
     [Tensorial S c2 M₂] :
@@ -271,10 +271,10 @@ lemma basis_map_prod {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
       (toTensor (M := (M ⊗[k] M₂))).symm =
     (((Tensor.basis (S := S) c).map (toTensor (M := M)).symm).tensorProduct
     ((Tensor.basis (S := S) c2).map (toTensor (M := M₂)).symm)).reindex
-    (Tensor.ComponentIdx.prodEquiv.symm) := by
+    (ComponentIdx.prod.symm) := by
   rw [Tensor.basis_prod_eq]
   ext b
-  simp only [Tensor.ComponentIdx.prodEquiv, Module.Basis.map_apply, Module.Basis.coe_reindex,
+  simp only [ComponentIdx.prod, Module.Basis.map_apply, Module.Basis.coe_reindex,
     Equiv.symm_symm, Equiv.coe_fn_mk, Function.comp_apply, Module.Basis.tensorProduct_apply]
   apply toTensor.injective
   simp only [LinearEquiv.apply_symm_apply]
