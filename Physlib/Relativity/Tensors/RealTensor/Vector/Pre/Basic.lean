@@ -46,6 +46,11 @@ lemma contrBasis_toFin1dℝ {d : ℕ} (i : Fin 1 ⊕ Fin d) :
   simp only [ContrMod.toFin1dℝ, contrBasis, Basis.coe_ofEquivFun]
   rfl
 
+lemma contrBasis_repr_apply {d : ℕ} (p : Contr d) (i : Fin 1 ⊕ Fin d) :
+    (contrBasis d).repr p i = p.val i := by
+  simp only [contrBasis, Basis.ofEquivFun_repr_apply]
+  rfl
+
 /-- The standard basis of contravariant Lorentz vectors indexed by `Fin (1 + d)`. -/
 def contrBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (Contr d) :=
   Basis.reindex (contrBasis d) finSumFinEquiv
