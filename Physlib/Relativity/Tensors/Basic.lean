@@ -22,7 +22,9 @@ open Module IndexNotation CategoryTheory MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] (S : TensorSpecies k C G)
+variable {k : Type} [CommRing k] {C G : Type} [Group G]
+  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  (S : TensorSpecies k C G basisIdx)
 
 /-- The tensors associated with a list of indices of a given color
   `c : Fin n → C`. -/
@@ -30,16 +32,18 @@ noncomputable abbrev Tensor {n : ℕ} (c : Fin n → C) : Type := (S.F.obj (Over
 
 namespace Tensor
 
-variable {S : TensorSpecies k C G} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
+variable {S : TensorSpecies k C G basisIdx} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
   {c2 : Fin n2 → C}
 
+set_option linter.unusedVariables false in
 /-- Given a list of indices `c : Fin n → C` e.g. `![.up, .down]`, the type
   `ComponentIdx c` is the type of components indexes of a tensor with those indices
   e.g. `⟨0, 2⟩` corresponding to `T⁰₂`. -/
-abbrev ComponentIdx {n : ℕ} (c : Fin n → C) : Type := Π j, Fin (S.repDim (c j))
+abbrev ComponentIdx {n : ℕ} {S : TensorSpecies k C G basisIdx} (c : Fin n → C) : Type :=
+  Π j, basisIdx (c j)
 
 lemma ComponentIdx.congr_right {n : ℕ} {c : Fin n → C} (b : ComponentIdx (S := S) c)
-    (i j : Fin n) (h : i = j) : b i = Fin.cast (by simp [h]) (b j) := by
+    (i j : Fin n) (h : i = j) : b i = basisIdxCongr (by simp [h]) (b j) := by
   subst h
   rfl
 
@@ -47,7 +51,7 @@ lemma ComponentIdx.congr_right {n : ℕ} {c : Fin n → C} (b : ComponentIdx (S 
 def ComponentIdx.cast {n m : ℕ} {c : Fin n → C} {cm : Fin m → C}
     (h : n = m) (hc : c = cm ∘ Fin.cast h) (b : ComponentIdx (S := S) c) :
     ComponentIdx (S := S) cm := fun j =>
-      Fin.cast (by simp [hc]) (b (Fin.cast h.symm j))
+      basisIdxCongr (by simp [hc]) (b (Fin.cast h.symm j))
 
 /-!
 
@@ -57,7 +61,7 @@ def ComponentIdx.cast {n m : ℕ} {c : Fin n → C} {cm : Fin m → C}
 
 /-- The type of pure tensors associated to a list of indices `c : OverColor C`.
   A pure tensor is a tensor which can be written in the form `v1 ⊗ₜ v2 ⊗ₜ v3 …`. -/
-abbrev Pure (S : TensorSpecies k C G) (c : Fin n → C) : Type :=
+abbrev Pure (S : TensorSpecies k C G basisIdx) (c : Fin n → C) : Type :=
     (i : Fin n) → S.FD.obj (Discrete.mk (c i))
 
 namespace Pure
@@ -365,7 +369,7 @@ lemma ofComponents_componentMap {n : ℕ} (c : Fin n → C) (t : S.Tensor c) :
 def basis {n : ℕ} (c : Fin n → C) : Basis (ComponentIdx (S := S) c) k (S.Tensor c) where
   repr := (LinearEquiv.mk (componentMap c) (ofComponents c)
     (fun x => by simp) (fun x => by simp)).trans
-    (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → Fin (S.repDim (c j)))).symm
+    (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → basisIdx (c j))).symm
 
 lemma basis_apply {n : ℕ} (c : Fin n → C) (b : ComponentIdx (S := S) c) :
     basis c b = (Pure.basisVector c b).toTensor := by
