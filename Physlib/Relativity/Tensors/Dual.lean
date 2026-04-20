@@ -21,7 +21,9 @@ open MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] {S : TensorSpecies k C G}
+variable {k : Type} [CommRing k] {C G : Type} [Group G]
+  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  {S : TensorSpecies k C G basisIdx}
 
 namespace Tensor
 
@@ -168,14 +170,5 @@ lemma toDual_equivariant {c : C} (g : G) (t : S.Tensor ![c]) :
 end Tensor
 
 open Tensor
-@[simp]
-lemma repDim_τ {c : C} [StrongRankCondition k] :
-    S.repDim (S.τ c) = S.repDim c := by
-  trans Module.finrank k (S.Tensor ![S.τ c])
-  · rw [finrank_tensor_eq]
-    simp
-  rw [toDual.symm.finrank_eq]
-  rw [finrank_tensor_eq]
-  simp
 
 end TensorSpecies
