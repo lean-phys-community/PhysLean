@@ -121,6 +121,12 @@ These re-express fields of `realLorentzTensor d` in terms of `Lorentz` data.
 
 -/
 
+@[simp]
+lemma basisIdxCongr_apply {d : ℕ} {c1 c2 : realLorentzTensor.Color} (h : c1 = c2)
+    (i : Fin 1 ⊕ Fin d) :
+    TensorSpecies.basisIdxCongr (basisIdx := fun _ => Fin 1 ⊕ Fin d) h i = i := by
+  rfl
+
 lemma basis_eq_contrBasis {d : ℕ} :
     (realLorentzTensor d).basis Color.up = Lorentz.contrBasis (d := d) := rfl
 
@@ -203,27 +209,20 @@ lemma contrT_basis_repr_apply_eq_fin {n d: ℕ} {c : Fin (n + 1 + 1) → realLor
     {h : i ≠ j ∧ (realLorentzTensor d).τ (c i) = c j}
     (t : ℝT(d,c)) (b : ComponentIdx (c ∘ Pure.dropPairEmb i j)) :
     (basis (c ∘ Pure.dropPairEmb i j)).repr (contrT n i j h t) b =
-    ∑ (x : Fin (1 + d)),
+    ∑ (x : Fin 1 ⊕ Fin d),
     ((basis c).repr t
-    (DropPairSection.ofFinEquiv h.1 b ⟨Fin.cast (by simp) x, Fin.cast (by simp) x⟩)) := by
+    (DropPairSection.ofFinEquiv h.1 b ⟨x, x⟩)) := by
   rw [contrT_basis_repr_apply_eq_sum_fin]
-  let e : Fin ((realLorentzTensor d).repDim (c i)) ≃ Fin (1 + d) :=
-    (Fin.castOrderIso (by simp)).toEquiv
-  rw [← e.symm.sum_comp]
   congr
   funext x
-  rw [Finset.sum_eq_single (Fin.cast (by simp) x)]
-  · erw [contr_basis]
-    simp [e]
+  rw [Finset.sum_eq_single (x)]
+  · rw [contr_basis]
+    simp
   · intro y _ hy
-    erw [contr_basis, if_neg]
-    · dsimp only [ne_eq, OrderIso.toEquiv_symm, RelIso.coe_fn_toEquiv, e]
-      simp
-    · dsimp only [OrderIso.toEquiv_symm, RelIso.coe_fn_toEquiv, ne_eq, id_eq,
-      eq_mpr_eq_cast, Fin.val_cast, e]
-      simp_all only [ne_eq, Fin.ext_iff, Finset.mem_univ, Fin.val_cast,
-        OrderIso.coe_symm_toEquiv, Fin.symm_castOrderIso, Fin.castOrderIso_apply]
-      omega
+    rw [contr_basis, if_neg]
+    · simp_all
+    · simp only [basisIdxCongr_apply]
+      exact Ne.symm hy
   · simp
 
 end realLorentzTensor
