@@ -129,8 +129,7 @@ lemma toTensor_toFieldStrength {d} (A : ElectromagneticPotential d) (x : SpaceTi
 lemma toTensor_toFieldStrength_basis_repr {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (b : ComponentIdx (S := realLorentzTensor d) (Fin.append ![Color.up] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x)) b =
-    ∑ κ, (η (finSumFinEquiv.symm (b 0)) κ * ∂_ κ A x (finSumFinEquiv.symm (b 1)) -
-      η (finSumFinEquiv.symm (b 1)) κ * ∂_ κ A x (finSumFinEquiv.symm (b 0))) := by
+    ∑ κ, (η (b 0) κ * ∂_ κ A x (b 1) - η (b 1) κ * ∂_ κ A x (b 0)) := by
   rw [toTensor_toFieldStrength]
   simp only [Tensorial.self_toTensor_apply, map_sub,
     Finsupp.coe_sub, Pi.sub_apply]
@@ -139,30 +138,28 @@ lemma toTensor_toFieldStrength_basis_repr {d} (A : ElectromagneticPotential d) (
     enter [1, 2, n]
     rw [Tensor.prodT_basis_repr_apply, contrMetric_repr_apply_eq_minkowskiMatrix]
     enter [1]
-    change η (finSumFinEquiv.symm (b 0)) (finSumFinEquiv.symm n)
+    change η (b 0) (n)
   conv_lhs =>
     enter [1, 2, n, 2]
     rw [toTensor_deriv_basis_repr_apply]
-    change ∂_ (finSumFinEquiv.symm n) A x (finSumFinEquiv.symm (b 1))
+    change ∂_ (n) A x (b 1)
   rw [Tensor.permT_basis_repr_symm_apply, contrT_basis_repr_apply_eq_fin]
   conv_lhs =>
     enter [2, 2, n]
     rw [Tensor.prodT_basis_repr_apply, contrMetric_repr_apply_eq_minkowskiMatrix]
     enter [1]
-    change η (finSumFinEquiv.symm (b 1)) (finSumFinEquiv.symm n)
+    change η (b 1) (n)
   conv_lhs =>
     enter [2, 2, n, 2]
     rw [toTensor_deriv_basis_repr_apply]
-    change ∂_ (finSumFinEquiv.symm n) A x (finSumFinEquiv.symm (b 0))
+    change ∂_ (n) A x (b 0)
   rw [← Finset.sum_sub_distrib]
-  rw [← finSumFinEquiv.sum_comp]
-  simp only [Fin.isValue, Equiv.symm_apply_apply]
 
 lemma toFieldStrength_tensor_basis_eq_basis {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (b : ComponentIdx (S := realLorentzTensor d) (Fin.append ![Color.up] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x)) b =
     (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr (toFieldStrength A x)
-      (finSumFinEquiv.symm (b 0), finSumFinEquiv.symm (b 1)) := by
+      (b 0, b 1) := by
   rw [Tensorial.basis_toTensor_apply]
   rw [Tensorial.basis_map_prod]
   simp only [Nat.reduceSucc, Nat.reduceAdd, Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
@@ -187,13 +184,10 @@ lemma toFieldStrength_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 �
   match μν with
   | (μ, ν) =>
   trans (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x))
-    (fun | 0 => finSumFinEquiv μ | 1 => finSumFinEquiv ν); swap
+    (fun | 0 => μ | 1 => ν); swap
   · rw [toTensor_toFieldStrength_basis_repr]
-    simp
   rw [toFieldStrength_tensor_basis_eq_basis]
-  congr 1
-  change _ = (finSumFinEquiv.symm (finSumFinEquiv μ), finSumFinEquiv.symm (finSumFinEquiv ν))
-  simp
+  rfl
 
 lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : ElectromagneticPotential d) (x : SpaceTime d) :
@@ -236,9 +230,8 @@ lemma fieldStrengthMatrix_eq_tensor_basis_repr {d} (A : ElectromagneticPotential
     (x : SpaceTime d) (μ ν : (Fin 1 ⊕ Fin d)) :
     A.fieldStrengthMatrix x (μ, ν) =
     (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x))
-    (fun | 0 => finSumFinEquiv μ | 1 => finSumFinEquiv ν) := by
+    (fun | 0 => μ | 1 => ν) := by
   rw [toFieldStrength_tensor_basis_eq_basis]
-  simp only [Equiv.symm_apply_apply]
   rfl
 
 lemma toFieldStrength_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d) :
@@ -549,8 +542,8 @@ lemma toTensor_fieldStrengthAux_basis_repr {d} (A : DistElectromagneticPotential
     (ε : 𝓢(SpaceTime d, ℝ))
     (b : ComponentIdx (S := realLorentzTensor d) (Fin.append ![Color.up] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (fieldStrengthAux A ε)) b =
-    ∑ κ, (η (finSumFinEquiv.symm (b 0)) κ * SpaceTime.distDeriv κ A ε (finSumFinEquiv.symm (b 1)) -
-      η (finSumFinEquiv.symm (b 1)) κ * SpaceTime.distDeriv κ A ε (finSumFinEquiv.symm (b 0))) := by
+    ∑ κ, (η (b 0) κ * SpaceTime.distDeriv κ A ε (b 1) -
+      η (b 1) κ * SpaceTime.distDeriv κ A ε (b 0)) := by
   rw [toTensor_fieldStrengthAux]
   simp only [Tensorial.self_toTensor_apply, map_sub,
     Finsupp.coe_sub, Pi.sub_apply]
@@ -559,31 +552,29 @@ lemma toTensor_fieldStrengthAux_basis_repr {d} (A : DistElectromagneticPotential
     enter [1, 2, n]
     rw [Tensor.prodT_basis_repr_apply, contrMetric_repr_apply_eq_minkowskiMatrix]
     enter [1]
-    change η (finSumFinEquiv.symm (b 0)) (finSumFinEquiv.symm n)
+    change η (b 0) n
   conv_lhs =>
     enter [1, 2, n, 2]
     rw [toTensor_deriv_basis_repr_apply]
-    change distDeriv (finSumFinEquiv.symm n) A ε (finSumFinEquiv.symm (b 1))
+    change distDeriv n A ε (b 1)
   rw [Tensor.permT_basis_repr_symm_apply, contrT_basis_repr_apply_eq_fin]
   conv_lhs =>
     enter [2, 2, n]
     rw [Tensor.prodT_basis_repr_apply, contrMetric_repr_apply_eq_minkowskiMatrix]
     enter [1]
-    change η (finSumFinEquiv.symm (b 1)) (finSumFinEquiv.symm n)
+    change η (b 1) n
   conv_lhs =>
     enter [2, 2, n, 2]
     rw [toTensor_deriv_basis_repr_apply]
-    change distDeriv (finSumFinEquiv.symm n) A ε (finSumFinEquiv.symm (b 0))
+    change distDeriv n A ε (b 0)
   rw [← Finset.sum_sub_distrib]
-  rw [← finSumFinEquiv.sum_comp]
-  simp only [Fin.isValue, Equiv.symm_apply_apply]
 
 lemma fieldStrengthAux_tensor_basis_eq_basis {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ))
     (b : ComponentIdx (S := realLorentzTensor d) (Fin.append ![Color.up] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (A.fieldStrengthAux ε)) b =
     (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr (A.fieldStrengthAux ε)
-      (finSumFinEquiv.symm (b 0), finSumFinEquiv.symm (b 1)) := by
+      (b 0, b 1) := by
   rw [Tensorial.basis_toTensor_apply]
   rw [Tensorial.basis_map_prod]
   simp only [Nat.reduceSucc, Nat.reduceAdd, Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
@@ -608,13 +599,9 @@ lemma fieldStrengthAux_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 
   match μν with
   | (μ, ν) =>
   trans (Tensor.basis _).repr (Tensorial.toTensor (A.fieldStrengthAux ε))
-    (fun | 0 => finSumFinEquiv μ | 1 => finSumFinEquiv ν); swap
+    (fun | 0 => μ | 1 => ν); swap
   · rw [toTensor_fieldStrengthAux_basis_repr]
-    simp
   rw [fieldStrengthAux_tensor_basis_eq_basis]
-  congr 1
-  change _ = (finSumFinEquiv.symm (finSumFinEquiv μ), finSumFinEquiv.symm (finSumFinEquiv ν))
-  simp
 
 lemma fieldStrengthAux_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) :

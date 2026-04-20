@@ -55,27 +55,22 @@ lemma minkowskiProductMap_toCoord {d : ℕ} (p q : Vector d) :
     rw [prodT_basis_repr_apply]
     enter [1]
     erw [coMetric_repr_apply_eq_minkowskiMatrix]
-  simp only [Fin.isValue, Function.comp_apply]
   conv_lhs =>
     enter [2, x, 1, 2, y, 1]
     simp only [Fin.isValue]
-    change minkowskiMatrix (finSumFinEquiv.symm y) (finSumFinEquiv.symm x)
+    change minkowskiMatrix y x
   conv_lhs =>
     enter [2, x, 2]
     rw [tensor_basis_repr_toTensor_apply]
     enter [1]
-    change finSumFinEquiv.symm x
+    change x
   conv_lhs =>
     enter [2, x, 1, 2, y, 2]
     simp only [Fin.isValue]
     rw [tensor_basis_repr_toTensor_apply]
     enter [1]
-    change finSumFinEquiv.symm y
-  conv_lhs =>
-    enter [2, x, 1]
-    rw [← finSumFinEquiv.sum_comp]
-  rw [← finSumFinEquiv.sum_comp]
-  simp only [Equiv.symm_apply_apply, Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero,
+    change y
+  simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero,
     Fin.isValue, Finset.sum_singleton, ne_eq, reduceCtorEq, not_false_eq_true,
     minkowskiMatrix.off_diag_zero, zero_mul, Finset.sum_const_zero, _root_.add_zero,
     _root_.zero_add]
