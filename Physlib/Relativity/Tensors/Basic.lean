@@ -371,6 +371,13 @@ def basis {n : ℕ} (c : Fin n → C) : Basis (ComponentIdx (S := S) c) k (S.Ten
     (fun x => by simp) (fun x => by simp)).trans
     (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → basisIdx (c j))).symm
 
+lemma basis_congr {c1 c2 : C} (h : c1 = c2) (x : basisIdx c1)
+    (y : basisIdx c2) (hxy : y = basisIdxCongr (by simp [h]) x) :
+    S.FD.map (eqToHom (by simp [h])) ((S.basis c1) x) =
+    (S.basis c2) y := by
+  subst h hxy
+  simp
+
 lemma basis_apply {n : ℕ} (c : Fin n → C) (b : ComponentIdx (S := S) c) :
     basis c b = (Pure.basisVector c b).toTensor := by
   change ofComponents c _ = _

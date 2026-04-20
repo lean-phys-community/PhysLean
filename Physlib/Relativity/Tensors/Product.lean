@@ -82,7 +82,8 @@ open OverColor
 namespace Tensor
 
 variable {k C G : Type} [CommRing k] [Group G]
-  {S : TensorSpecies k C G} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
+  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  {S : TensorSpecies k C G basisIdx} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
   {c2 : Fin n2 → C}
 
 /-!
@@ -102,10 +103,10 @@ variable {k C G : Type} [CommRing k] [Group G]
 def ComponentIdx.prod {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     ComponentIdx (S := S) (Fin.append c c1) ≃
       ComponentIdx (S := S) c × ComponentIdx (S := S) c1 where
-  toFun p := (fun i => Fin.cast (by simp) (p (Fin.castAdd n2 i)),
-    fun i => Fin.cast (by simp) (p (Fin.natAdd n1 i)))
-  invFun p := Fin.addCases (fun i => Fin.cast (by simp) (p.1 i))
-    (fun i => Fin.cast (by simp) (p.2 i))
+  toFun p := (fun i => basisIdxCongr (by simp) (p (Fin.castAdd n2 i)),
+    fun i => basisIdxCongr (by simp) (p (Fin.natAdd n1 i)))
+  invFun p := Fin.addCases (fun i => basisIdxCongr (by simp) (p.1 i))
+    (fun i => basisIdxCongr (by simp) (p.2 i))
   left_inv p := by
     ext1 i
     revert i
@@ -203,22 +204,12 @@ lemma Pure.prodP_basisVector {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C}
   ext i
   obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective i
   rw [Pure.prodP_apply_finSumFinEquiv]
-  have basis_congr {c1 c2 : C} (h : c1 = c2) (x : Fin (S.repDim c1))
-    (y : Fin (S.repDim c2)) (hxy : y = Fin.cast (by simp [h]) x) :
-      S.FD.map (eqToHom (by simp [h])) ((S.basis c1) x) =
-      (S.basis c2) y := by
-    subst h hxy
-    simp
-  match i with
-  | Sum.inl i =>
+  cases i
+  all_goals
     simp only [basisVector]
     apply basis_congr
     · simp [ComponentIdx.prod]
-    · simp
-  | Sum.inr i =>
-    simp only [basisVector]
-    apply basis_congr
-    · simp [ComponentIdx.prod]
+      rfl
     · simp
 
 /-!
@@ -240,16 +231,13 @@ lemma Pure.prodP_component {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   simp only [finSumFinEquiv_apply_left, finSumFinEquiv_apply_right,
     Fintype.prod_sum_type]
   congr
+  all_goals
   · funext x
     generalize_proofs h1 h2
     simp only [Discrete.mk.injEq] at h2
     rw [S.basis_congr_repr h2]
-    rfl
-  · funext x
-    generalize_proofs h1 h2
-    simp only [Discrete.mk.injEq] at h2
-    rw [S.basis_congr_repr h2]
-    rfl
+    congr
+    simp [ComponentIdx.prod]
 
 /-!
 
