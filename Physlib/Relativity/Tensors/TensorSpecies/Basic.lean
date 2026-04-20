@@ -97,6 +97,13 @@ omit [(c : C) → Fintype (basisIdx c)] [(c : C) → DecidableEq (basisIdx c)] i
 lemma basisIdxCongr_rfl (c : C) (i : basisIdx c) :
   basisIdxCongr (Eq.refl c) i = i := rfl
 
+
+omit [(c : C) → Fintype (basisIdx c)] [(c : C) → DecidableEq (basisIdx c)] in
+@[simp]
+lemma basisIdxCongr_apply_apply {c c1 c2 : C} (h1 : c = c1) (h2 : c1 = c2) (i : basisIdx c) :
+    basisIdxCongr h2 (basisIdxCongr h1 i) = basisIdxCongr (by simp [h1, h2]) i := by
+  simp [basisIdxCongr]
+
 @[simp]
 lemma τ_τ_apply (c : C) : S.τ (S.τ c) = c := S.τ_involution c
 
