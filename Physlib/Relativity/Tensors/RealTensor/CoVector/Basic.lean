@@ -143,17 +143,14 @@ lemma zero_apply {d : ℕ} (i : Fin 1 ⊕ Fin d) :
 /-- The equivalence between the type of indices of a Lorentz vector and
   `Fin 1 ⊕ Fin d`. -/
 def indexEquiv {d : ℕ} :
-    ComponentIdx (S := (realLorentzTensor d)) ![Color.down] ≃ Fin 1 ⊕ Fin d :=
-  let e : (ComponentIdx (S := (realLorentzTensor d)) ![Color.down])
-    ≃ Fin (1 + d) := {
-    toFun := fun f => Fin.cast (by rfl) (f 0)
-    invFun := fun x => (fun j => Fin.cast (by simp) x)
-    left_inv := fun f => by
-      ext j
-      fin_cases j
-      simp
-    right_inv := fun x => by rfl}
-  e.trans finSumFinEquiv.symm
+    ComponentIdx (S := (realLorentzTensor d)) ![Color.down] ≃ Fin 1 ⊕ Fin d where
+  toFun f := f 0
+  invFun i := fun _ => i
+  left_inv f := by
+    ext m
+    fin_cases m
+    simp
+  right_inv i := by rfl
 
 instance tensorial {d : ℕ} : Tensorial (realLorentzTensor d) ![.down] (CoVector d) where
   toTensor := LinearEquiv.symm <|
@@ -178,7 +175,7 @@ lemma toTensor_symm_apply {d : ℕ} (p : ℝT[d, .down]) :
 
 lemma toTensor_symm_pure {d : ℕ} (p : Pure (realLorentzTensor d) ![.down]) (i : Fin 1 ⊕ Fin d) :
     (toTensor (self := tensorial)).symm p.toTensor i =
-    ((Lorentz.coBasisFin d).repr (p 0)) (indexEquiv.symm i 0) := by
+    ((Lorentz.coBasis d).repr (p 0)) (indexEquiv.symm i 0) := by
   rw [toTensor_symm_apply]
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd,
     Equiv.piCongrLeft'_apply, Finsupp.equivFunOnFinite_apply, Fin.isValue]
@@ -212,11 +209,13 @@ lemma toTensor_symm_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
   rw [Tensor.basis_apply]
   funext i
   rw [toTensor_symm_pure]
-  simp [coBasisFin, Pure.basisVector]
+  simp [Pure.basisVector]
   conv_lhs =>
     enter [1, 2]
-    change (coBasisFin d) (indexEquiv.symm μ 0)
-  simp [coBasisFin, indexEquiv, Finsupp.single_apply]
+    change (coBasis d) (indexEquiv.symm μ 0)
+  simp [coBasis, indexEquiv, Pi.single_apply]
+  congr 1
+  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
 
 lemma toTensor_basis_eq_tensor_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
     toTensor (basis μ) = Tensor.basis ![Color.down] (indexEquiv.symm μ) := by
@@ -282,9 +281,8 @@ lemma smul_eq_sum {d : ℕ} (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : CoV
     conv_lhs =>
       enter [1, 2]
       change (LorentzGroup.transpose Λ⁻¹) *ᵥ (p 0)
-    rw [coBasisFin_repr_apply]
+    rw [coBasis_repr_apply]
     conv_lhs => simp [indexEquiv]
-
     rw [mulVec_eq_sum]
     simp only [Finset.sum_apply]
     congr
@@ -292,9 +290,8 @@ lemma smul_eq_sum {d : ℕ} (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : CoV
     simp [Fin.isValue, Pi.smul_apply, transpose_apply, MulOpposite.smul_eq_mul_unop,
       MulOpposite.unop_op, Nat.succ_eq_add_one, Nat.reduceAdd]
     congr
-    rw [toTensor_symm_pure, coBasisFin_repr_apply]
-    congr
-    simp [indexEquiv]
+    rw [toTensor_symm_pure, coBasis_repr_apply]
+    rfl
   · intro r t h
     simp only [actionT_smul, _root_.map_smul]
     change r * toTensor (self := tensorial).symm (Λ • t) i = _
