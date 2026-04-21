@@ -171,7 +171,7 @@ lemma toComplex_eq_sum_basis {n} (c : Fin n → realLorentzTensor.Color) (v : �
       Tensor.basis (S := complexLorentzTensor) (colorToComplex ∘ c) i := by
   simp only [toComplex, LinearMap.coe_mk, AddHom.coe_mk]
   rw [← Equiv.sum_comp ComponentIdx.complexify]
-  rfl
+  simp
 
 /-- The representation of `toComplex v` in the complexified basis equals
   the real representation coerced to complex. -/
