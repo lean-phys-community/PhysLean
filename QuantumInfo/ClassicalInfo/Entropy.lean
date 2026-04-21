@@ -96,7 +96,8 @@ theorem Hₛ_le_log_d (d : ProbDistribution α) : Hₛ d ≤ Real.log (Fintype.c
   --Thanks Aristotle
   by_cases h : Fintype.card α = 0
   · simp_all [Hₛ, Fintype.card_eq_zero_iff.mp h]
-  -- Since the sum of the probabilities is 1, we can apply Jensen's inequality for the convex function -x log x.
+  -- Since the sum of the probabilities is 1, we can apply Jensen's inequality for the
+    -- convex function -x log x.
   have h_jensen {p : α → ℝ} (hsum : ∑ i, p i = 1) (hp : ∀ i, 0 ≤ p i ∧ p i ≤ 1) :
       -∑ i, p i * (p i).log ≤ Real.log (Fintype.card α) := by
     have h_jensen : (∑ i, (Fintype.card α : ℝ)⁻¹ * p i) * (∑ i, (Fintype.card α : ℝ)⁻¹ * p i).log ≤

@@ -15,12 +15,13 @@ public import Mathlib.Topology.UnitInterval
 
 /-! # Probabilities
 
-This defines a type `Prob`, which is simply any real number in the interval O to 1. This then comes with
-additional statements such as its application to convex sets, and it makes useful type alias for
-functions that only make sense on probabilities.
+This defines a type `Prob`, which is simply any real number in the interval O to 1.
+This then comes with additional statements such as its application to convex sets, and
+it makes useful type alias for functions that only make sense on probabilities.
 
-A significant application is in the `Mixable` typeclass, also in this file, which is a general notion
-of convex combination that applies to types as opposed to sets; elements are `Mixable.mix`ed using `Prob`s.
+A significant application is in the `Mixable` typeclass, also in this file, which is a
+general notion of convex combination that applies to types as opposed to sets;
+elements are `Mixable.mix`ed using `Prob`s.
 -/
 
 @[expose] public section
@@ -221,21 +222,24 @@ theorem mul_eq_one_iff (p q : Prob) : p * q = 1 ↔ p = 1 ∧ q = 1 := by
 
 end Prob
 
-/-- A `Mixable T` typeclass instance gives a compact way of talking about the action of probabilities
-  for forming linear combinations in convex spaces. The notation `p [ x₁ ↔ x₂ ]` means to take a convex
+/-- A `Mixable T` typeclass instance gives a compact way of talking about the
+  action of probabilities for forming linear combinations in convex spaces.
+  The notation `p [ x₁ ↔ x₂ ]` means to take a convex
   combination, equal to `x₁` if `p=1` and to `x₂` if `p=0`.
 
-  Mixable is defined by an "underlying" data type `U` with addition and scalar multiplication, and a
-  bijection between the `T` and a convex set of `U`. For instance, in `Mixable (Distribution (Fin n))`,
-  `U` is `n`-element vectors (which form the probability simplex, degenerate in one dimension). For
-  `QuantumInfo.Finite.MState` density matrices in quantum mechanics, which are PSD matrices of trace 1,
-  `U` is the underlying matrix.
+  Mixable is defined by an "underlying" data type `U` with addition and scalar
+  multiplication, and a bijection between the `T` and a convex set of `U`.
+  For instance, in `Mixable (Distribution (Fin n))`, `U` is `n`-element vectors
+  (which form the probability simplex, degenerate in one dimension). For
+  `QuantumInfo.Finite.MState` density matrices in quantum mechanics, which are
+  PSD matrices of trace 1, `U` is the underlying matrix.
 
-  Why not just stick with existing notions of `Convex`? `Convex` requires that the type already forms an
-  `AddCommMonoid` and `Module ℝ`. But many types, such as `Distribution`, are not: there is no good notion of
-  "multiplying a probability distribution by 0.3" to get another distribution. We can coerce the distribution
-  into, say, a vector or a function, but then we are not doing arithmetic with distributions. Accordingly,
-  the expression `0.3 * distA + 0.7 * distB` cannot represent a distribution on its own. -/
+  Why not just stick with existing notions of `Convex`? `Convex` requires that
+  the type already forms an `AddCommMonoid` and `Module ℝ`. But many types, such as `Distribution`,
+  are not: there is no good notion of "multiplying a probability distribution by 0.3" to get another
+  distribution. We can coerce the distribution nto, say, a vector or a function, but then we are not
+  doing arithmetic with distributions. Accordingly, the expression `0.3 * distA + 0.7 * distB`
+  cannot represent a distribution on its own. -/
 class Mixable (U : outParam (Type u)) (T : Type v) [AddCommMonoid U] [Module ℝ U] where
   /-- Getter for the underlying data -/
   to_U : T → U
@@ -257,8 +261,9 @@ def mix_ab [inst : Mixable U T] {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) (hab :
     (y := to_U x₂) (exists_apply_eq_apply _ _)
     ha hb hab
 
-/-- `Mixable.mix` represents the notion of "convex combination" on the type `T`, afforded by the `Mixable`
-instance. It takes a `Prob`, that is, a `Real` between 0 and 1. For working directly with a Real, use `mix_ab`. -/
+/-- `Mixable.mix` represents the notion of "convex combination" on the type `T`, afforded by the
+  `Mixable` instance. It takes a `Prob`, that is, a `Real` between 0 and 1. For working directly
+  with a Real, use `mix_ab`. -/
 def mix [inst : Mixable U T] (p : Prob) (x₁ x₂ : T) : T :=
   inst.mix_ab p.zero_le_coe (1 - p).zero_le_coe p.add_one_minus x₁ x₂
 
@@ -285,7 +290,8 @@ instance instUniv [AddCommMonoid T] [Module ℝ T] : Mixable T T where
   mkT := fun _ ↦ ⟨_, rfl⟩
 
 @[simp]
-theorem mkT_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} (h : ∃ t', to_U t' = t) : instUniv.mkT h = ⟨t, rfl⟩ :=
+theorem mkT_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} (h : ∃ t', to_U t' = t) :
+    instUniv.mkT h = ⟨t, rfl⟩ :=
   rfl
 
 @[simp]
@@ -294,13 +300,16 @@ theorem to_U_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} : instUniv.to_U t
 
 section pi
 
-theorem instPi.lem_1 {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)] [inst : ∀i, Mixable (U i) (T i)]
-    {u : (i : D) → U i} (h : ∃ (t : (i : D) → T i), (fun d => to_U (t d)) = u) (d : D) : ∃ (t : T d), to_U t = u d := by
+theorem instPi.lem_1 {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)]
+    [inst : ∀i, Mixable (U i) (T i)]
+    {u : (i : D) → U i} (h : ∃ (t : (i : D) → T i), (fun d => to_U (t d)) = u) (d : D) :
+    ∃ (t : T d), to_U t = u d := by
   obtain ⟨t, h⟩ := h
   use t d
   exact congrFun h d
 
-variable {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)] [inst : ∀i, Mixable (U i) (T i)] in
+variable {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)]
+  [inst : ∀i, Mixable (U i) (T i)] in
 /-- Mixable instance on Pi types. -/
 instance instPi : Mixable ((i:D) → U i) ((i:D) → T i) where
   to_U x := fun d ↦ (inst d).to_U (x d)
@@ -315,12 +324,13 @@ instance instPi : Mixable ((i:D) → U i) ((i:D) → T i) where
     simp only [to_U_of_mkT, Pi.add_apply, Pi.smul_apply]
 
 @[simp]
-theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t, to_U t = u) : (instPi.mkT h).val =
-    fun d ↦ (inst.mkT (instPi.lem_1 h d)).val :=
+theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t, to_U t = u) :
+    (instPi.mkT h).val = fun d ↦ (inst.mkT (instPi.lem_1 h d)).val :=
   rfl
 
 @[simp]
-theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} : (instPi).to_U t = fun d ↦ inst.to_U (t d) :=
+theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} :
+    (instPi).to_U t = fun d ↦ inst.to_U (t d) :=
   rfl
 
 end pi
@@ -379,13 +389,14 @@ theorem mkT_mixable (u : ℝ) (h : ∃ t : Prob, Mixable.to_U t = u) : Mixable.m
 
 /-- `Prob.mix` is an alias of `Mixable.mix` so it can be accessed from a probability with
 dot notation, e.g. `p.mix x y`. -/
-abbrev mix [AddCommMonoid U] [Module ℝ U] [inst : Mixable U T] (p : Prob) (x₁ x₂ : T) := inst.mix p x₁ x₂
+abbrev mix [AddCommMonoid U] [Module ℝ U] [inst : Mixable U T]
+    (p : Prob) (x₁ x₂ : T) := inst.mix p x₁ x₂
 
 section negLog
 open ENNReal
 
-/-- Map a probability [0,1] to [0,+∞] with -log p. Special case that 0 maps to +∞ (not 0, as Real.log
-does). This makes it `Antitone`.
+/-- Map a probability [0,1] to [0,+∞] with -log p. Special case that 0 maps to +∞ (not 0, as
+  Real.log does). This makes it `Antitone`.
 -/
 noncomputable def negLog : Prob → ENNReal :=
   fun p ↦ if p = 0 then ∞ else .ofNNReal ⟨-Real.log p,

@@ -60,7 +60,8 @@ namespace DMChannel
 /-- Apply a discrete memoryless channel to an n-character string. -/
 def on_fin (C : DMChannel I O) {n : ℕ} (is : Fin n → I) : ProbDistribution (Fin n → O) :=
   ⟨fun os ↦ ∏ k, C.symb_dist (is k) (os k), by
-    -- change ∑ os in Fintype.piFinset fun x => (Finset.univ : Finset O), ∏ k : Fin n, ((C.symb_dist (is k)) (os k) : ℝ) = 1
+    -- change ∑ os in Fintype.piFinset fun x => (Finset.univ : Finset O),
+    --  ∏ k : Fin n, ((C.symb_dist (is k)) (os k) : ℝ) = 1
     -- have : ∀i, Finset.sum Finset.univ (C.symb_dist i) = 1 :=
     --   fun i ↦ Distribution.prop <| C.symb_dist i
     -- rw [Finset.sum_prod_piFinset]

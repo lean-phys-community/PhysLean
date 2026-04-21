@@ -110,7 +110,8 @@ If two matrix maps satisfy the trace duality property, they are equal.
 lemma dual_unique
     (M : MatrixMap dIn dOut 𝕜) (M' : MatrixMap dOut dIn 𝕜)
     (h : ∀ A B, (M A * B).trace = (A * M' B).trace) : M.dual = M' := by
-  -- By definition of dual, we know that for any A and B, the trace of (M A) * B equals the trace of A * (M.dual B).
+  -- By definition of dual, we know that for any A and B, the trace of (M A) * B equals the trace of
+  -- A * (M.dual B).
   have h_dual : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜, (M A * B).trace = (A * M.dual B).trace := by
     exact fun A B => Dual.trace_eq M A B;
   -- Since these two linear maps agree on all bases, they must be equal.
@@ -124,7 +125,8 @@ The Choi matrix of the dual map is the transpose of the reindexed Choi matrix of
 -/
 lemma dual_choi_matrix (M : MatrixMap dIn dOut 𝕜) :
     M.dual.choi_matrix = (M.choi_matrix.transpose).reindex (Equiv.prodComm dOut dIn) (Equiv.prodComm dOut dIn) := by
-  -- By definition of dual, we know that $(M.dual (single j₁ j₂ 1)) i₁ i₂ = (M (single i₂ i₁ 1)) j₂ j₁$.
+  -- By definition of dual, we know that
+  -- $(M.dual (single j₁ j₂ 1)) i₁ i₂ = (M (single i₂ i₁ 1)) j₂ j₁$.
   have h_dual_def : ∀ (i₁ : dIn) (j₁ : dOut) (i₂ : dIn) (j₂ : dOut), (M.dual (Matrix.single j₁ j₂ 1)) i₁ i₂ = (M (Matrix.single i₂ i₁ 1)) j₂ j₁ := by
     intro i₁ j₁ i₂ j₂
     have h_dual_def : (M.dual (Matrix.single j₁ j₂ 1)) i₁ i₂ = Matrix.trace (Matrix.single i₂ i₁ 1 * M.dual (Matrix.single j₁ j₂ 1)) := by
@@ -141,7 +143,8 @@ lemma dual_choi_matrix (M : MatrixMap dIn dOut 𝕜) :
   aesop
 
 /--
-If the Choi matrix of a map is positive semidefinite, then the Choi matrix of its dual is also positive semidefinite.
+If the Choi matrix of a map is positive semidefinite, then the Choi matrix of its dual is also
+positive semidefinite.
 -/
 lemma dual_choi_matrix_posSemidef_of_posSemidef (M : MatrixMap dIn dOut 𝕜) (h : M.choi_matrix.PosSemidef) :
     M.dual.choi_matrix.PosSemidef := by
@@ -227,7 +230,8 @@ theorem IsCompletelyPositive.dual (h : M.IsCompletelyPositive) : M.dual.IsComple
   rw [ h_dual_kron, dual_id ]
 
 /--
-The composition of the dual of the inverse of the dual basis isomorphism with the dual basis isomorphism is the evaluation map.
+The composition of the dual of the inverse of the dual basis isomorphism with the dual basis
+isomorphism is the evaluation map.
 -/
 lemma Module.Basis.dualMap_toDualEquiv_symm_comp_toDualEquiv {ι R M : Type*} [Fintype ι] [DecidableEq ι] [CommRing R] [AddCommGroup M] [Module R M] [Module.IsReflexive R M] (b : Module.Basis ι R M) :
     b.toDualEquiv.symm.toLinearMap.dualMap ∘ₗ b.toDualEquiv.toLinearMap = (Module.evalEquiv R M).toLinearMap := by
@@ -241,7 +245,8 @@ lemma Module.Basis.dualMap_toDualEquiv_symm_comp_toDualEquiv {ι R M : Type*} [F
   ac_rfl
 
 /--
-The composition of the inverse of the dual basis isomorphism with the dual of the dual basis isomorphism is the inverse of the evaluation map.
+The composition of the inverse of the dual basis isomorphism with the dual of the dual basis
+isomorphism is the inverse of the evaluation map.
 -/
 lemma Module.Basis.toDualEquiv_symm_comp_dualMap_toDualEquiv {ι R M : Type*} [Fintype ι] [DecidableEq ι] [CommRing R] [AddCommGroup M] [Module R M] [Module.IsReflexive R M] (b : Module.Basis ι R M) :
     b.toDualEquiv.symm.toLinearMap ∘ₗ b.toDualEquiv.toLinearMap.dualMap = (Module.evalEquiv R M).symm.toLinearMap := by
@@ -402,9 +407,9 @@ theorem HPMap.ofHermitianMat_linearMap (f : HPMap dIn dOut ℂ) :
 
 variable (f : HPMap dIn dOut) (A : HermitianMat dIn ℂ)
 
---Can define one for HPMap's that has 'easier' definitional properties, uses the inner product structure,
---doesn't go through Module.Basis the same way. Requires the equivalence between ℝ-linear maps of HermitianMats
---and ℂ-linear maps of matrices.
+--Can define one for HPMap's that has 'easier' definitional properties, uses the inner product
+--structure, doesn't go through Module.Basis the same way. Requires the equivalence between ℝ-linear
+--maps of HermitianMats and ℂ-linear maps of matrices.
 def HPMap.hermDual : HPMap dOut dIn :=
   HPMap.ofHermitianMat (LinearMapClass.linearMap f).adjoint
 

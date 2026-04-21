@@ -22,7 +22,8 @@ variable (A I O : Type*)
  strings (`List`s) of any length over an alphabet `A`, and returns strings over `I`;
  the decoder takes `O` and gives back strings over `A`. The idea is that a channel
  would map from strings of `I` to `O`. Important special cases are where `I=O` (the channel doesn't
- change the symbol set), and `FixedLengthCode` where the output lengths only depend on input lengths. -/
+ change the symbol set), and `FixedLengthCode` where the output lengths only depend on input
+ lengths. -/
 structure Code where
   encoder : List A → List I
   decoder : List O → List A
@@ -38,8 +39,8 @@ structure FixedLengthCode extends Code A I O where
 /-- A `BlockCode` is a `FixedLengthCode` that (1) maps symbols in discrete blocks of fixed length,
  (2) the encoded alphabet `I` has a canonical injection into `O`, and (3) has encoder and decoders
  that are inverses of each other. This is well-suited to describing noise and erasure channels. If
- the channel merely "corrupts" the data then this `O = I`; the erasure channel might for instance take
- `O = I ⊕ Unit` or `Option I`.
+ the channel merely "corrupts" the data then this `O = I`; the erasure channel might for instance
+ take `O = I ⊕ Unit` or `Option I`.
 
  We define the behavior of a block code to "fail" if the input is not a multiple of the block size,
  by having it return an empty list. -/

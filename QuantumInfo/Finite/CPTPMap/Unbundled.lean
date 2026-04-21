@@ -62,7 +62,8 @@ theorem IsTracePreserving_iff_trace_choi [DecidableEq A] (M : MatrixMap A B R) :
 
 namespace IsTracePreserving
 
-/-- Simp lemma: the trace of the image of a IsTracePreserving map is the same as the original trace. -/
+/-- Simp lemma: the trace of the image of a IsTracePreserving map is the same as the original
+trace. -/
 @[simp]
 theorem apply_trace (h : M.IsTracePreserving) (ρ : Matrix A A R)
     : (M ρ).trace = ρ.trace :=
@@ -354,12 +355,14 @@ variable {d : Type*} [Fintype d]
 open MatrixOrder
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely positive map. -/
+/-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely
+  positive map. -/
 theorem kron_kronecker_const {C : Matrix d d R} (h : C.PosSemidef) {h₁ h₂ : _} : IsCompletelyPositive
     (⟨⟨fun M => M ⊗ₖ C, h₁⟩, h₂⟩ : MatrixMap A (A × d) R) := by
   intros n x hx
   have h_kronecker_pos : (x ⊗ₖ C).PosSemidef := by
-    -- Since $x$ and $C$ are positive semidefinite, there exist matrices $U$ and $V$ such that $x = U^*U$ and $C = V^*V$.
+    -- Since $x$ and $C$ are positive semidefinite, there exist matrices $U$ and $V$ such that
+    -- $x = U^*U$ and $C = V^*V$.
     obtain ⟨U, hU⟩ : ∃ U : Matrix (A × Fin n) (A × Fin n) R, x = star U * U := by
       classical
       apply CStarAlgebra.nonneg_iff_eq_star_mul_self.mp

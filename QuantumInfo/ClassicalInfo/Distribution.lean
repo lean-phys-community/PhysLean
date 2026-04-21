@@ -11,8 +11,10 @@ public import Mathlib.Analysis.Convex.Combination
 
 /-! # Distributions on finite sets
 
-We define the type `Distribution α` on a `Fintype α`. By restricting ourselves to distributoins on finite types,
-a lot of notation and casts are greatly simplified. This suffices for (most) finite-dimensional quantum theory.
+We define the type `Distribution α` on a `Fintype α`. By restricting ourselves to distributoins on
+finite types, a lot of notation and casts are greatly simplified.
+This suffices for (most) finite-dimensional quantum theory.
+
 -/
 
 @[expose] public section
@@ -101,7 +103,8 @@ theorem constant_def' (x y : α) : (constant x : α → Prob) y = if x = y then 
   <;> simp [h]
 
 /-- If a distribution has an element with probability 1, the distribution has a constant. -/
-theorem constant_of_exists_one {D : ProbDistribution α} {x : α} (h : D x = 1) : D = ProbDistribution.constant x := by
+theorem constant_of_exists_one {D : ProbDistribution α} {x : α} (h : D x = 1) :
+    D = ProbDistribution.constant x := by
   ext y
   by_cases h₂ : x = y
   · simp [h, ← h₂]
@@ -136,11 +139,13 @@ def prod (d1 : ProbDistribution α) (d2 : ProbDistribution β) : ProbDistributio
 theorem prod_def (x : α) (y : β) : prod d1 d2 ⟨x, y⟩ = (d1 x) * (d2 y) :=
   rfl
 
-/-- Given a distribution on α, extend it to a distribution on `Sum α β` by giving it no support on `β`. -/
+/-- Given a distribution on α, extend it to a distribution on `Sum α β` by
+  giving it no support on `β`. -/
 def extend_right (d : ProbDistribution α) : ProbDistribution (α ⊕ β) :=
   ⟨fun x ↦ Sum.casesOn x d.val (Function.const _ 0), by simp⟩
 
-/-- Given a distribution on α, extend it to a distribution on `Sum β α` by giving it no support on `β`. -/
+/-- Given a distribution on α, extend it to a distribution on `Sum β α` by
+  giving it no support on `β`. -/
 def extend_left (d : ProbDistribution α) : ProbDistribution (β ⊕ α) :=
   ⟨fun x ↦ Sum.casesOn x (Function.const _ 0) d.val, by simp⟩
 
@@ -157,7 +162,8 @@ def relabel (d : ProbDistribution α) (σ : β ≃ α) : ProbDistribution β :=
   ⟨fun b ↦ d (σ b),
    by rw [Equiv.sum_comp σ (fun a ↦ (d a : ℝ))]; exact d.prop⟩
 
--- The two properties below (and congrRandVar) follow from the fact that Distribution is a contravariant functor.
+-- The two properties below (and congrRandVar) follow from the fact that Distribution is a
+-- contravariant functor.
 -- However, mathlib does not seem to support that outside of the CategoryTheory namespace
 /-- ProbDistribution on α and β are equivalent for equivalent types α ≃ β. -/
 def congr (σ : α ≃ β) : ProbDistribution α ≃ ProbDistribution β := by
@@ -181,10 +187,12 @@ theorem congr_apply (σ : α ≃ β) (d : ProbDistribution α) (j : β): (congr 
 
 /-- The inverse and congruence operations for distributions commute -/
 @[simp]
-theorem congr_symm_apply (σ : α ≃ β) : (ProbDistribution.congr σ).symm = ProbDistribution.congr σ.symm := by
+theorem congr_symm_apply (σ : α ≃ β) :
+    (ProbDistribution.congr σ).symm = ProbDistribution.congr σ.symm := by
   rfl
 
-/-- The distribution on Fin 2 corresponding to a coin with probability p. Chance p of 1, 1-p of 0. -/
+/-- The distribution on Fin 2 corresponding to a coin with probability p.
+  Chance p of 1, 1-p of 0. -/
 def coin (p : Prob) : ProbDistribution (Fin 2) :=
   ⟨(if · = 0 then p else 1 - p), by simp⟩
 
@@ -233,24 +241,27 @@ instance instLawfulFunctor : LawfulFunctor (RandVar α) where
 variable {T U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T]
 
 /-- `Distribution.exp_val` is the expectation value of a random variable `X`. Under the hood,
-it is the "convex combination over a finite family" on the type `T`, afforded by the `Mixable` instance,
-with the probability distribution of `X` as weights. -/
+it is the "convex combination over a finite family" on the type `T`, afforded by
+the `Mixable` instance, with the probability distribution of `X` as weights. -/
 def expect_val (X : RandVar α T) : T := by
   let u : U := ∑ i ∈ Finset.univ, (X.distr i : ℝ) • (inst.to_U (X.var i))
   have ht : ∃ t : T, inst.to_U t = u := by
     have h₀ : ∀ i ∈ Finset.univ, 0 ≤ ↑(X.distr i) := by simp
     have h₁ : ∑ i ∈ Finset.univ, (X.distr i : ℝ) = 1 := by simp
-    have hz : ∀ i ∈ Finset.univ, inst.to_U (X.var i) ∈ Set.range inst.to_U := by simp [Finset.mem_univ]
+    have hz : ∀ i ∈ Finset.univ, inst.to_U (X.var i) ∈ Set.range inst.to_U := by
+      simp [Finset.mem_univ]
     exact Set.mem_range.mp (inst.convex.sum_mem h₀ h₁ hz)
   exact (inst.mkT ht).1
 
 /-- The expectation value of a random variable over `α = Fin 2` is the same as `Mixable.mix`
 with probabiliy weight `X.distr 0` -/
-theorem expect_val_eq_mixable_mix (d : ProbDistribution (Fin 2)) (x₁ x₂ : T) : expect_val ⟨![x₁, x₂], d⟩ = Mixable.mix (d 0) x₁ x₂ := by
+theorem expect_val_eq_mixable_mix (d : ProbDistribution (Fin 2)) (x₁ x₂ : T) :
+    expect_val ⟨![x₁, x₂], d⟩ = Mixable.mix (d 0) x₁ x₂ := by
   apply Mixable.to_U_inj
   simp only [Mixable.mix, expect_val, DFunLike.coe, Mixable.to_U_of_mkT]
   calc
-    ∑ i : Fin (Nat.succ 0).succ, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) = ∑ i, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) := by
+    ∑ i : Fin (Nat.succ 0).succ, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) =
+        ∑ i, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) := by
       simp
     _ = (d 0 : ℝ) • Mixable.to_U (![x₁, x₂] 0) + (d 1 : ℝ) • Mixable.to_U (![x₁, x₂] 1) := by
       simp
@@ -259,14 +270,16 @@ theorem expect_val_eq_mixable_mix (d : ProbDistribution (Fin 2)) (x₁ x₂ : T)
       simpa only [Subtype.ext_iff, Prob.coe_one_minus, eq_sub_iff_add_eq, add_comm,
         fun_eq_val, Fin.sum_univ_two] using d.property
 
-/-- The expectation value of a random variable with constant probability distribution `constant x` is its value at `x` -/
+/-- The expectation value of a random variable with constant probability distribution
+  `constant x` is its value at `x` -/
 theorem expect_val_constant (x : α) (f : α → T) : expect_val ⟨f, (constant x)⟩ = f x := by
   apply Mixable.to_U_inj
   simp only [expect_val, constant, DFunLike.coe, Mixable.to_U_of_mkT, apply_ite, Prob.coe_one,
     Prob.coe_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
 
 /-- The expectation value of a nonnegative real random variable is also nonnegative -/
-theorem zero_le_expect_val (d : ProbDistribution α) (f : α → ℝ) (hpos : 0 ≤ f) : 0 ≤ expect_val ⟨f, d⟩ := by
+theorem zero_le_expect_val (d : ProbDistribution α) (f : α → ℝ) (hpos : 0 ≤ f) :
+    0 ≤ expect_val ⟨f, d⟩ := by
   simp only [expect_val, Mixable.mkT, Mixable.to_U, id]
   apply Fintype.sum_nonneg
   intro x
@@ -291,13 +304,15 @@ def congrRandVar (σ : α ≃ β) : RandVar α T ≃ RandVar β T := by
     · simp [Function.comp_assoc]
     · rw [← ProbDistribution.congr_symm_apply, Equiv.apply_symm_apply]
 
-/-- Given a `T`-valued random variable `X` over `α`, mapping over `T` commutes with the equivalence over `α` -/
+/-- Given a `T`-valued random variable `X` over `α`, mapping over `T` commutes
+  with the equivalence over `α` -/
 def map_congr_eq_congr_map {S : Type _} [Mixable U S] (f : T → S) (σ : α ≃ β) (X : RandVar α T) :
   f <$> congrRandVar σ X = congrRandVar σ (f <$> X) := by rfl
 
 /-- The expectation value is invariant under equivalence of random variables -/
 @[simp]
-theorem expect_val_congr_eq_expect_val (σ : α ≃ β) (X : RandVar α T) : expect_val (congrRandVar σ X) = expect_val X := by
+theorem expect_val_congr_eq_expect_val (σ : α ≃ β) (X : RandVar α T) :
+    expect_val (congrRandVar σ X) = expect_val X := by
   apply Mixable.to_U_inj
   simp only [expect_val, congrRandVar, Equiv.coe_fn_mk, Function.comp_apply, Mixable.to_U_of_mkT,
     congr_apply]

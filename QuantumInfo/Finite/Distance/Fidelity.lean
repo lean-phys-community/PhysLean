@@ -20,7 +20,8 @@ variable {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] (ρ σ : MS
 
 namespace MState
 
-/-- The fidelity of two quantum states. This is the quantum version of the Bhattacharyya coefficient. -/
+/-- The fidelity of two quantum states. This is the quantum version of the Bhattacharyya
+  coefficient. -/
 def fidelity (ρ σ : MState d) : ℝ :=
   (σ.M.conj ρ.M.sqrt.mat).sqrt.trace
 

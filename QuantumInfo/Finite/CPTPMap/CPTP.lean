@@ -10,10 +10,11 @@ public import QuantumInfo.Finite.Unitary
 
 /-! # Completely Positive Trace Preserving maps
 
-A `CPTPMap` is a `ℂ`-linear map between matrices (`MatrixMap` is an alias), bundled with the facts that it
-`IsCompletelyPositive` and `IsTracePreserving`. CPTP maps are typically regarded as the "most general
-quantum operation", as they map density matrices (`MState`s) to density matrices. The type `PTPMap`,
-for maps that are positive (but not necessarily completely positive) is also declared.
+A `CPTPMap` is a `ℂ`-linear map between matrices (`MatrixMap` is an alias), bundled with the facts
+that it `IsCompletelyPositive` and `IsTracePreserving`. CPTP maps are typically regarded as the
+"most general quantum operation", as they map density matrices (`MState`s) to density matrices. The
+type `PTPMap`, for maps that are positive (but not necessarily completely positive) is also
+declared.
 
 A large portion of the theory is in terms of the Choi matrix (`MatrixMap.choi_matrix`), as the
 positive-definiteness of this matrix corresponds to being a CP map. This is
@@ -32,8 +33,8 @@ This file also defines several important examples of, classes of, and operations
  * `IsEntanglementBreaking`, `IsDegradable`, `IsAntidegradable`: Entanglement breaking, degradable
     and antidegradable channels.
  * `SWAP`, `assoc`, `assoc'`, `traceLeft`, `traceRight`: The CPTP maps corresponding to important
-    operations on states. These correspond directly to `MState.SWAP`, `MState.assoc`, `MState.assoc'`,
-    `MState.traceLeft`, and `MState.traceRight`.
+    operations on states. These correspond directly to `MState.SWAP`, `MState.assoc`,
+    `MState.assoc'`, `MState.traceLeft`, and `MState.traceRight`.
 -/
 
 @[expose] public section
@@ -455,16 +456,14 @@ variable [DecidableEq dOut] [Inhabited dOut]
 --PULLOUT
 omit [DecidableEq dOut] [Inhabited dOut] in
 /-
-PROBLEM
-If a MatrixMap of_kraus K K is trace-preserving, then Σ_k K_k† K_k = 1.
+PROBLEM If a MatrixMap of_kraus K K is trace-preserving, then Σ_k K_k† K_k = 1.
 
-PROVIDED SOLUTION
-The TP condition says for all X, trace((of_kraus K K) X) = trace(X).
-Unfolding of_kraus: trace(Σ_k K_k X K_k†) = Σ_k trace(K_k† K_k X) (by cycle) = trace((Σ_k K_k† K_k) X).
-So trace(A X) = trace(X) for all X where A = Σ_k K_k† K_k, which means A = 1.
-Use `Matrix.eq_of_trace_mul_eq` or the fact that trace is a faithful pairing on matrices
-to conclude A = 1. The TP condition `Λ.TP` gives us `∀ x, (Λ.map x).trace = x.trace`, and
-since `Λ.map = of_kraus K K`, we substitute and simplify.
+PROVIDED SOLUTION The TP condition says for all X, trace((of_kraus K K) X) = trace(X). Unfolding
+of_kraus: trace(Σ_k K_k X K_k†) = Σ_k trace(K_k† K_k X) (by cycle) = trace((Σ_k K_k† K_k) X). So
+trace(A X) = trace(X) for all X where A = Σ_k K_k† K_k, which means A = 1. Use
+`Matrix.eq_of_trace_mul_eq` or the fact that trace is a faithful pairing on matrices to conclude A =
+1. The TP condition `Λ.TP` gives us `∀ x, (Λ.map x).trace = x.trace`, and since `Λ.map = of_kraus K
+K`, we substitute and simplify.
 -/
 private lemma kraus_sum_eq_one_of_TP
     {κ : Type*} [Fintype κ]
