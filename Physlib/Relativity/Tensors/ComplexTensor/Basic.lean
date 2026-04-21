@@ -236,7 +236,14 @@ instance {n m : ℕ} {c : Fin n → complexLorentzTensor.Color}
     Decidable (σ = σ') :=
   decidable_of_iff _ (OverColor.Hom.ext_iff σ σ')
 
-/-!
+lemma basisIdxCongr_eq_cast {c1 c2 : complexLorentzTensor.Color}
+    (h : c1 = c2) (i : Fin (repDim c1)) :
+    TensorSpecies.basisIdxCongr (basisIdx := fun c => Fin (repDim c)) h i =
+      Fin.cast (by simp [h]) i := by
+  subst h
+  rfl
+
+/-
 
 ## Relating basis
 
