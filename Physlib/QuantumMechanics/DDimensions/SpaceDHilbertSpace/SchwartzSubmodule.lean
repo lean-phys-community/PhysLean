@@ -133,6 +133,21 @@ lemma bddSchwartzIncl_injective (d : ℕ) (a : ℕ∞) : Function.Injective (bdd
 def bddSchwartzEquiv {d : ℕ} {a : ℕ∞} : bddSchwartzMap d a ≃ₗ[ℂ] bddSchwartzSubmodule d a :=
   LinearEquiv.ofInjective (bddSchwartzIncl d a) (bddSchwartzIncl_injective d a)
 
+/-!
+### B.2. (In)equalities
+-/
+
+lemma bddSchwartzSubmodule_zero_eq (d : ℕ) : bddSchwartzSubmodule d 0 = schwartzSubmodule d := by
+  simp [bddSchwartzSubmodule, bddSchwartzIncl, bddSchwartzMap_zero_eq_top d]
+
+lemma bddSchwartzSubmodule_le (d : ℕ) (a : ℕ∞) : bddSchwartzSubmodule d a ≤ schwartzSubmodule d :=
+  LinearMap.range_domRestrict_le_range _ _
+
+lemma bddSchwartzSubmodule_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
+    bddSchwartzSubmodule d b ≤ bddSchwartzSubmodule d a := by
+  simp only [bddSchwartzSubmodule, bddSchwartzIncl, LinearMap.range_domRestrict]
+  exact Submodule.map_mono (bddSchwartzMap_le_of_ge d h)
+
 end
 
 end
