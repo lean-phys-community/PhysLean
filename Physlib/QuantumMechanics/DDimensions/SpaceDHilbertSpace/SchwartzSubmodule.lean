@@ -82,6 +82,10 @@ end
 
 section
 
+/-!
+### B.1. Definitions
+-/
+
 /-- The submodule of Schwartz maps which are bounded by `Cₖ‖x‖ᵏ` for all `(k : ℕ) ≤ a`. -/
 def bddSchwartzMap (d : ℕ) (a : ℕ∞) : Submodule ℂ 𝓢(Space d, ℂ) where
   carrier := {f : 𝓢(Space d, ℂ) |
@@ -109,6 +113,25 @@ lemma bddSchwartzMap_zero_eq_top (d : ℕ) : bddSchwartzMap d 0 = ⊤ := by
 
 lemma bddSchwartzMap_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
     bddSchwartzMap d b ≤ bddSchwartzMap d a := fun _ hx k hk ↦ hx k (hk.trans h)
+
+/-- The linear map including `bddSchwartzMap d a` into the Hilbert space. -/
+def bddSchwartzIncl (d : ℕ) (a : ℕ∞) : bddSchwartzMap d a →ₗ[ℂ] SpaceDHilbertSpace d :=
+  schwartzIncl.domRestrict (bddSchwartzMap d a)
+
+/-- The submodule of `SpaceDHilbertSpace d` consisting of Schwartz functions which are bounded
+  by `Cₖ‖x‖ᵏ` for all `(k : ℕ) ≤ a`. -/
+abbrev bddSchwartzSubmodule (d : ℕ) (a : ℕ∞) : Submodule ℂ (SpaceDHilbertSpace d) :=
+  (bddSchwartzIncl d a).range
+
+lemma bddSchwartzIncl_injective (d : ℕ) (a : ℕ∞) : Function.Injective (bddSchwartzIncl d a) := by
+  apply LinearMap.injective_domRestrict_iff.mpr
+  have h : (schwartzIncl (d := d)).toLinearMap.ker = ⊥ := by ext; simp [← schwartzEquiv_apply_coe]
+  exact h.symm ▸ inf_bot_eq _
+
+/-- The linear equivalence between `bddSchwartzMap d a` and the bounded Schwartz submodule
+  of `SpaceDHilbertSpace d`. -/
+def bddSchwartzEquiv {d : ℕ} {a : ℕ∞} : bddSchwartzMap d a ≃ₗ[ℂ] bddSchwartzSubmodule d a :=
+  LinearEquiv.ofInjective (bddSchwartzIncl d a) (bddSchwartzIncl_injective d a)
 
 end
 
