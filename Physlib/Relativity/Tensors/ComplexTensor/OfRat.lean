@@ -137,7 +137,7 @@ lemma contrT_ofRat_eq_sum_dropPairSection {n : ℕ} {c : Fin (n + 1 + 1) → com
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   rw [← map_sum Physlib.RatComplexNum.toComplexNum]
   rw [ofRat_basis_repr_apply]
-  simp
+  simp [basisIdxCongr_eq_cast]
 
 open ComponentIdx
 set_option backward.isDefEq.respectTransparency false in
@@ -146,7 +146,8 @@ lemma contrT_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color
     (f : (ComponentIdx c) → RatComplexNum) :
   (contrT n i j h (ofRat f)) = ((ofRat (fun b =>
     (∑ x : Fin (complexLorentzTensor.repDim (c i)),
-      f (DropPairSection.ofFinEquiv h.1 b (x, Fin.cast (by simp [← h.2, repDim_tau]) x)))))) := by
+      f (DropPairSection.ofFinEquiv h.1 b (x, Fin.cast (by
+        simp [← h.2, complexLorentzTensor.repDim_tau]) x)))))) := by
   rw [contrT_ofRat_eq_sum_dropPairSection]
   congr
   funext b
@@ -177,6 +178,6 @@ lemma permT_ofRat {n m : ℕ} {c : Fin n → complexLorentzTensor.Color}
   simp only [permT_basis_repr_symm_apply, ofRat_basis_repr_apply]
   congr
   ext i
-  simp
+  simp [basisIdxCongr_eq_cast]
 
 end complexLorentzTensor

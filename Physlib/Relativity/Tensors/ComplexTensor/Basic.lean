@@ -243,6 +243,10 @@ lemma basisIdxCongr_eq_cast {c1 c2 : complexLorentzTensor.Color}
   subst h
   rfl
 
+lemma repDim_tau {c : complexLorentzTensor.Color} :
+    repDim (complexLorentzTensor.τ c) = repDim c := by
+  cases c <;> simp [repDim] <;> rfl
+
 /-
 
 ## Relating basis
