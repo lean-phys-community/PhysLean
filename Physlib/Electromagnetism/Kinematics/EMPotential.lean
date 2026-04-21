@@ -153,7 +153,6 @@ lemma differentiable_component {d : ℕ}
   rw [SpaceTime.differentiable_vector]
   exact hA
 
-
 @[fun_prop]
 lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
     (hA : Differentiable ℝ A) : Differentiable ℝ (fun x => Λ • A (Λ⁻¹ • x)) := by
@@ -305,7 +304,7 @@ lemma deriv_eq_tensorDeriv {d} (A : ElectromagneticPotential d)
     A.deriv x = tensorDeriv A.val x := by
   rw [deriv, tensorDeriv_eq_sum_tensor_basis (by fun_prop)]
   /- Match the basis sum. -/
-  let e :  ComponentIdx (Fin.append ![Color.down] ![Color.up])
+  let e : ComponentIdx (Fin.append ![Color.down] ![Color.up])
       ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prod.trans <|
     Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
   rw [← e.symm.sum_comp, Fintype.sum_prod_type]

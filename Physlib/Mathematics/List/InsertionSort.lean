@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 public import Physlib.Mathematics.List
 import all Physlib.Mathematics.List
-import all Mathlib.Data.List.Sort
 /-!
 # List lemmas
 

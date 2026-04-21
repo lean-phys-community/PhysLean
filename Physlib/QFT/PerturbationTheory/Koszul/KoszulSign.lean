@@ -7,7 +7,6 @@ module
 public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSignInsert
 public import Physlib.Mathematics.List.InsertionSort
 import all Physlib.Mathematics.List
-import all Mathlib.Data.List.Sort
 /-!
 
 # Koszul sign
