@@ -214,7 +214,8 @@ private lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
 lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
     Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) := by
   rcases eq_zero_or_pos d with (rfl | hd)
-  · suffices polyBddSchwartzMap 0 ⊤ = ⊤ by
+  · -- `d = 0`: Every function `Space 0 ≅ {0} → ℂ` is in `polyBddSchwartzSubmodule 0 ⊤`
+    suffices polyBddSchwartzMap 0 ⊤ = ⊤ by
       simp [polyBddSchwartzSubmodule, polyBddSchwartzIncl, this, schwartzSubmodule_dense]
     refine Submodule.eq_top_iff'.mpr (fun f k hk ↦ ?_)
     refine ⟨1 + ‖f 0‖, by positivity, fun x ↦ ?_⟩
@@ -222,7 +223,8 @@ lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
     rcases eq_or_ne k 0 with (rfl | hk')
     · simp
     · simp [hk', add_nonneg]
-  · intro ξ
+  · -- `d > 0`: Construct a sequence in `polyBddSchwartzSubmodule d ⊤` which tends to `ξ`
+    intro ξ
     apply mem_closure_iff_seq_limit.mpr
     -- `ψₙ = [fₙ]` is a sequence in `schwartzSubmodule` which tends to `ξ`
     obtain ⟨ψ, hψ, hψξ⟩ := mem_closure_iff_seq_limit.mp (schwartzSubmodule_dense d ξ)
@@ -232,11 +234,15 @@ lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
       ⟨(n + 1)⁻¹, 2 * (n + 1 : ℝ)⁻¹, by positivity, lt_two_mul_self Nat.inv_pos_of_nat⟩
     -- `φₙ = [bₙfₙ]` is a sequence in `schwartzSubmodule` which tends to `0`
     let g (n : ℕ) : 𝓢(Space d, ℂ) := smulLeftCLM ℂ (b n) (f n)
-    let φ (n : ℕ) : SpaceDHilbertSpace d := schwartzEquiv (g n)
+    let φ (n : ℕ) : SpaceDHilbertSpace d := schwartzIncl (g n)
     have hg (n : ℕ) (x : Space d) : g n x = b n x * f n x := by
       have := (b n).hasCompactSupport.hasTemperateGrowth (b n).contDiff
       rw [smulLeftCLM_apply_apply this, ← Complex.coe_smul, smul_eq_mul]
-    have hfg (n : ℕ) : f n - g n ∈ polyBddSchwartzMap d ⊤ := by
+    use ψ - φ
+    constructor
+    · intro n
+      rw [SetLike.mem_coe, LinearMap.mem_range, Subtype.exists]
+      refine ⟨f n - g n, ?_, by simp [f, φ, polyBddSchwartzIncl, ← schwartzEquiv_apply_coe]⟩
       intro k _
       obtain ⟨C, hC_pos, hC⟩ := (f n).decay 0 0
       simp only [pow_zero, norm_iteratedFDeriv_zero, one_mul] at hC
@@ -254,11 +260,6 @@ lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
           simp_rw [norm_mul, ← ofReal_one, ← ofReal_sub, norm_real, Real.norm_eq_abs, abs_one]
           refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
           exact abs_sub_le_of_nonneg_of_le zero_le_one le_rfl (b n).nonneg (b n).le_one
-    use ψ - φ
-    constructor
-    · intro n
-      rw [SetLike.mem_coe, LinearMap.mem_range, Subtype.exists]
-      exact ⟨f n - g n, hfg n, by simp [f, φ, polyBddSchwartzIncl, ← schwartzEquiv_apply_coe]⟩
     · refine tendsto_of_sub_tendsto_zero ξ hψξ ?_
       rw [sub_sub_cancel_left, Pi.neg_def, ← neg_zero, tendsto_neg_iff]
       -- Split `φₙ = σₙ + (φₙ - σₐ)` with `σₙ ≔ [bₙξ]` a sequence in `SpaceDHilbertSpace`
@@ -277,24 +278,26 @@ lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
       have hψξ_ae (n : ℕ) : ψ n - ξ =ᵐ[volume] f n - ξ :=
         (AEEqFun.coeFn_sub (ψ n).val ξ.val).trans <| (hψ_ae n).sub EventuallyEq.rfl
       refine tendsto_of_sub_tendsto_zero (f := σ) 0 ?_ ?_
-      · apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
+      · -- `σ = bₙξ → 0` since the norms are bounded by the integral of `‖ξ‖²` (independent of `n`!)
+        -- on a domain which tends to zero
+        apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
         let B (n : ℕ) : Set (Space d) := Metric.ball 0 (b n).rOut
-        have hvolB : Tendsto (⇑volume ∘ B) atTop (nhds 0) := by
-          have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
-          let C : ℝ := (ENNReal.ofReal (√Real.pi ^ d / Real.Gamma (d / 2 + 1))).toReal
-          suffices ⇑volume ∘ B = fun n ↦ ENNReal.ofReal (C * (b n).rOut ^ d) by
-            simp_rw [this, b, ← ENNReal.ofReal_zero, ← one_div, mul_pow, ← mul_assoc]
+        have hξB : Tendsto (fun n ↦ ∫⁻ x in B n, ‖ξ x‖ₑ ^ 2) atTop (nhds 0) := by
+          refine tendsto_setLIntegral_zero ?_ ?_
+          · apply lt_top_iff_ne_top.mp
+            have hξ := L2.eLpNorm_rpow_two_norm_lt_top ξ
+            simp_rw [eLpNorm_one_eq_lintegral_enorm, Real.rpow_ofNat, enorm_pow, enorm_norm] at hξ
+            exact hξ
+          · have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
+            let C : ℝ := (ENNReal.ofReal (√Real.pi ^ d / Real.Gamma (d / 2 + 1))).toReal
+            have hvolB : ⇑volume ∘ B = fun n ↦ ENNReal.ofReal (C * (b n).rOut ^ d) := by
+              ext n
+              simp [B, InnerProductSpace.volume_ball, C, mul_comm,
+                ENNReal.ofReal_pow (b n).rOut_pos.le]
+            simp_rw [hvolB, ← ENNReal.ofReal_zero, b, ← one_div, mul_pow, ← mul_assoc]
             rw [← mul_zero (C * 2 ^ d), ← zero_pow (M₀ := ℝ) hd.ne']
             refine ENNReal.tendsto_ofReal <| Tendsto.const_mul (C * 2 ^ d) ?_
             exact tendsto_one_div_add_atTop_nhds_zero_nat.pow d
-          ext n
-          simp [B, InnerProductSpace.volume_ball, C, mul_comm, ENNReal.ofReal_pow (b n).rOut_pos.le]
-        have hξB : Tendsto (fun n ↦ ∫⁻ x in B n, ‖ξ x‖ₑ ^ 2) atTop (nhds 0) := by
-          refine tendsto_setLIntegral_zero ?_ hvolB
-          apply lt_top_iff_ne_top.mp
-          have hξ := L2.eLpNorm_rpow_two_norm_lt_top ξ
-          simp_rw [eLpNorm_one_eq_lintegral_enorm, Real.rpow_ofNat, enorm_pow, enorm_norm] at hξ
-          exact hξ
         refine Tendsto.squeeze tendsto_const_nhds hξB (zero_le _) (fun n ↦ ?_)
         suffices ∫⁻ x, ‖σ n x‖ₑ ^ 2 = ∫⁻ x in B n, ‖σ n x‖ₑ ^ 2 by
           rw [this]
@@ -306,9 +309,9 @@ lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
         rw [← setLIntegral_univ, h, h, setLIntegral_univ]
         refine (setLIntegral_eq_of_support_subset ?_).symm
         refine Function.support_subset_iff'.mpr (fun x hx ↦ ?_)
-        suffices b n x = 0 by simp [s, this]
-        exact (b n).zero_of_le_dist (Std.not_lt.mp hx)
-      · apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
+        simp [s, (b n).zero_of_le_dist (not_lt.mp hx)]
+      · -- `φₙ - σₙ = bₙ(ψₙ - ξ) → 0` since `ψₙ → ξ` (by definition) and the `bₙ` are bounded
+        apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
         have hψξ : Tendsto (fun n ↦ ∫⁻ x, ‖(ψ n - ξ) x‖ₑ ^ 2) atTop (nhds 0) :=
           tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mp (sub_self ξ ▸ hψξ.sub_const ξ)
         refine Tendsto.squeeze tendsto_const_nhds hψξ (zero_le _) (fun n ↦ ?_)
