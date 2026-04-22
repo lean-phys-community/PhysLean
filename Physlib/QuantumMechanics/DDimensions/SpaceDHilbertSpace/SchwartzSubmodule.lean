@@ -5,7 +5,9 @@ Authors: Gregory J. Loges
 -/
 module
 
+public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
+public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 /-!
 
@@ -185,6 +187,29 @@ lemma polyBddSchwartzSubmodule_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
 /-!
 ### B.3. Density
 -/
+
+open Filter Complex
+
+private lemma enorm_bump_mul_le_enorm {𝕜 E : Type*} [RCLike 𝕜] [NormedAddCommGroup E]
+    [NormedSpace ℝ E] [HasContDiffBump E] {c : E} (f : ContDiffBump c) (g : E → 𝕜) (x : E) :
+    ‖f x * g x‖ₑ ≤ ‖g x‖ₑ := by
+  nth_rw 2 [← one_mul (g x)]
+  simp_rw [enorm_mul]
+  refine mul_le_mul_left ?_ ‖g x‖ₑ
+  apply enorm_le_iff_norm_le.mpr
+  rw [norm_algebraMap', Real.norm_eq_abs, norm_one, ← abs_one]
+  exact abs_le_abs_of_nonneg f.nonneg f.le_one
+
+private lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
+    {d : ℕ} {α : Type*} {l : Filter α} {ψ : α → SpaceDHilbertSpace d} :
+    Tendsto ψ l (nhds 0) ↔ Tendsto (fun a ↦ ∫⁻ x : Space d, ‖ψ a x‖ₑ ^ 2) l (nhds 0) := by
+  trans Tendsto (fun a ↦ (∫⁻ x, ‖ψ a x‖ₑ ^ 2) ^ (2⁻¹ : ℝ)) l (nhds 0)
+  · simp [tendsto_iff_edist_tendsto_0, edist_zero_right, Lp.enorm_def, eLpNorm, eLpNorm']
+  constructor <;> intro h
+  · apply Tendsto.ennrpow_const 2 at h
+    simp_all [← ENNReal.rpow_mul_natCast]
+  · apply Tendsto.ennrpow_const 2⁻¹ at h
+    simp_all
 
 lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
     Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) :=
