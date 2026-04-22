@@ -9,7 +9,40 @@ public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 /-!
 
-# Schwartz submodule of the Hilbert space
+# Schwartz submodules
+
+## i. Overview
+
+In this module we define the Schwartz submodule of `SpaceDHilbertSpace`.
+
+We also define, for each `a : ℕ∞`, a variant corresponding to Schwartz maps `f` satisfying
+the polynomial growth bounds `‖x‖ ^ (-k) * ‖f x‖ ≤ Cₖ` for each `(k : ℕ) ≤ a`. In particular,
+for `a = ⊤` such a bound holds for all natural numbers. These serve as a natural domain
+for singular unbounded operators such as the `1/r` Coulomb potential acting on `SpaceDHilbertSpace`.
+
+Note: the condition defining polynomially-bounded Schwartz maps is phrased as
+`‖x‖ ^ (-k) * ‖f x‖ ≤ Cₖ` rather than as `‖f x‖ ≤ Cₖ * ‖x‖ ^ k` to mirror `SchwartzMap.decay`.
+These two conditions only differ at `x = 0` and are therefore equivalent for `d > 0` since
+then `f 0` may be determined by continuity. For `d = 0` the former does not constrain `f 0 = 0`
+(since `x = 0` is the only point and `0⁻¹ = 0`) while the latter does (and would therefore spoil
+their being dense in `SpaceDHilbertSpace 0 ≅ ℂ`).
+
+## ii. Key results
+
+- `schwartzSubmodule d`: Submodule of `SpaceDHilbertSpace d` consisting of the L² equivalence
+  classes of Schwartz maps `𝓢(Space d, ℂ)`.
+- `polyBddSchwartzSubmodule d (a : ℕ∞)`: Restriction of `schwartzSubmodule d` to those Schwartz maps
+  which are bounded by powers of `‖x‖`.
+
+## iii. Table of contents
+
+- A. Schwartz submodule
+- B. Polynomially-bounded Schwartz submodule
+  - B.1. Definitions
+  - B.2. (In)equalities
+  - B.3. Density
+
+## iv. References
 
 -/
 
@@ -17,8 +50,6 @@ public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 
 namespace QuantumMechanics
 namespace SpaceDHilbertSpace
-
-noncomputable section
 
 open MeasureTheory
 open InnerProductSpace
@@ -28,16 +59,16 @@ open SchwartzMap
 ## A. Schwartz submodule
 -/
 
-section
+noncomputable section
 
 variable {d : ℕ}
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The continuous linear map including Schwartz functions into `SpaceDHilbertSpace d`. -/
+/-- The continuous linear map including Schwartz maps into `SpaceDHilbertSpace d`. -/
 def schwartzIncl : 𝓢(Space d, ℂ) →L[ℂ] SpaceDHilbertSpace d := toLpCLM ℂ (E := Space d) ℂ 2
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The submodule of `SpaceDHilbertSpace d` consisting of Schwartz functions. -/
+/-- The submodule of `SpaceDHilbertSpace d` corresponding to Schwartz maps. -/
 abbrev schwartzSubmodule (d : ℕ) := (schwartzIncl (d := d)).range
 
 instance : CoeFun (schwartzSubmodule d) fun _ ↦ Space d → ℂ := ⟨fun ψ ↦ ψ.val⟩
@@ -50,8 +81,8 @@ lemma schwartzSubmodule_dense (d : ℕ) :
   denseRange_toLpCLM ENNReal.top_ne_ofNat.symm
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The linear equivalence between the Schwartz functions `𝓢(Space d, ℂ)`
-  and the Schwartz submodule of `SpaceDHilbertSpace d`. -/
+/-- The linear equivalence between the Schwartz maps `𝓢(Space d, ℂ)` and the Schwartz submodule
+  of `SpaceDHilbertSpace d`. -/
 def schwartzEquiv : 𝓢(Space d, ℂ) ≃ₗ[ℂ] schwartzSubmodule d :=
   LinearEquiv.ofInjective schwartzIncl.toLinearMap (injective_toLp (E := Space d) 2)
 
@@ -74,20 +105,23 @@ lemma schwartzEquiv_inner :
 lemma schwartzEquiv_ae_eq (h : schwartzEquiv f =ᵐ[volume] schwartzEquiv g) : f = g :=
   (EmbeddingLike.apply_eq_iff_eq _).mp (SetLike.coe_eq_coe.mp (ext_iff.mpr h))
 
+lemma schwartzIncl_ker : schwartzIncl.ker = (⊥ : Submodule ℂ 𝓢(Space d, ℂ)) := by
+  ext; simp [← schwartzEquiv_apply_coe]
+
 end
 
 /-!
-## B. Bounded Schwartz submodule
+## B. Polynomially-bounded Schwartz submodule
 -/
 
-section
+noncomputable section
 
 /-!
 ### B.1. Definitions
 -/
 
-/-- The submodule of Schwartz maps which are bounded by `Cₖ‖x‖ᵏ` for all `(k : ℕ) ≤ a`. -/
-def bddSchwartzMap (d : ℕ) (a : ℕ∞) : Submodule ℂ 𝓢(Space d, ℂ) where
+/-- A function is a bounded Schwartz map if it is both Schwartz and bounded by powers of `‖x‖`. -/
+def polyBddSchwartzMap (d : ℕ) (a : ℕ∞) : Submodule ℂ 𝓢(Space d, ℂ) where
   carrier := {f : 𝓢(Space d, ℂ) |
     ∀ k : ℕ, k ≤ a → ∃ C : ℝ, 0 < C ∧ ∀ x : Space d, ‖x‖ ^ (-k : ℤ) * ‖f x‖ ≤ C}
   add_mem' := by
@@ -106,50 +140,52 @@ def bddSchwartzMap (d : ℕ) (a : ℕ∞) : Submodule ℂ 𝓢(Space d, ℂ) whe
     rw [smul_apply, norm_smul, mul_rotate', mul_comm ‖f x‖]
     exact le_trans (mul_le_mul_of_nonneg_left (hC x) (norm_nonneg c)) (by linarith)
 
-lemma bddSchwartzMap_zero_eq_top (d : ℕ) : bddSchwartzMap d 0 = ⊤ := by
-  ext f
-  have := f.decay 0 0
-  simp_all [bddSchwartzMap]
+/-- The linear map `schwartzIncl` with domain restricted to `polyBddSchwartzMap d a`. -/
+def polyBddSchwartzIncl {d : ℕ} {a : ℕ∞} : polyBddSchwartzMap d a →ₗ[ℂ] SpaceDHilbertSpace d :=
+  schwartzIncl.domRestrict (polyBddSchwartzMap d a)
 
-lemma bddSchwartzMap_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
-    bddSchwartzMap d b ≤ bddSchwartzMap d a := fun _ hx k hk ↦ hx k (hk.trans h)
+/-- The submodule of `SpaceDHilbertSpace d` corresponding to bounded Schwartz maps. -/
+abbrev polyBddSchwartzSubmodule (d : ℕ) (a : ℕ∞) : Submodule ℂ (SpaceDHilbertSpace d) :=
+  (polyBddSchwartzIncl (a := a)).range
 
-/-- The linear map including `bddSchwartzMap d a` into the Hilbert space. -/
-def bddSchwartzIncl (d : ℕ) (a : ℕ∞) : bddSchwartzMap d a →ₗ[ℂ] SpaceDHilbertSpace d :=
-  schwartzIncl.domRestrict (bddSchwartzMap d a)
+lemma polyBddSchwartzIncl_injective (d : ℕ) (a : ℕ∞) :
+    Function.Injective (polyBddSchwartzIncl (d := d) (a := a)) :=
+  LinearMap.injective_domRestrict_iff.mpr <| schwartzIncl_ker.symm ▸ inf_bot_eq _
 
-/-- The submodule of `SpaceDHilbertSpace d` consisting of Schwartz functions which are bounded
-  by `Cₖ‖x‖ᵏ` for all `(k : ℕ) ≤ a`. -/
-abbrev bddSchwartzSubmodule (d : ℕ) (a : ℕ∞) : Submodule ℂ (SpaceDHilbertSpace d) :=
-  (bddSchwartzIncl d a).range
-
-lemma bddSchwartzIncl_injective (d : ℕ) (a : ℕ∞) : Function.Injective (bddSchwartzIncl d a) := by
-  apply LinearMap.injective_domRestrict_iff.mpr
-  have h : (schwartzIncl (d := d)).toLinearMap.ker = ⊥ := by ext; simp [← schwartzEquiv_apply_coe]
-  exact h.symm ▸ inf_bot_eq _
-
-/-- The linear equivalence between `bddSchwartzMap d a` and the bounded Schwartz submodule
-  of `SpaceDHilbertSpace d`. -/
-def bddSchwartzEquiv {d : ℕ} {a : ℕ∞} : bddSchwartzMap d a ≃ₗ[ℂ] bddSchwartzSubmodule d a :=
-  LinearEquiv.ofInjective (bddSchwartzIncl d a) (bddSchwartzIncl_injective d a)
+/-- The linear equivalence between polynomially-bounded Schwartz maps and the corresponding
+  submodule of the Hilbert space. -/
+def polyBddSchwartzEquiv {d : ℕ} {a : ℕ∞} :
+    polyBddSchwartzMap d a ≃ₗ[ℂ] polyBddSchwartzSubmodule d a :=
+  LinearEquiv.ofInjective polyBddSchwartzIncl (polyBddSchwartzIncl_injective d a)
 
 /-!
 ### B.2. (In)equalities
 -/
 
-lemma bddSchwartzSubmodule_zero_eq (d : ℕ) : bddSchwartzSubmodule d 0 = schwartzSubmodule d := by
-  simp [bddSchwartzSubmodule, bddSchwartzIncl, bddSchwartzMap_zero_eq_top d]
+lemma polyBddSchwartzMap_zero_eq_top (d : ℕ) : polyBddSchwartzMap d 0 = ⊤ := by
+  ext f
+  have := f.decay 0 0
+  simp_all [polyBddSchwartzMap]
 
-lemma bddSchwartzSubmodule_le (d : ℕ) (a : ℕ∞) : bddSchwartzSubmodule d a ≤ schwartzSubmodule d :=
-  LinearMap.range_domRestrict_le_range _ _
+lemma polyBddSchwartzMap_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
+    polyBddSchwartzMap d b ≤ polyBddSchwartzMap d a := fun _ hx k hk ↦ hx k (hk.trans h)
 
-lemma bddSchwartzSubmodule_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
-    bddSchwartzSubmodule d b ≤ bddSchwartzSubmodule d a := by
-  simp only [bddSchwartzSubmodule, bddSchwartzIncl, LinearMap.range_domRestrict]
-  exact Submodule.map_mono (bddSchwartzMap_le_of_ge d h)
+lemma polyBddSchwartzSubmodule_zero_eq (d : ℕ) :
+    polyBddSchwartzSubmodule d 0 = schwartzSubmodule d := by
+  simp [polyBddSchwartzSubmodule, polyBddSchwartzIncl, polyBddSchwartzMap_zero_eq_top]
+
+lemma polyBddSchwartzSubmodule_le (d : ℕ) (a : ℕ∞) :
+    polyBddSchwartzSubmodule d a ≤ schwartzSubmodule d := LinearMap.range_domRestrict_le_range _ _
+
+lemma polyBddSchwartzSubmodule_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
+    polyBddSchwartzSubmodule d b ≤ polyBddSchwartzSubmodule d a := by
+  simp only [polyBddSchwartzSubmodule, polyBddSchwartzIncl, LinearMap.range_domRestrict]
+  exact Submodule.map_mono (polyBddSchwartzMap_le_of_ge d h)
 
 end
 
 end
+end
+
 end SpaceDHilbertSpace
 end QuantumMechanics
