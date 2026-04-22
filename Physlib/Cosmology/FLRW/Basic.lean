@@ -175,22 +175,22 @@ noncomputable def decelerationParameter (a : ℝ → ℝ) (t : ℝ) : ℝ :=
 /-- Quotient-rule expression for the time derivative of the Hubble constant:
   `dₜ H = (a'' a - (a')^2) / a^2`. -/
 lemma deriv_hubbleConstant {a : ℝ → ℝ} {t : ℝ}
-    (ha : DifferentiableAt ℝ a t) (hda : DifferentiableAt ℝ (deriv a) t)
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (deriv a) t)
     (haz : a t ≠ 0) :
     deriv (hubbleConstant a) t =
       (deriv (deriv a) t * a t - (deriv a t) ^ 2) / (a t) ^ 2 := by
   change deriv (deriv a / a) t = _
-  rw [deriv_div hda ha haz]
+  rw [deriv_div hd_a ha haz]
   ring
 
 /-- The deceleration parameter is equal to `- (1 + (dₜ H)/H^2)`. -/
 lemma decelerationParameter_eq_one_plus_hubbleConstant
     {a : ℝ → ℝ} {t : ℝ}
-    (ha : DifferentiableAt ℝ a t) (hda : DifferentiableAt ℝ (deriv a) t)
-    (haz : a t ≠ 0) (hdaz : deriv a t ≠ 0) :
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (deriv a) t)
+    (haz : a t ≠ 0) (hd_az : deriv a t ≠ 0) :
     decelerationParameter a t =
       -(1 + deriv (hubbleConstant a) t / (hubbleConstant a t) ^ 2) := by
-  rw [deriv_hubbleConstant ha hda haz]
+  rw [deriv_hubbleConstant ha hd_a haz]
   unfold decelerationParameter hubbleConstant
   field_simp
   ring
@@ -198,11 +198,11 @@ lemma decelerationParameter_eq_one_plus_hubbleConstant
 /-- The time evolution of the hubble parameter is equal to `dₜ H = - H^2 (1 + q)`. -/
 lemma time_evolution_hubbleConstant
     {a : ℝ → ℝ} {t : ℝ}
-    (ha : DifferentiableAt ℝ a t) (hda : DifferentiableAt ℝ (deriv a) t)
-    (haz : a t ≠ 0) (hdaz : deriv a t ≠ 0) :
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (deriv a) t)
+    (haz : a t ≠ 0) (hd_az : deriv a t ≠ 0) :
     deriv (hubbleConstant a) t =
       -(hubbleConstant a t) ^ 2 * (1 + decelerationParameter a t) := by
-  rw [deriv_hubbleConstant ha hda haz]
+  rw [deriv_hubbleConstant ha hd_a haz]
   unfold hubbleConstant decelerationParameter
   field_simp
   ring
@@ -215,15 +215,15 @@ lemma time_evolution_hubbleConstant
   statement uses the corrected inequality `-1 < q`.) -/
 lemma hubbleConstant_decrease_iff
     {a : ℝ → ℝ}
-    (ha : ∀ t, DifferentiableAt ℝ a t) (hda : ∀ t, DifferentiableAt ℝ (deriv a) t)
-    (haz : ∀ t, a t ≠ 0) (hdaz : ∀ t, deriv a t ≠ 0) :
+    (ha : ∀ t, DifferentiableAt ℝ a t) (hd_a : ∀ t, DifferentiableAt ℝ (deriv a) t)
+    (haz : ∀ t, a t ≠ 0) (hd_az : ∀ t, deriv a t ≠ 0) :
     (∃ t, deriv (hubbleConstant a) t < 0) ↔ (∃ t, -1 < decelerationParameter a t) := by
   have key : ∀ t, deriv (hubbleConstant a) t < 0 ↔ -1 < decelerationParameter a t := by
     intro t
-    have hH : hubbleConstant a t ≠ 0 := div_ne_zero (hdaz t) (haz t)
+    have hH : hubbleConstant a t ≠ 0 := div_ne_zero (hd_az t) (haz t)
     have hHsq : 0 < (hubbleConstant a t) ^ 2 :=
       (sq_nonneg _).lt_of_ne (Ne.symm (pow_ne_zero _ hH))
-    rw [time_evolution_hubbleConstant (ha t) (hda t) (haz t) (hdaz t)]
+    rw [time_evolution_hubbleConstant (ha t) (hd_a t) (haz t) (hd_az t)]
     constructor <;> intro h <;> nlinarith
   exact ⟨fun ⟨t, ht⟩ => ⟨t, (key t).mp ht⟩, fun ⟨t, ht⟩ => ⟨t, (key t).mpr ht⟩⟩
 end FriedmannEquation
