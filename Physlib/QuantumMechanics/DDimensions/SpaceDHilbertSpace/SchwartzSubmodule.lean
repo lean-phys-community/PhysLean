@@ -182,9 +182,18 @@ lemma polyBddSchwartzSubmodule_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
   simp only [polyBddSchwartzSubmodule, polyBddSchwartzIncl, LinearMap.range_domRestrict]
   exact Submodule.map_mono (polyBddSchwartzMap_le_of_ge d h)
 
-end
+/-!
+### B.3. Density
+-/
 
-end
+lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
+    Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) :=
+  sorry
+
+lemma polyBddSchwartzSubmodule_dense (d : ℕ) (a : ℕ∞) :
+    Dense (polyBddSchwartzSubmodule d a : Set (SpaceDHilbertSpace d)) :=
+  (polyBddSchwartzSubmodule_top_dense d).mono (polyBddSchwartzSubmodule_le_of_ge d le_top)
+
 end
 
 end SpaceDHilbertSpace
