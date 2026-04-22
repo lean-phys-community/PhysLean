@@ -80,6 +80,7 @@ instance : DecidableEq Color := fun x y =>
   | Color.down, Color.downR => isFalse fun h => Color.noConfusion h
   | Color.down, Color.up => isFalse fun h => Color.noConfusion h
 
+/-- The dimensions of each of the different types of complex Lorentz vector space. -/
 abbrev repDim (c : Color) : ℕ :=
   match c with
   | Color.upL => 2

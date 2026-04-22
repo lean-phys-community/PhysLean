@@ -39,6 +39,7 @@ set_option linter.unusedVariables false in
 /-- Given a list of indices `c : Fin n → C` e.g. `![.up, .down]`, the type
   `ComponentIdx c` is the type of components indexes of a tensor with those indices
   e.g. `⟨0, 2⟩` corresponding to `T⁰₂`. -/
+@[nolint unusedArguments]
 abbrev ComponentIdx {n : ℕ} {S : TensorSpecies k C G basisIdx} (c : Fin n → C) : Type :=
   Π j, basisIdx (c j)
 
