@@ -115,14 +115,22 @@ scoped[PauliMatrix] notation "σ^^^" => toTensor pauliMatrix
 
 set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_basis_expand : σ^^^ =
-    Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 2) | 2 => (0 : Fin 2))
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (0 : Fin 4) | 1 => (1 : Fin 2) | 2 => (1 : Fin 2))
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (1 : Fin 4) | 1 => (0 : Fin 2) | 2 => (1 : Fin 2))
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 2) | 2 => (0 : Fin 2))
-    - I • Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (2 : Fin 4) | 1 => (0 : Fin 2) | 2 => (1 : Fin 2))
-    + I • Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (2 : Fin 4) | 1 => (1 : Fin 2) | 2 => (0 : Fin 2))
-    + Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (3 : Fin 4) | 1 => (0 : Fin 2) | 2 => (0 : Fin 2))
-    - Tensor.basis ![Color.up, Color.upL, Color.upR] (fun | 0 => (3 : Fin 4) | 1 => (1 : Fin 2) | 2 => (1 : Fin 2)) := by
+    Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 2) | 2 => (0 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (0 : Fin 4) | 1 => (1 : Fin 2) | 2 => (1 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (1 : Fin 4) | 1 => (0 : Fin 2) | 2 => (1 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 2) | 2 => (0 : Fin 2))
+    - I • Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (2 : Fin 4) | 1 => (0 : Fin 2) | 2 => (1 : Fin 2))
+    + I • Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (2 : Fin 4) | 1 => (1 : Fin 2) | 2 => (0 : Fin 2))
+    + Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (3 : Fin 4) | 1 => (0 : Fin 2) | 2 => (0 : Fin 2))
+    - Tensor.basis ![Color.up, Color.upL, Color.upR]
+      (fun | 0 => (3 : Fin 4) | 1 => (1 : Fin 2) | 2 => (1 : Fin 2)) := by
   apply toTensor (self := tensorial).symm.injective
   simp [toTensor_symm_basis]
   funext μ α β
@@ -188,10 +196,14 @@ lemma toTensor_eq_asConsTensor :
 lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else 0) := by
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else 0) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [toTensor_basis_expand]
@@ -254,10 +266,14 @@ open Lorentz
 lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliCo]
@@ -280,10 +296,14 @@ lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
 lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliCoDown]
@@ -318,10 +338,14 @@ lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
 lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else 0) := by
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
+    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else
+    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
+      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else 0) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliContrDown]

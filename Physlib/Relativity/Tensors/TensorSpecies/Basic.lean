@@ -90,13 +90,12 @@ variable {k : Type} [CommRing k] {C : Type} [Group G]
 
 /-- The casting between `basisIdx c` and `basisIdx c1`. -/
 def basisIdxCongr {c c1 : C} (h : c = c1) :
-    basisIdx c ≃ basisIdx c1 :=  Equiv.cast (by simp [h])
+    basisIdx c ≃ basisIdx c1 := Equiv.cast (by simp [h])
 
 omit [(c : C) → Fintype (basisIdx c)] [(c : C) → DecidableEq (basisIdx c)] in
 @[simp]
 lemma basisIdxCongr_rfl (c : C) (i : basisIdx c) :
-  basisIdxCongr (Eq.refl c) i = i := rfl
-
+    basisIdxCongr (Eq.refl c) i = i := rfl
 
 omit [(c : C) → Fintype (basisIdx c)] [(c : C) → DecidableEq (basisIdx c)] in
 @[simp]

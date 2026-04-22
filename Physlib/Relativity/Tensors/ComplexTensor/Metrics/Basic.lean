@@ -227,9 +227,12 @@ lemma altRightMetric_eq_altRightBasis : εR' =
 
 open Lorentz in
 lemma coMetric_eq_basis : η' =
-    (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down] (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 4)))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down] (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 4)))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down] (fun | 0 => (2 : Fin 4) | 1 => (2 : Fin 4)))
+    (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
+      (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
+      (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
+      (fun | 0 => (2 : Fin 4) | 1 => (2 : Fin 4)))
     - (Tensor.basis (S := complexLorentzTensor) ![Color.down, Color.down]
       (fun | 0 => (3 : Fin 4) | 1 => (3 : Fin 4))) := by
   rw [coMetric_eq_complexCoBasisFin4]
@@ -250,9 +253,12 @@ lemma coMetric_eq_basis : η' =
 
 open Lorentz in
 lemma contrMetric_eq_basis : η =
-    (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up] (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 4)))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up] (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 4)))
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up] (fun | 0 => (2 : Fin 4) | 1 => (2 : Fin 4)))
+    (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
+      (fun | 0 => (0 : Fin 4) | 1 => (0 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
+      (fun | 0 => (1 : Fin 4) | 1 => (1 : Fin 4)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
+      (fun | 0 => (2 : Fin 4) | 1 => (2 : Fin 4)))
     - (Tensor.basis (S := complexLorentzTensor) ![Color.up, Color.up]
       (fun | 0 => (3 : Fin 4) | 1 => (3 : Fin 4))) := by
   rw [contrMetric_eq_complexContrBasisFin4]
@@ -273,7 +279,8 @@ lemma contrMetric_eq_basis : η =
 
 open Fermion in
 lemma leftMetric_eq_basis : εL =
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.upL, Color.upL] (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.upL, Color.upL]
+      (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
     + (Tensor.basis (S := complexLorentzTensor)
       ![Color.upL, Color.upL] (fun | 0 => (1 : Fin 2) | 1 => (0 : Fin 2))) := by
   rw [leftMetric_eq_leftBasis]
@@ -288,7 +295,8 @@ lemma leftMetric_eq_basis : εL =
 
 open Fermion in
 lemma altLeftMetric_eq_basis : εL' =
-    (Tensor.basis (S := complexLorentzTensor) ![Color.downL, Color.downL] (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
+    (Tensor.basis (S := complexLorentzTensor) ![Color.downL, Color.downL]
+      (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
     - (Tensor.basis (S := complexLorentzTensor)
       ![Color.downL, Color.downL] (fun | 0 => (1 : Fin 2) | 1 => (0 : Fin 2))) := by
   rw [altLeftMetric_eq_altLeftBasis]
@@ -303,7 +311,8 @@ lemma altLeftMetric_eq_basis : εL' =
 
 open Fermion in
 lemma rightMetric_eq_basis : εR =
-    - (Tensor.basis (S := complexLorentzTensor) ![Color.upR, Color.upR] (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
+    - (Tensor.basis (S := complexLorentzTensor) ![Color.upR, Color.upR]
+      (fun | 0 => (0 : Fin 2) | 1 => (1 : Fin 2)))
     + (Tensor.basis (S := complexLorentzTensor)
       ![Color.upR, Color.upR] (fun | 0 => (1 : Fin 2) | 1 => (0 : Fin 2))) := by
   rw [rightMetric_eq_rightBasis]
@@ -360,7 +369,8 @@ lemma contrMetric_eq_ofRat : η = ofRat fun f =>
 
 lemma leftMetric_eq_ofRat : εL = ofRat fun f =>
     if f 0 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 1 = Fin.cast (by rfl) (1 : Fin 2) then - 1 else
-    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then 1 else 0 := by
+    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then
+      1 else 0 := by
   rw [leftMetric_eq_basis]
   conv_lhs =>
     rw [basis_eq_ofRat, basis_eq_ofRat]
@@ -370,7 +380,8 @@ lemma leftMetric_eq_ofRat : εL = ofRat fun f =>
 
 lemma altLeftMetric_eq_ofRat : εL' = ofRat fun f =>
     if f 0 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 1 = Fin.cast (by rfl) (1 : Fin 2) then 1 else
-    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then - 1 else 0 := by
+    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then
+      - 1 else 0 := by
   rw [altLeftMetric_eq_basis]
   conv_lhs =>
     rw [basis_eq_ofRat, basis_eq_ofRat]
@@ -390,7 +401,8 @@ lemma rightMetric_eq_ofRat : εR = ofRat fun f =>
 
 lemma altRightMetric_eq_ofRat : εR' = ofRat fun f =>
     if f 0 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 1 = Fin.cast (by rfl) (1 : Fin 2) then 1 else
-    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then - 1 else 0 := by
+    if f 1 = Fin.cast (by rfl) (0 : Fin 2) ∧ f 0 = Fin.cast (by rfl) (1 : Fin 2) then
+      - 1 else 0 := by
   rw [altRightMetric_eq_basis]
   conv_lhs =>
     rw [basis_eq_ofRat, basis_eq_ofRat]

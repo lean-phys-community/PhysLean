@@ -80,7 +80,8 @@ We first define the `Tensorial` class.
 class Tensorial
     {k : outParam Type} [CommRing k] {C G : outParam Type} [Group G]
     {basisIdx : outParam (C → Type)} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-    {n : outParam ℕ} (S : outParam (TensorSpecies k C G basisIdx)) (c :outParam (Fin n → C)) (M : Type)
+    {n : outParam ℕ} (S : outParam (TensorSpecies k C G basisIdx))
+    (c :outParam (Fin n → C)) (M : Type)
     [AddCommMonoid M] [Module k M] where
   /-- The equivalence between `M` and `S.Tensor c` in a tensorial instance. -/
   toTensor : M ≃ₗ[k] S.Tensor c

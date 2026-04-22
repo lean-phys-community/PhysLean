@@ -742,7 +742,7 @@ lemma toComplex_contrP_basisVector {n : ℕ} {c : Fin (n + 1 + 1) → realLorent
     toComplex_basis (c := c') (i := fun k => b (Pure.dropPairEmb i j k))]
   congr 1
   · -- contrPCoeff: real and complex both equal 0 or 1 with same condition
-    have h_real := realLorentzTensor.contr_basis (c := c i) (b i) ( (b j))
+    have h_real := realLorentzTensor.contr_basis (c := c i) (b i) (b j)
     have h_complex := complexLorentzTensor.basis_contr ((colorToComplex ∘ c) i)
       ((ComponentIdx.complexify b) i)
       (Fin.cast (by simp [tau_colorToComplex, h.2]) ((ComponentIdx.complexify b) j))
@@ -772,7 +772,7 @@ lemma toComplex_contrP_basisVector {n : ℕ} {c : Fin (n + 1 + 1) → realLorent
     · rfl
     · simp [h1] at h2
     · rename_i h2
-      simp
+      simp only [Complex.ofReal_zero, zero_ne_one]
       apply h1
       apply finSumFinEquiv.injective
       ext
@@ -879,7 +879,7 @@ lemma ComponentIdx.complexify_comp_succAbove
 /-- Convert an evaluation index from the real repDim to the complex repDim. -/
 noncomputable def evalIdxToComplex {n : ℕ}
     {c : Fin (n + 1) → realLorentzTensor.Color} (i : Fin (n + 1))
-    (b : Fin 1 ⊕ Fin 3) :  Fin (complexLorentzTensor.repDim ((colorToComplex ∘ c) i)) :=
+    (b : Fin 1 ⊕ Fin 3) : Fin (complexLorentzTensor.repDim ((colorToComplex ∘ c) i)) :=
   Fin.cast repDim_colorToComplex.symm (finSumFinEquiv b)
 
 /-- `evalT` on the complex side, but with output colors as `colorToComplex ∘ (c ∘ i.succAbove)`.

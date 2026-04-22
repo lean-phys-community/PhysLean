@@ -173,7 +173,8 @@ lemma contr_basis {d : ℕ} {c : realLorentzTensor.Color}
     change Lorentz.contrCoContract.hom
       (Lorentz.contrBasis d i ⊗ₜ Lorentz.coBasis d j) = _
     rw [Lorentz.contrCoContract_hom_tmul]
-    simp
+    simp only [Rep.tensorUnit_V, Lorentz.contrBasis_toFin1dℝ, Lorentz.coBasis_toFin1dℝ,
+      dotProduct_single, mul_one]
     rw [Pi.single_apply]
     refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
     simp only [eq_comm]
