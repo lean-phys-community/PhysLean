@@ -216,24 +216,31 @@ lemma deriv_hubbleConstant_eq_neg_sq_mul
   field_simp
   ring
 
+/-- Pointwise: `∂ₜ H t < 0` iff `-1 < q t` (assuming `a` is twice differentiable at `t`
+  and both `a t` and `∂ₜ a t` are nonzero). -/
+lemma deriv_hubbleConstant_neg_iff
+    {a : Time → ℝ} {t : Time}
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (∂ₜ a) t)
+    (haz : a t ≠ 0) (hd_az : ∂ₜ a t ≠ 0) :
+    ∂ₜ (hubbleConstant a) t < 0 ↔ -1 < decelerationParameter a t := by
+  have hH : hubbleConstant a t ≠ 0 := hubbleConstant_ne_zero hd_az haz
+  have hHsq : 0 < (hubbleConstant a t) ^ 2 :=
+    (sq_nonneg _).lt_of_ne (Ne.symm (pow_ne_zero _ hH))
+  rw [deriv_hubbleConstant_eq_neg_sq_mul ha hd_a haz hd_az]
+  constructor <;> intro h <;> nlinarith
+
 /-- There exists a time at which `∂ₜ H < 0` iff there exists a time with `q > -1`.
 
   (The corresponding informal statement was written with `q < -1`. Since
   `dₜ H = -H² (1 + q)` and `H ≠ 0`, one has `dₜ H < 0 ↔ q > -1`, so the formal
   statement uses the corrected inequality `-1 < q`.) -/
-lemma deriv_hubbleConstant_neg_iff
+lemma exists_deriv_hubbleConstant_neg_iff
     {a : Time → ℝ}
     (ha : ∀ t, DifferentiableAt ℝ a t) (hd_a : ∀ t, DifferentiableAt ℝ (∂ₜ a) t)
     (haz : ∀ t, a t ≠ 0) (hd_az : ∀ t, ∂ₜ a t ≠ 0) :
-    (∃ t, ∂ₜ (hubbleConstant a) t < 0) ↔ (∃ t, -1 < decelerationParameter a t) := by
-  have key : ∀ t, ∂ₜ (hubbleConstant a) t < 0 ↔ -1 < decelerationParameter a t := by
-    intro t
-    have hH : hubbleConstant a t ≠ 0 := hubbleConstant_ne_zero (hd_az t) (haz t)
-    have hHsq : 0 < (hubbleConstant a t) ^ 2 :=
-      (sq_nonneg _).lt_of_ne (Ne.symm (pow_ne_zero _ hH))
-    rw [deriv_hubbleConstant_eq_neg_sq_mul (ha t) (hd_a t) (haz t) (hd_az t)]
-    constructor <;> intro h <;> nlinarith
-  exact ⟨fun ⟨t, ht⟩ => ⟨t, (key t).mp ht⟩, fun ⟨t, ht⟩ => ⟨t, (key t).mpr ht⟩⟩
+    (∃ t, ∂ₜ (hubbleConstant a) t < 0) ↔ (∃ t, -1 < decelerationParameter a t) :=
+  ⟨fun ⟨t, ht⟩ => ⟨t, (deriv_hubbleConstant_neg_iff (ha t) (hd_a t) (haz t) (hd_az t)).mp ht⟩,
+   fun ⟨t, ht⟩ => ⟨t, (deriv_hubbleConstant_neg_iff (ha t) (hd_a t) (haz t) (hd_az t)).mpr ht⟩⟩
 end FriedmannEquation
 end FLRW
 
