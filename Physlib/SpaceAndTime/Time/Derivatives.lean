@@ -72,6 +72,29 @@ lemma deriv_neg [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) :
   rw [deriv, fderiv_neg]
   rfl
 
+/-- Quotient rule for `Time.deriv` on real-valued functions: if `c` and `g` are
+  differentiable at `t` and `g t ≠ 0`, then
+  `∂ₜ (c / g) t = (∂ₜ c t * g t - c t * ∂ₜ g t) / (g t)^2`. -/
+lemma deriv_div {c g : Time → ℝ}
+    (hc : DifferentiableAt ℝ c t) (hg : DifferentiableAt ℝ g t) (hgz : g t ≠ 0) :
+    ∂ₜ (fun s => c s / g s) t =
+      (∂ₜ c t * g t - c t * ∂ₜ g t) / (g t) ^ 2 := by
+  have h_inv : DifferentiableAt ℝ (fun s => (g s)⁻¹) t := hg.inv hgz
+  have h_eq : (fun s : Time => c s / g s) = (fun s => c s * (g s)⁻¹) := by
+    funext; rw [div_eq_mul_inv]
+  have h_inv_fderiv : fderiv ℝ (fun s : Time => (g s)⁻¹) t =
+      (fderiv ℝ (Inv.inv : ℝ → ℝ) (g t)).comp (fderiv ℝ g t) := by
+    change fderiv ℝ (Inv.inv ∘ g) t = _
+    exact fderiv_comp t (differentiableAt_inv hgz) hg
+  rw [h_eq, Time.deriv_eq, fderiv_fun_mul hc h_inv]
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul]
+  rw [h_inv_fderiv, fderiv_inv' hgz]
+  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply,
+    ContinuousLinearMap.neg_apply, ContinuousLinearMap.mulLeftRight_apply]
+  rw [← Time.deriv_eq c t, ← Time.deriv_eq g t]
+  field_simp
+  ring
+
 /-!
 
 ## C. Derivative of constant functions
