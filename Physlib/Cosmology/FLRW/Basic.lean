@@ -239,8 +239,7 @@ lemma exists_deriv_hubbleConstant_neg_iff
     (ha : ∀ t, DifferentiableAt ℝ a t) (hd_a : ∀ t, DifferentiableAt ℝ (∂ₜ a) t)
     (haz : ∀ t, a t ≠ 0) (hd_az : ∀ t, ∂ₜ a t ≠ 0) :
     (∃ t, ∂ₜ (hubbleConstant a) t < 0) ↔ (∃ t, -1 < decelerationParameter a t) :=
-  ⟨fun ⟨t, ht⟩ => ⟨t, (deriv_hubbleConstant_neg_iff (ha t) (hd_a t) (haz t) (hd_az t)).mp ht⟩,
-   fun ⟨t, ht⟩ => ⟨t, (deriv_hubbleConstant_neg_iff (ha t) (hd_a t) (haz t) (hd_az t)).mpr ht⟩⟩
+  exists_congr fun t => deriv_hubbleConstant_neg_iff (ha t) (hd_a t) (haz t) (hd_az t)
 end FriedmannEquation
 end FLRW
 
