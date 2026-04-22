@@ -327,5 +327,9 @@ unsafe def main (args : List String) : IO UInt32 := do
   let fileOut : System.FilePath := {toString := "./docs/_data/TODO.yml"}
   if "mkFile" ∈ args then
     IO.println (s!"TODOList file made.")
+    -- Create directory if it doesn't exist
+    let dir : System.FilePath := {toString := "./docs/_data"}
+    if !(← System.FilePath.pathExists dir) then
+      IO.FS.createDirAll dir
     IO.FS.writeFile fileOut ymlString
   pure 0
