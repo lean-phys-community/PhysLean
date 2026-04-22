@@ -172,21 +172,60 @@ noncomputable def hubbleConstant (a : ℝ → ℝ) (t : ℝ) : ℝ :=
 noncomputable def decelerationParameter (a : ℝ → ℝ) (t : ℝ) : ℝ :=
     - (deriv (deriv a) t * a t) / (deriv a t)^2
 
+/-- Quotient-rule expression for the time derivative of the Hubble constant:
+  `dₜ H = (a'' a - (a')^2) / a^2`. -/
+lemma deriv_hubbleConstant {a : ℝ → ℝ} {t : ℝ}
+    (ha : DifferentiableAt ℝ a t) (hda : DifferentiableAt ℝ (deriv a) t)
+    (haz : a t ≠ 0) :
+    deriv (hubbleConstant a) t =
+      (deriv (deriv a) t * a t - (deriv a t) ^ 2) / (a t) ^ 2 := by
+  change deriv (deriv a / a) t = _
+  rw [deriv_div hda ha haz]
+  ring
+
 /-- The deceleration parameter is equal to `- (1 + (dₜ H)/H^2)`. -/
-informal_lemma decelerationParameter_eq_one_plus_hubbleConstant where
-  deps := []
-  tag := "6Z23H"
+lemma decelerationParameter_eq_one_plus_hubbleConstant
+    {a : ℝ → ℝ} {t : ℝ}
+    (ha : DifferentiableAt ℝ a t) (hda : DifferentiableAt ℝ (deriv a) t)
+    (haz : a t ≠ 0) (hdaz : deriv a t ≠ 0) :
+    decelerationParameter a t =
+      -(1 + deriv (hubbleConstant a) t / (hubbleConstant a t) ^ 2) := by
+  rw [deriv_hubbleConstant ha hda haz]
+  unfold decelerationParameter hubbleConstant
+  field_simp
+  ring
 
 /-- The time evolution of the hubble parameter is equal to `dₜ H = - H^2 (1 + q)`. -/
-informal_lemma time_evolution_hubbleConstant where
-  deps := []
-  tag := "6Z3BS"
+lemma time_evolution_hubbleConstant
+    {a : ℝ → ℝ} {t : ℝ}
+    (ha : DifferentiableAt ℝ a t) (hda : DifferentiableAt ℝ (deriv a) t)
+    (haz : a t ≠ 0) (hdaz : deriv a t ≠ 0) :
+    deriv (hubbleConstant a) t =
+      -(hubbleConstant a t) ^ 2 * (1 + decelerationParameter a t) := by
+  rw [deriv_hubbleConstant ha hda haz]
+  unfold hubbleConstant decelerationParameter
+  field_simp
+  ring
 
-/-- There exists a time at which the hubble constant decreases if and only if
-  there exists a time where the deceleration parameter is less then `-1`. -/
-informal_lemma hubbleConstant_decrease_iff where
-  deps := []
-  tag := "6Z3FS"
+/-- There exists a time at which the Hubble constant is strictly decreasing if and only if
+  there exists a time where the deceleration parameter is greater than `-1`.
+
+  (The corresponding informal statement was written with `q < -1`. Since
+  `dₜ H = -H² (1 + q)` and `H ≠ 0`, one has `dₜ H < 0 ↔ q > -1`, so the formal
+  statement uses the corrected inequality `-1 < q`.) -/
+lemma hubbleConstant_decrease_iff
+    {a : ℝ → ℝ}
+    (ha : ∀ t, DifferentiableAt ℝ a t) (hda : ∀ t, DifferentiableAt ℝ (deriv a) t)
+    (haz : ∀ t, a t ≠ 0) (hdaz : ∀ t, deriv a t ≠ 0) :
+    (∃ t, deriv (hubbleConstant a) t < 0) ↔ (∃ t, -1 < decelerationParameter a t) := by
+  have key : ∀ t, deriv (hubbleConstant a) t < 0 ↔ -1 < decelerationParameter a t := by
+    intro t
+    have hH : hubbleConstant a t ≠ 0 := div_ne_zero (hdaz t) (haz t)
+    have hHsq : 0 < (hubbleConstant a t) ^ 2 :=
+      (sq_nonneg _).lt_of_ne (Ne.symm (pow_ne_zero _ hH))
+    rw [time_evolution_hubbleConstant (ha t) (hda t) (haz t) (hdaz t)]
+    constructor <;> intro h <;> nlinarith
+  exact ⟨fun ⟨t, ht⟩ => ⟨t, (key t).mp ht⟩, fun ⟨t, ht⟩ => ⟨t, (key t).mpr ht⟩⟩
 end FriedmannEquation
 end FLRW
 
