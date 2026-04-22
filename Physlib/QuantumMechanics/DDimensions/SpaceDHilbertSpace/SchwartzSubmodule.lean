@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
+public import Physlib.Meta.Linters.Sorry
 /-!
 
 # Schwartz submodules
@@ -186,10 +187,12 @@ lemma polyBddSchwartzSubmodule_le_of_ge (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
 ### B.3. Density
 -/
 
+@[sorryful]
 lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
     Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) :=
   sorry
 
+@[sorryful]
 lemma polyBddSchwartzSubmodule_dense (d : ℕ) (a : ℕ∞) :
     Dense (polyBddSchwartzSubmodule d a : Set (SpaceDHilbertSpace d)) :=
   (polyBddSchwartzSubmodule_top_dense d).mono (polyBddSchwartzSubmodule_le_of_ge d le_top)
