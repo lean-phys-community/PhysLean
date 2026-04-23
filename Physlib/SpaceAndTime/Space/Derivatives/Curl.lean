@@ -7,6 +7,7 @@ module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
 public import Physlib.Meta.Linters.Sorry
+public import Mathlib.MeasureTheory.Integral.CurveIntegral.Poincare
 /-!
 
 # Curl on Space
@@ -275,9 +276,24 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 -/
 
 @[sorryful]
-lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f)
+lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f)
     (hcurl : curl f = 0) : ∃ g : Space → ℝ, f = grad g := by
-  sorry
+  let s : Set (Space) := Set.univ
+  have hs : Convex ℝ s := convex_univ
+  have hso : IsOpen s := isOpen_univ
+  let ω : Space → Space →L[ℝ] ℝ:= fun a => InnerProductSpace.toDual ℝ _ (basis.repr.symm (f a))
+  have hω : DifferentiableOn ℝ ω s := by
+    simp [ω]
+    refine differentiableOn_univ.mpr ?_
+    sorry
+  have hdω: ∀ a ∈ s, ∀ (x y : Space), ((fderiv ℝ ω a) x) y = ((fderiv ℝ ω a) y) x := by
+    sorry
+  obtain ⟨g, hg⟩ := Convex.exists_forall_hasFDerivAt_of_fderiv_symmetric hs hso (ω := ω) hω hdω
+  use g
+  simp [ω, ← hasGradientAt_iff_hasFDerivAt, s] at hg
+  ext1 x
+  specialize hg x
+  simpa using (HasGradientAt.unique (hasGradientWithinAt_grad g x hg.differentiableAt) hg).symm
 
 /-!
 
