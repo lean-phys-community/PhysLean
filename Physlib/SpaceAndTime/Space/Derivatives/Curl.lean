@@ -6,6 +6,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
+public import Physlib.Meta.Linters.Sorry
 /-!
 
 # Curl on Space
@@ -35,6 +36,8 @@ We also prove some basic vector-identities involving of the curl operator.
   - A.6. The div of a curl is zero
   - A.7. The curl of a grad is zero
   - A.8. The curl of a curl
+  - A.9. Div zero, then equal to curl
+  - A.10. Curl zero, then equal to grad
 - B. The curl on distributions
   - B.1. The components of the curl
   - B.2. Basic equalities
@@ -253,6 +256,28 @@ lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ
     repeat
       try apply contDiff_euclidean.mp
       exact hf
+
+/-!
+
+### A.9. Div zero, then equal to curl
+
+-/
+
+@[sorryful]
+lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f)
+    (hdiv : ∇ ⬝ f = 0) : ∃ g: Space → EuclideanSpace ℝ (Fin 3), f = curl g := by
+  sorry
+
+/-!
+
+### A.10. Div zero, then equal to curl
+
+-/
+
+@[sorryful]
+lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f)
+    (hdiv : curl f = 0) : ∃ g : Space → ℝ, f = grad g := by
+  sorry
 
 /-!
 
