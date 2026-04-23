@@ -16,11 +16,15 @@ public import Physlib.Meta.Linters.Sorry
 In this module we define polynomially-bounded Schwartz submodules of `SpaceDHilbertSpace`.
 
 For each `a : ℕ∞`, `polyBddSchwartzSubmodule d a` is the submodule corresponding to Schwartz
-maps `f` satisfying the polynomial growth bounds `‖x‖ ^ (-k) * ‖f x‖ ≤ Cₖ` for each `(k : ℕ) ≤ a`.
+maps `f` satisfying the polynomial growth bounds `‖x‖ ^ (-k) * ‖f x‖ ≤ Cₖ` for all `(k : ℕ) ≤ a`.
 In particular, for `a = ⊤` such a bound holds for all natural numbers.
 
-These serve as a natural domain for singular unbounded operators such as the `1/r` Coulomb
-potential acting on `SpaceDHilbertSpace`.
+These serve as a natural domain for singular unbounded operators. For example, the `1/r` Coulomb
+potential operator maps `polyBddSchwartzSubmodule d ⊤` to itself. In the same way that multiplying
+a Schwartz map by any polynomial in the coordinates results in a square-integrable function,
+polynomially-bounded Schwartz maps may be multiplied by Laurent polynomials and remain
+square-integrable (the precise condition depends on `d`, `a` and the negative degree of
+the Laurent polynomial).
 
 Note: the condition defining polynomially-bounded Schwartz maps is phrased as
 `‖x‖ ^ (-k) * ‖f x‖ ≤ Cₖ` rather than as `‖f x‖ ≤ Cₖ * ‖x‖ ^ k` to mirror `SchwartzMap.decay`.
