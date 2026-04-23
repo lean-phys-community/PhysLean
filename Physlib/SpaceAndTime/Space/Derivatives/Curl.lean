@@ -285,7 +285,8 @@ lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Diff
   have hω : DifferentiableOn ℝ ω s := by
     simp [ω]
     refine differentiableOn_univ.mpr ?_
-    sorry
+    apply (InnerProductSpace.toDual ℝ (Space)).differentiable.fun_comp
+    fun_prop
   have hdω: ∀ a ∈ s, ∀ (x y : Space), ((fderiv ℝ ω a) x) y = ((fderiv ℝ ω a) y) x := by
     sorry
   obtain ⟨g, hg⟩ := Convex.exists_forall_hasFDerivAt_of_fderiv_symmetric hs hso (ω := ω) hω hdω
