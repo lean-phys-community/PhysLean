@@ -72,6 +72,19 @@ lemma deriv_neg [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) :
   rw [deriv, fderiv_neg]
   rfl
 
+/-- Quotient rule for `Time.deriv` on real-valued functions: if `c` and `g` are
+  differentiable at `t` and `g t ≠ 0`, then
+  `∂ₜ (c / g) t = (∂ₜ c t * g t - c t * ∂ₜ g t) / (g t)^2`. -/
+lemma deriv_div {c g : Time → ℝ}
+    (hc : DifferentiableAt ℝ c t) (hg : DifferentiableAt ℝ g t) (hgz : g t ≠ 0) :
+    ∂ₜ (fun s => c s / g s) t =
+      (∂ₜ c t * g t - c t * ∂ₜ g t) / (g t) ^ 2 := by
+  repeat rw [Time.deriv_eq]
+  ring_nf
+  simp [fderiv_fun_mul hc (DifferentiableAt.fun_inv (by fun_prop) hgz),
+    fderiv_comp' t (differentiableAt_inv hgz) hg]
+  grind
+
 /-!
 
 ## C. Derivative of constant functions

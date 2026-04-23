@@ -9,6 +9,7 @@ public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 public import Physlib.Meta.Linters.Sorry
 public import Physlib.Meta.Informal.Basic
+public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
 # The Friedmann-Lemaître-Robertson-Walker metric
@@ -110,11 +111,13 @@ namespace FLRW
 
 namespace FriedmannEquation
 
+open Time
+
 /--
 The first-order Friedmann equation.
 
-- `a : ℝ → ℝ` is the FLRW scale factor as a function of cosmic time `t`.
-- `ρ : ℝ → ℝ` is the total energy density as a function of cosmic time `t`.
+- `a : Time → ℝ` is the FLRW scale factor as a function of cosmic time `t`.
+- `ρ : Time → ℝ` is the total energy density as a function of cosmic time `t`.
 - `k : ℝ` is the spatial curvature parameter.
 - `Λ : ℝ` is the cosmological constant.
 - `G : ℝ` is Newton's constant.
@@ -126,8 +129,8 @@ At time `t` the equation reads:
 `(a'(t) / a(t))^2 = (8πG/3) ρ(t) − k c^2 / a(t)^2 + Λ c^2 / 3`.
 
 -/
-def FirstOrderFriedmann (a ρ: ℝ → ℝ) (k Λ G c : ℝ) (t : ℝ) : Prop :=
-    ((deriv a t / a t)^2
+def FirstOrderFriedmann (a ρ : Time → ℝ) (k Λ G c : ℝ) (t : Time) : Prop :=
+    ((∂ₜ a t / a t)^2
       = ((8 * Real.pi * G) / 3) * ρ t - k * c^2 / (a t)^2 + Λ * c ^2/ 3)
 
 /--
@@ -135,9 +138,9 @@ The second-order Friedmann equation.
 Note: Other sources may call this the Raychaudhuri equation.
 We choose not to use that terminology to avoid the Raychaudhuri equation
 related to describing congruences of geodesics in general relativity.
-- `a : ℝ → ℝ` is the FLRW scale factor as a function of cosmic time `t`.
-- `ρ : ℝ → ℝ` is the total energy density as a function of cosmic time `t`.
-- `p : ℝ → ℝ` is the pressure. It is related to `ρ` via `p = w * ρ `
+- `a : Time → ℝ` is the FLRW scale factor as a function of cosmic time `t`.
+- `ρ : Time → ℝ` is the total energy density as a function of cosmic time `t`.
+- `p : Time → ℝ` is the pressure. It is related to `ρ` via `p = w * ρ `
 - `w` is the equation of state. We will introduce this later.
 - `Λ : ℝ` is the cosmological constant.
 - `G : ℝ` is Newton's constant.
@@ -149,8 +152,8 @@ At time `t` the equation reads:
 `(a''(t) / a (t)) = - (4πG/3) * (ρ(t) + 3 * p(t) / c^2) + Λ * c^2 / 3`.
 
 -/
-def SecondOrderFriedmann (a ρ p: ℝ → ℝ) (Λ G c : ℝ) (t : ℝ) : Prop :=
-    (deriv (deriv a) t) / a t = - (4 * Real.pi * G / 3) * (ρ t + 3 * p t / c^2) + Λ * c^2 / 3
+def SecondOrderFriedmann (a ρ p : Time → ℝ) (Λ G c : ℝ) (t : Time) : Prop :=
+    ∂ₜ (∂ₜ a) t / a t = - (4 * Real.pi * G / 3) * (ρ t + 3 * p t / c^2) + Λ * c^2 / 3
 
 /-- The hubble constant defined in terms of the scale factor
   as `(dₜ a) / a`.
@@ -159,8 +162,14 @@ def SecondOrderFriedmann (a ρ p: ℝ → ℝ) (Λ G c : ℝ) (t : ℝ) : Prop :
 
   Semiformal implementation note: Implement also scoped notation. -/
 
-noncomputable def hubbleConstant (a : ℝ → ℝ) (t : ℝ) : ℝ :=
-    deriv a t / a t
+noncomputable def hubbleConstant (a : Time → ℝ) (t : Time) : ℝ :=
+    ∂ₜ a t / a t
+
+/-- The Hubble constant is nonzero whenever `∂ₜ a t` and `a t` are both nonzero. -/
+lemma hubbleConstant_ne_zero {a : Time → ℝ} {t : Time}
+    (hd_az : ∂ₜ a t ≠ 0) (haz : a t ≠ 0) :
+    hubbleConstant a t ≠ 0 :=
+  div_ne_zero hd_az haz
 
 /-- The deceleration parameter defined in terms of the scale factor
   as `- (dₜdₜ a) a / (dₜ a)^2`.
@@ -169,24 +178,68 @@ noncomputable def hubbleConstant (a : ℝ → ℝ) (t : ℝ) : ℝ :=
 
   Semiformal implementation note: Implement also scoped notation. -/
 
-noncomputable def decelerationParameter (a : ℝ → ℝ) (t : ℝ) : ℝ :=
-    - (deriv (deriv a) t * a t) / (deriv a t)^2
+noncomputable def decelerationParameter (a : Time → ℝ) (t : Time) : ℝ :=
+    - (∂ₜ (∂ₜ a) t * a t) / (∂ₜ a t)^2
+
+/-- Quotient-rule expression for the time derivative of the Hubble constant:
+  `dₜ H = (a'' a - (a')^2) / a^2`. -/
+lemma deriv_hubbleConstant {a : Time → ℝ} {t : Time}
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (∂ₜ a) t)
+    (haz : a t ≠ 0) :
+    ∂ₜ (hubbleConstant a) t =
+      (∂ₜ (∂ₜ a) t * a t - (∂ₜ a t) ^ 2) / (a t) ^ 2 := by
+  show ∂ₜ (fun s => ∂ₜ a s / a s) t = _
+  rw [Time.deriv_div hd_a ha haz]
+  ring
 
 /-- The deceleration parameter is equal to `- (1 + (dₜ H)/H^2)`. -/
-informal_lemma decelerationParameter_eq_one_plus_hubbleConstant where
-  deps := []
-  tag := "6Z23H"
+lemma decelerationParameter_eq_one_plus_hubbleConstant
+    {a : Time → ℝ} {t : Time}
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (∂ₜ a) t)
+    (haz : a t ≠ 0) (hd_az : ∂ₜ a t ≠ 0) :
+    decelerationParameter a t =
+      -(1 + ∂ₜ (hubbleConstant a) t / (hubbleConstant a t) ^ 2) := by
+  rw [deriv_hubbleConstant ha hd_a haz]
+  simp only [decelerationParameter, hubbleConstant]
+  field_simp
+  ring
 
-/-- The time evolution of the hubble parameter is equal to `dₜ H = - H^2 (1 + q)`. -/
-informal_lemma time_evolution_hubbleConstant where
-  deps := []
-  tag := "6Z3BS"
+/-- The time derivative of the Hubble constant equals `-H² (1 + q)`. -/
+lemma deriv_hubbleConstant_eq_neg_sq_mul
+    {a : Time → ℝ} {t : Time}
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (∂ₜ a) t)
+    (haz : a t ≠ 0) (hd_az : ∂ₜ a t ≠ 0) :
+    ∂ₜ (hubbleConstant a) t =
+      -(hubbleConstant a t) ^ 2 * (1 + decelerationParameter a t) := by
+  rw [deriv_hubbleConstant ha hd_a haz]
+  simp only [hubbleConstant, decelerationParameter]
+  field_simp
+  ring
 
-/-- There exists a time at which the hubble constant decreases if and only if
-  there exists a time where the deceleration parameter is less then `-1`. -/
-informal_lemma hubbleConstant_decrease_iff where
-  deps := []
-  tag := "6Z3FS"
+/-- Pointwise: `∂ₜ H t < 0` iff `-1 < q t` (assuming `a` is twice differentiable at `t`
+  and both `a t` and `∂ₜ a t` are nonzero). -/
+lemma deriv_hubbleConstant_neg_iff
+    {a : Time → ℝ} {t : Time}
+    (ha : DifferentiableAt ℝ a t) (hd_a : DifferentiableAt ℝ (∂ₜ a) t)
+    (haz : a t ≠ 0) (hd_az : ∂ₜ a t ≠ 0) :
+    ∂ₜ (hubbleConstant a) t < 0 ↔ -1 < decelerationParameter a t := by
+  have hH : hubbleConstant a t ≠ 0 := hubbleConstant_ne_zero hd_az haz
+  have hHsq : 0 < (hubbleConstant a t) ^ 2 :=
+    (sq_nonneg _).lt_of_ne (Ne.symm (pow_ne_zero _ hH))
+  rw [deriv_hubbleConstant_eq_neg_sq_mul ha hd_a haz hd_az]
+  constructor <;> intro h <;> nlinarith
+
+/-- There exists a time at which `∂ₜ H < 0` iff there exists a time with `q > -1`.
+
+  (The corresponding informal statement was written with `q < -1`. Since
+  `dₜ H = -H² (1 + q)` and `H ≠ 0`, one has `dₜ H < 0 ↔ q > -1`, so the formal
+  statement uses the corrected inequality `-1 < q`.) -/
+lemma exists_deriv_hubbleConstant_neg_iff
+    {a : Time → ℝ}
+    (ha : ∀ t, DifferentiableAt ℝ a t) (hd_a : ∀ t, DifferentiableAt ℝ (∂ₜ a) t)
+    (haz : ∀ t, a t ≠ 0) (hd_az : ∀ t, ∂ₜ a t ≠ 0) :
+    (∃ t, ∂ₜ (hubbleConstant a) t < 0) ↔ (∃ t, -1 < decelerationParameter a t) :=
+  exists_congr fun t => deriv_hubbleConstant_neg_iff (ha t) (hd_a t) (haz t) (hd_az t)
 end FriedmannEquation
 end FLRW
 
