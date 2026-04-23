@@ -141,9 +141,10 @@ def polyBddSchwartzMap (d : ℕ) (a : ℕ∞) : Submodule ℂ 𝓢(Space d, ℂ)
     rw [smul_apply, norm_smul, mul_rotate', mul_comm ‖f x‖]
     exact le_trans (mul_le_mul_of_nonneg_left (hC x) (norm_nonneg c)) (by linarith)
 
-/-- The linear map `schwartzIncl` with domain restricted to `polyBddSchwartzMap d a`. -/
-def polyBddSchwartzIncl {d : ℕ} {a : ℕ∞} : polyBddSchwartzMap d a →ₗ[ℂ] SpaceDHilbertSpace d :=
-  schwartzIncl.domRestrict (polyBddSchwartzMap d a)
+/-- The continuous linear map `schwartzIncl` with domain restricted to `polyBddSchwartzMap d a`. -/
+def polyBddSchwartzIncl {d : ℕ} {a : ℕ∞} : polyBddSchwartzMap d a →L[ℂ] SpaceDHilbertSpace d :=
+  ⟨schwartzIncl.domRestrict (polyBddSchwartzMap d a),
+    schwartzIncl.continuous_domRestrict schwartzIncl.continuous _⟩
 
 /-- The submodule of `SpaceDHilbertSpace d` corresponding to bounded Schwartz maps. -/
 abbrev polyBddSchwartzSubmodule (d : ℕ) (a : ℕ∞) : Submodule ℂ (SpaceDHilbertSpace d) :=
@@ -157,7 +158,7 @@ lemma polyBddSchwartzIncl_injective (d : ℕ) (a : ℕ∞) :
   submodule of the Hilbert space. -/
 def polyBddSchwartzEquiv {d : ℕ} {a : ℕ∞} :
     polyBddSchwartzMap d a ≃ₗ[ℂ] polyBddSchwartzSubmodule d a :=
-  LinearEquiv.ofInjective polyBddSchwartzIncl (polyBddSchwartzIncl_injective d a)
+  LinearEquiv.ofInjective polyBddSchwartzIncl.toLinearMap (polyBddSchwartzIncl_injective d a)
 
 /-!
 ### B.2. (In)equalities
