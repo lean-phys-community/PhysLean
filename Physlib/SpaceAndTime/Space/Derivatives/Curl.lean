@@ -270,7 +270,7 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 /-!
 
-### A.10. Div zero, then equal to curl
+### A.10. Curl zero, then equal to grad
 
 -/
 
