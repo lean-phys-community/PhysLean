@@ -83,7 +83,7 @@ lemma deriv_div {c g : Time → ℝ}
   ring_nf
   simp [fderiv_fun_mul hc (DifferentiableAt.fun_inv (by fun_prop) hgz),
     fderiv_comp' t (differentiableAt_inv hgz) hg]
-  grind 
+  grind
 
 /-!
 
