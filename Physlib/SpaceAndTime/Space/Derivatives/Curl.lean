@@ -276,7 +276,7 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 @[sorryful]
 lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f)
-    (hdiv : curl f = 0) : ∃ g : Space → ℝ, f = grad g := by
+    (hcurl : curl f = 0) : ∃ g : Space → ℝ, f = grad g := by
   sorry
 
 /-!
