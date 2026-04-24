@@ -266,6 +266,148 @@ lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ
 ### A.9. Div zero, then equal to curl
 
 -/
+open  Matrix MeasureTheory
+
+private noncomputable def homotopyOperatorIntegrand (f : Space → EuclideanSpace ℝ (Fin 3)) :
+  Space → ℝ → EuclideanSpace ℝ (Fin 3) := fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x)
+
+@[fun_prop]
+private lemma homotopyOperatorIntegrand_continuous_param {f : Space → EuclideanSpace ℝ (Fin 3)}
+    (hf : Differentiable ℝ f) (x : Space) : Continuous (homotopyOperatorIntegrand f x ·) := by
+  simp [homotopyOperatorIntegrand]
+  have hf (i : Fin 3) : Continuous (fun t => f ((t : ℝ) • x) i) := by
+    change Continuous (EuclideanSpace.proj i ∘ f ∘ fun t => t • x)
+    apply Continuous.comp (by fun_prop)
+    apply Continuous.comp ?_ ?_
+    · exact hf.continuous
+    · fun_prop
+  refine Continuous.comp' (by fun_prop) ?_
+  refine continuous_pi ?_
+  intro i
+  fin_cases i
+  all_goals
+  · simp [crossProduct]
+    refine Continuous.fun_mul (by fun_prop) ?_
+    refine Continuous.sub ?_ ?_
+    all_goals
+    · apply Continuous.mul ?_ ?_
+      · fun_prop
+      · exact hf _
+
+private lemma homotopyOperatorIntegrand_intervalIntegrable {f : Space → EuclideanSpace ℝ (Fin 3)}
+    (hf : Differentiable ℝ f) (x : Space) :
+    IntervalIntegrable (homotopyOperatorIntegrand f x ·) volume (0 : ℝ) 1 := by
+  apply Continuous.intervalIntegrable
+  fun_prop
+
+private lemma fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct  {f : Space → EuclideanSpace ℝ (Fin 3)}
+    (hf : Differentiable ℝ f) (x : Space) (t : ℝ) (y : Space) (i : Fin 3) :
+    fderiv ℝ (homotopyOperatorIntegrand f · t) x y i =
+    t • (fderiv ℝ (fun x => (WithLp.toLp 2 ((crossProduct (basis.repr x).ofLp)
+      (f (t • x)).ofLp)).ofLp i) x) y := by
+  have cross_diff (t : ℝ) :
+      Differentiable ℝ (fun x => WithLp.toLp 2 ((crossProduct (basis.repr x).ofLp) (f (t • x)).ofLp)) := by
+    refine differentiable_euclidean.mpr ?_
+    intro i
+    fin_cases i
+    all_goals
+    · simp [crossProduct]
+      fun_prop
+  conv_lhs =>
+    simp [homotopyOperatorIntegrand]
+    rw [fderiv_fun_smul (by fun_prop) (Differentiable.differentiableAt (cross_diff t) )]
+    simp
+  change t • (fderiv ℝ (fun x => WithLp.toLp 2 ((crossProduct (basis.repr x).ofLp) (f (t • x)).ofLp)) x) y _ = _
+  trans t • ((fderiv ℝ (fun x => WithLp.toLp 2 ((crossProduct (basis.repr x).ofLp) (f (t • x)).ofLp) i) x) y)
+  · change _ = t • (fderiv ℝ (EuclideanSpace.proj i ∘ (fun x => (WithLp.toLp 2 ((crossProduct (basis.repr x).ofLp) (f (t • x)).ofLp)))) x) y
+    rw [fderiv_comp]
+    simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+      PiLp.proj_apply]
+    · fun_prop
+    · exact Differentiable.differentiableAt (cross_diff t)
+  rfl
+
+
+private lemma fderiv_homotopyOperatorIntegrand_zero_eq  {f : Space → EuclideanSpace ℝ (Fin 3)}
+    (hf : Differentiable ℝ f) (x : Space) (t : ℝ) (y : Space) :
+    fderiv ℝ (homotopyOperatorIntegrand f · t) x y 0 =
+      t * (x 1 * t * fderiv ℝ f (t • x) y 2 + f (t • x) 2 * y 1 -
+      (x 2 * t * fderiv ℝ f (t • x) y 1 + f (t • x) 1 * y 2)) := by
+  have fderiv_f (x : Space) (t : ℝ) (y : Space)
+      (i : Fin 3) : (fderiv ℝ (fun x => (f (t • x)).ofLp i) x) y = t * fderiv ℝ f (t • x) y i := by
+    calc _
+      _ = (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y := by rfl
+      _ = fderiv ℝ (f ∘ fun x => t • x) x y i := by
+        rw [fderiv_comp]
+        simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+          PiLp.proj_apply]
+        · fun_prop
+        · fun_prop
+      _ = t * fderiv ℝ f (t • x) y i := by
+        rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
+        simp
+  rw [fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct]
+  simp [crossProduct]
+  rw [fderiv_fun_sub (by fun_prop) (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop),
+    fderiv_fun_mul (by fun_prop) (by fun_prop)]
+  simp [fderiv_f]
+  ring_nf
+  simp
+  exact hf
+
+private lemma fderiv_homotopyOperatorIntegrand_one_eq  {f : Space → EuclideanSpace ℝ (Fin 3)}
+    (hf : Differentiable ℝ f) (x : Space) (t : ℝ) (y : Space) :
+    fderiv ℝ (homotopyOperatorIntegrand f · t) x y 1 =
+      t * (x 2 * t * fderiv ℝ f (t • x) y 0 + f (t • x) 0 * y 2 -
+      (x 0 * t * fderiv ℝ f (t • x) y 2 + f (t • x) 2 * y 0)) := by
+  have fderiv_f (x : Space) (t : ℝ) (y : Space)
+      (i : Fin 3) : (fderiv ℝ (fun x => (f (t • x)).ofLp i) x) y = t * fderiv ℝ f (t • x) y i := by
+    calc _
+      _ = (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y := by rfl
+      _ = fderiv ℝ (f ∘ fun x => t • x) x y i := by
+        rw [fderiv_comp]
+        simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+          PiLp.proj_apply]
+        · fun_prop
+        · fun_prop
+      _ = t * fderiv ℝ f (t • x) y i := by
+        rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
+        simp
+  rw [fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct]
+  simp [crossProduct]
+  rw [fderiv_fun_sub (by fun_prop) (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop),
+    fderiv_fun_mul (by fun_prop) (by fun_prop)]
+  simp [fderiv_f]
+  ring_nf
+  simp
+  exact hf
+
+private lemma fderiv_homotopyOperatorIntegrand_two_eq  {f : Space → EuclideanSpace ℝ (Fin 3)}
+    (hf : Differentiable ℝ f) (x : Space) (t : ℝ) (y : Space) :
+    fderiv ℝ (homotopyOperatorIntegrand f · t) x y 2 =
+      t * (x 0 * t * fderiv ℝ f (t • x) y 1 + f (t • x) 1 * y 0 -
+      (x 1 * t * fderiv ℝ f (t • x) y 0 + f (t • x) 0 * y 1)) := by
+  have fderiv_f (x : Space) (t : ℝ) (y : Space)
+      (i : Fin 3) : (fderiv ℝ (fun x => (f (t • x)).ofLp i) x) y = t * fderiv ℝ f (t • x) y i := by
+    calc _
+      _ = (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y := by rfl
+      _ = fderiv ℝ (f ∘ fun x => t • x) x y i := by
+        rw [fderiv_comp]
+        simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+          PiLp.proj_apply]
+        · fun_prop
+        · fun_prop
+      _ = t * fderiv ℝ f (t • x) y i := by
+        rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
+        simp
+  rw [fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct]
+  simp [crossProduct]
+  rw [fderiv_fun_sub (by fun_prop) (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop),
+    fderiv_fun_mul (by fun_prop) (by fun_prop)]
+  simp [fderiv_f]
+  ring_nf
+  simp
+  exact hf
 
 open  Matrix MeasureTheory
 set_option maxHeartbeats 0 in

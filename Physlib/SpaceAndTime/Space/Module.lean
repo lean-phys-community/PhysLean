@@ -538,6 +538,16 @@ lemma fderiv_val {d : ℕ} (p : Space d) :
   change fderiv ℝ (equivPi d) p = _
   rw [ContinuousLinearEquiv.fderiv]
 
+@[simp]
+lemma fderiv_of_val_apply {d : ℕ} (p y : Space d) (i : Fin d) :
+    fderiv ℝ (fun p => p.val i) p y = y i := by
+  trans fderiv ℝ (Space.coordCLM i) p y
+  · congr
+    funext i
+    simp [Space.coordCLM, Space.coord_apply]
+  simp
+  simp [Space.coordCLM, Space.coord_apply]
+
 @[fun_prop]
 lemma contDiffOn_vadd (s : Space d) :
     ContDiffOn ℝ ω (fun (v : EuclideanSpace ℝ (Fin d)) => v +ᵥ s) Set.univ := by
