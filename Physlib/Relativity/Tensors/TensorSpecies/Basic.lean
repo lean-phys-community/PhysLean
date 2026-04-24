@@ -85,23 +85,23 @@ namespace TensorSpecies
 open OverColor
 
 variable {k : Type} [CommRing k] {C : Type} [Group G]
-  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-  (S : TensorSpecies k C G basisIdx)
+  {basisIdx : C → Type}
 
 /-- The casting between `basisIdx c` and `basisIdx c1`. -/
 def basisIdxCongr {c c1 : C} (h : c = c1) :
     basisIdx c ≃ basisIdx c1 := Equiv.cast (by simp [h])
 
-omit [(c : C) → Fintype (basisIdx c)] [(c : C) → DecidableEq (basisIdx c)] in
 @[simp]
 lemma basisIdxCongr_rfl (c : C) (i : basisIdx c) :
     basisIdxCongr (Eq.refl c) i = i := rfl
 
-omit [(c : C) → Fintype (basisIdx c)] [(c : C) → DecidableEq (basisIdx c)] in
 @[simp]
 lemma basisIdxCongr_apply_apply {c c1 c2 : C} (h1 : c = c1) (h2 : c1 = c2) (i : basisIdx c) :
     basisIdxCongr h2 (basisIdxCongr h1 i) = basisIdxCongr (by simp [h1, h2]) i := by
   simp [basisIdxCongr]
+
+variable  [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  (S : TensorSpecies k C G basisIdx)
 
 @[simp]
 lemma τ_τ_apply (c : C) : S.τ (S.τ c) = c := S.τ_involution c
