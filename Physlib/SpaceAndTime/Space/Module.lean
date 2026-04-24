@@ -420,9 +420,9 @@ lemma fderiv_basis_repr_symm {d} (v : EuclideanSpace ℝ (Fin d)) :
 lemma basis_induction {d} {P : Space d → Prop}
     (hb : ∀ i, P (basis i)) (hzero : P 0)
     (hadd : ∀ p1 p2, P p1 → P p2 → P (p1 + p2))
-    (hsmul : ∀ (c : ℝ) p, P p → P (c • p)) (p : Space d) :  P p := by
+    (hsmul : ∀ (c : ℝ) p, P p → P (c • p)) (p : Space d) : P p := by
   rw [← OrthonormalBasis.sum_repr basis p]
-  have hp_sum  (s : Finset (Fin d)) (f : (Fin d) → Space d)
+  have hp_sum (s : Finset (Fin d)) (f : (Fin d) → Space d)
     (hi : ∀ i ∈ s, P (f i)) : P (∑ x ∈ s, f x) := by
     induction' s using Finset.induction with i s hi ih
     · simpa using hzero
@@ -545,7 +545,7 @@ lemma fderiv_of_val_apply {d : ℕ} (p y : Space d) (i : Fin d) :
   · congr
     funext i
     simp [Space.coordCLM, Space.coord_apply]
-  simp
+  simp only [ContinuousLinearMap.fderiv]
   simp [Space.coordCLM, Space.coord_apply]
 
 @[fun_prop]

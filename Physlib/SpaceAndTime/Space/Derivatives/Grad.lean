@@ -270,8 +270,8 @@ lemma euclid_gradient_eq_sum {d} (f : EuclideanSpace ℝ (Fin d) → ℝ) (x : E
 lemma hasGradientWithinAt_grad {d} (f : Space d → ℝ) (x : Space d)
     (hf : DifferentiableAt ℝ f x) :
     HasGradientAt f (basis.repr.symm (∇ f x)) x := by
- rw [← gradient_apply_eq_grad]
- exact DifferentiableAt.hasGradientAt hf
+  rw [← gradient_apply_eq_grad]
+  exact DifferentiableAt.hasGradientAt hf
 
 /-!
 

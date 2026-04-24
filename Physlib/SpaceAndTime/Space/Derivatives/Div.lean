@@ -164,7 +164,6 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     rw [div_smul]
     fun_prop
 
-
 /-!
 
 ## B. Divergence of distributions
