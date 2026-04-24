@@ -352,17 +352,13 @@ private lemma fderiv_homotopyOperatorIntegrand_zero_eq  {f : Space → Euclidean
       (x 2 * t * fderiv ℝ f (t • x) y 1 + f (t • x) 1 * y 2)) := by
   have fderiv_f (x : Space) (t : ℝ) (y : Space)
       (i : Fin 3) : (fderiv ℝ (fun x => (f (t • x)).ofLp i) x) y = t * fderiv ℝ f (t • x) y i := by
-    calc _
-      _ = (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y := by rfl
-      _ = fderiv ℝ (f ∘ fun x => t • x) x y i := by
-        rw [fderiv_comp]
-        simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
-          PiLp.proj_apply]
-        · fun_prop
-        · fun_prop
-      _ = t * fderiv ℝ f (t • x) y i := by
-        rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
-        simp
+    change (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y = _
+    rw [fderiv_comp _ (by fun_prop) (by fun_prop),
+      fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
+    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_id', fderiv_fun_const,
+      Pi.zero_apply, ContinuousLinearMap.zero_smulRight, add_zero, ContinuousLinearMap.coe_comp',
+      ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_id', Pi.smul_apply, id_eq, map_smul,
+      PiLp.proj_apply, smul_eq_mul]
   rw [fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct]
   simp [crossProduct]
   rw [fderiv_fun_sub (by fun_prop) (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop),
@@ -379,17 +375,13 @@ private lemma fderiv_homotopyOperatorIntegrand_one_eq  {f : Space → EuclideanS
       (x 0 * t * fderiv ℝ f (t • x) y 2 + f (t • x) 2 * y 0)) := by
   have fderiv_f (x : Space) (t : ℝ) (y : Space)
       (i : Fin 3) : (fderiv ℝ (fun x => (f (t • x)).ofLp i) x) y = t * fderiv ℝ f (t • x) y i := by
-    calc _
-      _ = (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y := by rfl
-      _ = fderiv ℝ (f ∘ fun x => t • x) x y i := by
-        rw [fderiv_comp]
-        simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
-          PiLp.proj_apply]
-        · fun_prop
-        · fun_prop
-      _ = t * fderiv ℝ f (t • x) y i := by
-        rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
-        simp
+    change (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y = _
+    rw [fderiv_comp _ (by fun_prop) (by fun_prop),
+      fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
+    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_id', fderiv_fun_const,
+      Pi.zero_apply, ContinuousLinearMap.zero_smulRight, add_zero, ContinuousLinearMap.coe_comp',
+      ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_id', Pi.smul_apply, id_eq, map_smul,
+      PiLp.proj_apply, smul_eq_mul]
   rw [fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct]
   simp [crossProduct]
   rw [fderiv_fun_sub (by fun_prop) (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop),
@@ -406,17 +398,13 @@ private lemma fderiv_homotopyOperatorIntegrand_two_eq  {f : Space → EuclideanS
       (x 1 * t * fderiv ℝ f (t • x) y 0 + f (t • x) 0 * y 1)) := by
   have fderiv_f (x : Space) (t : ℝ) (y : Space)
       (i : Fin 3) : (fderiv ℝ (fun x => (f (t • x)).ofLp i) x) y = t * fderiv ℝ f (t • x) y i := by
-    calc _
-      _ = (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y := by rfl
-      _ = fderiv ℝ (f ∘ fun x => t • x) x y i := by
-        rw [fderiv_comp]
-        simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
-          PiLp.proj_apply]
-        · fun_prop
-        · fun_prop
-      _ = t * fderiv ℝ f (t • x) y i := by
-        rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
-        simp
+    change (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y = _
+    rw [fderiv_comp _ (by fun_prop) (by fun_prop),
+      fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
+    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_id', fderiv_fun_const,
+      Pi.zero_apply, ContinuousLinearMap.zero_smulRight, add_zero, ContinuousLinearMap.coe_comp',
+      ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_id', Pi.smul_apply, id_eq, map_smul,
+      PiLp.proj_apply, smul_eq_mul]
   rw [fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct]
   simp [crossProduct]
   rw [fderiv_fun_sub (by fun_prop) (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop),
@@ -432,7 +420,8 @@ private lemma fderiv_homotopyOperatorIntegrand_uncurry_continuous
   refine continuous_clm_apply.mpr ?_
   intro y
   suffices h1 : Continuous ((PiLp.continuousLinearEquiv 2 ℝ _).symm ∘
-    (PiLp.continuousLinearEquiv 2 ℝ _)∘  (fun p : Space × ℝ => fderiv ℝ (homotopyOperatorIntegrand f · p.2) p.1 y)) by
+    (PiLp.continuousLinearEquiv 2 ℝ _) ∘
+    (fun p : Space × ℝ => fderiv ℝ (homotopyOperatorIntegrand f · p.2) p.1 y)) by
     simpa using h1
   apply Continuous.comp (by fun_prop) ?_
   apply continuous_pi
@@ -535,40 +524,31 @@ private lemma deriv_sub_deriv_intervalIntegral_homotopyOperatorIntegrand
 
 lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 1 f)
     (hdiv : ∇ ⬝ f = 0) : ∃ g: Space → EuclideanSpace ℝ (Fin 3), f = - curl g := by
-  let F : Space → ℝ → EuclideanSpace ℝ (Fin 3) :=  homotopyOperatorIntegrand f
-  let F' : Space → ℝ → Space →L[ℝ] EuclideanSpace ℝ (Fin 3) := fun x t => fderiv ℝ (F · t) x
   have f_differentiable : Differentiable ℝ f := hf.differentiable (by simp)
   have fderiv_f_t (x : Space) (t : ℝ)
       (i : Fin 3) : (fderiv ℝ (fun t => (f (t • x)).ofLp i) t) 1 = fderiv ℝ f (t • x) x i := by
-    calc _
-      _ = (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun (t : ℝ) => t • x) t) 1 := by rfl
-      _ = fderiv ℝ (f ∘ fun t => t • x) t 1 i := by
-        rw [fderiv_comp]
-        simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
-          PiLp.proj_apply]
-        · fun_prop
-        · fun_prop
-      _ =  fderiv ℝ f (t • x) x i := by
-        rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
-        simp
+    change (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun (t : ℝ) => t • x) t) 1 = _
+    rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_comp _ (by fun_prop) (by fun_prop),
+      fderiv_fun_smul (by fun_prop) (by fun_prop)]
+    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_const, Pi.zero_apply,
+      fderiv_id', ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
+      ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.zero_apply, smul_zero,
+      ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.coe_id', id_eq, one_smul, zero_add,
+      PiLp.proj_apply]
   have hi (x : Space) (i : Fin 3):  ∫ (t : ℝ) in 0..1, (t * f (t • x) i * 2) -
         t  * (- fderiv ℝ f (t • x) (t • x)) i ∂(volume) = f x i := by
     trans ∫ (t : ℝ) in 0..1, fderiv ℝ (fun t => t ^ 2 * f (t • x) i) t 1 ∂(volume)
     · congr
       funext t
       rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
-      simp only [ map_smul, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul, mul_neg,
-        sub_neg_eq_add, ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply]
       simp [fderiv_f_t]
       ring
-    trans ∫ (t : ℝ) in 0..1, _root_.deriv (fun t => t ^ 2 * f (t • x) i) t  ∂(volume)
-    · simp
-    rw [intervalIntegral.integral_deriv_eq_sub ]
     simp
-    · fun_prop
+    rw [intervalIntegral.integral_deriv_eq_sub  (by fun_prop)]
+    simp
     · apply Continuous.intervalIntegrable
       fun_prop
-  use fun x => ∫ (t : ℝ) in 0..1, F x t ∂(volume)
+  use fun x => ∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t ∂(volume)
   ext x i
   fin_cases i <;> symm
   all_goals
@@ -577,7 +557,6 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
     simp [fderiv_homotopyOperatorIntegrand_one_eq (hf.differentiable (by simp)),
       fderiv_homotopyOperatorIntegrand_zero_eq (hf.differentiable (by simp)),
       fderiv_homotopyOperatorIntegrand_two_eq (hf.differentiable (by simp)), basis_apply]
-    ring_nf
     rw [← hi]
     congr
     funext t
@@ -589,15 +568,9 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
     conv_rhs =>
       enter [2, 2,1, 1, 2]
       rw [hx]
-  · linear_combination (norm := ring_nf) - t ^ 2 * x 0 * hdiv
-    simp [Fin.sum_univ_three]
-    ring
-  · linear_combination (norm := ring_nf) - t ^ 2 * x 1 * hdiv
-    simp [Fin.sum_univ_three]
-    ring
-  · linear_combination (norm := ring_nf) - t ^ 2 * x 2 * hdiv
-    simp [Fin.sum_univ_three]
-    ring
+  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 0 * hdiv
+  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 1 * hdiv
+  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 2 * hdiv
 
 
 /-!
