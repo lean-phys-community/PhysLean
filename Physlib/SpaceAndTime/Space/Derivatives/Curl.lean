@@ -10,6 +10,7 @@ public import Physlib.Meta.Linters.Sorry
 public import Mathlib.MeasureTheory.Integral.CurveIntegral.Poincare
 public import Physlib.SpaceAndTime.Space.CrossProduct
 public import Mathlib.Analysis.Calculus.ParametricIntervalIntegral
+
 /-!
 
 # Curl on Space
@@ -668,19 +669,47 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 
 
-
-
-
-
-
-
 /-!
 
 ### A.10. Curl zero, then equal to grad
 
 -/
 
-@[sorryful]
+lemma deriv_comm_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f)
+    (hcurl : curl f = 0) (x : Space) (i j : Fin 3):
+    ∂[i] f x j = ∂[j] f x i := by
+  fin_cases i <;> fin_cases j
+  any_goals rfl
+  all_goals
+    simp
+    rw [← deriv_euclid (by fun_prop), ← deriv_euclid (by fun_prop)]
+    have hcurl' (i : Fin 3) : curl f x i  = 0 := by simp [hcurl]
+  · specialize hcurl' 2
+    simp [curl] at hcurl'
+    simp
+    linear_combination (norm := ring_nf) hcurl'
+  · specialize hcurl' 1
+    simp [curl] at hcurl'
+    simp
+    linear_combination (norm := ring_nf) -hcurl'
+  · specialize hcurl' 2
+    simp [curl] at hcurl'
+    simp
+    linear_combination (norm := ring_nf) -hcurl'
+  · specialize hcurl' 0
+    simp [curl] at hcurl'
+    simp
+    linear_combination (norm := ring_nf) hcurl'
+  · specialize hcurl' 1
+    simp [curl] at hcurl'
+    simp
+    linear_combination (norm := ring_nf) hcurl'
+  · specialize hcurl' 0
+    simp [curl] at hcurl'
+    simp
+    linear_combination (norm := ring_nf) -hcurl'
+
+open InnerProductSpace
 lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f)
     (hcurl : curl f = 0) : ∃ g : Space → ℝ, f = grad g := by
   let s : Set (Space) := Set.univ
@@ -692,8 +721,32 @@ lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Diff
     refine differentiableOn_univ.mpr ?_
     apply (InnerProductSpace.toDual ℝ (Space)).differentiable.fun_comp
     fun_prop
+  have hω_fderiv (a x y : Space) : fderiv ℝ ω a x y =
+     ⟪(basis.repr.symm (fderiv ℝ f a x)), y⟫_ℝ:= by
+    calc _
+      _ = (fderiv ℝ ( InnerProductSpace.toDual ℝ _ ∘ fun a => (basis.repr.symm (f a))) a x) y := by rfl
+    rw [fderiv_comp _ (by simpa using (InnerProductSpace.toDual ℝ (Space)).differentiable.differentiableAt) (by fun_prop)]
+    erw [(InnerProductSpace.toDual ℝ (Space)).fderiv]
+    simp
+    erw [InnerProductSpace.toDual_apply_apply]
+    rw [fderiv_comp' _ (by fun_prop) (by fun_prop)]
+    simp
   have hdω: ∀ a ∈ s, ∀ (x y : Space), ((fderiv ℝ ω a) x) y = ((fderiv ℝ ω a) y) x := by
-    sorry
+    intro a ha x y
+    rw [hω_fderiv, hω_fderiv]
+    induction' y using basis_induction with i p1 p2 h1 h2 c p1 h1
+    rotate_left
+    · simp
+    · simp [inner_add_left, inner_add_right, h1, h2]
+    · simp [inner_smul_left, inner_smul_right, h1]
+    induction' x using basis_induction with j p1 p2 h1 h2 c p1 h1
+    rotate_left
+    · simp
+    · simp [inner_add_right, ← h1,← h2]
+    · simp [inner_smul_right, ← h1]
+    simp
+    rw [← deriv_eq, ← deriv_eq]
+    exact deriv_comm_of_curl_zero f hf hcurl a j i
   obtain ⟨g, hg⟩ := Convex.exists_forall_hasFDerivAt_of_fderiv_symmetric hs hso (ω := ω) hω hdω
   use g
   simp [ω, ← hasGradientAt_iff_hasFDerivAt, s] at hg
