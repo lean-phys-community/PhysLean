@@ -64,6 +64,17 @@ noncomputable def div {d} (f : Space d → EuclideanSpace ℝ (Fin d)) :
 @[inherit_doc div]
 macro (name := divNotation) "∇" "⬝" f:term:100 : term => `(div $f)
 
+lemma div_eq_sum_fderiv {d} (f : Space d → EuclideanSpace ℝ (Fin d))
+    (hf : Differentiable ℝ f) (x : Space d) :
+    (∇ ⬝ f) x = ∑ i, fderiv ℝ f x (basis i) i := by
+  simp [div, Space.deriv]
+  congr
+  funext i
+  rw [← Space.deriv_eq]
+  rw [deriv_euclid]
+  rfl
+  fun_prop
+
 /-!
 
 ### A.1. The divergence on the zero function
@@ -152,6 +163,7 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     rw [hf'.map_smul]
     rw [div_smul]
     fun_prop
+
 
 /-!
 
