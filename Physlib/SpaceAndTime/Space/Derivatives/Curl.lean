@@ -290,7 +290,7 @@ private noncomputable def homotopyOperatorIntegrand (f : Space → EuclideanSpac
 private lemma homotopyOperatorIntegrand_eq (f : Space → EuclideanSpace ℝ (Fin 3)) :
     homotopyOperatorIntegrand f = fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x) := by rfl
 @[fun_prop]
-private lemma homotopyOperatorIntegrand_differentiable_space {f : Space → EuclideanSpace ℝ (Fin 3)}
+private lemma differentiable_homotopyOperatorIntegrand_space {f : Space → EuclideanSpace ℝ (Fin 3)}
     (hf : Differentiable ℝ f) (t : ℝ) :
     Differentiable ℝ (homotopyOperatorIntegrand f · t) := by
   simp [homotopyOperatorIntegrand]
@@ -324,7 +324,7 @@ private lemma homotopyOperatorIntegrand_continuous_param {f : Space → Euclidea
       · fun_prop
       · exact hf _
 
-private lemma homotopyOperatorIntegrand_intervalIntegrable {f : Space → EuclideanSpace ℝ (Fin 3)}
+private lemma intervalIntegrable_homotopyOperatorIntegrand {f : Space → EuclideanSpace ℝ (Fin 3)}
     (hf : Differentiable ℝ f) (x : Space) :
     IntervalIntegrable (homotopyOperatorIntegrand f x ·) volume (0 : ℝ) 1 := by
   apply Continuous.intervalIntegrable
@@ -430,7 +430,7 @@ private lemma fderiv_homotopyOperatorIntegrand_two_eq {f : Space → EuclideanSp
   simp only [true_or]
   exact hf
 
-private lemma fderiv_homotopyOperatorIntegrand_uncurry_continuous
+private lemma continuous_uncurry_fderiv_homotopyOperatorIntegrand
     {f : Space → EuclideanSpace ℝ (Fin 3)} (hf : ContDiff ℝ 1 f) :
     Continuous (Function.uncurry (fun x t => fderiv ℝ (homotopyOperatorIntegrand f · t) x)) := by
   refine continuous_clm_apply.mpr ?_
@@ -452,7 +452,7 @@ private lemma fderiv_homotopyOperatorIntegrand_uncurry_continuous
   · simp [fderiv_homotopyOperatorIntegrand_two_eq hf]
     fun_prop
 
-private lemma intervalIntegral_homotopyOperatorIntegrand_hasFDerivAt
+private lemma hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand
     {f : Space → EuclideanSpace ℝ (Fin 3)} (hf : ContDiff ℝ 1 f) (x₀ : Space) :
     HasFDerivAt (fun (x : Space) => ∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t ∂(volume))
       (∫ (t : ℝ) in 0..1, fderiv ℝ (homotopyOperatorIntegrand f · t) x₀ ∂(volume)) x₀ := by
@@ -466,7 +466,7 @@ private lemma intervalIntegral_homotopyOperatorIntegrand_hasFDerivAt
       (by simp [s])
       (by
         apply (Continuous.comp ?_
-          (fderiv_homotopyOperatorIntegrand_uncurry_continuous hf)).continuousOn
+          (continuous_uncurry_fderiv_homotopyOperatorIntegrand hf)).continuousOn
         change Continuous (@norm _ ContinuousLinearMap.toSeminormedAddCommGroup.toNorm)
         fun_prop)
   change HasFDerivAt (fun (x : Space) => ∫ (t : ℝ) in 0..1, F x t ∂(volume))
@@ -478,11 +478,11 @@ private lemma intervalIntegral_homotopyOperatorIntegrand_hasFDerivAt
   · filter_upwards with x
     simp [F, homotopyOperatorIntegrand_eq]
     fun_prop
-  · exact homotopyOperatorIntegrand_intervalIntegrable (hf.differentiable (by simp)) x₀
+  · exact intervalIntegrable_homotopyOperatorIntegrand (hf.differentiable (by simp)) x₀
   · refine IntervalIntegrable.aestronglyMeasurable' ?_
     simp only [zero_le_one, sup_of_le_right, inf_of_le_left]
     apply Continuous.intervalIntegrable
-    exact Continuous.uncurry_left x₀ (fderiv_homotopyOperatorIntegrand_uncurry_continuous hf)
+    exact Continuous.uncurry_left x₀ (continuous_uncurry_fderiv_homotopyOperatorIntegrand hf)
   · filter_upwards with t
     intro h x hx
     have hx2 := ha.2
@@ -495,10 +495,10 @@ private lemma intervalIntegral_homotopyOperatorIntegrand_hasFDerivAt
   · filter_upwards with t
     intro h x hx
     dsimp [F', F]
-    apply (homotopyOperatorIntegrand_differentiable_space _ _).differentiableAt.hasFDerivAt
+    apply (differentiable_homotopyOperatorIntegrand_space _ _).differentiableAt.hasFDerivAt
     exact hf.differentiable (by simp)
 
-private lemma deriv_sub_deriv_intervalIntegral_homotopyOperatorIntegrand
+private lemma deriv_intervalIntegral_homotopyOperatorIntegrand_sub
     (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 1 f) (i j k m : Fin 3) (x₀ : Space) :
     ∂[i] (fun x => (∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t ∂(volume)) k) x₀
     - ∂[j] (fun x => (∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t ∂(volume)) m) x₀ =
@@ -507,10 +507,10 @@ private lemma deriv_sub_deriv_intervalIntegral_homotopyOperatorIntegrand
   let F : Space → ℝ → EuclideanSpace ℝ (Fin 3) := homotopyOperatorIntegrand f
   let F' : Space → ℝ → Space →L[ℝ] EuclideanSpace ℝ (Fin 3) := fun x t => fderiv ℝ (F · t) x
   have F'_continuous : Continuous (Function.uncurry F') := by
-    exact fderiv_homotopyOperatorIntegrand_uncurry_continuous (hf)
+    exact continuous_uncurry_fderiv_homotopyOperatorIntegrand (hf)
   have hfderiv (x₀ : Space) : HasFDerivAt (fun (x : Space) => ∫ (t : ℝ) in 0..1, F x t ∂(volume))
       (∫ (t : ℝ) in 0..1, F' x₀ t ∂(volume)) x₀ := by
-    exact intervalIntegral_homotopyOperatorIntegrand_hasFDerivAt (hf) x₀
+    exact hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) x₀
   have F'_apply_apply (x₀ : Space) (y : Space) (i : Fin 3) :
       ((∫ (t : ℝ) in 0..1, F' x₀ t) y).ofLp i =
       (∫ (t : ℝ) in 0..1, F' x₀ t y i) := by
@@ -536,7 +536,7 @@ private lemma deriv_sub_deriv_intervalIntegral_homotopyOperatorIntegrand
   · apply Continuous.intervalIntegrable
     fun_prop
 
-lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 1 f)
+lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 1 f)
     (hdiv : ∇ ⬝ f = 0) :
     ∃ g: Space → EuclideanSpace ℝ (Fin 3), f = curl g ∧ Differentiable ℝ g := by
   suffices hneg : ∃ g: Space → EuclideanSpace ℝ (Fin 3), f = - curl g ∧ Differentiable ℝ g by
@@ -565,8 +565,7 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
       rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
       simp [fderiv_f_t]
       ring
-    simp only [fderiv_eq_smul_deriv, differentiableAt_fun_id, DifferentiableAt.fun_pow, smul_eq_mul,
-      one_mul]
+    simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
     rw [intervalIntegral.integral_deriv_eq_sub (by fun_prop)]
     simp only [one_pow, one_smul, one_mul, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
       zero_smul, zero_mul, sub_zero]
@@ -576,12 +575,12 @@ lemma eq_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
   apply And.intro
   swap
   · intro x
-    exact (intervalIntegral_homotopyOperatorIntegrand_hasFDerivAt (hf) _).differentiableAt
+    exact (hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) _).differentiableAt
   ext x i
   fin_cases i <;> symm
   all_goals
     simp [curl]
-    rw [deriv_sub_deriv_intervalIntegral_homotopyOperatorIntegrand _ hf]
+    rw [deriv_intervalIntegral_homotopyOperatorIntegrand_sub _ hf]
     simp [fderiv_homotopyOperatorIntegrand_one_eq (hf.differentiable (by simp)),
       fderiv_homotopyOperatorIntegrand_zero_eq (hf.differentiable (by simp)),
       fderiv_homotopyOperatorIntegrand_two_eq (hf.differentiable (by simp)), basis_apply]
@@ -641,7 +640,7 @@ lemma deriv_comm_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : D
     linear_combination (norm := ring_nf) -hcurl'
 
 open InnerProductSpace
-lemma eq_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f)
+lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f)
     (hcurl : curl f = 0) : ∃ g : Space → ℝ, f = grad g ∧ Differentiable ℝ g := by
   let s : Set (Space) := Set.univ
   have hs : Convex ℝ s := convex_univ
