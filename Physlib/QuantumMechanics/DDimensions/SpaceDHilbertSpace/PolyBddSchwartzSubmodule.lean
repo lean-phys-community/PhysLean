@@ -155,18 +155,22 @@ private lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
   · apply Tendsto.ennrpow_const 2⁻¹ at h
     simp_all
 
+private lemma polyBddSchwartzSubmodule_zero_top_dense :
+    Dense (polyBddSchwartzSubmodule 0 ⊤ : Set (SpaceDHilbertSpace 0)) := by
+  suffices polyBddSchwartzMap 0 ⊤ = ⊤ by
+    simp [polyBddSchwartzSubmodule, polyBddSchwartzIncl, this, schwartzSubmodule_dense]
+  refine Submodule.eq_top_iff'.mpr (fun f k hk ↦ ?_)
+  refine ⟨1 + ‖f 0‖, by positivity, fun x ↦ ?_⟩
+  simp only [Space.point_dim_zero_eq, norm_zero, zpow_neg, zpow_natCast]
+  rcases eq_or_ne k 0 with (rfl | hk')
+  · simp
+  · simp [hk', add_nonneg]
+
 lemma polyBddSchwartzSubmodule_top_dense (d : ℕ) :
     Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) := by
   rcases eq_zero_or_pos d with (rfl | hd)
-  · -- `d = 0`: Every function `Space 0 ≅ {0} → ℂ` is in `polyBddSchwartzSubmodule 0 ⊤`
-    suffices polyBddSchwartzMap 0 ⊤ = ⊤ by
-      simp [polyBddSchwartzSubmodule, polyBddSchwartzIncl, this, schwartzSubmodule_dense]
-    refine Submodule.eq_top_iff'.mpr (fun f k hk ↦ ?_)
-    refine ⟨1 + ‖f 0‖, by positivity, fun x ↦ ?_⟩
-    simp only [Space.point_dim_zero_eq, norm_zero, zpow_neg, zpow_natCast]
-    rcases eq_or_ne k 0 with (rfl | hk')
-    · simp
-    · simp [hk', add_nonneg]
+  · -- `d = 0`: Every function `Space 0 ≅ {0} → ℂ` is in `polyBddSchwartzSubmodule 0 ⊤`.
+    exact polyBddSchwartzSubmodule_zero_top_dense
   · -- `d > 0`: Construct a sequence in `polyBddSchwartzSubmodule d ⊤` which tends to `ξ`
     intro ξ
     apply mem_closure_iff_seq_limit.mpr
