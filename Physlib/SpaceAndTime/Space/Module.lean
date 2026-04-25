@@ -539,7 +539,7 @@ lemma fderiv_val {d : ℕ} (p : Space d) :
   rw [ContinuousLinearEquiv.fderiv]
 
 @[simp]
-lemma fderiv_of_val_apply {d : ℕ} (p y : Space d) (i : Fin d) :
+lemma fderiv_eval_apply {d : ℕ} (p y : Space d) (i : Fin d) :
     fderiv ℝ (fun p => p.val i) p y = y i := by
   trans fderiv ℝ (Space.coordCLM i) p y
   · congr

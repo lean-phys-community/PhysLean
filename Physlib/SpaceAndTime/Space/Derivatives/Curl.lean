@@ -40,8 +40,8 @@ We also prove some basic vector-identities involving of the curl operator.
   - A.6. The div of a curl is zero
   - A.7. The curl of a grad is zero
   - A.8. The curl of a curl
-  - A.9. Div zero, then equal to curl
-  - A.10. Curl zero, then equal to grad
+  - A.9. A divergence-free field is a curl
+  - A.10. A curl-free field is a gradient
 - B. The curl on distributions
   - B.1. The components of the curl
   - B.2. Basic equalities
@@ -263,7 +263,7 @@ lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ
 
 /-!
 
-### A.9. Div zero, then equal to curl
+### A.9. A divergence-free field is a curl
 
 We now prove that if the divergence of a function is zero,
 then it is equal to the curl of some function.
@@ -601,13 +601,13 @@ lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
 
 /-!
 
-### A.10. Curl zero, then equal to grad
+### A.10. A curl-free field is a gradient
 
 We show that if the curl of a function is zero, then it is equal to the gradient of some function.
 The key lemma here is
 `Convex.exists_forall_hasFDerivAt_of_fderiv_symmetric`, which is
 a more general version of this result in Mathlib. We turn this here into something
-more familiar, to the physicists.
+more familiar, to the physicists via `deriv_comm_of_curl_zero`.
 
 -/
 
@@ -686,7 +686,7 @@ lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
   apply And.intro _ (fun x => (hg x).differentiableAt)
   ext1 x
   specialize hg x
-  simpa using (HasGradientAt.unique (hg.differentiableAt.hasGradientWithinAt_grad x) hg).symm
+  simpa using (HasGradientAt.unique (hg.differentiableAt.hasGradientAt_grad x) hg).symm
 
 /-!
 
