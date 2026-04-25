@@ -267,7 +267,7 @@ lemma euclid_gradient_eq_sum {d} (f : EuclideanSpace ℝ (Fin d) → ℝ) (x : E
   funext i
   ring
 
-lemma hasGradientWithinAt_grad {d} (f : Space d → ℝ) (x : Space d)
+lemma _root_.DifferentiableAt.hasGradientAt_grad {d} {f : Space d → ℝ} (x : Space d)
     (hf : DifferentiableAt ℝ f x) :
     HasGradientAt f (basis.repr.symm (∇ f x)) x := by
   rw [← gradient_apply_eq_grad]

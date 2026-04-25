@@ -667,12 +667,12 @@ lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
   have hdω: ∀ a ∈ s, ∀ (x y : Space), ((fderiv ℝ ω a) x) y = ((fderiv ℝ ω a) y) x := by
     intro a ha x y
     rw [hω_fderiv, hω_fderiv]
-    induction' y using basis_induction with i p1 p2 h1 h2 c p1 h1
+    induction' y using basis_induction_on with i p1 p2 h1 h2 c p1 h1
     rotate_left
     · simp
     · simp [inner_add_left, inner_add_right, h1, h2]
     · simp [inner_smul_left, inner_smul_right, h1]
-    induction' x using basis_induction with j p1 p2 h1 h2 c p1 h1
+    induction' x using basis_induction_on with j p1 p2 h1 h2 c p1 h1
     rotate_left
     · simp
     · simp [inner_add_right, ← h1,← h2]
@@ -686,7 +686,7 @@ lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
   apply And.intro _ (fun x => (hg x).differentiableAt)
   ext1 x
   specialize hg x
-  simpa using (HasGradientAt.unique (hasGradientWithinAt_grad g x hg.differentiableAt) hg).symm
+  simpa using (HasGradientAt.unique (hg.differentiableAt.hasGradientWithinAt_grad x) hg).symm
 
 /-!
 

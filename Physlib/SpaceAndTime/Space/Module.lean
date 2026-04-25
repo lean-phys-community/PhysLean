@@ -417,7 +417,7 @@ lemma fderiv_basis_repr_symm {d} (v : EuclideanSpace ℝ (Fin d)) :
   change fderiv ℝ basis.repr.symm.toContinuousLinearMap v = _
   rw [ContinuousLinearMap.fderiv]
 
-lemma basis_induction {d} {P : Space d → Prop}
+lemma basis_induction_on {d} {P : Space d → Prop}
     (hb : ∀ i, P (basis i)) (hzero : P 0)
     (hadd : ∀ p1 p2, P p1 → P p2 → P (p1 + p2))
     (hsmul : ∀ (c : ℝ) p, P p → P (c • p)) (p : Space d) : P p := by
