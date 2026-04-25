@@ -52,7 +52,7 @@ in the standard directions.
 -/
 
 @[expose] public section
-
+open Physlib
 namespace Space
 
 /-!

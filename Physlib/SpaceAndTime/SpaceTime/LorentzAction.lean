@@ -48,7 +48,7 @@ open Matrix
 open Complex
 open ComplexConjugate
 open TensorSpecies
-open SchwartzMap
+open SchwartzMap Physlib
 attribute [-simp] Fintype.sum_sum_type
 
 /-!

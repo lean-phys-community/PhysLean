@@ -44,6 +44,7 @@ sitting at the origin in 1d space.
 @[expose] public section
 
 namespace Electromagnetism
+open Physlib
 open Distribution SchwartzMap
 open Space MeasureTheory
 namespace DistElectromagneticPotential

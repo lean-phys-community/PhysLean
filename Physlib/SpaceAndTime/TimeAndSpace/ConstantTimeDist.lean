@@ -63,6 +63,8 @@ noncomputable section
 variable (𝕜 : Type) {E F F' : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]
   [NormedAddCommGroup F'] [NormedSpace ℝ E] [NormedSpace ℝ F]
 
+open Physlib
+
 namespace Space
 
 open MeasureTheory

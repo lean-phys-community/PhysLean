@@ -22,7 +22,7 @@ We show that position wavefunctions are generalized eigenvectors of the position
 -/
 
 @[expose] public section
-
+open Physlib
 namespace QuantumMechanics
 
 namespace OneDimension

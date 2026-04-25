@@ -43,6 +43,7 @@ carrying a steady current along the x-axis.
 @[expose] public section
 
 namespace Electromagnetism
+open Physlib
 open Distribution SchwartzMap
 open Space MeasureTheory
 namespace DistElectromagneticPotential

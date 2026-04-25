@@ -22,6 +22,8 @@ to non-relativistic physics (defined using `Space` and `Time`).
 
 noncomputable section
 
+open Physlib
+
 namespace SpaceTime
 
 open Time

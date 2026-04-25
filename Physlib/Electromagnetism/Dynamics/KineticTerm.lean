@@ -67,7 +67,7 @@ namespace Electromagnetism
 open Module realLorentzTensor
 open IndexNotation
 open TensorSpecies
-open Tensor ContDiff
+open Tensor ContDiff Physlib
 
 namespace ElectromagneticPotential
 

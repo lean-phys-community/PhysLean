@@ -45,7 +45,7 @@ We also prove some basic vector-identities involving of the curl operator.
 -/
 
 @[expose] public section
-
+open Physlib
 namespace Space
 
 /-!

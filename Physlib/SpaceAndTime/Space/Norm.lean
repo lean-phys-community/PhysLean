@@ -56,7 +56,7 @@ We use properties of this power series to prove various results about distributi
 -/
 
 @[expose] public section
-open SchwartzMap NNReal
+open SchwartzMap NNReal Physlib
 noncomputable section
 
 variable (𝕜 : Type) {E F F' : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]

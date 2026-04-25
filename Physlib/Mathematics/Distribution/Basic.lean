@@ -87,6 +87,9 @@ where `E` is a normed vector space over `ℝ` and `F` is a normed vector space o
 
 -/
 
+/- Need the `Physlib` namespace to prevent conflict with Mathlib's distributions. -/
+namespace Physlib
+
 /-- An `F`-valued distribution on `E` (where `E` is a normed vector space over `ℝ` and `F` is a
 normed vector space over `𝕜`) is a continuous linear map `𝓢(E, 𝕜) →L[𝕜] F` where `𝒮(E, 𝕜)` is
 the Schwartz space of smooth functions `E → 𝕜` with rapidly decreasing iterated derivatives. This
@@ -477,3 +480,4 @@ lemma heavisideStep_apply (d : ℕ) (η : 𝓢(EuclideanSpace ℝ (Fin d.succ), 
   rfl
 
 end Distribution
+end Physlib

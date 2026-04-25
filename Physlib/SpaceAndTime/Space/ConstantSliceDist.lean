@@ -50,6 +50,7 @@ lines and planes, rather then points.
 
 @[expose] public section
 open SchwartzMap NNReal
+open Physlib
 noncomputable section
 
 variable (𝕜 : Type) {E F F' : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]

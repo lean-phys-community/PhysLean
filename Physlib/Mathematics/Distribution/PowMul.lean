@@ -20,7 +20,7 @@ open SchwartzMap NNReal
 noncomputable section
 
 variable (𝕜 : Type) {E F : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]
-
+namespace Physlib
 namespace Distribution
 
 variable [NormedSpace ℝ E]
@@ -166,3 +166,4 @@ lemma powOneMul_apply (ψ : 𝓢(ℝ, 𝕜)) (x : ℝ) :
     powOneMul 𝕜 ψ x = x * ψ x := rfl
 
 end Distribution
+end Physlib
