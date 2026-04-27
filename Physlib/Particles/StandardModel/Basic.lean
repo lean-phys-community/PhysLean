@@ -15,7 +15,7 @@ This file defines the basic properties of the standard model in particle physics
 -/
 
 @[expose] public section
-TODO "6V2FP" "Redefine the gauge group as a quotient of SU(3) x SU(2) x U(1) by a subgroup of ℤ₆."
+TODO "Redefine the gauge group as a quotient of SU(3) x SU(2) x U(1) by a subgroup of ℤ₆."
 
 namespace StandardModel
 

@@ -73,7 +73,7 @@ noncomputable section
 
 -/
 
-TODO "6V2DR" "SpaceTime should be refactored into a structure, or similar, to prevent casting."
+TODO "SpaceTime should be refactored into a structure, or similar, to prevent casting."
 
 /-- `SpaceTime d` corresponds to `d+1` dimensional space-time.
   This is equipped with an instance of the action of a Lorentz group,

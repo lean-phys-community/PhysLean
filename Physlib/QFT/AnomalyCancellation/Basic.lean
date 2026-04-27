@@ -109,7 +109,7 @@ We provide a constructor `ACCSystemChargesMk` for `ACCSystemCharges` given the n
 
 -/
 
-TODO "NCRC5" "Replace `ACCSystemChargesMk` with `⟨n⟩` notation everywhere. "
+TODO "Replace `ACCSystemChargesMk` with `⟨n⟩` notation everywhere. "
 /--
   Creates an `ACCSystemCharges` object with the specified number of charges.
 -/
@@ -595,9 +595,9 @@ formalize this derivation in Lean, and instead take the resulting homogeneous fo
 
 -/
 
-TODO "6VZMW" "Anomaly cancellation conditions can be derived formally from the gauge group
+TODO "Anomaly cancellation conditions can be derived formally from the gauge group
   and fermionic representations using e.g. topological invariants. Include such a
   definition."
 
-TODO "6VZM3" "Anomaly cancellation conditions can be defined using algebraic varieties.
+TODO "Anomaly cancellation conditions can be defined using algebraic varieties.
   Link such an approach to the approach here."

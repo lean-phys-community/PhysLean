@@ -400,7 +400,7 @@ lemma normalOrderF_ofFieldOpF_mul_ofFieldOpF (φ φ' : 𝓕.FieldOp) :
 
 -/
 
-TODO "6V2JJ" "Split the following two lemmas up into smaller parts."
+TODO "Split the following two lemmas up into smaller parts."
 
 set_option backward.isDefEq.respectTransparency false in
 lemma normalOrderF_superCommuteF_ofCrAnListF_create_create_ofCrAnListF

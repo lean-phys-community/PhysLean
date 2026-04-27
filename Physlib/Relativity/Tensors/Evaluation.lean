@@ -135,7 +135,7 @@ lemma evalT_pure {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
   conv_rhs => rw [← PiTensorProduct.lift.tprod]
   rfl
 
-TODO "6VZ6G" "Add lemmas related to the interaction of evalT and permT, prodT and contrT."
+TODO "Add lemmas related to the interaction of evalT and permT, prodT and contrT."
 
 end Tensor
 

@@ -20,10 +20,10 @@ namespace ClassicalMechanics
 
 namespace HarmonicOscillator
 
-TODO "4DLKC" "Configuration Space should be refactored to take `EuclideanSpace ℝ (Fin 1)`
+TODO "Configuration Space should be refactored to take `EuclideanSpace ℝ (Fin 1)`
     as its value."
 
-TODO "4DLL5" "The API around this should be improved to allow further development of a proper
+TODO "The API around this should be improved to allow further development of a proper
     geometric model of the Harmonic Oscillator (see TODO item 4DK2M)."
 
 /-- The configuration space of the harmonic oscillator. -/

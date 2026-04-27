@@ -290,10 +290,10 @@ noncomputable instance {d : ℕ} : MeasurableSpace (Space d) := borel (Space d)
 instance {d : ℕ} : BorelSpace (Space d) where
   measurable_eq := by rfl
 
-TODO "HB6YZ" "In the above documentation describe what an instance is, and why
+TODO "In the above documentation describe what an instance is, and why
   it is useful to have instances for `Space d`."
 
-TODO "HB6WN" "After TODO 'HB6VC', give `Space d` the necessary instances
+TODO "After TODO 'HB6VC', give `Space d` the necessary instances
   using `inferInstanceAs`."
 /-!
 
@@ -331,7 +331,7 @@ lemma sum_apply {ι : Type} [Fintype ι] (f : ι → Space d) (i : Fin d) :
 
 -/
 
-TODO "HB6Z4" "In the above documentation describe the notion of a basis
+TODO "In the above documentation describe the notion of a basis
   in Lean."
 
 /-- The standard basis of Space based on `Fin d`. -/

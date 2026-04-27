@@ -199,7 +199,7 @@ lemma dimScale_pos (u1 u2 : UnitChoices) (d : Dimension) :
   · simp
   · exact Ne.symm (dimScale_ne_zero u1 u2 d)
 
-TODO "LCSAY" "Make SI : UnitChoices computable, probably by
+TODO "Make SI : UnitChoices computable, probably by
   replacing the axioms defining the units. See here:
   https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/physical.20units/near/534914807"
 /-- The choice of units corresponding to SI units, that is

@@ -16,7 +16,7 @@ This file is currently a stub.
 
 @[expose] public section
 
-TODO "6VZNP" "Prove that every member of the restricted Lorentz group is
+TODO "Prove that every member of the restricted Lorentz group is
   combination of a boost and a rotation."
 
 namespace LorentzGroup

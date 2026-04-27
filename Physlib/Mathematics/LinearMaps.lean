@@ -18,7 +18,7 @@ quadratic and cubic equations.
 -/
 
 @[expose] public section
-TODO "6VZLZ" "Replace the definitions in this file with Mathlib definitions."
+TODO "Replace the definitions in this file with Mathlib definitions."
 
 /-- The structure defining a homogeneous quadratic equation. -/
 @[simp]

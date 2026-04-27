@@ -119,7 +119,7 @@ lemma mdifferentiable_manifoldStructure_iff_differentiable {M d} [NormedAddCommG
     apply (mdifferentiableAt_iff_differentiableAt.mpr h).comp (I' := 𝓘(ℝ, Space d))
     exact (modelDiffeo.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt
 
-TODO "3XMN6" "Make the version of the derivative described through
+TODO "Make the version of the derivative described through
   `deriv_eq_mfderiv_manifoldStructure` the definition of `deriv` and prove the
   equivalence with the current definition, under suitable conditions."
 

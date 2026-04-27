@@ -637,7 +637,7 @@ lemma PermCond.comp {n n1 n2 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C}
     simp only [Function.comp_apply]
     rw [h.2, h2.2]
 
-TODO "6VZ3C" "Prove that if `σ` satisfies `PermCond c c1 σ` then `PermCond.inv σ h`
+TODO "Prove that if `σ` satisfies `PermCond c c1 σ` then `PermCond.inv σ h`
   satisfies `PermCond c1 c (PermCond.inv σ h)`."
 
 lemma fin_cast_permCond (n n1 : ℕ) {c : Fin n → C} (h : n1 = n) :

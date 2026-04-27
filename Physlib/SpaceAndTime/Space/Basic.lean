@@ -76,10 +76,10 @@ the `VAdd (EuclideanSpace ℝ (Fin d)) (Space d)` instance instead.
 
 -/
 
-TODO "HB6RR" "In the above documentation describe the notion of a type, and
+TODO "In the above documentation describe the notion of a type, and
   introduce the type `Space d`."
 
-TODO "HB6VC" "Convert `Space` from an `abbrev` to a `def`."
+TODO "Convert `Space` from an `abbrev` to a `def`."
 
 /-- The type `Space d` is the world-volume which corresponds to
 `d` dimensional (flat) Euclidean space with a given (but arbitrary)

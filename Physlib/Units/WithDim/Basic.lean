@@ -157,6 +157,6 @@ lemma cast_scaleUnit {d d2 : Dimension} {M : Type} [MulAction ℝ≥0 M] (m : Wi
   subst h
   simp
 
-TODO "LPWE4" "Induce instances on `WithDim d M` from instances on `M`."
+TODO "Induce instances on `WithDim d M` from instances on `M`."
 
 end WithDim

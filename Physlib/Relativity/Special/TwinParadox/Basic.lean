@@ -65,7 +65,7 @@ def properTimeTwinB : ℝ := SpaceTime.properTime T.startPoint T.twinBMid +
 /-- The proper time of twin A minus the proper time of twin B. -/
 def ageGap : ℝ := T.properTimeTwinA - T.properTimeTwinB
 
-TODO "6V2UQ" "Find the conditions for which the age gap for the twin paradox is zero."
+TODO "Find the conditions for which the age gap for the twin paradox is zero."
 
 /-- In the twin paradox with instantaneous acceleration, Twin A is always older
   then Twin B. -/
@@ -141,7 +141,7 @@ lemma example1_ageGap : example1.ageGap = 6 := by
 
 end InstantaneousTwinParadox
 
-TODO "7ROQ4" "Do the twin paradox with a non-instantaneous acceleration. This should be done
+TODO "Do the twin paradox with a non-instantaneous acceleration. This should be done
   in a different module."
 
 end SpecialRelativity

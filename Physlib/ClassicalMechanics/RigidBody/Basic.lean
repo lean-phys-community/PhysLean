@@ -28,7 +28,7 @@ In this module we will define the basic properties of a rigid body, including
 
 open Manifold
 
-TODO "MEX5S" "The definition of a rigid body is currently defined via linear maps
+TODO "The definition of a rigid body is currently defined via linear maps
   from the space of smooth functions to ℝ. When possible, it should be change
   to *continuous* linear maps. "
 

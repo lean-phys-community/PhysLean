@@ -95,7 +95,7 @@ lemma positionOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐱 i ψ
 /-!
 ### A.2. Radius powers (regularized)
 -/
-TODO "ZGCNP" "Incorporate normRegularizedPow into Space.Norm"
+TODO "Incorporate normRegularizedPow into Space.Norm"
 
 /-- Power of regularized norm, `(‖x‖² + ε²)^(s/2)`. -/
 def normRegularizedPow (d : ℕ) (ε s : ℝ) : Space d → ℝ :=

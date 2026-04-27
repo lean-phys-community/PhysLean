@@ -38,7 +38,7 @@ noncomputable def harmonicWave (a g : ℝ → Space d → ℝ) (ω : WaveVector 
     Time → Space d → ℝ :=
     fun t r => a (ω k) r * Real.cos (ω k * t - g (ω k) r)
 
-TODO "EGQUA" "Show that the wave equation is invariant under rotations and any direction `s`
+TODO "Show that the wave equation is invariant under rotations and any direction `s`
     can be rotated to `EuclideanSpace.single 2 1` if only one wave is concerned."
 open InnerProductSpace
 set_option linter.unusedVariables false in
@@ -75,7 +75,7 @@ lemma transverseHarmonicPlaneWave_eq_planeWave {c : ℝ} {k : WaveVector} {f₀x
   ring_nf
   simp [ne_of_gt, hc_ge_zero, hω_ge_zero, mul_comm ω, mul_assoc, basis_repr_inner_eq]
 
-TODO "EGU3E" "Show that any disturbance (subject to certain conditions) can be expressed
+TODO "Show that any disturbance (subject to certain conditions) can be expressed
     as a superposition of harmonic plane waves via Fourier integral."
 
 end ClassicalMechanics

@@ -201,7 +201,7 @@ set_option backward.isDefEq.respectTransparency false in
 noncomputable def parsecs : LengthUnit := scale (648000/Real.pi) astronomicalUnits
   (by norm_num; exact Real.pi_pos)
 
-TODO "ITXJV" "For each unit of charge give the reference the literature where it's definition
+TODO "For each unit of charge give the reference the literature where it's definition
   is defined."
 
 /-!

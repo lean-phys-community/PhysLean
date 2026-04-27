@@ -386,7 +386,7 @@ lemma completeness_of_isPhenoClosedQ5_isPhenoClosedQ10
 
 -/
 
-TODO "JGVOQ" "Make the result `viableChargesMultiset` a safe definition, that is to
+TODO "Make the result `viableChargesMultiset` a safe definition, that is to
   say proof that the recursion terminates."
 
 /-- All charges, for a given `S5 S10 : Finset 𝓩`,

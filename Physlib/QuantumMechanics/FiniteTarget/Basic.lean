@@ -65,7 +65,7 @@ noncomputable def timeEvolutionMatrixStandard (t : ℝ) :
     let b : Basis (Fin n) ℂ H := Module.finBasisOfFinrankEq ℂ H A.hdim
     (timeEvolutionMatrix A t b)
 
-TODO "6VZGG" "Define a smooth structure on `FiniteTarget`."
+TODO "Define a smooth structure on `FiniteTarget`."
 
 end FiniteTarget
 

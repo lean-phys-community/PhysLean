@@ -22,7 +22,7 @@ We define the Lorentz group.
 -/
 
 @[expose] public section
-TODO "6VZHM" "Define the Lie group structure on the Lorentz group."
+TODO "Define the Lie group structure on the Lorentz group."
 
 noncomputable section
 

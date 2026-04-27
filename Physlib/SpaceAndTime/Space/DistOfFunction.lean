@@ -145,7 +145,7 @@ lemma distOfFunction_inner {d n : ℕ} (f : Space d → EuclideanSpace ℝ (Fin 
   rw [integral_inner, real_inner_comm]
   fun_prop
 
-TODO "LV5RM" "Add a general lemma specifying the derivative of
+TODO "Add a general lemma specifying the derivative of
   functions from distributions."
 
 /-!

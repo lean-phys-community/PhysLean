@@ -41,7 +41,7 @@ structure EMSystem where
   /-- The permeability of free space. -/
   μ₀ : ℝ
 
-TODO "6V2UZ" "Charge density and current density should be generalized to signed measures,
+TODO "Charge density and current density should be generalized to signed measures,
   in such a way
   that they are still easy to work with and can be integrated with with tensor notation.
   See here:

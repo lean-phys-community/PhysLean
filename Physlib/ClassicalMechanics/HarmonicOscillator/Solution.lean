@@ -209,7 +209,7 @@ The correctness proofs showing that the conversion produces the expected traject
 are given later in section D.1, after the trajectory machinery has been defined.
 -/
 
-TODO "6VZME" "Implement other initial conditions (deferred to future PRs). For example:
+TODO "Implement other initial conditions (deferred to future PRs). For example:
 - Two positions at different times.
 - Two velocities at different times.
 And convert them into the type `InitialConditions` above."
@@ -880,10 +880,10 @@ We give some open TODOs for the classical harmonic oscillator.
 
 -/
 
-TODO "6VZI3" "For the classical harmonic oscillator find the time for which it returns to
+TODO "For the classical harmonic oscillator find the time for which it returns to
   it's initial position and velocity."
 
-TODO "6VZJB" "For the classical harmonic oscillator find the times for
+TODO "For the classical harmonic oscillator find the times for
   which it passes through zero."
 
 end InitialConditions

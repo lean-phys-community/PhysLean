@@ -66,17 +66,17 @@ open Real
 open ContDiff
 open Time
 
-TODO "DHO05" "Derive solutions for the underdamped case (oscillatory with exponential decay)."
+TODO "Derive solutions for the underdamped case (oscillatory with exponential decay)."
 
-TODO "DHO06" "Derive solutions for the critically damped case (fastest non-oscillatory return)."
+TODO "Derive solutions for the critically damped case (fastest non-oscillatory return)."
 
-TODO "DHO07" "Derive solutions for the overdamped case (slow non-oscillatory return)."
+TODO "Derive solutions for the overdamped case (slow non-oscillatory return)."
 
-TODO "DHO08" "Define and prove properties of the quality factor Q."
+TODO "Define and prove properties of the quality factor Q."
 
-TODO "DHO09" "Define and prove properties of the relaxation time τ."
+TODO "Define and prove properties of the relaxation time τ."
 
-TODO "DHO10" "Prove that the damped harmonic oscillator reduces to the undamped case when γ = 0."
+TODO "Prove that the damped harmonic oscillator reduces to the undamped case when γ = 0."
 
 /-!
 

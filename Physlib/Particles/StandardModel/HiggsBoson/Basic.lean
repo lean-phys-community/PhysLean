@@ -461,7 +461,7 @@ We define the Higgs bundle.
 
 -/
 
-TODO "6V2IS" "Make `HiggsBundle` an associated bundle."
+TODO "Make `HiggsBundle` an associated bundle."
 
 /-- The `HiggsBundle` is defined as the trivial vector bundle with base `SpaceTime` and
   fiber `HiggsVec`. Thus as a manifold it corresponds to `ℝ⁴ × ℂ²`. -/
@@ -815,9 +815,9 @@ lemma const_normSq (φ : HiggsVec) (x : SpaceTime) :
 The results in this section are currently informal.
 -/
 
-TODO "6V2MV" "Define the global gauge action on HiggsField."
-TODO "6V2M3" "Prove `⟪φ1, φ2⟫_H` invariant under the global gauge action. (norm_map_of_mem_unitary)"
-TODO "6V2NA" "Prove invariance of potential under global gauge action."
+TODO "Define the global gauge action on HiggsField."
+TODO "Prove `⟪φ1, φ2⟫_H` invariant under the global gauge action. (norm_map_of_mem_unitary)"
+TODO "Prove invariance of potential under global gauge action."
 
 /-- The action of `gaugeTransformI` on `HiggsField` acting pointwise through `HiggsVec.rep`. -/
 informal_definition gaugeAction where

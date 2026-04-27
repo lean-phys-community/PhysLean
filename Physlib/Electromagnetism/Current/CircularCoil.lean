@@ -29,7 +29,7 @@ electromagnetic potentials and fields around a circular coil.
 
 @[expose] public section
 
-TODO "TCGIW" "Copying the structure of the electrostatics of an infinite wire,
+TODO "Copying the structure of the electrostatics of an infinite wire,
   complete the definitions and proofs for a circular coil carrying a steady current."
 
 namespace Electromagnetism

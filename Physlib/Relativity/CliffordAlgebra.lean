@@ -35,7 +35,7 @@ This file defines the Gamma matrices and their relationship to the Clifford alge
 -/
 
 @[expose] public section
-TODO "6VZF2" "Prove injectivity of ofCliffordAlgebra and construct the full isomorphism."
+TODO "Prove injectivity of ofCliffordAlgebra and construct the full isomorphism."
 namespace spaceTime
 open Complex
 

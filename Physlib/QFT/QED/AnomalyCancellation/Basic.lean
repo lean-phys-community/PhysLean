@@ -31,7 +31,7 @@ open Finset
 namespace PureU1
 open BigOperators
 
-TODO "K3HYF" "The implementation of pure U(1) anomaly cancellation conditions is done
+TODO "The implementation of pure U(1) anomaly cancellation conditions is done
   currently through the type `ACCSystemCharges`. This whole directory could be
   simplified by refactoring to remove `ACCSystemCharges` defining `PureU1Charges` as
   `Fin n → ℚ` directly, or this space quotiented by permutations and overall factors."

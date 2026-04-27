@@ -17,4 +17,4 @@ public import Physlib.Meta.TODO.Basic
 
 @[expose] public section
 
-TODO "L7O4I" "Derive the frequencies of vibaration of a symmetric linear triatomic molecule."
+TODO "Derive the frequencies of vibaration of a symmetric linear triatomic molecule."

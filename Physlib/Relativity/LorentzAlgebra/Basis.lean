@@ -39,7 +39,7 @@ block, while rotation generators are antisymmetric matrices acting only on spati
 
 ## Future Work
 
-TODO "6VZKA" can be completed by proving linear independence and spanning of these
+TODO can be completed by proving linear independence and spanning of these
 6 generators, then constructing a formal `Basis (Fin 2 × Fin 3) ℝ lorentzAlgebra`.
 
 -/
@@ -152,16 +152,16 @@ The following properties are documented in the docstrings but not yet formally p
 These should be established in future PRs to complete the characterization of the generators.
 -/
 
-TODO "BOOST_SYM" "Prove that boost generators are symmetric: \
+TODO "Prove that boost generators are symmetric: \
   (boostGenerator i)ᵀ = boostGenerator i"
 
-TODO "BOOST_TRACE" "Prove that boost generators are traceless: \
+TODO "Prove that boost generators are traceless: \
   Matrix.trace (boostGenerator i) = 0"
 
-TODO "ROT_ANTISYM" "Prove that rotation generators are antisymmetric: \
+TODO "Prove that rotation generators are antisymmetric: \
   (rotationGenerator i)ᵀ = -(rotationGenerator i)"
 
-TODO "ROT_TRACE" "Prove that rotation generators are traceless: \
+TODO "Prove that rotation generators are traceless: \
   Matrix.trace (rotationGenerator i) = 0"
 
 end lorentzAlgebra

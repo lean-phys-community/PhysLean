@@ -17,7 +17,7 @@ matrices.
 -/
 
 @[expose] public section
-TODO "6VZLO" "Prove topological properties of the Orthochronous Lorentz Group."
+TODO "Prove topological properties of the Orthochronous Lorentz Group."
 
 noncomputable section
 
