@@ -7,6 +7,7 @@ module
 
 public import Physlib.SpaceAndTime.SpaceTime.Derivatives
 public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
+public import Physlib.Relativity.Tensors.Elab
 /-!
 
 # The Electromagnetic Potential
@@ -349,25 +350,47 @@ are just equal to `∂_ μ A x ν`.
 
 -/
 
+open Tensorial
+/-- Evaluation of the tensor components of `∂_ μ A x ν`. -/
+lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentiable ℝ A)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {tensorDeriv A.val x | [μ] [ν]}ᵀ = ∂_ μ A x ν := by
+  trans  (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A x) (μ , ν); swap
+  · simp [deriv, Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
+  rw [deriv_eq_tensorDeriv _ hA]
+  generalize (tensorDeriv A.val x) = t
+  obtain ⟨t, rfl⟩ := toTensor.symm.surjective t
+  induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
+  · conv_lhs =>
+      simp only [LinearEquiv.apply_symm_apply, basis_apply, evalT_pure, Pure.evalP, map_smul,
+        toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
+    /- Transforming the basis -/
+    let e : ComponentIdx (Fin.append ![Color.down] ![Color.up])
+      ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prod.trans <|
+      Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
+    have eb : e b = (b 0,  b 1) := by rfl
+    have h1 :  Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis =
+        (((Tensor.basis (Fin.append ![Color.down] ![Color.up]))).map toTensor.symm).reindex e := by
+      ext ⟨i, j⟩
+      simp_rw [Tensorial.basis_map_prod, Basis.tensorProduct_apply,
+        ← Lorentz.Vector.toTensor_symm_basis, ← Lorentz.CoVector.toTensor_symm_basis, e]
+      simp
+    change _ * ((realLorentzTensor d).basis (Color.up)).repr
+      ((realLorentzTensor d).basis (Color.up) (b 1)) ν = _
+    simp [Pure.basisVector, h1, Finsupp.single_apply, eb]
+    grind
+  · simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
+  · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
+  · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
+
 @[simp]
 lemma deriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : ElectromagneticPotential d)
     (x : SpaceTime d) :
     (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A x) μν =
     ∂_ μν.1 A x μν.2 := by
-  match μν with
-  | (μ, ν) =>
-  rw [deriv]
-  simp only [map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul, Finset.sum_apply,
-    Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, smul_eq_mul]
-  rw [Finset.sum_eq_single μ, Finset.sum_eq_single ν]
-  · simp
-  · intro μ' _ h
-    simp [h]
-  · simp
-  · intro ν' _ h
-    simp [h]
-  · simp
+  rcases μν  with ⟨μ, ν⟩
+  simp [deriv, Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
 
 lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (b : ComponentIdx (S := realLorentzTensor d)
