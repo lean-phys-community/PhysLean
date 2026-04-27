@@ -355,30 +355,28 @@ open Tensorial
 lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentiable ℝ A)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {tensorDeriv A.val x | [μ] [ν]}ᵀ = ∂_ μ A x ν := by
-  trans  (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A x) (μ , ν); swap
+  trans  (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A x) (μ, ν); swap
   · simp [deriv, Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
   rw [deriv_eq_tensorDeriv _ hA]
   generalize (tensorDeriv A.val x) = t
   obtain ⟨t, rfl⟩ := toTensor.symm.surjective t
   induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
-  · conv_lhs =>
-      simp only [LinearEquiv.apply_symm_apply, basis_apply, evalT_pure, Pure.evalP, map_smul,
-        toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
+  · simp only [LinearEquiv.apply_symm_apply, basis_apply, evalT_pure, Pure.evalP, map_smul,
+      toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
+    change _ * ((realLorentzTensor d).basis (Color.up)).repr
+      ((realLorentzTensor d).basis (Color.up) (b 1)) ν = _
     /- Transforming the basis -/
     let e : ComponentIdx (Fin.append ![Color.down] ![Color.up])
       ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prod.trans <|
       Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
-    have eb : e b = (b 0,  b 1) := by rfl
     have h1 :  Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis =
         (((Tensor.basis (Fin.append ![Color.down] ![Color.up]))).map toTensor.symm).reindex e := by
       ext ⟨i, j⟩
       simp_rw [Tensorial.basis_map_prod, Basis.tensorProduct_apply,
         ← Lorentz.Vector.toTensor_symm_basis, ← Lorentz.CoVector.toTensor_symm_basis, e]
       simp
-    change _ * ((realLorentzTensor d).basis (Color.up)).repr
-      ((realLorentzTensor d).basis (Color.up) (b 1)) ν = _
-    simp [Pure.basisVector, h1, Finsupp.single_apply, eb]
-    grind
+    simp [Pure.basisVector, h1, Finsupp.single_apply]
+    grind [show e b = (b 0,  b 1) from rfl]
   · simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
   · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
   · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
