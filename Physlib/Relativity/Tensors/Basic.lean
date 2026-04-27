@@ -22,7 +22,9 @@ open Module IndexNotation CategoryTheory MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] (S : TensorSpecies k C G)
+variable {k : Type} [CommRing k] {C G : Type} [Group G]
+  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  (S : TensorSpecies k C G basisIdx)
 
 /-- The tensors associated with a list of indices of a given color
   `c : Fin n → C`. -/
@@ -30,16 +32,19 @@ noncomputable abbrev Tensor {n : ℕ} (c : Fin n → C) : Type := (S.F.obj (Over
 
 namespace Tensor
 
-variable {S : TensorSpecies k C G} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
+variable {S : TensorSpecies k C G basisIdx} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
   {c2 : Fin n2 → C}
 
+set_option linter.unusedVariables false in
 /-- Given a list of indices `c : Fin n → C` e.g. `![.up, .down]`, the type
   `ComponentIdx c` is the type of components indexes of a tensor with those indices
   e.g. `⟨0, 2⟩` corresponding to `T⁰₂`. -/
-abbrev ComponentIdx {n : ℕ} (c : Fin n → C) : Type := Π j, Fin (S.repDim (c j))
+@[nolint unusedArguments]
+abbrev ComponentIdx {n : ℕ} {S : TensorSpecies k C G basisIdx} (c : Fin n → C) : Type :=
+  Π j, basisIdx (c j)
 
 lemma ComponentIdx.congr_right {n : ℕ} {c : Fin n → C} (b : ComponentIdx (S := S) c)
-    (i j : Fin n) (h : i = j) : b i = Fin.cast (by simp [h]) (b j) := by
+    (i j : Fin n) (h : i = j) : b i = basisIdxCongr (by simp [h]) (b j) := by
   subst h
   rfl
 
@@ -47,7 +52,7 @@ lemma ComponentIdx.congr_right {n : ℕ} {c : Fin n → C} (b : ComponentIdx (S 
 def ComponentIdx.cast {n m : ℕ} {c : Fin n → C} {cm : Fin m → C}
     (h : n = m) (hc : c = cm ∘ Fin.cast h) (b : ComponentIdx (S := S) c) :
     ComponentIdx (S := S) cm := fun j =>
-      Fin.cast (by simp [hc]) (b (Fin.cast h.symm j))
+      basisIdxCongr (by simp [hc]) (b (Fin.cast h.symm j))
 
 /-!
 
@@ -57,7 +62,7 @@ def ComponentIdx.cast {n m : ℕ} {c : Fin n → C} {cm : Fin m → C}
 
 /-- The type of pure tensors associated to a list of indices `c : OverColor C`.
   A pure tensor is a tensor which can be written in the form `v1 ⊗ₜ v2 ⊗ₜ v3 …`. -/
-abbrev Pure (S : TensorSpecies k C G) (c : Fin n → C) : Type :=
+abbrev Pure (S : TensorSpecies k C G basisIdx) (c : Fin n → C) : Type :=
     (i : Fin n) → S.FD.obj (Discrete.mk (c i))
 
 namespace Pure
@@ -365,7 +370,14 @@ lemma ofComponents_componentMap {n : ℕ} (c : Fin n → C) (t : S.Tensor c) :
 def basis {n : ℕ} (c : Fin n → C) : Basis (ComponentIdx (S := S) c) k (S.Tensor c) where
   repr := (LinearEquiv.mk (componentMap c) (ofComponents c)
     (fun x => by simp) (fun x => by simp)).trans
-    (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → Fin (S.repDim (c j)))).symm
+    (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → basisIdx (c j))).symm
+
+lemma basis_congr {c1 c2 : C} (h : c1 = c2) (x : basisIdx c1)
+    (y : basisIdx c2) (hxy : y = basisIdxCongr (by simp [h]) x) :
+    S.FD.map (eqToHom (by simp [h])) ((S.basis c1) x) =
+    (S.basis c2) y := by
+  subst h hxy
+  simp
 
 lemma basis_apply {n : ℕ} (c : Fin n → C) (b : ComponentIdx (S := S) c) :
     basis c b = (Pure.basisVector c b).toTensor := by
@@ -412,22 +424,21 @@ end Basis
 
 -/
 
-lemma finrank_tensor_eq {n : ℕ} [StrongRankCondition k] (c : Fin n → C) :
-    Module.finrank k (S.Tensor c) = ∏ x, S.repDim (c x) := by
-  rw [(Tensor.basis c).repr.finrank_eq]
-  rw [(Finsupp.linearEquivFunOnFinite _ _ _).finrank_eq]
-  rw [Module.finrank_pi]
-  simp
-
-instance {k : Type} [Field k] {C G : Type} [Group G] (S : TensorSpecies k C G)
+instance {k : Type} [Field k] {C G : Type} [Group G]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    (S : TensorSpecies k C G basisIdx)
     {c : Fin n → C} : FiniteDimensional k (S.Tensor c) :=
   Module.Basis.finiteDimensional_of_finite (Tensor.basis c)
 
-noncomputable instance {k : Type} [RCLike k] {C G : Type} [Group G] (S : TensorSpecies k C G)
+noncomputable instance {k : Type} [RCLike k] {C G : Type} [Group G]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    (S : TensorSpecies k C G basisIdx)
     {c : Fin n → C} : TopologicalSpace (S.Tensor c) :=
   moduleTopology k (S.Tensor c)
 
-instance {k : Type} [RCLike k] {C G : Type} [Group G] (S : TensorSpecies k C G)
+instance {k : Type} [RCLike k] {C G : Type} [Group G]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    (S : TensorSpecies k C G basisIdx)
     {c : Fin n → C} : IsTopologicalAddGroup (S.Tensor c) :=
   IsModuleTopology.topologicalAddGroup (R := k) (S.Tensor c)
 
@@ -654,12 +665,12 @@ def Pure.permP {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 lemma Pure.permP_basisVector {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (σ : Fin m → Fin n) (h : PermCond c c1 σ) (b : ComponentIdx (S := S) c) :
     Pure.permP σ h (Pure.basisVector c b) =
-    Pure.basisVector c1 (fun i => Fin.cast (by simp [h.preserve_color]) (b (σ i))) := by
+    Pure.basisVector c1 (fun i => basisIdxCongr (by simp [h.preserve_color]) (b (σ i))) := by
   ext i
   simp only [permP, basisVector]
-  have h1 {c1 c2 : C} (h : c1 = c2) (x : Fin (S.repDim c1)) :
+  have h1 {c1 c2 : C} (h : c1 = c2) (x : basisIdx c1) :
       S.FD.map (eqToHom (by simp [h])) ((S.basis (c1)) x) =
-      (S.basis c2) (Fin.cast (by simp [h]) x) := by
+      (S.basis c2) (basisIdxCongr (by simp [h]) x) := by
     subst h
     simp
   apply h1
@@ -762,7 +773,8 @@ lemma permT_permT {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fi
   · intro b
     simp only [P]
     rw [basis_apply, permT_pure, permT_pure, permT_pure]
-    simp
+    simp only [Pure.permP_basisVector, basisIdxCongr_apply_apply, Function.comp_apply]
+    rfl
   · simp [P]
   · intro r t h1
     simp_all [P]
@@ -774,7 +786,7 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
     (b : ComponentIdx c1) :
     (basis c1).repr (permT σ h t) b =
     (basis c).repr t (fun i =>
-      Fin.cast (by simp [PermCond.inv_perserve_color]) (b (h.inv σ i))) := by
+      basisIdxCongr (by simp [PermCond.inv_perserve_color]) (b (h.inv σ i))) := by
   apply induction_on_basis (t := t)
   · intro b'
     rw [basis_apply]
@@ -786,18 +798,10 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
     apply Iff.intro
     · intro h'
       funext x
-      conv_rhs => rw [← h']
-      simp [Fin.ext_iff]
-      congr
-      · exact Eq.symm (PermCond.inv_apply_apply σ h x)
-      · exact Eq.symm (PermCond.inv_apply_apply σ h x)
+      simpa [← h'] using ComponentIdx.congr_right _ _ _ (PermCond.inv_apply_apply σ h x).symm
     · intro h'
       funext x
-      rw [h']
-      simp [Fin.ext_iff]
-      congr
-      · exact PermCond.apply_inv_apply σ h x
-      · exact PermCond.apply_inv_apply σ h x
+      simpa [h'] using (ComponentIdx.congr_right _ _ _ (PermCond.apply_inv_apply σ h x).symm).symm
   · simp
   · intro r t h
     simp [h]

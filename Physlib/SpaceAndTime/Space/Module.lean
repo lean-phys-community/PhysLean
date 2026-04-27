@@ -9,6 +9,7 @@ public import Physlib.SpaceAndTime.Space.Basic
 public import Mathlib.Geometry.Manifold.Diffeomorph
 public import Mathlib.Analysis.Distribution.TemperateGrowth
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Tactic.Cases
 /-!
 
 # The structure of a module on Space
@@ -416,6 +417,28 @@ lemma fderiv_basis_repr_symm {d} (v : EuclideanSpace ℝ (Fin d)) :
   change fderiv ℝ basis.repr.symm.toContinuousLinearMap v = _
   rw [ContinuousLinearMap.fderiv]
 
+lemma basis_induction_on {d} {P : Space d → Prop}
+    (hb : ∀ i, P (basis i)) (hzero : P 0)
+    (hadd : ∀ p1 p2, P p1 → P p2 → P (p1 + p2))
+    (hsmul : ∀ (c : ℝ) p, P p → P (c • p)) (p : Space d) : P p := by
+  rw [← OrthonormalBasis.sum_repr basis p]
+  have hp_sum (s : Finset (Fin d)) (f : (Fin d) → Space d)
+    (hi : ∀ i ∈ s, P (f i)) : P (∑ x ∈ s, f x) := by
+    induction' s using Finset.induction with i s hi ih
+    · simpa using hzero
+    · rw [Finset.sum_insert]
+      apply hadd
+      · apply hi
+        simp
+      · apply ih
+        intro i h'
+        apply hi
+        simp_all
+      simp_all
+  apply hp_sum
+  intro i _
+  apply hsmul
+  apply hb
 /-!
 
 ## Coordinates
@@ -514,6 +537,16 @@ lemma fderiv_val {d : ℕ} (p : Space d) :
     fderiv ℝ Space.val p = (equivPi d) := by
   change fderiv ℝ (equivPi d) p = _
   rw [ContinuousLinearEquiv.fderiv]
+
+@[simp]
+lemma fderiv_eval_apply {d : ℕ} (p y : Space d) (i : Fin d) :
+    fderiv ℝ (fun p => p.val i) p y = y i := by
+  trans fderiv ℝ (Space.coordCLM i) p y
+  · congr
+    funext i
+    simp [Space.coordCLM, Space.coord_apply]
+  simp only [ContinuousLinearMap.fderiv]
+  simp [Space.coordCLM, Space.coord_apply]
 
 @[fun_prop]
 lemma contDiffOn_vadd (s : Space d) :

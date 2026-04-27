@@ -144,30 +144,26 @@ lemma kineticTerm_eq_sum {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     rw [prodT_basis_repr_apply]
     enter [1]
     erw [coMetric_repr_apply_eq_minkowskiMatrix]
-    change η (finSumFinEquiv.symm μ') (finSumFinEquiv.symm μ)
+    change η μ' μ
   conv_lhs =>
     enter [2, 2, μ, 2, ν, 1, 2, μ', 2, ν', 1, 2]
     erw [coMetric_repr_apply_eq_minkowskiMatrix]
-    change η (finSumFinEquiv.symm ν') (finSumFinEquiv.symm ν)
+    change η (ν') (ν)
   conv_lhs =>
     enter [2, 2, μ, 2, ν, 1, 2, μ', 2, ν', 2]
     rw [toFieldStrength_tensor_basis_eq_basis]
     change ((Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x))
-      (finSumFinEquiv.symm μ', finSumFinEquiv.symm ν')
+      (μ', ν')
   conv_lhs =>
     enter [2, 2, μ, 2, ν, 2]
     rw [toFieldStrength_tensor_basis_eq_basis]
     change ((Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x))
-      (finSumFinEquiv.symm μ, finSumFinEquiv.symm ν)
-  rw [← finSumFinEquiv.sum_comp]
+      (μ, ν)
   conv_lhs =>
     enter [2, 2, μ]
-    rw [← finSumFinEquiv.sum_comp]
     enter [2, ν]
-    rw [← finSumFinEquiv.sum_comp]
     rw [Finset.sum_mul]
     enter [2, μ']
-    rw [← finSumFinEquiv.sum_comp]
     rw [Finset.sum_mul]
     enter [2, ν']
     simp
@@ -1043,45 +1039,7 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
     rw [gradKineticTerm_eq_fieldStrength A x hA]
     simp [Lorentz.Vector.apply_sum]
   ring_nf
-  congr 1
-  rw [← finSumFinEquiv.sum_comp]
-  congr
-  funext μ
-  congr
-  · apply Lorentz.CoVector.indexEquiv.symm.injective
-    simp only [Function.comp_apply, Fin.cast_eq_self, Equiv.symm_apply_apply]
-    simp [Lorentz.CoVector.indexEquiv]
-    funext j
-    fin_cases j
-    simp only [Fin.zero_eta, Matrix.cons_val_zero, Fin.cast_eq_self,
-      ComponentIdx.prod, Equiv.coe_fn_mk]
-    simp only [ComponentIdx.DropPairSection.ofFinEquiv, Equiv.coe_fn_mk,
-      ComponentIdx.DropPairSection.ofFin, Fin.cast_eq_self, Function.comp_apply, left_eq_dite_iff]
-    intro h
-    change ¬ 0 = 0 at h
-    simp at h
-  funext x
-  congr
-  · apply finSumFinEquiv.injective
-    simp only [Function.comp_apply, Fin.cast_eq_self, Equiv.apply_symm_apply]
-    simp [ComponentIdx.prod]
-    simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
-    intro _ h
-    apply False.elim
-    apply h
-    decide
-  · apply finSumFinEquiv.injective
-    simp only [Function.comp_apply, Fin.cast_eq_self, Equiv.apply_symm_apply]
-    simp [ComponentIdx.prod]
-    simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
-    split_ifs
-    · rename_i h
-      suffices ¬ (finSumFinEquiv (Sum.inr 1) = (0 : Fin (1 + 1 + 1))) from False.elim (this h)
-      decide
-    · rename_i h h2
-      suffices ¬ (finSumFinEquiv (Sum.inr 1) = (1 : Fin (1 + 1 + 1))) from False.elim (this h2)
-      decide
-    · rfl
+  rfl
 
 end ElectromagneticPotential
 
@@ -1242,14 +1200,13 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
     simp [Lorentz.Vector.apply_sum]
   ring_nf
   congr 1
-  rw [← finSumFinEquiv.sum_comp]
   congr
   funext μ
   rw [distTensorDeriv_toTensor_basis_repr]
   conv_rhs =>
     enter [1, 2, 2]
   trans (Tensor.basis _).repr (Tensorial.toTensor (distDeriv μ (A.fieldStrength) ε))
-      (fun | 0 => finSumFinEquiv μ | 1 => finSumFinEquiv ν)
+      (fun | 0 => μ | 1 => ν)
   · generalize (distDeriv μ (A.fieldStrength) ε) = t at *
     rw [Tensorial.basis_toTensor_apply]
     rw [Tensorial.basis_map_prod]
@@ -1267,36 +1224,20 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
       simp
     rw [hb]
     rw [Module.Basis.repr_reindex_apply]
-    congr 1
-    simp [ComponentIdx.prod, Vector.indexEquiv]
-    apply And.intro
-    · rw [@Equiv.eq_symm_apply]
-      rfl
-    · rw [@Equiv.eq_symm_apply]
-      rfl
+    rfl
   apply congr
   · simp
-    congr
-    apply Lorentz.CoVector.indexEquiv.symm.injective
-    simp only [Nat.reduceSucc, Fin.isValue, Equiv.symm_apply_apply]
-    simp [Lorentz.CoVector.indexEquiv]
-    funext j
-    fin_cases j
-    simp [ComponentIdx.prod]
-    simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
-    intro h
-    change ¬ 0 = 0 at h
-    simp at h
+    rfl
   funext x
   fin_cases x
-  · simp only [Function.comp_apply, Fin.cast_eq_self]
+  · simp only [Function.comp_apply]
     simp [ComponentIdx.prod]
     simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
     intro _ h
     apply False.elim
     apply h
     decide
-  · simp only [Function.comp_apply, Fin.cast_eq_self]
+  · simp only [Function.comp_apply]
     simp [ComponentIdx.prod]
     simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
     split_ifs

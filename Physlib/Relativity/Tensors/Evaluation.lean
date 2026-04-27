@@ -21,7 +21,9 @@ open MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] {S : TensorSpecies k C G}
+variable {k : Type} [CommRing k] {C G : Type} [Group G]
+  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  {S : TensorSpecies k C G basisIdx}
 
 namespace Tensor
 
@@ -35,14 +37,14 @@ variable {n : ℕ} {c : Fin (n + 1) → C}
 
 -/
 
-/-- Given a `i : Fin (n + 1)`, a `b : Fin (S.repDim (c i))` and a pure tensor
+/-- Given a `i : Fin (n + 1)`, a `b : basisIdx (c i)` and a pure tensor
   `p : Pure S c`, `evalPCoeff i b p` is the `b`th component of `p i`. -/
-noncomputable def evalPCoeff (i : Fin (n + 1)) (b : Fin (S.repDim (c i))) (p : Pure S c) : k :=
+noncomputable def evalPCoeff (i : Fin (n + 1)) (b : basisIdx (c i)) (p : Pure S c) : k :=
   (S.basis (c i)).repr (p i) b
 
 @[simp]
 lemma evalPCoeff_update_self (i : Fin (n + 1)) [inst : DecidableEq (Fin (n + 1))]
-    (b : Fin (S.repDim (c i))) (p : Pure S c)
+    (b : basisIdx (c i)) (p : Pure S c)
     (x : S.FD.obj (Discrete.mk (c i))) :
     evalPCoeff i b (p.update i x) = (S.basis (c i)).repr x b := by
   simp [evalPCoeff]
@@ -50,7 +52,7 @@ lemma evalPCoeff_update_self (i : Fin (n + 1)) [inst : DecidableEq (Fin (n + 1))
 @[simp]
 lemma evalPCoeff_update_succAbove (i : Fin (n + 1)) [inst : DecidableEq (Fin (n + 1))]
     (j : Fin n)
-    (b : Fin (S.repDim (c i))) (p : Pure S c)
+    (b : basisIdx (c i)) (p : Pure S c)
     (x : S.FD.obj (Discrete.mk (c (i.succAbove j)))) :
     evalPCoeff i b (p.update (i.succAbove j) x) = evalPCoeff i b p := by
   simp [evalPCoeff]
@@ -61,16 +63,16 @@ lemma evalPCoeff_update_succAbove (i : Fin (n + 1)) [inst : DecidableEq (Fin (n 
 
 -/
 
-/-- Given a `i : Fin (n + 1)`, a `b : Fin (S.repDim (c i))` and a pure tensor
+/-- Given a `i : Fin (n + 1)`, a `b : basisIdx (c i)` and a pure tensor
   `p : Pure S c`, `evalP i b p` is the tensor formed by evaluating the `i`th index
   of `p` at `b`. -/
-noncomputable def evalP (i : Fin (n + 1)) (b : Fin (S.repDim (c i))) (p : Pure S c) :
+noncomputable def evalP (i : Fin (n + 1)) (b : basisIdx (c i)) (p : Pure S c) :
   Tensor S (c ∘ i.succAbove) := evalPCoeff i b p • (drop p i).toTensor
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma evalP_update_add [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
-    (b : Fin (S.repDim (c i))) (p : Pure S c)
+    (b : basisIdx (c i)) (p : Pure S c)
     (x y: S.FD.obj (Discrete.mk (c j))) :
     evalP i b (p.update j (x + y)) =
     evalP i b (p.update j x) + evalP i b (p.update j y) := by
@@ -82,7 +84,7 @@ lemma evalP_update_add [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma evalP_update_smul [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
-    (b : Fin (S.repDim (c i))) (p : Pure S c)
+    (b : basisIdx (c i)) (p : Pure S c)
     (r : k)
     (x : S.FD.obj (Discrete.mk (c j))) :
     evalP i b (p.update j (r • x)) =
@@ -101,7 +103,7 @@ lemma evalP_update_smul [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
 set_option backward.isDefEq.respectTransparency false in
 /-- The multi-linear map formed by evaluation of an index of pure tensors. -/
 noncomputable def evalPMultilinear {n : ℕ} {c : Fin (n + 1)→ C}
-    (i : Fin (n + 1)) (b : Fin (S.repDim (c i))) :
+    (i : Fin (n + 1)) (b : basisIdx (c i)) :
     MultilinearMap k (fun i => S.FD.obj (Discrete.mk (c i)))
       (S.Tensor (c ∘ i.succAbove)) where
   toFun p := evalP i b p
@@ -120,13 +122,13 @@ end Pure
   `t : Tensor S c`, `evalT i b t` is the tensor formed by evaluating the `i`th index
   of `t` at `b`. -/
 noncomputable def evalT {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
-      (b : Fin (S.repDim (c i))) :
+      (b : basisIdx (c i)) :
     Tensor S c →ₗ[k] Tensor S (c ∘ i.succAbove) :=
   PiTensorProduct.lift (Pure.evalPMultilinear i b)
 
 @[simp]
 lemma evalT_pure {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
-    (b : Fin (S.repDim (c i))) (p : Pure S c) :
+    (b : basisIdx (c i)) (p : Pure S c) :
     evalT i b p.toTensor = Pure.evalP i b p := by
   simp only [evalT, Pure.toTensor]
   change _ = Pure.evalPMultilinear i b p

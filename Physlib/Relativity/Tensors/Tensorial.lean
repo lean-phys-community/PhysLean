@@ -63,7 +63,9 @@ open MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] {S : TensorSpecies k C G}
+variable {k : Type} [CommRing k] {C G : Type} [Group G]
+  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  {S : TensorSpecies k C G basisIdx}
 
 /-!
 
@@ -77,7 +79,9 @@ We first define the `Tensorial` class.
   linear equivalence with a module `S.Tensor c` for `S` a tensor species. -/
 class Tensorial
     {k : outParam Type} [CommRing k] {C G : outParam Type} [Group G]
-    {n : outParam ℕ} (S : outParam (TensorSpecies k C G)) (c :outParam (Fin n → C)) (M : Type)
+    {basisIdx : outParam (C → Type)} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {n : outParam ℕ} (S : outParam (TensorSpecies k C G basisIdx))
+    (c :outParam (Fin n → C)) (M : Type)
     [AddCommMonoid M] [Module k M] where
   /-- The equivalence between `M` and `S.Tensor c` in a tensorial instance. -/
   toTensor : M ≃ₗ[k] S.Tensor c
@@ -94,12 +98,13 @@ The module of tensors of a tensor species carries a canonical tensorial instance
 through the equivalence.
 
 -/
-noncomputable instance self {n : ℕ} (S : TensorSpecies k C G) (c : Fin n → C) :
+noncomputable instance self {n : ℕ} (S : TensorSpecies k C G basisIdx) (c : Fin n → C) :
     Tensorial S c (S.Tensor c) where
   toTensor := LinearEquiv.refl k (S.Tensor c)
 
 @[simp]
-lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G) (c : Fin n → C) (t : S.Tensor c) :
+lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G basisIdx)
+    (c : Fin n → C) (t : S.Tensor c) :
     Tensorial.toTensor t = t := by
   rw [Tensorial.toTensor]
   rfl
@@ -290,8 +295,9 @@ lemma basis_map_prod {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
 
 section Continuous
 
-variable {k : Type} [RCLike k] {C G : Type} [Group G] (S : TensorSpecies k C G)
-    {c : Fin n → C} {M : Type} [AddCommGroup M] [Module k M]
+variable {k : Type} [RCLike k] {C G : Type} [Group G]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    (S : TensorSpecies k C G basisIdx) {c : Fin n → C} {M : Type} [AddCommGroup M] [Module k M]
     [TopologicalSpace M]
 
 /-!

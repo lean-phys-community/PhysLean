@@ -373,7 +373,7 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (b : ComponentIdx (S := realLorentzTensor d)
       (Fin.append ![Color.down] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (deriv A x)) b =
-    ∂_ (finSumFinEquiv.symm (b 0)) A x (finSumFinEquiv.symm (b 1)) := by
+    ∂_ (b 0) A x (b 1) := by
   rw [Tensorial.basis_toTensor_apply]
   rw [Tensorial.basis_map_prod]
   simp only [Nat.reduceSucc, Nat.reduceAdd, Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
@@ -469,7 +469,7 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) (b : ComponentIdx (S := realLorentzTensor d)
       (Fin.append ![Color.down] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (deriv A ε)) b =
-    distDeriv (finSumFinEquiv.symm (b 0)) A ε (finSumFinEquiv.symm (b 1)) := by
+    distDeriv (b 0) A ε (b 1) := by
   rw [Tensorial.basis_toTensor_apply]
   rw [Tensorial.basis_map_prod]
   simp only [Nat.reduceSucc, Nat.reduceAdd, Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,

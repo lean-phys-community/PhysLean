@@ -81,12 +81,23 @@ instance : DecidableEq Color := fun x y =>
   | Color.down, Color.downR => isFalse fun h => Color.noConfusion h
   | Color.down, Color.up => isFalse fun h => Color.noConfusion h
 
+/-- The dimensions of each of the different types of complex Lorentz vector space. -/
+abbrev repDim (c : Color) : ℕ :=
+  match c with
+  | Color.upL => 2
+  | Color.downL => 2
+  | Color.upR => 2
+  | Color.downR => 2
+  | Color.up => 4
+  | Color.down => 4
+
 end complexLorentzTensor
 
 noncomputable section
 open complexLorentzTensor in
 /-- The tensor structure for complex Lorentz tensors. -/
-def complexLorentzTensor : TensorSpecies ℂ complexLorentzTensor.Color SL(2, ℂ) where
+def complexLorentzTensor : TensorSpecies ℂ complexLorentzTensor.Color SL(2, ℂ)
+    (fun c => Fin (repDim c)) where
   FD := Discrete.functor fun c =>
     match c with
     | Color.upL => Fermion.leftHanded
@@ -135,22 +146,6 @@ def complexLorentzTensor : TensorSpecies ℂ complexLorentzTensor.Color SL(2, �
     | Discrete.mk Color.downR => Fermion.rightAltRightUnit
     | Discrete.mk Color.up => Lorentz.coContrUnit
     | Discrete.mk Color.down => Lorentz.contrCoUnit
-  repDim := fun c =>
-    match c with
-    | Color.upL => 2
-    | Color.downL => 2
-    | Color.upR => 2
-    | Color.downR => 2
-    | Color.up => 4
-    | Color.down => 4
-  repDim_neZero := fun c =>
-    match c with
-    | Color.upL => inferInstance
-    | Color.downL => inferInstance
-    | Color.upR => inferInstance
-    | Color.downR => inferInstance
-    | Color.up => inferInstance
-    | Color.down => inferInstance
   basis := fun c =>
     match c with
     | Color.upL => Fermion.leftBasis
@@ -214,8 +209,8 @@ scoped[complexLorentzTensor] notation "ℂT(" c ")" => complexLorentzTensor.Tens
 
 /-- Contracting two basis elements gives `1` if the index for the basis elements is the same,
   and `0` otherwise. Holds for any color of index. -/
-lemma basis_contr (c : complexLorentzTensor.Color) (i : Fin (complexLorentzTensor.repDim c))
-    (j : Fin (complexLorentzTensor.repDim (complexLorentzTensor.τ c))) :
+lemma basis_contr (c : complexLorentzTensor.Color) (i : Fin (repDim c))
+    (j : Fin (repDim (complexLorentzTensor.τ c))) :
     complexLorentzTensor.castToField
     ((complexLorentzTensor.contr.app {as := c}).hom
     (complexLorentzTensor.basis c i ⊗ₜ complexLorentzTensor.basis (complexLorentzTensor.τ c) j)) =
@@ -242,7 +237,18 @@ instance {n m : ℕ} {c : Fin n → complexLorentzTensor.Color}
     Decidable (σ = σ') :=
   decidable_of_iff _ (OverColor.Hom.ext_iff σ σ')
 
-/-!
+lemma basisIdxCongr_eq_cast {c1 c2 : complexLorentzTensor.Color}
+    (h : c1 = c2) (i : Fin (repDim c1)) :
+    TensorSpecies.basisIdxCongr (basisIdx := fun c => Fin (repDim c)) h i =
+      Fin.cast (by simp [h]) i := by
+  subst h
+  rfl
+
+lemma repDim_tau {c : complexLorentzTensor.Color} :
+    repDim (complexLorentzTensor.τ c) = repDim c := by
+  cases c <;> simp [repDim] <;> rfl
+
+/-
 
 ## Relating basis
 
@@ -318,7 +324,6 @@ lemma repr_ρ_basis_vector_up (Λ : SL(2, ℂ)) (b i : Fin 4) :
           (complexLorentzTensor.basis Color.up b))) i =
       (LorentzGroup.toComplex (Lorentz.SL2C.toLorentzGroup Λ))
         (finSumFinEquiv.symm i) (finSumFinEquiv.symm b) := by
-  simp only [basis_up_eq]
   erw [Lorentz.complexContrBasis_reindex_apply_eq_fin4]
   simp_rw [basis_eq_complexContrBasisFin4, Lorentz.complexContrBasisFin4_eq_reindex]
   rw [Basis.repr_reindex_apply, Basis.reindex_apply]
@@ -331,13 +336,13 @@ lemma repr_ρ_basis_vector_up (Λ : SL(2, ℂ)) (b i : Fin 4) :
 Transport version of `repr_ρ_basis_vector_up` for a color `c₀` that is propositionally `Color.up`.
 -/
 lemma repr_ρ_basis_vector_up_of_eq (c₀ : Color) (h : c₀ = Color.up) (Λ : SL(2, ℂ))
-    (b i : Fin (complexLorentzTensor.repDim c₀)) :
+    (b i : Fin (repDim c₀)) :
     ((complexLorentzTensor.basis c₀).repr
         (((complexLorentzTensor.FD.obj { as := c₀ }).ρ Λ)
           (complexLorentzTensor.basis c₀ b))) i =
       (LorentzGroup.toComplex (Lorentz.SL2C.toLorentzGroup Λ))
-        (finSumFinEquiv.symm (Fin.cast (by rw [h]; rfl) i))
-        (finSumFinEquiv.symm (Fin.cast (by rw [h]; rfl) b)) := by
+        (finSumFinEquiv.symm (Fin.cast (by rw [h];) i))
+        (finSumFinEquiv.symm (Fin.cast (by rw [h];) b)) := by
   subst h
   simpa using repr_ρ_basis_vector_up Λ b i
 
@@ -354,7 +359,6 @@ lemma repr_ρ_basis_vector_down (Λ : SL(2, ℂ)) (b i : Fin 4) :
           (complexLorentzTensor.basis Color.down b))) i =
       (LorentzGroup.toComplex (Lorentz.SL2C.toLorentzGroup Λ))⁻¹
         (finSumFinEquiv.symm b) (finSumFinEquiv.symm i) := by
-  simp only [basis_down_eq]
   erw [Lorentz.complexCoBasis_reindex_apply_eq_fin4]
   simp_rw [basis_eq_complexCoBasisFin4, Lorentz.complexCoBasisFin4_eq_reindex]
   rw [Basis.repr_reindex_apply, Basis.reindex_apply]
@@ -369,13 +373,13 @@ Transport version of `repr_ρ_basis_vector_down` for a color `c₀` that is prop
 `Color.down`.
 -/
 lemma repr_ρ_basis_vector_down_of_eq (c₀ : Color) (h : c₀ = Color.down) (Λ : SL(2, ℂ))
-    (b i : Fin (complexLorentzTensor.repDim c₀)) :
+    (b i : Fin (repDim c₀)) :
     ((complexLorentzTensor.basis c₀).repr
         (((complexLorentzTensor.FD.obj { as := c₀ }).ρ Λ)
           (complexLorentzTensor.basis c₀ b))) i =
       (LorentzGroup.toComplex (Lorentz.SL2C.toLorentzGroup Λ))⁻¹
-        (finSumFinEquiv.symm (Fin.cast (by rw [h]; rfl) b))
-        (finSumFinEquiv.symm (Fin.cast (by rw [h]; rfl) i)) := by
+        (finSumFinEquiv.symm (Fin.cast (by rw [h];) b))
+        (finSumFinEquiv.symm (Fin.cast (by rw [h];) i)) := by
   subst h
   simpa using repr_ρ_basis_vector_down Λ b i
 

@@ -326,7 +326,6 @@ public import Physlib.Relativity.Tensors.OfInt
 public import Physlib.Relativity.Tensors.Product
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
-public import Physlib.Relativity.Tensors.RealTensor.Derivative
 public import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre

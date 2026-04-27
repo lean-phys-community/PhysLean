@@ -22,7 +22,9 @@ open MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G] {S : TensorSpecies k C G}
+variable {k : Type} [CommRing k] {C G : Type} [Group G]
+  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+  {S : TensorSpecies k C G basisIdx}
 
 namespace Tensor
 
@@ -559,7 +561,7 @@ lemma fromPairT_basis_repr {c c1 : C}
 
 set_option backward.isDefEq.respectTransparency false in
 lemma fromPairT_apply_basis_repr {c c1 : C}
-    (b0 : Fin (S.repDim c)) (b1 : Fin (S.repDim c1)) :
+    (b0 : basisIdx c) (b1 : basisIdx c1) :
     fromPairT (S.basis c b0 ⊗ₜ[k] S.basis c1 b1) =
     Tensor.basis ![c, c1] (fun | 0 => b0 | 1 => b1) := by
   apply (Tensor.basis _).repr.injective
@@ -769,8 +771,8 @@ lemma fromTripleT_basis_repr {c c1 c2 : C}
 
 set_option backward.isDefEq.respectTransparency false in
 lemma fromTripleT_apply_basis {c c1 c2 : C}
-    (b0 : Fin (S.repDim c)) (b1 : Fin (S.repDim c1))
-    (b2 : Fin (S.repDim c2)) :
+    (b0 : basisIdx c) (b1 : basisIdx c1)
+    (b2 : basisIdx c2) :
     fromTripleT (S.basis c b0 ⊗ₜ[k] (S.basis c1 b1 ⊗ₜ[k] S.basis c2 b2)) =
     Tensor.basis ![c, c1, c2] (fun | 0 => b0 | 1 => b1 | 2 => b2) := by
   apply (Tensor.basis _).repr.injective
