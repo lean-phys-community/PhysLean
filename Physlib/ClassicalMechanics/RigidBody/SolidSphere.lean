@@ -21,6 +21,7 @@ center of mass and inertia tensor.
 
 open Manifold
 open MeasureTheory
+
 namespace RigidBody
 open NNReal
 

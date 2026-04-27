@@ -31,6 +31,7 @@ open SchwartzMap
 open HilbertSpace
 open NNReal
 open Field
+
 namespace OneDimension
 
 /-- A reflectionless potential is specified by three

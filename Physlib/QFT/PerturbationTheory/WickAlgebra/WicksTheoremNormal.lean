@@ -20,6 +20,7 @@ public import Physlib.QFT.PerturbationTheory.WickContraction.TimeCond
 namespace FieldSpecification
 variable {𝓕 : FieldSpecification}
 open FieldOpFreeAlgebra
+
 namespace WickAlgebra
 open WickContraction
 open EqTimeOnly

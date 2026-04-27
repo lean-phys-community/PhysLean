@@ -20,6 +20,7 @@ open FieldOpFreeAlgebra
 open Physlib.List
 open FieldStatistic
 open WickContraction
+
 namespace WickAlgebra
 variable {𝓕 : FieldSpecification}
 

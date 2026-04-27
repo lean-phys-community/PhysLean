@@ -17,6 +17,7 @@ public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Contraction
 noncomputable section
 
 open Module Matrix MatrixGroups Complex TensorProduct CategoryTheory.MonoidalCategory
+
 namespace Lorentz
 
 /-- The contra-co unit for complex lorentz vectors. Usually denoted `δⁱᵢ`. -/

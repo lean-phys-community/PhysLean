@@ -62,6 +62,7 @@ open ClassicalMechanics
 variable (OM : OpticalMedium)
 open Matrix
 open Real
+
 namespace ElectromagneticPotential
 open InnerProductSpace
 

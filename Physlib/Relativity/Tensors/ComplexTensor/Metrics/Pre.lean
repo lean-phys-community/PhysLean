@@ -20,6 +20,7 @@ open MatrixGroups
 open Complex
 open TensorProduct
 open CategoryTheory.MonoidalCategory
+
 namespace Lorentz
 
 /-- The metric `ηᵃᵃ` as an element of `(complexContr ⊗ complexContr).V`. -/

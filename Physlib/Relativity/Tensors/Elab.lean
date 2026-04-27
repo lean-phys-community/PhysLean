@@ -55,6 +55,7 @@ public import Physlib.Relativity.Tensors.Tensorial
 
 @[expose] public meta section
 open Lean Meta Elab Tactic Term
+
 namespace TensorSpecies
 namespace Tensor
 

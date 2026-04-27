@@ -47,6 +47,7 @@ namespace Electromagnetism
 open Physlib
 open Distribution SchwartzMap
 open Space MeasureTheory
+
 namespace DistElectromagneticPotential
 
 /-!

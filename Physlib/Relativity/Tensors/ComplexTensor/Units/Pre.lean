@@ -21,6 +21,7 @@ open MatrixGroups
 open Complex
 open TensorProduct
 open CategoryTheory.MonoidalCategory
+
 namespace Lorentz
 
 /-- The contra-co unit for complex lorentz vectors. Usually denoted `δⁱᵢ`. -/

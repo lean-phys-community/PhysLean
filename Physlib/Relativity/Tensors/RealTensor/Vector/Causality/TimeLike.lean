@@ -19,6 +19,7 @@ noncomputable section
 namespace Lorentz
 open realLorentzTensor
 open InnerProductSpace
+
 namespace Vector
 
 /-- For timelike vectors with negative time components,

@@ -20,6 +20,7 @@ This file may eventually be upstreamed to Mathlib.
 @[expose] public section
 
 open Polynomial
+
 namespace Physlib
 
 /-- The Physicists Hermite polynomial are defined as polynomials over `ℤ` in `X` recursively

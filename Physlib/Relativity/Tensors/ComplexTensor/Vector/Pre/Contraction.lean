@@ -21,6 +21,7 @@ open MatrixGroups
 open Complex
 open TensorProduct
 open CategoryTheory.MonoidalCategory
+
 namespace Lorentz
 
 set_option backward.isDefEq.respectTransparency false in

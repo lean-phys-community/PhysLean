@@ -16,6 +16,7 @@ public import Physlib.Relativity.Tensors.RealTensor.Units.Pre
 noncomputable section
 
 open Module Matrix MatrixGroups Complex TensorProduct CategoryTheory.MonoidalCategory
+
 namespace Lorentz
 
 /-- The metric `ηᵃᵃ` as an element of `(Contr d ⊗ Contr d).V`. -/

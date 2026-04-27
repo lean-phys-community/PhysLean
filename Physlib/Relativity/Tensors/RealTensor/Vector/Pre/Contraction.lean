@@ -22,6 +22,7 @@ open Complex
 open TensorProduct
 open CategoryTheory.MonoidalCategory
 open minkowskiMatrix
+
 namespace Lorentz
 
 variable {d : ℕ}

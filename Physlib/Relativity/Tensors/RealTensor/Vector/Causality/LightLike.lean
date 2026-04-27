@@ -19,6 +19,7 @@ noncomputable section
 namespace Lorentz
 open realLorentzTensor
 open InnerProductSpace
+
 namespace Vector
 
 lemma lightLike_iff_norm_sq_zero {d : ℕ} (p : Vector d) :
