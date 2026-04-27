@@ -37,15 +37,15 @@ meta initialize todoExtension : SimplePersistentEnvExtension todoInfo (Array tod
   }
 
 /-- Syntax for the `TODO ...` command. -/
-syntax (name := todo_comment) "TODO " str str : command
+syntax (name := todo_comment) "TODO " str : command
 
 /-- Elaborator for the `TODO ...` command -/
 @[command_elab todo_comment]
 meta def elabTODO : Elab.Command.CommandElab := fun stx =>
   match stx with
-  | `(TODO $t $s) => do
+  | `(TODO $s) => do
     let str : String := s.getString
-    let tag : String := t.getString
+    let tag : String := toString (String.hash str)
     let pos := stx.getPos?
     match pos with
     | some pos => do
@@ -56,6 +56,8 @@ meta def elabTODO : Elab.Command.CommandElab := fun stx =>
       let modName := env.mainModule
       let todoInfo : todoInfo := { content := str, fileName := modName, line := line, tag := tag }
       modifyEnv fun env => todoExtension.addEntry env todoInfo
+      Elab.Command.liftTermElabM <| Lean.Elab.Term.addTermInfo' s
+        (Lean.mkStrLit s!"TODO tag: {tag}") (expectedType? := none)
     | none => throwError "Invalid syntax for `TODO` command"
   | _ => throwError "Invalid syntax for `TODO` command"
 
