@@ -15,6 +15,7 @@ In this module we define the Planck's constant `ℏ` as a positive real number.
 -/
 
 @[expose] public section
+
 open NNReal
 
 namespace Constants

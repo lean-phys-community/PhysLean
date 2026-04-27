@@ -23,7 +23,9 @@ Physical examples of such systems include:
 -/
 
 @[expose] public section
+
 open Constants Module
+
 namespace QuantumMechanics
 
 /-- A `FiniteTarget` structure that is basis independent, i.e. use a linear map for

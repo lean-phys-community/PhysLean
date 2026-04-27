@@ -23,6 +23,7 @@ The choice of units can be made on a case-by-case basis, as long as they are don
 -/
 
 @[expose] public section
+
 open NNReal
 
 /-- The type `Temperature` represents the temperature in a given (but arbitrary) set of units

@@ -16,6 +16,7 @@ We define specific instances of areas, such as square meters, square feet, etc.
 -/
 
 @[expose] public section
+
 open Dimension
 open NNReal
 

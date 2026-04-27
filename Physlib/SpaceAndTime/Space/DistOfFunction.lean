@@ -37,6 +37,7 @@ to reference the underlying Schwartz maps.
 -/
 
 @[expose] public section
+
 open SchwartzMap NNReal
 noncomputable section
 

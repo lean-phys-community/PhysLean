@@ -13,6 +13,7 @@ public import Physlib.Relativity.PauliMatrices.ToTensor
 -/
 
 @[expose] public section
+
 open IndexNotation
 open CategoryTheory
 open MonoidalCategory

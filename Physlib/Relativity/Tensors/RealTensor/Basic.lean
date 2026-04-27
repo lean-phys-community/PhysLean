@@ -17,6 +17,7 @@ which are used to define `realLorentzTensor`.
 -/
 
 @[expose] public section
+
 open Matrix
 open MatrixGroups
 open Complex

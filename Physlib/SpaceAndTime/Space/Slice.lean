@@ -37,6 +37,7 @@ extracts the `i`th coordinate on `Space d.succ`.
 -/
 
 @[expose] public section
+
 open NNReal
 noncomputable section
 

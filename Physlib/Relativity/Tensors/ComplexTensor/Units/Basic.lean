@@ -13,6 +13,7 @@ public import Physlib.Relativity.Tensors.ComplexTensor.OfRat
 -/
 
 @[expose] public section
+
 open IndexNotation
 open CategoryTheory
 open MonoidalCategory

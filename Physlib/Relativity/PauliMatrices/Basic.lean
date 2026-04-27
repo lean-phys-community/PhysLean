@@ -29,6 +29,7 @@ and the following abbreviations:
 -/
 
 @[expose] public section
+
 open Matrix
 open Complex
 open TensorProduct

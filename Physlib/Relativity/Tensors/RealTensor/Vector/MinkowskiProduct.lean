@@ -17,6 +17,7 @@ In this module we define and create an API around the Minkowski product on Loren
 -/
 
 @[expose] public section
+
 open Module IndexNotation
 open Matrix
 open MatrixGroups

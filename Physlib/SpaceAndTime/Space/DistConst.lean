@@ -31,7 +31,9 @@ We show that the derivatives of this constant distribution are zero.
 -/
 
 @[expose] public section
+
 open Physlib
+
 namespace Space
 open Distribution
 

@@ -15,6 +15,7 @@ in `d`-dimensional space, in an arbitrary (but given) set of units.
 -/
 
 @[expose] public section
+
 open Dimension
 
 /-- Momentum in `d`-dimensional space in an arbitrary, but given, set of units.

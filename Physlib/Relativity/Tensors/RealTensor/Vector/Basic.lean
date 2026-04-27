@@ -18,6 +18,7 @@ We create an API around Lorentz vectors to make working with them as easy as pos
 -/
 
 @[expose] public section
+
 open Module IndexNotation
 open CategoryTheory
 open MonoidalCategory

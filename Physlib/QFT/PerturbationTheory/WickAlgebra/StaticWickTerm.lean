@@ -16,6 +16,7 @@ public import Physlib.QFT.PerturbationTheory.WickContraction.StaticContract
 -/
 
 @[expose] public section
+
 open FieldSpecification
 variable {𝓕 : FieldSpecification}
 

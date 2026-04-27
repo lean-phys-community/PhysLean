@@ -16,6 +16,7 @@ The definition the PMNS matrix, which describes neutrino oscillations as part of
 -/
 
 @[expose] public section
+
 open Matrix Complex
 
 noncomputable section

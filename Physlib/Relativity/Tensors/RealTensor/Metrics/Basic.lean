@@ -14,6 +14,7 @@ public import Physlib.Relativity.Tensors.MetricTensor
 -/
 
 @[expose] public section
+
 open Module IndexNotation
 open CategoryTheory
 open MonoidalCategory

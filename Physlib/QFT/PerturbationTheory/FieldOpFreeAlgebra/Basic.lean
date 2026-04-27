@@ -33,7 +33,9 @@ super commutation relations between creation and annihilation operators.
 -/
 
 @[expose] public section
+
 open Module
+
 namespace FieldSpecification
 variable {𝓕 : FieldSpecification}
 

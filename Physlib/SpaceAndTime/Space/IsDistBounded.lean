@@ -65,6 +65,7 @@ of the space.
 -/
 
 @[expose] public section
+
 open SchwartzMap NNReal
 noncomputable section
 

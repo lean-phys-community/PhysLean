@@ -15,9 +15,11 @@ public import Physlib.Relativity.Tensors.RealTensor.Basic
 -/
 
 @[expose] public section
+
 open Matrix
 open TensorProduct
 open TensorSpecies
+
 namespace realLorentzTensor
 open Tensor
 

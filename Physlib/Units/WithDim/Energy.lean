@@ -16,6 +16,7 @@ We define specific instances of energy.
 -/
 
 @[expose] public section
+
 open Dimension
 open NNReal
 

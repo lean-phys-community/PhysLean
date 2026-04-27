@@ -16,6 +16,7 @@ We define specific instances of speed, such as miles per hour, kilometers per ho
 -/
 
 @[expose] public section
+
 open Dimension
 open NNReal
 

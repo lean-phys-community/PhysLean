@@ -39,6 +39,7 @@ This file is equivalent to `invPowMeasure`, which will slowly be deprecated.
 -/
 
 @[expose] public section
+
 open NNReal Real
 noncomputable section
 

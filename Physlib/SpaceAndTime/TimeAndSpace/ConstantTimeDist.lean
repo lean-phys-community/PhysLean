@@ -57,6 +57,7 @@ to get a Schwartz Map on `Space d`.
 -/
 
 @[expose] public section
+
 open SchwartzMap NNReal
 noncomputable section
 

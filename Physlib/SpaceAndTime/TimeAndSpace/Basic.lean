@@ -53,7 +53,9 @@ We put these results in the namespace `Space` by convention.
 -/
 
 @[expose] public section
+
 open Physlib
+
 namespace Space
 
 /-!
