@@ -73,8 +73,21 @@ variable {n : ℕ} (hn : Module.finrank 𝕜 E = n)
 /-- There is an equivalence between the eigenvalues of a finite dimensional symmetric operator,
 and the eigenvalues of that operator conjugated by a unitary. -/
 def conj_unitary_eigenvalue_equiv (U : unitary (E →ₗ[𝕜] E)) (hT : T.IsSymmetric) :
-    { σ : Equiv.Perm (Fin n) // (hT.conj_unitary_IsSymmetric U).eigenvalues hn = hT.eigenvalues hn ∘ σ } := by
-  sorry --use conj_unitary_eigenspace_equiv
+    { σ : Equiv.Perm (Fin n) //
+      (hT.conj_unitary_IsSymmetric U).eigenvalues hn = hT.eigenvalues hn ∘ σ } := by
+  set hS := hT.conj_unitary_IsSymmetric U
+  suffices heq : hS.eigenvalues hn = hT.eigenvalues hn from ⟨1, by simp [heq]⟩
+  apply List.ofFn_injective
+  apply List.Perm.eq_of_sortedGE
+    (hS.eigenvalues_antitone hn).sortedGE_ofFn (hT.eigenvalues_antitone hn).sortedGE_ofFn
+  rw [← Multiset.coe_eq_coe, ← Fin.univ_val_map, ← Fin.univ_val_map]
+  refine Multiset.ext.mpr fun a ↦ ?_
+  have h (R : E →ₗ[𝕜] E) (hR : R.IsSymmetric) :
+      (Finset.univ.val.map (hR.eigenvalues hn)).count a
+        = Module.finrank 𝕜 (eigenspace R (a : 𝕜)) := by
+    rw [Multiset.count_map, ← hR.card_filter_eigenvalues_eq hn ↑a, Finset.card_def]
+    congr 1; ext; simp [eq_comm]
+  rw [h _ hS, h _ hT, (conj_unitary_eigenspace_equiv T U ↑a).finrank_eq]
 
 end IsSymmetric
 end LinearMap

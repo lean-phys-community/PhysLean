@@ -141,18 +141,10 @@ theorem id_achievesRate_log_dim : (id (dIn := d₁)).AchievesRate (Real.logb 2 (
   intro ε hε
   use 1, zero_lt_one, Fintype.card d₁, id
   constructor
-  · --they are equivalent up to permutation
-    -- TODO: Instead this proof should be `@[simp] piProd (fun x => id) = id` and `emulates_self`
-    refine' ⟨ _, _, _ ⟩;
-    exact CPTPMap.ofEquiv ( Fintype.equivFinOfCardEq ( by simp +decide ) ).symm;
-    exact CPTPMap.ofEquiv ( Fintype.equivFinOfCardEq ( by simp +decide ) );
-    apply CPTPMap.ext;
-    ext; simp +decide [ CPTPMap.piProd ];
-    unfold MatrixMap.piProd
-    simp_all only [gt_iff_lt, PiTensorProduct.map_id, LinearMap.toMatrix_id_eq_basis_toMatrix,
-      Module.Basis.toMatrix_self, Matrix.reindex_apply, Matrix.submatrix_one_equiv, Matrix.toLin_one]
-    erw [ MatrixMap.submatrix_apply ]
-    simp_all only [Equiv.symm_symm, Equiv.apply_symm_apply, Matrix.submatrix_apply]
+  · --piProd of id's is id, then use emulates_self up to equivalence
+    rw [show (fun (_ : Fin 1) ↦ id (dIn := d₁)) = (fun _ ↦ id) from rfl, piProd_id]
+    exact let σ := Fintype.equivFinOfCardEq (by simp +decide : Fintype.card (Fin 1 → d₁) = Fintype.card d₁)
+      ⟨ofEquiv σ.symm, ofEquiv σ, by ext1; simp⟩
   constructor
   · norm_num
   · exact εApproximates_monotone (εApproximates_self id) hε.le
@@ -177,13 +169,10 @@ theorem not_achievesRate_gt_log_dim_out (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR :
     intro ε hε_pos
     obtain ⟨n, hn, dimB, B, hB_emulate, hB_rate, hB_approx⟩ := h ε hε_pos
     have h_id_emulate : (CPTPMap.piProd (fun (_ : Fin n) => CPTPMap.id (dIn := d₂))).Emulates B := by
-      -- Since `id_{d₂}` emulates `Λ`, we can use the fact that the tensor product of emulations is an emulation.
-      have h_tensor_emulate : ∀ (n : ℕ), (CPTPMap.piProd (fun (_ : Fin n) => CPTPMap.id (dIn := d₂))).Emulates (CPTPMap.piProd (fun (_ : Fin n) => Λ)) := by
-        intro n
-        obtain ⟨E, D, hD⟩ := h_emulate
-        use CPTPMap.piProd (fun (_ : Fin n) => E), CPTPMap.piProd (fun (_ : Fin n) => D);
-        simp [ ← hD, ← CPTPMap.piProd_comp];
-      exact emulates_trans _ _ _ ( h_tensor_emulate n ) hB_emulate;
+      rw [piProd_id]
+      obtain ⟨E, D, hD⟩ := h_emulate
+      exact emulates_trans _ _ _ ⟨piProd fun _ => E, piProd fun _ => D,
+        by simp [← hD, ← CPTPMap.piProd_comp]⟩ hB_emulate
     exact ⟨ n, hn, dimB, B, h_id_emulate, hB_rate, hB_approx ⟩;
   refine not_le_of_gt hR <| not_lt.mp fun h => ?_
   exact not_lt_of_ge ( le_of_not_gt fun h' => not_achievesRate_gt_log_dim_in _ h' h_id_achieves ) h

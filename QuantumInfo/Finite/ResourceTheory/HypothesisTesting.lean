@@ -522,11 +522,10 @@ theorem rate_pos_of_smul_pos {ε : Prob} {d : Type*} [Fintype d] [DecidableEq d]
     (hσ₂ : 0 < β_ ε(ρ‖{σ₂})) {c : ℝ} (hc : 0 < c) (hσ : c • σ₂ ≤ σ₁.M) : 0 < β_ ε(ρ‖{σ₁}) := by
   simp only [of_singleton, lt_iInf_iff] at hσ₂ ⊢
   rcases hσ₂ with ⟨⟨b, _, hb_le⟩, hb_pos, hb⟩
-  change 0 < b at hb_pos --TODO simp thm / lemma
+  simp only [← Subtype.coe_lt_coe, Prob.coe_zero] at hb_pos
   use ⟨(min c 1) * b, by positivity, by bound⟩
   constructor
-  · change 0 < (min c 1) * b --TODO simp thm / lemma
-    positivity
+  · simp only [← Subtype.coe_lt_coe, Prob.coe_zero]; positivity
   intro i
   specialize hb i
   rw [Subtype.mk_le_mk, MState.exp_val] at hb ⊢
