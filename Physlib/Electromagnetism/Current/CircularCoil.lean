@@ -29,8 +29,8 @@ electromagnetic potentials and fields around a circular coil.
 
 @[expose] public section
 
-TODO "Copying the structure of the electrostatics of an infinite wire,
-  complete the definitions and proofs for a circular coil carrying a steady current."
+TODO "Prove that the magnetic field around a circular current loop is as given
+  in the reference https://ntrs.nasa.gov/api/citations/20140002333/downloads/20140002333.pdf."
 
 namespace Electromagnetism
 namespace DistElectromagneticPotential

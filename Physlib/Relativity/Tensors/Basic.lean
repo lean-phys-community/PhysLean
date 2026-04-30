@@ -15,6 +15,13 @@ public import Physlib.Meta.TODO.Basic
 
 -/
 
+TODO "In this file (Physlib/Relativity/Tensors/Basic.lean), write an overview of the
+  implementation of tensors in Physlib. It should cover the main points:
+- the definition of a tensor species,
+- the meaning of color,
+- the tensorial instances,
+- other key definitions."
+
 @[expose] public section
 
 open Module IndexNotation CategoryTheory MonoidalCategory

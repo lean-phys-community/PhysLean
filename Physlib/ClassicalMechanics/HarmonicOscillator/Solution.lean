@@ -209,7 +209,7 @@ The correctness proofs showing that the conversion produces the expected traject
 are given later in section D.1, after the trajectory machinery has been defined.
 -/
 
-TODO "Implement other initial conditions (deferred to future PRs). For example:
+TODO "Implement other initial conditions for the classical harmonic oscillator. For example:
 - Two positions at different times.
 - Two velocities at different times.
 And convert them into the type `InitialConditions` above."

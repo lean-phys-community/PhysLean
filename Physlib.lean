@@ -94,6 +94,7 @@ public import Physlib.Meta.Remark.Basic
 public import Physlib.Meta.Remark.Properties
 public import Physlib.Meta.Sorry
 public import Physlib.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Global
 public import Physlib.Meta.TransverseTactics
 public import Physlib.Optics.Basic
 public import Physlib.Optics.Polarization.Basic

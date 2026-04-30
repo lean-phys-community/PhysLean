@@ -18,7 +18,8 @@ quadratic and cubic equations.
 -/
 
 @[expose] public section
-TODO "Replace the definitions in this file with Mathlib definitions."
+TODO "Replace the definitions of bi-linear maps in `./Mathematics/LinaerMaps`
+ with definitions from Mathlib."
 
 /-- The structure defining a homogeneous quadratic equation. -/
 @[simp]
