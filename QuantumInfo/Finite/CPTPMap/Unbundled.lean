@@ -121,6 +121,41 @@ theorem kron {M₁ : MatrixMap A B R} {M₂ : MatrixMap C D R} (h₁ : M₁.IsTr
       · exact Matrix.trace_single_eq_of_ne _ _ _ h
   simp [h_simp]
 
+section piProd
+
+variable {ι : Type u} [DecidableEq ι] [Fintype ι]
+variable {dI : ι → Type v} [∀ i, Fintype (dI i)] [∀ i, DecidableEq (dI i)]
+variable {dO : ι → Type w} [∀ i, Fintype (dO i)] [∀ i, DecidableEq (dO i)]
+variable {R : Type*} [CommSemiring R]
+
+/-- The `MatrixMap.piProd` product of IsTracePreserving maps is also trace preserving. -/
+theorem piProd {Λi : ∀ i, MatrixMap (dI i) (dO i) R} (h₁ : ∀ i, (Λi i).IsTracePreserving) :
+    (MatrixMap.piProd Λi).IsTracePreserving := by
+  rw [IsTracePreserving_iff_trace_choi, MatrixMap.choi_matrix_piProd]
+  ext f g
+  simp [Matrix.traceLeft, Matrix.piProd, Matrix.reindex_apply]
+  have htrace : ∀ i, (Λi i).choi_matrix.traceLeft = 1 := fun i =>
+    (IsTracePreserving_iff_trace_choi (Λi i)).1 (h₁ i)
+  have hprod : ∀ a b : ∀ i, dI i,
+      (∑ x : ∀ i, dO i, ∏ i, (Λi i).choi_matrix (x i, a i) (x i, b i)) =
+        ∏ i, ∑ x, (Λi i).choi_matrix (x, a i) (x, b i) := fun a b => by
+    simpa using
+      (Fintype.prod_sum (f := fun i x => (Λi i).choi_matrix (x, a i) (x, b i))).symm
+  by_cases hfg : f = g
+  · subst hfg
+    rw [hprod]
+    have hdiag : ∀ i, ∑ x, (Λi i).choi_matrix (x, f i) (x, f i) = 1 := fun i => by
+      simpa [Matrix.traceLeft] using congrFun₂ (htrace i) (f i) (f i)
+    simp [hdiag]
+  · obtain ⟨i, hi⟩ := Function.ne_iff.mp hfg
+    have hfactor : ∑ x, (Λi i).choi_matrix (x, f i) (x, g i) = 0 := by
+      simpa [Matrix.traceLeft, Matrix.one_apply, hi]
+        using congrFun₂ (htrace i) (f i) (g i)
+    rw [hprod, Finset.prod_eq_zero (Finset.mem_univ i) hfactor]
+    simp [hfg]
+
+end piProd
+
 variable {S : Type*} [CommSemiring S] [Star S] [DecidableEq A] in
 set_option backward.isDefEq.respectTransparency false in
 /-- The channel X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ formed by Kraus operators M, N : κ → Matrix B A R
@@ -784,7 +819,10 @@ variable {dO : ι → Type w} [∀i, Fintype (dO i)] [∀i, DecidableEq (dO i)]
 /-- The `MatrixMap.piProd` product of IsCompletelyPositive maps is also completely positive. -/
 theorem piProd {Λi : ∀ i, MatrixMap (dI i) (dO i) R} (h₁ : ∀ i, (Λi i).IsCompletelyPositive) :
     IsCompletelyPositive (MatrixMap.piProd Λi) := by
-  sorry
+  rw [choi_PSD_iff_CP_map, MatrixMap.choi_matrix_piProd]
+  convert Matrix.PosSemidef.submatrix
+    (Matrix.PosSemidef.piProd (fun i => (choi_PSD_iff_CP_map (Λi i)).1 (h₁ i)))
+    (Equiv.arrowProdEquivProdArrow ι dO dI).symm using 1
 
 end piProd
 

@@ -365,18 +365,35 @@ variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
 variable {dI : ι → Type v} [∀(i :ι), Fintype (dI i)] [∀(i :ι), DecidableEq (dI i)]
 variable {dO : ι → Type w} [∀(i :ι), Fintype (dO i)] [∀(i :ι), DecidableEq (dO i)]
 
+set_option maxRecDepth 1000 in
 /-- Finitely-indexed tensor products of CPTPMaps.  -/
 def piProd (Λi : (i:ι) → CPTPMap (dI i) (dO i)) : CPTPMap ((i:ι) → dI i) ((i:ι) → dO i) where
   toLinearMap := MatrixMap.piProd (fun i ↦ (Λi i).map)
   cp := MatrixMap.IsCompletelyPositive.piProd (fun i ↦ (Λi i).cp)
-  TP := sorry
+  TP := MatrixMap.IsTracePreserving.piProd (fun i ↦ (Λi i).TP)
 
 theorem fin_1_piProd
   {dI : Fin 1 → Type v} [Fintype (dI 0)] [DecidableEq (dI 0)]
   {dO : Fin 1 → Type w} [Fintype (dO 0)] [DecidableEq (dO 0)]
   (Λi : (i : Fin 1) → CPTPMap (dI 0) (dO 0)) :
-    piProd Λi = sorry ∘ₘ ((Λi 1) ∘ₘ sorry) :=
-  sorry --TODO: permutations
+    piProd Λi =
+      ofEquiv (Equiv.funUnique (Fin 1) (dO 0)).symm ∘ₘ
+        ((Λi 1) ∘ₘ ofEquiv (Equiv.funUnique (Fin 1) (dI 0))) := by
+  apply CPTPMap.ext
+  change MatrixMap.piProd (fun i ↦ (Λi i).map) =
+    MatrixMap.submatrix ℂ (Equiv.funUnique (Fin 1) (dO 0)) ∘ₗ
+      ((Λi 1).map ∘ₗ MatrixMap.submatrix ℂ (Equiv.funUnique (Fin 1) (dI 0)).symm)
+  apply MatrixMap.choi_equiv.injective
+  conv_lhs => rw [MatrixMap.choi_equiv_apply, MatrixMap.choi_matrix_piProd]
+  rw [MatrixMap.choi_equiv_apply]
+  ext ⟨i, a⟩ ⟨j, b⟩
+  simp only [Matrix.reindex_apply, Matrix.piProd, Matrix.of_apply,
+    Fintype.prod_subsingleton _ (0 : Fin 1),
+    MatrixMap.choi_matrix, LinearMap.comp_apply,
+    MatrixMap.submatrix_apply, Matrix.submatrix_apply, Matrix.single]
+  convert rfl
+  ext
+  simp [funext_iff]
 
 /--
 The tensor product of composed maps is the composition of the tensor products.
