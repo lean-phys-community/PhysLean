@@ -59,7 +59,9 @@ open TensorSpecies
 open Tensor
 open SpaceTime
 open TensorProduct
-open minkowskiMatrix
+open minkowskiMatrix Tensorial
+open Lorentz
+
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
@@ -110,6 +112,67 @@ lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime
   · rfl
   · rw [permT_permT]
     rfl
+
+lemma toFieldStrength_eq_sub_tensorDeriv {d} {A : ElectromagneticPotential d}
+    (hA : Differentiable ℝ A) (x : SpaceTime d) :
+    toFieldStrength A x =
+    Tensorial.toTensor.symm (permT id PermCond.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
+    - Tensorial.toTensor.symm (permT ![1, 0] PermCond.auto
+    {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := by
+  simp only [toFieldStrength_eq_tensorDeriv hA, map_add, map_neg, sub_eq_add_neg, permT_permT]
+  rfl
+
+lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
+    A.toFieldStrength = fun x => ∑ μ, ∑ ν, toField {A.toFieldStrength x| [μ] [ν]}ᵀ •
+      Lorentz.Vector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν := by
+  ext x
+  /- This is a fairly general proof, so we can generalize our tensor. -/
+  generalize (A.toFieldStrength x) = t
+  apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
+  ext ⟨μ, ν⟩
+  simp only [map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul, Finset.sum_apply,
+    Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, Finsupp.single_apply,
+    smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel, Finset.sum_ite_eq',
+    Finset.mem_univ, ↓reduceIte, Finset.sum_const_zero]
+  obtain ⟨t, rfl⟩ := toTensor.symm.surjective t
+  induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
+  · simp only [LinearEquiv.apply_symm_apply, basis_apply, evalT_pure, Pure.evalP, map_smul,
+      toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
+    change _ = _ * ((realLorentzTensor d).basis (Color.up)).repr
+      ((realLorentzTensor d).basis (Color.up) (b 1)) ν
+    /- Transforming the basis -/
+    let e := ComponentIdx.prod.trans ((Vector.indexEquiv (d := d)).prodCongr Vector.indexEquiv)
+    simp only [prod_basis_of_map_reindex Vector.basis_eq_map_tensor_basis
+        Vector.basis_eq_map_tensor_basis, Basis.repr_reindex, Basis.map_repr,
+      LinearEquiv.symm_symm, LinearEquiv.trans_apply, LinearEquiv.apply_symm_apply,
+      Finsupp.mapDomain_equiv_apply, basis_repr_pure, Pure.component_basisVector, Fin.isValue,
+      Pure.basisVector, Basis.repr_self, Finsupp.single_apply, mul_ite, mul_one, mul_zero]
+    grind [show e b = (b 0,  b 1) from rfl]
+  · simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
+  · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
+  · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
+
+lemma toFieldStrength_eq_sum_basis {d} {A : ElectromagneticPotential d}
+    (hA : Differentiable ℝ A) (x : SpaceTime d) :
+    A.toFieldStrength x =  ∑ μ, ∑ ν, (∑ κ, (η μ κ *  ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)) •
+      Lorentz.Vector.basis μ ⊗ₜ Lorentz.Vector.basis ν := by
+  apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
+  ext ⟨μ, ν⟩
+  simp only [map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul,
+    Finset.sum_apply, Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self,
+    Finsupp.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel,
+    Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Finset.sum_const_zero]
+  simp only [prod_basis_of_map_reindex Vector.basis_eq_map_tensor_basis
+        Vector.basis_eq_map_tensor_basis,
+    toFieldStrength_eq_sub_tensorDeriv hA, self_toTensor_apply, ← deriv_eq_tensorDeriv _ hA,
+    map_sub, Basis.repr_reindex, Basis.map_repr, LinearEquiv.symm_symm, LinearEquiv.trans_apply,
+    LinearEquiv.apply_symm_apply, Finsupp.coe_sub, Pi.sub_apply, Finsupp.mapDomain_equiv_apply,
+    permT_basis_repr_symm_apply, Function.comp_apply, contrT_basis_repr_apply_eq_fin,
+    prodT_basis_repr_apply, contrMetric_repr_apply_eq_minkowskiMatrix,
+    prod_tensor_basis_eq_map_reindex CoVector.basis_eq_map_tensor_basis
+        Vector.basis_eq_map_tensor_basis,
+    LinearEquiv.symm_apply_apply, Equiv.symm_symm, deriv_basis_repr_apply, Finset.sum_sub_distrib]
+  rfl
 
 lemma toTensor_toFieldStrength {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     Tensorial.toTensor (toFieldStrength A x) =
