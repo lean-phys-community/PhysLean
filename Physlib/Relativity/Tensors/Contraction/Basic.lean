@@ -27,7 +27,7 @@ variable {k : Type} [CommRing k] {C G : Type} [Group G]
 
 TODO "docs: The files on contractions of tensors are currently lacking documentation.
   These should be added, mirroring good examples within Physlib."
-  "
+
 namespace Tensor
 
 /-!
