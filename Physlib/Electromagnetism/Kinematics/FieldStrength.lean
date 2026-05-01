@@ -252,6 +252,10 @@ lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : Lor
   simp only [Tensorial.toTensor_smul, prodT_equivariant, contrT_equivariant, map_neg,
     permT_equivariant, map_add, ← Tensorial.smul_toTensor_symm, smul_add, smul_neg]
 
+/-- This lemma expresses the component form of the transformed field strength
+tensor: when a Lorentz transformation Λ acts on the potential A, the resulting field strength
+tensor's components are given by the standard tensor transformation rule involving the Lorentz
+matrix elements Λ^μ_κ and Λ^ν_ρ applied to the original field components. -/
 lemma toFieldStrength_action_eq_sum {d} (A : ElectromagneticPotential d) (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) (x : SpaceTime d) :
     (Λ • A).toFieldStrength x = ∑ μ, ∑ ν,
