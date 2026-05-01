@@ -184,9 +184,12 @@ lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
   · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
   · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
 
+
+/-- The statement that `F = F^{μν} eᵤ ⊗ eᵥ` written explicitly, with
+  the components given by `∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)`. -/
 lemma toFieldStrength_eq_sum_basis {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
-    A.toFieldStrength x =  ∑ μ, ∑ ν, (∑ κ, (η μ κ *  ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)) •
+    A.toFieldStrength x = ∑ μ, ∑ ν, (∑ κ, (η μ κ *  ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)) •
       Lorentz.Vector.basis μ ⊗ₜ Lorentz.Vector.basis ν := by
   apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
   ext ⟨μ, ν⟩
@@ -206,6 +209,8 @@ lemma toFieldStrength_eq_sum_basis {d} {A : ElectromagneticPotential d}
     LinearEquiv.symm_apply_apply, Equiv.symm_symm, deriv_basis_repr_apply, Finset.sum_sub_distrib]
   rfl
 
+/-- The statement that `F = F^{μν} eᵤ ⊗ eᵥ` written explicitly, with
+  with the components given by `(η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ)`. -/
 lemma toFieldStrength_eq_sum_basis_single {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
     A.toFieldStrength x = ∑ μ, ∑ ν, (η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ) •
@@ -225,6 +230,9 @@ lemma toFieldStrength_eq_sum_basis_single {d} {A : ElectromagneticPotential d}
     simp only [zero_mul]
     exact id (Ne.symm hb)
   · simp
+
+TODO "Add a section in this file on the evaluation of the field strength tensor's indices.
+  I.e. equalitites related to `toField {A.toFieldStrength x| [μ] [ν]}ᵀ`."
 
 /-!
 

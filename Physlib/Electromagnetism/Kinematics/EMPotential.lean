@@ -139,6 +139,8 @@ noncomputable instance {d} : MulAction (LorentzGroup d) (ElectromagneticPotentia
     ext i
     simp [action_val, one_smul]
 
+TODO "Lift the action on `ElectromagneticPotential d` to a `DistribMulAction`."
+
 /-!
 
 ### A.3. Differentiability
@@ -162,6 +164,9 @@ lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotent
   · apply Differentiable.comp
     · exact hA
     · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)
+
+TODO "Add results related to the differentiability of the
+  derivative of the Electromagnetic potential."
 
 /-!
 
