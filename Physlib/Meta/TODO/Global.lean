@@ -18,13 +18,14 @@ but are still important for the development of Physlib.
 @[expose] public section
 
 
-/-!
-
-## Style
-
--/
-
 TODO "Ensure that all the lines in QuantumInfo are below 100 characters long."
+
+TODO "Turn the `sorryful` linter on for the QuantumInfo module."
 
 TODO "Remove all instances of `erw` within Physlib. This usually
   indicates the need for better API."
+
+TODO "Refactor: Refactor the code in the QuantumInfo module to mirror the API structure
+  of the rest of Physlib. For example, different key data structures should have their own files
+  or directories. Results should be organized in a general way such that they can be applied more
+  generally."

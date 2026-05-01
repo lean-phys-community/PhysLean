@@ -42,6 +42,12 @@ namespace Tensor
 variable {S : TensorSpecies k C G basisIdx} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
   {c2 : Fin n2 → C}
 
+TODO "Refactor: Throughout the `Tensor` file system are lemmas related to
+  `ComponentIdx`. The definition of `ComponentIdx` and the lemmas about it should
+  be placed in it's own directory. Around `ComponentIdx`, we should build
+  convenient API. Here `ComponentIdx` is the type of values that indices
+  in e.g. Lorentz tensors can take."
+
 set_option linter.unusedVariables false in
 /-- Given a list of indices `c : Fin n → C` e.g. `![.up, .down]`, the type
   `ComponentIdx c` is the type of components indexes of a tensor with those indices
