@@ -31,12 +31,13 @@ We define a tensor version and a matrix version and prover various properties of
 - A. The field strength tensor
   - A.1. Tensor equalities
   - A.2. Vector equalities
-  - A.3. Elements of the field strength tensor in terms of basis
-  - A.4. The field strength matrix
-    - A.4.1. Differentiability of the field strength matrix
-  - A.5. The antisymmetry of the field strength tensor
-  - A.6. Equivariance of the field strength tensor
-  - A.7. Linearity of the field strength tensor
+  - A.3. The group action acting on the field strength tensor
+  - A.4. Elements of the field strength tensor in terms of basis
+  - A.5. The field strength matrix
+    - A.5.1. Differentiability of the field strength matrix
+  - A.6. The antisymmetry of the field strength tensor
+  - A.7. Equivariance of the field strength matrix
+  - A.8. Linearity of the field strength tensor
 - B. Field strength for distributions
   - B.1. Auxiliary definition of field strength for distributions, with no linearity
   - B.2. The definition of the field strength
@@ -156,7 +157,7 @@ tensor in.
   the components extracted via `toField`. -/
 lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
     A.toFieldStrength = fun x => ∑ μ, ∑ ν, toField {A.toFieldStrength x| [μ] [ν]}ᵀ •
-      Lorentz.Vector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν := by
+      Vector.basis μ ⊗ₜ[ℝ] Vector.basis ν := by
   ext x
   /- This is a fairly general proof, so we can generalize our tensor. -/
   generalize (A.toFieldStrength x) = t
@@ -183,7 +184,6 @@ lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
   · simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
   · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
   · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
-
 
 /-- The statement that `F = F^{μν} eᵤ ⊗ eᵥ` written explicitly, with
   the components given by `∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)`. -/
@@ -236,7 +236,46 @@ TODO "Add a section in this file on the evaluation of the field strength tensor'
 
 /-!
 
-### A.3. Elements of the field strength tensor in terms of basis
+## A.3. The group action acting on the field strength tensor
+
+We show that the field strength tensor is equivariant under the action of the Lorentz group.
+That is transforming the potential and then taking the field strength is the same
+as taking the field strength and then transforming the resulting tensor.
+
+-/
+
+set_option backward.isDefEq.respectTransparency false in
+lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : LorentzGroup d)
+    (hf : Differentiable ℝ A) (x : SpaceTime d) :
+    (Λ • A).toFieldStrength x = Λ • A.toFieldStrength (Λ⁻¹ • x) := by
+  rw [toFieldStrength, deriv_equivariant A Λ hf, ← actionT_contrMetric Λ, toFieldStrength]
+  simp only [Tensorial.toTensor_smul, prodT_equivariant, contrT_equivariant, map_neg,
+    permT_equivariant, map_add, ← Tensorial.smul_toTensor_symm, smul_add, smul_neg]
+
+lemma toFieldStrength_action_eq_sum {d} (A : ElectromagneticPotential d) (Λ : LorentzGroup d)
+    (hf : Differentiable ℝ A) (x : SpaceTime d) :
+    (Λ • A).toFieldStrength x = ∑ μ, ∑ ν,
+      (∑ κ, ∑ ρ, Λ.1 μ κ * Λ.1 ν ρ * toField {A.toFieldStrength (Λ⁻¹ • x) | [κ] [ρ]}ᵀ) •
+      Vector.basis μ ⊗ₜ[ℝ] Vector.basis ν := by
+  conv_lhs => rw [toFieldStrength_equivariant A Λ hf x, toFieldStrength_eq_sum_basis_eval]
+  change Tensorial.smulLinearMap _ _ = _
+  simp only [Nat.reduceSucc, Nat.reduceAdd, Fin.isValue, Fin.succAbove_zero, map_sum, map_smul]
+  simp [smulLinearMap, smul_prod, Vector.smul_basis, tmul_sum, sum_tmul,
+    Finset.smul_sum, tmul_smul, smul_tmul, smul_smul]
+  conv_lhs => enter [2, μ, 2, ν]; rw [Finset.sum_comm]
+  conv_lhs => enter [2, μ]; rw [Finset.sum_comm]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl (fun ν _ => ?_)
+  conv_lhs => enter [2, μ]; rw [Finset.sum_comm]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl (fun μ _ => ?_)
+  simp [← Finset.sum_smul]
+  congr 1
+  exact Finset.sum_congr rfl (fun κ _ => Finset.sum_congr rfl (fun κ _ => by ring))
+
+/-!
+
+### A.4. Elements of the field strength tensor in terms of basis
 
 -/
 
@@ -328,7 +367,7 @@ lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) �
 
 /-!
 
-### A.4. The field strength matrix
+### A.5. The field strength matrix
 
 We define the field strength matrix to be the matrix representation of the field strength tensor
 in the standard basis.
@@ -367,7 +406,7 @@ lemma toFieldStrength_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d
 
 /-!
 
-#### A.4.1. Differentiability of the field strength matrix
+#### A.5.1. Differentiability of the field strength matrix
 
 -/
 
@@ -454,7 +493,7 @@ lemma fieldStrengthMatrix_smooth {d} {A : ElectromagneticPotential d}
 
 /-!
 
-### A.5. The antisymmetry of the field strength tensor
+### A.6. The antisymmetry of the field strength tensor
 
 We show that the field strength tensor is antisymmetric.
 
@@ -490,21 +529,9 @@ lemma fieldStrengthMatrix_diag_eq_zero {d} (A : ElectromagneticPotential d) (x :
 
 /-!
 
-### A.6. Equivariance of the field strength tensor
-
-We show that the field strength tensor is equivariant under the action of the Lorentz group.
-That is transforming the potential and then taking the field strength is the same
-as taking the field strength and then transforming the resulting tensor.
+### A.7. Equivariance of the field strength matrix
 
 -/
-
-set_option backward.isDefEq.respectTransparency false in
-lemma toFieldStrength_equivariant {d} (A : ElectromagneticPotential d) (Λ : LorentzGroup d)
-    (hf : Differentiable ℝ A) (x : SpaceTime d) :
-    toFieldStrength (Λ • A) x = Λ • toFieldStrength A (Λ⁻¹ • x) := by
-  rw [toFieldStrength, deriv_equivariant A Λ hf, ← actionT_contrMetric Λ, toFieldStrength]
-  simp only [Tensorial.toTensor_smul, prodT_equivariant, contrT_equivariant, map_neg,
-    permT_equivariant, map_add, ← Tensorial.smul_toTensor_symm, smul_add, smul_neg]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma fieldStrengthMatrix_equivariant {d} (A : ElectromagneticPotential d)
@@ -545,7 +572,7 @@ lemma fieldStrengthMatrix_equivariant {d} (A : ElectromagneticPotential d)
 
 /-!
 
-### A.7. Linearity of the field strength tensor
+### A.8. Linearity of the field strength tensor
 
 We show that the field strength tensor is linear in the potential.
 
