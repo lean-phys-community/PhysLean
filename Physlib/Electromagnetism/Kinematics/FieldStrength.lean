@@ -93,7 +93,7 @@ noncomputable def toFieldStrength {d} (A : ElectromagneticPotential d) :
 ### A.1. Tensor equalities
 
 These equalities for the field strength tensor are in
-terms of tensor expressions and index notation. In pratice,
+terms of tensor expressions and index notation. In practice,
 we don't expect them to be used explicitly. They are useful for proving some
 of the API within this module.
 
