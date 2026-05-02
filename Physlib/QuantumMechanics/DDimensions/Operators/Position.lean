@@ -47,6 +47,7 @@ Notation:
   - B.1. Position vector
   - B.2. Radius powers (regularized)
   - B.3. Radius powers
+    - B.3.1. As limit of regularized operators
 
 ## iv. References
 
@@ -500,6 +501,100 @@ notation "ℛ[" d' "]" => radiusPowUnboundedOperator (d := d')
 lemma radiusPowUnboundedOperator_apply_ae {d : ℕ} (s : ℝ) (ψ : (ℛ[d] s).domain) :
     ℛ s ψ =ᵐ[volume] 𝐫 s (polyBddSchwartzEquiv.symm ψ) :=
   radiusPowOperatorSchwartz_apply_ae ψ
+
+/-!
+### B.3.1. As limit of regularized operators
+-/
+
+open ENNReal in
+lemma radiusRegPowUnbounded_tendsto_radiusPowUnbounded {d : ℕ} (hd : 0 < d) {s : ℝ}
+    {ψ : schwartzSubmodule d} (hψ : ↑ψ ∈ polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
+    Tendsto (fun ε ↦ ℛ₀ ε s ψ) nhdsZeroUnits (nhds (ℛ s ⟨ψ, hψ⟩)) := by
+  have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
+  apply tendsto_sub_nhds_zero_iff.mp
+  apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
+  obtain ⟨f, hf⟩ := polyBddSchwartzEquiv.surjective ⟨ψ.1, hψ⟩
+  have hf' := (polyBddSchwartzEquiv.symm_apply_eq.mpr hf.symm).symm
+  have h_int : ∀ ε,
+      ∫⁻ x, ‖(ℛ₀ ε s ψ - ℛ s ⟨ψ, hψ⟩).1 x‖ₑ ^ 2 = ∫⁻ x, ‖𝐫₀ ε s f x - 𝐫 s f.1 x‖ₑ ^ 2 := by
+    intro ε
+    refine lintegral_congr_ae ?_
+    filter_upwards [radiusRegPowUnboundedOperator_apply_ae_eq ε s ψ,
+      radiusPowUnboundedOperator_apply_ae s ⟨ψ, hψ⟩,
+      AEEqFun.coeFn_sub (ℛ₀ ε s ψ).val (ℛ s ⟨ψ, hψ⟩).val] with x h₁ h₂ h₃
+    simp only [h₁, h₂, h₃, AddSubgroupClass.coe_sub, Pi.sub_apply, hf']
+    congr
+    exact (polyBddSchwartzEquiv_symm_apply_coe hψ).symm
+  simp_rw [h_int]
+  rw [(lintegral_zero (α := Space d) (μ := volume)).symm] -- change `0` to `∫⁻ x, 0` for dom.convg.
+  have h_meas : ∀ᶠ ε in nhdsZeroUnits, Measurable fun x ↦ ‖𝐫₀ ε s f x - 𝐫 s f.1 x‖ₑ ^ 2 :=
+    Eventually.of_forall (fun _ ↦ by fun_prop)
+  have h_lim : ∀ᵐ x, Tendsto (fun ε ↦ ‖𝐫₀ ε s f x - 𝐫 s f.1 x‖ₑ ^ 2) nhdsZeroUnits (nhds 0) := by
+    filter_upwards [radiusRegPow_ae_tendsto_radiusPow hd s f] with x h
+    apply tendsto_sub_nhds_zero_iff.mpr at h
+    have := h.enorm.ennrpow_const 2
+    simp_all
+  have hpow : ∀ x : Space d, ‖x‖ ^ s = (‖x‖ ^ 2) ^ (s / 2) := by
+    simp [← Real.rpow_natCast_mul (norm_nonneg _), mul_div_cancel₀]
+  -- Use dominated convergence theorem with different bounds for `s` positive vs. negative
+  rcases le_or_gt 0 s with (hs | hs)
+  · let bound : Space d → ℝ≥0∞ := fun x ↦ ‖𝐫₀ 1 s f x‖ₑ ^ 2
+    refine tendsto_lintegral_filter_of_dominated_convergence bound h_meas ?_ ?_ h_lim
+    · apply eventually_iff_exists_mem.mpr
+      use {ε : ℝˣ | ε.1 ^ 2 ≤ 1}
+      refine ⟨?_, fun ε hε ↦ ?_⟩
+      · use Metric.ball (0 : ℝ) 1
+        refine ⟨IsOpen.mem_nhds Metric.isOpen_ball (by norm_num), ?_⟩
+        simp only [Metric.ball, dist_zero_right, Real.norm_eq_abs, Set.preimage_setOf_eq,
+          Units.coeHom_apply, sq_le_one_iff_abs_le_one, Set.setOf_subset_setOf]
+        exact fun _ ↦ Std.le_of_lt
+      · refine Eventually.of_forall (fun x ↦ ?_)
+        simp_rw [bound, ENNReal.pow_le_pow_left_iff two_ne_zero, enorm_le_iff_norm_le]
+        calc
+          _ = |(‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) - ‖x‖ ^ s| * ‖f x‖ := by
+            simp [← sub_mul, ← Complex.ofReal_sub]
+          _ ≤ |(‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)| * ‖f x‖ := by
+            refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
+            refine abs_le_abs_of_nonneg ?_ ?_
+            · rw [hpow, sub_nonneg]
+              exact Real.rpow_le_rpow (by positivity) (by nlinarith) (by linarith)
+            · exact sub_le_self _ (Real.rpow_nonneg (norm_nonneg x) _)
+          _ ≤ |(‖x‖ ^ 2 + 1 ^ 2) ^ (s / 2)| * ‖f x‖ := by
+            refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
+            refine abs_le_abs_of_nonneg ?_ ?_
+            · exact Real.rpow_nonneg (norm_sq_add_unit_sq_pos _ _).le (s / 2)
+            · exact Real.rpow_le_rpow (norm_sq_add_unit_sq_pos _ _).le (by simp_all) (by linarith)
+          _ = ‖𝐫₀ 1 s f x‖ := by simp
+    · have := pow_ne_top (n := 2) ((𝐫₀ 1 s f.1).memLp 2).2.ne
+      rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ofNat_ne_top] at this
+      simp_all [bound]
+  · let bound : Space d → ℝ≥0∞ := fun x ↦ ‖𝐫 s f x‖ₑ ^ 2
+    refine tendsto_lintegral_filter_of_dominated_convergence bound h_meas ?_ ?_ h_lim
+    · refine Eventually.of_forall (fun ε ↦ ?_)
+      apply ae_iff.mpr
+      refine measure_mono_null ?_ (measure_singleton 0)
+      intro x hx
+      by_contra hx'
+      apply hx
+      simp_rw [bound, ENNReal.pow_le_pow_left_iff two_ne_zero, enorm_le_iff_norm_le]
+      calc
+        _ = |‖x‖ ^ s - (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)| * ‖f x‖ := by
+          simp [← sub_mul, ← Complex.ofReal_sub, abs_sub_comm]
+        _ ≤ |‖x‖ ^ s| * ‖f x‖ := by
+          refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
+          refine abs_le_abs_of_nonneg ?_ ?_
+          · rw [hpow, sub_nonneg]
+            refine (Real.rpow_le_rpow_iff_of_neg ?_ ?_ (by linarith)).mpr ?_
+            · exact norm_sq_add_unit_sq_pos ε x
+            · exact sq_pos_of_ne_zero (norm_ne_zero_iff.mpr hx')
+            · exact (le_add_iff_nonneg_right _).mpr (pow_two_nonneg _)
+          · rw [tsub_le_iff_right, le_add_iff_nonneg_right]
+            exact (normRegularizedPow_pos d ε s x).le
+        _ = ‖𝐫 s f x‖ := by simp
+    · have hrf := radiusPowOperator_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
+      have := pow_ne_top (n := 2) hrf.2.ne
+      rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ofNat_ne_top] at this
+      simp_all [bound]
 
 end
 end QuantumMechanics
