@@ -498,20 +498,27 @@ section
 
 variable
   {E : Submodule ℂ H} (hE : Dense (E : Set H))
-  {f : E →ₗ[ℂ] E} (hf : f.IsSymmetric)
+  {f : E →ₗ[ℂ] H} (hf : ∀ x y : E, ⟪f x, ↑y⟫_ℂ = ⟪↑x, f y⟫_ℂ)
+  {g : E →ₗ[ℂ] E} (hg : g.IsSymmetric)
   (T : UnboundedOperator H H)
 
 /-- An `UnboundedOperator` constructed from a symmetric linear map on a dense submodule `E`. -/
 def ofSymmetric : UnboundedOperator H H where
-  toLinearPMap := LinearPMap.mk E (E.subtype ∘ₗ f)
+  toLinearPMap := LinearPMap.mk E f
   dense_domain := hE
   is_closable := by
-    refine isClosable_iff_exists_closed_extension.mpr ?_
-    use (LinearPMap.mk E (E.subtype ∘ₗ f))†
-    exact ⟨LinearPMap.adjoint_isClosed hE, IsFormalAdjoint.le_adjoint hE hf⟩
+    apply isClosable_iff_exists_closed_extension.mpr
+    exact ⟨(LinearPMap.mk E f)†, LinearPMap.adjoint_isClosed hE, IsFormalAdjoint.le_adjoint hE hf⟩
+
+/-- An `UnboundedOperators` constructed from a symmetric linear map on a dense submodule `E`
+  to itself. -/
+def ofSymmetric' : UnboundedOperator H H := ofSymmetric (f := E.subtype ∘ₗ g) hE hg
 
 @[simp]
-lemma ofSymmetric_apply (ψ : E) : (ofSymmetric hE hf) ψ = E.subtype (f ψ) := rfl
+lemma ofSymmetric_apply (ψ : E) : ofSymmetric hE hf ψ = f ψ := rfl
+
+@[simp]
+lemma ofSymmetric'_apply (ψ : E) : ofSymmetric' hE hg ψ = g ψ := rfl
 
 -- Note that cannot simply co-opt `LinearMap.IsSymmetric` because
 -- the domain and codomain of `T` need not be the same.
@@ -582,7 +589,7 @@ section
 
 variable
   {E : Submodule ℂ H} (hE : Dense (E : Set H))
-  {f : E →ₗ[ℂ] E} (hf : f.IsSymmetric)
+  {g : E →ₗ[ℂ] E} (hg : g.IsSymmetric)
   (T : UnboundedOperator H H)
 
 /-- A map `F : D(T) →L[ℂ] ℂ` is a generalized eigenvector of an unbounded operator `T`
@@ -591,11 +598,11 @@ def IsGeneralizedEigenvector (F : T.domain →L[ℂ] ℂ) (c : ℂ) : Prop :=
   ∀ ψ : T.domain, ∃ ψ' : T.domain, ψ' = T ψ ∧ F ψ' = c • F ψ
 
 lemma isGeneralizedEigenvector_ofSymmetric_iff (F : E →L[ℂ] ℂ) (c : ℂ) :
-    IsGeneralizedEigenvector (ofSymmetric hE hf) F c ↔ ∀ ψ : E, F (f ψ) = c • F ψ := by
+    IsGeneralizedEigenvector (ofSymmetric' hE hg) F c ↔ ∀ ψ : E, F (g ψ) = c • F ψ := by
   constructor <;> intro h ψ
   · obtain ⟨ψ', hψ', hψ''⟩ := h ψ
     exact (SetLike.coe_eq_coe.mp hψ') ▸ hψ''
-  · use f ψ
+  · use g ψ
     exact ⟨by simp, h ψ⟩
 
 end

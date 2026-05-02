@@ -365,6 +365,7 @@ noncomputable section
 
 open SpaceDHilbertSpace
 open SchwartzSubmodule
+open UnboundedOperator
 
 /-!
 ### B.1. Position vector
@@ -390,7 +391,7 @@ lemma positionOperatorSchwartz_isSymmetric : (positionOperatorSchwartz i).IsSymm
 /-- The symmetric position unbounded operators with domain the Schwartz submodule
   of the Hilbert space. -/
 def positionUnboundedOperator : UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
-  UnboundedOperator.ofSymmetric (SchwartzSubmodule.dense d) (positionOperatorSchwartz_isSymmetric i)
+  ofSymmetric' (SchwartzSubmodule.dense d) (positionOperatorSchwartz_isSymmetric i)
 
 /-!
 ### B.2. Radius powers (regularized)
@@ -419,8 +420,7 @@ lemma radiusRegPowOperatorSchwartz_isSymmetric {d : ℕ} (ε : ℝˣ) (s : ℝ) 
   of the Hilbert space. -/
 def radiusRegPowUnboundedOperator {d : ℕ} (ε : ℝˣ) (s : ℝ) :
     UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
-  UnboundedOperator.ofSymmetric (SchwartzSubmodule.dense d)
-    (radiusRegPowOperatorSchwartz_isSymmetric ε s)
+  ofSymmetric' (SchwartzSubmodule.dense d) (radiusRegPowOperatorSchwartz_isSymmetric ε s)
 
 end
 end QuantumMechanics

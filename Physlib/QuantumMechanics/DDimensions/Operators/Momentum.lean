@@ -82,6 +82,7 @@ lemma momentumOperator_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐩 i ψ
 open MeasureTheory
 open SpaceDHilbertSpace
 open SchwartzSubmodule
+open UnboundedOperator
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The momentum operators defined on the Schwartz submodule. -/
@@ -117,8 +118,7 @@ lemma momentumOperatorSchwartz_isSymmetric :
   submodule of the Hilbert space. -/
 def momentumUnboundedOperator :
     UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
-  UnboundedOperator.ofSymmetric (SchwartzSubmodule.dense d)
-    (momentumOperatorSchwartz_isSymmetric i)
+  ofSymmetric' (SchwartzSubmodule.dense d) (momentumOperatorSchwartz_isSymmetric i)
 
 end
 end QuantumMechanics
