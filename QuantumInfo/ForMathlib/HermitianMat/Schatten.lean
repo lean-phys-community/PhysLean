@@ -32,7 +32,7 @@ For a positive Hermitian matrix A, ||A||_p = (Tr(A^p))^(1/p).
 theorem schattenNorm_hermitian_pow {A : HermitianMat d ℂ} (hA : 0 ≤ A) {p : ℝ} (hp : 0 < p) :
     schattenNorm A.mat p = (A ^ p).trace ^ (1/p) := by
   convert congr_arg (· ^ (1 / p)) _ using 1
-  convert congr_arg _ (A.cfc_sq_rpow_eq_cfc_rpow hA p hp) using 1
+  convert congr_arg _ (A.cfc_sq_rpow_eq_cfc_rpow hA p hp.le) using 1
   unfold HermitianMat.trace
   convert rfl
   convert (A ^ 2).mat_cfc (· ^ (p / 2))
