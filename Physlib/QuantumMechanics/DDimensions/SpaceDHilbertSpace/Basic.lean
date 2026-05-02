@@ -152,7 +152,6 @@ lemma mk_eq_iff {f g : Space d → ℂ} {hf : MemHS f} {hg : MemHS g} :
 lemma ext_iff {f g : SpaceDHilbertSpace d} :
     f = g ↔ (f : Space d → ℂ) =ᵐ[volume] (g : Space d → ℂ) := Lp.ext_iff
 
-
 /-!
 ## Limits
 -/
