@@ -8,6 +8,7 @@ module
 public import QuantumInfo.ForMathlib.HermitianMat.CFC
 
 public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.InnerProductSpace.Positive
 public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.PosPart.Basic
 
 /-!
@@ -56,6 +57,26 @@ theorem projector_add_orthogonal : projector S + projector Sᗮ = 1 := by
   erw [ Subtype.mk_eq_mk ];
   ext i j; simp [ LinearMap.toMatrix_apply, Matrix.one_apply ] ;
 
+theorem projector_nonneg : 0 ≤ projector S := by
+  rw [zero_le_iff]
+  unfold projector
+  let P := S.subtypeL.comp S.orthogonalProjection
+  have hP : P.toLinearMap.IsSymmetricProjection := by
+    simpa [Submodule.starProjection, P] using
+      (Submodule.isSymmetricProjection_starProjection (U := S))
+  exact LinearMap.posSemidef_toMatrix_iff _ |>.2
+    ((LinearMap.IsIdempotentElem.isPositive_iff_isSymmetric hP.1).2 hP.2)
+
+@[simp]
+theorem projector_ker : (projector S).ker = Sᗮ := by
+  ext v
+  change (Matrix.toEuclideanLin
+      (LinearMap.toMatrix (PiLp.basisFun 2 𝕜 n) (PiLp.basisFun 2 𝕜 n)
+        (S.subtypeL.comp S.orthogonalProjection)) v = 0 ↔ v ∈ Sᗮ)
+  rw [show Matrix.toEuclideanLin = Matrix.toLpLin (2 : ENNReal) (2 : ENNReal) from rfl,
+    Matrix.toLpLin_eq_toLin, Matrix.toLin_toMatrix]
+  exact Submodule.starProjection_apply_eq_zero_iff (K := S)
+
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem trace_projector : (projector S).trace = (Module.finrank 𝕜 S : ℝ) := by
@@ -77,6 +98,14 @@ noncomputable def supportProj (A : HermitianMat n 𝕜) : HermitianMat n 𝕜 :=
 The `HermitianMat.projector` for the `HermitianMat.ker` submodule.
 -/
 noncomputable def kerProj (A : HermitianMat n 𝕜) : HermitianMat n 𝕜 := projector A.ker
+
+@[simp]
+theorem supportProj_ker : A.supportProj.ker = A.ker := by
+  rw [supportProj, projector_ker, support_orthogonal_eq_range]
+
+@[simp]
+theorem kerProj_ker : A.kerProj.ker = A.support := by
+  rw [kerProj, projector_ker, ker_orthogonal_eq_support]
 
 @[simp]
 theorem kerProj_add_supportProj : A.kerProj + A.supportProj = 1 := by
@@ -411,15 +440,6 @@ theorem negPart_Continuous : Continuous (·⁻ : HermitianMat n ℂ → _) := by
   simp_rw [negPart_eq_cfc_min]
   fun_prop
 
-proof_wanted posPart_le_zero_iff : A⁺ ≤ 0 ↔ A ≤ 0
-
-proof_wanted posPart_eq_zero_iff : A⁺ = 0 ↔ A ≤ 0
-/- := by
-   rw [← posPart_le_zero_iff]
-   have := zero_le_posPart A
-   constructor <;> order
--/
-
 --Many missing lemmas: see `Mathlib.Algebra.Order.Group.PosPart` for examples
 -- (They don't apply here since it's not a Lattice, and there's no well-defined `max` in
 --   the Loewner order.)
@@ -497,6 +517,24 @@ theorem inner_negPart_zero_iff : ⟪A, A⁻⟫ = 0 ↔ 0 ≤ A := by
     apply le_antisymm
     · exact inner_negPart_nonpos A
     · exact inner_ge_zero h (negPart_nonneg A)
+
+theorem posPart_eq_zero_iff : A⁺ = 0 ↔ A ≤ 0 := by
+  refine ⟨fun h => by simpa [h] using posPart_le (A := A), fun hA => ?_⟩
+  have hnegPart : (-A)⁻ = A⁺ := by
+    rw [negPart_eq_cfc_ite, posPart_eq_cfc_ite]
+    nth_rw 1 [← cfc_id A]
+    rw [← cfc_neg, ← cfc_comp]
+    congr! 2 with x; simp
+  have h0 : ⟪-A, A⁺⟫ = 0 := by
+    simpa [hnegPart] using (inner_negPart_zero_iff (A := -A)).2 (by simpa using hA)
+  have hA_eq : -A = A⁻ - A⁺ := by
+    conv_lhs => rw [show A = A⁺ - A⁻ from (posPart_add_negPart A).symm]
+    abel
+  have hself : ⟪A⁺, A⁺⟫ = 0 := by
+    rw [hA_eq, HermitianMat.inner_sub_right, HermitianMat.inner_comm A⁻ A⁺,
+      posPart_inner_negPart_zero, zero_sub, neg_eq_zero] at h0
+    exact h0
+  exact inner_self_eq_zero.mp hself
 
 theorem inner_negPart_neg_iff : ⟪A, A⁻⟫ < 0 ↔ ¬0 ≤ A := by
   simp [← inner_negPart_zero_iff, lt_iff_le_and_ne, inner_negPart_nonpos A]
