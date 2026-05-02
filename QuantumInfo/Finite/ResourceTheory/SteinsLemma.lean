@@ -2139,10 +2139,7 @@ theorem limit_hypotesting_eq_limit_rel_entropy (ρ : MState (H i)) (ε : Prob) (
   · exact RelativeEntResource.tendsto_ennreal ρ -- The regularized relative entropy of resource is not infinity
 
 /-
-info: 'SteinsLemma.limit_hypotesting_eq_limit_rel_entropy' depends on axioms: [propext,
- sandwichedRenyiEntropy_DPI_ax,
- Classical.choice,
- Quot.sound]
+info: 'SteinsLemma.limit_hypotesting_eq_limit_rel_entropy' depends on axioms: [propext, Classical.choice, Quot.sound]
 -/
 /-
 Commented out because of module system.
