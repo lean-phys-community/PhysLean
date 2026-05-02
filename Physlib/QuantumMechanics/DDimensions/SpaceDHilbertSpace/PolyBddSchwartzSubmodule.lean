@@ -147,12 +147,11 @@ lemma polyBddSchwartzMap_zero_eq_top (d : ℕ) : polyBddSchwartzMap d 0 = ⊤ :=
 lemma polyBddSchwartzMap_antitone (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
     polyBddSchwartzMap d b ≤ polyBddSchwartzMap d a := fun _ hx k hk ↦ hx k (hk.trans h)
 
-lemma of_zero_eq (d : ℕ) :
-    polyBddSchwartzSubmodule d 0 = schwartzSubmodule d := by
+lemma of_zero_eq (d : ℕ) : polyBddSchwartzSubmodule d 0 = schwartzSubmodule d := by
   simp [polyBddSchwartzSubmodule, polyBddSchwartzIncl, polyBddSchwartzMap_zero_eq_top]
 
-lemma le_schwartzSubmodule (d : ℕ) (a : ℕ∞) :
-    polyBddSchwartzSubmodule d a ≤ schwartzSubmodule d := LinearMap.range_domRestrict_le_range _ _
+lemma le_schwartzSubmodule (d : ℕ) (a : ℕ∞) : polyBddSchwartzSubmodule d a ≤ schwartzSubmodule d :=
+  LinearMap.range_domRestrict_le_range _ _
 
 lemma antitone (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
     polyBddSchwartzSubmodule d b ≤ polyBddSchwartzSubmodule d a := by
@@ -186,8 +185,7 @@ private lemma dense_zero_top :
   · simp
   · simp [hk', add_nonneg]
 
-lemma dense_top (d : ℕ) :
-    Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) := by
+lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) := by
   rcases eq_zero_or_pos d with (rfl | hd)
   · -- `d = 0`: Every function `Space 0 ≅ {0} → ℂ` is in `polyBddSchwartzSubmodule 0 ⊤`.
     exact dense_zero_top
@@ -288,8 +286,7 @@ lemma dense_top (d : ℕ) :
         simp_rw [h, h', Pi.sub_apply, hg, s, ← mul_sub]
         exact ENNReal.pow_le_pow_left <| enorm_bump_mul_le_enorm (b n) (fun x ↦ f n x - ξ x) x
 
-lemma dense (d : ℕ) (a : ℕ∞) :
-    Dense (polyBddSchwartzSubmodule d a : Set (SpaceDHilbertSpace d)) :=
+lemma dense (d : ℕ) (a : ℕ∞) : Dense (polyBddSchwartzSubmodule d a : Set (SpaceDHilbertSpace d)) :=
   (dense_top d).mono (antitone d le_top)
 
 end PolyBddSchwartzSubmodule
