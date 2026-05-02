@@ -214,32 +214,44 @@ lemma radiusPowOperator_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(
 
 set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
-lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : 0 < d + 2 * s) (ψ : 𝓢(Space d, ℂ)) :
+lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)
+    (hψ : ψ ∈ polyBddSchwartzMap d a) (h : 0 < d + 2 * (a + s)) :
     MemHS (𝐫 s ψ) := by
   rcases Nat.eq_zero_or_pos d with (rfl | hd)
   · simp only [MemHS, MemLp.of_discrete]
-  · refine (MeasureTheory.memLp_two_iff_integrable_sq_norm (by fun_prop)).mpr ⟨by fun_prop, ?_⟩
-    suffices ∫⁻ (a : Space d), ‖‖ψ a‖ ^ 2 * ‖a‖ ^ (2 * s)‖ₑ < ⊤ by
+  · have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
+    refine (memLp_two_iff_integrable_sq_norm (by fun_prop)).mpr ⟨by fun_prop, ?_⟩
+    suffices ∫⁻ (x : Space d), ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ < ⊤ by
       have hInt (x : Space d) : ‖𝐫 s ψ x‖ ^ 2 = ‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s) := by
         simp [radiusPowOperator, mul_pow, mul_comm, Real.rpow_mul]
       simpa only [HasFiniteIntegral, hInt]
     rw [← lintegral_add_compl _ (measurableSet_ball (x := 0) (ε := 1)), ENNReal.add_lt_top]
     constructor
-    · -- `‖x‖ < 1`: bound `‖ψ x‖` by a constant
-      obtain ⟨C, hC_pos, hC⟩ := ψ.decay 0 0
-      simp only [pow_zero, norm_iteratedFDeriv_zero, one_mul] at hC
-      suffices hBound : ∀ x, ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * s)‖ₑ by
+    · -- `‖x‖ < 1`: bound `‖ψ x‖` by `‖x‖ᵃ`
+      obtain ⟨C, hC_pos, hC⟩ := hψ a (le_refl _)
+      suffices hBound : ∀ᵐ x, ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * (a + s))‖ₑ by
         calc
-          _ ≤ ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * s)‖ₑ :=
-            setLIntegral_mono' measurableSet_ball (fun x _ ↦ hBound x)
-          _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖‖x‖ ^ (2 * s)‖ₑ :=
+          _ ≤ ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * (a + s))‖ₑ :=
+            setLIntegral_mono_ae' measurableSet_ball (Eventually.mono hBound fun _ h' _ ↦ h')
+          _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖‖x‖ ^ (2 * (a + s))‖ₑ :=
             lintegral_const_mul _ (by fun_prop)
         apply ENNReal.mul_lt_top enorm_lt_top
         exact ((integrableOn_norm_rpow_ball_iff hd Real.zero_lt_one _).mpr h).hasFiniteIntegral
-      intro x
-      simp_rw [← enorm_mul, enorm_le_iff_norm_le, norm_mul, norm_pow, Real.norm_eq_abs, sq_abs]
-      refine mul_le_mul_of_nonneg_right ?_ (abs_nonneg _)
-      exact (sq_le_sq₀ (norm_nonneg _) hC_pos.le).mpr (hC x)
+      apply ae_iff.mpr
+      refine measure_mono_null ?_ (measure_singleton 0)
+      intro x hx
+      by_contra hx'
+      apply hx
+      apply norm_pos_iff.mpr at hx'
+      simp_rw [← enorm_mul, enorm_le_iff_norm_le, mul_add, Real.rpow_add hx', norm_mul, ← mul_assoc]
+      refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
+      simp_rw [← Nat.cast_two (R := ℝ), mul_comm, Real.rpow_mul_natCast hx'.le, norm_pow, ← mul_pow,
+        norm_norm, Real.norm_eq_abs, abs_of_pos hC_pos, abs_of_nonneg (Real.rpow_nonneg hx'.le _)]
+      apply (sq_le_sq₀ (norm_nonneg _) (by positivity)).mpr
+      apply (inv_mul_le_iff₀' (by positivity)).mp
+      rw [← Real.rpow_neg_one, ← Real.rpow_mul hx'.le, mul_comm _ (-1), neg_mul, one_mul,
+        Real.rpow_neg_natCast]
+      exact hC x
     · -- `1 ≤ ‖x‖`: bound `‖ψ x‖` by a suitable power of `‖x‖`
       obtain ⟨C, hC_pos, hC⟩ := ψ.decay (⌈s⌉.toNat + d) 0
       simp only [norm_iteratedFDeriv_zero, ← Real.rpow_natCast, Nat.cast_add] at hC
