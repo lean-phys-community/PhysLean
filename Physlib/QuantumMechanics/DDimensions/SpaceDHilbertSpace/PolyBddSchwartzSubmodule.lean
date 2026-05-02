@@ -144,17 +144,6 @@ private lemma enorm_bump_mul_le_enorm {𝕜 E : Type*} [RCLike 𝕜] [NormedAddC
   rw [norm_algebraMap', Real.norm_eq_abs, norm_one, ← abs_one]
   exact abs_le_abs_of_nonneg f.nonneg f.le_one
 
-private lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
-    {d : ℕ} {α : Type*} {l : Filter α} {ψ : α → SpaceDHilbertSpace d} :
-    Tendsto ψ l (nhds 0) ↔ Tendsto (fun a ↦ ∫⁻ x : Space d, ‖ψ a x‖ₑ ^ 2) l (nhds 0) := by
-  trans Tendsto (fun a ↦ (∫⁻ x, ‖ψ a x‖ₑ ^ 2) ^ (2⁻¹ : ℝ)) l (nhds 0)
-  · simp [tendsto_iff_edist_tendsto_0, edist_zero_right, Lp.enorm_def, eLpNorm, eLpNorm']
-  constructor <;> intro h
-  · apply Tendsto.ennrpow_const 2 at h
-    simp_all [← ENNReal.rpow_mul_natCast]
-  · apply Tendsto.ennrpow_const 2⁻¹ at h
-    simp_all
-
 private lemma polyBddSchwartzSubmodule_zero_top_dense :
     Dense (polyBddSchwartzSubmodule 0 ⊤ : Set (SpaceDHilbertSpace 0)) := by
   suffices polyBddSchwartzMap 0 ⊤ = ⊤ by
