@@ -105,7 +105,34 @@ def polyBddSchwartzEquiv {d : ℕ} {a : ℕ∞} :
   LinearEquiv.ofInjective polyBddSchwartzIncl.toLinearMap (polyBddSchwartzIncl_injective d a)
 
 /-!
-### B. (In)equalities
+## B. Coercions
+-/
+
+instance {d : ℕ} {a : ℕ∞} : CoeOut (polyBddSchwartzMap d a) 𝓢(Space d, ℂ) := ⟨fun f ↦ f.val⟩
+
+instance {d : ℕ} {a : ℕ∞} : CoeFun (polyBddSchwartzMap d a) (fun _ ↦ Space d → ℂ) :=
+  ⟨fun f ↦ ⇑f.val⟩
+
+@[simp]
+lemma toFun_eq_coe {d : ℕ} {a : ℕ∞} (f : polyBddSchwartzMap d a) (x : Space d) :
+    f.val.toFun x = f.val x :=
+  rfl
+
+lemma polyBddSchwartzEquiv_symm_apply_coe {d : ℕ} {a : ℕ∞}
+    {ψ : schwartzSubmodule d} (hψ : ↑ψ ∈ polyBddSchwartzSubmodule d a) :
+    (polyBddSchwartzEquiv.symm ⟨ψ, hψ⟩).val = schwartzEquiv.symm ψ := by
+  apply schwartzEquiv.injective
+  apply SetLike.coe_eq_coe.mp
+  obtain ⟨g, hg⟩ := polyBddSchwartzEquiv.surjective ⟨ψ.val, hψ⟩
+  have hg' : polyBddSchwartzIncl g = ψ := SetLike.coe_eq_coe.mpr hg
+  rw [← hg, LinearEquiv.symm_apply_apply, LinearEquiv.apply_symm_apply, ← hg']
+  rfl
+
+lemma polyBddSchwartzEquiv_coe_ae {d : ℕ} {a : ℕ∞} (f : polyBddSchwartzMap d a) :
+    polyBddSchwartzEquiv f =ᵐ[volume] f.val := schwartzEquiv_coe_ae f.val
+
+/-!
+### C. (In)equalities
 -/
 
 lemma polyBddSchwartzMap_zero_eq_top (d : ℕ) : polyBddSchwartzMap d 0 = ⊤ := by
