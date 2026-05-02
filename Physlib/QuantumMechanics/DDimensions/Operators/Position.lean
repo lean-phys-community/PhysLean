@@ -46,6 +46,7 @@ Notation:
 - B. Unbounded operators
   - B.1. Position vector
   - B.2. Radius powers (regularized)
+  - B.3. Radius powers
 
 ## iv. References
 
@@ -184,6 +185,9 @@ def radiusPowOperator {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space
 
 @[inherit_doc radiusPowOperator]
 notation "𝐫" => radiusPowOperator
+
+@[inherit_doc radiusPowOperator]
+notation "𝐫[" d' "]" => radiusPowOperator (d := d')
 
 lemma radiusPowOperator_apply_fun {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     𝐫 s ψ = fun x ↦ ‖x‖ ^ s • ψ x := rfl
@@ -430,6 +434,72 @@ lemma radiusRegPowOperatorSchwartz_isSymmetric {d : ℕ} (ε : ℝˣ) (s : ℝ) 
 def radiusRegPowUnboundedOperator {d : ℕ} (ε : ℝˣ) (s : ℝ) :
     UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
   ofSymmetric' (SchwartzSubmodule.dense d) (radiusRegPowOperatorSchwartz_isSymmetric ε s)
+
+@[inherit_doc radiusRegPowUnboundedOperator]
+notation "ℛ₀" => radiusRegPowUnboundedOperator
+
+@[inherit_doc radiusRegPowUnboundedOperator]
+notation "ℛ₀[" d' "]" => radiusRegPowUnboundedOperator (d := d')
+
+lemma radiusRegPowUnboundedOperator_apply_ae_eq {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : schwartzSubmodule d) :
+    ℛ₀ ε s ψ =ᵐ[volume] 𝐫₀ ε s (schwartzEquiv.symm ψ) :=
+  schwartzEquiv_coe_ae _
+
+/-!
+### B.3. Radius powers
+-/
+
+open Complex
+
+lemma add_floor_toNat_pos_aux (d : ℕ) (s : ℝ) : 0 < d + 2 * (⌊1 - d / 2 - s⌋.toNat + s) := by
+  let n : ℤ := ⌊1 - d / 2 - s⌋
+  have hn₁ : 1 - d / 2 - s < n + 1 := Int.lt_floor_add_one _
+  have hn₂ : (n : ℝ) ≤ n.toNat := Int.cast_le.mpr (Int.self_le_toNat _)
+  linarith
+
+/-- Radius operator acting on a polynomially-bounded Schwartz submodule. -/
+def radiusPowOperatorSchwartz {d : ℕ} (s : ℝ) :
+    polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat →ₗ[ℂ] SpaceDHilbertSpace d where
+  toFun ψ :=
+    let f := polyBddSchwartzEquiv.symm ψ
+    mk <| radiusPowOperator_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
+  map_add' := by simp [← mk_add]
+  map_smul' := by simp [← mk_const_smul]
+
+lemma radiusPowOperatorSchwartz_apply_ae {d : ℕ} {s : ℝ}
+    (ψ : polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
+    radiusPowOperatorSchwartz s ψ =ᵐ[volume] 𝐫 s (polyBddSchwartzEquiv.symm ψ) := by
+  let f := polyBddSchwartzEquiv.symm ψ
+  exact coe_mk_ae <| radiusPowOperator_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
+
+lemma radiusPowOperatorSchwartz_isSymmetric (d : ℕ) (s : ℝ) :
+    ∀ ψ φ : polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat,
+      ⟪radiusPowOperatorSchwartz s ψ, ↑φ⟫_ℂ = ⟪↑ψ, radiusPowOperatorSchwartz s φ⟫_ℂ := by
+  intro ψ φ
+  obtain ⟨f, hf⟩ := polyBddSchwartzEquiv.surjective ψ
+  obtain ⟨g, hg⟩ := polyBddSchwartzEquiv.surjective φ
+  refine integral_congr_ae ?_
+  filter_upwards [polyBddSchwartzEquiv_coe_ae f, radiusPowOperatorSchwartz_apply_ae ψ,
+    polyBddSchwartzEquiv_coe_ae g, radiusPowOperatorSchwartz_apply_ae φ] with x h₁ h₂ h₃ h₄
+  simp_rw [h₂, h₄, ← hf, ← hg, h₁, h₃, LinearEquiv.symm_apply_apply]
+  simp only [radiusPowOperator_apply, real_smul, RCLike.inner_apply, map_mul, conj_ofReal]
+  ring
+
+/-- The symmetric radius unbounded operators with domain a polynomially-bounded Schwartz submodule
+  of the Hilbert space. -/
+def radiusPowUnboundedOperator {d : ℕ} (s : ℝ) :
+    UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
+  ofSymmetric (PolyBddSchwartzSubmodule.dense d _) (radiusPowOperatorSchwartz_isSymmetric d s)
+
+@[inherit_doc radiusPowUnboundedOperator]
+notation "ℛ" => radiusPowUnboundedOperator
+
+@[inherit_doc radiusPowUnboundedOperator]
+notation "ℛ[" d' "]" => radiusPowUnboundedOperator (d := d')
+
+lemma radiusPowUnboundedOperator_apply_ae {d : ℕ} (s : ℝ) (ψ : (ℛ[d] s).domain) :
+    ℛ s ψ =ᵐ[volume] 𝐫 s (polyBddSchwartzEquiv.symm ψ) :=
+  radiusPowOperatorSchwartz_apply_ae ψ
 
 end
 end QuantumMechanics
