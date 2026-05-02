@@ -6,7 +6,7 @@ Authors: Gregory J. Loges
 module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
-public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 /-!
@@ -53,9 +53,13 @@ Notation:
 
 @[expose] public section
 
-open Physlib
-
 namespace QuantumMechanics
+
+open Filter
+open MeasureTheory
+open SchwartzMap
+open SpaceDHilbertSpace
+open SchwartzSubmodule PolyBddSchwartzSubmodule
 
 variable {d : ℕ} (i : Fin d)
 
@@ -65,7 +69,6 @@ variable {d : ℕ} (i : Fin d)
 
 noncomputable section
 open Space Function
-open SchwartzMap
 
 /-!
 ### A.1. Position vector
@@ -170,9 +173,6 @@ lemma positionOperatorSqr_eq {d : ℕ} (ε : ℝˣ) :
 /-!
 ### A.3. Radius powers
 -/
-
-open MeasureTheory
-open SpaceDHilbertSpace
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The radius operator to power `s` is the linear map from `𝓢(Space d, ℂ)` to `Space d → ℂ` that
@@ -285,8 +285,6 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (h : 0 < d + 2 * s) (ψ 
 #### A.3.1. As limit of regularized operators
 -/
 
-open Filter
-
 /-- Neighborhoods of "0" in the non-zero reals, i.e. those sets containing `(-ε,0) ∪ (0,ε) ⊆ ℝˣ`
   for some `ε > 0`. -/
 abbrev nhdsZeroUnits : Filter ℝˣ := comap (Units.coeHom ℝ) (nhds 0)
@@ -363,9 +361,8 @@ end
 
 noncomputable section
 
-open SpaceDHilbertSpace
-open SchwartzSubmodule
 open UnboundedOperator
+open InnerProductSpace
 
 /-!
 ### B.1. Position vector
