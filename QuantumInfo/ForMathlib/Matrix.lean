@@ -1153,18 +1153,7 @@ theorem PosDef.zero_lt {n : Type*} [Nonempty n] [Fintype n] {A : Matrix n n ℂ}
   apply lt_of_le_of_ne
   · replace hA := hA.posSemidef
     rwa [Matrix.nonneg_iff_posSemidef]
-  · rintro rfl
-    --wtf do better. TODO
-    have : ¬(0 < 0) := by trivial
-    classical rw [← Matrix.posDef_natCast_iff (n := n) (R := ℂ)] at this
-    revert hA
-    convert this
-    ext; simp
-    trans ((0 : ℕ) : ℂ)
-    · simp
-    classical
-    change _ = ite _ _ _
-    simp
+  · rintro rfl; exact absurd (hA.diag_pos (i := Classical.arbitrary n)) (by simp)
 
 
 lemma IsHermitian.spectrum_eq_image_eigenvalues [Fintype n] {A : Matrix n n ℂ} (hA : A.IsHermitian) :

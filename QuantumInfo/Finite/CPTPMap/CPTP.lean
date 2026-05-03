@@ -392,6 +392,12 @@ theorem piProd_comp
     convert MatrixMap.piProd_comp _ _;
     infer_instance
 
+@[simp]
+theorem piProd_id :
+    piProd (fun i ↦ (CPTPMap.id : CPTPMap (dI i) (dI i))) = CPTPMap.id := by
+  apply CPTPMap.ext
+  simp [piProd, id_map, MatrixMap.piProd_id]
+
 end finprod
 
 section unitary

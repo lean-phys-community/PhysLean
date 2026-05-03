@@ -29,8 +29,23 @@ theorem fidelity_ge_zero : 0 ≤ fidelity ρ σ := by
   apply HermitianMat.trace_nonneg
   apply HermitianMat.sqrt_nonneg
 
-theorem fidelity_le_one : fidelity ρ σ ≤ 1 :=
-  sorry --submultiplicativity of trace and sqrt
+theorem fidelity_le_one : fidelity ρ σ ≤ 1 := by
+  unfold fidelity
+  rw [HermitianMat.sqrt_eq_cfc_rpow_half, ← HermitianMat.rpow_eq_cfc]
+  calc ((σ.M.conj ρ.M.sqrt.mat) ^ (1/2 : ℝ)).trace
+      ≤ ((σ.M ^ (2/2 : ℝ)).trace ^ (1/2 : ℝ) *
+         (ρ.M.sqrt ^ (2 : ℝ)).trace ^ (1/2 : ℝ)) ^ (2 * (1/2 : ℝ)) :=
+        HermitianMat.trace_rpow_conj_le σ.nonneg (HermitianMat.sqrt_nonneg ρ.M)
+          (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+    _ = 1 := by
+        have h1 : (σ.M ^ (2/2 : ℝ)).trace = 1 := by
+          rw [show (2:ℝ)/2 = 1 from by norm_num, HermitianMat.rpow_one]; exact σ.tr
+        have h2 : (ρ.M.sqrt ^ (2 : ℝ)).trace = 1 := by
+          rw [show ρ.M.sqrt = ρ.M ^ (1/2 : ℝ) from by
+            rw [HermitianMat.sqrt_eq_cfc_rpow_half, ← HermitianMat.rpow_eq_cfc],
+            ← HermitianMat.rpow_mul ρ.nonneg,
+            show (1:ℝ)/2 * 2 = 1 from by norm_num, HermitianMat.rpow_one]; exact ρ.tr
+        simp [h2]
 
 /-- The fidelity, as a `Prob` probability with value between 0 and 1. -/
 def fidelity_prob : Prob :=
@@ -57,8 +72,16 @@ theorem fidelity_eq_one_iff_self : fidelity ρ σ = 1 ↔ ρ = σ :=
   fun h ↦ h ▸ fidelity_self_eq_one ρ⟩
 
 /-- The fidelity is a symmetric quantity. -/
-theorem fidelity_symm : fidelity ρ σ = fidelity σ ρ :=
-  sorry --break into sqrts
+theorem fidelity_symm : fidelity ρ σ = fidelity σ ρ := by
+  simp only [fidelity]
+  have expand : ∀ (a b : MState d), (a.M.conj b.M.sqrt.mat).mat =
+      (b.M.sqrt.mat * a.M.sqrt.mat) * (a.M.sqrt.mat * b.M.sqrt.mat) := fun a b => by
+    simp [HermitianMat.conj_apply_mat, b.M.sqrt.conjTranspose_mat,
+      (HermitianMat.sqrt_sq a.nonneg).symm, Matrix.mul_assoc]
+  have h_eig := ((σ.M.conj ρ.M.sqrt.mat).H.eigenvalues_eq_eigenvalues_iff
+    (ρ.M.conj σ.M.sqrt.mat).H).mpr (by rw [expand σ ρ, expand ρ σ, Matrix.charpoly_mul_comm])
+  show ((σ.M.conj ρ.M.sqrt.mat).cfc Real.sqrt).trace = ((ρ.M.conj σ.M.sqrt.mat).cfc Real.sqrt).trace
+  rw [HermitianMat.trace_cfc_eq, HermitianMat.trace_cfc_eq, h_eig]
 
 /-- The fidelity cannot decrease under the application of a channel. -/
 theorem fidelity_channel_nondecreasing [DecidableEq d₂] (Λ : CPTPMap d d₂) : fidelity (Λ ρ) (Λ σ) ≥ fidelity ρ σ :=

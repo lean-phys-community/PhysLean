@@ -143,8 +143,8 @@ scoped instance : NonUnitalNonAssocRing (HermitianMat d 𝕜) where
 
 variable [Invertible (2 : 𝕜)] [DecidableEq d]
 
---TODO: Upgrade this to NonAssocCommRing, see #28604 in Mathlib
-scoped instance : NonAssocRing (HermitianMat d 𝕜) where
+scoped instance : NonAssocCommRing (HermitianMat d 𝕜) where
+  mul_comm := HermitianMat.symmMul_comm
 
 end field
 

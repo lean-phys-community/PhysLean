@@ -39,6 +39,7 @@ their being dense in `SpaceDHilbertSpace 0 ≅ ℂ`).
 - `polyBddSchwartzSubmodule d (a : ℕ∞)`: Restriction of `schwartzSubmodule d` to those Schwartz maps
   which are bounded by powers of `‖x‖`.
 - `PolyBddSchwartzSubmodule.dense d a`: These submodules are dense in `SpaceDHilbertSpace`.
+- `PolyBddSchwartzSubmodule.dense d a`: These submodules are dense in `SpaceDHilbertSpace`.
 
 ## iii. Table of contents
 
@@ -195,6 +196,7 @@ lemma dense_top (d : ℕ) :
     intro ξ
     apply mem_closure_iff_seq_limit.mpr
     -- `ψₙ = [fₙ]` is a sequence in `schwartzSubmodule` which tends to `ξ`
+    obtain ⟨ψ, hψ, hψξ⟩ := mem_closure_iff_seq_limit.mp (SchwartzSubmodule.dense d ξ)
     obtain ⟨ψ, hψ, hψξ⟩ := mem_closure_iff_seq_limit.mp (SchwartzSubmodule.dense d ξ)
     let f (n : ℕ) : 𝓢(Space d, ℂ) := schwartzEquiv.symm ⟨ψ n, hψ n⟩
     -- `bₙ` is a sequence of bump functions with shrinking domain

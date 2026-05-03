@@ -3,12 +3,10 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
---For the first three lemmas
 module
 
 public import Mathlib.Topology.Algebra.Module.LinearMap
 
---For the third lemma
 public import Mathlib.Analysis.CStarAlgebra.Classes
 public import Mathlib.Analysis.InnerProductSpace.Spectrum
 public import Mathlib.Order.CompletePartialOrder
@@ -20,16 +18,6 @@ namespace ContinuousLinearMap
 variable {R S : Type*} [Semiring R] [Semiring S] (σ : R →+* S) (M M₂ : Type*)
 variable [TopologicalSpace M] [AddCommMonoid M] [TopologicalSpace M₂] [AddCommMonoid M₂]
 variable [Module R M] [Module S M₂]
-
---These two theorems might look a bit silly as aliases of `LinearMap.____`, but they don't `simp` on their
---TODO: I think we can remove these now that we've bumped to Lean 4.28.0
-@[simp]
-theorem range_zero [RingHomSurjective σ] : (0 : M →SL[σ] M₂).range = ⊥ := by
-  simp
-
-@[simp]
-theorem ker_zero : (0 : M →SL[σ] M₂).ker = ⊤ := by
-  simp
 
 theorem ker_mk (f : M →ₛₗ[σ] M₂) (hf : Continuous f.toFun) :
     (ContinuousLinearMap.mk f hf).ker = LinearMap.ker f := by

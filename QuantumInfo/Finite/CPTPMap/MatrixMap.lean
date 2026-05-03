@@ -412,4 +412,11 @@ theorem piProd_comp
   simp [piProd, PiTensorProduct.map_comp, ← Matrix.toLin_mul]
   rw [← LinearMap.toMatrix_comp]
 
+@[simp]
+theorem piProd_id :
+    piProd (fun i ↦ (LinearMap.id : MatrixMap (dI i) (dI i) R)) = LinearMap.id := by
+  simp [piProd, PiTensorProduct.map_id, LinearMap.toMatrix_id_eq_basis_toMatrix,
+    Module.Basis.toMatrix_self, Matrix.reindex_apply, Matrix.submatrix_one_equiv,
+    Matrix.toLin_one]
+
 end pi

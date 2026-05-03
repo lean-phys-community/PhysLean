@@ -431,8 +431,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
   have hfxz (x) (hx : x ∈ S) (z) (hz : z ∈ segment ℝ y₁ y₂) : min (f x y₁) (f x y₂) ≤ f x z :=
     (hfq₁ x hx).min_le_mem_segment hy₁ hy₂ hz
   have hC'zAB (z) (hz : z ∈ segment ℝ y₁ y₂) : C' z ⊆ A ∪ B := by
-    --TODO: On newer Mathlib this is just `grind [inf_le_iff, le_trans]`
-    intro; simp [C', A, B]; grind [inf_le_iff, le_trans]
+    intro; grind [inf_le_iff, le_trans]
   have hC'z (z) (hz : z ∈ segment ℝ y₁ y₂) : Convex ℝ (C' z) :=
     hfq₂ z (hT₂.segment_subset hy₁ hy₂ hz) β
   have hC'zAB (z) (hz : z ∈ segment ℝ y₁ y₂) : C' z ⊆ A ∨ C' z ⊆ B := by
@@ -657,8 +656,7 @@ private lemma sion_exists_min_fin
       apply h_bddB.mono
       rintro _ ⟨x, hx, rfl⟩
       use x, hx
-      -- TODO: On a newer mathlib this line is just `grind`
-      rcases max_cases (f x ↑y₀') (f x yₙ) <;> grind
+      grind
     clear h_non_inter
     rw [lt_inf_iff]
     constructor
