@@ -1238,7 +1238,7 @@ theorem traceRight_right_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
 @[simp]
 theorem traceNorm_eq_1 (ρ : MState d) : ρ.m.traceNorm = 1 :=
   have := calc (ρ.m.traceNorm : ℂ)
-    _ = ρ.m.trace := ρ.psd.traceNorm_PSD_eq_trace
+    _ = ρ.m.trace := ρ.psd.traceNorm_eq_trace
     _ = 1 := ρ.tr'
   Complex.ofReal_eq_one.mp this
 
