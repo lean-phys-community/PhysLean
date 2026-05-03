@@ -6,12 +6,20 @@ Authors: Alex Meiburg
 module
 
 public import QuantumInfo.StatMech.Hamiltonian
+public import QuantumInfo.ForMathlib.ComplexLaplaceTransform
+public import Mathlib.Analysis.Complex.HasPrimitives
+public import Mathlib.Analysis.Complex.RealDeriv
 public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 public import Mathlib.Data.Real.StarOrdered
 public import Mathlib.MeasureTheory.Constructions.Pi
+public import Mathlib.MeasureTheory.Constructions.BorelSpace.WithTop
+public import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 public import Mathlib.MeasureTheory.Integral.Bochner.Basic
+public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
 public import Mathlib.MeasureTheory.Integral.Bochner.L1
 public import Mathlib.MeasureTheory.Integral.Bochner.VitaliCaratheodory
+public import Mathlib.MeasureTheory.Integral.DominatedConvergence
+public import Mathlib.MeasureTheory.Measure.Prod
 public import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 public import Mathlib.Order.CompletePartialOrder
 
@@ -31,6 +39,48 @@ def PartitionZ (β : ℝ) : ℝ :=
   ∫ (config : H.dim d → ℝ),
     let E := H.H config
     if h : E = ⊤ then 0 else Real.exp (-β * (E.untop h))
+
+/-- The complexified partition function, viewed as a Laplace transform. -/
+def PartitionZComplex (z : ℂ) : ℂ :=
+  ComplexLaplaceTransform (fun config : H.dim d → ℝ => H.H config) z
+
+/-- The complex convergence domain of the partition-function Laplace transform. -/
+def ZComplexConvergenceDomain : Set ℂ :=
+  ComplexLaplaceConvergenceDomain (fun config : H.dim d → ℝ => H.H config)
+
+private theorem partitionZ_eq_re_partitionZComplex {β : ℝ}
+    (hβ : (β : ℂ) ∈ H.ZComplexConvergenceDomain d) :
+    H.PartitionZ d β = (H.PartitionZComplex d β).re := by
+  have hInt : MeasureTheory.Integrable (μ := MeasureTheory.volume)
+      (ComplexLaplaceIntegrand (fun config : H.dim d → ℝ => H.H config) (β : ℂ)) := hβ
+  rw [PartitionZ, PartitionZComplex, ComplexLaplaceTransform]
+  calc
+    (∫ (config : H.dim d → ℝ),
+        have E := H.H config
+        if h : E = ⊤ then 0 else Real.exp (-β * E.untop h)) =
+        ∫ x, RCLike.re (ComplexLaplaceIntegrand
+          (fun config : H.dim d → ℝ => H.H config) (β : ℂ) x) := by
+      apply MeasureTheory.integral_congr_ae
+      filter_upwards with config
+      unfold ComplexLaplaceIntegrand
+      by_cases h : H.H config = ⊤
+      · simp [h]
+      · simp only [h, dite_false]
+        set e : ℝ := (H.H config).untop h
+        simpa [Complex.ofReal_mul] using (Complex.exp_ofReal_re (-(β * e))).symm
+    _ = RCLike.re (∫ x, ComplexLaplaceIntegrand
+        (fun config : H.dim d → ℝ => H.H config) (β : ℂ) x) := integral_re hInt
+
+open scoped ContDiff Topology in
+theorem contDiffAt_partitionZ_of_mem_interior_convergenceDomain {β : ℝ}
+    (hβ : (β : ℂ) ∈ interior (H.ZComplexConvergenceDomain d)) :
+    ContDiffAt ℝ ⊤ (H.PartitionZ d) β := by
+  refine (analyticAt_complexLaplaceTransform_of_mem_interior_convergenceDomain
+    (E := fun config : H.dim d → ℝ => H.H config) (H.measurable_H d) hβ).contDiffAt
+    |>.real_of_complex |>.congr_of_eventuallyEq ?_
+  filter_upwards [(Complex.continuous_ofReal.tendsto β).eventually
+    (IsOpen.mem_nhds isOpen_interior hβ)] with x hx
+  exact H.partitionZ_eq_re_partitionZComplex d (_root_.interior_subset hx)
 
 /-- The partition function as a function of temperature T instead of β. -/
 def PartitionZT (T : ℝ) : ℝ :=
@@ -85,66 +135,73 @@ so this will be differentiable if
 is, aka if the Laplace transform is differentiable.
 See e.g. https://math.stackexchange.com/q/84382/127777
 For this we really want the fact that the Laplace transform is analytic wherever it's absolutely convergent,
-which is (as Wikipedia informs) an easy consequence of Fubini's theorem + Morera's theorem. However, Morera's
-theorem isn't in mathlib yet. So this is a sorry for now
+which follows from the local domination estimate above, Fubini's theorem, and Morera's theorem.
 -/
-open scoped ContDiff in
-theorem DifferentiableAt_Z_if_ZIntegrable {β : ℝ} (h : H.ZIntegrable d β) : ContDiffAt ℝ ω (H.PartitionZ d) β :=
-  sorry
-
-/-- The two definitions of entropy, in terms of T or β, are equivalent. -/
-theorem entropy_A_eq_entropy_Z (T β : ℝ) (hβT : T * β = 1) (hi : H.ZIntegrable d β)
-    : EntropyS H d T = EntropySβ H d β := by
-  have hTnz : T ≠ 0 := left_ne_zero_of_mul_eq_one hβT
-  have hβnz : β ≠ 0 := right_ne_zero_of_mul_eq_one hβT
-  have hβT' := eq_one_div_of_mul_eq_one_right hβT
+/-- The two definitions of entropy, in terms of `T` or `β = 1 / T`, are equivalent. -/
+theorem entropy_A_eq_entropy_Z (T : ℝ) (hT : T ≠ 0)
+    (hZne : H.PartitionZ d (1 / T) ≠ 0)
+    (hZint : ((1 / T : ℝ) : ℂ) ∈ interior (H.ZComplexConvergenceDomain d)) :
+    EntropyS H d T = EntropySβ H d (1 / T) := by
+  have hZdiff : DifferentiableAt ℝ (H.PartitionZ d) (1 / T) :=
+    (H.contDiffAt_partitionZ_of_mem_interior_convergenceDomain d hZint).differentiableAt
+      (by simp)
   dsimp [EntropyS, EntropySβ, InternalU, PartitionZT]
   unfold HelmholtzA
   erw [deriv_mul]
   rw [deriv_neg'', neg_mul, one_mul, neg_add_rev, neg_neg, mul_neg, add_comm]
   congr 1
-  · rw [PartitionZT, hβT']
   simp_rw [PartitionZT]
   have hdc := deriv_comp (h := fun T ↦ T⁻¹) (h₂ := fun β => Real.log (H.PartitionZ d β)) T ?_ ?_
   unfold Function.comp at hdc
-  simp only [hdc, one_div, deriv_inv', mul_neg, neg_inj, hβT']
+  simp only [hdc, one_div, deriv_inv', mul_neg, neg_inj]
   field_simp
   ring_nf
   --Show the differentiability side-goals
-  · rw [← one_div, ← hβT']
-    have h₁ := hi.2
-    have := (DifferentiableAt_Z_if_ZIntegrable hi).differentiableAt WithTop.top_ne_zero
+  · rw [← one_div]
     fun_prop (disch := assumption)
   · fun_prop (disch := assumption)
   · fun_prop
   · simp_rw [PartitionZT]
-    rw [hβT'] at hi
-    have := hi.2
-    have := (DifferentiableAt_Z_if_ZIntegrable hi).differentiableAt WithTop.top_ne_zero
     fun_prop (disch := assumption)
 
+
 set_option backward.isDefEq.respectTransparency false in
+open scoped ContDiff in
 /--
 The "definition of temperature from entropy":
 1/T = (∂S/∂U), when the derivative is at constant extrinsic d (typically N/V).
 Here we use β instead of 1/T on the left, and express the right actually as (∂S/∂β)/(∂U/∂β),
 as all our things are ultimately parameterized by β.
+
+This identity requires the denominator `∂U/∂β` to be nonzero.
 -/
-theorem β_eq_deriv_S_U {β : ℝ} (hi : H.ZIntegrable d β) : β = (deriv (H.EntropySβ d) β) / deriv (H.InternalU d) β := by
+theorem β_eq_deriv_S_U {β : ℝ}
+    (hZne : H.PartitionZ d β ≠ 0)
+    (hZint : (β : ℂ) ∈ interior (H.ZComplexConvergenceDomain d))
+    (hU' : deriv (H.InternalU d) β ≠ 0) :
+    β = (deriv (H.EntropySβ d) β) / deriv (H.InternalU d) β := by
+  have hZ : ContDiffAt ℝ ⊤ (H.PartitionZ d) β :=
+    H.contDiffAt_partitionZ_of_mem_interior_convergenceDomain d hZint
   unfold EntropySβ
   unfold InternalU
 
   --Show the differentiability side-goals
-  have : DifferentiableAt ℝ (fun β => Real.log (H.PartitionZ d β)) β := by
-    have := hi.2
-    have := (DifferentiableAt_Z_if_ZIntegrable hi).differentiableAt WithTop.top_ne_zero
+  have hlogDiff : DifferentiableAt ℝ (fun β => Real.log (H.PartitionZ d β)) β := by
+    have := hZne
+    have := hZ.differentiableAt (by simp)
     fun_prop (disch := assumption)
-  have : DifferentiableAt ℝ (deriv fun β => Real.log (H.PartitionZ d β)) β := by
-    have this := (DifferentiableAt_Z_if_ZIntegrable hi).log hi.2
+  have hlogDerivDiff : DifferentiableAt ℝ (deriv fun β => Real.log (H.PartitionZ d β)) β := by
+    have this := hZ.log hZne
     replace this :=
-      (this.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt WithTop.top_ne_zero
+      (this.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (by simp)
     unfold deriv
     fun_prop
+  have hderiv : deriv (deriv fun β => Real.log (H.PartitionZ d β)) β ≠ 0 := by
+    intro hzero
+    apply hU'
+    change deriv (-fun β => deriv (fun β' => Real.log (H.PartitionZ d β')) β) β = 0
+    rw [deriv.neg]
+    simp [hzero]
 
   --Main goal
   simp only [mul_neg]
@@ -152,19 +209,17 @@ theorem β_eq_deriv_S_U {β : ℝ} (hi : H.ZIntegrable d β) : β = (deriv (H.En
   dsimp
   erw [deriv_mul]
   simp only [deriv_id'', one_mul, neg_add_rev, add_neg_cancel_comm_assoc, neg_div_neg_eq]
-  have : deriv (deriv fun β => Real.log (H.PartitionZ d β)) β ≠ 0 := ?_
-  exact (mul_div_cancel_right₀ β this).symm
+  exact (mul_div_cancel_right₀ β hderiv).symm
   --Discharge those side-goals
-  · sorry
-  · fun_prop (disch := assumption)
-  · fun_prop (disch := assumption)
+  · exact differentiableAt_id
+  · exact hlogDerivDiff
   · fun_prop (disch := assumption)
   · fun_prop (disch := assumption)
 
 set_option backward.isDefEq.respectTransparency false in
 open scoped ContDiff in
-example (x : ℝ) (f : ℝ → ℝ) (hf : ContDiffAt ℝ ω f x) : DifferentiableAt ℝ (deriv f) x := by
-  have := (hf.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt WithTop.top_ne_zero
+example (x : ℝ) (f : ℝ → ℝ) (hf : ContDiffAt ℝ ⊤ f x) : DifferentiableAt ℝ (deriv f) x := by
+  have := (hf.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (by simp)
   unfold deriv
   fun_prop
 
