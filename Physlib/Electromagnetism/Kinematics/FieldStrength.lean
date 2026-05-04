@@ -78,12 +78,12 @@ TODO "Currently the API for the field strength tensor has the definition
 
 ## A. The field strength tensor
 
-We define the field strength tensor `F_μ^ν` in terms of the derivative of the
+We define the field strength tensor `F^{μν}` in terms of the derivative of the
 electromagnetic potential `A^μ`. We then prove that this tensor transforms correctly
 under Lorentz transformations.
 
 -/
-/-- The field strength from an electromagnetic potential, as a tensor `F_μ^ν`. -/
+/-- The field strength from an electromagnetic potential, as a tensor `F^{μν}`. -/
 noncomputable def toFieldStrength {d} (A : ElectromagneticPotential d) :
     SpaceTime d → Lorentz.Vector d ⊗[ℝ] Lorentz.Vector d := fun x =>
   Tensorial.toTensor.symm
