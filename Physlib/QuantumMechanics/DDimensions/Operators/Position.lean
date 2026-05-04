@@ -452,18 +452,23 @@ lemma radiusRegPowUnboundedOperator_apply_ae_eq {d : ℕ} (ε : ℝˣ) (s : ℝ)
 
 open Complex
 
-lemma add_floor_toNat_pos_aux (d : ℕ) (s : ℝ) : 0 < d + 2 * (⌊1 - d / 2 - s⌋.toNat + s) := by
+private lemma add_floor_toNat_pos_aux (d : ℕ) (s : ℝ) :
+    0 < d + 2 * (⌊1 - d / 2 - s⌋.toNat + s) := by
   let n : ℤ := ⌊1 - d / 2 - s⌋
   have hn₁ : 1 - d / 2 - s < n + 1 := Int.lt_floor_add_one _
   have hn₂ : (n : ℝ) ≤ n.toNat := Int.cast_le.mpr (Int.self_le_toNat _)
   linarith
 
+lemma radiusPowOperator_apply_polyBddSchwartz_memHS {d : ℕ} {s : ℝ}
+    (ψ : polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
+    MemHS (𝐫[d] s (polyBddSchwartzEquiv.symm ψ)) :=
+  let f := polyBddSchwartzEquiv.symm ψ
+  radiusPowOperator_apply_memHS s f.1 ⌊1 - d / 2 - s⌋.toNat f.2 (add_floor_toNat_pos_aux d s)
+
 /-- Radius operator acting on a polynomially-bounded Schwartz submodule. -/
 def radiusPowOperatorSchwartz {d : ℕ} (s : ℝ) :
     polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat →ₗ[ℂ] SpaceDHilbertSpace d where
-  toFun ψ :=
-    let f := polyBddSchwartzEquiv.symm ψ
-    mk <| radiusPowOperator_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
+  toFun ψ := mk (radiusPowOperator_apply_polyBddSchwartz_memHS ψ)
   map_add' := by simp [← mk_add]
   map_smul' := by simp [← mk_const_smul]
 
