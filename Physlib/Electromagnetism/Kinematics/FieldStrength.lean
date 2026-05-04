@@ -153,6 +153,12 @@ tensor in.
 
 -/
 
+TODO "Generalize the proof of `toFieldStrength_eq_sum_basis_eval` so that any tensor
+  can easily be written as the sum of its components times the basis.
+  The likely location for this is in the `Tensorial` module.
+  The TODO item with tag: 8285454220008908699 is likely a prerequisite to this."
+
+
 /-- The statement that `F = F^{μν} eᵤ ⊗ eᵥ` written explicitly, with
   the components extracted via `toField`. -/
 lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :

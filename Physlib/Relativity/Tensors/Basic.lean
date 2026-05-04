@@ -54,6 +54,10 @@ def ComponentIdx.cast {n m : ℕ} {c : Fin n → C} {cm : Fin m → C}
     ComponentIdx (S := S) cm := fun j =>
       basisIdxCongr (by simp [hc]) (b (Fin.cast h.symm j))
 
+TODO "Define the equivalence between `ComponentIdx ![c]` and `basisIdx c`.
+  Replace Lorentz.Vector.indexEquiv and Lorentz.CoVector.indexEquiv with this more
+  general definition."
+
 /-!
 
 ## Pure tensors
