@@ -3,9 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.MState
+module
 
-import QuantumInfo.ForMathlib
+public import QuantumInfo.Finite.MState
+
+public import QuantumInfo.ForMathlib
+
+@[expose] public section
 
 noncomputable section
 
@@ -25,6 +29,7 @@ namespace TrDistance
 
 variable {d d₂ : Type*} [Fintype d] [Fintype d₂] (ρ σ : MState d)
 
+set_option backward.isDefEq.respectTransparency false in
 theorem ge_zero : 0 ≤ TrDistance ρ σ := by
   rw [TrDistance]
   simp [Matrix.traceNorm_nonneg]

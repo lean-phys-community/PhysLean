@@ -3,9 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.Braket
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.ClassicalInfo.Entropy
+module
+
+public import QuantumInfo.Finite.Braket
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.ClassicalInfo.Entropy
 
 /-!
 Quantum notions of information and entropy.
@@ -17,6 +19,8 @@ We start with quantities of _entropy_, namely the von Neumann entropy and its de
  * Quantum conditional mutual information, `qcmi`.
 and then prove facts about them.
 -/
+
+@[expose] public section
 
 /- # TODO / Goals:
 
@@ -101,6 +105,7 @@ theorem Sᵥₙ_of_pure_zero (ψ : Ket d) : Sᵥₙ (MState.pure ψ) = 0 := by
   obtain ⟨i, hi⟩ := MState.spectrum_pure_eq_constant ψ
   rw [Sᵥₙ, hi, Hₛ_constant_eq_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem Sᵥₙ_eq_neg_trace_log (ρ : MState d) : Sᵥₙ ρ = -⟪ρ.M.log, ρ.M⟫ := by
   open HermitianMat in
   rw [log, inner_eq_re_trace]
@@ -112,6 +117,7 @@ theorem Sᵥₙ_eq_neg_trace_log (ρ : MState d) : Sᵥₙ ρ = -⟪ρ.M.log, ρ
   apply Finset.sum_equiv e.symm (by simp)
   simp [MState.spectrum, ProbDistribution.mk', he, mul_comm]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Von Neumann entropy is the trace of the matrix function `x ↦ -x log x`. -/
 theorem Sᵥₙ_eq_trace_cfc_negMulLog (ρ : MState d) :
     Sᵥₙ ρ = (ρ.M.cfc Real.negMulLog).trace := by
@@ -175,7 +181,7 @@ section partial_trace_pure
 /--
 Convert a vector on a product space to a matrix.
 -/
-private def vecToMat {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] (v : d₁ × d₂ → ℂ) : Matrix d₁ d₂ ℂ :=
+def vecToMat {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] (v : d₁ × d₂ → ℂ) : Matrix d₁ d₂ ℂ :=
   Matrix.of (fun i j => v (i, j))
 
 /--
@@ -258,6 +264,7 @@ private lemma multiset_filter_map_ofReal_eq {R : Type*} [RCLike R] (M : Multiset
     (M.map (RCLike.ofReal : ℝ → R)).filter (· ≠ 0) = (M.filter (· ≠ 0)).map RCLike.ofReal := by
   simp [Multiset.filter_map]
 
+set_option backward.isDefEq.respectTransparency false in
 /-
 The non-zero roots of the characteristic polynomial are the non-zero eigenvalues mapped
 to complex numbers.

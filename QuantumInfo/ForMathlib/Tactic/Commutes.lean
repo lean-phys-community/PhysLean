@@ -3,32 +3,33 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
+module
 
-import QuantumInfo.ForMathlib.Tactic.Commutes.Attribute
-import Mathlib.Algebra.BigOperators.Group.List.Basic
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.BigOperators.Ring.List
-import Mathlib.Algebra.Group.Action.Defs
-import Mathlib.Algebra.Group.Center
-import Mathlib.Algebra.Group.Commute.Basic
-import Mathlib.Algebra.Group.Commute.Hom
-import Mathlib.Algebra.Group.Commute.Units
-import Mathlib.Algebra.Group.Invertible.Basic
-import Mathlib.Algebra.Group.Opposite
-import Mathlib.Algebra.Group.Pi.Lemmas
-import Mathlib.Algebra.Group.Prod
-import Mathlib.Algebra.GroupWithZero.Commute
-import Mathlib.Algebra.GroupWithZero.Semiconj
-import Mathlib.Algebra.Polynomial.Basic
-import Mathlib.Algebra.Ring.Commute
-import Mathlib.Algebra.Ring.Nat
-import Mathlib.Algebra.Star.SelfAdjoint
-import Mathlib.Data.Int.Cast.Lemmas
-import Mathlib.Data.Matrix.Basic
-import Mathlib.Data.Nat.Cast.Commute
-import Mathlib.Data.Rat.Cast.Defs
-import Mathlib.GroupTheory.GroupAction.Ring
-import Mathlib.LinearAlgebra.Matrix.ZPow
+public import QuantumInfo.ForMathlib.Tactic.Commutes.Attribute
+public import Mathlib.Algebra.BigOperators.Group.List.Basic
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.BigOperators.Ring.List
+public import Mathlib.Algebra.Group.Action.Defs
+public import Mathlib.Algebra.Group.Center
+public import Mathlib.Algebra.Group.Commute.Basic
+public import Mathlib.Algebra.Group.Commute.Hom
+public import Mathlib.Algebra.Group.Commute.Units
+public import Mathlib.Algebra.Group.Invertible.Basic
+public import Mathlib.Algebra.Group.Opposite
+public import Mathlib.Algebra.Group.Pi.Lemmas
+public import Mathlib.Algebra.Group.Prod
+public import Mathlib.Algebra.GroupWithZero.Commute
+public import Mathlib.Algebra.GroupWithZero.Semiconj
+public import Mathlib.Algebra.Polynomial.Basic
+public import Mathlib.Algebra.Ring.Commute
+public import Mathlib.Algebra.Ring.Nat
+public import Mathlib.Algebra.Star.SelfAdjoint
+public import Mathlib.Data.Int.Cast.Lemmas
+public import Mathlib.Data.Matrix.Basic
+public import Mathlib.Data.Nat.Cast.Commute
+public import Mathlib.Data.Rat.Cast.Defs
+public import Mathlib.GroupTheory.GroupAction.Ring
+public import Mathlib.LinearAlgebra.Matrix.ZPow
 
 /-!
 
@@ -38,6 +39,8 @@ This tactic uses `aesop` to discharge goals relating to the `Commute` relation. 
 tries to do straightforward recursion on expressions, along with some basic normalization
 of ring operations.
 -/
+
+@[expose] public section
 
 /-- A tactic for proving goals of the `Commute` relation.
 

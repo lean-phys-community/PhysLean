@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap
+module
+
+public import QuantumInfo.Finite.CPTPMap
 
 /-! # Positive Operator-Valued Measures
 
@@ -18,6 +20,8 @@ are the route to get back to classical information (a `ProbDistribution` of outc
 TODO: They can also evolve under CPTP maps themselves (the Heisenberg picture of quantum evolution), they might commute
 with each other or not, they might be projective or not.
 -/
+
+@[expose] public section
 noncomputable section
 open BigOperators
 open ComplexOrder
@@ -43,6 +47,7 @@ namespace POVM
 
 variable {X : Type*} {d : Type*} [Fintype X] [Fintype d] [DecidableEq d] [DecidableEq X]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The act of measuring is a quantum channel, that maps a `d`-dimensional quantum
 state to an `d × X`-dimensional quantum-classical state. -/
 def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
@@ -114,6 +119,7 @@ theorem measurementMap_apply_hermitianMat (Λ : POVM X d) (m : HermitianMat d �
   simp only [HermitianMat.diagonal, mat_mk, diagonal_apply, single, of_apply]
   split_ifs <;> grind only [= map_zero, = map_one]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A POVM leads to a distribution of outcomes on any given mixed state ρ. -/
 def measure (Λ : POVM X d) (ρ : MState d) : ProbDistribution X := .mk'
     (f := fun x ↦ ⟪Λ.mats x, ρ.M⟫)

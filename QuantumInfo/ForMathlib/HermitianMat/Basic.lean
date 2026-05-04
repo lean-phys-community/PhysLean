@@ -3,17 +3,21 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.Matrix
-import QuantumInfo.ForMathlib.IsMaximalSelfAdjoint
-import QuantumInfo.ForMathlib.ContinuousLinearMap
-import QuantumInfo.ForMathlib.Tactic.Commutes
+module
 
-import Mathlib.Analysis.Matrix.Normed
-import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
-import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
-import Mathlib.Tactic.NormNum.GCD
+public import QuantumInfo.ForMathlib.Matrix
+public import QuantumInfo.ForMathlib.IsMaximalSelfAdjoint
+public import QuantumInfo.ForMathlib.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.Tactic.Commutes
+
+public import Mathlib.Analysis.Matrix.Normed
+public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
+public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic
+public import Mathlib.Analysis.SpecialFunctions.Bernstein
+public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+public import Mathlib.Tactic.NormNum.GCD
+
+@[expose] public section
 
 /-- The type of Hermitian matrices, as a `Subtype`. Equivalent to a `Matrix n n α` bundled
 with the fact that `Matrix.IsHermitian`. -/
@@ -159,6 +163,7 @@ instance : IsTopologicalAddGroup (HermitianMat n α) where
 
 variable  [TopologicalSpace R] [SMul R α] [ContinuousSMul R α] [StarModule R α]
 
+set_option backward.isDefEq.respectTransparency false in
 instance : ContinuousSMul R (HermitianMat n α) where
   continuous_smul := by
     rw [continuous_induced_rng]
@@ -166,6 +171,8 @@ instance : ContinuousSMul R (HermitianMat n α) where
 
 --Shorcut instances:
 instance : IsTopologicalAddGroup (HermitianMat n 𝕜) := inferInstance
+
+set_option backward.isDefEq.respectTransparency false in
 instance : ContinuousSMul ℝ (HermitianMat n ℂ) := inferInstance
 
 --TODO: Would be good to figure out the general (not just RCLike) version of this.
@@ -197,11 +204,14 @@ theorem mat_finset_sum (f : ι → HermitianMat n α) (s : Finset ι) :
 section module
 
 variable [Semiring R] [Module R α] [StarModule R α]
+
+set_option backward.isDefEq.respectTransparency false in
 instance : Module R (HermitianMat n α) :=
   inferInstanceAs (Module R (selfAdjoint (Matrix n n α)))
 
 variable [TopologicalSpace α]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The projection from HermitianMat to Matrix, as a continuous linear map. -/
 @[simps]
 def matₗ : HermitianMat n α →L[R] Matrix n n α where
@@ -233,8 +243,10 @@ theorem mk_one (h : (1 : Matrix n n α).IsHermitian) : ⟨1, h⟩ = (1 : Hermiti
 theorem one_apply (i j : n) : (1 : HermitianMat n α) i j = (1 : Matrix n n α) i j := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 noncomputable instance : AddCommMonoidWithOne (HermitianMat n 𝕜) where
 
+set_option backward.isDefEq.respectTransparency false in
 instance [i : Nonempty n] : NeZero (1 : HermitianMat n 𝕜) := by
   constructor
   intro h
@@ -257,6 +269,7 @@ theorem mat_inv : (A⁻¹).mat = A.mat⁻¹ := by
 theorem zero_inv : ((0 : HermitianMat m α)⁻¹) = 0 := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem one_inv : ((1 : HermitianMat m α)⁻¹) = 1 := by
   ext1; simp
@@ -268,6 +281,7 @@ noncomputable instance instPow : Pow (HermitianMat m α) ℕ :=
 theorem mat_pow (n : ℕ) : (A ^ n).mat = A.mat ^ n := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem pow_zero : A ^ 0 = 1 := by
   ext1; simp
@@ -276,6 +290,7 @@ theorem pow_zero : A ^ 0 = 1 := by
 theorem zero_pow (hn : n ≠ 0): (0 : HermitianMat m α) ^ n = 0 := by
   ext1; simp [hn]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem one_pow : ((1 : HermitianMat m α) ^ n) = 1 := by
   ext1; simp
@@ -291,6 +306,7 @@ theorem mat_zpow (z : ℤ) : (A ^ z).mat = A.mat ^ z := by
 theorem zpow_natCast : A ^ (n : ℤ) = A ^ n := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem zpow_zero : A ^ (0 : ℤ) = 1 := by
   ext1; simp
@@ -299,6 +315,7 @@ theorem zpow_zero : A ^ (0 : ℤ) = 1 := by
 theorem zpow_one : A ^ (1 : ℤ) = A := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem one_zpow : ((1 : HermitianMat m α) ^ z) = 1 := by
   ext1; simp
@@ -332,6 +349,7 @@ end commring
 section rclike
 
 variable [Finite n] in
+set_option backward.isDefEq.respectTransparency false in
 instance FiniteDimensional : FiniteDimensional ℝ (HermitianMat n 𝕜) :=
   FiniteDimensional.finiteDimensional_submodule (selfAdjoint.submodule ℝ (Matrix n n 𝕜))
 
@@ -393,6 +411,7 @@ theorem conj_zero [DecidableEq n] : A.conj (0 : Matrix m n α) = 0 := by
 theorem conj_one [DecidableEq n] : A.conj 1 = A := by
   simp [conj_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma conj_one_unitary [DecidableEq n] (U : Matrix.unitaryGroup n α) :
     conj U.val 1 = 1 := by
@@ -402,6 +421,7 @@ lemma conj_one_unitary [DecidableEq n] (U : Matrix.unitaryGroup n α) :
 
 variable (R : Type*) [Star R] [TrivialStar R] [CommSemiring R] [Algebra R α] [StarModule R α]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `HermitianMat.conj` as an `R`-linear map, where `R` is the ring of relevant reals. -/
 def conjLinear {m} (B : Matrix m n α) : HermitianMat n α →ₗ[R] HermitianMat m α where
   toAddHom := conj B
@@ -424,12 +444,13 @@ section eigenspace
 
 variable [Fintype n] [DecidableEq n] (A : HermitianMat n 𝕜)
 
+set_option backward.isDefEq.respectTransparency false in
 instance [i : Nonempty n] : FaithfulSMul ℝ (HermitianMat n 𝕜) where
   eq_of_smul_eq_smul h := by
     simpa [RCLike.smul_re, -mat_apply] using congr(RCLike.re ($(h 1).val i.some i.some))
 
 /-- The continuous linear map associated with a Hermitian matrix. -/
-def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n where
+noncomputable def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n where
   toLinearMap := A.mat.toEuclideanLin
   cont := LinearMap.continuous_of_finiteDimensional _
 
@@ -441,6 +462,7 @@ theorem isSymmetric : A.lin.IsSymmetric :=
 theorem lin_zero : (0 : HermitianMat n 𝕜).lin = 0 := by
   simp [lin]; rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem lin_one : (1 : HermitianMat n 𝕜).lin = 1 := by
   simp [lin]; rfl
@@ -450,7 +472,7 @@ noncomputable def eigenspace (μ : 𝕜) : Submodule 𝕜 (EuclideanSpace 𝕜 n
 
 /-- The kernel of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
 `LinearMap.ker A.toMat.toEuclideanLin`. Equivalently, the zero-eigenspace. -/
-def ker : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+noncomputable def ker : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   LinearMap.ker A.lin.toLinearMap
 
 theorem mem_ker_iff_mulVec_zero (x : EuclideanSpace 𝕜 n) : x ∈ A.ker ↔ A.mat.mulVec x = 0 := by
@@ -475,7 +497,7 @@ theorem ker_pos_smul {c : ℝ} (hc : c ≠ 0) : (c • A).ker = A.ker := by
 
 /-- The support of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
 `LinearMap.range A.toMat.toEuclideanLin`. Equivalently, the sum of all nonzero eigenspaces. -/
-def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+noncomputable def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   LinearMap.range A.lin.toLinearMap
 
 /-- The support of a Hermitian matrix is the sum of its nonzero eigenspaces. -/
@@ -523,6 +545,7 @@ theorem diagonal_mat : (diagonal 𝕜 f).mat = Matrix.diagonal (f · : n → �
 theorem diagonal_zero : (diagonal 𝕜 0) = (0 : HermitianMat n 𝕜) := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem diagonal_one : (diagonal 𝕜 1) = (1 : HermitianMat n 𝕜) := by
   ext; rw [diagonal_mat]; simp
@@ -583,6 +606,7 @@ theorem zero_kronecker (A : HermitianMat m α) : (0 : HermitianMat n α) ⊗ₖ 
 theorem kronecker_zero (A : HermitianMat m α) : A ⊗ₖ (0 : HermitianMat n α) = 0 := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 variable [DecidableEq m] [DecidableEq n] in
 @[simp]
 theorem kronecker_one_one : (1 : HermitianMat m α) ⊗ₖ (1 : HermitianMat n α) = 1 := by
@@ -614,6 +638,7 @@ theorem kron_commute [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
   rw [commute_iff_eq] at hAC hBD ⊢
   simp only [kronecker_mat, ← Matrix.mul_kronecker_mul, hAC, hBD]
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 A ⊗ₖ 1 always commutes with 1 ⊗ₖ B
 -/
@@ -726,7 +751,7 @@ theorem conj_ne_zero {A : HermitianMat d 𝕜} {M : Matrix d₂ d 𝕜} (hA : A 
 theorem conj_ne_zero_iff {A : HermitianMat d 𝕜} {M : Matrix d₂ d 𝕜}
     (h : LinearMap.ker M.toEuclideanLin ≤ A.ker) : A.conj M ≠ 0 ↔ A ≠ 0  := by
   refine ⟨?_, (conj_ne_zero · h)⟩
-  intro h rfl; simp at h--should be grind[= map_zero] but I don't know why. TODO.
+  intro h rfl; grind
 
 section spectrum
 

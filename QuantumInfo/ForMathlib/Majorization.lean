@@ -3,8 +3,10 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib
-import QuantumInfo.ForMathlib.Matrix
+module
+
+public import Mathlib
+public import QuantumInfo.ForMathlib.Matrix
 
 /-! # Majorization and weak log-majorization
 
@@ -18,6 +20,8 @@ the key singular value inequality needed for the Schatten–Hölder inequality.
 * `holder_step_for_singularValues`: the Hölder step giving
   `∑ σ↓ᵢ(A)^r · σ↓ᵢ(B)^r ≤ (∑ σᵢ(A)^p)^{r/p} · (∑ σᵢ(B)^q)^{r/q}`.
 -/
+
+@[expose] public section
 
 open Finset BigOperators Matrix
 
@@ -458,6 +462,7 @@ lemma singularValues_compoundMatrix_rev (M : Matrix d d ℂ) (k : ℕ)
   obtain ⟨σ, hσ⟩ := singularValues_compoundMatrix_perm M k
   exact ⟨σ.symm j, by rw [← hσ]; simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- There exists a bijection `σ : Fin (card d) ≃ d` such that
     `singularValues M (σ i) = singularValuesSorted M i` for all `i`. -/
 lemma exists_sorting_equiv (M : Matrix d d ℂ) :
@@ -531,6 +536,7 @@ lemma prod_singularValues_subset_le_sorted_prod (M : Matrix d d ℂ) (k : ℕ)
   intro i j hij
   simpa [g] using congr_arg σ hij
 
+set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 800000 in
 lemma exists_subset_prod_eq_sorted_prod (M : Matrix d d ℂ) (k : ℕ)
     (hk : k ≤ Fintype.card d) :
@@ -838,6 +844,7 @@ For the direct induction approach on n:
 Hmm, this doesn't work cleanly because log(y_i/x_i) can be negative for some i.
 Better approach: prove it directly using the Abel summation identity and nonnegativity of each term.
 -/
+set_option backward.isDefEq.respectTransparency false in
 lemma sum_mul_log_nonneg_of_weak_log_maj {n : ℕ}
     {x y : Fin n → ℝ}
     (hx_pos : ∀ i, 0 < x i) (hy_pos : ∀ i, 0 < y i)
@@ -973,6 +980,7 @@ lemma sum_rpow_singularValues_mul_le (A B : Matrix d d ℂ) {r : ℝ} (hr : 0 < 
 
 /-! ## Hölder inequality for singular values -/
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 The finite-sum Hölder inequality applied to sequences of r-th powers of
 sorted singular values.

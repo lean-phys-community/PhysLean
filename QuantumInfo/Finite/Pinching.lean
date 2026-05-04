@@ -3,10 +3,12 @@ Copyright (c) 2025 Leonardo A Lessa. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Leonardo A Lessa, Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.Finite.MState
-import QuantumInfo.Finite.Entropy
-import QuantumInfo.ForMathlib.HermitianMat.CFC
+module
+
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.Finite.MState
+public import QuantumInfo.Finite.Entropy
+public import QuantumInfo.ForMathlib.HermitianMat.CFC
 
 /-! # Pinching channels
 A pinching channel decoheres in the eigenspaces of a given state.
@@ -16,6 +18,8 @@ where the P_i are the projectors onto the i-th eigenspaces of ρ = ∑ᵢ pᵢ P
 
 TODO: Generalize to pinching with respect to arbitrary P(O)VM.
 -/
+
+@[expose] public section
 
 noncomputable section
 open scoped Matrix RealInnerProductSpace
@@ -67,6 +71,7 @@ theorem pinching_kraus_ortho (ρ : MState d) (i j : spectrum ℝ ρ.m) :
   · grind [sq, HermitianMat.mat_pow, pinching_sq_eq_self]
   · exact pinching_kraus_orthogonal ρ hij
 
+set_option backward.isDefEq.respectTransparency false in
 theorem pinching_sum (ρ : MState d) : ∑ k, pinching_kraus ρ k = 1 := by
   ext i j
   simp only [pinching_kraus, HermitianMat.cfc]
@@ -79,6 +84,7 @@ theorem pinching_sum (ρ : MState d) : ∑ k, pinching_kraus ρ k = 1 := by
   rw [← cfc_sum, Finset.sum_fn, cfc_congr heq, cfc_one (R := ℝ) (ha := _)]
   rw [IsSelfAdjoint, Matrix.star_eq_conjTranspose, ρ.Hermitian]
 
+set_option backward.isDefEq.respectTransparency false in
 def pinching_map (ρ : MState d) : CPTPMap d d ℂ :=
   CPTPMap.of_kraus_CPTPMap (HermitianMat.mat ∘ pinching_kraus ρ) (by
   conv =>
@@ -128,6 +134,7 @@ theorem pinching_commutes (ρ σ : MState d) :
   simp only [← mul_assoc, hr]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem pinching_self (ρ : MState d) : pinching_map ρ ρ = ρ := by
   ext1
@@ -144,6 +151,7 @@ theorem pinching_self (ρ : MState d) : pinching_map ρ ρ = ρ := by
   simp only [pinching_sum, HermitianMat.mat_one, mul_one]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Lemma 3.10 of Hayashi's book "Quantum Information Theory - Mathematical Foundations".
 Also, Lemma 5 in https://arxiv.org/pdf/quant-ph/0107004.
 -- Used in (S60) -/
@@ -265,6 +273,7 @@ theorem inner_cfc_pinching (ρ σ : MState d) (f : ℝ → ℝ) :
   convert congr($(pinching_sum σ).mat)
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 theorem inner_cfc_pinching_right (ρ σ : MState d) (f : ℝ → ℝ) :
     ⟪(pinching_map σ ρ).M, σ.M.cfc f⟫ = ⟪ρ.M, σ.M.cfc f⟫ := by
   --TODO Cleanup
@@ -299,6 +308,7 @@ theorem pinching_map_eq_sum_conj_hermitian (σ ρ : MState d) :
   ext1
   simp [pinching_eq_sum_conj σ ρ]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem pinching_map_ker_le (ρ σ : MState d) : (pinching_map σ ρ).M.ker ≤ ρ.M.ker := by
   have h_ker_sum : (∑ k, ρ.M.conj (pinching_kraus σ k).mat).ker = ⨅ k, (ρ.M.conj (pinching_kraus σ k).mat).ker := by
     apply HermitianMat.ker_sum
@@ -336,6 +346,7 @@ theorem pinching_kraus_ker_of_ne_zero {d : Type*} [Fintype d] [DecidableEq d]
 
 end AristotleLemmas
 
+set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 2000000 in
 theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ker) :
     σ.M.ker ≤ (pinching_map σ ρ).M.ker := by
@@ -382,6 +393,7 @@ theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ke
     · simp
   · simp [← Matrix.mulVec_mulVec, h_proj_zero _ hk_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Exercise 2.8 of Hayashi's book "A group theoretic approach to Quantum Information". -/
 theorem pinching_pythagoras (ρ σ : MState d) :
     𝐃(ρ‖σ) = 𝐃(ρ‖pinching_map σ ρ) + 𝐃(pinching_map σ ρ‖σ) := by

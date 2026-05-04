@@ -3,12 +3,16 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.LogExp
-import QuantumInfo.ForMathlib.HermitianMat.Sqrt
-import QuantumInfo.ForMathlib.HermitianMat.Unitary
-import Mathlib.Analysis.SpecialFunctions.Integrability.Basic
-import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
-import Mathlib.MeasureTheory.Integral.IntegralEqImproper
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.LogExp
+public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
+public import QuantumInfo.ForMathlib.HermitianMat.Unitary
+public import Mathlib.Analysis.SpecialFunctions.Integrability.Basic
+public import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
+public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
+
+@[expose] public section
 
 variable {d d₂ 𝕜 : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
 variable [RCLike 𝕜]
@@ -88,6 +92,7 @@ lemma sqrt_eq_cfc_rpow_half (A : HermitianMat d 𝕜)  :
   intro
   simp [Real.sqrt_eq_rpow]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem one_rpow : (1 : HermitianMat d 𝕜) ^ r = 1 := by
   rcases isEmpty_or_nonempty d
@@ -127,6 +132,7 @@ theorem conj_rpow (hA : 0 ≤ A) (hq : q ≠ 0) (hqr : r + 2 * q ≠ 0) :
   rw [pow_two, Real.rpow_add' hi hqr, two_mul, Real.rpow_add' hi (by simpa)]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 theorem pow_half_mul (hA : 0 ≤ A) :
     (A ^ (1/2 : ℝ)).mat * (A ^ (1/2 : ℝ)).mat = A := by
   rw [← mat_rpow_add hA]
@@ -148,6 +154,7 @@ theorem inv_eq_rpow_neg_one (hA : A.mat.PosDef) : A⁻¹ = A ^ (-1 : ℝ) := by
   rw [← cfc_inv, rpow_eq_cfc]
   simp_rw [Real.rpow_neg_one]
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 theorem sandwich_self (hB : B.mat.PosDef) :
     (B.conj (B ^ (-1/2 : ℝ)).mat) = 1 := by
@@ -164,6 +171,7 @@ theorem sandwich_self (hB : B.mat.PosDef) :
   rw [ ← Matrix.mul_assoc, hB_inv_sqrt, Matrix.nonsing_inv_mul _ ];
   exact isUnit_iff_ne_zero.mpr hB.det_pos.ne'
 
+set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-p) := by
   --TODO cleanup
@@ -252,6 +260,7 @@ private lemma rpow_kron_diagonal
   congr! 2 with x
   apply Real.mul_rpow (ha x.1) (hb x.2)
 
+set_option backward.isDefEq.respectTransparency false in
 open scoped Kronecker in
 omit [DecidableEq d] [DecidableEq d₂] in
 lemma conj_kron
@@ -260,6 +269,7 @@ lemma conj_kron
   ext1
   simp [conj, Matrix.mul_kronecker_mul, Matrix.conjTranspose_kronecker]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma rpow_kron
     {A : HermitianMat d ℂ} {B : HermitianMat d₂ ℂ} (r : ℝ) (hA : 0 ≤ A) (hB : 0 ≤ B) :
     (A ⊗ₖ B) ^ r = (A ^ r) ⊗ₖ (B ^ r) := by
@@ -324,6 +334,7 @@ theorem continuousOn_rpow_joint_nonneg_pos
 
 end continuity
 
+set_option backward.isDefEq.respectTransparency false in
 /-
 For a positive Hermitian matrix A, (A^2)^(p/2) = A^p, expressed using functional calculus.
 TODO: Cleanup, generalize...
@@ -371,6 +382,7 @@ noncomputable def rpowApprox (A : HermitianMat d ℂ) (q T : ℝ) : HermitianMat
   ∫ t in (0)..T, t ^ q • ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (A + t • 1)⁻¹)
 
 set_option maxHeartbeats 800000 in
+set_option backward.isDefEq.respectTransparency false in
 open MeasureTheory ComplexOrder in
 theorem rpowApprox_mono {A B : HermitianMat d ℂ} (hA : A.mat.PosDef) (hB : B.mat.PosDef)
     (hAB : A ≤ B) (hq : 0 ≤ q) (T : ℝ) (hT : 0 < T) :
@@ -523,6 +535,7 @@ lemma rpowConst_pos (hq : 0 < q) (hq1 : q < 1) : 0 < rpowConst q := by
   linarith
 
 open MeasureTheory Filter in
+set_option backward.isDefEq.respectTransparency false in
 /-- The scalar rpow approximation converges pointwise.
     `scalarRpowApprox q T x → rpowConst q * (x^q - 1)` as `T → ∞`. -/
 lemma scalarRpowApprox_tendsto {x : ℝ} (hx : 0 < x) (hq : 0 < q) (hq1 : q < 1) :
@@ -570,6 +583,7 @@ lemma scalarRpowApprox_tendsto {x : ℝ} (hx : 0 < x) (hq : 0 < q) (hq1 : q < 1)
   · linarith
 
 open MeasureTheory ComplexOrder Filter in
+set_option backward.isDefEq.respectTransparency false in
 /-- The matrix rpow approximation converges: `rpowApprox A q T → rpowConst q • (A^q - 1)`. -/
 lemma tendsto_rpowApprox (hA : A.mat.PosDef) (hq : 0 < q) (hq1 : q < 1) :
     Tendsto (rpowApprox A q) atTop (nhds (rpowConst q • (A ^ q - 1))) := by
@@ -612,6 +626,7 @@ theorem rpow_le_rpow_of_posDef (hA : A.mat.PosDef) (hAB : A ≤ B)
     simp_all
 
 open ComplexOrder Filter in
+set_option backward.isDefEq.respectTransparency false in
 /-- The **Löwner—Heinz theorem**: for matrices A and B, if `0 ≤ A ≤ B` and `0 < q ≤ 1`,
 then `A^q ≤ B^q`. That is, real roots are operator monotone. -/
 theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)

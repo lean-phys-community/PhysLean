@@ -3,8 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Order.CompletePartialOrder
+module
+
+public import Mathlib.Analysis.SpecialFunctions.Log.Basic
+public import Mathlib.Order.CompletePartialOrder
+
+@[expose] public section
 
 --Can this be rewritten more generally? For `finiteness` to work, I don't know how.
 --PR'ed in #33105

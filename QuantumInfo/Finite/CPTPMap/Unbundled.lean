@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap.MatrixMap
+module
+
+public import QuantumInfo.Finite.CPTPMap.MatrixMap
 
 /-! # Properties of Matrix Maps
 
@@ -15,6 +17,8 @@ These are the *unbundled* versions, which just state the relevant properties of 
 The bundled versions are `HPMap`, `UnitalMap`, `TPMap`, `PMap`, and `CPMap` respectively, given
 in Bundled.lean.
 -/
+
+@[expose] public section
 
 namespace MatrixMap
 
@@ -58,7 +62,8 @@ theorem IsTracePreserving_iff_trace_choi [DecidableEq A] (M : MatrixMap A B R) :
 
 namespace IsTracePreserving
 
-/-- Simp lemma: the trace of the image of a IsTracePreserving map is the same as the original trace. -/
+/-- Simp lemma: the trace of the image of a IsTracePreserving map is the same as the original
+trace. -/
 @[simp]
 theorem apply_trace (h : M.IsTracePreserving) (ρ : Matrix A A R)
     : (M ρ).trace = ρ.trace :=
@@ -117,6 +122,7 @@ theorem kron {M₁ : MatrixMap A B R} {M₂ : MatrixMap C D R} (h₁ : M₁.IsTr
   simp [h_simp]
 
 variable {S : Type*} [CommSemiring S] [Star S] [DecidableEq A] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The channel X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ formed by Kraus operators M, N : κ → Matrix B A R
 is trace-preserving if ∑ k : κ, (N k)ᴴ * (M k) = 1 -/
 theorem of_kraus_isTracePreserving
@@ -348,12 +354,15 @@ variable {d : Type*} [Fintype d]
 
 open MatrixOrder
 
-/-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely positive map. -/
+set_option backward.isDefEq.respectTransparency false in
+/-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely
+  positive map. -/
 theorem kron_kronecker_const {C : Matrix d d R} (h : C.PosSemidef) {h₁ h₂ : _} : IsCompletelyPositive
     (⟨⟨fun M => M ⊗ₖ C, h₁⟩, h₂⟩ : MatrixMap A (A × d) R) := by
   intros n x hx
   have h_kronecker_pos : (x ⊗ₖ C).PosSemidef := by
-    -- Since $x$ and $C$ are positive semidefinite, there exist matrices $U$ and $V$ such that $x = U^*U$ and $C = V^*V$.
+    -- Since $x$ and $C$ are positive semidefinite, there exist matrices $U$ and $V$ such that
+    -- $x = U^*U$ and $C = V^*V$.
     obtain ⟨U, hU⟩ : ∃ U : Matrix (A × Fin n) (A × Fin n) R, x = star U * U := by
       classical
       apply CStarAlgebra.nonneg_iff_eq_star_mul_self.mp
@@ -561,6 +570,7 @@ theorem conj_eq_mulRightLinearMap_comp_mulRightLinearMap (y : Matrix B A R) :
     conj y = mulRightLinearMap B R y.conjTranspose ∘ₗ mulLeftLinearMap A R y := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The act of conjugating (not necessarily by a unitary, just by any matrix at all) is completely positive. -/
 theorem conj_isCompletelyPositive (M : Matrix B A R) : (conj M).IsCompletelyPositive := by
   --TODO: This is identical to congruence_CP

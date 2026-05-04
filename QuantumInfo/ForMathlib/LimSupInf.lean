@@ -3,20 +3,24 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.Normed.Ring.Lemmas
-import Mathlib.Data.Finset.Attr
-import Mathlib.Data.Int.Star
-import Mathlib.Data.Real.StarOrdered
-import Mathlib.Tactic.Bound
-import Mathlib.Tactic.Peel
-import Mathlib.Tactic.Common
-import Mathlib.Tactic.Continuity
-import Mathlib.Tactic.Finiteness.Attr
-import Mathlib.Tactic.SetLike
-import Mathlib.Util.CompileInductive
-import Mathlib.Topology.Instances.ENNReal.Lemmas
-import Mathlib.Topology.Instances.Nat
+module
+
+public import Mathlib.Algebra.Order.Ring.Star
+public import Mathlib.Analysis.Normed.Ring.Lemmas
+public import Mathlib.Data.Finset.Attr
+public import Mathlib.Data.Int.Star
+public import Mathlib.Data.Real.StarOrdered
+public import Mathlib.Tactic.Bound
+public import Mathlib.Tactic.Peel
+public import Mathlib.Tactic.Common
+public import Mathlib.Tactic.Continuity
+public import Mathlib.Tactic.Finiteness.Attr
+public import Mathlib.Tactic.SetLike
+public import Mathlib.Util.CompileInductive
+public import Mathlib.Topology.Instances.ENNReal.Lemmas
+public import Mathlib.Topology.Instances.Nat
+
+@[expose] public section
 
 open scoped NNReal
 open scoped ENNReal
@@ -87,7 +91,7 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
   classical
   by_contra h_contra;
   -- By definition of negation, if $\neg P$ holds, then $P$ does not hold.
-  push_neg at h_contra;
+  push Not at h_contra;
   -- Apply `exists_strictMono_seq_le` to obtain a strictly increasing sequence `n_k` such that `f (1/(k+1)) (n_k) ≤ y + 1/(k+1)`.
   obtain ⟨n, hn_mono, hn_le⟩ : ∃ n : ℕ → ℕ, StrictMono n ∧ ∀ k : ℕ, f ((k : ℝ≥0) + 1)⁻¹ (n k) ≤ (y : ℝ≥0∞) + ((k : ℝ≥0) + 1)⁻¹ := by
     -- Apply `exists_strictMono_seq_le` to obtain a strictly increasing sequence `n_k` such that `f (1/(k+1)) (n_k) ≤ y + 1/(k+1)` for all `k`.
@@ -168,6 +172,7 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
         exact le_sup_right
   exact h_contra g hg_pos hg_tendsto_zero |> not_lt_of_ge hg_liminf;
 
+set_option backward.isDefEq.respectTransparency false in
 /- Version of `exists_liminf_zero_of_forall_liminf_le` that lets you also require `g`
 to have an upper bound. -/
 lemma exists_liminf_zero_of_forall_liminf_le_with_UB (y : ℝ≥0) (f : ℝ≥0 → ℕ → ℝ≥0∞)
@@ -368,6 +373,7 @@ lemma limsup_le_of_block_sequence_bound {α : Type*} (y : ℝ≥0) (f : α → �
     rw [ hg k b hk.1 hk.2 ];
     exact le_trans ( hbound k b hk.1 hk.2 ) ( add_le_add_right ( hK k ( le_of_not_gt fun hk' => by linarith [ hT.monotone hk'.nat_succ_le ] ) ) _ )
 
+set_option backward.isDefEq.respectTransparency false in
 /- Version of `exists_liminf_zero_of_forall_liminf_le_with_UB` that lets you stipulate it for
 two different functions simultaneously, one with liminf and one with limsup. -/
 lemma exists_liminf_zero_of_forall_liminf_limsup_le_with_UB (y₁ y₂ : ℝ≥0) (f₁ f₂ : ℝ≥0 → ℕ → ℝ≥0∞)

@@ -3,16 +3,20 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Algebra.Order.Module.Field
-import Mathlib.Analysis.Convex.PathConnected
-import Mathlib.Analysis.Convex.Quasiconvex
-import Mathlib.Analysis.Convex.Topology
-import Mathlib.Analysis.Normed.Order.Lattice
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Data.EReal.Operations
-import Mathlib.Data.Fintype.Order
-import Mathlib.Topology.Algebra.InfiniteSum.Order
-import Mathlib.Topology.MetricSpace.Bounded
+module
+
+public import Mathlib.Algebra.Order.Module.Field
+public import Mathlib.Analysis.Convex.PathConnected
+public import Mathlib.Analysis.Convex.Quasiconvex
+public import Mathlib.Analysis.Convex.Topology
+public import Mathlib.Analysis.Normed.Order.Lattice
+public import Mathlib.Analysis.SpecificLimits.Basic
+public import Mathlib.Data.EReal.Operations
+public import Mathlib.Data.Fintype.Order
+public import Mathlib.Topology.Algebra.InfiniteSum.Order
+public import Mathlib.Topology.MetricSpace.Bounded
+
+@[expose] public section
 
 @[simp]
 theorem Set.image2_flip {α β γ : Type*} {f : α → β → γ} (s : Set α) (t : Set β) :
@@ -295,6 +299,7 @@ theorem UpperSemicontinuousOn.frequently_lt_of_tendsto {α β γ : Type*} [Topol
       using ⟨hzI n, hn (hzI n)⟩
   simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 theorem Finset.ciInf_insert {α β : Type*} [DecidableEq α] [ConditionallyCompleteLattice β]
   (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
     ⨅ (a : (insert x t : _)), f a = f x ⊓ ⨅ (a : t), f a := by
@@ -380,6 +385,7 @@ variable
   (hfq₁ : ∀ x, x ∈ S → QuasiconcaveOn ℝ T (f x))
   (hT₂ : Convex ℝ T) (hS₂ : Convex ℝ S)
 
+set_option backward.isDefEq.respectTransparency false in
 include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hT₂ hS₃ in
 private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y₂ ∈ T)
     (a : ℝ) (ha : a < ⨅ x : S, (max (f x y₁) (f x y₂)))
@@ -425,8 +431,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
   have hfxz (x) (hx : x ∈ S) (z) (hz : z ∈ segment ℝ y₁ y₂) : min (f x y₁) (f x y₂) ≤ f x z :=
     (hfq₁ x hx).min_le_mem_segment hy₁ hy₂ hz
   have hC'zAB (z) (hz : z ∈ segment ℝ y₁ y₂) : C' z ⊆ A ∪ B := by
-    --TODO: On newer Mathlib this is just `grind [inf_le_iff, le_trans]`
-    intro; simp [C', A, B]; grind [inf_le_iff, le_trans]
+    intro; grind [inf_le_iff, le_trans]
   have hC'z (z) (hz : z ∈ segment ℝ y₁ y₂) : Convex ℝ (C' z) :=
     hfq₂ z (hT₂.segment_subset hy₁ hy₂ hz) β
   have hC'zAB (z) (hz : z ∈ segment ℝ y₁ y₂) : C' z ⊆ A ∨ C' z ⊆ B := by
@@ -554,6 +559,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
   · rw [Set.inter_eq_self_of_subset_left hR] at hIJ
     exact hI₁ hIJ
 
+set_option backward.isDefEq.respectTransparency false in
 include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ in
 private lemma sion_exists_min_fin
   (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T))
@@ -650,8 +656,7 @@ private lemma sion_exists_min_fin
       apply h_bddB.mono
       rintro _ ⟨x, hx, rfl⟩
       use x, hx
-      -- TODO: On a newer mathlib this line is just `grind`
-      rcases max_cases (f x ↑y₀') (f x yₙ) <;> grind
+      grind
     clear h_non_inter
     rw [lt_inf_iff]
     constructor
@@ -675,6 +680,7 @@ private lemma sion_exists_min_fin
       have := x.2.2.le
       exact le_sup_of_le_right this
 
+set_option backward.isDefEq.respectTransparency false in
 include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ hT₃ in
 /-- **Sion's Minimax theorem**. Because of `ciSup` and `ciInf` junk values when f isn't
 bounded, we need to assume that it's bounded above and below. -/

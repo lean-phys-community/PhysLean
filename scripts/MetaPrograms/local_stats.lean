@@ -3,12 +3,12 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Informal.Post
+import Physlib.Meta.Informal.Post
 import Mathlib.Lean.CoreM
-import PhysLean.Meta.AllFilePaths
+import Physlib.Meta.AllFilePaths
 /-!
 
-# Local stats within PhysLean
+# Local stats within Physlib
 
 Given a directory this script returns the statistics of
 the lean files contained within.
@@ -18,12 +18,12 @@ of lemmas.
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 
 def numDefs (dir : String) : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   let dirName := dir.replace "./" ""
   let dirName := dirName.replace ".lean" ""
   let dirName := dirName.replace "/" "."
@@ -31,8 +31,8 @@ def numDefs (dir : String) : CoreM Nat := do
    && (← Lean.Name.fileName c.name).toString.startsWith dirName
 
 def numLemmas (dir : String) : CoreM Nat := do
-  let imports ← PhysLean.allImports
-  let x ← imports.mapM PhysLean.Imports.getUserConsts
+  let imports ← Physlib.allImports
+  let x ← imports.mapM Physlib.Imports.getUserConsts
   let dirName := dir.replace "./" ""
   let dirName := dirName.replace ".lean" ""
   let dirName := dirName.replace "/" "."
@@ -53,7 +53,7 @@ unsafe def main (args  : List String) : IO UInt32 := do
   | [dir] => do
   let files ← allFilePaths.go (#[] : Array FilePath) dir (dir : FilePath)
   let noFiles := files.size
-  let statString ← CoreM.withImportModules #[`PhysLean] (getStats dir).run'
+  let statString ← CoreM.withImportModules #[`Physlib] (getStats dir).run'
   println! statString
 
   println! s!"Number of files: {noFiles}"

@@ -3,8 +3,12 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Rpow
-import QuantumInfo.ForMathlib.Majorization
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Rpow
+public import QuantumInfo.ForMathlib.Majorization
+
+@[expose] public section
 
 variable {d d₂ 𝕜 : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
 variable [RCLike 𝕜]
@@ -170,6 +174,7 @@ lemma conjTranspose_half_mul_eq_conj
   have := HermitianMat.pow_half_mul hA; simp_all [ ← mul_assoc ] ;
   simp only [mul_assoc, this]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma schattenNorm_half_mul_rpow_eq_trace_conj
     {A B : HermitianMat d ℂ} (hA : 0 ≤ A)
     {α : ℝ} (hα : 0 < α) :

@@ -3,7 +3,9 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Rodolfo Soldati
 -/
-import QuantumInfo.Finite.MState
+module
+
+public import QuantumInfo.Finite.MState
 
 /-! # Unitary operators on quantum state
 
@@ -12,6 +14,8 @@ This file is intended for lemmas about unitary matrices (`Matrix.unitaryGroup`) 
 
 This is imported by `CPTPMap` to define things like unitary channels, Kraus operators, and
 complementary channels, so this file itself does not discuss channels yet. -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -73,6 +77,7 @@ The ◃ notation comes from the theory of racks and quandles, where this is a
 conjugation-like operation. -/
 scoped[MState] notation:80 U:80 " ◃ " ρ:81 => MState.U_conj ρ U
 
+set_option backward.isDefEq.respectTransparency false in
 /-- You might think this should only be true up to permutation, so that it would read like
 `∃ σ : Equiv.Perm d, (ρ.U_conj U).spectrum = ρ.spectrum.relabel σ`. But since eigenvalues
 of a matrix are always canonically sorted, this is actually an equality.
@@ -86,6 +91,7 @@ theorem U_conj_spectrum_eq (ρ : MState d) (U : 𝐔[d]) :
 theorem inner_U_conj (ρ σ : MState d) (U : 𝐔[d]) : ⟪U ◃ ρ, U ◃ σ⟫_Prob = ⟪ρ, σ⟫_Prob := by
   simp [U_conj, inner_def]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The **No-cloning theorem**, saying that if states `ψ` and `φ` can both be perfectly cloned using a
 unitary `U` and a fiducial state `f`, and they aren't identical (their inner product is less than 1),
 then the two states must be orthogonal to begin with. In short: only orthogonal states can be simultaneously

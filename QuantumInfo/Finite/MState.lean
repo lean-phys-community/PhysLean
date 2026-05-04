@@ -3,11 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Leonardo A. Lessa
 -/
-import QuantumInfo.ForMathlib
-import QuantumInfo.ClassicalInfo.Distribution
-import QuantumInfo.Finite.Braket
+module
 
-import Mathlib.Logic.Equiv.Basic
+public import QuantumInfo.ForMathlib
+public import QuantumInfo.ClassicalInfo.Distribution
+public import QuantumInfo.Finite.Braket
+
+public import Mathlib.Logic.Equiv.Basic
 
 /-!
 Finite dimensional quantum mixed states, ρ.
@@ -32,6 +34,8 @@ Important definitions:
  * `mix`: The total state corresponding to an ensemble
  * `average`: Averages a function over an ensemble, with appropriate weights
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -82,7 +86,7 @@ open Lean Meta Mathlib.Meta.Positivity in
 Note: we must not call `whnfR` on `e` because `MState.M` is a structure
 projection (reducible), so `whnfR` would reduce it and destroy the pattern. -/
 @[positivity MState.M _]
-def evalMStateM : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalMStateM : PositivityExt where eval {_u _α} _zα _pα e := do
   let ρ := e.appArg!
   pure (.positive (← mkAppM ``MState.pos #[ρ]))
 
@@ -147,6 +151,7 @@ theorem eigenvalue_nonneg : ∀ i, 0 ≤ ρ.Hermitian.eigenvalues i := by
   rw [← Matrix.PosSemidef.nonneg_iff_eigenvalue_nonneg ρ.Hermitian]
   exact ρ.nonneg
 
+set_option backward.isDefEq.respectTransparency false in
 -- Could have used properties of ρ.spectrum
 theorem eigenvalue_le_one : ∀ i, ρ.Hermitian.eigenvalues i ≤ 1 := by
   intro i
@@ -209,6 +214,7 @@ theorem exp_val_prob {T : HermitianMat d ℂ} (h : 0 ≤ T ∧ T ≤ 1) :
     0 ≤ ρ.exp_val T ∧ ρ.exp_val T ≤ 1 :=
   ⟨ρ.exp_val_nonneg h.1, ρ.exp_val_le_one h.2⟩
 
+set_option backward.isDefEq.respectTransparency false in
 theorem exp_val_sub (A B : HermitianMat d ℂ) :
     ρ.exp_val (A - B) = ρ.exp_val A - ρ.exp_val B := by
   simp [exp_val, inner_sub_right]
@@ -227,6 +233,7 @@ theorem exp_val_eq_one_iff {A : HermitianMat d ℂ} (hA₂ : A ≤ 1) :
   rw [exp_val_sub, exp_val_one]
   rw [sub_eq_zero, eq_comm]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem exp_val_add (A B : HermitianMat d ℂ) :
     ρ.exp_val (A + B) = ρ.exp_val A + ρ.exp_val B := by
   simp [exp_val, inner_add_right]
@@ -280,6 +287,7 @@ def spectrum (ρ : MState d) : ProbDistribution d :=
     (ρ.psd.eigenvalues_nonneg ·)
     (by rw [sum_eigenvalues_eq_trace, ρ.tr])
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The spectrum of a pure state is (1,0,0,...), i.e. a constant distribution. -/
 theorem spectrum_pure_eq_constant :
     ∃ i, (pure ψ).spectrum = ProbDistribution.constant i := by
@@ -345,6 +353,7 @@ theorem spectrum_pure_eq_constant :
   use i
   exact ProbDistribution.constant_of_exists_one hi
 
+set_option backward.isDefEq.respectTransparency false in
 /-- If the spectrum of a mixed state is (1,0,0...) i.e. a constant distribution, it is
  a pure state. -/
 theorem pure_of_constant_spectrum (h : ∃ i, ρ.spectrum = ProbDistribution.constant i) :
@@ -398,6 +407,7 @@ theorem pure_iff_constant_spectrum : (∃ ψ, ρ = pure ψ) ↔
   ⟨fun h ↦ h.rec fun ψ h₂ ↦ h₂ ▸ spectrum_pure_eq_constant ψ,
   pure_of_constant_spectrum ρ⟩
 
+set_option backward.isDefEq.respectTransparency false in
 theorem pure_iff_purity_one : (∃ ψ, ρ = pure ψ) ↔ ρ.purity = 1 := by
   --purity = exp(-Collision entropy)
   --purity eq 1 iff collision entropy is zero
@@ -461,6 +471,7 @@ theorem pure_iff_purity_one : (∃ ψ, ρ = pure ψ) ↔ ρ.purity = 1 := by
         ProbDistribution.normalized, Finset.mem_univ, Finset.sum_erase_eq_sub, Set.Icc.coe_one, sub_self, Finset.mem_erase,
         ne_eq, and_true, Prob.zero_le_coe]
 
+set_option backward.isDefEq.respectTransparency false in
 --TODO: Would be better if there was an `MState.eigenstate` or similar (maybe extending
 -- a similar thing for `HermitianMat`) and then this could be an equality with that, as
 -- an explicit formula, instead of this `Exists`.
@@ -551,13 +562,16 @@ Here, the maximally mixed one is chosen. -/
 instance instInhabited [Nonempty d] : Inhabited (MState d) where
   default := uniform
 
+lemma default_eq [Nonempty d] : (default : MState d) = uniform := rfl
+
 @[simp]
 theorem M_default [Unique d] : (default : MState d).M = 1 := by
-  simp [instInhabited, uniform]
+  simp [default_eq, uniform]
   rfl
 
 section ptrace
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Partial tracing out the left half of a system. -/
 @[simps]
 def traceLeft (ρ : MState (d₁ × d₂)) : MState d₂ where
@@ -565,6 +579,7 @@ def traceLeft (ρ : MState (d₁ × d₂)) : MState d₂ where
   nonneg := zero_le_iff.mpr ρ.psd.traceLeft
   tr := by simp [trace]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Partial tracing out the right half of a system. -/
 @[simps]
 def traceRight (ρ : MState (d₁ × d₂)) : MState d₁ where
@@ -631,17 +646,18 @@ theorem spectrum_prod (ρ₁ : MState d₁) (ρ₂ : MState d₂) : ∃(σ : d�
   obtain ⟨ i, j, h ⟩ := h σ; have := congr_fun hσ ( i, j ) ; simp_all [ MState.spectrum ] ;
   exact h ( by exact Subtype.ext this )
 
+set_option backward.isDefEq.respectTransparency false in
 theorem sInf_spectrum_prod (ρ : MState d) (σ : MState d₂) :
     sInf (_root_.spectrum ℝ (ρ ⊗ᴹ σ).m) = sInf (_root_.spectrum ℝ ρ.m) * sInf (_root_.spectrum ℝ σ.m) := by
   rcases isEmpty_or_nonempty d with _ | _; · simp
   rcases isEmpty_or_nonempty d₂ with _ | _; · simp
   rw [MState.m, MState.prod, HermitianMat.spectrum_prod, ← MState.m, ← MState.m]
   apply csInf_mul_nonneg
-  · exact IsSelfAdjoint.spectrum_nonempty ρ.M.H
+  · exact ContinuousFunctionalCalculus.spectrum_nonempty _ ρ.M.H
   · rw [MState.m, ρ.M.H.spectrum_real_eq_range_eigenvalues]
     rintro _ ⟨i, rfl⟩
     apply ρ.eigenvalue_nonneg
-  · exact IsSelfAdjoint.spectrum_nonempty σ.M.H
+  · exact ContinuousFunctionalCalculus.spectrum_nonempty _ σ.M.H
   · rw [MState.m, σ.M.H.spectrum_real_eq_range_eigenvalues]
     rintro _ ⟨i, rfl⟩
     apply σ.eigenvalue_nonneg
@@ -654,12 +670,14 @@ def IsSeparable (ρ : MState (d₁ × d₂)) : Prop :=
     ∃ ps : ProbDistribution ρLRs, --ProbDistribution over those pairs, an ensemble
       ρ.M = ∑ ρLR : ρLRs, (ps ρLR : ℝ) • (Prod.fst ρLR.val).M ⊗ₖ (Prod.snd ρLR.val).M
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A product state `MState.prod` is separable. -/
 theorem IsSeparable_prod (ρ₁ : MState d₁) (ρ₂ : MState d₂) : IsSeparable (ρ₁ ⊗ᴹ ρ₂) := by
   let only := (ρ₁, ρ₂)
   use { only }, ProbDistribution.constant ⟨only, Finset.mem_singleton_self only⟩
   simp [prod, Unique.eq_default, only]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem eq_of_sum_eq_pure {d : Type*} [Fintype d] [DecidableEq d]
     {ι : Type*} {s : Finset ι} {p : ι → ℝ} {ρs : ι → MState d}
     {ρ : MState d} (h_pure : ρ.purity = 1) (h_sum : ρ.M = ∑ i ∈ s, p i • (ρs i).M)
@@ -770,6 +788,7 @@ theorem pureQ_injective {d : Type*} [Fintype d] [DecidableEq d] : Function.Injec
   simp [pureQ] at h
   exact Quotient.sound ((PhaseEquiv_iff_pure_eq _ _).mpr h)
 
+set_option backward.isDefEq.respectTransparency false in
 theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] [DecidableEq d₁] [DecidableEq d₂]
     (ψ : Ket (d₁ × d₂)) (h : IsSeparable (pure ψ)) : ψ.IsProd := by
   obtain ⟨ ρLRs, ps, hps ⟩ := h;
@@ -844,6 +863,7 @@ theorem pure_separable_iff_IsProd (ψ : Ket (d₁ × d₂)) :
     rw [pure_prod_pure ξ φ]
     exact IsSeparable_prod _ _;
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 A mixed state is pure if and only if its rank is 1.
 -/
@@ -886,8 +906,9 @@ theorem pure_iff_rank_eq_one {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
             rw [ Fintype.card_subtype ] at h_diag ; exact h_diag;
           obtain ⟨i, hi⟩ : ∃ i : d, h_herm.eigenvalues i ≠ 0 := by
             exact not_forall.mp fun h => by simp [ h ] at h_diag;
-          rw [ Finset.sum_eq_add_sum_diff_singleton ( Finset.mem_univ i ) ] at h_diag;
-          exact ⟨ i, hi, fun j hj => Classical.not_not.1 fun hj' => absurd h_diag ( by rw [ if_neg hi ] ; exact ne_of_gt ( lt_add_of_pos_right _ ( lt_of_lt_of_le ( by simp [ hj' ] ) ( Finset.single_le_sum ( fun x _ => by positivity ) ( Finset.mem_sdiff.2 ⟨ Finset.mem_univ j, by simp [ hj ] ⟩ ) ) ) ) ) ⟩;
+          rw [ Finset.sum_eq_add_sum_diff_singleton i _ (by simp) ] at h_diag;
+          exact ⟨i, hi, fun j hj => Classical.not_not.1 fun hj' =>
+            absurd h_diag ( by rw [ if_neg hi ] ; exact ne_of_gt ( lt_add_of_pos_right _ ( lt_of_lt_of_le ( by simp [ hj' ] ) ( Finset.single_le_sum ( fun x _ => by positivity ) ( Finset.mem_sdiff.2 ⟨ Finset.mem_univ j, by simp [ hj ] ⟩ ) ) ) ) ) ⟩;
         -- Since the diagonal matrix in the spectral theorem has exactly one non-zero entry, we can write ρ.m as |ψ⟩⟨ψ| for some ket ψ.
         use fun j => (h_herm.eigenvectorUnitary : Matrix d d ℂ) j i * Real.sqrt (h_herm.eigenvalues i);
         convert this using 1
@@ -907,6 +928,7 @@ theorem pure_iff_rank_eq_one {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
     generalize_proofs at *;
     refine' MState.ext_m _ ; aesop
 
+set_option backward.isDefEq.respectTransparency false in
 /--
 A ket on a product space is a product state if and only if its coefficient matrix has rank 1.
 -/
@@ -1031,6 +1053,7 @@ def purifyX (ρ : MState d) : { ψ : Ket (d × d) // (pure ψ).traceRight = ρ }
 
 end purification
 
+set_option backward.isDefEq.respectTransparency false in
 @[simps]
 def relabel (ρ : MState d₁) (e : d₂ ≃ d₁) : MState d₂ where
   M := ρ.M.reindex e.symm
@@ -1084,6 +1107,7 @@ theorem relabel_cast {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁]
   symm
   apply cast_heq
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem spectrum_relabel {ρ : MState d} (e : d₂ ≃ d) :
     _root_.spectrum ℝ (ρ.relabel e).m = _root_.spectrum ℝ ρ.m := by
@@ -1269,6 +1293,7 @@ noncomputable instance : MetricSpace (MState d) :=
 theorem dist_eq (x y : MState d) : dist x y = dist x.M y.M := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 instance : BoundedSpace (MState d) where
   bounded_univ :=
     CompactSpace.isCompact_univ.isBounded
@@ -1293,6 +1318,7 @@ section finprod
 variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
 variable {dI : ι → Type v} [∀(i :ι), Fintype (dI i)] [∀(i :ι), DecidableEq (dI i)]
 
+set_option backward.isDefEq.respectTransparency false in
 def piProd (ρi : (i:ι) → MState (dI i)) : MState ((i:ι) → dI i) where
   M := {
     val := Matrix.piProd (fun i ↦ (ρi i).m)

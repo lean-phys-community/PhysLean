@@ -3,9 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Basic
-import QuantumInfo.ForMathlib.ContinuousLinearMap
-import QuantumInfo.ForMathlib.LinearEquiv
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Basic
+public import QuantumInfo.ForMathlib.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.LinearEquiv
 
 /-!
 Much like `Matrix.reindex` and `Matrix.submatrix`, we can reindex a Hermitian matrix to get another
@@ -14,6 +16,8 @@ Hermitian matrix; however, this only makes sense when both permutations are the 
 
 This file then gives relevant lemmas for simplifying this.
 -/
+
+@[expose] public section
 namespace HermitianMat
 
 variable {d d₂ d₃ d₄ 𝕜 : Type*} [RCLike 𝕜]
@@ -46,6 +50,7 @@ theorem reindex_reindex (A : HermitianMat d 𝕜) (e : d ≃ d₂) (f : d₂ ≃
 theorem reindex_zero : (0 : HermitianMat d 𝕜).reindex e = 0 := by
   ext1; simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem reindex_one [DecidableEq d] [DecidableEq d₂] :
     (1 : HermitianMat d 𝕜).reindex e = 1 := by

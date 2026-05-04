@@ -5,14 +5,14 @@ echo "Running linter for Lean files"
 
 ./scripts/lint-style.sh
 
-echo "Building PhysLean"
+echo "Building Physlib"
 
-lake build PhysLean
+lake build Physlib
 
 echo "Run linter"
 
-lake exe runLinter PhysLean
+lake exe runLinter Physlib
 
 echo "Run shake"
 
-lake exe shake PhysLean
+lake exe shake Physlib

@@ -3,15 +3,19 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg, Leonardo A. Lessa, Rodolfo R. Soldati
 -/
-import Mathlib.Algebra.Module.Submodule.Lattice
-import Mathlib.Analysis.Subadditive
-import Mathlib.CategoryTheory.Functor.FullyFaithful
-import Mathlib.CategoryTheory.Monoidal.Braided.Basic
-import Mathlib.Data.EReal.Basic
-import Mathlib.Tactic
+module
 
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.Finite.Entropy
+public import Mathlib.Algebra.Module.Submodule.Lattice
+public import Mathlib.Analysis.Subadditive
+public import Mathlib.CategoryTheory.Functor.FullyFaithful
+public import Mathlib.CategoryTheory.Monoidal.Braided.Basic
+public import Mathlib.Data.EReal.Basic
+public import Mathlib.Tactic
+
+public import QuantumInfo.Finite.CPTPMap
+public import QuantumInfo.Finite.Entropy
+
+@[expose] public section
 
 open scoped Topology
 
@@ -50,7 +54,9 @@ class ResourcePretheory (ι : Type*) extends Semigroup ι where
     )
      = Equiv.cast (congrArg H <| mul_assoc i j k)
 
+attribute [reducible] ResourcePretheory.FinH
 attribute [instance] ResourcePretheory.FinH
+attribute [reducible] ResourcePretheory.DecEqH
 attribute [instance] ResourcePretheory.DecEqH
 attribute [instance] ResourcePretheory.NonemptyH
 
@@ -244,6 +250,7 @@ theorem statePow_add_relabel (ρ : MState (H i)) (m n : ℕ) :
   obtain ⟨h, h₂⟩ := h
   rw [h₂, MState.relabel_cast]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem statePow_mul (ρ : MState (H i)) (m n : ℕ) : ρ ⊗ᵣ^[m * n] ≍ (ρ ⊗ᵣ^[m]) ⊗ᵣ^[n] := by
   rw [← eq_cast_iff_heq]; swap
   · rw [spacePow_mul]
@@ -289,6 +296,7 @@ theorem statePow_rw {n m : ℕ} (h : n = m) (ρ : MState (H i)) :
   subst n
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem qRelEntropy_statePow (ρ σ : MState (H i)) (n : ℕ) :
     𝐃(ρ ⊗ᵣ^[n] ‖ σ  ⊗ᵣ^[n]) = n * 𝐃(ρ‖σ) := by
@@ -302,6 +310,7 @@ theorem sInf_spectrum_rprod {j : ι} (ρ : MState (H i)) (σ : MState (H j)) :
     sInf (spectrum ℝ (ρ ⊗ᵣ σ).m) = sInf (spectrum ℝ ρ.m) * sInf (spectrum ℝ σ.m) := by
   rw [← MState.sInf_spectrum_prod, prodRelabel, MState.spectrum_relabel]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sInf_spectrum_spacePow (σ : MState (H i)) (n : ℕ) :
     sInf (spectrum ℝ (σ ⊗ᵣ^[n]).m) = sInf (spectrum ℝ σ.m) ^ n := by
   induction n
@@ -315,6 +324,7 @@ lemma sInf_spectrum_spacePow (σ : MState (H i)) (n : ℕ) :
   · rename_i n ih
     rw [statePow_succ, sInf_spectrum_rprod, ih, pow_succ]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_statePow {α : ℝ} (ρ σ : MState (H i)) (n : ℕ) :
     D̃_ α(ρ ⊗ᵣ^[n] ‖ σ ⊗ᵣ^[n]) = n * D̃_ α(ρ‖σ) := by
@@ -432,6 +442,7 @@ theorem exists_isFree_relativeEntResource (ρ : MState (H i)) :
   use σ, hσ₁
   rw [RelativeEntResource, ← hσ₂.iInf_eq hσ₁, ENNReal.ofNNReal, WithTop.coe_untop, iInf_subtype']
 
+set_option backward.isDefEq.respectTransparency false in
 theorem RelativeEntResource.Subadditive (ρ : MState (H i)) : Subadditive fun n ↦ 𝑅ᵣ (ρ ⊗ᵣ^[n]) := by
   intro m n
   obtain ⟨σ₂, hσ₂f, hσ₂d⟩ := exists_isFree_relativeEntResource (ρ ⊗ᵣ^[m])

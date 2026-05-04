@@ -3,6 +3,8 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
+module
+
 /-!
 # Defining Quantum Capacity
 
@@ -33,4 +35,4 @@ Note: Option (6) is what Devetak, in arxiv:0304127, actually proves the LSD theo
 To capture the idea of "quantum capacity", and some other idea that turns out to be equivalent, (1), (2), or (5) seems best. The definitions (1) and (2) seem to be the more recently popular ones. Between those two, choosing "supremum" or "maximum", the supremum seems shorter to state in a definition (as it doesn't require proving closure); indeed Mathlib has no notion of "max real" as a function, only a supremum which can also be shown to be in the set. But the definition in (2) of "For every δ>0, there is a k:ℕ such that k < n implies the existence of a (...)-coding scheme" is cleaner work with as a way to directly construct or extract codes, as opposed to limits of sequences of codes. And finally, the notions of "emulate" and "approximate" seem useful for defining it more elegantly.
 
 This leads to the final definition in [Capacity.lean](./QuantumInfo/Finite/Capacity.html).
--/
+-/@[expose] public section

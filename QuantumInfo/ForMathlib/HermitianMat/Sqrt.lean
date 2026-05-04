@@ -3,7 +3,11 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Proj
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Proj
+
+@[expose] public section
 
 variable {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
 variable {A B : HermitianMat d 𝕜} {f g : ℝ → ℝ}
@@ -70,7 +74,7 @@ theorem sqrt_posDef {A : HermitianMat d 𝕜} (hA : A.mat.PosDef) :
 open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `HermitianMat.sqrt` -/
 @[positivity HermitianMat.sqrt _]
-def evalHermitianMatSqrt : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatSqrt : PositivityExt where eval {_u _α} _zα _pα e := do
   let .app _sqrt (A : Expr) ← whnfR e | throwError "not sqrt application"
   try
     let (isStrictA, pfA) ← bestResult A
