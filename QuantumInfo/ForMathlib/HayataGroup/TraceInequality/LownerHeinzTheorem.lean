@@ -3,14 +3,15 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzCore
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzCore
 
-import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
-import Mathlib.Analysis.Convex.Continuous
-import Mathlib.Analysis.InnerProductSpace.StarOrder
+public import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
+public import Mathlib.Analysis.Convex.Continuous
+public import Mathlib.Analysis.InnerProductSpace.StarOrder
 
-set_option linter.style.longLine false
+@[expose] public section
 
 /-!
 ## Wrapper（`B(ℋ)`）

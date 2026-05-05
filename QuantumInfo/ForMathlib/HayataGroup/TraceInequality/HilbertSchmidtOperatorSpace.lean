@@ -3,15 +3,19 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.GeneralizedPerspectiveFunction
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.GeneralizedPerspectiveFunction
 
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Analysis.InnerProductSpace.Trace
-import Mathlib.Analysis.Normed.Lp.PiLp
-import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.Topology.Algebra.Module.FiniteDimension
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Analysis.InnerProductSpace.Trace
+public import Mathlib.Analysis.Normed.Lp.PiLp
+public import Mathlib.LinearAlgebra.Complex.FiniteDimensional
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+public import Mathlib.Topology.Algebra.Module.FiniteDimension
+
+@[expose] public section
 
 namespace HilbertSchmidtOperatorSpace
 
@@ -83,12 +87,12 @@ instance : FiniteDimensional ℂ (HSOp ℋ) := by
   show FiniteDimensional ℂ (ℋ →L[ℂ] ℋ)
   infer_instance
 
-private noncomputable def hsCoordsLinearEquiv :
+noncomputable def hsCoordsLinearEquiv :
     HSCoords ℋ ≃ₗ[ℂ] (HSCoordFun ℋ) := by
   simpa [HSCoords, HSCoordFun] using
     (WithLp.linearEquiv (2 : ENNReal) ℂ (HSCoordFun ℋ))
 
-private def matrixToFun :
+def matrixToFun :
     Matrix (HSIndex ℋ) (HSIndex ℋ) ℂ ≃ₗ[ℂ] HSCoordFun ℋ where
   toFun M p := M p.1 p.2
   invFun f i j := f (i, j)
@@ -105,12 +109,12 @@ private def matrixToFun :
     ext ⟨i, j⟩
     rfl
 
-private noncomputable def matrixToCoords :
+noncomputable def matrixToCoords :
     Matrix (HSIndex ℋ) (HSIndex ℋ) ℂ ≃ₗ[ℂ] HSCoords ℋ :=
   (matrixToFun (ℋ := ℋ)).trans hsCoordsLinearEquiv.symm
 
 /-- Forget continuity and identify continuous linear operators with linear endomorphisms. -/
-private noncomputable def hsLinearMapEquiv :
+noncomputable def hsLinearMapEquiv :
     HSOp ℋ ≃ₗ[ℂ] (ℋ →ₗ[ℂ] ℋ) :=
   LinearMap.toContinuousLinearMap.symm
 
@@ -366,14 +370,12 @@ lemma re_hsInner_eq_traceRe (X Y : L ℋ) :
   rw [hsInner_eq_trace]
   simp [mul_assoc]
 
-omit [CompleteSpace ℋ] in
 @[simp] lemma leftMulHS_real_smul_one (r : ℝ) :
     leftMulHS (ℋ := ℋ) (r • (1 : L ℋ)) = r • (1 : L (HSOp ℋ)) := by
   ext T
   change ofOp ((r • (1 : L ℋ)) * toOp T) = ofOp (r • toOp T)
   simp [Algebra.smul_def]
 
-omit [CompleteSpace ℋ] in
 @[simp] lemma rightMulHS_real_smul_one (r : ℝ) :
     rightMulHS (ℋ := ℋ) (r • (1 : L ℋ)) = r • (1 : L (HSOp ℋ)) := by
   ext T

@@ -1,6 +1,6 @@
-When porting the code from https://github.com/Hayata-Yamasaki-Group/lean-quantum to this repo,
+When porting the code from https://github.com/Hayata-Yamasaki-Group/lean-quantum to Lean-QuamtumInfo,
 besides moving the code to a different directory (and thus editing the imports at the tops of
-files), three changes were made:
+files), a few changes were made:
  * Some of the `Nontrivial` and `CompleteSpace` instance variables were moved around or `omit`ted, in
    or to prevent the linter warnings about unneeded variables. This was done in:
    - BlockDiagonal.lean
@@ -9,12 +9,10 @@ files), three changes were made:
    - JensenOperatorInequality.lean
    - JensenOperatorInequalityIImpIV.lean
    - JensenOperatorInequalityIVtoV.lean
-   - LiebAndoTrace.lean
- * Three instances of `set_option backward.isDefEq.respectTransparency false` in LiebAndoTrace
-   were removed, since these are a new thing with v4.29.
- * In BlockDiagonal.lean, in `blockDiagonalHom` in the proof of `commutes'`, there was a final
-   `rfl` tactic that was needed in v4.29 but not in v4.28, probably for reason related to
-   respectTransparency. This final line was commented out.
+   - LiebAndoTrace.Lean
+ * Code was moved to the "module system", adding `module`/`public import`/`@[expose]` to the start
+   of each file.
+ * Some whitespace was modified to make lines fit without the longLine linter complaining.
 
 The project this code is graciously borrowed from is the work of the following:
 

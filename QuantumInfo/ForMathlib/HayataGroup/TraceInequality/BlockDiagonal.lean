@@ -3,11 +3,14 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
-import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Topology.Algebra.Module.LinearMapPiProd
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
+public import Mathlib.Analysis.InnerProductSpace.Adjoint
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Topology.Algebra.Module.LinearMapPiProd
+
+@[expose] public section
 
 namespace JensenOperatorInequality
 
@@ -126,7 +129,7 @@ noncomputable def blockDiagonalHom : (L ℋ × L ℋ) →⋆ₐ[ℝ] L (HSum ℋ
     ext z i
     fin_cases i <;> {
       simp [blockDiagonal, hsumProj, hsumIncl, hsumEquiv, Algebra.algebraMap_eq_smul_one]
-      -- rfl --TODO: Port from v4.29 to v4.28 didn't need this
+      rfl
     }
   map_star' := by
     intro p

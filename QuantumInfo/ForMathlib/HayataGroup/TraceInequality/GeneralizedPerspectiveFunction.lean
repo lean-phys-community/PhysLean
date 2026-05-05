@@ -3,10 +3,12 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequality
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequality
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
+@[expose] public section
 
 namespace GeneralizedPerspectiveFunction
 

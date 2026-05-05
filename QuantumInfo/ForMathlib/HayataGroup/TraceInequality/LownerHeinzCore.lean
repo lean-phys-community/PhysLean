@@ -4,11 +4,14 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
 
-import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
-import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Order
-import Mathlib.LinearAlgebra.Matrix.PosDef
+module
 
-set_option linter.style.longLine false
+public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
+public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.IntegralRepresentation
+public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Order
+public import Mathlib.LinearAlgebra.Matrix.PosDef
+
+@[expose] public section
 
 /-!
 ## 構造（Core / Wrapper）
@@ -20,8 +23,9 @@ Core として切り出したものです。
 - `section Spectrum`：`NonnegSpectrumClass` などを仮定して、主要定理群を置く **重い層**
 - `namespace LownerHeinzCore.Spectral`：`spectralOrder` を **`local instance`** として閉じ込めた wrapper
 
-`spectralOrder` を Core 本体に混ぜず、wrapper 側で局所化することで、他モジュールへの順序変更が漏れないようにしています。
-また `NonnegSpectrumClass` は必要な層で明示し、場当たりの `infer_instance` 散布を避けています。
+`spectralOrder` を Core 本体に混ぜず、wrapper 側で局所化することで、他モジュールへの順序変更が
+漏れないようにしています。また `NonnegSpectrumClass` は必要な層で明示し、場当たりの `infer_instance`
+散布を避けています。
 -/
 
 namespace LownerHeinzCore
@@ -747,7 +751,8 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
         cfcR (fun x : ℝ ↦ 1 / (x + t)) ((1 - u) • A + u • B)
           ≤ (1 - u) • cfcR (fun x : ℝ ↦ 1 / (x + t)) A
             + u • cfcR (fun x : ℝ ↦ 1 / (x + t)) B := by
-      simpa using (one_div_add_t_operatorConvexOn_Ici  t ht) (A := A) (B := B) (t := u) hA hB hu0 hu1 As Bs
+      simpa using (one_div_add_t_operatorConvexOn_Ici  t ht) (A := A)
+        (B := B) (t := u) hA hB hu0 hu1 As Bs
     -- rewrite `-(x/(x+t))` as `(-1) + t/(x+t)` under functional calculus
     have hcalc (T : 𝓐) (hT : IsSelfAdjoint T) (Ts : spectrum ℝ T ⊆ Set.Ici (0 : ℝ)) :
         cfcR (fun x : ℝ ↦ - (x / (x + t))) T
@@ -783,10 +788,11 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
               + cfcR (fun x : ℝ ↦ t * invfun x) T := by
             simpa using
               (cfc_const_add (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (r := (-1 : ℝ))
-                (f := fun x : ℝ ↦ t * invfun x) (a := T) (hf := continuousOn_const.mul hcont) (ha := hT))
+                (f := fun x : ℝ ↦ t * invfun x) (a := T)
+                (hf := continuousOn_const.mul hcont) (ha := hT))
         _ = algebraMap ℝ (𝓐) (-1 : ℝ)
               + t • cfcR invfun T := by
-            simp [cfc_const_mul (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (r := t) (f := invfun) (a := T)
+            simp [cfc_const_mul (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) t invfun T
               (hf := hcont)]
         _ = algebraMap ℝ (𝓐) (-1 : ℝ)
               + t • cfcR (fun x : ℝ ↦ 1 / (x + t)) T := by
@@ -1349,7 +1355,8 @@ private lemma G_eqOn_rpowIntegrand₀₁_mul {q : NNReal} (hq_real : (q : ℝ) �
 
 private lemma convexOn_G_rpowIntegrand₀₁_mul {q : NNReal} (hq_real : (q : ℝ) ∈ Set.Ioo (0 : ℝ) 1)
     (t : ℝ) (htpos : 0 < t) :
-    ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ cfcₙ (fun x : ℝ ↦ x * Real.rpowIntegrand₀₁ (q : ℝ) t x) X) := by
+    ConvexOn ℝ (Set.Ici (0 : 𝓐))
+      (fun X : 𝓐 ↦ cfcₙ (fun x : ℝ ↦ x * Real.rpowIntegrand₀₁ (q : ℝ) t x) X) := by
   -- use `EqOn` to replace the integrand by a structured convex expression
   let r : ℝ := t ^ ((q : ℝ) - 1)
   have hr_nonneg : 0 ≤ r :=
@@ -1363,9 +1370,8 @@ private lemma convexOn_G_rpowIntegrand₀₁_mul {q : NNReal} (hq_real : (q : �
     simpa [sub_eq_add_neg] using hid.add hconst
   have h_one_div : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ cfcR (fun x : ℝ ↦ 1 / (x + t)) X) :=
     convexOn_cfcR_one_div_add_t  t htpos
-  have h_inner :
-      ConvexOn ℝ (Set.Ici (0 : 𝓐))
-        (fun X : 𝓐 ↦ X - algebraMap ℝ (𝓐) t + (t ^ (2 : ℕ)) • cfcR (fun x : ℝ ↦ 1 / (x + t)) X) := by
+  have h_inner : ConvexOn ℝ (Set.Ici (0 : 𝓐))
+      (fun X : 𝓐 ↦ X - algebraMap ℝ 𝓐 t + (t ^ (2 : ℕ)) • cfcR (fun x : ℝ ↦ 1 / (x + t)) X) := by
     have hterm :
         ConvexOn ℝ (Set.Ici (0 : 𝓐))
           (fun X : 𝓐 ↦ (t ^ (2 : ℕ)) • cfcR (fun x : ℝ ↦ 1 / (x + t)) X) :=
@@ -2036,7 +2042,8 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
     dsimp [OperatorConcaveOn, OperatorConvexOn] at hconc
     have h1 :
         (-Cr) ≤ (1 - t) • (-Ar) + t • (-Br) := by
-      simpa [C, Ar, Br, Cr, cfcR, cfc_neg] using hconc (A := A) (B := B) (t := t) hA hB ht0 ht1 As0 Bs0
+      simpa [C, Ar, Br, Cr, cfcR, cfc_neg] using
+        hconc (A := A) (B := B) (t := t) hA hB ht0 ht1 As0 Bs0
     have h2 : (1 - t) • (-Ar) + t • (-Br) = -Dr := by
       simp [Dr, smul_neg, add_comm]
     have h3 : (-Cr) ≤ (-Dr) := by

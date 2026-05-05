@@ -3,12 +3,13 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.BlockDiagonal
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
-import Mathlib.Analysis.CStarAlgebra.Unitary.Span
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.BlockDiagonal
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
+public import Mathlib.Analysis.CStarAlgebra.Unitary.Span
 
-set_option linter.style.longLine false
+@[expose] public section
 
 namespace JensenOperatorInequalityScratch
 
@@ -259,13 +260,13 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
     congr 1 <;> simp [mul_assoc]
   have hAtilde_cfc :
       cfcR (ℋ := HSum ℋ) f Atilde =
-        blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f A) (cfcR (ℋ := ℋ) f B) := by
+        blockDiagonal (cfcR (ℋ := ℋ) f A) (cfcR (ℋ := ℋ) f B) := by
     simpa [Atilde] using
       cfcR_blockDiagonal (ℋ := ℋ) (f := f) A B hA hB
         (hcont.mono (by intro x hx; simp))
   have hright_block :
       star Xtilde * cfcR (ℋ := HSum ℋ) f Atilde * Xtilde =
-        blockDiagonal (ℋ := ℋ) (star X * cfcR (ℋ := ℋ) f A * X + star Y * cfcR (ℋ := ℋ) f B * Y) 0 := by
+        blockDiagonal (ℋ := ℋ) (star X * cfcR f A * X + star Y * cfcR f B * Y) 0 := by
     rw [hAtilde_cfc]
     rw [show star Xtilde = blockOp (ℋ := ℋ) (star X) (star Y) 0 0 by
       simp [Xtilde]]
@@ -274,7 +275,7 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
     congr 1 <;> simp [mul_assoc]
   have hleft_block :
       cfcR (ℋ := HSum ℋ) f (star Xtilde * Atilde * Xtilde) =
-        blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f (star X * A * X + star Y * B * Y)) (cfcR (ℋ := ℋ) f 0) := by
+        blockDiagonal (cfcR f (star X * A * X + star Y * B * Y)) (cfcR f 0) := by
     rw [hmul_block]
     simpa using
       cfcR_blockDiagonal (ℋ := ℋ) (f := f) (star X * A * X + star Y * B * Y) 0 hsum_sa (by simp)

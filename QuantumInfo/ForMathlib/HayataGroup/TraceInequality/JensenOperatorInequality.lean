@@ -3,10 +3,11 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequalityIImpIV
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequalityIImpIV
 
-set_option linter.style.longLine false
+@[expose] public section
 
 namespace JensenOperatorInequality
 
@@ -156,7 +157,6 @@ private lemma spectrum_Ici_of_nonneg_wrap {A : L ℋ} (hA0 : (0 : L ℋ) ≤ A) 
 
 variable [Nontrivial ℋ]
 
-omit [CompleteSpace ℋ] in
 private lemma spectrum_zero_subset_Ici_wrap :
     spectrum ℝ (0 : L ℋ) ⊆ Set.Ici (0 : ℝ) := by
   intro x hx
@@ -274,7 +274,7 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
         (hcont.mono (by intro x hx; simp))
   have hright_block :
       star Xtilde * cfcR (ℋ := HSum ℋ) f Atilde * Xtilde =
-        blockDiagonal (ℋ := ℋ) (star X * cfcR (ℋ := ℋ) f A * X + star Y * cfcR (ℋ := ℋ) f B * Y) 0 := by
+        blockDiagonal (star X * cfcR (ℋ := ℋ) f A * X + star Y * cfcR (ℋ := ℋ) f B * Y) 0 := by
     rw [hAtilde_cfc]
     rw [show star Xtilde = blockOp (ℋ := ℋ) (star X) (star Y) 0 0 by
       simp [Xtilde]]
@@ -283,10 +283,10 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
     congr 1 <;> simp [mul_assoc]
   have hleft_block :
       cfcR (ℋ := HSum ℋ) f (star Xtilde * Atilde * Xtilde) =
-        blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f (star X * A * X + star Y * B * Y)) (cfcR (ℋ := ℋ) f 0) := by
+        blockDiagonal (cfcR f (star X * A * X + star Y * B * Y)) (cfcR f 0) := by
     rw [hmul_block]
     simpa using
-      cfcR_blockDiagonal_wrap (ℋ := ℋ) (f := f) (star X * A * X + star Y * B * Y) 0 hsum_sa (by simp)
+      cfcR_blockDiagonal_wrap f (star X * A * X + star Y * B * Y) 0 hsum_sa (by simp)
         (hcont.mono (by intro x hx; simp))
   rw [hleft_block, hright_block] at hcore
   exact blockDiagonal_le_left_wrap (ℋ := ℋ) hcore
@@ -400,18 +400,18 @@ theorem theorem_2_5_2_i_ici_all_imp_v {f : ℝ → ℝ}
     rw [hAtilde_cfc]
     rw [show star Xtilde = blockOp (ℋ := ℋ) (star X) (star Y) 0 0 by
       simp [Xtilde]]
-    rw [show Xtilde = blockOp (ℋ := ℋ) X 0 Y 0 by rfl]
-    rw [blockDiagonal_eq_blockOp_wrap, blockOp_mul_wrap, blockOp_mul_wrap, blockDiagonal_eq_blockOp_wrap]
+    rw [show Xtilde = blockOp (ℋ := ℋ) X 0 Y 0 by rfl, blockDiagonal_eq_blockOp_wrap,
+      blockOp_mul_wrap, blockOp_mul_wrap, blockDiagonal_eq_blockOp_wrap]
     congr 1 <;> simp [mul_assoc]
   have hsum_spec : spectrum ℝ (star X * A * X + star Y * B * Y) ⊆ Set.Ici (0 : ℝ) :=
     spectrum_Ici_of_nonneg_wrap (ℋ := ℋ) hsum_nonneg
   have hleft_block :
       cfcR (ℋ := HSum ℋ) f (star Xtilde * Atilde * Xtilde) =
-        blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f (star X * A * X + star Y * B * Y)) (cfcR (ℋ := ℋ) f 0) := by
+        blockDiagonal (cfcR f (star X * A * X + star Y * B * Y)) (cfcR f 0) := by
     rw [hmul_block]
     simpa using
-      cfcR_blockDiagonal_wrap (ℋ := ℋ) (f := f) (star X * A * X + star Y * B * Y) 0 hsum_sa (by simp)
-        (continuousOn_union_of_subset_Ici_wrap (f := f) hcontIci hsum_spec spectrum_zero_subset_Ici_wrap)
+      cfcR_blockDiagonal_wrap f (star X * A * X + star Y * B * Y) 0 hsum_sa (by simp)
+        (continuousOn_union_of_subset_Ici_wrap hcontIci hsum_spec spectrum_zero_subset_Ici_wrap)
   rw [hleft_block, hright_block] at hcore
   exact blockDiagonal_le_left_wrap (ℋ := ℋ) hcore
 

@@ -3,13 +3,14 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.BlockDiagonal
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
-import Mathlib.Analysis.CStarAlgebra.Unitary.Span
-import Mathlib.Algebra.Star.UnitaryStarAlgAut
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.BlockDiagonal
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
+public import Mathlib.Analysis.CStarAlgebra.Unitary.Span
+public import Mathlib.Algebra.Star.UnitaryStarAlgAut
 
-set_option linter.style.longLine false
+@[expose] public section
 
 namespace JensenOperatorInequality
 
@@ -315,7 +316,10 @@ private lemma sqrt_blockDiagonal_of_nonneg
   · simpa using
       (by cfc_cont_tac : ContinuousOn Real.sqrt (spectrum ℝ A ∪ spectrum ℝ B))
 
-omit [CompleteSpace ℋ] in
+--BUG? In v4.28, this didn't require CompleteSpace ℋ. Then it did.
+-- The `NormedAlgebra ℝ (L ℋ)` instances comes from a `CStarAlgebra (ℋ →L[ℂ] ℋ)`, which is
+-- `instCStarAlgebraContinuousLinearMapComplexIdOfCompleteSpace`, which requires CompleteSpace ℋ.
+-- In principle this isn't necessary.
 private lemma complex_I_smul_real_I_smul_invTwo (r : ℝ) (T : L ℋ) :
     Complex.I • r • Complex.I • (2⁻¹ : ℝ) • T =
       -((2⁻¹ : ℝ) * r) • T := by
@@ -337,7 +341,6 @@ private lemma complex_I_smul_real_I_smul_invTwo (r : ℝ) (T : L ℋ) :
     _ = -((2⁻¹ : ℝ) * r) • T x := by
             simp [neg_smul, mul_comm]
 
-omit [CompleteSpace ℋ] in
 private lemma real_smul_complex_I_real_smul_complex_I_comm (s r : ℝ) (T : L ℋ) :
     (s : ℝ) • Complex.I • r • Complex.I • T =
       Complex.I • r • Complex.I • (s : ℝ) • T := by
@@ -352,7 +355,6 @@ private lemma real_smul_complex_I_real_smul_complex_I_comm (s r : ℝ) (T : L �
     _ = Complex.I • r • Complex.I • (s : ℝ) • T := by
             rfl
 
-omit [CompleteSpace ℋ] in
 private lemma half_add_half_eq (T : L ℋ) :
     (2⁻¹ : ℝ) • T + (2⁻¹ : ℝ) • T = T := by
   calc
@@ -361,7 +363,6 @@ private lemma half_add_half_eq (T : L ℋ) :
     _ = (1 : ℝ) • T := by norm_num
     _ = T := by simp
 
-omit [CompleteSpace ℋ] in
 private lemma half_mul_real_add_half_mul_real_eq (r : ℝ) (T : L ℋ) :
     ((2⁻¹ : ℝ) * r) • T + ((2⁻¹ : ℝ) * r) • T = r • T := by
   calc
@@ -524,7 +525,6 @@ private lemma spectrum_Ici_of_nonneg {A : L ℋ} (hA0 : (0 : L ℋ) ≤ A) :
 
 variable [Nontrivial ℋ]
 
-omit [CompleteSpace ℋ] in
 private lemma spectrum_zero_subset_Ici :
     spectrum ℝ (0 : L ℋ) ⊆ Set.Ici (0 : ℝ) := by
   intro x hx
@@ -667,7 +667,7 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
     simpa [Atilde] using blockDiagonal_selfAdjoint (ℋ := ℋ) (hA := by simp) hA
   have hAtilde0 : (0 : L (HSum ℋ)) ≤ Atilde := by
     simpa [Atilde] using blockDiagonal_nonneg (ℋ := ℋ) (show (0 : L ℋ) ≤ 0 by simp) hA0
-  have hAtilde_spec : spectrum ℝ Atilde ⊆ Set.Ici (0 : ℝ) := spectrum_Ici_of_nonneg (ℋ := HSum ℋ) hAtilde0
+  have hAtilde_spec : spectrum ℝ Atilde ⊆ Set.Ici (0 : ℝ) := spectrum_Ici_of_nonneg hAtilde0
   have hB1_nonneg : (0 : L (HSum ℋ)) ≤ (star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ)) := by
     simpa [mul_assoc] using star_left_conjugate_nonneg hAtilde0 (U : L (HSum ℋ))
   have hB2_nonneg : (0 : L (HSum ℋ)) ≤ (star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)) := by
@@ -676,9 +676,9 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
     IsSelfAdjoint.of_nonneg hB1_nonneg
   have hB2_sa : IsSelfAdjoint ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ))) :=
     IsSelfAdjoint.of_nonneg hB2_nonneg
-  have hB1_spec : spectrum ℝ ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) ⊆ Set.Ici (0 : ℝ) :=
+  have hB1_spec : spectrum ℝ (star U * Atilde * (U : L (HSum ℋ))) ⊆ Set.Ici (0 : ℝ) :=
     spectrum_Ici_of_nonneg (ℋ := HSum ℋ) hB1_nonneg
-  have hB2_spec : spectrum ℝ ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ))) ⊆ Set.Ici (0 : ℝ) :=
+  have hB2_spec : spectrum ℝ (star V * Atilde * (V : L (HSum ℋ))) ⊆ Set.Ici (0 : ℝ) :=
     spectrum_Ici_of_nonneg (ℋ := HSum ℋ) hB2_nonneg
   have hmid_conv :
       cfcR (ℋ := HSum ℋ) f
@@ -717,7 +717,7 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
       cfcR (ℋ := HSum ℋ) f
           ((1 / 2 : ℝ) • ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
             (1 / 2 : ℝ) • ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) =
-        blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f (star X * A * X)) (cfcR (ℋ := ℋ) f (R1 * A * R1)) := by
+        blockDiagonal (cfcR f (star X * A * X)) (cfcR (ℋ := ℋ) f (R1 * A * R1)) := by
     have hXAX_nonneg : (0 : L ℋ) ≤ star X * A * X := by
       simpa [mul_assoc] using star_left_conjugate_nonneg hA0 X
     have hR1AR1_nonneg : (0 : L ℋ) ≤ R1 * A * R1 := by
@@ -850,10 +850,12 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
       (sqrt_blockDiagonal_of_nonneg (ℋ := ℋ) (A := 1 - star X * X) (B := 1 - X * star X)
         hR0sa hR1sa hR0nonneg hR1nonneg)
   have hR0self : IsSelfAdjoint R0 := by
-    have h : IsSelfAdjoint (CFC.sqrt (1 - star X * X)) := (CFC.sqrt_nonneg (1 - star X * X)).isSelfAdjoint
+    have h : IsSelfAdjoint (CFC.sqrt (1 - star X * X)) :=
+      (CFC.sqrt_nonneg (1 - star X * X)).isSelfAdjoint
     simpa [R0] using h
   have hR1self : IsSelfAdjoint R1 := by
-    have h : IsSelfAdjoint (CFC.sqrt (1 - X * star X)) := (CFC.sqrt_nonneg (1 - X * star X)).isSelfAdjoint
+    have h : IsSelfAdjoint (CFC.sqrt (1 - X * star X)) :=
+      (CFC.sqrt_nonneg (1 - X * star X)).isSelfAdjoint
     simpa [R1] using h
   have hU_block :
       (U : L (HSum ℋ)) = blockOp (ℋ := ℋ) (Complex.I • R0) (star X) X (Complex.I • R1) := by
@@ -920,8 +922,8 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
       cfcR (ℋ := HSum ℋ) f
           ((1 / 2 : ℝ) • ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
             (1 / 2 : ℝ) • ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) ≤
-        ((1 / 2 : ℝ) • cfcR (ℋ := HSum ℋ) f ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
-          (1 / 2 : ℝ) • cfcR (ℋ := HSum ℋ) f ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) := by
+        ((1 / 2 : ℝ) • cfcR f ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
+          (1 / 2 : ℝ) • cfcR f ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) := by
     have hhalf : (1 - (2⁻¹ : ℝ)) = (2⁻¹ : ℝ) := by norm_num
     simpa [hhalf] using
         (hconv₂
@@ -949,7 +951,7 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
       cfcR (ℋ := HSum ℋ) f
           ((1 / 2 : ℝ) • ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
             (1 / 2 : ℝ) • ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) =
-        blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f (star X * A * X)) (cfcR (ℋ := ℋ) f (R1 * A * R1)) := by
+        blockDiagonal (cfcR f (star X * A * X)) (cfcR f (R1 * A * R1)) := by
     have hXAX_sa : IsSelfAdjoint (star X * A * X) := by
       change star (star X * A * X) = star X * A * X
       simp [hA.star_eq, mul_assoc]
@@ -957,7 +959,7 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
       change star (R1 * A * R1) = R1 * A * R1
       simp [hR1self.star_eq, hA.star_eq, mul_assoc]
     rw [hmid_block]
-    refine cfcR_blockDiagonal (ℋ := ℋ) (f := f) (A := star X * A * X) (B := R1 * A * R1) hXAX_sa hR1AR1_sa ?_
+    refine cfcR_blockDiagonal (f := f) (A := star X * A * X) (B := R1 * A * R1) hXAX_sa hR1AR1_sa ?_
     · exact (operatorConvex_continuousOn_univ (ℋ := ℋ) hconv).mono (by intro x hx; simp)
   have hRightEval :
       ((1 / 2 : ℝ) • cfcR (ℋ := HSum ℋ) f ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
@@ -1016,7 +1018,8 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
     exact blockDiagonal_le_left (ℋ := ℋ) hcore
   have hdrop :
       star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) ≤ star X * cfcR (ℋ := ℋ) f A * X := by
-    simpa [add_comm, add_left_comm, add_assoc] using add_le_add_left hterm_nonpos (star X * cfcR (ℋ := ℋ) f A * X)
+    simpa [add_comm, add_left_comm, add_assoc] using
+      add_le_add_left hterm_nonpos (star X * cfcR f A * X)
   exact htop.trans hdrop
 
 end Theorem252

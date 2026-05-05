@@ -3,14 +3,17 @@ Copyright (c) 2026 Hayata Yamasaki. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 -/
+module
 
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.OperatorGeometricMean
-import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.HilbertSchmidtOperatorSpace
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.InnerProductSpace.JointEigenspace
-import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
-import Mathlib.LinearAlgebra.Lagrange
-import Mathlib.LinearAlgebra.Trace
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.OperatorGeometricMean
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.HilbertSchmidtOperatorSpace
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import Mathlib.Analysis.InnerProductSpace.JointEigenspace
+public import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
+public import Mathlib.LinearAlgebra.Lagrange
+public import Mathlib.LinearAlgebra.Trace
+
+@[expose] public section
 
 namespace LiebAndoTrace
 
@@ -33,7 +36,7 @@ set_option synthInstance.maxHeartbeats 80000 in
 noncomputable local instance :
     IsometricContinuousFunctionalCalculus ℂ ((L ℋ)ᵐᵒᵖ) IsStarNormal := inferInstance
 
--- set_option backward.isDefEq.respectTransparency false in -- turned out in v4.29 -> v4.28 backport
+set_option backward.isDefEq.respectTransparency false in
 set_option synthInstance.maxHeartbeats 80000 in
 noncomputable instance instCFCRealSelfAdjointMop :
     ContinuousFunctionalCalculus ℝ ((L ℋ)ᵐᵒᵖ) IsSelfAdjoint := inferInstance
@@ -58,7 +61,7 @@ noncomputable def liebCorollaryTraceMap (q r : ℝ) (K : L ℋ) (A B : L ℋ) : 
 noncomputable def andoTraceMap (q r : ℝ) (K : L ℋ) (A B : L ℋ) : ℝ :=
   traceRe (ℋ := ℋ) (A ^ q * star K * B ^ (-r) * K)
 
-omit [CompleteSpace ℋ] [Nontrivial ℋ] in
+omit [Nontrivial ℋ] in
 private lemma rightMulHS_real_smul_one (r : ℝ) :
     rightMulHS (ℋ := ℋ) (r • (1 : L ℋ)) = r • (1 : L (HSOp ℋ)) := by
   ext T
@@ -74,7 +77,7 @@ private lemma rightMulHS_real_smul_one (r : ℝ) :
           rfl
     _ = r • ofOp (toOp T * (1 : L ℋ)) := by simp
 
-omit [CompleteSpace ℋ] [Nontrivial ℋ] in
+omit [Nontrivial ℋ] in
 private lemma rightMulHS_nonneg {A : L ℋ} (hA0 : 0 ≤ A) :
     0 ≤ rightMulHS (ℋ := ℋ) A := by
   let sqrtA : L ℋ := A ^ ((1 : ℝ) / 2)
@@ -85,7 +88,7 @@ private lemma rightMulHS_nonneg {A : L ℋ} (hA0 : 0 ≤ A) :
       _ = A ^ (((1 : ℝ) / 2) * 2) := by
             simpa [sqrtA] using
               (CFC.rpow_rpow_of_exponent_nonneg A ((1 : ℝ) / 2) 2
-                (by positivity) (by positivity) (ha₂ := hA0))
+                (by positivity) (by positivity) (ha := hA0))
       _ = A ^ (1 : ℝ) := by ring_nf
       _ = A := by simpa using CFC.rpow_one A
   have hsqrt_sq : sqrtA * sqrtA = A := by
@@ -294,7 +297,7 @@ private lemma cfcR_apply_of_mem_eigenspace_real
 
 -- This proof is isolated because the joint eigenspace decomposition is heartbeat-heavy.
 set_option maxHeartbeats 800000 in
--- set_option backward.isDefEq.respectTransparency false in -- turned out in v4.29 -> v4.28 backport
+set_option backward.isDefEq.respectTransparency false in
 private lemma hmiddle_leftMul_rightMul
     {s : ℝ} {A B : L ℋ}
     (hA : A ∈ pdSet (ℋ := ℋ)) (hB : B ∈ pdSet (ℋ := ℋ)) :
@@ -406,7 +409,7 @@ private lemma hmiddle_leftMul_rightMul
       calc
         B ^ (-s) = (B ^ (-1 : ℝ)) ^ s := by
           symm
-          simpa using (CFC.rpow_rpow (a := B) (-1 : ℝ) s hBunit (by norm_num) hB0)
+          simpa using (CFC.rpow_rpow B (-1 : ℝ) s (by norm_num) (hBunit.isStrictlyPositive hB0))
         _ = cfcR (ℋ := ℋ) (fun x : ℝ ↦ x ^ s) (B ^ (-1 : ℝ)) := by
           simpa [cfcR] using
             (CFC.rpow_eq_cfc_real (A := L ℋ) (a := B ^ (-1 : ℝ)) (y := s) (ha := hBinv0))]
@@ -547,7 +550,7 @@ private lemma hmiddle_leftMul_rightMul
 
 -- The bridge lemma expands a large `HSOp`-valued generalized perspective term.
 set_option maxHeartbeats 800000 in
--- set_option backward.isDefEq.respectTransparency false in -- turned out in v4.29 -> v4.28 backport
+set_option backward.isDefEq.respectTransparency false in
 private lemma phiK_operatorPowerMean_eq_liebTraceMap
     {s : ℝ} (K A B : L ℋ) (hA : A ∈ pdSet (ℋ := ℋ)) (hB : B ∈ pdSet (ℋ := ℋ)) :
     phiK (ℋ := ℋ) K
@@ -1286,8 +1289,7 @@ theorem liebExtensionTrace_jointlyConcaveOn_pdSet
       calc
         (B ^ β) ^ (1 - q) = B ^ (β * (1 - q)) := by
             simpa using
-              (CFC.rpow_rpow_of_exponent_nonneg (A := L ℋ) (a := B) (x := β) (y := 1 - q)
-                hβ0 (by linarith) (ha₂ := hB0))
+              (CFC.rpow_rpow_of_exponent_nonneg (A := L ℋ) B β (1 - q) hβ0 (by linarith) hB0)
         _ = B ^ p := by rw [hβmul]
     simp [liebTraceMap, liebExtensionTraceMap, hpow, mul_assoc]
   simpa [hpow_rewrite hB₁_mem, hpow_rewrite hB₂_mem, hpow_rewrite hB_combo_mem] using
@@ -1303,7 +1305,7 @@ theorem andoTrace_jointlyConvexOn_pdSet
   · have hrz : r = 0 := by linarith
     subst hqeq
     subst hrz
-    convert (liebTrace_jointlyConvexOn_pdSet (ℋ := ℋ) (s := 1) (by norm_num) (by norm_num) K) using 1
+    convert (liebTrace_jointlyConvexOn_pdSet (s := 1) (by norm_num) (by norm_num) K) using 1
     ext A B
     simp [andoTraceMap, liebTraceMap]
   · have hqgt : 1 < q := lt_of_le_of_ne hq1 (Ne.symm hqeq)
@@ -1429,7 +1431,7 @@ theorem andoTrace_jointlyConvexOn_pdSet
         · calc
             (B ^ β) ^ (1 - q) = B ^ (β * (1 - q)) := by
                 simpa [mul_comm] using
-                  (CFC.rpow_rpow (a := B) (x := β) (y := 1 - q) hBunit hβzero hB0)
+                  (CFC.rpow_rpow B β (1 - q) hβzero (hBunit.isStrictlyPositive hB0))
             _ = B ^ (-r) := by rw [hβmul]
       simp [liebTraceMap, andoTraceMap, hpow, mul_assoc]
     simpa [hpow_rewrite hB₁_mem, hpow_rewrite hB₂_mem, hpow_rewrite hB_combo_mem] using
