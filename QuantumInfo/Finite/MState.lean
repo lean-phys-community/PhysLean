@@ -1304,7 +1304,7 @@ theorem Continuous_HermitianMat : Continuous (MState.M (d := d)) :=
 
 @[fun_prop]
 theorem Continuous_Matrix : Continuous (MState.m (d := d)) := by
-  unfold MState.m
+  show Continuous (fun ρ : MState d => ρ.M.mat)
   fun_prop
 
 theorem image_M_isBounded (S : Set (MState d)) : Bornology.IsBounded (MState.M '' S) := by

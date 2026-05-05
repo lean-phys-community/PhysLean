@@ -749,6 +749,18 @@ theorem purify_trace (Λ : CPTPMap dIn dOut) : Λ = (
 --TODO: Best to rewrite the "zero_prep / prep / append" as one CPTPMap.append channel when we
 -- define that.
 
+/-- The Stinespring preparation `prep ∘ append` acts on a matrix entry by the Kronecker product
+with the fixed pure state `|default⟩⟨default|` on `dOut × dOut`. -/
+theorem prep_append_map_entry (X : Matrix dIn dIn ℂ)
+    (a₁ : dIn) (b₁c₁ : dOut × dOut) (a₂ : dIn) (b₂c₂ : dOut × dOut) :
+    let τ := MState.pure (Ket.basis (default : dOut × dOut))
+    let zero_prep : CPTPMap Unit (dOut × dOut) := replacement τ
+    let prep := (id ⊗ᶜᵖ zero_prep)
+    let append : CPTPMap dIn (dIn × Unit) := CPTPMap.ofEquiv (Equiv.prodPUnit dIn).symm
+    (prep ∘ₘ append).map X (a₁, b₁c₁) (a₂, b₂c₂) =
+    X a₁ a₂ * τ.m b₁c₁ b₂c₂ := by
+  simp [purify_prep_append_entry]
+
 /-- The complementary channel comes from tracing out the other half (the right half) of the purified channel `purify`. -/
 def complementary (Λ : CPTPMap dIn dOut) : CPTPMap dIn (dIn × dOut) :=
   let zero_prep : CPTPMap Unit (dOut × dOut) := replacement (MState.pure (Ket.basis default))

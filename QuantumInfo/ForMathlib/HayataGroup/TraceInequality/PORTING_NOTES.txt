@@ -1,0 +1,29 @@
+When porting the code from https://github.com/Hayata-Yamasaki-Group/lean-quantum to this repo,
+besides moving the code to a different directory (and thus editing the imports at the tops of
+files), three changes were made:
+ * Some of the `Nontrivial` and `CompleteSpace` instance variables were moved around or `omit`ted, in
+   or to prevent the linter warnings about unneeded variables. This was done in:
+   - BlockDiagonal.lean
+   - GeneralizedPerspectiveFunction.lean
+   - HilbertSchmidtOperatorSpace.lean
+   - JensenOperatorInequality.lean
+   - JensenOperatorInequalityIImpIV.lean
+   - JensenOperatorInequalityIVtoV.lean
+   - LiebAndoTrace.lean
+ * Three instances of `set_option backward.isDefEq.respectTransparency false` in LiebAndoTrace
+   were removed, since these are a new thing with v4.29.
+ * In BlockDiagonal.lean, in `blockDiagonalHom` in the proof of `commutes'`, there was a final
+   `rfl` tactic that was needed in v4.29 but not in v4.28, probably for reason related to
+   respectTransparency. This final line was commented out.
+
+The project this code is graciously borrowed from is the work of the following:
+
+Kazumi Kasaura (OMRON SINIC X, RIKEN)
+Kei Tsukamoto (The University of Tokyo)
+Kento Mori (MOLSIS)
+Lisa Mizuno (The University of Tokyo)
+Takahiro Namatame (Kyoto University)
+Yuta Oriike (CyberAgent)
+Masaya Taniguchi (RIKEN)
+Sho Sonoda (RIKEN, CyberAgent)
+Hayata Yamasaki (The University of Tokyo)

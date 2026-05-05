@@ -431,7 +431,7 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
         rw [← hT₁]
         exact HermitianMat.inner_comm _ _
     rw [hΦ₁, hΦ₂]
-    exact sandwichedRenyiEntropy_DPI_ax hα.le ρ σ Φ
+    exact sandwichedRenyiEntropy_DPI hα.le ρ σ Φ
 
   --If q = 1, this inequality is trivial
   by_cases hq₂ : q = 1
