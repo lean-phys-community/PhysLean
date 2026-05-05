@@ -668,14 +668,6 @@ lemma gradKineticTerm_eq_sum_sum {d} {𝓕 : FreeSpace}
     A.gradKineticTerm 𝓕 x = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
         (1 / (𝓕.μ₀) * (η μ μ * η ν ν * ∂_ μ (fun x' => ∂_ μ A x' ν) x -
         ∂_ μ (fun x' => ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
-  have diff_partial (μ) :
-      ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [Lorentz.Vector.differentiable_apply]
-    refine Differentiable.clm_apply ?_ ?_
-    · refine ((contDiff_succ_iff_fderiv (n := 1)).mp ?_).2.2.differentiable
-        (by simp)
-      exact ContDiff.of_le ha (right_eq_inf.mp rfl)
-    · fun_prop
   rw [gradKineticTerm_eq_sum_fderiv A ha]
   calc _
       _ = ∑ (μ : (Fin 1 ⊕ Fin d)), ∑ (ν : (Fin 1 ⊕ Fin d)),
@@ -729,12 +721,10 @@ lemma gradKineticTerm_eq_sum_sum {d} {𝓕 : FreeSpace}
         congr
         · rw [fderiv_const_mul]
           simp [SpaceTime.deriv_eq]
-          conv => enter [2, x]; rw [SpaceTime.deriv_eq]
-          apply diff_partial μ ν
+          fun_prop
         · rw [fderiv_const_mul]
           simp [SpaceTime.deriv_eq]
-          conv => enter [2, x]; rw [SpaceTime.deriv_eq]
-          apply diff_partial ν μ
+          fun_prop
       _ = ∑ (μ : (Fin 1 ⊕ Fin d)), ∑ (ν : (Fin 1 ⊕ Fin d)),
         ((1 / (𝓕.μ₀) * (η μ μ * η ν ν * ∂_ μ (fun x' => ∂_ μ A x' ν) x -
         ∂_ μ (fun x' => ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν) := by
@@ -759,73 +749,59 @@ lemma gradKineticTerm_eq_fieldStrength {d} {𝓕 : FreeSpace} (A : Electromagnet
     A.gradKineticTerm 𝓕 x = ∑ (ν : (Fin 1 ⊕ Fin d)), (1/𝓕.μ₀ * η ν ν) •
     (∑ (μ : (Fin 1 ⊕ Fin d)), (∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x))
     • Lorentz.Vector.basis ν := by
-  have diff_partial (μ) :
-      ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [Lorentz.Vector.differentiable_apply]
-    refine Differentiable.clm_apply ?_ ?_
-    · refine ((contDiff_succ_iff_fderiv (n := 1)).mp ?_).2.2.differentiable
-        (by simp)
-      exact ContDiff.of_le ha (right_eq_inf.mp rfl)
-    · fun_prop
   calc _
-      _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
-        (1/𝓕.μ₀ * (η μ μ * η ν ν * ∂_ μ (fun x' => ∂_ μ A x' ν) x -
-        ∂_ μ (fun x' => ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
-          rw [gradKineticTerm_eq_sum_sum A x ha]
-      _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
-        ((1/𝓕.μ₀ * η ν ν) * (η μ μ * ∂_ μ (fun x' => ∂_ μ A x' ν) x -
-        η ν ν * ∂_ μ (fun x' => ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
-          apply Finset.sum_congr rfl (fun ν _ => ?_)
-          apply Finset.sum_congr rfl (fun μ _ => ?_)
-          congr 1
-          ring_nf
-          simp
-      _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
-        ((1/𝓕.μ₀ * η ν ν) * (∂_ μ (fun x' => η μ μ * ∂_ μ A x' ν) x -
-            ∂_ μ (fun x' => η ν ν * ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
-          apply Finset.sum_congr rfl (fun ν _ => ?_)
-          apply Finset.sum_congr rfl (fun μ _ => ?_)
-          congr
-          · rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_const_mul]
-            rfl
-            apply diff_partial μ ν
-          · rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_const_mul]
-            rfl
-            apply diff_partial ν μ
-      _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
-        ((1/𝓕.μ₀ * η ν ν) * (∂_ μ (fun x' => η μ μ * ∂_ μ A x' ν -
-            η ν ν * ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
-          apply Finset.sum_congr rfl (fun ν _ => ?_)
-          apply Finset.sum_congr rfl (fun μ _ => ?_)
-          congr
-          rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_fun_sub]
-          simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply]
-          · conv => enter [2, x]; rw [SpaceTime.deriv_eq]
-            apply Differentiable.differentiableAt
-            apply Differentiable.const_mul
-            exact diff_partial μ ν
-          · conv => enter [2, x]; rw [SpaceTime.deriv_eq]
-            apply Differentiable.differentiableAt
-            apply Differentiable.const_mul
-            exact diff_partial ν μ
-      _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
-        ((1/𝓕.μ₀ * η ν ν) * (∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x)) •
-            Lorentz.Vector.basis ν := by
-          apply Finset.sum_congr rfl (fun ν _ => ?_)
-          apply Finset.sum_congr rfl (fun μ _ => ?_)
-          congr
-          funext x
-          rw [toFieldStrength_basis_repr_apply_eq_single]
-      _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ((1/𝓕.μ₀ * η ν ν) *
-          ∑ (μ : (Fin 1 ⊕ Fin d)), (∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x))
-          • Lorentz.Vector.basis ν := by
-          apply Finset.sum_congr rfl (fun ν _ => ?_)
-          rw [← Finset.sum_smul, Finset.mul_sum]
-      _ = ∑ (ν : (Fin 1 ⊕ Fin d)), (1/𝓕.μ₀ * η ν ν) •
-          (∑ (μ : (Fin 1 ⊕ Fin d)), (∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x))
-          • Lorentz.Vector.basis ν := by
-          apply Finset.sum_congr rfl (fun ν _ => ?_)
-          rw [smul_smul]
+    _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
+      (1/𝓕.μ₀ * (η μ μ * η ν ν * ∂_ μ (fun x' => ∂_ μ A x' ν) x -
+      ∂_ μ (fun x' => ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
+        rw [gradKineticTerm_eq_sum_sum A x ha]
+    _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
+      ((1/𝓕.μ₀ * η ν ν) * (η μ μ * ∂_ μ (fun x' => ∂_ μ A x' ν) x -
+      η ν ν * ∂_ μ (fun x' => ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
+        apply Finset.sum_congr rfl (fun ν _ => ?_)
+        apply Finset.sum_congr rfl (fun μ _ => ?_)
+        congr 1
+        ring_nf
+        simp
+    _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
+      ((1/𝓕.μ₀ * η ν ν) * (∂_ μ (fun x' => η μ μ * ∂_ μ A x' ν) x -
+          ∂_ μ (fun x' => η ν ν * ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
+        apply Finset.sum_congr rfl (fun ν _ => ?_)
+        apply Finset.sum_congr rfl (fun μ _ => ?_)
+        congr
+        · rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_const_mul]
+          rfl
+          fun_prop
+        · rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_const_mul]
+          rfl
+          fun_prop
+    _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
+      ((1/𝓕.μ₀ * η ν ν) * (∂_ μ (fun x' => η μ μ * ∂_ μ A x' ν -
+          η ν ν * ∂_ ν A x' μ) x)) • Lorentz.Vector.basis ν := by
+        apply Finset.sum_congr rfl (fun ν _ => ?_)
+        apply Finset.sum_congr rfl (fun μ _ => ?_)
+        congr
+        rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_fun_sub]
+        simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply]
+        · fun_prop
+        · fun_prop
+    _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
+      ((1/𝓕.μ₀ * η ν ν) * (∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x)) •
+          Lorentz.Vector.basis ν := by
+        apply Finset.sum_congr rfl (fun ν _ => ?_)
+        apply Finset.sum_congr rfl (fun μ _ => ?_)
+        congr
+        funext x
+        rw [toFieldStrength_basis_repr_apply_eq_single]
+    _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ((1/𝓕.μ₀ * η ν ν) *
+        ∑ (μ : (Fin 1 ⊕ Fin d)), (∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x))
+        • Lorentz.Vector.basis ν := by
+        apply Finset.sum_congr rfl (fun ν _ => ?_)
+        rw [← Finset.sum_smul, Finset.mul_sum]
+    _ = ∑ (ν : (Fin 1 ⊕ Fin d)), (1/𝓕.μ₀ * η ν ν) •
+        (∑ (μ : (Fin 1 ⊕ Fin d)), (∂_ μ (A.fieldStrengthMatrix · (μ, ν)) x))
+        • Lorentz.Vector.basis ν := by
+        apply Finset.sum_congr rfl (fun ν _ => ?_)
+        rw [smul_smul]
 
 /-!
 
@@ -845,22 +821,9 @@ lemma gradKineticTerm_eq_electric_magnetic {𝓕 : FreeSpace} (A : Electromagnet
     ∑ i, (𝓕.μ₀⁻¹ * (1 / 𝓕.c ^ 2 * ∂ₜ (fun t => A.electricField 𝓕.c t x.space) (x.time 𝓕.c) i-
       ∑ j, Space.deriv j (A.magneticFieldMatrix 𝓕.c (x.time 𝓕.c) · (j, i)) x.space)) •
       Lorentz.Vector.basis (Sum.inr i) := by
-  have diff_partial (μ) :
-      ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [Lorentz.Vector.differentiable_apply]
-    refine Differentiable.clm_apply ?_ ?_
-    · refine ((contDiff_succ_iff_fderiv (n := 1)).mp ?_).2.2.differentiable
-        (by simp)
-      exact ContDiff.of_le ha (right_eq_inf.mp rfl)
-    · fun_prop
   have hdiff (μ ν) : Differentiable ℝ fun x => (A.fieldStrengthMatrix x) (μ, ν) := by
-    conv => enter [2, x]; rw [toFieldStrength_basis_repr_apply_eq_single,
-      SpaceTime.deriv_eq, SpaceTime.deriv_eq]
-    apply Differentiable.sub
-    apply Differentiable.const_mul
-    · exact diff_partial (μ, ν).1 (μ, ν).2
-    apply Differentiable.const_mul
-    · exact diff_partial (μ, ν).2 (μ, ν).1
+    conv => enter [2, x]; rw [toFieldStrength_basis_repr_apply_eq_single]
+    fun_prop
   rw [gradKineticTerm_eq_fieldStrength A x ha]
   rw [Fintype.sum_sum_type, Fin.sum_univ_one]
   congr 1
@@ -1029,9 +992,7 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
   rw [permT_basis_repr_symm_apply, contrT_basis_repr_apply_eq_fin]
   conv_rhs =>
     enter [2, 2, 2, μ]
-    rw [tensorDeriv_toTensor_basis_repr (by
-      apply toFieldStrength_differentiable
-      apply hA.of_le (ENat.LEInfty.out))]
+    rw [tensorDeriv_toTensor_basis_repr (by fun_prop)]
     enter [2, x]
     rw [toFieldStrength_tensor_basis_eq_basis]
     change fieldStrengthMatrix A x _
