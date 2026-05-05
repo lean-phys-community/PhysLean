@@ -42,7 +42,8 @@ lemma lineY₃B₃Charges_quad (a b : ℚ) : accQuad (lineY₃B₃Charges a b).v
   rw [quadBiLin.toHomogeneousQuad.map_smul]
   rw [quadBiLin.toHomogeneousQuad.map_smul]
   rw [quadBiLin.map_smul₁, quadBiLin.map_smul₂]
-  erw [quadSol Y₃.1, quadSol B₃.1]
+  rw [← accQuad]
+  rw [quadSol Y₃.1, quadSol B₃.1]
   simp only [mul_zero, add_zero, zero_add, mul_eq_zero, OfNat.ofNat_ne_zero, false_or]
   apply Or.inr ∘ Or.inr
   with_unfolding_all rfl
@@ -56,7 +57,8 @@ lemma lineY₃B₃Charges_cubic (a b : ℚ) : accCube (lineY₃B₃Charges a b).
   rw [cubeTriLin.toCubic.map_smul]
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂, cubeTriLin.map_smul₃]
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂, cubeTriLin.map_smul₃]
-  erw [Y₃.cubicSol, B₃.cubicSol]
+  repeat rw [← cubicACC_apply]
+  rw [Y₃.cubicSol, B₃.cubicSol]
   rw [show cubeTriLin Y₃.val Y₃.val B₃.val = 0 by with_unfolding_all rfl]
   rw [show cubeTriLin B₃.val B₃.val Y₃.val = 0 by with_unfolding_all rfl]
   simp
