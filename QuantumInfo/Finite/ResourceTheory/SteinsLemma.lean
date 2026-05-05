@@ -17,17 +17,10 @@ public import Mathlib.Tactic.Bound
 
 @[expose] public section
 
-open NNReal
-open scoped ENNReal
-open ComplexOrder
-open Topology
-open scoped Prob
+open NNReal ComplexOrder Topology
+open ResourcePretheory FreeStateTheory UnitalPretheory UnitalFreeStateTheory
+open scoped ENNReal Prob RealInnerProductSpace InnerProductSpace
 open scoped OptimalHypothesisRate
-open ResourcePretheory
-open FreeStateTheory
-open UnitalPretheory
-open UnitalFreeStateTheory
-open scoped RealInnerProductSpace InnerProductSpace
 
 namespace SteinsLemma
 
