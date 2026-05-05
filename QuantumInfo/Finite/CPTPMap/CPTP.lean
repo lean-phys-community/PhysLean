@@ -357,6 +357,16 @@ def prod (Λ₁ : CPTPMap dI₁ dO₁) (Λ₂ : CPTPMap dI₂ dO₂) : CPTPMap (
 
 infixl:70 "⊗ᶜᵖ" => CPTPMap.prod
 
+/-- Tensor products commute with channel application:
+`(Λ₁ ⊗ᶜᵖ Λ₂) (ρ₁ ⊗ᴹ ρ₂) = Λ₁ ρ₁ ⊗ᴹ Λ₂ ρ₂`. -/
+@[simp]
+theorem prod_apply_prod (Λ₁ : CPTPMap dI₁ dO₁) (Λ₂ : CPTPMap dI₂ dO₂)
+    (ρ₁ : MState dI₁) (ρ₂ : MState dI₂) :
+    (Λ₁ ⊗ᶜᵖ Λ₂) (ρ₁ ⊗ᴹ ρ₂) = (Λ₁ ρ₁) ⊗ᴹ (Λ₂ ρ₂) := by
+  apply MState.ext_m
+  simpa [CPTPMap.prod, MState.prod] using
+    MatrixMap.kron_map_of_kron_state Λ₁.map Λ₂.map ρ₁.m ρ₂.m
+
 end prod
 
 section finprod
