@@ -31,6 +31,9 @@ open BigOperators
 /-- The line through $Y_3$ and $B_3$ as `LinSols`. -/
 def lineY₃B₃Charges (a b : ℚ) : MSSMACC.LinSols := a • Y₃.1.1 + b • B₃.1.1
 
+lemma lineY₃B₃Charges_val (a b : ℚ) :
+    (lineY₃B₃Charges a b).val = a • Y₃.1.1.val + b • B₃.1.1.val := rfl
+
 set_option backward.isDefEq.respectTransparency false in
 lemma lineY₃B₃Charges_quad (a b : ℚ) : accQuad (lineY₃B₃Charges a b).val = 0 := by
   change accQuad (a • Y₃.val + b • B₃.val) = 0
@@ -61,6 +64,9 @@ lemma lineY₃B₃Charges_cubic (a b : ℚ) : accCube (lineY₃B₃Charges a b).
 /-- The line through $Y_3$ and $B_3$ as `Sols`. -/
 def lineY₃B₃ (a b : ℚ) : MSSMACC.Sols :=
   AnomalyFreeMk' (lineY₃B₃Charges a b) (lineY₃B₃Charges_quad a b) (lineY₃B₃Charges_cubic a b)
+
+lemma lineY₃B₃_val (a b : ℚ) : (lineY₃B₃ a b).val = a • Y₃.val + b • B₃.val := by
+  simp [lineY₃B₃, lineY₃B₃Charges_val]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma doublePoint_Y₃_B₃ (R : MSSMACC.LinSols) :

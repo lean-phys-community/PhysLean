@@ -439,6 +439,10 @@ def MSSMACC : ACCSystem where
 namespace MSSMACC
 open MSSMCharges
 
+lemma cubicACC_apply (S : MSSMACC.Charges) : MSSMACC.cubicACC S = cubeTriLin.toCubic S := rfl
+
+-- lemma quadBiLin
+
 lemma quadSol (S : MSSMACC.QuadSols) : accQuad S.val = 0 := by
   have hS := S.quadSol
   simp only [MSSMACC_numberQuadratic, HomogeneousQuadratic, MSSMACC_quadraticACCs] at hS
