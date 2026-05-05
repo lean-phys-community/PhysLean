@@ -13,11 +13,14 @@
 
 ## An open-source, community, project to digitalize results from physics into Lean 4
 
+
+
 [![](https://img.shields.io/badge/Getting-Started-darkgreen)](https://physlib.io/GettingStarted.html)
 [![](https://img.shields.io/badge/The-Website-darkgreen)](https://physlib.io)
 [![](https://img.shields.io/badge/How_To-Get_Involved-darkgreen)](https://physlib.io/GetInvolved.html)
 [![](https://img.shields.io/badge/Physlib_Zulip-Discussion-darkgreen)](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/)
 [![](https://img.shields.io/badge/TODO-List-darkgreen)](https://physlib.io/TODOList)
+
 
 [![](https://img.shields.io/badge/View_The-Stats-blue)](https://physlib.io/Stats)
 [![](https://img.shields.io/badge/Lean-v4.29.1-blue)](https://github.com/leanprover/lean4/releases/tag/v4.29.1)
@@ -26,6 +29,7 @@
 [![api_docs](https://img.shields.io/badge/doc-API_docs-blue)](https://physlib.io/docs/)
 
 </div>
+
 
 ## Requirements of the project
 
