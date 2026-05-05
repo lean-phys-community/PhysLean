@@ -62,14 +62,13 @@ def repCharges {n : ℕ} : Representation ℚ (PermGroup n) (SMCharges n).Charge
     intro S
     rw [charges_eq_toSpecies_eq]
     intro i
-    erw [toSMSpecies_toSpecies_inv]
-    rfl
+    exact toSMSpecies_toSpecies_inv _ _
 
 /-- The species charges of a set of charges acted on by a family permutation is the permutation
   of those species charges with the corresponding part of the family permutation. -/
 lemma repCharges_toSpecies (f : PermGroup n) (S : (SMCharges n).Charges) (j : Fin 5) :
-    toSpecies j (repCharges f S) = toSpecies j S ∘ f⁻¹ j := by
-  erw [toSMSpecies_toSpecies_inv]
+    toSpecies j (repCharges f S) = toSpecies j S ∘ f⁻¹ j :=
+  toSMSpecies_toSpecies_inv _ _
 
 /-- The sum over every charge in any species to some power `m` is invariant under the group
   action. -/
