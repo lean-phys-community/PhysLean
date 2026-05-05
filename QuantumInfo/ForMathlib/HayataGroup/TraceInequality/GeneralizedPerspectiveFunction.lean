@@ -547,13 +547,13 @@ end Theorem25Forward
 -- (fΔh)(A,B) := h(B)^{1/2} f(h(B)^{-1/2} A h(B)^{-1/2}) h(B)^{1/2}
 
 -- Theorem 2.5 https://www.pnas.org/doi/10.1073/pnas.1102518108
--- Suppose that f is a continous function with f(0) ≤ 0, and h is a continuous function with h > 0.
+-- Suppose that f is a continuous function with f(0) ≤ 0, and h is a continuous function with h > 0.
 -- If f is operator convex and h is operator concave,
 -- then fΔh is jointly convex
 
 end GeneralizedPerspectiveFunction
 
 -- Corollary 2.6 https://www.pnas.org/doi/10.1073/pnas.1102518108
--- Suppose that f is a continous function with f(0) ≥ 0, and h is a continuous function with h > 0.
+-- Suppose that f is a continuous function with f(0) ≥ 0, and h is a continuous function with h > 0.
 -- If f is operator convcave and h is operator concave,
 -- then fΔh is jointly concave
