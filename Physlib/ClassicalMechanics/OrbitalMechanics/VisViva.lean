@@ -11,29 +11,39 @@ public import Mathlib.Data.Real.Sqrt
 
 /-!
 # Circular Orbit Vis Viva
-Defines the orbital speed for a circular orbit (v^2 = G M / r).
+The vis-viva equation relates the speed of an orbiting body to its position
+and the mass of the central body. This module defines a simplified version of the
+vis-viva equation that is restricted to circular orbits (v^2 = G M / r).
 -/
+
 
 @[expose] public section
 
 namespace ClassicalMechanics
 
+/-- System parameters for the vis-viva equation in circular orbital mechanics. -/
 structure VisViva where
-  G : ℝ      -- gravitational constant
-  M : ℝ      -- central mass body
-  m : ℝ      -- orbiting mass body # for later usage
+  /-- Gravitational constant. -/
+  G : ℝ
+  /-- Central mass body. -/
+  M : ℝ
+  /-- Orbiting mass body. -/
+  m : ℝ
 
 namespace VisViva
 
+/-- Configuration space for orbital mechanics, defining the orbital radius. -/
 structure ConfigurationSpace where
-  r : ℝ      -- radius
+  /-- Orbital radius. -/
+  r : ℝ
 
-/-- Orbital speed for a circular orbit. -/
+/-- The orbital speed required for a circular orbit at radius `r`. -/
 noncomputable def speedCircular (sys : VisViva) (cfg : ConfigurationSpace) : ℝ :=
   Real.sqrt (sys.G * sys.M / cfg.r)
 
 /-- Lemma: the square of the circular orbit speed equals G M / r. -/
-lemma speedCircular_sq (sys : VisViva) (cfg : ConfigurationSpace) (hr : cfg.r > 0) (hG : sys.G > 0) (hM : sys.M > 0) :
+lemma speedCircular_sq (sys : VisViva) (cfg : ConfigurationSpace) (hr : cfg.r > 0) (hG : sys.G > 0)
+    (hM : sys.M > 0) :
     (speedCircular sys cfg)^2 = sys.G * sys.M / cfg.r := by
   simp [speedCircular]
   apply Real.sq_sqrt
