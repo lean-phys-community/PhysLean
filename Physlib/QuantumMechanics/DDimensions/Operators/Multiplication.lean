@@ -96,12 +96,9 @@ lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
   apply mem_closure_iff_seq_limit.mpr
   obtain ⟨u, hu, hfu⟩ := AEStronglyMeasurable.aemeasurable hf
   let s : ℕ → Set (Space d) := fun n ↦ u ⁻¹' (Metric.closedBall 0 n)
-  have hs : ∀ n, MeasurableSet (s n) := fun n ↦ hu measurableSet_closedBall
   let φ : ℕ → SpaceDHilbertSpace d := fun n ↦ mk (f := (s n).indicator ψ) <| by
     apply memHS_iff.mpr
-    have hsψ : AEStronglyMeasurable ((s n).indicator ψ) volume :=
-      AEStronglyMeasurable.indicator (by fun_prop) (hs n)
-    refine ⟨hsψ, by fun_prop, ?_⟩
+    refine ⟨by measurability, by measurability, ?_⟩
     refine HasFiniteIntegral.mono (memHS_iff.mp (coe_hilbertSpace_memHS ψ)).2.2 ?_
     refine Eventually.of_forall (fun x ↦ ?_)
     by_cases hx : x ∈ s n <;> simp [hx]
@@ -110,10 +107,7 @@ lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
   constructor
   · intro n
     apply memHS_iff.mpr
-    have hfφ : AEStronglyMeasurable (f • (φ n).val.cast) volume := by
-      change AEStronglyMeasurable (fun x ↦ f x * φ n x) volume
-      fun_prop
-    refine ⟨hfφ, by fun_prop, ?_⟩
+    refine ⟨by measurability, by measurability, ?_⟩
     refine HasFiniteIntegral.mono (memHS_iff.mp (coe_hilbertSpace_memHS (n • φ n))).2.2 ?_
     filter_upwards [hfu, coeFn_smul n (φ n).val, hφ n] with x h₁ h₂ h₃
     by_cases hx : x ∈ s n
@@ -133,10 +127,7 @@ lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     simp_rw [h]
     rw [← MeasureTheory.lintegral_zero (α := Space d) (μ := volume)]
     refine tendsto_lintegral_of_dominated_convergence' (fun x ↦ ‖ψ x‖ₑ ^ 2) ?_ ?_ ?_ ?_
-    · intro n
-      refine AEMeasurable.pow_const ?_ 2
-      refine AEMeasurable.enorm ?_
-      exact AEMeasurable.indicator (by fun_prop) (hs n).compl
+    · measurability
     · intro n
       filter_upwards with x
       by_cases hx : x ∈ s n <;> simp [hx]
