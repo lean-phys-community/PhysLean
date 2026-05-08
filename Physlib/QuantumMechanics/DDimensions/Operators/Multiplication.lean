@@ -173,6 +173,50 @@ lemma mulLPM_conj_isFormalAdjoint (f : Space d → ℂ) :
   filter_upwards [coe_mk_ae φ.prop, coe_mk_ae ψ.prop] with x h₁ h₂
   simp [mulLPM, h₁, h₂, mul_assoc, mul_left_comm]
 
+open InnerProductSpaceSubmodule in
+lemma isClosable_of_dense_formalAdjoint
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+    {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
+    {f : E →ₗ.[ℂ] F} (hf : Dense (f.domain : Set E))
+    {g : F →ₗ.[ℂ] E} (hg : Dense (g.domain : Set F))
+    (hgf : g.IsFormalAdjoint f) :
+    f.IsClosable := by
+  have hf' : Dense (f.adjoint.domain : Set F) := by
+    refine Dense.mono ?_ hg
+    rcases eq_or_lt_of_le (hgf.symm.le_adjoint hf) with (rfl | h)
+    · rfl
+    · exact (LinearPMap.domain_mono h).le
+  use f.adjoint.adjoint
+  ext
+  rw [LinearPMap.adjoint_graph_eq_graph_adjoint hf']
+  rw [LinearPMap.adjoint_graph_eq_graph_adjoint hf]
+  rw [mem_submodule_adjoint_adjoint_iff_mem_submoduleToLp_orthogonal_orthogonal]
+  rw [Submodule.orthogonal_orthogonal_eq_closure]
+  rw [mem_submodule_iff_mem_submoduleToLp]
+  rw [submoduleToLp_closure]
+
+/-- The unbounded operator which maps `ψ` to `f • ψ`
+  with domain `{ψ | f • ψ ∈ SpaceDHilbertSpace d}`. -/
+def mulUnbounded (f : Space d → ℂ) (hf : AEStronglyMeasurable f) :
+    UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) where
+  toLinearPMap := mulLPM f
+  dense_domain := mulLPM_dense_domain hf
+  is_closable := by
+    refine isClosable_of_dense_formalAdjoint (g := mulLPM (conj ∘ f)) ?_ ?_ ?_
+    · exact mulLPM_dense_domain hf
+    · exact mulLPM_conj_domain hf ▸ mulLPM_dense_domain hf
+    · exact mulLPM_conj_isFormalAdjoint f
+
+@[inherit_doc mulUnbounded]
+scoped notation "ℳ" => mulUnbounded
+
+lemma mem_mulUnbounded_domain_iff
+    {f : Space d → ℂ} {hf : AEStronglyMeasurable f} {ψ : SpaceDHilbertSpace d} :
+    ψ ∈ (ℳ f hf).domain ↔ MemHS (f • ψ.val.cast) := Iff.rfl
+
+lemma mulUnbounded_apply_ae {f : Space d → ℂ} {hf : AEStronglyMeasurable f} (ψ : (ℳ f hf).domain) :
+    (ℳ f hf) ψ =ᵐ[volume] f • ψ := coe_mk_ae ψ.prop
+
 end
 end SpaceDHilbertSpace
 end QuantumMechanics
