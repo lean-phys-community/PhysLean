@@ -5,7 +5,6 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
 /-!
