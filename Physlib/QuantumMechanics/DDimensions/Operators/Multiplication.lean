@@ -5,6 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
+public import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
 /-!
@@ -34,6 +35,7 @@ noncomputable section
 open MeasureTheory
 open AEEqFun
 open Filter
+open ComplexConjugate
 
 variable {d : ℕ}
 
@@ -157,6 +159,19 @@ lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
       by_cases hx : x ∈ s n
       · simp_all
       · simp_all [enorm, nnnorm, norm_neg_add]
+
+lemma mulLPM_conj_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
+    (mulLPM (conj ∘ f)).domain = (mulLPM f).domain := by
+  ext
+  simp only [mulLPM, smul_eq_mul, memHS_iff]
+  exact and_congr (iff_of_true (by fun_prop) (by fun_prop)) (by simp)
+
+lemma mulLPM_conj_isFormalAdjoint (f : Space d → ℂ) :
+    (mulLPM (conj ∘ f)).IsFormalAdjoint (mulLPM f) := by
+  intro ψ φ
+  refine integral_congr_ae ?_
+  filter_upwards [coe_mk_ae φ.prop, coe_mk_ae ψ.prop] with x h₁ h₂
+  simp [mulLPM, h₁, h₂, mul_assoc, mul_left_comm]
 
 end
 end SpaceDHilbertSpace
