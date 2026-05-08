@@ -20,9 +20,24 @@ namely a vector `ψ ∈ SpaceDHilbertSpace d` is in the domain iff `f • ψ ∈
 
 ## ii. Key results
 
+- `mulUnbounded f hf` : Given a function `f : Space d → ℂ` and a proof `hf`
+  of `AEStronglyMeasurable f`, the unbounded operator defined by multiplication by `f`.
+
+Notation:
+- `ℳ` for `mulUnbounded`
+
 ## iii. Table of contents
 
+- A. Multiplication LinearPMap
+  - A.1. Dense domain
+  - A.2. Conjugation
+- B. Multiplication unbounded operator
+
 ## iv. References
+
+See examples 1.3 and 3.8 in
+- K. Schmüdgen, (2012). "Unbounded self-adjoint operators on Hilbert space" (Vol. 265). Springer.
+  https://doi.org/10.1007/978-94-007-4753-1
 
 -/
 
@@ -38,6 +53,10 @@ open Filter
 open ComplexConjugate
 
 variable {d : ℕ}
+
+/-!
+## A. Multiplication LinearPMap
+-/
 
 /-- The `LinearPMap` which maps `ψ` to `f • ψ` with domain `{ψ | f • ψ ∈ SpaceDHilbertSpace d}`. -/
 def mulLPM (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
@@ -67,6 +86,10 @@ def mulLPM (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbe
       change (f • (c • ψ.1.val).cast) x = _
       simp [h, mul_left_comm]
   }
+
+/-!
+### A.1. Dense domain
+-/
 
 lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     Dense ((mulLPM f).domain : Set (SpaceDHilbertSpace d)) := by
@@ -160,6 +183,10 @@ lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
       · simp_all
       · simp_all [enorm, nnnorm, norm_neg_add]
 
+/-!
+### A.2. Conjugation
+-/
+
 lemma mulLPM_conj_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (mulLPM (conj ∘ f)).domain = (mulLPM f).domain := by
   ext
@@ -173,7 +200,12 @@ lemma mulLPM_conj_isFormalAdjoint (f : Space d → ℂ) :
   filter_upwards [coe_mk_ae φ.prop, coe_mk_ae ψ.prop] with x h₁ h₂
   simp [mulLPM, h₁, h₂, mul_assoc, mul_left_comm]
 
+/-!
+## B. Multiplication unbounded operator
+-/
+
 open InnerProductSpaceSubmodule in
+/-- A LinearPMap with densely-defined formal adjoint is closable. -/
 lemma isClosable_of_dense_formalAdjoint
     {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
     {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
