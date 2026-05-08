@@ -101,7 +101,7 @@ theorem traceNorm_Hermitian_eq_sum_abs_eigenvalues {A : Matrix n n R} (hA : A.Is
   simp_rw [← sq, ← Real.sqrt_sq_eq_abs, ← Matrix.trace_diagonal]
   set B := ((diagonal fun i => (hA.eigenvalues i : R) ^ 2)) with bD
   rw [CFC.sqrt_eq_real_sqrt B _, bD]
-  . rw [cfcₙ_eq_cfc]
+  . rw [cfcₙ_eq_cfc (by fun_prop) (by simp)]
     rw_mod_cast [cfc_diagonal (g := fun i => (hA.eigenvalues i) ^2)]
     simp
   . apply Matrix.PosSemidef.nonneg
