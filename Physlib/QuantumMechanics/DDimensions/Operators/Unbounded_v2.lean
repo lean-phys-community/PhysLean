@@ -10,6 +10,28 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 
 # Unbounded operators
 
+## i. Overview
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Definitions
+- B. Dense domain
+- C. Closability
+- D. Adjoints
+- E. Symmetric operators
+- F. Self-adjoint operators
+- G. Essentially self-adjoint operators
+- H. Unbounded operators
+
+## iv. References
+
+- M. Reed & B. Simon, (1972). "Methods of modern mathematical physics: Vol. 1. Functional analysis".
+  Academic Press. https://doi.org/10.1016/B978-0-12-585001-8.X5001-6
+- K. Schmüdgen, (2012). "Unbounded self-adjoint operators on Hilbert space" (Vol. 265). Springer.
+  https://doi.org/10.1007/978-94-007-4753-1
+
 -/
 
 @[expose] public section
