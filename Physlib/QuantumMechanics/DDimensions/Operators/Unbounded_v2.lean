@@ -303,4 +303,12 @@ lemma IsSelfAdjoint.smul_ofReal [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ
 lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint (-T) :=
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
+/-!
+## G. Essentially self-adjoint operators
+-/
+
+lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsSymmetric :=
+  (IsSelfAdjoint.isSymmetric h h'.closure).of_le T.le_closure
+
 end LinearPMap
