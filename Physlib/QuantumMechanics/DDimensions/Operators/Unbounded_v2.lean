@@ -17,7 +17,9 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 namespace LinearPMap
 
 open Submodule
+open InnerProductSpace
 open InnerProductSpaceSubmodule
+open Complex ComplexConjugate
 
 variable
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
@@ -127,5 +129,52 @@ lemma IsClosable.smul (h : U.IsClosable) (c : ℂ) : (c • U).IsClosable := by
 lemma neg_eq_neg_one_smul (U : H →ₗ.[ℂ] H') : -U = (-1 : ℂ) • U := ext (by simp) (by simp)
 
 lemma IsClosable.neg (h : U.IsClosable) : (-U).IsClosable := neg_eq_neg_one_smul U ▸ h.smul _
+
+/-!
+## D. Adjoints
+-/
+
+/-- The adjoint of a zero LinearPMap (any domain) is zero (domain `⊤`).  -/
+lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
+  refine dExt ?_ fun x y hxy ↦ ?_
+  · ext
+    simp only [zero_domain, mem_top, iff_true]
+    apply (mem_adjoint_domain_iff _ _).mpr
+    exact continuous_of_const (by simp [h_zero])
+  · by_cases h : U.HasDenseDomain
+    · exact adjoint_apply_eq h x (by simp [h_zero])
+    · exact adjoint_apply_of_not_dense h x
+
+lemma adjoint_smul [CompleteSpace H] (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) :
+    (c • U)† = conj c • U† := by
+  refine dExt ?_ fun x y hxy ↦ ?_
+  · ext x
+    change Continuous (fun w ↦ ⟪x, c • U w⟫_ℂ) ↔ Continuous (fun w ↦ ⟪x, U w⟫_ℂ)
+    exact Iff.trans (by simp [inner_smul_right]) (continuous_const_smul_iff₀ hc)
+  · by_cases h : U.HasDenseDomain
+    · refine adjoint_apply_eq (smul_domain c U ▸ h) x fun w ↦ ?_
+      simp [inner_smul_left, inner_smul_right, adjoint_isFormalAdjoint h y w, hxy]
+    · simp [adjoint_apply_of_not_dense h y, adjoint_apply_of_not_dense (smul_domain c U ▸ h) x]
+
+lemma adjoint_neg [CompleteSpace H] (U : H →ₗ.[ℂ] H') : (-U)† = -U† := by
+  simp [neg_eq_neg_one_smul, adjoint_smul]
+
+lemma adjoint_antitone [CompleteSpace H]
+    (h₁₂ : U₁.HasDenseDomain ∨ ¬U₂.HasDenseDomain) (h_le : U₁ ≤ U₂) : U₂† ≤ U₁† := by
+  have h_agree : ∀ w : U₁.domain, U₁ w = U₂ ⟨w, h_le.1 w.2⟩ := fun w ↦ @h_le.2 w ⟨w, h_le.1 w.2⟩ rfl
+  constructor
+  · intro v
+    let f₁ : U₁.domain → ℂ := fun w ↦ ⟪v, U₁ w⟫_ℂ
+    let f₂ : U₂.domain → ℂ := fun w ↦ ⟪v, U₂ w⟫_ℂ
+    change Continuous f₂ → Continuous f₁
+    suffices f₁ = fun w : U₁.domain ↦ f₂ ⟨w, h_le.1 w.2⟩ by rw [this]; fun_prop
+    simp [f₁, f₂, h_agree]
+  · intro u v huv
+    rcases h₁₂ with (h₁ | h₂)
+    · have h₂ : U₂.HasDenseDomain := h₁.mono h_le.1
+      refine (adjoint_apply_eq h₁ v fun w ↦ ?_).symm
+      rw [adjoint_isFormalAdjoint h₂ u ⟨w, h_le.1 w.2⟩, h_agree, huv]
+    · have h₁ : ¬U₁.HasDenseDomain := fun h ↦ h₂ (h.mono h_le.1)
+      rw [adjoint_apply_of_not_dense h₁ v, adjoint_apply_of_not_dense h₂ u]
 
 end LinearPMap
