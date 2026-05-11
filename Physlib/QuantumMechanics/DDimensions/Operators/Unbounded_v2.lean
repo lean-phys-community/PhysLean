@@ -265,4 +265,42 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
   have hy : T₂ y = T₁ ⟨y, h_le.1 y.2⟩ := @h_le.2 y ⟨y, h_le.1 y.2⟩ rfl
   exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
 
+/-!
+## F. Self-adjoint operators
+-/
+
+lemma IsSelfAdjoint.isSymmetric [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsSymmetric := by
+  rw [isSymmetric_def]
+  nth_rw 1 [← h]
+  exact adjoint_isFormalAdjoint h'
+
+lemma IsSelfAdjoint.isClosed [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsClosed :=
+  h ▸ adjoint_isClosed h'
+
+lemma IsSelfAdjoint.isClosable [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsClosable :=
+  (isClosed h h').isClosable
+
+lemma IsSelfAdjoint.isUnbounded [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsUnbounded :=
+  ⟨h', isClosable h h'⟩
+
+lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† := by
+  apply isSelfAdjoint_def.mp at h
+  exact h.symm ▸ h
+
+lemma IsSelfAdjoint.smul [CompleteSpace H]
+    (h : IsSelfAdjoint T) {c : ℂ} (hc : c ≠ 0) (hc' : conj c = c) :
+    IsSelfAdjoint (c • T) := by
+  rw [isSelfAdjoint_def, T.adjoint_smul hc, hc', isSelfAdjoint_def.mp h]
+
+lemma IsSelfAdjoint.smul_ofReal [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} (hr : r ≠ 0) :
+    IsSelfAdjoint (ofReal r • T) :=
+  smul h (ofReal_ne_zero.mpr hr) (conj_ofReal r)
+
+lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint (-T) :=
+  neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
+
 end LinearPMap
