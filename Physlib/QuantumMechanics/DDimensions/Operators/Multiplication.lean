@@ -13,7 +13,16 @@ public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 
 ## i. Overview
 
+In this module we introduce unbounded operators defined by multiplication by a function
+`f : Space d → ℂ`. The domain is defined to be as large as possible, namely a vector
+`ψ ∈ SpaceDHilbertSpace d` is in the domain iff `f • ψ ∈ SpaceDHilbertSpace d`.
+
 ## ii. Key results
+
+- `mulOperator f` : Given a function `f : Space d → ℂ`, the operator defined by `ψ ↦ f • ψ`
+  (with maximal domain) with notation `ℳ f`.
+- `mulOperator_adjoint_eq_conj` : For a.e. strongly measurable `f`, `(ℳ f)† = ℳ (conj ∘ f)`
+- `mulOperator_isUnbounded` : For a.e. strongly measurable `f`, `ℳ f` is an unbounded operator.
 
 ## iii. Table of contents
 
@@ -150,7 +159,7 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
         _ ≤ n := Nat.cast_le.mpr hn
 
 /-!
-## C. Adjoint & symmetric
+## C. Adjoint
 -/
 
 -- Can the AEStronglyMeasurable hypothesis be removed?
