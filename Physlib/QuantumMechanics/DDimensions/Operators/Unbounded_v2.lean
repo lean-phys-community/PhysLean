@@ -177,4 +177,92 @@ lemma adjoint_antitone [CompleteSpace H]
     · have h₁ : ¬U₁.HasDenseDomain := fun h ↦ h₂ (h.mono h_le.1)
       rw [adjoint_apply_of_not_dense h₁ v, adjoint_apply_of_not_dense h₂ u]
 
+/-!
+## E. Symmetric operators
+-/
+
+/-- The analogue of `inner_map_polarization` for LinearPMap. -/
+lemma inner_map_polarization (x y : T.domain) :
+    ⟪T y, x⟫_ℂ = (⟪T (x + y), ↑(x + y)⟫_ℂ - ⟪T (x - y), ↑(x - y)⟫_ℂ
+      + I * ⟪T (x + I • y), ↑(x + I • y)⟫_ℂ - I * ⟪T (x - I • y), ↑(x - I • y)⟫_ℂ) / 4 := by
+  simp only [map_add, coe_add, inner_add_right, inner_add_left, map_sub, AddSubgroupClass.coe_sub,
+    inner_sub_right, inner_sub_left, sub_sub, map_smul, SetLike.val_smul, inner_smul_left, conj_I,
+    neg_mul, inner_smul_right, mul_add, mul_neg, ← mul_assoc, ← pow_two, I_sq, one_mul, neg_neg,
+    sub_neg_eq_add, mul_sub]
+  ring
+
+/-- The analogue of `inner_map_polarization'` for LinearPMap. -/
+theorem inner_map_polarization' (x y : T.domain) :
+    ⟪T x, y⟫_ℂ = (⟪T (x + y), ↑(x + y)⟫_ℂ - ⟪T (x - y), ↑(x - y)⟫_ℂ
+      - I * ⟪T (x + I • y), ↑(x + I • y)⟫_ℂ + I * ⟪T (x - I • y), ↑(x - I • y)⟫_ℂ) / 4 := by
+  simp only [map_add, coe_add, inner_add_right, inner_add_left, map_sub, AddSubgroupClass.coe_sub,
+    inner_sub_right, inner_sub_left, sub_sub, map_smul, SetLike.val_smul, inner_smul_left, conj_I,
+    neg_mul, inner_smul_right, mul_add, mul_neg, ← mul_assoc, ← pow_two, I_sq, one_mul, neg_neg,
+    sub_neg_eq_add, mul_sub]
+  ring
+
+-- The analogue of `LinearMap.isSymmetric_iff_inner_map_self_real` for LinearPMap.
+lemma isSymmetric_iff_inner_map_self_real :
+    T.IsSymmetric ↔ ∀ x : T.domain, conj ⟪T x, x⟫_ℂ = ⟪T x, x⟫_ℂ := by
+  refine ⟨fun h_symm x ↦ by simp [h_symm x x], fun h_re x y ↦ ?_⟩
+  nth_rw 2 [← inner_conj_symm]
+  nth_rw 2 [inner_map_polarization]
+  simp only [map_div₀, _root_.map_sub, _root_.map_add, map_mul, neg_mul, conj_ofNat, conj_I, h_re]
+  rw [inner_map_polarization']
+  simp [sub_eq_add_neg]
+
+lemma IsSymmetric.isClosable [CompleteSpace H] (h : T.IsSymmetric) (h' : T.HasDenseDomain) :
+    T.IsClosable :=
+  isClosable_iff_exists_closed_extension.mpr ⟨T†, adjoint_isClosed h', h.le_adjoint h'⟩
+
+lemma IsSymmetric.isUnbounded_iff_hasDenseDomain [CompleteSpace H] (h : T.IsSymmetric) :
+    T.IsUnbounded ↔ T.HasDenseDomain :=
+  and_iff_left_of_imp h.isClosable
+
+lemma isSymmetric_iff_le_adjoint [CompleteSpace H] (h : T.HasDenseDomain) :
+    T.IsSymmetric ↔ T ≤ T† := by
+  refine ⟨fun h_symm ↦ h_symm.le_adjoint h, fun h_le x y ↦ ?_⟩
+  have h_eq : T x = T† ⟨x, h_le.1 x.2⟩ := @h_le.2 x ⟨x, h_le.1 x.2⟩ rfl
+  exact h_eq ▸ adjoint_isFormalAdjoint h _ _
+
+lemma IsSymmetric.isSelfAdjoint_iff [CompleteSpace H] (h : T.IsSymmetric) (h' : T.HasDenseDomain) :
+    IsSelfAdjoint T ↔ T†.domain = T.domain := by
+  constructor <;> intro h''
+  · congr
+  · exact dExt h'' fun x y hxy ↦ Eq.symm <| @(h.le_adjoint h').2 y x hxy.symm
+
+lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
+    (T + T.adjoint).IsSymmetric := by
+  intro x y
+  have h₁ := adjoint_isFormalAdjoint h ⟨x, x.2.2⟩ ⟨y, y.2.1⟩
+  have h₂ := adjoint_isFormalAdjoint h ⟨y, y.2.2⟩ ⟨x, x.2.1⟩
+  apply starRingEquiv.apply_eq_iff_eq.mpr at h₂
+  simp only [RingEquiv.toEquiv_eq_coe, EquivLike.coe_coe, starRingEquiv_apply, RCLike.star_def,
+    inner_conj_symm, MulOpposite.op_inj] at h₂
+  simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
+  exact add_comm _ _
+
+lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by simp [h x y]
+
+lemma IsSymmetric.add (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ + T₂).IsSymmetric := by
+  intro x y
+  specialize h₁ ⟨x, x.2.1⟩ ⟨y, y.2.1⟩
+  specialize h₂ ⟨x, x.2.2⟩ ⟨y, y.2.2⟩
+  simp [h₁, h₂, add_apply, inner_add_left, inner_add_right]
+
+lemma IsSymmetric.sub (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ - T₂).IsSymmetric :=
+  sub_eq_add_neg T₁ T₂ ▸ h₁.add h₂.neg
+
+lemma IsSymmetric.smul (h : T.IsSymmetric) {c : ℂ} (hc : conj c = c) : (c • T).IsSymmetric :=
+  fun x y ↦ by simp only [smul_apply, inner_smul_left, inner_smul_right, hc, h x y]
+
+lemma IsSymmetric.smul_ofReal (h : T.IsSymmetric) (r : ℝ) : (ofReal r • T).IsSymmetric :=
+  h.smul (conj_ofReal r)
+
+lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.IsSymmetric := by
+  intro x y
+  have hx : T₂ x = T₁ ⟨x, h_le.1 x.2⟩ := @h_le.2 x ⟨x, h_le.1 x.2⟩ rfl
+  have hy : T₂ y = T₁ ⟨y, h_le.1 y.2⟩ := @h_le.2 y ⟨y, h_le.1 y.2⟩ rfl
+  exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
+
 end LinearPMap
