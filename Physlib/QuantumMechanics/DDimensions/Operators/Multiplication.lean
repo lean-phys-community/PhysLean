@@ -5,7 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
+public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded_v2
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 /-!
 
@@ -13,24 +13,15 @@ public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 
 ## i. Overview
 
-In this module we introduce unbounded operators defined by multiplication by a function
-`f : Space d → ℂ` which is `AEStronglyMeasurable`. The domain is defined to be as large as possible,
-namely a vector `ψ ∈ SpaceDHilbertSpace d` is in the domain iff `f • ψ ∈ SpaceDHilbertSpace d`.
-
 ## ii. Key results
-
-- `mulUnbounded f hf` : Given a function `f : Space d → ℂ` and a proof `hf`
-  of `AEStronglyMeasurable f`, the unbounded operator defined by multiplication by `f`.
-
-Notation:
-- `ℳ` for `mulUnbounded`
 
 ## iii. Table of contents
 
-- A. Multiplication LinearPMap
-  - A.1. Dense domain
-  - A.2. Conjugation
-- B. Multiplication unbounded operator
+- A. Definition
+- B. Dense domain
+- C. Adjoint
+  - C.1. Self-adjoint
+- D. Closable & unbounded
 
 ## iv. References
 
@@ -46,6 +37,7 @@ namespace QuantumMechanics
 namespace SpaceDHilbertSpace
 noncomputable section
 
+open LinearPMap
 open MeasureTheory
 open AEEqFun
 open Filter
@@ -54,11 +46,11 @@ open ComplexConjugate
 variable {d : ℕ}
 
 /-!
-## A. Multiplication LinearPMap
+## A. Definition
 -/
 
-/-- The `LinearPMap` which maps `ψ` to `f • ψ` with domain `{ψ | f • ψ ∈ SpaceDHilbertSpace d}`. -/
-def mulLPM (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
+/-- The LinearPMap which maps `ψ` to `f • ψ` with domain `{ψ | f • ψ ∈ SpaceDHilbertSpace d}`. -/
+def mulOperator (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
   domain := {
     carrier := {ψ : SpaceDHilbertSpace d | MemHS (f • ψ.val.cast)}
     add_mem' := by
@@ -86,12 +78,22 @@ def mulLPM (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbe
       simp [h, mul_left_comm]
   }
 
+@[inherit_doc mulOperator]
+notation "ℳ" => mulOperator
+
+lemma mem_mulOperator_domain_iff
+    {f : Space d → ℂ} {ψ : SpaceDHilbertSpace d} : ψ ∈ (ℳ f).domain ↔ MemHS (f • ψ.val.cast) :=
+  Iff.rfl
+
+lemma mulOperator_apply_ae {f : Space d → ℂ} (ψ : (ℳ f).domain) : (ℳ f) ψ =ᵐ[volume] f • ψ :=
+  coe_mk_ae ψ.prop
+
 /-!
-### A.1. Dense domain
+## B. Dense domain
 -/
 
-lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    Dense ((mulLPM f).domain : Set (SpaceDHilbertSpace d)) := by
+lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
+    (ℳ f).HasDenseDomain := by
   intro ψ
   apply mem_closure_iff_seq_limit.mpr
   obtain ⟨u, hu, hfu⟩ := AEStronglyMeasurable.aemeasurable hf
@@ -148,70 +150,78 @@ lemma mulLPM_dense_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
         _ ≤ n := Nat.cast_le.mpr hn
 
 /-!
-### A.2. Conjugation
+## C. Adjoint & symmetric
 -/
 
-lemma mulLPM_conj_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (mulLPM (conj ∘ f)).domain = (mulLPM f).domain := by
+-- Can the AEStronglyMeasurable hypothesis be removed?
+lemma mulOperator_conj_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
+    (ℳ (conj ∘ f)).domain = (ℳ f).domain := by
   ext
-  simp only [mulLPM, smul_eq_mul, memHS_iff]
+  simp only [mulOperator, smul_eq_mul, memHS_iff]
   exact and_congr (iff_of_true (by fun_prop) (by fun_prop)) (by simp)
 
-lemma mulLPM_conj_isFormalAdjoint (f : Space d → ℂ) :
-    (mulLPM (conj ∘ f)).IsFormalAdjoint (mulLPM f) := by
-  intro ψ φ
-  refine integral_congr_ae ?_
-  filter_upwards [coe_mk_ae φ.prop, coe_mk_ae ψ.prop] with x h₁ h₂
-  simp [mulLPM, h₁, h₂, mul_assoc, mul_left_comm]
+lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
+    (ℳ f)† = ℳ (conj ∘ f) := by
+  refine eq_of_eq_graph ?_
+  ext u
+  rw [adjoint_graph_eq_graph_adjoint (mulOperator_hasDenseDomain hf), Submodule.mem_adjoint_iff]
+  constructor
+  · intro h
+    let g : Space d → ℂ := fun x ↦ conj (f x) * u.1 x - u.2 x
+    have hg : AEStronglyMeasurable g := by measurability
+    have h_int : ∀ ψ : (ℳ f).domain, ∫ x, (AEEqFun.mk g hg) x * conj (ψ.val x) = 0 := by
+      intro ψ
+      have h_int₁ : Integrable fun x ↦ u.1 x * conj (ℳ f ψ x) := L2.integrable_inner (ℳ f ψ) u.1
+      have h_int₂ : Integrable fun x ↦ u.2 x * conj (ψ.val x) := L2.integrable_inner ψ.val u.2
+      symm
+      trans ∫ x, u.1 x * conj (ℳ f ψ x) - u.2 x * conj (ψ.val x)
+      · exact (h ψ (ℳ f ψ) (mem_graph (ℳ f) ψ)) ▸ (integral_sub h_int₁ h_int₂).symm
+      refine integral_congr_ae ?_
+      filter_upwards [mulOperator_apply_ae ψ, AEEqFun.coeFn_mk g hg] with x h₁ h₂
+      simp [h₁, h₂, g, sub_mul, mul_assoc, mul_left_comm]
+    have hu₂ : u.2 =ᵐ[volume] (conj ∘ f) • u.1 := by
+      sorry
+    have hu₁ : u.1 ∈ (ℳ (conj ∘ f)).domain :=
+      mem_mulOperator_domain_iff.mpr <| memHS_of_ae u.2 (coe_hilbertSpace_memHS u.2) hu₂
+    apply (mem_graph_iff _).mpr
+    refine ⟨⟨u.1, hu₁⟩, rfl, ?_⟩
+    apply ext_iff.mpr
+    filter_upwards [mulOperator_apply_ae ⟨u.1, hu₁⟩, hu₂] with x h₁ h₂
+    rw [h₁, h₂]
+  · intro hu v₁ v₂ hv
+    obtain ⟨ψ, hu₁, hu₂⟩ := (mem_graph_iff _).mp hu
+    obtain ⟨φ, rfl, rfl⟩ := (mem_graph_iff _).mp hv
+    rw [sub_eq_zero]
+    refine integral_congr_ae ?_
+    filter_upwards [mulOperator_apply_ae ψ, mulOperator_apply_ae φ]
+    simp_all [mul_assoc, mul_left_comm]
 
 /-!
-## B. Multiplication unbounded operator
+### C.1. Self-adjoint
 -/
 
-open InnerProductSpaceSubmodule in
-/-- A LinearPMap with densely-defined formal adjoint is closable. -/
-lemma isClosable_of_dense_formalAdjoint
-    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
-    {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
-    {f : E →ₗ.[ℂ] F} (hf : Dense (f.domain : Set E))
-    {g : F →ₗ.[ℂ] E} (hg : Dense (g.domain : Set F))
-    (hgf : g.IsFormalAdjoint f) :
-    f.IsClosable := by
-  have hf' : Dense (f.adjoint.domain : Set F) := by
-    refine Dense.mono ?_ hg
-    rcases eq_or_lt_of_le (hgf.symm.le_adjoint hf) with (rfl | h)
-    · rfl
-    · exact (LinearPMap.domain_mono h).le
-  use f.adjoint.adjoint
-  ext
-  rw [LinearPMap.adjoint_graph_eq_graph_adjoint hf']
-  rw [LinearPMap.adjoint_graph_eq_graph_adjoint hf]
-  rw [mem_submodule_adjoint_adjoint_iff_mem_submoduleToLp_orthogonal_orthogonal]
-  rw [Submodule.orthogonal_orthogonal_eq_closure]
-  rw [mem_submodule_iff_mem_submoduleToLp]
-  rw [submoduleToLp_closure]
+lemma mulOperator_isSelfAdjoint_ofReal
+    {f : Space d → ℂ} (hf : AEStronglyMeasurable f) (hf' : conj ∘ f = f) :
+    IsSelfAdjoint (ℳ f) := by
+  apply isSelfAdjoint_def.mpr
+  rw [mulOperator_adjoint_eq_conj hf, hf']
 
-/-- The unbounded operator which maps `ψ` to `f • ψ`
-  with domain `{ψ | f • ψ ∈ SpaceDHilbertSpace d}`. -/
-def mulUnbounded (f : Space d → ℂ) (hf : AEStronglyMeasurable f) :
-    UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) where
-  toLinearPMap := mulLPM f
-  dense_domain := mulLPM_dense_domain hf
-  is_closable := by
-    refine isClosable_of_dense_formalAdjoint (g := mulLPM (conj ∘ f)) ?_ ?_ ?_
-    · exact mulLPM_dense_domain hf
-    · exact mulLPM_conj_domain hf ▸ mulLPM_dense_domain hf
-    · exact mulLPM_conj_isFormalAdjoint f
+/-!
+## D. Closable & unbounded
+-/
 
-@[inherit_doc mulUnbounded]
-scoped notation "ℳ" => mulUnbounded
+lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
+    (ℳ f).IsClosable := by
+  refine isClosable_of_exists_dense_formalAdjoint ?_ ?_
+  · exact mulOperator_hasDenseDomain hf
+  · refine ⟨ℳ (conj ∘ f), ?_, ?_⟩
+    · exact mulOperator_hasDenseDomain (by measurability)
+    · rw [← mulOperator_adjoint_eq_conj hf]
+      exact adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)
 
-lemma mem_mulUnbounded_domain_iff
-    {f : Space d → ℂ} {hf : AEStronglyMeasurable f} {ψ : SpaceDHilbertSpace d} :
-    ψ ∈ (ℳ f hf).domain ↔ MemHS (f • ψ.val.cast) := Iff.rfl
-
-lemma mulUnbounded_apply_ae {f : Space d → ℂ} {hf : AEStronglyMeasurable f} (ψ : (ℳ f hf).domain) :
-    (ℳ f hf) ψ =ᵐ[volume] f • ψ := coe_mk_ae ψ.prop
+lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
+    (ℳ f).IsUnbounded :=
+  ⟨mulOperator_hasDenseDomain hf, mulOperator_isClosable hf⟩
 
 end
 end SpaceDHilbertSpace
