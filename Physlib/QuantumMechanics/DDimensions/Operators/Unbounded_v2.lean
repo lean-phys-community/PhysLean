@@ -47,4 +47,27 @@ def IsEssentiallySelfAdjoint [CompleteSpace H] (T : H →ₗ.[ℂ] H) : Prop := 
 lemma isEssentiallySelfAdjoint_def [CompleteSpace H] :
     T.IsEssentiallySelfAdjoint ↔ IsSelfAdjoint T.closure := Iff.rfl
 
+/-!
+## B. Dense domain
+-/
+
+lemma HasDenseDomain.isUnbounded_iff_isClosable (h : U.HasDenseDomain) :
+    U.IsUnbounded ↔ U.IsClosable :=
+  and_iff_right h
+
+lemma HasDenseDomain.closure (h : U.HasDenseDomain) : U.closure.HasDenseDomain :=
+  h.mono U.le_closure.1
+
+lemma HasDenseDomain.neg (h : U.HasDenseDomain) : (-U).HasDenseDomain := h
+
+lemma HasDenseDomain.smul (h : U.HasDenseDomain) (c : ℂ) : (c • U).HasDenseDomain := h
+
+lemma HasDenseDomain.add_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain ≤ U₂.domain) :
+    (U₁ + U₂).HasDenseDomain :=
+  h₁.mono (by simp [h_le, add_domain])
+
+lemma HasDenseDomain.sub_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain ≤ U₂.domain) :
+    (U₁ - U₂).HasDenseDomain :=
+  h₁.mono (by simp [h_le, sub_domain])
+
 end LinearPMap
