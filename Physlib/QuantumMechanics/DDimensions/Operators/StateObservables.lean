@@ -107,7 +107,7 @@ lemma inner_eq_expectedValue (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
     (expectedValue T ψ hψ : ℂ) = ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ :=
   (expectedValue_eq_inner T hT ψ hψ).symm
 
-/-- Same as `expectedValue`; kept for state-observable naming. -/
+/-- State-observable notation for the expectation value. -/
 def stateExpectedValue (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) : ℝ :=
   expectedValue T ψ hψ
 
