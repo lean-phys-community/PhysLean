@@ -241,6 +241,7 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
 public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
