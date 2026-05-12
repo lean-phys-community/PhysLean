@@ -80,50 +80,37 @@ theorem fidelity_eq_traceNorm_sqrt_mul_sqrt (ρ σ : MState d) :
 
 /-- The fidelity is 1 if and only if the two states are the same. -/
 theorem fidelity_eq_one_iff_self : fidelity ρ σ = 1 ↔ ρ = σ := by
-  constructor
-  · intro h
-    let A : Matrix d d ℂ := ρ.M.sqrt.mat
-    let B : Matrix d d ℂ := σ.M.sqrt.mat
-    let X : Matrix d d ℂ := B * A
-    have hX : X.traceNorm = 1 := by
-      simpa [X, A, B] using (fidelity_eq_traceNorm_sqrt_mul_sqrt ρ σ).symm.trans h
-    obtain ⟨U, hU⟩ := (Matrix.traceNorm_eq_max_tr_U X).left
-    have hUeq : RCLike.re ((U.1 * X).trace) = 1 := by
-      rw [hU]; simpa using hX
-    have hAherm : Matrix.conjTranspose A = A := by simp [A]
-    have hBherm : Matrix.conjTranspose B = B := by simp [B]
-    have hAeq : ρ.m = Matrix.conjTranspose A * A := by
-      simpa [A, hAherm] using (HermitianMat.sqrt_sq ρ.nonneg).symm
-    have hBeq : σ.m = Matrix.conjTranspose B * B := by
-      simpa [B, hBherm] using (HermitianMat.sqrt_sq σ.nonneg).symm
-    have hUB : Matrix.conjTranspose (U.1 * B) * (U.1 * B) = Matrix.conjTranspose B * B := by
-      rw [Matrix.conjTranspose_mul, Matrix.mul_assoc]
-      simp [show Matrix.conjTranspose U.1 = star U.1 from rfl, ← Matrix.mul_assoc, U.2.1]
-    let z : ℂ := (U.1 * X).trace
-    have hz1 : (Matrix.conjTranspose A * (U.1 * B)).trace = z := by
-      dsimp [z, X]; rw [hAherm, ← Matrix.mul_assoc, Matrix.trace_mul_cycle, Matrix.trace_mul_comm]
-    have hz2 : (Matrix.conjTranspose (U.1 * B) * A).trace = conj z := by
-      rw [show Matrix.conjTranspose (U.1 * B) * A =
-          Matrix.conjTranspose (Matrix.conjTranspose A * (U.1 * B)) by
-        simp [Matrix.conjTranspose_mul, hAherm, hBherm]]
-      simpa [hz1] using Matrix.trace_conjTranspose (Matrix.conjTranspose A * (U.1 * B))
-    have htraceM : (Matrix.conjTranspose (A - U.1 * B) * (A - U.1 * B)).trace = 0 := by
-      have h_expand : (Matrix.conjTranspose (A - U.1 * B) * (A - U.1 * B)).trace =
-          (Matrix.conjTranspose A * A).trace - (Matrix.conjTranspose A * (U.1 * B)).trace
-            - (Matrix.conjTranspose (U.1 * B) * A).trace
-            + (Matrix.conjTranspose (U.1 * B) * (U.1 * B)).trace := by
-        simp [sub_eq_add_neg, Matrix.conjTranspose_mul, Matrix.mul_add, Matrix.add_mul,
-          Matrix.trace_add, Matrix.trace_neg, add_assoc, add_left_comm, add_comm]
-      rw [h_expand, hz1, hz2, ← hAeq, ρ.tr', hUB, ← hBeq, σ.tr']
-      have : z + conj z = 2 := by rw [RCLike.add_conj, hUeq]; push_cast; ring
-      linear_combination -this
-    have hAU : A = U.1 * B :=
-      sub_eq_zero.mp (Matrix.trace_conjTranspose_mul_self_eq_zero_iff.mp htraceM)
-    exact MState.ext_m <| calc ρ.m = Matrix.conjTranspose A * A := hAeq
-      _ = Matrix.conjTranspose (U.1 * B) * (U.1 * B) := by rw [hAU]
-      _ = Matrix.conjTranspose B * B := hUB
-      _ = σ.m := hBeq.symm
-  · rintro rfl; exact fidelity_self_eq_one ρ
+  refine ⟨fun h => ?_, fun h => h ▸ fidelity_self_eq_one ρ⟩
+  set A : Matrix d d ℂ := ρ.M.sqrt.mat
+  set B : Matrix d d ℂ := σ.M.sqrt.mat
+  have hAh : Aᴴ = A := by simp [A]
+  have hBh : Bᴴ = B := by simp [B]
+  have hAeq : ρ.m = Aᴴ * A := by simpa [hAh] using (HermitianMat.sqrt_sq ρ.nonneg).symm
+  have hBeq : σ.m = Bᴴ * B := by simpa [hBh] using (HermitianMat.sqrt_sq σ.nonneg).symm
+  obtain ⟨U, hU⟩ := (Matrix.traceNorm_eq_max_re_tr_U (B * A)).left
+  have hUB : (U.1 * B)ᴴ * (U.1 * B) = Bᴴ * B := by
+    rw [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    simp [show (U.1)ᴴ = star U.1 from rfl, ← Matrix.mul_assoc, U.2.1]
+  set z : ℂ := (U.1 * (B * A)).trace
+  have hzre : z.re = 1 := hU.trans ((fidelity_eq_traceNorm_sqrt_mul_sqrt ρ σ).symm.trans h)
+  have hzconj : z + conj z = 2 := by rw [Complex.add_conj, hzre]; push_cast; ring
+  have hz1 : (Aᴴ * (U.1 * B)).trace = z := by
+    show _ = (U.1 * (B * A)).trace
+    rw [hAh, ← Matrix.mul_assoc, Matrix.trace_mul_cycle, Matrix.trace_mul_comm]
+  have hz2 : ((U.1 * B)ᴴ * A).trace = conj z := by
+    rw [show ((U.1 * B)ᴴ * A) = (Aᴴ * (U.1 * B))ᴴ from by
+      simp [Matrix.conjTranspose_mul, hAh, hBh]]
+    simpa [hz1] using Matrix.trace_conjTranspose (Aᴴ * (U.1 * B))
+  have hAU : A = U.1 * B := by
+    refine sub_eq_zero.mp <| Matrix.trace_conjTranspose_mul_self_eq_zero_iff.mp ?_
+    have h_expand : ((A - U.1 * B)ᴴ * (A - U.1 * B)).trace =
+        (Aᴴ * A).trace - (Aᴴ * (U.1 * B)).trace - ((U.1 * B)ᴴ * A).trace
+          + ((U.1 * B)ᴴ * (U.1 * B)).trace := by
+      simp [sub_eq_add_neg, Matrix.conjTranspose_mul, Matrix.mul_add, Matrix.add_mul,
+        Matrix.trace_add, Matrix.trace_neg, add_assoc, add_left_comm, add_comm]
+    rw [h_expand, hz1, hz2, ← hAeq, ρ.tr', hUB, ← hBeq, σ.tr']
+    linear_combination -hzconj
+  exact MState.ext_m <| by rw [hAeq, hAU, hUB, ← hBeq]
 
 /-- The fidelity is a symmetric quantity. -/
 theorem fidelity_symm : fidelity ρ σ = fidelity σ ρ := by
