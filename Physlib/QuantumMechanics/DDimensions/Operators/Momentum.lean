@@ -6,7 +6,6 @@ Authors: Gregory J. Loges
 module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
-public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded_v2
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
 public import Physlib.QuantumMechanics.PlanckConstant
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
@@ -83,47 +82,6 @@ lemma momentumCLM_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐩 i ψ x = 
 open MeasureTheory
 open SpaceDHilbertSpace
 open SchwartzSubmodule
-open UnboundedOperator
-
-set_option backward.isDefEq.respectTransparency false in
-/-- The momentum operators defined on the Schwartz submodule. -/
-def momentumOperatorSchwartz : schwartzSubmodule d →ₗ[ℂ] schwartzSubmodule d :=
-  schwartzEquiv.toLinearMap ∘ₗ (𝐩 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
-
-set_option backward.isDefEq.respectTransparency false in
-lemma momentumOperatorSchwartz_isSymmetric :
-    (momentumOperatorSchwartz i).IsSymmetric := by
-  intro ψ ψ'
-  obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
-  obtain ⟨f', rfl⟩ := schwartzEquiv.surjective ψ'
-  simp only [momentumOperatorSchwartz, LinearMap.coe_comp, LinearEquiv.coe_coe,
-    ContinuousLinearMap.coe_coe, Function.comp_apply, LinearEquiv.symm_apply_apply,
-    schwartzEquiv_inner, momentumCLM_apply, neg_mul, map_neg, map_mul, Complex.conj_I,
-    Complex.conj_ofReal, neg_neg, mul_neg, integral_neg]
-  field_simp
-  simp only [Space.deriv_eq, mul_assoc, integral_const_mul, neg_mul_eq_mul_neg, starRingEnd_apply]
-  congr 2
-  rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable _ _ _ (by fun_prop) (by fun_prop)]
-  · simp only [neg_neg, fderiv_star]
-    rfl
-  · simp only [fderiv_star]
-    exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr
-        ((f.fderivCLM ℂ _ ℂ).evalCLM ℂ _ ℂ (basis i)).integrable)
-      (SchwartzMap.memLp_top f' volume)
-  · exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr f.integrable)
-      (((f'.fderivCLM ℂ _ ℂ).evalCLM ℂ _ ℂ (basis i)).memLp_top volume)
-  · exact .mul_of_top_left (((starL' ℝ : ℂ ≃L[ℝ] ℂ).integrable_comp_iff).mpr f.integrable)
-      (f'.memLp_top volume)
-
-/-- The symmetric momentum unbounded operators with domain the Schwartz
-  submodule of the Hilbert space. -/
-def momentumUnboundedOperator :
-    UnboundedOperator (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) :=
-  ofSymmetric' (SchwartzSubmodule.dense d) (momentumOperatorSchwartz_isSymmetric i)
-
-/-!
-## Momentum operator v2
--/
 
 /-- The momentum operator as a LinearPMap with domain the Schwartz submodule. -/
 def momentumOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
