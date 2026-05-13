@@ -25,7 +25,8 @@ The most basic facts:
  * `emulates_self`: Every channel emulates itself.
  * `emulates_trans`: If A emulates B and B emulates C, then A emulates C. (That is, emulation is an ordering.)
  * `εApproximates A B ε` is equivalent to the existence of some δ (depending ε and dims(A)) so that |A-B| has diamond norm at most δ, and δ→0 as ε→0.
- * `achievesRate_0`: Every channel achievesRate 0. So, the set of achievable rates is Nonempty.
+ * `achievesRate_0`: Every channel out of a nonempty space achievesRate 0. So, in that case,
+   the set of achievable rates is Nonempty.
  * If a channel achievesRate R₁, it also every achievesRate R₂ every R₂ ≤ R₁, i.e. it is an interval extending left towards -∞. Achievable rates are `¬BddBelow`.
  * `bddAbove_achievesRate`: A channel C : dimX → dimY cannot achievesRate R with `R > log2(min(dimX, dimY))`. Thus, the interval is `BddAbove`.
 
@@ -122,19 +123,13 @@ end εApproximates
 
 section AchievesRate
 
-/-- Every quantum channel achieves a rate of zero. -/
-theorem achievesRate_0 (Λ : CPTPMap d₁ d₂) : Λ.AchievesRate 0 := by
-  intro ε hε
-  use 1, zero_lt_one, 1, default
-  constructor
-  · have : Nonempty d₁ := by sorry--having a CPTPMap should be enough to conclude in- and out-spaces are nonempty
-    have : Nonempty d₂ := by sorry
-    use Classical.ofNonempty, Classical.ofNonempty
-    sorry--exact Unique.eq_default _
-  constructor
-  · norm_num
-  · rw [Unique.eq_default id]
-    sorry--apply εApproximates_monotone (εApproximates_self default) hε.le
+/-- Every quantum channel out of a nonempty space achieves a rate of zero.
+`Nonempty d₂` is derived from `Λ` via `PTPMap.nonemptyOut`. -/
+theorem achievesRate_0 (Λ : CPTPMap d₁ d₂) [Nonempty d₁] : Λ.AchievesRate 0 := fun ε hε => by
+  have : Nonempty d₂ := Λ.toPTPMap.nonemptyOut
+  refine ⟨1, one_pos, 1, default, ⟨default, default, Subsingleton.elim _ _⟩, by norm_num, ?_⟩
+  simpa [show (default : CPTPMap (Fin 1) (Fin 1)) = id from Subsingleton.elim _ _] using
+    εApproximates_monotone (εApproximates_self (id (dIn := Fin 1))) hε.le
 
 /-- The identity channel on D dimensional space achieves a rate of log2(D). -/
 theorem id_achievesRate_log_dim : (id (dIn := d₁)).AchievesRate (Real.logb 2 (Fintype.card d₁)) := by
@@ -188,8 +183,9 @@ end AchievesRate
 
 section capacity
 
-/-- Quantum channel capacity is nonnegative. -/
-theorem zero_le_quantumCapacity (Λ : CPTPMap d₁ d₂) : 0 ≤ Λ.quantumCapacity :=
+/-- Quantum channel capacity is nonnegative for channels out of a nonempty space. -/
+theorem zero_le_quantumCapacity (Λ : CPTPMap d₁ d₂) [Nonempty d₁] :
+    0 ≤ Λ.quantumCapacity :=
   le_csSup (bddAbove_achievesRate Λ) (achievesRate_0 Λ)
 
 /-- Quantum channel capacity is at most log2(D), where D is the input dimension. -/

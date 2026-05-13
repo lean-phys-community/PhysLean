@@ -6,6 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import QuantumInfo.Finite.CPTPMap.MatrixMap
+public import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
 
 /-! # Properties of Matrix Maps
 
@@ -19,6 +20,8 @@ in Bundled.lean.
 -/
 
 @[expose] public section
+
+open scoped Matrix MatrixOrder ComplexOrder Matrix.Norms.L2Operator CStarAlgebra
 
 namespace MatrixMap
 
@@ -761,6 +764,95 @@ theorem IsCompletelyPositive.exists_kraus (Φ : MatrixMap A B R) (hCP : Φ.IsCom
   funext
   rw [eq_iff_iff, iff_comm]
   exact MatrixMap.choi_matrix_inj.eq_iff
+
+open scoped MatrixOrder in
+/-- Kadison-Schwarz for completely positive subunital matrix maps. -/
+theorem cp_subunital_kadison_schwarz {M : MatrixMap A B ℂ} [DecidableEq B]
+    (hM : M.IsCompletelyPositive) (hM1 : M 1 ≤ (1 : Matrix B B ℂ))
+    (X : Matrix A A ℂ) :
+    (M X)ᴴ * M X ≤ M (Xᴴ * X) := by
+  have hblock :
+      (Matrix.fromBlocks (M 1) (M X) ((M X)ᴴ) (M (Xᴴ * X))).PosSemidef := by
+    classical
+    obtain ⟨K, rfl⟩ := MatrixMap.IsCompletelyPositive.exists_kraus _ hM
+    rw [MatrixMap.of_kraus_eq_sum_conj]
+    convert Matrix.posSemidef_sum Finset.univ (fun k _ => by
+      simpa [MatrixMap.conj, Matrix.mul_assoc] using
+        Matrix.fromBlocks_gram_posSemidef (X * (K k)ᴴ) (K k)ᴴ) using 1
+    ext i j
+    cases i <;> cases j <;>
+      simp [Matrix.sum_apply, Matrix.fromBlocks_apply₁₁, Matrix.fromBlocks_apply₁₂,
+        Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂, Matrix.conjTranspose_sum,
+        Matrix.mul_assoc]
+  have hgap_block :
+      (Matrix.fromBlocks (1 - M 1) 0 0 (0 : Matrix B B ℂ)).PosSemidef := by
+    have hnonneg : (0 : Matrix B B ℂ) ≤ 1 - M 1 := by simpa [sub_nonneg] using hM1
+    rw [← show (CFC.sqrt (1 - M 1))ᴴ * CFC.sqrt (1 - M 1) = 1 - M 1 from by
+      rw [show (CFC.sqrt (1 - M 1))ᴴ = CFC.sqrt (1 - M 1) from by
+        simpa using (CFC.sqrt_nonneg (1 - M 1)).1.eq]
+      exact CFC.sqrt_mul_sqrt_self (1 - M 1) hnonneg]
+    simpa using Matrix.fromBlocks_gram_posSemidef
+      (0 : Matrix B B ℂ) (CFC.sqrt (1 - M 1))
+  have hsum :
+      (Matrix.fromBlocks (1 : Matrix B B ℂ) (M X) ((M X)ᴴ) (M (Xᴴ * X))).PosSemidef := by
+    convert hblock.add hgap_block using 1
+    ext i j
+    cases i <;> cases j <;>
+      simp [Matrix.fromBlocks, sub_eq_add_neg, add_left_comm, add_comm]
+  letI : Invertible (1 : Matrix B B ℂ) := invertibleOne
+  simpa [sub_nonneg] using
+    (Matrix.PosDef.fromBlocks₁₁ (B := M X) (D := M (Xᴴ * X))
+      (hA := (Matrix.PosDef.one : (1 : Matrix B B ℂ).PosDef))).mp hsum
+
+open scoped MatrixOrder in
+/-- A positive subunital matrix map is contractive on positive inputs. -/
+theorem positive_subunital_norm_apply_le {M : MatrixMap A B ℂ} [DecidableEq B]
+    (hM : M.IsPositive) (hM1 : M 1 ≤ (1 : Matrix B B ℂ))
+    {X : Matrix A A ℂ} (hX : 0 ≤ X) :
+    ‖M X‖ ≤ ‖X‖ := by
+  let eA := Matrix.toEuclideanCLM (n := A) (𝕜 := ℂ)
+  let eB := Matrix.toEuclideanCLM (n := B) (𝕜 := ℂ)
+  have hXle : X ≤ ‖X‖ • (1 : Matrix A A ℂ) := by
+    refine (map_le_map_iff eA).mp ?_
+    have h := IsSelfAdjoint.le_algebraMap_norm_self (IsSelfAdjoint.of_nonneg (map_nonneg eA hX))
+    have hs : algebraMap ℝ (EuclideanSpace ℂ A →L[ℂ] EuclideanSpace ℂ A) ‖eA X‖ =
+        eA (‖X‖ • (1 : Matrix A A ℂ)) := by
+      rw [Algebra.algebraMap_eq_smul_one]
+      ext x i
+      change (((‖X‖ : ℂ) • x).ofLp i) =
+        (((‖X‖ : ℂ) • (1 : Matrix A A ℂ)) *ᵥ x.ofLp) i
+      rw [Matrix.smul_mulVec, Matrix.one_mulVec, WithLp.ofLp_smul]
+    exact h.trans_eq hs
+  have hMX_le : M X ≤ ‖X‖ • (1 : Matrix B B ℂ) :=
+    (show M X ≤ ‖X‖ • M 1 by
+      simpa [sub_nonneg, map_sub, map_smul] using
+        (hM (by simpa [sub_nonneg] using hXle :
+          (‖X‖ • (1 : Matrix A A ℂ) - X).PosSemidef)).nonneg).trans
+      (smul_le_smul_of_nonneg_left hM1 (norm_nonneg X))
+  have hMX_nn : 0 ≤ M X := (hM (by simpa [Matrix.nonneg_iff_posSemidef] using hX)).nonneg
+  have hone : ‖(1 : Matrix B B ℂ)‖ ≤ 1 := by
+    rcases subsingleton_or_nontrivial (Matrix B B ℂ) with h | h
+    · simp [Subsingleton.elim (1 : Matrix B B ℂ) 0]
+    · exact CStarRing.norm_one.le
+  refine (CStarAlgebra.norm_le_norm_of_nonneg_of_le (map_nonneg eB hMX_nn)
+    ((map_le_map_iff eB).mpr hMX_le)).trans ?_
+  change ‖‖X‖ • (1 : Matrix B B ℂ)‖ ≤ ‖X‖
+  rw [show (‖X‖ • (1 : Matrix B B ℂ)) = ((‖X‖ : ℂ) • (1 : Matrix B B ℂ)) by ext; simp, norm_smul]
+  simpa using mul_le_mul_of_nonneg_left hone (norm_nonneg X)
+
+open scoped MatrixOrder in
+/-- A completely positive subunital matrix map is contractive in operator norm. -/
+theorem cp_subunital_opNorm_le_one {M : MatrixMap A B ℂ} [DecidableEq B]
+    (hM : M.IsCompletelyPositive) (hM1 : M 1 ≤ (1 : Matrix B B ℂ))
+    (X : Matrix A A ℂ) :
+    ‖M X‖ ≤ ‖X‖ := by
+  refine (sq_le_sq₀ (norm_nonneg (M X)) (norm_nonneg X)).mp ?_
+  simp only [sq, ← CStarRing.norm_star_mul_self, Matrix.star_eq_conjTranspose]
+  let e := Matrix.toEuclideanCLM (n := B) (𝕜 := ℂ)
+  exact (CStarAlgebra.norm_le_norm_of_nonneg_of_le
+      (map_nonneg e (star_mul_self_nonneg (M X)))
+      ((map_le_map_iff e).mpr (cp_subunital_kadison_schwarz hM hM1 X))).trans
+    (positive_subunital_norm_apply_le hM.IsPositive hM1 (star_mul_self_nonneg X))
 
 /--
 The Kronecker product of two Kraus maps is the Kraus map of the Kronecker products of the operators.

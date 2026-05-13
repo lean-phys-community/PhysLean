@@ -384,6 +384,9 @@ public import Physlib.StatisticalMechanics.CanonicalEnsemble.Basic
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Lemmas
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.TwoState
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.Basic
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.IdealGas
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.ThermoQuantities
 public import Physlib.StringTheory.Basic
 public import Physlib.StringTheory.FTheory.SU5.Basic
 public import Physlib.StringTheory.FTheory.SU5.Charges.AnomalyFree
