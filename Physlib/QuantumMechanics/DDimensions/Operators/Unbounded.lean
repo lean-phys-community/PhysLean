@@ -131,6 +131,7 @@ lemma isClosable_of_zero (h_zero : ⇑U = 0) : U.IsClosable := by
   rw [nhds_prod_eq, Filter.tendsto_prod_iff'] at hb'
   simp_all
 
+@[aesop safe apply]
 lemma IsClosable.smul (h : U.IsClosable) (c : ℂ) : (c • U).IsClosable := by
   rcases eq_zero_or_neZero c with (rfl | hc)
   · exact isClosable_of_zero (by simp)
@@ -150,6 +151,7 @@ lemma IsClosable.smul (h : U.IsClosable) (c : ℂ) : (c • U).IsClosable := by
 
 lemma neg_eq_neg_one_smul (U : H →ₗ.[ℂ] H') : -U = (-1 : ℂ) • U := ext (by simp) (by simp)
 
+@[aesop safe apply]
 lemma IsClosable.neg (h : U.IsClosable) : (-U).IsClosable := neg_eq_neg_one_smul U ▸ h.smul _
 
 /-!
@@ -167,6 +169,7 @@ lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
     · exact adjoint_apply_eq h x (by simp [h_zero])
     · exact adjoint_apply_of_not_dense h x
 
+@[simp]
 lemma adjoint_smul [CompleteSpace H] (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) :
     (c • U)† = conj c • U† := by
   refine dExt ?_ fun x y hxy ↦ ?_
@@ -178,6 +181,7 @@ lemma adjoint_smul [CompleteSpace H] (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c �
       simp [inner_smul_left, inner_smul_right, adjoint_isFormalAdjoint h y w, hxy]
     · simp [adjoint_apply_of_not_dense h y, adjoint_apply_of_not_dense (smul_domain c U ▸ h) x]
 
+@[simp]
 lemma adjoint_neg [CompleteSpace H] (U : H →ₗ.[ℂ] H') : (-U)† = -U† := by
   simp [neg_eq_neg_one_smul, adjoint_smul]
 
@@ -264,20 +268,25 @@ lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
   simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
   exact add_comm _ _
 
+@[aesop safe apply]
 lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by simp [h x y]
 
+@[aesop safe apply]
 lemma IsSymmetric.add (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ + T₂).IsSymmetric := by
   intro x y
   specialize h₁ ⟨x, x.2.1⟩ ⟨y, y.2.1⟩
   specialize h₂ ⟨x, x.2.2⟩ ⟨y, y.2.2⟩
   simp [h₁, h₂, add_apply, inner_add_left, inner_add_right]
 
+@[aesop safe apply]
 lemma IsSymmetric.sub (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ - T₂).IsSymmetric :=
   sub_eq_add_neg T₁ T₂ ▸ h₁.add h₂.neg
 
+@[aesop safe apply]
 lemma IsSymmetric.smul (h : T.IsSymmetric) {c : ℂ} (hc : conj c = c) : (c • T).IsSymmetric :=
   fun x y ↦ by simp only [smul_apply, inner_smul_left, inner_smul_right, hc, h x y]
 
+@[aesop safe apply]
 lemma IsSymmetric.smul_ofReal (h : T.IsSymmetric) (r : ℝ) : (ofReal r • T).IsSymmetric :=
   h.smul (conj_ofReal r)
 
@@ -309,19 +318,23 @@ lemma IsSelfAdjoint.isUnbounded [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.
     T.IsUnbounded :=
   ⟨h', isClosable h h'⟩
 
+@[aesop safe apply]
 lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† := by
   apply isSelfAdjoint_def.mp at h
   exact h.symm ▸ h
 
+@[aesop safe apply]
 lemma IsSelfAdjoint.smul [CompleteSpace H]
     (h : IsSelfAdjoint T) {c : ℂ} (hc : c ≠ 0) (hc' : conj c = c) :
     IsSelfAdjoint (c • T) := by
   rw [isSelfAdjoint_def, T.adjoint_smul hc, hc', isSelfAdjoint_def.mp h]
 
+@[aesop safe apply]
 lemma IsSelfAdjoint.smul_ofReal [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} (hr : r ≠ 0) :
     IsSelfAdjoint (ofReal r • T) :=
   smul h (ofReal_ne_zero.mpr hr) (conj_ofReal r)
 
+@[aesop safe apply]
 lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint (-T) :=
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
@@ -360,6 +373,7 @@ lemma IsUnbounded.adjoint [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounde
   simp only [neg_zero, WithLp.prod_inner_apply, inner_zero_right, add_zero]
   exact hx y (mem_domain_of_mem_graph hy)
 
+@[simp]
 lemma IsUnbounded.closure_adjoint_eq_adjoint [CompleteSpace H] (h : U.IsUnbounded) :
     U.closure† = U† := by
   refine eq_of_eq_graph ?_
@@ -369,6 +383,7 @@ lemma IsUnbounded.closure_adjoint_eq_adjoint [CompleteSpace H] (h : U.IsUnbounde
     mem_submodule_closure_adjoint_iff_mem_submoduleToLp_closure_orthogonal, orthogonal_closure,
     mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
 
+@[simp]
 lemma IsUnbounded.adjoint_adjoint_eq_closure [CompleteSpace H] [CompleteSpace H']
     (h : U.IsUnbounded) :
     U†† = U.closure := by
