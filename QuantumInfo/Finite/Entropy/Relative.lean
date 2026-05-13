@@ -20,7 +20,7 @@ variable [DecidableEq dA] [DecidableEq dB] [DecidableEq dC] [DecidableEq dA₁] 
 variable {𝕜 : Type*} [RCLike 𝕜]
 variable {α : ℝ} {ρ σ : MState d}
 
-open scoped InnerProductSpace RealInnerProductSpace HermitianMat
+open scoped Matrix ComplexOrder InnerProductSpace RealInnerProductSpace HermitianMat
 
 /-!
 To do relative entropies, we start with the _sandwiched Renyi Relative Entropy_ which is a nice general form.
@@ -2133,10 +2133,178 @@ theorem qRelativeEnt_ne_top {ρ σ : MState d} [σ.M.NonSingular] : 𝐃(ρ‖σ
   rw [qRelativeEnt]
   finiteness
 
+omit [DecidableEq dA] in
+open HermitianMat in
+private lemma inner_kron_one_eq_inner_traceRight
+    (A : HermitianMat dA ℂ) (M : HermitianMat (dA × dB) ℂ) :
+    ⟪A ⊗ₖ (1 : HermitianMat dB ℂ), M⟫ = ⟪A, M.traceRight⟫ := by
+  rw [inner_comm, inner_eq_re_trace, inner_eq_re_trace]
+  exact (congrArg Complex.re (Matrix.trace_mul_kron_one_right M.mat A.mat)).trans <| by
+    simpa using congrArg Complex.re (Matrix.trace_mul_comm M.traceRight.mat A.mat)
+
+omit [DecidableEq dB] in
+open HermitianMat in
+private lemma inner_one_kron_eq_inner_traceLeft
+    (B : HermitianMat dB ℂ) (M : HermitianMat (dA × dB) ℂ) :
+    ⟪(1 : HermitianMat dA ℂ) ⊗ₖ B, M⟫ = ⟪B, M.traceLeft⟫ := by
+  rw [inner_comm, inner_eq_re_trace, inner_eq_re_trace]
+  exact (congrArg Complex.re (Matrix.trace_mul_one_kron_right M.mat B.mat)).trans <| by
+    simpa using congrArg Complex.re (Matrix.trace_mul_comm M.traceLeft.mat B.mat)
+
+private lemma fixed_support_kron_right (ρ : MState (dA × dB))
+    {x : EuclideanSpace ℂ (dA × dB)} (hx : x ∈ ρ.M.support) :
+    (ρ.traceRight.M.supportProj ⊗ₖ (1 : HermitianMat dB ℂ)).lin x = x := by
+  let K : HermitianMat (dA × dB) ℂ := ρ.traceRight.M.kerProj ⊗ₖ (1 : HermitianMat dB ℂ)
+  simpa [Matrix.toEuclideanLin,
+    show K.mat.toEuclideanLin x = 0 by
+      simpa [HermitianMat.lin] using
+        ((HermitianMat.inner_zero_iff ρ.nonneg (by
+          simpa [K] using HermitianMat.kronecker_nonneg
+            (by simpa [HermitianMat.kerProj] using
+              (HermitianMat.projector_nonneg (S := ρ.traceRight.M.ker)))
+            (by rw [HermitianMat.zero_le_iff]; exact Matrix.PosSemidef.one))).1 (by
+          rw [HermitianMat.inner_comm, inner_kron_one_eq_inner_traceRight,
+            HermitianMat.inner_comm]
+          simpa [K, MState.exp_val] using
+            (ρ.traceRight.exp_val_eq_zero_iff
+              (by simpa [HermitianMat.kerProj] using
+                (HermitianMat.projector_nonneg (S := ρ.traceRight.M.ker)))).2
+              (by simp)) hx)] using
+    congrArg (fun T : HermitianMat (dA × dB) ℂ => T.mat.toEuclideanLin x)
+      (show K + ρ.traceRight.M.supportProj ⊗ₖ (1 : HermitianMat dB ℂ) = 1 by
+        simp only [K, ← HermitianMat.add_kronecker,
+          ρ.traceRight.M.kerProj_add_supportProj, HermitianMat.kronecker_one_one])
+
+private lemma fixed_support_kron_left (ρ : MState (dA × dB))
+    {x : EuclideanSpace ℂ (dA × dB)} (hx : x ∈ ρ.M.support) :
+    ((1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.supportProj).lin x = x := by
+  let K : HermitianMat (dA × dB) ℂ := (1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.kerProj
+  let P : HermitianMat (dA × dB) ℂ := (1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.supportProj
+  have hK_nonneg : 0 ≤ K := by
+    dsimp [K]
+    exact HermitianMat.kronecker_nonneg
+      (by rw [HermitianMat.zero_le_iff]; exact Matrix.PosSemidef.one)
+      (by simpa [HermitianMat.kerProj] using
+        (HermitianMat.projector_nonneg (S := ρ.traceLeft.M.ker)))
+  have hsum : K + P = 1 := by
+    show K + P = 1
+    simp only [K, P, ← HermitianMat.kronecker_add, ρ.traceLeft.M.kerProj_add_supportProj,
+      HermitianMat.kronecker_one_one]
+  simpa [P, Matrix.toEuclideanLin,
+    show K.mat.toEuclideanLin x = 0 by
+      simpa [HermitianMat.lin] using ((HermitianMat.inner_zero_iff ρ.nonneg hK_nonneg).1 (by
+      rw [HermitianMat.inner_comm, inner_one_kron_eq_inner_traceLeft]
+      rw [HermitianMat.inner_comm]
+      simpa [K, MState.exp_val] using
+        (ρ.traceLeft.exp_val_eq_zero_iff
+          (by simpa [HermitianMat.kerProj] using
+            (HermitianMat.projector_nonneg (S := ρ.traceLeft.M.ker)))).2
+          (by simp)) hx)] using
+    congrArg (fun T : HermitianMat (dA × dB) ℂ => T.mat.toEuclideanLin x) hsum
+
 /-- `I(A:B) = 𝐃(ρᴬᴮ‖ρᴬ ⊗ ρᴮ)` -/
 theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
     qMutualInfo ρ = (𝐃(ρ‖ρ.traceRight ⊗ᴹ ρ.traceLeft) : EReal) := by
-  sorry
+  have fixed_support_kron_prod : ∀ {x : EuclideanSpace ℂ (dA × dB)},
+      x ∈ ρ.M.support →
+        (ρ.traceRight.M.supportProj ⊗ₖ ρ.traceLeft.M.supportProj).lin x = x := by
+    intro x hx
+    let A : Matrix (dA × dB) (dA × dB) ℂ :=
+      Matrix.kroneckerMap (· * ·) ρ.traceRight.M.supportProj.mat (1 : Matrix dB dB ℂ)
+    let B : Matrix (dA × dB) (dA × dB) ℂ :=
+      Matrix.kroneckerMap (· * ·) (1 : Matrix dA dA ℂ) ρ.traceLeft.M.supportProj.mat
+    have hxA' : A.toEuclideanLin x = x := by
+      simpa [A, HermitianMat.lin, Matrix.toEuclideanLin] using fixed_support_kron_right ρ hx
+    have hxB' : B.toEuclideanLin x = x := by
+      simpa [B, HermitianMat.lin, Matrix.toEuclideanLin] using fixed_support_kron_left ρ hx
+    have hmul : (A * B).toEuclideanLin x = x := by
+      simpa [A, B, Matrix.toEuclideanLin, Matrix.mulVec_mulVec] using
+        show A.toEuclideanLin (B.toEuclideanLin x) = x by rw [hxB', hxA']
+    simpa [HermitianMat.lin, Matrix.toEuclideanLin, A, B, ← Matrix.mul_kronecker_mul] using hmul
+  have prod_marginals_ker_le : (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.ker ≤ ρ.M.ker := by
+    let P : HermitianMat (dA × dB) ℂ := ρ.traceRight.M.supportProj ⊗ₖ ρ.traceLeft.M.supportProj
+    have hP : ρ.M.support ≤ P.support := by
+      intro x hx
+      exact ⟨x, by simpa [P] using fixed_support_kron_prod hx⟩
+    have hkerP : P.ker ≤ ρ.M.ker := by
+      simpa [HermitianMat.support_orthogonal_eq_range] using Submodule.orthogonal_le hP
+    exact (show (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.ker ≤ P.ker by
+      change LinearMap.ker
+          ((Matrix.kroneckerMap (· * ·) ρ.traceRight.M.mat ρ.traceLeft.M.mat).toEuclideanLin)
+        ≤ LinearMap.ker
+          ((Matrix.kroneckerMap (· * ·) ρ.traceRight.M.supportProj.mat
+            ρ.traceLeft.M.supportProj.mat).toEuclideanLin)
+      exact ker_kron_le_of_le _ _ _ _
+        (by
+          simpa [HermitianMat.ker, HermitianMat.lin] using
+            (show ρ.traceRight.M.ker ≤ ρ.traceRight.M.supportProj.ker by simp))
+        (by
+          simpa [HermitianMat.ker, HermitianMat.lin] using
+            (show ρ.traceLeft.M.ker ≤ ρ.traceLeft.M.supportProj.ker by simp))).trans hkerP
+  have right_mul_eq_of_fixed_support {Q ρM : HermitianMat (dA × dB) ℂ}
+      (hfix : ∀ x : EuclideanSpace ℂ (dA × dB), x ∈ ρM.support → Q.lin x = x) :
+      ρM.mat * Q.mat = ρM.mat := by
+    have hleft : Q.mat * ρM.mat = ρM.mat := by
+      rw [Matrix.ext_iff_mulVec]
+      intro v
+      have hv : WithLp.toLp 2 (ρM.mat.mulVec v) ∈ ρM.support :=
+        Set.mem_range_self (WithLp.toLp 2 v)
+      simpa [Matrix.mulVec_mulVec, HermitianMat.lin, Matrix.toEuclideanLin] using hfix _ hv
+    simpa [Matrix.conjTranspose_mul, HermitianMat.conjTranspose_mat] using
+      congrArg Matrix.conjTranspose hleft
+  have inner_kron_support_right_eq (A : HermitianMat dA ℂ) :
+      ⟪ρ.M, A ⊗ₖ ρ.traceLeft.M.supportProj⟫ = ⟪ρ.M, A ⊗ₖ (1 : HermitianMat dB ℂ)⟫ := by
+    let Q : HermitianMat (dA × dB) ℂ := (1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.supportProj
+    have hQ : ρ.M.mat * Q.mat = ρ.M.mat := by
+      apply right_mul_eq_of_fixed_support
+      intro x hx
+      simpa [Q] using fixed_support_kron_left ρ hx
+    have hmat : Q.mat * (A ⊗ₖ (1 : HermitianMat dB ℂ)).mat =
+        (A ⊗ₖ ρ.traceLeft.M.supportProj).mat := by
+      simp [Q, HermitianMat.kronecker_mat, ← Matrix.mul_kronecker_mul]
+    rw [HermitianMat.inner_eq_re_trace, HermitianMat.inner_eq_re_trace]
+    apply congrArg Complex.re
+    rw [← hmat, ← Matrix.mul_assoc, hQ]
+  have inner_support_kron_left_eq (B : HermitianMat dB ℂ) :
+      ⟪ρ.M, ρ.traceRight.M.supportProj ⊗ₖ B⟫ = ⟪ρ.M, (1 : HermitianMat dA ℂ) ⊗ₖ B⟫ := by
+    let Q : HermitianMat (dA × dB) ℂ := ρ.traceRight.M.supportProj ⊗ₖ (1 : HermitianMat dB ℂ)
+    have hQ : ρ.M.mat * Q.mat = ρ.M.mat := by
+      apply right_mul_eq_of_fixed_support
+      intro x hx
+      simpa [Q] using fixed_support_kron_right ρ hx
+    have hmat : Q.mat * ((1 : HermitianMat dA ℂ) ⊗ₖ B).mat =
+        (ρ.traceRight.M.supportProj ⊗ₖ B).mat := by
+      simp [Q, HermitianMat.kronecker_mat, ← Matrix.mul_kronecker_mul]
+    rw [HermitianMat.inner_eq_re_trace, HermitianMat.inner_eq_re_trace]
+    apply congrArg Complex.re
+    rw [← hmat, ← Matrix.mul_assoc, hQ]
+  rw [qRelativeEnt_ker prod_marginals_ker_le, qMutualInfo,
+    Sᵥₙ_eq_neg_trace_log, Sᵥₙ_eq_neg_trace_log, Sᵥₙ_eq_neg_trace_log]
+  rw [show (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.log =
+      ρ.traceRight.M.log ⊗ₖ ρ.traceLeft.M.supportProj +
+      ρ.traceRight.M.supportProj ⊗ₖ ρ.traceLeft.M.log by
+    simpa [MState.prod] using
+      (HermitianMat.log_kron_with_proj (A := ρ.traceRight.M) (B := ρ.traceLeft.M)),
+    inner_sub_right, inner_add_right]
+  rw [show ⟪ρ.M.log, ρ.M⟫ = ⟪ρ.M, ρ.M.log⟫ by rw [HermitianMat.inner_comm]]
+  exact congrArg (fun x : ℝ => (x : EReal)) <| by
+    rw [show ⟪ρ.M, ρ.traceRight.M.log ⊗ₖ ρ.traceLeft.M.supportProj⟫ =
+        ⟪ρ.traceRight.M.log, ρ.traceRight.M⟫ by
+      calc
+        _ = ⟪ρ.M, ρ.traceRight.M.log ⊗ₖ (1 : HermitianMat dB ℂ)⟫ :=
+          inner_kron_support_right_eq ρ.traceRight.M.log
+        _ = ⟪ρ.traceRight.M.log, ρ.traceRight.M⟫ := by
+          simpa [HermitianMat.inner_comm] using
+            inner_kron_one_eq_inner_traceRight ρ.traceRight.M.log ρ.M,
+      show ⟪ρ.M, ρ.traceRight.M.supportProj ⊗ₖ ρ.traceLeft.M.log⟫ =
+        ⟪ρ.traceLeft.M.log, ρ.traceLeft.M⟫ by
+      calc
+        _ = ⟪ρ.M, (1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.log⟫ :=
+          inner_support_kron_left_eq ρ.traceLeft.M.log
+        _ = ⟪ρ.traceLeft.M.log, ρ.traceLeft.M⟫ := by
+          simpa [HermitianMat.inner_comm] using
+            inner_one_kron_eq_inner_traceLeft ρ.traceLeft.M.log ρ.M]
+    ring
 
 /-
 Helper: If σ₂ ≤ α • σ₁ for density matrices, then α > 0.

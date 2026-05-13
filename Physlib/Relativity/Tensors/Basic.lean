@@ -13,6 +13,29 @@ public import Physlib.Meta.TODO.Basic
 
 # Tensors
 
+This module sets up the tensors used for index notation in Physlib.
+
+Physics picture:
+- Choose a symmetry group `G` (for example, the Lorentz group).
+- Give each index kind a name called a *color* (encoded by a type `C`).
+  In Lorentzian notation, a typical choice is two colors: `up` and `down`.
+- For each color, choose a representation of `G`.
+- Fix a basis for each color. This determines which values that index can take and
+  lets us speak about tensor components explicitly.
+- Specify a dual color for each color, telling us which index pairs can contract.
+- For dual pairs, provide the contraction/unit/metric data used for contraction and
+  for raising/lowering indices.
+
+All of this structure is packaged as a `TensorSpecies`.
+
+For `S : TensorSpecies` and a list of index colors `c : Fin n → C`:
+- `Tensor S c` is the type of tensors with those indices.
+- `Pure S c` is the type of pure tensors, i.e. tensors of the form
+  `v₀ ⊗ₜ v₁ ⊗ₜ v₂ …`.
+- `ComponentIdx S c` is the type of allowed component labels for those indices.
+
+From this setup we get the usual index-notation operations in a uniform way:
+contraction, raising/lowering, and permutation of indices.
 -/
 
 TODO "In this file (Physlib/Relativity/Tensors/Basic.lean), write an overview of the

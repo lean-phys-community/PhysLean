@@ -11,6 +11,7 @@ public import QuantumInfo.Finite.MState
 
 open MState
 open BigOperators
+open scoped RealInnerProductSpace InnerProductSpace
 
 noncomputable section
 
@@ -187,33 +188,26 @@ theorem sum_prob_mul_eq_one_iff {ι : Type*} [Fintype ι] (p : ι → ℝ) (x : 
     · simp [hi]
     · simp [a i hi]
 
---CLEANUP. This proof used to work but it took forever to build. Also now it's broken.
-theorem MState.exp_val_pure_eq_one_iff {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) (ψ : Ket d) :
+theorem MState.exp_val_pure_eq_one_iff {d : Type*} [Fintype d] [DecidableEq d]
+    (ρ : MState d) (ψ : Ket d) :
     ρ.exp_val (pure ψ) = 1 ↔ ρ = pure ψ := by
-  stop
-  constructor <;> intro h <;> simp_all +decide [ MState.exp_val ];
-  · have h_eq : ρ.M = (MState.pure ψ).M := by
-      have h_eq : (ρ.M - (MState.pure ψ).M).inner (ρ.M - (MState.pure ψ).M) = 0 := by
-        have h_eq_inner : (ρ.M - (MState.pure ψ).M).inner (ρ.M - (MState.pure ψ).M) = ρ.M.inner ρ.M - 2 * ρ.M.inner (MState.pure ψ).M + (MState.pure ψ).M.inner (MState.pure ψ).M := by
-          norm_num [ HermitianMat.inner, Matrix.mul_apply ];
-          simp +decide [ Matrix.mul_sub, Matrix.sub_mul, Matrix.trace_sub, Matrix.trace_mul_comm ( ρ.m ) ];
-          ring;
-        have h_eq_inner : ρ.M.inner ρ.M ≤ 1 ∧ (MState.pure ψ).M.inner (MState.pure ψ).M = 1 := by
-          aesop;
-          · have := ρ.M.inner_le_mul_trace ρ.zero_le ρ.zero_le;
-            aesop;
-          · simp +decide [ HermitianMat.inner ];
-            have := MState.pure_mul_self ψ; aesop;
-        have h_eq_inner : (ρ.M - (MState.pure ψ).M).inner (ρ.M - (MState.pure ψ).M) ≥ 0 := by
-          exact?;
-        linarith;
-      have h_eq : ∀ (A : HermitianMat d ℂ), A.inner A = 0 → A = 0 := by
-        intro A hA;
-        exact?;
-      exact sub_eq_zero.mp ( h_eq _ ‹_› );
-    cases ρ ; cases ψ ; aesop;
-  · unfold HermitianMat.inner; aesop;
-    rw [ MState.pure_mul_self ] ; aesop
+  have hpure_inner_prob : ⟪MState.pure ψ, MState.pure ψ⟫_Prob = 1 :=
+    Subtype.ext (by rw [MState.pure_inner]; simp [Braket.dot_self_eq_one])
+  have hpure_inner : ⟪(MState.pure ψ).M, (MState.pure ψ).M⟫ = 1 := by
+    simpa [MState.inner_def] using congrArg (fun p : Prob => (p : ℝ)) hpure_inner_prob
+  constructor
+  · intro h
+    have hρ_le : ⟪ρ.M, ρ.M⟫ ≤ 1 := by
+      have := HermitianMat.inner_le_mul_trace ρ.nonneg ρ.nonneg; simpa [ρ.tr]
+    have hinner : ⟪ρ.M, (MState.pure ψ).M⟫ = 1 := by simpa [MState.exp_val] using h
+    have hsq : ⟪ρ.M - (MState.pure ψ).M, ρ.M - (MState.pure ψ).M⟫ =
+        ⟪ρ.M, ρ.M⟫ - 2 * ⟪ρ.M, (MState.pure ψ).M⟫ + ⟪(MState.pure ψ).M, (MState.pure ψ).M⟫ := by
+      simp only [HermitianMat.inner_def, IsMaximalSelfAdjoint.RCLike_selfadjMap, HermitianMat.mat_sub,
+        MState.mat_M, RCLike.re_to_complex]
+      simp [Matrix.mul_sub, Matrix.sub_mul, Matrix.trace_sub, Matrix.trace_mul_comm (ρ.m)]; ring
+    exact MState.ext (eq_of_sub_eq_zero (inner_self_eq_zero.mp (le_antisymm
+      (by rw [hsq]; linarith) (ρ.M - (MState.pure ψ).M).inner_self_nonneg)))
+  · rintro rfl; simpa [MState.exp_val] using hpure_inner
 
 set_option backward.isDefEq.respectTransparency false in
 theorem mix_mEnsemble_pure_iff_pure {e : MEnsemble d α} :
