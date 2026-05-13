@@ -129,7 +129,7 @@ lemma momentum_commutation_momentum : ⁅𝐩 i, 𝐩 j⁆ = 0 := by
   ext ψ x
   have hdiff (k : Fin d) : Differentiable ℝ (∂[k] ψ) := Space.deriv_differentiable (ψ.smooth 2) k
   show 𝐩 i (𝐩 j ψ) x - 𝐩 j (𝐩 i ψ) x = 0
-  simp only [momentumOperator_apply_fun, Space.deriv_const_smul _ (hdiff _),
+  simp only [momentumCLM_apply_fun, Space.deriv_const_smul _ (hdiff _),
     Space.deriv_commute _ (ψ.smooth 2), sub_self]
 
 lemma momentum_comp_commute : 𝐩 i ∘L 𝐩 j = 𝐩 j ∘L 𝐩 i := by
@@ -155,7 +155,7 @@ lemma position_commutation_momentum : ⁅𝐱 i, 𝐩 j⁆ =
   ext ψ x
   show 𝐱 i (𝐩 j ψ) x - 𝐩 j (𝐱 i ψ) x = _
   trans (I * ℏ) * (-x i * ∂[j] ψ x + ∂[j] ((fun x : Space d ↦ x i) • ⇑ψ) x)
-  · simp only [positionOperator_apply, momentumOperator_apply, positionOperator_apply_fun]
+  · simp only [positionOperator_apply, momentumCLM_apply, positionOperator_apply_fun]
     ring
   rw [Space.deriv_smul (by fun_prop) (by fun_prop)]
   rw [Space.deriv_component]
@@ -193,7 +193,7 @@ lemma radiusRegPow_commutation_momentum :
   have hdiff3 : DifferentiableAt ℝ (fun x ↦ ‖x‖ ^ 2 + ε ^ 2) x :=
     Differentiable.differentiableAt (by fun_prop)
   show 𝐫₀ ε s (𝐩 i ψ) x - 𝐩 i (𝐫₀ ε s ψ) x = (s * I * ℏ) * 𝐫₀ ε (s-2) (𝐱 i ψ) x
-  simp only [momentumOperator_apply, positionOperator_apply, radiusRegPowOperator_apply_fun]
+  simp only [momentumCLM_apply, positionOperator_apply, radiusRegPowOperator_apply_fun]
   rw [← Pi.smul_def', Space.deriv_smul hdiff1 (by fun_prop)]
   suffices ∂[i] (fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)) x =
       s * (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2 - 1) * x i by
