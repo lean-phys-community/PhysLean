@@ -88,7 +88,7 @@ lemma stateCovariance_eq_re_symm_centered :
     simp [z, inner_conj_symm]
   rw [stateCovariance_eq_re_inner_centered, hz]
   change z.re = ((z + star z).re) / 2
-  simp
+  simp only [Complex.add_re, Complex.star_def, Complex.conj_re, add_self_div_two]
 
 @[simp]
 lemma stateCovariance_self_eq_stateVariance (A : H →ₗ.[ℂ] H)
@@ -141,8 +141,8 @@ private lemma sub_expectation_commutator_eq_raw
     _ = ⟪a, b⟫_ℂ - ⟪b, a⟫_ℂ := by
           rw [hμa_right, hμa_left, hμb_right, hμb_left, inner_self_eq_norm_sq_to_K,
             hψ_norm]
-          simp
-          ring
+          simp only [Complex.star_def, Complex.conj_ofReal, pow_two, mul_assoc, mul_comm]
+          ring_nf
 
 private lemma raw_commutator_eq_of_symmetric
     (A B : H →ₗ.[ℂ] H) (hA : A.IsSymmetric) (hB : B.IsSymmetric)
@@ -171,57 +171,6 @@ private lemma raw_commutator_eq_of_symmetric
     _ = ⟪ψ, A ⟨B ⟨ψ, hψB⟩, hAB⟩ - B ⟨A ⟨ψ, hψA⟩, hBA⟩⟫_ℂ := by
           rw [inner_sub_right]
     _ = Complex.I * c := h_raw
-
-section RawCommutator
-
-variable (A B : H →ₗ.[ℂ] H) (hA : A.IsSymmetric) (hB : B.IsSymmetric)
-variable (ψ : H) (hψA : ψ ∈ A.domain) (hψB : ψ ∈ B.domain)
-variable (hψ_norm : ‖ψ‖ = 1)
-variable (hBA : A ⟨ψ, hψA⟩ ∈ B.domain)
-variable (hAB : B ⟨ψ, hψB⟩ ∈ A.domain)
-variable {c : ℝ}
-variable (h_raw :
-  ⟪ψ, A ⟨(B ⟨ψ, hψB⟩ : H), hAB⟩ -
-      B ⟨(A ⟨ψ, hψA⟩ : H), hBA⟩⟫_ℂ = Complex.I * c)
-
-include hA hB hψ_norm hBA hAB h_raw
-
-/-- A raw commutator expectation determines the centered commutator expectation. -/
-lemma inner_centered_commutator_of_raw_commutator :
-    ⟪centered A ψ hψA, centered B ψ hψB⟫_ℂ -
-        ⟪centered B ψ hψB, centered A ψ hψA⟫_ℂ =
-      Complex.I * c := by
-  let a : H := A ⟨ψ, hψA⟩
-  let b : H := B ⟨ψ, hψB⟩
-  let μa : ℝ := stateExpectedValue A ψ hψA
-  let μb : ℝ := stateExpectedValue B ψ hψB
-  have hμa_right : ⟪ψ, a⟫_ℂ = (μa : ℂ) := by
-    simpa [a, μa] using stateExpectedValue_eq_inner A hA ψ hψA
-  have hμa_left : ⟪a, ψ⟫_ℂ = (μa : ℂ) := by
-    have h_symm : ⟪a, ψ⟫_ℂ = ⟪ψ, a⟫_ℂ := by
-      simpa [a] using hA ⟨ψ, hψA⟩ ⟨ψ, hψA⟩
-    simpa [h_symm] using hμa_right
-  have hμb_right : ⟪ψ, b⟫_ℂ = (μb : ℂ) := by
-    simpa [b, μb] using stateExpectedValue_eq_inner B hB ψ hψB
-  have hμb_left : ⟪b, ψ⟫_ℂ = (μb : ℂ) := by
-    have h_symm : ⟪b, ψ⟫_ℂ = ⟪ψ, b⟫_ℂ := by
-      simpa [b] using hB ⟨ψ, hψB⟩ ⟨ψ, hψB⟩
-    simpa [h_symm] using hμb_right
-  calc
-    ⟪centered A ψ hψA, centered B ψ hψB⟫_ℂ -
-        ⟪centered B ψ hψB, centered A ψ hψA⟫_ℂ =
-      ⟪a - (μa : ℂ) • ψ, b - (μb : ℂ) • ψ⟫_ℂ -
-        ⟪b - (μb : ℂ) • ψ, a - (μa : ℂ) • ψ⟫_ℂ := by
-          rfl
-    _ = ⟪a, b⟫_ℂ - ⟪b, a⟫_ℂ :=
-      sub_expectation_commutator_eq_raw ψ a b μa μb
-        hμa_right hμa_left hμb_right hμb_left hψ_norm
-    _ = Complex.I * c :=
-      raw_commutator_eq_of_symmetric A B hA hB ψ hψA hψB hBA hAB rfl rfl h_raw
-
-omit hA hB hψ_norm hBA hAB h_raw
-
-end RawCommutator
 
 private lemma commutator_half_sq_le_mul_norm_sq {u v : H} {c : ℝ}
     (h_comm : ⟪u, v⟫_ℂ - ⟪v, u⟫_ℂ = Complex.I * c) :
@@ -311,6 +260,39 @@ variable (h_raw :
       B ⟨(A ⟨ψ, hψA⟩ : H), hBA⟩⟫_ℂ = Complex.I * c)
 
 include hA hB hψ_norm hBA hAB h_raw
+
+/-- A raw commutator expectation determines the centered commutator expectation. -/
+lemma inner_centered_commutator_of_raw_commutator :
+    ⟪centered A ψ hψA, centered B ψ hψB⟫_ℂ -
+        ⟪centered B ψ hψB, centered A ψ hψA⟫_ℂ =
+      Complex.I * c := by
+  let a : H := A ⟨ψ, hψA⟩
+  let b : H := B ⟨ψ, hψB⟩
+  let μa : ℝ := stateExpectedValue A ψ hψA
+  let μb : ℝ := stateExpectedValue B ψ hψB
+  have hμa_right : ⟪ψ, a⟫_ℂ = (μa : ℂ) := by
+    simpa [a, μa] using stateExpectedValue_eq_inner A hA ψ hψA
+  have hμa_left : ⟪a, ψ⟫_ℂ = (μa : ℂ) := by
+    have h_symm : ⟪a, ψ⟫_ℂ = ⟪ψ, a⟫_ℂ := by
+      simpa [a] using hA ⟨ψ, hψA⟩ ⟨ψ, hψA⟩
+    simpa [h_symm] using hμa_right
+  have hμb_right : ⟪ψ, b⟫_ℂ = (μb : ℂ) := by
+    simpa [b, μb] using stateExpectedValue_eq_inner B hB ψ hψB
+  have hμb_left : ⟪b, ψ⟫_ℂ = (μb : ℂ) := by
+    have h_symm : ⟪b, ψ⟫_ℂ = ⟪ψ, b⟫_ℂ := by
+      simpa [b] using hB ⟨ψ, hψB⟩ ⟨ψ, hψB⟩
+    simpa [h_symm] using hμb_right
+  calc
+    ⟪centered A ψ hψA, centered B ψ hψB⟫_ℂ -
+        ⟪centered B ψ hψB, centered A ψ hψA⟫_ℂ =
+      ⟪a - (μa : ℂ) • ψ, b - (μb : ℂ) • ψ⟫_ℂ -
+        ⟪b - (μb : ℂ) • ψ, a - (μa : ℂ) • ψ⟫_ℂ := by
+          rfl
+    _ = ⟪a, b⟫_ℂ - ⟪b, a⟫_ℂ :=
+      sub_expectation_commutator_eq_raw ψ a b μa μb
+        hμa_right hμa_left hμb_right hμb_left hψ_norm
+    _ = Complex.I * c :=
+      raw_commutator_eq_of_symmetric A B hA hB ψ hψA hψB hBA hAB rfl rfl h_raw
 
 /-- A raw commutator expectation implies the squared Robertson uncertainty bound. -/
 lemma state_uncertainty_squared_of_raw_commutator :
