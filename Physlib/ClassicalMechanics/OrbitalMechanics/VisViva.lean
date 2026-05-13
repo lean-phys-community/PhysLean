@@ -42,8 +42,8 @@ noncomputable def speedCircular (sys : VisViva) (cfg : ConfigurationSpace) : ℝ
   Real.sqrt (sys.G * sys.M / cfg.r)
 
 /-- Lemma: the square of the circular orbit speed equals G M / r. -/
-lemma speedCircular_sq (sys : VisViva) (cfg : ConfigurationSpace) (hr : cfg.r > 0) (hG : sys.G > 0)
-    (hM : sys.M > 0) :
+lemma speedCircular_sq (sys : VisViva) (cfg : ConfigurationSpace) (hr : 0 < cfg.r) (hG : 0 < sys.G)
+    (hM : 0 < sys.M) :
     (speedCircular sys cfg)^2 = sys.G * sys.M / cfg.r := by
   simp [speedCircular]
   apply Real.sq_sqrt
