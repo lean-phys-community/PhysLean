@@ -14,7 +14,7 @@ noncomputable section
 open BigOperators
 open ComplexConjugate
 open Kronecker
-open scoped Matrix ComplexOrder
+open scoped Matrix ComplexOrder RealInnerProductSpace InnerProductSpace
 
 variable {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] (ρ σ : MState d)
 
@@ -66,10 +66,51 @@ theorem fidelity_self_eq_one : fidelity ρ ρ = 1 := by
   rw [← Real.rpow_two, Real.rpow_inv_rpow hx (by norm_num), ← sq, ← Real.rpow_two]
   exact Real.rpow_rpow_inv hx (by norm_num)
 
+/-- Fidelity can be rewritten as the trace norm of the product of square roots. -/
+theorem fidelity_eq_traceNorm_sqrt_mul_sqrt (ρ σ : MState d) :
+    fidelity ρ σ = (σ.M.sqrt.mat * ρ.M.sqrt.mat).traceNorm := by
+  open MatrixOrder in
+  rw [fidelity, HermitianMat.sqrt_eq_cfc_rpow_half, HermitianMat.trace_eq_re_trace,
+    Matrix.traceNorm, CFC.sqrt_eq_rpow]
+  change RCLike.re (((σ.M.conj ρ.M.sqrt.mat) ^ (1 / 2 : ℝ)).mat.trace) = _
+  rw [show ((σ.M.conj ρ.M.sqrt.mat) ^ (1 / 2 : ℝ)).mat =
+      ((σ.M.conj ρ.M.sqrt.mat).mat) ^ (1 / 2 : ℝ) by
+    rw [HermitianMat.rpow_eq_cfc, HermitianMat.mat_cfc, CFC.rpow_eq_cfc_real (ha := by positivity)]]
+  simp [HermitianMat.conj_apply_mat, Matrix.mul_assoc, (HermitianMat.sqrt_sq σ.nonneg).symm]
+
 /-- The fidelity is 1 if and only if the two states are the same. -/
-theorem fidelity_eq_one_iff_self : fidelity ρ σ = 1 ↔ ρ = σ :=
-  ⟨by sorry,
-  fun h ↦ h ▸ fidelity_self_eq_one ρ⟩
+theorem fidelity_eq_one_iff_self : fidelity ρ σ = 1 ↔ ρ = σ := by
+  refine ⟨fun h => ?_, fun h => h ▸ fidelity_self_eq_one ρ⟩
+  set A : Matrix d d ℂ := ρ.M.sqrt.mat
+  set B : Matrix d d ℂ := σ.M.sqrt.mat
+  have hAh : Aᴴ = A := by simp [A]
+  have hBh : Bᴴ = B := by simp [B]
+  have hAeq : ρ.m = Aᴴ * A := by simpa [hAh] using (HermitianMat.sqrt_sq ρ.nonneg).symm
+  have hBeq : σ.m = Bᴴ * B := by simpa [hBh] using (HermitianMat.sqrt_sq σ.nonneg).symm
+  obtain ⟨U, hU⟩ := (Matrix.traceNorm_eq_max_re_tr_U (B * A)).left
+  have hUB : (U.1 * B)ᴴ * (U.1 * B) = Bᴴ * B := by
+    rw [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    simp [show (U.1)ᴴ = star U.1 from rfl, ← Matrix.mul_assoc, U.2.1]
+  set z : ℂ := (U.1 * (B * A)).trace
+  have hzre : z.re = 1 := hU.trans ((fidelity_eq_traceNorm_sqrt_mul_sqrt ρ σ).symm.trans h)
+  have hzconj : z + conj z = 2 := by rw [Complex.add_conj, hzre]; push_cast; ring
+  have hz1 : (Aᴴ * (U.1 * B)).trace = z := by
+    show _ = (U.1 * (B * A)).trace
+    rw [hAh, ← Matrix.mul_assoc, Matrix.trace_mul_cycle, Matrix.trace_mul_comm]
+  have hz2 : ((U.1 * B)ᴴ * A).trace = conj z := by
+    rw [show ((U.1 * B)ᴴ * A) = (Aᴴ * (U.1 * B))ᴴ from by
+      simp [Matrix.conjTranspose_mul, hAh, hBh]]
+    simpa [hz1] using Matrix.trace_conjTranspose (Aᴴ * (U.1 * B))
+  have hAU : A = U.1 * B := by
+    refine sub_eq_zero.mp <| Matrix.trace_conjTranspose_mul_self_eq_zero_iff.mp ?_
+    have h_expand : ((A - U.1 * B)ᴴ * (A - U.1 * B)).trace =
+        (Aᴴ * A).trace - (Aᴴ * (U.1 * B)).trace - ((U.1 * B)ᴴ * A).trace
+          + ((U.1 * B)ᴴ * (U.1 * B)).trace := by
+      simp [sub_eq_add_neg, Matrix.conjTranspose_mul, Matrix.mul_add, Matrix.add_mul,
+        Matrix.trace_add, Matrix.trace_neg, add_assoc, add_left_comm, add_comm]
+    rw [h_expand, hz1, hz2, ← hAeq, ρ.tr', hUB, ← hBeq, σ.tr']
+    linear_combination -hzconj
+  exact MState.ext_m <| by rw [hAeq, hAU, hUB, ← hBeq]
 
 /-- The fidelity is a symmetric quantity. -/
 theorem fidelity_symm : fidelity ρ σ = fidelity σ ρ := by
