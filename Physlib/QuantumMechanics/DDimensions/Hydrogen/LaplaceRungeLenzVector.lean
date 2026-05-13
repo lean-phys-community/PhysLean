@@ -155,7 +155,7 @@ private lemma positionDotMomentum_commutation_radiusRegPow (d : ℕ) (ε : ℝˣ
     _ = (-s * I * ℏ) • (∑ i, 𝐱 i ∘L 𝐱 i) ∘L 𝐫₀ ε (s-2) := by
       simp [← lie_skew (𝐩 _), radiusRegPow_commutation_momentum, Finset.smul_sum,
         position_comp_radiusRegPow_commute, finset_sum_comp, comp_assoc]
-    _ = (-s * I * ℏ) • (𝐫₀ ε s - ε.1 ^ 2 • 𝐫₀ ε (s-2)) := by simp [positionOperatorSqr_eq ε]
+    _ = (-s * I * ℏ) • (𝐫₀ ε s - ε.1 ^ 2 • 𝐫₀ ε (s-2)) := by simp [positionCLMSqr_eq ε]
 
 private lemma positionCompMomentumSqr_comm {d : ℕ} (i j : Fin d) :
     ⁅𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩), 𝐱 j ∘L (𝐩 ⬝ᵥ 𝐩)⁆ = (-2 * I * ℏ) • (𝐩 ⬝ᵥ 𝐩) ∘L 𝐋 i j := by
@@ -329,7 +329,7 @@ private lemma xL_Lx_eq {d : ℕ} (ε : ℝˣ) (i : Fin d) :
   -- Split/do sums
   simp_rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, ← Finset.smul_sum, ← finset_sum_comp,
     sum_smul, Finset.sum_const, Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ,
-    positionOperatorSqr_eq ε, sub_comp, smul_comp, id_comp, smul_sub]
+    positionCLMSqr_eq ε, sub_comp, smul_comp, id_comp, smul_sub]
   -- Clean up coefficients
   simp_rw [add_sub_assoc, add_right_inj, smul_smul, ← sub_smul, sub_eq_add_neg, neg_add, ← neg_smul,
     ← Complex.coe_smul, smul_smul, ofReal_neg, ofReal_mul, ofReal_pow, ofReal_ofNat, neg_neg]
@@ -486,7 +486,7 @@ private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
         ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, mul_assoc, sub_eq_add_neg]
     _ = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩) - (I * ℏ * (d - 1)) • 𝐫₀ ε (-1)
         - (I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) := by
-      simp only [dotProduct, mul_def, positionOperatorSqr_eq ε, comp_sub, comp_smul, comp_id,
+      simp only [dotProduct, mul_def, positionCLMSqr_eq ε, comp_sub, comp_smul, comp_id,
         radiusRegPowOperator_comp_eq, smul_sub, ← Complex.coe_smul, ofReal_pow, smul_smul]
       ring_nf
       simp_rw [← add_sub_assoc, add_assoc, ← add_smul, sub_eq_add_neg, ← neg_smul]
@@ -499,7 +499,7 @@ set_option backward.isDefEq.respectTransparency false in
 private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐫₀ ε (-1) ∘L 𝐱 i =
     ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) - (ε.1 ^ 2) • 𝐫₀ ε (-2) := by
   simp_rw [← comp_finset_sum, ← comp_assoc, position_comp_radiusRegPow_commute, comp_assoc,
-    ← comp_finset_sum, ← comp_assoc, radiusRegPowOperator_comp_eq, positionOperatorSqr_eq ε]
+    ← comp_finset_sum, ← comp_assoc, radiusRegPowOperator_comp_eq, positionCLMSqr_eq ε]
   ring_nf
   simp
 
