@@ -82,7 +82,8 @@ private lemma conj_inner_apply_self_eq_of_isSymmetric (T : H →ₗ.[ℂ] H) (hT
 
 /-- Expectation value `re ⟪ψ, Tψ⟫_ℂ` for `ψ ∈ T.domain`.
 
-For symmetric `T`, this agrees with `⟪ψ, Tψ⟫_ℂ` after coercion from `ℝ`; see `expectedValue_eq_inner`. -/
+For symmetric `T`, this agrees with `⟪ψ, Tψ⟫_ℂ` after coercion from `ℝ`;
+see `expectedValue_eq_inner`. -/
 def expectedValue (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) : ℝ :=
   (⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ).re
 
@@ -394,7 +395,8 @@ lemma stdDev_eq_zero_iff_centered_eq_zero_of_norm_eq_one :
   rw [← stateStdDev_eq_stdDev_of_mem_domain T hT ψ hψ hTψ hψ_norm,
     stateStdDev_eq_zero_iff_centered_eq_zero]
 
-/-- For unit `ψ`, zero second-order standard deviation is equivalent to the eigenvector condition. -/
+/-- For unit `ψ`, zero second-order standard deviation is equivalent to the eigenvector
+condition. -/
 lemma stdDev_eq_zero_iff_isEigenvector_of_norm_eq_one :
     stdDev T ψ hψ hTψ = 0 ↔
       T.IsEigenvector ⟨ψ, hψ⟩ (stateExpectedValue T ψ hψ : ℂ) := by

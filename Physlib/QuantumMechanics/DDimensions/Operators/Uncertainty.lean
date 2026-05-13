@@ -141,8 +141,8 @@ private lemma sub_expectation_commutator_eq_raw
     _ = ⟪a, b⟫_ℂ - ⟪b, a⟫_ℂ := by
           rw [hμa_right, hμa_left, hμb_right, hμb_left, inner_self_eq_norm_sq_to_K,
             hψ_norm]
-          simp
-          ring
+          simp only [Complex.star_def, Complex.conj_ofReal, pow_two, mul_assoc, mul_comm]
+          ring_nf
 
 private lemma raw_commutator_eq_of_symmetric
     (A B : H →ₗ.[ℂ] H) (hA : A.IsSymmetric) (hB : B.IsSymmetric)

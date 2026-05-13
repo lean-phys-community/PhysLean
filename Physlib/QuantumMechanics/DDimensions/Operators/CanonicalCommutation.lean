@@ -14,8 +14,9 @@ This file transports the position and momentum operators on Schwartz maps to par
 `SpaceDHilbertSpace d`, with common domain `schwartzSubmodule d`. It then records the
 same-coordinate canonical commutation relation and the corresponding uncertainty lower bound.
 
-This file supplies the concrete position/momentum data needed to apply the abstract uncertainty inequality,
-which is proved in `LinearPMap` form in `Physlib.QuantumMechanics.DDimensions.Operators.Uncertainty`
+This file supplies the concrete position/momentum data needed to apply the abstract uncertainty
+inequality, which is proved in `LinearPMap` form in
+`Physlib.QuantumMechanics.DDimensions.Operators.Uncertainty`.
 
 ## Main declarations
 
