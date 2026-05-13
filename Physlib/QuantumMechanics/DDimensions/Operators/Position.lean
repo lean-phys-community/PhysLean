@@ -6,7 +6,6 @@ Authors: Gregory J. Loges
 module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
-public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
@@ -392,9 +391,11 @@ noncomputable section
 ### B.1. Position vector
 -/
 
+/-- The operator on `SpaceDHilbertSpace d` acting by multiplication by `fun x ↦ xᵢ`. -/
 def positionOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
   ℳ (Complex.ofRealCLM ∘L Space.coordCLM i)
 
+@[inherit_doc positionOperator]
 notation "𝐗" => positionOperator
 
 lemma positionOperator_hasDenseDomain : (𝐗 i).HasDenseDomain :=
@@ -412,11 +413,15 @@ lemma positionOperator_isUnbounded : (𝐗 i).IsUnbounded := by
 ### B.2. Radius powers (regularized)
 -/
 
+/-- The operator on `SpaceDHilbertSpace d` acting by multiplication by
+  `fun x ↦ (‖x‖² + ε²)^(s/2)`. -/
 def radiusRegPowMulOperator (ε : ℝˣ) (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
   ℳ (Complex.ofReal ∘ normRegularizedPow d ε s)
 
+@[inherit_doc radiusRegPowMulOperator]
 notation "𝐑₀" => radiusRegPowMulOperator
 
+@[inherit_doc radiusRegPowMulOperator]
 notation "𝐑₀[" d' "]" => radiusRegPowMulOperator (d := d')
 
 lemma radiusRegPowMulOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).HasDenseDomain :=
@@ -434,11 +439,14 @@ lemma radiusRegPowMulOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] �
 ### B.3. Radius powers
 -/
 
+/-- The operator on `SpaceDHilbertSpace d` acting by multiplication by `fun x ↦ ‖x‖ˢ`. -/
 def radiusPowMulOperator (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
   ℳ (Complex.ofReal ∘ fun x ↦ ‖x‖ ^ s)
 
+@[inherit_doc radiusPowMulOperator]
 notation "𝐑" => radiusPowMulOperator
 
+@[inherit_doc radiusPowMulOperator]
 notation "𝐑[" d' "]" => radiusPowMulOperator (d := d')
 
 lemma radiusPowMulOperator_hasDenseDomain (s : ℝ) : (𝐑[d] s).HasDenseDomain := by

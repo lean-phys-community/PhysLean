@@ -156,7 +156,7 @@ lemma IsClosable.neg (h : U.IsClosable) : (-U).IsClosable := neg_eq_neg_one_smul
 ## D. Adjoints
 -/
 
-/-- The adjoint of a zero LinearPMap (any domain) is zero (domain `⊤`).  -/
+/-- The adjoint of a zero LinearPMap (any domain) is zero (domain `⊤`). -/
 lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
   refine dExt ?_ fun x y hxy ↦ ?_
   · ext
