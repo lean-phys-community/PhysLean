@@ -349,7 +349,7 @@ private lemma pSqr_comm_rx {d : ℕ} (ε : ℝˣ) (i : Fin d) :
     ring_nf
   rw [← add_assoc, add_left_inj, add_rotate]
   simp_rw [xL_Lx_eq ε i, comp_add, comp_smul, smul_add, ← Complex.coe_smul, smul_smul, ← comp_assoc,
-    radiusRegPowOperator_comp_eq, comp_assoc, add_assoc, ← add_smul, ofReal_mul, ofReal_sub,
+    radiusRegPowCLM_comp_eq, comp_assoc, add_assoc, ← add_smul, ofReal_mul, ofReal_sub,
     ofReal_neg, ofReal_pow, ofReal_ofNat]
   ring_nf
   simp [I_sq]
@@ -487,7 +487,7 @@ private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
     _ = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩) - (I * ℏ * (d - 1)) • 𝐫₀ ε (-1)
         - (I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) := by
       simp only [dotProduct, mul_def, positionCLMSqr_eq ε, comp_sub, comp_smul, comp_id,
-        radiusRegPowOperator_comp_eq, smul_sub, ← Complex.coe_smul, ofReal_pow, smul_smul]
+        radiusRegPowCLM_comp_eq, smul_sub, ← Complex.coe_smul, ofReal_pow, smul_smul]
       ring_nf
       simp_rw [← add_sub_assoc, add_assoc, ← add_smul, sub_eq_add_neg, ← neg_smul]
       ring_nf
@@ -499,7 +499,7 @@ set_option backward.isDefEq.respectTransparency false in
 private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐫₀ ε (-1) ∘L 𝐱 i =
     ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) - (ε.1 ^ 2) • 𝐫₀ ε (-2) := by
   simp_rw [← comp_finset_sum, ← comp_assoc, position_comp_radiusRegPow_commute, comp_assoc,
-    ← comp_finset_sum, ← comp_assoc, radiusRegPowOperator_comp_eq, positionCLMSqr_eq ε]
+    ← comp_finset_sum, ← comp_assoc, radiusRegPowCLM_comp_eq, positionCLMSqr_eq ε]
   ring_nf
   simp
 

@@ -20,21 +20,17 @@ In this module we introduce several position operators for quantum mechanics on 
 ## ii. Key results
 
 Definitions:
-- `positionOperator` : (components of) the position vector operator acting on Schwartz maps
+- `positionCLM` : (components of) the position vector operator acting on Schwartz maps
     `𝓢(Space d, ℂ)` by multiplication by `xᵢ`.
-- `radiusRegPowOperator` : operator acting on Schwartz maps by multiplication by
+- `radiusRegPowCLM` : operator acting on Schwartz maps by multiplication by
     `(‖x‖² + ε²)^(s/2)`, a smooth regularization of `‖x‖ˢ`.
-- `positionUnboundedOperator` : a symmetric unbounded operator acting on the Schwartz submodule
-    of the Hilbert space `SpaceDHilbertSpace d`.
-- `readiusRegPowUnboundedOperator` : a symmetric unbounded operator acting on the Schwartz
-    submodule of the Hilbert space `SpaceDHilbertSpace d`. For `s ≤ 0` this operator is in fact
-    bounded (by `|ε|ˢ`) and has natural domain the entire Hilbert space, but for uniformity we
-    use the same domain for all `s`.
+- `positionOperator` : a self-adjoint multiplication operator acting on `SpaceDHilbertSpace d`.
+- `readiusRegPowOperator` : a self-adjoint multiplication operator acting on `SpaceDHilbertSpace d`.
 
 Notation:
-- `𝐱` for `positionOperator`
-- `𝐫₀` for `radiusRegPowOperator`
-- `𝐫` for `radiusPowOperator`
+- `𝐱` for `positionCLM`
+- `𝐫₀` for `radiusRegPowCLM`
+- `𝐫` for `radiusPowLM`
 
 ## iii. Table of contents
 
@@ -140,37 +136,37 @@ lemma normRegularizedPow_measurable (d : ℕ) (ε s : ℝ) :
 set_option backward.isDefEq.respectTransparency false in
 /-- The radius operator to power `s`, regularized by `ε ≠ 0`, is the continuous linear map
   from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `(‖x‖² + ε²)^(s/2) • ψ`. -/
-def radiusRegPowOperator {d : ℕ} (ε : ℝˣ) (s : ℝ) : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
+def radiusRegPowCLM {d : ℕ} (ε : ℝˣ) (s : ℝ) : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
   SchwartzMap.smulLeftCLM ℂ (Complex.ofReal ∘ normRegularizedPow d ε s)
 
-@[inherit_doc radiusRegPowOperator]
-notation "𝐫₀" => radiusRegPowOperator
+@[inherit_doc radiusRegPowCLM]
+notation "𝐫₀" => radiusRegPowCLM
 
-@[inherit_doc radiusRegPowOperator]
-notation "𝐫₀[" d' "]" => radiusRegPowOperator (d := d')
+@[inherit_doc radiusRegPowCLM]
+notation "𝐫₀[" d' "]" => radiusRegPowCLM (d := d')
 
-lemma radiusRegPowOperator_apply_fun {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+lemma radiusRegPowCLM_apply_fun {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     𝐫₀ ε s ψ = fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
   ext x
-  dsimp [radiusRegPowOperator]
+  dsimp [radiusRegPowCLM]
   refine smulLeftCLM_apply_apply ?_ ψ x
   exact HasTemperateGrowth.comp (by fun_prop) (normRegularizedPow_hasTemperateGrowth d ε s)
 
 @[simp]
-lemma radiusRegPowOperator_apply {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
+lemma radiusRegPowCLM_apply {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
     𝐫₀ ε s ψ x = (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
-  rw [radiusRegPowOperator_apply_fun]
+  rw [radiusRegPowCLM_apply_fun]
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
-lemma radiusRegPowOperator_comp_eq {d : ℕ} (ε : ℝˣ) (s t : ℝ) :
+lemma radiusRegPowCLM_comp_eq {d : ℕ} (ε : ℝˣ) (s t : ℝ) :
     𝐫₀[d] ε s ∘L 𝐫₀ ε t = 𝐫₀ ε (s+t) := by
   ext ψ x
   simp [add_div, Real.rpow_add (norm_sq_add_unit_sq_pos ε x), mul_assoc]
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
-lemma radiusRegPowOperator_zero {d : ℕ} (ε : ℝˣ) :
+lemma radiusRegPowCLM_zero {d : ℕ} (ε : ℝˣ) :
     𝐫₀ ε 0 = ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
   simp
@@ -188,29 +184,29 @@ lemma positionCLMSqr_eq {d : ℕ} (ε : ℝˣ) :
 set_option backward.isDefEq.respectTransparency false in
 /-- The radius operator to power `s` is the linear map from `𝓢(Space d, ℂ)` to `Space d → ℂ` that
   maps `ψ` to `x ↦ ‖x‖ˢψ(x)` (which is 'nearly' Schwartz for general `s`). -/
-def radiusPowOperator {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space d → ℂ where
+def radiusPowLM {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space d → ℂ where
   toFun ψ := (fun x : Space d ↦ ‖x‖ ^ s) • ψ
   map_add' _ _ := by rw [← smul_add]; rfl
   map_smul' _ _ := by rw [smul_comm]; rfl
 
-@[inherit_doc radiusPowOperator]
-notation "𝐫" => radiusPowOperator
+@[inherit_doc radiusPowLM]
+notation "𝐫" => radiusPowLM
 
-@[inherit_doc radiusPowOperator]
-notation "𝐫[" d' "]" => radiusPowOperator (d := d')
+@[inherit_doc radiusPowLM]
+notation "𝐫[" d' "]" => radiusPowLM (d := d')
 
-lemma radiusPowOperator_apply_fun {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+lemma radiusPowLM_apply_fun {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     𝐫 s ψ = fun x ↦ ‖x‖ ^ s • ψ x := rfl
 
 @[simp]
-lemma radiusPowOperator_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
+lemma radiusPowLM_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
     𝐫 s ψ x = ‖x‖ ^ s • ψ x := by
-  rw [radiusPowOperator_apply_fun]
+  rw [radiusPowLM_apply_fun]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
 @[fun_prop]
-lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
+lemma radiusPowLM_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
     (hx : x ≠ 0) : ContDiffAt ℝ n (𝐫 s ψ) x := by
   refine ContDiffAt.smul ?_ (ψ.contDiffAt n)
   have h (x : Space d) : ‖x‖ ^ s = (inner ℝ x x) ^ (s / 2) := by
@@ -221,14 +217,14 @@ lemma radiusPowOperator_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 
 set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is strongly measurable. -/
 @[fun_prop]
-lemma radiusPowOperator_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+lemma radiusPowLM_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     StronglyMeasurable (𝐫 s ψ) := by
-  rw [radiusPowOperator_apply_fun]
+  rw [radiusPowLM_apply_fun]
   exact StronglyMeasurable.smul (by measurability) ψ.continuous.stronglyMeasurable
 
 set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
-lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)
+lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)
     (hψ : ψ ∈ polyBddSchwartzMap d a) (h : 0 < d + 2 * (a + s)) :
     MemHS (𝐫 s ψ) := by
   rcases Nat.eq_zero_or_pos d with (rfl | hd)
@@ -237,7 +233,7 @@ lemma radiusPowOperator_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)
     refine (memLp_two_iff_integrable_sq_norm (by fun_prop)).mpr ⟨by fun_prop, ?_⟩
     suffices ∫⁻ (x : Space d), ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ < ⊤ by
       have hInt (x : Space d) : ‖𝐫 s ψ x‖ ^ 2 = ‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s) := by
-        simp [radiusPowOperator, mul_pow, mul_comm, Real.rpow_mul]
+        simp [radiusPowLM, mul_pow, mul_comm, Real.rpow_mul]
       simpa only [HasFiniteIntegral, hInt]
     rw [← lintegral_add_compl _ (measurableSet_ball (x := 0) (ε := 1)), ENNReal.add_lt_top]
     constructor
@@ -327,7 +323,7 @@ lemma radiusRegPow_tendsto_radiusPow {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ
     (hx : x ≠ 0) : Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x)) := by
   have hpow : ‖x‖ ^ s = (‖x‖ ^ 2 + 0 ^ 2) ^ (s / 2) := by
     simp [← Real.rpow_natCast_mul, mul_div_cancel₀]
-  simp only [radiusRegPowOperator_apply, radiusPowOperator_apply, Complex.real_smul, hpow]
+  simp only [radiusRegPowCLM_apply, radiusPowLM_apply, Complex.real_smul, hpow]
   refine Tendsto.mul_const (ψ x) <| Tendsto.ofReal ?_
   refine Tendsto.rpow_const ?_ (Or.inl <| by simp [hx])
   exact Tendsto.const_add _ <| Tendsto.pow tendsto_comap 2
@@ -338,7 +334,7 @@ lemma radiusRegPow_tendsto_radiusPow' {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, �
   refine tendsto_pi_nhds.mpr fun x ↦ ?_
   rcases eq_zero_or_neZero x with (rfl | hx)
   · rcases h with (hs | hψ)
-    · simp only [radiusRegPowOperator_apply, radiusPowOperator_apply, Complex.real_smul, norm_zero,
+    · simp only [radiusRegPowCLM_apply, radiusPowLM_apply, Complex.real_smul, norm_zero,
         ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_add]
       have : (0 : ℝ) ^ s = (0 ^ 2) ^ (s / 2) := by
         rw [← Real.rpow_natCast_mul (le_refl 0), Nat.cast_ofNat, mul_div_cancel₀ s (by norm_num)]
@@ -415,56 +411,56 @@ lemma positionOperator_isUnbounded : (𝐗 i).IsUnbounded := by
 
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by
   `fun x ↦ (‖x‖² + ε²)^(s/2)`. -/
-def radiusRegPowMulOperator (ε : ℝˣ) (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
+def radiusRegPowOperator (ε : ℝˣ) (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
   ℳ (Complex.ofReal ∘ normRegularizedPow d ε s)
 
-@[inherit_doc radiusRegPowMulOperator]
-notation "𝐑₀" => radiusRegPowMulOperator
+@[inherit_doc radiusRegPowOperator]
+notation "𝐑₀" => radiusRegPowOperator
 
-@[inherit_doc radiusRegPowMulOperator]
-notation "𝐑₀[" d' "]" => radiusRegPowMulOperator (d := d')
+@[inherit_doc radiusRegPowOperator]
+notation "𝐑₀[" d' "]" => radiusRegPowOperator (d := d')
 
-lemma radiusRegPowMulOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).HasDenseDomain :=
+lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
-lemma radiusRegPowMulOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝐑₀[d] ε s) := by
+lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝐑₀[d] ε s) := by
   refine mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
-lemma radiusRegPowMulOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).IsUnbounded := by
+lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
-  · exact radiusRegPowMulOperator_isSelfAdjoint ε s
-  · exact radiusRegPowMulOperator_hasDenseDomain ε s
+  · exact radiusRegPowOperator_isSelfAdjoint ε s
+  · exact radiusRegPowOperator_hasDenseDomain ε s
 
 /-!
 ### B.3. Radius powers
 -/
 
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by `fun x ↦ ‖x‖ˢ`. -/
-def radiusPowMulOperator (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
+def radiusPowOperator (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
   ℳ (Complex.ofReal ∘ fun x ↦ ‖x‖ ^ s)
 
-@[inherit_doc radiusPowMulOperator]
-notation "𝐑" => radiusPowMulOperator
+@[inherit_doc radiusPowOperator]
+notation "𝐑" => radiusPowOperator
 
-@[inherit_doc radiusPowMulOperator]
-notation "𝐑[" d' "]" => radiusPowMulOperator (d := d')
+@[inherit_doc radiusPowOperator]
+notation "𝐑[" d' "]" => radiusPowOperator (d := d')
 
-lemma radiusPowMulOperator_hasDenseDomain (s : ℝ) : (𝐑[d] s).HasDenseDomain := by
+lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝐑[d] s).HasDenseDomain := by
   refine mulOperator_hasDenseDomain ?_
   suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
-lemma radiusPowMulOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝐑[d] s) := by
+lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝐑[d] s) := by
   refine mulOperator_isSelfAdjoint_ofReal ?_ (by ext; simp)
   suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
-lemma radiusPowMulOperator_isUnbounded : (𝐑₀[d] ε s).IsUnbounded := by
+lemma radiusPowOperator_isUnbounded : (𝐑₀[d] ε s).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
-  · exact radiusRegPowMulOperator_isSelfAdjoint ε s
-  · exact radiusRegPowMulOperator_hasDenseDomain ε s
+  · exact radiusRegPowOperator_isSelfAdjoint ε s
+  · exact radiusRegPowOperator_hasDenseDomain ε s
 
 open Complex
 
@@ -475,19 +471,19 @@ private lemma add_floor_toNat_pos_aux (d : ℕ) (s : ℝ) :
   have hn₂ : (n : ℝ) ≤ n.toNat := Int.cast_le.mpr (Int.self_le_toNat _)
   linarith
 
-lemma radiusPowOperator_apply_polyBddSchwartz_memHS {d : ℕ} {s : ℝ}
+lemma radiusPowLM_apply_polyBddSchwartz_memHS {d : ℕ} {s : ℝ}
     (ψ : polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
     MemHS (𝐫[d] s (polyBddSchwartzEquiv.symm ψ)) :=
   let f := polyBddSchwartzEquiv.symm ψ
-  radiusPowOperator_apply_memHS s f.1 ⌊1 - d / 2 - s⌋.toNat f.2 (add_floor_toNat_pos_aux d s)
+  radiusPowLM_apply_memHS s f.1 ⌊1 - d / 2 - s⌋.toNat f.2 (add_floor_toNat_pos_aux d s)
 
-lemma radiusPowMulOperator_domain_ge {d : ℕ} (s : ℝ) :
-    polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat ≤ (radiusPowMulOperator s).domain := by
+lemma radiusPowOperator_domain_ge {d : ℕ} (s : ℝ) :
+    polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat ≤ (radiusPowOperator s).domain := by
   intro ψ hψ
   let f := polyBddSchwartzEquiv.symm ⟨ψ, hψ⟩
   apply mem_mulOperator_domain_iff.mpr
   refine memHS_of_ae (𝐫 s f.1) ?_ ?_
-  · exact radiusPowOperator_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
+  · exact radiusPowLM_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
   · filter_upwards [polyBddSchwartzEquiv_coe_ae f]
     simp_all [f]
 

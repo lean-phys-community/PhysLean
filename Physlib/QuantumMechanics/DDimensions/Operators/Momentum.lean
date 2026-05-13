@@ -21,9 +21,9 @@ In this module we introduce several momentum operators for quantum mechanics on 
 ## ii. Key results
 
 Definitions:
-- `momentumOperator` : (components of) the momentum vector operator acting on Schwartz maps
+- `momentumCLM` : (components of) the momentum vector operator acting on Schwartz maps
     `𝓢(Space d, ℂ)` as `-iℏ∂ᵢ`.
-- `momentumUnboundedOperator` : a symmetric unbounded operator acting on the Schwartz submodule
+- `momentumOperator` : a symmetric unbounded operator acting on the Schwartz submodule
     of the Hilbert space `SpaceDHilbertSpace d`.
 
 Notation:
