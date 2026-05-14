@@ -9,6 +9,7 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+import Physlib.Meta.Linters.Sorry
 /-!
 
 # Position operators
@@ -397,6 +398,7 @@ notation "𝐗" => positionOperator
 lemma positionOperator_hasDenseDomain : (𝐗 i).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
+@[sorryful]
 lemma positionOperator_isSelfAdjoint : IsSelfAdjoint (𝐗 i) :=
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
@@ -423,6 +425,7 @@ notation "𝐑₀[" d' "]" => radiusRegPowOperator (d := d')
 lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
+@[sorryful]
 lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝐑₀[d] ε s) := by
   refine mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
@@ -451,6 +454,7 @@ lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝐑[d] s).HasDenseDomain :=
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
+@[sorryful]
 lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝐑[d] s) := by
   refine mulOperator_isSelfAdjoint_ofReal ?_ (by ext; simp)
   suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
