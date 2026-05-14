@@ -402,6 +402,7 @@ lemma positionOperator_hasDenseDomain : (𝐗 i).HasDenseDomain :=
 lemma positionOperator_isSelfAdjoint : IsSelfAdjoint (𝐗 i) :=
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
+@[sorryful]
 lemma positionOperator_isUnbounded : (𝐗 i).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
   · exact positionOperator_isSelfAdjoint i
@@ -429,6 +430,7 @@ lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] �
 lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝐑₀[d] ε s) := by
   refine mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
+@[sorryful]
 lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
   · exact radiusRegPowOperator_isSelfAdjoint ε s
@@ -461,6 +463,7 @@ lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝐑[d] s) := b
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
+@[sorryful]
 lemma radiusPowOperator_isUnbounded : (𝐑₀[d] ε s).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
   · exact radiusRegPowOperator_isSelfAdjoint ε s

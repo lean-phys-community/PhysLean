@@ -232,6 +232,7 @@ lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f)
     · rw [← mulOperator_adjoint_eq_conj hf]
       exact adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)
 
+@[sorryful]
 lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (ℳ f).IsUnbounded :=
   ⟨mulOperator_hasDenseDomain hf, mulOperator_isClosable hf⟩
