@@ -12,7 +12,31 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 
 ## i. Overview
 
+In this module we introduce unbounded operators on inner product spaces. By "unbounded operator"
+we mean a partially-defined linear map (`LinearPMap`) which is both densely defined and closable.
+These provide the mathematical structure appropriate for describing operators in non-relativistic
+quantum mechanics. Of particular interest are (essentially) self-adjoint unbounded operators since
+these correspond to physical observables.
+
+### Notes
+
+- Naming convention : Definitions of `LinearPMap`s for quantum mechanical unbounded operators should
+    have a name of the form `[…]Operator` and notation should use calligraphic capital letters,
+    e.g. `mulOperator f` (`𝓜 f`) for the multiplication operator associated with the function `f`.
+
+- Implementation : Although operators encountered in quantum mechanics are almost always unbounded,
+    we opt to implement unbounded operators via the property `IsUnbounded` on `LinearPMap` rather
+    than as a structure `UnboundedOperator` extending `LinearPMap`. The basic reason for this
+    is that addition/subtraction and composition of unbounded operators in general does not result
+    in another unbounded operator. This means, for example, that any attempt to define addition of
+    `UnboundedOperator`s would inevitably require introducing junk values that spoil associativity.
+
 ## ii. Key results
+
+- `IsUnbounded.adjoint` : The adjoint of an unbounded operator is also unbounded.
+- `IsUnbounded.adjoint_closure_eq_adjoint` : An unbounded operator and its closure have
+    the same adjoint.
+- `IsUnbounded.adjoint_adjoint_eq_closure` : An unbounded operator `U` satisfies `U†† = U.closure`.
 
 ## iii. Table of contents
 
@@ -51,6 +75,9 @@ variable
 
 /-!
 ## A. Definitions
+
+See `LinearPMap.instStar` and `LinearPMap.isSelfAdjoint_def` for the definition of `IsSelfAdjoint`
+for `LinearPMap`s.
 -/
 
 /-- A LinearPMap `U` has dense domain iff `U.domain` is dense in `H`. -/
