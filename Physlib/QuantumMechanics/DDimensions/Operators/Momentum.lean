@@ -89,21 +89,21 @@ def momentumOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d wh
   toFun := schwartzIncl.toLinearMap ∘ₗ (𝐩 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
 @[inherit_doc momentumOperator]
-notation "𝐏" => momentumOperator
+notation "𝓟" => momentumOperator
 
 lemma momentumOperator_apply (ψ : schwartzSubmodule d) :
-    𝐏 i ψ = schwartzEquiv (𝐩 i (schwartzEquiv.symm ψ)) := rfl
+    𝓟 i ψ = schwartzEquiv (𝐩 i (schwartzEquiv.symm ψ)) := rfl
 
 lemma momentumOperator_apply_ae (ψ : schwartzSubmodule d) :
-    𝐏 i ψ =ᵐ[volume] 𝐩 i (schwartzEquiv.symm ψ) :=
+    𝓟 i ψ =ᵐ[volume] 𝐩 i (schwartzEquiv.symm ψ) :=
   schwartzEquiv_coe_ae _
 
-lemma momentumOperator_range (ψ : schwartzSubmodule d) : 𝐏 i ψ ∈ schwartzSubmodule d := by
+lemma momentumOperator_range (ψ : schwartzSubmodule d) : 𝓟 i ψ ∈ schwartzSubmodule d := by
   simp [momentumOperator_apply]
 
-lemma momentumOperator_hasDenseDomain : (𝐏 i).HasDenseDomain := SchwartzSubmodule.dense d
+lemma momentumOperator_hasDenseDomain : (𝓟 i).HasDenseDomain := SchwartzSubmodule.dense d
 
-lemma momentumOperator_isSymmetric : (𝐏 i).IsSymmetric := by
+lemma momentumOperator_isSymmetric : (𝓟 i).IsSymmetric := by
   intro ψ φ
   obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
   obtain ⟨g, rfl⟩ := schwartzEquiv.surjective φ
@@ -132,14 +132,14 @@ lemma momentumOperator_isSymmetric : (𝐏 i).IsSymmetric := by
   congr 2
   exact integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable hI₂ hI₃ hI₄ (by fun_prop) (by fun_prop)
 
-lemma momentumOperator_isUnbounded : (𝐏 i).IsUnbounded := by
+lemma momentumOperator_isUnbounded : (𝓟 i).IsUnbounded := by
   refine (LinearPMap.IsSymmetric.isUnbounded_iff_hasDenseDomain ?_).mpr ?_
   · exact momentumOperator_isSymmetric i
   · exact momentumOperator_hasDenseDomain i
 
 /-- The square of the momentum operator. -/
 def momentumSqOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  ∑ i, (𝐏 i).comp (𝐏 i) (momentumOperator_range i)
+  ∑ i, (𝓟 i).comp (𝓟 i) (momentumOperator_range i)
 
 end
 end QuantumMechanics

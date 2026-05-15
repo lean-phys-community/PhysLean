@@ -390,20 +390,20 @@ noncomputable section
 
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by `fun x ↦ xᵢ`. -/
 def positionOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  ℳ (Complex.ofRealCLM ∘L Space.coordCLM i)
+  𝓜 (Complex.ofRealCLM ∘L Space.coordCLM i)
 
 @[inherit_doc positionOperator]
-notation "𝐗" => positionOperator
+notation "𝓧" => positionOperator
 
-lemma positionOperator_hasDenseDomain : (𝐗 i).HasDenseDomain :=
+lemma positionOperator_hasDenseDomain : (𝓧 i).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
 @[sorryful]
-lemma positionOperator_isSelfAdjoint : IsSelfAdjoint (𝐗 i) :=
+lemma positionOperator_isSelfAdjoint : IsSelfAdjoint (𝓧 i) :=
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
 @[sorryful]
-lemma positionOperator_isUnbounded : (𝐗 i).IsUnbounded := by
+lemma positionOperator_isUnbounded : (𝓧 i).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
   · exact positionOperator_isSelfAdjoint i
   · exact positionOperator_hasDenseDomain i
@@ -415,23 +415,23 @@ lemma positionOperator_isUnbounded : (𝐗 i).IsUnbounded := by
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by
   `fun x ↦ (‖x‖² + ε²)^(s/2)`. -/
 def radiusRegPowOperator (ε : ℝˣ) (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  ℳ (Complex.ofReal ∘ normRegularizedPow d ε s)
+  𝓜 (Complex.ofReal ∘ normRegularizedPow d ε s)
 
 @[inherit_doc radiusRegPowOperator]
-notation "𝐑₀" => radiusRegPowOperator
+notation "𝓡₀" => radiusRegPowOperator
 
 @[inherit_doc radiusRegPowOperator]
-notation "𝐑₀[" d' "]" => radiusRegPowOperator (d := d')
+notation "𝓡₀[" d' "]" => radiusRegPowOperator (d := d')
 
-lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).HasDenseDomain :=
+lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
 @[sorryful]
-lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝐑₀[d] ε s) := by
+lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝓡₀[d] ε s) := by
   refine mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
 @[sorryful]
-lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s).IsUnbounded := by
+lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
   · exact radiusRegPowOperator_isSelfAdjoint ε s
   · exact radiusRegPowOperator_hasDenseDomain ε s
@@ -442,32 +442,32 @@ lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝐑₀[d] ε s
 
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by `fun x ↦ ‖x‖ˢ`. -/
 def radiusPowOperator (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  ℳ (Complex.ofReal ∘ fun x ↦ ‖x‖ ^ s)
+  𝓜 (Complex.ofReal ∘ fun x ↦ ‖x‖ ^ s)
 
 @[inherit_doc radiusPowOperator]
-notation "𝐑" => radiusPowOperator
+notation "𝓡" => radiusPowOperator
 
 @[inherit_doc radiusPowOperator]
-notation "𝐑[" d' "]" => radiusPowOperator (d := d')
+notation "𝓡[" d' "]" => radiusPowOperator (d := d')
 
-lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝐑[d] s).HasDenseDomain := by
+lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝓡[d] s).HasDenseDomain := by
   refine mulOperator_hasDenseDomain ?_
   suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
 @[sorryful]
-lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝐑[d] s) := by
+lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝓡[d] s) := by
   refine mulOperator_isSelfAdjoint_ofReal ?_ (by ext; simp)
   suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
 @[sorryful]
-lemma radiusPowOperator_isUnbounded : (𝐑₀[d] ε s).IsUnbounded := by
+lemma radiusPowOperator_isUnbounded (s : ℝ) : (𝓡[d] s).IsUnbounded := by
   refine LinearPMap.IsSelfAdjoint.isUnbounded ?_ ?_
-  · exact radiusRegPowOperator_isSelfAdjoint ε s
-  · exact radiusRegPowOperator_hasDenseDomain ε s
+  · exact radiusPowOperator_isSelfAdjoint s
+  · exact radiusPowOperator_hasDenseDomain s
 
 open Complex
 

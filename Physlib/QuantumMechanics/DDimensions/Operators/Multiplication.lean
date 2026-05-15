@@ -21,9 +21,9 @@ In this module we introduce unbounded operators defined by multiplication by a f
 ## ii. Key results
 
 - `mulOperator f` : Given a function `f : Space d → ℂ`, the operator defined by `ψ ↦ f • ψ`
-  (with maximal domain) with notation `ℳ f`.
-- `mulOperator_adjoint_eq_conj` : For a.e. strongly measurable `f`, `(ℳ f)† = ℳ (conj ∘ f)`
-- `mulOperator_isUnbounded` : For a.e. strongly measurable `f`, `ℳ f` is an unbounded operator.
+  (with maximal domain) with notation `𝓜 f`.
+- `mulOperator_adjoint_eq_conj` : For a.e. strongly measurable `f`, `(𝓜 f)† = 𝓜 (conj ∘ f)`
+- `mulOperator_isUnbounded` : For a.e. strongly measurable `f`, `𝓜 f` is an unbounded operator.
 
 ## iii. Table of contents
 
@@ -89,13 +89,13 @@ def mulOperator (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceD
   }
 
 @[inherit_doc mulOperator]
-notation "ℳ" => mulOperator
+notation "𝓜" => mulOperator
 
 lemma mem_mulOperator_domain_iff
-    {f : Space d → ℂ} {ψ : SpaceDHilbertSpace d} : ψ ∈ (ℳ f).domain ↔ MemHS (f • ψ.val.cast) :=
+    {f : Space d → ℂ} {ψ : SpaceDHilbertSpace d} : ψ ∈ (𝓜 f).domain ↔ MemHS (f • ψ.val.cast) :=
   Iff.rfl
 
-lemma mulOperator_apply_ae {f : Space d → ℂ} (ψ : (ℳ f).domain) : (ℳ f) ψ =ᵐ[volume] f • ψ :=
+lemma mulOperator_apply_ae {f : Space d → ℂ} (ψ : (𝓜 f).domain) : (𝓜 f) ψ =ᵐ[volume] f • ψ :=
   coe_mk_ae ψ.prop
 
 /-!
@@ -103,7 +103,7 @@ lemma mulOperator_apply_ae {f : Space d → ℂ} (ψ : (ℳ f).domain) : (ℳ f)
 -/
 
 lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (ℳ f).HasDenseDomain := by
+    (𝓜 f).HasDenseDomain := by
   intro ψ
   apply mem_closure_iff_seq_limit.mpr
   obtain ⟨u, hu, hfu⟩ := AEStronglyMeasurable.aemeasurable hf
@@ -165,14 +165,14 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
 
 -- Can the AEStronglyMeasurable hypothesis be removed?
 lemma mulOperator_conj_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (ℳ (conj ∘ f)).domain = (ℳ f).domain := by
+    (𝓜 (conj ∘ f)).domain = (𝓜 f).domain := by
   ext
   simp only [mulOperator, smul_eq_mul, memHS_iff]
   exact and_congr (iff_of_true (by fun_prop) (by fun_prop)) (by simp)
 
 @[sorryful]
 lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (ℳ f)† = ℳ (conj ∘ f) := by
+    (𝓜 f)† = 𝓜 (conj ∘ f) := by
   refine eq_of_eq_graph ?_
   ext u
   rw [adjoint_graph_eq_graph_adjoint (mulOperator_hasDenseDomain hf), Submodule.mem_adjoint_iff]
@@ -180,19 +180,19 @@ lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurab
   · intro h
     let g : Space d → ℂ := fun x ↦ conj (f x) * u.1 x - u.2 x
     have hg : AEStronglyMeasurable g := by measurability
-    have h_int : ∀ ψ : (ℳ f).domain, ∫ x, (AEEqFun.mk g hg) x * conj (ψ.val x) = 0 := by
+    have h_int : ∀ ψ : (𝓜 f).domain, ∫ x, (AEEqFun.mk g hg) x * conj (ψ.val x) = 0 := by
       intro ψ
-      have h_int₁ : Integrable fun x ↦ u.1 x * conj (ℳ f ψ x) := L2.integrable_inner (ℳ f ψ) u.1
+      have h_int₁ : Integrable fun x ↦ u.1 x * conj (𝓜 f ψ x) := L2.integrable_inner (𝓜 f ψ) u.1
       have h_int₂ : Integrable fun x ↦ u.2 x * conj (ψ.val x) := L2.integrable_inner ψ.val u.2
       symm
-      trans ∫ x, u.1 x * conj (ℳ f ψ x) - u.2 x * conj (ψ.val x)
-      · exact (h ψ (ℳ f ψ) (mem_graph (ℳ f) ψ)) ▸ (integral_sub h_int₁ h_int₂).symm
+      trans ∫ x, u.1 x * conj (𝓜 f ψ x) - u.2 x * conj (ψ.val x)
+      · exact (h ψ (𝓜 f ψ) (mem_graph (𝓜 f) ψ)) ▸ (integral_sub h_int₁ h_int₂).symm
       refine integral_congr_ae ?_
       filter_upwards [mulOperator_apply_ae ψ, AEEqFun.coeFn_mk g hg] with x h₁ h₂
       simp [h₁, h₂, g, sub_mul, mul_assoc, mul_left_comm]
     have hu₂ : u.2 =ᵐ[volume] (conj ∘ f) • u.1 := by
       sorry
-    have hu₁ : u.1 ∈ (ℳ (conj ∘ f)).domain :=
+    have hu₁ : u.1 ∈ (𝓜 (conj ∘ f)).domain :=
       mem_mulOperator_domain_iff.mpr <| memHS_of_ae u.2 (coe_hilbertSpace_memHS u.2) hu₂
     apply (mem_graph_iff _).mpr
     refine ⟨⟨u.1, hu₁⟩, rfl, ?_⟩
@@ -214,7 +214,7 @@ lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurab
 @[sorryful]
 lemma mulOperator_isSelfAdjoint_ofReal
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f) (hf' : conj ∘ f = f) :
-    IsSelfAdjoint (ℳ f) := by
+    IsSelfAdjoint (𝓜 f) := by
   apply isSelfAdjoint_def.mpr
   rw [mulOperator_adjoint_eq_conj hf, hf']
 
@@ -224,17 +224,17 @@ lemma mulOperator_isSelfAdjoint_ofReal
 
 @[sorryful]
 lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (ℳ f).IsClosable := by
+    (𝓜 f).IsClosable := by
   refine isClosable_of_exists_dense_formalAdjoint ?_ ?_
   · exact mulOperator_hasDenseDomain hf
-  · refine ⟨ℳ (conj ∘ f), ?_, ?_⟩
+  · refine ⟨𝓜 (conj ∘ f), ?_, ?_⟩
     · exact mulOperator_hasDenseDomain (by measurability)
     · rw [← mulOperator_adjoint_eq_conj hf]
       exact adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)
 
 @[sorryful]
 lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (ℳ f).IsUnbounded :=
+    (𝓜 f).IsUnbounded :=
   ⟨mulOperator_hasDenseDomain hf, mulOperator_isClosable hf⟩
 
 end
