@@ -374,7 +374,7 @@ lemma IsUnbounded.adjoint [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounde
   exact hx y (mem_domain_of_mem_graph hy)
 
 @[simp]
-lemma IsUnbounded.closure_adjoint_eq_adjoint [CompleteSpace H] (h : U.IsUnbounded) :
+lemma IsUnbounded.adjoint_closure_eq_adjoint [CompleteSpace H] (h : U.IsUnbounded) :
     U.closure† = U† := by
   refine eq_of_eq_graph ?_
   ext
