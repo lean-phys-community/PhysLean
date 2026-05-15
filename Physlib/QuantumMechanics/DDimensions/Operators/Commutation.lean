@@ -228,7 +228,7 @@ lemma radiusRegPow_commutation_momentumSqr :
         ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, dotProduct, mul_def, mul_assoc]
     _ = (2 * s * I * ℏ) • 𝐫₀ ε (s-2) ∘L (𝐱 ⬝ᵥ 𝐩) + (s * (d + s - 2) * ℏ ^ 2) • 𝐫₀ ε (s-2)
         - (ε ^ 2 * s * (s - 2) * ℏ ^ 2) • 𝐫₀ ε (s-4) := by
-      simp_rw [positionCLMSqr_eq ε, comp_sub, comp_smul, comp_id, radiusRegPowCLM_comp_eq]
+      simp_rw [positionSqCLM_eq ε, comp_sub, comp_smul, comp_id, radiusRegPowCLM_comp_eq]
       simp only [smul_sub, smul_smul, ← Complex.coe_smul, ofReal_mul, ofReal_add, ofReal_sub,
         ofReal_pow, ofReal_ofNat, ofReal_natCast]
       ring_nf

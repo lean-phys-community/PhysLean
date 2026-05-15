@@ -173,7 +173,7 @@ lemma radiusRegPowCLM_zero {d : ℕ} (ε : ℝˣ) :
   simp
 
 set_option backward.isDefEq.respectTransparency false in
-lemma positionCLMSqr_eq {d : ℕ} (ε : ℝˣ) :
+lemma positionSqCLM_eq {d : ℕ} (ε : ℝˣ) :
     ∑ i, 𝐱 i ∘L 𝐱 i = 𝐫₀ ε 2 - ε.1 ^ 2 • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
   simp [Space.norm_sq_eq, add_mul, ← mul_assoc, ← pow_two, Finset.sum_mul]
