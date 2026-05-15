@@ -138,7 +138,7 @@ lemma momentumOperator_isUnbounded : (𝐏 i).IsUnbounded := by
   · exact momentumOperator_hasDenseDomain i
 
 /-- The square of the momentum operator. -/
-def momentumSqrOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
+def momentumSqOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
   ∑ i, (𝐏 i).comp (𝐏 i) (momentumOperator_range i)
 
 end
