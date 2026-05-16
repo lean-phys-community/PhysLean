@@ -22,11 +22,11 @@ open BigOperators
 
 /-- The vector space of charges corresponding to the SM fermions with RHN. -/
 @[simps!]
-def SMνCharges (n : ℕ) : ACCSystemCharges := ACCSystemChargesMk (6 * n)
+def SMνCharges (n : ℕ) : ACCSystemCharges := ⟨6 * n⟩
 
 /-- The vector spaces of charges of one species of fermions in the SM. -/
 @[simps!]
-def SMνSpecies (n : ℕ) : ACCSystemCharges := ACCSystemChargesMk n
+def SMνSpecies (n : ℕ) : ACCSystemCharges := ⟨n⟩
 
 namespace SMνCharges
 

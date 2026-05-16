@@ -21,11 +21,11 @@ open BigOperators
 
 /-- The vector space of charges corresponding to the MSSM fermions. -/
 @[simps!]
-def MSSMCharges : ACCSystemCharges := ACCSystemChargesMk 20
+def MSSMCharges : ACCSystemCharges := ⟨20⟩
 
 /-- The vector spaces of charges of one species of fermions in the MSSM. -/
 @[simps!]
-def MSSMSpecies : ACCSystemCharges := ACCSystemChargesMk 3
+def MSSMSpecies : ACCSystemCharges := ⟨3⟩
 
 namespace MSSMCharges
 

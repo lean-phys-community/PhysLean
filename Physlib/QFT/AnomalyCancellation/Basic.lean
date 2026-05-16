@@ -41,7 +41,6 @@ Related to these are the different types of spaces of charges:
 ## iii. Table of contents
 
 - A. The module of charges
-  - A.1. A constructor for `ACCSystemCharges`
 - B. The module of charges
   - B.1. The `ℚ`-module structure on the type `Charges`
   - B.2. The finiteness of the `ℚ`-module structure on `Charges`
@@ -102,19 +101,6 @@ structure ACCSystemCharges where
   numberCharges : ℕ
 
 /-!
-
-### A.1. A constructor for `ACCSystemCharges`
-
-We provide a constructor `ACCSystemChargesMk` for `ACCSystemCharges` given the number of charges.
-
--/
-
-TODO "Replace `ACCSystemChargesMk` with `⟨n⟩` notation everywhere. "
-/--
-  Creates an `ACCSystemCharges` object with the specified number of charges.
--/
-def ACCSystemChargesMk (n : ℕ) : ACCSystemCharges where
-  numberCharges := n
 
 namespace ACCSystemCharges
 
