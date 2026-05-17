@@ -100,8 +100,6 @@ structure ACCSystemCharges where
   /-- The number of charges. -/
   numberCharges : ℕ
 
-/-!
-
 namespace ACCSystemCharges
 
 /-!
