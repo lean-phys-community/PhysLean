@@ -5,7 +5,7 @@ Authors: Matteo Cipollina
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded_v2
+public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Mathlib.Analysis.SpecialFunctions.Sqrt
 /-!
 # State observables
