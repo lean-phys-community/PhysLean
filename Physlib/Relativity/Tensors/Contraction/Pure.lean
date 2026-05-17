@@ -79,6 +79,24 @@ lemma dropPairEmb_eq_succAbove_succAbove (i : Fin (n + 1 + 1)) (j : Fin (n + 1))
       simp_all
       try omega
 
+lemma dropPairEmb_eq_predAbove {i j : Fin (n + 1 + 1)} (hij : i ≠ j) :
+    dropPairEmb i j = fun x => (i.succAbove (((Fin.predAbove 0 i).predAbove j).succAbove x)) := by
+  rcases Fin.eq_self_or_eq_succAbove i j with rfl | ⟨j, rfl⟩
+  · contradiction
+  · ext x
+    rw [dropPairEmb_eq_succAbove_succAbove, Function.comp_apply]
+    congr
+    rcases eq_or_ne i 0 with rfl | hi
+    · rfl
+    · rw [Fin.predAbove_zero_of_ne_zero hi]
+      rcases lt_or_ge (i.pred hi).castSucc (i.succAbove j) with h | h
+      · rw [Fin.predAbove_of_castSucc_lt _ _ h, Fin.pred_succAbove]
+        rw [← Fin.lt_succAbove_iff_le_castSucc]
+        exact lt_of_le_of_ne ((Fin.castSucc_pred_lt_iff hi).mp h) hij
+      · rw [Fin.predAbove_of_le_castSucc _ _ h, Fin.castPred_succAbove]
+        rw [Fin.castSucc_lt_iff_succ_le, ← Fin.succAbove_lt_iff_succ_le]
+        exact (Fin.le_castSucc_pred_iff hi).mp h
+
 lemma dropPairEmb_injective {n : ℕ}
     (i j : Fin (n + 1 + 1)) : Function.Injective (dropPairEmb i j) := by
   rcases Fin.eq_self_or_eq_succAbove i j with rfl | ⟨j, rfl⟩

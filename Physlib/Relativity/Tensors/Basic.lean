@@ -8,6 +8,7 @@ module
 public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
+public import Mathlib.Tactic.Cases
 public import Physlib.Meta.TODO.Basic
 /-!
 
@@ -848,6 +849,30 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
   · intro t1 t2 h1 h2
     simp [h1, h2]
 
+lemma permT_basis {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
+    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    (b : ComponentIdx c) :
+    (permT σ h) (basis (S := S) c b) = basis c1 (fun i =>
+      basisIdxCongr (by simp [h.2]) (b (σ i))) := by
+  apply (basis c1).repr.injective
+  ext b'
+  rw [permT_basis_repr_symm_apply]
+  simp only [Basis.repr_self, Finsupp.single_apply]
+  congr 1
+  simp only [eq_iff_iff]
+  constructor
+  · intro h
+    rw [h]
+    ext i
+    simp only [basisIdxCongr_apply_apply]
+    refine Eq.symm (ComponentIdx.congr_right b' i (PermCond.inv σ _ (σ i)) ?_)
+    simp [PermCond.apply_inv_apply]
+  · rintro rfl
+    ext i
+    simp only [basisIdxCongr_apply_apply]
+    apply ComponentIdx.congr_right
+    simp [PermCond.inv_apply_apply]
+
 lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (t : S.Tensor c) :
     permT σ h t = 0 ↔ t = 0 := by
@@ -887,6 +912,14 @@ lemma toField_pure {c : Fin 0 → C} (p : Pure S c) :
   congr
   ext i
   exact Fin.elim0 i
+
+lemma toField_permT {c c1 : Fin 0 → C} (σ : Fin 0 → Fin 0) (h : PermCond c c1 σ) (t : S.Tensor c) :
+    toField (permT σ h t) = toField t := by
+  induction' t using induction_on_basis with b r t ht t1 t2 h1 h2
+  · simp [toField_pure, basis_apply, permT_pure]
+  · simp
+  · simp [ht]
+  · simp [h1, h2]
 
 @[simp]
 lemma toField_basis_default {c : Fin 0 → C} :

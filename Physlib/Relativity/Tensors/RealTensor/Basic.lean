@@ -7,6 +7,8 @@ module
 
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
 public import Physlib.Relativity.Tensors.Contraction.Basis
+public import Physlib.Relativity.Tensors.Elab
+meta import Mathlib.Tactic.Cases
 /-!
 
 ## Real Lorentz tensors
@@ -233,6 +235,74 @@ lemma contrT_basis_repr_apply_eq_fin {n d: ℕ} {c : Fin (n + 1 + 1) → realLor
     · simp only [basisIdxCongr_apply]
       exact Ne.symm hy
   · simp
+
+/-!
+
+## Contractions and to Field
+
+-/
+
+attribute [-simp] Fintype.sum_sum_type
+
+lemma contrPCoeff_basis {d n : ℕ} {c : Fin n → realLorentzTensor.Color} (i j : Fin n)
+    (hij : i ≠ j ∧ (realLorentzTensor d).τ (c i) = c j)
+    (b : ComponentIdx (S := realLorentzTensor d) c) :
+    Pure.contrPCoeff i j hij (Pure.basisVector c b) = if b i = b j then 1 else 0 := by
+  simp only [Pure.contrPCoeff, Monoidal.tensorUnit_obj, Rep.tensorUnit_V, Rep.tensorUnit_ρ,
+    Functor.comp_obj, Discrete.functor_obj_eq_as, Function.comp_apply, Pure.basisVector]
+  generalize b i = b1 at *
+  generalize b j = b2 at *
+  suffices h : ∀ c, ∀ c1,  (hc : (realLorentzTensor d).τ c = c1) →
+    (realLorentzTensor d).castToField ((ConcreteCategory.hom
+    ((realLorentzTensor d).contr.app { as :=c }))
+    (((realLorentzTensor d).basis c) b1 ⊗ₜ[ℝ]
+      (ConcreteCategory.hom ((realLorentzTensor d).FD.map (eqToHom (by simp_all))))
+      (((realLorentzTensor d).basis c1) b2))) =
+    if b1 = b2 then 1 else 0 by
+    exact h (c i) (c j) hij.2
+  rintro c c1 rfl
+  exact contr_basis _ _
+
+lemma contrT_eq_sum_evalT {n} {d} (c : Fin (n + 1 + 1) → Color) (i j : Fin (n + 1 + 1))
+    (h : i ≠ j ∧ (realLorentzTensor d).τ (c i) = c j) (t : ℝT(d, c)) :
+    contrT n i j h t =  ∑ (μ : Fin 1 ⊕ Fin d), permT id (by
+      simp [Pure.dropPairEmb_eq_predAbove h.1])
+     (evalT ((Fin.predAbove 0 i).predAbove j) μ (evalT i μ t)) := by
+  induction' t using Tensor.induction_on_basis with b r t h t1 t2 h1 h2
+  · rw [contrT_basis]
+    simp only [ contrPCoeff_basis, ite_smul, one_smul, zero_smul]
+    conv_rhs =>
+      enter [2, μ];
+      simp only [evalT_basis, Fin.zero_succAbove, apply_ite, Fin.succ_zero_eq_one, map_zero]
+    simp only [Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+    have h0 : i.succAbove ((Fin.predAbove 0 i).predAbove j) = j := by
+      rcases i.eq_zero_or_eq_succ with rfl | ⟨k, rfl⟩
+      · exact Fin.succAbove_predAbove (Ne.symm h.1)
+      · rw [Fin.predAbove_zero_succ]
+        exact Fin.succ_succAbove_predAbove (Ne.symm h.1)
+    rw [h0]
+    split_ifs with h₁ _ h₂
+    · rw [permT_basis]
+      congr
+      ext x
+      simp only [Function.comp_apply, ComponentIdx.dropPair, id_eq, basisIdxCongr_eq_refl,
+        Equiv.refl_apply]
+      rw [Pure.dropPairEmb_eq_predAbove h.1]
+    · symm at h₁; contradiction
+    · symm at h₂; contradiction
+    · rfl
+  · simp
+  · simp [Finset.smul_sum, h]
+  · simp [h1, h2, Finset.sum_add_distrib]
+
+lemma contrT_toField {d} (c : Fin 2 → Color)
+    (h : 0 ≠ 1 ∧ (realLorentzTensor d).τ (c 0) = c 1) (t : ℝT(d, c)) :
+    (contrT 0 0 1 h t).toField = ∑ (μ : Fin 1 ⊕ Fin d), {t | [μ] [μ]}ᵀ.toField := by
+  rw [contrT_eq_sum_evalT, map_sum, Tensorial.self_toTensor_apply]
+  congr
+  ext μ
+  simp only [toField_permT]
+  rfl
 
 end realLorentzTensor
 end

@@ -93,12 +93,12 @@ lemma contrMetric_eq_fromPairT {d : ℕ} :
 @[simp]
 lemma actionT_coMetric {d : ℕ} (g : LorentzGroup d) :
     g • η' d = η' d:= by
-  rw [TensorSpecies.metricTensor_invariant]
+  erw [TensorSpecies.metricTensor_invariant]
 
 /-- The tensor `contrMetric` is invariant under the action of `LorentzGroup d`. -/
 @[simp]
 lemma actionT_contrMetric {d} (g : LorentzGroup d) : g • η d = η d := by
-  rw [TensorSpecies.metricTensor_invariant]
+  erw [TensorSpecies.metricTensor_invariant]
 
 /-
 
