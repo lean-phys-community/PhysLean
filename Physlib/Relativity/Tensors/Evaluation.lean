@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.Basic
+public import Physlib.Relativity.Tensors.Product
 /-!
 
 # Evaluation of tensor indices
@@ -56,6 +57,10 @@ lemma evalPCoeff_update_succAbove (i : Fin (n + 1)) [inst : DecidableEq (Fin (n 
     (x : S.FD.obj (Discrete.mk (c (i.succAbove j)))) :
     evalPCoeff i b (p.update (i.succAbove j) x) = evalPCoeff i b p := by
   simp [evalPCoeff]
+
+lemma evalPCoeff_basisVector (i : Fin (n + 1)) (b : basisIdx (c i)) (b' : ComponentIdx (S := S) c) :
+    evalPCoeff i b (Pure.basisVector c b') = if b' i = b then (1 : k) else 0 := by
+  simp [evalPCoeff, basisVector, Finsupp.single_apply]
 
 /-!
 
@@ -133,6 +138,14 @@ lemma evalT_pure {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
   simp only [evalT, Pure.toTensor]
   change _ = Pure.evalPMultilinear i b p
   conv_rhs => rw [← PiTensorProduct.lift.tprod]
+  rfl
+
+lemma evalT_basis {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
+    (b : ComponentIdx c) (x : basisIdx (c i)) :
+    evalT i x (basis (S := S) c b) = if b i = x then basis (c ∘ i.succAbove)
+      (fun j => b (i.succAbove j)) else 0 := by
+  simp only [basis_apply, evalT_pure, Pure.evalP, Pure.evalPCoeff_basisVector, ite_smul, one_smul,
+    zero_smul]
   rfl
 
 TODO "Add lemmas related to the interaction of evalT and permT, prodT and contrT."

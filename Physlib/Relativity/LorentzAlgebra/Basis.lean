@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.LorentzAlgebra.Basic
-public import Physlib.Meta.TODO.Basic
 /-!
 # Generators of the Lorentz Algebra
 
@@ -145,23 +144,40 @@ lemma rotationGenerator_mem (i : Fin 3) : rotationGenerator i ∈ lorentzAlgebra
     simp only [Sum.elim_inr]
     fin_cases i <;> fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
 
-/-!
-## TODO: Properties of Generators
+/-- The boost generators are symmetric. -/
+@[simp]
+lemma boostGenerator_transpose (i : Fin 3) :
+    (boostGenerator i)ᵀ = boostGenerator i := by
+  ext μ ν
+  rcases μ with μ | μ <;> rcases ν with ν | ν <;>
+    fin_cases μ <;> fin_cases ν <;> simp [boostGenerator]
 
-The following properties are documented in the docstrings but not yet formally proven.
-These should be established in future PRs to complete the characterization of the generators.
--/
+/-- The boost generators are traceless. -/
+@[simp]
+lemma boostGenerator_trace (i : Fin 3) :
+    Matrix.trace (boostGenerator i) = 0 := by
+  rw [Matrix.trace]
+  apply Finset.sum_eq_zero
+  intro μ _
+  rcases μ with μ | μ <;> simp [boostGenerator]
 
-TODO "Prove that boost generators are symmetric: \
-  (boostGenerator i)ᵀ = boostGenerator i"
+/-- The rotation generators are antisymmetric. -/
+@[simp]
+lemma rotationGenerator_transpose (i : Fin 3) :
+    (rotationGenerator i)ᵀ = -rotationGenerator i := by
+  ext μ ν
+  fin_cases i <;> rcases μ with μ | μ <;> rcases ν with ν | ν <;>
+    fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
 
-TODO "Prove that boost generators are traceless: \
-  Matrix.trace (boostGenerator i) = 0"
-
-TODO "Prove that rotation generators are antisymmetric: \
-  (rotationGenerator i)ᵀ = -(rotationGenerator i)"
-
-TODO "Prove that rotation generators are traceless: \
-  Matrix.trace (rotationGenerator i) = 0"
+/-- The rotation generators are traceless. -/
+@[simp]
+lemma rotationGenerator_trace (i : Fin 3) :
+    Matrix.trace (rotationGenerator i) = 0 := by
+  rw [Matrix.trace]
+  apply Finset.sum_eq_zero
+  intro μ _
+  rcases μ with μ | μ
+  · fin_cases i <;> simp [rotationGenerator]
+  · fin_cases i <;> fin_cases μ <;> simp [rotationGenerator]
 
 end lorentzAlgebra

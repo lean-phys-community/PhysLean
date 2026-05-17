@@ -6,8 +6,11 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.SpaceTime.Derivatives
+public import Physlib.SpaceAndTime.Space.Derivatives.Curl
 public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
 public import Physlib.Relativity.Tensors.Elab
+public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
+
 /-!
 
 # The Electromagnetic Potential
@@ -31,11 +34,12 @@ spacetime to contravariant Lorentz vectors.
 
 - A. The electromagnetic potential
   - A.1. Basic instances on the type of electromagnetic potentials
-  - A.2. The group action on the ElectromagneticPotential
-  - A.3. Differentiability
-  - A.4. The action on the space-time derivatives
-  - A.5. Variational adjoint derivative of component
-  - A.6. Variational adjoint derivative of derivatives of the potential
+  - A.2. Basic constructors of the electromagnetic potential
+  - A.3. The group action on the ElectromagneticPotential
+  - A.4. Differentiability
+  - A.5. The action on the space-time derivatives
+  - A.6. Variational adjoint derivative of component
+  - A.7. Variational adjoint derivative of derivatives of the potential
 - B. The derivative tensor of the electromagnetic potential
   - B.1. Equivariance of the derivative tensor
   - B.2. The elements of the derivative tensor in terms of the basis
@@ -121,7 +125,81 @@ lemma smul_apply {d} (r : ℝ) (A : ElectromagneticPotential d) (x : SpaceTime d
 
 /-!
 
-## A.2. The group action on the ElectromagneticPotential
+## A.2. Basic constructors of the electromagnetic potential
+
+-/
+
+/-- The electromagnetic potential from a scalar potential, where
+  the vector potential is set to zero. -/
+noncomputable def ofScalarPotential {d} (c : SpeedOfLight)
+    (ϕ : Time → Space d → ℝ) : ElectromagneticPotential d where
+  val x μ :=
+    match μ with
+    | Sum.inl 0 => (timeSlice c).symm ϕ x
+    | Sum.inr _ => 0
+
+/-- The creation of an electromagnetic potential from a static scalar potential. -/
+noncomputable def ofStaticScalarPotential {d} (c : SpeedOfLight)
+    (ϕ : Space d → ℝ) : ElectromagneticPotential d :=
+  ofScalarPotential c (fun _ => ϕ)
+
+/-- The electromagnetic potential from a vector potential, where
+  the scalar potential is set equal to zero. -/
+noncomputable def ofVectorPotential {d} (c : SpeedOfLight)
+     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
+    ElectromagneticPotential d where
+  val x μ :=
+    match μ with
+    | Sum.inl 0 => 0
+    | Sum.inr i => (timeSlice c).symm A x i
+
+/-- The creation of an electromagnetic potential from a static vector potential. -/
+noncomputable def ofStaticVectorPotential {d} (c : SpeedOfLight)
+    (A : Space d → EuclideanSpace ℝ (Fin d)) : ElectromagneticPotential d :=
+  ofVectorPotential c (fun _ => A)
+
+/-- The creation of an electromagnetic potential from the non-relativistic potentials. -/
+noncomputable def ofPotentials {d} (c : SpeedOfLight) (ϕ : Time → Space d → ℝ)
+    (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
+    ElectromagneticPotential d where
+  val x μ :=
+    match μ with
+    | Sum.inl 0 => (timeSlice c).symm ϕ x
+    | Sum.inr i => (timeSlice c).symm A x i
+
+/-- The creation of of an electromagnetic potential from static potentials. -/
+noncomputable def ofStaticPotentials {d} (c : SpeedOfLight) (ϕ : Space d → ℝ)
+    (A : Space d → EuclideanSpace ℝ (Fin d)) : ElectromagneticPotential d :=
+  ofStaticScalarPotential c ϕ + ofStaticVectorPotential c A
+
+/-- The electromagnetic potential from a static electric and a static magnetic field.
+  There is no canonical choice here, so this depends on choice. -/
+noncomputable def ofStaticElectricMagneticField (c : SpeedOfLight)
+    (E : Space 3 → EuclideanSpace ℝ (Fin 3))
+    (B : Space 3 → EuclideanSpace ℝ (Fin 3))
+    (hE : Differentiable ℝ E) (hB : ContDiff ℝ 1 B)
+    (E_curl : Space.curl E = 0) (B_div : Space.div B = 0) :
+    ElectromagneticPotential 3 :=
+  have φ : Space 3 → ℝ := - Classical.choose (Space.exists_grad_of_curl_zero E hE E_curl)
+  have A : Space 3 → EuclideanSpace ℝ (Fin 3) :=
+    Classical.choose (Space.exists_curl_of_div_zero B hB B_div)
+  ofStaticPotentials c φ A
+
+TODO "Add a constructor of the electromagnetic potential from non-static electric and
+  magnetic fields."
+
+TODO "Prove differentiability conditions with respect to the constructors of
+  the electromagnetic potential."
+
+TODO "Write lemmas for the various properties (e.g. the electric field) of
+  the electromagnetic potential from the various constructors."
+
+TODO "Define constructors for the distributional electromagnetic potential, similar
+  to e.g. `ofScalarPotential` and `ofVectorPotential` for `ElectromagneticPotential`."
+
+/-!
+
+## A.3. The group action on the ElectromagneticPotential
 
 -/
 
@@ -143,7 +221,7 @@ TODO "Lift the action on `ElectromagneticPotential d` to a `DistribMulAction`."
 
 /-!
 
-### A.3. Differentiability
+### A.4. Differentiability
 
 We show that the components of field strength tensor are differentiable if the potential is.
 -/
@@ -207,7 +285,7 @@ TODO "Add results related to the differentiability of the
 
 /-!
 
-### A.4. The action on the space-time derivatives
+### A.5. The action on the space-time derivatives
 
 Given a ElectromagneticPotential `A^μ`, we can consider its derivative `∂_μ A^ν`.
 Under a Lorentz transformation `Λ`, this transforms as
@@ -272,7 +350,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
 
 /-!
 
-### A.5. Variational adjoint derivative of component
+### A.6. Variational adjoint derivative of component
 
 We find the variational adjoint derivative of the components of the potential.
 This will be used to find e.g. the variational derivative of the kinetic term,
@@ -305,7 +383,7 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
 
 /-!
 
-### A.6. Variational adjoint derivative of derivatives of the potential
+### A.7. Variational adjoint derivative of derivatives of the potential
 
 We find the variational adjoint derivative of the derivatives of the components of the potential.
 This will again be used to find the variational derivative of the kinetic term,
