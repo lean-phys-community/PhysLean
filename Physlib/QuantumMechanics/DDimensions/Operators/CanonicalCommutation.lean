@@ -22,8 +22,10 @@ inequality, which is proved in `LinearPMap` form in
 
 - `QuantumMechanics.positionPMapSchwartz`: position as a partial linear map with Schwartz domain.
 - `QuantumMechanics.momentumPMapSchwartz`: momentum as a partial linear map with Schwartz domain.
+- `QuantumMechanics.schwartzCoord_position_momentum_commutator`: the CCR on pullback
+  `schwartzEquiv.symm ψ` in `𝓢(Space d, ℂ)`.
 - `QuantumMechanics.positionPMapSchwartz_commutator_momentumPMapSchwartz`: the transported
-  canonical commutation relation.
+  canonical commutation relation for the partial maps.
 - `QuantumMechanics.position_momentum_same_coordinate_uncertainty_squared`: the squared
   same-coordinate lower bound.
 - `QuantumMechanics.position_momentum_same_coordinate_uncertainty`: the same-coordinate
@@ -38,108 +40,120 @@ inequality, which is proved in `LinearPMap` form in
 
 namespace QuantumMechanics
 
-open Complex Constants
+open Bracket Complex Constants
 open KroneckerDelta
 open SpaceDHilbertSpace
 open SchwartzSubmodule
 open SchwartzMap
 open InnerProductSpace
 open LinearPMap
+open ContinuousLinearMap
 
 noncomputable section
 
-variable {d : ℕ} (i j : Fin d)
+variable {d : ℕ}
 
 /-- Position as a partial linear map on `SpaceDHilbertSpace d`, with Schwartz domain. -/
-def positionPMapSchwartz : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  LinearPMap.mk (schwartzSubmodule d)
-    ((schwartzSubmodule d).subtype ∘ₗ positionOperatorSchwartz i)
+def positionPMapSchwartz (i : Fin d) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
+  domain := schwartzSubmodule d
+  toFun := schwartzIncl.toLinearMap ∘ₗ (𝐱 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
 /-- Momentum as a partial linear map on `SpaceDHilbertSpace d`, with Schwartz domain. -/
-def momentumPMapSchwartz : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  LinearPMap.mk (schwartzSubmodule d)
-    ((schwartzSubmodule d).subtype ∘ₗ momentumOperatorSchwartz i)
+abbrev momentumPMapSchwartz (i : Fin d) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
+  momentumOperator (d := d) (i := i)
 
 @[simp]
-lemma positionPMapSchwartz_domain :
-    (positionPMapSchwartz (d := d) i).domain = schwartzSubmodule d :=
+lemma positionPMapSchwartz_domain (i : Fin d) :
+    (positionPMapSchwartz i).domain = schwartzSubmodule d :=
   rfl
 
 @[simp]
-lemma momentumPMapSchwartz_domain :
-    (momentumPMapSchwartz (d := d) i).domain = schwartzSubmodule d :=
+lemma momentumPMapSchwartz_domain (i : Fin d) :
+    (momentumPMapSchwartz i).domain = schwartzSubmodule d :=
   rfl
 
 @[simp]
-lemma positionPMapSchwartz_apply (ψ : schwartzSubmodule d) :
-    positionPMapSchwartz i ψ = (positionOperatorSchwartz i ψ : SpaceDHilbertSpace d) :=
+lemma positionPMapSchwartz_apply (i : Fin d) (ψ : schwartzSubmodule d) :
+    positionPMapSchwartz i ψ = schwartzEquiv (𝐱 i (schwartzEquiv.symm ψ)) :=
   rfl
 
-@[simp]
-lemma momentumPMapSchwartz_apply (ψ : schwartzSubmodule d) :
-    momentumPMapSchwartz i ψ = (momentumOperatorSchwartz i ψ : SpaceDHilbertSpace d) :=
-  rfl
+lemma momentumPMapSchwartz_apply (i : Fin d) (ψ : schwartzSubmodule d) :
+    momentumPMapSchwartz i ψ = schwartzEquiv (𝐩 i (schwartzEquiv.symm ψ)) :=
+  momentumOperator_apply i ψ
+
+lemma positionPMapSchwartz_range (i : Fin d) (ψ : schwartzSubmodule d) :
+    positionPMapSchwartz i ψ ∈ schwartzSubmodule d := by
+  simp [positionPMapSchwartz_apply]
 
 /-- The position partial map is symmetric on the Schwartz domain. -/
-lemma positionPMapSchwartz_isSymmetric :
-    (positionPMapSchwartz (d := d) i).IsSymmetric :=
-  fun ψ φ ↦ positionOperatorSchwartz_isSymmetric i ψ φ
+lemma positionPMapSchwartz_isSymmetric (i : Fin d) :
+    (positionPMapSchwartz i).IsSymmetric := by
+  intro ψ φ
+  obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
+  obtain ⟨g, rfl⟩ := schwartzEquiv.surjective φ
+  simp only [positionPMapSchwartz_apply, ← Submodule.coe_inner, schwartzEquiv_inner,
+    schwartzEquiv.symm_apply_apply, positionCLM_apply]
+  open MeasureTheory in
+  refine integral_congr_ae ?_
+  filter_upwards with x
+  have hi : starRingEnd ℂ ((↑(x i) : ℂ) * f x) = (↑(x i) : ℂ) * starRingEnd ℂ (f x) := by
+    rw [map_mul, Complex.conj_ofReal]
+  rw [hi]
+  ring
 
 /-- The momentum partial map is symmetric on the Schwartz domain. -/
-lemma momentumPMapSchwartz_isSymmetric :
-    (momentumPMapSchwartz (d := d) i).IsSymmetric :=
-  fun ψ φ ↦ momentumOperatorSchwartz_isSymmetric i ψ φ
+lemma momentumPMapSchwartz_isSymmetric (i : Fin d) :
+    (momentumPMapSchwartz i).IsSymmetric :=
+  momentumOperator_isSymmetric i
 
 /-- The Schwartz position partial map is densely defined and closable. -/
-lemma positionPMapSchwartz_isUnbounded :
-    (positionPMapSchwartz (d := d) i).IsUnbounded :=
-  LinearPMap.isUnbounded_of_dense_of_isSymmetric'
-    (SchwartzSubmodule.dense d) (positionOperatorSchwartz_isSymmetric i)
+lemma positionPMapSchwartz_isUnbounded (i : Fin d) :
+    (positionPMapSchwartz i).IsUnbounded := by
+  refine (LinearPMap.IsSymmetric.isUnbounded_iff_hasDenseDomain
+    (positionPMapSchwartz_isSymmetric i)).mpr ?_
+  exact SchwartzSubmodule.dense d
 
 /-- The Schwartz momentum partial map is densely defined and closable. -/
-lemma momentumPMapSchwartz_isUnbounded :
-    (momentumPMapSchwartz (d := d) i).IsUnbounded :=
-  LinearPMap.isUnbounded_of_dense_of_isSymmetric'
-    (SchwartzSubmodule.dense d) (momentumOperatorSchwartz_isSymmetric i)
+lemma momentumPMapSchwartz_isUnbounded (i : Fin d) :
+    (momentumPMapSchwartz i).IsUnbounded :=
+  momentumOperator_isUnbounded i
 
-/-- The continuous Schwartz operators satisfy `[xᵢ, pⱼ] = iℏ δᵢⱼ`. -/
-lemma positionOperatorSchwartz_commutator_momentumOperatorSchwartz
-    (ψ : schwartzSubmodule d) :
-    positionOperatorSchwartz i (momentumOperatorSchwartz j ψ) -
-        momentumOperatorSchwartz j (positionOperatorSchwartz i ψ) =
-      (I * ℏ) • δ[i,j] • ψ := by
-  apply schwartzEquiv.symm.injective
-  simpa [Bracket.bracket, ContinuousLinearMap.mul_def, positionOperatorSchwartz,
-    momentumOperatorSchwartz, sub_eq_add_neg, smul_smul] using
-    congrArg (· (schwartzEquiv.symm ψ)) (position_commutation_momentum i j)
+/-- Schwartz maps satisfy the coordinate canonical commutation relation. -/
+lemma schwartzCoord_position_momentum_commutator (i j : Fin d) (ψ : schwartzSubmodule d) :
+    𝐱 i (𝐩 j (schwartzEquiv.symm ψ)) - 𝐩 j (𝐱 i (schwartzEquiv.symm ψ)) =
+      (I * ℏ) • δ[i,j] • schwartzEquiv.symm ψ := by
+  simpa [Bracket.bracket, ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply,
+    ContinuousLinearMap.id_apply] using
+    congrArg (fun F : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) => F (schwartzEquiv.symm ψ))
+      (position_commutation_momentum i j)
 
 /-- The canonical commutation relation for the position and momentum partial maps on the Schwartz
 domain. -/
-lemma positionPMapSchwartz_commutator_momentumPMapSchwartz
-    (ψ : schwartzSubmodule d) :
+lemma positionPMapSchwartz_commutator_momentumPMapSchwartz (i j : Fin d) (ψ : schwartzSubmodule d) :
     positionPMapSchwartz i
         ⟨(momentumPMapSchwartz j ψ : SpaceDHilbertSpace d),
-          (momentumOperatorSchwartz j ψ).property⟩ -
+          momentumOperator_range j ψ⟩ -
       momentumPMapSchwartz j
         ⟨(positionPMapSchwartz i ψ : SpaceDHilbertSpace d),
-          (positionOperatorSchwartz i ψ).property⟩ =
+          positionPMapSchwartz_range i ψ⟩ =
       (I * ℏ) • δ[i,j] • (ψ : SpaceDHilbertSpace d) := by
-  simpa only using
+  simpa [positionPMapSchwartz_apply, momentumPMapSchwartz_apply, schwartzEquiv.apply_symm_apply,
+    Submodule.coe_smul, Submodule.coe_sub] using
     congrArg ((↑) : schwartzSubmodule d → SpaceDHilbertSpace d)
-      (positionOperatorSchwartz_commutator_momentumOperatorSchwartz i j ψ)
+      (congrArg schwartzEquiv (schwartzCoord_position_momentum_commutator i j ψ))
 
 /-- Expectation-level form of the same-coordinate canonical commutation relation. -/
 lemma inner_positionPMapSchwartz_commutator_momentumPMapSchwartz_same
-    (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
+    (i : Fin d) (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
     ⟪(ψ : SpaceDHilbertSpace d),
       (positionPMapSchwartz i
         ⟨(momentumPMapSchwartz i ψ : SpaceDHilbertSpace d),
-          (momentumOperatorSchwartz i ψ).property⟩ -
+          momentumOperator_range i ψ⟩ -
       momentumPMapSchwartz i
         ⟨(positionPMapSchwartz i ψ : SpaceDHilbertSpace d),
-          (positionOperatorSchwartz i ψ).property⟩)⟫_ℂ =
+          positionPMapSchwartz_range i ψ⟩)⟫_ℂ =
       I * ℏ := by
-  rw [positionPMapSchwartz_commutator_momentumPMapSchwartz (i := i) (j := i) ψ]
+  rw [positionPMapSchwartz_commutator_momentumPMapSchwartz i i ψ]
   simp only [KroneckerDelta.eq_one_of_same, one_smul]
   rw [inner_smul_right, inner_self_eq_norm_sq_to_K, hψ_norm, sq]
   simp
@@ -147,7 +161,7 @@ lemma inner_positionPMapSchwartz_commutator_momentumPMapSchwartz_same
 /-- The same-coordinate position and momentum variances satisfy the squared Heisenberg lower bound
 on normalized Schwartz-domain states. -/
 lemma position_momentum_same_coordinate_uncertainty_squared
-    (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
+    (i : Fin d) (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
     LinearPMap.stateVariance (positionPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property *
       LinearPMap.stateVariance (momentumPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property ≥
         (ℏ / 2) ^ 2 := by
@@ -157,12 +171,12 @@ lemma position_momentum_same_coordinate_uncertainty_squared
   simpa only [abs_of_nonneg ℏ_nonneg] using
     state_uncertainty_squared_of_raw_commutator A B (positionPMapSchwartz_isSymmetric i)
       (momentumPMapSchwartz_isSymmetric i) (ψ : SpaceDHilbertSpace d) ψ.property ψ.property
-      hψ_norm (positionOperatorSchwartz i ψ).property (momentumOperatorSchwartz i ψ).property
+      hψ_norm (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
       (c := ℏ) hraw
 
 /-- The same-coordinate Robertson-Schrodinger lower bound on normalized Schwartz-domain states. -/
 lemma position_momentum_same_coordinate_uncertainty_squared_with_covariance
-    (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
+    (i : Fin d) (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
     LinearPMap.stateVariance (positionPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property *
       LinearPMap.stateVariance (momentumPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property ≥
         (LinearPMap.stateCovariance (positionPMapSchwartz i) (momentumPMapSchwartz i)
@@ -174,13 +188,13 @@ lemma position_momentum_same_coordinate_uncertainty_squared_with_covariance
     state_uncertainty_squared_with_covariance_of_raw_commutator A B
       (positionPMapSchwartz_isSymmetric i) (momentumPMapSchwartz_isSymmetric i)
       (ψ : SpaceDHilbertSpace d) ψ.property ψ.property hψ_norm
-      (positionOperatorSchwartz i ψ).property (momentumOperatorSchwartz i ψ).property
+      (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
       (c := ℏ) hraw
 
 /-- The same-coordinate position and momentum standard deviations satisfy the Heisenberg lower
 bound on normalized Schwartz-domain states. -/
 lemma position_momentum_same_coordinate_uncertainty
-    (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
+    (i : Fin d) (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
     LinearPMap.stateStdDev (positionPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property *
       LinearPMap.stateStdDev (momentumPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property ≥
         ℏ / 2 := by
@@ -190,7 +204,7 @@ lemma position_momentum_same_coordinate_uncertainty
   simpa only [abs_of_nonneg ℏ_nonneg] using
     state_uncertainty_of_raw_commutator A B (positionPMapSchwartz_isSymmetric i)
       (momentumPMapSchwartz_isSymmetric i) (ψ : SpaceDHilbertSpace d) ψ.property ψ.property
-      hψ_norm (positionOperatorSchwartz i ψ).property (momentumOperatorSchwartz i ψ).property
+      hψ_norm (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
       (c := ℏ) hraw
 
 end
