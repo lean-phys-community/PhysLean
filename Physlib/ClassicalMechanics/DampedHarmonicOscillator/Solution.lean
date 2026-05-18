@@ -13,31 +13,34 @@ public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 
 ## i. Overview
 
-In this module we define the regime-specific solutions to the damped harmonic oscillator
-and prove that they satisfy the equation of motion. The formulas are split into an
-exponential decay factor and a regime-specific base trajectory: trigonometric for the
-underdamped case, polynomial for the critically damped case, and hyperbolic for the
-overdamped case.
+In this module we define the solution to the damped harmonic oscillator for given initial
+conditions and prove that it satisfies the equation of motion. The solution selects the
+appropriate closed form from the sign of the discriminant: trigonometric for the underdamped
+case, polynomial for the critically damped case, and hyperbolic for the overdamped case.
 
 ## ii. Key results
 
 - `InitialConditions` is a structure for the initial position and velocity.
-- `trajectoryUnderdamped`, `trajectoryCriticallyDamped`, and `trajectoryOverdamped` are the
-  explicit regime-specific trajectories.
-- `trajectory_underdamped_equationOfMotion`,
-  `trajectory_criticallydamped_equationOfMotion`, and
-  `trajectory_overdamped_equationOfMotion` prove that those trajectories satisfy the equation
-  of motion in their corresponding damping regimes.
+- `trajectory` selects the appropriate regime-specific trajectory from the sign of the
+  discriminant.
+- `trajectory_equationOfMotion_of_underdamped`,
+  `trajectory_equationOfMotion_of_criticallyDamped`, and
+  `trajectory_equationOfMotion_of_overdamped` prove the selected trajectory satisfies the
+  equation of motion in each damping regime.
+- `trajectory_equationOfMotion` proves that the selected trajectory satisfies the equation
+  of motion.
 
 ## iii. Table of contents
 
 - A. The initial conditions
 - B. Trajectories associated with the initial conditions
-  - B.1. Explicit regime-specific trajectories
-  - B.2. Shared calculus lemmas
-  - B.3. Derivatives of the base trajectories
+  - B.1. Regime-specific base trajectories
+  - B.2. The selected trajectory
+  - B.3. Shared calculus lemmas
+  - B.4. Derivatives of the base trajectories
 - C. Trajectories and equation of motion
-  - C.1. Uniqueness of the solutions
+  - C.1. The selected trajectory satisfies the equation of motion
+  - C.2. Uniqueness of the solutions
 
 ## iv. References
 
@@ -45,7 +48,12 @@ References for the damped harmonic oscillator include:
 - Landau & Lifshitz, Mechanics, page 76, section 25.
 - Goldstein, Classical Mechanics, Chapter 2.
 
+## v. TODOs
+
 -/
+TODO "Prove that the selected trajectory is the unique solution of the equation of motion with
+the given initial conditions."
+
 
 @[expose] public section
 
@@ -83,47 +91,87 @@ structure InitialConditions where
 For each damping regime, we give an explicit formula for the trajectory with the specified
 initial conditions.
 
-### B.1. Explicit regime-specific trajectories
+### B.1. Regime-specific base trajectories
 
 -/
 
 /-- The oscillatory part of the underdamped trajectory before exponential decay. -/
 noncomputable def underdampedBase
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  cos (S.underdampedAngularFrequency * t) • IC.x₀
-    + (sin (S.underdampedAngularFrequency * t)/S.underdampedAngularFrequency) •
+  cos (S.angularFrequency * t) • IC.x₀
+    + (sin (S.angularFrequency * t)/S.angularFrequency) •
       (IC.v₀ + S.decayRate • IC.x₀)
-
-/-- Given initial conditions, the solution in the underdamped regime. -/
-noncomputable def trajectoryUnderdamped
-    (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  exp (-S.decayRate * t) • S.underdampedBase IC t
 
 /-- The polynomial part of the critically damped trajectory before exponential decay. -/
 noncomputable def criticallyDampedBase
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
   IC.x₀ + (t : ℝ) • (IC.v₀ + S.decayRate • IC.x₀)
 
-/-- Given initial conditions, the solution in the critically damped regime. -/
-noncomputable def trajectoryCriticallyDamped
-    (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  exp (-S.decayRate * t) • S.criticallyDampedBase IC t
-
 /-- The hyperbolic part of the overdamped trajectory before exponential decay. -/
 noncomputable def overdampedBase
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  cosh (S.overdampedSplitRate * t) • IC.x₀
-      + (sinh (S.overdampedSplitRate * t) / S.overdampedSplitRate) •
+  cosh (S.angularFrequency * t) • IC.x₀
+      + (sinh (S.angularFrequency * t) / S.angularFrequency) •
         (IC.v₀ + S.decayRate • IC.x₀)
-
-/-- Given initial conditions, the solution in the overdamped regime. -/
-noncomputable def trajectoryOverdamped
-    (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  exp (-S.decayRate * t) • S.overdampedBase IC t
 
 /-!
 
-### B.2. Shared calculus lemmas
+### B.2. The selected trajectory
+
+-/
+
+/-- Given initial conditions, the solution selected from the damping regime of the
+oscillator. -/
+noncomputable def trajectory
+    (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := by
+  classical
+  exact
+    if S.IsUnderdamped then
+      fun t : Time => exp (-S.decayRate * t) • S.underdampedBase IC t
+    else if S.IsCriticallyDamped then
+      fun t : Time => exp (-S.decayRate * t) • S.criticallyDampedBase IC t
+    else
+      fun t : Time => exp (-S.decayRate * t) • S.overdampedBase IC t
+
+/-- In the underdamped regime, the selected trajectory uses the trigonometric base. -/
+lemma trajectory_eq_underdamped (IC : InitialConditions) (hS : S.IsUnderdamped) :
+    S.trajectory IC =
+      fun t : Time => exp (-S.decayRate * t) • S.underdampedBase IC t := by
+  classical
+  simp [trajectory, hS]
+
+/-- In the critically damped regime, the selected trajectory uses the polynomial base. -/
+lemma trajectory_eq_criticallyDamped (IC : InitialConditions) (hS : S.IsCriticallyDamped) :
+    S.trajectory IC =
+      fun t : Time => exp (-S.decayRate * t) • S.criticallyDampedBase IC t := by
+  classical
+  have hnotUnder : ¬ S.IsUnderdamped := by
+    intro hUnder
+    rw [IsUnderdamped] at hUnder
+    rw [IsCriticallyDamped] at hS
+    linarith
+  simp [trajectory, hnotUnder, hS]
+
+/-- In the overdamped regime, the selected trajectory uses the hyperbolic base. -/
+lemma trajectory_eq_overdamped (IC : InitialConditions) (hS : S.IsOverdamped) :
+    S.trajectory IC =
+      fun t : Time => exp (-S.decayRate * t) • S.overdampedBase IC t := by
+  classical
+  have hnotUnder : ¬ S.IsUnderdamped := by
+    intro hUnder
+    rw [IsUnderdamped] at hUnder
+    rw [IsOverdamped] at hS
+    linarith
+  have hnotCritical : ¬ S.IsCriticallyDamped := by
+    intro hCritical
+    rw [IsCriticallyDamped] at hCritical
+    rw [IsOverdamped] at hS
+    linarith
+  simp [trajectory, hnotUnder, hnotCritical]
+
+/-!
+
+### B.3. Shared calculus lemmas
 
 The three solution formulas all have the form `exp (-a * t) • y t`. The following private
 lemmas compute the first and second derivatives of that expression and package the common
@@ -185,7 +233,7 @@ private lemma exp_decay_smul_equationOfMotion
 
 /-!
 
-### B.3. Derivatives of the base trajectories
+### B.4. Derivatives of the base trajectories
 
 The remaining private lemmas compute the velocity and acceleration of the trigonometric,
 polynomial, and hyperbolic base trajectories before the exponential decay factor is applied.
@@ -213,37 +261,37 @@ private lemma criticallyDampedBase_acceleration (IC : InitialConditions) :
 
 private lemma underdampedBase_velocity (IC : InitialConditions) (hS : S.IsUnderdamped) :
     ∂ₜ (fun t : Time =>
-      cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
-        (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
+      cos (S.angularFrequency * t.val) • IC.x₀ +
+        (sin (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀)) =
     fun t : Time =>
-      (-S.underdampedAngularFrequency * sin (S.underdampedAngularFrequency * t.val)) • IC.x₀ +
-        cos (S.underdampedAngularFrequency * t.val) •
+      (-S.angularFrequency * sin (S.angularFrequency * t.val)) • IC.x₀ +
+        cos (S.angularFrequency * t.val) •
           (IC.v₀ + S.decayRate • IC.x₀) := by
   funext t
   rw [Time.deriv]
   rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
-  have hΩ : S.underdampedAngularFrequency ≠ 0 := S.underdampedAngularFrequency_ne_zero hS
+  have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_underdamped hS
   have hcos :
-      (fderiv ℝ (fun y : Time => cos (S.underdampedAngularFrequency * y.val)) t) 1 =
-        -S.underdampedAngularFrequency *
-          sin (S.underdampedAngularFrequency * t.val) := by
+      (fderiv ℝ (fun y : Time => cos (S.angularFrequency * y.val)) t) 1 =
+        -S.angularFrequency *
+          sin (S.angularFrequency * t.val) := by
     rw [fderiv_cos (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
     simp [mul_comm]
   have hsin :
       (fderiv ℝ (fun y : Time =>
-          sin (S.underdampedAngularFrequency * y.val) /
-            S.underdampedAngularFrequency) t) 1 =
-        cos (S.underdampedAngularFrequency * t.val) := by
+          sin (S.angularFrequency * y.val) /
+            S.angularFrequency) t) 1 =
+        cos (S.angularFrequency * t.val) := by
     have hscale :
         fderiv ℝ (fun y : Time =>
-            sin (S.underdampedAngularFrequency * y.val) /
-              S.underdampedAngularFrequency) t =
-          (1 / S.underdampedAngularFrequency) •
+            sin (S.angularFrequency * y.val) /
+              S.angularFrequency) t =
+          (1 / S.angularFrequency) •
             fderiv ℝ (fun y : Time =>
-              sin (S.underdampedAngularFrequency * y.val)) t := by
+              sin (S.angularFrequency * y.val)) t := by
       rw [← fderiv_mul_const]
       congr
       funext y
@@ -256,12 +304,12 @@ private lemma underdampedBase_velocity (IC : InitialConditions) (hS : S.IsUnderd
 
 private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUnderdamped) :
     ∂ₜ (∂ₜ (fun t : Time =>
-      cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
-        (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
+      cos (S.angularFrequency * t.val) • IC.x₀ +
+        (sin (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀))) =
-    fun t : Time => -S.underdampedAngularFrequency^2 •
-      (cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
-        (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
+    fun t : Time => -S.angularFrequency^2 •
+      (cos (S.angularFrequency * t.val) • IC.x₀ +
+        (sin (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀)) := by
   funext t
   rw [S.underdampedBase_velocity IC hS]
@@ -269,17 +317,17 @@ private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUn
   rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
-  have hΩ : S.underdampedAngularFrequency ≠ 0 := S.underdampedAngularFrequency_ne_zero hS
+  have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_underdamped hS
   have hsin :
       (fderiv ℝ (fun y : Time =>
-        S.underdampedAngularFrequency * sin (S.underdampedAngularFrequency * y.val)) t) 1 =
-      S.underdampedAngularFrequency^2 * cos (S.underdampedAngularFrequency * t.val) := by
+        S.angularFrequency * sin (S.angularFrequency * y.val)) t) 1 =
+      S.angularFrequency^2 * cos (S.angularFrequency * t.val) := by
     rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
     rw [fderiv_sin (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
     simp [pow_two, mul_comm, mul_assoc]
   have hcos :
-      (fderiv ℝ (fun y : Time => cos (S.underdampedAngularFrequency * y.val)) t) 1 =
-      -S.underdampedAngularFrequency * sin (S.underdampedAngularFrequency * t.val) := by
+      (fderiv ℝ (fun y : Time => cos (S.angularFrequency * y.val)) t) 1 =
+      -S.angularFrequency * sin (S.angularFrequency * t.val) := by
     rw [fderiv_cos (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
     simp [mul_comm]
   simp [hsin, hcos, smul_add, smul_smul]
@@ -287,33 +335,33 @@ private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUn
 
 private lemma overdampedBase_velocity (IC : InitialConditions) (hS : S.IsOverdamped) :
     ∂ₜ (fun t : Time =>
-      cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
-        (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
+      cosh (S.angularFrequency * t.val) • IC.x₀ +
+        (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀)) =
     fun t : Time =>
-      (S.overdampedSplitRate * sinh (S.overdampedSplitRate * t.val)) • IC.x₀ +
-        cosh (S.overdampedSplitRate * t.val) •
+      (S.angularFrequency * sinh (S.angularFrequency * t.val)) • IC.x₀ +
+        cosh (S.angularFrequency * t.val) •
           (IC.v₀ + S.decayRate • IC.x₀) := by
   funext t
   rw [Time.deriv]
   rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
-  have hLambda : S.overdampedSplitRate ≠ 0 := S.overdampedSplitRate_ne_zero hS
+  have hLambda : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
   have hcosh :
-      (fderiv ℝ (fun y : Time => cosh (S.overdampedSplitRate * y.val)) t) 1 =
-        S.overdampedSplitRate * sinh (S.overdampedSplitRate * t.val) := by
+      (fderiv ℝ (fun y : Time => cosh (S.angularFrequency * y.val)) t) 1 =
+        S.angularFrequency * sinh (S.angularFrequency * t.val) := by
     rw [fderiv_cosh (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
     simp [mul_comm]
   have hsinh :
       (fderiv ℝ (fun y : Time =>
-          sinh (S.overdampedSplitRate * y.val) / S.overdampedSplitRate) t) 1 =
-        cosh (S.overdampedSplitRate * t.val) := by
+          sinh (S.angularFrequency * y.val) / S.angularFrequency) t) 1 =
+        cosh (S.angularFrequency * t.val) := by
     have hscale :
         fderiv ℝ (fun y : Time =>
-            sinh (S.overdampedSplitRate * y.val) / S.overdampedSplitRate) t =
-          (1 / S.overdampedSplitRate) •
-            fderiv ℝ (fun y : Time => sinh (S.overdampedSplitRate * y.val)) t := by
+            sinh (S.angularFrequency * y.val) / S.angularFrequency) t =
+          (1 / S.angularFrequency) •
+            fderiv ℝ (fun y : Time => sinh (S.angularFrequency * y.val)) t := by
       rw [← fderiv_mul_const]
       congr
       funext y
@@ -326,12 +374,12 @@ private lemma overdampedBase_velocity (IC : InitialConditions) (hS : S.IsOverdam
 
 private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOverdamped) :
     ∂ₜ (∂ₜ (fun t : Time =>
-      cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
-        (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
+      cosh (S.angularFrequency * t.val) • IC.x₀ +
+        (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀))) =
-    fun t : Time => S.overdampedSplitRate^2 •
-      (cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
-        (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
+    fun t : Time => S.angularFrequency^2 •
+      (cosh (S.angularFrequency * t.val) • IC.x₀ +
+        (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀)) := by
   funext t
   rw [S.overdampedBase_velocity IC hS]
@@ -339,17 +387,17 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
   rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop)]
-  have hLambda : S.overdampedSplitRate ≠ 0 := S.overdampedSplitRate_ne_zero hS
+  have hLambda : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
   have hsinh :
       (fderiv ℝ (fun y : Time =>
-        S.overdampedSplitRate * sinh (S.overdampedSplitRate * y.val)) t) 1 =
-      S.overdampedSplitRate^2 * cosh (S.overdampedSplitRate * t.val) := by
+        S.angularFrequency * sinh (S.angularFrequency * y.val)) t) 1 =
+      S.angularFrequency^2 * cosh (S.angularFrequency * t.val) := by
     rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
     rw [fderiv_sinh (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
     simp [pow_two, mul_comm, mul_assoc]
   have hcosh :
-      (fderiv ℝ (fun y : Time => cosh (S.overdampedSplitRate * y.val)) t) 1 =
-      S.overdampedSplitRate * sinh (S.overdampedSplitRate * t.val) := by
+      (fderiv ℝ (fun y : Time => cosh (S.angularFrequency * y.val)) t) 1 =
+      S.angularFrequency * sinh (S.angularFrequency * t.val) := by
     rw [fderiv_cosh (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
     simp [mul_comm]
   simp [hsinh, hcosh, smul_add, smul_smul]
@@ -361,14 +409,15 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
 The regime-specific trajectories satisfy the equation of motion for the damped harmonic
 oscillator.
 
+### C.1. The selected trajectory satisfies the equation of motion
 -/
 
-/-- The critically damped trajectory satisfies the damped equation of motion. -/
-lemma trajectory_criticallydamped_equationOfMotion (IC : InitialConditions)
+/-- In the critically damped regime, the selected trajectory satisfies the damped equation
+of motion. -/
+lemma trajectory_equationOfMotion_of_criticallyDamped (IC : InitialConditions)
     (hS : S.IsCriticallyDamped) :
-    S.EquationOfMotion (S.trajectoryCriticallyDamped IC) := by
-  change S.EquationOfMotion
-    (fun t : Time => exp (-S.decayRate * t.val) • S.criticallyDampedBase IC t)
+    S.EquationOfMotion (S.trajectory IC) := by
+  rw [S.trajectory_eq_criticallyDamped IC hS]
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
   have hk : S.k = S.m * (S.decayRate^2 - 0) := by
     simpa [sub_zero] using S.k_eq_m_mul_decayRate_sq_of_criticallyDamped hS
@@ -386,95 +435,107 @@ lemma trajectory_criticallydamped_equationOfMotion (IC : InitialConditions)
       fun_prop)
     hbase hγ hk
 
-/-- The underdamped trajectory satisfies the damped equation of motion. -/
-lemma trajectory_underdamped_equationOfMotion (IC : InitialConditions)
+/-- In the underdamped regime, the selected trajectory satisfies the damped equation of
+motion. -/
+lemma trajectory_equationOfMotion_of_underdamped (IC : InitialConditions)
     (hS : S.IsUnderdamped) :
-    S.EquationOfMotion (S.trajectoryUnderdamped IC) := by
-  change S.EquationOfMotion
-    (fun t : Time => exp (-S.decayRate * t.val) • S.underdampedBase IC t)
+    S.EquationOfMotion (S.trajectory IC) := by
+  rw [S.trajectory_eq_underdamped IC hS]
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
-  have hk : S.k = S.m * (S.decayRate^2 - (-S.underdampedAngularFrequency^2)) := by
-    rw [S.k_eq_m_mul_ω_sq, S.underdampedAngularFrequency_sq hS]
+  have hk : S.k = S.m * (S.decayRate^2 - (-S.angularFrequency^2)) := by
+    rw [S.k_eq_m_mul_ω_sq, S.angularFrequency_sq_of_underdamped hS]
     ring
   have hbase :
       ∂ₜ (∂ₜ (S.underdampedBase IC)) =
-        fun t => (-S.underdampedAngularFrequency^2) • S.underdampedBase IC t := by
+        fun t => (-S.angularFrequency^2) • S.underdampedBase IC t := by
     change ∂ₜ (∂ₜ (fun t : Time =>
-        cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
-          (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
+        cos (S.angularFrequency * t.val) • IC.x₀ +
+          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀))) =
-      fun t => -S.underdampedAngularFrequency^2 •
-        (cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
-          (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
+      fun t => -S.angularFrequency^2 •
+        (cos (S.angularFrequency * t.val) • IC.x₀ +
+          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀))
     exact S.underdampedBase_acceleration IC hS
   exact S.exp_decay_smul_equationOfMotion S.decayRate
-    (-S.underdampedAngularFrequency^2) (S.underdampedBase IC)
+    (-S.angularFrequency^2) (S.underdampedBase IC)
     (by
       change Differentiable ℝ (fun t : Time =>
-        cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
-          (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
+        cos (S.angularFrequency * t.val) • IC.x₀ +
+          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀))
       fun_prop)
     (by
       change Differentiable ℝ (∂ₜ (fun t : Time =>
-        cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
-          (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
+        cos (S.angularFrequency * t.val) • IC.x₀ +
+          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀)))
       rw [S.underdampedBase_velocity IC hS]
       fun_prop)
     hbase hγ hk
 
-/-- The overdamped trajectory satisfies the damped equation of motion. -/
-lemma trajectory_overdamped_equationOfMotion (IC : InitialConditions)
+/-- In the overdamped regime, the selected trajectory satisfies the damped equation of
+motion. -/
+lemma trajectory_equationOfMotion_of_overdamped (IC : InitialConditions)
     (hS : S.IsOverdamped) :
-    S.EquationOfMotion (S.trajectoryOverdamped IC) := by
-  change S.EquationOfMotion
-    (fun t : Time => exp (-S.decayRate * t.val) • S.overdampedBase IC t)
+    S.EquationOfMotion (S.trajectory IC) := by
+  rw [S.trajectory_eq_overdamped IC hS]
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
-  have hk : S.k = S.m * (S.decayRate^2 - S.overdampedSplitRate^2) := by
-    rw [S.k_eq_m_mul_ω_sq, S.overdampedSplitRate_sq hS]
+  have hk : S.k = S.m * (S.decayRate^2 - S.angularFrequency^2) := by
+    rw [S.k_eq_m_mul_ω_sq, S.angularFrequency_sq_of_overdamped hS]
     ring
   have hbase :
       ∂ₜ (∂ₜ (S.overdampedBase IC)) =
-        fun t => S.overdampedSplitRate^2 • S.overdampedBase IC t := by
+        fun t => S.angularFrequency^2 • S.overdampedBase IC t := by
     change ∂ₜ (∂ₜ (fun t : Time =>
-        cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
-          (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
+        cosh (S.angularFrequency * t.val) • IC.x₀ +
+          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀))) =
-      fun t => S.overdampedSplitRate^2 •
-        (cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
-          (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
+      fun t => S.angularFrequency^2 •
+        (cosh (S.angularFrequency * t.val) • IC.x₀ +
+          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀))
     exact S.overdampedBase_acceleration IC hS
-  exact S.exp_decay_smul_equationOfMotion S.decayRate (S.overdampedSplitRate^2)
+  exact S.exp_decay_smul_equationOfMotion S.decayRate (S.angularFrequency^2)
     (S.overdampedBase IC)
     (by
       change Differentiable ℝ (fun t : Time =>
-        cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
-          (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
+        cosh (S.angularFrequency * t.val) • IC.x₀ +
+          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀))
       fun_prop)
     (by
       change Differentiable ℝ (∂ₜ (fun t : Time =>
-        cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
-          (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
+        cosh (S.angularFrequency * t.val) • IC.x₀ +
+          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
             (IC.v₀ + S.decayRate • IC.x₀)))
       rw [S.overdampedBase_velocity IC hS]
       fun_prop)
     hbase hγ hk
 
+/-- The selected trajectory satisfies the damped equation of motion. -/
+lemma trajectory_equationOfMotion (IC : InitialConditions) :
+    S.EquationOfMotion (S.trajectory IC) := by
+  by_cases hUnder : S.IsUnderdamped
+  · exact S.trajectory_equationOfMotion_of_underdamped IC hUnder
+  · by_cases hCritical : S.IsCriticallyDamped
+    · exact S.trajectory_equationOfMotion_of_criticallyDamped IC hCritical
+    · have hOver : S.IsOverdamped := by
+        rw [IsOverdamped, IsUnderdamped, IsCriticallyDamped] at *
+        by_contra hNotOver
+        have hNonneg : 0 ≤ S.discriminant := le_of_not_gt hUnder
+        have hNonpos : S.discriminant ≤ 0 := le_of_not_gt hNotOver
+        exact hCritical (le_antisymm hNonpos hNonneg)
+      exact S.trajectory_equationOfMotion_of_overdamped IC hOver
+
 /-!
 
-### C.1. Uniqueness of the solutions
+### C.2. Uniqueness of the solutions
 
-Future work: prove that, in each damping regime, the corresponding explicit trajectory is
-the unique solution of the damped equation of motion with the given initial conditions.
+Future work: prove that, in each damping regime, the selected explicit branch is the unique
+solution of the damped equation of motion with the given initial conditions.
 
 -/
-
-/- The uniqueness theorem should compare an arbitrary smooth solution with the appropriate
-regime-specific trajectory and use the matching initial position and velocity at time `0`. -/
 
 end DampedHarmonicOscillator
 

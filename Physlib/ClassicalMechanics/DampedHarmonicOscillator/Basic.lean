@@ -45,13 +45,13 @@ In the `Basic` module:
 - `energy_dissipation_rate` computes the rate at which damping removes mechanical energy.
 - `IsUnderdamped`, `IsCriticallyDamped`, and `IsOverdamped` define the three damping
   regimes from the discriminant `γ^2 - 4 * m * k`.
+- `angularFrequency` selects the real frequency parameter from the damping regime.
 - `toUndamped_equationOfMotion` relates the damped and undamped equations of motion when
   the damping coefficient is zero.
 
 In the `Solution` module:
 - `InitialConditions` contains the initial position and velocity.
-- `trajectoryUnderdamped`, `trajectoryCriticallyDamped`, and `trajectoryOverdamped` give the
-  explicit regime-specific solutions.
+- `trajectory` gives the explicit solution selected from the damping regime.
 
 ## iii. Table of contents
 
@@ -221,8 +221,8 @@ lemma equationOfMotion_iff_newtons_2nd_law (xₜ : Time → EuclideanSpace ℝ (
 ## D. Damping regimes
 
 The sign of the discriminant `γ^2 - 4 * m * k` separates the underdamped, critically
-damped, and overdamped regimes. We also define the decay rate and the real frequencies
-that appear in the explicit solution formulas.
+damped, and overdamped regimes. We also define the decay rate and the regime-selected
+real frequency that appears in the explicit solution formulas.
 
 -/
 
@@ -231,12 +231,6 @@ noncomputable def discriminant : ℝ := S.γ^2 - 4 * S.m * S.k
 
 /-- The exponential decay rate `γ / (2 * m)`. -/
 noncomputable def decayRate : ℝ := S.γ / (2 * S.m)
-
-/-- The oscillation frequency in the underdamped regime. -/
-noncomputable def underdampedAngularFrequency : ℝ := sqrt (- S.discriminant) / (2 * S.m)
-
-/-- The real split rate between the two roots in the overdamped regime. -/
-noncomputable def overdampedSplitRate : ℝ := sqrt S.discriminant / (2 * S.m)
 
 /-- The system is underdamped when γ² < 4mk. -/
 def IsUnderdamped : Prop := S.discriminant < 0
@@ -249,6 +243,21 @@ def IsOverdamped : Prop := 0 < S.discriminant
 
 /-- The system is undamped when γ = 0. -/
 def IsUndamped : Prop := S.γ = 0
+
+/-- The real frequency selected by the damping regime.
+
+In the underdamped regime this is the oscillation frequency. In the critically damped
+regime it is `0`. In the overdamped regime this is the real split rate between the two
+roots. -/
+noncomputable def angularFrequency : ℝ := by
+  classical
+  exact
+    if S.IsUnderdamped then
+      sqrt (- S.discriminant) / (2 * S.m)
+    else if S.IsCriticallyDamped then
+      0
+    else
+      sqrt S.discriminant / (2 * S.m)
 
 /-- The relationship between the discriminant, decay rate, and natural angular frequency. -/
 lemma discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq :
@@ -325,51 +334,88 @@ lemma isOverdamped_decayRate (hS : S.IsOverdamped) : S.ω < S.decayRate := by
     nlinarith
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 
-/-- In the underdamped regime, the damped angular frequency squares to `ω^2 - decayRate^2`. -/
-lemma underdampedAngularFrequency_sq (hS : S.IsUnderdamped) :
-    S.underdampedAngularFrequency^2 = S.ω^2 - S.decayRate^2 := by
-  rw [underdampedAngularFrequency, div_pow, sq_sqrt]
+/-- In the underdamped regime, the selected frequency uses the oscillation frequency. -/
+lemma angularFrequency_eq_underdamped (hS : S.IsUnderdamped) :
+    S.angularFrequency = sqrt (- S.discriminant) / (2 * S.m) := by
+  classical
+  simp [angularFrequency, hS]
+
+/-- In the critically damped regime, the selected frequency is zero. -/
+lemma angularFrequency_eq_criticallyDamped (hS : S.IsCriticallyDamped) :
+    S.angularFrequency = 0 := by
+  classical
+  have hnotUnder : ¬ S.IsUnderdamped := by
+    intro hUnder
+    rw [IsUnderdamped] at hUnder
+    rw [IsCriticallyDamped] at hS
+    linarith
+  simp [angularFrequency, hnotUnder, hS]
+
+/-- In the overdamped regime, the selected frequency uses the real split rate. -/
+lemma angularFrequency_eq_overdamped (hS : S.IsOverdamped) :
+    S.angularFrequency = sqrt S.discriminant / (2 * S.m) := by
+  classical
+  have hnotUnder : ¬ S.IsUnderdamped := by
+    intro hUnder
+    rw [IsUnderdamped] at hUnder
+    rw [IsOverdamped] at hS
+    linarith
+  have hnotCritical : ¬ S.IsCriticallyDamped := by
+    intro hCritical
+    rw [IsCriticallyDamped] at hCritical
+    rw [IsOverdamped] at hS
+    linarith
+  simp [angularFrequency, hnotUnder, hnotCritical]
+
+/-- In the underdamped regime, the selected angular frequency squares to
+`ω^2 - decayRate^2`. -/
+lemma angularFrequency_sq_of_underdamped (hS : S.IsUnderdamped) :
+    S.angularFrequency^2 = S.ω^2 - S.decayRate^2 := by
+  rw [S.angularFrequency_eq_underdamped hS, div_pow, sq_sqrt]
   · rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq]
     field_simp [S.m_ne_zero]
     ring
   · rw [IsUnderdamped] at hS
     exact le_of_lt (neg_pos.mpr hS)
 
-/-- The underdamped angular frequency is positive in the underdamped regime. -/
-lemma underdampedAngularFrequency_pos (hS : S.IsUnderdamped) :
-    0 < S.underdampedAngularFrequency := by
-  rw [underdampedAngularFrequency]
+/-- The selected angular frequency is positive in the underdamped regime. -/
+lemma angularFrequency_pos_of_underdamped (hS : S.IsUnderdamped) :
+    0 < S.angularFrequency := by
+  rw [S.angularFrequency_eq_underdamped hS]
   apply div_pos
   · rw [IsUnderdamped] at hS
     exact sqrt_pos.mpr (neg_pos.mpr hS)
   · nlinarith [S.m_pos]
 
-/-- The underdamped angular frequency is nonzero in the underdamped regime. -/
-lemma underdampedAngularFrequency_ne_zero (hS : S.IsUnderdamped) :
-    S.underdampedAngularFrequency ≠ 0 :=
-  Ne.symm (ne_of_lt (S.underdampedAngularFrequency_pos hS))
+/-- The selected angular frequency is nonzero in the underdamped regime. -/
+lemma angularFrequency_ne_zero_of_underdamped (hS : S.IsUnderdamped) :
+    S.angularFrequency ≠ 0 :=
+  Ne.symm (ne_of_lt (S.angularFrequency_pos_of_underdamped hS))
 
-/-- In the overdamped regime, the split rate squares to `decayRate^2 - ω^2`. -/
-lemma overdampedSplitRate_sq (hS : S.IsOverdamped) :
-    S.overdampedSplitRate^2 = S.decayRate^2 - S.ω^2 := by
-  rw [overdampedSplitRate, div_pow, sq_sqrt]
+/-- In the overdamped regime, the selected angular frequency squares to
+`decayRate^2 - ω^2`. -/
+lemma angularFrequency_sq_of_overdamped (hS : S.IsOverdamped) :
+    S.angularFrequency^2 = S.decayRate^2 - S.ω^2 := by
+  rw [S.angularFrequency_eq_overdamped hS, div_pow, sq_sqrt]
   · rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq]
     field_simp [S.m_ne_zero]
     ring
   · rw [IsOverdamped] at hS
     exact le_of_lt hS
 
-/-- The overdamped split rate is positive in the overdamped regime. -/
-lemma overdampedSplitRate_pos (hS : S.IsOverdamped) : 0 < S.overdampedSplitRate := by
-  rw [overdampedSplitRate]
+/-- The selected angular frequency is positive in the overdamped regime. -/
+lemma angularFrequency_pos_of_overdamped (hS : S.IsOverdamped) :
+    0 < S.angularFrequency := by
+  rw [S.angularFrequency_eq_overdamped hS]
   apply div_pos
   · rw [IsOverdamped] at hS
     exact sqrt_pos.mpr hS
   · nlinarith [S.m_pos]
 
-/-- The overdamped split rate is nonzero in the overdamped regime. -/
-lemma overdampedSplitRate_ne_zero (hS : S.IsOverdamped) : S.overdampedSplitRate ≠ 0 :=
-  Ne.symm (ne_of_lt (S.overdampedSplitRate_pos hS))
+/-- The selected angular frequency is nonzero in the overdamped regime. -/
+lemma angularFrequency_ne_zero_of_overdamped (hS : S.IsOverdamped) :
+    S.angularFrequency ≠ 0 :=
+  Ne.symm (ne_of_lt (S.angularFrequency_pos_of_overdamped hS))
 
 /-!
 ## E. To undamped oscillator
