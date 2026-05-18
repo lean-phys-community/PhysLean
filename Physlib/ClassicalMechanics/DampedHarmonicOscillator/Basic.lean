@@ -234,7 +234,7 @@ that appear in the explicit solution formulas.
 noncomputable def discriminant : ℝ := S.γ^2 - 4 * S.m * S.k
 
 /-- The exponential decay rate `γ / (2 * m)`. -/
-noncomputable def decay_rate : ℝ := S.γ / (2 * S.m)
+noncomputable def decayRate : ℝ := S.γ / (2 * S.m)
 
 /-- The oscillation frequency in the underdamped regime. -/
 noncomputable def underdampedAngularFrequency : ℝ := sqrt (- S.discriminant) / (2 * S.m)
@@ -256,36 +256,36 @@ def IsUndamped : Prop := S.γ = 0
 
 /-- The relationship between the discriminant, decay rate, and natural angular frequency. -/
 lemma discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq :
-    S.discriminant = 4 * S.m^2 * (S.decay_rate^2 - S.ω^2) := by
-  rw [discriminant, decay_rate, S.ω_sq]
+    S.discriminant = 4 * S.m^2 * (S.decayRate^2 - S.ω^2) := by
+  rw [discriminant, decayRate, S.ω_sq]
   field_simp [S.m_ne_zero]
   ring
 
 /-- The decay rate is nonnegative. -/
-lemma decay_rate_nonneg : 0 ≤ S.decay_rate := by
-  rw [decay_rate]
+lemma decay_rate_nonneg : 0 ≤ S.decayRate := by
+  rw [decayRate]
   exact div_nonneg S.γ_nonneg (by nlinarith [S.m_pos])
 
 /-- An undamped oscillator lies in the underdamped regime. -/
 lemma isUnderdamped_of_gamma_eq_zero (hγ : S.γ = 0) : S.IsUnderdamped := by
-  rw [IsUnderdamped, discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq S, decay_rate]
+  rw [IsUnderdamped, discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq S, decayRate]
   rw [hγ]
   ring_nf
   nlinarith [sq_pos_of_pos S.m_pos, sq_pos_of_pos S.ω_pos]
 
 /-- An underdamped system has decay rate less than the natural frequency. -/
-lemma isUnderdamped_decay_rate (hS : S.IsUnderdamped) : S.ω > S.decay_rate := by
+lemma isUnderdamped_decay_rate (hS : S.IsUnderdamped) : S.ω > S.decayRate := by
   rw [IsUnderdamped] at hS
   rw [discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq] at hS
   have hm_sq_pos : 0 < 4 * S.m^2 := by
     have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
     nlinarith
-  have hsq : S.decay_rate^2 < S.ω^2 := by
+  have hsq : S.decayRate^2 < S.ω^2 := by
     nlinarith
   nlinarith [S.decay_rate_nonneg, S.ω_pos]
 
 /-- A critically damped system has decay rate equal to the natural frequency. -/
-lemma isCriticallyDamped_decay_rate (hS : S.IsCriticallyDamped) : S.ω = S.decay_rate := by
+lemma isCriticallyDamped_decay_rate (hS : S.IsCriticallyDamped) : S.ω = S.decayRate := by
   rw [IsCriticallyDamped] at hS
   rw [discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq] at hS
   have hm_sq_ne_zero : 4 * S.m^2 ≠ 0 := by
@@ -293,26 +293,26 @@ lemma isCriticallyDamped_decay_rate (hS : S.IsCriticallyDamped) : S.ω = S.decay
       have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
       nlinarith
     exact ne_of_gt hm_sq_pos
-  have hsq : S.decay_rate^2 = S.ω^2 := by
-    have hsub : S.decay_rate^2 - S.ω^2 = 0 := by
+  have hsq : S.decayRate^2 = S.ω^2 := by
+    have hsub : S.decayRate^2 - S.ω^2 = 0 := by
       exact (mul_eq_zero.mp hS).resolve_left hm_sq_ne_zero
     linarith
   nlinarith [S.decay_rate_nonneg, S.ω_pos]
 
 /-- An overdamped system has decay rate greater than the natural frequency. -/
-lemma isOverdamped_decay_rate (hS : S.IsOverdamped) : S.ω < S.decay_rate := by
+lemma isOverdamped_decay_rate (hS : S.IsOverdamped) : S.ω < S.decayRate := by
   rw [IsOverdamped] at hS
   rw [discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq] at hS
   have hm_sq_pos : 0 < 4 * S.m^2 := by
     have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
     nlinarith
-  have hsq : S.ω^2 < S.decay_rate^2 := by
+  have hsq : S.ω^2 < S.decayRate^2 := by
     nlinarith
   nlinarith [S.decay_rate_nonneg, S.ω_pos]
 
 /-- In the underdamped regime, the damped angular frequency squares to `ω^2 - decay_rate^2`. -/
 lemma underdampedAngularFrequency_sq (hS : S.IsUnderdamped) :
-    S.underdampedAngularFrequency^2 = S.ω^2 - S.decay_rate^2 := by
+    S.underdampedAngularFrequency^2 = S.ω^2 - S.decayRate^2 := by
   rw [underdampedAngularFrequency, div_pow, sq_sqrt]
   · rw [discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq]
     field_simp [S.m_ne_zero]
@@ -336,7 +336,7 @@ lemma underdampedAngularFrequency_ne_zero (hS : S.IsUnderdamped) :
 
 /-- In the overdamped regime, the split rate squares to `decay_rate^2 - ω^2`. -/
 lemma overdampedSplitRate_sq (hS : S.IsOverdamped) :
-    S.overdampedSplitRate^2 = S.decay_rate^2 - S.ω^2 := by
+    S.overdampedSplitRate^2 = S.decayRate^2 - S.ω^2 := by
   rw [overdampedSplitRate, div_pow, sq_sqrt]
   · rw [discriminant_eq_four_mul_m_sq_mul_decay_rate_sq_sub_ω_sq]
     field_simp [S.m_ne_zero]
