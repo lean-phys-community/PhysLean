@@ -134,14 +134,14 @@ noncomputable def trajectory
       fun t : Time => exp (-S.decayRate * t) • S.overdampedBase IC t
 
 /-- In the underdamped regime, the selected trajectory uses the trigonometric base. -/
-lemma trajectory_eq_underdamped (IC : InitialConditions) (hS : S.IsUnderdamped) :
+lemma trajectory_eq_of_underdamped (IC : InitialConditions) (hS : S.IsUnderdamped) :
     S.trajectory IC =
       fun t : Time => exp (-S.decayRate * t) • S.underdampedBase IC t := by
   classical
   simp [trajectory, hS]
 
 /-- In the critically damped regime, the selected trajectory uses the polynomial base. -/
-lemma trajectory_eq_criticallyDamped (IC : InitialConditions) (hS : S.IsCriticallyDamped) :
+lemma trajectory_eq_of_criticallyDamped (IC : InitialConditions) (hS : S.IsCriticallyDamped) :
     S.trajectory IC =
       fun t : Time => exp (-S.decayRate * t) • S.criticallyDampedBase IC t := by
   classical
@@ -153,7 +153,7 @@ lemma trajectory_eq_criticallyDamped (IC : InitialConditions) (hS : S.IsCritical
   simp [trajectory, hnotUnder, hS]
 
 /-- In the overdamped regime, the selected trajectory uses the hyperbolic base. -/
-lemma trajectory_eq_overdamped (IC : InitialConditions) (hS : S.IsOverdamped) :
+lemma trajectory_eq_of_overdamped (IC : InitialConditions) (hS : S.IsOverdamped) :
     S.trajectory IC =
       fun t : Time => exp (-S.decayRate * t) • S.overdampedBase IC t := by
   classical
@@ -417,7 +417,7 @@ of motion. -/
 lemma trajectory_equationOfMotion_of_criticallyDamped (IC : InitialConditions)
     (hS : S.IsCriticallyDamped) :
     S.EquationOfMotion (S.trajectory IC) := by
-  rw [S.trajectory_eq_criticallyDamped IC hS]
+  rw [S.trajectory_eq_of_criticallyDamped IC hS]
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
   have hk : S.k = S.m * (S.decayRate^2 - 0) := by
     simpa [sub_zero] using S.k_eq_m_mul_decayRate_sq_of_criticallyDamped hS
@@ -440,7 +440,7 @@ motion. -/
 lemma trajectory_equationOfMotion_of_underdamped (IC : InitialConditions)
     (hS : S.IsUnderdamped) :
     S.EquationOfMotion (S.trajectory IC) := by
-  rw [S.trajectory_eq_underdamped IC hS]
+  rw [S.trajectory_eq_of_underdamped IC hS]
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
   have hk : S.k = S.m * (S.decayRate^2 - (-S.angularFrequency^2)) := by
     rw [S.k_eq_m_mul_ω_sq, S.angularFrequency_sq_of_underdamped hS]
@@ -479,7 +479,7 @@ motion. -/
 lemma trajectory_equationOfMotion_of_overdamped (IC : InitialConditions)
     (hS : S.IsOverdamped) :
     S.EquationOfMotion (S.trajectory IC) := by
-  rw [S.trajectory_eq_overdamped IC hS]
+  rw [S.trajectory_eq_of_overdamped IC hS]
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
   have hk : S.k = S.m * (S.decayRate^2 - S.angularFrequency^2) := by
     rw [S.k_eq_m_mul_ω_sq, S.angularFrequency_sq_of_overdamped hS]
