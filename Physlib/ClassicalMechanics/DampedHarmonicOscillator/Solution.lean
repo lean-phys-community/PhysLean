@@ -34,9 +34,8 @@ overdamped case.
 - A. The initial conditions
 - B. Trajectories associated with the initial conditions
   - B.1. Explicit regime-specific trajectories
-  - B.2. Parameter identities
-  - B.3. Shared calculus lemmas
-  - B.4. Derivatives of the base trajectories
+  - B.2. Shared calculus lemmas
+  - B.3. Derivatives of the base trajectories
 - C. Trajectories and equation of motion
   - C.1. Uniqueness of the solutions
 
@@ -124,35 +123,7 @@ noncomputable def trajectoryOverdamped
 
 /-!
 
-### B.2. Parameter identities
-
-These identities rewrite `γ` and `k` in the form used by the shared proof for the
-exponentially decaying trajectories.
-
--/
-
-/-- The damping coefficient is twice mass times the decay rate. -/
-lemma gamma_eq_two_mul_m_mul_decayRate : S.γ = 2 * S.m * S.decayRate := by
-  rw [decayRate]
-  field_simp [S.m_ne_zero]
-
-/-- The spring constant is `m * ω^2`. -/
-lemma k_eq_m_mul_ω_sq : S.k = S.m * S.ω^2 := by
-  rw [S.ω_sq]
-  field_simp [S.m_ne_zero]
-
-/-- In the critically damped regime, `k = m * decayRate^2`. -/
-lemma k_eq_m_mul_decayRate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
-    S.k = S.m * S.decayRate^2 := by
-  have hωa : S.ω = S.decayRate := S.isCriticallyDamped_decayRate hS
-  have hωsq : S.decayRate ^ 2 = S.k / S.m := by
-    simpa [hωa] using S.ω_sq
-  field_simp [S.m_ne_zero] at hωsq
-  nlinarith
-
-/-!
-
-### B.3. Shared calculus lemmas
+### B.2. Shared calculus lemmas
 
 The three solution formulas all have the form `exp (-a * t) • y t`. The following private
 lemmas compute the first and second derivatives of that expression and package the common
@@ -214,7 +185,7 @@ private lemma exp_decay_smul_equationOfMotion
 
 /-!
 
-### B.4. Derivatives of the base trajectories
+### B.3. Derivatives of the base trajectories
 
 The remaining private lemmas compute the velocity and acceleration of the trigonometric,
 polynomial, and hyperbolic base trajectories before the exponential decay factor is applied.

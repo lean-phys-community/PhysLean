@@ -295,6 +295,25 @@ lemma isCriticallyDamped_decayRate (hS : S.IsCriticallyDamped) : S.ω = S.decayR
     linarith
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 
+/-- The damping coefficient is twice mass times the decay rate. -/
+lemma gamma_eq_two_mul_m_mul_decayRate : S.γ = 2 * S.m * S.decayRate := by
+  rw [decayRate]
+  field_simp [S.m_ne_zero]
+
+/-- The spring constant is `m * ω^2`. -/
+lemma k_eq_m_mul_ω_sq : S.k = S.m * S.ω^2 := by
+  rw [S.ω_sq]
+  field_simp [S.m_ne_zero]
+
+/-- In the critically damped regime, `k = m * decayRate^2`. -/
+lemma k_eq_m_mul_decayRate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
+    S.k = S.m * S.decayRate^2 := by
+  have hωa : S.ω = S.decayRate := S.isCriticallyDamped_decayRate hS
+  have hωsq : S.decayRate ^ 2 = S.k / S.m := by
+    simpa [hωa] using S.ω_sq
+  field_simp [S.m_ne_zero] at hωsq
+  nlinarith
+
 /-- An overdamped system has decay rate greater than the natural frequency. -/
 lemma isOverdamped_decayRate (hS : S.IsOverdamped) : S.ω < S.decayRate := by
   rw [IsOverdamped] at hS
