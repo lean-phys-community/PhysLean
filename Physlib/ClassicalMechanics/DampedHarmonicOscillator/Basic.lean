@@ -50,7 +50,7 @@ In the `Basic` module:
 
 In the `Solution` module:
 - `InitialConditions` contains the initial position and velocity.
-- `trajectory_underdamped`, `trajectory_criticallydamped`, and `trajectory_overdamped` give the
+- `trajectoryUnderdamped`, `trajectoryCriticallyDamped`, and `trajectoryOverdamped` give the
   explicit regime-specific solutions.
 
 ## iii. Table of contents

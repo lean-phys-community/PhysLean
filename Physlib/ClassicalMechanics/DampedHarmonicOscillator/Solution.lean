@@ -22,7 +22,7 @@ overdamped case.
 ## ii. Key results
 
 - `InitialConditions` is a structure for the initial position and velocity.
-- `trajectory_underdamped`, `trajectory_criticallydamped`, and `trajectory_overdamped` are the
+- `trajectoryUnderdamped`, `trajectoryCriticallyDamped`, and `trajectoryOverdamped` are the
   explicit regime-specific trajectories.
 - `trajectory_underdamped_equationOfMotion`,
   `trajectory_criticallydamped_equationOfMotion`, and
@@ -96,7 +96,7 @@ noncomputable def underdampedBase
       (IC.v₀ + S.decayRate • IC.x₀)
 
 /-- Given initial conditions, the solution in the underdamped regime. -/
-noncomputable def trajectory_underdamped
+noncomputable def trajectoryUnderdamped
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
   exp (-S.decayRate * t) • S.underdampedBase IC t
 
@@ -106,7 +106,7 @@ noncomputable def criticallyDampedBase
   IC.x₀ + (t : ℝ) • (IC.v₀ + S.decayRate • IC.x₀)
 
 /-- Given initial conditions, the solution in the critically damped regime. -/
-noncomputable def trajectory_criticallydamped
+noncomputable def trajectoryCriticallyDamped
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
   exp (-S.decayRate * t) • S.criticallyDampedBase IC t
 
@@ -118,7 +118,7 @@ noncomputable def overdampedBase
         (IC.v₀ + S.decayRate • IC.x₀)
 
 /-- Given initial conditions, the solution in the overdamped regime. -/
-noncomputable def trajectory_overdamped
+noncomputable def trajectoryOverdamped
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
   exp (-S.decayRate * t) • S.overdampedBase IC t
 
@@ -395,7 +395,7 @@ oscillator.
 /-- The critically damped trajectory satisfies the damped equation of motion. -/
 lemma trajectory_criticallydamped_equationOfMotion (IC : InitialConditions)
     (hS : S.IsCriticallyDamped) :
-    S.EquationOfMotion (S.trajectory_criticallydamped IC) := by
+    S.EquationOfMotion (S.trajectoryCriticallyDamped IC) := by
   change S.EquationOfMotion
     (fun t : Time => exp (-S.decayRate * t.val) • S.criticallyDampedBase IC t)
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
@@ -418,7 +418,7 @@ lemma trajectory_criticallydamped_equationOfMotion (IC : InitialConditions)
 /-- The underdamped trajectory satisfies the damped equation of motion. -/
 lemma trajectory_underdamped_equationOfMotion (IC : InitialConditions)
     (hS : S.IsUnderdamped) :
-    S.EquationOfMotion (S.trajectory_underdamped IC) := by
+    S.EquationOfMotion (S.trajectoryUnderdamped IC) := by
   change S.EquationOfMotion
     (fun t : Time => exp (-S.decayRate * t.val) • S.underdampedBase IC t)
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
@@ -457,7 +457,7 @@ lemma trajectory_underdamped_equationOfMotion (IC : InitialConditions)
 /-- The overdamped trajectory satisfies the damped equation of motion. -/
 lemma trajectory_overdamped_equationOfMotion (IC : InitialConditions)
     (hS : S.IsOverdamped) :
-    S.EquationOfMotion (S.trajectory_overdamped IC) := by
+    S.EquationOfMotion (S.trajectoryOverdamped IC) := by
   change S.EquationOfMotion
     (fun t : Time => exp (-S.decayRate * t.val) • S.overdampedBase IC t)
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
