@@ -150,8 +150,6 @@ lemma k_eq_m_mul_decayRate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
   field_simp [S.m_ne_zero] at hωsq
   nlinarith
 
-private abbrev TrajectorySpace := EuclideanSpace ℝ (Fin 1)
-
 /-!
 
 ### B.3. Shared calculus lemmas
@@ -163,7 +161,7 @@ equation-of-motion argument.
 -/
 
 private lemma exp_decay_smul_velocity
-    (a : ℝ) (y : Time → TrajectorySpace) (hy : Differentiable ℝ y) :
+    (a : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1)) (hy : Differentiable ℝ y) :
     ∂ₜ (fun t : Time => exp (-a * t.val) • y t) =
       fun t : Time => exp (-a * t.val) • (∂ₜ y t - a • y t) := by
   funext t
@@ -178,7 +176,7 @@ private lemma exp_decay_smul_velocity
   module
 
 private lemma exp_decay_smul_acceleration
-    (a μ : ℝ) (y : Time → TrajectorySpace)
+    (a μ : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1))
     (hy : Differentiable ℝ y) (hdy : Differentiable ℝ (∂ₜ y))
     (hy'' : ∂ₜ (∂ₜ y) = fun t => μ • y t) :
     ∂ₜ (∂ₜ (fun t : Time => exp (-a * t.val) • y t)) =
@@ -202,7 +200,7 @@ private lemma exp_decay_smul_acceleration
   module
 
 private lemma exp_decay_smul_equationOfMotion
-    (a μ : ℝ) (y : Time → TrajectorySpace)
+    (a μ : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1))
     (hy : Differentiable ℝ y) (hdy : Differentiable ℝ (∂ₜ y))
     (hy'' : ∂ₜ (∂ₜ y) = fun t => μ • y t)
     (hγ : S.γ = 2 * S.m * a) (hk : S.k = S.m * (a^2 - μ)) :
@@ -236,7 +234,8 @@ private lemma criticallyDampedBase_velocity (IC : InitialConditions) :
   simp
 
 private lemma criticallyDampedBase_acceleration (IC : InitialConditions) :
-    ∂ₜ (∂ₜ (S.criticallyDampedBase IC)) = fun _ => (0 : TrajectorySpace) := by
+    ∂ₜ (∂ₜ (S.criticallyDampedBase IC)) =
+      fun _ => (0 : EuclideanSpace ℝ (Fin 1)) := by
   rw [criticallyDampedBase_velocity]
   funext t
   simp
