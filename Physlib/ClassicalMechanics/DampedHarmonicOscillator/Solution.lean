@@ -93,34 +93,34 @@ noncomputable def underdampedBase
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
   cos (S.underdampedAngularFrequency * t) • IC.x₀
     + (sin (S.underdampedAngularFrequency * t)/S.underdampedAngularFrequency) •
-      (IC.v₀ + S.decay_rate • IC.x₀)
+      (IC.v₀ + S.decayRate • IC.x₀)
 
 /-- Given initial conditions, the solution in the underdamped regime. -/
 noncomputable def trajectory_underdamped
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  exp (-S.decay_rate * t) • S.underdampedBase IC t
+  exp (-S.decayRate * t) • S.underdampedBase IC t
 
 /-- The polynomial part of the critically damped trajectory before exponential decay. -/
 noncomputable def criticallyDampedBase
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  IC.x₀ + (t : ℝ) • (IC.v₀ + S.decay_rate • IC.x₀)
+  IC.x₀ + (t : ℝ) • (IC.v₀ + S.decayRate • IC.x₀)
 
 /-- Given initial conditions, the solution in the critically damped regime. -/
 noncomputable def trajectory_criticallydamped
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  exp (-S.decay_rate * t) • S.criticallyDampedBase IC t
+  exp (-S.decayRate * t) • S.criticallyDampedBase IC t
 
 /-- The hyperbolic part of the overdamped trajectory before exponential decay. -/
 noncomputable def overdampedBase
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
   cosh (S.overdampedSplitRate * t) • IC.x₀
       + (sinh (S.overdampedSplitRate * t) / S.overdampedSplitRate) •
-        (IC.v₀ + S.decay_rate • IC.x₀)
+        (IC.v₀ + S.decayRate • IC.x₀)
 
 /-- Given initial conditions, the solution in the overdamped regime. -/
 noncomputable def trajectory_overdamped
     (IC : InitialConditions) : Time → EuclideanSpace ℝ (Fin 1) := fun t =>
-  exp (-S.decay_rate * t) • S.overdampedBase IC t
+  exp (-S.decayRate * t) • S.overdampedBase IC t
 
 /-!
 
@@ -132,8 +132,8 @@ exponentially decaying trajectories.
 -/
 
 /-- The damping coefficient is twice mass times the decay rate. -/
-lemma gamma_eq_two_mul_m_mul_decay_rate : S.γ = 2 * S.m * S.decay_rate := by
-  rw [decay_rate]
+lemma gamma_eq_two_mul_m_mul_decayRate : S.γ = 2 * S.m * S.decayRate := by
+  rw [decayRate]
   field_simp [S.m_ne_zero]
 
 /-- The spring constant is `m * ω^2`. -/
@@ -141,11 +141,11 @@ lemma k_eq_m_mul_ω_sq : S.k = S.m * S.ω^2 := by
   rw [S.ω_sq]
   field_simp [S.m_ne_zero]
 
-/-- In the critically damped regime, `k = m * decay_rate^2`. -/
-lemma k_eq_m_mul_decay_rate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
-    S.k = S.m * S.decay_rate^2 := by
-  have hωa : S.ω = S.decay_rate := S.isCriticallyDamped_decay_rate hS
-  have hωsq : S.decay_rate ^ 2 = S.k / S.m := by
+/-- In the critically damped regime, `k = m * decayRate^2`. -/
+lemma k_eq_m_mul_decayRate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
+    S.k = S.m * S.decayRate^2 := by
+  have hωa : S.ω = S.decayRate := S.isCriticallyDamped_decayRate hS
+  have hωsq : S.decayRate ^ 2 = S.k / S.m := by
     simpa [hωa] using S.ω_sq
   field_simp [S.m_ne_zero] at hωsq
   nlinarith
@@ -225,10 +225,10 @@ polynomial, and hyperbolic base trajectories before the exponential decay factor
 
 private lemma criticallyDampedBase_velocity (IC : InitialConditions) :
     ∂ₜ (S.criticallyDampedBase IC) =
-      fun _ : Time => IC.v₀ + S.decay_rate • IC.x₀ := by
+      fun _ : Time => IC.v₀ + S.decayRate • IC.x₀ := by
   funext t
   change ∂ₜ (fun t : Time =>
-    IC.x₀ + t.val • (IC.v₀ + S.decay_rate • IC.x₀)) t = _
+    IC.x₀ + t.val • (IC.v₀ + S.decayRate • IC.x₀)) t = _
   rw [Time.deriv]
   rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_fun_const]
@@ -245,11 +245,11 @@ private lemma underdamped_base_velocity (IC : InitialConditions) (hS : S.IsUnder
     ∂ₜ (fun t : Time =>
       cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
         (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
-          (IC.v₀ + S.decay_rate • IC.x₀)) =
+          (IC.v₀ + S.decayRate • IC.x₀)) =
     fun t : Time =>
       (-S.underdampedAngularFrequency * sin (S.underdampedAngularFrequency * t.val)) • IC.x₀ +
         cos (S.underdampedAngularFrequency * t.val) •
-          (IC.v₀ + S.decay_rate • IC.x₀) := by
+          (IC.v₀ + S.decayRate • IC.x₀) := by
   funext t
   rw [Time.deriv]
   rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
@@ -288,11 +288,11 @@ private lemma underdamped_base_acceleration (IC : InitialConditions) (hS : S.IsU
     ∂ₜ (∂ₜ (fun t : Time =>
       cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
         (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
-          (IC.v₀ + S.decay_rate • IC.x₀))) =
+          (IC.v₀ + S.decayRate • IC.x₀))) =
     fun t : Time => -S.underdampedAngularFrequency^2 •
       (cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
         (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
-          (IC.v₀ + S.decay_rate • IC.x₀)) := by
+          (IC.v₀ + S.decayRate • IC.x₀)) := by
   funext t
   rw [S.underdamped_base_velocity IC hS]
   rw [Time.deriv]
@@ -319,11 +319,11 @@ private lemma overdamped_base_velocity (IC : InitialConditions) (hS : S.IsOverda
     ∂ₜ (fun t : Time =>
       cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
         (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
-          (IC.v₀ + S.decay_rate • IC.x₀)) =
+          (IC.v₀ + S.decayRate • IC.x₀)) =
     fun t : Time =>
       (S.overdampedSplitRate * sinh (S.overdampedSplitRate * t.val)) • IC.x₀ +
         cosh (S.overdampedSplitRate * t.val) •
-          (IC.v₀ + S.decay_rate • IC.x₀) := by
+          (IC.v₀ + S.decayRate • IC.x₀) := by
   funext t
   rw [Time.deriv]
   rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
@@ -358,11 +358,11 @@ private lemma overdamped_base_acceleration (IC : InitialConditions) (hS : S.IsOv
     ∂ₜ (∂ₜ (fun t : Time =>
       cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
         (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
-          (IC.v₀ + S.decay_rate • IC.x₀))) =
+          (IC.v₀ + S.decayRate • IC.x₀))) =
     fun t : Time => S.overdampedSplitRate^2 •
       (cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
         (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
-          (IC.v₀ + S.decay_rate • IC.x₀)) := by
+          (IC.v₀ + S.decayRate • IC.x₀)) := by
   funext t
   rw [S.overdamped_base_velocity IC hS]
   rw [Time.deriv]
@@ -398,18 +398,18 @@ lemma trajectory_criticallydamped_equationOfMotion (IC : InitialConditions)
     (hS : S.IsCriticallyDamped) :
     S.EquationOfMotion (S.trajectory_criticallydamped IC) := by
   change S.EquationOfMotion
-    (fun t : Time => exp (-S.decay_rate * t.val) • S.criticallyDampedBase IC t)
-  have hγ : S.γ = 2 * S.m * S.decay_rate := S.gamma_eq_two_mul_m_mul_decay_rate
-  have hk : S.k = S.m * (S.decay_rate^2 - 0) := by
-    simpa [sub_zero] using S.k_eq_m_mul_decay_rate_sq_of_criticallyDamped hS
+    (fun t : Time => exp (-S.decayRate * t.val) • S.criticallyDampedBase IC t)
+  have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
+  have hk : S.k = S.m * (S.decayRate^2 - 0) := by
+    simpa [sub_zero] using S.k_eq_m_mul_decayRate_sq_of_criticallyDamped hS
   have hbase :
       ∂ₜ (∂ₜ (S.criticallyDampedBase IC)) =
         fun t => (0 : ℝ) • S.criticallyDampedBase IC t := by
     simpa using S.criticallyDampedBase_acceleration IC
-  exact S.exp_decay_smul_equationOfMotion S.decay_rate 0 (S.criticallyDampedBase IC)
+  exact S.exp_decay_smul_equationOfMotion S.decayRate 0 (S.criticallyDampedBase IC)
     (by
       change Differentiable ℝ (fun t : Time =>
-        IC.x₀ + t.val • (IC.v₀ + S.decay_rate • IC.x₀))
+        IC.x₀ + t.val • (IC.v₀ + S.decayRate • IC.x₀))
       fun_prop)
     (by
       rw [S.criticallyDampedBase_velocity IC]
@@ -421,9 +421,9 @@ lemma trajectory_underdamped_equationOfMotion (IC : InitialConditions)
     (hS : S.IsUnderdamped) :
     S.EquationOfMotion (S.trajectory_underdamped IC) := by
   change S.EquationOfMotion
-    (fun t : Time => exp (-S.decay_rate * t.val) • S.underdampedBase IC t)
-  have hγ : S.γ = 2 * S.m * S.decay_rate := S.gamma_eq_two_mul_m_mul_decay_rate
-  have hk : S.k = S.m * (S.decay_rate^2 - (-S.underdampedAngularFrequency^2)) := by
+    (fun t : Time => exp (-S.decayRate * t.val) • S.underdampedBase IC t)
+  have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
+  have hk : S.k = S.m * (S.decayRate^2 - (-S.underdampedAngularFrequency^2)) := by
     rw [S.k_eq_m_mul_ω_sq, S.underdampedAngularFrequency_sq hS]
     ring
   have hbase :
@@ -432,25 +432,25 @@ lemma trajectory_underdamped_equationOfMotion (IC : InitialConditions)
     change ∂ₜ (∂ₜ (fun t : Time =>
         cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
           (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
-            (IC.v₀ + S.decay_rate • IC.x₀))) =
+            (IC.v₀ + S.decayRate • IC.x₀))) =
       fun t => -S.underdampedAngularFrequency^2 •
         (cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
           (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
-            (IC.v₀ + S.decay_rate • IC.x₀))
+            (IC.v₀ + S.decayRate • IC.x₀))
     exact S.underdamped_base_acceleration IC hS
-  exact S.exp_decay_smul_equationOfMotion S.decay_rate
+  exact S.exp_decay_smul_equationOfMotion S.decayRate
     (-S.underdampedAngularFrequency^2) (S.underdampedBase IC)
     (by
       change Differentiable ℝ (fun t : Time =>
         cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
           (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
-            (IC.v₀ + S.decay_rate • IC.x₀))
+            (IC.v₀ + S.decayRate • IC.x₀))
       fun_prop)
     (by
       change Differentiable ℝ (∂ₜ (fun t : Time =>
         cos (S.underdampedAngularFrequency * t.val) • IC.x₀ +
           (sin (S.underdampedAngularFrequency * t.val) / S.underdampedAngularFrequency) •
-            (IC.v₀ + S.decay_rate • IC.x₀)))
+            (IC.v₀ + S.decayRate • IC.x₀)))
       rw [S.underdamped_base_velocity IC hS]
       fun_prop)
     hbase hγ hk
@@ -460,9 +460,9 @@ lemma trajectory_overdamped_equationOfMotion (IC : InitialConditions)
     (hS : S.IsOverdamped) :
     S.EquationOfMotion (S.trajectory_overdamped IC) := by
   change S.EquationOfMotion
-    (fun t : Time => exp (-S.decay_rate * t.val) • S.overdampedBase IC t)
-  have hγ : S.γ = 2 * S.m * S.decay_rate := S.gamma_eq_two_mul_m_mul_decay_rate
-  have hk : S.k = S.m * (S.decay_rate^2 - S.overdampedSplitRate^2) := by
+    (fun t : Time => exp (-S.decayRate * t.val) • S.overdampedBase IC t)
+  have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
+  have hk : S.k = S.m * (S.decayRate^2 - S.overdampedSplitRate^2) := by
     rw [S.k_eq_m_mul_ω_sq, S.overdampedSplitRate_sq hS]
     ring
   have hbase :
@@ -471,25 +471,25 @@ lemma trajectory_overdamped_equationOfMotion (IC : InitialConditions)
     change ∂ₜ (∂ₜ (fun t : Time =>
         cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
           (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
-            (IC.v₀ + S.decay_rate • IC.x₀))) =
+            (IC.v₀ + S.decayRate • IC.x₀))) =
       fun t => S.overdampedSplitRate^2 •
         (cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
           (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
-            (IC.v₀ + S.decay_rate • IC.x₀))
+            (IC.v₀ + S.decayRate • IC.x₀))
     exact S.overdamped_base_acceleration IC hS
-  exact S.exp_decay_smul_equationOfMotion S.decay_rate (S.overdampedSplitRate^2)
+  exact S.exp_decay_smul_equationOfMotion S.decayRate (S.overdampedSplitRate^2)
     (S.overdampedBase IC)
     (by
       change Differentiable ℝ (fun t : Time =>
         cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
           (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
-            (IC.v₀ + S.decay_rate • IC.x₀))
+            (IC.v₀ + S.decayRate • IC.x₀))
       fun_prop)
     (by
       change Differentiable ℝ (∂ₜ (fun t : Time =>
         cosh (S.overdampedSplitRate * t.val) • IC.x₀ +
           (sinh (S.overdampedSplitRate * t.val) / S.overdampedSplitRate) •
-            (IC.v₀ + S.decay_rate • IC.x₀)))
+            (IC.v₀ + S.decayRate • IC.x₀)))
       rw [S.overdamped_base_velocity IC hS]
       fun_prop)
     hbase hγ hk
