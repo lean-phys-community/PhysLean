@@ -145,10 +145,6 @@ proportional to `-γ ‖ẋ‖^2`.
 
 -/
 
-/-- The instantaneous energy dissipation rate along a trajectory. -/
-noncomputable def energyDissipationRate (xₜ : Time → EuclideanSpace ℝ (Fin 1)) : Time → ℝ :=
-  fun t => - S.γ * ⟪∂ₜ xₜ t, ∂ₜ xₜ t⟫_ℝ
-
 /-- Along a smooth solution of the damped equation of motion, the derivative of the
 mechanical energy is `-γ ‖ẋ‖^2`. -/
 lemma energy_dissipation_rate (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time)
