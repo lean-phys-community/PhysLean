@@ -27,7 +27,7 @@ the system exhibits three different behaviors:
   amplitude.
 - **Critically damped** (`γ^2 = 4 * m * k`): fastest return to equilibrium without
   oscillation.
-- **Overdamped** (`γ^2 > 4 * m * k`): slow return to equilibrium without oscillation.
+- **Overdamped** (`4 * m * k < γ^2`): slow return to equilibrium without oscillation.
 
 In this file, the position and velocity both have type `EuclideanSpace ℝ (Fin 1)`. This
 coordinate model is useful for a first formalization, but it works only because the
@@ -165,7 +165,7 @@ lemma energy_dissipation_rate (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : 
   rw [hforce]
   simp [inner_smul_right]
 
-/-- If `γ > 0` and the velocity is nonzero at a time, the mechanical energy is strictly
+/-- If `0 < γ` and the velocity is nonzero at a time, the mechanical energy is strictly
 decreasing at that time. -/
 lemma energy_not_conserved (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time)
     (h1 : S.EquationOfMotion xₜ) (hx : ContDiff ℝ ∞ xₜ) (hdx : ∂ₜ xₜ t ≠ 0) (hγ : 0 < S.γ) :
@@ -248,8 +248,8 @@ def IsUnderdamped : Prop := S.discriminant < 0
 /-- The system is critically damped when γ² = 4mk. -/
 def IsCriticallyDamped : Prop := S.discriminant = 0
 
-/-- The system is overdamped when γ² > 4mk. -/
-def IsOverdamped : Prop := S.discriminant > 0
+/-- The system is overdamped when 4mk < γ². -/
+def IsOverdamped : Prop := 0 < S.discriminant
 
 /-- The system is undamped when γ = 0. -/
 def IsUndamped : Prop := S.γ = 0
@@ -274,7 +274,7 @@ lemma isUnderdamped_of_gamma_eq_zero (hγ : S.γ = 0) : S.IsUnderdamped := by
   nlinarith [sq_pos_of_pos S.m_pos, sq_pos_of_pos S.ω_pos]
 
 /-- An underdamped system has decay rate less than the natural frequency. -/
-lemma isUnderdamped_decayRate (hS : S.IsUnderdamped) : S.ω > S.decayRate := by
+lemma isUnderdamped_decayRate (hS : S.IsUnderdamped) : S.decayRate < S.ω := by
   rw [IsUnderdamped] at hS
   rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
   have hm_sq_pos : 0 < 4 * S.m^2 := by
