@@ -367,7 +367,9 @@ the zero-damping case.
 We also show that the equations of motion are equivalent in this case.
 -/
 
+set_option linter.unusedVariables false in
 /-- Convert a damped oscillator to its underlying undamped oscillator when `γ = 0`. -/
+@[nolint unusedArguments]
 def toUndamped (S : DampedHarmonicOscillator) (_hS : S.IsUndamped) :
     HarmonicOscillator :=
   S.toHarmonicOscillator
