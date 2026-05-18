@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Nicola Bernini. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Nicola Bernini, Joseph Tooby-Smith, Lode Vermeulen, Florian Wiesner
+Authors: Nicola Bernini, Florian Wiesner
 -/
 module
 
@@ -118,9 +118,11 @@ namespace DampedHarmonicOscillator
 variable (S : DampedHarmonicOscillator)
 
 /-!
-
 The mass/spring nonzero lemmas, the natural angular frequency, and the undamped energy API
 are inherited from `HarmonicOscillator`.
+-/
+
+/-!
 
 ## B. The equation of motion and energy dissipation
 
@@ -131,10 +133,7 @@ are inherited from `HarmonicOscillator`.
 /-- The equation of motion for the damped harmonic oscillator:
 `m ẍ + γ ẋ + k x = 0`. -/
 noncomputable def EquationOfMotion (xₜ : Time → EuclideanSpace ℝ (Fin 1)) : Prop :=
-  ∀ t : Time,
-    S.m • ∂ₜ (∂ₜ xₜ) t +
-    S.γ • ∂ₜ xₜ t +
-    S.k • xₜ t = 0
+  ∀ t : Time, S.m • ∂ₜ (∂ₜ xₜ) t + S.γ • ∂ₜ xₜ t + S.k • xₜ t = 0
 
 /-!
 
@@ -169,10 +168,7 @@ lemma energy_dissipation_rate (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : 
 /-- If `γ > 0` and the velocity is nonzero at a time, the mechanical energy is strictly
 decreasing at that time. -/
 lemma energy_not_conserved (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time)
-    (h1 : S.EquationOfMotion xₜ)
-    (hx : ContDiff ℝ ∞ xₜ)
-    (hdx : ∂ₜ xₜ t ≠ 0)
-    (hγ : 0 < S.γ) :
+    (h1 : S.EquationOfMotion xₜ) (hx : ContDiff ℝ ∞ xₜ) (hdx : ∂ₜ xₜ t ≠ 0) (hγ : 0 < S.γ) :
     ∂ₜ (S.energy xₜ) t < 0 := by
   rw [energy_dissipation_rate S xₜ t h1 hx]
   rw [neg_mul]
@@ -194,11 +190,10 @@ We define the force of the damped oscillator as `- k x - γ v`.
 
 -/
 
+/-- The force of the damped harmonic oscillator at a given position and time. -/
 noncomputable def force (S : DampedHarmonicOscillator)
     (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
-    EuclideanSpace ℝ (Fin 1) :=
-  - S.k • xₜ t
-  - S.γ • ∂ₜ xₜ t
+    EuclideanSpace ℝ (Fin 1) := - S.k • xₜ t - S.γ • ∂ₜ xₜ t
 
 /-!
 
