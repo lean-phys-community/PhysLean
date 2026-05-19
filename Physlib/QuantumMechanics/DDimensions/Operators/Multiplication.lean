@@ -170,7 +170,44 @@ lemma mulOperator_conj_domain {f : Space d → ℂ} (hf : AEStronglyMeasurable f
   simp only [mulOperator, smul_eq_mul, memHS_iff]
   exact and_congr (iff_of_true (by fun_prop) (by fun_prop)) (by simp)
 
-@[sorryful]
+private lemma exists_monotone_sets_hasFiniteIntegral
+    (f g : Space d → ℂ) (hf : AEStronglyMeasurable f) (hg : AEStronglyMeasurable g) :
+    ∃ s : ℕ → Set (Space d), Monotone s ∧ ⋃ n, s n = Set.univ ∧ (∀ n, MeasurableSet (s n))
+      ∧ ∀ k, k = 1 ∨ k = 2 →
+        ∀ n, HasFiniteIntegral (fun x ↦ ‖f x ^ k * g x‖ ^ 2) (volume.restrict (s n)) := by
+  have hfg : AEStronglyMeasurable (fun x ↦ f x * g x) := by measurability
+  have hffg : AEStronglyMeasurable (fun x ↦ f x ^ 2 * g x) := by measurability
+  obtain ⟨w₁, hw₁, hw₁'⟩ := hfg
+  obtain ⟨w₂, hw₂, hw₂'⟩ := hffg
+  let s : ℕ → Set (Space d) :=
+    fun n ↦ Metric.closedBall 0 n ∩ (w₁ ⁻¹' Metric.closedBall 0 n ∩ w₂ ⁻¹' Metric.closedBall 0 n)
+  refine ⟨s, ?_, ?_, by measurability, ?_⟩
+  · intro _ _ hmn _ hx
+    refine ⟨?_, ?_, ?_⟩
+    · exact Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.1
+    · exact Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.1
+    · exact Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.2
+  · ext x
+    simp only [Set.mem_iUnion, Set.mem_univ, iff_true]
+    use max ⌈‖x‖⌉.toNat (max ⌈‖w₁ x‖⌉.toNat ⌈‖w₂ x‖⌉.toNat)
+    suffices ∀ r : ℝ, 0 ≤ r → r ≤ ⌈r⌉.toNat by simp [s, this]
+    intro r hr
+    calc
+      r ≤ ⌈r⌉ := Int.le_ceil r
+      _ = (⌈r⌉.toNat : ℤ) := by simp [Int.ceil_nonneg hr]
+      _ = ⌈r⌉.toNat := AddGroupWithOne.intCast_ofNat _
+  · intro k hk n
+    refine lt_of_le_of_lt (b := ‖(n : ℝ) ^ 2‖ₑ * volume (s n)) ?_ ?_
+    · rw [← setLIntegral_const]
+      refine setLIntegral_mono_ae' (by measurability) ?_
+      filter_upwards [hw₁', hw₂'] with x h₁ h₂ ⟨h₃, h₃'⟩
+      apply enorm_le_iff_norm_le.mpr
+      simp_rw [norm_pow, norm_norm, RCLike.norm_natCast]
+      refine pow_le_pow_left₀ (norm_nonneg _) ?_ 2
+      rcases hk <;> simp_all
+    · refine ENNReal.mul_lt_top (by norm_num) ?_
+      exact measure_inter_lt_top_of_left_ne_top measure_closedBall_lt_top.ne
+
 lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (𝓜 f)† = 𝓜 (conj ∘ f) := by
   refine eq_of_eq_graph ?_
