@@ -17,17 +17,10 @@ public import Mathlib.Tactic.Bound
 
 @[expose] public section
 
-open NNReal
-open scoped ENNReal
-open ComplexOrder
-open Topology
-open scoped Prob
+open NNReal ComplexOrder Topology
+open ResourcePretheory FreeStateTheory UnitalPretheory UnitalFreeStateTheory
+open scoped ENNReal Prob RealInnerProductSpace InnerProductSpace
 open scoped OptimalHypothesisRate
-open ResourcePretheory
-open FreeStateTheory
-open UnitalPretheory
-open UnitalFreeStateTheory
-open scoped RealInnerProductSpace InnerProductSpace
 
 namespace SteinsLemma
 
@@ -2137,15 +2130,3 @@ theorem limit_hypotesting_eq_limit_rel_entropy (ρ : MState (H i)) (ε : Prob) (
   constructor
   · exact GeneralizedQSteinsLemma ρ hε -- Theorem 1 in Hayashi & Yamasaki
   · exact RelativeEntResource.tendsto_ennreal ρ -- The regularized relative entropy of resource is not infinity
-
-/-
-info: 'SteinsLemma.limit_hypotesting_eq_limit_rel_entropy' depends on axioms: [propext,
- sandwichedRenyiEntropy_DPI_ax,
- Classical.choice,
- Quot.sound]
--/
-/-
-Commented out because of module system.
-#guard_msgs in
-#print axioms limit_hypotesting_eq_limit_rel_entropy
--/

@@ -25,7 +25,6 @@ prove that they satisfy the equation of motion, and prove some properties of the
 
 - A. The initial conditions
   - A.1. Definition of the initial conditions
-    - A.1.1. Extensionality lemma
   - A.2. Relation to other types of initial conditions
   - A.3. The zero initial conditions
     - A.3.1. Simple results for the zero initial conditions
@@ -80,29 +79,16 @@ We start by defining the type of initial conditions for the harmonic oscillator.
 -/
 
 /-- The initial conditions for the harmonic oscillator specified by an initial position,
-  and an initial velocity. -/
-structure InitialConditions where
+  and an initial velocity.
+
+The `@[ext]` attribute provides an extensionality lemma for `InitialConditions`.
+That is, a lemma which states that two initial conditions are equal if their
+initial positions and initial velocities are equal. -/
+@[ext] structure InitialConditions where
   /-- The initial position of the harmonic oscillator. -/
   x₀ : EuclideanSpace ℝ (Fin 1)
   /-- The initial velocity of the harmonic oscillator. -/
   v₀ : EuclideanSpace ℝ (Fin 1)
-
-/-!
-
-#### A.1.1. Extensionality lemma
-
-We prove an extensionality lemma for `InitialConditions`.
-That is, a lemma which states that two initial conditions are equal if their
-initial positions and initial velocities are equal.
-
--/
-
-@[ext]
-lemma InitialConditions.ext {IC₁ IC₂ : InitialConditions} (h1 : IC₁.x₀ = IC₂.x₀)
-    (h2 : IC₁.v₀ = IC₂.v₀) : IC₁ = IC₂ := by
-  cases IC₁
-  cases IC₂
-  simp_all
 
 /-!
 
@@ -147,7 +133,7 @@ This is useful when the natural reference point for a problem is not at time zer
 
   The conditions can be converted to the standard `InitialConditions` format (at `t=0`)
   using the `toInitialConditions` function. -/
-structure InitialConditionsAtTime where
+@[ext] structure InitialConditionsAtTime where
   /-- The time at which the initial conditions are specified. -/
   t₀ : Time
   /-- The position at time t₀. -/
@@ -155,21 +141,6 @@ structure InitialConditionsAtTime where
   /-- The velocity at time t₀. -/
   v_t₀ : EuclideanSpace ℝ (Fin 1)
 
-/-!
-
-##### A.2.1.1. Extensionality lemma
-
-We prove an extensionality lemma for `InitialConditionsAtTime`.
-
--/
-
-@[ext]
-lemma InitialConditionsAtTime.ext {IC₁ IC₂ : InitialConditionsAtTime}
-    (h1 : IC₁.t₀ = IC₂.t₀) (h2 : IC₁.x_t₀ = IC₂.x_t₀) (h3 : IC₁.v_t₀ = IC₂.v_t₀) :
-    IC₁ = IC₂ := by
-  cases IC₁
-  cases IC₂
-  simp_all
 
 /-!
 
@@ -673,7 +644,6 @@ lemma toInitialConditions_velocity_at_t₀ (S : HarmonicOscillator)
   rw [← h1]
   ring
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The energy of the trajectory at time `t₀` equals the energy computed from the
   initial conditions at `t₀`. -/
 lemma toInitialConditions_energy_at_t₀ (S : HarmonicOscillator)
@@ -790,7 +760,6 @@ the velocity is zero.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma trajectory_velocity_eq_zero_iff (IC : InitialConditions) (t : Time) :
     ∂ₜ (IC.trajectory S) t = 0 ↔
     ‖(IC.trajectory S) t‖ = √(‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2) := by
@@ -872,6 +841,34 @@ lemma trajectory_velocity_eq_zero_iff (IC : InitialConditions) (t : Time) :
     rw [pow_ne_zero_iff ?_]
     apply ω_ne_zero
     exact Ne.symm (Nat.zero_ne_add_one 1)
+end InitialConditions
+
+/--
+The period of a harmonic oscillator is `2 * π / ω`.
+-/
+noncomputable def period (S : HarmonicOscillator) : ℝ := 2 * π / S.ω
+
+@[inherit_doc period]
+scoped notation "T" => HarmonicOscillator.period
+
+lemma period_eq : T S = 2 * π / S.ω := rfl
+
+lemma period_pos : 0 < T S := by
+  have := S.ω_pos
+  rw [period_eq]
+  positivity
+
+/--
+The trajectory of the harmonic oscillator is periodic with period of `2 * π / ω`.
+-/
+lemma trajectory_periodic (IC : InitialConditions) :
+    Function.Periodic (IC.trajectory S) (T S) := fun t ↦ by
+  have h : S.ω * (t.val + 2 * π / S.ω) = S.ω * t.val + 2 * π := by
+    have := S.ω_ne_zero
+    ring_nf; field_simp
+  rw [InitialConditions.trajectory, add_val, period_eq, h, cos_add_two_pi, sin_add_two_pi]
+  rfl
+
 /-!
 
 ## F. Some open TODOs
@@ -885,8 +882,6 @@ TODO "For the classical harmonic oscillator find the time for which it returns t
 
 TODO "For the classical harmonic oscillator find the times for
   which it passes through zero."
-
-end InitialConditions
 
 end HarmonicOscillator
 

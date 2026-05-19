@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Units.WithDim.Speed
+public import Physlib.Units.FDeriv
 /-!
 
 # Examples of units in Physlib
@@ -225,5 +226,20 @@ lemma cosDim_isDimensionallyCorrect : IsDimensionallyCorrect CosDim := by
 
 -/
 
-TODO "Add an example involving derivatives."
+example {M1 M2 : Type} [NormedAddCommGroup M1] [NormedSpace ℝ M1]
+    [ContinuousConstSMul ℝ M1] [HasDim M1]
+    [NormedAddCommGroup M2] [NormedSpace ℝ M2] [SMulCommClass ℝ ℝ M2]
+    [ContinuousConstSMul ℝ M2] [HasDim M2] (f : M1 → M2)
+    (hf : IsDimensionallyCorrect f) (f_diff : Differentiable ℝ f) :
+    IsDimensionallyCorrect (fderiv ℝ f) :=
+  fderiv_isDimensionallyCorrect f hf f_diff
+
+example {M1 M2 : Type} [NormedAddCommGroup M1] [NormedSpace ℝ M1]
+    [ContinuousConstSMul ℝ M1] [HasDim M1]
+    [NormedAddCommGroup M2] [NormedSpace ℝ M2] [SMulCommClass ℝ ℝ M2]
+    [ContinuousConstSMul ℝ M2] [HasDim M2] (dm : M1) (f : M1 → M2)
+    (hf : IsDimensionallyCorrect f) (f_diff : Differentiable ℝ f) :
+    IsDimensionallyCorrect (fun x (v : WithDim (dim M2 * (dim M1)⁻¹) M2) =>
+      fderiv ℝ f x dm = v.1) :=
+  fderiv_dimension_const_direction dm f hf f_diff
 end UnitExamples

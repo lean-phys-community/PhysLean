@@ -74,7 +74,7 @@ lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
     accQuad (a • S.val + b • (Y n).val) = a ^ 2 * accQuad S.val := by
   erw [BiLinearSymm.toHomogeneousQuad_add, quadSol (b • (Y n)).1]
   rw [quadBiLin.map_smul₁, quadBiLin.map_smul₂, quadBiLin.swap, on_quadBiLin_AFL]
-  erw [accQuad.map_smul]
+  rw [← accQuad, accQuad.map_smul]
   simp
 
 lemma add_quad (S : (PlusU1 n).QuadSols) (a b : ℚ) :

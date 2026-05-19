@@ -189,12 +189,24 @@ lemma schattenNorm_half_mul_rpow_eq_trace_conj
     rw [ Matrix.conjTranspose_conjTranspose ];
     exact congrArg Complex.re (congrArg Matrix.trace (congrArg (cfc fun x => x ^ α) h_conj));
   · have h_eigenvalues_nonneg : ∀ i, 0 ≤ (Matrix.isHermitian_mul_conjTranspose_self ((A ^ (1 / 2 : ℝ)).mat * B.mat).conjTranspose).eigenvalues i := by
-      intro i; exact (by
-      have := Matrix.eigenvalues_conjTranspose_mul_self_nonneg ( ( A ^ ( 1 / 2 : ℝ ) ).mat * B.mat ) i; aesop;);
-    simp_all [ Matrix.trace, Matrix.IsHermitian.cfc ];
-    simp_all [ Matrix.mul_apply, Matrix.diagonal ];
+      intro i
+      simpa only [one_div, HermitianMat.conjTranspose_mat, HermitianMat.conj_apply_mat,
+        Matrix.conjTranspose_mul] using
+          ((A ^ (1 / 2 : ℝ)).mat * B.mat).eigenvalues_conjTranspose_mul_self_nonneg i
+    simp only [Matrix.trace, Matrix.IsHermitian.cfc, one_div, Matrix.conjTranspose_mul,
+      HermitianMat.conjTranspose_mat, Complex.coe_algebraMap, Unitary.conjStarAlgAut_apply,
+      Matrix.diag_apply, Complex.re_sum, ge_iff_le]
+    simp only [one_div, Matrix.conjTranspose_mul, HermitianMat.conjTranspose_mat,
+      HermitianMat.conj_apply_mat, HermitianMat.conjTranspose_mat] at h_eigenvalues_nonneg h_conj
+    simp_all only
+    simp only [Matrix.diagonal, Function.comp_apply, one_div, Matrix.conjTranspose_mul,
+      HermitianMat.conjTranspose_mat, Matrix.mul_apply, Matrix.IsHermitian.eigenvectorUnitary_apply,
+      Matrix.of_apply, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte,
+      Matrix.star_apply, RCLike.star_def, Complex.re_sum, Complex.mul_re, Complex.ofReal_re,
+      Complex.ofReal_im, sub_zero, Complex.conj_re, Complex.mul_im, zero_add, Complex.conj_im,
+      mul_neg, sub_neg_eq_add, h_conj]
     refine' Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ => _;
-    field_simp;
+    field_simp
     exact mul_nonneg ( Real.rpow_nonneg ( h_eigenvalues_nonneg j ) _ ) (by positivity)
 
 /-!

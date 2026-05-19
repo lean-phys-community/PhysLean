@@ -5,24 +5,26 @@ Authors: Alex Meiburg
 -/
 module
 
-public import QuantumInfo.StatMech.Hamiltonian
 public import QuantumInfo.ForMathlib.ComplexLaplaceTransform
 public import Mathlib.Analysis.Complex.HasPrimitives
 public import Mathlib.Analysis.Complex.RealDeriv
-public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
-public import Mathlib.Data.Real.StarOrdered
-public import Mathlib.MeasureTheory.Constructions.Pi
 public import Mathlib.MeasureTheory.Constructions.BorelSpace.WithTop
 public import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
-public import Mathlib.MeasureTheory.Integral.Bochner.Basic
-public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
-public import Mathlib.MeasureTheory.Integral.Bochner.L1
-public import Mathlib.MeasureTheory.Integral.Bochner.VitaliCaratheodory
 public import Mathlib.MeasureTheory.Integral.DominatedConvergence
 public import Mathlib.MeasureTheory.Measure.Prod
+public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
+public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+public import Mathlib.MeasureTheory.Integral.Bochner.Basic
 public import Mathlib.MeasureTheory.Measure.Haar.OfBasis
-public import Mathlib.Order.CompletePartialOrder
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.Basic
+public import Physlib.Meta.TODO.Basic
 
+
+/-!
+
+## The theormodynamical quantities of a microcanonical ensemble
+
+-/
 @[expose] public section
 
 noncomputable section
@@ -30,12 +32,13 @@ namespace MicroHamiltonian
 
 variable {D : Type} (H : MicroHamiltonian D) (d : D)
 
-/-- The partition function corresponding to a given MicroHamiltonian. This is a function taking a thermodynamic β, not a temperature.
-It also depends on the data D defining the system extrinsincs.
+/-- The partition function corresponding to a given MicroHamiltonian. This is a function taking a
+  thermodynamic β, not a temperature. It also depends on the data D defining the system extrinsincs.
 
- * Ideally this would be an NNReal, but ∫ (NNReal) doesn't work right now, so it would just be a separate proof anyway
+ * Ideally this would be an NNReal, but ∫ (NNReal) doesn't work right now, so it would just be a
+   separate proof anyway
 -/
-def PartitionZ (β : ℝ) : ℝ :=
+def partitionZ (β : ℝ) : ℝ :=
   ∫ (config : H.dim d → ℝ),
     let E := H.H config
     if h : E = ⊤ then 0 else Real.exp (-β * (E.untop h))
@@ -83,37 +86,39 @@ theorem contDiffAt_partitionZ_of_mem_interior_convergenceDomain {β : ℝ}
   exact H.partitionZ_eq_re_partitionZComplex d (_root_.interior_subset hx)
 
 /-- The partition function as a function of temperature T instead of β. -/
-def PartitionZT (T : ℝ) : ℝ :=
-  PartitionZ H d (1/T)
+def partitionZT (T : ℝ) : ℝ :=
+  partitionZ H d (1/T)
 
 /-- The Internal Energy, U or E, defined as -∂(ln Z)/∂β. Parameterized here with β. -/
-def InternalU (β : ℝ) : ℝ :=
-  -deriv (fun β' ↦ (PartitionZ H d β').log) β
+def internalU (β : ℝ) : ℝ :=
+  -deriv (fun β' ↦ (partitionZ H d β').log) β
 
-/-- The Helmholtz Free Energy, -T * ln Z. Also denoted F. Parameterized here with temperature T, not β. -/
-def HelmholtzA (T : ℝ) : ℝ :=
-  -T * (PartitionZT H d T).log
+/-- The Helmholtz Free Energy, -T * ln Z. Also denoted F. Parameterized here with temperature T, not
+  β. -/
+def helmholtzA (T : ℝ) : ℝ :=
+  -T * (partitionZT H d T).log
 
 /-- The entropy, defined as the -∂A/∂T. Function of T. -/
-def EntropyS (T : ℝ) : ℝ :=
-  -deriv (HelmholtzA H d) T
+def entropyS (T : ℝ) : ℝ :=
+  -deriv (helmholtzA H d) T
 
 /-- The entropy, defined as ln Z + β*U. Function of β. -/
-def EntropySβ (β : ℝ) : ℝ :=
-  (PartitionZ H d β).log + β * InternalU H d β
+def entropySβ (β : ℝ) : ℝ :=
+  (partitionZ H d β).log + β * internalU H d β
 
-/-- To be able to compute or define anything from a Hamiltonian, we need its partition function to be
-a computable integral. A Hamiltonian is ZIntegrable at β if PartitionZ is Lesbegue integrable and nonzero.
+/-- To be able to compute or define anything from a Hamiltonian, we need its partition function to
+  be a computable integral. A Hamiltonian is ZIntegrable at β if PartitionZ is Lesbegue integrable
+  and nonzero.
 -/
 def ZIntegrable (β : ℝ) : Prop :=
   MeasureTheory.Integrable (fun (config : H.dim d → ℝ) ↦
     let E := H.H config;
     if h : E = ⊤ then 0 else Real.exp (-β * (E.untop h))
-  ) ∧ (H.PartitionZ d β ≠ 0)
+  ) ∧ (H.partitionZ d β ≠ 0)
 
 /--
-This Prop defines the most common case of ZIntegrable, that it is integrable at all finite temperatures
-(aka all positive β).
+This Prop defines the most common case of ZIntegrable, that it is integrable at all finite
+temperatures (aka all positive β).
 -/
 def PositiveβIntegrable : Prop :=
   ∀ β > 0, H.ZIntegrable d β
@@ -233,8 +238,8 @@ open MicroHamiltonian
 variable (H : NVEHamiltonian) (d : ℕ × ℝ)
 
 /-- Pressure, as a function of T. Defined as the conjugate variable to volume. -/
-def Pressure (T : ℝ) : ℝ :=
+def pressure (T : ℝ) : ℝ :=
   let (n, V) := d;
-  -deriv (fun V' ↦ HelmholtzA H (n, V') T) V
+  - deriv (fun V' ↦ helmholtzA H (n, V') T) V
 
 end NVEHamiltonian

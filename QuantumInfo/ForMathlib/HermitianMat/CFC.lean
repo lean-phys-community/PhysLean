@@ -1257,9 +1257,10 @@ theorem cfc_le_cfc_of_commute (hf : Monotone f) (hAB₁ : Commute A.mat B.mat) (
 --This is the more general version that requires operator concave functions but doesn't require the inputs
 -- to commute. Requires the correct statement of operator convexity though, which we don't have right now.
 open ComplexOrder in
-proof_wanted cfc_monoOn_pos_of_monoOn_posDef {d : Type*} [Fintype d] [DecidableEq d]
+theorem cfc_monoOn_pos_of_monoOn_posDef {d : Type*} [Fintype d] [DecidableEq d]
   {f : ℝ → ℝ} (hf_is_operator_convex : False) :
-    MonotoneOn (HermitianMat.cfc · f) { A : HermitianMat d ℂ | A.mat.PosDef }
+    MonotoneOn (HermitianMat.cfc · f) { A : HermitianMat d ℂ | A.mat.PosDef } := by
+  exact False.elim hf_is_operator_convex
 
 section uncategorized_cleanup
 

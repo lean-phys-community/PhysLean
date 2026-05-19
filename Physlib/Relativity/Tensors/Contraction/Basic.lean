@@ -25,6 +25,9 @@ variable {k : Type} [CommRing k] {C G : Type} [Group G]
   {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
   {S : TensorSpecies k C G basisIdx}
 
+TODO "docs: The files on contractions of tensors are currently lacking documentation.
+  These should be added, mirroring good examples within Physlib."
+
 namespace Tensor
 
 /-!

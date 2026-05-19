@@ -49,6 +49,7 @@ inductive PhyslibCategory
   | StringTheory
   | StatisticalMechanics
   | Thermodynamics
+  | QuantumInfo
   | Other
 deriving BEq, DecidableEq
 
@@ -67,6 +68,7 @@ def PhyslibCategory.string :  PhyslibCategory → String
   | StringTheory => "String Theory"
   | StatisticalMechanics => "Statistical Mechanics"
   | Thermodynamics => "Thermodynamics"
+  | QuantumInfo => "Quantum Information"
   | Other => "Other"
 
 def PhyslibCategory.emoji : PhyslibCategory → String
@@ -84,6 +86,7 @@ def PhyslibCategory.emoji : PhyslibCategory → String
   | StringTheory => "🧵"
   | StatisticalMechanics => "🎲"
   | Thermodynamics => "🔥"
+  | QuantumInfo => "💻"
   | Other => "❓"
 
 def PhyslibCategory.List :  List PhyslibCategory :=
@@ -101,6 +104,7 @@ def PhyslibCategory.List :  List PhyslibCategory :=
     PhyslibCategory.StringTheory,
     PhyslibCategory.StatisticalMechanics,
     PhyslibCategory.Thermodynamics,
+    PhyslibCategory.QuantumInfo,
     PhyslibCategory.Other]
 
 instance : ToString PhyslibCategory where
@@ -133,6 +137,8 @@ def PhyslibCategory.ofFileName (n : Name) : PhyslibCategory :=
     PhyslibCategory.StatisticalMechanics
   else if n.toString.startsWith "Physlib.Thermodynamics" then
     PhyslibCategory.Thermodynamics
+  else if n.toString.startsWith "Physlib.QuantumInfo" then
+    PhyslibCategory.QuantumInfo
   else
     PhyslibCategory.Other
 
@@ -316,7 +322,7 @@ unsafe def fullTODOYML : MetaM String := do
 unsafe def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
   println! "Generating TODO list."
-  let env ← importModules (loadExts := true) #[`Physlib] {} 0
+  let env ← importModules (loadExts := true) #[`Physlib, `QuantumInfo] {} 0
   let fileName := ""
   let options : Options := {}
   let ctx : Core.Context := {fileName, options, fileMap := default }
