@@ -24,7 +24,8 @@ When `T` is symmetric, `‖ψ‖ = 1`, and `Tψ ∈ T.domain`, it also equals `�
 
 - `LinearPMap.variance_eq_norm_sq_sub_expectedValue_sq`: for a unit vector and symmetric `T`,
   the variance is `‖Tψ‖ ^ 2 - ⟨T⟩_ψ ^ 2`.
-- `LinearPMap.variance_eq_re_inner_sub_expectedValue_sq`: the second-order formula when `Tψ ∈ T.domain`.
+- `LinearPMap.variance_eq_re_inner_sub_expectedValue_sq`: the second-order formula when
+`Tψ ∈ T.domain`.
 - `LinearPMap.variance_eq_zero_iff_isEigenvector` and
   `LinearPMap.standardDeviation_eq_zero_iff_isEigenvector`: for a unit vector, zero variance or
   standard deviation is equivalent to the eigenvector condition.
