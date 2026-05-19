@@ -254,6 +254,24 @@ lemma adjoint_antitone [CompleteSpace H]
     · have h₁ : ¬U₁.HasDenseDomain := fun h ↦ h₂ (h.mono h_le.1)
       rw [adjoint_apply_of_not_dense h₁ v, adjoint_apply_of_not_dense h₂ u]
 
+lemma adjoint_add_le_add_adjoint [CompleteSpace H]
+    (U₁ U₂ : H →ₗ.[ℂ] H') (h₁₂ : (U₁ + U₂).HasDenseDomain) : U₁† + U₂† ≤ (U₁ + U₂)† := by
+  have h₁ : U₁.HasDenseDomain := h₁₂.mono Set.inter_subset_left
+  have h₂ : U₂.HasDenseDomain := h₁₂.mono Set.inter_subset_right
+  constructor
+  · intro u hu
+    apply mem_adjoint_domain_of_exists
+    use U₁† ⟨u, hu.1⟩ + U₂† ⟨u, hu.2⟩
+    intro x
+    simp only [add_apply, inner_add_left, inner_add_right,
+      adjoint_isFormalAdjoint h₁ ⟨u, hu.1⟩ ⟨x, x.2.1⟩,
+      adjoint_isFormalAdjoint h₂ ⟨u, hu.2⟩ ⟨x, x.2.2⟩]
+  · intro u v huv
+    refine (adjoint_apply_eq h₁₂ _ fun w ↦ ?_).symm
+    simp only [add_apply, inner_add_left, inner_add_right, ← huv,
+      adjoint_isFormalAdjoint h₁ ⟨u, u.2.1⟩ ⟨w, w.2.1⟩,
+      adjoint_isFormalAdjoint h₂ ⟨u, u.2.2⟩ ⟨w, w.2.2⟩]
+
 /-!
 ## E. Symmetric operators
 -/
