@@ -71,9 +71,9 @@ lemma stateCovariance_eq_re_symm_centered :
   simp only [Complex.add_re, Complex.star_def, Complex.conj_re, add_self_div_two]
 
 @[simp]
-lemma stateCovariance_self_eq_stateVariance (A : H →ₗ.[ℂ] H) (ψ : A.domain) :
-    stateCovariance A A ψ (by exact ψ.2) = stateVariance A ψ := by
-  rw [stateCovariance_eq_re_inner_centered, stateVariance_eq_centered_norm_sq,
+lemma stateCovariance_self_eq_variance (A : H →ₗ.[ℂ] H) (ψ : A.domain) :
+    stateCovariance A A ψ (by exact ψ.2) = variance A ψ := by
+  rw [stateCovariance_eq_re_inner_centered, variance_eq_centered_norm_sq,
     inner_self_eq_norm_sq_to_K]
   rw [sq, sq, Complex.mul_re]
   simp [Complex.ofReal_re, Complex.ofReal_im]
