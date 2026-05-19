@@ -121,6 +121,29 @@ end SupRegularized
 
 section real
 
+private def realNegOrderIso : ℝ ≃o ℝᵒᵈ where
+  toEquiv := Equiv.neg ℝ
+  map_rel_iff' := by
+    intro a b
+    change (-b : ℝ) ≤ -a ↔ a ≤ b
+    simpa using neg_le_neg_iff
+
+private theorem limsup_eq_neg_liminf_neg {fn : ℕ → ℝ} {_lb _ub : ℝ}Expand commentComment on line R131Resolved
+    (hl : ∀ n, _lb ≤ fn n) (hu : ∀ n, fn n ≤ _ub) :
+    Filter.atTop.limsup fn = -Filter.atTop.liminf (fun n => -fn n) := by
+  have hneg : -Filter.atTop.limsup fn = Filter.atTop.liminf (fun n => -fn n) := by
+    have hdual := OrderIso.limsup_apply (f := Filter.atTop) (u := fn) realNegOrderIso
+      (hu := Filter.isBoundedUnder_of_eventually_le (f := Filter.atTop) (u := fn)
+        (Filter.Eventually.of_forall hu))
+      (hu_co := Filter.isCoboundedUnder_le_of_le Filter.atTop hl)
+      (hgu := Filter.isBoundedUnder_of_eventually_le (α := ℝᵒᵈ) (f := Filter.atTop)
+        (u := fun n => (-fn n : ℝᵒᵈ)) (Filter.Eventually.of_forall fun n => neg_le_neg (hu n)))
+      (hgu_co := Filter.isCoboundedUnder_le_of_le (α := ℝᵒᵈ) Filter.atTop
+        (f := fun n => (-fn n : ℝᵒᵈ)) (x := (-_lb : ℝᵒᵈ)) fun n => neg_le_neg (hl n))
+    simpa [Filter.limsup, Filter.liminf, Filter.limsSup, Filter.limsInf, realNegOrderIso] using
+      congrArg OrderDual.ofDual hdual
+  linarith
+
 variable {fn : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
 
 theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegularized (-fn ·)
