@@ -15,7 +15,6 @@ defines the expectation value and the centered vector `Tψ - ⟨T⟩_ψ ψ`.
 ## Main definitions
 
 - `LinearPMap.expectedValue`: the real part of `⟪ψ, Tψ⟫_ℂ`.
-- `LinearPMap.stateExpectedValue`: the same quantity, with state-observable naming.
 - `LinearPMap.centered`: the centered vector `Tψ - ⟨T⟩ψ`.
 
 ## Main statements
@@ -69,44 +68,25 @@ lemma inner_eq_expectedValue (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T
     (expectedValue T ψ : ℂ) = ⟪(ψ : H), T ψ⟫_ℂ :=
   (expectedValue_eq_inner T hT ψ).symm
 
-/-- Same as `expectedValue`; kept for state-observable naming. -/
-def stateExpectedValue (T : H →ₗ.[ℂ] H) (ψ : T.domain) : ℝ :=
-  expectedValue T ψ
-
-/-- State-level expectation values reduce to quadratic-form expectation values. -/
-lemma stateExpectedValue_eq_expectedValue (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    stateExpectedValue T ψ = expectedValue T ψ :=
-  rfl
-
-/-- For symmetric partial linear maps, the complex inner product is the state expectation value. -/
-lemma stateExpectedValue_eq_inner (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T.domain) :
-    ⟪(ψ : H), T ψ⟫_ℂ = (stateExpectedValue T ψ : ℂ) := by
-  simpa [stateExpectedValue] using expectedValue_eq_inner T hT ψ
-
-/-- Reverse orientation of `LinearPMap.stateExpectedValue_eq_inner`. -/
-lemma inner_eq_stateExpectedValue (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T.domain) :
-    (stateExpectedValue T ψ : ℂ) = ⟪(ψ : H), T ψ⟫_ℂ :=
-  (stateExpectedValue_eq_inner T hT ψ).symm
-
 /-- The centered vector `Tψ - ⟨T⟩_ψ ψ`. -/
 def centered (T : H →ₗ.[ℂ] H) (ψ : T.domain) : H :=
-  T ψ - (stateExpectedValue T ψ : ℂ) • (ψ : H)
+  T ψ - (expectedValue T ψ : ℂ) • (ψ : H)
 
 /-- The centered vector, unfolded to its raw expression. -/
 lemma centered_eq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    centered T ψ = T ψ - (stateExpectedValue T ψ : ℂ) • (ψ : H) :=
+    centered T ψ = T ψ - (expectedValue T ψ : ℂ) • (ψ : H) :=
   rfl
 
 /-- A centered vector vanishes exactly when `Tψ = ⟨T⟩_ψ ψ`. -/
 lemma centered_eq_zero_iff (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    centered T ψ = 0 ↔ T ψ = (stateExpectedValue T ψ : ℂ) • (ψ : H) := by
+    centered T ψ = 0 ↔ T ψ = (expectedValue T ψ : ℂ) • (ψ : H) := by
   rw [centered_eq, sub_eq_zero]
 
 /-- For a unit vector and symmetric `T`, the centered vector is orthogonal to the state. -/
 lemma inner_state_centered_eq_zero (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
     (ψ : T.domain) (hψ_norm : ‖(ψ : H)‖ = 1) :
     ⟪(ψ : H), centered T ψ⟫_ℂ = 0 := by
-  rw [centered_eq, inner_sub_right, inner_smul_right, stateExpectedValue_eq_inner T hT ψ]
+  rw [centered_eq, inner_sub_right, inner_smul_right, expectedValue_eq_inner T hT ψ]
   simp [hψ_norm, inner_self_eq_norm_sq_to_K]
 
 /-- The conjugate orientation of `LinearPMap.inner_state_centered_eq_zero`. -/
@@ -114,8 +94,8 @@ lemma inner_centered_state_eq_zero (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
     (ψ : T.domain) (hψ_norm : ‖(ψ : H)‖ = 1) :
     ⟪centered T ψ, (ψ : H)⟫_ℂ = 0 := by
   rw [centered_eq, inner_sub_left, inner_smul_left]
-  have hμ := stateExpectedValue_eq_inner T hT ψ
-  have hμ' : ⟪T ψ, (ψ : H)⟫_ℂ = (stateExpectedValue T ψ : ℂ) := by
+  have hμ := expectedValue_eq_inner T hT ψ
+  have hμ' : ⟪T ψ, (ψ : H)⟫_ℂ = (expectedValue T ψ : ℂ) := by
     simpa [inner_conj_symm] using congrArg star hμ
   rw [hμ']
   simp [hψ_norm, inner_self_eq_norm_sq_to_K]
