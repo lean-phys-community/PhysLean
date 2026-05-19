@@ -53,8 +53,8 @@ def chargeMap (f : PermGroup) : MSSMCharges.Charges →ₗ[ℚ] MSSMCharges.Char
     rfl
 
 lemma chargeMap_toSpecies (f : PermGroup) (S : MSSMCharges.Charges) (j : Fin 6) :
-    toSMSpecies j (chargeMap f S) = toSMSpecies j S ∘ f j := by
-  erw [toSMSpecies_toSpecies_inv]
+    toSMSpecies j (chargeMap f S) = toSMSpecies j S ∘ f j :=
+  toSMSpecies_toSpecies_inv _ _
 
 /-- The representation of `permGroup` acting on the vector space of charges. -/
 @[simp]
@@ -78,12 +78,11 @@ def repCharges : Representation ℚ PermGroup (MSSMCharges).Charges where
     rw [charges_eq_toSpecies_eq]
     refine And.intro ?_ $ Prod.mk_inj.mp rfl
     intro i
-    erw [toSMSpecies_toSpecies_inv]
-    rfl
+    exact toSMSpecies_toSpecies_inv _ _
 
 lemma repCharges_toSMSpecies (f : PermGroup) (S : MSSMCharges.Charges) (j : Fin 6) :
-    toSMSpecies j (repCharges f S) = toSMSpecies j S ∘ f⁻¹ j := by
-  erw [toSMSpecies_toSpecies_inv]
+    toSMSpecies j (repCharges f S) = toSMSpecies j S ∘ f⁻¹ j :=
+  toSMSpecies_toSpecies_inv _ _
 
 lemma toSpecies_sum_invariant (m : ℕ) (f : PermGroup) (S : MSSMCharges.Charges) (j : Fin 6) :
     ∑ i, ((fun a => a ^ m) ∘ toSMSpecies j (repCharges f S)) i =

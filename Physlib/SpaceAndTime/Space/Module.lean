@@ -293,8 +293,6 @@ instance {d : ℕ} : BorelSpace (Space d) where
 TODO "In the above documentation describe what an instance is, and why
   it is useful to have instances for `Space d`."
 
-TODO "After TODO 'HB6VC', give `Space d` the necessary instances
-  using `inferInstanceAs`."
 /-!
 
 ## The norm on `Space`

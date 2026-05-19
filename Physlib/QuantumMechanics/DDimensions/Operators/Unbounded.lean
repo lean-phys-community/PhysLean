@@ -12,37 +12,42 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 
 ## i. Overview
 
-In this module we define unbounded operators between Hilbert spaces.
+In this module we introduce unbounded operators on inner product spaces. By "unbounded operator"
+we mean a partially-defined linear map (`LinearPMap`) which is both densely defined and closable.
+These provide the mathematical structure appropriate for describing operators in non-relativistic
+quantum mechanics. Of particular interest are (essentially) self-adjoint unbounded operators since
+these correspond to physical observables.
+
+### Notes
+
+- Naming convention : Definitions of `LinearPMap`s for quantum mechanical unbounded operators should
+    have a name of the form `[…]Operator` and notation should use calligraphic capital letters,
+    e.g. `mulOperator f` (`𝓜 f`) for the multiplication operator associated with the function `f`.
+
+- Implementation : Although operators encountered in quantum mechanics are almost always unbounded,
+    we opt to implement unbounded operators via the property `IsUnbounded` on `LinearPMap` rather
+    than as a structure `UnboundedOperator` extending `LinearPMap`. The basic reason for this
+    is that addition/subtraction and composition of unbounded operators in general does not result
+    in another unbounded operator. This means, for example, that any attempt to define addition of
+    `UnboundedOperator`s would inevitably require introducing junk values that spoil associativity.
 
 ## ii. Key results
 
-Definitions:
-- `UnboundedOperator`: Densely defined, closable unbounded operator between Hilbert spaces.
-- `partialOrder`: Poset structure for unbounded operators.
-- `ofSymmetric`: Construction of an unbounded operator from a symmetric `LinearPMap`.
-- `IsGeneralizedEigenvector`: The notion of eigenvectors/values for linear functionals.
-
-(In)equalities:
-- `le_closure`: `U ≤ U.closure`
-- `adjoint_adjoint_eq_closure`: `U†† = U.closure`
-- `adjoint_ge_adjoint_of_le`: `U₁ ≤ U₂ → U₂† ≤ U₁†`
-- `closure_mono`: `U₁ ≤ U₂ → U₁.closure ≤ U₂.closure`
-- `isSymmetric_iff_le_adjoint`: `IsSymmetric T ↔ T ≤ T†`
+- `IsUnbounded.adjoint` : The adjoint of an unbounded operator is also unbounded.
+- `IsUnbounded.adjoint_closure_eq_adjoint` : An unbounded operator and its closure have
+    the same adjoint.
+- `IsUnbounded.adjoint_adjoint_eq_closure` : An unbounded operator `U` satisfies `U†† = U.closure`.
 
 ## iii. Table of contents
 
-- A. Definition
-- B. Basic identities
-- C. Instances
-  - C.1. Partial order
-  - C.2. Zero
-  - C.3. AddZeroClass
-  - C.4. DistribSMul
-- D. Closure
-- E. Adjoint
-- F. Symmetric operators
-- G. Self-adjoint operators
-- H. Generalized eigenvectors
+- A. Definitions
+- B. Dense domain
+- C. Closability
+- D. Adjoints
+- E. Symmetric operators
+- F. Self-adjoint operators
+- G. Essentially self-adjoint operators
+- H. Unbounded operators
 
 ## iv. References
 
@@ -55,550 +60,392 @@ Definitions:
 
 @[expose] public section
 
-namespace QuantumMechanics
+namespace LinearPMap
 
-open LinearPMap Submodule
-open InnerProductSpace InnerProductSpaceSubmodule
-
-/-!
-## A. Definition
--/
-
-/-- An `UnboundedOperator` is a linear map from a submodule of `H` to `H'`,
-  assumed to be both densely defined and closable. -/
-structure UnboundedOperator
-    (H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (H' : Type*) [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H']
-    extends LinearPMap ℂ H H' where
-  /-- The domain of an unbounded operator is dense in `H`. -/
-  dense_domain : Dense (domain : Set H)
-  /-- An unbounded operator is closable. -/
-  is_closable : toLinearPMap.IsClosable
-
-namespace UnboundedOperator
+open Submodule
+open InnerProductSpace
+open InnerProductSpaceSubmodule
+open Complex ComplexConjugate
 
 variable
-  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-  {H' : Type*} [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H']
-
-@[ext]
-lemma ext {U₁ U₂ : UnboundedOperator H H'} (h : U₁.toLinearPMap = U₂.toLinearPMap) :
-    U₁ = U₂ := by
-  cases U₁
-  simp_all
-
-instance : CoeFun (UnboundedOperator H H') (fun U ↦ U.domain → H') :=
-  ⟨fun U ↦ U.toLinearPMap.toFun'⟩
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {H' : Type*} [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+  {T T₁ T₂ : H →ₗ.[ℂ] H}
+  {U U₁ U₂ : H →ₗ.[ℂ] H'}
 
 /-!
-## B. Basic identities
+## A. Definitions
+
+See `LinearPMap.instStar` and `LinearPMap.isSelfAdjoint_def` for the definition of `IsSelfAdjoint`
+for `LinearPMap`s.
 -/
 
-section
-open Complex
+/-- A LinearPMap `U` has dense domain iff `U.domain` is dense in `H`. -/
+def HasDenseDomain (U : H →ₗ.[ℂ] H') : Prop := Dense (U.domain : Set H)
 
-lemma inner_map_polarization {T : UnboundedOperator H H} (x y : T.domain) :
-    ⟪T x, ↑y⟫_ℂ = (⟪T (x + y), ↑(x + y)⟫_ℂ - ⟪T (x - y), ↑(x - y)⟫_ℂ
-    - I * ⟪T (x + I • y), ↑(x + I • y)⟫_ℂ + I * ⟪T (x - I • y), ↑(x - I • y)⟫_ℂ) / 4 := by
-  simp only [LinearPMap.map_add, coe_add, inner_add_right, inner_add_left, LinearPMap.map_sub,
-    AddSubgroupClass.coe_sub, inner_sub_right, inner_sub_left, LinearPMap.map_smul,
-    SetLike.val_smul, inner_smul_left, conj_I, inner_smul_right]
-  grind [I_sq]
+lemma hasDenseDomain_def : U.HasDenseDomain ↔ Dense (U.domain : Set H) := Iff.rfl
 
-lemma inner_map_polarization' {T : UnboundedOperator H H} (x y : T.domain) :
-    ⟪↑x, T y⟫_ℂ = (⟪↑(x + y), T (x + y)⟫_ℂ - ⟪↑(x - y), T (x - y)⟫_ℂ
-    - I * ⟪↑(x + I • y), T (x + I • y)⟫_ℂ + I * ⟪↑(x - I • y), T (x - I • y)⟫_ℂ) / 4 := by
-  simp only [coe_add, LinearPMap.map_add, inner_add_right, inner_add_left, AddSubgroupClass.coe_sub,
-    LinearPMap.map_sub, inner_sub_right, inner_sub_left, SetLike.val_smul, LinearPMap.map_smul,
-    inner_smul_left, conj_I, inner_smul_right]
-  grind [I_sq]
+/-- A LinearPMap is an unbounded operator iff it has dense domain and is closable. -/
+def IsUnbounded (U : H →ₗ.[ℂ] H') : Prop := U.HasDenseDomain ∧ U.IsClosable
 
-end
+lemma isUnbounded_def : U.IsUnbounded ↔ U.HasDenseDomain ∧ U.IsClosable := Iff.rfl
+
+/-- A LinearPMap `U` is symmetric iff `⟪U x, y⟫_ℂ = ⟪x, U y⟫_ℂ` for all `x y : U.domain`. -/
+def IsSymmetric (T : H →ₗ.[ℂ] H) : Prop := T.IsFormalAdjoint T
+
+lemma isSymmetric_def : T.IsSymmetric ↔ T.IsFormalAdjoint T := Iff.rfl
+
+/-- A LinearPMap is essentially self-adjoint iff its closure is self-adjoint. -/
+def IsEssentiallySelfAdjoint [CompleteSpace H] (T : H →ₗ.[ℂ] H) : Prop := IsSelfAdjoint T.closure
+
+lemma isEssentiallySelfAdjoint_def [CompleteSpace H] :
+    T.IsEssentiallySelfAdjoint ↔ IsSelfAdjoint T.closure := Iff.rfl
 
 /-!
-## C. Instances
+## B. Dense domain
 -/
 
-section
+lemma HasDenseDomain.isUnbounded_iff_isClosable (h : U.HasDenseDomain) :
+    U.IsUnbounded ↔ U.IsClosable :=
+  and_iff_right h
 
-open Classical
+lemma HasDenseDomain.closure (h : U.HasDenseDomain) : U.closure.HasDenseDomain :=
+  h.mono U.le_closure.1
+
+lemma HasDenseDomain.neg (h : U.HasDenseDomain) : (-U).HasDenseDomain := h
+
+lemma HasDenseDomain.smul (h : U.HasDenseDomain) (c : ℂ) : (c • U).HasDenseDomain := h
+
+lemma HasDenseDomain.add_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain ≤ U₂.domain) :
+    (U₁ + U₂).HasDenseDomain :=
+  h₁.mono (by simp [h_le, add_domain])
+
+lemma HasDenseDomain.sub_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain ≤ U₂.domain) :
+    (U₁ - U₂).HasDenseDomain :=
+  h₁.mono (by simp [h_le, sub_domain])
 
 /-!
-### C.1. Partial order
-
-Unbounded operators inherit the structure of a poset from `LinearPMap`,
-but *not* that of a `SemilatticeInf` because `U₁.domain ⊓ U₂.domain` may not be dense.
+## C. Closability
 -/
 
-instance : PartialOrder (UnboundedOperator H H') where
-  le U₁ U₂ := U₁.toLinearPMap ≤ U₂.toLinearPMap
-  le_refl _ := le_refl _
-  le_trans _ _ _ h₁₂ h₂₃ := le_trans h₁₂ h₂₃
-  le_antisymm _ _ h h' := ext <| le_antisymm h h'
+lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U := by
+  constructor <;> intro h'
+  · exact eq_of_eq_graph (h.graph_closure_eq_closure_graph ▸ h'.submodule_topologicalClosure_eq)
+  · exact h' ▸ h.closure_isClosed
 
-/-!
-### C.2. Zero
--/
+/-- A LinearPMap with densely-defined formal adjoint is closable. -/
+lemma isClosable_of_exists_dense_formalAdjoint [CompleteSpace H] [CompleteSpace H']
+    (h : U.HasDenseDomain) (h_fadj : ∃ U' : H' →ₗ.[ℂ] H, U'.HasDenseDomain ∧ U'.IsFormalAdjoint U) :
+    U.IsClosable := by
+  have h_adj : U†.HasDenseDomain := by
+    obtain ⟨U', hU', hU''⟩ := h_fadj
+    refine Dense.mono ?_ hU'
+    rcases eq_or_lt_of_le (hU''.symm.le_adjoint h) with (rfl | h_lt)
+    · rfl
+    · exact (domain_mono h_lt).le
+  use U††
+  ext
+  rw [adjoint_graph_eq_graph_adjoint h_adj, adjoint_graph_eq_graph_adjoint h,
+    mem_submodule_adjoint_adjoint_iff_mem_submoduleToLp_orthogonal_orthogonal,
+    orthogonal_orthogonal_eq_closure, mem_submodule_iff_mem_submoduleToLp, submoduleToLp_closure]
 
--- A zero LinearPMap (any domain) is closable
-lemma isClosable_of_zero {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    [NormedAddCommGroup F] [InnerProductSpace ℂ F] {f : LinearPMap ℂ E F} (hf : f.toFun' = 0) :
-    f.IsClosable := by
-  use f.graph.topologicalClosure.toLinearPMap
-  refine Eq.symm <| toLinearPMap_graph_eq f.graph.topologicalClosure fun x hx _ ↦ ?_
+/-- A zero LinearPMap (any domain) is closable. -/
+lemma isClosable_of_zero (h_zero : ⇑U = 0) : U.IsClosable := by
+  use U.graph.topologicalClosure.toLinearPMap
+  refine (toLinearPMap_graph_eq _ fun x hx hx₁ ↦ ?_).symm
   obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp hx
-  have (n : ℕ) : (b n).2 = 0 := by specialize hb n; simp_all
+  have hbn : ∀ n, (b n).snd = 0 := fun n ↦ by specialize hb n; simp_all
   rw [nhds_prod_eq, Filter.tendsto_prod_iff'] at hb'
   simp_all
 
-instance : Zero (UnboundedOperator H H') := ⟨0, by simp, isClosable_of_zero rfl⟩
-
-@[simp]
-lemma zero_toLinearPMap : (0 : UnboundedOperator H H').toLinearPMap = 0 := rfl
-
-instance : Inhabited (UnboundedOperator H H') := ⟨instZero.zero⟩
-
-/-!
-### C.3. AddZeroClass
-
-In defining addition for unbounded operators we use two junk values.
-- If `U₁.domain ∩ U₂.domain` is not dense, then `U₁ + U₂ = 0` (domain `⊤`)
-- If `U₁.domain ∩ U₂.domain` is dense but `U₁.toLinearPMap + U₂.toLinearPMap` is not closable,
-  then `U₁ + U₂ = 0` with domain `U₁.domain ∩ U₂.domain`.
-This ensures that distributivity, `c • (U₁ + U₂) = c • U₁ + c • U₂`, holds for `(c : ℂ) = 0`.
--/
-
-noncomputable instance : Add (UnboundedOperator H H') where
-  add U₁ U₂ :=
-    if hD : Dense (U₁.domain ⊓ U₂.domain : Set H) then
-      if hC : (U₁.toLinearPMap + U₂.toLinearPMap).IsClosable then
-        ⟨U₁.toLinearPMap + U₂.toLinearPMap, hD, hC⟩
-      else ⟨⟨U₁.domain ⊓ U₂.domain, 0⟩, hD, isClosable_of_zero rfl⟩
-    else 0
-
-/-- The domain of `U₁ + U₂` is `D(U₁) ∩ D(U₂)` when it is dense. -/
-lemma add_domain_of_dense {U₁ U₂ : UnboundedOperator H H'}
-    (hD : Dense (U₁.domain ⊓ U₂.domain : Set H)) : (U₁ + U₂).domain = U₁.domain ⊓ U₂.domain := by
-  rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
-  by_cases hC : (U₁.toLinearPMap + U₂.toLinearPMap).IsClosable
-  · simp only [hD, hC, ↓reduceDIte, LinearPMap.add_domain]
-  · simp only [hD, hC, ↓reduceDIte]
-
-/-- The junk value for `U₁ + U₂` has domain all of `H` when `D(U₁) ∩ D(U₂)` is not dense. -/
-lemma add_domain_of_not_dense {U₁ U₂ : UnboundedOperator H H'}
-    (hD : ¬Dense (U₁.domain ⊓ U₂.domain : Set H)) : (U₁ + U₂).domain = ⊤ := by
-  rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
-  simp only [hD, ↓reduceDIte, zero_toLinearPMap, zero_domain]
-
-lemma mem_domain_of_dense {U₁ U₂ : UnboundedOperator H H'}
-    (hD : Dense (U₁.domain ⊓ U₂.domain : Set H)) (ψ : (U₁ + U₂).domain) :
-    ↑ψ ∈ U₁.domain ∧ ↑ψ ∈ U₂.domain :=
-  mem_inf.mp <| (add_domain_of_dense hD) ▸ ψ.2
-
-/-- `U₁ + U₂` is the unbounded operator corresponding to `U₁.toLinearPMap + U₂.toLinearPMap`,
-  provided it is both densely defined and closable. -/
-lemma add_toLinearPMap_of_dense_closable {U₁ U₂ : UnboundedOperator H H'}
-    (hD : Dense (U₁.domain ⊓ U₂.domain : Set H))
-    (hC : (U₁.toLinearPMap + U₂.toLinearPMap).IsClosable) :
-    (U₁ + U₂).toLinearPMap = U₁.toLinearPMap + U₂.toLinearPMap := by
-  rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
-  simp only [hD, hC, ↓reduceDIte]
-
-/-- The junk value for `U₁ + U₂` when `D(U₁) ∩ D(U₂)` is dense and `U₁ + U₂` is not closable. -/
-lemma add_toLinearPMap_of_dense_not_closable {U₁ U₂ : UnboundedOperator H H'}
-    (hD : Dense (U₁.domain ⊓ U₂.domain : Set H))
-    (hC : ¬(U₁.toLinearPMap + U₂.toLinearPMap).IsClosable) :
-    (U₁ + U₂).toLinearPMap = ⟨U₁.domain ⊓ U₂.domain, 0⟩ := by
-  rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
-  simp only [hD, hC, ↓reduceDIte]
-
-/-- The junk value for `U₁ + U₂` when `D(U₁) ∩ D(U₂)` is not dense. -/
-lemma add_toLinearPMap_of_not_dense {U₁ U₂ : UnboundedOperator H H'}
-    (hD : ¬Dense (U₁.domain ⊓ U₂.domain : Set H)) : (U₁ + U₂).toLinearPMap = 0 := by
-  rw [HAdd.hAdd, instHAdd, Add.add, instAdd]
-  simp only [hD, ↓reduceDIte, zero_toLinearPMap]
-
-/-- `(U₁ + U₂)ψ = U₁ψ + U₂ψ` provided `U₁ + U₂` is not given by a junk value. -/
-lemma add_apply_of_dense_closable {U₁ U₂ : UnboundedOperator H H'}
-    (hD : Dense (U₁.domain ⊓ U₂.domain : Set H))
-    (hC : (U₁.toLinearPMap + U₂.toLinearPMap).IsClosable) (ψ : (U₁ + U₂).domain) :
-    (U₁ + U₂) ψ = U₁ ⟨ψ, (mem_domain_of_dense hD ψ).1⟩ + U₂ ⟨ψ, (mem_domain_of_dense hD ψ).2⟩ := by
-  obtain ⟨_, hb⟩ := LinearPMap.dExt_iff.mp <| add_toLinearPMap_of_dense_closable hD hC
-  simp only [Subtype.forall] at hb
-  specialize hb ψ ψ.2 ψ (mem_domain_of_dense hD ψ) rfl
-  simp_all [LinearPMap.add_apply]
-
-noncomputable instance : AddZeroClass (UnboundedOperator H H') where
-  zero_add U := by
-    apply UnboundedOperator.ext
-    rw [← zero_add U.toLinearPMap]
-    exact add_toLinearPMap_of_dense_closable (by simp [U.dense_domain]) (by simp [U.is_closable])
-  add_zero U := by
-    apply UnboundedOperator.ext
-    rw [← add_zero U.toLinearPMap]
-    exact add_toLinearPMap_of_dense_closable (by simp [U.dense_domain]) (by simp [U.is_closable])
-
-/-- Addition of unbounded operators is associative when neither of the intermediate additions,
-  `U₁ + U₂` and `U₂ + U₃`, is given by a junk value. -/
-lemma add_assoc {U₁ U₂ U₃ : UnboundedOperator H H'}
-    (hD₁₂ : Dense (U₁.domain ⊓ U₂.domain : Set H)) (hC₁₂ : (U₁.1 + U₂.1).IsClosable)
-    (hD₂₃ : Dense (U₂.domain ⊓ U₃.domain : Set H)) (hC₂₃ : (U₂.1 + U₃.1).IsClosable) :
-    U₁ + U₂ + U₃ = U₁ + (U₂ + U₃) := by
-  apply UnboundedOperator.ext
-  by_cases hD : Dense (U₁.domain ⊓ U₂.domain ⊓ U₃.domain : Set H)
-  · have hD' : Dense (U₁.domain ⊓ (U₂.domain ⊓ U₃.domain) : Set H) := by grind
-    have hD₁₂' : (U₁ + U₂).domain = U₁.domain ⊓ U₂.domain := add_domain_of_dense hD₁₂
-    have hD₂₃' : (U₂ + U₃).domain = U₂.domain ⊓ U₃.domain := add_domain_of_dense hD₂₃
-    have h₁₂ : (U₁ + U₂).1 = U₁.1 + U₂.1 := add_toLinearPMap_of_dense_closable hD₁₂ hC₁₂
-    have h₂₃ : (U₂ + U₃).1 = U₂.1 + U₃.1 := add_toLinearPMap_of_dense_closable hD₂₃ hC₂₃
-    by_cases hC : (U₁.1 + U₂.1 + U₃.1).IsClosable
-    · -- No junk values anywhere: addition is associative
-      have hC' : (U₁.1 + (U₂.1 + U₃.1)).IsClosable := by grind
-      rw [add_toLinearPMap_of_dense_closable (by simp_all) (h₁₂ ▸ hC), h₁₂,
-        add_toLinearPMap_of_dense_closable (by simp_all) (h₂₃ ▸ hC'), h₂₃]
-      grind
-    · -- D(U₁) ∩ D(U₂) ∩ D(U₃) is dense but neither side is closable:
-      -- both sides are the junk zero operator with domain D(U₁) ∩ D(U₂) ∩ D(U₃)
-      have hC' : ¬(U₁.1 + (U₂.1 + U₃.1)).IsClosable := by grind
-      rw [add_toLinearPMap_of_dense_not_closable (by simp_all) (h₁₂ ▸ hC), hD₁₂',
-        add_toLinearPMap_of_dense_not_closable (by simp_all) (h₂₃ ▸ hC'), hD₂₃']
-      grind
-  · -- D(U₁) ∩ D(U₂) ∩ D(U₃) is not dense: both sides are the junk zero operator with domain ⊤
-    have hD' : ¬Dense (U₁.domain ⊓ (U₂.domain ⊓ U₃.domain) : Set H) := by grind
-    have hD₁₂' : ¬Dense ((U₁ + U₂).domain ⊓ U₃.domain : Set H) := add_domain_of_dense hD₁₂ ▸ hD
-    have hD₂₃' : ¬Dense (U₁.domain ⊓ (U₂ + U₃).domain : Set H) := add_domain_of_dense hD₂₃ ▸ hD'
-    rw [add_toLinearPMap_of_not_dense hD₁₂', add_toLinearPMap_of_not_dense hD₂₃']
-
-/-!
-### C.4. DistribSMul
-
-Scalar multiplication by complex numbers is inherited from `LinearPMap`. Note that `(c : ℂ) • U` has
-the same domain as `U` for all constants; in particular, `(0 : ℂ) • U ≤ 0` with equality if and only
-if `U.domain = ⊤`.
--/
-
-lemma smul_mem_graph_of_mem_smul_graph {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    [NormedAddCommGroup F] [InnerProductSpace ℂ F] {f : LinearPMap ℂ E F} {c : ℂ} (hc : c ≠ 0)
-    {x : E × F} (h : x ∈ (c • f).graph.topologicalClosure) :
-    (x.fst, c⁻¹ • x.snd) ∈ f.graph.topologicalClosure := by
-  obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp h
-  apply mem_closure_iff_seq_limit.mpr
-  use fun n ↦ ((b n).fst, c⁻¹ • (b n).snd)
-  rw [nhds_prod_eq, Filter.tendsto_prod_iff'] at *
-  refine ⟨?_, ⟨hb'.1, ?_⟩⟩
-  · have {y : f.domain} {z : F} : c • f y = z ↔ f y = c⁻¹ • z := by aesop
-    simp_all
-  · rw [nhds_smul₀ (inv_ne_zero hc), ← Pi.smul_def, Filter.smul_tendsto_smul_iff₀ (inv_ne_zero hc)]
-    exact hb'.2
-
-set_option backward.isDefEq.respectTransparency false in
-lemma smul_isClosable_of_isClosable {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    [NormedAddCommGroup F] [InnerProductSpace ℂ F] {f : LinearPMap ℂ E F} (hf : f.IsClosable)
-    (c : ℂ) : (c • f).IsClosable := by
+@[aesop safe apply]
+lemma IsClosable.smul (h : U.IsClosable) (c : ℂ) : (c • U).IsClosable := by
   rcases eq_zero_or_neZero c with (rfl | hc)
   · exact isClosable_of_zero (by simp)
-  · use (c • f).graph.topologicalClosure.toLinearPMap
-    refine Eq.symm <| toLinearPMap_graph_eq _ (fun x hx hx1 ↦ ?_)
-    suffices c⁻¹ • x.snd = 0 by aesop
-    have hx := smul_mem_graph_of_mem_smul_graph hc.ne hx
-    rw [IsClosable.graph_closure_eq_closure_graph hf, hx1] at hx
-    exact graph_fst_eq_zero_snd f.closure hx rfl
+  · use (c • U).graph.topologicalClosure.toLinearPMap
+    refine (toLinearPMap_graph_eq _ fun x hx hx₁ ↦ ?_).symm
+    rw [← smul_zero c, ← inv_smul_eq_iff₀ hc.ne]
+    refine graph_fst_eq_zero_snd U.closure ?_ rfl
+    rw [← h.graph_closure_eq_closure_graph]
+    apply mem_closure_iff_seq_limit.mpr
+    obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp hx
+    use fun n ↦ ((b n).fst, c⁻¹ • (b n).snd)
+    rw [nhds_prod_eq, Filter.tendsto_prod_iff'] at *
+    refine ⟨fun n ↦ ?_, hx₁ ▸ hb'.1, hb'.2.const_smul c⁻¹⟩
+    obtain ⟨u, hu, hu'⟩ := hb n
+    simp only [coe_toAddSubmonoid, SetLike.mem_coe, mem_graph_iff, Subtype.exists, ← hu']
+    exact ⟨u.1, u.1.2, rfl, ((inv_smul_eq_iff₀ hc.ne).mpr hu).symm⟩
 
-noncomputable instance : SMul ℂ (UnboundedOperator H H') where
-  smul c U := ⟨c • U.toLinearPMap, U.dense_domain, smul_isClosable_of_isClosable U.is_closable c⟩
+lemma neg_eq_neg_one_smul (U : H →ₗ.[ℂ] H') : -U = (-1 : ℂ) • U := ext (by simp) (by simp)
 
-variable (U : UnboundedOperator H H')
-
-@[simp]
-lemma smul_domain (c : ℂ) : (c • U).domain = U.domain := rfl
-
-@[simp]
-lemma smul_toLinearPMap (c : ℂ) : (c • U).toLinearPMap = c • U.toLinearPMap := rfl
-
-lemma zero_smul_le_zero : (0 : ℂ) • U ≤ 0 := ⟨by simp, by simp⟩
-
-set_option backward.isDefEq.respectTransparency false in
-noncomputable instance : DistribSMul ℂ (UnboundedOperator H H') where
-  smul_zero _ := ext <| by ext <;> simp
-  smul_add c U₁ U₂ := by
-    apply UnboundedOperator.ext
-    by_cases hD : Dense (U₁.domain ⊓ U₂.domain : Set H)
-    · have hD' : Dense ((c • U₁).domain ⊓ (c • U₂).domain : Set H) := by grind
-      by_cases hC : (U₁.1 + U₂.1).IsClosable
-      · -- No junk values: smul distributes as it does for `LinearPMap`
-        have h : c • (U₁.1 + U₂.1) = c • U₁.1 + c • U₂.1 := by
-          ext
-          · simp [LinearPMap.add_domain]
-          · simp [LinearPMap.add_apply]
-        have hC' : ((c • U₁).1 + (c • U₂).1).IsClosable := by
-          simp [← h, smul_isClosable_of_isClosable hC]
-        simp only [h, smul_toLinearPMap, add_toLinearPMap_of_dense_closable hD hC,
-          add_toLinearPMap_of_dense_closable hD' hC']
-      · -- `D(U₁) ∩ D(U₂)` is dense and `U₁ + U₂` is not closable:
-        -- both sides are the zero operator on `D(U₁) ∩ D(U₂)`.
-        -- `c = 0` must be treated separately because in this case the RHS side *is* closable.
-        rw [smul_toLinearPMap, add_toLinearPMap_of_dense_not_closable hD hC]
-        rcases eq_zero_or_neZero c with (rfl | hc)
-        · have hC' : (((0 : ℂ) • U₁).1 + ((0 : ℂ) • U₂).1).IsClosable :=
-            isClosable_of_zero (by ext; simp [LinearPMap.add_apply])
-          rw [add_toLinearPMap_of_dense_closable hD' hC']
-          ext
-          · simp [LinearPMap.add_domain]
-          · simp [LinearPMap.add_apply]
-        · have h : U₁.1 + U₂.1 = c⁻¹ • (c • U₁.1 + c • U₂.1) := by
-            ext
-            · simp [LinearPMap.add_domain]
-            · simp [LinearPMap.add_apply, smul_smul, inv_mul_cancel₀ hc.ne]
-          have hC' := fun h' ↦ hC (h ▸ smul_isClosable_of_isClosable h' c⁻¹)
-          rw [add_toLinearPMap_of_dense_not_closable hD' hC']
-          ext <;> simp
-    · -- `D(U₁) ∩ D(U₂)` is not dense: both sides are the junk zero operator with domain `⊤`
-      have hD' : ¬Dense ((c • U₁).domain ⊓ (c • U₂).domain : Set H) := by grind
-      rw [smul_toLinearPMap, add_toLinearPMap_of_not_dense hD, add_toLinearPMap_of_not_dense hD']
-      ext <;> simp
-
-end
+@[aesop safe apply]
+lemma IsClosable.neg (h : U.IsClosable) : (-U).IsClosable := neg_eq_neg_one_smul U ▸ h.smul _
 
 /-!
-## D. Closure
+## D. Adjoints
 -/
 
-section
-
-variable (U : UnboundedOperator H H')
-
-/-- The closure of an unbounded operator. -/
-noncomputable def closure : UnboundedOperator H H' where
-  toLinearPMap := U.toLinearPMap.closure
-  dense_domain := Dense.mono (HasCore.le_domain (closureHasCore U.toLinearPMap)) U.dense_domain
-  is_closable := IsClosed.isClosable (IsClosable.closure_isClosed U.is_closable)
+/-- The adjoint of a zero LinearPMap (any domain) is zero (domain `⊤`). -/
+lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
+  refine dExt ?_ fun x y hxy ↦ ?_
+  · ext
+    simp only [zero_domain, mem_top, iff_true]
+    apply (mem_adjoint_domain_iff _ _).mpr
+    exact continuous_of_const (by simp [h_zero])
+  · by_cases h : U.HasDenseDomain
+    · exact adjoint_apply_eq h x (by simp [h_zero])
+    · exact adjoint_apply_of_not_dense h x
 
 @[simp]
-lemma closure_toLinearPMap : U.closure.toLinearPMap = U.toLinearPMap.closure := rfl
+lemma adjoint_smul [CompleteSpace H] (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) :
+    (c • U)† = conj c • U† := by
+  refine dExt ?_ fun x y hxy ↦ ?_
+  · ext x
+    change Continuous (fun w ↦ ⟪x, c • U w⟫_ℂ) ↔ Continuous (fun w ↦ ⟪x, U w⟫_ℂ)
+    exact Iff.trans (by simp [inner_smul_right]) (continuous_const_smul_iff₀ hc)
+  · by_cases h : U.HasDenseDomain
+    · refine adjoint_apply_eq (smul_domain c U ▸ h) x fun w ↦ ?_
+      simp [inner_smul_left, inner_smul_right, adjoint_isFormalAdjoint h y w, hxy]
+    · simp [adjoint_apply_of_not_dense h y, adjoint_apply_of_not_dense (smul_domain c U ▸ h) x]
 
-lemma le_closure : U ≤ U.closure := LinearPMap.le_closure U.toLinearPMap
+@[simp]
+lemma adjoint_neg [CompleteSpace H] (U : H →ₗ.[ℂ] H') : (-U)† = -U† := by
+  simp [neg_eq_neg_one_smul, adjoint_smul]
 
-/-- An unbounded operator is closed iff the graph of its defining LinearPMap is closed. -/
-def IsClosed : Prop := U.toLinearPMap.IsClosed
-
-lemma closure_isClosed : U.closure.IsClosed := IsClosable.closure_isClosed U.is_closable
-
-lemma isClosed_def : IsClosed U ↔ U.closure = U := by
-  refine ⟨fun h ↦ ?_, fun h ↦ h ▸ closure_isClosed U⟩
-  rw [UnboundedOperator.ext_iff, closure_toLinearPMap]
-  apply eq_of_eq_graph
-  rw [← IsClosable.graph_closure_eq_closure_graph U.is_closable]
-  exact IsClosed.submodule_topologicalClosure_eq h
-
-end
+lemma adjoint_antitone [CompleteSpace H]
+    (h₁₂ : U₁.HasDenseDomain ∨ ¬U₂.HasDenseDomain) (h_le : U₁ ≤ U₂) : U₂† ≤ U₁† := by
+  have h_agree : ∀ w : U₁.domain, U₁ w = U₂ ⟨w, h_le.1 w.2⟩ := fun w ↦ @h_le.2 w ⟨w, h_le.1 w.2⟩ rfl
+  constructor
+  · intro v
+    let f₁ : U₁.domain → ℂ := fun w ↦ ⟪v, U₁ w⟫_ℂ
+    let f₂ : U₂.domain → ℂ := fun w ↦ ⟪v, U₂ w⟫_ℂ
+    change Continuous f₂ → Continuous f₁
+    suffices f₁ = fun w : U₁.domain ↦ f₂ ⟨w, h_le.1 w.2⟩ by rw [this]; fun_prop
+    simp [f₁, f₂, h_agree]
+  · intro u v huv
+    rcases h₁₂ with (h₁ | h₂)
+    · have h₂ : U₂.HasDenseDomain := h₁.mono h_le.1
+      refine (adjoint_apply_eq h₁ v fun w ↦ ?_).symm
+      rw [adjoint_isFormalAdjoint h₂ u ⟨w, h_le.1 w.2⟩, h_agree, huv]
+    · have h₁ : ¬U₁.HasDenseDomain := fun h ↦ h₂ (h.mono h_le.1)
+      rw [adjoint_apply_of_not_dense h₁ v, adjoint_apply_of_not_dense h₂ u]
 
 /-!
-## E. Adjoint
+## E. Symmetric operators
 -/
 
-section
+/-- The analogue of `inner_map_polarization` for LinearPMap. -/
+lemma inner_map_polarization (x y : T.domain) :
+    ⟪T y, x⟫_ℂ = (⟪T (x + y), ↑(x + y)⟫_ℂ - ⟪T (x - y), ↑(x - y)⟫_ℂ
+      + I * ⟪T (x + I • y), ↑(x + I • y)⟫_ℂ - I * ⟪T (x - I • y), ↑(x - I • y)⟫_ℂ) / 4 := by
+  simp only [map_add, coe_add, inner_add_right, inner_add_left, map_sub, AddSubgroupClass.coe_sub,
+    inner_sub_right, inner_sub_left, sub_sub, map_smul, SetLike.val_smul, inner_smul_left, conj_I,
+    neg_mul, inner_smul_right, mul_add, mul_neg, ← mul_assoc, ← pow_two, I_sq, one_mul, neg_neg,
+    sub_neg_eq_add, mul_sub]
+  ring
 
-variable (U : UnboundedOperator H H')
+/-- The analogue of `inner_map_polarization'` for LinearPMap. -/
+theorem inner_map_polarization' (x y : T.domain) :
+    ⟪T x, y⟫_ℂ = (⟪T (x + y), ↑(x + y)⟫_ℂ - ⟪T (x - y), ↑(x - y)⟫_ℂ
+      - I * ⟪T (x + I • y), ↑(x + I • y)⟫_ℂ + I * ⟪T (x - I • y), ↑(x - I • y)⟫_ℂ) / 4 := by
+  simp only [map_add, coe_add, inner_add_right, inner_add_left, map_sub, AddSubgroupClass.coe_sub,
+    inner_sub_right, inner_sub_left, sub_sub, map_smul, SetLike.val_smul, inner_smul_left, conj_I,
+    neg_mul, inner_smul_right, mul_add, mul_neg, ← mul_assoc, ← pow_two, I_sq, one_mul, neg_neg,
+    sub_neg_eq_add, mul_sub]
+  ring
 
-/-- The adjoint of a densely defined, closable `LinearPMap` is densely defined. -/
-lemma adjoint_dense_of_isClosable {f : LinearPMap ℂ H H'} (h_dense : Dense (f.domain : Set H))
-    (h_closable : f.IsClosable) : Dense (f†.domain : Set H') := by
-  by_contra hd
-  have : ∃ x ∈ f†.domainᗮ, x ≠ 0 := by
-    apply not_forall.mp at hd
-    rcases hd with ⟨y, hy⟩
-    have hnetop : f†.domainᗮᗮ ≠ ⊤ := by
-      rw [orthogonal_orthogonal_eq_closure]
-      exact Ne.symm (ne_of_mem_of_not_mem' trivial hy)
-    have hnebot : f†.domainᗮ ≠ ⊥ := by
-      by_contra
-      apply hnetop
-      rwa [orthogonal_eq_top_iff]
-    exact exists_mem_ne_zero_of_ne_bot hnebot
-  rcases this with ⟨x, hx, hx'⟩
+-- The analogue of `LinearMap.isSymmetric_iff_inner_map_self_real` for LinearPMap.
+lemma isSymmetric_iff_inner_map_self_real :
+    T.IsSymmetric ↔ ∀ x : T.domain, conj ⟪T x, x⟫_ℂ = ⟪T x, x⟫_ℂ := by
+  refine ⟨fun h_symm x ↦ by simp [h_symm x x], fun h_re x y ↦ ?_⟩
+  nth_rw 2 [← inner_conj_symm]
+  nth_rw 2 [inner_map_polarization]
+  simp only [map_div₀, _root_.map_sub, _root_.map_add, map_mul, neg_mul, conj_ofNat, conj_I, h_re]
+  rw [inner_map_polarization']
+  simp [sub_eq_add_neg]
+
+lemma IsSymmetric.isClosable [CompleteSpace H] (h : T.IsSymmetric) (h' : T.HasDenseDomain) :
+    T.IsClosable :=
+  isClosable_iff_exists_closed_extension.mpr ⟨T†, adjoint_isClosed h', h.le_adjoint h'⟩
+
+lemma IsSymmetric.isUnbounded_iff_hasDenseDomain [CompleteSpace H] (h : T.IsSymmetric) :
+    T.IsUnbounded ↔ T.HasDenseDomain :=
+  and_iff_left_of_imp h.isClosable
+
+lemma isSymmetric_iff_le_adjoint [CompleteSpace H] (h : T.HasDenseDomain) :
+    T.IsSymmetric ↔ T ≤ T† := by
+  refine ⟨fun h_symm ↦ h_symm.le_adjoint h, fun h_le x y ↦ ?_⟩
+  have h_eq : T x = T† ⟨x, h_le.1 x.2⟩ := @h_le.2 x ⟨x, h_le.1 x.2⟩ rfl
+  exact h_eq ▸ adjoint_isFormalAdjoint h _ _
+
+lemma IsSymmetric.isSelfAdjoint_iff [CompleteSpace H] (h : T.IsSymmetric) (h' : T.HasDenseDomain) :
+    IsSelfAdjoint T ↔ T†.domain = T.domain := by
+  constructor <;> intro h''
+  · congr
+  · exact dExt h'' fun x y hxy ↦ Eq.symm <| @(h.le_adjoint h').2 y x hxy.symm
+
+lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
+    (T + T.adjoint).IsSymmetric := by
+  intro x y
+  have h₁ := adjoint_isFormalAdjoint h ⟨x, x.2.2⟩ ⟨y, y.2.1⟩
+  have h₂ := adjoint_isFormalAdjoint h ⟨y, y.2.2⟩ ⟨x, x.2.1⟩
+  apply starRingEquiv.apply_eq_iff_eq.mpr at h₂
+  simp only [RingEquiv.toEquiv_eq_coe, EquivLike.coe_coe, starRingEquiv_apply, RCLike.star_def,
+    inner_conj_symm, MulOpposite.op_inj] at h₂
+  simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
+  exact add_comm _ _
+
+@[aesop safe apply]
+lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by simp [h x y]
+
+@[aesop safe apply]
+lemma IsSymmetric.add (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ + T₂).IsSymmetric := by
+  intro x y
+  specialize h₁ ⟨x, x.2.1⟩ ⟨y, y.2.1⟩
+  specialize h₂ ⟨x, x.2.2⟩ ⟨y, y.2.2⟩
+  simp [h₁, h₂, add_apply, inner_add_left, inner_add_right]
+
+@[aesop safe apply]
+lemma IsSymmetric.sub (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ - T₂).IsSymmetric :=
+  sub_eq_add_neg T₁ T₂ ▸ h₁.add h₂.neg
+
+@[aesop safe apply]
+lemma IsSymmetric.smul (h : T.IsSymmetric) {c : ℂ} (hc : conj c = c) : (c • T).IsSymmetric :=
+  fun x y ↦ by simp only [smul_apply, inner_smul_left, inner_smul_right, hc, h x y]
+
+@[aesop safe apply]
+lemma IsSymmetric.smul_ofReal (h : T.IsSymmetric) (r : ℝ) : (ofReal r • T).IsSymmetric :=
+  h.smul (conj_ofReal r)
+
+lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.IsSymmetric := by
+  intro x y
+  have hx : T₂ x = T₁ ⟨x, h_le.1 x.2⟩ := @h_le.2 x ⟨x, h_le.1 x.2⟩ rfl
+  have hy : T₂ y = T₁ ⟨y, h_le.1 y.2⟩ := @h_le.2 y ⟨y, h_le.1 y.2⟩ rfl
+  exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
+
+/-!
+## F. Self-adjoint operators
+-/
+
+lemma IsSelfAdjoint.isSymmetric [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsSymmetric := by
+  rw [isSymmetric_def]
+  nth_rw 1 [← h]
+  exact adjoint_isFormalAdjoint h'
+
+lemma IsSelfAdjoint.isClosed [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsClosed :=
+  h ▸ adjoint_isClosed h'
+
+lemma IsSelfAdjoint.isClosable [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsClosable :=
+  (isClosed h h').isClosable
+
+lemma IsSelfAdjoint.isUnbounded [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
+    T.IsUnbounded :=
+  ⟨h', isClosable h h'⟩
+
+@[aesop safe apply]
+lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† := by
+  apply isSelfAdjoint_def.mp at h
+  exact h.symm ▸ h
+
+@[aesop safe apply]
+lemma IsSelfAdjoint.smul [CompleteSpace H]
+    (h : IsSelfAdjoint T) {c : ℂ} (hc : c ≠ 0) (hc' : conj c = c) :
+    IsSelfAdjoint (c • T) := by
+  rw [isSelfAdjoint_def, T.adjoint_smul hc, hc', isSelfAdjoint_def.mp h]
+
+@[aesop safe apply]
+lemma IsSelfAdjoint.smul_ofReal [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} (hr : r ≠ 0) :
+    IsSelfAdjoint (ofReal r • T) :=
+  smul h (ofReal_ne_zero.mpr hr) (conj_ofReal r)
+
+@[aesop safe apply]
+lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint (-T) :=
+  neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
+
+/-!
+## G. Essentially self-adjoint operators
+-/
+
+lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsSymmetric :=
+  (IsSelfAdjoint.isSymmetric h h'.closure).of_le T.le_closure
+
+/-!
+## H. Unbounded operators
+-/
+
+lemma IsUnbounded.hasDenseDomain (h : U.IsUnbounded) : U.HasDenseDomain := h.1
+
+lemma IsUnbounded.isClosable (h : U.IsUnbounded) : U.IsClosable := h.2
+
+lemma IsUnbounded.adjoint [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
+    U†.IsUnbounded := by
+  refine ⟨?_, (adjoint_isClosed h.1).isClosable⟩
+  by_contra h_adj
+  obtain ⟨y, hy⟩ := not_forall.mp h_adj
+  have h_ne_bot : U†.domainᗮ = ⊥ → False := by
+    rw [← orthogonal_eq_top_iff, orthogonal_orthogonal_eq_closure]
+    exact fun a ↦ ne_of_mem_of_not_mem' mem_top hy a.symm
+  obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot h_ne_bot
   apply hx'
-  apply graph_fst_eq_zero_snd f.closure _ rfl
-  rw [← IsClosable.graph_closure_eq_closure_graph h_closable,
-    mem_submodule_closure_iff_mem_submoduleToLp_closure,
-    ← orthogonal_orthogonal_eq_closure,
+  refine graph_fst_eq_zero_snd U.closure ?_ rfl
+  rw [← IsClosable.graph_closure_eq_closure_graph h.2,
+    mem_submodule_closure_iff_mem_submoduleToLp_closure, ← orthogonal_orthogonal_eq_closure,
     ← mem_submodule_adjoint_adjoint_iff_mem_submoduleToLp_orthogonal_orthogonal,
-    ← LinearPMap.adjoint_graph_eq_graph_adjoint h_dense,
-    mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
+    ← adjoint_graph_eq_graph_adjoint h.1, mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
   rintro ⟨y, Uy⟩ hy
   simp only [neg_zero, WithLp.prod_inner_apply, inner_zero_right, add_zero]
   exact hx y (mem_domain_of_mem_graph hy)
 
-/-- The adjoint of an unbounded operator, denoted as `U†`. -/
-noncomputable def adjoint : UnboundedOperator H' H where
-  toLinearPMap := U.toLinearPMap.adjoint
-  dense_domain := adjoint_dense_of_isClosable U.dense_domain U.is_closable
-  is_closable := IsClosed.isClosable (adjoint_isClosed U.dense_domain)
-
-@[inherit_doc]
-scoped postfix:1024 "†" => UnboundedOperator.adjoint
+@[simp]
+lemma IsUnbounded.adjoint_closure_eq_adjoint [CompleteSpace H] (h : U.IsUnbounded) :
+    U.closure† = U† := by
+  refine eq_of_eq_graph ?_
+  ext
+  rw [adjoint_graph_eq_graph_adjoint h.1, adjoint_graph_eq_graph_adjoint h.1.closure,
+    ← IsClosable.graph_closure_eq_closure_graph h.2,
+    mem_submodule_closure_adjoint_iff_mem_submoduleToLp_closure_orthogonal, orthogonal_closure,
+    mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
 
 @[simp]
-lemma adjoint_toLinearPMap : U†.toLinearPMap = U.toLinearPMap† := rfl
-
-lemma adjoint_isClosed : U†.IsClosed := LinearPMap.adjoint_isClosed U.dense_domain
-
-lemma adjoint_closure_eq_adjoint : U†.closure = U† := (isClosed_def U†).mp <| adjoint_isClosed U
-
-lemma closure_adjoint_eq_adjoint : U.closure† = U† := by
-  -- Reduce to statement about graphs using density and closability assumptions
-  apply UnboundedOperator.ext
-  apply LinearPMap.eq_of_eq_graph
-  rw [adjoint_toLinearPMap, adjoint_graph_eq_graph_adjoint U.closure.dense_domain]
-  rw [adjoint_toLinearPMap, adjoint_graph_eq_graph_adjoint U.dense_domain]
-  rw [closure_toLinearPMap, ← IsClosable.graph_closure_eq_closure_graph U.is_closable]
+lemma IsUnbounded.adjoint_adjoint_eq_closure [CompleteSpace H] [CompleteSpace H']
+    (h : U.IsUnbounded) :
+    U†† = U.closure := by
+  refine eq_of_eq_graph ?_
   ext
-  rw [mem_submodule_closure_adjoint_iff_mem_submoduleToLp_closure_orthogonal,
-    orthogonal_closure, mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
-
-lemma adjoint_adjoint_eq_closure : U†† = U.closure := by
-  -- Reduce to statement about graphs using density and closability assumptions
-  apply UnboundedOperator.ext
-  apply LinearPMap.eq_of_eq_graph
-  rw [adjoint_toLinearPMap, adjoint_graph_eq_graph_adjoint U†.dense_domain]
-  rw [adjoint_toLinearPMap, adjoint_graph_eq_graph_adjoint U.dense_domain]
-  rw [closure_toLinearPMap, ← IsClosable.graph_closure_eq_closure_graph U.is_closable]
-  ext
-  rw [mem_submodule_adjoint_adjoint_iff_mem_submoduleToLp_orthogonal_orthogonal,
+  rw [adjoint_graph_eq_graph_adjoint h.adjoint.1, adjoint_graph_eq_graph_adjoint h.1,
+    ← IsClosable.graph_closure_eq_closure_graph h.2,
+    mem_submodule_adjoint_adjoint_iff_mem_submoduleToLp_orthogonal_orthogonal,
     orthogonal_orthogonal_eq_closure, mem_submodule_closure_iff_mem_submoduleToLp_closure]
 
-lemma le_adjoint_adjoint : U ≤ U†† := adjoint_adjoint_eq_closure U ▸ le_closure U
+lemma IsUnbounded.le_adjoint_adjoint [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
+    U ≤ U†† :=
+  h.adjoint_adjoint_eq_closure ▸ U.le_closure
 
-lemma isClosed_iff : IsClosed U ↔ U†† = U := adjoint_adjoint_eq_closure U ▸ isClosed_def U
+lemma IsUnbounded.isClosed_iff [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
+    U.IsClosed ↔ U†† = U :=
+  h.adjoint_adjoint_eq_closure ▸ h.2.isClosed_iff
 
-lemma adjoint_ge_adjoint_of_le {U₁ U₂ : UnboundedOperator H H'} (h : U₁ ≤ U₂) : U₂† ≤ U₁† := by
-  obtain ⟨h_domain, h_agree⟩ := h
-  simp only [Subtype.forall] at h_agree
-  have heq (x : U₁.domain) (v : U₂†.domain) : ⟪U₂† v, x⟫_ℂ = ⟪(v : H'), U₁ x⟫_ℂ := by
-    have hx₂ : ↑x ∈ U₂.domain := h_domain <| coe_mem x
-    have h : U₁ x = U₂ ⟨x, hx₂⟩ := h_agree x x.2 x hx₂ rfl
-    exact h ▸ adjoint_isFormalAdjoint U₂.dense_domain v ⟨x, hx₂⟩
-  constructor
-  · intro v hv
-    apply mem_adjoint_domain_of_exists v
-    use U₂† ⟨v, hv⟩
-    exact fun x ↦ heq x ⟨v, hv⟩
-  · exact fun u v huv ↦ (adjoint_apply_eq U₁.dense_domain v <| fun x ↦ huv ▸ heq x u).symm
+lemma IsUnbounded.closure_mono [CompleteSpace H] [CompleteSpace H']
+    (h₁ : U₁.IsUnbounded) (h₂ : U₂.IsUnbounded) (h_le : U₁ ≤ U₂) :
+    U₁.closure ≤ U₂.closure := by
+  rw [← h₁.adjoint_adjoint_eq_closure, ← h₂.adjoint_adjoint_eq_closure]
+  exact adjoint_antitone (Or.inl h₂.adjoint.1) <| adjoint_antitone (Or.inl h₁.1) h_le
 
-lemma closure_mono {U₁ U₂ : UnboundedOperator H H'} (h : U₁ ≤ U₂) : U₁.closure ≤ U₂.closure := by
-  repeat rw [← adjoint_adjoint_eq_closure]
-  exact adjoint_ge_adjoint_of_le <| adjoint_ge_adjoint_of_le h
+/-- A LinearPMap constructed from a symmetric LinearMap with dense domain
+  is an unbounded operator. -/
+lemma isUnbounded_of_dense_of_isSymmetric [CompleteSpace H] {E : Submodule ℂ H}
+    (hE : Dense (E : Set H)) {f : E →ₗ[ℂ] H} (h : ∀ x y : E, ⟪f x, ↑y⟫_ℂ = ⟪↑x, f y⟫_ℂ) :
+    (mk E f).IsUnbounded :=
+  ⟨hE, IsSymmetric.isClosable h hE⟩
 
-end
+/-- Variant of `of_dense_of_isSymmetric` for an endomorphism satisfying `LinearMap.IsSymmetric`. -/
+lemma isUnbounded_of_dense_of_isSymmetric' [CompleteSpace H]
+    {E : Submodule ℂ H} (hE : Dense (E : Set H)) {f : E →ₗ[ℂ] E} (h : f.IsSymmetric) :
+    (mk E (E.subtype ∘ₗ f)).IsUnbounded :=
+  ⟨hE, IsSymmetric.isClosable h hE⟩
 
-/-!
-## F. Symmetric operators
--/
-
-section
-
-variable
-  {E : Submodule ℂ H} (hE : Dense (E : Set H))
-  {f : E →ₗ[ℂ] E} (hf : f.IsSymmetric)
-  (T : UnboundedOperator H H)
-
-/-- An `UnboundedOperator` constructed from a symmetric linear map on a dense submodule `E`. -/
-def ofSymmetric : UnboundedOperator H H where
-  toLinearPMap := LinearPMap.mk E (E.subtype ∘ₗ f)
-  dense_domain := hE
-  is_closable := by
-    refine isClosable_iff_exists_closed_extension.mpr ?_
-    use (LinearPMap.mk E (E.subtype ∘ₗ f))†
-    exact ⟨LinearPMap.adjoint_isClosed hE, IsFormalAdjoint.le_adjoint hE hf⟩
-
-@[simp]
-lemma ofSymmetric_apply (ψ : E) : (ofSymmetric hE hf) ψ = E.subtype (f ψ) := rfl
-
--- Note that cannot simply co-opt `LinearMap.IsSymmetric` because
--- the domain and codomain of `T` need not be the same.
-/-- `T` is symmetric if `⟪T x, y⟫ = ⟪x, T y⟫` for all `x,y ∈ T.domain`. -/
-def IsSymmetric : Prop := ∀ x y : T.domain, ⟪T x, y⟫_ℂ = ⟪(x : H), T y⟫_ℂ
-
-lemma isSymmetric_iff_inner_map_self_real :
-    IsSymmetric T ↔ ∀ x : T.domain, (starRingEnd ℂ) ⟪T x, x⟫_ℂ = ⟪T x, x⟫_ℂ := by
-  simp only [inner_conj_symm]
-  refine ⟨fun hT x ↦ (hT x x).symm, fun h x y ↦ ?_⟩
-  rw [inner_map_polarization, inner_map_polarization']
-  rw [h (x + y), h (x - y), h (x + Complex.I • y), h (x - Complex.I • y)]
-
-lemma isSymmetric_iff_le_adjoint : IsSymmetric T ↔ T ≤ T† := by
-  refine ⟨fun hT ↦ IsFormalAdjoint.le_adjoint T.dense_domain <| IsFormalAdjoint.symm hT, ?_⟩
-  intro h x y
-  obtain ⟨h_domain, h_agree⟩ := h
-  simp only [Subtype.forall] at h_agree
-  have hy : ↑y ∈ T†.domain := h_domain <| coe_mem y
-  have heq := (IsFormalAdjoint.symm <| adjoint_isFormalAdjoint T.dense_domain) x ⟨y, hy⟩
-  exact (h_agree y y.2 y hy rfl) ▸ heq
-
-end
-
-/-!
-## G. Self-adjoint operators
--/
-
-section
-
-variable (T : UnboundedOperator H H)
-
-noncomputable instance instStar : Star (UnboundedOperator H H) := ⟨adjoint⟩
-
-lemma isSelfAdjoint_def : IsSelfAdjoint T ↔ T† = T := Iff.rfl
-
-lemma isSelfAdjoint_iff : IsSelfAdjoint T ↔ IsSelfAdjoint T.toLinearPMap := by
-  rw [isSelfAdjoint_def, LinearPMap.isSelfAdjoint_def, ← adjoint_toLinearPMap,
-    UnboundedOperator.ext_iff]
-
-lemma isClosed_of_isSelfAdjoint {T : UnboundedOperator H H} (hT : IsSelfAdjoint T) : IsClosed T :=
-  hT ▸ adjoint_isClosed T
-
-lemma isSymmetric_of_isSelfAdjoint {T : UnboundedOperator H H} (hT : IsSelfAdjoint T) :
-    IsSymmetric T := by
-  rw [isSymmetric_iff_le_adjoint]
-  exact ge_of_eq hT
-
-/-- `T` is essentially self-adjoint if its closure is self-adjoint. -/
-def IsEssentiallySelfAdjoint : Prop := IsSelfAdjoint T.closure
-
-lemma isEssentiallySelfAdjoint_def : IsEssentiallySelfAdjoint T ↔ T† = T.closure := by
-  rw [IsEssentiallySelfAdjoint, isSelfAdjoint_def, closure_adjoint_eq_adjoint]
-
-lemma isSelfAdjoint_isEssentiallySelfAdjoint {T : UnboundedOperator H H} (hT : IsSelfAdjoint T) :
-    IsEssentiallySelfAdjoint T := by
-  rw [isEssentiallySelfAdjoint_def]
-  nth_rw 2 [← hT]
-  exact Eq.symm <| adjoint_closure_eq_adjoint T
-
-end
-
-/-!
-## H. Generalized eigenvectors
--/
-
-section
-
-variable
-  {E : Submodule ℂ H} (hE : Dense (E : Set H))
-  {f : E →ₗ[ℂ] E} (hf : f.IsSymmetric)
-  (T : UnboundedOperator H H)
-
-/-- A map `F : D(T) →L[ℂ] ℂ` is a generalized eigenvector of an unbounded operator `T`
-  if there is an eigenvalue `c` such that for all `ψ ∈ D(T)`, `F (T ψ) = c ⬝ F ψ`. -/
-def IsGeneralizedEigenvector (F : T.domain →L[ℂ] ℂ) (c : ℂ) : Prop :=
-  ∀ ψ : T.domain, ∃ ψ' : T.domain, ψ' = T ψ ∧ F ψ' = c • F ψ
-
-lemma isGeneralizedEigenvector_ofSymmetric_iff (F : E →L[ℂ] ℂ) (c : ℂ) :
-    IsGeneralizedEigenvector (ofSymmetric hE hf) F c ↔ ∀ ψ : E, F (f ψ) = c • F ψ := by
-  constructor <;> intro h ψ
-  · obtain ⟨ψ', hψ', hψ''⟩ := h ψ
-    exact (SetLike.coe_eq_coe.mp hψ') ▸ hψ''
-  · use f ψ
-    exact ⟨by simp, h ψ⟩
-
-end
-
-end UnboundedOperator
-end QuantumMechanics
+end LinearPMap

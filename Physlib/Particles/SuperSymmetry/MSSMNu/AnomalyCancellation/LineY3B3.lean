@@ -31,6 +31,9 @@ open BigOperators
 /-- The line through $Y_3$ and $B_3$ as `LinSols`. -/
 def lineY₃B₃Charges (a b : ℚ) : MSSMACC.LinSols := a • Y₃.1.1 + b • B₃.1.1
 
+lemma lineY₃B₃Charges_val (a b : ℚ) :
+    (lineY₃B₃Charges a b).val = a • Y₃.1.1.val + b • B₃.1.1.val := rfl
+
 set_option backward.isDefEq.respectTransparency false in
 lemma lineY₃B₃Charges_quad (a b : ℚ) : accQuad (lineY₃B₃Charges a b).val = 0 := by
   change accQuad (a • Y₃.val + b • B₃.val) = 0
@@ -39,7 +42,8 @@ lemma lineY₃B₃Charges_quad (a b : ℚ) : accQuad (lineY₃B₃Charges a b).v
   rw [quadBiLin.toHomogeneousQuad.map_smul]
   rw [quadBiLin.toHomogeneousQuad.map_smul]
   rw [quadBiLin.map_smul₁, quadBiLin.map_smul₂]
-  erw [quadSol Y₃.1, quadSol B₃.1]
+  rw [← accQuad]
+  rw [quadSol Y₃.1, quadSol B₃.1]
   simp only [mul_zero, add_zero, zero_add, mul_eq_zero, OfNat.ofNat_ne_zero, false_or]
   apply Or.inr ∘ Or.inr
   with_unfolding_all rfl
@@ -53,7 +57,8 @@ lemma lineY₃B₃Charges_cubic (a b : ℚ) : accCube (lineY₃B₃Charges a b).
   rw [cubeTriLin.toCubic.map_smul]
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂, cubeTriLin.map_smul₃]
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂, cubeTriLin.map_smul₃]
-  erw [Y₃.cubicSol, B₃.cubicSol]
+  repeat rw [← cubicACC_apply]
+  rw [Y₃.cubicSol, B₃.cubicSol]
   rw [show cubeTriLin Y₃.val Y₃.val B₃.val = 0 by with_unfolding_all rfl]
   rw [show cubeTriLin B₃.val B₃.val Y₃.val = 0 by with_unfolding_all rfl]
   simp
@@ -61,6 +66,9 @@ lemma lineY₃B₃Charges_cubic (a b : ℚ) : accCube (lineY₃B₃Charges a b).
 /-- The line through $Y_3$ and $B_3$ as `Sols`. -/
 def lineY₃B₃ (a b : ℚ) : MSSMACC.Sols :=
   AnomalyFreeMk' (lineY₃B₃Charges a b) (lineY₃B₃Charges_quad a b) (lineY₃B₃Charges_cubic a b)
+
+lemma lineY₃B₃_val (a b : ℚ) : (lineY₃B₃ a b).val = a • Y₃.val + b • B₃.val := by
+  simp [lineY₃B₃, lineY₃B₃Charges_val]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma doublePoint_Y₃_B₃ (R : MSSMACC.LinSols) :

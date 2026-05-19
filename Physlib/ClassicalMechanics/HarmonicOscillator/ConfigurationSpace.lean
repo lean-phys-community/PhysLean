@@ -23,8 +23,9 @@ namespace HarmonicOscillator
 TODO "Configuration Space should be refactored to take `EuclideanSpace ℝ (Fin 1)`
     as its value."
 
-TODO "The API around this should be improved to allow further development of a proper
-    geometric model of the Harmonic Oscillator (see TODO item 4DK2M)."
+TODO "The API around the configuration space
+    should be improved to allow further development of a proper
+    geometric model of the Harmonic Oscillator."
 
 /-- The configuration space of the harmonic oscillator. -/
 structure ConfigurationSpace where

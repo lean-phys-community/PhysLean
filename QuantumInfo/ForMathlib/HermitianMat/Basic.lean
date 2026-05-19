@@ -751,7 +751,7 @@ theorem conj_ne_zero {A : HermitianMat d 𝕜} {M : Matrix d₂ d 𝕜} (hA : A 
 theorem conj_ne_zero_iff {A : HermitianMat d 𝕜} {M : Matrix d₂ d 𝕜}
     (h : LinearMap.ker M.toEuclideanLin ≤ A.ker) : A.conj M ≠ 0 ↔ A ≠ 0  := by
   refine ⟨?_, (conj_ne_zero · h)⟩
-  intro h rfl; simp at h--should be grind[= map_zero] but I don't know why. TODO.
+  intro h rfl; grind
 
 section spectrum
 

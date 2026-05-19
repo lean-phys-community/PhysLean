@@ -8,12 +8,43 @@ module
 public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
+public import Mathlib.Tactic.Cases
 public import Physlib.Meta.TODO.Basic
 /-!
 
 # Tensors
 
+This module sets up the tensors used for index notation in Physlib.
+
+Physics picture:
+- Choose a symmetry group `G` (for example, the Lorentz group).
+- Give each index kind a name called a *color* (encoded by a type `C`).
+  In Lorentzian notation, a typical choice is two colors: `up` and `down`.
+- For each color, choose a representation of `G`.
+- Fix a basis for each color. This determines which values that index can take and
+  lets us speak about tensor components explicitly.
+- Specify a dual color for each color, telling us which index pairs can contract.
+- For dual pairs, provide the contraction/unit/metric data used for contraction and
+  for raising/lowering indices.
+
+All of this structure is packaged as a `TensorSpecies`.
+
+For `S : TensorSpecies` and a list of index colors `c : Fin n → C`:
+- `Tensor S c` is the type of tensors with those indices.
+- `Pure S c` is the type of pure tensors, i.e. tensors of the form
+  `v₀ ⊗ₜ v₁ ⊗ₜ v₂ …`.
+- `ComponentIdx S c` is the type of allowed component labels for those indices.
+
+From this setup we get the usual index-notation operations in a uniform way:
+contraction, raising/lowering, and permutation of indices.
 -/
+
+TODO "In this file (Physlib/Relativity/Tensors/Basic.lean), write an overview of the
+  implementation of tensors in Physlib. It should cover the main points:
+- the definition of a tensor species,
+- the meaning of color,
+- the tensorial instances,
+- other key definitions."
 
 @[expose] public section
 
@@ -35,6 +66,12 @@ namespace Tensor
 variable {S : TensorSpecies k C G basisIdx} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
   {c2 : Fin n2 → C}
 
+TODO "Refactor: Throughout the `Tensor` file system are lemmas related to
+  `ComponentIdx`. The definition of `ComponentIdx` and the lemmas about it should
+  be placed in it's own directory. Around `ComponentIdx`, we should build
+  convenient API. Here `ComponentIdx` is the type of values that indices
+  in e.g. Lorentz tensors can take."
+
 set_option linter.unusedVariables false in
 /-- Given a list of indices `c : Fin n → C` e.g. `![.up, .down]`, the type
   `ComponentIdx c` is the type of components indexes of a tensor with those indices
@@ -53,6 +90,10 @@ def ComponentIdx.cast {n m : ℕ} {c : Fin n → C} {cm : Fin m → C}
     (h : n = m) (hc : c = cm ∘ Fin.cast h) (b : ComponentIdx (S := S) c) :
     ComponentIdx (S := S) cm := fun j =>
       basisIdxCongr (by simp [hc]) (b (Fin.cast h.symm j))
+
+TODO "Define the equivalence between `ComponentIdx ![c]` and `basisIdx c`.
+  Replace Lorentz.Vector.indexEquiv and Lorentz.CoVector.indexEquiv with this more
+  general definition."
 
 /-!
 
@@ -808,6 +849,30 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
   · intro t1 t2 h1 h2
     simp [h1, h2]
 
+lemma permT_basis {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
+    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    (b : ComponentIdx c) :
+    (permT σ h) (basis (S := S) c b) = basis c1 (fun i =>
+      basisIdxCongr (by simp [h.2]) (b (σ i))) := by
+  apply (basis c1).repr.injective
+  ext b'
+  rw [permT_basis_repr_symm_apply]
+  simp only [Basis.repr_self, Finsupp.single_apply]
+  congr 1
+  simp only [eq_iff_iff]
+  constructor
+  · intro h
+    rw [h]
+    ext i
+    simp only [basisIdxCongr_apply_apply]
+    refine Eq.symm (ComponentIdx.congr_right b' i (PermCond.inv σ _ (σ i)) ?_)
+    simp [PermCond.apply_inv_apply]
+  · rintro rfl
+    ext i
+    simp only [basisIdxCongr_apply_apply]
+    apply ComponentIdx.congr_right
+    simp [PermCond.inv_apply_apply]
+
 lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (t : S.Tensor c) :
     permT σ h t = 0 ↔ t = 0 := by
@@ -847,6 +912,14 @@ lemma toField_pure {c : Fin 0 → C} (p : Pure S c) :
   congr
   ext i
   exact Fin.elim0 i
+
+lemma toField_permT {c c1 : Fin 0 → C} (σ : Fin 0 → Fin 0) (h : PermCond c c1 σ) (t : S.Tensor c) :
+    toField (permT σ h t) = toField t := by
+  induction' t using induction_on_basis with b r t ht t1 t2 h1 h2
+  · simp [toField_pure, basis_apply, permT_pure]
+  · simp
+  · simp [ht]
+  · simp [h1, h2]
 
 @[simp]
 lemma toField_basis_default {c : Fin 0 → C} :

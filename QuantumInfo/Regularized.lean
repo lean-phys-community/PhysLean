@@ -121,38 +121,13 @@ end SupRegularized
 
 section real
 
-private def realNegOrderIso : ℝ ≃o ℝᵒᵈ where
-  toEquiv := Equiv.neg ℝ
-  map_rel_iff' := by
-    intro a b
-    change (-b : ℝ) ≤ -a ↔ a ≤ b
-    simpa using neg_le_neg_iff
-
-private theorem limsup_eq_neg_liminf_neg {fn : ℕ → ℝ} {_lb _ub : ℝ}
-    (hl : ∀ n, _lb ≤ fn n) (hu : ∀ n, fn n ≤ _ub) :
-    Filter.atTop.limsup fn = -Filter.atTop.liminf (fun n => -fn n) := by
-  have hneg : -Filter.atTop.limsup fn = Filter.atTop.liminf (fun n => -fn n) := by
-    have hdual := OrderIso.limsup_apply (f := Filter.atTop) (u := fn) realNegOrderIso
-      (hu := Filter.isBoundedUnder_of_eventually_le (f := Filter.atTop) (u := fn)
-        (Filter.Eventually.of_forall hu))
-      (hu_co := Filter.isCoboundedUnder_le_of_le Filter.atTop hl)
-      (hgu := Filter.isBoundedUnder_of_eventually_le (α := ℝᵒᵈ) (f := Filter.atTop)
-        (u := fun n => (-fn n : ℝᵒᵈ)) (Filter.Eventually.of_forall fun n => neg_le_neg (hu n)))
-      (hgu_co := Filter.isCoboundedUnder_le_of_le (α := ℝᵒᵈ) Filter.atTop
-        (f := fun n => (-fn n : ℝᵒᵈ)) (x := (-_lb : ℝᵒᵈ)) fun n => neg_le_neg (hl n))
-    simpa [Filter.limsup, Filter.liminf, Filter.limsSup, Filter.limsInf, realNegOrderIso] using
-      congrArg OrderDual.ofDual hdual
-  linarith
-
 variable {fn : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
 
 theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
-  unfold InfRegularized SupRegularized
-  have h : -Filter.atTop.liminf fn = Filter.atTop.limsup (fun n => -fn n) := by
-    simpa using (limsup_eq_neg_liminf_neg (fn := fun n => -fn n)
-      (hl := fun n => neg_le_neg (hu n)) (hu := fun n => neg_le_neg (hl n))).symm
-  linarith
+  have liminf_neg : Filter.liminf fn Filter.atTop = -(Filter.limsup (-fn) Filter.atTop) := by
+    simp [Filter.limsup_eq, Filter.liminf_eq, Real.sInf_def]
+  exact Real.ext_cauchy (congrArg Real.cauchy liminf_neg)
 
 theorem SupRegularized.to_InfRegularized : SupRegularized fn hl hu = -InfRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
@@ -180,12 +155,9 @@ theorem InfRegularized.of_Subadditive (hf : Subadditive (fun n ↦ fn n * n))
       convert Or.inr (hl (n+1))
       field_simp
   )
-  have heq : (fun n => fn n * n / n) =ᶠ[Filter.atTop] fn := by
-    refine (Filter.eventually_atTop.2 ?_ : (fun n => fn n * n / n) =ᶠ[Filter.atTop] fn)
-    refine ⟨1, ?_⟩
-    intro n hn
-    have hn' : (n : ℝ) ≠ 0 := by
-      exact_mod_cast Nat.ne_of_gt (Nat.succ_le_iff.mp hn)
-    field_simp [hn']
-  have hfn : Filter.Tendsto fn .atTop (nhds hf.lim) := (Filter.tendsto_congr' heq).1 h₁
-  exact (Filter.Tendsto.liminf_eq hfn).symm
+  have h₂ : Filter.Tendsto fn .atTop (nhds hf.lim) := by
+    refine h₁.congr' ?_
+    filter_upwards [Filter.eventually_ne_atTop 0] with n hn
+    have : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn
+    field_simp
+  exact h₂.liminf_eq.symm

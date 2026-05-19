@@ -31,6 +31,18 @@ variable [RCLike 𝕜] [DecidableEq n]
 
 namespace Matrix
 
+open scoped ComplexOrder MatrixOrder
+
+omit [DecidableEq n] in
+/-- The block Gram matrix `[[YᴴY, YᴴX], [XᴴY, XᴴX]]` is positive semidefinite. -/
+theorem fromBlocks_gram_posSemidef {m n k : Type*} [Fintype m] [Fintype n] [Fintype k]
+    (X : Matrix k n ℂ) (Y : Matrix k m ℂ) :
+    (fromBlocks (Yᴴ * Y) (Yᴴ * X) (Xᴴ * Y) (Xᴴ * X)).PosSemidef := by
+  convert posSemidef_conjTranspose_mul_self
+    (fromBlocks Y X (0 : Matrix k m ℂ) (0 : Matrix k n ℂ)) using 1
+  rw [fromBlocks_conjTranspose, fromBlocks_multiply]
+  simp
+
 set_option backward.isDefEq.respectTransparency false in
 theorem zero_rank_eq_zero {A : Matrix n n 𝕜} [Fintype n] (hA : A.rank = 0) : A = 0 := by
   have h : ∀ v, A.mulVecLin v = 0 := by
@@ -1153,18 +1165,7 @@ theorem PosDef.zero_lt {n : Type*} [Nonempty n] [Fintype n] {A : Matrix n n ℂ}
   apply lt_of_le_of_ne
   · replace hA := hA.posSemidef
     rwa [Matrix.nonneg_iff_posSemidef]
-  · rintro rfl
-    --wtf do better. TODO
-    have : ¬(0 < 0) := by trivial
-    classical rw [← Matrix.posDef_natCast_iff (n := n) (R := ℂ)] at this
-    revert hA
-    convert this
-    ext; simp
-    trans ((0 : ℕ) : ℂ)
-    · simp
-    classical
-    change _ = ite _ _ _
-    simp
+  · rintro rfl; exact absurd (hA.diag_pos (i := Classical.arbitrary n)) (by simp)
 
 
 lemma IsHermitian.spectrum_eq_image_eigenvalues [Fintype n] {A : Matrix n n ℂ} (hA : A.IsHermitian) :

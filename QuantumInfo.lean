@@ -37,8 +37,3 @@ public import QuantumInfo.Finite.Capacity_doc
 public import QuantumInfo.ClassicalInfo.Distribution
 public import QuantumInfo.ClassicalInfo.Entropy
 public import QuantumInfo.ClassicalInfo.Prob
-
---Statistical mechanics
-public import QuantumInfo.StatMech.Hamiltonian
-public import QuantumInfo.StatMech.IdealGas
-public import QuantumInfo.StatMech.ThermoQuantities

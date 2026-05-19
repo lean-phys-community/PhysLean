@@ -38,8 +38,8 @@ def chargesMapOfSpeciesMap {n m : ℕ} (f : (SMνSpecies n).Charges →ₗ[ℚ] 
 lemma chargesMapOfSpeciesMap_toSpecies {n m : ℕ}
     (f : (SMνSpecies n).Charges →ₗ[ℚ] (SMνSpecies m).Charges)
     (S : (SMνCharges n).Charges) (j : Fin 6) :
-    toSpecies j (chargesMapOfSpeciesMap f S) = (LinearMap.comp f (toSpecies j)) S := by
-  erw [toSMSpecies_toSpecies_inv]
+    toSpecies j (chargesMapOfSpeciesMap f S) = (LinearMap.comp f (toSpecies j)) S :=
+  toSMSpecies_toSpecies_inv _ _
 
 /-- The projection of the `m`-family charges onto the first `n`-family charges for species. -/
 @[simps!]
@@ -68,16 +68,16 @@ def speciesEmbed (m n : ℕ) :
     funext i
     simp only [SMνSpecies_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add]
     by_cases hi : i.val < m
-    · erw [dif_pos hi, dif_pos hi, dif_pos hi]
-    · erw [dif_neg hi, dif_neg hi, dif_neg hi]
+    · rw [dif_pos hi, dif_pos hi, dif_pos hi]
+    · rw [dif_neg hi, dif_neg hi, dif_neg hi]
       with_unfolding_all rfl
   map_smul' a S := by
     funext i
     simp only [SMνSpecies_numberCharges, HSMul.hSMul, ACCSystemCharges.chargesModule_smul,
       eq_ratCast, Rat.cast_eq_id, id_eq]
     by_cases hi : i.val < m
-    · erw [dif_pos hi, dif_pos hi]
-    · erw [dif_neg hi, dif_neg hi]
+    · rw [dif_pos hi, dif_pos hi]
+    · rw [dif_neg hi, dif_neg hi]
       exact Eq.symm (Rat.mul_zero a)
 
 /-- The embedding of the `m`-family charges onto the `n`-family charges, with all
@@ -101,7 +101,7 @@ def familyUniversal (n : ℕ) : (SMνCharges 1).Charges →ₗ[ℚ] (SMνCharges
 
 lemma toSpecies_familyUniversal {n : ℕ} (j : Fin 6) (S : (SMνCharges 1).Charges)
     (i : Fin n) : toSpecies j (familyUniversal n S) i = toSpecies j S ⟨0, by simp⟩ := by
-  erw [chargesMapOfSpeciesMap_toSpecies]
+  rw [familyUniversal, chargesMapOfSpeciesMap_toSpecies]
   rfl
 
 set_option backward.isDefEq.respectTransparency false in

@@ -19,6 +19,13 @@ We create an API around Lorentz vectors to make working with them as easy as pos
 
 @[expose] public section
 
+TODO "Refactor: Split this module on Lorentz vectors into two: `Basic.lean` and `Tensorial.lean`.
+  The former should contain the basic definitions and vector space structure of
+  Lorentz vectors (e.g. the basis etc.). This should only depend on imports from Mathlib.
+  The latter should contain the tensorial instance and everything which should
+  depend on the `Tensorial` imports. A similar TODO item exists
+  for Lorentz co-vectors."
+
 open Module IndexNotation
 open CategoryTheory
 open MonoidalCategory

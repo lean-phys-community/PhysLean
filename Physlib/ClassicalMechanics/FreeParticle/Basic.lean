@@ -1,0 +1,179 @@
+/-
+Copyright (c) 2026 Pranav Magdum. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Pranav Magdum
+-/
+module
+
+public import Mathlib.Data.Real.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Basic
+public import Physlib.Meta.TODO.Basic
+public import Physlib.Meta.Sorry
+public import Physlib.SpaceAndTime.Time.Derivatives
+/-!
+# The Free Particle
+
+## i. Overview
+
+The free particle is one of the simplest systems in classical mechanics: a particle of mass `m`
+moving with no external forces acting on it. Physically, this means the particle just keeps moving
+at constant velocity.
+
+In this file, we work in a simple 1D coordinate system where position and velocity are functions
+of time with values in `ℝ`. This keeps things easy to reason about. A more complete treatment would
+use manifolds and tangent bundles.
+
+## ii. Key results
+
+The main things we show about the free particle are:
+
+In the `Basic` module:
+- `FreeParticle` stores the mass of the particle.
+- `NewtonsSecondLaw` encodes the equation `m * q'' = 0`.
+- `accel_zero` shows that this implies `q'' = 0`.
+- `velocity_const_of_zero_acc` shows that zero acceleration means velocity is constant.
+- `energy_conservation_of_equationOfMotion` shows that kinetic energy stays constant over time.
+
+So overall, we formalise the usual chain:
+Newton’s law → zero acceleration → constant velocity → constant energy.
+
+## iii. Table of contents
+
+- A. The setup
+- B. Equation of motion
+  - B.1. Newton's second law
+  - B.2. Zero acceleration
+- C. What zero acceleration implies
+  - C.1. Constant velocity
+- D. Energy
+  - D.1. Kinetic energy
+  - D.2. Energy conservation
+
+## iv. References
+
+
+-/
+
+@[expose] public section
+
+namespace ClassicalMechanics
+
+open Time
+TODO "Prove conservation of linear momentum for the free particle."
+
+/--
+A classical free particle with positive mass.
+
+A free particle is a mechanical system evolving in the absence of
+external forces. The dynamics are therefore entirely determined by
+Newton's second law with zero force.
+
+The only parameter of the system is the particle mass. The assumption
+that the mass is strictly positive is physically natural and is used
+throughout the development when simplifying the equation of motion.
+-/
+structure FreeParticle where
+  /--
+  The mass of the free particle.
+
+  This parameter determines the inertial response of the particle in
+  Newton's second law.
+  -/
+  mass : ℝ
+  mass_pos : 0 < mass
+
+namespace FreeParticle
+
+/--
+A trajectory is a time-dependent position function describing the motion
+of the particle in one spatial dimension. Defining the trajectory.
+-/
+abbrev Trajectory := Time → ℝ
+
+set_option linter.unusedVariables false in
+/--
+The velocity of a trajectory at a given time.
+This is defined as the time derivative of the position function.
+-/
+@[nolint unusedArguments]
+noncomputable
+def velocity (s : FreeParticle) (q : Trajectory) (t : Time) : ℝ :=
+  deriv q t
+
+/--
+The kinetic energy of the free particle along a trajectory.
+
+This is given by the classical expression `E = (1 / 2) m v²`,
+where `m` is the particle mass and `v` is the velocity.
+-/
+noncomputable
+def kineticEnergy (s : FreeParticle) (q : Trajectory) (t : Time) : ℝ :=
+  (1 / 2) * s.mass * (s.velocity q t)^2
+
+/--
+Newton's second law for the free particle.
+
+Since no external forces act on the particle, Newton's second law
+reduces to the equation `m q'' = 0`, expressing that the acceleration
+vanishes identically.
+-/
+def NewtonsSecondLaw (s : FreeParticle) (q : Trajectory) (t : Time) : Prop :=
+  s.mass * deriv (s.velocity q) t = 0
+
+/--
+Newton's second law for a free particle implies that the acceleration
+vanishes identically.
+
+Since the particle mass is strictly positive, the equation
+`m q'' = 0` can be simplified to `q'' = 0` by cancelling the mass
+factor.
+-/
+lemma accel_zero (s : FreeParticle) (q : Trajectory) (h : ∀ t, s.NewtonsSecondLaw q t) :
+    ∀ t, deriv (deriv q) t = 0 := by
+  intro t
+  have h₀ : s.mass ≠ 0 := ne_of_gt s.mass_pos
+  have h1 := h t
+  exact (mul_eq_zero.mp h1).resolve_left h₀
+
+/--
+If the acceleration of a trajectory vanishes everywhere, then the
+velocity is constant.
+
+More precisely, if the second derivative of the trajectory is zero
+for all times, then there exists a constant `v₀` such that the
+velocity is equal to `v₀` at every time.
+
+The continuity assumption on `deriv q` is included to apply standard
+results from real analysis relating vanishing derivatives to constant
+functions.
+-/
+@[sorryful]
+lemma velocity_const_of_zero_acc (q : Time → ℝ) (h : ∀ t, deriv (deriv q) t = 0)
+    (hcont : ContDiff ℝ 1 q) : ∃ v₀, ∀ t, deriv q t = v₀ := by
+  -- this is a standard analysis result (related to `is_const_of_fderiv_eq_zero`)
+  sorry
+/--
+A free particle satisfying the equation of motion conserves kinetic energy.
+
+The proof follows the standard argument from classical mechanics:
+Newton's second law implies that the acceleration vanishes, which in
+turn implies that the velocity is constant. Since the kinetic energy
+depends only on the square of the velocity, it follows that the kinetic
+energy is constant in time.
+-/
+@[sorryful]
+theorem kineticEnergy_conserved (s : FreeParticle) (q : Trajectory)
+    (h : ∀ t, s.NewtonsSecondLaw q t) (hcont : ContDiff ℝ 1 q) :
+    ∃ E, ∀ t, s.kineticEnergy q t = E := by
+  -- get q'' = 0
+  have h_acc : ∀ t, deriv (deriv q) t = 0 :=
+  accel_zero s q h
+  -- get constant velocity
+  rcases velocity_const_of_zero_acc q h_acc hcont with ⟨v₀, hv⟩
+  -- energy is constant
+  refine ⟨(1 / 2) * s.mass * v₀^2, fun t => ?_⟩
+  unfold kineticEnergy velocity
+  rw [hv t]
+
+end FreeParticle
+end ClassicalMechanics

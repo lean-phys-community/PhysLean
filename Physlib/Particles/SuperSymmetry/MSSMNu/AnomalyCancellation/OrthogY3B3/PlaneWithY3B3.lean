@@ -53,9 +53,9 @@ lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R
   have h1 := congrArg (fun S => dot Y₃.val S) h
   have h2 := congrArg (fun S => dot B₃.val S) h
   simp only at h1 h2
-  erw [dot.map_add₂, dot.map_add₂] at h1 h2
-  erw [dot.map_add₂ Y₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h1
-  erw [dot.map_add₂ B₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h2
+  rw [dot.map_add₂, dot.map_add₂] at h1 h2
+  rw [dot.map_add₂ Y₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h1
+  rw [dot.map_add₂ B₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h2
   rw [dot.map_add₂] at h1 h2
   rw [dot.map_smul₂, dot.map_smul₂, dot.map_smul₂] at h1 h2
   rw [dot.map_smul₂, dot.map_smul₂, dot.map_smul₂] at h1 h2
@@ -97,7 +97,9 @@ lemma planeY₃B₃_quad (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
     + 2 * b * quadBiLin B₃.val R.val + c * quadBiLin R.val R.val) := by
   rw [planeY₃B₃_val]
   rw [accQuad, BiLinearSymm.toHomogeneousQuad_add]
-  erw [lineY₃B₃Charges_quad]
+  rw [← lineY₃B₃Charges_val, ← accQuad]
+  rw [lineY₃B₃Charges_quad]
+  rw [lineY₃B₃Charges_val, accQuad]
   rw [quadBiLin.toHomogeneousQuad.map_smul]
   rw [quadBiLin.map_add₁, quadBiLin.map_smul₁, quadBiLin.map_smul₁]
   rw [quadBiLin.map_smul₂, quadBiLin.map_smul₂]
@@ -110,9 +112,12 @@ lemma planeY₃B₃_cubic (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
     (3 * a * cubeTriLin R.val R.val Y₃.val
     + 3 * b * cubeTriLin R.val R.val B₃.val + c * cubeTriLin R.val R.val R.val) := by
   rw [planeY₃B₃_val]
-  rw [accCube, TriLinearSymm.toCubic_add]
-  erw [lineY₃B₃Charges_cubic]
-  erw [lineY₃B₃_doublePoint (c • R.1) a b]
+  rw [accCube, TriLinearSymm.toCubic_add, ← accCube]
+  rw [← lineY₃B₃Charges_val]
+  rw [lineY₃B₃Charges_cubic]
+  rw [TriLinearSymm.map_smul₃, lineY₃B₃Charges_val, ← lineY₃B₃_val]
+  rw [lineY₃B₃_doublePoint]
+  rw [lineY₃B₃_val, accCube]
   rw [cubeTriLin.toCubic.map_smul]
   rw [cubeTriLin.map_smul₁, cubeTriLin.map_smul₂]
   rw [cubeTriLin.map_add₃, cubeTriLin.map_smul₃, cubeTriLin.map_smul₃]

@@ -287,6 +287,37 @@ lemma basis_map_prod {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
   simp only [LinearEquiv.apply_symm_apply]
   rfl
 
+open Tensor in
+lemma prod_basis_of_map_reindex {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
+    [Tensorial S c M] [AddCommMonoid M₂] [Module k M₂]
+    [Tensorial S c2 M₂] {ι ι2 : Type}  {b : Module.Basis ι k M} {b2 : Module.Basis ι2 k M₂}
+    {e : Tensor.ComponentIdx c ≃ ι} {e2 : Tensor.ComponentIdx c2 ≃ ι2}
+    (h : b = ((Tensor.basis (S := S) c).map toTensor.symm).reindex e)
+    (h2 : b2 = ((Tensor.basis (S := S) c2).map  toTensor.symm).reindex e2) :
+    b.tensorProduct b2 = ((Tensor.basis (S := S) (Fin.append c c2)).map
+    (toTensor (S := S) (M := M ⊗[k] M₂)).symm).reindex
+    (ComponentIdx.prod.trans (e.prodCongr e2)) := by
+  ext ⟨i, j⟩
+  simp_rw [Tensorial.basis_map_prod, Module.Basis.tensorProduct_apply]
+  simp [h, h2]
+
+open Tensor in
+lemma prod_tensor_basis_eq_map_reindex {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Type}
+    [Tensorial S c M] [AddCommMonoid M₂] [Module k M₂]
+    [Tensorial S c2 M₂] {ι ι2 : Type}  {b : Module.Basis ι k M} {b2 : Module.Basis ι2 k M₂}
+    {e : Tensor.ComponentIdx c ≃ ι} {e2 : Tensor.ComponentIdx c2 ≃ ι2}
+    (h : b = ((Tensor.basis (S := S) c).map toTensor.symm).reindex e)
+    (h2 : b2 = ((Tensor.basis (S := S) c2).map  toTensor.symm).reindex e2) :
+    Tensor.basis (S := S) (Fin.append c c2) =
+    ((b.tensorProduct b2).map (toTensor (S := S) (M := M ⊗[k] M₂))).reindex
+    (ComponentIdx.prod.trans (e.prodCongr e2)).symm := by
+  rw [Tensor.basis_prod_eq]
+  ext r
+  simp
+  obtain ⟨⟨i, j⟩, rfl⟩ := ComponentIdx.prod.symm.surjective r
+  simp [h, h2, tensorEquivProd, toTensor_tprod]
+
+
 /-!
 
 ## E. Continuous properties

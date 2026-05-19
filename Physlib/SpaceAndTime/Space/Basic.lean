@@ -76,11 +76,6 @@ the `VAdd (EuclideanSpace ℝ (Fin d)) (Space d)` instance instead.
 
 -/
 
-TODO "In the above documentation describe the notion of a type, and
-  introduce the type `Space d`."
-
-TODO "Convert `Space` from an `abbrev` to a `def`."
-
 /-- The type `Space d` is the world-volume which corresponds to
 `d` dimensional (flat) Euclidean space with a given (but arbitrary)
 choice of length unit, and a given (but arbitrary) choice of zero.
@@ -257,6 +252,10 @@ instance {d : ℕ} : Nontrivial (Space d.succ) where
 ## C. Model structure (i.e. structure of a manifold)
 
 -/
+
+TODO "Fix the manifold structure on `Space d`. In particular, we should not need to
+  define `manifoldStructure`. Instead, we should be able to give `Space d` an instance
+  of `IsManifold` directly."
 
 /-- The manifold structure on `Space d`. -/
 noncomputable def manifoldStructure (d : ℕ) :

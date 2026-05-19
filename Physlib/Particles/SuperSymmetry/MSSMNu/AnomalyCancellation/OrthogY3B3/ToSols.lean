@@ -287,7 +287,7 @@ lemma inLineEqToSol_proj (T : InLineEqSol) : inLineEqToSol (inLineEqProj T) = T.
 /-- Given an element of `inQuad × ℚ × ℚ × ℚ`, a solution to the ACCs. -/
 def inQuadToSol : InQuad × ℚ × ℚ × ℚ → MSSMACC.Sols := fun (R, a₁, a₂, a₃) =>
   AnomalyFreeMk' (lineCube R.val.val a₁ a₂ a₃)
-    (by erw [planeY₃B₃_quad, R.prop.1, R.prop.2.1, R.prop.2.2]; simp)
+    (by rw [lineCube, planeY₃B₃_quad, R.prop.1, R.prop.2.1, R.prop.2.2]; simp)
       (lineCube_cube R.val.val a₁ a₂ a₃)
 
 lemma inQuadToSol_smul (R : InQuad) (c₁ c₂ c₃ d : ℚ) :

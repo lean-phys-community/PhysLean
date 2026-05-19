@@ -236,8 +236,8 @@ lemma gaugeGroupI_smul_inner (g : StandardModel.GaugeGroupI) (φ ψ : HiggsVec) 
       simp
       rfl
     _ = (ψ ⬝ᵥ star (φ.toFin2ℂ)) := by
-      erw [dotProduct_smul, smul_dotProduct, smul_smul, Unitary.star_mul_self]
-      simp
+      rw [dotProduct_smul, WithLp.ofLp_smul, smul_dotProduct, smul_smul, Unitary.star_mul_self,
+        one_smul]
 
 @[simp]
 lemma gaugeGroupI_smul_norm (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :

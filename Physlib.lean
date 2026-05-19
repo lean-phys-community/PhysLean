@@ -3,13 +3,16 @@ module
 public import Physlib.ClassicalFieldTheory.Local.Variation
 public import Physlib.ClassicalMechanics.Basic
 public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Basic
+public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Solution
 public import Physlib.ClassicalMechanics.EulerLagrange
+public import Physlib.ClassicalMechanics.FreeParticle.Basic
 public import Physlib.ClassicalMechanics.HamiltonsEquations
 public import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
 public import Physlib.ClassicalMechanics.HarmonicOscillator.ConfigurationSpace
 public import Physlib.ClassicalMechanics.HarmonicOscillator.Solution
 public import Physlib.ClassicalMechanics.Lagrangian.TotalDerivativeEquivalence
 public import Physlib.ClassicalMechanics.Mass.MassUnit
+public import Physlib.ClassicalMechanics.OrbitalMechanics.VisViva
 public import Physlib.ClassicalMechanics.Pendulum.CoplanarDoublePendulum
 public import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
 public import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
@@ -94,6 +97,7 @@ public import Physlib.Meta.Remark.Basic
 public import Physlib.Meta.Remark.Properties
 public import Physlib.Meta.Sorry
 public import Physlib.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Global
 public import Physlib.Meta.TransverseTactics
 public import Physlib.Optics.Basic
 public import Physlib.Optics.Polarization.Basic
@@ -238,7 +242,11 @@ public import Physlib.QuantumMechanics.DDimensions.Hydrogen.LaplaceRungeLenzVect
 public import Physlib.QuantumMechanics.DDimensions.Operators.AngularMomentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
 public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
+public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
@@ -381,6 +389,9 @@ public import Physlib.StatisticalMechanics.CanonicalEnsemble.Basic
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Lemmas
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.TwoState
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.Basic
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.IdealGas
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.ThermoQuantities
 public import Physlib.StringTheory.Basic
 public import Physlib.StringTheory.FTheory.SU5.Basic
 public import Physlib.StringTheory.FTheory.SU5.Charges.AnomalyFree

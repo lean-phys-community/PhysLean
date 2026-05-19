@@ -226,6 +226,15 @@ lemma contrT_basis_repr_apply_eq_sum_fin {n : ℕ} {c : Fin (n + 1 + 1) → C} {
     Fintype.sum_prod_type]
   simp
 
+
+lemma contrT_basis {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
+    (h : i ≠ j ∧ S.τ (c i) = c j) (b : ComponentIdx (S := S) c):
+    contrT n i j h (basis c b) =
+    Pure.contrPCoeff i j h (Pure.basisVector c b) •
+      basis (c ∘ Pure.dropPairEmb i j) (b.dropPair i j) := by
+  simp only [basis_apply, contrT_pure, Pure.contrP, Pure.dropPair_basisVector]
+  rfl
+
 end Tensor
 
 end TensorSpecies

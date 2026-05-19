@@ -194,9 +194,7 @@ lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
     rw [toFieldStrength_equivariant _ _ (hA.differentiable (by simp))]
   conv_lhs =>
     enter [x]
-    rw [tensorDeriv_equivariant _ _ _ (by
-      apply toFieldStrength_differentiable
-      exact hA.of_le ENat.LEInfty.out)]
+    rw [tensorDeriv_equivariant _ _ _ (differentiable_toFieldStrength_of_smooth hA)]
     rw [smul_comm]
     rw [Tensorial.toTensor_smul, Tensorial.toTensor_smul]
     simp only [one_div, map_smul, actionT_smul,

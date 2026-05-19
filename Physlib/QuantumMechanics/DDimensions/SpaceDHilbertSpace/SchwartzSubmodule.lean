@@ -22,6 +22,10 @@ In this module we define the Schwartz submodule of `SpaceDHilbertSpace`.
 
 ## iii. Table of contents
 
+- A. Definitions
+- B. Coercions
+- D. Misc.
+
 ## iv. References
 
 -/
@@ -31,17 +35,17 @@ In this module we define the Schwartz submodule of `SpaceDHilbertSpace`.
 namespace QuantumMechanics
 namespace SpaceDHilbertSpace
 
+noncomputable section
+
 open MeasureTheory
 open InnerProductSpace
 open SchwartzMap
 
-/-!
-## A. Schwartz submodule
--/
-
-noncomputable section
-
 variable {d : ℕ}
+
+/-!
+## A. Definitions
+-/
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map including Schwartz maps into `SpaceDHilbertSpace d`. -/
@@ -51,30 +55,39 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The submodule of `SpaceDHilbertSpace d` corresponding to Schwartz maps. -/
 abbrev schwartzSubmodule (d : ℕ) := (schwartzIncl (d := d)).range
 
-instance : CoeFun (schwartzSubmodule d) fun _ ↦ Space d → ℂ := ⟨fun ψ ↦ ψ.val⟩
-
-@[simp]
-lemma val_eq_coe (ψ : schwartzSubmodule d) (x : Space d) : ψ.val x = ψ x := rfl
-
-lemma schwartzSubmodule_dense (d : ℕ) :
-    Dense (schwartzSubmodule d : Set (SpaceDHilbertSpace d)) :=
-  denseRange_toLpCLM ENNReal.top_ne_ofNat.symm
-
 set_option backward.isDefEq.respectTransparency false in
 /-- The linear equivalence between the Schwartz maps `𝓢(Space d, ℂ)` and the Schwartz submodule
   of `SpaceDHilbertSpace d`. -/
 def schwartzEquiv : 𝓢(Space d, ℂ) ≃ₗ[ℂ] schwartzSubmodule d :=
   LinearEquiv.ofInjective schwartzIncl.toLinearMap (injective_toLp (E := Space d) 2)
 
+namespace SchwartzSubmodule
+
 variable (f g : 𝓢(Space d, ℂ)) (ψ : schwartzSubmodule d)
 
-lemma schwartzEquiv_coe_ae : (schwartzEquiv f) =ᵐ[volume] f := coeFn_toLp f 2 volume
+/-!
+## B. Coercions
+-/
+
+instance : CoeFun (schwartzSubmodule d) fun _ ↦ Space d → ℂ := ⟨fun ψ ↦ ψ.val⟩
+
+lemma schwartzEquiv_apply_coe : ↑(schwartzEquiv f) = schwartzIncl f := by simp [schwartzEquiv]
+
+lemma schwartzEquiv_coe_ae : schwartzEquiv f =ᵐ[volume] f := coeFn_toLp f 2 volume
 
 lemma schwartzEquiv_symm_coe_ae : schwartzEquiv.symm ψ =ᵐ[volume] ψ := by
   nth_rw 2 [← schwartzEquiv.apply_symm_apply ψ]
   exact (schwartzEquiv_coe_ae _).symm
 
-lemma schwartzEquiv_apply_coe : ↑(schwartzEquiv f) = schwartzIncl f := by simp [schwartzEquiv]
+lemma schwartzEquiv_ae_eq (h : schwartzEquiv f =ᵐ[volume] schwartzEquiv g) : f = g :=
+  (EmbeddingLike.apply_eq_iff_eq _).mp (SetLike.coe_eq_coe.mp (ext_iff.mpr h))
+
+/-!
+## C. Misc.
+-/
+
+lemma dense (d : ℕ) : Dense (schwartzSubmodule d : Set (SpaceDHilbertSpace d)) :=
+  denseRange_toLpCLM ENNReal.top_ne_ofNat.symm
 
 lemma schwartzEquiv_inner :
     ⟪schwartzEquiv f, schwartzEquiv g⟫_ℂ = ∫ x : Space d, starRingEnd ℂ (f x) * g x := by
@@ -82,13 +95,10 @@ lemma schwartzEquiv_inner :
   filter_upwards [schwartzEquiv_coe_ae f, schwartzEquiv_coe_ae g] with _ hf hg
   simp [hf, hg, mul_comm]
 
-lemma schwartzEquiv_ae_eq (h : schwartzEquiv f =ᵐ[volume] schwartzEquiv g) : f = g :=
-  (EmbeddingLike.apply_eq_iff_eq _).mp (SetLike.coe_eq_coe.mp (ext_iff.mpr h))
-
 lemma schwartzIncl_ker : schwartzIncl.ker = (⊥ : Submodule ℂ 𝓢(Space d, ℂ)) := by
   ext; simp [← schwartzEquiv_apply_coe]
 
+end SchwartzSubmodule
 end
-
 end SpaceDHilbertSpace
 end QuantumMechanics

@@ -357,6 +357,16 @@ def prod (Λ₁ : CPTPMap dI₁ dO₁) (Λ₂ : CPTPMap dI₂ dO₂) : CPTPMap (
 
 infixl:70 "⊗ᶜᵖ" => CPTPMap.prod
 
+/-- Tensor products commute with channel application:
+`(Λ₁ ⊗ᶜᵖ Λ₂) (ρ₁ ⊗ᴹ ρ₂) = Λ₁ ρ₁ ⊗ᴹ Λ₂ ρ₂`. -/
+@[simp]
+theorem prod_apply_prod (Λ₁ : CPTPMap dI₁ dO₁) (Λ₂ : CPTPMap dI₂ dO₂)
+    (ρ₁ : MState dI₁) (ρ₂ : MState dI₂) :
+    (Λ₁ ⊗ᶜᵖ Λ₂) (ρ₁ ⊗ᴹ ρ₂) = (Λ₁ ρ₁) ⊗ᴹ (Λ₂ ρ₂) := by
+  apply MState.ext_m
+  simpa [CPTPMap.prod, MState.prod] using
+    MatrixMap.kron_map_of_kron_state Λ₁.map Λ₂.map ρ₁.m ρ₂.m
+
 end prod
 
 section finprod
@@ -365,18 +375,35 @@ variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
 variable {dI : ι → Type v} [∀(i :ι), Fintype (dI i)] [∀(i :ι), DecidableEq (dI i)]
 variable {dO : ι → Type w} [∀(i :ι), Fintype (dO i)] [∀(i :ι), DecidableEq (dO i)]
 
+set_option maxRecDepth 1000 in
 /-- Finitely-indexed tensor products of CPTPMaps.  -/
 def piProd (Λi : (i:ι) → CPTPMap (dI i) (dO i)) : CPTPMap ((i:ι) → dI i) ((i:ι) → dO i) where
   toLinearMap := MatrixMap.piProd (fun i ↦ (Λi i).map)
   cp := MatrixMap.IsCompletelyPositive.piProd (fun i ↦ (Λi i).cp)
-  TP := sorry
+  TP := MatrixMap.IsTracePreserving.piProd (fun i ↦ (Λi i).TP)
 
 theorem fin_1_piProd
   {dI : Fin 1 → Type v} [Fintype (dI 0)] [DecidableEq (dI 0)]
   {dO : Fin 1 → Type w} [Fintype (dO 0)] [DecidableEq (dO 0)]
   (Λi : (i : Fin 1) → CPTPMap (dI 0) (dO 0)) :
-    piProd Λi = sorry ∘ₘ ((Λi 1) ∘ₘ sorry) :=
-  sorry --TODO: permutations
+    piProd Λi =
+      ofEquiv (Equiv.funUnique (Fin 1) (dO 0)).symm ∘ₘ
+        ((Λi 1) ∘ₘ ofEquiv (Equiv.funUnique (Fin 1) (dI 0))) := by
+  apply CPTPMap.ext
+  change MatrixMap.piProd (fun i ↦ (Λi i).map) =
+    MatrixMap.submatrix ℂ (Equiv.funUnique (Fin 1) (dO 0)) ∘ₗ
+      ((Λi 1).map ∘ₗ MatrixMap.submatrix ℂ (Equiv.funUnique (Fin 1) (dI 0)).symm)
+  apply MatrixMap.choi_equiv.injective
+  conv_lhs => rw [MatrixMap.choi_equiv_apply, MatrixMap.choi_matrix_piProd]
+  rw [MatrixMap.choi_equiv_apply]
+  ext ⟨i, a⟩ ⟨j, b⟩
+  simp only [Matrix.reindex_apply, Matrix.piProd, Matrix.of_apply,
+    Fintype.prod_subsingleton _ (0 : Fin 1),
+    MatrixMap.choi_matrix, LinearMap.comp_apply,
+    MatrixMap.submatrix_apply, Matrix.submatrix_apply, Matrix.single]
+  convert rfl
+  ext
+  simp [funext_iff]
 
 /--
 The tensor product of composed maps is the composition of the tensor products.
@@ -391,6 +418,12 @@ theorem piProd_comp
     apply CPTPMap.ext
     convert MatrixMap.piProd_comp _ _;
     infer_instance
+
+@[simp]
+theorem piProd_id :
+    piProd (fun i ↦ (CPTPMap.id : CPTPMap (dI i) (dI i))) = CPTPMap.id := by
+  apply CPTPMap.ext
+  simp [piProd, id_map, MatrixMap.piProd_id]
 
 end finprod
 
@@ -742,6 +775,18 @@ theorem purify_trace (Λ : CPTPMap dIn dOut) : Λ = (
 
 --TODO: Best to rewrite the "zero_prep / prep / append" as one CPTPMap.append channel when we
 -- define that.
+
+/-- The Stinespring preparation `prep ∘ append` acts on a matrix entry by the Kronecker product
+with the fixed pure state `|default⟩⟨default|` on `dOut × dOut`. -/
+theorem prep_append_map_entry (X : Matrix dIn dIn ℂ)
+    (a₁ : dIn) (b₁c₁ : dOut × dOut) (a₂ : dIn) (b₂c₂ : dOut × dOut) :
+    let τ := MState.pure (Ket.basis (default : dOut × dOut))
+    let zero_prep : CPTPMap Unit (dOut × dOut) := replacement τ
+    let prep := (id ⊗ᶜᵖ zero_prep)
+    let append : CPTPMap dIn (dIn × Unit) := CPTPMap.ofEquiv (Equiv.prodPUnit dIn).symm
+    (prep ∘ₘ append).map X (a₁, b₁c₁) (a₂, b₂c₂) =
+    X a₁ a₂ * τ.m b₁c₁ b₂c₂ := by
+  simp [purify_prep_append_entry]
 
 /-- The complementary channel comes from tracing out the other half (the right half) of the purified channel `purify`. -/
 def complementary (Λ : CPTPMap dIn dOut) : CPTPMap dIn (dIn × dOut) :=

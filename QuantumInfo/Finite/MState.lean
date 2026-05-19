@@ -266,7 +266,18 @@ def pure (ψ : Ket d) : MState d where
     simp [HermitianMat.trace_eq_re_trace, Matrix.trace, Matrix.vecMulVec_apply, Bra.eq_conj, h₁]
     exact ψ.normalized
 
-proof_wanted pure_inner : ⟪pure ψ, pure φ⟫_Prob = ‖Braket.dot ψ φ‖^2
+theorem pure_inner : ⟪pure ψ, pure φ⟫_Prob = ‖Braket.dot ψ φ‖^2 := by
+  simp [MState.inner_def, HermitianMat.inner_def, pure, Matrix.vecMulVec_mul_vecMulVec,
+    Braket.dot_eq_dotProduct, Matrix.trace_smul]
+  rw [show ((ψ : d → ℂ) ⬝ᵥ ((φ : Bra d) : d → ℂ)) =
+      conj (((ψ : Bra d) : d → ℂ) ⬝ᵥ (φ : d → ℂ)) from by
+    change (ψ : d → ℂ) ⬝ᵥ star (φ : d → ℂ) =
+      conj (((ψ : Bra d) : d → ℂ) ⬝ᵥ (φ : d → ℂ))
+    rw [Matrix.dotProduct_star (ψ : d → ℂ) (φ : d → ℂ)]
+    congr 1
+    simpa [Bra.eq_conj] using dotProduct_comm (φ : d → ℂ) (star (ψ : d → ℂ))]
+  simpa [Complex.normSq_apply] using
+    Complex.normSq_eq_norm_sq (((ψ : Bra d) : d → ℂ) ⬝ᵥ (φ : d → ℂ))
 
 @[simp]
 theorem pure_apply {i j : d} : (pure ψ).m i j = (ψ i) * conj (ψ j) := by
@@ -1238,7 +1249,7 @@ theorem traceRight_right_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
 @[simp]
 theorem traceNorm_eq_1 (ρ : MState d) : ρ.m.traceNorm = 1 :=
   have := calc (ρ.m.traceNorm : ℂ)
-    _ = ρ.m.trace := ρ.psd.traceNorm_PSD_eq_trace
+    _ = ρ.m.trace := ρ.psd.traceNorm_eq_trace
     _ = 1 := ρ.tr'
   Complex.ofReal_eq_one.mp this
 
@@ -1304,7 +1315,7 @@ theorem Continuous_HermitianMat : Continuous (MState.M (d := d)) :=
 
 @[fun_prop]
 theorem Continuous_Matrix : Continuous (MState.m (d := d)) := by
-  unfold MState.m
+  show Continuous (fun ρ : MState d => ρ.M.mat)
   fun_prop
 
 theorem image_M_isBounded (S : Set (MState d)) : Bornology.IsBounded (MState.M '' S) := by
