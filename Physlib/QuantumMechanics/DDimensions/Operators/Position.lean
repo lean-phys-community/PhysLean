@@ -6,6 +6,7 @@ Authors: Gregory J. Loges
 module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
+public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
@@ -25,6 +26,8 @@ Definitions:
     `𝓢(Space d, ℂ)` by multiplication by `xᵢ`.
 - `radiusRegPowCLM` : operator acting on Schwartz maps by multiplication by
     `(‖x‖² + ε²)^(s/2)`, a smooth regularization of `‖x‖ˢ`.
+- `schwartzPositionOperator` : a symmetric unbounded operator on the Schwartz submodule of
+    `SpaceDHilbertSpace d`.
 - `positionOperator` : a self-adjoint multiplication operator acting on `SpaceDHilbertSpace d`.
 - `readiusRegPowOperator` : a self-adjoint multiplication operator acting on `SpaceDHilbertSpace d`.
 
@@ -41,6 +44,7 @@ Notation:
   - A.3. Radius powers
     - A.3.1. As limit of regularized operators
 - B. Unbounded operators
+  - B.0. Schwartz-domain position
   - B.1. Position vector
   - B.2. Radius powers (regularized)
   - B.3. Radius powers
@@ -383,6 +387,57 @@ end
 -/
 
 noncomputable section
+
+/-!
+### B.0. Schwartz-domain position
+-/
+
+/-- The position operator as a `LinearPMap` with domain the Schwartz submodule.
+
+This is the pullback of `positionCLM` to `SpaceDHilbertSpace d`. It is not the same as
+`positionOperator` (`𝓧`), which acts by multiplication on a larger domain. -/
+def schwartzPositionOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
+  domain := schwartzSubmodule d
+  toFun := schwartzIncl.toLinearMap ∘ₗ (𝐱 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
+
+@[simp]
+lemma schwartzPositionOperator_domain :
+    (schwartzPositionOperator i).domain = schwartzSubmodule d :=
+  rfl
+
+@[simp]
+lemma schwartzPositionOperator_apply (ψ : schwartzSubmodule d) :
+    schwartzPositionOperator i ψ = schwartzEquiv (𝐱 i (schwartzEquiv.symm ψ)) :=
+  rfl
+
+lemma schwartzPositionOperator_range (ψ : schwartzSubmodule d) :
+    schwartzPositionOperator i ψ ∈ schwartzSubmodule d := by
+  simp [schwartzPositionOperator_apply]
+
+lemma schwartzPositionOperator_hasDenseDomain :
+    (schwartzPositionOperator i).HasDenseDomain :=
+  SchwartzSubmodule.dense d
+
+lemma schwartzPositionOperator_isSymmetric :
+    (schwartzPositionOperator i).IsSymmetric := by
+  intro ψ φ
+  obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
+  obtain ⟨g, rfl⟩ := schwartzEquiv.surjective φ
+  simp only [schwartzPositionOperator_apply, ← Submodule.coe_inner, schwartzEquiv_inner,
+    schwartzEquiv.symm_apply_apply, positionCLM_apply]
+  open MeasureTheory in
+  refine integral_congr_ae ?_
+  filter_upwards with x
+  have hi : starRingEnd ℂ ((↑(x i) : ℂ) * f x) = (↑(x i) : ℂ) * starRingEnd ℂ (f x) := by
+    rw [map_mul, Complex.conj_ofReal]
+  rw [hi]
+  ring
+
+lemma schwartzPositionOperator_isUnbounded :
+    (schwartzPositionOperator i).IsUnbounded := by
+  refine (LinearPMap.IsSymmetric.isUnbounded_iff_hasDenseDomain ?_).mpr ?_
+  · exact schwartzPositionOperator_isSymmetric i
+  · exact schwartzPositionOperator_hasDenseDomain i
 
 /-!
 ### B.1. Position vector

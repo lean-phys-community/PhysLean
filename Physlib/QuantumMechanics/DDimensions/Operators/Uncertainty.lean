@@ -6,36 +6,48 @@ Authors: Matteo Cipollina
 module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateCovariance
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
 /-!
+
 # Uncertainty bounds for partial linear maps
 
-This file proves abstract uncertainty bounds for symmetric partial linear maps on complex inner
-product spaces. The statements are independent of any concrete position or momentum operator.
+## i. Overview
 
-The state-level results use only the domain assumptions needed to form the centered vectors. The
-raw-commutator results add the second-order domain hypotheses required to apply `A` to `Bψ` and
-`B` to `Aψ`.
+In this module we prove abstract Robertson and Robertson–Schrödinger uncertainty bounds for
+symmetric partial linear maps on a complex inner product space. The statements are independent of
+any concrete position or momentum operator.
 
-## Main statements
+The centered-commutator results use only the domain assumptions needed to form the centered
+vectors. The raw-commutator results add the second-order domain hypotheses required to apply `A`
+to `Bψ` and `B` to `Aψ`.
 
-- `LinearPMap.inner_centered_commutator_of_raw_commutator`: a raw commutator expectation gives the
-  corresponding centered commutator expectation.
-- `LinearPMap.state_uncertainty_squared_of_centered_commutator`: the Robertson squared bound from a
-  centered commutator identity.
-- `LinearPMap.state_uncertainty_squared_with_covariance_of_centered_commutator`: the strengthened
-  Robertson-Schrodinger bound.
-- `LinearPMap.state_uncertainty_of_centered_commutator`: the standard-deviation form of the bound.
-- `LinearPMap.state_uncertainty_squared_of_raw_commutator`,
-  `LinearPMap.state_uncertainty_squared_with_covariance_of_raw_commutator`, and
-  `LinearPMap.state_uncertainty_of_raw_commutator`: variants using a raw commutator expectation.
+## ii. Key results
 
-## References
+- `inner_im_of_commutator_eq` : an anti-Hermitian commutator identity fixes the imaginary part of
+  an inner product.
+- `inner_centered_commutator_of_raw_commutator` : a raw commutator expectation gives the centered
+  commutator expectation.
+- `state_uncertainty_squared_of_centered_commutator` : the Robertson squared bound from a centered
+  commutator identity.
+- `state_uncertainty_squared_with_covariance_of_centered_commutator` : the strengthened
+  Robertson–Schrödinger bound.
+- `state_uncertainty_of_centered_commutator` : the standard-deviation form of the bound.
+- `state_uncertainty_squared_of_raw_commutator`,
+  `state_uncertainty_squared_with_covariance_of_raw_commutator`, and
+  `state_uncertainty_of_raw_commutator` : variants using a raw commutator expectation.
+
+## iii. Table of contents
+
+- A. Inner product lemmas
+- B. Centered commutator bounds
+- C. Raw commutator bounds
+
+## iv. References
 
 - [H. P. Robertson, *The Uncertainty Principle* (1929)][robertson1929uncertainty].
 - [E. Schrodinger, *Zum Heisenbergschen Unscharfeprinzip* (1930)][schrodinger1930heisenberg].
 - [B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12][hall2013quantum].
+
 -/
 
 @[expose] public section
@@ -47,6 +59,12 @@ open InnerProductSpace
 noncomputable section
 
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+
+/-!
+
+## A. Inner product lemmas
+
+-/
 
 lemma inner_im_of_commutator_eq {u v : H} {c : ℝ}
     (h_comm : ⟪u, v⟫_ℂ - ⟪v, u⟫_ℂ = Complex.I * c) :
@@ -96,13 +114,11 @@ lemma raw_commutator_eq_of_symmetric
     (h_raw : ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩ - B ⟨A ψ, hBA⟩⟫_ℂ = Complex.I * c) :
     ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ - ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ = Complex.I * c := by
   have ha_pairing :
-      ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ =
-        ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩⟫_ℂ := by
-    simpa using hA ψ ⟨B ⟨ψ, hψB⟩, hAB⟩
+      ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ = ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩⟫_ℂ := by
+    exact hA ψ ⟨B ⟨ψ, hψB⟩, hAB⟩
   have hb_pairing :
-      ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ =
-        ⟪(ψ : H), B ⟨A ψ, hBA⟩⟫_ℂ := by
-    simpa using hB ⟨ψ, hψB⟩ ⟨A ψ, hBA⟩
+      ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ = ⟪(ψ : H), B ⟨A ψ, hBA⟩⟫_ℂ := by
+    exact hB ⟨ψ, hψB⟩ ⟨A ψ, hBA⟩
   calc
     ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ - ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ =
       ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩⟫_ℂ -
@@ -115,6 +131,7 @@ lemma raw_commutator_eq_of_symmetric
 lemma commutator_half_sq_le_mul_norm_sq {u v : H} {c : ℝ}
     (h_comm : ⟪u, v⟫_ℂ - ⟪v, u⟫_ℂ = Complex.I * c) :
     (|c| / 2) ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 := by
+  suffices (|c| / 2) ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 by exact this
   have h_sq : |c / 2| ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 := by
     have h_bound : |c / 2| ≤ ‖u‖ * ‖v‖ := by
       have h_im : |(⟪u, v⟫_ℂ).im| ≤ ‖u‖ * ‖v‖ :=
@@ -127,9 +144,16 @@ lemma commutator_half_sq_le_mul_norm_sq {u v : H} {c : ℝ}
 private lemma sqrt_mul_le_of_sq_le {x y z : ℝ}
     (hx : 0 ≤ x) (hz : 0 ≤ z) (hxy : z ^ 2 ≤ x * y) :
     z ≤ Real.sqrt x * Real.sqrt y := by
+  suffices z ≤ Real.sqrt x * Real.sqrt y by exact this
   have hs : Real.sqrt (z ^ 2) ≤ Real.sqrt (x * y) := Real.sqrt_le_sqrt hxy
   rw [Real.sqrt_sq hz, Real.sqrt_mul hx] at hs
   simpa [mul_comm] using hs
+
+/-!
+
+## B. Centered commutator bounds
+
+-/
 
 section CenteredBounds
 
@@ -155,7 +179,7 @@ lemma state_uncertainty_squared_of_centered_commutator :
   rw [h_mul_sq]
   exact commutator_half_sq_le_mul_norm_sq h_centered
 
-/-- A centered commutator identity implies the Robertson-Schrodinger uncertainty bound. -/
+/-- A centered commutator identity implies the Robertson–Schrödinger uncertainty bound. -/
 lemma state_uncertainty_squared_with_covariance_of_centered_commutator :
     (stateCovariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 ≤
       variance A ψ * variance B ⟨ψ, hψB⟩ := by
@@ -182,11 +206,17 @@ lemma state_uncertainty_squared_with_covariance_of_centered_commutator :
 /-- A centered commutator identity implies the standard uncertainty bound. -/
 lemma state_uncertainty_of_centered_commutator :
     |c| / 2 ≤ standardDeviation A ψ * standardDeviation B ⟨ψ, hψB⟩ := by
+  have h_sq := state_uncertainty_squared_of_centered_commutator A B ψ hψB h_centered
   refine sqrt_mul_le_of_sq_le (variance_nonneg A ψ) (by positivity) ?_
-  simpa [standardDeviation] using
-    state_uncertainty_squared_of_centered_commutator A B ψ hψB h_centered
+  simpa [standardDeviation] using h_sq
 
 end CenteredBounds
+
+/-!
+
+## C. Raw commutator bounds
+
+-/
 
 section RawBounds
 
@@ -239,23 +269,20 @@ lemma inner_centered_commutator_of_raw_commutator :
 lemma state_uncertainty_squared_of_raw_commutator :
     (|c| / 2) ^ 2 ≤ variance A ψ * variance B ⟨ψ, hψB⟩ :=
   state_uncertainty_squared_of_centered_commutator A B ψ hψB
-    (inner_centered_commutator_of_raw_commutator
-      A B hA hB ψ hψB hψ_norm hBA hAB h_raw)
+    (inner_centered_commutator_of_raw_commutator A B hA hB ψ hψB hψ_norm hBA hAB h_raw)
 
 /-- A raw commutator expectation implies the squared uncertainty bound with covariance term. -/
 lemma state_uncertainty_squared_with_covariance_of_raw_commutator :
     (stateCovariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 ≤
       variance A ψ * variance B ⟨ψ, hψB⟩ :=
   state_uncertainty_squared_with_covariance_of_centered_commutator A B ψ hψB
-    (inner_centered_commutator_of_raw_commutator
-      A B hA hB ψ hψB hψ_norm hBA hAB h_raw)
+    (inner_centered_commutator_of_raw_commutator A B hA hB ψ hψB hψ_norm hBA hAB h_raw)
 
 /-- A raw commutator expectation implies the standard uncertainty bound. -/
 lemma state_uncertainty_of_raw_commutator :
     |c| / 2 ≤ standardDeviation A ψ * standardDeviation B ⟨ψ, hψB⟩ :=
   state_uncertainty_of_centered_commutator A B ψ hψB
-    (inner_centered_commutator_of_raw_commutator
-      A B hA hB ψ hψB hψ_norm hBA hAB h_raw)
+    (inner_centered_commutator_of_raw_commutator A B hA hB ψ hψB hψ_norm hBA hAB h_raw)
 
 end RawBounds
 
