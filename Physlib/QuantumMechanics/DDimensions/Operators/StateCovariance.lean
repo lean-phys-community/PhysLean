@@ -6,7 +6,7 @@ Authors: Matteo Cipollina
 module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.StateVariance
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
 /-!
 # State covariance
 

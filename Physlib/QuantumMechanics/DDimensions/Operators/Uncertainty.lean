@@ -7,7 +7,7 @@ module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateCovariance
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.StateVariance
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
 /-!
 # Uncertainty bounds for partial linear maps
 
