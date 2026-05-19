@@ -21,11 +21,11 @@ open BigOperators
 
 /-- Associate to each (including RHN) SM fermion a set of charges-/
 @[simps!]
-def SMCharges (n : ℕ) : ACCSystemCharges := ACCSystemChargesMk (5 * n)
+def SMCharges (n : ℕ) : ACCSystemCharges := ⟨5 * n⟩
 
 /-- The vector space associated with a single species of fermions. -/
 @[simps!]
-def SMSpecies (n : ℕ) : ACCSystemCharges := ACCSystemChargesMk n
+def SMSpecies (n : ℕ) : ACCSystemCharges := ⟨n⟩
 
 namespace SMCharges
 

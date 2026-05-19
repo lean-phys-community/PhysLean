@@ -1,425 +1,428 @@
-import Physlib.ClassicalFieldTheory.Local.Variation
-import Physlib.ClassicalMechanics.Basic
-import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Basic
-import Physlib.ClassicalMechanics.EulerLagrange
-import Physlib.ClassicalMechanics.FreeParticle.Basic
-import Physlib.ClassicalMechanics.HamiltonsEquations
-import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
-import Physlib.ClassicalMechanics.HarmonicOscillator.ConfigurationSpace
-import Physlib.ClassicalMechanics.HarmonicOscillator.Solution
-import Physlib.ClassicalMechanics.Lagrangian.TotalDerivativeEquivalence
-import Physlib.ClassicalMechanics.Mass.MassUnit
-import Physlib.ClassicalMechanics.OrbitalMechanics.VisViva
-import Physlib.ClassicalMechanics.Pendulum.CoplanarDoublePendulum
-import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
-import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
-import Physlib.ClassicalMechanics.RigidBody.Basic
-import Physlib.ClassicalMechanics.RigidBody.SolidSphere
-import Physlib.ClassicalMechanics.Scattering.RigidSphere
-import Physlib.ClassicalMechanics.Vibrations.LinearTriatomic
-import Physlib.ClassicalMechanics.WaveEquation.Basic
-import Physlib.ClassicalMechanics.WaveEquation.HarmonicWave
-import Physlib.CondensedMatter.Basic
-import Physlib.CondensedMatter.TightBindingChain.Basic
-import Physlib.Cosmology.Basic
-import Physlib.Cosmology.FLRW.Basic
-import Physlib.Electromagnetism.Basic
-import Physlib.Electromagnetism.Charge.ChargeUnit
-import Physlib.Electromagnetism.Current.CircularCoil
-import Physlib.Electromagnetism.Current.InfiniteWire
-import Physlib.Electromagnetism.Dynamics.Basic
-import Physlib.Electromagnetism.Dynamics.CurrentDensity
-import Physlib.Electromagnetism.Dynamics.Hamiltonian
-import Physlib.Electromagnetism.Dynamics.IsExtrema
-import Physlib.Electromagnetism.Dynamics.KineticTerm
-import Physlib.Electromagnetism.Dynamics.Lagrangian
-import Physlib.Electromagnetism.Kinematics.Boosts
-import Physlib.Electromagnetism.Kinematics.EMPotential
-import Physlib.Electromagnetism.Kinematics.ElectricField
-import Physlib.Electromagnetism.Kinematics.FieldStrength
-import Physlib.Electromagnetism.Kinematics.MagneticField
-import Physlib.Electromagnetism.Kinematics.ScalarPotential
-import Physlib.Electromagnetism.Kinematics.VectorPotential
-import Physlib.Electromagnetism.PointParticle.OneDimension
-import Physlib.Electromagnetism.PointParticle.ThreeDimension
-import Physlib.Electromagnetism.ThreeDimension.Basic
-import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations
-import Physlib.Electromagnetism.Vacuum.Constant
-import Physlib.Electromagnetism.Vacuum.HarmonicWave
-import Physlib.Electromagnetism.Vacuum.IsPlaneWave
-import Physlib.Mathematics.Calculus.AdjFDeriv
-import Physlib.Mathematics.Calculus.Divergence
-import Physlib.Mathematics.DataStructures.FourTree.Basic
-import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
-import Physlib.Mathematics.DataStructures.Matrix.LieTrace
-import Physlib.Mathematics.Distribution.Basic
-import Physlib.Mathematics.Distribution.PowMul
-import Physlib.Mathematics.FDerivCurry
-import Physlib.Mathematics.Fin
-import Physlib.Mathematics.Fin.Involutions
-import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
-import Physlib.Mathematics.Geometry.Metric.Riemannian.Defs
-import Physlib.Mathematics.InnerProductSpace.Adjoint
-import Physlib.Mathematics.InnerProductSpace.Basic
-import Physlib.Mathematics.InnerProductSpace.Calculus
-import Physlib.Mathematics.InnerProductSpace.Submodule
-import Physlib.Mathematics.KroneckerDelta
-import Physlib.Mathematics.LinearMaps
-import Physlib.Mathematics.List
-import Physlib.Mathematics.List.InsertIdx
-import Physlib.Mathematics.List.InsertionSort
-import Physlib.Mathematics.PiTensorProduct
-import Physlib.Mathematics.RatComplexNum
-import Physlib.Mathematics.SO3.Basic
-import Physlib.Mathematics.SchurTriangulation
-import Physlib.Mathematics.SpecialFunctions.PhysHermite
-import Physlib.Mathematics.Trigonometry.Tanh
-import Physlib.Mathematics.VariationalCalculus.Basic
-import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
-import Physlib.Mathematics.VariationalCalculus.HasVarAdjoint
-import Physlib.Mathematics.VariationalCalculus.HasVarGradient
-import Physlib.Mathematics.VariationalCalculus.IsLocalizedfunctionTransform
-import Physlib.Mathematics.VariationalCalculus.IsTestFunction
-import Physlib.Meta.AllFilePaths
-import Physlib.Meta.Basic
-import Physlib.Meta.Informal.Basic
-import Physlib.Meta.Informal.Post
-import Physlib.Meta.Informal.SemiFormal
-import Physlib.Meta.Linters.Sorry
-import Physlib.Meta.Notes.Basic
-import Physlib.Meta.Notes.HTMLNote
-import Physlib.Meta.Notes.NoteFile
-import Physlib.Meta.Notes.ToHTML
-import Physlib.Meta.Remark.Basic
-import Physlib.Meta.Remark.Properties
-import Physlib.Meta.Sorry
-import Physlib.Meta.TODO.Basic
-import Physlib.Meta.TODO.Global
-import Physlib.Meta.TransverseTactics
-import Physlib.Optics.Basic
-import Physlib.Optics.Polarization.Basic
-import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
-import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Basic
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.FamilyMaps
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.NoGrav.Basic
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.Basic
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.DimSevenPlane
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.FamilyMaps
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Permutations
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.BMinusL
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.Basic
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.BoundPlaneDim
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.FamilyMaps
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.HyperCharge
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.PlaneNonSols
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.QuadSol
-import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.QuadSolToSol
-import Physlib.Particles.BeyondTheStandardModel.Spin10.Basic
-import Physlib.Particles.BeyondTheStandardModel.TwoHDM.Basic
-import Physlib.Particles.BeyondTheStandardModel.TwoHDM.GramMatrix
-import Physlib.Particles.BeyondTheStandardModel.TwoHDM.Potential
-import Physlib.Particles.FlavorPhysics.CKMMatrix.Basic
-import Physlib.Particles.FlavorPhysics.CKMMatrix.Invariants
-import Physlib.Particles.FlavorPhysics.CKMMatrix.PhaseFreedom
-import Physlib.Particles.FlavorPhysics.CKMMatrix.Relations
-import Physlib.Particles.FlavorPhysics.CKMMatrix.Rows
-import Physlib.Particles.FlavorPhysics.CKMMatrix.StandardParameterization.Basic
-import Physlib.Particles.FlavorPhysics.CKMMatrix.StandardParameterization.StandardParameters
-import Physlib.Particles.NeutrinoPhysics.Basic
-import Physlib.Particles.StandardModel.AnomalyCancellation.Basic
-import Physlib.Particles.StandardModel.AnomalyCancellation.FamilyMaps
-import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.Basic
-import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.One.Lemmas
-import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.One.LinearParameterization
-import Physlib.Particles.StandardModel.AnomalyCancellation.Permutations
-import Physlib.Particles.StandardModel.Basic
-import Physlib.Particles.StandardModel.HiggsBoson.Basic
-import Physlib.Particles.StandardModel.HiggsBoson.Potential
-import Physlib.Particles.StandardModel.Representations
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.B3
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Basic
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.HyperCharge
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.LineY3B3
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.Basic
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.PlaneWithY3B3
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.ToSols
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Permutations
-import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Y3
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.AllowsTerm
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Map
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimalSuperSet
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.Basic
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.FinsetTerms
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.OfFinset
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.OfFieldLabel
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.OfPotentialTerm
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoClosed
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoConstrained
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
-import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.ZMod
-import Physlib.Particles.SuperSymmetry.SU5.FieldLabels
-import Physlib.Particles.SuperSymmetry.SU5.Potential
-import Physlib.QFT.AnomalyCancellation.Basic
-import Physlib.QFT.AnomalyCancellation.GroupActions
-import Physlib.QFT.PerturbationTheory.CreateAnnihilate
-import Physlib.QFT.PerturbationTheory.FeynmanDiagrams.Basic
-import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.Basic
-import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.Grading
-import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.NormTimeOrder
-import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.NormalOrder
-import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.SuperCommute
-import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.TimeOrder
-import Physlib.QFT.PerturbationTheory.FieldSpecification.Basic
-import Physlib.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
-import Physlib.QFT.PerturbationTheory.FieldSpecification.CrAnSection
-import Physlib.QFT.PerturbationTheory.FieldSpecification.Filters
-import Physlib.QFT.PerturbationTheory.FieldSpecification.NormalOrder
-import Physlib.QFT.PerturbationTheory.FieldSpecification.TimeOrder
-import Physlib.QFT.PerturbationTheory.FieldStatistics.Basic
-import Physlib.QFT.PerturbationTheory.FieldStatistics.ExchangeSign
-import Physlib.QFT.PerturbationTheory.FieldStatistics.OfFinset
-import Physlib.QFT.PerturbationTheory.Koszul.KoszulSign
-import Physlib.QFT.PerturbationTheory.Koszul.KoszulSignInsert
-import Physlib.QFT.PerturbationTheory.WickAlgebra.Basic
-import Physlib.QFT.PerturbationTheory.WickAlgebra.Grading
-import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Basic
-import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Lemmas
-import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.WickContractions
-import Physlib.QFT.PerturbationTheory.WickAlgebra.StaticWickTerm
-import Physlib.QFT.PerturbationTheory.WickAlgebra.StaticWickTheorem
-import Physlib.QFT.PerturbationTheory.WickAlgebra.SuperCommute
-import Physlib.QFT.PerturbationTheory.WickAlgebra.TimeContraction
-import Physlib.QFT.PerturbationTheory.WickAlgebra.TimeOrder
-import Physlib.QFT.PerturbationTheory.WickAlgebra.Universality
-import Physlib.QFT.PerturbationTheory.WickAlgebra.WickTerm
-import Physlib.QFT.PerturbationTheory.WickAlgebra.WicksTheorem
-import Physlib.QFT.PerturbationTheory.WickAlgebra.WicksTheoremNormal
-import Physlib.QFT.PerturbationTheory.WickContraction.Basic
-import Physlib.QFT.PerturbationTheory.WickContraction.Card
-import Physlib.QFT.PerturbationTheory.WickContraction.Erase
-import Physlib.QFT.PerturbationTheory.WickContraction.ExtractEquiv
-import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContract
-import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
-import Physlib.QFT.PerturbationTheory.WickContraction.Involutions
-import Physlib.QFT.PerturbationTheory.WickContraction.IsFull
-import Physlib.QFT.PerturbationTheory.WickContraction.Join
-import Physlib.QFT.PerturbationTheory.WickContraction.Perm
-import Physlib.QFT.PerturbationTheory.WickContraction.Sign.Basic
-import Physlib.QFT.PerturbationTheory.WickContraction.Sign.InsertNone
-import Physlib.QFT.PerturbationTheory.WickContraction.Sign.InsertSome
-import Physlib.QFT.PerturbationTheory.WickContraction.Sign.Join
-import Physlib.QFT.PerturbationTheory.WickContraction.Singleton
-import Physlib.QFT.PerturbationTheory.WickContraction.StaticContract
-import Physlib.QFT.PerturbationTheory.WickContraction.SubContraction
-import Physlib.QFT.PerturbationTheory.WickContraction.TimeCond
-import Physlib.QFT.PerturbationTheory.WickContraction.TimeContract
-import Physlib.QFT.PerturbationTheory.WickContraction.Uncontracted
-import Physlib.QFT.PerturbationTheory.WickContraction.UncontractedList
-import Physlib.QFT.QED.AnomalyCancellation.Basic
-import Physlib.QFT.QED.AnomalyCancellation.BasisLinear
-import Physlib.QFT.QED.AnomalyCancellation.ConstAbs
-import Physlib.QFT.QED.AnomalyCancellation.Even.BasisLinear
-import Physlib.QFT.QED.AnomalyCancellation.Even.LineInCubic
-import Physlib.QFT.QED.AnomalyCancellation.Even.Parameterization
-import Physlib.QFT.QED.AnomalyCancellation.LineInPlaneCond
-import Physlib.QFT.QED.AnomalyCancellation.LowDim.One
-import Physlib.QFT.QED.AnomalyCancellation.LowDim.Three
-import Physlib.QFT.QED.AnomalyCancellation.LowDim.Two
-import Physlib.QFT.QED.AnomalyCancellation.Odd.BasisLinear
-import Physlib.QFT.QED.AnomalyCancellation.Odd.LineInCubic
-import Physlib.QFT.QED.AnomalyCancellation.Odd.Parameterization
-import Physlib.QFT.QED.AnomalyCancellation.Permutations
-import Physlib.QFT.QED.AnomalyCancellation.Sorts
-import Physlib.QFT.QED.AnomalyCancellation.VectorLike
-import Physlib.QuantumMechanics.DDimensions.Hydrogen.Basic
-import Physlib.QuantumMechanics.DDimensions.Hydrogen.LaplaceRungeLenzVector
-import Physlib.QuantumMechanics.DDimensions.Operators.AngularMomentum
-import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
-import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
-import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
-import Physlib.QuantumMechanics.DDimensions.Operators.Position
-import Physlib.QuantumMechanics.DDimensions.Operators.StateCovariance
-import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
-import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
-import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.SecondOrder
-import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.StateVariance
-import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
-import Physlib.QuantumMechanics.DDimensions.Operators.Uncertainty
-import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
-import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
-import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
-import Physlib.QuantumMechanics.FiniteTarget.Basic
-import Physlib.QuantumMechanics.FiniteTarget.HilbertSpace
-import Physlib.QuantumMechanics.OneDimension.GeneralPotential.Basic
-import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Basic
-import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Completeness
-import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
-import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Examples
-import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.TISE
-import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
-import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Gaussians
-import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PlaneWaves
-import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PositionStates
-import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
-import Physlib.QuantumMechanics.OneDimension.Operators.Commutation
-import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
-import Physlib.QuantumMechanics.OneDimension.Operators.Parity
-import Physlib.QuantumMechanics.OneDimension.Operators.Position
-import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
-import Physlib.QuantumMechanics.OneDimension.ReflectionlessPotential.Basic
-import Physlib.QuantumMechanics.PlanckConstant
-import Physlib.Relativity.Bispinors.Basic
-import Physlib.Relativity.CliffordAlgebra
-import Physlib.Relativity.LorentzAlgebra.Basic
-import Physlib.Relativity.LorentzAlgebra.Basis
-import Physlib.Relativity.LorentzAlgebra.ExponentialMap
-import Physlib.Relativity.LorentzGroup.Basic
-import Physlib.Relativity.LorentzGroup.Boosts.Apply
-import Physlib.Relativity.LorentzGroup.Boosts.Basic
-import Physlib.Relativity.LorentzGroup.Boosts.Generalized
-import Physlib.Relativity.LorentzGroup.Orthochronous.Basic
-import Physlib.Relativity.LorentzGroup.Proper
-import Physlib.Relativity.LorentzGroup.Restricted.Basic
-import Physlib.Relativity.LorentzGroup.Restricted.FromBoostRotation
-import Physlib.Relativity.LorentzGroup.Rotations
-import Physlib.Relativity.LorentzGroup.ToVector
-import Physlib.Relativity.MinkowskiMatrix
-import Physlib.Relativity.PauliMatrices.AsTensor
-import Physlib.Relativity.PauliMatrices.Basic
-import Physlib.Relativity.PauliMatrices.CliffordAlgebra
-import Physlib.Relativity.PauliMatrices.Relations
-import Physlib.Relativity.PauliMatrices.SelfAdjoint
-import Physlib.Relativity.PauliMatrices.ToTensor
-import Physlib.Relativity.SL2C.Basic
-import Physlib.Relativity.SL2C.SelfAdjoint
-import Physlib.Relativity.Special.ProperTime
-import Physlib.Relativity.Special.TwinParadox.Basic
-import Physlib.Relativity.SpeedOfLight
-import Physlib.Relativity.Tensors.Basic
-import Physlib.Relativity.Tensors.Color.Basic
-import Physlib.Relativity.Tensors.Color.Discrete
-import Physlib.Relativity.Tensors.Color.Lift
-import Physlib.Relativity.Tensors.ComplexTensor.Basic
-import Physlib.Relativity.Tensors.ComplexTensor.Lemmas
-import Physlib.Relativity.Tensors.ComplexTensor.Matrix.Pre
-import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Basic
-import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Lemmas
-import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Pre
-import Physlib.Relativity.Tensors.ComplexTensor.OfRat
-import Physlib.Relativity.Tensors.ComplexTensor.Units.Basic
-import Physlib.Relativity.Tensors.ComplexTensor.Units.Pre
-import Physlib.Relativity.Tensors.ComplexTensor.Units.Symm
-import Physlib.Relativity.Tensors.ComplexTensor.Vector.Pre.Basic
-import Physlib.Relativity.Tensors.ComplexTensor.Vector.Pre.Contraction
-import Physlib.Relativity.Tensors.ComplexTensor.Vector.Pre.Modules
-import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Basic
-import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Contraction
-import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Metric
-import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Modules
-import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Two
-import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Unit
-import Physlib.Relativity.Tensors.Constructors
-import Physlib.Relativity.Tensors.Contraction.Basic
-import Physlib.Relativity.Tensors.Contraction.Basis
-import Physlib.Relativity.Tensors.Contraction.Products
-import Physlib.Relativity.Tensors.Contraction.Pure
-import Physlib.Relativity.Tensors.Dual
-import Physlib.Relativity.Tensors.Elab
-import Physlib.Relativity.Tensors.Evaluation
-import Physlib.Relativity.Tensors.MetricTensor
-import Physlib.Relativity.Tensors.OfInt
-import Physlib.Relativity.Tensors.Product
-import Physlib.Relativity.Tensors.RealTensor.Basic
-import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
-import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
-import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
-import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
-import Physlib.Relativity.Tensors.RealTensor.ToComplex
-import Physlib.Relativity.Tensors.RealTensor.Units.Pre
-import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
-import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.Basic
-import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.LightLike
-import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.TimeLike
-import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
-import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Basic
-import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Contraction
-import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Modules
-import Physlib.Relativity.Tensors.RealTensor.Velocity.Basic
-import Physlib.Relativity.Tensors.TensorSpecies.Basic
-import Physlib.Relativity.Tensors.Tensorial
-import Physlib.Relativity.Tensors.UnitTensor
-import Physlib.SpaceAndTime.Space.Basic
-import Physlib.SpaceAndTime.Space.ConstantSliceDist
-import Physlib.SpaceAndTime.Space.CrossProduct
-import Physlib.SpaceAndTime.Space.Derivatives.Basic
-import Physlib.SpaceAndTime.Space.Derivatives.Curl
-import Physlib.SpaceAndTime.Space.Derivatives.Div
-import Physlib.SpaceAndTime.Space.Derivatives.Grad
-import Physlib.SpaceAndTime.Space.Derivatives.Iterated
-import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
-import Physlib.SpaceAndTime.Space.Derivatives.MultiIndex
-import Physlib.SpaceAndTime.Space.DistConst
-import Physlib.SpaceAndTime.Space.DistOfFunction
-import Physlib.SpaceAndTime.Space.Integrals.Basic
-import Physlib.SpaceAndTime.Space.Integrals.NormPow
-import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
-import Physlib.SpaceAndTime.Space.IsDistBounded
-import Physlib.SpaceAndTime.Space.LengthUnit
-import Physlib.SpaceAndTime.Space.Module
-import Physlib.SpaceAndTime.Space.Norm
-import Physlib.SpaceAndTime.Space.Slice
-import Physlib.SpaceAndTime.Space.Translations
-import Physlib.SpaceAndTime.SpaceTime.Basic
-import Physlib.SpaceAndTime.SpaceTime.Boosts
-import Physlib.SpaceAndTime.SpaceTime.Derivatives
-import Physlib.SpaceAndTime.SpaceTime.LorentzAction
-import Physlib.SpaceAndTime.SpaceTime.TimeSlice
-import Physlib.SpaceAndTime.Time.Basic
-import Physlib.SpaceAndTime.Time.Derivatives
-import Physlib.SpaceAndTime.Time.TimeMan
-import Physlib.SpaceAndTime.Time.TimeTransMan
-import Physlib.SpaceAndTime.Time.TimeUnit
-import Physlib.SpaceAndTime.TimeAndSpace.Basic
-import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
-import Physlib.StatisticalMechanics.BoltzmannConstant
-import Physlib.StatisticalMechanics.CanonicalEnsemble.Basic
-import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite
-import Physlib.StatisticalMechanics.CanonicalEnsemble.Lemmas
-import Physlib.StatisticalMechanics.CanonicalEnsemble.TwoState
-import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.Basic
-import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.IdealGas
-import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.ThermoQuantities
-import Physlib.StringTheory.Basic
-import Physlib.StringTheory.FTheory.SU5.Basic
-import Physlib.StringTheory.FTheory.SU5.Charges.AnomalyFree
-import Physlib.StringTheory.FTheory.SU5.Charges.OfRationalSection
-import Physlib.StringTheory.FTheory.SU5.Charges.Viable
-import Physlib.StringTheory.FTheory.SU5.Fluxes.Basic
-import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.ChiralIndices
-import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Completeness
-import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Elems
-import Physlib.StringTheory.FTheory.SU5.Quanta.Basic
-import Physlib.StringTheory.FTheory.SU5.Quanta.FiveQuanta
-import Physlib.StringTheory.FTheory.SU5.Quanta.IsViable
-import Physlib.StringTheory.FTheory.SU5.Quanta.TenQuanta
-import Physlib.Thermodynamics.Basic
-import Physlib.Thermodynamics.IdealGas.Basic
-import Physlib.Thermodynamics.Temperature.Basic
-import Physlib.Thermodynamics.Temperature.TemperatureUnits
-import Physlib.Units.Basic
-import Physlib.Units.Dimension
-import Physlib.Units.Examples
-import Physlib.Units.FDeriv
-import Physlib.Units.Integral
-import Physlib.Units.UnitDependent
-import Physlib.Units.WithDim.Area
-import Physlib.Units.WithDim.Basic
-import Physlib.Units.WithDim.Energy
-import Physlib.Units.WithDim.Mass
-import Physlib.Units.WithDim.Momentum
-import Physlib.Units.WithDim.Pressure
-import Physlib.Units.WithDim.Speed
-import Physlib.Units.WithDim.Velocity
+module
+
+public import Physlib.ClassicalFieldTheory.Local.Variation
+public import Physlib.ClassicalMechanics.Basic
+public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Basic
+public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Solution
+public import Physlib.ClassicalMechanics.EulerLagrange
+public import Physlib.ClassicalMechanics.FreeParticle.Basic
+public import Physlib.ClassicalMechanics.HamiltonsEquations
+public import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
+public import Physlib.ClassicalMechanics.HarmonicOscillator.ConfigurationSpace
+public import Physlib.ClassicalMechanics.HarmonicOscillator.Solution
+public import Physlib.ClassicalMechanics.Lagrangian.TotalDerivativeEquivalence
+public import Physlib.ClassicalMechanics.Mass.MassUnit
+public import Physlib.ClassicalMechanics.OrbitalMechanics.VisViva
+public import Physlib.ClassicalMechanics.Pendulum.CoplanarDoublePendulum
+public import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
+public import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
+public import Physlib.ClassicalMechanics.RigidBody.Basic
+public import Physlib.ClassicalMechanics.RigidBody.SolidSphere
+public import Physlib.ClassicalMechanics.Scattering.RigidSphere
+public import Physlib.ClassicalMechanics.Vibrations.LinearTriatomic
+public import Physlib.ClassicalMechanics.WaveEquation.Basic
+public import Physlib.ClassicalMechanics.WaveEquation.HarmonicWave
+public import Physlib.CondensedMatter.Basic
+public import Physlib.CondensedMatter.TightBindingChain.Basic
+public import Physlib.Cosmology.Basic
+public import Physlib.Cosmology.FLRW.Basic
+public import Physlib.Electromagnetism.Basic
+public import Physlib.Electromagnetism.Charge.ChargeUnit
+public import Physlib.Electromagnetism.Current.CircularCoil
+public import Physlib.Electromagnetism.Current.InfiniteWire
+public import Physlib.Electromagnetism.Dynamics.Basic
+public import Physlib.Electromagnetism.Dynamics.CurrentDensity
+public import Physlib.Electromagnetism.Dynamics.Hamiltonian
+public import Physlib.Electromagnetism.Dynamics.IsExtrema
+public import Physlib.Electromagnetism.Dynamics.KineticTerm
+public import Physlib.Electromagnetism.Dynamics.Lagrangian
+public import Physlib.Electromagnetism.Kinematics.Boosts
+public import Physlib.Electromagnetism.Kinematics.EMPotential
+public import Physlib.Electromagnetism.Kinematics.ElectricField
+public import Physlib.Electromagnetism.Kinematics.FieldStrength
+public import Physlib.Electromagnetism.Kinematics.MagneticField
+public import Physlib.Electromagnetism.Kinematics.ScalarPotential
+public import Physlib.Electromagnetism.Kinematics.VectorPotential
+public import Physlib.Electromagnetism.PointParticle.OneDimension
+public import Physlib.Electromagnetism.PointParticle.ThreeDimension
+public import Physlib.Electromagnetism.ThreeDimension.Basic
+public import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations
+public import Physlib.Electromagnetism.Vacuum.Constant
+public import Physlib.Electromagnetism.Vacuum.HarmonicWave
+public import Physlib.Electromagnetism.Vacuum.IsPlaneWave
+public import Physlib.Mathematics.Calculus.AdjFDeriv
+public import Physlib.Mathematics.Calculus.Divergence
+public import Physlib.Mathematics.DataStructures.FourTree.Basic
+public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
+public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
+public import Physlib.Mathematics.Distribution.Basic
+public import Physlib.Mathematics.Distribution.PowMul
+public import Physlib.Mathematics.FDerivCurry
+public import Physlib.Mathematics.Fin
+public import Physlib.Mathematics.Fin.Involutions
+public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
+public import Physlib.Mathematics.Geometry.Metric.Riemannian.Defs
+public import Physlib.Mathematics.InnerProductSpace.Adjoint
+public import Physlib.Mathematics.InnerProductSpace.Basic
+public import Physlib.Mathematics.InnerProductSpace.Calculus
+public import Physlib.Mathematics.InnerProductSpace.Submodule
+public import Physlib.Mathematics.KroneckerDelta
+public import Physlib.Mathematics.LinearMaps
+public import Physlib.Mathematics.List
+public import Physlib.Mathematics.List.InsertIdx
+public import Physlib.Mathematics.List.InsertionSort
+public import Physlib.Mathematics.PiTensorProduct
+public import Physlib.Mathematics.RatComplexNum
+public import Physlib.Mathematics.SO3.Basic
+public import Physlib.Mathematics.SchurTriangulation
+public import Physlib.Mathematics.SpecialFunctions.PhysHermite
+public import Physlib.Mathematics.Trigonometry.Tanh
+public import Physlib.Mathematics.VariationalCalculus.Basic
+public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
+public import Physlib.Mathematics.VariationalCalculus.HasVarAdjoint
+public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
+public import Physlib.Mathematics.VariationalCalculus.IsLocalizedfunctionTransform
+public import Physlib.Mathematics.VariationalCalculus.IsTestFunction
+public import Physlib.Meta.AllFilePaths
+public import Physlib.Meta.Basic
+public import Physlib.Meta.Informal.Basic
+public import Physlib.Meta.Informal.Post
+public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Meta.Linters.Sorry
+public import Physlib.Meta.Notes.Basic
+public import Physlib.Meta.Notes.HTMLNote
+public import Physlib.Meta.Notes.NoteFile
+public import Physlib.Meta.Notes.ToHTML
+public import Physlib.Meta.Remark.Basic
+public import Physlib.Meta.Remark.Properties
+public import Physlib.Meta.Sorry
+public import Physlib.Meta.TODO.Basic
+public import Physlib.Meta.TODO.Global
+public import Physlib.Meta.TransverseTactics
+public import Physlib.Optics.Basic
+public import Physlib.Optics.Polarization.Basic
+public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
+public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Basic
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.FamilyMaps
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.NoGrav.Basic
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.Basic
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.DimSevenPlane
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Ordinary.FamilyMaps
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Permutations
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.BMinusL
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.Basic
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.BoundPlaneDim
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.FamilyMaps
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.HyperCharge
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.PlaneNonSols
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.QuadSol
+public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.PlusU1.QuadSolToSol
+public import Physlib.Particles.BeyondTheStandardModel.Spin10.Basic
+public import Physlib.Particles.BeyondTheStandardModel.TwoHDM.Basic
+public import Physlib.Particles.BeyondTheStandardModel.TwoHDM.GramMatrix
+public import Physlib.Particles.BeyondTheStandardModel.TwoHDM.Potential
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Basic
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Invariants
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.PhaseFreedom
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Relations
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.Rows
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.StandardParameterization.Basic
+public import Physlib.Particles.FlavorPhysics.CKMMatrix.StandardParameterization.StandardParameters
+public import Physlib.Particles.NeutrinoPhysics.Basic
+public import Physlib.Particles.StandardModel.AnomalyCancellation.Basic
+public import Physlib.Particles.StandardModel.AnomalyCancellation.FamilyMaps
+public import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.Basic
+public import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.One.Lemmas
+public import Physlib.Particles.StandardModel.AnomalyCancellation.NoGrav.One.LinearParameterization
+public import Physlib.Particles.StandardModel.AnomalyCancellation.Permutations
+public import Physlib.Particles.StandardModel.Basic
+public import Physlib.Particles.StandardModel.HiggsBoson.Basic
+public import Physlib.Particles.StandardModel.HiggsBoson.Potential
+public import Physlib.Particles.StandardModel.Representations
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.B3
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Basic
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.HyperCharge
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.LineY3B3
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.Basic
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.PlaneWithY3B3
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.ToSols
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Permutations
+public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Y3
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.AllowsTerm
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Map
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimalSuperSet
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.Basic
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.FinsetTerms
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.MinimallyAllowsTerm.OfFinset
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.OfFieldLabel
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.OfPotentialTerm
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoClosed
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.PhenoConstrained
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
+public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.ZMod
+public import Physlib.Particles.SuperSymmetry.SU5.FieldLabels
+public import Physlib.Particles.SuperSymmetry.SU5.Potential
+public import Physlib.QFT.AnomalyCancellation.Basic
+public import Physlib.QFT.AnomalyCancellation.GroupActions
+public import Physlib.QFT.PerturbationTheory.CreateAnnihilate
+public import Physlib.QFT.PerturbationTheory.FeynmanDiagrams.Basic
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.Basic
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.Grading
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.NormTimeOrder
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.NormalOrder
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.SuperCommute
+public import Physlib.QFT.PerturbationTheory.FieldOpFreeAlgebra.TimeOrder
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.Basic
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.CrAnSection
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.Filters
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.NormalOrder
+public import Physlib.QFT.PerturbationTheory.FieldSpecification.TimeOrder
+public import Physlib.QFT.PerturbationTheory.FieldStatistics.Basic
+public import Physlib.QFT.PerturbationTheory.FieldStatistics.ExchangeSign
+public import Physlib.QFT.PerturbationTheory.FieldStatistics.OfFinset
+public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSign
+public import Physlib.QFT.PerturbationTheory.Koszul.KoszulSignInsert
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.Basic
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.Grading
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Basic
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.Lemmas
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.NormalOrder.WickContractions
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.StaticWickTerm
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.StaticWickTheorem
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.SuperCommute
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.TimeContraction
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.TimeOrder
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.Universality
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.WickTerm
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.WicksTheorem
+public import Physlib.QFT.PerturbationTheory.WickAlgebra.WicksTheoremNormal
+public import Physlib.QFT.PerturbationTheory.WickContraction.Basic
+public import Physlib.QFT.PerturbationTheory.WickContraction.Card
+public import Physlib.QFT.PerturbationTheory.WickContraction.Erase
+public import Physlib.QFT.PerturbationTheory.WickContraction.ExtractEquiv
+public import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContract
+public import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
+public import Physlib.QFT.PerturbationTheory.WickContraction.Involutions
+public import Physlib.QFT.PerturbationTheory.WickContraction.IsFull
+public import Physlib.QFT.PerturbationTheory.WickContraction.Join
+public import Physlib.QFT.PerturbationTheory.WickContraction.Perm
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.Basic
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.InsertNone
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.InsertSome
+public import Physlib.QFT.PerturbationTheory.WickContraction.Sign.Join
+public import Physlib.QFT.PerturbationTheory.WickContraction.Singleton
+public import Physlib.QFT.PerturbationTheory.WickContraction.StaticContract
+public import Physlib.QFT.PerturbationTheory.WickContraction.SubContraction
+public import Physlib.QFT.PerturbationTheory.WickContraction.TimeCond
+public import Physlib.QFT.PerturbationTheory.WickContraction.TimeContract
+public import Physlib.QFT.PerturbationTheory.WickContraction.Uncontracted
+public import Physlib.QFT.PerturbationTheory.WickContraction.UncontractedList
+public import Physlib.QFT.QED.AnomalyCancellation.Basic
+public import Physlib.QFT.QED.AnomalyCancellation.BasisLinear
+public import Physlib.QFT.QED.AnomalyCancellation.ConstAbs
+public import Physlib.QFT.QED.AnomalyCancellation.Even.BasisLinear
+public import Physlib.QFT.QED.AnomalyCancellation.Even.LineInCubic
+public import Physlib.QFT.QED.AnomalyCancellation.Even.Parameterization
+public import Physlib.QFT.QED.AnomalyCancellation.LineInPlaneCond
+public import Physlib.QFT.QED.AnomalyCancellation.LowDim.One
+public import Physlib.QFT.QED.AnomalyCancellation.LowDim.Three
+public import Physlib.QFT.QED.AnomalyCancellation.LowDim.Two
+public import Physlib.QFT.QED.AnomalyCancellation.Odd.BasisLinear
+public import Physlib.QFT.QED.AnomalyCancellation.Odd.LineInCubic
+public import Physlib.QFT.QED.AnomalyCancellation.Odd.Parameterization
+public import Physlib.QFT.QED.AnomalyCancellation.Permutations
+public import Physlib.QFT.QED.AnomalyCancellation.Sorts
+public import Physlib.QFT.QED.AnomalyCancellation.VectorLike
+public import Physlib.QuantumMechanics.DDimensions.Hydrogen.Basic
+public import Physlib.QuantumMechanics.DDimensions.Hydrogen.LaplaceRungeLenzVector
+public import Physlib.QuantumMechanics.DDimensions.Operators.AngularMomentum
+public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
+public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
+public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
+public import Physlib.QuantumMechanics.DDimensions.Operators.Position
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateCovariance
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.SecondOrder
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.StateVariance
+public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
+public import Physlib.QuantumMechanics.DDimensions.Operators.Uncertainty
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.FiniteTarget.Basic
+public import Physlib.QuantumMechanics.FiniteTarget.HilbertSpace
+public import Physlib.QuantumMechanics.OneDimension.GeneralPotential.Basic
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Basic
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Completeness
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Examples
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.TISE
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Gaussians
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PlaneWaves
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PositionStates
+public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.OneDimension.Operators.Commutation
+public import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
+public import Physlib.QuantumMechanics.OneDimension.Operators.Parity
+public import Physlib.QuantumMechanics.OneDimension.Operators.Position
+public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
+public import Physlib.QuantumMechanics.OneDimension.ReflectionlessPotential.Basic
+public import Physlib.QuantumMechanics.PlanckConstant
+public import Physlib.Relativity.Bispinors.Basic
+public import Physlib.Relativity.CliffordAlgebra
+public import Physlib.Relativity.LorentzAlgebra.Basic
+public import Physlib.Relativity.LorentzAlgebra.Basis
+public import Physlib.Relativity.LorentzAlgebra.ExponentialMap
+public import Physlib.Relativity.LorentzGroup.Basic
+public import Physlib.Relativity.LorentzGroup.Boosts.Apply
+public import Physlib.Relativity.LorentzGroup.Boosts.Basic
+public import Physlib.Relativity.LorentzGroup.Boosts.Generalized
+public import Physlib.Relativity.LorentzGroup.Orthochronous.Basic
+public import Physlib.Relativity.LorentzGroup.Proper
+public import Physlib.Relativity.LorentzGroup.Restricted.Basic
+public import Physlib.Relativity.LorentzGroup.Restricted.FromBoostRotation
+public import Physlib.Relativity.LorentzGroup.Rotations
+public import Physlib.Relativity.LorentzGroup.ToVector
+public import Physlib.Relativity.MinkowskiMatrix
+public import Physlib.Relativity.PauliMatrices.AsTensor
+public import Physlib.Relativity.PauliMatrices.Basic
+public import Physlib.Relativity.PauliMatrices.CliffordAlgebra
+public import Physlib.Relativity.PauliMatrices.Relations
+public import Physlib.Relativity.PauliMatrices.SelfAdjoint
+public import Physlib.Relativity.PauliMatrices.ToTensor
+public import Physlib.Relativity.SL2C.Basic
+public import Physlib.Relativity.SL2C.SelfAdjoint
+public import Physlib.Relativity.Special.ProperTime
+public import Physlib.Relativity.Special.TwinParadox.Basic
+public import Physlib.Relativity.SpeedOfLight
+public import Physlib.Relativity.Tensors.Basic
+public import Physlib.Relativity.Tensors.Color.Basic
+public import Physlib.Relativity.Tensors.Color.Discrete
+public import Physlib.Relativity.Tensors.Color.Lift
+public import Physlib.Relativity.Tensors.ComplexTensor.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Lemmas
+public import Physlib.Relativity.Tensors.ComplexTensor.Matrix.Pre
+public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Lemmas
+public import Physlib.Relativity.Tensors.ComplexTensor.Metrics.Pre
+public import Physlib.Relativity.Tensors.ComplexTensor.OfRat
+public import Physlib.Relativity.Tensors.ComplexTensor.Units.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Units.Pre
+public import Physlib.Relativity.Tensors.ComplexTensor.Units.Symm
+public import Physlib.Relativity.Tensors.ComplexTensor.Vector.Pre.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Vector.Pre.Contraction
+public import Physlib.Relativity.Tensors.ComplexTensor.Vector.Pre.Modules
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Contraction
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Metric
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Modules
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Two
+public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Unit
+public import Physlib.Relativity.Tensors.Constructors
+public import Physlib.Relativity.Tensors.Contraction.Basic
+public import Physlib.Relativity.Tensors.Contraction.Basis
+public import Physlib.Relativity.Tensors.Contraction.Products
+public import Physlib.Relativity.Tensors.Contraction.Pure
+public import Physlib.Relativity.Tensors.Dual
+public import Physlib.Relativity.Tensors.Elab
+public import Physlib.Relativity.Tensors.Evaluation
+public import Physlib.Relativity.Tensors.MetricTensor
+public import Physlib.Relativity.Tensors.OfInt
+public import Physlib.Relativity.Tensors.Product
+public import Physlib.Relativity.Tensors.RealTensor.Basic
+public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
+public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
+public import Physlib.Relativity.Tensors.RealTensor.ToComplex
+public import Physlib.Relativity.Tensors.RealTensor.Units.Pre
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.LightLike
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.TimeLike
+public import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Contraction
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Modules
+public import Physlib.Relativity.Tensors.RealTensor.Velocity.Basic
+public import Physlib.Relativity.Tensors.TensorSpecies.Basic
+public import Physlib.Relativity.Tensors.Tensorial
+public import Physlib.Relativity.Tensors.UnitTensor
+public import Physlib.SpaceAndTime.Space.Basic
+public import Physlib.SpaceAndTime.Space.ConstantSliceDist
+public import Physlib.SpaceAndTime.Space.CrossProduct
+public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Curl
+public import Physlib.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.SpaceAndTime.Space.Derivatives.Grad
+public import Physlib.SpaceAndTime.Space.Derivatives.Iterated
+public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
+public import Physlib.SpaceAndTime.Space.Derivatives.MultiIndex
+public import Physlib.SpaceAndTime.Space.DistConst
+public import Physlib.SpaceAndTime.Space.DistOfFunction
+public import Physlib.SpaceAndTime.Space.Integrals.Basic
+public import Physlib.SpaceAndTime.Space.Integrals.NormPow
+public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
+public import Physlib.SpaceAndTime.Space.IsDistBounded
+public import Physlib.SpaceAndTime.Space.LengthUnit
+public import Physlib.SpaceAndTime.Space.Module
+public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Slice
+public import Physlib.SpaceAndTime.Space.Translations
+public import Physlib.SpaceAndTime.SpaceTime.Basic
+public import Physlib.SpaceAndTime.SpaceTime.Boosts
+public import Physlib.SpaceAndTime.SpaceTime.Derivatives
+public import Physlib.SpaceAndTime.SpaceTime.LorentzAction
+public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
+public import Physlib.SpaceAndTime.Time.Basic
+public import Physlib.SpaceAndTime.Time.Derivatives
+public import Physlib.SpaceAndTime.Time.TimeMan
+public import Physlib.SpaceAndTime.Time.TimeTransMan
+public import Physlib.SpaceAndTime.Time.TimeUnit
+public import Physlib.SpaceAndTime.TimeAndSpace.Basic
+public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
+public import Physlib.StatisticalMechanics.BoltzmannConstant
+public import Physlib.StatisticalMechanics.CanonicalEnsemble.Basic
+public import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite
+public import Physlib.StatisticalMechanics.CanonicalEnsemble.Lemmas
+public import Physlib.StatisticalMechanics.CanonicalEnsemble.TwoState
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.Basic
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.IdealGas
+public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.ThermoQuantities
+public import Physlib.StringTheory.Basic
+public import Physlib.StringTheory.FTheory.SU5.Basic
+public import Physlib.StringTheory.FTheory.SU5.Charges.AnomalyFree
+public import Physlib.StringTheory.FTheory.SU5.Charges.OfRationalSection
+public import Physlib.StringTheory.FTheory.SU5.Charges.Viable
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.Basic
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.ChiralIndices
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Completeness
+public import Physlib.StringTheory.FTheory.SU5.Fluxes.NoExotics.Elems
+public import Physlib.StringTheory.FTheory.SU5.Quanta.Basic
+public import Physlib.StringTheory.FTheory.SU5.Quanta.FiveQuanta
+public import Physlib.StringTheory.FTheory.SU5.Quanta.IsViable
+public import Physlib.StringTheory.FTheory.SU5.Quanta.TenQuanta
+public import Physlib.Thermodynamics.Basic
+public import Physlib.Thermodynamics.IdealGas.Basic
+public import Physlib.Thermodynamics.Temperature.Basic
+public import Physlib.Thermodynamics.Temperature.TemperatureUnits
+public import Physlib.Units.Basic
+public import Physlib.Units.Dimension
+public import Physlib.Units.Examples
+public import Physlib.Units.FDeriv
+public import Physlib.Units.Integral
+public import Physlib.Units.UnitDependent
+public import Physlib.Units.WithDim.Area
+public import Physlib.Units.WithDim.Basic
+public import Physlib.Units.WithDim.Energy
+public import Physlib.Units.WithDim.Mass
+public import Physlib.Units.WithDim.Momentum
+public import Physlib.Units.WithDim.Pressure
+public import Physlib.Units.WithDim.Speed
+public import Physlib.Units.WithDim.Velocity
