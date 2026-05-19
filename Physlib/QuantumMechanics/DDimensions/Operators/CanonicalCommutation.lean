@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Axiomatic-AI. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Matteo Cipollina
+Authors: Matteo Cipollina, Austin Letson
 -/
 module
 
@@ -162,49 +162,51 @@ lemma inner_positionPMapSchwartz_commutator_momentumPMapSchwartz_same
 on normalized Schwartz-domain states. -/
 lemma position_momentum_same_coordinate_uncertainty_squared
     (i : Fin d) (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
-    LinearPMap.stateVariance (positionPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property *
-      LinearPMap.stateVariance (momentumPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property ≥
+    LinearPMap.variance (positionPMapSchwartz i) ψ *
+      LinearPMap.variance (momentumPMapSchwartz i) ⟨ψ, ψ.2⟩ ≥
         (ℏ / 2) ^ 2 := by
   let A := positionPMapSchwartz i
   let B := momentumPMapSchwartz i
+  have hψB : (ψ : SpaceDHilbertSpace d) ∈ B.domain := ψ.2
   have hraw := inner_positionPMapSchwartz_commutator_momentumPMapSchwartz_same i ψ hψ_norm
   simpa only [abs_of_nonneg ℏ_nonneg] using
     state_uncertainty_squared_of_raw_commutator A B (positionPMapSchwartz_isSymmetric i)
-      (momentumPMapSchwartz_isSymmetric i) (ψ : SpaceDHilbertSpace d) ψ.property ψ.property
-      hψ_norm (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
+      (momentumPMapSchwartz_isSymmetric i) ψ hψB hψ_norm
+      (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
       (c := ℏ) hraw
 
 /-- The same-coordinate Robertson-Schrodinger lower bound on normalized Schwartz-domain states. -/
 lemma position_momentum_same_coordinate_uncertainty_squared_with_covariance
     (i : Fin d) (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
-    LinearPMap.stateVariance (positionPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property *
-      LinearPMap.stateVariance (momentumPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property ≥
-        (LinearPMap.stateCovariance (positionPMapSchwartz i) (momentumPMapSchwartz i)
-          (ψ : SpaceDHilbertSpace d) ψ.property ψ.property) ^ 2 + (ℏ / 2) ^ 2 := by
+    LinearPMap.variance (positionPMapSchwartz i) ψ *
+      LinearPMap.variance (momentumPMapSchwartz i) ⟨ψ, ψ.2⟩ ≥
+        (LinearPMap.stateCovariance (positionPMapSchwartz i) (momentumPMapSchwartz i) ψ
+          (by exact ψ.2)) ^ 2 + (ℏ / 2) ^ 2 := by
   let A := positionPMapSchwartz i
   let B := momentumPMapSchwartz i
+  have hψB : (ψ : SpaceDHilbertSpace d) ∈ B.domain := ψ.2
   have hraw := inner_positionPMapSchwartz_commutator_momentumPMapSchwartz_same i ψ hψ_norm
   simpa only using
     state_uncertainty_squared_with_covariance_of_raw_commutator A B
       (positionPMapSchwartz_isSymmetric i) (momentumPMapSchwartz_isSymmetric i)
-      (ψ : SpaceDHilbertSpace d) ψ.property ψ.property hψ_norm
-      (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
+      ψ hψB hψ_norm (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
       (c := ℏ) hraw
 
 /-- The same-coordinate position and momentum standard deviations satisfy the Heisenberg lower
 bound on normalized Schwartz-domain states. -/
 lemma position_momentum_same_coordinate_uncertainty
     (i : Fin d) (ψ : schwartzSubmodule d) (hψ_norm : ‖(ψ : SpaceDHilbertSpace d)‖ = 1) :
-    LinearPMap.stateStdDev (positionPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property *
-      LinearPMap.stateStdDev (momentumPMapSchwartz i) (ψ : SpaceDHilbertSpace d) ψ.property ≥
+    LinearPMap.standardDeviation (positionPMapSchwartz i) ψ *
+      LinearPMap.standardDeviation (momentumPMapSchwartz i) ⟨ψ, ψ.2⟩ ≥
         ℏ / 2 := by
   let A := positionPMapSchwartz i
   let B := momentumPMapSchwartz i
+  have hψB : (ψ : SpaceDHilbertSpace d) ∈ B.domain := ψ.2
   have hraw := inner_positionPMapSchwartz_commutator_momentumPMapSchwartz_same i ψ hψ_norm
   simpa only [abs_of_nonneg ℏ_nonneg] using
     state_uncertainty_of_raw_commutator A B (positionPMapSchwartz_isSymmetric i)
-      (momentumPMapSchwartz_isSymmetric i) (ψ : SpaceDHilbertSpace d) ψ.property ψ.property
-      hψ_norm (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
+      (momentumPMapSchwartz_isSymmetric i) ψ hψB hψ_norm
+      (positionPMapSchwartz_range i ψ) (momentumOperator_range i ψ)
       (c := ℏ) hraw
 
 end
