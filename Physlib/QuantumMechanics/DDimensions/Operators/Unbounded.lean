@@ -428,6 +428,16 @@ lemma IsEssentiallySelfAdjoint.isUnbounded [CompleteSpace H]
     (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsUnbounded :=
   h.isSymmetric.isUnbounded_iff_hasDenseDomain.mpr h'
 
+/-- The closure is the unique self-adjoint extension of an essentially self-adjoint operator. -/
+lemma IsEssentiallySelfAdjoint.unique_self_adjoint_extension [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain)
+    {T₂ : H →ₗ.[ℂ] H} (h_le : T ≤ T₂) (h₂ : IsSelfAdjoint T₂) :
+    T₂ = T.closure := by
+  have h_cl : T₂.IsClosed := IsSelfAdjoint.isClosed h₂
+  have h_cl' : T₂.closure = T₂ := h_cl.isClosable.isClosed_iff.mp h_cl
+  have h_le' : T.closure ≤ T₂ := h_cl' ▸ h_cl.isClosable.closure_mono h_le
+  exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl <| h'.closure) h_le') h_le'
+
 @[aesop safe apply]
 lemma IsEssentiallySelfAdjoint.smul [CompleteSpace H]
     (h : T.IsEssentiallySelfAdjoint) {c : ℂ} (hc : c ≠ 0) (hc' : conj c = c) :
@@ -444,16 +454,6 @@ lemma IsEssentiallySelfAdjoint.smul_ofReal [CompleteSpace H]
 lemma IsEssentiallySelfAdjoint.neg [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
     (-T).IsEssentiallySelfAdjoint :=
   neg_eq_neg_one_smul T ▸ h.smul (by norm_num) (by norm_num)
-
-/-- The closure is the unique self-adjoint extension of an essentially self-adjoint operator. -/
-lemma IsEssentiallySelfAdjoint.unique_self_adjoint_extension [CompleteSpace H]
-    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain)
-    {T₂ : H →ₗ.[ℂ] H} (h_le : T ≤ T₂) (h₂ : IsSelfAdjoint T₂) :
-    T₂ = T.closure := by
-  have h_cl : T₂.IsClosed := IsSelfAdjoint.isClosed h₂
-  have h_cl' : T₂.closure = T₂ := h_cl.isClosable.isClosed_iff.mp h_cl
-  have h_le' : T.closure ≤ T₂ := h_cl' ▸ h_cl.isClosable.closure_mono h_le
-  exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl <| h'.closure) h_le') h_le'
 
 /-!
 ## H. Unbounded operators
