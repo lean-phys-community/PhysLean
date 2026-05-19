@@ -38,7 +38,7 @@ TODO "The implementation of pure U(1) anomaly cancellation conditions is done
 
 /-- The vector space of charges. -/
 @[simps!]
-def PureU1Charges (n : ℕ) : ACCSystemCharges := ACCSystemChargesMk n
+def PureU1Charges (n : ℕ) : ACCSystemCharges := ⟨n⟩
 
 open BigOperators in
 /-- The gravitational anomaly. -/
