@@ -327,23 +327,19 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
 ## F. Self-adjoint operators
 -/
 
-lemma IsSelfAdjoint.isSymmetric [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
-    T.IsSymmetric := by
+lemma IsSelfAdjoint.isSymmetric [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsSymmetric := by
   rw [isSymmetric_def]
   nth_rw 1 [← h]
-  exact adjoint_isFormalAdjoint h'
+  exact adjoint_isFormalAdjoint h.dense_domain
 
-lemma IsSelfAdjoint.isClosed [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
-    T.IsClosed :=
-  h ▸ adjoint_isClosed h'
+lemma IsSelfAdjoint.isClosed [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsClosed :=
+  h ▸ adjoint_isClosed h.dense_domain
 
-lemma IsSelfAdjoint.isClosable [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
-    T.IsClosable :=
-  (isClosed h h').isClosable
+lemma IsSelfAdjoint.isClosable [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsClosable :=
+  (isClosed h).isClosable
 
-lemma IsSelfAdjoint.isUnbounded [CompleteSpace H] (h : IsSelfAdjoint T) (h' : T.HasDenseDomain) :
-    T.IsUnbounded :=
-  ⟨h', isClosable h h'⟩
+lemma IsSelfAdjoint.isUnbounded [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsUnbounded :=
+  ⟨h.dense_domain, isClosable h⟩
 
 @[aesop safe apply]
 lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† := by
