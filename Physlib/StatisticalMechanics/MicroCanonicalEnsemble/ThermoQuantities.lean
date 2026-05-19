@@ -138,9 +138,10 @@ Letting μ⁻(H,E) be the measure of {x | H(x) ≤ E}, then for nonzero β,
 so this will be differentiable if
 ∫ exp(-βE) * μ⁻(H,E) dE
 is, aka if the Laplace transform is differentiable.
-See e.g. https://math.stackexchange.com/q/84382/127777
-For this we really want the fact that the Laplace transform is analytic wherever it's absolutely convergent,
-which follows from the local domination estimate above, Fubini's theorem, and Morera's theorem.
+
+For this we really want the fact that the Laplace transform is analytic wherever it's
+absolutely convergent, which follows from the local domination estimate above,
+Fubini's theorem, and Morera's theorem.
 -/
 /-- The two definitions of entropy, in terms of `T` or `β = 1 / T`, are equivalent. -/
 theorem entropy_A_eq_entropy_Z (T : ℝ) (hT : T ≠ 0)

@@ -46,8 +46,9 @@ def IdealGas : NVEHamiltonian where
         (show Measurable fun config : Fin n × (Fin 3 ⊕ Fin 3) → ℝ =>
           |config (i, Sum.inl ax)| by fun_prop) measurable_const
     · convert WithTop.isOpenEmbedding_coe.measurableEmbedding.measurable.comp
-        (Finset.measurable_sum _ fun (x : Fin n × Fin 3) _ => (show Measurable fun config : Fin n × (Fin 3 ⊕ Fin 3) → ℝ =>
-          config (x.1, Sum.inr x.2) ^ 2 / (2 : ℝ) by fun_prop)) using 1
+        (Finset.measurable_sum _ fun (x : Fin n × Fin 3) _ =>
+          (show Measurable fun config : Fin n × (Fin 3 ⊕ Fin 3) → ℝ =>
+            config (x.1, Sum.inr x.2) ^ 2 / (2 : ℝ) by fun_prop)) using 1
       ext config
       rw [← WithTop.coe_sum]
       rfl
