@@ -290,39 +290,15 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
 
 lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (𝓜 f)† = 𝓜 (conj ∘ f) := by
-  refine eq_of_eq_graph ?_
-  ext u
-  rw [adjoint_graph_eq_graph_adjoint (mulOperator_hasDenseDomain hf), Submodule.mem_adjoint_iff]
-  constructor
-  · intro h
-    let g : Space d → ℂ := fun x ↦ conj (f x) * u.1 x - u.2 x
-    have hg : AEStronglyMeasurable g := by measurability
-    have h_int : ∀ ψ : (𝓜 f).domain, ∫ x, (AEEqFun.mk g hg) x * conj (ψ.val x) = 0 := by
-      intro ψ
-      have h_int₁ : Integrable fun x ↦ u.1 x * conj (𝓜 f ψ x) := L2.integrable_inner (𝓜 f ψ) u.1
-      have h_int₂ : Integrable fun x ↦ u.2 x * conj (ψ.val x) := L2.integrable_inner ψ.val u.2
-      symm
-      trans ∫ x, u.1 x * conj (𝓜 f ψ x) - u.2 x * conj (ψ.val x)
-      · exact (h ψ (𝓜 f ψ) (mem_graph (𝓜 f) ψ)) ▸ (integral_sub h_int₁ h_int₂).symm
-      refine integral_congr_ae ?_
-      filter_upwards [mulOperator_apply_ae ψ, AEEqFun.coeFn_mk g hg] with x h₁ h₂
-      simp [h₁, h₂, g, sub_mul, mul_assoc, mul_left_comm]
-    have hu₂ : u.2 =ᵐ[volume] (conj ∘ f) • u.1 := by
-      sorry
-    have hu₁ : u.1 ∈ (𝓜 (conj ∘ f)).domain :=
-      mem_mulOperator_domain_iff.mpr <| memHS_of_ae u.2 (coe_hilbertSpace_memHS u.2) hu₂
-    apply (mem_graph_iff _).mpr
-    refine ⟨⟨u.1, hu₁⟩, rfl, ?_⟩
-    apply ext_iff.mpr
-    filter_upwards [mulOperator_apply_ae ⟨u.1, hu₁⟩, hu₂] with x h₁ h₂
-    rw [h₁, h₂]
-  · intro hu v₁ v₂ hv
-    obtain ⟨ψ, hu₁, hu₂⟩ := (mem_graph_iff _).mp hu
-    obtain ⟨φ, rfl, rfl⟩ := (mem_graph_iff _).mp hv
-    rw [sub_eq_zero]
+  have hFA : (𝓜 f).IsFormalAdjoint (𝓜 (conj ∘ f)) := by
+    intro ψ φ
     refine integral_congr_ae ?_
-    filter_upwards [mulOperator_apply_ae ψ, mulOperator_apply_ae φ]
-    simp_all [mul_assoc, mul_left_comm]
+    filter_upwards [mulOperator_apply_ae ψ, mulOperator_apply_ae φ] with x h₁ h₂
+    simp [h₁, h₂, mul_assoc, mul_left_comm]
+  refine eq_of_le_of_ge ?_ (hFA.le_adjoint <| mulOperator_hasDenseDomain hf)
+  refine ⟨mulOperator_adjoint_domain_le hf, fun ψ ψ' hψ ↦ ?_⟩
+  refine adjoint_apply_eq (mulOperator_hasDenseDomain hf) ψ fun φ ↦ ?_
+  rw [← inner_conj_symm, hψ, (hFA φ ψ').symm, inner_conj_symm]
 
 /-!
 ### C.1. Self-adjoint
