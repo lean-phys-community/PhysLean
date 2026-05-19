@@ -7,7 +7,6 @@ module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
-import Physlib.Meta.Linters.Sorry
 /-!
 
 # Multiplication operators on `SpaceDHilbertSpace`
@@ -304,7 +303,6 @@ lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurab
 ### C.1. Self-adjoint
 -/
 
-@[sorryful]
 lemma mulOperator_isSelfAdjoint_ofReal
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f) (hf' : conj ∘ f = f) :
     IsSelfAdjoint (𝓜 f) := by
@@ -315,7 +313,6 @@ lemma mulOperator_isSelfAdjoint_ofReal
 ## D. Closable & unbounded
 -/
 
-@[sorryful]
 lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (𝓜 f).IsClosable := by
   refine isClosable_of_exists_dense_formalAdjoint ?_ ?_
@@ -325,7 +322,6 @@ lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f)
     · rw [← mulOperator_adjoint_eq_conj hf]
       exact adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)
 
-@[sorryful]
 lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (𝓜 f).IsUnbounded :=
   ⟨mulOperator_hasDenseDomain hf, mulOperator_isClosable hf⟩
