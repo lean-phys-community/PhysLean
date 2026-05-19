@@ -176,10 +176,34 @@ lemma IsClosable.smul (h : U.IsClosable) (c : ℂ) : (c • U).IsClosable := by
     simp only [coe_toAddSubmonoid, SetLike.mem_coe, mem_graph_iff, Subtype.exists, ← hu']
     exact ⟨u.1, u.1.2, rfl, ((inv_smul_eq_iff₀ hc.ne).mpr hu).symm⟩
 
+lemma IsClosable.smul_iff {c : ℂ} (hc : c ≠ 0) : (c • U).IsClosable ↔ U.IsClosable :=
+  ⟨fun h ↦ one_smul ℂ U ▸ inv_mul_cancel₀ hc ▸ smul_smul c⁻¹ c U ▸ h.smul c⁻¹, fun h ↦ h.smul c⟩
+
 lemma neg_eq_neg_one_smul (U : H →ₗ.[ℂ] H') : -U = (-1 : ℂ) • U := ext (by simp) (by simp)
 
 @[aesop safe apply]
 lemma IsClosable.neg (h : U.IsClosable) : (-U).IsClosable := neg_eq_neg_one_smul U ▸ h.smul _
+
+lemma closure_smul (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) : (c • U).closure = c • U.closure := by
+  by_cases h : U.IsClosable
+  · apply eq_of_eq_graph
+    ext ⟨x₁, x₂⟩
+    simp only [← (h.smul c).graph_closure_eq_closure_graph, smul_graph, ← SetLike.mem_coe,
+      topologicalClosure_coe, map_coe, LinearMap.prodMap_apply, LinearMap.id_coe, id_eq,
+      LinearMap.smul_apply, mem_closure_iff_seq_limit, Set.mem_image, Prod.exists, nhds_prod_eq,
+      Filter.tendsto_prod_iff', ← h.graph_closure_eq_closure_graph, Prod.mk.injEq,
+      (eq_inv_smul_iff₀ hc).symm, exists_eq_right_right, exists_eq_right]
+    constructor <;> intro ⟨b, hb, hb₁, hb₂⟩
+    · refine ⟨fun n ↦ ⟨(b n).1, c⁻¹ • (b n).2⟩, fun n ↦ ?_, hb₁, hb₂.const_smul c⁻¹⟩
+      obtain ⟨u, v, huv, huv'⟩ := hb n
+      have hu := mem_domain_of_mem_graph huv
+      use ⟨⟨u, hu⟩, v⟩
+      simp [← huv', smul_smul, inv_mul_cancel₀ hc, (image_iff hu).mpr huv]
+    · refine ⟨fun n ↦ ⟨(b n).1, c • (b n).2⟩, fun n ↦ ?_, hb₁, ?_⟩
+      · obtain ⟨u, hu, hu'⟩ := hb n
+        exact ⟨u.1, u.2, by simp_all, by simp [← hu']⟩
+      · exact one_smul ℂ x₂ ▸ mul_inv_cancel₀ hc ▸ smul_smul c c⁻¹ x₂ ▸ hb₂.const_smul c
+  · rw [closure_def' h, closure_def' <| (not_congr <| IsClosable.smul_iff hc).mpr h]
 
 /-!
 ## D. Adjoints
