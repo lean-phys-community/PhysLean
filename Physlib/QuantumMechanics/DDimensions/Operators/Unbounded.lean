@@ -407,9 +407,26 @@ lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint 
 ## G. Essentially self-adjoint operators
 -/
 
-lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H]
-    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsSymmetric :=
-  (IsSelfAdjoint.isSymmetric h h'.closure).of_le T.le_closure
+lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
+    T.IsSymmetric :=
+  (IsSelfAdjoint.isSymmetric h).of_le T.le_closure
+
+@[aesop safe apply]
+lemma IsEssentiallySelfAdjoint.smul [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) {c : ℂ} (hc : c ≠ 0) (hc' : conj c = c) :
+    (c • T).IsEssentiallySelfAdjoint := by
+  simp_all [isEssentiallySelfAdjoint_def, isSelfAdjoint_def, closure_smul _ hc, adjoint_smul _ hc]
+
+@[aesop safe apply]
+lemma IsEssentiallySelfAdjoint.smul_ofReal [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) {r : ℝ} (hr : r ≠ 0) :
+    (ofReal r • T).IsEssentiallySelfAdjoint :=
+  h.smul (ofReal_ne_zero.mpr hr) (conj_ofReal r)
+
+@[aesop safe apply]
+lemma IsEssentiallySelfAdjoint.neg [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
+    (-T).IsEssentiallySelfAdjoint :=
+  neg_eq_neg_one_smul T ▸ h.smul (by norm_num) (by norm_num)
 
 /-!
 ## H. Unbounded operators
