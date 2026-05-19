@@ -40,90 +40,82 @@ noncomputable section
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
 private lemma conj_inner_apply_self_eq_of_isSymmetric (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
-    (ψ : H) (hψ : ψ ∈ T.domain) :
-    (starRingEnd ℂ) ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ =
-      ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ := by
-  simpa [inner_conj_symm] using hT ⟨ψ, hψ⟩ ⟨ψ, hψ⟩
+    (ψ : T.domain) :
+    (starRingEnd ℂ) ⟪(ψ : H), T ψ⟫_ℂ = ⟪(ψ : H), T ψ⟫_ℂ := by
+  simpa [inner_conj_symm] using hT ψ ψ
 
 /-- Expectation value `re ⟪ψ, Tψ⟫_ℂ` for `ψ ∈ T.domain`.
 
 For symmetric `T`, this agrees with `⟪ψ, Tψ⟫_ℂ` after coercion from `ℝ`;
 see `expectedValue_eq_inner`. -/
-def expectedValue (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) : ℝ :=
-  (⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ).re
+def expectedValue (T : H →ₗ.[ℂ] H) (ψ : T.domain) : ℝ :=
+  (⟪(ψ : H), T ψ⟫_ℂ).re
 
 /-- The expectation value, unfolded as a real part. -/
-lemma expectedValue_eq_re_inner (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) :
-    expectedValue T ψ hψ = (⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ).re :=
+lemma expectedValue_eq_re_inner (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
+    expectedValue T ψ = (⟪(ψ : H), T ψ⟫_ℂ).re :=
   rfl
 
 /-- If `T` is symmetric, `⟪ψ, Tψ⟫_ℂ` is the expectation value, coerced to `ℂ`. -/
-lemma expectedValue_eq_inner (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
-    (ψ : H) (hψ : ψ ∈ T.domain) :
-    ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ = (expectedValue T ψ hψ : ℂ) := by
-  have h_re : ((⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ).re : ℂ) =
-      ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ :=
+lemma expectedValue_eq_inner (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T.domain) :
+    ⟪(ψ : H), T ψ⟫_ℂ = (expectedValue T ψ : ℂ) := by
+  have h_re : ((⟪(ψ : H), T ψ⟫_ℂ).re : ℂ) = ⟪(ψ : H), T ψ⟫_ℂ :=
     Complex.conj_eq_iff_re.mp
-      (by simpa using conj_inner_apply_self_eq_of_isSymmetric T hT ψ hψ)
+      (by simpa using conj_inner_apply_self_eq_of_isSymmetric T hT ψ)
   simpa [expectedValue] using h_re.symm
 
 /-- Reverse orientation of `LinearPMap.expectedValue_eq_inner`. -/
-lemma inner_eq_expectedValue (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
-    (ψ : H) (hψ : ψ ∈ T.domain) :
-    (expectedValue T ψ hψ : ℂ) = ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ :=
-  (expectedValue_eq_inner T hT ψ hψ).symm
+lemma inner_eq_expectedValue (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T.domain) :
+    (expectedValue T ψ : ℂ) = ⟪(ψ : H), T ψ⟫_ℂ :=
+  (expectedValue_eq_inner T hT ψ).symm
 
 /-- Same as `expectedValue`; kept for state-observable naming. -/
-def stateExpectedValue (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) : ℝ :=
-  expectedValue T ψ hψ
+def stateExpectedValue (T : H →ₗ.[ℂ] H) (ψ : T.domain) : ℝ :=
+  expectedValue T ψ
 
 /-- State-level expectation values reduce to quadratic-form expectation values. -/
-lemma stateExpectedValue_eq_expectedValue (T : H →ₗ.[ℂ] H) (ψ : H)
-    (hψ : ψ ∈ T.domain) :
-    stateExpectedValue T ψ hψ = expectedValue T ψ hψ :=
+lemma stateExpectedValue_eq_expectedValue (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
+    stateExpectedValue T ψ = expectedValue T ψ :=
   rfl
 
 /-- For symmetric partial linear maps, the complex inner product is the state expectation value. -/
-lemma stateExpectedValue_eq_inner (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
-    (ψ : H) (hψ : ψ ∈ T.domain) :
-    ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ = (stateExpectedValue T ψ hψ : ℂ) := by
-  simpa [stateExpectedValue] using expectedValue_eq_inner T hT ψ hψ
+lemma stateExpectedValue_eq_inner (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T.domain) :
+    ⟪(ψ : H), T ψ⟫_ℂ = (stateExpectedValue T ψ : ℂ) := by
+  simpa [stateExpectedValue] using expectedValue_eq_inner T hT ψ
 
 /-- Reverse orientation of `LinearPMap.stateExpectedValue_eq_inner`. -/
-lemma inner_eq_stateExpectedValue (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
-    (ψ : H) (hψ : ψ ∈ T.domain) :
-    (stateExpectedValue T ψ hψ : ℂ) = ⟪ψ, (T ⟨ψ, hψ⟩ : H)⟫_ℂ :=
-  (stateExpectedValue_eq_inner T hT ψ hψ).symm
+lemma inner_eq_stateExpectedValue (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T.domain) :
+    (stateExpectedValue T ψ : ℂ) = ⟪(ψ : H), T ψ⟫_ℂ :=
+  (stateExpectedValue_eq_inner T hT ψ).symm
 
 /-- The centered vector `Tψ - ⟨T⟩_ψ ψ`. -/
-def centered (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) : H :=
-  T ⟨ψ, hψ⟩ - (stateExpectedValue T ψ hψ : ℂ) • ψ
+def centered (T : H →ₗ.[ℂ] H) (ψ : T.domain) : H :=
+  T ψ - (stateExpectedValue T ψ : ℂ) • (ψ : H)
 
 /-- The centered vector, unfolded to its raw expression. -/
-lemma centered_eq (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) :
-    centered T ψ hψ = (T ⟨ψ, hψ⟩ : H) - (stateExpectedValue T ψ hψ : ℂ) • ψ :=
+lemma centered_eq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
+    centered T ψ = T ψ - (stateExpectedValue T ψ : ℂ) • (ψ : H) :=
   rfl
 
 /-- A centered vector vanishes exactly when `Tψ = ⟨T⟩_ψ ψ`. -/
-lemma centered_eq_zero_iff (T : H →ₗ.[ℂ] H) (ψ : H) (hψ : ψ ∈ T.domain) :
-    centered T ψ hψ = 0 ↔
-      (T ⟨ψ, hψ⟩ : H) = (stateExpectedValue T ψ hψ : ℂ) • ψ := by
+lemma centered_eq_zero_iff (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
+    centered T ψ = 0 ↔ T ψ = (stateExpectedValue T ψ : ℂ) • (ψ : H) := by
   rw [centered_eq, sub_eq_zero]
 
 /-- For a unit vector and symmetric `T`, the centered vector is orthogonal to the state. -/
 lemma inner_state_centered_eq_zero (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
-    (ψ : H) (hψ : ψ ∈ T.domain) (hψ_norm : ‖ψ‖ = 1) :
-    ⟪ψ, centered T ψ hψ⟫_ℂ = 0 := by
-  rw [centered_eq, inner_sub_right, inner_smul_right, stateExpectedValue_eq_inner T hT ψ hψ]
+    (ψ : T.domain) (hψ_norm : ‖(ψ : H)‖ = 1) :
+    ⟪(ψ : H), centered T ψ⟫_ℂ = 0 := by
+  rw [centered_eq, inner_sub_right, inner_smul_right, stateExpectedValue_eq_inner T hT ψ]
   simp [hψ_norm, inner_self_eq_norm_sq_to_K]
 
 /-- The conjugate orientation of `LinearPMap.inner_state_centered_eq_zero`. -/
 lemma inner_centered_state_eq_zero (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
-    (ψ : H) (hψ : ψ ∈ T.domain) (hψ_norm : ‖ψ‖ = 1) :
-    ⟪centered T ψ hψ, ψ⟫_ℂ = 0 := by
+    (ψ : T.domain) (hψ_norm : ‖(ψ : H)‖ = 1) :
+    ⟪centered T ψ, (ψ : H)⟫_ℂ = 0 := by
   rw [centered_eq, inner_sub_left, inner_smul_left]
-  have hμ := stateExpectedValue_eq_inner T hT ψ hψ
-  have hμ' : ⟪(T ⟨ψ, hψ⟩ : H), ψ⟫_ℂ = (stateExpectedValue T ψ hψ : ℂ) := by
+  have hμ := stateExpectedValue_eq_inner T hT ψ
+  have hμ' : ⟪T ψ, (ψ : H)⟫_ℂ = (stateExpectedValue T ψ : ℂ) := by
     simpa [inner_conj_symm] using congrArg star hμ
   rw [hμ']
   simp [hψ_norm, inner_self_eq_norm_sq_to_K]
