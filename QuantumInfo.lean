@@ -1,39 +1,85 @@
-/-
-Copyright (c) 2025 Alex Meiburg. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Alex Meiburg
--/
---Mathlib imports
-module
-
-public import QuantumInfo.ForMathlib
-
---Code
-public import QuantumInfo.Finite.Channel.DegradableOrder
-public import QuantumInfo.Finite.CPTPMap
-public import QuantumInfo.Finite.Distance
-public import QuantumInfo.Finite.Qubit.Basic
-public import QuantumInfo.Finite.ResourceTheory.FreeState
--- import QuantumInfo.Finite.ResourceTheory.ResourceTheory --Commenting out for now -- pretty broken
-public import QuantumInfo.Finite.ResourceTheory.SteinsLemma
-public import QuantumInfo.Finite.Braket
-public import QuantumInfo.Finite.Capacity
-public import QuantumInfo.Finite.Ensemble
-public import QuantumInfo.Finite.Entanglement
-public import QuantumInfo.Finite.Entropy
--- import QuantumInfo.Finite.AxiomatizedEntropy.Defs --Experimental
--- import QuantumInfo.Finite.AxiomatizedEntropy.Renyi --Experimental
-public import QuantumInfo.Finite.MState
-public import QuantumInfo.Finite.Pinching
-public import QuantumInfo.Finite.POVM
-public import QuantumInfo.Finite.Unitary
-
---Documentation without code
-public import QuantumInfo.Finite.Capacity_doc
-
---Classical information theory
--- import QuantumInfo.ClassicalInfo.Capacity
--- import QuantumInfo.ClassicalInfo.Channel
-public import QuantumInfo.ClassicalInfo.Distribution
-public import QuantumInfo.ClassicalInfo.Entropy
-public import QuantumInfo.ClassicalInfo.Prob
+import QuantumInfo.ClassicalInfo.Capacity
+import QuantumInfo.ClassicalInfo.Channel
+import QuantumInfo.ClassicalInfo.Distribution
+import QuantumInfo.ClassicalInfo.Entropy
+import QuantumInfo.ClassicalInfo.ForMathlib.Analysis.SpecialFunctions.Log.NegMulLog
+import QuantumInfo.ClassicalInfo.Prob
+import QuantumInfo.Finite.AxiomatizedEntropy.Defs
+import QuantumInfo.Finite.AxiomatizedEntropy.Renyi
+import QuantumInfo.Finite.Braket
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.CPTPMap.Bundled
+import QuantumInfo.Finite.CPTPMap.CPTP
+import QuantumInfo.Finite.CPTPMap.Dual
+import QuantumInfo.Finite.CPTPMap.MatrixMap
+import QuantumInfo.Finite.CPTPMap.Unbundled
+import QuantumInfo.Finite.Capacity
+import QuantumInfo.Finite.Capacity_doc
+import QuantumInfo.Finite.Channel.DegradableOrder
+import QuantumInfo.Finite.Distance
+import QuantumInfo.Finite.Distance.Fidelity
+import QuantumInfo.Finite.Distance.TraceDistance
+import QuantumInfo.Finite.Ensemble
+import QuantumInfo.Finite.Entanglement
+import QuantumInfo.Finite.Entropy
+import QuantumInfo.Finite.Entropy.DPI
+import QuantumInfo.Finite.Entropy.Relative
+import QuantumInfo.Finite.Entropy.SSA
+import QuantumInfo.Finite.Entropy.VonNeumann
+import QuantumInfo.Finite.MState
+import QuantumInfo.Finite.POVM
+import QuantumInfo.Finite.Pinching
+import QuantumInfo.Finite.Qubit.Basic
+import QuantumInfo.Finite.ResourceTheory.FreeState
+import QuantumInfo.Finite.ResourceTheory.HypothesisTesting
+import QuantumInfo.Finite.ResourceTheory.ResourceTheory
+import QuantumInfo.Finite.ResourceTheory.SteinsLemma
+import QuantumInfo.Finite.Unitary
+import QuantumInfo.ForMathlib
+import QuantumInfo.ForMathlib.ContinuousLinearMap
+import QuantumInfo.ForMathlib.ContinuousSup
+import QuantumInfo.ForMathlib.Filter
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.BlockDiagonal
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.GeneralizedPerspectiveFunction
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.HilbertSchmidtOperatorSpace
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequality
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequalityIImpIV
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequalityIVtoV
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LiebAndoTrace
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzCore
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
+import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.OperatorGeometricMean
+import QuantumInfo.ForMathlib.HermitianMat
+import QuantumInfo.ForMathlib.HermitianMat.Basic
+import QuantumInfo.ForMathlib.HermitianMat.CFC
+import QuantumInfo.ForMathlib.HermitianMat.Inner
+import QuantumInfo.ForMathlib.HermitianMat.Jordan
+import QuantumInfo.ForMathlib.HermitianMat.LiebConcavity
+import QuantumInfo.ForMathlib.HermitianMat.LogExp
+import QuantumInfo.ForMathlib.HermitianMat.NonSingular
+import QuantumInfo.ForMathlib.HermitianMat.Order
+import QuantumInfo.ForMathlib.HermitianMat.Peierls
+import QuantumInfo.ForMathlib.HermitianMat.Proj
+import QuantumInfo.ForMathlib.HermitianMat.Reindex
+import QuantumInfo.ForMathlib.HermitianMat.Rpow
+import QuantumInfo.ForMathlib.HermitianMat.Schatten
+import QuantumInfo.ForMathlib.HermitianMat.Sqrt
+import QuantumInfo.ForMathlib.HermitianMat.Trace
+import QuantumInfo.ForMathlib.HermitianMat.Unitary
+import QuantumInfo.ForMathlib.IsMaximalSelfAdjoint
+import QuantumInfo.ForMathlib.Isometry
+import QuantumInfo.ForMathlib.LimSupInf
+import QuantumInfo.ForMathlib.LinearEquiv
+import QuantumInfo.ForMathlib.Majorization
+import QuantumInfo.ForMathlib.Matrix
+import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
+import QuantumInfo.ForMathlib.Minimax
+import QuantumInfo.ForMathlib.Misc
+import QuantumInfo.ForMathlib.SionMinimax
+import QuantumInfo.ForMathlib.Superadditive
+import QuantumInfo.ForMathlib.Tactic.Commutes
+import QuantumInfo.ForMathlib.Tactic.Commutes.Attribute
+import QuantumInfo.ForMathlib.ULift
+import QuantumInfo.ForMathlib.Unitary
+import QuantumInfo.InfiniteDim.QState
+import QuantumInfo.Regularized
