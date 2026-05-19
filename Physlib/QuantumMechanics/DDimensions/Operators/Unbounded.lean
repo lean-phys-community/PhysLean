@@ -33,6 +33,10 @@ these correspond to physical observables.
 
 ## ii. Key results
 
+- `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
+    dense domain.
+- `IsEssentiallySelfAdjoint.unique_self_adjoint_extension` : The closure of an essentially
+    self-adjoint unbounded operator is its unique self-adjoint extension.
 - `IsUnbounded.adjoint` : The adjoint of an unbounded operator is also unbounded.
 - `IsUnbounded.adjoint_closure_eq_adjoint` : An unbounded operator and its closure have
     the same adjoint.
@@ -324,7 +328,7 @@ lemma IsSymmetric.isSelfAdjoint_iff [CompleteSpace H] (h : T.IsSymmetric) (h' : 
     IsSelfAdjoint T ↔ T†.domain = T.domain := by
   constructor <;> intro h''
   · congr
-  · exact dExt h'' fun x y hxy ↦ Eq.symm <| @(h.le_adjoint h').2 y x hxy.symm
+  · exact (eq_of_le_of_domain_eq ((isSymmetric_iff_le_adjoint h').mp h) h''.symm).symm
 
 lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
     (T + T.adjoint).IsSymmetric := by
@@ -383,6 +387,11 @@ lemma IsSelfAdjoint.isClosable [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsClo
 lemma IsSelfAdjoint.isUnbounded [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsUnbounded :=
   ⟨h.dense_domain, isClosable h⟩
 
+lemma IsSelfAdjoint.isEssentiallySelfAdjoint [CompleteSpace H] (h : IsSelfAdjoint T) :
+    T.IsEssentiallySelfAdjoint :=
+  isEssentiallySelfAdjoint_def.mpr <|
+    ((IsSelfAdjoint.isClosable h).isClosed_iff.mp h.isClosed).symm ▸ h
+
 @[aesop safe apply]
 lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† := by
   apply isSelfAdjoint_def.mp at h
@@ -411,6 +420,14 @@ lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H] (h : T.IsEssentiall
     T.IsSymmetric :=
   (IsSelfAdjoint.isSymmetric h).of_le T.le_closure
 
+lemma IsEssentiallySelfAdjoint.isClosable [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsClosable :=
+  h.isSymmetric.isClosable h'
+
+lemma IsEssentiallySelfAdjoint.isUnbounded [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsUnbounded :=
+  h.isSymmetric.isUnbounded_iff_hasDenseDomain.mpr h'
+
 @[aesop safe apply]
 lemma IsEssentiallySelfAdjoint.smul [CompleteSpace H]
     (h : T.IsEssentiallySelfAdjoint) {c : ℂ} (hc : c ≠ 0) (hc' : conj c = c) :
@@ -427,6 +444,16 @@ lemma IsEssentiallySelfAdjoint.smul_ofReal [CompleteSpace H]
 lemma IsEssentiallySelfAdjoint.neg [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
     (-T).IsEssentiallySelfAdjoint :=
   neg_eq_neg_one_smul T ▸ h.smul (by norm_num) (by norm_num)
+
+/-- The closure is the unique self-adjoint extension of an essentially self-adjoint operator. -/
+lemma IsEssentiallySelfAdjoint.unique_self_adjoint_extension [CompleteSpace H]
+    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain)
+    {T₂ : H →ₗ.[ℂ] H} (h_le : T ≤ T₂) (h₂ : IsSelfAdjoint T₂) :
+    T₂ = T.closure := by
+  have h_cl : T₂.IsClosed := IsSelfAdjoint.isClosed h₂
+  have h_cl' : T₂.closure = T₂ := h_cl.isClosable.isClosed_iff.mp h_cl
+  have h_le' : T.closure ≤ T₂ := h_cl' ▸ h_cl.isClosable.closure_mono h_le
+  exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl <| h'.closure) h_le') h_le'
 
 /-!
 ## H. Unbounded operators
@@ -454,6 +481,9 @@ lemma IsUnbounded.adjoint [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounde
   rintro ⟨y, Uy⟩ hy
   simp only [neg_zero, WithLp.prod_inner_apply, inner_zero_right, add_zero]
   exact hx y (mem_domain_of_mem_graph hy)
+
+lemma IsUnbounded.closure (h : U.IsUnbounded) : U.closure.IsUnbounded :=
+  ⟨h.1.closure, h.2.closureIsClosable⟩
 
 @[simp]
 lemma IsUnbounded.adjoint_closure_eq_adjoint [CompleteSpace H] (h : U.IsUnbounded) :
@@ -483,12 +513,6 @@ lemma IsUnbounded.le_adjoint_adjoint [CompleteSpace H] [CompleteSpace H'] (h : U
 lemma IsUnbounded.isClosed_iff [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
     U.IsClosed ↔ U†† = U :=
   h.adjoint_adjoint_eq_closure ▸ h.2.isClosed_iff
-
-lemma IsUnbounded.closure_mono [CompleteSpace H] [CompleteSpace H']
-    (h₁ : U₁.IsUnbounded) (h₂ : U₂.IsUnbounded) (h_le : U₁ ≤ U₂) :
-    U₁.closure ≤ U₂.closure := by
-  rw [← h₁.adjoint_adjoint_eq_closure, ← h₂.adjoint_adjoint_eq_closure]
-  exact adjoint_antitone (Or.inl h₂.adjoint.1) <| adjoint_antitone (Or.inl h₁.1) h_le
 
 /-- A LinearPMap constructed from a symmetric LinearMap with dense domain
   is an unbounded operator. -/
