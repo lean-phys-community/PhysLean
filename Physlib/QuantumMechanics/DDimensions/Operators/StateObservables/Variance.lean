@@ -14,6 +14,8 @@ public import Mathlib.Analysis.SpecialFunctions.Sqrt
 The variance of a partial linear map `T` in a state `ψ` is `‖Tψ - ⟨T⟩_ψ ψ‖ ^ 2`. It only
 requires `ψ ∈ T.domain`.
 
+When `T` is symmetric, `‖ψ‖ = 1`, and `Tψ ∈ T.domain`, it also equals `⟨T^2⟩_ψ - ⟨T⟩_ψ ^ 2`.
+
 ## Main definitions
 
 - `LinearPMap.variance` and `LinearPMap.standardDeviation`.
@@ -22,6 +24,7 @@ requires `ψ ∈ T.domain`.
 
 - `LinearPMap.variance_eq_norm_sq_sub_expectedValue_sq`: for a unit vector and symmetric `T`,
   the variance is `‖Tψ‖ ^ 2 - ⟨T⟩_ψ ^ 2`.
+- `LinearPMap.variance_eq_re_inner_sub_expectedValue_sq`: the second-order formula when `Tψ ∈ T.domain`.
 - `LinearPMap.variance_eq_zero_iff_isEigenvector` and
   `LinearPMap.standardDeviation_eq_zero_iff_isEigenvector`: for a unit vector, zero variance or
   standard deviation is equivalent to the eigenvector condition.
@@ -166,6 +169,33 @@ lemma standardDeviation_eq_zero_iff_isEigenvector (T : H →ₗ.[ℂ] H)
     norm_num at this
   · intro h_eigen
     exact h_eigen.1
+
+section SecondOrder
+
+variable (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
+variable (ψ : T.domain)
+variable (hTψ : T ψ ∈ T.domain)
+variable (hψ_norm : ‖(ψ : H)‖ = 1)
+
+include hT
+
+/-- For symmetric `T`, `re ⟪ψ, T(Tψ)⟫` is `‖Tψ‖ ^ 2`. -/
+lemma re_inner_apply_sq_eq_norm_sq :
+    (⟪(ψ : H), T ⟨T ψ, hTψ⟩⟫_ℂ).re = ‖T ψ‖ ^ 2 := by
+  rw [← hT ψ ⟨T ψ, hTψ⟩, inner_self_eq_norm_sq_to_K]
+  rw [sq, sq, Complex.mul_re]
+  simp [Complex.ofReal_re, Complex.ofReal_im]
+
+include hψ_norm
+
+/-- When `Tψ ∈ T.domain`, variance equals `⟨T^2⟩_ψ - ⟨T⟩_ψ ^ 2`. -/
+lemma variance_eq_re_inner_sub_expectedValue_sq :
+    variance T ψ =
+      (⟪(ψ : H), T ⟨T ψ, hTψ⟩⟫_ℂ).re - expectedValue T ψ ^ 2 := by
+  rw [variance_eq_norm_sq_sub_expectedValue_sq T hT ψ hψ_norm,
+    re_inner_apply_sq_eq_norm_sq T hT ψ hTψ]
+
+end SecondOrder
 
 end
 end LinearPMap

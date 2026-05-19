@@ -245,8 +245,7 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.SecondOrder
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.StateVariance
+public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
