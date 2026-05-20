@@ -174,18 +174,15 @@ private lemma exists_monotone_sets_hasFiniteIntegral
     ∃ s : ℕ → Set (Space d), Monotone s ∧ ⋃ n, s n = Set.univ ∧ (∀ n, MeasurableSet (s n))
       ∧ ∀ k, k = 1 ∨ k = 2 →
         ∀ n, HasFiniteIntegral (fun x ↦ ‖f x ^ k * g x‖ ^ 2) (volume.restrict (s n)) := by
-  have hfg : AEStronglyMeasurable (fun x ↦ f x * g x) := by measurability
-  have hffg : AEStronglyMeasurable (fun x ↦ f x ^ 2 * g x) := by measurability
-  obtain ⟨w₁, hw₁, hw₁'⟩ := hfg
-  obtain ⟨w₂, hw₂, hw₂'⟩ := hffg
+  obtain ⟨w₁, hw₁, hw₁'⟩ : AEStronglyMeasurable (fun x ↦ f x * g x) := by measurability
+  obtain ⟨w₂, hw₂, hw₂'⟩ : AEStronglyMeasurable (fun x ↦ f x ^ 2 * g x) := by measurability
   let s : ℕ → Set (Space d) :=
     fun n ↦ Metric.closedBall 0 n ∩ (w₁ ⁻¹' Metric.closedBall 0 n ∩ w₂ ⁻¹' Metric.closedBall 0 n)
   refine ⟨s, ?_, ?_, by measurability, ?_⟩
-  · intro _ _ hmn _ hx
-    refine ⟨?_, ?_, ?_⟩
-    · exact Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.1
-    · exact Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.1
-    · exact Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.2
+  · exact fun _ _ hmn _ hx ↦
+      ⟨ Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.1,
+        Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.1,
+        Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.2⟩
   · ext x
     simp only [Set.mem_iUnion, Set.mem_univ, iff_true]
     use max ⌈‖x‖⌉.toNat (max ⌈‖w₁ x‖⌉.toNat ⌈‖w₂ x‖⌉.toNat)
@@ -227,12 +224,13 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
     intro n
     apply memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
     refine lt_of_eq_of_lt ?_ (hs_int 2 (Or.inr rfl) n)
-    trans ∫⁻ x, ‖‖(f • w n) x‖ ^ 2‖ₑ
-    · refine lintegral_congr_ae ?_
-      filter_upwards [coe_mk_ae (hw n)] with _ h
-      simp [φ, h]
-    trans ∫⁻ x in s n, ‖‖(f • w n) x‖ ^ 2‖ₑ
-    · exact (setLIntegral_eq_of_support_subset fun x hx ↦ by simp_all [w]).symm
+    calc
+      _ = ∫⁻ x, ‖‖(f • w n) x‖ ^ 2‖ₑ := by
+        refine lintegral_congr_ae ?_
+        filter_upwards [coe_mk_ae (hw n)] with _ h
+        simp [φ, h]
+      _ = ∫⁻ x in s n, ‖‖(f • w n) x‖ ^ 2‖ₑ := by
+        exact (setLIntegral_eq_of_support_subset fun x hx ↦ by simp_all [w]).symm
     exact setLIntegral_congr_fun (hs_meas n) fun x hx ↦ by simp [w, hx, ← mul_assoc, ← pow_two]
   suffices ∀ n, ∫⁻ x in s n, ‖‖f x‖ ^ 2 * ‖ψ x‖ ^ 2‖ₑ ≤ ∫⁻ x, ‖‖ξ x‖ ^ 2‖ₑ by
     apply mem_mulOperator_domain_iff.mpr
