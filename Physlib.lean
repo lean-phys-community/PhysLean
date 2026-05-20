@@ -1,6 +1,5 @@
 module
 
-public import Physlib.ClassicalFieldTheory.Local.LocalJet
 public import Physlib.ClassicalFieldTheory.Local.Variation
 public import Physlib.ClassicalMechanics.Basic
 public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Basic
@@ -349,6 +348,7 @@ public import Physlib.SpaceAndTime.Space.ConstantSliceDist
 public import Physlib.SpaceAndTime.Space.CrossProduct
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 public import Physlib.SpaceAndTime.Space.Derivatives.Curl
+public import Physlib.SpaceAndTime.Space.Derivatives.DerivativeIndex
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
 public import Physlib.SpaceAndTime.Space.Derivatives.Grad
 public import Physlib.SpaceAndTime.Space.Derivatives.Iterated
