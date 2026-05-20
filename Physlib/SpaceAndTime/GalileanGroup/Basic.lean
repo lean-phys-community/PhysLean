@@ -31,6 +31,18 @@ x' = R x + v t + a
 so the action on `Time × Space d` reads
 `(t, x) ↦ (t + b, R x + v t + a)`.
 
+**Sign convention.** This is the *active* convention: a pure boost by `v` sends
+`x` to `x + v t` (the point itself is dragged along the velocity). The *passive*
+change-of-frame interpretation, where one re-expresses the same point in a frame
+moving with velocity `v`, would use the opposite sign — `x' = x - v t`.
+
+**Spatial positions vs. spatial vectors.** The type `Space d` represents spatial
+positions, while `velocity` and `spaceTranslation` are spatial vectors, represented
+by `EuclideanSpace ℝ (Fin d)`. This file works at the coordinate level: the formula
+`R x + v t + a` is implemented using the coordinate representation of `x`. The
+vector terms `v t` and `a` should be read as displacements added to the transformed
+spatial position.
+
 This file is the **first-step** API: it provides only the data type, four
 "pure" constructors, the identity, and the coordinate action together with
 its core `simp` lemmas. Subsequent PRs will add the group law, the inverse,
@@ -88,7 +100,12 @@ noncomputable section
 the four independent pieces of data
 `(rotation, boost velocity, spatial translation, time translation)`, and
 acts on `(t, x) : Time × Space d` by
-`(t, x) ↦ (t + b, R x + v t + a)`.
+`(t, x) ↦ (t + b, R x + v t + a)` in the active convention.
+
+The fields `velocity` and `spaceTranslation` are spatial *vectors* and live in
+`EuclideanSpace ℝ (Fin d)`, whereas `Space d` is the type of spatial *positions*.
+In this first-step API, the action is implemented in coordinates: the transformed
+spatial point has coordinates `R x + v t + a`.
 
 The default value of `d` is `3`, so `GalileanGroup = GalileanGroup 3`. -/
 structure GalileanGroup (d : ℕ := 3) where
@@ -145,7 +162,10 @@ lemma id_timeTranslation : (id : GalileanGroup d).timeTranslation = 0 := rfl
 
 -/
 
-/-- The Galilean transformation that is a pure rotation by `R`. -/
+/-- The Galilean transformation that is a pure orthogonal spatial transformation `R`.
+
+It sends `(t, x)` to `(t, R x)`. Since `R` lies in `O(d)`, this includes both
+ordinary proper rotations and reflections. -/
 def pureRotation (R : Matrix.orthogonalGroup (Fin d) ℝ) : GalileanGroup d :=
   ⟨R, 0, 0, 0⟩
 
@@ -171,7 +191,10 @@ lemma pureRotation_timeTranslation (R : Matrix.orthogonalGroup (Fin d) ℝ) :
 
 -/
 
-/-- The Galilean transformation that is a pure boost of velocity `v`. -/
+/-- The Galilean transformation that is a pure boost of velocity `v`.
+
+With the active convention used in this file, it sends `(t, x)` to
+`(t, x + v t)`. -/
 def pureBoost (v : EuclideanSpace ℝ (Fin d)) : GalileanGroup d :=
   ⟨1, v, 0, 0⟩
 
@@ -197,7 +220,9 @@ lemma pureBoost_timeTranslation (v : EuclideanSpace ℝ (Fin d)) :
 
 -/
 
-/-- The Galilean transformation that is a pure spatial translation by `a`. -/
+/-- The Galilean transformation that is a pure spatial translation by `a`.
+
+It sends `(t, x)` to `(t, x + a)`. -/
 def pureSpaceTranslation (a : EuclideanSpace ℝ (Fin d)) : GalileanGroup d :=
   ⟨1, 0, a, 0⟩
 
@@ -223,7 +248,9 @@ lemma pureSpaceTranslation_timeTranslation (a : EuclideanSpace ℝ (Fin d)) :
 
 -/
 
-/-- The Galilean transformation that is a pure time translation by `b`. -/
+/-- The Galilean transformation that is a pure time translation by `b`.
+
+It sends `(t, x)` to `(t + b, x)`.  -/
 def pureTimeTranslation (b : Time) : GalileanGroup d :=
   ⟨1, 0, 0, b⟩
 
@@ -254,7 +281,8 @@ lemma pureTimeTranslation_timeTranslation (b : Time) :
 ```
 (t, x) ↦ (t + b, R x + v t + a)
 ```
-where `R, v, a, b` are the four pieces of data of `g`. -/
+where `R, v, a, b` are the four pieces of data of `g`. This uses the active
+convention for boosts. -/
 def apply (g : GalileanGroup d) (tx : Time × Space d) : Time × Space d :=
   (tx.1 + g.timeTranslation,
     ⟨fun i => g.rotation.1.mulVec tx.2.val i
@@ -272,7 +300,7 @@ lemma apply_fst (g : GalileanGroup d) (t : Time) (x : Space d) :
     (g.apply (t, x)).1 = t + g.timeTranslation := rfl
 
 @[simp]
-lemma apply_snd_apply (g : GalileanGroup d) (t : Time) (x : Space d) (i : Fin d) :
+lemma apply_snd_coord (g : GalileanGroup d) (t : Time) (x : Space d) (i : Fin d) :
     (g.apply (t, x)).2 i =
       g.rotation.1.mulVec x.val i + t.val * g.velocity i + g.spaceTranslation i :=
   rfl
