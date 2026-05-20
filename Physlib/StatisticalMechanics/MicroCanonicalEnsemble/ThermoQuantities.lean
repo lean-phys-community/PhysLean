@@ -53,10 +53,10 @@ def ZComplexConvergenceDomain : Set ℂ :=
 
 private theorem partitionZ_eq_re_partitionZComplex {β : ℝ}
     (hβ : (β : ℂ) ∈ H.ZComplexConvergenceDomain d) :
-    H.PartitionZ d β = (H.PartitionZComplex d β).re := by
+    H.partitionZ d β = (H.PartitionZComplex d β).re := by
   have hInt : MeasureTheory.Integrable (μ := MeasureTheory.volume)
       (ComplexLaplaceIntegrand (fun config : H.dim d → ℝ => H.H config) (β : ℂ)) := hβ
-  rw [PartitionZ, PartitionZComplex, ComplexLaplaceTransform]
+  rw [partitionZ, PartitionZComplex, ComplexLaplaceTransform]
   calc
     (∫ (config : H.dim d → ℝ),
         have E := H.H config
@@ -77,7 +77,7 @@ private theorem partitionZ_eq_re_partitionZComplex {β : ℝ}
 open scoped ContDiff Topology in
 theorem contDiffAt_partitionZ_of_mem_interior_convergenceDomain {β : ℝ}
     (hβ : (β : ℂ) ∈ interior (H.ZComplexConvergenceDomain d)) :
-    ContDiffAt ℝ ⊤ (H.PartitionZ d) β := by
+    ContDiffAt ℝ ⊤ (H.partitionZ d) β := by
   refine (analyticAt_complexLaplaceTransform_of_mem_interior_convergenceDomain
     (E := fun config : H.dim d → ℝ => H.H config) (H.measurable_H d) hβ).contDiffAt
     |>.real_of_complex |>.congr_of_eventuallyEq ?_
@@ -145,19 +145,19 @@ Fubini's theorem, and Morera's theorem.
 -/
 /-- The two definitions of entropy, in terms of `T` or `β = 1 / T`, are equivalent. -/
 theorem entropy_A_eq_entropy_Z (T : ℝ) (hT : T ≠ 0)
-    (hZne : H.PartitionZ d (1 / T) ≠ 0)
+    (hZne : H.partitionZ d (1 / T) ≠ 0)
     (hZint : ((1 / T : ℝ) : ℂ) ∈ interior (H.ZComplexConvergenceDomain d)) :
-    EntropyS H d T = EntropySβ H d (1 / T) := by
-  have hZdiff : DifferentiableAt ℝ (H.PartitionZ d) (1 / T) :=
+    entropyS H d T = entropySβ H d (1 / T) := by
+  have hZdiff : DifferentiableAt ℝ (H.partitionZ d) (1 / T) :=
     (H.contDiffAt_partitionZ_of_mem_interior_convergenceDomain d hZint).differentiableAt
       (by simp)
-  dsimp [EntropyS, EntropySβ, InternalU, PartitionZT]
-  unfold HelmholtzA
+  dsimp [entropyS, entropySβ, internalU, partitionZT]
+  unfold helmholtzA
   erw [deriv_mul]
   rw [deriv_neg'', neg_mul, one_mul, neg_add_rev, neg_neg, mul_neg, add_comm]
   congr 1
-  simp_rw [PartitionZT]
-  have hdc := deriv_comp (h := fun T ↦ T⁻¹) (h₂ := fun β => Real.log (H.PartitionZ d β)) T ?_ ?_
+  simp_rw [partitionZT]
+  have hdc := deriv_comp (h := fun T ↦ T⁻¹) (h₂ := fun β => Real.log (H.partitionZ d β)) T ?_ ?_
   unfold Function.comp at hdc
   simp only [hdc, one_div, deriv_inv', mul_neg, neg_inj]
   field_simp
@@ -167,7 +167,7 @@ theorem entropy_A_eq_entropy_Z (T : ℝ) (hT : T ≠ 0)
     fun_prop (disch := assumption)
   · fun_prop (disch := assumption)
   · fun_prop
-  · simp_rw [PartitionZT]
+  · simp_rw [partitionZT]
     fun_prop (disch := assumption)
 
 
@@ -182,30 +182,30 @@ as all our things are ultimately parameterized by β.
 This identity requires the denominator `∂U/∂β` to be nonzero.
 -/
 theorem β_eq_deriv_S_U {β : ℝ}
-    (hZne : H.PartitionZ d β ≠ 0)
+    (hZne : H.partitionZ d β ≠ 0)
     (hZint : (β : ℂ) ∈ interior (H.ZComplexConvergenceDomain d))
-    (hU' : deriv (H.InternalU d) β ≠ 0) :
-    β = (deriv (H.EntropySβ d) β) / deriv (H.InternalU d) β := by
-  have hZ : ContDiffAt ℝ ⊤ (H.PartitionZ d) β :=
+    (hU' : deriv (H.internalU d) β ≠ 0) :
+    β = (deriv (H.entropySβ d) β) / deriv (H.internalU d) β := by
+  have hZ : ContDiffAt ℝ ⊤ (H.partitionZ d) β :=
     H.contDiffAt_partitionZ_of_mem_interior_convergenceDomain d hZint
-  unfold EntropySβ
-  unfold InternalU
+  unfold entropySβ
+  unfold internalU
 
   --Show the differentiability side-goals
-  have hlogDiff : DifferentiableAt ℝ (fun β => Real.log (H.PartitionZ d β)) β := by
+  have hlogDiff : DifferentiableAt ℝ (fun β => Real.log (H.partitionZ d β)) β := by
     have := hZne
     have := hZ.differentiableAt (by simp)
     fun_prop (disch := assumption)
-  have hlogDerivDiff : DifferentiableAt ℝ (deriv fun β => Real.log (H.PartitionZ d β)) β := by
+  have hlogDerivDiff : DifferentiableAt ℝ (deriv fun β => Real.log (H.partitionZ d β)) β := by
     have this := hZ.log hZne
     replace this :=
       (this.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (by simp)
     unfold deriv
     fun_prop
-  have hderiv : deriv (deriv fun β => Real.log (H.PartitionZ d β)) β ≠ 0 := by
+  have hderiv : deriv (deriv fun β => Real.log (H.partitionZ d β)) β ≠ 0 := by
     intro hzero
     apply hU'
-    change deriv (-fun β => deriv (fun β' => Real.log (H.PartitionZ d β')) β) β = 0
+    change deriv (-fun β => deriv (fun β' => Real.log (H.partitionZ d β')) β) β = 0
     rw [deriv.neg]
     simp [hzero]
 
