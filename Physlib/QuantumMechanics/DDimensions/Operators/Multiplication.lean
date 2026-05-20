@@ -6,7 +6,7 @@ Authors: Gregory J. Loges
 module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
-public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.Basic
+public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
 import Physlib.Meta.Linters.Sorry
 /-!
 
@@ -28,7 +28,7 @@ In this module we introduce unbounded operators defined by multiplication by a f
 ## iii. Table of contents
 
 - A. Definition
-- B. Dense domain
+- B. Domain
 - C. Adjoint
   - C.1. Self-adjoint
 - D. Closable & unbounded
@@ -99,7 +99,7 @@ lemma mulOperator_apply_ae {f : Space d → ℂ} (ψ : (𝓜 f).domain) : (𝓜 
   coe_mk_ae ψ.prop
 
 /-!
-## B. Dense domain
+## B. Domain
 -/
 
 lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
@@ -158,6 +158,18 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
         _ ≤ (⌈‖u x‖⌉ : ℝ) := Int.le_ceil _
         _ ≤ ⌈‖u x‖⌉.toNat := Int.cast_le.mpr (Int.self_le_toNat _)
         _ ≤ n := Nat.cast_le.mpr hn
+
+open SchwartzMap SchwartzSubmodule in
+lemma mulOperator_domain_ge_of_hasTemperateGrowth
+    {f : Space d → ℂ} (hf : f.HasTemperateGrowth) : schwartzSubmodule d ≤ (𝓜 f).domain := by
+  intro ψ hψ
+  obtain ⟨g, hg⟩ := schwartzEquiv.surjective ⟨ψ, hψ⟩
+  let w : 𝓢(Space d, ℂ) := smulLeftCLM ℂ f g
+  let φ : SpaceDHilbertSpace d := schwartzEquiv w
+  apply mem_mulOperator_domain_iff.mpr
+  refine memHS_of_ae φ (coe_hilbertSpace_memHS φ) ?_
+  filter_upwards [schwartzEquiv_coe_ae w, schwartzEquiv_coe_ae g] with x h₁ h₂
+  simp [w, φ, h₁, ← h₂, hg, smulLeftCLM_apply_apply hf]
 
 /-!
 ## C. Adjoint
