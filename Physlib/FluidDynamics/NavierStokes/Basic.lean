@@ -98,19 +98,6 @@ def momentumFlux (d : ℕ) (rho : MassDensity d) (velocity : VelocityField d) :
     rho time position • Matrix.vecMulVec
       (fun i => velocity time position i) (fun j => velocity time position j)
 
-/-- The value of `momentumDensity` at a time and position. -/
-lemma momentumDensity_apply (d : ℕ) (rho : MassDensity d) (velocity : VelocityField d)
-    (time : Time) (position : Space d) :
-    momentumDensity d rho velocity time position =
-      rho time position • velocity time position := rfl
-
-/-- The `(i, j)` component of the convective momentum flux `rho u ⊗ u`. -/
-lemma momentumFlux_apply (d : ℕ) (rho : MassDensity d) (velocity : VelocityField d)
-    (time : Time) (position : Space d) (i j : Fin d) :
-    momentumFlux d rho velocity time position i j =
-      rho time position * velocity time position i * velocity time position j := by
-  simp [momentumFlux, Matrix.vecMulVec_apply, mul_assoc]
-
 /-!
 
 ## C. Conservative equations
@@ -160,19 +147,6 @@ noncomputable def materialAcceleration (d : ℕ) (velocity : VelocityField d) : 
   fun time position =>
     ∂ₜ (fun time' => velocity time' position) time +
       convectiveTerm d velocity time position
-
-/-- The value of the convective term `(u · ∇)u` at a time and position. -/
-lemma convectiveTerm_apply (d : ℕ) (velocity : VelocityField d)
-    (time : Time) (position : Space d) :
-    convectiveTerm d velocity time position =
-      ∑ j, velocity time position j • ∂[j] (velocity time) position := rfl
-
-/-- The value of the material acceleration `∂ₜ u + (u · ∇)u` at a time and position. -/
-lemma materialAcceleration_apply (d : ℕ) (velocity : VelocityField d)
-    (time : Time) (position : Space d) :
-    materialAcceleration d velocity time position =
-      ∂ₜ (fun time' => velocity time' position) time +
-        convectiveTerm d velocity time position := rfl
 
 /-- Conservation of momentum in convective form.
 
