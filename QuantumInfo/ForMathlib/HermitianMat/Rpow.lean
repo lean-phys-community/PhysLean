@@ -6,7 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import QuantumInfo.ForMathlib.HermitianMat.LogExp
-public import QuantumInfo.ForMathlib.Majorization
+public import QuantumInfo.ForMathlib.HermitianMat.CompoundMatrix
 public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
 public import QuantumInfo.ForMathlib.HermitianMat.Unitary
 public import Mathlib.Analysis.SpecialFunctions.Integrability.Basic
@@ -691,58 +691,6 @@ variable {A B : HermitianMat d ℂ} {q r : ℝ}
 open ComplexOrder MatrixOrder
 open scoped AllOrdered
 
-private def compoundHermitian (A : HermitianMat d ℂ) (k : ℕ) :
-    HermitianMat {S : Finset d // S.card = k} ℂ :=
-  ⟨compoundMatrix A.mat k, by
-    show (compoundMatrix A.mat k).conjTranspose = compoundMatrix A.mat k
-    rw [← compoundMatrix_conjTranspose]
-    exact congrArg (compoundMatrix · k) A.H⟩
-
-private lemma compoundMatrix_unitary (U : Matrix d d ℂ)
-    (hU : U ∈ Matrix.unitaryGroup d ℂ) (k : ℕ) :
-    compoundMatrix U k ∈ Matrix.unitaryGroup {S : Finset d // S.card = k} ℂ := by
-  rw [Matrix.mem_unitaryGroup_iff']
-  change (compoundMatrix U k).conjTranspose * compoundMatrix U k = 1
-  rw [← compoundMatrix_conjTranspose, ← compoundMatrix_mul,
-    show U.conjTranspose * U = 1 by
-      simpa [Matrix.star_eq_conjTranspose] using Matrix.mem_unitaryGroup_iff'.mp hU]
-  convert compoundMatrix_diagonal (fun _ => 1) k using 1
-  aesop
-
-private lemma compoundHermitian_eigenvalues
-    (A : HermitianMat d ℂ) (k : ℕ) :
-    ∃ σ : {S : Finset d // S.card = k} ≃ {S : Finset d // S.card = k},
-      (compoundHermitian A k).H.eigenvalues ∘ σ =
-        fun S => ∏ i : Fin k, A.H.eigenvalues (S.1.orderEmbOfFin S.2 i) := by
-  apply Matrix.IsHermitian.eigenvalues_eq_of_unitary_similarity_diagonal
-  rotate_right
-  · exact compoundMatrix (Matrix.IsHermitian.eigenvectorUnitary A.H) k
-  · exact compoundMatrix_unitary _ (by simp [Matrix.unitaryGroup]) _
-  · simpa [compoundHermitian, compoundMatrix_mul, compoundMatrix_diagonal, Matrix.mul_assoc,
-      Matrix.star_eq_conjTranspose, ← compoundMatrix_conjTranspose] using
-      congrArg (fun x => compoundMatrix x k) (Matrix.IsHermitian.spectral_theorem A.H)
-
-private lemma compoundHermitian_nonneg (A : HermitianMat d ℂ) (hA : 0 ≤ A) (k : ℕ) :
-    0 ≤ compoundHermitian A k := by
-  rw [zero_le_iff, (compoundHermitian A k).H.posSemidef_iff_eigenvalues_nonneg]
-  obtain ⟨σ, hσ⟩ := compoundHermitian_eigenvalues A k
-  intro S
-  rw [show (compoundHermitian A k).H.eigenvalues S =
-      ∏ i : Fin k, A.H.eigenvalues ((σ.symm S).1.orderEmbOfFin (σ.symm S).2 i) by
-    simpa [Function.comp_def] using congrFun hσ (σ.symm S)]
-  exact Finset.prod_nonneg (fun i _ => A.eigenvalues_nonneg hA _)
-
-private lemma compoundHermitian_conj (A : HermitianMat d ℂ) (B : Matrix d d ℂ) (k : ℕ) :
-    compoundHermitian (A.conj B) k =
-      (compoundHermitian A k).conj (compoundMatrix B k) := by
-  ext1
-  simp [compoundHermitian, HermitianMat.conj_apply_mat, compoundMatrix_mul,
-    ← compoundMatrix_conjTranspose, Matrix.mul_assoc]
-
-private noncomputable def compoundUnitary (U : Matrix.unitaryGroup d ℂ) (k : ℕ) :
-    Matrix.unitaryGroup {S : Finset d // S.card = k} ℂ :=
-  ⟨compoundMatrix U.val k, compoundMatrix_unitary U.val U.property k⟩
-
 private lemma compoundHermitian_rpow (A : HermitianMat d ℂ) (hA : 0 ≤ A)
     (k : ℕ) (r : ℝ) :
     compoundHermitian (A ^ r) k = (compoundHermitian A k) ^ r := by
@@ -769,17 +717,6 @@ private lemma compoundHermitian_rpow (A : HermitianMat d ℂ) (hA : 0 ≤ A)
       simp [Matrix.diagonal, h]
   rw [hAeq, rpow_conj_unitary, compoundHermitian_conj, compoundHermitian_conj, hdiag_rpow]
   exact (rpow_conj_unitary ((diagonal ℂ a).compoundHermitian k) (compoundUnitary U k) r).symm
-
-omit [DecidableEq d] in
-private lemma compound_card_pos (k : ℕ) (hk : k ≤ Fintype.card d) :
-    0 < Fintype.card {S : Finset d // S.card = k} := by
-  classical
-  obtain ⟨S, _, hScard⟩ := Finset.exists_subset_card_eq (s := (Finset.univ : Finset d)) hk
-  exact Fintype.card_pos_iff.mpr ⟨⟨S, hScard⟩⟩
-
-private def compoundZero (k : ℕ) (hk : k ≤ Fintype.card d) :
-    Fin (Fintype.card {S : Finset d // S.card = k}) :=
-  ⟨0, compound_card_pos k hk⟩
 
 private lemma conj_rpow_le_one_of_conj_le_one_posDef
     {A B : HermitianMat d ℂ} (hA : 0 ≤ A) (hB : B.mat.PosDef)
