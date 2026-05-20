@@ -6,7 +6,7 @@ Authors: Florian Wiesner
 module
 
 public import Mathlib.Data.Matrix.Basic
-public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Div
 /-!
 
 # Tensor divergence on Space
@@ -59,7 +59,7 @@ vector field whose `i`th component is
 -/
 noncomputable def tensorDiv (d : ℕ) (T : Space d → Matrix (Fin d) (Fin d) ℝ) :
     Space d → EuclideanSpace ℝ (Fin d) := fun x => WithLp.toLp 2 fun i =>
-  ∑ j, ∂[j] (fun x => T x i j) x
+  div (fun y : Space d => WithLp.toLp 2 fun j => T y i j) x
 
 /-!
 
@@ -70,7 +70,8 @@ noncomputable def tensorDiv (d : ℕ) (T : Space d → Matrix (Fin d) (Fin d) �
 @[simp]
 lemma tensorDiv_apply (d : ℕ) (T : Space d → Matrix (Fin d) (Fin d) ℝ)
     (x : Space d) (i : Fin d) :
-    tensorDiv d T x i = ∑ j, ∂[j] (fun x => T x i j) x := rfl
+    tensorDiv d T x i = ∑ j, ∂[j] (fun x => T x i j) x := by
+  simp [tensorDiv, div]
 
 /-!
 
