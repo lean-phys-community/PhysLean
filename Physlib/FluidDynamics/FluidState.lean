@@ -27,7 +27,7 @@ fields used by specific balance laws are provided by extension structures.
 - `StressTensor` : A time-dependent matrix-valued stress field.
 - `BodyForce` : A time-dependent vector body-force field per unit mass.
 - `FluidState` : The density and velocity fields of a fluid.
-- `MomentumBalanceFields` : A fluid state with stress and body force.
+- `FluidInMomentumBalance` : A fluid state with stress and body force.
 
 ## iii. Table of contents
 
@@ -83,7 +83,7 @@ structure FluidState (d : ℕ) where
   velocity : VelocityField d
 
 /-- The fields needed for a momentum balance: fluid state, stress, and body force. -/
-structure MomentumBalanceFields (d : ℕ) extends FluidState d where
+structure FluidInMomentumBalance (d : ℕ) extends FluidState d where
   /-- The stress tensor field. -/
   stress : StressTensor d
   /-- The body-force field per unit mass. -/

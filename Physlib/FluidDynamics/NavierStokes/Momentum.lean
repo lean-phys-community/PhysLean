@@ -55,14 +55,14 @@ namespace NavierStokes
 
 /-- The momentum density `rho u`. -/
 def momentumDensity (d : ℕ) (fluid : FluidState d) : MomentumDensityField d :=
-  fun time position => fluid.rho time position • fluid.velocity time position
+  fun t x => fluid.rho t x • fluid.velocity t x
 
 /-- The convective momentum flux `rho u ⊗ u`. -/
 def momentumFlux (d : ℕ) (fluid : FluidState d) :
     Time → Space d → Matrix (Fin d) (Fin d) ℝ :=
-  fun time position =>
-    fluid.rho time position • Matrix.vecMulVec
-      (fun i => fluid.velocity time position i) (fun j => fluid.velocity time position j)
+  fun t x =>
+    fluid.rho t x • Matrix.vecMulVec
+      (fun i => fluid.velocity t x i) (fun j => fluid.velocity t x j)
 
 /-!
 
@@ -78,12 +78,12 @@ The equation is
 
 Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
-def ConservativeMomentumEquation (d : ℕ) (data : MomentumBalanceFields d) : Prop :=
-  ∀ time position,
-    ∂ₜ (fun time' => momentumDensity d data.toFluidState time' position) time +
-        matrixDiv d (momentumFlux d data.toFluidState time) position =
-      matrixDiv d (data.stress time) position +
-        data.rho time position • data.bodyForce time position
+def ConservativeMomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
+  ∀ t x,
+    ∂ₜ (fun t' => momentumDensity d data.toFluidState t' x) t +
+        matrixDiv d (momentumFlux d data.toFluidState t) x =
+      matrixDiv d (data.stress t) x +
+        data.rho t x • data.bodyForce t x
 
 /-!
 
@@ -93,13 +93,13 @@ def ConservativeMomentumEquation (d : ℕ) (data : MomentumBalanceFields d) : Pr
 
 /-- The nonlinear transport term `(u · ∇)u`. -/
 noncomputable def convectiveTerm (d : ℕ) (velocity : VelocityField d) : VectorField d :=
-  fun time position => ∑ j, velocity time position j • ∂[j] (velocity time) position
+  fun t x => ∑ j, velocity t x j • ∂[j] (velocity t) x
 
 /-- The material acceleration `∂ₜ u + (u · ∇)u`. -/
 noncomputable def materialAcceleration (d : ℕ) (velocity : VelocityField d) : VectorField d :=
-  fun time position =>
-    ∂ₜ (fun time' => velocity time' position) time +
-      convectiveTerm d velocity time position
+  fun t x =>
+    ∂ₜ (fun t' => velocity t' x) t +
+      convectiveTerm d velocity t x
 
 /-- Conservation of momentum in convective form.
 
@@ -109,11 +109,11 @@ The equation is
 
 Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
-def ConvectiveMomentumEquation (d : ℕ) (data : MomentumBalanceFields d) : Prop :=
-  ∀ time position,
-    data.rho time position • materialAcceleration d data.velocity time position =
-      matrixDiv d (data.stress time) position +
-        data.rho time position • data.bodyForce time position
+def ConvectiveMomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
+  ∀ t x,
+    data.rho t x • materialAcceleration d data.velocity t x =
+      matrixDiv d (data.stress t) x +
+        data.rho t x • data.bodyForce t x
 
 /-!
 
@@ -123,111 +123,111 @@ def ConvectiveMomentumEquation (d : ℕ) (data : MomentumBalanceFields d) : Prop
 
 /-- The left-hand side of the conservative momentum equation. -/
 noncomputable def conservativeMomentumLHS (d : ℕ) (fluid : FluidState d) : VectorField d :=
-  fun time position =>
-    ∂ₜ (fun time' => momentumDensity d fluid time' position) time +
-      matrixDiv d (momentumFlux d fluid time) position
+  fun t x =>
+    ∂ₜ (fun t' => momentumDensity d fluid t' x) t +
+      matrixDiv d (momentumFlux d fluid t) x
 
 /-- The left-hand side of the convective momentum equation. -/
 noncomputable def convectiveMomentumLHS (d : ℕ) (fluid : FluidState d) : VectorField d :=
-  fun time position => fluid.rho time position • materialAcceleration d fluid.velocity time position
+  fun t x => fluid.rho t x • materialAcceleration d fluid.velocity t x
 
 /-- Product rule for the time derivative of a scalar field times a velocity field. -/
 lemma timeDeriv_smul_velocity (d : ℕ) (rhoAtPosition : Time → ℝ)
-    (velocityAtPosition : Time → EuclideanSpace ℝ (Fin d)) (time : Time)
-    (hRho : DifferentiableAt ℝ rhoAtPosition time)
-    (hVelocity : DifferentiableAt ℝ velocityAtPosition time) :
-    ∂ₜ (fun time' => rhoAtPosition time' • velocityAtPosition time') time =
-      rhoAtPosition time • ∂ₜ velocityAtPosition time +
-        ∂ₜ rhoAtPosition time • velocityAtPosition time := by
+    (velocityAtPosition : Time → EuclideanSpace ℝ (Fin d)) (t : Time)
+    (hRho : DifferentiableAt ℝ rhoAtPosition t)
+    (hVelocity : DifferentiableAt ℝ velocityAtPosition t) :
+    ∂ₜ (fun t' => rhoAtPosition t' • velocityAtPosition t') t =
+      rhoAtPosition t • ∂ₜ velocityAtPosition t +
+        ∂ₜ rhoAtPosition t • velocityAtPosition t := by
   rw [Time.deriv_eq, Time.deriv_eq, Time.deriv_eq]
-  change (fderiv ℝ (rhoAtPosition • velocityAtPosition) time) 1 =
-    rhoAtPosition time • (fderiv ℝ velocityAtPosition time) 1 +
-      (fderiv ℝ rhoAtPosition time) 1 • velocityAtPosition time
+  change (fderiv ℝ (rhoAtPosition • velocityAtPosition) t) 1 =
+    rhoAtPosition t • (fderiv ℝ velocityAtPosition t) 1 +
+      (fderiv ℝ rhoAtPosition t) 1 • velocityAtPosition t
   rw [fderiv_smul hRho hVelocity]
   rfl
 
 /-- Product rule for the time derivative of the momentum density `rho u`. -/
 lemma timeDeriv_momentumDensity (d : ℕ) (fluid : FluidState d)
-    (time : Time) (position : Space d)
-    (hRho : DifferentiableAt ℝ (fun time' => fluid.rho time' position) time)
-    (hVelocity : DifferentiableAt ℝ (fun time' => fluid.velocity time' position) time) :
-    ∂ₜ (fun time' => momentumDensity d fluid time' position) time =
-      fluid.rho time position • ∂ₜ (fun time' => fluid.velocity time' position) time +
-        ∂ₜ (fun time' => fluid.rho time' position) time • fluid.velocity time position := by
+    (t : Time) (x : Space d)
+    (hRho : DifferentiableAt ℝ (fun t' => fluid.rho t' x) t)
+    (hVelocity : DifferentiableAt ℝ (fun t' => fluid.velocity t' x) t) :
+    ∂ₜ (fun t' => momentumDensity d fluid t' x) t =
+      fluid.rho t x • ∂ₜ (fun t' => fluid.velocity t' x) t +
+        ∂ₜ (fun t' => fluid.rho t' x) t • fluid.velocity t x := by
   simpa [momentumDensity] using
-    timeDeriv_smul_velocity d (fun time' => fluid.rho time' position)
-      (fun time' => fluid.velocity time' position) time hRho hVelocity
+    timeDeriv_smul_velocity d (fun t' => fluid.rho t' x)
+      (fun t' => fluid.velocity t' x) t hRho hVelocity
 
 /-- Product rule for one spatial derivative of one component of `rho u ⊗ u`. -/
 lemma spaceDeriv_momentumFlux_component (d : ℕ) (fluid : FluidState d)
-    (time : Time) (position : Space d) (i j : Fin d)
-    (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid time))
-    (hVelocity : Differentiable ℝ (fluid.velocity time)) :
-    ∂[j] (fun position' => momentumFlux d fluid time position' i j) position =
-      fluid.velocity time position i •
-        ∂[j] (fun position' => momentumDensity d fluid time position' j) position +
-      ∂[j] (fun position' => fluid.velocity time position' i) position •
-        momentumDensity d fluid time position j := by
-  have hProduct := Space.deriv_smul (u := j) (x := position)
-    (c := fun position' => fluid.velocity time position' i)
-    (f := fun position' => momentumDensity d fluid time position' j)
+    (t : Time) (x : Space d) (i j : Fin d)
+    (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid t))
+    (hVelocity : Differentiable ℝ (fluid.velocity t)) :
+    ∂[j] (fun x' => momentumFlux d fluid t x' i j) x =
+      fluid.velocity t x i •
+        ∂[j] (fun x' => momentumDensity d fluid t x' j) x +
+      ∂[j] (fun x' => fluid.velocity t x' i) x •
+        momentumDensity d fluid t x j := by
+  have hProduct := Space.deriv_smul (u := j) (x := x)
+    (c := fun x' => fluid.velocity t x' i)
+    (f := fun x' => momentumDensity d fluid t x' j)
     ((differentiable_euclidean.mp hVelocity i).differentiableAt)
     ((differentiable_euclidean.mp hMomentumDensity j).differentiableAt)
   rw [← hProduct]
   congr
-  funext position'
+  funext x'
   simp [momentumFlux, momentumDensity, Matrix.vecMulVec_apply, mul_left_comm]
 
 /-- The matrix divergence of `rho u ⊗ u` split into continuity and convective parts. -/
 lemma matrixDiv_momentumFlux (d : ℕ) (fluid : FluidState d)
-    (time : Time) (position : Space d)
-    (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid time))
-    (hVelocity : Differentiable ℝ (fluid.velocity time)) :
-    matrixDiv d (momentumFlux d fluid time) position =
-      (∇ ⬝ momentumDensity d fluid time) position • fluid.velocity time position +
-        fluid.rho time position • convectiveTerm d fluid.velocity time position := by
+    (t : Time) (x : Space d)
+    (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid t))
+    (hVelocity : Differentiable ℝ (fluid.velocity t)) :
+    matrixDiv d (momentumFlux d fluid t) x =
+      (∇ ⬝ momentumDensity d fluid t) x • fluid.velocity t x +
+        fluid.rho t x • convectiveTerm d fluid.velocity t x := by
   ext i
   simp [matrixDiv_apply, div, convectiveTerm, smul_eq_mul]
-  change (∑ j, ∂[j] (fun position' =>
-      momentumFlux d fluid time position' i j) position) =
-    (∑ j, ∂[j] (fun position' =>
-      momentumDensity d fluid time position' j) position) *
-        fluid.velocity time position i +
-      fluid.rho time position *
-        (∑ j, fluid.velocity time position j * ∂[j] (fluid.velocity time) position i)
+  change (∑ j, ∂[j] (fun x' =>
+      momentumFlux d fluid t x' i j) x) =
+    (∑ j, ∂[j] (fun x' =>
+      momentumDensity d fluid t x' j) x) *
+        fluid.velocity t x i +
+      fluid.rho t x *
+        (∑ j, fluid.velocity t x j * ∂[j] (fluid.velocity t) x i)
   calc
-    (∑ j, ∂[j] (fun position' =>
-        momentumFlux d fluid time position' i j) position)
+    (∑ j, ∂[j] (fun x' =>
+        momentumFlux d fluid t x' i j) x)
         = ∑ j,
-            (fluid.velocity time position i *
-                ∂[j] (fun position' =>
-                  momentumDensity d fluid time position' j) position +
-              ∂[j] (fun position' => fluid.velocity time position' i) position *
-                momentumDensity d fluid time position j) := by
+            (fluid.velocity t x i *
+                ∂[j] (fun x' =>
+                  momentumDensity d fluid t x' j) x +
+              ∂[j] (fun x' => fluid.velocity t x' i) x *
+                momentumDensity d fluid t x j) := by
           apply Finset.sum_congr rfl
           intro j _
-          rw [spaceDeriv_momentumFlux_component d fluid time position i j
+          rw [spaceDeriv_momentumFlux_component d fluid t x i j
             hMomentumDensity hVelocity]
           simp [smul_eq_mul]
-    _ = fluid.velocity time position i *
-          (∑ j, ∂[j] (fun position' =>
-            momentumDensity d fluid time position' j) position) +
-        fluid.rho time position *
-          (∑ j, fluid.velocity time position j * ∂[j] (fluid.velocity time) position i) := by
+    _ = fluid.velocity t x i *
+          (∑ j, ∂[j] (fun x' =>
+            momentumDensity d fluid t x' j) x) +
+        fluid.rho t x *
+          (∑ j, fluid.velocity t x j * ∂[j] (fluid.velocity t) x i) := by
           rw [Finset.sum_add_distrib]
           congr 1
           · rw [Finset.mul_sum]
           · rw [Finset.mul_sum]
             apply Finset.sum_congr rfl
             intro j _
-            rw [Space.deriv_euclid (ν := j) (μ := i) (f := fluid.velocity time)
-              hVelocity position]
+            rw [Space.deriv_euclid (ν := j) (μ := i) (f := fluid.velocity t)
+              hVelocity x]
             simp [momentumDensity, mul_comm, mul_assoc]
-    _ = (∑ j, ∂[j] (fun position' =>
-          momentumDensity d fluid time position' j) position) *
-          fluid.velocity time position i +
-        fluid.rho time position *
-          (∑ j, fluid.velocity time position j * ∂[j] (fluid.velocity time) position i) := by
+    _ = (∑ j, ∂[j] (fun x' =>
+          momentumDensity d fluid t x' j) x) *
+          fluid.velocity t x i +
+        fluid.rho t x *
+          (∑ j, fluid.velocity t x j * ∂[j] (fluid.velocity t) x i) := by
           ring
 
 /-- The algebraic bridge between conservative and convective momentum.
@@ -237,17 +237,17 @@ the continuity residual times the velocity field.
 -/
 lemma conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
     (d : ℕ) (fluid : FluidState d)
-    (time : Time) (position : Space d)
-    (hRhoTime : DifferentiableAt ℝ (fun time' => fluid.rho time' position) time)
-    (hVelocityTime : DifferentiableAt ℝ (fun time' => fluid.velocity time' position) time)
-    (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid time))
-    (hVelocitySpace : Differentiable ℝ (fluid.velocity time)) :
-    conservativeMomentumLHS d fluid time position =
-      convectiveMomentumLHS d fluid time position +
-        continuityResidual d fluid time position • fluid.velocity time position := by
+    (t : Time) (x : Space d)
+    (hRhoTime : DifferentiableAt ℝ (fun t' => fluid.rho t' x) t)
+    (hVelocityTime : DifferentiableAt ℝ (fun t' => fluid.velocity t' x) t)
+    (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid t))
+    (hVelocitySpace : Differentiable ℝ (fluid.velocity t)) :
+    conservativeMomentumLHS d fluid t x =
+      convectiveMomentumLHS d fluid t x +
+        continuityResidual d fluid t x • fluid.velocity t x := by
   rw [conservativeMomentumLHS, convectiveMomentumLHS, continuityResidual]
-  rw [timeDeriv_momentumDensity d fluid time position hRhoTime hVelocityTime]
-  rw [matrixDiv_momentumFlux d fluid time position hMomentumDensity hVelocitySpace]
+  rw [timeDeriv_momentumDensity d fluid t x hRhoTime hVelocityTime]
+  rw [matrixDiv_momentumFlux d fluid t x hMomentumDensity hVelocitySpace]
   ext i
   simp [materialAcceleration, convectiveTerm, div, momentumDensity, smul_eq_mul]
   ring_nf
@@ -259,48 +259,48 @@ The differentiability assumptions are exactly the product-rule assumptions used 
 `partial_t (rho u)` and `matrixDiv (rho u ⊗ u)`.
 -/
 theorem ConservativeMomentumEquation_iff_ConvectiveMomentumEquation
-    (d : ℕ) (data : MomentumBalanceFields d)
+    (d : ℕ) (data : FluidInMomentumBalance d)
     (hContinuity : ContinuityEquation d data.toFluidState)
-    (hRhoTime : ∀ time position,
-      DifferentiableAt ℝ (fun time' => data.rho time' position) time)
-    (hVelocityTime : ∀ time position,
-      DifferentiableAt ℝ (fun time' => data.velocity time' position) time)
-    (hMomentumDensity : ∀ time,
-      Differentiable ℝ (momentumDensity d data.toFluidState time))
-    (hVelocitySpace : ∀ time, Differentiable ℝ (data.velocity time)) :
+    (hRhoTime : ∀ t x,
+      DifferentiableAt ℝ (fun t' => data.rho t' x) t)
+    (hVelocityTime : ∀ t x,
+      DifferentiableAt ℝ (fun t' => data.velocity t' x) t)
+    (hMomentumDensity : ∀ t,
+      Differentiable ℝ (momentumDensity d data.toFluidState t))
+    (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
     ConservativeMomentumEquation d data ↔
       ConvectiveMomentumEquation d data := by
   constructor
-  · intro hConservative time position
-    have hResidual : continuityResidual d data.toFluidState time position = 0 := by
-      simpa [continuityResidual] using hContinuity time position
+  · intro hConservative t x
+    have hResidual : continuityResidual d data.toFluidState t x = 0 := by
+      simpa [continuityResidual] using hContinuity t x
     have hLhs := conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-      d data.toFluidState time position (hRhoTime time position) (hVelocityTime time position)
-      (hMomentumDensity time) (hVelocitySpace time)
+      d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
+      (hMomentumDensity t) (hVelocitySpace t)
     have hLhs' :
-        conservativeMomentumLHS d data.toFluidState time position =
-          convectiveMomentumLHS d data.toFluidState time position := by
+        conservativeMomentumLHS d data.toFluidState t x =
+          convectiveMomentumLHS d data.toFluidState t x := by
       rw [hLhs, hResidual, zero_smul, add_zero]
-    change convectiveMomentumLHS d data.toFluidState time position =
-      matrixDiv d (data.stress time) position +
-        data.rho time position • data.bodyForce time position
+    change convectiveMomentumLHS d data.toFluidState t x =
+      matrixDiv d (data.stress t) x +
+        data.rho t x • data.bodyForce t x
     rw [← hLhs']
-    exact hConservative time position
-  · intro hConvective time position
-    have hResidual : continuityResidual d data.toFluidState time position = 0 := by
-      simpa [continuityResidual] using hContinuity time position
+    exact hConservative t x
+  · intro hConvective t x
+    have hResidual : continuityResidual d data.toFluidState t x = 0 := by
+      simpa [continuityResidual] using hContinuity t x
     have hLhs := conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-      d data.toFluidState time position (hRhoTime time position) (hVelocityTime time position)
-      (hMomentumDensity time) (hVelocitySpace time)
+      d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
+      (hMomentumDensity t) (hVelocitySpace t)
     have hLhs' :
-        conservativeMomentumLHS d data.toFluidState time position =
-          convectiveMomentumLHS d data.toFluidState time position := by
+        conservativeMomentumLHS d data.toFluidState t x =
+          convectiveMomentumLHS d data.toFluidState t x := by
       rw [hLhs, hResidual, zero_smul, add_zero]
-    change conservativeMomentumLHS d data.toFluidState time position =
-      matrixDiv d (data.stress time) position +
-        data.rho time position • data.bodyForce time position
+    change conservativeMomentumLHS d data.toFluidState t x =
+      matrixDiv d (data.stress t) x +
+        data.rho t x • data.bodyForce t x
     rw [hLhs']
-    exact hConvective time position
+    exact hConvective t x
 
 end NavierStokes
 end FluidDynamics

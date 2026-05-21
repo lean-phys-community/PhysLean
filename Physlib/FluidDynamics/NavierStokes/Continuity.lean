@@ -46,18 +46,18 @@ namespace NavierStokes
 
 /-- Conservation of mass in conservative form, `partial_t rho + div (rho u) = 0`. -/
 def ContinuityEquation (d : ℕ) (fluid : FluidState d) : Prop :=
-  ∀ time position,
-    ∂ₜ (fun time' => fluid.rho time' position) time +
-      (∇ ⬝ fun position' => fluid.rho time position' • fluid.velocity time position') position =
+  ∀ t x,
+    ∂ₜ (fun t' => fluid.rho t' x) t +
+      (∇ ⬝ fun x' => fluid.rho t x' • fluid.velocity t x') x =
         0
 
 /-- The scalar continuity-equation residual
 `partial_t rho + div (rho u)`. -/
 noncomputable def continuityResidual (d : ℕ) (fluid : FluidState d) :
     Time → Space d → ℝ :=
-  fun time position =>
-    ∂ₜ (fun time' => fluid.rho time' position) time +
-      (∇ ⬝ fun position' => fluid.rho time position' • fluid.velocity time position') position
+  fun t x =>
+    ∂ₜ (fun t' => fluid.rho t' x) t +
+      (∇ ⬝ fun x' => fluid.rho t x' • fluid.velocity t x') x
 
 end NavierStokes
 end FluidDynamics

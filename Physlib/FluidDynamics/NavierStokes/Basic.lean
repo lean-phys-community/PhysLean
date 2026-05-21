@@ -47,26 +47,26 @@ namespace NavierStokes
 -/
 
 /-- The conservative Navier-Stokes balance-law form with an externally supplied stress tensor. -/
-def ConservativeForm (d : ℕ) (data : MomentumBalanceFields d) : Prop :=
+def ConservativeForm (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
   ContinuityEquation d data.toFluidState ∧
     ConservativeMomentumEquation d data
 
 /-- The convective Navier-Stokes form with an externally supplied stress tensor. -/
-def ConvectiveForm (d : ℕ) (data : MomentumBalanceFields d) : Prop :=
+def ConvectiveForm (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
   ContinuityEquation d data.toFluidState ∧
     ConvectiveMomentumEquation d data
 
 /-- The conservative and convective Navier-Stokes forms are equivalent when the fields are
 differentiable enough for the product rules. -/
 theorem ConservativeForm_iff_ConvectiveForm
-    (d : ℕ) (data : MomentumBalanceFields d)
-    (hRhoTime : ∀ time position,
-      DifferentiableAt ℝ (fun time' => data.rho time' position) time)
-    (hVelocityTime : ∀ time position,
-      DifferentiableAt ℝ (fun time' => data.velocity time' position) time)
-    (hMomentumDensity : ∀ time,
-      Differentiable ℝ (momentumDensity d data.toFluidState time))
-    (hVelocitySpace : ∀ time, Differentiable ℝ (data.velocity time)) :
+    (d : ℕ) (data : FluidInMomentumBalance d)
+    (hRhoTime : ∀ t x,
+      DifferentiableAt ℝ (fun t' => data.rho t' x) t)
+    (hVelocityTime : ∀ t x,
+      DifferentiableAt ℝ (fun t' => data.velocity t' x) t)
+    (hMomentumDensity : ∀ t,
+      Differentiable ℝ (momentumDensity d data.toFluidState t))
+    (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
     ConservativeForm d data ↔
       ConvectiveForm d data := by
   constructor
