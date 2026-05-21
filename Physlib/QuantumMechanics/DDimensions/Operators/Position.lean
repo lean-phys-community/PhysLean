@@ -9,7 +9,6 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
-import Physlib.Meta.Linters.Sorry
 /-!
 
 # Position operators
@@ -398,11 +397,9 @@ notation "𝓧" => positionOperator
 lemma positionOperator_hasDenseDomain : (𝓧 i).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
-@[sorryful]
 lemma positionOperator_isSelfAdjoint : IsSelfAdjoint (𝓧 i) :=
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
-@[sorryful]
 lemma positionOperator_isUnbounded : (𝓧 i).IsUnbounded :=
   LinearPMap.IsSelfAdjoint.isUnbounded (positionOperator_isSelfAdjoint i)
 
@@ -424,11 +421,9 @@ notation "𝓡₀[" d' "]" => radiusRegPowOperator (d := d')
 lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
-@[sorryful]
 lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝓡₀[d] ε s) := by
   refine mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
-@[sorryful]
 lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).IsUnbounded :=
   LinearPMap.IsSelfAdjoint.isUnbounded (radiusRegPowOperator_isSelfAdjoint ε s)
 
@@ -452,14 +447,12 @@ lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝓡[d] s).HasDenseDomain :=
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
-@[sorryful]
 lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝓡[d] s) := by
   refine mulOperator_isSelfAdjoint_ofReal ?_ (by ext; simp)
   suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
   ext x
   simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
 
-@[sorryful]
 lemma radiusPowOperator_isUnbounded (s : ℝ) : (𝓡[d] s).IsUnbounded :=
   LinearPMap.IsSelfAdjoint.isUnbounded (radiusPowOperator_isSelfAdjoint s)
 

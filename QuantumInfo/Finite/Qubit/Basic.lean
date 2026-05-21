@@ -6,6 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import QuantumInfo.Finite.CPTPMap
+public import Physlib.Meta.TODO.Basic
 
 /-!
 Quantum theory and operations specific to qubits.
@@ -17,6 +18,9 @@ Quantum theory and operations specific to qubits.
 -/
 
 @[expose] public section
+
+TODO "Improve the module doc-string of the `Qubit` file, to explain the
+  current implementation."
 
 abbrev Qubit := Fin 2
 
