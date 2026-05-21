@@ -214,7 +214,7 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
   let w : ℕ → Space d → ℂ := fun n ↦ (s n).indicator ((conj ∘ f) • ψ)
   have hw : ∀ n, MemHS (w n) := by
     intro n
-    apply memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
+    refine memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
     refine lt_of_eq_of_lt ?_ (hs_int 1 (Or.inl rfl) n)
     trans ∫⁻ x in s n, ‖‖w n x‖ ^ 2‖ₑ
     · exact (setLIntegral_eq_of_support_subset fun x hx ↦ by simp_all [w]).symm
@@ -229,8 +229,8 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
         refine lintegral_congr_ae ?_
         filter_upwards [coe_mk_ae (hw n)] with _ h
         simp [φ, h]
-      _ = ∫⁻ x in s n, ‖‖(f • w n) x‖ ^ 2‖ₑ := by
-        exact (setLIntegral_eq_of_support_subset fun x hx ↦ by simp_all [w]).symm
+      _ = ∫⁻ x in s n, ‖‖(f • w n) x‖ ^ 2‖ₑ :=
+        (setLIntegral_eq_of_support_subset fun x hx ↦ by simp_all [w]).symm
     exact setLIntegral_congr_fun (hs_meas n) fun x hx ↦ by simp [w, hx, ← mul_assoc, ← pow_two]
   suffices ∀ n, ∫⁻ x in s n, ‖‖f x‖ ^ 2 * ‖ψ x‖ ^ 2‖ₑ ≤ ∫⁻ x, ‖‖ξ x‖ ^ 2‖ₑ by
     apply mem_mulOperator_domain_iff.mpr
