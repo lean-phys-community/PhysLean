@@ -135,7 +135,7 @@ noncomputable def ofScalarPotential {d} (c : SpeedOfLight)
     (ϕ : Time → Space d → ℝ) : ElectromagneticPotential d where
   val x μ :=
     match μ with
-    | Sum.inl 0 => (timeSlice c).symm ϕ x
+    | Sum.inl 0 => ((timeSlice c).symm ϕ x) / c
     | Sum.inr _ => 0
 
 /-- The creation of an electromagnetic potential from a static scalar potential. -/
@@ -146,7 +146,7 @@ noncomputable def ofStaticScalarPotential {d} (c : SpeedOfLight)
 /-- The electromagnetic potential from a vector potential, where
   the scalar potential is set equal to zero. -/
 noncomputable def ofVectorPotential {d} (c : SpeedOfLight)
-     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
+    (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
     ElectromagneticPotential d where
   val x μ :=
     match μ with
@@ -164,13 +164,32 @@ noncomputable def ofPotentials {d} (c : SpeedOfLight) (ϕ : Time → Space d →
     ElectromagneticPotential d where
   val x μ :=
     match μ with
-    | Sum.inl 0 => (timeSlice c).symm ϕ x
+    | Sum.inl 0 => ((timeSlice c).symm ϕ x) / c
     | Sum.inr i => (timeSlice c).symm A x i
+
+lemma ofPotentials_eq_add {d} (c : SpeedOfLight) (ϕ : Time → Space d → ℝ)
+    (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
+    ofPotentials c ϕ A = ofScalarPotential c ϕ + ofVectorPotential c A := by
+  ext x
+  refine Lorentz.Vector.ext_of_apply (fun i => ?_)
+  match i with
+  | Sum.inl 0 =>
+    simp only [ofPotentials, Fin.isValue, add_val, Pi.add_apply, Lorentz.Vector.apply_add]
+    simp only [ofScalarPotential, Fin.isValue, ofVectorPotential, add_zero]
+  | Sum.inr i =>
+    simp only [ofPotentials, add_val, Pi.add_apply, Lorentz.Vector.apply_add]
+    simp [ofScalarPotential, ofVectorPotential]
 
 /-- The creation of of an electromagnetic potential from static potentials. -/
 noncomputable def ofStaticPotentials {d} (c : SpeedOfLight) (ϕ : Space d → ℝ)
     (A : Space d → EuclideanSpace ℝ (Fin d)) : ElectromagneticPotential d :=
   ofStaticScalarPotential c ϕ + ofStaticVectorPotential c A
+
+lemma ofStaticPotentials_eq_ofPotentials {d} (c : SpeedOfLight) (ϕ : Space d → ℝ)
+    (A : Space d → EuclideanSpace ℝ (Fin d)) :
+    ofStaticPotentials c ϕ A = ofPotentials c (fun _ => ϕ) (fun _ => A) := by
+  rw [ofPotentials_eq_add]
+  rfl
 
 /-- The electromagnetic potential from a static electric and a static magnetic field.
   There is no canonical choice here, so this depends on choice. -/

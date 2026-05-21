@@ -554,6 +554,9 @@ lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
   · linear_combination (norm := {simp [Fin.sum_univ_three, this]; ring}) - t ^ 2 * x 1 * hdiv
   · linear_combination (norm := {simp [Fin.sum_univ_three, this]; ring}) - t ^ 2 * x 2 * hdiv
 
+TODO "Generalize the statement that a div-free field is a curl
+  to time-dependent fields."
+
 /-!
 
 ### A.10. A curl-free field is a gradient
@@ -642,6 +645,9 @@ lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
   ext1 x
   specialize hg x
   simpa using (HasGradientAt.unique (hg.differentiableAt.hasGradientAt_grad x) hg).symm
+
+TODO "Generalize the statement that a curl-free field is a gradient
+  to time-dependent fields."
 
 /-!
 
