@@ -42,7 +42,7 @@ open SpaceDHilbertSpace
 
 /-- A single-particle quantum system with Hilbert space `SpaceDHilbertSpace d`,
   characterized by the number of spatial dimensions `d : ℕ`, particle's mass `m > 0`
-  and potential function `potential : Space d → ℝ` (assumed to be a.e. strongly measurable). -/
+  and potential function `potential : Space d → ℝ`. -/
 @[ext]
 structure SpaceDQuantumSystem where
   /-- The number of spatial dimensions. -/
@@ -50,9 +50,8 @@ structure SpaceDQuantumSystem where
   /-- The mass (positive). -/
   m : ℝ
   hm : 0 < m
-  /-- The potential function (a.e. strongly measurable). -/
+  /-- The potential function. -/
   potential : Space d → ℝ
-  hAESM : AEStronglyMeasurable potential
 
 variable {Q : SpaceDQuantumSystem}
 
@@ -74,12 +73,6 @@ lemma m_nonneg : 0 ≤ Q.m := Q.hm.le
 
 @[simp]
 lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
-
-@[fun_prop]
-lemma potential_aestronglymeasurable : AEStronglyMeasurable Q.potential := Q.hAESM
-
-@[fun_prop]
-lemma potential_aemeasurable : AEMeasurable Q.potential := Q.hAESM.aemeasurable
 
 /-!
 ## B. Operators
@@ -130,7 +123,8 @@ def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 (ofReal ∘ Q.potential)
 
 lemma potentialOperator_eq : Q.potentialOperator = 𝓜 (ofReal ∘ Q.potential) := rfl
 
-lemma potentialOperator_isSelfAdjoint : IsSelfAdjoint Q.potentialOperator :=
+lemma potentialOperator_isSelfAdjoint (h_AESM : AEStronglyMeasurable Q.potential) :
+    IsSelfAdjoint Q.potentialOperator :=
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
 lemma potentialOperator_domain_ge (h_HTG : Q.potential.HasTemperateGrowth) :
