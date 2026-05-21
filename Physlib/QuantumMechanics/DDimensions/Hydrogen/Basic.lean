@@ -5,7 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
+public import Physlib.QuantumMechanics.DDimensions.Basic
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
 /-!
 
@@ -27,34 +27,48 @@ e.g. see https://doi.org/10.1103/PhysRevA.80.032507 and https://doi.org/10.1063/
 @[expose] public section
 
 namespace QuantumMechanics
+open MeasureTheory
 open SchwartzMap
 
 /-- A hydrogen atom is characterized by the number of spatial dimensions `d`,
   the mass `m` and the coefficient `k` for the `1/r` potential. -/
-structure HydrogenAtom where
-  /-- Number of spatial dimensions -/
-  d : ℕ
-
-  /-- Mass (positive) -/
-  m : ℝ
-  hm : 0 < m
-
-  /-- Coefficient in potential (positive for attractive) -/
+structure HydrogenAtom extends SpaceDQuantumSystem where
+  /-- Coefficient in the Coulomb potential (positive for attractive) -/
   k : ℝ
+  coulomb_potential : potential = fun x ↦ -k * ‖x‖⁻¹
 
 namespace HydrogenAtom
 noncomputable section
 
 variable (H : HydrogenAtom)
 
+/-!
+## A. Basic
+-/
+
 @[simp]
-lemma m_ne_zero : H.m ≠ 0 := by linarith [H.hm]
+lemma potential_eq : H.potential = fun x ↦ -H.k * ‖x‖⁻¹ := H.coulomb_potential
+
+@[fun_prop]
+lemma potential_AESM : AEStronglyMeasurable H.potential := by
+  rw [potential_eq]
+  exact AEMeasurable.aestronglyMeasurable (by fun_prop)
+
+@[fun_prop]
+lemma potential_AEM : AEMeasurable H.potential := H.potential_AESM.aemeasurable
+
+/-!
+## B. Regularization
+-/
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The hydrogen atom Hamiltonian regularized by `ε ≠ 0` is defined to be
   `𝐇(ε) ≔ (2m)⁻¹𝐩² - k·𝐫(ε)⁻¹`. -/
-def hamiltonianReg (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=
+def hamiltonianRegCLM (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=
   (2 * H.m)⁻¹ • (𝐩 ⬝ᵥ 𝐩) - H.k • 𝐫₀ ε (-1)
+
+lemma hamiltonianRegCLM_eq (ε : ℝˣ) :
+    H.hamiltonianRegCLM ε = (2 * H.m)⁻¹ • (𝐩 ⬝ᵥ 𝐩) - H.k • 𝐫₀ ε (-1) := rfl
 
 end
 end HydrogenAtom
