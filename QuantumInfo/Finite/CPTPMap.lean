@@ -7,6 +7,7 @@ module
 
 public import QuantumInfo.Finite.CPTPMap.Bundled
 public import QuantumInfo.Finite.CPTPMap.CPTP
+public import QuantumInfo.Finite.CPTPMap.CQPrepare
 public import QuantumInfo.Finite.CPTPMap.Dual
 public import QuantumInfo.Finite.CPTPMap.MatrixMap
 public import QuantumInfo.Finite.CPTPMap.Unbundled

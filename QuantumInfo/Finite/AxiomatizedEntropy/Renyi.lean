@@ -23,7 +23,7 @@ namespace AxiomatizedEntropy
 /-- A conservative wrapper around the actual quantum relative entropy. On normalized PSD inputs
 it agrees with `_root_.qRelativeEnt`; away from the state space we leave the value at `0`. -/
 @[irreducible]
-noncomputable def qRelativeEnt (ρ : MState d) (σ : HermitianMat d ℂ) : ENNReal :=
+noncomputable def qRelativeEntExtension (ρ : MState d) (σ : HermitianMat d ℂ) : ENNReal :=
   open Classical in
   if hσ : σ.trace = 1 ∧ 0 ≤ σ then
     let σ' : MState d := { M := σ, nonneg := hσ.2, tr := hσ.1 }
@@ -32,9 +32,9 @@ noncomputable def qRelativeEnt (ρ : MState d) (σ : HermitianMat d ℂ) : ENNRe
     0
 
 @[simp]
-theorem qRelativeEnt_state (ρ σ : MState d) :
-    qRelativeEnt ρ (σ : HermitianMat d ℂ) = _root_.qRelativeEnt ρ σ := by
-  rw [qRelativeEnt, dif_pos ⟨σ.tr, σ.nonneg⟩]
+theorem qRelativeEntExtension_state (ρ σ : MState d) :
+    qRelativeEntExtension ρ (σ : HermitianMat d ℂ) = _root_.qRelativeEnt ρ σ := by
+  rw [qRelativeEntExtension, dif_pos ⟨σ.tr, σ.nonneg⟩]
 
 private lemma uniform_log [Nonempty d] :
     (MState.uniform : MState d).M.log =
@@ -44,15 +44,15 @@ private lemma uniform_log [Nonempty d] :
   funext _
   simp [ProbDistribution.uniform_def, Real.log_inv]
 
-instance : RelEntropy qRelativeEnt where
+instance : RelEntropy qRelativeEntExtension where
   DPI := by
     intro d₁ d₂ _ _ _ _ ρ σ Λ
-    simpa [qRelativeEnt_state] using
+    simpa [qRelativeEntExtension_state] using
       (sandwichedRenyiEntropy_DPI (d₁ := d₁) (d₂ := d₂) (α := 1)
         (hα := le_rfl) (ρ := ρ) (σ := σ) (Φ := Λ))
   of_kron := by
     intro d₁ d₂ _ _ _ _ ρ₁ σ₁ ρ₂ σ₂
-    rw [qRelativeEnt_state, qRelativeEnt_state, qRelativeEnt_state]
+    rw [qRelativeEntExtension_state, qRelativeEntExtension_state, qRelativeEntExtension_state]
     exact _root_.qRelativeEnt_additive ρ₁ σ₁ ρ₂ σ₂
   normalized := by
     intro d _ _ _ i
@@ -76,11 +76,11 @@ instance : RelEntropy qRelativeEnt where
     have hq := _root_.qRelativeEnt_eq_neg_Sᵥₙ_add
       (ρ := MState.ofClassical (.constant i)) (σ := MState.uniform)
     rw [if_pos hker, Sᵥₙ_ofClassical, Hₛ_constant_eq_zero, hicul] at hq
-    simp [qRelativeEnt_state, hq, EReal.coe_nnreal_eq_coe_real]
+    simp [qRelativeEntExtension_state, hq, EReal.coe_nnreal_eq_coe_real]
 
 /-- Quantum relative entropy as `Tr[ρ (log ρ - log σ)]` when supports are correct. -/
-theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
-    (qRelativeEnt ρ σ : EReal) = ⟪ρ.M, ρ.M.log - σ.M.log⟫ := by
-  simpa [qRelativeEnt_state] using (_root_.qRelativeEnt_ker (ρ := ρ) (σ := σ) h)
+theorem qRelativeEntExtension_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
+    (qRelativeEntExtension ρ σ : EReal) = ⟪ρ.M, ρ.M.log - σ.M.log⟫ := by
+  simpa [qRelativeEntExtension_state] using (_root_.qRelativeEnt_ker (ρ := ρ) (σ := σ) h)
 
 end AxiomatizedEntropy

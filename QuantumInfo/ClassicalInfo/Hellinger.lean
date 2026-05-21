@@ -22,6 +22,8 @@ universe u
 
 open scoped BigOperators
 
+namespace ProbDistribution
+
 /-- The Hellinger overlap, or Bhattacharyya coefficient, of two finite probability distributions. -/
 def hellingerOverlap {κ : Type u} [Fintype κ] (P Q : ProbDistribution κ) : ℝ :=
   ∑ x, Real.sqrt ((P x : ℝ) * (Q x : ℝ))
@@ -73,43 +75,4 @@ theorem hellingerOverlap_coin_lt_one (p q : Prob) (hpq : (p : ℝ) < q) :
       Real.sq_sqrt (mul_nonneg (sub_nonneg.mpr hp1) (sub_nonneg.mpr hq1))]
     nlinarith [(Real.sqrt_mul (mul_nonneg hp0 hq0) ((1 - p) * (1 - q))).symm]
 
-/-- The type obtained by taking `n` iterated dyadic self-products of `d`. -/
-def DyadicPow (d : Type u) : ℕ → Type u
-  | 0 => d
-  | n + 1 => DyadicPow d n × DyadicPow d n
-
-instance dyadicPowFintype {d : Type u} [Fintype d] (n : ℕ) : Fintype (DyadicPow d n) := by
-  induction n with
-  | zero => simpa [DyadicPow] using (inferInstance : Fintype d)
-  | succ n ih => simpa [DyadicPow] using (inferInstance : Fintype (DyadicPow d n × DyadicPow d n))
-
-instance dyadicPowDecidableEq {d : Type u} [DecidableEq d] (n : ℕ) :
-    DecidableEq (DyadicPow d n) := by
-  induction n with
-  | zero => simpa [DyadicPow] using (inferInstance : DecidableEq d)
-  | succ n ih =>
-      simpa [DyadicPow] using (inferInstance : DecidableEq (DyadicPow d n × DyadicPow d n))
-
-/-- Iterated dyadic product power of a finite probability distribution. -/
-def dyadicProbPow {d : Type u} [Fintype d] (dist : ProbDistribution d) :
-    ∀ n, ProbDistribution (DyadicPow d n)
-  | 0 => dist
-  | n + 1 => ProbDistribution.prod (dyadicProbPow dist n) (dyadicProbPow dist n)
-
-/-- Hellinger overlap of dyadic product powers. -/
-theorem hellingerOverlap_dyadicProbPow {d : Type u} [Fintype d]
-    (P Q : ProbDistribution d) :
-    ∀ n, hellingerOverlap (dyadicProbPow P n) (dyadicProbPow Q n) =
-      (hellingerOverlap P Q) ^ (2 ^ n : ℕ) := by
-  intro n
-  induction n with
-  | zero =>
-      change hellingerOverlap P Q = (hellingerOverlap P Q) ^ (1 : ℕ)
-      rw [pow_one]
-  | succ n ih =>
-      change hellingerOverlap
-          (ProbDistribution.prod (dyadicProbPow P n) (dyadicProbPow P n))
-          (ProbDistribution.prod (dyadicProbPow Q n) (dyadicProbPow Q n)) =
-        (hellingerOverlap P Q) ^ (2 ^ (n + 1) : ℕ)
-      rw [hellingerOverlap_prod, ih, show 2 ^ (n + 1) = 2 ^ n + 2 ^ n by omega, pow_add]
-
+end ProbDistribution
