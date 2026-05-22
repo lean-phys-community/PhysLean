@@ -423,10 +423,9 @@ def schwartzPositionOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSp
 
 @[simp]
 lemma schwartzPositionOperator_domain :
-    (schwartzPositionOperator i).domain = schwartzSubmodule d :=
-  by
-    rw [schwartzPositionOperator, LinearPMap.domRestrict_domain, inf_eq_left]
-    exact schwartzSubmodule_le_positionOperator_domain i
+    (schwartzPositionOperator i).domain = schwartzSubmodule d := by
+  rw [schwartzPositionOperator, LinearPMap.domRestrict_domain, inf_eq_left]
+  exact schwartzSubmodule_le_positionOperator_domain i
 
 /-- Regard a Schwartz-domain vector as an element of the domain of `schwartzPositionOperator`. -/
 abbrev schwartzPositionOperatorDomain (ψ : schwartzSubmodule d) :
@@ -439,31 +438,30 @@ instance : Coe (schwartzSubmodule d) (schwartzPositionOperator i).domain where
 
 @[simp]
 lemma schwartzPositionOperator_apply (ψ : schwartzSubmodule d) :
-    schwartzPositionOperator i ψ = schwartzEquiv (𝐱 i (schwartzEquiv.symm ψ)) :=
-  by
-    obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
-    rw [schwartzEquiv.symm_apply_apply]
-    change ((𝓧 i).domRestrict (schwartzSubmodule d))
-        ⟨schwartzEquiv f, ⟨(schwartzEquiv f).2,
-          schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩⟩ =
-      schwartzEquiv (𝐱 i f)
-    have hrestrict :
-        ((𝓧 i).domRestrict (schwartzSubmodule d))
-            ⟨schwartzEquiv f, ⟨(schwartzEquiv f).2,
-              schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩⟩ =
-          (𝓧 i) ⟨schwartzEquiv f,
-            schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩ :=
-      LinearPMap.domRestrict_apply rfl
-    rw [hrestrict]
-    apply SpaceDHilbertSpace.ext_iff.mpr
-    filter_upwards [mulOperator_apply_ae ⟨schwartzEquiv f,
-      schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩,
-      schwartzEquiv_coe_ae f, schwartzEquiv_coe_ae (𝐱 i f)] with x h𝓧 hf hx
-    change (((𝓜 ⇑(Complex.ofRealCLM.comp (Space.coordCLM i))) ⟨schwartzEquiv f, _⟩ :
-      SpaceDHilbertSpace d) : Space d → ℂ) x =
-        ((schwartzEquiv ((𝐱 i) f) : SpaceDHilbertSpace d) : Space d → ℂ) x
-    rw [h𝓧, hx]
-    simp [hf, Space.coordCLM_apply, Space.coord_apply, positionCLM_apply]
+    schwartzPositionOperator i ψ = schwartzEquiv (𝐱 i (schwartzEquiv.symm ψ)) := by
+  obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
+  rw [schwartzEquiv.symm_apply_apply]
+  change ((𝓧 i).domRestrict (schwartzSubmodule d))
+      ⟨schwartzEquiv f, ⟨(schwartzEquiv f).2,
+        schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩⟩ =
+    schwartzEquiv (𝐱 i f)
+  have hrestrict :
+      ((𝓧 i).domRestrict (schwartzSubmodule d))
+          ⟨schwartzEquiv f, ⟨(schwartzEquiv f).2,
+            schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩⟩ =
+        (𝓧 i) ⟨schwartzEquiv f,
+          schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩ :=
+    LinearPMap.domRestrict_apply rfl
+  rw [hrestrict]
+  apply SpaceDHilbertSpace.ext_iff.mpr
+  filter_upwards [mulOperator_apply_ae ⟨schwartzEquiv f,
+    schwartzSubmodule_le_positionOperator_domain i (schwartzEquiv f).2⟩,
+    schwartzEquiv_coe_ae f, schwartzEquiv_coe_ae (𝐱 i f)] with x h𝓧 hf hx
+  change (((𝓜 ⇑(Complex.ofRealCLM.comp (Space.coordCLM i))) ⟨schwartzEquiv f, _⟩ :
+    SpaceDHilbertSpace d) : Space d → ℂ) x =
+      ((schwartzEquiv ((𝐱 i) f) : SpaceDHilbertSpace d) : Space d → ℂ) x
+  rw [h𝓧, hx]
+  simp [hf, Space.coordCLM_apply, Space.coord_apply, positionCLM_apply]
 
 lemma schwartzPositionOperator_range (ψ : schwartzSubmodule d) :
     schwartzPositionOperator i ψ ∈ schwartzSubmodule d := by
