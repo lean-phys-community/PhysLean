@@ -144,6 +144,8 @@ variable
   {T T₁ T₂ : H →ₗ.[ℂ] H} {S : α → H →ₗ.[ℂ] H}
   {U U₁ U₂ : H →ₗ.[ℂ] H'} {V : α → H →ₗ.[ℂ] H'}
 
+instance : IsScalarTower ℝ ℂ H := IsScalarTower.complexToReal
+
 /-!
 ### B.1. Definitions
 
@@ -448,7 +450,7 @@ lemma IsSymmetric.smul (h : T.IsSymmetric) {c : ℂ} (hc : conj c = c) : (c • 
   fun x y ↦ by simp only [smul_apply, inner_smul_left, inner_smul_right, hc, h x y]
 
 @[aesop safe apply]
-lemma IsSymmetric.smul_ofReal (h : T.IsSymmetric) (r : ℝ) : (ofReal r • T).IsSymmetric :=
+lemma IsSymmetric.real_smul (h : T.IsSymmetric) (r : ℝ) : (r • T).IsSymmetric :=
   h.smul (conj_ofReal r)
 
 @[aesop safe apply]
@@ -497,8 +499,8 @@ lemma IsSelfAdjoint.smul [CompleteSpace H]
   rw [isSelfAdjoint_def, T.adjoint_smul hc, hc', isSelfAdjoint_def.mp h]
 
 @[aesop safe apply]
-lemma IsSelfAdjoint.smul_ofReal [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} (hr : r ≠ 0) :
-    IsSelfAdjoint (ofReal r • T) :=
+lemma IsSelfAdjoint.real_smul [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} (hr : r ≠ 0) :
+    IsSelfAdjoint (r • T) :=
   smul h (ofReal_ne_zero.mpr hr) (conj_ofReal r)
 
 @[aesop safe apply]
@@ -542,9 +544,9 @@ lemma IsEssentiallySelfAdjoint.smul [CompleteSpace H]
   simp_all [isEssentiallySelfAdjoint_def, isSelfAdjoint_def, closure_smul _ hc, adjoint_smul _ hc]
 
 @[aesop safe apply]
-lemma IsEssentiallySelfAdjoint.smul_ofReal [CompleteSpace H]
+lemma IsEssentiallySelfAdjoint.real_smul [CompleteSpace H]
     (h : T.IsEssentiallySelfAdjoint) {r : ℝ} (hr : r ≠ 0) :
-    (ofReal r • T).IsEssentiallySelfAdjoint :=
+    (r • T).IsEssentiallySelfAdjoint :=
   h.smul (ofReal_ne_zero.mpr hr) (conj_ofReal r)
 
 @[aesop safe apply]
