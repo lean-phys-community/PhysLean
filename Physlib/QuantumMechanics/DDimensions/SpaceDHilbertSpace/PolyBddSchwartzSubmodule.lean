@@ -177,7 +177,7 @@ private lemma enorm_bump_mul_le_enorm {𝕜 E : Type*} [RCLike 𝕜] [NormedAddC
 private lemma dense_zero_top :
     Dense (polyBddSchwartzSubmodule 0 ⊤ : Set (SpaceDHilbertSpace 0)) := by
   suffices polyBddSchwartzMap 0 ⊤ = ⊤ by
-    simp [polyBddSchwartzSubmodule, polyBddSchwartzIncl, this, SchwartzSubmodule.dense]
+    simp [polyBddSchwartzSubmodule, polyBddSchwartzIncl, this]
   refine Submodule.eq_top_iff'.mpr (fun f k hk ↦ ?_)
   refine ⟨1 + ‖f 0‖, by positivity, fun x ↦ ?_⟩
   simp only [Space.point_dim_zero_eq, norm_zero, zpow_neg, zpow_natCast]
