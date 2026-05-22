@@ -45,7 +45,8 @@ these correspond to physical observables.
 ## iii. Table of contents
 
 - A. General
-  - A.1. Finite sums
+  - A.1. DistribMulAction
+  - A.2. Finite sums
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
   - B.2. Dense domain
@@ -69,11 +70,6 @@ these correspond to physical observables.
 
 namespace LinearPMap
 
-open Submodule
-open InnerProductSpace
-open InnerProductSpaceSubmodule
-open Complex ComplexConjugate
-
 /-!
 ## A. General
 
@@ -88,10 +84,26 @@ variable {E : Type*} [AddCommGroup E] [Module R E]
 variable {F : Type*} [AddCommGroup F] [Module R F]
 
 /-!
-### A.1. Finite sums
+### A.1. DistribMulAction
 -/
 
 section
+
+variable {M : Type*} [Monoid M] [DistribMulAction M F] [SMulCommClass R M F]
+
+instance instDistribMulAction : DistribMulAction M (E →ₗ.[R] F) where
+  smul_zero _ := by ext; rfl; simp
+  smul_add _ _ _ := by ext; rfl; simp [add_apply]
+
+end
+
+/-!
+### A.2. Finite sums
+-/
+
+section
+
+open Submodule
 
 variable {α : Type*} [Fintype α] (f : α → E →ₗ.[R] F)
 
@@ -119,6 +131,11 @@ end General
 -/
 
 section InnerProductSpaces
+
+open Submodule
+open InnerProductSpace
+open InnerProductSpaceSubmodule
+open Complex ComplexConjugate
 
 variable
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
