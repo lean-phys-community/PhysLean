@@ -492,27 +492,31 @@ lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint 
 ### B.7. Essentially self-adjoint operators
 -/
 
+lemma IsEssentiallySelfAdjoint.hasDenseDomain [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
+    T.HasDenseDomain :=
+  hasDenseDomain_iff_closure_hasDenseDomain.mpr (isEssentiallySelfAdjoint_def.mp h).dense_domain
+
 lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
     T.IsSymmetric :=
   (IsSelfAdjoint.isSymmetric h).of_le T.le_closure
 
-lemma IsEssentiallySelfAdjoint.isClosable [CompleteSpace H]
-    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsClosable :=
-  h.isSymmetric.isClosable h'
+lemma IsEssentiallySelfAdjoint.isClosable [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
+    T.IsClosable :=
+  h.isSymmetric.isClosable h.hasDenseDomain
 
-lemma IsEssentiallySelfAdjoint.isUnbounded [CompleteSpace H]
-    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain) : T.IsUnbounded :=
-  h.isSymmetric.isUnbounded_iff_hasDenseDomain.mpr h'
+lemma IsEssentiallySelfAdjoint.isUnbounded [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
+    T.IsUnbounded :=
+  h.isSymmetric.isUnbounded_iff_hasDenseDomain.mpr h.hasDenseDomain
 
 /-- The closure is the unique self-adjoint extension of an essentially self-adjoint operator. -/
 lemma IsEssentiallySelfAdjoint.unique_self_adjoint_extension [CompleteSpace H]
-    (h : T.IsEssentiallySelfAdjoint) (h' : T.HasDenseDomain)
-    {T₂ : H →ₗ.[ℂ] H} (h_le : T ≤ T₂) (h₂ : IsSelfAdjoint T₂) :
+    (h : T.IsEssentiallySelfAdjoint) {T₂ : H →ₗ.[ℂ] H} (h_le : T ≤ T₂) (h₂ : IsSelfAdjoint T₂) :
     T₂ = T.closure := by
+  have h_dense : T.HasDenseDomain := h.hasDenseDomain
   have h_cl : T₂.IsClosed := IsSelfAdjoint.isClosed h₂
   have h_cl' : T₂.closure = T₂ := h_cl.isClosable.isClosed_iff.mp h_cl
   have h_le' : T.closure ≤ T₂ := h_cl' ▸ h_cl.isClosable.closure_mono h_le
-  exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl <| h'.closure) h_le') h_le'
+  exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl <| h_dense.closure) h_le') h_le'
 
 @[aesop safe apply]
 lemma IsEssentiallySelfAdjoint.smul [CompleteSpace H]
