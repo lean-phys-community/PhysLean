@@ -12,8 +12,14 @@ public import Physlib.SpaceAndTime.Time.Derivatives
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
 
 /-!
-This module introduces the continuity criterium.
-There is potential to add various different lemmas expanding on this.
+# Continuity and Incompressibility
+
+This module formulates mass conservation by defining the condidtions for an ideal fluid to satisfy
+the `Continuity Equation`.
+
+Additionally, it defines the mathematical model for `incompressibility` of a fluid.
+
+There is potential to extend this module broadly with various lemmas and theorems.
 -/
 
 open scoped InnerProductSpace

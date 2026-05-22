@@ -12,11 +12,13 @@ public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.SpaceAndTime.Time.Derivatives
 
 /-!
-This module introduces:
-steady flow,
-material derivative,
-isentropic behavious,
-the bernoulli equation
+This module focuses on defining specific flow states. It introduces the formal definitions of
+
+- `steady flow`
+- `isentropic behaviour`
+- `material derivative`
+
+after which it defines the `Bernoulli function`.
 -/
 
 open scoped InnerProductSpace

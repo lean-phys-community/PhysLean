@@ -12,8 +12,11 @@ public import Physlib.SpaceAndTime.Space.Module
 public import Physlib.SpaceAndTime.Time.Basic
 
 /-!
-This module introduces the idea of an ideal fluid and the mass flux density
-and basic physical properties, meant to be later used for proofs.
+This module establishes the core mathematical structure of an ideal fluid. It defines the
+
+- `continuous and differentiable fields` (dencity, velocity, pressure, entropy, and enthalpy)
+- `mass, entropy, energy flux densities`
+- `fluid volume structures` alongside surface integrals to compute various flows
 -/
 
 open scoped InnerProductSpace

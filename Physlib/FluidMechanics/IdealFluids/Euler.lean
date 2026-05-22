@@ -13,7 +13,8 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Grad
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
 
 /-!
-This module introduces the Euler's equation.
+This module introduces the conservation of momentum in ideal fluids by formalizing
+the `Euler's equation`.
 -/
 
 open scoped InnerProductSpace
