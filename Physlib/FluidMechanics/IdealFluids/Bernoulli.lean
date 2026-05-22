@@ -42,8 +42,6 @@ def IdealFluid.isIsentropic (F: IdealFluid):
       ∀ (t: Time) (pos: Space),
       F.materialDerivative t pos F.entropy = 0
 
--- TODO: Make into material derivative
-
 /-- The Bernoulli function (1/2)v^2 + w -/
 noncomputable def IdealFluid.bernoulliEquation (F: IdealFluid)
 (t: Time) (pos: Space) (g: Space → ℝ):
