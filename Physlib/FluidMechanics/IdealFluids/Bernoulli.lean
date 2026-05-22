@@ -14,7 +14,9 @@ public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 This module introduces:
 steady flow,
-... (still under construction)
+material derivative,
+isentropic behavious,
+the bernoulli equation
 -/
 
 open scoped InnerProductSpace
@@ -48,17 +50,3 @@ noncomputable def IdealFluid.bernoulliEquation (F: IdealFluid)
     ℝ :=
       let v := F.velocity t pos
       0.5 * ⟪v, v⟫_ℝ + F.enthalpy t pos + g pos
-
--- TODO: Recheck sign
-
-/-- Derivation:
-  If the flow is steady and isentropic, the bernoulli equation is constant
--/
-theorem bernoulli_derivation (F : IdealFluid) (g : Space → ℝ) (t : Time) (pos : Space)
-    (Eul : F.satisfiesEuler g)
-    (Stdy : F.isSteady)
-    (Istrpc : F.isIsentropic) :
-    let v := F.velocity t pos
-    ⟪v, Space.grad (F.bernoulliEquation t · g) pos⟫_ℝ = 0 :=
-      by
-        sorry

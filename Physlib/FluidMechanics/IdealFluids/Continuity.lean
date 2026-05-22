@@ -29,13 +29,5 @@ public def IdealFluid.satisfiesContinuity (F : IdealFluid):
 
 /-- Criterion for incompressibility -/
 public def IdealFluid.isIncompressible (F : IdealFluid):
-    Prop :=
-      ∀ (t : Time) (pos : Space), ∂ₜ (F.density · pos) t = 0
-
-/-- Theorem: If constant density and incompressible div(v)=0-/
-theorem incompress_const_density_implies_div_v_eq_zero (F : IdealFluid)
-    (Cont      : F.satisfiesContinuity)
-    (Incomp    : F.isIncompressible)
-    (ConstDens : ∀ (t : Time) (pos : Space), Space.grad (F.density t ·) pos = 0) :
-    ∀ (t : Time) (pos : Space), Space.div (F.velocity t ·) pos = 0 := by
-      sorry
+  Prop :=
+    ∀ (t : Time) (pos : Space), ∂ₜ (F.density · pos) t = 0

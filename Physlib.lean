@@ -48,6 +48,10 @@ public import Physlib.Electromagnetism.Vacuum.Constant
 public import Physlib.Electromagnetism.Vacuum.HarmonicWave
 public import Physlib.Electromagnetism.Vacuum.IsPlaneWave
 public import Physlib.Mathematics.Calculus.AdjFDeriv
+public import Physlib.FluidMechanics.IdealFluids.Basic
+public import Physlib.FluidMechanics.IdealFluids.Bernoulli
+public import Physlib.FluidMechanics.IdealFluids.Continuity
+public import Physlib.FluidMechanics.IdealFluids.Euler
 public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.Mathematics.DataStructures.FourTree.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
@@ -80,10 +84,6 @@ public import Physlib.Mathematics.VariationalCalculus.HasVarAdjoint
 public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
 public import Physlib.Mathematics.VariationalCalculus.IsLocalizedfunctionTransform
 public import Physlib.Mathematics.VariationalCalculus.IsTestFunction
-public import Physlib.FluidMechanics.IdealFluids.Basic
-public import Physlib.FluidMechanics.IdealFluids.Bernoulli
-public import Physlib.FluidMechanics.IdealFluids.Continuity
-public import Physlib.FluidMechanics.IdealFluids.Euler
 public import Physlib.Meta.AllFilePaths
 public import Physlib.Meta.Basic
 public import Physlib.Meta.Informal.Basic
