@@ -79,6 +79,7 @@ lemma momentumCLM_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐩 i ψ x = 
 
 -/
 
+open LinearPMap
 open MeasureTheory
 open SpaceDHilbertSpace
 open SchwartzSubmodule
@@ -139,7 +140,18 @@ lemma momentumOperator_isUnbounded : (𝓟 i).IsUnbounded := by
 
 /-- The square of the momentum operator. -/
 def momentumSqOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  ∑ i, (𝓟 i).comp (𝓟 i) (momentumOperator_range i)
+  sum fun i ↦ (𝓟 i).comp (𝓟 i) (momentumOperator_range i)
+
+lemma momentumSqOperator_eq :
+    momentumSqOperator (d := d) = sum fun i ↦ (𝓟 i).comp (𝓟 i) (momentumOperator_range i) := rfl
+
+lemma momentumSqOperator_domain_eq : momentumSqOperator.domain = schwartzSubmodule d := by
+  rw [momentumSqOperator_eq, sum_domain]
+  rcases eq_zero_or_pos d with rfl | hd
+  · simp [SchwartzSubmodule.zero_eq_top]
+  · letI := Fin.pos_iff_nonempty.mp hd
+    rw [← iInf_const (a := schwartzSubmodule d) (ι := Fin d)]
+    congr
 
 end
 end QuantumMechanics
