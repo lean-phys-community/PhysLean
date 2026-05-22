@@ -150,6 +150,22 @@ lemma HasDenseDomain.isUnbounded_iff_isClosable (h : U.HasDenseDomain) :
 lemma HasDenseDomain.closure (h : U.HasDenseDomain) : U.closure.HasDenseDomain :=
   h.mono U.le_closure.1
 
+lemma closure_domain_le_domain_closure (U : H →ₗ.[ℂ] H') : U.closure.domain ≤ U.domain.closure := by
+  by_cases h_cl : U.IsClosable
+  · intro ψ hψ
+    obtain ⟨φ, hψφ⟩ := h_cl.graph_closure_eq_closure_graph ▸ mem_domain_iff.mp hψ
+    obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp hψφ
+    apply mem_closure_iff_seq_limit.mpr
+    refine ⟨fun n ↦ (b n).1, fun n ↦ ?_, (nhds_prod_eq (x := ψ) (y := φ) ▸ hb').fst⟩
+    specialize hb n
+    simp only [coe_toAddSubmonoid, SetLike.mem_coe, mem_graph_iff, Subtype.exists,
+      exists_and_left, exists_eq_left] at hb
+    exact hb.choose
+  · simp [closure_def' h_cl, closure_le.mp]
+
+lemma hasDenseDomain_iff_closure_hasDenseDomain : U.HasDenseDomain ↔ U.closure.HasDenseDomain :=
+  ⟨HasDenseDomain.closure, fun h ↦ dense_closure.mp (h.mono U.closure_domain_le_domain_closure)⟩
+
 lemma HasDenseDomain.neg (h : U.HasDenseDomain) : (-U).HasDenseDomain := h
 
 lemma HasDenseDomain.smul (h : U.HasDenseDomain) (c : ℂ) : (c • U).HasDenseDomain := h
