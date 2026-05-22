@@ -70,12 +70,46 @@ open Submodule
 open InnerProductSpace
 open InnerProductSpaceSubmodule
 open Complex ComplexConjugate
+section General
+
+variable {R : Type*} [Ring R]
+variable {E : Type*} [AddCommGroup E] [Module R E]
+variable {F : Type*} [AddCommGroup F] [Module R F]
+
+/-!
+### A.1. Finite sums
+-/
+
+section
+
+variable {α : Type*} [Fintype α] (f : α → E →ₗ.[R] F)
+
+/-- A finite sum of partial linear maps.
+
+  `sum f` and `∑ a, f a` are equal, but not by definition.
+  With `sum f` both `domain` and `toFun` are made explicit. -/
+def sum : E →ₗ.[R] F where
+  domain := ⨅ a, (f a).domain
+  toFun := ∑ a, (f a).toFun ∘ₗ inclusion (fun _ _ ↦ by simp_all only [mem_iInf])
+
+lemma sum_domain : (sum f).domain = ⨅ a, (f a).domain := rfl
+
+lemma sum_domain_le (a : α) : (sum f).domain ≤ (f a).domain := fun _ _ ↦ by simp_all [sum, mem_iInf]
+
+lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_le f a ψ.2⟩ := by
+  simp [sum, inclusion_apply]
+
+end
+
+end General
+
 
 variable
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {H' : Type*} [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
-  {T T₁ T₂ : H →ₗ.[ℂ] H}
-  {U U₁ U₂ : H →ₗ.[ℂ] H'}
+  {α : Type*} [Fintype α]
+  {T T₁ T₂ : H →ₗ.[ℂ] H} {S : α → H →ₗ.[ℂ] H}
+  {U U₁ U₂ : H →ₗ.[ℂ] H'} {V : α → H →ₗ.[ℂ] H'}
 
 /-!
 ## A. Definitions
@@ -127,6 +161,11 @@ lemma HasDenseDomain.add_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain 
 lemma HasDenseDomain.sub_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain ≤ U₂.domain) :
     (U₁ - U₂).HasDenseDomain :=
   h₁.mono (by simp [h_le, sub_domain])
+
+lemma HasDenseDomain.sum_of_le
+    {E : Submodule ℂ H} (hE : Dense (E : Set H)) (h : ∀ a, E ≤ (V a).domain) :
+    (sum V).HasDenseDomain :=
+  hE.mono (by simp [sum_domain, h])
 
 /-!
 ## C. Closability
@@ -362,6 +401,11 @@ lemma IsSymmetric.smul (h : T.IsSymmetric) {c : ℂ} (hc : conj c = c) : (c • 
 @[aesop safe apply]
 lemma IsSymmetric.smul_ofReal (h : T.IsSymmetric) (r : ℝ) : (ofReal r • T).IsSymmetric :=
   h.smul (conj_ofReal r)
+
+@[aesop safe apply]
+lemma IsSymmetric.sum (h : ∀ a, (S a).IsSymmetric) : (sum S).IsSymmetric := by
+  intro x y
+  simp [sum_apply, sum_inner, inner_sum, h _ ⟨x, sum_domain_le S _ x.2⟩ ⟨y, sum_domain_le S _ y.2⟩]
 
 lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.IsSymmetric := by
   intro x y
