@@ -6,6 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import QuantumInfo.ForMathlib.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.ComplexLaplaceTransform
 public import QuantumInfo.ForMathlib.ContinuousSup
 public import QuantumInfo.ForMathlib.Filter
 public import QuantumInfo.ForMathlib.HermitianMat
