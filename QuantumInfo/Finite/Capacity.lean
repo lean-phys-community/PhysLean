@@ -123,8 +123,7 @@ end εApproximates
 
 section AchievesRate
 
-/-- Every quantum channel out of a nonempty space achieves a rate of zero.
-`Nonempty d₂` is derived from `Λ` via `PTPMap.nonemptyOut`. -/
+/-- Every quantum channel out of a nonempty space achieves at least a rate of zero. -/
 theorem achievesRate_0 (Λ : CPTPMap d₁ d₂) [Nonempty d₁] : Λ.AchievesRate 0 := fun ε hε => by
   have : Nonempty d₂ := Λ.toPTPMap.nonemptyOut
   refine ⟨1, one_pos, 1, default, ⟨default, default, Subsingleton.elim _ _⟩, by norm_num, ?_⟩

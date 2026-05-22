@@ -134,6 +134,11 @@ instance : ChartedSpace (Vector d) (Vector d) := chartedSpaceSelf (Vector d)
 instance {d} : CoeFun (Vector d) (fun _ => Fin 1 ⊕ Fin d → ℝ) where
   coe := fun v => v
 
+lemma ext_of_apply {d} {v w : Vector d} (h : ∀ i, v i = w i) : v = w := by
+  apply (equivEuclid d).injective
+  ext i
+  simpa using h i
+
 @[simp]
 lemma apply_smul {d : ℕ} (c : ℝ) (v : Vector d) (i : Fin 1 ⊕ Fin d) :
     (c • v) i = c * v i := rfl

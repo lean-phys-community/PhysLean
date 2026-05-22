@@ -34,6 +34,24 @@ def IdealGas : NVEHamiltonian where
       ∑ (i : Fin n) (ax : Fin 3), config (i,.inr ax)^2 / (2 : ℝ)
     else
       ⊤
+  measurable_H := by
+    rintro ⟨n, V⟩
+    dsimp
+    refine Measurable.ite ?_ ?_ measurable_const
+    · rw [Set.setOf_forall]
+      apply MeasurableSet.iInter
+      intro i
+      rw [Set.setOf_forall]
+      exact MeasurableSet.iInter fun ax => measurableSet_le
+        (show Measurable fun config : Fin n × (Fin 3 ⊕ Fin 3) → ℝ =>
+          |config (i, Sum.inl ax)| by fun_prop) measurable_const
+    · convert WithTop.isOpenEmbedding_coe.measurableEmbedding.measurable.comp
+        (Finset.measurable_sum _ fun (x : Fin n × Fin 3) _ =>
+          (show Measurable fun config : Fin n × (Fin 3 ⊕ Fin 3) → ℝ =>
+            config (x.1, Sum.inr x.2) ^ 2 / (2 : ℝ) by fun_prop)) using 1
+      ext config
+      rw [← WithTop.coe_sum]
+      rfl
 
 namespace IdealGas
 open MicroHamiltonian

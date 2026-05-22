@@ -7,6 +7,7 @@ module
 
 public import QuantumInfo.ForMathlib.Superadditive
 public import Mathlib.Order.LiminfLimsup
+public import Mathlib.Topology.Order.LiminfLimsup
 public import Mathlib.Topology.Order.MonotoneConvergence
 
 /-! Definition of "Regularized quantities" as are common in information theory,
@@ -120,6 +121,29 @@ end SupRegularized
 
 section real
 
+private def realNegOrderIso : ℝ ≃o ℝᵒᵈ where
+  toEquiv := Equiv.neg ℝ
+  map_rel_iff' := by
+    intro a b
+    change (-b : ℝ) ≤ -a ↔ a ≤ b
+    simpa using neg_le_neg_iff
+
+private theorem limsup_eq_neg_liminf_neg {fn : ℕ → ℝ} {_lb _ub : ℝ}Expand commentComment on line R131Resolved
+    (hl : ∀ n, _lb ≤ fn n) (hu : ∀ n, fn n ≤ _ub) :
+    Filter.atTop.limsup fn = -Filter.atTop.liminf (fun n => -fn n) := by
+  have hneg : -Filter.atTop.limsup fn = Filter.atTop.liminf (fun n => -fn n) := by
+    have hdual := OrderIso.limsup_apply (f := Filter.atTop) (u := fn) realNegOrderIso
+      (hu := Filter.isBoundedUnder_of_eventually_le (f := Filter.atTop) (u := fn)
+        (Filter.Eventually.of_forall hu))
+      (hu_co := Filter.isCoboundedUnder_le_of_le Filter.atTop hl)
+      (hgu := Filter.isBoundedUnder_of_eventually_le (α := ℝᵒᵈ) (f := Filter.atTop)
+        (u := fun n => (-fn n : ℝᵒᵈ)) (Filter.Eventually.of_forall fun n => neg_le_neg (hu n)))
+      (hgu_co := Filter.isCoboundedUnder_le_of_le (α := ℝᵒᵈ) Filter.atTop
+        (f := fun n => (-fn n : ℝᵒᵈ)) (x := (-_lb : ℝᵒᵈ)) fun n => neg_le_neg (hl n))
+    simpa [Filter.limsup, Filter.liminf, Filter.limsSup, Filter.limsInf, realNegOrderIso] using
+      congrArg OrderDual.ofDual hdual
+  linarith
+
 variable {fn : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
 
 theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegularized (-fn ·)
@@ -130,19 +154,8 @@ theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegular
 
 theorem SupRegularized.to_InfRegularized : SupRegularized fn hl hu = -InfRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
-  -- By definition of `InfRegularized` and `SupRegularized`, we can rewrite the goal using the fact that the liminf of a function is the negative of the limsup of its negative.
-  have h_limsup_limsup : Filter.limsup fn Filter.atTop = -Filter.liminf (fun n => -fn n) Filter.atTop := by
-    -- By definition of liminf and limsup, we know that for any sequence of real numbers, the liminf of the negative of the sequence is the negative of the limsup of the original sequence.
-    have h_limsup_neg : ∀ (s : ℕ → ℝ), Filter.liminf (fun n => -s n) Filter.atTop = -Filter.limsup s Filter.atTop := by
-      -- Apply the definition of liminf and limsup.
-      intros s
-      rw [Filter.liminf_eq, Filter.limsup_eq];
-      -- By definition of supremum and infimum, we know that the supremum of a set is the negative of the infimum of its negative.
-      have h_sup_neg_inf : ∀ (S : Set ℝ), sSup S = -sInf (-S) := by
-        intro S; rw [ Real.sInf_def ] ; aesop;
-      convert h_sup_neg_inf _ using 3 ; aesop;
-    rw [ h_limsup_neg, neg_neg ];
-  exact h_limsup_limsup
+  unfold InfRegularized SupRegularized
+  exact limsup_eq_neg_liminf_neg hl hu
 
 /-- For `Antitone` functions, the value `Filter.Tendsto` the `InfRegularized` value. -/
 theorem InfRegularized.anti_tendsto (h : Antitone fn) :

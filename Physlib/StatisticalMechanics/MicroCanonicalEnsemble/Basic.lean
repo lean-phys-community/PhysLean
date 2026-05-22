@@ -7,6 +7,9 @@ module
 
 public import Mathlib.Data.Fintype.Defs
 public import Mathlib.Data.Real.Basic
+public import Mathlib.MeasureTheory.Constructions.BorelSpace.Real
+public import Mathlib.MeasureTheory.Constructions.Pi
+public import Mathlib.MeasureTheory.Constructions.BorelSpace.WithTop
 public import Physlib.Meta.Sorry
 /-!
 
@@ -34,6 +37,8 @@ structure MicroHamiltonian (D : Type) where
   [dim_fin : ∀ d, Fintype (dim d)]
   /-- Given the configuration, what is its energy? -/
   H : {d : D} → (dim d → ℝ) → WithTop ℝ
+  --The energy function must be measurable (else the partition function integral is meaningless).
+  measurable_H : ∀ d, Measurable (@H d)
 
 /-- We add the dim_fin to the instance cache so that things like the measure can be synthesized -/
 instance microHamiltonianFintype {D} (H : MicroHamiltonian D) (d : D) : Fintype (H.dim d) :=
