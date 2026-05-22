@@ -5,7 +5,7 @@ Authors: Matteo Cipollina
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateCovariance
+public import Physlib.QuantumMechanics.DDimensions.Operators.Covariance
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
 /-!
 
@@ -25,6 +25,8 @@ to `Bψ` and `B` to `Aψ`.
 
 - `inner_im_of_commutator_eq` : an anti-Hermitian commutator identity fixes the imaginary part of
   an inner product.
+- `centeredCommutatorExpectation` : the scalar commutator of the centered vectors.
+- `rawCommutatorExpectation` : the expectation of the raw commutator on a state.
 - `inner_centered_commutator_of_raw_commutator` : a raw commutator expectation gives the centered
   commutator expectation.
 - `state_uncertainty_squared_of_centered_commutator` : the Robertson squared bound from a centered
@@ -128,6 +130,19 @@ lemma raw_commutator_eq_of_symmetric
           rw [inner_sub_right]
     _ = Complex.I * c := h_raw
 
+/-- The scalar commutator of the centered vectors of `A` and `B` in the state `ψ`. -/
+def centeredCommutatorExpectation (A B : H →ₗ.[ℂ] H)
+    (ψ : A.domain) (hψB : (ψ : H) ∈ B.domain) : ℂ :=
+  ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ -
+    ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ
+
+/-- The expectation of the raw commutator `[A, B]` in the state `ψ`, with explicit second-order
+domain witnesses. -/
+def rawCommutatorExpectation (A B : H →ₗ.[ℂ] H)
+    (ψ : A.domain) (hψB : (ψ : H) ∈ B.domain)
+    (hBA : A ψ ∈ B.domain) (hAB : B ⟨ψ, hψB⟩ ∈ A.domain) : ℂ :=
+  ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩ - B ⟨A ψ, hBA⟩⟫_ℂ
+
 lemma commutator_half_sq_le_mul_norm_sq {u v : H} {c : ℝ}
     (h_comm : ⟪u, v⟫_ℂ - ⟪v, u⟫_ℂ = Complex.I * c) :
     (|c| / 2) ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 := by
@@ -161,10 +176,7 @@ variable (A B : H →ₗ.[ℂ] H)
 variable (ψ : A.domain)
 variable (hψB : (ψ : H) ∈ B.domain)
 variable {c : ℝ}
-variable (h_centered :
-  ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ -
-    ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ =
-      Complex.I * c)
+variable (h_centered : centeredCommutatorExpectation A B ψ hψB = Complex.I * c)
 
 include h_centered
 
@@ -172,27 +184,23 @@ include h_centered
 lemma state_uncertainty_squared_of_centered_commutator :
     (|c| / 2) ^ 2 ≤ variance A ψ * variance B ⟨ψ, hψB⟩ := by
   rw [variance_eq_centered_norm_sq, variance_eq_centered_norm_sq]
-  have h_mul_sq :
-      ‖centered A ψ‖ ^ 2 * ‖centered B ⟨ψ, hψB⟩‖ ^ 2 =
-        (‖centered A ψ‖ * ‖centered B ⟨ψ, hψB⟩‖) ^ 2 := by
-    ring
-  rw [h_mul_sq]
-  exact commutator_half_sq_le_mul_norm_sq h_centered
+  rw [show ‖centered A ψ‖ ^ 2 * ‖centered B ⟨ψ, hψB⟩‖ ^ 2 =
+    (‖centered A ψ‖ * ‖centered B ⟨ψ, hψB⟩‖) ^ 2 by ring]
+  exact commutator_half_sq_le_mul_norm_sq (by simpa [centeredCommutatorExpectation] using
+    h_centered)
 
 /-- A centered commutator identity implies the Robertson–Schrödinger uncertainty bound. -/
 lemma state_uncertainty_squared_with_covariance_of_centered_commutator :
-    (stateCovariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 ≤
+    (covariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 ≤
       variance A ψ * variance B ⟨ψ, hψB⟩ := by
   rw [variance_eq_centered_norm_sq, variance_eq_centered_norm_sq]
-  have h_mul_sq :
-      ‖centered A ψ‖ ^ 2 * ‖centered B ⟨ψ, hψB⟩‖ ^ 2 =
-        (‖centered A ψ‖ * ‖centered B ⟨ψ, hψB⟩‖) ^ 2 := by
-    ring
-  rw [h_mul_sq]
+  rw [show ‖centered A ψ‖ ^ 2 * ‖centered B ⟨ψ, hψB⟩‖ ^ 2 =
+    (‖centered A ψ‖ * ‖centered B ⟨ψ, hψB⟩‖) ^ 2 by ring]
   calc
-    (stateCovariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 =
+    (covariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 =
         ‖⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ‖ ^ 2 := by
-          rw [inner_norm_sq_eq_re_sq_add_commutator_half_sq h_centered]
+          rw [inner_norm_sq_eq_re_sq_add_commutator_half_sq
+            (by simpa [centeredCommutatorExpectation] using h_centered)]
           rfl
     _ ≤ (‖centered A ψ‖ * ‖centered B ⟨ψ, hψB⟩‖) ^ 2 := by
         have h_bound :=
@@ -227,16 +235,13 @@ variable (hψ_norm : ‖(ψ : H)‖ = 1)
 variable (hBA : A ψ ∈ B.domain)
 variable (hAB : B ⟨ψ, hψB⟩ ∈ A.domain)
 variable {c : ℝ}
-variable (h_raw :
-  ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩ - B ⟨A ψ, hBA⟩⟫_ℂ = Complex.I * c)
+variable (h_raw : rawCommutatorExpectation A B ψ hψB hBA hAB = Complex.I * c)
 
 include hA hB hψ_norm hBA hAB h_raw
 
 /-- A raw commutator expectation determines the centered commutator expectation. -/
 lemma inner_centered_commutator_of_raw_commutator :
-    ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ -
-        ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ =
-      Complex.I * c := by
+    centeredCommutatorExpectation A B ψ hψB = Complex.I * c := by
   let a : H := A ψ
   let b : H := B ⟨ψ, hψB⟩
   let μa : ℝ := expectedValue A ψ
@@ -254,8 +259,11 @@ lemma inner_centered_commutator_of_raw_commutator :
       simpa [b] using hB ⟨ψ, hψB⟩ ⟨ψ, hψB⟩
     simpa [h_symm] using hμb_right
   calc
-    ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ -
-        ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ =
+    centeredCommutatorExpectation A B ψ hψB =
+      ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ -
+        ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ := by
+          rfl
+    _ =
       ⟪a - (μa : ℂ) • (ψ : H), b - (μb : ℂ) • (ψ : H)⟫_ℂ -
         ⟪b - (μb : ℂ) • (ψ : H), a - (μa : ℂ) • (ψ : H)⟫_ℂ := by
           rfl
@@ -263,7 +271,8 @@ lemma inner_centered_commutator_of_raw_commutator :
       sub_expectation_commutator_eq_raw (ψ : H) a b μa μb
         hμa_right hμa_left hμb_right hμb_left hψ_norm
     _ = Complex.I * c :=
-      raw_commutator_eq_of_symmetric A B hA hB ψ hψB hBA hAB h_raw
+      raw_commutator_eq_of_symmetric A B hA hB ψ hψB hBA hAB
+        (by simpa [rawCommutatorExpectation] using h_raw)
 
 /-- A raw commutator expectation implies the squared Robertson uncertainty bound. -/
 lemma state_uncertainty_squared_of_raw_commutator :
@@ -273,7 +282,7 @@ lemma state_uncertainty_squared_of_raw_commutator :
 
 /-- A raw commutator expectation implies the squared uncertainty bound with covariance term. -/
 lemma state_uncertainty_squared_with_covariance_of_raw_commutator :
-    (stateCovariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 ≤
+    (covariance A B ψ hψB) ^ 2 + (c / 2) ^ 2 ≤
       variance A ψ * variance B ⟨ψ, hψB⟩ :=
   state_uncertainty_squared_with_covariance_of_centered_commutator A B ψ hψB
     (inner_centered_commutator_of_raw_commutator A B hA hB ψ hψB hψ_norm hBA hAB h_raw)

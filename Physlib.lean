@@ -242,10 +242,10 @@ public import Physlib.QuantumMechanics.DDimensions.Hydrogen.Basic
 public import Physlib.QuantumMechanics.DDimensions.Hydrogen.LaplaceRungeLenzVector
 public import Physlib.QuantumMechanics.DDimensions.Operators.AngularMomentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
+public import Physlib.QuantumMechanics.DDimensions.Operators.Covariance
 public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateCovariance
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance

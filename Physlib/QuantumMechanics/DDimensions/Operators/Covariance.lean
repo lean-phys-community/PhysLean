@@ -8,14 +8,29 @@ module
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
 /-!
-# State covariance
 
-For symmetric partial linear maps `A` and `B` on a common state `ψ`, this file defines the
-covariance `re ⟪(Aψ)ᶜ, (Bψ)ᶜ⟫` of the centered vectors.
+# Covariance
 
-## Main definitions
+## i. Overview
 
-- `LinearPMap.stateCovariance`: the real part of the inner product of two centered vectors.
+In this module we define the covariance of two partial linear maps `A` and `B` in a common state
+`ψ` as the real part of the inner product of their centered vectors.
+
+## ii. Key results
+
+- `covariance` : the real part of the centered inner product.
+- `covariance_comm` : covariance is symmetric in the two observables.
+- `covariance_eq_re_symm_centered` : covariance as the real part of the symmetrized centered
+  inner product.
+- `covariance_self_eq_variance` : the covariance of an observable with itself is its variance.
+
+## iii. Table of contents
+
+- A. Covariance
+
+## iv. References
+
+- [B. C. Hall, *Quantum Theory for Mathematicians*, Chapter 12][hall2013quantum].
 
 -/
 
@@ -29,26 +44,32 @@ noncomputable section
 
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
+/-!
+
+## A. Covariance
+
+-/
+
 section Covariance
 
 variable (A B : H →ₗ.[ℂ] H)
 variable (ψ : A.domain)
 variable (hψB : (ψ : H) ∈ B.domain)
 
-/-- State covariance, defined as the real part of the centered inner product. -/
-def stateCovariance : ℝ :=
+/-- Covariance, defined as the real part of the centered inner product. -/
+def covariance : ℝ :=
   (⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ).re
 
-/-- State covariance, unfolded to the real part of the centered inner product. -/
-lemma stateCovariance_eq_re_inner_centered :
-    stateCovariance A B ψ hψB =
+/-- Covariance, unfolded to the real part of the centered inner product. -/
+lemma covariance_eq_re_inner_centered :
+    covariance A B ψ hψB =
       (⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ).re :=
   rfl
 
-/-- Swapping the two observables does not change the state covariance. -/
-lemma stateCovariance_comm :
-    stateCovariance A B ψ hψB = stateCovariance B A ⟨ψ, hψB⟩ ψ.2 := by
-  rw [stateCovariance_eq_re_inner_centered, stateCovariance_eq_re_inner_centered]
+/-- Swapping the two observables does not change the covariance. -/
+lemma covariance_comm :
+    covariance A B ψ hψB = covariance B A ⟨ψ, hψB⟩ ψ.2 := by
+  rw [covariance_eq_re_inner_centered, covariance_eq_re_inner_centered]
   calc
     (⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ).re =
         (((starRingEnd ℂ) ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ)).re := by
@@ -58,23 +79,22 @@ lemma stateCovariance_comm :
         (⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ).re
       rw [Complex.star_def, Complex.conj_re]
 
-/-- State covariance as the real part of the symmetrized centered inner product. -/
-lemma stateCovariance_eq_re_symm_centered :
-    stateCovariance A B ψ hψB =
+/-- Covariance as the real part of the symmetrized centered inner product. -/
+lemma covariance_eq_re_symm_centered :
+    covariance A B ψ hψB =
       ((⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ +
         ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ).re) / 2 := by
   let z : ℂ := ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ
   have hz : ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ = star z := by
     simp [z, inner_conj_symm]
-  rw [stateCovariance_eq_re_inner_centered, hz]
+  rw [covariance_eq_re_inner_centered, hz]
   change z.re = ((z + star z).re) / 2
   simp only [Complex.add_re, Complex.star_def, Complex.conj_re, add_self_div_two]
 
 @[simp]
-lemma stateCovariance_self_eq_variance (A : H →ₗ.[ℂ] H) (ψ : A.domain) :
-    stateCovariance A A ψ (by exact ψ.2) = variance A ψ := by
-  rw [stateCovariance_eq_re_inner_centered, variance_eq_centered_norm_sq,
-    inner_self_eq_norm_sq_to_K]
+lemma covariance_self_eq_variance (A : H →ₗ.[ℂ] H) (ψ : A.domain) :
+    covariance A A ψ (by exact ψ.2) = variance A ψ := by
+  rw [covariance_eq_re_inner_centered, variance_eq_centered_norm_sq, inner_self_eq_norm_sq_to_K]
   rw [sq, sq, Complex.mul_re]
   simp [Complex.ofReal_re, Complex.ofReal_im]
 
