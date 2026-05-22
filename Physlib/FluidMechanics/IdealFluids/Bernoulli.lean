@@ -25,28 +25,32 @@ open scoped InnerProductSpace
 open Time
 open Space
 
+namespace IdealFluid
+
 /-- Determines whether a flow is steady -/
-def IdealFluid.isSteady (F: IdealFluid) :
+def isSteady (F : IdealFluid) :
     Prop :=
       ∀ (pos : Space),
       ∂ₜ (F.velocity · pos) = 0
 
 /-- Definition of a material derivative -/
-noncomputable def IdealFluid.materialDerivative (t: Time) (pos: Space)
-(F: IdealFluid) (f: Time → Space → ℝ) :
+noncomputable def materialDerivative ( t: Time) (pos : Space)
+(F : IdealFluid) (f : Time → Space → ℝ) :
     ℝ :=
       ∂ₜ (f · pos) t +
       ⟪F.velocity t pos, ∇ (f t ·) pos ⟫_ℝ
 
 /-- Determines whether a flow is isentropic -/
-def IdealFluid.isIsentropic (F: IdealFluid):
+def isIsentropic (F : IdealFluid):
     Prop :=
-      ∀ (t: Time) (pos: Space),
+      ∀ (t : Time) (pos : Space),
       F.materialDerivative t pos F.entropy = 0
 
 /-- The Bernoulli function (1/2)v^2 + w -/
-noncomputable def IdealFluid.bernoulliEquation (F: IdealFluid)
-(t: Time) (pos: Space) (g: Space → ℝ):
+noncomputable def bernoulliEquation (F : IdealFluid)
+(t : Time) (pos : Space) (g : Space → ℝ):
     ℝ :=
       let v := F.velocity t pos
       0.5 * ⟪v, v⟫_ℝ + F.enthalpy t pos + g pos
+
+end IdealFluid

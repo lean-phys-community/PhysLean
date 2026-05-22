@@ -14,7 +14,7 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Div
 /-!
 # Continuity and Incompressibility
 
-This module formulates mass conservation by defining the condidtions for an ideal fluid to satisfy
+This module formulates mass conservation by defining the conditions for an ideal fluid to satisfy
 the `Continuity Equation`.
 
 Additionally, it defines the mathematical model for `incompressibility` of a fluid.
@@ -26,14 +26,18 @@ open scoped InnerProductSpace
 open Time
 open Space
 
+namespace IdealFluid
+
 /-- defining satisfying the equation of continuity -/
-public def IdealFluid.satisfiesContinuity (F : IdealFluid):
+public def satisfiesContinuity (F : IdealFluid):
     Prop :=
       ∀ (t : Time) (pos : Space),
       ∂ₜ (F.density · pos) t +
       Space.div (F.massFluxDensity t ·) pos = (0 : ℝ)
 
 /-- Criterion for incompressibility -/
-public def IdealFluid.isIncompressible (F : IdealFluid):
+public def isIncompressible (F : IdealFluid):
   Prop :=
     ∀ (t : Time) (pos : Space), ∂ₜ (F.density · pos) t = 0
+
+end IdealFluid
