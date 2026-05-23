@@ -252,15 +252,15 @@ lemma conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_sm
   simp [materialAcceleration, convectiveTerm, div, momentumDensity, smul_eq_mul]
   ring_nf
 
-/-- The conservative and convective momentum equations are equivalent when the continuity
-equation holds.
+/-- The conservative and convective momentum equations are equivalent when the classical
+continuity equation holds.
 
 The differentiability assumptions are exactly the product-rule assumptions used to rewrite
 `partial_t (rho u)` and `matrixDiv (rho u ⊗ u)`.
 -/
 theorem ConservativeMomentumEquation_iff_ConvectiveMomentumEquation
     (d : ℕ) (data : FluidInMomentumBalance d)
-    (hContinuity : ContinuityEquation d data.toFluidState)
+    (hContinuity : ClassicalContinuityEquation d data.toFluidState)
     (hRhoTime : ∀ t x,
       DifferentiableAt ℝ (fun t' => data.rho t' x) t)
     (hVelocityTime : ∀ t x,
@@ -272,8 +272,12 @@ theorem ConservativeMomentumEquation_iff_ConvectiveMomentumEquation
       ConvectiveMomentumEquation d data := by
   constructor
   · intro hConservative t x
+    have hMassFluxSpace :
+        DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
+      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
     have hResidual : continuityResidual d data.toFluidState t x = 0 := by
-      simpa [continuityResidual] using hContinuity t x
+      simpa [continuityResidual] using
+        hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace
     have hLhs := conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
       d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
       (hMomentumDensity t) (hVelocitySpace t)
@@ -287,8 +291,12 @@ theorem ConservativeMomentumEquation_iff_ConvectiveMomentumEquation
     rw [← hLhs']
     exact hConservative t x
   · intro hConvective t x
+    have hMassFluxSpace :
+        DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
+      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
     have hResidual : continuityResidual d data.toFluidState t x = 0 := by
-      simpa [continuityResidual] using hContinuity t x
+      simpa [continuityResidual] using
+        hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace
     have hLhs := conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
       d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
       (hMomentumDensity t) (hVelocitySpace t)

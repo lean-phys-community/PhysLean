@@ -16,14 +16,14 @@ The Navier-Stokes equations are a set of partial differential equations that des
 the motion of viscous fluid substances. They are fundamental in fluid dynamics and are
 used to model the behavior of fluids in various contexts, including gas flow and water flow.
 
-This file combines the continuity equation with the conservative and convective momentum
-equations. The stress tensor is left as an input field, so this is the balance-law layer
-before specializing to a Newtonian stress law.
+This file combines the classical continuity equation with the conservative and convective
+momentum equations. The stress tensor is left as an input field, so this is the
+balance-law layer before specializing to a Newtonian stress law.
 
 ## ii. Key results
 
-- `ConservativeForm` : Continuity and conservative momentum equations together.
-- `ConvectiveForm` : Continuity and convective momentum equations together.
+- `ConservativeForm` : Classical continuity and conservative momentum equations together.
+- `ConvectiveForm` : Classical continuity and convective momentum equations together.
 - `ConservativeForm_iff_ConvectiveForm` : Equivalence of the two forms when the
   fields are differentiable.
 
@@ -48,12 +48,12 @@ namespace NavierStokes
 
 /-- The conservative Navier-Stokes balance-law form with an externally supplied stress tensor. -/
 def ConservativeForm (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
-  ContinuityEquation d data.toFluidState ∧
+  ClassicalContinuityEquation d data.toFluidState ∧
     ConservativeMomentumEquation d data
 
 /-- The convective Navier-Stokes form with an externally supplied stress tensor. -/
 def ConvectiveForm (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
-  ContinuityEquation d data.toFluidState ∧
+  ClassicalContinuityEquation d data.toFluidState ∧
     ConvectiveMomentumEquation d data
 
 /-- The conservative and convective Navier-Stokes forms are equivalent when the fields are
