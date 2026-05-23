@@ -513,7 +513,7 @@ lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint 
 
 lemma IsEssentiallySelfAdjoint.hasDenseDomain [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
     T.HasDenseDomain :=
-  hasDenseDomain_iff_closure_hasDenseDomain.mpr (isEssentiallySelfAdjoint_def.mp h).dense_domain
+  hasDenseDomain_iff_closure_hasDenseDomain.mpr h.dense_domain
 
 lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
     T.IsSymmetric :=
