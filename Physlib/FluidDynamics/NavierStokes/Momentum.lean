@@ -21,11 +21,11 @@ balance-law layer before specializing to a Newtonian stress law.
 
 - `momentumDensity` : The vector momentum density `rho u`.
 - `momentumFlux` : The convective momentum flux `rho u ⊗ u`.
-- `ConservativeMomentumEquation` : Conservation of momentum using `Space.matrixDiv`.
+- `MomentumEquation` : Conservation of momentum using `Space.matrixDiv`.
 - `convectiveTerm` : The nonlinear transport term `(u · ∇)u`.
 - `materialAcceleration` : The material acceleration `∂ₜ u + (u · ∇)u`.
 - `ConvectiveMomentumEquation` : The momentum equation in convective form.
-- `ConservativeMomentumEquation_iff_ConvectiveMomentumEquation` : Equivalence of the two
+- `MomentumEquation_iff_ConvectiveMomentumEquation` : Equivalence of the two
   momentum equations when continuity holds and the fields are differentiable.
 
 ## iii. Table of contents
@@ -78,9 +78,9 @@ The equation is
 
 Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
-def ConservativeMomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
+def MomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
   ∀ t x,
-    ∂ₜ (fun t' => momentumDensity d data.toFluidState t' x) t +
+    ∂ₜ (momentumDensity d data.toFluidState · x) t +
         matrixDiv d (momentumFlux d data.toFluidState t) x =
       matrixDiv d (data.stress t) x +
         data.rho t x • data.bodyForce t x
@@ -92,14 +92,14 @@ def ConservativeMomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : P
 -/
 
 /-- The nonlinear transport term `(u · ∇)u`. -/
-noncomputable def convectiveTerm (d : ℕ) (velocity : VelocityField d) : VectorField d :=
-  fun t x => ∑ j, velocity t x j • ∂[j] (velocity t) x
+noncomputable def convectiveTerm (d : ℕ) (fluid : FluidState d) : VectorField d :=
+  fun t x => ∑ j, fluid.velocity t x j • ∂[j] (fluid.velocity t) x
 
 /-- The material acceleration `∂ₜ u + (u · ∇)u`. -/
-noncomputable def materialAcceleration (d : ℕ) (velocity : VelocityField d) : VectorField d :=
+noncomputable def materialAcceleration (d : ℕ) (fluid : FluidState d) : VectorField d :=
   fun t x =>
-    ∂ₜ (fun t' => velocity t' x) t +
-      convectiveTerm d velocity t x
+    ∂ₜ (fluid.velocity · x) t +
+      convectiveTerm d fluid t x
 
 /-- Conservation of momentum in convective form.
 
@@ -111,7 +111,7 @@ Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
 def ConvectiveMomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
   ∀ t x,
-    data.rho t x • materialAcceleration d data.velocity t x =
+    data.rho t x • materialAcceleration d data.toFluidState t x =
       matrixDiv d (data.stress t) x +
         data.rho t x • data.bodyForce t x
 
@@ -124,12 +124,12 @@ def ConvectiveMomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Pro
 /-- The left-hand side of the conservative momentum equation. -/
 noncomputable def conservativeMomentumLHS (d : ℕ) (fluid : FluidState d) : VectorField d :=
   fun t x =>
-    ∂ₜ (fun t' => momentumDensity d fluid t' x) t +
+    ∂ₜ (momentumDensity d fluid · x) t +
       matrixDiv d (momentumFlux d fluid t) x
 
 /-- The left-hand side of the convective momentum equation. -/
 noncomputable def convectiveMomentumLHS (d : ℕ) (fluid : FluidState d) : VectorField d :=
-  fun t x => fluid.rho t x • materialAcceleration d fluid.velocity t x
+  fun t x => fluid.rho t x • materialAcceleration d fluid t x
 
 /-- Product rule for the time derivative of a scalar field times a velocity field. -/
 lemma timeDeriv_smul_velocity (d : ℕ) (rhoAtPosition : Time → ℝ)
@@ -149,14 +149,13 @@ lemma timeDeriv_smul_velocity (d : ℕ) (rhoAtPosition : Time → ℝ)
 /-- Product rule for the time derivative of the momentum density `rho u`. -/
 lemma timeDeriv_momentumDensity (d : ℕ) (fluid : FluidState d)
     (t : Time) (x : Space d)
-    (hRho : DifferentiableAt ℝ (fun t' => fluid.rho t' x) t)
-    (hVelocity : DifferentiableAt ℝ (fun t' => fluid.velocity t' x) t) :
-    ∂ₜ (fun t' => momentumDensity d fluid t' x) t =
-      fluid.rho t x • ∂ₜ (fun t' => fluid.velocity t' x) t +
-        ∂ₜ (fun t' => fluid.rho t' x) t • fluid.velocity t x := by
+    (hRho : DifferentiableAt ℝ (fluid.rho · x) t)
+    (hVelocity : DifferentiableAt ℝ (fluid.velocity · x) t) :
+    ∂ₜ (momentumDensity d fluid · x) t =
+      fluid.rho t x • ∂ₜ (fluid.velocity · x) t +
+        ∂ₜ (fluid.rho · x) t • fluid.velocity t x := by
   simpa [momentumDensity] using
-    timeDeriv_smul_velocity d (fun t' => fluid.rho t' x)
-      (fun t' => fluid.velocity t' x) t hRho hVelocity
+    timeDeriv_smul_velocity d (fluid.rho · x) (fluid.velocity · x) t hRho hVelocity
 
 /-- Product rule for one spatial derivative of one component of `rho u ⊗ u`. -/
 lemma spaceDeriv_momentumFlux_component (d : ℕ) (fluid : FluidState d)
@@ -185,7 +184,7 @@ lemma matrixDiv_momentumFlux (d : ℕ) (fluid : FluidState d)
     (hVelocity : Differentiable ℝ (fluid.velocity t)) :
     matrixDiv d (momentumFlux d fluid t) x =
       (∇ ⬝ momentumDensity d fluid t) x • fluid.velocity t x +
-        fluid.rho t x • convectiveTerm d fluid.velocity t x := by
+        fluid.rho t x • convectiveTerm d fluid t x := by
   ext i
   simp [matrixDiv_apply, div, convectiveTerm, smul_eq_mul]
   change (∑ j, ∂[j] (fun x' =>
@@ -238,8 +237,8 @@ the continuity residual times the velocity field.
 lemma conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
     (d : ℕ) (fluid : FluidState d)
     (t : Time) (x : Space d)
-    (hRhoTime : DifferentiableAt ℝ (fun t' => fluid.rho t' x) t)
-    (hVelocityTime : DifferentiableAt ℝ (fun t' => fluid.velocity t' x) t)
+    (hRhoTime : DifferentiableAt ℝ (fluid.rho · x) t)
+    (hVelocityTime : DifferentiableAt ℝ (fluid.velocity · x) t)
     (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid t))
     (hVelocitySpace : Differentiable ℝ (fluid.velocity t)) :
     conservativeMomentumLHS d fluid t x =
@@ -258,17 +257,15 @@ continuity equation holds.
 The differentiability assumptions are exactly the product-rule assumptions used to rewrite
 `partial_t (rho u)` and `matrixDiv (rho u ⊗ u)`.
 -/
-theorem ConservativeMomentumEquation_iff_ConvectiveMomentumEquation
+theorem MomentumEquation_iff_ConvectiveMomentumEquation
     (d : ℕ) (data : FluidInMomentumBalance d)
     (hContinuity : ClassicalContinuityEquation d data.toFluidState)
-    (hRhoTime : ∀ t x,
-      DifferentiableAt ℝ (fun t' => data.rho t' x) t)
-    (hVelocityTime : ∀ t x,
-      DifferentiableAt ℝ (fun t' => data.velocity t' x) t)
+    (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
+    (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)
     (hMomentumDensity : ∀ t,
       Differentiable ℝ (momentumDensity d data.toFluidState t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
-    ConservativeMomentumEquation d data ↔
+    MomentumEquation d data ↔
       ConvectiveMomentumEquation d data := by
   constructor
   · intro hConservative t x

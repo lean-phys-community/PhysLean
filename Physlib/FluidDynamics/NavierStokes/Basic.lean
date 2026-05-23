@@ -49,7 +49,7 @@ namespace NavierStokes
 /-- The conservative Navier-Stokes balance-law form with an externally supplied stress tensor. -/
 def ConservativeForm (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
   ClassicalContinuityEquation d data.toFluidState ∧
-    ConservativeMomentumEquation d data
+    MomentumEquation d data
 
 /-- The convective Navier-Stokes form with an externally supplied stress tensor. -/
 def ConvectiveForm (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
@@ -60,10 +60,8 @@ def ConvectiveForm (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
 differentiable enough for the product rules. -/
 theorem ConservativeForm_iff_ConvectiveForm
     (d : ℕ) (data : FluidInMomentumBalance d)
-    (hRhoTime : ∀ t x,
-      DifferentiableAt ℝ (fun t' => data.rho t' x) t)
-    (hVelocityTime : ∀ t x,
-      DifferentiableAt ℝ (fun t' => data.velocity t' x) t)
+    (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
+    (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)
     (hMomentumDensity : ∀ t,
       Differentiable ℝ (momentumDensity d data.toFluidState t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
@@ -72,12 +70,12 @@ theorem ConservativeForm_iff_ConvectiveForm
   constructor
   · intro hConservative
     refine ⟨hConservative.1, ?_⟩
-    exact (ConservativeMomentumEquation_iff_ConvectiveMomentumEquation d data hConservative.1
+    exact (MomentumEquation_iff_ConvectiveMomentumEquation d data hConservative.1
       hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp
       hConservative.2
   · intro hConvective
     refine ⟨hConvective.1, ?_⟩
-    exact (ConservativeMomentumEquation_iff_ConvectiveMomentumEquation d data hConvective.1
+    exact (MomentumEquation_iff_ConvectiveMomentumEquation d data hConvective.1
       hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr
       hConvective.2
 
