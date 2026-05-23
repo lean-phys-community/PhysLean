@@ -62,6 +62,7 @@ public import Physlib.Mathematics.Fin
 public import Physlib.Mathematics.Fin.Involutions
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
 public import Physlib.Mathematics.Geometry.Metric.Riemannian.Defs
+public import Physlib.Mathematics.GoldenRatio
 public import Physlib.Mathematics.InnerProductSpace.Adjoint
 public import Physlib.Mathematics.InnerProductSpace.Basic
 public import Physlib.Mathematics.InnerProductSpace.Calculus
