@@ -47,11 +47,11 @@ public import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations
 public import Physlib.Electromagnetism.Vacuum.Constant
 public import Physlib.Electromagnetism.Vacuum.HarmonicWave
 public import Physlib.Electromagnetism.Vacuum.IsPlaneWave
-public import Physlib.Mathematics.Calculus.AdjFDeriv
 public import Physlib.FluidMechanics.IdealFluids.Basic
 public import Physlib.FluidMechanics.IdealFluids.Bernoulli
 public import Physlib.FluidMechanics.IdealFluids.Continuity
 public import Physlib.FluidMechanics.IdealFluids.Euler
+public import Physlib.Mathematics.Calculus.AdjFDeriv
 public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.Mathematics.DataStructures.FourTree.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
