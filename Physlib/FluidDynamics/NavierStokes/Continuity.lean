@@ -52,17 +52,14 @@ The equation is asserted at points where the time derivative of `rho` and the sp
 divergence of `rho u` are classical derivatives.
 -/
 def ClassicalContinuityEquation (d : ℕ) (fluid : FluidState d) : Prop :=
-  ∀ t x,
-    DifferentiableAt ℝ (fluid.rho · x) t →
+  ∀ t x, DifferentiableAt ℝ (fluid.rho · x) t →
       DifferentiableAt ℝ (fun x' => fluid.rho t x' • fluid.velocity t x') x →
         ∂ₜ (fluid.rho · x) t + (∇ ⬝ fun x' => fluid.rho t x' • fluid.velocity t x') x = 0
 
 /-- The scalar continuity-equation residual
 `partial_t rho + div (rho u)`. -/
-noncomputable def continuityResidual (d : ℕ) (fluid : FluidState d) :
-    Time → Space d → ℝ :=
-  fun t x =>
-    ∂ₜ (fluid.rho · x) t + (∇ ⬝ fun x' => fluid.rho t x' • fluid.velocity t x') x
+noncomputable def continuityResidual (d : ℕ) (fluid : FluidState d) : Time → Space d → ℝ :=
+  fun t x => ∂ₜ (fluid.rho · x) t + (∇ ⬝ fun x' => fluid.rho t x' • fluid.velocity t x') x
 
 /-- A stronger continuity equation for globally differentiable fields.
 
@@ -77,8 +74,7 @@ def SmoothContinuityEquation (d : ℕ) (fluid : FluidState d) : Prop :=
 
 /-- A smooth continuity equation satisfies the guarded classical continuity equation. -/
 lemma SmoothContinuityEquation.toClassical (d : ℕ) (fluid : FluidState d) :
-    SmoothContinuityEquation d fluid →
-      ClassicalContinuityEquation d fluid := by
+    SmoothContinuityEquation d fluid → ClassicalContinuityEquation d fluid := by
   intro hSmooth t x _ _
   simpa [continuityResidual] using hSmooth.2.2 t x
 
