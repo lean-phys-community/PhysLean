@@ -5,7 +5,7 @@ Authors: Alex Meiburg
 -/
 module
 
-public import QuantumInfo.Finite.Entropy.Defs
+public import QuantumInfo.Finite.AxiomatizedEntropy.Defs
 
 /-! # Quantum Relative Entropy and α-Renyi Entropy -/
 

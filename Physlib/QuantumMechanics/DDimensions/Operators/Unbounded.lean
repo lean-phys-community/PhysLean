@@ -33,6 +33,8 @@ these correspond to physical observables.
 
 ## ii. Key results
 
+- `LinearPMap.comp_domain` and `LinearPMap.comp_apply` : domain and application lemmas for
+    composition of partial linear maps.
 - `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
     dense domain.
 - `IsEssentiallySelfAdjoint.unique_self_adjoint_extension` : The closure of an essentially
@@ -44,14 +46,15 @@ these correspond to physical observables.
 
 ## iii. Table of contents
 
-- A. Definitions
-- B. Dense domain
-- C. Closability
-- D. Adjoints
-- E. Symmetric operators
-- F. Self-adjoint operators
-- G. Essentially self-adjoint operators
-- H. Unbounded operators
+- A. Basic partial linear map API
+- B. Definitions
+- C. Dense domain
+- D. Closability
+- E. Adjoints
+- F. Symmetric operators
+- G. Self-adjoint operators
+- H. Essentially self-adjoint operators
+- I. Unbounded operators
 
 ## iv. References
 
@@ -71,6 +74,35 @@ open InnerProductSpace
 open InnerProductSpaceSubmodule
 open Complex ComplexConjugate
 
+section Basic
+
+variable
+  {R : Type*} [Ring R]
+  {E : Type*} [AddCommGroup E] [Module R E]
+  {F : Type*} [AddCommGroup F] [Module R F]
+  {G : Type*} [AddCommGroup G] [Module R G]
+
+/-!
+## A. Basic partial linear map API
+
+This section contains lemmas for partial linear maps that are independent of the
+analytic structure used below.
+-/
+
+@[simp]
+lemma comp_domain (g : F →ₗ.[R] G) (f : E →ₗ.[R] F)
+    (H : ∀ x : f.domain, (f x : F) ∈ g.domain) :
+    (g.comp f H).domain = f.domain :=
+  rfl
+
+@[simp]
+lemma comp_apply (g : F →ₗ.[R] G) (f : E →ₗ.[R] F)
+    (H : ∀ x : f.domain, (f x : F) ∈ g.domain) (x : f.domain) :
+    g.comp f H x = g ⟨f x, H x⟩ :=
+  rfl
+
+end Basic
+
 variable
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {H' : Type*} [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
@@ -78,7 +110,7 @@ variable
   {U U₁ U₂ : H →ₗ.[ℂ] H'}
 
 /-!
-## A. Definitions
+## B. Definitions
 
 See `LinearPMap.instStar` and `LinearPMap.isSelfAdjoint_def` for the definition of `IsSelfAdjoint`
 for `LinearPMap`s.
@@ -106,7 +138,7 @@ lemma isEssentiallySelfAdjoint_def [CompleteSpace H] :
     T.IsEssentiallySelfAdjoint ↔ IsSelfAdjoint T.closure := Iff.rfl
 
 /-!
-## B. Dense domain
+## C. Dense domain
 -/
 
 lemma HasDenseDomain.isUnbounded_iff_isClosable (h : U.HasDenseDomain) :
@@ -129,7 +161,7 @@ lemma HasDenseDomain.sub_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain 
   h₁.mono (by simp [h_le, sub_domain])
 
 /-!
-## C. Closability
+## D. Closability
 -/
 
 lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U := by
@@ -210,7 +242,7 @@ lemma closure_smul (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) : (c • U).
   · rw [closure_def' h, closure_def' <| (not_congr <| IsClosable.smul_iff hc).mpr h]
 
 /-!
-## D. Adjoints
+## E. Adjoints
 -/
 
 /-- The adjoint of a zero LinearPMap (any domain) is zero (domain `⊤`). -/
@@ -277,7 +309,7 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
       adjoint_isFormalAdjoint h₂ ⟨u, u.2.2⟩ ⟨w, w.2.2⟩]
 
 /-!
-## E. Symmetric operators
+## F. Symmetric operators
 -/
 
 /-- The analogue of `inner_map_polarization` for LinearPMap. -/
@@ -370,7 +402,7 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
   exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
 
 /-!
-## F. Self-adjoint operators
+## G. Self-adjoint operators
 -/
 
 lemma IsSelfAdjoint.isSymmetric [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsSymmetric := by
@@ -413,7 +445,7 @@ lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint 
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
 /-!
-## G. Essentially self-adjoint operators
+## H. Essentially self-adjoint operators
 -/
 
 lemma IsEssentiallySelfAdjoint.isSymmetric [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
@@ -456,7 +488,7 @@ lemma IsEssentiallySelfAdjoint.neg [CompleteSpace H] (h : T.IsEssentiallySelfAdj
   neg_eq_neg_one_smul T ▸ h.smul (by norm_num) (by norm_num)
 
 /-!
-## H. Unbounded operators
+## I. Unbounded operators
 -/
 
 lemma IsUnbounded.hasDenseDomain (h : U.IsUnbounded) : U.HasDenseDomain := h.1
