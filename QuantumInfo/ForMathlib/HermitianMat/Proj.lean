@@ -210,6 +210,121 @@ theorem supportProj_eq_cfc : A.supportProj = A.cfc (if · = 0 then 0 else 1) := 
   simp [ Finset.sum_ite, Finset.filter_eq, Finset.filter_and ];
   rw [ Finset.sum_eq_single i ] <;> aesop
 
+section ComplexSupport
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+open RealInnerProductSpace
+
+/-- The support projection acts as the identity on the range of a Hermitian matrix. -/
+lemma supportProj_mul_self (A : HermitianMat d ℂ) :
+    A.supportProj.mat * A.mat = A.mat := by
+  have h_supportProj_mul_A :
+      ∀ v : d → ℂ, A.supportProj.val.mulVec (A.val.mulVec v) = A.val.mulVec v := by
+    intro v
+    have h_range : WithLp.toLp 2 (A.val.mulVec v) ∈ LinearMap.range A.val.toEuclideanLin := by
+      exact ⟨ _, rfl ⟩
+    have h_supportProj_mul_A :
+        ∀ v : EuclideanSpace ℂ d,
+          v ∈ LinearMap.range A.val.toEuclideanLin → A.supportProj.val.toEuclideanLin v = v := by
+      intro v hv
+      have h_supportProj_mul_A :
+          A.supportProj.val.toEuclideanLin v =
+            Submodule.orthogonalProjection (LinearMap.range A.val.toEuclideanLin) v := by
+        simp only [val_eq_coe, Submodule.coe_orthogonalProjection_apply]
+        simp [supportProj, projector]
+        simp only [Submodule.starProjection]
+        simp [-Submodule.coe_orthogonalProjection_apply]
+        have key : ∀ (f : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d),
+            Matrix.toEuclideanLin
+              ((LinearMap.toMatrix (EuclideanSpace.basisFun d ℂ).toBasis
+                (EuclideanSpace.basisFun d ℂ).toBasis) f) = f := by
+          intro f
+          rw [Matrix.toEuclideanLin, Matrix.toLpLin_eq_toLin]
+          exact Matrix.toLin_toMatrix _ _ f
+        have hsup : A.support = (Matrix.toEuclideanLin (↑A : Matrix d d ℂ)).range := by
+          simp [HermitianMat.support, HermitianMat.lin]
+        rw [key, LinearMap.comp_apply, Submodule.subtype_apply, hsup]
+        rfl
+      rw [h_supportProj_mul_A]
+      exact Submodule.eq_starProjection_of_mem_of_inner_eq_zero (by simpa using hv) (by simp)
+    exact congr(WithLp.ofLp $(h_supportProj_mul_A _ h_range))
+  exact Matrix.toLin'.injective (LinearMap.ext fun v => by simpa using h_supportProj_mul_A v)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The trace of a Hermitian matrix is its inner product with its support projection. -/
+lemma inner_supportProj_self (A : HermitianMat d ℂ) :
+    ⟪A, A.supportProj⟫ = A.trace := by
+  simp only [trace, IsMaximalSelfAdjoint.RCLike_selfadjMap, Matrix.trace, Matrix.diag_apply,
+    mat_apply, map_sum, RCLike.re_to_complex]
+  simp only [inner, IsMaximalSelfAdjoint.RCLike_selfadjMap, RCLike.re_to_complex]
+  convert congr_arg Complex.re (congr_arg Matrix.trace (HermitianMat.supportProj_mul_self A)) using 1
+  · simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, mat_apply, Complex.re_sum,
+      Complex.mul_re, Finset.sum_sub_distrib, mul_comm]
+    exact congrArg₂ _ Finset.sum_comm Finset.sum_comm
+  · simp only [Matrix.trace, Matrix.diag_apply, mat_apply, Complex.re_sum]
+
+/-- If the kernel of `B` is contained in the kernel of `A`, then the support projection of `B`
+acts as the identity on `A`. -/
+lemma mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
+    (h : B.ker ≤ A.ker) :
+    A.mat * B.supportProj.mat = A.mat := by
+  have h_supportProj_mul_B : B.supportProj.mat * B.mat = B.mat := by
+    exact supportProj_mul_self B
+  have h_range_A_subset_range_B :
+      LinearMap.range A.lin.toLinearMap ≤ LinearMap.range B.lin.toLinearMap := by
+    have h_orthogonal_complement :
+        LinearMap.range (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) =
+          (LinearMap.ker (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
+      have h_orthogonal_complement :
+          ∀ T : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d,
+            T = T.adjoint → LinearMap.range T = (LinearMap.ker T)ᗮ := by
+        intro T hT
+        refine' Submodule.eq_of_le_of_finrank_eq _ _
+        · rintro x ⟨y, rfl⟩
+          rw [Submodule.mem_orthogonal' (LinearMap.ker T) (T y)]
+          intro z hz
+          rw [LinearMap.mem_ker] at hz
+          simp [← LinearMap.adjoint_inner_right, ← hT, hz]
+        · have := LinearMap.finrank_range_add_finrank_ker T
+          have := Submodule.finrank_add_finrank_orthogonal (LinearMap.ker T)
+          linarith
+      apply h_orthogonal_complement
+      simp
+    have h_orthogonal_complement_A :
+        LinearMap.range (A.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) ≤
+          (LinearMap.ker (A.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
+      intro x hx y hy
+      simp_all only [LinearMap.mem_range, ContinuousLinearMap.coe_coe, LinearMap.mem_ker]
+      obtain ⟨z, rfl⟩ := hx
+      have h_orthogonal_complement_A :
+          ∀ y z : EuclideanSpace ℂ d, ⟪y, A.lin z⟫_ℂ = ⟪A.lin y, z⟫_ℂ := by
+        simp
+      rw [h_orthogonal_complement_A, hy, inner_zero_left]
+    exact h_orthogonal_complement.symm ▸
+      le_trans h_orthogonal_complement_A (Submodule.orthogonal_le h)
+  have h_supportProj_mul_A :
+      ∀ v : EuclideanSpace ℂ d, B.supportProj.mat.mulVec (A.mat.mulVec v) = A.mat.mulVec v := by
+    intro v
+    obtain ⟨w, hw⟩ : WithLp.toLp 2 (A.mat.mulVec v) ∈ LinearMap.range B.lin.toLinearMap := by
+      exact h_range_A_subset_range_B (Set.mem_range_self v)
+    replace h_supportProj_mul_B := congr(Matrix.mulVec $h_supportProj_mul_B w)
+    replace hw := congr(WithLp.ofLp $hw)
+    simp only [ContinuousLinearMap.coe_coe] at hw
+    simpa only [← hw, ← Matrix.mulVec_mulVec] using h_supportProj_mul_B
+  have h_matrix_eq :
+      ∀ M N : Matrix d d ℂ,
+        (∀ v : EuclideanSpace ℂ d, M.mulVec (N.mulVec v) = N.mulVec v) → M * N = N := by
+    intro M N hMN
+    ext i j
+    specialize hMN (WithLp.toLp 2 (Pi.single j 1))
+    replace hMN := congr_fun hMN i
+    aesop
+  rw [← Matrix.conjTranspose_inj]
+  simp_all only [Matrix.mulVec_mulVec, Matrix.conjTranspose_mul, conjTranspose_mat, implies_true]
+
+end ComplexSupport
+
 /-- Projector onto the non-negative eigenspace of `B - A`. Accessible by the notation
 `{A ≤ₚ B}`, which is scoped to `HermitianMat`. This is the unique maximum operator `P`
 such that `P^2 = P` and `P * A * P ≤ P * B * P` in the Loewner order. -/

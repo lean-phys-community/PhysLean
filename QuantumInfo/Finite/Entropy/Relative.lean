@@ -273,105 +273,6 @@ lemma HermitianMat.rpow_neg_mul_rpow_eq_supportProj
   convert congr_arg ( fun x : HermitianMat d ℂ => x.val ) h_cfc_eq using 1;
   exact congr_arg ( fun x : HermitianMat d ℂ => x.val ) ( supportProj_eq_cfc A )
 
-lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
-    A.supportProj.mat * A.mat = A.mat := by
-  have h_supportProj_mul_A : ∀ (v : d → ℂ), (A.supportProj.val.mulVec (A.val.mulVec v)) = (A.val.mulVec v) := by
-    intro v
-    have h_range : WithLp.toLp 2 (A.val.mulVec v) ∈ LinearMap.range A.val.toEuclideanLin := by
-      exact ⟨ _, rfl ⟩
-    have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), v ∈ LinearMap.range A.val.toEuclideanLin → (A.supportProj.val.toEuclideanLin v) = v := by
-      intro v hv
-      have h_supportProj_mul_A : (A.supportProj.val.toEuclideanLin v) = (Submodule.orthogonalProjection (LinearMap.range A.val.toEuclideanLin) v) := by
-        simp only [val_eq_coe, Submodule.coe_orthogonalProjection_apply]
-        simp [supportProj, projector]
-        simp only [Submodule.starProjection]
-        simp [-Submodule.coe_orthogonalProjection_apply]
-        have key : ∀ (f : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d),
-            Matrix.toEuclideanLin
-              ((LinearMap.toMatrix (EuclideanSpace.basisFun d ℂ).toBasis (EuclideanSpace.basisFun d ℂ).toBasis) f) = f := by
-          intro f
-          rw [Matrix.toEuclideanLin, Matrix.toLpLin_eq_toLin]
-          exact Matrix.toLin_toMatrix _ _ f
-        have hsup : A.support = (Matrix.toEuclideanLin (↑A : Matrix d d ℂ)).range := by
-          simp [HermitianMat.support, HermitianMat.lin]
-        rw [key, LinearMap.comp_apply, Submodule.subtype_apply, hsup]
-        rfl
-      rw [h_supportProj_mul_A]
-      exact Submodule.eq_starProjection_of_mem_of_inner_eq_zero (by simpa using hv) (by simp)
-    exact congr(WithLp.ofLp $(h_supportProj_mul_A _ h_range))
-  exact Matrix.toLin'.injective ( LinearMap.ext fun v => by simpa using h_supportProj_mul_A v )
-
-set_option backward.isDefEq.respectTransparency false in
-lemma HermitianMat.inner_supportProj_self (A : HermitianMat d ℂ) :
-    ⟪A, A.supportProj⟫ = A.trace := by
-  simp only [trace, IsMaximalSelfAdjoint.RCLike_selfadjMap, Matrix.trace, Matrix.diag_apply,
-    mat_apply, map_sum, RCLike.re_to_complex]
-  simp only [inner, IsMaximalSelfAdjoint.RCLike_selfadjMap, RCLike.re_to_complex];
-  convert congr_arg Complex.re ( congr_arg Matrix.trace ( HermitianMat.supportProj_mul_self A ) ) using 1;
-  · simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, mat_apply, Complex.re_sum,
-      Complex.mul_re, Finset.sum_sub_distrib, mul_comm];
-    exact congrArg₂ _ ( Finset.sum_comm ) ( Finset.sum_comm );
-  · simp only [Matrix.trace, Matrix.diag_apply, mat_apply, Complex.re_sum]
-
-lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
-  (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
-    A.mat * B.supportProj.mat = A.mat := by
-  -- Since $B.supportProj$ is the projection onto $range B$, we have $B.supportProj * B.mat = B.mat$.
-  have h_supportProj_mul_B : B.supportProj.mat * B.mat = B.mat := by
-    exact supportProj_mul_self B
-  have h_range_A_subset_range_B : LinearMap.range A.lin.toLinearMap ≤ LinearMap.range B.lin.toLinearMap := by
-    have h_orthogonal_complement : LinearMap.range (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) = (LinearMap.ker (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
-      have h_orthogonal_complement : ∀ (T : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d), T = T.adjoint → LinearMap.range T = (LinearMap.ker T)ᗮ := by
-        intro T hT;
-        refine' Submodule.eq_of_le_of_finrank_eq _ _;
-        · rintro x ⟨y, rfl⟩
-          rw [Submodule.mem_orthogonal' (LinearMap.ker T) (T y)]
-          intro z hz
-          rw [LinearMap.mem_ker] at hz
-          simp [← LinearMap.adjoint_inner_right, ← hT, hz]
-        · have := LinearMap.finrank_range_add_finrank_ker T;
-          have := Submodule.finrank_add_finrank_orthogonal (LinearMap.ker T)
-          linarith;
-      apply h_orthogonal_complement
-      simp
-    have h_orthogonal_complement_A : LinearMap.range (A.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) ≤ (LinearMap.ker (A.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
-      intro x hx y hy
-      simp_all only [LinearMap.mem_range, ContinuousLinearMap.coe_coe, LinearMap.mem_ker]
-      obtain ⟨ z, rfl ⟩ := hx;
-      have h_orthogonal_complement_A : ∀ (y z : EuclideanSpace ℂ d), ⟪y, A.lin z⟫_ℂ = ⟪A.lin y, z⟫_ℂ := by
-        simp
-      rw [ h_orthogonal_complement_A, hy, inner_zero_left ];
-    exact h_orthogonal_complement.symm ▸ le_trans h_orthogonal_complement_A ( Submodule.orthogonal_le h );
-  -- Since $B.supportProj$ is the projection onto $range B$, and $range A \subseteq range B$, we have $B.supportProj * A = A$.
-  have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), B.supportProj.mat.mulVec (A.mat.mulVec v) = A.mat.mulVec v := by
-    intro v
-    obtain ⟨w, hw⟩ : WithLp.toLp 2 (A.mat.mulVec v) ∈ LinearMap.range B.lin.toLinearMap := by
-      exact h_range_A_subset_range_B ( Set.mem_range_self v );
-    replace h_supportProj_mul_B := congr(Matrix.mulVec $h_supportProj_mul_B w)
-    replace hw := congr(WithLp.ofLp $hw)
-    simp only [ContinuousLinearMap.coe_coe] at hw
-    simpa only [← hw, ← Matrix.mulVec_mulVec] using h_supportProj_mul_B
-  -- By definition of matrix multiplication, if B.supportProj * A * v = A * v for all vectors v, then B.supportProj * A = A.
-  have h_matrix_eq : ∀ (M N : Matrix d d ℂ), (∀ v : EuclideanSpace ℂ d, M.mulVec (N.mulVec v) = N.mulVec v) → M * N = N := by
-    intro M N hMN
-    ext i j
-    specialize hMN (WithLp.toLp 2 ( Pi.single j 1 ))
-    replace hMN := congr_fun hMN i
-    aesop;
-  rw [← Matrix.conjTranspose_inj]
-  simp_all only [Matrix.mulVec_mulVec, Matrix.conjTranspose_mul, conjTranspose_mat, implies_true]
-
-set_option backward.isDefEq.respectTransparency false in
-lemma HermitianMat.inner_supportProj_of_ker_le {A B : HermitianMat d ℂ}
-  (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
-    ⟪A, B.supportProj⟫ = A.trace := by
-  rw [inner_def, mul_supportProj_of_ker_le h, trace]
-
-lemma supportProj_inner_density (h : σ.M.ker ≤ ρ.M.ker) :
-    ⟪σ.M.supportProj, ρ.M⟫_ℝ = 1 := by
-  rw [HermitianMat.inner_comm, HermitianMat.inner_supportProj_of_ker_le h]
-  simp
-
 set_option backward.isDefEq.respectTransparency false in
 /-
 ⟪ρ.M.conj (σ.M ^ t).mat, σ.M ^ (-2 * t)⟫_ℝ = 1 for density matrices ρ, σ with ker(σ) ≤ ker(ρ).
@@ -390,7 +291,8 @@ private lemma sandwiched_inner_eq_one (h : σ.M.ker ≤ ρ.M.ker) (t : ℝ) :
     rw [HermitianMat.inner_def, HermitianMat.conj_apply_mat, HermitianMat.conjTranspose_mat]
     rw [Matrix.trace_mul_comm, ← mul_assoc, ← mul_assoc, h_combine]
     rw [Matrix.trace_mul_cycle, h_support, ← HermitianMat.inner_def]
-    exact supportProj_inner_density h
+    rw [← ρ.tr, HermitianMat.inner_comm, HermitianMat.inner_def,
+      HermitianMat.mul_supportProj_of_ker_le h, HermitianMat.trace]
 
 private theorem sandwiched_trace_of_gt_1 (h : σ.M.ker ≤ ρ.M.ker) (hα : α > 1) :
     1 ≤ ((ρ.M.conj (σ.M ^ ((1 - α)/(2 * α)) ).mat) ^ α).trace := by
@@ -1476,10 +1378,14 @@ theorem sandwichedRelRentropy_additive_alpha_one_aux (ρ₁ σ₁ : MState d₁)
     constructor <;> apply HermitianMat.log_kron_with_proj;
   have h_inner_supportProj : ∀ (A : HermitianMat d₁ ℂ) (B : HermitianMat d₂ ℂ), ⟪A ⊗ₖ B, ρ₁ ⊗ᴹ ρ₂⟫ = ⟪A, ρ₁⟫ * ⟪B, ρ₂⟫ := by
     exact fun A B => HermitianMat.inner_kron A B ρ₁ ρ₂;
-  simp only [HermitianMat.ker] at h1 h2
+  have h1_support : ⟪ρ₁.M, σ₁.M.supportProj⟫ = 1 := by
+    rw [← ρ₁.tr, HermitianMat.inner_def, HermitianMat.mul_supportProj_of_ker_le h1,
+      HermitianMat.trace]
+  have h2_support : ⟪ρ₂.M, σ₂.M.supportProj⟫ = 1 := by
+    rw [← ρ₂.tr, HermitianMat.inner_def, HermitianMat.mul_supportProj_of_ker_le h2,
+      HermitianMat.trace]
   simp_all only [inner_sub_right, inner_add_right, real_inner_comm,
-    HermitianMat.inner_supportProj_self, MState.tr, mul_one, one_mul,
-    HermitianMat.inner_supportProj_of_ker_le]
+    HermitianMat.inner_supportProj_self, MState.tr, mul_one, one_mul]
   abel
 
 /-- The Sandwiched Renyi Relative Entropy, defined with ln (nits). Note that at `α = 1` this definition
@@ -2430,7 +2336,8 @@ private lemma HermitianMat.inner_log_sub_le_log_alpha (ρ : MState d) {σ₁ σ�
   rw [h_log_smul] at h_log_mono
   simp only [add_comm, sub_eq_add_neg, neg_add_rev] at h_log_mono h_log_smul ⊢
   have h_inner_support : ⟪ρ.M, σ₁.M.supportProj⟫ = 1 := by
-    rw [HermitianMat.inner_supportProj_of_ker_le hker₁, ρ.tr]
+    rw [← ρ.tr, HermitianMat.inner_def, HermitianMat.mul_supportProj_of_ker_le hker₁,
+      HermitianMat.trace]
   simp_all [← add_assoc, inner_add_right, inner_smul_right]
 
 set_option backward.isDefEq.respectTransparency false in
