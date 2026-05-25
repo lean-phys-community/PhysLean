@@ -226,6 +226,13 @@ theorem Braket.dot_self_eq_one (ψ : Ket d) :〈ψ‖ψ〉= 1 := by
     rw [Complex.normSq_eq_conj_mul_self]
   simpa [dot, Bra.eq_conj, h₁] using congr(Complex.ofReal $ψ.normalized)
 
+/-- Swapping the arguments conjugates the bra-ket product:
+    `⟨ψ₂|ψ₁⟩ = conj(⟨ψ₁|ψ₂⟩)`. -/
+theorem Braket.dot_swap_conj (ψ₁ ψ₂ : Ket d) :
+    〈ψ₂‖ψ₁〉 = starRingEnd ℂ 〈ψ₁‖ψ₂〉 := by
+  simp +decide [Braket.dot]
+  ac_rfl
+
 section prod
 variable {d d₁ d₂ : Type*} [Fintype d] [Fintype d₁] [Fintype d₂]
 

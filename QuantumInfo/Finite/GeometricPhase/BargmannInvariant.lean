@@ -64,20 +64,12 @@ lemma bargmannPhaseThree_degenerate (ψ : Ket d) :
 
 /-! ## Conjugacy -/
 
-/-- Swapping the arguments conjugates the bra-ket product:
-    `⟨ψ₂|ψ₁⟩ = conj(⟨ψ₁|ψ₂⟩)`.
-    TODO: this is a general property of `dot` and should be moved to `Braket.lean`. -/
-lemma dot_swap_conj (ψ₁ ψ₂ : Ket d) :
-    〈ψ₂‖ψ₁〉 = starRingEnd ℂ 〈ψ₁‖ψ₂〉 := by
-  simp +decide [Braket.dot]
-  ac_rfl
-
 /-- Reversing the cyclic order conjugates the invariant. -/
 lemma bargmannInvariantThree_reverse (ψ₁ ψ₂ ψ₃ : Ket d) :
     bargmannInvariantThree ψ₃ ψ₂ ψ₁ = starRingEnd ℂ (bargmannInvariantThree ψ₁ ψ₂ ψ₃) := by
   unfold bargmannInvariantThree
   conv_lhs =>
-    rw [dot_swap_conj ψ₂ ψ₃, dot_swap_conj ψ₁ ψ₂, dot_swap_conj ψ₃ ψ₁,
+    rw [Braket.dot_swap_conj ψ₂ ψ₃, Braket.dot_swap_conj ψ₁ ψ₂, Braket.dot_swap_conj ψ₃ ψ₁,
         ← map_mul, ← map_mul]
   congr 1; ring
 
