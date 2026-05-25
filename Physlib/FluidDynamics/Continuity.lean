@@ -10,12 +10,13 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Div
 public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
-# The Navier-Stokes continuity equation
+# Continuity equation for fluid flows
 
 ## i. Overview
 
-This module defines the classical conservative mass-balance equation for a fluid state and
-the corresponding continuity residual.
+This module defines the classical conservative mass-balance equation for a fluid state and the
+corresponding continuity residual. These definitions are independent of a particular momentum
+equation, so they can be reused by Navier-Stokes, Euler, and other fluid models.
 
 ## ii. Key results
 
@@ -38,7 +39,6 @@ open Space
 open Time
 
 namespace FluidDynamics
-namespace NavierStokes
 
 /-!
 
@@ -78,5 +78,4 @@ lemma SmoothContinuityEquation.toClassical (d : ℕ) (fluid : FluidState d) :
   intro hSmooth t x _ _
   simpa [continuityResidual] using hSmooth.2.2 t x
 
-end NavierStokes
 end FluidDynamics

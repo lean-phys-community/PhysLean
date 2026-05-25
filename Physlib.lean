@@ -74,10 +74,11 @@ public import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations
 public import Physlib.Electromagnetism.Vacuum.Constant
 public import Physlib.Electromagnetism.Vacuum.HarmonicWave
 public import Physlib.Electromagnetism.Vacuum.IsPlaneWave
+public import Physlib.FluidDynamics.Continuity
 public import Physlib.FluidDynamics.FluidState
 public import Physlib.FluidDynamics.Incompressible
+public import Physlib.FluidDynamics.Momentum
 public import Physlib.FluidDynamics.NavierStokes.Basic
-public import Physlib.FluidDynamics.NavierStokes.Continuity
 public import Physlib.FluidDynamics.NavierStokes.Momentum
 public import Physlib.Mathematics.Calculus.AdjFDeriv
 public import Physlib.Mathematics.Calculus.Divergence
