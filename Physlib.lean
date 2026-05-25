@@ -75,6 +75,8 @@ public import Physlib.Electromagnetism.Vacuum.Constant
 public import Physlib.Electromagnetism.Vacuum.HarmonicWave
 public import Physlib.Electromagnetism.Vacuum.IsPlaneWave
 public import Physlib.FluidDynamics.Continuity
+public import Physlib.FluidDynamics.Euler.Basic
+public import Physlib.FluidDynamics.Euler.Bernoulli
 public import Physlib.FluidDynamics.FluidState
 public import Physlib.FluidDynamics.Incompressible
 public import Physlib.FluidDynamics.Momentum
