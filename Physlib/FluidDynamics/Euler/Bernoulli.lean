@@ -20,6 +20,7 @@ conserved.
 ## ii. Key results
 
 - `FluidInBernoulliFlow` : Euler-flow data with enthalpy and potential fields.
+- `HasConservativeBodyForce` : Predicate encoding the convention `bodyForce = -grad Phi`.
 - `isSteady` : Predicate saying the velocity field has no time dependence.
 - `materialDerivative` : Material derivative of a scalar field along a fluid velocity field.
 - `isIsentropic` : Predicate saying the entropy is materially conserved.
@@ -31,9 +32,10 @@ conserved.
 ## iii. Table of contents
 
 - A. Bernoulli data
-- B. Flow-state predicates
-- C. Bernoulli function
-- D. Bernoulli-law predicates
+- B. Conservative-force convention
+- C. Flow-state predicates
+- D. Bernoulli function
+- E. Bernoulli-law predicates
 
 ## iv. References
 
@@ -56,8 +58,8 @@ namespace FluidDynamics
 /-- The fields needed for Bernoulli theory: Euler data, entropy, enthalpy, and an external
 potential.
 
-The potential is the scalar field `Phi` that would satisfy `bodyForce = -grad Phi` in the
-standard conservative-force setting. This relation is not imposed by the data structure.
+The potential is the potential energy per unit mass. In the conservative-force convention used
+below, it satisfies `bodyForce = -grad Phi`. This relation is not imposed by the data structure.
 -/
 structure FluidInBernoulliFlow (d : ℕ) extends FluidInEulerBalance d where
   /-- The specific entropy field. -/
@@ -69,7 +71,18 @@ structure FluidInBernoulliFlow (d : ℕ) extends FluidInEulerBalance d where
 
 /-!
 
-## B. Flow-state predicates
+## B. Conservative-force convention
+
+-/
+
+/-- A Bernoulli flow has conservative body force when its body force is minus the gradient of
+the potential energy per unit mass. -/
+def HasConservativeBodyForce (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
+  ∀ t x, data.bodyForce t x = -(∇ data.potential x)
+
+/-!
+
+## C. Flow-state predicates
 
 -/
 
@@ -88,7 +101,7 @@ def isIsentropic (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
 
 /-!
 
-## C. Bernoulli function
+## D. Bernoulli function
 
 -/
 
@@ -103,7 +116,7 @@ noncomputable def bernoulliFunction (d : ℕ) (data : FluidInBernoulliFlow d) : 
 
 /-!
 
-## D. Bernoulli-law predicates
+## E. Bernoulli-law predicates
 
 -/
 
