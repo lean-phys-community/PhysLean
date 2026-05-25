@@ -1,0 +1,79 @@
+/-
+Copyright (c) 2026 Florian Wiesner. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Florian Wiesner, Michał Mogielnicki
+-/
+module
+
+public import Physlib.FluidDynamics.FluidState
+public import Physlib.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.SpaceAndTime.Time.Derivatives
+/-!
+
+# Incompressible fluid flows
+
+## i. Overview
+
+This module defines general incompressibility predicates for fluid flows. These predicates are
+not tied to a particular equation of motion, so they can be reused later by incompressible
+Navier-Stokes, incompressible Euler, and Bernoulli-style developments.
+
+## ii. Key results
+
+- `incompressibilityResidual` : The divergence of the velocity field.
+- `ClassicalIncompressible` : Incompressibility guarded by velocity differentiability.
+- `SmoothIncompressible` : Incompressibility with globally differentiable velocity.
+- `SmoothIncompressible.toClassical` : Smooth incompressibility implies classical
+  incompressibility.
+- `DensityTimeIndependent` : A fluid flow whose density has zero time derivative.
+
+## iii. Table of contents
+
+- A. Incompressibility predicates
+
+## iv. References
+
+-/
+
+@[expose] public section
+
+open Space
+open Time
+
+namespace FluidDynamics
+
+/-!
+
+## A. Incompressibility predicates
+
+-/
+
+/-- The incompressibility residual, given by the divergence of the velocity field. -/
+noncomputable def incompressibilityResidual (d : ℕ) (fluid : FluidState d) :
+    Time → Space d → ℝ :=
+  fun t x => (∇ ⬝ fluid.velocity t) x
+
+/-- A classical incompressible flow has divergence-free velocity at points where the velocity
+field is differentiable. -/
+def ClassicalIncompressible (d : ℕ) (fluid : FluidState d) : Prop :=
+  ∀ t x, DifferentiableAt ℝ (fluid.velocity t) x →
+    incompressibilityResidual d fluid t x = 0
+
+/-- A smooth incompressible flow has globally differentiable velocity and vanishing
+incompressibility residual everywhere. -/
+def SmoothIncompressible (d : ℕ) (fluid : FluidState d) : Prop :=
+  (∀ t, Differentiable ℝ (fluid.velocity t)) ∧
+    ∀ t x, incompressibilityResidual d fluid t x = 0
+
+/-- A smooth incompressible flow is classically incompressible. -/
+lemma SmoothIncompressible.toClassical (d : ℕ) (fluid : FluidState d) :
+    SmoothIncompressible d fluid → ClassicalIncompressible d fluid := by
+  intro hSmooth t x _
+  simpa [incompressibilityResidual] using hSmooth.2 t x
+
+/-- A fluid flow has time-independent density when the density has zero time derivative at
+each spatial point. -/
+def DensityTimeIndependent (d : ℕ) (fluid : FluidState d) : Prop :=
+  ∀ t x, ∂ₜ (fluid.rho · x) t = 0
+
+end FluidDynamics
