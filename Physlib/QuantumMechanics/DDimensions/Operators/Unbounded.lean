@@ -47,6 +47,7 @@ these correspond to physical observables.
 - A. General
   - A.1. DistribMulAction
   - A.2. Finite sums
+  - A.3. Restricted composition
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
   - B.2. Dense domain
@@ -79,6 +80,8 @@ on an inner product/Hilbert space structure.
 
 section General
 
+open Submodule
+
 variable {R : Type*} [Ring R]
 variable {E : Type*} [AddCommGroup E] [Module R E]
 variable {F : Type*} [AddCommGroup F] [Module R F]
@@ -103,8 +106,6 @@ end
 
 section
 
-open Submodule
-
 variable {α : Type*} [Fintype α] (f : α → E →ₗ.[R] F)
 
 /-- A finite sum of partial linear maps.
@@ -121,6 +122,46 @@ lemma sum_domain_le (a : α) : (sum f).domain ≤ (f a).domain := fun _ _ ↦ by
 
 lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_le f a ψ.2⟩ := by
   simp [sum, inclusion_apply]
+
+end
+
+/-!
+### A.3. Restricted composition
+-/
+
+section
+
+variable {G : Type*} [AddCommGroup G] [Module R G]
+
+/-- The composition of `g` with the minimal restriction of `f` that ensures `g (f x)` is defined. -/
+def compRestricted (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : E →ₗ.[R] G :=
+  g.comp (f.domRestrict <| (g.domain.comap f.toFun).map f.domain.subtype) (by
+    intro ⟨x, h, _⟩
+    simp only [map_coe, subtype_apply, comap_coe, Set.mem_image, Set.mem_preimage,
+      toFun_eq_coe, SetLike.mem_coe] at h
+    obtain ⟨y, hy, hy'⟩ := h
+    rw [domRestrict_apply hy'.symm]
+    exact hy)
+
+lemma mem_compRestricted_domain_iff {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
+    x ∈ (g.compRestricted f).domain ↔ ∃ h : x ∈ f.domain, f ⟨x, h⟩ ∈ g.domain := by
+  change x ∈ (g.domain.comap f.toFun).map f.domain.subtype ⊓ f.domain ↔ _
+  simp
+
+/-- `compRestricted` is the same as `comp` when the range of `f` is contained in `g.domain`. -/
+lemma compRestricted_eq_comp
+    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (h : ∀ x : f.domain, f x ∈ g.domain) :
+    g.compRestricted f = g.comp f h := by
+  ext x
+  · change _ ↔ x ∈ f.domain
+    simp [mem_compRestricted_domain_iff, h]
+  · rfl
+
+/-- `compRestricted` is the maximal composition of `g` with a domain restriction of `f`. -/
+lemma compRestricted_ge {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {S : Submodule R E}
+    (h : ∀ x : (f.domRestrict S).domain, f ⟨x, x.2.2⟩ ∈ g.domain) :
+    g.comp (f.domRestrict S) h ≤ g.compRestricted f :=
+  ⟨fun x hx ↦ mem_compRestricted_domain_iff.mpr ⟨hx.2, h ⟨x, hx⟩⟩, by aesop⟩
 
 end
 
