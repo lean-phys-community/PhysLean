@@ -23,6 +23,9 @@ In this module we introduce unbounded operators defined by multiplication by a f
   (with maximal domain) with notation `𝓜 f`.
 - `mulOperator_adjoint_eq_conj` : For a.e. strongly measurable `f`, `(𝓜 f)† = 𝓜 (conj ∘ f)`
 - `mulOperator_isUnbounded` : For a.e. strongly measurable `f`, `𝓜 f` is an unbounded operator.
+- `mulOperator_comp_le` : The composition `𝓜 f ∘ᵣ 𝓜 g` is contained in `𝓜 (f • g)`.
+- `mulOperator_comp_eq` : The composition `𝓜 f ∘ᵣ 𝓜 g` is equal to `𝓜 (f • g)` when
+    `(𝓜 g).domain = ⊤`.
 
 ## iii. Table of contents
 
@@ -31,6 +34,7 @@ In this module we introduce unbounded operators defined by multiplication by a f
 - C. Adjoint
   - C.1. Self-adjoint
 - D. Closable & unbounded
+- E. Composition
 
 ## iv. References
 

@@ -35,6 +35,8 @@ these correspond to physical observables.
 
 - `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
     dense domain.
+- `adjoint_comp_le_comp_adjoint` : The inequality `U† ∘ V† ≤ (V ∘ U)†` when `V` and `V ∘ U` have
+    dense domain.
 - `IsEssentiallySelfAdjoint.unique_self_adjoint_extension` : The closure of an essentially
     self-adjoint unbounded operator is its unique self-adjoint extension.
 - `IsUnbounded.adjoint` : The adjoint of an unbounded operator is also unbounded.
