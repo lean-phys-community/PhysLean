@@ -148,6 +148,16 @@ lemma mem_compRestricted_domain_iff {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x
   change x ∈ (g.domain.comap f.toFun).map f.domain.subtype ⊓ f.domain ↔ _
   simp
 
+lemma apply_mem_domain_of_mem_compRestricted_domain
+    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g.compRestricted f).domain) :
+    f ⟨x, x.2.2⟩ ∈ g.domain := by
+  obtain ⟨_, h⟩ := mem_compRestricted_domain_iff.mp x.2
+  exact h
+
+lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g.compRestricted f).domain) :
+    g.compRestricted f x = g ⟨f ⟨x, x.2.2⟩, apply_mem_domain_of_mem_compRestricted_domain x⟩ :=
+  rfl
+
 /-- `compRestricted` is the same as `comp` when the range of `f` is contained in `g.domain`. -/
 lemma compRestricted_eq_comp
     {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (h : ∀ x : f.domain, f x ∈ g.domain) :

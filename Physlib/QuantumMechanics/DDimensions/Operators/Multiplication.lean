@@ -336,6 +336,38 @@ lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f
     (𝓜 f).IsUnbounded :=
   ⟨mulOperator_hasDenseDomain hf, mulOperator_isClosable hf⟩
 
+/-!
+## E. Composition
+-/
+
+lemma mulOperator_comp_le (f g : Space d → ℂ) : (𝓜 f).compRestricted (𝓜 g) ≤ 𝓜 (f • g) := by
+  constructor
+  · intro ψ hψ
+    obtain ⟨hψ, hgψ⟩ := mem_compRestricted_domain_iff.mp hψ
+    apply mem_mulOperator_domain_iff.mpr
+    refine memHS_of_ae _ (mem_mulOperator_domain_iff.mp hgψ) ?_
+    filter_upwards [mulOperator_apply_ae ⟨ψ, hψ⟩]
+    simp_all [mul_assoc]
+  · intro ψ φ hψφ
+    rw [compRestricted_apply]
+    apply ext_iff.mpr
+    obtain ⟨hψ, hgψ⟩ := mem_compRestricted_domain_iff.mp ψ.2
+    filter_upwards [mulOperator_apply_ae φ, mulOperator_apply_ae ⟨ψ, hψ⟩,
+      mulOperator_apply_ae ⟨𝓜 g ⟨ψ, hψ⟩, hgψ⟩]
+    simp_all [mul_assoc]
+
+lemma mulOperator_comp_eq (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 g).domain = ⊤) :
+    (𝓜 f).compRestricted (𝓜 g) = 𝓜 (f • g) := by
+  have hle := mulOperator_comp_le f g
+  refine eq_of_le_of_domain_eq hle ?_
+  refine eq_of_le_of_ge hle.1 fun ψ hψ ↦ ?_
+  apply mem_compRestricted_domain_iff.mpr
+  use h ▸ Submodule.mem_top
+  apply mem_mulOperator_domain_iff.mpr
+  refine memHS_of_ae _ (mem_mulOperator_domain_iff.mp hψ) ?_
+  filter_upwards [mulOperator_apply_ae ⟨ψ, h ▸ Submodule.mem_top⟩]
+  simp_all [mul_assoc]
+
 end
 end SpaceDHilbertSpace
 end QuantumMechanics
