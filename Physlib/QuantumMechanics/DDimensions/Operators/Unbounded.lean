@@ -181,9 +181,11 @@ open Complex ComplexConjugate
 variable
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {H' : Type*} [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+  {H'' : Type*} [NormedAddCommGroup H''] [InnerProductSpace ℂ H'']
   {α : Type*} [Fintype α]
   {T T₁ T₂ : H →ₗ.[ℂ] H} {S : α → H →ₗ.[ℂ] H}
-  {U U₁ U₂ : H →ₗ.[ℂ] H'} {V : α → H →ₗ.[ℂ] H'}
+  {U U₁ U₂ : H →ₗ.[ℂ] H'} {W : α → H →ₗ.[ℂ] H'}
+  {V V₁ V₂ : H' →ₗ.[ℂ] H''}
 
 instance : IsScalarTower ℝ ℂ H := IsScalarTower.complexToReal
 
@@ -255,8 +257,8 @@ lemma HasDenseDomain.sub_of_le (h₁ : U₁.HasDenseDomain) (h_le : U₁.domain 
   h₁.mono (by simp [h_le, sub_domain])
 
 lemma HasDenseDomain.sum_of_le
-    {E : Submodule ℂ H} (hE : Dense (E : Set H)) (h : ∀ a, E ≤ (V a).domain) :
-    (sum V).HasDenseDomain :=
+    {E : Submodule ℂ H} (hE : Dense (E : Set H)) (h : ∀ a, E ≤ (W a).domain) :
+    (sum W).HasDenseDomain :=
   hE.mono (by simp [sum_domain, h])
 
 /-!
@@ -406,6 +408,22 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
     simp only [add_apply, inner_add_left, inner_add_right, ← huv,
       adjoint_isFormalAdjoint h₁ ⟨u, u.2.1⟩ ⟨w, w.2.1⟩,
       adjoint_isFormalAdjoint h₂ ⟨u, u.2.2⟩ ⟨w, w.2.2⟩]
+
+/-- `U† ∘ V† ≤ (V ∘ U)†` -/
+lemma adjoint_comp_le_comp_adjoint [CompleteSpace H] [CompleteSpace H']
+    (hV : V.HasDenseDomain) (hVU : (V.compRestricted U).HasDenseDomain) :
+    U†.compRestricted V† ≤ (V.compRestricted U)† := by
+  have hU : U.HasDenseDomain := hVU.mono fun _ hx ↦ hx.2
+  have h : (U†.compRestricted V†).IsFormalAdjoint (V.compRestricted U) := by
+    intro x y
+    obtain ⟨_, hx⟩ := mem_compRestricted_domain_iff.mp x.2
+    obtain ⟨_, hy⟩ := mem_compRestricted_domain_iff.mp y.2
+    trans ⟪V† ⟨x, x.2.2⟩, U ⟨y, y.2.2⟩⟫_ℂ
+    · exact adjoint_isFormalAdjoint hU ⟨V† ⟨x, x.2.2⟩, hx⟩ ⟨y, y.2.2⟩
+    exact adjoint_isFormalAdjoint hV ⟨x, x.2.2⟩ ⟨U ⟨y, y.2.2⟩, hy⟩
+  constructor
+  · exact fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨U†.compRestricted V† ⟨x, hx⟩, h ⟨x, hx⟩⟩
+  · exact fun x y hxy ↦ (adjoint_apply_eq hVU y <| hxy ▸ h x).symm
 
 /-!
 ### B.5. Symmetric operators
