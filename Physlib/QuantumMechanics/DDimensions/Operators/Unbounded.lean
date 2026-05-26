@@ -510,6 +510,14 @@ lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
   simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
   exact add_comm _ _
 
+lemma IsSymmetric.comp_self (h : T.IsSymmetric) : (T ∘ᵣ T).IsSymmetric := by
+  intro x y
+  have hTx := mem_domain_of_mem_compRestricted_domain x
+  have hTy := mem_domain_of_mem_compRestricted_domain y
+  trans ⟪T ⟨x, x.2.2⟩, T ⟨y, y.2.2⟩⟫_ℂ
+  · exact h ⟨T ⟨x, x.2.2⟩, hTx⟩ ⟨y, y.2.2⟩
+  exact h ⟨x, x.2.2⟩ ⟨T ⟨y, y.2.2⟩, hTy⟩
+
 @[aesop safe apply]
 lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by simp [h x y]
 
