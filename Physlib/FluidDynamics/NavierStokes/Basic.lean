@@ -57,7 +57,7 @@ def ConvectiveNavierStokes (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
 
 /-- The conservative and convective Navier-Stokes forms are equivalent when the fields are
 differentiable enough for the product rules. -/
-theorem NavierStokes_iff_ConvectiveNavierStokes
+theorem navierStokes_iff_convectiveNavierStokes
     (d : ℕ) (data : FluidInMomentumBalance d)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)

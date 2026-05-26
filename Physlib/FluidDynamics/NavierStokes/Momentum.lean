@@ -25,7 +25,7 @@ balance-law layer before specializing to a Newtonian stress law.
 - `convectiveTerm` : The nonlinear transport term `(u · ∇)u`.
 - `materialAcceleration` : The material acceleration `∂ₜ u + (u · ∇)u`.
 - `ConvectiveMomentumEquation` : The momentum equation in convective form.
-- `MomentumEquation_iff_ConvectiveMomentumEquation` : Equivalence of the two
+- `momentumEquation_iff_convectiveMomentumEquation` : Equivalence of the two
   momentum equations when continuity holds and the fields are differentiable.
 
 ## iii. Table of contents
@@ -231,7 +231,7 @@ continuity equation holds.
 The differentiability assumptions are exactly the product-rule assumptions used to rewrite
 `partial_t (rho u)` and `matrixDiv (rho u ⊗ u)`.
 -/
-theorem MomentumEquation_iff_ConvectiveMomentumEquation
+theorem momentumEquation_iff_convectiveMomentumEquation
     (d : ℕ) (data : FluidInMomentumBalance d)
     (hContinuity : ClassicalContinuityEquation d data.toFluidState)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
