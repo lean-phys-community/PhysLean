@@ -192,7 +192,7 @@ private lemma exists_monotone_sets_hasFiniteIntegral
     fun n ↦ Metric.closedBall 0 n ∩ (w₁ ⁻¹' Metric.closedBall 0 n ∩ w₂ ⁻¹' Metric.closedBall 0 n)
   refine ⟨s, ?_, ?_, by measurability, ?_⟩
   · exact fun _ _ hmn _ hx ↦
-      ⟨ Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.1,
+      ⟨Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.1,
         Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.1,
         Metric.closedBall_subset_closedBall (Nat.cast_le.mpr hmn) hx.2.2⟩
   · ext x
