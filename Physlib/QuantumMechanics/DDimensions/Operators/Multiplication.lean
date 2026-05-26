@@ -340,7 +340,7 @@ lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f
 ## E. Composition
 -/
 
-lemma mulOperator_comp_le (f g : Space d → ℂ) : (𝓜 f).compRestricted (𝓜 g) ≤ 𝓜 (f • g) := by
+lemma mulOperator_comp_le (f g : Space d → ℂ) : 𝓜 f ∘ᵣ 𝓜 g ≤ 𝓜 (f • g) := by
   constructor
   · intro ψ hψ
     obtain ⟨hψ, hgψ⟩ := mem_compRestricted_domain_iff.mp hψ
@@ -349,7 +349,6 @@ lemma mulOperator_comp_le (f g : Space d → ℂ) : (𝓜 f).compRestricted (�
     filter_upwards [mulOperator_apply_ae ⟨ψ, hψ⟩]
     simp_all [mul_assoc]
   · intro ψ φ hψφ
-    rw [compRestricted_apply]
     apply ext_iff.mpr
     obtain ⟨hψ, hgψ⟩ := mem_compRestricted_domain_iff.mp ψ.2
     filter_upwards [mulOperator_apply_ae φ, mulOperator_apply_ae ⟨ψ, hψ⟩,
@@ -357,7 +356,7 @@ lemma mulOperator_comp_le (f g : Space d → ℂ) : (𝓜 f).compRestricted (�
     simp_all [mul_assoc]
 
 lemma mulOperator_comp_eq (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 g).domain = ⊤) :
-    (𝓜 f).compRestricted (𝓜 g) = 𝓜 (f • g) := by
+    𝓜 f ∘ᵣ 𝓜 g = 𝓜 (f • g) := by
   have hle := mulOperator_comp_le f g
   refine eq_of_le_of_domain_eq hle ?_
   refine eq_of_le_of_ge hle.1 fun ψ hψ ↦ ?_

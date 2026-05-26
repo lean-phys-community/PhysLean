@@ -127,13 +127,20 @@ end
 
 /-!
 ### A.3. Restricted composition
+
+The composition of two partial linear maps `g : F →ₗ.[R] G` and `f : E →ₗ.[R] F` is defined
+only if the range of `f` is contained in the domain of `g` (c.f. `LinearPMap.comp`).
+`g.compRestricted f` (`g ∘ᵣ f`) is defined to be the composition of `g` with the restriction of `f`
+to exactly those `x : f.domain` for which `f x ∈ g.domain`. This allows one to work with the
+composition of partial linear maps while having the domain implicitly accounted for.
 -/
 
 section
 
 variable {G : Type*} [AddCommGroup G] [Module R G]
 
-/-- The composition of `g` with the minimal restriction of `f` that ensures `g (f x)` is defined. -/
+/-- `g ∘ᵣ f` is the composition of `g` with `f` restricted to a domain consisting of exactly those
+  `x : f.domain` for which `f x ∈ g.domain`. -/
 def compRestricted (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : E →ₗ.[R] G :=
   g.comp (f.domRestrict <| (g.domain.comap f.toFun).map f.domain.subtype) (by
     intro ⟨x, h, _⟩
@@ -143,34 +150,37 @@ def compRestricted (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : E →ₗ.[R] G :=
     rw [domRestrict_apply hy'.symm]
     exact hy)
 
+@[inherit_doc compRestricted]
+infixr:80 " ∘ᵣ " => compRestricted
+
 lemma mem_compRestricted_domain_iff {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
-    x ∈ (g.compRestricted f).domain ↔ ∃ h : x ∈ f.domain, f ⟨x, h⟩ ∈ g.domain := by
+    x ∈ (g ∘ᵣ f).domain ↔ ∃ h : x ∈ f.domain, f ⟨x, h⟩ ∈ g.domain := by
   change x ∈ (g.domain.comap f.toFun).map f.domain.subtype ⊓ f.domain ↔ _
   simp
 
-lemma apply_mem_domain_of_mem_compRestricted_domain
-    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g.compRestricted f).domain) :
-    f ⟨x, x.2.2⟩ ∈ g.domain := by
+lemma mem_domain_of_mem_compRestricted_domain
+    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) : f ⟨x, x.2.2⟩ ∈ g.domain := by
   obtain ⟨_, h⟩ := mem_compRestricted_domain_iff.mp x.2
   exact h
 
-lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g.compRestricted f).domain) :
-    g.compRestricted f x = g ⟨f ⟨x, x.2.2⟩, apply_mem_domain_of_mem_compRestricted_domain x⟩ :=
+@[simp]
+lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) :
+    (g ∘ᵣ f) x = g ⟨f ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩ :=
   rfl
 
 /-- `compRestricted` is the same as `comp` when the range of `f` is contained in `g.domain`. -/
 lemma compRestricted_eq_comp
     {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (h : ∀ x : f.domain, f x ∈ g.domain) :
-    g.compRestricted f = g.comp f h := by
+    g ∘ᵣ f = g.comp f h := by
   ext x
   · change _ ↔ x ∈ f.domain
     simp [mem_compRestricted_domain_iff, h]
   · rfl
 
-/-- `compRestricted` is the maximal composition of `g` with a domain restriction of `f`. -/
-lemma compRestricted_ge {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {S : Submodule R E}
+/-- `compRestricted` is maximal amongst compositions of `g` with domain restrictions of `f`. -/
+lemma comp_le_compRestricted {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {S : Submodule R E}
     (h : ∀ x : (f.domRestrict S).domain, f ⟨x, x.2.2⟩ ∈ g.domain) :
-    g.comp (f.domRestrict S) h ≤ g.compRestricted f :=
+    g.comp (f.domRestrict S) h ≤ g ∘ᵣ f :=
   ⟨fun x hx ↦ mem_compRestricted_domain_iff.mpr ⟨hx.2, h ⟨x, hx⟩⟩, by aesop⟩
 
 end
@@ -419,20 +429,18 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
       adjoint_isFormalAdjoint h₁ ⟨u, u.2.1⟩ ⟨w, w.2.1⟩,
       adjoint_isFormalAdjoint h₂ ⟨u, u.2.2⟩ ⟨w, w.2.2⟩]
 
-/-- `U† ∘ V† ≤ (V ∘ U)†` -/
 lemma adjoint_comp_le_comp_adjoint [CompleteSpace H] [CompleteSpace H']
-    (hV : V.HasDenseDomain) (hVU : (V.compRestricted U).HasDenseDomain) :
-    U†.compRestricted V† ≤ (V.compRestricted U)† := by
+    (hV : V.HasDenseDomain) (hVU : (V ∘ᵣ U).HasDenseDomain) : U† ∘ᵣ V† ≤ (V ∘ᵣ U)† := by
   have hU : U.HasDenseDomain := hVU.mono fun _ hx ↦ hx.2
-  have h : (U†.compRestricted V†).IsFormalAdjoint (V.compRestricted U) := by
+  have h : (U† ∘ᵣ V†).IsFormalAdjoint (V ∘ᵣ U) := by
     intro x y
-    obtain ⟨_, hx⟩ := mem_compRestricted_domain_iff.mp x.2
-    obtain ⟨_, hy⟩ := mem_compRestricted_domain_iff.mp y.2
+    have hx := mem_domain_of_mem_compRestricted_domain x
+    have hy := mem_domain_of_mem_compRestricted_domain y
     trans ⟪V† ⟨x, x.2.2⟩, U ⟨y, y.2.2⟩⟫_ℂ
     · exact adjoint_isFormalAdjoint hU ⟨V† ⟨x, x.2.2⟩, hx⟩ ⟨y, y.2.2⟩
     exact adjoint_isFormalAdjoint hV ⟨x, x.2.2⟩ ⟨U ⟨y, y.2.2⟩, hy⟩
   constructor
-  · exact fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨U†.compRestricted V† ⟨x, hx⟩, h ⟨x, hx⟩⟩
+  · exact fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨(U† ∘ᵣ V†) ⟨x, hx⟩, h ⟨x, hx⟩⟩
   · exact fun x y hxy ↦ (adjoint_apply_eq hVU y <| hxy ▸ h x).symm
 
 /-!
