@@ -23,8 +23,8 @@ In this module we introduce unbounded operators defined by multiplication by a f
   (with maximal domain) with notation `𝓜 f`.
 - `mulOperator_adjoint_eq_conj` : For a.e. strongly measurable `f`, `(𝓜 f)† = 𝓜 (conj ∘ f)`
 - `mulOperator_isUnbounded` : For a.e. strongly measurable `f`, `𝓜 f` is an unbounded operator.
-- `mulOperator_comp_le` : The composition `𝓜 f ∘ᵣ 𝓜 g` is contained in `𝓜 (f • g)`.
-- `mulOperator_comp_eq` : The composition `𝓜 f ∘ᵣ 𝓜 g` is equal to `𝓜 (f • g)` when
+- `mulOperator_compRestricted_le` : The composition `𝓜 f ∘ᵣ 𝓜 g` is contained in `𝓜 (f • g)`.
+- `mulOperator_compRestricted_eq` : The composition `𝓜 f ∘ᵣ 𝓜 g` is equal to `𝓜 (f • g)` when
     `(𝓜 g).domain = ⊤`.
 
 ## iii. Table of contents
@@ -344,7 +344,7 @@ lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f
 ## E. Composition
 -/
 
-lemma mulOperator_comp_le (f g : Space d → ℂ) : 𝓜 f ∘ᵣ 𝓜 g ≤ 𝓜 (f • g) := by
+lemma mulOperator_compRestricted_le (f g : Space d → ℂ) : 𝓜 f ∘ᵣ 𝓜 g ≤ 𝓜 (f • g) := by
   constructor
   · intro ψ hψ
     obtain ⟨hψ, hgψ⟩ := mem_compRestricted_domain_iff.mp hψ
@@ -359,9 +359,9 @@ lemma mulOperator_comp_le (f g : Space d → ℂ) : 𝓜 f ∘ᵣ 𝓜 g ≤ �
       mulOperator_apply_ae ⟨𝓜 g ⟨ψ, hψ⟩, hgψ⟩]
     simp_all [mul_assoc]
 
-lemma mulOperator_comp_eq (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 g).domain = ⊤) :
+lemma mulOperator_compRestricted_eq (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 g).domain = ⊤) :
     𝓜 f ∘ᵣ 𝓜 g = 𝓜 (f • g) := by
-  have hle := mulOperator_comp_le f g
+  have hle := mulOperator_compRestricted_le f g
   refine eq_of_le_of_domain_eq hle ?_
   refine eq_of_le_of_ge hle.1 fun ψ hψ ↦ ?_
   apply mem_compRestricted_domain_iff.mpr

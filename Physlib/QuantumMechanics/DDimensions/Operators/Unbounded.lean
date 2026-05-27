@@ -35,8 +35,8 @@ these correspond to physical observables.
 
 - `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
     dense domain.
-- `adjoint_comp_le_comp_adjoint` : The inequality `U† ∘ V† ≤ (V ∘ U)†` when `V` and `V ∘ U` have
-    dense domain.
+- `adjoint_compRestricted_le_compRestricted_adjoint` : The inequality `U† ∘ᵣ V† ≤ (V ∘ᵣ U)†`
+    when `V` and `V ∘ᵣ U` have dense domain.
 - `IsEssentiallySelfAdjoint.unique_self_adjoint_extension` : The closure of an essentially
     self-adjoint unbounded operator is its unique self-adjoint extension.
 - `IsUnbounded.adjoint` : The adjoint of an unbounded operator is also unbounded.
@@ -431,7 +431,7 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
       adjoint_isFormalAdjoint h₁ ⟨u, u.2.1⟩ ⟨w, w.2.1⟩,
       adjoint_isFormalAdjoint h₂ ⟨u, u.2.2⟩ ⟨w, w.2.2⟩]
 
-lemma adjoint_comp_le_comp_adjoint [CompleteSpace H] [CompleteSpace H']
+lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [CompleteSpace H']
     (hV : V.HasDenseDomain) (hVU : (V ∘ᵣ U).HasDenseDomain) : U† ∘ᵣ V† ≤ (V ∘ᵣ U)† := by
   have hU : U.HasDenseDomain := hVU.mono fun _ hx ↦ hx.2
   have h : (U† ∘ᵣ V†).IsFormalAdjoint (V ∘ᵣ U) := by
@@ -510,7 +510,7 @@ lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
   simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
   exact add_comm _ _
 
-lemma IsSymmetric.comp_self (h : T.IsSymmetric) : (T ∘ᵣ T).IsSymmetric := by
+lemma IsSymmetric.compRestricted_self (h : T.IsSymmetric) : (T ∘ᵣ T).IsSymmetric := by
   intro x y
   have hTx := mem_domain_of_mem_compRestricted_domain x
   have hTy := mem_domain_of_mem_compRestricted_domain y
