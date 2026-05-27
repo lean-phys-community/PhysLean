@@ -39,12 +39,10 @@ open Complex Matrix
 
 noncomputable section
 
-namespace GeometricPhase
-
-/-! ## The Bloch sphere -/
-
 /-- The Bloch sphere: unit sphere in `EuclideanSpace ℝ (Fin 3)`. -/
 abbrev BlochSphere := Metric.sphere (0 : EuclideanSpace ℝ (Fin 3)) 1
+
+namespace BlochSphere
 
 /-- The raw Bloch vector for angles (α, θ). Internal helper for `blochPoint`. -/
 private def blochVecRaw (α θ : ℝ) : Fin 3 → ℝ :=
@@ -105,4 +103,4 @@ lemma dot_blochPoint (α₁ θ₁ α₂ θ₂ : ℝ) :
     Real.sin θ₁ * Real.sin θ₂ from by rw [Real.cos_sub]; ring]
   ring
 
-end GeometricPhase
+end BlochSphere
