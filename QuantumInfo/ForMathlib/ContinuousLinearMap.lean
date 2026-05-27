@@ -5,9 +5,6 @@ Authors: Alex Meiburg
 -/
 module
 
-public import Mathlib.Topology.Algebra.Module.LinearMap
-
-public import Mathlib.Analysis.CStarAlgebra.Classes
 public import Mathlib.Analysis.InnerProductSpace.Spectrum
 public import Mathlib.Order.CompletePartialOrder
 

@@ -68,7 +68,7 @@ lemma div_ne_zero (x y : MassUnit) : ¬ x / y = (0 : ℝ≥0) := by
 @[simp]
 lemma div_pos (x y : MassUnit) : (0 : ℝ≥0) < x/ y := by
   apply lt_of_le_of_ne
-  · exact zero_le (x / y)
+  · exact zero_le
   · exact Ne.symm (div_ne_zero x y)
 
 set_option backward.isDefEq.respectTransparency false in
@@ -76,6 +76,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma div_self (x : MassUnit) :
     x / x = (1 : ℝ≥0) := by
   simp [div_eq_val, x.val_ne_zero]
+  rfl
 
 lemma div_symm (x y : MassUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by

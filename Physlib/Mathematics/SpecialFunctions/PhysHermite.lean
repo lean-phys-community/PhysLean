@@ -136,7 +136,7 @@ lemma iterate_derivative_physHermite_self {n : ℕ} :
       Nat.cast_inj, pow_eq_zero_iff', OfNat.ofNat_ne_zero, ne_eq, false_and, or_false]
     rw [Nat.descFactorial_self]
   | m + 1 =>
-    rw [coeff_physHermite_of_lt (by omega), Polynomial.coeff_C_ne_zero (by omega)]
+    rw [coeff_physHermite_of_lt (by omega), Polynomial.coeff_C_of_ne_zero (by omega)]
     rfl
 
 @[simp]
@@ -291,7 +291,7 @@ lemma guassian_integrable_polynomial {b : ℝ} (hb : 0 < b) (P : Polynomial ℤ)
   conv =>
     enter [1, x]
     rw [Polynomial.aeval_eq_sum_range, Finset.sum_mul]
-  apply MeasureTheory.integrable_finset_sum
+  apply MeasureTheory.integrable_finsetSum
   intro i hi
   have h2 : (fun a => P.coeff i • a ^ i * Real.exp (-b * a ^ 2)) =
       (P.coeff i : ℝ) • (fun x => (x ^ (i : ℝ) * Real.exp (-b * x ^ 2))) := by
@@ -309,7 +309,7 @@ lemma guassian_integrable_polynomial_cons {b c : ℝ} (hb : 0 < b) (P : Polynomi
   conv =>
     enter [1, x]
     rw [Polynomial.aeval_eq_sum_range, Finset.sum_mul]
-  apply MeasureTheory.integrable_finset_sum
+  apply MeasureTheory.integrable_finsetSum
   intro i hi
   have h2 : (fun a => P.coeff i • (c * a) ^ i * Real.exp (-b * a ^ 2)) =
       (c ^ i * P.coeff i : ℝ) • (fun x => (x ^ (i : ℝ) * Real.exp (-b * x ^ 2))) := by
