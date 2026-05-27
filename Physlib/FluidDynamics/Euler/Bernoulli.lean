@@ -21,9 +21,9 @@ conserved.
 
 - `FluidInBernoulliFlow` : Euler-flow data with enthalpy and potential fields.
 - `HasConservativeBodyForce` : Predicate encoding the convention `bodyForce = -grad Phi`.
-- `isSteady` : Predicate saying the velocity field has no time dependence.
+- `IsSteady` : Predicate saying the velocity field has no time dependence.
 - `materialDerivative` : Material derivative of a scalar field along a fluid velocity field.
-- `isIsentropic` : Predicate saying the entropy is materially conserved.
+- `IsIsentropic` : Predicate saying the entropy is materially conserved.
 - `specificKineticEnergy` : The specific kinetic energy `|u|^2 / 2`.
 - `bernoulliFunction` : The Bernoulli function `|u|^2 / 2 + h + Phi`.
 - `LocalBernoulliLaw` : Vanishing spatial gradient of the Bernoulli function.
@@ -87,7 +87,7 @@ def HasConservativeBodyForce (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
 -/
 
 /-- A fluid state is steady when the velocity has zero time derivative everywhere. -/
-def isSteady (d : ℕ) (fluid : FluidState d) : Prop :=
+def IsSteady (d : ℕ) (fluid : FluidState d) : Prop :=
   ∀ t x, ∂ₜ (fluid.velocity · x) t = 0
 
 /-- The material derivative `D_t f = partial_t f + u · grad f` of a scalar field. -/
@@ -96,7 +96,7 @@ noncomputable def materialDerivative (d : ℕ) (fluid : FluidState d)
   fun t x => ∂ₜ (field · x) t + ⟪fluid.velocity t x, ∇ (field t) x⟫_ℝ
 
 /-- A Bernoulli flow is isentropic when the entropy is materially conserved. -/
-def isIsentropic (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
+def IsIsentropic (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
   ∀ t x, materialDerivative d data.toFluidState data.entropy t x = 0
 
 /-!

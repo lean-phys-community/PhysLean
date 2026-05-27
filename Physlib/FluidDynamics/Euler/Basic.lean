@@ -20,15 +20,15 @@ reuse the corresponding Navier-Stokes balance-law definitions.
 ## ii. Key results
 
 - `FluidInEulerBalance` : A fluid state with pressure and body force.
-- `eulerMomentumRHS` : The pressure-gradient and body-force side of Euler momentum balance.
+- `eulerForceDensity` : The pressure-gradient and body-force density in Euler momentum balance.
 - `Euler` : Classical continuity and conservative Euler momentum together.
-- `euler_iff_convectiveEuler` : Equivalence of the conservative and convective forms when the
+- `euler_iff_convective_euler` : Equivalence of the conservative and convective forms when the
   fields are differentiable.
 
 ## iii. Table of contents
 
 - A. Euler data
-- B. Euler momentum right-hand side
+- B. Euler force density
 - C. Euler equation
 - D. Equivalence of conservative and convective Euler forms
 
@@ -58,12 +58,12 @@ structure FluidInEulerBalance (d : ℕ) extends FluidState d where
 
 /-!
 
-## B. Euler momentum right-hand side
+## B. Euler force density
 
 -/
 
-/-- The right-hand side of Euler momentum balance, `-grad p + rho f`. -/
-noncomputable def eulerMomentumRHS (d : ℕ) (data : FluidInEulerBalance d) : VectorField d :=
+/-- The force density in Euler momentum balance, `-grad p + rho f`. -/
+noncomputable def eulerForceDensity (d : ℕ) (data : FluidInEulerBalance d) : VectorField d :=
   fun t x => -(∇ (data.pressure t) x) + data.rho t x • data.bodyForce t x
 
 /-!
@@ -75,7 +75,7 @@ noncomputable def eulerMomentumRHS (d : ℕ) (data : FluidInEulerBalance d) : Ve
 /-- The conservative Euler equations: classical continuity and conservative momentum balance. -/
 def Euler (d : ℕ) (data : FluidInEulerBalance d) : Prop :=
   ClassicalContinuityEquation d data.toFluidState ∧
-    ∀ t x, conservativeMomentumLHS d data.toFluidState t x = eulerMomentumRHS d data t x
+    ∀ t x, conservativeMomentumLHS d data.toFluidState t x = eulerForceDensity d data t x
 
 /-!
 
@@ -85,7 +85,7 @@ def Euler (d : ℕ) (data : FluidInEulerBalance d) : Prop :=
 
 /-- The conservative and convective Euler forms are equivalent when the fields are
 differentiable enough for the product rules. -/
-theorem euler_iff_convectiveEuler
+theorem euler_iff_convective_euler
     (d : ℕ) (data : FluidInEulerBalance d)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)
@@ -94,7 +94,7 @@ theorem euler_iff_convectiveEuler
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
     Euler d data ↔
       ClassicalContinuityEquation d data.toFluidState ∧
-        ∀ t x, convectiveMomentumLHS d data.toFluidState t x = eulerMomentumRHS d data t x := by
+        ∀ t x, convectiveMomentumLHS d data.toFluidState t x = eulerForceDensity d data t x := by
   constructor
   · intro hConservative
     refine ⟨hConservative.1, ?_⟩
