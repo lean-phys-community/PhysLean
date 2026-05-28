@@ -33,6 +33,10 @@ these correspond to physical observables.
 
 ## ii. Key results
 
+- `LinearPMap.compRestricted` : For two partial linear maps `g : F →ₗ[R] G` and `f : E →ₗ[R] F`,
+    the composition of `g` with `f` with natural domain `{x : f.domain | f x ∈ g.domain}`.
+- `LinearPMap.instMonoid` : Partial linear maps `E →ₗ.[R] E` with `compRestricted`
+    for multiplication and the identity map for `1` comprise a monoid.
 - `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
     dense domain.
 - `adjoint_compRestricted_le_compRestricted_adjoint` : The inequality `U† ∘ᵣ V† ≤ (V ∘ᵣ U)†`
@@ -123,6 +127,7 @@ lemma sum_domain : (sum f).domain = ⨅ a, (f a).domain := rfl
 
 lemma sum_domain_le (a : α) : (sum f).domain ≤ (f a).domain := fun _ _ ↦ by simp_all [sum, mem_iInf]
 
+@[simp]
 lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_le f a ψ.2⟩ := by
   simp [sum, inclusion_apply]
 
@@ -174,6 +179,7 @@ lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘
     (g ∘ᵣ f) x = g ⟨f ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩ :=
   rfl
 
+/-- The zero map is right-absorbing. -/
 @[simp]
 lemma compRestricted_zero (g : F →ₗ.[R] G) : g ∘ᵣ (0 : E →ₗ.[R] F) = 0 := by
   ext
@@ -228,7 +234,7 @@ end
 ### A.4. Monoid
 
 Partial linear maps `E →ₗ.[R] E` with `compRestricted` for multiplication and
-the identity (domain `⊤`) for `1` comprise a monoid.
+the identity map (domain `⊤`) for `1` comprise a monoid.
 -/
 
 instance instMonoid : Monoid (E →ₗ.[R] E) where
@@ -245,6 +251,8 @@ instance instMonoid : Monoid (E →ₗ.[R] E) where
     ext
     · simp [mem_compRestricted_domain_iff]
     · rfl
+
+lemma mul_def (f₁ f₂ : E →ₗ.[R] E) : f₁ * f₂ = f₁ ∘ᵣ f₂ := rfl
 
 @[simp]
 lemma one_domain : (1 : E →ₗ.[R] E).domain = ⊤ := rfl
@@ -514,7 +522,7 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
 
 lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [CompleteSpace H']
     (hV : V.HasDenseDomain) (hVU : (V ∘ᵣ U).HasDenseDomain) : U† ∘ᵣ V† ≤ (V ∘ᵣ U)† := by
-  have hU : U.HasDenseDomain := hVU.mono fun _ hx ↦ hx.2
+  have hU : U.HasDenseDomain := hVU.mono (compRestricted_domain_le V U)
   have h : (U† ∘ᵣ V†).IsFormalAdjoint (V ∘ᵣ U) := by
     intro x y
     have hx := mem_domain_of_mem_compRestricted_domain x
