@@ -50,6 +50,7 @@ these correspond to physical observables.
   - A.1. DistribMulAction
   - A.2. Finite sums
   - A.3. Restricted composition
+  - A.4. Monoid
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
   - B.2. Dense domain
@@ -185,7 +186,40 @@ lemma comp_le_compRestricted {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {S : Subm
     g.comp (f.domRestrict S) h ≤ g ∘ᵣ f :=
   ⟨fun x hx ↦ mem_compRestricted_domain_iff.mpr ⟨hx.2, h ⟨x, hx⟩⟩, by aesop⟩
 
+lemma compRestricted_assoc {H : Type*} [AddCommGroup H] [Module R H]
+    (f₁ : G →ₗ.[R] H) (f₂ : F →ₗ.[R] G) (f₃ : E →ₗ.[R] F) :
+    (f₁ ∘ᵣ f₂) ∘ᵣ f₃ = f₁ ∘ᵣ f₂ ∘ᵣ f₃ := by
+  ext
+  · simp only [mem_compRestricted_domain_iff]
+    tauto
+  · rfl
+
 end
+
+/-!
+### A.4. Monoid
+
+Partial linear maps `E →ₗ.[R] E` with `compRestricted` for multiplication and
+the identity (domain `⊤`) for `1` comprise a monoid.
+-/
+
+instance instMonoid : Monoid (E →ₗ.[R] E) where
+  mul := compRestricted
+  mul_assoc := compRestricted_assoc
+  one := ⟨⊤, topEquiv.toLinearMap⟩
+  one_mul f := by
+    change ⟨⊤, topEquiv.toLinearMap⟩ ∘ᵣ f = f
+    ext
+    · simp [mem_compRestricted_domain_iff]
+    · rfl
+  mul_one f := by
+    change f ∘ᵣ ⟨⊤, topEquiv.toLinearMap⟩ = f
+    ext
+    · simp [mem_compRestricted_domain_iff]
+    · rfl
+
+@[simp]
+lemma one_domain : (1 : E →ₗ.[R] E).domain = ⊤ := rfl
 
 end General
 
