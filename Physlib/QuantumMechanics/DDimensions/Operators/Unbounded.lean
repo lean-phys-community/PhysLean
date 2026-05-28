@@ -156,6 +156,9 @@ def compRestricted (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : E →ₗ.[R] G :=
 @[inherit_doc compRestricted]
 infixr:80 " ∘ᵣ " => compRestricted
 
+lemma compRestricted_domain_le (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : (g ∘ᵣ f).domain ≤ f.domain :=
+  fun _ h ↦ h.2
+
 lemma mem_compRestricted_domain_iff {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
     x ∈ (g ∘ᵣ f).domain ↔ ∃ h : x ∈ f.domain, f ⟨x, h⟩ ∈ g.domain := by
   change x ∈ (g.domain.comap f.toFun).map f.domain.subtype ⊓ f.domain ↔ _
@@ -193,6 +196,31 @@ lemma compRestricted_assoc {H : Type*} [AddCommGroup H] [Module R H]
   · simp only [mem_compRestricted_domain_iff]
     tauto
   · rfl
+
+@[simp]
+lemma compRestricted_zero (g : F →ₗ.[R] G) : g ∘ᵣ (0 : E →ₗ.[R] F) = 0 := by
+  ext
+  · simp [mem_compRestricted_domain_iff]
+  · exact g.map_zero
+
+lemma compRestricted_mono_left {g g' : F →ₗ.[R] G} (h : g ≤ g') (f : E →ₗ.[R] F) :
+    g ∘ᵣ f ≤ g' ∘ᵣ f := by
+  constructor
+  · intro x hx
+    obtain ⟨hx', hfx⟩ := mem_compRestricted_domain_iff.mp hx
+    exact mem_compRestricted_domain_iff.mpr ⟨hx', h.1 hfx⟩
+  · intro x y hxy
+    exact @h.2 ⟨f ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩
+      ⟨f ⟨y, y.2.2⟩, mem_domain_of_mem_compRestricted_domain y⟩ (by simp [hxy])
+
+lemma compRestricted_mono_right (g : F →ₗ.[R] G) {f f' : E →ₗ.[R] F} (h : f ≤ f') :
+    g ∘ᵣ f ≤ g ∘ᵣ f' := by
+  constructor
+  · intro x hx
+    obtain ⟨hx', hfx⟩ := mem_compRestricted_domain_iff.mp hx
+    exact mem_compRestricted_domain_iff.mpr ⟨h.1 hx', (@h.2 ⟨x, hx'⟩ ⟨x, h.1 hx'⟩ rfl) ▸ hfx⟩
+  · intro x y hxy
+    simp only [compRestricted_apply, @h.2 ⟨x, x.2.2⟩ ⟨y, y.2.2⟩ hxy]
 
 end
 
