@@ -345,6 +345,18 @@ lemma HasDenseDomain.sum_of_le
     (sum W).HasDenseDomain :=
   hE.mono (by simp [sum_domain, h])
 
+lemma HasDenseDomain.pow
+    (h : T.HasDenseDomain) (h_range : ∀ x : T.domain, T x ∈ T.domain) (n : ℕ) :
+    (T ^ n).HasDenseDomain := by
+  apply h.mono
+  induction n with
+  | zero => simp
+  | succ n ih => exact fun x hx ↦ mem_compRestricted_domain_iff.mpr ⟨hx, ih (h_range ⟨x, hx⟩)⟩
+
+lemma pow_hasDenseDomain_of_le
+    {n : ℕ} (h : (T ^ n).HasDenseDomain) {k : ℕ} (hle : k ≤ n) : (T ^ k).HasDenseDomain :=
+  h.mono <| pow_sub_mul_pow T hle ▸ compRestricted_domain_le _ _
+
 /-!
 ### B.3. Closability
 -/
@@ -430,6 +442,13 @@ lemma closure_smul (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) : (c • U).
 ### B.4. Adjoints
 -/
 
+@[simp]
+lemma adjoint_one [CompleteSpace H] : (1 : H →ₗ.[ℂ] H)† = 1 := by
+  ext x
+  · simp only [one_domain, mem_top, iff_true]
+    exact mem_adjoint_domain_of_exists _ ⟨x, fun _ ↦ rfl⟩
+  · exact adjoint_apply_eq dense_univ _ fun _ ↦ rfl
+
 /-- The adjoint of a zero LinearPMap (any domain) is zero (domain `⊤`). -/
 lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
   refine dExt ?_ fun x y hxy ↦ ?_
@@ -507,6 +526,15 @@ lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [Comple
   · exact fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨(U† ∘ᵣ V†) ⟨x, hx⟩, h ⟨x, hx⟩⟩
   · exact fun x y hxy ↦ (adjoint_apply_eq hVU y <| hxy ▸ h x).symm
 
+lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] (n : ℕ) (h : (T ^ n).HasDenseDomain) :
+    T† ^ n ≤ (T ^ n)† := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hTn : (T ^ n).HasDenseDomain := pow_hasDenseDomain_of_le h n.le_succ
+    refine le_trans ?_ (adjoint_compRestricted_le_compRestricted_adjoint hTn h)
+    exact pow_succ' T† n ▸ compRestricted_mono_right T† (ih hTn)
+
 /-!
 ### B.5. Symmetric operators
 -/
@@ -572,13 +600,21 @@ lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
   simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
   exact add_comm _ _
 
-lemma IsSymmetric.compRestricted_self (h : T.IsSymmetric) : (T ∘ᵣ T).IsSymmetric := by
-  intro x y
-  have hTx := mem_domain_of_mem_compRestricted_domain x
-  have hTy := mem_domain_of_mem_compRestricted_domain y
-  trans ⟪T ⟨x, x.2.2⟩, T ⟨y, y.2.2⟩⟫_ℂ
-  · exact h ⟨T ⟨x, x.2.2⟩, hTx⟩ ⟨y, y.2.2⟩
-  exact h ⟨x, x.2.2⟩ ⟨T ⟨y, y.2.2⟩, hTy⟩
+@[aesop safe apply]
+lemma IsSymmetric.pow (h : T.IsSymmetric) (n : ℕ) : (T ^ n).IsSymmetric := by
+  induction n with
+  | zero => exact fun _ _ ↦ rfl
+  | succ n ih =>
+    intro x y
+    let y' : (T * T ^ n).domain := ⟨y, pow_succ' T n ▸ y.2⟩
+    let Tx : (T ^ n).domain := ⟨T ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩
+    let Tny : T.domain := ⟨(T ^ n) ⟨y', y'.2.2⟩, mem_domain_of_mem_compRestricted_domain y'⟩
+    have hy : T Tny = (T ^ (n + 1)) y := by
+      change (T * T ^ n) y' = (T ^ (n + 1)) y
+      congr 1
+      · exact (pow_succ' T n).symm
+      · exact (Subtype.heq_iff_coe_eq <| by simp [pow_succ']).mpr rfl
+    exact (ih Tx ⟨y', y'.2.2⟩).trans (hy ▸ h ⟨x, x.2.2⟩ Tny)
 
 @[aesop safe apply]
 lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by simp [h x y]
