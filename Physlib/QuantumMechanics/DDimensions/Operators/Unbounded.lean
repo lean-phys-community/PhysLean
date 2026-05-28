@@ -174,6 +174,20 @@ lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘
     (g ∘ᵣ f) x = g ⟨f ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩ :=
   rfl
 
+@[simp]
+lemma compRestricted_zero (g : F →ₗ.[R] G) : g ∘ᵣ (0 : E →ₗ.[R] F) = 0 := by
+  ext
+  · simp [mem_compRestricted_domain_iff]
+  · exact g.map_zero
+
+lemma compRestricted_assoc {H : Type*} [AddCommGroup H] [Module R H]
+    (f₁ : G →ₗ.[R] H) (f₂ : F →ₗ.[R] G) (f₃ : E →ₗ.[R] F) :
+    (f₁ ∘ᵣ f₂) ∘ᵣ f₃ = f₁ ∘ᵣ f₂ ∘ᵣ f₃ := by
+  ext
+  · simp only [mem_compRestricted_domain_iff]
+    tauto
+  · rfl
+
 /-- `compRestricted` is the same as `comp` when the range of `f` is contained in `g.domain`. -/
 lemma compRestricted_eq_comp
     {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (h : ∀ x : f.domain, f x ∈ g.domain) :
@@ -188,20 +202,6 @@ lemma comp_le_compRestricted {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {S : Subm
     (h : ∀ x : (f.domRestrict S).domain, f ⟨x, x.2.2⟩ ∈ g.domain) :
     g.comp (f.domRestrict S) h ≤ g ∘ᵣ f :=
   ⟨fun x hx ↦ mem_compRestricted_domain_iff.mpr ⟨hx.2, h ⟨x, hx⟩⟩, by aesop⟩
-
-lemma compRestricted_assoc {H : Type*} [AddCommGroup H] [Module R H]
-    (f₁ : G →ₗ.[R] H) (f₂ : F →ₗ.[R] G) (f₃ : E →ₗ.[R] F) :
-    (f₁ ∘ᵣ f₂) ∘ᵣ f₃ = f₁ ∘ᵣ f₂ ∘ᵣ f₃ := by
-  ext
-  · simp only [mem_compRestricted_domain_iff]
-    tauto
-  · rfl
-
-@[simp]
-lemma compRestricted_zero (g : F →ₗ.[R] G) : g ∘ᵣ (0 : E →ₗ.[R] F) = 0 := by
-  ext
-  · simp [mem_compRestricted_domain_iff]
-  · exact g.map_zero
 
 lemma compRestricted_mono_left {g g' : F →ₗ.[R] G} (h : g ≤ g') (f : E →ₗ.[R] F) :
     g ∘ᵣ f ≤ g' ∘ᵣ f := by
@@ -526,7 +526,7 @@ lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [Comple
   · exact fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨(U† ∘ᵣ V†) ⟨x, hx⟩, h ⟨x, hx⟩⟩
   · exact fun x y hxy ↦ (adjoint_apply_eq hVU y <| hxy ▸ h x).symm
 
-lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] (n : ℕ) (h : (T ^ n).HasDenseDomain) :
+lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDenseDomain) :
     T† ^ n ≤ (T ^ n)† := by
   induction n with
   | zero => simp
@@ -609,12 +609,12 @@ lemma IsSymmetric.pow (h : T.IsSymmetric) (n : ℕ) : (T ^ n).IsSymmetric := by
     let y' : (T * T ^ n).domain := ⟨y, pow_succ' T n ▸ y.2⟩
     let Tx : (T ^ n).domain := ⟨T ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩
     let Tny : T.domain := ⟨(T ^ n) ⟨y', y'.2.2⟩, mem_domain_of_mem_compRestricted_domain y'⟩
-    have hy : T Tny = (T ^ (n + 1)) y := by
+    have h_eq : T Tny = (T ^ (n + 1)) y := by
       change (T * T ^ n) y' = (T ^ (n + 1)) y
       congr 1
       · exact (pow_succ' T n).symm
       · exact (Subtype.heq_iff_coe_eq <| by simp [pow_succ']).mpr rfl
-    exact (ih Tx ⟨y', y'.2.2⟩).trans (hy ▸ h ⟨x, x.2.2⟩ Tny)
+    exact (ih Tx ⟨y', y'.2.2⟩).trans (h_eq ▸ h ⟨x, x.2.2⟩ Tny)
 
 @[aesop safe apply]
 lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by simp [h x y]
