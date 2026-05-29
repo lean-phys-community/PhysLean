@@ -5,32 +5,30 @@ Authors: Florian Wiesner, Michał Mogielnicki
 -/
 module
 
-public import Physlib.FluidDynamics.Momentum
-public import Physlib.SpaceAndTime.Space.Derivatives.Grad
+public import Physlib.FluidDynamics.CauchyMomentum
 /-!
 
 # Euler equation for fluid flows
 
 ## i. Overview
 
-This module defines the Euler momentum equation for inviscid fluid flow. The pressure gradient
-and body force terms are kept explicit, while the conservative and convective left-hand sides
-reuse the corresponding Navier-Stokes balance-law definitions.
+This module defines the Euler equations for inviscid fluid flow as continuity, Cauchy momentum,
+and an inviscid stress law. The pressure field appears through the constitutive relation for
+the Cauchy stress tensor rather than as a field of the flow data.
 
 ## ii. Key results
 
-- `FluidInEulerBalance` : A fluid flow with pressure and body force.
-- `eulerForceDensity` : The pressure-gradient and body-force density in Euler momentum balance.
-- `Euler` : Classical continuity and conservative Euler momentum together.
+- `IsInviscid` : Predicate saying the Cauchy stress is the inviscid pressure stress.
+- `Euler` : Classical continuity, Cauchy momentum, and inviscid stress together.
+- `ConvectiveEuler` : Classical continuity, convective Cauchy momentum, and inviscid stress.
 - `euler_iff_convective_euler` : Equivalence of the conservative and convective forms when the
   fields are differentiable.
 
 ## iii. Table of contents
 
-- A. Euler data
-- B. Euler force density
-- C. Euler equation
-- D. Equivalence of conservative and convective Euler forms
+- A. Inviscid stress law
+- B. Euler equations
+- C. Equivalence of conservative and convective Euler forms
 
 ## iv. References
 
@@ -38,101 +36,59 @@ reuse the corresponding Navier-Stokes balance-law definitions.
 
 @[expose] public section
 
-open Space
-open Time
-
 namespace FluidDynamics
 
 /-!
 
-## A. Euler data
+## A. Inviscid stress law
 
 -/
 
-/-- The fields needed for Euler momentum balance: fluid flow, pressure, and body force. -/
-structure FluidInEulerBalance (d : ℕ) extends FluidFlow d where
-  /-- The pressure field. -/
-  pressure : ScalarField d
-  /-- The body-force field per unit mass. -/
-  bodyForce : BodyForce d
+/-- A Cauchy flow is inviscid with pressure `p` when its stress is `-p I`. -/
+def IsInviscid (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d) : Prop :=
+  ∀ t x, flow.stress t x = (-(pressure t x)) • (1 : Matrix (Fin d) (Fin d) ℝ)
 
 /-!
 
-## B. Euler force density
+## B. Euler equations
 
 -/
 
-/-- The force density in Euler momentum balance, `-grad p + rho f`. -/
-noncomputable def eulerForceDensity (d : ℕ) (data : FluidInEulerBalance d) : VectorField d :=
-  fun t x => -(∇ (data.pressure t) x) + data.rho t x • data.bodyForce t x
+/-- The conservative Euler equations: continuity, Cauchy momentum, and inviscid stress. -/
+def Euler (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d) : Prop :=
+  ClassicalContinuityEquation d flow.toFluidFlow ∧
+    CauchyMomentumEquation d flow ∧ IsInviscid d flow pressure
+
+/-- The convective Euler equations: continuity, convective Cauchy momentum, and inviscid
+stress. -/
+def ConvectiveEuler (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d) : Prop :=
+  ClassicalContinuityEquation d flow.toFluidFlow ∧
+    ConvectiveCauchyMomentumEquation d flow ∧ IsInviscid d flow pressure
 
 /-!
 
-## C. Euler equation
-
--/
-
-/-- The conservative Euler equations: classical continuity and conservative momentum balance. -/
-def Euler (d : ℕ) (data : FluidInEulerBalance d) : Prop :=
-  ClassicalContinuityEquation d data.toFluidFlow ∧
-    ∀ t x, conservativeMomentumLHS d data.toFluidFlow t x = eulerForceDensity d data t x
-
-/-!
-
-## D. Equivalence of conservative and convective Euler forms
+## C. Equivalence of conservative and convective Euler forms
 
 -/
 
 /-- The conservative and convective Euler forms are equivalent when the fields are
 differentiable enough for the product rules. -/
 theorem euler_iff_convective_euler
-    (d : ℕ) (data : FluidInEulerBalance d)
-    (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
-    (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)
+    (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d)
+    (hRhoTime : ∀ t x, DifferentiableAt ℝ (flow.rho · x) t)
+    (hVelocityTime : ∀ t x, DifferentiableAt ℝ (flow.velocity · x) t)
     (hMomentumDensity : ∀ t,
-      Differentiable ℝ (momentumDensity d data.toFluidFlow t))
-    (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
-    Euler d data ↔
-      ClassicalContinuityEquation d data.toFluidFlow ∧
-        ∀ t x, convectiveMomentumLHS d data.toFluidFlow t x = eulerForceDensity d data t x := by
+      Differentiable ℝ (momentumDensity d flow.toFluidFlow t))
+    (hVelocitySpace : ∀ t, Differentiable ℝ (flow.velocity t)) :
+    Euler d flow pressure ↔ ConvectiveEuler d flow pressure := by
   constructor
   · intro hConservative
-    refine ⟨hConservative.1, ?_⟩
-    intro t x
-    have hMassFluxSpace :
-        DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
-      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
-    have hResidual : continuityResidual d data.toFluidFlow t x = 0 := by
-      simpa [continuityResidual] using
-        hConservative.1 t x (by simpa using hRhoTime t x) hMassFluxSpace
-    have hLhs :=
-      conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-        d data.toFluidFlow t x (hRhoTime t x) (hVelocityTime t x)
-        (hMomentumDensity t) (hVelocitySpace t)
-    have hLhs' :
-        conservativeMomentumLHS d data.toFluidFlow t x =
-          convectiveMomentumLHS d data.toFluidFlow t x := by
-      rw [hLhs, hResidual, zero_smul, add_zero]
-    rw [← hLhs']
-    exact hConservative.2 t x
+    refine ⟨hConservative.1, ?_, hConservative.2.2⟩
+    exact (cauchy_momentum_iff_convective_cauchy_momentum d flow hConservative.1
+      hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp hConservative.2.1
   · intro hConvective
-    refine ⟨hConvective.1, ?_⟩
-    intro t x
-    have hMassFluxSpace :
-        DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
-      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
-    have hResidual : continuityResidual d data.toFluidFlow t x = 0 := by
-      simpa [continuityResidual] using
-        hConvective.1 t x (by simpa using hRhoTime t x) hMassFluxSpace
-    have hLhs :=
-      conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-        d data.toFluidFlow t x (hRhoTime t x) (hVelocityTime t x)
-        (hMomentumDensity t) (hVelocitySpace t)
-    have hLhs' :
-        conservativeMomentumLHS d data.toFluidFlow t x =
-          convectiveMomentumLHS d data.toFluidFlow t x := by
-      rw [hLhs, hResidual, zero_smul, add_zero]
-    rw [hLhs']
-    exact hConvective.2 t x
+    refine ⟨hConvective.1, ?_, hConvective.2.2⟩
+    exact (cauchy_momentum_iff_convective_cauchy_momentum d flow hConvective.1
+      hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr hConvective.2.1
 
 end FluidDynamics

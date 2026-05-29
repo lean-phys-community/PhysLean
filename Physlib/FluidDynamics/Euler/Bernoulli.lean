@@ -6,6 +6,7 @@ Authors: Florian Wiesner, Michał Mogielnicki
 module
 
 public import Physlib.FluidDynamics.Euler.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Grad
 /-!
 
 # Bernoulli theory for Euler flows
@@ -13,14 +14,14 @@ public import Physlib.FluidDynamics.Euler.Basic
 ## i. Overview
 
 This module is reserved for Bernoulli definitions and results derived from Euler-flow
-assumptions. The intended development includes the Bernoulli function associated with
-velocity, enthalpy, and an external potential, together with assumptions under which it is
-conserved.
+assumptions. The intended development uses the shared `ThermodynamicCauchyFlow` data together
+with an explicit external potential parameter, rather than defining a separate Bernoulli-flow
+structure.
 
 ## ii. Key results
 
-- `FluidInBernoulliFlow` : Euler-flow data with enthalpy and potential fields.
-- `HasConservativeBodyForce` : Predicate encoding the convention `bodyForce = -grad Phi`.
+- `HasBodyForcePotential` : Predicate encoding the convention `bodyForce = -grad Phi`.
+- `HasConservativeBodyForce` : Predicate saying a body force has some potential.
 - `IsSteady` : Predicate saying the velocity field has no time dependence.
 - `materialDerivative` : Material derivative of a scalar field along a fluid velocity field.
 - `IsIsentropic` : Predicate saying the entropy is materially conserved.
@@ -31,11 +32,10 @@ conserved.
 
 ## iii. Table of contents
 
-- A. Bernoulli data
-- B. Conservative-force convention
-- C. Flow predicates
-- D. Bernoulli function
-- E. Bernoulli-law predicates
+- A. Conservative-force convention
+- B. Flow predicates
+- C. Bernoulli function
+- D. Bernoulli-law predicates
 
 ## iv. References
 
@@ -51,38 +51,21 @@ namespace FluidDynamics
 
 /-!
 
-## A. Bernoulli data
+## A. Conservative-force convention
 
 -/
 
-/-- The fields needed for Bernoulli theory: Euler data, entropy, enthalpy, and an external
-potential.
+/-- A flow has body-force potential `Phi` when its body force is minus the gradient of `Phi`. -/
+def HasBodyForcePotential (d : ℕ) (flow : CauchyFlow d) (potential : Space d → ℝ) : Prop :=
+  ∀ t x, flow.bodyForce t x = -(∇ potential x)
 
-The potential is the potential energy per unit mass. In the conservative-force convention used
-below, it satisfies `bodyForce = -grad Phi`. This relation is not imposed by the data structure.
--/
-structure FluidInBernoulliFlow (d : ℕ) extends FluidInEulerBalance d where
-  /-- The specific entropy field. -/
-  entropy : ScalarField d
-  /-- The specific enthalpy field. -/
-  enthalpy : ScalarField d
-  /-- The external potential field. -/
-  potential : Space d → ℝ
+/-- A flow has conservative body force when its body force has some potential. -/
+def HasConservativeBodyForce (d : ℕ) (flow : CauchyFlow d) : Prop :=
+  ∃ potential : Space d → ℝ, HasBodyForcePotential d flow potential
 
 /-!
 
-## B. Conservative-force convention
-
--/
-
-/-- A Bernoulli flow has conservative body force when its body force is minus the gradient of
-the potential energy per unit mass. -/
-def HasConservativeBodyForce (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
-  ∀ t x, data.bodyForce t x = -(∇ data.potential x)
-
-/-!
-
-## C. Flow predicates
+## B. Flow predicates
 
 -/
 
@@ -95,13 +78,13 @@ noncomputable def materialDerivative (d : ℕ) (fluid : FluidFlow d)
     (field : ScalarField d) : ScalarField d :=
   fun t x => ∂ₜ (field · x) t + ⟪fluid.velocity t x, ∇ (field t) x⟫_ℝ
 
-/-- A Bernoulli flow is isentropic when the entropy is materially conserved. -/
-def IsIsentropic (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
-  ∀ t x, materialDerivative d data.toFluidFlow data.entropy t x = 0
+/-- A thermodynamic flow is isentropic when the entropy is materially conserved. -/
+def IsIsentropic (d : ℕ) (flow : ThermodynamicCauchyFlow d) : Prop :=
+  ∀ t x, materialDerivative d flow.toFluidFlow flow.entropy t x = 0
 
 /-!
 
-## D. Bernoulli function
+## C. Bernoulli function
 
 -/
 
@@ -110,22 +93,24 @@ noncomputable def specificKineticEnergy (d : ℕ) (fluid : FluidFlow d) : Scalar
   fun t x => (1 / 2 : ℝ) * ⟪fluid.velocity t x, fluid.velocity t x⟫_ℝ
 
 /-- The Bernoulli function `|u|^2 / 2 + h + Phi`. -/
-noncomputable def bernoulliFunction (d : ℕ) (data : FluidInBernoulliFlow d) : ScalarField d :=
-  fun t x => specificKineticEnergy d data.toFluidFlow t x + data.enthalpy t x +
-    data.potential x
+noncomputable def bernoulliFunction
+    (d : ℕ) (flow : ThermodynamicCauchyFlow d) (potential : Space d → ℝ) : ScalarField d :=
+  fun t x => specificKineticEnergy d flow.toFluidFlow t x + flow.enthalpy t x + potential x
 
 /-!
 
-## E. Bernoulli-law predicates
+## D. Bernoulli-law predicates
 
 -/
 
 /-- A local Bernoulli law: the Bernoulli function has zero spatial gradient. -/
-def LocalBernoulliLaw (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
-  ∀ t x, (∇ (bernoulliFunction d data t)) x = 0
+def LocalBernoulliLaw
+    (d : ℕ) (flow : ThermodynamicCauchyFlow d) (potential : Space d → ℝ) : Prop :=
+  ∀ t x, (∇ (bernoulliFunction d flow potential t)) x = 0
 
 /-- A global Bernoulli law: the Bernoulli function is spatially constant at each time. -/
-def BernoulliLaw (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
-  ∀ t x y, bernoulliFunction d data t x = bernoulliFunction d data t y
+def BernoulliLaw
+    (d : ℕ) (flow : ThermodynamicCauchyFlow d) (potential : Space d → ℝ) : Prop :=
+  ∀ t x y, bernoulliFunction d flow potential t x = bernoulliFunction d flow potential t y
 
 end FluidDynamics
