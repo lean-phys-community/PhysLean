@@ -5,7 +5,7 @@ Authors: Florian Wiesner, Michał Mogielnicki
 -/
 module
 
-public import Physlib.FluidDynamics.FluidState
+public import Physlib.FluidDynamics.FluidFlow
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
 public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
@@ -49,31 +49,31 @@ namespace FluidDynamics
 -/
 
 /-- The incompressibility residual, given by the divergence of the velocity field. -/
-noncomputable def incompressibilityResidual (d : ℕ) (fluid : FluidState d) :
+noncomputable def incompressibilityResidual (d : ℕ) (fluid : FluidFlow d) :
     Time → Space d → ℝ :=
   fun t x => (∇ ⬝ fluid.velocity t) x
 
 /-- A classical incompressible flow has divergence-free velocity at points where the velocity
 field is differentiable. -/
-def ClassicalIncompressible (d : ℕ) (fluid : FluidState d) : Prop :=
+def ClassicalIncompressible (d : ℕ) (fluid : FluidFlow d) : Prop :=
   ∀ t x, DifferentiableAt ℝ (fluid.velocity t) x →
     incompressibilityResidual d fluid t x = 0
 
 /-- A smooth incompressible flow has globally differentiable velocity and vanishing
 incompressibility residual everywhere. -/
-def SmoothIncompressible (d : ℕ) (fluid : FluidState d) : Prop :=
+def SmoothIncompressible (d : ℕ) (fluid : FluidFlow d) : Prop :=
   (∀ t, Differentiable ℝ (fluid.velocity t)) ∧
     ∀ t x, incompressibilityResidual d fluid t x = 0
 
 /-- A smooth incompressible flow is classically incompressible. -/
-lemma SmoothIncompressible.toClassical (d : ℕ) (fluid : FluidState d) :
+lemma SmoothIncompressible.toClassical (d : ℕ) (fluid : FluidFlow d) :
     SmoothIncompressible d fluid → ClassicalIncompressible d fluid := by
   intro hSmooth t x _
   simpa [incompressibilityResidual] using hSmooth.2 t x
 
 /-- A fluid flow has time-independent density when the density has zero time derivative at
 each spatial point. -/
-def DensityTimeIndependent (d : ℕ) (fluid : FluidState d) : Prop :=
+def DensityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
   ∀ t x, ∂ₜ (fluid.rho · x) t = 0
 
 end FluidDynamics

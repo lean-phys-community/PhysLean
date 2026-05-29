@@ -57,7 +57,7 @@ Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
 def MomentumEquation (d : ℕ) (data : CauchyFlow d) : Prop :=
   ∀ t x,
-    conservativeMomentumLHS d data.toFluidState t x =
+    conservativeMomentumLHS d data.toFluidFlow t x =
       matrixDiv d (data.stress t) x + data.rho t x • data.bodyForce t x
 
 /-!
@@ -76,7 +76,7 @@ Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
 def ConvectiveMomentumEquation (d : ℕ) (data : CauchyFlow d) : Prop :=
   ∀ t x,
-    data.rho t x • materialAcceleration d data.toFluidState t x =
+    data.rho t x • materialAcceleration d data.toFluidFlow t x =
       matrixDiv d (data.stress t) x + data.rho t x • data.bodyForce t x
 
 /-!
@@ -93,20 +93,20 @@ The differentiability assumptions are exactly the product-rule assumptions used 
 -/
 theorem momentumEquation_iff_convectiveMomentumEquation
     (d : ℕ) (data : CauchyFlow d)
-    (hContinuity : ClassicalContinuityEquation d data.toFluidState)
+    (hContinuity : ClassicalContinuityEquation d data.toFluidFlow)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)
-    (hMomentumDensity : ∀ t, Differentiable ℝ (momentumDensity d data.toFluidState t))
+    (hMomentumDensity : ∀ t, Differentiable ℝ (momentumDensity d data.toFluidFlow t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
     MomentumEquation d data ↔ ConvectiveMomentumEquation d data := by
-  have conservative_eq_convective_lhs : ∀ t x, conservativeMomentumLHS d data.toFluidState t x =
-      convectiveMomentumLHS d data.toFluidState t x := by
+  have conservative_eq_convective_lhs : ∀ t x, conservativeMomentumLHS d data.toFluidFlow t x =
+      convectiveMomentumLHS d data.toFluidFlow t x := by
     intro t x
-    have hResidual : continuityResidual d data.toFluidState t x = 0 := by
+    have hResidual : continuityResidual d data.toFluidFlow t x = 0 := by
       simpa [continuityResidual] using
         hContinuity t x (by simpa using hRhoTime t x) (hMomentumDensity t).differentiableAt
     rw [conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-        d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
+        d data.toFluidFlow t x (hRhoTime t x) (hVelocityTime t x)
         (hMomentumDensity t) (hVelocitySpace t), hResidual, zero_smul, add_zero]
   exact ⟨fun h t x => (conservative_eq_convective_lhs t x).symm.trans (h t x),
     fun h t x => (conservative_eq_convective_lhs t x).trans (h t x)⟩

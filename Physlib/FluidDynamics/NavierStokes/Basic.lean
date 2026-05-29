@@ -47,12 +47,12 @@ namespace FluidDynamics
 
 /-- The conservative Navier-Stokes balance-law form with an externally supplied stress tensor. -/
 def NavierStokes (d : ℕ) (data : CauchyFlow d) : Prop :=
-  FluidDynamics.ClassicalContinuityEquation d data.toFluidState ∧
+  FluidDynamics.ClassicalContinuityEquation d data.toFluidFlow ∧
     FluidDynamics.NavierStokes.MomentumEquation d data
 
 /-- The convective Navier-Stokes form with an externally supplied stress tensor. -/
 def ConvectiveNavierStokes (d : ℕ) (data : CauchyFlow d) : Prop :=
-  FluidDynamics.ClassicalContinuityEquation d data.toFluidState ∧
+  FluidDynamics.ClassicalContinuityEquation d data.toFluidFlow ∧
     FluidDynamics.NavierStokes.ConvectiveMomentumEquation d data
 
 /-- The conservative and convective Navier-Stokes forms are equivalent when the fields are
@@ -62,7 +62,7 @@ theorem navierStokes_iff_convectiveNavierStokes
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)
     (hMomentumDensity : ∀ t,
-      Differentiable ℝ (FluidDynamics.momentumDensity d data.toFluidState t))
+      Differentiable ℝ (FluidDynamics.momentumDensity d data.toFluidFlow t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
     NavierStokes d data ↔ ConvectiveNavierStokes d data :=
   and_congr_right fun h =>

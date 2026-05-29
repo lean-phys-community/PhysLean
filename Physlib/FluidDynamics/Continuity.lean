@@ -5,7 +5,7 @@ Authors: Florian Wiesner
 -/
 module
 
-public import Physlib.FluidDynamics.FluidState
+public import Physlib.FluidDynamics.FluidFlow
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
 public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
@@ -14,7 +14,7 @@ public import Physlib.SpaceAndTime.Time.Derivatives
 
 ## i. Overview
 
-This module defines the classical conservative mass-balance equation for a fluid state and the
+This module defines the classical conservative mass-balance equation for a fluid flow and the
 corresponding continuity residual. These definitions are independent of a particular momentum
 equation, so they can be reused by Navier-Stokes, Euler, and other fluid models.
 
@@ -51,14 +51,14 @@ namespace FluidDynamics
 The equation is asserted at points where the time derivative of `rho` and the spatial
 divergence of `rho u` are classical derivatives.
 -/
-def ClassicalContinuityEquation (d : ℕ) (fluid : FluidState d) : Prop :=
+def ClassicalContinuityEquation (d : ℕ) (fluid : FluidFlow d) : Prop :=
   ∀ t x, DifferentiableAt ℝ (fluid.rho · x) t →
       DifferentiableAt ℝ (fun x' => fluid.rho t x' • fluid.velocity t x') x →
         ∂ₜ (fluid.rho · x) t + (∇ ⬝ fun x' => fluid.rho t x' • fluid.velocity t x') x = 0
 
 /-- The scalar continuity-equation residual
 `partial_t rho + div (rho u)`. -/
-noncomputable def continuityResidual (d : ℕ) (fluid : FluidState d) : Time → Space d → ℝ :=
+noncomputable def continuityResidual (d : ℕ) (fluid : FluidFlow d) : Time → Space d → ℝ :=
   fun t x => ∂ₜ (fluid.rho · x) t + (∇ ⬝ fun x' => fluid.rho t x' • fluid.velocity t x') x
 
 /-- A stronger continuity equation for globally differentiable fields.
@@ -67,13 +67,13 @@ This version records the first-order regularity needed by the classical continui
 the density is differentiable in time, the mass flux `rho u` is differentiable in space, and
 the continuity residual vanishes everywhere.
 -/
-def SmoothContinuityEquation (d : ℕ) (fluid : FluidState d) : Prop :=
+def SmoothContinuityEquation (d : ℕ) (fluid : FluidFlow d) : Prop :=
   (∀ x, Differentiable ℝ (fluid.rho · x)) ∧
     (∀ t, Differentiable ℝ (fun x => fluid.rho t x • fluid.velocity t x)) ∧
       ∀ t x, continuityResidual d fluid t x = 0
 
 /-- A smooth continuity equation satisfies the guarded classical continuity equation. -/
-lemma SmoothContinuityEquation.toClassical (d : ℕ) (fluid : FluidState d) :
+lemma SmoothContinuityEquation.toClassical (d : ℕ) (fluid : FluidFlow d) :
     SmoothContinuityEquation d fluid → ClassicalContinuityEquation d fluid := by
   intro hSmooth t x _ _
   simpa [continuityResidual] using hSmooth.2.2 t x

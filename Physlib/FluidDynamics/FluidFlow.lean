@@ -9,12 +9,12 @@ public import Physlib.SpaceAndTime.Space.Basic
 public import Physlib.SpaceAndTime.Time.Basic
 /-!
 
-# Fluid states
+# Fluid flows
 
 ## i. Overview
 
 This module defines the basic fields used to describe a fluid on `d`-dimensional space.
-The core structure `FluidState` contains only the density and velocity fields. Additional
+The core structure `FluidFlow` contains only the density and velocity fields. Additional
 fields used by momentum balance and thermodynamic laws are provided by extension structures.
 
 ## ii. Key results
@@ -26,14 +26,14 @@ fields used by momentum balance and thermodynamic laws are provided by extension
 - `MomentumDensityField` : A time-dependent vector momentum density field.
 - `StressTensor` : A time-dependent matrix-valued stress field.
 - `BodyForce` : A time-dependent vector body-force field per unit mass.
-- `FluidState` : The density and velocity fields of a fluid.
-- `CauchyFlow` : A fluid state with Cauchy stress and body force.
+- `FluidFlow` : The density and velocity fields of a fluid.
+- `CauchyFlow` : A fluid flow with Cauchy stress and body force.
 - `ThermodynamicCauchyFlow` : A Cauchy flow with entropy and enthalpy fields.
 
 ## iii. Table of contents
 
 - A. Field types
-- B. Fluid state structures
+- B. Fluid flow structures
 
 ## iv. References
 
@@ -72,19 +72,19 @@ abbrev BodyForce (d : ℕ) := VectorField d
 
 /-!
 
-## B. Fluid state structures
+## B. Fluid flow structures
 
 -/
 
 /-- The density and velocity fields of a fluid on `d`-dimensional space. -/
-structure FluidState (d : ℕ) where
+structure FluidFlow (d : ℕ) where
   /-- The mass density field. -/
   rho : MassDensity d
   /-- The velocity field. -/
   velocity : VelocityField d
 
 /-- A fluid flow equipped with Cauchy stress and body-force fields. -/
-structure CauchyFlow (d : ℕ) extends FluidState d where
+structure CauchyFlow (d : ℕ) extends FluidFlow d where
   /-- The Cauchy stress tensor field. -/
   stress : StressTensor d
   /-- The body-force field per unit mass. -/

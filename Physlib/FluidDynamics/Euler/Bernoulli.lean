@@ -33,7 +33,7 @@ conserved.
 
 - A. Bernoulli data
 - B. Conservative-force convention
-- C. Flow-state predicates
+- C. Flow predicates
 - D. Bernoulli function
 - E. Bernoulli-law predicates
 
@@ -82,22 +82,22 @@ def HasConservativeBodyForce (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
 
 /-!
 
-## C. Flow-state predicates
+## C. Flow predicates
 
 -/
 
-/-- A fluid state is steady when the velocity has zero time derivative everywhere. -/
-def IsSteady (d : ℕ) (fluid : FluidState d) : Prop :=
+/-- A fluid flow is steady when the velocity has zero time derivative everywhere. -/
+def IsSteady (d : ℕ) (fluid : FluidFlow d) : Prop :=
   ∀ t x, ∂ₜ (fluid.velocity · x) t = 0
 
 /-- The material derivative `D_t f = partial_t f + u · grad f` of a scalar field. -/
-noncomputable def materialDerivative (d : ℕ) (fluid : FluidState d)
+noncomputable def materialDerivative (d : ℕ) (fluid : FluidFlow d)
     (field : ScalarField d) : ScalarField d :=
   fun t x => ∂ₜ (field · x) t + ⟪fluid.velocity t x, ∇ (field t) x⟫_ℝ
 
 /-- A Bernoulli flow is isentropic when the entropy is materially conserved. -/
 def IsIsentropic (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
-  ∀ t x, materialDerivative d data.toFluidState data.entropy t x = 0
+  ∀ t x, materialDerivative d data.toFluidFlow data.entropy t x = 0
 
 /-!
 
@@ -105,13 +105,13 @@ def IsIsentropic (d : ℕ) (data : FluidInBernoulliFlow d) : Prop :=
 
 -/
 
-/-- The specific kinetic energy `|u|^2 / 2` of a fluid state. -/
-noncomputable def specificKineticEnergy (d : ℕ) (fluid : FluidState d) : ScalarField d :=
+/-- The specific kinetic energy `|u|^2 / 2` of a fluid flow. -/
+noncomputable def specificKineticEnergy (d : ℕ) (fluid : FluidFlow d) : ScalarField d :=
   fun t x => (1 / 2 : ℝ) * ⟪fluid.velocity t x, fluid.velocity t x⟫_ℝ
 
 /-- The Bernoulli function `|u|^2 / 2 + h + Phi`. -/
 noncomputable def bernoulliFunction (d : ℕ) (data : FluidInBernoulliFlow d) : ScalarField d :=
-  fun t x => specificKineticEnergy d data.toFluidState t x + data.enthalpy t x +
+  fun t x => specificKineticEnergy d data.toFluidFlow t x + data.enthalpy t x +
     data.potential x
 
 /-!

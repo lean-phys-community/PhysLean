@@ -52,21 +52,21 @@ namespace FluidDynamics
 -/
 
 /-- The momentum density `rho u`. -/
-def momentumDensity (d : ℕ) (fluid : FluidState d) : MomentumDensityField d :=
+def momentumDensity (d : ℕ) (fluid : FluidFlow d) : MomentumDensityField d :=
   fun t x => fluid.rho t x • fluid.velocity t x
 
 /-- The convective momentum flux `rho u ⊗ u`. -/
-def momentumFlux (d : ℕ) (fluid : FluidState d) : Time → Space d → Matrix (Fin d) (Fin d) ℝ :=
+def momentumFlux (d : ℕ) (fluid : FluidFlow d) : Time → Space d → Matrix (Fin d) (Fin d) ℝ :=
   fun t x =>
     fluid.rho t x • Matrix.vecMulVec (fun i => fluid.velocity t x i)
       (fun j => fluid.velocity t x j)
 
 /-- The nonlinear transport term `(u · ∇)u`. -/
-noncomputable def convectiveTerm (d : ℕ) (fluid : FluidState d) : VectorField d :=
+noncomputable def convectiveTerm (d : ℕ) (fluid : FluidFlow d) : VectorField d :=
   fun t x => ∑ j, fluid.velocity t x j • ∂[j] (fluid.velocity t) x
 
 /-- The material acceleration `∂ₜ u + (u · ∇)u`. -/
-noncomputable def materialAcceleration (d : ℕ) (fluid : FluidState d) : VectorField d :=
+noncomputable def materialAcceleration (d : ℕ) (fluid : FluidFlow d) : VectorField d :=
   fun t x => ∂ₜ (fluid.velocity · x) t + convectiveTerm d fluid t x
 
 /-!
@@ -76,11 +76,11 @@ noncomputable def materialAcceleration (d : ℕ) (fluid : FluidState d) : Vector
 -/
 
 /-- The left-hand side of the conservative momentum equation. -/
-noncomputable def conservativeMomentumLHS (d : ℕ) (fluid : FluidState d) : VectorField d :=
+noncomputable def conservativeMomentumLHS (d : ℕ) (fluid : FluidFlow d) : VectorField d :=
   fun t x => ∂ₜ (momentumDensity d fluid · x) t + matrixDiv d (momentumFlux d fluid t) x
 
 /-- The left-hand side of the convective momentum equation. -/
-noncomputable def convectiveMomentumLHS (d : ℕ) (fluid : FluidState d) : VectorField d :=
+noncomputable def convectiveMomentumLHS (d : ℕ) (fluid : FluidFlow d) : VectorField d :=
   fun t x => fluid.rho t x • materialAcceleration d fluid t x
 
 /-!
@@ -104,7 +104,7 @@ lemma timeDeriv_smul_velocity (d : ℕ) (rhoAtPosition : Time → ℝ)
   rfl
 
 /-- Product rule for the time derivative of the momentum density `rho u`. -/
-lemma timeDeriv_momentumDensity (d : ℕ) (fluid : FluidState d)
+lemma timeDeriv_momentumDensity (d : ℕ) (fluid : FluidFlow d)
     (t : Time) (x : Space d)
     (hRho : DifferentiableAt ℝ (fluid.rho · x) t)
     (hVelocity : DifferentiableAt ℝ (fluid.velocity · x) t) :
@@ -114,7 +114,7 @@ lemma timeDeriv_momentumDensity (d : ℕ) (fluid : FluidState d)
     timeDeriv_smul_velocity d (fluid.rho · x) (fluid.velocity · x) t hRho hVelocity
 
 /-- Product rule for one spatial derivative of one component of `rho u ⊗ u`. -/
-lemma spaceDeriv_momentumFlux_component (d : ℕ) (fluid : FluidState d)
+lemma spaceDeriv_momentumFlux_component (d : ℕ) (fluid : FluidFlow d)
     (t : Time) (x : Space d) (i j : Fin d)
     (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid t))
     (hVelocity : Differentiable ℝ (fluid.velocity t)) :
@@ -132,7 +132,7 @@ lemma spaceDeriv_momentumFlux_component (d : ℕ) (fluid : FluidState d)
   simp [momentumFlux, momentumDensity, Matrix.vecMulVec_apply, mul_left_comm]
 
 /-- The matrix divergence of `rho u ⊗ u` split into continuity and convective parts. -/
-lemma matrixDiv_momentumFlux (d : ℕ) (fluid : FluidState d)
+lemma matrixDiv_momentumFlux (d : ℕ) (fluid : FluidFlow d)
     (t : Time) (x : Space d)
     (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid t))
     (hVelocity : Differentiable ℝ (fluid.velocity t)) :
@@ -175,7 +175,7 @@ The conservative momentum left-hand side equals the convective momentum left-han
 the continuity residual times the velocity field.
 -/
 lemma conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-    (d : ℕ) (fluid : FluidState d)
+    (d : ℕ) (fluid : FluidFlow d)
     (t : Time) (x : Space d)
     (hRhoTime : DifferentiableAt ℝ (fluid.rho · x) t)
     (hVelocityTime : DifferentiableAt ℝ (fluid.velocity · x) t)
