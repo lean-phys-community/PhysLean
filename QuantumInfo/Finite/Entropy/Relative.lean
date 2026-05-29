@@ -6,6 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import QuantumInfo.Finite.Entropy.VonNeumann
+public import Physlib.Meta.Sorry
 
 @[expose] public section
 
@@ -439,9 +440,7 @@ private theorem sandwichedRelRentropy_nonneg_α_lt_1 (h : σ.M.ker ≤ ρ.M.ker)
 private theorem sandwichedRelRentropy_nonneg_α_gt_1 (h : σ.M.ker ≤ ρ.M.ker) (hα : α > 1) :
     0 ≤ ((ρ.M.conj (σ.M ^ ((1 - α)/(2 * α)) ).mat) ^ α).trace.log / (α - 1) := by
   grw [← sandwiched_trace_of_gt_1 h hα]
-  · simp
-  · linarith
-
+  simp
 
 private lemma sandwichedRelRentropy.trace_at_one (ρ σ : MState d) :
     ((ρ.M.conj (σ.M ^ ((1 - (1:ℝ)) / (2 * (1:ℝ)))).mat) ^ (1:ℝ)).trace = 1 := by
@@ -450,7 +449,6 @@ private lemma sandwichedRelRentropy.trace_at_one (ρ σ : MState d) :
 /-
 For fixed PSD B, the derivative of α ↦ Tr[B^α] at α = 1 is ⟪B, B.log⟫ = Tr[B log B].
 -/
-set_option backward.isDefEq.respectTransparency false in
 private lemma hasDerivAt_trace_rpow_at_one (B : HermitianMat d ℂ) (hB : 0 ≤ B) :
     HasDerivAt (fun α : ℝ => (B ^ α).trace) ⟪B, B.log⟫ 1 := by
   have h_inner : ⟪B, B.log⟫ = ∑ i, (B.H.eigenvalues i) * Real.log (B.H.eigenvalues i) := by
@@ -679,7 +677,6 @@ Scalar rpow cross term with just continuity: for a continuous function b with
   c * log c at α = 1. The key insight is that ∂/∂x(x^α - x)|_{α=1} = 0,
   so the derivative of b doesn't matter.
 -/
-set_option backward.isDefEq.respectTransparency false in
 private lemma scalar_rpow_cross_term_of_continuous {b : ℝ → ℝ} {c : ℝ}
     (hb_cont : ContinuousAt b 1) (hc : b 1 = c) (hc_pos : 0 < c)
     (hb_pos : ∀ᶠ α in nhds 1, 0 < b α) :
@@ -692,7 +689,7 @@ private lemma scalar_rpow_cross_term_of_continuous {b : ℝ → ℝ} {c : ℝ}
     rw [ Metric.eventually_nhds_iff ] at *;
     obtain ⟨ ε, ε_pos, hε ⟩ := hb_pos; use ε, ε_pos; intros y hy hy'; rw [ Real.rpow_add ( hε ( show Dist.dist ( 1 + y ) 1 < ε from by simpa using hy ) ), Real.rpow_one ]
     ring_nf
-    norm_num [ hc ] ; ring;
+    norm_num [ hc ]
   -- Use the fact that $b(1 + t) \to c$ as $t \to 0$.
   have h_b : Filter.Tendsto (fun t => b (1 + t)) (nhdsWithin 0 {0}ᶜ) (nhds c) := by
     exact hc ▸ hb_cont.tendsto.comp ( tendsto_nhdsWithin_of_tendsto_nhds ( by norm_num [ Filter.Tendsto ] ) );
@@ -718,7 +715,6 @@ Scalar rpow cross term for the zero case: for continuous b with b(1) = 0,
   0 ≤ b(α) near 1, the function α ↦ b(α)^α - b(α) has derivative 0 at α = 1.
   Uses the convention 0 * log 0 = 0.
 -/
-set_option backward.isDefEq.respectTransparency false in
 private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
     (hb_cont : ContinuousAt b 1) (hc : b 1 = 0)
     (hb_nonneg : ∀ᶠ α in nhds 1, 0 ≤ b α) :
@@ -876,7 +872,6 @@ Uniform convergence of (x^{1+h} - x)/h to x * log x on [0, K] as h → 0.
 This is the uniform version of the derivative of s ↦ x^s at s = 1.
 -/
 set_option maxHeartbeats 800000 in
-set_option backward.isDefEq.respectTransparency false in
 private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
     ∀ ε > 0, ∃ δ > 0, ∀ h : ℝ, 0 < |h| → |h| < δ →
     ∀ x ∈ Set.Icc 0 K, |(x ^ (1 + h) - x) / h - x * Real.log x| < ε := by
@@ -1010,7 +1005,6 @@ The remainder term r(1+h)/h → 0 where
 `r(α) = Tr[M(α)^α] - Tr[M(α)] - Tr[ρ.M^α] + Tr[ρ.M]`
 -/
 set_option maxHeartbeats 800000 in
-set_option backward.isDefEq.respectTransparency false in
 private lemma cross_term_slope_tendsto_zero
     {M : ℝ → HermitianMat d ℂ}
     (hM_nonneg : ∀ᶠ α in nhds 1, 0 ≤ M α)
@@ -1128,7 +1122,6 @@ private lemma rpow_trace_cross_term_vanishes {ρ σ : MState d}
   convert HasDerivAt.add ( HasDerivAt.sub h_cross_term.1 h_cross_term.2 ) ( hasDerivAt_const _ _ ) using 1
   ring
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem sandwichedRelRentropy.hasDerivAt_trace_at_one {ρ σ : MState d}
     (h : σ.M.ker ≤ ρ.M.ker) :
     HasDerivAt
@@ -1146,7 +1139,6 @@ private theorem sandwichedRelRentropy.hasDerivAt_trace_at_one {ρ σ : MState d}
   · simp only [inner_sub_right]
     ring
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The key limit: as α → 1, log(Tr[(ρ.conj σ^t)^α]) / (α-1) → ⟪ρ, log ρ - log σ⟫,
     where t = (1-α)/(2α). Derived from hasDerivAt_trace_at_one via L'Hôpital
@@ -1421,7 +1413,6 @@ lemma ker_prod_le_iff (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂) :
 
 --TODO: Generalize to RCLike.
 omit [DecidableEq d₁] [DecidableEq d₂] in
-set_option backward.isDefEq.respectTransparency false in
 lemma HermitianMat.inner_kron
     (A : HermitianMat d₁ ℂ) (B : HermitianMat d₂ ℂ) (C : HermitianMat d₁ ℂ) (D : HermitianMat d₂ ℂ) :
     ⟪A ⊗ₖ B, C ⊗ₖ D⟫ = ⟪A, C⟫ * ⟪B, D⟫ := by
@@ -1467,7 +1458,6 @@ lemma continuousOn_rpow_uniform {K : Set ℝ} (hK : IsCompact K) :
   · have : |r - n| < δ := abs_lt.mpr ⟨by linarith, by linarith⟩
     simpa
 
-set_option backward.isDefEq.respectTransparency false in
 theorem sandwichedRelRentropy_additive_alpha_one_aux (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂)
   (h1 : σ₁.M.ker ≤ ρ₁.M.ker) (h2 : σ₂.M.ker ≤ ρ₂.M.ker) :
     ⟪(ρ₁ ⊗ᴹ ρ₂).M, (ρ₁ ⊗ᴹ ρ₂).M.log - (σ₁ ⊗ᴹ σ₂).M.log⟫ =
@@ -1591,16 +1581,15 @@ theorem sandwichedRelRentropy_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
   have := HermitianMat.ker_reindex_le_iff  (σ : HermitianMat d ℂ ) ↑ρ e.symm
   split_ifs <;> simp_all [HermitianMat.conj_submatrix]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
   --Technically this holds for all α except for `-1` and `0`. But those are stupid.
   --TODO: Maybe SandwichedRelRentropy should actually be defined differently for α = 0?
     D̃_ α(ρ‖ρ) = 0 := by
-  simp? [SandwichedRelRentropy, NNReal.eq_iff, hα] says
+  simp? [SandwichedRelRentropy, NNReal.eq_iff, hα, -NNReal.coe_eq_zero] says
     simp only [SandwichedRelRentropy, hα, ↓reduceDIte, Std.le_refl, sub_self, inner_zero_right,
-      ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_mk, NNReal.coe_zero, ite_eq_left_iff,
-      div_eq_zero_iff, Real.log_eq_zero]
+      ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_zero]
+  simp [NNReal.toReal]
   intro hα
   left; right; left
   rw [HermitianMat.rpow_eq_cfc, HermitianMat.rpow_eq_cfc]
@@ -1676,8 +1665,7 @@ private theorem sandwichedRelRentropy.continuousOn_Ioi_1 (ρ σ : MState d) :
     ContinuousOn (fun α => D̃_ α(ρ‖σ)) (Set.Ioi 1) := by
   dsimp [SandwichedRelRentropy]
   split_ifs with hρ
-  · simp [← ENNReal.ofReal_eq_coe_nnreal]
-    rw [continuousOn_congr (f := fun α ↦ ENNReal.ofReal
+  · rw [continuousOn_congr (f := fun α ↦ ENNReal.ofReal
       (Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1)))]
     · apply (ENNReal.continuous_ofReal).comp_continuousOn
       apply ContinuousOn.div₀
@@ -1692,7 +1680,11 @@ private theorem sandwichedRelRentropy.continuousOn_Ioi_1 (ρ σ : MState d) :
       · clear hρ; grind
     · intro α (hα : 1 < α)
       dsimp only
-      rw [if_pos (zero_lt_one.trans hα), if_neg hα.ne']
+      have hα₀ : 0 < α := by linarith
+      have hα₁ : α ≠ 1 := by linarith
+      simp only [dif_pos hα₀, if_neg hα₁, ENNReal.ofReal]
+      rw [Real.toNNReal_of_nonneg]
+      rfl
   · rw [continuousOn_congr (f := fun α ↦ ⊤)]
     · fun_prop
     · clear ρ σ hρ;
@@ -1720,8 +1712,7 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
     ContinuousOn (fun α => D̃_ α(ρ‖σ)) (Set.Ioo 0 1) := by
   dsimp [SandwichedRelRentropy]
   split_ifs with hρ
-  · simp [← ENNReal.ofReal_eq_coe_nnreal]
-    rw [continuousOn_congr (f := fun α ↦ ENNReal.ofReal
+  · rw [continuousOn_congr (f := fun α ↦ ENNReal.ofReal
       (Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1)))]
     · apply (ENNReal.continuous_ofReal).comp_continuousOn
       apply ContinuousOn.div₀
@@ -1734,7 +1725,12 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
       · intro x hx; exact sub_ne_zero.mpr (ne_of_lt hx.2)
     · intro α hα
       dsimp only
-      rw [if_pos hα.1, if_neg (ne_of_lt hα.2)]
+      have hα₀ : 0 < α := hα.1
+      have hα₁ : α ≠ 1 := ne_of_lt hα.2
+      split_ifs
+      · norm_cast
+      · rw [ENNReal.ofReal, Real.toNNReal_of_nonneg]
+        rfl
   · rw [continuousOn_congr (f := fun α ↦ ⊤)]
     · fun_prop
     · intro x hx
@@ -1786,9 +1782,9 @@ theorem sandwichedRelRentropy.continuousOn (ρ σ : MState d) :
 theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
     𝐃(ρ‖σ).toEReal = ⟪ρ.M, ρ.M.log - σ.M.log⟫ := by
   simp [qRelativeEnt, SandwichedRelRentropy, h, EReal.coe_nnreal_eq_coe_real]
+  norm_cast
 
 open Classical in
-set_option backward.isDefEq.respectTransparency false in
 theorem qRelativeEnt_eq_neg_Sᵥₙ_add (ρ σ : MState d) :
     (qRelativeEnt ρ σ).toEReal = -(Sᵥₙ ρ : EReal) +
       if σ.M.ker ≤ ρ.M.ker then (-⟪ρ.M, σ.M.log⟫ : EReal) else (⊤ : EReal) := by
@@ -1803,13 +1799,14 @@ theorem qRelativeEnt_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
     𝐃(ρ.relabel e‖σ.relabel e) = 𝐃(ρ‖σ) := by
   simp [qRelativeEnt]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_of_unique [Unique d] (ρ σ : MState d) :
     D̃_α(ρ‖σ) = 0 := by
   rcases Subsingleton.allEq ρ default
   rcases Subsingleton.allEq σ default
   simp [SandwichedRelRentropy]
+  intro
+  rfl
 
 @[simp]
 theorem qRelEntropy_of_unique [Unique d] (ρ σ : MState d) :
@@ -1902,7 +1899,7 @@ private lemma tendsto_inner_cfc_approxLog (ρ x : MState d) (hx : x.M.ker ≤ ρ
       Filter.atTop (nhds ⟪ρ.M, x.M.log⟫) := by
   rw [show x.M.log = x.M.cfc Real.log from rfl, inner_cfc_eq_sum_eigenWeight]
   simp_rw [inner_cfc_eq_sum_eigenWeight]
-  apply tendsto_finset_sum
+  apply tendsto_finsetSum
   intro i _
   have hpsd : x.M.mat.PosSemidef := by
     have h := x.pos.le
@@ -2032,7 +2029,7 @@ private lemma inner_cfc_approxLog_tendsto_bot (ρ x : MState d) (hx : ¬(x.M.ker
     rw [ show approxLog N ( x.M.H.eigenvalues i ) = -↑N from by rw [ show x.M.H.eigenvalues i = 0 from Finset.mem_filter.mp hi |>.2 ] ; exact approxLog_at_zero N ] ;
   convert h_split_sum.atBot_add ( show Filter.Tendsto ( fun N : ℕ => ∑ i ∈ Finset.univ.filter ( fun i => x.M.H.eigenvalues i ≠ 0 ), approxLog N ( x.M.H.eigenvalues i ) * eigenWeight ρ x i ) Filter.atTop ( nhds ( ∑ i ∈ Finset.univ.filter ( fun i => x.M.H.eigenvalues i ≠ 0 ), Real.log ( x.M.H.eigenvalues i ) * eigenWeight ρ x i ) ) from ?_ ) using 2;
   · rw [ inner_cfc_eq_sum_eigenWeight, Finset.sum_filter_add_sum_filter_not ];
-  · apply tendsto_finset_sum
+  · apply tendsto_finsetSum
     intro i hi
     exact Filter.Tendsto.mul ((approxLog_tendsto_at_pos ( show 0 < x.M.H.eigenvalues i from lt_of_le_of_ne (x.eigenvalue_nonneg i) (Ne.symm (by aesop))))) tendsto_const_nhds
 
@@ -2080,7 +2077,6 @@ Relative entropy is lower semicontinuous (in each argument, actually, but we onl
 latter here). Will need the fact that all the cfc / eigenvalue stuff is continuous, plus
 carefully handling what happens with the kernel subspace, which will make this a pain.
 -/
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous fun σ => 𝐃(ρ‖σ) := by
   simp_rw [qRelativeEnt, SandwichedRelRentropy, if_true, lowerSemicontinuous_iff]
@@ -2119,6 +2115,7 @@ TODO:
  * Define (joint) convexity as its own thing - a `ConvexOn` for `Mixable` types.
  * Maybe, more broadly, find a way to make `ConvexOn` work with the subset of `Matrix` that corresponds to `MState`.
 -/
+@[sorryful]
 theorem qRelativeEnt_joint_convexity :
   ∀ (ρ₁ ρ₂ σ₁ σ₂ : MState d), ∀ (p : Prob),
     𝐃(p [ρ₁ ↔ ρ₂]‖p [σ₁ ↔ σ₂]) ≤ p * 𝐃(ρ₁‖σ₁) + (1 - p) * 𝐃(ρ₂‖σ₂) := by
@@ -2328,7 +2325,6 @@ private lemma HermitianMat.inner_log_mono_of_posDef_of_le {A B C : HermitianMat 
     ⟪C, A.log⟫ ≤ ⟪C, B.log⟫ := by
   exact inner_mono hC (log_mono hA hAB)
 
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 private lemma posDef_add_eps {A : HermitianMat d ℂ} (hA : 0 ≤ A) {ε : ℝ} (hε : 0 < ε) :
     (A + ε • 1).mat.PosDef := by
@@ -2391,7 +2387,7 @@ private lemma inner_log_shift_tendsto {A C : HermitianMat d 𝕜} (hker : A.ker 
     (𝓝[>] 0).Tendsto (fun (ε : ℝ) ↦ ⟪C, (A + ε • 1).log⟫) (𝓝 ⟪C, A.log⟫) := by
   simp only [log_add_eps_eq_cfc A]
   simp only [inner_cfc_eq_sum, HermitianMat.log]
-  refine tendsto_finset_sum _ fun i _ ↦ ?_
+  refine tendsto_finsetSum _ fun i _ ↦ ?_
   by_cases hi : A.H.eigenvalues i = 0
   · simp [eigenproj_coeff_zero_of_ker_le hker hi]
   · have h := log_add_eps_eq_cfc A
@@ -2414,7 +2410,6 @@ private lemma HermitianMat.inner_log_mono_of_psd_of_le {A B C : HermitianMat d �
   · apply inner_log_shift_tendsto
     exact (ker_antitone hA hAB).trans hker
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma HermitianMat.inner_log_sub_le_log_alpha (ρ : MState d) {σ₁ σ₂ : MState d} {α : ℝ}
     (hσ : σ₂.M ≤ α • σ₁.M)
     (hker₁ : σ₁.M.ker ≤ ρ.M.ker) (hker₂ : σ₂.M.ker ≤ ρ.M.ker) :
@@ -2433,7 +2428,6 @@ private lemma HermitianMat.inner_log_sub_le_log_alpha (ρ : MState d) {σ₁ σ�
     rw [HermitianMat.inner_supportProj_of_ker_le hker₁, ρ.tr]
   simp_all [← add_assoc, inner_add_right, inner_smul_right]
 
-set_option backward.isDefEq.respectTransparency false in
 theorem qRelEntropy_le_add_of_le_smul (ρ : MState d) {σ₁ σ₂ : MState d} (hσ : σ₂.M ≤ α • σ₁.M) :
     𝐃(ρ‖σ₁) ≤ 𝐃(ρ‖σ₂) + ENNReal.ofReal (Real.log α)
     := by

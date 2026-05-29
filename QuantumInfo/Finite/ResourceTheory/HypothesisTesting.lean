@@ -263,10 +263,9 @@ set_option backward.isDefEq.respectTransparency false in
 --Lemma 3 from Hayashi
 theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompact S)
     (hS₂ : Convex ℝ (MState.M '' S)) : ⨆ σ ∈ S, β_ ε(ρ‖{σ}) = β_ ε(ρ‖S) := by
-
   --Work out the case where S is empty, so we can now assume it's nonempty
   rcases S.eq_empty_or_nonempty with rfl|hnS
-  · simpa using bot_eq_zero''
+  · simpa using _root_.bot_eq_zero
   --Upgrade this fact to an instance
   have _ : Nonempty S := hnS.to_subtype
 

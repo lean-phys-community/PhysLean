@@ -81,7 +81,7 @@ theorem sandwichedRelRentropy_eq_log_traceFunctional (hα₀ : 0 < α) (hα₁ :
   rw [ENNReal.ofReal_eq_coe_nnreal]
   unfold SandwichedRelRentropy sandwichedTraceFunctional
   split
-  next h => simp_all only
+  next h => simp_all only; norm_cast
   next h => rfl
 
 /-
@@ -1276,8 +1276,7 @@ theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
     rw [inner_sub_right, inner_sub_right]
     grind only [log_conj_unitary, inner_conj_unitary]
   · ext1
-    dsimp
-    congr! 1
+    congr 3
     convert congr_arg Real.log (sandwichedTraceFunctional_conj_unitary_MState U ρ σ) using 1
 
 /-

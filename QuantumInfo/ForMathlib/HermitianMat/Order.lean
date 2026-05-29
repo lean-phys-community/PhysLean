@@ -523,7 +523,7 @@ theorem le_smul_one_imp_eigenvalues_le [DecidableEq n] (A : HermitianMat n ℂ) 
     star v ⬝ᵥ ((M : ℂ) • (1 : Matrix n n ℂ)) *ᵥ v at hquad
   have hquadC : (A.H.eigenvalues i : ℂ) ≤ (M : ℂ) := by
     have hright : star v ⬝ᵥ ((M : ℂ) • (1 : Matrix n n ℂ)) *ᵥ v = (M : ℂ) := by
-      simpa [Matrix.smul_mulVec, hv] using (Algebra.algebraMap_eq_smul_one M).symm
+      simp [Matrix.smul_mulVec, hv]
     simpa [Matrix.smul_mulVec, hv] using hquad.trans_eq hright
   exact_mod_cast hquadC
 

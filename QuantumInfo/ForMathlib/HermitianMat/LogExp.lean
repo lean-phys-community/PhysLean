@@ -386,7 +386,7 @@ lemma tendsto_cfc_log_div_add_atTop (x : HermitianMat d 𝕜) :
     exact fun T => cfc_toMat_eq_sum_smul_proj x fun u => Real.log ((1 + T) / (u + T));
   -- The limit of a sum is the sum of the limits.
   have h_sum : Filter.Tendsto (fun T : ℝ => ∑ i, Real.log ((1 + T) / (x.H.eigenvalues i + T)) • (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) * x.H.eigenvectorUnitary.val.conjTranspose)) Filter.atTop (nhds (∑ i, 0 • (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) * x.H.eigenvectorUnitary.val.conjTranspose))) := by
-    refine' tendsto_finset_sum _ fun i _ => _;
+    refine' tendsto_finsetSum _ fun i _ => _;
     convert Filter.Tendsto.smul_const ( Real.tendsto_log_div_add_atTop ( x.H.eigenvalues i ) ) _ using 1;
     all_goals try infer_instance;
     norm_num +zetaDelta at *

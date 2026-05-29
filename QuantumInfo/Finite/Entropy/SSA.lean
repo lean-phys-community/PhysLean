@@ -1012,7 +1012,7 @@ private lemma MState.traceLeft_continuous :
   -- Since the matrix traceLeft is continuous, the function that maps a state to its partial trace is also continuous.
   have h_traceLeft_cont : Continuous (fun ρ : HermitianMat (d₁ × d₂) ℂ => ρ.traceLeft) := by
     have h_cont : Continuous (fun ρ : Matrix (d₁ × d₂) (d₁ × d₂) ℂ => ρ.traceLeft) := by
-      exact continuous_pi fun _ => continuous_pi fun _ => continuous_finset_sum _ fun _ _ => continuous_apply _ |> Continuous.comp <| continuous_apply _ |> Continuous.comp <| continuous_id';
+      exact continuous_pi fun _ => continuous_pi fun _ => continuous_finsetSum _ fun _ _ => continuous_apply _ |> Continuous.comp <| continuous_apply _ |> Continuous.comp <| continuous_id';
     convert h_cont.comp ( show Continuous fun ρ : HermitianMat ( d₁ × d₂ ) ℂ => ρ.1 from ?_ ) using 1;
     · constructor <;> intro h <;> rw [ continuous_induced_rng ] at * <;> aesop;
     · fun_prop;

@@ -253,7 +253,7 @@ lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
   erw [Matrix.map_tsum (algebraMap ℝ ℂ).toAddMonoidHom RCLike.continuous_ofReal hs]
   apply tsum_congr
   intro k
-  erw [Matrix.map_smul, Matrix.map_pow]
+  erw [Matrix.map_smul, Matrix.map_pow A (algebraMap ℝ ℂ) k]
   simp
 
 end NormedSpace

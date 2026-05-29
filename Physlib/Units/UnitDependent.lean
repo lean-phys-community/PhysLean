@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Units.Basic
-public import Mathlib.Topology.Algebra.Module.StrongTopology
+public import Mathlib.Topology.Algebra.Module.Spaces.ContinuousLinearMap
 /-!
 
 ## Types which depend on dimensions
@@ -189,11 +189,11 @@ noncomputable instance : UnitDependent UnitChoices where
     congr 1 <;> simp
   scaleUnit_trans' u1 u2 u3 u := by
     congr 1
-    · simp [LengthUnit.div_eq_val]
-    · simp [TimeUnit.div_eq_val]
-    · simp [MassUnit.div_eq_val]
-    · simp [ChargeUnit.div_eq_val]
-    · simp [TemperatureUnit.div_eq_val]
+    · simp [LengthUnit.div_eq_val, toReal]
+    · simp [TimeUnit.div_eq_val, toReal]
+    · simp [MassUnit.div_eq_val, toReal]
+    · simp [ChargeUnit.div_eq_val, toReal]
+    · simp [TemperatureUnit.div_eq_val, toReal]
   scaleUnit_id u1 u := by simp
 
 @[simp]
@@ -201,11 +201,11 @@ lemma UnitChoices.scaleUnit_apply_fst (u1 u2 : UnitChoices) :
     (scaleUnit u1 u2 u1) = u2 := by
   simp [scaleUnit]
   apply UnitChoices.ext
-  · simp [LengthUnit.scale, LengthUnit.div_eq_val]
-  · simp [TimeUnit.scale, TimeUnit.div_eq_val]
-  · simp [MassUnit.scale, MassUnit.div_eq_val]
-  · simp [ChargeUnit.scale, ChargeUnit.div_eq_val]
-  · simp [TemperatureUnit.scale, TemperatureUnit.div_eq_val]
+  · simp [LengthUnit.scale, LengthUnit.div_eq_val, toReal]
+  · simp [TimeUnit.scale, TimeUnit.div_eq_val, toReal]
+  · simp [MassUnit.scale, MassUnit.div_eq_val, toReal]
+  · simp [ChargeUnit.scale, ChargeUnit.div_eq_val, toReal]
+  · simp [TemperatureUnit.scale, TemperatureUnit.div_eq_val, toReal]
 
 @[simp]
 lemma UnitChoices.dimScale_scaleUnit {u1 u2 u : UnitChoices} (d : Dimension) :
@@ -217,19 +217,19 @@ lemma UnitChoices.dimScale_scaleUnit {u1 u2 u : UnitChoices} (d : Dimension) :
   congr 1
   · congr 1
     simp [scaleUnit]
-    simp [LengthUnit.div_eq_val]
+    simp [LengthUnit.div_eq_val, toReal]
   · congr 1
     simp [scaleUnit]
-    simp [TimeUnit.div_eq_val]
+    simp [TimeUnit.div_eq_val, toReal]
   · congr 1
     simp [scaleUnit]
-    simp [MassUnit.div_eq_val]
+    simp [MassUnit.div_eq_val, toReal]
   · congr 1
     simp [scaleUnit]
-    simp [ChargeUnit.div_eq_val]
+    simp [ChargeUnit.div_eq_val, toReal]
   · congr 1
     simp [scaleUnit]
-    simp [TemperatureUnit.div_eq_val]
+    simp [TemperatureUnit.div_eq_val, toReal]
 
 lemma Dimensionful.of_scaleUnit {M : Type} [CarriesDimension M] {u1 u2 u : UnitChoices}
     (c : Dimensionful M) :

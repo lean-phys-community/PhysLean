@@ -10,12 +10,6 @@ public import QuantumInfo.ForMathlib.IsMaximalSelfAdjoint
 public import QuantumInfo.ForMathlib.ContinuousLinearMap
 public import QuantumInfo.ForMathlib.Tactic.Commutes
 
-public import Mathlib.Analysis.Matrix.Normed
-public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
-public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic
-public import Mathlib.Analysis.SpecialFunctions.Bernstein
-public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
-public import Mathlib.Tactic.NormNum.GCD
 
 @[expose] public section
 
@@ -199,7 +193,7 @@ instance : AddCommGroup (HermitianMat n α) :=
 @[simp, norm_cast]
 theorem mat_finset_sum (f : ι → HermitianMat n α) (s : Finset ι) :
     (∑ i ∈ s, f i).mat = ∑ i ∈ s, (f i).mat := by
-  apply AddSubgroup.val_finset_sum
+  apply AddSubgroup.val_finsetSum
 
 section module
 
@@ -456,7 +450,7 @@ noncomputable def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n w
 
 @[simp]
 theorem isSymmetric : A.lin.IsSymmetric :=
-  Matrix.isHermitian_iff_isSymmetric.mp A.H
+  Matrix.isSymmetric_toEuclideanLin_iff.symm.mp A.H
 
 @[simp]
 theorem lin_zero : (0 : HermitianMat n 𝕜).lin = 0 := by

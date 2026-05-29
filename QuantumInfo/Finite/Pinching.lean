@@ -134,7 +134,6 @@ theorem pinching_commutes (ρ σ : MState d) :
   simp only [← mul_assoc, hr]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem pinching_self (ρ : MState d) : pinching_map ρ ρ = ρ := by
   ext1
@@ -222,6 +221,7 @@ theorem pinching_bound (ρ σ : MState d) : ρ.M ≤ (↑(Fintype.card (spectrum
     congr! with x _ y _
     rw [← Matrix.mul_assoc]
     exact h_mul x y
+  · simp
   · have hc (c d : ℂ) : d = starRingEnd ℂ d  → c = d → c = d.re := by
       rintro h rfl; simp [Complex.ext_iff] at h ⊢; linarith
     apply hc <;> clear hc
@@ -273,7 +273,6 @@ theorem inner_cfc_pinching (ρ σ : MState d) (f : ℝ → ℝ) :
   convert congr($(pinching_sum σ).mat)
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 theorem inner_cfc_pinching_right (ρ σ : MState d) (f : ℝ → ℝ) :
     ⟪(pinching_map σ ρ).M, σ.M.cfc f⟫ = ⟪ρ.M, σ.M.cfc f⟫ := by
   --TODO Cleanup
@@ -308,7 +307,6 @@ theorem pinching_map_eq_sum_conj_hermitian (σ ρ : MState d) :
   ext1
   simp [pinching_eq_sum_conj σ ρ]
 
-set_option backward.isDefEq.respectTransparency false in
 theorem pinching_map_ker_le (ρ σ : MState d) : (pinching_map σ ρ).M.ker ≤ ρ.M.ker := by
   have h_ker_sum : (∑ k, ρ.M.conj (pinching_kraus σ k).mat).ker = ⨅ k, (ρ.M.conj (pinching_kraus σ k).mat).ker := by
     apply HermitianMat.ker_sum
@@ -346,8 +344,6 @@ theorem pinching_kraus_ker_of_ne_zero {d : Type*} [Fintype d] [DecidableEq d]
 
 end AristotleLemmas
 
-set_option backward.isDefEq.respectTransparency false in
-set_option maxHeartbeats 2000000 in
 theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ker) :
     σ.M.ker ≤ (pinching_map σ ρ).M.ker := by
   --TODO Cleanup
@@ -393,7 +389,6 @@ theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ke
     · simp
   · simp [← Matrix.mulVec_mulVec, h_proj_zero _ hk_zero]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Exercise 2.8 of Hayashi's book "A group theoretic approach to Quantum Information". -/
 theorem pinching_pythagoras (ρ σ : MState d) :
     𝐃(ρ‖σ) = 𝐃(ρ‖pinching_map σ ρ) + 𝐃(pinching_map σ ρ‖σ) := by

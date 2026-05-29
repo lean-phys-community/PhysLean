@@ -145,7 +145,8 @@ lemma dimScale_transitive (u1 u2 u3 : UnitChoices) (d : Dimension) :
   repeat rw [← mul_rpow]
   apply NNReal.eq
   simp only [LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val, ChargeUnit.div_eq_val,
-    TemperatureUnit.div_eq_val, NNReal.coe_mul, coe_rpow, coe_mk]
+    TemperatureUnit.div_eq_val, NNReal.coe_mul, coe_rpow]
+  rw [toReal]
   field_simp
 
 @[simp]
