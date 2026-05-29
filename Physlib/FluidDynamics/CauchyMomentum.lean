@@ -90,44 +90,17 @@ theorem cauchy_momentum_iff_convective_cauchy_momentum
     (hMomentumDensity : ∀ t, Differentiable ℝ (momentumDensity d flow.toFluidFlow t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (flow.velocity t)) :
     CauchyMomentumEquation d flow ↔ ConvectiveCauchyMomentumEquation d flow := by
-  constructor
-  · intro hConservative t x
-    have hMassFluxSpace :
-        DifferentiableAt ℝ (fun x' => flow.rho t x' • flow.velocity t x') x := by
-      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
+  have conservative_eq_convective_lhs : ∀ t x,
+      conservativeMomentumLHS d flow.toFluidFlow t x =
+        convectiveMomentumLHS d flow.toFluidFlow t x := by
+    intro t x
     have hResidual : continuityResidual d flow.toFluidFlow t x = 0 := by
       simpa [continuityResidual] using
-        hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace
-    have hLhs :=
-      conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
+        hContinuity t x (by simpa using hRhoTime t x) (hMomentumDensity t).differentiableAt
+    rw [conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
         d flow.toFluidFlow t x (hRhoTime t x) (hVelocityTime t x)
-        (hMomentumDensity t) (hVelocitySpace t)
-    have hLhs' :
-        conservativeMomentumLHS d flow.toFluidFlow t x =
-          convectiveMomentumLHS d flow.toFluidFlow t x := by
-      rw [hLhs, hResidual, zero_smul, add_zero]
-    change convectiveMomentumLHS d flow.toFluidFlow t x =
-      matrixDiv d (flow.stress t) x + flow.rho t x • flow.bodyForce t x
-    rw [← hLhs']
-    exact hConservative t x
-  · intro hConvective t x
-    have hMassFluxSpace :
-        DifferentiableAt ℝ (fun x' => flow.rho t x' • flow.velocity t x') x := by
-      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
-    have hResidual : continuityResidual d flow.toFluidFlow t x = 0 := by
-      simpa [continuityResidual] using
-        hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace
-    have hLhs :=
-      conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-        d flow.toFluidFlow t x (hRhoTime t x) (hVelocityTime t x)
-        (hMomentumDensity t) (hVelocitySpace t)
-    have hLhs' :
-        conservativeMomentumLHS d flow.toFluidFlow t x =
-          convectiveMomentumLHS d flow.toFluidFlow t x := by
-      rw [hLhs, hResidual, zero_smul, add_zero]
-    change conservativeMomentumLHS d flow.toFluidFlow t x =
-      matrixDiv d (flow.stress t) x + flow.rho t x • flow.bodyForce t x
-    rw [hLhs']
-    exact hConvective t x
+        (hMomentumDensity t) (hVelocitySpace t), hResidual, zero_smul, add_zero]
+  exact ⟨fun h t x => (conservative_eq_convective_lhs t x).symm.trans (h t x),
+    fun h t x => (conservative_eq_convective_lhs t x).trans (h t x)⟩
 
 end FluidDynamics
