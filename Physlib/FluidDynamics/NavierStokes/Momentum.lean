@@ -55,7 +55,7 @@ The equation is
 
 Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
-def MomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
+def MomentumEquation (d : ℕ) (data : CauchyFlow d) : Prop :=
   ∀ t x,
     conservativeMomentumLHS d data.toFluidState t x =
       matrixDiv d (data.stress t) x + data.rho t x • data.bodyForce t x
@@ -74,7 +74,7 @@ The equation is
 
 Here `stress` is intentionally not yet specialized to a Newtonian stress law.
 -/
-def ConvectiveMomentumEquation (d : ℕ) (data : FluidInMomentumBalance d) : Prop :=
+def ConvectiveMomentumEquation (d : ℕ) (data : CauchyFlow d) : Prop :=
   ∀ t x,
     data.rho t x • materialAcceleration d data.toFluidState t x =
       matrixDiv d (data.stress t) x + data.rho t x • data.bodyForce t x
@@ -92,7 +92,7 @@ The differentiability assumptions are exactly the product-rule assumptions used 
 `partial_t (rho u)` and `matrixDiv (rho u ⊗ u)`.
 -/
 theorem momentumEquation_iff_convectiveMomentumEquation
-    (d : ℕ) (data : FluidInMomentumBalance d)
+    (d : ℕ) (data : CauchyFlow d)
     (hContinuity : ClassicalContinuityEquation d data.toFluidState)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (data.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (data.velocity · x) t)

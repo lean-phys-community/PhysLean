@@ -15,7 +15,7 @@ public import Physlib.SpaceAndTime.Time.Basic
 
 This module defines the basic fields used to describe a fluid on `d`-dimensional space.
 The core structure `FluidState` contains only the density and velocity fields. Additional
-fields used by specific balance laws are provided by extension structures.
+fields used by momentum balance and thermodynamic laws are provided by extension structures.
 
 ## ii. Key results
 
@@ -27,7 +27,8 @@ fields used by specific balance laws are provided by extension structures.
 - `StressTensor` : A time-dependent matrix-valued stress field.
 - `BodyForce` : A time-dependent vector body-force field per unit mass.
 - `FluidState` : The density and velocity fields of a fluid.
-- `FluidInMomentumBalance` : A fluid state with stress and body force.
+- `CauchyFlow` : A fluid state with Cauchy stress and body force.
+- `ThermodynamicCauchyFlow` : A Cauchy flow with entropy and enthalpy fields.
 
 ## iii. Table of contents
 
@@ -82,11 +83,18 @@ structure FluidState (d : ℕ) where
   /-- The velocity field. -/
   velocity : VelocityField d
 
-/-- The fields needed for a momentum balance: fluid state, stress, and body force. -/
-structure FluidInMomentumBalance (d : ℕ) extends FluidState d where
-  /-- The stress tensor field. -/
+/-- A fluid flow equipped with Cauchy stress and body-force fields. -/
+structure CauchyFlow (d : ℕ) extends FluidState d where
+  /-- The Cauchy stress tensor field. -/
   stress : StressTensor d
   /-- The body-force field per unit mass. -/
   bodyForce : BodyForce d
+
+/-- A Cauchy flow equipped with thermodynamic entropy and enthalpy fields. -/
+structure ThermodynamicCauchyFlow (d : ℕ) extends CauchyFlow d where
+  /-- The specific entropy field. -/
+  entropy : ScalarField d
+  /-- The specific enthalpy field. -/
+  enthalpy : ScalarField d
 
 end FluidDynamics
