@@ -6,7 +6,7 @@ Authors: Florian Wiesner
 module
 
 public import Physlib.SpaceAndTime.Space.Basic
-public import Physlib.SpaceAndTime.Time.Basic
+public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
 # Fluid flows
@@ -28,17 +28,22 @@ fields used by momentum balance and thermodynamic laws are provided by extension
 - `FluidFlow` : The density and velocity fields of a fluid.
 - `CauchyFlow` : A fluid flow with Cauchy stress and specific body force.
 - `ThermodynamicCauchyFlow` : A Cauchy flow with entropy and enthalpy fields.
+- `DensityTimeIndependent` : A fluid flow whose density has zero time derivative.
+- `VelocityTimeIndependent` : A fluid flow whose velocity has zero time derivative.
 
 ## iii. Table of contents
 
 - A. Field types
 - B. Fluid flow structures
+- C. Time-independence predicates
 
 ## iv. References
 
 -/
 
 @[expose] public section
+
+open Time
 
 namespace FluidDynamics
 
@@ -79,7 +84,7 @@ structure FluidFlow (d : ℕ) where
   /-- The velocity field. -/
   velocity : VelocityField d
 
-/-- A fluid flow equipped with Cauchy stress and body-force fields. -/
+/-- A fluid flow equipped with Cauchy stress and specific body-force fields. -/
 structure CauchyFlow (d : ℕ) extends FluidFlow d where
   /-- The Cauchy stress tensor field. -/
   stress : StressTensor d
@@ -92,5 +97,21 @@ structure ThermodynamicCauchyFlow (d : ℕ) extends CauchyFlow d where
   entropy : ScalarField d
   /-- The specific enthalpy field. -/
   enthalpy : ScalarField d
+
+/-!
+
+## C. Time-independence predicates
+
+-/
+
+/-- A fluid flow has time-independent density when the density has zero time derivative at
+each spatial point. -/
+def DensityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
+  ∀ t x, ∂ₜ (fluid.rho · x) t = 0
+
+/-- A fluid flow has time-independent velocity when the velocity has zero time derivative at
+each spatial point. -/
+def VelocityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
+  ∀ t x, ∂ₜ (fluid.velocity · x) t = 0
 
 end FluidDynamics

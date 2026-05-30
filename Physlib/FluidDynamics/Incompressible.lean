@@ -7,7 +7,6 @@ module
 
 public import Physlib.FluidDynamics.FluidFlow
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
-public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
 # Incompressible fluid flows
@@ -25,7 +24,6 @@ Navier-Stokes, incompressible Euler, and Bernoulli-style developments.
 - `SmoothIncompressible` : Incompressibility with globally differentiable velocity.
 - `SmoothIncompressible.toClassical` : Smooth incompressibility implies classical
   incompressibility.
-- `DensityTimeIndependent` : A fluid flow whose density has zero time derivative.
 
 ## iii. Table of contents
 
@@ -38,7 +36,6 @@ Navier-Stokes, incompressible Euler, and Bernoulli-style developments.
 @[expose] public section
 
 open Space
-open Time
 
 namespace FluidDynamics
 
@@ -70,10 +67,5 @@ lemma SmoothIncompressible.toClassical (d : ℕ) (fluid : FluidFlow d) :
     SmoothIncompressible d fluid → ClassicalIncompressible d fluid := by
   intro hSmooth t x _
   simpa [incompressibilityResidual] using hSmooth.2 t x
-
-/-- A fluid flow has time-independent density when the density has zero time derivative at
-each spatial point. -/
-def DensityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
-  ∀ t x, ∂ₜ (fluid.rho · x) t = 0
 
 end FluidDynamics

@@ -21,8 +21,7 @@ structure.
 ## ii. Key results
 
 - `HasBodyForcePotential` : Predicate encoding the convention `specificBodyForce = -grad Phi`.
-- `HasConservativeBodyForce` : Predicate saying a body force has some potential.
-- `IsSteady` : Predicate saying the velocity field has no time dependence.
+- `HasConservativeBodyForce` : Predicate saying a specific body force has some potential.
 - `materialDerivative` : Material derivative of a scalar field along a fluid velocity field.
 - `IsIsentropic` : Predicate saying the entropy is materially conserved.
 - `specificKineticEnergy` : The specific kinetic energy `|u|^2 / 2`.
@@ -33,7 +32,7 @@ structure.
 ## iii. Table of contents
 
 - A. Conservative-force convention
-- B. Flow predicates
+- B. Thermodynamic-flow predicates
 - C. Bernoulli function
 - D. Bernoulli-law predicates
 
@@ -60,19 +59,15 @@ namespace FluidDynamics
 def HasBodyForcePotential (d : ℕ) (flow : CauchyFlow d) (potential : Space d → ℝ) : Prop :=
   ∀ t x, flow.specificBodyForce t x = -(∇ potential x)
 
-/-- A flow has conservative body force when its body force has some potential. -/
+/-- A flow has conservative body force when its specific body force has some potential. -/
 def HasConservativeBodyForce (d : ℕ) (flow : CauchyFlow d) : Prop :=
   ∃ potential : Space d → ℝ, HasBodyForcePotential d flow potential
 
 /-!
 
-## B. Flow predicates
+## B. Thermodynamic-flow predicates
 
 -/
-
-/-- A fluid flow is steady when the velocity has zero time derivative everywhere. -/
-def IsSteady (d : ℕ) (fluid : FluidFlow d) : Prop :=
-  ∀ t x, ∂ₜ (fluid.velocity · x) t = 0
 
 /-- The material derivative `D_t f = partial_t f + u · grad f` of a scalar field. -/
 noncomputable def materialDerivative (d : ℕ) (fluid : FluidFlow d)

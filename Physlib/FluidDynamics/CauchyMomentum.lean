@@ -13,8 +13,9 @@ public import Physlib.FluidDynamics.Momentum
 ## i. Overview
 
 This module defines the conservative and convective Cauchy momentum equations for a fluid flow
-with stress and body-force fields. The stress tensor is left as an input field, so this is the
-balance-law layer before specializing to a constitutive law, such as Euler or Navier-Stokes.
+with stress and specific body-force fields. The stress tensor is left as an input field, so this
+is the balance-law layer before specializing to a constitutive law, such as Euler or
+Navier-Stokes.
 
 ## ii. Key results
 
