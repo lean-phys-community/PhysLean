@@ -19,9 +19,9 @@ the Cauchy stress tensor rather than as a field of the flow data.
 
 ## ii. Key results
 
-- `IsInviscid` : Predicate saying the Cauchy stress is the inviscid pressure stress.
-- `matrixDiv_stress_eq_neg_grad_pressure_of_is_inviscid` : The inviscid stress contributes the
-  usual pressure-gradient force term.
+- `CauchyFlow.IsInviscid` : Predicate saying the Cauchy stress is the inviscid pressure stress.
+- `CauchyFlow.matrixDiv_stress_eq_neg_grad_pressure_of_is_inviscid` : The inviscid stress
+  contributes the usual pressure-gradient force term.
 - `Euler` : Classical continuity, Cauchy momentum, and inviscid stress together.
 - `ConvectiveEuler` : Classical continuity, convective Cauchy momentum, and inviscid stress.
 - `euler_iff_convective_euler` : Equivalence of the conservative and convective forms when the
@@ -42,6 +42,8 @@ the Cauchy stress tensor rather than as a field of the flow data.
 open Space
 
 namespace FluidDynamics
+
+namespace CauchyFlow
 
 /-!
 
@@ -80,6 +82,8 @@ theorem matrixDiv_stress_eq_neg_grad_pressure_of_is_inviscid
     exact hInviscid t x]
   exact matrixDiv_inviscid_pressure_stress d (pressure t)
 
+end CauchyFlow
+
 /-!
 
 ## B. Euler equations
@@ -88,14 +92,14 @@ theorem matrixDiv_stress_eq_neg_grad_pressure_of_is_inviscid
 
 /-- The conservative Euler equations: continuity, Cauchy momentum, and inviscid stress. -/
 def Euler (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d) : Prop :=
-  ClassicalContinuityEquation d flow.toFluidFlow ∧
-    CauchyMomentumEquation d flow ∧ IsInviscid d flow pressure
+  FluidFlow.ClassicalContinuityEquation d flow.toFluidFlow ∧
+    CauchyFlow.CauchyMomentumEquation d flow ∧ CauchyFlow.IsInviscid d flow pressure
 
 /-- The convective Euler equations: continuity, convective Cauchy momentum, and inviscid
 stress. -/
 def ConvectiveEuler (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d) : Prop :=
-  ClassicalContinuityEquation d flow.toFluidFlow ∧
-    ConvectiveCauchyMomentumEquation d flow ∧ IsInviscid d flow pressure
+  FluidFlow.ClassicalContinuityEquation d flow.toFluidFlow ∧
+    CauchyFlow.ConvectiveCauchyMomentumEquation d flow ∧ CauchyFlow.IsInviscid d flow pressure
 
 /-!
 
@@ -110,17 +114,17 @@ theorem euler_iff_convective_euler
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (flow.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (flow.velocity · x) t)
     (hMomentumDensity : ∀ t,
-      Differentiable ℝ (momentumDensity d flow.toFluidFlow t))
+      Differentiable ℝ (FluidFlow.momentumDensity d flow.toFluidFlow t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (flow.velocity t)) :
     Euler d flow pressure ↔ ConvectiveEuler d flow pressure := by
   constructor
   · intro hConservative
     refine ⟨hConservative.1, ?_, hConservative.2.2⟩
-    exact (cauchy_momentum_iff_convective_cauchy_momentum d flow hConservative.1
+    exact (CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum d flow hConservative.1
       hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp hConservative.2.1
   · intro hConvective
     refine ⟨hConvective.1, ?_, hConvective.2.2⟩
-    exact (cauchy_momentum_iff_convective_cauchy_momentum d flow hConvective.1
+    exact (CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum d flow hConvective.1
       hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr hConvective.2.1
 
 end FluidDynamics

@@ -19,10 +19,11 @@ Navier-Stokes.
 
 ## ii. Key results
 
-- `CauchyMomentumEquation` : Conservation of momentum using `Space.matrixDiv`.
-- `ConvectiveCauchyMomentumEquation` : The Cauchy momentum equation in convective form.
-- `cauchy_momentum_iff_convective_cauchy_momentum` : Equivalence of the two Cauchy momentum
-  equations when continuity holds and the fields are differentiable.
+- `CauchyFlow.CauchyMomentumEquation` : Conservation of momentum using `Space.matrixDiv`.
+- `CauchyFlow.ConvectiveCauchyMomentumEquation` : The Cauchy momentum equation in convective
+  form.
+- `CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum` : Equivalence of the two Cauchy
+  momentum equations when continuity holds and the fields are differentiable.
 
 ## iii. Table of contents
 
@@ -38,6 +39,8 @@ Navier-Stokes.
 open Space
 
 namespace FluidDynamics
+
+namespace CauchyFlow
 
 /-!
 
@@ -55,7 +58,7 @@ Here `stress` is intentionally not yet specialized to a constitutive law.
 -/
 def CauchyMomentumEquation (d : ℕ) (flow : CauchyFlow d) : Prop :=
   ∀ t x,
-    conservativeMomentumLHS d flow.toFluidFlow t x =
+    FluidFlow.conservativeMomentumLHS d flow.toFluidFlow t x =
       matrixDiv d (flow.stress t) x + flow.rho t x • flow.specificBodyForce t x
 
 /-- Conservation of momentum in convective form.
@@ -68,7 +71,7 @@ Here `stress` is intentionally not yet specialized to a constitutive law.
 -/
 def ConvectiveCauchyMomentumEquation (d : ℕ) (flow : CauchyFlow d) : Prop :=
   ∀ t x,
-    flow.rho t x • materialAcceleration d flow.toFluidFlow t x =
+    flow.rho t x • FluidFlow.materialAcceleration d flow.toFluidFlow t x =
       matrixDiv d (flow.stress t) x + flow.rho t x • flow.specificBodyForce t x
 
 /-!
@@ -85,23 +88,25 @@ The differentiability assumptions are exactly the product-rule assumptions used 
 -/
 theorem cauchy_momentum_iff_convective_cauchy_momentum
     (d : ℕ) (flow : CauchyFlow d)
-    (hContinuity : ClassicalContinuityEquation d flow.toFluidFlow)
+    (hContinuity : FluidFlow.ClassicalContinuityEquation d flow.toFluidFlow)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (flow.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (flow.velocity · x) t)
-    (hMomentumDensity : ∀ t, Differentiable ℝ (momentumDensity d flow.toFluidFlow t))
+    (hMomentumDensity : ∀ t, Differentiable ℝ (FluidFlow.momentumDensity d flow.toFluidFlow t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (flow.velocity t)) :
     CauchyMomentumEquation d flow ↔ ConvectiveCauchyMomentumEquation d flow := by
   have conservative_eq_convective_lhs : ∀ t x,
-      conservativeMomentumLHS d flow.toFluidFlow t x =
-        convectiveMomentumLHS d flow.toFluidFlow t x := by
+      FluidFlow.conservativeMomentumLHS d flow.toFluidFlow t x =
+        FluidFlow.convectiveMomentumLHS d flow.toFluidFlow t x := by
     intro t x
-    have hResidual : continuityResidual d flow.toFluidFlow t x = 0 := by
-      simpa [continuityResidual] using
+    have hResidual : FluidFlow.continuityResidual d flow.toFluidFlow t x = 0 := by
+      simpa [FluidFlow.continuityResidual] using
         hContinuity t x (by simpa using hRhoTime t x) (hMomentumDensity t).differentiableAt
-    rw [conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
+    rw [FluidFlow.conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
         d flow.toFluidFlow t x (hRhoTime t x) (hVelocityTime t x)
         (hMomentumDensity t) (hVelocitySpace t), hResidual, zero_smul, add_zero]
   exact ⟨fun h t x => (conservative_eq_convective_lhs t x).symm.trans (h t x),
     fun h t x => (conservative_eq_convective_lhs t x).trans (h t x)⟩
+
+end CauchyFlow
 
 end FluidDynamics

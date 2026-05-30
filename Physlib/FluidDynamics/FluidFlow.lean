@@ -28,8 +28,8 @@ fields used by momentum balance and thermodynamic laws are provided by extension
 - `FluidFlow` : The density and velocity fields of a fluid.
 - `CauchyFlow` : A fluid flow with Cauchy stress and specific body force.
 - `ThermodynamicCauchyFlow` : A Cauchy flow with entropy and enthalpy fields.
-- `DensityTimeIndependent` : A fluid flow whose density has zero time derivative.
-- `VelocityTimeIndependent` : A fluid flow whose velocity has zero time derivative.
+- `FluidFlow.DensityTimeIndependent` : A fluid flow whose density has zero time derivative.
+- `FluidFlow.VelocityTimeIndependent` : A fluid flow whose velocity has zero time derivative.
 
 ## iii. Table of contents
 
@@ -104,6 +104,8 @@ structure ThermodynamicCauchyFlow (d : ℕ) extends CauchyFlow d where
 
 -/
 
+namespace FluidFlow
+
 /-- A fluid flow has time-independent density when the density has zero time derivative at
 each spatial point. -/
 def DensityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
@@ -113,5 +115,7 @@ def DensityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
 each spatial point. -/
 def VelocityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
   ∀ t x, ∂ₜ (fluid.velocity · x) t = 0
+
+end FluidFlow
 
 end FluidDynamics

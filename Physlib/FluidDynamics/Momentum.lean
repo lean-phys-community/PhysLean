@@ -19,14 +19,14 @@ they can be reused by Navier-Stokes, Euler, and related systems.
 
 ## ii. Key results
 
-- `momentumDensity` : The vector momentum density `rho u`.
-- `momentumFlux` : The convective momentum flux `rho u ⊗ u`.
-- `convectiveTerm` : The nonlinear transport term `(u · ∇)u`.
-- `materialAcceleration` : The material acceleration `∂ₜ u + (u · ∇)u`.
-- `conservativeMomentumLHS` : The conservative momentum-balance left-hand side.
-- `convectiveMomentumLHS` : The convective momentum-balance left-hand side.
-- `conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul` : The bridge
-  between conservative and convective momentum forms.
+- `FluidFlow.momentumDensity` : The vector momentum density `rho u`.
+- `FluidFlow.momentumFlux` : The convective momentum flux `rho u ⊗ u`.
+- `FluidFlow.convectiveTerm` : The nonlinear transport term `(u · ∇)u`.
+- `FluidFlow.materialAcceleration` : The material acceleration `∂ₜ u + (u · ∇)u`.
+- `FluidFlow.conservativeMomentumLHS` : The conservative momentum-balance left-hand side.
+- `FluidFlow.convectiveMomentumLHS` : The convective momentum-balance left-hand side.
+- `FluidFlow.conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul` :
+  The bridge between conservative and convective momentum forms.
 
 ## iii. Table of contents
 
@@ -44,6 +44,8 @@ open Space
 open Time
 
 namespace FluidDynamics
+
+namespace FluidFlow
 
 /-!
 
@@ -189,5 +191,7 @@ lemma conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_sm
   ext i
   simp [materialAcceleration, convectiveTerm, div, momentumDensity, smul_eq_mul]
   ring_nf
+
+end FluidFlow
 
 end FluidDynamics
