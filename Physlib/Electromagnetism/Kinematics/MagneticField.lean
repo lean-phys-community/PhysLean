@@ -165,6 +165,47 @@ lemma magneticField_div_eq_zero (A : ElectromagneticPotential)
 
 /-!
 
+### A.4. The magnetic field on constructors
+
+-/
+
+open Matrix in
+/-- The magnetic field of the electromagnetic potential created from the electric field
+  `E` and the magnetic field `B` is `B`, as long as Gauss's law is satisfied. -/
+lemma ofElectromagneticField_magneticField {c : SpeedOfLight}
+    (E : ElectricField) (B : MagneticField) (B_contDiff : ∀ t, ContDiff ℝ 1 (B t))
+    (B_grad : ∀ t, ∇ ⬝ (B t) = 0) :
+    (ofElectromagneticField c E B).magneticField c = B := by
+  ext1 t
+  ext1 x
+  have h1 := eq_neg_curl_of_div_zero (B t) (B_contDiff t) (B_grad t)
+  conv_rhs => rw [h1]
+  simp only [magneticField, ofElectromagneticField_vectorPotential, WithLp.equiv_apply,
+    WithLp.ofLp_smul, map_smul, LinearMap.smul_apply]
+  rw [fun_curl_neg]
+  simp only [WithLp.equiv_symm_apply, WithLp.toLp_smul, Pi.neg_apply]
+  change  Differentiable ℝ fun x =>
+    ∫ (u : ℝ) in 0..1, u • WithLp.toLp 2 ((crossProduct (Space.basis.repr x).ofLp)
+    (B t (u • x)).ofLp)
+  apply ContDiff.differentiable (n := 1) _ (by simp)
+  apply contDiff_parametric_intervalIntegral_of_contDiff
+  refine contDiff_euclidean.mpr ?_
+  intro i
+  let C : ( Space) × ℝ → EuclideanSpace ℝ (Fin 3) := fun p =>
+      let x := p.1
+      let u := p.2
+      (u • basis.repr x) ⨯ₑ₃ B t (u • x)
+  suffices h : ContDiff ℝ 1 (fun x => C x i) by
+    convert h using 1
+    simp [C]
+    rfl
+  fin_cases i
+  all_goals
+  · simp [C, crossProduct]
+    fun_prop
+
+/-!
+
 ## B. The field strength matrix in terms of the electric and magnetic fields
 
 -/

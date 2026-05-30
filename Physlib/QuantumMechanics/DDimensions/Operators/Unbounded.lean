@@ -33,6 +33,10 @@ these correspond to physical observables.
 
 ## ii. Key results
 
+- `LinearPMap.compRestricted` : For two partial linear maps `g : F →ₗ[R] G` and `f : E →ₗ[R] F`,
+    the composition of `g` with `f` with natural domain `{x : f.domain | f x ∈ g.domain}`.
+- `LinearPMap.instMonoid` : Partial linear maps `E →ₗ.[R] E` with `compRestricted`
+    for multiplication and the identity map for `1` comprise a monoid.
 - `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
     dense domain.
 - `adjoint_compRestricted_le_compRestricted_adjoint` : The inequality `U† ∘ᵣ V† ≤ (V ∘ᵣ U)†`
@@ -50,6 +54,7 @@ these correspond to physical observables.
   - A.1. DistribMulAction
   - A.2. Finite sums
   - A.3. Restricted composition
+  - A.4. Monoid
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
   - B.2. Dense domain
@@ -122,6 +127,7 @@ lemma sum_domain : (sum f).domain = ⨅ a, (f a).domain := rfl
 
 lemma sum_domain_le (a : α) : (sum f).domain ≤ (f a).domain := fun _ _ ↦ by simp_all [sum, mem_iInf]
 
+@[simp]
 lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_le f a ψ.2⟩ := by
   simp [sum, inclusion_apply]
 
@@ -155,6 +161,9 @@ def compRestricted (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : E →ₗ.[R] G :=
 @[inherit_doc compRestricted]
 infixr:80 " ∘ᵣ " => compRestricted
 
+lemma compRestricted_domain_le (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : (g ∘ᵣ f).domain ≤ f.domain :=
+  fun _ h ↦ h.2
+
 lemma mem_compRestricted_domain_iff {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
     x ∈ (g ∘ᵣ f).domain ↔ ∃ h : x ∈ f.domain, f ⟨x, h⟩ ∈ g.domain := by
   change x ∈ (g.domain.comap f.toFun).map f.domain.subtype ⊓ f.domain ↔ _
@@ -169,6 +178,21 @@ lemma mem_domain_of_mem_compRestricted_domain
 lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) :
     (g ∘ᵣ f) x = g ⟨f ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩ :=
   rfl
+
+/-- The zero map is right-absorbing. -/
+@[simp]
+lemma compRestricted_zero (g : F →ₗ.[R] G) : g ∘ᵣ (0 : E →ₗ.[R] F) = 0 := by
+  ext
+  · simp [mem_compRestricted_domain_iff]
+  · exact g.map_zero
+
+lemma compRestricted_assoc {H : Type*} [AddCommGroup H] [Module R H]
+    (f₁ : G →ₗ.[R] H) (f₂ : F →ₗ.[R] G) (f₃ : E →ₗ.[R] F) :
+    (f₁ ∘ᵣ f₂) ∘ᵣ f₃ = f₁ ∘ᵣ f₂ ∘ᵣ f₃ := by
+  ext
+  · simp only [mem_compRestricted_domain_iff]
+    tauto
+  · rfl
 
 /-- `compRestricted` is the same as `comp` when the range of `f` is contained in `g.domain`. -/
 lemma compRestricted_eq_comp
@@ -185,7 +209,53 @@ lemma comp_le_compRestricted {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {S : Subm
     g.comp (f.domRestrict S) h ≤ g ∘ᵣ f :=
   ⟨fun x hx ↦ mem_compRestricted_domain_iff.mpr ⟨hx.2, h ⟨x, hx⟩⟩, by aesop⟩
 
+lemma compRestricted_mono_left {g g' : F →ₗ.[R] G} (h : g ≤ g') (f : E →ₗ.[R] F) :
+    g ∘ᵣ f ≤ g' ∘ᵣ f := by
+  constructor
+  · intro x hx
+    obtain ⟨hx', hfx⟩ := mem_compRestricted_domain_iff.mp hx
+    exact mem_compRestricted_domain_iff.mpr ⟨hx', h.1 hfx⟩
+  · intro x y hxy
+    exact @h.2 ⟨f ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩
+      ⟨f ⟨y, y.2.2⟩, mem_domain_of_mem_compRestricted_domain y⟩ (by simp [hxy])
+
+lemma compRestricted_mono_right (g : F →ₗ.[R] G) {f f' : E →ₗ.[R] F} (h : f ≤ f') :
+    g ∘ᵣ f ≤ g ∘ᵣ f' := by
+  constructor
+  · intro x hx
+    obtain ⟨hx', hfx⟩ := mem_compRestricted_domain_iff.mp hx
+    exact mem_compRestricted_domain_iff.mpr ⟨h.1 hx', (@h.2 ⟨x, hx'⟩ ⟨x, h.1 hx'⟩ rfl) ▸ hfx⟩
+  · intro x y hxy
+    simp only [compRestricted_apply, @h.2 ⟨x, x.2.2⟩ ⟨y, y.2.2⟩ hxy]
+
 end
+
+/-!
+### A.4. Monoid
+
+Partial linear maps `E →ₗ.[R] E` with `compRestricted` for multiplication and
+the identity map (domain `⊤`) for `1` comprise a monoid.
+-/
+
+instance instMonoid : Monoid (E →ₗ.[R] E) where
+  mul := compRestricted
+  mul_assoc := compRestricted_assoc
+  one := ⟨⊤, topEquiv.toLinearMap⟩
+  one_mul f := by
+    change ⟨⊤, topEquiv.toLinearMap⟩ ∘ᵣ f = f
+    ext
+    · simp [mem_compRestricted_domain_iff]
+    · rfl
+  mul_one f := by
+    change f ∘ᵣ ⟨⊤, topEquiv.toLinearMap⟩ = f
+    ext
+    · simp [mem_compRestricted_domain_iff]
+    · rfl
+
+lemma mul_def (f₁ f₂ : E →ₗ.[R] E) : f₁ * f₂ = f₁ ∘ᵣ f₂ := rfl
+
+@[simp]
+lemma one_domain : (1 : E →ₗ.[R] E).domain = ⊤ := rfl
 
 end General
 
@@ -283,6 +353,18 @@ lemma HasDenseDomain.sum_of_le
     (sum W).HasDenseDomain :=
   hE.mono (by simp [sum_domain, h])
 
+lemma HasDenseDomain.pow
+    (h : T.HasDenseDomain) (h_range : ∀ x : T.domain, T x ∈ T.domain) (n : ℕ) :
+    (T ^ n).HasDenseDomain := by
+  apply h.mono
+  induction n with
+  | zero => simp
+  | succ n ih => exact fun x hx ↦ mem_compRestricted_domain_iff.mpr ⟨hx, ih (h_range ⟨x, hx⟩)⟩
+
+lemma pow_hasDenseDomain_of_le
+    {n : ℕ} (h : (T ^ n).HasDenseDomain) {k : ℕ} (hle : k ≤ n) : (T ^ k).HasDenseDomain :=
+  h.mono <| pow_sub_mul_pow T hle ▸ compRestricted_domain_le _ _
+
 /-!
 ### B.3. Closability
 -/
@@ -368,6 +450,13 @@ lemma closure_smul (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) : (c • U).
 ### B.4. Adjoints
 -/
 
+@[simp]
+lemma adjoint_one [CompleteSpace H] : (1 : H →ₗ.[ℂ] H)† = 1 := by
+  ext x
+  · simp only [one_domain, mem_top, iff_true]
+    exact mem_adjoint_domain_of_exists _ ⟨x, fun _ ↦ rfl⟩
+  · exact adjoint_apply_eq dense_univ _ fun _ ↦ rfl
+
 /-- The adjoint of a zero LinearPMap (any domain) is zero (domain `⊤`). -/
 lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
   refine dExt ?_ fun x y hxy ↦ ?_
@@ -433,7 +522,7 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
 
 lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [CompleteSpace H']
     (hV : V.HasDenseDomain) (hVU : (V ∘ᵣ U).HasDenseDomain) : U† ∘ᵣ V† ≤ (V ∘ᵣ U)† := by
-  have hU : U.HasDenseDomain := hVU.mono fun _ hx ↦ hx.2
+  have hU : U.HasDenseDomain := hVU.mono (compRestricted_domain_le V U)
   have h : (U† ∘ᵣ V†).IsFormalAdjoint (V ∘ᵣ U) := by
     intro x y
     have hx := mem_domain_of_mem_compRestricted_domain x
@@ -444,6 +533,15 @@ lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [Comple
   constructor
   · exact fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨(U† ∘ᵣ V†) ⟨x, hx⟩, h ⟨x, hx⟩⟩
   · exact fun x y hxy ↦ (adjoint_apply_eq hVU y <| hxy ▸ h x).symm
+
+lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDenseDomain) :
+    T† ^ n ≤ (T ^ n)† := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hTn : (T ^ n).HasDenseDomain := pow_hasDenseDomain_of_le h n.le_succ
+    refine le_trans ?_ (adjoint_compRestricted_le_compRestricted_adjoint hTn h)
+    exact pow_succ' T† n ▸ compRestricted_mono_right T† (ih hTn)
 
 /-!
 ### B.5. Symmetric operators
@@ -510,13 +608,21 @@ lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
   simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
   exact add_comm _ _
 
-lemma IsSymmetric.compRestricted_self (h : T.IsSymmetric) : (T ∘ᵣ T).IsSymmetric := by
-  intro x y
-  have hTx := mem_domain_of_mem_compRestricted_domain x
-  have hTy := mem_domain_of_mem_compRestricted_domain y
-  trans ⟪T ⟨x, x.2.2⟩, T ⟨y, y.2.2⟩⟫_ℂ
-  · exact h ⟨T ⟨x, x.2.2⟩, hTx⟩ ⟨y, y.2.2⟩
-  exact h ⟨x, x.2.2⟩ ⟨T ⟨y, y.2.2⟩, hTy⟩
+@[aesop safe apply]
+lemma IsSymmetric.pow (h : T.IsSymmetric) (n : ℕ) : (T ^ n).IsSymmetric := by
+  induction n with
+  | zero => exact fun _ _ ↦ rfl
+  | succ n ih =>
+    intro x y
+    let y' : (T * T ^ n).domain := ⟨y, pow_succ' T n ▸ y.2⟩
+    let Tx : (T ^ n).domain := ⟨T ⟨x, x.2.2⟩, mem_domain_of_mem_compRestricted_domain x⟩
+    let Tny : T.domain := ⟨(T ^ n) ⟨y', y'.2.2⟩, mem_domain_of_mem_compRestricted_domain y'⟩
+    have h_eq : T Tny = (T ^ (n + 1)) y := by
+      change (T * T ^ n) y' = (T ^ (n + 1)) y
+      congr 1
+      · exact (pow_succ' T n).symm
+      · exact (Subtype.heq_iff_coe_eq <| by simp [pow_succ']).mpr rfl
+    exact (ih Tx ⟨y', y'.2.2⟩).trans (h_eq ▸ h ⟨x, x.2.2⟩ Tny)
 
 @[aesop safe apply]
 lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by simp [h x y]

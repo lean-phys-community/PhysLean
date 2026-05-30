@@ -10,7 +10,7 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Curl
 public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
 public import Physlib.Relativity.Tensors.Elab
 public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
-
+public import Physlib.Mathematics.Calculus.ParametricIntegration
 /-!
 
 # The Electromagnetic Potential
@@ -186,24 +186,16 @@ lemma ofStaticPotentials_eq_ofPotentials {d} (c : SpeedOfLight) (ϕ : Space d �
   rw [ofPotentials_eq_add]
   rfl
 
-/-- The electromagnetic potential from a static electric and a static magnetic field.
-  There is no canonical choice here, so this depends on choice. -/
-noncomputable def ofStaticElectricMagneticField (c : SpeedOfLight)
-    (E : Space 3 → EuclideanSpace ℝ (Fin 3))
-    (B : Space 3 → EuclideanSpace ℝ (Fin 3))
-    (hE : Differentiable ℝ E) (hB : ContDiff ℝ 1 B)
-    (E_curl : Space.curl E = 0) (B_div : Space.div B = 0) :
+open MeasureTheory Matrix Space InnerProductSpace Time in
+/-- The electromagnetic potential from an electric and a magnetic field.
+  This defines the electromagnetic potential in the Poincare gauge. -/
+noncomputable def ofElectromagneticField (c : SpeedOfLight)
+    (E : Time → Space 3 → EuclideanSpace ℝ (Fin 3))
+    (B : Time → Space 3 → EuclideanSpace ℝ (Fin 3)) :
     ElectromagneticPotential 3 :=
-  have φ : Space 3 → ℝ := - Classical.choose (Space.exists_grad_of_curl_zero E hE E_curl)
-  have A : Space 3 → EuclideanSpace ℝ (Fin 3) :=
-    Classical.choose (Space.exists_curl_of_div_zero B hB B_div)
-  ofStaticPotentials c φ A
-
-TODO "Add a constructor of the electromagnetic potential from non-static electric and
-  magnetic fields."
-
-TODO "Prove differentiability conditions with respect to the constructors of
-  the electromagnetic potential."
+  let A := fun t (x : Space) => - ∫ u in 0..(1 : ℝ), (u • basis.repr x) ⨯ₑ₃ B t (u • x) ∂(volume)
+  let φ := fun t (x : Space) => - ∫ u in (0 : ℝ)..1, ⟪E t (u • x), basis.repr x⟫_ℝ ∂(volume)
+  ofPotentials c φ A
 
 TODO "Write lemmas for the various properties (e.g. the electric field) of
   the electromagnetic potential from the various constructors."
@@ -296,6 +288,109 @@ lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
 
 TODO "Add results related to the differentiability of the
   derivative of the Electromagnetic potential."
+
+/-!
+
+### A.5. Differentiablity in terms of constructors
+
+-/
+
+lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
+    (hϕ : Differentiable ℝ ↿φ) : Differentiable ℝ (ofScalarPotential c φ) := by
+  simp [ofScalarPotential]
+  rw [← SpaceTime.differentiable_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr _ => fun_prop
+
+lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
+    (hϕ : ContDiff ℝ n ↿φ) : ContDiff ℝ n (ofScalarPotential c φ) := by
+  simp [ofScalarPotential]
+  rw [← SpaceTime.contDiff_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr _ => fun_prop
+
+lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
+    (A : Time → Space d → EuclideanSpace ℝ (Fin d))
+    (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofVectorPotential c A) := by
+  simp [ofVectorPotential]
+  rw [← SpaceTime.differentiable_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
+
+lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
+    (A : Time → Space d → EuclideanSpace ℝ (Fin d))
+    (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofVectorPotential c A) := by
+  simp [ofVectorPotential]
+  rw [← SpaceTime.contDiff_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
+
+lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
+    (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : Differentiable ℝ ↿φ)
+    (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofPotentials c φ A) := by
+  simp [ofPotentials]
+  rw [← SpaceTime.differentiable_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
+
+lemma contDiff_ofPotentials {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
+    (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : ContDiff ℝ n ↿φ)
+    (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofPotentials c φ A) := by
+  simp [ofPotentials]
+  rw [← SpaceTime.contDiff_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
+
+open MeasureTheory Matrix Space InnerProductSpace Time in
+lemma contDiff_ofElectromagneticField {n : ℕ} (c : SpeedOfLight)
+    (E : Time → Space 3 → EuclideanSpace ℝ (Fin 3))
+    (B : Time → Space 3 → EuclideanSpace ℝ (Fin 3)) (hE : ContDiff ℝ n ↿E)
+    (hB : ContDiff ℝ n ↿B) : ContDiff ℝ n (ofElectromagneticField c E B) := by
+  let A : Time → Space → EuclideanSpace ℝ (Fin 3) := fun t x =>
+    - ∫ u in 0..(1 : ℝ), (u • basis.repr x) ⨯ₑ₃ B t (u • x) ∂(volume)
+  have h1 : ContDiff ℝ n ↿A := by
+    simp only [WithLp.equiv_apply, A]
+    apply ContDiff.neg
+    apply contDiff_parametric_intervalIntegral_of_contDiff
+    refine contDiff_euclidean.mpr ?_
+    intro i
+    let C : (Time × Space) × ℝ → EuclideanSpace ℝ (Fin 3) := fun p =>
+      let (t, x) := p.1
+      let u := p.2
+      (u • basis.repr x) ⨯ₑ₃ B t (u • x)
+    change ContDiff ℝ n (fun x => C x i)
+    fin_cases i
+    all_goals
+    · simp [C, crossProduct]
+      fun_prop
+  have hn : ContDiff ℝ n ↿A := h1.of_le (by simp)
+  rw [← SpaceTime.contDiff_vector]
+  intro μ
+  match μ with
+  | Sum.inr i =>
+    change ContDiff ℝ n (fun x => (timeSlice c).symm A x i)
+    fun_prop
+  | Sum.inl 0 =>
+    simp only [ofElectromagneticField, ofPotentials, map_smul, WithLp.equiv_apply,
+      WithLp.ofLp_smul, LinearMap.smul_apply, WithLp.equiv_symm_apply, WithLp.toLp_smul,
+      Fin.isValue]
+    apply ContDiff.div _ (by fun_prop) (by simp)
+    apply timeSlice_symm_contDiff
+    apply ContDiff.neg
+    apply contDiff_parametric_intervalIntegral_of_contDiff
+    fun_prop
 
 /-!
 

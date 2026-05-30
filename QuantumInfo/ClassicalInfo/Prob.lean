@@ -232,7 +232,7 @@ end Prob
   multiplication, and a bijection between the `T` and a convex set of `U`.
   For instance, in `Mixable (Distribution (Fin n))`, `U` is `n`-element vectors
   (which form the probability simplex, degenerate in one dimension). For
-  `QuantumInfo.Finite.MState` density matrices in quantum mechanics, which are
+  `QuantumInfo.States.Mixed.MState` density matrices in quantum mechanics, which are
   PSD matrices of trace 1, `U` is the underlying matrix.
 
   Why not just stick with existing notions of `Convex`? `Convex` requires that

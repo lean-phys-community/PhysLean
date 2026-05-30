@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Electromagnetism.Kinematics.EMPotential
+public import Physlib.Electromagnetism.Kinematics.VectorPotential
 public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
 public import Mathlib.Data.Real.Hom
 /-!
@@ -112,12 +112,28 @@ lemma ofStaticPotentials_scalarPotential {d} (c : SpeedOfLight) (φ : Space d �
     (ofStaticPotentials c φ A).scalarPotential c = fun _ => φ := by
   simp [ofStaticPotentials_eq_ofPotentials]
 
-lemma ofStaticElectricMagneticField_scalarPotential_eq_choose (c : SpeedOfLight)
-    (E B : Space → EuclideanSpace ℝ (Fin 3)) (hE : Differentiable ℝ E)
-    (hB : ContDiff ℝ 1 B) (E_curl : Space.curl E = 0) (B_div : Space.div B = 0) :
-    (ofStaticElectricMagneticField c E B hE hB E_curl B_div).scalarPotential c =
-    fun _ => - Classical.choose (Space.exists_grad_of_curl_zero E hE E_curl):= by
-  simp [ofStaticElectricMagneticField]
+open MeasureTheory Matrix Space InnerProductSpace Time in
+lemma ofElectromagneticField_scalarPotential (c : SpeedOfLight)
+    (E : Time → Space → EuclideanSpace ℝ (Fin 3))
+    (B : Time → Space → EuclideanSpace ℝ (Fin 3)) :
+    (ofElectromagneticField c E B).scalarPotential c = fun t x =>
+    - ∫ u in (0 : ℝ)..1, ⟪E t (u • x), basis.repr x⟫_ℝ ∂(volume) := by
+  simp [ofElectromagneticField]
+
+open MeasureTheory Matrix Space InnerProductSpace Time in
+lemma ofElectromagneticField_scalarPotential_eq_add_vectorPotential (c : SpeedOfLight)
+    (E : Time → Space → EuclideanSpace ℝ (Fin 3))
+    (B : Time → Space → EuclideanSpace ℝ (Fin 3)) (hb : ContDiff ℝ 1 ↿B) :
+    (ofElectromagneticField c E B).scalarPotential c = fun t x =>
+    - ∫ u in (0 : ℝ)..1, ⟪E t (u • x) +
+    ∂ₜ ((ofElectromagneticField c E B).vectorPotential c ·
+      (u • x)) t, basis.repr x⟫_ℝ ∂(volume) := by
+  simp [ofElectromagneticField_scalarPotential, inner_add_left]
+  ext t x
+  simp only [neg_inj]
+  congr
+  ext u
+  simp [time_deriv_vectorPotential_inner_radial_eq_zero_ofElectromagneticField (B := B) hb]
 
 /-!
 

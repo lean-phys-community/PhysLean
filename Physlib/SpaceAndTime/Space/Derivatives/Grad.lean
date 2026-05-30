@@ -91,6 +91,7 @@ lemma grad_zero : ∇ (0 : Space d → ℝ) = 0 := by
 
 -/
 
+@[to_fun]
 lemma grad_add (f1 f2 : Space d → ℝ)
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∇ (f1 + f2) = ∇ f1 + ∇ f2 := by
@@ -126,6 +127,7 @@ lemma grad_const : ∇ (fun _ : Space d => c) = 0 := by
 
 -/
 
+@[to_fun]
 lemma grad_smul (f : Space d → ℝ) (k : ℝ)
     (hf : Differentiable ℝ f) :
     ∇ (k • f) = k • ∇ f := by
@@ -142,6 +144,7 @@ lemma grad_smul (f : Space d → ℝ) (k : ℝ)
 
 -/
 
+@[to_fun]
 lemma grad_neg (f : Space d → ℝ) :
     ∇ (- f) = - ∇ f := by
   unfold grad
