@@ -86,7 +86,7 @@ lemma div_self (x : ChargeUnit) :
 lemma div_symm (x y : ChargeUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
   rw [div_eq_val, inv_eq_one_div, div_eq_val]
-  simp
+  simp only [one_div, NNReal.coe_inv]
   rw [toReal, inv_div]
 
 @[simp]

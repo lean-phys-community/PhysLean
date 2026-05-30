@@ -41,7 +41,7 @@ lemma norm_iteratedFDeriv_ofRealCLM {x} (i : ℕ) :
       rw [ContinuousMultilinearMap.norm_def]
       rw [← RCLike.ofRealCLM_apply]
       simp [-RCLike.ofRealCLM_apply, Real.norm_eq_abs]
-      simp
+      simp only [Fin.isValue, RCLike.ofRealCLM_apply, norm_algebraMap', Real.norm_eq_abs]
       apply le_antisymm
       · apply csInf_le ⟨0, fun c hc => hc.1⟩
         exact ⟨le_of_lt one_pos, fun m => by rw [one_mul]⟩

@@ -77,7 +77,8 @@ lemma oneKilometerPerHour_in_SI :
   simp [oneKilometerPerHour, dimScale,
     LengthUnit.kilometers, TimeUnit.hours, toDimensionful_apply_apply]
   ext
-  simp
+  simp only [WithDim.smul_val, smul_eq_mul, mul_one, NNReal.coe_mul, coe_rpow, NNReal.coe_div,
+    NNReal.coe_ofNat]
   rw [toReal]
   norm_num
 
@@ -85,7 +86,8 @@ lemma oneKilometerPerHour_in_SI :
 lemma oneKnot_in_SI : oneKnot SI = ⟨463/900⟩ := by
   simp [oneKnot, dimScale, LengthUnit.nauticalMiles, TimeUnit.hours, toDimensionful_apply_apply]
   ext
-  simp
+  simp only [WithDim.smul_val, smul_eq_mul, mul_one, NNReal.coe_mul, coe_rpow, NNReal.coe_div,
+    NNReal.coe_ofNat]
   rw [toReal]
   norm_num
 
