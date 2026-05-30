@@ -61,25 +61,24 @@ noncomputable def velocityGradient (d : ℕ) (flow : FluidFlow d) :
 /-- The Newtonian stress tensor
 `-p I + mu (grad u + grad u^T) + lambda (div u) I`.
 
-The scalar fields are pressure, shear viscosity, and the coefficient of the isotropic
-viscous-divergence term.
+The scalar fields are pressure, shear viscosity, and second viscosity.
 -/
 noncomputable def newtonianStressTensor (d : ℕ) (flow : FluidFlow d)
-    (pressure shearViscosity bulkViscosity : ScalarField d) : StressTensor d :=
+    (pressure shearViscosity secondViscosity : ScalarField d) : StressTensor d :=
   fun t x =>
     (-(pressure t x)) • (1 : Matrix (Fin d) (Fin d) ℝ) +
       shearViscosity t x •
         (velocityGradient d flow t x + Matrix.transpose (velocityGradient d flow t x)) +
-        (bulkViscosity t x * (∇ ⬝ flow.velocity t) x) •
+        (secondViscosity t x * (∇ ⬝ flow.velocity t) x) •
           (1 : Matrix (Fin d) (Fin d) ℝ)
 
 /-- A Cauchy flow is Newtonian when its stress tensor has the Newtonian constitutive form. -/
 def IsNewtonian
     (d : ℕ) (flow : CauchyFlow d)
-    (pressure shearViscosity bulkViscosity : ScalarField d) : Prop :=
+    (pressure shearViscosity secondViscosity : ScalarField d) : Prop :=
   ∀ t x,
     flow.stress t x =
-      newtonianStressTensor d flow.toFluidFlow pressure shearViscosity bulkViscosity t x
+      newtonianStressTensor d flow.toFluidFlow pressure shearViscosity secondViscosity t x
 
 /-!
 
@@ -91,19 +90,19 @@ def IsNewtonian
 stress. -/
 def NavierStokes
     (d : ℕ) (flow : CauchyFlow d)
-    (pressure shearViscosity bulkViscosity : ScalarField d) : Prop :=
+    (pressure shearViscosity secondViscosity : ScalarField d) : Prop :=
   ClassicalContinuityEquation d flow.toFluidFlow ∧
     CauchyMomentumEquation d flow ∧
-      IsNewtonian d flow pressure shearViscosity bulkViscosity
+      IsNewtonian d flow pressure shearViscosity secondViscosity
 
 /-- The convective Navier-Stokes equations: continuity, convective Cauchy momentum, and
 Newtonian stress. -/
 def ConvectiveNavierStokes
     (d : ℕ) (flow : CauchyFlow d)
-    (pressure shearViscosity bulkViscosity : ScalarField d) : Prop :=
+    (pressure shearViscosity secondViscosity : ScalarField d) : Prop :=
   ClassicalContinuityEquation d flow.toFluidFlow ∧
     ConvectiveCauchyMomentumEquation d flow ∧
-      IsNewtonian d flow pressure shearViscosity bulkViscosity
+      IsNewtonian d flow pressure shearViscosity secondViscosity
 
 /-!
 
@@ -115,14 +114,14 @@ def ConvectiveNavierStokes
 differentiable enough for the product rules. -/
 theorem navier_stokes_iff_convective_navier_stokes
     (d : ℕ) (flow : CauchyFlow d)
-    (pressure shearViscosity bulkViscosity : ScalarField d)
+    (pressure shearViscosity secondViscosity : ScalarField d)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (flow.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (flow.velocity · x) t)
     (hMomentumDensity : ∀ t,
       Differentiable ℝ (momentumDensity d flow.toFluidFlow t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (flow.velocity t)) :
-    NavierStokes d flow pressure shearViscosity bulkViscosity ↔
-      ConvectiveNavierStokes d flow pressure shearViscosity bulkViscosity := by
+    NavierStokes d flow pressure shearViscosity secondViscosity ↔
+      ConvectiveNavierStokes d flow pressure shearViscosity secondViscosity := by
   constructor
   · intro hConservative
     refine ⟨hConservative.1, ?_, hConservative.2.2⟩

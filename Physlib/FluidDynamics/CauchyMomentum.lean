@@ -55,7 +55,7 @@ Here `stress` is intentionally not yet specialized to a constitutive law.
 def CauchyMomentumEquation (d : ℕ) (flow : CauchyFlow d) : Prop :=
   ∀ t x,
     conservativeMomentumLHS d flow.toFluidFlow t x =
-      matrixDiv d (flow.stress t) x + flow.rho t x • flow.bodyForce t x
+      matrixDiv d (flow.stress t) x + flow.rho t x • flow.specificBodyForce t x
 
 /-- Conservation of momentum in convective form.
 
@@ -68,7 +68,7 @@ Here `stress` is intentionally not yet specialized to a constitutive law.
 def ConvectiveCauchyMomentumEquation (d : ℕ) (flow : CauchyFlow d) : Prop :=
   ∀ t x,
     flow.rho t x • materialAcceleration d flow.toFluidFlow t x =
-      matrixDiv d (flow.stress t) x + flow.rho t x • flow.bodyForce t x
+      matrixDiv d (flow.stress t) x + flow.rho t x • flow.specificBodyForce t x
 
 /-!
 

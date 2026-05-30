@@ -20,7 +20,7 @@ structure.
 
 ## ii. Key results
 
-- `HasBodyForcePotential` : Predicate encoding the convention `bodyForce = -grad Phi`.
+- `HasBodyForcePotential` : Predicate encoding the convention `specificBodyForce = -grad Phi`.
 - `HasConservativeBodyForce` : Predicate saying a body force has some potential.
 - `IsSteady` : Predicate saying the velocity field has no time dependence.
 - `materialDerivative` : Material derivative of a scalar field along a fluid velocity field.
@@ -55,9 +55,10 @@ namespace FluidDynamics
 
 -/
 
-/-- A flow has body-force potential `Phi` when its body force is minus the gradient of `Phi`. -/
+/-- A flow has body-force potential `Phi` when its specific body force is minus the gradient of
+`Phi`. -/
 def HasBodyForcePotential (d : ℕ) (flow : CauchyFlow d) (potential : Space d → ℝ) : Prop :=
-  ∀ t x, flow.bodyForce t x = -(∇ potential x)
+  ∀ t x, flow.specificBodyForce t x = -(∇ potential x)
 
 /-- A flow has conservative body force when its body force has some potential. -/
 def HasConservativeBodyForce (d : ℕ) (flow : CauchyFlow d) : Prop :=

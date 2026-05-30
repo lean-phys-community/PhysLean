@@ -25,9 +25,8 @@ fields used by momentum balance and thermodynamic laws are provided by extension
 - `VelocityField` : A time-dependent vector velocity field.
 - `MomentumDensityField` : A time-dependent vector momentum density field.
 - `StressTensor` : A time-dependent matrix-valued stress field.
-- `BodyForce` : A time-dependent vector body-force field per unit mass.
 - `FluidFlow` : The density and velocity fields of a fluid.
-- `CauchyFlow` : A fluid flow with Cauchy stress and body force.
+- `CauchyFlow` : A fluid flow with Cauchy stress and specific body force.
 - `ThermodynamicCauchyFlow` : A Cauchy flow with entropy and enthalpy fields.
 
 ## iii. Table of contents
@@ -67,9 +66,6 @@ abbrev MomentumDensityField (d : ℕ) := VectorField d
 /-- A matrix-valued stress tensor field on `d`-dimensional space. -/
 abbrev StressTensor (d : ℕ) := Time → Space d → Matrix (Fin d) (Fin d) ℝ
 
-/-- A body-force field per unit mass on `d`-dimensional space. -/
-abbrev BodyForce (d : ℕ) := VectorField d
-
 /-!
 
 ## B. Fluid flow structures
@@ -87,8 +83,8 @@ structure FluidFlow (d : ℕ) where
 structure CauchyFlow (d : ℕ) extends FluidFlow d where
   /-- The Cauchy stress tensor field. -/
   stress : StressTensor d
-  /-- The body-force field per unit mass. -/
-  bodyForce : BodyForce d
+  /-- The specific body-force field, i.e. force per unit mass. -/
+  specificBodyForce : VectorField d
 
 /-- A Cauchy flow equipped with thermodynamic entropy and enthalpy fields. -/
 structure ThermodynamicCauchyFlow (d : ℕ) extends CauchyFlow d where
