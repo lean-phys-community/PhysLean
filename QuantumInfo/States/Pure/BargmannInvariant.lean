@@ -26,6 +26,7 @@ geodesic triangle in projective Hilbert space.
  * `bargmannPhaseThree_reverse`: reversing negates the phase (mod 2π)
  * `bargmannInvariantThree_cyclic`: cyclic permutation preserves `Δ₃`
  * `bargmannPhaseThree_cyclic`: cyclic permutation preserves the phase
+ * `norm_bargmannInvariantThree_le_one`: `‖Δ₃‖ ≤ 1` (via `Braket.norm_dot_le_one`)
 
 ## References
  * [V. Bargmann, *Note on Wigner's theorem on symmetry operations*,
@@ -99,4 +100,18 @@ omit [DecidableEq d] in
 lemma bargmannPhaseThree_cyclic (ψ₁ ψ₂ ψ₃ : Ket d) :
     bargmannPhaseThree ψ₂ ψ₃ ψ₁ = bargmannPhaseThree ψ₁ ψ₂ ψ₃ := by
   unfold bargmannPhaseThree; rw [bargmannInvariantThree_cyclic]
+
+/-! ## Norm bounds -/
+
+omit [DecidableEq d] in
+/-- The Bargmann invariant has norm at most 1: each inner product factor
+    is bounded by Cauchy-Schwarz on unit vectors. -/
+lemma norm_bargmannInvariantThree_le_one (ψ₁ ψ₂ ψ₃ : Ket d) :
+    ‖bargmannInvariantThree ψ₁ ψ₂ ψ₃‖ ≤ 1 := by
+  unfold bargmannInvariantThree
+  calc ‖〈ψ₁‖ψ₂〉 * 〈ψ₂‖ψ₃〉 * 〈ψ₃‖ψ₁〉‖
+      = ‖〈ψ₁‖ψ₂〉‖ * ‖〈ψ₂‖ψ₃〉‖ * ‖〈ψ₃‖ψ₁〉‖ := by rw [norm_mul, norm_mul]
+    _ ≤ 1 * 1 * 1 := by
+        gcongr <;> exact Braket.norm_dot_le_one _ _
+    _ = 1 := by ring
 
