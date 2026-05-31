@@ -131,7 +131,6 @@ lemma normPowerSeries_tendsto {d} (x : Space d) (hx : x ≠ 0) :
   · left
     simpa using hx
 
-set_option backward.isDefEq.respectTransparency false in
 lemma normPowerSeries_inv_tendsto {d} (x : Space d) (hx : x ≠ 0) :
     Filter.Tendsto (fun n => (normPowerSeries n x)⁻¹) Filter.atTop (𝓝 (‖x‖⁻¹)) := by
   apply Filter.Tendsto.inv₀
@@ -591,7 +590,6 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} (m : �
         simpa using hx
     simpa using h1
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.succ - 1 : ℕ) + 1 ≤ m)
     (η : 𝓢(Space d.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ)) :
     Filter.Tendsto (fun n =>
@@ -950,7 +948,9 @@ The proof
 open Distribution
 
 set_option backward.isDefEq.respectTransparency false in
-lemma distDiv_inv_pow_eq_dim {d : ℕ} :
+/-- Auxiliary lemma with dimension defined as d.succ to handle `homeomorphUnitSphereProd`.
+The dimension correct version is declared in `distDiv_inv_pow_eq_dim`. -/
+private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
     distDiv (distOfFunction (fun x : Space d.succ => ‖x‖ ^ (- d.succ : ℤ) • basis.repr x)
       (IsDistBounded.zpow_smul_repr_self (- d.succ : ℤ) (by omega))) =
       (d.succ * (volume (α := Space d.succ)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
@@ -1097,5 +1097,12 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} :
   simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, ContinuousLinearMap.coe_smul',
     Pi.smul_apply, diracDelta_apply, smul_eq_mul]
   ring
+
+lemma distDiv_inv_pow_eq_dim {d : ℕ} (hd : d ≥ 1) :
+    distDiv (distOfFunction (fun x : Space d => ‖x‖ ^ (- d : ℤ) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self (- d : ℤ) (by omega))) =
+      (d * (volume (α := Space d)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  obtain ⟨d', rfl⟩ := Nat.exists_eq_succ_of_ne_zero (by omega : d ≠ 0)
+  exact distDiv_inv_pow_eq_dim'
 
 end Space
