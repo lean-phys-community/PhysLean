@@ -266,26 +266,26 @@ section
 
 variable (f f₁ f₂ f₃ : E →ₗ.[R] F) {g g₁ g₂ : E →ₗ.[R] F}
 
-lemma sub_self_le_zero : f - f ≤ 0 := ⟨le_top, by simp [sub_apply]⟩
+lemma sub_le_zero : f - f ≤ 0 := ⟨le_top, by simp [sub_apply]⟩
 
-lemma neg_add_self_le_zero : -f + f ≤ 0 := ⟨le_top, by simp [add_apply]⟩
+lemma neg_add_le_zero : -f + f ≤ 0 := ⟨le_top, by simp [add_apply]⟩
 
 lemma le_iff_neg_le_neg : g₁ ≤ g₂ ↔ -g₁ ≤ -g₂ :=
   ⟨fun ⟨h, h'⟩ ↦ ⟨h, fun _ _ h'' ↦ by simp [h' h'']⟩, fun ⟨h, _⟩ ↦ ⟨h, fun _ _ _ ↦ by aesop⟩⟩
 
 lemma le_neg_iff_neg_le : g₁ ≤ -g₂ ↔ -g₁ ≤ g₂ := by rw [le_iff_neg_le_neg, neg_neg]
 
-lemma add_sub_cancel_le : f₁ + (f₂ - f₁) ≤ f₂ :=
+lemma add_sub_le_cancel : f₁ + (f₂ - f₁) ≤ f₂ :=
   ⟨by simp [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
 
-lemma add_sub_cancel_left_le : f₁ + f₂ - f₁ ≤ f₂ := add_sub_assoc f₁ f₂ f₁ ▸ add_sub_cancel_le f₁ f₂
+lemma add_sub_le_cancel_left : f₁ + f₂ - f₁ ≤ f₂ := add_sub_assoc f₁ f₂ f₁ ▸ add_sub_le_cancel f₁ f₂
 
-lemma add_sub_cancel_right_le : f₁ + f₂ - f₂ ≤ f₁ := add_comm f₁ f₂ ▸ add_sub_cancel_left_le f₂ f₁
+lemma add_sub_le_cancel_right : f₁ + f₂ - f₂ ≤ f₁ := add_comm f₁ f₂ ▸ add_sub_le_cancel_left f₂ f₁
 
-lemma add_add_sub_cancel_le : f₁ + f₂ + (f₃ - f₂) ≤ f₁ + f₃ :=
+lemma add_add_sub_le_cancel : f₁ + f₂ + (f₃ - f₂) ≤ f₁ + f₃ :=
   ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
 
-lemma add_sub_sub_cancel_le : f₁ + f₂ - (f₁ - f₃) ≤ f₂ + f₃ :=
+lemma add_sub_sub_le_cancel : f₁ + f₂ - (f₁ - f₃) ≤ f₂ + f₃ :=
   ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
 
 lemma sub_le_of_le_add (h : g ≤ g₁ + g₂) : g - g₂ ≤ g₁ := by
