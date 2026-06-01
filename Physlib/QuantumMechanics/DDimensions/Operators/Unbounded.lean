@@ -307,12 +307,8 @@ lemma add_left_le_of_le (h : g₁ ≤ g₂) : f + g₁ ≤ f + g₂ := by
 lemma add_right_le_of_le (h : g₁ ≤ g₂) : g₁ + f ≤ g₂ + f :=
   add_comm f g₁ ▸ add_comm f g₂ ▸ add_left_le_of_le f h
 
-lemma sub_right_le_of_le (h : g₁ ≤ g₂) : g₁ - f ≤ g₂ - f := by
-  constructor
-  · simp only [sub_domain, le_inf_iff, inf_le_right, and_true]
-    exact inf_le_of_left_le h.1
-  · intro x y hxy
-    simp_rw [sub_apply, @h.2 ⟨x, x.2.1⟩ ⟨y, y.2.1⟩ hxy, hxy]
+lemma sub_right_le_of_le (h : g₁ ≤ g₂) : g₁ - f ≤ g₂ - f :=
+  sub_eq_add_neg g₁ f ▸ sub_eq_add_neg g₂ f ▸ add_right_le_of_le (-f) h
 
 lemma sub_left_le_of_le (h : g₁ ≤ g₂) : f - g₁ ≤ f - g₂ :=
   neg_sub g₁ f ▸ neg_sub g₂ f ▸ le_iff_neg_le_neg.mp (sub_right_le_of_le f h)
