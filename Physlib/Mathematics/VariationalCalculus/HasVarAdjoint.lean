@@ -726,7 +726,7 @@ lemma grad {d} : HasVarAdjoint (fun (φ : Space d → ℝ) x => Space.grad φ x)
   have h2 := HasVarAdjoint.comp h1 (HasVarAdjoint.gradient (d := d))
   convert h2 using 1
   · funext x t
-    rw [Space.grad_eq_gradiant]
+    rw [Space.grad_eq_gradient]
     simp
 
 lemma div {d} : HasVarAdjoint (fun (φ : Space d → EuclideanSpace ℝ (Fin d)) x => Space.div φ x)

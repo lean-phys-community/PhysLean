@@ -500,6 +500,9 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     simp
   map_smul' a f := by simp
 
+@[inherit_doc distDeriv]
+macro "∂ᵈ[" i:term "]" : term => `(distDeriv $i)
+
 /-!
 
 ### B.2. Basic equality
@@ -508,7 +511,7 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 lemma distDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin d) (f : (Space d) →d[ℝ] M) (ε : 𝓢(Space d, ℝ)) :
-    (distDeriv μ f) ε = fderivD ℝ f ε (basis μ) := by
+    (∂ᵈ[μ] f) ε = fderivD ℝ f ε (basis μ) := by
   simp [distDeriv, Distribution.fderivD]
 
 /-!
@@ -544,7 +547,7 @@ lemma schwartMap_fderiv_comm {d}
 
 lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ ν : Fin d) (f : (Space d) →d[ℝ] M) :
-    (distDeriv ν (distDeriv μ f)) = (distDeriv μ (distDeriv ν f)) := by
+    (∂ᵈ[ν] (∂ᵈ[μ] f)) = (∂ᵈ[μ] (∂ᵈ[ν] f)) := by
   ext η
   simp [distDeriv, Distribution.fderivD]
   congr 1

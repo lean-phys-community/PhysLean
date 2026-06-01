@@ -58,7 +58,7 @@ open InnerProductSpace
 /-- The general form of the wave equation where `c` is the propagation speed. -/
 def WaveEquation {d} (f : Time → Space d → EuclideanSpace ℝ (Fin d))
     (t : Time) (x : Space d) (c : ℝ) : Prop :=
-    c^2 • Δ (f t) x - ∂ₜ (fun t => (∂ₜ (fun t => f t x) t)) t = 0
+    c^2 • Δᵥ (f t) x - ∂ₜ (fun t => (∂ₜ (fun t => f t x) t)) t = 0
 
 /-!
 
@@ -174,7 +174,7 @@ open InnerProductSpace
 
 lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
     (h' : Differentiable ℝ f₀) (i : Fin d) :
-    Space.deriv i (planeWave f₀ c s t) =
+    ∂[i] (planeWave f₀ c s t) =
     s.unit i • fun x => planeWave (fderiv ℝ f₀ · 1) c s t x:= by
   ext x j
   rw [Space.deriv_eq]
@@ -193,7 +193,7 @@ lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
 
 lemma planeWave_apply_space_deriv {d f₀ c} {s : Direction d}
     (h' : Differentiable ℝ f₀) (i j : Fin d) :
-    Space.deriv i (fun x => planeWave f₀ c s t x j) =
+    ∂[i] (fun x => planeWave f₀ c s t x j) =
     s.unit i • fun x => planeWave (fderiv ℝ f₀ · 1) c s t x j := by
   funext x
   rw [Space.deriv_eq_fderiv_basis]
@@ -209,7 +209,7 @@ lemma planeWave_apply_space_deriv {d f₀ c} {s : Direction d}
 
 lemma planeWave_space_deriv_space_deriv {d f₀ c} {s : Direction d}
     (h' : ContDiff ℝ 2 f₀) (i : Fin d) :
-    Space.deriv i (Space.deriv i (planeWave f₀ c s t)) =
+    ∂[i] (∂[i] (planeWave f₀ c s t)) =
     s.unit i ^ 2 • fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x := by
   conv_lhs =>
     enter [2, j]
@@ -231,8 +231,8 @@ lemma planeWave_space_deriv_space_deriv {d f₀ c} {s : Direction d}
 
 lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
     (h' : ContDiff ℝ 2 f₀) (i j : Fin d) :
-    Space.deriv i (Space.deriv i (fun x => planeWave f₀ c s t x j)) =
-    (s.unit i) ^ 2 •fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x j := by
+    ∂[i] (∂[i] (fun x => planeWave f₀ c s t x j)) =
+    (s.unit i) ^ 2 • fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x j := by
   conv_lhs =>
     enter [2, j]
     rw [planeWave_apply_space_deriv (h'.differentiable (by simp)) i]
@@ -257,11 +257,13 @@ lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
 -/
 
 lemma planeWave_laplacian {d f₀ c} {s : Direction d} (h' : ContDiff ℝ 2 f₀) :
-    Δ (planeWave f₀ c s t) = fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x := by
+    Δᵥ (planeWave f₀ c s t) = fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x := by
   ext x j
-  simp [laplacianVec, laplacian]
+  rw [laplacianVec]
   conv_lhs =>
-    enter [2, i]
+    enter [1, 2, i]
+    rw [laplacian_eq_sum_snd_deriv]
+    enter [0, x, 2, i]
     rw [planeWave_apply_space_deriv_space_deriv h']
   simp only [Pi.smul_apply, smul_eq_mul]
   rw [← Finset.sum_mul]

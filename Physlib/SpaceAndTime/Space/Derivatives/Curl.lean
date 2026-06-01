@@ -248,7 +248,7 @@ lemma curl_of_grad_eq_zero (f : Space → ℝ) (hf : ContDiff ℝ 2 f) :
 -/
 
 lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
-    ∇ ⨯ (∇ ⨯ f) = ∇ (∇ ⬝ f) - Δ f := by
+    ∇ ⨯ (∇ ⨯ f) = ∇ (∇ ⬝ f) - Δᵥ f := by
   unfold laplacianVec laplacian div grad curl Finset.sum
   simp only [Fin.isValue, Fin.univ_val_map, List.ofFn_succ, Fin.succ_zero_eq_one,
     Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
@@ -755,6 +755,9 @@ noncomputable def distCurl : (Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) →�
     ext x
     simp
 
+@[inherit_doc distCurl]
+macro (name := distCurlNotation) "∇ᵈ" "⨯" f:term:100 : term => `(distCurl $f)
+
 /-!
 
 ### B.1. The components of the curl
@@ -762,21 +765,21 @@ noncomputable def distCurl : (Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) →�
 -/
 
 lemma distCurl_apply_zero (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : 𝓢(Space, ℝ)) :
-    distCurl f η 0 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 2) (fderivCLM ℝ Space ℝ η)) 1
+    (∇ᵈ ⨯ f) η 0 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 2) (fderivCLM ℝ Space ℝ η)) 1
     + f (SchwartzMap.evalCLM ℝ Space ℝ (basis 1) (fderivCLM ℝ Space ℝ η)) 2 := by
   simp [distCurl]
   rw [fderivD_apply, fderivD_apply]
   simp
 
 lemma distCurl_apply_one (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : 𝓢(Space, ℝ)) :
-    distCurl f η 1 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 0) (fderivCLM ℝ Space ℝ η)) 2
+    (∇ᵈ ⨯ f) η 1 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 0) (fderivCLM ℝ Space ℝ η)) 2
     + f (SchwartzMap.evalCLM ℝ Space ℝ (basis 2) (fderivCLM ℝ Space ℝ η)) 0 := by
   simp [distCurl]
   rw [fderivD_apply, fderivD_apply]
   simp
 
 lemma distCurl_apply_two (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : 𝓢(Space, ℝ)) :
-    distCurl f η 2 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 1) (fderivCLM ℝ Space ℝ η)) 0
+    (∇ᵈ ⨯ f) η 2 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 1) (fderivCLM ℝ Space ℝ η)) 0
     + f (SchwartzMap.evalCLM ℝ Space ℝ (basis 0) (fderivCLM ℝ Space ℝ η)) 1 := by
   simp [distCurl]
   rw [fderivD_apply, fderivD_apply]
@@ -789,7 +792,7 @@ lemma distCurl_apply_two (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η 
 -/
 
 lemma distCurl_apply (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : 𝓢(Space, ℝ)) :
-    distCurl f η = WithLp.toLp 2 fun
+    (∇ᵈ ⨯ f) η = WithLp.toLp 2 fun
     | 0 => - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 2) (fderivCLM ℝ Space ℝ η)) 1
       + f (SchwartzMap.evalCLM ℝ Space ℝ (basis 1) (fderivCLM ℝ Space ℝ η)) 2
     | 1 => - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 0) (fderivCLM ℝ Space ℝ η)) 2
@@ -811,7 +814,7 @@ lemma distCurl_apply (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : �
 /-- The curl of a grad is equal to zero. -/
 @[simp]
 lemma distCurl_distGrad_eq_zero (f : (Space) →d[ℝ] ℝ) :
-    distCurl (distGrad f) = 0 := by
+    ∇ᵈ ⨯ (∇ᵈ f) = 0 := by
   ext η i
   fin_cases i
   all_goals
