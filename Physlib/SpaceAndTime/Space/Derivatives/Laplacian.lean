@@ -58,10 +58,6 @@ lemma laplacian_eq_sum_snd_deriv {d} (f : Space d → ℝ) :
   unfold laplacian div grad
   simp
 
-lemma laplacian_eq_sum_snd_deriv_apply {d} (f : Space d → ℝ) (x : Space d) :
-    Δ f x = ∑ i, ∂[i] (∂[i] f) x := by
-  rw [laplacian_eq_sum_snd_deriv]
-
 /-!
 
 ## B. Laplacian on vector valued functions
