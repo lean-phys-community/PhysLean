@@ -186,7 +186,7 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
   simp only [ContinuousLinearMap.add_apply, Pi.add_apply]
   repeat fun_prop
 
-/-- Derivatives on space distribute over addition. -/
+/-- Derivatives on space distribute over subtraction. -/
 @[to_fun]
 lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
