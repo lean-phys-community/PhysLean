@@ -36,6 +36,7 @@ variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
 noncomputable section
 
+open Submodule
 open Metric
 open Complex
 
@@ -118,6 +119,67 @@ lemma ball_subset_regularityDomain
     _ ≤ ‖T x - z • x‖ - ‖(z - z') • x‖ := by linarith [h x]
     _ ≤ ‖T x - z • x + (z - z') • x‖ := norm_sub_le_norm_add _ _
     _ = ‖T x - z' • x‖ := by simp [sub_smul]
+
+-- Prop 2.1.ii
+/-- `T.regularityDomain ⊆ ℂ` is an open set. -/
+lemma regularityDomain_isOpen (T : H →ₗ.[ℂ] H) : IsOpen T.regularityDomain :=
+  isOpen_iff.mpr fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, ball_subset_regularityDomain h⟩
+
+-- Prop 2.1.iii
+/-- `T` and `T.closure` have the same regularity domain. -/
+lemma regularityDomain_closure (T : H →ₗ.[ℂ] H) :
+    T.closure.regularityDomain = T.regularityDomain := by
+  refine eq_of_le_of_ge (regularityDomain_antitone T.le_closure) ?_
+  exact fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
+
+-- Prop 2.1.iii
+lemma range_closure_sub_eq_closure_range_sub [CompleteSpace H]
+    {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z : ℂ} (hz : z ∈ T.regularityDomain) :
+    (T.closure - z • 1).toFun.range = (T - z • 1).toFun.range.closure := by
+  ext y
+  constructor
+  · intro ⟨⟨x, hx⟩, hxy⟩
+    obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp <|
+      hT.graph_closure_eq_closure_graph ▸ T.closure.mem_graph ⟨x, hx.1⟩
+    simp only [coe_toAddSubmonoid, SetLike.mem_coe, mem_graph_iff] at hb
+    rw [nhds_prod_eq] at hb'
+    apply mem_closure_iff_seq_limit.mpr
+    refine ⟨fun n ↦ (b n).2 - z • (b n).1, fun n ↦ ?_, hxy ▸ hb'.snd.sub (hb'.fst.const_smul z)⟩
+    obtain ⟨u, hu₁, hu₂⟩ := hb n
+    use ⟨u, by simp [sub_domain]⟩
+    simp [sub_apply, ← hu₁, hu₂]
+  · intro hy
+    obtain ⟨b, hb, hby⟩ := mem_closure_iff_seq_limit.mp hy
+    let x : ℕ → H := fun n ↦ (hb n).choose
+    have hx : ∀ n, x n ∈ T.domain := fun n ↦ (hb n).choose.2.1
+    have hx' : ∀ n, T ⟨x n, hx n⟩ - z • x n = b n := fun n ↦ (hb n).choose_spec
+    have hCS : CauchySeq x := by
+      apply Metric.cauchySeq_iff'.mpr fun ε hε ↦ ?_
+      obtain ⟨c, hc, h_bound⟩ := hz
+      obtain ⟨N, hN⟩ := cauchySeq_iff'.mp hby.cauchySeq (c * ε) (mul_pos hc hε)
+      refine ⟨N, fun n hn ↦ Eq.trans_lt (dist_eq_norm _ _) ((mul_lt_mul_iff_right₀ hc).mp ?_)⟩
+      calc
+        _ ≤ ‖T (⟨x n, hx n⟩ - ⟨x N, hx N⟩) - z • (x n - x N)‖ := h_bound _
+        _ = ‖b n - b N‖ := by rw [← hx', ← hx', map_sub, smul_sub, sub_sub_sub_comm]
+        _ = dist (b n) (b N) := (dist_eq_norm _ _).symm
+        _ < (c * ε) := hN n hn
+    obtain ⟨x₀, hx₀⟩ := CompleteSpace.complete hCS
+    suffices (x₀, y + z • x₀) ∈ T.closure.graph by
+      obtain ⟨x₀', rfl, _⟩ := (mem_graph_iff _).mp this
+      use ⟨x₀', by simp [sub_domain]⟩
+      simp_all [sub_apply]
+    rw [← hT.graph_closure_eq_closure_graph]
+    apply mem_closure_iff_seq_limit.mpr
+    refine ⟨fun n ↦ (x n, b n + z • x n), fun n ↦ ?_, ?_⟩
+    · exact (mem_graph_iff _).mpr ⟨⟨x n, hx n⟩, by simp [← hx' n]⟩
+    · exact Filter.Tendsto.prodMk_nhds hx₀ (hby.add <| Filter.Tendsto.const_smul hx₀ z)
+
+-- Prop 2.1.iv
+lemma sub_range_isClosed [CompleteSpace H]
+    {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) {z : ℂ} (hz : z ∈ T.regularityDomain) :
+    _root_.IsClosed ((T - z • 1).toFun.range : Set H) := by
+  have hT' : T.closure = T := hT.isClosable.isClosed_iff.mp hT
+  exact (hT' ▸ range_closure_sub_eq_closure_range_sub hT.isClosable hz) ▸ isClosed_closure
 
 end
 
