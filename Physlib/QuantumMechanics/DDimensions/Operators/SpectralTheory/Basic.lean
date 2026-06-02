@@ -18,6 +18,16 @@ which are of central importance in quantum mechanics.
 
 ## ii. Key results
 
+Definitions
+- `LinearPMap.regularityDomain` : The set of regular points for a partial linear map `T`.
+    A complex number `z` is a regular point for `T` if there exists `c > 0` such that
+    `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`.
+
+Main results
+- `regularityDomain_isOpen` : The regularity domain is an open subset of `ℂ`.
+- `closure_range_sub_eq_range_closure_sub` : If `z` is a regular point for a closable operator `T`
+    then the closure of `(T - z • 1).range` is `(T.closure - z • 1).range`.
+
 ## iii. Table of contents
 
 - A. Regularity domain
@@ -44,7 +54,7 @@ open Complex
 ## A. Regularity domain
 -/
 
-/-- `IsLowerBound T z c` means that `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`. -/
+/-- `IsLowerBound T z c` is the property that `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`. -/
 def IsLowerBound (T : H →ₗ.[ℂ] H) (z : ℂ) (c : ℝ) : Prop := ∀ x : T.domain, c * ‖x‖ ≤ ‖T x - z • x‖
 
 lemma isLowerBound_of_le
@@ -57,8 +67,8 @@ lemma isLowerBound_of_ge
     IsLowerBound T₁ z c :=
   fun x ↦ @hle.2 x ⟨x, hle.1 x.2⟩ rfl ▸ h ⟨x, hle.1 x.2⟩
 
-lemma isLowerBound_closure {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLowerBound T z c) :
-    IsLowerBound T.closure z c := by
+lemma isLowerBound_closure
+    {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLowerBound T z c) : IsLowerBound T.closure z c := by
   by_cases hT : T.IsClosable
   · intro x
     obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp <|
@@ -71,7 +81,6 @@ lemma isLowerBound_closure {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLow
     exact hy₁ ▸ hy₂ ▸ h y
   · rwa [closure_def' hT]
 
--- Def 2.1
 /-- The regular points for `T`.
 
   `z : ℂ` is a regular point for `T` iff there exists a constant `c > 0` such that
@@ -82,7 +91,6 @@ def regularityDomain (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | ∃ c > 0, I
 lemma regularityDomain_antitone : Antitone (regularityDomain (H := H)) :=
   fun _ _ hle _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_of_ge hle h⟩
 
--- Prop 2.1.i
 /-- `z` is a regular point for `T` iff `T - z • 1` has a bounded inverse. -/
 lemma mem_regularityDomain_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
     z ∈ T.regularityDomain ↔ (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).inverse.IsBounded := by
@@ -110,8 +118,7 @@ lemma mem_regularityDomain_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
 
 /-- The regularity domain of `T` contains open balls with radii controlled by the lower bounds. -/
 lemma ball_subset_regularityDomain
-    {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLowerBound T z c) :
-    ball z c ⊆ T.regularityDomain := by
+    {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLowerBound T z c) : ball z c ⊆ T.regularityDomain := by
   intro z' hzc
   refine ⟨c - ‖z - z'‖, by simp_all [dist_eq, norm_sub_rev], fun x ↦ ?_⟩
   calc
@@ -120,34 +127,21 @@ lemma ball_subset_regularityDomain
     _ ≤ ‖T x - z • x + (z - z') • x‖ := norm_sub_le_norm_add _ _
     _ = ‖T x - z' • x‖ := by simp [sub_smul]
 
--- Prop 2.1.ii
-/-- `T.regularityDomain ⊆ ℂ` is an open set. -/
+/-- The regularity domain is an open set. -/
 lemma regularityDomain_isOpen (T : H →ₗ.[ℂ] H) : IsOpen T.regularityDomain :=
   isOpen_iff.mpr fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, ball_subset_regularityDomain h⟩
 
--- Prop 2.1.iii
 /-- `T` and `T.closure` have the same regularity domain. -/
 lemma regularityDomain_closure (T : H →ₗ.[ℂ] H) :
     T.closure.regularityDomain = T.regularityDomain := by
   refine eq_of_le_of_ge (regularityDomain_antitone T.le_closure) ?_
   exact fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
 
--- Prop 2.1.iii
-lemma range_closure_sub_eq_closure_range_sub [CompleteSpace H]
+lemma closure_range_sub_eq_range_closure_sub [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z : ℂ} (hz : z ∈ T.regularityDomain) :
-    (T.closure - z • 1).toFun.range = (T - z • 1).toFun.range.closure := by
+    (T - z • 1).toFun.range.closure = (T.closure - z • 1).toFun.range := by
   ext y
   constructor
-  · intro ⟨⟨x, hx⟩, hxy⟩
-    obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp <|
-      hT.graph_closure_eq_closure_graph ▸ T.closure.mem_graph ⟨x, hx.1⟩
-    simp only [coe_toAddSubmonoid, SetLike.mem_coe, mem_graph_iff] at hb
-    rw [nhds_prod_eq] at hb'
-    apply mem_closure_iff_seq_limit.mpr
-    refine ⟨fun n ↦ (b n).2 - z • (b n).1, fun n ↦ ?_, hxy ▸ hb'.snd.sub (hb'.fst.const_smul z)⟩
-    obtain ⟨u, hu₁, hu₂⟩ := hb n
-    use ⟨u, by simp [sub_domain]⟩
-    simp [sub_apply, ← hu₁, hu₂]
   · intro hy
     obtain ⟨b, hb, hby⟩ := mem_closure_iff_seq_limit.mp hy
     let x : ℕ → H := fun n ↦ (hb n).choose
@@ -173,13 +167,22 @@ lemma range_closure_sub_eq_closure_range_sub [CompleteSpace H]
     refine ⟨fun n ↦ (x n, b n + z • x n), fun n ↦ ?_, ?_⟩
     · exact (mem_graph_iff _).mpr ⟨⟨x n, hx n⟩, by simp [← hx' n]⟩
     · exact Filter.Tendsto.prodMk_nhds hx₀ (hby.add <| Filter.Tendsto.const_smul hx₀ z)
+  · intro ⟨⟨x, hx⟩, hxy⟩
+    obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp <|
+      hT.graph_closure_eq_closure_graph ▸ T.closure.mem_graph ⟨x, hx.1⟩
+    simp only [coe_toAddSubmonoid, SetLike.mem_coe, mem_graph_iff] at hb
+    rw [nhds_prod_eq] at hb'
+    apply mem_closure_iff_seq_limit.mpr
+    refine ⟨fun n ↦ (b n).2 - z • (b n).1, fun n ↦ ?_, hxy ▸ hb'.snd.sub (hb'.fst.const_smul z)⟩
+    obtain ⟨u, hu₁, hu₂⟩ := hb n
+    use ⟨u, by simp [sub_domain]⟩
+    simp [sub_apply, ← hu₁, hu₂]
 
--- Prop 2.1.iv
 lemma sub_range_isClosed [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) {z : ℂ} (hz : z ∈ T.regularityDomain) :
     _root_.IsClosed ((T - z • 1).toFun.range : Set H) := by
   have hT' : T.closure = T := hT.isClosable.isClosed_iff.mp hT
-  exact (hT' ▸ range_closure_sub_eq_closure_range_sub hT.isClosable hz) ▸ isClosed_closure
+  exact (hT' ▸ closure_range_sub_eq_range_closure_sub hT.isClosable hz) ▸ isClosed_closure
 
 end
 
