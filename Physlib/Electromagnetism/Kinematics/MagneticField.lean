@@ -87,52 +87,11 @@ lemma magneticField_eq {c : SpeedOfLight} (A : ElectromagneticPotential) :
 
 -/
 
-lemma magneticField_fst_eq_fieldStrengthMatrix {c : SpeedOfLight}
+lemma magneticField_coord_eq_fieldStrengthMatrix {i : Fin 3} {c : SpeedOfLight}
     (A : ElectromagneticPotential) (t : Time)
     (x : Space) (hA : Differentiable ℝ A) :
-    A.magneticField c t x 0 =
-    - A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x)) (Sum.inr 1, Sum.inr 2) := by
-  rw [toFieldStrength_basis_repr_apply_eq_single]
-  simp only [Fin.isValue, inr_i_inr_i, neg_mul, one_mul, sub_neg_eq_add, neg_add_rev, neg_neg]
-  rw [magneticField]
-  simp only [curl, Fin.isValue]
-  rw [neg_add_eq_sub]
-  congr
-  all_goals
-  · rw [SpaceTime.deriv_sum_inr c _ hA]
-    simp only [Fin.isValue, ContinuousLinearEquiv.apply_symm_apply]
-    rw [Space.deriv_eq, Space.deriv_eq, Lorentz.Vector.fderiv_apply]
-    rfl
-    · refine Differentiable.comp hA ?_
-      refine Differentiable.fun_comp ?_ ?_
-      · exact ContinuousLinearEquiv.differentiable (toTimeAndSpace c).symm
-      · fun_prop
-
-lemma magneticField_snd_eq_fieldStrengthMatrix {c : SpeedOfLight}
-    (A : ElectromagneticPotential) (t : Time)
-    (x : Space) (hA : Differentiable ℝ A) :
-    A.magneticField c t x 1 = A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x))
-      (Sum.inr 0, Sum.inr 2) := by
-  rw [toFieldStrength_basis_repr_apply_eq_single]
-  simp only [Fin.isValue, inr_i_inr_i, neg_mul, one_mul, sub_neg_eq_add]
-  rw [magneticField]
-  simp only [curl, Fin.isValue]
-  rw [neg_add_eq_sub]
-  congr
-  all_goals
-  · rw [SpaceTime.deriv_sum_inr c _ hA]
-    simp only [Fin.isValue, ContinuousLinearEquiv.apply_symm_apply]
-    rw [Space.deriv_eq, Space.deriv_eq, Lorentz.Vector.fderiv_apply]
-    rfl
-    · refine Differentiable.comp hA ?_
-      refine Differentiable.fun_comp ?_ ?_
-      · exact ContinuousLinearEquiv.differentiable (toTimeAndSpace c).symm
-      · fun_prop
-
-lemma magneticField_thd_eq_fieldStrengthMatrix {c : SpeedOfLight} (A : ElectromagneticPotential)
-    (t : Time) (x : Space) (hA : Differentiable ℝ A) :
-    A.magneticField c t x 2 =
-    - A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x)) (Sum.inr 0, Sum.inr 1) := by
+    A.magneticField c t x i =
+    - A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x)) (Sum.inr (i+1), Sum.inr (i+2)) := by
   rw [toFieldStrength_basis_repr_apply_eq_single]
   simp only [Fin.isValue, inr_i_inr_i, neg_mul, one_mul, sub_neg_eq_add, neg_add_rev, neg_neg]
   rw [magneticField]
@@ -233,27 +192,11 @@ lemma fieldStrengthMatrix_eq_electric_magnetic {c} (A : ElectromagneticPotential
   | Sum.inr i, Sum.inl 0 =>
     simp [electricField_eq_fieldStrengthMatrix A t x i hA]
     field_simp
-    exact fieldStrengthMatrix_antisymm A ((toTimeAndSpace c).symm (t, x)) (Sum.inr i) (Sum.inl 0)
+    rw [fieldStrengthMatrix_antisymm]
   | Sum.inr i, Sum.inr j =>
-    match i, j with
-    | 0, 0 => simp
-    | 0, 1 =>
-      simp [magneticField_thd_eq_fieldStrengthMatrix A t x hA]
-    | 0, 2 =>
-      simp [magneticField_snd_eq_fieldStrengthMatrix A t x hA]
-    | 1, 0 =>
-      simp [magneticField_thd_eq_fieldStrengthMatrix A t x hA]
-      rw [fieldStrengthMatrix_antisymm]
-    | 1, 1 => simp
-    | 1, 2 =>
-      simp [magneticField_fst_eq_fieldStrengthMatrix A t x hA]
-    | 2, 0 =>
-      simp [magneticField_snd_eq_fieldStrengthMatrix A t x hA]
-      rw [fieldStrengthMatrix_antisymm]
-    | 2, 1 =>
-      simp [magneticField_fst_eq_fieldStrengthMatrix A t x hA]
-      rw [fieldStrengthMatrix_antisymm]
-    | 2, 2 => simp
+    fin_cases i <;> fin_cases j <;>
+    simp [magneticField_coord_eq_fieldStrengthMatrix A t x hA]
+    repeat rw [fieldStrengthMatrix_antisymm]
 
 lemma fieldStrengthMatrix_eq_electric_magnetic_of_spaceTime (c : SpeedOfLight)
     (A : ElectromagneticPotential)
@@ -334,44 +277,25 @@ lemma magneticFieldMatrix_diag_eq_zero {c : SpeedOfLight}
 lemma magneticField_eq_magneticFieldMatrix {c : SpeedOfLight} (A : ElectromagneticPotential)
     (hA : Differentiable ℝ A) :
     A.magneticField c = fun t x => WithLp.toLp 2 fun i =>
-      match i with
-      | 0 => - A.magneticFieldMatrix c t x (1, 2)
-      | 1 => A.magneticFieldMatrix c t x (0, 2)
-      | 2 => - A.magneticFieldMatrix c t x (0, 1) := by
+      - A.magneticFieldMatrix c t x ((i+1), (i+2)) := by
   rw [magneticFieldMatrix_eq]
-  ext t x i
-  fin_cases i
-  · simp [magneticField_fst_eq_fieldStrengthMatrix A t x hA]
-  · simp [magneticField_snd_eq_fieldStrengthMatrix A t x hA]
-  · simp [magneticField_thd_eq_fieldStrengthMatrix A t x hA]
+  ext t x
+  simp [magneticField_coord_eq_fieldStrengthMatrix A t x hA]
 
 lemma magneticField_curl_eq_magneticFieldMatrix{c : SpeedOfLight} (A : ElectromagneticPotential)
     (hA : ContDiff ℝ 2 A) (t : Time) :
     (∇ ⨯ A.magneticField c t) x i = ∑ j, Space.deriv j (A.magneticFieldMatrix c t · (j, i)) x:= by
   rw [magneticField_eq_magneticFieldMatrix A (hA.differentiable (by simp))]
-  simp only [curl, Fin.isValue]
-  fin_cases i
-  · simp only [Fin.isValue, deriv_eq_fderiv_basis, fderiv_fun_neg, ContinuousLinearMap.neg_apply,
-    Fin.zero_eta, Fin.sum_univ_three, magneticFieldMatrix_diag_eq_zero, fderiv_fun_const,
-    Pi.zero_apply, ContinuousLinearMap.zero_apply, zero_add]
-    conv_lhs =>
-      enter [2, 1, 2, x]
-      rw [magneticFieldMatrix_antisymm]
+  simp only [curl, Fin.isValue, deriv_eq_fderiv_basis, fderiv_fun_neg,
+    ContinuousLinearMap.neg_apply, sub_neg_eq_add, Fin.sum_univ_three]
+  fin_cases i <;>
+  · simp only [Fin.reduceFinMk, Fin.isValue, Fin.reduceAdd, zero_add,
+    magneticFieldMatrix_diag_eq_zero, fderiv_fun_const, Pi.ofNat_apply,
+    ContinuousLinearMap.zero_apply, add_zero]
     conv_lhs =>
       enter [1, 1, 1, 2, x]
       rw [magneticFieldMatrix_antisymm]
-    simp
-  · simp only [Fin.isValue, deriv_eq_fderiv_basis, fderiv_fun_neg, ContinuousLinearMap.neg_apply,
-    sub_neg_eq_add, Fin.mk_one, Fin.sum_univ_three, magneticFieldMatrix_diag_eq_zero,
-    fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.zero_apply, add_zero]
-    conv_lhs =>
-      enter [1, 1, 1, 2, x]
-      rw [magneticFieldMatrix_antisymm]
-    simp only [Fin.isValue, fderiv_fun_neg, ContinuousLinearMap.neg_apply, neg_neg]
-    ring
-  · simp only [Fin.isValue, deriv_eq_fderiv_basis, fderiv_fun_neg, ContinuousLinearMap.neg_apply,
-    sub_neg_eq_add, Fin.reduceFinMk, Fin.sum_univ_three, magneticFieldMatrix_diag_eq_zero,
-    fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.zero_apply, add_zero]
+    simp [add_comm]
 
 /-!
 
@@ -483,27 +407,13 @@ lemma magneticFieldMatrix_space_deriv_eq {c : SpeedOfLight} (A : Electromagnetic
   conv_rhs =>
     enter [2, 2, x]
     rw [magneticFieldMatrix_eq_vectorPotential A (hA.differentiable (by simp)) t x]
-  conv_lhs =>
-    rw [Space.deriv_eq_fderiv_basis]
-  rw [fderiv_fun_sub]
-  simp [← Space.deriv_eq_fderiv_basis]
-  conv_rhs =>
-    rw [Space.deriv_eq_fderiv_basis]
-    enter [2]
-    rw [Space.deriv_eq_fderiv_basis]
-  rw [fderiv_fun_sub, fderiv_fun_sub]
-  simp [← Space.deriv_eq_fderiv_basis]
-  conv_lhs =>
-    rw [Space.deriv_commute _ (vectorPotential_apply_contDiff_space _ hA _ _)]
-    enter [2]
-    rw [Space.deriv_commute _ ((vectorPotential_apply_contDiff_space _ hA _ _))]
-  conv_rhs =>
-    enter [1, 1]
-    rw [Space.deriv_commute _ ((vectorPotential_apply_contDiff_space _ hA _ _))]
+  rw [fun_deriv_sub, fun_deriv_sub, fun_deriv_sub]
+  rw [Space.deriv_commute _ (vectorPotential_apply_contDiff_space _ hA _ i),
+      Space.deriv_commute _ (vectorPotential_apply_contDiff_space _ hA _ j),
+      Space.deriv_commute _ (vectorPotential_apply_contDiff_space _ hA _ k)]
   ring
   all_goals
-  · apply Differentiable.differentiableAt
-    apply Space.deriv_differentiable
+  · apply Space.deriv_differentiable
     apply vectorPotential_apply_contDiff_space _ hA
 
 /-!

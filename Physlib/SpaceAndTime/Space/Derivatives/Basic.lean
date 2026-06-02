@@ -159,11 +159,12 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) (μ : Fin d
 
 /-!
 
-### A.3. Derivative distributes over addition
+### A.3. Derivative distributes over addition and subtraction
 
 -/
 
 /-- Derivatives on space distribute over addition. -/
+@[to_fun]
 lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
@@ -183,6 +184,17 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
   ext x
   rw [fderiv_fun_add]
   simp only [ContinuousLinearMap.add_apply, Pi.add_apply]
+  repeat fun_prop
+
+/-- Derivatives on space distribute over addition. -/
+@[to_fun]
+lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+    ∂[u] (f1 - f2) = ∂[u] f1 - ∂[u] f2 := by
+  rw [deriv_eq_fderiv_fun]
+  ext x
+  rw [fderiv_sub]
+  rfl
   repeat fun_prop
 
 /-!
