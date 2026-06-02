@@ -57,12 +57,12 @@ open Complex
 /-- `IsLowerBound T z c` is the property that `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`. -/
 def IsLowerBound (T : H →ₗ.[ℂ] H) (z : ℂ) (c : ℝ) : Prop := ∀ x : T.domain, c * ‖x‖ ≤ ‖T x - z • x‖
 
-lemma isLowerBound_of_le
-    {T : H →ₗ.[ℂ] H} {z : ℂ} {c c' : ℝ} (hle : c' ≤ c) (h : IsLowerBound T z c) :
-    IsLowerBound T z c' :=
+lemma isLowerBound_of_right_le
+    {T : H →ₗ.[ℂ] H} {z : ℂ} {c₁ c₂ : ℝ} (hle : c₁ ≤ c₂) (h : IsLowerBound T z c₂) :
+    IsLowerBound T z c₁ :=
   fun x ↦ (mul_le_mul_of_nonneg_right hle (norm_nonneg x)).trans (h x)
 
-lemma isLowerBound_of_ge
+lemma isLowerBound_of_left_le
     {T₁ T₂ : H →ₗ.[ℂ] H} (hle : T₁ ≤ T₂) {z : ℂ} {c : ℝ} (h : IsLowerBound T₂ z c) :
     IsLowerBound T₁ z c :=
   fun x ↦ @hle.2 x ⟨x, hle.1 x.2⟩ rfl ▸ h ⟨x, hle.1 x.2⟩
@@ -89,7 +89,7 @@ def regularityDomain (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | ∃ c > 0, I
 
 /-- `T ≤ T'` implies `T'.regularityDomain ⊆ T.regularityDomain`. -/
 lemma regularityDomain_antitone : Antitone (regularityDomain (H := H)) :=
-  fun _ _ hle _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_of_ge hle h⟩
+  fun _ _ hle _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_of_left_le hle h⟩
 
 /-- `z` is a regular point for `T` iff `T - z • 1` has a bounded inverse. -/
 lemma mem_regularityDomain_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
