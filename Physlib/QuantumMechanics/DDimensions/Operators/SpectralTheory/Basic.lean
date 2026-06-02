@@ -36,6 +36,9 @@ variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
 noncomputable section
 
+open Metric
+open Complex
+
 /-!
 ## A. Regularity domain
 -/
@@ -66,6 +69,55 @@ lemma isLowerBound_closure {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLow
     obtain ⟨y, hy₁, hy₂⟩ := (mem_graph_iff _).mp (hb n)
     exact hy₁ ▸ hy₂ ▸ h y
   · rwa [closure_def' hT]
+
+-- Def 2.1
+/-- The regular points for `T`.
+
+  `z : ℂ` is a regular point for `T` iff there exists a constant `c > 0` such that
+  `c * ‖x‖ ≤ ‖(T - z • 1) x‖` for all `x ∈ (T - z • 1).domain`. -/
+def regularityDomain (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | ∃ c > 0, IsLowerBound T z c}
+
+/-- `T ≤ T'` implies `T'.regularityDomain ⊆ T.regularityDomain`. -/
+lemma regularityDomain_antitone : Antitone (regularityDomain (H := H)) :=
+  fun _ _ hle _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_of_ge hle h⟩
+
+-- Prop 2.1.i
+/-- `z` is a regular point for `T` iff `T - z • 1` has a bounded inverse. -/
+lemma mem_regularityDomain_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
+    z ∈ T.regularityDomain ↔ (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).inverse.IsBounded := by
+  constructor
+  · intro ⟨c, hc, h_bound⟩
+    have h_ker : (T - z • 1).toFun.ker = ⊥ := by
+      ext x
+      constructor <;> intro
+      · have : c * ‖x‖ ≤ 0 → ‖x‖ ≤ 0 := fun h' ↦ nonpos_of_mul_nonpos_right h' hc
+        specialize h_bound ⟨x, x.2.1⟩
+        simp_all [sub_apply]
+      · simp_all
+    refine ⟨h_ker, c⁻¹, inv_pos.mpr hc, fun ⟨x, hx⟩ ↦ ?_⟩
+    rw [inverse_domain] at hx
+    obtain ⟨y, hy⟩ := hx
+    specialize h_bound ⟨y, y.2.1⟩
+    simp_all [le_inv_mul_iff₀, sub_apply, inverse_apply_eq h_ker (y := ⟨x, hx⟩) hy]
+  · rintro ⟨h_ker, c, hc, h_bound⟩
+    refine ⟨c⁻¹, inv_pos.mpr hc, fun x ↦ ?_⟩
+    apply (inv_mul_le_iff₀ hc).mpr
+    have hx : ↑x ∈ (T - z • 1).domain := by simp [sub_domain]
+    specialize h_bound ⟨(T - z • 1) ⟨x, hx⟩, by simp [inverse_domain]⟩
+    rw [inverse_apply_eq h_ker (x := ⟨x, hx⟩) rfl] at h_bound
+    simp_all [sub_apply]
+
+/-- The regularity domain of `T` contains open balls with radii controlled by the lower bounds. -/
+lemma ball_subset_regularityDomain
+    {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLowerBound T z c) :
+    ball z c ⊆ T.regularityDomain := by
+  intro z' hzc
+  refine ⟨c - ‖z - z'‖, by simp_all [dist_eq, norm_sub_rev], fun x ↦ ?_⟩
+  calc
+    _ = c * ‖x‖ - ‖(z - z') • x‖ := by simp [sub_mul, norm_smul]
+    _ ≤ ‖T x - z • x‖ - ‖(z - z') • x‖ := by linarith [h x]
+    _ ≤ ‖T x - z • x + (z - z') • x‖ := norm_sub_le_norm_add _ _
+    _ = ‖T x - z' • x‖ := by simp [sub_smul]
 
 end
 

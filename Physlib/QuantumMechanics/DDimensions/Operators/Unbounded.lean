@@ -258,6 +258,12 @@ lemma mul_def (f₁ f₂ : E →ₗ.[R] E) : f₁ * f₂ = f₁ ∘ᵣ f₂ := r
 @[simp]
 lemma one_domain : (1 : E →ₗ.[R] E).domain = ⊤ := rfl
 
+@[simp]
+lemma one_toFun : (1 : E →ₗ.[R] E).toFun = topEquiv.toLinearMap := rfl
+
+@[simp]
+lemma one_coe : (1 : E →ₗ.[R] E).toFun' = ⇑topEquiv.toLinearMap := rfl
+
 /-!
 ### A.5. Inequalities
 -/
@@ -351,12 +357,18 @@ def HasDenseDomain (U : H →ₗ.[ℂ] H') : Prop := Dense (U.domain : Set H)
 
 lemma hasDenseDomain_def : U.HasDenseDomain ↔ Dense (U.domain : Set H) := Iff.rfl
 
+/-- A LinearPMap is bounded iff there exists a constant `c` such that `‖U x‖ ≤ c * ‖x‖`
+  for all `x : U.domain`. -/
+def IsBounded (U : H →ₗ.[ℂ] H') : Prop := ∃ c > 0, ∀ x : U.domain, ‖U x‖ ≤ c * ‖x‖
+
+lemma isBounded_def : U.IsBounded ↔ ∃ c > 0, ∀ x : U.domain, ‖U x‖ ≤ c * ‖x‖ := Iff.rfl
+
 /-- A LinearPMap is an unbounded operator iff it has dense domain and is closable. -/
 def IsUnbounded (U : H →ₗ.[ℂ] H') : Prop := U.HasDenseDomain ∧ U.IsClosable
 
 lemma isUnbounded_def : U.IsUnbounded ↔ U.HasDenseDomain ∧ U.IsClosable := Iff.rfl
 
-/-- A LinearPMap `U` is symmetric iff `⟪U x, y⟫_ℂ = ⟪x, U y⟫_ℂ` for all `x y : U.domain`. -/
+/-- A LinearPMap `T` is symmetric iff `⟪T x, y⟫_ℂ = ⟪x, T y⟫_ℂ` for all `x y : T.domain`. -/
 def IsSymmetric (T : H →ₗ.[ℂ] H) : Prop := T.IsFormalAdjoint T
 
 lemma isSymmetric_def : T.IsSymmetric ↔ T.IsFormalAdjoint T := Iff.rfl
