@@ -5,6 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
+public import Physlib.SpaceAndTime.Space.IsDistBounded
 public import Physlib.SpaceAndTime.Space.Module
 public import Mathlib.MeasureTheory.Constructions.HaarToSphere
 public import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
@@ -28,6 +29,8 @@ The integrability of `x ↦ ‖x‖ᵖ` on `ball 0 b` and `(ball 0 b)ᶜ` follow
     with `0 ∉ closure s`.
 - `integrableOn_norm_rpow_of_compl_nhds`: A sufficient condition for integrability on `s`
     with `0 ∉ closure s`.
+- `radial_norm_power_spherical_integral_eq_space_integral`: The spherical-coordinate integral
+    identity for integer powers of the norm against a Schwartz map.
 
 ## iii. Table of contents
 
@@ -39,7 +42,7 @@ The integrability of `x ↦ ‖x‖ᵖ` on `ball 0 b` and `(ball 0 b)ᶜ` follow
 
 namespace Space
 
-open MeasureTheory
+open MeasureTheory SchwartzMap
 
 private lemma npow_indicator_rpow_eq {n : ℕ} {s : Set ℝ} (hs : 0 ∉ s) (p : ℝ) :
     (fun r ↦ r ^ n • s.indicator (fun r ↦ r ^ p) r) = s.indicator (fun r ↦ r ^ (n + p)) := by
@@ -47,6 +50,49 @@ private lemma npow_indicator_rpow_eq {n : ℕ} {s : Set ℝ} (hs : 0 ∉ s) (p :
   by_cases hr : r ∈ s
   · grind [Set.indicator_of_mem, smul_eq_mul, add_comm, Real.rpow_add_natCast]
   · simp [hr]
+
+lemma radial_norm_power_spherical_integral_eq_space_integral
+    {d p : ℕ} {q : ℤ} (hp_int : (p : ℤ) = q + (d.succ : ℤ))
+    (hp_pos : 0 < p) (η : 𝓢(Space d.succ, ℝ)) :
+    ∫ (n : ↑(Metric.sphere (0 : Space d.succ) 1)),
+        ∫ (r : Set.Ioi (0 : ℝ)),
+          r.1 ^ (p - 1) * η (r.1 • n.1)
+          ∂(.comap Subtype.val volume)
+        ∂(volume (α := Space d.succ).toSphere)
+      =
+    ∫ x : Space d.succ, η x * ‖x‖ ^ q := by
+  symm
+  calc
+    ∫ x : Space d.succ, η x * ‖x‖ ^ q
+        = ∫ r, η (r.2.1 • r.1.1) * ‖r.2.1 • r.1.1‖ ^ q
+            ∂(volume (α := Space d.succ).toSphere.prod
+              (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
+          rw [integral_volume_eq_spherical]
+    _ = ∫ (n : ↑(Metric.sphere (0 : Space d.succ) 1)),
+          ∫ r, η (r.1 • n.1) * ‖r.1 • n.1‖ ^ q
+            ∂(Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))
+          ∂(volume (α := Space d.succ).toSphere) := by
+          rw [MeasureTheory.integral_prod]
+          convert IsDistBounded.integrable_space_mul_spherical
+            (IsDistBounded.pow q (by omega)) η using 1
+    _ = ∫ (n : ↑(Metric.sphere (0 : Space d.succ) 1)),
+          ∫ (r : Set.Ioi (0 : ℝ)),
+            r.1 ^ (p - 1) * η (r.1 • n.1)
+            ∂(.comap Subtype.val volume)
+          ∂(volume (α := Space d.succ).toSphere) := by
+          congr
+          funext n
+          simp [Measure.volumeIoiPow]
+          erw [integral_withDensity_eq_integral_smul (by fun_prop)]
+          congr
+          funext r
+          have hr : 0 < (r : ℝ) := r.2
+          have hnorm := norm_smul_sphere n (le_of_lt hr)
+          rw [NNReal.smul_def, Real.coe_toNNReal _ (pow_nonneg (le_of_lt hr) d)]
+          simp only [smul_eq_mul]
+          rw [hnorm]
+          rw [← radial_jacobian_zpow hp_int hp_pos hr]
+          ring
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The function `x ↦ ‖x‖ᵖ` is integrable on `{x : Space d | 0 ≤ ‖x‖ < b}` iff `0 < d + p`. -/

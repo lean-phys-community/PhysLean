@@ -6,6 +6,8 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.SpaceAndTime.Space.Integrals.NormPow
+public import Physlib.Mathematics.Distribution.PowMul
 /-!
 
 # The norm on space
@@ -27,6 +29,8 @@ We use properties of this power series to prove various results about distributi
   norm.
 - `distGrad_distOfFunction_log_norm` : The gradient of the distribution defined by the logarithm
   of the norm.
+- `distDiv_norm_zpow_smul_repr_self_eq_smul` : The divergence of the distribution defined by
+  `x ↦ ‖x‖ ^ q • x`.
 - `distDiv_inv_pow_eq_dim` : The divergence of the distribution defined by the
   inverse power of the norm proportional to the Dirac delta distribution.
 
@@ -946,6 +950,257 @@ The proof
 
 -/
 open Distribution
+
+private lemma integrable_real_pow_mul_schwartz
+    (ψ : 𝓢(ℝ, ℝ)) (k : ℕ) :
+    Integrable (fun x : ℝ => x ^ k * ψ x) volume := by
+  refine (ψ.integrable_pow_mul volume k).mono' (by fun_prop) ?_
+  filter_upwards with x
+  simp [norm_mul, norm_pow]
+
+private lemma radial_power_deriv_integral_by_parts
+    {d : ℕ} (η : 𝓢(Space d.succ, ℝ))
+    (n : ↑(Metric.sphere (0 : Space d.succ) 1))
+    (p : ℕ) (hp : 0 < p) :
+    - ∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+        ∂(.comap Subtype.val volume)
+      =
+      (p : ℝ) * ∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ (p - 1) * η (r.1 • n.1)
+        ∂(.comap Subtype.val volume) := by
+  let η' : 𝓢(ℝ, ℝ) := SchwartzMap.compCLM (g := fun a => a • n.1) ℝ (by
+    apply And.intro
+    · fun_prop
+    · intro n'
+      match n' with
+      | 0 =>
+        use 1, 1
+        simp [norm_smul]
+      | 1 =>
+        use 0, 1
+        intro x
+        simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right,
+          ContinuousLinearMap.norm_id]
+      | n' + 1 + 1 =>
+        use 0, 0
+        intro x
+        simp only [Real.norm_eq_abs, pow_zero, mul_one, norm_le_zero_iff]
+        rw [iteratedFDeriv_succ_eq_comp_right]
+        conv_lhs =>
+          enter [2, 3, y]
+          simp [fderiv_smul_const]
+        rw [iteratedFDeriv_succ_const]
+        rfl) (by use 1, 1; simp [norm_smul]) η
+  have hη'_apply (x : ℝ) : η' x = η (x • n.1) := by
+    simp [η']
+  have hmul_iter_apply :
+      ∀ k x, ((Physlib.Distribution.powOneMul ℝ)^[k] η') x = x ^ k * η' x := by
+    intro k
+    induction k with
+    | zero =>
+        intro x
+        simp
+    | succ k ih =>
+        intro x
+        rw [Function.iterate_succ_apply']
+        rw [Physlib.Distribution.powOneMul_apply, ih]
+        rw [pow_succ]
+        change x * (x ^ k * η' x) = x ^ k * x * η' x
+        ring
+  have hleft_subtype :
+      ∫ (r : Set.Ioi (0 : ℝ)),
+          r.1 ^ p * _root_.deriv (fun a => η (a • n.1)) r.1
+          ∂(.comap Subtype.val volume)
+        =
+        ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ p * _root_.deriv (fun a => η (a • n.1)) x := by
+    exact MeasureTheory.integral_subtype_comap (μ := volume)
+      (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
+      (fun x : ℝ => x ^ p * _root_.deriv (fun a => η (a • n.1)) x)
+  have hright_subtype :
+      ∫ (r : Set.Ioi (0 : ℝ)),
+          r.1 ^ (p - 1) * η (r.1 • n.1)
+          ∂(.comap Subtype.val volume)
+        =
+        ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ (p - 1) * η (x • n.1) := by
+    exact MeasureTheory.integral_subtype_comap (μ := volume)
+      (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
+      (fun x : ℝ => x ^ (p - 1) * η (x • n.1))
+  rw [hleft_subtype, hright_subtype]
+  have hIBP :
+      ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ p * _root_.deriv (fun a => η (a • n.1)) x
+        =
+        (0 : ℝ) - (0 : ℝ) -
+          ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+            ((p : ℝ) * x ^ (p - 1)) * η (x • n.1) := by
+    refine MeasureTheory.integral_Ioi_mul_deriv_eq_deriv_mul
+      (a := (0 : ℝ))
+      (u := fun x : ℝ => x ^ p)
+      (u' := fun x : ℝ => (p : ℝ) * x ^ (p - 1))
+      (v := fun x : ℝ => η (x • n.1))
+      (v' := fun x : ℝ => _root_.deriv (fun a => η (a • n.1)) x)
+      (a' := (0 : ℝ)) (b' := (0 : ℝ)) ?_ ?_ ?_ ?_ ?_ ?_
+    · intro x hx
+      simpa using (hasDerivAt_pow p x)
+    · intro x hx
+      exact DifferentiableAt.hasDerivAt (by fun_prop :
+        DifferentiableAt ℝ (fun x : ℝ => η (x • n.1)) x)
+    · have hderiv_int :
+          Integrable (fun x : ℝ =>
+            x ^ p * ((SchwartzMap.derivCLM ℝ ℝ) η') x) volume :=
+        integrable_real_pow_mul_schwartz ((SchwartzMap.derivCLM ℝ ℝ) η') p
+      exact hderiv_int.integrableOn.congr_fun (by
+        intro x hx
+        have hderiv_eq :
+            _root_.deriv η' x = _root_.deriv (fun a => η (a • n.1)) x := by
+          congr 1
+        simp [SchwartzMap.derivCLM_apply, hderiv_eq])
+        measurableSet_Ioi
+    · have hbase :
+          Integrable (fun x : ℝ => x ^ (p - 1) * η' x) volume :=
+        integrable_real_pow_mul_schwartz η' (p - 1)
+      have hconst :
+          Integrable (fun x : ℝ => (p : ℝ) * (x ^ (p - 1) * η' x)) volume :=
+        hbase.const_mul (p : ℝ)
+      exact hconst.integrableOn.congr_fun (by
+        intro x hx
+        ring_nf
+        simp [hη'_apply, mul_assoc])
+        measurableSet_Ioi
+    · have hcont :
+          ContinuousAt (fun x : ℝ => x ^ p * η (x • n.1)) (0 : ℝ) := by
+        fun_prop
+      have hlim := tendsto_nhdsWithin_of_tendsto_nhds
+        (s := Set.Ioi (0 : ℝ)) hcont.tendsto
+      simpa [Pi.mul_apply, hη'_apply, hp.ne'] using hlim
+    · have hzero :
+          Filter.Tendsto (fun x : ℝ => x ^ p * η' x) Filter.atTop (𝓝 (0 : ℝ)) := by
+        have hsch :
+            Filter.Tendsto (fun x : ℝ => ((Physlib.Distribution.powOneMul ℝ)^[p] η') x)
+              Filter.atTop (𝓝 (0 : ℝ)) :=
+          Filter.Tendsto.mono_left
+            (((Physlib.Distribution.powOneMul ℝ)^[p] η').toZeroAtInfty.zero_at_infty')
+            atTop_le_cocompact
+        exact hsch.congr' (Filter.Eventually.of_forall (fun x => by
+          rw [hmul_iter_apply p x]))
+      simpa [hη'_apply, Pi.mul_apply] using hzero
+  calc
+    -∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+        x ^ p * _root_.deriv (fun a => η (a • n.1)) x
+        = ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+            ((p : ℝ) * x ^ (p - 1)) * η (x • n.1) := by
+          rw [hIBP]
+          ring
+    _ = (p : ℝ) * ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ (p - 1) * η (x • n.1) := by
+          rw [← integral_const_mul]
+          congr
+          funext x
+          ring
+
+private lemma distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv
+    {d p : ℕ} (q : ℤ) (hq : 0 < q + (d.succ : ℤ))
+    (hp_int : (p : ℤ) = q + (d.succ : ℤ))
+    (η : 𝓢(Space d.succ, ℝ)) :
+    (∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega)))) η =
+      - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+        ∂(.comap Subtype.val volume))
+        ∂(volume (α := Space d.succ).toSphere) := by
+  let F : Space d.succ → ℝ := fun x =>
+    inner ℝ (‖x‖ ^ q • basis.repr x) (grad η x)
+  calc
+    (∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega)))) η
+        = - ∫ x, F x := by
+            rw [distDiv_ofFunction]
+    _ = - ∫ r, F (r.2.1 • r.1.1)
+        ∂(volume (α := Space d.succ).toSphere.prod
+          (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
+          rw [integral_volume_eq_spherical]
+    _ = - ∫ n, (∫ r, F (r.1 • n.1)
+        ∂(Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1)))
+        ∂(volume (α := Space d.succ).toSphere) := by
+          rw [MeasureTheory.integral_prod]
+          convert integrable_isDistBounded_inner_grad_schwartzMap_spherical
+            (IsDistBounded.zpow_smul_repr_self q (by omega)) η using 1
+    _ = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+        ∂(.comap Subtype.val volume))
+        ∂(volume (α := Space d.succ).toSphere) := by
+          congr
+          funext n
+          simp [F, Measure.volumeIoiPow]
+          erw [integral_withDensity_eq_integral_smul (by fun_prop)]
+          · congr
+            funext r
+            have hr : 0 < (r : ℝ) := r.2
+            have hnorm := norm_smul_sphere n (le_of_lt hr)
+            rw [NNReal.smul_def]
+            rw [Real.coe_toNNReal _ (pow_nonneg (le_of_lt hr) d)]
+            · simp only [smul_eq_mul]
+              rw [hnorm]
+              rw [← grad_smul_inner_space (n : Space d.succ) (⇑η)
+                (SchwartzMap.differentiable η) (r : ℝ) hr]
+              rw [real_inner_comm]
+              simp only [inner_smul_right]
+              rw [← radial_jacobian_zpow_mul_self hp_int hr]
+              ring
+
+lemma distDiv_norm_zpow_smul_repr_self_eq_smul
+    {d : ℕ} (q : ℤ) (hq : 0 < q + (d.succ : ℤ)) :
+    ∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega))) =
+      (((q + (d.succ : ℤ) : ℤ) : ℝ) •
+        distOfFunction (fun x : Space d.succ => ‖x‖ ^ q)
+          (IsDistBounded.pow q (by omega))) := by
+  ext η
+  let p : ℕ := Int.toNat (q + (d.succ : ℤ))
+  have hp_int : (p : ℤ) = q + (d.succ : ℤ) := by
+    dsimp [p]
+    exact Int.toNat_of_nonneg (le_of_lt hq)
+  have hp_pos : 0 < p := by
+    have : (0 : ℤ) < (p : ℤ) := by
+      rw [hp_int]
+      exact hq
+    exact_mod_cast this
+  have hcoef : (((q + (d.succ : ℤ) : ℤ) : ℝ)) = (p : ℝ) := by
+    exact_mod_cast hp_int.symm
+  calc
+    (∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega)))) η
+        = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
+            r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+            ∂(.comap Subtype.val volume))
+            ∂(volume (α := Space d.succ).toSphere) := by
+          exact distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv q hq hp_int η
+    _ = ∫ n, (p : ℝ) * ∫ (r : Set.Ioi (0 : ℝ)),
+            r.1 ^ (p - 1) * η (r.1 • n.1)
+            ∂(.comap Subtype.val volume)
+            ∂(volume (α := Space d.succ).toSphere) := by
+          rw [← integral_neg]
+          congr
+          funext n
+          exact radial_power_deriv_integral_by_parts η n p hp_pos
+    _ = (p : ℝ) * ∫ n : ↑(Metric.sphere (0 : Space d.succ) 1),
+          ∫ (r : Set.Ioi (0 : ℝ)),
+            r.1 ^ (p - 1) * η (r.1 • n.1)
+            ∂(.comap Subtype.val volume)
+            ∂(volume (α := Space d.succ).toSphere) := by
+          rw [integral_const_mul]
+    _ = (p : ℝ) * ∫ x : Space d.succ, η x * ‖x‖ ^ q := by
+          rw [radial_norm_power_spherical_integral_eq_space_integral hp_int hp_pos η]
+    _ = (((q + (d.succ : ℤ) : ℤ) : ℝ) •
+        distOfFunction (fun x : Space d.succ => ‖x‖ ^ q)
+          (IsDistBounded.pow q (by omega))) η := by
+          simp [distOfFunction_apply, mul_comm]
+          left
+          rw [← hcoef]
+          norm_num
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Auxiliary lemma with dimension defined as d.succ to handle `homeomorphUnitSphereProd`.

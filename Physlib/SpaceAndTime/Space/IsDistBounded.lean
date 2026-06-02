@@ -240,6 +240,27 @@ lemma integrable_space_mul {d : ℕ} {f : Space d → ℝ} (hf : IsDistBounded f
     Integrable (fun x : Space d => η x * f x) volume := by
   exact hf.integrable_space η
 
+lemma integrable_space_mul_spherical {dm1 : ℕ}
+    {f : Space dm1.succ → ℝ}
+    (hf : IsDistBounded f) (η : 𝓢(Space dm1.succ, ℝ)) :
+    Integrable ((fun x => η x.1 * f x.1)
+      ∘ (homeomorphUnitSphereProd (Space dm1.succ)).symm)
+      ((volume (α := Space dm1.succ)).toSphere.prod
+      (Measure.volumeIoiPow (Module.finrank ℝ (Space dm1.succ) - 1))) := by
+  have h1 : Integrable ((fun x => η x.1 * f x.1))
+      (.comap (Subtype.val (p := fun x => x ∈ ({0}ᶜ : Set _))) volume) := by
+    change Integrable ((fun x => η x * f x) ∘ Subtype.val)
+      (.comap (Subtype.val (p := fun x => x ∈ ({0}ᶜ : Set _))) volume)
+    rw [← MeasureTheory.integrableOn_iff_comap_subtypeVal]
+    · exact (hf.integrable_space_mul η).integrableOn
+    · simp
+  have he := (MeasureTheory.Measure.measurePreserving_homeomorphUnitSphereProd
+    (volume (α := Space dm1.succ)))
+  rw [← he.integrable_comp_emb]
+  · convert h1
+    simp only [Nat.succ_eq_add_one, Function.comp_apply, Homeomorph.symm_apply_apply]
+  · exact Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space dm1.succ))
+
 @[fun_prop]
 lemma integrable_space_fderiv {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
     (η : 𝓢(Space d, ℝ)) (y : Space d) :

@@ -124,6 +124,47 @@ lemma integral_one_dim_eq_integral_real {f : Space 1 → ℝ} :
 
 /-!
 
+## B.1. Radial power algebra
+
+-/
+
+lemma norm_smul_sphere {d : ℕ} (n : ↑(Metric.sphere (0 : Space d.succ) 1))
+    {r : ℝ} (hr : 0 ≤ r) :
+    ‖(r • (n : Space d.succ))‖ = r := by
+  simp [norm_smul, mem_sphere_zero_iff_norm.mp n.2, abs_of_nonneg hr]
+
+lemma radial_jacobian_zpow_mul_self
+    {d p : ℕ} {q : ℤ} (hp_int : (p : ℤ) = q + (d.succ : ℤ))
+    {r : ℝ} (hr : 0 < r) :
+    r ^ d * (r ^ q * r) = r ^ p := by
+  have hz : r ≠ 0 := ne_of_gt hr
+  calc
+    r ^ d * (r ^ q * r)
+        = r ^ (d : ℤ) * (r ^ q * r ^ (1 : ℤ)) := by
+            rw [zpow_natCast, zpow_one]
+    _ = r ^ ((d : ℤ) + (q + 1)) := by
+            rw [← zpow_add₀ hz q 1, ← zpow_add₀ hz (d : ℤ) (q + 1)]
+    _ = r ^ (p : ℤ) := by
+            congr 1; omega
+    _ = r ^ p := by
+            rw [zpow_natCast]
+
+lemma radial_jacobian_zpow
+    {d p : ℕ} {q : ℤ} (hp_int : (p : ℤ) = q + (d.succ : ℤ))
+    (hp_pos : 0 < p) {r : ℝ} (hr : 0 < r) :
+    r ^ d * r ^ q = r ^ (p - 1) := by
+  have hz : r ≠ 0 := ne_of_gt hr
+  calc
+    r ^ d * r ^ q
+        = r ^ ((d : ℤ) + q) := by
+            rw [← zpow_natCast r d, ← zpow_add₀ hz (d : ℤ) q]
+    _ = r ^ ((p - 1 : ℕ) : ℤ) := by
+            congr 1; omega
+    _ = r ^ (p - 1) := by
+            rw [zpow_natCast]
+
+/-!
+
 ## C. Integrals over volume to spherical
 
 -/
