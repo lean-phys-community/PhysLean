@@ -76,8 +76,9 @@ scoped[Space] notation "Δᵥ" => laplacianVec
 open Physlib Distribution
 
 /-- The distributional `distLaplacian` operator. -/
-noncomputable def distLaplacian {d : ℕ} (f : (Space d) →d[ℝ] ℝ) : (Space d) →d[ℝ] ℝ :=
-  ∇ᵈ ⬝ (∇ᵈ f)
+noncomputable def distLaplacian {d} :
+    ((Space d) →d[ℝ] ℝ) →ₗ[ℝ] (Space d) →d[ℝ] ℝ :=
+    distDiv ∘ₗ distGrad
 
 @[inherit_doc distLaplacian]
 scoped[Space] notation "Δᵈ" => distLaplacian
