@@ -22,11 +22,11 @@ Definitions
 - `LinearPMap.regularityDomain` : The set of regular points for a partial linear map `T`.
     A complex number `z` is a regular point for `T` if there exists `c > 0` such that
     `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`.
-- `LinearPMap.deficiencySubspace` : For an operator `T` and complex number `z`, the submodule
-    orthogonal to the range of `T - z • 1`.
-- `LinearPMap.defectNumber` : The rank of the deficiency subspace.
+- `LinearPMap.deficiencySubspace` : For an operator `T` any complex number `z`, the closed submodule
+    which is orthogonal to the range of `T - z • 1`.
+- `LinearPMap.defectNumber` : The rank of the deficiency subspace as a (possibly infinite) cardinal.
 - `LinearPMap.numericalRange` : For an operator `T`, the set of complex numbers `⟪x, T x⟫_ℂ`
-    with `x ∈ T.domain` and `‖x‖ = 1`.
+    as `x` ranges over the unit sphere in `T.domain`.
 
 Main results
 - `regularityDomain_isOpen` : The regularity domain is an open subset of `ℂ`.
@@ -34,15 +34,16 @@ Main results
     then the closure of `(T - z • 1).range` is `(T.closure - z • 1).range`.
 - `defectNumber_same_of_same_connectedComponent` : The defect number is constant on each connected
     component of the regularity domain.
-- `numericalRange_convex` : The Toeplitz-Hausdorff theorem — the numerical range is a convex set.
 - `mem_regularityDomain_of_not_mem_numericalRange_closure` : The regularity domain contains the
     exterior of the numerical range.
+- `numericalRange_convex` : The Toeplitz-Hausdorff theorem — the numerical range is a convex set.
 
 ## iii. Table of contents
 
 - A. Regularity domain
 - B. Deficiency subspace & defect number
 - C. Numerical range
+  - C.1. The Toeplitz-Hausdorff theorem
 
 ## iv. References
 
@@ -373,6 +374,43 @@ lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
     refine ⟨⟨x, by simp [sub_domain]⟩, hx, ?_⟩
     simp_all [← hcz, ← hxz, sub_apply, inner_sub_right, inner_smul_right]
 
+/-- The regularity domain contains the exterior of the numerical range. -/
+lemma mem_regularityDomain_of_not_mem_numericalRange_closure
+    {T : H →ₗ.[ℂ] H} {z : ℂ} (h : z ∉ _root_.closure T.numericalRange) :
+    z ∈ T.regularityDomain := by
+  by_cases hT : T.domain = ⊥
+  · refine ⟨1, zero_lt_one, fun ⟨x, hx⟩ ↦ ?_⟩
+    rw [hT] at hx
+    simp_all
+  · use infDist z T.numericalRange
+    constructor
+    · exact (infDist_pos_iff_notMem_closure <| numericalRange_nonempty hT).mp h
+    · intro x
+      rcases eq_or_ne x 0 with rfl | hx
+      · simp
+      · let y : T.domain := ofReal ‖x‖⁻¹ • x
+        have hy : ‖y‖ = 1 := by
+          simp only [y, norm_smul, ofReal_inv, norm_inv, norm_real, norm_norm]
+          exact inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx)
+        have hy' : ‖x‖ ^ 2 * ⟪↑y, T y⟫_ℂ = ⟪↑x, T x⟫_ℂ := by
+          simp_rw [y, map_smul, SetLike.val_smul, inner_smul_left, inner_smul_right, conj_ofReal,
+            ← mul_assoc, pow_two, ← ofReal_mul]
+          field_simp
+          simp
+        apply (mul_le_mul_iff_left₀ <| norm_pos_iff.mpr hx).mp
+        rw [mul_assoc, ← pow_two, mul_comm _ ‖x‖]
+        calc
+          _ ≤ ‖z - ⟪↑y, T y⟫_ℂ‖ * ‖x‖ ^ 2 := mul_le_mul_of_nonneg_right
+            (dist_eq z _ ▸ infDist_le_dist_of_mem ⟨y, hy, rfl⟩) (pow_two_nonneg _)
+          _ = ‖⟪↑y, T y⟫_ℂ * ‖x‖ ^ 2 - z * ‖x‖ ^ 2‖ := by simp [norm_sub_rev, ← sub_mul]
+          _ = ‖⟪↑x, T x⟫_ℂ - z * ‖x‖ ^ 2‖ := by rw [mul_comm, hy']
+          _ = ‖⟪↑x, T x - z • x⟫_ℂ‖ := by simp [inner_sub_right, inner_smul_right]
+          _ ≤ ‖x‖ * ‖T x - z • x‖ := norm_inner_le_norm _ _
+
+/-!
+### C.1. The Toeplitz-Hausdorff theorem
+-/
+
 private lemma exists_phase_add_im_eq_zero (z₁ z₂ : ℂ) :
     ∃ θ : ℝ, (exp (I * θ) * z₁ + exp (-I * θ) * z₂).im = 0 := by
   let g : ℝ → ℝ := fun θ ↦ (exp (I * θ) * z₁ + exp (-I * θ) * z₂).im
@@ -462,39 +500,6 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
         zero_add, ofReal_neg, neg_mul, mul_neg, mul_one, add_re, ofReal_add, ofReal_mul,
         ofReal_sub, ofReal_one, ofReal_pow]
       ring
-
-/-- The regularity domain contains the exterior of the numerical range. -/
-lemma mem_regularityDomain_of_not_mem_numericalRange_closure
-    {T : H →ₗ.[ℂ] H} {z : ℂ} (h : z ∉ _root_.closure T.numericalRange) :
-    z ∈ T.regularityDomain := by
-  by_cases hT : T.domain = ⊥
-  · refine ⟨1, zero_lt_one, fun ⟨x, hx⟩ ↦ ?_⟩
-    rw [hT] at hx
-    simp_all
-  · use infDist z T.numericalRange
-    constructor
-    · exact (infDist_pos_iff_notMem_closure <| numericalRange_nonempty hT).mp h
-    · intro x
-      rcases eq_or_ne x 0 with rfl | hx
-      · simp
-      · let y : T.domain := ofReal ‖x‖⁻¹ • x
-        have hy : ‖y‖ = 1 := by
-          simp only [y, norm_smul, ofReal_inv, norm_inv, norm_real, norm_norm]
-          exact inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx)
-        have hy' : ‖x‖ ^ 2 * ⟪↑y, T y⟫_ℂ = ⟪↑x, T x⟫_ℂ := by
-          simp_rw [y, map_smul, SetLike.val_smul, inner_smul_left, inner_smul_right, conj_ofReal,
-            ← mul_assoc, pow_two, ← ofReal_mul]
-          field_simp
-          simp
-        apply (mul_le_mul_iff_left₀ <| norm_pos_iff.mpr hx).mp
-        rw [mul_assoc, ← pow_two, mul_comm _ ‖x‖]
-        calc
-          _ ≤ ‖z - ⟪↑y, T y⟫_ℂ‖ * ‖x‖ ^ 2 := mul_le_mul_of_nonneg_right
-            (dist_eq z _ ▸ infDist_le_dist_of_mem ⟨y, hy, rfl⟩) (pow_two_nonneg _)
-          _ = ‖⟪↑y, T y⟫_ℂ * ‖x‖ ^ 2 - z * ‖x‖ ^ 2‖ := by simp [norm_sub_rev, ← sub_mul]
-          _ = ‖⟪↑x, T x⟫_ℂ - z * ‖x‖ ^ 2‖ := by rw [mul_comm, hy']
-          _ = ‖⟪↑x, T x - z • x⟫_ℂ‖ := by simp [inner_sub_right, inner_smul_right]
-          _ ≤ ‖x‖ * ‖T x - z • x‖ := norm_inner_le_norm _ _
 
 end
 
