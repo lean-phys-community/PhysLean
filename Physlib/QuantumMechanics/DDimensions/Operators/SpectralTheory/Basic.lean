@@ -225,7 +225,7 @@ lemma defectNumber_closure [CompleteSpace H]
     simp [← hT.closure_range_sub_eq_range_closure_sub hz]
   · rw [closure_def' hT]
 
-lemma inf_ne_bot_of_rank_lt
+lemma _root_.Submodule.inf_ne_bot_of_rank_lt
     {E F : Submodule ℂ H} [E.HasOrthogonalProjection] (h_rank : Module.rank ℂ E < Module.rank ℂ F) :
     Eᗮ ⊓ F ≠ ⊥ := by
   let Φ : F →L[ℂ] E := E.orthogonalProjection ∘L F.subtypeL
@@ -237,7 +237,8 @@ lemma inf_ne_bot_of_rank_lt
   have hE : y ∈ Eᗮ := orthogonalProjection_eq_zero_iff.mp (_root_.map_sub Φ _ _ ▸ sub_eq_zero.mpr h)
   exact fun hEF ↦ hy ((mem_bot ℂ).mp <| hEF ▸ ⟨hE, hF⟩)
 
-lemma exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosed)
+lemma IsClosed.exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H]
+    {T : H →ₗ.[ℂ] H} (hT : T.IsClosed)
     {z₁ z₂ : ℂ} (hz₁ : z₁ ∈ T.regularityDomain) (h : T.defectNumber z₁ < T.defectNumber z₂) :
     ∃ x : T.domain, x ≠ 0 ∧ ⟪T x - z₁ • x, T x - z₂ • x⟫_ℂ = 0 := by
   obtain ⟨y, h_inf, hy⟩ := (Submodule.ne_bot_iff _).mp (inf_ne_bot_of_rank_lt h)
@@ -250,8 +251,8 @@ lemma exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H] {T : H →ₗ.[�
   · apply (mem_orthogonal' _ _).mp at hy₂
     simp [← hy₂ ((T - z₂ • 1) ⟨x, hx.1, by simp⟩) (by simp), sub_apply, ← hxy]
 
-lemma defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z₁ z₂ : ℂ}
-    {c : ℝ} (h : IsLowerBound T z₁ c) (h_ball : z₂ ∈ ball z₁ c) :
+lemma IsClosable.defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosable)
+    {z₁ z₂ : ℂ} {c : ℝ} (h : IsLowerBound T z₁ c) (h_ball : z₂ ∈ ball z₁ c) :
     T.defectNumber z₁ = T.defectNumber z₂ := by
   by_cases hz₁ : z₁ ∈ T.regularityDomain
   · have hz₂ : z₂ ∈ T.regularityDomain := ball_subset_regularityDomain h h_ball
@@ -262,8 +263,8 @@ lemma defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT :
     obtain ⟨x, hx, h'⟩ : ∃ x : Tcl.domain, x ≠ 0 ∧ ⟪Tcl x - z₂ • x, Tcl x - z₁ • x⟫_ℂ = 0 := by
       rcases lt_or_gt_of_ne hne with hle | hle
       · simp_rw [inner_eq_zero_symm]
-        exact exists_inner_eq_zero_of_defectNumber_lt hT.closure_isClosed hz₁ hle
-      · exact exists_inner_eq_zero_of_defectNumber_lt hT.closure_isClosed hz₂ hle
+        exact hT.closure_isClosed.exists_inner_eq_zero_of_defectNumber_lt hz₁ hle
+      · exact hT.closure_isClosed.exists_inner_eq_zero_of_defectNumber_lt hz₂ hle
     refine not_le (a := ‖z₁ - z₂‖ * ‖x‖).mpr ?_ le_rfl
     refine lt_of_lt_of_le (b := ‖Tcl x - z₁ • x‖) ?_ ?_
     · refine lt_of_lt_of_le ?_ (isLowerBound_closure h x)
@@ -279,7 +280,7 @@ lemma defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT :
     exact hz₁ ⟨c, lt_of_le_of_lt dist_nonneg h_ball, h⟩
 
 /-- `T.defectNumber` is constant on each connected component of `T.regularityDomain`. -/
-lemma defectNumber_same_of_same_connectedComponent [CompleteSpace H]
+lemma IsClosable.defectNumber_same_of_same_connectedComponent [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable)
     {z₁ z₂ : T.regularityDomain} (h : connectedComponent z₁ = connectedComponent z₂) :
     T.defectNumber z₁ = T.defectNumber z₂ := by
