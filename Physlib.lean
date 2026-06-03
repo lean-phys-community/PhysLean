@@ -169,6 +169,11 @@ public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Permutations
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Y3
 public import Physlib.Particles.SuperSymmetry.N1.Basic
+public import Physlib.Particles.SuperSymmetry.N1.Derivative
+public import Physlib.Particles.SuperSymmetry.N1.KahlerMetric
+public import Physlib.Particles.SuperSymmetry.N1.KahlerPotential
+public import Physlib.Particles.SuperSymmetry.N1.LogKahlerHn
+public import Physlib.Particles.SuperSymmetry.N1.SuperPotential
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.AllowsTerm
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
