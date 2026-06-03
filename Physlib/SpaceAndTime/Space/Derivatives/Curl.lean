@@ -768,7 +768,6 @@ lemma distCurl_apply (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : �
   ext i
   simp [distCurl_coord_apply]
 
-
 /-!
 
 ### B.3. The curl of a grad is zero
