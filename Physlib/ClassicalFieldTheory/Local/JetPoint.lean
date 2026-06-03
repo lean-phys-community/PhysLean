@@ -167,7 +167,6 @@ lemma jetAt_coord (k : ℕ) (f : Space d → Space m) (x : Space d)
     (I : DerivativeIndex d k) (a : Fin m) :
     (jetAt k f x).coord I a = ∂^[I.1] (fun y => (f y) a) x := rfl
 
-@[simp]
 lemma jetAt_coord_zero (k : ℕ) (f : Space d → Space m) (x : Space d) (a : Fin m) :
     (jetAt k f x).coord 0 a = (f x) a := by
   simp [jetAt_coord]
@@ -177,7 +176,6 @@ lemma jetCoordinatesAt_eq (k : ℕ) (g : Space d → Space m) (x : Space d)
     (I : DerivativeIndex d k) (a : Fin m) :
     jetCoordinatesAt k g x I a = ∂^[I.1] (fun y => (g y) a) x := rfl
 
-@[simp]
 lemma jetCoordinatesAt_zero (k : ℕ) (g : Space d → Space m) (x : Space d) (a : Fin m) :
     jetCoordinatesAt k g x 0 a = (g x) a := by
   simp [jetCoordinatesAt]
