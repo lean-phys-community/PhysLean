@@ -151,7 +151,7 @@ lemma regularityDomain_closure (T : H →ₗ.[ℂ] H) :
   refine eq_of_le_of_ge (regularityDomain_antitone T.le_closure) ?_
   exact fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
 
-lemma closure_range_sub_eq_range_closure_sub [CompleteSpace H]
+lemma IsClosable.closure_range_sub_eq_range_closure_sub [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z : ℂ} (hz : z ∈ T.regularityDomain) :
     (T - z • 1).toFun.range.closure = (T.closure - z • 1).toFun.range := by
   ext y
@@ -192,11 +192,11 @@ lemma closure_range_sub_eq_range_closure_sub [CompleteSpace H]
     use ⟨u, by simp [sub_domain]⟩
     simp [sub_apply, ← hu₁, hu₂]
 
-lemma sub_range_isClosed [CompleteSpace H]
+lemma IsClosed.sub_range_isClosed [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) {z : ℂ} (hz : z ∈ T.regularityDomain) :
     _root_.IsClosed ((T - z • 1).toFun.range : Set H) := by
   have hT' : T.closure = T := hT.isClosable.isClosed_iff.mp hT
-  exact (hT' ▸ closure_range_sub_eq_range_closure_sub hT.isClosable hz) ▸ isClosed_closure
+  exact (hT' ▸ hT.isClosable.closure_range_sub_eq_range_closure_sub hz) ▸ isClosed_closure
 
 /-!
 ## B. Deficiency subspace & defect number
@@ -222,14 +222,14 @@ lemma defectNumber_closure [CompleteSpace H]
     T.closure.defectNumber z = T.defectNumber z := by
   by_cases hT : T.IsClosable
   · refine congrArg (fun p : Submodule ℂ H ↦ Module.rank ℂ p) ?_
-    simp [← closure_range_sub_eq_range_closure_sub hT hz]
+    simp [← hT.closure_range_sub_eq_range_closure_sub hz]
   · rw [closure_def' hT]
 
-lemma inf_ne_bot_of_rank_lt {E F : Submodule ℂ H} [E.HasOrthogonalProjection]
-    (hlt : Module.rank ℂ E < Module.rank ℂ F) :
+lemma inf_ne_bot_of_rank_lt
+    {E F : Submodule ℂ H} [E.HasOrthogonalProjection] (h_rank : Module.rank ℂ E < Module.rank ℂ F) :
     Eᗮ ⊓ F ≠ ⊥ := by
   let Φ : F →L[ℂ] E := E.orthogonalProjection ∘L F.subtypeL
-  have hΦ : ¬(⇑Φ).Injective := fun h' ↦ not_le_of_gt hlt (Φ.rank_le_of_injective h')
+  have hΦ : ¬(⇑Φ).Injective := fun h' ↦ not_le_of_gt h_rank (Φ.rank_le_of_injective h')
   obtain ⟨x₁, x₂, h, hx⟩ := Function.not_injective_iff.mp hΦ
   let y : H := x₁ - x₂
   have hy : y ≠ 0 := fun h' ↦ hx (SetLike.coe_eq_coe.mp <| sub_eq_zero.mp h')
@@ -242,7 +242,7 @@ lemma exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H] {T : H →ₗ.[�
     ∃ x : T.domain, x ≠ 0 ∧ ⟪T x - z₁ • x, T x - z₂ • x⟫_ℂ = 0 := by
   obtain ⟨y, h_inf, hy⟩ := (Submodule.ne_bot_iff _).mp (inf_ne_bot_of_rank_lt h)
   obtain ⟨hy₁, hy₂⟩ := mem_inf.mp h_inf
-  haveI := sub_range_isClosed hT hz₁ -- needed for `orthogonal_orthogonal`
+  haveI := hT.sub_range_isClosed hz₁ -- needed for `orthogonal_orthogonal`
   simp only [deficiencySubspace_coe, orthogonal_orthogonal] at hy₁ hy₂
   obtain ⟨⟨x, hx⟩, hxy⟩ := hy₁
   refine ⟨⟨x, hx.1⟩, fun h ↦ hy ?_, ?_⟩
@@ -250,8 +250,7 @@ lemma exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H] {T : H →ₗ.[�
   · apply (mem_orthogonal' _ _).mp at hy₂
     simp [← hy₂ ((T - z₂ • 1) ⟨x, hx.1, by simp⟩) (by simp), sub_apply, ← hxy]
 
-lemma defectNumber_eq_of_mem_ball [CompleteSpace H]
-    {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z₁ z₂ : ℂ}
+lemma defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z₁ z₂ : ℂ}
     {c : ℝ} (h : IsLowerBound T z₁ c) (h_ball : z₂ ∈ ball z₁ c) :
     T.defectNumber z₁ = T.defectNumber z₂ := by
   by_cases hz₁ : z₁ ∈ T.regularityDomain
@@ -344,7 +343,7 @@ section
 open Set
 open Pointwise
 
-/-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1}`. -/
+/-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1} ⊆ ℂ`. -/
 def numericalRange (T : H →ₗ.[ℂ] H) : Set ℂ := (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x : T.domain | ‖x‖ = 1}
 
 lemma numericalRange_eq (T : H →ₗ.[ℂ] H) :
@@ -452,7 +451,7 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
       simp_rw [hxd, hba, ofReal_sub, ofReal_one, ← hca, ← hdc]
       field_simp
       simp [mul_sub, mul_comm]
-    -- Now pick `θ` so that `y₂ ≔ eⁱᶿy₁` satisfies `⟪y₀, S y₂⟫_ℂ + ⟪y₂, S y₀⟫ ∈ ℝ`
+    -- First pick `θ` so that `y₂ ≔ eⁱᶿy₁` satisfies `⟪y₀, S y₂⟫ + ⟪y₂, S y₀⟫ ∈ ℝ`
     obtain ⟨θ, hθ⟩ := exists_phase_add_im_eq_zero ⟪↑y₀, S y₁⟫_ℂ ⟪↑y₁, S y₀⟫_ℂ
     let y₂ : S.domain := exp (I * θ) • y₁
     have hy₂ : ‖y₂‖ = 1 := by simp [y₂, norm_smul, hy₁]
@@ -461,7 +460,8 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
       simp [← hθ, y₂, map_smul, SetLike.val_smul, inner_smul_left, inner_smul_right, ← exp_conj]
     have h₂ : ⟪↑y₂, S y₂⟫_ℂ = 1 := by
       simp [y₂, map_smul, inner_smul_left, inner_smul_right, h₁, ← exp_conj, ← exp_add]
-    -- `f` is a parametrization of the line connecting `y₀` and `y₂`
+    -- `f` parametrizes the line connecting `y₀` and `y₂` and never vanishes because `y₀` and `y₂`
+    -- are linearly independent (since `y₀ = λy₂` implies `0 = ⟪y₀, S y₀⟫ = |λ|²⟪y₂, S y₂⟫ = λ²`).
     let f : ℝ → S.domain := fun r ↦ (1 - r : ℂ) • y₀ + (r : ℂ) • y₂
     have hf : ∀ r, f r ≠ 0 := by
       intro r hr
