@@ -225,7 +225,7 @@ lemma defectNumber_closure [CompleteSpace H]
     simp [← closure_range_sub_eq_range_closure_sub hT hz]
   · rw [closure_def' hT]
 
-lemma inf_ne_bot_of_rank_lt [CompleteSpace H] {E F : Submodule ℂ H} [E.HasOrthogonalProjection]
+lemma inf_ne_bot_of_rank_lt {E F : Submodule ℂ H} [E.HasOrthogonalProjection]
     (hlt : Module.rank ℂ E < Module.rank ℂ F) :
     Eᗮ ⊓ F ≠ ⊥ := by
   let Φ : F →L[ℂ] E := E.orthogonalProjection ∘L F.subtypeL
