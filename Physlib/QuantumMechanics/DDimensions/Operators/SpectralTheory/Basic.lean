@@ -376,8 +376,81 @@ private lemma exists_phase_add_im_eq_zero (z₁ z₂ : ℂ) :
     exact (mem_image _ _ _).mp (hIVT ⟨by linarith, by linarith⟩)
 
 /-- The Toeplitz-Hausdorff theorem. -/
-lemma numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRange := by
-  sorry
+theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRange := by
+  intro z₀ hz₀ z₁ hz₁ a b ha hb hab
+  rcases eq_or_ne z₁ z₀ with rfl | hz
+  · simp [← add_mul, eq_sub_iff_add_eq.mpr hab, hz₁]
+  · apply sub_ne_zero.mpr at hz
+    obtain ⟨x₀, hx₀, _⟩ := hz₀
+    obtain ⟨x₁, hx₁, _⟩ := hz₁
+    -- Apply an affine transformation to effectively move the endpoints `z₀` and `z₁` to `0` and `1`
+    let S : H →ₗ.[ℂ] H := (z₁ - z₀)⁻¹ • (T - z₀ • 1)
+    let y₀ : S.domain := ⟨x₀, by simp [S, sub_domain]⟩
+    let y₁ : S.domain := ⟨x₁, by simp [S, sub_domain]⟩
+    have hy₀ : ‖y₀‖ = 1 := hx₀
+    have hy₁ : ‖y₁‖ = 1 := hx₁
+    have h₀ : ⟪↑y₀, S y₀⟫_ℂ = 0 := by simp_all [S, y₀, sub_apply, inner_smul_right, inner_sub_right]
+    have h₁ : ⟪↑y₁, S y₁⟫_ℂ = 1 := by simp_all [S, y₁, sub_apply, inner_smul_right, inner_sub_right]
+    suffices ofReal '' unitInterval ⊆ S.numericalRange by
+      have hba : a = 1 - b := by linarith
+      rw [numericalRange_smul, numericalRange_sub_const] at this
+      obtain ⟨c, hc, hca⟩ := (image_subset_iff.mp this) ⟨hb, by linarith⟩
+      obtain ⟨d, hd, hdc⟩ := hc
+      obtain ⟨x, hx, hxd⟩ := hd
+      simp only [mem_singleton_iff, exists_eq_left] at hca hdc hxd
+      simp only [real_smul, smul_eq_mul] at *
+      use x, hx
+      simp_rw [hxd, hba, ofReal_sub, ofReal_one, ← hca, ← hdc]
+      field_simp
+      simp [mul_sub, mul_comm]
+    -- Now pick `θ` so that `y₂ ≔ eⁱᶿy₁` satisfies `⟪y₀, S y₂⟫_ℂ + ⟪y₂, S y₀⟫ ∈ ℝ`
+    obtain ⟨θ, hθ⟩ := exists_phase_add_im_eq_zero ⟪↑y₀, S y₁⟫_ℂ ⟪↑y₁, S y₀⟫_ℂ
+    let y₂ : S.domain := exp (I * θ) • y₁
+    have hy₂ : ‖y₂‖ = 1 := by simp [y₂, norm_smul, hy₁]
+    have hy_im : (⟪↑y₀, S y₂⟫_ℂ).im = -(⟪↑y₂, S y₀⟫_ℂ).im := by
+      apply eq_neg_iff_add_eq_zero.mpr
+      simp [← hθ, y₂, map_smul, SetLike.val_smul, inner_smul_left, inner_smul_right, ← exp_conj]
+    have h₂ : ⟪↑y₂, S y₂⟫_ℂ = 1 := by
+      simp [y₂, map_smul, inner_smul_left, inner_smul_right, h₁, ← exp_conj, ← exp_add]
+    -- `f` is a parametrization of the line connecting `y₀` and `y₂`
+    let f : ℝ → S.domain := fun r ↦ (1 - r : ℂ) • y₀ + (r : ℂ) • y₂
+    have hf : ∀ r, f r ≠ 0 := by
+      intro r hr
+      rcases eq_or_ne r 0 with rfl | hr'
+      · exact (hy₁ ▸ zero_ne_one).symm (norm_eq_zero.mpr (by simp_all [f]))
+      · apply (pow_ne_zero 2 hr').symm
+        apply ofReal_inj.mp
+        calc
+          _ = (1 - r) ^ 2 * ⟪↑y₀, S y₀⟫_ℂ := by simp [h₀]
+          _ = ⟪↑((1 - r : ℂ) • y₀), S ((1 - r : ℂ) • y₀)⟫_ℂ := by
+            simp [map_smul, inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
+          _ = ⟪↑(-(r • y₂)), S (-(r • y₂))⟫_ℂ := by simp [eq_neg_iff_add_eq_zero.mpr hr]
+        simp [map_neg, ← Complex.coe_smul, map_smul, inner_smul_left, inner_smul_right, pow_two, h₂]
+    -- `g r = ⟪f r, S (f r)⟫_ℂ / ‖f r‖²` is real (by def of `θ`) and clearly in `S.numericalRange`.
+    -- `g 0 = 0`, `g 1 = 1` and continuity ensure that all of `[0,1]` is also in `S.numericalRange`.
+    let g : ℝ → ℝ := fun t ↦ (t ^ 2 + (1 - t) * t * (⟪↑y₀, S y₂⟫_ℂ + ⟪↑y₂, S y₀⟫_ℂ).re) / ‖f t‖ ^ 2
+    have hg₀ : g 0 = 0 := by simp [g]
+    have hg₁ : g 1 = 1 := by simp [g, f, coe_norm y₂ ▸ hy₂]
+    have hg_cont : Continuous g := Continuous.div₀ (by fun_prop) (by fun_prop) (by simp [hf])
+    intro c ⟨t, ht, htc⟩
+    obtain ⟨r, hr, hrt⟩ := (hg₀ ▸ hg₁ ▸ intermediate_value_Icc zero_le_one hg_cont.continuousOn) ht
+    rw [← htc, ← hrt]
+    refine ⟨‖f r‖⁻¹ • f r, ?_, ?_⟩
+    · simp only [mem_setOf_eq, norm_smul, norm_inv, norm_norm]
+      exact inv_mul_cancel₀ (norm_ne_zero_iff.mpr (hf r))
+    · have hf_sq : ofReal (‖f r‖ ^ 2) ≠ 0 := by simp [hf]
+      simp_rw [← Complex.coe_smul, map_smul, SetLike.val_smul, inner_smul_left,inner_smul_right,
+        ← mul_assoc, conj_ofReal, ← pow_two, ← ofReal_pow, inv_pow, ofReal_inv]
+      apply (inv_mul_eq_iff_eq_mul₀ hf_sq).mpr
+      simp_rw [g, ofReal_div, mul_div_cancel₀ _ hf_sq, add_comm (r ^ 2)]
+      simp only [f, map_add, map_smul, coe_add, inner_add_left, inner_add_right,
+        SetLike.val_smul, inner_smul_left, inner_smul_right, h₀, h₂]
+      nth_rw 1 [← re_add_im ⟪↑y₀, S y₂⟫_ℂ]
+      nth_rw 1 [← re_add_im ⟪↑y₂, S y₀⟫_ℂ]
+      simp only [hy_im, mul_add, RingHom.map_sub, RingHom.map_one, conj_ofReal, mul_zero,
+        zero_add, ofReal_neg, neg_mul, mul_neg, mul_one, add_re, ofReal_add, ofReal_mul,
+        ofReal_sub, ofReal_one, ofReal_pow]
+      ring
 
 /-- The regularity domain contains the exterior of the numerical range. -/
 lemma mem_regularityDomain_of_not_mem_numericalRange_closure
