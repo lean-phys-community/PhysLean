@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Module
-public import Mathlib.MeasureTheory.Constructions.Polish.Basic
 /-!
 
 # Slices of space

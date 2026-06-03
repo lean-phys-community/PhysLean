@@ -6,10 +6,10 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 module
 
 public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
-public import Mathlib.Analysis.InnerProductSpace.Calculus
 public import Physlib.Mathematics.Distribution.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.SpaceAndTime.Space.Module
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Derivatives on Space

@@ -6,19 +6,8 @@ Authors: Dennj Osele
 module
 
 public import Mathlib.Analysis.Complex.HasPrimitives
-public import Mathlib.Analysis.Complex.RealDeriv
-public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 public import Mathlib.Data.Real.StarOrdered
-public import Mathlib.MeasureTheory.Constructions.Pi
 public import Mathlib.MeasureTheory.Constructions.BorelSpace.WithTop
-public import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
-public import Mathlib.MeasureTheory.Integral.Bochner.Basic
-public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
-public import Mathlib.MeasureTheory.Integral.Bochner.L1
-public import Mathlib.MeasureTheory.Integral.Bochner.VitaliCaratheodory
-public import Mathlib.MeasureTheory.Integral.DominatedConvergence
-public import Mathlib.MeasureTheory.Measure.Prod
-public import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 public import Mathlib.Order.CompletePartialOrder
 
 @[expose] public section

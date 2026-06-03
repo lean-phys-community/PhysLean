@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Particles.StandardModel.HiggsBoson.Basic
-public import Mathlib.Tactic.Cases
 /-!
 # The potential of the Higgs field
 

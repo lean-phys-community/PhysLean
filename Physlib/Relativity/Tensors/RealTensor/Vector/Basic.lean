@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Geometry.Manifold.IsManifold.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Basic
-public import Physlib.Relativity.Tensors.Tensorial
 /-!
 
 # Lorentz Vectors

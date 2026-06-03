@@ -8,7 +8,6 @@ module
 public import Physlib.Electromagnetism.Distributional.Dynamics.IsExtrema
 public import Physlib.SpaceAndTime.Space.Norm
 public import Physlib.SpaceAndTime.Space.ConstantSliceDist
-public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 /-!
 
 # The magnetic field around a infinite wire

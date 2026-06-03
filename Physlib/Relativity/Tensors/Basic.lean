@@ -10,7 +10,6 @@ public import Physlib.Relativity.Tensors.Contraction.SuccSuccAbove
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
 public import Mathlib.Tactic.Cases
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # Tensors

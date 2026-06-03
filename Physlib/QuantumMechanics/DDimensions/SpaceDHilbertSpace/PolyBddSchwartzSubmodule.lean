@@ -5,9 +5,9 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 /-!
 
 # Polynomially-bounded Schwartz submodules

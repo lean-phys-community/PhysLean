@@ -5,9 +5,6 @@ Authors: Alex Meiburg
 -/
 module
 
-public import Mathlib.Data.Fintype.Defs
-public import Mathlib.Data.Real.Basic
-public import Mathlib.MeasureTheory.Constructions.BorelSpace.Real
 public import Mathlib.MeasureTheory.Constructions.Pi
 public import Mathlib.MeasureTheory.Constructions.BorelSpace.WithTop
 public import Physlib.Meta.Sorry

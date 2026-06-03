@@ -8,7 +8,6 @@ module
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
 public import Physlib.Relativity.Tensors.Contraction.Basis
 public import Physlib.Relativity.Tensors.Elab
-meta import Mathlib.Tactic.Cases
 /-!
 
 ## Real Lorentz tensors

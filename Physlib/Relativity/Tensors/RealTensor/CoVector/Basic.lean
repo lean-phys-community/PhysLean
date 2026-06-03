@@ -5,7 +5,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Mathlib.Geometry.Manifold.ChartedSpace
 /-!

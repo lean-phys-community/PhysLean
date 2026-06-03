@@ -5,9 +5,6 @@ Authors: Pranav Magdum
 -/
 module
 
-public import Mathlib.Data.Real.Basic
-public import Mathlib.Analysis.Calculus.Deriv.Basic
-public import Physlib.Meta.TODO.Basic
 public import Physlib.Meta.Sorry
 public import Physlib.SpaceAndTime.Time.Derivatives
 /-!

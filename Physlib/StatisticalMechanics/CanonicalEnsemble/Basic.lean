@@ -6,7 +6,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 module
 
 public import Mathlib.MeasureTheory.Integral.Prod
-public import Mathlib.Topology.MetricSpace.Polish
 public import Physlib.Thermodynamics.Temperature.Basic
 /-!
 # Canonical Ensemble: Core Definitions

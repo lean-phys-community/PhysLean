@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Algebra.GroupWithZero.Nat
 public import Mathlib.Algebra.Order.Group.Nat
-public import Mathlib.Algebra.Order.ZeroLEOne
 public import Mathlib.Data.Fin.SuccPred
 /-!
 # List lemmas

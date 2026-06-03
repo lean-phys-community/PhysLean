@@ -6,7 +6,6 @@ Authors: Hannah Dawe
 
 module
 
-public import Mathlib.Data.Real.Basic
 public import Mathlib.Data.Real.Sqrt
 
 /-!

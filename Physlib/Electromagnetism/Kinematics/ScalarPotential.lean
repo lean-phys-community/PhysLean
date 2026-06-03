@@ -6,8 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Kinematics.VectorPotential
-public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
-public import Mathlib.Data.Real.Hom
 /-!
 
 # The Scalar Potential

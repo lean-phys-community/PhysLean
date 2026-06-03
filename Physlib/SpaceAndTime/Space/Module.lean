@@ -8,8 +8,8 @@ module
 public import Physlib.SpaceAndTime.Space.Basic
 public import Mathlib.Geometry.Manifold.Diffeomorph
 public import Mathlib.Analysis.Distribution.TemperateGrowth
-public import Mathlib.Analysis.Calculus.ContDiff.WithLp
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Analysis.Calculus.ContDiff.WithLp
 public import Mathlib.Tactic.Cases
 /-!
 

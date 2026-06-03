@@ -6,7 +6,6 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Curl
-public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
 # Functions and distributions on Time and Space d
