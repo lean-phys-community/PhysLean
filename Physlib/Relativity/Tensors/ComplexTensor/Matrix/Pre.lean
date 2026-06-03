@@ -67,7 +67,7 @@ lemma coCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `complexContr ⊗ complexCo` to `4 x 4` complex matrices. -/
-def contrCoToMatrix : (ContrℂModule ⊗[ℂ] CoℂModule)  ≃ₗ[ℂ]
+def contrCoToMatrix : (ContrℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
     Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ :=
   (Basis.tensorProduct complexContrBasis complexCoBasis).repr ≪≫ₗ
   Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ

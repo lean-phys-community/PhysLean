@@ -84,7 +84,7 @@ lemma leftMetricVal_expand_tmul : leftMetricVal =
     neg_neg, one_smul, add_zero]
   module
 
-lemma leftMetricVal_expand_tmul' : leftMetricVal =  leftBasis 1 ⊗ₜ[ℂ] leftBasis 0
+lemma leftMetricVal_expand_tmul' : leftMetricVal = leftBasis 1 ⊗ₜ[ℂ] leftBasis 0
     - leftBasis 0 ⊗ₜ[ℂ] leftBasis 1 := by rw [leftMetricVal_expand_tmul]; abel
 
 set_option backward.isDefEq.respectTransparency false in
@@ -177,7 +177,7 @@ lemma rightMetricVal_expand_tmul : rightMetricVal =
   module
 
 lemma rightMetricVal_expand_tmul' : rightMetricVal = rightBasis 1 ⊗ₜ[ℂ] rightBasis 0
-    - rightBasis 0 ⊗ₜ[ℂ] rightBasis 1  := by rw [rightMetricVal_expand_tmul]; abel
+    - rightBasis 0 ⊗ₜ[ℂ] rightBasis 1 := by rw [rightMetricVal_expand_tmul]; abel
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ε^{dot a}^{dot a}` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ rightHanded ⊗ rightHanded`,
@@ -283,7 +283,7 @@ lemma leftAltContraction_apply_metric :
       (leftAltContraction.toLinearMap.rTensor _).lTensor _ <|
       (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
       TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
-      (leftMetric 1) ⊗ₜ[ℂ] (altLeftMetric 1)) = altLeftLeftUnit (1 : ℂ)  := by
+      (leftMetric 1) ⊗ₜ[ℂ] (altLeftMetric 1)) = altLeftLeftUnit (1 : ℂ) := by
   rw [leftMetric_apply_one, altLeftMetric_apply_one]
   rw [leftMetricVal_expand_tmul', altLeftMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub, assoc_tmul, LinearMap.lTensor_tmul,

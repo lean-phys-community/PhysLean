@@ -135,14 +135,13 @@ def ComponentIdx.prod {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
 def Pure.prodP {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) : Pure S (Fin.append c c1) :=
   Fin.addCases (fun i => LinearEquiv.cast (R := k) (by simp) (p1 i))
-  (fun i => LinearEquiv.cast (R := k)  (by simp) (p2 i))
+  (fun i => LinearEquiv.cast (R := k) (by simp) (p2 i))
 
 /-!
 
 ### B.3. The vectors making up product of two pure tensors
 
 -/
-
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
@@ -621,7 +620,7 @@ lemma Pure.prodP_update_add_toTensor_left {n1 n2} {c : Fin n1 → C} {c1 : Fin n
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n2) (x y : V (c1 i)) :
     (Pure.prodP p1 (Pure.update p2 i (x + y))).toTensor
     = (Pure.prodP p1 (Pure.update p2 i x)).toTensor
-     + (Pure.prodP p1 (Pure.update p2 i y)).toTensor := by simp
+    + (Pure.prodP p1 (Pure.update p2 i y)).toTensor := by simp
 /-!
 
 ## C. Products of tensors

@@ -142,14 +142,14 @@ lemma ofElectromagneticField_magneticField {c : SpeedOfLight}
     WithLp.ofLp_smul, map_smul, LinearMap.smul_apply]
   rw [fun_curl_neg]
   simp only [WithLp.equiv_symm_apply, WithLp.toLp_smul, Pi.neg_apply]
-  change  Differentiable ℝ fun x =>
+  change Differentiable ℝ fun x =>
     ∫ (u : ℝ) in 0..1, u • WithLp.toLp 2 ((crossProduct (Space.basis.repr x).ofLp)
     (B t (u • x)).ofLp)
   apply ContDiff.differentiable (n := 1) _ (by simp)
   apply contDiff_parametric_intervalIntegral_of_contDiff
   refine contDiff_euclidean.mpr ?_
   intro i
-  let C : ( Space) × ℝ → EuclideanSpace ℝ (Fin 3) := fun p =>
+  let C : (Space) × ℝ → EuclideanSpace ℝ (Fin 3) := fun p =>
       let x := p.1
       let u := p.2
       (u • basis.repr x) ⨯ₑ₃ B t (u • x)

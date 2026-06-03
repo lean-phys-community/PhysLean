@@ -15,7 +15,6 @@ public import Physlib.Relativity.Tensors.Product
 
 @[expose] public section
 
-
 namespace TensorSpecies
 
 variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]

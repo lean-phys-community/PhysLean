@@ -92,10 +92,10 @@ lemma contrT_permT {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     (i j : Fin (n1 + 1 + 1)) (hij : i ≠ j ∧ S.τ (c1 i) = (c1 j))
     (σ : Fin (n1 + 1 + 1) → Fin (n + 1 + 1))
     (hσ : PermCond c c1 σ) (t : Tensor S c) :
-    contrT n1 i j hij (permT σ hσ t) = permT _ (hσ.succSuccAbove i j hij.1 )
+    contrT n1 i j hij (permT σ hσ t) = permT _ (hσ.succSuccAbove i j hij.1)
       (contrT n (σ i) (σ j) (by simp [hσ.2, hij, hσ.1.injective.eq_iff]) t) := by
   let P (t : Tensor S c) : Prop := contrT n1 i j hij (permT σ hσ t) =
-      permT _ (hσ.succSuccAbove i j hij.1 )
+      permT _ (hσ.succSuccAbove i j hij.1)
         (contrT n (σ i) (σ j) (by simp [hσ.2, hij, hσ.1.injective.eq_iff]) t)
   change P t
   apply induction_on_pure

@@ -5,21 +5,8 @@ Authors: Alex Meiburg
 -/
 module
 
-public import QuantumInfo.ForMathlib.ComplexLaplaceTransform
-public import Mathlib.Analysis.Complex.HasPrimitives
-public import Mathlib.Analysis.Complex.RealDeriv
-public import Mathlib.MeasureTheory.Constructions.BorelSpace.WithTop
-public import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
-public import Mathlib.MeasureTheory.Integral.DominatedConvergence
-public import Mathlib.MeasureTheory.Measure.Prod
-public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
-public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
-public import Mathlib.MeasureTheory.Integral.Bochner.Basic
-public import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 public import Physlib.StatisticalMechanics.MicroCanonicalEnsemble.Basic
-public import Physlib.Meta.TODO.Basic
-
-
+public import QuantumInfo.ForMathlib.ComplexLaplaceTransform
 /-!
 
 ## The theormodynamical quantities of a microcanonical ensemble
@@ -35,8 +22,8 @@ variable {D : Type} (H : MicroHamiltonian D) (d : D)
 /-- The partition function corresponding to a given MicroHamiltonian. This is a function taking a
   thermodynamic β, not a temperature. It also depends on the data D defining the system extrinsincs.
 
- * Ideally this would be an NNReal, but ∫ (NNReal) doesn't work right now, so it would just be a
-   separate proof anyway
+  * Ideally this would be an NNReal, but ∫ (NNReal) doesn't work right now, so it would just be a
+    separate proof anyway
 -/
 def partitionZ (β : ℝ) : ℝ :=
   ∫ (config : H.dim d → ℝ),
@@ -113,8 +100,7 @@ def entropySβ (β : ℝ) : ℝ :=
 def ZIntegrable (β : ℝ) : Prop :=
   MeasureTheory.Integrable (fun (config : H.dim d → ℝ) ↦
     let E := H.H config;
-    if h : E = ⊤ then 0 else Real.exp (-β * (E.untop h))
-  ) ∧ (H.partitionZ d β ≠ 0)
+    if h : E = ⊤ then 0 else Real.exp (-β * (E.untop h))) ∧ (H.partitionZ d β ≠ 0)
 
 /--
 This Prop defines the most common case of ZIntegrable, that it is integrable at all finite
@@ -169,7 +155,6 @@ theorem entropy_A_eq_entropy_Z (T : ℝ) (hT : T ≠ 0)
   · fun_prop
   · simp_rw [partitionZT]
     fun_prop (disch := assumption)
-
 
 set_option backward.isDefEq.respectTransparency false in
 open scoped ContDiff in

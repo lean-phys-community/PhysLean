@@ -229,7 +229,7 @@ lemma ZIntegrable (hV : 0 < V) (hβ : 0 < β) : IdealGas.ZIntegrable (n,V) β :=
     exact hZpos.ne'
   · exact hZpos.ne'
 
-/-- The ideal gas law: PV = nRT. In our unitsless system, R = 1.-/
+/-- The ideal gas law: PV = nRT. In our unitsless system, R = 1. -/
 theorem ideal_gas_law (hV : 0 < V) (hT : 0 < T) :
     let P := IdealGas.pressure (n,V) T;
     let R := 1;

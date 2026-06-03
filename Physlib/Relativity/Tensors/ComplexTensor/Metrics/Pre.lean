@@ -142,7 +142,7 @@ lemma contrCoContraction_apply_metric :
       (contrMetric 1) ⊗ₜ[ℂ] (coMetric 1)) = coContrUnit (1 : ℝ) := by
   rw [contrMetric_apply_one, coMetric_apply_one]
   rw [contrMetricVal_expand_tmul, coMetricVal_expand_tmul]
-  simp  [Fin.isValue, tmul_sub, sub_tmul, map_sub]
+  simp [Fin.isValue, tmul_sub, sub_tmul, map_sub]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
   repeat erw [contrCoContraction_basis']
   simp only [Fin.isValue, ↓reduceIte, one_smul, reduceCtorEq, zero_smul, sub_zero, zero_sub,
@@ -162,7 +162,7 @@ lemma coContrContraction_apply_metric :
   simp [Fin.isValue, tmul_sub, sub_tmul, map_sub]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
   repeat erw [coContrContraction_basis']
-  simp  [Fin.isValue, ↓reduceIte, one_smul, reduceCtorEq, Sum.inr.injEq, one_ne_zero,
+  simp [Fin.isValue, ↓reduceIte, one_smul, reduceCtorEq, Sum.inr.injEq, one_ne_zero,
     Fin.reduceEq, zero_ne_one]
   erw [contrCoUnit_apply_one, contrCoUnitVal_expand_tmul]
 

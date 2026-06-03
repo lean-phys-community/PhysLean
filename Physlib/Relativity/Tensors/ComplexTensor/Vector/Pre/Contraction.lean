@@ -90,7 +90,6 @@ def contrCoContraction : (ContrℂModule.SL2CRep.tprod CoℂModule.SL2CRep).Inte
     rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
     simp
 
-
 lemma contrCoContraction_hom_tmul (ψ : ContrℂModule) (φ : CoℂModule) :
     contrCoContraction (ψ ⊗ₜ φ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ := by
   rfl
@@ -129,7 +128,6 @@ def coContrContraction : (CoℂModule.SL2CRep.tprod ContrℂModule.SL2CRep).Inte
     rw [dotProduct_mulVec, mulVec_transpose, vecMul_vecMul]
     rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
     simp
-
 
 lemma coContrContraction_hom_tmul (φ : CoℂModule) (ψ : ContrℂModule) :
     coContrContraction (φ ⊗ₜ ψ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ := by

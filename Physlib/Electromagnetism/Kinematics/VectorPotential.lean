@@ -109,13 +109,11 @@ lemma ofStaticPotentials_vectorPotential {d} (c : SpeedOfLight) (φ : Space d �
     (ofStaticPotentials c φ A).vectorPotential c = fun _ => A := by
   simp [ofStaticPotentials_eq_ofPotentials]
 
-
 /-!
 
 ## B.1. ofElectromagneticField
 
 -/
-
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma ofElectromagneticField_vectorPotential (c : SpeedOfLight)
@@ -128,7 +126,7 @@ lemma ofElectromagneticField_vectorPotential (c : SpeedOfLight)
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma ofElectromagneticField_vectorPotential_apply {t x} (c : SpeedOfLight)
     (E : Time → Space 3 → EuclideanSpace ℝ (Fin 3))
-    (B : Time → Space 3 → EuclideanSpace ℝ (Fin 3)) (i : Fin 3) (hB : Continuous ↿B)  :
+    (B : Time → Space 3 → EuclideanSpace ℝ (Fin 3)) (i : Fin 3) (hB : Continuous ↿B) :
     (ofElectromagneticField c E B).vectorPotential c t x i =
     - ∫ u in 0..(1 : ℝ), ((u • Space.basis.repr x) ⨯ₑ₃ B t (u • x)) i ∂volume := by
   simp [ofElectromagneticField_vectorPotential]
@@ -166,7 +164,6 @@ lemma ofElectromagneticField_vectorPotential_apply_eq_expand {t x} {c : SpeedOfL
       fun_prop
     · apply Continuous.intervalIntegrable
       fun_prop
-
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 @[fun_prop]

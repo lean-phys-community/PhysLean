@@ -16,7 +16,6 @@ and the mass of the central body. This module defines a simplified version of th
 vis-viva equation that is restricted to circular orbits (v^2 = G M / r).
 -/
 
-
 @[expose] public section
 
 namespace ClassicalMechanics

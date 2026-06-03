@@ -66,7 +66,7 @@ lemma coMetric_eq_fromConstPair {d : ℕ} :
 
 lemma contrMetric_eq_fromConstPair {d : ℕ} :
     η d = fromConstPair (S := realLorentzTensor d)
-      (c1 := .up) (c2 := .up)  (Lorentz.preContrMetric d) := by
+      (c1 := .up) (c2 := .up) (Lorentz.preContrMetric d) := by
   rw [contrMetric, metricTensor]
   rfl
 
@@ -78,7 +78,7 @@ lemma coMetric_eq_fromPairT {d : ℕ} :
   exact Lorentz.preCoMetric_apply_one
 
 lemma contrMetric_eq_fromPairT {d : ℕ} :
-    η d = fromPairT  (S := realLorentzTensor d) (c1 := .up) (c2 := .up)
+    η d = fromPairT (S := realLorentzTensor d) (c1 := .up) (c2 := .up)
         (Lorentz.preContrMetricVal d) := by
   rw [contrMetric_eq_fromConstPair, fromConstPair]
   congr 1

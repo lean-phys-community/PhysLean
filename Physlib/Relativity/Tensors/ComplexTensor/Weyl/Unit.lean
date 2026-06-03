@@ -179,7 +179,7 @@ set_option backward.isDefEq.respectTransparency false in
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altRightHanded ⊗ rightHanded`, manifesting
   the invariance under the `SL(2,ℂ)` action. -/
 def altRightRightUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
-    (altRightHandedRep.tprod rightHandedRep)  where
+    (altRightHandedRep.tprod rightHandedRep) where
   toFun := fun a =>
     let a' : ℂ := a
     a' • altRightRightUnitVal
@@ -237,7 +237,6 @@ lemma contr_leftAltLeftUnit (x : AltLeftHandedModule) :
   simp [- Fintype.sum_sum_type, smul_tmul, altLeftContraction_basis,
     leftAltLeftUnit_apply_one, leftAltLeftUnitVal_expand_tmul, add_tmul, tmul_add]
 
-
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `altRightRightUnit` does nothing. -/
 lemma contr_altRightRightUnit (x : RightHandedModule) :
@@ -261,7 +260,6 @@ lemma contr_rightAltRightUnit (x : AltRightHandedModule) :
   subst hc
   simp [- Fintype.sum_sum_type, smul_tmul, altRightContraction_basis,
     rightAltRightUnit_apply_one, rightAltRightUnitVal_expand_tmul, add_tmul, tmul_add]
-
 
 /-!
 

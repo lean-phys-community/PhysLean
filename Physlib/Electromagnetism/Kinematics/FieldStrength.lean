@@ -189,7 +189,7 @@ lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
   the components given by `∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)`. -/
 lemma toFieldStrength_eq_sum_basis {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
-    A.toFieldStrength x = ∑ μ, ∑ ν, (∑ κ, (η μ κ *  ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)) •
+    A.toFieldStrength x = ∑ μ, ∑ ν, (∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)) •
       Lorentz.Vector.basis μ ⊗ₜ Lorentz.Vector.basis ν := by
   apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
   ext ⟨μ, ν⟩

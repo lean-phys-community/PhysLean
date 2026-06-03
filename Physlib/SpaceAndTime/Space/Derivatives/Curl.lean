@@ -509,7 +509,7 @@ lemma eq_neg_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
       zero_smul, zero_mul, sub_zero]
     · apply Continuous.intervalIntegrable
       fun_prop
-  change  f = -curl fun x => ∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t
+  change f = -curl fun x => ∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t
   ext x i
   fin_cases i <;> symm
   all_goals
@@ -572,7 +572,6 @@ lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
   · intro x
     exact (hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) _).differentiableAt
   · exact eq_neg_curl_of_div_zero f hf hdiv
-
 
 TODO "Generalize the statement that a div-free field is a curl
   to time-dependent fields."
