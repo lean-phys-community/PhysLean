@@ -42,7 +42,6 @@ the scalar potential is non-relativistic and is therefore a function of `Time` a
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 

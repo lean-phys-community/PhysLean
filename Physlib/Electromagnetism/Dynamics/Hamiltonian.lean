@@ -46,7 +46,6 @@ in the case of three spatial dimensions.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 

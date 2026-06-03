@@ -159,11 +159,12 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) (μ : Fin d
 
 /-!
 
-### A.3. Derivative distributes over addition
+### A.3. Derivative distributes over addition and subtraction
 
 -/
 
 /-- Derivatives on space distribute over addition. -/
+@[to_fun]
 lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
@@ -183,6 +184,17 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
   ext x
   rw [fderiv_fun_add]
   simp only [ContinuousLinearMap.add_apply, Pi.add_apply]
+  repeat fun_prop
+
+/-- Derivatives on space distribute over subtraction. -/
+@[to_fun]
+lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+    ∂[u] (f1 - f2) = ∂[u] f1 - ∂[u] f2 := by
+  rw [deriv_eq_fderiv_fun]
+  ext x
+  rw [fderiv_sub]
+  rfl
   repeat fun_prop
 
 /-!
@@ -500,6 +512,9 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     simp
   map_smul' a f := by simp
 
+@[inherit_doc distDeriv]
+macro "∂ᵈ[" i:term "]" : term => `(distDeriv $i)
+
 /-!
 
 ### B.2. Basic equality
@@ -508,7 +523,7 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 lemma distDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin d) (f : (Space d) →d[ℝ] M) (ε : 𝓢(Space d, ℝ)) :
-    (distDeriv μ f) ε = fderivD ℝ f ε (basis μ) := by
+    (∂ᵈ[μ] f) ε = fderivD ℝ f ε (basis μ) := by
   simp [distDeriv, Distribution.fderivD]
 
 /-!
@@ -544,7 +559,7 @@ lemma schwartMap_fderiv_comm {d}
 
 lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ ν : Fin d) (f : (Space d) →d[ℝ] M) :
-    (distDeriv ν (distDeriv μ f)) = (distDeriv μ (distDeriv ν f)) := by
+    (∂ᵈ[ν] (∂ᵈ[μ] f)) = (∂ᵈ[μ] (∂ᵈ[ν] f)) := by
   ext η
   simp [distDeriv, Distribution.fderivD]
   congr 1

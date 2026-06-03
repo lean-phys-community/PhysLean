@@ -22,7 +22,7 @@ namespace Lorentz
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `Contr ⊗ Contr` to `(1 + d) x (1 + d)` real matrices. -/
-def contrContrToMatrixRe {d : ℕ} : (Contr d ⊗ Contr d).V ≃ₗ[ℝ]
+def contrContrToMatrixRe {d : ℕ} : (ContrMod d ⊗[ℝ] ContrMod d) ≃ₗ[ℝ]
     Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
   (Basis.tensorProduct (contrBasis d) (contrBasis d)).repr ≪≫ₗ
   Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ

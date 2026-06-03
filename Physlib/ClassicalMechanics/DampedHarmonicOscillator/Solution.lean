@@ -54,7 +54,6 @@ References for the damped harmonic oscillator include:
 TODO "Prove that the selected trajectory is the unique solution of the equation of motion with
 the given initial conditions."
 
-
 @[expose] public section
 
 namespace ClassicalMechanics

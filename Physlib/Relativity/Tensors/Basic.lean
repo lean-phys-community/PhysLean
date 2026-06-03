@@ -49,24 +49,33 @@ TODO "In this file (Physlib/Relativity/Tensors/Basic.lean), write an overview of
 
 @[expose] public section
 
-open Module IndexNotation CategoryTheory MonoidalCategory
+open Module
 
 namespace TensorSpecies
-open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G]
-  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-  (S : TensorSpecies k C G basisIdx)
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
+    (S : TensorSpecies k C G V basisIdx rep b)
 
+set_option linter.unusedVariables false in
 /-- The tensors associated with a list of indices of a given color
   `c : Fin n → C`. -/
-noncomputable abbrev Tensor {n : ℕ} (c : Fin n → C) : Type := (S.F.obj (OverColor.mk c))
+@[nolint unusedArguments]
+noncomputable abbrev Tensor {n : ℕ} (S : TensorSpecies k C G V basisIdx rep b)
+  (c : Fin n → C) : Type := PiTensorProduct k (fun i => V (c i))
 
 namespace Tensor
 
-variable {S : TensorSpecies k C G basisIdx} {n n' n2 : ℕ} {c : Fin n → C} {c' : Fin n' → C}
-  {c2 : Fin n2 → C}
+variable {S : TensorSpecies k C G V basisIdx rep b} {n n' n2 : ℕ} {c : Fin n → C}
+  {c' : Fin n' → C} {c2 : Fin n2 → C}
 
+/-!
+
+## Components of tensors
+
+-/
 TODO "Refactor: Throughout the `Tensor` file system are lemmas related to
   `ComponentIdx`. The definition of `ComponentIdx` and the lemmas about it should
   be placed in it's own directory. Around `ComponentIdx`, we should build
@@ -78,7 +87,7 @@ set_option linter.unusedVariables false in
   `ComponentIdx c` is the type of components indexes of a tensor with those indices
   e.g. `⟨0, 2⟩` corresponding to `T⁰₂`. -/
 @[nolint unusedArguments]
-abbrev ComponentIdx {n : ℕ} {S : TensorSpecies k C G basisIdx} (c : Fin n → C) : Type :=
+abbrev ComponentIdx {n : ℕ} {S : TensorSpecies k C G V basisIdx rep b} (c : Fin n → C) : Type :=
   Π j, basisIdx (c j)
 
 lemma ComponentIdx.congr_right {n : ℕ} {c : Fin n → C} (b : ComponentIdx (S := S) c)
@@ -102,25 +111,26 @@ TODO "Define the equivalence between `ComponentIdx ![c]` and `basisIdx c`.
 
 -/
 
+set_option linter.unusedVariables false in
 /-- The type of pure tensors associated to a list of indices `c : OverColor C`.
   A pure tensor is a tensor which can be written in the form `v1 ⊗ₜ v2 ⊗ₜ v3 …`. -/
-abbrev Pure (S : TensorSpecies k C G basisIdx) (c : Fin n → C) : Type :=
-    (i : Fin n) → S.FD.obj (Discrete.mk (c i))
+@[nolint unusedArguments]
+abbrev Pure (S : TensorSpecies k C G V basisIdx rep b) (c : Fin n → C) : Type :=
+    (i : Fin n) → V (c i)
 
 namespace Pure
 
-@[simp]
 lemma congr_right {n : ℕ} {c : Fin n → C} (p : Pure S c)
-    (i j : Fin n) (h : i = j) : S.FD.map (eqToHom (by rw [h])) (p j) = p i := by
+    (i j : Fin n) (h : i = j) : LinearEquiv.cast (R := k) (by rw [h]) (p j) = p i := by
   subst h
   simp
 
 lemma congr_mid {n : ℕ} {c : Fin n → C} (c' : C) (p : Pure S c)
     (i j : Fin n) (h : i = j) (hi : c i = c') (hj : c j = c') :
-    S.FD.map (eqToHom (by rw [hi] : { as := c i } = { as := c' })) (p i) =
-    S.FD.map (eqToHom (by rw [hj] : { as := c j } = { as := c' })) (p j) := by
+    LinearEquiv.cast (R := k) (by rw [hi] : c i = c') (p i) =
+    LinearEquiv.cast (R := k) (by rw [hj] : c j = c') (p j) := by
   subst hi
-  simp only [eqToHom_refl, Discrete.functor_map_id, ConcreteCategory.id_apply]
+  simp only [LinearEquiv.cast_apply, cast_eq]
   symm
   apply congr_right
   exact h
@@ -128,20 +138,12 @@ lemma congr_mid {n : ℕ} {c : Fin n → C} (c' : C) (p : Pure S c)
 lemma map_mid_move_left {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C} (p : Pure S c)
     (p' : Pure S c1) {c' : C}
     (i : Fin n) (j : Fin n1) (hi : c i = c') (hj : c1 j = c') :
-    S.FD.map (eqToHom (by rw [hi] : { as := c i } = { as := c' })) (p i) =
-    S.FD.map (eqToHom (by rw [hj] : { as := c1 j } = { as := c' })) (p' j)
-    ↔ S.FD.map (eqToHom (by rw [hi, hj] : { as := c i } = { as := c1 j})) (p i) =
+    LinearEquiv.cast (R := k) (by rw [hi] : c i = c') (p i) =
+   LinearEquiv.cast (R := k) (by rw [hj] : c1 j = c')  (p' j)
+    ↔ LinearEquiv.cast (R := k) (by rw [hi, hj] : c i = c1 j)  (p i) =
     (p' j) := by
   subst hj
-  simp_all only [eqToHom_refl, Discrete.functor_map_id, ConcreteCategory.id_apply]
-
-lemma map_map_apply {n : ℕ} {c : Fin n → C} (c1 c2 : C) (p : Pure S c) (i : Fin n)
-    (f : ({ as := c i } : Discrete C) ⟶ { as := c1 })
-    (g : ({ as := c1 } : Discrete C) ⟶ { as := c2 }) :
-    (ConcreteCategory.hom (S.FD.map g))
-    ((ConcreteCategory.hom (S.FD.map f)) (p i)) =
-    S.FD.map (f ≫ g) (p i) := by
-  simp only [Functor.map_comp, ConcreteCategory.comp_apply]
+  simp_all
 
 /-- The tensor corresponding to a pure tensor. -/
 noncomputable def toTensor {n : ℕ} {c : Fin n → C} (p : Pure S c) : S.Tensor c :=
@@ -151,21 +153,30 @@ lemma toTensor_apply {n : ℕ} (c : Fin n → C) (p : Pure S c) :
     toTensor p = PiTensorProduct.tprod k p := rfl
 
 /-- Given a list of indices `c` of `n` indices, a pure tensor `p`, an element `i : Fin n` and
-  a `x` in `S.FD.obj (Discrete.mk (c i))` then `update p i x` corresponds to `p` where
+  a `x` in `V (c i)` then `update p i x` corresponds to `p` where
   the `i`th part of `p` is replaced with `x`.
 
   E.g. if `n = 2` and `p = v₀ ⊗ₜ v₁` then `update p 0 x = x ⊗ₜ v₁`. -/
 def update {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c) (i : Fin n)
-    (x : S.FD.obj (Discrete.mk (c i))) : Pure S c := Function.update p i x
+    (x : V (c i)) : Pure S c := Function.update p i x
+
+lemma update_eq_function_update {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)]
+    (p : Pure S c) (i : Fin n)
+    (x : V (c i)) : update p i x = Function.update p i x := rfl
 
 @[simp]
 lemma update_same {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c) (i : Fin n)
-    (x : S.FD.obj (Discrete.mk (c i))) : (update p i x) i = x := by
+    (x : V (c i)) : (update p i x) i = x := by
   simp [update]
+
+lemma update_diff {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c) (i j : Fin n)
+    (x : V (c i)) (hij : i ≠ j) : (update p i x) j = p j := by
+  simp_all [update, Function.update]
+  grind
 
 @[simp]
 lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fin (n + 1))]
-    (p : Pure S c) (i : Fin (n + 1)) (j : Fin n) (x : S.FD.obj (Discrete.mk (c (i.succAbove j)))) :
+    (p : Pure S c) (i : Fin (n + 1)) (j : Fin n) (x : V (c (i.succAbove j))) :
     update p (i.succAbove j) x i = p i := by
   simp only [update]
   rw [Function.update_of_ne]
@@ -174,14 +185,14 @@ lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : Decidable
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
-    (i : Fin n) (x y : S.FD.obj (Discrete.mk (c i))) :
+    (i : Fin n) (x y : V (c i)) :
     (update p i (x + y)).toTensor = (update p i x).toTensor + (update p i y).toTensor := by
   simp [toTensor, update]
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_smul {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
-    (i : Fin n) (r : k) (y : S.FD.obj (Discrete.mk (c i))) :
+    (i : Fin n) (r : k) (y : V (c i)) :
     (update p i (r • y)).toTensor = r • (update p i y).toTensor := by
   simp [toTensor, update]
 
@@ -195,7 +206,7 @@ def drop {n : ℕ} {c : Fin (n + 1) → C} (p : Pure S c) (i : Fin (n + 1)) :
 
 @[simp]
 lemma update_succAbove_drop {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fin (n + 1))]
-    (p : Pure S c) (i : Fin (n + 1)) (k : Fin n) (x : S.FD.obj (Discrete.mk (c (i.succAbove k)))) :
+    (p : Pure S c) (i : Fin (n + 1)) (k : Fin n) (x : V (c (i.succAbove k))) :
     (update p (i.succAbove k) x).drop i = (p.drop i).update k x := by
   ext j
   simp only [Function.comp_apply, drop, update]
@@ -210,32 +221,12 @@ lemma update_succAbove_drop {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableE
 
 @[simp]
 lemma update_drop_self {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fin (n + 1))]
-    (p : Pure S c) (i : Fin (n + 1)) (x : S.FD.obj (Discrete.mk (c i))) :
+    (p : Pure S c) (i : Fin (n + 1)) (x : V (c i)) :
     (update p i x).drop i = p.drop i := by
   ext k
   simp only [Function.comp_apply, drop, update]
   rw [Function.update_of_ne]
   exact Fin.succAbove_ne i k
-
-set_option backward.isDefEq.respectTransparency false in
-lemma μ_toTensor_tmul_toTensor {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
-    (t : Pure S c) (t1 : Pure S c1) :
-    ((Functor.LaxMonoidal.μ S.F _ _).hom (t.toTensor ⊗ₜ t1.toTensor)) =
-    PiTensorProduct.tprod k (fun | Sum.inl i => t i | Sum.inr i => t1 i) := by
-  change lift.μModEquiv _ _ _ (t.toTensor ⊗ₜ t1.toTensor) = _
-  rw [lift.μModEquiv]
-  simp only [lift.toRep_V_carrier, Functor.id_obj]
-  rw [LinearEquiv.trans_apply]
-  rw [toTensor, toTensor]
-  rw [Physlib.PiTensorProduct.tmulEquiv_tmul_tprod]
-  simp only [tensorObj_of_left, tensorObj_of_hom, PiTensorProduct.congr_tprod]
-  congr
-  funext i
-  match i with
-  | Sum.inl i =>
-    rfl
-  | Sum.inr i =>
-    rfl
 
 /-!
 
@@ -249,16 +240,16 @@ lemma μ_toTensor_tmul_toTensor {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 
   For example, if `p = v ⊗ₜ w` and `b = ⟨0, 1⟩` then `component p b = v⁰ ⊗ₜ w¹`. -/
 noncomputable def component {n : ℕ} {c : Fin n → C} (p : Pure S c)
-    (b : ComponentIdx (S := S) c) : k :=
-    ∏ i, (S.basis (c i)).repr (p i) (b i)
+    (φ : ComponentIdx (S := S) c) : k :=
+    ∏ i, (b (c i)).repr (p i) (φ i)
 
-lemma component_eq {n : ℕ} {c : Fin n → C} (p : Pure S c) (b : ComponentIdx c) :
-    p.component b = ∏ i, (S.basis (c i)).repr (p i) (b i) := by rfl
+lemma component_eq {n : ℕ} {c : Fin n → C} (p : Pure S c) (φ : ComponentIdx c) :
+    p.component φ = ∏ i, (b (c i)).repr (p i) (φ i) := by rfl
 
 lemma component_eq_drop {n : ℕ} {c : Fin (n + 1) → C} (p : Pure S c) (i : Fin (n + 1))
-    (b : ComponentIdx c) :
-    p.component b = ((S.basis (c i)).repr (p i) (b i)) *
-    ((drop p i).component (fun j => b (i.succAbove j))) := by
+    (φ : ComponentIdx c) :
+    p.component φ = ((b (c i)).repr (p i) (φ i)) *
+    ((drop p i).component (fun j => φ (i.succAbove j))) := by
   simp only [component, Function.comp_apply]
   rw [Fin.prod_univ_succAbove _ i]
   rfl
@@ -266,7 +257,7 @@ lemma component_eq_drop {n : ℕ} {c : Fin (n + 1) → C} (p : Pure S c) (i : Fi
 @[simp]
 lemma component_update_add {n : ℕ} [inst : DecidableEq (Fin n)]
     {c : Fin n → C} (p : Pure S c) (i : Fin n)
-    (x y : S.FD.obj (Discrete.mk (c i))) (b : ComponentIdx c) :
+    (x y :V (c i)) (b : ComponentIdx c) :
     (update p i (x + y)).component b = (update p i x).component b +
     (update p i y).component b := by
   cases n
@@ -278,7 +269,7 @@ lemma component_update_add {n : ℕ} [inst : DecidableEq (Fin n)]
 @[simp]
 lemma component_update_smul {n : ℕ} [inst : DecidableEq (Fin n)]
     {c : Fin n → C} (p : Pure S c) (i : Fin n)
-    (x : k) (y : S.FD.obj (Discrete.mk (c i))) (b : ComponentIdx c) :
+    (x : k) (y : V (c i)) (b : ComponentIdx c) :
     (update p i (x • y)).component b = x * (update p i y).component b := by
   cases n
   · exact Fin.elim0 i
@@ -290,7 +281,7 @@ lemma component_update_smul {n : ℕ} [inst : DecidableEq (Fin n)]
 /-- The multilinear map taking pure tensors `p` to a map `ComponentIdx c → k` which when
   evaluated returns the components of `p`. -/
 noncomputable def componentMap {n : ℕ} (c : Fin n → C) :
-    MultilinearMap k (fun i => S.FD.obj (Discrete.mk (c i))) (ComponentIdx (S := S) c → k) where
+    MultilinearMap k (fun i => V (c i)) (ComponentIdx (S := S) c → k) where
   toFun p := fun b => component p b
   map_update_add' p i x y := by
     ext b
@@ -309,8 +300,8 @@ lemma componentMap_apply {n : ℕ} (c : Fin n → C)
 
 /-- Given an component idx `b` in `ComponentIdx c`, `basisVector c b` is the pure tensor
   formed by `S.basis (c i) (b i)`. -/
-noncomputable def basisVector {n : ℕ} (c : Fin n → C) (b : ComponentIdx (S := S) c) : Pure S c :=
-  fun i => S.basis (c i) (b i)
+noncomputable def basisVector {n : ℕ} (c : Fin n → C) (φ : ComponentIdx (S := S) c) : Pure S c :=
+  fun i => b (c i) (φ i)
 
 @[simp]
 lemma component_basisVector {n : ℕ} (c : Fin n → C) (b1 b2 : ComponentIdx (S := S) c) :
@@ -387,20 +378,20 @@ lemma ofComponents_componentMap {n : ℕ} (c : Fin n → C) (t : S.Tensor c) :
   · intro p
     simp only [componentMap_pure, Pure.componentMap_apply]
     have h1 (x : ComponentIdx c) : p.component x • (Pure.basisVector c x).toTensor =
-        Pure.toTensor (fun i => ((S.basis (c i)).repr (p i)) (x i) • (S.basis (c i)) (x i)) := by
+        Pure.toTensor (fun i => ((b (c i)).repr (p i)) (x i) • (b (c i)) (x i)) := by
       rw [Pure.component_eq, Pure.toTensor]
       exact Eq.symm (MultilinearMap.map_smul_univ (PiTensorProduct.tprod k)
-          (fun i => ((S.basis (c i)).repr (p i)) (x i)) fun i => (S.basis (c i)) (x i))
+          (fun i => ((b (c i)).repr (p i)) (x i)) fun i => (b (c i)) (x i))
     conv_lhs =>
       enter [2, x]
       rw [h1]
     trans (PiTensorProduct.tprod k) fun i =>
-      ∑ x, ((S.basis (c i)).repr (p i)) x • (S.basis (c i)) x
+      ∑ x, ((b (c i)).repr (p i)) x • (b (c i)) x
     · exact (MultilinearMap.map_sum (PiTensorProduct.tprod k) fun i j =>
-        ((S.basis (c i)).repr (p i)) j • (S.basis (c i)) j).symm
+        ((b (c i)).repr (p i)) j • (b (c i)) j).symm
     congr
     funext i
-    exact Basis.sum_equivFun (S.basis (c i)) (p i)
+    exact Basis.sum_equivFun (b (c i)) (p i)
   · intro r t ht
     simp only [map_smul, Pi.smul_apply, smul_eq_mul, ← smul_smul]
     conv_rhs => rw [← ht]
@@ -414,19 +405,12 @@ def basis {n : ℕ} (c : Fin n → C) : Basis (ComponentIdx (S := S) c) k (S.Ten
     (fun x => by simp) (fun x => by simp)).trans
     (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → basisIdx (c j))).symm
 
-lemma basis_congr {c1 c2 : C} (h : c1 = c2) (x : basisIdx c1)
-    (y : basisIdx c2) (hxy : y = basisIdxCongr (by simp [h]) x) :
-    S.FD.map (eqToHom (by simp [h])) ((S.basis c1) x) =
-    (S.basis c2) y := by
-  subst h hxy
-  simp
-
-lemma basis_apply {n : ℕ} (c : Fin n → C) (b : ComponentIdx (S := S) c) :
-    basis c b = (Pure.basisVector c b).toTensor := by
+lemma basis_apply {n : ℕ} (c : Fin n → C) (φ : ComponentIdx (S := S) c) :
+    basis c φ = (Pure.basisVector c φ).toTensor := by
   change ofComponents c _ = _
   simp only [ofComponents, LinearEquiv.coe_toEquiv_symm, LinearEquiv.symm_symm, EquivLike.coe_coe,
     Finsupp.linearEquivFunOnFinite_single, LinearMap.coe_mk, AddHom.coe_mk]
-  rw [Finset.sum_eq_single b]
+  rw [Finset.sum_eq_single φ]
   · simp
   · intro b' _ hb
     rw [Pi.single_apply]
@@ -437,8 +421,8 @@ lemma basis_apply {n : ℕ} (c : Fin n → C) (b : ComponentIdx (S := S) c) :
 lemma basis_repr_pure {n : ℕ} (c : Fin n → C)
     (p : Pure S c) :
     (basis c).repr p.toTensor = p.component := by
-  ext b
-  change componentMap c p.toTensor b = _
+  ext φ
+  change componentMap c p.toTensor φ = _
   simp
 
 lemma induction_on_basis {n : ℕ} {c : Fin n → C} {P : S.Tensor c → Prop}
@@ -466,21 +450,27 @@ end Basis
 
 -/
 
-instance {k : Type} [Field k] {C G : Type} [Group G]
+instance {k : Type} [Field k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
     {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-    (S : TensorSpecies k C G basisIdx)
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
+    (S : TensorSpecies k C G V basisIdx rep b)
     {c : Fin n → C} : FiniteDimensional k (S.Tensor c) :=
   Module.Basis.finiteDimensional_of_finite (Tensor.basis c)
 
-noncomputable instance {k : Type} [RCLike k] {C G : Type} [Group G]
+noncomputable instance {k : Type} [RCLike k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
     {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-    (S : TensorSpecies k C G basisIdx)
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
+    (S : TensorSpecies k C G V basisIdx rep b)
     {c : Fin n → C} : TopologicalSpace (S.Tensor c) :=
   moduleTopology k (S.Tensor c)
 
-instance {k : Type} [RCLike k] {C G : Type} [Group G]
+instance {k : Type} [RCLike k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
     {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-    (S : TensorSpecies k C G basisIdx)
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
+    (S : TensorSpecies k C G V basisIdx rep b)
     {c : Fin n → C} : IsTopologicalAddGroup (S.Tensor c) :=
   IsModuleTopology.topologicalAddGroup (R := k) (S.Tensor c)
 
@@ -492,19 +482,27 @@ instance {k : Type} [RCLike k] {C G : Type} [Group G]
 namespace Pure
 
 noncomputable instance actionP : MulAction G (Pure S c) where
-  smul g p := fun i => (S.FD.obj _).ρ g (p i)
+  smul g p := fun i => rep (c i) g (p i)
   one_smul p := by
     ext i
-    change (S.FD.obj _).ρ 1 (p i) = p i
+    change  rep (c i) 1 (p i) = p i
     simp
   mul_smul g g' p := by
     ext i
-    change (S.FD.obj _).ρ (g * g') (p i) = (S.FD.obj _).ρ g ((S.FD.obj _).ρ g' (p i))
+    change rep (c i) (g * g') (p i) = rep (c i) g (rep (c i) g' (p i))
     simp
 
-noncomputable instance : SMul (G) (Pure S c) := actionP.toSMul
+lemma actionP_eq {g : G} {p : Pure S c} : g • p = fun i => rep (c i) g (p i) := rfl
 
-lemma actionP_eq {g : G} {p : Pure S c} : g • p = fun i => (S.FD.obj _).ρ g (p i) := rfl
+lemma rep_cast {g : G} {c c1 : C} (p : V c) (h : c = c1) :
+    LinearEquiv.cast (R := k) h (rep c g p) = rep c1 g (LinearEquiv.cast (R := k) h p):= by
+  subst h
+  rfl
+
+lemma actionP_cast {g : G} {p : Pure S c} (h : c = c1):
+    LinearEquiv.cast (R := k) h (g • p) = g • LinearEquiv.cast (R := k) h p := by
+  subst h
+  rfl
 
 @[simp]
 lemma drop_actionP {n : ℕ} {c : Fin (n + 1) → C} {i : Fin (n + 1)} {p : Pure S c} (g : G) :
@@ -521,24 +519,27 @@ end Pure
 ## The action on tensors
 
 -/
-noncomputable instance actionT : MulAction G (S.Tensor c) where
-  smul g t := (S.F.obj (OverColor.mk c)).ρ g t
-  one_smul t := by
-    change (S.F.obj (OverColor.mk c)).ρ 1 t = t
-    simp
-  mul_smul g g' t := by
-    change (S.F.obj (OverColor.mk c)).ρ (g * g') t =
-      (S.F.obj (OverColor.mk c)).ρ g ((S.F.obj (OverColor.mk c)).ρ g' t)
-    simp
 
-lemma actionT_eq {g : G} {t : S.Tensor c} : g • t = (S.F.obj (OverColor.mk c)).ρ g t := rfl
+noncomputable instance : SMul G (S.Tensor c) where
+  smul g t := PiTensorProduct.map (fun i => rep (c i) g) t
+
+lemma actionT_eq {g : G} {t : S.Tensor c} : g • t =
+    PiTensorProduct.map (fun i => rep (c i) g) t := rfl
+
+noncomputable instance actionT : MulAction G (S.Tensor c) where
+  one_smul t := by
+    simp [actionT_eq]
+  mul_smul g g' t := by
+    simp [actionT_eq]
+    change _ = (PiTensorProduct.map (fun i => rep (c i) g) ∘ₗ
+      (PiTensorProduct.map (fun i => rep (c i) g'))) t
+    rw [← PiTensorProduct.map_comp]
+    rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma actionT_pure {g : G} {p : Pure S c} :
     g • p.toTensor = Pure.toTensor (g • p) := by
-  rw [actionT_eq, Pure.toTensor]
-  simp only [F_def, lift, lift.toRepFunc, LaxBraidedFunctor.of_toFunctor]
-  rw [lift.toRep_ρ_tprod]
+  rw [actionT_eq, Pure.toTensor, PiTensorProduct.map_tprod]
   rfl
 
 lemma actionT_add {g : G} {t1 t2 : S.Tensor c} :
@@ -560,6 +561,10 @@ lemma actionT_neg {g : G} {t : S.Tensor c} :
   rw [actionT_eq]
   simp only [map_neg, neg_inj]
   rfl
+
+noncomputable instance : DistribMulAction G (S.Tensor c) where
+  smul_zero g := by simp [actionT_zero]
+  smul_add g t1 t2 := by simp [actionT_add]
 
 /-!
 
@@ -638,6 +643,14 @@ lemma PermCond.inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
   rw [h.preserve_color]
   rfl
 
+@[simp, nolint simpVarHead]
+lemma PermCond.toEquiv_symm_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
+    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (x : Fin m) :
+    c (h.toEquiv.symm x) = c1 x := by
+  obtain ⟨x, rfl⟩ := h.toEquiv.surjective x
+  rw [h.preserve_color]
+  rfl
+
 lemma PermCond.symm {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) :
     PermCond c1 c (h.inv σ) := by
@@ -651,22 +664,6 @@ lemma PermCond.symm {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
       simp [apply_inv_apply]
   · intro x
     rw [h.inv_perserve_color]
-/-- For a map `σ : Fin m → Fin n` satisfying `PermCond c c1 σ`,
-  that map lifted to a morphism in the `OverColor C` category. -/
-def PermCond.toHom {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) :
-    OverColor.mk c ⟶ OverColor.mk c1 :=
-  equivToHomEq (h.toEquiv) (h.preserve_color)
-
-/-- Given a morphism in the `OverColor C` between `c` and `c1` category the corresponding morphism
-  `(Hom.toEquiv σ).symm` satisfies the `PermCond`. -/
-lemma PermCond.ofHom {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : OverColor.mk c ⟶ OverColor.mk c1) :
-    PermCond c c1 (Hom.toEquiv σ).symm := by
-  apply And.intro
-  · exact Equiv.bijective (Hom.toEquiv σ).symm
-  · intro x
-    simpa [OverColor.mk_hom] using Hom.toEquiv_symm_apply σ x
 
 /-- The composition of two maps satisfying `PermCond` also satisfies the `PermCond`. -/
 lemma PermCond.comp {n n1 n2 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C}
@@ -741,39 +738,48 @@ lemma fin_cast_permCond (n n1 : ℕ) {c : Fin n → C} (h : n1 = n) :
   `permP σ _ p = w ⊗ₜ v`. -/
 def Pure.permP {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (σ : Fin m → Fin n) (h : PermCond c c1 σ) (p : Pure S c) : Pure S c1 :=
-  fun i => S.FD.map (eqToHom (by simp [h.preserve_color])) (p (σ i))
+  fun i => LinearEquiv.cast (R := k) (by simp [h.preserve_color]) (p (σ i))
 
 @[simp]
 lemma Pure.permP_basisVector {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) (b : ComponentIdx (S := S) c) :
-    Pure.permP σ h (Pure.basisVector c b) =
-    Pure.basisVector c1 (fun i => basisIdxCongr (by simp [h.preserve_color]) (b (σ i))) := by
+    (σ : Fin m → Fin n) (h : PermCond c c1 σ) (φ : ComponentIdx (S := S) c) :
+    Pure.permP σ h (Pure.basisVector c φ) =
+    Pure.basisVector c1 (fun i => basisIdxCongr (by simp [h.preserve_color]) (φ (σ i))) := by
   ext i
   simp only [permP, basisVector]
   have h1 {c1 c2 : C} (h : c1 = c2) (x : basisIdx c1) :
-      S.FD.map (eqToHom (by simp [h])) ((S.basis (c1)) x) =
-      (S.basis c2) (basisIdxCongr (by simp [h]) x) := by
+      LinearEquiv.cast (R := k) (by simp [h]) ((b (c1)) x) =
+      (b c2) (basisIdxCongr (by simp [h]) x) := by
     subst h
     simp
   apply h1
   simp [h.preserve_color]
 
+lemma Pure.permP_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
+    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (g : G) (p : Pure S c) :
+    Pure.permP σ h (g • p) = g • Pure.permP σ h p := by
+  ext i
+  simp only [permP, actionP_eq]
+  generalize p (σ i) = p
+  generalize_proofs h1 h2
+  generalize c1 i = c' at *
+  generalize c (σ i) = c at *
+  subst h2
+  simp
+
 /-- Given a permutation `σ : Fin m → Fin n` of indices satisfying `PermCond` through `h`,
   and a tensor `t`, `permT σ h t` is the tensor tensor permuted according to `σ`. -/
 noncomputable def permT {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) : S.Tensor c →ₗ[k] S.Tensor c1 where
-  toFun t := (S.F.map h.toHom).hom t
-  map_add' t1 t2 := by
-    simp
-  map_smul' r t := by
-    simp
+    (σ : Fin m → Fin n) (h : PermCond c c1 σ) : S.Tensor c →ₗ[k] S.Tensor c1 :=
+  PiTensorProduct.map (fun i => LinearEquiv.cast (R := k) (M := V)
+   (by simp : c (h.toEquiv.symm i) = c1 i)) ∘ₗ
+   (PiTensorProduct.reindex k _ h.toEquiv).toLinearMap
 
-set_option backward.isDefEq.respectTransparency false in
 lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (p : Pure S c) :
     permT σ h p.toTensor = (p.permP σ h).toTensor := by
-  simp only [F_def, permT, Pure.toTensor, LinearMap.coe_mk, AddHom.coe_mk]
-  rw [OverColor.lift.map_tprod]
+  simp only [permT, Pure.toTensor, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
+    PiTensorProduct.reindex_tprod, PiTensorProduct.map_tprod, LinearEquiv.cast_apply]
   rfl
 
 set_option backward.isDefEq.respectTransparency false in
@@ -781,9 +787,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma Pure.permP_id_self {n : ℕ} {c : Fin n → C} (p : Pure S c) :
     Pure.permP (id : Fin n → Fin n) (by simp : PermCond c c id) p = p := by
   ext i
-  simp only [permP, Pure.permP]
-  rw [eqToHom_refl]
-  simp
+  simp [Pure.permP]
 
 @[simp]
 lemma permT_id_self {n : ℕ} {c : Fin n → C} (t : S.Tensor c) :
@@ -816,8 +820,16 @@ lemma permT_congr_eq_id' {n : ℕ} {c : Fin n → C} (t t1 : S.Tensor c)
 lemma permT_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (g : G) (t : S.Tensor c) :
     permT σ h (g • t) = g • permT σ h t := by
-  simp only [permT, actionT_eq, LinearMap.coe_mk, AddHom.coe_mk]
-  exact Rep.hom_comm_apply (S.F.map h.toHom) g t
+  apply induction_on_pure (t := t)
+  · intro p
+    simp [actionT_pure, permT_pure]
+    congr
+    simp [Pure.permP_equivariant]
+  · intro r t ht
+    rw [actionT_smul, map_smul]
+    simp [ht]
+  · intro t1 t2 h1 h2
+    simp [h1, h2]
 
 @[congr]
 lemma Pure.permP_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
@@ -842,7 +854,7 @@ lemma Pure.permP_permP {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2
     (p : Pure S c) :
     Pure.permP σ2 h2 (Pure.permP σ h p) = Pure.permP (σ ∘ σ2) (PermCond.comp h h2) p := by
   ext i
-  simp [permP, Pure.permP, Function.comp_apply, map_map_apply]
+  simp [permP, Pure.permP, Function.comp_apply]
 
 @[simp]
 lemma permT_permT {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fin m2 → C}
@@ -865,10 +877,10 @@ lemma permT_permT {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fi
 
 lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (t : S.Tensor c)
-    (b : ComponentIdx c1) :
-    (basis c1).repr (permT σ h t) b =
+    (φ : ComponentIdx c1) :
+    (basis c1).repr (permT σ h t) φ =
     (basis c).repr t (fun i =>
-      basisIdxCongr (by simp [PermCond.inv_perserve_color]) (b (h.inv σ i))) := by
+      basisIdxCongr (by simp [PermCond.inv_perserve_color]) (φ (h.inv σ i))) := by
   apply induction_on_basis (t := t)
   · intro b'
     rw [basis_apply]
@@ -935,7 +947,6 @@ lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 ## field
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The linear map between tensors with zero indices and the underlying field
   `k`. -/
 noncomputable def toField {c : Fin 0 → C} : S.Tensor c →ₗ[k] k :=
@@ -944,7 +955,6 @@ noncomputable def toField {c : Fin 0 → C} : S.Tensor c →ₗ[k] k :=
 lemma toField_default {c : Fin 0 → C} :
     toField (Pure.toTensor default : S.Tensor c) = 1 := by
   simp [toField, Pure.toTensor]
-  erw [PiTensorProduct.isEmptyEquiv_apply_tprod]
 
 @[simp]
 lemma toField_pure {c : Fin 0 → C} (p : Pure S c) :
@@ -989,7 +999,7 @@ lemma toField_equivariant {c : Fin 0 → C} (g : G) (t : Tensor S c) :
   · intro r t hp
     simp [hp]
   · intro t1 t2 hp1 hp2
-    simp [hp1, hp2, actionT_add]
+    simp [hp1, hp2]
 
 end Tensor
 

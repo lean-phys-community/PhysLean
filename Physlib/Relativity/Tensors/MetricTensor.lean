@@ -14,22 +14,20 @@ public import Physlib.Relativity.Tensors.UnitTensor
 
 @[expose] public section
 
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
-
 namespace TensorSpecies
-open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G]
-  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-  {S : TensorSpecies k C G basisIdx}
+variable {k : Type} [RCLike k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    {S : TensorSpecies k C G V basisIdx rep b}
+attribute [-simp] LinearEquiv.cast_apply
 
 open Tensor
 
 /-- The metric tensor associated with a color `c`. -/
 noncomputable def metricTensor (c : C) : S.Tensor ![c, c] :=
-  fromConstPair (S.metric.app (Discrete.mk c))
+  fromConstPair (S.metric c)
 
 lemma metricTensor_congr {c c1 : C} (h : c = c1) :
     S.metricTensor c = permT id (by simp [h]) (metricTensor c1) := by
@@ -43,17 +41,16 @@ lemma metricTensor_invariant {c : C} (g : G) :
 
 lemma permT_fromPairTContr_metric_metric {c : C} :
     permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> rfl))
-    (fromPairTContr ((S.metric.app (Discrete.mk c)).hom (1 : k))
-    ((S.metric.app (Discrete.mk (S.τ c))).hom (1 : k))) =
-    (unitTensor c) := by
+    (fromPairTContr ((S.metric c) (1 : k))
+    ((S.metric ( (S.τ c))) (1 : k))) = (unitTensor c) := by
   rw [fromPairTContr, ← fromPairT_comm]
-  change _ = fromPairT ((S.unit.app (Discrete.mk c)).hom (1 : k))
+  change _ = fromPairT ((S.unit c) (1 : k))
   rw [← S.contr_metric]
   rfl
 
 lemma fromPairTContr_metric_metric_eq_permT_unit {c : C} :
-    fromPairTContr ((S.metric.app (Discrete.mk c)).hom (1 : k))
-    ((S.metric.app (Discrete.mk (S.τ c))).hom (1 : k)) =
+    fromPairTContr ((S.metric c) (1 : k))
+    ((S.metric (S.τ c)) (1 : k)) =
     permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> rfl))
     (unitTensor c) := by
   rw [← permT_fromPairTContr_metric_metric]

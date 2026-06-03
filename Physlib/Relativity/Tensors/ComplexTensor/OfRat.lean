@@ -16,12 +16,11 @@ public import Physlib.Relativity.Tensors.Dual
 
 @[expose] public section
 
-open Module IndexNotation
+open Module
 open CategoryTheory
 open MonoidalCategory
 
 namespace complexLorentzTensor
-open OverColor
 open Physlib.RatComplexNum
 open Physlib
 
@@ -71,35 +70,34 @@ lemma basis_eq_ofRat {n : ℕ} {c : Fin n → complexLorentzTensor.Color}
 lemma contr_basis_ratComplexNum {c : complexLorentzTensor.Color}
     (i : Fin (complexLorentzTensor.repDim c))
     (j : Fin (complexLorentzTensor.repDim (complexLorentzTensor.τ c))) :
-    complexLorentzTensor.castToField
-      ((complexLorentzTensor.contr.app (Discrete.mk c)).hom
+      ((complexLorentzTensor.contr c)
       (complexLorentzTensor.basis c i ⊗ₜ
       complexLorentzTensor.basis (complexLorentzTensor.τ c) j))
       = toComplexNum (if i.val = j.val then 1 else 0) := by
   match c with
   | Color.upL =>
-    change Fermion.leftAltContraction.hom (Fermion.leftBasis i ⊗ₜ Fermion.altLeftBasis j) = _
+    change Fermion.leftAltContraction (Fermion.leftBasis i ⊗ₜ Fermion.altLeftBasis j) = _
     rw [Fermion.leftAltContraction_basis]
     simp
   | Color.downL =>
-    change Fermion.altLeftContraction.hom (Fermion.altLeftBasis i ⊗ₜ Fermion.leftBasis j) = _
+    change Fermion.altLeftContraction (Fermion.altLeftBasis i ⊗ₜ Fermion.leftBasis j) = _
     rw [Fermion.altLeftContraction_basis]
     simp
   | Color.upR =>
-    change Fermion.rightAltContraction.hom (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
+    change Fermion.rightAltContraction (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
     rw [Fermion.rightAltContraction_basis]
     simp
   | Color.downR =>
-    change Fermion.rightAltContraction.hom (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
+    change Fermion.rightAltContraction (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
     rw [Fermion.rightAltContraction_basis]
     simp
   | Color.up =>
-    change Lorentz.contrCoContraction.hom
+    change Lorentz.contrCoContraction
       (Lorentz.complexContrBasisFin4 i ⊗ₜ Lorentz.complexCoBasisFin4 j) = _
     rw [Lorentz.contrCoContraction_basis]
     simp
   | Color.down =>
-    change Lorentz.contrCoContraction.hom
+    change Lorentz.contrCoContraction
       (Lorentz.complexContrBasisFin4 i ⊗ₜ Lorentz.complexCoBasisFin4 j) = _
     rw [Lorentz.contrCoContraction_basis]
     simp

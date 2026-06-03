@@ -21,12 +21,8 @@ There is likely a more direct path to this result.
 
 @[expose] public section
 
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
 open Matrix
 open TensorProduct
-open CategoryTheory
 
 namespace PauliMatrix
 open Fermion
@@ -45,8 +41,7 @@ lemma pauliCo_contr_pauliContr :
     rw [permT_basis_repr_symm_apply]
     rw [_root_.map_smul]
     simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, Fin.succAbove_zero,
-      Function.comp_apply, OverColor.mk_hom, OverColor.equivToHomEq_toEquiv, Finsupp.coe_smul,
-      Pi.smul_apply, smul_eq_mul]
+      Function.comp_apply, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul]
     rw (transparency := .instances) [prodT_basis_repr_apply]
     simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, Fin.succAbove_zero,
       Function.comp_apply]
@@ -61,10 +56,7 @@ lemma pauliCo_contr_pauliContr :
     enter [2, x]
     rw [prodT_basis_repr_apply]
     simp only [pauliCo_eq_ofRat, toTensor_eq_ofRat]
-    simp only [Fin.isValue, ofRat_basis_repr_apply, Function.comp_apply, Monoidal.tensorUnit_obj,
-      Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
-      Action.FunctorCategoryEquivalence.functor_obj_obj, Functor.comp_obj,
-      Discrete.functor_obj_eq_as, Fin.cast_eq_self]
+    simp only [Fin.isValue, Fin.cast_eq_self, ofRat_basis_repr_apply]
     left
     rw [← Physlib.RatComplexNum.toComplexNum.map_mul]
   conv_lhs =>

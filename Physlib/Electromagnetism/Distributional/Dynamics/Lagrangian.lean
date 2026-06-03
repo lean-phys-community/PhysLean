@@ -47,7 +47,6 @@ In this implementation we set `μ₀ = 1`. It is a TODO to introduce this consta
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 

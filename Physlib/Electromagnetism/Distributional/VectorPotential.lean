@@ -40,7 +40,6 @@ the vector potential is non-relativistic and is therefore a distribution of `Tim
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 
@@ -59,7 +58,6 @@ open minkowskiMatrix SchwartzMap
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The vector potential of an electromagnetic potential which is a distribution. -/
 noncomputable def vectorPotential {d} (c : SpeedOfLight) :
     DistElectromagneticPotential d →ₗ[ℝ]

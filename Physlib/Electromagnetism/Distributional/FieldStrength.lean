@@ -36,7 +36,6 @@ In this module we define the field strength tensor in terms of the electromagnet
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 

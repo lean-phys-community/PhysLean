@@ -70,7 +70,6 @@ noncomputable def wireCurrentDensity (c : SpeedOfLight) :
   map_add' I1 I2 := by simp [add_smul]
   map_smul' r I := by simp [smul_smul]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma wireCurrentDensity_chargeDesnity (c : SpeedOfLight) (I : ℝ) :
     (wireCurrentDensity c I).chargeDensity c = 0 := by
@@ -78,7 +77,6 @@ lemma wireCurrentDensity_chargeDesnity (c : SpeedOfLight) (I : ℝ) :
   simp [DistLorentzCurrentDensity.chargeDensity, wireCurrentDensity, constantTime_apply,
   constantSliceDist_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma wireCurrentDensity_currentDensity_fst (c : SpeedOfLight) (I : ℝ)
     (η : 𝓢(Time × Space 3, ℝ)) :
     (wireCurrentDensity c I).currentDensity c η 0 =
@@ -88,7 +86,6 @@ lemma wireCurrentDensity_currentDensity_fst (c : SpeedOfLight) (I : ℝ)
   simp [wireCurrentDensity, DistLorentzCurrentDensity.currentDensity,
     constantTime_apply, constantSliceDist_apply, diracDelta'_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma wireCurrentDensity_currentDensity_snd (c : SpeedOfLight) (I : ℝ)
     (ε : 𝓢(Time × Space 3, ℝ)) :
@@ -96,7 +93,6 @@ lemma wireCurrentDensity_currentDensity_snd (c : SpeedOfLight) (I : ℝ)
   simp [wireCurrentDensity, DistLorentzCurrentDensity.currentDensity,
     constantTime_apply, constantSliceDist_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma wireCurrentDensity_currentDensity_thrd (c : SpeedOfLight) (I : ℝ)
     (ε : 𝓢(Time × Space 3, ℝ)) :
@@ -134,7 +130,6 @@ $$V(t, x, y, z) = 0.$$
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma infiniteWire_scalarPotential (𝓕 : FreeSpace) (I : ℝ) :
     (infiniteWire 𝓕 I).scalarPotential 𝓕.c = 0 := by
@@ -155,14 +150,13 @@ a system with translational symmetry along the x-axis.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma infiniteWire_vectorPotential (𝓕 : FreeSpace) (I : ℝ) :
     (infiniteWire 𝓕 I).vectorPotential 𝓕.c =
     (constantTime <|
     constantSliceDist 0
     ((- I * 𝓕.μ₀ / (2 * Real.pi)) • distOfFunction (fun (x : Space 2) =>
       Real.log ‖x‖ • EuclideanSpace.single 0 (1 : ℝ))
-    (IsDistBounded.log_norm.smul_const _))) := by
+    (by apply IsDistBounded.log_norm.smul_const))) := by
   ext η i
   simp [vectorPotential, infiniteWire, constantTime_apply,
   constantSliceDist_apply, Lorentz.Vector.spatialCLM, distOfFunction_vector_eval,
@@ -272,7 +266,7 @@ lemma infiniteWire_isExterma {𝓕 : FreeSpace} {I : ℝ} :
         conv_rhs => rw [distDeriv_apply, fderivD_apply]
         simp [distGrad_apply]
     rw [distGrad_distOfFunction_log_norm]
-    have h1 := distDiv_inv_pow_eq_dim (d := 1)
+    have h1 := distDiv_inv_pow_eq_dim (d := 2)
     simp at h1
     simp [h1]
   · simp only [Fin.mk_one, Fin.isValue, neg_sub, Finset.sum_sub_distrib, Fin.sum_univ_three,

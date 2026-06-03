@@ -45,7 +45,6 @@ We define a tensor version and a matrix version and prover various properties of
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 
@@ -170,8 +169,7 @@ lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
   induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
   · simp only [LinearEquiv.apply_symm_apply, basis_apply, evalT_pure, Pure.evalP, map_smul,
       toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
-    change _ = _ * ((realLorentzTensor d).basis (Color.up)).repr
-      ((realLorentzTensor d).basis (Color.up) (b 1)) ν
+    change _ = _ * (Lorentz.contrBasis d).repr (Lorentz.contrBasis d (b 1)) ν
     /- Transforming the basis -/
     let e := ComponentIdx.prod.trans ((Vector.indexEquiv (d := d)).prodCongr Vector.indexEquiv)
     simp only [prod_basis_of_map_reindex Vector.basis_eq_map_tensor_basis

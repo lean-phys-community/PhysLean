@@ -50,10 +50,6 @@ def toFin1dℝFun : ContrMod d ≃ (Fin 1 ⊕ Fin d → ℝ) where
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- The instance of `AddCommMonoid` on `ContrℝModule` defined via its equivalence
-  with `Fin 1 ⊕ Fin d → ℝ`. -/
-instance : AddCommMonoid (ContrMod d) := Equiv.addCommMonoid toFin1dℝFun
-
 /-- The instance of `AddCommGroup` on `ContrℝModule` defined via its equivalence
   with `Fin 1 ⊕ Fin d → ℝ`. -/
 instance : AddCommGroup (ContrMod d) := Equiv.addCommGroup toFin1dℝFun
@@ -329,10 +325,6 @@ def toFin1dℝFun : CoMod d ≃ (Fin 1 ⊕ Fin d → ℝ) where
   invFun f := ⟨f⟩
   left_inv _ := rfl
   right_inv _ := rfl
-
-/-- The instance of `AddCommMonoid` on `CoℂModule` defined via its equivalence
-  with `Fin 1 ⊕ Fin d → ℝ`. -/
-instance : AddCommMonoid (CoMod d) := Equiv.addCommMonoid toFin1dℝFun
 
 /-- The instance of `AddCommGroup` on `CoℝModule` defined via its equivalence
   with `Fin 1 ⊕ Fin d → ℝ`. -/

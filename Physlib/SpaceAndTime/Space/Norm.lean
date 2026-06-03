@@ -131,7 +131,6 @@ lemma normPowerSeries_tendsto {d} (x : Space d) (hx : x ≠ 0) :
   · left
     simpa using hx
 
-set_option backward.isDefEq.respectTransparency false in
 lemma normPowerSeries_inv_tendsto {d} (x : Space d) (hx : x ≠ 0) :
     Filter.Tendsto (fun n => (normPowerSeries n x)⁻¹) Filter.atTop (𝓝 (‖x‖⁻¹)) := by
   apply Filter.Tendsto.inv₀
@@ -490,7 +489,7 @@ lemma fderiv_log_normPowerSeries {d : ℕ} {n : ℕ} (x y : Space d) :
 -/
 
 lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
-    distGrad (distOfFunction (fun x : Space d => (normPowerSeries n x) ^ m) (by fun_prop)) =
+    ∇ᵈ (distOfFunction (fun x : Space d => (normPowerSeries n x) ^ m) (by fun_prop)) =
     distOfFunction (fun x : Space d => (m * (normPowerSeries n x) ^ (m - 2)) • basis.repr x)
     (by fun_prop) := by
   ext1 η
@@ -535,10 +534,10 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} (m : �
     (hm : - (d.succ - 1 : ℕ) ≤ m) (η : 𝓢(Space d.succ, ℝ))
     (y : EuclideanSpace ℝ (Fin d.succ)) :
     Filter.Tendsto (fun n =>
-    ⟪(distGrad (distOfFunction
+    ⟪(∇ᵈ (distOfFunction
     (fun x : Space d.succ => (normPowerSeries n x) ^ m) (by fun_prop))) η, y⟫_ℝ)
     Filter.atTop
-    (𝓝 (⟪distGrad (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
+    (𝓝 (⟪∇ᵈ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
     (IsDistBounded.pow m hm)) η, y⟫_ℝ)) := by
   simp only [distGrad_inner_eq, Distribution.fderivD_apply, distOfFunction_apply]
   change Filter.Tendsto (fun n => - ∫ (x : Space d.succ),
@@ -591,11 +590,10 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} (m : �
         simpa using hx
     simpa using h1
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.succ - 1 : ℕ) + 1 ≤ m)
     (η : 𝓢(Space d.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ)) :
     Filter.Tendsto (fun n =>
-    ⟪(distGrad (distOfFunction (fun x : Space d.succ => (normPowerSeries n x) ^ m)
+    ⟪(∇ᵈ (distOfFunction (fun x : Space d.succ => (normPowerSeries n x) ^ m)
     (by fun_prop))) η, y⟫_ℝ)
     Filter.atTop
     (𝓝 (⟪distOfFunction (fun x : Space d.succ => (m * ‖x‖ ^ (m - 2)) • basis.repr x) (by
@@ -718,7 +716,7 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.
 -/
 
 lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
-    distGrad (distOfFunction (fun x : Space d => Real.log (normPowerSeries n x)) (by fun_prop)) =
+    ∇ᵈ (distOfFunction (fun x : Space d => Real.log (normPowerSeries n x)) (by fun_prop)) =
     distOfFunction (fun x : Space d => ((normPowerSeries n x) ^ (- 2 : ℤ)) • basis.repr x)
     (by fun_prop) := by
   ext1 η
@@ -762,10 +760,10 @@ lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
 lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ}
     (η : 𝓢(Space d.succ.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ.succ)) :
     Filter.Tendsto (fun n =>
-    ⟪(distGrad (distOfFunction
+    ⟪(∇ᵈ (distOfFunction
     (fun x : Space d.succ.succ => Real.log (normPowerSeries n x)) (by fun_prop))) η, y⟫_ℝ)
     Filter.atTop
-    (𝓝 (⟪distGrad (distOfFunction (fun x : Space d.succ.succ => Real.log ‖x‖)
+    (𝓝 (⟪∇ᵈ (distOfFunction (fun x : Space d.succ.succ => Real.log ‖x‖)
     (IsDistBounded.log_norm)) η, y⟫_ℝ)) := by
   simp only [distGrad_inner_eq, Distribution.fderivD_apply, distOfFunction_apply]
   change Filter.Tendsto (fun n => -
@@ -814,7 +812,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ}
 lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ}
     (η : 𝓢(Space d.succ.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ.succ)) :
     Filter.Tendsto (fun n =>
-    ⟪(distGrad (distOfFunction (fun x : Space d.succ.succ => Real.log (normPowerSeries n x))
+    ⟪(∇ᵈ (distOfFunction (fun x : Space d.succ.succ => Real.log (normPowerSeries n x))
     (by fun_prop))) η, y⟫_ℝ)
     Filter.atTop
     (𝓝 (⟪distOfFunction (fun x : Space d.succ.succ => (‖x‖ ^ (- 2 : ℤ)) • basis.repr x) (by
@@ -907,7 +905,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ}
 -/
 
 lemma distGrad_distOfFunction_norm_zpow {d : ℕ} (m : ℤ) (hm : - (d.succ - 1 : ℕ) + 1 ≤ m) :
-    distGrad (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
+    ∇ᵈ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
       (IsDistBounded.pow m (by simp_all; omega)))
     = distOfFunction (fun x : Space d.succ => (m * ‖x‖ ^ (m - 2)) • basis.repr x) (by
       simp [← smul_smul]
@@ -927,7 +925,7 @@ lemma distGrad_distOfFunction_norm_zpow {d : ℕ} (m : ℤ) (hm : - (d.succ - 1 
 -/
 
 lemma distGrad_distOfFunction_log_norm {d : ℕ} :
-    distGrad (distOfFunction (fun x : Space d.succ.succ => Real.log ‖x‖)
+    ∇ᵈ (distOfFunction (fun x : Space d.succ.succ => Real.log ‖x‖)
       (IsDistBounded.log_norm))
     = distOfFunction (fun x : Space d.succ.succ => (‖x‖ ^ (- 2 : ℤ)) • basis.repr x) (by
       refine (IsDistBounded.zpow_smul_repr_self _ ?_)
@@ -950,8 +948,10 @@ The proof
 open Distribution
 
 set_option backward.isDefEq.respectTransparency false in
-lemma distDiv_inv_pow_eq_dim {d : ℕ} :
-    distDiv (distOfFunction (fun x : Space d.succ => ‖x‖ ^ (- d.succ : ℤ) • basis.repr x)
+/-- Auxiliary lemma with dimension defined as d.succ to handle `homeomorphUnitSphereProd`.
+The dimension correct version is declared in `distDiv_inv_pow_eq_dim`. -/
+private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
+    ∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ (- d.succ : ℤ) • basis.repr x)
       (IsDistBounded.zpow_smul_repr_self (- d.succ : ℤ) (by omega))) =
       (d.succ * (volume (α := Space d.succ)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
   ext η
@@ -1097,5 +1097,13 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} :
   simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, ContinuousLinearMap.coe_smul',
     Pi.smul_apply, diracDelta_apply, smul_eq_mul]
   ring
+
+lemma distDiv_inv_pow_eq_dim {d : ℕ} :
+    ∇ᵈ ⬝ (distOfFunction (fun x : Space d => ‖x‖ ^ (- d : ℤ) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self (- d : ℤ) (by omega))) =
+      (d * (volume (α := Space d)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  rcases d with _ | d'
+  · simp; rfl
+  · exact distDiv_inv_pow_eq_dim'
 
 end Space

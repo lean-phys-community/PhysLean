@@ -26,15 +26,12 @@ TODO "Refactor: Split this module on Lorentz vectors into two: `Basic.lean` and 
   depend on the `Tensorial` imports. A similar TODO item exists
   for Lorentz co-vectors."
 
-open Module IndexNotation
-open CategoryTheory
-open MonoidalCategory
+open Module
 open Matrix
 open MatrixGroups
 open Complex
 open TensorProduct
-open IndexNotation
-open CategoryTheory
+
 noncomputable section
 
 namespace Lorentz
@@ -350,16 +347,9 @@ set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_symm_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
     (toTensor (self := tensorial)).symm (Tensor.basis ![Color.up] (indexEquiv.symm μ)) =
     basis μ := by
-  rw [Tensor.basis_apply]
   funext i
-  rw [toTensor_symm_pure]
-  simp [Pure.basisVector]
-  conv_lhs =>
-    enter [1, 2]
-    change (contrBasis d) (indexEquiv.symm μ 0)
-  simp [contrBasis, indexEquiv, Pi.single_apply]
-  congr 1
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  simp [Tensor.basis_apply, toTensor_symm_pure, Pure.basisVector, Finsupp.single_apply,
+    indexEquiv]
 
 lemma toTensor_basis_eq_tensor_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
     toTensor (basis μ) = Tensor.basis ![Color.up] (indexEquiv.symm μ) := by

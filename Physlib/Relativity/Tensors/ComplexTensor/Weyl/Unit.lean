@@ -27,7 +27,7 @@ open TensorProduct
 open CategoryTheory.MonoidalCategory
 
 /-- The left-alt-left unit `δᵃₐ` as an element of `(leftHanded ⊗ altLeftHanded).V`. -/
-def leftAltLeftUnitVal : (leftHanded ⊗ altLeftHanded).V :=
+def leftAltLeftUnitVal : (LeftHandedModule ⊗[ℂ] AltLeftHandedModule) :=
   leftAltLeftToMatrix.symm 1
 
 set_option backward.isDefEq.respectTransparency false in
@@ -42,34 +42,33 @@ lemma leftAltLeftUnitVal_expand_tmul : leftAltLeftUnitVal =
 set_option backward.isDefEq.respectTransparency false in
 /-- The left-alt-left unit `δᵃₐ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ leftHanded ⊗ altLeftHanded `,
   manifesting the invariance under the `SL(2,ℂ)` action. -/
-def leftAltLeftUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ leftHanded ⊗ altLeftHanded := Rep.ofHom
-{
-    toFun := fun a =>
-      let a' : ℂ := a
-      a' • leftAltLeftUnitVal,
-    map_add' := fun x y => by
-      simp only [add_smul]
-    map_smul' := fun m x => by
-      simp only [smul_smul]
-      rfl
-    isIntertwining' M := by
-      refine LinearMap.ext fun x : ℂ => ?_
-      change x • leftAltLeftUnitVal =
-        (TensorProduct.map (leftHanded.ρ M) (altLeftHanded.ρ M)) (x • leftAltLeftUnitVal)
-      simp only [map_smul]
-      apply congrArg
-      simp only [leftAltLeftUnitVal]
-      rw [leftAltLeftToMatrix_ρ_symm]
-      apply congrArg
-      simp
-}
+def leftAltLeftUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
+    (leftHandedRep.tprod altLeftHandedRep) where
+  toFun := fun a =>
+    let a' : ℂ := a
+    a' • leftAltLeftUnitVal
+  map_add' := fun x y => by
+    simp only [add_smul]
+  map_smul' := fun m x => by
+    simp only [smul_smul]
+    rfl
+  isIntertwining' M := by
+    refine LinearMap.ext fun x : ℂ => ?_
+    change x • leftAltLeftUnitVal =
+      (TensorProduct.map (leftHandedRep M) (altLeftHandedRep M)) (x • leftAltLeftUnitVal)
+    simp only [map_smul]
+    apply congrArg
+    simp only [leftAltLeftUnitVal]
+    rw [leftAltLeftToMatrix_ρ_symm]
+    apply congrArg
+    simp
 
-lemma leftAltLeftUnit_apply_one : leftAltLeftUnit.hom (1 : ℂ) = leftAltLeftUnitVal := by
+lemma leftAltLeftUnit_apply_one : leftAltLeftUnit (1 : ℂ) = leftAltLeftUnitVal := by
   change (1 : ℂ) • leftAltLeftUnitVal = leftAltLeftUnitVal
   simp only [one_smul]
 
 /-- The alt-left-left unit `δₐᵃ` as an element of `(altLeftHanded ⊗ leftHanded).V`. -/
-def altLeftLeftUnitVal : (altLeftHanded ⊗ leftHanded).V :=
+def altLeftLeftUnitVal : (AltLeftHandedModule ⊗[ℂ] LeftHandedModule) :=
   altLeftLeftToMatrix.symm 1
 
 set_option backward.isDefEq.respectTransparency false in
@@ -84,10 +83,12 @@ lemma altLeftLeftUnitVal_expand_tmul : altLeftLeftUnitVal =
 set_option backward.isDefEq.respectTransparency false in
 /-- The alt-left-left unit `δₐᵃ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ leftHanded `,
   manifesting the invariance under the `SL(2,ℂ)` action. -/
-def altLeftLeftUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ leftHanded := Rep.ofHom {
+def altLeftLeftUnit :
+    (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
+      (altLeftHandedRep.tprod leftHandedRep) where
   toFun := fun a =>
       let a' : ℂ := a
-      a' • altLeftLeftUnitVal,
+      a' • altLeftLeftUnitVal
   map_add' := fun x y => by
     simp only [add_smul]
   map_smul' := fun m x => by
@@ -96,7 +97,7 @@ def altLeftLeftUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ leftHanded
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • altLeftLeftUnitVal =
-      (TensorProduct.map (altLeftHanded.ρ M) (leftHanded.ρ M)) (x • altLeftLeftUnitVal)
+      (TensorProduct.map (altLeftHandedRep M) (leftHandedRep M)) (x • altLeftLeftUnitVal)
     simp only [map_smul]
     apply congrArg
     simp only [altLeftLeftUnitVal]
@@ -104,16 +105,15 @@ def altLeftLeftUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ leftHanded
     apply congrArg
     simp only [mul_one, ← transpose_mul, SpecialLinearGroup.det_coe, isUnit_iff_ne_zero, ne_eq,
       one_ne_zero, not_false_eq_true, mul_nonsing_inv, transpose_one]
-}
 
 /-- Applying the morphism `altLeftLeftUnit` to `1` returns `altLeftLeftUnitVal`. -/
-lemma altLeftLeftUnit_apply_one : altLeftLeftUnit.hom (1 : ℂ) = altLeftLeftUnitVal := by
+lemma altLeftLeftUnit_apply_one : altLeftLeftUnit (1 : ℂ) = altLeftLeftUnitVal := by
   change (1 : ℂ) • altLeftLeftUnitVal = altLeftLeftUnitVal
   simp only [one_smul]
 
 /-- The right-alt-right unit `δ^{dot a}_{dot a}` as an element of
   `(rightHanded ⊗ altRightHanded).V`. -/
-def rightAltRightUnitVal : (rightHanded ⊗ altRightHanded).V :=
+def rightAltRightUnitVal : RightHandedModule ⊗[ℂ] AltRightHandedModule :=
   rightAltRightToMatrix.symm 1
 
 set_option backward.isDefEq.respectTransparency false in
@@ -129,41 +129,40 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The right-alt-right unit `δ^{dot a}_{dot a}` as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ rightHanded ⊗ altRightHanded`, manifesting
   the invariance under the `SL(2,ℂ)` action. -/
-def rightAltRightUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ rightHanded ⊗ altRightHanded := Rep.ofHom
-{
-    toFun := fun a =>
-      let a' : ℂ := a
-      a' • rightAltRightUnitVal,
-    map_add' := fun x y => by
-      simp only [add_smul]
-    map_smul' := fun m x => by
-      simp only [smul_smul]
-      rfl
-    isIntertwining' M := by
-      refine LinearMap.ext fun x : ℂ => ?_
-      change x • rightAltRightUnitVal =
-        (TensorProduct.map (rightHanded.ρ M) (altRightHanded.ρ M)) (x • rightAltRightUnitVal)
-      simp only [map_smul]
-      apply congrArg
-      simp only [rightAltRightUnitVal]
-      rw [rightAltRightToMatrix_ρ_symm]
-      apply congrArg
-      simp only [RCLike.star_def, mul_one]
-      symm
-      refine transpose_eq_one.mp ?h.h.h.a
-      simp only [transpose_mul, transpose_transpose]
-      change (M.1)⁻¹ᴴ * (M.1)ᴴ = 1
-      rw [@conjTranspose_nonsing_inv]
-      simp
-  }
+def rightAltRightUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
+    (rightHandedRep.tprod altRightHandedRep) where
+  toFun := fun a =>
+    let a' : ℂ := a
+    a' • rightAltRightUnitVal
+  map_add' := fun x y => by
+    simp only [add_smul]
+  map_smul' := fun m x => by
+    simp only [smul_smul]
+    rfl
+  isIntertwining' M := by
+    refine LinearMap.ext fun x : ℂ => ?_
+    change x • rightAltRightUnitVal =
+      (TensorProduct.map (rightHandedRep M) (altRightHandedRep M)) (x • rightAltRightUnitVal)
+    simp only [map_smul]
+    apply congrArg
+    simp only [rightAltRightUnitVal]
+    rw [rightAltRightToMatrix_ρ_symm]
+    apply congrArg
+    simp only [RCLike.star_def, mul_one]
+    symm
+    refine transpose_eq_one.mp ?h.h.h.a
+    simp only [transpose_mul, transpose_transpose]
+    change (M.1)⁻¹ᴴ * (M.1)ᴴ = 1
+    rw [@conjTranspose_nonsing_inv]
+    simp
 
-lemma rightAltRightUnit_apply_one : rightAltRightUnit.hom (1 : ℂ) = rightAltRightUnitVal := by
+lemma rightAltRightUnit_apply_one : rightAltRightUnit (1 : ℂ) = rightAltRightUnitVal := by
   change (1 : ℂ) • rightAltRightUnitVal = rightAltRightUnitVal
   simp only [one_smul]
 
 /-- The alt-right-right unit `δ_{dot a}^{dot a}` as an element of
   `(rightHanded ⊗ altRightHanded).V`. -/
-def altRightRightUnitVal : (altRightHanded ⊗ rightHanded).V :=
+def altRightRightUnitVal : (AltRightHandedModule ⊗[ℂ] RightHandedModule) :=
   altRightRightToMatrix.symm 1
 
 set_option backward.isDefEq.respectTransparency false in
@@ -179,32 +178,32 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The alt-right-right unit `δ_{dot a}^{dot a}` as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altRightHanded ⊗ rightHanded`, manifesting
   the invariance under the `SL(2,ℂ)` action. -/
-def altRightRightUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altRightHanded ⊗ rightHanded := Rep.ofHom {
-    toFun := fun a =>
-      let a' : ℂ := a
-      a' • altRightRightUnitVal,
-    map_add' := fun x y => by
-      simp only [add_smul]
-    map_smul' := fun m x => by
-      simp only [smul_smul]
-      rfl
-    isIntertwining' M := by
-      refine LinearMap.ext fun x : ℂ => ?_
-      change x • altRightRightUnitVal =
-        (TensorProduct.map (altRightHanded.ρ M) (rightHanded.ρ M)) (x • altRightRightUnitVal)
-      simp only [map_smul]
-      apply congrArg
-      simp only [altRightRightUnitVal]
-      rw [altRightRightToMatrix_ρ_symm]
-      apply congrArg
-      simp only [mul_one, RCLike.star_def]
-      symm
-      change (M.1)⁻¹ᴴ * (M.1)ᴴ = 1
-      rw [@conjTranspose_nonsing_inv]
-      simp
-  }
+def altRightRightUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
+    (altRightHandedRep.tprod rightHandedRep)  where
+  toFun := fun a =>
+    let a' : ℂ := a
+    a' • altRightRightUnitVal
+  map_add' := fun x y => by
+    simp only [add_smul]
+  map_smul' := fun m x => by
+    simp only [smul_smul]
+    rfl
+  isIntertwining' M := by
+    refine LinearMap.ext fun x : ℂ => ?_
+    change x • altRightRightUnitVal =
+      (TensorProduct.map (altRightHandedRep M) (rightHandedRep M)) (x • altRightRightUnitVal)
+    simp only [map_smul]
+    apply congrArg
+    simp only [altRightRightUnitVal]
+    rw [altRightRightToMatrix_ρ_symm]
+    apply congrArg
+    simp only [mul_one, RCLike.star_def]
+    symm
+    change (M.1)⁻¹ᴴ * (M.1)ᴴ = 1
+    rw [@conjTranspose_nonsing_inv]
+    simp
 
-lemma altRightRightUnit_apply_one : altRightRightUnit.hom (1 : ℂ) = altRightRightUnitVal := by
+lemma altRightRightUnit_apply_one : altRightRightUnit (1 : ℂ) = altRightRightUnitVal := by
   change (1 : ℂ) • altRightRightUnitVal = altRightRightUnitVal
   simp only [one_smul]
 
@@ -216,83 +215,53 @@ lemma altRightRightUnit_apply_one : altRightRightUnit.hom (1 : ℂ) = altRightRi
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `altLeftLeftUnit` does nothing. -/
-lemma contr_altLeftLeftUnit (x : leftHanded) :
-    (λ_ leftHanded).hom.hom
-    (((leftAltContraction) ▷ leftHanded).hom
-    ((α_ _ _ leftHanded).inv.hom
-    (x ⊗ₜ[ℂ] altLeftLeftUnit.hom (1 : ℂ)))) = x := by
+lemma contr_altLeftLeftUnit (x : LeftHandedModule) :
+    (TensorProduct.lid ℂ _ <|
+    leftAltContraction.toLinearMap.rTensor _ <|
+    (TensorProduct.assoc ℂ _ _ _).symm <|
+    x ⊗ₜ[ℂ] (altLeftLeftUnit (1 : ℂ))) = x := by
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span leftBasis x)
   subst hc
-  rw [altLeftLeftUnit_apply_one, altLeftLeftUnitVal_expand_tmul]
-  simp only [Rep.tensor_V, Rep.tensorUnit_V, Rep.tensor_ρ, Rep.tensorUnit_ρ, Rep.hom_hom_leftUnitor,
-    Rep.hom_whiskerRight, Rep.hom_inv_associator, Fin.sum_univ_two, Fin.isValue, tmul_add, add_tmul,
-    smul_tmul, tmul_smul, ← Representation.IntertwiningMap.toLinearMap_apply,
-    Representation.TensorProduct.assoc_symm_toLinearMap, LinearMap.map_add, map_smul,
-    LinearEquiv.coe_coe, assoc_symm_tmul, Representation.IntertwiningMap.toLinearMap_rTensor,
-    LinearMap.rTensor_tmul, Representation.IntertwiningMap.coe_toLinearMap,
-    Representation.TensorProduct.toLinearMap_lid, lid_tmul]
-  repeat erw [leftAltContraction_basis]
-  simp
+  simp [- Fintype.sum_sum_type, smul_tmul, leftAltContraction_basis,
+    altLeftLeftUnit_apply_one, altLeftLeftUnitVal_expand_tmul, add_tmul, tmul_add]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `leftAltLeftUnit` does nothing. -/
-lemma contr_leftAltLeftUnit (x : altLeftHanded) :
-    (λ_ altLeftHanded).hom.hom
-    (((altLeftContraction) ▷ altLeftHanded).hom
-    ((α_ _ _ altLeftHanded).inv.hom
-    (x ⊗ₜ[ℂ] leftAltLeftUnit.hom (1 : ℂ)))) = x := by
+lemma contr_leftAltLeftUnit (x : AltLeftHandedModule) :
+    (TensorProduct.lid ℂ _ <|
+    altLeftContraction.toLinearMap.rTensor _ <|
+    (TensorProduct.assoc ℂ _ _ _).symm <|
+    x ⊗ₜ[ℂ] (leftAltLeftUnit (1 : ℂ))) = x := by
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span altLeftBasis x)
   subst hc
-  rw [leftAltLeftUnit_apply_one, leftAltLeftUnitVal_expand_tmul]
-  simp only [Rep.tensor_V, Rep.tensorUnit_V, Rep.tensor_ρ, Rep.tensorUnit_ρ, Rep.hom_hom_leftUnitor,
-    Rep.hom_whiskerRight, Rep.hom_inv_associator, Fin.sum_univ_two, Fin.isValue, tmul_add, add_tmul,
-    smul_tmul, tmul_smul, ← Representation.IntertwiningMap.toLinearMap_apply,
-    Representation.TensorProduct.assoc_symm_toLinearMap, LinearMap.map_add, map_smul,
-    LinearEquiv.coe_coe, assoc_symm_tmul, Representation.IntertwiningMap.toLinearMap_rTensor,
-    LinearMap.rTensor_tmul, Representation.IntertwiningMap.coe_toLinearMap,
-    Representation.TensorProduct.toLinearMap_lid, lid_tmul]
-  repeat erw [altLeftContraction_basis]
-  simp
+  simp [- Fintype.sum_sum_type, smul_tmul, altLeftContraction_basis,
+    leftAltLeftUnit_apply_one, leftAltLeftUnitVal_expand_tmul, add_tmul, tmul_add]
+
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `altRightRightUnit` does nothing. -/
-lemma contr_altRightRightUnit (x : rightHanded) :
-    (λ_ rightHanded).hom.hom
-    (((rightAltContraction) ▷ rightHanded).hom
-    ((α_ _ _ rightHanded).inv.hom
-    (x ⊗ₜ[ℂ] altRightRightUnit.hom (1 : ℂ)))) = x := by
+lemma contr_altRightRightUnit (x : RightHandedModule) :
+    (TensorProduct.lid ℂ _ <|
+    rightAltContraction.toLinearMap.rTensor _ <|
+    (TensorProduct.assoc ℂ _ _ _).symm <|
+    x ⊗ₜ[ℂ] (altRightRightUnit (1 : ℂ))) = x := by
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span rightBasis x)
   subst hc
-  rw [altRightRightUnit_apply_one, altRightRightUnitVal_expand_tmul]
-  simp only [Rep.tensor_V, Rep.tensorUnit_V, Rep.tensor_ρ, Rep.tensorUnit_ρ, Rep.hom_hom_leftUnitor,
-    Rep.hom_whiskerRight, Rep.hom_inv_associator, Fin.sum_univ_two, Fin.isValue, tmul_add, add_tmul,
-    smul_tmul, tmul_smul, ← Representation.IntertwiningMap.toLinearMap_apply,
-    Representation.TensorProduct.assoc_symm_toLinearMap, LinearMap.map_add, map_smul,
-    LinearEquiv.coe_coe, assoc_symm_tmul, Representation.IntertwiningMap.toLinearMap_rTensor,
-    LinearMap.rTensor_tmul, Representation.IntertwiningMap.coe_toLinearMap,
-    Representation.TensorProduct.toLinearMap_lid, lid_tmul]
-  repeat erw [rightAltContraction_basis]
-  simp
+  simp [- Fintype.sum_sum_type, smul_tmul, rightAltContraction_basis,
+    altRightRightUnit_apply_one, altRightRightUnitVal_expand_tmul, add_tmul, tmul_add]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `rightAltRightUnit` does nothing. -/
-lemma contr_rightAltRightUnit (x : altRightHanded) :
-    (λ_ altRightHanded).hom.hom
-    (((altRightContraction) ▷ altRightHanded).hom
-    ((α_ _ _ altRightHanded).inv.hom
-    (x ⊗ₜ[ℂ] rightAltRightUnit.hom (1 : ℂ)))) = x := by
+lemma contr_rightAltRightUnit (x : AltRightHandedModule) :
+    (TensorProduct.lid ℂ _ <|
+    altRightContraction.toLinearMap.rTensor _ <|
+    (TensorProduct.assoc ℂ _ _ _).symm <|
+    x ⊗ₜ[ℂ] (rightAltRightUnit (1 : ℂ))) = x := by
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (Basis.mem_span altRightBasis x)
   subst hc
-  rw [rightAltRightUnit_apply_one, rightAltRightUnitVal_expand_tmul]
-  simp only [Rep.tensor_V, Rep.tensorUnit_V, Rep.tensor_ρ, Rep.tensorUnit_ρ, Rep.hom_hom_leftUnitor,
-    Rep.hom_whiskerRight, Rep.hom_inv_associator, Fin.sum_univ_two, Fin.isValue, tmul_add, add_tmul,
-    smul_tmul, tmul_smul, ← Representation.IntertwiningMap.toLinearMap_apply,
-    Representation.TensorProduct.assoc_symm_toLinearMap, LinearMap.map_add, map_smul,
-    LinearEquiv.coe_coe, assoc_symm_tmul, Representation.IntertwiningMap.toLinearMap_rTensor,
-    LinearMap.rTensor_tmul, Representation.IntertwiningMap.coe_toLinearMap,
-    Representation.TensorProduct.toLinearMap_lid, lid_tmul]
-  repeat erw [altRightContraction_basis]
-  simp
+  simp [- Fintype.sum_sum_type, smul_tmul, altRightContraction_basis,
+    rightAltRightUnit_apply_one, rightAltRightUnitVal_expand_tmul, add_tmul, tmul_add]
+
 
 /-!
 
@@ -302,29 +271,29 @@ lemma contr_rightAltRightUnit (x : altRightHanded) :
 open CategoryTheory
 
 lemma altLeftLeftUnit_symm :
-    (altLeftLeftUnit.hom (1 : ℂ)) = (altLeftHanded ◁ 𝟙 _).hom
-    ((β_ leftHanded altLeftHanded).hom.hom (leftAltLeftUnit.hom (1 : ℂ))) := by
+    altLeftLeftUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
+    (TensorProduct.comm ℂ _ _ (leftAltLeftUnit (1 : ℂ))) := by
   rw [altLeftLeftUnit_apply_one, altLeftLeftUnitVal_expand_tmul]
   rw [leftAltLeftUnit_apply_one, leftAltLeftUnitVal_expand_tmul]
   rfl
 
 lemma leftAltLeftUnit_symm :
-    (leftAltLeftUnit.hom (1 : ℂ)) = (leftHanded ◁ 𝟙 _).hom ((β_ altLeftHanded leftHanded).hom.hom
-    (altLeftLeftUnit.hom (1 : ℂ))) := by
+    leftAltLeftUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
+      (TensorProduct.comm ℂ _ _ (altLeftLeftUnit (1 : ℂ))) := by
   rw [altLeftLeftUnit_apply_one, altLeftLeftUnitVal_expand_tmul]
   rw [leftAltLeftUnit_apply_one, leftAltLeftUnitVal_expand_tmul]
   rfl
 
 lemma altRightRightUnit_symm :
-    (altRightRightUnit.hom (1 : ℂ)) = (altRightHanded ◁ 𝟙 _).hom
-    ((β_ rightHanded altRightHanded).hom.hom (rightAltRightUnit.hom (1 : ℂ))) := by
+    altRightRightUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
+      (TensorProduct.comm ℂ _ _ (rightAltRightUnit (1 : ℂ))) := by
   rw [altRightRightUnit_apply_one, altRightRightUnitVal_expand_tmul]
   rw [rightAltRightUnit_apply_one, rightAltRightUnitVal_expand_tmul]
   rfl
 
 lemma rightAltRightUnit_symm :
-    (rightAltRightUnit.hom (1 : ℂ)) = (rightHanded ◁ 𝟙 _).hom
-    ((β_ altRightHanded rightHanded).hom.hom (altRightRightUnit.hom (1 : ℂ))) := by
+    rightAltRightUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
+      (TensorProduct.comm ℂ _ _ (altRightRightUnit (1 : ℂ))) := by
   rw [altRightRightUnit_apply_one, altRightRightUnitVal_expand_tmul]
   rw [rightAltRightUnit_apply_one, rightAltRightUnitVal_expand_tmul]
   rfl

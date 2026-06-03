@@ -27,7 +27,7 @@ namespace Lorentz
 set_option backward.isDefEq.respectTransparency false in
 /-- The bi-linear map corresponding to contraction of a contravariant Lorentz vector with a
   covariant Lorentz vector. -/
-def contrCoContrBi : complexContr →ₗ[ℂ] complexCo →ₗ[ℂ] ℂ where
+def contrCoContrBi : ContrℂModule →ₗ[ℂ] CoℂModule →ₗ[ℂ] ℂ where
   toFun ψ := {
     toFun := fun φ => ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ,
     map_add' := by
@@ -52,7 +52,7 @@ def contrCoContrBi : complexContr →ₗ[ℂ] complexCo →ₗ[ℂ] ℂ where
 set_option backward.isDefEq.respectTransparency false in
 /-- The bi-linear map corresponding to contraction of a covariant Lorentz vector with a
   contravariant Lorentz vector. -/
-def contrContrCoBi : complexCo →ₗ[ℂ] complexContr →ₗ[ℂ] ℂ where
+def contrContrCoBi : CoℂModule →ₗ[ℂ] ContrℂModule →ₗ[ℂ] ℂ where
   toFun φ := {
     toFun := fun ψ => φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ,
     map_add' := by
@@ -79,24 +79,24 @@ def contrContrCoBi : complexCo →ₗ[ℂ] complexContr →ₗ[ℂ] ℂ where
     covariant Lorentz vector in the
     standard basis (i.e. the dot product).
     In terms of index notation this is the contraction is ψⁱ φᵢ. -/
-def contrCoContraction : complexContr ⊗ complexCo ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) := Rep.ofHom
-  {
-    toLinearMap := TensorProduct.lift contrCoContrBi,
-    isIntertwining' M := TensorProduct.ext' fun ψ φ => by
-      change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) ⬝ᵥ
-        ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) =
-          ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ
-      rw [dotProduct_mulVec, vecMul_transpose, mulVec_mulVec]
-      rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
-      simp
-  }
+def contrCoContraction : (ContrℂModule.SL2CRep.tprod CoℂModule.SL2CRep).IntertwiningMap
+    (Representation.trivial ℂ SL(2,ℂ) ℂ) where
+  toLinearMap := TensorProduct.lift contrCoContrBi
+  isIntertwining' M := TensorProduct.ext' fun ψ φ => by
+    change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) ⬝ᵥ
+      ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) =
+        ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ
+    rw [dotProduct_mulVec, vecMul_transpose, mulVec_mulVec]
+    rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
+    simp
 
-lemma contrCoContraction_hom_tmul (ψ : complexContr) (φ : complexCo) :
-    contrCoContraction.hom (ψ ⊗ₜ φ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ := by
+
+lemma contrCoContraction_hom_tmul (ψ : ContrℂModule) (φ : CoℂModule) :
+    contrCoContraction (ψ ⊗ₜ φ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ := by
   rfl
 
 lemma contrCoContraction_basis (i j : Fin 4) :
-    contrCoContraction.hom (complexContrBasisFin4 i ⊗ₜ complexCoBasisFin4 j) =
+    contrCoContraction (complexContrBasisFin4 i ⊗ₜ complexCoBasisFin4 j) =
     if i.1 = j.1 then (1 : ℂ) else 0 := by
   rw [contrCoContraction_hom_tmul]
   simp only [complexContrBasisFin4, Basis.coe_reindex, Function.comp_apply,
@@ -107,7 +107,7 @@ lemma contrCoContraction_basis (i j : Fin 4) :
   simp only [EmbeddingLike.apply_eq_iff_eq, Fin.ext_iff, eq_comm]
 
 lemma contrCoContraction_basis' (i j : Fin 1 ⊕ Fin 3) :
-    contrCoContraction.hom (complexContrBasis i ⊗ₜ complexCoBasis j) =
+    contrCoContraction (complexContrBasis i ⊗ₜ complexCoBasis j) =
     if i = j then (1 : ℂ) else 0 := by
   rw [contrCoContraction_hom_tmul]
   simp only [complexContrBasis_toFin13ℂ, complexCoBasis_toFin13ℂ, dotProduct_single, mul_one]
@@ -120,23 +120,23 @@ lemma contrCoContraction_basis' (i j : Fin 1 ⊕ Fin 3) :
     contravariant Lorentz vector in the
     standard basis (i.e. the dot product).
     In terms of index notation this is the contraction is φᵢ ψⁱ. -/
-def coContrContraction : complexCo ⊗ complexContr ⟶ 𝟙_ (Rep ℂ SL(2,ℂ)) := Rep.ofHom
-  {
-  toLinearMap := TensorProduct.lift contrContrCoBi,
+def coContrContraction : (CoℂModule.SL2CRep.tprod ContrℂModule.SL2CRep).IntertwiningMap
+    (Representation.trivial ℂ SL(2,ℂ) ℂ) where
+  toLinearMap := TensorProduct.lift contrContrCoBi
   isIntertwining' M := TensorProduct.ext' fun φ ψ => by
     change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ φ.toFin13ℂ) ⬝ᵥ
       ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) *ᵥ ψ.toFin13ℂ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ
     rw [dotProduct_mulVec, mulVec_transpose, vecMul_vecMul]
     rw [inv_mul_of_invertible (LorentzGroup.toComplex (SL2C.toLorentzGroup M))]
     simp
-  }
 
-lemma coContrContraction_hom_tmul (φ : complexCo) (ψ : complexContr) :
-    coContrContraction.hom (φ ⊗ₜ ψ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ := by
+
+lemma coContrContraction_hom_tmul (φ : CoℂModule) (ψ : ContrℂModule) :
+    coContrContraction (φ ⊗ₜ ψ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ := by
   rfl
 
 lemma coContrContraction_basis (i j : Fin 4) :
-    coContrContraction.hom (complexCoBasisFin4 i ⊗ₜ complexContrBasisFin4 j) =
+    coContrContraction (complexCoBasisFin4 i ⊗ₜ complexContrBasisFin4 j) =
     if i.1 = j.1 then (1 : ℂ) else 0 := by
   rw [coContrContraction_hom_tmul]
   simp only [complexCoBasisFin4, Basis.coe_reindex, Function.comp_apply, complexCoBasis_toFin13ℂ,
@@ -146,7 +146,7 @@ lemma coContrContraction_basis (i j : Fin 4) :
   simp only [eq_comm, EmbeddingLike.apply_eq_iff_eq, Fin.ext_iff]
 
 lemma coContrContraction_basis' (i j : Fin 1 ⊕ Fin 3) :
-    coContrContraction.hom (complexCoBasis i ⊗ₜ complexContrBasis j) =
+    coContrContraction (complexCoBasis i ⊗ₜ complexContrBasis j) =
     if i = j then (1 : ℂ) else 0 := by
   rw [coContrContraction_hom_tmul]
   simp only [complexCoBasis_toFin13ℂ, complexContrBasis_toFin13ℂ, dotProduct_single, mul_one]
@@ -160,12 +160,12 @@ lemma coContrContraction_basis' (i j : Fin 1 ⊕ Fin 3) :
 
 -/
 
-lemma contrCoContraction_tmul_symm (φ : complexContr) (ψ : complexCo) :
-    contrCoContraction.hom (φ ⊗ₜ ψ) = coContrContraction.hom (ψ ⊗ₜ φ) := by
+lemma contrCoContraction_tmul_symm (φ : ContrℂModule) (ψ : CoℂModule) :
+    contrCoContraction (φ ⊗ₜ ψ) = coContrContraction (ψ ⊗ₜ φ) := by
   rw [contrCoContraction_hom_tmul, coContrContraction_hom_tmul, dotProduct_comm]
 
-lemma coContrContraction_tmul_symm (φ : complexCo) (ψ : complexContr) :
-    coContrContraction.hom (φ ⊗ₜ ψ) = contrCoContraction.hom (ψ ⊗ₜ φ) := by
+lemma coContrContraction_tmul_symm (φ : CoℂModule) (ψ : ContrℂModule) :
+    coContrContraction (φ ⊗ₜ ψ) = contrCoContraction (ψ ⊗ₜ φ) := by
   rw [contrCoContraction_tmul_symm]
 
 end Lorentz

@@ -15,13 +15,10 @@ public import Physlib.Relativity.Tensors.MetricTensor
 
 @[expose] public section
 
-open Module IndexNotation
-open CategoryTheory
-open MonoidalCategory
+open Module
 open Matrix
 open MatrixGroups
 open TensorProduct
-open IndexNotation
 
 noncomputable section
 
@@ -62,23 +59,27 @@ open TensorSpecies
 open Tensor
 
 lemma coMetric_eq_fromConstPair {d : ℕ} :
-    η' d = fromConstPair (Lorentz.preCoMetric d) := by
+    η' d = fromConstPair (S := realLorentzTensor d) (c1 := .down) (c2 := .down)
+      (Lorentz.preCoMetric d) := by
   rw [coMetric, metricTensor]
   rfl
 
 lemma contrMetric_eq_fromConstPair {d : ℕ} :
-    η d = fromConstPair (Lorentz.preContrMetric d) := by
+    η d = fromConstPair (S := realLorentzTensor d)
+      (c1 := .up) (c2 := .up)  (Lorentz.preContrMetric d) := by
   rw [contrMetric, metricTensor]
   rfl
 
 lemma coMetric_eq_fromPairT {d : ℕ} :
-    η' d = fromPairT (Lorentz.preCoMetricVal d) := by
+    η' d = fromPairT (S := realLorentzTensor d) (c1 := .down) (c2 := .down)
+      (Lorentz.preCoMetricVal d) := by
   rw [coMetric_eq_fromConstPair, fromConstPair]
   congr 1
   exact Lorentz.preCoMetric_apply_one
 
 lemma contrMetric_eq_fromPairT {d : ℕ} :
-    η d = fromPairT (Lorentz.preContrMetricVal d) := by
+    η d = fromPairT  (S := realLorentzTensor d) (c1 := .up) (c2 := .up)
+        (Lorentz.preContrMetricVal d) := by
   rw [contrMetric_eq_fromConstPair, fromConstPair]
   congr 1
   exact Lorentz.preContrMetric_apply_one

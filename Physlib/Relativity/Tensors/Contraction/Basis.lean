@@ -14,14 +14,15 @@ public import Physlib.Relativity.Tensors.Contraction.Basic
 
 @[expose] public section
 
-open IndexNotation CategoryTheory MonoidalCategory Module
+open Module
 
 namespace TensorSpecies
-open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G]
-  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-  {S : TensorSpecies k C G basisIdx}
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    {S : TensorSpecies k C G V basisIdx rep b}
 
 namespace Tensor
 
@@ -156,31 +157,35 @@ lemma Pure.dropPair_basisVector {n : ℕ} {c : Fin (n + 1 + 1) → C}
   funext l
   simp [dropPair, basisVector]
 
+attribute [-simp] LinearEquiv.cast_apply
 set_option backward.isDefEq.respectTransparency false in
 lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (h : i ≠ j ∧ S.τ (c i) = c j) (t : Tensor S c)
-    (b : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
-    (basis (c ∘ Fin.succSuccAbove i j)).repr (contrT n i j h t) b =
-    ∑ (b' : DropPairSection b), (basis c).repr t b'.1 *
-    S.castToField ((S.contr.app (Discrete.mk (c i))).hom
-    (S.basis (c i) (b'.1 i) ⊗ₜ[k] S.basis (S.τ (c i)) (basisIdxCongr (by rw [h.2]) (b'.1 j)))) := by
+    (φ : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
+    (basis (c ∘ Fin.succSuccAbove i j)).repr (contrT n i j h t) φ =
+    ∑ (b' : DropPairSection φ), (basis c).repr t b'.1 *
+     (S.contr (c i) (b (c i) (b'.1 i) ⊗ₜ[k] b (S.τ (c i))
+      (basisIdxCongr (by rw [h.2]) (b'.1 j)))) := by
   apply induction_on_basis _ _ _ _ t
   · intro b'
     conv_lhs =>
       rw [basis_apply, contrT_pure]
       simp [Pure.contrP, Pure.dropPair_basisVector]
-      change if b'.dropPair i j = b then _ else 0
+      change if b'.dropPair i j = φ then _ else 0
     split_ifs
     · rename_i h
       subst h
       rw [Finset.sum_eq_single ⟨b', by simp⟩]
-      · simp [Pure.contrPCoeff, castToField]
+      · simp [Pure.contrPCoeff]
         simp [Pure.basisVector]
-        rw [S.basis_congr (h.2 : S.τ (c i) = c j)]
-        simp
+        congr 2
+        generalize_proofs h1 h2
+        generalize b' j = bj
+        generalize c j = cj at *
+        subst h2
+        rfl
       · intro b'' _ hb
-        simp only [Basis.repr_self, Monoidal.tensorUnit_obj, Functor.comp_obj,
-          Discrete.functor_obj_eq_as, Function.comp_apply]
+        simp only [Basis.repr_self]
         apply mul_eq_zero_of_left
         rw [@MonoidAlgebra.single_apply]
         rw [if_neg]
@@ -216,13 +221,13 @@ lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (
 set_option backward.isDefEq.respectTransparency false in
 lemma contrT_basis_repr_apply_eq_sum_fin {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (h : i ≠ j ∧ S.τ (c i) = c j) (t : Tensor S c)
-    (b : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
-    (basis (c ∘ Fin.succSuccAbove i j)).repr (contrT n i j h t) b =
+    (φ  : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
+    (basis (c ∘ Fin.succSuccAbove i j)).repr (contrT n i j h t) φ =
     ∑ (x1 : basisIdx (c i)), ∑ (x2 : basisIdx (c j)),
-    (basis c).repr t (DropPairSection.ofFinEquiv h.1 b (x1, x2)).1 *
-    S.castToField ((S.contr.app (Discrete.mk (c i))).hom
-    (S.basis (c i) x1 ⊗ₜ[k] S.basis (S.τ (c i)) (basisIdxCongr (by rw [h.2]) x2))) := by
-  rw [contrT_basis_repr_apply h t b, ← (DropPairSection.ofFinEquiv h.1 b).sum_comp,
+    (basis c).repr t (DropPairSection.ofFinEquiv h.1 φ (x1, x2)).1 *
+    ((S.contr (c i))
+    (b (c i) x1 ⊗ₜ[k] b (S.τ (c i)) (basisIdxCongr (by rw [h.2]) x2))) := by
+  rw [contrT_basis_repr_apply h t φ, ← (DropPairSection.ofFinEquiv h.1 φ).sum_comp,
     Fintype.sum_prod_type]
   simp
 

@@ -51,7 +51,6 @@ Newton’s law → zero acceleration → constant velocity → constant energy.
 
 ## iv. References
 
-
 -/
 
 @[expose] public section

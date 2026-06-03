@@ -48,7 +48,6 @@ spacetime to contravariant Lorentz vectors.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 

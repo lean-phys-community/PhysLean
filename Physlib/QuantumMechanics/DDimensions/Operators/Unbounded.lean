@@ -55,6 +55,7 @@ these correspond to physical observables.
   - A.2. Finite sums
   - A.3. Restricted composition
   - A.4. Monoid
+  - A.5. Inequalities
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
   - B.2. Dense domain
@@ -257,6 +258,69 @@ lemma mul_def (f₁ f₂ : E →ₗ.[R] E) : f₁ * f₂ = f₁ ∘ᵣ f₂ := r
 @[simp]
 lemma one_domain : (1 : E →ₗ.[R] E).domain = ⊤ := rfl
 
+@[simp]
+lemma one_toFun : (1 : E →ₗ.[R] E).toFun = topEquiv.toLinearMap := rfl
+
+@[simp]
+lemma one_coe : (1 : E →ₗ.[R] E).toFun' = ⇑topEquiv.toLinearMap := rfl
+
+/-!
+### A.5. Inequalities
+-/
+
+section
+
+variable (f f₁ f₂ f₃ : E →ₗ.[R] F) {g g₁ g₂ : E →ₗ.[R] F}
+
+lemma sub_le_zero : f - f ≤ 0 := ⟨le_top, by simp [sub_apply]⟩
+
+lemma neg_add_le_zero : -f + f ≤ 0 := ⟨le_top, by simp [add_apply]⟩
+
+lemma le_iff_neg_le_neg : g₁ ≤ g₂ ↔ -g₁ ≤ -g₂ :=
+  ⟨fun ⟨h, h'⟩ ↦ ⟨h, fun _ _ h'' ↦ by simp [h' h'']⟩, fun ⟨h, _⟩ ↦ ⟨h, fun _ _ _ ↦ by aesop⟩⟩
+
+lemma le_neg_iff_neg_le : g₁ ≤ -g₂ ↔ -g₁ ≤ g₂ := by rw [le_iff_neg_le_neg, neg_neg]
+
+lemma add_sub_le_cancel : f₁ + (f₂ - f₁) ≤ f₂ :=
+  ⟨by simp [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
+
+lemma add_sub_le_cancel_left : f₁ + f₂ - f₁ ≤ f₂ := add_sub_assoc f₁ f₂ f₁ ▸ add_sub_le_cancel f₁ f₂
+
+lemma add_sub_le_cancel_right : f₁ + f₂ - f₂ ≤ f₁ := add_comm f₁ f₂ ▸ add_sub_le_cancel_left f₂ f₁
+
+lemma add_add_sub_le_cancel : f₁ + f₂ + (f₃ - f₂) ≤ f₁ + f₃ :=
+  ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
+
+lemma add_sub_sub_le_cancel : f₁ + f₂ - (f₁ - f₃) ≤ f₂ + f₃ :=
+  ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
+
+lemma sub_le_of_le_add (h : g ≤ g₁ + g₂) : g - g₂ ≤ g₁ := by
+  constructor
+  · exact (inf_le_of_left_le le_rfl).trans (le_inf_iff.mp <| add_domain g₁ g₂ ▸ h.1).1
+  · intro ⟨x, hx⟩ ⟨y, hy⟩ rfl
+    simp [sub_apply, @h.2 ⟨x, hx.1⟩ ⟨x, ⟨hy, hx.2⟩⟩ rfl, add_apply]
+
+lemma add_le_of_le_sub (h : g ≤ g₁ - g₂) : g + g₂ ≤ g₁ :=
+  sub_neg_eq_add g g₂ ▸ sub_le_of_le_add (sub_eq_add_neg g₁ g₂ ▸ h)
+
+lemma add_left_le_of_le (h : g₁ ≤ g₂) : f + g₁ ≤ f + g₂ := by
+  constructor
+  · simp only [add_domain, le_inf_iff, inf_le_left, true_and]
+    exact (inf_le_of_right_le le_rfl).trans h.1
+  · intro x y hxy
+    simp_rw [add_apply, @h.2 ⟨x, x.2.2⟩ ⟨y, y.2.2⟩ hxy, hxy]
+
+lemma add_right_le_of_le (h : g₁ ≤ g₂) : g₁ + f ≤ g₂ + f :=
+  add_comm f g₁ ▸ add_comm f g₂ ▸ add_left_le_of_le f h
+
+lemma sub_right_le_of_le (h : g₁ ≤ g₂) : g₁ - f ≤ g₂ - f :=
+  sub_eq_add_neg g₁ f ▸ sub_eq_add_neg g₂ f ▸ add_right_le_of_le (-f) h
+
+lemma sub_left_le_of_le (h : g₁ ≤ g₂) : f - g₁ ≤ f - g₂ :=
+  neg_sub g₁ f ▸ neg_sub g₂ f ▸ le_iff_neg_le_neg.mp (sub_right_le_of_le f h)
+
+end
+
 end General
 
 /-!
@@ -293,12 +357,18 @@ def HasDenseDomain (U : H →ₗ.[ℂ] H') : Prop := Dense (U.domain : Set H)
 
 lemma hasDenseDomain_def : U.HasDenseDomain ↔ Dense (U.domain : Set H) := Iff.rfl
 
+/-- A LinearPMap is bounded iff there exists a constant `c` such that `‖U x‖ ≤ c * ‖x‖`
+  for all `x : U.domain`. -/
+def IsBounded (U : H →ₗ.[ℂ] H') : Prop := ∃ c > 0, ∀ x : U.domain, ‖U x‖ ≤ c * ‖x‖
+
+lemma isBounded_def : U.IsBounded ↔ ∃ c > 0, ∀ x : U.domain, ‖U x‖ ≤ c * ‖x‖ := Iff.rfl
+
 /-- A LinearPMap is an unbounded operator iff it has dense domain and is closable. -/
 def IsUnbounded (U : H →ₗ.[ℂ] H') : Prop := U.HasDenseDomain ∧ U.IsClosable
 
 lemma isUnbounded_def : U.IsUnbounded ↔ U.HasDenseDomain ∧ U.IsClosable := Iff.rfl
 
-/-- A LinearPMap `U` is symmetric iff `⟪U x, y⟫_ℂ = ⟪x, U y⟫_ℂ` for all `x y : U.domain`. -/
+/-- A LinearPMap `T` is symmetric iff `⟪T x, y⟫_ℂ = ⟪x, T y⟫_ℂ` for all `x y : T.domain`. -/
 def IsSymmetric (T : H →ₗ.[ℂ] H) : Prop := T.IsFormalAdjoint T
 
 lemma isSymmetric_def : T.IsSymmetric ↔ T.IsFormalAdjoint T := Iff.rfl

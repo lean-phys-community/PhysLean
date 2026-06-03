@@ -40,7 +40,6 @@ electromagnetic action.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 

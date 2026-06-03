@@ -43,7 +43,6 @@ In this implementation we have set `μ₀ = 1`. It is a TODO to introduce this c
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff Physlib
 

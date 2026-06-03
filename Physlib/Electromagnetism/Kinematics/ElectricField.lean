@@ -42,7 +42,6 @@ In this module we define the electric field, and prove lemmas about it.
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 

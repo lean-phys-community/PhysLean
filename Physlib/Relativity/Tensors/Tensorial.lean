@@ -56,16 +56,14 @@ There are no known references for this material.
 
 @[expose] public section
 
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
-
 namespace TensorSpecies
-open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G]
-  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-  {S : TensorSpecies k C G basisIdx}
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    {S : TensorSpecies k C G V basisIdx rep b}
+attribute [-simp] LinearEquiv.cast_apply
 
 /-!
 
@@ -77,10 +75,14 @@ We first define the `Tensorial` class.
 
 /-- The tensorial class is used to define a tensor structure on a type `M` through a
   linear equivalence with a module `S.Tensor c` for `S` a tensor species. -/
-class Tensorial
-    {k : outParam Type} [CommRing k] {C G : outParam Type} [Group G]
+class Tensorial {n : outParam ℕ}
+
+    {k : outParam Type} [CommRing k] {C : outParam Type} {G : outParam Type} [Group G]
+    {V :outParam (C → Type)} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
     {basisIdx : outParam (C → Type)} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-    {n : outParam ℕ} (S : outParam (TensorSpecies k C G basisIdx))
+    {rep : outParam ((c : C) → Representation k G (V c))}
+    {b : outParam ((c : C) → Module.Basis (basisIdx c) k (V c))}
+    (S : outParam (TensorSpecies k C G V basisIdx rep b))
     (c :outParam (Fin n → C)) (M : Type)
     [AddCommMonoid M] [Module k M] where
   /-- The equivalence between `M` and `S.Tensor c` in a tensorial instance. -/
@@ -98,12 +100,12 @@ The module of tensors of a tensor species carries a canonical tensorial instance
 through the equivalence.
 
 -/
-noncomputable instance self {n : ℕ} (S : TensorSpecies k C G basisIdx) (c : Fin n → C) :
+noncomputable instance self {n : ℕ} (S : TensorSpecies k C G V basisIdx rep b) (c : Fin n → C) :
     Tensorial S c (S.Tensor c) where
   toTensor := LinearEquiv.refl k (S.Tensor c)
 
 @[simp]
-lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G basisIdx)
+lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G V basisIdx rep b)
     (c : Fin n → C) (t : S.Tensor c) :
     Tensorial.toTensor t = t := by
   rw [Tensorial.toTensor]
@@ -117,7 +119,7 @@ lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G basisIdx)
 
 /-- The number of indices of a elements `t : M` where `M` carries a tensorial instance. -/
 noncomputable def numIndices (t : M) [Tensorial S c M] : ℕ :=
-  TensorSpecies.numIndices (toTensor t)
+  TensorSpecies.numIndices (S := S) (toTensor t)
 
 /-!
 
@@ -173,7 +175,7 @@ noncomputable instance (priority := high) distribMulAction [Tensorial S c M] :
     DistribMulAction G M where
   smul_add g m m' := by
     apply toTensor.injective
-    simp [toTensor_smul, map_add, Tensor.actionT_add]
+    simp [toTensor_smul, map_add]
   smul_zero g := by
     apply toTensor.injective
     simp only [toTensor_smul, map_zero, Tensor.actionT_zero]
@@ -326,9 +328,12 @@ lemma prod_tensor_basis_eq_map_reindex {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Ty
 
 section Continuous
 
-variable {k : Type} [RCLike k] {C G : Type} [Group G]
+variable {k : Type} [RCLike k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
     {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-    (S : TensorSpecies k C G basisIdx) {c : Fin n → C} {M : Type} [AddCommGroup M] [Module k M]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    (S : TensorSpecies k C G V basisIdx rep b) {c : Fin n → C} {M : Type}
+    [AddCommGroup M] [Module k M]
     [TopologicalSpace M]
 
 /-!

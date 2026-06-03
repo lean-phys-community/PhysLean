@@ -48,7 +48,6 @@ Maxwell's equations with sources, i.e. Gauss's law and Ampère's law.
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 
