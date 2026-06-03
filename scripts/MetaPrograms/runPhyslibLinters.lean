@@ -17,6 +17,7 @@ open Lake
 /-- Run the Batteries linter on a given module and update the linter if `update` is `true`. -/
 unsafe def runLinterOnModule  (module : Name): IO Unit := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   -- If the linter is being run on a target that doesn't import `Batteries.Tactic.List`,
   -- the linters are ineffective. So we import it here.
   let lintModule := `Batteries.Tactic.Lint
