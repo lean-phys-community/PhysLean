@@ -324,6 +324,60 @@ lemma defectNumber_eq_of_same_connectedComponent [CompleteSpace H]
   rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₁)]
   rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₂)]
 
+/-!
+## C. Numerical range
+-/
+
+/-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1}`. -/
+def numericalRange (T : H →ₗ.[ℂ] H) : Set ℂ := (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x : T.domain | ‖x‖ = 1}
+
+lemma numericalRange_eq (T : H →ₗ.[ℂ] H) :
+    T.numericalRange = (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x | ‖x‖ = 1} := rfl
+
+lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : T.numericalRange.Nonempty := by
+  obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot hT
+  refine ⟨(‖x‖ ^ 2)⁻¹ * ⟪x, T ⟨x, hx⟩⟫_ℂ, ofReal ‖x‖⁻¹ • ⟨x, hx⟩, ?_, ?_⟩
+  · simp [norm_smul, inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx')]
+  · simp_rw [map_smul]
+    simp [inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
+
+/-- The Toeplitz-Hausdorff theorem. -/
+lemma numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRange := by
+  sorry
+
+/-- The regularity domain contains the exterior of the numerical range. -/
+lemma mem_regularityDomain_of_not_mem_numericalRange_closure
+    {T : H →ₗ.[ℂ] H} {z : ℂ} (h : z ∉ _root_.closure T.numericalRange) :
+    z ∈ T.regularityDomain := by
+  by_cases hT : T.domain = ⊥
+  · refine ⟨1, zero_lt_one, fun ⟨x, hx⟩ ↦ ?_⟩
+    rw [hT] at hx
+    simp_all
+  · use infDist z T.numericalRange
+    constructor
+    · exact (infDist_pos_iff_notMem_closure <| numericalRange_nonempty hT).mp h
+    · intro x
+      rcases eq_or_ne x 0 with rfl | hx
+      · simp
+      · let y : T.domain := ofReal ‖x‖⁻¹ • x
+        have hy : ‖y‖ = 1 := by
+          simp only [y, norm_smul, ofReal_inv, norm_inv, norm_real, norm_norm]
+          exact inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx)
+        have hy' : ‖x‖ ^ 2 * ⟪↑y, T y⟫_ℂ = ⟪↑x, T x⟫_ℂ := by
+          simp_rw [y, map_smul, SetLike.val_smul, inner_smul_left, inner_smul_right, conj_ofReal,
+            ← mul_assoc, pow_two, ← ofReal_mul]
+          field_simp
+          simp
+        apply (mul_le_mul_iff_left₀ <| norm_pos_iff.mpr hx).mp
+        rw [mul_assoc, ← pow_two, mul_comm _ ‖x‖]
+        calc
+          _ ≤ ‖z - ⟪↑y, T y⟫_ℂ‖ * ‖x‖ ^ 2 := mul_le_mul_of_nonneg_right
+            (dist_eq z _ ▸ infDist_le_dist_of_mem ⟨y, hy, rfl⟩) (pow_two_nonneg _)
+          _ = ‖⟪↑y, T y⟫_ℂ * ‖x‖ ^ 2 - z * ‖x‖ ^ 2‖ := by simp [norm_sub_rev, ← sub_mul]
+          _ = ‖⟪↑x, T x⟫_ℂ - z * ‖x‖ ^ 2‖ := by rw [mul_comm, hy']
+          _ = ‖⟪↑x, T x - z • x⟫_ℂ‖ := by simp [inner_sub_right, inner_smul_right]
+          _ ≤ ‖x‖ * ‖T x - z • x‖ := norm_inner_le_norm _ _
+
 end
 
 end LinearPMap
