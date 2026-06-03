@@ -34,8 +34,8 @@ Main results
     then the closure of `(T - z • 1).range` is `(T.closure - z • 1).range`.
 - `defectNumber_same_of_same_connectedComponent` : The defect number is constant on each connected
     component of the regularity domain.
-- `mem_regularityDomain_of_not_mem_numericalRange_closure` : The regularity domain contains the
-    exterior of the numerical range.
+- `compl_closure_numericalRange_le_regularityDomain` : The regularity domain contains the exterior
+    of the numerical range.
 - `numericalRange_convex` : The Toeplitz-Hausdorff theorem — the numerical range is a convex set.
 
 ## iii. Table of contents
@@ -375,16 +375,16 @@ lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
     simp_all [← hcz, ← hxz, sub_apply, inner_sub_right, inner_smul_right]
 
 /-- The regularity domain contains the exterior of the numerical range. -/
-lemma mem_regularityDomain_of_not_mem_numericalRange_closure
-    {T : H →ₗ.[ℂ] H} {z : ℂ} (h : z ∉ _root_.closure T.numericalRange) :
-    z ∈ T.regularityDomain := by
+lemma compl_closure_numericalRange_le_regularityDomain (T : H →ₗ.[ℂ] H) :
+    (_root_.closure T.numericalRange)ᶜ ≤ T.regularityDomain := by
+  intro z hz
   by_cases hT : T.domain = ⊥
   · refine ⟨1, zero_lt_one, fun ⟨x, hx⟩ ↦ ?_⟩
     rw [hT] at hx
     simp_all
   · use infDist z T.numericalRange
     constructor
-    · exact (infDist_pos_iff_notMem_closure <| numericalRange_nonempty hT).mp h
+    · exact (infDist_pos_iff_notMem_closure <| numericalRange_nonempty hT).mp hz
     · intro x
       rcases eq_or_ne x 0 with rfl | hx
       · simp
