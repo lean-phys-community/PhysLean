@@ -31,6 +31,7 @@ Main results
 ## iii. Table of contents
 
 - A. Regularity domain
+- B. Deficiency subspace & defect number
 
 ## iv. References
 
@@ -183,6 +184,33 @@ lemma sub_range_isClosed [CompleteSpace H]
     _root_.IsClosed ((T - z • 1).toFun.range : Set H) := by
   have hT' : T.closure = T := hT.isClosable.isClosed_iff.mp hT
   exact (hT' ▸ closure_range_sub_eq_range_closure_sub hT.isClosable hz) ▸ isClosed_closure
+
+/-!
+## B. Deficiency subspace & defect number
+-/
+
+/-- The closed submodule `(T - z • 1).rangeᗮ`. -/
+def deficiencySubspace (T : H →ₗ.[ℂ] H) (z : ℂ) : ClosedSubmodule ℂ H :=
+  ⟨(T - z • 1).toFun.rangeᗮ, isClosed_orthogonal _⟩
+
+@[simp]
+lemma deficiencySubspace_coe (T : H →ₗ.[ℂ] H) (z : ℂ) :
+    T.deficiencySubspace z = (T - z • 1).toFun.rangeᗮ := rfl
+
+/-- The rank of `T.deficiencySubspace z = (T - z • 1).rangeᗮ`. -/
+def defectNumber (T : H →ₗ.[ℂ] H) (z : ℂ) : Cardinal := Module.rank ℂ (T.deficiencySubspace z)
+
+lemma defectNumber_eq (T : H →ₗ.[ℂ] H) (z : ℂ) :
+    T.defectNumber z = Module.rank ℂ (T.deficiencySubspace z) := rfl
+
+/-- `T` and `T.closure` have the same defect number at points in their regularity domain. -/
+lemma defectNumber_closure [CompleteSpace H]
+    {T : H →ₗ.[ℂ] H} {z : ℂ} (hz : z ∈ T.regularityDomain) :
+    T.closure.defectNumber z = T.defectNumber z := by
+  by_cases hT : T.IsClosable
+  · refine congrArg (fun p : Submodule ℂ H ↦ Module.rank ℂ p) ?_
+    simp [← closure_range_sub_eq_range_closure_sub hT hz]
+  · rw [closure_def' hT]
 
 end
 
