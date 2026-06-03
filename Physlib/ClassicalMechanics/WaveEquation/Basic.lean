@@ -186,7 +186,7 @@ lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
   rw [fderiv_sub_const]
   rw [fderiv_inner_apply]
   simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
-    fderiv_id', ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add, mul_eq_mul_left_iff]
+    fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add, mul_eq_mul_left_iff]
   left
   simp [planeWave_eq]
   repeat fun_prop
@@ -315,7 +315,7 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
     simp only [fderiv_fun_const, Pi.ofNat_apply, sub_zero, ContinuousLinearMap.coe_comp',
       Function.comp_apply]
     rw [fderiv_inner_apply]
-    simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
+    simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
     trans (fderiv ℝ (fun x' => (f₀' x') (s.unit u • 1)) (inner ℝ x s.unit - c * t)) (s.unit u • 1)
     simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
       basis_inner, zero_add, fderiv_eq_smul_deriv, smul_eq_mul, mul_one]
@@ -426,7 +426,7 @@ lemma wave_fderiv_inner_eq_inner_fderiv_proj {f₀ : ℝ → EuclideanSpace ℝ 
   rw [fderiv_comp, fderiv_fun_sub]
   simp only [fderiv_fun_const, Pi.zero_apply, sub_zero, ContinuousLinearMap.coe_comp',
     Function.comp_apply, differentiableAt_fun_id, differentiableAt_const, fderiv_inner_apply,
-    ContinuousLinearMap.zero_apply, inner_zero_right, fderiv_id', ContinuousLinearMap.coe_id',
+    ContinuousLinearMap.zero_apply, inner_zero_right, fderiv_fun_id, ContinuousLinearMap.coe_id',
     id_eq, zero_add]
   simp only [fderiv_eq_smul_deriv, PiLp.smul_apply, smul_eq_mul, basis_inner]
   rw [← mul_one (s.unit i), ← smul_eq_mul (s.unit i)]

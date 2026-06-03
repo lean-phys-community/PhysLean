@@ -185,7 +185,7 @@ lemma toComplex_repr {n} {c : Fin n → realLorentzTensor.Color}
   rw [toComplex_eq_sum_basis]
   -- `repr` commutes with finite sums of tensors; then push the Finsupp evaluation into the sum
   rw [map_sum]
-  simp only [Finsupp.coe_finset_sum, Finset.sum_apply]
+  simp only [Finsupp.coe_finsetSum, Finset.sum_apply]
   -- The sum has only one non-zero term (when k = i.complexify)
   rw [Fintype.sum_eq_single i.complexify]
   · -- Case k = i.complexify: show the term equals ↑(repr v i)
@@ -385,7 +385,7 @@ lemma toComplexPure_component {c : Fin n → Color} (p : Pure realLorentzTensor 
         Lorentz.complexContrBasisFin4 (finSumFinEquiv x))))
      (finSumFinEquiv φx)
     · simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finset_sum, Pi.add_apply,
+      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finsetSum, Pi.add_apply,
       Finset.sum_apply]
       rfl
     simp [- Fintype.sum_sum_type, Lorentz.complexContrBasisFin4 ]
@@ -399,7 +399,7 @@ lemma toComplexPure_component {c : Fin n → Color} (p : Pure realLorentzTensor 
       Lorentz.complexCoBasisFin4 (finSumFinEquiv x))))
      (finSumFinEquiv φx)
     · simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finset_sum, Pi.add_apply,
+      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finsetSum, Pi.add_apply,
       Finset.sum_apply]
       rfl
     simp [- Fintype.sum_sum_type, Lorentz.complexCoBasisFin4 ]

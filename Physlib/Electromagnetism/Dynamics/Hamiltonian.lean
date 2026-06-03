@@ -155,14 +155,14 @@ lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
     rw [fderiv_mul_const (by fun_prop)]
     rw [fderiv_const_mul (by fun_prop)]
     rw [fderiv_const_mul (by fun_prop)]
-    rw [fderiv_pow _ (by fun_prop)]
+    rw [fderiv_fun_pow _ (by fun_prop)]
     simp
   conv_lhs =>
     enter [1, 1, 2, 2, 2, i]
     rw [fderiv_mul_const (by fun_prop)]
     rw [fderiv_const_mul (by fun_prop)]
     simp
-  rw [fderiv_pow _ (by fun_prop)]
+  rw [fderiv_fun_pow _ (by fun_prop)]
   simp [Lorentz.Vector.coordCLM]
   rw [← Finset.sum_sub_distrib]
   rw [Finset.mul_sum]

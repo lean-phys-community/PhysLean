@@ -167,7 +167,7 @@ lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
       rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
         Finset.mul_sum]
       ring_nf
-    · apply MeasureTheory.integrable_finset_sum
+    · apply MeasureTheory.integrable_finsetSum
       intro i _
       apply Integrable.const_mul
       specialize h2 (p i) (p_bound i) (g i) η
@@ -307,7 +307,7 @@ lemma integrable_time_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
       rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
         Finset.mul_sum]
       ring_nf
-    · apply MeasureTheory.integrable_finset_sum
+    · apply MeasureTheory.integrable_finsetSum
       intro i _
       apply Integrable.const_mul
       specialize h2 (p i) (p_bound i) (g i) η
@@ -430,7 +430,7 @@ lemma integrable_mul_inv_pow {d : ℕ}
       rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
         Finset.mul_sum]
       ring_nf
-    · apply MeasureTheory.integrable_finset_sum
+    · apply MeasureTheory.integrable_finsetSum
       intro i _
       apply Integrable.const_mul
       apply (hr (p i) (p_bound i) (g i) (pMax_max i)).mono

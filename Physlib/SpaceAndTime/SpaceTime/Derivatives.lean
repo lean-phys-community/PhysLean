@@ -233,7 +233,7 @@ lemma deriv_sum_inr {d : ℕ} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ
   change _ = (toTimeAndSpace c).symm ((fderiv ℝ ((toTimeAndSpace c x).1, ·) (toTimeAndSpace c x).2)
     (Space.basis i))
   rw [DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id', ContinuousLinearMap.prod_apply,
+  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.prod_apply,
     ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id', id_eq]
   trans (toTimeAndSpace c).symm (0, Space.basis i)
   · rw [← toTimeAndSpace_basis_inr (c := c)]
@@ -264,7 +264,7 @@ lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
   simp only [Fin.isValue, Prod.mk.eta, toTimeAndSpace_symm_fderiv, ContinuousLinearMap.coe_comp',
     ContinuousLinearEquiv.coe_coe, Function.comp_apply]
   rw [DifferentiableAt.fderiv_prodMk]
-  simp only [Fin.isValue, fderiv_id', fderiv_fun_const, Pi.zero_apply,
+  simp only [Fin.isValue, fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
     ContinuousLinearMap.prod_apply, ContinuousLinearMap.coe_id', id_eq,
     ContinuousLinearMap.zero_apply]
   rw [← map_smul]
@@ -470,7 +470,7 @@ lemma tensorDeriv_toTensor_basis_repr
   · intro b' _ hb
     simp only [ite_eq_right_iff]
     intro hx
-    grind
+    exact absurd (CoVector.indexEquiv.symm_apply_eq.mp hx) hb
   · simp
 
 /-- The expansion of `tensorDeriv` in terms of the tensor basis vector. -/
@@ -502,7 +502,7 @@ def distTensorDeriv {M d} [NormedAddCommGroup M]
     map_smul' a ε := by
       simp [← Finset.smul_sum, tmul_smul]
     cont := by
-      refine continuous_finset_sum Finset.univ (fun μ _ => ?_)
+      refine continuous_finsetSum Finset.univ (fun μ _ => ?_)
       refine Continuous.comp' ?_ ?_
       · change Continuous (fun y => (Lorentz.CoVector.basis μ) ⊗ₜ y)
         obtain ⟨w,b,hb1⟩ := exists_orthonormalBasis ℝ M
@@ -573,7 +573,7 @@ lemma distTensorDeriv_toTensor_basis_repr {M : Type} [NormedAddCommGroup M]
   · intro b' _ hb
     simp only [ite_eq_right_iff]
     intro hx
-    grind
+    exact absurd (CoVector.indexEquiv.symm_apply_eq.mp hx) hb
   · simp
 
 end SpaceTime

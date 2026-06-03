@@ -417,7 +417,7 @@ lemma massTerm_zero_of_quarticTerm_zero_stabilityCounterExample (H : TwoHiggsDou
   rw [quarticTerm_stabilityCounterExample_eq_norm_pow_four] at h
   rw [massTerm_stabilityCounterExample]
   simp at h
-  have h1 : H.Φ1 = H.Φ2 := by grind
+  have h1 : H.Φ1 = H.Φ2 := by rw [← sub_eq_zero, h]
   simp [← Complex.ofReal_pow, h1]
 
 /-!

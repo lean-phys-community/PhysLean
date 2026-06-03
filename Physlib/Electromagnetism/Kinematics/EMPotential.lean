@@ -604,7 +604,8 @@ lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentia
         ← Lorentz.Vector.toTensor_symm_basis, ← Lorentz.CoVector.toTensor_symm_basis, e]
       simp
     simp [Pure.basisVector, h1, Finsupp.single_apply]
-    grind [show e b = (b 0,  b 1) from rfl]
+    by_cases hμ : b 0 = μ <;> by_cases hν : b 1 = ν <;>
+    simp_all [Equiv.eq_symm_apply, show e b = (b 0, b 1) from rfl]
   · simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
   · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
   · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]

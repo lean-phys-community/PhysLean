@@ -160,6 +160,7 @@ lemma lorentzGroup_smul_dist_apply (Λ : LorentzGroup d) (f : (SpaceTime d) →d
 
 -/
 
+set_option synthInstance.maxHeartbeats 40000
 instance : DistribMulAction (LorentzGroup d) ((SpaceTime d) →d[ℝ] M) where
   one_smul f := by
     ext η

@@ -363,7 +363,7 @@ private lemma fderiv_homotopyOperatorIntegrand_apply_eq {f : Space → Euclidean
     change (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun x => t • x) x) y = _
     rw [fderiv_comp _ (by fun_prop) (by fun_prop),
       fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
-    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_id', fderiv_fun_const,
+    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_id, fderiv_fun_const,
       Pi.zero_apply, ContinuousLinearMap.zero_smulRight, add_zero, ContinuousLinearMap.coe_comp',
       ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_id', Pi.smul_apply, id_eq, map_smul,
       PiLp.proj_apply, smul_eq_mul]
@@ -491,7 +491,7 @@ lemma eq_neg_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
     rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_comp _ (by fun_prop) (by fun_prop),
       fderiv_fun_smul (by fun_prop) (by fun_prop)]
     simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_const, Pi.zero_apply,
-      fderiv_id', ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
+      fderiv_fun_id, ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
       ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.zero_apply, smul_zero,
       ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.coe_id', id_eq, one_smul, zero_add,
       PiLp.proj_apply]
@@ -548,7 +548,7 @@ lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
     rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_comp _ (by fun_prop) (by fun_prop),
       fderiv_fun_smul (by fun_prop) (by fun_prop)]
     simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_const, Pi.zero_apply,
-      fderiv_id', ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
+      fderiv_fun_id, ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
       ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.zero_apply, smul_zero,
       ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.coe_id', id_eq, one_smul, zero_add,
       PiLp.proj_apply]

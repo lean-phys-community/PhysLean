@@ -443,7 +443,7 @@ lemma integrable_isDistBounded_inner_grad_schwartzMap {dm1 : ℕ}
   conv =>
     enter [1, x]
     rw [grad_eq_sum, inner_sum]
-  apply MeasureTheory.integrable_finset_sum
+  apply MeasureTheory.integrable_finsetSum
   intro i _
   simp [inner_smul_right]
   have integrable_lemma (i j : Fin (dm1 + 1)) :

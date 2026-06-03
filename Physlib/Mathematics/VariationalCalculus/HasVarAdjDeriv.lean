@@ -259,7 +259,7 @@ lemma congr {F G : (X → U) → (Y → V)} {F' } {u : X → U}
             one_smul]
           rw [← fderiv_apply_one_eq_deriv]
           rw [DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
-        simp only [fderiv_id', fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
+        simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
           ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
         fun_prop
   adjoint := by
