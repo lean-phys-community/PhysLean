@@ -22,16 +22,27 @@ Definitions
 - `LinearPMap.regularityDomain` : The set of regular points for a partial linear map `T`.
     A complex number `z` is a regular point for `T` if there exists `c > 0` such that
     `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`.
+- `LinearPMap.deficiencySubspace` : For an operator `T` and complex number `z`, the submodule
+    orthogonal to the range of `T - z • 1`.
+- `LinearPMap.defectNumber` : The rank of the deficiency subspace.
+- `LinearPMap.numericalRange` : For an operator `T`, the set of complex numbers `⟪x, T x⟫_ℂ`
+    with `x ∈ T.domain` and `‖x‖ = 1`.
 
 Main results
 - `regularityDomain_isOpen` : The regularity domain is an open subset of `ℂ`.
 - `closure_range_sub_eq_range_closure_sub` : If `z` is a regular point for a closable operator `T`
     then the closure of `(T - z • 1).range` is `(T.closure - z • 1).range`.
+- `defectNumber_same_of_same_connectedComponent` : The defect number is constant on each connected
+    component of the regularity domain.
+- `numericalRange_convex` : The Toeplitz-Hausdorff theorem — the numerical range is a convex set.
+- `mem_regularityDomain_of_not_mem_numericalRange_closure` : The regularity domain contains the
+    exterior of the numerical range.
 
 ## iii. Table of contents
 
 - A. Regularity domain
 - B. Deficiency subspace & defect number
+- C. Numerical range
 
 ## iv. References
 
@@ -268,7 +279,7 @@ lemma defectNumber_eq_of_mem_ball [CompleteSpace H]
     exact hz₁ ⟨c, lt_of_le_of_lt dist_nonneg h_ball, h⟩
 
 /-- `T.defectNumber` is constant on each connected component of `T.regularityDomain`. -/
-lemma defectNumber_eq_of_same_connectedComponent [CompleteSpace H]
+lemma defectNumber_same_of_same_connectedComponent [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable)
     {z₁ z₂ : T.regularityDomain} (h : connectedComponent z₁ = connectedComponent z₂) :
     T.defectNumber z₁ = T.defectNumber z₂ := by
