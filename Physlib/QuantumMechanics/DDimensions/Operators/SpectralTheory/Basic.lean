@@ -213,8 +213,7 @@ lemma defectNumber_closure [CompleteSpace H]
     simp [← closure_range_sub_eq_range_closure_sub hT hz]
   · rw [closure_def' hT]
 
-lemma inf_ne_bot_of_rank_lt [CompleteSpace H]
-    {E F : Submodule ℂ H} [E.HasOrthogonalProjection] [F.HasOrthogonalProjection]
+lemma inf_ne_bot_of_rank_lt [CompleteSpace H] {E F : Submodule ℂ H} [E.HasOrthogonalProjection]
     (hlt : Module.rank ℂ E < Module.rank ℂ F) :
     Eᗮ ⊓ F ≠ ⊥ := by
   let Φ : F →L[ℂ] E := E.orthogonalProjection ∘L F.subtypeL
@@ -328,6 +327,11 @@ lemma defectNumber_eq_of_same_connectedComponent [CompleteSpace H]
 ## C. Numerical range
 -/
 
+section
+
+open Set
+open Pointwise
+
 /-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1}`. -/
 def numericalRange (T : H →ₗ.[ℂ] H) : Set ℂ := (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x : T.domain | ‖x‖ = 1}
 
@@ -340,6 +344,36 @@ lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : T
   · simp [norm_smul, inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx')]
   · simp_rw [map_smul]
     simp [inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
+
+lemma numericalRange_smul (T : H →ₗ.[ℂ] H) (c : ℂ) :
+    (c • T).numericalRange = c • T.numericalRange := by
+  ext
+  simp [numericalRange_eq, inner_smul_right, mem_smul_set]
+
+lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
+    (T - c • 1).numericalRange = T.numericalRange - {c} := by
+  ext z
+  constructor
+  · intro ⟨x, hx, hxz⟩
+    refine ⟨z + c, ⟨⟨x, x.2.1⟩, hx, ?_⟩, by simp⟩
+    simp_all [← hxz, sub_apply, inner_sub_right, inner_smul_right]
+  · intro ⟨z', ⟨x, hx, hxz⟩, hcz⟩
+    simp only [mem_singleton_iff, exists_eq_left] at hcz
+    refine ⟨⟨x, by simp [sub_domain]⟩, hx, ?_⟩
+    simp_all [← hcz, ← hxz, sub_apply, inner_sub_right, inner_smul_right]
+
+private lemma exists_phase_add_im_eq_zero (z₁ z₂ : ℂ) :
+    ∃ θ : ℝ, (exp (I * θ) * z₁ + exp (-I * θ) * z₂).im = 0 := by
+  let g : ℝ → ℝ := fun θ ↦ (exp (I * θ) * z₁ + exp (-I * θ) * z₂).im
+  suffices ∃ θ ∈ Icc 0 Real.pi, g θ = 0 by exact ⟨this.choose, this.choose_spec.2⟩
+  have hg : g Real.pi = -g 0 := by simp [g, mul_comm I, exp_neg, add_comm]
+  have hg' : Continuous g := by fun_prop
+  rcases le_or_gt (g 0) 0 with hle | hlt
+  · have hIVT := hg ▸ intermediate_value_Icc Real.pi_nonneg hg'.continuousOn
+    exact (mem_image _ _ _).mp (hIVT ⟨by linarith, by linarith⟩)
+  · simp_rw [← neg_eq_zero (a := g _)]
+    have hIVT := neg_neg (g 0) ▸ hg ▸ intermediate_value_Icc Real.pi_nonneg hg'.neg.continuousOn
+    exact (mem_image _ _ _).mp (hIVT ⟨by linarith, by linarith⟩)
 
 /-- The Toeplitz-Hausdorff theorem. -/
 lemma numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRange := by
@@ -377,6 +411,8 @@ lemma mem_regularityDomain_of_not_mem_numericalRange_closure
           _ = ‖⟪↑x, T x⟫_ℂ - z * ‖x‖ ^ 2‖ := by rw [mul_comm, hy']
           _ = ‖⟪↑x, T x - z • x⟫_ℂ‖ := by simp [inner_sub_right, inner_smul_right]
           _ ≤ ‖x‖ * ‖T x - z • x‖ := norm_inner_le_norm _ _
+
+end
 
 end
 
