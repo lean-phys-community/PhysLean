@@ -49,6 +49,7 @@ noncomputable section
 
 open Submodule
 open Metric
+open InnerProductSpace
 open Complex
 
 /-!
@@ -224,6 +225,104 @@ lemma inf_ne_bot_of_rank_lt [CompleteSpace H]
   have hF : y ∈ F := sub_mem (coe_mem x₁) (coe_mem x₂)
   have hE : y ∈ Eᗮ := orthogonalProjection_eq_zero_iff.mp (_root_.map_sub Φ _ _ ▸ sub_eq_zero.mpr h)
   exact fun hEF ↦ hy ((mem_bot ℂ).mp <| hEF ▸ ⟨hE, hF⟩)
+
+lemma exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosed)
+    {z₁ z₂ : ℂ} (hz₁ : z₁ ∈ T.regularityDomain) (h : T.defectNumber z₁ < T.defectNumber z₂) :
+    ∃ x : T.domain, x ≠ 0 ∧ ⟪T x - z₁ • x, T x - z₂ • x⟫_ℂ = 0 := by
+  obtain ⟨y, h_inf, hy⟩ := (Submodule.ne_bot_iff _).mp (inf_ne_bot_of_rank_lt h)
+  obtain ⟨hy₁, hy₂⟩ := mem_inf.mp h_inf
+  haveI := sub_range_isClosed hT hz₁ -- needed for `orthogonal_orthogonal`
+  simp only [deficiencySubspace_coe, orthogonal_orthogonal] at hy₁ hy₂
+  obtain ⟨⟨x, hx⟩, hxy⟩ := hy₁
+  refine ⟨⟨x, hx.1⟩, fun h ↦ hy ?_, ?_⟩
+  · simp [← hxy, coe_eq_zero.mp, (mk_eq_zero _ _).mp h]
+  · apply (mem_orthogonal' _ _).mp at hy₂
+    simp [← hy₂ ((T - z₂ • 1) ⟨x, hx.1, by simp⟩) (by simp), sub_apply, ← hxy]
+
+lemma defectNumber_eq_of_mem_ball [CompleteSpace H]
+    {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z₁ z₂ : ℂ}
+    {c : ℝ} (h : IsLowerBound T z₁ c) (h_ball : z₂ ∈ ball z₁ c) :
+    T.defectNumber z₁ = T.defectNumber z₂ := by
+  by_cases hz₁ : z₁ ∈ T.regularityDomain
+  · have hz₂ : z₂ ∈ T.regularityDomain := ball_subset_regularityDomain h h_ball
+    rw [← defectNumber_closure hz₁, ← defectNumber_closure hz₂]
+    rw [← regularityDomain_closure] at hz₁ hz₂
+    by_contra! hne
+    let Tcl : H →ₗ.[ℂ] H := T.closure
+    obtain ⟨x, hx, h'⟩ : ∃ x : Tcl.domain, x ≠ 0 ∧ ⟪Tcl x - z₂ • x, Tcl x - z₁ • x⟫_ℂ = 0 := by
+      rcases lt_or_gt_of_ne hne with hle | hle
+      · simp_rw [inner_eq_zero_symm]
+        exact exists_inner_eq_zero_of_defectNumber_lt hT.closure_isClosed hz₁ hle
+      · exact exists_inner_eq_zero_of_defectNumber_lt hT.closure_isClosed hz₂ hle
+    refine not_le (a := ‖z₁ - z₂‖ * ‖x‖).mpr ?_ le_rfl
+    refine lt_of_lt_of_le (b := ‖Tcl x - z₁ • x‖) ?_ ?_
+    · refine lt_of_lt_of_le ?_ (isLowerBound_closure h x)
+      exact (mul_lt_mul_iff_left₀ <| norm_pos_iff.mpr hx).mpr (mem_ball_iff_norm'.mp h_ball)
+    · rcases eq_or_ne (Tcl x - z₁ • x) 0 with heq | hne
+      · exact heq ▸ norm_zero (E := H) ▸ mul_nonneg (norm_nonneg _) (norm_nonneg x)
+      · apply (mul_le_mul_iff_left₀ (norm_pos_iff.mpr hne)).mp
+        trans ‖⟪Tcl x - z₂ • x - (z₁ - z₂) • x, Tcl x - z₁ • x⟫_ℂ‖
+        · simp [sub_smul, pow_two]
+        rw [inner_sub_left, h', zero_sub, inner_smul_left, norm_neg, norm_mul, norm_conj, mul_assoc]
+        exact mul_le_mul_of_nonneg_left (norm_inner_le_norm _ _) (norm_nonneg _)
+  · false_or_by_contra -- `z₁ ∉ T.regularityDomain` ⇒ `c ≤ 0` ⇒ `z₂ ∈ ∅`
+    exact hz₁ ⟨c, lt_of_le_of_lt dist_nonneg h_ball, h⟩
+
+/-- `T.defectNumber` is constant on each connected component of `T.regularityDomain`. -/
+lemma defectNumber_eq_of_same_connectedComponent [CompleteSpace H]
+    {T : H →ₗ.[ℂ] H} (hT : T.IsClosable)
+    {z₁ z₂ : T.regularityDomain} (h : connectedComponent z₁ = connectedComponent z₂) :
+    T.defectNumber z₁ = T.defectNumber z₂ := by
+  have h_joined : Joined z₁ z₂ := by
+    haveI := T.regularityDomain_isOpen.locPathConnectedSpace
+    rw [← mem_pathComponent_iff, pathComponent_symm, pathComponent_eq_connectedComponent, ← h]
+    exact mem_connectedComponent
+  let path : Path z₁ z₂ := h_joined.somePath
+  by_contra! hne
+  let a : unitInterval := sSup {r | ∀ r' ≤ r, T.defectNumber (path r') = T.defectNumber z₁}
+  have ha : ∀ r < a, T.defectNumber (path r) = T.defectNumber z₁ := by
+    intro r hr
+    obtain ⟨b, hb, hrb⟩ := lt_sSup_iff.mp hr
+    exact hb r hrb.le
+  let c : ℝ := (path a).prop.choose
+  have hc_pos : 0 < c := (path a).prop.choose_spec.1
+  have hc_bound : IsLowerBound T (path a) c := (path a).prop.choose_spec.2
+  obtain ⟨ε, hε, hε_ball⟩ : ∃ ε > 0, ball a ε ⊆ path ⁻¹' ball (path a) c := by
+    apply Metric.mem_nhds_iff.mp
+    refine (IsOpen.mem_nhds_iff ?_).mpr ?_
+    · exact path.continuous.isOpen_preimage _ isOpen_ball
+    · simp [hc_pos]
+  obtain ⟨b₁, h₁, h₁'⟩ : ∃ b ∈ ball a ε, T.defectNumber (path b) = T.defectNumber z₁ := by
+    rcases le_or_gt ε a with hle | hlt
+    · let r : ℝ := a - ε / 2
+      have hr : 0 ≤ r := by dsimp [r]; linarith
+      have hr' : r < a := sub_lt_self _ (half_pos hε)
+      use ⟨r, hr, by linarith [a.2.2]⟩
+      exact ⟨by simp [dist, r, abs_div, abs_of_nonneg hε.le, hε], ha _ hr'⟩
+    · exact ⟨0, by simp [dist, abs_of_nonneg a.2.1, hlt], by rw [path.source]⟩
+  obtain ⟨b₂, h₂, h₂'⟩ : ∃ b ∈ ball a ε, T.defectNumber (path b) ≠ T.defectNumber z₁ := by
+    by_cases! h₀ : a < 1
+    · by_contra! h'
+      let r : unitInterval :=
+        ⟨min (a + ε / 2) 1, le_inf_iff.mpr ⟨by linarith [a.2.1], zero_le_one⟩, inf_le_right⟩
+      refine not_le_of_gt (a := a) (b := r) ?_ ?_
+      · apply (Set.inclusion_lt_inclusion <| Set.subset_univ _).mp
+        simp [r, hε, h₀]
+      · refine le_sSup_iff.mpr fun _ hub ↦ hub fun b hbr ↦ ?_
+        rcases lt_or_ge b a with hlt | hle
+        · exact ha b hlt
+        · refine h' b ?_
+          apply mem_ball.mpr
+          calc
+            _ = (b : ℝ) - a := by simp [dist, hle]
+            _ ≤ r - a := by simp [hbr]
+            _ = min (ε / 2) (1 - a) := by simp [r, ← min_sub_sub_right]
+            _ < ε := by simp [hε]
+    · have : a = 1 := eq_of_le_of_ge a.2.2 h₀
+      refine ⟨a, mem_ball_self hε, by rw [this, path.target]; exact hne.symm⟩
+  apply h₁' ▸ h₂'
+  rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₁)]
+  rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₂)]
 
 end
 
