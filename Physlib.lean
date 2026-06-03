@@ -67,6 +67,10 @@ public import Physlib.FluidDynamics.NavierStokes.Momentum
 public import Physlib.Mathematics.Calculus.AdjFDeriv
 public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.Mathematics.Calculus.ParametricIntegration
+public import Physlib.Mathematics.Calculus.Wirtinger.Basic
+public import Physlib.Mathematics.Calculus.Wirtinger.Coordinate
+public import Physlib.Mathematics.Calculus.Wirtinger.Multivariable
+public import Physlib.Mathematics.Calculus.Wirtinger.UpperHalfPlane
 public import Physlib.Mathematics.DataStructures.FourTree.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
