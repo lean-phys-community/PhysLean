@@ -164,6 +164,7 @@ public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.ToSols
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Permutations
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Y3
+public import Physlib.Particles.SuperSymmetry.N1.Basic
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.AllowsTerm
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
@@ -368,7 +369,6 @@ public import Physlib.Relativity.Tensors.RealTensor.Velocity.Basic
 public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 public import Physlib.Relativity.Tensors.Tensorial
 public import Physlib.Relativity.Tensors.UnitTensor
-public import Physlib.SUSY.N1.Basic
 public import Physlib.SpaceAndTime.Space.Basic
 public import Physlib.SpaceAndTime.Space.ConstantSliceDist
 public import Physlib.SpaceAndTime.Space.CrossProduct

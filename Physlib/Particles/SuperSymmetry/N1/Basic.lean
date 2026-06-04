@@ -37,7 +37,7 @@ This file carries only the index/configuration data; the chiral and anti-chiral
 derivatives `∂_I` / `∂_J̄` (the `Model` methods `M.dChiralScalar` /
 `M.dAntiChiralScalar`) are built on top of it in `Derivative.lean`.
 
-The files of this `SUSY/N1/` folder:
+The files of this `Particles/SuperSymmetry/N1/` folder:
 
 * `Basic.lean` (this file) — the `Model` indexing data and the chiral
   configuration type.
