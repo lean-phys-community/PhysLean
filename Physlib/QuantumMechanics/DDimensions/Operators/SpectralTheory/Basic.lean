@@ -22,8 +22,8 @@ Definitions
 - `LinearPMap.regularityDomain` : The set of regular points for a partial linear map `T`.
     A complex number `z` is a regular point for `T` if there exists `c > 0` such that
     `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`.
-- `LinearPMap.deficiencySubspace` : For an operator `T` any complex number `z`, the closed submodule
-    which is orthogonal to the range of `T - z • 1`.
+- `LinearPMap.deficiencySubspace` : For an operator `T` and any complex number `z`,
+    the closed submodule which is orthogonal to the range of `T - z • 1`.
 - `LinearPMap.defectNumber` : The rank of the deficiency subspace as a (possibly infinite) cardinal.
 - `LinearPMap.numericalRange` : For an operator `T`, the set of complex numbers `⟪x, T x⟫_ℂ`
     as `x` ranges over the unit sphere in `T.domain`.
@@ -98,7 +98,7 @@ lemma isLowerBound_closure
 /-- The regular points for `T`.
 
   `z : ℂ` is a regular point for `T` iff there exists a constant `c > 0` such that
-  `c * ‖x‖ ≤ ‖(T - z • 1) x‖` for all `x ∈ (T - z • 1).domain`. -/
+  `c * ‖x‖ ≤ ‖(T - z • 1) x‖` for all `x ∈ T.domain`. -/
 def regularityDomain (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | ∃ c > 0, IsLowerBound T z c}
 
 /-- `T ≤ T'` implies `T'.regularityDomain ⊆ T.regularityDomain`. -/
@@ -202,7 +202,10 @@ lemma IsClosed.sub_range_isClosed [CompleteSpace H]
 ## B. Deficiency subspace & defect number
 -/
 
-/-- The closed submodule `(T - z • 1).rangeᗮ`. -/
+/-- For a partial linear map `T` and any complex number `z`, the closed submodule which
+  is orthogonal to the range of `T - z • 1`.
+
+  `T.defectNumber z` is defined as the rank of this subspace. -/
 def deficiencySubspace (T : H →ₗ.[ℂ] H) (z : ℂ) : ClosedSubmodule ℂ H :=
   ⟨(T - z • 1).toFun.rangeᗮ, isClosed_orthogonal _⟩
 
@@ -279,7 +282,7 @@ lemma IsClosable.defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[�
   · false_or_by_contra -- `z₁ ∉ T.regularityDomain` ⇒ `c ≤ 0` ⇒ `z₂ ∈ ∅`
     exact hz₁ ⟨c, lt_of_le_of_lt dist_nonneg h_ball, h⟩
 
-/-- `T.defectNumber` is constant on each connected component of `T.regularityDomain`. -/
+/-- The defect number is constant on each connected component of the regularity domain. -/
 lemma IsClosable.defectNumber_same_of_same_connectedComponent [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable)
     {z₁ z₂ : T.regularityDomain} (h : connectedComponent z₁ = connectedComponent z₂) :
@@ -462,7 +465,7 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
     have h₂ : ⟪↑y₂, S y₂⟫_ℂ = 1 := by
       simp [y₂, map_smul, inner_smul_left, inner_smul_right, h₁, ← exp_conj, ← exp_add]
     -- `f` parametrizes the line connecting `y₀` and `y₂` and never vanishes because `y₀` and `y₂`
-    -- are linearly independent (since `y₀ = λy₂` implies `0 = ⟪y₀, S y₀⟫ = |λ|²⟪y₂, S y₂⟫ = λ²`).
+    -- are linearly independent (since `y₀ = λy₂` implies `0 = ⟪y₀, S y₀⟫ = |λ|²⟪y₂, S y₂⟫ = |λ|²`).
     let f : ℝ → S.domain := fun r ↦ (1 - r : ℂ) • y₀ + (r : ℂ) • y₂
     have hf : ∀ r, f r ≠ 0 := by
       intro r hr
