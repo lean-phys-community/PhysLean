@@ -980,8 +980,9 @@ private lemma radial_power_deriv_integral_by_parts
       | 1 =>
         use 0, 1
         intro x
-        simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right,
-          ContinuousLinearMap.norm_id]
+        simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right]
+        rw [(continuousMultilinearCurryRightEquiv' ℝ 0 ℝ (Space d.succ)).symm.norm_map]
+        simp [ContinuousLinearMap.norm_smulRight_apply]
       | n' + 1 + 1 =>
         use 0, 0
         intro x
