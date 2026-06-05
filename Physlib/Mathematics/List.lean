@@ -42,7 +42,7 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     simp only [List.takeWhile, List.eraseIdx_zero]
     by_cases hPb : P b
     · have hPa : P a := by
-        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp [Fin.lt_def]) (by simpa using hPb)
+        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp [hPb, hPa]
     · simp only [hPb, decide_false]
       simp_all only [List.length_cons, List.get_eq_getElem, List.tail_cons, decide_false,
@@ -98,7 +98,7 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
       Nat.sub_eq_zero_of_le, List.eraseIdx_zero]
     by_cases hPb : P b
     · have hPa : P a := by
-        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp [Fin.lt_def]) (by simpa using hPb)
+        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp [hPb, hPa]
     · simp only [List.tail_cons, hPb, decide_false, Bool.false_eq_true, not_false_eq_true,
       List.dropWhile_cons_of_neg]
@@ -111,7 +111,7 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     simp only [Nat.succ_eq_add_one, List.eraseIdx_cons_succ]
     by_cases hPb : P b
     · have hPa : P a := by
-        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp [Fin.lt_def]) (by simpa using hPb)
+        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp only [List.dropWhile, hPa, decide_true, List.takeWhile, hPb, List.length_cons,
         add_le_add_iff_right, Nat.reduceSubDiff]
       rw [dropWile_eraseIdx]

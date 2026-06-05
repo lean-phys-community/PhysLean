@@ -66,7 +66,7 @@ lemma coMetric_eq_fromConstPair {d : ℕ} :
 
 lemma contrMetric_eq_fromConstPair {d : ℕ} :
     η d = fromConstPair (S := realLorentzTensor d)
-      (c1 := .up) (c2 := .up)  (Lorentz.preContrMetric d) := by
+      (c1 := .up) (c2 := .up) (Lorentz.preContrMetric d) := by
   rw [contrMetric, metricTensor]
   rfl
 
@@ -78,7 +78,7 @@ lemma coMetric_eq_fromPairT {d : ℕ} :
   exact Lorentz.preCoMetric_apply_one
 
 lemma contrMetric_eq_fromPairT {d : ℕ} :
-    η d = fromPairT  (S := realLorentzTensor d) (c1 := .up) (c2 := .up)
+    η d = fromPairT (S := realLorentzTensor d) (c1 := .up) (c2 := .up)
         (Lorentz.preContrMetricVal d) := by
   rw [contrMetric_eq_fromConstPair, fromConstPair]
   congr 1
@@ -115,7 +115,7 @@ lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
   rw [coMetric_eq_fromPairT]
   simp [Lorentz.preCoMetricVal]
   erw [Lorentz.coCoToMatrixRe_symm_expand_tmul]
-  simp only [map_sum, _root_.map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul,
+  simp only [map_sum, _root_.map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul,
     Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Fin.isValue]
   conv_lhs =>
     enter [2, x1, 2, x2]
@@ -152,7 +152,7 @@ lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
   rw [contrMetric_eq_fromPairT]
   simp [Lorentz.preContrMetricVal]
   erw [Lorentz.contrContrToMatrixRe_symm_expand_tmul]
-  simp only [map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul, Finset.sum_apply,
+  simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
     Pi.smul_apply, smul_eq_mul, Fin.isValue]
   conv_lhs =>
     enter [2, x1, 2, x2]

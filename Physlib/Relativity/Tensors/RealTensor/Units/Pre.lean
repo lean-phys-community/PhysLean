@@ -135,7 +135,7 @@ lemma preCoContrUnit_apply_one {d : ℕ} : (preCoContrUnit d) (1 : ℝ) = preCoC
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `contrCoUnit` does nothing. -/
 lemma contr_preContrCoUnit {d : ℕ} (x : CoMod d) :
-    (TensorProduct.lid ℝ  _ <|
+    (TensorProduct.lid ℝ _ <|
     coContrContract.toLinearMap.rTensor _ <|
     (TensorProduct.assoc ℝ (CoMod d) (ContrMod d) (CoMod d)).symm <|
     x ⊗ₜ[ℝ] (preContrCoUnit d (1 : ℝ))) = x := by
@@ -170,10 +170,10 @@ lemma contr_preContrCoUnit {d : ℕ} (x : CoMod d) :
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `coContrUnit`. -/
 lemma contr_preCoContrUnit {d : ℕ} (x : ContrMod d) :
-    (TensorProduct.lid ℝ  _ <|
+    (TensorProduct.lid ℝ _ <|
     contrCoContract.toLinearMap.rTensor _ <|
     (TensorProduct.assoc ℝ (ContrMod d) (CoMod d) (ContrMod d)).symm <|
-    x ⊗ₜ[ℝ] (preCoContrUnit d (1 : ℝ))) = x  := by
+    x ⊗ₜ[ℝ] (preCoContrUnit d (1 : ℝ))) = x := by
   have h1 : ((TensorProduct.assoc ℝ (ContrMod d) (CoMod d) (ContrMod d)).symm
       (x ⊗ₜ[ℝ] (preCoContrUnit d) (1 : ℝ)))
       = ∑ i, (x ⊗ₜ[ℝ] coBasis d i) ⊗ₜ[ℝ] contrBasis d i := by
@@ -220,7 +220,7 @@ lemma preContrCoUnit_symm {d : ℕ} :
 set_option backward.isDefEq.respectTransparency false in
 lemma preCoContrUnit_symm {d : ℕ} :
     (preCoContrUnit d) (1 : ℝ) = LinearMap.lTensor _ (LinearEquiv.cast (by simp)).toLinearMap
-    (TensorProduct.comm ℝ _ _ ((preContrCoUnit d) (1 : ℝ)))  := by
+    (TensorProduct.comm ℝ _ _ ((preContrCoUnit d) (1 : ℝ))) := by
   rw [preContrCoUnit_apply_one, preContrCoUnitVal_expand_tmul]
   rw [preCoContrUnit_apply_one, preCoContrUnitVal_expand_tmul]
   simp

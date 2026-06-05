@@ -149,7 +149,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm is homogeneous under scalar multiplication. Property 9.1.2 in Wilde. -/
 theorem traceNorm_smul (A : Matrix m n R) (c : R) : (c • A).traceNorm = ‖c‖ * A.traceNorm := by
   have h : (c • A)ᴴ * (c • A) = (‖c‖^2:R) • (Aᴴ * A) := by
-    rw [conjTranspose_smul, RCLike.star_def, mul_smul, smul_mul, smul_smul]
+    rw [conjTranspose_smul, RCLike.star_def, Matrix.mul_smul, smul_mul, smul_smul]
     rw [RCLike.mul_conj c]
   rw [traceNorm, h]
   open MatrixOrder in

@@ -5,13 +5,9 @@ Authors: Alex Meiburg
 -/
 module
 
-public import QuantumInfo.ForMathlib.HermitianMat.LogExp
 public import QuantumInfo.ForMathlib.HermitianMat.CompoundMatrix
+public import QuantumInfo.ForMathlib.HermitianMat.LogExp
 public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
-public import QuantumInfo.ForMathlib.HermitianMat.Unitary
-public import Mathlib.Analysis.SpecialFunctions.Integrability.Basic
-public import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
-public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
 @[expose] public section
 
@@ -605,7 +601,7 @@ lemma tendsto_rpowApprox (hA : A.mat.PosDef) (hq : 0 < q) (hq1 : q < 1) :
   have h_expand_tgt : (A.cfc (fun x => rpowConst q * (x ^ q - 1))).mat = ∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) :=
     cfc_toMat_eq_sum_smul_proj A (fun x => rpowConst q * (x ^ q - 1))
   have h_sum : Tendsto (fun T : ℝ => ∑ i, scalarRpowApprox q T (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose)) atTop (nhds (∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose))) := by
-    refine tendsto_finset_sum _ fun i _ => ?_
+    refine tendsto_finsetSum _ fun i _ => ?_
     have := scalarRpowApprox_tendsto (hA.eigenvalues_pos i) hq hq1
     exact Filter.Tendsto.smul_const (Complex.continuous_ofReal.continuousAt.tendsto.comp this) _
   open scoped Matrix.Norms.Frobenius in
@@ -712,7 +708,7 @@ private lemma compoundHermitian_rpow (A : HermitianMat d ℂ) (hA : 0 ≤ A)
     ext S T
     by_cases h : S = T
     · subst h
-      simp [Real.finset_prod_rpow _ _ (fun i _ => ha _)]
+      simp [Real.finsetProd_rpow _ _ (fun i _ => ha _)]
     · rw [HermitianMat.diagonal_mat, HermitianMat.diagonal_mat]
       simp [Matrix.diagonal, h]
   rw [hAeq, rpow_conj_unitary, compoundHermitian_conj, compoundHermitian_conj, hdiag_rpow]
@@ -979,7 +975,7 @@ private lemma lieb_thirring_le_one_posDef
             simpa [M, N] using compound_top_singular_le_posDef hA hB hr0 hr1 k hk
       _ = ∏ i : Fin k, (singularValuesSorted M ⟨i.val, by omega⟩) ^ r := by
             have hprod := congrArg (· ^ r) (prod_singularValuesSorted_eq_compoundSV M k hk).symm
-            have hrpow := (Real.finset_prod_rpow (s := Finset.univ)
+            have hrpow := (Real.finsetProd_rpow (s := Finset.univ)
               (f := fun i : Fin k => singularValuesSorted M ⟨i.val, by omega⟩)
               (fun i _ => singularValuesSorted_nonneg M _) r)
             simpa using hprod.trans hrpow.symm
@@ -1286,14 +1282,14 @@ private lemma tendsto_intervalIntegral_weighted_trace_mul_inv_shift {A : Hermiti
                 exact htIoc.1)]
               simp [Finset.mul_sum]
       _ = ∑ i, ∫ t in (0)..T, t ^ (p - 1) * (A.H.eigenvalues i / (A.H.eigenvalues i + t)) := by
-            rw [intervalIntegral.integral_finset_sum]
+            rw [intervalIntegral.integral_finsetSum]
             intro i hi
             exact intervalIntegrable_weighted_div_nonneg
               (x := A.H.eigenvalues i) (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i)
               hp hT
   rw [Filter.tendsto_congr' hEq]
   simpa [trace_rpow_eq_sum, Finset.mul_sum] using
-    (tendsto_finset_sum Finset.univ fun i _ =>
+    (tendsto_finsetSum Finset.univ fun i _ =>
       tendsto_intervalIntegral_weighted_div_nonneg
         (x := A.H.eigenvalues i) (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i)
         hp hp1)

@@ -5,7 +5,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Mathlib.Geometry.Manifold.ChartedSpace
 /-!
@@ -84,7 +83,7 @@ instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (CoVector d) where
     intro h
     apply (equivEuclid d).injective
     simp at h
-    grind
+    rw [← neg_add_eq_zero, h]
 
 set_option backward.isDefEq.respectTransparency false in
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (CoVector d) where

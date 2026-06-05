@@ -164,7 +164,7 @@ lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (
     (φ : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
     (basis (c ∘ Fin.succSuccAbove i j)).repr (contrT n i j h t) φ =
     ∑ (b' : DropPairSection φ), (basis c).repr t b'.1 *
-     (S.contr (c i) (b (c i) (b'.1 i) ⊗ₜ[k] b (S.τ (c i))
+      (S.contr (c i) (b (c i) (b'.1 i) ⊗ₜ[k] b (S.τ (c i))
       (basisIdxCongr (by rw [h.2]) (b'.1 j)))) := by
   apply induction_on_basis _ _ _ _ t
   · intro b'
@@ -221,7 +221,7 @@ lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (
 set_option backward.isDefEq.respectTransparency false in
 lemma contrT_basis_repr_apply_eq_sum_fin {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (h : i ≠ j ∧ S.τ (c i) = c j) (t : Tensor S c)
-    (φ  : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
+    (φ : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
     (basis (c ∘ Fin.succSuccAbove i j)).repr (contrT n i j h t) φ =
     ∑ (x1 : basisIdx (c i)), ∑ (x2 : basisIdx (c j)),
     (basis c).repr t (DropPairSection.ofFinEquiv h.1 φ (x1, x2)).1 *
@@ -231,9 +231,8 @@ lemma contrT_basis_repr_apply_eq_sum_fin {n : ℕ} {c : Fin (n + 1 + 1) → C} {
     Fintype.sum_prod_type]
   simp
 
-
 lemma contrT_basis {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
-    (h : i ≠ j ∧ S.τ (c i) = c j) (b : ComponentIdx (S := S) c):
+    (h : i ≠ j ∧ S.τ (c i) = c j) (b : ComponentIdx (S := S) c) :
     contrT n i j h (basis c b) =
     Pure.contrPCoeff i j h (Pure.basisVector c b) •
       basis (c ∘ Fin.succSuccAbove i j) (b.dropPair i j) := by

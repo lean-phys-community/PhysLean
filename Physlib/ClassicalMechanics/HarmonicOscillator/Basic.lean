@@ -271,7 +271,7 @@ lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : Con
   simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
     ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
   rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right]
   congr 1
   simp only [smul_add]
@@ -290,7 +290,7 @@ lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : C
   simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
     ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
   trans S.k * ⟪xₜ t, ∂ₜ xₜ t⟫_ℝ
   · rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right,
       ← inner_smul_right, ← inner_smul_right]
@@ -409,7 +409,7 @@ lemma gradient_inner_self (x : EuclideanSpace ℝ (Fin 1)) :
   rw [show (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) =
       fun y => ⟪(fun y => y) y, (fun y => y) y⟫_ℝ from rfl]
   rw [fderiv_inner_apply (𝕜 := ℝ) hid hid]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq, real_inner_comm, inner_smul_left',
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, real_inner_comm, inner_smul_left',
     ringHom_apply]
   ring
 

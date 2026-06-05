@@ -82,8 +82,10 @@ lemma ofβ_eq : ofβ = fun β => ⟨⟨1 / (kB * β), by
 
 @[simp]
 lemma β_ofβ (β' : ℝ≥0) : β (ofβ β') = β' := by
-  ext
   simp [β, ofβ, toReal]
+  field_simp [kB_ne_zero]
+  ext
+  show 1 / (kB * (1 / (↑β' * kB))) = ↑β'
   field_simp [kB_ne_zero]
 
 @[simp]
@@ -150,6 +152,7 @@ lemma ofβ_differentiableOn :
     simp at hx
     have hx' : 0 < x := by simpa using hx
     simp [ofβ_eq, hx'.le, Real.toNNReal, NNReal.coe_mk]
+    norm_cast
 
 /-! ### Convergence -/
 
@@ -194,7 +197,7 @@ private lemma tendsto_const_inv_mul_atTop (a : ℝ) (ha : 0 < a) :
       mul_le_mul_of_nonneg_left hBB (le_of_lt ha)
     simpa [one_div] using one_div_le_one_div_of_le hB0 hden_le
   have hB_gt_base : (1 / (a * ε)) < (B : ℝ) := by
-    simp [B, Breal]
+    simp [B, Breal, NNReal.toReal]
   have hden_gt : (1 / ε) < (a * (B : ℝ)) := by
     have h' := mul_lt_mul_of_pos_left hB_gt_base ha
     have hane : a ≠ 0 := ne_of_gt ha
@@ -228,7 +231,7 @@ lemma tendsto_toReal_ofβ_atTop :
   have hform :
       (fun b : ℝ≥0 => (Temperature.ofβ b : ℝ))
         = (fun b : ℝ≥0 => (1 : ℝ) / (kB * (b : ℝ))) := by
-    funext b; simp [Temperature.ofβ, Temperature.toReal]
+    funext b; simp [Temperature.ofβ, Temperature.toReal]; norm_cast
   have hsrc :
       Tendsto (fun b : ℝ≥0 => (1 : ℝ) / (kB * (b : ℝ))) atTop (𝓝 (0 : ℝ)) :=
     tendsto_const_inv_mul_atTop kB kB_pos
@@ -289,6 +292,7 @@ lemma beta_fun_T_formula (t : ℝ) (ht : 0 < t) :
   have : ((Temperature.ofNNReal (Real.toNNReal t)).β : ℝ) = 1 / (kB * t) := by
     simp [Temperature.β, Temperature.ofNNReal, Temperature.toReal,
       Real.toNNReal_of_nonneg ht0, one_div, mul_comm]
+    norm_cast
   simpa [betaFromReal] using this
 
 /-- On `Ioi 0`, `Beta_fun_T t` equals `1 / (kB * t)`. -/

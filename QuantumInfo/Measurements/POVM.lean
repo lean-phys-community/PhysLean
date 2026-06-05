@@ -51,7 +51,6 @@ namespace POVM
 
 variable {X : Type*} {d : Type*} [Fintype X] [Fintype d] [DecidableEq d] [DecidableEq X]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The act of measuring is a quantum channel, that maps a `d`-dimensional quantum
 state to an `d × X`-dimensional quantum-classical state. -/
 def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
@@ -77,7 +76,6 @@ def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
         by simp [Matrix.smul_kronecker]⟩
       set M₃ := LinearMap.comp M₂ M₁ with hM₃
       simp only [M₁, M₂, LinearMap.comp, kronecker, LinearMap.coe_mk, AddHom.coe_mk] at hM₃
-      unfold Function.comp at hM₃
       rw [← hM₃]
       apply MatrixMap.IsCompletelyPositive.comp
       · dsimp [M₁]

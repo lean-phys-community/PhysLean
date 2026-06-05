@@ -183,7 +183,7 @@ lemma fieldStrengthAux_eq_basis {d} (A : DistElectromagneticPotential d)
   ext b
   match b with
   | (μ, ν) =>
-  simp [map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul, Finset.sum_apply,
+  simp [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
     Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, smul_eq_mul]
   simp [Finsupp.single_apply]
   rw [fieldStrengthAux_basis_repr_apply_eq_single]

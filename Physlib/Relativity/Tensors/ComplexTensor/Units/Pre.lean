@@ -72,7 +72,6 @@ def contrCoUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     apply congrArg
     simp
 
-
 lemma contrCoUnit_apply_one : contrCoUnit (1 : ℂ) = contrCoUnitVal := by
   change (1 : ℂ) • contrCoUnitVal = contrCoUnitVal
   rw [one_smul]
@@ -137,7 +136,6 @@ lemma coContrUnit_apply_one : coContrUnit (1 : ℂ) = coContrUnitVal := by
 
 -/
 
-
 set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `contrCoUnit` does nothing. -/
 lemma contr_contrCoUnit (x : CoℂModule) :
@@ -171,7 +169,7 @@ lemma contr_coContrUnit (x : ContrℂModule) :
 
 open CategoryTheory
 
-lemma contrCoUnit_symm  :
+lemma contrCoUnit_symm :
     contrCoUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
       (TensorProduct.comm ℂ _ _ (coContrUnit (1 : ℂ))) := by
   rw [contrCoUnit_apply_one, contrCoUnitVal_expand_tmul]
@@ -180,7 +178,7 @@ lemma contrCoUnit_symm  :
 
 lemma coContrUnit_symm :
     (coContrUnit (1 : ℂ)) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
-      (TensorProduct.comm ℂ _ _ (contrCoUnit (1 : ℂ)))  := by
+      (TensorProduct.comm ℂ _ _ (contrCoUnit (1 : ℂ))) := by
   rw [coContrUnit_apply_one, coContrUnitVal_expand_tmul]
   rw [contrCoUnit_apply_one, contrCoUnitVal_expand_tmul]
   rfl

@@ -14,7 +14,6 @@ public import Physlib.Relativity.Tensors.ComplexTensor.OfRat
 
 @[expose] public section
 
-
 open Matrix
 open MatrixGroups
 open Complex

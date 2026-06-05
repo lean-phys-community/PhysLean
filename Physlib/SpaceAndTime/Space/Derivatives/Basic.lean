@@ -9,6 +9,7 @@ public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 public import Physlib.Mathematics.Distribution.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.SpaceAndTime.Space.Module
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Derivatives on Space
@@ -159,11 +160,12 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) (μ : Fin d
 
 /-!
 
-### A.3. Derivative distributes over addition
+### A.3. Derivative distributes over addition and subtraction
 
 -/
 
 /-- Derivatives on space distribute over addition. -/
+@[to_fun]
 lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
@@ -183,6 +185,17 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
   ext x
   rw [fderiv_fun_add]
   simp only [ContinuousLinearMap.add_apply, Pi.add_apply]
+  repeat fun_prop
+
+/-- Derivatives on space distribute over subtraction. -/
+@[to_fun]
+lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+    ∂[u] (f1 - f2) = ∂[u] f1 - ∂[u] f2 := by
+  rw [deriv_eq_fderiv_fun]
+  ext x
+  rw [fderiv_sub]
+  rfl
   repeat fun_prop
 
 /-!
@@ -280,7 +293,7 @@ lemma deriv_component (μ ν : Fin d) (x : Space d) :
 lemma deriv_component_sq {d : ℕ} {ν μ : Fin d} (x : Space d) :
     (deriv ν (fun x => (x μ) ^ 2) x) = if ν = μ then 2 * x μ else 0:= by
   rw [deriv_eq_fderiv_basis]
-  rw [fderiv_pow]
+  rw [fderiv_fun_pow]
   simp only [Nat.add_one_sub_one, pow_one, nsmul_eq_mul, Nat.cast_ofNat,
     ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
   rw [← deriv_eq_fderiv_basis, deriv_component]
@@ -437,7 +450,7 @@ lemma deriv_inner_left {d} (x1 x2 : Space d) (i : Fin d) :
   rw [deriv_eq_fderiv_basis]
   rw [fderiv_inner_apply]
   simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
-    fderiv_id', ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add]
+    fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add]
   · fun_prop
   · fun_prop
 
@@ -446,7 +459,7 @@ lemma deriv_inner_right {d} (x1 x2 : Space d) (i : Fin d) :
     deriv i (fun x => ⟪x1, x⟫_ℝ) x2 = x1 i := by
   rw [deriv_eq_fderiv_basis]
   rw [fderiv_inner_apply]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq, inner_basis, fderiv_fun_const,
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, inner_basis, fderiv_fun_const,
     Pi.ofNat_apply, ContinuousLinearMap.zero_apply, inner_zero_left, add_zero]
   · fun_prop
   · fun_prop

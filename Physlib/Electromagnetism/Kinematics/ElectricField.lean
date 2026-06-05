@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Electromagnetism.Kinematics.VectorPotential
 public import Physlib.Electromagnetism.Kinematics.ScalarPotential
 public import Physlib.Electromagnetism.Kinematics.FieldStrength
 public import Physlib.Electromagnetism.Basic
@@ -93,7 +92,7 @@ lemma ofElectromagneticField_electricField {c : SpeedOfLight}
   suffices h : E t x + ∂ₜ (fun t => (ofElectromagneticField c E B).vectorPotential c t x) t =
       - ∇ ((ofElectromagneticField c E B).scalarPotential c t) x by
     simp only [electricField]
-    grind
+    rw [sub_eq_iff_eq_add', ← h, add_comm]
   convert congrFun (eq_grad_integral_of_curl_zero (fun x => E t x +
       ∂ₜ (fun t => (ofElectromagneticField c E B).vectorPotential c t x) t) ?_ ?_) x
   · simp [ofElectromagneticField_scalarPotential_eq_add_vectorPotential _ _ B (by fun_prop)]

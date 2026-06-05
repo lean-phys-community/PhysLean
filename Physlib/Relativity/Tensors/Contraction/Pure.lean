@@ -268,7 +268,7 @@ lemma contrPCoeff_invariant {n : ℕ} {c : Fin n → C} {i j : Fin n}
   generalize p i = pi at *
   generalize c i = ci at *
   generalize (LinearEquiv.cast (R := k) h2) pj = pj' at *
-  trans  (S.contr ci) (((rep ci).tprod (rep (S.τ ci))) g  (pi ⊗ₜ[k] pj'))
+  trans (S.contr ci) (((rep ci).tprod (rep (S.τ ci))) g (pi ⊗ₜ[k] pj'))
   · simp
   rw [(S.contr _).isIntertwining]
   simp

@@ -17,6 +17,7 @@ open Lake
 /-- Run the Batteries linter on a given module and update the linter if `update` is `true`. -/
 unsafe def runLinterOnModule  (module : Name): IO Unit := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   -- If the linter is being run on a target that doesn't import `Batteries.Tactic.List`,
   -- the linters are ineffective. So we import it here.
   let lintModule := `Batteries.Tactic.Lint
@@ -36,6 +37,11 @@ unsafe def runLinterOnModule  (module : Name): IO Unit := do
   Prod.fst <$> (CoreM.toIO · ctx state) do
     let decls ← getDeclsInPackage module.getRoot
     let linters ← getChecks (slow := true) (runAlways := none) (runOnly := none)
+    -- The `defsWithUnderscore` linter flags any `def`/`instance`/structure-projection whose name
+    -- contains an underscore. It produces many false positives in Physlib (e.g. the deliberate
+    -- `_physlib` instance suffix, mirroring mathlib's exempted `_mathlib`, and `informal_lemma`s
+    -- which elaborate to `def`s but follow the snake_case lemma convention). Disable it here.
+    let linters := linters.filter (·.name != `defsWithUnderscore)
     println! "Results been linted with the following linters:"
     println! linters.map (·.name)
     println! "Starting parallel running on linters on all declarations. Results if any are

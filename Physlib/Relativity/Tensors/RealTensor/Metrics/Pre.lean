@@ -201,7 +201,7 @@ lemma contrCoContract_apply_metric {d : ℕ} :
           · simp
           · exact id (Ne.symm hb)
         · simp
-    _ = (TensorProduct.comm ℝ _ _  <| ∑ i, contrBasis d i ⊗ₜ[ℝ] coBasis d i) := by
+    _ = (TensorProduct.comm ℝ _ _ <| ∑ i, contrBasis d i ⊗ₜ[ℝ] coBasis d i) := by
         congr
         simp only [map_sum]
         simp

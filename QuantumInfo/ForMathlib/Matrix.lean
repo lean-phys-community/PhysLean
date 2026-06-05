@@ -339,7 +339,7 @@ theorem ker_range_antitone {d : Type*} [Fintype d] [DecidableEq d] {A B : Matrix
     LinearMap.ker A.toEuclideanLin ≤ LinearMap.ker B.toEuclideanLin ↔
     LinearMap.range B.toEuclideanLin ≤ LinearMap.range A.toEuclideanLin
      := by
-  rw [Matrix.isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   exact ContinuousLinearMap.ker_le_ker_iff_range_le_range
     (T := Matrix.toEuclideanCLM.toFun B) (U := Matrix.toEuclideanCLM.toFun A) hB hA
 
@@ -706,23 +706,6 @@ theorem PosDef.kron {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [
     use (star hA.left.eigenvectorUnitary.val) ⊗ₖ (star hB.left.eigenvectorUnitary.val)
     simp [← Matrix.mul_kronecker_mul]
 
-theorem PosDef.submatrix {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
-    {M : Matrix d₁ d₁ 𝕜} (hM : M.PosDef) {e : d₂ → d₁} (he : Function.Injective e) : (M.submatrix e e).PosDef := by
-  rw [Matrix.posDef_iff_dotProduct_mulVec] at hM ⊢
-  use hM.left.submatrix e
-  intro x hx
-  let y : d₁ → 𝕜 := fun i ↦ ∑ j ∈ { j | e j = i}, x j
-  have hy : y ≠ 0 := by
-    contrapose! hx
-    simp only [funext_iff] at hx ⊢
-    intro i
-    simpa [y, he.eq_iff, Finset.sum_eq_single_of_mem] using hx (e i)
-  convert @hM.right y hy
-  dsimp [Matrix.mulVec, dotProduct, y]
-  simp only [map_sum]
-  simp only [Finset.sum_mul, Finset.sum_filter, Finset.mul_sum]
-  simp [← Finset.mul_sum, Finset.sum_comm]
-
 theorem PosDef.reindex {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
     {M : Matrix d₁ d₁ 𝕜} (hM : M.PosDef) (e : d₁ ≃ d₂) : (M.reindex e e).PosDef :=
   hM.submatrix e.symm.injective
@@ -788,11 +771,11 @@ theorem IsHermitian.cfc_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) (
         norm_num +zetaDelta at *;
       refine' Polynomial.funext fun t => _;
       convert h_char_poly t using 1;
-      · simp [ Matrix.det_apply', Polynomial.eval_finset_sum ];
+      · simp [ Matrix.det_apply', Polynomial.eval_finsetSum ];
         simp [ Matrix.one_apply, Polynomial.eval_prod ];
         congr! 3;
         aesop;
-      · simp [ Matrix.det_apply', Polynomial.eval_finset_sum ];
+      · simp [ Matrix.det_apply', Polynomial.eval_finsetSum ];
         simp [ Matrix.one_apply, Polynomial.eval_prod ];
         exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
     simp_all [ Matrix.charmatrix, Matrix.det_diagonal ];
@@ -836,9 +819,9 @@ lemma IsHermitian.eigenvalues_eq_of_unitary_similarity_diagonal {d 𝕜 : Type*}
         simp
       refine' Polynomial.funext fun t => _;
       convert h_det t using 1 <;> simp [ Matrix.charpoly, Matrix.det_apply' ];
-      · simp [ Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
+      · simp [ Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
         exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
-      · simp [ Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
+      · simp [ Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_prod, Matrix.one_apply ];
         exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
     rw [ h, h_char_poly ];
   -- The roots of the characteristic polynomial of A are its eigenvalues (by `IsHermitian.charpoly_roots_eq_eigenvalues`).
@@ -895,10 +878,16 @@ theorem cfc_diagonal (g : d → ℝ) (f : ℝ → ℝ) :
       )⟩
     · simp
     · simp [diagonal, ← Matrix.ext_iff, mul_apply]
-      grind
+      intro x y i j
+      split_ifs with h
+      · subst h; simp
+      · rfl
     · simp
     · simp [diagonal, funext_iff]
-      grind [add_zero]
+      intro x y i j
+      split_ifs with h
+      · simp
+      · simp
     · simp [← ext_iff, diagonal]
       exact fun r i j ↦ rfl
     · simp [← ext_iff, diagonal]

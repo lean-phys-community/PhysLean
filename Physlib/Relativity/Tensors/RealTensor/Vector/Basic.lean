@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Geometry.Manifold.IsManifold.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Basic
-public import Physlib.Relativity.Tensors.Tensorial
 /-!
 
 # Lorentz Vectors
@@ -95,7 +94,7 @@ instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) where
     intro h
     apply (equivEuclid d).injective
     simp at h
-    grind
+    rw [← neg_add_eq_zero, h]
 
 set_option backward.isDefEq.respectTransparency false in
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (Vector d) where

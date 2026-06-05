@@ -8,6 +8,8 @@ module
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.SpaceAndTime.Space.Module
 public import Physlib.SpaceAndTime.Time.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Inv
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Time Derivatives
@@ -83,7 +85,8 @@ lemma deriv_div {c g : Time → ℝ}
   ring_nf
   simp [fderiv_fun_mul hc (DifferentiableAt.fun_inv (by fun_prop) hgz),
     fderiv_comp' t (differentiableAt_inv hgz) hg]
-  grind
+  field_simp
+  ring
 
 /-!
 

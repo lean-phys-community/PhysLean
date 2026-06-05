@@ -8,6 +8,7 @@ module
 public import Mathlib.Analysis.Calculus.ContDiff.FiniteDimension
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 public import Physlib.SpaceAndTime.Space.Slice
+public import Mathlib.Analysis.Calculus.ParametricIntegral
 /-!
 
 # Constant slice distributions
@@ -212,7 +213,7 @@ lemma schwartzMap_fderiv_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ
             congr
             rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
             simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
-              fderiv_id']
+              fderiv_fun_id]
             fun_prop
             fun_prop
 
@@ -351,7 +352,7 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
           congr 1
           rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
           simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
-            fderiv_id']
+            fderiv_fun_id]
           fun_prop
           fun_prop
     apply le_of_eq

@@ -59,7 +59,7 @@ lemma lrlOperator_eq (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i = 𝐱 i �
     _ = 𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩) - (𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 i
         + ((2⁻¹ * I * ℏ) • H.d • 𝐩 i - (2⁻¹ * I * ℏ) • 𝐩 i) := by
       simp only [add_sub_assoc, Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum,
-        ← comp_finset_sum, ← finset_sum_comp, sum_smul, smul_add, smul_sub, smul_smul, mul_assoc]
+        ← comp_finsetSum, ← finsetSum_comp, sum_smul, smul_add, smul_sub, smul_smul, mul_assoc]
       norm_num
       rfl
     _ = 𝐱 i ∘L (𝐩 ⬝ᵥ 𝐩) - (𝐱 ⬝ᵥ 𝐩) ∘L 𝐩 i + (2⁻¹ * I * ℏ * (H.d - 1)) • 𝐩 i := by
@@ -72,7 +72,7 @@ lemma lrlOperator_eq' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i =
   symm
   trans ∑ j, 𝐱 i ∘L 𝐩 j ∘L 𝐩 j - ∑ j, (𝐱 j ∘L 𝐩 j) ∘L 𝐩 i
   · simp [dotProduct, mul_def, angularMomentumOperator, comp_assoc, momentum_comp_commute]
-  simp [← comp_finset_sum, ← finset_sum_comp, dotProduct, mul_def]
+  simp [← comp_finsetSum, ← finsetSum_comp, dotProduct, mul_def]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- `𝐀(ε)ᵢ = 𝐩ⱼ𝐋ᵢⱼ - ½iℏ(d-1)𝐩ᵢ - mk·𝐫(ε)⁻¹𝐱ᵢ` -/
@@ -154,7 +154,7 @@ private lemma positionDotMomentum_commutation_radiusRegPow (d : ℕ) (ε : ℝˣ
     _ = ∑ i, 𝐱 i ∘L ⁅𝐩 i, 𝐫₀ ε s⁆ := by simp [dotProduct, mul_def, sum_lie, leibniz_lie]
     _ = (-s * I * ℏ) • (∑ i, 𝐱 i ∘L 𝐱 i) ∘L 𝐫₀ ε (s-2) := by
       simp [← lie_skew (𝐩 _), radiusRegPow_commutation_momentum, Finset.smul_sum,
-        position_comp_radiusRegPow_commute, finset_sum_comp, comp_assoc]
+        position_comp_radiusRegPow_commute, finsetSum_comp, comp_assoc]
     _ = (-s * I * ℏ) • (𝐫₀ ε s - ε.1 ^ 2 • 𝐫₀ ε (s-2)) := by simp [positionSqCLM_eq ε]
 
 private lemma positionCompMomentumSqr_comm {d : ℕ} (i j : Fin d) :
@@ -327,7 +327,7 @@ private lemma xL_Lx_eq {d : ℕ} (ε : ℝˣ) (i : Fin d) :
     position_commutation_momentum, symm _ i, comp_add, comp_smul, smul_add, comp_id, add_assoc,
     ← Complex.coe_smul, smul_smul, ← add_smul, ← comp_assoc, eq_one_of_same, one_smul]
   -- Split/do sums
-  simp_rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, ← Finset.smul_sum, ← finset_sum_comp,
+  simp_rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, ← Finset.smul_sum, ← finsetSum_comp,
     sum_smul, Finset.sum_const, Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ,
     positionSqCLM_eq ε, sub_comp, smul_comp, id_comp, smul_sub]
   -- Clean up coefficients
@@ -366,7 +366,7 @@ private lemma r_comm_pL_Lp {d : ℕ} (ε : ℝˣ) (i : Fin d) :
         ← Finset.smul_sum, comp_assoc, ofReal_neg, ofReal_one, ← neg_smul]
       ring_nf
     _ = -((I * ℏ) • 𝐫₀ ε (-3) ∘L (𝐱 ⬝ᵥ 𝐋 i + 𝐋 i ⬝ᵥ 𝐱)) := by
-      simp_rw [angularMomentum_comp_radiusRegPow_commute, comp_assoc, ← comp_add, ← comp_finset_sum,
+      simp_rw [angularMomentum_comp_radiusRegPow_commute, comp_assoc, ← comp_add, ← comp_finsetSum,
         Finset.sum_add_distrib, dotProduct, mul_def]
 
 set_option backward.isDefEq.respectTransparency false in
@@ -444,13 +444,13 @@ private lemma sum_LppL (d : ℕ) :
       _ = 𝐋 i j ∘L (𝐩 k ∘L 𝐩 k) ∘L 𝐋 i j := by
         simp_rw [← comp_assoc, ← sub_comp, angularMomentumOperator]
   trans (2 : ℂ)⁻¹ • ∑ i, ∑ j, 𝐋 i j ∘L (𝐩 ⬝ᵥ 𝐩) ∘L 𝐋 i j
-  · simp_rw [← comp_finset_sum, ← finset_sum_comp, ← comp_assoc, dotProduct, mul_def]
-  simp_rw [← comp_assoc, ← momentumSqr_comp_angularMomentum_commute, comp_assoc, ← comp_finset_sum,
+  · simp_rw [← comp_finsetSum, ← finsetSum_comp, ← comp_assoc, dotProduct, mul_def]
+  simp_rw [← comp_assoc, ← momentumSqr_comp_angularMomentum_commute, comp_assoc, ← comp_finsetSum,
     ← comp_smul, angularMomentumOperatorSqr]
 
 private lemma sum_Lprx (d : ℕ) (ε : ℝˣ) :
     ∑ i, ∑ j, 𝐋 i j ∘L 𝐩 j ∘L 𝐫₀[d] ε (-1) ∘L 𝐱 i = 𝐫₀ ε (-1) ∘L 𝐋² := by
-  simp_rw [← position_comp_radiusRegPow_commute, ← comp_assoc, ← finset_sum_comp _ (𝐫₀ _ _)]
+  simp_rw [← position_comp_radiusRegPow_commute, ← comp_assoc, ← finsetSum_comp _ (𝐫₀ _ _)]
   rw [sum_symmetrize]
   conv_lhs =>
     enter [1, 2, 2, i, 2, j]
@@ -463,7 +463,7 @@ private lemma sum_Lprx (d : ℕ) (ε : ℝˣ) :
 
 private lemma sum_rxpL (d : ℕ) (ε : ℝˣ) :
     ∑ i, ∑ j, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐩 j ∘L 𝐋 i j = 𝐫₀ ε (-1) ∘L 𝐋² := by
-  simp_rw [← comp_finset_sum (𝐫₀ _ _)]
+  simp_rw [← comp_finsetSum (𝐫₀ _ _)]
   rw [sum_symmetrize]
   conv_lhs =>
     enter [2, 2, 2, i, 2, j]
@@ -483,7 +483,7 @@ private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
         + (I * ℏ) • 𝐫₀ ε (-3) ∘L 𝐱 i ∘L 𝐱 i) := by simp [momentum_comp_position_eq]
     _ = 𝐫₀ ε (-1) ∘L ∑ i, 𝐱 i ∘L 𝐩 i + (-d * I * ℏ) • 𝐫₀ ε (-1)
         + (I * ℏ) • 𝐫₀ ε (-3) ∘L ∑ i, 𝐱 i ∘L 𝐱 i := by
-      simp [Finset.sum_add_distrib, ← comp_finset_sum, ← Finset.smul_sum,
+      simp [Finset.sum_add_distrib, ← comp_finsetSum, ← Finset.smul_sum,
         ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, mul_assoc, sub_eq_add_neg]
     _ = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩) - (I * ℏ * (d - 1)) • 𝐫₀ ε (-1)
         - (I * ℏ * ε.1 ^ 2) • 𝐫₀ ε (-3) := by
@@ -494,13 +494,13 @@ private lemma sum_prx (d : ℕ) (ε : ℝˣ) :
       ring_nf
 
 private lemma sum_rxp (d : ℕ) (ε : ℝˣ) :
-    ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐩 i = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩) := by rw [← comp_finset_sum]; rfl
+    ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐩 i = 𝐫₀ ε (-1) ∘L (𝐱 ⬝ᵥ 𝐩) := by rw [← comp_finsetSum]; rfl
 
 set_option backward.isDefEq.respectTransparency false in
 private lemma sum_rxrx (d : ℕ) (ε : ℝˣ) : ∑ i, 𝐫₀[d] ε (-1) ∘L 𝐱 i ∘L 𝐫₀ ε (-1) ∘L 𝐱 i =
     ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) - (ε.1 ^ 2) • 𝐫₀ ε (-2) := by
-  simp_rw [← comp_finset_sum, ← comp_assoc, position_comp_radiusRegPow_commute, comp_assoc,
-    ← comp_finset_sum, ← comp_assoc, radiusRegPowCLM_comp_eq, positionSqCLM_eq ε]
+  simp_rw [← comp_finsetSum, ← comp_assoc, position_comp_radiusRegPow_commute, comp_assoc,
+    ← comp_finsetSum, ← comp_assoc, radiusRegPowCLM_comp_eq, positionSqCLM_eq ε]
   ring_nf
   simp
 
@@ -517,7 +517,7 @@ lemma lrlOperatorSqr_eq (ε : ℝˣ) : H.lrlOperator ε ⬝ᵥ H.lrlOperator ε 
   conv_lhs => enter [2, i, 1]; rw [lrlOperator_eq']
   conv_lhs => enter [2, i, 2]; rw [lrlOperator_eq'']
   simp_rw [dotProduct, mul_def, sub_eq_add_neg, ← neg_smul, add_comp, comp_add, smul_comp,
-    comp_smul, finset_sum_comp, comp_finset_sum, Finset.sum_add_distrib, ← Finset.smul_sum,
+    comp_smul, finsetSum_comp, comp_finsetSum, Finset.sum_add_distrib, ← Finset.smul_sum,
     comp_assoc, sum_LppL, sum_Lpp, sum_Lprx, sum_ppL, sum_prx, sum_rxpL, sum_rxp, sum_rxrx]
   simp only [dotProduct, mul_def, ← neg_mul, smul_zero, add_zero, ← Complex.coe_smul, ofReal_mul,
     ofReal_neg, smul_smul, zero_add, sub_eq_add_neg, ← neg_smul, smul_add, ofReal_pow,

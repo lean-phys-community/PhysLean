@@ -251,7 +251,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
       intro x _
       simp [F']
       rw [fderiv_comp', DifferentiableAt.fderiv_prodMk]
-      simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id']
+      simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id]
       trans ‖(fderiv ℝ ⇑η (t, x))‖ * ‖(ContinuousLinearMap.prod (0 : Space d →L[ℝ] Time)
         (ContinuousLinearMap.id ℝ (Space d)))‖
       · exact ContinuousLinearMap.opNorm_comp_le (fderiv ℝ ⇑η (t, x))
@@ -403,7 +403,7 @@ lemma integrable_fderiv_space {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : S
         (ContinuousLinearMap.id ℝ (Space d))‖ * (|1 + ‖t‖| ^ rt)⁻¹ := by
     intro x t
     rw [fderiv_comp', DifferentiableAt.fderiv_prodMk]
-    simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id']
+    simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id]
     trans ‖(fderiv ℝ ⇑η (t, x))‖ * ‖(ContinuousLinearMap.prod (0 : Space d →L[ℝ] Time)
       (ContinuousLinearMap.id ℝ (Space d)))‖
     · exact ContinuousLinearMap.opNorm_comp_le (fderiv ℝ ⇑η (t, x))
@@ -481,7 +481,7 @@ lemma time_integral_contDiff {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ
         funext t
         simp only [LineDeriv.lineDerivOpCLM_apply]
         rw [fderiv_comp', DifferentiableAt.fderiv_prodMk]
-        simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id', ContinuousLinearMap.coe_comp',
+        simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.coe_comp',
           Function.comp_apply, ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply,
           ContinuousLinearMap.coe_id', id_eq, SchwartzMap.lineDerivOp_apply_eq_fderiv]
         fun_prop
@@ -744,7 +744,7 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
         trans (fderiv ℝ (iteratedFDeriv ℝ n ⇑η ∘ fun x => (t, x)) x) (y 0)
         · rfl
         rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
-        simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id',
+        simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id,
           ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.prod_apply,
           ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id', id_eq]
         fun_prop
@@ -999,7 +999,7 @@ lemma constantTime_distSpaceDeriv {M : Type} {d : ℕ} [NormedAddCommGroup M] [N
   funext t
   change (fderiv ℝ (η ∘ fun x => (t, x)) x) (basis i) = _
   rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id', ContinuousLinearMap.coe_comp',
+  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.coe_comp',
     Function.comp_apply, ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply,
     ContinuousLinearMap.coe_id', id_eq]
   · fun_prop
@@ -1078,7 +1078,7 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
       funext t
       change _ = (fderiv ℝ (η ∘ fun t => (t, x)) t) 1
       rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
-      simp only [fderiv_id', fderiv_fun_const, Pi.zero_apply,
+      simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
         ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.prod_apply,
         ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
       · fun_prop
@@ -1098,7 +1098,7 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
             apply Differentiable.differentiableAt
             exact η.smooth'.differentiable (by simp))
             (by fun_prop), DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
-          simp only [Nat.succ_eq_add_one, fderiv_id', fderiv_fun_const, Pi.zero_apply,
+          simp only [Nat.succ_eq_add_one, fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
             ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.prod_apply,
             ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
         exact integrable_time_integral (LineDeriv.lineDerivOpCLM ℝ _ ((1, 0) : Time × Space d) η) x

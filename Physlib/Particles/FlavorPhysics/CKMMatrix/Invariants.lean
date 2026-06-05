@@ -28,7 +28,6 @@ noncomputable section
 namespace Invariant
 
 /-- The complex jarlskog invariant for a CKM matrix. -/
-@[simps!]
 def jarlskogℂCKM (V : CKMMatrix) : ℂ :=
   [V]us * [V]cb * conj [V]ub * conj [V]cs
 

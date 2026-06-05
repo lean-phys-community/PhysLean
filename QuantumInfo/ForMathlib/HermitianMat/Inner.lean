@@ -298,7 +298,7 @@ private theorem inner_zero_iff_aux_lemma [DecidableEq n] (hA₁ : A.mat.PosSemid
     simp only [LinearMap.mem_ker]
     show (Matrix.toEuclideanLin val_1) ((Matrix.toEuclideanLin val) y) = 0
     simp [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mulVec_mulVec, h_comm]
-  · grind
+  · exact h_range_ker
 
 /-- The inner product of two PSD matrices is zero iff they have disjoint support, i.e., each lives entirely
 in the other's kernel. -/

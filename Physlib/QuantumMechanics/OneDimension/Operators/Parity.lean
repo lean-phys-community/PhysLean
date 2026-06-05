@@ -8,6 +8,7 @@ module
 public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
 public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
 public import Mathlib.MeasureTheory.Measure.Haar.Unique
+public import Mathlib.Analysis.Calculus.ContDiff.Operations
 /-!
 
 # Parity operator
@@ -47,7 +48,6 @@ def parityOperator : (ℝ → ℂ) →ₗ[ℂ] (ℝ → ℂ) where
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The parity operator on the Schwartz maps is defined as the linear map from
   `𝓢(ℝ, ℂ)` to itself, such that `ψ` is taken to `fun x => ψ (-x)`. -/
 def parityOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
@@ -67,7 +67,7 @@ def parityOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
       simp [ContinuousLinearMap.norm_id]
     | .succ (.succ n) =>
       rw [iteratedFDeriv_succ_eq_comp_right]
-      simp only [Nat.succ_eq_add_one, fderiv_id', Function.comp_apply,
+      simp only [Nat.succ_eq_add_one, fderiv_fun_id, Function.comp_apply,
         LinearIsometryEquiv.norm_map, ge_iff_le]
       rw [iteratedFDeriv_const_of_ne]
       simp only [Pi.zero_apply, norm_zero]
@@ -80,7 +80,6 @@ def parityOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
     intro x
     simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The unbounded parity operator, whose domain is Schwartz maps. -/
 def parityOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_injective :=
   UnboundedOperator.ofSelfCLM parityOperatorSchwartz
@@ -99,7 +98,6 @@ lemma parityOperatorSchwartz_parityOperatorSchwartz (ψ : 𝓢(ℝ, ℂ)) :
 
 open InnerProductSpace
 
-set_option backward.isDefEq.respectTransparency false in
 lemma parityOperatorUnbounded_isSelfAdjoint :
     parityOperatorUnbounded.IsSelfAdjoint := by
   intro ψ1 ψ2
@@ -112,8 +110,6 @@ lemma parityOperatorUnbounded_isSelfAdjoint :
   · exact Eq.symm (integral_neg_eq_self f volume)
   · simp only [neg_neg, f]
     rfl
-
-open InnerProductSpace
 
 end HilbertSpace
 end

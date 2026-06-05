@@ -88,7 +88,7 @@ lemma fromSingleT_map {c c1 : C}
 
 set_option backward.isDefEq.respectTransparency false in
 lemma contrT_fromSingleT_fromSingleT {c : C} (x : V c)
-    (y :  V (S.τ c)) :
+    (y : V (S.τ c)) :
     contrT (S := S) 0 0 1 (by simp; rfl) (prodT (fromSingleT x) (fromSingleT y)) =
     (S.contr c) (x ⊗ₜ[k] y) • (Pure.toTensor default) := by
   rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, prodT_pure, contrT_pure, Pure.contrP,
@@ -133,11 +133,11 @@ lemma fromPairT_tmul {c1 c2 : C} (x : V c1)
 
 set_option backward.isDefEq.respectTransparency false in
 lemma actionT_fromPairT {c1 c2 : C}
-    (x : V c1 ⊗[k]V c2 )
+    (x : V c1 ⊗[k]V c2)
     (g : G) :
     g • fromPairT (S := S) x = fromPairT (TensorProduct.map (rep c1 g)
       (rep c2 g) x) := by
-  let P (x : V c1 ⊗[k] V c2 ) : Prop :=
+  let P (x : V c1 ⊗[k] V c2) : Prop :=
     g • fromPairT (S := S) x = fromPairT (TensorProduct.map (rep c1 g)
       (rep c2 g) x)
   change P x
@@ -211,9 +211,9 @@ lemma fromPairT_comm {c1 c2 : C}
 
 /-- The contraction of tensors with one index with one with two indices defined categorically. -/
 noncomputable def fromSingleTContrFromPairT {c c2 : C}
-    (x : V c) (y : V (S.τ c) ⊗[k] V c2) :  S.Tensor ![c2] :=
+    (x : V c) (y : V (S.τ c) ⊗[k] V c2) : S.Tensor ![c2] :=
   let T1 : V c ⊗[k] (V (S.τ c) ⊗[k] (V c2)) := x ⊗ₜ[k] y
-  let T3 : (V c ⊗[k] V (S.τ c) ) ⊗[k] V c2 := (TensorProduct.assoc _ _ _ _).symm T1
+  let T3 : (V c ⊗[k] V (S.τ c)) ⊗[k] V c2 := (TensorProduct.assoc _ _ _ _).symm T1
   let T4 : k ⊗[k] V c2 := (S.contr c).toLinearMap.rTensor (V c2) T3
   let T5 : V c2 := TensorProduct.lid _ _ T4
   fromSingleT T5
@@ -419,7 +419,7 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : C)
 set_option backward.isDefEq.respectTransparency false in
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : C)
     (x : V c1 ⊗[k] V c)
-    (y :  V (S.τ c) ⊗[k] V c2) :
+    (y : V (S.τ c) ⊗[k] V c2) :
     contrT 2 1 2 (by simp; rfl)
       (prodT (fromPairT x) (fromPairT y)) =
     permT id (by simp; exact ⟨rfl, rfl⟩) (fromPairTContr x y) := by
@@ -583,7 +583,7 @@ lemma actionT_fromTripleT {c1 c2 c3 : C}
 
 set_option backward.isDefEq.respectTransparency false in
 lemma fromTripleT_basis_repr {c c1 c2 : C}
-    (x : V c ⊗[k] (V c1  ⊗[k] V c2))
+    (x : V c ⊗[k] (V c1 ⊗[k] V c2))
     (φ : ComponentIdx ![c, c1, c2]) :
     (basis ![c, c1, c2]).repr (fromTripleT (S := S) x) φ =
     (Basis.tensorProduct (b c) (Basis.tensorProduct (b c1) (b c2))).repr x

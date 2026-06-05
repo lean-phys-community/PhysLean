@@ -46,8 +46,9 @@ def header : String := "
 
 "
 
-def main (args : List String) : IO UInt32 := do
+unsafe def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   let firstArg := args.head?
   match firstArg with
   | some x => do

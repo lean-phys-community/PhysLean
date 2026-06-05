@@ -48,12 +48,11 @@ lemma ofCliffordAlgebra_ι_single (i : Fin 3) (r : ℝ) :
   CliffordAlgebra.lift_ι_apply _ _ _ |>.trans <| Subtype.ext <| by
     simp only [Fin.isValue, Nat.succ_eq_add_one, Nat.reduceAdd, LinearMap.coe_sum,
       LinearMap.coe_smulRight, LinearMap.coe_proj, Function.eval, SetLike.mk_smul_mk,
-      Finset.sum_apply, AddSubmonoidClass.coe_finset_sum]
+      Finset.sum_apply, AddSubmonoidClass.coe_finsetSum]
     rw [Finset.sum_eq_single i]
     · simp
     · intro b _ hb
       simp [Pi.single_eq_of_ne hb]
-      module
     · simp
 
 end PauliMatrix

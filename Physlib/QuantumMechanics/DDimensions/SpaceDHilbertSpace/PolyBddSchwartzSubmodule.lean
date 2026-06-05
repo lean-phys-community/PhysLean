@@ -5,9 +5,9 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 /-!
 
 # Polynomially-bounded Schwartz submodules
@@ -155,7 +155,8 @@ lemma le_schwartzSubmodule (d : ℕ) (a : ℕ∞) : polyBddSchwartzSubmodule d a
 
 lemma antitone (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
     polyBddSchwartzSubmodule d b ≤ polyBddSchwartzSubmodule d a := by
-  simp only [polyBddSchwartzSubmodule, polyBddSchwartzIncl, LinearMap.range_domRestrict]
+  simp only [polyBddSchwartzSubmodule, polyBddSchwartzIncl,
+    ContinuousLinearMap.toLinearMap_domRestrict, LinearMap.range_domRestrict]
   exact Submodule.map_mono (polyBddSchwartzMap_antitone d h)
 
 /-!
@@ -264,7 +265,7 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
             rw [← mul_zero (C * 2 ^ d), ← zero_pow (M₀ := ℝ) hd.ne']
             refine ENNReal.tendsto_ofReal <| Tendsto.const_mul (C * 2 ^ d) ?_
             exact tendsto_one_div_add_atTop_nhds_zero_nat.pow d
-        refine Tendsto.squeeze tendsto_const_nhds hξB (zero_le _) (fun n ↦ ?_)
+        refine Tendsto.squeeze tendsto_const_nhds hξB (zero_le) (fun n ↦ ?_)
         suffices ∫⁻ x, ‖σ n x‖ₑ ^ 2 = ∫⁻ x in B n, ‖σ n x‖ₑ ^ 2 by
           rw [this]
           refine setLIntegral_mono_ae' measurableSet_ball ?_
@@ -280,7 +281,7 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
         apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
         have hψξ : Tendsto (fun n ↦ ∫⁻ x, ‖(ψ n - ξ) x‖ₑ ^ 2) atTop (nhds 0) :=
           tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mp (sub_self ξ ▸ hψξ.sub_const ξ)
-        refine Tendsto.squeeze tendsto_const_nhds hψξ (zero_le _) (fun n ↦ ?_)
+        refine Tendsto.squeeze tendsto_const_nhds hψξ (zero_le) (fun n ↦ ?_)
         refine lintegral_mono_ae ?_
         filter_upwards [hφσ_ae n, hψξ_ae n] with x h h'
         simp_rw [h, h', Pi.sub_apply, hg, s, ← mul_sub]

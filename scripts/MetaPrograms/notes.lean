@@ -411,5 +411,6 @@ def makeYML (nt : Note × String) : IO UInt32 := do
 
 unsafe def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   let _ ← notesToMake.mapM makeYML
   pure 0

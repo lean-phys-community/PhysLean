@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.Basic
 public import Physlib.Relativity.Tensors.Product
 /-!
 
@@ -14,7 +13,6 @@ public import Physlib.Relativity.Tensors.Product
 -/
 
 @[expose] public section
-
 
 namespace TensorSpecies
 

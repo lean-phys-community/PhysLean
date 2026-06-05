@@ -201,9 +201,9 @@ def pseudoRiemannianMetricValToQuadraticForm
   exists_companion' :=
       ⟨LinearMap.mk₂ ℝ (fun v y => val x v y + val x y v)
         (fun v₁ v₂ y => by simp only [map_add, add_apply]; ring)
-        (fun a v y => by simp only [map_smul, smul_apply]; ring_nf; exact Eq.symm (smul_add ..))
+        (fun a v y => by simp only [map_smul, smul_apply]; ring)
         (fun v y₁ y₂ => by simp only [map_add, add_apply]; ring)
-        (fun a v y => by simp only [map_smul, smul_apply]; ring_nf; exact Eq.symm (smul_add ..)),
+        (fun a v y => by simp only [map_smul, smul_apply]; ring),
             by
               intro v y
               simp only [LinearMap.mk₂_apply, ContinuousLinearMap.map_add,
@@ -383,6 +383,7 @@ lemma flatL_surj
         fun f => f.toLinearMap
       let from_dual : Module.Dual ℝ (TangentSpace I x) → (TangentSpace I x →L[ℝ] ℝ) := fun f =>
         ContinuousLinearMap.mk f (by
+          have : T2Space (TangentSpace I x) := inferInstanceAs (T2Space E)
           apply LinearMap.continuous_of_finiteDimensional)
       let equiv : (TangentSpace I x →L[ℝ] ℝ) ≃ₗ[ℝ] Module.Dual ℝ (TangentSpace I x) :=
       { toFun := to_dual,
@@ -406,6 +407,7 @@ def flatEquiv
     (g : PseudoRiemannianMetric E H M n I)
     (x : M) :
     TangentSpace I x ≃L[ℝ] (TangentSpace I x →L[ℝ] ℝ) :=
+  have : T2Space (TangentSpace I x) := inferInstanceAs (T2Space E)
   LinearEquiv.toContinuousLinearEquiv
     (LinearEquiv.ofBijective
       ((g.flatL x).toLinearMap)
@@ -567,13 +569,11 @@ noncomputable def cotangentToQuadraticForm (g : PseudoRiemannianMetric E H M n I
           cotangentMetricVal g x ω₁ ω₂ + cotangentMetricVal g x ω₂ ω₁)
         (fun ω₁ ω₂ ω₃ => by simp only [cotangentMetricVal, map_add, add_apply]; ring)
         (fun a ω₁ ω₂ => by
-          simp only [cotangentMetricVal, map_smul, smul_apply];
-          ring_nf; exact Eq.symm (smul_add ..))
+          simp only [cotangentMetricVal, map_smul, smul_apply]; ring)
         (fun ω₁ ω₂ ω₃ => by
           simp only [cotangentMetricVal, map_add, add_apply]; ring)
         (fun a ω₁ ω₂ => by
-          simp only [cotangentMetricVal, map_smul, smul_apply]; ring_nf;
-          exact Eq.symm (smul_add ..)),
+          simp only [cotangentMetricVal, map_smul, smul_apply]; ring),
           by
             intro ω₁ ω₂
             simp only [LinearMap.mk₂_apply, cotangentMetricVal]

@@ -42,7 +42,7 @@ lemma metricTensor_invariant {c : C} (g : G) :
 lemma permT_fromPairTContr_metric_metric {c : C} :
     permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> rfl))
     (fromPairTContr ((S.metric c) (1 : k))
-    ((S.metric ( (S.τ c))) (1 : k))) = (unitTensor c) := by
+    ((S.metric ((S.τ c))) (1 : k))) = (unitTensor c) := by
   rw [fromPairTContr, ← fromPairT_comm]
   change _ = fromPairT ((S.unit c) (1 : k))
   rw [← S.contr_metric]

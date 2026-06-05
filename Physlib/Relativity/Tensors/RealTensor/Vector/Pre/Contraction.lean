@@ -144,8 +144,8 @@ open CategoryTheory
 
 /-- The linear map from Contr d ⊗ Contr d to ℝ induced by the homomorphism
   `Contr.toCo` and the contraction `contrCoContract`. -/
-def contrContrContract :  ((ContrMod.rep (d := d)).tprod (ContrMod.rep (d := d))).IntertwiningMap
-    (Representation.trivial ℝ (LorentzGroup d) ℝ) :=  contrCoContract.comp
+def contrContrContract : ((ContrMod.rep (d := d)).tprod (ContrMod.rep (d := d))).IntertwiningMap
+    (Representation.trivial ℝ (LorentzGroup d) ℝ) := contrCoContract.comp
   ((Contr.toCo d).lTensor (ContrMod.rep (d := d)))
 
 /-- The linear map from Contr d ⊗ Contr d to ℝ induced by the homomorphism

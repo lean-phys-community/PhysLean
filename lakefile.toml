@@ -1,0 +1,115 @@
+name = "Physlib"
+defaultTargets = ["Physlib", "QuantumInfo"]
+
+[[require]]
+name = "«doc-gen4»"
+git = "https://github.com/leanprover/doc-gen4"
+rev = "v4.30.0"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.30.0"
+
+[[lean_lib]]
+name = "Physlib"
+moreLeanArgs = ["-Dwarn.sorry=false", "-Dweak.says.verify=true"]
+
+[[lean_lib]]
+name = "QuantumInfo"
+moreLeanArgs = ["-Dwarn.sorry=false", "-Dweak.says.verify=true"]
+
+[[lean_exe]]
+name = "check_file_imports"
+srcDir = "scripts"
+
+[[lean_exe]]
+name = "style_lint"
+srcDir = "scripts/MetaPrograms"
+
+[[lean_exe]]
+name = "type_former_lint"
+srcDir = "scripts"
+
+[[lean_exe]]
+name = "lint_all"
+srcDir = "scripts"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "check_dup_tags"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "sorry_lint"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "runPhyslibLinters"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "free_simps"
+srcDir = "scripts/MetaPrograms"
+
+[[lean_exe]]
+name = "spelling"
+srcDir = "scripts/MetaPrograms"
+
+[[lean_exe]]
+name = "check_rfl"
+srcDir = "scripts/MetaPrograms"
+
+[[lean_exe]]
+name = "redundant_imports"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "module_doc_lint"
+srcDir = "scripts/MetaPrograms"
+
+[[lean_exe]]
+name = "stats"
+srcDir = "scripts"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "local_stats"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "make_tag"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "TODO_to_yml"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "informal"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "find_TODOs"
+srcDir = "scripts"
+
+[[lean_exe]]
+name = "notes"
+srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "mathlib_textLint_on_physlib"
+srcDir = "scripts"
+
+[[lean_exe]]
+name = "no_docs"
+srcDir = "scripts/MetaPrograms"

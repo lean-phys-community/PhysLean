@@ -185,7 +185,7 @@ lemma toComplex_repr {n} {c : Fin n → realLorentzTensor.Color}
   rw [toComplex_eq_sum_basis]
   -- `repr` commutes with finite sums of tensors; then push the Finsupp evaluation into the sum
   rw [map_sum]
-  simp only [Finsupp.coe_finset_sum, Finset.sum_apply]
+  simp only [Finsupp.coe_finsetSum, Finset.sum_apply]
   -- The sum has only one non-zero term (when k = i.complexify)
   rw [Fintype.sum_eq_single i.complexify]
   · -- Case k = i.complexify: show the term equals ↑(repr v i)
@@ -301,7 +301,7 @@ open Lorentz.SL2C
 
 /-- For a given color, the map turning a real Lorentz vector into a complex one. -/
 noncomputable def toComplexVector (c : realLorentzTensor.Color) :
-  realLorentzTensor.modules 3 c  →ₛₗ[Complex.ofRealHom] complexLorentzTensor.modules
+  realLorentzTensor.modules 3 c →ₛₗ[Complex.ofRealHom] complexLorentzTensor.modules
     (colorToComplex c) where
   toFun v := match c with
     | Color.up => ∑ i, ((Lorentz.contrBasis 3).repr v i) •
@@ -381,37 +381,37 @@ lemma toComplexPure_component {c : Fin n → Color} (p : Pure realLorentzTensor 
   generalize c x = c at *
   fin_cases c
   · simp only [colorToComplex, toComplexVector, Nat.reduceAdd, Fin.cast_eq_self, P, b, b']
-    trans  (∑ x, (Lorentz.complexContrBasisFin4.repr ((Lorentz.contrBasis.repr px) x •
+    trans (∑ x, (Lorentz.complexContrBasisFin4.repr ((Lorentz.contrBasis.repr px) x •
         Lorentz.complexContrBasisFin4 (finSumFinEquiv x))))
-     (finSumFinEquiv φx)
+      (finSumFinEquiv φx)
     · simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finset_sum, Pi.add_apply,
+      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finsetSum, Pi.add_apply,
       Finset.sum_apply]
       rfl
-    simp [- Fintype.sum_sum_type, Lorentz.complexContrBasisFin4 ]
-    trans  ∑ x, ( ((Lorentz.contrBasis.repr px) x • Lorentz.complexContrBasis.repr
-      (Lorentz.complexContrBasis x)  φx))
-    · simp  [Basis.repr_self, Complex.real_smul]
+    simp [- Fintype.sum_sum_type, Lorentz.complexContrBasisFin4]
+    trans ∑ x, (((Lorentz.contrBasis.repr px) x • Lorentz.complexContrBasis.repr
+      (Lorentz.complexContrBasis x) φx))
+    · simp [Basis.repr_self, Complex.real_smul]
       rfl
     simp [- Fintype.sum_sum_type, Finsupp.single_apply]
   · simp only [colorToComplex, toComplexVector, Nat.reduceAdd, Fin.cast_eq_self, P, b, b']
-    trans  (∑ x, (Lorentz.complexCoBasisFin4.repr ((Lorentz.coBasis.repr px) x •
+    trans (∑ x, (Lorentz.complexCoBasisFin4.repr ((Lorentz.coBasis.repr px) x •
       Lorentz.complexCoBasisFin4 (finSumFinEquiv x))))
-     (finSumFinEquiv φx)
+      (finSumFinEquiv φx)
     · simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finset_sum, Pi.add_apply,
+      Finset.sum_singleton, Nat.reduceAdd, Finsupp.coe_add, Finsupp.coe_finsetSum, Pi.add_apply,
       Finset.sum_apply]
       rfl
-    simp [- Fintype.sum_sum_type, Lorentz.complexCoBasisFin4 ]
-    trans  ∑ x, ( ((Lorentz.coBasis.repr px) x •
-      Lorentz.complexCoBasis.repr (Lorentz.complexCoBasis x)  φx))
-    · simp  [Basis.repr_self, Complex.real_smul]
+    simp [- Fintype.sum_sum_type, Lorentz.complexCoBasisFin4]
+    trans ∑ x, (((Lorentz.coBasis.repr px) x •
+      Lorentz.complexCoBasis.repr (Lorentz.complexCoBasis x) φx))
+    · simp [Basis.repr_self, Complex.real_smul]
       rfl
     simp [- Fintype.sum_sum_type, Finsupp.single_apply]
 
 @[sorryful]
 lemma actionP_toComplexPure {n : ℕ } (c : Fin n → Color) (p : Pure realLorentzTensor c)
-    (Λ : SL(2, ℂ))  :
+    (Λ : SL(2, ℂ)) :
     Λ • toComplexPure p = toComplexPure (toLorentzGroup Λ • p) := by
   ext i
   simp [Pure.actionP_eq, toComplexPure]
@@ -424,24 +424,24 @@ lemma actionP_toComplexPure {n : ℕ } (c : Fin n → Color) (p : Pure realLoren
     | complexLorentzTensor.Color.up => Lorentz.ContrℂModule.SL2CRep
     | complexLorentzTensor.Color.down => Lorentz.CoℂModule.SL2CRep
   let b' (c : Color) : Representation ℝ _ (realLorentzTensor.modules 3 c) :=
-    (match c  with
+    (match c with
     | Color.up => Lorentz.ContrMod.rep
     | Color.down => Lorentz.CoMod.rep)
   let P (c : Color) (px : realLorentzTensor.modules 3 c) : Prop :=
-    b c Λ (toComplexVector c px)  = toComplexVector c (b' c (toLorentzGroup Λ) px)
+    b c Λ (toComplexVector c px) = toComplexVector c (b' c (toLorentzGroup Λ) px)
   change P (c i) (p i)
   generalize p i = p at *
   generalize c i = c at *
   fin_cases c
   · simp_all [P, b, b', colorToComplex]
-    calc _ =  (Lorentz.ContrℂModule.SL2CRep Λ) (∑ i, ((Lorentz.contrBasis 3).repr p i) •
+    calc _ = (Lorentz.ContrℂModule.SL2CRep Λ) (∑ i, ((Lorentz.contrBasis 3).repr p i) •
       Lorentz.complexContrBasisFin4 (finSumFinEquiv i)) := by rfl
-        _ =  (∑ i, (Lorentz.ContrℂModule.SL2CRep Λ) (((Lorentz.contrBasis 3).repr p i) •
+        _ = (∑ i, (Lorentz.ContrℂModule.SL2CRep Λ) (((Lorentz.contrBasis 3).repr p i) •
           (Lorentz.complexContrBasisFin4 (finSumFinEquiv i)))) := by
           simp only [Nat.reduceAdd, map_sum]
-        _ =  (∑ i, (Lorentz.ContrℂModule.SL2CRep Λ) (((Lorentz.contrBasis 3).repr p i : ℂ) •
+        _ = (∑ i, (Lorentz.ContrℂModule.SL2CRep Λ) (((Lorentz.contrBasis 3).repr p i : ℂ) •
           (Lorentz.complexContrBasisFin4 (finSumFinEquiv i)))) := by rfl
-        _ =  (∑ i, (((Lorentz.contrBasis 3).repr p i : ℂ) •
+        _ = (∑ i, (((Lorentz.contrBasis 3).repr p i : ℂ) •
             (Lorentz.ContrℂModule.SL2CRep Λ)
             (Lorentz.complexContrBasisFin4 (finSumFinEquiv i)))) := by
           congr
@@ -451,7 +451,7 @@ lemma actionP_toComplexPure {n : ℕ } (c : Fin n → Color) (p : Pure realLoren
   · simp_all [P, b, b', colorToComplex]
     sorry
 
-lemma toComplex_pure  {n : ℕ } (c : Fin n → Color) (p : Pure realLorentzTensor c) :
+lemma toComplex_pure {n : ℕ} (c : Fin n → Color) (p : Pure realLorentzTensor c) :
     toComplex p.toTensor = (toComplexPure p).toTensor := by
   apply (Tensor.basis _).repr.injective
   ext φ

@@ -7,7 +7,7 @@ module
 
 public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
-public import Mathlib.Topology.Algebra.Module.PointwiseConvergence
+public import Mathlib.Topology.Algebra.Module.Spaces.PointwiseConvergenceCLM
 /-!
 
 # Distributions

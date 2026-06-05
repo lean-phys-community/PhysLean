@@ -370,12 +370,14 @@ lemma re_hsInner_eq_traceRe (X Y : L ℋ) :
   rw [hsInner_eq_trace]
   simp [mul_assoc]
 
+omit [CompleteSpace ℋ] in
 @[simp] lemma leftMulHS_real_smul_one (r : ℝ) :
     leftMulHS (ℋ := ℋ) (r • (1 : L ℋ)) = r • (1 : L (HSOp ℋ)) := by
   ext T
   change ofOp ((r • (1 : L ℋ)) * toOp T) = ofOp (r • toOp T)
   simp [Algebra.smul_def]
 
+omit [CompleteSpace ℋ] in
 @[simp] lemma rightMulHS_real_smul_one (r : ℝ) :
     rightMulHS (ℋ := ℋ) (r • (1 : L ℋ)) = r • (1 : L (HSOp ℋ)) := by
   ext T

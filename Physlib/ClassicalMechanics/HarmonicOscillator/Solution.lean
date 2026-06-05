@@ -141,7 +141,6 @@ This is useful when the natural reference point for a problem is not at time zer
   /-- The velocity at time t₀. -/
   v_t₀ : EuclideanSpace ℝ (Fin 1)
 
-
 /-!
 
 ##### A.2.1.2. Conversion to standard initial conditions

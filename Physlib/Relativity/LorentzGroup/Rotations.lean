@@ -109,8 +109,7 @@ def ofSpecialOrthogonal {d} :
         rw [mem_iff_self_mul_dual, ← h1] at hΛ
         simp [minkowskiMatrix.dual] at hΛ
         rw [minkowskiMatrix.as_block] at hΛ
-        simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply,
-          SubtractionMonoid.neg_neg] at hΛ
+        simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply] at hΛ
         ext i j
         trans (Matrix.fromBlocks (1 : Matrix (Fin 1) (Fin 1) ℝ) 0 0 (M * M.transpose))
           (Sum.inr i) (Sum.inr j)

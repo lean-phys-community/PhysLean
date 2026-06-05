@@ -204,7 +204,7 @@ def complexLorentzTensor : TensorSpecies ℂ complexLorentzTensor.Color SL(2, �
     match c with
     | Color.upL => Fermion.altLeftLeftUnit_symm
     | Color.downL => Fermion.leftAltLeftUnit_symm
-    | Color.upR =>  Fermion.altRightRightUnit_symm
+    | Color.upR => Fermion.altRightRightUnit_symm
     | Color.downR => Fermion.rightAltRightUnit_symm
     | Color.up => Lorentz.coContrUnit_symm
     | Color.down => Lorentz.contrCoUnit_symm
@@ -239,7 +239,7 @@ abbrev basis (c : Color) : Module.Basis (Fin (repDim c)) ℂ (modules c) :=
   | Color.down => Lorentz.complexCoBasisFin4
 
 /-- The reps associated with each of the different types of complex Lorentz vector space. -/
-abbrev rep (c : Color) : Representation ℂ  SL(2, ℂ) (modules c) :=
+abbrev rep (c : Color) : Representation ℂ SL(2, ℂ) (modules c) :=
   match c with
   | Color.upL => Fermion.leftHandedRep
   | Color.downL => Fermion.altLeftHandedRep

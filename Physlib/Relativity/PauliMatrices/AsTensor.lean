@@ -129,7 +129,7 @@ def asConsTensor :
             simp only [SL2C.toLorentzGroup_apply_coe, Fintype.sum_sum_type, Finset.univ_unique,
               Fin.default_eq_zero, Fin.isValue, Finset.sum_singleton, map_inv,
               LorentzGroup.inv_eq_dual, AddSubgroup.coe_add, selfAdjoint.val_smul,
-              AddSubgroup.val_finset_sum, map_add, map_sum]
+              AddSubgroup.val_finsetSum, map_add, map_sum]
         _ = ∑ x, ∑ i, ∑ j, ((SL2C.toLorentzGroup M).1 i x • (complexContrBasis i)) ⊗ₜ[ℂ]
               leftRightToMatrix.symm.toLinearMap
                 ((SL2C.toLorentzGroup M⁻¹).1 x j • (pauliBasis j)) := by

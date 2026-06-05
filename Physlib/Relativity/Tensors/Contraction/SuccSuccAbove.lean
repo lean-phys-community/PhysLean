@@ -145,7 +145,7 @@ lemma succSuccAbove_range {i j : Fin (n + 1 + 1)} (hij : i ≠ j) :
     simpa using h1
   · intro h
     simp at h
-    rcases  Fin.eq_self_or_eq_succAbove i a with rfl | ⟨a, rfl⟩
+    rcases Fin.eq_self_or_eq_succAbove i a with rfl | ⟨a, rfl⟩
     · simp_all
     use a
     simp_all
@@ -154,7 +154,7 @@ lemma succSuccAbove_eq_orderEmbOfFin {n : ℕ}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j) :
     succSuccAbove i j = Finset.orderEmbOfFin {i, j}ᶜ
     (by rw [Finset.card_compl]; simp [Finset.card_pair hij]) := by
-  apply ((succSuccAbove_strictMono i j).range_inj  (OrderEmbedding.strictMono _)).mp
+  apply ((succSuccAbove_strictMono i j).range_inj (OrderEmbedding.strictMono _)).mp
   simp only [succSuccAbove_range hij, Finset.range_orderEmbOfFin, Finset.coe_compl,
       Finset.coe_insert, Finset.coe_singleton]
 

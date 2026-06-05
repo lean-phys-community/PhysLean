@@ -224,7 +224,7 @@ lemma radiusRegPow_commutation_momentumSqr :
       simp [momentum_comp_position_eq, sub_add_eq_add_sub, ← two_smul ℂ]
     _ = (s * I * ℏ) • ((2 : ℂ) • 𝐫₀ ε (s-2) ∘L (𝐱 ⬝ᵥ 𝐩) - (d * I * ℏ) • 𝐫₀ ε (s-2)
         - ((s - 2) * I * ℏ) • 𝐫₀ ε (s-4) ∘L ∑ i, 𝐱 i ∘L 𝐱 i) := by
-      simp [Finset.sum_sub_distrib, ← Finset.smul_sum, ← comp_finset_sum,
+      simp [Finset.sum_sub_distrib, ← Finset.smul_sum, ← comp_finsetSum,
         ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, dotProduct, mul_def, mul_assoc]
     _ = (2 * s * I * ℏ) • 𝐫₀ ε (s-2) ∘L (𝐱 ⬝ᵥ 𝐩) + (s * (d + s - 2) * ℏ ^ 2) • 𝐫₀ ε (s-2)
         - (ε ^ 2 * s * (s - 2) * ℏ ^ 2) • 𝐫₀ ε (s-4) := by

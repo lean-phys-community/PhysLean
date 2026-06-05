@@ -8,7 +8,6 @@ module
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
 public import Physlib.Relativity.Tensors.Contraction.Basis
 public import Physlib.Relativity.Tensors.Elab
-meta import Mathlib.Tactic.Cases
 /-!
 
 ## Real Lorentz tensors
@@ -64,10 +63,10 @@ open realLorentzTensor in
 /-- The tensor structure for complex Lorentz tensors. -/
 def realLorentzTensor (d : ℕ := 3) : TensorSpecies
     ℝ realLorentzTensor.Color (LorentzGroup d)
-    (fun | Color.up  => Lorentz.ContrMod d | Color.down => Lorentz.CoMod d)
+    (fun | Color.up => Lorentz.ContrMod d | Color.down => Lorentz.CoMod d)
     (fun _ => Fin 1 ⊕ Fin d)
-    (fun | Color.up  => Lorentz.ContrMod.rep | Color.down => Lorentz.CoMod.rep)
-    (fun | Color.up  => Lorentz.contrBasis d | Color.down => Lorentz.coBasis d)  where
+    (fun | Color.up => Lorentz.ContrMod.rep | Color.down => Lorentz.CoMod.rep)
+    (fun | Color.up => Lorentz.contrBasis d | Color.down => Lorentz.coBasis d) where
   τ := fun c =>
     match c with
     | Color.up => Color.down
@@ -185,12 +184,12 @@ lemma contrPCoeff_basis {d n : ℕ} {c : Fin n → realLorentzTensor.Color} (i j
 
 lemma contrT_eq_sum_evalT {n} {d} (c : Fin (n + 1 + 1) → Color) (i j : Fin (n + 1 + 1))
     (h : i ≠ j ∧ (realLorentzTensor d).τ (c i) = c j) (t : ℝT(d, c)) :
-    contrT n i j h t =  ∑ (μ : Fin 1 ⊕ Fin d), permT id (by
+    contrT n i j h t = ∑ (μ : Fin 1 ⊕ Fin d), permT id (by
       simp [Fin.succSuccAbove_eq_predAbove h.1])
-     (evalT ((Fin.predAbove 0 i).predAbove j) μ (evalT i μ t)) := by
+      (evalT ((Fin.predAbove 0 i).predAbove j) μ (evalT i μ t)) := by
   induction' t using Tensor.induction_on_basis with b r t h t1 t2 h1 h2
   · rw [contrT_basis]
-    simp only [ contrPCoeff_basis, ite_smul, one_smul, zero_smul]
+    simp only [contrPCoeff_basis, ite_smul, one_smul, zero_smul]
     conv_rhs =>
       enter [2, μ];
       simp only [evalT_basis, Fin.zero_succAbove, apply_ite, Fin.succ_zero_eq_one, map_zero]

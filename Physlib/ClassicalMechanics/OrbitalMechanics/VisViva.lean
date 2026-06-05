@@ -6,7 +6,6 @@ Authors: Hannah Dawe
 
 module
 
-public import Mathlib.Data.Real.Basic
 public import Mathlib.Data.Real.Sqrt
 
 /-!
@@ -15,7 +14,6 @@ The vis-viva equation relates the speed of an orbiting body to its position
 and the mass of the central body. This module defines a simplified version of the
 vis-viva equation that is restricted to circular orbits (v^2 = G M / r).
 -/
-
 
 @[expose] public section
 

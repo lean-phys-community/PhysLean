@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Distributional.Basic
-public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
 public import Mathlib.Data.Real.Hom
 /-!
 

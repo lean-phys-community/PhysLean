@@ -100,7 +100,7 @@ lemma mul_polynomial_integrable (f : ℝ → ℂ) (hf : MemHS f) (P : Polynomial
     rw [Finsupp.sum]
     simp
   rw [h2]
-  apply MeasureTheory.integrable_finset_sum
+  apply MeasureTheory.integrable_finsetSum
   intro i hi
   simp only [mul_assoc]
   have hf' : (fun x => ↑(a i) * (physHermite i (x/Q.ξ) *
@@ -199,7 +199,7 @@ lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     funext x
     rw [← ha]
     simp [← Finset.sum_mul, Finsupp.sum]
-  rw [h2, MeasureTheory.integral_finset_sum]
+  rw [h2, MeasureTheory.integral_finsetSum]
   · apply Finset.sum_eq_zero
     intro x hx
     simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
@@ -394,7 +394,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       (Complex.I * ↑c * ↑y) ^ r / r ! *
       (f y * Real.exp (- y^2 / (2 * Q.ξ^2)))) = fun (n : ℕ) => 0 := by
     funext n
-    rw [MeasureTheory.integral_finset_sum]
+    rw [MeasureTheory.integral_finsetSum]
     · apply Finset.sum_eq_zero
       intro r hr
       have hf' : (fun a => (Complex.I * ↑c * ↑a) ^ r / ↑r ! *

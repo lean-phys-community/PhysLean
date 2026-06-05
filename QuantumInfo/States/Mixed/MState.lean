@@ -709,7 +709,7 @@ theorem eq_of_sum_eq_pure {d : Type*} [Fintype d] [DecidableEq d]
     have h_tr_pure : ∑ j ∈ s, p j • ⟪ρ.M, (ρs j).M⟫ = 1 := by
       have h_tr_pure : ⟪ρ.M, ∑ j ∈ s, p j • (ρs j).M⟫ = ∑ j ∈ s, p j • ⟪ρ.M, (ρs j).M⟫ := by
         simp [ HermitianMat.inner_def, ← val_eq_coe ];
-        rw [AddSubgroup.val_finset_sum]
+        rw [AddSubgroup.val_finsetSum]
         simp [Finset.mul_sum]
       rw [ ← h_tr_pure, ← h_sum ];
       convert h_pure using 1;

@@ -6,12 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import Mathlib.Analysis.InnerProductSpace.JointEigenspace
-public import Mathlib.Analysis.SpecialFunctions.Bernstein
-public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 public import Mathlib.LinearAlgebra.Matrix.Permutation
-public import Mathlib.LinearAlgebra.Matrix.IsDiag
-public import Mathlib.Tactic.NormNum.GCD
-
 public import QuantumInfo.ForMathlib.Matrix
 
 @[expose] public section
@@ -451,7 +446,7 @@ theorem LinearMap.apply_A_sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[�
     mul_one, ← RCLike.conj_eq_iff_re, ← RCLike.star_def]
   have h₃ : (sharedEigenbasis hA hB hAB) i ≠ 0 := by
     have := (sharedEigenbasis hA hB hAB).orthonormal.1 i
-    grind [norm_zero, zero_ne_one]
+    exact fun h => by simp [h] at this
   simpa [inner_smul_left, inner_smul_right, h₂, h₃] using
     hA ((sharedEigenbasis hA hB hAB) i) ((sharedEigenbasis hA hB hAB) i)
 
@@ -467,15 +462,15 @@ theorem LinearMap.apply_B_sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[�
     mul_one, ← RCLike.conj_eq_iff_re, ← RCLike.star_def]
   have h₃ : (sharedEigenbasis hA hB hAB) i ≠ 0 := by
     have := (sharedEigenbasis hA hB hAB).orthonormal.1 i
-    grind [norm_zero, zero_ne_one]
+    exact fun h => by simp [h] at this
   simpa [inner_smul_left, inner_smul_right, h₂, h₃] using
     hB ((sharedEigenbasis hA hB hAB) i) ((sharedEigenbasis hA hB hAB) i)
 
 noncomputable def Matrix.sharedEigenbasis
   (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : Commute A B) :
     OrthonormalBasis d 𝕜 (EuclideanSpace 𝕜 d) :=
-  LinearMap.sharedEigenbasis (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB) (commute_euclideanLin hAB)
+  LinearMap.sharedEigenbasis (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB) (commute_euclideanLin hAB)
 
 noncomputable def Matrix.sharedEigenvectorUnitary (hA : A.IsHermitian) (hB : B.IsHermitian)
     (hAB : Commute A B) : Matrix.unitaryGroup d 𝕜 :=
@@ -494,21 +489,21 @@ theorem sharedEigenvectorUnitary_mulVec (j : d) : (sharedEigenvectorUnitary hA h
 
 noncomputable def sharedEigenvalueA (j : d) : ℝ :=
   LinearMap.sharedEigenvaluesA
-    (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB)
     (commute_euclideanLin hAB) j
 
 noncomputable def sharedEigenvalueB (j : d) : ℝ :=
   LinearMap.sharedEigenvaluesB
-    (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB)
     (commute_euclideanLin hAB) j
 
 /-- Analogous to `Matrix.IsHermitian.mulVec_eigenvectorBasis` for the shared basis. -/
 theorem mulVec_sharedEigenbasisA (j : d) :
     A *ᵥ (sharedEigenbasis hA hB hAB j) =
     (sharedEigenvalueA hA hB hAB) j • WithLp.ofLp (sharedEigenbasis hA hB hAB j) := by
-  rw [isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   have h := LinearMap.apply_A_sharedEigenbasis hA hB (Matrix.commute_euclideanLin hAB) j
   simp only [algebraMap_smul] at h
   have := congr_arg WithLp.ofLp h
@@ -518,7 +513,7 @@ theorem mulVec_sharedEigenbasisA (j : d) :
 theorem mulVec_sharedEigenbasisB (j : d) :
     B *ᵥ (sharedEigenbasis hA hB hAB j) =
     (sharedEigenvalueB hA hB hAB) j • WithLp.ofLp (sharedEigenbasis hA hB hAB j) := by
-  rw [isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   have h := LinearMap.apply_B_sharedEigenbasis hA hB (Matrix.commute_euclideanLin hAB) j
   simp only [algebraMap_smul] at h
   have := congr_arg WithLp.ofLp h
@@ -546,7 +541,7 @@ theorem star_shared_mul_A_mul_IsDiag : IsDiag
     congr! 3;
   · have := ( sharedEigenbasis hA hB hAB ).orthonormal;
     rw [ orthonormal_iff_ite ] at this;
-    simp only [inner] at this
+    simp only [inner, ← starRingEnd_apply] at this
     rw [ ← Finset.smul_sum, this i j, if_neg hij, smul_zero ]
 
 /-- Analogous to `Matrix.IsHermitian.star_mul_self_mul_eq_diagonal` for the shared basis. -/

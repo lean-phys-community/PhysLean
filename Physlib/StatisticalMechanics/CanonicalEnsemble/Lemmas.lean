@@ -137,7 +137,9 @@ lemma kB_mul_beta (T : Temperature) (hT : 0 < T.val) :
     exact_mod_cast (ne_of_gt hT)
   simp [Temperature.β]
   field_simp [Temperature.β, hkB, hT0, toReal]
-  rfl
+  rw [NNReal.toReal]
+  field_simp
+  simp [toReal, hT0]
 
 /-- Fundamental relation between thermodynamic and differential entropy:
 `S_thermo = S_diff - kB * dof * log h`. -/

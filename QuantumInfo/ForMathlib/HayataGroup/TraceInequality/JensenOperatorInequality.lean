@@ -157,6 +157,7 @@ private lemma spectrum_Ici_of_nonneg_wrap {A : L ℋ} (hA0 : (0 : L ℋ) ≤ A) 
 
 variable [Nontrivial ℋ]
 
+omit [CompleteSpace ℋ] in
 private lemma spectrum_zero_subset_Ici_wrap :
     spectrum ℝ (0 : L ℋ) ⊆ Set.Ici (0 : ℝ) := by
   intro x hx

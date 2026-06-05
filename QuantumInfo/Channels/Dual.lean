@@ -390,6 +390,7 @@ def HPMap.ofHermitianMat {dOut : Type*} (f : HermitianMat dIn ℂ →ₗ[ℝ] He
     · simp [IsSelfAdjoint.imaginaryPart h]
 
 set_option backward.isDefEq.respectTransparency false in
+omit [Fintype dOut] in
 --PULLOUT
 @[simp]
 theorem HPMap.linearMap_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
@@ -403,7 +404,6 @@ theorem HPMap.linearMap_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] Her
   suffices imaginaryPart x = 0 by simp [this]
   simp [imaginaryPart, skewAdjoint.negISMul, show star x = x from hx]
 
-set_option backward.isDefEq.respectTransparency false in
 --PULLOUT
 omit [Fintype dOut] in
 @[simp]

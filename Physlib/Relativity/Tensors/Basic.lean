@@ -10,7 +10,6 @@ public import Physlib.Relativity.Tensors.Contraction.SuccSuccAbove
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
 public import Mathlib.Tactic.Cases
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # Tensors
@@ -139,8 +138,8 @@ lemma map_mid_move_left {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C} (p : 
     (p' : Pure S c1) {c' : C}
     (i : Fin n) (j : Fin n1) (hi : c i = c') (hj : c1 j = c') :
     LinearEquiv.cast (R := k) (by rw [hi] : c i = c') (p i) =
-   LinearEquiv.cast (R := k) (by rw [hj] : c1 j = c')  (p' j)
-    ↔ LinearEquiv.cast (R := k) (by rw [hi, hj] : c i = c1 j)  (p i) =
+    LinearEquiv.cast (R := k) (by rw [hj] : c1 j = c') (p' j)
+    ↔ LinearEquiv.cast (R := k) (by rw [hi, hj] : c i = c1 j) (p i) =
     (p' j) := by
   subst hj
   simp_all
@@ -485,7 +484,7 @@ noncomputable instance actionP : MulAction G (Pure S c) where
   smul g p := fun i => rep (c i) g (p i)
   one_smul p := by
     ext i
-    change  rep (c i) 1 (p i) = p i
+    change rep (c i) 1 (p i) = p i
     simp
   mul_smul g g' p := by
     ext i
@@ -495,11 +494,11 @@ noncomputable instance actionP : MulAction G (Pure S c) where
 lemma actionP_eq {g : G} {p : Pure S c} : g • p = fun i => rep (c i) g (p i) := rfl
 
 lemma rep_cast {g : G} {c c1 : C} (p : V c) (h : c = c1) :
-    LinearEquiv.cast (R := k) h (rep c g p) = rep c1 g (LinearEquiv.cast (R := k) h p):= by
+    LinearEquiv.cast (R := k) h (rep c g p) = rep c1 g (LinearEquiv.cast (R := k) h p) := by
   subst h
   rfl
 
-lemma actionP_cast {g : G} {p : Pure S c} (h : c = c1):
+lemma actionP_cast {g : G} {p : Pure S c} (h : c = c1) :
     LinearEquiv.cast (R := k) h (g • p) = g • LinearEquiv.cast (R := k) h p := by
   subst h
   rfl
@@ -698,7 +697,7 @@ lemma PermCond.succSuccAbove_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1 + 1) → C}
     let i1' := (predPredAbove i2' j2' hi2j2' i1 (by simp [i2', j2']));
     let j1' := (predPredAbove i2' j2' hi2j2' j1 (by simp [i2', j2']));
     PermCond ((c ∘ i2'.succSuccAbove j2') ∘ i1'.succSuccAbove j1')
-      ((c ∘ i1.succSuccAbove j1) ∘ i2.succSuccAbove  j2) id := by
+      ((c ∘ i1.succSuccAbove j1) ∘ i2.succSuccAbove j2) id := by
   apply And.intro (Function.bijective_id)
   simp only [id_eq, Function.comp_apply]
   intro i
@@ -772,8 +771,8 @@ lemma Pure.permP_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 noncomputable def permT {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (σ : Fin m → Fin n) (h : PermCond c c1 σ) : S.Tensor c →ₗ[k] S.Tensor c1 :=
   PiTensorProduct.map (fun i => LinearEquiv.cast (R := k) (M := V)
-   (by simp : c (h.toEquiv.symm i) = c1 i)) ∘ₗ
-   (PiTensorProduct.reindex k _ h.toEquiv).toLinearMap
+    (by simp : c (h.toEquiv.symm i) = c1 i)) ∘ₗ
+  (PiTensorProduct.reindex k _ h.toEquiv).toLinearMap
 
 lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (p : Pure S c) :

@@ -583,7 +583,7 @@ lemma adjFDeriv_apply
               enter [2, y]
               rw [h]
               simp only [map_sum, map_smul, inner_sum']
-            rw [MeasureTheory.integral_finset_sum]
+            rw [MeasureTheory.integral_finsetSum]
             congr
             funext i
             congr
@@ -653,7 +653,7 @@ lemma adjFDeriv_apply
               apply Differentiable.differentiableAt
               fun_prop
         _ = ∫ (y : X), - (∑ i, fderiv ℝ (fun y' => bX.repr (ψ y') i) y (bX i)) * ⟪dy, φ y⟫_ℝ := by
-            rw [← MeasureTheory.integral_finset_sum]
+            rw [← MeasureTheory.integral_finsetSum]
             · congr
               funext y
               simp [Finset.sum_mul]

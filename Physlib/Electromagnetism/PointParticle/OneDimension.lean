@@ -8,7 +8,6 @@ module
 public import Physlib.Electromagnetism.Distributional.Dynamics.IsExtrema
 public import Physlib.SpaceAndTime.Space.Norm
 public import Physlib.SpaceAndTime.Space.Translations
-public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 /-!
 
 # The electrostatics of a stationary point particle in 1d

@@ -5,11 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.SpaceTime.Derivatives
-public import Physlib.SpaceAndTime.Space.Derivatives.Curl
 public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
-public import Physlib.Relativity.Tensors.Elab
 public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
 
 /-!
@@ -147,7 +144,7 @@ lemma deriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
   match μν with
   | (μ, ν) =>
   rw [deriv_eq_sum_sum]
-  simp only [map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul, Finset.sum_apply,
+  simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
     Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, smul_eq_mul]
   rw [Finset.sum_eq_single μ, Finset.sum_eq_single ν]
   · simp

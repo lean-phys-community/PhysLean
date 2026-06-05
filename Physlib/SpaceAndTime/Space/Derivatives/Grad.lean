@@ -324,7 +324,7 @@ lemma grad_inner_space {d} (x : Space d) (f : Space d → ℝ) (hd : Differentia
 
 lemma grad_smul_inner_space {d} (x : Space d) (f : Space d → ℝ) (hd : Differentiable ℝ f) (t : ℝ)
     (ht : 0 < t) :
-    ⟪∇ f (t • x), basis.repr x⟫_ℝ =  _root_.deriv (fun r => f (r • x)) t := by
+    ⟪∇ f (t • x), basis.repr x⟫_ℝ = _root_.deriv (fun r => f (r • x)) t := by
   by_cases hx : ‖x‖ = 0
   · simp at hx
     simp [hx]
@@ -332,7 +332,7 @@ lemma grad_smul_inner_space {d} (x : Space d) (f : Space d → ℝ) (hd : Differ
     _ = ‖x‖ * ⟪∇ f (t • x), ‖x‖⁻¹ • basis.repr x⟫_ℝ := by
       simp [inner_smul_right]
       grind
-    _ = ‖x‖ *  ⟪∇ f (t • x), ‖t • x‖⁻¹ • basis.repr (t • x)⟫_ℝ  := by
+    _ = ‖x‖ * ⟪∇ f (t • x), ‖t • x‖⁻¹ • basis.repr (t • x)⟫_ℝ := by
       simp [norm_smul, smul_smul]
       grind
     _ = ‖x‖ * _root_.deriv (fun r => f (r • ‖t • x‖⁻¹ • t • x)) ‖t • x‖ := by
@@ -340,7 +340,7 @@ lemma grad_smul_inner_space {d} (x : Space d) (f : Space d → ℝ) (hd : Differ
     _ = ‖x‖ * _root_.deriv (fun r => f (r • ‖x‖⁻¹ • x)) (t * ‖x‖) := by
       simp [smul_smul, norm_smul]
       grind
-    _ = ‖x‖ *  _root_.deriv ((fun r => f (r • x)) ∘ (fun r => ‖x‖⁻¹ * r)) (t * ‖x‖) := by
+    _ = ‖x‖ * _root_.deriv ((fun r => f (r • x)) ∘ (fun r => ‖x‖⁻¹ * r)) (t * ‖x‖) := by
       congr
       funext r
       simp [smul_smul]
@@ -350,7 +350,6 @@ lemma grad_smul_inner_space {d} (x : Space d) (f : Space d → ℝ) (hd : Differ
       rw [deriv_const_mul _ (by fun_prop)]
       simp only [deriv_id'', mul_one]
       grind
-
 
 open MeasureTheory
 lemma eq_integral_grad {f : Space → ℝ} (hf : ContDiff ℝ 1 f) :
@@ -375,7 +374,7 @@ lemma eq_integral_grad {f : Space → ℝ} (hf : ContDiff ℝ 1 f) :
       · exact h'
       · grind
       · grind
-    _ =  (f (1 • x) - f 0) + f 0 := by
+    _ = (f (1 • x) - f 0) + f 0 := by
       rw [intervalIntegral.integral_deriv_eq_sub (by fun_prop)]
       simp only [one_smul, zero_smul, sub_add_cancel]
       · apply Continuous.intervalIntegrable
@@ -443,7 +442,7 @@ lemma integrable_isDistBounded_inner_grad_schwartzMap {dm1 : ℕ}
   conv =>
     enter [1, x]
     rw [grad_eq_sum, inner_sum]
-  apply MeasureTheory.integrable_finset_sum
+  apply MeasureTheory.integrable_finsetSum
   intro i _
   simp [inner_smul_right]
   have integrable_lemma (i j : Fin (dm1 + 1)) :

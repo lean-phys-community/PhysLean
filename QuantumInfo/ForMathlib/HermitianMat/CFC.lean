@@ -436,7 +436,7 @@ theorem continuousOn_cfc_fun {T : Set ℝ}
   apply Continuous.subtype_mk
   conv => enter [1, x]; apply A.cfc_toMat_eq_sum_smul_proj (f x)
   unfold Set.restrict at hf
-  apply continuous_finset_sum _
+  apply continuous_finsetSum _
   rw [A.H.spectrum_real_eq_range_eigenvalues] at hA
   refine fun i _ ↦ Continuous.smul (hf _ (by grind)) (by fun_prop)
 
@@ -1104,7 +1104,7 @@ lemma intervalIntegrable_sum_smul_const (T₁ T₂ : ℝ) {μ : Measure ℝ} (g 
     (P : d → Matrix d d 𝕜) (hg : ∀ i, IntervalIntegrable (fun t ↦ g t i) μ T₁ T₂) :
     IntervalIntegrable (fun t ↦ ∑ i, g t i • P i) μ T₁ T₂ := by
   simp_all [intervalIntegrable_iff]
-  exact integrable_finset_sum _ fun i _ ↦ Integrable.smul_const (hg i) _
+  exact integrable_finsetSum _ fun i _ ↦ Integrable.smul_const (hg i) _
 
 set_option backward.isDefEq.respectTransparency false in
 /--
@@ -1166,7 +1166,8 @@ lemma integral_cfc_eq_cfc_integral (T₁ T₂ : ℝ) {μ : Measure ℝ} (f : ℝ
     ∫ t in T₁..T₂, A.cfc (f t) ∂μ = A.cfc (fun u ↦ ∫ t in T₁..T₂, f t u ∂μ) := by
   ext1
   rw [ integral_toMat ];
-  · rw [ intervalIntegral.integral_congr fun t ht ↦ HermitianMat.cfc_toMat_eq_sum_smul_proj A ( f t ), intervalIntegral.integral_finset_sum ];
+  · rw [ intervalIntegral.integral_congr fun t ht ↦
+        HermitianMat.cfc_toMat_eq_sum_smul_proj A ( f t ), intervalIntegral.integral_finsetSum ];
     · rw [ Finset.sum_congr rfl fun i _ ↦ intervalIntegral.integral_smul_const _ _ ];
       exact Eq.symm (cfc_toMat_eq_sum_smul_proj A fun u ↦ ∫ (t : ℝ) in T₁..T₂, f t u ∂μ);
     · simp_all [ intervalIntegrable_iff ];
@@ -1180,11 +1181,15 @@ theorem cfc_pos_of_pos {A : HermitianMat d 𝕜} {f : ℝ → ℝ} (hA : 0 < A)
   have h_pos := (posSemidef_iff_spectrum_nonneg A).mp hA.le
   have h_f_pos : ∃ x ∈ spectrum ℝ (A.cfc f).mat, x ≠ 0 := by
     obtain ⟨ x, hx₁, hx₂ ⟩ := ne_zero_iff_ne_zero_spectrum A |>.1 hA.ne'
-    exact ⟨ f x, by simpa using HermitianMat.spectrum_cfc_eq_image A f ▸ Set.mem_image_of_mem f hx₁, by cases lt_or_gt_of_ne hx₂ <;> linarith [ hf x ( lt_of_le_of_ne ( h_pos x hx₁ ) ( Ne.symm hx₂ ) ) ] ⟩;
+    exact ⟨ f x, by simpa using HermitianMat.spectrum_cfc_eq_image A f ▸ Set.mem_image_of_mem f hx₁,
+        by cases lt_or_gt_of_ne hx₂ <;>
+        linarith [ hf x ( lt_of_le_of_ne ( h_pos x hx₁ ) ( Ne.symm hx₂ ) ) ] ⟩;
   have h_f_nonneg : 0 ≤ A.cfc f := by
     rw [HermitianMat.posSemidef_iff_spectrum_nonneg];
     rw [ HermitianMat.spectrum_cfc_eq_image ];
-    rintro _ ⟨ x, hx, rfl ⟩ ; exact if hx0 : x = 0 then by simpa [ hx0 ] using hf₂ else hf x ( lt_of_le_of_ne ( h_pos x hx ) ( Ne.symm hx0 ) ) |> le_of_lt;
+    rintro _ ⟨ x, hx, rfl ⟩ ; exact if hx0 : x = 0 then by
+        simpa [ hx0 ] using hf₂ else hf x ( lt_of_le_of_ne ( h_pos x hx ) ( Ne.symm hx0 ) ) |>
+        le_of_lt;
   have h_f_nonzero : A.cfc f ≠ 0 := by
     contrapose! h_f_pos;
     simp [h_f_pos, spectrum.mem_iff, Matrix.isUnit_iff_isUnit_det, Algebra.algebraMap_eq_smul_one]

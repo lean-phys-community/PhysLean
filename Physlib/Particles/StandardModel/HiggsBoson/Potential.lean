@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Particles.StandardModel.HiggsBoson.Basic
-public import Mathlib.Tactic.Cases
 /-!
 # The potential of the Higgs field
 
@@ -60,8 +59,8 @@ def toFun (φ : HiggsField) (x : SpaceTime) : ℝ :=
 lemma toFun_smooth (φ : HiggsField) :
     ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℝ) ⊤ (fun x => P.toFun φ x) := by
   simp only [toFun, normSq, neg_mul]
-  exact (contMDiff_const.smul φ.normSq_smooth).neg.add
-    ((contMDiff_const.smul φ.normSq_smooth).smul φ.normSq_smooth)
+  exact ((contMDiff_const (I' := 𝓘(ℝ, ℝ)) (M' := ℝ)).smul φ.normSq_smooth).neg.add
+    (((contMDiff_const (I' := 𝓘(ℝ, ℝ)) (M' := ℝ)).smul φ.normSq_smooth).smul φ.normSq_smooth)
 
 /-- The Higgs potential formed by negating the mass squared and the quartic coupling. -/
 def neg : Potential where

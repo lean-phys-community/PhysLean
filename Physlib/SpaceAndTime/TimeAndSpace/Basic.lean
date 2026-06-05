@@ -6,7 +6,6 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Derivatives.Curl
-public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
 # Functions and distributions on Time and Space d
@@ -78,7 +77,7 @@ lemma fderiv_space_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M
   rw [fderiv_comp]
   simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
   rw [DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id', ContinuousLinearMap.prod_apply,
+  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.prod_apply,
     ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id', id_eq]
   repeat' fun_prop
 
@@ -90,7 +89,7 @@ lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
   rw [fderiv_comp]
   simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
   rw [DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_id', fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
+  simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
     ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
   repeat' fun_prop
 
