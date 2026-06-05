@@ -36,8 +36,10 @@ Here `df(d) = fderiv ℝ f u d` is the real Fréchet derivative of `f` along the
 `f` along the real line `t ↦ u + t·d`. Over all directions these limits assemble into
 the `ℝ`-linear map `df = fderiv ℝ f u : V → ℂ`, so "real" names the scalar `t` and the
 resulting `ℝ`-linearity, not the direction `d`. Multiplication by `i` is the 90° rotation
-supplied by the complex structure on `V`, so `(d, i·d)` is a rotated copy of a
-real/imaginary axis pair; for `V = ℂ`, `d = 1` they are the actual axes, `df(d) = ∂f/∂x`
+supplied by the complex structure on `V`, so `i·d` is `d` turned by 90°: `(d, i·d)` is an
+orthogonal pair pointing in `d`'s own (arbitrary) direction, a rotated and rescaled copy
+of the real/imaginary axes `(1, i)`. For `V = ℂ`, `d = 1` they are the actual axes,
+`df(d) = ∂f/∂x`
 and `df(i·d) = ∂f/∂y`, and the formulas reduce to the textbook
 `∂f/∂z = (1/2)(∂_x − i ∂_y)f`, `∂f/∂z̄ = (1/2)(∂_x + i ∂_y)f`.
 
