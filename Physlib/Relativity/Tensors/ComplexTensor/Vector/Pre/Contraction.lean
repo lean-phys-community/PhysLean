@@ -24,7 +24,6 @@ open CategoryTheory.MonoidalCategory
 
 namespace Lorentz
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The bi-linear map corresponding to contraction of a contravariant Lorentz vector with a
   covariant Lorentz vector. -/
 def contrCoContrBi : ContrℂModule →ₗ[ℂ] CoℂModule →ₗ[ℂ] ℂ where
@@ -49,7 +48,6 @@ def contrCoContrBi : ContrℂModule →ₗ[ℂ] CoℂModule →ₗ[ℂ] ℂ wher
     rw [smul_dotProduct]
     rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The bi-linear map corresponding to contraction of a covariant Lorentz vector with a
   contravariant Lorentz vector. -/
 def contrContrCoBi : CoℂModule →ₗ[ℂ] ContrℂModule →ₗ[ℂ] ℂ where

@@ -383,7 +383,6 @@ lemma uncontractedListEmd_toFun_eq_get (φs : List 𝓕.FieldOp) (φsΛ : WickCo
     φsΛ.uncontractedList.get ∘ (finCongr (by simp [uncontractedListGet])) := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma uncontractedListEmd_strictMono {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {i j : Fin [φsΛ]ᵘᶜ.length} (h : i < j) : uncontractedListEmd i < uncontractedListEmd j := by
   simp only [uncontractedListEmd, uncontractedIndexEquiv, List.get_eq_getElem,
@@ -393,12 +392,10 @@ lemma uncontractedListEmd_strictMono {φs : List 𝓕.FieldOp} {φsΛ : WickCont
   exact φsΛ.uncontractedList_sorted_lt.sortedLT
   exact h
 
-set_option backward.isDefEq.respectTransparency false in
 lemma uncontractedListEmd_mem_uncontracted {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     (i : Fin [φsΛ]ᵘᶜ.length) : uncontractedListEmd i ∈ φsΛ.uncontracted := by
   simp [uncontractedListEmd]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma uncontractedListEmd_surjective_mem_uncontracted {φs : List 𝓕.FieldOp}
     {φsΛ : WickContraction φs.length} (i : Fin φs.length) (hi : i ∈ φsΛ.uncontracted) :
     ∃ j, φsΛ.uncontractedListEmd j = i := by
@@ -442,7 +439,6 @@ lemma getElem_uncontractedListEmd {φs : List 𝓕.FieldOp} {φsΛ : WickContrac
   simp only [uncontractedListGet, List.getElem_map, List.get_eq_getElem]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma uncontractedListEmd_empty {φs : List 𝓕.FieldOp} :
     (empty (n := φs.length)).uncontractedListEmd = (finCongr (by simp)).toEmbedding := by

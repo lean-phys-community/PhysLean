@@ -87,7 +87,6 @@ lemma preContrMetric_apply_one {d : ℕ} : (preContrMetric d) (1 : ℝ) = preCon
 def preCoMetricVal (d : ℕ := 3) : (Co d ⊗ Co d).V :=
   coCoToMatrixRe.symm ((@minkowskiMatrix d))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `preContrMetricVal` into basis. -/
 lemma preCoMetricVal_expand_tmul {d : ℕ} : preCoMetricVal d =
     coBasis d (Sum.inl 0) ⊗ₜ[ℝ] coBasis d (Sum.inl 0) -
@@ -108,7 +107,6 @@ lemma preCoMetricVal_expand_tmul {d : ℕ} : preCoMetricVal d =
     exact fun a => hb (id (Eq.symm a))
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma preCoMetricVal_expand_tmul_minkowskiMatrix {d : ℕ} : preCoMetricVal d =
     ∑ i, (minkowskiMatrix i i) • (coBasis d i ⊗ₜ[ℝ] coBasis d i) := by
   rw [preCoMetricVal_expand_tmul]
@@ -151,7 +149,6 @@ lemma preCoMetric_apply_one {d : ℕ} : (preCoMetric d) (1 : ℝ) = preCoMetricV
 -/
 
 open minkowskiMatrix in
-set_option backward.isDefEq.respectTransparency false in
 lemma contrCoContract_apply_metric {d : ℕ} :
     (TensorProduct.comm ℝ _ _ <|
       (TensorProduct.lid ℝ _).lTensor _ <|
@@ -209,7 +206,6 @@ lemma contrCoContract_apply_metric {d : ℕ} :
   simp
 
 open minkowskiMatrix in
-set_option backward.isDefEq.respectTransparency false in
 lemma coContrContract_apply_metric {d : ℕ} :
     (TensorProduct.comm ℝ _ _ <|
     (TensorProduct.lid ℝ _).lTensor _ <|

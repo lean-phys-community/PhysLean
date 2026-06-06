@@ -227,7 +227,6 @@ lemma fieldStrengthMatrix_inr_inl_eq_electricField {c : SpeedOfLight}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma electricField_contDiff {n} {c : SpeedOfLight} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ (n + 1) A) : ContDiff ℝ n ↿(A.electricField c) := by
   rw [@contDiff_euclidean]

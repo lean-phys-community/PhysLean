@@ -54,7 +54,6 @@ variable {d : ℕ} (i : Fin d)
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Component `i` of the momentum operator is the continuous linear map
 from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `-iℏ ∂ᵢψ`. -/
 def momentumCLM : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=

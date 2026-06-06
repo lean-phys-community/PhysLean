@@ -207,7 +207,6 @@ lemma isOrthochronous_mul {Λ Λ' : LorentzGroup d} (h : IsOrthochronous Λ)
   exact Lorentz.Velocity.zero_le_minkowskiProduct
     (orthochronoustoVelocity (isOrthochronous_inv_iff.mpr h)) (orthochronoustoVelocity h')
 
-set_option backward.isDefEq.respectTransparency false in
 lemma isOrthochronous_mul_iff {Λ Λ' : LorentzGroup d} :
     IsOrthochronous (Λ * Λ') ↔ (IsOrthochronous Λ = IsOrthochronous Λ') := by
   by_cases h : IsOrthochronous Λ <;> by_cases h' : IsOrthochronous Λ'

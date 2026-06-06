@@ -86,7 +86,6 @@ lemma fromSingleT_map {c c1 : C}
   fin_cases i
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrT_fromSingleT_fromSingleT {c : C} (x : V c)
     (y : V (S.τ c)) :
     contrT (S := S) 0 0 1 (by simp; rfl) (prodT (fromSingleT x) (fromSingleT y)) =
@@ -112,7 +111,6 @@ open TensorProduct
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The construction of a tensor with two indices from the tensor product
   `V c1 ⊗[k] V c2 ` defined
   categorically. -/
@@ -131,7 +129,6 @@ lemma fromPairT_tmul {c1 c2 : C} (x : V c1)
     (prodT (fromSingleT (S := S) x) (fromSingleT y)) := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma actionT_fromPairT {c1 c2 : C}
     (x : V c1 ⊗[k]V c2)
     (g : G) :
@@ -177,7 +174,6 @@ lemma fromPairT_map_right {c1 c2 c2' : C} (h :c2 = c2')
   · intro x y hx hy
     simp [P, hx, hy]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fromPairT_comm {c1 c2 : C}
     (x : V c1 ⊗[k] V c2) :
     fromPairT (TensorProduct.comm k _ _ x) =
@@ -416,7 +412,6 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : C)
   conv_rhs => rw [fromPairT_tmul]
   simp only [permT_permT, map_smul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : C)
     (x : V c1 ⊗[k] V c)
     (y : V (S.τ c) ⊗[k] V c2) :
@@ -452,7 +447,6 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : C)
     rw [← hx, ← hy]
     simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fromPairT_basis_repr {c c1 : C}
     (x : V c ⊗[k] V c1)
     (φ : ComponentIdx ![c, c1]) :
@@ -481,7 +475,6 @@ lemma fromPairT_basis_repr {c c1 : C}
   · intro x y hx hy
     simp_all [P]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fromPairT_apply_basis_repr {c c1 : C}
     (b0 : basisIdx c) (b1 : basisIdx c1) :
     fromPairT (S := S) (b c b0 ⊗ₜ[k] b c1 b1) =
@@ -513,7 +506,6 @@ noncomputable def fromConstPair {c1 c2 : C}
       (v : (Representation.trivial k G k).IntertwiningMap ((rep c1).tprod (rep c2))) :
     S.Tensor ![c1, c2] := fromPairT (v (1 : k))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Tensors formed by `fromConstPair` are invariant under the group action. -/
 @[simp]
 lemma actionT_fromConstPair {c1 c2 : C}
@@ -528,7 +520,6 @@ lemma actionT_fromConstPair {c1 c2 : C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The construction of a tensor with two indices from the tensor product
   `V c1 ⊗[k] V c2 ` defined
   categorically. -/
@@ -554,7 +545,6 @@ lemma fromTripleT_tmul {c1 c2 c3 : C} (x : V c1)
       (prodT (fromSingleT (S := S) x) (prodT (fromSingleT y) (fromSingleT z))) := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma actionT_fromTripleT {c1 c2 c3 : C}
     (x : V c1 ⊗[k] (V c2 ⊗[k] V c3)) (g : G) :
     g • fromTripleT (S := S) x = fromTripleT (TensorProduct.map (rep c1 g)
@@ -581,7 +571,6 @@ lemma actionT_fromTripleT {c1 c2 c3 : C}
   · intro x y hx hy
     simp [P, hx, hy]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fromTripleT_basis_repr {c c1 c2 : C}
     (x : V c ⊗[k] (V c1 ⊗[k] V c2))
     (φ : ComponentIdx ![c, c1, c2]) :
@@ -622,7 +611,6 @@ lemma fromTripleT_basis_repr {c c1 c2 : C}
   · intro x y hx hy
     simp_all [P]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fromTripleT_apply_basis {c c1 c2 : C}
     (b0 : basisIdx c) (b1 : basisIdx c1)
     (b2 : basisIdx c2) :
@@ -661,7 +649,6 @@ noncomputable def fromConstTriple {c1 c2 c3 : C}
       ((rep c1).tprod ((rep c2).tprod (rep c3)))) :
   S.Tensor ![c1, c2, c3] := fromTripleT (v (1 : k))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Tensors formed by `fromConstPair` are invariant under the group action. -/
 @[simp]
 lemma actionT_fromConstTriple {c1 c2 c3 : C}

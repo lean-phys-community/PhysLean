@@ -181,14 +181,12 @@ lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : Decidable
   rw [Function.update_of_ne]
   exact Fin.ne_succAbove i j
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (x y : V (c i)) :
     (update p i (x + y)).toTensor = (update p i x).toTensor + (update p i y).toTensor := by
   simp [toTensor, update]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_smul {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (r : k) (y : V (c i)) :
@@ -368,7 +366,6 @@ lemma componentMap_ofComponents {n : ℕ} (c : Fin n → C) (f : ComponentIdx c 
   ext b
   simp [ofComponents]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma ofComponents_componentMap {n : ℕ} (c : Fin n → C) (t : S.Tensor c) :
     ofComponents c (componentMap c t) = t := by
@@ -535,7 +532,6 @@ noncomputable instance actionT : MulAction G (S.Tensor c) where
     rw [← PiTensorProduct.map_comp]
     rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma actionT_pure {g : G} {p : Pure S c} :
     g • p.toTensor = Pure.toTensor (g • p) := by
   rw [actionT_eq, Pure.toTensor, PiTensorProduct.map_tprod]

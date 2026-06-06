@@ -83,7 +83,6 @@ open Distribution
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma continuous_time_integral {d} (η : 𝓢(Time × Space d, ℝ)) :
     Continuous (fun x : Space d => ∫ t : Time, η (t, x)) := by
   obtain ⟨rt, hrt⟩ : ∃ r, Integrable (fun x : Time => ‖((1 + ‖x‖) ^ r)⁻¹‖) volume := by
@@ -147,7 +146,6 @@ lemma continuous_time_integral {d} (η : 𝓢(Time × Space d, ℝ)) :
 
 set_option maxSynthPendingDepth 10000 in
 
-set_option backward.isDefEq.respectTransparency false in
 lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x₀ : Space d) :
     HasFDerivAt (fun x => ∫ (t : Time), η (t, x))
       (∫ (t : Time), fderiv ℝ (fun x : Space d => η (t, x)) x₀) x₀ := by
@@ -319,7 +317,6 @@ lemma time_integral_differentiable {d : ℕ} (η : 𝓢(Time × Space d.succ, �
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 set_option maxSynthPendingDepth 10000 in
 @[fun_prop]
 lemma integrable_fderiv_space {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : Space d) :
@@ -505,7 +502,6 @@ lemma time_integral_contDiff {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma integrable_time_integral {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : Space d) :
     Integrable (fun t => η (t, x)) volume := by
@@ -549,7 +545,6 @@ lemma integrable_time_integral {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : 
 #### B.2.1. Bounds on powers times norm of iterated derivatives
 
 -/
-set_option backward.isDefEq.respectTransparency false in
 lemma pow_mul_iteratedFDeriv_norm_le {n m} {d : ℕ} :
     ∃ rt, ∀ (η : 𝓢(Time × Space d, ℝ)), ∀ (x : Space d),
     Integrable (fun x : Time => ‖((1 + ‖x‖) ^ rt)⁻¹‖) volume ∧
@@ -621,7 +616,6 @@ lemma pow_mul_iteratedFDeriv_norm_le {n m} {d : ℕ} :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma iteratedFDeriv_norm_mul_pow_integrable {d : ℕ} (n m : ℕ) (η : 𝓢(Time × Space d, ℝ))
     (x : Space d) :
@@ -850,7 +844,6 @@ lemma time_integral_iteratedFDeriv_norm_le {d : ℕ} (n : ℕ) (η : 𝓢(Time �
 ### C.3. Bound on the norm of iterated derivative mul a power
 
 -/
-set_option backward.isDefEq.respectTransparency false in
 lemma time_integral_mul_pow_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) :
     ∃ rt, ∀ (η : 𝓢(Time × Space d, ℝ)),∀ (x : Space d),
     Integrable (fun x : Time => ‖((1 + ‖x‖) ^ rt)⁻¹‖) volume ∧
@@ -910,7 +903,6 @@ lemma time_integral_mul_pow_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map taking Schwartz maps on `Time × Space d` to
   `space d` by integrating over time. -/
 def timeIntegralSchwartz {d : ℕ} :

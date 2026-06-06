@@ -102,7 +102,6 @@ lemma gradFreeCurrentPotential_eq_sum_basis {d}
     (gradFreeCurrentPotential J) ε =
     (∑ μ, (η μ μ • (J ε μ) • Lorentz.Vector.basis μ)) := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradFreeCurrentPotential_sum_inl_0 (𝓕 : FreeSpace) {d}
     (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ)) :
     (gradFreeCurrentPotential J) ε (Sum.inl 0) =
@@ -117,7 +116,6 @@ lemma gradFreeCurrentPotential_sum_inl_0 (𝓕 : FreeSpace) {d}
   rw [← distTimeSlice_symm_apply]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradFreeCurrentPotential_sum_inr_i (𝓕 : FreeSpace) {d}
     (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ)) (i : Fin d) :
     (gradFreeCurrentPotential J) ε (Sum.inr i) =
@@ -171,7 +169,6 @@ lemma gradLagrangian_sum_inl_0 {𝓕 : FreeSpace}
     - 𝓕.c * (distTimeSlice 𝓕.c).symm (J.chargeDensity 𝓕.c) ε := by
   simp [gradLagrangian, gradKineticTerm_sum_inl_eq, gradFreeCurrentPotential_sum_inl_0 𝓕]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_sum_inr_i {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (J : DistLorentzCurrentDensity d)
     (ε : 𝓢(SpaceTime d, ℝ)) (i : Fin d) :
@@ -190,7 +187,6 @@ lemma gradLagrangian_sum_inr_i {𝓕 : FreeSpace}
 -/
 
 attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue in
-set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (J : DistLorentzCurrentDensity d)
     (ε : 𝓢(SpaceTime d, ℝ)) (ν : Fin 1 ⊕ Fin d) :

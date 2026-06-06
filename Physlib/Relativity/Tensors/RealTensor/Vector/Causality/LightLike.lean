@@ -46,7 +46,6 @@ lemma causallyPrecedes_refl {d : ℕ} (p : Vector d) : causallyPrecedes p p := b
   right
   simp [pastLightConeBoundary]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For two lightlike vectors with equal time components, their spatial parts
     have equal Euclidean norms -/
 lemma lightlike_eq_spatial_norm_of_eq_time {d : ℕ} {v w : Vector d}

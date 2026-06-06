@@ -228,7 +228,6 @@ lemma stabilityCounterExample_ξ :
   funext μ
   simp [stabilityCounterExample, ξ]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma stabilityCounterExample_η :
     stabilityCounterExample.η = fun μ => fun ν =>
     match μ, ν with
@@ -331,7 +330,6 @@ lemma quarticTerm_𝓵₄_expand (P : PotentialParameters) (H : TwoHiggsDoublet)
   rw [← inner_conj_symm]
   exact Complex.normSq_conj ⟪H.Φ2, H.Φ1⟫_ℂ
 
-set_option backward.isDefEq.respectTransparency false in
 lemma quarticTerm_eq_gramVector (P : PotentialParameters) (H : TwoHiggsDoublet) :
     quarticTerm P H = ∑ a, ∑ b, H.gramVector a * H.gramVector b * P.η a b := by
   simp [quarticTerm_𝓵₄_expand, Fin.sum_univ_three, PotentialParameters.η, normSq_Φ1_eq_gramVector,
@@ -481,7 +479,6 @@ def PotentialIsStable (P : PotentialParameters) : Prop :=
 
 open Real
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The potential `stabilityCounterExample` is not stable. -/
 lemma stabilityCounterExample_not_potentialIsStable :
     ¬ PotentialIsStable .stabilityCounterExample := by
@@ -601,7 +598,6 @@ It is the function `J2` in https://arxiv.org/abs/hep-ph/0605184.
 noncomputable def massTermReduced (P : PotentialParameters) (k : EuclideanSpace ℝ (Fin 3)) : ℝ :=
   P.ξ (Sum.inl 0) + ∑ μ, P.ξ (Sum.inr μ) * k μ
 
-set_option backward.isDefEq.respectTransparency false in
 lemma massTermReduced_lower_bound (P : PotentialParameters) (k : EuclideanSpace ℝ (Fin 3))
     (hk : ‖k‖ ^ 2 ≤ 1) : P.ξ (Sum.inl 0) - √(∑ a, |P.ξ (Sum.inr a)| ^ 2) ≤ massTermReduced P k := by
   simp only [Fin.isValue, massTermReduced]
@@ -838,7 +834,6 @@ lemma quarticTermReduced_nonneg_of_potentialIsStable (P : PotentialParameters)
       (by rw [sqrt_sq_eq_abs]; grind)) (hs (|x| + |d| + 1) (by positivity))
   exact fun x hx => (le_div_iff_of_neg (by grind)).mpr (by grind)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma potentialIsStable_iff_massTermReduced_sq_le_quarticTermReduced (P : PotentialParameters) :
     PotentialIsStable P ↔ ∃ c, 0 ≤ c ∧ ∀ k : EuclideanSpace ℝ (Fin 3), ‖k‖ ^ 2 ≤ 1 →
       0 ≤ quarticTermReduced P k ∧

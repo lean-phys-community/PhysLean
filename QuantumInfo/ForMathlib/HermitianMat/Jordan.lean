@@ -50,7 +50,6 @@ theorem symmMul_toMat : (A.symmMul B).mat =
 
 variable [Invertible (2 : 𝕜)]
 
-set_option backward.isDefEq.respectTransparency false in
 variable {A B} in
 @[simp]
 theorem symmMul_of_commute (hAB : Commute A.mat B.mat) :
@@ -64,22 +63,18 @@ theorem symmMul_self : (symmMul A A).mat = A.mat * A.mat := by
 
 variable [DecidableEq d]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem symmMul_one : A.symmMul 1 = A := by
   ext1; simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem one_symmMul : symmMul 1 A = A := by
   ext1; simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem symmMul_neg_one : A.symmMul (-1) = -A := by
   ext1; simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem neg_one_symmMul : symmMul (-1) A = -A := by
   ext1; simp
@@ -105,7 +100,6 @@ scoped instance : CommMagma (HermitianMat d 𝕜) where
 theorem mul_eq_symmMul : A * B = A.symmMul B := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 scoped instance : IsCommJordan (HermitianMat d 𝕜) where
   lmul_comm_rmul_rmul a b := by
     ext1
@@ -119,7 +113,6 @@ scoped instance : MulZeroClass (HermitianMat d 𝕜) where
 
 variable [DecidableEq d] [Invertible (2 : 𝕜)]
 
-set_option backward.isDefEq.respectTransparency false in
 scoped instance : MulZeroOneClass (HermitianMat d 𝕜) where
   one_mul := by simp [mul_eq_symmMul]
   mul_one := by simp [mul_eq_symmMul]
@@ -130,7 +123,6 @@ section field
 
 variable {d 𝕜 : Type*} [Fintype d] [Field 𝕜] [StarRing 𝕜]
 
-set_option backward.isDefEq.respectTransparency false in
 scoped instance : NonUnitalNonAssocRing (HermitianMat d 𝕜) where
   left_distrib a b c := by
     ext1
@@ -152,7 +144,6 @@ section rclike
 
 variable {d 𝕜 : Type*} [Fintype d] [RCLike 𝕜]
 
-set_option backward.isDefEq.respectTransparency false in
 scoped instance : IsScalarTower ℝ (HermitianMat d 𝕜) (HermitianMat d 𝕜) where
   smul_assoc r x y := by
     ext : 2

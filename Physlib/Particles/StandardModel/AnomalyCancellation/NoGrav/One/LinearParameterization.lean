@@ -92,13 +92,11 @@ lemma cubic (S : linearParameters) :
   simp only [asCharges, neg_add_rev, neg_mul, mul_neg, neg_neg]
   ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma cubic_zero_Q'_zero (S : linearParameters) (hc : accCube (S.asCharges) = 0)
     (h : S.Q' = 0) : S.E' = 0 := by
   rw [cubic, h] at hc
   simpa using hc
 
-set_option backward.isDefEq.respectTransparency false in
 lemma cubic_zero_E'_zero (S : linearParameters) (hc : accCube (S.asCharges) = 0)
     (h : S.E' = 0) : S.Q' = 0 := by
   rw [cubic, h] at hc
@@ -234,7 +232,6 @@ def tolinearParametersQNeqZero (S : {S : linearParameters // S.Q' ≠ 0 ∧ S.E'
       simp only [neg_eq_zero, mul_eq_zero, OfNat.ofNat_ne_zero, or_false]
       simpa using S.2⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A bijection between the type `linearParametersQENeqZero` and linear parameters
   with `Q'` and `E'` non-zero. -/
 @[simps!]
@@ -307,7 +304,6 @@ lemma cubic_v_or_w_zero (S : linearParametersQENeqZero) (h : accCube (bijection 
   have h2 := FLTThree S.v S.w (-1) hn.1 hn.2 (Ne.symm (ne_of_beq_false (by rfl)))
   exact h2 h
 
-set_option backward.isDefEq.respectTransparency false in
 lemma cubic_v_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.val = 0)
     (hv : S.v = 0) : S.w = -1 := by
   rw [S.cubic, hv] at h
@@ -326,7 +322,6 @@ lemma cubic_v_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.
   simp_all
   exact eq_neg_of_add_eq_zero_left h'
 
-set_option backward.isDefEq.respectTransparency false in
 lemma cube_w_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.val = 0)
     (hw : S.w = 0) : S.v = -1 := by
   rw [S.cubic, hw] at h
@@ -345,7 +340,6 @@ lemma cube_w_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.v
   simp_all only [one_mul, neg_mul, mul_eq_zero, ne_eq, or_false]
   exact eq_neg_of_add_eq_zero_left h'
 
-set_option backward.isDefEq.respectTransparency false in
 lemma cube_w_v (S : linearParametersQENeqZero) (h : accCube (bijection S).1.val = 0) :
     (S.v = -1 ∧ S.w = 0) ∨ (S.v = 0 ∧ S.w = -1) := by
   have h' := cubic_v_or_w_zero S h

@@ -225,7 +225,6 @@ theorem exp_val_prob {T : HermitianMat d ℂ} (h : 0 ≤ T ∧ T ≤ 1) :
     0 ≤ ρ.exp_val T ∧ ρ.exp_val T ≤ 1 :=
   ⟨ρ.exp_val_nonneg h.1, ρ.exp_val_le_one h.2⟩
 
-set_option backward.isDefEq.respectTransparency false in
 theorem exp_val_sub (A B : HermitianMat d ℂ) :
     ρ.exp_val (A - B) = ρ.exp_val A - ρ.exp_val B := by
   simp [exp_val, inner_sub_right]
@@ -244,7 +243,6 @@ theorem exp_val_eq_one_iff {A : HermitianMat d ℂ} (hA₂ : A ≤ 1) :
   rw [exp_val_sub, exp_val_one]
   rw [sub_eq_zero, eq_comm]
 
-set_option backward.isDefEq.respectTransparency false in
 theorem exp_val_add (A B : HermitianMat d ℂ) :
     ρ.exp_val (A + B) = ρ.exp_val A + ρ.exp_val B := by
   simp [exp_val, inner_add_right]
@@ -309,7 +307,6 @@ def spectrum (ρ : MState d) : ProbDistribution d :=
     (ρ.psd.eigenvalues_nonneg ·)
     (by rw [sum_eigenvalues_eq_trace, ρ.tr])
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The spectrum of a pure state is (1,0,0,...), i.e. a constant distribution. -/
 theorem spectrum_pure_eq_constant :
     ∃ i, (pure ψ).spectrum = ProbDistribution.constant i := by
@@ -593,7 +590,6 @@ theorem M_default [Unique d] : (default : MState d).M = 1 := by
 
 section ptrace
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Partial tracing out the left half of a system. -/
 @[simps]
 def traceLeft (ρ : MState (d₁ × d₂)) : MState d₂ where
@@ -601,7 +597,6 @@ def traceLeft (ρ : MState (d₁ × d₂)) : MState d₂ where
   nonneg := zero_le_iff.mpr ρ.psd.traceLeft
   tr := by simp [trace]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Partial tracing out the right half of a system. -/
 @[simps]
 def traceRight (ρ : MState (d₁ × d₂)) : MState d₁ where
@@ -668,7 +663,6 @@ theorem spectrum_prod (ρ₁ : MState d₁) (ρ₂ : MState d₂) : ∃(σ : d�
   obtain ⟨ i, j, h ⟩ := h σ; have := congr_fun hσ ( i, j ) ; simp_all [ MState.spectrum ] ;
   exact h ( by exact Subtype.ext this )
 
-set_option backward.isDefEq.respectTransparency false in
 theorem sInf_spectrum_prod (ρ : MState d) (σ : MState d₂) :
     sInf (_root_.spectrum ℝ (ρ ⊗ᴹ σ).m) = sInf (_root_.spectrum ℝ ρ.m) * sInf (_root_.spectrum ℝ σ.m) := by
   rcases isEmpty_or_nonempty d with _ | _; · simp
@@ -692,7 +686,6 @@ def IsSeparable (ρ : MState (d₁ × d₂)) : Prop :=
     ∃ ps : ProbDistribution ρLRs, --ProbDistribution over those pairs, an ensemble
       ρ.M = ∑ ρLR : ρLRs, (ps ρLR : ℝ) • (Prod.fst ρLR.val).M ⊗ₖ (Prod.snd ρLR.val).M
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A product state `MState.prod` is separable. -/
 theorem IsSeparable_prod (ρ₁ : MState d₁) (ρ₂ : MState d₂) : IsSeparable (ρ₁ ⊗ᴹ ρ₂) := by
   let only := (ρ₁, ρ₂)
@@ -810,7 +803,6 @@ theorem pureQ_injective {d : Type*} [Fintype d] [DecidableEq d] : Function.Injec
   simp [pureQ] at h
   exact Quotient.sound ((PhaseEquiv_iff_pure_eq _ _).mpr h)
 
-set_option backward.isDefEq.respectTransparency false in
 theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] [DecidableEq d₁] [DecidableEq d₂]
     (ψ : Ket (d₁ × d₂)) (h : IsSeparable (pure ψ)) : ψ.IsProd := by
   obtain ⟨ ρLRs, ps, hps ⟩ := h;
@@ -885,7 +877,6 @@ theorem pure_separable_iff_IsProd (ψ : Ket (d₁ × d₂)) :
     rw [pure_prod_pure ξ φ]
     exact IsSeparable_prod _ _;
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 A mixed state is pure if and only if its rank is 1.
 -/
@@ -950,7 +941,6 @@ theorem pure_iff_rank_eq_one {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
     generalize_proofs at *;
     refine' MState.ext_m _ ; aesop
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 A ket on a product space is a product state if and only if its coefficient matrix has rank 1.
 -/
@@ -1075,7 +1065,6 @@ def purifyX (ρ : MState d) : { ψ : Ket (d × d) // (pure ψ).traceRight = ρ }
 
 end purification
 
-set_option backward.isDefEq.respectTransparency false in
 @[simps]
 def relabel (ρ : MState d₁) (e : d₂ ≃ d₁) : MState d₂ where
   M := ρ.M.reindex e.symm
@@ -1340,7 +1329,6 @@ section finprod
 variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
 variable {dI : ι → Type v} [∀(i :ι), Fintype (dI i)] [∀(i :ι), DecidableEq (dI i)]
 
-set_option backward.isDefEq.respectTransparency false in
 def piProd (ρi : (i:ι) → MState (dI i)) : MState ((i:ι) → dI i) where
   M := {
     val := Matrix.piProd (fun i ↦ (ρi i).m)

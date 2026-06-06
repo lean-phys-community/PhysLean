@@ -106,7 +106,6 @@ TODO "Add a constructor for DistElectromagneticPotential from electric and
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The derivative of a electromagnetic potential, which is a distribution. -/
 noncomputable def deriv {d} : DistElectromagneticPotential d →ₗ[ℝ]
     (SpaceTime d) →d[ℝ] Lorentz.CoVector d ⊗[ℝ] Lorentz.Vector d := distTensorDeriv
@@ -114,7 +113,6 @@ noncomputable def deriv {d} : DistElectromagneticPotential d →ₗ[ℝ]
 TODO "Remove the definition `deriv` in distributional electromagnetism and replace it with
   `distTensorDeriv` everywhere."
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_eq_sum_sum {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
     deriv A ε =∑ μ, ∑ ν, (SpaceTime.distDeriv μ A ε ν) •
@@ -185,7 +183,6 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : DistElectromagneticPotential d)
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_equivariant {d} {A : DistElectromagneticPotential d}
     (Λ : LorentzGroup d) : deriv (Λ • A) = Λ • deriv A := by
   rw [deriv, distTensorDeriv_equivariant]

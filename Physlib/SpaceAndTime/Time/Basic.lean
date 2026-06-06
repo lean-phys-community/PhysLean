@@ -366,7 +366,6 @@ instance : BorelSpace Time where
 -/
 open MeasureTheory
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The orthonomral basis on `Time` defined by `1`. -/
 noncomputable def basis : OrthonormalBasis (Fin 1) ℝ Time where
   repr := {

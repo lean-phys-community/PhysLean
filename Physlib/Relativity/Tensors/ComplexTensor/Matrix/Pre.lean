@@ -23,7 +23,6 @@ open CategoryTheory.MonoidalCategory
 
 namespace Lorentz
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `complexContr ⊗ complexContr` to `4 x 4` complex matrices. -/
 def contrContrToMatrix : (ContrℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
     Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ :=
@@ -31,7 +30,6 @@ def contrContrToMatrix : (ContrℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
   Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `contrContrToMatrix` in terms of the standard basis. -/
 lemma contrContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     contrContrToMatrix.symm M =
@@ -45,7 +43,6 @@ lemma contrContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 �
     rfl
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `complexCo ⊗ complexCo` to `4 x 4` complex matrices. -/
 def coCoToMatrix : (CoℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
     Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ :=
@@ -53,7 +50,6 @@ def coCoToMatrix : (CoℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
   Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `coCoToMatrix` in terms of the standard basis. -/
 lemma coCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     coCoToMatrix.symm M = ∑ i, ∑ j, M i j • (complexCoBasis i ⊗ₜ[ℂ] complexCoBasis j) := by
@@ -65,7 +61,6 @@ lemma coCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin
     rfl
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `complexContr ⊗ complexCo` to `4 x 4` complex matrices. -/
 def contrCoToMatrix : (ContrℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
     Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ :=
@@ -73,7 +68,6 @@ def contrCoToMatrix : (ContrℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
   Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `contrCoToMatrix` in terms of the standard basis. -/
 lemma contrCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     contrCoToMatrix.symm M = ∑ i, ∑ j, M i j • (complexContrBasis i ⊗ₜ[ℂ] complexCoBasis j) := by
@@ -86,7 +80,6 @@ lemma contrCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ 
     rfl
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `complexCo ⊗ complexContr` to `4 x 4` complex matrices. -/
 def coContrToMatrix : (CoℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
     Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ :=
@@ -94,7 +87,6 @@ def coContrToMatrix : (CoℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
   Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `coContrToMatrix` in terms of the standard basis. -/
 lemma coContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     coContrToMatrix.symm M = ∑ i, ∑ j, M i j • (complexCoBasis i ⊗ₜ[ℂ] complexContrBasis j) := by
@@ -293,7 +285,6 @@ lemma coContrToMatrix_ρ (v : (CoℂModule ⊗[ℂ] ContrℂModule)) (M : SL(2,�
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (ContrℂModule.SL2CRep M) (ContrℂModule.SL2CRep M)
       (contrContrToMatrix.symm v) =
@@ -304,7 +295,6 @@ lemma contrContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma coCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (CoℂModule.SL2CRep M) (CoℂModule.SL2CRep M) (coCoToMatrix.symm v) =
     coCoToMatrix.symm ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ * v *
@@ -314,7 +304,6 @@ lemma coCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) 
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (ContrℂModule.SL2CRep M) (CoℂModule.SL2CRep M) (contrCoToMatrix.symm v) =
     contrCoToMatrix.symm ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) * v *
@@ -324,7 +313,6 @@ lemma contrCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) �
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma coContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (CoℂModule.SL2CRep M) (ContrℂModule.SL2CRep M) (coContrToMatrix.symm v) =
     coContrToMatrix.symm ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ * v *

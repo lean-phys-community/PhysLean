@@ -530,7 +530,6 @@ by the operator `permT`.
   classical
   simp [Tensor.basis_apply, permT_pure, Pure.permP_basisVector, basisIdxCongr_eq_cast]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with permT. -/
 lemma permT_toComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color}
@@ -952,7 +951,6 @@ lemma toComplex_evalP_basisVector {n : ℕ} {c : Fin (n + 1) → realLorentzTens
               (i.succAbove k)))).toTensor)).symm
       · simp [h]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with `evalT`. -/
 lemma evalT_toComplex {n : ℕ}
     {c : Fin (n + 1) → realLorentzTensor.Color}

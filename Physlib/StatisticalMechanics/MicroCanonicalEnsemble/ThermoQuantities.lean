@@ -156,7 +156,6 @@ theorem entropy_A_eq_entropy_Z (T : ℝ) (hT : T ≠ 0)
   · simp_rw [partitionZT]
     fun_prop (disch := assumption)
 
-set_option backward.isDefEq.respectTransparency false in
 open scoped ContDiff in
 /--
 The "definition of temperature from entropy":
@@ -207,7 +206,6 @@ theorem β_eq_deriv_S_U {β : ℝ}
   · fun_prop (disch := assumption)
   · fun_prop (disch := assumption)
 
-set_option backward.isDefEq.respectTransparency false in
 open scoped ContDiff in
 example (x : ℝ) (f : ℝ → ℝ) (hf : ContDiffAt ℝ ⊤ f x) : DifferentiableAt ℝ (deriv f) x := by
   have := (hf.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (by simp)

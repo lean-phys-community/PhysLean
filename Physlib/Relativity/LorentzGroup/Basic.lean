@@ -294,7 +294,6 @@ lemma toProd_embedding : IsEmbedding (@toProd d) where
     (isInducing_iff ⇑toProd).mp (IsInducing.of_comp toProd_continuous continuous_fst
       ((isInducing_iff (Prod.fst ∘ ⇑toProd)).mpr rfl))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The embedding from the Lorentz Group into `GL (Fin 4) ℝ`. -/
 lemma toGL_embedding : IsEmbedding (@toGL d).toFun where
   injective := toGL_injective

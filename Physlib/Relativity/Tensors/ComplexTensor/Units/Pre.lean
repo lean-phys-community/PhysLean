@@ -47,7 +47,6 @@ lemma contrCoUnitVal_eq_sum_tmul : contrCoUnitVal =
   simp [contrCoUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The contra-co unit for complex lorentz vectors as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexCo`, manifesting the invariance under
   the `SL(2, ℂ)` action. -/
@@ -99,7 +98,6 @@ lemma coContrUnitVal_eq_sum_tmul : coContrUnitVal =
   simp [coContrUnitVal_expand_tmul, Fin.isValue, Fin.sum_univ_three]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The co-contra unit for complex lorentz vectors as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexContr`, manifesting the invariance under
   the `SL(2, ℂ)` action. -/
@@ -136,7 +134,6 @@ lemma coContrUnit_apply_one : coContrUnit (1 : ℂ) = coContrUnitVal := by
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `contrCoUnit` does nothing. -/
 lemma contr_contrCoUnit (x : CoℂModule) :
     (TensorProduct.lid ℂ _ <|
@@ -148,7 +145,6 @@ lemma contr_contrCoUnit (x : CoℂModule) :
   simp [- Fintype.sum_sum_type, map_sum, tmul_sum, smul_tmul, coContrContraction_basis',
     contrCoUnit_apply_one, contrCoUnitVal_eq_sum_tmul, sum_tmul]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `coContrUnit`. -/
 lemma contr_coContrUnit (x : ContrℂModule) :
     (TensorProduct.lid ℂ _ <|

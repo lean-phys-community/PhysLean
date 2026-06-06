@@ -134,7 +134,6 @@ lemma V_rho_conj_mul_self_eq (ρAB : HermitianMat (dA × dB) ℂ) (hρ : ρAB.ma
   simp_all [ mul_assoc, Matrix.mul_assoc ];
   simp [ ← Matrix.mul_assoc, ← map_to_tensor_MES_prop ]
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The partial trace (left) of a positive definite matrix is positive definite.
 -/
@@ -902,7 +901,6 @@ private lemma PosDef_assoc'_traceRight
   apply PosDef_traceRight
   convert hρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪(-ρ.assoc'.traceRight.M.traceRight.log) ⊗ₖ (1 : HermitianMat (d₂ × d₃) ℂ) +
@@ -914,13 +912,11 @@ private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     convert inner_kron_one_eq_inner_traceRight _ _ using 1;
     simp [ HermitianMat.traceRight ];
     congr! 2;
-    congr! 1;
     ext i j; simp [ Matrix.traceRight ] ;
     exact Fintype.sum_prod_type fun x => ρ.m (i, x) (j, x)
   · rw [ Sᵥₙ_eq_neg_trace_log ];
     simp [ inner_one_kron_eq_inner_traceLeft ]
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma wm_inner_rhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪((-ρ.assoc'.traceRight.M.log) ⊗ₖ (1 : HermitianMat d₃ ℂ) +
@@ -1018,7 +1014,6 @@ private lemma MState.traceLeft_continuous :
     · fun_prop;
   exact continuous_induced_rng.mpr ( by continuity )
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 private lemma MState.traceRight_continuous :
     Continuous (MState.traceRight : MState (d₁ × d₂) → MState d₁) := by

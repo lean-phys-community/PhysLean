@@ -287,7 +287,6 @@ instance {D1 : Type} [NormedAddCommGroup D1] [MeasurableSpace D1]
       rcases x
       simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma integrable_time_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
     (η : 𝓢(Time × Space d, ℝ)) :
@@ -1005,7 +1004,6 @@ lemma log_norm {d : ℕ} :
       apply le_trans _ h1
       simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma zpow_smul_self {d : ℕ} (n : ℤ) (hn : - (d - 1 : ℕ) - 1 ≤ n) :
     IsDistBounded (d := d) (fun x => ‖x‖ ^ n • x) := by
   by_cases hzero : n = -1
@@ -1286,7 +1284,6 @@ lemma isDistBounded_mul_inner_of_smul_norm {d : ℕ} {f : Space d → ℝ}
     IsDistBounded (fun x => ⟪y, x⟫_ℝ * f x) := by
   convert hf.isDistBounded_smul_inner_of_smul_norm hae y using 2
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma mul_inner_pow_neg_two {d : ℕ}
     (y : Space d.succ.succ) :

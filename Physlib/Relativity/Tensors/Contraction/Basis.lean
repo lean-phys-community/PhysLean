@@ -158,7 +158,6 @@ lemma Pure.dropPair_basisVector {n : ℕ} {c : Fin (n + 1 + 1) → C}
   simp [dropPair, basisVector]
 
 attribute [-simp] LinearEquiv.cast_apply
-set_option backward.isDefEq.respectTransparency false in
 lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (h : i ≠ j ∧ S.τ (c i) = c j) (t : Tensor S c)
     (φ : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :
@@ -218,7 +217,6 @@ lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (
     funext x
     rw [← add_mul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrT_basis_repr_apply_eq_sum_fin {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (h : i ≠ j ∧ S.τ (c i) = c j) (t : Tensor S c)
     (φ : ComponentIdx (c ∘ Fin.succSuccAbove i j)) :

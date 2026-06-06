@@ -101,7 +101,6 @@ lemma evalP_update_smul [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The multi-linear map formed by evaluation of an index of pure tensors. -/
 noncomputable def evalPMultilinear {n : ℕ} {c : Fin (n + 1)→ C}
     (i : Fin (n + 1)) (φ : basisIdx (c i)) :

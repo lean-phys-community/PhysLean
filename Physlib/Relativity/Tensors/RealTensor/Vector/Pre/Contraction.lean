@@ -414,7 +414,6 @@ lemma matrix_apply_stdBasis (ν μ : Fin 1 ⊕ Fin d) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma same_eq_det_toSelfAdjoint (x : ContrMod 3) :
     ⟪x, x⟫ₘ = det (ContrMod.toSelfAdjoint x).1 := by
   rw [ContrMod.toSelfAdjoint_apply_coe, as_sum_toSpace, det_fin_two,

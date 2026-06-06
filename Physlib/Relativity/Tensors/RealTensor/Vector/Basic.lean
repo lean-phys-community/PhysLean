@@ -53,11 +53,9 @@ instance {d} : Module ℝ (Vector d) :=
 instance {d} : AddCommGroup (Vector d) :=
   inferInstanceAs (AddCommGroup (Fin 1 ⊕ Fin d → ℝ))
 
-set_option backward.isDefEq.respectTransparency false in
 instance {d} : FiniteDimensional ℝ (Vector d) :=
   inferInstanceAs (FiniteDimensional ℝ (Fin 1 ⊕ Fin d → ℝ))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The equivalence between `Vector d` and `EuclideanSpace ℝ (Fin 1 ⊕ Fin d)`. -/
 def equivEuclid (d : ℕ) :
     Vector d ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 1 ⊕ Fin d) :=
@@ -96,7 +94,6 @@ instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) where
     simp at h
     rw [← neg_add_eq_zero, h]
 
-set_option backward.isDefEq.respectTransparency false in
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (Vector d) where
   norm_smul_le c v := by
     simp only [norm_eq_equivEuclid, map_smul]
@@ -256,7 +253,6 @@ lemma contDiff_apply {n : WithTop ℕ∞} {d : ℕ} {α : Type*}
     · fun_prop
     · exact h
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fderiv_apply {d : ℕ} {α : Type*}
     [NormedAddCommGroup α] [NormedSpace ℝ α]
     (f : α → Vector d) (h : Differentiable ℝ f)
@@ -267,7 +263,6 @@ lemma fderiv_apply {d : ℕ} {α : Type*}
   simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma fderiv_coord {d : ℕ} (μ : Fin 1 ⊕ Fin d) (x : Vector d) :
     fderiv ℝ (fun v : Vector d => v μ) x = coordCLM μ := by
@@ -660,14 +655,12 @@ def asSmoothManifold (d : ℕ) : ModelWithCorners ℝ (Vector d) (Vector d) := �
 -/
 open InnerProductSpace
 
-set_option backward.isDefEq.respectTransparency false in
 lemma basis_inner {d : ℕ} (μ : Fin 1 ⊕ Fin d) (p : Lorentz.Vector d) :
     ⟪Lorentz.Vector.basis μ, p⟫_ℝ = p μ := by
   simp [inner_eq_equivEuclid]
   rw [PiLp.inner_apply]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma inner_basis {d : ℕ} (p : Lorentz.Vector d) (μ : Fin 1 ⊕ Fin d) :
     ⟪p, Lorentz.Vector.basis μ⟫_ℝ = p μ := by
   simp [inner_eq_equivEuclid]

@@ -198,7 +198,6 @@ lemma grad_apply {d} (f : Space d → ℝ) (x : Space d) (i : Fin d) :
 
 open InnerProductSpace
 
-set_option backward.isDefEq.respectTransparency false in
 lemma grad_inner_single {d} (f : Space d → ℝ) (x : Space d) (i : Fin d) :
     ⟪∇ f x, EuclideanSpace.single i 1⟫_ℝ = ∂[i] f x := by
   simp only [EuclideanSpace.inner_single_right, conj_trivial,
@@ -264,7 +263,6 @@ lemma gradient_eq_sum {d} (f : Space d → ℝ) (x : Space d) :
     gradient f x = ∑ i, ∂[i] f x • basis i := by
   simp [gradient_eq_grad, grad_eq_sum f x]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma euclid_gradient_eq_sum {d} (f : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) :
     gradient f x = ∑ i, fderiv ℝ f x (EuclideanSpace.single i 1) • EuclideanSpace.single i 1 := by
   apply ext_inner_right (𝕜 := ℝ) fun y => ?_
@@ -432,7 +430,6 @@ lemma grad_inner_right {d : ℕ} (x : Space d) :
 
 open InnerProductSpace Distribution SchwartzMap MeasureTheory
 
-set_option backward.isDefEq.respectTransparency false in
 /- The quantity `⟪f x, Space.grad η x⟫_ℝ` is integrable for `f` bounded
   and `η` a Schwartz map. -/
 lemma integrable_isDistBounded_inner_grad_schwartzMap {dm1 : ℕ}
@@ -553,7 +550,6 @@ lemma distGrad_eq_of_inner {d} (f : (Space d) →d[ℝ] ℝ)
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma distGrad_eq_sum_basis {d} (f : (Space d) →d[ℝ] ℝ) (η : 𝓢(Space d, ℝ)) :
     ∇ᵈ f η =
       ∑ i, - f (SchwartzMap.evalCLM ℝ (Space d) ℝ (basis i) (fderivCLM ℝ (Space d) ℝ η)) •

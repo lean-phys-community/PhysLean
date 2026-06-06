@@ -34,7 +34,6 @@ lemma unitTensor_congr {c c1 : C} (h : c = c1) :
   subst h
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The unit tensor is symmetric on dualing the color. -/
 lemma unitTensor_eq_permT_dual (c : C) :
     S.unitTensor c = permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> simp))

@@ -122,7 +122,6 @@ lemma radiusRegPow_commutation_radiusRegPow : ⁅𝐫₀[d] ε s, 𝐫₀[d] ε 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Momentum operators commute: `[pᵢ, pⱼ] = 0`. -/
 @[simp]
 lemma momentum_commutation_momentum : ⁅𝐩 i, 𝐩 j⁆ = 0 := by
@@ -148,7 +147,6 @@ lemma momentumSqr_comp_momentum_commute : (𝐩 ⬝ᵥ 𝐩) ∘L 𝐩 i = 𝐩 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The canonical commutation relations: `[xᵢ, pⱼ] = iℏ δᵢⱼ𝟙`. -/
 lemma position_commutation_momentum : ⁅𝐱 i, 𝐩 j⁆ =
     (I * ℏ) • δ[i,j] • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
@@ -181,7 +179,6 @@ lemma position_commutation_momentumSqr : ⁅𝐱 i, 𝐩 ⬝ᵥ 𝐩⁆ = (2 * I
   simp only [dotProduct, mul_def, lie_sum, lie_leibniz, position_commutation_momentum, comp_smul,
     smul_comp, comp_id, id_comp, ← two_smul ℂ, smul_smul, mul_assoc, ← Finset.smul_sum, sum_smul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma radiusRegPow_commutation_momentum :
     ⁅𝐫₀[d] ε s, 𝐩 i⁆ = (s * I * ℏ) • 𝐫₀ ε (s-2) ∘L 𝐱 i := by
   ext ψ x
@@ -207,7 +204,6 @@ lemma momentum_comp_radiusRegPow_eq :
     𝐩 i ∘L 𝐫₀ ε s = 𝐫₀ ε s ∘L 𝐩 i - (s * I * ℏ) • 𝐫₀ ε (s-2) ∘L 𝐱 i := by
   rw [comp_eq_comp_sub_commute, radiusRegPow_commutation_momentum]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma radiusRegPow_commutation_momentumSqr :
     ⁅𝐫₀[d] ε s, 𝐩[d] ⬝ᵥ 𝐩⁆ = (2 * s * I * ℏ) • 𝐫₀ ε (s-2) ∘L (𝐱 ⬝ᵥ 𝐩)
     + (s * (d + s - 2) * ℏ ^ 2) • 𝐫₀ ε (s-2) - (ε ^ 2 * s * (s - 2) * ℏ ^ 2) • 𝐫₀ ε (s-4) := by
@@ -300,7 +296,6 @@ lemma angularMomentumSqr_commutation_momentumSqr : ⁅𝐋²[d], 𝐩[d] ⬝ᵥ 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma angularMomentum_commutation_angularMomentum : ⁅𝐋 i j, 𝐋 k l⁆ =
     (I * ℏ) • (δ[i,k] • 𝐋 j l - δ[i,l] • 𝐋 j k - δ[j,k] • 𝐋 i l + δ[j,l] • 𝐋 i k) := by
   nth_rw 2 [angularMomentumOperator]

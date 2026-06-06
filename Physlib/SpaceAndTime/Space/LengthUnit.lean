@@ -71,7 +71,6 @@ lemma div_pos (x y : LengthUnit) : (0 : ℝ≥0) < x/ y := by
   · exact zero_le
   · exact Ne.symm (div_ne_zero x y)
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma div_self (x : LengthUnit) :
     x / x = (1 : ℝ≥0) := by
@@ -198,7 +197,6 @@ noncomputable def astronomicalUnits : LengthUnit := scale (149597870700) meters
 /-- The length unit of a light year (9,460,730,472,580,800 meters). -/
 noncomputable def lightYears : LengthUnit := scale (9460730472580800) meters
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The length unit of a parsec (648,000/π astronomicalUnits). -/
 noncomputable def parsecs : LengthUnit := scale (648000/Real.pi) astronomicalUnits
   (by norm_num; exact Real.pi_pos)

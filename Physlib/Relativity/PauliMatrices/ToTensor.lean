@@ -143,7 +143,6 @@ lemma toTensor_basis_expand : σ^^^ =
     simp [pauliMatrix]
 
 open Lorentz in
-set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_eq_asConsTensor :
     σ^^^ = fromConstTriple (S := complexLorentzTensor)
       (c1 := Color.up) (c2 := Color.upL) (c3 := Color.upR) PauliMatrix.asConsTensor := by

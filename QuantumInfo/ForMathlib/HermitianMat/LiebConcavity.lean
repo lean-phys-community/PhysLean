@@ -271,7 +271,6 @@ Joint concavity of the Lieb extension trace map on HermitianMat.
   This bridges `liebExtensionTrace_jointlyConcaveOn_pdSet` to HermitianMat.
 -/
 set_option maxHeartbeats 1600000 in
-set_option backward.isDefEq.respectTransparency false in
 private lemma liebExtension_bridge [Nonempty d]
     {q r : ℝ} (hq : 0 < q) (hr : 0 < r) (hqr : q + r ≤ 1)
     (K : HermitianMat d ℂ)

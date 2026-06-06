@@ -173,7 +173,6 @@ instance instSub : Sub Prob where
 theorem coe_sub (p q : Prob) : (p - q : Prob)  = (p.val - q.val) ⊔ (0 : ℝ) := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp, norm_cast]
 theorem coe_one_minus (p : Prob) : (1 - p : Prob) = 1 - (p : ℝ) := by
   simp [coe_sub]
@@ -427,7 +426,6 @@ theorem negLog_Antitone : Antitone negLog := by
 theorem negLog_zero : —log (0 : Prob) = ⊤ := by
   simp [negLog]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem negLog_one : —log 1 = 0 := by
   simp [negLog]; rfl

@@ -59,7 +59,6 @@ scoped[OptimalHypothesisRate] notation "β_" ε " (" ρ "‖" S ")" =>  OptimalH
 
 namespace OptimalHypothesisRate
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The space of strategies `T` in `OptimalHypothesisRate` is inhabited, we always have some valid strategy. -/
 instance iInf_Inhabited (ρ : MState d) (ε : Prob) :
     Inhabited { m // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } :=
@@ -79,7 +78,6 @@ theorem iInf_IsCompact (ρ : MState d) (ε : Prob) : IsCompact { m | ρ.exp_val 
     fun_prop
   exact hC₁.inter_left hC₂
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The space of strategies `T` in `OptimalHypothesisRate` is convex. -/
 theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
   --We *could* get this from a more general fact that any linear subspace is convex,

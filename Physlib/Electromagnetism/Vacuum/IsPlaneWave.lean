@@ -118,7 +118,6 @@ lemma magneticFieldMatrix_eq_magneticFunction {d : ℕ}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma electricFunction_eq_electricField {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
     {s : Direction d} (P : IsPlaneWave 𝓕 A s) :
@@ -130,7 +129,6 @@ lemma electricFunction_eq_electricField {d : ℕ}
   simp only [inner_zero_left, zero_sub]
   field_simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma magneticFunction_eq_magneticFieldMatrix {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
     {s : Direction d} (P : IsPlaneWave 𝓕 A s) :
@@ -148,7 +146,6 @@ lemma magneticFunction_eq_magneticFieldMatrix {d : ℕ}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma electricFunction_unique {d : ℕ} {𝓕 : FreeSpace}
     {A : ElectromagneticPotential d} {s : Direction d}
     (P : IsPlaneWave 𝓕 A s) (E1 : ℝ → EuclideanSpace ℝ (Fin d))
@@ -167,7 +164,6 @@ lemma electricFunction_unique {d : ℕ} {𝓕 : FreeSpace}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma magneticFunction_unique {d : ℕ} {𝓕 : FreeSpace}
     {A : ElectromagneticPotential d} {s : Direction d}
     (P : IsPlaneWave 𝓕 A s)

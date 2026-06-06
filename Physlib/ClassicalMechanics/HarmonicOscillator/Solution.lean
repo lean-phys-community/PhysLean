@@ -588,7 +588,6 @@ due to the conservation of energy. Here we show it's value.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma trajectory_energy (IC : InitialConditions) : S.energy (IC.trajectory S) =
     fun _ => 1/2 * (S.m * ‖IC.v₀‖ ^2 + S.k * ‖IC.x₀‖ ^ 2) := by
   funext t

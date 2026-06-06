@@ -73,7 +73,6 @@ noncomputable def electricField {d} (c : SpeedOfLight) :
       smul_eq_mul, Real.ringHom_apply]
     ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma electricField_eq_fieldStrength {d} {c : SpeedOfLight}
     (A : DistElectromagneticPotential d) (ε : 𝓢(Time × Space d, ℝ))
     (i : Fin d) : A.electricField c ε i = - c * (Vector.basis.tensorProduct Vector.basis).repr

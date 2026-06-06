@@ -69,7 +69,6 @@ noncomputable def fieldStrengthAux {d} (A : DistElectromagneticPotential d)
       (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv ε | μ' ν) + -
       (η d | ν ν' ⊗ A.deriv ε | ν' μ)}ᵀ)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fieldStrengthAux_eq_add {d} (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) :
     fieldStrengthAux A ε =
     Tensorial.toTensor.symm (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv ε | μ' ν)}ᵀ)
@@ -194,7 +193,6 @@ lemma fieldStrengthAux_eq_basis {d} (A : DistElectromagneticPotential d)
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The field strength of an electromagnetic potential which is a distribution. -/
 noncomputable def fieldStrength {d} :
     DistElectromagneticPotential d →ₗ[ℝ]
@@ -263,7 +261,6 @@ lemma fieldStrength_diag_zero {d} (A : DistElectromagneticPotential d)
   rw [fieldStrength_basis_repr_eq_single]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma distDeriv_fieldStrength_diag_zero {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) (μ ν : Fin 1 ⊕ Fin d) :

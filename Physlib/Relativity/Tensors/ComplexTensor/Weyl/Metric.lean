@@ -87,7 +87,6 @@ lemma leftMetricVal_expand_tmul : leftMetricVal =
 lemma leftMetricVal_expand_tmul' : leftMetricVal = leftBasis 1 ⊗ₜ[ℂ] leftBasis 0
     - leftBasis 0 ⊗ₜ[ℂ] leftBasis 1 := by rw [leftMetricVal_expand_tmul]; abel
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The metric `εᵃᵃ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ leftHanded ⊗ leftHanded`,
   making manifest its invariance under the action of `SL(2,ℂ)`. -/
 def leftMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
@@ -131,7 +130,6 @@ lemma altLeftMetricVal_expand_tmul : altLeftMetricVal =
     Fin.isValue, cons_val_zero, cons_val_one, zero_smul, one_smul, zero_add, add_zero]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The metric `εₐₐ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ altLeftHanded`,
   making manifest its invariance under the action of `SL(2,ℂ)`. -/
 def altLeftMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
@@ -179,7 +177,6 @@ lemma rightMetricVal_expand_tmul : rightMetricVal =
 lemma rightMetricVal_expand_tmul' : rightMetricVal = rightBasis 1 ⊗ₜ[ℂ] rightBasis 0
     - rightBasis 0 ⊗ₜ[ℂ] rightBasis 1 := by rw [rightMetricVal_expand_tmul]; abel
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ε^{dot a}^{dot a}` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ rightHanded ⊗ rightHanded`,
   making manifest its invariance under the action of `SL(2,ℂ)`. -/
 def rightMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
@@ -230,7 +227,6 @@ lemma altRightMetricVal_expand_tmul : altRightMetricVal =
     Fin.isValue, cons_val_zero, cons_val_one, zero_smul, one_smul, zero_add, add_zero]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ε_{dot a}_{dot a}` as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altRightHanded ⊗ altRightHanded`,
   making manifest its invariance under the action of `SL(2,ℂ)`. -/
@@ -297,7 +293,6 @@ lemma leftAltContraction_apply_metric :
   rw [add_comm]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 lemma altLeftContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
     (TensorProduct.lid ℂ _).lTensor _ <|
@@ -340,7 +335,6 @@ lemma rightAltContraction_apply_metric :
   rw [add_comm]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 lemma altRightContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
       (TensorProduct.lid ℂ _).lTensor _ <|

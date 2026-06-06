@@ -213,12 +213,10 @@ Here, we use the uniform superposition -/
 instance instInhabited [Nonempty d] : Inhabited (Ket d) where
   default := uniform_superposition
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Construct the Ket corresponding to a basis vector, with a +1 phase. -/
 def Ket.basis (i : d) : Ket d :=
   ⟨fun j ↦ if i = j then 1 else 0, by simp [apply_ite]⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Construct the Bra corresponding to a basis vector, with a +1 phase. -/
 def Bra.basis (i : d) : Bra d :=
   ⟨fun j ↦ if i = j then 1 else 0, by simp [apply_ite]⟩
@@ -340,7 +338,6 @@ theorem Ket.IsProd_iff_mul_eq_mul (ψ : Ket (d₁ × d₂)) : ψ.IsProd ↔
 end prod
 
 section mes
-set_option backward.isDefEq.respectTransparency false in
 /-- The Maximally Entangled State, or MES, on a d×d system. In principle there are many, this
 is specifically the MES with an all-positive phase. For instance on `d := Fin 2`, this is the
 Bell state. -/
