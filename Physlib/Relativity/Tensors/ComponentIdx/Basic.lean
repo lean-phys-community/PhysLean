@@ -10,6 +10,8 @@ public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 
 # Component indices
 
+## i. Overview
+
 For a tensor species `S` and a list of colors `c : Fin n → C`, `ComponentIdx S c`
 is the type of choices of a basis index for every color in `c`. For example, for a
 tensor with colors `![.up, .down]`, an element of `ComponentIdx ![.up, .down]`
@@ -17,6 +19,21 @@ records one contravariant component index and one covariant component index.
 
 This file contains the basic definition and congruence/cast API. Operations on
 component indices induced by tensor products and contractions live in sibling files.
+
+## ii. Key results
+
+- `TensorSpecies.Tensor.ComponentIdx` is the type of component indices for a tensor
+  with a given list of colors.
+- `TensorSpecies.Tensor.ComponentIdx.congr_right` relates entries whose positions are equal.
+- `TensorSpecies.Tensor.ComponentIdx.cast` casts component indices along equivalent color maps.
+
+## iii. Table of contents
+
+- A. Basic definitions
+
+## iv. References
+
+There are no known references for the material in this module.
 
 -/
 
@@ -29,6 +46,12 @@ variable {k : Type} [CommRing k] {C G : Type} [Group G]
   {S : TensorSpecies k C G basisIdx}
 
 namespace Tensor
+
+/-!
+
+## A. Basic definitions
+
+-/
 
 set_option linter.unusedVariables false in
 /-- Given a list of indices `c : Fin n → C`, the type `ComponentIdx c` is the type of

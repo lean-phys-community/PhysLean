@@ -6,12 +6,29 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.ComponentIdx.Basic
-public import Mathlib.Data.Fin.Tuple.Basic
 /-!
 
 # Products of component indices
 
+## i. Overview
+
 This file contains the component-index API induced by appending two lists of tensor colors.
+
+The main construction identifies component indices for appended color lists with pairs
+of component indices for each side of the append.
+
+## ii. Key results
+
+- `TensorSpecies.Tensor.ComponentIdx.prod` is the equivalence between
+  `ComponentIdx (Fin.append c c1)` and `ComponentIdx c × ComponentIdx c1`.
+
+## iii. Table of contents
+
+- A. Product equivalence
+
+## iv. References
+
+There are no known references for the material in this module.
 
 -/
 
@@ -24,6 +41,12 @@ variable {k C G : Type} [CommRing k] [Group G]
   {S : TensorSpecies k C G basisIdx}
 
 namespace Tensor
+
+/-!
+
+## A. Product equivalence
+
+-/
 
 /-- The equivalence between `ComponentIdx (Fin.append c c1)` and
   `ComponentIdx c × ComponentIdx c1` formed by products. -/

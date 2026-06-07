@@ -6,13 +6,30 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.ComponentIdx.Basic
-public import Mathlib.Data.Fin.Tuple.Basic
 /-!
 
 # Component indices for one-index tensors
 
+## i. Overview
+
 This file defines the canonical equivalence between component indices for a single
 color and the basis indices of that color.
+
+## ii. Key results
+
+- `TensorSpecies.Tensor.ComponentIdx.single` is the equivalence between
+  `ComponentIdx ![c]` and `basisIdx c`.
+- `TensorSpecies.Tensor.ComponentIdx.single_apply` and
+  `TensorSpecies.Tensor.ComponentIdx.single_symm_apply` are simp lemmas for the two
+  directions of this equivalence.
+
+## iii. Table of contents
+
+- A. Single-index equivalence
+
+## iv. References
+
+There are no known references for the material in this module.
 
 -/
 
@@ -25,6 +42,12 @@ variable {k : Type} [CommRing k] {C G : Type} [Group G]
   {S : TensorSpecies k C G basisIdx}
 
 namespace Tensor
+
+/-!
+
+## A. Single-index equivalence
+
+-/
 
 /-- The equivalence between component indices for a single color and the basis indices
 of that color. -/

@@ -106,9 +106,8 @@ lemma contrT_basis_repr_apply_eq_sum_fin {n : ℕ} {c : Fin (n + 1 + 1) → C} {
     Fintype.sum_prod_type]
   simp
 
-
 lemma contrT_basis {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
-    (h : i ≠ j ∧ S.τ (c i) = c j) (b : ComponentIdx (S := S) c):
+    (h : i ≠ j ∧ S.τ (c i) = c j) (b : ComponentIdx (S := S) c) :
     contrT n i j h (basis c b) =
     Pure.contrPCoeff i j h (Pure.basisVector c b) •
       basis (c ∘ Fin.succSuccAbove i j) (b.dropPair i j) := by

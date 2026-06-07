@@ -10,7 +10,6 @@ public import Physlib.Relativity.Tensors.Contraction.SuccSuccAbove
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
 public import Mathlib.Tactic.Cases
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # Tensors
@@ -672,7 +671,7 @@ lemma PermCond.succSuccAbove_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1 + 1) → C}
     let i1' := (predPredAbove i2' j2' hi2j2' i1 (by simp [i2', j2']));
     let j1' := (predPredAbove i2' j2' hi2j2' j1 (by simp [i2', j2']));
     PermCond ((c ∘ i2'.succSuccAbove j2') ∘ i1'.succSuccAbove j1')
-      ((c ∘ i1.succSuccAbove j1) ∘ i2.succSuccAbove  j2) id := by
+      ((c ∘ i1.succSuccAbove j1) ∘ i2.succSuccAbove j2) id := by
   apply And.intro (Function.bijective_id)
   simp only [id_eq, Function.comp_apply]
   intro i

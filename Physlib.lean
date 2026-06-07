@@ -316,10 +316,6 @@ public import Physlib.Relativity.SL2C.SelfAdjoint
 public import Physlib.Relativity.Special.ProperTime
 public import Physlib.Relativity.Special.TwinParadox.Basic
 public import Physlib.Relativity.SpeedOfLight
-public import Physlib.Relativity.Tensors.ComponentIdx.Basic
-public import Physlib.Relativity.Tensors.ComponentIdx.Contraction
-public import Physlib.Relativity.Tensors.ComponentIdx.Product
-public import Physlib.Relativity.Tensors.ComponentIdx.Single
 public import Physlib.Relativity.Tensors.Basic
 public import Physlib.Relativity.Tensors.Color.Basic
 public import Physlib.Relativity.Tensors.Color.Discrete
@@ -343,6 +339,10 @@ public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Metric
 public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Modules
 public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Two
 public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Unit
+public import Physlib.Relativity.Tensors.ComponentIdx.Basic
+public import Physlib.Relativity.Tensors.ComponentIdx.Contraction
+public import Physlib.Relativity.Tensors.ComponentIdx.Product
+public import Physlib.Relativity.Tensors.ComponentIdx.Single
 public import Physlib.Relativity.Tensors.Constructors
 public import Physlib.Relativity.Tensors.Contraction.Basic
 public import Physlib.Relativity.Tensors.Contraction.Basis

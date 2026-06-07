@@ -11,8 +11,32 @@ public import Physlib.Relativity.Tensors.Contraction.SuccSuccAbove
 
 # Contractions of component indices
 
+## i. Overview
+
 This file contains the component-index API induced by dropping a pair of contracted
 indices from a tensor.
+
+The constructions here describe how component indices restrict along
+`Fin.succSuccAbove`, and how the fiber of this restriction is equivalent to the two
+component choices at the contracted positions.
+
+## ii. Key results
+
+- `TensorSpecies.Tensor.ComponentIdx.dropPair` restricts a component index by dropping
+  two positions.
+- `TensorSpecies.Tensor.ComponentIdx.DropPairSection` is the finite set of component
+  indices mapping to a fixed restricted component index.
+- `TensorSpecies.Tensor.ComponentIdx.DropPairSection.ofFinEquiv` identifies a
+  `DropPairSection` with the two basis indices at the dropped positions.
+
+## iii. Table of contents
+
+- A. Dropping a pair
+- B. Sections of the drop-pair map
+
+## iv. References
+
+There are no known references for the material in this module.
 
 -/
 
@@ -28,11 +52,23 @@ namespace Tensor
 
 namespace ComponentIdx
 
+/-!
+
+## A. Dropping a pair
+
+-/
+
 /-- The `ComponentIdx` obtained by dropping two components. -/
 def dropPair {n : ℕ} {c : Fin (n + 1 + 1) → C}
     (i j : Fin (n + 1 + 1)) (b : ComponentIdx (S := S) c) :
     ComponentIdx (S := S) (c ∘ Fin.succSuccAbove i j) :=
   fun m => b (Fin.succSuccAbove i j m)
+
+/-!
+
+## B. Sections of the drop-pair map
+
+-/
 
 /-- Given a coordinate parameter
   `b : Π k, Fin (S.repDim ((c ∘ i.succAbove ∘ j.succAbove) k)))`, the
