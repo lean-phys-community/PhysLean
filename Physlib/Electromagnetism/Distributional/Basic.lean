@@ -32,7 +32,6 @@ spacetime to contravariant Lorentz vectors.
   - A.1. Constructors
   - A.2. The derivative of the electromagnetic potential as a distribution
   - A.3. The derivative in terms of the basis
-  - A.4. Equivariance of the derivative distribution
 
 ## iv. References
 
@@ -106,18 +105,11 @@ TODO "Add a constructor for DistElectromagneticPotential from electric and
 
 -/
 
-/-- The derivative of a electromagnetic potential, which is a distribution. -/
-noncomputable def deriv {d} : DistElectromagneticPotential d →ₗ[ℝ]
-    (SpaceTime d) →d[ℝ] Lorentz.CoVector d ⊗[ℝ] Lorentz.Vector d := distTensorDeriv
-
-TODO "Remove the definition `deriv` in distributional electromagnetism and replace it with
-  `distTensorDeriv` everywhere."
-
-lemma deriv_eq_sum_sum {d} (A : DistElectromagneticPotential d)
+lemma distTensorDeriv_eq_sum_sum {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
-    deriv A ε =∑ μ, ∑ ν, (SpaceTime.distDeriv μ A ε ν) •
+    distTensorDeriv A ε =∑ μ, ∑ ν, (SpaceTime.distDeriv μ A ε ν) •
       Lorentz.CoVector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν := by
-  simp [deriv, distTensorDeriv_apply]
+  simp [distTensorDeriv_apply]
   congr
   funext μ
   conv_lhs => rw [← Lorentz.Vector.basis.sum_repr (SpaceTime.distDeriv μ A ε)]
@@ -134,14 +126,14 @@ lemma deriv_eq_sum_sum {d} (A : DistElectromagneticPotential d)
 -/
 
 @[simp]
-lemma deriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
+lemma distTensorDeriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
-    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A ε) μν =
+    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (distTensorDeriv A ε) μν =
     distDeriv μν.1 A ε μν.2 := by
   match μν with
   | (μ, ν) =>
-  rw [deriv_eq_sum_sum]
+  rw [distTensorDeriv_eq_sum_sum]
   simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
     Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, smul_eq_mul]
   rw [Finset.sum_eq_single μ, Finset.sum_eq_single ν]
@@ -153,10 +145,10 @@ lemma deriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     simp [h]
   · simp
 
-lemma toTensor_deriv_basis_repr_apply {d} (A : DistElectromagneticPotential d)
+lemma toTensor_distTensorDeriv_basis_repr_apply {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) (b : ComponentIdx (S := realLorentzTensor d)
       (Fin.append ![Color.down] ![Color.up])) :
-    (Tensor.basis _).repr (Tensorial.toTensor (deriv A ε)) b =
+    (Tensor.basis _).repr (Tensorial.toTensor (distTensorDeriv A ε)) b =
     distDeriv (b 0) A ε (b 1) := by
   rw [Tensorial.basis_toTensor_apply]
   rw [Tensorial.basis_map_prod]
@@ -174,18 +166,8 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : DistElectromagneticPotential d)
     | ⟨i, j⟩ =>
     simp
   rw [hb]
-  rw [Module.Basis.repr_reindex_apply, deriv_basis_repr_apply]
+  rw [Module.Basis.repr_reindex_apply, distTensorDeriv_basis_repr_apply]
   rfl
-
-/-!
-
-### A.4. Equivariance of the derivative distribution
-
--/
-
-lemma deriv_equivariant {d} {A : DistElectromagneticPotential d}
-    (Λ : LorentzGroup d) : deriv (Λ • A) = Λ • deriv A := by
-  rw [deriv, distTensorDeriv_equivariant]
 
 end DistElectromagneticPotential
 
