@@ -638,6 +638,15 @@ def ofTemporalComponent {d : ℕ} : ℝ →L[ℝ] Vector d where
   map_add' := by simp [add_smul]
   map_smul' := by simp [smul_smul]
 
+/-- The continuous linear map corresponding to the creation of a
+  Lorentz Vector with only non-zero spatial components. -/
+def ofSpatialComponent {d : ℕ} : EuclideanSpace ℝ (Fin d) →L[ℝ] Vector d where
+  toFun xs := ∑ i, xs i • basis (Sum.inr i)
+  map_add' xs ys := by
+    simp [add_smul, Finset.sum_add_distrib]
+  map_smul' c xs := by
+    simp [smul_smul, Finset.smul_sum]
+
 /-!
 
 ## Smoothness
