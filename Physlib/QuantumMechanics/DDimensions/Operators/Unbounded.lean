@@ -644,7 +644,7 @@ lemma isClosable_of_continuous (h : Continuous U) : U.IsClosable := by
   · exact mul_zero M ▸ (norm_eq_zero.mpr hx₁) ▸ hbx.fst.norm.const_mul M
 
 /-- A strengthening of `closure_domain_le_domain_closure` for continuous operators. -/
-lemma closure_domain_of_continuous [CompleteSpace H'] (h : Continuous U) :
+lemma closure_domain_eq_domain_closure_of_continuous [CompleteSpace H'] (h : Continuous U) :
     U.closure.domain = U.domain.closure := by
   refine eq_of_le_of_ge U.closure_domain_le_domain_closure fun x hx ↦ ?_
   obtain ⟨M, hM, h_bound⟩ := LinearMap.continuous_iff_bounded.mp h
@@ -671,16 +671,16 @@ lemma closure_domain_of_continuous [CompleteSpace H'] (h : Continuous U) :
   · rw [nhds_prod_eq]
     exact Filter.Tendsto.prodMk hb' hy
 
-lemma isClosed_iff_of_continuous [CompleteSpace H'] (h : Continuous U) :
+lemma isClosed_iff_isClosed_domain_of_continuous [CompleteSpace H'] (h : Continuous U) :
     U.IsClosed ↔ _root_.IsClosed (U.domain : Set H) := by
   rw [(isClosable_of_continuous h).isClosed_iff]
-  have h_domain := closure_domain_of_continuous h
+  have h_domain := closure_domain_eq_domain_closure_of_continuous h
   constructor <;> intro hcl
   · exact hcl ▸ h_domain ▸ isClosed_closure
   · refine (eq_of_le_of_domain_eq U.le_closure ?_).symm
     exact h_domain ▸ hcl.submodule_topologicalClosure_eq.symm
 
-lemma IsClosed.toFun_graph_isClosed (hU : U.IsClosed) :
+lemma IsClosed.isClosed_toFun_graph (hU : U.IsClosed) :
     _root_.IsClosed (U.toFun.graph : Set (U.domain × H')) := by
   refine isClosed_of_closure_subset fun ⟨x₁, x₂⟩ hx ↦ ?_
   simp only [SetLike.mem_coe, LinearMap.mem_graph_iff, toFun_eq_coe]
@@ -697,12 +697,12 @@ lemma IsClosed.toFun_graph_isClosed (hU : U.IsClosed) :
 
   This follows immediately from `LinearMap.continuous_of_isClosed_graph`
   and the completeness of `H` and `H'`. -/
-lemma IsClosed.continuous_of_domain_isClosed [CompleteSpace H] [CompleteSpace H']
+lemma IsClosed.continuous_of_isClosed_domain [CompleteSpace H] [CompleteSpace H']
     (hU : U.IsClosed) (h : _root_.IsClosed (U.domain : Set H)) :
     Continuous U := by
   have hCS : CompleteSpace U.domain := instCompleteSpaceSubtypeMemSubmoduleOfIsClosedCoe U.domain
   refine @LinearMap.continuous_of_isClosed_graph _ _ _ _ _ hCS _ _ _ _ U.toFun ?_
-  exact hU.toFun_graph_isClosed
+  exact hU.isClosed_toFun_graph
 
 lemma IsClosable.add_continuous
     (h₁ : U₁.IsClosable) (h₂ : Continuous U₂) (h : U₁.domain ≤ U₂.domain) :
