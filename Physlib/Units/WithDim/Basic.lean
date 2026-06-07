@@ -38,6 +38,41 @@ instance (d : Dimension) (M : Type) : HasDim (WithDim d M) where
 lemma dim_apply (d : Dimension) (M : Type) :
     dim (WithDim d M) = d := rfl
 
+/-!
+## Inherited instances
+-/
+
+instance (d : Dimension) (M : Type) [Inhabited M] : Inhabited (WithDim d M) where
+  default := ⟨default⟩
+
+instance (d : Dimension) (M : Type) [Zero M] : Zero (WithDim d M) where
+  zero := ⟨0⟩
+
+@[simp]
+lemma val_zero {d : Dimension} {M : Type} [Zero M] :
+    (0 : WithDim d M).val = 0 := rfl
+
+instance (d : Dimension) (M : Type) [Add M] : Add (WithDim d M) where
+  add m1 m2 := ⟨m1.val + m2.val⟩
+
+@[simp]
+lemma val_add {d : Dimension} {M : Type} [Add M] (m1 m2 : WithDim d M) :
+    (m1 + m2).val = m1.val + m2.val := rfl
+
+instance (d : Dimension) (M : Type) [Neg M] : Neg (WithDim d M) where
+  neg m := ⟨-m.val⟩
+
+@[simp]
+lemma val_neg {d : Dimension} {M : Type} [Neg M] (m : WithDim d M) :
+    (-m).val = -m.val := rfl
+
+instance (d : Dimension) (M : Type) [Sub M] : Sub (WithDim d M) where
+  sub m1 m2 := ⟨m1.val - m2.val⟩
+
+@[simp]
+lemma val_sub {d : Dimension} {M : Type} [Sub M] (m1 m2 : WithDim d M) :
+    (m1 - m2).val = m1.val - m2.val := rfl
+
 instance (d : Dimension) (M : Type) [MulAction ℝ≥0 M] : MulAction ℝ≥0 (WithDim d M) where
   smul a m := ⟨a • m.val⟩
   one_smul m := ext _ _ (one_smul ℝ≥0 m.val)
@@ -157,6 +192,7 @@ lemma cast_scaleUnit {d d2 : Dimension} {M : Type} [MulAction ℝ≥0 M] (m : Wi
   subst h
   simp
 
-TODO "Induce instances on `WithDim d M` from instances on `M`."
+TODO "Induce further algebraic, order and topological instances on `WithDim d M`
+  from instances on `M`."
 
 end WithDim
