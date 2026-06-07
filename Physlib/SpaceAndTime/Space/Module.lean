@@ -290,8 +290,27 @@ noncomputable instance {d : ℕ} : MeasurableSpace (Space d) := borel (Space d)
 instance {d : ℕ} : BorelSpace (Space d) where
   measurable_eq := by rfl
 
-TODO "In the above documentation describe what an instance is, and why
-  it is useful to have instances for `Space d`."
+/-!
+
+In Lean, an `instance` supplies a typeclass automatically. When a definition or
+theorem needs a structure such as `AddCommGroup (Space d)`, `Module ℝ (Space d)`,
+`NormedAddCommGroup (Space d)`, `InnerProductSpace ℝ (Space d)`, or
+`MeasurableSpace (Space d)`, typeclass inference searches for the corresponding
+instance and inserts it without the user passing it explicitly.
+
+These instances make `Space d` usable with standard mathematical notation and
+with the Mathlib API. For example, they allow expressions such as `p + q`,
+`c • p`, `‖p‖`, `inner ℝ p q`, and measurable-set arguments involving the Borel
+structure. They also make general theorems about modules, normed groups, inner
+product spaces, and measurable spaces apply directly to `Space d`.
+
+For `Space d`, these instances are intentional choices rather than inherited
+facts: the type was defined as a structure instead of an abbreviation for
+`EuclideanSpace ℝ (Fin d)`. In particular, the additive and module structures
+choose an origin, while the norm, inner product, and Borel structure choose the
+standard Euclidean coordinate geometry on `Fin d`.
+
+-/
 
 /-!
 
@@ -327,10 +346,22 @@ lemma sum_apply {ι : Type} [Fintype ι] (f : ι → Space d) (i : Fin d) :
 
 ## Basis
 
--/
+A basis in Lean is typically represented by `Module.Basis ι R M`: an indexed
+family of vectors in an `R`-module `M` such that every element of `M` has a
+unique finite linear expansion in those vectors. The index type `ι` names the
+basis vectors, and the map `basis.repr` gives the coordinate representation of a
+vector with respect to that basis.
 
-TODO "In the above documentation describe the notion of a basis
-  in Lean."
+For inner product spaces, Lean also has `OrthonormalBasis ι R M`. This is a
+basis whose vectors are orthonormal, packaged together with a linear isometric
+equivalence between `M` and its coordinate space. It can be coerced to the
+underlying `Module.Basis` using `basis.toBasis` when only the linear-algebraic
+basis structure is needed.
+
+The standard basis below is indexed by `Fin d`, so the basis vector `basis i`
+is the unit vector in the `i`th coordinate direction of `Space d`.
+
+-/
 
 /-- The standard basis of Space based on `Fin d`. -/
 noncomputable def basis {d} : OrthonormalBasis (Fin d) ℝ (Space d) where
