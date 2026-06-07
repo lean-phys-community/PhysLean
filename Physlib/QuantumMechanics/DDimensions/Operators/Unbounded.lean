@@ -360,12 +360,6 @@ def HasDenseDomain (U : H →ₗ.[ℂ] H') : Prop := Dense (U.domain : Set H)
 
 lemma hasDenseDomain_def : U.HasDenseDomain ↔ Dense (U.domain : Set H) := Iff.rfl
 
-/-- A LinearPMap is bounded iff there exists a constant `c` such that `‖U x‖ ≤ c * ‖x‖`
-  for all `x : U.domain`. -/
-def IsBounded (U : H →ₗ.[ℂ] H') : Prop := ∃ c > 0, ∀ x : U.domain, ‖U x‖ ≤ c * ‖x‖
-
-lemma isBounded_def : U.IsBounded ↔ ∃ c > 0, ∀ x : U.domain, ‖U x‖ ≤ c * ‖x‖ := Iff.rfl
-
 /-- A LinearPMap is an unbounded operator iff it has dense domain and is closable. -/
 def IsUnbounded (U : H →ₗ.[ℂ] H') : Prop := U.HasDenseDomain ∧ U.IsClosable
 
