@@ -629,6 +629,7 @@ lemma _root_.LinearMap.continuous_iff_bounded {𝕜 E F : Type*} [NontriviallyNo
   rw [← isBoundedLinearMap_iff]
   exact IsBoundedLinearMap.isLinearMap_and_continuous_iff_isBoundedLinearMap f
 
+/-- Continuous operators are closable. -/
 lemma isClosable_of_continuous (h : Continuous U) : U.IsClosable := by
   use U.graph.topologicalClosure.toLinearPMap
   refine (toLinearPMap_graph_eq _ fun x hx hx₁ ↦ ?_).symm
@@ -671,6 +672,7 @@ lemma closure_domain_eq_domain_closure_of_continuous [CompleteSpace H'] (h : Con
   · rw [nhds_prod_eq]
     exact Filter.Tendsto.prodMk hb' hy
 
+/-- A continuous operator is closed iff its domain is closed. -/
 lemma isClosed_iff_isClosed_domain_of_continuous [CompleteSpace H'] (h : Continuous U) :
     U.IsClosed ↔ _root_.IsClosed (U.domain : Set H) := by
   rw [(isClosable_of_continuous h).isClosed_iff]
@@ -704,6 +706,7 @@ lemma IsClosed.continuous_of_isClosed_domain [CompleteSpace H] [CompleteSpace H'
   refine @LinearMap.continuous_of_isClosed_graph _ _ _ _ _ hCS _ _ _ _ U.toFun ?_
   exact hU.isClosed_toFun_graph
 
+/-- Closability is preserved upon adding a continuous operator. -/
 lemma IsClosable.add_continuous
     (h₁ : U₁.IsClosable) (h₂ : Continuous U₂) (h : U₁.domain ≤ U₂.domain) :
     (U₁ + U₂).IsClosable := by
@@ -722,10 +725,12 @@ lemma IsClosable.add_continuous
     refine sub_zero x₂ ▸ hbx.snd.sub ?_
     exact map_zero U₂ ▸ (h₂.tendsto 0).comp (tendsto_subtype_rng.mpr hbx.fst)
 
+/-- Closability is preserved upon subtracting a continuous operator. -/
 lemma IsClosable.sub_continuous
     (h₁ : U₁.IsClosable) (h₂ : Continuous U₂) (h : U₁.domain ≤ U₂.domain) : (U₁ - U₂).IsClosable :=
   sub_eq_add_neg U₁ U₂ ▸ h₁.add_continuous h₂.neg h
 
+/-- Closedness is preserved upon adding a continuous operator. -/
 lemma IsClosed.add_continuous [CompleteSpace H']
     (h₁ : U₁.IsClosed) (h₂ : Continuous U₂) (h : U₁.domain ≤ U₂.domain) : (U₁ + U₂).IsClosed := by
   have hcl : (U₁ + U₂).IsClosable := h₁.isClosable.add_continuous h₂ h
@@ -761,6 +766,7 @@ lemma IsClosed.add_continuous [CompleteSpace H']
     exact tendsto_subtype_rng.mpr hbx.fst
   simp_all [add_domain, add_apply]
 
+/-- Closedness is preserved upon subtracting a continuous operator. -/
 lemma IsClosed.sub_continuous [CompleteSpace H']
     (h₁ : U₁.IsClosed) (h₂ : Continuous U₂) (h : U₁.domain ≤ U₂.domain) : (U₁ - U₂).IsClosed :=
   sub_eq_add_neg U₁ U₂ ▸ h₁.add_continuous h₂.neg h
