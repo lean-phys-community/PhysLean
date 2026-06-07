@@ -686,6 +686,30 @@ lemma isClosed_iff_of_continuous [CompleteSpace H'] (h : Continuous U) :
   · refine (eq_of_le_of_domain_eq U.le_closure ?_).symm
     exact h_domain ▸ hcl.submodule_topologicalClosure_eq.symm
 
+lemma IsClosed.toFun_graph_isClosed (hU : U.IsClosed) :
+    _root_.IsClosed (U.toFun.graph : Set (U.domain × H')) := by
+  refine isClosed_of_closure_subset fun ⟨x₁, x₂⟩ hx ↦ ?_
+  simp only [SetLike.mem_coe, LinearMap.mem_graph_iff, toFun_eq_coe]
+  suffices (↑x₁, x₂) ∈ U.graph.topologicalClosure by
+    simp_all [hU.isClosable.graph_closure_eq_closure_graph, hU.isClosable.isClosed_iff.mp hU]
+  obtain ⟨b, hb, hbx⟩ := mem_closure_iff_seq_limit.mp hx
+  apply mem_closure_iff_seq_limit.mpr
+  rw [nhds_prod_eq] at *
+  refine ⟨fun n ↦ (↑(b n).1, (b n).2), by simp_all, ?_⟩
+  exact Filter.Tendsto.prodMk (tendsto_subtype_rng.mp hbx.fst) hbx.snd
+
+/-- The **closed graph theorem** for partial linear maps:
+  a closed operator with closed domain is continuous.
+
+  This follows immediately from `LinearMap.continuous_of_isClosed_graph`
+  and the completeness of `H` and `H'`. -/
+lemma IsClosed.continuous_of_domain_isClosed [CompleteSpace H] [CompleteSpace H']
+    (hU : U.IsClosed) (h : _root_.IsClosed (U.domain : Set H)) :
+    Continuous U := by
+  have hCS : CompleteSpace U.domain := instCompleteSpaceSubtypeMemSubmoduleOfIsClosedCoe U.domain
+  refine @LinearMap.continuous_of_isClosed_graph _ _ _ _ _ hCS _ _ _ _ U.toFun ?_
+  exact hU.toFun_graph_isClosed
+
 /-!
 ### B.3. Classes of operators
 -/
