@@ -22,9 +22,6 @@ structure.
 
 - `HasBodyForcePotential` : Predicate encoding the convention `specificBodyForce = -grad Phi`.
 - `HasConservativeBodyForce` : Predicate saying a specific body force has some potential.
-- `materialDerivative` : Material derivative of a scalar field along a fluid velocity field.
-- `IsIsentropic` : Predicate saying the entropy is materially conserved.
-- `specificKineticEnergy` : The specific kinetic energy `|u|^2 / 2`.
 - `bernoulliFunction` : The Bernoulli function `|u|^2 / 2 + h + Phi`.
 - `LocalBernoulliLaw` : Vanishing spatial gradient of the Bernoulli function.
 - `BernoulliLaw` : Spatial constancy of the Bernoulli function at each time.
@@ -32,9 +29,8 @@ structure.
 ## iii. Table of contents
 
 - A. Conservative-force convention
-- B. Thermodynamic-flow predicates
-- C. Bernoulli function
-- D. Bernoulli-law predicates
+- B. Bernoulli function
+- C. Bernoulli-law predicates
 
 ## iv. References
 
@@ -42,9 +38,7 @@ structure.
 
 @[expose] public section
 
-open scoped InnerProductSpace
 open Space
-open Time
 
 namespace FluidDynamics
 
@@ -65,37 +59,19 @@ def HasConservativeBodyForce (d : ℕ) (flow : CauchyFlow d) : Prop :=
 
 /-!
 
-## B. Thermodynamic-flow predicates
+## B. Bernoulli function
 
 -/
-
-/-- The material derivative `D_t f = partial_t f + u · grad f` of a scalar field. -/
-noncomputable def materialDerivative (d : ℕ) (fluid : FluidFlow d)
-    (field : ScalarField d) : ScalarField d :=
-  fun t x => ∂ₜ (field · x) t + ⟪fluid.velocity t x, ∇ (field t) x⟫_ℝ
-
-/-- A thermodynamic flow is isentropic when the entropy is materially conserved. -/
-def IsIsentropic (d : ℕ) (flow : ThermodynamicCauchyFlow d) : Prop :=
-  ∀ t x, materialDerivative d flow.toFluidFlow flow.entropy t x = 0
-
-/-!
-
-## C. Bernoulli function
-
--/
-
-/-- The specific kinetic energy `|u|^2 / 2` of a fluid flow. -/
-noncomputable def specificKineticEnergy (d : ℕ) (fluid : FluidFlow d) : ScalarField d :=
-  fun t x => (1 / 2 : ℝ) * ⟪fluid.velocity t x, fluid.velocity t x⟫_ℝ
 
 /-- The Bernoulli function `|u|^2 / 2 + h + Phi`. -/
 noncomputable def bernoulliFunction
     (d : ℕ) (flow : ThermodynamicCauchyFlow d) (potential : Space d → ℝ) : ScalarField d :=
-  fun t x => specificKineticEnergy d flow.toFluidFlow t x + flow.enthalpy t x + potential x
+  fun t x => FluidFlow.specificKineticEnergy d flow.toFluidFlow t x + flow.enthalpy t x +
+    potential x
 
 /-!
 
-## D. Bernoulli-law predicates
+## C. Bernoulli-law predicates
 
 -/
 

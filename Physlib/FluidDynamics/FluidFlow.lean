@@ -5,7 +5,7 @@ Authors: Florian Wiesner
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Basic
+public import Physlib.SpaceAndTime.Space.Derivatives.Grad
 public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
 
@@ -34,12 +34,18 @@ laws such as Bernoulli-type statements.
 - `ThermodynamicCauchyFlow` : A Cauchy flow with entropy and enthalpy fields.
 - `FluidFlow.DensityTimeIndependent` : A fluid flow whose density has zero time derivative.
 - `FluidFlow.VelocityTimeIndependent` : A fluid flow whose velocity has zero time derivative.
+- `FluidFlow.materialDerivative` : The material derivative along a fluid velocity field.
+- `FluidFlow.specificKineticEnergy` : The specific kinetic energy `|u|^2 / 2`.
+- `ThermodynamicCauchyFlow.IsIsentropic` : A thermodynamic Cauchy flow whose entropy is
+  materially conserved.
 
 ## iii. Table of contents
 
 - A. Field types
 - B. Fluid flow structures
 - C. Time-independence predicates
+- D. Flow-derived scalar quantities
+- E. Thermodynamic-flow predicates
 
 ## iv. References
 
@@ -47,6 +53,8 @@ laws such as Bernoulli-type statements.
 
 @[expose] public section
 
+open scoped InnerProductSpace
+open Space
 open Time
 
 namespace FluidDynamics
@@ -132,5 +140,39 @@ def VelocityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
   ∀ t x, ∂ₜ (fluid.velocity · x) t = 0
 
 end FluidFlow
+
+/-!
+
+## D. Flow-derived scalar quantities
+
+-/
+
+namespace FluidFlow
+
+/-- The material derivative `D_t f = partial_t f + u · grad f` of a scalar field. -/
+noncomputable def materialDerivative (d : ℕ) (fluid : FluidFlow d)
+    (field : ScalarField d) : ScalarField d :=
+  fun t x => ∂ₜ (field · x) t + ⟪fluid.velocity t x, ∇ (field t) x⟫_ℝ
+
+/-- The specific kinetic energy `|u|^2 / 2` of a fluid flow. -/
+noncomputable def specificKineticEnergy (d : ℕ) (fluid : FluidFlow d) : ScalarField d :=
+  fun t x => (1 / 2 : ℝ) * ⟪fluid.velocity t x, fluid.velocity t x⟫_ℝ
+
+end FluidFlow
+
+/-!
+
+## E. Thermodynamic-flow predicates
+
+-/
+
+namespace ThermodynamicCauchyFlow
+
+/-- A thermodynamic flow is isentropic when the entropy is materially conserved along the
+underlying fluid velocity field. -/
+def IsIsentropic (d : ℕ) (flow : ThermodynamicCauchyFlow d) : Prop :=
+  ∀ t x, FluidFlow.materialDerivative d flow.toFluidFlow flow.entropy t x = 0
+
+end ThermodynamicCauchyFlow
 
 end FluidDynamics
