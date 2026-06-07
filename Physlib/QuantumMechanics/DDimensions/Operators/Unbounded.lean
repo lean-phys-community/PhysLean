@@ -58,13 +58,16 @@ these correspond to physical observables.
   - A.5. Inequalities
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
-  - B.2. Dense domain
-  - B.3. Closability
-  - B.4. Adjoints
-  - B.5. Symmetric operators
-  - B.6. Self-adjoint operators
-  - B.7. Essentially self-adjoint operators
-  - B.8. Unbounded operators
+  - B.2. Basic properties
+    - B.2.1. Dense domain
+    - B.2.2. Closability
+    - B.2.3. Adjoints
+    - B.2.4. Continuity / boundedness
+  - B.3. Classes of operators
+    - B.3.1. Symmetric operators
+    - B.3.2. Self-adjoint operators
+    - B.3.3. Essentially self-adjoint operators
+    - B.3.4. Unbounded operators
 
 ## iv. References
 
@@ -380,7 +383,11 @@ lemma isEssentiallySelfAdjoint_def [CompleteSpace H] :
     T.IsEssentiallySelfAdjoint ↔ IsSelfAdjoint T.closure := Iff.rfl
 
 /-!
-### B.2. Dense domain
+### B.2. Basic properties
+-/
+
+/-!
+#### B.2.1. Dense domain
 -/
 
 lemma HasDenseDomain.isUnbounded_iff_isClosable (h : U.HasDenseDomain) :
@@ -436,7 +443,7 @@ lemma pow_hasDenseDomain_of_le
   h.mono <| pow_sub_mul_pow T hle ▸ compRestricted_domain_le _ _
 
 /-!
-### B.3. Closability
+#### B.2.2. Closability
 -/
 
 lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U := by
@@ -517,7 +524,7 @@ lemma closure_smul (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) : (c • U).
   · rw [closure_def' h, closure_def' <| (not_congr <| IsClosable.smul_iff hc).mpr h]
 
 /-!
-### B.4. Adjoints
+#### B.2.3. Adjoints
 -/
 
 @[simp]
@@ -614,7 +621,15 @@ lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDen
     exact pow_succ' T† n ▸ compRestricted_mono_right T† (ih hTn)
 
 /-!
-### B.5. Symmetric operators
+#### B.2.4. Continuity / boundedness
+-/
+
+/-!
+### B.3. Classes of operators
+-/
+
+/-!
+#### B.3.1. Symmetric operators
 -/
 
 /-- The analogue of `inner_map_polarization` for LinearPMap. -/
@@ -728,7 +743,7 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
   exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
 
 /-!
-### B.6. Self-adjoint operators
+#### B.3.2. Self-adjoint operators
 -/
 
 lemma IsSelfAdjoint.isSymmetric [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsSymmetric := by
@@ -771,7 +786,7 @@ lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint 
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
 /-!
-### B.7. Essentially self-adjoint operators
+#### B.3.3. Essentially self-adjoint operators
 -/
 
 lemma IsEssentiallySelfAdjoint.hasDenseDomain [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
@@ -818,7 +833,7 @@ lemma IsEssentiallySelfAdjoint.neg [CompleteSpace H] (h : T.IsEssentiallySelfAdj
   neg_eq_neg_one_smul T ▸ h.smul (by norm_num) (by norm_num)
 
 /-!
-### B.8. Unbounded operators
+#### B.3.4. Unbounded operators
 -/
 
 lemma IsUnbounded.hasDenseDomain (h : U.IsUnbounded) : U.HasDenseDomain := h.1
