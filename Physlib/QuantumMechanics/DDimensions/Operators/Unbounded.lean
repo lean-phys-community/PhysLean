@@ -624,6 +624,68 @@ lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDen
 #### B.2.4. Continuity / boundedness
 -/
 
+/-- `f : E →ₗ[𝕜] F` is continuous iff there exists `M > 0` s.t. `‖f x‖ ≤ M * ‖x‖` for all `x : E`.
+
+  This is a (convenient) immediate consequence of
+  `IsBoundedLinearMap.isLinearMap_and_continuous_iff_isBoundedLinearMap`. -/
+lemma _root_.LinearMap.continuous_iff_bounded {𝕜 E F : Type*} [NontriviallyNormedField 𝕜]
+    [SeminormedAddCommGroup E] [NormedSpace 𝕜 E] [SeminormedAddCommGroup F] [NormedSpace 𝕜 F]
+    {f : E →ₗ[𝕜] F} : Continuous f ↔ ∃ M, 0 < M ∧ ∀ x : E, ‖f x‖ ≤ M * ‖x‖ := by
+  refine (and_congr_right_iff (a := IsLinearMap 𝕜 f)).mp ?_ f.isLinear
+  rw [← isBoundedLinearMap_iff]
+  exact IsBoundedLinearMap.isLinearMap_and_continuous_iff_isBoundedLinearMap f
+
+lemma isClosable_of_continuous (h : Continuous U) : U.IsClosable := by
+  use U.graph.topologicalClosure.toLinearPMap
+  refine (toLinearPMap_graph_eq _ fun x hx hx₁ ↦ ?_).symm
+  obtain ⟨b, hb, hbx⟩ := mem_closure_iff_seq_limit.mp hx
+  rw [nhds_prod_eq] at hbx
+  apply norm_eq_zero.mp
+  apply tendsto_nhds_unique hbx.snd.norm
+  obtain ⟨M, hM, h_bound⟩ := LinearMap.continuous_iff_bounded.mp h
+  refine squeeze_zero (g := fun n ↦ M * ‖(b n).1‖) (fun _ ↦ norm_nonneg _) (fun n ↦ ?_) ?_
+  · obtain ⟨y, hy₁, hy₂⟩ := (mem_graph_iff _).mp (hb n)
+    simp only [← hy₁, ← hy₂]
+    exact h_bound y
+  · exact mul_zero M ▸ (norm_eq_zero.mpr hx₁) ▸ hbx.fst.norm.const_mul M
+
+/-- A strengthening of `closure_domain_le_domain_closure` for continuous operators. -/
+lemma closure_domain_of_continuous [CompleteSpace H'] (h : Continuous U) :
+    U.closure.domain = U.domain.closure := by
+  refine eq_of_le_of_ge U.closure_domain_le_domain_closure fun x hx ↦ ?_
+  obtain ⟨M, hM, h_bound⟩ := LinearMap.continuous_iff_bounded.mp h
+  obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp hx
+  simp only [coe_toAddSubmonoid, SetLike.mem_coe] at hb
+  let Ub : ℕ → H' := fun n ↦ U ⟨b n, hb n⟩
+  have hCS : CauchySeq Ub := by
+    refine Metric.cauchySeq_iff'.mpr fun ε hε ↦ ?_
+    obtain ⟨N, hN⟩ := Metric.cauchySeq_iff'.mp hb'.cauchySeq (M⁻¹ * ε) (by positivity)
+    refine ⟨N, fun n hn ↦ ?_⟩
+    refine lt_of_le_of_lt ?_ ((lt_inv_mul_iff₀ hM).mp (hN n hn))
+    calc
+      _ = ‖Ub n - Ub N‖ := dist_eq_norm _ _
+      _ = ‖U (⟨b n, hb n⟩ - ⟨b N, hb N⟩)‖ := by simp [Ub, map_sub]
+      _ ≤ M * ‖b n - b N‖ := h_bound _
+      _ = M * dist (b n) (b N) := by rw [dist_eq_norm]
+  obtain ⟨y, hy⟩ := CompleteSpace.complete hCS
+  apply mem_domain_iff.mpr
+  rw [← (isClosable_of_continuous h).graph_closure_eq_closure_graph]
+  use y
+  apply mem_closure_iff_seq_limit.mpr
+  refine ⟨fun n ↦ (b n, Ub n), fun n ↦ ?_, ?_⟩
+  · simp [hb n, Ub]
+  · rw [nhds_prod_eq]
+    exact Filter.Tendsto.prodMk hb' hy
+
+lemma isClosed_iff_of_continuous [CompleteSpace H'] (h : Continuous U) :
+    U.IsClosed ↔ _root_.IsClosed (U.domain : Set H) := by
+  rw [(isClosable_of_continuous h).isClosed_iff]
+  have h_domain := closure_domain_of_continuous h
+  constructor <;> intro hcl
+  · exact hcl ▸ h_domain ▸ isClosed_closure
+  · refine (eq_of_le_of_domain_eq U.le_closure ?_).symm
+    exact h_domain ▸ hcl.submodule_topologicalClosure_eq.symm
+
 /-!
 ### B.3. Classes of operators
 -/
