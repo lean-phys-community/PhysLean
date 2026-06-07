@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # Units on Length
@@ -138,6 +137,20 @@ equal to `1`. This is really down to a choice in the isomorphism between the set
 on the space manifold and the positive reals.
 From this choice of meters, we can define other length units by scaling meters.
 
+The references for the numerical definitions used below are:
+* the BIPM SI Brochure for the meter, the speed of light, and SI prefixes:
+  https://www.bipm.org/documents/d/guest/si-brochure-9-en-pdf
+* NIST Handbook 44, Appendix C, for the international foot-based units and
+  the international nautical mile:
+  https://doi.org/10.6028/NIST.HB.44-2023
+* IAU 2012 Resolution B2 for the astronomical unit:
+  https://www.iau.org/static/resolutions/IAU2012_English.pdf
+* the IAU Style Manual recommendations for the Julian year convention used in
+  the light-year:
+  https://iauarchive.eso.org/publications/proceedings_rules/units/
+* IAU 2015 Resolution B2 for the exact parsec convention:
+  https://www.iau.org/static/resolutions/IAU2015_English.pdf
+
 -/
 
 /-- The definition of a length unit of meters. -/
@@ -200,9 +213,6 @@ noncomputable def lightYears : LengthUnit := scale (9460730472580800) meters
 /-- The length unit of a parsec (648,000/π astronomicalUnits). -/
 noncomputable def parsecs : LengthUnit := scale (648000/Real.pi) astronomicalUnits
   (by norm_num; exact Real.pi_pos)
-
-TODO "For each unit of charge give the reference the literature where it's definition
-  is defined."
 
 /-!
 
