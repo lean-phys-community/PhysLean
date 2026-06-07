@@ -151,14 +151,8 @@ lemma zero_apply {d : ℕ} (i : Fin 1 ⊕ Fin d) :
 /-- The equivalence between the type of indices of a Lorentz vector and
   `Fin 1 ⊕ Fin d`. -/
 def indexEquiv {d : ℕ} :
-    ComponentIdx (S := (realLorentzTensor d)) ![Color.down] ≃ Fin 1 ⊕ Fin d where
-  toFun f := f 0
-  invFun i := fun _ => i
-  left_inv f := by
-    ext m
-    fin_cases m
-    simp
-  right_inv i := by rfl
+    ComponentIdx (S := (realLorentzTensor d)) ![Color.down] ≃ Fin 1 ⊕ Fin d :=
+  ComponentIdx.single (S := realLorentzTensor d) (c := Color.down)
 
 instance tensorial {d : ℕ} : Tensorial (realLorentzTensor d) ![.down] (CoVector d) where
   toTensor := LinearEquiv.symm <|

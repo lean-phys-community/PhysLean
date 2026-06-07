@@ -287,14 +287,8 @@ lemma fderiv_coord {d : ℕ} (μ : Fin 1 ⊕ Fin d) (x : Vector d) :
 /-- The equivalence between the type of indices of a Lorentz vector and
   `Fin 1 ⊕ Fin d`. -/
 def indexEquiv {d : ℕ} :
-    ComponentIdx (S := (realLorentzTensor d)) ![Color.up] ≃ Fin 1 ⊕ Fin d where
-  toFun f := f 0
-  invFun i := fun _ => i
-  left_inv f := by
-    ext m
-    fin_cases m
-    simp
-  right_inv i := by rfl
+    ComponentIdx (S := (realLorentzTensor d)) ![Color.up] ≃ Fin 1 ⊕ Fin d :=
+  ComponentIdx.single (S := realLorentzTensor d) (c := Color.up)
 
 instance tensorial {d : ℕ} : Tensorial (realLorentzTensor d) ![.up] (Vector d) where
   toTensor := LinearEquiv.symm <|
@@ -456,7 +450,8 @@ lemma smul_eq_sum {d : ℕ} (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : Vec
     congr
     funext j
     simp only [Fin.isValue, Pi.smul_apply, transpose_apply, MulOpposite.smul_eq_mul_unop,
-      MulOpposite.unop_op, Nat.succ_eq_add_one, Nat.reduceAdd, mul_eq_mul_left_iff]
+      MulOpposite.unop_op, Nat.succ_eq_add_one, Nat.reduceAdd,
+      ComponentIdx.single_symm_apply, basisIdxCongr_apply, mul_eq_mul_left_iff]
     left
     rw [toTensor_symm_pure, contrBasis_repr_apply]
     rfl
