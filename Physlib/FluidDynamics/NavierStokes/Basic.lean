@@ -130,13 +130,15 @@ theorem navier_stokes_iff_convective_navier_stokes
   constructor
   · intro hConservative
     refine ⟨hConservative.1, ?_, hConservative.2.2⟩
-    exact (CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum d flow
-      hConservative.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp
-        hConservative.2.1
+    exact
+      (CauchyFlow.cauchyMomentumEquation_iff_convectiveCauchyMomentumEquation d flow
+        hConservative.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp
+          hConservative.2.1
   · intro hConvective
     refine ⟨hConvective.1, ?_, hConvective.2.2⟩
-    exact (CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum d flow
-      hConvective.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr
-        hConvective.2.1
+    exact
+      (CauchyFlow.cauchyMomentumEquation_iff_convectiveCauchyMomentumEquation d flow
+        hConvective.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr
+          hConvective.2.1
 
 end FluidDynamics

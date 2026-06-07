@@ -24,7 +24,7 @@ the Cauchy stress tensor rather than as a field of the flow data.
   contributes the usual pressure-gradient force term.
 - `Euler` : Classical continuity, Cauchy momentum, and inviscid stress together.
 - `ConvectiveEuler` : Classical continuity, convective Cauchy momentum, and inviscid stress.
-- `euler_iff_convective_euler` : Equivalence of the conservative and convective forms when the
+- `euler_iff_convectiveEuler` : Equivalence of the conservative and convective forms when the
   fields are differentiable.
 
 ## iii. Table of contents
@@ -51,7 +51,12 @@ namespace CauchyFlow
 
 -/
 
-/-- A Cauchy flow is inviscid with pressure `p` when its stress is `-p I`. -/
+/-- A Cauchy flow is inviscid with pressure `p` when its stress is the isotropic pressure stress
+`-p I`.
+
+In this formulation, inviscid means that the Cauchy stress has no viscous or shear contribution.
+It does not rule out body forces; those are carried separately by `CauchyFlow.specificBodyForce`.
+-/
 def IsInviscid (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d) : Prop :=
   ∀ t x, flow.stress t x = (-(pressure t x)) • (1 : Matrix (Fin d) (Fin d) ℝ)
 
@@ -109,7 +114,7 @@ def ConvectiveEuler (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d) :
 
 /-- The conservative and convective Euler forms are equivalent when the fields are
 differentiable enough for the product rules. -/
-theorem euler_iff_convective_euler
+theorem euler_iff_convectiveEuler
     (d : ℕ) (flow : CauchyFlow d) (pressure : ScalarField d)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (flow.rho · x) t)
     (hVelocityTime : ∀ t x, DifferentiableAt ℝ (flow.velocity · x) t)
@@ -120,11 +125,15 @@ theorem euler_iff_convective_euler
   constructor
   · intro hConservative
     refine ⟨hConservative.1, ?_, hConservative.2.2⟩
-    exact (CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum d flow hConservative.1
-      hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp hConservative.2.1
+    exact
+      (CauchyFlow.cauchyMomentumEquation_iff_convectiveCauchyMomentumEquation d flow
+        hConservative.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp
+          hConservative.2.1
   · intro hConvective
     refine ⟨hConvective.1, ?_, hConvective.2.2⟩
-    exact (CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum d flow hConvective.1
-      hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr hConvective.2.1
+    exact
+      (CauchyFlow.cauchyMomentumEquation_iff_convectiveCauchyMomentumEquation d flow
+        hConvective.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr
+          hConvective.2.1
 
 end FluidDynamics

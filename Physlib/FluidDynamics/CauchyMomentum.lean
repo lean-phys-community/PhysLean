@@ -22,8 +22,8 @@ Navier-Stokes.
 - `CauchyFlow.CauchyMomentumEquation` : Conservation of momentum using `Space.matrixDiv`.
 - `CauchyFlow.ConvectiveCauchyMomentumEquation` : The Cauchy momentum equation in convective
   form.
-- `CauchyFlow.cauchy_momentum_iff_convective_cauchy_momentum` : Equivalence of the two Cauchy
-  momentum equations when continuity holds and the fields are differentiable.
+- `CauchyFlow.cauchyMomentumEquation_iff_convectiveCauchyMomentumEquation` : Equivalence of the
+  two Cauchy momentum equations when continuity holds and the fields are differentiable.
 
 ## iii. Table of contents
 
@@ -86,7 +86,7 @@ continuity equation holds.
 The differentiability assumptions are exactly the product-rule assumptions used to rewrite
 `partial_t (rho u)` and `matrixDiv (rho u ⊗ u)`.
 -/
-theorem cauchy_momentum_iff_convective_cauchy_momentum
+theorem cauchyMomentumEquation_iff_convectiveCauchyMomentumEquation
     (d : ℕ) (flow : CauchyFlow d)
     (hContinuity : FluidFlow.ClassicalContinuityEquation d flow.toFluidFlow)
     (hRhoTime : ∀ t x, DifferentiableAt ℝ (flow.rho · x) t)

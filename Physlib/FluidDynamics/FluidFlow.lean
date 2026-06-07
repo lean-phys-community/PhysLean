@@ -14,8 +14,12 @@ public import Physlib.SpaceAndTime.Time.Derivatives
 ## i. Overview
 
 This module defines the basic fields used to describe a fluid on `d`-dimensional space.
-The core structure `FluidFlow` contains only the density and velocity fields. Additional
-fields used by momentum balance and thermodynamic laws are provided by extension structures.
+The core structure `FluidFlow` contains only the density and velocity fields, so it is the
+minimal data needed for kinematic and mass-transport constructions such as continuity,
+incompressibility, momentum density, and material derivatives. The structure `CauchyFlow`
+adds Cauchy stress and specific body-force fields, the extra data used for momentum balances.
+The structure `ThermodynamicCauchyFlow` adds entropy and enthalpy fields for thermodynamic
+laws such as Bernoulli-type statements.
 
 ## ii. Key results
 
@@ -77,21 +81,32 @@ abbrev StressTensor (d : ℕ) := Time → Space d → Matrix (Fin d) (Fin d) ℝ
 
 -/
 
-/-- The density and velocity fields of a fluid on `d`-dimensional space. -/
+/-- The density and velocity fields of a fluid on `d`-dimensional space.
+
+This is the kinematic/mass-transport layer of the fluid API. It intentionally contains no
+stress, body force, or thermodynamic fields. Those are introduced only by the extension
+structures that need them. -/
 structure FluidFlow (d : ℕ) where
   /-- The mass density field. -/
   rho : MassDensity d
   /-- The velocity field. -/
   velocity : VelocityField d
 
-/-- A fluid flow equipped with Cauchy stress and specific body-force fields. -/
+/-- A fluid flow equipped with Cauchy stress and specific body-force fields.
+
+This is the momentum-balance layer of the fluid API. The Cauchy stress is the primitive
+dynamic field; pressure and viscosity enter through stress laws rather than as fields of
+`CauchyFlow` itself. -/
 structure CauchyFlow (d : ℕ) extends FluidFlow d where
   /-- The Cauchy stress tensor field. -/
   stress : StressTensor d
   /-- The specific body-force field, i.e. force per unit mass. -/
   specificBodyForce : VectorField d
 
-/-- A Cauchy flow equipped with thermodynamic entropy and enthalpy fields. -/
+/-- A Cauchy flow equipped with thermodynamic entropy and enthalpy fields.
+
+This extends the kinematic and momentum-balance data with thermodynamic fields used by
+isentropic and Bernoulli-type laws. -/
 structure ThermodynamicCauchyFlow (d : ℕ) extends CauchyFlow d where
   /-- The specific entropy field. -/
   entropy : ScalarField d
