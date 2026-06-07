@@ -29,10 +29,11 @@ In the `Basic` module:
 - `NewtonsSecondLaw` encodes the equation `m * q'' = 0`.
 - `accel_zero` shows that this implies `q'' = 0`.
 - `velocity_const_of_zero_acc` shows that zero acceleration means velocity is constant.
-- `energy_conservation_of_equationOfMotion` shows that kinetic energy stays constant over time.
+- `linearMomentum_conserved` shows that linear momentum stays constant over time.
+- `kineticEnergy_conserved` shows that kinetic energy stays constant over time.
 
 So overall, we formalise the usual chain:
-Newton’s law → zero acceleration → constant velocity → constant energy.
+Newton’s law → zero acceleration → constant velocity → constant momentum and energy.
 
 ## iii. Table of contents
 
@@ -42,9 +43,12 @@ Newton’s law → zero acceleration → constant velocity → constant energy.
   - B.2. Zero acceleration
 - C. What zero acceleration implies
   - C.1. Constant velocity
-- D. Energy
-  - D.1. Kinetic energy
-  - D.2. Energy conservation
+- D. Momentum
+  - D.1. Linear momentum
+  - D.2. Momentum conservation
+- E. Energy
+  - E.1. Kinetic energy
+  - E.2. Energy conservation
 
 ## iv. References
 
@@ -55,7 +59,6 @@ Newton’s law → zero acceleration → constant velocity → constant energy.
 namespace ClassicalMechanics
 
 open Time
-TODO "Prove conservation of linear momentum for the free particle."
 
 /--
 A classical free particle with positive mass.
@@ -95,6 +98,16 @@ This is defined as the time derivative of the position function.
 noncomputable
 def velocity (s : FreeParticle) (q : Trajectory) (t : Time) : ℝ :=
   deriv q t
+
+/--
+The linear momentum of the free particle along a trajectory.
+
+This is given by the classical one-dimensional expression `p = m v`,
+where `m` is the particle mass and `v` is the velocity.
+-/
+noncomputable
+def linearMomentum (s : FreeParticle) (q : Trajectory) (t : Time) : ℝ :=
+  s.mass * s.velocity q t
 
 /--
 The kinetic energy of the free particle along a trajectory.
@@ -148,6 +161,33 @@ lemma velocity_const_of_zero_acc (q : Time → ℝ) (h : ∀ t, deriv (deriv q) 
     (hcont : ContDiff ℝ 1 q) : ∃ v₀, ∀ t, deriv q t = v₀ := by
   -- this is a standard analysis result (related to `is_const_of_fderiv_eq_zero`)
   sorry
+
+/--
+If a free-particle trajectory has constant velocity, then its linear momentum is constant.
+-/
+lemma linearMomentum_conserved_of_velocity_const (s : FreeParticle) (q : Trajectory)
+    (h : ∃ v₀, ∀ t, s.velocity q t = v₀) :
+    ∃ p, ∀ t, s.linearMomentum q t = p := by
+  rcases h with ⟨v₀, hv⟩
+  refine ⟨s.mass * v₀, fun t => ?_⟩
+  unfold linearMomentum
+  rw [hv t]
+
+/--
+A free particle satisfying the equation of motion conserves linear momentum.
+
+Newton's second law implies that the acceleration vanishes, so the velocity is constant.
+Since the particle mass is fixed, the linear momentum is constant in time.
+-/
+@[sorryful]
+theorem linearMomentum_conserved (s : FreeParticle) (q : Trajectory)
+    (h : ∀ t, s.NewtonsSecondLaw q t) (hcont : ContDiff ℝ 1 q) :
+    ∃ p, ∀ t, s.linearMomentum q t = p := by
+  have h_acc : ∀ t, deriv (deriv q) t = 0 :=
+    accel_zero s q h
+  rcases velocity_const_of_zero_acc q h_acc hcont with ⟨v₀, hv⟩
+  exact linearMomentum_conserved_of_velocity_const s q ⟨v₀, hv⟩
+
 /--
 A free particle satisfying the equation of motion conserves kinetic energy.
 
