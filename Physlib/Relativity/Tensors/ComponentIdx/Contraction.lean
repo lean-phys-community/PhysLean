@@ -45,8 +45,11 @@ There are no known references for the material in this module.
 namespace TensorSpecies
 
 variable {k : Type} [CommRing k] {C G : Type} [Group G]
+  {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
   {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-  {S : TensorSpecies k C G basisIdx}
+  {rep : (c : C) → Representation k G (V c)}
+  {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+  {S : TensorSpecies k C G V basisIdx rep b}
 
 namespace Tensor
 
