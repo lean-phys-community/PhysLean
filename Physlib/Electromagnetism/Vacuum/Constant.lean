@@ -40,7 +40,6 @@ electromagnetic action.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 
@@ -191,7 +190,6 @@ lemma constantEB_vectorPotential_space_deriv {c : SpeedOfLight}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma constantEB_electricField {c : SpeedOfLight}
     {E₀ : EuclideanSpace ℝ (Fin d)} {B₀ : Fin d × Fin d → ℝ}

@@ -73,13 +73,6 @@ theorem lt_ciInf_iff (hf : BddBelow (Set.range f)) :
     a < iInf f ↔ ∃ b, a < b ∧ ∀ (i : ι), b ≤ f i :=
   ⟨(⟨iInf f, ·, (ciInf_le hf ·)⟩), fun ⟨_, hb₁, hb₂⟩ ↦ lt_of_lt_of_le hb₁ (le_ciInf hb₂)⟩
 
-theorem ciSup_sup_eq (hf : BddAbove (Set.range f)) (hg : BddAbove (Set.range g)) : ⨆ x, f x ⊔ g x = (⨆ x, f x) ⊔ ⨆ x, g x :=
-  le_antisymm (ciSup_le fun _ => sup_le_sup (le_ciSup hf _) <| le_ciSup hg _)
-    (sup_le (ciSup_mono (hf.range_max hg) fun _ => le_sup_left) <| ciSup_mono (hf.range_max hg) fun _ => le_sup_right)
-
-theorem ciInf_inf_eq (hf : BddBelow (Set.range f)) (hg : BddBelow (Set.range g)) : ⨅ x, f x ⊓ g x = (⨅ x, f x) ⊓ ⨅ x, g x :=
-  ciSup_sup_eq (α := αᵒᵈ) hf hg
-
 theorem sup_ciSup (hf : BddAbove (Set.range f)) : a ⊔ ⨆ x, f x = ⨆ x, a ⊔ f x := by
   rw [ciSup_sup_eq (by simp) hf, ciSup_const]
 
@@ -299,7 +292,6 @@ theorem UpperSemicontinuousOn.frequently_lt_of_tendsto {α β γ : Type*} [Topol
       using ⟨hzI n, hn (hzI n)⟩
   simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Finset.ciInf_insert {α β : Type*} [DecidableEq α] [ConditionallyCompleteLattice β]
   (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
     ⨅ (a : (insert x t : _)), f a = f x ⊓ ⨅ (a : t), f a := by
@@ -385,7 +377,6 @@ variable
   (hfq₁ : ∀ x, x ∈ S → QuasiconcaveOn ℝ T (f x))
   (hT₂ : Convex ℝ T) (hS₂ : Convex ℝ S)
 
-set_option backward.isDefEq.respectTransparency false in
 include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hT₂ hS₃ in
 private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y₂ ∈ T)
     (a : ℝ) (ha : a < ⨅ x : S, (max (f x y₁) (f x y₂)))
@@ -559,7 +550,6 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
   · rw [Set.inter_eq_self_of_subset_left hR] at hIJ
     exact hI₁ hIJ
 
-set_option backward.isDefEq.respectTransparency false in
 include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ in
 private lemma sion_exists_min_fin
   (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T))
@@ -680,7 +670,6 @@ private lemma sion_exists_min_fin
       have := x.2.2.le
       exact le_sup_of_le_right this
 
-set_option backward.isDefEq.respectTransparency false in
 include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ hT₃ in
 /-- **Sion's Minimax theorem**. Because of `ciSup` and `ciInf` junk values when f isn't
 bounded, we need to assume that it's bounded above and below. -/

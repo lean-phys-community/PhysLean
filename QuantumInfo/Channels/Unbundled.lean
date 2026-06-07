@@ -160,7 +160,6 @@ theorem piProd {Λi : ∀ i, MatrixMap (dI i) (dO i) R} (h₁ : ∀ i, (Λi i).I
 end piProd
 
 variable {S : Type*} [CommSemiring S] [Star S] [DecidableEq A] in
-set_option backward.isDefEq.respectTransparency false in
 /-- The channel X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ formed by Kraus operators M, N : κ → Matrix B A R
 is trace-preserving if ∑ k : κ, (N k)ᴴ * (M k) = 1 -/
 theorem of_kraus_isTracePreserving
@@ -392,7 +391,6 @@ variable {d : Type*} [Fintype d]
 
 open MatrixOrder
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely
   positive map. -/
 theorem kron_kronecker_const {C : Matrix d d R} (h : C.PosSemidef) {h₁ h₂ : _} : IsCompletelyPositive

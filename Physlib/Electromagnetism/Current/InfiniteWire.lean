@@ -8,7 +8,6 @@ module
 public import Physlib.Electromagnetism.Distributional.Dynamics.IsExtrema
 public import Physlib.SpaceAndTime.Space.Norm
 public import Physlib.SpaceAndTime.Space.ConstantSliceDist
-public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
 /-!
 
 # The magnetic field around a infinite wire
@@ -156,7 +155,7 @@ lemma infiniteWire_vectorPotential (𝓕 : FreeSpace) (I : ℝ) :
     constantSliceDist 0
     ((- I * 𝓕.μ₀ / (2 * Real.pi)) • distOfFunction (fun (x : Space 2) =>
       Real.log ‖x‖ • EuclideanSpace.single 0 (1 : ℝ))
-    (IsDistBounded.log_norm.smul_const _))) := by
+    (by apply IsDistBounded.log_norm.smul_const))) := by
   ext η i
   simp [vectorPotential, infiniteWire, constantTime_apply,
   constantSliceDist_apply, Lorentz.Vector.spatialCLM, distOfFunction_vector_eval,

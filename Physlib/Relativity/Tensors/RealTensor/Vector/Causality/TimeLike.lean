@@ -43,7 +43,6 @@ lemma timeLike_iff_norm_sq_pos {d : ℕ} (p : Vector d) :
     · rename_i h
       simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For timeLike vectors in Minkowski space, the inner product of the spatial part
     is less than the square of the time component -/
 lemma timelike_time_dominates_space {d : ℕ} {v : Vector d}
@@ -65,7 +64,6 @@ lemma timelike_time_dominates_space {d : ℕ} {v : Vector d}
     exact lt_of_sub_pos h_norm_pos
   exact h
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For nonzero timelike vectors, the time component is nonzero -/
 @[simp]
 lemma time_component_ne_zero_of_timelike {d : ℕ} {v : Vector d}
@@ -86,7 +84,6 @@ lemma timelike_time_component_ne_zero {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     timeComponent v ≠ 0 := time_component_ne_zero_of_timelike hv
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A vector is timelike if and only if its time component squared is less than
     the sum of its spatial components squared -/
 lemma timeLike_iff_time_lt_space {d : ℕ} {v : Vector d} :

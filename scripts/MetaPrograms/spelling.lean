@@ -61,6 +61,7 @@ def dictionary : MetaM (Array String) := do
 
 unsafe def main (_ : List String) : IO Unit := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   println! "Checking spelling."
   let env ← importModules (loadExts := true) #[`Physlib] {} 0
   let fileName := ""

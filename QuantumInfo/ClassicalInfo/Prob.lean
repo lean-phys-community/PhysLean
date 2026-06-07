@@ -95,7 +95,7 @@ instance : LinearOrderedCommMonoidWithZero Prob where
     intros a ha b h hb
     rw [← Subtype.coe_lt_coe]
     exact mul_lt_mul_of_pos_left hb ha
-  zero_le a := a.2.1
+  isBot_zero a := a.2.1
 
 @[simp]
 theorem zero_le_coe {p : Prob} : 0 ≤ (p : ℝ) :=
@@ -151,6 +151,7 @@ theorem toNNReal_one : (1 : Prob) = (1 : ℝ≥0) :=
 
 theorem ofNNReal_toNNReal : ENNReal.ofNNReal (toNNReal p) = ENNReal.ofReal (p : ℝ) := by
   simp [toNNReal, ENNReal.ofReal_eq_coe_nnreal]
+  norm_cast
 
 def NNReal.asProb (p : ℝ≥0) (hp : p ≤ 1) : Prob :=
   ⟨p, ⟨p.2, hp⟩⟩
@@ -172,7 +173,6 @@ instance instSub : Sub Prob where
 theorem coe_sub (p q : Prob) : (p - q : Prob)  = (p.val - q.val) ⊔ (0 : ℝ) := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp, norm_cast]
 theorem coe_one_minus (p : Prob) : (1 - p : Prob) = 1 - (p : ℝ) := by
   simp [coe_sub]
@@ -418,7 +418,7 @@ theorem negLog_Antitone : Antitone negLog := by
     have : 0 ≤ x.1 := zero_le
     linarith +splitNe
   · exact OrderTop.le_top _
-  · rw [ENNReal.coe_le_coe, ← NNReal.coe_le_coe, coe_mk, coe_mk, neg_le_neg_iff]
+  · rw [ENNReal.coe_le_coe, toReal_le, toReal, neg_le_neg_iff]
     apply (Real.log_le_log_iff _ _).mpr h
     <;> exact lt_of_le_of_ne zero_le (unitInterval.coe_ne_zero.mpr (by assumption)).symm
 
@@ -426,10 +426,9 @@ theorem negLog_Antitone : Antitone negLog := by
 theorem negLog_zero : —log (0 : Prob) = ⊤ := by
   simp [negLog]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem negLog_one : —log 1 = 0 := by
-  simp [negLog]
+  simp [negLog]; rfl
 
 @[simp]
 theorem negLog_eq_top_iff {p : Prob} : —log p = ⊤ ↔ p = 0 := by
@@ -444,7 +443,7 @@ theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by
   rw [negLog]
   split_ifs with hp
   · simp [hp]
-  · simp
+  · simp; rfl
 
 theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENNReal.ofReal x ≤ —log p := by
   by_cases hx : 0 ≤ x
@@ -460,11 +459,14 @@ theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENN
         rw [← ENNReal.toReal_lt_toReal ofReal_ne_top coe_ne_top, toReal_ofReal hx]
         simpa using lt_neg_of_lt_neg h
       · apply le_of_eq
+        conv_rhs =>
+          enter [1, 1]
+          rw [h, Real.log_exp, neg_neg]
         rw [← ENNReal.toReal_eq_toReal_iff' ofReal_ne_top coe_ne_top,
-          coe_toReal, coe_mk, h, Real.log_exp, neg_neg, toReal_ofReal hx]
+          coe_toReal, toReal, toReal_ofReal hx]
   · trans 0
     · simp only [nonpos_iff_eq_zero, ofReal_eq_zero, le_of_not_ge hx]
-    · exact _root_.zero_le _
+    · exact _root_.zero_le
 
 @[aesop (rule_sets := [finiteness]) safe apply]
 theorem negLog_ne_top {p : Prob} (hp : 0 < p.val) : —log p ≠ ∞ := by
@@ -497,7 +499,7 @@ theorem zero_lt_negLog {p : Prob} : 0 < —log p ↔ p ≠ 1 := by
   split_ifs with h
   · simp [h]
   constructor <;> intro h₂ <;> contrapose! h₂
-  · simp [h₂]
+  · simp [h₂]; rfl
   simp only [nonpos_iff_eq_zero, ENNReal.coe_eq_zero] at h₂
   rw [Subtype.ext_iff] at h₂
   simp only [NNReal.val_eq_coe, NNReal.coe_zero, neg_eq_zero, Real.log_eq_zero,
@@ -521,9 +523,10 @@ theorem Continuous_negLog : Continuous negLog := by
     rw [Subtype.dist_eq, Set.Icc.coe_zero, dist_zero_right, Real.norm_eq_abs] at ha'
     split_ifs with h; · simp
     rw [Subtype.mk_eq_mk, Set.Icc.coe_zero] at h
-    simp only [ENNReal.coe_lt_coe, ← NNReal.coe_lt_coe, NNReal.coe_mk]
+    simp only [ENNReal.coe_lt_coe, ← NNReal.coe_lt_coe]
     replace ha' := Real.log_lt_log (by positivity) ((le_abs_self _).trans_lt ha')
     simp only [Real.log_exp] at ha'
+    show x < -Real.log a
     linarith
   have h_cont_on_pos : ContinuousOn —log (Set.Ioi 0) := by
     intro p hp

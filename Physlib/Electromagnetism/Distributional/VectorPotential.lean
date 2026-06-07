@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Distributional.Basic
-public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
 public import Mathlib.Data.Real.Hom
 /-!
 
@@ -40,7 +39,6 @@ the vector potential is non-relativistic and is therefore a distribution of `Tim
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 

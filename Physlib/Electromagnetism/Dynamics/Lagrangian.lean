@@ -64,7 +64,6 @@ In this implementation we set `μ₀ = 1`. It is a TODO to introduce this consta
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 
@@ -311,7 +310,6 @@ lemma lagrangian_hasVarGradientAt_gradLagrangian {𝓕 : FreeSpace}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_sum_fieldStrengthMatrix {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J) :
     A.gradLagrangian 𝓕 J = fun x => ∑ ν,
@@ -335,7 +333,6 @@ lemma gradLagrangian_eq_sum_fieldStrengthMatrix {𝓕 : FreeSpace} (A : Electrom
 -/
 
 open Time LorentzCurrentDensity
-set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_electricField_magneticField {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
@@ -378,7 +375,6 @@ lemma gradLagrangian_eq_electricField_magneticField {𝓕 : FreeSpace}
 
 -/
 attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue in
-set_option backward.isDefEq.respectTransparency false in
 lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)

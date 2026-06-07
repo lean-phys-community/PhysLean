@@ -61,7 +61,7 @@ noncomputable def liebCorollaryTraceMap (q r : ℝ) (K : L ℋ) (A B : L ℋ) : 
 noncomputable def andoTraceMap (q r : ℝ) (K : L ℋ) (A B : L ℋ) : ℝ :=
   traceRe (ℋ := ℋ) (A ^ q * star K * B ^ (-r) * K)
 
-omit [Nontrivial ℋ] in
+omit [Nontrivial ℋ] [CompleteSpace ℋ] in
 private lemma rightMulHS_real_smul_one (r : ℝ) :
     rightMulHS (ℋ := ℋ) (r • (1 : L ℋ)) = r • (1 : L (HSOp ℋ)) := by
   ext T
@@ -297,7 +297,6 @@ private lemma cfcR_apply_of_mem_eigenspace_real
 
 -- This proof is isolated because the joint eigenspace decomposition is heartbeat-heavy.
 set_option maxHeartbeats 800000 in
-set_option backward.isDefEq.respectTransparency false in
 private lemma hmiddle_leftMul_rightMul
     {s : ℝ} {A B : L ℋ}
     (hA : A ∈ pdSet (ℋ := ℋ)) (hB : B ∈ pdSet (ℋ := ℋ)) :
@@ -550,7 +549,6 @@ private lemma hmiddle_leftMul_rightMul
 
 -- The bridge lemma expands a large `HSOp`-valued generalized perspective term.
 set_option maxHeartbeats 800000 in
-set_option backward.isDefEq.respectTransparency false in
 private lemma phiK_operatorPowerMean_eq_liebTraceMap
     {s : ℝ} (K A B : L ℋ) (hA : A ∈ pdSet (ℋ := ℋ)) (hB : B ∈ pdSet (ℋ := ℋ)) :
     phiK (ℋ := ℋ) K

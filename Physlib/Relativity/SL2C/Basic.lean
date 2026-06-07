@@ -56,7 +56,7 @@ we can define a representation a representation of `SL(2, ℂ)` on spacetime.
 /-- Given an element `M ∈ SL(2, ℂ)` the linear map from `selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)` to
   itself defined by `A ↦ M * A * Mᴴ`. -/
 @[simps!]
-def toSelfAdjointMap (M : SL(2, ℂ)) :
+noncomputable def toSelfAdjointMap (M : SL(2, ℂ)) :
     selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) →ₗ[ℝ] selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ) where
   toFun A := ⟨M.1 * A.1 * Matrix.conjTranspose M,
     by
@@ -82,7 +82,6 @@ lemma toSelfAdjointMap_apply_det (M : SL(2, ℂ)) (A : selfAdjoint (Matrix (Fin 
   simp only [toSelfAdjointMap, LinearMap.coe_mk, AddHom.coe_mk, det_mul, det_conjTranspose]
   simp only [SpecialLinearGroup.det_coe, one_mul, star_one, mul_one]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma toSelfAdjointMap_apply_pauliBasis'_inl (M : SL(2, ℂ)) :
     toSelfAdjointMap M (PauliMatrix.pauliBasis' (Sum.inl 0)) =
     ((‖M.1 0 0‖ ^ 2 + ‖M.1 0 1‖ ^ 2 + ‖M.1 1 0‖ ^ 2 + ‖M.1 1 1‖ ^ 2) / 2) •

@@ -58,7 +58,6 @@ instance instHasInv_of_invertible [i : Invertible A.mat] : NonSingular A :=
 instance instInvertible_of_hasInv [h : NonSingular A] : Invertible A.mat :=
   h.isUnit.invertible
 
-set_option backward.isDefEq.respectTransparency false in
 instance : NonSingular (1 : HermitianMat n R) :=
   instHasInv_of_invertible (i := invertibleOne)
 
@@ -158,7 +157,6 @@ theorem nonSingular_iff_reindex (e : n ≃ m) : NonSingular (A.reindex e) ↔ No
 
 section fwd
 
-set_option backward.isDefEq.respectTransparency false in
 theorem nonSingular_empty [IsEmpty n] : NonSingular A := by
   rw [Subsingleton.eq_one A]
   infer_instance

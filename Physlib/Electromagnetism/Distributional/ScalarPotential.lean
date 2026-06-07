@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Distributional.Basic
-public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
 public import Mathlib.Data.Real.Hom
 /-!
 
@@ -39,7 +38,6 @@ the scalar potential is non-relativistic and is therefore a distribution of `Tim
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 
@@ -58,7 +56,6 @@ open minkowskiMatrix
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The scalar potential of an electromagnetic potential which is a distribution. -/
 noncomputable def scalarPotential {d} (c : SpeedOfLight) :
     DistElectromagneticPotential d →ₗ[ℝ]

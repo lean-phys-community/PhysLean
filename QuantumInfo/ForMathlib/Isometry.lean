@@ -6,12 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import Mathlib.Analysis.InnerProductSpace.JointEigenspace
-public import Mathlib.Analysis.SpecialFunctions.Bernstein
-public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 public import Mathlib.LinearAlgebra.Matrix.Permutation
-public import Mathlib.LinearAlgebra.Matrix.IsDiag
-public import Mathlib.Tactic.NormNum.GCD
-
 public import QuantumInfo.ForMathlib.Matrix
 
 @[expose] public section
@@ -225,7 +220,6 @@ theorem Matrix.IsHermitian.cfc_eq_any_unitary {n 𝕜 : Type*} [RCLike 𝕜] [Fi
     hA.cfc f = U.val * diagonal (RCLike.ofReal ∘ f ∘ D) * star U.val :=
   Matrix.IsHermitian.cfc_eq_any_isometry hA U.2.2 U.2.1 hUD f
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem Matrix.cfc_conj_isometry' (hA : A.IsHermitian) (f : ℝ → ℝ) {u : Matrix d₂ d 𝕜}
   (hu₁ : u.Isometry) (hu₂ : uᴴ.Isometry) :
     cfc f (u * A * uᴴ) = u * (cfc f A) * uᴴ := by
@@ -253,7 +247,6 @@ private theorem Matrix.cfc_conj_isometry' (hA : A.IsHermitian) (f : ℝ → ℝ)
   simp only [Matrix.mul_assoc, conjTranspose_mul, star_eq_conjTranspose, U', D]
   exact isHermitian_mul_mul_conjTranspose _ hA
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_conj_isometry (f : ℝ → ℝ) {u : Matrix d₂ d 𝕜}
   (hu₁ : u.Isometry) (hu₂ : uᴴ.Isometry) :
     cfc f (u * A * uᴴ) = u * (cfc f A) * uᴴ := by
@@ -268,19 +261,16 @@ theorem Matrix.cfc_conj_isometry (f : ℝ → ℝ) {u : Matrix d₂ d 𝕜}
     simp only [Matrix.mul_assoc, hu₃]
     simp [← Matrix.mul_assoc, hu₃]
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_conj_unitary (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
     cfc f (u * A * u⁻¹) = u * (cfc f A) * u⁻¹ := by
   have hu := u.prop
   rw [mem_unitaryGroup_iff_isometry] at hu
   exact Matrix.cfc_conj_isometry f hu.left hu.right
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_conj_unitary' (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
     cfc f (uᴴ * A * u.val) = uᴴ * (cfc f A) * u.val := by
   simpa only [inv_inv] using cfc_conj_unitary f u⁻¹
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.cfc_reindex (f : ℝ → ℝ) (e : d ≃ d₂) :
     cfc f (reindex e e A) = reindex e e (cfc f A) := by
   rw [reindex_eq_conj, reindex_eq_conj]
@@ -451,7 +441,7 @@ theorem LinearMap.apply_A_sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[�
     mul_one, ← RCLike.conj_eq_iff_re, ← RCLike.star_def]
   have h₃ : (sharedEigenbasis hA hB hAB) i ≠ 0 := by
     have := (sharedEigenbasis hA hB hAB).orthonormal.1 i
-    grind [norm_zero, zero_ne_one]
+    exact fun h => by simp [h] at this
   simpa [inner_smul_left, inner_smul_right, h₂, h₃] using
     hA ((sharedEigenbasis hA hB hAB) i) ((sharedEigenbasis hA hB hAB) i)
 
@@ -467,15 +457,15 @@ theorem LinearMap.apply_B_sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[�
     mul_one, ← RCLike.conj_eq_iff_re, ← RCLike.star_def]
   have h₃ : (sharedEigenbasis hA hB hAB) i ≠ 0 := by
     have := (sharedEigenbasis hA hB hAB).orthonormal.1 i
-    grind [norm_zero, zero_ne_one]
+    exact fun h => by simp [h] at this
   simpa [inner_smul_left, inner_smul_right, h₂, h₃] using
     hB ((sharedEigenbasis hA hB hAB) i) ((sharedEigenbasis hA hB hAB) i)
 
 noncomputable def Matrix.sharedEigenbasis
   (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : Commute A B) :
     OrthonormalBasis d 𝕜 (EuclideanSpace 𝕜 d) :=
-  LinearMap.sharedEigenbasis (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB) (commute_euclideanLin hAB)
+  LinearMap.sharedEigenbasis (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB) (commute_euclideanLin hAB)
 
 noncomputable def Matrix.sharedEigenvectorUnitary (hA : A.IsHermitian) (hB : B.IsHermitian)
     (hAB : Commute A B) : Matrix.unitaryGroup d 𝕜 :=
@@ -494,21 +484,21 @@ theorem sharedEigenvectorUnitary_mulVec (j : d) : (sharedEigenvectorUnitary hA h
 
 noncomputable def sharedEigenvalueA (j : d) : ℝ :=
   LinearMap.sharedEigenvaluesA
-    (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB)
     (commute_euclideanLin hAB) j
 
 noncomputable def sharedEigenvalueB (j : d) : ℝ :=
   LinearMap.sharedEigenvaluesB
-    (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB)
     (commute_euclideanLin hAB) j
 
 /-- Analogous to `Matrix.IsHermitian.mulVec_eigenvectorBasis` for the shared basis. -/
 theorem mulVec_sharedEigenbasisA (j : d) :
     A *ᵥ (sharedEigenbasis hA hB hAB j) =
     (sharedEigenvalueA hA hB hAB) j • WithLp.ofLp (sharedEigenbasis hA hB hAB j) := by
-  rw [isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   have h := LinearMap.apply_A_sharedEigenbasis hA hB (Matrix.commute_euclideanLin hAB) j
   simp only [algebraMap_smul] at h
   have := congr_arg WithLp.ofLp h
@@ -518,7 +508,7 @@ theorem mulVec_sharedEigenbasisA (j : d) :
 theorem mulVec_sharedEigenbasisB (j : d) :
     B *ᵥ (sharedEigenbasis hA hB hAB j) =
     (sharedEigenvalueB hA hB hAB) j • WithLp.ofLp (sharedEigenbasis hA hB hAB j) := by
-  rw [isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   have h := LinearMap.apply_B_sharedEigenbasis hA hB (Matrix.commute_euclideanLin hAB) j
   simp only [algebraMap_smul] at h
   have := congr_arg WithLp.ofLp h
@@ -546,7 +536,7 @@ theorem star_shared_mul_A_mul_IsDiag : IsDiag
     congr! 3;
   · have := ( sharedEigenbasis hA hB hAB ).orthonormal;
     rw [ orthonormal_iff_ite ] at this;
-    simp only [inner] at this
+    simp only [inner, ← starRingEnd_apply] at this
     rw [ ← Finset.smul_sum, this i j, if_neg hij, smul_zero ]
 
 /-- Analogous to `Matrix.IsHermitian.star_mul_self_mul_eq_diagonal` for the shared basis. -/
@@ -613,7 +603,6 @@ instance instInvertibleUnitaryGroup (U : Matrix.unitaryGroup d 𝕜) : Invertibl
 instance (U : Matrix.unitaryGroup d 𝕜) : Invertible U.val :=
   ⟨star U.val, U.2.1, U.2.2⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If a matrix is diagonalized by a unitary matrix, then it can be written as a
 CFC of a (particular, canonical) diagonal matrix. -/
 theorem Matrix.IsDiag.exists_cfc {U : Matrix.unitaryGroup d 𝕜} {M : Matrix d d 𝕜}
@@ -645,7 +634,6 @@ theorem Matrix.IsDiag.exists_cfc {U : Matrix.unitaryGroup d 𝕜} {M : Matrix d 
     symm; convert Classical.choose_eq _
     exact Fin.val_inj)
 
-set_option backward.isDefEq.respectTransparency false in
 --TODO: Make Iff version.
 /-- If two Hermitian matrices commute, there exists a common matrix that they are both a CFC of. -/
 theorem Commute.exists_cfc (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : Commute A B) :

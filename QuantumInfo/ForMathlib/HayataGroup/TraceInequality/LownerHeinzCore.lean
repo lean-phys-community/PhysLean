@@ -1500,7 +1500,7 @@ private lemma convexOn_rpow_Ioo_one_two {p : ℝ} (hp : p ∈ Set.Ioo (1 : ℝ) 
   let q : NNReal := ⟨p - 1, sub_nonneg.mpr (le_of_lt hp.1)⟩
   have hq0 : (0 : NNReal) < q := by
     have : (0 : ℝ) < (q : ℝ) := by
-      simpa [q] using (sub_pos.mpr hp.1)
+      exact_mod_cast sub_pos.mpr hp.1
     exact (NNReal.coe_pos).1 this
   have hq1 : q < (1 : NNReal) := by
     have : (q : ℝ) < (1 : ℝ) := by
@@ -1523,7 +1523,7 @@ private lemma convexOn_rpow_Ioo_one_two {p : ℝ} (hp : p ∈ Set.Ioo (1 : ℝ) 
   -- simplify the real exponent `(1 + q : ℝ)` into `p`
   have hreal : (((1 : NNReal) + q : NNReal) : ℝ) = p := by
     have : (1 : ℝ) + (p - 1) = p := by ring
-    simp [q, this]
+    norm_cast
   simp [hEq, hreal]
 
 omit [Nontrivial (𝓐)] in

@@ -61,7 +61,6 @@ lemma potential_AEM : AEMeasurable H.potential := H.potential_AESM.aemeasurable
 ## B. Regularization
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The hydrogen atom Hamiltonian regularized by `ε ≠ 0` is defined to be
   `𝐇(ε) ≔ (2m)⁻¹𝐩² - k·𝐫(ε)⁻¹`. -/
 def hamiltonianRegCLM (ε : ℝˣ) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=

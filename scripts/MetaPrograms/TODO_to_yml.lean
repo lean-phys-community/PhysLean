@@ -321,6 +321,7 @@ unsafe def fullTODOYML : MetaM String := do
 
 unsafe def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   println! "Generating TODO list."
   let env ← importModules (loadExts := true) #[`Physlib, `QuantumInfo] {} 0
   let fileName := ""

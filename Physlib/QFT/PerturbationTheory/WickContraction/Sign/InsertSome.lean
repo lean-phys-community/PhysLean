@@ -68,7 +68,6 @@ lemma stat_ofFinset_eq_one_of_gradingCompliant (φs : List 𝓕.FieldOp)
     exact False.elim (h1 hsom')
     rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma signFinset_insertAndContract_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (i1 i2 : Fin φs.length)
     (j : φsΛ.uncontracted) :
@@ -226,7 +225,6 @@ def signInsertSomeProd (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : Wi
     else
       1
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Given a Wick contraction `φsΛ` the sign defined in the following way,
 related to inserting a field `φ` at position `i` and contracting it with `j : φsΛ.uncontracted`.
 - If `j < i`, for each field `φₐ` in `φⱼ₊₁…φᵢ₋₁` without a dual at position `< j`
@@ -249,7 +247,6 @@ def signInsertSome (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : WickCo
     (i : Fin φs.length.succ) (j : φsΛ.uncontracted) : ℂ :=
   signInsertSomeCoef φ φs φsΛ i j * signInsertSomeProd φ φs φsΛ i j
 
-set_option backward.isDefEq.respectTransparency false in
 lemma sign_insert_some (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : WickContraction φs.length)
     (i : Fin φs.length.succ) (j : φsΛ.uncontracted) :
     (φsΛ ↩Λ φ i (some j)).sign = (φsΛ.signInsertSome φ φs i j) * φsΛ.sign := by
@@ -608,7 +605,6 @@ lemma signInsertSomeCoef_eq_finset (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     stat_signFinset_insert_some_self_fst]
   simp [hφj]
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The following two signs are equal for `i.succAbove k < i`. The sign `signInsertSome φ φs φsΛ i k`
 which is constructed as follows:
@@ -737,7 +733,6 @@ lemma signInsertSome_mul_filter_contracted_of_lt (φ : 𝓕.FieldOp) (φs : List
         or_true, imp_self]
         omega
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The following two signs are equal for `i < i.succAbove k`.
 The sign `signInsertSome φ φs φsΛ i k` which is constructed

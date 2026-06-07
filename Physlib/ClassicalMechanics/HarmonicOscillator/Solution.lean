@@ -141,7 +141,6 @@ This is useful when the natural reference point for a problem is not at time zer
   /-- The velocity at time t₀. -/
   v_t₀ : EuclideanSpace ℝ (Fin 1)
 
-
 /-!
 
 ##### A.2.1.2. Conversion to standard initial conditions
@@ -589,7 +588,6 @@ due to the conservation of energy. Here we show it's value.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma trajectory_energy (IC : InitialConditions) : S.energy (IC.trajectory S) =
     fun _ => 1/2 * (S.m * ‖IC.v₀‖ ^2 + S.k * ‖IC.x₀‖ ^ 2) := by
   funext t

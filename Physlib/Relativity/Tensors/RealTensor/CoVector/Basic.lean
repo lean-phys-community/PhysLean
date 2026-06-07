@@ -25,15 +25,12 @@ TODO "Split this module on Lorentz co-vectors into two: `Basic.lean` and `Tensor
   depend on the `Tensorial` imports. A similar TODO item exists
   for Lorentz vectors."
 
-open Module IndexNotation
-open CategoryTheory
-open MonoidalCategory
+open Module
 open Matrix
 open MatrixGroups
 open Complex
 open TensorProduct
-open IndexNotation
-open CategoryTheory
+
 noncomputable section
 
 namespace Lorentz
@@ -56,11 +53,9 @@ instance {d} : Module ℝ (CoVector d) :=
 instance {d} : AddCommGroup (CoVector d) :=
   inferInstanceAs (AddCommGroup (Fin 1 ⊕ Fin d → ℝ))
 
-set_option backward.isDefEq.respectTransparency false in
 instance {d} : FiniteDimensional ℝ (CoVector d) :=
   inferInstanceAs (FiniteDimensional ℝ (Fin 1 ⊕ Fin d → ℝ))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The equivalence between `CoVector d` and `EuclideanSpace ℝ (Fin 1 ⊕ Fin d)`. -/
 def equivEuclid (d : ℕ) :
     CoVector d ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 1 ⊕ Fin d) :=
@@ -72,7 +67,6 @@ instance (d : ℕ) : Norm (CoVector d) where
 lemma norm_eq_equivEuclid (d : ℕ) (v : CoVector d) :
     ‖v‖ = ‖equivEuclid d v‖ := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (CoVector d) where
   dist_self x := by simp [norm_eq_equivEuclid]
   dist_comm x y := by
@@ -86,9 +80,8 @@ instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (CoVector d) where
     intro h
     apply (equivEuclid d).injective
     simp at h
-    grind
+    rw [← neg_add_eq_zero, h]
 
-set_option backward.isDefEq.respectTransparency false in
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (CoVector d) where
   norm_smul_le c v := by
     simp only [norm_eq_equivEuclid, map_smul]
@@ -207,16 +200,9 @@ set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_symm_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
     (toTensor (self := tensorial)).symm (Tensor.basis ![Color.down] (indexEquiv.symm μ)) =
     basis μ := by
-  rw [Tensor.basis_apply]
   funext i
-  rw [toTensor_symm_pure]
-  simp [Pure.basisVector]
-  conv_lhs =>
-    enter [1, 2]
-    change (coBasis d) (indexEquiv.symm μ 0)
-  simp [coBasis, indexEquiv, Pi.single_apply]
-  congr 1
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  simp [Tensor.basis_apply, toTensor_symm_pure, Pure.basisVector, Finsupp.single_apply,
+    indexEquiv]
 
 lemma toTensor_basis_eq_tensor_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
     toTensor (basis μ) = Tensor.basis ![Color.down] (indexEquiv.symm μ) := by

@@ -297,6 +297,7 @@ def IO.withStdoutRedirectedTo {α} (filePath : System.FilePath) (action : IO α)
 
 unsafe def main (args : List String) : IO Unit := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   let rootModule := `Physlib
   CoreM.withImportModules #[rootModule] do
     /- Build informal dependencies with all information necessary. -/

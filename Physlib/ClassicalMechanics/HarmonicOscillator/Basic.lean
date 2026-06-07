@@ -259,7 +259,6 @@ the time derivatives of the energies.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (kineticEnergy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t⟫_ℝ := by
   funext t
@@ -271,14 +270,13 @@ lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : Con
   simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
     ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
   rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right]
   congr 1
   simp only [smul_add]
   module
   repeat fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (fun t => potentialEnergy S (xₜ t)) = fun t => ⟪∂ₜ xₜ t, S.k • xₜ t⟫_ℝ := by
   funext t
@@ -290,7 +288,7 @@ lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : C
   simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
     ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
   trans S.k * ⟪xₜ t, ∂ₜ xₜ t⟫_ℝ
   · rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right,
       ← inner_smul_right, ← inner_smul_right]
@@ -302,7 +300,6 @@ lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : C
   rw [contDiff_infty_iff_fderiv] at hx
   exact hx.1
 
-set_option backward.isDefEq.respectTransparency false in
 lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (energy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t⟫_ℝ := by
   unfold energy
@@ -399,7 +396,6 @@ lemma toDual_symm_innerSL (x : EuclideanSpace ℝ (Fin 1)) :
   ext y
   simp [InnerProductSpace.toDual_symm_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_inner_self (x : EuclideanSpace ℝ (Fin 1)) :
     gradient (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) x = (2 : ℝ) • x := by
   refine ext_inner_right (𝕜 := ℝ) fun y => ?_
@@ -409,7 +405,7 @@ lemma gradient_inner_self (x : EuclideanSpace ℝ (Fin 1)) :
   rw [show (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) =
       fun y => ⟪(fun y => y) y, (fun y => y) y⟫_ℝ from rfl]
   rw [fderiv_inner_apply (𝕜 := ℝ) hid hid]
-  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq, real_inner_comm, inner_smul_left',
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, real_inner_comm, inner_smul_left',
     ringHom_apply]
   ring
 
@@ -743,7 +739,6 @@ We prove a simple equality for the Hamiltonian, to help in computations.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma hamiltonian_eq :
     hamiltonian S = fun _ p x => (1 / (2 : ℝ)) * (1 / S.m) * ⟪p, p⟫_ℝ +
       (1 / (2 : ℝ)) * S.k * ⟪x, x⟫_ℝ := by
@@ -787,7 +782,6 @@ We now write down the gradients of the Hamiltonian with respect to the momentum 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_hamiltonian_position_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1))
     (p : EuclideanSpace ℝ (Fin 1)) :
     gradient (hamiltonian S t p) x = S.k • x := by
@@ -805,7 +799,6 @@ lemma gradient_hamiltonian_position_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1
   rw [h_eq, gradient_add_const', gradient_const_mul_inner_self]
   ext; simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_hamiltonian_momentum_eq (t : Time) (x : EuclideanSpace ℝ (Fin 1))
     (p : EuclideanSpace ℝ (Fin 1)) :
     gradient (hamiltonian S t · x) p = (1 / S.m) • p := by
@@ -832,7 +825,6 @@ This is independent of whether the trajectory satisfies the equations of motion 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma hamiltonian_eq_energy (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
     (fun t => hamiltonian S t (toCanonicalMomentum S t (xₜ t) (∂ₜ xₜ t)) (xₜ t)) = energy S xₜ := by
   funext t

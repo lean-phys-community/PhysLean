@@ -66,7 +66,7 @@ def mix (e : MEnsemble d α) : MState d := ProbDistribution.expect_val e
 
 @[simp]
 theorem mix_of (e : MEnsemble d α) : (mix e).m = ∑ i, (e.distr i : ℝ) • (e.states i).m := by
-  apply AddSubgroup.val_finset_sum -- *laughs in defeq*
+  apply AddSubgroup.val_finsetSum -- *laughs in defeq*
 
 /-- Two mixed-state ensembles indexed by `\alpha` and `\beta` are equivalent if `α ≃ β`. -/
 def congrMEnsemble (σ : α ≃ β) : MEnsemble d α ≃ MEnsemble d β := ProbDistribution.congrRandVar σ
@@ -126,7 +126,6 @@ A pure-state ensemble mixes into a pure state if and only if
 the only states in the ensemble with nonzero probability are equal
 to the same Ket `ψ` up to a global phase.
 -/
-set_option backward.isDefEq.respectTransparency false in
 theorem mix_pEnsemble_pure_iff_pure {e : PEnsemble d α} :
     mix (toMEnsemble e) = MState.pure ψ ↔
     ∀ i : α, e.distr i ≠ 0 → MState.pure (e.states i) = MState.pure ψ := by

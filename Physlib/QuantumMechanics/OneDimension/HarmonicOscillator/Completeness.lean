@@ -57,7 +57,6 @@ lemma mul_eigenfunction_integrable (f : ℝ → ℂ) (hf : MemHS f) :
     funext x
     simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma mul_physHermite_integrable (f : ℝ → ℂ) (hf : MemHS f) (n : ℕ) :
     MeasureTheory.Integrable (fun x => physHermite n (x/Q.ξ) *
       (f x * ↑(Real.exp (- x ^ 2 / (2 * Q.ξ^2))))) := by
@@ -100,7 +99,7 @@ lemma mul_polynomial_integrable (f : ℝ → ℂ) (hf : MemHS f) (P : Polynomial
     rw [Finsupp.sum]
     simp
   rw [h2]
-  apply MeasureTheory.integrable_finset_sum
+  apply MeasureTheory.integrable_finsetSum
   intro i hi
   simp only [mul_assoc]
   have hf' : (fun x => ↑(a i) * (physHermite i (x/Q.ξ) *
@@ -155,7 +154,6 @@ local notation "hm" => Q.hm
 local notation "hℏ" => Q.hℏ
 local notation "hω" => Q.hω
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orthogonal_physHermite_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (n : ℕ) : ∫ (x : ℝ), (physHermite n (x / Q.ξ)) * (f x * ↑(Real.exp (- x ^ 2 / (2 * Q.ξ ^ 2))))
@@ -186,7 +184,6 @@ lemma orthogonal_physHermite_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_ofNat]
   ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (P : Polynomial ℤ) :
@@ -199,7 +196,7 @@ lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     funext x
     rw [← ha]
     simp [← Finset.sum_mul, Finsupp.sum]
-  rw [h2, MeasureTheory.integral_finset_sum]
+  rw [h2, MeasureTheory.integral_finsetSum]
   · apply Finset.sum_eq_zero
     intro x hx
     simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
@@ -222,7 +219,6 @@ lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       ring
     exact hf' ▸ (MeasureTheory.Integrable.smul _ (Q.mul_physHermite_integrable f hf i))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then it is orthogonal to
 
@@ -260,7 +256,6 @@ lemma orthogonal_power_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
 
 open Finset
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then it is orthogonal to
 
@@ -394,7 +389,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       (Complex.I * ↑c * ↑y) ^ r / r ! *
       (f y * Real.exp (- y^2 / (2 * Q.ξ^2)))) = fun (n : ℕ) => 0 := by
     funext n
-    rw [MeasureTheory.integral_finset_sum]
+    rw [MeasureTheory.integral_finsetSum]
     · apply Finset.sum_eq_zero
       intro r hr
       have hf' : (fun a => (Complex.I * ↑c * ↑a) ^ r / ↑r ! *
@@ -428,7 +423,6 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
 open FourierTransform MeasureTheory Real Lp MemLp Filter Complex Topology
   ComplexInnerProductSpace ComplexConjugate
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then the fourier transform of
 

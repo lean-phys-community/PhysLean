@@ -45,7 +45,6 @@ lemma wicks_theorem_congr {φs φs' : List 𝓕.FieldOp} (h : φs = φs') :
   subst h
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 For a list `φs` of `𝓕.FieldOp`, Wick's theorem states that
 

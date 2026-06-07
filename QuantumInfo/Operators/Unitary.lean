@@ -54,7 +54,6 @@ theorem U_conj_spectrum_eq (ρ : MState d) (U : 𝐔[d]) :
 theorem inner_U_conj (ρ σ : MState d) (U : 𝐔[d]) : ⟪U ◃ ρ, U ◃ σ⟫_Prob = ⟪ρ, σ⟫_Prob := by
   simp [U_conj, inner_def]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The **No-cloning theorem**, saying that if states `ψ` and `φ` can both be perfectly cloned using a
 unitary `U` and a fiducial state `f`, and they aren't identical (their inner product is less than 1),
 then the two states must be orthogonal to begin with. In short: only orthogonal states can be simultaneously

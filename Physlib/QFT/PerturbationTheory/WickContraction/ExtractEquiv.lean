@@ -6,8 +6,8 @@ Authors: Joseph Tooby-Smith
 module
 
 meta import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
-import all Init.Data.Fin.Fold
 public import Physlib.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
+import all Init.Data.Fin.Fold
 /-!
 
 # Equivalence extracting element from contraction

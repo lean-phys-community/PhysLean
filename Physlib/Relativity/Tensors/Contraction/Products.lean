@@ -15,16 +15,14 @@ public import Physlib.Relativity.Tensors.Product
 
 @[expose] public section
 
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
-
 namespace TensorSpecies
-open OverColor
 
-variable {k : Type} [CommRing k] {C G : Type} [Group G]
-  {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-  {S : TensorSpecies k C G basisIdx}
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    {S : TensorSpecies k C G V basisIdx rep b}
+attribute [-simp] LinearEquiv.cast_apply
 
 namespace Tensor
 
@@ -34,45 +32,37 @@ namespace Tensor
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma Pure.contrPCoeff_natAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
     (p : Pure S c) (p1 : Pure S c1) :
     contrPCoeff (Fin.natAdd n1 i) (Fin.natAdd n1 j)
-    (by simp_all [Fin.ext_iff]) (p1.prodP p)
-    = contrPCoeff i j hij p := by
-  simp only [contrPCoeff, Monoidal.tensorUnit_obj, Functor.comp_obj, Discrete.functor_obj_eq_as,
-    Function.comp_apply, prodP_apply_natAdd]
-  conv_lhs => erw [S.contr_congr _ ((c i)) (by simp)]
-  apply congrArg
-  congr 1
-  · change (ConcreteCategory.hom (S.FD.map (Discrete.eqToHom _)))
-      ((ConcreteCategory.hom (S.FD.map (eqToHom _))) (p i)) = _
-    simp [map_map_apply]
-  · change (ConcreteCategory.hom (S.FD.map (Discrete.eqToHom _)))
-      ((ConcreteCategory.hom (S.FD.map (eqToHom _))) _) = _
-    simp [map_map_apply]
+    (by simp_all [Fin.ext_iff]) (p1.prodP p) = contrPCoeff i j hij p := by
+  simp only [contrPCoeff, prodP_apply_natAdd]
+  generalize_proofs ha hb hc hd he
+  generalize p i = pi at *
+  generalize p j = pj at *
+  generalize c i = ci at *
+  generalize c j = cj at *
+  subst he
+  subst hb
+  simp [LinearEquiv.cast_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma Pure.contrPCoeff_castAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
     (p : Pure S c) (p1 : Pure S c1) :
     contrPCoeff (Fin.castAdd n1 i) (Fin.castAdd n1 j)
-    (by simp_all [Fin.ext_iff]) (p.prodP p1)
-    = contrPCoeff i j hij p := by
-  simp only [contrPCoeff, Monoidal.tensorUnit_obj, Functor.comp_obj, Discrete.functor_obj_eq_as,
-    Function.comp_apply, prodP_apply_castAdd]
-  conv_lhs => erw [S.contr_congr _ ((c i)) (by simp)]
-  apply congrArg
-  congr 1
-  · change (ConcreteCategory.hom (S.FD.map (Discrete.eqToHom _)))
-      ((ConcreteCategory.hom (S.FD.map (eqToHom _))) (p i)) = _
-    simp [map_map_apply]
-  · change (ConcreteCategory.hom (S.FD.map (Discrete.eqToHom _)))
-      ((ConcreteCategory.hom (S.FD.map (eqToHom _))) _) = _
-    simp [map_map_apply]
+    (by simp_all [Fin.ext_iff]) (p.prodP p1) = contrPCoeff i j hij p := by
+  simp only [contrPCoeff, prodP_apply_castAdd]
+  generalize_proofs ha hb hc hd he
+  generalize p i = pi at *
+  generalize p j = pj at *
+  generalize c i = ci at *
+  generalize c j = cj at *
+  subst he
+  subst hb
+  simp [LinearEquiv.cast_apply]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_dropPair {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
@@ -92,12 +82,12 @@ lemma Pure.prodP_dropPair {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     simp only [finSumFinEquiv_apply_left]
     rw [← congr_right (p1.prodP p) _ (Fin.castAdd (n + 1 + 1) x)
       (by rw [Fin.succSuccAbove_natAdd_apply_castAdd i j])]
-    simp [map_map_apply]
+    simp [LinearEquiv.cast_apply]
   | Sum.inr m =>
     simp only [finSumFinEquiv_apply_right]
     rw [← congr_right (p1.prodP p) _ (Fin.natAdd n1 (i.succSuccAbove j m))
       (by rw [Fin.succSuccAbove_comm_natAdd i j])]
-    simp [map_map_apply]
+    simp [LinearEquiv.cast_apply]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_contrP_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
@@ -106,17 +96,16 @@ lemma Pure.prodP_contrP_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     (p : Pure S c) (p1 : Pure S c1) :
     prodT p1.toTensor (contrP i j hij p) =
     ((permT id (PermCond.append_right_succSuccAbove i j)) <|
-    contrP
-      (finSumFinEquiv (m := n1) (Sum.inr i))
-      (finSumFinEquiv (m := n1) (Sum.inr j))
-      (by simpa using hij) <|
+    contrP (Fin.natAdd n1 i) (Fin.natAdd n1 j) (by simpa using hij) <|
     prodP p1 p) := by
   simp only [contrP, map_smul, Nat.add_eq, finSumFinEquiv_apply_right]
   rw [contrPCoeff_natAdd i j hij]
-  congr 1
-  rw [prodT_pure, permT_pure]
-  congr
+  rw [prodT_pure]
   rw [prodP_dropPair _ _ hij]
+  generalize_proofs ha hb hc hd
+  erw [map_smul]
+  congr
+  erw [permT_pure]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma prodT_contrT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
@@ -126,6 +115,7 @@ lemma prodT_contrT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     prodT t1 (contrT n i j hij t) =
     ((permT id (PermCond.append_right_succSuccAbove i j)) <|
     contrT _
+
       (finSumFinEquiv (m := n1) (Sum.inr i))
       (finSumFinEquiv (m := n1) (Sum.inr j))
       (by simpa using hij) <|

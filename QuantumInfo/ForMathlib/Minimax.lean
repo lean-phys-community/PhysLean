@@ -5,14 +5,9 @@ Authors: Alex Meiburg
 -/
 module
 
-public import QuantumInfo.ForMathlib.SionMinimax
-
---minimize these imports?
-public import Mathlib.Analysis.InnerProductSpace.Basic
-public import Mathlib.GroupTheory.MonoidLocalization.Basic
-public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-public import Mathlib.Topology.Algebra.Module.StrongTopology
 public import Mathlib.Topology.Algebra.Module.FiniteDimension
+public import Mathlib.Topology.Algebra.Module.Spaces.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.SionMinimax
 
 @[expose] public section
 
@@ -115,7 +110,7 @@ theorem continuous_stupid.{u_2, u_1} {M : Type u_1} [inst : NormedAddCommGroup M
   have h_eval : Continuous (fun p : (M →L[ℝ] ℝ) × M ↦ p.1 p.2) := by
     have h_sum : Continuous (fun p : (M →L[ℝ] ℝ) × M ↦
         ∑ i, p.1 (Module.finBasis ℝ M i) * ((Module.finBasis ℝ M).repr p.2) i) := by
-      refine continuous_finset_sum _ fun i _ ↦ .mul (by fun_prop) ?_;
+      refine continuous_finsetSum _ fun i _ ↦ .mul (by fun_prop) ?_;
       · exact ((Module.finBasis ℝ M).coord i).continuous_of_finiteDimensional.comp continuous_snd;
     convert h_sum with x
     rw [ ← (Module.finBasis ℝ M).sum_repr x.2, map_sum]

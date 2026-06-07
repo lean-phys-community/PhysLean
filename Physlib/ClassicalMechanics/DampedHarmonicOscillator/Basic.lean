@@ -23,11 +23,11 @@ m ẍ + γ ẋ + k x = 0
 
 Depending on the relationship between the damping coefficient and the natural frequency,
 the system exhibits three different behaviors:
-- **Underdamped** (`γ^2 < 4 * m * k`): oscillatory motion with exponentially decaying
+- **Underdamped** (`γ^2 < 4 * m * k`) : oscillatory motion with exponentially decaying
   amplitude.
-- **Critically damped** (`γ^2 = 4 * m * k`): fastest return to equilibrium without
+- **Critically damped** (`γ^2 = 4 * m * k`) : fastest return to equilibrium without
   oscillation.
-- **Overdamped** (`4 * m * k < γ^2`): slow return to equilibrium without oscillation.
+- **Overdamped** (`4 * m * k < γ^2`) : slow return to equilibrium without oscillation.
 
 In this file, the position and velocity both have type `EuclideanSpace ℝ (Fin 1)`. This
 coordinate model is useful for a first formalization, but it works only because the
@@ -84,8 +84,8 @@ open ContDiff
 open Time
 
 TODO "Create a new file for the geometric model which properly models the
- position as a configuration space and velocity as its tangent space, see the
- HarmonicOscillator file."
+  position as a configuration space and velocity as its tangent space, see the
+  HarmonicOscillator file."
 
 TODO "Define and prove properties of the quality factor Q."
 
@@ -193,14 +193,13 @@ noncomputable def force (S : DampedHarmonicOscillator)
 
 /-!
 
-
 ### C.2. Equation of motion if and only if Newton's second law
 
 We show that the equation of motion is equivalent to Newton's second law.
 
 -/
 
-lemma equationOfMotion_iff_newtons_2nd_law (xₜ : Time → EuclideanSpace ℝ (Fin 1)):
+lemma equationOfMotion_iff_newtons_2nd_law (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
     S.EquationOfMotion xₜ ↔
     (∀ t : Time, S.m • ∂ₜ (∂ₜ xₜ) t = force S xₜ t) := by
   simp only [EquationOfMotion, force]
@@ -457,7 +456,6 @@ lemma toUndamped_equationOfMotion (S : DampedHarmonicOscillator) (hS : S.IsUndam
       _ = HarmonicOscillator.force (S.toUndamped hS) (xₜ t) := h t
       _ = force S xₜ t := by
         simp [force, HarmonicOscillator.force_eq_linear, toUndamped, hγ]
-
 
 end DampedHarmonicOscillator
 

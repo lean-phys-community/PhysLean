@@ -180,20 +180,22 @@ theorem convex_roof_of_pure (ψ : Ket d) : convex_roof g (pure ψ) = g (KetUpToP
     use 1; simp only [gt_iff_lt, zero_lt_one, true_and]; use trivial_pEnsemble ψ 0
     constructor
     · exact trivial_pEnsemble_mix ψ 0
-    · simp only [pure_average_NNReal, Fin.isValue, ← NNReal.coe_le_coe, coe_mk]
-      rw [trivial_pEnsemble_average ψ _ 0]
+    · simp only [pure_average_NNReal, Fin.isValue, ← NNReal.coe_le_coe]
+      conv_lhs =>
+        enter [1, 1]
+        rw [trivial_pEnsemble_average ψ _ 0]
       rfl
   · apply le_convex_roof
     intro n hnpos e hmix
     apply le_of_eq
-    simp only [pure_average_NNReal, ← NNReal.coe_inj, coe_mk]
+    simp only [pure_average_NNReal, ← NNReal.coe_inj]
     have hphase_inv : ∀ a b, Ket.PhaseEquiv.r a b →
         (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) a = (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) b := by
       intro a b hab
       simp only [Function.comp_apply]
       congr 1
       exact congrArg g (Quotient.sound hab)
-    rw [mix_pEnsemble_pure_average (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) hphase_inv hmix]
+    simp [mix_pEnsemble_pure_average (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) hphase_inv hmix]
     rfl
 
 omit [Nonempty d] in
@@ -205,15 +207,20 @@ theorem mixed_convex_roof_of_pure (ψ : Ket d) : mixed_convex_roof f (pure ψ) =
     use 1; simp only [gt_iff_lt, zero_lt_one, true_and]; use trivial_mEnsemble (pure ψ) 0
     constructor
     · exact trivial_mEnsemble_mix (pure ψ) 0
-    · simp only [average_NNReal, Fin.isValue, ← NNReal.coe_le_coe, coe_mk]
-      rw [trivial_mEnsemble_average _ (pure ψ) 0]
+    · simp only [average_NNReal, Fin.isValue, ← NNReal.coe_le_coe]
+      conv_lhs =>
+        enter [1, 1]
+        rw [trivial_mEnsemble_average _ (pure ψ) 0]
       rfl
   · apply le_mixed_convex_roof
     intro n hnpos e hmix
     replace hpure := mix_mEnsemble_pure_iff_pure.mp hmix
     apply le_of_eq
-    simp only [average_NNReal, ← NNReal.coe_inj, coe_mk]
-    rw [mix_mEnsemble_pure_average (toReal ∘ f) hmix, Function.comp_apply]
+    simp only [average_NNReal, ← NNReal.coe_inj]
+    conv_rhs =>
+      enter [1, 1]
+      rw [mix_mEnsemble_pure_average (toReal ∘ f) hmix, Function.comp_apply]
+    rfl
 
 /-- Entanglement of Formation of bipartite systems. It is the convex roof extension of the
 von Neumann entropy of one of the subsystems (here chosen to be the left one, but see `Entropy.Sᵥₙ_of_partial_eq`).
@@ -295,6 +302,5 @@ theorem EoF_of_MES : EoF (pure <| Ket.MES d) = Real.log (Finset.card Finset.univ
   -- The von Neumann entropy of the maximally mixed state is log(d).
   have h_von_neumann : Sᵥₙ (MState.uniform : MState d) = Real.log (Fintype.card d) := by
     rw [MState.uniform, Sᵥₙ_ofClassical ProbDistribution.uniform, Hₛ_uniform, Finset.card_univ]
-  simp only [NNReal.coe_mk]
-  rw [traceRight_pure_MES]
+  simp [traceRight_pure_MES]
   exact h_von_neumann

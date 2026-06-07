@@ -242,7 +242,6 @@ lemma directSum_eq_bosonic_plus_fermionic
     conv_lhs => rw [hx, hy]
     abel
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For a field specification `𝓕`, the algebra `𝓕.FieldOpFreeAlgebra` is graded by `FieldStatistic`.
   Those `ofCrAnListF φs` for which `φs` has an overall `bosonic` statistic
   (i.e. `𝓕 |>ₛ φs = bosonic`) span `bosonic`

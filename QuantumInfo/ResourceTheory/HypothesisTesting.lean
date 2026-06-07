@@ -59,7 +59,6 @@ scoped[OptimalHypothesisRate] notation "β_" ε " (" ρ "‖" S ")" =>  OptimalH
 
 namespace OptimalHypothesisRate
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The space of strategies `T` in `OptimalHypothesisRate` is inhabited, we always have some valid strategy. -/
 instance iInf_Inhabited (ρ : MState d) (ε : Prob) :
     Inhabited { m // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } :=
@@ -79,7 +78,6 @@ theorem iInf_IsCompact (ρ : MState d) (ε : Prob) : IsCompact { m | ρ.exp_val 
     fun_prop
   exact hC₁.inter_left hC₂
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The space of strategies `T` in `OptimalHypothesisRate` is convex. -/
 theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
   --We *could* get this from a more general fact that any linear subspace is convex,
@@ -251,28 +249,29 @@ theorem pos_of_lt_one {ρ : MState d} (S : Set (MState d))
   --`ρ.exp_val (1 - T) = ρ.exp_val 1 - ρ.exp_val T = ρ.trace - 0 = 1`, a contradiction.
   by_contra h
   obtain ⟨⟨T, hT₁, hT₂, hT₃⟩, hT₄, hT₅⟩ := exists_min ρ ε S
-  rw [← bot_eq_zero'', not_bot_lt_iff] at h
-  rw [h, iSup_eq_bot, bot_eq_zero''] at hT₄
-  specialize hT₄ σ
-  simp only [iSup_pos hσ₁, Subtype.ext_iff, Set.Icc.coe_zero, MState.exp_val] at hT₄
-  rw [HermitianMat.inner_zero_iff σ.nonneg hT₂] at hT₄
+  push Not at h
+  simp at h
+  rw [h] at hT₄
+  have h_sup_zero := hT₄ ▸ le_iSup₂ σ hσ₁
+  have h_eq := le_antisymm h_sup_zero (by simp)
+  rw [Subtype.ext_iff, Set.Icc.coe_zero] at h_eq
+  simp only [MState.exp_val] at h_eq
+  rw [HermitianMat.inner_zero_iff σ.nonneg hT₂] at h_eq
   replace hT₁ : ρ.exp_val (1 - T) ≠ 1 := (lt_of_le_of_lt hT₁ hε).ne
   absurd hT₁
   rw [ρ.exp_val_eq_one_iff ?_, sub_sub_cancel]
-  · grw [← hT₄]
-    rwa [HermitianMat.ker, HermitianMat.ker, ContinuousLinearMap.ker_le_ker_iff_range_le_range] at hσ₂
-    · simp
-    · simp
+  · grw [← h_eq]
+    rwa [HermitianMat.ker, HermitianMat.ker,
+      ContinuousLinearMap.ker_le_ker_iff_range_le_range] at hσ₂ <;> simp
   · exact sub_le_self 1 hT₂
 
 set_option backward.isDefEq.respectTransparency false in
 --Lemma 3 from Hayashi
 theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompact S)
     (hS₂ : Convex ℝ (MState.M '' S)) : ⨆ σ ∈ S, β_ ε(ρ‖{σ}) = β_ ε(ρ‖S) := by
-
   --Work out the case where S is empty, so we can now assume it's nonempty
   rcases S.eq_empty_or_nonempty with rfl|hnS
-  · simpa using bot_eq_zero''
+  · simpa using _root_.bot_eq_zero
   --Upgrade this fact to an instance
   have _ : Nonempty S := hnS.to_subtype
 
@@ -321,7 +320,15 @@ theorem ker_diagonal_prob_eq_bot {q : Prob} (hq₁ : 0 < q) (hq₂ : q < 1) :
     · simpa [← Complex.ofReal_one, Complex.real_lt_real]
   simp [LinearMap.ker_eq_bot', HermitianMat.ker] at hA ⊢
   intro m hm
-  simpa only [WithLp.ofLp_eq_zero] using hA m congr($hm)
+  have h := hA m
+  simp at h
+  apply h
+  · have := congrArg (·.ofLp 0) hm
+    simp [ProbDistribution.coin, HermitianMat.diagonal, HermitianMat.lin] at this
+    exact this
+  · have := congrArg (·.ofLp 1) hm
+    simp [ProbDistribution.coin, HermitianMat.diagonal, HermitianMat.lin] at this
+    exact this
 
 variable {d₂ : Type*} [Fintype d₂] [DecidableEq d₂] in
 /-- Lemma S1 -/
@@ -465,13 +472,13 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
   --Turn the ENNReal problem into a Real problem
   have hα₂ : Subtype.mk _ pf2 ≠ 0 := by
     change ¬(_ = Subtype.mk 0 _)
-    simp only [mk_zero, Nonneg.mk_eq_zero]
+    simp
     linarith
   rw [← ENNReal.coe_mul, ← ENNReal.coe_div hα₂, ← ENNReal.coe_add, ENNReal.coe_le_coe]
   clear hα₂
-  simp only [← coe_le_coe, coe_mk, NNReal.coe_add, NNReal.coe_div, NNReal.coe_mul, neg_mul]
+  simp only [← coe_le_coe, NNReal.coe_add, NNReal.coe_div, NNReal.coe_mul]
+  simp [toReal]
   clear pf1 pf2
-
   rw [← add_div, ← sub_eq_add_neg]
   conv =>
     enter [2,1,1,1]
@@ -514,8 +521,7 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
     rw [mul_comm, ← mul_div, mul_comm, show (1 - α) = -(α - 1) by abel]
     simp [-neg_sub, neg_div, div_self (a := α - 1) (by linarith)]
   · rw [div_le_div_iff_of_pos_right (by linarith), tsub_le_iff_right]
-    nth_rewrite 4 [Prob.coe_sub]
-    simp only [Set.Icc.coe_one, sub_nonneg, Prob.coe_le_one, sup_of_le_left, sub_add_cancel]
+    simp only [sub_add_cancel]
     apply Real.log_le_log
     · refine mul_pos (Real.rpow_pos_of_pos hp _) (Real.rpow_pos_of_pos hq _)
     rw [le_add_iff_nonneg_right]

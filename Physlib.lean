@@ -164,6 +164,7 @@ public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.OrthogY3B3.ToSols
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Permutations
 public import Physlib.Particles.SuperSymmetry.MSSMNu.AnomalyCancellation.Y3
+public import Physlib.Particles.SuperSymmetry.N1.Basic
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.AllowsTerm
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Basic
 public import Physlib.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
@@ -261,6 +262,7 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Covariance
 public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
+public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basic
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
@@ -317,9 +319,6 @@ public import Physlib.Relativity.Special.ProperTime
 public import Physlib.Relativity.Special.TwinParadox.Basic
 public import Physlib.Relativity.SpeedOfLight
 public import Physlib.Relativity.Tensors.Basic
-public import Physlib.Relativity.Tensors.Color.Basic
-public import Physlib.Relativity.Tensors.Color.Discrete
-public import Physlib.Relativity.Tensors.Color.Lift
 public import Physlib.Relativity.Tensors.ComplexTensor.Basic
 public import Physlib.Relativity.Tensors.ComplexTensor.Lemmas
 public import Physlib.Relativity.Tensors.ComplexTensor.Matrix.Pre

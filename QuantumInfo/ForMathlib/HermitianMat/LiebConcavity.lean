@@ -5,10 +5,8 @@ Authors: Alex Meiburg
 -/
 module
 
-public import QuantumInfo.ForMathlib.HermitianMat.Rpow
-public import QuantumInfo.ForMathlib.HermitianMat.Schatten
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LiebAndoTrace
-public import Mathlib
+public import QuantumInfo.ForMathlib.HermitianMat.Schatten
 
 @[expose] public section
 
@@ -55,7 +53,13 @@ lemma Φ_nonneg (A : HermitianMat d ℂ) (hA : 0 ≤ A) :
   · convert Φ_isSelfAdjoint A using 1
     simp [IsSelfAdjoint, LinearMap.IsSymmetric]
     simp [ContinuousLinearMap.ext_iff, ContinuousLinearMap.star_eq_adjoint]
-    grind only [IsSelfAdjoint.adjoint_eq, Φ_isSelfAdjoint, ContinuousLinearMap.adjoint_inner_left]
+    constructor
+    · intro h x
+      apply ext_inner_left ℂ
+      intro y
+      rw [ContinuousLinearMap.adjoint_inner_right, h]
+    · intro h x y
+      rw [← ContinuousLinearMap.adjoint_inner_left, h]
   · intro x
     have h_inner : ∀ x : EuclideanSpace ℂ d, 0 ≤ Complex.re (inner ℂ x (Φ A.mat x)) := by
       intro x
@@ -88,25 +92,23 @@ lemma Φ_mem_pdSet [Nonempty d] (A : HermitianMat d ℂ) (hA : A.mat.PosDef) :
       simp [Φ]
       simp [Algebra.algebraMap_eq_smul_one, Matrix.mulVec, dotProduct]
       simp [Matrix.one_apply, Finset.sum_ite_eq]
-      rfl
   refine' ⟨ Φ_isSelfAdjoint A, h_spectrum.symm ▸ _ ⟩
   exact HermitianMat.Matrix.PosDef.spectrum_subset_Ioi hA
 
-set_option backward.isDefEq.respectTransparency false in
+set_option synthInstance.maxHeartbeats 80000 in
 /-- `Φ` commutes with CFC for Hermitian matrices. -/
 lemma Φ_cfc (A : HermitianMat d ℂ) (f : ℝ → ℝ) :
     Φ (cfc f A.mat) = cfc f (Φ A.mat) := by
   exact StarAlgHomClass.map_cfc Φ f A.mat (hφ := Φ_continuous)
     (ha := A.H.isSelfAdjoint)
 
-set_option backward.isDefEq.respectTransparency false in
+set_option synthInstance.maxHeartbeats 80000 in
 /-- `Φ` commutes with rpow for PSD matrices. -/
 lemma Φ_rpow (A : HermitianMat d ℂ) (hA : 0 ≤ A) (r : ℝ) :
     Φ (A ^ r).mat = (Φ A.mat) ^ r := by
   rw [HermitianMat.rpow_eq_cfc, HermitianMat.mat_cfc]
   rw [Φ_cfc, CFC.rpow_eq_cfc_real (ha := Φ_nonneg A hA)]
 
-set_option maxHeartbeats 800000 in
 /-- General trace bridge: the operator trace of Φ(M) equals the matrix trace of M,
 for any matrix M (not just Hermitian). -/
 lemma trace_Φ_eq (M : Matrix d d ℂ) :
@@ -127,7 +129,7 @@ namespace HermitianMat
 
 open LiebAndoTrace GeneralizedPerspectiveFunction ComplexOrder
 
-set_option maxHeartbeats 400000 in
+omit [Fintype d] in
 /-- The PSD cone is convex. -/
 private lemma psd_convex : Convex ℝ {σ : HermitianMat d ℂ | 0 ≤ σ} := by
   intro σ₁ hσ₁ σ₂ hσ₂ a b ha hb _
@@ -177,6 +179,7 @@ private lemma psd_add_eps_posdef [Nonempty d] (σ : HermitianMat d ℂ) (hσ : 0
       exact Finset.sum_subset (Finset.subset_univ _) fun j hj₁ hj₂ => by aesop
     · aesop
 
+omit [Fintype d] in
 /-- σ + εI → σ as ε → 0+. -/
 private lemma tendsto_add_eps (σ : HermitianMat d ℂ) :
     Filter.Tendsto (fun ε : ℝ ↦ σ + ε • (1 : HermitianMat d ℂ))
@@ -268,7 +271,6 @@ Joint concavity of the Lieb extension trace map on HermitianMat.
   This bridges `liebExtensionTrace_jointlyConcaveOn_pdSet` to HermitianMat.
 -/
 set_option maxHeartbeats 1600000 in
-set_option backward.isDefEq.respectTransparency false in
 private lemma liebExtension_bridge [Nonempty d]
     {q r : ℝ} (hq : 0 < q) (hr : 0 < r) (hqr : q + r ≤ 1)
     (K : HermitianMat d ℂ)

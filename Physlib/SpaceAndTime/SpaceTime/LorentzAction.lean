@@ -63,7 +63,6 @@ attribute [-simp] Fintype.sum_sum_type
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The Lorentz group action on Schwartz functions taking the Lorentz group to
   continuous linear maps. -/
 def schwartzAction {d} : LorentzGroup d →* 𝓢(SpaceTime d, ℝ) →L[ℝ] 𝓢(SpaceTime d, ℝ) where
@@ -160,6 +159,7 @@ lemma lorentzGroup_smul_dist_apply (Λ : LorentzGroup d) (f : (SpaceTime d) →d
 
 -/
 
+set_option synthInstance.maxHeartbeats 40000
 instance : DistribMulAction (LorentzGroup d) ((SpaceTime d) →d[ℝ] M) where
   one_smul f := by
     ext η

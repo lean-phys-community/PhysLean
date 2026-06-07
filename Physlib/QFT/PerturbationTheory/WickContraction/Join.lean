@@ -22,7 +22,6 @@ variable {n : ℕ} (c : WickContraction n)
 open Physlib.List
 open WickAlgebra
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Given a list `φs` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs` and a Wick contraction
   `φsucΛ` of `[φsΛ]ᵘᶜ`, `join φsΛ φsucΛ` is defined as the Wick contraction of `φs` consisting of
   the contractions in `φsΛ` and those in `φsucΛ`.
@@ -74,7 +73,6 @@ lemma join_congr {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
   subst h1
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Given a contracting pair within `φsΛ` the corresponding contracting pair within
   `(join φsΛ φsucΛ)`. -/
 def joinLiftLeft {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
@@ -89,7 +87,6 @@ lemma jointLiftLeft_injective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction
   rw [Subtype.mk_eq_mk] at h
   refine Subtype.ext h
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Given a contracting pair within `φsucΛ` the corresponding contracting pair within
   `(join φsΛ φsucΛ)`. -/
 def joinLiftRight {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
@@ -157,7 +154,6 @@ lemma joinLift_injective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.
     have h1 := jointLiftLeft_ne_joinLiftRight b a
     simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 lemma joinLift_surjective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} : Function.Surjective (@joinLift _ _ φsΛ φsucΛ) := by
   intro a
@@ -246,7 +242,6 @@ lemma join_sndFieldOfContract_joinLift {φs : List 𝓕.FieldOp} (φsΛ : WickCo
   · simp [joinLiftLeft]
   · exact fstFieldOfContract_lt_sndFieldOfContract φsΛ a
 
-set_option backward.isDefEq.respectTransparency false in
 lemma mem_join_right_iff {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) (a : Finset (Fin [φsΛ]ᵘᶜ.length)) :
     a ∈ φsucΛ.1 ↔ a.map uncontractedListEmd ∈ (join φsΛ φsucΛ).1 := by
@@ -267,7 +262,6 @@ lemma mem_join_right_iff {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.
     subst h2
     exact ha
 
-set_option backward.isDefEq.respectTransparency false in
 lemma join_card {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} :
     (join φsΛ φsucΛ).1.card = φsΛ.1.card + φsucΛ.1.card := by
@@ -287,7 +281,6 @@ lemma join_card {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
   have hcard := φsΛ.2.1 a ha
   simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma empty_join {φs : List 𝓕.FieldOp} (φsΛ : WickContraction [empty (n := φs.length)]ᵘᶜ.length) :
     join empty φsΛ = congr (by simp) φsΛ := by
@@ -344,7 +337,6 @@ lemma join_staticContract {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs
   funext a
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma mem_join_uncontracted_of_mem_right_uncontracted {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) (i : Fin [φsΛ]ᵘᶜ.length)
@@ -377,7 +369,6 @@ lemma exists_mem_left_uncontracted_of_mem_join_uncontracted {φs : List 𝓕.Fie
   intro p hp
   simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 lemma exists_mem_right_uncontracted_of_mem_join_uncontracted {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) (i : Fin φs.length)
@@ -528,7 +519,6 @@ lemma join_getDual?_apply_uncontractedListEmb_isSome_iff {φs : List 𝓕.FieldO
   rw [← Decidable.not_iff_not]
   simp [join_getDual?_apply_uncontractedListEmb_eq_none_iff]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma join_getDual?_apply_uncontractedListEmb_some {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) (i : Fin [φsΛ]ᵘᶜ.length)
@@ -573,7 +563,6 @@ section
 
 variable {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma join_sub_quot (S : Finset (Finset (Fin φs.length))) (ha : S ⊆ φsΛ.1) :
     join (subContraction S ha) (quotContraction S ha) = φsΛ := by
   apply Subtype.ext

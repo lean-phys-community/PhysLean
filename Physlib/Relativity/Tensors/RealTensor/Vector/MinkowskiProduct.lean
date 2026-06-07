@@ -6,7 +6,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
-public import Physlib.Relativity.Tensors.Elab
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 /-!
 
@@ -18,10 +17,9 @@ In this module we define and create an API around the Minkowski product on Loren
 
 @[expose] public section
 
-open Module IndexNotation
+open Module
 open Matrix
 open MatrixGroups
-open CategoryTheory
 noncomputable section
 
 namespace Lorentz
@@ -134,7 +132,6 @@ lemma minkowskiProductMap_smul_snd {d : ℕ} (c : ℝ) (p q : Vector d) :
     minkowskiProductMap p (c • q) = c * minkowskiProductMap p q := by
   rw [minkowskiProductMap_symm, minkowskiProductMap_smul_fst, minkowskiProductMap_symm q p]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The Minkowski product of two Lorentz vectors as a linear map. -/
 def minkowskiProduct {d : ℕ} : Vector d →L[ℝ] Vector d →L[ℝ] ℝ where
   toFun p := {
@@ -199,7 +196,6 @@ lemma minkowskiProduct_invariant {d : ℕ} (p q : Vector d) (Λ : LorentzGroup d
     toField_equivariant]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 open InnerProductSpace in
 lemma minkowskiProduct_eq_timeComponent_spatialPart {d : ℕ} (p q : Vector d) :
     ⟪p, q⟫ₘ = p.timeComponent * q.timeComponent -
@@ -253,7 +249,6 @@ lemma minkowskiProduct_eq_zero_forall_iff {d : ℕ} (p : Vector d) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma map_minkowskiProduct_eq_self_forall_iff {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) :
     (∀ p q : Vector d, ⟪f p, q⟫ₘ = ⟪p, q⟫ₘ) ↔ f = LinearMap.id := by
   constructor

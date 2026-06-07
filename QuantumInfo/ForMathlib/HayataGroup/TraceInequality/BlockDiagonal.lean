@@ -6,9 +6,6 @@ Authors: Kei Tsukamoto, Kento Mori, Hayata Yamasaki
 module
 
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
-public import Mathlib.Analysis.InnerProductSpace.Adjoint
-public import Mathlib.Analysis.InnerProductSpace.PiL2
-public import Mathlib.Topology.Algebra.Module.LinearMapPiProd
 
 @[expose] public section
 
@@ -129,7 +126,6 @@ noncomputable def blockDiagonalHom : (L ℋ × L ℋ) →⋆ₐ[ℝ] L (HSum ℋ
     ext z i
     fin_cases i <;> {
       simp [blockDiagonal, hsumProj, hsumIncl, hsumEquiv, Algebra.algebraMap_eq_smul_one]
-      rfl
     }
   map_star' := by
     intro p

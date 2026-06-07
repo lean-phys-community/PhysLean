@@ -9,6 +9,7 @@ public import Physlib.SpaceAndTime.Space.Basic
 public import Mathlib.Geometry.Manifold.Diffeomorph
 public import Mathlib.Analysis.Distribution.TemperateGrowth
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Analysis.Calculus.ContDiff.WithLp
 public import Mathlib.Tactic.Cases
 /-!
 
@@ -242,7 +243,6 @@ noncomputable instance : NormedAddCommGroup (Space d) where
 instance {d} : Inner ℝ (Space d) where
   inner p q := ∑ i, p i * q i
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma inner_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
     inner ℝ (v1 +ᵥ (0 : Space d)) (v2 +ᵥ (0 : Space d)) = Inner.inner ℝ v1 v2 := by
@@ -693,7 +693,6 @@ lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume v
 -/
 
 open Manifold in
-set_option backward.isDefEq.respectTransparency false in
 /-- A diffeomorphism between the two different manifold structures on `Space d`,
   that equivalent to `manifoldStructure d` and that equivalent to `𝓘(ℝ, Space d)` -/
 noncomputable def modelDiffeo {d} :

@@ -32,7 +32,6 @@ noncomputable def eigenValue (n : ℕ) : ℝ := (n + 1/2) * ℏ * Q.ω
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_eigenfunction_zero : deriv (Q.eigenfunction 0) =
     Complex.ofReal (- 1 / Q.ξ ^2) • Complex.ofReal * Q.eigenfunction 0 := by
   rw [eigenfunction_zero]
@@ -85,7 +84,6 @@ lemma deriv_eigenfunction_zero' : deriv (Q.eigenfunction 0) =
   ring_nf
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_physHermite_characteristic_length (n : ℕ) :
     deriv (fun x => Complex.ofReal (physHermite n (x/Q.ξ))) = fun x =>
     Complex.ofReal (1/Q.ξ) * 2 * n * physHermite (n-1) (x/Q.ξ) := by
@@ -114,7 +112,6 @@ lemma deriv_physHermite_characteristic_length (n : ℕ) :
     simp only [cast_add, cast_one, add_tsub_cancel_right]
     ring_nf
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_eigenfunction_succ (n : ℕ) :
     deriv (Q.eigenfunction (n + 1)) = fun x =>
     Complex.ofReal (1/√(2 ^ (n + 1) * (n + 1)!) * (1/Q.ξ)) •
@@ -138,7 +135,6 @@ lemma deriv_eigenfunction_succ (n : ℕ) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_deriv_eigenfunction_zero (x : ℝ) : deriv (deriv (Q.eigenfunction 0)) x =
     (- 1 / Q.ξ^2) * (1 + ((- 1/ Q.ξ^2) * x ^ 2)) * Q.eigenfunction 0 x := by
   simp only [deriv_eigenfunction_zero, Complex.ofReal_div, Complex.ofReal_neg,
@@ -159,7 +155,6 @@ lemma deriv_deriv_eigenfunction_zero (x : ℝ) : deriv (deriv (Q.eigenfunction 0
   simp only [Complex.ofReal_one, Complex.ofReal_pow, one_mul, one_pow, inv_pow]
   ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_deriv_eigenfunction_succ (n : ℕ) (x : ℝ) :
     deriv (fun x => deriv (Q.eigenfunction (n + 1)) x) x =
     Complex.ofReal (1/√(2 ^ (n + 1) * (n + 1) !) * (1/Q.ξ)) *
@@ -188,7 +183,6 @@ lemma deriv_deriv_eigenfunction_succ (n : ℕ) (x : ℝ) :
   simp only [one_div, Complex.ofReal_inv, cast_add, cast_one, add_tsub_cancel_right]
   ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_deriv_eigenfunction (n : ℕ) (x : ℝ) :
     deriv (fun x => deriv (Q.eigenfunction n) x) x = (- 1 / Q.ξ^2) * ((2 * n + 1)
     + ((- 1/ Q.ξ^2) * x ^ 2)) * Q.eigenfunction n x := by

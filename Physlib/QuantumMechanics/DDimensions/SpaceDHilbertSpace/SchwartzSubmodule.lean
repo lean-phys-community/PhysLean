@@ -47,15 +47,12 @@ variable {d : ℕ}
 ## A. Definitions
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map including Schwartz maps into `SpaceDHilbertSpace d`. -/
 def schwartzIncl : 𝓢(Space d, ℂ) →L[ℂ] SpaceDHilbertSpace d := toLpCLM ℂ (E := Space d) ℂ 2
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The submodule of `SpaceDHilbertSpace d` corresponding to Schwartz maps. -/
 abbrev schwartzSubmodule (d : ℕ) := (schwartzIncl (d := d)).range
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The linear equivalence between the Schwartz maps `𝓢(Space d, ℂ)` and the Schwartz submodule
   of `SpaceDHilbertSpace d`. -/
 def schwartzEquiv : 𝓢(Space d, ℂ) ≃ₗ[ℂ] schwartzSubmodule d :=

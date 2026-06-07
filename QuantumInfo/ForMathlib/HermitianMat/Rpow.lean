@@ -5,13 +5,9 @@ Authors: Alex Meiburg
 -/
 module
 
-public import QuantumInfo.ForMathlib.HermitianMat.LogExp
 public import QuantumInfo.ForMathlib.HermitianMat.CompoundMatrix
+public import QuantumInfo.ForMathlib.HermitianMat.LogExp
 public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
-public import QuantumInfo.ForMathlib.HermitianMat.Unitary
-public import Mathlib.Analysis.SpecialFunctions.Integrability.Basic
-public import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
-public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
 @[expose] public section
 
@@ -109,7 +105,6 @@ lemma sqrt_eq_cfc_rpow_half (A : HermitianMat d 𝕜)  :
   intro
   simp [Real.sqrt_eq_rpow]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem one_rpow : (1 : HermitianMat d 𝕜) ^ r = 1 := by
   rcases isEmpty_or_nonempty d
@@ -149,7 +144,6 @@ theorem conj_rpow (hA : 0 ≤ A) (hq : q ≠ 0) (hqr : r + 2 * q ≠ 0) :
   rw [pow_two, Real.rpow_add' hi hqr, two_mul, Real.rpow_add' hi (by simpa)]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 theorem pow_half_mul (hA : 0 ≤ A) :
     (A ^ (1/2 : ℝ)).mat * (A ^ (1/2 : ℝ)).mat = A := by
   rw [← mat_rpow_add hA]
@@ -171,7 +165,6 @@ theorem inv_eq_rpow_neg_one (hA : A.mat.PosDef) : A⁻¹ = A ^ (-1 : ℝ) := by
   rw [← cfc_inv, rpow_eq_cfc]
   simp_rw [Real.rpow_neg_one]
 
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 theorem sandwich_self (hB : B.mat.PosDef) :
     (B.conj (B ^ (-1/2 : ℝ)).mat) = 1 := by
@@ -188,7 +181,6 @@ theorem sandwich_self (hB : B.mat.PosDef) :
   rw [ ← Matrix.mul_assoc, hB_inv_sqrt, Matrix.nonsing_inv_mul _ ];
   exact isUnit_iff_ne_zero.mpr hB.det_pos.ne'
 
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder in
 lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-p) := by
   --TODO cleanup
@@ -277,7 +269,6 @@ private lemma rpow_kron_diagonal
   congr! 2 with x
   apply Real.mul_rpow (ha x.1) (hb x.2)
 
-set_option backward.isDefEq.respectTransparency false in
 open scoped Kronecker in
 omit [DecidableEq d] [DecidableEq d₂] in
 lemma conj_kron
@@ -286,7 +277,6 @@ lemma conj_kron
   ext1
   simp [conj, Matrix.mul_kronecker_mul, Matrix.conjTranspose_kronecker]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma rpow_kron
     {A : HermitianMat d ℂ} {B : HermitianMat d₂ ℂ} (r : ℝ) (hA : 0 ≤ A) (hB : 0 ≤ B) :
     (A ⊗ₖ B) ^ r = (A ^ r) ⊗ₖ (B ^ r) := by
@@ -351,7 +341,6 @@ theorem continuousOn_rpow_joint_nonneg_pos
 
 end continuity
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For positive semidefinite `A`, `(A ^ 2) ^ (p / 2) = A ^ p` in functional calculus form.
 
 The nonnegative exponent assumption is needed for continuity at zero. For positive definite
@@ -537,7 +526,6 @@ lemma rpowConst_pos (hq : 0 < q) (hq1 : q < 1) : 0 < rpowConst q := by
   linarith
 
 open MeasureTheory Filter in
-set_option backward.isDefEq.respectTransparency false in
 /-- The scalar rpow approximation converges pointwise.
     `scalarRpowApprox q T x → rpowConst q * (x^q - 1)` as `T → ∞`. -/
 lemma scalarRpowApprox_tendsto {x : ℝ} (hx : 0 < x) (hq : 0 < q) (hq1 : q < 1) :
@@ -605,7 +593,7 @@ lemma tendsto_rpowApprox (hA : A.mat.PosDef) (hq : 0 < q) (hq1 : q < 1) :
   have h_expand_tgt : (A.cfc (fun x => rpowConst q * (x ^ q - 1))).mat = ∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) :=
     cfc_toMat_eq_sum_smul_proj A (fun x => rpowConst q * (x ^ q - 1))
   have h_sum : Tendsto (fun T : ℝ => ∑ i, scalarRpowApprox q T (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose)) atTop (nhds (∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose))) := by
-    refine tendsto_finset_sum _ fun i _ => ?_
+    refine tendsto_finsetSum _ fun i _ => ?_
     have := scalarRpowApprox_tendsto (hA.eigenvalues_pos i) hq hq1
     exact Filter.Tendsto.smul_const (Complex.continuous_ofReal.continuousAt.tendsto.comp this) _
   open scoped Matrix.Norms.Frobenius in
@@ -632,7 +620,6 @@ theorem rpow_le_rpow_of_posDef (hA : A.mat.PosDef) (hAB : A ≤ B)
     simp_all
 
 open ComplexOrder Filter in
-set_option backward.isDefEq.respectTransparency false in
 /-- The **Löwner—Heinz theorem**: for matrices A and B, if `0 ≤ A ≤ B` and `0 < q ≤ 1`,
 then `A^q ≤ B^q`. That is, real roots are operator monotone. -/
 theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
@@ -712,7 +699,7 @@ private lemma compoundHermitian_rpow (A : HermitianMat d ℂ) (hA : 0 ≤ A)
     ext S T
     by_cases h : S = T
     · subst h
-      simp [Real.finset_prod_rpow _ _ (fun i _ => ha _)]
+      simp [Real.finsetProd_rpow _ _ (fun i _ => ha _)]
     · rw [HermitianMat.diagonal_mat, HermitianMat.diagonal_mat]
       simp [Matrix.diagonal, h]
   rw [hAeq, rpow_conj_unitary, compoundHermitian_conj, compoundHermitian_conj, hdiag_rpow]
@@ -979,7 +966,7 @@ private lemma lieb_thirring_le_one_posDef
             simpa [M, N] using compound_top_singular_le_posDef hA hB hr0 hr1 k hk
       _ = ∏ i : Fin k, (singularValuesSorted M ⟨i.val, by omega⟩) ^ r := by
             have hprod := congrArg (· ^ r) (prod_singularValuesSorted_eq_compoundSV M k hk).symm
-            have hrpow := (Real.finset_prod_rpow (s := Finset.univ)
+            have hrpow := (Real.finsetProd_rpow (s := Finset.univ)
               (f := fun i : Fin k => singularValuesSorted M ⟨i.val, by omega⟩)
               (fun i _ => singularValuesSorted_nonneg M _) r)
             simpa using hprod.trans hrpow.symm
@@ -1286,14 +1273,14 @@ private lemma tendsto_intervalIntegral_weighted_trace_mul_inv_shift {A : Hermiti
                 exact htIoc.1)]
               simp [Finset.mul_sum]
       _ = ∑ i, ∫ t in (0)..T, t ^ (p - 1) * (A.H.eigenvalues i / (A.H.eigenvalues i + t)) := by
-            rw [intervalIntegral.integral_finset_sum]
+            rw [intervalIntegral.integral_finsetSum]
             intro i hi
             exact intervalIntegrable_weighted_div_nonneg
               (x := A.H.eigenvalues i) (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i)
               hp hT
   rw [Filter.tendsto_congr' hEq]
   simpa [trace_rpow_eq_sum, Finset.mul_sum] using
-    (tendsto_finset_sum Finset.univ fun i _ =>
+    (tendsto_finsetSum Finset.univ fun i _ =>
       tendsto_intervalIntegral_weighted_div_nonneg
         (x := A.H.eigenvalues i) (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i)
         hp hp1)

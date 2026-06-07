@@ -51,7 +51,6 @@ namespace POVM
 
 variable {X : Type*} {d : Type*} [Fintype X] [Fintype d] [DecidableEq d] [DecidableEq X]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The act of measuring is a quantum channel, that maps a `d`-dimensional quantum
 state to an `d × X`-dimensional quantum-classical state. -/
 def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
@@ -77,7 +76,6 @@ def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
         by simp [Matrix.smul_kronecker]⟩
       set M₃ := LinearMap.comp M₂ M₁ with hM₃
       simp only [M₁, M₂, LinearMap.comp, kronecker, LinearMap.coe_mk, AddHom.coe_mk] at hM₃
-      unfold Function.comp at hM₃
       rw [← hM₃]
       apply MatrixMap.IsCompletelyPositive.comp
       · dsimp [M₁]
@@ -123,7 +121,6 @@ theorem measurementMap_apply_hermitianMat (Λ : POVM X d) (m : HermitianMat d �
   simp only [HermitianMat.diagonal, mat_mk, diagonal_apply, single, of_apply]
   split_ifs <;> grind only [= map_zero, = map_one]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A POVM leads to a distribution of outcomes on any given mixed state ρ. -/
 def measure (Λ : POVM X d) (ρ : MState d) : ProbDistribution X := .mk'
     (f := fun x ↦ ⟪Λ.mats x, ρ.M⟫)

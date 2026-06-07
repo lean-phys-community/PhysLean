@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Module
-public import Mathlib.MeasureTheory.Constructions.Polish.Basic
 /-!
 
 # Slices of space
@@ -179,7 +178,7 @@ lemma fderiv_slice_symm {d : ℕ} (i : Fin d.succ) (p1 : ℝ × Space d) :
 lemma fderiv_slice_symm_left_apply {d : ℕ} (i : Fin d.succ) (x : Space d) (r1 r2 : ℝ) :
     (fderiv ℝ (fun r => (slice i).symm (r, x))) r1 r2 = (slice i).symm (r2, 0) := by
   rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop)]
-  simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_id', fderiv_fun_const, Pi.zero_apply,
+  simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
     ContinuousLinearMap.coe_comp', ContinuousLinearEquiv.coe_coe, Function.comp_apply,
     ContinuousLinearMap.prod_apply, ContinuousLinearMap.coe_id', id_eq,
     ContinuousLinearMap.zero_apply]
@@ -190,7 +189,7 @@ lemma fderiv_slice_symm_right_apply {d : ℕ} (i : Fin d.succ) (r : ℝ)
     (x1 x2 : Space d) :
     (fderiv ℝ (fun x => (slice i).symm (r, x))) x1 x2 = (slice i).symm (0, x2) := by
   rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop)]
-  simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply, fderiv_id',
+  simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply, fderiv_fun_id,
     ContinuousLinearMap.coe_comp', ContinuousLinearEquiv.coe_coe, Function.comp_apply,
     ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id',
     id_eq]

@@ -78,7 +78,6 @@ lemma lineInPlaneCond_eq_last' {S : (PureU1 (n.succ.succ)).LinSols} (hS : LineIn
   field_simp at h2
   linear_combination h2
 
-set_option backward.isDefEq.respectTransparency false in
 lemma lineInPlaneCond_eq_last {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols}
     (hS : LineInPlaneCond S) : ConstAbsProp ((S.val ((Fin.last n.succ.succ.succ).castSucc)),
     (S.val ((Fin.last n.succ.succ.succ).succ))) := by

@@ -63,29 +63,30 @@ lemma div_eq_val (x y : MassUnit) :
 lemma div_ne_zero (x y : MassUnit) : ¬ x / y = (0 : ℝ≥0) := by
   rw [div_eq_val]
   refine coe_ne_zero.mp ?_
-  simp
+  simp [toReal]
 
 @[simp]
 lemma div_pos (x y : MassUnit) : (0 : ℝ≥0) < x/ y := by
   apply lt_of_le_of_ne
-  · exact zero_le (x / y)
+  · exact zero_le
   · exact Ne.symm (div_ne_zero x y)
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma div_self (x : MassUnit) :
     x / x = (1 : ℝ≥0) := by
   simp [div_eq_val, x.val_ne_zero]
+  rfl
 
 lemma div_symm (x y : MassUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
   rw [div_eq_val, inv_eq_one_div, div_eq_val]
-  simp
+  simp only [one_div, NNReal.coe_inv]
+  rw [toReal, inv_div]
 
 @[simp]
 lemma div_mul_div_coe (x y z : MassUnit) :
-    (x / y : ℝ) * (y /z : ℝ) = x /z := by
-  simp [div_eq_val]
+    (x / y : ℝ) * (y / z : ℝ) = x / z := by
+  simp [div_eq_val, toReal]
   field_simp
 
 /-!
@@ -107,8 +108,6 @@ lemma scale_div_self (x : MassUnit) (r : ℝ) (hr : 0 < r) :
 lemma self_div_scale (x : MassUnit) (r : ℝ) (hr : 0 < r) :
     x / scale r x hr = (⟨1/r, _root_.div_nonneg (by simp) (le_of_lt hr)⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
-  ext
-  simp only [coe_mk]
   field_simp
 
 @[simp]
@@ -120,6 +119,7 @@ lemma scale_div_scale (x1 x2 : MassUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 <
     scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
   refine NNReal.eq ?_
   simp [scale, div_eq_val]
+  rw [toReal]
   field_simp
 
 @[simp]
@@ -187,12 +187,12 @@ noncomputable def nominalSolarMasses : MassUnit := scale (1.988416e30) kilograms
 -/
 
 lemma pounds_div_ounces : pounds / ounces = (16 : ℝ≥0) := NNReal.eq <| by
-  simp [pounds, ounces]; norm_num
+  simp [pounds, ounces]; rw [toReal]; norm_num
 
 lemma shortTons_div_kilograms : shortTons / kilograms = (907.18474 : ℝ≥0) := NNReal.eq <| by
-  simp [shortTons, pounds]; norm_num
+  simp [shortTons, pounds]; rw [toReal]; norm_num
 
 lemma longTons_div_kilograms : longTons / kilograms = (1016.0469088 : ℝ≥0) := NNReal.eq <| by
-  simp [longTons, pounds]; norm_num
+  simp [longTons, pounds]; rw [toReal]; norm_num
 
 end MassUnit

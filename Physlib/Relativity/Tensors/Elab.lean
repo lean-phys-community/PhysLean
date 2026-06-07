@@ -18,7 +18,7 @@ public import Physlib.Relativity.Tensors.Tensorial
 
 ## Examples
 
-- Suppose `T` and `T'` are tensors `S.F (OverColor.mk ![c1, c2])`.
+- Suppose `T` and `T'` are tensors with color `![c1, c2]`.
 - `{T | μ ν}ᵀ` is `tensorNode T`.
 - We can also write e.g. `{T | μ ν}ᵀ.tensor` to get the tensor itself.
 - `{- T | μ ν}ᵀ` is `neg (tensorNode T)`.
@@ -29,13 +29,13 @@ public import Physlib.Relativity.Tensors.Tensorial
 - `{T | μ ν = T' | μ ν}ᵀ` is `(tensorNode T).tensor = (perm _ (tensorNode T')).tensor`.
 - If `a ∈ k` then `{a •ₜ T | μ ν}ᵀ` is `smulNode a (tensorNode T)`.
 - If `g ∈ S.G` then `{g •ₐ T | μ ν}ᵀ` is `actionNode g (tensorNode T)`.
-- Suppose `T2` is a tensor `S.F (OverColor.mk ![c3])`.
+- Suppose `T2` is a tensor with color `![c3]`.
   Then `{T | μ ν ⊗ T2 | σ}ᵀ` is `prodNode (tensorNode T1) (tensorNode T2)`.
-- If `T3` is a tensor `S.F (OverColor.mk ![S.τ c1, S.τ c2])`, then
+- If `T3` is a tensor with color `![S.τ c1, S.τ c2]`, then
   `{T | μ ν ⊗ T3 | μ σ}ᵀ` is `contr 0 1 _ (prodNode (tensorNode T1) (tensorNode T3))`.
   `{T | μ ν ⊗ T3 | μ ν }ᵀ` is
   `contr 0 0 _ (contr 0 1 _ (prodNode (tensorNode T1) (tensorNode T3)))`.
-- If `T4` is a tensor `S.F (OverColor.mk ![c2, c1])` then
+- If `T4` is a tensor with color `![c2, c1]` then
   `{T | μ ν + T4 | ν μ }ᵀ`is `addNode (tensorNode T) (perm _ (tensorNode T4))` where `_`
   is the permutation of the two indices of `T4`.
   `{T | μ ν = T4 | ν μ }ᵀ` is `(tensorNode T).tensor = (perm _ (tensorNode T4)).tensor` is the
@@ -288,7 +288,7 @@ syntax "-" tensorExpr : tensorExpr
 
 -/
 
-/-- For syntax of the form `T` where `T` is `S.F.obj (OverColor.mk c)` this returns
+/-- For syntax of the form `T` where `T` is `Tensor S c` this returns
   the value of `TensorSpecies.numIndices T`. That is, the exact number of indices
   associated with that tensor. -/
 def getNumIndicesExact (stx : Syntax) : TermElabM ℕ := do
@@ -397,7 +397,7 @@ def getIndicesRightEq (stx : Syntax) : TermElabM (List (TSyntax `indexExpr)) := 
 -/
 open TensorSpecies
 
-/-- For a term of the form `T` where `T` is `S.F.obj (OverColor.mk c)`,
+/-- For a term of the form `T` where `T` is `Tensor S c`,
   `tensorTermToTensorTree` returns the term corresponding to the `tensorNode T` -/
 def nodeTermMap (T : Term) : Term :=
   Syntax.mkApp (mkIdent ``Tensorial.toTensor) #[T]

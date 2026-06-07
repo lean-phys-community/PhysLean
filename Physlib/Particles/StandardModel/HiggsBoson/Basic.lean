@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Particles.StandardModel.Basic
-public import Mathlib.Geometry.Manifold.VectorBundle.SmoothSection
+public import Mathlib.Geometry.Manifold.VectorBundle.ContMDiffSection
 /-!
 
 # The Higgs field
@@ -144,7 +144,6 @@ as `(√a, 0)`. This has the property that it's norm is equal to `a`.
 def ofReal (a : ℝ) : HiggsVec :=
   !₂[Real.sqrt a, 0]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma ofReal_normSq {a : ℝ} (ha : 0 ≤ a) : ‖ofReal a‖ ^ 2 = a := by
   simp only [ofReal]
@@ -174,18 +173,15 @@ instance : SMul StandardModel.GaugeGroupI HiggsVec where
 lemma gaugeGroupI_smul_eq (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
     g • φ = (WithLp.toLp 2 <| g.toU1 ^ 3 • (g.toSU2.1 *ᵥ φ.ofLp)) := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gaugeGroupI_smul_eq_U1_mul_SU2 (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
     g • φ = (WithLp.toLp 2 <| g.toSU2.1 *ᵥ (g.toU1 ^ 3 • φ.ofLp)) := by
   rw [gaugeGroupI_smul_eq, ← mulVec_smul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gaugeGroupI_smul_eq_U1_smul_SU2 (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
     g • φ = (WithLp.toLp 2 <| (g.toU1 ^ 3 • g.toSU2.1) *ᵥ φ.ofLp) := by
   rw [gaugeGroupI_smul_eq]
   rw [Matrix.smul_mulVec]
 
-set_option backward.isDefEq.respectTransparency false in
 instance : MulAction StandardModel.GaugeGroupI HiggsVec where
   one_smul φ := by simp [gaugeGroupI_smul_eq]
   mul_smul g₁ g₂ φ := by
@@ -382,7 +378,6 @@ informal_lemma stability_group where
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma ofU1Subgroup_smul_eq_smul (g : unitary ℂ) (φ : HiggsVec) :
     (StandardModel.GaugeGroupI.ofU1Subgroup g) • φ =
     (WithLp.toLp 2 <| !![1, 0; 0, g.1 ^ 6] *ᵥ φ.ofLp) := by
@@ -406,7 +401,6 @@ lemma ofU1Subgroup_smul_eq_smul (g : unitary ℂ) (φ : HiggsVec) :
     simp only [smul_eq_mul]
     ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gaugeGroupI_smul_phase_snd (φ : HiggsVec) :
     ∃ g : StandardModel.GaugeGroupI,
       (g • φ).ofLp 1 = ‖(φ.ofLp 1)‖ ∧
@@ -475,7 +469,6 @@ We given the Higgs bundle an instance of a smooth vector bundle.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The instance of a smooth vector bundle with total space `HiggsBundle` and fiber `HiggsVec`. -/
 instance : ContMDiffVectorBundle ⊤ HiggsVec HiggsBundle (Lorentz.Vector.asSmoothManifold 3) :=
   Bundle.Trivial.contMDiffVectorBundle HiggsVec
@@ -514,7 +507,6 @@ We define the constant Higgs field associated to a given Higgs vector.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Given a vector in `HiggsVec` the constant Higgs field with value equal to that
 section. -/
 def const : HiggsVec →ₗ[ℝ] HiggsField where
@@ -654,41 +646,35 @@ lemma inner_symm (φ1 φ2 : HiggsField) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma inner_add_left (φ1 φ2 φ3 : HiggsField) :
     ⟪φ1 + φ2, φ3⟫_(SpaceTime → ℂ) = ⟪φ1, φ3⟫_(SpaceTime → ℂ) + ⟪φ2, φ3⟫_(SpaceTime → ℂ) := by
   funext x
   simp [inner_apply]
   rw [_root_.inner_add_left]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma inner_add_right (φ1 φ2 φ3 : HiggsField) :
     ⟪φ1, φ2 + φ3⟫_(SpaceTime → ℂ) = ⟪φ1, φ2⟫_(SpaceTime → ℂ) + ⟪φ1, φ3⟫_(SpaceTime → ℂ) := by
   funext x
   simp [inner_apply]
   rw [_root_.inner_add_right]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma inner_zero_left (φ : HiggsField) :
     ⟪0, φ⟫_(SpaceTime → ℂ) = 0 := by
   funext x
   simp [inner_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma inner_zero_right (φ : HiggsField) :
     ⟪φ, 0⟫_(SpaceTime → ℂ) = 0 := by
   funext x
   simp [inner_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma inner_neg_left (φ1 φ2 : HiggsField) :
     ⟪-φ1, φ2⟫_(SpaceTime → ℂ) = -⟪φ1, φ2⟫_(SpaceTime → ℂ) := by
   funext x
   simp [inner_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma inner_neg_right (φ1 φ2 : HiggsField) :
     ⟪φ1, -φ2⟫_(SpaceTime → ℂ) = -⟪φ1, φ2⟫_(SpaceTime → ℂ) := by
   funext x
@@ -700,7 +686,6 @@ lemma inner_neg_right (φ1 φ2 : HiggsField) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma inner_smooth (φ1 φ2 : HiggsField) : ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℂ) ⊤
     ⟪φ1, φ2⟫_(SpaceTime → ℂ) := by
   rw [inner_eq_expand]
@@ -774,7 +759,6 @@ lemma normSq_nonneg (φ : HiggsField) (x : SpaceTime) : 0 ≤ ‖φ‖_H^2 x := 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma normSq_zero : ‖0‖_H^2 = 0 := by
   ext x

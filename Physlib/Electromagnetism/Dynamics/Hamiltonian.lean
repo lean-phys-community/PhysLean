@@ -46,7 +46,6 @@ in the case of three spatial dimensions.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 
@@ -129,7 +128,6 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ 2 A) (J : LorentzCurrentDensity d) :
     A.canonicalMomentum 𝓕 J = fun x => fun μ =>
@@ -156,14 +154,14 @@ lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
     rw [fderiv_mul_const (by fun_prop)]
     rw [fderiv_const_mul (by fun_prop)]
     rw [fderiv_const_mul (by fun_prop)]
-    rw [fderiv_pow _ (by fun_prop)]
+    rw [fderiv_fun_pow _ (by fun_prop)]
     simp
   conv_lhs =>
     enter [1, 1, 2, 2, 2, i]
     rw [fderiv_mul_const (by fun_prop)]
     rw [fderiv_const_mul (by fun_prop)]
     simp
-  rw [fderiv_pow _ (by fun_prop)]
+  rw [fderiv_fun_pow _ (by fun_prop)]
   simp [Lorentz.Vector.coordCLM]
   rw [← Finset.sum_sub_distrib]
   rw [Finset.mul_sum]
@@ -247,7 +245,6 @@ lemma hamiltonian_eq_electricField_vectorPotential {d} {𝓕 : FreeSpace}
     exact hA.differentiable (by simp)
   · exact hA.differentiable (by simp)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma hamiltonian_eq_electricField_scalarPotential {d} {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d) (hA : ContDiff ℝ 2 A)
     (J : LorentzCurrentDensity d) (x : SpaceTime d) :

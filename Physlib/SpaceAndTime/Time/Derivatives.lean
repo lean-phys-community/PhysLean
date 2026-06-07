@@ -8,6 +8,8 @@ module
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.SpaceAndTime.Space.Module
 public import Physlib.SpaceAndTime.Time.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Inv
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Time Derivatives
@@ -83,7 +85,8 @@ lemma deriv_div {c g : Time → ℝ}
   ring_nf
   simp [fderiv_fun_mul hc (DifferentiableAt.fun_inv (by fun_prop) hgz),
     fderiv_comp' t (differentiableAt_inv hgz) hg]
-  grind
+  field_simp
+  ring
 
 /-!
 
@@ -166,7 +169,6 @@ lemma fderiv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
   · fun_prop
   · fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_lorentzVector {d : ℕ} {f : Time → Lorentz.Vector d}
     (hf : Differentiable ℝ f) (t : Time) (i : Fin 1 ⊕ Fin d) :
     deriv (fun t => f t i) t = deriv (fun t => f t) t i := by

@@ -28,7 +28,6 @@ abbrev ElectricField (d : ℕ := 3) := Time → Space d → EuclideanSpace ℝ (
   `ℝ^d`. -/
 abbrev MagneticField (d : ℕ := 3) := Time → Space d → EuclideanSpace ℝ (Fin d)
 
-open IndexNotation
 open realLorentzTensor
 
 /-- The vector potential of an electromagnetic field-/

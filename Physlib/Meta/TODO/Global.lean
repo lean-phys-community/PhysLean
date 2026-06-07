@@ -17,7 +17,6 @@ but are still important for the development of Physlib.
 
 @[expose] public section
 
-
 TODO "Ensure that all the lines in QuantumInfo are below 100 characters long."
 
 TODO "Turn the `sorryful` linter on for the QuantumInfo module."

@@ -15,13 +15,10 @@ public import Physlib.Relativity.Tensors.MetricTensor
 
 @[expose] public section
 
-open Module IndexNotation
-open CategoryTheory
-open MonoidalCategory
+open Module
 open Matrix
 open MatrixGroups
 open TensorProduct
-open IndexNotation
 
 noncomputable section
 
@@ -62,23 +59,27 @@ open TensorSpecies
 open Tensor
 
 lemma coMetric_eq_fromConstPair {d : ℕ} :
-    η' d = fromConstPair (Lorentz.preCoMetric d) := by
+    η' d = fromConstPair (S := realLorentzTensor d) (c1 := .down) (c2 := .down)
+      (Lorentz.preCoMetric d) := by
   rw [coMetric, metricTensor]
   rfl
 
 lemma contrMetric_eq_fromConstPair {d : ℕ} :
-    η d = fromConstPair (Lorentz.preContrMetric d) := by
+    η d = fromConstPair (S := realLorentzTensor d)
+      (c1 := .up) (c2 := .up) (Lorentz.preContrMetric d) := by
   rw [contrMetric, metricTensor]
   rfl
 
 lemma coMetric_eq_fromPairT {d : ℕ} :
-    η' d = fromPairT (Lorentz.preCoMetricVal d) := by
+    η' d = fromPairT (S := realLorentzTensor d) (c1 := .down) (c2 := .down)
+      (Lorentz.preCoMetricVal d) := by
   rw [coMetric_eq_fromConstPair, fromConstPair]
   congr 1
   exact Lorentz.preCoMetric_apply_one
 
 lemma contrMetric_eq_fromPairT {d : ℕ} :
-    η d = fromPairT (Lorentz.preContrMetricVal d) := by
+    η d = fromPairT (S := realLorentzTensor d) (c1 := .up) (c2 := .up)
+        (Lorentz.preContrMetricVal d) := by
   rw [contrMetric_eq_fromConstPair, fromConstPair]
   congr 1
   exact Lorentz.preContrMetric_apply_one
@@ -106,7 +107,6 @@ lemma actionT_contrMetric {d} (g : LorentzGroup d) : g • η d = η d := by
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.down, Color.down]) :
     (Tensor.basis _).repr (coMetric d) b =
@@ -114,7 +114,7 @@ lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
   rw [coMetric_eq_fromPairT]
   simp [Lorentz.preCoMetricVal]
   erw [Lorentz.coCoToMatrixRe_symm_expand_tmul]
-  simp only [map_sum, _root_.map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul,
+  simp only [map_sum, _root_.map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul,
     Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Fin.isValue]
   conv_lhs =>
     enter [2, x1, 2, x2]
@@ -143,7 +143,6 @@ lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     simp at hy
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.up, Color.up]) :
     (Tensor.basis _).repr (contrMetric d) b =
@@ -151,7 +150,7 @@ lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
   rw [contrMetric_eq_fromPairT]
   simp [Lorentz.preContrMetricVal]
   erw [Lorentz.contrContrToMatrixRe_symm_expand_tmul]
-  simp only [map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul, Finset.sum_apply,
+  simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
     Pi.smul_apply, smul_eq_mul, Fin.isValue]
   conv_lhs =>
     enter [2, x1, 2, x2]

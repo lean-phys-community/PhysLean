@@ -25,15 +25,12 @@ TODO "Refactor: Split this module on Lorentz vectors into two: `Basic.lean` and 
   depend on the `Tensorial` imports. A similar TODO item exists
   for Lorentz co-vectors."
 
-open Module IndexNotation
-open CategoryTheory
-open MonoidalCategory
+open Module
 open Matrix
 open MatrixGroups
 open Complex
 open TensorProduct
-open IndexNotation
-open CategoryTheory
+
 noncomputable section
 
 namespace Lorentz
@@ -56,11 +53,9 @@ instance {d} : Module ℝ (Vector d) :=
 instance {d} : AddCommGroup (Vector d) :=
   inferInstanceAs (AddCommGroup (Fin 1 ⊕ Fin d → ℝ))
 
-set_option backward.isDefEq.respectTransparency false in
 instance {d} : FiniteDimensional ℝ (Vector d) :=
   inferInstanceAs (FiniteDimensional ℝ (Fin 1 ⊕ Fin d → ℝ))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The equivalence between `Vector d` and `EuclideanSpace ℝ (Fin 1 ⊕ Fin d)`. -/
 def equivEuclid (d : ℕ) :
     Vector d ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 1 ⊕ Fin d) :=
@@ -97,9 +92,8 @@ instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) where
     intro h
     apply (equivEuclid d).injective
     simp at h
-    grind
+    rw [← neg_add_eq_zero, h]
 
-set_option backward.isDefEq.respectTransparency false in
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (Vector d) where
   norm_smul_le c v := by
     simp only [norm_eq_equivEuclid, map_smul]
@@ -259,7 +253,6 @@ lemma contDiff_apply {n : WithTop ℕ∞} {d : ℕ} {α : Type*}
     · fun_prop
     · exact h
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fderiv_apply {d : ℕ} {α : Type*}
     [NormedAddCommGroup α] [NormedSpace ℝ α]
     (f : α → Vector d) (h : Differentiable ℝ f)
@@ -270,7 +263,6 @@ lemma fderiv_apply {d : ℕ} {α : Type*}
   simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma fderiv_coord {d : ℕ} (μ : Fin 1 ⊕ Fin d) (x : Vector d) :
     fderiv ℝ (fun v : Vector d => v μ) x = coordCLM μ := by
@@ -343,16 +335,9 @@ set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_symm_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
     (toTensor (self := tensorial)).symm (Tensor.basis ![Color.up] (indexEquiv.symm μ)) =
     basis μ := by
-  rw [Tensor.basis_apply]
   funext i
-  rw [toTensor_symm_pure]
-  simp [Pure.basisVector]
-  conv_lhs =>
-    enter [1, 2]
-    change (contrBasis d) (indexEquiv.symm μ 0)
-  simp [contrBasis, indexEquiv, Pi.single_apply]
-  congr 1
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  simp [Tensor.basis_apply, toTensor_symm_pure, Pure.basisVector, Finsupp.single_apply,
+    indexEquiv]
 
 lemma toTensor_basis_eq_tensor_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
     toTensor (basis μ) = Tensor.basis ![Color.up] (indexEquiv.symm μ) := by
@@ -665,14 +650,12 @@ def asSmoothManifold (d : ℕ) : ModelWithCorners ℝ (Vector d) (Vector d) := �
 -/
 open InnerProductSpace
 
-set_option backward.isDefEq.respectTransparency false in
 lemma basis_inner {d : ℕ} (μ : Fin 1 ⊕ Fin d) (p : Lorentz.Vector d) :
     ⟪Lorentz.Vector.basis μ, p⟫_ℝ = p μ := by
   simp [inner_eq_equivEuclid]
   rw [PiLp.inner_apply]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma inner_basis {d : ℕ} (p : Lorentz.Vector d) (μ : Fin 1 ⊕ Fin d) :
     ⟪p, Lorentz.Vector.basis μ⟫_ℝ = p μ := by
   simp [inner_eq_equivEuclid]

@@ -43,7 +43,6 @@ In this implementation we have set `μ₀ = 1`. It is a TODO to introduce this c
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff Physlib
 
@@ -107,7 +106,6 @@ lemma gradKineticTerm_eq_sum_sum {d} {𝓕 : FreeSpace}
         (1 / (𝓕.μ₀) * (η μ μ * η ν ν * distDeriv μ (distDeriv μ A) ε ν -
         distDeriv μ (distDeriv ν A) ε μ)) • Lorentz.Vector.basis ν := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradKineticTerm_eq_fieldStrength {d} {𝓕 : FreeSpace} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
     A.gradKineticTerm 𝓕 ε = ∑ ν, (1/𝓕.μ₀ * η ν ν) •
@@ -129,7 +127,6 @@ lemma gradKineticTerm_eq_fieldStrength {d} {𝓕 : FreeSpace} (A : DistElectroma
   ring_nf
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradKineticTerm_sum_inl_eq {d} {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) :
     A.gradKineticTerm 𝓕 ε (Sum.inl 0) =
@@ -151,7 +148,6 @@ lemma gradKineticTerm_sum_inl_eq {d} {𝓕 : FreeSpace}
     simp
   field_simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradKineticTerm_sum_inr_eq {d} {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) (i : Fin d) :
     A.gradKineticTerm 𝓕 ε (Sum.inr i) =

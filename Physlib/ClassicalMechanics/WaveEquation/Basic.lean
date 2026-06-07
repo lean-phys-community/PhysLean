@@ -58,7 +58,7 @@ open InnerProductSpace
 /-- The general form of the wave equation where `c` is the propagation speed. -/
 def WaveEquation {d} (f : Time → Space d → EuclideanSpace ℝ (Fin d))
     (t : Time) (x : Space d) (c : ℝ) : Prop :=
-    c^2 • Δ (f t) x - ∂ₜ (fun t => (∂ₜ (fun t => f t x) t)) t = 0
+    c^2 • Δᵥ (f t) x - ∂ₜ (fun t => (∂ₜ (fun t => f t x) t)) t = 0
 
 /-!
 
@@ -174,7 +174,7 @@ open InnerProductSpace
 
 lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
     (h' : Differentiable ℝ f₀) (i : Fin d) :
-    Space.deriv i (planeWave f₀ c s t) =
+    ∂[i] (planeWave f₀ c s t) =
     s.unit i • fun x => planeWave (fderiv ℝ f₀ · 1) c s t x:= by
   ext x j
   rw [Space.deriv_eq]
@@ -186,14 +186,14 @@ lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
   rw [fderiv_sub_const]
   rw [fderiv_inner_apply]
   simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
-    fderiv_id', ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add, mul_eq_mul_left_iff]
+    fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add, mul_eq_mul_left_iff]
   left
   simp [planeWave_eq]
   repeat fun_prop
 
 lemma planeWave_apply_space_deriv {d f₀ c} {s : Direction d}
     (h' : Differentiable ℝ f₀) (i j : Fin d) :
-    Space.deriv i (fun x => planeWave f₀ c s t x j) =
+    ∂[i] (fun x => planeWave f₀ c s t x j) =
     s.unit i • fun x => planeWave (fderiv ℝ f₀ · 1) c s t x j := by
   funext x
   rw [Space.deriv_eq_fderiv_basis]
@@ -209,7 +209,7 @@ lemma planeWave_apply_space_deriv {d f₀ c} {s : Direction d}
 
 lemma planeWave_space_deriv_space_deriv {d f₀ c} {s : Direction d}
     (h' : ContDiff ℝ 2 f₀) (i : Fin d) :
-    Space.deriv i (Space.deriv i (planeWave f₀ c s t)) =
+    ∂[i] (∂[i] (planeWave f₀ c s t)) =
     s.unit i ^ 2 • fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x := by
   conv_lhs =>
     enter [2, j]
@@ -231,8 +231,8 @@ lemma planeWave_space_deriv_space_deriv {d f₀ c} {s : Direction d}
 
 lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
     (h' : ContDiff ℝ 2 f₀) (i j : Fin d) :
-    Space.deriv i (Space.deriv i (fun x => planeWave f₀ c s t x j)) =
-    (s.unit i) ^ 2 •fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x j := by
+    ∂[i] (∂[i] (fun x => planeWave f₀ c s t x j)) =
+    (s.unit i) ^ 2 • fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x j := by
   conv_lhs =>
     enter [2, j]
     rw [planeWave_apply_space_deriv (h'.differentiable (by simp)) i]
@@ -257,11 +257,13 @@ lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
 -/
 
 lemma planeWave_laplacian {d f₀ c} {s : Direction d} (h' : ContDiff ℝ 2 f₀) :
-    Δ (planeWave f₀ c s t) = fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x := by
+    Δᵥ (planeWave f₀ c s t) = fun x => planeWave (iteratedDeriv 2 f₀ ·) c s t x := by
   ext x j
-  simp [laplacianVec, laplacian]
+  rw [laplacianVec]
   conv_lhs =>
-    enter [2, i]
+    enter [1, 2, i]
+    rw [laplacian_eq_sum_snd_deriv]
+    enter [0, x, 2, i]
     rw [planeWave_apply_space_deriv_space_deriv h']
   simp only [Pi.smul_apply, smul_eq_mul]
   rw [← Finset.sum_mul]
@@ -313,7 +315,7 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
     simp only [fderiv_fun_const, Pi.ofNat_apply, sub_zero, ContinuousLinearMap.coe_comp',
       Function.comp_apply]
     rw [fderiv_inner_apply]
-    simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq]
+    simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
     trans (fderiv ℝ (fun x' => (f₀' x') (s.unit u • 1)) (inner ℝ x s.unit - c * t)) (s.unit u • 1)
     simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
       basis_inner, zero_add, fderiv_eq_smul_deriv, smul_eq_mul, mul_one]
@@ -344,7 +346,6 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
   · exact wave_differentiable
   · fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If `f₀` is a function of `(inner ℝ x s - c * t)`, the fderiv of its components
 with respect to spatial coordinates is equal to the corresponding component of
 the propagation direction `s` times time derivative. -/
@@ -424,7 +425,7 @@ lemma wave_fderiv_inner_eq_inner_fderiv_proj {f₀ : ℝ → EuclideanSpace ℝ 
   rw [fderiv_comp, fderiv_fun_sub]
   simp only [fderiv_fun_const, Pi.zero_apply, sub_zero, ContinuousLinearMap.coe_comp',
     Function.comp_apply, differentiableAt_fun_id, differentiableAt_const, fderiv_inner_apply,
-    ContinuousLinearMap.zero_apply, inner_zero_right, fderiv_id', ContinuousLinearMap.coe_id',
+    ContinuousLinearMap.zero_apply, inner_zero_right, fderiv_fun_id, ContinuousLinearMap.coe_id',
     id_eq, zero_add]
   simp only [fderiv_eq_smul_deriv, PiLp.smul_apply, smul_eq_mul, basis_inner]
   rw [← mul_one (s.unit i), ← smul_eq_mul (s.unit i)]

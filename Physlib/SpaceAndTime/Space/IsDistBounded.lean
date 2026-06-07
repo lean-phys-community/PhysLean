@@ -9,7 +9,6 @@ public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
 public import Physlib.SpaceAndTime.Time.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
-public import Mathlib.Tactic.Cases
 /-!
 
 # Functions on `Space d` which can be made into distributions
@@ -167,7 +166,7 @@ lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
       rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
         Finset.mul_sum]
       ring_nf
-    · apply MeasureTheory.integrable_finset_sum
+    · apply MeasureTheory.integrable_finsetSum
       intro i _
       apply Integrable.const_mul
       specialize h2 (p i) (p_bound i) (g i) η
@@ -288,7 +287,6 @@ instance {D1 : Type} [NormedAddCommGroup D1] [MeasurableSpace D1]
       rcases x
       simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma integrable_time_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
     (η : 𝓢(Time × Space d, ℝ)) :
@@ -307,7 +305,7 @@ lemma integrable_time_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
       rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
         Finset.mul_sum]
       ring_nf
-    · apply MeasureTheory.integrable_finset_sum
+    · apply MeasureTheory.integrable_finsetSum
       intro i _
       apply Integrable.const_mul
       specialize h2 (p i) (p_bound i) (g i) η
@@ -430,7 +428,7 @@ lemma integrable_mul_inv_pow {d : ℕ}
       rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
         Finset.mul_sum]
       ring_nf
-    · apply MeasureTheory.integrable_finset_sum
+    · apply MeasureTheory.integrable_finsetSum
       intro i _
       apply Integrable.const_mul
       apply (hr (p i) (p_bound i) (g i) (pMax_max i)).mono
@@ -1006,7 +1004,6 @@ lemma log_norm {d : ℕ} :
       apply le_trans _ h1
       simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma zpow_smul_self {d : ℕ} (n : ℤ) (hn : - (d - 1 : ℕ) - 1 ≤ n) :
     IsDistBounded (d := d) (fun x => ‖x‖ ^ n • x) := by
   by_cases hzero : n = -1
@@ -1287,7 +1284,6 @@ lemma isDistBounded_mul_inner_of_smul_norm {d : ℕ} {f : Space d → ℝ}
     IsDistBounded (fun x => ⟪y, x⟫_ℝ * f x) := by
   convert hf.isDistBounded_smul_inner_of_smul_norm hae y using 2
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma mul_inner_pow_neg_two {d : ℕ}
     (y : Space d.succ.succ) :

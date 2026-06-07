@@ -461,7 +461,6 @@ lemma singularValues_compoundMatrix_rev (M : Matrix d d ℂ) (k : ℕ)
   obtain ⟨σ, hσ⟩ := singularValues_compoundMatrix_perm M k
   exact ⟨σ.symm j, by rw [← hσ]; simp⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /-- There exists a bijection `σ : Fin (card d) ≃ d` such that
     `singularValues M (σ i) = singularValuesSorted M i` for all `i`. -/
 lemma exists_sorting_equiv (M : Matrix d d ℂ) :
@@ -535,7 +534,6 @@ lemma prod_singularValues_subset_le_sorted_prod (M : Matrix d d ℂ) (k : ℕ)
   intro i j hij
   simpa [g] using congr_arg σ hij
 
-set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 800000 in
 lemma exists_subset_prod_eq_sorted_prod (M : Matrix d d ℂ) (k : ℕ)
     (hk : k ≤ Fintype.card d) :
@@ -548,7 +546,7 @@ lemma exists_subset_prod_eq_sorted_prod (M : Matrix d d ℂ) (k : ℕ)
       have h_perm : Multiset.ofList (List.ofFn (singularValuesSorted M)) = Multiset.ofList (List.ofFn (singularValues M ∘ (Fintype.equivFin d).symm)) := by
         have h_sorted : List.ofFn (singularValuesSorted M) = Multiset.sort (Multiset.map (singularValues M) Finset.univ.val) (· ≥ ·) := by
           refine' List.ext_get _ _ <;> simp
-          exact fun n h₁ h₂ => rfl
+          exact fun n i => rfl
         simp [h_sorted, List.ofFn_eq_map]
         refine' Multiset.eq_of_le_of_card_le _ _ <;> simp [Multiset.le_iff_count]
         intro a; rw [Multiset.count_map]; simp [List.count]
@@ -586,7 +584,7 @@ lemma exists_subset_prod_eq_sorted_prod (M : Matrix d d ℂ) (k : ℕ)
             · exact ⟨Fin.succ (σ.symm ⟨i, by simpa using hi⟩), by simp⟩
         · use Equiv.swap ⟨0, by simp⟩ ⟨1, by simp⟩; simp [List.finRange_succ]
           refine' List.ext_get _ _ <;> simp [Function.comp]
-          intro n hn hn'; rcases n with (_ | _ | n) <;> trivial
+          intro n hn; rcases n with (_ | _ | n) <;> trivial
         · rename_i h₁ h₂ h₃ h₄
           obtain ⟨σ₁, hσ₁⟩ := h₃
           obtain ⟨σ₂, hσ₂⟩ := h₄
@@ -817,8 +815,8 @@ lemma rpow_preserves_weak_log_maj {n : ℕ}
       ∏ i : Fin k, (fun j => y j ^ r) ⟨i.val, by omega⟩ := by
   intro k hk
   convert Real.rpow_le_rpow _ (h_log_maj k hk) hr.le using 1 <;>
-    norm_num [Real.finset_prod_rpow _ _ fun i _ => hx_nn _,
-              Real.finset_prod_rpow _ _ fun i _ => hy_nn _]
+    norm_num [Real.finsetProd_rpow _ _ fun i _ => hx_nn _,
+              Real.finsetProd_rpow _ _ fun i _ => hy_nn _]
   exact Finset.prod_nonneg fun _ _ => hx_nn _
 
 /-
@@ -979,7 +977,6 @@ lemma sum_rpow_singularValues_mul_le (A B : Matrix d d ℂ) {r : ℝ} (hr : 0 < 
 
 /-! ## Hölder inequality for singular values -/
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The finite-sum Hölder inequality applied to sequences of r-th powers of
 sorted singular values.

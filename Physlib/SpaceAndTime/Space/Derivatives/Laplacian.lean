@@ -41,12 +41,8 @@ namespace Space
 -/
 
 /-- The scalar `laplacian` operator. -/
-noncomputable def laplacian {d} (f : Space d → ℝ) :
-    Space d → ℝ := fun x =>
-  -- second derivative of f in i-th coordinate
-  -- ∂²f/∂xᵢ²
-  let df2 i x := ∂[i] (∂[i] f) x
-  ∑ i, df2 i x
+noncomputable def laplacian {d} (f : Space d → ℝ) : Space d → ℝ :=
+    ∇ ⬝ ∇ f
 
 @[inherit_doc laplacian]
 scoped[Space] notation "Δ" => laplacian
@@ -57,11 +53,10 @@ scoped[Space] notation "Δ" => laplacian
 
 -/
 
-lemma laplacian_eq_div_of_grad (f : Space → ℝ) :
-    Δ f = ∇ ⬝ ∇ f := by
-  unfold laplacian div grad Finset.sum
-  simp only [Fin.univ_val_map, List.ofFn_succ, Fin.isValue, Fin.succ_zero_eq_one,
-    Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
+lemma laplacian_eq_sum_snd_deriv {d} (f : Space d → ℝ) :
+    Δ f = fun x => ∑ i, ∂[i] (∂[i] f) x := by
+  unfold laplacian div grad
+  simp
 
 /-!
 
@@ -73,10 +68,19 @@ lemma laplacian_eq_div_of_grad (f : Space → ℝ) :
 noncomputable def laplacianVec {d} (f : Space d → EuclideanSpace ℝ (Fin d)) :
     Space d → EuclideanSpace ℝ (Fin d) := fun x => WithLp.toLp 2 fun i =>
   -- get i-th component of `f`
-  let fi i x := (f x) i
-  Δ (fi i) x
+  Δ (fun x => f x i) x
 
 @[inherit_doc laplacianVec]
-scoped[Space] notation "Δ" => laplacianVec
+scoped[Space] notation "Δᵥ" => laplacianVec
+
+open Physlib Distribution
+
+/-- The distributional `distLaplacian` operator. -/
+noncomputable def distLaplacian {d} :
+    ((Space d) →d[ℝ] ℝ) →ₗ[ℝ] (Space d) →d[ℝ] ℝ :=
+    distDiv ∘ₗ distGrad
+
+@[inherit_doc distLaplacian]
+scoped[Space] notation "Δᵈ" => distLaplacian
 
 end Space

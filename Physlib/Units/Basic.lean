@@ -145,7 +145,8 @@ lemma dimScale_transitive (u1 u2 u3 : UnitChoices) (d : Dimension) :
   repeat rw [← mul_rpow]
   apply NNReal.eq
   simp only [LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val, ChargeUnit.div_eq_val,
-    TemperatureUnit.div_eq_val, NNReal.coe_mul, coe_rpow, coe_mk]
+    TemperatureUnit.div_eq_val, NNReal.coe_mul, coe_rpow]
+  rw [toReal]
   field_simp
 
 @[simp]
@@ -165,7 +166,6 @@ lemma dimScale_ne_zero (u1 u2 : UnitChoices) (d : Dimension) :
     dimScale u1 u2 d ≠ 0 := by
   simp [dimScale]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma dimScale_symm (u1 u2 : UnitChoices) (d : Dimension) :
     dimScale u1 u2 d = (dimScale u2 u1 d)⁻¹ := by
   simp only [dimScale_apply, mul_inv]
@@ -176,13 +176,11 @@ lemma dimScale_symm (u1 u2 : UnitChoices) (d : Dimension) :
   · rw [ChargeUnit.div_symm, inv_rpow]
   · rw [TemperatureUnit.div_symm, inv_rpow]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma dimScale_of_inv_eq_swap (u1 u2 : UnitChoices) (d : Dimension) :
     dimScale u1 u2 d⁻¹ = dimScale u2 u1 d := by
   simp only [map_inv]
   conv_rhs => rw[dimScale_symm]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma smul_dimScale_injective {M : Type} [MulAction ℝ≥0 M] (u1 u2 : UnitChoices) (d : Dimension)
     (m1 m2 : M) :

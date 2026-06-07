@@ -61,7 +61,6 @@ In this implementation we have set `μ₀ = 1`. It is a TODO to introduce this c
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff Physlib
 
@@ -658,7 +657,6 @@ We rewrite the variational gradient as a simple double sum over
 second derivatives of the potential.
 
 -/
-set_option backward.isDefEq.respectTransparency false in
 lemma gradKineticTerm_eq_sum_sum {d} {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d) (x : SpaceTime d) (ha : ContDiff ℝ ∞ A) :
     A.gradKineticTerm 𝓕 x = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
@@ -972,7 +970,6 @@ lemma kineticTerm_hasVarGradientAt {d} {𝓕 : FreeSpace} (A : ElectromagneticPo
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue in
 lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d) (x : SpaceTime d)

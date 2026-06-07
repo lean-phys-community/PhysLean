@@ -57,11 +57,9 @@ variable {W} [NormedAddCommGroup W] [NormedSpace ℝ W]
 noncomputable def div {d} (f : Space d → EuclideanSpace ℝ (Fin d)) :
     Space d → ℝ := fun x =>
   -- get i-th component of `f`
-  let fi i x := (f x) i
   -- derivative of i-th component in i-th coordinate
-  -- ∂fᵢ/∂xⱼ
-  let df i x := ∂[i] (fi i) x
-  ∑ i, df i x
+  -- ∂fᵢ/∂xᵢ
+  ∑ i, ∂[i] (fun x => (f x) i) x
 
 @[inherit_doc div]
 macro (name := divNotation) "∇" "⬝" f:term:100 : term => `(div $f)
@@ -174,7 +172,6 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
 
 open MeasureTheory SchwartzMap InnerProductSpace Distribution
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The divergence of a distribution `(Space d) →d[ℝ] (EuclideanSpace ℝ (Fin d))` as a distribution
   `(Space d) →d[ℝ] ℝ`. -/
 noncomputable def distDiv {d} :
@@ -199,21 +196,23 @@ noncomputable def distDiv {d} :
     ext x
     simp
 
+@[inherit_doc distDiv]
+macro (name := distDivNotation) "∇ᵈ" "⬝" f:term:100 : term => `(distDiv $f)
+
 /-!
 
 ### B.1. Basic equalities
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma distDiv_apply_eq_sum_fderivD {d}
     (f : (Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) (η : 𝓢(Space d, ℝ)) :
-    distDiv f η = ∑ i, fderivD ℝ f η (basis i) i := by
+    (∇ᵈ ⬝ f) η = ∑ i, fderivD ℝ f η (basis i) i := by
   simp [distDiv, EuclideanSpace.inner_single_right]
 
 lemma distDiv_apply_eq_sum_distDeriv {d}
     (f : (Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) (η : 𝓢(Space d, ℝ)) :
-    distDiv f η = ∑ i, distDeriv i f η i := by
+    (∇ᵈ ⬝ f) η = ∑ i, ∂ᵈ[i] f η i := by
   rw [distDiv_apply_eq_sum_fderivD]
   rfl
 
@@ -223,12 +222,11 @@ lemma distDiv_apply_eq_sum_distDeriv {d}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The divergence of a distribution from a bounded function. -/
 lemma distDiv_ofFunction {dm1 : ℕ} {f : Space dm1.succ → EuclideanSpace ℝ (Fin dm1.succ)}
     {hf : IsDistBounded f} (η : 𝓢(Space dm1.succ, ℝ)) :
-    distDiv (distOfFunction f hf) η =
-    - ∫ x : Space dm1.succ, ⟪f x, Space.grad η x⟫_ℝ := by
+    (∇ᵈ ⬝ (distOfFunction f hf)) η =
+    - ∫ x : Space dm1.succ, ⟪f x, ∇ η x⟫_ℝ := by
   rw [distDiv_apply_eq_sum_fderivD]
   conv_rhs =>
     enter [1, 2, x]
@@ -243,7 +241,7 @@ lemma distDiv_ofFunction {dm1 : ℕ} {f : Space dm1.succ → EuclideanSpace ℝ 
         ((fderivCLM ℝ (Space dm1.succ) ℝ) η)) x • f x) j) volume := by
     simp only [PiLp.smul_apply]
     exact (hf.pi_comp j).integrable_space _
-  rw [MeasureTheory.integral_finset_sum]
+  rw [MeasureTheory.integral_finsetSum]
   · simp
     congr
     funext i

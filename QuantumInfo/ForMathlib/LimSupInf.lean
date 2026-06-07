@@ -98,7 +98,7 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
     apply exists_strictMono_seq_le y f; intro x hx_pos; (
     refine' le_of_forall_gt_imp_ge_of_dense fun z hz => _;
     refine' csSup_le _ _ <;> norm_num;
-    · exact ⟨ 0, ⟨ 0, fun _ _ => zero_le _ ⟩ ⟩;
+    · exact ⟨ 0, ⟨ 0, fun _ _ => zero_le ⟩ ⟩;
     · intro b n hn; specialize hc x hx_pos z hz; have := hc.eventually_gt_atTop n
       simp_all only [gt_iff_lt, Filter.eventually_atTop, ge_iff_le]
       obtain ⟨w, h⟩ := this
@@ -120,7 +120,7 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
     rw [ tendsto_order ] at *
     simp_all only [gt_iff_lt, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true,
       ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one, ge_iff_le, inv_pos, add_pos_iff,
-      Nat.cast_pos, Nat.findGreatest_pos, zero_lt_one, or_true, implies_true, not_lt_zero', Filter.eventually_atTop,
+      Nat.cast_pos, Nat.findGreatest_pos, zero_lt_one, or_true, implies_true, not_lt_zero, Filter.eventually_atTop,
       not_isEmpty_of_nonempty, IsEmpty.forall_iff, IsEmpty.exists_iff, true_and, g]
     intro a' a
     exact Filter.eventually_atTop.mp ( h_find_greatest_inf.eventually_gt_atTop ⌈ ( a' : ℝ≥0 ) ⁻¹⌉₊ ) |> fun ⟨ M, hM ⟩ ↦ ⟨ M, fun m hm ↦ by simpa using inv_lt_of_inv_lt₀ a <| by exact lt_of_lt_of_le ( Nat.lt_of_ceil_lt <| hM m hm ) <| mod_cast Nat.le_succ _ ⟩;
@@ -140,7 +140,7 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
       exact hn_mono a;
   have hg_liminf : Filter.liminf (fun n => f (g n) n) Filter.atTop ≤ y := by
     refine' csSup_le _ _ <;> norm_num;
-    · exact ⟨ 0, ⟨ 0, fun _ _ => zero_le _ ⟩ ⟩;
+    · exact ⟨ 0, ⟨ 0, fun _ _ => zero_le ⟩ ⟩;
     · intro b x hx; contrapose! hx
       simp_all only [gt_iff_lt, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true,
         ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one, ge_iff_le, inv_pos, add_pos_iff,
@@ -172,7 +172,6 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
         exact le_sup_right
   exact h_contra g hg_pos hg_tendsto_zero |> not_lt_of_ge hg_liminf;
 
-set_option backward.isDefEq.respectTransparency false in
 /- Version of `exists_liminf_zero_of_forall_liminf_le` that lets you also require `g`
 to have an upper bound. -/
 lemma exists_liminf_zero_of_forall_liminf_le_with_UB (y : ℝ≥0) (f : ℝ≥0 → ℕ → ℝ≥0∞)
@@ -211,7 +210,7 @@ lemma exists_limsup_zero_of_forall_limsup_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
       obtain ⟨left, right⟩ := hM
       exact le_trans ( left.id_le _ ) ha;
     rw [ tendsto_order ]
-    simp_all only [gt_iff_lt, ge_iff_le, not_lt_zero', one_div, Filter.eventually_atTop, not_isEmpty_of_nonempty,
+    simp_all only [gt_iff_lt, ge_iff_le, not_lt_zero, one_div, Filter.eventually_atTop, not_isEmpty_of_nonempty,
       IsEmpty.forall_iff, IsEmpty.exists_iff, implies_true, true_and]
     intro a' a
     obtain ⟨left, right⟩ := hM
@@ -373,7 +372,6 @@ lemma limsup_le_of_block_sequence_bound {α : Type*} (y : ℝ≥0) (f : α → �
     rw [ hg k b hk.1 hk.2 ];
     exact le_trans ( hbound k b hk.1 hk.2 ) ( add_le_add_right ( hK k ( le_of_not_gt fun hk' => by linarith [ hT.monotone hk'.nat_succ_le ] ) ) _ )
 
-set_option backward.isDefEq.respectTransparency false in
 /- Version of `exists_liminf_zero_of_forall_liminf_le_with_UB` that lets you stipulate it for
 two different functions simultaneously, one with liminf and one with limsup. -/
 lemma exists_liminf_zero_of_forall_liminf_limsup_le_with_UB (y₁ y₂ : ℝ≥0) (f₁ f₂ : ℝ≥0 → ℕ → ℝ≥0∞)

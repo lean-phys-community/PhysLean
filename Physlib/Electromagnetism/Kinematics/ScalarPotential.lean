@@ -6,8 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Kinematics.VectorPotential
-public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
-public import Mathlib.Data.Real.Hom
 /-!
 
 # The Scalar Potential
@@ -42,7 +40,6 @@ the scalar potential is non-relativistic and is therefore a function of `Time` a
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 

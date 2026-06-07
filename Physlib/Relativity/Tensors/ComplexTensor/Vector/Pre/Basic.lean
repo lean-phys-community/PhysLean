@@ -25,16 +25,8 @@ open TensorProduct
 
 namespace Lorentz
 
-/-- The representation of `SL(2, ℂ)` on complex vectors corresponding to contravariant
-  Lorentz vectors. In index notation these have an up index `ψⁱ`. -/
-def complexContr : Rep ℂ SL(2, ℂ) := Rep.of ContrℂModule.SL2CRep
-
-/-- The representation of `SL(2, ℂ)` on complex vectors corresponding to contravariant
-  Lorentz vectors. In index notation these have a down index `ψⁱ`. -/
-def complexCo : Rep ℂ SL(2, ℂ) := Rep.of CoℂModule.SL2CRep
-
 /-- The standard basis of complex contravariant Lorentz vectors. -/
-def complexContrBasis : Basis (Fin 1 ⊕ Fin 3) ℂ complexContr :=
+def complexContrBasis : Basis (Fin 1 ⊕ Fin 3) ℂ ContrℂModule :=
   Basis.ofEquivFun ContrℂModule.toFin13ℂEquiv
 
 @[simp]
@@ -45,20 +37,20 @@ lemma complexContrBasis_toFin13ℂ (i :Fin 1 ⊕ Fin 3) :
 
 @[simp]
 lemma complexContrBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
-    (LinearMap.toMatrix complexContrBasis complexContrBasis) (complexContr.ρ M) i j =
+    (LinearMap.toMatrix complexContrBasis complexContrBasis) (ContrℂModule.SL2CRep M) i j =
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M)) i j := by
   rw [LinearMap.toMatrix_apply]
   simp only [complexContrBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
   change (((LorentzGroup.toComplex (SL2C.toLorentzGroup M))) *ᵥ (Pi.single j 1)) i = _
   simp
 
-lemma complexContrBasis_ρ_val (M : SL(2,ℂ)) (v : complexContr) :
-    ((complexContr.ρ M) v).val =
+lemma complexContrBasis_ρ_val (M : SL(2,ℂ)) (v : ContrℂModule) :
+    ((ContrℂModule.SL2CRep M) v).val =
     LorentzGroup.toComplex (SL2C.toLorentzGroup M) *ᵥ v.val := by
   rfl
 
 /-- The standard basis of complex contravariant Lorentz vectors indexed by `Fin 4`. -/
-def complexContrBasisFin4 : Basis (Fin 4) ℂ complexContr :=
+def complexContrBasisFin4 : Basis (Fin 4) ℂ ContrℂModule :=
   Basis.reindex complexContrBasis finSumFinEquiv
 
 lemma complexContrBasisFin4_eq_reindex :
@@ -101,7 +93,7 @@ lemma complexContrBasisFin4_apply_succ (i : Fin 3) :
   fin_cases i <;> decide
 
 /-- The standard basis of complex covariant Lorentz vectors. -/
-def complexCoBasis : Basis (Fin 1 ⊕ Fin 3) ℂ complexCo :=
+def complexCoBasis : Basis (Fin 1 ⊕ Fin 3) ℂ CoℂModule :=
   Basis.ofEquivFun CoℂModule.toFin13ℂEquiv
 
 @[simp]
@@ -111,7 +103,7 @@ lemma complexCoBasis_toFin13ℂ (i :Fin 1 ⊕ Fin 3) : (complexCoBasis i).toFin1
 
 @[simp]
 lemma complexCoBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
-    (LinearMap.toMatrix complexCoBasis complexCoBasis) (complexCo.ρ M) i j =
+    (LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M) i j =
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ i j := by
   rw [LinearMap.toMatrix_apply]
   simp only [complexCoBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply, transpose_apply]
@@ -119,7 +111,7 @@ lemma complexCoBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
   simp
 
 /-- The standard basis of complex covariant Lorentz vectors indexed by `Fin 4`. -/
-def complexCoBasisFin4 : Basis (Fin 4) ℂ complexCo :=
+def complexCoBasisFin4 : Basis (Fin 4) ℂ CoℂModule :=
   Basis.reindex complexCoBasis finSumFinEquiv
 
 lemma complexCoBasisFin4_eq_reindex :
@@ -160,10 +152,9 @@ lemma complexCoBasisFin4_apply_three :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The semilinear map including real Lorentz vectors into complex contravariant
   lorentz vectors. -/
-def inclCongrRealLorentz : ContrMod 3 →ₛₗ[Complex.ofRealHom] complexContr where
+def inclCongrRealLorentz : ContrMod 3 →ₛₗ[Complex.ofRealHom] ContrℂModule where
   toFun v := {val := ofReal ∘ v.toFin1dℝ}
   map_add' x y := by
     apply Lorentz.ContrℂModule.ext
@@ -197,16 +188,15 @@ lemma complexContrBasis_of_real (i : Fin 1 ⊕ Fin 3) :
     simp [h]
 
 lemma inclCongrRealLorentz_ρ (M : SL(2, ℂ)) (v : ContrMod 3) :
-    (complexContr.ρ M) (inclCongrRealLorentz v) =
+    (ContrℂModule.SL2CRep M) (inclCongrRealLorentz v) =
     inclCongrRealLorentz ((Contr 3).ρ (SL2C.toLorentzGroup M) v) := by
   apply Lorentz.ContrℂModule.ext
   rw [complexContrBasis_ρ_val, inclCongrRealLorentz_val, inclCongrRealLorentz_val]
   rw [LorentzGroup.toComplex_mulVec_ofReal]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma SL2CRep_ρ_basis (M : SL(2, ℂ)) (i : Fin 1 ⊕ Fin 3) :
-    (complexContr.ρ M) (complexContrBasis i) =
+    (ContrℂModule.SL2CRep M) (complexContrBasis i) =
     ∑ j, (SL2C.toLorentzGroup M).1 j i •
     complexContrBasis j := by
   rw [complexContrBasis_of_real, inclCongrRealLorentz_ρ]

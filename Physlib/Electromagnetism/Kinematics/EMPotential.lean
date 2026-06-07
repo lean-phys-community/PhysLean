@@ -5,10 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.SpaceTime.Derivatives
-public import Physlib.SpaceAndTime.Space.Derivatives.Curl
 public import Physlib.Mathematics.VariationalCalculus.HasVarAdjDeriv
-public import Physlib.Relativity.Tensors.Elab
 public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
 public import Physlib.Mathematics.Calculus.ParametricIntegration
 /-!
@@ -54,7 +51,6 @@ spacetime to contravariant Lorentz vectors.
 
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor
 
@@ -403,7 +399,6 @@ Under a Lorentz transformation `Λ`, this transforms as
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime d}
     (Λ : LorentzGroup d) (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) :
     ∂_ μ (Λ • A) x ν = ∑ κ, ∑ ρ, (Λ.1 ν κ * Λ⁻¹.1 ρ μ) * ∂_ ρ A (Λ⁻¹ • x) κ := by
@@ -468,7 +463,6 @@ and derive the equations of motion.
 -/
 
 open ContDiff
-set_option backward.isDefEq.respectTransparency false in
 lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime d → Lorentz.Vector d)
     (hA : ContDiff ℝ ∞ A) :
         HasVarAdjDerivAt (fun (A' : SpaceTime d → Lorentz.Vector d) x => A' x μ)
@@ -584,7 +578,7 @@ open Tensorial
 lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentiable ℝ A)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {tensorDeriv A.val x | [μ] [ν]}ᵀ = ∂_ μ A x ν := by
-  trans  (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A x) (μ, ν); swap
+  trans (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A x) (μ, ν); swap
   · simp [deriv, Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
   rw [deriv_eq_tensorDeriv _ hA]
   generalize (tensorDeriv A.val x) = t
@@ -592,20 +586,20 @@ lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentia
   induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
   · simp only [LinearEquiv.apply_symm_apply, basis_apply, evalT_pure, Pure.evalP, map_smul,
       toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
-    change _ * ((realLorentzTensor d).basis (Color.up)).repr
-      ((realLorentzTensor d).basis (Color.up) (b 1)) ν = _
+    change _ * (Lorentz.contrBasis d).repr (Lorentz.contrBasis d (b 1)) ν = _
     /- Transforming the basis -/
     let e : ComponentIdx (Fin.append ![Color.down] ![Color.up])
       ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prod.trans <|
       Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
-    have h1 :  Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis =
+    have h1 : Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis =
         (((Tensor.basis (Fin.append ![Color.down] ![Color.up]))).map toTensor.symm).reindex e := by
       ext ⟨i, j⟩
       simp_rw [Tensorial.basis_map_prod, Basis.tensorProduct_apply,
         ← Lorentz.Vector.toTensor_symm_basis, ← Lorentz.CoVector.toTensor_symm_basis, e]
       simp
     simp [Pure.basisVector, h1, Finsupp.single_apply]
-    grind [show e b = (b 0,  b 1) from rfl]
+    by_cases hμ : b 0 = μ <;> by_cases hν : b 1 = ν <;>
+    simp_all [Equiv.eq_symm_apply, show e b = (b 0, b 1) from rfl]
   · simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
   · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
   · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
@@ -616,7 +610,7 @@ lemma deriv_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (x : SpaceTime d) :
     (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (deriv A x) μν =
     ∂_ μν.1 A x μν.2 := by
-  rcases μν  with ⟨μ, ν⟩
+  rcases μν with ⟨μ, ν⟩
   simp [deriv, Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
 
 lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)

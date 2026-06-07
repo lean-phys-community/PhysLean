@@ -5,9 +5,6 @@ Authors: Alex Meiburg
 -/
 module
 
-public import Mathlib.Data.Fintype.Defs
-public import Mathlib.Data.Real.Basic
-public import Mathlib.MeasureTheory.Constructions.BorelSpace.Real
 public import Mathlib.MeasureTheory.Constructions.Pi
 public import Mathlib.MeasureTheory.Constructions.BorelSpace.WithTop
 public import Physlib.Meta.Sorry
@@ -33,14 +30,14 @@ structure MicroHamiltonian (D : Type) where
   /-- For extrinsic parameters D (e.g. the number of particles of different chemical species,
     the shape of the box), how many continuous degrees of freedom are there? -/
   dim : D → Type
-  /-- We require that the number of degrees of freedom is finite. -/
+  /-- The number of degrees of freedom is finite. -/
   [dim_fin : ∀ d, Fintype (dim d)]
   /-- Given the configuration, what is its energy? -/
   H : {d : D} → (dim d → ℝ) → WithTop ℝ
   --The energy function must be measurable (else the partition function integral is meaningless).
   measurable_H : ∀ d, Measurable (@H d)
 
-/-- We add the dim_fin to the instance cache so that things like the measure can be synthesized -/
+/-- The dim_fin to the instance cache is added so that things like the measure can be synthesized -/
 instance microHamiltonianFintype {D} (H : MicroHamiltonian D) (d : D) : Fintype (H.dim d) :=
   H.dim_fin d
 

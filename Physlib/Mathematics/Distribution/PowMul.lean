@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
+public import Mathlib.Analysis.Calculus.ContDiff.Bounds
 /-!
 
 ## The multiple of a Schwartz map by `x`
@@ -37,19 +38,17 @@ lemma norm_iteratedFDeriv_ofRealCLM {x} (i : ℕ) :
     induction i with
     | zero =>
       simp [iteratedFDeriv_succ_eq_comp_right]
-      rw [@ContinuousLinearMap.norm_def]
-      apply ContinuousLinearMap.opNorm_eq_of_bounds
-      · simp
-      · intro x
-        simp only [fderiv_eq_smul_deriv, Real.norm_eq_abs, one_mul]
-        rw [← @RCLike.ofRealCLM_apply]
-        simp [- RCLike.ofRealCLM_apply, norm_smul]
-        simp
-      · intro N hN h
-        have h1 := h 1
-        rw [← RCLike.ofRealCLM_apply] at h1
-        simp [- RCLike.ofRealCLM_apply] at h1
-        simpa using h1
+      rw [ContinuousMultilinearMap.norm_def]
+      rw [← RCLike.ofRealCLM_apply]
+      simp [-RCLike.ofRealCLM_apply, Real.norm_eq_abs]
+      simp only [Fin.isValue, RCLike.ofRealCLM_apply, norm_algebraMap', Real.norm_eq_abs]
+      apply le_antisymm
+      · apply csInf_le ⟨0, fun c hc => hc.1⟩
+        exact ⟨le_of_lt one_pos, fun m => by rw [one_mul]⟩
+      · apply le_csInf
+        · exact ⟨1, le_of_lt one_pos, fun m => by rw [one_mul]⟩
+        · intro c ⟨_, hc⟩
+          simpa using hc (fun _ => 1)
     | succ i ih =>
       rw [iteratedFDeriv_succ_eq_comp_right]
       simp only [Nat.succ_eq_add_one, ContinuousLinearMap.fderiv, Function.comp_apply,

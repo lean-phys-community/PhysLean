@@ -23,9 +23,9 @@ noncomputable section
 open Module
 open scoped InnerProductSpace
 
-variable  {M N : Type}
-      [NormedAddCommGroup M] [NormedSpace ℝ M] [ProperSpace M]
-       [NormedAddCommGroup N] [NormedSpace ℝ N]
+variable {M N : Type}
+    [NormedAddCommGroup M] [NormedSpace ℝ M] [ProperSpace M]
+    [NormedAddCommGroup N] [NormedSpace ℝ N]
 open MeasureTheory
 lemma hasFDerivAt_parametric_intervalIntegral_of_contDiff
     {F : M → ℝ → N} (hf : ContDiff ℝ 1 ↿F) (x₀ : M) :
@@ -85,7 +85,7 @@ lemma fderiv_apply_parameteric_intervalIntegral
 
 lemma fderiv_parameteric_intervalIntegral
     {F : M → ℝ → N} (hf : ContDiff ℝ 1 ↿F) (x₀ : M) :
-    fderiv ℝ (fun (x : M) => ∫ (t : ℝ) in 0..1, F x t ∂(volume))  =
+    fderiv ℝ (fun (x : M) => ∫ (t : ℝ) in 0..1, F x t ∂(volume)) =
       fun x => ∫ (t : ℝ) in 0..1, fderiv ℝ (F · t) x ∂(volume) := by
   have h := hasFDerivAt_parametric_intervalIntegral_of_contDiff hf x₀
   ext1 x
@@ -101,7 +101,7 @@ lemma contDiff_one_parametric_intervalIntegral_of_contDiff
     {F : M → ℝ → N} (hf : ContDiff ℝ 1 ↿F) :
     ContDiff ℝ 1 (fun (x : M) => ∫ (t : ℝ) in 0..1, F x t ∂(volume)) := by
   rw [contDiff_one_iff_hasFDerivAt]
-  use fun x₀ => (∫ (t : ℝ) in 0..1, fderiv ℝ  (F · t) x₀ ∂(volume))
+  use fun x₀ => (∫ (t : ℝ) in 0..1, fderiv ℝ (F · t) x₀ ∂(volume))
   apply And.intro
   · fun_prop
   · intro x

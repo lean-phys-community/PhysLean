@@ -26,6 +26,7 @@ def Imports.RedundantImports (imp : Import) : MetaM UInt32 := do
 
 unsafe def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   let imports ← allImports
   let _ ← CoreM.withImportModules #[`Physlib] (imports.mapM Imports.RedundantImports).run'
   return 0

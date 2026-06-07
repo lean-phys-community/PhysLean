@@ -5,9 +5,6 @@ Authors: Pranav Magdum
 -/
 module
 
-public import Mathlib.Data.Real.Basic
-public import Mathlib.Analysis.Calculus.Deriv.Basic
-public import Physlib.Meta.TODO.Basic
 public import Physlib.Meta.Sorry
 public import Physlib.SpaceAndTime.Time.Derivatives
 /-!
@@ -50,7 +47,6 @@ Newton’s law → zero acceleration → constant velocity → constant energy.
   - D.2. Energy conservation
 
 ## iv. References
-
 
 -/
 

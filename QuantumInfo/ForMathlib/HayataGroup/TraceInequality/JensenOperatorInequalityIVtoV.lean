@@ -58,6 +58,7 @@ def CondV (f : ℝ → ℝ) : Prop :=
     cfcR (ℋ := ℋ) f (star X * A * X + star Y * B * Y) ≤
       star X * cfcR (ℋ := ℋ) f A * X + star Y * cfcR (ℋ := ℋ) f B * Y
 
+omit [CompleteSpace ℋ] in
 /-- `L (HSum ℋ)` is nontrivial once `L ℋ` is. -/
 private theorem nontrivial_hsumL : Nontrivial (L (HSum ℋ)) := by
   have h_not_sub : ¬ Subsingleton ℋ := by
@@ -89,7 +90,7 @@ private lemma blockDiagonal_selfAdjoint {A B : L ℋ}
   change star (blockDiagonal (ℋ := ℋ) A B) = blockDiagonal (ℋ := ℋ) A B
   simp [blockDiagonal_star, hA.star_eq, hB.star_eq]
 
-omit [Nontrivial ℋ] in
+omit [Nontrivial ℋ] [CompleteSpace ℋ] in
 private lemma blockDiagonal_eq_blockOp (A B : L ℋ) :
     blockDiagonal (ℋ := ℋ) A B = blockOp (ℋ := ℋ) A 0 0 B := by
   ext z i

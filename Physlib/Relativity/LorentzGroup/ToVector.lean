@@ -90,7 +90,6 @@ lemma toVector_eq_basis_iff_timeComponent_eq_one {d : ℕ} (Λ : LorentzGroup d)
       rw [h1]
       simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma smul_timeComponent_eq_toVector_minkowskiProduct {d : ℕ} (Λ : LorentzGroup d)
     (v : Lorentz.Vector d) :
     (Λ • v).timeComponent = ⟪toVector Λ⁻¹, v⟫ₘ := by

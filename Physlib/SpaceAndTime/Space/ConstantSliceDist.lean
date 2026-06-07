@@ -8,6 +8,7 @@ module
 public import Mathlib.Analysis.Calculus.ContDiff.FiniteDimension
 public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 public import Physlib.SpaceAndTime.Space.Slice
+public import Mathlib.Analysis.Calculus.ParametricIntegral
 /-!
 
 # Constant slice distributions
@@ -73,7 +74,6 @@ open MeasureTheory Real
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma schwartzMap_slice_bound {n m} {d : ℕ} (i : Fin d.succ) :
     ∃ rt, ∀ (η : 𝓢(Space d.succ, ℝ)), ∃ k,
     Integrable (fun x : ℝ => ‖((1 + ‖x‖) ^ rt)⁻¹‖) volume ∧
@@ -175,7 +175,6 @@ lemma schwartzMap_integrable_slice_symm {d : ℕ} (i : Fin d.succ) (η : 𝓢(Sp
   · fun_prop
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 set_option maxSynthPendingDepth 10000 in
 lemma schwartzMap_fderiv_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ, ℝ)) (x : Space d)
     (i : Fin d.succ) :
@@ -212,7 +211,7 @@ lemma schwartzMap_fderiv_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ
             congr
             rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
             simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
-              fderiv_id']
+              fderiv_fun_id]
             fun_prop
             fun_prop
 
@@ -285,7 +284,6 @@ lemma continuous_schwartzMap_slice_integral {d} (i : Fin d.succ) (η : 𝓢(Spac
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, ℝ)) (i : Fin d.succ)
     (x₀ : Space d) :
     HasFDerivAt (fun x => ∫ (r : ℝ), η ((slice i).symm (r, x)))
@@ -351,7 +349,7 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
           congr 1
           rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
           simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
-            fderiv_id']
+            fderiv_fun_id]
           fun_prop
           fun_prop
     apply le_of_eq
@@ -530,7 +528,6 @@ lemma schwartzMap_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n : ℕ) (η 
   refine mul_le_mul ?_ (by rfl) (by positivity) (by positivity)
   exact norm_integral_le_integral_norm fun a => iteratedFDeriv ℝ n ⇑η _
 
-set_option backward.isDefEq.respectTransparency false in
 lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) (i : Fin d.succ) :
     ∃ rt, ∀ (η : 𝓢(Space d.succ, ℝ)),∀ (x : Space d),
     Integrable (fun x : ℝ => ‖((1 + ‖x‖) ^ rt)⁻¹‖) volume ∧
@@ -597,7 +594,6 @@ lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The continuous linear map taking a Schwartz map and integrating over the `i`th component,
   to give a Schwartz map of one dimension lower. -/
 def sliceSchwartz {d : ℕ} (i : Fin d.succ) :

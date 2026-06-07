@@ -259,7 +259,7 @@ lemma congr {F G : (X → U) → (Y → V)} {F' } {u : X → U}
             one_smul]
           rw [← fderiv_apply_one_eq_deriv]
           rw [DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
-        simp only [fderiv_id', fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
+        simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
           ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
         fun_prop
   adjoint := by
@@ -482,7 +482,6 @@ protected lemma deriv (F : (ℝ → U) → (ℝ → V)) (F') (u) (hF : HasVarAdj
     (fun ψ x => F' (fun x' => - deriv ψ x') x) u :=
   comp (F:=deriv) (G:=F) (hF := deriv' (F u) hF.apply_smooth_self) (hG := hF)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fmap
     {U} [NormedAddCommGroup U] [NormedSpace ℝ U] [InnerProductSpace' ℝ U]
     {V} [NormedAddCommGroup V] [NormedSpace ℝ V] [InnerProductSpace' ℝ V]
@@ -799,14 +798,14 @@ protected lemma gradient {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
     fun_prop
   · intro φ1 φ2 h1 h2
     rw [Space.gradient_eq_grad]
-    rw [Space.grad_add, Space.grad_eq_gradiant, Space.grad_eq_gradiant]
+    rw [Space.grad_add, Space.grad_eq_gradient, Space.grad_eq_gradient]
     simp
     rfl
     · exact h1.differentiable (by simp)
     · exact h2.differentiable (by simp)
   · intro c φ hφ
     rw [Space.gradient_eq_grad]
-    rw [Space.grad_smul, Space.grad_eq_gradiant]
+    rw [Space.grad_smul, Space.grad_eq_gradient]
     simp
     rfl
     exact hφ.differentiable (by simp)

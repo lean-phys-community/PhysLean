@@ -5,15 +5,11 @@ Authors: Alex Meiburg, Leonardo A. Lessa, Rodolfo R. Soldati
 -/
 module
 
+public import QuantumInfo.Channels.Pinching
+public import QuantumInfo.ForMathlib.HermitianMat.Jordan
+public import QuantumInfo.ForMathlib.LimSupInf
 public import QuantumInfo.ResourceTheory.FreeState
 public import QuantumInfo.ResourceTheory.HypothesisTesting
-public import QuantumInfo.Channels.Pinching
-public import QuantumInfo.ForMathlib.Matrix
-public import QuantumInfo.ForMathlib.LimSupInf
-public import QuantumInfo.ForMathlib.HermitianMat
-public import QuantumInfo.ForMathlib.HermitianMat.Jordan
-
-public import Mathlib.Tactic.Bound
 
 @[expose] public section
 
@@ -101,7 +97,10 @@ private theorem Lemma6 {m : ℕ} (hm : 0 < m) (ρ σf : MState (H i)) (σₘ : M
           linarith
         have hz2 : (ENNReal.ofNNReal ⟨α - 1, pf2⟩) ≠ 0 := by
           --TODO: should be `bound`, ideally
-          simp [NNReal.eq_iff]
+          simp
+          intro h
+          have := congrArg Subtype.val h
+          simp at this
           linarith
         finiteness
 
@@ -185,7 +184,6 @@ open PosSemidef
 -- TODO: Commutation and order relations about `proj_le` specified in the text
 -- between Eqs. (S77) and (S78)
 
-set_option backward.isDefEq.respectTransparency false in
 open scoped HermitianMat in
 theorem LemmaS2liminf {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
   {d : ℕ → Type*} [∀ n, Fintype (d n)] [∀ n, DecidableEq (d n)] (ρ : (n : ℕ) → MState (d n)) (σ : (n : ℕ) → MState (d n))
@@ -254,7 +252,6 @@ theorem LemmaS2liminf {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
   rw [HermitianMat.inner_comm, ← MState.exp_val]
   exact (ρ n).exp_val_nonneg ((Real.exp (n * (Rinf + ε4)) • (σ n).M).projLE_nonneg (ρ n).M)
 
-set_option backward.isDefEq.respectTransparency false in
 open scoped HermitianMat in
 theorem LemmaS2limsup {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
   {d : ℕ → Type*} [∀ n, Fintype (d n)] [∀ n, DecidableEq (d n)] (ρ : (n : ℕ) → MState (d n)) (σ : (n : ℕ) → MState (d n))
@@ -434,7 +431,6 @@ private lemma commute_aux (n : ℕ) {x : ℝ}
   rw [HermitianMat.projLT_def] at hE
   commutes
 
-set_option backward.isDefEq.respectTransparency false in
 open HermMul in
 private lemma rexp_mul_smul_proj_lt_mul_sub_le_mul_sub {n : ℕ} {x : ℝ}
   {E ℰ σ : HermitianMat d ℂ} (hℰσ : Commute ℰ.mat σ.mat) (hx : 0 < x)
@@ -505,7 +501,6 @@ private lemma rexp_mul_smul_proj_lt_mul_sub_le_mul_sub {n : ℕ} {x : ℝ}
     change 0 < Real.exp (n * x) * gi
     positivity
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma rexp_mul_smul_proj_lt_mul_sub_le_mul_sub' {n : ℕ} {x : ℝ} {y : ℝ}
   {E ℰ σ : HermitianMat d ℂ} (hℰσ : Commute ℰ.mat σ.mat)
   (hℰ : ℰ.mat.PosSemidef) (hσ : σ.mat.PosDef)
@@ -788,7 +783,6 @@ private theorem log_le_f (n : ℕ) (lam : ℝ) : Real.log lam ≤ f_map i n lam 
   _ = _ := by
     rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- (S46), part 2 -/
 private theorem f_le_log (n : ℕ) (lam : ℝ) : f_map i n lam < Real.log lam + σ₁_c i n :=
   calc
@@ -844,7 +838,6 @@ private theorem σ'_posdef : (σ' ρ ε m σ n).m.PosDef := by
   · apply UnitalPretheory.PosDef.npow (σ₁_pos i)
   · norm_num [← Prob.ne_iff]
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem hσ'n_eq_sum_third : (σ' ρ ε m σ n).M =
     (1 / 3 : ℝ) • («σ̃» m σ n) + (1 / 3 : ℝ) • («σ⋆» ρ ε n) + (1 / 3 : ℝ) • ((σ₁ i) ⊗ᵣ^[n]) := by
   unfold σ'
@@ -855,7 +848,6 @@ private theorem hσ'n_eq_sum_third : (σ' ρ ε m σ n).M =
   dsimp [Mixable.to_U]
   norm_num only [one_div, Prob.coe_one_minus, smul_add, smul_smul]
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem hσ₁_le_σ' : (1 / 3 : ℝ) • ((σ₁ i) ⊗ᵣ^[n]).M ≤ (σ' ρ ε m σ n).M := by
     rw [hσ'n_eq_sum_third]
     apply le_add_of_nonneg_left
@@ -902,7 +894,6 @@ variable (m : ℕ) (σ : (n : ℕ) → IsFree (i := i ^ n)) (n : ℕ)
 --We're now finally ready to define the main sequence with the properties we want, σ''.
 --This is the normalized version of σ''_unnormalized, which gives a state because that sequence is
 -- already PosDef
-set_option backward.isDefEq.respectTransparency false in
 private def σ'' : (n : ℕ) → MState (H (i ^ n)) := fun n ↦ {
   --TODO make this its own definition: Normalizing a matrix to give a tr-1 op.
   M := (σ''_unnormalized ρ ε m σ n).trace⁻¹ • (σ''_unnormalized ρ ε m σ n)
@@ -923,7 +914,6 @@ private lemma σ''_posdef n : (σ'' ρ ε m σ n).M.mat.PosDef := by
   have := (σ''_tr_bounds ρ ε m σ n).left
   positivity
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma σ'_le_σ'' (n) : Real.exp (-σ₁_c i n) • (σ' ρ ε m σ n).M ≤ σ'' ρ ε m σ n := by
   dsimp [σ'']
   set x := (σ''_unnormalized ρ ε m σ n).trace
@@ -944,7 +934,6 @@ private lemma σ'_le_σ'' (n) : Real.exp (-σ₁_c i n) • (σ' ρ ε m σ n).M
   · positivity
   · positivity
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma σ''_le_σ' (n) : σ'' ρ ε m σ n ≤ Real.exp (σ₁_c i n) • (σ' ρ ε m σ n).M := by
     dsimp [σ'']
     set x := (σ''_unnormalized ρ ε m σ n).trace
@@ -961,7 +950,6 @@ private lemma σ''_le_σ' (n) : σ'' ρ ε m σ n ≤ Real.exp (σ₁_c i n) •
     suffices 0 ≤ 1 - x⁻¹ by positivity
     simpa using inv_le_one_of_one_le₀ (σ''_tr_bounds ρ ε m σ n).left
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem «σ''_ge_σ⋆» n : σ'' ρ ε m σ n ≥ (Real.exp (-σ₁_c i n) / 3) • («σ⋆» ρ ε n).M := by
     grw [ge_iff_le, ← σ'_le_σ'', div_eq_mul_inv, ← smul_smul, ← one_div]
     rw [smul_le_smul_iff_of_pos_left (by positivity), hσ'n_eq_sum_third]
@@ -972,7 +960,6 @@ private theorem «σ''_ge_σ⋆» n : σ'' ρ ε m σ n ≥ (Real.exp (-σ₁_c 
     · have := ((σ₁ i) ⊗ᵣ^[n]).nonneg
       positivity
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem «σ''_ge_σ̃» n : σ'' ρ ε m σ n ≥ (Real.exp (-σ₁_c i n) / 3) • («σ̃» m σ n).M := by
     grw [ge_iff_le, ← σ'_le_σ'', div_eq_mul_inv, ← smul_smul, ← one_div]
     rw [smul_le_smul_iff_of_pos_left (by positivity), hσ'n_eq_sum_third]
@@ -1133,7 +1120,7 @@ private theorem EquationS62
         (f := fun n ↦ ⟨σ₁_c i n + Real.log 3, add_nonneg (σ₁_c_pos i n).le (Real.log_nonneg (by norm_num))⟩)
         (σ₁_c_littleO i)
       intro n
-      rw [coe_mk, neg_add', Real.exp_sub, Real.exp_log (by positivity)]
+      rw [toReal, neg_add', Real.exp_sub, Real.exp_log (by positivity)]
       exact «σ''_ge_σ⋆» ρ ε m σ n
     _ = _ := by --(S69)
       congr! 4 with n
@@ -1162,7 +1149,7 @@ private theorem EquationS62
         (f := fun n ↦ ⟨σ₁_c i n + Real.log 3, add_nonneg (σ₁_c_pos i n).le (Real.log_nonneg (by norm_num))⟩)
         (σ₁_c_littleO i)
       intro n
-      rw [coe_mk, neg_add', Real.exp_sub, Real.exp_log (by positivity)]
+      rw [toReal, neg_add', Real.exp_sub, Real.exp_log (by positivity)]
       exact «σ''_ge_σ̃» ρ ε m σ n
     _ ≤ _ := by --(S72)
       have _ := HermitianMat.nonSingular_of_posDef (σ₁_pos i)
@@ -1207,7 +1194,6 @@ private theorem EquationS62
     · intro _ _ hxy; grind
     · exact hEComm ε2 n
     · grw [hR1R2, ← hε₀, add_zero]
-      exact hR2
   clear hEComm
 
   have Esum : E1 + E2 + E3 = 1 := by
@@ -1592,7 +1578,7 @@ private theorem EquationS62
       dsimp
       conv =>
         enter [2, 1, n]
-        rw [← ENNReal.ofReal_eq_coe_nnreal]
+        exact (ENNReal.ofReal_eq_coe_nnreal _).symm
       refine ENNReal.ofReal_mono.map_liminf_of_continuousAt _ ?_ ?_ ?_
       · apply ENNReal.continuous_ofReal.continuousAt
       · use 1
@@ -1788,8 +1774,9 @@ theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (
     · have : ε'.val < 1 := hε'₂.trans hε.2
       rcases ε' with ⟨ε', hε'₁, hε'₂⟩
       simp only [Prob.toNNReal, Prob.coe_one_minus, ENNReal.coe_eq_zero]
-      rw [Subtype.ext_iff, val_eq_coe, val_eq_coe, coe_zero, coe_mk]
-      grind
+      rw [Subtype.ext_iff, val_eq_coe, val_eq_coe, coe_zero]
+      simp [toReal]
+      linarith
 
   let ε₀ : ℝ := (R2 ρ σ - R1 ρ ε).toReal * (ε - ε') / (1 - ε)
   have hε₀ : 0 < ε₀ :=
@@ -1815,7 +1802,7 @@ theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (
   -- m exists because R2 + ε₀ is strictly above R2, which is the liminf.
   obtain ⟨m, hm⟩ :=
     have h : R2 ρ σ < R2 ρ σ + .ofNNReal ⟨ε₀, hε₀.le⟩ :=
-      ENNReal.lt_add_right hR2 (by simp [← NNReal.coe_eq_zero, hε₀.ne'])
+      ENNReal.lt_add_right hR2 (by simp [← NNReal.coe_eq_zero, toReal, hε₀.ne'])
     (Filter.frequently_lt_of_liminf_lt (h := h)).forall_exists_of_atTop 1
 
   have qRel_σ''_le_σ' n : 𝐃(ρ ⊗ᵣ^[n]‖σ'' ρ ε m σ n) ≤ 𝐃(ρ ⊗ᵣ^[n]‖σ' ρ ε m σ n) + ENNReal.ofReal (σ₁_c i n) := by
@@ -1889,7 +1876,8 @@ theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (
     _ ≤ ENNReal.ofReal (Real.log (n + 1)) := by
       grw [hdle n]
       · exact_mod_cast le_rfl
-      · simp [hdpos n]
+      · norm_cast
+        exact hdpos n
 
   -- Eq. (S61)
   have hliminf : Filter.atTop.liminf (fun n ↦ 𝐃(ρ ⊗ᵣ^[n]‖σ' ρ ε m σ n) / n) =
@@ -1982,7 +1970,7 @@ theorem Lemma7_gap (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) {ε
   · exact (SteinsLemma.Lemma7 ρ hε σ h ε' hε').choose_spec
   · push Not at h
     rw [tsub_eq_zero_of_le h.le]
-    exact zero_le _
+    exact zero_le
 
 end Lemma7
 
@@ -2028,7 +2016,9 @@ theorem GeneralizedQSteinsLemma {i : ι} (ρ : MState (H i)) {ε : Prob} (hε : 
         apply ENNReal.Tendsto.mul_const
         · simp only [ENNReal.tendsto_pow_atTop_nhds_zero_iff]
           --This should just be `simp` or `bound` at this point. TODO.
-          simp [Prob.toNNReal, ← NNReal.coe_lt_coe, hε'.1]
+          simp [Prob.toNNReal]
+          change (1 - ε' : ℝ) < 1
+          simp [hε'.1]
         · right; exact ENNReal.sub_ne_top hσ₁_top
       suffices h : ∀ (m k : ℕ), R2 ρ (σₖ (m + k)) - R1 ρ ε ≤ (1 - ε')^k * (R2 ρ (σₖ m) - R1 ρ ε) by
         convert h 0; simp

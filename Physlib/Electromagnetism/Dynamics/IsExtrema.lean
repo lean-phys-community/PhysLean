@@ -48,7 +48,6 @@ Maxwell's equations with sources, i.e. Gauss's law and Ampère's law.
 @[expose] public section
 namespace Electromagnetism
 open Module realLorentzTensor
-open IndexNotation
 open TensorSpecies
 open Tensor ContDiff
 
@@ -126,7 +125,6 @@ $$\frac{1}{\mu_0} \partial_\mu F^{\mu \nu} - J^{\nu} = 0.$$
 
 attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue
 
-set_option backward.isDefEq.respectTransparency false in
 lemma isExtrema_iff_tensors {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J) :

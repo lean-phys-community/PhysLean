@@ -70,7 +70,6 @@ variable {ι ι1 : Type} [MeasurableSpace ι]
 noncomputable def mathematicalHelmholtzFreeEnergy (T : Temperature) : ℝ :=
   - kB * T.val * Real.log (𝓒.mathematicalPartitionFunction T)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The relationship between the physical Helmholtz Free Energy and the Helmholtz Potential. -/
 lemma helmholtzFreeEnergy_eq_helmholtzMathematicalFreeEnergy_add_correction (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
@@ -85,7 +84,6 @@ lemma helmholtzFreeEnergy_eq_helmholtzMathematicalFreeEnergy_add_correction (T :
     simp
   simp [sub_eq_add_neg, h_log_pow, mul_add, add_comm, mul_comm, mul_left_comm, mul_assoc]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- General identity: S_diff = kB β ⟨E⟩ + kB log Z_math.
 This connects the differential entropy to the mean energy and the mathematical partition function.
 Integrability of `log (probability …)` follows from the pointwise formula. -/
@@ -137,7 +135,9 @@ lemma kB_mul_beta (T : Temperature) (hT : 0 < T.val) :
     exact_mod_cast (ne_of_gt hT)
   simp [Temperature.β]
   field_simp [Temperature.β, hkB, hT0, toReal]
-  rfl
+  rw [NNReal.toReal]
+  field_simp
+  simp [toReal, hT0]
 
 /-- Fundamental relation between thermodynamic and differential entropy:
 `S_thermo = S_diff - kB * dof * log h`. -/
@@ -319,7 +319,6 @@ theorem helmholtzFreeEnergy_eq_meanEnergy_sub_temp_mul_thermodynamicEntropy
           mul_comm, mul_left_comm, mul_assoc]
   rw [hF_rewrite, h_rhs]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Theorem: Helmholtz identity with semi–classical correction term**.
 Physical identity (always true for `T > 0`) :
   (U - F)/T = S_thermo
@@ -716,7 +715,6 @@ open scoped Topology Filter
 
 /-! ## Fluctuations: variance identity -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The identity Var(E) = ⟨E²⟩ - ⟨E⟩². -/
 theorem energyVariance_eq_meanSquareEnergy_sub_meanEnergy_sq
     (𝓒 : CanonicalEnsemble ι) (T : Temperature) [IsProbabilityMeasure (𝓒.μProd T)]
