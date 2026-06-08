@@ -144,7 +144,7 @@ The references for the numerical definitions used below are:
   the international nautical mile:
   https://doi.org/10.6028/NIST.HB.44-2023
 * IAU 2012 Resolution B2 for the astronomical unit:
-  https://www.iau.org/static/resolutions/IAU2012_English.pdf
+  https://iauarchive.eso.org/static/resolutions/IAU2012_English.pdf
 * the IAU Style Manual recommendations for the Julian year convention used in
   the light-year:
   https://iauarchive.eso.org/publications/proceedings_rules/units/
