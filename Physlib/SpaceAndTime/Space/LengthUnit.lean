@@ -149,7 +149,7 @@ The references for the numerical definitions used below are:
   the light-year:
   https://iauarchive.eso.org/publications/proceedings_rules/units/
 * IAU 2015 Resolution B2 for the exact parsec convention:
-  https://www.iau.org/static/resolutions/IAU2015_English.pdf
+  https://iauarchive.eso.org/static/resolutions/IAU2015_English.pdf
 
 -/
 
