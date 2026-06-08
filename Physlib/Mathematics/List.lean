@@ -20,7 +20,6 @@ open Fin
 open Physlib
 variable {n : Nat}
 
-set_option backward.isDefEq.respectTransparency false in
 lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.takeWhile P (List.eraseIdx l i) = (List.takeWhile P l).eraseIdx i
@@ -61,7 +60,6 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
         simpa using h (Fin.succ i) (Fin.succ j) (by simpa using hij) (by simpa using hP)
     · simp [hPa]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.dropWhile P (List.eraseIdx l i) =
@@ -454,7 +452,6 @@ lemma get_eq_orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRe
       simp only [hr, add_tsub_cancel_right]
       omega
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsertEquiv_get {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
     (r0 : I) :
     (r0 :: r).get ∘ (orderedInsertEquiv le1 r r0).symm = (List.orderedInsert le1 r0 r).get := by
@@ -467,7 +464,6 @@ lemma orderedInsert_eraseIdx_orderedInsertEquiv_zero
     (List.orderedInsert le1 r0 r).eraseIdx (orderedInsertEquiv le1 r r0 ⟨0, by simp⟩) = r := by
   simp [orderedInsertEquiv]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_eraseIdx_orderedInsertEquiv_succ
     {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) (n : ℕ)
     (hn : Nat.succ n < (r0 :: r).length)
@@ -581,7 +577,6 @@ def insertionSortEquiv {α : Type} (r : α → α → Prop) [DecidableRel r] : (
   | a :: l =>
     (Fin.equivCons (insertionSortEquiv r l)).trans (orderedInsertEquiv r (List.insertionSort r l) a)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_get {α : Type} {r : α → α → Prop} [DecidableRel r] : (l : List α) →
     l.get ∘ (insertionSortEquiv r l).symm = (List.insertionSort r l).get
   | [] => by rfl
@@ -626,7 +621,6 @@ lemma insertionSort_eq_ofFn {α : Type} {r : α → α → Prop} [DecidableRel r
   rw [insertionSortEquiv_get (r := r)]
   exact (List.ofFn_get (List.insertionSort r l)).symm
 
-set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRel r] :
     (l : List α) → (i : Fin l.length) → (j : Fin l.length) → (hij : i < j)
     → (hij' : insertionSortEquiv r l j < insertionSortEquiv r l i) →

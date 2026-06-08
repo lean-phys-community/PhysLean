@@ -29,14 +29,12 @@ open CategoryTheory.MonoidalCategory
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `leftHanded ⊗ leftHanded` to `2 x 2` complex matrices. -/
 def leftLeftToMatrix : (LeftHandedModule ⊗[ℂ] LeftHandedModule) ≃ₗ[ℂ] Matrix (Fin 2) (Fin 2) ℂ :=
   (Basis.tensorProduct leftBasis leftBasis).repr ≪≫ₗ
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `leftLeftToMatrix` in terms of the standard basis. -/
 lemma leftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftLeftToMatrix.symm M = ∑ i, ∑ j, M i j • (leftBasis i ⊗ₜ[ℂ] leftBasis j) := by
@@ -48,7 +46,6 @@ lemma leftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     exact congrArg _ (Basis.tensorProduct_apply leftBasis leftBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `altLeftHanded ⊗ altLeftHanded` to `2 x 2` complex matrices. -/
 def altLeftaltLeftToMatrix : (AltLeftHandedModule ⊗[ℂ] AltLeftHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -56,7 +53,6 @@ def altLeftaltLeftToMatrix : (AltLeftHandedModule ⊗[ℂ] AltLeftHandedModule) 
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `altLeftaltLeftToMatrix` in terms of the standard basis. -/
 lemma altLeftaltLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     altLeftaltLeftToMatrix.symm M = ∑ i, ∑ j, M i j • (altLeftBasis i ⊗ₜ[ℂ] altLeftBasis j) := by
@@ -68,7 +64,6 @@ lemma altLeftaltLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     exact congrArg _ (Basis.tensorProduct_apply altLeftBasis altLeftBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `leftHanded ⊗ altLeftHanded` to `2 x 2` complex matrices. -/
 def leftAltLeftToMatrix : (LeftHandedModule ⊗[ℂ] AltLeftHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -76,7 +71,6 @@ def leftAltLeftToMatrix : (LeftHandedModule ⊗[ℂ] AltLeftHandedModule) ≃ₗ
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `leftAltLeftToMatrix` in terms of the standard basis. -/
 lemma leftAltLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftAltLeftToMatrix.symm M = ∑ i, ∑ j, M i j • (leftBasis i ⊗ₜ[ℂ] altLeftBasis j) := by
@@ -88,7 +82,6 @@ lemma leftAltLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     exact congrArg _ (Basis.tensorProduct_apply leftBasis altLeftBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `altLeftHanded ⊗ leftHanded` to `2 x 2` complex matrices. -/
 def altLeftLeftToMatrix : (AltLeftHandedModule ⊗[ℂ] LeftHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -96,7 +89,6 @@ def altLeftLeftToMatrix : (AltLeftHandedModule ⊗[ℂ] LeftHandedModule) ≃ₗ
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `altLeftLeftToMatrix` in terms of the standard basis. -/
 lemma altLeftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     altLeftLeftToMatrix.symm M = ∑ i, ∑ j, M i j • (altLeftBasis i ⊗ₜ[ℂ] leftBasis j) := by
@@ -108,7 +100,6 @@ lemma altLeftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     exact congrArg _ (Basis.tensorProduct_apply altLeftBasis leftBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `rightHanded ⊗ rightHanded` to `2 x 2` complex matrices. -/
 def rightRightToMatrix : (RightHandedModule ⊗[ℂ] RightHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -116,7 +107,6 @@ def rightRightToMatrix : (RightHandedModule ⊗[ℂ] RightHandedModule) ≃ₗ[�
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `rightRightToMatrix` in terms of the standard basis. -/
 lemma rightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     rightRightToMatrix.symm M = ∑ i, ∑ j, M i j • (rightBasis i ⊗ₜ[ℂ] rightBasis j) := by
@@ -128,7 +118,6 @@ lemma rightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     exact congrArg _ (Basis.tensorProduct_apply rightBasis rightBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `altRightHanded ⊗ altRightHanded` to `2 x 2` complex matrices. -/
 def altRightAltRightToMatrix : (AltRightHandedModule ⊗[ℂ] AltRightHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -136,7 +125,6 @@ def altRightAltRightToMatrix : (AltRightHandedModule ⊗[ℂ] AltRightHandedModu
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `altRightAltRightToMatrix` in terms of the standard basis. -/
 lemma altRightAltRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     altRightAltRightToMatrix.symm M =
@@ -149,7 +137,6 @@ lemma altRightAltRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ)
     exact congrArg _ (Basis.tensorProduct_apply altRightBasis altRightBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `rightHanded ⊗ altRightHanded` to `2 x 2` complex matrices. -/
 def rightAltRightToMatrix : (RightHandedModule ⊗[ℂ] AltRightHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -157,7 +144,6 @@ def rightAltRightToMatrix : (RightHandedModule ⊗[ℂ] AltRightHandedModule) �
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `rightAltRightToMatrix` in terms of the standard basis. -/
 lemma rightAltRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     rightAltRightToMatrix.symm M = ∑ i, ∑ j, M i j • (rightBasis i ⊗ₜ[ℂ] altRightBasis j) := by
@@ -169,7 +155,6 @@ lemma rightAltRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     exact congrArg _ (Basis.tensorProduct_apply rightBasis altRightBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `altRightHanded ⊗ rightHanded` to `2 x 2` complex matrices. -/
 def altRightRightToMatrix : (AltRightHandedModule ⊗[ℂ] RightHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -177,7 +162,6 @@ def altRightRightToMatrix : (AltRightHandedModule ⊗[ℂ] RightHandedModule) �
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `altRightRightToMatrix` in terms of the standard basis. -/
 lemma altRightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     altRightRightToMatrix.symm M = ∑ i, ∑ j, M i j • (altRightBasis i ⊗ₜ[ℂ] rightBasis j) := by
@@ -189,7 +173,6 @@ lemma altRightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     exact congrArg _ (Basis.tensorProduct_apply altRightBasis rightBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `altLeftHanded ⊗ altRightHanded` to `2 x 2` complex matrices. -/
 def altLeftAltRightToMatrix : (AltLeftHandedModule ⊗[ℂ] AltRightHandedModule) ≃ₗ[ℂ]
     Matrix (Fin 2) (Fin 2) ℂ :=
@@ -197,7 +180,6 @@ def altLeftAltRightToMatrix : (AltLeftHandedModule ⊗[ℂ] AltRightHandedModule
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `altLeftAltRightToMatrix` in terms of the standard basis. -/
 lemma altLeftAltRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     altLeftAltRightToMatrix.symm M = ∑ i, ∑ j, M i j • (altLeftBasis i ⊗ₜ[ℂ] altRightBasis j) := by
@@ -209,14 +191,12 @@ lemma altLeftAltRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) 
     exact congrArg _ (Basis.tensorProduct_apply altLeftBasis altRightBasis i j)
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `leftHanded ⊗ rightHanded` to `2 x 2` complex matrices. -/
 def leftRightToMatrix : (LeftHandedModule ⊗[ℂ] RightHandedModule) ≃ₗ[ℂ] Matrix (Fin 2) (Fin 2) ℂ :=
   (Basis.tensorProduct leftBasis rightBasis).repr ≪≫ₗ
   Finsupp.linearEquivFunOnFinite ℂ ℂ (Fin 2 × Fin 2) ≪≫ₗ
   LinearEquiv.curry ℂ ℂ (Fin 2) (Fin 2)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `leftRightToMatrix` in terms of the standard basis. -/
 lemma leftRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftRightToMatrix.symm M = ∑ i, ∑ j, M i j • (leftBasis i ⊗ₜ[ℂ] rightBasis j) := by
@@ -657,7 +637,6 @@ lemma leftRightToMatrix_ρ (v : (LeftHandedModule ⊗[ℂ] RightHandedModule)) (
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma leftLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (leftHandedRep M) (leftHandedRep M) (leftLeftToMatrix.symm v) =
     leftLeftToMatrix.symm (M.1 * v * (M.1)ᵀ) := by
@@ -666,7 +645,6 @@ lemma leftLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) 
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma altLeftaltLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (altLeftHandedRep M) (altLeftHandedRep M) (altLeftaltLeftToMatrix.symm v) =
     altLeftaltLeftToMatrix.symm ((M.1⁻¹)ᵀ * v * (M.1⁻¹)) := by
@@ -675,7 +653,6 @@ lemma altLeftaltLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma leftAltLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (leftHandedRep M) (altLeftHandedRep M) (leftAltLeftToMatrix.symm v) =
     leftAltLeftToMatrix.symm (M.1 * v * (M.1⁻¹)) := by
@@ -684,7 +661,6 @@ lemma leftAltLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma altLeftLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (altLeftHandedRep M) (leftHandedRep M) (altLeftLeftToMatrix.symm v) =
     altLeftLeftToMatrix.symm ((M.1⁻¹)ᵀ * v * (M.1)ᵀ) := by
@@ -693,7 +669,6 @@ lemma altLeftLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma rightRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (rightHandedRep M) (rightHandedRep M) (rightRightToMatrix.symm v) =
     rightRightToMatrix.symm ((M.1.map star) * v * ((M.1.map star))ᵀ) := by
@@ -702,7 +677,6 @@ lemma rightRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma altRightAltRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (altRightHandedRep M) (altRightHandedRep M)
       (altRightAltRightToMatrix.symm v) =
@@ -712,7 +686,6 @@ lemma altRightAltRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma rightAltRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (rightHandedRep M) (altRightHandedRep M) (rightAltRightToMatrix.symm v) =
     rightAltRightToMatrix.symm ((M.1.map star) * v * (((M.1⁻¹).conjTranspose)ᵀ)) := by
@@ -721,7 +694,6 @@ lemma rightAltRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,�
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma altRightRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (altRightHandedRep M) (rightHandedRep M) (altRightRightToMatrix.symm v) =
     altRightRightToMatrix.symm (((M.1⁻¹).conjTranspose) * v * (M.1.map star)ᵀ) := by
@@ -730,7 +702,6 @@ lemma altRightRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,�
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma altLeftAltRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (altLeftHandedRep M) (altRightHandedRep M) (altLeftAltRightToMatrix.symm v) =
     altLeftAltRightToMatrix.symm ((M.1⁻¹)ᵀ * v * ((M.1⁻¹).conjTranspose)ᵀ) := by
@@ -739,7 +710,6 @@ lemma altLeftAltRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma leftRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (leftHandedRep M) (rightHandedRep M) (leftRightToMatrix.symm v) =
     leftRightToMatrix.symm (M.1 * v * (M.1)ᴴ) := by

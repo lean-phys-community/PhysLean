@@ -402,7 +402,6 @@ lemma normalOrderF_ofFieldOpF_mul_ofFieldOpF (φ φ' : 𝓕.FieldOp) :
 
 TODO "Split the following two lemmas up into smaller parts."
 
-set_option backward.isDefEq.respectTransparency false in
 lemma normalOrderF_superCommuteF_ofCrAnListF_create_create_ofCrAnListF
     (φc φc' : 𝓕.CrAnFieldOp) (hφc : 𝓕 |>ᶜ φc = CreateAnnihilate.create)
     (hφc' : 𝓕 |>ᶜ φc' = CreateAnnihilate.create) (φs φs' : List 𝓕.CrAnFieldOp) :
@@ -462,7 +461,6 @@ lemma normalOrderF_superCommuteF_ofCrAnListF_create_create_ofCrAnListF
     ofCrAnListF_singleton]
   rw [ofCrAnListF_append, ofCrAnListF_singleton, ofCrAnListF_singleton, smul_mul_assoc]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma normalOrderF_superCommuteF_ofCrAnListF_annihilate_annihilate_ofCrAnListF
     (φa φa' : 𝓕.CrAnFieldOp)
     (hφa : 𝓕 |>ᶜ φa = CreateAnnihilate.annihilate)

@@ -72,7 +72,6 @@ lemma div_pos (x y : TemperatureUnit) : (0 : ℝ≥0) < x/ y := by
   · exact zero_le
   · exact Ne.symm (div_ne_zero x y)
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma div_self (x : TemperatureUnit) :
     x / x = (1 : ℝ≥0) := by

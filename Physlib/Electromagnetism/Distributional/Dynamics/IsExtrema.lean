@@ -93,7 +93,6 @@ Here $\mathbf{B}$ is the magnetic field matrix.
 
 -/
 open Space
-set_option backward.isDefEq.respectTransparency false in
 lemma isExtrema_iff_space_time {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d)
     (J : DistLorentzCurrentDensity d) :
@@ -198,7 +197,6 @@ holds.
 -/
 open SpaceTime minkowskiMatrix
 set_option maxHeartbeats 600000 in
-set_option backward.isDefEq.respectTransparency false in
 lemma isExterma_iff_tensor {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d)
     (J : DistLorentzCurrentDensity d) :

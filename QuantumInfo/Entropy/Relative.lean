@@ -53,7 +53,6 @@ lemma weighted_jensen_rpow (b w : d → ℝ) (q : ℝ)
     (∑ j, w j * b j) ^ q ≤ ∑ j, w j * b j ^ q :=
   Real.rpow_arith_mean_le_arith_mean_rpow Finset.univ _ _ (fun i _ ↦ hw i) hsum (fun i _ ↦ hb i) hq
 
-set_option backward.isDefEq.respectTransparency false in
 omit [DecidableEq d] in
 /--
 Doubly stochastic Hölder inequality: for nonneg a, b, doubly stochastic w,
@@ -140,7 +139,6 @@ lemma MState.rpow_le_one' {r : ℝ} (hσ : 0 < r) : σ.M ^ r ≤ 1 := by
   have hle : σ.M.H.eigenvalues i ≤ 1 := σ.eigenvalue_le_one i
   linarith [Real.rpow_le_one hge hle hσ.le]
 
-set_option backward.isDefEq.respectTransparency false in
 --PULLOUT
 /-- If A ≥ 0 and A ≤ 1, then each eigenvalue of A is in [0, 1]. -/
 lemma HermitianMat.eigenvalues_le_one_of_le_one
@@ -190,7 +188,6 @@ lemma HermitianMat.trace_rpow_le_trace_of_le_one
     · exact A.eigenvalues_le_one_of_le_one hA1 i
     · exact hp
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma trace_conj_rpow_eq_inner (hα₀ : 0 < α) (hα : α < 1) :
     ((ρ.M ^ α).conj (σ.M ^ ((1 - α) / (2 * α) * α)).mat).trace = ⟪ρ.M ^ α, σ.M ^ (1 - α)⟫_ℝ := by
   convert congr_arg _ ( HermitianMat.inner_eq_trace_rc _ _ ) using 2;
@@ -302,7 +299,6 @@ lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
     exact congr(WithLp.ofLp $(h_supportProj_mul_A _ h_range))
   exact Matrix.toLin'.injective ( LinearMap.ext fun v => by simpa using h_supportProj_mul_A v )
 
-set_option backward.isDefEq.respectTransparency false in
 lemma HermitianMat.inner_supportProj_self (A : HermitianMat d ℂ) :
     ⟪A, A.supportProj⟫ = A.trace := by
   simp only [trace, IsMaximalSelfAdjoint.RCLike_selfadjMap, Matrix.trace, Matrix.diag_apply,
@@ -362,7 +358,6 @@ lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   rw [← Matrix.conjTranspose_inj]
   simp_all only [Matrix.mulVec_mulVec, Matrix.conjTranspose_mul, conjTranspose_mat, implies_true]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma HermitianMat.inner_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
     ⟪A, B.supportProj⟫ = A.trace := by
@@ -373,7 +368,6 @@ lemma supportProj_inner_density (h : σ.M.ker ≤ ρ.M.ker) :
   rw [HermitianMat.inner_comm, HermitianMat.inner_supportProj_of_ker_le h]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-
 ⟪ρ.M.conj (σ.M ^ t).mat, σ.M ^ (-2 * t)⟫_ℝ = 1 for density matrices ρ, σ with ker(σ) ≤ ker(ρ).
 -/
@@ -610,7 +604,6 @@ private lemma hasDerivAt_inner_rpow_at_zero (h : σ.M.ker ≤ ρ.M.ker) :
 /-  The derivative of α ↦ Tr[ρ σ^((1-α)/α)] at α = 1 is -⟪ρ, log σ⟫.
     Uses trace cyclic: Tr[σ^t ρ σ^t] = Tr[ρ σ^(2t)].
     With 2t(α) = (1-α)/α, d/dα (2t) = -1/α², and d/dε σ^ε|_{ε=0} = log σ. -/
-set_option backward.isDefEq.respectTransparency false in
 private lemma hasDerivAt_trace_conj_at_one {ρ σ : MState d}
     (h : σ.M.ker ≤ ρ.M.ker) :
     HasDerivAt
@@ -2036,7 +2029,6 @@ private lemma inner_cfc_approxLog_tendsto_bot (ρ x : MState d) (hx : ¬(x.M.ker
 end lowerSemicontinuous_2
 
 open Classical in
-set_option backward.isDefEq.respectTransparency false in
 theorem qRelativeEnt_lowerSemicontinuous_2 (ρ x : MState d) (hx : ¬(x.M.ker ≤ ρ.M.ker)) (y : ENNReal) (hy : y < ⊤) :
     ∀ᶠ (x' : MState d) in nhds x,
       y < (if x'.M.ker ≤ ρ.M.ker then ⟪ρ.M, ρ.M.log - x'.M.log⟫ else ⊤ : EReal) := by
@@ -2308,7 +2300,6 @@ Helper: If σ₂ ≤ α • σ₁ for density matrices, then α > 0.
    Proof: σ₂ has trace 1, so it's nonzero. If α ≤ 0, then α • σ₁ ≤ 0 (since σ₁ ≥ 0),
    but σ₂ ≤ α • σ₁ ≤ 0 with σ₂ ≥ 0 forces σ₂ = 0, contradicting trace = 1.
 -/
-set_option backward.isDefEq.respectTransparency false in
 private lemma pos_of_MState_le_smul {σ₁ σ₂ : MState d} (hσ : σ₂.M ≤ α • σ₁.M) : 0 < α := by
   by_contra! h_nonpos
   apply σ₂.pos.ne'

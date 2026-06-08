@@ -84,7 +84,6 @@ variable
   {V} [NormedAddCommGroup V] [NormedSpace ℝ V] [InnerProductSpace' ℝ V]
   {Y} [NormedAddCommGroup Y] [InnerProductSpace ℝ Y] [FiniteDimensional ℝ Y][MeasurableSpace Y]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A version of `fundamental_theorem_of_variational_calculus'` for `Continuous f`.
 The proof uses assumption that source of `f` is finite-dimensional
 inner-product space, so that a bump function with compact support exists via

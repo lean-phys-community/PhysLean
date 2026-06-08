@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.Basic
+public import Physlib.Relativity.Tensors.ComponentIdx.Product
 /-!
 
 # The product of tensors
@@ -86,33 +87,6 @@ variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
 
 /-!
 
-## A. Products of index components
-
--/
-
-/-!
-
-### A.1 The product of component indices as an equivalence
-
--/
-
-/-- The equivalence between `ComponentIdx (Fin.append c c1)` and
-  `ComponentIdx c × ComponentIdx c1` formed by products. -/
-def ComponentIdx.prod {n1 n2 : ℕ} {c : Fin n1 → C} {c1 : Fin n2 → C} :
-    ComponentIdx (S := S) (Fin.append c c1) ≃
-    ComponentIdx (S := S) c × ComponentIdx (S := S) c1 where
-  toFun p := (fun i => basisIdxCongr (by simp) (p (Fin.castAdd n2 i)),
-    fun i => basisIdxCongr (by simp) (p (Fin.natAdd n1 i)))
-  invFun p := Fin.addCases (fun i => basisIdxCongr (by simp) (p.1 i))
-    (fun i => basisIdxCongr (by simp) (p.2 i))
-  left_inv p := by
-    ext1 i
-    revert i
-    simp [Fin.forall_fin_add]
-  right_inv p := by simp
-
-/-!
-
 ## B. Products of pure tensors
 
 -/
@@ -143,7 +117,6 @@ def Pure.prodP {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.prodP_apply_castAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n1) :
@@ -151,7 +124,6 @@ lemma Pure.prodP_apply_castAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     LinearEquiv.cast (R := k) (by simp) (p1 i) := by
   simp [Pure.prodP]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.prodP_apply_natAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n2) :
@@ -692,7 +664,6 @@ lemma prodT_basis {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 -/
 
 set_option synthInstance.maxHeartbeats 0 in
-set_option backward.isDefEq.respectTransparency false in
 /-- The linear equivalence between `S.Tensor c ⊗[k] S.Tensor c1` and
     `S.Tensor (Fin.append c c1)`. -/
 noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 → C} :
@@ -752,7 +723,6 @@ noncomputable def tensorEquivProd {n n2 : ℕ} {c : Fin n → C} {c1 : Fin n2 �
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Rewriting basis for the product in terms of the tensor product basis. -/
 lemma basis_prod_eq {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
     basis (S := S) (Fin.append c c1) =
@@ -802,7 +772,6 @@ lemma prodT_basis_repr_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma prodT_equivariant {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (g : G) (t : S.Tensor c) (t1 : S.Tensor c1) :
@@ -833,7 +802,6 @@ lemma prodT_equivariant {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma prodT_default_right {n} {c : Fin n → C}
     {c1 : Fin 0 → C} (t : S.Tensor c) :
     prodT t (Pure.toTensor default : S.Tensor c1) =
@@ -858,7 +826,6 @@ lemma prodT_default_right {n} {c : Fin n → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma prodT_swap {n n1} {c : Fin n → C}
     {c1 : Fin n1 → C}
     (t : S.Tensor c) (t1 : S.Tensor c1) :
@@ -890,7 +857,6 @@ lemma prodT_swap {n n1} {c : Fin n → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma prodT_permT_left {n n'} {c : Fin n → C} {c' : Fin n' → C}
     (σ : Fin n' → Fin n) (h : PermCond c c' σ) (t : S.Tensor c) (t2 : S.Tensor c2) :
@@ -947,7 +913,6 @@ lemma prodT_permT_right {n n'} {c : Fin n → C} {c' : Fin n' → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma prodT_assoc {n n1 n2} {c : Fin n → C}
     {c1 : Fin n1 → C} {c2 : Fin n2 → C}
     (t : S.Tensor c) (t1 : S.Tensor c1) (t2 : S.Tensor c2) :
@@ -987,7 +952,6 @@ lemma prodT_assoc {n n1 n2} {c : Fin n → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma prodT_assoc' {n n1 n2} {c : Fin n → C}
     {c1 : Fin n1 → C} {c2 : Fin n2 → C}
     (t : S.Tensor c) (t1 : S.Tensor c1) (t2 : S.Tensor c2) :

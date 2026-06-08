@@ -112,7 +112,6 @@ theorem IsHermitianPreserving.dual {M : MatrixMap dIn dOut ℂ} (h : M.IsHermiti
     exact htrace2.symm.trans (Dual.trace_eq M A x)
 
 open MatrixOrder
-set_option backward.isDefEq.respectTransparency false in
 --TODO Cleanup, find home, abstract out to HermitianMats...?
 theorem _root_.Matrix.PosSemidef.trace_mul_nonneg {n : Type*} [Fintype n] [DecidableEq n]
     {A B : Matrix n n 𝕜} (hA : A.PosSemidef) (hB : B.PosSemidef) :
@@ -238,7 +237,6 @@ private theorem matrix_mem_span_kronecker {A C : Type*} [Fintype A] [Fintype C]
       ((Matrix.single a₁ a₂ 1 : Matrix A A 𝕜),
         (Matrix.single c₁ c₂ 1 : Matrix C C 𝕜)), rfl⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The dual of a Kronecker product of maps is the Kronecker product of their duals.
 -/
@@ -308,7 +306,6 @@ lemma Module.Basis.toDualEquiv_symm_comp_dualMap_toDualEquiv {ι R M : Type*} [F
   simp [ Module.Basis.toDual ];
   ac_rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem dual_dual : M.dual.dual = M := by
   refine dual_unique (M := M.dual) (M' := M) ?_
@@ -436,7 +433,6 @@ theorem HPMap.hermDual_hermDual : f.hermDual.hermDual = f := by
 
 open RealInnerProductSpace
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The defining property of a dual map: inner products are preserved on the opposite argument. -/
 theorem HPMap.inner_hermDual (B : HermitianMat dOut ℂ) :
     ⟪f A, B⟫ = ⟪A, f.hermDual B⟫ := by
@@ -466,7 +462,6 @@ theorem MatrixMap.IsPositive.hermDual (h : MatrixMap.IsPositive f.map) : f.hermD
   rw [HPMap.inner_hermDual, HPMap.hermDual_hermDual]
   apply HermitianMat.inner_ge_zero hx h
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
 theorem HPMap.hermDual_Unital [DecidableEq dIn] [DecidableEq dOut] (h : MatrixMap.IsTracePreserving f.map) :
     f.hermDual.map.Unital := by

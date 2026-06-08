@@ -24,7 +24,6 @@ variable {m n R : Type*}
 variable [Fintype m] [Fintype n]
 variable [RCLike R]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm of a matrix: Tr[√(A† A)]. -/
 def traceNorm (A : Matrix m n R) : ℝ :=
   open MatrixOrder in
@@ -85,7 +84,6 @@ theorem traceNorm_unitary_conj {A : Matrix n n R} {U : Matrix.unitaryGroup n R} 
   have hu := (Matrix.mem_unitaryGroup_iff_isometry U.val).mp U.2
   exact traceNorm_isometry_conj hu.1 hu.1
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For Hermitian matrices, the trace norm is the sum of absolute eigenvalues.
 
 This is Proposition 9.1.1 in Wilde. -/
@@ -108,14 +106,12 @@ theorem traceNorm_Hermitian_eq_sum_abs_eigenvalues {A : Matrix n n R} (hA : A.Is
     rw [Matrix.posSemidef_diagonal_iff]
     exact_mod_cast fun i => sq_nonneg (hA.eigenvalues i)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm is nonnegative. Property 9.1.1 in Wilde. -/
 theorem traceNorm_nonneg (A : Matrix m n R) : 0 ≤ A.traceNorm :=
   open MatrixOrder in
   And.left $ RCLike.nonneg_iff.1
     (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg (Aᴴ * A))).trace_nonneg
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm is zero iff the matrix is zero. -/
 theorem traceNorm_zero_iff (A : Matrix m n R) : A.traceNorm = 0 ↔ A = 0 := by
   open MatrixOrder in
@@ -145,7 +141,6 @@ theorem traceNorm_zero_iff (A : Matrix m n R) : A.traceNorm = 0 ↔ A = 0 := by
   · rintro rfl
     simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The trace norm is homogeneous under scalar multiplication. Property 9.1.2 in Wilde. -/
 theorem traceNorm_smul (A : Matrix m n R) (c : R) : (c • A).traceNorm = ‖c‖ * A.traceNorm := by
   have h : (c • A)ᴴ * (c • A) = (‖c‖^2:R) • (Aᴴ * A) := by
@@ -476,7 +471,6 @@ theorem traceNorm_add_le (A B : Matrix n n ℂ) : (A + B).traceNorm ≤ A.traceN
       simpa [add_comm] using add_le_add_left
         (h₃ (a := RCLike.re ((Uab.1 * B).trace)) ⟨Uab, rfl⟩) (traceNorm A)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A positive semidefinite matrix has trace norm equal to its trace. -/
 theorem PosSemidef.traceNorm_eq_trace {A : Matrix m m R} (hA : A.PosSemidef) :
     A.traceNorm = A.trace := by

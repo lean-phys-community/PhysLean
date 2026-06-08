@@ -287,7 +287,6 @@ theorem traceRight_eq_MState_traceRight (ρ : MState (d₁ × d₂)) :
 
 end trace
 
-set_option backward.isDefEq.respectTransparency false in
 /--The replacement channel that maps all inputs to a given state. -/
 def replacement [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) : CPTPMap dIn dOut :=
   traceLeft ∘ₘ {

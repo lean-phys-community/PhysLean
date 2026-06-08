@@ -53,7 +53,6 @@ section charges
 variable {S : (PureU1 n.succ).Charges} {A : (PureU1 n.succ).LinSols}
 variable (hS : ConstAbsSorted S) (hA : ConstAbsSorted A.val)
 
-set_option backward.isDefEq.respectTransparency false in
 include hS in
 lemma lt_eq {k i : Fin n.succ} (hk : S k ≤ 0) (hik : i ≤ k) : S i = S k := by
   have hSS := hS.2 i k hik
@@ -69,7 +68,6 @@ lemma val_le_zero {i : Fin n.succ} (hi : S i ≤ 0) : S i = S (0 : Fin n.succ) :
   apply lt_eq hS hi
   exact Fin.zero_le i
 
-set_option backward.isDefEq.respectTransparency false in
 include hS in
 lemma gt_eq {k i: Fin n.succ} (hk : 0 ≤ S k) (hik : k ≤ i) : S i = S k := by
   have hSS := hS.2 k i hik
@@ -84,7 +82,6 @@ lemma zero_gt (h0 : 0 ≤ S (0 : Fin n.succ)) (i : Fin n.succ) : S (0 : Fin n.su
   symm
   refine gt_eq hS h0 (Fin.zero_le i)
 
-set_option backward.isDefEq.respectTransparency false in
 include hS in
 lemma opposite_signs_eq_neg {i j : Fin n.succ} (hi : S i ≤ 0) (hj : 0 ≤ S j) : S i = - S j := by
   have hSS := hS.1 i j
@@ -94,7 +91,6 @@ lemma opposite_signs_eq_neg {i j : Fin n.succ} (hi : S i ≤ 0) (hj : 0 ≤ S j)
     linarith
   · exact h
 
-set_option backward.isDefEq.respectTransparency false in
 include hS in
 lemma is_zero (h0 : S (0 : Fin n.succ) = 0) : S = 0 := by
   funext i
@@ -250,7 +246,6 @@ lemma AFL_even_below (A : (PureU1 (2 * n.succ)).LinSols) (h : ConstAbsSorted A.v
     rfl
   · exact AFL_even_below' h hA i
 
-set_option backward.isDefEq.respectTransparency false in
 lemma AFL_even_above' {A : (PureU1 (2 * n.succ)).LinSols} (h : ConstAbsSorted A.val)
     (hA : A.val (0 : Fin (2*n.succ)) ≠ 0) (i : Fin n.succ) :
     A.val (Fin.cast (split_equal n.succ) (Fin.natAdd n.succ i)) =

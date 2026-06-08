@@ -24,7 +24,6 @@ open FieldStatistic
 
 namespace WickAlgebra
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 For a list `φs` of `𝓕.FieldOp`, the static version of Wick's theorem states that
 

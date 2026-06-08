@@ -38,7 +38,6 @@ lemma physHermite_succ (n : ℕ) :
     physHermite (n + 1) = 2 • X * physHermite n - derivative (physHermite n) := by
   simp [physHermite]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_eq_iterate (n : ℕ) :
     physHermite n = (fun p => 2 * X * p - derivative p)^[n] 1 := by
   induction n with
@@ -48,10 +47,8 @@ lemma physHermite_eq_iterate (n : ℕ) :
 @[simp]
 lemma physHermite_zero : physHermite 0 = C 1 := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_one : physHermite 1 = 2 * X := by simp [physHermite_succ]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma derivative_physHermite_succ : (n : ℕ) →
     derivative (physHermite (n + 1)) = 2 * (n + 1) • physHermite n
   | 0 => by
@@ -159,14 +156,12 @@ lemma physHermite_zero_apply (x : ℝ) : physHermite 0 x = 1 := by simp
 lemma physHermite_pow (n m : ℕ) (x : ℝ) : physHermite n x ^ m = aeval x (physHermite n ^ m) := by
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_succ_fun (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) = 2 • (fun x => x) *
     (physHermite n : ℝ → ℝ)- (2 * n : ℝ) • (physHermite (n - 1) : ℝ → ℝ) := by
   ext x
   simp [physHermite_succ', aevalEquiv, aeval, mul_assoc]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma physHermite_succ_fun' (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) = fun x => 2 • x *
     physHermite n x -
@@ -193,14 +188,12 @@ lemma deriv_physHermite_differentiableAt (n m : ℕ) (x : ℝ) :
   rw [iterated_deriv_physHermite_eq_aeval]
   exact Polynomial.differentiableAt_aeval _
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_physHermite (n : ℕ) :
     deriv (physHermite n) = 2 * n * (physHermite (n - 1)) := by
   ext x
   rw [Polynomial.deriv_aeval (physHermite n), derivative_physHermite]
   simp [aeval, aevalEquiv, mul_assoc]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fderiv_physHermite
     {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (x : E)
     (f : E → ℝ) (hf : DifferentiableAt ℝ f x) (n : ℕ) :
@@ -245,7 +238,6 @@ lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_gaussian_eq_physHermite_mul_gaussian (n : ℕ) (x : ℝ) :
     deriv^[n] (fun y => Real.exp (- y ^ 2)) x =
     (-1 : ℝ) ^ n * physHermite n x * Real.exp (- x ^ 2) := by
@@ -284,7 +276,6 @@ lemma physHermite_eq_deriv_gaussian' (n : ℕ) (x : ℝ) :
   rw [physHermite_eq_deriv_gaussian, Real.exp_neg]
   field_simp [Real.exp_ne_zero]
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma guassian_integrable_polynomial {b : ℝ} (hb : 0 < b) (P : Polynomial ℤ) :
     MeasureTheory.Integrable fun x : ℝ => (P.aeval x) * Real.exp (-b * x ^ 2) := by
@@ -438,7 +429,6 @@ lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
   rw [physHermite_orthogonal hnm]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 theorem physHermite_norm (n : ℕ) :
     ∫ x : ℝ, (physHermite n x * physHermite n x) * Real.exp (- x ^ 2) =
     ↑n ! * 2 ^ n * √Real.pi := by

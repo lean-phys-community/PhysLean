@@ -101,7 +101,6 @@ protected theorem inner_smul_left (r : R) : ⟪r • A, B⟫_R = r * ⟪A, B⟫_
 protected theorem inner_smul_right (r : R) : ⟪A, r • B⟫_R = r * ⟪A, B⟫_R := by
   simp [inner_def, selfadj_smul]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The Hermitian inner product as bilinear form. Compare with `innerₗ` (in the root namespace)
 which requires an `InnerProductSpace` instance. -/
 protected def innerₗ : LinearMap.BilinForm R (HermitianMat n α) where
@@ -119,12 +118,10 @@ section starring
 variable [CommSemiring R] [Ring α] [StarRing α] [Algebra R α] [IsMaximalSelfAdjoint R α] [DecidableEq n]
 variable (A B : HermitianMat n α)
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem inner_one : ⟪A, 1⟫_R = A.trace := by
   simp only [inner_def, mat_one,  mul_one, trace]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem one_inner : ⟪1, A⟫_R = A.trace := by
   simp only [inner_def, one_mul, mat_one, trace]
@@ -188,7 +185,6 @@ theorem inner_mul_nonneg (h : 0 ≤ A.mat * B.mat) : 0 ≤ ⟪A, B⟫ := by
   rw [Matrix.nonneg_iff_posSemidef] at h
   exact (RCLike.nonneg_iff.mp h.trace_nonneg).left
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The inner product for PSD matrices is nonnegative. -/
 theorem inner_ge_zero (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ ⟪A, B⟫ := by
   rw [zero_le_iff] at hB
@@ -198,7 +194,6 @@ theorem inner_ge_zero (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ ⟪A, B⟫ := by
   nth_rewrite 1 [← (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg A.mat)).left]
   exact (RCLike.nonneg_iff.mp (hB.conjTranspose_mul_mul_same _).trace_nonneg).left
 
-set_option backward.isDefEq.respectTransparency false in
 theorem inner_mono (hA : 0 ≤ A) : B ≤ C → ⟪A, B⟫ ≤ ⟪A, C⟫ := by
   intro hBC
   classical have hTr : 0 ≤ ⟪A, C - B⟫ := inner_ge_zero hA (zero_le_iff.mpr hBC)
@@ -215,7 +210,6 @@ theorem inner_le_mul_trace (hA : 0 ≤ A) (hB : 0 ≤ B) : ⟪A, B⟫ ≤ A.trac
   simp [mul_comm]
 
 --TODO cleanup
-set_option backward.isDefEq.respectTransparency false in
 private theorem inner_zero_iff_aux_lemma [DecidableEq n] (hA₁ : A.mat.PosSemidef) (hB₁ : B.mat.PosSemidef) :
   RCLike.re (A.val * B.val).trace = 0 ↔
     LinearMap.range (Matrix.toEuclideanLin A.val) ≤
@@ -333,7 +327,6 @@ variable {d : Type*} [Fintype d] {𝕜 : Type*} [RCLike 𝕜]
 
 --Check that it synthesizes ok
 #guard_msgs(drop info) in
-set_option backward.isDefEq.respectTransparency false in
 #synth ContractibleSpace (HermitianMat d ℂ)
 
 @[fun_prop]
@@ -341,7 +334,6 @@ theorem inner_continuous : Continuous (Inner.inner ℝ (E := HermitianMat d 𝕜
   rw [funext₂ inner_eq_re_trace]
   fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop] --fun_prop can actually prove this, should I leave this on or not?
 theorem inner_bilinForm_Continuous (A : HermitianMat d 𝕜) : Continuous ⇑(HermitianMat.innerₗ A) :=
   LinearMap.continuous_of_finiteDimensional _
@@ -352,7 +344,6 @@ section innerproductspace
 
 variable {d d₂ : Type*} [Fintype d] [Fintype d₂] {𝕜 : Type*} [RCLike 𝕜]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- We define the Hermitian inner product as our "canonical" inner product, which does induce a norm.
 This disagrees slightly with Mathlib convention on the `Matrix` type, which avoids asserting one norm
 as there are several reasonable ones; for Hermitian matrices, though, this seem to be the right choice. -/
@@ -405,13 +396,11 @@ theorem norm_eq_sqrt_inner_self (A : HermitianMat d 𝕜) : ‖A‖ = √(⟪A, 
     neg_mul_eq_mul_neg]
   congr 2 <;> (rw [← A.H]; simp)
 
-set_option backward.isDefEq.respectTransparency false in
 noncomputable instance instNormedSpace : NormedSpace ℝ (HermitianMat d 𝕜) where
   norm_smul_le r x := by
     simp [norm_eq_sqrt_inner_self, ← mul_assoc, Real.sqrt_mul',
       inner_self_nonneg, Real.sqrt_mul_self_eq_abs]
 
-set_option backward.isDefEq.respectTransparency false in
 noncomputable instance instInnerProductSpace : InnerProductSpace ℝ (HermitianMat d 𝕜) :=
    letI : Inner ℝ (HermitianMat d 𝕜) := InnerProductCore.toInner;
    letI : NormedSpace ℝ (HermitianMat d 𝕜) := instNormedSpace;
@@ -508,7 +497,6 @@ easily from this. More generally `A ≤ m ∧ m ≤ B` is compact.
 theorem unitInterval_IsCompact : IsCompact {m : HermitianMat d 𝕜 | 0 ≤ m ∧ m ≤ 1} :=
   CompactIccSpace.isCompact_Icc
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem norm_one : ‖(1 : HermitianMat d 𝕜)‖ = √(Fintype.card d : ℝ) := by
   rw [norm_eq_sqrt_real_inner (F := HermitianMat d 𝕜)]

@@ -72,7 +72,6 @@ open Space Function
 ### A.1. Position vector
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Component `i` of the position operator is the continuous linear map
   from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `xᵢψ`. -/
 def positionCLM : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
@@ -133,7 +132,6 @@ lemma normRegularizedPow_measurable (d : ℕ) (ε s : ℝ) :
   rw [normRegularizedPow_eq]
   fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The radius operator to power `s`, regularized by `ε ≠ 0`, is the continuous linear map
   from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `(‖x‖² + ε²)^(s/2) • ψ`. -/
 def radiusRegPowCLM {d : ℕ} (ε : ℝˣ) (s : ℝ) : 𝓢(Space d, ℂ) →L[ℂ] 𝓢(Space d, ℂ) :=
@@ -157,21 +155,18 @@ lemma radiusRegPowCLM_apply {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d,
     𝐫₀ ε s ψ x = (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
   rw [radiusRegPowCLM_apply_fun]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma radiusRegPowCLM_comp_eq {d : ℕ} (ε : ℝˣ) (s t : ℝ) :
     𝐫₀[d] ε s ∘L 𝐫₀ ε t = 𝐫₀ ε (s+t) := by
   ext ψ x
   simp [add_div, Real.rpow_add (norm_sq_add_unit_sq_pos ε x), mul_assoc]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma radiusRegPowCLM_zero {d : ℕ} (ε : ℝˣ) :
     𝐫₀ ε 0 = ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma positionSqCLM_eq {d : ℕ} (ε : ℝˣ) :
     ∑ i, 𝐱 i ∘L 𝐱 i = 𝐫₀ ε 2 - ε.1 ^ 2 • ContinuousLinearMap.id ℂ 𝓢(Space d, ℂ) := by
   ext
@@ -181,7 +176,6 @@ lemma positionSqCLM_eq {d : ℕ} (ε : ℝˣ) :
 ### A.3. Radius powers
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The radius operator to power `s` is the linear map from `𝓢(Space d, ℂ)` to `Space d → ℂ` that
   maps `ψ` to `x ↦ ‖x‖ˢψ(x)` (which is 'nearly' Schwartz for general `s`). -/
 def radiusPowLM {d : ℕ} (s : ℝ) : 𝓢(Space d, ℂ) →ₗ[ℂ] Space d → ℂ where
@@ -203,7 +197,6 @@ lemma radiusPowLM_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space
     𝐫 s ψ x = ‖x‖ ^ s • ψ x := by
   rw [radiusPowLM_apply_fun]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
 @[fun_prop]
 lemma radiusPowLM_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
@@ -214,7 +207,6 @@ lemma radiusPowLM_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(S
   simp only [h]
   exact ContDiffAt.rpow_const_of_ne (by fun_prop) (inner_self_ne_zero.mpr hx)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is strongly measurable. -/
 @[fun_prop]
 lemma radiusPowLM_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
@@ -222,7 +214,6 @@ lemma radiusPowLM_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space 
   rw [radiusPowLM_apply_fun]
   exact StronglyMeasurable.smul (by measurability) ψ.continuous.stronglyMeasurable
 
-set_option backward.isDefEq.respectTransparency false in
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)
     (hψ : ψ ∈ polyBddSchwartzMap d a) (h : 0 < d + 2 * (a + s)) :

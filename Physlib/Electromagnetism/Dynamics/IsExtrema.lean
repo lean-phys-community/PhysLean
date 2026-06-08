@@ -125,7 +125,6 @@ $$\frac{1}{\mu_0} \partial_\mu F^{\mu \nu} - J^{\nu} = 0.$$
 
 attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue
 
-set_option backward.isDefEq.respectTransparency false in
 lemma isExtrema_iff_tensors {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJ : ContDiff ℝ ∞ J) :

@@ -25,7 +25,6 @@ variable {A B : HermitianMat d 𝕜} {x : ℝ}
 
 noncomputable section
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Matrix.IsHermitian.log_smul_of_ne_zero {A : Matrix d d 𝕜} (hA : A.IsHermitian) (hx : x ≠ 0) :
     cfc Real.log (x • A) = (Real.log x) • cfc (if · = 0 then (0 : ℝ) else 1) A + cfc Real.log A := by
   have hCFC : cfc (Real.log ∘ (x * ·)) A = cfc Real.log (x • A) := by
@@ -117,12 +116,10 @@ theorem _root_.Commute.log_right (hAB : Commute A.mat B.mat) :
 theorem reindex_log (e : d ≃ d₂) : (A.reindex e).log = A.log.reindex e :=
   cfc_reindex A Real.log e
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem log_zero : (0 : HermitianMat d 𝕜).log = 0 := by
   simp [log]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem log_one : (1 : HermitianMat d 𝕜).log = 0 := by
   simp [log]
@@ -140,7 +137,6 @@ theorem log_smul {A : HermitianMat d 𝕜} {x : ℝ} (hx : x ≠ 0) [NonSingular
 /-
 The inverse function is operator antitone for positive definite matrices.
 -/
-set_option backward.isDefEq.respectTransparency false in
 open ComplexOrder MatrixOrder in
 theorem inv_antitone (hA : A.mat.PosDef) (h : A ≤ B) : B⁻¹ ≤ A⁻¹ := by
   -- Since $B - A$ is positive semidefinite, we can write it as $C^*C$ for some matrix $C$.
@@ -196,7 +192,6 @@ lemma Real.integral_inv_sub_inv_finite (x T : ℝ) (hx : 0 < x) (hT : 0 < T) :
   · exact ContinuousOn.intervalIntegrable ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.div continuousAt_const ( continuousAt_const.add continuousAt_id ) ( by linarith [ Set.mem_Icc.mp ( by simpa [ hT.le ] using ht ) ] ) );
   · exact ContinuousOn.intervalIntegrable ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.div continuousAt_const ( continuousAt_const.add continuousAt_id ) ( by linarith [ Set.mem_Icc.mp ( by simpa [ hT.le ] using ht ) ] ) )
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The limit of $\log((1+T)/(x+T))$ as $T \to \infty$ is 0, for $x > 0$.
 -/
@@ -530,7 +525,6 @@ lemma inv_convex {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.mat.Pos
     refine this.trans_eq (Finset.sum_congr rfl fun _ _ => by ring );
 
 open ComplexOrder in
-set_option backward.isDefEq.respectTransparency false in
 /--
 The shifted inverse function is operator convex on positive definite matrices.
 -/
@@ -669,7 +663,6 @@ lemma log_conj_unitary (A : HermitianMat d 𝕜) (U : Matrix.unitaryGroup d 𝕜
   cfc_conj_unitary _ Real.log U
 
 open RealInnerProductSpace in
-set_option backward.isDefEq.respectTransparency false in
 theorem inner_log_smul_of [NonSingular A] {x : ℝ} (hx : x ≠ 0) :
     ⟪(x • A).log, B⟫ = Real.log x * B.trace + ⟪A.log, B⟫ := by
   simp [log_smul hx, inner_add_left]

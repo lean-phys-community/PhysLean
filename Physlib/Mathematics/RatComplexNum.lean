@@ -56,7 +56,6 @@ lemma add_fst (x y : RatComplexNum) : (x + y).fst = x.fst + y.fst := rfl
 @[simp]
 lemma add_snd (x y : RatComplexNum) : (x + y).snd = x.snd + y.snd := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 instance : AddCommGroup RatComplexNum where
   add_assoc := by
     intro a b c

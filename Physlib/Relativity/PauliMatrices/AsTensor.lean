@@ -45,21 +45,18 @@ lemma asTensor_expand_complexContrBasis : asTensor =
     + complexContrBasis (Sum.inr 2) ⊗ₜ leftRightToMatrix.symm (pauliBasis (Sum.inr 2)) := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of the pauli matrix `σ₀` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inl_0_expand : leftRightToMatrix.symm (pauliBasis (Sum.inl 0)) =
     leftBasis 0 ⊗ₜ rightBasis 0 + leftBasis 1 ⊗ₜ rightBasis 1 := by
   rw [leftRightToMatrix_symm_expand_tmul]
   simp [pauliBasis, pauliSelfAdjoint, pauliMatrix]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of the pauli matrix `σ₁` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inr_0_expand : leftRightToMatrix.symm (pauliBasis (Sum.inr 0)) =
     leftBasis 0 ⊗ₜ rightBasis 1 + leftBasis 1 ⊗ₜ rightBasis 0:= by
   rw [leftRightToMatrix_symm_expand_tmul]
   simp [pauliBasis, pauliSelfAdjoint, pauliMatrix]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of the pauli matrix `σ₂` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inr_1_expand : leftRightToMatrix.symm (pauliBasis (Sum.inr 1)) =
     -(I • leftBasis 0 ⊗ₜ[ℂ] rightBasis 1) + I • leftBasis 1 ⊗ₜ[ℂ] rightBasis 0 := by
@@ -75,7 +72,6 @@ lemma leftRightToMatrix_σSA_inr_2_expand : leftRightToMatrix.symm (pauliBasis (
   simp [pauliBasis, pauliSelfAdjoint, pauliMatrix]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of `asTensor` into complexContrBasis basis of tensor product vectors. -/
 lemma asTensor_expand : asTensor =
     complexContrBasis (Sum.inl 0) ⊗ₜ (leftBasis 0 ⊗ₜ rightBasis 0)

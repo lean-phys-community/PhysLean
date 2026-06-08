@@ -346,7 +346,6 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
   · exact wave_differentiable
   · fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If `f₀` is a function of `(inner ℝ x s - c * t)`, the fderiv of its components
 with respect to spatial coordinates is equal to the corresponding component of
 the propagation direction `s` times time derivative. -/

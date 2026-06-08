@@ -317,7 +317,6 @@ lemma deriv_euclid {d ν μ} {f : Space d → EuclideanSpace ℝ (Fin n)}
   · fun_prop
   · fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_lorentz_vector {d ν μ} {f : Space d → Lorentz.Vector d}
     (hf : Differentiable ℝ f) (x : Space d) :
     deriv ν (fun x => f x μ) x = deriv ν (fun x => f x) x μ := by

@@ -703,7 +703,6 @@ lemma probability_nonneg
   have hpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
   simp [CanonicalEnsemble.probability, div_nonneg, Real.exp_nonneg, hpos.le]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Probabilities are strictly positive. -/
 lemma probability_pos
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
@@ -763,7 +762,6 @@ lemma partitionFunction_def (𝓒 : CanonicalEnsemble ι) (T : Temperature) :
     𝓒.partitionFunction T =
       𝓒.mathematicalPartitionFunction T / (𝓒.phaseSpaceunit ^ 𝓒.dof) := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma partitionFunction_pos
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
@@ -981,7 +979,6 @@ lemma integral_probability
           𝓒.mathematicalPartitionFunction T := by simp [hZ]
     _ = 1 := by simp [hZpos.ne']
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Normalization of the dimensionless physical probability density over the base measure. -/
 lemma integral_physicalProbability_base
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)

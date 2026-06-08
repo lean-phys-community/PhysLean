@@ -100,7 +100,6 @@ abbrev map (M : HPMap dIn dOut 𝕜) : MatrixMap dIn dOut 𝕜 := M.toLinearMap
 theorem ext (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
   rwa [HPMap.mk.injEq]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Two maps are equal if they agree on all Hermitian inputs. -/
 theorem funext_hermitian (h : ∀ M : HermitianMat dIn ℂ, CΛ₁.map M = CΛ₂.map M) :
     CΛ₁ = CΛ₂ := by
@@ -121,7 +120,6 @@ theorem funext_pos [Fintype dIn] (h : ∀ M : HermitianMat dIn ℂ, 0 ≤ M → 
   rw [← M.posPart_add_negPart]
   simp [HermitianMat.posPart_nonneg, HermitianMat.negPart_nonneg, h]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Two maps are equal if they agree on all positive inputs with trace one -/
 theorem funext_pos_trace [Fintype dIn]
   (h : ∀ M : HermitianMat dIn ℂ, 0 ≤ M → M.trace = 1 → CΛ₁.map M = CΛ₂.map M) :
@@ -158,7 +156,6 @@ noncomputable instance instFunLike : FunLike (HPMap dIn dOut ℂ) (HermitianMat 
 lemma apply_hermitianMat_eq (Λ : HPMap dIn dOut ℂ) (ρ : HermitianMat dIn ℂ) :
     Λ ρ = ⟨Λ.map ρ.1, Λ.HP ρ.2⟩ := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 instance [Fintype dIn] : ContinuousLinearMapClass
     (HPMap dIn dOut ℂ) ℝ (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
   map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
@@ -194,7 +191,6 @@ noncomputable instance instFunLike : FunLike (PMap dIn dOut ℂ) (HermitianMat d
 lemma apply_hermitianMat_eq (Λ : PMap dIn dOut ℂ) (ρ : HermitianMat dIn ℂ) :
     Λ ρ = ⟨Λ.map ρ.1, Λ.HP ρ.2⟩ := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 set_option synthInstance.maxHeartbeats 40000 in
 instance instLinearMapClass : LinearMapClass (PMap dIn dOut ℂ) ℝ (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
   map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
@@ -247,7 +243,6 @@ noncomputable instance instFunLike : FunLike (PTPMap dIn dOut ℂ) (HermitianMat
 lemma apply_hermitianMat_eq_toPMap (Λ : PTPMap dIn dOut ℂ) (ρ : HermitianMat dIn ℂ) :
     Λ ρ = Λ.toPMap ρ := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 instance instLinearMapClass : LinearMapClass (PTPMap dIn dOut ℂ) ℝ (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
   map_add f x y := by simp [apply_hermitianMat_eq_toPMap]
   map_smulₛₗ f c x := by simp [apply_hermitianMat_eq_toPMap]
@@ -392,7 +387,6 @@ noncomputable instance instFunLike : FunLike (PUMap dIn dOut ℂ) (HermitianMat 
 lemma apply_hermitianMat_eq_toPMap (Λ : PUMap dIn dOut ℂ) (ρ : HermitianMat dIn ℂ) :
     Λ ρ = Λ.toPMap ρ := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 instance instLinearMapClass : LinearMapClass (PUMap dIn dOut ℂ) ℝ (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
   map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
   map_smulₛₗ f c x := HermitianMat.ext <| by simp [apply_hermitianMat_eq_toPMap]
@@ -434,7 +428,6 @@ noncomputable instance instFunLike : FunLike (CPUMap dIn dOut ℂ) (HermitianMat
 lemma apply_hermitianMat_eq_toPMap (Λ : CPUMap dIn dOut ℂ) (ρ : HermitianMat dIn ℂ) :
     Λ ρ = Λ.toPMap ρ := rfl
 
-set_option backward.isDefEq.respectTransparency false in
 instance instLinearMapClass : LinearMapClass (CPUMap dIn dOut ℂ) ℝ (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
   map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
   map_smulₛₗ f c x := HermitianMat.ext <| by simp [apply_hermitianMat_eq_toPMap]

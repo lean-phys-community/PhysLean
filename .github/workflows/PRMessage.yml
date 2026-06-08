@@ -1,0 +1,32 @@
+name: PR Comment
+
+on:
+  workflow_dispatch:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+    build:
+        name: Comment a pull_request
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Comment a pull_request
+              uses: mb2dev/github-action-comment-pull-request@1.0.0
+              with:
+                message:  |
+                  Thank you for this PR, which will now be reviewed. Please 
+                  see our [review guidelines](https://github.com/leanprover-community/physlib/blob/master/docs/ReviewGuidelines.md) 
+                  if you are not familiar with the process. You should expect a back and forth 
+                  with a reviewer before your PR is merged. See also that link for how to 
+                  add appropriate labels to your PR. The PR will also go through a number 
+                  of automated checks. You can learn more about these [here](https://github.com/leanprover-community/physlib/blob/master/scripts/README.md), 
+                  including how to run them locally.
+
+                  If you want to bring attention to this PR, please write a message on this 
+                  [thread](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/PR.20reviews/with/596447366) of the Lean Zulip.
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

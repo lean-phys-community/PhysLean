@@ -76,7 +76,6 @@ lemma preContrCoUnit_apply_one {d : ℕ} : (preContrCoUnit d) (1 : ℝ) = preCon
 def preCoContrUnitVal (d : ℕ := 3) : (Co d ⊗ Contr d).V :=
   coContrToMatrixRe.symm 1
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `preCoContrUnitVal` into basis. -/
 lemma preCoContrUnitVal_expand_tmul {d : ℕ} : preCoContrUnitVal d =
     ∑ i, coBasis d i ⊗ₜ[ℝ] contrBasis d i := by
@@ -84,7 +83,7 @@ lemma preCoContrUnitVal_expand_tmul {d : ℕ} : preCoContrUnitVal d =
   rw [coContrToMatrixRe_symm_expand_tmul]
   simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
     Finset.sum_singleton, ne_eq, reduceCtorEq, not_false_eq_true, one_apply_ne, zero_smul,
-    Finset.sum_const_zero, add_zero, one_apply_eq, one_smul, zero_add, add_right_inj]
+    Finset.sum_const_zero, add_zero, one_apply_eq, one_smul, zero_add]
   congr
   funext x
   rw [Finset.sum_eq_single x]
@@ -132,7 +131,6 @@ lemma preCoContrUnit_apply_one {d : ℕ} : (preCoContrUnit d) (1 : ℝ) = preCoC
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `contrCoUnit` does nothing. -/
 lemma contr_preContrCoUnit {d : ℕ} (x : CoMod d) :
     (TensorProduct.lid ℝ _ <|
@@ -167,7 +165,6 @@ lemma contr_preContrCoUnit {d : ℕ} (x : CoMod d) :
   rw [map_sum]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Contraction on the right with `coContrUnit`. -/
 lemma contr_preCoContrUnit {d : ℕ} (x : ContrMod d) :
     (TensorProduct.lid ℝ _ <|
@@ -209,7 +206,6 @@ lemma contr_preCoContrUnit {d : ℕ} (x : ContrMod d) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma preContrCoUnit_symm {d : ℕ} :
     (preContrCoUnit d) (1 : ℝ) = LinearMap.lTensor _ (LinearEquiv.cast (by rfl)).toLinearMap
       (TensorProduct.comm ℝ _ _ ((preCoContrUnit d) (1 : ℝ))) := by
@@ -217,7 +213,6 @@ lemma preContrCoUnit_symm {d : ℕ} :
   rw [preCoContrUnit_apply_one, preCoContrUnitVal_expand_tmul]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma preCoContrUnit_symm {d : ℕ} :
     (preCoContrUnit d) (1 : ℝ) = LinearMap.lTensor _ (LinearEquiv.cast (by simp)).toLinearMap
     (TensorProduct.comm ℝ _ _ ((preContrCoUnit d) (1 : ℝ))) := by

@@ -169,7 +169,6 @@ lemma fderiv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
   · fun_prop
   · fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma deriv_lorentzVector {d : ℕ} {f : Time → Lorentz.Vector d}
     (hf : Differentiable ℝ f) (t : Time) (i : Fin 1 ⊕ Fin d) :
     deriv (fun t => f t i) t = deriv (fun t => f t) t i := by

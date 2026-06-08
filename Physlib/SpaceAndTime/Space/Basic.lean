@@ -300,7 +300,6 @@ lemma range_manifoldStructure {d : ℕ} :
   simpa using ⟨(manifoldStructure d).symm x, manifoldStructure_comp_manifoldStructure_symm_apply x⟩
 
 open Manifold in
-set_option backward.isDefEq.respectTransparency false in
 lemma contMDiff_vaddConst (d : ℕ) : ContMDiff
     (manifoldStructure d) (𝓘(ℝ, EuclideanSpace ℝ (Fin d))) ⊤ (manifoldStructure d).toFun := by
   rw [contMDiff_iff]

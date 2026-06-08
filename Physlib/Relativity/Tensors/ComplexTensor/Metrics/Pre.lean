@@ -46,7 +46,6 @@ lemma contrMetricVal_expand_tmul : contrMetricVal =
     zero_add]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ηᵃᵃ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexContr`,
   making its invariance under the action of `SL(2,ℂ)`. -/
 def contrMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
@@ -97,7 +96,6 @@ lemma coMetricVal_expand_tmul : coMetricVal =
     zero_add]
   module
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The metric `ηᵢᵢ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexCo`,
   making its invariance under the action of `SL(2,ℂ)`. -/
 def coMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
@@ -149,7 +147,6 @@ lemma contrCoContraction_apply_metric :
     Sum.inr.injEq, one_ne_zero, Fin.reduceEq, sub_neg_eq_add, zero_ne_one, sub_self]
   erw [coContrUnit_apply_one, coContrUnitVal_expand_tmul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma coContrContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
       (TensorProduct.lid ℂ _).lTensor _ <|

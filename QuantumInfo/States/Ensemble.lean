@@ -126,7 +126,6 @@ A pure-state ensemble mixes into a pure state if and only if
 the only states in the ensemble with nonzero probability are equal
 to the same Ket `ψ` up to a global phase.
 -/
-set_option backward.isDefEq.respectTransparency false in
 theorem mix_pEnsemble_pure_iff_pure {e : PEnsemble d α} :
     mix (toMEnsemble e) = MState.pure ψ ↔
     ∀ i : α, e.distr i ≠ 0 → MState.pure (e.states i) = MState.pure ψ := by

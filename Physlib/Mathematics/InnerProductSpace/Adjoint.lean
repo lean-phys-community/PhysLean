@@ -142,7 +142,6 @@ lemma HasAdjoint.smul_left {f : E → F} {f'} (c : 𝕜)
   constructor; intros
   simp[inner_smul_left', inner_smul_right', hf.adjoint_inner_left]
 
-set_option backward.isDefEq.respectTransparency false in
 open ComplexConjugate in
 lemma HasAdjoint.smul_right {f : E → 𝕜} {f'} (v : F)
     (hf : HasAdjoint 𝕜 f f') :

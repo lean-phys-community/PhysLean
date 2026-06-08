@@ -284,7 +284,6 @@ lemma succSuccAbove_predPredAbove (i j : Fin (n + 1 + 1)) (hij : i ≠ j) (m : F
   dsimp [succSuccAbove, predPredAbove]
   grind
 
-set_option backward.isDefEq.respectTransparency false in
 lemma predPredAbove_eq_orderIsoOfFin (i j : Fin (n + 1 + 1)) (hij : i ≠ j) (m : Fin (n + 1 + 1))
     (hm : m ≠ i ∧ m ≠ j) :
     predPredAbove i j hij m hm =

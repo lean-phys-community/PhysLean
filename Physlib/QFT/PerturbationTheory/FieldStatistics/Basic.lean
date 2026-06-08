@@ -215,7 +215,6 @@ lemma ofList_insertionSort (s : 𝓕 → FieldStatistic) (le1 : 𝓕 → 𝓕 �
     (φs : List 𝓕) : ofList s (List.insertionSort le1 φs) = ofList s φs :=
   ofList_perm s (List.perm_insertionSort le1 φs)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma ofList_map_eq_finset_prod (s : 𝓕 → FieldStatistic) :
     (φs : List 𝓕) → (l : List (Fin φs.length)) → (hl : l.Nodup) →
     ofList s (l.map φs.get) = ∏ (i : Fin φs.length), if i ∈ l then s φs[i] else 1

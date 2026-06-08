@@ -197,7 +197,6 @@ lemma contrPCoeff_update_snd_add {n : ℕ} [inst : DecidableEq (Fin n)] {c : Fin
   repeat rw [Pure.update_diff]
   all_goals grind
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma contrPCoeff_update_fst_smul {n : ℕ} [inst : DecidableEq (Fin n)] {c : Fin n → C}
     (i j : Fin n) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -209,7 +208,6 @@ lemma contrPCoeff_update_fst_smul {n : ℕ} [inst : DecidableEq (Fin n)] {c : Fi
   simp only [tmul_smul, map_smul, smul_eq_mul]
   all_goals grind
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma contrPCoeff_update_snd_smul {n : ℕ} [inst : DecidableEq (Fin n)] {c : Fin n → C}
     (i j : Fin n) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -257,7 +255,6 @@ lemma contrPCoeff_mul_dropPair {n : ℕ} {c : Fin (n + 1 + 1 + 1 + 1) → C}
   simp only [contrPCoeff_dropPair, succSuccAbove_predPredAbove]
   rw [mul_comm]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma contrPCoeff_invariant {n : ℕ} {c : Fin n → C} {i j : Fin n}
     {hij : i ≠ j ∧ S.τ (c i) = c j} {p : Pure S c}
@@ -331,7 +328,6 @@ lemma contrP_symm {n : ℕ} {c : Fin (n + 1 + 1) → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The multi-linear map formed by contracting a pair of indices of pure tensors. -/
 noncomputable def contrPMultilinear {n : ℕ} {c : Fin (n + 1 + 1) → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j) :

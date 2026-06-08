@@ -461,7 +461,6 @@ lemma singularValues_compoundMatrix_rev (M : Matrix d d ℂ) (k : ℕ)
   obtain ⟨σ, hσ⟩ := singularValues_compoundMatrix_perm M k
   exact ⟨σ.symm j, by rw [← hσ]; simp⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /-- There exists a bijection `σ : Fin (card d) ≃ d` such that
     `singularValues M (σ i) = singularValuesSorted M i` for all `i`. -/
 lemma exists_sorting_equiv (M : Matrix d d ℂ) :
@@ -978,7 +977,6 @@ lemma sum_rpow_singularValues_mul_le (A B : Matrix d d ℂ) {r : ℝ} (hr : 0 < 
 
 /-! ## Hölder inequality for singular values -/
 
-set_option backward.isDefEq.respectTransparency false in
 /--
 The finite-sum Hölder inequality applied to sequences of r-th powers of
 sorted singular values.

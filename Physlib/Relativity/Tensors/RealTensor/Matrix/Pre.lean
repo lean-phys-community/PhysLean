@@ -20,7 +20,6 @@ open Matrix Module MatrixGroups Complex TensorProduct CategoryTheory.MonoidalCat
 
 namespace Lorentz
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `Contr ⊗ Contr` to `(1 + d) x (1 + d)` real matrices. -/
 def contrContrToMatrixRe {d : ℕ} : (ContrMod d ⊗[ℝ] ContrMod d) ≃ₗ[ℝ]
     Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
@@ -28,7 +27,6 @@ def contrContrToMatrixRe {d : ℕ} : (ContrMod d ⊗[ℝ] ContrMod d) ≃ₗ[ℝ
   Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
   LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `contrContrToMatrixRe` in terms of the standard basis. -/
 lemma contrContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     contrContrToMatrixRe.symm M = ∑ i, ∑ j, M i j • (contrBasis d i ⊗ₜ[ℝ] contrBasis d j) := by
@@ -41,7 +39,6 @@ lemma contrContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1
     rfl
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `Co ⊗ Co` to `(1 + d) x (1 + d)` real matrices. -/
 def coCoToMatrixRe {d : ℕ} : (Co d ⊗ Co d).V ≃ₗ[ℝ]
     Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
@@ -49,7 +46,6 @@ def coCoToMatrixRe {d : ℕ} : (Co d ⊗ Co d).V ≃ₗ[ℝ]
   Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
   LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expanding `coCoToMatrixRe` in terms of the standard basis. -/
 lemma coCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     coCoToMatrixRe.symm M = ∑ i, ∑ j, M i j • (coBasis d i ⊗ₜ[ℝ] coBasis d j) := by
@@ -61,7 +57,6 @@ lemma coCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ F
     rfl
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `Contr d ⊗ Co d` to `(1 + d) x (1 + d)` real matrices. -/
 def contrCoToMatrixRe {d : ℕ} : (Contr d ⊗ Co d).V ≃ₗ[ℝ]
     Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
@@ -69,7 +64,6 @@ def contrCoToMatrixRe {d : ℕ} : (Contr d ⊗ Co d).V ≃ₗ[ℝ]
   Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
   LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of ` (coBasis d) (coBasis d)` in terms of the standard basis. -/
 lemma contrCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     contrCoToMatrixRe.symm M = ∑ i, ∑ j, M i j • (contrBasis d i ⊗ₜ[ℝ] coBasis d j) := by
@@ -82,7 +76,6 @@ lemma contrCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
     rfl
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Equivalence of `Co d ⊗ Contr d` to `(1 + d) x (1 + d)` real matrices. -/
 def coContrToMatrixRe : (Co d ⊗ Contr d).V ≃ₗ[ℝ]
     Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
@@ -90,7 +83,6 @@ def coContrToMatrixRe : (Co d ⊗ Contr d).V ≃ₗ[ℝ]
   Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
   LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `coContrToMatrixRe` in terms of the standard basis. -/
 lemma coContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     coContrToMatrixRe.symm M = ∑ i, ∑ j, M i j • (coBasis d i ⊗ₜ[ℝ] contrBasis d j) := by
@@ -263,7 +255,6 @@ lemma coContrToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Contr d)).V) (M : Lorentz
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrContrToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
     TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M) (contrContrToMatrixRe.symm v) =
@@ -273,7 +264,6 @@ lemma contrContrToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma coCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
     TensorProduct.map ((Co d).ρ M) ((Co d).ρ M) (coCoToMatrixRe.symm v) =
@@ -284,7 +274,6 @@ lemma coCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ 
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contrCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
     TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M) (contrCoToMatrixRe.symm v) =
@@ -294,7 +283,6 @@ lemma contrCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
   rw [← h1]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma coContrToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
     TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M) (coContrToMatrixRe.symm v) =

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.TensorSpecies.Basic
+public import Physlib.Relativity.Tensors.ComponentIdx.Single
 public import Physlib.Relativity.Tensors.Contraction.SuccSuccAbove
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
@@ -75,35 +75,6 @@ variable {S : TensorSpecies k C G V basisIdx rep b} {n n' n2 : ℕ} {c : Fin n �
 ## Components of tensors
 
 -/
-TODO "Refactor: Throughout the `Tensor` file system are lemmas related to
-  `ComponentIdx`. The definition of `ComponentIdx` and the lemmas about it should
-  be placed in it's own directory. Around `ComponentIdx`, we should build
-  convenient API. Here `ComponentIdx` is the type of values that indices
-  in e.g. Lorentz tensors can take."
-
-set_option linter.unusedVariables false in
-/-- Given a list of indices `c : Fin n → C` e.g. `![.up, .down]`, the type
-  `ComponentIdx c` is the type of components indexes of a tensor with those indices
-  e.g. `⟨0, 2⟩` corresponding to `T⁰₂`. -/
-@[nolint unusedArguments]
-abbrev ComponentIdx {n : ℕ} {S : TensorSpecies k C G V basisIdx rep b} (c : Fin n → C) : Type :=
-  Π j, basisIdx (c j)
-
-lemma ComponentIdx.congr_right {n : ℕ} {c : Fin n → C} (b : ComponentIdx (S := S) c)
-    (i j : Fin n) (h : i = j) : b i = basisIdxCongr (by simp [h]) (b j) := by
-  subst h
-  rfl
-
-/-- Casting of a `ComponentIdx` through equivalent color maps. -/
-def ComponentIdx.cast {n m : ℕ} {c : Fin n → C} {cm : Fin m → C}
-    (h : n = m) (hc : c = cm ∘ Fin.cast h) (b : ComponentIdx (S := S) c) :
-    ComponentIdx (S := S) cm := fun j =>
-      basisIdxCongr (by simp [hc]) (b (Fin.cast h.symm j))
-
-TODO "Define the equivalence between `ComponentIdx ![c]` and `basisIdx c`.
-  Replace Lorentz.Vector.indexEquiv and Lorentz.CoVector.indexEquiv with this more
-  general definition."
-
 /-!
 
 ## Pure tensors
@@ -181,14 +152,12 @@ lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : Decidable
   rw [Function.update_of_ne]
   exact Fin.ne_succAbove i j
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (x y : V (c i)) :
     (update p i (x + y)).toTensor = (update p i x).toTensor + (update p i y).toTensor := by
   simp [toTensor, update]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma toTensor_update_smul {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (r : k) (y : V (c i)) :
@@ -368,7 +337,6 @@ lemma componentMap_ofComponents {n : ℕ} (c : Fin n → C) (f : ComponentIdx c 
   ext b
   simp [ofComponents]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma ofComponents_componentMap {n : ℕ} (c : Fin n → C) (t : S.Tensor c) :
     ofComponents c (componentMap c t) = t := by
@@ -535,7 +503,6 @@ noncomputable instance actionT : MulAction G (S.Tensor c) where
     rw [← PiTensorProduct.map_comp]
     rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma actionT_pure {g : G} {p : Pure S c} :
     g • p.toTensor = Pure.toTensor (g • p) := by
   rw [actionT_eq, Pure.toTensor, PiTensorProduct.map_tprod]

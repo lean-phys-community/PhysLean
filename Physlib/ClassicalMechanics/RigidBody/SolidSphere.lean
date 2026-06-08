@@ -25,7 +25,6 @@ open MeasureTheory
 namespace RigidBody
 open NNReal
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The solid sphere as a rigid body. -/
 noncomputable def solidSphere (d : ℕ) (m R : ℝ≥0) : RigidBody d where
   ρ := ⟨⟨fun f => m / volume.real (Metric.closedBall (0 : Space d) R) *

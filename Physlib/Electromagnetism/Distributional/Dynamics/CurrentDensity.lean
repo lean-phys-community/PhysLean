@@ -62,7 +62,6 @@ namespace DistLorentzCurrentDensity
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The charge density underlying a Lorentz current density which is a distribution. -/
 noncomputable def chargeDensity {d : ℕ} (c : SpeedOfLight) :
     (DistLorentzCurrentDensity d) →ₗ[ℝ] (Time × Space d) →d[ℝ] ℝ where
@@ -79,7 +78,6 @@ noncomputable def chargeDensity {d : ℕ} (c : SpeedOfLight) :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The underlying (non-Lorentz) current density associated with a distributive
   Lorentz current density. -/
 noncomputable def currentDensity (c : SpeedOfLight) :

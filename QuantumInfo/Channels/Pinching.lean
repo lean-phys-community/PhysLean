@@ -78,7 +78,6 @@ theorem pinching_kraus_ortho (ρ : MState d) (i j : spectrum ℝ ρ.m) :
   · grind [sq, HermitianMat.mat_pow, pinching_sq_eq_self]
   · exact pinching_kraus_orthogonal ρ hij
 
-set_option backward.isDefEq.respectTransparency false in
 theorem pinching_sum (ρ : MState d) : ∑ k, pinching_kraus ρ k = 1 := by
   ext i j
   simp only [pinching_kraus, HermitianMat.cfc]
@@ -91,7 +90,6 @@ theorem pinching_sum (ρ : MState d) : ∑ k, pinching_kraus ρ k = 1 := by
   rw [← cfc_sum, Finset.sum_fn, cfc_congr heq, cfc_one (R := ℝ) (ha := _)]
   rw [IsSelfAdjoint, Matrix.star_eq_conjTranspose, ρ.Hermitian]
 
-set_option backward.isDefEq.respectTransparency false in
 def pinching_map (ρ : MState d) : CPTPMap d d ℂ :=
   CPTPMap.of_kraus_CPTPMap (HermitianMat.mat ∘ pinching_kraus ρ) (by
   conv =>

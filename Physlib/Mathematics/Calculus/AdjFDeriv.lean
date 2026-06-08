@@ -126,7 +126,6 @@ protected lemma HasAdjFDerivAt.contDiffAt_deriv
     · apply ContinuousLinearMap.adjoint.isBoundedBilinearMap_real.contDiff
     · fun_prop
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_eq_adjFDeriv
     {f : U → 𝕜} {x : U} (hf : DifferentiableAt 𝕜 f x) :
     gradient f x = adjFDeriv 𝕜 f x 1 := by

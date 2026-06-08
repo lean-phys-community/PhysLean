@@ -64,7 +64,6 @@ lemma insertionSortEquiv_gt_zero_of_ne_insertionSortMinPos {α : Type} (r : α �
   simp only [Fin.ext_iff]
   omega
 
-set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α → α → Prop)
     [DecidableRel r] (a : α) (l : List α)
     (i : Fin (insertionSortDropMinPos r a l).length)
