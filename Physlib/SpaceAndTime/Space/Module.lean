@@ -279,6 +279,11 @@ instance {d} : InnerProductSpace ℝ (Space d) where
     simp only [smul_vadd_zero, inner_vadd_zero, conj_trivial]
     exact InnerProductSpace.smul_left v1 v2 a
 
+lemma norm_smul_sphere {d : ℕ} (n : ↑(Metric.sphere (0 : Space d.succ) 1))
+    {r : ℝ} (hr : 0 ≤ r) :
+    ‖(r • (n : Space d.succ))‖ = r := by
+  simp [norm_smul, mem_sphere_zero_iff_norm.mp n.2, abs_of_nonneg hr]
+
 /-!
 
 ## A.4. Instance of a measurable space
