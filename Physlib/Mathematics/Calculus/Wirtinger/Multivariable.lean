@@ -14,17 +14,11 @@ public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 
 ## Notation
 
-* The direction is a *subscript*: `d_v f` is the derivative in direction `v` of `f` at the
-  (implicit) base point `u`.
-* Three operators share this form — the total real derivative `d_v f`, and its holomorphic
-  and anti-holomorphic Wirtinger parts `∂_v f`, `∂̄_v f` (straight `d` for the total, `∂`/`∂̄`
-  for the parts).
-* A `/∂` fraction differentiates with respect to a *variable* (not a direction): either a
-  real coordinate, `∂f/∂x`, `∂f/∂z` (the `V = ℂ` case below), or the single argument of a
-  one-variable function in the chain rule, `∂g/∂f`, `∂g/∂f̄` (outer `g : ℂ → ℂ`, inner
-  `f : V → ℂ`; Leibniz form, §D).
-* For iterated derivatives (§I) the operators compose, `∂_v ∂̄_w f`.
-* `f̄` is the pointwise conjugate `p ↦ conj (f p)`.
+How the operators read is fixed in `Wirtinger.Basic`: the direction is a *subscript* (total
+real derivative `d_v f`, holomorphic and anti-holomorphic Wirtinger parts `∂_v f`, `∂̄_v f`),
+a `/∂` fraction differentiates with respect to a *variable* (`∂g/∂f`), and `f̄` is the
+pointwise conjugate. For iterated derivatives (§I) the operators compose, `∂_v ∂̄_w f`.
+
 * `v`, `w` are directions in `V`.
 * `u : V` is the *fixed* base point a derivative is evaluated at — the implicit point in the
   subscript notation.
@@ -44,29 +38,28 @@ direction `v : V` (a complex number when `V = ℂ`, a vector in general):
   `∂_v f  = (1/2)(d_v f − i·d_{i·v} f)`     (`dWirtingerDir`)
   `∂̄_v f = (1/2)(d_v f + i·d_{i·v} f)`     (`dWirtingerAntiDir`)
 
-**Real derivative.** `d_v f = fderiv ℝ f u v` is the real Fréchet derivative along `v`: the
-limit `lim_{t→0} (f(u + t·v) − f(u)) / t` over real `t`. So "real" names the scalar `t`, not
-the direction `v`; over all `v` these limits form the `ℝ`-linear map `fderiv ℝ f u : V → ℂ`.
+Here `d_v f = fderiv ℝ f u v` is the real Fréchet derivative along `v`, the limit
+`lim_{t→0} (f(u + t·v) − f(u)) / t` over real `t`; so "real" names the scalar `t`, not the
+direction `v`, and over all `v` these limits form the `ℝ`-linear map `fderiv ℝ f u : V → ℂ`.
+The second direction `i·v` is `v` turned 90° by the complex structure on `V`, so `(v, i·v)`
+is an orthogonal frame in `v`'s own (arbitrary) direction, a rotated and rescaled copy of the
+axes `(1, i)`. For `V = ℂ` one may take `v = 1`, giving `d_v f = ∂f/∂x` and
+`d_{i·v} f = ∂f/∂y`; writing `z = x + i y` and `z̄ = x − i y`, the formulas recover the
+classical `∂f/∂z = (1/2)(∂_x − i ∂_y)f` and `∂f/∂z̄ = (1/2)(∂_x + i ∂_y)f`.
 
-**Rotation.** `i·v` is `v` turned 90° by the complex structure on `V`; `(v, i·v)` is an
-orthogonal frame in `v`'s own (arbitrary) direction, a rotated, rescaled copy of the axes
-`(1, i)`. For `V = ℂ` take `v = 1`: then `d_v f = ∂f/∂x`, `d_{i·v} f = ∂f/∂y`, and with
-`z = x + i y`, `z̄ = x − i y` the formulas recover the classical
-`∂f/∂z = (1/2)(∂_x − i ∂_y)f`, `∂f/∂z̄ = (1/2)(∂_x + i ∂_y)f`.
-
-**Holomorphy.** `ℝ`-linearity commutes with real scaling and addition; `ℂ`-linearity adds
-commuting with `i`, i.e. `d_{i·v} f = i·d_v f`. The real derivative always has the first;
-the gap `d_{i·v} f − i·d_v f` to the second is exactly `−2i·∂̄_v f`. So `∂̄_v f` is the
-obstruction to `ℂ`-linearity — it vanishes iff `f` is holomorphic.
-
-**Splitting.** The two operators split the real derivative into holomorphic and
-anti-holomorphic parts — the directional form of `d = ∂ + ∂̄` (Dolbeault) — summing back to
+The two operators measure the failure of `ℂ`-linearity. The real derivative always commutes
+with real scaling and addition; `ℂ`-linearity asks in addition that it commute with `i`, that
+is `d_{i·v} f = i·d_v f`. The gap `d_{i·v} f − i·d_v f` to that condition is exactly
+`−2i·∂̄_v f`, so `∂̄_v f` is the obstruction to `ℂ`-linearity and vanishes precisely when `f`
+is holomorphic. Equivalently, the operators split the real derivative into its holomorphic and
+anti-holomorphic parts, the directional form of the Dolbeault decomposition `d = ∂ + ∂̄`,
+which sum back to
 
   `d_v f = ∂_v f + ∂̄_v f`.
 
 This is the coordinate-free form of treating `z` and `z̄` as independent (the `V = ℂ` case
-above). When `f` is holomorphic the anti-holomorphic half drops and `∂_v f` is the ordinary
-complex derivative (§F). Everything rests on `fderiv ℝ` and `Wirtinger.Basic`, no lower
+above). When `f` is holomorphic the anti-holomorphic half vanishes and `∂_v f` is the ordinary
+complex derivative (§F). Everything rests on `fderiv ℝ` and `Wirtinger.Basic`, with no lower
 Wirtinger layer.
 
 On these operators the module builds the **full directional calculus**:
@@ -392,34 +385,39 @@ lemma dWirtingerAntiDir_comp {g : ℂ → ℂ} (hg : DifferentiableAt ℝ g (f u
 
 ## E. Domain conjugation
 
-The §C lemmas conjugate a function's *output*; this section conjugates its
-*input*. Precomposing `g` with a domain map `L` — forming `g ∘ L` — relates the
-directional derivatives of the composite to those of `g`.
-
-The map `L : V → V'` is **conjugate-`ℂ`-linear**: real-linear and continuous, but
-anti-commuting with multiplication by `i`,
+The goal is to differentiate anti-holomorphic functions: a holomorphic `g` precomposed with
+conjugation of its input (the scalar case is `g(z̄)`, but the input is a general vector). So
+this section conjugates a function's *input*: precomposing `g` with a domain map
+`L : V → V'` (forming `g ∘ L`) swaps the two operators, whereas §C conjugated the output.
+The map `L` is **conjugate-`ℂ`-linear**: real-linear and continuous, but anti-commuting with
+`i`:
 
   `L (i · x) = −(i · L x)`,
 
-the abstract form of complex conjugation (`conj (i·x) = −i · conj x`). That sign
-flip is what turns a holomorphic derivative into an anti-holomorphic one: in the holomorphic
-combination `(1/2)(d_v f − i·d_{i·v} f)`, the `d_{i·v} f` term picks up the minus from
-`L`, converting it into the anti-holomorphic combination. So precomposition **swaps** the
-two operators and transports the base point and direction through `L`:
+the abstract form of `conj (i·x) = −i · conj x`. That sign flip swaps the two operators: in
+the holomorphic combination `(1/2)(d_v f − i·d_{i·v} f)` the `d_{i·v} f` term picks up the
+minus from `L`, turning it anti-holomorphic. So precomposition `g ∘ L` swaps `∂ ↔ ∂̄`, with
+`g`'s derivative taken at the mapped point `L u` in the mapped direction `L v`:
 
   `∂_v(g ∘ L)`  at `u`  =  `∂̄_{L v} g`  at `L u`
+  `∂̄_v(g ∘ L)`  at `u`  =  `∂_{L v} g`  at `L u`
 
-(`dWirtingerDir_comp_conjLinear`, with the dual `∂̄_v(g ∘ L) = ∂_{L v} g`).
+(`dWirtingerDir_comp_conjLinear` and its dual `dWirtingerAntiDir_comp_conjLinear`).
 
-Use it to differentiate a function whose input has been conjugated (`g ∘ L`, e.g.
-`g(z̄)`). The swap rewrites that derivative as the *other* operator on the plain
-`g`, exposing it for the §F collapse: for a holomorphic `g`, `g ∘ L` then has
-vanishing holomorphic derivative and an anti-holomorphic derivative equal to the complex
-derivative of `g` — the Cauchy–Riemann split for anti-holomorphic dependence. It
-is the input-side counterpart of §C's output conjugation, the two together fixing
-how the operators behave under conjugation on either side. The proof is
-`restrictScalars`-free (only the anti-commutation of `L` enters) and holds over
-any complex `V`, `V'`.
+Concretely on `ℂ`, let `L : z ↦ z̄` and `g(z) = log(z)`, so `g ∘ L` is `z ↦ log(z̄)`. The
+theorem computes this composite's derivatives from the known derivative of `log`, swapping
+the operator. Its anti-holomorphic derivative is `log`'s ordinary derivative `1/z` at the
+mapped point `z̄`:
+
+  `∂̄_z log(z̄) = 1/z̄`,
+
+while its holomorphic derivative vanishes, `∂_z log(z̄) = 0`, because `log` is holomorphic.
+So `log(z̄)` is purely anti-holomorphic, with its dependence carried by `∂̄`.
+
+So precomposing with conjugation turns `∂` into `∂̄` and vice versa: a holomorphic `g(z̄)`
+has zero holomorphic derivative, and its anti-holomorphic derivative is just `g`'s ordinary
+complex derivative (§F, and the example above). The proof uses only `L`'s anti-commutation
+with `i`, so it holds over any complex `V`, `V'`.
 
 -/
 
@@ -428,9 +426,9 @@ section DomainConjugation
 variable {V' : Type*} [NormedAddCommGroup V'] [NormedSpace ℝ V'] [NormedSpace ℂ V']
 
 omit [NormedSpace ℂ V] [NormedSpace ℂ V'] in
-/-- The real Fréchet derivative of `g ∘ L` at `u`, applied to `x`, is the
-derivative of `g` at `L u` applied to `L x` — the chain rule for an inner
-continuous linear map. -/
+/-- Chain rule for an inner continuous linear map `L`. Because the derivative of a linear
+map is the map itself, the real Fréchet derivative of `g ∘ L` at `u`, applied to `x`, equals
+the derivative of `g` at `L u` applied to `L x`. -/
 private lemma fderiv_comp_clm_apply {g : V' → ℂ} {L : V →L[ℝ] V'} {u : V}
     (hg : DifferentiableAt ℝ g (L u)) (x : V) :
     fderiv ℝ (fun p => g (L p)) u x = fderiv ℝ g (L u) (L x) := by
@@ -438,15 +436,19 @@ private lemma fderiv_comp_clm_apply {g : V' → ℂ} {L : V →L[ℝ] V'} {u : V
     fderiv_comp u hg L.differentiableAt, ContinuousLinearMap.fderiv,
     ContinuousLinearMap.comp_apply]
 
-/-- Precomposing with a conjugate-`ℂ`-linear `L` turns the holomorphic directional
-derivative into the anti-holomorphic one at the transported point and direction. -/
+/-- Domain conjugation swaps the operators: precomposing with a conjugate-`ℂ`-linear `L`
+turns the holomorphic derivative of `g ∘ L` at `u` into the anti-holomorphic derivative of
+`g` at the mapped point `L u`, in the mapped direction `L v`:
+`∂_v(g ∘ L)` at `u` equals `∂̄_{L v} g` at `L u`. -/
 lemma dWirtingerDir_comp_conjLinear {g : V' → ℂ} {L : V →L[ℝ] V'} {u : V}
     (hL : ∀ x : V, L (Complex.I • x) = -(Complex.I • L x))
     (hg : DifferentiableAt ℝ g (L u)) (v : V) :
     dWirtingerDir (fun p => g (L p)) v u = dWirtingerAntiDir g (L v) (L u) := by
   simp only [dWirtingerDir, dWirtingerAntiDir, fderiv_comp_clm_apply hg, hL, map_neg]; ring
 
-/-- Dual of `dWirtingerDir_comp_conjLinear`. -/
+/-- Dual of `dWirtingerDir_comp_conjLinear`: the anti-holomorphic derivative of `g ∘ L` at
+`u` is the holomorphic derivative of `g` at the mapped point `L u`, in the mapped direction
+`L v`: `∂̄_v(g ∘ L)` at `u` equals `∂_{L v} g` at `L u`. -/
 lemma dWirtingerAntiDir_comp_conjLinear {g : V' → ℂ} {L : V →L[ℝ] V'} {u : V}
     (hL : ∀ x : V, L (Complex.I • x) = -(Complex.I • L x))
     (hg : DifferentiableAt ℝ g (L u)) (v : V) :
@@ -459,13 +461,24 @@ end DomainConjugation
 
 ## F. The holomorphic collapse
 
-When the real Fréchet derivative is `ℂ`-linear along the chosen direction
-(`d_{i·v} f = i·d_v f` — the Cauchy–Riemann content), `dWirtingerDir` returns the
-full derivative and `dWirtingerAntiDir` vanishes; dually for a conjugate-linear
-derivative. The hypothesis is `restrictScalars`-free, so this collapse is
-domain-general and proven once here; producing the hypothesis from holomorphy is
-the only step that meets the `ℝ`/`ℂ` `restrictScalars` diamond, and is done per
-concrete domain by the consumers.
+The two-operator split collapses to one exactly when `f` is holomorphic along `v`, i.e. its
+real derivative is `ℂ`-linear there (`d_{i·v} f = i·d_v f`, the Cauchy–Riemann condition):
+then `∂_v f` is the full real derivative `d_v f` and `∂̄_v f` vanishes. Dually, a
+conjugate-`ℂ`-linear derivative makes `∂_v f` vanish and `∂̄_v f` the full derivative.
+
+The lemmas take this `ℂ`-linearity condition directly as hypothesis, not holomorphy itself.
+The reason is a clean division of labor.
+
+**The domain-general collapse.** Given the identity `d_{i·v} f = i·d_v f`, the collapse is pure
+algebra: unfold `∂_v f = (1/2)(d_v f − i·d_{i·v} f)`, substitute the identity, and `∂_v f`
+reduces to `d_v f` while `∂̄_v f` cancels to `0`. No property of the domain `V` enters, so a
+single proof covers every complex `V`.
+
+**The domain-specific bridge.** Holomorphy is stated through the complex derivative
+`fderiv ℂ`, but the collapse is about the real derivative `fderiv ℝ`; the implication
+`f` holomorphic ⟹ `d_{i·v} f = i·d_v f` is the bridge between them. Relating the two
+derivatives is domain-specific, so each consumer establishes the bridge in its own setting,
+then applies the domain-general lemma above.
 
 -/
 
@@ -501,27 +514,46 @@ lemma dWirtingerAntiDir_eq_of_antilinear {v : V}
 
 ## G. The second-derivative bridge
 
-Each directional operator is, definitionally, the combination
-`(1/2)(d_v f + c·d_{i·v} f)` of the real Fréchet derivative along a
-direction `v` and its `i`-rotation `i·v` (`c = −i` holomorphic, `c = +i`
-anti-holomorphic) — so the two directions are not independent: `b₂ = i·b₁`.
-The `weightedDirDeriv` records this combination as a function of the base
-point, generalised to two free directions `b₁`, `b₂`; that relation plays no
-role in differentiating the combination, so it is dropped here. Differentiating
-a `weightedDirDeriv` once more sends each first derivative to the second real
-Fréchet derivative `fderiv ℝ (fderiv ℝ f) u`, evaluated on two slots.
+Schwarz's theorem (§I) commutes two Wirtinger operators, so it differentiates a directional
+Wirtinger derivative a *second* time. This section bridges that second derivative to the
+second real Fréchet derivative `fderiv ℝ (fderiv ℝ f) u`, where mixed partials are already
+symmetric.
 
-Because `weightedDirDeriv` and the bridge (`fderiv_weightedDirDeriv`) are
-generic in the weight `c` and the two directions `b₁`, `b₂`, one lemma serves
-*every* second-order combination. The four pairings —
-holomorphic∘holomorphic, holomorphic∘anti-holomorphic,
-anti-holomorphic∘holomorphic, anti-holomorphic∘anti-holomorphic — are just four
-instantiations of the same bridge, differing only in the complex coefficients;
-each reduces to the same `fderiv ℝ (fderiv ℝ f) u` on the four directions `v`,
-`i·v`, `w`, `i·w`. §I discharges the mixed pairing (the one Kähler geometry
-needs); the other three would follow from this bridge with no new plumbing — a
-different choice of `(c, b₁, b₂)`, then `ContDiffAt.isSymmSndFDerivAt` and
-`ring`.
+Each directional operator is, definitionally, a combination `(1/2)(d_{b₁} f + c·d_{b₂} f)` of
+the real derivative along two directions (`c = −i` holomorphic with `b₂ = i·b₁`, `c = +i`
+anti-holomorphic). `weightedDirDeriv` records this as a function of the base point, with
+`b₁`, `b₂` left free: the directions stay fixed while the point `p` varies, turning the
+one-point derivative into a field `V → ℂ` that can itself be differentiated. Differentiating
+it once more sends each first derivative to `fderiv ℝ (fderiv ℝ f) u` on two slots.
+
+The two inner directions `b₁`, `b₂` are intrinsic: they are the pair a Wirtinger derivative
+already combines (`v` and `i·v`). The second differentiation, by contrast, is an ordinary
+Fréchet derivative along one new direction `a`, so the bridge lands directly on the plain
+second derivative `fderiv ℝ (fderiv ℝ f) u` in the outer slot `a` and inner slot `b₁`/`b₂`,
+whose slot symmetry (`ContDiffAt.isSymmSndFDerivAt`) drives Schwarz. The *outer* Wirtinger
+combination is rebuilt afterward by instantiating `a` at `v` and `i·v`.
+
+Because `weightedDirDeriv` and its bridge `fderiv_weightedDirDeriv` are generic in `c`, `b₁`,
+`b₂`, one lemma serves every second-order pairing. The four combinations (holomorphic or
+anti-holomorphic, twice) differ only in their coefficients and all reduce to
+`fderiv ℝ (fderiv ℝ f) u` on the directions `v`, `i·v`, `w`, `i·w`. §I discharges the mixed
+pairing that Kähler geometry needs; the others follow from the same bridge with a different
+`(c, b₁, b₂)`, then `ContDiffAt.isSymmSndFDerivAt` and `ring`.
+
+**Structure.**
+
+* `weightedDirDeriv` : the base-point field `p ↦ (1/2)(d_{b₁} f + c·d_{b₂} f)`, the shape
+  shared by both directional operators (`c = −i` or `+i`).
+* `differentiableAt_fderiv` : from `ContDiffAt ℝ 2 f`, the first derivative `fderiv ℝ f` is
+  itself differentiable at `u`, the regularity the rest of the section consumes.
+* `hasFDerivAt_fderiv_apply`, `hasFDerivAt_weightedDirDeriv` : the evaluation field
+  `p ↦ d_b f`, and hence `weightedDirDeriv`, is differentiable wherever `fderiv ℝ f` is.
+* `fderiv_weightedDirDeriv` : the bridge, sending a derivative of `weightedDirDeriv` along a
+  direction `a` to the second Fréchet derivative `fderiv ℝ (fderiv ℝ f) u` in the two slots.
+* `dWirtingerDir_eq_weightedDirDeriv`, `dWirtingerAntiDir_eq_weightedDirDeriv` : the operators
+  `∂_v f`, `∂̄_v f` are `weightedDirDeriv` at `(c, b₁, b₂) = (−i, v, i·v)` and `(i, w, i·w)`.
+* `fderiv_dWirtingerDir`, `fderiv_dWirtingerAntiDir` : specialize the bridge, so a second
+  derivative of `∂_v f`, `∂̄_v f` lands on `fderiv ℝ (fderiv ℝ f) u` in the two slots.
 
 -/
 
@@ -605,14 +637,27 @@ private lemma fderiv_dWirtingerDir (hf' : DifferentiableAt ℝ (fderiv ℝ f) u)
 
 ## H. Differentiability and locality
 
-Two regularity facts about the operators viewed as fields in the base point.
-**Differentiability**: on a `C²` field the directional derivative `p ↦ ∂_v f`
-is itself real-differentiable (`differentiableAt_dWirtingerDir`) — by §G it is a
-`weightedDirDeriv`, and `fderiv ℝ f` is differentiable for a `C²` `f`. This is the
-regularity §I needs to differentiate a Wirtinger derivative a second time.
-**Locality**: each operator depends only on `f` near `u`, inherited from
-`fderiv ℝ` — fields agreeing on a neighbourhood of `u` have equal directional
-derivative there (`dWirtingerDir_congr_of_eventuallyEq`).
+Schwarz (§I) and the coordinate layer treat a directional derivative as a field in the base
+point `p`, and need two regularity facts about it. Both are public packagings of §G, consumed
+in `Coordinate.lean`.
+
+**Differentiability.** On a `C²` field the directional derivative `p ↦ ∂_v f` is itself
+real-differentiable (`differentiableAt_dWirtingerDir`): by §G it is a `weightedDirDeriv`, and
+`fderiv ℝ f` is differentiable for a `C²` `f`. Without this a Wirtinger derivative could not
+be differentiated a second time, as Schwarz (§I) does.
+
+**Locality.** The value `∂_v f` at `u` depends only on how `f` behaves near `u`, inherited
+from `fderiv ℝ f u`: the operator is built from it, and a Fréchet derivative is fixed by `f`
+on an arbitrarily small neighbourhood. So if `f₁` and `f₂` coincide on some neighbourhood of
+`u` (in Lean `f₁ =ᶠ[nhds u] f₂`, where `=ᶠ` is equality on a filter-large set and `[nhds u]`
+is the neighbourhood filter of `u`) they have the same directional derivative at `u`
+(`dWirtingerDir_congr_of_eventuallyEq`). This is what makes the operators usable on functions
+regular only on a restricted domain (the Kähler potentials, defined on a slit domain rather
+than all of `V`): the derivative at `u` needs only `f` near `u`, so a consumer may swap `f`
+for a locally-equal representative and rely on the local `C²`/holomorphy hypotheses
+(`ContDiffAt`, `DifferentiableAt`), which likewise depend only on `f` near `u`: their `...At`
+form asks for regularity only on a neighbourhood of `u`, which a restricted-domain function
+has at each point of its domain.
 
 -/
 
@@ -650,15 +695,15 @@ lemma dWirtingerAntiDir_congr_of_eventuallyEq {f₁ f₂ : V → ℂ} {u : V}
 
 -/
 
-/-- **Schwarz's theorem** for the directional Wirtinger operators: on a `C²`
-field the holomorphic and anti-holomorphic directional derivatives in any two directions
-commute, `∂_v ∂̄_w f = ∂̄_w ∂_v f`.
+/-- **Schwarz's theorem** for the directional Wirtinger operators: on a `C²` field `f` the
+holomorphic and anti-holomorphic directional derivatives commute in any two directions,
+`∂_v ∂̄_w f = ∂̄_w ∂_v f`.
 
-Both orders expand, through the bridge, into a real-linear combination of
-the second real Fréchet derivative `fderiv ℝ (fderiv ℝ f) u` on the four
-directions `v`, `i·v`, `w`, `i·w`; the two orders differ only by transposing the
-two slots of that second derivative, which `ContDiffAt.isSymmSndFDerivAt`
-equates. -/
+The commutation adds no analytic input. By the §G bridge each order expands into a real-linear
+combination of the second real Fréchet derivative `fderiv ℝ (fderiv ℝ f) u` on the four
+directions `v`, `i·v`, `w`, `i·w`. The two orders give the same combination up to transposing
+the two slots of that second derivative, and `ContDiffAt.isSymmSndFDerivAt`, the symmetry of
+ordinary mixed second partials, equates them. -/
 theorem dWirtingerDir_dWirtingerAntiDir_comm (hf2 : ContDiffAt ℝ 2 f u) (v w : V) :
     dWirtingerDir (fun p => dWirtingerAntiDir f w p) v u
       = dWirtingerAntiDir (fun p => dWirtingerDir f v p) w u := by
