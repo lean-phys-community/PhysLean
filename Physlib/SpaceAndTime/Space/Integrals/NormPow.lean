@@ -84,16 +84,14 @@ private lemma radial_jacobian_zpow
 lemma radial_norm_power_spherical_integral_eq_space_integral
     {d p : ℕ} {q : ℤ} (hp_int : (p : ℤ) = q + (d.succ : ℤ))
     (hp_pos : 0 < p) (η : 𝓢(Space d.succ, ℝ)) :
-    ∫ (n : ↑(Metric.sphere (0 : Space d.succ) 1)),
+    ∫ x : Space d.succ, η x * ‖x‖ ^ q =
+      ∫ (n : ↑(Metric.sphere (0 : Space d.succ) 1)),
         ∫ (r : Set.Ioi (0 : ℝ)),
           r.1 ^ (p - 1) * η (r.1 • n.1)
           ∂(.comap Subtype.val volume)
-        ∂(volume (α := Space d.succ).toSphere)
-      =
-    ∫ x : Space d.succ, η x * ‖x‖ ^ q := by
+        ∂(volume (α := Space d.succ).toSphere) := by
   have hf : Integrable (fun x : Space d.succ => η x * ‖x‖ ^ q) volume :=
     IsDistBounded.integrable_space_mul (IsDistBounded.pow q (by omega)) η
-  symm
   rw [integral_volume_eq_spherical_integral
     (d := d) (fun x : Space d.succ => η x * ‖x‖ ^ q) hf]
   congr

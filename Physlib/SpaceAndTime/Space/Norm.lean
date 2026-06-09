@@ -53,7 +53,8 @@ We use properties of this power series to prove various results about distributi
 - B. Distributions involving norms
   - B.1. The gradient of distributions based on powers
   - B.2. The gradient of distributions based on logs
-  - B.3. Divergence equal dirac delta
+  - B.3. Divergence of radial norm-power distributions
+  - B.4. Divergence equal dirac delta
 
 ## iv. References
 
@@ -941,12 +942,7 @@ lemma distGrad_distOfFunction_log_norm {d : ℕ} :
 
 /-!
 
-### B.3. Divergence equal dirac delta
-
-We show that the divergence of `x ↦ ‖x‖ ^ (- d) • x` is equal to a multiple of the Dirac delta
-at `0`.
-
-The proof
+### B.3. Divergence of radial norm-power distributions
 
 -/
 open Distribution
@@ -1194,7 +1190,7 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
             ∂(volume (α := Space d.succ).toSphere) := by
           rw [integral_const_mul]
     _ = (p : ℝ) * ∫ x : Space d.succ, η x * ‖x‖ ^ q := by
-          rw [radial_norm_power_spherical_integral_eq_space_integral hp_int hp_pos η]
+          rw [← radial_norm_power_spherical_integral_eq_space_integral hp_int hp_pos η]
     _ = (((q + (d.succ : ℤ) : ℤ) : ℝ) •
         distOfFunction (fun x : Space d.succ => ‖x‖ ^ q)
           (IsDistBounded.pow q (by omega))) η := by
@@ -1203,6 +1199,14 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
           rw [← hcoef]
           norm_num
 
+/-!
+
+### B.4. Divergence equal dirac delta
+
+We show that the divergence of `x ↦ ‖x‖ ^ (- d) • x` is equal to a multiple of the Dirac delta
+at `0`.
+
+-/
 set_option backward.isDefEq.respectTransparency false in
 /-- Auxiliary lemma with dimension defined as d.succ to handle `homeomorphUnitSphereProd`.
 The dimension correct version is declared in `distDiv_inv_pow_eq_dim`. -/
