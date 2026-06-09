@@ -1,12 +1,13 @@
 /-
 Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Joseph Tooby-Smith, Nikolai Kashcheev
 -/
 module
 
 public import Physlib.SpaceAndTime.SpaceTime.Basic
 public import Physlib.Meta.Linters.Sorry
+public import Mathlib.RingTheory.RootsOfUnity.Complex
 /-!
 # The Standard Model
 
@@ -109,22 +110,214 @@ lemma ofU1Subgroup_toU1 (u1 : unitary ℂ) :
     toU1 (ofU1Subgroup u1) = u1 := rfl
 end GaugeGroupI
 
+/-- The unitary complex number associated to a sixth root of unity. -/
+noncomputable def gaugeGroupℤ₆UnitaryOfRoot (α : rootsOfUnity 6 ℂ) : unitary ℂ :=
+  ⟨((α : ℂˣ) : ℂ), by
+    have hα : ‖((α : ℂˣ) : ℂ)‖ = 1 := Complex.norm_eq_one_of_mem_rootsOfUnity α.prop
+    constructor
+    · rw [RCLike.star_def, Complex.conj_mul', hα]
+      norm_num
+    · rw [RCLike.star_def, Complex.mul_conj', hα]
+      norm_num⟩
+
+@[simp]
+lemma gaugeGroupℤ₆UnitaryOfRoot_coe (α : rootsOfUnity 6 ℂ) :
+    (gaugeGroupℤ₆UnitaryOfRoot α : ℂ) = ((α : ℂˣ) : ℂ) := rfl
+
+/-- The `SU(3)` scalar matrix associated to a sixth root of unity. -/
+noncomputable def gaugeGroupℤ₆SU3OfRoot (α : rootsOfUnity 6 ℂ) :
+    specialUnitaryGroup (Fin 3) ℂ :=
+  let z : ℂ := ((α : ℂˣ) : ℂ)
+  ⟨scalar (Fin 3) (z ^ 2), by
+    rw [mem_specialUnitaryGroup_iff]
+    have hz : ‖z‖ = 1 := by
+      simpa [z] using Complex.norm_eq_one_of_mem_rootsOfUnity α.prop
+    have hz2 : star (z ^ 2) * z ^ 2 = 1 := by
+      rw [RCLike.star_def, Complex.conj_mul', Complex.norm_pow, hz]
+      norm_num
+    constructor
+    · rw [mem_unitaryGroup_iff']
+      rw [Matrix.scalar_apply, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
+        Matrix.diagonal_mul_diagonal, Matrix.diagonal_eq_one]
+      funext i
+      simpa [Pi.star_def] using hz2
+    · have hα : z ^ 6 = 1 := by
+        simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
+      rw [Matrix.scalar_apply, Matrix.det_diagonal, Fin.prod_univ_three]
+      calc
+        z ^ 2 * z ^ 2 * z ^ 2 = z ^ 6 := by ring
+        _ = 1 := hα⟩
+
+/-- The `SU(2)` scalar matrix associated to a sixth root of unity. -/
+noncomputable def gaugeGroupℤ₆SU2OfRoot (α : rootsOfUnity 6 ℂ) :
+    specialUnitaryGroup (Fin 2) ℂ :=
+  let u : unitary ℂ := gaugeGroupℤ₆UnitaryOfRoot α
+  let z : ℂ := ((α : ℂˣ) : ℂ)
+  let w : ℂ := star ((u ^ 3 : unitary ℂ) : ℂ)
+  ⟨scalar (Fin 2) w, by
+    rw [mem_specialUnitaryGroup_iff]
+    have hw : star w * w = 1 := by
+      change star (star ((u ^ 3 : unitary ℂ) : ℂ)) *
+        star ((u ^ 3 : unitary ℂ) : ℂ) = 1
+      rw [star_star]
+      exact (u ^ 3 : unitary ℂ).prop.2
+    have hα : z ^ 6 = 1 := by
+      simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
+    have hw2 : w ^ 2 = 1 := by
+      calc
+        w ^ 2 = star (z ^ 6) := by
+          simp [w, u, z, pow_succ]
+          ring
+        _ = 1 := by simp [hα]
+    constructor
+    · rw [mem_unitaryGroup_iff']
+      rw [Matrix.scalar_apply, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
+        Matrix.diagonal_mul_diagonal, Matrix.diagonal_eq_one]
+      funext i
+      simpa [Pi.star_def] using hw
+    · rw [Matrix.scalar_apply, Matrix.det_diagonal, Fin.prod_univ_two]
+      simpa [pow_two] using hw2⟩
+
+/-- The element of `GaugeGroupI` associated to a sixth root of unity. -/
+noncomputable def gaugeGroupℤ₆OfRoot (α : rootsOfUnity 6 ℂ) : GaugeGroupI :=
+  (gaugeGroupℤ₆SU3OfRoot α, gaugeGroupℤ₆SU2OfRoot α, gaugeGroupℤ₆UnitaryOfRoot α)
+
+@[simp]
+lemma gaugeGroupℤ₆OfRoot_toSU3 (α : rootsOfUnity 6 ℂ) :
+    GaugeGroupI.toSU3 (gaugeGroupℤ₆OfRoot α) = gaugeGroupℤ₆SU3OfRoot α := rfl
+
+@[simp]
+lemma gaugeGroupℤ₆OfRoot_toSU2 (α : rootsOfUnity 6 ℂ) :
+    GaugeGroupI.toSU2 (gaugeGroupℤ₆OfRoot α) = gaugeGroupℤ₆SU2OfRoot α := rfl
+
+@[simp]
+lemma gaugeGroupℤ₆OfRoot_toU1 (α : rootsOfUnity 6 ℂ) :
+    GaugeGroupI.toU1 (gaugeGroupℤ₆OfRoot α) = gaugeGroupℤ₆UnitaryOfRoot α := rfl
+
+lemma gaugeGroupℤ₆OfRoot_mem_center (α : rootsOfUnity 6 ℂ) :
+    gaugeGroupℤ₆OfRoot α ∈ Subgroup.center GaugeGroupI := by
+  rw [Subgroup.mem_center_iff]
+  intro g
+  apply GaugeGroupI.ext
+  · change GaugeGroupI.toSU3 g * gaugeGroupℤ₆SU3OfRoot α =
+      gaugeGroupℤ₆SU3OfRoot α * GaugeGroupI.toSU3 g
+    ext i j
+    simp [gaugeGroupℤ₆SU3OfRoot, Matrix.scalar_apply, mul_comm]
+  · change GaugeGroupI.toSU2 g * gaugeGroupℤ₆SU2OfRoot α =
+      gaugeGroupℤ₆SU2OfRoot α * GaugeGroupI.toSU2 g
+    ext i j
+    simp [gaugeGroupℤ₆SU2OfRoot, Matrix.scalar_apply, mul_comm]
+  · change GaugeGroupI.toU1 g * gaugeGroupℤ₆UnitaryOfRoot α =
+      gaugeGroupℤ₆UnitaryOfRoot α * GaugeGroupI.toU1 g
+    exact mul_comm _ _
+
+/-- The homomorphism from sixth roots of unity to `GaugeGroupI`. -/
+noncomputable def gaugeGroupℤ₆Hom : rootsOfUnity 6 ℂ →* GaugeGroupI where
+  toFun := gaugeGroupℤ₆OfRoot
+  map_one' := by
+    apply GaugeGroupI.ext
+    · change gaugeGroupℤ₆SU3OfRoot 1 = 1
+      ext i j
+      simp [gaugeGroupℤ₆SU3OfRoot, Matrix.scalar_apply]
+    · change gaugeGroupℤ₆SU2OfRoot 1 = 1
+      ext i j
+      simp [gaugeGroupℤ₆SU2OfRoot, gaugeGroupℤ₆UnitaryOfRoot, Matrix.scalar_apply]
+    · change gaugeGroupℤ₆UnitaryOfRoot 1 = 1
+      ext
+      simp [gaugeGroupℤ₆UnitaryOfRoot]
+  map_mul' α β := by
+    apply GaugeGroupI.ext
+    · change gaugeGroupℤ₆SU3OfRoot (α * β) =
+        gaugeGroupℤ₆SU3OfRoot α * gaugeGroupℤ₆SU3OfRoot β
+      ext i j
+      simp [gaugeGroupℤ₆SU3OfRoot, Matrix.scalar_apply, pow_two, mul_left_comm, mul_comm]
+    · change gaugeGroupℤ₆SU2OfRoot (α * β) =
+        gaugeGroupℤ₆SU2OfRoot α * gaugeGroupℤ₆SU2OfRoot β
+      ext i j
+      fin_cases i <;> fin_cases j <;>
+        simp [gaugeGroupℤ₆SU2OfRoot, gaugeGroupℤ₆UnitaryOfRoot, Matrix.scalar_apply,
+          pow_succ] <;>
+        ring
+    · change gaugeGroupℤ₆UnitaryOfRoot (α * β) =
+        gaugeGroupℤ₆UnitaryOfRoot α * gaugeGroupℤ₆UnitaryOfRoot β
+      ext
+      simp [gaugeGroupℤ₆UnitaryOfRoot]
+
+@[simp]
+lemma gaugeGroupℤ₆Hom_apply (α : rootsOfUnity 6 ℂ) :
+    gaugeGroupℤ₆Hom α = gaugeGroupℤ₆OfRoot α := rfl
+
+@[simp]
+lemma gaugeGroupℤ₆Hom_toSU3 (α : rootsOfUnity 6 ℂ) :
+    GaugeGroupI.toSU3 (gaugeGroupℤ₆Hom α) = gaugeGroupℤ₆SU3OfRoot α := rfl
+
+@[simp]
+lemma gaugeGroupℤ₆Hom_toSU2 (α : rootsOfUnity 6 ℂ) :
+    GaugeGroupI.toSU2 (gaugeGroupℤ₆Hom α) = gaugeGroupℤ₆SU2OfRoot α := rfl
+
+@[simp]
+lemma gaugeGroupℤ₆Hom_toU1 (α : rootsOfUnity 6 ℂ) :
+    GaugeGroupI.toU1 (gaugeGroupℤ₆Hom α) = gaugeGroupℤ₆UnitaryOfRoot α := rfl
+
 /-- The subgroup of the un-quotiented gauge group which acts trivially on all particles in the
 standard model, i.e., the ℤ₆-subgroup of `GaugeGroupI` with elements `(α^2 * I₃, α^(-3) * I₂, α)`,
 where `α` is a sixth complex root of unity.
 
 See https://math.ucr.edu/home/baez/guts.pdf
 -/
-@[sorryful]
-def gaugeGroupℤ₆SubGroup [inst : Group GaugeGroupI] : Subgroup GaugeGroupI := sorry
+noncomputable def gaugeGroupℤ₆SubGroup : Subgroup GaugeGroupI :=
+  gaugeGroupℤ₆Hom.range
+
+lemma gaugeGroupℤ₆OfRoot_mem (α : rootsOfUnity 6 ℂ) :
+    gaugeGroupℤ₆OfRoot α ∈ gaugeGroupℤ₆SubGroup :=
+  ⟨α, rfl⟩
+
+lemma mem_gaugeGroupℤ₆SubGroup_iff (g : GaugeGroupI) :
+    g ∈ gaugeGroupℤ₆SubGroup ↔ ∃ α : rootsOfUnity 6 ℂ, gaugeGroupℤ₆OfRoot α = g := by
+  simp [gaugeGroupℤ₆SubGroup]
+
+lemma gaugeGroupℤ₆SubGroup_le_center :
+    gaugeGroupℤ₆SubGroup ≤ Subgroup.center GaugeGroupI := by
+  intro g hg
+  rw [mem_gaugeGroupℤ₆SubGroup_iff] at hg
+  rcases hg with ⟨α, rfl⟩
+  exact gaugeGroupℤ₆OfRoot_mem_center α
+
+instance gaugeGroupℤ₆SubGroup_normal : gaugeGroupℤ₆SubGroup.Normal where
+  conj_mem n hn g := by
+    have hn_center : n ∈ Subgroup.center GaugeGroupI := gaugeGroupℤ₆SubGroup_le_center hn
+    have hcomm : g * n = n * g := (Subgroup.mem_center_iff.mp hn_center) g
+    have hconj : g * n * g⁻¹ = n := by
+      calc
+        g * n * g⁻¹ = n * g * g⁻¹ := by rw [hcomm]
+        _ = n := by simp [mul_assoc]
+    simpa [hconj] using hn
 
 /-- The smallest possible gauge group of the Standard Model, i.e., the quotient of `GaugeGroupI` by
 the ℤ₆-subgroup `gaugeGroupℤ₆SubGroup`.
 
 See https://math.ucr.edu/home/baez/guts.pdf
 -/
-@[sorryful]
-def GaugeGroupℤ₆ : Type := sorry
+def GaugeGroupℤ₆ : Type :=
+  GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup
+
+noncomputable instance : Group GaugeGroupℤ₆ :=
+  inferInstanceAs (Group (GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup))
+
+namespace GaugeGroupℤ₆
+
+/-- The quotient map from `GaugeGroupI` to `GaugeGroupℤ₆`. -/
+noncomputable def mk : GaugeGroupI →* GaugeGroupℤ₆ :=
+  QuotientGroup.mk' gaugeGroupℤ₆SubGroup
+
+@[simp]
+lemma mk_gaugeGroupℤ₆OfRoot (α : rootsOfUnity 6 ℂ) :
+    mk (gaugeGroupℤ₆OfRoot α) = 1 := by
+  change ((gaugeGroupℤ₆OfRoot α : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) = 1
+  rw [QuotientGroup.eq_one_iff]
+  exact gaugeGroupℤ₆OfRoot_mem α
+
+end GaugeGroupℤ₆
 
 /-- The ℤ₂subgroup of the un-quotiented gauge group which acts trivially on all particles in the
 standard model, i.e., the ℤ₂-subgroup of `GaugeGroupI` derived from the ℤ₂ subgroup of
