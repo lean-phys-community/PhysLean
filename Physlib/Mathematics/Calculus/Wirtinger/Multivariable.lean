@@ -12,78 +12,82 @@ public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 
 # Multivariable Wirtinger calculus and Schwarz's theorem
 
+## Notation
+
+* The direction is a *subscript*: `d_v f` is the derivative in direction `v` of `f` at the
+  (implicit) base point `u`.
+* Three operators share this form — the total real derivative `d_v f`, and its holomorphic
+  and anti-holomorphic Wirtinger parts `∂_v f`, `∂̄_v f` (straight `d` for the total, `∂`/`∂̄`
+  for the parts).
+* A `/∂` fraction differentiates with respect to a *variable* (not a direction): either a
+  real coordinate, `∂f/∂x`, `∂f/∂z` (the `V = ℂ` case below), or the single argument of a
+  one-variable function in the chain rule, `∂g/∂f`, `∂g/∂f̄` (outer `g : ℂ → ℂ`, inner
+  `f : V → ℂ`; Leibniz form, §D).
+* For iterated derivatives (§I) the operators compose, `∂_v ∂̄_w f`.
+* `f̄` is the pointwise conjugate `p ↦ conj (f p)`.
+* `v`, `w` are directions in `V`.
+* `u : V` is the *fixed* base point a derivative is evaluated at — the implicit point in the
+  subscript notation.
+* `p : V` is the *bound* base-point variable when a derivative is repackaged as a function of
+  position: the inner field of an iterated operator (`fun p => dWirtingerAntiDir f w p`, §I),
+  or the composite in the chain rule (`fun p => g (f p)`, §D).
+
+Base points (`u`, `p`) and directions (`v`, `w`) all live in `V`: a vector space is its own
+tangent space, so a displacement from a point is again an element of `V` (`u + t·v`).
+
 ## i. Overview
 
 This module is the **foundation** of physlib's Wirtinger calculus. It defines the
-**directional Wirtinger derivatives** of `f : V → ℂ` on a complex vector space `V`,
-along a direction vector `v : V` (a complex number when `V = ℂ`, a vector in general):
+**directional Wirtinger derivatives** of `f : V → ℂ` on a complex vector space `V`, along a
+direction `v : V` (a complex number when `V = ℂ`, a vector in general):
 
   `∂_v f  = (1/2)(d_v f − i·d_{i·v} f)`     (`dWirtingerDir`)
   `∂̄_v f = (1/2)(d_v f + i·d_{i·v} f)`     (`dWirtingerAntiDir`)
 
-**Notation.** The direction is a *subscript*: `∂_v f` is the derivative in direction `v`
-of `f` at the (implicit) base point `u` — `v` is a direction, never `f`'s argument. Three
-operators share this form — the total real derivative `d_v f`, and its holomorphic and
-anti-holomorphic Wirtinger parts `∂_v f`, `∂̄_v f` (straight `d` for the total, `∂`/`∂̄`
-for the parts). A `/∂` fraction is reserved for genuine coordinate partials `∂f/∂x`,
-`∂f/∂z`, meaningful only when the variable is a real coordinate (the `V = ℂ` case below).
-For iterated derivatives (§H) the operators compose, `∂_v ∂̄_w f`. `f̄` is the pointwise
-conjugate `p ↦ conj (f p)`; `v`, `w` are directions and `u`, `p` base points in `V` (`p`
-the bound variable when an operator is read as a field over base points).
+**Real derivative.** `d_v f = fderiv ℝ f u v` is the real Fréchet derivative along `v`: the
+limit `lim_{t→0} (f(u + t·v) − f(u)) / t` over real `t`. So "real" names the scalar `t`, not
+the direction `v`; over all `v` these limits form the `ℝ`-linear map `fderiv ℝ f u : V → ℂ`.
 
-Here `d_v f = fderiv ℝ f u v` is the real Fréchet derivative of `f` along the *vector*
-`v`: the limit `lim_{t→0} (f(u + t·v) − f(u)) / t` with `t ∈ ℝ`, the rate of change of
-`f` along the real line `t ↦ u + t·v`. Over all directions these limits assemble into
-the `ℝ`-linear map `fderiv ℝ f u : V → ℂ`, so "real" names the scalar `t` and the
-resulting `ℝ`-linearity, not the direction `v`. Multiplication by `i` is the 90° rotation
-supplied by the complex structure on `V`, so `i·v` is `v` turned by 90°: `(v, i·v)` is an
-orthogonal pair pointing in `v`'s own (arbitrary) direction, a rotated and rescaled copy
-of the real/imaginary axes `(1, i)`. For `V = ℂ` we may pick `v = 1`, aligning the frame
-with the Cartesian axes (`i·v = i`), so `d_v f = ∂f/∂x` and `d_{i·v} f = ∂f/∂y`, and the
-formulas recover the usual definition `∂f/∂z = (1/2)(∂_x − i ∂_y)f`,
-`∂f/∂z̄ = (1/2)(∂_x + i ∂_y)f`.
+**Rotation.** `i·v` is `v` turned 90° by the complex structure on `V`; `(v, i·v)` is an
+orthogonal frame in `v`'s own (arbitrary) direction, a rotated, rescaled copy of the axes
+`(1, i)`. For `V = ℂ` take `v = 1`: then `d_v f = ∂f/∂x`, `d_{i·v} f = ∂f/∂y`, and with
+`z = x + i y`, `z̄ = x − i y` the formulas recover the classical
+`∂f/∂z = (1/2)(∂_x − i ∂_y)f`, `∂f/∂z̄ = (1/2)(∂_x + i ∂_y)f`.
 
-`ℝ`-linearity asks the map to commute with real scaling and addition; `ℂ`-linearity
-asks in addition that it commute with `i`, i.e. that `d_{i·v} f = i·d_v f`. The real
-derivative always meets the first condition; whether it meets the second is measured by
-the gap `d_{i·v} f − i·d_v f` between the two sides. That gap is precisely `−2i·∂̄_v f`,
-so the anti-holomorphic operator *is* the obstruction to `ℂ`-linearity: it vanishes
-exactly when `d_{i·v} f = i·d_v f` holds, i.e. iff `f` is holomorphic.
+**Holomorphy.** `ℝ`-linearity commutes with real scaling and addition; `ℂ`-linearity adds
+commuting with `i`, i.e. `d_{i·v} f = i·d_v f`. The real derivative always has the first;
+the gap `d_{i·v} f − i·d_v f` to the second is exactly `−2i·∂̄_v f`. So `∂̄_v f` is the
+obstruction to `ℂ`-linearity — it vanishes iff `f` is holomorphic.
 
-The two operators split this real directional derivative into its holomorphic and
-anti-holomorphic parts — the directional form of the splitting `d = ∂ + ∂̄` of the
-exterior derivative into its holomorphic and anti-holomorphic (Dolbeault) parts — which
-sum back to the original:
+**Splitting.** The two operators split the real derivative into holomorphic and
+anti-holomorphic parts — the directional form of `d = ∂ + ∂̄` (Dolbeault) — summing back to
 
   `d_v f = ∂_v f + ∂̄_v f`.
 
-A single `d_v f` sums the dependence of `f` on `z` and on `z̄`; each Wirtinger derivative
-is the full real derivative with the other half removed (`∂_v f = d_v f − ∂̄_v f` keeps
-the `z`-dependence, drops the `z̄`). This is what lets `z` and `z̄` be treated as
-independent variables; holomorphy is exactly the case where the dropped half vanishes
-(`d_{i·v} f = i·d_v f`), collapsing `∂_v f` back to the ordinary complex derivative (§E).
-Everything is built on `fderiv ℝ` and the algebraic lemmas of `Wirtinger.Basic`, not on
-any lower Wirtinger layer.
+This is the coordinate-free form of treating `z` and `z̄` as independent (the `V = ℂ` case
+above). When `f` is holomorphic the anti-holomorphic half drops and `∂_v f` is the ordinary
+complex derivative (§F). Everything rests on `fderiv ℝ` and `Wirtinger.Basic`, no lower
+Wirtinger layer.
 
 On these operators the module builds the **full directional calculus**:
 
 * real-linearity, the Leibniz rule, and the finite-sum rule (§B);
-* the inner-field conjugation lemmas and the two-term chain rule for an outer
-  `g : ℂ → ℂ` (§C);
+* the inner-field conjugation lemmas, swapping the two operators (§C);
+* the two-term Wirtinger chain rule for an outer `g : ℂ → ℂ` (§D);
 * domain conjugation: precomposing with a conjugate-linear map swaps the two
-  operators (§D);
+  operators (§E);
 * the holomorphic / anti-holomorphic collapse, keyed on `ℂ`-linearity or
-  conjugate-linearity of the real derivative along `v` (§E);
-* differentiability and locality of the operators on a `C²` field (§G).
+  conjugate-linearity of the real derivative along `v` (§F);
+* differentiability and locality of the operators on a `C²` field (§H).
 
-The capstone (§H) is **Schwarz's theorem** in Wirtinger form. On a `C²` field the
+The capstone (§I) is **Schwarz's theorem** in Wirtinger form. On a `C²` field the
 holomorphic and anti-holomorphic derivatives in any two directions commute:
 
   `∂_v ∂̄_w f = ∂̄_w ∂_v f`     (`dWirtingerDir_dWirtingerAntiDir_comm`)
 
 It is no new analytic fact: it reduces to the symmetry of the second real Fréchet
 derivative (`ContDiffAt.isSymmSndFDerivAt`), carried out via the `weightedDirDeriv` bridge
-of §F.
+of §G.
 
 ## ii. Key results
 
@@ -117,25 +121,28 @@ of §F.
 
 - A. The directional Wirtinger operators
 - B. Real-linearity and the Leibniz rule
-- C. Conjugation and the Wirtinger chain rule
-- D. Domain conjugation
-- E. The holomorphic collapse
-- F. The second-derivative bridge
-- G. Differentiability and locality
-- H. Schwarz's theorem
+- C. Conjugation
+- D. The Wirtinger chain rule
+- E. Domain conjugation
+- F. The holomorphic collapse
+- G. The second-derivative bridge
+- H. Differentiability and locality
+- I. Schwarz's theorem
 
 ## iv. References
 
 - Kreutz-Delgado, *The Complex Gradient Operator and the CR-Calculus*,
   arXiv:0906.4835 — directional/multivariable formulation and two-term chain
-  rule (§C); second-order theory behind §F–H.
+  rule (§D); second-order theory behind §G–I.
 - Mortini & Rupp, *The Clairaut–Schwarz Theorem for Mixed Wirtinger
   Derivatives*, Bull. Iranian Math. Soc. 48 (2022), 2643–2647 — the mixed
-  holomorphic/anti-holomorphic symmetry of §H under the same `C²` hypothesis,
+  holomorphic/anti-holomorphic symmetry of §I under the same `C²` hypothesis,
   with the same reduction to real Schwarz used here.
 - Koor, Qiu, Kwek & Rebentrost, *A short tutorial on Wirtinger Calculus with
   applications in quantum information*, arXiv:2312.04858 — companion
   exposition of the scalar single/multivariable calculus and sign conventions.
+- *Complex differential form*, Wikipedia (section "The Dolbeault operators") — the
+  `d = ∂ + ∂̄` splitting and the `∂`/`∂̄` notation this module's operators are named after.
 
 -/
 
@@ -152,10 +159,10 @@ variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedSpace ℂ
 
 ## A. The directional Wirtinger operators
 
-The directional operators repackage the real Fréchet derivative of `f` along
-the two directions `v` and `i·v` into a holomorphic and an anti-holomorphic
-combination — the directional `∂_v f`, whose `V = ℂ`, `v = 1` case is the
-classical one-variable Wirtinger derivative `∂f/∂z`.
+The two directional operators repackage the real Fréchet derivative of `f` along
+`v` and `i·v` into a holomorphic part `∂_v f` and an anti-holomorphic part `∂̄_v f`,
+the combinations `(1/2)(d_v f ∓ i·d_{i·v} f)`. Both are `ℂ`-valued and depend on the
+base point `u`.
 
 -/
 
@@ -278,21 +285,23 @@ lemma dWirtingerAntiDir_fun_sum {α : Type*} {s : Finset α} {F : α → V → �
 
 /-!
 
-## C. Conjugation and the Wirtinger chain rule
+## C. Conjugation
 
-Conjugating the function swaps the two operators up to an outer conjugation (via
-`fderiv_star_eq`); composing with an outer `g : ℂ → ℂ` gives the two-term
-Wirtinger chain rule, with the real-linear decomposition
-`realLinear_apply_eq_wirtinger` supplying the holomorphic / anti-holomorphic
-split.
+Conjugating the inner field `f` swaps the two operators, up to an outer conjugation on the
+value (`fderiv_star_eq`):
 
-The chain rule meets two notations, kept in separate lanes. The outer one-variable `g`
-is differentiated with respect to its argument — **Leibniz** form `∂g/∂f`, `∂g/∂f̄`, the
-partials of `g` over its variable `f` and conjugate `f̄`, the bar on the *variable*
-(`∂g/∂f` is `dWirtingerDir g 1 (f u)`, evaluated where the argument equals `f u`). The
-inner `f` and the composite are differentiated **directionally** — **Dolbeault** subscript
-form `∂_v`, `∂̄_v`, the bar on the *operator*. The two must not be conflated: `∂g/∂f̄` is a
-partial over a variable, `∂_v f` a derivative along a direction.
+  `∂_v f̄ = conj (∂̄_v f)`,     `∂̄_v f̄ = conj (∂_v f)`.
+
+Each operator applied to the conjugate field `f̄` returns the *other* operator on `f`,
+conjugated — the bar exchanges holomorphic and anti-holomorphic dependence. Concretely, on
+`V = ℂ` take the holomorphic `f(z) = z`, with `∂_z z = 1`, `∂̄_z z = 0`:
+
+* `∂_v f̄ = conj (∂̄_v f)` reads `∂_z z̄ = conj 0 = 0` — the conjugate `z̄` has no
+  holomorphic part;
+* the dual `∂̄_v f̄ = conj (∂_v f)` reads `∂̄_z z̄ = conj 1 = 1` — all of `z̄`'s dependence
+  sits in the anti-holomorphic operator.
+
+The chain rule of §D builds on these to handle a conjugated inner argument.
 
 -/
 
@@ -318,16 +327,32 @@ lemma dWirtingerAntiDir_star_comp (hf : DifferentiableAt ℝ f u) (v : V) :
     map_ofNat, Complex.conj_I]
   ring
 
-/-- The two-term Wirtinger chain rule for `dWirtingerDir`. A generally non-holomorphic
-outer `g : ℂ → ℂ` responds to its argument through both `∂g/∂f` and `∂g/∂f̄` (its Wirtinger
-partials over the variable `f`); composing with `f` feeds in the directional derivatives
-`∂_v f` and `∂_v f̄`, giving the two channels
-`∂_v(g∘f) = (∂g/∂f)·∂_v f + (∂g/∂f̄)·∂_v f̄` (Leibniz outer, Dolbeault inner — see §C).
+/-!
 
-Proof: the real chain rule makes the outer factor an `ℝ`-linear map `ℂ → ℂ`, which
-`realLinear_apply_eq_wirtinger` writes as `L(w) = (∂g/∂f)·w + (∂g/∂f̄)·conj(w)`; applying
-this on the inner directions `v` and `i·v` and recombining by `ring` gives the two
-channels. -/
+## D. The Wirtinger chain rule
+
+Composing with an outer `g : ℂ → ℂ` gives a **two-term** chain rule:
+
+  `∂_v(g∘f) = (∂g/∂f)·∂_v f + (∂g/∂f̄)·∂_v f̄`.
+
+A non-holomorphic `g` depends on both its argument and its conjugate, so both channels
+contribute: the holomorphic `∂g/∂f` and the anti-holomorphic `∂g/∂f̄`, each times the
+matching inner derivative — two terms where the complex-analytic rule has one. The two
+coefficients come from `realLinear_apply_eq_wirtinger`: every `ℝ`-linear `L : ℂ → ℂ`
+splits as `L w = a·w + b·conj w`, and on the outer real derivative `L = fderiv ℝ g (f u)`
+that gives `a = ∂g/∂f`, `b = ∂g/∂f̄`. The proof applies this split to the outer factor and
+reuses the §C conjugation lemmas for the `∂_v f̄` term.
+
+-/
+
+/-- The two-term Wirtinger chain rule for `dWirtingerDir`, outer `g : ℂ → ℂ` and inner
+`f : V → ℂ`:
+
+  `∂_v(g∘f) = (∂g/∂f)·∂_v f + (∂g/∂f̄)·∂_v f̄`.
+
+`realLinear_apply_eq_wirtinger` splits the chain rule's outer `ℝ`-linear factor into the
+`∂g/∂f`, `∂g/∂f̄` coefficients, each multiplying its inner directional derivative `∂_v f`,
+`∂_v f̄`. -/
 lemma dWirtingerDir_comp {g : ℂ → ℂ} (hg : DifferentiableAt ℝ g (f u))
     (hf : DifferentiableAt ℝ f u) (v : V) :
     dWirtingerDir (fun p => g (f p)) v u =
@@ -342,9 +367,13 @@ lemma dWirtingerDir_comp {g : ℂ → ℂ} (hg : DifferentiableAt ℝ g (f u))
   simp only [ContinuousLinearEquiv.coe_coe, Complex.conjCLE_apply, Complex.star_def]
   ring
 
-/-- The two-term Wirtinger chain rule for `dWirtingerAntiDir`, the anti-holomorphic dual
-of `dWirtingerDir_comp`: the same two channels, with the inner derivative now
-anti-holomorphic, `(∂g/∂f)·∂̄_v f + (∂g/∂f̄)·∂̄_v f̄`. Same proof as `dWirtingerDir_comp`. -/
+/-- The two-term Wirtinger chain rule for `dWirtingerAntiDir`, the anti-holomorphic dual of
+`dWirtingerDir_comp`:
+
+  `∂̄_v(g∘f) = (∂g/∂f)·∂̄_v f + (∂g/∂f̄)·∂̄_v f̄`.
+
+Same outer `∂g/∂f`, `∂g/∂f̄` coefficients, now each multiplying its anti-holomorphic inner
+derivative `∂̄_v f`, `∂̄_v f̄`; same proof as `dWirtingerDir_comp`. -/
 lemma dWirtingerAntiDir_comp {g : ℂ → ℂ} (hg : DifferentiableAt ℝ g (f u))
     (hf : DifferentiableAt ℝ f u) (v : V) :
     dWirtingerAntiDir (fun p => g (f p)) v u =
@@ -361,7 +390,7 @@ lemma dWirtingerAntiDir_comp {g : ℂ → ℂ} (hg : DifferentiableAt ℝ g (f u
 
 /-!
 
-## D. Domain conjugation
+## E. Domain conjugation
 
 The §C lemmas conjugate a function's *output*; this section conjugates its
 *input*. Precomposing `g` with a domain map `L` — forming `g ∘ L` — relates the
@@ -384,7 +413,7 @@ two operators and transports the base point and direction through `L`:
 
 Use it to differentiate a function whose input has been conjugated (`g ∘ L`, e.g.
 `g(z̄)`). The swap rewrites that derivative as the *other* operator on the plain
-`g`, exposing it for the §E collapse: for a holomorphic `g`, `g ∘ L` then has
+`g`, exposing it for the §F collapse: for a holomorphic `g`, `g ∘ L` then has
 vanishing holomorphic derivative and an anti-holomorphic derivative equal to the complex
 derivative of `g` — the Cauchy–Riemann split for anti-holomorphic dependence. It
 is the input-side counterpart of §C's output conjugation, the two together fixing
@@ -428,7 +457,7 @@ end DomainConjugation
 
 /-!
 
-## E. The holomorphic collapse
+## F. The holomorphic collapse
 
 When the real Fréchet derivative is `ℂ`-linear along the chosen direction
 (`d_{i·v} f = i·d_v f` — the Cauchy–Riemann content), `dWirtingerDir` returns the
@@ -470,7 +499,7 @@ lemma dWirtingerAntiDir_eq_of_antilinear {v : V}
 
 /-!
 
-## F. The second-derivative bridge
+## G. The second-derivative bridge
 
 Each directional operator is, definitionally, the combination
 `(1/2)(d_v f + c·d_{i·v} f)` of the real Fréchet derivative along a
@@ -489,7 +518,7 @@ holomorphic∘holomorphic, holomorphic∘anti-holomorphic,
 anti-holomorphic∘holomorphic, anti-holomorphic∘anti-holomorphic — are just four
 instantiations of the same bridge, differing only in the complex coefficients;
 each reduces to the same `fderiv ℝ (fderiv ℝ f) u` on the four directions `v`,
-`i·v`, `w`, `i·w`. §H discharges the mixed pairing (the one Kähler geometry
+`i·v`, `w`, `i·w`. §I discharges the mixed pairing (the one Kähler geometry
 needs); the other three would follow from this bridge with no new plumbing — a
 different choice of `(c, b₁, b₂)`, then `ContDiffAt.isSymmSndFDerivAt` and
 `ring`.
@@ -574,13 +603,13 @@ private lemma fderiv_dWirtingerDir (hf' : DifferentiableAt ℝ (fderiv ℝ f) u)
 
 /-!
 
-## G. Differentiability and locality
+## H. Differentiability and locality
 
 Two regularity facts about the operators viewed as fields in the base point.
 **Differentiability**: on a `C²` field the directional derivative `p ↦ ∂_v f`
-is itself real-differentiable (`differentiableAt_dWirtingerDir`) — by §F it is a
+is itself real-differentiable (`differentiableAt_dWirtingerDir`) — by §G it is a
 `weightedDirDeriv`, and `fderiv ℝ f` is differentiable for a `C²` `f`. This is the
-regularity §H needs to differentiate a Wirtinger derivative a second time.
+regularity §I needs to differentiate a Wirtinger derivative a second time.
 **Locality**: each operator depends only on `f` near `u`, inherited from
 `fderiv ℝ` — fields agreeing on a neighbourhood of `u` have equal directional
 derivative there (`dWirtingerDir_congr_of_eventuallyEq`).
@@ -617,7 +646,7 @@ lemma dWirtingerAntiDir_congr_of_eventuallyEq {f₁ f₂ : V → ℂ} {u : V}
 
 /-!
 
-## H. Schwarz's theorem
+## I. Schwarz's theorem
 
 -/
 
