@@ -688,6 +688,28 @@ lemma mem_residualSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
 lemma residualSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σʳ T ⊆ σ T :=
   fun _ ⟨_, h, _⟩ ↦ mem_spectrum_iff.mpr (Or.inr <| Or.inl h)
 
+/-!
+#### D.2.3. Continuous spectrum
+-/
+
+/-- The continuous spectrum, `σᶜ`, of a partial linear map.
+
+  A complex number `z` is in `σᶜ T` iff the range of `T - z • 1` is not closed. -/
+def continuousSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ :=
+  {z : ℂ | ¬_root_.IsClosed ((T - z • 1).toFun.range : Set H)}
+
+@[inherit_doc continuousSpectrum]
+local notation "σᶜ" => continuousSpectrum
+
+lemma continuousSpectrum_eq (T : H →ₗ.[ℂ] H) :
+    σᶜ T = {z | ¬_root_.IsClosed ((T - z • 1).toFun.range : Set H)} := rfl
+
+lemma mem_continuousSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
+    z ∈ σᶜ T ↔ ¬_root_.IsClosed ((T - z • 1).toFun.range : Set H) := Iff.rfl
+
+lemma continuousSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σᶜ T ⊆ σ T :=
+  fun _ h ⟨_, h_range, _⟩ ↦ h (by simp [h_range])
+
 end
 
 end LinearPMap
