@@ -21,6 +21,24 @@ The scope of this module is to define on `Space d` the structure of a `Module`
 These instances require certain non-canonical choices to be made, for example the choice
 of a zero and for a basis, a choice of orientation.
 
+In Lean, an `instance` supplies a typeclass automatically. When a definition or
+theorem needs a structure such as `AddCommGroup (Space d)`, `Module ℝ (Space d)`,
+`NormedAddCommGroup (Space d)`, `InnerProductSpace ℝ (Space d)`, or
+`MeasurableSpace (Space d)`, typeclass inference searches for the corresponding
+instance and inserts it without the user passing it explicitly.
+
+These instances make `Space d` usable with standard mathematical notation and
+with the Mathlib API. For example, they allow expressions such as `p + q`,
+`c • p`, `‖p‖`, `inner ℝ p q`, and measurable-set arguments involving the Borel
+structure. They also make general theorems about modules, normed groups, inner
+product spaces, and measurable spaces apply directly to `Space d`.
+
+For `Space d`, these instances are intentional choices rather than inherited
+facts: the type was defined as a structure instead of an abbreviation for
+Euclidean space. In particular, the additive and module structures choose an
+origin, while the norm, inner product, and Borel structure choose the standard
+Euclidean coordinate geometry.
+
 -/
 
 @[expose] public section
@@ -289,28 +307,6 @@ noncomputable instance {d : ℕ} : MeasurableSpace (Space d) := borel (Space d)
 
 instance {d : ℕ} : BorelSpace (Space d) where
   measurable_eq := by rfl
-
-/-!
-
-In Lean, an `instance` supplies a typeclass automatically. When a definition or
-theorem needs a structure such as `AddCommGroup (Space d)`, `Module ℝ (Space d)`,
-`NormedAddCommGroup (Space d)`, `InnerProductSpace ℝ (Space d)`, or
-`MeasurableSpace (Space d)`, typeclass inference searches for the corresponding
-instance and inserts it without the user passing it explicitly.
-
-These instances make `Space d` usable with standard mathematical notation and
-with the Mathlib API. For example, they allow expressions such as `p + q`,
-`c • p`, `‖p‖`, `inner ℝ p q`, and measurable-set arguments involving the Borel
-structure. They also make general theorems about modules, normed groups, inner
-product spaces, and measurable spaces apply directly to `Space d`.
-
-For `Space d`, these instances are intentional choices rather than inherited
-facts: the type was defined as a structure instead of an abbreviation for
-`EuclideanSpace ℝ (Fin d)`. In particular, the additive and module structures
-choose an origin, while the norm, inner product, and Borel structure choose the
-standard Euclidean coordinate geometry on `Fin d`.
-
--/
 
 /-!
 
