@@ -303,6 +303,9 @@ lemma sub_le_of_le_add (h : g ≤ g₁ + g₂) : g - g₂ ≤ g₁ := by
   · intro ⟨x, hx⟩ ⟨y, hy⟩ rfl
     simp [sub_apply, @h.2 ⟨x, hx.1⟩ ⟨x, ⟨hy, hx.2⟩⟩ rfl, add_apply]
 
+lemma sub_add_le_cancel : f₁ - f₂ + f₂ ≤ f₁ :=
+  sub_eq_add_neg f₁ f₂ ▸ sub_neg_eq_add _ f₂ ▸ add_sub_le_cancel_right f₁ (-f₂)
+
 lemma add_le_of_le_sub (h : g ≤ g₁ - g₂) : g + g₂ ≤ g₁ :=
   sub_neg_eq_add g g₂ ▸ sub_le_of_le_add (sub_eq_add_neg g₁ g₂ ▸ h)
 
