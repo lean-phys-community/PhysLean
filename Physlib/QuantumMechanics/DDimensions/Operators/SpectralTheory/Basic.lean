@@ -230,6 +230,13 @@ def defectNumber (T : H →ₗ.[ℂ] H) (z : ℂ) : Cardinal := Module.rank ℂ 
 lemma defectNumber_eq (T : H →ₗ.[ℂ] H) (z : ℂ) :
     T.defectNumber z = Module.rank ℂ (T.deficiencySubspace z) := rfl
 
+lemma IsClosed.defectNumber_eq_zero_iff [CompleteSpace H]
+    {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) {z : ℂ} (hz : z ∈ T.regularityDomain) :
+    T.defectNumber z = 0 ↔ (T - z • 1).toFun.range = ⊤ := by
+  haveI := hT.sub_range_isClosed hz -- needed for HasOrthogonalProjection
+  rw [← orthogonal_eq_bot_iff, ← rank_eq_zero]
+  exact Iff.rfl
+
 /-- `T` and `T.closure` have the same defect number at points in their regularity domain. -/
 lemma defectNumber_closure [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} {z : ℂ} (hz : z ∈ T.regularityDomain) :
@@ -547,6 +554,60 @@ lemma resolventSet_eq (T : H →ₗ.[ℂ] H) :
 lemma mem_resolventSet_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
     z ∈ ρ T ↔ (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z) :=
   Iff.rfl
+
+/-- If an operator is not closed then its resolvent set is empty. -/
+lemma resolventSet_eq_empty [CompleteSpace H] {T : H →ₗ.[ℂ] H} (h : ¬T.IsClosed) : ρ T = ∅ := by
+  ext z
+  simp only [mem_empty_iff_false, iff_false]
+  by_contra ⟨h_ker, h_range, h_cont⟩
+  suffices (T - z • 1).IsClosed by
+    have hTz : T - z • 1 + z • 1 = T :=
+      eq_of_le_of_domain_eq (sub_add_le_cancel _ _) (by simp [add_domain, sub_domain])
+    exact h <| hTz ▸ this.add_continuous (Continuous.const_smul (by fun_prop) _) (by simp)
+  apply (inverse_closed_iff h_ker).mp
+  apply (isClosed_iff_isClosed_domain_of_continuous h_cont).mpr
+  simp [inverse_domain, h_range]
+
+lemma resolventSet_subset_regularityDomain (T : H →ₗ.[ℂ] H) : ρ T ⊆ T.regularityDomain :=
+  fun _ ⟨h_ker, _, h_cont⟩ ↦ mem_regularityDomain_iff.mpr ⟨h_ker, h_cont⟩
+
+/-- For a closed operator the continuity of the resolvent is redundant
+  in the definition of the resolvent set. -/
+lemma IsClosed.resolventSet_eq [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) :
+    ρ T = {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤} := by
+  ext z
+  rw [mem_resolventSet_iff, mem_setOf_eq, and_congr_right_iff, and_iff_left_iff_imp]
+  intro h_ker h_range
+  refine continuous_of_isClosed_domain ?_ ?_
+  · apply (inverse_closed_iff h_ker).mpr
+    exact hT.sub_continuous (Continuous.const_smul (by fun_prop) _) (by simp)
+  · simp [inverse_domain, h_range]
+
+/-- For a closed operator the resolvent set consists of those regular points for which
+  the defect number is zero. -/
+lemma IsClosed.resolventSet_eq' [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) :
+    ρ T = T.regularityDomain ∩ T.defectNumber ⁻¹' {0} := by
+  ext z
+  constructor
+  · intro hρ
+    have hz : z ∈ T.regularityDomain := T.resolventSet_subset_regularityDomain hρ
+    exact ⟨hz, (hT.defectNumber_eq_zero_iff hz).mpr hρ.2.1⟩
+  · intro ⟨h_reg, h_defect⟩
+    obtain ⟨h_ker, h_cont⟩ := mem_regularityDomain_iff.mp h_reg
+    exact ⟨h_ker, (hT.defectNumber_eq_zero_iff h_reg).mp h_defect, h_cont⟩
+
+/-- The resolvent set is an open subset of ℂ. -/
+lemma resolventSet_isOpen [CompleteSpace H] (T : H →ₗ.[ℂ] H) : IsOpen (ρ T) := by
+  by_cases hT : T.IsClosed
+  · rw [hT.resolventSet_eq']
+    apply isOpen_iff_forall_mem_open.mpr
+    intro z₁ hz₁
+    refine ⟨connectedComponentIn T.regularityDomain z₁, fun z₂ hz₂ ↦ ⟨?_, ?_⟩, ?_, ?_⟩
+    · exact connectedComponentIn_subset _ _ hz₂
+    · simp_all [hT.isClosable.defectNumber_const hz₂]
+    · exact T.regularityDomain_isOpen.connectedComponentIn
+    · exact mem_connectedComponentIn hz₁.1
+  · simp [resolventSet_eq_empty hT]
 
 end
 
