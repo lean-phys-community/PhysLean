@@ -162,33 +162,45 @@ variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedSpace ℂ
 
 The two directional operators repackage the real Fréchet derivative of `f` along
 `v` and `i·v` into a holomorphic part `∂_v f` and an anti-holomorphic part `∂̄_v f`,
-the combinations `(1/2)(d_v f ∓ i·d_{i·v} f)`. Both are `ℂ`-valued and depend on the
-base point `u`.
+the combinations `(1/2)(d_v f ∓ i·d_{i·v} f)`. Both share one shape, `weightedDirDeriv`,
+the base-point field `p ↦ (1/2)(d_{b₁} f + c·d_{b₂} f)`, and are its two specializations
+at `c = ∓i`, `(b₁, b₂) = (v, i·v)`. Defining the operators through it makes their second
+derivative — the engine of Schwarz's theorem (§G, §I) — a single bridge lemma. Both are
+`ℂ`-valued and depend on the base point `u`.
 
 -/
 
+/-- The base-point field `p ↦ (1/2)(d_{b₁} f + c·d_{b₂} f)`, a weighted combination of the
+real Fréchet derivative of `f` along two directions `b₁`, `b₂`. The directional Wirtinger
+operators are its two specializations: `dWirtingerDir f v` at `c = -i`, `(b₁, b₂) = (v, i·v)`,
+and `dWirtingerAntiDir f v` at `c = i`. Keeping `b₁`, `b₂` free lets §G differentiate it a
+second time once and reuse the bridge for both operators. -/
+def weightedDirDeriv (f : V → ℂ) (c : ℂ) (b₁ b₂ : V) : V → ℂ :=
+  fun p => (1 / 2 : ℂ) * (fderiv ℝ f p b₁ + c * fderiv ℝ f p b₂)
+
 /-- The holomorphic directional Wirtinger derivative `∂_v f = (1/2)(d_v f − i·d_{i·v} f)`
-of `f : V → ℂ` along the direction vector `v : V`. -/
-def dWirtingerDir (f : V → ℂ) (v : V) (u : V) : ℂ :=
-  (1 / 2 : ℂ) * (fderiv ℝ f u v - Complex.I * fderiv ℝ f u (Complex.I • v))
+of `f : V → ℂ` along the direction vector `v : V`, the `weightedDirDeriv` at `c = -i`. -/
+def dWirtingerDir (f : V → ℂ) (v u : V) : ℂ :=
+  weightedDirDeriv f (-Complex.I) v (Complex.I • v) u
 
 /-- The anti-holomorphic directional Wirtinger derivative
-`∂̄_v f = (1/2)(d_v f + i·d_{i·v} f)` of `f : V → ℂ` along the direction vector `v : V`. -/
-def dWirtingerAntiDir (f : V → ℂ) (v : V) (u : V) : ℂ :=
-  (1 / 2 : ℂ) * (fderiv ℝ f u v + Complex.I * fderiv ℝ f u (Complex.I • v))
+`∂̄_v f = (1/2)(d_v f + i·d_{i·v} f)` of `f : V → ℂ` along the direction vector `v : V`,
+the `weightedDirDeriv` at `c = i`. -/
+def dWirtingerAntiDir (f : V → ℂ) (v u : V) : ℂ :=
+  weightedDirDeriv f Complex.I v (Complex.I • v) u
 
-/-- Definitional unfolding of `dWirtingerDir`, used to expand the outer operator
-of a composition without touching the inner one. -/
+/-- Definitional unfolding of `dWirtingerDir` to the explicit Wirtinger combination, used to
+expand the outer operator of a composition without touching the inner one. -/
 lemma dWirtingerDir_apply (g : V → ℂ) (v u : V) :
     dWirtingerDir g v u
-      = (1 / 2 : ℂ) * (fderiv ℝ g u v - Complex.I * fderiv ℝ g u (Complex.I • v)) :=
-  rfl
+      = (1 / 2 : ℂ) * (fderiv ℝ g u v - Complex.I * fderiv ℝ g u (Complex.I • v)) := by
+  simp only [dWirtingerDir, weightedDirDeriv]; ring
 
-/-- Definitional unfolding of `dWirtingerAntiDir`. -/
+/-- Definitional unfolding of `dWirtingerAntiDir` to the explicit Wirtinger combination. -/
 lemma dWirtingerAntiDir_apply (g : V → ℂ) (v u : V) :
     dWirtingerAntiDir g v u
-      = (1 / 2 : ℂ) * (fderiv ℝ g u v + Complex.I * fderiv ℝ g u (Complex.I • v)) :=
-  rfl
+      = (1 / 2 : ℂ) * (fderiv ℝ g u v + Complex.I * fderiv ℝ g u (Complex.I • v)) := by
+  simp only [dWirtingerAntiDir, weightedDirDeriv]
 
 /-!
 
@@ -204,48 +216,48 @@ rule.
 /-- Constants have zero holomorphic directional Wirtinger derivative, `∂_v c = 0`. -/
 @[simp] lemma dWirtingerDir_const (c : ℂ) (v u : V) :
     dWirtingerDir (fun _ : V => c) v u = 0 := by
-  simp [dWirtingerDir, fderiv_const_apply]
+  simp [dWirtingerDir_apply, fderiv_const_apply]
 
 /-- Constants have zero anti-holomorphic directional Wirtinger derivative, `∂̄_v c = 0`. -/
 @[simp] lemma dWirtingerAntiDir_const (c : ℂ) (v u : V) :
     dWirtingerAntiDir (fun _ : V => c) v u = 0 := by
-  simp [dWirtingerAntiDir, fderiv_const_apply]
+  simp [dWirtingerAntiDir_apply, fderiv_const_apply]
 
 /-- `dWirtingerDir` of a negated function, `∂_v(−g) = −∂_v g`. Holds with no
 differentiability hypothesis, since `fderiv` of a negation is unconditional. -/
 @[simp] lemma dWirtingerDir_neg (g : V → ℂ) (v u : V) :
     dWirtingerDir (fun p => -(g p)) v u = -(dWirtingerDir g v u) := by
-  simp only [dWirtingerDir, fderiv_fun_neg, ContinuousLinearMap.neg_apply]; ring
+  simp only [dWirtingerDir_apply, fderiv_fun_neg, ContinuousLinearMap.neg_apply]; ring
 
 /-- `dWirtingerAntiDir` of a negated function, `∂̄_v(−g) = −∂̄_v g`. -/
 @[simp] lemma dWirtingerAntiDir_neg (g : V → ℂ) (v u : V) :
     dWirtingerAntiDir (fun p => -(g p)) v u = -(dWirtingerAntiDir g v u) := by
-  simp only [dWirtingerAntiDir, fderiv_fun_neg, ContinuousLinearMap.neg_apply]; ring
+  simp only [dWirtingerAntiDir_apply, fderiv_fun_neg, ContinuousLinearMap.neg_apply]; ring
 
 /-- Additivity of `dWirtingerDir`, `∂_v(g + h) = ∂_v g + ∂_v h`. -/
 lemma dWirtingerDir_add {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
     (hh : DifferentiableAt ℝ h u) (v : V) :
     dWirtingerDir (g + h) v u = dWirtingerDir g v u + dWirtingerDir h v u := by
-  simp only [dWirtingerDir, fderiv_add hg hh, ContinuousLinearMap.add_apply]; ring
+  simp only [dWirtingerDir_apply, fderiv_add hg hh, ContinuousLinearMap.add_apply]; ring
 
 /-- Additivity of `dWirtingerAntiDir`, `∂̄_v(g + h) = ∂̄_v g + ∂̄_v h`. -/
 lemma dWirtingerAntiDir_add {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
     (hh : DifferentiableAt ℝ h u) (v : V) :
     dWirtingerAntiDir (g + h) v u = dWirtingerAntiDir g v u + dWirtingerAntiDir h v u := by
-  simp only [dWirtingerAntiDir, fderiv_add hg hh, ContinuousLinearMap.add_apply]; ring
+  simp only [dWirtingerAntiDir_apply, fderiv_add hg hh, ContinuousLinearMap.add_apply]; ring
 
 /-- Compatibility of `dWirtingerDir` with complex scalar multiplication,
 `∂_v(c·g) = c·∂_v g`. -/
 lemma dWirtingerDir_smul (c : ℂ) {g : V → ℂ} (hg : DifferentiableAt ℝ g u) (v : V) :
     dWirtingerDir (c • g) v u = c • dWirtingerDir g v u := by
-  simp only [dWirtingerDir, fderiv_const_smul hg c, ContinuousLinearMap.smul_apply,
+  simp only [dWirtingerDir_apply, fderiv_const_smul hg c, ContinuousLinearMap.smul_apply,
     smul_eq_mul]; ring
 
 /-- Compatibility of `dWirtingerAntiDir` with complex scalar multiplication,
 `∂̄_v(c·g) = c·∂̄_v g`. -/
 lemma dWirtingerAntiDir_smul (c : ℂ) {g : V → ℂ} (hg : DifferentiableAt ℝ g u) (v : V) :
     dWirtingerAntiDir (c • g) v u = c • dWirtingerAntiDir g v u := by
-  simp only [dWirtingerAntiDir, fderiv_const_smul hg c, ContinuousLinearMap.smul_apply,
+  simp only [dWirtingerAntiDir_apply, fderiv_const_smul hg c, ContinuousLinearMap.smul_apply,
     smul_eq_mul]; ring
 
 omit [NormedSpace ℂ V] in
@@ -260,7 +272,7 @@ private lemma fderiv_mul_apply {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
 lemma dWirtingerDir_mul {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
     (hh : DifferentiableAt ℝ h u) (v : V) :
     dWirtingerDir (g * h) v u = dWirtingerDir g v u * h u + g u * dWirtingerDir h v u := by
-  simp only [dWirtingerDir, fderiv_mul_apply hg hh]; ring
+  simp only [dWirtingerDir_apply, fderiv_mul_apply hg hh]; ring
 
 /-- The Wirtinger Leibniz rule for `dWirtingerAntiDir`,
 `∂̄_v(g·h) = ∂̄_v g·h + g·∂̄_v h`. -/
@@ -268,20 +280,20 @@ lemma dWirtingerAntiDir_mul {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
     (hh : DifferentiableAt ℝ h u) (v : V) :
     dWirtingerAntiDir (g * h) v u =
       dWirtingerAntiDir g v u * h u + g u * dWirtingerAntiDir h v u := by
-  simp only [dWirtingerAntiDir, fderiv_mul_apply hg hh]; ring
+  simp only [dWirtingerAntiDir_apply, fderiv_mul_apply hg hh]; ring
 
 /-- Finite-sum rule for `dWirtingerDir`, `∂_v(∑ₐ Fₐ) = ∑ₐ ∂_v Fₐ`. -/
 lemma dWirtingerDir_fun_sum {α : Type*} {s : Finset α} {F : α → V → ℂ}
     (hF : ∀ a ∈ s, DifferentiableAt ℝ (F a) u) (v : V) :
     dWirtingerDir (fun p => ∑ a ∈ s, F a p) v u = ∑ a ∈ s, dWirtingerDir (F a) v u := by
-  simp only [dWirtingerDir, fderiv_fun_sum hF, ContinuousLinearMap.sum_apply]
+  simp only [dWirtingerDir_apply, fderiv_fun_sum hF, ContinuousLinearMap.sum_apply]
   rw [Finset.mul_sum, ← Finset.sum_sub_distrib, Finset.mul_sum]
 
 /-- Finite-sum rule for `dWirtingerAntiDir`, `∂̄_v(∑ₐ Fₐ) = ∑ₐ ∂̄_v Fₐ`. -/
 lemma dWirtingerAntiDir_fun_sum {α : Type*} {s : Finset α} {F : α → V → ℂ}
     (hF : ∀ a ∈ s, DifferentiableAt ℝ (F a) u) (v : V) :
     dWirtingerAntiDir (fun p => ∑ a ∈ s, F a p) v u = ∑ a ∈ s, dWirtingerAntiDir (F a) v u := by
-  simp only [dWirtingerAntiDir, fderiv_fun_sum hF, ContinuousLinearMap.sum_apply]
+  simp only [dWirtingerAntiDir_apply, fderiv_fun_sum hF, ContinuousLinearMap.sum_apply]
   rw [Finset.mul_sum, ← Finset.sum_add_distrib, Finset.mul_sum]
 
 /-!
@@ -329,7 +341,7 @@ lemma fderiv_star_eq {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 `∂_v f̄ = conj (∂̄_v f)`. -/
 lemma dWirtingerDir_star_comp (hf : DifferentiableAt ℝ f u) (v : V) :
     dWirtingerDir (fun p => star (f p)) v u = star (dWirtingerAntiDir f v u) := by
-  simp only [dWirtingerDir, dWirtingerAntiDir]
+  simp only [dWirtingerDir_apply, dWirtingerAntiDir_apply]
   rw [fderiv_star_eq hf]
   simp only [ContinuousLinearMap.comp_apply, ContinuousLinearEquiv.coe_coe,
     Complex.conjCLE_apply, Complex.star_def, map_mul, map_add, map_div₀, map_one,
@@ -340,7 +352,7 @@ lemma dWirtingerDir_star_comp (hf : DifferentiableAt ℝ f u) (v : V) :
 `∂̄_v f̄ = conj (∂_v f)`. Dual of `dWirtingerDir_star_comp`. -/
 lemma dWirtingerAntiDir_star_comp (hf : DifferentiableAt ℝ f u) (v : V) :
     dWirtingerAntiDir (fun p => star (f p)) v u = star (dWirtingerDir f v u) := by
-  simp only [dWirtingerDir, dWirtingerAntiDir]
+  simp only [dWirtingerDir_apply, dWirtingerAntiDir_apply]
   rw [fderiv_star_eq hf]
   simp only [ContinuousLinearMap.comp_apply, ContinuousLinearEquiv.coe_coe,
     Complex.conjCLE_apply, Complex.star_def, map_mul, map_sub, map_div₀, map_one,
@@ -406,7 +418,7 @@ lemma dWirtingerDir_comp {g : ℂ → ℂ} (hg : DifferentiableAt ℝ g (f u))
     dWirtingerDir (fun p => g (f p)) v u =
       dWirtingerDir g 1 (f u) * dWirtingerDir f v u
         + dWirtingerAntiDir g 1 (f u) * dWirtingerDir (fun p => star (f p)) v u := by
-  simp only [dWirtingerDir, dWirtingerAntiDir, smul_eq_mul, mul_one]
+  simp only [dWirtingerDir_apply, dWirtingerAntiDir_apply, smul_eq_mul, mul_one]
   rw [show (fun p => g (f p)) = g ∘ f from rfl, fderiv_comp u hg hf, fderiv_star_eq hf]
   simp only [ContinuousLinearMap.comp_apply]
   have hA := realLinear_apply_eq_wirtinger (fderiv ℝ g (f u)) (fderiv ℝ f u v)
@@ -427,7 +439,7 @@ lemma dWirtingerAntiDir_comp {g : ℂ → ℂ} (hg : DifferentiableAt ℝ g (f u
     dWirtingerAntiDir (fun p => g (f p)) v u =
       dWirtingerDir g 1 (f u) * dWirtingerAntiDir f v u
         + dWirtingerAntiDir g 1 (f u) * dWirtingerAntiDir (fun p => star (f p)) v u := by
-  simp only [dWirtingerDir, dWirtingerAntiDir, smul_eq_mul, mul_one]
+  simp only [dWirtingerDir_apply, dWirtingerAntiDir_apply, smul_eq_mul, mul_one]
   rw [show (fun p => g (f p)) = g ∘ f from rfl, fderiv_comp u hg hf, fderiv_star_eq hf]
   simp only [ContinuousLinearMap.comp_apply]
   have hA := realLinear_apply_eq_wirtinger (fderiv ℝ g (f u)) (fderiv ℝ f u v)
@@ -499,7 +511,9 @@ lemma dWirtingerDir_comp_conjLinear {g : V' → ℂ} {L : V →L[ℝ] V'} {u : V
     (hL : ∀ x : V, L (Complex.I • x) = -(Complex.I • L x))
     (hg : DifferentiableAt ℝ g (L u)) (v : V) :
     dWirtingerDir (fun p => g (L p)) v u = dWirtingerAntiDir g (L v) (L u) := by
-  simp only [dWirtingerDir, dWirtingerAntiDir, fderiv_comp_clm_apply hg, hL, map_neg]; ring
+  simp only [dWirtingerDir_apply, dWirtingerAntiDir_apply, fderiv_comp_clm_apply hg, hL,
+    map_neg]
+  ring
 
 /-- Dual of `dWirtingerDir_comp_conjLinear`: the anti-holomorphic derivative of `g ∘ L` at
 `u` is the holomorphic derivative of `g` at the mapped point `L u`, in the mapped direction
@@ -508,7 +522,9 @@ lemma dWirtingerAntiDir_comp_conjLinear {g : V' → ℂ} {L : V →L[ℝ] V'} {u
     (hL : ∀ x : V, L (Complex.I • x) = -(Complex.I • L x))
     (hg : DifferentiableAt ℝ g (L u)) (v : V) :
     dWirtingerAntiDir (fun p => g (L p)) v u = dWirtingerDir g (L v) (L u) := by
-  simp only [dWirtingerDir, dWirtingerAntiDir, fderiv_comp_clm_apply hg, hL, map_neg]; ring
+  simp only [dWirtingerDir_apply, dWirtingerAntiDir_apply, fderiv_comp_clm_apply hg, hL,
+    map_neg]
+  ring
 
 end DomainConjugation
 
@@ -542,28 +558,29 @@ holomorphic derivative is the full real derivative, `∂_v f = d_v f`. -/
 lemma dWirtingerDir_eq_of_clinear {v : V}
     (h : fderiv ℝ f u (Complex.I • v) = Complex.I • fderiv ℝ f u v) :
     dWirtingerDir f v u = fderiv ℝ f u v := by
-  simp only [dWirtingerDir, h, smul_eq_mul]; rw [← mul_assoc, Complex.I_mul_I]; ring
+  simp only [dWirtingerDir_apply, h, smul_eq_mul]; rw [← mul_assoc, Complex.I_mul_I]; ring
 
 /-- Holomorphic collapse: the anti-holomorphic derivative vanishes along a direction
 of `ℂ`-linearity, `∂̄_v f = 0`. -/
 lemma dWirtingerAntiDir_eq_zero_of_clinear {v : V}
     (h : fderiv ℝ f u (Complex.I • v) = Complex.I • fderiv ℝ f u v) :
     dWirtingerAntiDir f v u = 0 := by
-  simp only [dWirtingerAntiDir, h, smul_eq_mul]; rw [← mul_assoc, Complex.I_mul_I]; ring
+  simp only [dWirtingerAntiDir_apply, h, smul_eq_mul]; rw [← mul_assoc, Complex.I_mul_I]; ring
 
 /-- Anti-holomorphic collapse: a direction of conjugate-`ℂ`-linearity kills the
 holomorphic derivative, `∂_v f = 0`. -/
 lemma dWirtingerDir_eq_zero_of_antilinear {v : V}
     (h : fderiv ℝ f u (Complex.I • v) = -(Complex.I • fderiv ℝ f u v)) :
     dWirtingerDir f v u = 0 := by
-  simp only [dWirtingerDir, h, smul_eq_mul, mul_neg]; rw [← mul_assoc, Complex.I_mul_I]; ring
+  simp only [dWirtingerDir_apply, h, smul_eq_mul, mul_neg]; rw [← mul_assoc, Complex.I_mul_I]; ring
 
 /-- Anti-holomorphic collapse: the anti-holomorphic derivative is the full real
 derivative along a direction of conjugate-`ℂ`-linearity, `∂̄_v f = d_v f`. -/
 lemma dWirtingerAntiDir_eq_of_antilinear {v : V}
     (h : fderiv ℝ f u (Complex.I • v) = -(Complex.I • fderiv ℝ f u v)) :
     dWirtingerAntiDir f v u = fderiv ℝ f u v := by
-  simp only [dWirtingerAntiDir, h, smul_eq_mul, mul_neg]; rw [← mul_assoc, Complex.I_mul_I]; ring
+  simp only [dWirtingerAntiDir_apply, h, smul_eq_mul, mul_neg]
+  rw [← mul_assoc, Complex.I_mul_I]; ring
 
 /-!
 
@@ -595,12 +612,11 @@ anti-holomorphic, twice) differ only in their coefficients and all reduce to
 pairing that Kähler geometry needs; the others follow from the same bridge with a different
 `(c, b₁, b₂)`, then `ContDiffAt.isSymmSndFDerivAt` and `ring`.
 
+The operators are already `weightedDirDeriv` by definition (§A); this section differentiates
+that shared field a second time.
+
 **Structure.**
 
-* `weightedDirDeriv` : the base-point field `p ↦ (1/2)(d_{b₁} f + c·d_{b₂} f)`, the shape
-  shared by both directional operators (`c = −i` or `+i`).
-* `differentiableAt_fderiv` : from `ContDiffAt ℝ 2 f`, the first derivative `fderiv ℝ f` is
-  itself differentiable at `u`, the regularity the rest of the section consumes.
 * `hasFDerivAt_fderiv_apply`, `hasFDerivAt_weightedDirDeriv` : the evaluation field
   `p ↦ d_b f`, and hence `weightedDirDeriv`, is differentiable wherever `fderiv ℝ f` is.
 * `fderiv_weightedDirDeriv` : the bridge, sending a derivative of `weightedDirDeriv` along a
@@ -611,20 +627,6 @@ pairing that Kähler geometry needs; the others follow from the same bridge with
   derivative of `∂_v f`, `∂̄_v f` lands on `fderiv ℝ (fderiv ℝ f) u` in the two slots.
 
 -/
-
-/-- The combination `p ↦ (1/2)(d_{b₁} f + c·d_{b₂} f)` of the real Fréchet
-derivative of `f` along two directions. `dWirtingerDir f v` is this with
-`c = -i`, `b₁ = v`, `b₂ = i·v`; `dWirtingerAntiDir f v` with `c = i`. -/
-private def weightedDirDeriv (f : V → ℂ) (c : ℂ) (b₁ b₂ : V) : V → ℂ :=
-  fun p => (1 / 2 : ℂ) * (fderiv ℝ f p b₁ + c * fderiv ℝ f p b₂)
-
-omit [NormedSpace ℂ V] in
-/-- `f` is `C¹` in its first derivative, so `fderiv ℝ f` is differentiable at
-`u` — the regularity that makes a `weightedDirDeriv` (hence a directional derivative)
-differentiable. -/
-private lemma differentiableAt_fderiv (hf2 : ContDiffAt ℝ 2 f u) :
-    DifferentiableAt ℝ (fderiv ℝ f) u :=
-  (hf2.fderiv_right (m := 1) (by norm_num)).differentiableAt one_ne_zero
 
 omit [NormedSpace ℂ V] in
 /-- The field `p ↦ d_b f` is the evaluation map `· b` composed with `fderiv ℝ f`,
@@ -667,8 +669,8 @@ private lemma dWirtingerAntiDir_eq_weightedDirDeriv (w : V) :
 
 /-- A directional derivative is a `weightedDirDeriv`: holomorphic with `c = -i`. -/
 private lemma dWirtingerDir_eq_weightedDirDeriv (v : V) :
-    (fun p => dWirtingerDir f v p) = weightedDirDeriv f (-Complex.I) v (Complex.I • v) := by
-  funext p; simp only [dWirtingerDir, weightedDirDeriv]; ring
+    (fun p => dWirtingerDir f v p) = weightedDirDeriv f (-Complex.I) v (Complex.I • v) :=
+  rfl
 
 /-- Differentiating the anti-holomorphic directional derivative lands on the second
 real Fréchet derivative in the two slots. -/
@@ -721,28 +723,32 @@ real-differentiable. -/
 lemma differentiableAt_dWirtingerDir (hf2 : ContDiffAt ℝ 2 f u) (v : V) :
     DifferentiableAt ℝ (fun p => dWirtingerDir f v p) u := by
   rw [dWirtingerDir_eq_weightedDirDeriv]
-  exact (hasFDerivAt_weightedDirDeriv (differentiableAt_fderiv hf2) _ _ _).differentiableAt
+  have hf' : DifferentiableAt ℝ (fderiv ℝ f) u :=
+    (hf2.fderiv_right (m := 1) (by norm_num)).differentiableAt one_ne_zero
+  exact (hasFDerivAt_weightedDirDeriv hf' _ _ _).differentiableAt
 
 /-- On a `C²` field the anti-holomorphic directional derivative is itself
 real-differentiable. -/
 lemma differentiableAt_dWirtingerAntiDir (hf2 : ContDiffAt ℝ 2 f u) (w : V) :
     DifferentiableAt ℝ (fun p => dWirtingerAntiDir f w p) u := by
   rw [dWirtingerAntiDir_eq_weightedDirDeriv]
-  exact (hasFDerivAt_weightedDirDeriv (differentiableAt_fderiv hf2) _ _ _).differentiableAt
+  have hf' : DifferentiableAt ℝ (fderiv ℝ f) u :=
+    (hf2.fderiv_right (m := 1) (by norm_num)).differentiableAt one_ne_zero
+  exact (hasFDerivAt_weightedDirDeriv hf' _ _ _).differentiableAt
 
 /-- The holomorphic directional derivative depends only on the field near the point:
 fields agreeing on a neighbourhood have equal derivative. -/
 lemma dWirtingerDir_congr_of_eventuallyEq {f₁ f₂ : V → ℂ} {u : V}
     (h : f₁ =ᶠ[nhds u] f₂) (v : V) :
     dWirtingerDir f₁ v u = dWirtingerDir f₂ v u := by
-  simp only [dWirtingerDir, h.fderiv_eq]
+  simp only [dWirtingerDir_apply, h.fderiv_eq]
 
 /-- The anti-holomorphic directional derivative depends only on the field near the
 point; dual of `dWirtingerDir_congr_of_eventuallyEq`. -/
 lemma dWirtingerAntiDir_congr_of_eventuallyEq {f₁ f₂ : V → ℂ} {u : V}
     (h : f₁ =ᶠ[nhds u] f₂) (v : V) :
     dWirtingerAntiDir f₁ v u = dWirtingerAntiDir f₂ v u := by
-  simp only [dWirtingerAntiDir, h.fderiv_eq]
+  simp only [dWirtingerAntiDir_apply, h.fderiv_eq]
 
 /-!
 
@@ -762,7 +768,8 @@ ordinary mixed second partials, equates them. -/
 theorem dWirtingerDir_dWirtingerAntiDir_comm (hf2 : ContDiffAt ℝ 2 f u) (v w : V) :
     dWirtingerDir (fun p => dWirtingerAntiDir f w p) v u
       = dWirtingerAntiDir (fun p => dWirtingerDir f v p) w u := by
-  have hf' := differentiableAt_fderiv hf2
+  have hf' : DifferentiableAt ℝ (fderiv ℝ f) u :=
+    (hf2.fderiv_right (m := 1) (by norm_num)).differentiableAt one_ne_zero
   have hsymm : IsSymmSndFDerivAt ℝ f u := hf2.isSymmSndFDerivAt (by simp)
   rw [dWirtingerDir_apply (fun p => dWirtingerAntiDir f w p) v u,
     dWirtingerAntiDir_apply (fun p => dWirtingerDir f v p) w u,
