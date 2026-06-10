@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith, Nikolai Kashcheev
+Authors: Nikolai Kashcheev, Joseph Tooby-Smith
 -/
 module
 
@@ -150,33 +150,33 @@ noncomputable def gaugeGroupℤ₆SU3OfRoot (α : rootsOfUnity 6 ℂ) :
 
 /-- The `SU(2)` scalar matrix associated to a sixth root of unity. -/
 noncomputable def gaugeGroupℤ₆SU2OfRoot (α : rootsOfUnity 6 ℂ) :
-    specialUnitaryGroup (Fin 2) ℂ :=
+    specialUnitaryGroup (Fin 2) ℂ := by
   let u : unitary ℂ := gaugeGroupℤ₆UnitaryOfRoot α
   let z : ℂ := ((α : ℂˣ) : ℂ)
   let w : ℂ := star ((u ^ 3 : unitary ℂ) : ℂ)
-  ⟨scalar (Fin 2) w, by
-    rw [mem_specialUnitaryGroup_iff]
-    have hw : star w * w = 1 := by
-      change star (star ((u ^ 3 : unitary ℂ) : ℂ)) *
-        star ((u ^ 3 : unitary ℂ) : ℂ) = 1
-      rw [star_star]
-      exact (u ^ 3 : unitary ℂ).prop.2
-    have hα : z ^ 6 = 1 := by
-      simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
-    have hw2 : w ^ 2 = 1 := by
-      calc
-        w ^ 2 = star (z ^ 6) := by
-          simp [w, u, z, pow_succ]
-          ring
-        _ = 1 := by simp [hα]
-    constructor
-    · rw [mem_unitaryGroup_iff']
-      rw [Matrix.scalar_apply, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
-        Matrix.diagonal_mul_diagonal, Matrix.diagonal_eq_one]
-      funext i
-      simpa [Pi.star_def] using hw
-    · rw [Matrix.scalar_apply, Matrix.det_diagonal, Fin.prod_univ_two]
-      simpa [pow_two] using hw2⟩
+  refine ⟨scalar (Fin 2) w, ?_⟩
+  rw [mem_specialUnitaryGroup_iff]
+  have hw : star w * w = 1 := by
+    change star (star ((u ^ 3 : unitary ℂ) : ℂ)) *
+      star ((u ^ 3 : unitary ℂ) : ℂ) = 1
+    rw [star_star]
+    exact (u ^ 3 : unitary ℂ).prop.2
+  have hα : z ^ 6 = 1 := by
+    simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
+  have hw2 : w ^ 2 = 1 := by
+    calc
+      w ^ 2 = star (z ^ 6) := by
+        simp [w, u, z, pow_succ]
+        ring
+      _ = 1 := by simp [hα]
+  constructor
+  · rw [mem_unitaryGroup_iff']
+    rw [Matrix.scalar_apply, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
+      Matrix.diagonal_mul_diagonal, Matrix.diagonal_eq_one]
+    funext i
+    simpa [Pi.star_def] using hw
+  · rw [Matrix.scalar_apply, Matrix.det_diagonal, Fin.prod_univ_two]
+    simpa [pow_two] using hw2
 
 /-- The element of `GaugeGroupI` associated to a sixth root of unity. -/
 noncomputable def gaugeGroupℤ₆OfRoot (α : rootsOfUnity 6 ℂ) : GaugeGroupI :=
