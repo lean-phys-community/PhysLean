@@ -663,6 +663,31 @@ lemma mem_pointSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} : z ∈ σᵖ T ↔
 lemma pointSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σᵖ T ⊆ σ T :=
   fun _ h ↦ mem_spectrum_iff.mpr (Or.inl h)
 
+/-!
+#### D.2.2. Residual spectrum
+-/
+
+/-- The residual spectrum, `σʳ`, of a partial linear map.
+
+  A complex number `z` is in `σʳ T` iff `T - z • 1` is injective but not surjective
+  and `(T - z • 1)⁻¹` is continuous (equivalently, bounded). -/
+def residualSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ :=
+  {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)}
+
+@[inherit_doc residualSpectrum]
+local notation "σʳ" => residualSpectrum
+
+lemma residualSpectrum_eq (T : H →ₗ.[ℂ] H) :
+    σʳ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)} :=
+  rfl
+
+lemma mem_residualSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
+    z ∈ σʳ T ↔ (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z) :=
+  Iff.rfl
+
+lemma residualSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σʳ T ⊆ σ T :=
+  fun _ ⟨_, h, _⟩ ↦ mem_spectrum_iff.mpr (Or.inr <| Or.inl h)
+
 end
 
 end LinearPMap
