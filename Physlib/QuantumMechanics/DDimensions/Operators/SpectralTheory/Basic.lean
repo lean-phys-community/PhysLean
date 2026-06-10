@@ -294,60 +294,65 @@ lemma IsClosable.defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[�
     exact hz₁ ⟨c, lt_of_le_of_lt dist_nonneg h_ball, h⟩
 
 /-- The defect number is constant on each connected component of the regularity domain. -/
-lemma IsClosable.defectNumber_same_of_same_connectedComponent [CompleteSpace H]
+lemma IsClosable.defectNumber_const [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable)
-    {z₁ z₂ : T.regularityDomain} (h : connectedComponent z₁ = connectedComponent z₂) :
+    {z₁ z₂ : ℂ} (hz : z₂ ∈ connectedComponentIn T.regularityDomain z₁) :
     T.defectNumber z₁ = T.defectNumber z₂ := by
-  have h_joined : Joined z₁ z₂ := by
-    haveI := T.regularityDomain_isOpen.locPathConnectedSpace
-    rw [← mem_pathComponent_iff, pathComponent_symm, pathComponent_eq_connectedComponent, ← h]
-    exact mem_connectedComponent
-  let path : Path z₁ z₂ := h_joined.somePath
-  by_contra! hne
-  let a : unitInterval := sSup {r | ∀ r' ≤ r, T.defectNumber (path r') = T.defectNumber z₁}
-  have ha : ∀ r < a, T.defectNumber (path r) = T.defectNumber z₁ := by
-    intro r hr
-    obtain ⟨b, hb, hrb⟩ := lt_sSup_iff.mp hr
-    exact hb r hrb.le
-  let c : ℝ := (path a).prop.choose
-  have hc_pos : 0 < c := (path a).prop.choose_spec.1
-  have hc_bound : IsLowerBound T (path a) c := (path a).prop.choose_spec.2
-  obtain ⟨ε, hε, hε_ball⟩ : ∃ ε > 0, ball a ε ⊆ path ⁻¹' ball (path a) c := by
-    apply Metric.mem_nhds_iff.mp
-    refine (IsOpen.mem_nhds_iff ?_).mpr ?_
-    · exact path.continuous.isOpen_preimage _ isOpen_ball
-    · simp [hc_pos]
-  obtain ⟨b₁, h₁, h₁'⟩ : ∃ b ∈ ball a ε, T.defectNumber (path b) = T.defectNumber z₁ := by
-    rcases le_or_gt ε a with hle | hlt
-    · let r : ℝ := a - ε / 2
-      have hr : 0 ≤ r := by dsimp [r]; linarith
-      have hr' : r < a := sub_lt_self _ (half_pos hε)
-      use ⟨r, hr, by linarith [a.2.2]⟩
-      exact ⟨by simp [dist, r, abs_div, abs_of_nonneg hε.le, hε], ha _ hr'⟩
-    · exact ⟨0, by simp [dist, abs_of_nonneg a.2.1, hlt], by rw [path.source]⟩
-  obtain ⟨b₂, h₂, h₂'⟩ : ∃ b ∈ ball a ε, T.defectNumber (path b) ≠ T.defectNumber z₁ := by
-    by_cases! h₀ : a < 1
-    · by_contra! h'
-      let r : unitInterval :=
-        ⟨min (a + ε / 2) 1, le_inf_iff.mpr ⟨by linarith [a.2.1], zero_le_one⟩, inf_le_right⟩
-      refine not_le_of_gt (a := a) (b := r) ?_ ?_
-      · apply (Set.inclusion_lt_inclusion <| Set.subset_univ _).mp
-        simp [r, hε, h₀]
-      · refine le_sSup_iff.mpr fun _ hub ↦ hub fun b hbr ↦ ?_
-        rcases lt_or_ge b a with hlt | hle
-        · exact ha b hlt
-        · refine h' b ?_
-          apply mem_ball.mpr
-          calc
-            _ = (b : ℝ) - a := by simp [dist, hle]
-            _ ≤ r - a := by simp [hbr]
-            _ = min (ε / 2) (1 - a) := by simp [r, ← min_sub_sub_right]
-            _ < ε := by simp [hε]
-    · have : a = 1 := eq_of_le_of_ge a.2.2 h₀
-      refine ⟨a, mem_ball_self hε, by rw [this, path.target]; exact hne.symm⟩
-  apply h₁' ▸ h₂'
-  rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₁)]
-  rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₂)]
+  by_cases hz₁ : z₁ ∈ T.regularityDomain
+  · have h_joined : JoinedIn T.regularityDomain z₁ z₂ := by
+      haveI := T.regularityDomain_isOpen.locPathConnectedSpace
+      have hz₂ : z₂ ∈ T.regularityDomain := connectedComponentIn_subset _ _ hz
+      apply (joinedIn_iff_joined hz₁ hz₂).mpr
+      rw [← mem_pathComponent_iff, pathComponent_eq_connectedComponent]
+      exact mem_of_mem_image_val (connectedComponentIn_eq_image hz₁ ▸ hz)
+    let path : Path z₁ z₂ := h_joined.somePath
+    by_contra! hne
+    let a : unitInterval := sSup {r | ∀ r' ≤ r, T.defectNumber (path r') = T.defectNumber z₁}
+    have ha : ∀ r < a, T.defectNumber (path r) = T.defectNumber z₁ := by
+      intro r hr
+      obtain ⟨b, hb, hrb⟩ := lt_sSup_iff.mp hr
+      exact hb r hrb.le
+    let c : ℝ := (h_joined.somePath_mem a).choose
+    have hc_pos : 0 < c := (h_joined.somePath_mem a).choose_spec.1
+    have hc_bound : IsLowerBound T (path a) c := (h_joined.somePath_mem a).choose_spec.2
+    obtain ⟨ε, hε, hε_ball⟩ : ∃ ε > 0, ball a ε ⊆ path ⁻¹' ball (path a) c := by
+      apply Metric.mem_nhds_iff.mp
+      refine (IsOpen.mem_nhds_iff ?_).mpr ?_
+      · exact path.continuous.isOpen_preimage _ isOpen_ball
+      · simp [hc_pos]
+    obtain ⟨b₁, h₁, h₁'⟩ : ∃ b ∈ ball a ε, T.defectNumber (path b) = T.defectNumber z₁ := by
+      rcases le_or_gt ε a with hle | hlt
+      · let r : ℝ := a - ε / 2
+        have hr : 0 ≤ r := by dsimp [r]; linarith
+        have hr' : r < a := sub_lt_self _ (half_pos hε)
+        use ⟨r, hr, by linarith [a.2.2]⟩
+        exact ⟨by simp [dist, r, abs_div, abs_of_nonneg hε.le, hε], ha _ hr'⟩
+      · exact ⟨0, by simp [dist, abs_of_nonneg a.2.1, hlt], by rw [path.source]⟩
+    obtain ⟨b₂, h₂, h₂'⟩ : ∃ b ∈ ball a ε, T.defectNumber (path b) ≠ T.defectNumber z₁ := by
+      by_cases! h₀ : a < 1
+      · by_contra! h'
+        let r : unitInterval :=
+          ⟨min (a + ε / 2) 1, le_inf_iff.mpr ⟨by linarith [a.2.1], zero_le_one⟩, inf_le_right⟩
+        refine not_le_of_gt (a := a) (b := r) ?_ ?_
+        · apply (Set.inclusion_lt_inclusion <| Set.subset_univ _).mp
+          simp [r, hε, h₀]
+        · refine le_sSup_iff.mpr fun _ hub ↦ hub fun b hbr ↦ ?_
+          rcases lt_or_ge b a with hlt | hle
+          · exact ha b hlt
+          · refine h' b ?_
+            apply mem_ball.mpr
+            calc
+              _ = (b : ℝ) - a := by simp [dist, hle]
+              _ ≤ r - a := by simp [hbr]
+              _ = min (ε / 2) (1 - a) := by simp [r, ← min_sub_sub_right]
+              _ < ε := by simp [hε]
+      · have : a = 1 := eq_of_le_of_ge a.2.2 h₀
+        refine ⟨a, mem_ball_self hε, by rw [this, path.target]; exact hne.symm⟩
+    apply h₁' ▸ h₂'
+    rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₁)]
+    rw [← defectNumber_eq_of_mem_ball hT hc_bound (hε_ball h₂)]
+  · false_or_by_contra
+    exact (mem_empty_iff_false z₂).mp (connectedComponentIn_eq_empty hz₁ ▸ hz)
 
 /-!
 ## C. Numerical range
