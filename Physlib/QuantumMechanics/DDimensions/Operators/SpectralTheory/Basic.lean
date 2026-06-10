@@ -63,6 +63,13 @@ open Submodule
 open Metric
 open InnerProductSpace
 open Complex
+open Set
+
+/-- The resolvent, `(T - z • 1)⁻¹`. -/
+abbrev resolvent (T : H →ₗ.[ℂ] H) (z : ℂ) : H →ₗ.[ℂ] H := (T - z • 1).inverse
+
+@[inherit_doc resolvent]
+local notation "𝑅" => resolvent
 
 /-!
 ## A. Regularity domain
@@ -105,9 +112,10 @@ def regularityDomain (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | ∃ c > 0, I
 lemma regularityDomain_antitone : Antitone (regularityDomain (H := H)) :=
   fun _ _ hle _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_of_left_le hle h⟩
 
-/-- `z` is a regular point for `T` iff `T - z • 1` has a bounded inverse. -/
+/-- `z` is a regular point for `T` iff `T - z • 1` has
+  a continuous (equivalently, bounded) inverse. -/
 lemma mem_regularityDomain_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
-    z ∈ T.regularityDomain ↔ (T - z • 1).toFun.ker = ⊥ ∧ Continuous (T - z • 1).inverse := by
+    z ∈ T.regularityDomain ↔ (T - z • 1).toFun.ker = ⊥ ∧ Continuous (𝑅 T z) := by
   constructor
   · intro ⟨c, hc, h_bound⟩
     have h_ker : (T - z • 1).toFun.ker = ⊥ := by
@@ -117,7 +125,7 @@ lemma mem_regularityDomain_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
         specialize h_bound ⟨x, x.2.1⟩
         simp_all [sub_apply]
       · simp_all
-    refine ⟨h_ker, ?_⟩
+    use h_ker
     apply LinearMap.continuous_iff_bounded.mpr
     refine ⟨c⁻¹, inv_pos.mpr hc, fun ⟨x, hx⟩ ↦ ?_⟩
     rw [inverse_domain] at hx
@@ -130,7 +138,7 @@ lemma mem_regularityDomain_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
     apply (inv_mul_le_iff₀ hc).mpr
     have hx : ↑x ∈ (T - z • 1).domain := by simp [sub_domain]
     specialize h_bound ⟨(T - z • 1) ⟨x, hx⟩, by simp [inverse_domain]⟩
-    rw [toFun_eq_coe, inverse_apply_eq h_ker (x := ⟨x, hx⟩) rfl] at h_bound
+    simp only [toFun_eq_coe, inverse_apply_eq h_ker (x := ⟨x, hx⟩), coe_norm] at h_bound
     simp_all [sub_apply]
 
 /-- The regularity domain of `T` contains open balls with radii controlled by the lower bounds. -/
@@ -347,7 +355,6 @@ lemma IsClosable.defectNumber_same_of_same_connectedComponent [CompleteSpace H]
 
 section
 
-open Set
 open Pointwise
 
 /-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1} ⊆ ℂ`. -/
@@ -381,8 +388,8 @@ lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
     simp_all [← hcz, ← hxz, sub_apply, inner_sub_right, inner_smul_right]
 
 /-- The regularity domain contains the exterior of the numerical range. -/
-lemma compl_closure_numericalRange_le_regularityDomain (T : H →ₗ.[ℂ] H) :
-    (_root_.closure T.numericalRange)ᶜ ≤ T.regularityDomain := by
+lemma compl_closure_numericalRange_subset_regularityDomain (T : H →ₗ.[ℂ] H) :
+    (_root_.closure T.numericalRange)ᶜ ⊆ T.regularityDomain := by
   intro z hz
   by_cases hT : T.domain = ⊥
   · refine ⟨1, zero_lt_one, fun ⟨x, hx⟩ ↦ ?_⟩
