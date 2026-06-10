@@ -643,6 +643,26 @@ lemma spectrum_eq_univ [CompleteSpace H] {T : H →ₗ.[ℂ] H} (h : ¬T.IsClose
 lemma spectrum_isClosed [CompleteSpace H] (T : H →ₗ.[ℂ] H) : _root_.IsClosed (σ T) :=
   T.resolventSet_isOpen.isClosed_compl
 
+/-!
+#### D.2.1. Point spectrum
+-/
+
+/-- The point spectrum, `σᵖ`, of a partial linear map.
+
+  A complex number `z` is in `σᵖ T` iff `T - z • 1` is not injective. -/
+def pointSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | (T - z • 1).toFun.ker ≠ ⊥}
+
+@[inherit_doc pointSpectrum]
+local notation "σᵖ" => pointSpectrum
+
+lemma pointSpectrum_eq (T : H →ₗ.[ℂ] H) : σᵖ T = {z | (T - z • 1).toFun.ker ≠ ⊥} := rfl
+
+lemma mem_pointSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} : z ∈ σᵖ T ↔ (T - z • 1).toFun.ker ≠ ⊥ :=
+  Iff.rfl
+
+lemma pointSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σᵖ T ⊆ σ T :=
+  fun _ h ↦ mem_spectrum_iff.mpr (Or.inl h)
+
 end
 
 end LinearPMap
