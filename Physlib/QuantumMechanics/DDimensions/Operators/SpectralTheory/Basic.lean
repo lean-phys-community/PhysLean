@@ -18,25 +18,28 @@ which are of central importance in quantum mechanics.
 
 ## ii. Key results
 
-Definitions
-- `LinearPMap.regularityDomain` : The set of regular points for a partial linear map `T`.
-    A complex number `z` is a regular point for `T` if there exists `c > 0` such that
-    `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`.
-- `LinearPMap.deficiencySubspace` : For an operator `T` and any complex number `z`,
-    the closed submodule which is orthogonal to the range of `T - z • 1`.
-- `LinearPMap.defectNumber` : The rank of the deficiency subspace as a (possibly infinite) cardinal.
-- `LinearPMap.numericalRange` : For an operator `T`, the set of complex numbers `⟪x, T x⟫_ℂ`
-    as `x` ranges over the unit sphere in `T.domain`.
+Definitions (corresponding to an operator `T : H →ₗ.[ℂ] H`)
+- `LinearPMap.regularityDomain` : The set of regular points. A complex number `z` is a regular
+    point if there exists `c > 0` such that `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`.
+- `LinearPMap.deficiencySubspace` : Given a complex number `z`, the closed submodule which
+    is orthogonal to the range of `T - z • 1`.
+- `LinearPMap.defectNumber` : Given a complex number `z`, the rank of the corresponding
+    deficiency subspace as a (possibly infinite) cardinal.
+- `LinearPMap.numericalRange` : The set of complex numbers `⟪x, T x⟫_ℂ` as `x` ranges over
+    the unit sphere in `T.domain`.
+- `LinearPMap.resolventSet` (`ρ`) : The set of complex numbers `z` for which `T - z • 1`
+    has a continuous (equivalently, bounded) inverse with domain all of `H`.
 
 Main results
 - `regularityDomain_isOpen` : The regularity domain is an open subset of `ℂ`.
 - `closure_range_sub_eq_range_closure_sub` : If `z` is a regular point for a closable operator `T`
     then the closure of `(T - z • 1).range` is `(T.closure - z • 1).range`.
-- `defectNumber_same_of_same_connectedComponent` : The defect number is constant on each connected
-    component of the regularity domain.
-- `compl_closure_numericalRange_le_regularityDomain` : The regularity domain contains the exterior
-    of the numerical range.
+- `defectNumber_const` : The defect number is constant on each connected component
+    of the regularity domain.
+- `compl_closure_numericalRange_subset_regularityDomain` : The regularity domain contains
+    the exterior of the numerical range.
 - `numericalRange_convex` : The Toeplitz-Hausdorff theorem — the numerical range is a convex set.
+- `resolventSet_isOpen` : The resolvent set is an open subset of ℂ.
 
 ## iii. Table of contents
 
@@ -44,6 +47,8 @@ Main results
 - B. Deficiency subspace & defect number
 - C. Numerical range
   - C.1. The Toeplitz-Hausdorff theorem
+- D. Spectrum of a closed operator
+  - D.1. Resolvent set
 
 ## iv. References
 
