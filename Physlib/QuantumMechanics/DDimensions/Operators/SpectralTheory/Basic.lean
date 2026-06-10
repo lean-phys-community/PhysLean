@@ -614,6 +614,35 @@ lemma resolventSet_isOpen [CompleteSpace H] (T : H →ₗ.[ℂ] H) : IsOpen (ρ 
     · exact mem_connectedComponentIn hz₁.1
   · simp [resolventSet_eq_empty hT]
 
+/-!
+### D.2. Spectrum
+-/
+
+/-- The spectrum, `σ`, of a partial linear map.
+
+  `σ T` is the complement of `ρ T`. A complex number `z` is in `σ T` iff the linear map `T - z • 1`
+  from `T.domain` to `H` fails to be bijective or `(T - z • 1)⁻¹` is not continuous
+  (equivalently, is not bounded). -/
+def spectrum (T : H →ₗ.[ℂ] H) : Set ℂ := (ρ T)ᶜ
+
+@[inherit_doc spectrum]
+local notation "σ" => spectrum
+
+lemma spectrum_eq (T : H →ₗ.[ℂ] H) : σ T = (ρ T)ᶜ := rfl
+
+lemma mem_spectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
+    z ∈ σ T ↔ (T - z • 1).toFun.ker ≠ ⊥ ∨ (T - z • 1).toFun.range ≠ ⊤ ∨ ¬Continuous (𝑅 T z) := by
+  rw [spectrum_eq, mem_compl_iff, mem_resolventSet_iff]
+  tauto
+
+/-- If an operator is not closed then its spectrum is all of ℂ. -/
+lemma spectrum_eq_univ [CompleteSpace H] {T : H →ₗ.[ℂ] H} (h : ¬T.IsClosed) : σ T = univ :=
+  compl_empty ▸ compl_inj_iff.mpr (resolventSet_eq_empty h)
+
+/-- The spectrum is a closed subset of ℂ. -/
+lemma spectrum_isClosed [CompleteSpace H] (T : H →ₗ.[ℂ] H) : _root_.IsClosed (σ T) :=
+  T.resolventSet_isOpen.isClosed_compl
+
 end
 
 end LinearPMap
