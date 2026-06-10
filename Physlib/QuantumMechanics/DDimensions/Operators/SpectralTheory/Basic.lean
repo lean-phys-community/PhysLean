@@ -59,7 +59,10 @@ Main results
 - `compl_closure_numericalRange_subset_regularityDomain` : The regularity domain contains
     the exterior of the numerical range.
 - `numericalRange_convex` : The Toeplitz-Hausdorff theorem — the numerical range is a convex set.
-- `resolventSet_isOpen` : The resolvent set is an open subset of ℂ.
+- `resolventSet_isOpen` and `spectrum_isClosed` : The resolvent set is an open subset of ℂ
+    and its complement, the spectrum, is closed.
+- `IsClosed.spectrum_eq` : For a closed operator the spectrum is the union of the point, residual
+    and continuous spectra.
 
 ## iii. Table of contents
 
@@ -73,6 +76,7 @@ Main results
     - D.2.1. Point spectrum
     - D.2.2. Residual spectrum
     - D.2.3. Continuous spectrum
+  - D.3. Spectrum decomposition
 
 ## iv. References
 
@@ -733,6 +737,33 @@ lemma mem_continuousSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
 
 lemma continuousSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σᶜ T ⊆ σ T :=
   fun _ h ⟨_, h_range, _⟩ ↦ h (by simp [h_range])
+
+/-!
+### D.3. Spectrum decomposition
+-/
+
+lemma IsClosed.spectrum_eq [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) :
+    σ T = σᵖ T ∪ σʳ T ∪ σᶜ T := by
+  refine Subset.antisymm ?_ ?_
+  · intro z hσ
+    apply mem_spectrum_iff.mp at hσ
+    rcases eq_or_ne (T - z • 1).toFun.ker ⊥ with h_ker | h_ker
+    · by_cases h_cont : Continuous (𝑅 T z)
+      · left; right; exact ⟨h_ker, (hσ.neg_resolve_left h_ker).neg_resolve_right h_cont, h_cont⟩
+      · right
+        rw [mem_continuousSpectrum_iff, ← inverse_domain]
+        refine fun h ↦ h_cont ?_
+        refine continuous_of_isClosed_domain ?_ h
+        apply (inverse_closed_iff h_ker).mpr
+        exact hT.sub_continuous (Continuous.const_smul (by fun_prop) _) le_top
+    · left; left; exact h_ker
+  · refine union_subset ?_ T.continuousSpectrum_subset_spectrum
+    exact union_subset T.pointSpectrum_subset_spectrum T.residualSpectrum_subset_spectrum
+
+lemma pointSpectrum_inter_residualSpectrum (T : H →ₗ.[ℂ] H) : σᵖ T ∩ σʳ T = ∅ := by
+  ext
+  simp only [mem_inter_iff, mem_empty_iff_false, iff_false, not_and]
+  exact fun h h' ↦ h h'.1
 
 end
 
