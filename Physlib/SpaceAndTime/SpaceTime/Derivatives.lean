@@ -22,6 +22,9 @@ distributions on `SpaceTime d`.
 ## ii. Key results
 
 - `deriv` : The derivative of a function `SpaceTime d → M` along the `μ` coordinate.
+- `contDiff_deriv` : If `f` is `C^{n+1}` then `∂_ μ f` is `C^n`.
+- `differentiable_deriv` : If `f` is `C^2` then `∂_ μ f` is differentiable.
+- `deriv_commute` : Derivatives on `SpaceTime d` commute (Clairaut's theorem).
 - `deriv_sum_inr` : The derivative along a spatial coordinate in terms of the
   derivative on `Space d`.
 - `deriv_sum_inl` : The derivative along the temporal coordinate in terms of the
@@ -35,8 +38,10 @@ distributions on `SpaceTime d`.
   - A.1. The definition of the derivative
   - A.2. Basic equality lemmas
   - A.3. Derivative of the zero function
-  - A.4. The derivative of a function composed with a Lorentz transformation
-  - A.5. Spacetime derivatives in terms of time and space derivatives
+  - A.4. Smoothness and differentiability of the derivative
+  - A.5. Derivatives commute
+  - A.6. The derivative of a function composed with a Lorentz transformation
+  - A.7. Spacetime derivatives in terms of time and space derivatives
 - B. Derivatives of distributions
   - B.1. Commutation of derivatives of distributions
   - B.2. Lorentz group action on derivatives of distributions
@@ -162,7 +167,55 @@ attribute [-simp] Fintype.sum_sum_type
 
 /-!
 
-### A.4. The derivative of a function composed with a Lorentz transformation
+### A.4. Smoothness and differentiability of the derivative
+
+-/
+
+/-- If `f` is `C^{n+1}` then `∂_ μ f` is `C^n`. -/
+@[fun_prop]
+lemma contDiff_deriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : ℕ}
+    {n : WithTop ℕ∞} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (hf : ContDiff ℝ (n + 1) f) :
+    ContDiff ℝ n (∂_ μ f) := by
+  -- `∂_ μ f = fun x => fderiv ℝ f x (Lorentz.Vector.basis μ)`; use
+  -- `ContDiff.clm_apply` with `ContDiff.fderiv_right`.
+  show ContDiff ℝ n (fun x => fderiv ℝ f x (Lorentz.Vector.basis μ))
+  exact (ContDiff.fderiv_right (m := n) hf (by rfl)).clm_apply contDiff_const
+
+/-- If `f` is `C^2` then `∂_ μ f` is differentiable. -/
+@[fun_prop]
+lemma differentiable_deriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : ℕ}
+    (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (hf : ContDiff ℝ 2 f) :
+    Differentiable ℝ (∂_ μ f) :=
+  (contDiff_deriv μ f (n := 1) (by norm_cast)).differentiable one_ne_zero
+
+/-!
+
+### A.5. Derivatives commute
+
+-/
+
+/-- Derivatives on spacetime commute with one another (Clairaut's theorem). -/
+lemma deriv_commute {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : ℕ}
+    (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (hf : ContDiff ℝ 2 f) :
+    ∂_ μ (∂_ ν f) = ∂_ ν (∂_ μ f) := by
+  ext x
+  show fderiv ℝ (fun y => fderiv ℝ f y (Lorentz.Vector.basis ν)) x (Lorentz.Vector.basis μ) =
+    fderiv ℝ (fun y => fderiv ℝ f y (Lorentz.Vector.basis μ)) x (Lorentz.Vector.basis ν)
+  rw [fderiv_clm_apply, fderiv_clm_apply]
+  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
+    ContinuousLinearMap.flip_apply]
+  rw [IsSymmSndFDerivAt.eq]
+  · apply ContDiffAt.isSymmSndFDerivAt
+    exact hf.contDiffAt
+    simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
+  · have h1 := hf.differentiable (by norm_cast); fun_prop
+  · fun_prop
+  · have h1 := hf.differentiable (by norm_cast); fun_prop
+  · fun_prop
+
+/-!
+
+### A.6. The derivative of a function composed with a Lorentz transformation
 
 -/
 
@@ -208,7 +261,7 @@ lemma deriv_equivariant (f : SpaceTime d → M) (Λ : LorentzGroup d) (x : Space
 
 /-!
 
-### A.5. Spacetime derivatives in terms of time and space derivatives
+### A.7. Spacetime derivatives in terms of time and space derivatives
 
 -/
 
