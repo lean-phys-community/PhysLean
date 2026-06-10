@@ -16,6 +16,19 @@ In this module we develop the basics for the spectral theory of closed unbounded
 This forms the basis for the spectral theory of self-adjoint unbounded operators,
 which are of central importance in quantum mechanics.
 
+Definitions for subsets of ℂ associated to an operator `T : H →ₗ.[ℂ] H` vary by author.
+Here we adopt those used in
+[Konrad Schmüdgen, *Unbounded Self-Adjoint Operators on Hilbert Space*][Schmudgen2012],
+summarized in the following table:
+
+| Subset of ℂ | abbrev. | `D(T - z)` | `R(T - z)` | `(T - z)⁻¹` |
+| :---------- | :-----: | :--------: | :--------: | :---------: |
+| Regularity domain | | `= ⊥` | | continuous |
+| Resolvent set | `ρ` | `= ⊥` | `= ⊤` | continuous |
+| Point spectrum | `σᵖ` | `≠ ⊥` | | |
+| Residual spectrum | `σʳ` | `= ⊥` | `≠ ⊤` | continuous |
+| Continuous spectrum | `σᶜ` | | not closed | |
+
 ## ii. Key results
 
 Definitions (corresponding to an operator `T : H →ₗ.[ℂ] H`)
@@ -29,6 +42,13 @@ Definitions (corresponding to an operator `T : H →ₗ.[ℂ] H`)
     the unit sphere in `T.domain`.
 - `LinearPMap.resolventSet` (`ρ`) : The set of complex numbers `z` for which `T - z • 1`
     has a continuous (equivalently, bounded) inverse with domain all of `H`.
+- `LinearPMap.spectrum` (`σ`) : The complement of the resolvent set.
+- `LinearPMap.pointSpectrum` (`σᵖ`) : The set of complex numbers `z` for which `T - z • 1`
+    fails to be invertible.
+- `LinearPMap.residualSpectrum` (`σʳ`) : The set of complex numbers `z` for which `T - z • 1`
+    has a continuous (equivalently, bounded) inverse with domain not all of `H`.
+- `LinearPMap.continuousSpectrum` (`σᶜ`) : The set of complex numbers `z` for which
+    the range of `T - z • 1` is not dense in `H`.
 
 Main results
 - `regularityDomain_isOpen` : The regularity domain is an open subset of `ℂ`.
@@ -49,6 +69,10 @@ Main results
   - C.1. The Toeplitz-Hausdorff theorem
 - D. Spectrum of a closed operator
   - D.1. Resolvent set
+  - D.2. Spectrum
+    - D.2.1. Point spectrum
+    - D.2.2. Residual spectrum
+    - D.2.3. Continuous spectrum
 
 ## iv. References
 
