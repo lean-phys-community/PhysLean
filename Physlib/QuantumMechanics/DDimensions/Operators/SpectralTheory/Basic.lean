@@ -522,6 +522,32 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
 
 end
 
+/-!
+## D. Spectrum of a closed operator
+-/
+
+/-!
+### D.1. Resolvent set
+-/
+
+/-- The resolvent set, `ρ`, of a partial linear map.
+
+  A complex number `z` is in `ρ T` iff the linear map `T - z • 1` from `T.domain` to `H`
+  is a bijection with continuous (equivalently, bounded) inverse. -/
+def resolventSet (T : H →ₗ.[ℂ] H) : Set ℂ :=
+  {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)}
+
+@[inherit_doc resolventSet]
+local notation "ρ" => resolventSet
+
+lemma resolventSet_eq (T : H →ₗ.[ℂ] H) :
+    ρ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)} :=
+  rfl
+
+lemma mem_resolventSet_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
+    z ∈ ρ T ↔ (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z) :=
+  Iff.rfl
+
 end
 
 end LinearPMap
