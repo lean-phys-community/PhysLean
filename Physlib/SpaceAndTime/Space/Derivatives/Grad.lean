@@ -48,7 +48,8 @@ of the input function with respect to each spatial coordinate.
   - B.3. The gradient as a sum over basis vectors
   - B.4. The underlying function of the gradient distribution
   - B.5. The gradient applied to a Schwartz function
-  - B.6. The gradident of a Schwartz map
+  - B.6. Gradient of constant distributions
+  - B.7. The gradient of a Schwartz map
 
 ## iv. References
 
@@ -609,7 +610,20 @@ lemma distGrad_apply {d} (f : (Space d) →d[ℝ] ℝ) (ε : 𝓢(Space d, ℝ))
 
 /-!
 
-### B.6. The gradident of a Schwartz map
+### B.6. Gradient of constant distributions
+
+-/
+
+@[simp]
+lemma distGrad_const {d} (c : ℝ) :
+    ∇ᵈ (Distribution.const ℝ (Space d) c) = 0 := by
+  ext ε i
+  simp only [distGrad_apply, distDeriv_apply]
+  simp [Distribution.fderivD_const]
+
+/-!
+
+### B.7. The gradient of a Schwartz map
 
 -/
 

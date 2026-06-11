@@ -35,8 +35,8 @@ We use properties of this power series to prove various results about distributi
   of the norm.
 - `distDiv_inv_pow_eq_dim` : The divergence of the distribution defined by the
   inverse power of the norm proportional to the Dirac delta distribution.
-- `distLaplacian_fundamentalSolution_norm_zpow` : The Laplacian of the fundamental solution
-  power of the norm.
+- `distLaplacian_fundamentalSolution_norm_zpow_eq` : The Laplacian of the fundamental
+  solution power of the norm.
 
 ## iii. Table of contents
 
@@ -1463,5 +1463,38 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
   rw [hdiv]
   rw [smul_smul]
   ring_nf
+
+/-- Version of `distLaplacian_fundamentalSolution_norm_zpow` stated using the dimension of
+the ambient space. -/
+lemma distLaplacian_fundamentalSolution_norm_zpow_of_three_le {d : ℕ} (hd : 3 ≤ d) :
+    Δᵈ (distOfFunction (fun x : Space d => ‖x‖ ^ ((2 : ℤ) - (d : ℤ)))
+      (IsDistBounded.pow ((2 : ℤ) - (d : ℤ)) (by omega))) =
+      (((2 : ℝ) - (d : ℝ)) * (d : ℝ) *
+        (volume (α := Space d)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  rcases d with _ | _ | _ | d
+  · omega
+  · omega
+  · omega
+  · convert distLaplacian_fundamentalSolution_norm_zpow (d := d) using 1
+    ext x
+    simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one]
+    ring_nf
+
+/-- Version of `distLaplacian_fundamentalSolution_norm_zpow` stated for every dimension.
+In dimensions less than three, the exponent is zero and both sides are zero. -/
+lemma distLaplacian_fundamentalSolution_norm_zpow_eq {d : ℕ} :
+    Δᵈ (distOfFunction (fun x : Space d => ‖x‖ ^ (- ((d - 2 : ℕ) : ℤ)))
+      (IsDistBounded.pow _ (by grind))) =
+      (- ((d - 2 : ℕ) : ℝ) * (d : ℝ) *
+        (volume (α := Space d)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  by_cases hd : d < 3
+  · have hdim : d - 2 = 0 := by omega
+    simp [hdim]
+    exact distLaplacian_const 1
+  · convert distLaplacian_fundamentalSolution_norm_zpow_of_three_le
+      (d := d) (by grind) using 4 <;>
+      rw [Nat.cast_sub (by omega : 2 ≤ d)] <;>
+      ring_nf
 
 end Space
