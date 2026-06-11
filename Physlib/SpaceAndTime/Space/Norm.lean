@@ -35,6 +35,8 @@ We use properties of this power series to prove various results about distributi
   of the norm.
 - `distDiv_inv_pow_eq_dim` : The divergence of the distribution defined by the
   inverse power of the norm proportional to the Dirac delta distribution.
+- `distLaplacian_fundamentalSolution_norm_zpow` : The Laplacian of the fundamental solution
+  power of the norm.
 
 ## iii. Table of contents
 
@@ -58,6 +60,7 @@ We use properties of this power series to prove various results about distributi
   - B.3. Divergence of radial norm-power distributions
   - B.4. The Laplacian of distributions based on powers
   - B.5. Divergence equal dirac delta
+  - B.6. The Laplacian of the fundamental solution
 
 ## iv. References
 
@@ -1406,5 +1409,59 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} :
   rcases d with _ | d'
   · simp; rfl
   · exact distDiv_inv_pow_eq_dim'
+
+/-!
+
+### B.6. The Laplacian of the fundamental solution
+
+-/
+
+/-- In dimensions at least three, the distributional Laplacian of the fundamental-solution
+power of the norm is a multiple of the Dirac delta at the origin. -/
+lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
+    Δᵈ (distOfFunction (fun x : Space d.succ.succ.succ => ‖x‖ ^ (- (d.succ : ℤ)))
+      (IsDistBounded.pow (- (d.succ : ℤ)) (by omega))) =
+      ((- (d.succ : ℝ)) * (d.succ.succ.succ : ℝ) *
+        (volume (α := Space d.succ.succ.succ)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  rw [distLaplacian]
+  change ∇ᵈ ⬝ (∇ᵈ (distOfFunction
+    (fun x : Space d.succ.succ.succ => ‖x‖ ^ (- (d.succ : ℤ)))
+    (IsDistBounded.pow (- (d.succ : ℤ)) (by omega)))) = _
+  rw [distGrad_distOfFunction_norm_zpow (- (d.succ : ℤ)) (by omega)]
+  simp only [Int.cast_neg, Int.cast_natCast]
+  have hdist :
+      distOfFunction
+        (fun x : Space d.succ.succ.succ =>
+          (- (d.succ : ℝ) * ‖x‖ ^ ((- (d.succ : ℤ)) - 2)) • basis.repr x)
+        (by
+          simpa [smul_smul] using
+            (IsDistBounded.const_fun_smul
+              (F := EuclideanSpace ℝ (Fin d.succ.succ.succ))
+              (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))
+              (- (d.succ : ℝ)))) =
+        (- (d.succ : ℝ)) • distOfFunction
+          (fun x : Space d.succ.succ.succ =>
+            ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+          (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega)) := by
+    convert distOfFunction_smul_fun
+      (fun x : Space d.succ.succ.succ =>
+        ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))
+      (- (d.succ : ℝ)) using 1
+    ext x
+    simp [smul_smul]
+  rw [hdist]
+  rw [map_smul]
+  have hdiv :
+      ∇ᵈ ⬝ (distOfFunction
+        (fun x : Space d.succ.succ.succ =>
+          ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+        (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))) =
+        (d.succ.succ.succ * (volume (α := Space d.succ.succ.succ)).real
+          (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+    convert distDiv_inv_pow_eq_dim (d := d.succ.succ.succ) using 1
+  rw [hdiv]
+  rw [smul_smul]
+  ring_nf
 
 end Space
