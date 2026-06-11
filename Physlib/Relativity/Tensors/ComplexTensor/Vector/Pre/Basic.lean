@@ -110,7 +110,7 @@ lemma complexCoBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
   change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ (Pi.single j 1)) i = _
   simp
 
-lemma complexCoBasis_ρ_val (M : SL(2,ℂ)) (v : CoℂModule) :
+lemma CoℂModule.SL2CRep_val (M : SL(2,ℂ)) (v : CoℂModule) :
     ((CoℂModule.SL2CRep M) v).val =
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ v.val := by
   rfl
@@ -248,7 +248,7 @@ lemma inclCoRealLorentz_ρ (M : SL(2, ℂ)) (v : CoMod 3) :
     (CoℂModule.SL2CRep M) (inclCoRealLorentz v) =
     inclCoRealLorentz ((Co 3).ρ (SL2C.toLorentzGroup M) v) := by
   ext i
-  rw [complexCoBasis_ρ_val, inclCoRealLorentz_val, inclCoRealLorentz_val]
+  rw [CoℂModule.SL2CRep_val, inclCoRealLorentz_val, inclCoRealLorentz_val]
   change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ
       (ofRealHom ∘ v.toFin1dℝ)) i =
     (ofRealHom ∘ ((LorentzGroup.transpose (SL2C.toLorentzGroup M)⁻¹).1 *ᵥ
