@@ -123,6 +123,19 @@ instance : AddCommGroup CoℂModule := Equiv.addCommGroup toFin13ℂFun
   with `Fin 1 ⊕ Fin 3 → ℂ`. -/
 instance : Module ℂ CoℂModule := Equiv.module ℂ toFin13ℂFun
 
+@[ext]
+lemma ext (ψ ψ' : CoℂModule) (h : ψ.val = ψ'.val) : ψ = ψ' := by
+  cases ψ
+  cases ψ'
+  subst h
+  rfl
+
+@[simp]
+lemma val_add (ψ ψ' : CoℂModule) : (ψ + ψ').val = ψ.val + ψ'.val := rfl
+
+@[simp]
+lemma val_smul (r : ℂ) (ψ : CoℂModule) : (r • ψ).val = r • ψ.val := rfl
+
 /-- The linear equivalence between `CoℂModule` and `(Fin 1 ⊕ Fin 3 → ℂ)`. -/
 @[simps!]
 def toFin13ℂEquiv : CoℂModule ≃ₗ[ℂ] (Fin 1 ⊕ Fin 3 → ℂ) :=
