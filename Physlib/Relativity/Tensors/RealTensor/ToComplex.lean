@@ -6,7 +6,6 @@ Authors: Nikolai Kashcheev, Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.ComplexTensor.Basic
-public import Physlib.Meta.Sorry
 /-!
 
 # Complex Lorentz tensors from real Lorentz tensors
@@ -509,7 +508,6 @@ Finally we record that `toComplex` is equivariant for the natural action of
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` is equivariant. -/
-@[sorryful]
 lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     (v : ℝT(3, c)) (Λ : SL(2, ℂ)) :
     Λ • (toComplex v) = toComplex (Lorentz.SL2C.toLorentzGroup Λ • v) := by
