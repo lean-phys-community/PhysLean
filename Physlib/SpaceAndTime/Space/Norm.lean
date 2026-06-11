@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 public import Physlib.Mathematics.Distribution.PowMul
 /-!
@@ -31,6 +31,8 @@ We use properties of this power series to prove various results about distributi
   of the norm.
 - `distDiv_norm_zpow_smul_repr_self_eq_smul` : The divergence of the distribution defined by
   `x ↦ ‖x‖ ^ q • x`.
+- `distLaplacian_distOfFunction_norm_zpow` : The Laplacian of the distribution defined by a power
+  of the norm.
 - `distDiv_inv_pow_eq_dim` : The divergence of the distribution defined by the
   inverse power of the norm proportional to the Dirac delta distribution.
 
@@ -54,7 +56,8 @@ We use properties of this power series to prove various results about distributi
   - B.1. The gradient of distributions based on powers
   - B.2. The gradient of distributions based on logs
   - B.3. Divergence of radial norm-power distributions
-  - B.4. Divergence equal dirac delta
+  - B.4. The Laplacian of distributions based on powers
+  - B.5. Divergence equal dirac delta
 
 ## iv. References
 
@@ -1201,7 +1204,46 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
 
 /-!
 
-### B.4. Divergence equal dirac delta
+### B.4. The Laplacian of distributions based on powers
+
+-/
+
+lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} (m : ℤ)
+    (hm : - (d.succ - 1 : ℕ) + 1 ≤ m)
+    (hdiv : 0 < m - 2 + (d.succ : ℤ)) :
+    Δᵈ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
+      (IsDistBounded.pow m (by simp_all; omega))) =
+      (((m : ℝ) * (((m - 2 + (d.succ : ℤ) : ℤ) : ℝ))) •
+        distOfFunction (fun x : Space d.succ => ‖x‖ ^ (m - 2))
+          (IsDistBounded.pow (m - 2) (by omega))) := by
+  rw [distLaplacian]
+  change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
+    (IsDistBounded.pow m (by simp_all; omega)))) = _
+  rw [distGrad_distOfFunction_norm_zpow m hm]
+  have hdist :
+      distOfFunction (fun x : Space d.succ => (m * ‖x‖ ^ (m - 2)) • basis.repr x)
+          (by
+            simp [← smul_smul]
+            refine IsDistBounded.const_fun_smul ?_ ↑m
+            apply IsDistBounded.zpow_smul_repr_self
+            simp_all
+            omega) =
+        (m : ℝ) • distOfFunction
+          (fun x : Space d.succ => ‖x‖ ^ (m - 2) • basis.repr x)
+          (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) := by
+    convert distOfFunction_smul_fun
+      (fun x : Space d.succ => ‖x‖ ^ (m - 2) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) (m : ℝ) using 1
+    ext x
+    simp [smul_smul]
+  rw [hdist]
+  rw [map_smul]
+  rw [distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv]
+  rw [smul_smul]
+
+/-!
+
+### B.5. Divergence equal dirac delta
 
 We show that the divergence of `x ↦ ‖x‖ ^ (- d) • x` is equal to a multiple of the Dirac delta
 at `0`.
