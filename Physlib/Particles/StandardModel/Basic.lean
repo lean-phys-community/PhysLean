@@ -25,6 +25,12 @@ open Matrix
 open Complex
 open ComplexConjugate
 
+/-!
+
+## The unquotiented gauge group
+
+-/
+
 /-- The global gauge group of the Standard Model with no discrete quotients.
   The `I` in the Name is an indication of the statement that this has no discrete quotients. -/
 abbrev GaugeGroupI : Type :=
@@ -109,6 +115,12 @@ lemma ofU1Subgroup_toSU2 (u1 : unitary ℂ) :
 lemma ofU1Subgroup_toU1 (u1 : unitary ℂ) :
     toU1 (ofU1Subgroup u1) = u1 := rfl
 end GaugeGroupI
+
+/-!
+
+## The ℤ₆ quotient
+
+-/
 
 /-- The unitary complex number associated to a sixth root of unity. -/
 noncomputable def gaugeGroupℤ₆UnitaryOfRoot (α : rootsOfUnity 6 ℂ) : unitary ℂ :=
@@ -319,6 +331,12 @@ lemma mk_gaugeGroupℤ₆OfRoot (α : rootsOfUnity 6 ℂ) :
 
 end GaugeGroupℤ₆
 
+/-!
+
+## The ℤ₂ quotient
+
+-/
+
 /-- The ℤ₂subgroup of the un-quotiented gauge group which acts trivially on all particles in the
 standard model, i.e., the ℤ₂-subgroup of `GaugeGroupI` derived from the ℤ₂ subgroup of
 `gaugeGroupℤ₆SubGroup`.
@@ -337,6 +355,12 @@ See https://math.ucr.edu/home/baez/guts.pdf
 informal_definition GaugeGroupℤ₂ where
   deps := [``GaugeGroupI, ``StandardModel.gaugeGroupℤ₂SubGroup]
   tag := "6V2GO"
+
+/-!
+
+## The ℤ₃ quotient
+
+-/
 
 /-- The inclusion of third roots of unity into sixth roots of unity. -/
 noncomputable def gaugeGroupℤ₃RootToℤ₆Root : rootsOfUnity 3 ℂ →* rootsOfUnity 6 ℂ :=
@@ -455,6 +479,12 @@ lemma mk_gaugeGroupℤ₃OfRoot (α : rootsOfUnity 3 ℂ) :
 
 end GaugeGroupℤ₃
 
+/-!
+
+## Gauge groups from quotient choices
+
+-/
+
 /-- Specifies the allowed quotients of `SU(3) x SU(2) x U(1)` which give a valid
   gauge group of the Standard Model. -/
 inductive GaugeGroupQuot : Type
@@ -496,6 +526,12 @@ informal_lemma gaugeGroupI_lie where
 informal_lemma gaugeGroup_lie where
   deps := [``GaugeGroup]
   tag := "6V2HR"
+
+/-!
+
+## Gauge bundles and transformations
+
+-/
 
 /-- The trivial principal bundle over SpaceTime with structure group `GaugeGroupI`. -/
 informal_definition gaugeBundleI where
