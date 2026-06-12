@@ -267,7 +267,8 @@ lemma dWirtingerAntiCoord_apply {f : (ι → ℂ) → ℂ}
 ## B. The Pi-domain restrictScalars bridge
 
 The holomorphic collapse (§C–D) reads `∂̄_I f = 0` and `∂_I f = fderiv ℂ f` off the
-`ℂ`-linearity of the *real* derivative `fderiv ℝ f u`. A holomorphic `f` has a `ℂ`-linear complex derivative `fderiv ℂ f u`; viewing that
+`ℂ`-linearity of the *real* derivative `fderiv ℝ f u`. A holomorphic `f` has a
+`ℂ`-linear complex derivative `fderiv ℂ f u`; viewing that
 same map as merely `ℝ`-linear (its scalars restricted from `ℂ` to `ℝ`) gives the
 real derivative, `fderiv ℝ f u = (fderiv ℂ f u).restrictScalars ℝ`
 (`HasFDerivAt.restrictScalars`). Restricting scalars drops the `ℂ`-linear *bundling*,
