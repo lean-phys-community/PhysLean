@@ -50,6 +50,7 @@ public import Physlib.Electromagnetism.Kinematics.Boosts
 public import Physlib.Electromagnetism.Kinematics.EMPotential
 public import Physlib.Electromagnetism.Kinematics.ElectricField
 public import Physlib.Electromagnetism.Kinematics.FieldStrength
+public import Physlib.Electromagnetism.Kinematics.GaugeTransformation
 public import Physlib.Electromagnetism.Kinematics.MagneticField
 public import Physlib.Electromagnetism.Kinematics.ScalarPotential
 public import Physlib.Electromagnetism.Kinematics.VectorPotential
