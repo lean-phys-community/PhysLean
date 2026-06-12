@@ -396,7 +396,8 @@ public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
 public import Physlib.SpaceAndTime.Space.IsDistBounded
 public import Physlib.SpaceAndTime.Space.LengthUnit
 public import Physlib.SpaceAndTime.Space.Module
-public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Norm.Basic
+public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Slice
 public import Physlib.SpaceAndTime.Space.Translations
 public import Physlib.SpaceAndTime.SpaceTime.Basic

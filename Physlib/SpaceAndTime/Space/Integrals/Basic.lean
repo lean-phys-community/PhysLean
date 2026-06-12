@@ -79,6 +79,16 @@ lemma volume_closedBall_ne_top {d : ℕ} (x : Space d.succ) (r : ℝ) :
     apply not_eq_of_beq_eq_false
     rfl
 
+/-- The real volume of the unit ball in odd-dimensional space is positive. -/
+lemma volume_metricBall_odd_real_pos (m : ℕ) :
+    0 < (volume (α := Space (2 * m + 1))).real (Metric.ball 0 1) := by
+  rw [Measure.real]
+  rw [InnerProductSpace.volume_ball_of_dim_odd (k := m) (by simp [finrank_eq_dim])]
+  simp only [finrank_eq_dim, ENNReal.ofReal_one, one_pow, one_mul]
+  rw [ENNReal.toReal_ofReal]
+  positivity
+  positivity
+
 @[simp]
 lemma volume_metricBall_three :
     volume (Metric.ball (0 : Space 3) 1) = ENNReal.ofReal (4 / 3 * Real.pi) := by
