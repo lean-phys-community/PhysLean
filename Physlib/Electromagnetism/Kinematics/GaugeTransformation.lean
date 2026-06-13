@@ -44,6 +44,8 @@ the field strength of a bare-gradient potential. The invariance theorem
 - A. The pure-gauge potential
   - A.1. Definition and basic lemmas
   - A.2. Differentiability of the pure-gauge potential
+  - A.3. Vanishing field strength of the pure-gauge potential
+  - A.4. Lorentz equivariance of the pure-gauge potential
 - B. Gauge transformations
   - B.1. Definition and basic lemmas
   - B.2. Invariance of the field strength
@@ -109,6 +111,24 @@ lemma ofGradient_apply {d} (χ : SpaceTime d → ℝ) (x : SpaceTime d) (μ : Fi
     simp
   · simp
 
+/-- The pure-gauge potential built from the zero gauge function has all components zero.
+  (Stated pointwise: `ElectromagneticPotential` carries no `Zero` instance, so the bundled
+  form `ofGradient 0 = 0` is not expressible.) -/
+lemma ofGradient_zero {d} (x : SpaceTime d) (μ : Fin 1 ⊕ Fin d) :
+    ofGradient (0 : SpaceTime d → ℝ) x μ = 0 := by
+  rw [ofGradient_apply]
+  simp [SpaceTime.deriv_eq]
+
+/-- `ofGradient` is additive in the gauge function (when both summands are differentiable). -/
+lemma ofGradient_add {d} {χ₁ χ₂ : SpaceTime d → ℝ}
+    (hχ₁ : Differentiable ℝ χ₁) (hχ₂ : Differentiable ℝ χ₂) :
+    ofGradient (χ₁ + χ₂) = ofGradient χ₁ + ofGradient χ₂ := by
+  apply eq_of_val_eq; funext x μ
+  show ofGradient (χ₁ + χ₂) x μ = ofGradient χ₁ x μ + ofGradient χ₂ x μ
+  simp only [ofGradient_apply, SpaceTime.deriv_eq,
+    fderiv_add hχ₁.differentiableAt hχ₂.differentiableAt, ContinuousLinearMap.add_apply,
+    mul_add]
+
 /-!
 
 ### A.2. Differentiability of the pure-gauge potential
@@ -136,28 +156,7 @@ lemma contDiff_ofGradient {n} {d} {χ : SpaceTime d → ℝ} (hχ : ContDiff ℝ
 
 /-!
 
-## B. Gauge transformations
-
--/
-
-/-!
-
-### B.1. Definition and basic lemmas
-
--/
-
-/-- The gauge transformation `A^μ ↦ A^μ + ∂^μ χ` of an electromagnetic potential. -/
-noncomputable def gaugeTransform {d} (χ : SpaceTime d → ℝ) (A : ElectromagneticPotential d) :
-    ElectromagneticPotential d := A + ofGradient χ
-
-/-- Evaluation of `gaugeTransform`. -/
-lemma gaugeTransform_apply {d} (χ : SpaceTime d → ℝ) (A : ElectromagneticPotential d)
-    (x : SpaceTime d) : gaugeTransform χ A x = A x + ofGradient χ x := by
-  simp [gaugeTransform, add_apply]
-
-/-!
-
-### B.2. Invariance of the field strength
+### A.3. Vanishing field strength of the pure-gauge potential
 
 -/
 
@@ -186,73 +185,14 @@ lemma toFieldStrength_ofGradient {d} {χ : SpaceTime d → ℝ} (hχ : ContDiff 
   rw [heq]
   ring
 
-/-- The field strength tensor is invariant under gauge transformations. -/
-lemma toFieldStrength_gaugeTransform {d} (A : ElectromagneticPotential d)
-    (χ : SpaceTime d → ℝ) (hA : Differentiable ℝ A) (hχ : ContDiff ℝ 2 χ) (x : SpaceTime d) :
-    (gaugeTransform χ A).toFieldStrength x = A.toFieldStrength x := by
-  rw [gaugeTransform, toFieldStrength_add A (ofGradient χ) x hA (differentiable_ofGradient hχ),
-    toFieldStrength_ofGradient hχ, add_zero]
-
-/-- The field strength matrix is invariant under gauge transformations. -/
-lemma fieldStrengthMatrix_gaugeTransform {d} (A : ElectromagneticPotential d)
-    (χ : SpaceTime d → ℝ) (hA : Differentiable ℝ A) (hχ : ContDiff ℝ 2 χ) (x : SpaceTime d) :
-    (gaugeTransform χ A).fieldStrengthMatrix x = A.fieldStrengthMatrix x := by
-  rw [fieldStrengthMatrix, toFieldStrength_gaugeTransform A χ hA hχ]
-
 /-!
 
-### B.3. Group structure of gauge shifts
+### A.4. Lorentz equivariance of the pure-gauge potential
 
-Composing two gauge shifts by χ₁ and χ₂ is the same as shifting by χ₁ + χ₂. Together with
-`gaugeTransform_zero` this shows that the map `χ ↦ (A ↦ gaugeTransform χ A)` is a group action
-of the additive group of smooth functions. (We do not build the formal `MulAction` here —
-the composition lemma is the agreeable core, and the rest is straightforward from it.)
-
--/
-
-/-- The pure-gauge potential built from the zero gauge function has all components zero.
-  (Stated pointwise: `ElectromagneticPotential` carries no `Zero` instance, so the bundled
-  form `ofGradient 0 = 0` is not expressible.) -/
-lemma ofGradient_zero {d} (x : SpaceTime d) (μ : Fin 1 ⊕ Fin d) :
-    ofGradient (0 : SpaceTime d → ℝ) x μ = 0 := by
-  rw [ofGradient_apply]
-  simp [SpaceTime.deriv_eq]
-
-/-- `ofGradient` is additive in the gauge function (when both summands are differentiable). -/
-lemma ofGradient_add {d} {χ₁ χ₂ : SpaceTime d → ℝ}
-    (hχ₁ : Differentiable ℝ χ₁) (hχ₂ : Differentiable ℝ χ₂) :
-    ofGradient (χ₁ + χ₂) = ofGradient χ₁ + ofGradient χ₂ := by
-  apply eq_of_val_eq; funext x μ
-  show ofGradient (χ₁ + χ₂) x μ = ofGradient χ₁ x μ + ofGradient χ₂ x μ
-  simp only [ofGradient_apply, SpaceTime.deriv_eq,
-    fderiv_add hχ₁.differentiableAt hχ₂.differentiableAt, ContinuousLinearMap.add_apply,
-    mul_add]
-
-/-- Shifting by the zero gauge function is the identity. -/
-lemma gaugeTransform_zero {d} (A : ElectromagneticPotential d) :
-    gaugeTransform (0 : SpaceTime d → ℝ) A = A := by
-  apply eq_of_val_eq; funext x μ
-  show gaugeTransform (0 : SpaceTime d → ℝ) A x μ = A x μ
-  simp [gaugeTransform, add_apply, ofGradient_zero]
-
-/-- Two successive gauge shifts compose: shifting by χ₂ then χ₁ equals shifting by χ₁ + χ₂.
-  This upgrades one-step F-invariance to invariance along any finite chain of gauge shifts. -/
-lemma gaugeTransform_gaugeTransform {d} (A : ElectromagneticPotential d)
-    (χ₁ χ₂ : SpaceTime d → ℝ) (hχ₁ : Differentiable ℝ χ₁) (hχ₂ : Differentiable ℝ χ₂) :
-    gaugeTransform χ₁ (gaugeTransform χ₂ A) = gaugeTransform (χ₁ + χ₂) A := by
-  apply eq_of_val_eq; funext x μ
-  simp only [gaugeTransform, add_apply]
-  rw [ofGradient_add hχ₁ hχ₂]
-  simp [add_apply, add_comm, add_left_comm]
-
-/-!
-
-### B.4. Equivariance under Lorentz transformations
-
-The gauge-transformation map commutes with the Lorentz group action: applying Λ to a potential
-and then gauge-transforming by χ is the same as gauge-transforming by `χ ∘ (Λ⁻¹ • ·)` and then
-applying Λ. The proof reduces to the metric-commutativity identity `Λ * η = η * (Λ⁻¹)ᵀ`, which
-is the defining property of the Lorentz group (`LorentzGroup.comm_minkowskiMatrix`).
+`ofGradient` intertwines the Lorentz action on potentials with composition by Λ⁻¹ on the gauge
+function: `Λ • ofGradient χ = ofGradient (χ ∘ (Λ⁻¹ • ·))`. The proof reduces to the
+metric-commutativity identity `Λ * η = η * (Λ⁻¹)ᵀ`, which is the defining property of the
+Lorentz group (`LorentzGroup.comm_minkowskiMatrix`).
 
 -/
 
@@ -294,6 +234,89 @@ lemma ofGradient_equivariant {d} (χ : SpaceTime d → ℝ) (hχ : Differentiabl
     simp_rw [← mul_assoc]
     rw [← Finset.sum_mul, ← hmetric]
   rw [hlhs, hrhs]
+
+/-!
+
+## B. Gauge transformations
+
+-/
+
+/-!
+
+### B.1. Definition and basic lemmas
+
+-/
+
+/-- The gauge transformation `A^μ ↦ A^μ + ∂^μ χ` of an electromagnetic potential. -/
+noncomputable def gaugeTransform {d} (χ : SpaceTime d → ℝ) (A : ElectromagneticPotential d) :
+    ElectromagneticPotential d := A + ofGradient χ
+
+/-- Evaluation of `gaugeTransform`. -/
+lemma gaugeTransform_apply {d} (χ : SpaceTime d → ℝ) (A : ElectromagneticPotential d)
+    (x : SpaceTime d) : gaugeTransform χ A x = A x + ofGradient χ x := by
+  simp [gaugeTransform, add_apply]
+
+/-!
+
+### B.2. Invariance of the field strength
+
+The key ingredient — that a pure-gauge potential has vanishing field strength — is proved in §A.3
+(`toFieldStrength_ofGradient`).
+
+-/
+
+/-- The field strength tensor is invariant under gauge transformations. -/
+lemma toFieldStrength_gaugeTransform {d} (A : ElectromagneticPotential d)
+    (χ : SpaceTime d → ℝ) (hA : Differentiable ℝ A) (hχ : ContDiff ℝ 2 χ) (x : SpaceTime d) :
+    (gaugeTransform χ A).toFieldStrength x = A.toFieldStrength x := by
+  rw [gaugeTransform, toFieldStrength_add A (ofGradient χ) x hA (differentiable_ofGradient hχ),
+    toFieldStrength_ofGradient hχ, add_zero]
+
+/-- The field strength matrix is invariant under gauge transformations. -/
+lemma fieldStrengthMatrix_gaugeTransform {d} (A : ElectromagneticPotential d)
+    (χ : SpaceTime d → ℝ) (hA : Differentiable ℝ A) (hχ : ContDiff ℝ 2 χ) (x : SpaceTime d) :
+    (gaugeTransform χ A).fieldStrengthMatrix x = A.fieldStrengthMatrix x := by
+  rw [fieldStrengthMatrix, toFieldStrength_gaugeTransform A χ hA hχ]
+
+/-!
+
+### B.3. Group structure of gauge shifts
+
+Composing two gauge shifts by χ₁ and χ₂ is the same as shifting by χ₁ + χ₂. Together with
+`gaugeTransform_zero` this shows that the map `χ ↦ (A ↦ gaugeTransform χ A)` is a group action
+of the additive group of smooth functions. (We do not build the formal `MulAction` here —
+the composition lemma is the agreeable core, and the rest is straightforward from it.)
+
+The `ofGradient` lemmas used here — `ofGradient_zero` and `ofGradient_add` — are proved in §A.1.
+
+-/
+
+/-- Shifting by the zero gauge function is the identity. -/
+lemma gaugeTransform_zero {d} (A : ElectromagneticPotential d) :
+    gaugeTransform (0 : SpaceTime d → ℝ) A = A := by
+  apply eq_of_val_eq; funext x μ
+  show gaugeTransform (0 : SpaceTime d → ℝ) A x μ = A x μ
+  simp [gaugeTransform, add_apply, ofGradient_zero]
+
+/-- Two successive gauge shifts compose: shifting by χ₂ then χ₁ equals shifting by χ₁ + χ₂.
+  This upgrades one-step F-invariance to invariance along any finite chain of gauge shifts. -/
+lemma gaugeTransform_gaugeTransform {d} (A : ElectromagneticPotential d)
+    (χ₁ χ₂ : SpaceTime d → ℝ) (hχ₁ : Differentiable ℝ χ₁) (hχ₂ : Differentiable ℝ χ₂) :
+    gaugeTransform χ₁ (gaugeTransform χ₂ A) = gaugeTransform (χ₁ + χ₂) A := by
+  apply eq_of_val_eq; funext x μ
+  simp only [gaugeTransform, add_apply]
+  rw [ofGradient_add hχ₁ hχ₂]
+  simp [add_apply, add_comm, add_left_comm]
+
+/-!
+
+### B.4. Equivariance under Lorentz transformations
+
+The gauge-transformation map commutes with the Lorentz group action: applying Λ to a potential
+and then gauge-transforming by χ is the same as gauge-transforming by `χ ∘ (Λ⁻¹ • ·)` and then
+applying Λ. The proof delegates to `ofGradient_equivariant` (§A.4).
+
+-/
 
 /-- Gauge transformations commute with Lorentz transformations: applying Λ and then performing
   a gauge transformation by `χ` equals performing a gauge transformation by `χ ∘ (Λ⁻¹ • ·)`
