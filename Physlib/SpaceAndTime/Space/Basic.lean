@@ -240,12 +240,12 @@ noncomputable instance {d} : MetricSpace (Space d) where
 
 -/
 
-instance {d : ℕ} : Nontrivial (Space d.succ) where
+instance instNontrivial {d : ℕ} [NeZero d] : Nontrivial (Space d) where
   exists_pair_ne := by
     obtain k := Classical.choice Space.instNonempty
-    obtain ⟨v1, hv⟩ := exists_ne (0 : EuclideanSpace ℝ (Fin d.succ))
+    obtain ⟨v1, hv⟩ := exists_ne (0 : EuclideanSpace ℝ (Fin d))
     use k, v1 +ᵥ k
-    simpa only [ne_eq, eq_vadd_iff_vsub_eq, vsub_self] using hv.symm
+    simpa [ne_eq, eq_vadd_iff_vsub_eq, vsub_self] using hv.symm
 
 /-!
 

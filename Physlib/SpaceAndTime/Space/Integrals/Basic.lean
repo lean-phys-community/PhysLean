@@ -21,10 +21,10 @@ We focus here on the volume measure, which is the usual measure on `Space d`, i.
 
 - `volume_eq_addHaar` : The volume measure on `Space d` is the same as the Haar measure
   associated with the basis of `Space d`.
-- `integral_volume_eq_spherical` : The integral of a function over `Space d.succ` with
+- `integral_volume_eq_spherical` : The integral of a function over `Space d` with
   respect to the volume measure can be expressed as an integral over the unit sphere and
   the positive reals.
-- `lintegral_volume_eq_spherical` : The lower Lebesgue integral of a function over `Space d.succ`
+- `lintegral_volume_eq_spherical` : The lower Lebesgue integral of a function over `Space d`
   with respect to the volume measure can be expressed as a lower Lebesgue integral over the unit
   sphere and the positive reals.
 
@@ -44,40 +44,6 @@ open InnerProductSpace MeasureTheory
 
 lemma volume_eq_addHaar {d} : (volume (α := Space d)) = Space.basis.toBasis.addHaar := by
   exact (OrthonormalBasis.addHaar_eq_volume _).symm
-
-lemma volume_closedBall_ne_zero {d : ℕ} (x : Space d.succ) {r : ℝ} (hr : 0 < r) :
-    volume (Metric.closedBall x r) ≠ 0 := by
-  obtain ⟨k,hk⟩ := Nat.even_or_odd' d.succ
-  rcases hk with hk | hk
-  · rw [InnerProductSpace.volume_closedBall_of_dim_even (k := k)]
-    simp only [Nat.succ_eq_add_one, finrank_eq_dim, ne_eq, mul_eq_zero, Nat.add_eq_zero_iff,
-      one_ne_zero, and_false, not_false_eq_true, pow_eq_zero_iff, ENNReal.ofReal_eq_zero, not_or,
-      not_le]
-    apply And.intro
-    · simp_all
-    · positivity
-    · simpa using hk
-  · rw [InnerProductSpace.volume_closedBall_of_dim_odd (k := k)]
-    simp only [Nat.succ_eq_add_one, finrank_eq_dim, ne_eq, mul_eq_zero, Nat.add_eq_zero_iff,
-      one_ne_zero, and_false, not_false_eq_true, pow_eq_zero_iff, ENNReal.ofReal_eq_zero, not_or,
-      not_le]
-    apply And.intro
-    · simp_all
-    · positivity
-    · simpa using hk
-
-lemma volume_closedBall_ne_top {d : ℕ} (x : Space d.succ) (r : ℝ) :
-    volume (Metric.closedBall x r) ≠ ⊤ := by
-  obtain ⟨k,hk⟩ := Nat.even_or_odd' d.succ
-  rcases hk with hk | hk
-  · rw [InnerProductSpace.volume_closedBall_of_dim_even (by simpa using hk)]
-    simp only [Nat.succ_eq_add_one, finrank_eq_dim, ne_eq]
-    apply not_eq_of_beq_eq_false
-    rfl
-  · rw [InnerProductSpace.volume_closedBall_of_dim_odd (by simpa using hk)]
-    simp only [Nat.succ_eq_add_one, finrank_eq_dim, ne_eq]
-    apply not_eq_of_beq_eq_false
-    rfl
 
 @[simp]
 lemma volume_metricBall_three :
@@ -128,24 +94,23 @@ lemma integral_one_dim_eq_integral_real {f : Space 1 → ℝ} :
 
 -/
 
-lemma integral_volume_eq_spherical (d : ℕ) (f : Space d.succ → F)
+lemma integral_volume_eq_spherical (d : ℕ) [NeZero d] (f : Space d → F)
     [NormedAddCommGroup F] [NormedSpace ℝ F] :
-    ∫ x, f x ∂volume = ∫ x, f (x.2.1 • x.1.1) ∂(volume (α := Space d.succ).toSphere.prod
-        (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
+    ∫ x, f x ∂volume = ∫ x, f (x.2.1 • x.1.1) ∂(volume (α := Space d).toSphere.prod
+        (Measure.volumeIoiPow (Module.finrank ℝ (Space d) - 1))) := by
   rw [← MeasureTheory.MeasurePreserving.integral_comp (f := homeomorphUnitSphereProd _)
     (MeasureTheory.Measure.measurePreserving_homeomorphUnitSphereProd
-    (volume (α := Space d.succ)))
-    (Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space d.succ)))]
-  simp only [Nat.succ_eq_add_one, homeomorphUnitSphereProd_apply_snd_coe,
-    homeomorphUnitSphereProd_apply_fst_coe]
-  let f' : (x : (Space d.succ)) → F := fun x => f (‖↑x‖ • ‖↑x‖⁻¹ • ↑x)
+    (volume (α := Space d)))
+    (Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space d)))]
+  simp only [homeomorphUnitSphereProd_apply_snd_coe, homeomorphUnitSphereProd_apply_fst_coe]
+  let f' : (x : (Space d)) → F := fun x => f (‖↑x‖ • ‖↑x‖⁻¹ • ↑x)
   conv_rhs =>
     enter [2, x]
     change f' x.1
   rw [MeasureTheory.integral_subtype_comap (by simp), ← setIntegral_univ]
   simp [f']
   refine integral_congr_ae ?_
-  have h1 : ∀ᵐ x ∂(volume (α := Space d.succ)), x ≠ 0 := by
+  have h1 : ∀ᵐ x ∂(volume (α := Space d)), x ≠ 0 := by
     exact Measure.ae_ne volume 0
   filter_upwards [Measure.ae_ne volume 0] with x hx
   congr
@@ -156,14 +121,14 @@ lemma integral_volume_eq_spherical (d : ℕ) (f : Space d.succ → F)
   simp
 
 lemma integrable_spherical_of_integrable {d : ℕ} {F : Type*}
-    [NormedAddCommGroup F] [NormedSpace ℝ F] {f : Space d.succ → F}
+    [NormedAddCommGroup F] [NormedSpace ℝ F] {f : Space d → F}
     (hf : Integrable f volume) :
     Integrable
-      (fun x : ↑(Metric.sphere (0 : Space d.succ) 1) × Set.Ioi (0 : ℝ) =>
+      (fun x : ↑(Metric.sphere (0 : Space d) 1) × Set.Ioi (0 : ℝ) =>
         f (x.2.1 • x.1.1))
-      (volume (α := Space d.succ).toSphere.prod
-        (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
-  let s : Set (Space d.succ) := {0}ᶜ
+      (volume (α := Space d).toSphere.prod
+        (Measure.volumeIoiPow (Module.finrank ℝ (Space d) - 1))) := by
+  let s : Set (Space d) := {0}ᶜ
   have h1 : Integrable (fun x : s => f x.1)
       (.comap (Subtype.val (p := fun x => x ∈ s)) volume) := by
     change Integrable (f ∘ Subtype.val)
@@ -172,26 +137,26 @@ lemma integrable_spherical_of_integrable {d : ℕ} {F : Type*}
     · exact hf.integrableOn
     · simp [s]
   have he := MeasureTheory.Measure.measurePreserving_homeomorphUnitSphereProd
-    (volume (α := Space d.succ))
+    (volume (α := Space d))
   have hcomp :
       Integrable
-        ((fun x : s => f x.1) ∘ (homeomorphUnitSphereProd (Space d.succ)).symm)
-        (volume (α := Space d.succ).toSphere.prod
-          (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
+        ((fun x : s => f x.1) ∘ (homeomorphUnitSphereProd (Space d)).symm)
+        (volume (α := Space d).toSphere.prod
+          (Measure.volumeIoiPow (Module.finrank ℝ (Space d) - 1))) := by
     rw [← he.integrable_comp_emb]
     · convert h1
-      simp only [Nat.succ_eq_add_one, Function.comp_apply, Homeomorph.symm_apply_apply]
-    · exact Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space d.succ))
+      simp only [Function.comp_apply, Homeomorph.symm_apply_apply]
+    · exact Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space d))
   convert hcomp using 1
 
-lemma integral_volume_eq_spherical_iterated {d : ℕ} {F : Type*}
-    [NormedAddCommGroup F] [NormedSpace ℝ F] (f : Space d.succ → F)
+lemma integral_volume_eq_spherical_iterated {d : ℕ} [NeZero d] {F : Type*}
+    [NormedAddCommGroup F] [NormedSpace ℝ F] (f : Space d → F)
     (hf : Integrable f volume) :
-    ∫ x : Space d.succ, f x =
-      ∫ n : ↑(Metric.sphere (0 : Space d.succ) 1),
+    ∫ x : Space d, f x =
+      ∫ n : ↑(Metric.sphere (0 : Space d) 1),
         ∫ r : Set.Ioi (0 : ℝ), f (r.1 • n.1)
-          ∂(Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))
-        ∂(volume (α := Space d.succ).toSphere) := by
+          ∂(Measure.volumeIoiPow (Module.finrank ℝ (Space d) - 1))
+        ∂(volume (α := Space d).toSphere) := by
   rw [integral_volume_eq_spherical]
   rw [MeasureTheory.integral_prod]
   exact integrable_spherical_of_integrable hf
@@ -226,14 +191,14 @@ instance : SFinite (@Measure.comap ↑(Set.Ioi 0) ℝ Subtype.instMeasurableSpac
         apply MeasurableEmbedding.subtype_coe
         simp
 
-lemma integral_volume_eq_spherical_integral {d : ℕ} {F : Type*}
-    [NormedAddCommGroup F] [NormedSpace ℝ F] (f : Space d.succ → F)
+lemma integral_volume_eq_spherical_integral {d : ℕ} [NeZero d] {F : Type*}
+    [NormedAddCommGroup F] [NormedSpace ℝ F] (f : Space d → F)
     (hf : Integrable f volume) :
-    ∫ x : Space d.succ, f x =
-      ∫ n : ↑(Metric.sphere (0 : Space d.succ) 1),
-        ∫ r : Set.Ioi (0 : ℝ), (r.1 ^ d) • f (r.1 • n.1)
+    ∫ x : Space d, f x =
+      ∫ n : ↑(Metric.sphere (0 : Space d) 1),
+        ∫ r : Set.Ioi (0 : ℝ), (r.1 ^ (d - 1)) • f (r.1 • n.1)
           ∂(.comap Subtype.val volume)
-        ∂(volume (α := Space d.succ).toSphere) := by
+        ∂(volume (α := Space d).toSphere) := by
   rw [integral_volume_eq_spherical_iterated f hf]
   congr
   funext n
@@ -242,7 +207,7 @@ lemma integral_volume_eq_spherical_integral {d : ℕ} {F : Type*}
   congr
   funext r
   have hr : 0 ≤ (r : ℝ) := le_of_lt r.2
-  rw [NNReal.smul_def, Real.coe_toNNReal _ (pow_nonneg hr d)]
+  rw [NNReal.smul_def, Real.coe_toNNReal _ (pow_nonneg hr (d - 1))]
 
 /-!
 
@@ -250,18 +215,18 @@ lemma integral_volume_eq_spherical_integral {d : ℕ} {F : Type*}
 
 -/
 
-lemma lintegral_volume_eq_spherical (d : ℕ) (f : Space d.succ → ENNReal) (hf : Measurable f) :
-    ∫⁻ x, f x ∂volume = ∫⁻ x, f (x.2.1 • x.1.1) ∂(volume (α := Space d.succ).toSphere.prod
-        (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
+lemma lintegral_volume_eq_spherical (d : ℕ) [NeZero d]
+    (f : Space d → ENNReal) (hf : Measurable f) :
+    ∫⁻ x, f x ∂volume = ∫⁻ x, f (x.2.1 • x.1.1) ∂(volume (α := Space d).toSphere.prod
+        (Measure.volumeIoiPow (Module.finrank ℝ (Space d) - 1))) := by
   have h0 := MeasureTheory.MeasurePreserving.lintegral_comp
     (f := fun x => f (x.2.1 • x.1.1)) (g := homeomorphUnitSphereProd _)
     (MeasureTheory.Measure.measurePreserving_homeomorphUnitSphereProd
-    (volume (α := Space d.succ)))
+    (volume (α := Space d)))
     (by fun_prop)
   rw [← h0]
-  simp only [Nat.succ_eq_add_one, homeomorphUnitSphereProd_apply_snd_coe,
-    homeomorphUnitSphereProd_apply_fst_coe]
-  let f' : (x : (Space d.succ)) → ENNReal := fun x => f (‖↑x‖ • ‖↑x‖⁻¹ • ↑x)
+  simp only [homeomorphUnitSphereProd_apply_snd_coe, homeomorphUnitSphereProd_apply_fst_coe]
+  let f' : (x : (Space d)) → ENNReal := fun x => f (‖↑x‖ • ‖↑x‖⁻¹ • ↑x)
   conv_rhs =>
     enter [2, x]
     change f' x.1
@@ -276,17 +241,17 @@ lemma lintegral_volume_eq_spherical (d : ℕ) (f : Space d.succ → ENNReal) (hf
   field_simp
   rw [one_smul]
 
-lemma lintegral_volume_eq_spherical_mul (d : ℕ) (f : Space d.succ → ENNReal) (hf : Measurable f) :
-    ∫⁻ x, f x ∂volume = ∫⁻ x, f (x.2.1 • x.1.1) * .ofReal (x.2.1 ^ d)
-      ∂(volume (α := Space d.succ).toSphere.prod (Measure.volumeIoiPow 0)) := by
+lemma lintegral_volume_eq_spherical_mul (d : ℕ) [NeZero d]
+    (f : Space d → ENNReal) (hf : Measurable f) :
+    ∫⁻ x, f x ∂volume = ∫⁻ x, f (x.2.1 • x.1.1) * .ofReal (x.2.1 ^ (d - 1))
+      ∂(volume (α := Space d).toSphere.prod (Measure.volumeIoiPow 0)) := by
   rw [lintegral_volume_eq_spherical, Measure.volumeIoiPow,
     MeasureTheory.prod_withDensity_right,
     MeasureTheory.lintegral_withDensity_eq_lintegral_mul,
     Measure.volumeIoiPow, MeasureTheory.prod_withDensity_right,
     MeasureTheory.lintegral_withDensity_eq_lintegral_mul]
   · refine lintegral_congr_ae ?_
-    simp only [Nat.succ_eq_add_one, finrank_eq_dim, add_tsub_cancel_right, pow_zero,
-      ENNReal.ofReal_one]
+    simp only [finrank_eq_dim, pow_zero, ENNReal.ofReal_one]
     filter_upwards with x
     simp only [Pi.mul_apply, one_mul]
     ring
