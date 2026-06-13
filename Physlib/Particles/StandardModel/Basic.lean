@@ -337,24 +337,122 @@ end GaugeGroupℤ₆
 
 -/
 
-/-- The ℤ₂subgroup of the un-quotiented gauge group which acts trivially on all particles in the
+/-- The inclusion of second roots of unity into sixth roots of unity. -/
+noncomputable def gaugeGroupℤ₂RootToℤ₆Root : rootsOfUnity 2 ℂ →* rootsOfUnity 6 ℂ :=
+  Subgroup.inclusion (rootsOfUnity_le_of_dvd (by norm_num : 2 ∣ 6))
+
+/-- The element of `GaugeGroupI` associated to a second root of unity. -/
+noncomputable def gaugeGroupℤ₂OfRoot (α : rootsOfUnity 2 ℂ) : GaugeGroupI :=
+  gaugeGroupℤ₆OfRoot (gaugeGroupℤ₂RootToℤ₆Root α)
+
+@[simp]
+lemma gaugeGroupℤ₂OfRoot_toSU3 (α : rootsOfUnity 2 ℂ) :
+    GaugeGroupI.toSU3 (gaugeGroupℤ₂OfRoot α) =
+      gaugeGroupℤ₆SU3OfRoot (gaugeGroupℤ₂RootToℤ₆Root α) := rfl
+
+@[simp]
+lemma gaugeGroupℤ₂OfRoot_toSU2 (α : rootsOfUnity 2 ℂ) :
+    GaugeGroupI.toSU2 (gaugeGroupℤ₂OfRoot α) =
+      gaugeGroupℤ₆SU2OfRoot (gaugeGroupℤ₂RootToℤ₆Root α) := rfl
+
+@[simp]
+lemma gaugeGroupℤ₂OfRoot_toU1 (α : rootsOfUnity 2 ℂ) :
+    GaugeGroupI.toU1 (gaugeGroupℤ₂OfRoot α) =
+      gaugeGroupℤ₆UnitaryOfRoot (gaugeGroupℤ₂RootToℤ₆Root α) := rfl
+
+lemma gaugeGroupℤ₂OfRoot_mem_center (α : rootsOfUnity 2 ℂ) :
+    gaugeGroupℤ₂OfRoot α ∈ Subgroup.center GaugeGroupI :=
+  gaugeGroupℤ₆OfRoot_mem_center (gaugeGroupℤ₂RootToℤ₆Root α)
+
+/-- The homomorphism from second roots of unity to `GaugeGroupI`. -/
+noncomputable def gaugeGroupℤ₂Hom : rootsOfUnity 2 ℂ →* GaugeGroupI :=
+  gaugeGroupℤ₆Hom.comp gaugeGroupℤ₂RootToℤ₆Root
+
+@[simp]
+lemma gaugeGroupℤ₂Hom_apply (α : rootsOfUnity 2 ℂ) :
+    gaugeGroupℤ₂Hom α = gaugeGroupℤ₂OfRoot α := rfl
+
+@[simp]
+lemma gaugeGroupℤ₂Hom_toSU3 (α : rootsOfUnity 2 ℂ) :
+    GaugeGroupI.toSU3 (gaugeGroupℤ₂Hom α) =
+      gaugeGroupℤ₆SU3OfRoot (gaugeGroupℤ₂RootToℤ₆Root α) := rfl
+
+@[simp]
+lemma gaugeGroupℤ₂Hom_toSU2 (α : rootsOfUnity 2 ℂ) :
+    GaugeGroupI.toSU2 (gaugeGroupℤ₂Hom α) =
+      gaugeGroupℤ₆SU2OfRoot (gaugeGroupℤ₂RootToℤ₆Root α) := rfl
+
+@[simp]
+lemma gaugeGroupℤ₂Hom_toU1 (α : rootsOfUnity 2 ℂ) :
+    GaugeGroupI.toU1 (gaugeGroupℤ₂Hom α) =
+      gaugeGroupℤ₆UnitaryOfRoot (gaugeGroupℤ₂RootToℤ₆Root α) := rfl
+
+/-- The ℤ₂-subgroup of the un-quotiented gauge group which acts trivially on all particles in the
 standard model, i.e., the ℤ₂-subgroup of `GaugeGroupI` derived from the ℤ₂ subgroup of
 `gaugeGroupℤ₆SubGroup`.
 
 See https://math.ucr.edu/home/baez/guts.pdf
 -/
-informal_definition gaugeGroupℤ₂SubGroup where
-  deps := [``GaugeGroupI]
-  tag := "6V2GH"
+noncomputable def gaugeGroupℤ₂SubGroup : Subgroup GaugeGroupI :=
+  gaugeGroupℤ₂Hom.range
+
+lemma gaugeGroupℤ₂OfRoot_mem (α : rootsOfUnity 2 ℂ) :
+    gaugeGroupℤ₂OfRoot α ∈ gaugeGroupℤ₂SubGroup :=
+  ⟨α, rfl⟩
+
+lemma mem_gaugeGroupℤ₂SubGroup_iff (g : GaugeGroupI) :
+    g ∈ gaugeGroupℤ₂SubGroup ↔ ∃ α : rootsOfUnity 2 ℂ, gaugeGroupℤ₂OfRoot α = g := by
+  simp [gaugeGroupℤ₂SubGroup]
+
+lemma gaugeGroupℤ₂SubGroup_le_gaugeGroupℤ₆SubGroup :
+    gaugeGroupℤ₂SubGroup ≤ gaugeGroupℤ₆SubGroup := by
+  intro g hg
+  rw [mem_gaugeGroupℤ₂SubGroup_iff] at hg
+  rcases hg with ⟨α, rfl⟩
+  exact gaugeGroupℤ₆OfRoot_mem (gaugeGroupℤ₂RootToℤ₆Root α)
+
+lemma gaugeGroupℤ₂SubGroup_le_center :
+    gaugeGroupℤ₂SubGroup ≤ Subgroup.center GaugeGroupI := by
+  intro g hg
+  rw [mem_gaugeGroupℤ₂SubGroup_iff] at hg
+  rcases hg with ⟨α, rfl⟩
+  exact gaugeGroupℤ₂OfRoot_mem_center α
+
+instance gaugeGroupℤ₂SubGroup_normal : gaugeGroupℤ₂SubGroup.Normal where
+  conj_mem n hn g := by
+    have hn_center : n ∈ Subgroup.center GaugeGroupI := gaugeGroupℤ₂SubGroup_le_center hn
+    have hcomm : g * n = n * g := (Subgroup.mem_center_iff.mp hn_center) g
+    have hconj : g * n * g⁻¹ = n := by
+      calc
+        g * n * g⁻¹ = n * g * g⁻¹ := by rw [hcomm]
+        _ = n := by simp [mul_assoc]
+    simpa [hconj] using hn
 
 /-- The gauge group of the Standard Model with a ℤ₂ quotient, i.e., the quotient of `GaugeGroupI` by
 the ℤ₂-subgroup `gaugeGroupℤ₂SubGroup`.
 
 See https://math.ucr.edu/home/baez/guts.pdf
 -/
-informal_definition GaugeGroupℤ₂ where
-  deps := [``GaugeGroupI, ``StandardModel.gaugeGroupℤ₂SubGroup]
-  tag := "6V2GO"
+def GaugeGroupℤ₂ : Type :=
+  GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup
+
+noncomputable instance : Group GaugeGroupℤ₂ :=
+  inferInstanceAs (Group (GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup))
+
+namespace GaugeGroupℤ₂
+
+/-- The quotient map from `GaugeGroupI` to `GaugeGroupℤ₂`. -/
+noncomputable def mk : GaugeGroupI →* GaugeGroupℤ₂ :=
+  QuotientGroup.mk' gaugeGroupℤ₂SubGroup
+
+@[simp]
+lemma mk_gaugeGroupℤ₂OfRoot (α : rootsOfUnity 2 ℂ) :
+    mk (gaugeGroupℤ₂OfRoot α) = 1 := by
+  change ((gaugeGroupℤ₂OfRoot α : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) = 1
+  rw [QuotientGroup.eq_one_iff]
+  exact gaugeGroupℤ₂OfRoot_mem α
+
+end GaugeGroupℤ₂
 
 /-!
 
