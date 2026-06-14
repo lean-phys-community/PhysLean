@@ -11,6 +11,20 @@ public import Physlib.Meta.TODO.Basic
 
 # The Hilbert space of a finite target quantum mechanical system
 
+A finite target quantum mechanical system is one whose states live in a finite
+dimensional Hilbert space, with the basis states labelled by a finite type `d`
+(for example the sites of a finite lattice, or the levels of a qudit).
+
+This file contains
+- the definition of `FiniteHilbertSpace d`, the Hilbert space of such a system,
+  as a structure wrapping `EuclideanSpace ℂ d`, together with the notation `𝓗[d]`;
+- its vector space structure (`AddCommGroup` and `Module ℂ`), transferred from
+  `EuclideanSpace ℂ d` along the equivalence `equivEuclidean`;
+- its Hilbert space structure (`NormedAddCommGroup`, `InnerProductSpace ℂ`,
+  `FiniteDimensional ℂ` and `CompleteSpace`), induced along `linearEquivEuclidean`;
+- the standard orthonormal basis `basisFun`, whose elements are the states
+  localized at the points of `d`.
+
 -/
 
 @[expose] public section
@@ -33,9 +47,18 @@ TODO "To match this with the results currently in the `QuantumInfo` part of the 
   definition of bras and kets, and the definition of mixed states. Maybe also
   parts of `./ResourceTheory/FreeState`."
 
-/-- The finite dimensional Hilbert space of dimension `n`. -/
--- def FiniteHilbertSpace (n : ℕ) : Type := EuclideanSpace ℂ (Fin n)
 
+/-- The Hilbert space of a finite target quantum mechanical system whose target is
+  a finite type `d` with decidable equality.
+
+  It is defined as a structure with a single field `val`, wrapping an element of
+  `EuclideanSpace ℂ d` — the space of functions `d → ℂ` carrying the `L²` inner
+  product `⟪ψ, φ⟫ = ∑ i, conj (ψ i) * φ i`. Using a structure in preference to
+  `EuclideanSpace ℂ d` itself makes the Hilbert space of states a type of its own,
+  with its own API and the notation `𝓗[d]`.
+
+  Being finite dimensional, it is automatically a complete inner product space,
+  that is, a genuine Hilbert space. -/
 @[ext]
 structure FiniteHilbertSpace (d : Type*) [Fintype d] [DecidableEq d] where
   /-- The underlying element of `EuclideanSpace ℂ d`. -/
@@ -43,21 +66,6 @@ structure FiniteHilbertSpace (d : Type*) [Fintype d] [DecidableEq d] where
 
 @[inherit_doc FiniteHilbertSpace]
 scoped notation "𝓗[" d "]" => FiniteHilbertSpace d
-
--- instance {n : ℕ} : AddCommGroup (FiniteHilbertSpace n) := inferInstanceAs
---   (AddCommGroup (EuclideanSpace ℂ (Fin n)))
-
--- noncomputable instance {n : ℕ} : Module ℂ (FiniteHilbertSpace n) := inferInstanceAs
---   (Module ℂ (EuclideanSpace ℂ (Fin n)))
-
--- noncomputable instance {n : ℕ} : NormedAddCommGroup (FiniteHilbertSpace n) := inferInstanceAs
---   (NormedAddCommGroup (EuclideanSpace ℂ (Fin n)))
-
--- noncomputable instance {n : ℕ} : InnerProductSpace ℂ (FiniteHilbertSpace n) := inferInstanceAs
---   (InnerProductSpace ℂ (EuclideanSpace ℂ (Fin n)))
-
--- noncomputable instance {n : ℕ} : CompleteSpace (FiniteHilbertSpace n) := inferInstanceAs
---   (CompleteSpace (EuclideanSpace ℂ (Fin n)))
 
 
 namespace FiniteHilbertSpace
@@ -140,8 +148,7 @@ noncomputable def isometryEquivEuclidean : FiniteHilbertSpace d ≃ₗᵢ[ℂ] E
 
 -/
 
-/-- The standard orthonormal basis of `FiniteHilbertSpace d`, indexed by `d`.
-  Physically, this is the basis of states localized at the points of `d`. -/
+/-- The standard orthonormal basis of `FiniteHilbertSpace d`, indexed by `d`. -/
 noncomputable def basisFun (d : Type*) [Fintype d] [DecidableEq d] :
     OrthonormalBasis d ℂ (FiniteHilbertSpace d) :=
   (EuclideanSpace.basisFun d ℂ).map isometryEquivEuclidean.symm
