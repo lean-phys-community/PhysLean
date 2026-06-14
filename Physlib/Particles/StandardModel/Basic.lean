@@ -604,10 +604,14 @@ quotient.
 
 See https://math.ucr.edu/home/baez/guts.pdf
 -/
-informal_definition GaugeGroup where
-  deps := [``GaugeGroupI, ``gaugeGroupℤ₂SubGroup, ``gaugeGroupℤ₃SubGroup,
-    ``GaugeGroupQuot]
-  tag := "6V2HF"
+def GaugeGroup : GaugeGroupQuot → Type
+  | .ℤ₆ => GaugeGroupℤ₆
+  | .ℤ₂ => GaugeGroupℤ₂
+  | .ℤ₃ => GaugeGroupℤ₃
+  | .I => GaugeGroupI
+
+noncomputable instance (q : GaugeGroupQuot) : Group (GaugeGroup q) := by
+  cases q <;> dsimp [GaugeGroup] <;> infer_instance
 
 /-!
 
