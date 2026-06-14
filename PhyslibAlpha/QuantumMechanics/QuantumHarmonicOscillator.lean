@@ -19,13 +19,13 @@ def aLin : (ℕ → ℂ) →ₗ[ℂ] (ℕ → ℂ) := {
     unfold a
     intro x y
     ext n
-    simp
+    simp only [Pi.add_apply]
     ring_nf
   map_smul' := by
     intro m x
     unfold a
     ext n
-    simp
+    simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
     ring_nf
 }
 
@@ -38,14 +38,14 @@ def a_dagLin : (ℕ → ℂ) →ₗ[ℂ] (ℕ → ℂ) := {
     unfold a_dag
     intro x y
     ext n
-    simp
+    simp only [Pi.add_apply]
     ring_nf
     split_ifs <;> simp
   map_smul' := by
     intro m x
     unfold a_dag
     ext n
-    simp
+    simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, mul_ite, mul_zero]
     ring_nf
 }
 
@@ -54,7 +54,7 @@ def ε (n : ℕ) (c : ℂ) : ℕ → ℂ := fun i => ite (i = n) c 0
 /-- Verify that a_dag really is the transpose of a. -/
 lemma a_dag_eq (i j : ℕ) : a_dag (ε i 1) j = star (a (ε j 1) i) := by
     unfold a a_dag ε
-    simp
+    simp only [mul_ite, mul_one, mul_zero, RCLike.star_def]
     split_ifs with _ _ _ g₃
     all_goals try omega
     all_goals try exact Eq.symm ((fun {z} ↦ Complex.conj_eq_iff_re.mpr) rfl)
@@ -100,12 +100,12 @@ lemma verify_a_dag_a (n : ℕ) (x : ℕ → ℂ) :
 lemma verify_a_a_dag (n : ℕ) (x : ℕ → ℂ) :
     a (a_dag x) n = (n + 1) * x n  := by
   unfold a_dag a
-  simp
+  simp only [Nat.add_eq_zero_iff, one_ne_zero, and_false, ↓reduceIte, Nat.cast_add, Nat.cast_one,
+    add_tsub_cancel_right]
   rw [← mul_assoc]
   congr
   norm_cast
   refine Real.mul_self_sqrt ?_
-  simp
   norm_cast
   omega
 
@@ -113,13 +113,13 @@ lemma commutation_relation :
     a ∘ a_dag - a_dag ∘ a = id := by
   unfold a a_dag
   ext x i
-  simp
+  simp only [Pi.sub_apply, Function.comp_apply, Nat.add_eq_zero_iff, one_ne_zero, and_false,
+    ↓reduceIte, Nat.cast_add, Nat.cast_one, add_tsub_cancel_right, id_eq]
   split_ifs with g₀
   · rw [g₀];simp
   · norm_cast
     have : i - 1 + 1 = i := by omega
     rw [this]
-    simp
     repeat rw [← mul_assoc]
     have : (i + 1) * x i - i * x i = x i := by
         ring_nf
@@ -127,7 +127,6 @@ lemma commutation_relation :
     congr
     · norm_cast
       refine Real.mul_self_sqrt ?_
-      simp
       linarith
     · norm_cast
       refine Real.mul_self_sqrt ?_
@@ -145,11 +144,15 @@ lemma probabilityOf_eq_poisson_C (n : ℕ) (α : ℂ) :
     probabilityOf n α =
     ProbabilityTheory.poissonMeasure Λ {n} := by
   unfold probabilityOf ProbabilityTheory.poissonMeasure coherentState
-  simp
-  have : |√(n.factorial : ℝ)| = √(n.factorial : ℝ) := by
-    simp
+  simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
+    Complex.ofReal_ofNat, Complex.norm_div, Complex.norm_mul, norm_pow, Complex.norm_real,
+    Real.norm_eq_abs, MeasurableSpace.measurableSet_top, MeasureTheory.Measure.sum_apply,
+    MeasureTheory.Measure.smul_apply, MeasureTheory.Measure.dirac_apply', Set.indicator_singleton,
+    Pi.one_apply, smul_eq_mul]
+  have : |√(n.factorial : ℝ)| = √(n.factorial : ℝ) := by simp
   simp_rw [this]
-  simp [Pi.single, Function.update]
+  simp only [Pi.single, Function.update, eq_rec_constant, Pi.zero_apply, dite_eq_ite, mul_ite,
+    mul_one, mul_zero, tsum_ite_eq]
   simp_rw [← mul_div]
   field_simp
   have : √↑n.factorial ^ 2 = (n.factorial : ℝ) := by
@@ -165,14 +168,12 @@ lemma probabilityOf_eq_poisson_C (n : ℕ) (α : ℂ) :
     have (a b c d : ℝ) (hab : a = b) (hcd : c = d) :
         a * c = b * d := by rw [hab,hcd]
     apply this
-    · simp
-      norm_cast
+    · norm_cast
       have : ‖α‖^2 ≥ 0 := by simp
       have (r : ℝ) :
         Complex.exp (-(r/2)) = Real.exp (-(r/2)) := by simp
       rw [this]
-      have (r : ℝ) : ‖Complex.ofReal (Real.exp r)‖ = Real.exp r := by
-        simp
+      have (r : ℝ) : ‖Complex.ofReal (Real.exp r)‖ = Real.exp r := by simp
       rw [this]
       have h₀ (r : ℝ) : (Real.exp r) ^ (2:ℝ) = Real.exp (r * 2) :=
         Eq.symm (Real.exp_mul r 2)
@@ -181,10 +182,10 @@ lemma probabilityOf_eq_poisson_C (n : ℕ) (α : ℂ) :
       simp_rw [h₁] at h₀
       rw [h₀]
       congr
-      simp
+      simp only [neg_mul, isUnit_iff_ne_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+        IsUnit.div_mul_cancel, neg_inj]
       norm_cast
-    · simp
-      rw [pow_right_comm]
+    · rw [pow_right_comm]
       congr
   · apply div_nonneg
     apply mul_nonneg
@@ -202,7 +203,11 @@ lemma coherentState_only_eigenvector (α : ℂ) (v : ℕ → ℂ) :
     ext n
     induction n with
     | zero =>
-      unfold coherentState; simp; field_simp
+      unfold coherentState
+      simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
+        Complex.ofReal_ofNat, Pi.smul_apply, pow_zero, mul_one, Nat.factorial_zero, Nat.cast_one,
+        Real.sqrt_one, Complex.ofReal_one, div_one, smul_eq_mul]
+      field_simp
       rw [mul_assoc]
       rw [← Complex.exp_add]
       field_simp
@@ -242,13 +247,12 @@ lemma coherentState_only_eigenvector (α : ℂ) (v : ℕ → ℂ) :
     have : (Complex.exp (↑‖α‖ ^ 2 / 2)) ≠ 0 := by simp
     field_simp
     unfold coherentState
-    simp
+    simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
+      Complex.ofReal_ofNat, Pi.smul_apply, smul_eq_mul]
     field_simp
     ring_nf
     field_simp
-    rw [mul_assoc]
-    rw [add_comm 1 n]
-    rw [add_comm 1 (n:ℝ)]
+    rw [mul_assoc, add_comm 1 n, add_comm 1 (n:ℝ)]
     have : (n+1).factorial = (n+1) * n.factorial := rfl
     rw [this]
     norm_num
@@ -259,7 +263,9 @@ lemma eigenvector_coherentState (α : ℂ) :
   rw [coherentState_only_eigenvector α (coherentState α)]
   have : Complex.exp (↑‖α‖ ^ 2 / 2) * coherentState α 0 = 1 := by
     unfold coherentState
-    simp
+    simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
+      Complex.ofReal_ofNat, pow_zero, mul_one, Nat.factorial_zero, Nat.cast_one, Real.sqrt_one,
+      Complex.ofReal_one, div_one]
     rw [← Complex.exp_add]
     field_simp
     ring_nf
@@ -289,11 +295,12 @@ lemma a_dagalmost_eigenvector {α : ℂ} (hα : α ≠ 0) {n : ℕ} (hn : n ≠ 
   unfold a_dag
   split_ifs with g₀
   · tauto
-  · simp
+  · simp only [smul_eq_mul]
     rw [← Nat.mul_factorial_pred hn]
     norm_num
     have : Complex.ofReal √( (n-1).factorial) ≠ 0 := by
-      simp
+      simp only [ne_eq, Complex.ofReal_eq_zero, Nat.cast_nonneg, Real.sqrt_eq_zero,
+        Nat.cast_eq_zero]
       exact Nat.factorial_ne_zero (n - 1)
     field_simp
     have : α ^ n = α * α ^ (n - 1) := by
@@ -307,16 +314,18 @@ lemma a_dag_nullspace
   ext n
   induction n with
   | zero =>
-    simp
     have := congrFun hv 1
-    simp at this
+    simp at this ⊢
     tauto
   | succ n hn =>
     have := congrFun hv (n + 2)
-    simp at this hn hv ⊢
+    simp only [Nat.add_eq_zero_iff, OfNat.ofNat_ne_zero, and_false, ↓reduceIte, Nat.cast_add,
+      Nat.cast_ofNat, Nat.add_one_sub_one, Pi.zero_apply, mul_eq_zero,
+      Complex.ofReal_eq_zero] at this hn hv ⊢
     cases this with
     | inl h =>
-      exfalso;revert h;simp
+      exfalso
+      revert h
       refine Real.sqrt_ne_zero'.mpr ?_
       linarith
     | inr h =>
@@ -330,10 +339,9 @@ lemma no_a_dag_eigenvector {α : ℂ}
     · subst α; apply a_dag_nullspace; rw [hv]; simp
     have := congrFun hv 0
     unfold a_dag at this
-    simp at this
     ext n
     induction n with
-    | zero => simp;tauto
+    | zero => simp at this ⊢;tauto
     | succ n hn =>
       unfold a_dag at hv
       have := congrFun hv (n+1)
