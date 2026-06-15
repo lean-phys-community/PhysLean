@@ -17,7 +17,31 @@ guide](https://leanprover-community.github.io/contribute/style.html).
 - Place results in the appropriate existing file; do not create new files without good reason.
 - Number sections `# A. ...`, `## A.1. ...`. See
   [HarmonicOscillator/Basic.lean](Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean).
-- All content must pass the linters in [scripts/README.md](scripts/README.md).
+- Every definition needs a docstring; missing docstrings fail the linter.
+
+## Building and checks
+
+- Build with the cache, not from scratch: run `lake exe cache get` before `lake build`. A cold build
+  is very slow.
+- New files must be added to the import list in `Physlib.lean` (kept sorted), or the build fails.
+- Anything depending on `sorry` or `Lean.ofReduceBool` must be tagged `@[sorryful]` or `@[pseudo]` —
+  but submitted work should contain neither.
+- New physics terms that trip the spell-checker go in `scripts/MetaPrograms/spellingWords.txt`.
+
+The merge-blocking linters (run them locally before finishing; see
+[scripts/README.md](scripts/README.md) for the full list):
+
+- `lake exe lint_all` — the main check (build, imports, style, Lean linters, transitive imports).
+  May need running several times.
+- `./scripts/lint-style.sh` — style/indentation/line-length and `simp only` checks. **Commit your
+  changes first**; this linter reads committed state.
+
+## Before you finish
+
+1. `lake build` is green.
+2. `lake exe lint_all` and `./scripts/lint-style.sh` pass.
+3. Every new file is imported into `Physlib.lean`.
+4. No `sorry`, no `axiom`, every definition has a docstring.
 
 ## Proof structuring
 
