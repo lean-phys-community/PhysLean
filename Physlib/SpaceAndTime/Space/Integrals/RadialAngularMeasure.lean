@@ -111,18 +111,18 @@ lemma lintegral_radialMeasure {d : ℕ} (f : Space d → ENNReal) (hf : Measurab
   · fun_prop
   · fun_prop
 
-lemma lintegral_radialMeasure_eq_spherical_mul (d : ℕ) (f : Space d.succ → ENNReal)
-    (hf : Measurable f) :
+lemma lintegral_radialMeasure_eq_spherical_mul (d : ℕ) [NeZero d]
+    (f : Space d → ENNReal) (hf : Measurable f) :
     ∫⁻ x, f x ∂radialAngularMeasure = ∫⁻ x, f (x.2.1 • x.1.1)
-      ∂(volume (α := Space d.succ).toSphere.prod (Measure.volumeIoiPow 0)) := by
+      ∂(volume (α := Space d).toSphere.prod (Measure.volumeIoiPow 0)) := by
   rw [lintegral_radialMeasure, lintegral_volume_eq_spherical_mul]
   apply lintegral_congr_ae
   filter_upwards with x
   have hx := x.2.2
-  simp [Nat.succ_eq_add_one, -Subtype.coe_prop] at hx
+  simp [-Subtype.coe_prop] at hx
   simp [norm_smul]
   rw [abs_of_nonneg (le_of_lt x.2.2)]
-  trans ENNReal.ofReal (↑x.2 ^ d * (x.2.1 ^ d)⁻¹) * f (x.2.1 • ↑x.1.1)
+  trans ENNReal.ofReal (↑x.2 ^ (d - 1) * (x.2.1 ^ (d - 1))⁻¹) * f (x.2.1 • ↑x.1.1)
   · rw [ENNReal.ofReal_mul]
     ring
     have h2 := x.2.2
@@ -131,7 +131,7 @@ lemma lintegral_radialMeasure_eq_spherical_mul (d : ℕ) (f : Space d.succ → E
   trans ENNReal.ofReal 1 * f (x.2.1 • ↑x.1.1)
   · congr
     field_simp
-  simp only [ENNReal.ofReal_one, Nat.succ_eq_add_one, one_mul]
+  simp only [ENNReal.ofReal_one, one_mul]
   fun_prop
   fun_prop
 
@@ -195,10 +195,10 @@ lemma integrable_radialAngularMeasure_iff {d : ℕ} {f : Space d → F} :
   rw [Real.toNNReal_of_nonneg (by positivity), NNReal.smul_def, coe_mk]
 
 omit [NormedSpace ℝ F] in
-lemma integrable_radialAngularMeasure_of_spherical {d : ℕ} (f : Space d.succ → F)
+lemma integrable_radialAngularMeasure_of_spherical {d : ℕ} [NeZero d] (f : Space d → F)
     (hae : StronglyMeasurable f)
     (hf : Integrable (fun x => f (x.2.1 • x.1.1))
-    (volume (α := Space d.succ).toSphere.prod (Measure.volumeIoiPow 0))) :
+    (volume (α := Space d).toSphere.prod (Measure.volumeIoiPow 0))) :
     Integrable f radialAngularMeasure := by
   refine ⟨StronglyMeasurable.aestronglyMeasurable hae, ?_⟩
   rw [hasFiniteIntegral_iff_norm, lintegral_radialMeasure_eq_spherical_mul _ _

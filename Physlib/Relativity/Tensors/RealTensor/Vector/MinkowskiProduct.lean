@@ -5,7 +5,7 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 /-!
 

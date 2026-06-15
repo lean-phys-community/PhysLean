@@ -50,6 +50,7 @@ public import Physlib.Electromagnetism.Kinematics.Boosts
 public import Physlib.Electromagnetism.Kinematics.EMPotential
 public import Physlib.Electromagnetism.Kinematics.ElectricField
 public import Physlib.Electromagnetism.Kinematics.FieldStrength
+public import Physlib.Electromagnetism.Kinematics.GaugeTransformation
 public import Physlib.Electromagnetism.Kinematics.MagneticField
 public import Physlib.Electromagnetism.Kinematics.ScalarPotential
 public import Physlib.Electromagnetism.Kinematics.VectorPotential
@@ -357,6 +358,7 @@ public import Physlib.Relativity.Tensors.OfInt
 public import Physlib.Relativity.Tensors.Product
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.CoVector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
@@ -370,6 +372,7 @@ public import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Contraction
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Modules
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Velocity.Basic
 public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 public import Physlib.Relativity.Tensors.Tensorial

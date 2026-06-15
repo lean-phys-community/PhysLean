@@ -255,7 +255,7 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
             have hξ := L2.eLpNorm_rpow_two_norm_lt_top ξ
             simp_rw [eLpNorm_one_eq_lintegral_enorm, Real.rpow_ofNat, enorm_pow, enorm_norm] at hξ
             exact hξ
-          · have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
+          · have : NeZero d := ⟨hd.ne'⟩
             let C : ℝ := (ENNReal.ofReal (√Real.pi ^ d / Real.Gamma (d / 2 + 1))).toReal
             have hvolB : ⇑volume ∘ B = fun n ↦ ENNReal.ofReal (C * (b n).rOut ^ d) := by
               ext n

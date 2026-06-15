@@ -83,7 +83,7 @@ open MeasureTheory
 
 -/
 
-/-- The boundedness condition on a function ` EuclideanSpace ℝ (Fin dm1.succ) → F`
+/-- The boundedness condition on a function `Space d → F`
   for it to form a distribution. -/
 @[fun_prop]
 def IsDistBounded {d : ℕ} (f : Space d → F) : Prop :=
@@ -911,10 +911,9 @@ lemma pow_shift {d : ℕ} (n : ℤ)
     rfl
 
 @[fun_prop]
-lemma inv_shift {d : ℕ}
-    (g : Space d.succ.succ) :
-    IsDistBounded (d := d.succ.succ) (fun x => ‖x - g‖⁻¹) := by
-  convert IsDistBounded.pow_shift (d := d.succ.succ) (-1) g (by simp) using 1
+lemma inv_shift {d : ℕ} (g : Space d) (hd : 2 ≤ d := by omega) :
+    IsDistBounded (d := d) (fun x => ‖x - g‖⁻¹) := by
+  convert IsDistBounded.pow_shift (d := d) (-1) g (by omega) using 1
   ext1 x
   simp
 @[fun_prop]
@@ -970,9 +969,9 @@ lemma norm_add {d : ℕ} (g : Space d) :
   simp
 
 @[fun_prop]
-lemma inv {n : ℕ} :
-    IsDistBounded (d := n.succ.succ) (fun x => ‖x‖⁻¹) := by
-  convert IsDistBounded.pow (d := n.succ.succ) (-1) (by simp) using 1
+lemma inv {d : ℕ} (hd: 2 ≤ d := by omega):
+    IsDistBounded (d := d) (fun x => ‖x‖⁻¹) := by
+  convert IsDistBounded.pow (d := d) (-1) (by omega) using 1
   ext1 x
   simp
 
@@ -983,14 +982,14 @@ lemma norm {d : ℕ} : IsDistBounded (d := d) (fun x => ‖x‖) := by
   simp
 
 @[fun_prop]
-lemma log_norm {d : ℕ} :
-    IsDistBounded (d := d.succ.succ) (fun x => Real.log ‖x‖) := by
+lemma log_norm {d : ℕ} (hd : 2 ≤ d := by omega) :
+    IsDistBounded (d := d) (fun x => Real.log ‖x‖) := by
   apply IsDistBounded.mono (f := fun x => ‖x‖⁻¹ + ‖x‖)
   · fun_prop
   · apply AEMeasurable.aestronglyMeasurable
     fun_prop
   · intro x
-    simp only [Nat.succ_eq_add_one, Real.norm_eq_abs]
+    simp only [Real.norm_eq_abs]
     conv_rhs => rw [abs_of_nonneg (by positivity)]
     have h1 := Real.neg_inv_le_log (x := ‖x‖) (by positivity)
     have h2 := Real.log_le_rpow_div (x := ‖x‖) (by positivity) (ε := 1) (by positivity)
@@ -1285,14 +1284,13 @@ lemma isDistBounded_mul_inner_of_smul_norm {d : ℕ} {f : Space d → ℝ}
   convert hf.isDistBounded_smul_inner_of_smul_norm hae y using 2
 
 @[fun_prop]
-lemma mul_inner_pow_neg_two {d : ℕ}
-    (y : Space d.succ.succ) :
+lemma mul_inner_pow_neg_two {d : ℕ} (y : Space d) (hd : 2 ≤ d := by omega) :
     IsDistBounded (fun x => ⟪y, x⟫_ℝ * ‖x‖ ^ (- 2 : ℤ)) := by
   apply IsDistBounded.mono (f := fun x => (‖y‖ * ‖x‖) * ‖x‖ ^ (- 2 : ℤ))
   · simp [mul_assoc]
     apply IsDistBounded.const_mul_fun
     apply IsDistBounded.congr (f := fun x => ‖x‖ ^ (- 1 : ℤ))
-    · apply IsDistBounded.pow (d := d.succ.succ) (-1) (by simp)
+    · apply IsDistBounded.pow (d := d) (-1) (by omega)
     · apply AEMeasurable.aestronglyMeasurable
       fun_prop
     · intro x
