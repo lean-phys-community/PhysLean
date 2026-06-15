@@ -90,10 +90,10 @@ lemma firstVariationValue_eq_integral (L : Lagrangian d m k)
 
 lemma firstVariationValue_eq_zero_of_eulerLagrange_zero
     (L : Lagrangian d m k) (f : Space d → EuclideanSpace ℝ (Fin m))
-    (η : AdmissibleVariation d (EuclideanSpace ℝ (Fin m))) (hel : eulerLagrangeOp L f = 0) :
+    (η : AdmissibleVariation d (EuclideanSpace ℝ (Fin m))) (hEuler : eulerLagrangeOp L f = 0) :
     firstVariationValue L f η = 0 := by
   unfold firstVariationValue
-  rw [hel]
+  rw [hEuler]
   simp
 
 end Local

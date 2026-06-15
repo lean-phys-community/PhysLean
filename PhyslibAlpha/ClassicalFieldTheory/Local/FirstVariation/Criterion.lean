@@ -62,12 +62,12 @@ def HasFirstVariationFormula (L : Lagrangian d m k)
 
 lemma isCritical_of_eulerLagrange_zero (L : Lagrangian d m k)
     (f : Space d → EuclideanSpace ℝ (Fin m))
-    (hfirst : HasFirstVariationFormula L f) (hel : eulerLagrangeOp L f = 0) :
+    (hfirst : HasFirstVariationFormula L f) (hEuler : eulerLagrangeOp L f = 0) :
     IsCritical L f := by
   intro η hη
   have hderiv := hfirst η hη
   have hzero : firstVariationValue L f η = 0 :=
-    firstVariationValue_eq_zero_of_eulerLagrange_zero L f η hel
+    firstVariationValue_eq_zero_of_eulerLagrange_zero L f η hEuler
   rw [hzero] at hderiv
   exact hderiv
 
