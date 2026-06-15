@@ -283,13 +283,14 @@ lemma compRestricted_sub_ge (g : F →ₗ.[R] G) (f₁ f₂ : E →ₗ.[R] F) :
   simp only [sub_eq_add_neg, ← compRestricted_neg]
   exact compRestricted_add_ge g f₁ (-f₂)
 
-lemma compRestricted_smul {𝕜 : Type*} [RCLike 𝕜] [Module 𝕜 E] [Module 𝕜 F] [Module 𝕜 G]
-    {c : 𝕜} (hc : c ≠ 0) (g : F →ₗ.[𝕜] G) (f : E →ₗ.[𝕜] F) :
+lemma compRestricted_smul {S : Type*} [DivisionRing S]
+    [Module S E] [Module S F] [Module S G] [SMulCommClass S S F] [SMulCommClass S S G]
+    {c : S} (hc : c ≠ 0) (g : F →ₗ.[S] G) (f : E →ₗ.[S] F) :
     g ∘ᵣ (c • f) = c • (g ∘ᵣ f) := by
-  ext x
-  · simp [compRestricted_domain, g.domain.smul_mem_iff hc]
-  · simp only [compRestricted_apply, coe_smul, Pi.smul_apply,
-      ← g.toFun_eq_coe, ← g.toFun.map_smul, SetLike.mk_smul_mk]
+  ext x hx hx'
+  · simp [mem_compRestricted_domain_iff, g.domain.smul_mem_iff hc]
+  · obtain ⟨h, h'⟩ := mem_compRestricted_domain_iff.mp (smul_domain c (g ∘ᵣ f) ▸ hx')
+    exact g.toFun.map_smul c ⟨f ⟨x, h⟩, h'⟩
 
 @[simp]
 lemma smul_compRestricted {M : Type*} [Monoid M] [DistribMulAction M G] [SMulCommClass R M G]

@@ -814,8 +814,8 @@ lemma resolvent_sub' {T : H →ₗ.[ℂ] H} (z₁ z₂ : ℂ) (hz₁ : z₁ ∈ 
       · simp [S, sub_apply, add_apply, sub_smul, add_sub_assoc, ← sub_eq_add_neg]
     have hR : 𝑅 T z₂ = 𝑅 S z₁ := by simp [resolvent, hST]
     have hz₁' : z₁ ∈ ρ S := ⟨hST ▸ hz₂.1, hST ▸ hz₂.2.1, hR ▸ hz₂.2.2⟩
-    rw [hR, resolvent_sub h_domain.le hz₁ hz₁']
     suffices (S - T) ∘ᵣ 𝑅 S z₁ = (z₁ - z₂) • 𝑅 S z₁ by
+      rw [hR, resolvent_sub h_domain.le hz₁ hz₁']
       simp only [mul_def, compRestricted_assoc, this, compRestricted_smul (sub_ne_zero.mpr hz)]
     calc
       _ = ((z₁ - z₂) • domRestrict 1 (S - z₁ • 1).domain) ∘ᵣ 𝑅 S z₁ := by
