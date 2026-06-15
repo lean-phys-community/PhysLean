@@ -803,6 +803,32 @@ lemma resolvent_sub
         exact hT' (by simp [← inverse_range hz₂.1])
       · rfl
 
+lemma resolvent_sub' {T : H →ₗ.[ℂ] H} (z₁ z₂ : ℂ) (hz₁ : z₁ ∈ ρ T) (hz₂ : z₂ ∈ ρ T) :
+    𝑅 T z₁ - 𝑅 T z₂ = (z₁ - z₂) • (𝑅 T z₁ * 𝑅 T z₂) := by
+  rcases eq_or_ne z₁ z₂ with rfl | hz
+  · ext
+    · simp [sub_domain, inverse_domain, hz₁.2, mul_def, compRestricted_domain]
+    · simp [sub_apply]
+  · let S := T + (z₁ - z₂) • 1
+    have h_domain : S.domain = T.domain := by simp [S, add_domain]
+    have hST : S - z₁ • 1 = T - z₂ • 1 := by
+      ext
+      · simp [sub_domain, h_domain]
+      · simp [S, sub_apply, add_apply, sub_smul, add_sub_assoc, ← sub_eq_add_neg]
+    have hR : 𝑅 T z₂ = 𝑅 S z₁ := by simp [resolvent, hST]
+    have hz₁' : z₁ ∈ ρ S := ⟨hST ▸ hz₂.1, hST ▸ hz₂.2.1, hR ▸ hz₂.2.2⟩
+    have hST' : S - T = (z₁ - z₂) • domRestrict 1 T.domain := by
+      ext
+      · simp [h_domain, sub_domain]
+      · simp only [sub_apply, add_apply, add_sub_cancel_left, S]
+        rfl
+    have : domRestrict 1 (S - z₁ • 1).domain ∘ᵣ 𝑅 S z₁ = 𝑅 S z₁ := by
+      ext
+      · simp [mem_compRestricted_domain_iff, ← inverse_range hz₁'.1]
+      · rfl
+    have := resolvent_sub h_domain.le hz₁ hz₁'
+    simp_all [mul_def, compRestricted_assoc, sub_domain, compRestricted_smul (sub_ne_zero.mpr hz)]
+
 end
 
 end LinearPMap

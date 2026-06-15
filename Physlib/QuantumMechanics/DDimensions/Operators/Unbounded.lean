@@ -283,6 +283,22 @@ lemma compRestricted_sub_ge (g : F →ₗ.[R] G) (f₁ f₂ : E →ₗ.[R] F) :
   simp only [sub_eq_add_neg, ← compRestricted_neg]
   exact compRestricted_add_ge g f₁ (-f₂)
 
+lemma compRestricted_smul {𝕜 : Type*} [RCLike 𝕜] [Module 𝕜 E] [Module 𝕜 F] [Module 𝕜 G]
+    {c : 𝕜} (hc : c ≠ 0) (g : F →ₗ.[𝕜] G) (f : E →ₗ.[𝕜] F) :
+    g ∘ᵣ (c • f) = c • (g ∘ᵣ f) := by
+  ext x
+  · simp [compRestricted_domain, g.domain.smul_mem_iff hc]
+  · simp only [compRestricted_apply, coe_smul, Pi.smul_apply,
+      ← g.toFun_eq_coe, ← g.toFun.map_smul, SetLike.mk_smul_mk]
+
+@[simp]
+lemma smul_compRestricted {M : Type*} [Monoid M] [DistribMulAction M G] [SMulCommClass R M G]
+    (c : M) (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (c • g) ∘ᵣ f = c • (g ∘ᵣ f) := by
+  ext
+  · simp [compRestricted_domain]
+  · simp
+
 end
 
 /-!
