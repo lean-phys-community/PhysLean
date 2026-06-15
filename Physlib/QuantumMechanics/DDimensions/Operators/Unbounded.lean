@@ -168,15 +168,27 @@ infixr:80 " ∘ᵣ " => compRestricted
 lemma compRestricted_domain_le (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : (g ∘ᵣ f).domain ≤ f.domain :=
   fun _ h ↦ h.2
 
+lemma compRestricted_domain (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (g ∘ᵣ f).domain = (g.domain.comap f.toFun).map f.domain.subtype := by
+  change (f.domRestrict <| (g.domain.comap f.toFun).map f.domain.subtype).domain = _
+  rw [domRestrict_domain]
+  refine inf_of_le_left ?_
+  intro x h
+  simp only [mem_map, mem_comap, toFun_eq_coe, subtype_apply, Subtype.exists, exists_and_right,
+    exists_eq_right] at h
+  exact h.choose
+
 lemma mem_compRestricted_domain_iff {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
     x ∈ (g ∘ᵣ f).domain ↔ ∃ h : x ∈ f.domain, f ⟨x, h⟩ ∈ g.domain := by
-  change x ∈ (g.domain.comap f.toFun).map f.domain.subtype ⊓ f.domain ↔ _
-  simp
+  simp [compRestricted_domain]
+
+lemma mem_compRestricted_domain_iff' {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
+    x ∈ (g ∘ᵣ f).domain ↔ ∃ y : f.domain, x = y ∧ ∃ y' : g.domain, f y = y' := by
+  simp [mem_compRestricted_domain_iff]
 
 lemma mem_domain_of_mem_compRestricted_domain
-    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) : f ⟨x, x.2.2⟩ ∈ g.domain := by
-  obtain ⟨_, h⟩ := mem_compRestricted_domain_iff.mp x.2
-  exact h
+    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) : f ⟨x, x.2.2⟩ ∈ g.domain :=
+  (mem_compRestricted_domain_iff.mp x.2).choose_spec
 
 @[simp]
 lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) :
