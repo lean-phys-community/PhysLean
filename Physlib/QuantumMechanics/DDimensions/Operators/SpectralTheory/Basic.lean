@@ -77,6 +77,7 @@ Main results
     - D.2.2. Residual spectrum
     - D.2.3. Continuous spectrum
   - D.3. Spectrum decomposition
+- E. Resolvent identities
 
 ## iv. References
 
@@ -764,6 +765,43 @@ lemma pointSpectrum_inter_residualSpectrum (T : H →ₗ.[ℂ] H) : σᵖ T ∩ 
   ext
   simp only [mem_inter_iff, mem_empty_iff_false, iff_false, not_and]
   exact fun h h' ↦ h h'.1
+
+/-!
+## E. Resolvent identities
+-/
+
+lemma resolvent_sub
+    {T₁ T₂ : H →ₗ.[ℂ] H} (hT : T₂.domain ≤ T₁.domain) {z : ℂ} (hz₁ : z ∈ ρ T₁) (hz₂ : z ∈ ρ T₂) :
+    𝑅 T₁ z - 𝑅 T₂ z = 𝑅 T₁ z * (T₂ - T₁) * 𝑅 T₂ z := by
+  symm
+  calc
+    _ = 𝑅 T₁ z ∘ᵣ ((T₂ - z • 1 - (T₁ - z • 1)) ∘ᵣ 𝑅 T₂ z) := by
+      rw [mul_assoc]
+      congr 2
+      ext
+      · simp [sub_domain]
+      · simp [sub_apply]
+    _ = 𝑅 T₁ z ∘ᵣ ((T₂ - z • 1) ∘ᵣ 𝑅 T₂ z - (T₁ - z • 1) ∘ᵣ 𝑅 T₂ z) := by
+      congr
+      exact sub_compRestricted _ _ _
+    _ = 𝑅 T₁ z ∘ᵣ (1 - (T₁ - z • 1) ∘ᵣ 𝑅 T₂ z) := by
+      congr
+      rw [compRestricted_inverse_eq hz₂.1, inverse_domain, hz₂.2.1]
+      aesop
+    _ = 𝑅 T₁ z - 𝑅 T₁ z ∘ᵣ ((T₁ - z • 1) ∘ᵣ 𝑅 T₂ z) := by
+      nth_rw 2 [← mul_one (𝑅 T₁ z)]
+      refine (eq_of_le_of_domain_eq ?_ ?_).symm
+      · exact compRestricted_sub_ge _ _ _
+      · simp [sub_domain, compRestricted_domain, inverse_domain, hz₁.2]
+    _ = 𝑅 T₁ z - (domRestrict 1 T₁.domain) ∘ᵣ 𝑅 T₂ z := by
+      simp [← compRestricted_assoc, inverse_compRestricted_eq hz₁.1, sub_domain]
+    _ = 𝑅 T₁ z - 𝑅 T₂ z := by
+      ext x
+      · suffices 𝑅 T₂ z ⟨x, by simp [inverse_domain, hz₂.2]⟩ ∈ (T₁ - z • 1).domain by
+          simp_all [sub_domain, compRestricted_domain, inverse_domain, hz₁.2, hz₂.2]
+        have hT' : (T₂ - z • 1).domain ≤ (T₁ - z • 1).domain := by simp [sub_domain, hT]
+        exact hT' (by simp [← inverse_range hz₂.1])
+      · rfl
 
 end
 
