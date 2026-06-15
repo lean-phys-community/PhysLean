@@ -74,7 +74,9 @@ lemma oddNormIteratedLaplacianCoeff_ne_zero (m : ℕ) :
     · have h : (1 : ℤ) - 2 * (m : ℤ) ≠ 0 := by omega
       exact_mod_cast h
     · exact_mod_cast (by omega : (2 * m + 1 : ℕ) ≠ 0)
-    · exact ne_of_gt (volume_metricBall_odd_real_pos m)
+    · exact ne_of_gt <| ENNReal.toReal_pos
+        (Metric.measure_ball_pos volume 0 one_pos).ne'
+        measure_ball_lt_top.ne
 
 private lemma distLaplacian_norm_zpow_odd_boundary (m : ℕ) :
     Δᵈ (distOfFunction (fun x : Space (2 * m + 1) =>
