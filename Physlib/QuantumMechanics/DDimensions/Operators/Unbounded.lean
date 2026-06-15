@@ -244,6 +244,44 @@ lemma compRestricted_mono_right (g : F →ₗ.[R] G) {f f' : E →ₗ.[R] F} (h 
   · intro x y hxy
     simp only [compRestricted_apply, @h.2 ⟨x, x.2.2⟩ ⟨y, y.2.2⟩ hxy]
 
+@[simp]
+lemma neg_compRestricted (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : (-g) ∘ᵣ f = -g ∘ᵣ f := rfl
+
+@[simp]
+lemma compRestricted_neg (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : g ∘ᵣ (-f) = -g ∘ᵣ f := by
+  ext x hx hx'
+  · simp [mem_compRestricted_domain_iff]
+  · obtain ⟨h, h'⟩ := mem_compRestricted_domain_iff.mp hx'
+    exact g.toFun.map_neg ⟨f ⟨x, h⟩, h'⟩
+
+lemma add_compRestricted (g₁ g₂ : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (g₁ + g₂) ∘ᵣ f = g₁ ∘ᵣ f + g₂ ∘ᵣ f := by
+  ext x hx hx'
+  · simp only [mem_compRestricted_domain_iff, add_domain, mem_inf]
+    tauto
+  · simp [add_apply]
+
+lemma sub_compRestricted (g₁ g₂ : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (g₁ - g₂) ∘ᵣ f = g₁ ∘ᵣ f - g₂ ∘ᵣ f := by
+  simp [sub_eq_add_neg, add_compRestricted]
+
+lemma compRestricted_add_ge (g : F →ₗ.[R] G) (f₁ f₂ : E →ₗ.[R] F) :
+    g ∘ᵣ f₁ + g ∘ᵣ f₂ ≤ g ∘ᵣ (f₁ + f₂) := by
+  constructor
+  · intro x hx
+    obtain ⟨h₁, h₁'⟩ := mem_compRestricted_domain_iff.mp hx.1
+    obtain ⟨h₂, h₂'⟩ := mem_compRestricted_domain_iff.mp hx.2
+    exact mem_compRestricted_domain_iff.mpr ⟨⟨h₁, h₂⟩, add_mem h₁' h₂'⟩
+  · intro x y hxy
+    obtain ⟨h₁, h₁'⟩ := mem_compRestricted_domain_iff.mp x.2.1
+    obtain ⟨h₂, h₂'⟩ := mem_compRestricted_domain_iff.mp x.2.2
+    simp [← hxy, add_apply, ← g.map_add ⟨f₁ ⟨x, h₁⟩, h₁'⟩ ⟨f₂ ⟨x, h₂⟩, h₂'⟩]
+
+lemma compRestricted_sub_ge (g : F →ₗ.[R] G) (f₁ f₂ : E →ₗ.[R] F) :
+    g ∘ᵣ f₁ - g ∘ᵣ f₂ ≤ g ∘ᵣ (f₁ - f₂) := by
+  simp only [sub_eq_add_neg, ← compRestricted_neg]
+  exact compRestricted_add_ge g f₁ (-f₂)
+
 end
 
 /-!
