@@ -56,6 +56,7 @@ these correspond to physical observables.
   - A.3. Restricted composition
   - A.4. Monoid
   - A.5. Inequalities
+  - A.6. Inverses
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
   - B.2. Basic properties
@@ -376,6 +377,33 @@ lemma sub_left_le_of_le (h : g₁ ≤ g₂) : f - g₁ ≤ f - g₂ :=
   neg_sub g₁ f ▸ neg_sub g₂ f ▸ le_iff_neg_le_neg.mp (sub_right_le_of_le f h)
 
 end
+
+/-!
+## A.6. Inverses
+-/
+
+lemma inverse_ker {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) : f.inverse.toFun.ker = ⊥ := by
+  refine LinearMap.ker_eq_bot'.mpr fun ⟨y, hy⟩ hy' ↦ ?_
+  obtain ⟨x, hx⟩ := inverse_domain (f := f) ▸ hy
+  simp_all [inverse_apply_eq (x := x) (y := ⟨y, hy⟩) h_ker hx]
+
+lemma inverse_inverse {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) : f.inverse.inverse = f := by
+  ext x hx hx'
+  · rw [inverse_domain, inverse_range h_ker]
+  · refine inverse_apply_eq (y := ⟨x, hx⟩) (x := ⟨f ⟨x, hx'⟩, by simp [inverse_domain]⟩) ?_ ?_
+    · exact inverse_ker h_ker
+    · exact inverse_apply_eq (y := ⟨f ⟨x, hx'⟩, by simp [inverse_domain]⟩) (x := ⟨x, hx'⟩) h_ker rfl
+
+lemma inverse_compRestricted_eq {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) :
+    f.inverse ∘ᵣ f = domRestrict 1 f.domain := by
+  ext x hx hx'
+  · simp [mem_compRestricted_domain_iff, inverse_domain, ← toFun_eq_coe]
+  · exact inverse_apply_eq (x := ⟨x, hx.2⟩) h_ker rfl
+
+lemma compRestricted_inverse_eq {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) :
+    f ∘ᵣ f.inverse = domRestrict 1 f.inverse.domain := by
+  nth_rw 1 [← inverse_inverse h_ker]
+  exact inverse_compRestricted_eq (inverse_ker h_ker)
 
 end General
 
