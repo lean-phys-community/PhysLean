@@ -1,12 +1,12 @@
-module
 /-
 Copyright (c) 2026 Bjørn Kjos-Hanssen. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Bjørn Kjos-Hanssen
 -/
-import Mathlib.Data.Matrix.PEquiv
-import Mathlib.Probability.Distributions.Poisson.Basic
-import Mathlib.Analysis.Normed.Lp.lpSpace
+module
+public import Mathlib.Data.Matrix.PEquiv
+public import Mathlib.Probability.Distributions.Poisson.Basic
+public import Mathlib.Analysis.Normed.Lp.lpSpace
 /-!
 # Quantum harmonic oscillator
 -/
