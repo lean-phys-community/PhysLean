@@ -364,6 +364,13 @@ lemma add_add_sub_le_cancel : f₁ + f₂ + (f₃ - f₂) ≤ f₁ + f₃ :=
 lemma add_sub_sub_le_cancel : f₁ + f₂ - (f₁ - f₃) ≤ f₂ + f₃ :=
   ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
 
+lemma sub_sub_sub_le_cancel_right : f₁ - f₂ - (f₃ - f₂) ≤ f₁ - f₃ := by
+  simp only [sub_eq_add_neg, neg_add]
+  exact sub_eq_add_neg (-f₃) (-f₂) ▸ add_add_sub_le_cancel f₁ (-f₂) (-f₃)
+
+lemma sub_sub_sub_le_cancel_left : f₁ - f₂ - (f₁ - f₃) ≤ f₃ - f₂ :=
+  sub_eq_add_neg f₁ f₂ ▸ neg_add_eq_sub f₂ f₃ ▸ add_sub_sub_le_cancel f₁ (-f₂) f₃
+
 lemma sub_le_of_le_add (h : g ≤ g₁ + g₂) : g - g₂ ≤ g₁ := by
   constructor
   · exact (inf_le_of_left_le le_rfl).trans (le_inf_iff.mp <| add_domain g₁ g₂ ▸ h.1).1

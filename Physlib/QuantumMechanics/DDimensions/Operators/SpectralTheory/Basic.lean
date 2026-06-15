@@ -778,29 +778,26 @@ lemma resolvent_sub
     _ = 𝑅 T₁ z ∘ᵣ ((T₂ - z • 1 - (T₁ - z • 1)) ∘ᵣ 𝑅 T₂ z) := by
       rw [mul_assoc]
       congr 2
-      ext
-      · simp [sub_domain]
-      · simp [sub_apply]
+      exact (eq_of_le_of_domain_eq (sub_sub_sub_le_cancel_right _ _ _) (by simp [sub_domain])).symm
     _ = 𝑅 T₁ z ∘ᵣ ((T₂ - z • 1) ∘ᵣ 𝑅 T₂ z - (T₁ - z • 1) ∘ᵣ 𝑅 T₂ z) := by
       congr
       exact sub_compRestricted _ _ _
     _ = 𝑅 T₁ z ∘ᵣ (1 - (T₁ - z • 1) ∘ᵣ 𝑅 T₂ z) := by
       congr
       rw [compRestricted_inverse_eq hz₂.1, inverse_domain, hz₂.2.1]
-      aesop
+      simp [eq_of_le_of_domain_eq domRestrict_le]
     _ = 𝑅 T₁ z - 𝑅 T₁ z ∘ᵣ ((T₁ - z • 1) ∘ᵣ 𝑅 T₂ z) := by
       nth_rw 2 [← mul_one (𝑅 T₁ z)]
-      refine (eq_of_le_of_domain_eq ?_ ?_).symm
-      · exact compRestricted_sub_ge _ _ _
-      · simp [sub_domain, compRestricted_domain, inverse_domain, hz₁.2]
+      refine (eq_of_le_of_domain_eq (compRestricted_sub_ge _ _ _) ?_).symm
+      simp [sub_domain, compRestricted_domain, inverse_domain, hz₁.2]
     _ = 𝑅 T₁ z - (domRestrict 1 T₁.domain) ∘ᵣ 𝑅 T₂ z := by
       simp [← compRestricted_assoc, inverse_compRestricted_eq hz₁.1, sub_domain]
     _ = 𝑅 T₁ z - 𝑅 T₂ z := by
       ext x
-      · suffices 𝑅 T₂ z ⟨x, by simp [inverse_domain, hz₂.2]⟩ ∈ (T₁ - z • 1).domain by
-          simp_all [sub_domain, compRestricted_domain, inverse_domain, hz₁.2, hz₂.2]
-        have hT' : (T₂ - z • 1).domain ≤ (T₁ - z • 1).domain := by simp [sub_domain, hT]
-        exact hT' (by simp [← inverse_range hz₂.1])
+      · suffices 𝑅 T₂ z ⟨x, by simp [inverse_domain, hz₂.2]⟩ ∈ T₁.domain by
+          simp [sub_domain, mem_compRestricted_domain_iff, inverse_domain, hz₁.2, hz₂.2, this]
+        have hR₂ : (𝑅 T₂ z).toFun.range = T₂.domain := by simp [inverse_range hz₂.1, sub_domain]
+        exact hT (hR₂ ▸ mem_range_self _)
       · rfl
 
 lemma resolvent_sub' {T : H →ₗ.[ℂ] H} (z₁ z₂ : ℂ) (hz₁ : z₁ ∈ ρ T) (hz₂ : z₂ ∈ ρ T) :
@@ -817,17 +814,22 @@ lemma resolvent_sub' {T : H →ₗ.[ℂ] H} (z₁ z₂ : ℂ) (hz₁ : z₁ ∈ 
       · simp [S, sub_apply, add_apply, sub_smul, add_sub_assoc, ← sub_eq_add_neg]
     have hR : 𝑅 T z₂ = 𝑅 S z₁ := by simp [resolvent, hST]
     have hz₁' : z₁ ∈ ρ S := ⟨hST ▸ hz₂.1, hST ▸ hz₂.2.1, hR ▸ hz₂.2.2⟩
-    have hST' : S - T = (z₁ - z₂) • domRestrict 1 T.domain := by
-      ext
-      · simp [h_domain, sub_domain]
-      · simp only [sub_apply, add_apply, add_sub_cancel_left, S]
-        rfl
-    have : domRestrict 1 (S - z₁ • 1).domain ∘ᵣ 𝑅 S z₁ = 𝑅 S z₁ := by
-      ext
-      · simp [mem_compRestricted_domain_iff, ← inverse_range hz₁'.1]
-      · rfl
-    have := resolvent_sub h_domain.le hz₁ hz₁'
-    simp_all [mul_def, compRestricted_assoc, sub_domain, compRestricted_smul (sub_ne_zero.mpr hz)]
+    rw [hR, resolvent_sub h_domain.le hz₁ hz₁']
+    suffices (S - T) ∘ᵣ 𝑅 S z₁ = (z₁ - z₂) • 𝑅 S z₁ by
+      simp only [mul_def, compRestricted_assoc, this, compRestricted_smul (sub_ne_zero.mpr hz)]
+    calc
+      _ = ((z₁ - z₂) • domRestrict 1 (S - z₁ • 1).domain) ∘ᵣ 𝑅 S z₁ := by
+        congr
+        ext
+        · simp [h_domain, sub_domain]
+        · simp only [sub_apply, add_apply, add_sub_cancel_left, S]
+          rfl
+      _ = (z₁ - z₂) • (domRestrict 1 (S - z₁ • 1).domain ∘ᵣ 𝑅 S z₁) := smul_compRestricted _ _ _
+      _ = (z₁ - z₂) • 𝑅 S z₁ := by
+        congr
+        ext
+        · simp [mem_compRestricted_domain_iff, ← inverse_range hz₁'.1]
+        · rfl
 
 end
 
