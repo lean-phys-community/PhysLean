@@ -144,9 +144,11 @@ open Matrix
 local notation "δℤ" => (fun ρ σ => ((kroneckerDelta ρ σ : ℕ) : ℤ))
 
 /-- Generalized Kronecker delta:
-`δ^{μ₁...μₙ}_{ν₁...νₙ} = det (δ[μᵢ, νⱼ])`. -/
-def generalizedKroneckerDelta (n : ℕ) (d : ℕ := 3)
-    (μ : Fin n → Fin (d + 1)) (ν : Fin n → Fin (d + 1)) : ℤ :=
+`δ^{μ₁...μₙ}_{ν₁...νₙ} = det (δ[μᵢ, νⱼ])`. 
+
+This is defined for any finite type `α` with decidable equality. -/
+def generalizedKroneckerDelta {α : Type} [DecidableEq α] [Fintype α] (n : ℕ)
+    (μ : Fin n → α) (ν : Fin n → α) : ℤ :=
   Matrix.det (fun i j => δℤ (μ i) (ν j))
 
 end Generalized
