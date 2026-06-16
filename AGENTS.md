@@ -1,109 +1,69 @@
-# AGENTS.md
+# AGENTS file
 
-Instructions for AI agents contributing to Physlib. The human-facing policy and disclosure
-obligations are in [AI-POLICY.md](AI-POLICY.md); read it too. You produce the code, but the human
-author certifies it: a clean build proves you proved what was written, never that it is what they
-meant.
+## Introduction
 
-Also obey [docs/ReviewGuidelines.md](docs/ReviewGuidelines.md) and the Mathlib [style
-guide](https://leanprover-community.github.io/contribute/style.html).
+- This file contains instructions for AI agents contributing to Physlib.
+- The human-facing policy and disclosure obligations are in [AI-POLICY.md](AI-POLICY.md); read it too.
+- The human author must certify the code you write; the fact that it builds does not prove that what you have written is what the human author meant.
+- Obey also [docs/ReviewGuidelines.md](docs/ReviewGuidelines.md).
 
 ## Content
 
 - Use `lemma`, not `theorem`, unless the result is well known in the physics literature.
-- No `axiom` declarations. No `sorry` in submitted work.
-- Do not add lemmas that are trivial rewrites of existing Mathlib or Physlib results, unless they
-  add genuine physics context.
-- Place results in the appropriate existing file; do not create new files without good reason.
-- Number sections `# A. ...`, `## A.1. ...`. See
-  [HarmonicOscillator/Basic.lean](Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean).
-- Every definition needs a docstring; missing docstrings fail the linter.
+- Never use the `axiom` declaration.
+- Never use `sorry`.
+- Do not add lemmas that are trivial rewrites of existing Mathlib or Physlib results, unless they add genuine physics context.
+- Place results in the appropriate existing file; do not create new files without good reason. For example, if you need to prove a general result about derivatives on space in order to prove something in classical mechanics, that result should go in `Space.Derivatives.Basic`, not the classical mechanics file.
+- Include sections which are numbered by `# A. ...`, `## A.1. ...`. See [Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean](Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean) for an example.
+- Every definition must have a docstring.
+- Important lemmas should have a docstring.
 
-## Building and checks
+## Proof structure
 
-- Build with the cache, not from scratch: run `lake exe cache get` before `lake build`. A cold build
-  is very slow.
-- New files must be added to the import list in `Physlib.lean` (kept sorted), or the build fails.
-- Anything depending on `sorry` or `Lean.ofReduceBool` must be tagged `@[sorryful]` or `@[pseudo]` —
-  but submitted work should contain neither.
-- New physics terms that trip the spell-checker go in `scripts/MetaPrograms/spellingWords.txt`.
+In general proofs of lemmas and theorems should be short (under 50 LOC).
 
-The merge-blocking linters (run them locally before finishing; see
-[scripts/README.md](scripts/README.md) for the full list):
+Long proofs should be split into smaller lemmas. Where possible this should be done along one of the following directions.
 
-- `lake exe lint_all` — the main check (build, imports, style, Lean linters, transitive imports).
-  May need running several times.
-- `./scripts/lint-style.sh` — style/indentation/line-length and `simp only` checks. **Commit your
-  changes first**; this linter reads committed state.
+**Extract by meaning** — the fragment says something independently true:
+
+- The proof contains further properties about existing definitions. These properties should be extracted into their own lemmas.
+- The proof contains `calc` or `have` statements which contain physics context, and may be generally applicable.
+- The proof contains `have` statements with no physics content but general mathematical value (an algebraic identity, an inequality, a measurability/continuity/differentiability side-goal). These belong as general lemmas.
+- The proof first establishes a general statement and then instantiates it. Extract the general statement and keep the specialization as a corollary.
+- Part of the proof uses only the weaker form of a hypothesis (e.g. only continuity, not smoothness). Extract that part as a lemma stated under the weaker assumption.
+- A `let`/`set` constructs an object and proves properties about it inline. Promote the object to a `def` and its properties to lemmas.
+
+**Extract by structure** — the proof breaks into independent pieces:
+
+- Substantial `rcases`/`match` branches. Each branch becomes its own lemma, and the main proof dispatches.
+- The base case and inductive step of an induction, when long.
+- A long `calc` block. A contiguous run of steps establishing a named equality can become its own equational lemma.
+- Symmetry or duality, where half the proof mirrors the other (`≤` then `≥`, swapping two indices). Prove one direction as a lemma and obtain the other by symmetry.
+
+Surface a recommendation when a condition above is met.
+
+When a long proof cannot be split, make sure it contains comments.
 
 ## Before you finish
 
-1. `lake build` is green.
-2. `lake exe lint_all` and `./scripts/lint-style.sh` pass.
-3. Every new file is imported into `Physlib.lean`.
-4. No `sorry`, no `axiom`, every definition has a docstring.
+- Make sure all new files are imported into `Physlib.lean` or `PhyslibAlpha.lean` (keep sorted).
+- Anything depending on `sorry` or `Lean.ofReduceBool` must be tagged `@[sorryful]` or `@[pseudo]`.
+- New physics terms that trip the spell-checker go in `scripts/MetaPrograms/spellingWords.txt`.
+- Check that `lake build` works (run `lake exe cache get` first).
+- Check that `lake exe lint_all` passes.
+- Check `./scripts/lint-style.sh`, but **commit your changes first**; this linter reads committed state.
+- If edited a `PhyslibAlpha` file, check the following:
+  - `lake exe runPhyslibAlphaLinters`
+  - `./scripts/PhyslibAlpha/alphaFileImports.py`
+  - `./scripts/PhyslibAlpha/noAlphaImports.py`
+  - `./scripts/PhyslibAlpha/alphaPythonLinters.sh`
 
-## Proof structuring
-
-These are reviewer-judgment questions, not mechanical rules. **Surface a recommendation** when a
-condition below is met and let a human make the structural call; do **not** split or relocate lemmas
-unilaterally.
-
-A proof can mix concerns three ways. Flag whichever discriminator fires:
-
-| Type | Discriminator | Extracted lemma's statement |
-|---|---|---|
-| **Depth** | Contiguous block cites only general lemmas (`Finset.*`, `ring`, Mathlib), untouched by physics constants | Contains **zero** physics names |
-| **Breadth** | Proof cites lemmas from **two disjoint physics topic namespaces** | Each piece sits in **one** namespace |
-| **Computation** | Large contiguous `calc`/`ring_nf`/`field_simp`/`positivity` slab under a structural top-level tactic | A calculation lemma (may keep physics constants) |
-| **Leave inline** | Not a contiguous subgoal-closing block, or one indivisible argument | — |
-
-Rule: if the candidate cannot be cut as a contiguous run that closes its own subgoal, do not
-recommend splitting it.
-
-**Depth-mixing example.** The general-algebra block below is statable with no physics vocabulary, so
-it should become its own lemma:
-
-The Lean below is illustrative pseudocode (invented `ParticleSystem` API), not a compiling snippet;
-it shows the *shape* of the refactor, not exact lemma names.
-
-```lean
--- Before: general Finset plumbing inlined under a physics statement
-theorem totalKE_eq_sum (s : ParticleSystem n) :
-    s.totalKE = ∑ i, s.kineticEnergy i := by
-  unfold ParticleSystem.totalKE ParticleSystem.kineticEnergy
-  rw [Finset.mul_sum]   -- ← cites only Finset/ring, no physics constants
-  congr 1; ext i; ring
-
--- After: the plumbing is named; its statement has zero physics names
-private lemma half_mul_sum {n : ℕ} (f : Fin n → ℝ) :
-    (1 / 2) * ∑ i, f i = ∑ i, (1 / 2) * f i := by
-  rw [Finset.mul_sum]
-
-theorem totalKE_eq_sum (s : ParticleSystem n) :
-    s.totalKE = ∑ i, s.kineticEnergy i := by
-  unfold ParticleSystem.totalKE ParticleSystem.kineticEnergy
-  rw [half_mul_sum]
-  congr 1; ext i; ring
-```
-
-Length alone is not a reason to split: a long proof that is one indivisible argument should stay
-whole — especially foundational results, where added inter-lemma structure can be more fragile than
-the length costs in readability.
 
 ## PR scope
 
-A PR should add a **single coherent concept**. Cohesion governs, **not** line count.
+A PR should add a **single coherent concept**.
 
-- Every definition and lemma should either *be* that concept or supply the minimal API to state and
-  prove it.
-- Match the surrounding house pattern (e.g. one concept per file, developed with its full API).
-- A long but well-sectioned file (module docstring with overview, key results, table of contents) is
-  reviewable whole; do not fragment one concept across PRs to hit a line count.
-- Line count is a smell, not a gate: the [Review Guidelines](docs/ReviewGuidelines.md) thresholds
-  prompt the cohesion questions above. Split only along conceptual seams. Refactors,
-  reorganizations, and docs PRs may safely run larger. Surface an oversized-PR concern for a human;
-  do not split to satisfy a number.
+- Every definition and lemma should either *be* that concept or supply the minimal API to state and prove it.
 
 ## Commits
 
@@ -112,3 +72,10 @@ A PR should add a **single coherent concept**. Cohesion governs, **not** line co
 - Include a [sign-off](https://git-scm.com/docs/SubmittingPatches.html#sign-off)-style
   `Co-authored-by: Claude Opus 4.8 <no-reply+claude-opus-4-8@anthropic.com>` trailer on commits you
   produced.
+
+## PR descriptions
+If you write the PR description:
+
+- The PR description must list all lemmas and definitions added or removed, the file in which each appears, and a brief explanation of each.
+- The PR description should include a reviewer map: a brief guide indicating the order in which the reviewer should look at the changes.
+- The PR description must be concise.
