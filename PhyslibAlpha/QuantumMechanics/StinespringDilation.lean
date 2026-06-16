@@ -35,11 +35,10 @@ def QuantumChannel {R : Type*} [Mul R] [One R] [Star R] [AddCommMonoid R]
   ∑ i, (K i)ᴴ * K i = 1
 
 def QuantumOperation {R : Type*} [RCLike R]
-  {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q] [DecidableEq r]
-  (K : r → Matrix q q R) := ∑ i, (K i)ᴴ * K i ≤ 1
+    {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q] [DecidableEq r]
+    (K : r → Matrix q q R) := ∑ i, (K i)ᴴ * K i ≤ 1
 
-def densityMatrix {R : Type*} [Ring R] [PartialOrder R] [StarRing R]
-    (d : Type*) [Fintype d] :=
+def densityMatrix {R : Type*} [Ring R] [PartialOrder R] [StarRing R] (d : Type*) [Fintype d] :=
   {ρ : Matrix d d R // ρ.PosSemidef ∧ ρ.trace = 1}
 
 def densityMatrix.convex_comb {R : Type*} [RCLike R]
@@ -134,7 +133,7 @@ lemma stinespringOrtho {R : Type*} [RCLike R]
       simp only [star_def] at hz
       simp only [↓reduceIte]
       simp_rw [RCLike.conj_mul]
-      norm_cast -- !!
+      norm_cast
       exact EuclideanSpace.norm_sq_eq (WithLp.toLp 2 fun i ↦ α i j)
     · rw [if_neg g₀]
       have : (1 : Matrix m m R) i j = 0 := by
@@ -220,7 +219,7 @@ theorem complCard {R : Type*} [RCLike R] {m r : ℕ}
             use a
             simp_rw [ha]
         · exact (exists_orthonormalBasis R _).choose_spec.choose.toBasis
-    simp
+    simp only [add_tsub_cancel_right, Fintype.card_prod, Fintype.card_fin]
     linarith
 
 /--
@@ -238,7 +237,7 @@ lemma Fin.predAbove_of_ne_injective (n : ℕ) (k x y : Fin n)
   unfold predAbove_of_ne at heq
   split_ifs at heq
   all_goals
-  · simp at heq
+  · simp only [mk.injEq] at heq
     omega
 
 
@@ -303,12 +302,12 @@ lemma onbPart_inner {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fi
 
 
 lemma onbPart_norm {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fin m) (Fin m) R}
-  (hK : ∑ i, (K i)ᴴ * K i = 1) (x : Fin m × Fin r)
-  {z : Fin r} (hx : ¬x.2 = z) :
-  ‖WithLp.toLp 2 <| onbPart hK x hx‖ = 1 :=
-    let theRange := Submodule.span R <| Set.range
-        fun j => WithLp.toLp 2 fun i ↦ stinespringOp K i j
-    (exists_orthonormalBasis R theRangeᗮ).choose_spec.choose.orthonormal.1 _
+    (hK : ∑ i, (K i)ᴴ * K i = 1) (x : Fin m × Fin r)
+    {z : Fin r} (hx : ¬x.2 = z) :
+    ‖WithLp.toLp 2 <| onbPart hK x hx‖ = 1 :=
+  let theRange := Submodule.span R <| Set.range
+      fun j => WithLp.toLp 2 fun i ↦ stinespringOp K i j
+  (exists_orthonormalBasis R theRangeᗮ).choose_spec.choose.orthonormal.1 _
 
 
 
@@ -344,50 +343,49 @@ noncomputable def dilation {R : Type*} [Ring R]
 
 /-- One version of orthonormality of `stinespringOp`. -/
 theorem Ud_orthonormal₁ {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fin m) (Fin m) R}
-  (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) :
-  Orthonormal R fun y ↦
-    if hy : y.2 = z then WithLp.toLp 2 fun i ↦ stinespringOp K i y.1
+    (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) :
+    Orthonormal R fun y ↦ if hy : y.2 = z then WithLp.toLp 2 fun i ↦ stinespringOp K i y.1
     else WithLp.toLp 2 fun i ↦ onbPart hK y hy i := by
-    constructor
-    · intro i
-      simp only
-      split_ifs with g₀
-      · apply (stinespringOrtho hK).1
-      · apply onbPart_norm
-    · intro i j h
-      simp only
-      let theRange := Submodule.span R <| Set.range
-            fun j => WithLp.toLp 2 fun i ↦ stinespringOp K i j
-      split_ifs with g₀ g₁ g₂
-      · apply (stinespringOrtho hK).2
-        contrapose! h
-        refine Prod.ext_iff.mpr ?_
-        constructor
-        · tauto
-        · rw [g₀,g₁]
-      · -- use that they came from `theRange`, `theRangeᗮ` respectively.
-        have h₀ : (WithLp.toLp 2 fun i_1 ↦ stinespringOp K i_1 i.1) ∈ theRange := by
-            unfold theRange
-            generalize stinespringOp K = α
-            apply Submodule.mem_span_of_mem
-            simp
-        have h₁ : (WithLp.toLp 2 fun i ↦ onbPart hK j g₁ i) ∈ theRangeᗮ := by
-            unfold theRange
-            simp [onbPart]
-        exact h₁ _ h₀
-      · have h₀' : (WithLp.toLp 2 fun i_1 ↦ stinespringOp K i_1 j.1) ∈ theRange := by
-            unfold theRange
-            generalize stinespringOp K = α
-            apply Submodule.mem_span_of_mem
-            simp
-        have h₁ :  (WithLp.toLp 2 fun t ↦ onbPart hK i g₀ t) ∈ theRangeᗮ := by
-            unfold theRange
-            simp [onbPart]
-        have := h₁ _ h₀'
-        generalize (WithLp.toLp 2 fun i_1 ↦ onbPart hK i g₀ i_1) = α at *
-        generalize (WithLp.toLp 2 fun i ↦ stinespringOp K i j.1) = β at *
-        exact inner_eq_zero_symm.mp (h₁ β h₀')
-      · exact onbPart_inner hK g₀ g₂ h
+  constructor
+  · intro i
+    simp only
+    split_ifs with g₀
+    · apply (stinespringOrtho hK).1
+    · apply onbPart_norm
+  · intro i j h
+    simp only
+    let theRange := Submodule.span R <| Set.range
+          fun j => WithLp.toLp 2 fun i ↦ stinespringOp K i j
+    split_ifs with g₀ g₁ g₂
+    · apply (stinespringOrtho hK).2
+      contrapose! h
+      refine Prod.ext_iff.mpr ?_
+      constructor
+      · tauto
+      · rw [g₀,g₁]
+    · -- use that they came from `theRange`, `theRangeᗮ` respectively.
+      have h₀ : (WithLp.toLp 2 fun i_1 ↦ stinespringOp K i_1 i.1) ∈ theRange := by
+          unfold theRange
+          generalize stinespringOp K = α
+          apply Submodule.mem_span_of_mem
+          simp
+      have h₁ : (WithLp.toLp 2 fun i ↦ onbPart hK j g₁ i) ∈ theRangeᗮ := by
+          unfold theRange
+          simp [onbPart]
+      exact h₁ _ h₀
+    · have h₀' : (WithLp.toLp 2 fun i_1 ↦ stinespringOp K i_1 j.1) ∈ theRange := by
+          unfold theRange
+          generalize stinespringOp K = α
+          apply Submodule.mem_span_of_mem
+          simp
+      have h₁ :  (WithLp.toLp 2 fun t ↦ onbPart hK i g₀ t) ∈ theRangeᗮ := by
+          unfold theRange
+          simp [onbPart]
+      have := h₁ _ h₀'
+      generalize (WithLp.toLp 2 fun i_1 ↦ onbPart hK i g₀ i_1) = α at *
+      generalize (WithLp.toLp 2 fun i ↦ stinespringOp K i j.1) = β at *
+      exact inner_eq_zero_symm.mp (h₁ β h₀')
+    · exact onbPart_inner hK g₀ g₂ h
 
 
 
@@ -403,7 +401,7 @@ theorem Ud_orthonormal₂ {R : Type*} [RCLike R]
       rw [← this]
       congr
       ext y
-      simp
+      simp only
       split_ifs with g₀ <;> simp
     · intro _ _ hij
       have := h₀.2 hij
@@ -475,7 +473,7 @@ lemma Ud_unitary {R : Type*} [RCLike R]
      have :  star U * U = 1 := by
        have := this.2
        have : (Uᵀ * star Uᵀ)ᵀ = 1ᵀ := transpose_inj.mpr this
-       simp at this
+       simp only [transpose_mul, transpose_transpose, transpose_one] at this
        have : (star Uᵀ)ᵀ = star U := by
          exact Eq.symm (Matrix.ext fun i ↦ congrFun rfl)
        rw [← this]
@@ -554,7 +552,8 @@ theorem tracefree_version {R : Type*} [RCLike R]
   -- Since my proof broke in 4.27 -> 4.31, here's Aristotle's proof.
   simp only [stinespringOp, star_def, Fin.isValue, stinespringForm, stinespringDilation];
   ext x y
-  simp [ Matrix.mul_apply, Matrix.one_apply, tr₂ ]
+  simp only [Fin.isValue, Matrix.mul_apply, conjTranspose_apply, star_def, kroneckerMap_apply,
+    Matrix.one_apply, mul_ite, mul_one, mul_zero, tr₂]
   ring_nf;
   simp only [Fin.isValue, Matrix.sum_apply, kroneckerMap_apply, map_sum, map_mul,
     RingHomCompTriple.comp_apply, RingHom.id_apply, Fintype.sum_prod_type, Finset.sum_ite_eq',
@@ -805,46 +804,41 @@ lemma krausCompletion_isometry_of_TNI {R : Type*} [RCLike R] {m r : ℕ}
 
 
 def unital {R : Type*} [RCLike R] {m r : ℕ}
-  (K : Fin r → Matrix (Fin m) (Fin m) R) := ∑ i, K i * star (K i) = 1
+    (K : Fin r → Matrix (Fin m) (Fin m) R) := ∑ i, K i * star (K i) = 1
 
 def subunital {R : Type*} [RCLike R] {m r : ℕ}
-  (K : Fin r → Matrix (Fin m) (Fin m) R) := ∑ i, K i * star (K i) ≤ 1
+    (K : Fin r → Matrix (Fin m) (Fin m) R) := ∑ i, K i * star (K i) ≤ 1
 
 
 /-- Tr_B (A ⨂ B) = Tr(B) · A -/
 lemma partialTrace_tensor {R : Type*} [RCLike R] {m n : ℕ}
-  (A : Matrix (Fin m) (Fin m) R)
-  (B : Matrix (Fin n) (Fin n) R) :
+    (A : Matrix (Fin m) (Fin m) R) (B : Matrix (Fin n) (Fin n) R) :
     tr₂ (A ⊗ₖ B) = (trace B) • A  := by
-    unfold tr₂ trace kroneckerMap
-    simp only [of_apply, diag_apply]
-    ext i j
-    simp only [smul_apply, smul_eq_mul]
-    have := @Finset.sum_mul (a := A i j) (ι := Fin n)
-      (s := Finset.univ) (f := fun k => B k k) _ _
-    rw [this]
-    simp_rw [mul_comm]
+  unfold tr₂ trace kroneckerMap
+  simp only [of_apply, diag_apply]
+  ext i j
+  simp only [smul_apply, smul_eq_mul]
+  have := @Finset.sum_mul (a := A i j) (ι := Fin n)
+    (s := Finset.univ) (f := fun k => B k k) _ _
+  rw [this]
+  simp_rw [mul_comm]
 
 lemma krausApply_of_tensor {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r)
-     (ρ : Matrix (Fin m) (Fin m) R)
-     (α : Matrix (Fin m) (Fin m) R)
-     (β : Matrix (Fin r) (Fin r) R)
-     (hβ : β.trace = 1)
-     (h : (Ud hK z) * (ρ ⊗ₖ (single z z 1)) * (Ud hK z)ᴴ = α ⊗ₖ β)
-    : krausApply K ρ = α := by
-    rw [← stinespringUnitaryForm_works hK]
-    · unfold stinespringUnitaryForm
-      simp only
-      rw [h]
-      rw [partialTrace_tensor]
-      rw [hβ]
-      simp
+    (ρ α : Matrix (Fin m) (Fin m) R) (β : Matrix (Fin r) (Fin r) R)
+    (hβ : β.trace = 1) (h : (Ud hK z) * (ρ ⊗ₖ (single z z 1)) * (Ud hK z)ᴴ = α ⊗ₖ β) :
+    krausApply K ρ = α := by
+  rw [← stinespringUnitaryForm_works hK]
+  · unfold stinespringUnitaryForm
+    simp only
+    rw [h]
+    rw [partialTrace_tensor]
+    rw [hβ]
+    simp
 
 lemma trace_tr₂ {R : Type*} [RCLike R] {m n : ℕ}
-  (ρ : Matrix ((Fin m) × (Fin n))
-              ((Fin m) × (Fin n)) R) :
+    (ρ : Matrix (Fin m × Fin n) (Fin m × Fin n) R) :
     trace ρ = trace (tr₂ ρ) := Fintype.sum_prod_type fun x ↦ ρ x x
 
 
@@ -882,7 +876,7 @@ lemma CPTP_of_CPTNI {R : Type*} [RCLike R]
       simp only [Fin.isValue, of_apply, mul_ite, mul_one, mul_zero]
       have (j : Fin q × Fin 1) : (0 = j.2) = True := by
         have := j.2.2
-        simp
+        simp only [Fin.isValue, eq_iff_iff, iff_true]
         omega
       simp_rw [this]
       ext a b
@@ -905,6 +899,6 @@ theorem stinespringForm_eq {R : Type*} [RCLike R] {m r : ℕ}
     tr₂ (stinespringDilation K ρ) = krausApply K ρ := by
   unfold tr₂ stinespringDilation krausApply
   ext i j
-  simp [stinespringOp, Matrix.mul_apply]
+  simp only [stinespringOp, Fin.isValue, Matrix.mul_apply, conjTranspose_apply, star_def]
   simp [Matrix.mul_apply, Finset.sum_mul, Matrix.sum_apply, kroneckerMap_apply,
     Matrix.single]
