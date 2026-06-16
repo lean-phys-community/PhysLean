@@ -2,7 +2,6 @@
 
 ## Introduction
 
-- This file contains instructions for AI agents contributing to Physlib.
 - The human-facing policy and disclosure obligations are in [AI-POLICY.md](AI-POLICY.md); read it too.
 - The human author must certify the code you write; the fact that it builds does not prove that what you have written is what the human author meant.
 - Obey also [docs/ReviewGuidelines.md](docs/ReviewGuidelines.md).
@@ -58,7 +57,6 @@ When a long proof cannot be split, make sure it contains comments.
   - `./scripts/PhyslibAlpha/noAlphaImports.py`
   - `./scripts/PhyslibAlpha/alphaPythonLinters.sh`
 
-
 ## PR scope
 
 A PR should add a **single coherent concept**.
@@ -74,6 +72,7 @@ A PR should add a **single coherent concept**.
   produced.
 
 ## PR descriptions
+
 If you write the PR description:
 
 - The PR description must list all lemmas and definitions added or removed, the file in which each appears, and a brief explanation of each.

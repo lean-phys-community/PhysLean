@@ -1,6 +1,6 @@
 # AI policy
 
-This file is the human-facing contract for AI-assisted contributions to Physlib. The mechanical, in-loop instructions an AI agent must obey while generating content live in [AGENTS.md](AGENTS.md); this file governs what *you*, the human author, are accountable for.
+This file is the human-facing contract for AI-assisted contributions to Physlib. AI agent instructions are in [AGENTS.md](AGENTS.md).
 
 ## 1. Introduction
 
@@ -24,22 +24,8 @@ This file is the human-facing contract for AI-assisted contributions to Physlib.
 
 2.2. You must confirm your contribution satisfies the content and structure rules in [AGENTS.md](AGENTS.md) before opening the PR. The agent's compliance is your responsibility, not the reviewer's.
 
-## 3. PR description
+## 3. Review process
 
-3.1. The PR description must list all lemmas and definitions added or removed, the file in which each appears, and a brief explanation of each.
+3.1. All communication with human reviewers must be conducted by humans, not by an AI agent.
 
-3.2. The PR description should include a reviewer map: a brief guide indicating the order in which the reviewer should look at the changes.
-
-3.3. The PR description should state the author's expertise in the area of the PR.
-
-3.4. The PR description must disclose that an AI was used and describe the extent of its involvement.
-
-3.5. The PR description must state whether a human has checked the correctness of any included references.
-
-3.6. The PR must be concise.
-
-## 4. Review process
-
-4.1. All communication with human reviewers must be conducted by humans, not by an AI agent.
-
-4.2. If an AI agent is used to implement reviewer feedback, the author must independently verify that the feedback has been addressed correctly before requesting re-review. This must not be left to the reviewer to check.
+3.2. If an AI agent is used to implement reviewer feedback, the author must independently verify that the feedback has been addressed correctly before requesting re-review. This must not be left to the reviewer to check.
