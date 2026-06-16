@@ -131,4 +131,24 @@ lemma finset_sum_sum_smul_eq_zero {s s' : Finset α} {f : α → α → M}
 
 end Sums
 
+/-!
+
+# Generalized Kronecker delta
+
+-/
+
+section Generalized
+open Matrix
+
+/-- Integer-valued Kronecker entry via the existing `kroneckerDelta`. -/
+local notation "δℤ" => (fun ρ σ => ((kroneckerDelta ρ σ : ℕ) : ℤ))
+
+/-- Generalized Kronecker delta:
+`δ^{μ₁...μₙ}_{ν₁...νₙ} = det (δ[μᵢ, νⱼ])`. -/
+def generalizedKroneckerDelta (n : ℕ) (d : ℕ := 3)
+    (μ : Fin n → Fin (d + 1)) (ν : Fin n → Fin (d + 1)) : ℤ :=
+  Matrix.det (fun i j => δℤ (μ i) (ν j))
+
+end Generalized
+
 end KroneckerDelta
