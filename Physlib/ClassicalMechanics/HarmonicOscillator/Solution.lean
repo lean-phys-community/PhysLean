@@ -867,14 +867,11 @@ lemma trajectory_periodic (IC : InitialConditions) :
   rw [InitialConditions.trajectory, add_val, period_eq, h, cos_add_two_pi, sin_add_two_pi]
   rfl
 
-
-
 /--
 Assuming that the initial coordinate and velocity are not simultaneously zero,
 the time stamps when the harmonic oscillator returns to its initial coordinate and velocity is
 a multiple of its period
 -/
-
 lemma return_time (IC : InitialConditions) (non_trivial : (IC.x₀ ≠ 0 ∨ IC.v₀ ≠ 0) )
     (t : Time) (ht : IC.trajectory S t = IC.x₀ ∧ ∂ₜ (IC.trajectory S) t = IC.v₀) :
     (∃ n : ℤ,  (n : ℝ ) * (T S) = t) := by
@@ -917,7 +914,7 @@ lemma return_time (IC : InitialConditions) (non_trivial : (IC.x₀ ≠ 0 ∨ IC.
        rw[real_inner_smul_left]
      (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * xv =
        (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * inner ℝ  IC.v₀ IC.x₀ := by
-        rw [real_inner_comm IC.x₀ IC.v₀]
+         rw [real_inner_comm IC.x₀ IC.v₀]
      _  = (inner ℝ (c • IC.x₀) IC.x₀) +  inner ℝ  ((s / S.ω)  • IC.v₀) IC.x₀ := by
        rw [real_inner_smul_left IC.v₀]
      _ = (inner ℝ (c • IC.x₀ + (s / S.ω)  • IC.v₀) IC.x₀) := by rw [inner_add_left]
@@ -934,15 +931,18 @@ lemma return_time (IC : InitialConditions) (non_trivial : (IC.x₀ ≠ 0 ∨ IC.
      _ = vv := by rw [htv]
   have hcos : 1 = cos (S.ω * t) := by
     calc
-    1 =  det / det := by simp [det_ne_zero]
+    1 =  det / det := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self]
     _ = (vv +   xx * S.ω^2 ) / det := by rfl
-    _ = c * (vv +   xx * S.ω^2) / det + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
+    _ = c * ((vv +   xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
       nth_rewrite 1 [← hvv, ← hxx]
       ring_nf
-    _ = c * (vv +   xx * S.ω^2) / det  := by simp [S.ω_ne_zero]
-    _ = c * det / det := by rfl
-    _ = c := by simp [det_ne_zero]
+    _ = c * ((vv +   xx * S.ω^2) / det ) := by 
+      simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, 
+        div_self, sub_self, mul_zero, zero_div, add_zero]
+    _ = c * (det / det) := by rfl
+    _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
     _ = _ := by rfl
+
   let ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp (Eq.symm hcos)
   use n
   calc
@@ -950,7 +950,7 @@ lemma return_time (IC : InitialConditions) (non_trivial : (IC.x₀ ≠ 0 ∨ IC.
     _ = ((n : ℝ) * (2 * π)) / S.ω := by ring_nf
     _ = ( S.ω * t) / S.ω := by rw [hn]
     _ = t * (S.ω / S.ω) := by ring_nf
-    _ = t := by simp [S.ω_ne_zero]
+    _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
 
 
 /-!
