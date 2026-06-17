@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Nikolai Kashcheev, Joseph Tooby-Smith
 -/
 module
 
@@ -110,6 +110,11 @@ lemma complexCoBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
   change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ (Pi.single j 1)) i = _
   simp
 
+lemma CoℂModule.SL2CRep_val (M : SL(2,ℂ)) (v : CoℂModule) :
+    ((CoℂModule.SL2CRep M) v).val =
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ v.val := by
+  rfl
+
 /-- The standard basis of complex covariant Lorentz vectors indexed by `Fin 4`. -/
 def complexCoBasisFin4 : Basis (Fin 4) ℂ CoℂModule :=
   Basis.reindex complexCoBasis finSumFinEquiv
@@ -205,6 +210,55 @@ lemma SL2CRep_ρ_basis (M : SL(2, ℂ)) (i : Fin 1 ⊕ Fin 3) :
   funext j
   simp only [LinearMap.map_smulₛₗ, ofRealHom_eq_coe, coe_smul]
   rw [complexContrBasis_of_real]
+
+/-- The semilinear map including real Lorentz co-vectors into complex covariant
+  Lorentz vectors. -/
+def inclCoRealLorentz : CoMod 3 →ₛₗ[Complex.ofRealHom] CoℂModule where
+  toFun v := { val := ofReal ∘ v.toFin1dℝ }
+  map_add' x y := by
+    ext i
+    rw [CoℂModule.val_add]
+    simp only [Function.comp_apply, Pi.add_apply, map_add]
+    simp only [ofReal_add]
+  map_smul' c x := by
+    ext i
+    rw [CoℂModule.val_smul]
+    simp only [Function.comp_apply, ofRealHom_eq_coe, Pi.smul_apply, _root_.map_smul]
+    simp only [smul_eq_mul, ofReal_mul]
+
+lemma inclCoRealLorentz_val (v : CoMod 3) :
+    (inclCoRealLorentz v).val = ofRealHom ∘ v.toFin1dℝ := rfl
+
+lemma complexCoBasis_of_real (i : Fin 1 ⊕ Fin 3) :
+    (complexCoBasis i) = inclCoRealLorentz (CoMod.stdBasis i) := by
+  apply CoℂModule.ext
+  simp only [complexCoBasis, Basis.coe_ofEquivFun, inclCoRealLorentz,
+    LinearMap.coe_mk, AddHom.coe_mk]
+  ext j
+  simp only [Function.comp_apply]
+  change (Pi.single i 1) j = _
+  by_cases h : i = j
+  · subst h
+    rw [CoMod.toFin1dℝ, CoMod.stdBasis_toFin1dℝEquiv_apply_same]
+    simp
+  · rw [CoMod.toFin1dℝ, CoMod.stdBasis_toFin1dℝEquiv_apply_ne h]
+    simp [h]
+
+lemma inclCoRealLorentz_ρ (M : SL(2, ℂ)) (v : CoMod 3) :
+    (CoℂModule.SL2CRep M) (inclCoRealLorentz v) =
+    inclCoRealLorentz ((Co 3).ρ (SL2C.toLorentzGroup M) v) := by
+  ext i
+  rw [CoℂModule.SL2CRep_val, inclCoRealLorentz_val, inclCoRealLorentz_val]
+  change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ
+      (ofRealHom ∘ v.toFin1dℝ)) i =
+    (ofRealHom ∘ ((LorentzGroup.transpose (SL2C.toLorentzGroup M)⁻¹).1 *ᵥ
+      v.toFin1dℝ)) i
+  rw [LorentzGroup.toComplex_inv]
+  change (LorentzGroup.toComplex (LorentzGroup.transpose (SL2C.toLorentzGroup M)⁻¹) *ᵥ
+      (ofRealHom ∘ v.toFin1dℝ)) i =
+    (ofRealHom ∘ ((LorentzGroup.transpose (SL2C.toLorentzGroup M)⁻¹).1 *ᵥ
+      v.toFin1dℝ)) i
+  rw [LorentzGroup.toComplex_mulVec_ofReal]
 
 end Lorentz
 end

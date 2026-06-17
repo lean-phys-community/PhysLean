@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Distributional.Dynamics.IsExtrema
-public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.Translations
 /-!
 
@@ -157,7 +157,7 @@ lemma threeDimPointParticle_eq_distTranslate (𝓕 : FreeSpace) (q : ℝ) (r₀ 
     distTranslate (basis.repr r₀) <|
     distOfFunction (fun x => (((q * 𝓕.μ₀ * 𝓕.c)/ (4 * π))* ‖x‖⁻¹) •
       Lorentz.Vector.basis (Sum.inl 0))
-      ((IsDistBounded.inv.const_mul_fun _).smul_const _)) := by
+      (((IsDistBounded.inv (by norm_num)).const_mul_fun _).smul_const _)) := by
   rw [threeDimPointParticle]
   congr
   ext η
@@ -187,8 +187,7 @@ lemma threeDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ :
     Lorentz.Vector.basis_apply, ↓reduceIte, mul_one, smul_eq_mul]
   rw [distOfFunction_mul_fun _ (IsDistBounded.inv_shift _),
     distOfFunction_mul_fun _ (IsDistBounded.inv_shift _)]
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, ContinuousLinearMap.coe_smul', Pi.smul_apply,
-    smul_eq_mul]
+  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
   ring_nf
   simp only [𝓕.c_sq, one_div, mul_inv_rev, mul_eq_mul_right_iff, inv_eq_zero, OfNat.ofNat_ne_zero,
     or_false]

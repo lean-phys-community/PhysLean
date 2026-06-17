@@ -19,12 +19,15 @@ functions defined on `Space d`.
 
 - `laplacian` : The Laplacian operator on scalar functions on `Space d`.
 - `laplacianVec` : The Laplacian operator on vector-valued functions on `Space d`.
+- `distLaplacian` : The Laplacian operator on distributions on `Space d`.
 
 ## iii. Table of contents
 
 - A. Laplacian on functions to ℝ
   - A.1. Relation between laplacian and divergence of gradient
 - B. Laplacian on vector valued functions
+- C. Laplacian of distributions
+  - C.1. Laplacian of constant distributions
 
 ## iv. References
 
@@ -75,6 +78,12 @@ scoped[Space] notation "Δᵥ" => laplacianVec
 
 open Physlib Distribution
 
+/-!
+
+## C. Laplacian of distributions
+
+-/
+
 /-- The distributional `distLaplacian` operator. -/
 noncomputable def distLaplacian {d} :
     ((Space d) →d[ℝ] ℝ) →ₗ[ℝ] (Space d) →d[ℝ] ℝ :=
@@ -82,5 +91,16 @@ noncomputable def distLaplacian {d} :
 
 @[inherit_doc distLaplacian]
 scoped[Space] notation "Δᵈ" => distLaplacian
+
+/-!
+
+### C.1. Laplacian of constant distributions
+
+-/
+
+@[simp]
+lemma distLaplacian_const {d : ℕ} (c : ℝ) :
+    Δᵈ (Distribution.const ℝ (Space d) c) = 0 := by
+  simp [distLaplacian, distGrad_const]
 
 end Space

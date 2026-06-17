@@ -1,12 +1,11 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith, Nikolai Kashcheev
+Authors: Nikolai Kashcheev, Joseph Tooby-Smith
 -/
 module
 
 public import Physlib.Relativity.Tensors.ComplexTensor.Basic
-public import Physlib.Meta.Sorry
 /-!
 
 # Complex Lorentz tensors from real Lorentz tensors
@@ -341,6 +340,41 @@ noncomputable def toComplexVector (c : realLorentzTensor.Color) :
       rw [← smul_smul]
       rfl
 
+lemma toComplexVector_up_eq_inclCongrRealLorentz (v : Lorentz.ContrMod 3) :
+    toComplexVector Color.up v = Lorentz.inclCongrRealLorentz v := by
+  calc
+    toComplexVector Color.up v
+        = ∑ i, v.toFin1dℝ i • Lorentz.complexContrBasis i := by
+          simp [toComplexVector, Lorentz.contrBasis_repr_apply,
+            Lorentz.complexContrBasisFin4, Lorentz.ContrMod.toFin1dℝ_eq_val]
+          rfl
+    _ = ∑ i, v.toFin1dℝ i • Lorentz.inclCongrRealLorentz
+        (Lorentz.ContrMod.stdBasis i) := by
+          simp only [Lorentz.complexContrBasis_of_real]
+    _ = Lorentz.inclCongrRealLorentz
+        (∑ i, v.toFin1dℝ i • Lorentz.ContrMod.stdBasis i) := by
+          rw [map_sum]
+          simp only [LinearMap.map_smulₛₗ, Complex.ofRealHom_eq_coe, Complex.coe_smul]
+    _ = Lorentz.inclCongrRealLorentz v := by
+          rw [← Lorentz.ContrMod.stdBasis_decomp v]
+
+lemma toComplexVector_down_eq_inclCoRealLorentz (v : Lorentz.CoMod 3) :
+    toComplexVector Color.down v = Lorentz.inclCoRealLorentz v := by
+  calc
+    toComplexVector Color.down v
+        = ∑ i, v.toFin1dℝ i • Lorentz.complexCoBasis i := by
+          simp [toComplexVector, Lorentz.coBasis_repr_apply, Lorentz.complexCoBasisFin4]
+          rfl
+    _ = ∑ i, v.toFin1dℝ i • Lorentz.inclCoRealLorentz
+        (Lorentz.CoMod.stdBasis i) := by
+          simp only [Lorentz.complexCoBasis_of_real]
+    _ = Lorentz.inclCoRealLorentz
+        (∑ i, v.toFin1dℝ i • Lorentz.CoMod.stdBasis i) := by
+          rw [map_sum]
+          simp only [LinearMap.map_smulₛₗ, Complex.ofRealHom_eq_coe, Complex.coe_smul]
+    _ = Lorentz.inclCoRealLorentz v := by
+          rw [← Lorentz.CoMod.stdBasis_decomp v]
+
 /-- The function which turns a real pure tensor into a complex one. -/
 noncomputable def toComplexPure {c : Fin n → Color} (p : Pure realLorentzTensor c) :
     Pure complexLorentzTensor (colorToComplex ∘ c) := fun i =>
@@ -409,8 +443,7 @@ lemma toComplexPure_component {c : Fin n → Color} (p : Pure realLorentzTensor 
       rfl
     simp [- Fintype.sum_sum_type, Finsupp.single_apply]
 
-@[sorryful]
-lemma actionP_toComplexPure {n : ℕ } (c : Fin n → Color) (p : Pure realLorentzTensor c)
+lemma actionP_toComplexPure {n : ℕ} (c : Fin n → Color) (p : Pure realLorentzTensor c)
     (Λ : SL(2, ℂ)) :
     Λ • toComplexPure p = toComplexPure (toLorentzGroup Λ • p) := by
   ext i
@@ -434,22 +467,27 @@ lemma actionP_toComplexPure {n : ℕ } (c : Fin n → Color) (p : Pure realLoren
   generalize c i = c at *
   fin_cases c
   · simp_all [P, b, b', colorToComplex]
-    calc _ = (Lorentz.ContrℂModule.SL2CRep Λ) (∑ i, ((Lorentz.contrBasis 3).repr p i) •
-      Lorentz.complexContrBasisFin4 (finSumFinEquiv i)) := by rfl
-        _ = (∑ i, (Lorentz.ContrℂModule.SL2CRep Λ) (((Lorentz.contrBasis 3).repr p i) •
-          (Lorentz.complexContrBasisFin4 (finSumFinEquiv i)))) := by
-          simp only [Nat.reduceAdd, map_sum]
-        _ = (∑ i, (Lorentz.ContrℂModule.SL2CRep Λ) (((Lorentz.contrBasis 3).repr p i : ℂ) •
-          (Lorentz.complexContrBasisFin4 (finSumFinEquiv i)))) := by rfl
-        _ = (∑ i, (((Lorentz.contrBasis 3).repr p i : ℂ) •
-            (Lorentz.ContrℂModule.SL2CRep Λ)
-            (Lorentz.complexContrBasisFin4 (finSumFinEquiv i)))) := by
-          congr
-          funext x
-          rw [map_smul]
-    sorry
+    calc
+      (Lorentz.ContrℂModule.SL2CRep Λ) ((toComplexVector Color.up) p)
+          = (Lorentz.ContrℂModule.SL2CRep Λ) (Lorentz.inclCongrRealLorentz p) := by
+            exact congrArg (Lorentz.ContrℂModule.SL2CRep Λ)
+              (toComplexVector_up_eq_inclCongrRealLorentz p)
+      _ = Lorentz.inclCongrRealLorentz ((Lorentz.Contr 3).ρ (toLorentzGroup Λ) p) := by
+        rw [Lorentz.inclCongrRealLorentz_ρ]
+      _ = (toComplexVector Color.up) ((Lorentz.ContrMod.rep (toLorentzGroup Λ)) p) := by
+        exact (toComplexVector_up_eq_inclCongrRealLorentz
+          ((Lorentz.ContrMod.rep (toLorentzGroup Λ)) p)).symm
   · simp_all [P, b, b', colorToComplex]
-    sorry
+    calc
+      (Lorentz.CoℂModule.SL2CRep Λ) ((toComplexVector Color.down) p)
+          = (Lorentz.CoℂModule.SL2CRep Λ) (Lorentz.inclCoRealLorentz p) := by
+            exact congrArg (Lorentz.CoℂModule.SL2CRep Λ)
+              (toComplexVector_down_eq_inclCoRealLorentz p)
+      _ = Lorentz.inclCoRealLorentz ((Lorentz.Co 3).ρ (toLorentzGroup Λ) p) := by
+        rw [Lorentz.inclCoRealLorentz_ρ]
+      _ = (toComplexVector Color.down) ((Lorentz.CoMod.rep (toLorentzGroup Λ)) p) := by
+        exact (toComplexVector_down_eq_inclCoRealLorentz
+          ((Lorentz.CoMod.rep (toLorentzGroup Λ)) p)).symm
 
 lemma toComplex_pure {n : ℕ} (c : Fin n → Color) (p : Pure realLorentzTensor c) :
     toComplex p.toTensor = (toComplexPure p).toTensor := by
@@ -470,7 +508,6 @@ Finally we record that `toComplex` is equivariant for the natural action of
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` is equivariant. -/
-@[sorryful]
 lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     (v : ℝT(3, c)) (Λ : SL(2, ℂ)) :
     Λ • (toComplex v) = toComplex (Lorentz.SL2C.toLorentzGroup Λ • v) := by

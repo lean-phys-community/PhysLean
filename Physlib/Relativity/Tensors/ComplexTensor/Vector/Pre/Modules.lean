@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Nikolai Kashcheev, Joseph Tooby-Smith
 -/
 module
 
@@ -122,6 +122,19 @@ instance : AddCommGroup CoℂModule := Equiv.addCommGroup toFin13ℂFun
 /-- The instance of `Module` on `CoℂModule` defined via its equivalence
   with `Fin 1 ⊕ Fin 3 → ℂ`. -/
 instance : Module ℂ CoℂModule := Equiv.module ℂ toFin13ℂFun
+
+@[ext]
+lemma ext (ψ ψ' : CoℂModule) (h : ψ.val = ψ'.val) : ψ = ψ' := by
+  cases ψ
+  cases ψ'
+  subst h
+  rfl
+
+@[simp]
+lemma val_add (ψ ψ' : CoℂModule) : (ψ + ψ').val = ψ.val + ψ'.val := rfl
+
+@[simp]
+lemma val_smul (r : ℂ) (ψ : CoℂModule) : (r • ψ).val = r • ψ.val := rfl
 
 /-- The linear equivalence between `CoℂModule` and `(Fin 1 ⊕ Fin 3 → ℂ)`. -/
 @[simps!]

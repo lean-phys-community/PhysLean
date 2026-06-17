@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+message: "If you use this library, please cite it as below."
+authors:
+- name: "The Physlib Community"
+title: "Physlib: The Lean Physics Library"
+date-released: 2024-04-16
+url: "https://github.com/leanprover-community/physlib"

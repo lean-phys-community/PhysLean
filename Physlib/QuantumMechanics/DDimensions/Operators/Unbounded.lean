@@ -56,6 +56,7 @@ these correspond to physical observables.
   - A.3. Restricted composition
   - A.4. Monoid
   - A.5. Inequalities
+  - A.6. Inverses
 - B. Operators on inner product/Hilbert spaces
   - B.1. Definitions
   - B.2. Basic properties
@@ -168,15 +169,27 @@ infixr:80 " ∘ᵣ " => compRestricted
 lemma compRestricted_domain_le (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : (g ∘ᵣ f).domain ≤ f.domain :=
   fun _ h ↦ h.2
 
+lemma compRestricted_domain (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (g ∘ᵣ f).domain = (g.domain.comap f.toFun).map f.domain.subtype := by
+  change (f.domRestrict <| (g.domain.comap f.toFun).map f.domain.subtype).domain = _
+  rw [domRestrict_domain]
+  refine inf_of_le_left ?_
+  intro x h
+  simp only [mem_map, mem_comap, toFun_eq_coe, subtype_apply, Subtype.exists, exists_and_right,
+    exists_eq_right] at h
+  exact h.choose
+
 lemma mem_compRestricted_domain_iff {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
     x ∈ (g ∘ᵣ f).domain ↔ ∃ h : x ∈ f.domain, f ⟨x, h⟩ ∈ g.domain := by
-  change x ∈ (g.domain.comap f.toFun).map f.domain.subtype ⊓ f.domain ↔ _
-  simp
+  simp [compRestricted_domain]
+
+lemma mem_compRestricted_domain_iff' {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} {x : E} :
+    x ∈ (g ∘ᵣ f).domain ↔ ∃ y : f.domain, x = y ∧ ∃ y' : g.domain, f y = y' := by
+  simp [mem_compRestricted_domain_iff]
 
 lemma mem_domain_of_mem_compRestricted_domain
-    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) : f ⟨x, x.2.2⟩ ∈ g.domain := by
-  obtain ⟨_, h⟩ := mem_compRestricted_domain_iff.mp x.2
-  exact h
+    {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) : f ⟨x, x.2.2⟩ ∈ g.domain :=
+  (mem_compRestricted_domain_iff.mp x.2).choose_spec
 
 @[simp]
 lemma compRestricted_apply {g : F →ₗ.[R] G} {f : E →ₗ.[R] F} (x : (g ∘ᵣ f).domain) :
@@ -231,6 +244,61 @@ lemma compRestricted_mono_right (g : F →ₗ.[R] G) {f f' : E →ₗ.[R] F} (h 
     exact mem_compRestricted_domain_iff.mpr ⟨h.1 hx', (@h.2 ⟨x, hx'⟩ ⟨x, h.1 hx'⟩ rfl) ▸ hfx⟩
   · intro x y hxy
     simp only [compRestricted_apply, @h.2 ⟨x, x.2.2⟩ ⟨y, y.2.2⟩ hxy]
+
+@[simp]
+lemma neg_compRestricted (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : (-g) ∘ᵣ f = -g ∘ᵣ f := rfl
+
+@[simp]
+lemma compRestricted_neg (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) : g ∘ᵣ (-f) = -g ∘ᵣ f := by
+  ext x hx hx'
+  · simp [mem_compRestricted_domain_iff]
+  · obtain ⟨h, h'⟩ := mem_compRestricted_domain_iff.mp hx'
+    exact g.toFun.map_neg ⟨f ⟨x, h⟩, h'⟩
+
+lemma add_compRestricted (g₁ g₂ : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (g₁ + g₂) ∘ᵣ f = g₁ ∘ᵣ f + g₂ ∘ᵣ f := by
+  ext x hx hx'
+  · simp only [mem_compRestricted_domain_iff, add_domain, mem_inf]
+    tauto
+  · simp [add_apply]
+
+lemma sub_compRestricted (g₁ g₂ : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (g₁ - g₂) ∘ᵣ f = g₁ ∘ᵣ f - g₂ ∘ᵣ f := by
+  simp [sub_eq_add_neg, add_compRestricted]
+
+lemma compRestricted_add_ge (g : F →ₗ.[R] G) (f₁ f₂ : E →ₗ.[R] F) :
+    g ∘ᵣ f₁ + g ∘ᵣ f₂ ≤ g ∘ᵣ (f₁ + f₂) := by
+  constructor
+  · intro x hx
+    obtain ⟨h₁, h₁'⟩ := mem_compRestricted_domain_iff.mp hx.1
+    obtain ⟨h₂, h₂'⟩ := mem_compRestricted_domain_iff.mp hx.2
+    exact mem_compRestricted_domain_iff.mpr ⟨⟨h₁, h₂⟩, add_mem h₁' h₂'⟩
+  · intro x y hxy
+    obtain ⟨h₁, h₁'⟩ := mem_compRestricted_domain_iff.mp x.2.1
+    obtain ⟨h₂, h₂'⟩ := mem_compRestricted_domain_iff.mp x.2.2
+    simp [← hxy, add_apply, ← g.map_add ⟨f₁ ⟨x, h₁⟩, h₁'⟩ ⟨f₂ ⟨x, h₂⟩, h₂'⟩]
+
+lemma compRestricted_sub_ge (g : F →ₗ.[R] G) (f₁ f₂ : E →ₗ.[R] F) :
+    g ∘ᵣ f₁ - g ∘ᵣ f₂ ≤ g ∘ᵣ (f₁ - f₂) := by
+  simp only [sub_eq_add_neg, ← compRestricted_neg]
+  exact compRestricted_add_ge g f₁ (-f₂)
+
+lemma compRestricted_smul {S : Type*} [DivisionRing S]
+    [Module S E] [Module S F] [Module S G] [SMulCommClass S S F] [SMulCommClass S S G]
+    {c : S} (hc : c ≠ 0) (g : F →ₗ.[S] G) (f : E →ₗ.[S] F) :
+    g ∘ᵣ (c • f) = c • (g ∘ᵣ f) := by
+  ext x hx hx'
+  · simp [mem_compRestricted_domain_iff, g.domain.smul_mem_iff hc]
+  · obtain ⟨h, h'⟩ := mem_compRestricted_domain_iff.mp (smul_domain c (g ∘ᵣ f) ▸ hx')
+    exact g.toFun.map_smul c ⟨f ⟨x, h⟩, h'⟩
+
+@[simp]
+lemma smul_compRestricted {M : Type*} [Monoid M] [DistribMulAction M G] [SMulCommClass R M G]
+    (c : M) (g : F →ₗ.[R] G) (f : E →ₗ.[R] F) :
+    (c • g) ∘ᵣ f = c • (g ∘ᵣ f) := by
+  ext
+  · simp [compRestricted_domain]
+  · simp
 
 end
 
@@ -297,11 +365,21 @@ lemma add_add_sub_le_cancel : f₁ + f₂ + (f₃ - f₂) ≤ f₁ + f₃ :=
 lemma add_sub_sub_le_cancel : f₁ + f₂ - (f₁ - f₃) ≤ f₂ + f₃ :=
   ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
 
+lemma sub_sub_sub_le_cancel_right : f₁ - f₂ - (f₃ - f₂) ≤ f₁ - f₃ := by
+  simp only [sub_eq_add_neg, neg_add]
+  exact sub_eq_add_neg (-f₃) (-f₂) ▸ add_add_sub_le_cancel f₁ (-f₂) (-f₃)
+
+lemma sub_sub_sub_le_cancel_left : f₁ - f₂ - (f₁ - f₃) ≤ f₃ - f₂ :=
+  sub_eq_add_neg f₁ f₂ ▸ neg_add_eq_sub f₂ f₃ ▸ add_sub_sub_le_cancel f₁ (-f₂) f₃
+
 lemma sub_le_of_le_add (h : g ≤ g₁ + g₂) : g - g₂ ≤ g₁ := by
   constructor
   · exact (inf_le_of_left_le le_rfl).trans (le_inf_iff.mp <| add_domain g₁ g₂ ▸ h.1).1
   · intro ⟨x, hx⟩ ⟨y, hy⟩ rfl
     simp [sub_apply, @h.2 ⟨x, hx.1⟩ ⟨x, ⟨hy, hx.2⟩⟩ rfl, add_apply]
+
+lemma sub_add_le_cancel : f₁ - f₂ + f₂ ≤ f₁ :=
+  sub_eq_add_neg f₁ f₂ ▸ sub_neg_eq_add _ f₂ ▸ add_sub_le_cancel_right f₁ (-f₂)
 
 lemma add_le_of_le_sub (h : g ≤ g₁ - g₂) : g + g₂ ≤ g₁ :=
   sub_neg_eq_add g g₂ ▸ sub_le_of_le_add (sub_eq_add_neg g₁ g₂ ▸ h)
@@ -323,6 +401,33 @@ lemma sub_left_le_of_le (h : g₁ ≤ g₂) : f - g₁ ≤ f - g₂ :=
   neg_sub g₁ f ▸ neg_sub g₂ f ▸ le_iff_neg_le_neg.mp (sub_right_le_of_le f h)
 
 end
+
+/-!
+## A.6. Inverses
+-/
+
+lemma inverse_ker {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) : f.inverse.toFun.ker = ⊥ := by
+  refine LinearMap.ker_eq_bot'.mpr fun ⟨y, hy⟩ hy' ↦ ?_
+  obtain ⟨x, hx⟩ := inverse_domain (f := f) ▸ hy
+  simp_all [inverse_apply_eq (x := x) (y := ⟨y, hy⟩) h_ker hx]
+
+lemma inverse_inverse {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) : f.inverse.inverse = f := by
+  ext x hx hx'
+  · rw [inverse_domain, inverse_range h_ker]
+  · refine inverse_apply_eq (y := ⟨x, hx⟩) (x := ⟨f ⟨x, hx'⟩, by simp [inverse_domain]⟩) ?_ ?_
+    · exact inverse_ker h_ker
+    · exact inverse_apply_eq (y := ⟨f ⟨x, hx'⟩, by simp [inverse_domain]⟩) (x := ⟨x, hx'⟩) h_ker rfl
+
+lemma inverse_compRestricted_eq {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) :
+    f.inverse ∘ᵣ f = domRestrict 1 f.domain := by
+  ext x hx hx'
+  · simp [mem_compRestricted_domain_iff, inverse_domain, ← toFun_eq_coe]
+  · exact inverse_apply_eq (x := ⟨x, hx.2⟩) h_ker rfl
+
+lemma compRestricted_inverse_eq {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) :
+    f ∘ᵣ f.inverse = domRestrict 1 f.inverse.domain := by
+  nth_rw 1 [← inverse_inverse h_ker]
+  exact inverse_compRestricted_eq (inverse_ker h_ker)
 
 end General
 

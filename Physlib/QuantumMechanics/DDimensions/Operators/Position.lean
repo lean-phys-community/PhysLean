@@ -220,7 +220,7 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
     MemHS (𝐫 s ψ) := by
   rcases Nat.eq_zero_or_pos d with (rfl | hd)
   · simp only [MemHS, MemLp.of_discrete]
-  · have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
+  · have : NeZero d := ⟨hd.ne'⟩
     refine (memLp_two_iff_integrable_sq_norm (by fun_prop)).mpr ⟨by fun_prop, ?_⟩
     suffices ∫⁻ (x : Space d), ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ < ⊤ by
       have hInt (x : Space d) : ‖𝐫 s ψ x‖ ^ 2 = ‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s) := by
@@ -237,7 +237,7 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
           _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖‖x‖ ^ (2 * (a + s))‖ₑ :=
             lintegral_const_mul _ (by fun_prop)
         apply ENNReal.mul_lt_top enorm_lt_top
-        exact ((integrableOn_norm_rpow_ball_iff hd Real.zero_lt_one _).mpr h).hasFiniteIntegral
+        exact ((integrableOn_norm_rpow_ball_iff Real.zero_lt_one _).mpr h).hasFiniteIntegral
       apply ae_iff.mpr
       refine measure_mono_null ?_ (measure_singleton 0)
       intro x hx
@@ -265,7 +265,7 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
             lintegral_const_mul _ (by fun_prop)
         apply ENNReal.mul_lt_top enorm_lt_top
         have hd' : (d + -2 * d : ℝ) < 0 := by simp [hd]
-        exact ((integrableOn_norm_rpow_ball_compl_iff hd zero_lt_one _).mpr hd').hasFiniteIntegral
+        exact ((integrableOn_norm_rpow_ball_compl_iff zero_lt_one _).mpr hd').hasFiniteIntegral
       intro x hx
       simp only [Set.mem_compl_iff, Metric.mem_ball, dist_zero_right, not_lt] at hx
       simp_rw [← enorm_mul, enorm_le_iff_norm_le, norm_mul, norm_pow, Real.norm_eq_abs, sq_abs,
@@ -336,26 +336,24 @@ lemma radiusRegPow_tendsto_radiusPow' {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, �
   · exact radiusRegPow_tendsto_radiusPow s ψ hx.ne
 
 /-- a.e. version of `radiusRegPow_tendsto_radiusPow` -/
-lemma radiusRegPow_ae_tendsto_radiusPow {d : ℕ} (hd : 0 < d) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
+lemma radiusRegPow_ae_tendsto_radiusPow {d : ℕ} [NeZero d] (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     ∀ᵐ x, Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x)) := by
   apply ae_iff.mpr
   suffices h : {x | ¬Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x))} ⊆ {0} by
     rcases Set.subset_singleton_iff_eq.mp h with (h' | h')
     · exact h' ▸ measure_empty
-    · have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
-      exact h' ▸ measure_singleton 0
+    · exact h' ▸ measure_singleton 0
   intro x hx
   by_contra hx'
   exact hx <| radiusRegPow_tendsto_radiusPow s ψ hx'
 
-lemma radiusRegPow_ae_tendsto_iff {d : ℕ} (hd : 0 < d) {s : ℝ} {ψ : 𝓢(Space d, ℂ)}
+lemma radiusRegPow_ae_tendsto_iff {d : ℕ} [NeZero d] {s : ℝ} {ψ : 𝓢(Space d, ℂ)}
     {φ : Space d → ℂ} : (∀ᵐ x, Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (φ x)))
     ↔ φ =ᵐ[volume] 𝐫 s ψ := by
   let t₁ := {x | ¬Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (φ x))}
   let t₂ := {x | φ x ≠ 𝐫 s ψ x}
   show volume t₁ = 0 ↔ volume t₂ = 0
   suffices heq : t₁ ∪ {0} = t₂ ∪ {0} by
-    have : Nontrivial (Space d) := Nat.succ_pred_eq_of_pos hd ▸ Space.instNontrivialSucc
     have hUnion : ∀ t : Set (Space d), volume t = 0 ↔ volume (t ∪ {0}) = 0 :=
       fun _ ↦ by simp only [measure_union_null_iff, measure_singleton, and_true]
     rw [hUnion t₁, hUnion t₂, heq]

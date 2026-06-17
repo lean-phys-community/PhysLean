@@ -50,6 +50,7 @@ public import Physlib.Electromagnetism.Kinematics.Boosts
 public import Physlib.Electromagnetism.Kinematics.EMPotential
 public import Physlib.Electromagnetism.Kinematics.ElectricField
 public import Physlib.Electromagnetism.Kinematics.FieldStrength
+public import Physlib.Electromagnetism.Kinematics.GaugeTransformation
 public import Physlib.Electromagnetism.Kinematics.MagneticField
 public import Physlib.Electromagnetism.Kinematics.ScalarPotential
 public import Physlib.Electromagnetism.Kinematics.VectorPotential
@@ -67,6 +68,7 @@ public import Physlib.FluidDynamics.NavierStokes.Momentum
 public import Physlib.Mathematics.Calculus.AdjFDeriv
 public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.Mathematics.Calculus.ParametricIntegration
+public import Physlib.Mathematics.Calculus.Wirtinger.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
@@ -263,6 +265,7 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
 public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basic
+public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Symmetric
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
@@ -356,6 +359,7 @@ public import Physlib.Relativity.Tensors.OfInt
 public import Physlib.Relativity.Tensors.Product
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.CoVector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
@@ -369,6 +373,7 @@ public import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Contraction
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Modules
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Velocity.Basic
 public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 public import Physlib.Relativity.Tensors.Tensorial
@@ -387,13 +392,16 @@ public import Physlib.SpaceAndTime.Space.Derivatives.MatrixDiv
 public import Physlib.SpaceAndTime.Space.Derivatives.MultiIndex
 public import Physlib.SpaceAndTime.Space.DistConst
 public import Physlib.SpaceAndTime.Space.DistOfFunction
+public import Physlib.SpaceAndTime.Space.EuclideanGroup.AffineGroup
+public import Physlib.SpaceAndTime.Space.EuclideanGroup.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
 public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
 public import Physlib.SpaceAndTime.Space.IsDistBounded
 public import Physlib.SpaceAndTime.Space.LengthUnit
 public import Physlib.SpaceAndTime.Space.Module
-public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Norm.Basic
+public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Slice
 public import Physlib.SpaceAndTime.Space.Translations
 public import Physlib.SpaceAndTime.SpaceTime.Basic

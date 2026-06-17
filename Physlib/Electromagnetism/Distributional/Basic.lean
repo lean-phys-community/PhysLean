@@ -94,7 +94,22 @@ noncomputable def ofStaticScalarPotential {d} (c : SpeedOfLight) :
 TODO "Add a constructor for DistElectromagneticPotential from a scalar
   potential which is a function using an if...then...else... based on IsDistBounded."
 
-TODO "Add a constructor for DistElectromagneticPotential from vector potentials."
+/-- The creation of an electromagnetic potential from a vector potential. -/
+noncomputable def ofVectorPotential {d} (c : SpeedOfLight) :
+    ((Time × Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) →ₗ[ℝ]
+    DistElectromagneticPotential d where
+  toFun A := (distTimeSlice c).symm (Lorentz.Vector.ofSpatialComponent ∘L A)
+  map_add' A₁ A₂ := by
+    ext ε
+    simp
+  map_smul' r A := by
+    ext ε
+    simp
+
+/-- The creation of an electromagnetic potential from a static vector potential. -/
+noncomputable def ofStaticVectorPotential {d} (c : SpeedOfLight) :
+    ((Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) →ₗ[ℝ] DistElectromagneticPotential d :=
+  ofVectorPotential c ∘ₗ Space.constantTime
 
 TODO "Add a constructor for DistElectromagneticPotential from electric and
   magnetic fields."

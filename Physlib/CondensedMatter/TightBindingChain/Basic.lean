@@ -110,7 +110,7 @@ instance : NeZero T.N := T.N_ne_zero
 
 /-- The Hilbert space of a `TightBindingchain` is the `N`-dimensional finite dimensional
 Hilbert space. -/
-abbrev HilbertSpace := QuantumMechanics.FiniteHilbertSpace T.N
+abbrev HilbertSpace := QuantumMechanics.FiniteHilbertSpace (Fin T.N)
 
 /-!
 
@@ -129,7 +129,7 @@ Localized states correspond to the electron being located on a specific site in 
 /-- The eigenstate corresponding to the particle been located on the `n`th site. -/
 noncomputable def localizedState {T : TightBindingChain} :
     OrthonormalBasis (Fin T.N) ℂ (HilbertSpace T) :=
-  EuclideanSpace.basisFun (Fin T.N) ℂ
+  QuantumMechanics.FiniteHilbertSpace.basisFun (Fin T.N)
 
 /-!
 

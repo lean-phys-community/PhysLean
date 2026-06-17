@@ -5,7 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
+public import Physlib.SpaceAndTime.Space.Integrals.NormPow
+public import Physlib.Mathematics.Distribution.PowMul
 /-!
 
 # The norm on space
@@ -27,8 +29,14 @@ We use properties of this power series to prove various results about distributi
   norm.
 - `distGrad_distOfFunction_log_norm` : The gradient of the distribution defined by the logarithm
   of the norm.
+- `distDiv_norm_zpow_smul_repr_self_eq_smul` : The divergence of the distribution defined by
+  `x ↦ ‖x‖ ^ q • x`.
+- `distLaplacian_distOfFunction_norm_zpow` : The Laplacian of the distribution defined by a power
+  of the norm.
 - `distDiv_inv_pow_eq_dim` : The divergence of the distribution defined by the
   inverse power of the norm proportional to the Dirac delta distribution.
+- `distLaplacian_fundamentalSolution_norm_zpow_eq` : The Laplacian of the fundamental
+  solution power of the norm.
 
 ## iii. Table of contents
 
@@ -49,7 +57,10 @@ We use properties of this power series to prove various results about distributi
 - B. Distributions involving norms
   - B.1. The gradient of distributions based on powers
   - B.2. The gradient of distributions based on logs
-  - B.3. Divergence equal dirac delta
+  - B.3. Divergence of radial norm-power distributions
+  - B.4. The Laplacian of distributions based on powers
+  - B.5. Divergence equal dirac delta
+  - B.6. The Laplacian of the fundamental solution
 
 ## iv. References
 
@@ -937,16 +948,310 @@ lemma distGrad_distOfFunction_log_norm {d : ℕ} :
 
 /-!
 
-### B.3. Divergence equal dirac delta
-
-We show that the divergence of `x ↦ ‖x‖ ^ (- d) • x` is equal to a multiple of the Dirac delta
-at `0`.
-
-The proof
+### B.3. Divergence of radial norm-power distributions
 
 -/
 open Distribution
 
+private lemma integrable_real_pow_mul_schwartz
+    (ψ : 𝓢(ℝ, ℝ)) (k : ℕ) :
+    Integrable (fun x : ℝ => x ^ k * ψ x) volume := by
+  refine (ψ.integrable_pow_mul volume k).mono' (by fun_prop) ?_
+  filter_upwards with x
+  simp [norm_mul, norm_pow]
+
+private lemma radial_power_deriv_integral_by_parts
+    {d : ℕ} (η : 𝓢(Space d.succ, ℝ))
+    (n : ↑(Metric.sphere (0 : Space d.succ) 1))
+    (p : ℕ) (hp : 0 < p) :
+    - ∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+        ∂(.comap Subtype.val volume)
+      =
+      (p : ℝ) * ∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ (p - 1) * η (r.1 • n.1)
+        ∂(.comap Subtype.val volume) := by
+  let η' : 𝓢(ℝ, ℝ) := SchwartzMap.compCLM (g := fun a => a • n.1) ℝ (by
+    apply And.intro
+    · fun_prop
+    · intro n'
+      match n' with
+      | 0 =>
+        use 1, 1
+        simp [norm_smul]
+      | 1 =>
+        use 0, 1
+        intro x
+        simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right]
+        rw [(continuousMultilinearCurryRightEquiv' ℝ 0 ℝ (Space d.succ)).symm.norm_map]
+        simp [ContinuousLinearMap.norm_smulRight_apply]
+      | n' + 1 + 1 =>
+        use 0, 0
+        intro x
+        simp only [Real.norm_eq_abs, pow_zero, mul_one, norm_le_zero_iff]
+        rw [iteratedFDeriv_succ_eq_comp_right]
+        conv_lhs =>
+          enter [2, 3, y]
+          simp [fderiv_smul_const]
+        rw [iteratedFDeriv_succ_const]
+        rfl) (by use 1, 1; simp [norm_smul]) η
+  have hη'_apply (x : ℝ) : η' x = η (x • n.1) := by
+    simp [η']
+  have hmul_iter_apply :
+      ∀ k x, ((Physlib.Distribution.powOneMul ℝ)^[k] η') x = x ^ k * η' x := by
+    intro k
+    induction k with
+    | zero =>
+        intro x
+        simp
+    | succ k ih =>
+        intro x
+        rw [Function.iterate_succ_apply']
+        rw [Physlib.Distribution.powOneMul_apply, ih]
+        rw [pow_succ]
+        change x * (x ^ k * η' x) = x ^ k * x * η' x
+        ring
+  have hleft_subtype :
+      ∫ (r : Set.Ioi (0 : ℝ)),
+          r.1 ^ p * _root_.deriv (fun a => η (a • n.1)) r.1
+          ∂(.comap Subtype.val volume)
+        =
+        ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ p * _root_.deriv (fun a => η (a • n.1)) x := by
+    exact MeasureTheory.integral_subtype_comap (μ := volume)
+      (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
+      (fun x : ℝ => x ^ p * _root_.deriv (fun a => η (a • n.1)) x)
+  have hright_subtype :
+      ∫ (r : Set.Ioi (0 : ℝ)),
+          r.1 ^ (p - 1) * η (r.1 • n.1)
+          ∂(.comap Subtype.val volume)
+        =
+        ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ (p - 1) * η (x • n.1) := by
+    exact MeasureTheory.integral_subtype_comap (μ := volume)
+      (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
+      (fun x : ℝ => x ^ (p - 1) * η (x • n.1))
+  rw [hleft_subtype, hright_subtype]
+  have hIBP :
+      ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ p * _root_.deriv (fun a => η (a • n.1)) x
+        =
+        (0 : ℝ) - (0 : ℝ) -
+          ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+            ((p : ℝ) * x ^ (p - 1)) * η (x • n.1) := by
+    refine MeasureTheory.integral_Ioi_mul_deriv_eq_deriv_mul
+      (a := (0 : ℝ))
+      (u := fun x : ℝ => x ^ p)
+      (u' := fun x : ℝ => (p : ℝ) * x ^ (p - 1))
+      (v := fun x : ℝ => η (x • n.1))
+      (v' := fun x : ℝ => _root_.deriv (fun a => η (a • n.1)) x)
+      (a' := (0 : ℝ)) (b' := (0 : ℝ)) ?_ ?_ ?_ ?_ ?_ ?_
+    · intro x hx
+      simpa using (hasDerivAt_pow p x)
+    · intro x hx
+      exact DifferentiableAt.hasDerivAt (by fun_prop :
+        DifferentiableAt ℝ (fun x : ℝ => η (x • n.1)) x)
+    · have hderiv_int :
+          Integrable (fun x : ℝ =>
+            x ^ p * ((SchwartzMap.derivCLM ℝ ℝ) η') x) volume :=
+        integrable_real_pow_mul_schwartz ((SchwartzMap.derivCLM ℝ ℝ) η') p
+      exact hderiv_int.integrableOn.congr_fun (by
+        intro x hx
+        have hderiv_eq :
+            _root_.deriv η' x = _root_.deriv (fun a => η (a • n.1)) x := by
+          congr 1
+        simp [SchwartzMap.derivCLM_apply, hderiv_eq])
+        measurableSet_Ioi
+    · have hbase :
+          Integrable (fun x : ℝ => x ^ (p - 1) * η' x) volume :=
+        integrable_real_pow_mul_schwartz η' (p - 1)
+      have hconst :
+          Integrable (fun x : ℝ => (p : ℝ) * (x ^ (p - 1) * η' x)) volume :=
+        hbase.const_mul (p : ℝ)
+      exact hconst.integrableOn.congr_fun (by
+        intro x hx
+        ring_nf
+        simp [hη'_apply, mul_assoc])
+        measurableSet_Ioi
+    · have hcont :
+          ContinuousAt (fun x : ℝ => x ^ p * η (x • n.1)) (0 : ℝ) := by
+        fun_prop
+      have hlim := tendsto_nhdsWithin_of_tendsto_nhds
+        (s := Set.Ioi (0 : ℝ)) hcont.tendsto
+      simpa [Pi.mul_apply, hη'_apply, hp.ne'] using hlim
+    · have hzero :
+          Filter.Tendsto (fun x : ℝ => x ^ p * η' x) Filter.atTop (𝓝 (0 : ℝ)) := by
+        have hsch :
+            Filter.Tendsto (fun x : ℝ => ((Physlib.Distribution.powOneMul ℝ)^[p] η') x)
+              Filter.atTop (𝓝 (0 : ℝ)) :=
+          Filter.Tendsto.mono_left
+            (((Physlib.Distribution.powOneMul ℝ)^[p] η').toZeroAtInfty.zero_at_infty')
+            atTop_le_cocompact
+        exact hsch.congr' (Filter.Eventually.of_forall (fun x => by
+          rw [hmul_iter_apply p x]))
+      simpa [hη'_apply, Pi.mul_apply] using hzero
+  calc
+    -∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+        x ^ p * _root_.deriv (fun a => η (a • n.1)) x
+        = ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+            ((p : ℝ) * x ^ (p - 1)) * η (x • n.1) := by
+          rw [hIBP]
+          ring
+    _ = (p : ℝ) * ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
+          x ^ (p - 1) * η (x • n.1) := by
+          rw [← integral_const_mul]
+          congr
+          funext x
+          ring
+
+private lemma distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv
+    {d p : ℕ} (q : ℤ) (hq : 0 < q + (d.succ : ℤ))
+    (hp_int : (p : ℤ) = q + (d.succ : ℤ))
+    (η : 𝓢(Space d.succ, ℝ)) :
+    (∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega)))) η =
+      - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+        ∂(.comap Subtype.val volume))
+        ∂(volume (α := Space d.succ).toSphere) := by
+  let F : Space d.succ → ℝ := fun x =>
+    inner ℝ (‖x‖ ^ q • basis.repr x) (grad η x)
+  calc
+    (∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega)))) η
+        = - ∫ x, F x := by
+            rw [distDiv_ofFunction]
+    _ = - ∫ r, F (r.2.1 • r.1.1)
+        ∂(volume (α := Space d.succ).toSphere.prod
+          (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
+          rw [integral_volume_eq_spherical]
+    _ = - ∫ n, (∫ r, F (r.1 • n.1)
+        ∂(Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1)))
+        ∂(volume (α := Space d.succ).toSphere) := by
+          rw [MeasureTheory.integral_prod]
+          convert integrable_isDistBounded_inner_grad_schwartzMap_spherical
+            (IsDistBounded.zpow_smul_repr_self q (by omega)) η using 1
+    _ = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
+        r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+        ∂(.comap Subtype.val volume))
+        ∂(volume (α := Space d.succ).toSphere) := by
+          congr
+          funext n
+          simp [F, Measure.volumeIoiPow]
+          erw [integral_withDensity_eq_integral_smul (by fun_prop)]
+          · congr
+            funext r
+            have hr : 0 < (r : ℝ) := r.2
+            have hnorm := norm_smul_sphere n (le_of_lt hr)
+            rw [NNReal.smul_def]
+            rw [Real.coe_toNNReal _ (pow_nonneg (le_of_lt hr) d)]
+            · simp only [smul_eq_mul]
+              rw [hnorm]
+              rw [← grad_smul_inner_space (n : Space d.succ) (⇑η)
+                (SchwartzMap.differentiable η) (r : ℝ) hr]
+              rw [real_inner_comm]
+              simp only [inner_smul_right]
+              rw [← radial_jacobian_zpow_mul_self hp_int hr]
+              ring
+
+lemma distDiv_norm_zpow_smul_repr_self_eq_smul
+    {d : ℕ} (q : ℤ) (hq : 0 < q + (d.succ : ℤ)) :
+    ∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega))) =
+      (((q + (d.succ : ℤ) : ℤ) : ℝ) •
+        distOfFunction (fun x : Space d.succ => ‖x‖ ^ q)
+          (IsDistBounded.pow q (by omega))) := by
+  ext η
+  let p : ℕ := Int.toNat (q + (d.succ : ℤ))
+  have hp_int : (p : ℤ) = q + (d.succ : ℤ) := by
+    dsimp [p]
+    exact Int.toNat_of_nonneg (le_of_lt hq)
+  have hp_pos : 0 < p := by
+    have : (0 : ℤ) < (p : ℤ) := by
+      rw [hp_int]
+      exact hq
+    exact_mod_cast this
+  have hcoef : (((q + (d.succ : ℤ) : ℤ) : ℝ)) = (p : ℝ) := by
+    exact_mod_cast hp_int.symm
+  calc
+    (∇ᵈ ⬝ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ q • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self q (by omega)))) η
+        = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
+            r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
+            ∂(.comap Subtype.val volume))
+            ∂(volume (α := Space d.succ).toSphere) := by
+          exact distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv q hq hp_int η
+    _ = ∫ n, (p : ℝ) * ∫ (r : Set.Ioi (0 : ℝ)),
+            r.1 ^ (p - 1) * η (r.1 • n.1)
+            ∂(.comap Subtype.val volume)
+            ∂(volume (α := Space d.succ).toSphere) := by
+          rw [← integral_neg]
+          congr
+          funext n
+          exact radial_power_deriv_integral_by_parts η n p hp_pos
+    _ = (p : ℝ) * ∫ n : ↑(Metric.sphere (0 : Space d.succ) 1),
+          ∫ (r : Set.Ioi (0 : ℝ)),
+            r.1 ^ (p - 1) * η (r.1 • n.1)
+            ∂(.comap Subtype.val volume)
+            ∂(volume (α := Space d.succ).toSphere) := by
+          rw [integral_const_mul]
+    _ = (p : ℝ) * ∫ x : Space d.succ, η x * ‖x‖ ^ q := by
+          rw [← radial_norm_power_spherical_integral_eq_space_integral hp_int hp_pos η]
+    _ = (((q + (d.succ : ℤ) : ℤ) : ℝ) •
+        distOfFunction (fun x : Space d.succ => ‖x‖ ^ q)
+          (IsDistBounded.pow q (by omega))) η := by
+          simp [distOfFunction_apply, mul_comm]
+          left
+          rw [← hcoef]
+          norm_num
+
+/-!
+
+### B.4. The Laplacian of distributions based on powers
+
+-/
+
+lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} (m : ℤ)
+    (hm : - (d.succ - 1 : ℕ) + 1 ≤ m)
+    (hdiv : 0 < m - 2 + (d.succ : ℤ)) :
+    Δᵈ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
+      (IsDistBounded.pow m (by simp_all; omega))) =
+      (((m : ℝ) * (((m - 2 + (d.succ : ℤ) : ℤ) : ℝ))) •
+        distOfFunction (fun x : Space d.succ => ‖x‖ ^ (m - 2))
+          (IsDistBounded.pow (m - 2) (by omega))) := by
+  rw [distLaplacian]
+  change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
+    (IsDistBounded.pow m (by simp_all; omega)))) = _
+  rw [distGrad_distOfFunction_norm_zpow m hm]
+  have hdist :
+      distOfFunction (fun x : Space d.succ => (m * ‖x‖ ^ (m - 2)) • basis.repr x)
+          (by
+            simp [← smul_smul]
+            refine IsDistBounded.const_fun_smul ?_ ↑m
+            apply IsDistBounded.zpow_smul_repr_self
+            simp_all
+            omega) =
+        (m : ℝ) • distOfFunction
+          (fun x : Space d.succ => ‖x‖ ^ (m - 2) • basis.repr x)
+          (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) := by
+    convert distOfFunction_smul_fun
+      (fun x : Space d.succ => ‖x‖ ^ (m - 2) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) (m : ℝ) using 1
+    ext x
+    simp [smul_smul]
+  rw [hdist]
+  rw [map_smul]
+  rw [distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv]
+  rw [smul_smul]
+
+/-!
+
+### B.5. Divergence equal dirac delta
+
+We show that the divergence of `x ↦ ‖x‖ ^ (- d) • x` is equal to a multiple of the Dirac delta
+at `0`.
+
+-/
 set_option backward.isDefEq.respectTransparency false in
 /-- Auxiliary lemma with dimension defined as d.succ to handle `homeomorphUnitSphereProd`.
 The dimension correct version is declared in `distDiv_inv_pow_eq_dim`. -/
@@ -1104,5 +1409,92 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} :
   rcases d with _ | d'
   · simp; rfl
   · exact distDiv_inv_pow_eq_dim'
+
+/-!
+
+### B.6. The Laplacian of the fundamental solution
+
+-/
+
+/-- In dimensions at least three, the distributional Laplacian of the fundamental-solution
+power of the norm is a multiple of the Dirac delta at the origin. -/
+lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
+    Δᵈ (distOfFunction (fun x : Space d.succ.succ.succ => ‖x‖ ^ (- (d.succ : ℤ)))
+      (IsDistBounded.pow (- (d.succ : ℤ)) (by omega))) =
+      ((- (d.succ : ℝ)) * (d.succ.succ.succ : ℝ) *
+        (volume (α := Space d.succ.succ.succ)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  rw [distLaplacian]
+  change ∇ᵈ ⬝ (∇ᵈ (distOfFunction
+    (fun x : Space d.succ.succ.succ => ‖x‖ ^ (- (d.succ : ℤ)))
+    (IsDistBounded.pow (- (d.succ : ℤ)) (by omega)))) = _
+  rw [distGrad_distOfFunction_norm_zpow (- (d.succ : ℤ)) (by omega)]
+  simp only [Int.cast_neg, Int.cast_natCast]
+  have hdist :
+      distOfFunction
+        (fun x : Space d.succ.succ.succ =>
+          (- (d.succ : ℝ) * ‖x‖ ^ ((- (d.succ : ℤ)) - 2)) • basis.repr x)
+        (by
+          simpa [smul_smul] using
+            (IsDistBounded.const_fun_smul
+              (F := EuclideanSpace ℝ (Fin d.succ.succ.succ))
+              (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))
+              (- (d.succ : ℝ)))) =
+        (- (d.succ : ℝ)) • distOfFunction
+          (fun x : Space d.succ.succ.succ =>
+            ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+          (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega)) := by
+    convert distOfFunction_smul_fun
+      (fun x : Space d.succ.succ.succ =>
+        ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))
+      (- (d.succ : ℝ)) using 1
+    ext x
+    simp [smul_smul]
+  rw [hdist]
+  rw [map_smul]
+  have hdiv :
+      ∇ᵈ ⬝ (distOfFunction
+        (fun x : Space d.succ.succ.succ =>
+          ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+        (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))) =
+        (d.succ.succ.succ * (volume (α := Space d.succ.succ.succ)).real
+          (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+    convert distDiv_inv_pow_eq_dim (d := d.succ.succ.succ) using 1
+  rw [hdiv]
+  rw [smul_smul]
+  ring_nf
+
+/-- Version of `distLaplacian_fundamentalSolution_norm_zpow` stated using the dimension of
+the ambient space. -/
+lemma distLaplacian_fundamentalSolution_norm_zpow_of_three_le {d : ℕ} (hd : 3 ≤ d) :
+    Δᵈ (distOfFunction (fun x : Space d => ‖x‖ ^ ((2 : ℤ) - (d : ℤ)))
+      (IsDistBounded.pow ((2 : ℤ) - (d : ℤ)) (by omega))) =
+      (((2 : ℝ) - (d : ℝ)) * (d : ℝ) *
+        (volume (α := Space d)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  rcases d with _ | _ | _ | d
+  · omega
+  · omega
+  · omega
+  · convert distLaplacian_fundamentalSolution_norm_zpow (d := d) using 1
+    ext x
+    simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one]
+    ring_nf
+
+/-- Version of `distLaplacian_fundamentalSolution_norm_zpow` stated for every dimension.
+In dimensions less than three, the exponent is zero and both sides are zero. -/
+lemma distLaplacian_fundamentalSolution_norm_zpow_eq {d : ℕ} :
+    Δᵈ (distOfFunction (fun x : Space d => ‖x‖ ^ (- ((d - 2 : ℕ) : ℤ)))
+      (IsDistBounded.pow _ (by grind))) =
+      (- ((d - 2 : ℕ) : ℝ) * (d : ℝ) *
+        (volume (α := Space d)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  by_cases hd : d < 3
+  · have hdim : d - 2 = 0 := by omega
+    simp [hdim]
+    exact distLaplacian_const 1
+  · convert distLaplacian_fundamentalSolution_norm_zpow_of_three_le
+      (d := d) (by grind) using 4 <;>
+      rw [Nat.cast_sub (by omega : 2 ≤ d)] <;>
+      ring_nf
 
 end Space

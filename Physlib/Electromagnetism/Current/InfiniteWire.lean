@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Distributional.Dynamics.IsExtrema
-public import Physlib.SpaceAndTime.Space.Norm
+public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.ConstantSliceDist
 /-!
 
@@ -117,7 +117,7 @@ noncomputable def infiniteWire (𝓕 : FreeSpace) (I : ℝ) :
   constantSliceDist 0
   ((- I * 𝓕.μ₀ / (2 * Real.pi)) • distOfFunction (fun (x : Space 2) =>
     Real.log ‖x‖ • Lorentz.Vector.basis (Sum.inr 0))
-  (IsDistBounded.log_norm.smul_const _))
+  ((IsDistBounded.log_norm (by norm_num)).smul_const _))
 
 /-!
 
@@ -155,7 +155,7 @@ lemma infiniteWire_vectorPotential (𝓕 : FreeSpace) (I : ℝ) :
     constantSliceDist 0
     ((- I * 𝓕.μ₀ / (2 * Real.pi)) • distOfFunction (fun (x : Space 2) =>
       Real.log ‖x‖ • EuclideanSpace.single 0 (1 : ℝ))
-    (by apply IsDistBounded.log_norm.smul_const))) := by
+    (by apply (IsDistBounded.log_norm (by norm_num)).smul_const))) := by
   ext η i
   simp [vectorPotential, infiniteWire, constantTime_apply,
   constantSliceDist_apply, Lorentz.Vector.spatialCLM, distOfFunction_vector_eval,

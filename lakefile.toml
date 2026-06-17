@@ -16,6 +16,10 @@ name = "Physlib"
 moreLeanArgs = ["-Dwarn.sorry=false", "-Dweak.says.verify=true"]
 
 [[lean_lib]]
+name = "PhyslibAlpha"
+moreLeanArgs = ["-Dwarn.sorry=false", "-Dweak.says.verify=true"]
+
+[[lean_lib]]
 name = "QuantumInfo"
 moreLeanArgs = ["-Dwarn.sorry=false", "-Dweak.says.verify=true"]
 
@@ -49,6 +53,11 @@ supportInterpreter = true
 [[lean_exe]]
 name = "runPhyslibLinters"
 srcDir = "scripts/MetaPrograms"
+supportInterpreter = true
+
+[[lean_exe]]
+name = "runPhyslibAlphaLinters"
+srcDir = "scripts/PhyslibAlpha"
 supportInterpreter = true
 
 [[lean_exe]]
