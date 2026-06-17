@@ -130,5 +130,72 @@ lemma Ioi_subset_regularityDomain {m : ℝ} (h : m ∈ upperBounds (Θᵣₑ T))
   · exact fun _ _ ↦ by simp_all [neg_le.mp, upperBounds]
   · exact ⟨-r, by simp [mem_Ioi.mp hr], by simp [hrz]⟩
 
+/-- The regularity domain of a symmetric operator is connected iff it contains a real number. -/
+lemma regularityDomain_isConnected_iff :
+    IsConnected T.regularityDomain ↔ (ofReal ⁻¹' T.regularityDomain).Nonempty := by
+  rw [T.regularityDomain_isOpen.isConnected_iff_isPathConnected]
+  constructor
+  · intro h
+    obtain ⟨f, hf⟩ : JoinedIn T.regularityDomain (-I) I := by
+      refine h.joinedIn (-I) ?_ I ?_
+      · exact hT.mem_regularityDomain_of_im_ne_zero (by simp)
+      · exact hT.mem_regularityDomain_of_im_ne_zero (by simp)
+    obtain ⟨t, ht⟩ : ∃ t, (f t).im = 0 := by
+      have hIVT := intermediate_value_Icc (f := fun t ↦ (f t).im) zero_le_one (by fun_prop)
+      simp only [Path.source, neg_im, I_im, Path.target] at hIVT
+      have h₀ : (0 : ℝ) ∈ Icc (-1) 1 := by simp
+      exact ⟨(hIVT h₀).choose, (hIVT h₀).choose_spec.2⟩
+    specialize hf t
+    rw [← re_add_im (f t), ht] at hf
+    exact ⟨(f t).re, by simp_all⟩
+  · intro ⟨r, hr⟩
+    apply mem_preimage.mp at hr
+    refine isPathConnected_iff.mpr ⟨?_, fun z₁ hz₁ z₂ hz₂ ↦ ?_⟩
+    · exact ⟨I, hT.mem_regularityDomain_of_im_ne_zero (by simp)⟩
+    · have h : ∀ z ∈ T.regularityDomain, JoinedIn T.regularityDomain z r := by
+        intro z hz
+        by_cases hz_im : z.im = 0
+        · rcases eq_or_ne z r with rfl | hzr
+          · exact JoinedIn.refl hr
+          · let path : Path z r := {
+              toFun t := ((z + r) + (z - r) * cexp (Real.pi * t * I)) / 2
+              source' := by simp
+              target' := by simp [add_comm z r, add_add_sub_cancel]
+            }
+            refine ⟨path, fun t ↦ ?_⟩
+            by_cases! ht : ∃ n : ℤ, n = (t : ℝ)
+            · obtain ⟨n, htn⟩ := ht
+              obtain ⟨k, hk⟩ := Int.even_or_odd' n
+              rcases hk with heven | hodd
+              · suffices cexp (Real.pi * t * I) = 1 by simp [path, this, hz]
+                exact exp_eq_one_iff.mpr ⟨k, by simp [← htn, heven, mul_comm, ← mul_assoc]⟩
+              · suffices cexp (Real.pi * (t - 1) * I) = 1 by
+                  rw [mul_sub, sub_mul, mul_one, exp_sub_pi_mul_I, neg_eq_iff_eq_neg] at this
+                  simp [path, this, add_comm z r, hr]
+                exact exp_eq_one_iff.mpr ⟨k, by simp [← htn, hodd, mul_comm, ← mul_assoc]⟩
+            · have hzr' : z.re - r ≠ 0 :=
+                  fun h ↦ hzr <| Complex.ext (sub_eq_zero.mp h) (by simp [hz_im])
+              refine hT.mem_regularityDomain_of_im_ne_zero ?_
+              simp [path, hz_im, exp_im, Real.sin_eq_zero_iff, mul_comm, hzr', ht]
+        · refine JoinedIn.of_segment_subset fun w ⟨a, b, _, _, _, hw⟩ ↦ ?_
+          rcases eq_zero_or_neZero a with rfl | _
+          · simp_all
+          · exact hT.mem_regularityDomain_of_im_ne_zero fun _ ↦ hz_im (by simp_all [← hw])
+      exact (h z₁ hz₁).trans (h z₂ hz₂).symm
+
+/-- The regularity domain of a lower semibounded symmetric operator is connected. -/
+lemma regularityDomain_isConnected_of_bddBelow (h : BddBelow (Θᵣₑ T)) :
+    IsConnected T.regularityDomain := by
+  obtain ⟨m, hm⟩ := h
+  apply hT.regularityDomain_isConnected_iff.mpr
+  exact ⟨m - 1, hT.Iio_subset_regularityDomain hm ⟨m - 1, by simp⟩⟩
+
+/-- The regularity domain of an upper semibounded symmetric operator is connected. -/
+lemma regularityDomain_isConnected_of_bddAbove (h : BddAbove (Θᵣₑ T)) :
+    IsConnected T.regularityDomain := by
+  obtain ⟨m, hm⟩ := h
+  apply hT.regularityDomain_isConnected_iff.mpr
+  exact ⟨m + 1, hT.Ioi_subset_regularityDomain hm ⟨m + 1, by simp⟩⟩
+
 end IsSymmetric
 end LinearPMap
