@@ -440,15 +440,25 @@ scoped notation "Θ" => numericalRange
 
 lemma numericalRange_eq (T : H →ₗ.[ℂ] H) : Θ T = (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x | ‖x‖ = 1} := rfl
 
-lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : T.numericalRange.Nonempty := by
-  obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot hT
-  refine ⟨(‖x‖ ^ 2)⁻¹ * ⟪x, T ⟨x, hx⟩⟫_ℂ, ofReal ‖x‖⁻¹ • ⟨x, hx⟩, ?_, ?_⟩
-  · simp [norm_smul, inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx')]
+lemma mem_numericalRange {T : H →ₗ.[ℂ] H} {x : T.domain} (hx : x ≠ 0) :
+    (‖x‖ ^ 2)⁻¹ * ⟪↑x, T x⟫_ℂ ∈ Θ T := by
+  refine ⟨ofReal ‖x‖⁻¹ • x, ?_, ?_⟩
+  · simp [norm_smul, inv_mul_cancel₀, hx]
   · simp_rw [map_smul]
     simp [inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
 
-lemma numericalRange_smul (T : H →ₗ.[ℂ] H) (c : ℂ) :
-    (c • T).numericalRange = c • T.numericalRange := by
+lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : (Θ T).Nonempty := by
+  obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot hT
+  use (‖x‖ ^ 2)⁻¹ * ⟪x, T ⟨x, hx⟩⟫_ℂ
+  exact mem_numericalRange (x := ⟨x, hx⟩) (Subtype.coe_ne_coe.mp hx')
+
+@[simp]
+lemma numericalRange_neg (T : H →ₗ.[ℂ] H) : Θ (-T) = -Θ T := by
+  ext
+  simp [numericalRange_eq, neg_eq_iff_eq_neg]
+
+@[simp]
+lemma numericalRange_smul (T : H →ₗ.[ℂ] H) (c : ℂ) : Θ (c • T) = c • Θ T := by
   ext
   simp [numericalRange_eq, inner_smul_right, mem_smul_set]
 
