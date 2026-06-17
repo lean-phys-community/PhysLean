@@ -936,8 +936,8 @@ lemma return_time (IC : InitialConditions) (non_trivial : (IC.x₀ ≠ 0 ∨ IC.
     _ = c * ((vv +   xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
       nth_rewrite 1 [← hvv, ← hxx]
       ring_nf
-    _ = c * ((vv +   xx * S.ω^2) / det ) := by 
-      simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, 
+    _ = c * ((vv +   xx * S.ω^2) / det ) := by
+      simp only [ne_eq, S.ω_ne_zero, not_false_eq_true,
         div_self, sub_self, mul_zero, zero_div, add_zero]
     _ = c * (det / det) := by rfl
     _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
@@ -961,8 +961,6 @@ We give some open TODOs for the classical harmonic oscillator.
 
 -/
 
-TODO "For the classical harmonic oscillator find the time for which it returns to
-  it's initial position and velocity."
 
 TODO "For the classical harmonic oscillator find the times for
   which it passes through zero."
