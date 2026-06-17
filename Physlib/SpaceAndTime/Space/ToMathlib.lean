@@ -22,6 +22,17 @@ forward the `ChartedSpace` structure from `M`. -/
 public noncomputable def Homeomorph.chartedSpace (f : M ≃ₜ M') : ChartedSpace H M' :=
   f.isLocalHomeomorph.chartedSpace f.surjective
 
+variable (H) in
+public lemma Homeomorph.chartedSpace_chart_eqOn (f : M ≃ₜ M') (x : M') :
+    letI := f.chartedSpace H
+    Set.EqOn (chartAt H x) (f.symm.transOpenPartialHomeomorph (chartAt H (f.symm x))) (chartAt H x).source := by
+  intro y hy
+  rw [Homeomorph.chartedSpace, IsLocalHomeomorph.chartedSpace, IsLocalHomeomorph.chartedSpaceOfRightInverse]
+  simp [chartAt]
+  congr 1
+  · sorry -- stimmt
+  · sorry -- stimmt
+
 
 open OpenPartialHomeomorph
 

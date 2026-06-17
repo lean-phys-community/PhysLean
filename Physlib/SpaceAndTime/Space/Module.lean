@@ -703,6 +703,12 @@ noncomputable def modelDiffeo {d} : Diffeomorph (𝓡 d) 𝓘(ℝ, Space d) (Spa
     simp
     refine contMDiff_iff.mpr ⟨continuous_id', fun x y => ?_⟩
     simp [← Function.id_def]
+    rw [ContDiffOn]
+    intro z hz
+    have h := Space.chart_eq_Hom d x
+
+
+
   contMDiff_invFun := by
     sorry
 

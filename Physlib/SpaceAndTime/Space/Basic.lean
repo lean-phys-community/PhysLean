@@ -277,9 +277,13 @@ noncomputable def homEuclideanSpaceSpace (d : ℕ) : EuclideanSpace ℝ (Fin d) 
 noncomputable instance (priority := high) (d : ℕ) : ChartedSpace (EuclideanSpace ℝ (Fin d)) (Space d) :=
     (homEuclideanSpaceSpace d).chartedSpace (EuclideanSpace ℝ (Fin d))
 
-instance (d : ℕ) :
-    IsManifold (𝓡 d) ⊤ (Space d) :=
-  (homEuclideanSpaceSpace d).isManifold
+instance (d : ℕ) : IsManifold (𝓡 d) ⊤ (Space d) := (homEuclideanSpaceSpace d).isManifold
+
+public lemma chart_eq_Hom (d : ℕ) (x : Space d) : Set.EqOn (chartAt (EuclideanSpace ℝ (Fin d)) x)
+   (homEuclideanSpaceSpace d).symm (chartAt (EuclideanSpace ℝ (Fin d)) x).source :=  by
+  intro y hy
+  have h := (homEuclideanSpaceSpace d).chartedSpace_chart_eqOn (EuclideanSpace ℝ (Fin d)) x
+  apply h hy
 
 /-
 open Manifold in
