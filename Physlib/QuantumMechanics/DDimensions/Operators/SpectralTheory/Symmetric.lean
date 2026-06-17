@@ -12,7 +12,21 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basi
 
 ## i. Overview
 
+In this module we develop the spectral theory for symmetric operators.
+
+The numerical range of an operator, `Θ T = {⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1}`, is a subset of ℂ.
+For symmetric operators the numerical range consists only of real numbers and it is meaningful
+to discuss its upper/lower bounds. To facilitate this, we define `LinearPMap.realNumericalRange`
+as the projection of `LinearPMap.numericalRange` onto the real axis. For symmetric operators this
+simply reinterprets the numerical range as a subset of ℝ.
+
 ## ii. Key results
+
+- `realNumericalRange` (`Θᵣₑ`) : The projection of the numerical range onto the real axis.
+- `compl_ofReal_subset_regularityDomain` : The regularity domain of a symmetric operator contains
+    all complex numbers with non-zero imaginary part.
+- `regularityDomain_isConnected_iff` : The regularity domain of a symmetric operator is connected
+    if and only if it contains a real number.
 
 ## iii. Table of contents
 
