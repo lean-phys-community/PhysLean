@@ -16,6 +16,9 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basi
 
 ## iii. Table of contents
 
+- A. Numerical range
+- B. Regularity domain
+
 ## iv. References
 
 -/
@@ -25,10 +28,15 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basi
 namespace LinearPMap
 namespace IsSymmetric
 
+open InnerProductSpace
 open Complex
 open Set
 
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+
+/-!
+## A. Numerical range
+-/
 
 /-- The projection of the numerical range onto the real axis. -/
 def realNumericalRange (T : H →ₗ.[ℂ] H) : Set ℝ := re '' (Θ T)
@@ -69,6 +77,29 @@ lemma numericalRange_eq : Θ T = ofReal '' Θᵣₑ T := by
   · intro ⟨r, ⟨w, hw, hwr⟩, hrz⟩
     obtain ⟨s, _, rfl⟩ := hT.numericalRange_subset hw
     exact hrz ▸ (ofReal_re s ▸ hwr) ▸ hw
+
+/-!
+## B. Regularity domain
+-/
+
+/-- The regularity domain of a symmetric operator contains all complex numbers with non-zero
+  imaginary part. -/
+lemma mem_regularityDomain_of_im_ne_zero {z : ℂ} (hz : z.im ≠ 0) : z ∈ T.regularityDomain := by
+  refine ⟨|z.im|, abs_pos.mpr hz, fun x ↦ ?_⟩
+  refine le_of_sq_le_sq ?_ (norm_nonneg _)
+  have h : ‖z‖ ^ 2 = z.re ^ 2 + z.im ^ 2 := norm_eq_sqrt_sq_add_sq z ▸ Real.sq_sqrt (by nlinarith)
+  have h' : (⟪T x, x⟫_ℂ).im = 0 := conj_eq_iff_im.mp (isSymmetric_iff_inner_map_self_real.mp hT x)
+  refine le_of_le_of_eq (b := ‖T x - z.re • x‖ ^ 2 + z.im ^ 2 * ‖x‖ ^ 2) ?_ ?_
+  · simp [mul_pow]
+  · simp [norm_sub_sq (𝕜 := ℂ), ← Complex.coe_smul, inner_smul_right, norm_smul, mul_pow,
+      add_assoc, add_mul, h, h']
+
+/-- The regularity domain of a symmetric operator contains all complex numbers with non-zero
+  imaginary part. -/
+lemma compl_ofReal_subset_regularityDomain : (ofReal '' univ)ᶜ ⊆ T.regularityDomain := by
+  intro z hz
+  refine hT.mem_regularityDomain_of_im_ne_zero ?_
+  exact fun h ↦ hz ⟨z.re, mem_univ _, Eq.symm (Complex.ext rfl h)⟩
 
 end IsSymmetric
 end LinearPMap
