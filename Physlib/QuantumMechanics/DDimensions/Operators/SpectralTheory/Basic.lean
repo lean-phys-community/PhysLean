@@ -38,7 +38,7 @@ Definitions (corresponding to an operator `T : H →ₗ.[ℂ] H`)
     is orthogonal to the range of `T - z • 1`.
 - `LinearPMap.defectNumber` : Given a complex number `z`, the rank of the corresponding
     deficiency subspace as a (possibly infinite) cardinal.
-- `LinearPMap.numericalRange` : The set of complex numbers `⟪x, T x⟫_ℂ` as `x` ranges over
+- `LinearPMap.numericalRange` (`Θ`) : The set of complex numbers `⟪x, T x⟫_ℂ` as `x` ranges over
     the unit sphere in `T.domain`.
 - `LinearPMap.resolventSet` (`ρ`) : The set of complex numbers `z` for which `T - z • 1`
     has a continuous (equivalently, bounded) inverse with domain all of `H`.
@@ -98,6 +98,7 @@ open Metric
 open InnerProductSpace
 open Complex
 open Set
+open Pointwise
 
 /-- The resolvent, `(T - z • 1)⁻¹`. -/
 abbrev resolvent (T : H →ₗ.[ℂ] H) (z : ℂ) : H →ₗ.[ℂ] H := (T - z • 1).inverse
@@ -111,6 +112,11 @@ local notation "𝑅" => resolvent
 
 /-- `IsLowerBound T z c` is the property that `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`. -/
 def IsLowerBound (T : H →ₗ.[ℂ] H) (z : ℂ) (c : ℝ) : Prop := ∀ x : T.domain, c * ‖x‖ ≤ ‖T x - z • x‖
+
+lemma isLowerBound_neg {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLowerBound T z c) :
+    IsLowerBound (-T) (-z) c := by
+  intro x
+  simp only [neg_apply, neg_smul, sub_neg_eq_add, norm_neg_add, h x]
 
 lemma isLowerBound_of_right_le
     {T : H →ₗ.[ℂ] H} {z : ℂ} {c₁ c₂ : ℝ} (hle : c₁ ≤ c₂) (h : IsLowerBound T z c₂) :
@@ -141,6 +147,33 @@ lemma isLowerBound_closure
   `z : ℂ` is a regular point for `T` iff there exists a constant `c > 0` such that
   `c * ‖x‖ ≤ ‖(T - z • 1) x‖` for all `x ∈ T.domain`. -/
 def regularityDomain (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | ∃ c > 0, IsLowerBound T z c}
+
+@[simp]
+lemma regularityDomain_neg (T : H →ₗ.[ℂ] H) : (-T).regularityDomain = -T.regularityDomain := by
+  ext z
+  constructor
+  · exact fun ⟨c, hc, h_bound⟩ ↦ ⟨c, hc, neg_neg T ▸ isLowerBound_neg h_bound⟩
+  · exact fun ⟨c, hc, h_bound⟩ ↦ ⟨c, hc, neg_neg z ▸ isLowerBound_neg h_bound⟩
+
+@[simp]
+lemma regularityDomain_smul (T : H →ₗ.[ℂ] H) {w : ℂ} (hw : w ≠ 0) :
+    (w • T).regularityDomain = w • T.regularityDomain := by
+  ext z
+  constructor
+  · intro ⟨c, hc, h_bound⟩
+    refine ⟨w⁻¹ * z, ?_, ?_⟩
+    · refine ⟨‖w‖⁻¹ * c, by positivity, fun x ↦ ?_⟩
+      rw [mul_assoc]
+      apply (inv_mul_le_iff₀ <| norm_pos_iff.mpr hw).mpr
+      rw [← norm_smul, smul_sub, smul_smul, mul_inv_cancel_left₀ hw]
+      exact h_bound x
+    · simp [hw]
+  · intro ⟨u, ⟨c, hc, h_bound⟩, huz⟩
+    refine ⟨‖w‖ * c, by positivity, fun x ↦ ?_⟩
+    rw [mul_assoc]
+    apply (le_inv_mul_iff₀ <| norm_pos_iff.mpr hw).mp
+    refine le_of_le_of_eq (h_bound x) ?_
+    simp [← norm_inv, ← norm_smul, smul_sub, smul_smul, ← huz, hw]
 
 /-- `T ≤ T'` implies `T'.regularityDomain ⊆ T.regularityDomain`. -/
 lemma regularityDomain_antitone : Antitone (regularityDomain (H := H)) :=
@@ -399,30 +432,37 @@ lemma IsClosable.defectNumber_const [CompleteSpace H]
 ## C. Numerical range
 -/
 
-section
-
-open Pointwise
-
 /-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1} ⊆ ℂ`. -/
 def numericalRange (T : H →ₗ.[ℂ] H) : Set ℂ := (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x : T.domain | ‖x‖ = 1}
 
-lemma numericalRange_eq (T : H →ₗ.[ℂ] H) :
-    T.numericalRange = (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x | ‖x‖ = 1} := rfl
+@[inherit_doc numericalRange]
+scoped notation "Θ" => numericalRange
 
-lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : T.numericalRange.Nonempty := by
-  obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot hT
-  refine ⟨(‖x‖ ^ 2)⁻¹ * ⟪x, T ⟨x, hx⟩⟫_ℂ, ofReal ‖x‖⁻¹ • ⟨x, hx⟩, ?_, ?_⟩
-  · simp [norm_smul, inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx')]
+lemma numericalRange_eq (T : H →ₗ.[ℂ] H) : Θ T = (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x | ‖x‖ = 1} := rfl
+
+lemma mem_numericalRange {T : H →ₗ.[ℂ] H} {x : T.domain} (hx : x ≠ 0) :
+    (‖x‖ ^ 2)⁻¹ * ⟪↑x, T x⟫_ℂ ∈ Θ T := by
+  refine ⟨ofReal ‖x‖⁻¹ • x, ?_, ?_⟩
+  · simp [norm_smul, inv_mul_cancel₀, hx]
   · simp_rw [map_smul]
     simp [inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
 
-lemma numericalRange_smul (T : H →ₗ.[ℂ] H) (c : ℂ) :
-    (c • T).numericalRange = c • T.numericalRange := by
+lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : (Θ T).Nonempty := by
+  obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot hT
+  use (‖x‖ ^ 2)⁻¹ * ⟪x, T ⟨x, hx⟩⟫_ℂ
+  exact mem_numericalRange (x := ⟨x, hx⟩) (Subtype.coe_ne_coe.mp hx')
+
+@[simp]
+lemma numericalRange_neg (T : H →ₗ.[ℂ] H) : Θ (-T) = -Θ T := by
+  ext
+  simp [numericalRange_eq, neg_eq_iff_eq_neg]
+
+@[simp]
+lemma numericalRange_smul (T : H →ₗ.[ℂ] H) (c : ℂ) : Θ (c • T) = c • Θ T := by
   ext
   simp [numericalRange_eq, inner_smul_right, mem_smul_set]
 
-lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
-    (T - c • 1).numericalRange = T.numericalRange - {c} := by
+lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) : Θ (T - c • 1) = Θ T - {c} := by
   ext z
   constructor
   · intro ⟨x, hx, hxz⟩
@@ -435,13 +475,13 @@ lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
 
 /-- The regularity domain contains the exterior of the numerical range. -/
 lemma compl_closure_numericalRange_subset_regularityDomain (T : H →ₗ.[ℂ] H) :
-    (_root_.closure T.numericalRange)ᶜ ⊆ T.regularityDomain := by
+    (_root_.closure (Θ T))ᶜ ⊆ T.regularityDomain := by
   intro z hz
   by_cases hT : T.domain = ⊥
   · refine ⟨1, zero_lt_one, fun ⟨x, hx⟩ ↦ ?_⟩
     rw [hT] at hx
     simp_all
-  · use infDist z T.numericalRange
+  · use infDist z (Θ T)
     constructor
     · exact (infDist_pos_iff_notMem_closure <| numericalRange_nonempty hT).mp hz
     · intro x
@@ -484,7 +524,7 @@ private lemma exists_phase_add_im_eq_zero (z₁ z₂ : ℂ) :
     exact (mem_image _ _ _).mp (hIVT ⟨by linarith, by linarith⟩)
 
 /-- The Toeplitz-Hausdorff theorem. -/
-theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRange := by
+theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ (Θ T) := by
   intro z₀ hz₀ z₁ hz₁ a b ha hb hab
   rcases eq_or_ne z₁ z₀ with rfl | hz
   · simp [← add_mul, eq_sub_iff_add_eq.mpr hab, hz₁]
@@ -499,7 +539,7 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
     have hy₁ : ‖y₁‖ = 1 := hx₁
     have h₀ : ⟪↑y₀, S y₀⟫_ℂ = 0 := by simp_all [S, y₀, sub_apply, inner_smul_right, inner_sub_right]
     have h₁ : ⟪↑y₁, S y₁⟫_ℂ = 1 := by simp_all [S, y₁, sub_apply, inner_smul_right, inner_sub_right]
-    suffices ofReal '' unitInterval ⊆ S.numericalRange by
+    suffices ofReal '' unitInterval ⊆ Θ S by
       have hba : a = 1 - b := by linarith
       rw [numericalRange_smul, numericalRange_sub_const] at this
       obtain ⟨c, hc, hca⟩ := (image_subset_iff.mp this) ⟨hb, by linarith⟩
@@ -535,8 +575,8 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
             simp [map_smul, inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
           _ = ⟪↑(-(r • y₂)), S (-(r • y₂))⟫_ℂ := by simp [eq_neg_iff_add_eq_zero.mpr hr]
         simp [map_neg, ← Complex.coe_smul, map_smul, inner_smul_left, inner_smul_right, pow_two, h₂]
-    -- `g r = ⟪f r, S (f r)⟫_ℂ / ‖f r‖²` is real (by def of `θ`) and clearly in `S.numericalRange`.
-    -- `g 0 = 0`, `g 1 = 1` and continuity ensure that all of `[0,1]` is also in `S.numericalRange`.
+    -- `g r = ⟪f r, S (f r)⟫_ℂ / ‖f r‖²` is real (by def of `θ`) and clearly in `Θ S`.
+    -- `g 0 = 0`, `g 1 = 1` and continuity ensure that all of `[0,1]` is also in `Θ S`.
     let g : ℝ → ℝ := fun t ↦ (t ^ 2 + (1 - t) * t * (⟪↑y₀, S y₂⟫_ℂ + ⟪↑y₂, S y₀⟫_ℂ).re) / ‖f t‖ ^ 2
     have hg₀ : g 0 = 0 := by simp [g]
     have hg₁ : g 1 = 1 := by simp [g, f, coe_norm y₂ ▸ hy₂]
@@ -560,8 +600,6 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
         zero_add, ofReal_neg, neg_mul, mul_neg, mul_one, add_re, ofReal_add, ofReal_mul,
         ofReal_sub, ofReal_one, ofReal_pow]
       ring
-
-end
 
 /-!
 ## D. Spectrum of a closed operator

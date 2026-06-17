@@ -20,10 +20,15 @@ def main():
         print(f"Error: {physlib_alpha_lean} file not found")
         return False
 
-    # Get all .lean files in PhyslibAlpha directory
-    lean_files = sorted([f.name for f in physlib_alpha_dir.glob("*.lean")])
+    # Get all .lean files in PhyslibAlpha directory (recursively, including nested subdirectories)
+    # and convert each to its module name, e.g. PhyslibAlpha/Sub/File.lean -> PhyslibAlpha.Sub.File
+    lean_modules = set()
+    for f in physlib_alpha_dir.rglob("*.lean"):
+        rel = f.relative_to(physlib_alpha_dir).with_suffix("")
+        module_name = ".".join(("PhyslibAlpha",) + rel.parts)
+        lean_modules.add(module_name)
 
-    if not lean_files:
+    if not lean_modules:
         print(f"No .lean files found in {physlib_alpha_dir}")
         return True
 
@@ -31,22 +36,20 @@ def main():
     with open(physlib_alpha_lean, 'r') as f:
         content = f.read()
 
-    # Extract import statements (looking for "import PhyslibAlpha.<module>" where <module> is a direct file, not nested)
-    import_pattern = r'import\s+PhyslibAlpha\.(\w+)(?:\s|$)'
-    imports = set(re.findall(import_pattern, content))
-    imported_files = {f"{name}.lean" for name in imports}
+    # Extract import statements (looking for "import PhyslibAlpha.<module>" including nested modules)
+    import_pattern = r'import\s+(PhyslibAlpha(?:\.\w+)+)'
+    imported_modules = set(re.findall(import_pattern, content))
 
     # Check for missing imports
-    missing = set(lean_files) - imported_files
+    missing = lean_modules - imported_modules
 
     if missing:
         print(f"Error: The following .lean files are not imported in {physlib_alpha_lean}:")
-        for file in sorted(missing):
-            module_name = file.replace(".lean", "")
-            print(f"  - public import PhyslibAlpha.{module_name}")
+        for module_name in sorted(missing):
+            print(f"  - public import {module_name}")
         return False
     else:
-        print(f"✓ All {len(lean_files)} .lean files in {physlib_alpha_dir} are imported in {physlib_alpha_lean}")
+        print(f"✓ All {len(lean_modules)} .lean files in {physlib_alpha_dir} are imported in {physlib_alpha_lean}")
         return True
 
 if __name__ == "__main__":
