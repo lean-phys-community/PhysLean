@@ -75,9 +75,9 @@ lemma im_eq_zero_of_mem_numericalRange {z : ℂ} (hz : z ∈ Θ T) : z.im = 0 :=
   exact conj_eq_iff_im.mp (hxz ▸ isSymmetric_iff_inner_map_self_real.mp hT x)
 
 /-- The numerical range of a symmetric operator is contained in the real axis. -/
-lemma numericalRange_subset : Θ T ⊆ ofReal '' univ := by
+lemma numericalRange_subset : Θ T ⊆ range ofReal := by
   intro z hz
-  refine ⟨z.re, mem_univ _, ?_⟩
+  use z.re
   rw [← re_add_im z]
   simp [hT.im_eq_zero_of_mem_numericalRange hz]
 
@@ -92,6 +92,13 @@ lemma numericalRange_eq : Θ T = ofReal '' Θᵣₑ T := by
     obtain ⟨s, _, rfl⟩ := hT.numericalRange_subset hw
     exact hrz ▸ (ofReal_re s ▸ hwr) ▸ hw
 
+lemma closure_numericalRange_subset : _root_.closure (Θ T) ⊆ range ofReal := by
+  refine (closure_mono hT.numericalRange_subset).trans ?_
+  have h : range ofReal = im ⁻¹' {0} := by
+    ext z
+    exact ⟨fun ⟨r, hr⟩ ↦ hr ▸ ofReal_im r, fun hz ↦ ⟨z.re, Eq.symm (Complex.ext rfl hz)⟩⟩
+  exact (h ▸ IsClosed.preimage (by fun_prop) (by simp)).closure_subset
+
 /-!
 ## B. Regularity domain
 -/
@@ -99,21 +106,15 @@ lemma numericalRange_eq : Θ T = ofReal '' Θᵣₑ T := by
 /-- The regularity domain of a symmetric operator contains all complex numbers with non-zero
   imaginary part. -/
 lemma mem_regularityDomain_of_im_ne_zero {z : ℂ} (hz : z.im ≠ 0) : z ∈ T.regularityDomain := by
-  refine ⟨|z.im|, abs_pos.mpr hz, fun x ↦ ?_⟩
-  refine le_of_sq_le_sq ?_ (norm_nonneg _)
-  have h : ‖z‖ ^ 2 = z.re ^ 2 + z.im ^ 2 := norm_eq_sqrt_sq_add_sq z ▸ Real.sq_sqrt (by nlinarith)
-  have h' : (⟪T x, x⟫_ℂ).im = 0 := conj_eq_iff_im.mp (isSymmetric_iff_inner_map_self_real.mp hT x)
-  refine le_of_le_of_eq (b := ‖T x - z.re • x‖ ^ 2 + z.im ^ 2 * ‖x‖ ^ 2) ?_ ?_
-  · simp [mul_pow]
-  · simp [norm_sub_sq (𝕜 := ℂ), ← Complex.coe_smul, inner_smul_right, norm_smul, mul_pow,
-      add_assoc, add_mul, h, h']
+  apply T.compl_closure_numericalRange_subset_regularityDomain
+  refine (mem_compl_iff _ _).mpr fun h ↦ hz ?_
+  obtain ⟨r, _, rfl⟩ := hT.closure_numericalRange_subset h
+  exact ofReal_im r
 
 /-- The regularity domain of a symmetric operator contains all complex numbers with non-zero
   imaginary part. -/
-lemma compl_ofReal_subset_regularityDomain : (ofReal '' univ)ᶜ ⊆ T.regularityDomain := by
-  intro z hz
-  refine hT.mem_regularityDomain_of_im_ne_zero ?_
-  exact fun h ↦ hz ⟨z.re, mem_univ _, Eq.symm (Complex.ext rfl h)⟩
+lemma compl_ofReal_subset_regularityDomain : (range ofReal)ᶜ ⊆ T.regularityDomain :=
+  fun z hz ↦ hT.mem_regularityDomain_of_im_ne_zero fun h ↦ hz ⟨z.re, Eq.symm (Complex.ext rfl h)⟩
 
 /-- If `m` is a lower bound on the numerical range then the regularity domain contains `(-∞,m)`. -/
 lemma Iio_subset_regularityDomain {m : ℝ} (h : m ∈ lowerBounds (Θᵣₑ T)) :
