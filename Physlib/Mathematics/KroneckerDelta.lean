@@ -9,6 +9,7 @@ public import Mathlib.Algebra.BigOperators.Group.Finset.Piecewise
 public import Mathlib.Algebra.CharZero.Defs
 public import Mathlib.Algebra.Field.Defs
 public import Mathlib.Algebra.Module.Defs
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 /-!
 
 # Kronecker delta
