@@ -101,5 +101,34 @@ lemma compl_ofReal_subset_regularityDomain : (ofReal '' univ)ᶜ ⊆ T.regularit
   refine hT.mem_regularityDomain_of_im_ne_zero ?_
   exact fun h ↦ hz ⟨z.re, mem_univ _, Eq.symm (Complex.ext rfl h)⟩
 
+/-- If `m` is a lower bound on the numerical range then the regularity domain contains `(-∞,m)`. -/
+lemma Iio_subset_regularityDomain {m : ℝ} (h : m ∈ lowerBounds (Θᵣₑ T)) :
+    ofReal '' Iio m ⊆ T.regularityDomain := by
+  intro z ⟨r, hr, hrz⟩
+  refine ⟨m - r, sub_pos.mpr hr, fun x ↦ ?_⟩
+  rcases eq_zero_or_neZero x with rfl | hx
+  · simp
+  · obtain ⟨s, hs, hs'⟩ := hT.numericalRange_eq ▸ mem_numericalRange hx.ne
+    apply h at hs
+    have hsr : r < s := lt_of_lt_of_le hr hs
+    refine le_of_mul_le_mul_right ?_ (norm_pos_iff.mpr hx.ne)
+    calc
+      _ = (m - r) * ‖x‖ ^ 2 := by rw [mul_assoc, pow_two]
+      _ ≤ (s - r) * ‖x‖ ^ 2 := by nlinarith
+      _ = ‖s * ‖x‖ ^ 2 - r * ‖x‖ ^ 2‖ := by simp [← sub_mul, abs_of_pos, sub_pos, hsr]
+      _ = ‖(s : ℂ) * ‖x‖ ^ 2 - r * ‖x‖ ^ 2‖ := by simp [← ofReal_pow, ← ofReal_mul, ← ofReal_sub]
+      _ = ‖⟪↑x, T x⟫_ℂ - r * ‖x‖ ^ 2‖ := by simp [hs', mul_comm, hx.ne]
+      _ = ‖⟪↑x, T x - z • x⟫_ℂ‖ := by simp [inner_sub_right, inner_smul_right, hrz]
+      _ ≤ ‖T x - z • x‖ * ‖x‖ := mul_comm _ ‖x‖ ▸ norm_inner_le_norm _ _
+
+/-- If `m` is an upper bound on the numerical range then the regularity domain contains `(m,∞)`. -/
+lemma Ioi_subset_regularityDomain {m : ℝ} (h : m ∈ upperBounds (Θᵣₑ T)) :
+    ofReal '' Ioi m ⊆ T.regularityDomain := by
+  intro z ⟨r, hr, hrz⟩
+  rw [← neg_mem_neg, ← regularityDomain_neg]
+  refine hT.neg.Iio_subset_regularityDomain (m := -m) ?_ ?_
+  · exact fun _ _ ↦ by simp_all [neg_le.mp, upperBounds]
+  · exact ⟨-r, by simp [mem_Ioi.mp hr], by simp [hrz]⟩
+
 end IsSymmetric
 end LinearPMap
