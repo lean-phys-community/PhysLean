@@ -14,6 +14,7 @@
 - Never use structure fields of type `True`, or theorems returning `True`.
 - Never use an existential statement of the form `∃ x, ..., True` (any number of quantifiers ending in `True`).
 - Never use a scope-level variable hypothesis that assumes the conclusion, or a statement that trivially entails it.
+- Never include trailing white space. 
 - Do not add lemmas that are trivial rewrites of existing Mathlib or Physlib results, unless they add genuine physics context.
 - Place results in the appropriate existing file; do not create new files without good reason. For example, if you need to prove a general result about derivatives on space in order to prove something in classical mechanics, that result should go in `Space.Derivatives.Basic`, not the classical mechanics file.
 - Include sections which are numbered by `# A. ...`, `## A.1. ...`. See [Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean](Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean) for an example.
