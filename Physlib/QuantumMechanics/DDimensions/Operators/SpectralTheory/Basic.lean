@@ -38,7 +38,7 @@ Definitions (corresponding to an operator `T : H →ₗ.[ℂ] H`)
     is orthogonal to the range of `T - z • 1`.
 - `LinearPMap.defectNumber` : Given a complex number `z`, the rank of the corresponding
     deficiency subspace as a (possibly infinite) cardinal.
-- `LinearPMap.numericalRange` : The set of complex numbers `⟪x, T x⟫_ℂ` as `x` ranges over
+- `LinearPMap.numericalRange` (`Θ`) : The set of complex numbers `⟪x, T x⟫_ℂ` as `x` ranges over
     the unit sphere in `T.domain`.
 - `LinearPMap.resolventSet` (`ρ`) : The set of complex numbers `z` for which `T - z • 1`
     has a continuous (equivalently, bounded) inverse with domain all of `H`.
@@ -435,8 +435,10 @@ lemma IsClosable.defectNumber_const [CompleteSpace H]
 /-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1} ⊆ ℂ`. -/
 def numericalRange (T : H →ₗ.[ℂ] H) : Set ℂ := (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x : T.domain | ‖x‖ = 1}
 
-lemma numericalRange_eq (T : H →ₗ.[ℂ] H) :
-    T.numericalRange = (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x | ‖x‖ = 1} := rfl
+@[inherit_doc numericalRange]
+scoped notation "Θ" => numericalRange
+
+lemma numericalRange_eq (T : H →ₗ.[ℂ] H) : Θ T = (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x | ‖x‖ = 1} := rfl
 
 lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : T.numericalRange.Nonempty := by
   obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot hT
@@ -450,8 +452,7 @@ lemma numericalRange_smul (T : H →ₗ.[ℂ] H) (c : ℂ) :
   ext
   simp [numericalRange_eq, inner_smul_right, mem_smul_set]
 
-lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
-    (T - c • 1).numericalRange = T.numericalRange - {c} := by
+lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) : Θ (T - c • 1) = Θ T - {c} := by
   ext z
   constructor
   · intro ⟨x, hx, hxz⟩
@@ -464,13 +465,13 @@ lemma numericalRange_sub_const (T : H →ₗ.[ℂ] H) (c : ℂ) :
 
 /-- The regularity domain contains the exterior of the numerical range. -/
 lemma compl_closure_numericalRange_subset_regularityDomain (T : H →ₗ.[ℂ] H) :
-    (_root_.closure T.numericalRange)ᶜ ⊆ T.regularityDomain := by
+    (_root_.closure (Θ T))ᶜ ⊆ T.regularityDomain := by
   intro z hz
   by_cases hT : T.domain = ⊥
   · refine ⟨1, zero_lt_one, fun ⟨x, hx⟩ ↦ ?_⟩
     rw [hT] at hx
     simp_all
-  · use infDist z T.numericalRange
+  · use infDist z (Θ T)
     constructor
     · exact (infDist_pos_iff_notMem_closure <| numericalRange_nonempty hT).mp hz
     · intro x
@@ -513,7 +514,7 @@ private lemma exists_phase_add_im_eq_zero (z₁ z₂ : ℂ) :
     exact (mem_image _ _ _).mp (hIVT ⟨by linarith, by linarith⟩)
 
 /-- The Toeplitz-Hausdorff theorem. -/
-theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRange := by
+theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ (Θ T) := by
   intro z₀ hz₀ z₁ hz₁ a b ha hb hab
   rcases eq_or_ne z₁ z₀ with rfl | hz
   · simp [← add_mul, eq_sub_iff_add_eq.mpr hab, hz₁]
@@ -528,7 +529,7 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
     have hy₁ : ‖y₁‖ = 1 := hx₁
     have h₀ : ⟪↑y₀, S y₀⟫_ℂ = 0 := by simp_all [S, y₀, sub_apply, inner_smul_right, inner_sub_right]
     have h₁ : ⟪↑y₁, S y₁⟫_ℂ = 1 := by simp_all [S, y₁, sub_apply, inner_smul_right, inner_sub_right]
-    suffices ofReal '' unitInterval ⊆ S.numericalRange by
+    suffices ofReal '' unitInterval ⊆ Θ S by
       have hba : a = 1 - b := by linarith
       rw [numericalRange_smul, numericalRange_sub_const] at this
       obtain ⟨c, hc, hca⟩ := (image_subset_iff.mp this) ⟨hb, by linarith⟩
@@ -564,8 +565,8 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
             simp [map_smul, inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
           _ = ⟪↑(-(r • y₂)), S (-(r • y₂))⟫_ℂ := by simp [eq_neg_iff_add_eq_zero.mpr hr]
         simp [map_neg, ← Complex.coe_smul, map_smul, inner_smul_left, inner_smul_right, pow_two, h₂]
-    -- `g r = ⟪f r, S (f r)⟫_ℂ / ‖f r‖²` is real (by def of `θ`) and clearly in `S.numericalRange`.
-    -- `g 0 = 0`, `g 1 = 1` and continuity ensure that all of `[0,1]` is also in `S.numericalRange`.
+    -- `g r = ⟪f r, S (f r)⟫_ℂ / ‖f r‖²` is real (by def of `θ`) and clearly in `Θ S`.
+    -- `g 0 = 0`, `g 1 = 1` and continuity ensure that all of `[0,1]` is also in `Θ S`.
     let g : ℝ → ℝ := fun t ↦ (t ^ 2 + (1 - t) * t * (⟪↑y₀, S y₂⟫_ℂ + ⟪↑y₂, S y₀⟫_ℂ).re) / ‖f t‖ ^ 2
     have hg₀ : g 0 = 0 := by simp [g]
     have hg₁ : g 1 = 1 := by simp [g, f, coe_norm y₂ ▸ hy₂]
