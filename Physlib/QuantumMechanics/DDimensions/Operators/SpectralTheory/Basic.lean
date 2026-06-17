@@ -98,6 +98,7 @@ open Metric
 open InnerProductSpace
 open Complex
 open Set
+open Pointwise
 
 /-- The resolvent, `(T - z • 1)⁻¹`. -/
 abbrev resolvent (T : H →ₗ.[ℂ] H) (z : ℂ) : H →ₗ.[ℂ] H := (T - z • 1).inverse
@@ -111,6 +112,11 @@ local notation "𝑅" => resolvent
 
 /-- `IsLowerBound T z c` is the property that `c * ‖x‖ ≤ ‖T x - z • x‖` for all `x : T.domain`. -/
 def IsLowerBound (T : H →ₗ.[ℂ] H) (z : ℂ) (c : ℝ) : Prop := ∀ x : T.domain, c * ‖x‖ ≤ ‖T x - z • x‖
+
+lemma isLowerBound_neg {T : H →ₗ.[ℂ] H} {z : ℂ} {c : ℝ} (h : IsLowerBound T z c) :
+    IsLowerBound (-T) (-z) c := by
+  intro x
+  simp only [neg_apply, neg_smul, sub_neg_eq_add, norm_neg_add, h x]
 
 lemma isLowerBound_of_right_le
     {T : H →ₗ.[ℂ] H} {z : ℂ} {c₁ c₂ : ℝ} (hle : c₁ ≤ c₂) (h : IsLowerBound T z c₂) :
@@ -141,6 +147,33 @@ lemma isLowerBound_closure
   `z : ℂ` is a regular point for `T` iff there exists a constant `c > 0` such that
   `c * ‖x‖ ≤ ‖(T - z • 1) x‖` for all `x ∈ T.domain`. -/
 def regularityDomain (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | ∃ c > 0, IsLowerBound T z c}
+
+@[simp]
+lemma regularityDomain_neg (T : H →ₗ.[ℂ] H) : (-T).regularityDomain = -T.regularityDomain := by
+  ext z
+  constructor
+  · exact fun ⟨c, hc, h_bound⟩ ↦ ⟨c, hc, neg_neg T ▸ isLowerBound_neg h_bound⟩
+  · exact fun ⟨c, hc, h_bound⟩ ↦ ⟨c, hc, neg_neg z ▸ isLowerBound_neg h_bound⟩
+
+@[simp]
+lemma regularityDomain_smul (T : H →ₗ.[ℂ] H) {w : ℂ} (hw : w ≠ 0) :
+    (w • T).regularityDomain = w • T.regularityDomain := by
+  ext z
+  constructor
+  · intro ⟨c, hc, h_bound⟩
+    refine ⟨w⁻¹ * z, ?_, ?_⟩
+    · refine ⟨‖w‖⁻¹ * c, by positivity, fun x ↦ ?_⟩
+      rw [mul_assoc]
+      apply (inv_mul_le_iff₀ <| norm_pos_iff.mpr hw).mpr
+      rw [← norm_smul, smul_sub, smul_smul, mul_inv_cancel_left₀ hw]
+      exact h_bound x
+    · simp [hw]
+  · intro ⟨u, ⟨c, hc, h_bound⟩, huz⟩
+    refine ⟨‖w‖ * c, by positivity, fun x ↦ ?_⟩
+    rw [mul_assoc]
+    apply (le_inv_mul_iff₀ <| norm_pos_iff.mpr hw).mp
+    refine le_of_le_of_eq (h_bound x) ?_
+    simp [← norm_inv, ← norm_smul, smul_sub, smul_smul, ← huz, hw]
 
 /-- `T ≤ T'` implies `T'.regularityDomain ⊆ T.regularityDomain`. -/
 lemma regularityDomain_antitone : Antitone (regularityDomain (H := H)) :=
@@ -399,10 +432,6 @@ lemma IsClosable.defectNumber_const [CompleteSpace H]
 ## C. Numerical range
 -/
 
-section
-
-open Pointwise
-
 /-- The set `{⟪x, T x⟫_ℂ | x ∈ T.domain ∧ ‖x‖ = 1} ⊆ ℂ`. -/
 def numericalRange (T : H →ₗ.[ℂ] H) : Set ℂ := (fun x ↦ ⟪↑x, T x⟫_ℂ) '' {x : T.domain | ‖x‖ = 1}
 
@@ -560,8 +589,6 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ T.numericalRan
         zero_add, ofReal_neg, neg_mul, mul_neg, mul_one, add_re, ofReal_add, ofReal_mul,
         ofReal_sub, ofReal_one, ofReal_pow]
       ring
-
-end
 
 /-!
 ## D. Spectrum of a closed operator
