@@ -872,9 +872,9 @@ Assuming that the initial coordinate and velocity are not simultaneously zero,
 the time stamps when the harmonic oscillator returns to its initial coordinate and velocity is
 a multiple of its period
 -/
-lemma return_time (IC : InitialConditions) (non_trivial : (IC.x₀ ≠ 0 ∨ IC.v₀ ≠ 0) )
+lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v₀ ≠ 0)
     (t : Time) (ht : IC.trajectory S t = IC.x₀ ∧ ∂ₜ (IC.trajectory S) t = IC.v₀) :
-    (∃ n : ℤ,  (n : ℝ ) * (T S) = t) := by
+    ∃ n : ℤ,  (n : ℝ) * (T S) = t := by
   have htx := ht.left
   have htv := ht.right
   rw [InitialConditions.trajectory_eq] at htx
