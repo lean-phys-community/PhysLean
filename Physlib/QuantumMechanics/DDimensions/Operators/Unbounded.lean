@@ -12,11 +12,15 @@ public import Physlib.Mathematics.LinearPMap
 
 ## i. Overview
 
-In this module we introduce unbounded operators on inner product spaces. By "unbounded operator"
-we mean a partially-defined linear map (`LinearPMap`) which is both densely defined and closable.
-These provide the mathematical structure appropriate for describing operators in non-relativistic
-quantum mechanics. Of particular interest are (essentially) self-adjoint unbounded operators since
-these correspond to physical observables.
+The appropriate mathematical objects for discussing operators in non-relativistic quantum mechanics
+are partially-defined linear map (`LinearPMap`) between complex Hilbert spaces, `H →ₗ.[ℂ] H'`.
+An import class of operators in NRQM are those which are both densely defined and closable,
+which we refer to as _unbounded_. When `H = H'` operators may also be symmetric, self-adjoint or
+essentially self-adjoint (closure is self-adjoint).
+
+In this module we collect results on how the properties `HasDenseDomain`, `IsUnbounded`,
+`IsSymmetric`, `IsSelfAdjoint` and `IsEssentiallySelfAdjoint` interact with the basic algebraic
+operations, closure, adjoints and each other.
 
 ### Notes
 
@@ -33,10 +37,15 @@ these correspond to physical observables.
 
 ## ii. Key results
 
-- `LinearPMap.compRestricted` : For two partial linear maps `g : F →ₗ[R] G` and `f : E →ₗ[R] F`,
-    the composition of `g` with `f` with natural domain `{x : f.domain | f x ∈ g.domain}`.
-- `LinearPMap.instMonoid` : Partial linear maps `E →ₗ.[R] E` with `compRestricted`
-    for multiplication and the identity map for `1` comprise a monoid.
+Definitions
+- `HasDenseDomain` : An operator `U : H →ₗ.[ℂ] H'` has dense domain if `U.domain` is dense in `H`.
+- `IsUnbounded` : An operator is unbounded if it is both densely defined and closable.
+- `IsSymmetric` : An operator `T : H →ₗ.[ℂ] H` is symmetric if `⟪T x, y⟫_ℂ = ⟪x, T y⟫_ℂ` holds
+    for all `x y : T.domain`.
+- `IsEssentiallySelfAdjoint` : An operator `T : H →ₗ.[ℂ] H` is essentially self-adjoint if
+    its closure is self-adjoint.
+
+Results
 - `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
     dense domain.
 - `adjoint_compRestricted_le_compRestricted_adjoint` : The inequality `U† ∘ᵣ V† ≤ (V ∘ᵣ U)†`
@@ -64,10 +73,8 @@ these correspond to physical observables.
 
 ## iv. References
 
-- M. Reed & B. Simon, (1972). "Methods of modern mathematical physics: Vol. 1. Functional analysis".
-  Academic Press. https://doi.org/10.1016/B978-0-12-585001-8.X5001-6
-- K. Schmüdgen, (2012). "Unbounded self-adjoint operators on Hilbert space" (Vol. 265). Springer.
-  https://doi.org/10.1007/978-94-007-4753-1
+- [Reed and Simon, *Methods of Modern Mathematical Physics, Vol. I: Functional Analysis*][Reed1972]
+- [Konrad Schmüdgen, *Unbounded Self-Adjoint Operators on Hilbert Space*][Schmudgen2012]
 
 -/
 
