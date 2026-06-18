@@ -942,7 +942,6 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
     _ = c * (det / det) := by rfl
     _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
     _ = _ := by rfl
-
   let ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp (Eq.symm hcos)
   use n
   calc
