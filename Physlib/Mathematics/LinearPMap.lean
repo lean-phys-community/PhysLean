@@ -50,25 +50,11 @@ these correspond to physical observables.
 
 ## iii. Table of contents
 
-- A. General
-  - A.1. DistribMulAction
-  - A.2. Finite sums
-  - A.3. Restricted composition
-  - A.4. Monoid
-  - A.5. Inequalities
-  - A.6. Inverses
-- B. Operators on inner product/Hilbert spaces
-  - B.1. Definitions
-  - B.2. Basic properties
-    - B.2.1. Dense domain
-    - B.2.2. Closability
-    - B.2.3. Adjoints
-    - B.2.4. Continuity / boundedness
-  - B.3. Classes of operators
-    - B.3.1. Symmetric operators
-    - B.3.2. Self-adjoint operators
-    - B.3.3. Essentially self-adjoint operators
-    - B.3.4. Unbounded operators
+- A. Inequalities
+- B. Finite sums
+- C. Restricted composition
+- D. Monoid
+- E. Inverses
 
 ## iv. References
 
@@ -83,15 +69,6 @@ these correspond to physical observables.
 
 namespace LinearPMap
 
-/-!
-## A. General
-
-This section contains useful general results for partial linear maps which do not rely
-on an inner product/Hilbert space structure.
--/
-
-section General
-
 open Submodule
 
 variable {R : Type*} [Ring R]
@@ -99,24 +76,77 @@ variable {E : Type*} [AddCommGroup E] [Module R E]
 variable {F : Type*} [AddCommGroup F] [Module R F]
 
 /-!
-### A.1. DistribMulAction
+## A. Inequalities
 -/
 
-section
+section Inequalities
 
-variable {M : Type*} [Monoid M] [DistribMulAction M F] [SMulCommClass R M F]
+variable (f f₁ f₂ f₃ : E →ₗ.[R] F) {g g₁ g₂ : E →ₗ.[R] F}
 
-instance instDistribMulAction : DistribMulAction M (E →ₗ.[R] F) where
-  smul_zero _ := by ext; rfl; simp
-  smul_add _ _ _ := by ext; rfl; simp [add_apply]
+lemma sub_le_zero : f - f ≤ 0 := ⟨le_top, by simp [sub_apply]⟩
 
-end
+lemma neg_add_le_zero : -f + f ≤ 0 := ⟨le_top, by simp [add_apply]⟩
+
+lemma le_iff_neg_le_neg : g₁ ≤ g₂ ↔ -g₁ ≤ -g₂ :=
+  ⟨fun ⟨h, h'⟩ ↦ ⟨h, fun _ _ h'' ↦ by simp [h' h'']⟩, fun ⟨h, _⟩ ↦ ⟨h, fun _ _ _ ↦ by aesop⟩⟩
+
+lemma le_neg_iff_neg_le : g₁ ≤ -g₂ ↔ -g₁ ≤ g₂ := by rw [le_iff_neg_le_neg, neg_neg]
+
+lemma add_sub_le_cancel : f₁ + (f₂ - f₁) ≤ f₂ :=
+  ⟨by simp [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
+
+lemma add_sub_le_cancel_left : f₁ + f₂ - f₁ ≤ f₂ := add_sub_assoc f₁ f₂ f₁ ▸ add_sub_le_cancel f₁ f₂
+
+lemma add_sub_le_cancel_right : f₁ + f₂ - f₂ ≤ f₁ := add_comm f₁ f₂ ▸ add_sub_le_cancel_left f₂ f₁
+
+lemma add_add_sub_le_cancel : f₁ + f₂ + (f₃ - f₂) ≤ f₁ + f₃ :=
+  ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
+
+lemma add_sub_sub_le_cancel : f₁ + f₂ - (f₁ - f₃) ≤ f₂ + f₃ :=
+  ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
+
+lemma sub_sub_sub_le_cancel_right : f₁ - f₂ - (f₃ - f₂) ≤ f₁ - f₃ := by
+  simp only [sub_eq_add_neg, neg_add]
+  exact sub_eq_add_neg (-f₃) (-f₂) ▸ add_add_sub_le_cancel f₁ (-f₂) (-f₃)
+
+lemma sub_sub_sub_le_cancel_left : f₁ - f₂ - (f₁ - f₃) ≤ f₃ - f₂ :=
+  sub_eq_add_neg f₁ f₂ ▸ neg_add_eq_sub f₂ f₃ ▸ add_sub_sub_le_cancel f₁ (-f₂) f₃
+
+lemma sub_le_of_le_add (h : g ≤ g₁ + g₂) : g - g₂ ≤ g₁ := by
+  constructor
+  · exact (inf_le_of_left_le le_rfl).trans (le_inf_iff.mp <| add_domain g₁ g₂ ▸ h.1).1
+  · intro ⟨x, hx⟩ ⟨y, hy⟩ rfl
+    simp [sub_apply, @h.2 ⟨x, hx.1⟩ ⟨x, ⟨hy, hx.2⟩⟩ rfl, add_apply]
+
+lemma sub_add_le_cancel : f₁ - f₂ + f₂ ≤ f₁ :=
+  sub_eq_add_neg f₁ f₂ ▸ sub_neg_eq_add _ f₂ ▸ add_sub_le_cancel_right f₁ (-f₂)
+
+lemma add_le_of_le_sub (h : g ≤ g₁ - g₂) : g + g₂ ≤ g₁ :=
+  sub_neg_eq_add g g₂ ▸ sub_le_of_le_add (sub_eq_add_neg g₁ g₂ ▸ h)
+
+lemma add_left_le_of_le (h : g₁ ≤ g₂) : f + g₁ ≤ f + g₂ := by
+  constructor
+  · simp only [add_domain, le_inf_iff, inf_le_left, true_and]
+    exact (inf_le_of_right_le le_rfl).trans h.1
+  · intro x y hxy
+    simp_rw [add_apply, @h.2 ⟨x, x.2.2⟩ ⟨y, y.2.2⟩ hxy, hxy]
+
+lemma add_right_le_of_le (h : g₁ ≤ g₂) : g₁ + f ≤ g₂ + f :=
+  add_comm f g₁ ▸ add_comm f g₂ ▸ add_left_le_of_le f h
+
+lemma sub_right_le_of_le (h : g₁ ≤ g₂) : g₁ - f ≤ g₂ - f :=
+  sub_eq_add_neg g₁ f ▸ sub_eq_add_neg g₂ f ▸ add_right_le_of_le (-f) h
+
+lemma sub_left_le_of_le (h : g₁ ≤ g₂) : f - g₁ ≤ f - g₂ :=
+  neg_sub g₁ f ▸ neg_sub g₂ f ▸ le_iff_neg_le_neg.mp (sub_right_le_of_le f h)
+
+end Inequalities
 
 /-!
-### A.2. Finite sums
+## B. Finite sums
 -/
 
-section
+section Sums
 
 variable {α : Type*} [Fintype α] (f : α → E →ₗ.[R] F)
 
@@ -136,10 +166,10 @@ lemma sum_domain_le (a : α) : (sum f).domain ≤ (f a).domain := fun _ _ ↦ by
 lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_le f a ψ.2⟩ := by
   simp [sum, inclusion_apply]
 
-end
+end Sums
 
 /-!
-### A.3. Restricted composition
+## C. Restricted composition
 
 The composition of two partial linear maps `g : F →ₗ.[R] G` and `f : E →ₗ.[R] F` is defined
 only if the range of `f` is contained in the domain of `g` (c.f. `LinearPMap.comp`).
@@ -148,7 +178,7 @@ to exactly those `x : f.domain` for which `f x ∈ g.domain`. This allows one to
 composition of partial linear maps while having the domain implicitly accounted for.
 -/
 
-section
+section Composition
 
 variable {G : Type*} [AddCommGroup G] [Module R G]
 
@@ -300,14 +330,16 @@ lemma smul_compRestricted {M : Type*} [Monoid M] [DistribMulAction M G] [SMulCom
   · simp [compRestricted_domain]
   · simp
 
-end
+end Composition
 
 /-!
-### A.4. Monoid
+## D. Monoid
 
 Partial linear maps `E →ₗ.[R] E` with `compRestricted` for multiplication and
 the identity map (domain `⊤`) for `1` comprise a monoid.
 -/
+
+section Monoid
 
 instance instMonoid : Monoid (E →ₗ.[R] E) where
   mul := compRestricted
@@ -335,76 +367,13 @@ lemma one_toFun : (1 : E →ₗ.[R] E).toFun = topEquiv.toLinearMap := rfl
 @[simp]
 lemma one_coe : (1 : E →ₗ.[R] E).toFun' = ⇑topEquiv.toLinearMap := rfl
 
-/-!
-### A.5. Inequalities
--/
-
-section
-
-variable (f f₁ f₂ f₃ : E →ₗ.[R] F) {g g₁ g₂ : E →ₗ.[R] F}
-
-lemma sub_le_zero : f - f ≤ 0 := ⟨le_top, by simp [sub_apply]⟩
-
-lemma neg_add_le_zero : -f + f ≤ 0 := ⟨le_top, by simp [add_apply]⟩
-
-lemma le_iff_neg_le_neg : g₁ ≤ g₂ ↔ -g₁ ≤ -g₂ :=
-  ⟨fun ⟨h, h'⟩ ↦ ⟨h, fun _ _ h'' ↦ by simp [h' h'']⟩, fun ⟨h, _⟩ ↦ ⟨h, fun _ _ _ ↦ by aesop⟩⟩
-
-lemma le_neg_iff_neg_le : g₁ ≤ -g₂ ↔ -g₁ ≤ g₂ := by rw [le_iff_neg_le_neg, neg_neg]
-
-lemma add_sub_le_cancel : f₁ + (f₂ - f₁) ≤ f₂ :=
-  ⟨by simp [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
-
-lemma add_sub_le_cancel_left : f₁ + f₂ - f₁ ≤ f₂ := add_sub_assoc f₁ f₂ f₁ ▸ add_sub_le_cancel f₁ f₂
-
-lemma add_sub_le_cancel_right : f₁ + f₂ - f₂ ≤ f₁ := add_comm f₁ f₂ ▸ add_sub_le_cancel_left f₂ f₁
-
-lemma add_add_sub_le_cancel : f₁ + f₂ + (f₃ - f₂) ≤ f₁ + f₃ :=
-  ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
-
-lemma add_sub_sub_le_cancel : f₁ + f₂ - (f₁ - f₃) ≤ f₂ + f₃ :=
-  ⟨fun _ _ ↦ by simp_all [add_domain, sub_domain], fun _ _ h ↦ by simp [add_apply, sub_apply, h]⟩
-
-lemma sub_sub_sub_le_cancel_right : f₁ - f₂ - (f₃ - f₂) ≤ f₁ - f₃ := by
-  simp only [sub_eq_add_neg, neg_add]
-  exact sub_eq_add_neg (-f₃) (-f₂) ▸ add_add_sub_le_cancel f₁ (-f₂) (-f₃)
-
-lemma sub_sub_sub_le_cancel_left : f₁ - f₂ - (f₁ - f₃) ≤ f₃ - f₂ :=
-  sub_eq_add_neg f₁ f₂ ▸ neg_add_eq_sub f₂ f₃ ▸ add_sub_sub_le_cancel f₁ (-f₂) f₃
-
-lemma sub_le_of_le_add (h : g ≤ g₁ + g₂) : g - g₂ ≤ g₁ := by
-  constructor
-  · exact (inf_le_of_left_le le_rfl).trans (le_inf_iff.mp <| add_domain g₁ g₂ ▸ h.1).1
-  · intro ⟨x, hx⟩ ⟨y, hy⟩ rfl
-    simp [sub_apply, @h.2 ⟨x, hx.1⟩ ⟨x, ⟨hy, hx.2⟩⟩ rfl, add_apply]
-
-lemma sub_add_le_cancel : f₁ - f₂ + f₂ ≤ f₁ :=
-  sub_eq_add_neg f₁ f₂ ▸ sub_neg_eq_add _ f₂ ▸ add_sub_le_cancel_right f₁ (-f₂)
-
-lemma add_le_of_le_sub (h : g ≤ g₁ - g₂) : g + g₂ ≤ g₁ :=
-  sub_neg_eq_add g g₂ ▸ sub_le_of_le_add (sub_eq_add_neg g₁ g₂ ▸ h)
-
-lemma add_left_le_of_le (h : g₁ ≤ g₂) : f + g₁ ≤ f + g₂ := by
-  constructor
-  · simp only [add_domain, le_inf_iff, inf_le_left, true_and]
-    exact (inf_le_of_right_le le_rfl).trans h.1
-  · intro x y hxy
-    simp_rw [add_apply, @h.2 ⟨x, x.2.2⟩ ⟨y, y.2.2⟩ hxy, hxy]
-
-lemma add_right_le_of_le (h : g₁ ≤ g₂) : g₁ + f ≤ g₂ + f :=
-  add_comm f g₁ ▸ add_comm f g₂ ▸ add_left_le_of_le f h
-
-lemma sub_right_le_of_le (h : g₁ ≤ g₂) : g₁ - f ≤ g₂ - f :=
-  sub_eq_add_neg g₁ f ▸ sub_eq_add_neg g₂ f ▸ add_right_le_of_le (-f) h
-
-lemma sub_left_le_of_le (h : g₁ ≤ g₂) : f - g₁ ≤ f - g₂ :=
-  neg_sub g₁ f ▸ neg_sub g₂ f ▸ le_iff_neg_le_neg.mp (sub_right_le_of_le f h)
-
-end
+end Monoid
 
 /-!
-## A.6. Inverses
+## E. Inverses
 -/
+
+section Inverses
 
 lemma inverse_ker {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥) : f.inverse.toFun.ker = ⊥ := by
   refine LinearMap.ker_eq_bot'.mpr fun ⟨y, hy⟩ hy' ↦ ?_
@@ -429,6 +398,6 @@ lemma compRestricted_inverse_eq {f : E →ₗ.[R] F} (h_ker : f.toFun.ker = ⊥)
   nth_rw 1 [← inverse_inverse h_ker]
   exact inverse_compRestricted_eq (inverse_ker h_ker)
 
-end General
+end Inverses
 
 end LinearPMap
