@@ -932,11 +932,11 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
   have hcos : 1 = cos (S.ω * t) := by
     calc
     1 =  det / det := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self]
-    _ = (vv +   xx * S.ω^2 ) / det := by rfl
-    _ = c * ((vv +   xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
+    _ = (vv + xx * S.ω^2 ) / det := by rfl
+    _ = c * ((vv + xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
       nth_rewrite 1 [← hvv, ← hxx]
       ring_nf
-    _ = c * ((vv +   xx * S.ω^2) / det ) := by
+    _ = c * ((vv + xx * S.ω^2) / det ) := by
       simp only [ne_eq, S.ω_ne_zero, not_false_eq_true,
         div_self, sub_self, mul_zero, zero_div, add_zero]
     _ = c * (det / det) := by rfl
