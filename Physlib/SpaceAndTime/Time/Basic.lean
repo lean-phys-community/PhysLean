@@ -51,7 +51,7 @@ or origin.
   - B.6. Negation of times
   - B.7. Subtraction of times
   - B.8. Scalar multiplication of time
-  - B.9. Additive group, translation action and module on `Time`
+  - B.9. Module on `Time`
   - B.10. Norm of time
   - B.11. Inner product on `Time`
   - B.12. Decidability of `Time`
@@ -251,7 +251,7 @@ lemma smul_real_val (k : ℝ) (t : Time) :
 
 /-!
 
-### B.9. Additive group, translation action and module on `Time`
+### B.9. Module on `Time`
 
 -/
 
@@ -265,15 +265,6 @@ instance : AddGroup Time where
 
 instance : AddCommGroup Time where
   add_comm := by intros; ext; simp [add_comm]
-
-/-- The translation action on `Time` is addition of times. -/
-@[simp]
-lemma vadd_eq_add (dt t : Time) :
-    dt +ᵥ t = dt + t := rfl
-
-@[simp]
-lemma vadd_val (dt t : Time) :
-    (dt +ᵥ t).val = dt.val + t.val := rfl
 
 instance : Module ℝ Time where
   one_smul t := by ext; simp
