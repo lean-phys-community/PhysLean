@@ -574,7 +574,7 @@ def generalForm {R : Type*} [RCLike R]
 
 /-- General form of the Stinespring dilation. -/
 def stinespringGeneralForm {R : Type*} [RCLike R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (K : r → Matrix m m R) (z : r)
     (M : Matrix (m × r) (m × r) R) :=
     let U := dilation K z M
@@ -582,7 +582,7 @@ def stinespringGeneralForm {R : Type*} [RCLike R]
 
 /-- Even more general form of the Stinespring dilation. -/
 def stinespringGeneralForm_e {R : Type*} [RCLike R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (K : r → Matrix m m R) (z : r) (e : Matrix r r R)
     (M : Matrix (m × r) (m × r) R) :=
     let U := dilation K z M
