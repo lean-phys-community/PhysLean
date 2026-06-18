@@ -5,6 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
+public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.LinearPMap
 /-!
 
