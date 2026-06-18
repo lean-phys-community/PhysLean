@@ -50,25 +50,17 @@ these correspond to physical observables.
 
 ## iii. Table of contents
 
-- A. General
-  - A.1. DistribMulAction
-  - A.2. Finite sums
-  - A.3. Restricted composition
-  - A.4. Monoid
-  - A.5. Inequalities
-  - A.6. Inverses
-- B. Operators on inner product/Hilbert spaces
-  - B.1. Definitions
-  - B.2. Basic properties
-    - B.2.1. Dense domain
-    - B.2.2. Closability
-    - B.2.3. Adjoints
-    - B.2.4. Continuity / boundedness
-  - B.3. Classes of operators
-    - B.3.1. Symmetric operators
-    - B.3.2. Self-adjoint operators
-    - B.3.3. Essentially self-adjoint operators
-    - B.3.4. Unbounded operators
+- A. Definitions
+- B. Basic properties
+  - B.1. Dense domain
+  - B.2. Closability
+  - B.3. Adjoints
+  - B.4. Continuity / boundedness
+- C. Classes of operators
+  - C.1. Symmetric operators
+  - C.2. Self-adjoint operators
+  - C.3. Essentially self-adjoint operators
+  - C.4. Unbounded operators
 
 ## iv. References
 
@@ -82,12 +74,6 @@ these correspond to physical observables.
 @[expose] public section
 
 namespace LinearPMap
-
-/-!
-## B. Operators on inner product/Hilbert spaces
--/
-
-section InnerProductSpaces
 
 open Submodule
 open InnerProductSpace
@@ -103,10 +89,8 @@ variable
   {U U₁ U₂ : H →ₗ.[ℂ] H'} {W : α → H →ₗ.[ℂ] H'}
   {V V₁ V₂ : H' →ₗ.[ℂ] H''}
 
-instance : IsScalarTower ℝ ℂ H := IsScalarTower.complexToReal
-
 /-!
-### B.1. Definitions
+## A. Definitions
 
 See `LinearPMap.instStar` and `LinearPMap.isSelfAdjoint_def` for the definition of `IsSelfAdjoint`
 for `LinearPMap`s.
@@ -134,11 +118,11 @@ lemma isEssentiallySelfAdjoint_def [CompleteSpace H] :
     T.IsEssentiallySelfAdjoint ↔ IsSelfAdjoint T.closure := Iff.rfl
 
 /-!
-### B.2. Basic properties
+## B. Basic properties
 -/
 
 /-!
-#### B.2.1. Dense domain
+### B.1. Dense domain
 -/
 
 lemma HasDenseDomain.isUnbounded_iff_isClosable (h : U.HasDenseDomain) :
@@ -194,7 +178,7 @@ lemma pow_hasDenseDomain_of_le
   h.mono <| pow_sub_mul_pow T hle ▸ compRestricted_domain_le _ _
 
 /-!
-#### B.2.2. Closability
+### B.2. Closability
 -/
 
 lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U := by
@@ -275,7 +259,7 @@ lemma closure_smul (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) : (c • U).
   · rw [closure_def' h, closure_def' <| (not_congr <| IsClosable.smul_iff hc).mpr h]
 
 /-!
-#### B.2.3. Adjoints
+### B.3. Adjoints
 -/
 
 @[simp]
@@ -372,7 +356,7 @@ lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDen
     exact pow_succ' T† n ▸ compRestricted_mono_right T† (ih hTn)
 
 /-!
-#### B.2.4. Continuity / boundedness
+### B.4. Continuity / boundedness
 -/
 
 /-- `f : E →ₗ[𝕜] F` is continuous iff there exists `M > 0` s.t. `‖f x‖ ≤ M * ‖x‖` for all `x : E`.
@@ -529,11 +513,11 @@ lemma IsClosed.sub_continuous [CompleteSpace H']
   sub_eq_add_neg U₁ U₂ ▸ h₁.add_continuous h₂.neg h
 
 /-!
-### B.3. Classes of operators
+## C. Classes of operators
 -/
 
 /-!
-#### B.3.1. Symmetric operators
+### C.1. Symmetric operators
 -/
 
 /-- The analogue of `inner_map_polarization` for LinearPMap. -/
@@ -647,7 +631,7 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
   exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
 
 /-!
-#### B.3.2. Self-adjoint operators
+### C.2. Self-adjoint operators
 -/
 
 lemma IsSelfAdjoint.isSymmetric [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsSymmetric := by
@@ -690,7 +674,7 @@ lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint 
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
 /-!
-#### B.3.3. Essentially self-adjoint operators
+### C.3. Essentially self-adjoint operators
 -/
 
 lemma IsEssentiallySelfAdjoint.hasDenseDomain [CompleteSpace H] (h : T.IsEssentiallySelfAdjoint) :
@@ -737,7 +721,7 @@ lemma IsEssentiallySelfAdjoint.neg [CompleteSpace H] (h : T.IsEssentiallySelfAdj
   neg_eq_neg_one_smul T ▸ h.smul (by norm_num) (by norm_num)
 
 /-!
-#### B.3.4. Unbounded operators
+### C.4. Unbounded operators
 -/
 
 lemma IsUnbounded.hasDenseDomain (h : U.IsUnbounded) : U.HasDenseDomain := h.1
@@ -807,7 +791,5 @@ lemma isUnbounded_of_dense_of_isSymmetric' [CompleteSpace H]
     {E : Submodule ℂ H} (hE : Dense (E : Set H)) {f : E →ₗ[ℂ] E} (h : f.IsSymmetric) :
     (mk E (E.subtype ∘ₗ f)).IsUnbounded :=
   ⟨hE, IsSymmetric.isClosable h hE⟩
-
-end InnerProductSpaces
 
 end LinearPMap
