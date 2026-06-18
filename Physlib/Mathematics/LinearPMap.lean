@@ -8,45 +8,19 @@ module
 public import Physlib.Mathematics.InnerProductSpace.Submodule
 /-!
 
-# Unbounded operators
+# LinearPMap
 
 ## i. Overview
 
-In this module we introduce unbounded operators on inner product spaces. By "unbounded operator"
-we mean a partially-defined linear map (`LinearPMap`) which is both densely defined and closable.
-These provide the mathematical structure appropriate for describing operators in non-relativistic
-quantum mechanics. Of particular interest are (essentially) self-adjoint unbounded operators since
-these correspond to physical observables.
-
-### Notes
-
-- Naming convention : Definitions of `LinearPMap`s for quantum mechanical unbounded operators should
-    have a name of the form `[…]Operator` and notation should use calligraphic capital letters,
-    e.g. `mulOperator f` (`𝓜 f`) for the multiplication operator associated with the function `f`.
-
-- Implementation : Although operators encountered in quantum mechanics are almost always unbounded,
-    we opt to implement unbounded operators via the property `IsUnbounded` on `LinearPMap` rather
-    than as a structure `UnboundedOperator` extending `LinearPMap`. The basic reason for this
-    is that addition/subtraction and composition of unbounded operators in general does not result
-    in another unbounded operator. This means, for example, that any attempt to define addition of
-    `UnboundedOperator`s would inevitably require introducing junk values that spoil associativity.
+In this module we collect some basic results about `LinearPMap`s.
 
 ## ii. Key results
 
+- `LinearPMap.sum` : The finite sum of partial linear maps.
 - `LinearPMap.compRestricted` : For two partial linear maps `g : F →ₗ[R] G` and `f : E →ₗ[R] F`,
     the composition of `g` with `f` with natural domain `{x : f.domain | f x ∈ g.domain}`.
 - `LinearPMap.instMonoid` : Partial linear maps `E →ₗ.[R] E` with `compRestricted`
     for multiplication and the identity map for `1` comprise a monoid.
-- `adjoint_add_le_add_adjoint` : The inequality `U₁† + U₂† ≤ (U₁ + U₂)†` when `U₁ + U₂` has
-    dense domain.
-- `adjoint_compRestricted_le_compRestricted_adjoint` : The inequality `U† ∘ᵣ V† ≤ (V ∘ᵣ U)†`
-    when `V` and `V ∘ᵣ U` have dense domain.
-- `IsEssentiallySelfAdjoint.unique_self_adjoint_extension` : The closure of an essentially
-    self-adjoint unbounded operator is its unique self-adjoint extension.
-- `IsUnbounded.adjoint` : The adjoint of an unbounded operator is also unbounded.
-- `IsUnbounded.adjoint_closure_eq_adjoint` : An unbounded operator and its closure have
-    the same adjoint.
-- `IsUnbounded.adjoint_adjoint_eq_closure` : An unbounded operator `U` satisfies `U†† = U.closure`.
 
 ## iii. Table of contents
 
@@ -57,11 +31,6 @@ these correspond to physical observables.
 - E. Inverses
 
 ## iv. References
-
-- M. Reed & B. Simon, (1972). "Methods of modern mathematical physics: Vol. 1. Functional analysis".
-  Academic Press. https://doi.org/10.1016/B978-0-12-585001-8.X5001-6
-- K. Schmüdgen, (2012). "Unbounded self-adjoint operators on Hilbert space" (Vol. 265). Springer.
-  https://doi.org/10.1007/978-94-007-4753-1
 
 -/
 
