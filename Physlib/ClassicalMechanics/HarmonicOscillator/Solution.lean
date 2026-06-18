@@ -947,7 +947,7 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
   calc
     (n : ℝ) * (T S) = (n : ℝ) * (2 * π / S.ω) := by rfl
     _ = ((n : ℝ) * (2 * π)) / S.ω := by ring_nf
-    _ = ( S.ω * t) / S.ω := by rw [hn]
+    _ = (S.ω * t) / S.ω := by rw [hn]
     _ = t * (S.ω / S.ω) := by ring_nf
     _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
 
