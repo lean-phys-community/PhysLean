@@ -64,7 +64,7 @@ def tr₂ {R : Type*} [Ring R] {m n m' : Type*} [Fintype n]
 
 /-- `stinespringOp` is often written as `V`. -/
 def stinespringOp {R : Type*} [Ring R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
+    {m r : Type*} [Fintype r] [DecidableEq r]
   (K : r → Matrix m m R) : Matrix (m × r) m R :=
   let V₀ : Matrix (m × r) (m × Fin 1) R :=
     ∑ i, K i ⊗ₖ single i (0 : Fin 1) (1 : R)
@@ -346,7 +346,7 @@ def general_dilation {R : Type*}
 
 /-- A general, not necessarily unitary, dilation. -/
 def dilation {R : Type*} [Ring R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+    {m r : Type*} [Fintype r] [DecidableEq r]
     (K : r → Matrix m m R) (z : r) (M : Matrix (m × r) (m × r) R) :
     Matrix (m × r) (m × r) R := general_dilation z (stinespringOp K) (M)
 
