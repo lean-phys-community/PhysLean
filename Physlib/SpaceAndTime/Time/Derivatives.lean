@@ -8,6 +8,8 @@ module
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.SpaceAndTime.Space.Module
 public import Physlib.SpaceAndTime.Time.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Inv
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Time Derivatives
@@ -137,9 +139,9 @@ lemma deriv_div {c g : Time → ℝ}
   repeat rw [Time.deriv_eq]
   ring_nf
   simp [fderiv_fun_mul hc (DifferentiableAt.fun_inv (by fun_prop) hgz),
-    fderiv_comp' t (differentiableAt_inv hgz) hg, fderiv_inv' hgz]
+    fderiv_comp' t (differentiableAt_inv hgz) hg]
   field_simp
-  ring_nf
+  ring
 
 /-!
 
@@ -198,13 +200,8 @@ lemma deriv_contDiff_of_space {n} {M : Type} [NormedAddCommGroup M] [NormedSpace
 lemma differentiable_euclid {f : Time → EuclideanSpace ℝ (Fin n)}
     (hf : ∀ i, Differentiable ℝ (fun t => f t i)) :
     Differentiable ℝ f := by
-  let e := PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin n => ℝ)
-  have hcomp : Differentiable ℝ (fun t => e (f t)) := by
-    rw [differentiable_pi]
-    intro i
-    simpa [e] using hf i
-  have hsymm := e.symm.differentiable
-  simpa [Function.comp_def, e] using hsymm.comp hcomp
+  rw [differentiable_euclidean]
+  fun_prop
 
 lemma deriv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
     (hf : Differentiable ℝ f) (t : Time) :
