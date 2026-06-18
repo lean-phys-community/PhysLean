@@ -92,8 +92,8 @@ Proof: `cos(π/5) = (1 + √5)/4` (mathlib's `Real.cos_pi_div_five`); doubling
 gives `2 cos(π/5) = (1 + √5)/2 = φ`. -/
 theorem goldenRatio_two_cos_pi_div_five : φ = 2 * Real.cos (Real.pi / 5) := by
   rw [Real.cos_pi_div_five]
-  show Real.goldenRatio = 2 * ((1 + Real.sqrt 5) / 4)
-  unfold Real.goldenRatio
+  -- `Real.goldenRatio` is an `abbrev` for `(1 + √5)/2`, so this is defeq:
+  show (1 + Real.sqrt 5) / 2 = 2 * ((1 + Real.sqrt 5) / 4)
   ring
 
 /-- `φ` is a root of the quadratic `X² - X - 1`. -/
