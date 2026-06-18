@@ -1,15 +1,13 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Nikolai Kashcheev, Joseph Tooby-Smith
 -/
 module
 
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.SpaceAndTime.Space.Module
 public import Physlib.SpaceAndTime.Time.Basic
-public import Mathlib.Analysis.Calculus.Deriv.Inv
-public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Time Derivatives
@@ -21,10 +19,13 @@ In this module we define and prove basic lemmas about derivatives of functions o
 ## ii. Key results
 
 - `deriv` : The derivative of a function `Time → M` at a given time.
+- `manifoldDeriv` : The derivative of a function from `Time` to a manifold.
 
 ## iii. Table of contents
 
 - A. The definition of the derivative
+  - A.1. Derivatives of functions into vector spaces
+  - A.2. Derivatives of functions into manifolds
 - B. Linearlity properties of the derivative
 - C. Derivative of constant functions
 - D. Smoothness properties of the derivative
@@ -45,6 +46,13 @@ variable {M : Type} {d : ℕ} {t : Time}
 ## A. The definition of the derivative
 
 -/
+
+/-!
+
+### A.1. Derivatives of functions into vector spaces
+
+-/
+
 /-- Given a function `f : Time → M` the derivative of `f`. -/
 noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (f : Time → M) : Time → M :=
@@ -55,6 +63,51 @@ scoped notation "∂ₜ" => deriv
 
 lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (f : Time → M) (t : Time) : Time.deriv f t = fderiv ℝ f t 1 := rfl
+
+/-!
+
+### A.2. Derivatives of functions into manifolds
+
+-/
+
+open Manifold in
+/-- The time derivative of a function from `Time` to a manifold, as a tangent vector at
+the value of the function. -/
+noncomputable def manifoldDeriv {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] (f : Time → N) : (t : Time) → TangentSpace I (f t) :=
+  fun t => mfderiv 𝓘(ℝ, Time) I f t ((1 : Time) : TangentSpace 𝓘(ℝ, Time) t)
+
+open Manifold in
+lemma manifoldDeriv_eq {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] (f : Time → N) (t : Time) :
+    manifoldDeriv I f t =
+      mfderiv 𝓘(ℝ, Time) I f t ((1 : Time) : TangentSpace 𝓘(ℝ, Time) t) := rfl
+
+open Manifold in
+/-- The time derivative is the manifold derivative for functions into normed spaces. -/
+lemma deriv_eq_mfderiv [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (t : Time) :
+    deriv f t =
+      mfderiv 𝓘(ℝ, Time) 𝓘(ℝ, M) f t
+        ((1 : Time) : TangentSpace 𝓘(ℝ, Time) t) := by
+  rw [deriv_eq, ← mfderiv_eq_fderiv]
+  rfl
+
+open Manifold in
+lemma deriv_eq_manifoldDeriv [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (t : Time) :
+    deriv f t = manifoldDeriv 𝓘(ℝ, M) f t := by
+  rw [deriv_eq_mfderiv, manifoldDeriv_eq]
+
+open Manifold in
+@[simp]
+lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] (n : N) :
+    manifoldDeriv I (fun _ : Time => n) t = 0 := by
+  simp [manifoldDeriv]
 
 /-!
 
@@ -84,9 +137,9 @@ lemma deriv_div {c g : Time → ℝ}
   repeat rw [Time.deriv_eq]
   ring_nf
   simp [fderiv_fun_mul hc (DifferentiableAt.fun_inv (by fun_prop) hgz),
-    fderiv_comp' t (differentiableAt_inv hgz) hg]
+    fderiv_comp' t (differentiableAt_inv hgz) hg, fderiv_inv' hgz]
   field_simp
-  ring
+  ring_nf
 
 /-!
 
@@ -145,8 +198,13 @@ lemma deriv_contDiff_of_space {n} {M : Type} [NormedAddCommGroup M] [NormedSpace
 lemma differentiable_euclid {f : Time → EuclideanSpace ℝ (Fin n)}
     (hf : ∀ i, Differentiable ℝ (fun t => f t i)) :
     Differentiable ℝ f := by
-  rw [differentiable_euclidean]
-  fun_prop
+  let e := PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin n => ℝ)
+  have hcomp : Differentiable ℝ (fun t => e (f t)) := by
+    rw [differentiable_pi]
+    intro i
+    simpa [e] using hf i
+  have hsymm := e.symm.differentiable
+  simpa [Function.comp_def, e] using hsymm.comp hcomp
 
 lemma deriv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
     (hf : Differentiable ℝ f) (t : Time) :
