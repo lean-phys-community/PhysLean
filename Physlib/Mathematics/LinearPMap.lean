@@ -14,11 +14,19 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 
 In this module we collect some basic results about `LinearPMap`s.
 
+Most important is the definition of restricted composition.
+The composition of two partial linear maps `g : F →ₗ.[R] G` and `f : E →ₗ.[R] F` is defined
+only if the range of `f` is contained in the domain of `g` (c.f. `LinearPMap.comp`).
+`g.compRestricted f` (`g ∘ᵣ f`) is defined to be the composition of `g` with the restriction of `f`
+to exactly those `x : f.domain` for which `f x ∈ g.domain`. This allows one to work with the
+composition of partial linear maps while having the domain implicitly accounted for.
+
 ## ii. Key results
 
 - `LinearPMap.sum` : The finite sum of partial linear maps.
-- `LinearPMap.compRestricted` : For two partial linear maps `g : F →ₗ[R] G` and `f : E →ₗ[R] F`,
-    the composition of `g` with `f` with natural domain `{x : f.domain | f x ∈ g.domain}`.
+- `LinearPMap.compRestricted` (`∘ᵣ`) : For two partial linear maps
+    `g : F →ₗ[R] G` and `f : E →ₗ[R] F`, the composition of `g` with `f`
+    with natural domain `{x : f.domain | f x ∈ g.domain}`.
 - `LinearPMap.instMonoid` : Partial linear maps `E →ₗ.[R] E` with `compRestricted`
     for multiplication and the identity map for `1` comprise a monoid.
 
@@ -139,12 +147,6 @@ end Sums
 
 /-!
 ## C. Restricted composition
-
-The composition of two partial linear maps `g : F →ₗ.[R] G` and `f : E →ₗ.[R] F` is defined
-only if the range of `f` is contained in the domain of `g` (c.f. `LinearPMap.comp`).
-`g.compRestricted f` (`g ∘ᵣ f`) is defined to be the composition of `g` with the restriction of `f`
-to exactly those `x : f.domain` for which `f x ∈ g.domain`. This allows one to work with the
-composition of partial linear maps while having the domain implicitly accounted for.
 -/
 
 section Composition
