@@ -57,7 +57,7 @@ lemma smul_of_eq_zero [AddMonoid M] (i j : α) {f : α → α → M} (hf : f i i
 lemma smul_eq_zero_iff [AddMonoid M] (i j : α) (f : α → α → M) :
     δ[i,j] • f i j = 0 ↔ i ≠ j ∨ f i i = 0 := by
   rcases eq_or_ne i j with (rfl | hne)
-  · simp [one_nsmul]
+  · simp
   · simp [eq_zero_of_ne, hne]
 
 lemma smul_eq_zero_iff' [AddMonoid M] (i : α) (f : α → α → M) :
@@ -83,7 +83,7 @@ lemma smul_symm [AddMonoid M] (i j : α) (f : α → α → M) : δ[i,j] • f j
 lemma symmetrize [AddMonoid M] (i j : α) (f : α → α → M) :
     δ[i,j] • (f i j + f j i) = (2 * δ[i,j]) • f i j := by
   rcases eq_or_ne i j with (rfl | hne)
-  · simp [one_nsmul, two_nsmul]
+  · simp [two_nsmul]
   · simp [eq_zero_of_ne hne]
 
 lemma symmetrize' [AddCommMonoid M] {K : Type*} [Semifield K] [CharZero K] [Module K M]
@@ -114,7 +114,7 @@ lemma sum_mul [Fintype α] (i j : α) : ∑ k : α, δ[i,k] * δ[k,j] = δ[i,j] 
 
 @[simp]
 lemma sum_smul [Fintype α] (i : α) (f : α → M) : ∑ j : α, δ[i,j] • f j = f i := by
-  simp [kroneckerDelta, one_nsmul]
+  simp [kroneckerDelta]
 
 lemma sum_sum_smul_eq_zero [Fintype α] {f : α → α → M} (hf : ∀ i : α, f i i = 0) :
     ∑ i : α, ∑ j : α, δ[i,j] • f i j = 0 := by
@@ -122,7 +122,7 @@ lemma sum_sum_smul_eq_zero [Fintype α] {f : α → α → M} (hf : ∀ i : α, 
 
 lemma finset_sum_smul (s : Finset α) (i : α) (f : α → M) :
     ∑ j ∈ s, δ[i,j] • f j = if i ∈ s then f i else 0 := by
-  simp [kroneckerDelta, one_nsmul]
+  simp [kroneckerDelta]
 
 lemma finset_sum_sum_smul_eq_zero {s s' : Finset α} {f : α → α → M}
     (hf : ∀ i ∈ s ∩ s', f i i = 0) : ∑ i ∈ s, ∑ j ∈ s', δ[i,j] • f i j = 0 := by
