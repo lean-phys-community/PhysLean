@@ -13,36 +13,41 @@ public import Mathlib
 -/
 
 @[expose] public section
+noncomputable section
 
 open Matrix MatrixOrder ComplexOrder RCLike TensorProduct Kronecker
 
 /-- Completely positive map given by a (not necessarily minimal) Kraus family. -/
 def krausApply {R : Type*} [Mul R] [Star R] [AddCommMonoid R]
-    {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q] [DecidableEq r]
+    {q r : Type*} [Fintype q] [Fintype r]
     (K : r → Matrix q q R) (ρ : Matrix q q R) : Matrix q q R :=
   ∑ i, K i * ρ * (K i)ᴴ
 
 /-- Kraus operator preserves PSD property. -/
 lemma krausApply.posSemidef {R : Type*} [Ring R] [PartialOrder R] [StarRing R]
     [AddLeftMono R]
-    {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q] [DecidableEq r]
+    {q r : Type*} [Fintype q] [Fintype r]
     (K : r → Matrix q q R)
     {ρ : Matrix q q R} (hρ : ρ.PosSemidef) :
     (krausApply K ρ).PosSemidef :=
   posSemidef_sum _ fun _ _ => hρ.mul_mul_conjTranspose_same _
 
+/-- Quantum channel. -/
 def QuantumChannel {R : Type*} [Mul R] [One R] [Star R] [AddCommMonoid R]
-    {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q] [DecidableEq r]
+    {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q]
     (K : r → Matrix q q R) :=
   ∑ i, (K i)ᴴ * K i = 1
 
+/-- Quantum operation.  -/
 def QuantumOperation {R : Type*} [RCLike R]
-    {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q] [DecidableEq r]
+    {q r : Type*} [Fintype q] [Fintype r] [DecidableEq q]
     (K : r → Matrix q q R) := ∑ i, (K i)ᴴ * K i ≤ 1
 
+/-- Density matrix. -/
 def densityMatrix {R : Type*} [Ring R] [PartialOrder R] [StarRing R] (d : Type*) [Fintype d] :=
   {ρ : Matrix d d R // ρ.PosSemidef ∧ ρ.trace = 1}
 
+/-- Density matrices are closed under real convex combinations. -/
 def densityMatrix.convex_comb {R : Type*} [RCLike R]
     {d : ℕ} (ρ₀ ρ₁ : densityMatrix (Fin d) (R := R)) {t : R}
     (hp₀ : 0 ≤ t) (hp₁ : 0 ≤ 1 - t) : densityMatrix (Fin d) (R := R) :=
@@ -53,32 +58,35 @@ def densityMatrix.convex_comb {R : Type*} [RCLike R]
     simp⟩
 
 /-- Also known as `partialTraceRight`. -/
-noncomputable def tr₂ {R : Type*} [Ring R] {m n m' : Type*} [Fintype n]
+def tr₂ {R : Type*} [Ring R] {m n m' : Type*} [Fintype n]
     (ρ : Matrix (m × n) (m' × n) R) : Matrix m m' R :=
   fun i j => ∑ k, ρ (i, k) (j, k)
 
 /-- `stinespringOp` is often written as `V`. -/
-noncomputable def stinespringOp {R : Type*} [Ring R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+def stinespringOp {R : Type*} [Ring R]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
   (K : r → Matrix m m R) : Matrix (m × r) m R :=
   let V₀ : Matrix (m × r) (m × Fin 1) R :=
     ∑ i, K i ⊗ₖ single i (0 : Fin 1) (1 : R)
   fun x y => V₀ x (y,0)
 
-noncomputable def stinespringDilation {R : Type*} [Ring R] [StarRing R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+/-- The Stinespring dilation. -/
+def stinespringDilation {R : Type*} [Ring R] [StarRing R]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (K : r → Matrix m m R)
     (ρ : Matrix m m R) :=
   let V := stinespringOp K;
   V * ρ * Vᴴ
 
-noncomputable def stinespringForm {R : Type*} [Ring R] [StarRing R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+/-- The partial trace of the Stinespring dilation. -/
+def stinespringForm {R : Type*} [Ring R] [StarRing R]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (K : r → Matrix m m R) :=
   fun ρ => tr₂ (stinespringDilation K ρ)
 
+/-- A useful identity for Stinespring dilations. -/
 lemma stinespringOp_adjoint_mul_self {R : Type*} [Ring R] [StarRing R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (K : r → Matrix m m R) :
     ∑ i, star K i * K i = (stinespringOp K)ᴴ * stinespringOp K := by
   ext i j
@@ -90,6 +98,7 @@ lemma stinespringOp_adjoint_mul_self {R : Type*} [Ring R] [StarRing R]
     Finset.mem_univ, ↓reduceIte, conjTranspose_apply];
   erw [ Finset.sum_product, Finset.sum_comm ]
 
+/-- A useful identity for completely positive, trace non-increasing maps. -/
 lemma stinespringForm_CPTNI {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
     (K : r → Matrix m m R)
@@ -99,6 +108,8 @@ lemma stinespringForm_CPTNI {R : Type*} [RCLike R]
   rw [← stinespringOp_adjoint_mul_self]
   rfl
 
+/-- The Stinespring operator of a completely positive, trace-preserving maps
+is an isometry. (Note that `stinespringOp K` is not a square matrix in general.) -/
 lemma stinespringForm_CPTP_isometry {R : Type*} [Ring R] [StarRing R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
   {K : r → Matrix m m R}
@@ -107,8 +118,6 @@ lemma stinespringForm_CPTP_isometry {R : Type*} [Ring R] [StarRing R]
   rw [← hK]
   rw [← stinespringOp_adjoint_mul_self]
   rfl
-
-lemma hzRC {R : Type*} [RCLike R] (z : R) : star z * z = ‖z‖^2 := RCLike.conj_mul z
 
 /--
 Proving the columns of `V = stinespringOp K` are independent is a step
@@ -131,8 +140,6 @@ lemma stinespringOrtho {R : Type*} [RCLike R]
       rw [← h₁]
       simp only [inner_self_eq_norm_sq_to_K]
       generalize stinespringOp K = α
-      have hz := hzRC (R := R)
-      simp only [star_def] at hz
       simp only [↓reduceIte]
       simp_rw [RCLike.conj_mul]
       norm_cast
@@ -159,7 +166,8 @@ lemma basisCard {R : Type*} [RCLike R] {n m : Type*} [Fintype n] {s : Matrix n m
      rank_eq_card_basis
     ho.toSubtypeRange.exists_orthonormalBasis_extension.choose_spec.choose.toBasis)
 
-
+/-- Calculating the cardinality of the orthonormal basis obtained by
+extending the Stinespring orthonormal set, the columns of `stinespringOp K`. -/
 lemma stinespringCard {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
     {K : r → Matrix m m R}
@@ -233,6 +241,7 @@ def Fin.predAbove_of_ne {n : ℕ} {k i : Fin n}
   · exact ⟨i.1 - 1, by omega⟩
   · exact ⟨i.1, by omega⟩
 
+/-- A "missing lemma" for `Fin` types. -/
 lemma Fin.predAbove_of_ne_injective (n : ℕ) (k x y : Fin n)
     (hx : x ≠ k) (hy : y ≠ k)
     (heq : Fin.predAbove_of_ne hx = Fin.predAbove_of_ne hy) : x = y := by
@@ -246,7 +255,7 @@ lemma Fin.predAbove_of_ne_injective (n : ℕ) (k x y : Fin n)
 /-- The way this is written, `Fin r` and `Fin (r-1)` both occur
 so it is tricky to go to a general `Fintype`.
 -/
-noncomputable def onbPart {R : Type*} [RCLike R]
+def onbPart {R : Type*} [RCLike R]
     {m r : ℕ} {K : Fin r → Matrix (Fin m) (Fin m) R}
   (hK : ∑ i, (K i)ᴴ * K i = 1) (x : Fin m × Fin r) {z : Fin r} (hx : ¬x.2 = z) :
   -- if we make it `r+2` then the `x.2≠0` becomes unused.
@@ -302,7 +311,7 @@ lemma onbPart_inner {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fi
     rw [← h₁]
     simp_rw [α.choose_spec]
 
-
+/-- The vectors in the Stinespring orthonormal basis have norm 1. -/
 lemma onbPart_norm {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (x : Fin m × Fin r)
     {z : Fin r} (hx : ¬x.2 = z) :
@@ -314,7 +323,7 @@ lemma onbPart_norm {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fin
 
 
 /-- Also known as `unitaryDilation`. Respects x,y order. -/
-noncomputable def Ud {R : Type*} [RCLike R] {m r : ℕ}
+def Ud {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) :
     Matrix (Fin m × Fin r) (Fin m × Fin r) R := by
@@ -326,7 +335,7 @@ noncomputable def Ud {R : Type*} [RCLike R] {m r : ℕ}
 
 /-- This generalization of Stinespring dilation has the right
 "shape" but otherwise nothing specific to it. -/
-noncomputable def general_dilation {R : Type*}
+def general_dilation {R : Type*}
     {m r : Type*} [DecidableEq r]
     (z : r)
     (S : Matrix (m × r) m R)
@@ -336,7 +345,7 @@ noncomputable def general_dilation {R : Type*}
 
 
 /-- A general, not necessarily unitary, dilation. -/
-noncomputable def dilation {R : Type*} [Ring R]
+def dilation {R : Type*} [Ring R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
     (K : r → Matrix m m R) (z : r) (M : Matrix (m × r) (m × r) R) :
     Matrix (m × r) (m × r) R := general_dilation z (stinespringOp K) (M)
@@ -390,7 +399,7 @@ theorem Ud_orthonormal₁ {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matr
     · exact onbPart_inner hK g₀ g₂ h
 
 
-
+/-- The Stinespring dilation columns form an orthonormal basis. -/
 theorem Ud_orthonormal₂ {R : Type*} [RCLike R]
     {m r : ℕ} {K : Fin r → Matrix (Fin m) (Fin m) R}
   (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) :
@@ -411,12 +420,7 @@ theorem Ud_orthonormal₂ {R : Type*} [RCLike R]
       rw [← this]
       split_ifs at * with g₀ g₁ <;> rfl
 
-
-
-lemma RCLike.norm_eq {R : Type*} [RCLike R] (γ : R) :
-    RCLike.re γ * RCLike.re γ + RCLike.im γ * RCLike.im γ = ‖γ‖ ^ 2 := by
-    rw [RCLike.norm_sq_eq_def]
-
+/-- If `β` has length 1 then the dot product of `β` with itself is 1. -/
 lemma smul_self_one_of_norm_one {R : Type*} [RCLike R]
     {t : Type*} [Fintype t] {β : t → R} (hj : ‖WithLp.toLp 2 β‖ = 1) :
   ∑ x, (starRingEnd R) (β x) * β x = 1 := by
@@ -433,6 +437,7 @@ lemma smul_self_one_of_norm_one {R : Type*} [RCLike R]
         ring_nf
         simp
 
+/-- A matrix whose columns are orthonormal is unitary. -/
 theorem unitary_of_orthonormal {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
     (α : Matrix (m × r) (m × r) R)
@@ -454,6 +459,7 @@ theorem unitary_of_orthonormal {R : Type*} [RCLike R]
       nth_rw 1 [mul_comm]
       rfl
 
+/-- The transpose of the unitary dilation is unitary. -/
 lemma Ud_unitaryT {R : Type*} [RCLike R]
     {m r : ℕ} {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) :
@@ -484,17 +490,10 @@ lemma Ud_unitary {R : Type*} [RCLike R]
      · exact this
      · exact (mul_eq_one_comm_of_card_eq _ _ _ rfl).mp this
 
-
-
 open Kronecker TensorProduct
 
-/-
-The projector | e₀ > < e₀ |
--/
-def e₀Xe₀ {R : Type*} [RCLike R] {w : Type*} [Fintype w] [DecidableEq w] [Zero w] :
-    Matrix w w R :=
-    fun x y => if (x,y) = (0,0) then 1 else 0
-
+/-- Taking the partial trace of a tensor product with a matrix of trace 1 is the
+identity map. -/
 lemma tr₂_e₀Xe₀ {R : Type*} [RCLike R]
     {m w : Type*} [Fintype w] [Zero w]
     (e : Matrix w w R) (htr : e.trace = 1)
@@ -511,7 +510,8 @@ lemma tr₂_e₀Xe₀ {R : Type*} [RCLike R]
   rw [htr]
   simp
 
-noncomputable def stinespringUnitaryForm {R : Type*} [RCLike R] {m r : ℕ}
+/-- The Stinespring unitary form. -/
+def stinespringUnitaryForm {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r)
     (ρ : Matrix (Fin m) (Fin m) R) :
@@ -519,30 +519,14 @@ noncomputable def stinespringUnitaryForm {R : Type*} [RCLike R] {m r : ℕ}
     let U := Ud hK z
     tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
-noncomputable def stinespringUnitaryForm_e {R : Type*} [RCLike R] {m r : ℕ}
+/-- The Stinespring unitary form, general version. -/
+def stinespringUnitaryForm_e {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) (e : Matrix (Fin r) (Fin r) R)
-    --(he : e.trace = 1)
     (ρ : Matrix (Fin m) (Fin m) R) :
     (Matrix (Fin m) (Fin m) R) :=
     let U := Ud hK z
     tr₂ (U * (ρ ⊗ₖ e) * Uᴴ)
-
-/-- Unitary dilation, processing a whole word -/
-noncomputable def UdWord {α : Type*} {R : Type*} [RCLike R]
-  {n q r : ℕ}
-  {𝓚 : α → Fin r → Matrix (Fin q) (Fin q) R}
-    (hK : ∀ s, ∑ i, (𝓚 s i)ᴴ * 𝓚 s i = (1 : Matrix (Fin q) (Fin q) R))
-    (z : Fin r)
-   (word : Fin n → α)
-  (ρ : Matrix (Fin q × Fin r) (Fin q × Fin r) R) :
-  Matrix (Fin q × Fin r) (Fin q × Fin r) R := match n with
-| 0 => ρ
-| Nat.succ m =>
-        let U := Ud (hK (word (Fin.last m))) z
-        U * (UdWord hK z (Fin.init word) ρ) * Uᴴ
--- can generalize to arbitrary matrix in place of `Ud`
-
 
 /-- Trace-free version of the Stinespring Dilation Theorem. -/
 theorem tracefree_version {R : Type*} [RCLike R]
@@ -564,7 +548,7 @@ theorem tracefree_version {R : Type*} [RCLike R]
     mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte];
   exact Finset.sum_comm
 
-
+/-- A Heisberg picture / Schrödinger picture view of the Stinespring dilation. -/
 theorem heisenberg_schrõdinger {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Zero r] [Fintype m] [DecidableEq m]
     {K : r → Matrix m m R}
@@ -580,23 +564,24 @@ theorem heisenberg_schrõdinger {R : Type*} [RCLike R]
     rfl
 
 /-- A further generalization of `stinespringGeneralForm`. -/
-noncomputable def generalForm {R : Type*} [RCLike R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
+def generalForm {R : Type*} [RCLike R]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (z : r)
     (S : Matrix (m × r) m R)
     (M : Matrix (m × r) (m × r) R) :=
     let U := general_dilation z S M
     fun ρ => tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
-noncomputable def stinespringGeneralForm {R : Type*} [RCLike R]
+/-- General form of the Stinespring dilation. -/
+def stinespringGeneralForm {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
     (K : r → Matrix m m R) (z : r)
     (M : Matrix (m × r) (m × r) R) :=
     let U := dilation K z M
     fun ρ => tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
-
-noncomputable def stinespringGeneralForm_e {R : Type*} [RCLike R]
+/-- Even more general form of the Stinespring dilation. -/
+def stinespringGeneralForm_e {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m] [DecidableEq m]
     (K : r → Matrix m m R) (z : r) (e : Matrix r r R)
     (M : Matrix (m × r) (m × r) R) :=
@@ -607,7 +592,7 @@ noncomputable def stinespringGeneralForm_e {R : Type*} [RCLike R]
 /-- When we plug in `M = Ud hK`
 into the general `stinespringGeneralForm`,
 then we do get
-stinespringUnitaryForm hK
+`stinespringUnitaryForm hK`.
 -/
 theorem unitaryForm_of_general {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
@@ -641,7 +626,7 @@ theorem unitaryForm_of_general {R : Type*} [RCLike R] {m r : ℕ}
     simp at h ⊢
   · split_ifs with g₀ <;> rfl
 
-
+/-- The Stinespring unitary form as a general form applied to the unitary dilation. -/
 theorem unitaryForm_of_general_e {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) (e : Matrix (Fin r) (Fin r) R) :
@@ -723,7 +708,7 @@ lemma stinespringUnitaryForm_works {R : Type*} [RCLike R] {m r : ℕ}
 /-- The "orthogonal" CPTP completion of a CPTNI map.
 `Vtilde` is an alternative name for `krausCompletion`.
 -/
-noncomputable def krausCompletion {R : Type*} [RCLike R] {m r : ℕ}
+def krausCompletion {R : Type*} [RCLike R] {m r : ℕ}
   (K : Fin r → Matrix (Fin m) (Fin m) R) :
   Matrix (Fin m × Fin (r+1)) (Fin m) R := fun x => dite (x.2 < r)
   (fun H => stinespringOp K ⟨x.1, ⟨x.2, H⟩⟩)
@@ -804,15 +789,16 @@ lemma krausCompletion_isometry_of_TNI {R : Type*} [RCLike R] {m r : ℕ}
   abel
 
 
-
+/-- A unital operator. -/
 def unital {R : Type*} [RCLike R] {m r : ℕ}
     (K : Fin r → Matrix (Fin m) (Fin m) R) := ∑ i, K i * star (K i) = 1
 
+/-- A subunital operator. -/
 def subunital {R : Type*} [RCLike R] {m r : ℕ}
     (K : Fin r → Matrix (Fin m) (Fin m) R) := ∑ i, K i * star (K i) ≤ 1
 
 
-/-- Tr_B (A ⨂ B) = Tr(B) · A -/
+/-- The identity `Tr_B (A ⨂ B) = Tr(B) · A` -/
 lemma partialTrace_tensor {R : Type*} [RCLike R] {m n : ℕ}
     (A : Matrix (Fin m) (Fin m) R) (B : Matrix (Fin n) (Fin n) R) :
     tr₂ (A ⊗ₖ B) = (trace B) • A  := by
@@ -825,6 +811,7 @@ lemma partialTrace_tensor {R : Type*} [RCLike R] {m n : ℕ}
   rw [this]
   simp_rw [mul_comm]
 
+/-- A unitary dilation view of the application of a Kraus operator. -/
 lemma krausApply_of_tensor {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r)
@@ -839,6 +826,7 @@ lemma krausApply_of_tensor {R : Type*} [RCLike R] {m r : ℕ}
     rw [hβ]
     simp
 
+/-- Trace of partial trace equals trace. -/
 lemma trace_tr₂ {R : Type*} [RCLike R] {m n : ℕ}
     (ρ : Matrix (Fin m × Fin n) (Fin m × Fin n) R) :
     trace ρ = trace (tr₂ ρ) := Fintype.sum_prod_type fun x ↦ ρ x x
@@ -846,7 +834,7 @@ lemma trace_tr₂ {R : Type*} [RCLike R] {m n : ℕ}
 
 /-- The Kraus completion as a map from
 operations to channels. -/
-noncomputable def krausCompletionChannelMap {R : Type*} [RCLike R] {q r : ℕ}
+def krausCompletionChannelMap {R : Type*} [RCLike R] {q r : ℕ}
     {K : Fin r → Matrix (Fin q) (Fin q) R} (hK : QuantumOperation K) :
     {K : Fin (r+1) → Matrix (Fin q) (Fin q) R | QuantumChannel K} := by
   constructor
@@ -887,8 +875,8 @@ lemma CPTP_of_CPTNI {R : Type*} [RCLike R]
       simp
     · exact False.elim <| H <| Fin.eq_last_of_not_lt g₀
 
-
-noncomputable def partialTraceLeft {R : Type*} [RCLike R]
+/-- Partial trace on the left of a tensor product. -/
+def partialTraceLeft {R : Type*} [RCLike R]
     {m n : Type*} [Fintype m]
     (ρ : Matrix (m × n)
                 (m × n) R) : Matrix (n) (n) R :=
