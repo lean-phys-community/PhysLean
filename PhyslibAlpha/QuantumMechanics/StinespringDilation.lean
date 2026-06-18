@@ -709,10 +709,10 @@ lemma stinespringUnitaryForm_works {R : Type*} [RCLike R] {m r : ℕ}
 `Vtilde` is an alternative name for `krausCompletion`.
 -/
 def krausCompletion {R : Type*} [RCLike R] {m r : ℕ}
-  (K : Fin r → Matrix (Fin m) (Fin m) R) :
-  Matrix (Fin m × Fin (r+1)) (Fin m) R := fun x => dite (x.2 < r)
+    (K : Fin r → Matrix (Fin m) (Fin m) R) :
+    Matrix (Fin m × Fin (r+1)) (Fin m) R := fun x => dite (x.2 < r)
   (fun H => stinespringOp K ⟨x.1, ⟨x.2, H⟩⟩)
-   fun _ => (CFC.sqrt (1 - (stinespringOp K)ᴴ * (stinespringOp K)) : Matrix _ _ _) x.1
+  fun _ => (CFC.sqrt (1 - (stinespringOp K)ᴴ * (stinespringOp K)) : Matrix _ _ _) x.1
 
 /-- Entrywise formula for the Stinespring isometry: its `((x₁, x₂), y)` entry is `K x₂ x₁ y`. -/
 theorem stinespringOp_apply {R : Type*} [Ring R] {m r : Type*} [Fintype r] [DecidableEq r]
