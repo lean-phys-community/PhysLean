@@ -7,10 +7,12 @@ module
 public import Mathlib.Data.Matrix.PEquiv
 public import Mathlib.Probability.Distributions.Poisson.Basic
 public import Mathlib.Analysis.Normed.Lp.lpSpace
-import Mathlib
+public import Mathlib
 /-!
 # Stinespring dilation
 -/
+
+@[expose] public section
 
 open Matrix MatrixOrder ComplexOrder RCLike TensorProduct Kronecker
 
