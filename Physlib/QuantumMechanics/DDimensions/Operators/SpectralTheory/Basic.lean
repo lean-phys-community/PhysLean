@@ -290,8 +290,7 @@ lemma IsUnbounded.orthogonal_closure_sub_range [CompleteSpace H]
     refine (eq_of_le_of_domain_eq ?_ ?_).symm
     · refine le_of_eq_of_le ?_ (adjoint_sub_le_sub_adjoint T.closure (z • 1) hS_dense)
       rcases eq_zero_or_neZero z with rfl | hz₀
-      · suffices (0 : ℂ) • (1 : H →ₗ.[ℂ] H) = 0 by simp [this]
-        exact dExt rfl (by simp)
+      · simp
       · simp [adjoint_smul _ hz₀.ne]
     · ext x
       simp only [sub_domain, smul_domain, one_domain, le_top, inf_of_le_left]
