@@ -185,6 +185,20 @@ lemma pow_hasDenseDomain_of_le
     {n : ℕ} (h : (T ^ n).HasDenseDomain) {k : ℕ} (hle : k ≤ n) : (T ^ k).HasDenseDomain :=
   h.mono <| pow_sub_mul_pow T hle ▸ compRestricted_domain_le _ _
 
+/-- `U.rangeᗮ = U†.ker`
+
+  c.f. `LinearMap.orthogonal_range` and `ContinuousLinearMap.orthogonal_range` -/
+lemma HasDenseDomain.orthogonal_range [CompleteSpace H] (h : U.HasDenseDomain) :
+    U.toFun.rangeᗮ = U†.toFun.ker.map U†.domain.subtype := by
+  ext u
+  simp only [mem_orthogonal', Subtype.exists, mem_map, LinearMap.mem_ker, subtype_apply,
+    exists_and_right, exists_eq_right, toFun_eq_coe]
+  constructor
+  · intro h'
+    exact ⟨mem_adjoint_domain_of_exists u ⟨0, by simp [h']⟩, adjoint_apply_eq h _ (by simp [h'])⟩
+  · intro ⟨hu, hu'⟩ v ⟨x, hxv⟩
+    simp [← hxv, ← adjoint_isFormalAdjoint h ⟨u, hu⟩, hu']
+
 /-!
 ### B.2. Closability
 -/
@@ -789,6 +803,21 @@ lemma IsUnbounded.le_adjoint_adjoint [CompleteSpace H] [CompleteSpace H'] (h : U
 lemma IsUnbounded.isClosed_iff [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
     U.IsClosed ↔ U†† = U :=
   h.adjoint_adjoint_eq_closure ▸ h.2.isClosed_iff
+
+/-- `U†.rangeᗮ = U.closure.ker` -/
+lemma IsUnbounded.orthogonal_adjoint_range [CompleteSpace H] [CompleteSpace H']
+    (h : U.IsUnbounded) : U†.toFun.rangeᗮ = U.closure.toFun.ker.map U.closure.domain.subtype :=
+  h.adjoint_adjoint_eq_closure ▸ h.adjoint.hasDenseDomain.orthogonal_range
+
+/-- `U†.kerᗮ = U.range.closure` -/
+lemma IsUnbounded.orthogonal_adjoint_ker [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
+    (U†.toFun.ker.map U†.domain.subtype)ᗮ = U.toFun.range.closure :=
+  h.hasDenseDomain.orthogonal_range ▸ orthogonal_orthogonal_eq_closure _
+
+/-- `U.closure.kerᗮ = U†.range` -/
+lemma IsUnbounded.orthogonal_closure_ker [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
+    (U.closure.toFun.ker.map U.closure.domain.subtype)ᗮ = U†.toFun.range.closure :=
+  h.adjoint_adjoint_eq_closure ▸ h.adjoint.orthogonal_adjoint_ker
 
 /-- A LinearPMap constructed from a symmetric LinearMap with dense domain
   is an unbounded operator. -/
