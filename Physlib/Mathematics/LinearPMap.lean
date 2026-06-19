@@ -33,10 +33,11 @@ composition of partial linear maps while having the domain implicitly accounted 
 ## iii. Table of contents
 
 - A. Inequalities
-- B. Finite sums
-- C. Restricted composition
-- D. Monoid
-- E. Inverses
+- B. Zero smul
+- C. Finite sums
+- D. Restricted composition
+- E. Monoid
+- F. Inverses
 
 ## iv. References
 
@@ -120,7 +121,23 @@ lemma sub_left_le_of_le (h : g₁ ≤ g₂) : f - g₁ ≤ f - g₂ :=
 end Inequalities
 
 /-!
-## B. Finite sums
+## B. Zero smul
+-/
+
+section
+
+variable {𝕜 : Type*} [Field 𝕜] [Module 𝕜 E] [Module 𝕜 F]
+
+lemma zero_smul_le (f : E →ₗ.[𝕜] F) : (0 : 𝕜) • f ≤ 0 := ⟨le_top, by simp⟩
+
+@[simp]
+lemma zero_smul_eq {f : E →ₗ.[𝕜] F} (h : f.domain = ⊤) : (0 : 𝕜) • f = 0 :=
+  eq_of_le_of_domain_eq f.zero_smul_le h
+
+end
+
+/-!
+## C. Finite sums
 -/
 
 section Sums
@@ -146,7 +163,7 @@ lemma sum_apply (ψ : (sum f).domain) : sum f ψ = ∑ a, f a ⟨ψ, sum_domain_
 end Sums
 
 /-!
-## C. Restricted composition
+## D. Restricted composition
 -/
 
 section Composition
@@ -297,7 +314,7 @@ lemma smul_compRestricted {M : Type*} [Monoid M] [DistribMulAction M G] [SMulCom
 end Composition
 
 /-!
-## D. Monoid
+## E. Monoid
 
 Partial linear maps `E →ₗ.[R] E` with `compRestricted` for multiplication and
 the identity map (domain `⊤`) for `1` comprise a monoid.
@@ -334,7 +351,7 @@ lemma one_coe : (1 : E →ₗ.[R] E).toFun' = ⇑topEquiv.toLinearMap := rfl
 end Monoid
 
 /-!
-## E. Inverses
+## F. Inverses
 -/
 
 section Inverses

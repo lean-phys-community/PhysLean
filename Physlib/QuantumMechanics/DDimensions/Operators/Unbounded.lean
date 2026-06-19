@@ -289,6 +289,9 @@ lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
     · exact adjoint_apply_of_not_dense h x
 
 @[simp]
+lemma adjoint_zero [CompleteSpace H] : (0 : H →ₗ.[ℂ] H)† = 0 := adjoint_of_zero rfl
+
+@[simp]
 lemma adjoint_smul [CompleteSpace H] (U : H →ₗ.[ℂ] H') {c : ℂ} (hc : c ≠ 0) :
     (c • U)† = conj c • U† := by
   refine dExt ?_ fun x y hxy ↦ ?_
