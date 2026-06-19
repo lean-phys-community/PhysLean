@@ -357,6 +357,11 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
       adjoint_isFormalAdjoint h₁ ⟨u, u.2.1⟩ ⟨w, w.2.1⟩,
       adjoint_isFormalAdjoint h₂ ⟨u, u.2.2⟩ ⟨w, w.2.2⟩]
 
+lemma adjoint_sub_le_sub_adjoint [CompleteSpace H]
+    (U₁ U₂ : H →ₗ.[ℂ] H') (h₁₂ : (U₁ - U₂).HasDenseDomain) : U₁† - U₂† ≤ (U₁ - U₂)† := by
+  simp only [sub_eq_add_neg, ← adjoint_neg]
+  exact adjoint_add_le_add_adjoint U₁ (-U₂) h₁₂
+
 lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [CompleteSpace H']
     (hV : V.HasDenseDomain) (hVU : (V ∘ᵣ U).HasDenseDomain) : U† ∘ᵣ V† ≤ (V ∘ᵣ U)† := by
   have hU : U.HasDenseDomain := hVU.mono (compRestricted_domain_le V U)
