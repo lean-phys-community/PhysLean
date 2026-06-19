@@ -199,6 +199,12 @@ lemma HasDenseDomain.orthogonal_range [CompleteSpace H] (h : U.HasDenseDomain) :
   · intro ⟨hu, hu'⟩ v ⟨x, hxv⟩
     simp [← hxv, ← adjoint_isFormalAdjoint h ⟨u, hu⟩, hu']
 
+/-- `U†.kerᗮ = U.range.closure` -/
+lemma HasDenseDomain.orthogonal_adjoint_ker [CompleteSpace H] [CompleteSpace H']
+    (h : U.HasDenseDomain) :
+    (U†.toFun.ker.map U†.domain.subtype)ᗮ = U.toFun.range.closure :=
+  h.orthogonal_range ▸ orthogonal_orthogonal_eq_closure _
+
 /-!
 ### B.2. Closability
 -/
@@ -814,15 +820,10 @@ lemma IsUnbounded.orthogonal_adjoint_range [CompleteSpace H] [CompleteSpace H']
     (h : U.IsUnbounded) : U†.toFun.rangeᗮ = U.closure.toFun.ker.map U.closure.domain.subtype :=
   h.adjoint_adjoint_eq_closure ▸ h.adjoint.hasDenseDomain.orthogonal_range
 
-/-- `U†.kerᗮ = U.range.closure` -/
-lemma IsUnbounded.orthogonal_adjoint_ker [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
-    (U†.toFun.ker.map U†.domain.subtype)ᗮ = U.toFun.range.closure :=
-  h.hasDenseDomain.orthogonal_range ▸ orthogonal_orthogonal_eq_closure _
-
 /-- `U.closure.kerᗮ = U†.range` -/
 lemma IsUnbounded.orthogonal_closure_ker [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounded) :
     (U.closure.toFun.ker.map U.closure.domain.subtype)ᗮ = U†.toFun.range.closure :=
-  h.adjoint_adjoint_eq_closure ▸ h.adjoint.orthogonal_adjoint_ker
+  h.adjoint_adjoint_eq_closure ▸ h.adjoint.hasDenseDomain.orthogonal_adjoint_ker
 
 /-- A LinearPMap constructed from a symmetric LinearMap with dense domain
   is an unbounded operator. -/
