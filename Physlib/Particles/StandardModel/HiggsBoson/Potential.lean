@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Particles.StandardModel.HiggsBoson.Basic
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
 /-!
 # The potential of the Higgs field
 
@@ -47,6 +48,9 @@ structure Potential where
 namespace Potential
 
 variable (P : Potential)
+
+TODO "Define a CoeFun instance for the Higgs Potential (or similar), instead of relying on
+  `P.toFun`."
 
 /-- Given a element `P` of `Potential`, `P.toFun` is Higgs potential.
   It is defined for a Higgs field `φ` and a spacetime point `x` as

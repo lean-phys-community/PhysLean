@@ -8,6 +8,7 @@ module
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
 public import Physlib.Meta.Linters.Sorry
 public import Physlib.Meta.Informal.Basic
+public import Physlib.Meta.TODO.Basic
 public import Physlib.SpaceAndTime.Time.Derivatives
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 /-!
@@ -107,6 +108,10 @@ Semiformal implementation note: It is possible that we should restrict
 @[sorryful]
 def FLRW : Type := sorry
 
+TODO "Replace the placeholder `FLRW` type with a concrete structure bundling a positive
+  scale factor `a : Time → ℝ` (smooth, or at least twice differentiable) together with an
+  element of `SpatialGeometry`."
+
 namespace FLRW
 
 namespace FriedmannEquation
@@ -170,6 +175,17 @@ lemma hubbleConstant_ne_zero {a : Time → ℝ} {t : Time}
     (hd_az : ∂ₜ a t ≠ 0) (haz : a t ≠ 0) :
     hubbleConstant a t ≠ 0 :=
   div_ne_zero hd_az haz
+
+TODO "Define the Hubble constant `H₀ = H(t₀)`, the present-day value of the Hubble parameter
+  `hubbleConstant`, and the present Hubble radius `R_H = c / H₀`. Keep `parameter` (the
+  time-dependent `H(t)`) distinct from `constant` (the number `H₀`)."
+
+TODO "Express the Hubble parameter as a function of the scale factor, `H(a)`, and of the
+  redshift, `H(z)`, using `a = 1 / (1 + z)` with the normalization `a₀ = 1`; define the
+  reduced Hubble function `E(z) = H(z) / H₀`."
+
+TODO "Prove the change-of-variable relations underlying the age and distance integrals:
+  `∂ₜ a = a * hubbleConstant a`, `dt = − dz / ((1 + z) * H)` and `dχ = c * dz / H`."
 
 /-- The deceleration parameter defined in terms of the scale factor
   as `- (dₜdₜ a) a / (dₜ a)^2`.

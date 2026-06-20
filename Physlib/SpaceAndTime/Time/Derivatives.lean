@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Nikolai Kashcheev, Joseph Tooby-Smith
 -/
 module
 
@@ -21,10 +21,13 @@ In this module we define and prove basic lemmas about derivatives of functions o
 ## ii. Key results
 
 - `deriv` : The derivative of a function `Time → M` at a given time.
+- `manifoldDeriv` : The derivative of a function from `Time` to a manifold.
 
 ## iii. Table of contents
 
 - A. The definition of the derivative
+  - A.1. Derivatives of functions into vector spaces
+  - A.2. Derivatives of functions into manifolds
 - B. Linearlity properties of the derivative
 - C. Derivative of constant functions
 - D. Smoothness properties of the derivative
@@ -45,6 +48,13 @@ variable {M : Type} {d : ℕ} {t : Time}
 ## A. The definition of the derivative
 
 -/
+
+/-!
+
+### A.1. Derivatives of functions into vector spaces
+
+-/
+
 /-- Given a function `f : Time → M` the derivative of `f`. -/
 noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (f : Time → M) : Time → M :=
@@ -55,6 +65,51 @@ scoped notation "∂ₜ" => deriv
 
 lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (f : Time → M) (t : Time) : Time.deriv f t = fderiv ℝ f t 1 := rfl
+
+/-!
+
+### A.2. Derivatives of functions into manifolds
+
+-/
+
+open Manifold in
+/-- The time derivative of a function from `Time` to a manifold, as a tangent vector at
+the value of the function. -/
+noncomputable def manifoldDeriv {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] (f : Time → N) : (t : Time) → TangentSpace I (f t) :=
+  fun t => mfderiv 𝓘(ℝ, Time) I f t ((1 : Time) : TangentSpace 𝓘(ℝ, Time) t)
+
+open Manifold in
+lemma manifoldDeriv_eq {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] (f : Time → N) (t : Time) :
+    manifoldDeriv I f t =
+      mfderiv 𝓘(ℝ, Time) I f t ((1 : Time) : TangentSpace 𝓘(ℝ, Time) t) := rfl
+
+open Manifold in
+/-- The time derivative is the manifold derivative for functions into normed spaces. -/
+lemma deriv_eq_mfderiv [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (t : Time) :
+    deriv f t =
+      mfderiv 𝓘(ℝ, Time) 𝓘(ℝ, M) f t
+        ((1 : Time) : TangentSpace 𝓘(ℝ, Time) t) := by
+  rw [deriv_eq, ← mfderiv_eq_fderiv]
+  rfl
+
+open Manifold in
+lemma deriv_eq_manifoldDeriv [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (t : Time) :
+    deriv f t = manifoldDeriv 𝓘(ℝ, M) f t := by
+  rw [deriv_eq_mfderiv, manifoldDeriv_eq]
+
+open Manifold in
+@[simp]
+lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] (n : N) :
+    manifoldDeriv I (fun _ : Time => n) t = 0 := by
+  simp [manifoldDeriv]
 
 /-!
 

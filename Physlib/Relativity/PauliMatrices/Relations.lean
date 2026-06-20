@@ -110,7 +110,7 @@ lemma pauliContr_mul_pauliContrDown_add :
     rw [pauliContrDown_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, permT_ofRat, ← map_add]
   conv_rhs =>
-    rw [leftAltLeftUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
+    rw [leftDualLeftUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
       permT_ofRat]
   apply (Tensor.basis _).repr.injective
   ext b
@@ -126,7 +126,7 @@ lemma auliContrDown_pauliContr_mul_add :
     rw [pauliContrDown_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, permT_ofRat, ← map_add]
   conv_rhs =>
-    rw [altRightRightUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
+    rw [dualRightRightUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
       permT_ofRat]
   apply (Tensor.basis _).repr.injective
   ext b

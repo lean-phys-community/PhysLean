@@ -19,18 +19,11 @@ jobs:
               uses: mb2dev/github-action-comment-pull-request@1.0.0
               with:
                 message:  |
-                  Thank you for this PR, which will now be reviewed.
-                  If submitting to ./Physlib or ./QuantumInfo, please
-                  see our [review guidelines](https://github.com/leanprover-community/physlib/blob/master/docs/ReviewGuidelines.md)
-                  if you are not familiar with the process. You should expect a back and forth
-                  with a reviewer before your PR is merged. See also that link for how to
-                  add appropriate labels to your PR. The PR will also go through a number
-                  of automated checks. You can learn more about these [here](https://github.com/leanprover-community/physlib/blob/master/scripts/README.md),
-                  including how to run them locally.
+                  Thank you for this PR, which will now be reviewed. If submitting to ./Physlib or ./QuantumInfo, please see our [review guidelines](https://github.com/leanprover-community/physlib/blob/master/docs/ReviewGuidelines.md) if you are not familiar with the process. You should expect a back and forth with a reviewer before your PR is merged. See also that link for how to add appropriate labels to your PR. The PR will  also go through a number of automated checks. You can learn more about these [here](https://github.com/leanprover-community/physlib/blob/master/scripts/README.md), including how to run them locally.
 
-                  If you are submitting to ./PhyslibAlpha there will be a lighter review process,
-                  though your PR must still pass the automated checks.
+                  If you are submitting to ./PhyslibAlpha there will be a lighter review process, though your PR must still pass the automated checks.
 
-                  If you want to bring attention to this PR, please write a message on this
-                  [thread](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/PR.20reviews/with/596447366) of the Lean Zulip.
+                  If you want to bring attention to this PR, please write a message on this [thread](https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/PR.20reviews/with/596447366) of the Lean Zulip.
+
+                  **Important:** If a reviewer adds an `awaiting-author` label to your PR, once you have addressed the review comments, please remove that label by adding a comment with `-awaiting-author`. This helps us keep track of reviews.
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

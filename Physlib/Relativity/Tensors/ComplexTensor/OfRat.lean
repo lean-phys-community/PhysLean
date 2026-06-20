@@ -76,20 +76,20 @@ lemma contr_basis_ratComplexNum {c : complexLorentzTensor.Color}
       = toComplexNum (if i.val = j.val then 1 else 0) := by
   match c with
   | Color.upL =>
-    change Fermion.leftAltContraction (Fermion.leftBasis i ⊗ₜ Fermion.altLeftBasis j) = _
-    rw [Fermion.leftAltContraction_basis]
+    change Fermion.leftDualContraction (Fermion.leftBasis i ⊗ₜ Fermion.dualLeftBasis j) = _
+    rw [Fermion.leftDualContraction_basis]
     simp
   | Color.downL =>
-    change Fermion.altLeftContraction (Fermion.altLeftBasis i ⊗ₜ Fermion.leftBasis j) = _
-    rw [Fermion.altLeftContraction_basis]
+    change Fermion.dualLeftContraction (Fermion.dualLeftBasis i ⊗ₜ Fermion.leftBasis j) = _
+    rw [Fermion.dualLeftContraction_basis]
     simp
   | Color.upR =>
-    change Fermion.rightAltContraction (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
-    rw [Fermion.rightAltContraction_basis]
+    change Fermion.rightDualContraction (Fermion.rightBasis i ⊗ₜ Fermion.dualRightBasis j) = _
+    rw [Fermion.rightDualContraction_basis]
     simp
   | Color.downR =>
-    change Fermion.rightAltContraction (Fermion.rightBasis i ⊗ₜ Fermion.altRightBasis j) = _
-    rw [Fermion.rightAltContraction_basis]
+    change Fermion.rightDualContraction (Fermion.rightBasis i ⊗ₜ Fermion.dualRightBasis j) = _
+    rw [Fermion.rightDualContraction_basis]
     simp
   | Color.up =>
     change Lorentz.contrCoContraction

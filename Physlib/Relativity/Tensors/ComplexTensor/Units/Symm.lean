@@ -36,30 +36,30 @@ lemma contrCoUnit_symm : {δ | μ ν = δ' | ν μ}ᵀ := by
   rw [contrCoUnit, unitTensor_eq_permT_dual]
   rfl
 
-/-- Swapping indices of `altLeftLeftUnit` returns
-  `leftAltLeftUnit`: `{δL' | α α' = δL | α' α}ᵀ`. -/
-lemma altLeftLeftUnit_symm : {δL' | α α' = δL | α' α}ᵀ := by
-  rw [altLeftLeftUnit, unitTensor_eq_permT_dual]
+/-- Swapping indices of `dualLeftLeftUnit` returns
+  `leftDualLeftUnit`: `{δL' | α α' = δL | α' α}ᵀ`. -/
+lemma dualLeftLeftUnit_symm : {δL' | α α' = δL | α' α}ᵀ := by
+  rw [dualLeftLeftUnit, unitTensor_eq_permT_dual]
   rfl
 
-/-- Swapping indices of `leftAltLeftUnit` returns
-  `altLeftLeftUnit`: `{δL | α α' = δL' | α' α}ᵀ`. -/
-lemma leftAltLeftUnit_symm : {δL | α α' = δL' | α' α}ᵀ := by
-  rw [leftAltLeftUnit, unitTensor_eq_permT_dual]
+/-- Swapping indices of `leftDualLeftUnit` returns
+  `dualLeftLeftUnit`: `{δL | α α' = δL' | α' α}ᵀ`. -/
+lemma leftDualLeftUnit_symm : {δL | α α' = δL' | α' α}ᵀ := by
+  rw [leftDualLeftUnit, unitTensor_eq_permT_dual]
   rfl
 
-/-- Swapping indices of `altRightRightUnit` returns `rightAltRightUnit`:
+/-- Swapping indices of `dualRightRightUnit` returns `rightDualRightUnit`:
 `{δR' | β β' = δR | β' β}ᵀ`.
 -/
-lemma altRightRightUnit_symm : {δR' | β β' = δR | β' β}ᵀ := by
-  rw [altRightRightUnit, unitTensor_eq_permT_dual]
+lemma dualRightRightUnit_symm : {δR' | β β' = δR | β' β}ᵀ := by
+  rw [dualRightRightUnit, unitTensor_eq_permT_dual]
   rfl
 
-/-- Swapping indices of `rightAltRightUnit` returns `altRightRightUnit`:
+/-- Swapping indices of `rightDualRightUnit` returns `dualRightRightUnit`:
 `{δR | β β' = δR' | β' β}ᵀ`.
 -/
-lemma rightAltRightUnit_symm : {δR | β β' = δR' | β' β}ᵀ := by
-  rw [rightAltRightUnit, unitTensor_eq_permT_dual]
+lemma rightDualRightUnit_symm : {δR | β β' = δR' | β' β}ᵀ := by
+  rw [rightDualRightUnit, unitTensor_eq_permT_dual]
   rfl
 
 end complexLorentzTensor

@@ -11,8 +11,8 @@ public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Unit
 # Metrics of Weyl fermions
 
 We define the metrics for Weyl fermions, often denoted `ε` in the literature.
-These allow us to go from left-handed to alt-left-handed Weyl fermions and back,
-and from right-handed to alt-right-handed Weyl fermions and back.
+These allow us to go from left-handed to dual-left-handed Weyl fermions and back,
+and from right-handed to dual-right-handed Weyl fermions and back.
 
 -/
 
@@ -70,7 +70,7 @@ lemma metricRaw_comm_star (M : SL(2,ℂ)) : metricRaw * M.1.map star = ((M.1)⁻
   simp
 
 /-- The metric `εᵃᵃ` as an element of `(leftHanded ⊗ leftHanded).V`. -/
-def leftMetricVal : LeftHandedModule ⊗[ℂ] LeftHandedModule :=
+def leftMetricVal : LeftHandedWeyl ⊗[ℂ] LeftHandedWeyl :=
   leftLeftToMatrix.symm (- metricRaw)
 
 set_option backward.isDefEq.respectTransparency false in
@@ -116,27 +116,27 @@ lemma leftMetric_apply_one : leftMetric (1 : ℂ) = leftMetricVal := by
   change (1 : ℂ) • leftMetricVal = leftMetricVal
   simp only [one_smul]
 
-/-- The metric `εₐₐ` as an element of `(altLeftHanded ⊗ altLeftHanded).V`. -/
-def altLeftMetricVal : (AltLeftHandedModule ⊗[ℂ] AltLeftHandedModule) :=
-  altLeftaltLeftToMatrix.symm metricRaw
+/-- The metric `εₐₐ` as an element of `(dualLeftHanded ⊗ dualLeftHanded).V`. -/
+def dualLeftMetricVal : (DualLeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) :=
+  dualLeftdualLeftToMatrix.symm metricRaw
 
 set_option backward.isDefEq.respectTransparency false in
-/-- Expansion of `altLeftMetricVal` into the left basis. -/
-lemma altLeftMetricVal_expand_tmul : altLeftMetricVal =
-    altLeftBasis 0 ⊗ₜ[ℂ] altLeftBasis 1 - altLeftBasis 1 ⊗ₜ[ℂ] altLeftBasis 0 := by
-  simp only [altLeftMetricVal, Fin.isValue]
-  rw [altLeftaltLeftToMatrix_symm_expand_tmul]
+/-- Expansion of `dualLeftMetricVal` into the left basis. -/
+lemma dualLeftMetricVal_expand_tmul : dualLeftMetricVal =
+    dualLeftBasis 0 ⊗ₜ[ℂ] dualLeftBasis 1 - dualLeftBasis 1 ⊗ₜ[ℂ] dualLeftBasis 0 := by
+  simp only [dualLeftMetricVal, Fin.isValue]
+  rw [dualLeftdualLeftToMatrix_symm_expand_tmul]
   simp only [metricRaw, of_apply, cons_val', empty_val', cons_val_fin_one, Fin.sum_univ_two,
     Fin.isValue, cons_val_zero, cons_val_one, zero_smul, one_smul, zero_add, add_zero]
   module
 
-/-- The metric `εₐₐ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ altLeftHanded`,
+/-- The metric `εₐₐ` as a morphism `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ dualLeftHanded ⊗ dualLeftHanded`,
   making manifest its invariance under the action of `SL(2,ℂ)`. -/
-def altLeftMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
-    (altLeftHandedRep.tprod altLeftHandedRep) where
+def dualLeftMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
+    (dualLeftHandedRep.tprod dualLeftHandedRep) where
     toFun := fun a =>
       let a' : ℂ := a
-      a' • altLeftMetricVal
+      a' • dualLeftMetricVal
     map_add' := fun x y => by
       simp only [add_smul]
     map_smul' := fun m x => by
@@ -144,23 +144,23 @@ def altLeftMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
       rfl
     isIntertwining' M := by
       refine LinearMap.ext fun x : ℂ => ?_
-      change x • altLeftMetricVal =
-        (TensorProduct.map (altLeftHandedRep M) (altLeftHandedRep M)) (x • altLeftMetricVal)
+      change x • dualLeftMetricVal =
+        (TensorProduct.map (dualLeftHandedRep M) (dualLeftHandedRep M)) (x • dualLeftMetricVal)
       simp only [map_smul]
       apply congrArg
-      simp only [altLeftMetricVal]
-      rw [altLeftaltLeftToMatrix_ρ_symm]
+      simp only [dualLeftMetricVal]
+      rw [dualLeftdualLeftToMatrix_ρ_symm]
       apply congrArg
       rw [← metricRaw_comm, mul_assoc]
       simp only [SpecialLinearGroup.det_coe, isUnit_iff_ne_zero, ne_eq, one_ne_zero,
         not_false_eq_true, mul_nonsing_inv, mul_one]
 
-lemma altLeftMetric_apply_one : altLeftMetric (1 : ℂ) = altLeftMetricVal := by
-  change (1 : ℂ) • altLeftMetricVal = altLeftMetricVal
+lemma dualLeftMetric_apply_one : dualLeftMetric (1 : ℂ) = dualLeftMetricVal := by
+  change (1 : ℂ) • dualLeftMetricVal = dualLeftMetricVal
   simp only [one_smul]
 
 /-- The metric `ε^{dot a}^{dot a}` as an element of `(rightHanded ⊗ rightHanded).V`. -/
-def rightMetricVal : (RightHandedModule ⊗[ℂ] RightHandedModule) :=
+def rightMetricVal : (RightHandedWeyl ⊗[ℂ] RightHandedWeyl) :=
   rightRightToMatrix.symm (- metricRaw)
 
 set_option backward.isDefEq.respectTransparency false in
@@ -213,28 +213,28 @@ lemma rightMetric_apply_one : rightMetric (1 : ℂ) = rightMetricVal := by
   change (1 : ℂ) • rightMetricVal = rightMetricVal
   simp only [one_smul]
 
-/-- The metric `ε_{dot a}_{dot a}` as an element of `(altRightHanded ⊗ altRightHanded).V`. -/
-def altRightMetricVal : AltRightHandedModule ⊗[ℂ] AltRightHandedModule :=
-  altRightAltRightToMatrix.symm (metricRaw)
+/-- The metric `ε_{dot a}_{dot a}` as an element of `(dualRightHanded ⊗ dualRightHanded).V`. -/
+def dualRightMetricVal : DualRightHandedWeyl ⊗[ℂ] DualRightHandedWeyl :=
+  dualRightDualRightToMatrix.symm (metricRaw)
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `rightMetricVal` into the left basis. -/
-lemma altRightMetricVal_expand_tmul : altRightMetricVal =
-    altRightBasis 0 ⊗ₜ[ℂ] altRightBasis 1 - altRightBasis 1 ⊗ₜ[ℂ] altRightBasis 0 := by
-  simp only [altRightMetricVal, Fin.isValue]
-  erw [altRightAltRightToMatrix_symm_expand_tmul]
+lemma dualRightMetricVal_expand_tmul : dualRightMetricVal =
+    dualRightBasis 0 ⊗ₜ[ℂ] dualRightBasis 1 - dualRightBasis 1 ⊗ₜ[ℂ] dualRightBasis 0 := by
+  simp only [dualRightMetricVal, Fin.isValue]
+  erw [dualRightDualRightToMatrix_symm_expand_tmul]
   simp only [metricRaw, of_apply, cons_val', empty_val', cons_val_fin_one, Fin.sum_univ_two,
     Fin.isValue, cons_val_zero, cons_val_one, zero_smul, one_smul, zero_add, add_zero]
   module
 
 /-- The metric `ε_{dot a}_{dot a}` as a morphism
-  `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altRightHanded ⊗ altRightHanded`,
+  `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ dualRightHanded ⊗ dualRightHanded`,
   making manifest its invariance under the action of `SL(2,ℂ)`. -/
-def altRightMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
-    (altRightHandedRep.tprod altRightHandedRep) where
+def dualRightMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
+    (dualRightHandedRep.tprod dualRightHandedRep) where
   toFun := fun a =>
       let a' : ℂ := a
-      a' • altRightMetricVal
+      a' • dualRightMetricVal
   map_add' := fun x y => by
     simp only [add_smul]
   map_smul' := fun m x => by
@@ -242,13 +242,13 @@ def altRightMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     rfl
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
-    change x • altRightMetricVal =
-      (TensorProduct.map (altRightHandedRep M) (altRightHandedRep M)) (x • altRightMetricVal)
+    change x • dualRightMetricVal =
+      (TensorProduct.map (dualRightHandedRep M) (dualRightHandedRep M)) (x • dualRightMetricVal)
     simp only [map_smul]
     apply congrArg
-    trans altRightAltRightToMatrix.symm
+    trans dualRightDualRightToMatrix.symm
       (((M.1)⁻¹).conjTranspose * metricRaw * (((M.1)⁻¹).conjTranspose)ᵀ)
-    · rw [altRightMetricVal]
+    · rw [dualRightMetricVal]
       apply congrArg
       rw [← metricRaw_comm_star, mul_assoc]
       have h1 : ((M.1).map star * (M.1)⁻¹ᴴᵀ) = 1 := by
@@ -259,11 +259,11 @@ def altRightMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
         rw [← @conjTranspose_mul]
         simp
       rw [h1, mul_one]
-    · rw [← altRightAltRightToMatrix_ρ_symm metricRaw M]
+    · rw [← dualRightDualRightToMatrix_ρ_symm metricRaw M]
       rfl
 
-lemma altRightMetric_apply_one : altRightMetric (1 : ℂ) = altRightMetricVal := by
-  change (1 : ℂ) • altRightMetricVal = altRightMetricVal
+lemma dualRightMetric_apply_one : dualRightMetric (1 : ℂ) = dualRightMetricVal := by
+  change (1 : ℂ) • dualRightMetricVal = dualRightMetricVal
   simp only [one_smul]
 
 /-!
@@ -273,87 +273,87 @@ lemma altRightMetric_apply_one : altRightMetric (1 : ℂ) = altRightMetricVal :=
 -/
 
 set_option backward.isDefEq.respectTransparency false in
-lemma leftAltContraction_apply_metric :
+lemma leftDualContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
       (TensorProduct.lid ℂ _).lTensor _ <|
-      (leftAltContraction.toLinearMap.rTensor _).lTensor _ <|
+      (leftDualContraction.toLinearMap.rTensor _).lTensor _ <|
       (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
       TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
-      (leftMetric 1) ⊗ₜ[ℂ] (altLeftMetric 1)) = altLeftLeftUnit (1 : ℂ) := by
-  rw [leftMetric_apply_one, altLeftMetric_apply_one]
-  rw [leftMetricVal_expand_tmul', altLeftMetricVal_expand_tmul]
+      (leftMetric 1) ⊗ₜ[ℂ] (dualLeftMetric 1)) = dualLeftLeftUnit (1 : ℂ) := by
+  rw [leftMetric_apply_one, dualLeftMetric_apply_one]
+  rw [leftMetricVal_expand_tmul', dualLeftMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub, assoc_tmul, LinearMap.lTensor_tmul,
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [leftAltContraction_basis]
+  repeat erw [leftDualContraction_basis]
   simp only [Fin.isValue, Fin.val_one, Fin.val_zero, one_ne_zero, ↓reduceIte, one_smul, zero_ne_one]
-  erw [altLeftLeftUnit_apply_one, altLeftLeftUnitVal_expand_tmul]
+  erw [dualLeftLeftUnit_apply_one, dualLeftLeftUnitVal_expand_tmul]
   rw [add_comm]
   module
 
-lemma altLeftContraction_apply_metric :
+lemma dualLeftContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
     (TensorProduct.lid ℂ _).lTensor _ <|
-    (altLeftContraction.toLinearMap.rTensor _).lTensor _ <|
+    (dualLeftContraction.toLinearMap.rTensor _).lTensor _ <|
     (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
     TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
-    (altLeftMetric 1) ⊗ₜ[ℂ] (leftMetric 1)) = leftAltLeftUnit (1 : ℂ) := by
-  rw [leftMetric_apply_one, altLeftMetric_apply_one]
-  rw [leftMetricVal_expand_tmul', altLeftMetricVal_expand_tmul]
+    (dualLeftMetric 1) ⊗ₜ[ℂ] (leftMetric 1)) = leftDualLeftUnit (1 : ℂ) := by
+  rw [leftMetric_apply_one, dualLeftMetric_apply_one]
+  rw [leftMetricVal_expand_tmul', dualLeftMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub, assoc_tmul, LinearMap.lTensor_tmul,
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [altLeftContraction_basis]
+  repeat erw [dualLeftContraction_basis]
   simp only [Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.mod_succ, ↓reduceIte, one_smul, Nat.zero_mod,
     zero_ne_one, zero_smul, sub_zero, one_ne_zero, zero_sub, sub_neg_eq_add,
     Representation.IntertwiningMap.coe_toLinearMap]
-  erw [leftAltLeftUnit_apply_one, leftAltLeftUnitVal_expand_tmul]
+  erw [leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
 
 set_option backward.isDefEq.respectTransparency false in
-lemma rightAltContraction_apply_metric :
+lemma rightDualContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
     (TensorProduct.lid ℂ _).lTensor _ <|
-    (rightAltContraction.toLinearMap.rTensor _).lTensor _ <|
+    (rightDualContraction.toLinearMap.rTensor _).lTensor _ <|
     (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
     TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
-    (rightMetric 1) ⊗ₜ[ℂ] (altRightMetric 1)) = altRightRightUnit (1 : ℂ) := by
-  rw [rightMetric_apply_one, altRightMetric_apply_one]
-  rw [rightMetricVal_expand_tmul', altRightMetricVal_expand_tmul]
+    (rightMetric 1) ⊗ₜ[ℂ] (dualRightMetric 1)) = dualRightRightUnit (1 : ℂ) := by
+  rw [rightMetric_apply_one, dualRightMetric_apply_one]
+  rw [rightMetricVal_expand_tmul', dualRightMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub, assoc_tmul, LinearMap.lTensor_tmul,
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [rightAltContraction_basis]
+  repeat erw [rightDualContraction_basis]
   simp only [Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.mod_succ, Nat.zero_mod, one_ne_zero, ↓reduceIte,
     one_smul, zero_ne_one]
-  erw [altRightRightUnit_apply_one, altRightRightUnitVal_expand_tmul]
+  erw [dualRightRightUnit_apply_one, dualRightRightUnitVal_expand_tmul]
   rw [add_comm]
   module
 
-lemma altRightContraction_apply_metric :
+lemma dualRightContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
       (TensorProduct.lid ℂ _).lTensor _ <|
-      (altRightContraction.toLinearMap.rTensor _).lTensor _ <|
+      (dualRightContraction.toLinearMap.rTensor _).lTensor _ <|
       (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
       TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
-      (altRightMetric 1) ⊗ₜ[ℂ] (rightMetric 1)) = rightAltRightUnit (1 : ℂ) := by
-  rw [rightMetric_apply_one, altRightMetric_apply_one]
-  rw [rightMetricVal_expand_tmul', altRightMetricVal_expand_tmul]
+      (dualRightMetric 1) ⊗ₜ[ℂ] (rightMetric 1)) = rightDualRightUnit (1 : ℂ) := by
+  rw [rightMetric_apply_one, dualRightMetric_apply_one]
+  rw [rightMetricVal_expand_tmul', dualRightMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub, assoc_tmul, LinearMap.lTensor_tmul,
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [altRightContraction_basis]
+  repeat erw [dualRightContraction_basis]
   simp only [Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.mod_succ, ↓reduceIte, one_smul, Nat.zero_mod,
     zero_ne_one, zero_smul, sub_zero, one_ne_zero, zero_sub, sub_neg_eq_add,
     Representation.IntertwiningMap.coe_toLinearMap]
-  erw [rightAltRightUnit_apply_one, rightAltRightUnitVal_expand_tmul]
+  erw [rightDualRightUnit_apply_one, rightDualRightUnitVal_expand_tmul]
 
 end
 end Fermion

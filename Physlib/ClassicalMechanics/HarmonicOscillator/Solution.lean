@@ -867,6 +867,91 @@ lemma trajectory_periodic (IC : InitialConditions) :
   rw [InitialConditions.trajectory, add_val, period_eq, h, cos_add_two_pi, sin_add_two_pi]
   rfl
 
+/--
+Assuming that the initial coordinate and velocity are not simultaneously zero,
+the time stamps when the harmonic oscillator returns to its initial coordinate and velocity is
+a multiple of its period
+-/
+lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v₀ ≠ 0)
+    (t : Time) (ht : IC.trajectory S t = IC.x₀ ∧ ∂ₜ (IC.trajectory S) t = IC.v₀) :
+    ∃ n : ℤ,  (n : ℝ) * (T S) = t := by
+  have htx := ht.left
+  have htv := ht.right
+  rw [InitialConditions.trajectory_eq] at htx
+  rw [InitialConditions.trajectory_velocity] at htv
+  simp at htx
+  simp at htv
+  set c := cos (S.ω * t)
+  set s :=  sin (S.ω * t)
+  set xx := inner ℝ IC.x₀ IC.x₀
+  set vv := inner ℝ IC.v₀ IC.v₀
+  set xv := inner ℝ IC.x₀ IC.v₀
+  set det := vv + xx *  S.ω^2
+  have zero_lt_det :  0 < det := by
+   cases non_trivial with
+   | inl hx =>
+    have  xx_gt_zero : 0 < xx  := by
+        apply real_inner_self_pos.mpr
+        exact hx
+    calc
+      0 < xx * S.ω^2 := by bound
+      _ ≤  ‖IC.v₀‖^2 +   xx * S.ω^2  := by bound
+      _ = vv +   xx * S.ω^2 := by rw [← real_inner_self_eq_norm_sq IC.v₀]
+      _ = det := by rfl
+   | inr hv =>
+     have vv_gt_zero : 0 < vv := by
+        apply real_inner_self_pos.mpr
+        exact hv
+     calc
+        0 <  vv := vv_gt_zero
+        _ ≤ vv +   ‖IC.x₀‖^2 * S.ω^2 := by bound
+        _ = vv +   xx * S.ω^2  := by rw [← real_inner_self_eq_norm_sq IC.x₀]
+        _ = det := by rfl
+  have det_ne_zero : det ≠ 0 := by bound
+  have hxx : c * xx + (s / S.ω) * xv = xx := by
+    calc
+     c * xx + (s / S.ω) * xv =  (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * xv := by
+       rw[real_inner_smul_left]
+     (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * xv =
+       (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * inner ℝ  IC.v₀ IC.x₀ := by
+         rw [real_inner_comm IC.x₀ IC.v₀]
+     _  = (inner ℝ (c • IC.x₀) IC.x₀) +  inner ℝ  ((s / S.ω)  • IC.v₀) IC.x₀ := by
+       rw [real_inner_smul_left IC.v₀]
+     _ = (inner ℝ (c • IC.x₀ + (s / S.ω)  • IC.v₀) IC.x₀) := by rw [inner_add_left]
+     _ = xx := by rw [htx]
+  have hvv : - S.ω * s * xv + c * vv = vv := by
+    calc
+     - S.ω * s * xv + c * vv = - S.ω * (s * xv) + c * vv := by ring_nf
+     _ = - S.ω * inner ℝ (s • IC.x₀) IC.v₀ + c * vv := by rw[real_inner_smul_left]
+     _ = inner ℝ  (- S.ω • s • IC.x₀ ) IC.v₀ + c * vv := by rw [← real_inner_smul_left]
+     _ = inner ℝ  (- S.ω • s • IC.x₀ ) IC.v₀ + inner ℝ (c • IC.v₀) IC.v₀ := by
+       rw [← real_inner_smul_left]
+     _ = inner ℝ (- S.ω • s • IC.x₀ + c • IC.v₀) IC.v₀ := by rw [inner_add_left]
+     _ = inner ℝ (-( S.ω • s • IC.x₀) + c • IC.v₀) IC.v₀ := by rw [neg_smul]
+     _ = vv := by rw [htv]
+  have hcos : 1 = cos (S.ω * t) := by
+    calc
+    1 =  det / det := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self]
+    _ = (vv + xx * S.ω^2 ) / det := by rfl
+    _ = c * ((vv + xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
+      nth_rewrite 1 [← hvv, ← hxx]
+      ring_nf
+    _ = c * ((vv + xx * S.ω^2) / det ) := by
+      simp only [ne_eq, S.ω_ne_zero, not_false_eq_true,
+        div_self, sub_self, mul_zero, zero_div, add_zero]
+    _ = c * (det / det) := by rfl
+    _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
+    _ = _ := by rfl
+  let ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp (Eq.symm hcos)
+  use n
+  calc
+    (n : ℝ) * (T S) = (n : ℝ) * (2 * π / S.ω) := by rfl
+    _ = ((n : ℝ) * (2 * π)) / S.ω := by ring_nf
+    _ = (S.ω * t) / S.ω := by rw [hn]
+    _ = t * (S.ω / S.ω) := by ring_nf
+    _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
+
+
 /-!
 
 ## F. Some open TODOs
@@ -875,8 +960,6 @@ We give some open TODOs for the classical harmonic oscillator.
 
 -/
 
-TODO "For the classical harmonic oscillator find the time for which it returns to
-  it's initial position and velocity."
 
 TODO "For the classical harmonic oscillator find the times for
   which it passes through zero."

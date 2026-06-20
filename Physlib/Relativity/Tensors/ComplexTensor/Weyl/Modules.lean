@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Complex.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 ## Modules associated with Fermions
@@ -17,6 +18,7 @@ To overcome this, for each type of Weyl fermion we define a structure that wraps
 and these structures we define the instance of a module. This prevents casting between different
 types of fermions.
 
+
 -/
 
 @[expose] public section
@@ -24,37 +26,41 @@ types of fermions.
 namespace Fermion
 noncomputable section
 
+TODO "Make a directory in ./Physlib/Relativity called Fermions for these files.
+  Make this file (currently ..../Modules.lean) the Basic file, and include the basic module
+  definitions for the different types of Weyl fermions."
+
 section LeftHanded
 
 /-- The module in which left handed fermions live. This is equivalent to `Fin 2 → ℂ`. -/
-structure LeftHandedModule where
+structure LeftHandedWeyl where
   /-- The underlying value in `Fin 2 → ℂ`. -/
   val : Fin 2 → ℂ
 
-namespace LeftHandedModule
+namespace LeftHandedWeyl
 
-/-- The equivalence between `LeftHandedModule` and `Fin 2 → ℂ`. -/
-def toFin2ℂFun : LeftHandedModule ≃ (Fin 2 → ℂ) where
+/-- The equivalence between `LeftHandedWeyl` and `Fin 2 → ℂ`. -/
+def toFin2ℂFun : LeftHandedWeyl ≃ (Fin 2 → ℂ) where
   toFun v := v.val
   invFun f := ⟨f⟩
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- The instance of `AddCommMonoid` on `LeftHandedModule` defined via its equivalence
+/-- The instance of `AddCommMonoid` on `LeftHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommMonoid LeftHandedModule := Equiv.addCommMonoid toFin2ℂFun
+instance : AddCommMonoid LeftHandedWeyl := Equiv.addCommMonoid toFin2ℂFun
 
-/-- The instance of `AddCommGroup` on `LeftHandedModule` defined via its equivalence
+/-- The instance of `AddCommGroup` on `LeftHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommGroup LeftHandedModule := Equiv.addCommGroup toFin2ℂFun
+instance : AddCommGroup LeftHandedWeyl := Equiv.addCommGroup toFin2ℂFun
 
-/-- The instance of `Module` on `LeftHandedModule` defined via its equivalence
+/-- The instance of `Module` on `LeftHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : Module ℂ LeftHandedModule := Equiv.module ℂ toFin2ℂFun
+instance : Module ℂ LeftHandedWeyl := Equiv.module ℂ toFin2ℂFun
 
-/-- The linear equivalence between `LeftHandedModule` and `(Fin 2 → ℂ)`. -/
+/-- The linear equivalence between `LeftHandedWeyl` and `(Fin 2 → ℂ)`. -/
 @[simps!]
-def toFin2ℂEquiv : LeftHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
+def toFin2ℂEquiv : LeftHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
   toFun := toFin2ℂFun
   map_add' := fun _ _ => rfl
   map_smul' := fun _ _ => rfl
@@ -62,45 +68,43 @@ def toFin2ℂEquiv : LeftHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
-/-- The underlying element of `Fin 2 → ℂ` of a element in `LeftHandedModule` defined
+/-- The underlying element of `Fin 2 → ℂ` of a element in `LeftHandedWeyl` defined
   through the linear equivalence `toFin2ℂEquiv`. -/
-abbrev toFin2ℂ (ψ : LeftHandedModule) := toFin2ℂEquiv ψ
+abbrev toFin2ℂ (ψ : LeftHandedWeyl) := toFin2ℂEquiv ψ
 
-end LeftHandedModule
+end LeftHandedWeyl
 
 end LeftHanded
 
-section AltLeftHanded
-
-/-- The module in which alt-left handed fermions live. This is equivalent to `Fin 2 → ℂ`. -/
-structure AltLeftHandedModule where
+/-- The module in which dual-left handed fermions live. This is equivalent to `Fin 2 → ℂ`. -/
+structure DualLeftHandedWeyl where
   /-- The underlying value in `Fin 2 → ℂ`. -/
   val : Fin 2 → ℂ
 
-namespace AltLeftHandedModule
+namespace DualLeftHandedWeyl
 
-/-- The equivalence between `AltLeftHandedModule` and `Fin 2 → ℂ`. -/
-def toFin2ℂFun : AltLeftHandedModule ≃ (Fin 2 → ℂ) where
+/-- The equivalence between `DualLeftHandedWeyl` and `Fin 2 → ℂ`. -/
+def toFin2ℂFun : DualLeftHandedWeyl ≃ (Fin 2 → ℂ) where
   toFun v := v.val
   invFun f := ⟨f⟩
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- The instance of `AddCommMonoid` on `AltLeftHandedModule` defined via its equivalence
+/-- The instance of `AddCommMonoid` on `DualLeftHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommMonoid AltLeftHandedModule := Equiv.addCommMonoid toFin2ℂFun
+instance : AddCommMonoid DualLeftHandedWeyl := Equiv.addCommMonoid toFin2ℂFun
 
-/-- The instance of `AddCommGroup` on `AltLeftHandedModule` defined via its equivalence
+/-- The instance of `AddCommGroup` on `DualLeftHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommGroup AltLeftHandedModule := Equiv.addCommGroup toFin2ℂFun
+instance : AddCommGroup DualLeftHandedWeyl := Equiv.addCommGroup toFin2ℂFun
 
-/-- The instance of `Module` on `AltLeftHandedModule` defined via its equivalence
+/-- The instance of `Module` on `DualLeftHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : Module ℂ AltLeftHandedModule := Equiv.module ℂ toFin2ℂFun
+instance : Module ℂ DualLeftHandedWeyl := Equiv.module ℂ toFin2ℂFun
 
-/-- The linear equivalence between `AltLeftHandedModule` and `(Fin 2 → ℂ)`. -/
+/-- The linear equivalence between `DualLeftHandedWeyl` and `(Fin 2 → ℂ)`. -/
 @[simps!]
-def toFin2ℂEquiv : AltLeftHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
+def toFin2ℂEquiv : DualLeftHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
   toFun := toFin2ℂFun
   map_add' := fun _ _ => rfl
   map_smul' := fun _ _ => rfl
@@ -108,45 +112,44 @@ def toFin2ℂEquiv : AltLeftHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
-/-- The underlying element of `Fin 2 → ℂ` of a element in `AltLeftHandedModule` defined
+/-- The underlying element of `Fin 2 → ℂ` of a element in `DualLeftHandedWeyl` defined
   through the linear equivalence `toFin2ℂEquiv`. -/
-abbrev toFin2ℂ (ψ : AltLeftHandedModule) := toFin2ℂEquiv ψ
+abbrev toFin2ℂ (ψ : DualLeftHandedWeyl) := toFin2ℂEquiv ψ
 
-end AltLeftHandedModule
+end DualLeftHandedWeyl
 
-end AltLeftHanded
 
 section RightHanded
 
 /-- The module in which right handed fermions live. This is equivalent to `Fin 2 → ℂ`. -/
-structure RightHandedModule where
+structure RightHandedWeyl where
   /-- The underlying value in `Fin 2 → ℂ`. -/
   val : Fin 2 → ℂ
 
-namespace RightHandedModule
+namespace RightHandedWeyl
 
-/-- The equivalence between `RightHandedModule` and `Fin 2 → ℂ`. -/
-def toFin2ℂFun : RightHandedModule ≃ (Fin 2 → ℂ) where
+/-- The equivalence between `RightHandedWeyl` and `Fin 2 → ℂ`. -/
+def toFin2ℂFun : RightHandedWeyl ≃ (Fin 2 → ℂ) where
   toFun v := v.val
   invFun f := ⟨f⟩
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- The instance of `AddCommMonoid` on `RightHandedModule` defined via its equivalence
+/-- The instance of `AddCommMonoid` on `RightHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommMonoid RightHandedModule := Equiv.addCommMonoid toFin2ℂFun
+instance : AddCommMonoid RightHandedWeyl := Equiv.addCommMonoid toFin2ℂFun
 
-/-- The instance of `AddCommGroup` on `RightHandedModule` defined via its equivalence
+/-- The instance of `AddCommGroup` on `RightHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommGroup RightHandedModule := Equiv.addCommGroup toFin2ℂFun
+instance : AddCommGroup RightHandedWeyl := Equiv.addCommGroup toFin2ℂFun
 
-/-- The instance of `Module` on `RightHandedModule` defined via its equivalence
+/-- The instance of `Module` on `RightHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : Module ℂ RightHandedModule := Equiv.module ℂ toFin2ℂFun
+instance : Module ℂ RightHandedWeyl := Equiv.module ℂ toFin2ℂFun
 
-/-- The linear equivalence between `RightHandedModule` and `(Fin 2 → ℂ)`. -/
+/-- The linear equivalence between `RightHandedWeyl` and `(Fin 2 → ℂ)`. -/
 @[simps!]
-def toFin2ℂEquiv : RightHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
+def toFin2ℂEquiv : RightHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
   toFun := toFin2ℂFun
   map_add' := fun _ _ => rfl
   map_smul' := fun _ _ => rfl
@@ -154,45 +157,45 @@ def toFin2ℂEquiv : RightHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
-/-- The underlying element of `Fin 2 → ℂ` of a element in `RightHandedModule` defined
+/-- The underlying element of `Fin 2 → ℂ` of a element in `RightHandedWeyl` defined
   through the linear equivalence `toFin2ℂEquiv`. -/
-abbrev toFin2ℂ (ψ : RightHandedModule) := toFin2ℂEquiv ψ
+abbrev toFin2ℂ (ψ : RightHandedWeyl) := toFin2ℂEquiv ψ
 
-end RightHandedModule
+end RightHandedWeyl
 
 end RightHanded
 
-section AltRightHanded
+section DualRightHanded
 
-/-- The module in which alt-right handed fermions live. This is equivalent to `Fin 2 → ℂ`. -/
-structure AltRightHandedModule where
+/-- The module in which dual-right handed fermions live. This is equivalent to `Fin 2 → ℂ`. -/
+structure DualRightHandedWeyl where
   /-- The underlying value in `Fin 2 → ℂ`. -/
   val : Fin 2 → ℂ
 
-namespace AltRightHandedModule
+namespace DualRightHandedWeyl
 
-/-- The equivalence between `AltRightHandedModule` and `Fin 2 → ℂ`. -/
-def toFin2ℂFun : AltRightHandedModule ≃ (Fin 2 → ℂ) where
+/-- The equivalence between `DualRightHandedWeyl` and `Fin 2 → ℂ`. -/
+def toFin2ℂFun : DualRightHandedWeyl ≃ (Fin 2 → ℂ) where
   toFun v := v.val
   invFun f := ⟨f⟩
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- The instance of `AddCommMonoid` on `AltRightHandedModule` defined via its equivalence
+/-- The instance of `AddCommMonoid` on `DualRightHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommMonoid AltRightHandedModule := Equiv.addCommMonoid toFin2ℂFun
+instance : AddCommMonoid DualRightHandedWeyl := Equiv.addCommMonoid toFin2ℂFun
 
-/-- The instance of `AddCommGroup` on `AltRightHandedModule` defined via its equivalence
+/-- The instance of `AddCommGroup` on `DualRightHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : AddCommGroup AltRightHandedModule := Equiv.addCommGroup toFin2ℂFun
+instance : AddCommGroup DualRightHandedWeyl := Equiv.addCommGroup toFin2ℂFun
 
-/-- The instance of `Module` on `AltRightHandedModule` defined via its equivalence
+/-- The instance of `Module` on `DualRightHandedWeyl` defined via its equivalence
   with `Fin 2 → ℂ`. -/
-instance : Module ℂ AltRightHandedModule := Equiv.module ℂ toFin2ℂFun
+instance : Module ℂ DualRightHandedWeyl := Equiv.module ℂ toFin2ℂFun
 
-/-- The linear equivalence between `AltRightHandedModule` and `(Fin 2 → ℂ)`. -/
+/-- The linear equivalence between `DualRightHandedWeyl` and `(Fin 2 → ℂ)`. -/
 @[simps!]
-def toFin2ℂEquiv : AltRightHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
+def toFin2ℂEquiv : DualRightHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
   toFun := toFin2ℂFun
   map_add' := fun _ _ => rfl
   map_smul' := fun _ _ => rfl
@@ -200,13 +203,13 @@ def toFin2ℂEquiv : AltRightHandedModule ≃ₗ[ℂ] (Fin 2 → ℂ) where
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
-/-- The underlying element of `Fin 2 → ℂ` of a element in `AltRightHandedModule` defined
+/-- The underlying element of `Fin 2 → ℂ` of a element in `DualRightHandedWeyl` defined
   through the linear equivalence `toFin2ℂEquiv`. -/
-abbrev toFin2ℂ (ψ : AltRightHandedModule) := toFin2ℂEquiv ψ
+abbrev toFin2ℂ (ψ : DualRightHandedWeyl) := toFin2ℂEquiv ψ
 
-end AltRightHandedModule
+end DualRightHandedWeyl
 
-end AltRightHanded
+end DualRightHanded
 
 end
 end Fermion

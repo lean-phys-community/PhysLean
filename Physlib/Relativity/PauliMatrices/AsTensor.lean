@@ -34,7 +34,7 @@ open TensorProduct
 
 /-- The tensor `σ^μ^a^{dot a}` based on the Pauli-matrices as an element of
   `complexContr ⊗ leftHanded ⊗ rightHanded`. -/
-def asTensor : (ContrℂModule ⊗[ℂ] (LeftHandedModule ⊗[ℂ] RightHandedModule)) :=
+def asTensor : (ContrℂModule ⊗[ℂ] (LeftHandedWeyl ⊗[ℂ] RightHandedWeyl)) :=
   ∑ i, complexContrBasis i ⊗ₜ leftRightToMatrix.symm (pauliBasis i)
 
 /-- The expansion of `asTensor` into complexContrBasis basis vectors . -/

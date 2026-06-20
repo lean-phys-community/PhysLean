@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.SpaceAndTime.Space.Basic
+public import Physlib.SpaceAndTime.Space.Origin
 public import Mathlib.Geometry.Manifold.Diffeomorph
 public import Mathlib.Analysis.Distribution.TemperateGrowth
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
@@ -44,17 +45,6 @@ lemma add_val {d: ℕ} (x y : Space d) :
 lemma add_apply {d : ℕ} (x y : Space d) (i : Fin d) :
     (x + y) i = x i + y i := by
   simp [add_val]
-
-instance {d} : Zero (Space d) where
-  zero := ⟨fun _ => 0⟩
-
-@[simp]
-lemma zero_val {d : ℕ} : (0 : Space d).val = fun _ => 0 := rfl
-
-@[simp]
-lemma zero_apply {d : ℕ} (i : Fin d) :
-    (0 : Space d) i = 0 := by
-  simp [zero_val]
 
 instance {d} : AddCommMonoid (Space d) where
   add_assoc a b c:= by
