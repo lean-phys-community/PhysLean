@@ -81,7 +81,7 @@ namespace Lagrangian
     The key point is that F must be independent of velocity. -/
 def IsTotalTimeDerivative
     (δL : Time → X → X → ℝ) : Prop :=
-  ∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
+    ∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t (q : Time → X), (ContDiff ℝ ∞ q) → δL t (q t) (∂ₜ q t) = ∂ₜ (fun t' => F t' (q t')) t
 
 /--
@@ -92,6 +92,7 @@ def IsTotalTimeDerivative
 
     δL(t, q, dₜ q) = fderiv ℝ F (t, q) (1, dₜ q)
 -/
+omit [CompleteSpace X] in
 lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
@@ -135,7 +136,7 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
     intro q F t hF hq
     change  fderiv ℝ ((↿F) ∘ (tq q)) t 1 = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t)
     rw [fderiv_comp]
-    simp
+    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
     rw [← Time.deriv_eq,h_tq_der]
     exact hq
     apply ContDiffAt.differentiableAt
@@ -148,7 +149,7 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
     exact h_tq_contDiff q hq
     by_contra
     rcases this
-  -- start of the proof  
+  -- start of the proof
   constructor
   -- From total the total derivative to the explicit form
   intro h
@@ -158,17 +159,16 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
   use hFdif
   intro t q₀ v
   let qv := fun (t' : Time) => (q₀ - t.val • v) + t'.val • v
-  have h_qv : qv = ((fun (tR : ℝ) => (q₀ - t.val • v) + tR • v)) ∘ Time.val := by rfl
   have h_qv_contDiff : ContDiff ℝ ∞ qv := by
-    change ContDiff ℝ ∞ (((fun (tR : ℝ) => (q₀ - t.val • v) + tR • v)) ∘ Time.toRealCLE) 
+    change ContDiff ℝ ∞ (((fun (tR : ℝ) => (q₀ - t.val • v) + tR • v)) ∘ Time.toRealCLE)
     fun_prop
   have h_qv_t : qv t = q₀ := by
     calc
       qv t = (q₀ - t.val • v) + t.val • v := by rfl
       _ = q₀ := by module
   have h_qv_der : ∂ₜ qv t = v := by
-    calc 
-      ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v)  t 1 := by rfl
+    calc
+      ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v) t 1 := by rfl
       _ = v := by
         rw [fderiv_const_add,fderiv_smul_const]
         simp only [ContinuousLinearMap.smulRight_apply, fderiv_val, one_smul]
@@ -187,7 +187,7 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
   use F
   use hFdif
   intro t q hq_ContDiff
-  rw [hFder, ←h_F_tq_der]
+  rw [hFder, ← h_F_tq_der]
   rfl
   exact hFdif
   exact hq_ContDiff
@@ -238,7 +238,7 @@ lemma isTotalTimeDerivativeVelocity
       simpa [dF] using h0.symm
     simpa [hδL0] using this
 
-  -- Induced continuous linear functional on velocity: v ↦ dF (v,0).
+  -- Induced continuous linear functional on velocity: v ↦ dF (0,v).
   let φ : X →L[ℝ] ℝ :=
     dF.comp (ContinuousLinearMap.inr ℝ Time X)
 
