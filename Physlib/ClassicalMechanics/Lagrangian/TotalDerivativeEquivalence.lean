@@ -29,7 +29,7 @@ in field theory, but we avoid that terminology here since no gauge fields are in
 
 A general function δL(t, q, dₜ q) is a total time derivative if there exists a function
 F(t, q) (independent of velocity) such that:
-  δL(t, q, dₜ q) = d/dt F(t, q) = fderiv ℝ F (t q) (v, 1)
+  δL(t, q, dₜ q) = d/dt F(t, q) = fderiv ℝ F (t q) (1, dₜ q)
 
 By the chain rule, this expands to:
   δL(t, q, dₜ q) = ∂F/∂t + ⟨∇ᵣF, dₜ q⟩
@@ -92,7 +92,6 @@ def IsTotalTimeDerivative
 
     δL(t, q, dₜ q) = fderiv ℝ F (t, q) (1, dₜ q)
 -/
-omit [CompleteSpace X] in
 lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
