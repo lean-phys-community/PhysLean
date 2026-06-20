@@ -143,7 +143,7 @@ as `√(k/m)`.
 The angular frequency appears in the solutions to the equations of motion of the harmonic
 oscillator.
 
-Here we both define and proof properties related to the angular frequency.
+Here we both define and prove properties related to the angular frequency.
 
 -/
 
