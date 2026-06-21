@@ -29,7 +29,7 @@ in field theory, but we avoid that terminology here since no gauge fields are in
 
 A general function δL(t, q, dₜ q) is a total time derivative if there exists a function
 F(t, q) (independent of velocity) such that:
-  δL(t, q, dₜ q) = d/dt F(t, q) = fderiv ℝ F (t q) (1, dₜ q)
+  δL(t, q, dₜ q) = d/dt F(t, q) = fderiv ℝ F (t q) (v, 1)
 
 By the chain rule, this expands to:
   δL(t, q, dₜ q) = ∂F/∂t + ⟨∇ᵣF, dₜ q⟩
@@ -65,7 +65,6 @@ namespace ClassicalMechanics
 open InnerProductSpace ContDiff Time ContinuousMultilinearMap
 
 namespace Lagrangian
-
 /-!
 
 ## A. General Total Time Derivative
@@ -92,6 +91,7 @@ def IsTotalTimeDerivative
 
     δL(t, q, dₜ q) = fderiv ℝ F (t, q) (1, dₜ q)
 -/
+-- omit [CompleteSpace X] in 
 lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
@@ -172,9 +172,7 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
         rw [fderiv_const_add,fderiv_smul_const]
         simp only [ContinuousLinearMap.smulRight_apply, fderiv_val, one_smul]
         fun_prop
-  rw [← h_qv_t, ← h_qv_der]
-  rw [hFder]
-  rw [← h_F_tq_der]
+  rw [← h_qv_t, ← h_qv_der, hFder, ← h_F_tq_der]
   rfl
   exact hFdif
   exact h_qv_contDiff
