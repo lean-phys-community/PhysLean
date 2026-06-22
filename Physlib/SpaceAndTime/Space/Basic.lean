@@ -8,7 +8,6 @@ module
 public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.InnerProductSpace.PiL2
 public import Mathlib.Geometry.Manifold.Instances.Real
-public import Physlib.SpaceAndTime.Space.ToMathlib
 /-!
 
 # Space
@@ -284,20 +283,5 @@ lemma chartAt_eq (d : ℕ) (p : Space d) :
     chartAt (EuclideanSpace ℝ (Fin d)) p =
     (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph :=
   rfl
-
-
-/-
-open Manifold in
-lemma contMDiff_vaddConst (d : ℕ) : ContMDiff
-    (manifoldStructure d) (𝓘(ℝ, EuclideanSpace ℝ (Fin d))) ⊤ (manifoldStructure d).toFun := by
-  rw [contMDiff_iff]
-  refine ⟨(manifoldStructure d).continuous_toFun, fun x y ↦ ?_⟩
-  simp only [extChartAt, OpenPartialHomeomorph.extend, OpenPartialHomeomorph.refl_partialEquiv,
-    PartialEquiv.refl_source, OpenPartialHomeomorph.singletonChartedSpace_chartAt_eq,
-    modelWithCornersSelf_partialEquiv, PartialEquiv.trans_refl, PartialEquiv.refl_coe,
-    ModelWithCorners.toPartialEquiv_coe, PartialEquiv.refl_trans,
-    ModelWithCorners.toPartialEquiv_coe_symm, manifoldStructure_comp_manifoldStructure_symm,
-    CompTriple.comp_eq, ModelWithCorners.target_eq, Set.preimage_univ, Set.inter_univ]
-  exact contDiffOn_id-/
 
 end Space

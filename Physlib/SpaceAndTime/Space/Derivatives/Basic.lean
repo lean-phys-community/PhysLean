@@ -107,7 +107,6 @@ lemma deriv_eq_mfderiv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   rw [deriv_eq_fderiv_basis, ← mfderiv_eq_fderiv]
   rfl
 
-
 open Manifold in
 lemma mdifferentiable_manifoldStructure_iff_differentiable {M d} [NormedAddCommGroup M]
     [NormedSpace ℝ M] {f : Space d → M} {x : Space d} :
