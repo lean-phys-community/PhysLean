@@ -54,8 +54,7 @@ lemma resolventSet_eq_regularityDomain : ρ T = T.regularityDomain := by
     · suffices conj z ∉ σᵖ T by simp_all [pointSpectrum_eq]
       refine fun h ↦ hz' ?_
       obtain ⟨r, hr⟩ := (isSymmetric hT).pointSpectrum_real h
-      have hr' : conj (↑r) = z := by simp [hr]
-      simp [← hr']
+      simp [show z = conj (↑r) from by simp [hr]]
   have h_orthog := (isUnbounded hT).orthogonal_adjoint_sub_ker hz
   rw [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, h_ker'] at h_orthog
   simp [← h_orthog]
