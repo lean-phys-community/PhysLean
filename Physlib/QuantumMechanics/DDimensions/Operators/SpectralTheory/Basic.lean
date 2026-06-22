@@ -105,7 +105,7 @@ open Pointwise
 abbrev resolvent (T : H →ₗ.[ℂ] H) (z : ℂ) : H →ₗ.[ℂ] H := (T - z • 1).inverse
 
 @[inherit_doc resolvent]
-local notation "𝑅" => resolvent
+scoped notation "𝑅" => resolvent
 
 /-!
 ## A. Regularity domain
@@ -662,7 +662,7 @@ def resolventSet (T : H →ₗ.[ℂ] H) : Set ℂ :=
   {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)}
 
 @[inherit_doc resolventSet]
-local notation "ρ" => resolventSet
+scoped notation "ρ" => resolventSet
 
 lemma resolventSet_eq (T : H →ₗ.[ℂ] H) :
     ρ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)} :=
@@ -738,7 +738,7 @@ lemma resolventSet_isOpen [CompleteSpace H] (T : H →ₗ.[ℂ] H) : IsOpen (ρ 
 def spectrum (T : H →ₗ.[ℂ] H) : Set ℂ := (ρ T)ᶜ
 
 @[inherit_doc spectrum]
-local notation "σ" => spectrum
+scoped notation "σ" => spectrum
 
 lemma spectrum_eq (T : H →ₗ.[ℂ] H) : σ T = (ρ T)ᶜ := rfl
 
@@ -765,7 +765,7 @@ lemma spectrum_isClosed [CompleteSpace H] (T : H →ₗ.[ℂ] H) : _root_.IsClos
 def pointSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | (T - z • 1).toFun.ker ≠ ⊥}
 
 @[inherit_doc pointSpectrum]
-local notation "σᵖ" => pointSpectrum
+scoped notation "σᵖ" => pointSpectrum
 
 lemma pointSpectrum_eq (T : H →ₗ.[ℂ] H) : σᵖ T = {z | (T - z • 1).toFun.ker ≠ ⊥} := rfl
 
@@ -787,7 +787,7 @@ def residualSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ :=
   {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)}
 
 @[inherit_doc residualSpectrum]
-local notation "σʳ" => residualSpectrum
+scoped notation "σʳ" => residualSpectrum
 
 lemma residualSpectrum_eq (T : H →ₗ.[ℂ] H) :
     σʳ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)} :=
@@ -811,7 +811,7 @@ def continuousSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ :=
   {z : ℂ | ¬_root_.IsClosed ((T - z • 1).toFun.range : Set H)}
 
 @[inherit_doc continuousSpectrum]
-local notation "σᶜ" => continuousSpectrum
+scoped notation "σᶜ" => continuousSpectrum
 
 lemma continuousSpectrum_eq (T : H →ₗ.[ℂ] H) :
     σᶜ T = {z | ¬_root_.IsClosed ((T - z • 1).toFun.range : Set H)} := rfl
