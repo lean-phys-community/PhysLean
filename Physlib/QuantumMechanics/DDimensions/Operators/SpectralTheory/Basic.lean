@@ -800,6 +800,9 @@ lemma mem_residualSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
 lemma residualSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σʳ T ⊆ σ T :=
   fun _ ⟨_, h, _⟩ ↦ mem_spectrum_iff.mpr (Or.inr <| Or.inl h)
 
+lemma residualSpectrum_subset_regularityDomain (T : H →ₗ.[ℂ] H) : σʳ T ⊆ T.regularityDomain :=
+  fun _ hz ↦ mem_regularityDomain_iff.mpr ⟨hz.1, hz.2.2⟩
+
 /-!
 #### D.2.3. Continuous spectrum
 -/
