@@ -274,16 +274,17 @@ noncomputable def homEuclideanSpaceSpace (d : ℕ) : EuclideanSpace ℝ (Fin d) 
     use ε
     simp_all [dist, Real.sqrt_eq_rpow]
 
-noncomputable instance (priority := high) (d : ℕ) : ChartedSpace (EuclideanSpace ℝ (Fin d)) (Space d) :=
-    (homEuclideanSpaceSpace d).chartedSpace (EuclideanSpace ℝ (Fin d))
+noncomputable instance (d : ℕ) : ChartedSpace (EuclideanSpace ℝ (Fin d)) (Space d) :=
+    (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph.singletonChartedSpace (by simp)
 
-instance (d : ℕ) : IsManifold (𝓡 d) ⊤ (Space d) := (homEuclideanSpaceSpace d).isManifold
+instance (d : ℕ) : IsManifold (𝓡 d) ⊤ (Space d) :=
+  (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph.isManifold_singleton (by simp)
 
-public lemma chart_eq_Hom (d : ℕ) (x : Space d) : Set.EqOn (chartAt (EuclideanSpace ℝ (Fin d)) x)
-   (homEuclideanSpaceSpace d).symm (chartAt (EuclideanSpace ℝ (Fin d)) x).source :=  by
-  intro y hy
-  have h := (homEuclideanSpaceSpace d).chartedSpace_chart_eqOn (EuclideanSpace ℝ (Fin d)) x
-  apply h hy
+lemma chartAt_eq (d : ℕ) (p : Space d) :
+    chartAt (EuclideanSpace ℝ (Fin d)) p =
+    (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph :=
+  rfl
+
 
 /-
 open Manifold in
