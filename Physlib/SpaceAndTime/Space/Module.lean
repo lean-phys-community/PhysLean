@@ -21,6 +21,8 @@ The scope of this module is to define on `Space d` the structure of a `Module`
 These instances require certain non-canonical choices to be made, for example the choice
 of a zero and for a basis, a choice of orientation.
 
+## Instances in Lean
+
 In Lean, an `instance` supplies a typeclass automatically. When a definition or
 theorem needs a structure such as `AddCommGroup (Space d)`, `Module ℝ (Space d)`,
 `NormedAddCommGroup (Space d)`, `InnerProductSpace ℝ (Space d)`, or
