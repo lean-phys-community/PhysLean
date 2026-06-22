@@ -735,7 +735,6 @@ namespace InitialConditionsFromTwoPositions
 
 /-- The trajectory from `toInitialConditions` passes through `x_t₁` at time `t₁`,
   provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
-
 lemma toInitialConditions_trajectory_at_t₁ (S : HarmonicOscillator)
     (IC : InitialConditionsFromTwoPositions)
     (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
