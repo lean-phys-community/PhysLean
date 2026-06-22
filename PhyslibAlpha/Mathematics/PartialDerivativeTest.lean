@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Bjørn Kjos-Hanssen. All rights reserved.
+Copyright (c) 2026 Bjørn Kjos-Hanssen. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Bjørn Kjos-Hanssen
 -/
@@ -64,7 +64,8 @@ noncomputable def hessianBilinearCompanion {V : Type*} [NormedAddCommGroup V]
         simp) (fun _ _ _ ↦ by
         simp_rw [Matrix.vecCons, succ_eq_add_one, reduceAdd, ← curryLeft_apply,
           map_add]
-        simp
+        simp only [add_apply, curryLeft_apply, succ_eq_add_one, reduceAdd, Matrix.Fin.cons_vecEmpty,
+          Matrix.Fin.cons_vecCons]
         abel) (by
         simp_rw [Matrix.vecCons, ← curryLeft_apply]
         simp only [map_smul, ContinuousMultilinearMap.smul_apply, curryLeft_apply, succ_eq_add_one,
@@ -115,10 +116,10 @@ noncomputable def continuousBilinearMapOfContinuousMultilinearMap
 
 /-- . -/
 def QuadraticMap.toMultilinearMap {V : Type*} [AddCommGroup V] [Module ℝ V]
-  (Q : QuadraticMap ℝ V ℝ) : MultilinearMap ℝ (fun _ : Fin 2 => V) ℝ := {
-    toFun := fun v => Q.polarBilin (v 0) (v 1)
-    map_update_add' := by simp
-    map_update_smul' := by simp}
+    (Q : QuadraticMap ℝ V ℝ) : MultilinearMap ℝ (fun _ : Fin 2 => V) ℝ := {
+  toFun := fun v => Q.polarBilin (v 0) (v 1)
+  map_update_add' := by simp
+  map_update_smul' := by simp}
 
 
 /-- . -/
@@ -153,8 +154,8 @@ noncomputable def QuadraticMap.toMultilinearMapHalfPolarBilin
 The multilinear map associated to a quadratic map is continuous.
 -/
 theorem QuadraticMap.toMultilinearMap_continuous {V : Type*}
-  [NormedAddCommGroup V] [NormedSpace ℝ V]
-  [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) : Continuous Q.toMultilinearMap := by
+    [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) : Continuous Q.toMultilinearMap := by
   have h_bilinear : ∃ B : V →ₗ[ℝ] V →L[ℝ] ℝ, ∀ x y, B x y = Q.toMultilinearMap ![x, y] := by
     have h_bilinear : ∃ B : V →ₗ[ℝ] V →L[ℝ] ℝ, ∀ x y, B x y = Q.polarBilin x y := by
       have h_bilinear : ∀ x : V, ∃ Bx : V →L[ℝ] ℝ, ∀ y : V, Bx y = Q.polarBilin x y := by
@@ -163,7 +164,7 @@ theorem QuadraticMap.toMultilinearMap_continuous {V : Type*}
           apply ContinuousLinearMap.mk
           swap
           exact Q.polarBilin x
-          simp
+          simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom]
           exact LinearMap.continuous_of_finiteDimensional (Q.polarBilin x)
         )
         intro y;rfl
@@ -205,7 +206,7 @@ theorem QuadraticMap.toMultilinearMapHalfPolarBilin_continuous {V : Type*}
               linarith
             · intro c a
               unfold q
-              simp
+              simp only [one_div, map_smul, polarBilin_apply_apply, smul_eq_mul]
               linarith
 
           )
@@ -259,15 +260,15 @@ theorem QuadraticMap.toMultilinearMapHalfPolarBilin_continuous {V : Type*}
 Construct a continuous multilinear map from a quadratic map on a finite dimensional space.
 -/
 def QuadraticMap.toContinuousMultilinearMap {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
-  [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) :
-  ContinuousMultilinearMap ℝ (fun _ : Fin 2 ↦ V) ℝ :=
+    [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) :
+    ContinuousMultilinearMap ℝ (fun _ : Fin 2 ↦ V) ℝ :=
   { Q.toMultilinearMap with
     cont := Q.toMultilinearMap_continuous }
 
 /-- . -/
 noncomputable def QuadraticMap.toContinuousMultilinearMapHalfPolarBilin {V : Type*}
-  [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) :
-  ContinuousMultilinearMap ℝ (fun _ : Fin 2 ↦ V) ℝ :=
+    [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) :
+    ContinuousMultilinearMap ℝ (fun _ : Fin 2 ↦ V) ℝ :=
   { Q.toMultilinearMapHalfPolarBilin with
     cont := Q.toMultilinearMapHalfPolarBilin_continuous }
 
@@ -275,15 +276,15 @@ noncomputable def QuadraticMap.toContinuousMultilinearMapHalfPolarBilin {V : Typ
 The constructed continuous multilinear map agrees with the polar bilinear form.
 -/
 theorem QuadraticMap.toContinuousMultilinearMap_apply {V : Type*} [NormedAddCommGroup V]
-  [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) (x y : V) :
-  Q.toContinuousMultilinearMap ![x, y] = Q.polarBilin x y := by
-    rfl
+    [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) (x y : V) :
+    Q.toContinuousMultilinearMap ![x, y] = Q.polarBilin x y := by
+  rfl
 
 /-- . -/
 theorem QuadraticMap.toContinuousMultilinearMap_applyHalf {V : Type*} [NormedAddCommGroup V]
-  [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) (x y : V) :
-  Q.toContinuousMultilinearMapHalfPolarBilin ![x, y] = (1/2) * Q.polarBilin x y := by
-    rfl
+    [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) (x y : V) :
+    Q.toContinuousMultilinearMapHalfPolarBilin ![x, y] = (1/2) * Q.polarBilin x y := by
+  rfl
 
 
 /-- . -/
