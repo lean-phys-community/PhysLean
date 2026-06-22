@@ -734,7 +734,9 @@ lemma basis_eq_mfderiv_modelDiffeo_single (d : ℕ) (μ : Fin d) (x : Space d) :
     Homeomorph.toOpenPartialHomeomorph_symm_apply, fderivWithin_univ]
   rw [if_pos (modelDiffeo.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt]
   ext i
-  have h := fderiv_space_components i ((⇑modelDiffeo ∘ ⇑(homEuclideanSpaceSpace d))) (by simp [Function.comp_def, homEuclideanSpaceSpace]; fun_prop) (((homEuclideanSpaceSpace d).symm x)) ((EuclideanSpace.single μ 1))
+  have h := fderiv_space_components i ((⇑modelDiffeo ∘ ⇑(homEuclideanSpaceSpace d)))
+    (by simpa [Function.comp_def, homEuclideanSpaceSpace] using by fun_prop)
+    (((homEuclideanSpaceSpace d).symm x)) ((EuclideanSpace.single μ 1))
   convert h.symm
   simp only [basis_apply, homEuclideanSpaceSpace, PiLp.continuousLinearEquiv_symm_apply,
     Homeomorph.homeomorph_mk_coe, Equiv.coe_fn_mk, Function.comp_apply, modelDiffeo_apply,
