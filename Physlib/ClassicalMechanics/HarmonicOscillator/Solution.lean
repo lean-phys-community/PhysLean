@@ -744,9 +744,7 @@ lemma toInitialConditions_trajectory_at_t₁ (S : HarmonicOscillator)
   ext i
   simp only [PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
   field_simp [S.ω_ne_zero]
-  rw [show S.ω * (IC.t₂.val - IC.t₁.val) = S.ω * IC.t₂.val - S.ω * IC.t₁.val from by ring,
-    Real.sin_sub]
-  ring
+  grind [mul_sub, Real.sin_sub]
 
 /-- The trajectory from `toInitialConditions` passes through `x_t₂` at time `t₂`,
   provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
