@@ -54,7 +54,6 @@ QuantumInfo/ForMathlib/HermitianMat/Unitary.lean
 QuantumInfo/ForMathlib/IsMaximalSelfAdjoint.lean
 QuantumInfo/ForMathlib/Isometry.lean
 QuantumInfo/ForMathlib/LimSupInf.lean
-QuantumInfo/ForMathlib/LinearEquiv.lean
 QuantumInfo/ForMathlib/Majorization.lean
 QuantumInfo/ForMathlib/Matrix.lean
 QuantumInfo/ForMathlib/MatrixNorm/TraceNorm.lean
