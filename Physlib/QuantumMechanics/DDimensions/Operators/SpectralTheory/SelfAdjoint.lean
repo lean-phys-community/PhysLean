@@ -16,6 +16,8 @@ In this module we develop the spectral theory for self-adjoint operators.
 
 ## ii. Key results
 
+- `resolventSet_eq_regularityDomain` : The resolvent set and regularity domain coincide. That is,
+    if `T - z • 1` has a continuous (equivalently, bounded) inverse then its range is all of `H`.
 - `spectrum_real` : The spectrum of a self-adjoint unbounded operator is real.
 
 ## iii. Table of contents
@@ -59,7 +61,8 @@ lemma resolventSet_eq_regularityDomain : ρ T = T.regularityDomain := by
   rw [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, h_ker'] at h_orthog
   simp [← h_orthog]
 
-/-- `(T - z • 1).range = ⊤` is both a necessary and sufficient condition for `z ∈ ρ T`. -/
+/-- `(T - z • 1).range = ⊤` is a sufficient condition for `z ∈ ρ T`
+  (and it is a necessary condition by definition of `ρ`). -/
 lemma mem_resolventSet_of_range_eq_top {z : ℂ} (h : (T - z • 1).toFun.range = ⊤) : z ∈ ρ T := by
   by_cases hz_im : z.im = 0
   · rw [(isClosed hT).resolventSet_eq]
