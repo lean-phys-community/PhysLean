@@ -79,8 +79,9 @@ variable {k : Type} [CommRing k] [StarRing k] {C : Type} {G : Type} [Group G]
 We define `Conj`. Conjugation could be put directly on `S.Tensor c` as an antilinear map built
 through the tensor product, but we define it at the basis level instead, where it is simply
 "`star` the components" (§B) in the basis the species carries; the coordinate definition is the
-concrete one. The structure records what that recipe needs. Beyond `bar` (which colour is the conjugate of which) and its compatibility with
-the variance dual `τ`, it carries `barIdx_eq`, that a colour and its conjugate share basis labels so
+concrete one. The structure records what that recipe needs. Beyond `bar` (which colour is the
+conjugate of which) and its compatibility with the variance dual `τ`, it carries `barIdx_eq`, that a
+colour and its conjugate share basis labels so
 a `star`-ed component can be filed at the same label of the conjugate colour, and `conj_contrComm`,
 that the contraction coefficients are unchanged by `star`, the single condition that makes
 conjugation commute with contraction. Only `conj_contrComm` touches the scalars; the others are

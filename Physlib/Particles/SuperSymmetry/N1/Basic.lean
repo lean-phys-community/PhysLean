@@ -178,6 +178,7 @@ trivial `G`-representation (no `G`-charge), and the indicator basis `piBasis`. S
 /-- The carrier module of each colour: every colour shares the single carrier `ι → ℂ`. The
 distinctions between colours (variance and holomorphy) are recorded by the colour and the maps
 `τ`/`bar`, not by the carrier, so all four colours live in the same space. -/
+@[nolint unusedArguments]
 def chiralModule : ChiralColor → Type := fun _ => ι → ℂ
 
 instance instAddCommGroupChiralModule (c : ChiralColor) :
@@ -333,8 +334,8 @@ lemma deltaContr_deltaCap (b : Basis ι ℂ M) (x : M) :
   rw [TensorProduct.assoc_symm_tmul, LinearMap.rTensor_tmul, TensorProduct.lid_tmul,
     deltaContr_tmul_basis]
 
-/-- `∑_{IJ} (b_I · b_J) b_I ⊗ b_J = ∑_I b_I ⊗ b_I = deltaCap b` (the `contr_metric` law): contracting
-the two inner legs of `deltaCap b ⊗ deltaCap b` collapses it to a single cap, using
+/-- `∑_{IJ} (b_I · b_J) b_I ⊗ b_J = ∑_I b_I ⊗ b_I = deltaCap b` (the `contr_metric` law):
+contracting the two inner legs of `deltaCap b ⊗ deltaCap b` collapses it to a single cap, using
 `b_I · b_J = δ_{IJ}`. -/
 lemma deltaCap_contr_deltaCap (b : Basis ι ℂ M) :
     (TensorProduct.comm ℂ M M ((TensorProduct.lid ℂ M).lTensor M
@@ -493,7 +494,8 @@ example (g : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown, antiDown]) 
 /-- `conjT_contrT` applies to a one-index contraction: conjugating first and then contracting
 equals contracting the conjugate. Checked at colour `![chiralUp, chiralDown]` contracted at
 slots `0` and `1`. -/
-example (t : (chiralTensor (ι := ι) (G := G)).Tensor ![ChiralColor.chiralUp, ChiralColor.chiralDown]) :
+example (t : (chiralTensor (ι := ι) (G := G)).Tensor
+    ![ChiralColor.chiralUp, ChiralColor.chiralDown]) :
     chiralConjStructure.conjT (TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩ t)
       = TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩ (chiralConjStructure.conjT t) :=
   chiralConjStructure.conjT_contrT 0 1 ⟨by decide, rfl⟩ t
