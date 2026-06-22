@@ -209,10 +209,11 @@ lemma HasDenseDomain.orthogonal_adjoint_ker [CompleteSpace H] [CompleteSpace H']
 ### B.2. Closability
 -/
 
-lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U := by
-  constructor <;> intro h'
-  · exact eq_of_eq_graph (h.graph_closure_eq_closure_graph ▸ h'.submodule_topologicalClosure_eq)
-  · exact h' ▸ h.closure_isClosed
+lemma IsClosed.closure_eq (h : U.IsClosed) : U.closure = U :=
+  eq_of_eq_graph (h.isClosable.graph_closure_eq_closure_graph ▸ h.submodule_topologicalClosure_eq)
+
+lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U :=
+  ⟨IsClosed.closure_eq, fun h' ↦ h' ▸ h.closure_isClosed⟩
 
 /-- A LinearPMap with densely-defined formal adjoint is closable. -/
 lemma isClosable_of_exists_dense_formalAdjoint [CompleteSpace H] [CompleteSpace H']
