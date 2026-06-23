@@ -160,8 +160,7 @@ lemma velocity_const_of_zero_acc (q : Time → ℝ) (h : ∀ t, deriv (deriv q) 
     (hcont : ContDiff ℝ 2 q) : ∃ v₀, ∀ t, deriv q t = v₀ := by
   refine ⟨deriv q 0, fun t => ?_⟩
   refine is_const_of_fderiv_eq_zero (𝕜 := ℝ) (f := deriv q) ?_ ?_ t 0
-  · unfold Time.deriv
-    change Differentiable ℝ ((fun L : Time →L[ℝ] ℝ => L 1) ∘ fun t => fderiv ℝ q t)
+  · change Differentiable ℝ ((fun L : Time →L[ℝ] ℝ => L 1) ∘ fun t => fderiv ℝ q t)
     fun_prop
   · intro t
     ext p
