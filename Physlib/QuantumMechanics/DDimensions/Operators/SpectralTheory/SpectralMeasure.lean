@@ -32,6 +32,13 @@ open ContinuousLinearMap
 open MeasureTheory
 open Set
 
+instance (H : Type*) [SeminormedAddCommGroup H] [InnerProductSpace ℂ H] :
+    IsAddTorsionFree (H →L[ℂ] H) where
+  nsmul_right_injective n hn := by
+    refine Function.HasLeftInverse.injective ?_
+    use fun f ↦ (n : ℂ)⁻¹ • f
+    intro; ext; simp [← Nat.cast_smul_eq_nsmul ℂ, smul_smul, Nat.cast_ne_zero (R := ℂ), hn]
+
 /-!
 ## A. Definition
 -/
@@ -51,8 +58,6 @@ namespace SpectralMeasure
 variable {α : Type*} [MeasurableSpace α]
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 variable (μS : SpectralMeasure α H)
-
-instance : IsAddTorsionFree (H →L[ℂ] H) := sorry
 
 attribute [coe] toVectorMeasure
 
