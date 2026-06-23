@@ -197,9 +197,6 @@ noncomputable def ofElectromagneticField (c : SpeedOfLight)
 TODO "Write lemmas for the various properties (e.g. the electric field) of
   the electromagnetic potential from the various constructors."
 
-TODO "Define constructors for the distributional electromagnetic potential, similar
-  to e.g. `ofScalarPotential` and `ofVectorPotential` for `ElectromagneticPotential`."
-
 /-!
 
 ## A.3. The group action on the ElectromagneticPotential

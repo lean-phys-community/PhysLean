@@ -95,8 +95,6 @@ open Real
 open Space
 open InnerProductSpace
 
-TODO "Create a new folder for the damped harmonic oscillator, initially as a place-holder."
-
 TODO "Create a new file for the geometric model which properly models the position as a
     configuration space and velocity as its tangent space, then show explicitly how this
     coordinate model is a simplification of the geometric model.
