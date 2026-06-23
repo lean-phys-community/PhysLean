@@ -255,10 +255,10 @@ instance instNontrivial {d : ℕ} [NeZero d] : Nontrivial (Space d) where
 
 open Manifold Real
 
-TODO "Fix the manifold structure on `Space d`. In particular, we should not need to
-  define `manifoldStructure`. Instead, we should be able to give `Space d` an instance
-  of `IsManifold` directly."
-
+/--
+`Space d` is homoemorphic to d-dimensional euclidean space. This is used to define the `IsManifold`
+instance on `Space d`.
+-/
 noncomputable def homEuclideanSpaceSpace (d : ℕ) : EuclideanSpace ℝ (Fin d) ≃ₜ Space d where
   toFun v := ⟨EuclideanSpace.equiv (Fin d) ℝ v⟩
   invFun s := EuclideanSpace.equiv (Fin d) ℝ|>.symm s.val
