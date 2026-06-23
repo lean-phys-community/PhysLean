@@ -275,6 +275,7 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
 public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basic
 public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.SelfAdjoint
+public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.SpectralMeasure
 public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Symmetric
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
