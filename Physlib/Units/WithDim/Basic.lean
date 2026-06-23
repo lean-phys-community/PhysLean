@@ -103,6 +103,9 @@ instance (d : Dimension) (M : Type) [AddCommMonoid M] :
 
 instance (d : Dimension) (M : Type) [AddGroup M] :
     AddGroup (WithDim d M) where
+  sub_eq_add_neg m1 m2 := by
+    ext
+    simp [sub_eq_add_neg]
   neg_add_cancel m := by
     ext
     simp [neg_add_cancel]
