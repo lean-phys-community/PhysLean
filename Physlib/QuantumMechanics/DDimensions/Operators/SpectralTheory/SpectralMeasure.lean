@@ -13,7 +13,19 @@ public import Mathlib.MeasureTheory.VectorMeasure.Basic
 
 ## i. Overview
 
+A spectral measure `μS` on a measurable space `α` is a σ-additive function `Set α → H →L[ℂ] H`
+such that each set is mapped to a star projection on `H`, the empty set and non-measurable sets are
+mapped to zero, and `univ` is mapped to the identity.
+This is implemented as a structure extending `VectorMeasure α (H →L[ℂ] H)` with additional fields
+constraining `μS A` to be a star projection for each set `A` and `μS univ = 1`.
+
+For each `x : H` there is an associated measure `μₓ` given by `μₓ A = ‖μS A x‖² = ⟪x, μS A x⟫ ≤ 1`.
+
 ## ii. Key results
+
+- `SpectralMeasure` : A star projection-valued measure.
+- `comp_eq_of_inter` : For a spectral measure `μS` and measurable sets `A` and `B`,
+    the composition `μS A ∘ μS B = μS (A ∩ B)`.
 
 ## iii. Table of contents
 
