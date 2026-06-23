@@ -8,6 +8,21 @@ module
 public import Mathlib.Analysis.InnerProductSpace.Spectrum
 public import Mathlib.Order.CompletePartialOrder
 
+/-!
+# Continuous linear maps
+
+This file collects auxiliary results about `ContinuousLinearMap`s that are not (yet) available in
+Mathlib.
+
+## Main results
+
+* `ContinuousLinearMap.ker_mk`: the kernel of the continuous linear map built from a continuous
+  semilinear map `f` agrees with the kernel of `f`.
+* `ContinuousLinearMap.support_eq_sup_eigenspace_nonzero`: the range of a symmetric continuous
+  linear map on a finite-dimensional Euclidean space is the supremum of its eigenspaces for
+  nonzero eigenvalues.
+-/
+
 @[expose] public section
 
 namespace ContinuousLinearMap

@@ -20,7 +20,6 @@ QuantumInfo/Entropy/Relative.lean
 QuantumInfo/Entropy/SSA.lean
 QuantumInfo/Entropy/VonNeumann.lean
 QuantumInfo/ForMathlib/ComplexLaplaceTransform.lean
-QuantumInfo/ForMathlib/ContinuousLinearMap.lean
 QuantumInfo/ForMathlib/ContinuousSup.lean
 QuantumInfo/ForMathlib/Filter.lean
 QuantumInfo/ForMathlib/HayataGroup/TraceInequality/BlockDiagonal.lean
