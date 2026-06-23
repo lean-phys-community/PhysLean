@@ -93,7 +93,7 @@ def coordinateMap : (PureU1 n.succ).LinSols ≃ₗ[ℚ] Fin n →₀ ℚ where
   invFun f := ∑ i : Fin n, f i • asLinSols i
   left_inv S := by
     simp only [Nat.succ_eq_add_one, PureU1_numberCharges,
-      Finsupp.linearEquivFunOnFinite_symm_apply_apply, Function.comp_apply]
+      Finsupp.linearEquivFunOnFinite_symm_apply, Function.comp_apply]
     apply pureU1_anomalyFree_ext
     intro j
     rw [sum_of_vectors]
@@ -109,7 +109,7 @@ def coordinateMap : (PureU1 n.succ).LinSols ≃ₗ[ℚ] Fin n →₀ ℚ where
     simp only [PureU1_numberCharges]
     ext
     rename_i j
-    simp only [Nat.succ_eq_add_one, Finsupp.linearEquivFunOnFinite_symm_apply_apply,
+    simp only [Nat.succ_eq_add_one, Finsupp.linearEquivFunOnFinite_symm_apply,
       Function.comp_apply]
     rw [sum_of_vectors]
     simp only [HSMul.hSMul, SMul.smul, PureU1_numberCharges,
