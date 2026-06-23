@@ -457,15 +457,16 @@ lemma trajectory_equationOfMotion (IC : InitialConditions) :
 ### C.1. Uniqueness of the solutions
 
 We show that the trajectories are the unique solutions to the equation of motion
-for the given initial conditions. This is currently a TODO.
+for the given initial conditions.
 
 -/
 /-- The trajectories to the equation of motion for a given set of initial conditions
   are unique.
 
-  Semiformal implementation:
-  - One may needed the added condition of smoothness on `x` here.
-  - `EquationOfMotion` needs defining before this can be proved. -/
+  Given any smooth `x` satisfying the equation of motion with the same initial
+  position and velocity, the difference `y = x - IC.trajectory S` also solves the
+  equation of motion with zero initial conditions; energy conservation then forces
+  its energy, and hence `y`, to vanish identically, so `x = IC.trajectory S`. -/
 lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace ℝ (Fin 1))
     (hx : ContDiff ℝ ∞ x) :
     S.EquationOfMotion x ∧ x 0 = IC.x₀ ∧ ∂ₜ x 0 = IC.v₀ →
