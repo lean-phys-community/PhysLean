@@ -15,32 +15,21 @@ public import Mathlib.Algebra.Star.Basic
 
 ## i. Overview
 
-The components of a complex tensor are complex numbers, and conjugating them is a basic operation.
-On a tensor it does more than conjugate numbers: each index carries a colour naming the
-representation it transforms in, and conjugation sends every index to the conjugate
-representation. For spinor colours this swaps, for instance, left- and right-handed indices.
+Each index of a tensor carries a colour naming the representation it transforms in. A species
+already has the variance dual `τ c`, the colour an index must meet to contract. Conjugation adds a
+second involution, the conjugate colour `bar c`: the colour an index transforms in after complex
+conjugation. A spinor index is the textbook example: complex conjugation sends a left-handed Weyl
+spinor to a right-handed one, `(ψ_α)* = ψ̄_α̇`, so `bar` swaps the left- and right-handed colours
+while fixing a real vector colour. Variance is untouched, so `bar` commutes with `τ`. In an N=1
+chiral sector `bar` swaps chiral and anti-chiral indices.
 
-Reality and Hermiticity conditions are expressed through this operation: a tensor is real when
-conjugation fixes it, and a metric is Hermitian when conjugating it swaps its two indices. We
-package conjugation abstractly so these conditions can be stated once for any tensor species.
-
-There are two places one could define this conjugation: on the abstract tensor, or on its
-components. At the tensor level it would be an antilinear map on `S.Tensor c`, built through the
-tensor product without reference to a basis. At the basis level it is just "`star` the components":
-read a tensor's coordinates in the basis the species carries, conjugate each, and reinterpret them
-at the conjugate colours. We take the basis level. It is the concrete, direct one, and the
-basis-free construction, though possible, is heavier machinery that buys nothing here.
-Conjugate-linearity, `conjT (r • t) = star r • conjT t`, then follows for free from `star`.
-
-The rest of `Conj` is what that recipe needs to be well-defined. A component sits at a basis label
-of a colour `c`; after `star`-ing it we file it at the same label of the conjugate colour `bar c`,
-so `bar c` must carry the same labels as `c` (`barIdx_eq`). Contraction sums products of components
-weighted by the contraction coefficients, so for `star`-ing the components to commute with
-contracting them, those coefficients must be unchanged by conjugation (`conj_contrComm`); for the
-Kronecker-δ contractions here that is immediate. From this we build the `conj`-semilinear map
-`conjT` and prove its two laws: conjugation is an involution, and it commutes with contraction. The
-second makes reality and Hermiticity compatible with raising and lowering indices, which are
-contractions against a metric.
+`conjT` conjugates a tensor at the basis level: `star` each coordinate in the species basis and
+place it at the conjugate colour. Reality and Hermiticity are stated through it, a tensor is real
+when conjugation fixes it and a metric is Hermitian when conjugating it swaps its two indices.
+`Conj` records what the recipe needs: `bar c` shares basis labels with `c` (`barIdx_eq`) and the
+contraction coefficients survive `star` (`conj_contrComm`), which together make conjugation commute
+with contraction. `conjT` is then `conj`-semilinear, involutive, and commutes with contraction; the
+last makes reality and Hermiticity compatible with raising and lowering indices.
 
 ## ii. Key results
 
@@ -76,16 +65,12 @@ variable {k : Type} [CommRing k] [StarRing k] {C : Type} {G : Type} [Group G]
 
 ## A. The conjugation structure
 
-We define `Conj`. Conjugation could be put directly on `S.Tensor c` as an antilinear map built
-through the tensor product, but we define it at the basis level instead, where it is simply
-"`star` the components" (§B) in the basis the species carries; the coordinate definition is the
-concrete one. The structure records what that recipe needs. Beyond `bar` (which colour is the
-conjugate of which) and its compatibility with the variance dual `τ`, it carries `barIdx_eq`, that a
-colour and its conjugate share basis labels so
-a `star`-ed component can be filed at the same label of the conjugate colour, and `conj_contrComm`,
-that the contraction coefficients are unchanged by `star`, the single condition that makes
-conjugation commute with contraction. Only `conj_contrComm` touches the scalars; the others are
-bookkeeping on colours.
+We define `Conj` at the basis level, where conjugation is "`star` the components" (§B). Four of its
+fields are bookkeeping on colours and index sets, trivial to supply per instance: `bar` (the
+conjugate-colour involution), `bar_involution`, `bar_tau` (it commutes with `τ`), and `barIdx_eq`
+(a colour and its conjugate share basis labels). The one substantive field is `conj_contrComm`, that
+the contraction coefficients are unchanged by `star`; this is what makes conjugation commute with
+contraction (§D), and here it is `star δ = δ`.
 
 -/
 
@@ -198,14 +183,6 @@ We prove `conjT_conjT`: conjugating a tensor twice returns it, up to the identit
 `bar ∘ bar ∘ c = c`. The supporting lemmas reconcile the iterated basis-label casts.
 
 -/
-
-omit [StarRing k] [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)] in
-/-- `basisIdxCongr` only depends on its endpoints up to `HEq` of the arguments: equal target
-colours and heterogeneously equal labels give equal casts. -/
-private lemma basisIdxCongr_heq_arg {c₁ c₂ d : C} (h₁ : c₁ = d) (h₂ : c₂ = d)
-    {x : basisIdx c₁} {y : basisIdx c₂} (hxy : HEq x y) :
-    basisIdxCongr h₁ x = basisIdxCongr h₂ y := by
-  subst h₁; subst h₂; cases hxy; rfl
 
 /-- Undoing the two cast reindexings (at `bar c` then at `c`) on a label of the doubly-conjugated
 colour returns the `bar_involution` cast. Free from `barIdx_eq` by `cast_cast` + proof
