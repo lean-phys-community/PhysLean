@@ -7,18 +7,35 @@ module
 
 public import Mathlib.Analysis.Matrix.Normed
 
+/-!
+# Maximal self-adjoint elements
+
+This file introduces the `IsMaximalSelfAdjoint` typeclass, which records, for a star algebra `α`
+over a `TrivialStar` base ring `R`, a chosen additive map sending each element of `α` to the base
+ring `R`. It lets `HermitianMat.trace` return the "clean" base type rather than the full field:
+for instance `ℝ` when the input field is `ℂ`, while still returning `𝕜` directly when `𝕜` is
+already a `TrivialStar` field.
+-/
+
 @[expose] public section
 
-/- We want to have `HermitianMat.trace` give 𝕜 when 𝕜 is already a TrivialStar field, but give the "clean" type
-otherwise -- for instance, ℝ when the input field is ℂ. This typeclass lets us do so. -/
+/-- A `TrivialStar` commutative base ring `R` is *maximally self-adjoint* over a star algebra `α`
+when there is an additive map `selfadjMap : α →+ R` that is compatible with scalar multiplication
+and agrees with the algebra map on self-adjoint elements. This lets `HermitianMat.trace` return
+`𝕜` when `𝕜` is already a `TrivialStar` field, and otherwise return the "clean" base type (for
+instance `ℝ` when the input field is `ℂ`). -/
 class IsMaximalSelfAdjoint (R : outParam Type*) (α : Type*) [Star α] [Star R] [CommSemiring R]
     [Semiring α] [TrivialStar R] [Algebra R α] where
+  /-- The additive map sending an element of `α` to its self-adjoint part in the base ring `R`. -/
   selfadjMap : α →+ R
+  /-- `selfadjMap` is compatible with scalar multiplication by the base ring `R`. -/
   selfadj_smul : ∀ (r : R) (a : α), selfadjMap (r • a) = r * (selfadjMap a)
+  /-- On self-adjoint elements, `selfadjMap` agrees with the algebra map `R → α`. -/
   selfadj_algebra : ∀ {a : α}, IsSelfAdjoint a → algebraMap _ _ (selfadjMap a) = a
 
 /-- Every `TrivialStar` `CommSemiring` is its own maximal self adjoints. -/
-instance instTrivialStar_IsMaximalSelfAdjoint {R} [Star R] [TrivialStar R] [CommSemiring R] : IsMaximalSelfAdjoint R R where
+instance instTrivialStar_IsMaximalSelfAdjoint {R} [Star R] [TrivialStar R] [CommSemiring R] :
+    IsMaximalSelfAdjoint R R where
   selfadjMap := AddMonoidHom.id R
   selfadj_smul _ __ := rfl
   selfadj_algebra {_} _ := rfl
@@ -36,7 +53,8 @@ namespace IsMaximalSelfAdjoint
 -- take care of proving that anyway.
 
 @[simp]
-theorem trivial_selfadjMap {R} [Star R] [TrivialStar R] [CommSemiring R] : (selfadjMap : R →+ R) = .id R := by
+theorem trivial_selfadjMap {R} [Star R] [TrivialStar R] [CommSemiring R] :
+    (selfadjMap : R →+ R) = .id R := by
   rfl
 
 @[simp]
