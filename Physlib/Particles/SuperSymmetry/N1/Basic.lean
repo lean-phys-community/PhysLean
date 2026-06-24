@@ -46,16 +46,16 @@ The physical field content is the configuration `ChiralScalarConfiguration ι =
 scalars are the complex conjugates of this data, never an independent
 configuration.
 
-The index data is packaged as a `TensorSpecies` over `ChiralColor`. Every colour
-shares the one carrier `ι → ℂ`; the four colours are labels recording variance
-and holomorphy, not distinct spaces. Each carries the trivial `G`-representation,
-so `G` acts as the identity and the chiral scalars hold no `G`-charge.
-Contracting a colour against its `τ`-dual is
-the dot product of their coordinate vectors in the fixed basis, which on basis
-labels is the Kronecker `δ_{IJ}`. The `metric` and `unit` fields are both the
-same element, the δ "cap" `∑_I b_I ⊗ b_I` whose components are `δ^{IJ}`.
-Supplying this instance equips the chiral sector with the framework's generic
-tensor API (`.Tensor`, `.contrT`, and so on).
+The index data is packaged as a `ConjTensorSpecies` over `ChiralColor`. The chiral
+colours carry the standard carrier `ι → ℂ`; the anti colours carry its conjugate
+module `ConjModule (ι → ℂ)`, where `i` acts as `−i`, so anti-holomorphy is genuine
+carrier data and complex conjugation is an honest linear map between the two. Each
+carries the trivial `G`-representation, so `G` acts as the identity and the chiral
+scalars hold no `G`-charge. Contracting a colour against its `τ`-dual is the dot
+product of their coordinate vectors in that colour's basis, which on basis labels is
+the Kronecker `δ_{IJ}`. The `metric` and `unit` fields are both the δ "cap"
+`∑_I b_I ⊗ b_I` whose components are `δ^{IJ}`. Supplying this instance equips the
+chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, and so on).
 
 Conjugation is intrinsic species data, bundled into the same object: `chiralTensor`
 is a `ConjTensorSpecies`, a `TensorSpecies` extended with the conjugate-colour
@@ -163,37 +163,45 @@ variable {ι G}
 ## C. Carrier, representation, and basis
 
 A `TensorSpecies` takes, for each colour `c`, a carrier module, a `G`-representation on it, and a
-basis. Here none of these depend on the colour: every colour gets the same carrier `ι → ℂ`, the
-trivial `G`-representation (no `G`-charge), and the indicator basis `piBasis`. So `chiralModule`,
-`chiralRep`, and `chiralBasis` are constant in `c`; the colour is only the bookkeeping label that
-`τ` and `bar` act on.
+basis. The carrier depends on holomorphy: chiral colours carry the standard `ι → ℂ`, anti colours
+its conjugate module `ConjModule (ι → ℂ)` (so anti-holomorphy is genuine carrier data). The
+`G`-representation is trivial (no `G`-charge) for every colour; the basis is the indicator basis
+`piBasis` on the chiral carrier and its conjugate `Basis.conj piBasis` on the anti carrier. Variance
+(`τ`) preserves holomorphy, so it never leaves a colour's carrier; conjugation (`bar`) flips
+holomorphy and so maps a carrier to its conjugate.
 
 -/
 
-/-- The carrier module of each colour: every colour shares the single carrier `ι → ℂ`. The
-distinctions between colours (variance and holomorphy) are recorded by the colour and the maps
-`τ`/`bar`, not by the carrier, so all four colours live in the same space. -/
-@[nolint unusedArguments]
-def chiralModule : ChiralColor → Type := fun _ => ι → ℂ
+/-- The carrier module of each colour. The chiral colours carry the standard `ι → ℂ`; the anti
+colours carry its conjugate module `ConjModule (ι → ℂ)`, where `i` acts as `−i`. This makes
+anti-holomorphy genuine carrier data — complex conjugation is an honest linear map into the
+conjugate carrier — rather than a label tracked separately. -/
+abbrev chiralModule : ChiralColor → Type
+  | .chiralUp | .chiralDown => ι → ℂ
+  | .antiUp | .antiDown => ConjModule (ι → ℂ)
 
-instance instAddCommGroupChiralModule (c : ChiralColor) :
-    AddCommGroup (chiralModule (ι := ι) c) := inferInstanceAs (AddCommGroup (ι → ℂ))
+instance instAddCommGroupChiralModule : ∀ c, AddCommGroup (chiralModule (ι := ι) c)
+  | .chiralUp | .chiralDown => inferInstance
+  | .antiUp | .antiDown => inferInstance
 
-noncomputable instance instModuleChiralModule (c : ChiralColor) :
-    Module ℂ (chiralModule (ι := ι) c) := inferInstanceAs (Module ℂ (ι → ℂ))
+noncomputable instance instModuleChiralModule : ∀ c, Module ℂ (chiralModule (ι := ι) c)
+  | .chiralUp | .chiralDown => inferInstance
+  | .antiUp | .antiDown => inferInstance
 
 /-- The `G`-representation on each colour, taken trivial: the chiral scalars carry no
 `G`-charge in this sector. -/
 def chiralRep : (c : ChiralColor) → Representation ℂ G (chiralModule (ι := ι) c) :=
   fun _ => Representation.trivial ℂ G _
 
-/-- The standard basis of the carrier `ι → ℂ` (the indicator functions). -/
+/-- The standard basis of the chiral carrier `ι → ℂ` (the indicator functions). -/
 def piBasis : Basis ι ℂ (ι → ℂ) := Pi.basisFun ℂ ι
 
-/-- The standard basis of each colour's carrier: every colour shares the carrier `ι → ℂ`, hence
-the basis `piBasis`. -/
-def chiralBasis : (c : ChiralColor) → Basis ι ℂ (chiralModule (ι := ι) c) :=
-  fun _ => piBasis
+/-- The basis of each colour's carrier: the chiral colours use the indicator basis `piBasis`; the
+anti colours use its conjugate `Basis.conj piBasis`, whose coordinates are the `star` of the
+indicator coordinates. -/
+noncomputable def chiralBasis : (c : ChiralColor) → Basis ι ℂ (chiralModule (ι := ι) c)
+  | .chiralUp | .chiralDown => piBasis
+  | .antiUp | .antiDown => Basis.conj piBasis
 
 /-!
 ## D. The δ structure on a based finite module
@@ -403,24 +411,35 @@ lemma deltaContr_metric (b : Basis ι ℂ M) :
 -/
 
 /-- The chiral-index tensor species, bundled with its conjugation. Its colours are
-`chiral`/`anti` × `up`/`down`, all carried by `ι → ℂ`, and every colour contracts by the bare δ
-pairing with the δ cap serving as both metric and unit. Each `TensorSpecies` coherence law reduces,
-by case analysis on the colour, to the corresponding abstract δ lemma above. The conjugation flips
-holomorphy (`ChiralColor.bar`) while preserving variance; since every colour shares the index type
-`ι`, the identification `barIdx_eq` is `rfl`, and `conj_contrComm` is `star δ = δ`. Instantiating
+`chiral`/`anti` × `up`/`down`; the chiral carriers are `ι → ℂ`, the anti carriers their conjugate
+module `ConjModule (ι → ℂ)`. Every colour contracts by the δ pairing at its own basis (the conjugate
+basis on the anti side), with the δ cap serving as both metric and unit. Each `TensorSpecies`
+coherence law reduces, by case analysis on the colour, to the corresponding abstract δ lemma above.
+The conjugation flips holomorphy (`ChiralColor.bar`) while preserving variance; the index type `ι`
+is shared, so `barIdx_eq` is `rfl`, and `conj_contrComm` is `star δ = δ`. Instantiating
 `ConjTensorSpecies` this way gives the chiral sector both the framework's generic tensor API and
 its conjugation API (`conjT` and its laws) on one object. -/
 def chiralTensor : ConjTensorSpecies ℂ ChiralColor G (chiralModule (ι := ι)) (fun _ => ι)
     (chiralRep (ι := ι) (G := G)) (chiralBasis (ι := ι)) where
   τ := ChiralColor.tau
   τ_involution c := by cases c <;> rfl
-  -- The carrier is `ι → ℂ` for every colour, so the data fields are uniform in `c`.
-  contr _ := { deltaContr piBasis with
-      isIntertwining' g := by ext v; simp [Representation.tprod_apply, chiralRep] }
-  unit _ := { LinearMap.toSpanSingleton ℂ _ (deltaCap piBasis) with
-      isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
-  metric _ := { LinearMap.toSpanSingleton ℂ _ (deltaCap piBasis) with
-      isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
+  -- The δ data at each colour's own basis: `piBasis` on the chiral carrier, `Basis.conj piBasis`
+  -- on the anti carrier. `τ` preserves holomorphy, so both contracted slots share the carrier.
+  contr c := match c with
+    | .chiralUp | .chiralDown => { deltaContr piBasis with
+        isIntertwining' g := by ext v; simp [Representation.tprod_apply, chiralRep] }
+    | .antiUp | .antiDown => { deltaContr (Basis.conj piBasis) with
+        isIntertwining' g := by ext v; simp [Representation.tprod_apply, chiralRep] }
+  unit c := match c with
+    | .chiralUp | .chiralDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap piBasis) with
+        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
+    | .antiUp | .antiDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap (Basis.conj piBasis)) with
+        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
+  metric c := match c with
+    | .chiralUp | .chiralDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap piBasis) with
+        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
+    | .antiUp | .antiDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap (Basis.conj piBasis)) with
+        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
   -- Each coherence law reduces, by case analysis on `c`, to the matching abstract δ lemma.
   contr_tmul_symm c x y := by cases c <;> exact deltaContr_comm _ _ _
   unit_symm c := by cases c <;> exact deltaUnit_symm _
@@ -433,12 +452,29 @@ def chiralTensor : ConjTensorSpecies ℂ ChiralColor G (chiralModule (ι := ι))
   barIdx_eq _ := rfl
   conj_contrComm := by
     intro d x₁ x₂
-    -- Every colour's contraction is the real δ, so `star` fixes it; the `bar`-side casts are `rfl`,
-    -- so each case reduces by defeq to this single fact.
-    have h : star (deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂))
-        = deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂) := by
-      rw [deltaContr_basis_basis]; split <;> simp
-    cases d <;> exact h
+    -- The contraction at every colour is the real δ at that colour's basis, so `star` fixes it. Each
+    -- case is restated (`show`) in `deltaContr`-at-basis form — cheap, since the `IntertwiningMap`
+    -- coercion is `rfl` and the `bar`-side casts (`barIdx_eq`/`bar_tau`) are `rfl`. Then the *lemma*
+    -- `deltaContr_basis_basis` evaluates both sides by a syntactic rewrite, so the heavy `Basis.conj`
+    -- is never `whnf`'d (which is what made `exact`/unification time out).
+    have key : ∀ {M₁ M₂ : Type} [AddCommGroup M₁] [Module ℂ M₁] [AddCommGroup M₂] [Module ℂ M₂]
+        (B₁ : Basis ι ℂ M₁) (B₂ : Basis ι ℂ M₂),
+        star (deltaContr B₁ (B₁ x₁ ⊗ₜ[ℂ] B₁ x₂)) = deltaContr B₂ (B₂ x₁ ⊗ₜ[ℂ] B₂ x₂) := by
+      intro M₁ M₂ _ _ _ _ B₁ B₂
+      rw [deltaContr_basis_basis, deltaContr_basis_basis]; split <;> simp
+    cases d
+    · show star (deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂))
+          = deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂)
+      exact key piBasis (Basis.conj piBasis)
+    · show star (deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂))
+          = deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂)
+      exact key piBasis (Basis.conj piBasis)
+    · show star (deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂))
+          = deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂)
+      exact key (Basis.conj piBasis) piBasis
+    · show star (deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂))
+          = deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂)
+      exact key (Basis.conj piBasis) piBasis
 
 /-- Type-safety smoke test. `chiralUp` and `chiralDown` are `τ`-dual, so a rank-2 tensor with
 those index colours admits the framework contraction `contrT`. A same-variance pair would
