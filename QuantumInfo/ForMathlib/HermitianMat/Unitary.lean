@@ -9,8 +9,32 @@ public import QuantumInfo.ForMathlib.HermitianMat.Inner
 public import QuantumInfo.ForMathlib.HermitianMat.NonSingular
 public import QuantumInfo.ForMathlib.Isometry
 
+/-!
+# Unitaries and Hermitian matrices
+
+## i. Overview
+
+This file introduces notation for the unitary group, the Kronecker product of unitary matrices,
+and lemmas about how unitary conjugation acts on Hermitian matrices (preserving trace, order,
+inner product, and eigenvalues).
+
+## ii. Key results
+
+- `𝐔[n]` : notation for the unitary group `Matrix.unitaryGroup n ℂ`.
+- `Matrix.unitary_kron` : the Kronecker product of two unitary matrices, as a unitary.
+- `HermitianMat.eigenvalues_conj` : unitary conjugation preserves the eigenvalues.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
+/-- Notation `𝐔[n]` for the unitary group of `n × n` complex matrices. -/
 notation "𝐔[" n "]" => Matrix.unitaryGroup n ℂ
 
 namespace Matrix
@@ -35,9 +59,11 @@ theorem kron_unitary (a : 𝐔[α]) (b : 𝐔[β]) : a.val ⊗ₖ b.val ∈ 𝐔
   simp [Matrix.mem_unitaryGroup_iff, ← Matrix.mul_kronecker_mul]
 
 open Kronecker in
+/-- The Kronecker product of two unitary matrices, packaged as an element of the unitary group. -/
 def unitary_kron (a : 𝐔[α]) (b : 𝐔[β]) : 𝐔[α × β] :=
   ⟨_, kron_unitary a b⟩
 
+/-- Notation `a ⊗ᵤ b` for the Kronecker product `Matrix.unitary_kron a b` of unitaries. -/
 scoped infixl:60 " ⊗ᵤ " => unitary_kron
 
 @[simp]

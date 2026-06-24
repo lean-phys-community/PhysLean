@@ -9,29 +9,20 @@ public import QuantumInfo.Entropy.Relative
 public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
 public import QuantumInfo.ForMathlib.HermitianMat.LiebConcavity
 
-@[expose] public section
-
-noncomputable section
-
-variable {d d₁ d₂ d₃ : Type*}
-variable [Fintype d] [Fintype d₁] [Fintype d₂] [Fintype d₃]
-variable [DecidableEq d] [DecidableEq d₁] [DecidableEq d₂] [DecidableEq d₃]
-variable {dA dB dC dA₁ dA₂ : Type*}
-variable [Fintype dA] [Fintype dB] [Fintype dC] [Fintype dA₁] [Fintype dA₂]
-variable [DecidableEq dA] [DecidableEq dB] [DecidableEq dC] [DecidableEq dA₁] [DecidableEq dA₂]
-variable {𝕜 : Type*} [RCLike 𝕜]
-variable {α : ℝ} {ρ σ : MState d}
-
-open HermitianMat
-open scoped InnerProductSpace RealInnerProductSpace Topology
-
 /-!
 # DPI (Data Processing Inequality)
 
-The Data Processing Inequality (DPI) for the sandwiched Rényi relative entropy, and
-as a consequence, the quantum relative entropy.
+## i. Overview
 
-## Proof structure (for α > 1)
+The Data Processing Inequality (DPI) for the sandwiched Rényi relative entropy, and as a
+consequence, the quantum relative entropy.
+
+## ii. Key results
+
+- `sandwichedTraceFunctional` : the trace functional `Q̃_α(ρ‖σ) = Tr[(σ^γ ρ σ^γ)^α]`.
+- `f_alpha_at_optimizer` : the variational formula evaluated at the optimizer yields `Q̃_α`.
+
+## iii. Proof structure (for α > 1)
 
 Following Leditzky–Rouzé–Datta (arXiv:1306.5920), the proof proceeds as follows:
 
@@ -50,7 +41,26 @@ Following Leditzky–Rouzé–Datta (arXiv:1306.5920), the proof proceeds as fol
 
 4. The general DPI for CPTP maps follows via **Stinespring dilation**:
    any CPTP map can be decomposed as ancilla preparation + unitary + partial trace.
+
+## iv. References
+
 -/
+
+@[expose] public section
+
+noncomputable section
+
+variable {d d₁ d₂ d₃ : Type*}
+variable [Fintype d] [Fintype d₁] [Fintype d₂] [Fintype d₃]
+variable [DecidableEq d] [DecidableEq d₁] [DecidableEq d₂] [DecidableEq d₃]
+variable {dA dB dC dA₁ dA₂ : Type*}
+variable [Fintype dA] [Fintype dB] [Fintype dC] [Fintype dA₁] [Fintype dA₂]
+variable [DecidableEq dA] [DecidableEq dB] [DecidableEq dC] [DecidableEq dA₁] [DecidableEq dA₂]
+variable {𝕜 : Type*} [RCLike 𝕜]
+variable {α : ℝ} {ρ σ : MState d}
+
+open HermitianMat
+open scoped InnerProductSpace RealInnerProductSpace Topology
 
 open scoped Matrix ComplexOrder
 open BigOperators
@@ -67,6 +77,7 @@ noncomputable def sandwichedTraceFunctional (α : ℝ) (ρ σ : MState d) : ℝ 
   let γ := (1 - α) / (2 * α)
   ((ρ.M.conj (σ.M ^ γ).mat) ^ α).trace
 
+/-- Notation `Q̃_ α(ρ‖σ)` for the sandwiched trace functional `sandwichedTraceFunctional α ρ σ`. -/
 notation "Q̃_" α "(" ρ "‖" σ ")" => sandwichedTraceFunctional α ρ σ
 
 /-! ## Properties of the Trace Functional -/
@@ -263,7 +274,8 @@ theorem inner_rho_H_hat (hα : 1 < α) (ρ σ : MState d) :
 /-
 **Step 1b**: Evaluating `f_α` at the optimizer `H_hat` gives `Q̃_α(ρ‖σ)`.
 This is the key computation that verifies the variational formula at the optimizer.
-Proof: f_α(H_hat, ρ, σ) = α · Tr[(σ^γ ρ σ^γ)^α] - (α-1) · Tr[(σ^γ ρ σ^γ)^α] = Tr[(σ^γ ρ σ^γ)^α] = Q̃.
+Proof: f_α(H_hat, ρ, σ) = α · Tr[(σ^γ ρ σ^γ)^α] - (α-1) · Tr[(σ^γ ρ σ^γ)^α]
+  = Tr[(σ^γ ρ σ^γ)^α] = Q̃.
 -/
 theorem f_alpha_at_optimizer (hα : 1 < α) (ρ σ : MState d) :
     f_alpha α (H_hat α ρ σ) ρ σ = Q̃_ α(ρ‖σ) := by

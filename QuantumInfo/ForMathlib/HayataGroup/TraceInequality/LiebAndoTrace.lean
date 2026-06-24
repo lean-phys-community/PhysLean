@@ -13,6 +13,28 @@ public import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
 public import Mathlib.LinearAlgebra.Lagrange
 public import Mathlib.LinearAlgebra.Trace
 
+/-!
+# Lieb–Ando trace inequalities
+
+## i. Overview
+
+This file develops the Lieb–Ando trace functionals and proves their joint concavity/convexity
+on the positive-definite cone, the analytic core behind the Lieb concavity theorem.
+
+## ii. Key results
+
+- `liebTraceMap` : the trace functional `s, K, A, B ↦ Tr[...]` of the Lieb–Ando inequalities.
+- `liebTrace_jointlyConcaveOn_pdSet` : joint concavity of the trace functional.
+- `liebTrace_jointlyConvexOn_pdSet` : joint convexity in the complementary parameter range.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 namespace LiebAndoTrace
@@ -272,10 +294,9 @@ private lemma cfcR_apply_of_mem_eigenspace_real
   have hpoly : cfcR (ℋ := 𝓚) q.eval T = Polynomial.aeval T q := by
     simpa [cfcR] using (cfc_polynomial (p := IsSelfAdjoint) (q := q) (a := T) hT)
   have hxv : Module.End.HasEigenvector T.toLinearMap (r : ℂ) x := ⟨hx, hx0⟩
-  have hr_specC : (r : ℂ) ∈ spectrum ℂ T :=
-    by
-      change (r : ℂ) ∈ spectrum ℂ ((Module.End.toContinuousLinearMap 𝓚) T.toLinearMap)
-      simpa using (Module.End.hasEigenvalue_of_hasEigenvector hxv).mem_spectrum
+  have hr_specC : (r : ℂ) ∈ spectrum ℂ T := by
+    change (r : ℂ) ∈ spectrum ℂ ((Module.End.toContinuousLinearMap 𝓚) T.toLinearMap)
+    simpa using (Module.End.hasEigenvalue_of_hasEigenvector hxv).mem_spectrum
   have hr_spec : r ∈ spectrum ℝ T := spectrum.of_algebraMap_mem ℂ hr_specC
   calc
     cfcR (ℋ := 𝓚) f T x = cfcR (ℋ := 𝓚) q.eval T x := by rw [hcfc]
@@ -1045,7 +1066,8 @@ private lemma phiK_weightedSum_operatorPowerMean_eq
       simp only [phiK_operatorPowerMean_eq_liebTraceMap (ℋ := ℋ) (s := s) K A₁ B₁ hA₁ hB₁,
     phiK_operatorPowerMean_eq_liebTraceMap (ℋ := ℋ) (s := s) K A₂ B₂ hA₂ hB₂]
 
--- The `HSOp`-valued `operatorPowerMean` terms are large enough that the skeleton itself is expensive.
+-- The `HSOp`-valued `operatorPowerMean` terms are large enough that the skeleton itself is
+-- expensive.
 theorem liebTrace_jointlyConcaveOn_pdSet
     {s : ℝ} (hs0 : 0 < s) (hs1 : s < 1) (K : L ℋ) :
     JointlyConcaveOn (pdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ))

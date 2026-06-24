@@ -7,6 +7,28 @@ module
 
 public import QuantumInfo.ForMathlib.HermitianMat.Proj
 
+/-!
+# Square roots of Hermitian matrices
+
+## i. Overview
+
+This file defines the square root of a Hermitian matrix via the continuous functional calculus
+(mapping negative eigenvalues to zero) and proves its basic properties, such as squaring back to
+the positive part and interaction with positive-definite inverses.
+
+## ii. Key results
+
+- `HermitianMat.sqrt` : the square root of a Hermitian matrix.
+- `HermitianMat.sqrt_sq` : the square of the square root recovers a positive matrix.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 variable {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]

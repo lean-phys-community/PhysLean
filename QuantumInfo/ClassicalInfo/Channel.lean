@@ -8,6 +8,27 @@ module
 public import QuantumInfo.ClassicalInfo.Distribution
 public import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 
+/-!
+# Classical information channels
+
+## i. Overview
+
+This file defines channels as in classical information theory, mapping strings over an input
+alphabet to distributions over an output alphabet. The main case of interest is the discrete
+memoryless channel, which acts independently and identically on each input symbol.
+
+## ii. Key results
+
+- `DMChannel` : a discrete memoryless channel, assigning each input symbol an output distribution.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 open BigOperators

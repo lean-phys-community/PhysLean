@@ -22,11 +22,12 @@ public import QuantumInfo.Channels.Unbundled
 public import QuantumInfo.Measurements.POVM
 
 /-!
-Defines `OptimalHypothesisRate`, the optimal rate of distinguishing an `MState` ρ from a set of other
-mixed states `S`, with at most Type I error ε.
+Defines `OptimalHypothesisRate`, the optimal rate of distinguishing an `MState` ρ from a set of
+other mixed states `S`, with at most Type I error ε.
 
-That is to say: take a projective measurement (a `POVM`) with elements `{T, 1-T}`, where measuring `T`
-will mean we conclude our unknown state was ρ, and measuring `1-T` will mean we think the state was
+That is to say: take a projective measurement (a `POVM`) with elements `{T, 1-T}`, where measuring
+`T` will mean we conclude our unknown state was ρ, and measuring `1-T` will mean we think the state
+was
 something in `S`. We only accept T's such that `Tr[(1-T)ρ] ≤ ε`, that is, we have at most an ε
 probability of incorrectly concluding it was ρ. The Type II error associated to this T is then
 `max_{σ ∈ S} Tr[T σ]`, that is, the (worst possible, over possible states) chance of incorrectly
@@ -55,11 +56,14 @@ noncomputable def OptimalHypothesisRate (ρ : MState d) (ε : Prob) (S : Set (MS
   ⨅ T : { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1},
     ⨆ σ ∈ S, ⟨_, σ.exp_val_prob T.prop.right⟩
 
+/-- Notation `β_ ε(ρ‖S)` for `OptimalHypothesisRate ρ ε S`, the optimal hypothesis testing rate
+of distinguishing `ρ` from the set `S` at tolerance `ε`. -/
 scoped[OptimalHypothesisRate] notation "β_" ε " (" ρ "‖" S ")" =>  OptimalHypothesisRate ρ ε S
 
 namespace OptimalHypothesisRate
 
-/-- The space of strategies `T` in `OptimalHypothesisRate` is inhabited, we always have some valid strategy. -/
+/-- The space of strategies `T` in `OptimalHypothesisRate` is inhabited: there is always some
+valid strategy. -/
 instance iInf_Inhabited (ρ : MState d) (ε : Prob) :
     Inhabited { m // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } :=
   ⟨1, by simp⟩
@@ -68,7 +72,8 @@ instance (ρ : MState d) (ε : Prob) : Inhabited {m | ρ.exp_val (1 - m) ≤ ε 
   iInf_Inhabited ρ ε
 
 /-- The space of strategies `T` in `OptimalHypothesisRate` is compact. -/
-theorem iInf_IsCompact (ρ : MState d) (ε : Prob) : IsCompact { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
+theorem iInf_IsCompact (ρ : MState d) (ε : Prob) :
+    IsCompact { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
   have hC₁ : IsCompact {m : HermitianMat d ℂ | 0 ≤ m ∧ m ≤ 1} :=
     HermitianMat.unitInterval_IsCompact
   have hC₂ : IsClosed {m | ρ.exp_val (1 - m) ≤ ε} := by
@@ -79,7 +84,8 @@ theorem iInf_IsCompact (ρ : MState d) (ε : Prob) : IsCompact { m | ρ.exp_val 
   exact hC₁.inter_left hC₂
 
 /-- The space of strategies `T` in `OptimalHypothesisRate` is convex. -/
-theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
+theorem iInf_IsConvex (ρ : MState d) (ε : Prob) :
+    Convex ℝ { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
   --We *could* get this from a more general fact that any linear subspace is convex,
   --and the intersection of convex spaces is convex, and this is an intersection of
   --three convex spaces. That would be more broken-down and lemmaified.
@@ -188,9 +194,10 @@ theorem exists_min (ρ : MState d) (ε : Prob) (S : Set (MState d)):
       ∧ ρ.exp_val T = 1 - ε := by
   obtain ⟨T, hT₁, hT₂⟩ := exists_min' ρ ε S
 
-  --Instead of just `use T`, we (may) have to reduce it so that it saturates the ⟪ρ,T⟫ = 1 - ε bound.
-  --We do this by multiplying it by a scalar less than 1 to get a `T'`. Since this operator is less
-  --than T, it's still optimal in terms of achieving `β_ ε(ρ‖S)`, but it can get the `1 - ε` bound instead.
+  --Instead of just `use T`, we (may) have to reduce it so that it saturates the ⟪ρ,T⟫ = 1 - ε
+  --bound. We do this by multiplying it by a scalar less than 1 to get a `T'`. Since this operator
+  --is less than T, it's still optimal in terms of achieving `β_ ε(ρ‖S)`, but it can get the
+  --`1 - ε` bound instead.
   set δ := ρ.exp_val ↑T - (1 - ε)-- with δ_def
   by_cases hδ : δ = 0
   · use T, hT₁
@@ -238,7 +245,7 @@ and the kernel of the state `ρ` contains the kernel of some element in `S`, the
 hypothesis rate is positive - there is some lower bound on the type II errors we'll see. In
 other words, under these conditions, we cannot completely avoid type II errors. -/
 theorem pos_of_lt_one {ρ : MState d} (S : Set (MState d))
-  (hρ : ∃ σ ∈ S, σ.M.ker ≤ ρ.M.ker)
+    (hρ : ∃ σ ∈ S, σ.M.ker ≤ ρ.M.ker)
   {ε : Prob} (hε : ε < 1) : 0 < β_ ε(ρ‖S) := by
   obtain ⟨σ, hσ₁, hσ₂⟩ := hρ
   --Assume the converse: that the infimum is zero. The set of such T's is inhabited
@@ -309,7 +316,8 @@ theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompa
     rw [← iSup_subtype'', Set.Icc.coe_iSup zero_le_one, hi]
     rfl
 
---Maybe should be phrased in terms of `0 < ...` instead? Maybe belongs in another file? It's kiinnnd of specialized..
+--Maybe should be phrased in terms of `0 < ...` instead? Maybe belongs in another file? It's
+--kiinnnd of specialized..
 theorem ker_diagonal_prob_eq_bot {q : Prob} (hq₁ : 0 < q) (hq₂ : q < 1) :
     HermitianMat.ker (.diagonal ℂ (ProbDistribution.coin q ·)) = ⊥ := by
   have hA : (Matrix.toLin' (HermitianMat.diagonal ℂ (ProbDistribution.coin q ·)).mat).ker = ⊥ := by
@@ -338,8 +346,7 @@ theorem optimalHypothesisRate_antitone (ρ σ : MState d) (ℰ : CPTPMap d d₂)
   obtain ⟨ℰdualSubtype, h⟩ :
       ∃ e : ({ m : HermitianMat d₂ ℂ // (ℰ ρ).exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1} →
       { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1}),
-      ∀ x, e x = ℰ.hermDual x
-       := by
+      ∀ x, e x = ℰ.hermDual x := by
     constructor; swap
     · rintro ⟨m, hm₁, hm₂⟩
       refine ⟨ℰ.toPTPMap.hermDual m, ?_, PTPMap.hermDual.PTP_POVM ℰ.toPTPMap hm₂⟩
@@ -360,15 +367,14 @@ set_option backward.isDefEq.respectTransparency false in
 /-- This is from [Strong converse exponents for a quantum channel discrimination problem
 and quantum-feedback-assisted communication](https://doi.org/10.1007/s00220-016-2645-4), Lemma 5.
 
-It seems like this is actually true for all 0 < α (with appropriate modifications at α = 1), but we only need
-it for the case of 1 < α.
+It seems like this is actually true for all 0 < α (with appropriate modifications at α = 1), but we
+only need it for the case of 1 < α.
 -/
 theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα : 1 < α) :
     —log β_ ε(ρ‖{σ}) ≤ D̃_ α(ρ‖σ) + —log (1 - ε) *
-      (.ofNNReal ⟨α, zero_le_one.trans hα.le⟩) / (.ofNNReal ⟨α - 1, sub_nonneg_of_le hα.le⟩)
-    := by
+      (.ofNNReal ⟨α, zero_le_one.trans hα.le⟩) / (.ofNNReal ⟨α - 1, sub_nonneg_of_le hα.le⟩) := by
   generalize_proofs pf1 pf2
-  --If ρ isn't in the support of σ, the right hand side is just ⊤. (The left hand side is not, necessarily!)
+  --If ρ isn't in the support of σ, the right hand side is just ⊤. (The left hand side is not!)
   by_cases h_supp : σ.M.ker ≤ ρ.M.ker
   swap
   · simp [SandwichedRelRentropy, h_supp, zero_lt_one.trans hα]
@@ -392,7 +398,7 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
   -/
   -- The "monotonicity of the ..." part here refers to the data processing inequality, and
   -- the (p, 1-p) and (q,1-q) refer to states which are qubits ("coins") of probability p and
-  -- q, respectively. The states ρ and σ can be "processed" into these coins by measuring the optimal T.
+  -- q, respectively. The states ρ and σ can be "processed" into these coins by measuring optimal T.
 
   have h₂ : 0 < 1 - ε.val := by
     change ε.val < 1 at hε
@@ -436,7 +442,8 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
         rw [ProbDistribution.coin_eq_iff]
         ext
         dsimp [MState.exp_val] at hT₂
-        simp [POVM.measure, Λ, p, ProbDistribution.mk', coe_one_minus, ← hT₂, HermitianMat.inner_comm]
+        simp [POVM.measure, Λ, p, ProbDistribution.mk', coe_one_minus, ← hT₂,
+          HermitianMat.inner_comm]
       · congr
         rw [ProbDistribution.coin_eq_iff]
         ext
@@ -472,7 +479,7 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
   --Turn the ENNReal problem into a Real problem
   have hα₂ : Subtype.mk _ pf2 ≠ 0 := by
     change ¬(_ = Subtype.mk 0 _)
-    simp
+    simp only [Subtype.mk.injEq]
     linarith
   rw [← ENNReal.coe_mul, ← ENNReal.coe_div hα₂, ← ENNReal.coe_add, ENNReal.coe_le_coe]
   clear hα₂
@@ -548,7 +555,8 @@ theorem rate_pos_of_smul_pos {ε : Prob} {d : Type*} [Fintype d] [DecidableEq d]
 
 set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
-theorem rate_Continuous_singleton {ε : Prob} {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) :
+theorem rate_Continuous_singleton {ε : Prob} {d : Type*} [Fintype d] [DecidableEq d]
+    (ρ : MState d) :
     Continuous fun σ ↦ β_ ε(ρ‖{σ}) := by
   have h := HermitianMat.innerₗ.flip.continuous_iInf_fst
     (S := { m | ρ.exp_val (1 - m) ≤ ↑ε ∧ 0 ≤ m ∧ m ≤ 1 })

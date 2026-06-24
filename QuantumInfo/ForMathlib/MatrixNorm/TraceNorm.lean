@@ -10,6 +10,30 @@ public import QuantumInfo.ForMathlib.Majorization
 public import QuantumInfo.ForMathlib.HermitianMat.Unitary
 public import QuantumInfo.ForMathlib.Isometry
 
+/-!
+# The trace norm of a matrix
+
+## i. Overview
+
+This file defines the trace norm `Tr[√(A† A)]` of a matrix and proves its basic properties:
+nonnegativity, invariance under isometries and unitary conjugation, the variational
+characterization over unitaries, and convexity.
+
+## ii. Key results
+
+- `Matrix.traceNorm` : the trace norm `Tr[√(A† A)]`.
+- `Matrix.traceNorm_unitary_conj` : invariance of the trace norm under unitary conjugation.
+- `Matrix.traceNorm_eq_max_re_tr_U` : the variational formula for the trace norm.
+- `Matrix.traceNorm_convex` : convexity of the trace norm.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 open BigOperators
@@ -46,7 +70,7 @@ open MatrixOrder Isometry
 
 /-- The trace norm is invariant under left multiplication by an isometry. -/
 theorem traceNorm_isometry_left [Fintype k] {A : Matrix n m R} {u : Matrix k n R}
-  (hu₁ : u.Isometry) : traceNorm (u * A) = traceNorm A := by
+    (hu₁ : u.Isometry) : traceNorm (u * A) = traceNorm A := by
   unfold traceNorm
   congr 1
   simp [Matrix.mul_assoc]
@@ -55,7 +79,7 @@ theorem traceNorm_isometry_left [Fintype k] {A : Matrix n m R} {u : Matrix k n R
 
 /-- The trace norm is invariant under right multiplication by the adjoint of an isometry. -/
 theorem traceNorm_isometry_right [Fintype k] {A : Matrix n m R} {u : Matrix k m R}
-  (hu₁ : u.Isometry) : traceNorm (A * uᴴ) = traceNorm A := by
+    (hu₁ : u.Isometry) : traceNorm (A * uᴴ) = traceNorm A := by
   unfold traceNorm
   congr 1
   simp [← Matrix.mul_assoc]
@@ -80,7 +104,7 @@ private theorem traceNorm_isometry_conj {A : Matrix n n R} {u : Matrix m n R}
 /-- The trace norm is invariant under unitary conjugation. -/
 @[simp]
 theorem traceNorm_unitary_conj {A : Matrix n n R} {U : Matrix.unitaryGroup n R} :
-  traceNorm (U.val * A * U.valᴴ) = traceNorm A := by
+    traceNorm (U.val * A * U.valᴴ) = traceNorm A := by
   have hu := (Matrix.mem_unitaryGroup_iff_isometry U.val).mp U.2
   exact traceNorm_isometry_conj hu.1 hu.1
 
@@ -89,7 +113,8 @@ theorem traceNorm_unitary_conj {A : Matrix n n R} {U : Matrix.unitaryGroup n R} 
 This is Proposition 9.1.1 in Wilde. -/
 theorem traceNorm_Hermitian_eq_sum_abs_eigenvalues {A : Matrix n n R} (hA : A.IsHermitian) :
     A.traceNorm = ∑ i, abs (hA.eigenvalues i) := by
-  obtain ⟨U, D, hD, hA_eq, h_eig⟩ : ∃ U : Matrix.unitaryGroup n R, ∃ D : Matrix n n R, D.IsDiag ∧ A = U.val * D * U.valᴴ ∧ ∀ i, D i i = hA.eigenvalues i := by
+  obtain ⟨U, D, hD, hA_eq, h_eig⟩ : ∃ U : Matrix.unitaryGroup n R, ∃ D : Matrix n n R, D.IsDiag ∧
+      A = U.val * D * U.valᴴ ∧ ∀ i, D i i = hA.eigenvalues i := by
     refine' ⟨hA.eigenvectorUnitary, _, isDiag_diagonal _, hA.spectral_theorem, _⟩
     simp [diagonal]
   nth_rw 1 [hA_eq, traceNorm_unitary_conj]
@@ -99,10 +124,10 @@ theorem traceNorm_Hermitian_eq_sum_abs_eigenvalues {A : Matrix n n R} (hA : A.Is
   simp_rw [← sq, ← Real.sqrt_sq_eq_abs, ← Matrix.trace_diagonal]
   set B := ((diagonal fun i => (hA.eigenvalues i : R) ^ 2)) with bD
   rw [CFC.sqrt_eq_real_sqrt B _, bD]
-  . rw [cfcₙ_eq_cfc (by fun_prop) (by simp)]
+  · rw [cfcₙ_eq_cfc (by fun_prop) (by simp)]
     rw_mod_cast [cfc_diagonal (g := fun i => (hA.eigenvalues i) ^2)]
     simp
-  . apply Matrix.PosSemidef.nonneg
+  · apply Matrix.PosSemidef.nonneg
     rw [Matrix.posSemidef_diagonal_iff]
     exact_mod_cast fun i => sq_nonneg (hA.eigenvalues i)
 
@@ -164,7 +189,8 @@ theorem traceNorm_smul (A : Matrix m n R) (c : R) : (c • A).traceNorm = ‖c�
     apply CFC.sqrt_unique;
     · simp; rw [CFC.sqrt_mul_sqrt_self M hM_pd.nonneg]
     · exact le_trans ( by norm_num ) (
-        smul_le_smul_of_nonneg_left ( show 0 ≤ CFC.sqrt M from by exact (CFC.sqrt_nonneg M) ) ( norm_nonneg c ) );
+        smul_le_smul_of_nonneg_left ( show 0 ≤ CFC.sqrt M from by exact (CFC.sqrt_nonneg M) )
+          ( norm_nonneg c ) );
 
 section complexTraceNorm
 
@@ -219,12 +245,14 @@ theorem exists_svd_sqrt_eigenvalues (A : Matrix n n ℂ) :
   let V : Matrix.unitaryGroup n ℂ := ⟨Matrix.of (fun i j ↦ b j i), by
     simp only [Matrix.mem_unitaryGroup_iff]
     ext i j
-    simpa [inner] using b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)⟩
+    simpa [inner] using
+      b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)⟩
   let W : Matrix.unitaryGroup n ℂ := hH.eigenvectorUnitary
   have hAW : A * W.val = V.val * Matrix.diagonal s := by
     ext i j
     have hleft : (A * W.val) i j = A.mulVec (hH.eigenvectorBasis j).ofLp i := by
-      simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, W, Matrix.IsHermitian.eigenvectorUnitary_apply]
+      simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, W,
+        Matrix.IsHermitian.eigenvectorUnitary_apply]
     by_cases hj : hH.eigenvalues j = 0
     · have hzero : A.mulVec (hH.eigenvectorBasis j).ofLp = 0 := by
         apply (WithLp.toLp_injective (p := 2))
@@ -410,7 +438,8 @@ end complexTraceNorm
 /-- For square complex matrices, the trace norm is the maximum of `re (Tr[U * A])`
 over unitaries `U`. -/
 theorem traceNorm_eq_max_re_tr_U (A : Matrix n n ℂ) :
-    IsGreatest {x : ℝ | ∃ U : unitaryGroup n ℂ, Complex.re ((U.val * A).trace) = x} A.traceNorm := by
+    IsGreatest {x : ℝ | ∃ U : unitaryGroup n ℂ, Complex.re ((U.val * A).trace) = x}
+      A.traceNorm := by
   classical
   let hH : (Aᴴ * A).IsHermitian := by
     simpa using (Matrix.isHermitian_mul_conjTranspose_self A.conjTranspose)
@@ -480,7 +509,7 @@ theorem PosSemidef.traceNorm_eq_trace {A : Matrix m m R} (hA : A.PosSemidef) :
 
 /-- The trace norm is convex. Property 9.1.5 in Wilde. -/
 theorem traceNorm_convex (M N : Matrix n n ℂ) (l : ℝ) (hl : 0 ≤ l ∧ l ≤ 1) :
-  ((l:ℂ) • M + ((1 - l) : ℂ) • N).traceNorm ≤ l * M.traceNorm + (1-l) * N.traceNorm := by
+    ((l:ℂ) • M + ((1 - l) : ℂ) • N).traceNorm ≤ l * M.traceNorm + (1-l) * N.traceNorm := by
   refine (traceNorm_add_le _ _).trans ?_
   simp_rw [traceNorm_smul]
   nth_rw 1 [← Complex.ofReal_one]

@@ -16,6 +16,29 @@ public import Mathlib.Data.Fintype.Order
 public import Mathlib.Topology.Algebra.InfiniteSum.Order
 public import Mathlib.Topology.MetricSpace.Bounded
 
+/-!
+# Sion's minimax theorem
+
+## i. Overview
+
+This file proves Sion's minimax theorem: for a function `f` that is quasiconvex and lower
+semicontinuous in its first argument over a compact convex set `S`, and quasiconcave and upper
+semicontinuous in its second argument over a convex set `T`, the inf-sup equals the sup-inf.
+Supporting lemmas about `ciSup`/`ciInf`, quasiconvexity, and semicontinuity are also developed.
+
+## ii. Key results
+
+- `sion_minimax` : Sion's minimax theorem, `⨅ x, ⨆ y, f x y = ⨆ y, ⨅ x, f x y`.
+- `ciSup_ciInf_le_ciInf_ciSup` : the max-min inequality for conditionally complete lattices.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 @[simp]
@@ -27,9 +50,11 @@ section ciSup
 
 variable {ι α : Type*} [ConditionallyCompleteLattice α] {f g : ι → α} {a : α}
 
-/-- The **max-min theorem**. A version of `iSup_iInf_le_iInf_iSup` for conditionally complete lattices. -/
+/-- The **max-min theorem**. A version of `iSup_iInf_le_iInf_iSup` for conditionally complete
+lattices. -/
 theorem ciSup_ciInf_le_ciInf_ciSup {ι': Type*} [Nonempty ι]
-  (f : ι → ι' → α) (Ha : ∀ j, BddAbove (Set.range (f · j))) (Hb : ∀ i, BddBelow (Set.range (f i))) :
+    (f : ι → ι' → α) (Ha : ∀ j, BddAbove (Set.range (f · j)))
+    (Hb : ∀ i, BddBelow (Set.range (f i))) :
     ⨆ i, ⨅ j, f i j ≤ ⨅ j, ⨆ i, f i j :=
   ciSup_le fun i ↦ ciInf_mono (Hb i) fun j ↦ le_ciSup (Ha j) i
 
@@ -38,7 +63,8 @@ theorem BddAbove.range_max (hf : BddAbove (Set.range f)) (hg : BddAbove (Set.ran
   rcases hf with ⟨a, ha⟩
   rcases hg with ⟨b, hb⟩
   use a ⊔ b
-  simp only [mem_upperBounds, Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff, Pi.sup_apply] at ha hb ⊢
+  simp only [mem_upperBounds, Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff,
+    Pi.sup_apply] at ha hb ⊢
   intro i
   specialize ha i
   specialize hb i
@@ -49,7 +75,7 @@ theorem BddBelow.range_min (hf : BddBelow (Set.range f)) (hg : BddBelow (Set.ran
   BddAbove.range_max (α := αᵒᵈ) hf hg
 
 theorem ciInf_eq_min_cInf_inter_diff (S T : Set ι)
-  [Nonempty (S ∩ T : Set ι)] [Nonempty (S \ T : Set ι)] (hf : BddBelow (f '' S)) :
+    [Nonempty (S ∩ T : Set ι)] [Nonempty (S \ T : Set ι)] (hf : BddBelow (f '' S)) :
     ⨅ i : S, f i = (⨅ i : (S ∩ T : Set ι), f i) ⊓ ⨅ i : (S \ T : Set ι), f i := by
   apply le_antisymm
   · rw [le_inf_iff]
@@ -90,7 +116,7 @@ theorem le_ciSup_inf_ciSup (hf : BddAbove (Set.range f)) (hg : BddAbove (Set.ran
 end ciSup
 
 theorem QuasiconvexOn.subset
-  {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [LE β] [SMul 𝕜 E]
+    {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [LE β] [SMul 𝕜 E]
   {s : Set E} {f : E → β} (h : QuasiconvexOn 𝕜 s f) {t : Set E} (hts : t ⊆ s) (ht : Convex 𝕜 t) :
     QuasiconvexOn 𝕜 t f := by
   intro b
@@ -98,14 +124,14 @@ theorem QuasiconvexOn.subset
   simp +contextual [Set.ext_iff, @hts _]
 
 theorem QuasiconvexOn.mem_segment_le_max
-  {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [SemilatticeSup β] [SMul 𝕜 E]
+    {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [SemilatticeSup β] [SMul 𝕜 E]
   {s : Set E} {f : E → β} (h : QuasiconvexOn 𝕜 s f)
   {x y z : E} (hx : x ∈ s) (hy : y ∈ s) (hz : z ∈ segment 𝕜 x y):
     f z ≤ f x ⊔ f y :=
   ((h (f x ⊔ f y)).segment_subset (by simpa) (by simpa) hz).right
 
 theorem QuasiconcaveOn.min_le_mem_segment
-  {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [SemilatticeInf β] [SMul 𝕜 E]
+    {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [SemilatticeInf β] [SMul 𝕜 E]
   {s : Set E} {f : E → β} (h : QuasiconcaveOn 𝕜 s f)
   {x y z : E} (hx : x ∈ s) (hy : y ∈ s) (hz : z ∈ segment 𝕜 x y):
     f x ⊓ f y ≤ f z :=
@@ -116,14 +142,16 @@ theorem LowerSemicontinuousOn.bddBelow {α : Type*} [TopologicalSpace α] {S : S
   rcases S.eq_empty_or_nonempty with rfl | hS₂
   · simp
   have h_neighborhood : ∀ x ∈ S, ∃ U ∈ nhds x, ∀ y ∈ U ∩ S, g y > g x - 1 := by
-    -- By definition of lower semicontinuity, for each x ∈ S, there exists a neighborhood U_x such that g(y) > g(x) - 1 for all y ∈ U_x ∩ S.
+    -- By definition of lower semicontinuity, for each x ∈ S, there exists a neighborhood U_x
+    -- such that g(y) > g(x) - 1 for all y ∈ U_x ∩ S.
     intros x hx
     specialize hg x hx (g x - 1) (sub_one_lt (g x))
     rw [eventually_nhdsWithin_iff] at hg
     simp only [Set.mem_inter_iff, gt_iff_lt, and_imp]
     exact ⟨_, hg, fun y hy hyS ↦ hy hyS⟩
   choose! U hU using h_neighborhood
-  -- By the finite subcover property, there exists a finite subset t ⊆ S$ such that S ⊆ ⋃_{x ∈ t} U_x$.
+  -- By the finite subcover property, there exists a finite subset t ⊆ S$ such that
+  -- S ⊆ ⋃_{x ∈ t} U_x$.
   obtain ⟨t, ht⟩ : ∃ t, (∀ x ∈ t, x ∈ S) ∧ S ⊆ ⋃ x ∈ t, U x :=
     hS.elim_nhds_subcover U fun x hx ↦ hU x hx |>.1;
   -- Let $m$ be the minimum value of $g$ on the finite set $t$.
@@ -141,7 +169,8 @@ theorem LowerSemicontinuousOn.bddBelow {α : Type*} [TopologicalSpace α] {S : S
 theorem LowerSemicontinuousOn.max {α : Type*} [TopologicalSpace α] {S : Set α} {f g : α → ℝ}
     (hf : LowerSemicontinuousOn f S) (hg : LowerSemicontinuousOn g S) :
     LowerSemicontinuousOn (fun x ↦ max (f x) (g x)) S := by
-  convert lowerSemicontinuousOn_ciSup (s := S) (f := fun (i : Bool) x' ↦ if i then f x' else g x') ?_ ?_
+  convert lowerSemicontinuousOn_ciSup (s := S)
+    (f := fun (i : Bool) x' ↦ if i then f x' else g x') ?_ ?_
   · rw [ciSup_eq_of_forall_le_of_forall_lt_exists_gt] <;> aesop
   · simp
   · simp [hf, hg]
@@ -160,7 +189,8 @@ theorem lowerSemicontinuousOn_iff_isClosed_preimage {f : α → γ} [IsClosed s]
     · simp only [Set.mem_inter_iff, hx', Set.mem_preimage, Set.mem_Iic, true_and, not_le] at hx
       have := a x hx';
       rcases mem_nhdsWithin.1 ( this y hx ) with ⟨ o, ho, h ⟩;
-      exact ⟨ o, ho, h.1, Set.eq_empty_iff_forall_notMem.2 fun z hz => h.2 ⟨ hz.1, hz.2.1 ⟩ |> not_le_of_gt <| Set.mem_Iic.1 hz.2.2 ⟩;
+      exact ⟨ o, ho, h.1, Set.eq_empty_iff_forall_notMem.2 fun z hz =>
+        h.2 ⟨ hz.1, hz.2.1 ⟩ |> not_le_of_gt <| Set.mem_Iic.1 hz.2.2 ⟩;
     · exact ⟨ sᶜ, IsClosed.isOpen_compl, hx', by aesop ⟩;
   · intro a x hx y hy
     have hx_not_in : x ∉ s ∩ f ⁻¹' Set.Iic y := by
@@ -169,13 +199,16 @@ theorem lowerSemicontinuousOn_iff_isClosed_preimage {f : α → γ} [IsClosed s]
     filter_upwards [ IsOpen.mem_nhds ( isOpen_compl_iff.2 ( a y ) ) hx_not_in ] with z hz hzs
     exact lt_of_not_ge fun h => hz ⟨hzs, h⟩
 
-theorem segment.isConnected {E : Type u_1} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul ℝ E] (a b : E) :
+theorem segment.isConnected {E : Type u_1} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E]
+    [ContinuousAdd E] [ContinuousSMul ℝ E] (a b : E) :
     IsConnected (segment ℝ a b) := by
   rw [← Path.range_segment a b]
   exact isConnected_range (Path.segment a b).continuous
 
-theorem BddAbove.range_inf_of_image2 {M N α : Type*} {f : M → N → α} [ConditionallyCompleteLinearOrder α]
-  {S : Set M} {T : Set N} (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T)) :
+theorem BddAbove.range_inf_of_image2 {M N α : Type*} {f : M → N → α}
+    [ConditionallyCompleteLinearOrder α]
+    {S : Set M} {T : Set N} (h_bddA : BddAbove (Set.image2 f S T))
+    (h_bddB : BddBelow (Set.image2 f S T)) :
     BddAbove (Set.range fun y : T ↦ ⨅ x : S, f x y) := by
   rcases isEmpty_or_nonempty T with hT | hT
   · aesop
@@ -191,25 +224,28 @@ theorem BddAbove.range_inf_of_image2 {M N α : Type*} {f : M → N → α} [Cond
     exact hz (Set.mem_image2_of_mem hx hy)
   exact ⟨_, Set.forall_mem_range.2 (h_inf_le_M _ ·.2)⟩
 
-theorem BddBelow.range_sup_of_image2 {M N α : Type*} {f : M → N → α} [ConditionallyCompleteLinearOrder α]
-  {S : Set M} {T : Set N} (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T)) :
+theorem BddBelow.range_sup_of_image2 {M N α : Type*} {f : M → N → α}
+    [ConditionallyCompleteLinearOrder α]
+    {S : Set M} {T : Set N} (h_bddA : BddAbove (Set.image2 f S T))
+    (h_bddB : BddBelow (Set.image2 f S T)) :
       BddBelow (Set.range fun y : T ↦ ⨆ x : S, f x y) :=
   BddAbove.range_inf_of_image2 (α := αᵒᵈ) h_bddB h_bddA
 
 theorem ciInf_le_ciInf_of_subset {α β : Type*} [ConditionallyCompleteLattice α]
-  {f : β → α} {s t : Set β} (hs : s.Nonempty) (hf : BddBelow (f '' t)) (hst : s ⊆ t) :
+    {f : β → α} {s t : Set β} (hs : s.Nonempty) (hf : BddBelow (f '' t)) (hst : s ⊆ t) :
     ⨅ x : t, f x ≤ ⨅ x : s, f x := by
   have h_lower_bound : ∀ y ∈ s, ⨅ x : t, f x ≤ f y := by
     intro y hy
     obtain ⟨w_1, ⟨left_1, right_1⟩⟩ : f y ∈ f '' t := by
       use y, hst hy
-    exact le_trans ( ciInf_le (by simpa [ Set.range ] using hf ) ⟨ w_1, left_1 ⟩ ) ( by simp[right_1] );
+    exact le_trans ( ciInf_le (by simpa [ Set.range ] using hf ) ⟨ w_1, left_1 ⟩ )
+      ( by simp[right_1] );
   apply le_csInf
   · exact ⟨_, ⟨⟨_, hs.choose_spec⟩, rfl⟩⟩;
   · aesop
 
 theorem LowerSemicontinuousOn.dite_top {α β : Type*} [TopologicalSpace α] [Preorder β] [OrderTop β]
-  {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → p a → β}
+    {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → p a → β}
   (hf : LowerSemicontinuousOn (fun x : Subtype p ↦ f x.val x.prop) {x | x.val ∈ s})
   (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ setOf p) :
     LowerSemicontinuousOn (fun x ↦ dite (p x) (f x) (fun _ ↦ ⊤)) s := by
@@ -224,12 +260,14 @@ theorem LowerSemicontinuousOn.dite_top {α β : Type*} [TopologicalSpace α] [Pr
     filter_upwards [hf]
     simp only [Subtype.forall]
     grind [lt_top_of_lt]
-  · filter_upwards [self_mem_nhdsWithin, mem_nhdsWithin_of_mem_nhds (hu.isOpen_compl.mem_nhds (show x ∉ u by grind))]
+  · filter_upwards [self_mem_nhdsWithin,
+      mem_nhdsWithin_of_mem_nhds (hu.isOpen_compl.mem_nhds (show x ∉ u by grind))]
     intros
     simp_all only [Set.mem_compl_iff, ↓reduceDIte]
 
 theorem LowerSemicontinuousOn.comp_continuousOn {α β γ : Type*}
-  [TopologicalSpace α] [TopologicalSpace β] [Preorder γ] {f : α → β} {s : Set α} {g : β → γ} {t : Set β}
+    [TopologicalSpace α] [TopologicalSpace β] [Preorder γ] {f : α → β} {s : Set α} {g : β → γ}
+    {t : Set β}
   (hg : LowerSemicontinuousOn g t) (hf : ContinuousOn f s) (h : Set.MapsTo f s t) :
     LowerSemicontinuousOn (g ∘ f) s := by
   intro x hx y hy
@@ -244,21 +282,24 @@ theorem LowerSemicontinuousOn.comp_continuousOn {α β γ : Type*}
   exact h_final.mono fun x' hx' => hU _ hx'
 
 theorem UpperSemicontinuousOn.comp_continuousOn {α β γ : Type*}
-  [TopologicalSpace α] [TopologicalSpace β] [Preorder γ] {f : α → β} {s : Set α} {g : β → γ} {t : Set β}
+    [TopologicalSpace α] [TopologicalSpace β] [Preorder γ] {f : α → β} {s : Set α} {g : β → γ}
+    {t : Set β}
   (hg : UpperSemicontinuousOn g t) (hf : ContinuousOn f s) (h : Set.MapsTo f s t) :
     UpperSemicontinuousOn (g ∘ f) s :=
   LowerSemicontinuousOn.comp_continuousOn (γ := γᵒᵈ) hg hf h
 
 theorem LowerSemicontinuousOn.ite_top {α β : Type*} [TopologicalSpace α] [Preorder β] [OrderTop β]
-  {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → β} (hf : LowerSemicontinuousOn f (s ∩ setOf p))
+    {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → β}
+    (hf : LowerSemicontinuousOn f (s ∩ setOf p))
   (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ setOf p) :
     LowerSemicontinuousOn (fun x ↦ ite (p x) (f x) ⊤) s :=
   dite_top p (hf.comp_continuousOn (by fun_prop) (by intro; simp)) h_relatively_closed
 
 theorem LeftOrdContinuous.comp_lowerSemicontinuousOn_strong_assumptions {α γ δ : Type*}
-  [TopologicalSpace α] [LinearOrder γ] [LinearOrder δ] [TopologicalSpace δ] [OrderTopology δ]
+    [TopologicalSpace α] [LinearOrder γ] [LinearOrder δ] [TopologicalSpace δ] [OrderTopology δ]
   [TopologicalSpace γ] [OrderTopology γ] [DenselyOrdered γ] [DenselyOrdered δ]
-  {s : Set α} {g : γ → δ} {f : α → γ} (hg : LeftOrdContinuous g) (hf : LowerSemicontinuousOn f s) (hg2 : Monotone g) :
+  {s : Set α} {g : γ → δ} {f : α → γ} (hg : LeftOrdContinuous g) (hf : LowerSemicontinuousOn f s)
+  (hg2 : Monotone g) :
     LowerSemicontinuousOn (g ∘ f) s := by
   intros x hx y hy
   have hU : ∃ U ∈ nhds x, ∀ z ∈ U ∩ s, g (f z) > y := by
@@ -283,9 +324,11 @@ theorem LeftOrdContinuous.comp_lowerSemicontinuousOn_strong_assumptions {α γ �
   obtain ⟨w, ⟨left, right⟩⟩ := hU
   exact Filter.eventually_inf_principal.2 (Filter.mem_of_superset left right)
 
-theorem UpperSemicontinuousOn.frequently_lt_of_tendsto {α β γ : Type*} [TopologicalSpace β] [Preorder γ]
-  {f : β → γ} {T : Set β} (hf : UpperSemicontinuousOn f T) {c : γ} {zs : α → β} {z : β}
-  {l : Filter α} [l.NeBot] (hzs : l.Tendsto zs (nhds z)) (hx₂ : f z < c) (hzI : ∀ a, zs a ∈ T) (hzT : z ∈ T) :
+theorem UpperSemicontinuousOn.frequently_lt_of_tendsto {α β γ : Type*} [TopologicalSpace β]
+    [Preorder γ]
+    {f : β → γ} {T : Set β} (hf : UpperSemicontinuousOn f T) {c : γ} {zs : α → β} {z : β}
+  {l : Filter α} [l.NeBot] (hzs : l.Tendsto zs (nhds z)) (hx₂ : f z < c) (hzI : ∀ a, zs a ∈ T)
+  (hzT : z ∈ T) :
     ∀ᶠ a in l, f (zs a) < c := by
   have h : ∀ᶠ n in l, zs n ∈ {y ∈ T | f y < c} := by
     filter_upwards [hzs.eventually (eventually_nhdsWithin_iff.mp ((hf z hzT) c hx₂))] with n hn
@@ -293,7 +336,7 @@ theorem UpperSemicontinuousOn.frequently_lt_of_tendsto {α β γ : Type*} [Topol
   simp_all
 
 theorem Finset.ciInf_insert {α β : Type*} [DecidableEq α] [ConditionallyCompleteLattice β]
-  (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
+    (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
     ⨅ (a : (insert x t : _)), f a = f x ⊓ ⨅ (a : t), f a := by
   apply le_antisymm
   · apply le_inf
@@ -312,15 +355,17 @@ theorem Finset.ciInf_insert {α β : Type*} [DecidableEq α] [ConditionallyCompl
     aesop
 
 theorem Finset.ciSup_insert {α β : Type*} [DecidableEq α] [ConditionallyCompleteLattice β]
-  (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
+    (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
     ⨆ (a : (insert x t : _)), f a = f x ⊔ ⨆ (a : t), f a :=
   t.ciInf_insert (β := βᵒᵈ) ht x f
 
 section sion_minimax
 /-!
-Following https://projecteuclid.org/journals/kodai-mathematical-journal/volume-11/issue-1/Elementary-proof-for-Sions-minimax-theorem/10.2996/kmj/1138038812.full, with some corrections. There are two errors in Lemma 2 and the main theorem: an incorrect step that
-`(∀ x, a < f x) → (a < ⨅ x, f x)`. This is repaired by taking an extra `exists_between` to get `a < b < ⨅ ...`, concluding that
-`(∀ x, b < f x) → (b ≤ ⨅ x, f x)` and so `(a < ⨅ x, f x)`.
+Following https://projecteuclid.org/journals/kodai-mathematical-journal/volume-11/issue-1/Elementary-proof-for-Sions-minimax-theorem/10.2996/kmj/1138038812.full,
+with some corrections. There are two errors in Lemma 2 and the main theorem: an incorrect step
+that `(∀ x, a < f x) → (a < ⨅ x, f x)`. This is repaired by taking an extra `exists_between` to
+get `a < b < ⨅ ...`, concluding that `(∀ x, b < f x) → (b ≤ ⨅ x, f x)` and so
+`(a < ⨅ x, f x)`.
 -/
 
 variable  {M : Type*} [NormedAddCommGroup M]
@@ -330,7 +375,8 @@ variable  {M : Type*} [NormedAddCommGroup M]
   (hS₁ : IsCompact S) (hS₃ : S.Nonempty) (hT₃ : T.Nonempty)
 
 include hfc₂ hS₁ hS₃ in
-private theorem sion_exists_min_lowerSemi (a : ℝ) (hc : ∀ y₀ : T, ⨅ (x : S), f (↑x) y₀ ≤ a) (z : N) (hzT : z ∈ T) :
+private theorem sion_exists_min_lowerSemi (a : ℝ) (hc : ∀ y₀ : T, ⨅ (x : S), f (↑x) y₀ ≤ a)
+    (z : N) (hzT : z ∈ T) :
     ∃ x ∈ S, f x z ≤ a := by
   let _ := hS₃.to_subtype
   contrapose! hc
@@ -350,8 +396,10 @@ private theorem sion_exists_min_lowerSemi (a : ℝ) (hc : ∀ y₀ : T, ⨅ (x :
       choose! xn hxn using h_eps
       use fun n ↦ xn (1 / (n + 1))
       rw [tendsto_iff_dist_tendsto_zero]
-      refine squeeze_zero (fun _ ↦ abs_nonneg _) (fun n ↦ ?_) tendsto_one_div_add_atTop_nhds_zero_nat
-      refine abs_le.mpr ⟨?_, ?_⟩ <;> linarith [h_lower_bound (xn (1 / (n + 1))), hxn (1 / (n + 1)) (by positivity)]
+      refine squeeze_zero (fun _ ↦ abs_nonneg _) (fun n ↦ ?_)
+        tendsto_one_div_add_atTop_nhds_zero_nat
+      refine abs_le.mpr ⟨?_, ?_⟩ <;>
+        linarith [h_lower_bound (xn (1 / (n + 1))), hxn (1 / (n + 1)) (by positivity)]
     obtain ⟨x, subseq, hsubseq₁, hsubseq₂⟩ : ∃ x : S, ∃ subseq : ℕ → ℕ,
         StrictMono subseq ∧ Filter.Tendsto (fun n => xn (subseq n)) Filter.atTop (nhds x) := by
       simpa using (isCompact_iff_isCompact_univ.mp hS₁).isSeqCompact (x := xn) fun _ ↦ trivial
@@ -370,7 +418,8 @@ private theorem sion_exists_min_lowerSemi (a : ℝ) (hc : ∀ y₀ : T, ⨅ (x :
   order
 
 variable [Module ℝ M] [ContinuousSMul ℝ M]
-variable [AddCommGroup N] [TopologicalSpace N] [SequentialSpace N] [T2Space N] [ContinuousAdd N] [Module ℝ N] [ContinuousSMul ℝ N]
+variable [AddCommGroup N] [TopologicalSpace N] [SequentialSpace N] [T2Space N] [ContinuousAdd N]
+variable [Module ℝ N] [ContinuousSMul ℝ N]
 variable
   (hfc₁ : ∀ x, x ∈ S → UpperSemicontinuousOn (f x) T)
   (hfq₂ : ∀ y, y ∈ T → QuasiconvexOn ℝ S (f · y))
@@ -379,8 +428,8 @@ variable
 
 include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hT₂ hS₃ in
 private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y₂ ∈ T)
-    (a : ℝ) (ha : a < ⨅ x : S, (max (f x y₁) (f x y₂)))
-    : ∃ y₀ : T, a < ⨅ x : S, f x y₀ := by
+    (a : ℝ) (ha : a < ⨅ x : S, (max (f x y₁) (f x y₂))) :
+    ∃ y₀ : T, a < ⨅ x : S, f x y₀ := by
   by_contra! hc
   have _ := isCompact_iff_compactSpace.mp hS₁
   have _ := hS₁.isClosed
@@ -488,7 +537,8 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
       have hAC : A ∩ C z ⊆ A ∩ B := by apply Set.inter_subset_inter_right _ hCB
       rw [hAB, Set.subset_empty_iff, Set.ext_iff] at hAC
       revert hAC
-      simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and, imp_false, not_forall, not_not]
+      simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and, imp_false,
+        not_forall, not_not]
       exact ⟨x, hxA, hx⟩
     suffices hn : ∃ n, f x (zs n) < β by
       refine hn.imp fun n ↦ ?_
@@ -526,7 +576,8 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
       have hAC : C z ∩ B ⊆ A ∩ B := by apply Set.inter_subset_inter_left _ hCB
       rw [hAB, Set.subset_empty_iff, Set.ext_iff] at hAC
       revert hAC
-      simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and, imp_false, not_forall, not_not]
+      simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and, imp_false,
+        not_forall, not_not]
       exact ⟨x, hx, hxA⟩
     suffices hn : ∃ n, f x (zs n) < β by
       refine hn.imp fun n ↦ ?_
@@ -554,8 +605,8 @@ include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ in
 private lemma sion_exists_min_fin
   (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T))
   (ys : Finset N) (hys_n : ys.Nonempty) (hys : (ys : Set N) ⊆ T)
-  (a : ℝ) (ha : a < ⨅ x : S, ⨆ yi : ys, f x yi)
-    : ∃ y₀ : T, a < ⨅ x : S, f x y₀ := by
+  (a : ℝ) (ha : a < ⨅ x : S, ⨆ yi : ys, f x yi) :
+    ∃ y₀ : T, a < ⨅ x : S, f x y₀ := by
   induction hys_n using Finset.Nonempty.cons_induction generalizing S
   case singleton x =>
     simp at ha hys
@@ -595,7 +646,8 @@ private lemma sion_exists_min_fin
       apply lt_of_lt_of_le hab (hb.le.trans ?_)
       classical
       trans (⨅ x : S', ⨆ yi : { x // x ∈ (Insert.insert yₙ t : Finset N)}, f ↑x ↑yi)
-      · apply ciInf_le_ciInf_of_subset (f := fun x ↦ ⨆ yi : { x // x ∈ (Insert.insert yₙ t : Finset N)}, f ↑x ↑yi)
+      · apply ciInf_le_ciInf_of_subset
+          (f := fun x ↦ ⨆ yi : { x // x ∈ (Insert.insert yₙ t : Finset N)}, f ↑x ↑yi)
         · exact hS'_n
         · --BddBelow ((fun x => ⨆ yi, f x ↑yi) '' S)
           convert BddBelow.range_sup_of_image2 (T := S) (S := { x | x ∈ insert yₙ t }) (f := flip f)
@@ -664,7 +716,7 @@ private lemma sion_exists_min_fin
       rw [hS'_compl] at hS_diff_ne ⊢
       rw [Set.coe_setOf] at hS_diff_ne
       refine hab.trans_le ?_
-      simp
+      simp only [Set.coe_setOf, Set.mem_setOf_eq]
       apply le_ciInf
       intro x
       have := x.2.2.le
@@ -674,14 +726,15 @@ include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ hT₃ in
 /-- **Sion's Minimax theorem**. Because of `ciSup` and `ciInf` junk values when f isn't
 bounded, we need to assume that it's bounded above and below. -/
 theorem sion_minimax
-  (h_bddA : BddAbove (Set.image2 f S T))
-  (h_bddB : BddBelow (Set.image2 f S T))
-    : ⨅ x : S, ⨆ y : T, f x y = ⨆ y : T, ⨅ x : S, f x y := by
+    (h_bddA : BddAbove (Set.image2 f S T))
+  (h_bddB : BddBelow (Set.image2 f S T)) :
+    ⨅ x : S, ⨆ y : T, f x y = ⨆ y : T, ⨅ x : S, f x y := by
   have _ := hS₁.isClosed
   have _ := hS₃.to_subtype
   have _ := hT₃.to_subtype
   have h_bdd_0 (i : T) : BddBelow (Set.range fun j : S ↦ f j i) := by
-    --This one actually doesn't require h_bddB, we can just prove it from compactness + semicontinuity
+    --This one actually doesn't require h_bddB, we can just prove it from compactness +
+    --semicontinuity
     convert (hfc₂ i i.2).bddBelow hS₁
     ext; simp
   have h_bdd_1 (j : S) : BddAbove (Set.range fun (x : T) => f j x) :=
@@ -709,7 +762,8 @@ theorem sion_minimax
       rw [lt_ciInf_iff]; swap
       · --BddBelow (Set.range fun x => ⨆ yi : Finset.map ⋯, f ↑x ↑yi)
         exact BddBelow.range_sup_of_image2 (T := S) (S := u.map ⟨_, Subtype.val_injective⟩)
-          (f := flip f) (by apply h_bddA.mono; simp [flip]; grind) (by apply h_bddB.mono; simp [flip]; grind)
+          (f := flip f) (by apply h_bddA.mono; simp [flip]; grind)
+          (by apply h_bddB.mono; simp [flip]; grind)
       use b, hb₁
       intro i
       specialize hu i i.2

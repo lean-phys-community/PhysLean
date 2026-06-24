@@ -7,6 +7,30 @@ module
 
 public import Mathlib.Analysis.Subadditive
 
+/-!
+# Superadditive sequences
+
+## i. Overview
+
+This module defines `Superadditive` sequences of reals (mirroring Mathlib's `Subadditive`), relates
+them to `Subadditive` by negation, and proves the superadditive form of Fekete's lemma: a bounded
+superadditive sequence `u n / n` converges to its limit `Superadditive.lim`.
+
+## ii. Key results
+
+- `Superadditive` : the predicate `∀ m n, u (m + n) ≥ u m + u n`.
+- `Superadditive.to_Subadditive` / `Subadditive.to_Superadditive` : negation interchanges the two.
+- `Superadditive.lim` : the limit of a superadditive sequence.
+- `Superadditive.tendsto_lim` : Fekete's lemma for bounded superadditive sequences.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 def Superadditive (u : ℕ → ℝ) : Prop :=

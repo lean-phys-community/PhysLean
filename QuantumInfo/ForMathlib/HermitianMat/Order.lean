@@ -8,6 +8,29 @@ module
 public import QuantumInfo.ForMathlib.HermitianMat.Trace
 public import Mathlib.Analysis.RCLike.Basic
 
+/-!
+# The order structure on Hermitian matrices
+
+## i. Overview
+
+This file equips `HermitianMat n 𝕜` with its Loewner partial order (`A ≤ B ↔ B - A` is PSD) and
+proves the basic order facts, spectrum characterizations, kernel monotonicity, and a `positivity`
+extension for Hermitian-matrix positivity.
+
+## ii. Key results
+
+- `HermitianMat.le_iff` : `A ≤ B` iff `B - A` is positive semidefinite.
+- `HermitianMat.posSemidef_iff_spectrum_nonneg` : PSD is equivalent to a nonnegative spectrum.
+- `HermitianMat.ker_le_of_le_smul` : kernel monotonicity under a scaled order bound.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 namespace HermitianMat
@@ -193,8 +216,10 @@ meta partial def findMatrixPSDInExpr (e : Expr) (p : Expr) (ty : Expr) :
         let nonemptyType ← mkAppM ``Nonempty #[nType]
         match ← try? (synthInstance nonemptyType) with
         | some nonemptyInst =>
-          -- posDef_to_pos : {𝕜} → [RCLike 𝕜] → {n} → [Fintype n] → {A} → (hA : A.PosDef) → [Nonempty n] → 0 < A
-          let pf ← mkAppOptM ``HermitianMat.posDef_to_pos #[none, none, none, none, none, p, nonemptyInst]
+          -- posDef_to_pos : {𝕜} → [RCLike 𝕜] → {n} → [Fintype n] → {A} → (hA : A.PosDef) →
+          --   [Nonempty n] → 0 < A
+          let pf ← mkAppOptM ``HermitianMat.posDef_to_pos
+            #[none, none, none, none, none, p, nonemptyInst]
           return some (true, pf)
         | none =>
           let pSemidef ← mkAppM ``Matrix.PosDef.posSemidef #[p]
@@ -271,8 +296,10 @@ meta partial def findHermitianMatPSDInExpr (e : Expr) (p : Expr) (ty : Expr) :
             let nonemptyType ← mkAppM ``Nonempty #[nType]
             match ← try? (synthInstance nonemptyType) with
             | some nonemptyInst =>
-              -- mat_posDef_to_pos : {𝕜} → [RCLike 𝕜] → {n} → [Fintype n] → {A} → [Nonempty n] → (hA : A.mat.PosDef) → 0 < A
-              let pf ← mkAppOptM ``HermitianMat.mat_posDef_to_pos #[none, none, none, none, none, nonemptyInst, p]
+              -- mat_posDef_to_pos : {𝕜} → [RCLike 𝕜] → {n} → [Fintype n] → {A} → [Nonempty n] →
+              --   (hA : A.mat.PosDef) → 0 < A
+              let pf ← mkAppOptM ``HermitianMat.mat_posDef_to_pos
+                #[none, none, none, none, none, nonemptyInst, p]
               return some (true, pf)
             | none =>
               let pSemidef ← mkAppM ``Matrix.PosDef.posSemidef #[p]
@@ -307,7 +334,8 @@ meta def evalHermitianMatPSD : PositivityExt where eval {_u _α} _zα _pα e := 
       else
         best := .nonnegative pf
   match best with
-  | .none => throwError "evalHermitianMatPSD: no A.mat.PosSemidef or A.mat.PosDef hypothesis found for {e}"
+  | .none => throwError
+      "evalHermitianMatPSD: no A.mat.PosSemidef or A.mat.PosDef hypothesis found for {e}"
   | other => return other
 
 open Lean Meta Mathlib.Meta.Positivity in
@@ -377,7 +405,7 @@ theorem convex_cone (hA : 0 ≤ A) (hB : 0 ≤ B) {c₁ c₂ : ℝ} (hc₁ : 0 �
 
 theorem sq_nonneg [DecidableEq n] : 0 ≤ A ^ 2 := by
   simp [zero_le_iff, pow_two]
-  nth_rewrite 1 [←Matrix.IsHermitian.eq A.H]
+  nth_rewrite 1 [← Matrix.IsHermitian.eq A.H]
   exact Matrix.posSemidef_conjTranspose_mul_self A.mat
 
 theorem ker_antitone [DecidableEq n] (hA : 0 ≤ A) : A ≤ B → B.ker ≤ A.ker := by
@@ -483,20 +511,23 @@ theorem ker_conj [DecidableEq n] (hA : 0 ≤ A) (B : Matrix n n 𝕜) :
 
   ext v; simp [HermitianMat.conj];
   constructor <;> intro h;
-  · have := Matrix.PosSemidef.dotProduct_mulVec_zero_iff ( show Matrix.PosSemidef A.mat from zero_le_iff.mp hA );
+  · have := Matrix.PosSemidef.dotProduct_mulVec_zero_iff
+      ( show Matrix.PosSemidef A.mat from zero_le_iff.mp hA );
     convert this ( Bᴴ.mulVec v ) |>.1 _ using 1;
     · rw [ mem_ker_iff_mulVec_zero ];
       congr! 2;
     · convert congr_arg ( fun x : EuclideanSpace _ _ => star v.ofLp ⬝ᵥ x ) h using 1
       simp [Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec]
-      · simp [Matrix.mul_assoc, Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.star_mulVec, Matrix.conjTranspose_conjTranspose, lin]
+      · simp [Matrix.mul_assoc, Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.star_mulVec,
+          Matrix.conjTranspose_conjTranspose, lin]
       · simp [dotProduct]
   · simp only [ker, Matrix.mul_assoc, LinearMap.mem_ker]
     convert congr_arg B.toEuclideanLin h using 1
     · simp [HermitianMat.lin, Matrix.toEuclideanLin]
     · exact Eq.symm (LinearMap.map_zero (Matrix.toEuclideanLin B))
 
-theorem ker_le_of_le_smul {α : ℝ} [DecidableEq n] (hα : α ≠ 0) (hA : 0 ≤ A) (hAB : A ≤ α • B) : B.ker ≤ A.ker := by
+theorem ker_le_of_le_smul {α : ℝ} [DecidableEq n] (hα : α ≠ 0) (hA : 0 ≤ A) (hAB : A ≤ α • B) :
+    B.ker ≤ A.ker := by
   rw [← ker_pos_smul B hα]
   exact ker_antitone hA hAB
 
@@ -578,7 +609,8 @@ theorem subtype_mk_pos {M : Matrix m m 𝕜} (h : 0 < M) :
   h
 
 open MatrixOrder in
-private theorem _root_.Matrix.eigenvalues_nonneg [DecidableEq n] {M : Matrix n n 𝕜} (h : 0 ≤ M) (i : n) :
+private theorem _root_.Matrix.eigenvalues_nonneg [DecidableEq n] {M : Matrix n n 𝕜} (h : 0 ≤ M)
+    (i : n) :
     0 ≤ (Matrix.LE.le.posSemidef h).isHermitian.eigenvalues i :=
   (Matrix.LE.le.posSemidef h).eigenvalues_nonneg i
 
@@ -668,12 +700,14 @@ example (M : Matrix n m ℂ) : 0 ≤ M * M.conjTranspose := by positivity
 
 -- Test: ⟨Mᴴ * M, _⟩ nonneg as HermitianMat
 example (M : Matrix m n ℂ) :
-    (0 : HermitianMat n ℂ) ≤ ⟨M.conjTranspose * M, Matrix.isHermitian_conjTranspose_mul_self M⟩ := by
+    (0 : HermitianMat n ℂ) ≤
+      ⟨M.conjTranspose * M, Matrix.isHermitian_conjTranspose_mul_self M⟩ := by
   positivity
 
 -- Test: ⟨M * Mᴴ, _⟩ nonneg as HermitianMat
 example (M : Matrix n m ℝ) :
-    (0 : HermitianMat n ℝ) ≤ ⟨M * M.conjTranspose, Matrix.isHermitian_mul_conjTranspose_self M⟩ := by
+    (0 : HermitianMat n ℝ) ≤
+      ⟨M * M.conjTranspose, Matrix.isHermitian_mul_conjTranspose_self M⟩ := by
   positivity
 
 example (M : Matrix n n ℂ) (i : n) (A : HermitianMat n ℂ) (hA : 0 ≤ A) :

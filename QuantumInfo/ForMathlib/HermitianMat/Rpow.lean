@@ -9,30 +9,36 @@ public import QuantumInfo.ForMathlib.HermitianMat.CompoundMatrix
 public import QuantumInfo.ForMathlib.HermitianMat.LogExp
 public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
 
+/-!
+# Matrix Powers With Real Exponents
+
+## i. Overview
+
+Real powers of finite-dimensional Hermitian matrices via continuous functional calculus,
+`A ^ r = A.cfc (fun x => x ^ r)`, using `Real.rpow` so the operation is total. For positive
+semidefinite `A` this is the usual spectral power; zero eigenvalues stay zero for negative
+exponents, so use positive-definiteness hypotheses for inverse laws.
+
+## ii. Key results
+
+- `HermitianMat.rpow` : the real power of a Hermitian matrix.
+- algebraic and spectral lemmas for real powers, plus continuity in exponent and argument.
+- `HermitianMat.rpow_le_rpow_of_le` : the Loewner-Heinz monotonicity theorem for `0 < q ≤ 1`.
+- Lieb-Thirring and Rotfel'd trace inequalities for `0 < p ≤ 1`.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 variable {d d₂ 𝕜 : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
 variable [RCLike 𝕜]
 variable {A B : HermitianMat d 𝕜} {x q r : ℝ}
-
-/-! # Matrix Powers With Real Exponents
-
-This file defines real powers of finite-dimensional Hermitian matrices by continuous
-functional calculus:
-
-`A ^ r = A.cfc (fun x => x ^ r)`.
-
-The scalar function is `Real.rpow`, so this is a total operation on Hermitian matrices.
-For positive semidefinite matrices it has the expected spectral meaning. For negative
-exponents on singular matrices it follows the `Real.rpow` convention, so zero eigenvalues
-remain zero; use positive-definiteness hypotheses for inverse laws.
-
-Main results:
-* algebraic and spectral lemmas for real powers;
-* continuity in the exponent and in the matrix argument;
-* the Loewner-Heinz monotonicity theorem for `0 < q <= 1`;
-* Lieb-Thirring and Rotfel'd trace inequalities for `0 < p <= 1`.
--/
 
 noncomputable section
 namespace HermitianMat
@@ -64,7 +70,8 @@ theorem diagonal_pow (f : d → ℝ) :
   rfl
 
 @[fun_prop]
-theorem rpow_const_continuous {r : ℝ} (hr : 0 ≤ r) : Continuous (fun A : HermitianMat d ℂ ↦ A ^ r) := by
+theorem rpow_const_continuous {r : ℝ} (hr : 0 ≤ r) :
+    Continuous (fun A : HermitianMat d ℂ ↦ A ^ r) := by
   exact HermitianMat.cfc_continuous (Real.continuous_rpow_const hr)
 
 @[fun_prop]
@@ -78,7 +85,8 @@ theorem const_rpow_continuous [NonSingular A] : Continuous (fun r : ℝ ↦ A ^ 
 For a fixed Hermitian matrix A, the function x ↦ A^x is continuous for x > 0.
 -/
 @[fun_prop]
-theorem continuousOn_rpow_pos (A : HermitianMat d ℂ) : ContinuousOn (fun x : ℝ ↦ A ^ x) (Set.Ioi 0) := by
+theorem continuousOn_rpow_pos (A : HermitianMat d ℂ) :
+    ContinuousOn (fun x : ℝ ↦ A ^ x) (Set.Ioi 0) := by
   apply A.continuousOn_cfc_fun (hA := subset_rfl)
   intro i _ x hx
   exact (Real.continuousAt_const_rpow' hx.ne').continuousWithinAt
@@ -87,7 +95,8 @@ theorem continuousOn_rpow_pos (A : HermitianMat d ℂ) : ContinuousOn (fun x : �
 For a fixed Hermitian matrix A, the function x ↦ A^x is continuous for x < 0.
 -/
 @[fun_prop]
-theorem continuousOn_rpow_neg (A : HermitianMat d ℂ) : ContinuousOn (fun x : ℝ ↦ A ^ x) (Set.Iio 0) := by
+theorem continuousOn_rpow_neg (A : HermitianMat d ℂ) :
+    ContinuousOn (fun x : ℝ ↦ A ^ x) (Set.Iio 0) := by
   apply A.continuousOn_cfc_fun (hA := subset_rfl)
   intro i _ x hx
   exact (Real.continuousAt_const_rpow' hx.ne).continuousWithinAt
@@ -119,7 +128,7 @@ lemma rpow_zero (A : HermitianMat d 𝕜) : A ^ (0 : ℝ) = 1 := by
   simp [rpow_eq_cfc]
 
 lemma rpow_diagonal (a : d → ℝ) (r : ℝ) :
-  (diagonal ℂ a) ^ r = diagonal ℂ (fun i => a i ^ r) := by
+    (diagonal ℂ a) ^ r = diagonal ℂ (fun i => a i ^ r) := by
     exact cfc_diagonal _ _
 
 /-- Keeps in line with our simp-normal form for moving reindex outwards. -/
@@ -197,10 +206,11 @@ lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-
       have h_inv : (A ^ p).mat * (A ^ (-p)).mat = A.cfc (fun x => 1) := by
         rw [ h_inv ];
         refine' congr_arg _ ( cfc_congr_of_posDef hA _ );
-        exact fun x hx => by simp [ ← Real.rpow_add hx ] ;
-      rw [ h_inv, cfc_const ] ; norm_num;
+        exact fun x hx => by simp [ ← Real.rpow_add hx ];
+      rw [ h_inv, cfc_const ]; norm_num;
     exact h_inv;
-  -- By definition of matrix inverse, if $(A^p) * (A^{-p}) = 1$, then $(A^{-p})$ is the inverse of $(A^p)$.
+  -- By definition of matrix inverse, if $(A^p) * (A^{-p}) = 1$, then $(A^{-p})$ is the inverse of
+  -- $(A^p)$.
   have h_inv_def : (A ^ p).mat⁻¹ = (A ^ (-p)).mat := by
     exact Matrix.inv_eq_right_inv h_inv;
   convert congr_fun ( congr_fun h_inv_def i ) j using 1
@@ -223,7 +233,8 @@ lemma rpow_neg_mul_rpow_self (hA : A.mat.PosDef) (p : ℝ) :
         exact fun i => Real.rpow_pos_of_pos ( by exact Matrix.PosDef.eigenvalues_pos hA i ) _;
       have h_eigenvalues_pos : (A ^ p).mat.PosDef ↔ ∀ i, 0 < (A ^ p).H.eigenvalues i := by
         exact Matrix.IsHermitian.posDef_iff_eigenvalues_pos (H (A ^ p));
-      have h_eigenvalues_pos : ∃ e : d ≃ d, (A ^ p).H.eigenvalues = fun i => (A.H.eigenvalues (e i)) ^ p := by
+      have h_eigenvalues_pos :
+          ∃ e : d ≃ d, (A ^ p).H.eigenvalues = fun i => (A.H.eigenvalues (e i)) ^ p := by
         exact Matrix.IsHermitian.cfc_eigenvalues (H A) fun x => x.rpow p;
       aesop;
     exact h_pos_def p hA;
@@ -272,7 +283,7 @@ private lemma rpow_kron_diagonal
 open scoped Kronecker in
 omit [DecidableEq d] [DecidableEq d₂] in
 lemma conj_kron
-  (A : Matrix d d 𝕜) (B : Matrix d₂ d₂ 𝕜) (C : HermitianMat d 𝕜) (D : HermitianMat d₂ 𝕜) :
+    (A : Matrix d d 𝕜) (B : Matrix d₂ d₂ 𝕜) (C : HermitianMat d 𝕜) (D : HermitianMat d₂ 𝕜) :
     conj (A ⊗ₖ B) (C ⊗ₖ D) = conj A C ⊗ₖ conj B D := by
   ext1
   simp [conj, Matrix.mul_kronecker_mul, Matrix.conjTranspose_kronecker]
@@ -280,18 +291,22 @@ lemma conj_kron
 lemma rpow_kron
     {A : HermitianMat d ℂ} {B : HermitianMat d₂ ℂ} (r : ℝ) (hA : 0 ≤ A) (hB : 0 ≤ B) :
     (A ⊗ₖ B) ^ r = (A ^ r) ⊗ₖ (B ^ r) := by
-  obtain ⟨U, a, ha, hA⟩ : ∃ U : 𝐔[d], ∃ a : d → ℝ, (∀ i, 0 ≤ a i) ∧ A = conj U.val (diagonal ℂ a) := by
+  obtain ⟨U, a, ha, hA⟩ :
+      ∃ U : 𝐔[d], ∃ a : d → ℝ, (∀ i, 0 ≤ a i) ∧ A = conj U.val (diagonal ℂ a) := by
     rw [zero_le_iff] at hA
     exact ⟨_, _, hA.eigenvalues_nonneg, eq_conj_diagonal A⟩
-  obtain ⟨V, b, hb, hB⟩ : ∃ V : 𝐔[d₂], ∃ b : d₂ → ℝ, (∀ j, 0 ≤ b j) ∧ B = conj V.val (diagonal ℂ b) := by
+  obtain ⟨V, b, hb, hB⟩ :
+      ∃ V : 𝐔[d₂], ∃ b : d₂ → ℝ, (∀ j, 0 ≤ b j) ∧ B = conj V.val (diagonal ℂ b) := by
     rw [zero_le_iff] at hB
     exact ⟨_, _, hB.eigenvalues_nonneg, eq_conj_diagonal B⟩
-  have h_kron_r_pow : (A ⊗ₖ B) ^ r = conj (Matrix.unitary_kron U V).val ((diagonal ℂ a ⊗ₖ diagonal ℂ b) ^ r) := by
+  have h_kron_r_pow :
+      (A ⊗ₖ B) ^ r = conj (Matrix.unitary_kron U V).val ((diagonal ℂ a ⊗ₖ diagonal ℂ b) ^ r) := by
     subst hB hA
     rw [← rpow_conj_unitary, Matrix.unitary_kron, conj_kron]
   rw [h_kron_r_pow]
   subst A B
-  have h_kron_r_pow_diag : (diagonal ℂ a ⊗ₖ diagonal ℂ b) ^ r = ((diagonal ℂ a) ^ r) ⊗ₖ ((diagonal ℂ b) ^ r) := by
+  have h_kron_r_pow_diag :
+      (diagonal ℂ a ⊗ₖ diagonal ℂ b) ^ r = ((diagonal ℂ a) ^ r) ⊗ₖ ((diagonal ℂ b) ^ r) := by
     exact rpow_kron_diagonal a b r ha hb
   rw [h_kron_r_pow_diag, Matrix.unitary_kron]
   rw [rpow_conj_unitary, rpow_conj_unitary, ← conj_kron]
@@ -306,7 +321,8 @@ lemma continuousOn_rpow_uniform {K : Set ℝ} (hK : IsCompact K) :
   simp only [Set.mem_singleton_iff, UniformOnFun.toFun_ofFun, Metric.tendstoUniformlyOn_iff,
     Function.comp_apply, forall_eq]
   intro ε hεpos;
-  have h_unif_cont : UniformContinuousOn (fun (p : ℝ × ℝ) => p.1 ^ p.2) (K ×ˢ Set.Icc (r / 2) (r * 2)) := by
+  have h_unif_cont :
+      UniformContinuousOn (fun (p : ℝ × ℝ) => p.1 ^ p.2) (K ×ˢ Set.Icc (r / 2) (r * 2)) := by
     apply IsCompact.uniformContinuousOn_of_continuous
     · exact hK.prod CompactIccSpace.isCompact_Icc
     · refine continuousOn_of_forall_continuousAt fun p ⟨hp₁, ⟨hp₂₁, hp₂₂⟩⟩ ↦ ?_
@@ -314,7 +330,9 @@ lemma continuousOn_rpow_uniform {K : Set ℝ} (hK : IsCompact K) :
       fun_prop (disch := assumption)
   rw [Metric.uniformContinuousOn_iff] at h_unif_cont
   obtain ⟨δ, hδpos, H⟩ := h_unif_cont ε hεpos
-  filter_upwards [Ioo_mem_nhds (show r / 2 < r by linarith) (show r < r * 2 by linarith), Ioo_mem_nhds (show r - δ < r by linarith) (show r < r + δ by linarith)] with n ⟨_, _⟩ ⟨_, _⟩ x hx
+  filter_upwards [Ioo_mem_nhds (show r / 2 < r by linarith) (show r < r * 2 by linarith),
+    Ioo_mem_nhds (show r - δ < r by linarith) (show r < r + δ by linarith)] with
+    n ⟨_, _⟩ ⟨_, _⟩ x hx
   refine H (x, r) ⟨hx, ?_⟩ (x, n) ⟨hx, ?_⟩ ?_
   · constructor <;> linarith
   · constructor <;> linarith
@@ -348,11 +366,13 @@ matrices, the same identity should hold for all real `p`. -/
 theorem cfc_sq_rpow_eq_cfc_rpow
     (A : HermitianMat d 𝕜) (hA : 0 ≤ A) (p : ℝ) (hp : 0 ≤ p) :
     (A ^ 2).cfc (fun x => x ^ (p/2)) = A.cfc (fun x => x ^ p) := by
-  have h_sqrt : (A ^ 2).cfc (fun x => x ^ (p / 2)) = (A.cfc (fun x => x ^ 2)).cfc (fun x => x ^ (p / 2)) := by
+  have h_sqrt :
+      (A ^ 2).cfc (fun x => x ^ (p / 2)) = (A.cfc (fun x => x ^ 2)).cfc (fun x => x ^ (p / 2)) := by
     convert rfl;
     exact cfc_pow A;
   rw [ h_sqrt ];
-  have h_sqrt : ∀ (f g : ℝ → ℝ), Continuous f → Continuous g → ∀ (A : HermitianMat d 𝕜), (A.cfc f).cfc g = A.cfc (fun x => g (f x)) := by
+  have h_sqrt : ∀ (f g : ℝ → ℝ), Continuous f → Continuous g →
+      ∀ (A : HermitianMat d 𝕜), (A.cfc f).cfc g = A.cfc (fun x => g (f x)) := by
     exact fun f g a a A => Eq.symm (cfc_comp_apply A f g);
   rw [ h_sqrt ];
   · have h_sqrt : ∀ x : ℝ, 0 ≤ x → (x ^ 2) ^ (p / 2) = x ^ p := by
@@ -393,13 +413,16 @@ theorem rpowApprox_mono {A B : HermitianMat d ℂ} (hA : A.mat.PosDef) (hB : B.m
     (hAB : A ≤ B) (hq : 0 ≤ q) (T : ℝ) (hT : 0 < T) :
     rpowApprox A q T ≤ rpowApprox B q T := by
   unfold HermitianMat.rpowApprox
-  have h_integral_mono : ∀ᵐ t ∂Measure.restrict volume (Set.Ioc 0 T), t ^ q • ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (A + t • 1)⁻¹) ≤ t ^ q • ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (B + t • 1)⁻¹) := by
+  have h_integral_mono : ∀ᵐ t ∂Measure.restrict volume (Set.Ioc 0 T),
+      t ^ q • ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (A + t • 1)⁻¹) ≤
+        t ^ q • ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (B + t • 1)⁻¹) := by
     filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
     have h_inv_antitone : (B + t • 1)⁻¹ ≤ (A + t • 1)⁻¹ := by
       apply inv_antitone
       · exact hA.add_posSemidef ( Matrix.PosSemidef.smul ( Matrix.PosSemidef.one ) ht.1.le )
       · exact add_le_add_left hAB _
-    exact smul_le_smul_of_nonneg_left (sub_le_sub_left h_inv_antitone _) (Real.rpow_nonneg ht.1.le q)
+    exact smul_le_smul_of_nonneg_left (sub_le_sub_left h_inv_antitone _)
+      (Real.rpow_nonneg ht.1.le q)
   have h_cont_tq : ContinuousOn (fun t : ℝ => t ^ q) (Set.Icc 0 T) := by
     exact continuousOn_id.rpow_const fun _ _ => Or.inr hq
   have h_cont_const :
@@ -436,15 +459,19 @@ open MeasureTheory ComplexOrder in
 theorem rpowApprox_eq_cfc_scalar (A : HermitianMat d ℂ) (hA : A.mat.PosDef) (q T : ℝ)
     (hq : 0 ≤ q) (hT : 0 < T) :
     rpowApprox A q T = A.cfc (scalarRpowApprox q T) := by
-  have rpowApprox_eq_cfc_scalar : ∀ t ∈ Set.Ioc 0 T, t ^ q • ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (A + t • 1)⁻¹) = A.cfc (fun u => t ^ q * (1 / (1 + t) - 1 / (u + t))) := by
+  have rpowApprox_eq_cfc_scalar : ∀ t ∈ Set.Ioc 0 T,
+      t ^ q • ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (A + t • 1)⁻¹) =
+        A.cfc (fun u => t ^ q * (1 / (1 + t) - 1 / (u + t))) := by
     intro t ht
-    have h_integrand : ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (A + t • 1)⁻¹) = A.cfc (fun u => (1 + t)⁻¹ - (u + t)⁻¹) := by
+    have h_integrand : ((1 + t)⁻¹ • (1 : HermitianMat d ℂ) - (A + t • 1)⁻¹) =
+        A.cfc (fun u => (1 + t)⁻¹ - (u + t)⁻¹) := by
       have h_integrand : (A + t • 1)⁻¹ = A.cfc (fun u => (u + t)⁻¹) := by
         have h_inv : (A + t • 1)⁻¹ = A.cfc (fun u => (u + t)⁻¹) := by
           have h_inv_def : (A + t • 1)⁻¹ = (A.cfc (fun u => u + t))⁻¹ := by
-            rw [ show ( fun u => u + t ) = ( fun u => u ) + fun u => t from rfl, cfc_add ] ; aesop;
+            rw [ show ( fun u => u + t ) = ( fun u => u ) + fun u => t from rfl, cfc_add ]; aesop;
           have h_inv_comp : (A.cfc (fun u => u + t))⁻¹ = A.cfc (fun u => (u + t)⁻¹) := by
-            have h_inv_smul : ∀ {f : ℝ → ℝ} (hf : ∀ i, f (A.H.eigenvalues i) ≠ 0), (A.cfc f)⁻¹ = A.cfc (fun u => (f u)⁻¹) := by
+            have h_inv_smul : ∀ {f : ℝ → ℝ} (hf : ∀ i, f (A.H.eigenvalues i) ≠ 0),
+                (A.cfc f)⁻¹ = A.cfc (fun u => (f u)⁻¹) := by
               exact fun {f} hf => inv_cfc_eq_cfc_inv f hf
             apply h_inv_smul
             intro i
@@ -458,17 +485,28 @@ theorem rpowApprox_eq_cfc_scalar (A : HermitianMat d ℂ) (hA : A.mat.PosDef) (q
       rfl;
     aesop;
   -- Apply the fact that the integral of a CFC is the CFC of the integral.
-  have rpowApprox_integral_eq : ∫ t in (0)..T, A.cfc (fun u => t ^ q * (1 / (1 + t) - 1 / (u + t))) = A.cfc (fun u => ∫ t in (0)..T, t ^ q * (1 / (1 + t) - 1 / (u + t))) := by
-    have h_integrable : ∀ u : d, IntervalIntegrable (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
+  have rpowApprox_integral_eq :
+      ∫ t in (0)..T, A.cfc (fun u => t ^ q * (1 / (1 + t) - 1 / (u + t))) =
+        A.cfc (fun u => ∫ t in (0)..T, t ^ q * (1 / (1 + t) - 1 / (u + t))) := by
+    have h_integrable : ∀ u : d, IntervalIntegrable
+        (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
       intro u
-      have h_integrable : IntervalIntegrable (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
+      have h_integrable : IntervalIntegrable
+          (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
         have h_pos : 0 < A.H.eigenvalues u := by
           exact Matrix.PosDef.eigenvalues_pos hA u
-        exact ContinuousOn.intervalIntegrable ( by exact ContinuousOn.mul ( continuousOn_id.rpow_const fun x hx => Or.inr <| by linarith ) <| ContinuousOn.sub ( continuousOn_const.div ( continuousOn_const.add continuousOn_id ) fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] ) ( continuousOn_const.div ( continuousOn_const.add continuousOn_id ) fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] ) ) ..;
+        exact ContinuousOn.intervalIntegrable ( ContinuousOn.mul
+          ( continuousOn_id.rpow_const fun x hx => Or.inr <| by linarith ) <|
+          ContinuousOn.sub
+            ( continuousOn_const.div ( continuousOn_const.add continuousOn_id )
+              fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] )
+            ( continuousOn_const.div ( continuousOn_const.add continuousOn_id )
+              fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] ) ) ..;
       exact h_integrable
     exact integral_cfc_eq_cfc_integral _ _ _ h_integrable
   unfold HermitianMat.rpowApprox scalarRpowApprox; simp_all +singlePass;
-  rw [ ← rpowApprox_integral_eq, intervalIntegral.integral_of_le hT.le, integral_Ioc_eq_integral_Ioo ] at *
+  rw [ ← rpowApprox_integral_eq, intervalIntegral.integral_of_le hT.le,
+    integral_Ioc_eq_integral_Ioo ] at *
   rw [ setIntegral_congr_fun measurableSet_Ioo fun t ht => rpowApprox_eq_cfc_scalar t ht.1 ht.2.le ]
   simp [ ← integral_Ioc_eq_integral_Ioo, intervalIntegral.integral_of_le hT.le ]
 
@@ -490,8 +528,9 @@ lemma rpowConst_integrableOn (hq : 0 < q) (hq1 : q < 1) :
     · apply Measurable.aestronglyMeasurable
       fun_prop
     · filter_upwards [ae_restrict_mem measurableSet_Ioc ] with x hx
-      rw [ Real.norm_of_nonneg ( div_nonneg ( Real.rpow_nonneg hx.1.le _ ) ( by linarith [ hx.1 ] ) ) ]
-      exact div_le_self ( Real.rpow_nonneg hx.1.le _ ) ( by linarith [ hx.1 ] ) ;
+      rw [ Real.norm_of_nonneg
+        ( div_nonneg ( Real.rpow_nonneg hx.1.le _ ) ( by linarith [ hx.1 ] ) ) ]
+      exact div_le_self ( Real.rpow_nonneg hx.1.le _ ) ( by linarith [ hx.1 ] );
   · have h_bound : ∀ u : ℝ, 1 ≤ u → u ^ (q - 1) / (1 + u) ≤ u ^ (q - 2) := by
       intro u hu
       rw [div_le_iff₀ ( by positivity )]
@@ -520,8 +559,12 @@ lemma rpowConst_pos (hq : 0 < q) (hq1 : q < 1) : 0 < rpowConst q := by
       exact rpowConst_integrableOn hq hq1
     rw [ integral_pos_iff_support_of_nonneg_ae ];
     · simp [Function.support]
-      exact lt_of_lt_of_le ( by norm_num ) ( measure_mono <| show Set.Ioi ( 0 : ℝ ) ⊆ { x : ℝ | ¬x ^ ( q - 1 ) = 0 ∧ ¬1 + x = 0 } ∩ Set.Ioi 0 from fun x hx => ⟨ ⟨ ne_of_gt <| Real.rpow_pos_of_pos hx _, ne_of_gt <| add_pos zero_lt_one hx ⟩, hx ⟩ );
-    · filter_upwards [ ae_restrict_mem measurableSet_Ioi ] with u hu using div_nonneg ( Real.rpow_nonneg hu.out.le _ ) ( add_nonneg zero_le_one hu.out.le );
+      exact lt_of_lt_of_le ( by norm_num ) ( measure_mono <|
+        show Set.Ioi ( 0 : ℝ ) ⊆ { x : ℝ | ¬x ^ ( q - 1 ) = 0 ∧ ¬1 + x = 0 } ∩ Set.Ioi 0 from
+        fun x hx => ⟨ ⟨ ne_of_gt <| Real.rpow_pos_of_pos hx _,
+          ne_of_gt <| add_pos zero_lt_one hx ⟩, hx ⟩ );
+    · filter_upwards [ ae_restrict_mem measurableSet_Ioi ] with u hu using
+        div_nonneg ( Real.rpow_nonneg hu.out.le _ ) ( add_nonneg zero_le_one hu.out.le );
     · exact h_integrable;
   linarith
 
@@ -530,42 +573,62 @@ open MeasureTheory Filter in
     `scalarRpowApprox q T x → rpowConst q * (x^q - 1)` as `T → ∞`. -/
 lemma scalarRpowApprox_tendsto {x : ℝ} (hx : 0 < x) (hq : 0 < q) (hq1 : q < 1) :
     Filter.Tendsto (fun T => scalarRpowApprox q T x) atTop (nhds (rpowConst q * (x ^ q - 1))) := by
-  have h_def : ∀ T > 0, scalarRpowApprox q T x = x * (∫ t in (0)..T, t ^ (q - 1) / (x + t)) - (∫ t in (0)..T, t ^ (q - 1) / (1 + t)) := by
+  have h_def : ∀ T > 0, scalarRpowApprox q T x =
+      x * (∫ t in (0)..T, t ^ (q - 1) / (x + t)) - (∫ t in (0)..T, t ^ (q - 1) / (1 + t)) := by
     intro T hT
-    have : ∀ t ∈ Set.Ioc (0 : ℝ) T, t ^ q * (1 / (1 + t) - 1 / (x + t)) = x * (t ^ (q - 1) / (x + t)) - (t ^ (q - 1) / (1 + t)) := by
+    have : ∀ t ∈ Set.Ioc (0 : ℝ) T, t ^ q * (1 / (1 + t) - 1 / (x + t)) =
+        x * (t ^ (q - 1) / (x + t)) - (t ^ (q - 1) / (1 + t)) := by
       intro t ht; rw [ Real.rpow_sub_one ht.1.ne' ]
       grind
     rw [ intervalIntegral.integral_of_le hT.le, intervalIntegral.integral_of_le hT.le ];
     rw [ ← integral_const_mul, ← integral_sub ];
-    · exact Eq.trans ( intervalIntegral.integral_of_le hT.le ) ( setIntegral_congr_fun measurableSet_Ioc this );
+    · exact Eq.trans ( intervalIntegral.integral_of_le hT.le )
+        ( setIntegral_congr_fun measurableSet_Ioc this );
     · apply Integrable.const_mul _ _;
       apply Integrable.mono' (g := fun t => t ^ ( q - 1 ) / x)
       · exact ( intervalIntegral.intervalIntegrable_rpow' ( by linarith ) ).1.div_const _;
       · apply Measurable.aestronglyMeasurable
         fun_prop
-      · filter_upwards [ ae_restrict_mem measurableSet_Ioc ] with t ht using by rw [ Real.norm_of_nonneg ( div_nonneg ( Real.rpow_nonneg ht.1.le _ ) ( by linarith [ ht.1 ] ) ) ] ; exact div_le_div_of_nonneg_left ( Real.rpow_nonneg ht.1.le _ ) ( by linarith [ ht.1 ] ) ( by linarith [ ht.1 ] ) ;
+      · filter_upwards [ ae_restrict_mem measurableSet_Ioc ] with t ht using by
+          rw [ Real.norm_of_nonneg ( div_nonneg ( Real.rpow_nonneg ht.1.le _ )
+            ( by linarith [ ht.1 ] ) ) ];
+          exact div_le_div_of_nonneg_left ( Real.rpow_nonneg ht.1.le _ )
+            ( by linarith [ ht.1 ] ) ( by linarith [ ht.1 ] );
     · apply Integrable.mono' (g := fun t => t ^ ( q - 1 ) / ( 1 + 0 ))
       · exact ( intervalIntegral.intervalIntegrable_rpow' ( by linarith ) ).1.div_const _;
       · apply Measurable.aestronglyMeasurable
         fun_prop
-      · filter_upwards [ ae_restrict_mem measurableSet_Ioc ] with t ht using by rw [ Real.norm_of_nonneg ( div_nonneg ( Real.rpow_nonneg ( by linarith [ ht.1 ] ) _ ) ( by linarith [ ht.1 ] ) ) ] ; exact div_le_div_of_nonneg_left ( Real.rpow_nonneg ( by linarith [ ht.1 ] ) _ ) ( by linarith [ ht.1 ] ) ( by linarith [ ht.1 ] ) ;
-  have h_int_1 : Filter.Tendsto (fun T => ∫ t in (0)..T, t ^ (q - 1) / (1 + t)) Filter.atTop (nhds (rpowConst q)) := by
+      · filter_upwards [ ae_restrict_mem measurableSet_Ioc ] with t ht using by
+          rw [ Real.norm_of_nonneg ( div_nonneg ( Real.rpow_nonneg ( by linarith [ ht.1 ] ) _ )
+            ( by linarith [ ht.1 ] ) ) ];
+          exact div_le_div_of_nonneg_left ( Real.rpow_nonneg ( by linarith [ ht.1 ] ) _ )
+            ( by linarith [ ht.1 ] ) ( by linarith [ ht.1 ] );
+  have h_int_1 : Filter.Tendsto (fun T => ∫ t in (0)..T, t ^ (q - 1) / (1 + t)) Filter.atTop
+      (nhds (rpowConst q)) := by
     apply intervalIntegral_tendsto_integral_Ioi
     · exact rpowConst_integrableOn hq hq1
     · exact Filter.tendsto_id
-  have h_int_x : Filter.Tendsto (fun T => ∫ t in (0)..T, t ^ (q - 1) / (x + t)) Filter.atTop (nhds (rpowConst q * x ^ (q - 1))) := by
-    have h_subst : ∀ T > 0, ∫ t in (0)..T, t ^ (q - 1) / (x + t) = x ^ (q - 1) * ∫ u in (0)..T / x, u ^ (q - 1) / (1 + u) := by
+  have h_int_x : Filter.Tendsto (fun T => ∫ t in (0)..T, t ^ (q - 1) / (x + t)) Filter.atTop
+      (nhds (rpowConst q * x ^ (q - 1))) := by
+    have h_subst : ∀ T > 0, ∫ t in (0)..T, t ^ (q - 1) / (x + t) =
+        x ^ (q - 1) * ∫ u in (0)..T / x, u ^ (q - 1) / (1 + u) := by
       intro T hT
-      have h_subst : ∫ t in (0)..T, t ^ (q - 1) / (x + t) = ∫ u in (0)..T / x, (x * u) ^ (q - 1) / (x + x * u) * x := by
-        simp [ mul_comm x, intervalIntegral.integral_comp_mul_right ( fun u => u ^ ( q - 1 ) / ( x + u ) ), hx.ne' ];
+      have h_subst : ∫ t in (0)..T, t ^ (q - 1) / (x + t) =
+          ∫ u in (0)..T / x, (x * u) ^ (q - 1) / (x + x * u) * x := by
+        simp [ mul_comm x,
+          intervalIntegral.integral_comp_mul_right ( fun u => u ^ ( q - 1 ) / ( x + u ) ), hx.ne' ];
         rw [ inv_mul_eq_div, div_mul_cancel₀ _ hx.ne' ];
       rw [ h_subst, ← intervalIntegral.integral_const_mul ];
       refine intervalIntegral.integral_congr fun u hu ↦ ?_
-      rw [ Real.mul_rpow ( by positivity ) ( by cases Set.mem_uIcc.mp hu <;> nlinarith [ div_mul_cancel₀ T hx.ne' ] ) ]
+      rw [ Real.mul_rpow ( by positivity )
+        ( by cases Set.mem_uIcc.mp hu <;> nlinarith [ div_mul_cancel₀ T hx.ne' ] ) ]
       field_simp
-    rw [ Filter.tendsto_congr' ( by filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using h_subst T hT ) ]
-    simpa [ mul_comm ] using h_int_1.comp ( Filter.tendsto_id.atTop_div_const hx ) |> Filter.Tendsto.const_mul ( x ^ ( q - 1 ) ) ;
-  rw [ Filter.tendsto_congr' ( by filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using h_def T hT ) ]
+    rw [ Filter.tendsto_congr'
+      ( by filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using h_subst T hT ) ]
+    simpa [ mul_comm ] using h_int_1.comp ( Filter.tendsto_id.atTop_div_const hx ) |>
+      Filter.Tendsto.const_mul ( x ^ ( q - 1 ) );
+  rw [ Filter.tendsto_congr'
+    ( by filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using h_def T hT ) ]
   convert Filter.Tendsto.sub ( h_int_x.const_mul x ) h_int_1 using 2
   ring_nf
   rw [ mul_assoc, ← Real.rpow_one_add' hx.le ]
@@ -578,7 +641,8 @@ set_option backward.isDefEq.respectTransparency false in
 lemma tendsto_rpowApprox (hA : A.mat.PosDef) (hq : 0 < q) (hq1 : q < 1) :
     Tendsto (rpowApprox A q) atTop (nhds (rpowConst q • (A ^ q - 1))) := by
   have h_target : rpowConst q • (A ^ q - 1) = A.cfc (fun x => rpowConst q * (x ^ q - 1)) := by
-    have h2 : A.cfc (fun x => rpowConst q * (x ^ q - 1)) = rpowConst q • A.cfc (fun x => x ^ q - 1) :=
+    have h2 : A.cfc (fun x => rpowConst q * (x ^ q - 1)) =
+        rpowConst q • A.cfc (fun x => x ^ q - 1) :=
       HermitianMat.cfc_const_mul A (fun x => x ^ q - 1) (rpowConst q)
     have h3 : A.cfc (fun x => x ^ q - 1) = A.cfc (· ^ q) - 1 := by
       conv_rhs => rw [show (1 : HermitianMat d ℂ) = A.cfc (fun _ => (1 : ℝ)) by simp]
@@ -588,11 +652,22 @@ lemma tendsto_rpowApprox (hA : A.mat.PosDef) (hq : 0 < q) (hq1 : q < 1) :
     filter_upwards [Filter.eventually_gt_atTop 0] with T hT
     exact rpowApprox_eq_cfc_scalar A hA q T hq.le hT
   rw [Filter.tendsto_congr' h_eq, h_target]
-  have h_expand_src : ∀ T, (A.cfc (scalarRpowApprox q T)).mat = ∑ i, scalarRpowApprox q T (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) :=
+  have h_expand_src : ∀ T, (A.cfc (scalarRpowApprox q T)).mat =
+      ∑ i, scalarRpowApprox q T (A.H.eigenvalues i) •
+        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
+          A.H.eigenvectorUnitary.val.conjTranspose) :=
     fun T => cfc_toMat_eq_sum_smul_proj A (scalarRpowApprox q T)
-  have h_expand_tgt : (A.cfc (fun x => rpowConst q * (x ^ q - 1))).mat = ∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) :=
+  have h_expand_tgt : (A.cfc (fun x => rpowConst q * (x ^ q - 1))).mat =
+      ∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) •
+        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
+          A.H.eigenvectorUnitary.val.conjTranspose) :=
     cfc_toMat_eq_sum_smul_proj A (fun x => rpowConst q * (x ^ q - 1))
-  have h_sum : Tendsto (fun T : ℝ => ∑ i, scalarRpowApprox q T (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose)) atTop (nhds (∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose))) := by
+  have h_sum : Tendsto (fun T : ℝ => ∑ i, scalarRpowApprox q T (A.H.eigenvalues i) •
+      (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
+        A.H.eigenvectorUnitary.val.conjTranspose)) atTop
+      (nhds (∑ i, (rpowConst q * (A.H.eigenvalues i ^ q - 1)) •
+        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
+          A.H.eigenvectorUnitary.val.conjTranspose))) := by
     refine tendsto_finsetSum _ fun i _ => ?_
     have := scalarRpowApprox_tendsto (hA.eigenvalues_pos i) hq hq1
     exact Filter.Tendsto.smul_const (Complex.continuous_ofReal.continuousAt.tendsto.comp this) _
@@ -612,9 +687,12 @@ theorem rpow_le_rpow_of_posDef (hA : A.mat.PosDef) (hAB : A ≤ B)
   by_cases hq_eq_one : q = 1;
   · aesop;
   · have h_rpow : rpowConst q • (A ^ q - 1) ≤ rpowConst q • (B ^ q - 1) := by
-      convert le_of_tendsto_of_tendsto ( tendsto_rpowApprox hA hq ( lt_of_le_of_ne hq1 hq_eq_one ) ) ( tendsto_rpowApprox ( posDef_of_posDef_le hA hAB ) hq ( lt_of_le_of_ne hq1 hq_eq_one ) ) _ using 1
+      convert le_of_tendsto_of_tendsto ( tendsto_rpowApprox hA hq ( lt_of_le_of_ne hq1 hq_eq_one ) )
+        ( tendsto_rpowApprox ( posDef_of_posDef_le hA hAB ) hq ( lt_of_le_of_ne hq1 hq_eq_one ) )
+        _ using 1
       generalize_proofs at *; (
-      filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using rpowApprox_mono hA ( posDef_of_posDef_le hA hAB ) hAB hq.le T hT |> le_trans <| by aesop;);
+      filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using
+        rpowApprox_mono hA ( posDef_of_posDef_le hA hAB ) hAB hq.le T hT |> le_trans <| by aesop;);
     have h_rpow_pos : 0 < rpowConst q := by
       exact rpowConst_pos hq ( lt_of_le_of_ne hq1 hq_eq_one );
     simp_all
@@ -635,7 +713,8 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
       constructor <;> norm_num [ hε_pos, hA, hAB ];
       · exact H (Aε ε)
       · intro x hx_nonzero
-        have h_inner : star x ⬝ᵥ (Aε ε).mat.mulVec x = star x ⬝ᵥ A.mat.mulVec x + ε * star x ⬝ᵥ x := by
+        have h_inner : star x ⬝ᵥ (Aε ε).mat.mulVec x =
+            star x ⬝ᵥ A.mat.mulVec x + ε * star x ⬝ᵥ x := by
           simp [ Aε, Matrix.add_mulVec]
           ring_nf
           simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm];
@@ -644,23 +723,34 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
           exact inner_mulVec_nonneg hA x
         have h_inner_pos : 0 < star x ⬝ᵥ x := by
           simp_all
-        exact h_inner.symm ▸ add_pos_of_nonneg_of_pos h_inner_nonneg ( mul_pos ( mod_cast hε_pos ) ( mod_cast h_inner_pos ) ) |> lt_of_lt_of_le <| le_rfl;
+        exact h_inner.symm ▸ add_pos_of_nonneg_of_pos h_inner_nonneg
+          ( mul_pos ( mod_cast hε_pos ) ( mod_cast h_inner_pos ) ) |> lt_of_lt_of_le <| le_rfl;
     have h_pos_def_Bε : (Bε ε).mat.PosDef := by
       convert posDef_of_posDef_le h_pos_def_Aε _ using 1
-      exact add_le_add_left hAB _ |> le_trans ( by simp [ Aε ] ) ;
+      exact add_le_add_left hAB _ |> le_trans ( by simp [ Aε ] );
     have h_le_Aε_Bε : Aε ε ≤ Bε ε := by
-      exact add_le_add_left hAB _ |> le_trans <| by simp [ Bε ] ;
+      exact add_le_add_left hAB _ |> le_trans <| by simp [ Bε ];
     exact ⟨h_pos_def_Aε, h_pos_def_Bε, h_le_Aε_Bε⟩
-  -- By the continuity of the function $M \mapsto M^q$, we have $(Aε ε)^q \to A^q$ and $(Bε ε)^q \to B^q$ as $\epsilon \to 0^+$.
-  have h_cont : Filter.Tendsto (fun ε => (Aε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (A ^ q)) ∧ Filter.Tendsto (fun ε => (Bε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (B ^ q)) := by
-    have h_cont : ContinuousOn (fun M : HermitianMat d ℂ => M ^ q) (Set.univ : Set (HermitianMat d ℂ)) := by
+  -- By the continuity of the function $M \mapsto M^q$, we have $(Aε ε)^q \to A^q$ and
+  -- $(Bε ε)^q \to B^q$ as $\epsilon \to 0^+$.
+  have h_cont : Filter.Tendsto (fun ε => (Aε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (A ^ q)) ∧
+      Filter.Tendsto (fun ε => (Bε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (B ^ q)) := by
+    have h_cont : ContinuousOn (fun M : HermitianMat d ℂ => M ^ q)
+        (Set.univ : Set (HermitianMat d ℂ)) := by
       -- Apply the continuity of the function $M \mapsto M^q$ on the set of all Hermitian matrices.
       apply rpow_const_continuous hq.le |> Continuous.continuousOn
-    refine' ⟨ h_cont.continuousAt ( by simp ) |> fun h => h.tendsto.comp ( tendsto_nhdsWithin_of_tendsto_nhds <| Continuous.tendsto' _ _ _ _ ), h_cont.continuousAt ( by simp ) |> fun h => h.tendsto.comp ( tendsto_nhdsWithin_of_tendsto_nhds <| Continuous.tendsto' _ _ _ _ ) ⟩ <;> continuity;
-  -- By the continuity of the function $M \mapsto M^q$, we have $(Aε ε)^q \leq (Bε ε)^q$ for all $\epsilon > 0$.
+    refine' ⟨ h_cont.continuousAt ( by simp ) |> fun h => h.tendsto.comp
+        ( tendsto_nhdsWithin_of_tendsto_nhds <| Continuous.tendsto' _ _ _ _ ),
+      h_cont.continuousAt ( by simp ) |> fun h => h.tendsto.comp
+        ( tendsto_nhdsWithin_of_tendsto_nhds <| Continuous.tendsto' _ _ _ _ ) ⟩ <;> continuity;
+  -- By the continuity of the function $M \mapsto M^q$, we have $(Aε ε)^q \leq (Bε ε)^q$ for all
+  -- $\epsilon > 0$.
   have h_le : ∀ ε > 0, (Aε ε) ^ q ≤ (Bε ε) ^ q := by
-    exact fun ε hε => rpow_le_rpow_of_posDef ( h_pos_def ε hε |>.1 ) ( h_pos_def ε hε |>.2.2 ) hq hq1 |> le_trans <| by simp [ * ] ;
-  exact le_of_tendsto_of_tendsto h_cont.1 h_cont.2 ( Filter.eventually_of_mem self_mem_nhdsWithin fun ε hε => h_le ε hε ) |> fun h => by simpa using h;
+    exact fun ε hε => rpow_le_rpow_of_posDef ( h_pos_def ε hε |>.1 ) ( h_pos_def ε hε |>.2.2 )
+      hq hq1 |> le_trans <| by simp [ * ];
+  exact le_of_tendsto_of_tendsto h_cont.1 h_cont.2
+    ( Filter.eventually_of_mem self_mem_nhdsWithin fun ε hε => h_le ε hε ) |>
+    fun h => by simpa using h;
 
 end LoewnerHeinz
 
@@ -742,9 +832,11 @@ private lemma conj_rpow_le_one_of_conj_le_one_posDef
         · linarith [hr0.ne']
       _ = 1 := by
         have hInv : (B ^ (-r : ℝ)).mat = (B ^ r).mat⁻¹ := by
-          simpa [HermitianMat.mat_inv] using congrArg HermitianMat.mat (rpow_inv_eq_neg_rpow hB r).symm
+          simpa [HermitianMat.mat_inv] using
+            congrArg HermitianMat.mat (rpow_inv_eq_neg_rpow hB r).symm
         rw [hInv]
-        exact Matrix.mul_nonsing_inv _ (((B ^ r).mat).isUnit_iff_isUnit_det.mp (isUnit_rpow_toMat hB r))
+        exact Matrix.mul_nonsing_inv _
+          (((B ^ r).mat).isUnit_iff_isUnit_det.mp (isUnit_rpow_toMat hB r))
   exact le_trans hconj hright.le
 
 private lemma conj_smul_right (A B : HermitianMat d ℂ) (c : ℝ) :
@@ -759,7 +851,8 @@ private lemma conjTranspose_half_mul_eq_conj
       = (A.conj B.mat).mat := by
   have := HermitianMat.pow_half_mul hA
   simp only [Matrix.conjTranspose_mul, HermitianMat.conjTranspose_mat, Matrix.mul_assoc]
-  simpa [HermitianMat.conj_apply_mat, Matrix.mul_assoc] using congrArg (fun M => B.mat * M * B.mat) this
+  simpa [HermitianMat.conj_apply_mat, Matrix.mul_assoc] using
+    congrArg (fun M => B.mat * M * B.mat) this
 
 private lemma top_singular_le_of_self_mul_le_smul_one
     {e : Type*} [Fintype e] [DecidableEq e] (X : Matrix e e ℂ)
@@ -781,8 +874,10 @@ private lemma compound_top_singular_le_posDef
     {A B : HermitianMat d ℂ} (hA : 0 ≤ A) (hB : B.mat.PosDef)
     {r : ℝ} (hr0 : 0 < r) (hr1 : r ≤ 1)
     (k : ℕ) (hk : k ≤ Fintype.card d) :
-    singularValuesSorted (compoundMatrix ((A ^ (r / 2 : ℝ)).mat * (B ^ r).mat) k) (compoundZero k hk) ≤
-      singularValuesSorted (compoundMatrix ((A ^ (1 / 2 : ℝ)).mat * B.mat) k) (compoundZero k hk) ^ r := by
+    singularValuesSorted (compoundMatrix ((A ^ (r / 2 : ℝ)).mat * (B ^ r).mat) k)
+        (compoundZero k hk) ≤
+      singularValuesSorted (compoundMatrix ((A ^ (1 / 2 : ℝ)).mat * B.mat) k)
+        (compoundZero k hk) ^ r := by
   let Ak : HermitianMat {S : Finset d // S.card = k} ℂ := compoundHermitian A k
   let Bk : HermitianMat {S : Finset d // S.card = k} ℂ := compoundHermitian B k
   let Mk : Matrix {S : Finset d // S.card = k} {S : Finset d // S.card = k} ℂ :=
@@ -821,7 +916,8 @@ private lemma compound_top_singular_le_posDef
         (((compoundHermitian A k) ^ r).conj ((compoundHermitian B k) ^ r).mat).mat
     rw [compoundHermitian_rpow A hA k (r / 2 : ℝ),
       compoundHermitian_rpow B (zero_le_iff.mpr hB.posSemidef) k r]
-    rw [show (compoundHermitian A k) ^ (r / 2 : ℝ) = ((compoundHermitian A k) ^ r) ^ (1 / 2 : ℝ) from by
+    rw [show (compoundHermitian A k) ^ (r / 2 : ℝ) = ((compoundHermitian A k) ^ r) ^ (1 / 2 : ℝ)
+        from by
       change Ak ^ (r / 2 : ℝ) = (Ak ^ r) ^ (1 / 2 : ℝ)
       rw [← HermitianMat.rpow_mul hAk]; ring_nf]
     exact conjTranspose_half_mul_eq_conj
@@ -830,8 +926,7 @@ private lemma compound_top_singular_le_posDef
   have hMk_le : Ak.conj Bk.mat ≤ c ^ 2 • 1 := by
     change (Ak.conj Bk.mat).mat ≤ (c ^ 2 • (1 : HermitianMat {S : Finset d // S.card = k} ℂ)).mat
     have hmat : Mk.conjTranspose * Mk ≤
-        c ^ 2 • (1 : Matrix {S : Finset d // S.card = k} {S : Finset d // S.card = k} ℂ) :=
-      by
+        c ^ 2 • (1 : Matrix {S : Finset d // S.card = k} {S : Finset d // S.card = k} ℂ) := by
         simpa using
           (Matrix.PosSemidef.le_smul_one_of_eigenvalues_iff
             (Matrix.isHermitian_mul_conjTranspose_self Mk.conjTranspose) (c ^ 2)).mp
@@ -990,7 +1085,8 @@ private lemma lieb_thirring_le_one_posDef
   have hleft :
       ((A ^ r).conj (B ^ r).mat).trace =
         ∑ i : Fin (Fintype.card d), singularValuesSorted N i ^ 2 := by
-    have := trace_conj_rpow_eq_sum_singularValuesSorted (A := A ^ r) (B := B ^ r) (hA := rpow_nonneg hA) (α := 1)
+    have := trace_conj_rpow_eq_sum_singularValuesSorted (A := A ^ r) (B := B ^ r)
+      (hA := rpow_nonneg hA) (α := 1)
     rw [show ((A ^ r) ^ (1 / 2 : ℝ)) = A ^ (r / 2 : ℝ) from by
       rw [← HermitianMat.rpow_mul hA]; ring_nf] at this
     simpa [N] using this
@@ -999,7 +1095,8 @@ private lemma lieb_thirring_le_one_posDef
         ∑ i : Fin (Fintype.card d), (singularValuesSorted M i ^ r) ^ 2 := by
     calc ((A.conj B.mat) ^ r).trace
         = ∑ i : Fin (Fintype.card d), singularValuesSorted M i ^ (2 * r) := by
-            simpa [M] using trace_conj_rpow_eq_sum_singularValuesSorted (A := A) (B := B) (hA := hA) (α := r)
+            simpa [M] using
+              trace_conj_rpow_eq_sum_singularValuesSorted (A := A) (B := B) (hA := hA) (α := r)
       _ = ∑ i, (singularValuesSorted M i ^ r) ^ 2 := Finset.sum_congr rfl fun i _ => by
             have hn := singularValuesSorted_nonneg M i
             rw [← Real.rpow_natCast _ 2, ← Real.rpow_mul hn]; push_cast; ring_nf
@@ -1025,7 +1122,8 @@ lemma lieb_thirring_le_one
       Filter.Tendsto (fun ε => (f ε).trace) (nhdsWithin 0 (Set.Ioi 0)) (nhds target.trace) := by
     rw [← h0]
     simp only [HermitianMat.trace_eq_re_trace]
-    exact (RCLike.continuous_re.comp (HermitianMat.continuous_mat.comp hf).matrix_trace).continuousWithinAt.tendsto
+    exact (RCLike.continuous_re.comp
+      (HermitianMat.continuous_mat.comp hf).matrix_trace).continuousWithinAt.tendsto
   have hleft_tendsto :
       Filter.Tendsto
         (fun ε => ((A ^ r).conj ((Bε ε) ^ r).mat).trace)
@@ -1217,7 +1315,8 @@ private lemma trace_mul_inv_shift_eq_sum_div {A : HermitianMat d ℂ} (hA : 0 �
           refine Finset.sum_congr rfl ?_
           intro i hi
           have hpos : 0 < A.H.eigenvalues i + t := by
-            exact add_pos_of_nonneg_of_pos (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i) ht
+            exact add_pos_of_nonneg_of_pos
+              (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i) ht
           rw [show ((↑(A.H.eigenvalues i) + ↑t : ℂ)) = ↑(A.H.eigenvalues i + t) by simp,
             Complex.normSq_ofReal]
           field_simp [hpos.ne', div_eq_mul_inv]

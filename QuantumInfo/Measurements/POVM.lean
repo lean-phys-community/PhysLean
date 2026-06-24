@@ -14,15 +14,16 @@ public import QuantumInfo.Channels.Unbundled
 /-! # Positive Operator-Valued Measures
 
 A Positive Operator-Valued Measures, or POVM, is the most general notion of a quantum "measurement":
-a collection of positive semidefinite (PSD) operators that sum to the identity. These induce a distribution,
-`POVM.measure`, of measurement outcomes; and they induce a CPTP map, `POVM.measurement_map`, which changes the state
-but adds learned information.
+a collection of positive semidefinite (PSD) operators that sum to the identity. These induce a
+distribution, `POVM.measure`, of measurement outcomes; and they induce a CPTP map,
+`POVM.measurement_map`, which changes the state but adds learned information.
 
-Developing this theory is important if one wants to discuss classical information across quantum channels, as POVMs
-are the route to get back to classical information (a `ProbDistribution` of outcomes).
+Developing this theory is important if one wants to discuss classical information across quantum
+channels, as POVMs are the route to get back to classical information (a `ProbDistribution` of
+outcomes).
 
-TODO: They can also evolve under CPTP maps themselves (the Heisenberg picture of quantum evolution), they might commute
-with each other or not, they might be projective or not.
+TODO: They can also evolve under CPTP maps themselves (the Heisenberg picture of quantum evolution),
+they might commute with each other or not, they might be projective or not.
 -/
 
 @[expose] public section
@@ -43,6 +44,7 @@ open scoped RealInnerProductSpace
  This measurement action can be composed with `MState.of_classical`, in which
  case it is equal to a CPTP map `measurement_map`. -/
 structure POVM (X : Type*) (d : Type*) [Fintype X] [Fintype d] [DecidableEq d] where
+  /-- The family of PSD operators of the POVM, indexed by outcomes `X`. -/
   mats : X → HermitianMat d ℂ
   nonneg : ∀ x, 0 ≤ (mats x)
   normalized : ∑ x, mats x = 1
@@ -56,7 +58,8 @@ state to an `d × X`-dimensional quantum-classical state. -/
 def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
   toLinearMap :=
     ∑ (x : X), open Kronecker in {
-      toFun := fun ρ ↦ ((((Λ.mats x) ^ (1/2:ℝ)).mat * ρ * ((Λ.mats x)^(1/2:ℝ)).mat) ⊗ₖ Matrix.single x x 1)
+      toFun := fun ρ ↦ ((((Λ.mats x) ^ (1/2:ℝ)).mat * ρ * ((Λ.mats x)^(1/2:ℝ)).mat) ⊗ₖ
+        Matrix.single x x 1)
       map_add' := by simp [mul_add, add_mul, Matrix.kroneckerMap_add_left]
       map_smul' := by simp [Matrix.smul_kronecker]
     }
@@ -65,7 +68,8 @@ def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
     · exact fun _ _ ha ↦ ha.add
     · exact MatrixMap.IsCompletelyPositive.zero _ _
     · intro x _
-      --Note: this map M₁ would do as well as an object on its own, it's "measure and forget the result".
+      --Note: this map M₁ would do as well as an object on its own, it's "measure and forget the
+      --result".
       let M₁ : MatrixMap d d ℂ := ⟨⟨
         fun ρ ↦ ((Λ.mats x) ^ (1/2:ℝ)).mat * ρ * ((Λ.mats x)^(1/2:ℝ)).mat,
         by simp [mul_add, add_mul]⟩,
@@ -101,17 +105,18 @@ def measurementMap (Λ : POVM X d) : CPTPMap d (d × X) where
 
 open Kronecker in
 theorem measurementMap_apply_matrix (Λ : POVM X d) (m : Matrix d d ℂ) :
-  Λ.measurementMap.map m =  ∑ x : X,
-    ((((Λ.mats x) ^ (1/2:ℝ)).mat * m * ((Λ.mats x)^(1/2:ℝ)).mat) ⊗ₖ Matrix.single x x 1) := by
+    Λ.measurementMap.map m =  ∑ x : X,
+      ((((Λ.mats x) ^ (1/2:ℝ)).mat * m * ((Λ.mats x)^(1/2:ℝ)).mat) ⊗ₖ Matrix.single x x 1) := by
   dsimp [measurementMap, HPMap.map]
   rw [LinearMap.sum_apply]
   rfl
 
 open HermitianMat in
 theorem measurementMap_apply_hermitianMat (Λ : POVM X d) (m : HermitianMat d ℂ) :
-  Λ.measurementMap.toHPMap m = ∑ x : X,
-    --TODO: Something like `HermitianMat.single` to make this better
-    ((m.conj ((Λ.mats x)^(1/2:ℝ)).mat : HermitianMat d ℂ) ⊗ₖ HermitianMat.diagonal ℂ (fun y ↦ ite (x = y) 1 0)) := by
+    Λ.measurementMap.toHPMap m = ∑ x : X,
+      --TODO: Something like `HermitianMat.single` to make this better
+      ((m.conj ((Λ.mats x)^(1/2:ℝ)).mat : HermitianMat d ℂ) ⊗ₖ
+        HermitianMat.diagonal ℂ (fun y ↦ ite (x = y) 1 0)) := by
   ext1
   convert Λ.measurementMap_apply_matrix m.mat
   simp only [conj_apply, conjTranspose_mat, HermitianMat.mat_finset_sum,
@@ -129,7 +134,8 @@ def measure (Λ : POVM X d) (ρ : MState d) : ProbDistribution X := .mk'
       simp [HermitianMat.inner_eq_re_trace, ← Complex.re_sum, ← trace_sum, ← Finset.sum_mul,
         ← HermitianMat.mat_finset_sum, Λ.normalized])
 
-/-- The quantum-classical `POVM.measurement_map`, gives a marginal on the right equal to `POVM.measure`.-/
+/-- The quantum-classical `POVM.measurement_map`, gives a marginal on the right equal to
+`POVM.measure`.-/
 theorem traceLeft_measurementMap_eq_measure (Λ : POVM X d) (ρ : MState d) :
     (Λ.measurementMap ρ).traceLeft = MState.ofClassical (Λ.measure ρ) := by
   open Kronecker in
@@ -146,8 +152,8 @@ theorem traceLeft_measurementMap_eq_measure (Λ : POVM X d) (ρ : MState d) :
   simp only [HermitianMat.diagonal, HermitianMat.mat_mk, diagonal_apply]
   symm; split
   · subst j
-    simp only [measure, ProbDistribution.mk', ProbDistribution.funlike_apply, and_self, Finset.sum_ite_eq',
-      Finset.mem_univ, ↓reduceIte]
+    simp only [measure, ProbDistribution.mk', ProbDistribution.funlike_apply, and_self,
+      Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
     change _ = Matrix.trace _
     rw [Matrix.trace_mul_cycle, HermitianMat.pow_half_mul (Λ.nonneg i)]
     exact HermitianMat.inner_eq_trace_rc _ _

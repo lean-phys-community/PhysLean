@@ -10,6 +10,28 @@ public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheo
 public import Mathlib.Analysis.CStarAlgebra.Unitary.Span
 public import Mathlib.Algebra.Star.UnitaryStarAlgAut
 
+/-!
+# Jensen operator inequality: conditions (i) ⟹ (iv)
+
+## i. Overview
+
+This file defines the conditions (i), (iv), (v) of the Jensen operator inequality and proves
+that condition (i) implies condition (iv), over arbitrary complex Hilbert spaces.
+
+## ii. Key results
+
+- `CondI`, `CondIV`, `CondV` : the operator-convexity conditions of Theorem 2.5.2.
+- `theorem_2_5_2_i_ici_all_imp_iv` : condition (i) on `[0, ∞)` implies condition (iv).
+- `theorem_2_5_2_i_all_imp_iv` : condition (i) implies condition (iv).
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 namespace JensenOperatorInequality
@@ -297,7 +319,8 @@ private theorem nontrivial_hsumL [Nontrivial ℋ] : Nontrivial (L (HSum ℋ)) :=
   exact ⟨0, blockDiagonal (ℋ := ℋ) (1 : L ℋ) 0, hdiag_ne_zero.symm⟩
 
 set_option synthInstance.maxHeartbeats 100000 in
--- `CFC.sqrt` on block-diagonal operators triggers expensive instance search through the product map.
+-- `CFC.sqrt` on block-diagonal operators triggers expensive instance search through the product
+-- map.
 set_option linter.unusedSectionVars false in
 set_option maxHeartbeats 400000 in
 private lemma sqrt_blockDiagonal_of_nonneg
@@ -690,7 +713,8 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
           ((1 / 2 : ℝ) • ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
             (1 / 2 : ℝ) • ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) ≤
         ((1 / 2 : ℝ) • cfcR (ℋ := HSum ℋ) f ((star U : L (HSum ℋ)) * Atilde * (U : L (HSum ℋ))) +
-          (1 / 2 : ℝ) • cfcR (ℋ := HSum ℋ) f ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) := by
+          (1 / 2 : ℝ) • cfcR (ℋ := HSum ℋ) f
+            ((star V : L (HSum ℋ)) * Atilde * (V : L (HSum ℋ)))) := by
     have hhalf : (1 - (2⁻¹ : ℝ)) = (2⁻¹ : ℝ) := by norm_num
     simpa [hhalf] using
       (hconv₂

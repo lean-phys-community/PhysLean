@@ -11,6 +11,28 @@ public import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
 public import Mathlib.Analysis.Convex.Continuous
 public import Mathlib.Analysis.InnerProductSpace.StarOrder
 
+/-!
+# Löwner–Heinz theorem for bounded operators
+
+## i. Overview
+
+This file is a thin wrapper specializing the results of `LownerHeinzCore` to the algebra of bounded
+linear operators `L ℋ := ℋ →L[ℂ] ℋ` on a Hilbert space. It re-exports operator monotonicity,
+antitonicity, and the continuous functional calculus in this fixed-space setting.
+
+## ii. Key results
+
+- `LownerHeinzTheorem.L` : the algebra of bounded linear operators on `ℋ`.
+- `LownerHeinzTheorem.cfcR` : the real continuous functional calculus on `L ℋ`.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 /-!
@@ -30,6 +52,7 @@ universe u v
 
 open CFC
 
+/-- The algebra `L ℋ` of bounded linear operators `ℋ →L[ℂ] ℋ` on a Hilbert space `ℋ`. -/
 abbrev L (ℋ : Type u) [NormedAddCommGroup ℋ] [InnerProductSpace ℂ ℋ] : Type u :=
   ℋ →L[ℂ] ℋ
 
@@ -45,6 +68,7 @@ set_option synthInstance.maxHeartbeats 80000 in
 noncomputable instance instCFCRealSelfAdjoint :
     ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint := inferInstance
 
+/-- The real continuous functional calculus `f A` applied to an operator `A : L ℋ`. -/
 noncomputable abbrev cfcR (f : ℝ → ℝ) (A : L ℋ) : L ℋ :=
   LownerHeinzCore.cfcR (𝓐 := L ℋ) f A
 

@@ -10,6 +10,31 @@ public import Mathlib.Analysis.Normed.Module.FiniteDimension
 public import Mathlib.Data.Real.StarOrdered
 public import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
 
+/-!
+# Continuity of suprema and infima of continuous families
+
+## i. Overview
+
+This file collects lemmas showing that the supremum (or infimum) of a continuous family of
+functions over a compact or bounded set depends continuously on the remaining parameters, along
+with corollaries specialized to bilinear forms.
+
+## ii. Key results
+
+- `IsCompact.sSup_image_eq_sSup_image_closure` : the `sSup` of a continuous image is unchanged by
+  taking the closure of the set.
+- `IsCompact.closure_continuous_sSup` : the `sSup` over a set with compact closure is continuous.
+- `continuous_iSup` / `continuous_iInf` : continuity of the pointwise `iSup`/`iInf` of a
+  continuous family over a compact or bounded set.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 variable {α β γ : Type*} {S : Set β} {f : γ → β → α}
@@ -20,7 +45,7 @@ namespace IsCompact
 variable [TopologicalSpace β]
 
 theorem sSup_image_eq_sSup_image_closure {f : β → α}
-  (hS : IsCompact (closure S)) (hf : Continuous f) :
+    (hS : IsCompact (closure S)) (hf : Continuous f) :
     sSup (f '' S) = sSup (f '' closure S) := by
   rcases S.eq_empty_or_nonempty with rfl | h; · simp
   refine csSup_eq_of_forall_le_of_forall_lt_exists_gt (by simpa) ?_ ?_
@@ -36,7 +61,8 @@ theorem sSup_image_eq_sSup_image_closure {f : β → α}
     exact csSup_le ((h.mono subset_closure).image f) fun y hy ↦
       (h_image_closure.trans h_closure_image) hy
 
-theorem sInf_image_eq_sInf_image_closure {f : β → α} (hS : IsCompact (closure S)) (hf : Continuous f) :
+theorem sInf_image_eq_sInf_image_closure {f : β → α} (hS : IsCompact (closure S))
+    (hf : Continuous f) :
     sInf (f '' S) = sInf (f '' closure S) :=
   sSup_image_eq_sSup_image_closure (α := αᵒᵈ) hS hf
 
@@ -92,22 +118,26 @@ end Bornology.IsBounded
 
 namespace LinearMap
 
-/-- For bilinear maps in suitably well-behaved spaces with `IsModuleTopology`, taking the supremum in one
-argument is still `Continuous`, by `Bornology.IsBounded.continuous_iSup`. -/
+/-- For bilinear maps in suitably well-behaved spaces with `IsModuleTopology`, taking the supremum
+in one argument is still `Continuous`, by `Bornology.IsBounded.continuous_iSup`. -/
 theorem continuous_iSup {E F 𝕜 : Type*}
-  [CommRing 𝕜] [TopologicalSpace 𝕜] [IsTopologicalRing 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+    [CommRing 𝕜] [TopologicalSpace 𝕜] [IsTopologicalRing 𝕜] [ConditionallyCompleteLinearOrder 𝕜]
+  [OrderTopology 𝕜]
   [AddCommGroup E] [TopologicalSpace E] [Module 𝕜 E] [IsModuleTopology 𝕜 E]
-  [AddCommGroup F] [Module 𝕜 F] [PseudoMetricSpace F] [ProperSpace F] [Module.Finite 𝕜 F] [IsModuleTopology 𝕜 F]
+  [AddCommGroup F] [Module 𝕜 F] [PseudoMetricSpace F] [ProperSpace F] [Module.Finite 𝕜 F]
+  [IsModuleTopology 𝕜 F]
   (f : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜) {S : Set F} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨆ y : S, f x y :=
   hS.continuous_iSup <| by fun_prop
 
-/-- For bilinear maps in suitably well-behaved spaces with `IsModuleTopology`, taking the infimum in one
-argument is still `Continuous`, by `Bornology.IsBounded.continuous_iInf`. -/
+/-- For bilinear maps in suitably well-behaved spaces with `IsModuleTopology`, taking the infimum
+in one argument is still `Continuous`, by `Bornology.IsBounded.continuous_iInf`. -/
 theorem continuous_iInf {E F 𝕜 : Type*}
-  [CommRing 𝕜] [TopologicalSpace 𝕜] [IsTopologicalRing 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+    [CommRing 𝕜] [TopologicalSpace 𝕜] [IsTopologicalRing 𝕜] [ConditionallyCompleteLinearOrder 𝕜]
+  [OrderTopology 𝕜]
   [AddCommGroup E] [TopologicalSpace E] [Module 𝕜 E] [IsModuleTopology 𝕜 E]
-  [AddCommGroup F] [Module 𝕜 F] [PseudoMetricSpace F] [ProperSpace F] [Module.Finite 𝕜 F] [IsModuleTopology 𝕜 F]
+  [AddCommGroup F] [Module 𝕜 F] [PseudoMetricSpace F] [ProperSpace F] [Module.Finite 𝕜 F]
+  [IsModuleTopology 𝕜 F]
   (f : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜) {S : Set F} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨅ y : S, f x y :=
   hS.continuous_iInf <| by fun_prop
@@ -115,7 +145,8 @@ theorem continuous_iInf {E F 𝕜 : Type*}
 /-- A specialization of `LinearMap.continuous_iSup` to finite dimensional spaces, in place
 of requiring a (non-instance) `IsModuleTopology`. -/
 theorem continuous_iSup' {E F 𝕜 : Type*}
-  [NontriviallyNormedField 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜] [CompleteSpace 𝕜]
+    [NontriviallyNormedField 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+  [CompleteSpace 𝕜]
   [AddCommGroup E] [TopologicalSpace E] [IsTopologicalAddGroup E] [T2Space E]
   [Module 𝕜 E] [ContinuousSMul 𝕜 E] [FiniteDimensional 𝕜 E]
   [PseudoMetricSpace F] [ProperSpace F] [AddCommGroup F] [IsTopologicalAddGroup F] [T2Space F]
@@ -129,7 +160,8 @@ theorem continuous_iSup' {E F 𝕜 : Type*}
 /-- A specialization of `LinearMap.continuous_iInf` to finite dimensional spaces, in place
 of requiring a (non-instance) `IsModuleTopology`. -/
 theorem continuous_iInf' {E F 𝕜 : Type*}
-  [NontriviallyNormedField 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜] [CompleteSpace 𝕜]
+    [NontriviallyNormedField 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+  [CompleteSpace 𝕜]
   [AddCommGroup E] [TopologicalSpace E] [IsTopologicalAddGroup E] [T2Space E]
   [Module 𝕜 E] [ContinuousSMul 𝕜 E] [FiniteDimensional 𝕜 E]
   [PseudoMetricSpace F] [ProperSpace F] [AddCommGroup F] [IsTopologicalAddGroup F] [T2Space F]
@@ -142,7 +174,7 @@ theorem continuous_iInf' {E F 𝕜 : Type*}
 
 /-- Alias of `LinearMap.continuous_iSup' ` that takes `LinearMap.BilinForm`. -/
 theorem BilinForm.continuous_iSup {𝕜 E : Type*}
-  [RCLike 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+    [RCLike 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E] [ProperSpace E]
   (f : LinearMap.BilinForm 𝕜 E) {S : Set E} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨆ y : S, f x y :=
@@ -150,7 +182,7 @@ theorem BilinForm.continuous_iSup {𝕜 E : Type*}
 
 /-- Alias of `LinearMap.continuous_iInf' ` that takes `LinearMap.BilinForm`. -/
 theorem BilinForm.continuous_iInf {𝕜 E : Type*}
-  [RCLike 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+    [RCLike 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E] [ProperSpace E]
   (f : LinearMap.BilinForm 𝕜 E) {S : Set E} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨅ y : S, f x y :=
@@ -167,12 +199,12 @@ variable  {𝕜 𝕜₂ : Type*} {E F G : Type*} [NontriviallyNormedField 𝕜] 
 
 /-- A specialization of `Bornology.IsBounded.continuous_iSup_bilinear` to `ContinuousLinearMap`. -/
 theorem continuous_iSup
-  (f : F →SL[σ₁₂] E →L[𝕜] G) {S : Set E} (hS : Bornology.IsBounded S) :
+    (f : F →SL[σ₁₂] E →L[𝕜] G) {S : Set E} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨆ y : S, f x y :=
   hS.continuous_iSup <| by fun_prop
 
 theorem continuous_iInf
-  (f : F →SL[σ₁₂] E →L[𝕜] G) {S : Set E} (hS : Bornology.IsBounded S) :
+    (f : F →SL[σ₁₂] E →L[𝕜] G) {S : Set E} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨅ y : S, f x y :=
   hS.continuous_iInf (α := G) <| by fun_prop
 
@@ -180,14 +212,16 @@ end ContinuousLinearMap
 
 --This is the theorem we actually needed downstream...
 theorem LinearMap.BilinForm.continuous_iSup_fst
-  {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   (f : LinearMap.BilinForm ℝ E) {S : Set E} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨆ y : S, f y x := by
   exact LinearMap.BilinForm.continuous_iSup f.flip hS
   --Old "direct" proof:
-  -- -- Since $f$ is continuous, there exists $C > 0$ such that for all $y \in S$ and $x \in E$, $|f y x| \leq C \|y\| \|x\|$.
+  -- -- Since $f$ is continuous, there exists $C > 0$ such that for all $y \in S$ and $x \in E$,
+  -- -- $|f y x| \leq C \|y\| \|x\|$.
   -- obtain ⟨C, hC1, hC2⟩ : ∃ C > 0, ∀ y ∈ S, ∀ x : E, |f y x| ≤ C * ‖y‖ * ‖x‖ := by
-  --   -- Since $f$ is continuous, there exists $C > 0$ such that for all $y, x \in E$, $|f y x| \leq C \|y\| \|x\|$ by the boundedness of continuous bilinear maps on finite-dimensional spaces.
+  --   -- Since $f$ is continuous, there exists $C > 0$ such that for all $y, x \in E$,
+  --   -- $|f y x| \leq C \|y\| \|x\|$ by boundedness of continuous bilinear maps in finite dim.
   --   have h_cont : ∃ C > 0, ∀ y x : E, |f y x| ≤ C * ‖y‖ * ‖x‖ := by
   --     have h_bounded : Continuous (fun p : E × E => f p.1 p.2) := by
   --       have _ := isModuleTopologyOfFiniteDimensional (𝕜 := ℝ) (E := E)
@@ -199,7 +233,8 @@ theorem LinearMap.BilinForm.continuous_iSup_fst
   --           simp [Metric.closedBall, dist_eq_norm]
   --         exact h_closed_unit_ball.prod h_closed_unit_ball;
   --       obtain ⟨C, hC⟩ := h_compact.exists_bound_of_continuousOn h_bounded.continuousOn;
-  --       exact ⟨C ⊔ 1, zero_lt_one.trans_le (le_max_right _ _), fun y x hy hx ↦ (hC (y, x) ⟨hy, hx⟩ ).trans (le_max_left _ _)⟩;
+  --       exact ⟨C ⊔ 1, zero_lt_one.trans_le (le_max_right _ _),
+  --         fun y x hy hx ↦ (hC (y, x) ⟨hy, hx⟩ ).trans (le_max_left _ _)⟩;
   --     refine ⟨C, hC₀, fun y x ↦ ?_⟩;
   --     rcases eq_or_ne y 0 with rfl | hy; · simp
   --     rcases eq_or_ne x 0 with rfl | hx; · simp
@@ -231,7 +266,7 @@ theorem LinearMap.BilinForm.continuous_iSup_fst
   -- have h_sup_triangle : |(⨆ y : S, f y a) - (⨆ y : S, f y b)| ≤ C * M * ‖a - b‖ := by
   --   rw [abs_sub_le_iff]
   --   constructor
-  --   · -- Applying the inequality $f y a \leq f y b + C * M * ‖a - b‖$ to each term in the supremum, we get:
+  --   · -- Applying $f y a \leq f y b + C * M * ‖a - b‖$ to each term in the supremum:
   --     have h_le (y : S) : f y a ≤ f y b + C * M * ‖a - b‖ := by
   --       linarith [abs_le.mp (h_triangle y y.2)]
   --     rw [sub_le_iff_le_add, add_comm]
@@ -239,7 +274,8 @@ theorem LinearMap.BilinForm.continuous_iSup_fst
   --     · exact ⟨⟨ y, hy ⟩⟩
   --     · refine add_le_add ?_ le_rfl
   --       refine le_csSup ?_ (Set.mem_range_self _)
-  --       exact ⟨C * M * ‖b‖, Set.forall_mem_range.2 fun y => le_of_abs_le ((hC2 _ y.2 _).trans (by gcongr; exact hM2 _ y.2))⟩;
+  --       exact ⟨C * M * ‖b‖, Set.forall_mem_range.2 fun y => le_of_abs_le
+  --         ((hC2 _ y.2 _).trans (by gcongr; exact hM2 _ y.2))⟩;
   --   · rw [sub_le_iff_le_add']
   --     -- Applying the triangle inequality to each term in the supremum, we get:
   --     have h_sup_triangle (y) (hy : y ∈ S) : f y b ≤ f y a + C * M * ‖a - b‖ := by
@@ -259,7 +295,7 @@ theorem LinearMap.BilinForm.continuous_iSup_fst
   -- nlinarith [mul_pos hC1 hM1]
 
 theorem LinearMap.BilinForm.continuous_iInf_fst
-  {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   (f : LinearMap.BilinForm ℝ E) {S : Set E} (hS : Bornology.IsBounded S) :
     Continuous fun x ↦ ⨅ y : S, f y x :=
   LinearMap.BilinForm.continuous_iInf f.flip hS

@@ -7,6 +7,29 @@ module
 
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.GeneralizedPerspectiveFunction
 
+/-!
+# Operator geometric and power means
+
+## i. Overview
+
+This file defines the operator `(α, β)`-power mean via the generalized perspective function and
+proves joint concavity/convexity properties of it on positive(-definite) operators, including the
+case of the operator geometric mean.
+
+## ii. Key results
+
+- `OperatorGeometricMean.operatorPowerMean` : the operator `(α, β)`-power mean.
+- `OperatorGeometricMean.operatorPowerMean_jointlyConcaveOn_pdSet` : joint concavity for
+  `0 ≤ α, β ≤ 1`.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 namespace OperatorGeometricMean

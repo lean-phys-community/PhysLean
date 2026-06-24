@@ -10,8 +10,8 @@ public import QuantumInfo.ForMathlib.HermitianMat.Reindex
 /-! # Trace of Hermitian Matrices
 
 While the trace of a Hermitian matrix is, in informal math, typically just "the same as" a trace of
-a matrix that happens to be Hermitian - it is a real number, not a complex number. Or more generally,
-it is a self-adjoint element of the base `StarAddMonoid`.
+a matrix that happens to be Hermitian - it is a real number, not a complex number. Or more
+generally, it is a self-adjoint element of the base `StarAddMonoid`.
 
 Working directly with `Matrix.trace` then means that there would be constant casts between rings,
 chasing imaginary parts and inequalities and so on. By defining `HermitianMat.trace` as its own
@@ -29,12 +29,13 @@ namespace HermitianMat
 variable {R n m α : Type*} [Star R] [TrivialStar R] [Fintype n] [Fintype m]
 
 section star
-variable [AddGroup α] [StarAddMonoid α] [CommSemiring R] [Semiring α] [Algebra R α] [IsMaximalSelfAdjoint R α]
+variable [AddGroup α] [StarAddMonoid α] [CommSemiring R] [Semiring α] [Algebra R α]
+  [IsMaximalSelfAdjoint R α]
 
 /-- The trace of the matrix. This requires a `IsMaximalSelfAdjoint R α` instance, and then maps from
-  `HermitianMat n α` to `R`. This means that the trace of (say) a `HermitianMat n ℤ` gives values in ℤ,
-  but that the trace of a `HermitianMat n ℂ` gives values in ℝ. The fact that traces are "automatically"
-  real reduces coercions down the line. -/
+  `HermitianMat n α` to `R`. This means that the trace of (say) a `HermitianMat n ℤ` gives values in
+  ℤ, but that the trace of a `HermitianMat n ℂ` gives values in ℝ. The fact that traces are
+  "automatically" real reduces coercions down the line. -/
 def trace (A : HermitianMat n α) : R :=
   IsMaximalSelfAdjoint.selfadjMap (A.mat.trace)
 
@@ -160,9 +161,11 @@ section addCommGroup
 variable [AddCommGroup α] [StarAddMonoid α]
 omit [Fintype n]
 
+/-- The partial trace of a Hermitian matrix over the left factor `m`. -/
 def traceLeft (A : HermitianMat (m × n) α) : HermitianMat n α :=
   ⟨A.mat.traceLeft, A.H.traceLeft⟩
 
+/-- The partial trace of a Hermitian matrix over the right factor `n`. -/
 def traceRight (A : HermitianMat (m × n) α) : HermitianMat m α :=
   ⟨A.mat.traceRight, A.H.traceRight⟩
 

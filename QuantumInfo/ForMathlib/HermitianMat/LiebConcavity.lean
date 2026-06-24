@@ -1,6 +1,6 @@
 /-
 Copyright (c) 2026 Alex Meiburg. All rights reserved.
-Released under MIT license as described in the file LICENSE.
+Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
 module
@@ -8,13 +8,28 @@ module
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LiebAndoTrace
 public import QuantumInfo.ForMathlib.HermitianMat.Schatten
 
-@[expose] public section
+/-!
+# Lieb concavity for the DPI
 
-/-! ## Main result for DPI
+## i. Overview
 
 We derive the concavity of the trace functional `σ ↦ Tr[(σ^s H σ^s)^p]` from
-the Lieb–Ando trace inequalities proved in `LiebAndoTrace.lean`.
+the Lieb–Ando trace inequalities proved in `LiebAndoTrace.lean`, via bridge lemmas
+relating `HermitianMat` and the operators on `EuclideanSpace ℂ d`.
+
+## ii. Key results
+
+- `trace_conj_rpow_concave` : concavity of the relevant conjugated `rpow` trace functional.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
 -/
+
+@[expose] public section
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
 

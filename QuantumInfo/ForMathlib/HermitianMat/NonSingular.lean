@@ -8,6 +8,32 @@ module
 public import QuantumInfo.ForMathlib.HermitianMat.Order
 public import QuantumInfo.ForMathlib.Isometry
 
+/-!
+# Nonsingular Hermitian matrices
+
+## i. Overview
+
+This module introduces the `HermitianMat.NonSingular` typeclass (the underlying matrix is a unit)
+and develops many equivalent characterizations: being positive definite, having nonzero
+determinant, nonzero eigenvalues, trivial kernel, full support, or not having `0` in the spectrum.
+It also records how nonsingularity interacts with negation, inverse, scaling, conjugation,
+Kronecker products, and reindexing, along with supporting `Matrix.isUnit` lemmas.
+
+## ii. Key results
+
+- `HermitianMat.NonSingular` : the typeclass asserting the matrix is a unit.
+- `HermitianMat.nonsingular_iff_isUnit`, `nonSingular_iff_det_ne_zero`, `nonSingular_iff_ker_bot` :
+  various characterizations of nonsingularity.
+- `HermitianMat.nonSingular_iff_posDef_of_PSD` : for PSD matrices, nonsingular iff positive def.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 noncomputable section
@@ -42,6 +68,7 @@ variable {n m R 𝕜 : Type*} [Fintype n] [DecidableEq n] [Fintype m] [Decidable
 variable [CommRing R] [StarRing R] [RCLike 𝕜]
 variable (A : HermitianMat n R) (B : HermitianMat m R)
 
+/-- A Hermitian matrix is `NonSingular` when its underlying matrix is a unit (invertible). -/
 class NonSingular (A : HermitianMat n R) : Prop where
   isUnit : IsUnit A.mat
 

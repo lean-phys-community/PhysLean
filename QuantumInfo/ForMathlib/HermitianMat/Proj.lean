@@ -55,7 +55,7 @@ noncomputable def projector (S : Submodule 𝕜 (EuclideanSpace 𝕜 n)) : Hermi
 theorem projector_add_orthogonal : projector S + projector Sᗮ = 1 := by
   unfold projector;
   erw [ Subtype.mk_eq_mk ];
-  ext i j; simp [ LinearMap.toMatrix_apply, Matrix.one_apply ] ;
+  ext i j; simp [ LinearMap.toMatrix_apply, Matrix.one_apply ];
 
 theorem projector_nonneg : 0 ≤ projector S := by
   rw [zero_le_iff]
@@ -79,11 +79,16 @@ theorem projector_ker : (projector S).ker = Sᗮ := by
 
 @[simp]
 theorem trace_projector : (projector S).trace = (Module.finrank 𝕜 S : ℝ) := by
-  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by
+  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix
+      (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace
+      = Module.finrank 𝕜 S by
     simp [projector, trace_eq_re_trace, h_trace]
-  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = (LinearMap.id.toMatrix (Module.finBasis 𝕜 S) (Module.finBasis 𝕜 S)).trace by
+  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix
+      (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace
+      = (LinearMap.id.toMatrix (Module.finBasis 𝕜 S) (Module.finBasis 𝕜 S)).trace by
     simp [h_trace]
-  rw [LinearMap.toMatrix_comp _ (Module.finBasis 𝕜 ↥S), Matrix.trace_mul_comm, ← LinearMap.toMatrix_comp]
+  rw [LinearMap.toMatrix_comp _ (Module.finBasis 𝕜 ↥S), Matrix.trace_mul_comm,
+    ← LinearMap.toMatrix_comp]
   congr 2
   ext1
   simp [Submodule.orthogonalProjection_mem_subspace_eq_self]
@@ -120,7 +125,8 @@ theorem supportProj_of_nonSingular [NonSingular A] : A.supportProj = 1 := by
   simpa using A.kerProj_add_supportProj
 
 /--
-The projector onto a submodule S is the sum of the outer products of the vectors in an orthonormal basis of S.
+The projector onto a submodule S is the sum of the outer products of the vectors in an
+orthonormal basis of S.
 -/
 theorem projector_eq_sum_rankOne (b : OrthonormalBasis ι 𝕜 S) :
     (projector S).mat = ∑ i, Matrix.vecMulVec (S.subtype (b i)) (star (S.subtype (b i))) := by
@@ -128,10 +134,12 @@ theorem projector_eq_sum_rankOne (b : OrthonormalBasis ι 𝕜 S) :
   ext i j;
   field_simp;
   simp [Matrix.vecMulVec]
-  -- By definition of orthogonal projection, we can write the projection of $e_j$ onto $S$ as $\sum_{k} \langle e_j, b_k \rangle b_k$.
-  have h_proj : ∀ j : n, S.orthogonalProjection (EuclideanSpace.single j 1) = ∑ k, (star (b k |>.1 j)) • (b k |>.1) := by
+  -- The projection of $e_j$ onto $S$ equals $\sum_{k} \langle e_j, b_k \rangle b_k$.
+  have h_proj : ∀ j : n, S.orthogonalProjection (EuclideanSpace.single j 1)
+      = ∑ k, (star (b k |>.1 j)) • (b k |>.1) := by
     intro j
-    have h_proj : S.orthogonalProjection (EuclideanSpace.single j 1) = ∑ k, (inner 𝕜 (b k |>.1) (EuclideanSpace.single j 1)) • (b k |>.1) := by
+    have h_proj : S.orthogonalProjection (EuclideanSpace.single j 1)
+        = ∑ k, (inner 𝕜 (b k |>.1) (EuclideanSpace.single j 1)) • (b k |>.1) := by
       convert b.sum_repr ( S.orthogonalProjection ( EuclideanSpace.single j 1 ) ) using 1;
       constructor <;> intro h <;> simp_all [ Subtype.ext_iff, b.repr_apply_apply ];
     convert h_proj using 3
@@ -141,49 +149,59 @@ theorem projector_eq_sum_rankOne (b : OrthonormalBasis ι 𝕜 S) :
 
 set_option backward.isDefEq.respectTransparency false in
 /--
-The projector onto the support of A is the sum of the projections onto the eigenvectors with non-zero eigenvalues.
+The projector onto the support of A is the sum of the projections onto the eigenvectors with
+non-zero eigenvalues.
 -/
 lemma projector_support_eq_sum : A.supportProj.mat =
     ∑ i, (if A.H.eigenvalues i = 0 then 0 else 1) •
       Matrix.vecMulVec (A.H.eigenvectorBasis i) (star (A.H.eigenvectorBasis i)) := by
-  have h_support : A.support = Submodule.span (𝕜) (Set.image (fun i => A.H.eigenvectorBasis i) { i | A.H.eigenvalues i ≠ 0 }) := by
+  have h_support : A.support = Submodule.span (𝕜)
+      (Set.image (fun i => A.H.eigenvectorBasis i) { i | A.H.eigenvalues i ≠ 0 }) := by
     refine' le_antisymm _ _;
     · intro x hx;
-      -- By definition of $A.support$, we know that $x$ is in the orthogonal complement of the kernel of $A$.
+      -- $x$ is in the orthogonal complement of the kernel of $A$.
       have h_orthogonal_complement : x ∈ (A.ker : Submodule (𝕜) (EuclideanSpace (𝕜) n))ᗮ := by
         convert hx using 1;
         exact ker_orthogonal_eq_support A;
-      -- By definition of $A.ker$, we know that $x$ is orthogonal to all eigenvectors with zero eigenvalues.
-      have h_orthogonal_zero_eigenvalues : ∀ i, A.H.eigenvalues i = 0 → inner (𝕜) (A.H.eigenvectorBasis i) x = 0 := by
+      -- $x$ is orthogonal to all eigenvectors with zero eigenvalues.
+      have h_orthogonal_zero_eigenvalues : ∀ i, A.H.eigenvalues i = 0
+          → inner (𝕜) (A.H.eigenvectorBasis i) x = 0 := by
         intro i hi
         have h_eigenvector_zero : A.mat.mulVec (A.H.eigenvectorBasis i) = 0 := by
           have := A.H.mulVec_eigenvectorBasis i; aesop;
         convert h_orthogonal_complement ( A.H.eigenvectorBasis i ) _ using 1;
         exact (mem_ker_iff_mulVec_zero A ((H A).eigenvectorBasis i)).mpr h_eigenvector_zero;
-      -- By definition of $A.ker$, we know that $x$ can be written as a linear combination of eigenvectors with non-zero eigenvalues.
+      -- $x$ can be written as a linear combination of eigenvectors with non-zero eigenvalues.
       have h_decomp : x = ∑ i, (inner (𝕜) (A.H.eigenvectorBasis i) x) • A.H.eigenvectorBasis i := by
         exact Eq.symm (OrthonormalBasis.sum_repr' (H A).eigenvectorBasis x);
       rw [ h_decomp ];
-      exact Submodule.sum_mem _ fun i _ => if hi : A.H.eigenvalues i = 0 then by simp [h_orthogonal_zero_eigenvalues i hi ] else Submodule.smul_mem _ _ ( Submodule.subset_span ⟨ i, hi, rfl ⟩ );
+      exact Submodule.sum_mem _ fun i _ =>
+        if hi : A.H.eigenvalues i = 0 then by simp [h_orthogonal_zero_eigenvalues i hi ]
+        else Submodule.smul_mem _ _ ( Submodule.subset_span ⟨ i, hi, rfl ⟩ );
     · rw [ Submodule.span_le, Set.image_subset_iff ];
       intro i hi;
       simp_all [ HermitianMat.support ];
       use (1 / A.H.eigenvalues i) • A.H.eigenvectorBasis i;
-      convert congr_arg ( fun x => ( 1 / A.H.eigenvalues i ) • x ) ( A.H.mulVec_eigenvectorBasis i ) using 1
+      convert congr_arg ( fun x => ( 1 / A.H.eigenvalues i ) • x )
+        ( A.H.mulVec_eigenvectorBasis i ) using 1
       simp [hi]
       simp [ funext_iff, Matrix.mulVec, dotProduct ];
       exact PiLp.ext_iff;
-  have h_orthonormal_basis : ∃ b : OrthonormalBasis {i : n | A.H.eigenvalues i ≠ 0} (𝕜) (Submodule.span (𝕜) (Set.image (fun i => A.H.eigenvectorBasis i) {i | A.H.eigenvalues i ≠ 0})), ∀ i, b i = A.H.eigenvectorBasis i := by
+  have h_orthonormal_basis : ∃ b : OrthonormalBasis {i : n | A.H.eigenvalues i ≠ 0} (𝕜)
+      (Submodule.span (𝕜)
+        (Set.image (fun i => A.H.eigenvectorBasis i) {i | A.H.eigenvalues i ≠ 0})),
+      ∀ i, b i = A.H.eigenvectorBasis i := by
     refine' ⟨ _, _ ⟩;
     refine' OrthonormalBasis.mk _ _;
     use fun i => ⟨ A.H.eigenvectorBasis i, Submodule.subset_span ( Set.mem_image_of_mem _ i.2 ) ⟩;
     all_goals simp [ Orthonormal ];
-    · intro i j hij; have := A.H.eigenvectorBasis.orthonormal; simp_all [ orthonormal_iff_ite ] ;
+    · intro i j hij; have := A.H.eigenvectorBasis.orthonormal; simp_all [ orthonormal_iff_ite ];
       exact fun h => hij <| Subtype.ext h;
     · rw [ Submodule.eq_top_iff' ];
       rintro ⟨ x, hx ⟩;
       rw [ Submodule.mem_span ] at hx ⊢;
-      intro p hp; specialize hx ( Submodule.map ( Submodule.subtype _ ) p ) ; simp_all [ Set.range_subset_iff ] ;
+      intro p hp; specialize hx ( Submodule.map ( Submodule.subtype _ ) p );
+      simp_all [ Set.range_subset_iff ];
       exact hx fun i hi => ⟨ _, hp i hi, rfl ⟩;
   obtain ⟨ b, hb ⟩ := h_orthonormal_basis
   have h_sum_rankOne : (projector A.support).mat = ∑ i, Matrix.vecMulVec (b i) (star (b i)) := by
@@ -192,7 +210,8 @@ lemma projector_support_eq_sum : A.supportProj.mat =
   simp_all [ Finset.sum_ite ];
   convert h_sum_rankOne using 1;
   · exact h_support ▸ rfl;
-  · refine' Finset.sum_bij ( fun i hi => ⟨ i, by simpa using hi ⟩ ) _ _ _ _ <;> simp [ Finset.mem_filter ]
+  · refine' Finset.sum_bij ( fun i hi => ⟨ i, by simpa using hi ⟩ ) _ _ _ _ <;>
+      simp [ Finset.mem_filter ]
 
 /-
 `HermitianMat.supportProj` as a cfc.
@@ -203,7 +222,7 @@ theorem supportProj_eq_cfc : A.supportProj = A.cfc (if · = 0 then 0 else 1) := 
   convert projector_support_eq_sum A using 1;
   refine' Finset.sum_congr rfl fun i _ => _;
   ext x y
-  simp [ Matrix.vecMulVec, Matrix.mul_apply ] ;
+  simp [ Matrix.vecMulVec, Matrix.mul_apply ];
   simp [ Matrix.single ];
   simp [ Finset.sum_ite, Finset.filter_eq, Finset.filter_and ];
   rw [ Finset.sum_eq_single i ] <;> aesop
@@ -223,10 +242,16 @@ noncomputable def projLT (A B : HermitianMat n 𝕜) : HermitianMat n 𝕜 :=
 -- as the default ordering. We offer the `≥ₚ` notation which is the same with the arguments
 -- flipped, similar to how `GT.gt` is defeq to `LT.lt` with arguments flipped.
 -- We put the ≥ₚ first, since both can delaborate and we want to show the ≤ₚ one.
+/-- Notation `{A ≥ₚ B}` for `projLE B A`, the projector onto the non-negative eigenspace
+of `A - B`. -/
 scoped notation "{" A " ≥ₚ " B "}" => projLE B A
+/-- Notation `{A ≤ₚ B}` for `projLE A B`, the projector onto the non-negative eigenspace
+of `B - A`. -/
 scoped notation "{" A " ≤ₚ " B "}" => projLE A B
 
+/-- Notation `{A >ₚ B}` for `projLT B A`, the projector onto the positive eigenspace of `A - B`. -/
 scoped notation "{" A " >ₚ " B "}" => projLT B A
+/-- Notation `{A <ₚ B}` for `projLT A B`, the projector onto the positive eigenspace of `B - A`. -/
 scoped notation "{" A " <ₚ " B "}" => projLT A B
 
 theorem projLE_def : {A ≤ₚ B} = (B - A).cfc (fun x ↦ if 0 ≤ x then 1 else 0) := by

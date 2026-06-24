@@ -8,6 +8,27 @@ module
 public import QuantumInfo.ForMathlib.HermitianMat.Sqrt
 public import QuantumInfo.ForMathlib.HermitianMat.LiebConcavity
 
+/-!
+# Peierls' inequality
+
+## i. Overview
+
+This file proves Peierls' inequality for Hermitian matrices: for a convex function `g`, the sum of
+`g` applied to the diagonal entries is bounded by the trace of `g` applied (via the continuous
+functional calculus) to the matrix.
+
+## ii. Key results
+
+- `HermitianMat.peierls_inequality_ici` : Peierls' inequality for functions convex on `[0, ∞)`.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 noncomputable section
@@ -67,7 +88,7 @@ theorem peierls_inequality (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : Conv
   simp_all [trace_cfc_eq]
 
 theorem peierls_inequality_ici (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : ConvexOn ℝ (Set.Ici 0) g)
-  (hA : 0 ≤ A) :
+    (hA : 0 ≤ A) :
     ∑ i, g ((A.mat i i).re) ≤ (A.cfc g).trace := by
   -- By the properties of the trace and the convexity of $g$, we have:
   have h_trace_le : ∑ i, g ((A.mat i i).re) ≤ ∑ j, g (A.H.eigenvalues j) *

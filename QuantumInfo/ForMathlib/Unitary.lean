@@ -9,6 +9,29 @@ public import Mathlib.LinearAlgebra.Matrix.Kronecker
 public import Mathlib.LinearAlgebra.Matrix.PosDef
 public import QuantumInfo.ForMathlib.HermitianMat.Unitary
 
+/-!
+# Unitary conjugation of linear maps
+
+## i. Overview
+
+This file collects lemmas about unitary operators acting on finite-dimensional inner product
+spaces, in particular how conjugating a linear map by a unitary relates the eigenspaces and
+eigenvalues of the map to those of its conjugate.
+
+## ii. Key results
+
+- `LinearMap.conj_unitary_eigenspace_equiv` : eigenspaces are preserved (up to isomorphism) under
+  unitary conjugation.
+- `LinearMap.IsSymmetric.conj_unitary_IsSymmetric` : unitary conjugation preserves symmetry.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 open BigOperators

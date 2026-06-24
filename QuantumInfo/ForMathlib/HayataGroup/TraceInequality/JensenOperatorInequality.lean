@@ -7,6 +7,28 @@ module
 
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequalityIImpIV
 
+/-!
+# Jensen's operator inequality (Theorem 2.5.2)
+
+## i. Overview
+
+This file proves the implications between conditions (i)–(v) of the Jensen operator inequality
+for operator-convex functions, working over an arbitrary complex Hilbert space `ℋ`.
+
+## ii. Key results
+
+- `CondIVAll` : the uniform (universe-quantified) form of condition (iv).
+- `theorem_2_5_2_iv_imp_v` : condition (iv) implies condition (v).
+- `theorem_2_5_2_i_all_imp_v` : condition (i) implies condition (v).
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 namespace JensenOperatorInequality
@@ -33,6 +55,7 @@ set_option synthInstance.maxHeartbeats 400000 in
 noncomputable local instance : NonnegSpectrumClass ℝ (L (HSum ℋ)) := inferInstance
 set_option synthInstance.maxHeartbeats 400000 in
 -- Module ℝ for L (HSum ℋ) requires deep WithLp / CStarAlgebra chain.
+/-- The real module structure on the operators of the direct-sum Hilbert space `HSum ℋ`. -/
 noncomputable local instance : Module ℝ (L (HSum ℋ)) := inferInstance
 
 omit ℋ [NormedAddCommGroup ℋ] [InnerProductSpace ℂ ℋ] [CompleteSpace ℋ] in
@@ -280,7 +303,8 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
     rw [show star Xtilde = blockOp (ℋ := ℋ) (star X) (star Y) 0 0 by
       simp [Xtilde]]
     rw [show Xtilde = blockOp (ℋ := ℋ) X 0 Y 0 by rfl]
-    rw [blockDiagonal_eq_blockOp_wrap, blockOp_mul_wrap, blockOp_mul_wrap, blockDiagonal_eq_blockOp_wrap]
+    rw [blockDiagonal_eq_blockOp_wrap, blockOp_mul_wrap, blockOp_mul_wrap,
+      blockDiagonal_eq_blockOp_wrap]
     congr 1 <;> simp [mul_assoc]
   have hleft_block :
       cfcR (ℋ := HSum ℋ) f (star Xtilde * Atilde * Xtilde) =

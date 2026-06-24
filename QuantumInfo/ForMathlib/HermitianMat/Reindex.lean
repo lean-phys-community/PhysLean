@@ -24,6 +24,8 @@ variable {d d₂ d₃ d₄ 𝕜 : Type*} [RCLike 𝕜]
 
 variable (A B : HermitianMat d 𝕜) (e : d ≃ d₂)
 
+/-- Reindex a Hermitian matrix along an equivalence `e : d ≃ d₂`, yielding a Hermitian matrix on the
+new index type. -/
 def reindex (e : d ≃ d₂) : HermitianMat d₂ 𝕜 :=
   ⟨A.mat.reindex e e, A.H.submatrix e.symm⟩
 
@@ -88,7 +90,8 @@ theorem conj_submatrix (B : Matrix d₂ d₄ 𝕜) (e : d₃ ≃ d₂) (f : d �
   ext1
   simp [conj_apply, ← Matrix.submatrix_mul_equiv (e₂ := .refl d)]
 
-theorem reindex_eq_conj [DecidableEq d] (e : d ≃ d₂) : A.reindex e = A.conj (Matrix.reindex e (.refl d) 1) := by
+theorem reindex_eq_conj [DecidableEq d] (e : d ≃ d₂) :
+    A.reindex e = A.conj (Matrix.reindex e (.refl d) 1) := by
   ext : 3
   simp [-mat_apply, reindex, conj_apply, Matrix.submatrix,
     Matrix.mul_apply, Matrix.one_apply]

@@ -28,6 +28,8 @@ variable (A B : HermitianMat d 𝕜)
 
 namespace HermitianMat
 
+/-- The symmetrized (Jordan) product of two Hermitian matrices,
+`2⁻¹ • (A.mat * B.mat + B.mat * A.mat)`. -/
 def symmMul : HermitianMat d 𝕜 :=
   ⟨(2 : 𝕜)⁻¹ • (A.mat * B.mat + B.mat * A.mat),
     by simp [selfAdjoint, IsSelfAdjoint, add_comm, Matrix.star_eq_conjTranspose]⟩
@@ -89,6 +91,7 @@ section starRing
 variable {d 𝕜 : Type*} [Fintype d] [Field 𝕜] [StarRing 𝕜]
 variable (A B : HermitianMat d 𝕜)
 
+/-- The commutative magma structure on Hermitian matrices given by the symmetrized product. -/
 scoped instance : CommMagma (HermitianMat d 𝕜) where
   mul := HermitianMat.symmMul
   mul_comm := HermitianMat.symmMul_comm
@@ -107,12 +110,14 @@ scoped instance : IsCommJordan (HermitianMat d 𝕜) where
       mul_add, add_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_assoc]
     abel
 
+/-- The symmetrized product annihilates zero on both sides. -/
 scoped instance : MulZeroClass (HermitianMat d 𝕜) where
   zero_mul := by simp [mul_eq_symmMul]
   mul_zero := by simp [mul_eq_symmMul]
 
 variable [DecidableEq d] [Invertible (2 : 𝕜)]
 
+/-- The identity matrix is a two-sided unit for the symmetrized product. -/
 scoped instance : MulZeroOneClass (HermitianMat d 𝕜) where
   one_mul := by simp [mul_eq_symmMul]
   mul_one := by simp [mul_eq_symmMul]
@@ -123,6 +128,7 @@ section field
 
 variable {d 𝕜 : Type*} [Fintype d] [Field 𝕜] [StarRing 𝕜]
 
+/-- The symmetrized product distributes over addition, giving a non-unital non-associative ring. -/
 scoped instance : NonUnitalNonAssocRing (HermitianMat d 𝕜) where
   left_distrib a b c := by
     ext1
@@ -135,6 +141,7 @@ scoped instance : NonUnitalNonAssocRing (HermitianMat d 𝕜) where
 
 variable [Invertible (2 : 𝕜)] [DecidableEq d]
 
+/-- The non-associative commutative ring structure from the symmetrized product. -/
 scoped instance : NonAssocCommRing (HermitianMat d 𝕜) where
   mul_comm := HermitianMat.symmMul_comm
 

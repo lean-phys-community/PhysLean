@@ -20,6 +20,31 @@ public import QuantumInfo.ForMathlib.Minimax
 public import QuantumInfo.ForMathlib.Misc
 public import QuantumInfo.ForMathlib.Unitary
 
+/-!
+# Trace distance between quantum states
+
+## i. Overview
+
+This module defines the trace distance `TrDistance ρ σ` between two mixed quantum states as half the
+trace norm of their difference, packages it as a `Prob`, and proves basic properties: nonnegativity,
+the bound by one, symmetry, and the expression in terms of eigenvalues of the difference.
+
+## ii. Key results
+
+- `TrDistance` : the trace distance between two `MState`s.
+- `TrDistance.ge_zero` / `TrDistance.le_one` : the distance lies in `[0, 1]`.
+- `TrDistance.prob` : the trace distance as a `Prob`.
+- `TrDistance.symm` : symmetry of the trace distance.
+- `TrDistance.eq_abs_eigenvalues` : the distance as half the sum of `|eigenvalues|` of the diff.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 noncomputable section

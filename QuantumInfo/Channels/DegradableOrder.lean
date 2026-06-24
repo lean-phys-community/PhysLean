@@ -37,6 +37,8 @@ DecidableEq, the argument is also a Sigma to bring this along.
 
 section
 
+/-- The degradable preorder on channels with input type `dIn`: `Λ₁ ≤ Λ₂` when `Λ₂` can be
+degraded to `Λ₁`, ranging over channels of all output types. -/
 @[reducible]
 def DegradablePreorder (dIn : Type*) [Fintype dIn] [DecidableEq dIn] : Preorder
     (Σ dOut : (Σ t, Fintype t × DecidableEq t), let _ := dOut.snd.1; CPTPMap dIn dOut.fst) where

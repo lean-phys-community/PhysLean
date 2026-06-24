@@ -7,6 +7,29 @@ module
 
 public import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
 
+/-!
+# Monotonicity of `Real.negMulLog`
+
+## i. Overview
+
+This module provides monotonicity facts for `Real.negMulLog` (the function `x ↦ -x * log x`),
+showing it is strictly increasing on `[0, exp (-1)]`, strictly decreasing on `[exp (-1), ∞)`, and
+hence bounded above by `exp (-1)`.
+
+## ii. Key results
+
+- `Real.negMulLog_strictMonoOn` : `negMulLog` is strictly monotone on `Set.Icc 0 (exp (-1))`.
+- `Real.negMulLog_strictAntiOn` : `negMulLog` is strictly antitone on `Set.Ici (exp (-1))`.
+- `Real.negMulLog_le_rexp_neg_one` : for `0 ≤ x`, `negMulLog x ≤ exp (-1)`.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 noncomputable section

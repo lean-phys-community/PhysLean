@@ -105,7 +105,6 @@ theorem zero_le_coe {p : Prob} : 0 ≤ (p : ℝ) :=
 theorem coe_le_one {p : Prob} : (p : ℝ) ≤ 1 :=
   p.2.2
 
-@[simp]
 theorem zero_le {p : Prob} : 0 ≤ p :=
   zero_le_coe
 
@@ -153,9 +152,11 @@ theorem ofNNReal_toNNReal : ENNReal.ofNNReal (toNNReal p) = ENNReal.ofReal (p : 
   simp [toNNReal, ENNReal.ofReal_eq_coe_nnreal]
   norm_cast
 
+/-- View a nonnegative real `p ≤ 1` as a `Prob`. -/
 def NNReal.asProb (p : ℝ≥0) (hp : p ≤ 1) : Prob :=
   ⟨p, ⟨p.2, hp⟩⟩
 
+/-- View a nonnegative real with `p.1 ≤ 1` as a `Prob`. -/
 def NNReal.asProb' (p : ℝ≥0) (hp : p.1 ≤ 1) : Prob :=
   ⟨p, ⟨p.2, hp⟩⟩
 
@@ -254,8 +255,10 @@ namespace Mixable
 
 variable {T U : Type*} [AddCommMonoid U] [Module ℝ U]
 
+/-- The convex combination `a • x₁ + b • x₂` in `T`, for reals `a, b ≥ 0` with `a + b = 1`. -/
 @[reducible]
-def mix_ab [inst : Mixable U T] {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) (hab : a + b = 1) (x₁ x₂ : T) : T :=
+def mix_ab [inst : Mixable U T] {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) (hab : a + b = 1)
+    (x₁ x₂ : T) : T :=
   inst.mkT <| inst.convex
     (x := to_U x₁) (exists_apply_eq_apply _ _)
     (y := to_U x₂) (exists_apply_eq_apply _ _)
@@ -271,8 +274,10 @@ def mix [inst : Mixable U T] (p : Prob) (x₁ x₂ : T) : T :=
 theorem to_U_of_mkT [inst : Mixable U T] (u : U) {h} : inst.to_U (mkT (u := u) h).1 = u :=
   (mkT (u := u) h).2
 
+/-- Notation `p[x₁ ↔ x₂]` for the convex combination `Mixable.mix p x₁ x₂`. -/
 notation p "[" x₁:80 "↔" x₂ "]" => mix p x₁ x₂
 
+/-- Notation `p[x₁ ↔ x₂ : M]` for `Mixable.mix` using the explicit `Mixable` instance `M`. -/
 notation p "[" x₁:80 "↔" x₂ ":" M "]" => mix (inst := M) p x₁ x₂
 
 @[simp]
@@ -341,8 +346,8 @@ end pi
 def instSubtype {T : Type*} {P : T → Prop} (inst : Mixable U T)
     (h : ∀{x y:T},
       ∀⦃a b : ℝ⦄, (ha : 0 ≤ a) → (hb : 0 ≤ b) → (hab : a + b = 1) →
-      P x → P y → P (inst.mix_ab ha hb hab x y))
-    : Mixable U { t // P t} where
+      P x → P y → P (inst.mix_ab ha hb hab x y)) :
+    Mixable U { t // P t} where
   to_U x := inst.to_U (x.val)
   to_U_inj h := Subtype.ext (inst.to_U_inj h)
   mkT := fun {u} h ↦ ⟨by
@@ -403,6 +408,7 @@ noncomputable def negLog : Prob → ENNReal :=
     Left.nonneg_neg_iff.mpr (Real.log_nonpos p.2.1 p.2.2)⟩
 
 --Note that this is an em-dash `—` and not a minus `-`, to make the notation work.
+/-- Notation `—log p` for the negative logarithm `Prob.negLog p` (em-dash, not a minus). -/
 scoped notation "—log " => negLog
 
 --TODO: Upgrade to `StrictAnti`. Even better: bundle negLog as `Prob ≃o ENNRealᵒᵈ`.
@@ -445,7 +451,8 @@ theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by
   · simp [hp]
   · simp; rfl
 
-theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENNReal.ofReal x ≤ —log p := by
+theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) :
+    ENNReal.ofReal x ≤ —log p := by
   by_cases hx : 0 ≤ x
   · rw [negLog]
     split_ifs with hp

@@ -11,6 +11,30 @@ public import QuantumInfo.ForMathlib.ContinuousLinearMap
 public import QuantumInfo.ForMathlib.Tactic.Commutes
 
 
+/-!
+# Hermitian matrices
+
+## i. Overview
+
+This file defines `HermitianMat n α`, the subtype of `Matrix n n α` that are Hermitian, and develops
+its basic algebraic and order structure: the coercion to matrices, conjugation, the associated
+linear map, eigenspaces, kernel, support, and diagonal Hermitian matrices.
+
+## ii. Key results
+
+- `HermitianMat` : the type of Hermitian matrices, as a subtype.
+- `HermitianMat.conj` : conjugation of a Hermitian matrix by a (possibly rectangular) matrix.
+- `HermitianMat.ker`, `HermitianMat.support` : the kernel and support submodules.
+- `HermitianMat.eigenspace`, `HermitianMat.diagonal` : eigenspaces and diagonal Hermitian matrices.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 /-- The type of Hermitian matrices, as a `Subtype`. Equivalent to a `Matrix n n α` bundled
@@ -31,6 +55,7 @@ variable [AddGroup α] [StarAddMonoid α]
 theorem eq_IsHermitian : HermitianMat n α  = { m : Matrix n n α // m.IsHermitian} := by
   rfl
 
+/-- The underlying matrix of a Hermitian matrix. -/
 @[coe] def mat : HermitianMat n α → Matrix n n α :=
   Subtype.val
 
@@ -319,7 +344,7 @@ add_aesop_rules safe norm (rule_sets := [Commutes])
 theorem _root_.Matrix.inv_commute {α : Type*} {A : Matrix m m α} [CommRing α] : Commute A⁻¹ A := by
   rcases A.nonsing_inv_cancel_or_zero with h | h
   · simp [Commute, SemiconjBy, h]
-  . simp [h]
+  · simp [h]
 
 @[aesop safe apply (rule_sets := [Commutes])]
 theorem commute_inv_self : Commute A⁻¹.mat A.mat := by
@@ -354,16 +379,18 @@ section conj
 variable [CommRing α] [StarRing α] [Fintype n]
 variable (A : HermitianMat n α)
 
-/-- The Hermitian matrix given by conjugating by a (possibly rectangular) Matrix. If we required `B` to be
-square, this would apply to any `Semigroup`+`StarMul` (as proved by `IsSelfAdjoint.conjugate`). But this lets
-us conjugate to other sizes too, as is done in e.g. Kraus operators. That is, it's a _heterogeneous_ conjguation.
+/-- The Hermitian matrix given by conjugating by a (possibly rectangular) Matrix. If we required `B`
+to be square, this would apply to any `Semigroup`+`StarMul` (as proved by
+`IsSelfAdjoint.conjugate`). But this lets us conjugate to other sizes too, as is done in e.g. Kraus
+operators. That is, it's a _heterogeneous_ conjguation.
 -/
 def conj {m} (B : Matrix m n α) : HermitianMat n α →+ HermitianMat m α where
   toFun A :=
     ⟨B * A.mat * B.conjTranspose, by
     ext
     simp only [Matrix.star_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, Finset.sum_mul,
-      star_sum, star_mul', star_star, show ∀ (a b : n), star (A.mat b a) = A.mat a b from congrFun₂ A.property]
+      star_sum, star_mul', star_star,
+      show ∀ (a b : n), star (A.mat b a) = A.mat a b from congrFun₂ A.property]
     rw [Finset.sum_comm]
     congr! 2
     ring⟩
@@ -446,6 +473,7 @@ theorem lin_zero : (0 : HermitianMat n 𝕜).lin = 0 := by
 theorem lin_one : (1 : HermitianMat n 𝕜).lin = 1 := by
   simp [lin]; rfl
 
+/-- The `μ`-eigenspace of a Hermitian matrix `A`, as a submodule of Euclidean space. -/
 noncomputable def eigenspace (μ : 𝕜) : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   Module.End.eigenspace A.lin μ
 
@@ -466,7 +494,6 @@ theorem ker_eq_eigenspace_zero : A.ker = A.eigenspace 0 := by
 theorem ker_zero : (0 : HermitianMat n 𝕜).ker = ⊤ := by
   simp [ker]
 
-@[simp]
 theorem ker_one : (1 : HermitianMat n 𝕜).ker = ⊥ := by
   simp [ker]; rfl
 
@@ -487,7 +514,6 @@ theorem support_eq_sup_eigenspace_nonzero : A.support = ⨆ μ ≠ 0, A.eigenspa
 theorem support_zero : (0 : HermitianMat n 𝕜).support = ⊥ := by
   simp [support]
 
-@[simp]
 theorem support_one : (1 : HermitianMat n 𝕜).support = ⊤ := by
   simpa [support] using LinearMap.ker_eq_bot_iff_range_eq_top.mp rfl
 
@@ -510,6 +536,7 @@ section diagonal
 variable {𝕜 : Type*} [RCLike 𝕜] [DecidableEq n]
 
 variable (𝕜) in
+/-- The Hermitian matrix with real diagonal entries given by `f` and zero off-diagonal entries. -/
 def diagonal (f : n → ℝ) : HermitianMat n 𝕜 :=
   ⟨Matrix.diagonal (f ·),
     by simp [selfAdjoint.mem_iff, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose]⟩
@@ -625,7 +652,8 @@ theorem kron_id_commute_id_kro [Fintype m] [Fintype n] [DecidableEq m] [Decidabl
   commutes
 
 /-
-The conjugate of a Kronecker product by a Kronecker product is the Kronecker product of the conjugates.
+The conjugate of a Kronecker product by a Kronecker product is the Kronecker product of the
+conjugates.
 -/
 lemma kronecker_conj [Fintype m] [Fintype n]
     (A : HermitianMat m α) (B : HermitianMat n α) (C : Matrix p m α) (D : Matrix q n α) :
@@ -655,13 +683,13 @@ theorem range_le_ker_imp_zero {A : HermitianMat d 𝕜}
     simpa [ Matrix.mulVec, dotProduct ] using congr(WithLp.ofLp $(h) i)
   simp_all only [mat_apply, Matrix.zero_apply]
   replace hA_sq := congr_fun ( congr_fun hA_sq i ) i
-  simp_all only [Matrix.mul_apply, mat_apply, Matrix.zero_apply] ;
+  simp_all only [Matrix.mul_apply, mat_apply, Matrix.zero_apply];
   -- Since $A$ is Hermitian, we have $A i x * A x i = |A i x|^2$.
   have h_abs : ∀ x, (A i x) * (A x i) = ‖A i x‖ ^ 2 := by
     intro x; have := A.2
-    simp_all only [val_eq_coe, sq] ;
+    simp_all only [val_eq_coe, sq];
     have := congr_fun ( congr_fun this i ) x
-    simp_all only [Matrix.star_apply, mat_apply, RCLike.star_def] ;
+    simp_all only [Matrix.star_apply, mat_apply, RCLike.star_def];
     simp only [← this, mul_comm, RCLike.norm_conj];
     simp [ ← sq, RCLike.mul_conj ];
   simp_rw [h_abs] at hA_sq
@@ -680,9 +708,12 @@ theorem _root_.Matrix.range_mul_conjTranspose_of_ker_le_ker {A : Matrix d d 𝕜
     simp [Matrix.toEuclideanLin]
   · intro x hx;
     -- Since $x \in \text{range}(A)$, there exists $y \in \text{range}(Mᴴ)$ such that $A y = x$.
-    obtain ⟨y, hy⟩ : ∃ y ∈ LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)), A.toEuclideanLin y = x := by
-      have h_range_MH : LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)) = (LinearMap.ker (Matrix.toEuclideanLin M))ᗮ := by
-        have h_orthogonal : (LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)))ᗮ = LinearMap.ker (Matrix.toEuclideanLin M) := by
+    obtain ⟨y, hy⟩ : ∃ y ∈ LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)),
+        A.toEuclideanLin y = x := by
+      have h_range_MH : LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)) =
+          (LinearMap.ker (Matrix.toEuclideanLin M))ᗮ := by
+        have h_orthogonal : (LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)))ᗮ =
+            LinearMap.ker (Matrix.toEuclideanLin M) := by
           ext x
           rw [Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
           simp only [Submodule.mem_orthogonal, LinearMap.mem_ker, LinearMap.mem_range]
@@ -698,17 +729,26 @@ theorem _root_.Matrix.range_mul_conjTranspose_of_ker_le_ker {A : Matrix d d 𝕜
             rw [← hz, LinearMap.adjoint_inner_left, h, inner_zero_right]
         rw [← h_orthogonal, Submodule.orthogonal_orthogonal]
       obtain ⟨ y, rfl ⟩ := hx;
-      -- Since $y$ is in the range of $Mᴴ$, we can write $y$ as $y = y_1 + y_2$ where $y_1 \in \text{range}(Mᴴ)$ and $y_2 \in \text{ker}(M)$.
-      obtain ⟨y1, y2, hy1, hy2, hy⟩ : ∃ y1 y2 : EuclideanSpace 𝕜 d, y1 ∈ LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)) ∧ y2 ∈ LinearMap.ker (Matrix.toEuclideanLin M) ∧ y = y1 + y2 := by
-        have h_decomp : ∀ y : EuclideanSpace 𝕜 d, ∃ y1 ∈ LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)), ∃ y2 ∈ LinearMap.ker (Matrix.toEuclideanLin M), y = y1 + y2 := by
+      -- Since $y$ is in the range of $Mᴴ$, we can write $y$ as $y = y_1 + y_2$ where
+      -- $y_1 \in \text{range}(Mᴴ)$ and $y_2 \in \text{ker}(M)$.
+      obtain ⟨y1, y2, hy1, hy2, hy⟩ : ∃ y1 y2 : EuclideanSpace 𝕜 d,
+          y1 ∈ LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)) ∧
+          y2 ∈ LinearMap.ker (Matrix.toEuclideanLin M) ∧ y = y1 + y2 := by
+        have h_decomp : ∀ y : EuclideanSpace 𝕜 d,
+            ∃ y1 ∈ LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose)),
+            ∃ y2 ∈ LinearMap.ker (Matrix.toEuclideanLin M), y = y1 + y2 := by
           intro y
-          have h_decomp : y ∈ (LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose))) ⊔ (LinearMap.ker (Matrix.toEuclideanLin M)) := by
+          have h_decomp : y ∈ (LinearMap.range (Matrix.toEuclideanLin (M.conjTranspose))) ⊔
+              (LinearMap.ker (Matrix.toEuclideanLin M)) := by
             rw [ h_range_MH ];
             rw [ sup_comm, Submodule.sup_orthogonal_of_hasOrthogonalProjection ];
             exact Submodule.mem_top;
-          rw [ Submodule.mem_sup ] at h_decomp ; tauto;
-        exact ⟨ _, _, h_decomp y |> Classical.choose_spec |> And.left, h_decomp y |> Classical.choose_spec |> And.right |> Classical.choose_spec |> And.left, h_decomp y |> Classical.choose_spec |> And.right |> Classical.choose_spec |> And.right ⟩;
-      exact ⟨ y1, hy1, by rw [ hy, map_add, LinearMap.mem_ker.mp ( h hy2 ) ] ; simp ⟩;
+          rw [ Submodule.mem_sup ] at h_decomp; tauto;
+        exact ⟨ _, _, h_decomp y |> Classical.choose_spec |> And.left,
+          h_decomp y |> Classical.choose_spec |> And.right |> Classical.choose_spec |> And.left,
+          h_decomp y |> Classical.choose_spec |> And.right |> Classical.choose_spec
+            |> And.right ⟩;
+      exact ⟨ y1, hy1, by rw [ hy, map_add, LinearMap.mem_ker.mp ( h hy2 ) ]; simp ⟩;
     obtain ⟨ z, rfl ⟩ := hy.1;
     exact ⟨ z, by simpa [ Matrix.toEuclideanLin ] using hy.2 ⟩
 
@@ -716,7 +756,8 @@ theorem conj_ne_zero {A : HermitianMat d 𝕜} {M : Matrix d₂ d 𝕜} (hA : A 
     (h : LinearMap.ker M.toEuclideanLin ≤ A.ker) : A.conj M ≠ 0 := by
   by_contra h_contra
   have h_range : LinearMap.range A.mat.toEuclideanLin ≤ LinearMap.ker A.mat.toEuclideanLin := by
-    have h_range : LinearMap.range (A.mat * M.conjTranspose).toEuclideanLin ≤ LinearMap.ker M.toEuclideanLin := by
+    have h_range : LinearMap.range (A.mat * M.conjTranspose).toEuclideanLin ≤
+        LinearMap.ker M.toEuclideanLin := by
       rintro x ⟨y, rfl⟩
       replace h_contra := congr($(h_contra).mat)
       simp_all [Matrix.toLpLin_apply, Matrix.mul_assoc]
@@ -761,7 +802,7 @@ theorem ne_zero_iff_ne_zero_spectrum (A : HermitianMat n 𝕜) :
 
 open scoped Pointwise in
 theorem spectrum_prod
-  {A : HermitianMat m 𝕜} {B : HermitianMat n 𝕜} :
+    {A : HermitianMat m 𝕜} {B : HermitianMat n 𝕜} :
     spectrum ℝ (A ⊗ₖ B).mat = spectrum ℝ A.mat * spectrum ℝ B.mat :=
   Matrix.spectrum_prod A.H B.H
 

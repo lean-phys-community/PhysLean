@@ -9,6 +9,28 @@ public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.BlockDiagonal
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
 public import Mathlib.Analysis.CStarAlgebra.Unitary.Span
 
+/-!
+# Jensen operator inequality: from condition (iv) to condition (v)
+
+## i. Overview
+
+This scratch file develops the implication `(iv) → (v)` among the equivalent characterizations of
+operator convexity in the Jensen operator inequality, working with bounded operators on a Hilbert
+space and using block-diagonal/dilation techniques.
+
+## ii. Key results
+
+- `JensenOperatorInequalityScratch.CondIV` / `CondV` : local copies of conditions (iv) and (v).
+- `JensenOperatorInequalityScratch.CondIVAll` : the universe-uniform version of condition (iv).
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 namespace JensenOperatorInequalityScratch

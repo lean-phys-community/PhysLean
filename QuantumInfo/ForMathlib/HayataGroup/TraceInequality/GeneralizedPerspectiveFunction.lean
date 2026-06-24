@@ -8,6 +8,29 @@ module
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequality
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
 
+/-!
+# Generalized perspective functions
+
+## i. Overview
+
+This file defines the generalized operator perspective `GeneralizedPerspective f h A B` and the
+notions of joint convexity/concavity, and proves the perspective transfers operator convexity of
+`f` into joint convexity (Theorem 2.5/2.6).
+
+## ii. Key results
+
+- `GeneralizedPerspective` : the generalized operator perspective function of `f` and `h`.
+- `JointlyConvexOn`, `JointlyConcaveOn` : joint convexity/concavity on a product of sets.
+- `theorem_2_5_forward_jointlyConvexOn_psd_pd` : joint convexity of the perspective.
+
+## iii. Table of contents
+
+This can be filled in later.
+
+## iv. References
+
+-/
+
 @[expose] public section
 
 namespace GeneralizedPerspectiveFunction
