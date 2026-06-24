@@ -54,24 +54,21 @@ Contracting a colour against its `τ`-dual is
 the dot product of their coordinate vectors in the fixed basis, which on basis
 labels is the Kronecker `δ_{IJ}`. The `metric` and `unit` fields are both the
 same element, the δ "cap" `∑_I b_I ⊗ b_I` whose components are `δ^{IJ}`.
-Supplying this `TensorSpecies` instance equips the chiral sector with the
-framework's generic tensor API (`.Tensor`, `.contrT`, and so on).
+Supplying this instance equips the chiral sector with the framework's generic
+tensor API (`.Tensor`, `.contrT`, and so on).
 
-Conjugation is a separate operation layered on top of the species. The species
-fixes which indices contract (via `τ`) but has no notion of complex-conjugating
-a tensor; that is the role of `TensorSpecies.Conj`, a structure parameterized by
-a species. The chiral sector opts in with `chiralConjStructure` (§F), supplying
-the map `conjT` (conjugate the components and flip each index's holomorphy by
-`ChiralColor.bar`) and its laws. `bar` is the holomorphy dual, distinct from and
-commuting with the variance dual `τ`; it is not used in contraction.
+Conjugation is intrinsic species data, bundled into the same object: `chiralTensor`
+is a `ConjTensorSpecies`, a `TensorSpecies` extended with the conjugate-colour
+involution `ChiralColor.bar` and its coherence. The framework then supplies the
+map `conjT` (conjugate the components and flip each index's holomorphy by `bar`)
+and its laws. `bar` is the holomorphy dual, distinct from and commuting with the
+variance dual `τ`; it is not used in contraction.
 
 Conjugation enters wherever reality does. It is what lets one state that the
 Kähler metric is Hermitian (`conjT g` equals `g` with its two indices swapped),
 that the anti-chiral sector is the complex conjugate of the chiral one
 (`D̄_J̄ W̄ = conjT (D_I W)`), and hence that the F-term `g^{IJ̄} D_I W D̄_J̄ W̄`
-is real. The species can express none of these alone. Since `chiralConjStructure`
-has type `(chiralTensor …).Conj` and its coherence is a fact about
-`chiralTensor`'s contraction, it necessarily follows the species definition (§F).
+is real. The species can express none of these alone.
 
 ## ii. Key results
 
@@ -80,11 +77,9 @@ has type `(chiralTensor …).Conj` and its coherence is a fact about
     field data in the sector.
 - `SUSY.N1.ChiralColor` : the four colours `chiral`/`anti` × `up`/`down`, with the
     dual-colour involution `ChiralColor.tau`.
-- `SUSY.N1.chiralTensor` : the `TensorSpecies` assembled from the above, whose
-    `τ`-discipline makes the F-term contraction type-safe.
-- `SUSY.N1.chiralConjStructure` : the `TensorSpecies.Conj` instance realizing the
-    chiral-antichiral conjugation carried by `ChiralColor.bar`, the operation in
-    which reality and Hermiticity conditions are phrased.
+- `SUSY.N1.chiralTensor` : the `ConjTensorSpecies` assembled from the above, whose
+    `τ`-discipline makes the F-term contraction type-safe and whose `bar` carries the
+    chiral-antichiral conjugation in which reality and Hermiticity conditions are phrased.
 
 ## iii. Table of contents
 
@@ -98,7 +93,7 @@ has type `(chiralTensor …).Conj` and its coherence is a fact about
   - D.4. The coherence laws in `toSpanSingleton` form
 - E. The chiral-index tensor species
 - F. Conjugation
-  - F.1. The conjugation structure
+  - F.1. Smoke tests
   - F.2. Scalar and covector helpers
 
 ## iv. References
@@ -407,12 +402,15 @@ lemma deltaContr_metric (b : Basis ι ℂ M) :
 
 -/
 
-/-- The chiral-index tensor species. Its colours are `chiral`/`anti` × `up`/`down`, all carried
-by `ι → ℂ`, and every colour contracts by the bare δ pairing with the δ cap serving as both
-metric and unit. Each coherence law reduces, by case analysis on the colour, to the
-corresponding abstract δ lemma above. Instantiating `TensorSpecies` this way gives the chiral
-sector the framework's generic tensor API. -/
-def chiralTensor : TensorSpecies ℂ ChiralColor G (chiralModule (ι := ι)) (fun _ => ι)
+/-- The chiral-index tensor species, bundled with its conjugation. Its colours are
+`chiral`/`anti` × `up`/`down`, all carried by `ι → ℂ`, and every colour contracts by the bare δ
+pairing with the δ cap serving as both metric and unit. Each `TensorSpecies` coherence law reduces,
+by case analysis on the colour, to the corresponding abstract δ lemma above. The conjugation flips
+holomorphy (`ChiralColor.bar`) while preserving variance; since every colour shares the index type
+`ι`, the identification `barIdx_eq` is `rfl`, and `conj_contrComm` is `star δ = δ`. Instantiating
+`ConjTensorSpecies` this way gives the chiral sector both the framework's generic tensor API and
+its conjugation API (`conjT` and its laws) on one object. -/
+def chiralTensor : ConjTensorSpecies ℂ ChiralColor G (chiralModule (ι := ι)) (fun _ => ι)
     (chiralRep (ι := ι) (G := G)) (chiralBasis (ι := ι)) where
   τ := ChiralColor.tau
   τ_involution c := by cases c <;> rfl
@@ -428,6 +426,19 @@ def chiralTensor : TensorSpecies ℂ ChiralColor G (chiralModule (ι := ι)) (fu
   unit_symm c := by cases c <;> exact deltaUnit_symm _
   contr_unit c x := by cases c <;> exact deltaContr_unit _ x
   contr_metric c := by cases c <;> exact deltaContr_metric _
+  -- Conjugation data: `bar` flips holomorphy, the index set is shared (`rfl`), `star δ = δ`.
+  bar := ChiralColor.bar
+  bar_involution := ChiralColor.bar_bar
+  bar_tau := ChiralColor.bar_tau
+  barIdx_eq _ := rfl
+  conj_contrComm := by
+    intro d x₁ x₂
+    -- Every colour's contraction is the real δ, so `star` fixes it; the `bar`-side casts are `rfl`,
+    -- so each case reduces by defeq to this single fact.
+    have h : star (deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂))
+        = deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂) := by
+      rw [deltaContr_basis_basis]; split <;> simp
+    cases d <;> exact h
 
 /-- Type-safety smoke test. `chiralUp` and `chiralDown` are `τ`-dual, so a rank-2 tensor with
 those index colours admits the framework contraction `contrT`. A same-variance pair would
@@ -441,69 +452,47 @@ example (t : (chiralTensor (ι := ι) (G := G)).Tensor
 /-!
 ## F. Conjugation
 
-Conjugation is a layer on top of the species of §E, not part of it: `TensorSpecies.Conj S` is a
-structure parameterized by a species `S`, and the framework defines the conjugation map `conjT`
-and its laws once, abstractly, against any species that supplies one. This section therefore
-follows §E: `chiralConjStructure` has type `(chiralTensor …).Conj`, and its `conj_contrComm`
-field is a fact about `chiralTensor`'s contraction, neither of which can be stated before the
-species exists.
-
-The chiral sector's conjugation flips holomorphy (`ChiralColor.bar`) while preserving variance, and
-through the resulting `conjT` the reality and Hermiticity conditions are phrased. The basis index
-type `ι` is the same for every colour, so the index identification `barIdx_eq` is `rfl` and the
-component reindexing is the identity.
-
-### F.1. The conjugation structure
+Conjugation is bundled into `chiralTensor` itself (§E): as a `ConjTensorSpecies` it carries `bar`
+beside `τ`, and the framework supplies the conjugation map `conjT` and its laws (`conjT_smul`,
+`conjT_conjT`, `conjT_contrT`, `conjT_eq_permT_iff`) once, abstractly, against any
+`ConjTensorSpecies`. The chiral sector's conjugation flips holomorphy (`ChiralColor.bar`) while
+preserving variance, and through `chiralTensor.conjT` the reality and Hermiticity conditions are
+phrased. The basis index type `ι` is the same for every colour, so the identification `barIdx_eq`
+is `rfl` and the component reindexing is the identity.
 
 -/
 
 section Conjugation
 
-open TensorSpecies TensorSpecies.Tensor ChiralColor
+open TensorSpecies TensorSpecies.Tensor ConjTensorSpecies ChiralColor
 
-/-- The chiralTensor contraction coefficient of two basis vectors is the Kronecker δ, stated at
-the colour level so it matches goals carrying `chiralModule d`. -/
-lemma chiralTensor_contr_chiralBasis (d : ChiralColor) (x₁ x₂ : ι) :
-    (chiralTensor (ι := ι) (G := G)).contr d
-        (chiralBasis d x₁ ⊗ₜ[ℂ] chiralBasis ((chiralTensor (ι := ι) (G := G)).τ d) x₂)
-      = if x₁ = x₂ then 1 else 0 := by
-  cases d <;>
-    exact deltaContr_basis_basis _ x₁ x₂
+/-!
+### F.1. Smoke tests
 
-/-- The conjugation structure on the chiral tensor species: `bar` flips holomorphy while
-preserving variance, and the basis labels of each colour are identified with those of its
-conjugate via the identity (both carry the same index type `ι`). -/
-def chiralConjStructure : (chiralTensor (ι := ι) (G := G)).Conj where
-  bar := ChiralColor.bar
-  bar_involution := ChiralColor.bar_bar
-  bar_tau := ChiralColor.bar_tau
-  barIdx_eq _ := rfl
-  conj_contrComm := by
-    intro d x₁ x₂
-    cases d <;> simp [chiralTensor_contr_chiralBasis, apply_ite (starRingEnd ℂ), basisIdxCongr]
+Type-safety and behaviour checks for `chiralTensor`'s conjugation.
+-/
 
--- Smoke tests: type-safety and behaviour checks for `chiralConjStructure`.
-
-/-- Conjugating a metric-typed tensor `g : Tensor ![chiralDown, antiDown]` via `chiralConjStructure`
+/-- Conjugating a metric-typed tensor `g : Tensor ![chiralDown, antiDown]` via `chiralTensor.conjT`
 lands in the conjugate-colour list `ChiralColor.bar ∘ ![chiralDown, antiDown]`, i.e.
 `![antiDown, chiralDown]`. This is purely a type-safety check. -/
 example (g : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown, antiDown]) :
     (chiralTensor (ι := ι) (G := G)).Tensor (ChiralColor.bar ∘ ![chiralDown, antiDown]) :=
-  chiralConjStructure.conjT g
+  (chiralTensor (ι := ι) (G := G)).conjT g
 
 /-- `conjT_contrT` applies to a one-index contraction: conjugating first and then contracting
 equals contracting the conjugate. Checked at colour `![chiralUp, chiralDown]` contracted at
 slots `0` and `1`. -/
 example (t : (chiralTensor (ι := ι) (G := G)).Tensor
     ![ChiralColor.chiralUp, ChiralColor.chiralDown]) :
-    chiralConjStructure.conjT (TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩ t)
-      = TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩ (chiralConjStructure.conjT t) :=
-  chiralConjStructure.conjT_contrT 0 1 ⟨by decide, rfl⟩ t
+    (chiralTensor (ι := ι) (G := G)).conjT (TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩ t)
+      = TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩
+          ((chiralTensor (ι := ι) (G := G)).conjT t) :=
+  (chiralTensor (ι := ι) (G := G)).conjT_contrT 0 1 ⟨by decide, rfl⟩ t
 
 /-!
 ### F.2. Scalar and covector helpers
 
-These two definitions normalize the output of `chiralConjStructure.conjT` back to the canonical
+These two definitions normalize the output of `(chiralTensor (ι := ι) (G := G)).conjT` back to the canonical
 colour lists for scalar and anti-holomorphic covector tensors respectively.
 
 -/
@@ -512,7 +501,7 @@ colour lists for scalar and anti-holomorphic covector tensors respectively.
 def conjScalar (t : (chiralTensor (ι := ι) (G := G)).Tensor ![]) :
     (chiralTensor (ι := ι) (G := G)).Tensor ![] :=
   permT id ⟨Function.bijective_id, fun i => by fin_cases i⟩
-    (chiralConjStructure.conjT t)
+    ((chiralTensor (ι := ι) (G := G)).conjT t)
 
 /-- Conjugation of a holomorphic covector, normalized to the anti-holomorphic covector colour
 list `![antiDown]`. -/
@@ -520,7 +509,7 @@ def conjChiralCovector
     (t : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) :
     (chiralTensor (ι := ι) (G := G)).Tensor ![antiDown] :=
   permT ![0] ⟨by decide, fun i => by fin_cases i; rfl⟩
-    (chiralConjStructure.conjT t)
+    ((chiralTensor (ι := ι) (G := G)).conjT t)
 
 /-- For scalar tensors, `toField` of the normalized tensor conjugate is the complex conjugate of
 `toField`. -/
@@ -528,25 +517,25 @@ theorem toField_conjScalar (t : (chiralTensor (ι := ι) (G := G)).Tensor ![]) :
     (conjScalar t).toField = star t.toField := by
   rw [conjScalar, toField_permT]
   rw [toField_eq_repr, toField_eq_repr]
-  change componentMap (S := chiralTensor (ι := ι) (G := G))
-      (chiralConjStructure.bar ∘ ![]) (chiralConjStructure.conjT t) (fun j => Fin.elim0 j) =
-    star ((basis (S := chiralTensor (ι := ι) (G := G)) ![]).repr t (fun j => Fin.elim0 j))
-  rw [TensorSpecies.Conj.componentMap_conjT (cj := chiralConjStructure)]
+  change componentMap (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies)
+      ((chiralTensor (ι := ι) (G := G)).bar ∘ ![]) ((chiralTensor (ι := ι) (G := G)).conjT t) (fun j => Fin.elim0 j) =
+    star ((basis (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies) ![]).repr t (fun j => Fin.elim0 j))
+  rw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι) (G := G))]
   rfl
 
 /-- Component formula for the holomorphic covector conjugate: the `![I]` basis component of
 `conjChiralCovector t` is the complex conjugate of the `![I]` component of `t`. -/
 theorem repr_conjChiralCovector
     (t : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) (I : ι) :
-    (basis (S := chiralTensor (ι := ι) (G := G)) ![antiDown]).repr
+    (basis (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies) ![antiDown]).repr
         (conjChiralCovector t) ![I] =
-      star ((basis (S := chiralTensor (ι := ι) (G := G)) ![chiralDown]).repr t ![I]) := by
+      star ((basis (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies) ![chiralDown]).repr t ![I]) := by
   rw [conjChiralCovector, permT_basis_repr_symm_apply]
-  change componentMap (S := chiralTensor (ι := ι) (G := G))
-      (chiralConjStructure.bar ∘ ![chiralDown]) (chiralConjStructure.conjT t) _ = _
-  rw [TensorSpecies.Conj.componentMap_conjT (cj := chiralConjStructure)]
+  change componentMap (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies)
+      ((chiralTensor (ι := ι) (G := G)).bar ∘ ![chiralDown]) ((chiralTensor (ι := ι) (G := G)).conjT t) _ = _
+  rw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι) (G := G))]
   apply congrArg star
-  apply congrArg (fun idx => componentMap (S := chiralTensor (ι := ι) (G := G))
+  apply congrArg (fun idx => componentMap (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies)
     ![chiralDown] t idx)
   funext i
   fin_cases i
@@ -557,7 +546,7 @@ theorem repr_conjChiralCovector
 theorem conjChiralCovector_add
     (t₁ t₂ : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) :
     conjChiralCovector (t₁ + t₂) = conjChiralCovector t₁ + conjChiralCovector t₂ := by
-  rw [conjChiralCovector, chiralConjStructure.conjT_add]
+  rw [conjChiralCovector, (chiralTensor (ι := ι) (G := G)).conjT_add]
   simp [conjChiralCovector, map_add]
 
 /-- Conjugation of a holomorphic covector is conjugate-linear: a scalar `r` pulls out as
@@ -566,7 +555,7 @@ theorem conjChiralCovector_add
 theorem conjChiralCovector_smul (r : ℂ)
     (t : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) :
     conjChiralCovector (r • t) = star r • conjChiralCovector t := by
-  rw [conjChiralCovector, chiralConjStructure.conjT_smul]
+  rw [conjChiralCovector, (chiralTensor (ι := ι) (G := G)).conjT_smul]
   simp [conjChiralCovector]
 
 end Conjugation
