@@ -27,7 +27,6 @@ prove that they satisfy the equation of motion, and prove some properties of the
   - A.1. Definition of the initial conditions
   - A.2. Relation to other types of initial conditions
     - A.2.1. Initial conditions at arbitrary time
-      - A.2.1.1. Conversion to standard initial conditions
     - A.2.2. Initial conditions from two positions at different times
   - A.3. The zero initial conditions
     - A.3.1. Simple results for the zero initial conditions
@@ -130,6 +129,16 @@ the original specifications.
 We define a type for initial conditions specified at an arbitrary time `t₀`, rather than at `t=0`.
 This is useful when the natural reference point for a problem is not at time zero.
 
+The conversion to the standard `InitialConditions` works by "running the trajectory backward in
+time" from `t₀` to `0`. Given that we know `x(t₀)` and `v(t₀)`, we use the harmonic oscillator
+solution formula with time-reversal to determine what `x(0)` and `v(0)` must have been.
+
+Mathematically, if `x(t) = cos(ωt)·x₀ + (sin(ωt)/ω)·v₀`, then setting `t = t₀`:
+  `x(t₀) = cos(ωt₀)·x₀ + (sin(ωt₀)/ω)·v₀`
+  `v(t₀) = -ω·sin(ωt₀)·x₀ + cos(ωt₀)·v₀`
+
+Solving this linear system for `x₀` and `v₀` gives the formulas in `toInitialConditions` below.
+
 -/
 
 /-- Initial conditions for the harmonic oscillator specified at an arbitrary time `t₀`.
@@ -146,24 +155,6 @@ This is useful when the natural reference point for a problem is not at time zer
   x_t₀ : EuclideanSpace ℝ (Fin 1)
   /-- The velocity at time t₀. -/
   v_t₀ : EuclideanSpace ℝ (Fin 1)
-
-/-!
-
-##### A.2.1.1. Conversion to standard initial conditions
-
-We now define the conversion from `InitialConditionsAtTime` to the standard `InitialConditions`.
-
-The conversion works by "running the trajectory backward in time" from `t₀` to `0`.
-Given that we know `x(t₀)` and `v(t₀)`, we use the harmonic oscillator solution formula
-with time-reversal to determine what `x(0)` and `v(0)` must have been.
-
-Mathematically, if `x(t) = cos(ωt)·x₀ + (sin(ωt)/ω)·v₀`, then setting `t = t₀`:
-  `x(t₀) = cos(ωt₀)·x₀ + (sin(ωt₀)/ω)·v₀`
-  `v(t₀) = -ω·sin(ωt₀)·x₀ + cos(ωt₀)·v₀`
-
-Solving this linear system for `x₀` and `v₀` gives the formulas below.
-
--/
 
 namespace InitialConditionsAtTime
 
