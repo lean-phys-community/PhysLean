@@ -7,7 +7,9 @@ module
 
 public import Physlib.Relativity.Tensors.Contraction.Basic
 public import Physlib.Relativity.Tensors.Contraction.Basis
+public import Physlib.Mathematics.ConjModule
 public import Mathlib.Algebra.Star.Basic
+public import Mathlib.LinearAlgebra.Finsupp.LSum
 
 /-!
 
@@ -291,6 +293,50 @@ lemma conjT_contrT {n : ℕ} {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
   congr 2
   exact congrArg (b (S.τ (S.bar (c i)))) (basisIdxCongr_heq_arg _ _
     (HEq.symm ((cast_heq _ _).trans ((cast_heq _ _).trans (cast_heq _ _)))))
+
+/-!
+
+## E. The slot conjugation
+
+`slotConj` is the conjugate-linear isomorphism `V c ≃ₛₗ[starRingEnd k] V (bar c)`: read off the
+coordinates of a vector in the species basis, conjugate them (`star`), and re-seat them as the
+coordinates at the conjugate colour (the index sets agree by `barIdx_eq`). It is the single-slot
+shadow of `conjT`, packaged as a bundled equivalence so the Hermitian-metric layer can apply it to a
+metric slot. Semilinearity is built in via the coordinate `star`; invertibility is `star`'s
+involutivity together with `bar`'s.
+
+-/
+
+/-- The conjugate-linear slot isomorphism `V c ≃ₛₗ[starRingEnd k] V (bar c)`: conjugate the
+coordinates in the species basis and relabel to the conjugate colour via `barIdx_eq`. -/
+noncomputable def slotConj {c : C} : V c ≃ₛₗ[starRingEnd k] V (S.bar c) :=
+  ((b c).repr.trans (ConjModule.starFinsupp (k := k))).trans
+    ((Finsupp.domLCongr (Equiv.cast (S.barIdx_eq c).symm)).trans (b (S.bar c)).repr.symm)
+
+/-- `slotConj` on a basis vector: `b c i ↦ b (bar c) i` (relabelled through `barIdx_eq`), since the
+basis coordinates of `b c i` are the indicator at `i` and `star` fixes `0` and `1`. -/
+@[simp] lemma slotConj_basis {c : C} (i : basisIdx c) :
+    S.slotConj (b c i) = b (S.bar c) (Equiv.cast (S.barIdx_eq c).symm i) := by
+  simp [slotConj, ConjModule.starFinsupp, Finsupp.domLCongr_apply, Finsupp.mapRange_single]
+
+/-!
+
+## F. Hermitian pairings
+
+A metric slot pairs a colour `c` with its conjugate `bar c` (e.g. a chiral index with the
+anti-chiral one). `IsHermitian` is the structural form of `g_{IJ̄} = conj g_{JĪ}`: conjugating and
+swapping the two slots through `slotConj` returns `g`'s `star`. Because `V c` and `V (bar c)` are
+genuinely different modules this is the honest conjugate-transpose, not a bare `g = g.flip`. The
+seam is locked here as `IsHermitian`; the Kähler-metric layer instantiates it for the δ pairing.
+
+-/
+
+open scoped TensorProduct in
+/-- A pairing `g : V c ⊗ V (bar c) → k` is Hermitian when conjugating and swapping its two slots
+via `slotConj` returns its `star`: `g (x ⊗ y) = star (g (slotConj.symm y ⊗ slotConj x))`. -/
+def IsHermitian {c : C} (g : V c ⊗[k] V (S.bar c) →ₗ[k] k) : Prop :=
+  ∀ (x : V c) (y : V (S.bar c)),
+    g (x ⊗ₜ[k] y) = star (g (S.slotConj.symm y ⊗ₜ[k] S.slotConj x))
 
 end ConjTensorSpecies
 end
