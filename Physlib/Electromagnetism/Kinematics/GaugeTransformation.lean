@@ -111,9 +111,7 @@ lemma ofGradient_apply {d} (χ : SpaceTime d → ℝ) (x : SpaceTime d) (μ : Fi
     simp
   · simp
 
-/-- The pure-gauge potential built from the zero gauge function has all components zero.
-  (Stated pointwise: `ElectromagneticPotential` carries no `Zero` instance, so the bundled
-  form `ofGradient 0 = 0` is not expressible.) -/
+/-- The pure-gauge potential built from the zero gauge function has all components zero. -/
 lemma ofGradient_zero {d} (x : SpaceTime d) (μ : Fin 1 ⊕ Fin d) :
     ofGradient (0 : SpaceTime d → ℝ) x μ = 0 := by
   rw [ofGradient_apply]
