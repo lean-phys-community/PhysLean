@@ -91,7 +91,7 @@ def IsTotalTimeDerivative
 
     δL(t, q, dₜ q) = fderiv ℝ F (t, q) (1, dₜ q)
 -/
-lemma IsTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
+lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
   -- Preliminary construction: properties of the function t => (t, q t)
@@ -216,7 +216,7 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
     (h : IsTotalTimeDerivative (fun _ _ v => δL v)) :
     ∃ g : X, ∀ v, δL v = ⟪g, v⟫_ℝ := by
   classical
-  rcases (IsTotalTimeDerivative_explicit.mp h) with ⟨F, hFdiff, hEq⟩
+  rcases (isTotalTimeDerivative_explicit.mp h) with ⟨F, hFdiff, hEq⟩
 
   -- Derivative of F at (0,0)
   let dF : (Time  × X) →L[ℝ] ℝ :=
