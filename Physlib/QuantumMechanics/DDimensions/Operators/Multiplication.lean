@@ -111,18 +111,13 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
   apply mem_closure_iff_seq_limit.mpr
   obtain ⟨u, hu, hfu⟩ := AEStronglyMeasurable.aemeasurable hf
   let s : ℕ → Set (Space d) := fun n ↦ u ⁻¹' (Metric.closedBall 0 n)
-  let φ : ℕ → SpaceDHilbertSpace d := fun n ↦ mk (f := (s n).indicator ψ) <| by
-    apply memHS_iff.mpr
-    refine ⟨by measurability, by measurability, ?_⟩
-    refine HasFiniteIntegral.mono (memHS_iff.mp (coe_hilbertSpace_memHS ψ)).2.2 ?_
-    refine Eventually.of_forall (fun x ↦ ?_)
-    by_cases hx : x ∈ s n <;> simp [hx]
+  let φ : ℕ → SpaceDHilbertSpace d := fun n ↦
+    mk ((coe_hilbertSpace_memHS ψ).indicator (s := s n) (by measurability))
   have hφ : ∀ n, φ n =ᵐ[volume] (s n).indicator ψ := fun n ↦ coe_mk_ae _
   use φ
   constructor
   · intro n
-    apply memHS_iff.mpr
-    refine ⟨by measurability, by measurability, ?_⟩
+    refine memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
     refine HasFiniteIntegral.mono (memHS_iff.mp (coe_hilbertSpace_memHS (n • φ n))).2.2 ?_
     filter_upwards [hfu, coeFn_smul n (φ n).val, hφ n] with x h₁ h₂ h₃
     by_cases hx : x ∈ s n
@@ -150,17 +145,10 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
       simp_all
     · filter_upwards with x
       rw [← zero_pow two_ne_zero, ← enorm_zero (E := ℂ)]
-      refine ENNReal.Tendsto.pow ?_
-      refine Tendsto.enorm ?_
-      refine tendsto_nhds_of_eventually_eq ?_
-      apply eventually_atTop.mpr
-      use ⌈‖u x‖⌉.toNat
-      intro n hn
+      refine ENNReal.Tendsto.pow (Tendsto.enorm (tendsto_nhds_of_eventually_eq ?_))
+      refine eventually_atTop.mpr ⟨⌈‖u x‖⌉₊, fun n hn ↦ ?_⟩
       suffices ‖u x‖ ≤ n by simp [s, this]
-      calc
-        _ ≤ (⌈‖u x‖⌉ : ℝ) := Int.le_ceil _
-        _ ≤ ⌈‖u x‖⌉.toNat := Int.cast_le.mpr (Int.self_le_toNat _)
-        _ ≤ n := Nat.cast_le.mpr hn
+      exact (Nat.le_ceil _).trans (by exact_mod_cast hn)
 
 open SchwartzMap SchwartzSubmodule in
 lemma mulOperator_domain_ge_of_hasTemperateGrowth
@@ -169,7 +157,6 @@ lemma mulOperator_domain_ge_of_hasTemperateGrowth
   obtain ⟨g, hg⟩ := schwartzEquiv.surjective ⟨ψ, hψ⟩
   let w : 𝓢(Space d, ℂ) := smulLeftCLM ℂ f g
   let φ : SpaceDHilbertSpace d := schwartzEquiv w
-  apply mem_mulOperator_domain_iff.mpr
   refine memHS_of_ae φ (coe_hilbertSpace_memHS φ) ?_
   filter_upwards [schwartzEquiv_coe_ae w, schwartzEquiv_coe_ae g] with x h₁ h₂
   simp [w, φ, h₁, ← h₂, hg, smulLeftCLM_apply_apply hf]
@@ -202,12 +189,8 @@ private lemma exists_monotone_sets_hasFiniteIntegral
   · ext x
     simp only [Set.mem_iUnion, Set.mem_univ, iff_true]
     use max ⌈‖x‖⌉.toNat (max ⌈‖w₁ x‖⌉.toNat ⌈‖w₂ x‖⌉.toNat)
-    suffices ∀ r : ℝ, 0 ≤ r → r ≤ ⌈r⌉.toNat by simp [s, this]
-    intro r hr
-    calc
-      r ≤ ⌈r⌉ := Int.le_ceil r
-      _ = (⌈r⌉.toNat : ℤ) := by simp [Int.ceil_nonneg hr]
-      _ = ⌈r⌉.toNat := AddGroupWithOne.intCast_ofNat _
+    suffices ∀ r : ℝ, r ≤ ⌈r⌉.toNat by simp [s, this]
+    exact fun r ↦ (Int.le_ceil r).trans (by exact_mod_cast Int.self_le_toNat _)
   · intro k hk n
     refine lt_of_le_of_lt (b := ‖(n : ℝ) ^ 2‖ₑ * volume (s n)) ?_ ?_
     · rw [← setLIntegral_const]
@@ -249,12 +232,11 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
         (setLIntegral_eq_of_support_subset fun x hx ↦ by simp_all [w]).symm
     exact setLIntegral_congr_fun (hs_meas n) fun x hx ↦ by simp [w, hx, ← mul_assoc, ← pow_two]
   suffices ∀ n, ∫⁻ x in s n, ‖‖f x‖ ^ 2 * ‖ψ x‖ ^ 2‖ₑ ≤ ∫⁻ x, ‖‖ξ x‖ ^ 2‖ₑ by
-    apply mem_mulOperator_domain_iff.mpr
     refine memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
     refine lt_of_le_of_lt ?_ (memHS_iff.mp <| coe_hilbertSpace_memHS ξ).2.2
     trans ⨆ n, ∫⁻ x in s n, ‖‖f x‖ ^ 2 * ‖ψ x‖ ^ 2‖ₑ
-    · rw [← setLIntegral_univ, ← hs_univ]
-      rw [setLIntegral_iUnion_of_directed _ (directed_of_isDirected_le hs_mono)]
+    · rw [← setLIntegral_univ, ← hs_univ,
+        setLIntegral_iUnion_of_directed _ (directed_of_isDirected_le hs_mono)]
       simp [mul_pow]
     exact iSup_le this
   intro n
@@ -276,16 +258,12 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
       intro ψ
       rw [Lp.norm_def, eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ENNReal.ofNat_ne_top]
       simp [← ENNReal.toReal_pow, ← ENNReal.rpow_mul_natCast]
-  suffices (‖φ n‖ ^ 2) ^ 2 ≤ (‖ξ‖ * ‖φ n‖) ^ 2 by
-    by_cases! h : ‖φ n‖ = 0
-    · rw [h, zero_pow two_ne_zero]
-      exact pow_two_nonneg _
-    · rw [pow_two, mul_pow] at this
-      refine (mul_le_mul_iff_left₀ <| sq_pos_iff.mpr h).mp this
+  suffices ‖φ n‖ ^ 2 ≤ ‖ξ‖ * ‖φ n‖ by
+    nlinarith [this, sq_nonneg (‖ξ‖ - ‖φ n‖)]
   calc
-    _ = ‖⟪φ n, φ n⟫_ℂ‖ ^ 2 := by simp
-    _ = ‖⟪ψ, 𝓜 f ⟨φ n, hφ n⟩⟫_ℂ‖ ^ 2 := by
-      refine congrArg (fun r ↦ ‖r‖ ^ 2) ?_
+    _ = ‖⟪φ n, φ n⟫_ℂ‖ := by simp
+    _ = ‖⟪ψ, 𝓜 f ⟨φ n, hφ n⟩⟫_ℂ‖ := by
+      refine congrArg norm ?_
       refine integral_congr_ae ?_
       filter_upwards [coe_mk_ae (hw n), mulOperator_apply_ae ⟨φ n, hφ n⟩] with x h₁ h₂
       by_cases hx : x ∈ s n
@@ -297,9 +275,9 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
             simp_rw [← normSq_eq_norm_sq, Complex.ofReal_mul, normSq_eq_conj_mul_self, mul_comm]
           _ = f x * w n x * conj (ψ x) := by simp [w, hx, mul_assoc]
       · simp [φ, h₁, h₂, w, hx]
-    _ = ‖⟪ξ, φ n⟫_ℂ‖ ^ 2 := by
+    _ = ‖⟪ξ, φ n⟫_ℂ‖ := by
       rw [(adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf) ⟨ψ, hψ⟩ ⟨φ n, hφ n⟩).symm]
-    _ ≤ (‖ξ‖ * ‖φ n‖) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) (norm_inner_le_norm ξ (φ n)) 2
+    _ ≤ ‖ξ‖ * ‖φ n‖ := norm_inner_le_norm ξ (φ n)
 
 lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (𝓜 f)† = 𝓜 (conj ∘ f) := by
@@ -320,8 +298,7 @@ lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurab
 lemma mulOperator_isSelfAdjoint_ofReal
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f) (hf' : conj ∘ f = f) :
     IsSelfAdjoint (𝓜 f) := by
-  apply isSelfAdjoint_def.mpr
-  rw [mulOperator_adjoint_eq_conj hf, hf']
+  rw [isSelfAdjoint_def, mulOperator_adjoint_eq_conj hf, hf']
 
 /-!
 ## D. Closable & unbounded
@@ -329,12 +306,9 @@ lemma mulOperator_isSelfAdjoint_ofReal
 
 lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (𝓜 f).IsClosable := by
-  refine isClosable_of_exists_dense_formalAdjoint ?_ ?_
-  · exact mulOperator_hasDenseDomain hf
-  · refine ⟨𝓜 (conj ∘ f), ?_, ?_⟩
-    · exact mulOperator_hasDenseDomain (by measurability)
-    · rw [← mulOperator_adjoint_eq_conj hf]
-      exact adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)
+  refine isClosable_of_exists_dense_formalAdjoint (mulOperator_hasDenseDomain hf) ?_
+  exact ⟨𝓜 (conj ∘ f), mulOperator_hasDenseDomain (by measurability),
+    mulOperator_adjoint_eq_conj hf ▸ adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)⟩
 
 lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
     (𝓜 f).IsUnbounded :=
@@ -348,7 +322,6 @@ lemma mulOperator_compRestricted_le (f g : Space d → ℂ) : 𝓜 f ∘ᵣ 𝓜
   constructor
   · intro ψ hψ
     obtain ⟨hψ, hgψ⟩ := mem_compRestricted_domain_iff.mp hψ
-    apply mem_mulOperator_domain_iff.mpr
     refine memHS_of_ae _ (mem_mulOperator_domain_iff.mp hgψ) ?_
     filter_upwards [mulOperator_apply_ae ⟨ψ, hψ⟩]
     simp_all [mul_assoc]
@@ -364,9 +337,7 @@ lemma mulOperator_compRestricted_eq (f : Space d → ℂ) {g : Space d → ℂ} 
   have hle := mulOperator_compRestricted_le f g
   refine eq_of_le_of_domain_eq hle ?_
   refine eq_of_le_of_ge hle.1 fun ψ hψ ↦ ?_
-  apply mem_compRestricted_domain_iff.mpr
-  use h ▸ Submodule.mem_top
-  apply mem_mulOperator_domain_iff.mpr
+  refine mem_compRestricted_domain_iff.mpr ⟨h ▸ Submodule.mem_top, ?_⟩
   refine memHS_of_ae _ (mem_mulOperator_domain_iff.mp hψ) ?_
   filter_upwards [mulOperator_apply_ae ⟨ψ, h ▸ Submodule.mem_top⟩]
   simp_all [mul_assoc]
