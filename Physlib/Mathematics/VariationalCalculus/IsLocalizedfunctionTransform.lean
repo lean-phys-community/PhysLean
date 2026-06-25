@@ -39,6 +39,18 @@ def IsLocalizedFunctionTransform (F : (X → U) → (Y → V)) : Prop :=
 end
 namespace IsLocalizedFunctionTransform
 
+/-- If `φ` and `φ'` agree on `Metric.cthickening 1 K` and `x ∈ K`, then `φ` and `φ'` agree on a
+neighborhood of `x`. This packages the recurring locality argument used to transport equalities
+through `fderiv`/`deriv`-style operators. -/
+lemma eventuallyEq_of_eq_on_cthickening {X : Type*} {α : Type*} [PseudoEMetricSpace X] {K : Set X}
+    {φ φ' : X → α} (hφ : ∀ x ∈ Metric.cthickening 1 K, φ x = φ' x) {x : X} (hx : x ∈ K) :
+    φ =ᶠ[nhds x] φ' := by
+  apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
+  · apply Metric.isOpen_thickening.mem_nhds
+    exact Metric.self_subset_thickening one_pos K hx
+  · intro y hy
+    exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
+
 section
 variable
   {X} [NormedAddCommGroup X]
@@ -105,42 +117,28 @@ variable
   {U}
   {V}
 
-lemma mul_left {F : (X → ℝ) → (X → ℝ)} {ψ : X → ℝ} (hF : IsLocalizedFunctionTransform F) :
-    IsLocalizedFunctionTransform (fun φ x => ψ x * F φ x) := by
+/-- Localization is preserved by any pointwise post-composition `g x (F φ x)`, since the
+result on `K` still depends only on `F φ` there. Used to derive `mul_left`, `mul_right` and
+`smul_left`. -/
+private lemma postcomp {W} {F : (X → U) → (X → V)} {g : X → V → W}
+    (hF : IsLocalizedFunctionTransform F) :
+    IsLocalizedFunctionTransform (fun φ x => g x (F φ x)) := by
   intro K cK
-  obtain ⟨L,cL,h⟩ := hF K cK
-  refine ⟨L,cL, ?_⟩
-  intro _ _ hφ _ _;
-  simp only [mul_eq_mul_left_iff]
-  left
-  apply h
-  · simp_all
-  · simp_all
+  obtain ⟨L, cL, h⟩ := hF K cK
+  exact ⟨L, cL, fun φ φ' hφ x hx => by dsimp only; rw [h φ φ' hφ x hx]⟩
+
+lemma mul_left {F : (X → ℝ) → (X → ℝ)} {ψ : X → ℝ} (hF : IsLocalizedFunctionTransform F) :
+    IsLocalizedFunctionTransform (fun φ x => ψ x * F φ x) :=
+  postcomp (g := fun x v => ψ x * v) hF
 
 lemma mul_right {F : (X → ℝ) → (X → ℝ)} {ψ : X → ℝ} (hF : IsLocalizedFunctionTransform F) :
-    IsLocalizedFunctionTransform (fun φ x => F φ x * ψ x) := by
-  intro K cK
-  obtain ⟨L,cL,h⟩ := hF K cK
-  refine ⟨L,cL, ?_⟩
-  intro _ _ hφ _ _;
-  simp only [mul_eq_mul_right_iff]
-  left
-  apply h
-  · simp_all
-  · simp_all
+    IsLocalizedFunctionTransform (fun φ x => F φ x * ψ x) :=
+  postcomp (g := fun x v => v * ψ x) hF
 
 lemma smul_left [NormedAddCommGroup V] [NormedSpace ℝ V] {F : (X → U) → (X → V)} {ψ : X → ℝ}
     (hF : IsLocalizedFunctionTransform F) :
-    IsLocalizedFunctionTransform (fun φ x => ψ x • F φ x) := by
-  intro K cK
-  obtain ⟨L,cL,h⟩ := hF K cK
-  refine ⟨L,cL, ?_⟩
-  intro _ _ hφ _ _;
-  simp only
-  congr 1
-  apply h
-  · simp_all
-  · simp_all
+    IsLocalizedFunctionTransform (fun φ x => ψ x • F φ x) :=
+  postcomp (g := fun x v => ψ x • v) hF
 
 lemma div {d} : IsLocalizedFunctionTransform fun (φ : Space d → EuclideanSpace ℝ (Fin d)) x =>
     Space.div φ x := by
@@ -150,21 +148,8 @@ lemma div {d} : IsLocalizedFunctionTransform fun (φ : Space d → EuclideanSpac
   · exact IsCompact.cthickening cK
   · intro φ φ' hφ
     have h : ∀ (i : Fin d), ∀ x ∈ K,
-        (fun x => (φ x) i) =ᶠ[nhds x] fun x => (φ' x) i := by
-      intro i x hx
-      apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      refine mem_interior_iff_mem_nhds.mp ?_
-      rw [@mem_interior]
-      use Metric.thickening 1 K
-      simp only [subset_refl, true_and]
-      apply And.intro
-      · exact Metric.isOpen_thickening
-      · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-        use x
-        simpa using hx
-      · intro x hx
-        have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-        simp_all
+        (fun x => (φ x) i) =ᶠ[nhds x] fun x => (φ' x) i := fun i x hx =>
+      eventuallyEq_of_eq_on_cthickening (fun y hy => by rw [hφ y hy]) hx
     intro x hx; dsimp;
     simp [Space.div,Space.deriv]
     congr; funext i; congr 1
@@ -178,21 +163,8 @@ lemma div_comp_repr {d} : IsLocalizedFunctionTransform fun (φ : Space d → Spa
   · exact IsCompact.cthickening cK
   · intro φ φ' hφ
     have h : ∀ (i : Fin d), ∀ x ∈ K,
-        (fun x => (φ x) i) =ᶠ[nhds x] fun x => (φ' x) i := by
-      intro i x hx
-      apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      refine mem_interior_iff_mem_nhds.mp ?_
-      rw [@mem_interior]
-      use Metric.thickening 1 K
-      simp only [subset_refl, true_and]
-      apply And.intro
-      · exact Metric.isOpen_thickening
-      · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-        use x
-        simpa using hx
-      · intro x hx
-        have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-        simp_all
+        (fun x => (φ x) i) =ᶠ[nhds x] fun x => (φ' x) i := fun i x hx =>
+      eventuallyEq_of_eq_on_cthickening (fun y hy => by rw [hφ y hy]) hx
     intro x hx; dsimp;
     simp [Space.div,Space.deriv]
     congr; funext i; congr 1
@@ -209,20 +181,7 @@ lemma grad : IsLocalizedFunctionTransform fun (ψ : Space d → ℝ) x => Space.
     congr
     funext i
     congr 2
-    refine Filter.EventuallyEq.fderiv_eq ?_
-    apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-    refine mem_interior_iff_mem_nhds.mp ?_
-    rw [@mem_interior]
-    use Metric.thickening 1 K
-    simp only [subset_refl, true_and]
-    apply And.intro
-    · exact Metric.isOpen_thickening
-    · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-      use x
-      simpa using hx
-    · intro x hx
-      have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-      simp_all
+    exact Filter.EventuallyEq.fderiv_eq (eventuallyEq_of_eq_on_cthickening hφ hx)
 
 lemma gradient : IsLocalizedFunctionTransform fun (ψ : Space d → ℝ) x => gradient ψ x := by
   intro K cK
@@ -235,20 +194,7 @@ lemma gradient : IsLocalizedFunctionTransform fun (ψ : Space d → ℝ) x => gr
     congr
     funext i
     congr 2
-    refine Filter.EventuallyEq.fderiv_eq ?_
-    apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-    refine mem_interior_iff_mem_nhds.mp ?_
-    rw [@mem_interior]
-    use Metric.thickening 1 K
-    simp only [subset_refl, true_and]
-    apply And.intro
-    · exact Metric.isOpen_thickening
-    · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-      use x
-      simpa using hx
-    · intro x hx
-      have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-      simp_all
+    exact Filter.EventuallyEq.fderiv_eq (eventuallyEq_of_eq_on_cthickening hφ hx)
 
 lemma clm_apply [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup U] [NormedSpace ℝ U]
     (f : X → (U →L[ℝ] V)) : IsLocalizedFunctionTransform fun φ x => (f x) (φ x) := by
@@ -261,24 +207,9 @@ lemma deriv [NormedAddCommGroup U] [NormedSpace ℝ U] :
   use (Metric.cthickening 1 K)
   constructor
   · exact IsCompact.cthickening cK
-  · intro φ φ' hφ
-    have h : ∀ x ∈ K, φ =ᶠ[nhds x] φ' := by
-      intro x hx
-      apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      refine mem_interior_iff_mem_nhds.mp ?_
-      rw [@mem_interior]
-      use Metric.thickening 1 K
-      simp only [subset_refl, true_and]
-      apply And.intro
-      · exact Metric.isOpen_thickening
-      · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-        use x
-        simpa using hx
-      · intro x hx
-        have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-        exact hφ x hx'
-    intro x hx; dsimp;
-    apply (h x hx).deriv_eq
+  · intro φ φ' hφ x hx
+    dsimp
+    exact (eventuallyEq_of_eq_on_cthickening hφ hx).deriv_eq
 
 lemma fderiv [NormedAddCommGroup U] [NormedSpace ℝ U]
     [NormedSpace ℝ X] [ProperSpace X] {dx : X} :
@@ -287,44 +218,17 @@ lemma fderiv [NormedAddCommGroup U] [NormedSpace ℝ U]
   use (Metric.cthickening 1 K)
   constructor
   · exact IsCompact.cthickening cK
-  · intro φ φ' hφ
-    have h : ∀ x ∈ K, φ =ᶠ[nhds x] φ' := by
-      intro x hx
-      apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      refine mem_interior_iff_mem_nhds.mp ?_
-      rw [@mem_interior]
-      use Metric.thickening 1 K
-      simp only [subset_refl, true_and]
-      apply And.intro
-      · exact Metric.isOpen_thickening
-      · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-        use x
-        simpa using hx
-      · intro x hx
-        have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-        exact hφ x hx'
-    intro x hx; dsimp; congr 1
-    rw [Filter.EventuallyEq.fderiv_eq (h x hx)]
+  · intro φ φ' hφ x hx
+    dsimp; congr 1
+    rw [Filter.EventuallyEq.fderiv_eq (eventuallyEq_of_eq_on_cthickening hφ hx)]
 
 lemma fst {F : (X → U) → X → W × V} (hF : IsLocalizedFunctionTransform F) :
-    IsLocalizedFunctionTransform (fun φ x => (F φ x).1) := by
-  intro K cK
-  obtain ⟨L,cL,h⟩ := hF K cK
-  refine ⟨L,cL, ?_⟩
-  intro _ _ hφ _ _;
-  simp only
-  congr 1
-  (expose_names; exact h φ φ' hφ x h_1)
+    IsLocalizedFunctionTransform (fun φ x => (F φ x).1) :=
+  postcomp (g := fun _ p => p.1) hF
 
 lemma snd {F : (X → U) → X → W × V} (hF : IsLocalizedFunctionTransform F) :
-    IsLocalizedFunctionTransform (fun φ x => (F φ x).2) := by
-  intro K cK
-  obtain ⟨L,cL,h⟩ := hF K cK
-  refine ⟨L,cL, ?_⟩
-  intro _ _ hφ _ _;
-  simp only
-  congr 1
-  (expose_names; exact h φ φ' hφ x h_1)
+    IsLocalizedFunctionTransform (fun φ x => (F φ x).2) :=
+  postcomp (g := fun _ p => p.2) hF
 
 lemma prod {F : (X → U) → X → W}
     {G : (X → U) → X → V} (hF : IsLocalizedFunctionTransform F)
@@ -352,20 +256,7 @@ lemma adjFDeriv {dy} [NormedSpace ℝ X] [ProperSpace X]
     simp only
     congr 1
     simp only [DFunLike.coe_fn_eq]
-    apply Filter.EventuallyEq.fderiv_eq
-    apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-    refine mem_interior_iff_mem_nhds.mp ?_
-    rw [@mem_interior]
-    use Metric.thickening 1 K
-    simp only [subset_refl, true_and]
-    apply And.intro
-    · exact Metric.isOpen_thickening
-    · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-      use x
-      simpa using hx
-    · intro x hx
-      have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-      exact hφ x hx'
+    exact Filter.EventuallyEq.fderiv_eq (eventuallyEq_of_eq_on_cthickening hφ hx)
 
 end
 end IsLocalizedFunctionTransform
