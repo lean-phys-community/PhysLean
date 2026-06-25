@@ -515,175 +515,54 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
     (hx : ContDiff ℝ ∞ x) :
     S.EquationOfMotion x ∧ x 0 = IC.x₀ ∧ ∂ₜ x 0 = IC.v₀ →
     x = IC.trajectory S := by
-  intro h
-  rcases h with ⟨hEOM, hx0, hv0⟩
-
-  -- Newton form for x
-  have hNewt_x :
-      ∀ t, S.m • ∂ₜ (∂ₜ x) t = force S (x t) :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := x) hx).1 hEOM
-
-  -- Newton form for the explicit trajectory
-  have hTrajContDiff : ContDiff ℝ ∞ (IC.trajectory S) := by
-    -- trajectory_contDiff already exists and is [fun_prop]
-    fun_prop
-
-  have hNewt_traj :
-      ∀ t, S.m • ∂ₜ (∂ₜ (IC.trajectory S)) t = force S ((IC.trajectory S) t) :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := IC.trajectory S) hTrajContDiff).1
-      (trajectory_equationOfMotion S IC)
-
-  -- Define the difference y = x - traj
+  rintro ⟨hEOM, hx0, hv0⟩
+  have hTraj : ContDiff ℝ ∞ (IC.trajectory S) := by fun_prop
+  -- Time-derivative of a difference of differentiable functions, used below on `x - traj`.
+  have dsub : ∀ f g : Time → EuclideanSpace ℝ (Fin 1),
+      Differentiable ℝ f → Differentiable ℝ g →
+      ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
+    intro f g hf hg
+    funext t
+    simp only [Time.deriv_eq, fderiv_fun_sub (hf t) (hg t), ContinuousLinearMap.sub_apply]
+  -- The difference `y := x - traj` is smooth, again solves the equation of motion (the force is
+  -- linear), and has vanishing initial data; energy conservation then forces `y = 0`.
   set y : Time → EuclideanSpace ℝ (Fin 1) := fun t => x t - IC.trajectory S t with hydef
-
-  have hyContDiff : ContDiff ℝ ∞ y := by
-    -- ContDiff closed under subtraction
-    simpa [hydef] using hx.sub hTrajContDiff
-
-  -- First derivative of y
-  have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t := by
-    funext t
-    -- same style as in trajectory_velocity: unfold Time.deriv and use fderiv_fun_sub
-    rw [hydef, Time.deriv]
-    -- ContDiff implies DifferentiableAt - use this explicitly since fun_prop can't infer it
-    -- ContDiff ℝ ∞ f implies ContDiffAt ℝ ∞ f t for any t
-    have hx_contDiffAt : ContDiffAt ℝ ∞ x t := hx.contDiffAt
-    have htraj_contDiffAt : ContDiffAt ℝ ∞ (IC.trajectory S) t := hTrajContDiff.contDiffAt
-    have hx_diff : DifferentiableAt ℝ x t :=
-      ContDiffAt.differentiableAt hx_contDiffAt (by simp)
-    have htraj_diff : DifferentiableAt ℝ (IC.trajectory S) t :=
-      ContDiffAt.differentiableAt htraj_contDiffAt (by simp)
-    rw [fderiv_fun_sub hx_diff htraj_diff]
-    simp only [_root_.sub_apply, Time.deriv]
-
-  -- Second derivative of y
-  have hy_deriv2 :
-      ∂ₜ (∂ₜ y) = fun t => ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
-    funext t
-    rw [hy_deriv, Time.deriv]
-    -- now differentiate (∂ₜ x - ∂ₜ traj)
-    -- use differentiability of time-derivatives from ContDiff
-    have hx1 : Differentiable ℝ (fun t => ∂ₜ x t) :=
-      deriv_differentiable_of_contDiff x hx
-    have htr1 : Differentiable ℝ (fun t => ∂ₜ (IC.trajectory S) t) :=
-      deriv_differentiable_of_contDiff (IC.trajectory S) hTrajContDiff
-    -- Apply fderiv_fun_sub and use Time.deriv to convert back
-    -- Differentiable ℝ f means ∀ x, DifferentiableAt ℝ f x
-    -- In Mathlib, Differentiable is defined as ∀ x, DifferentiableAt, so we can apply directly
-    have hx1_at : DifferentiableAt ℝ (fun t => ∂ₜ x t) t := hx1 t
-    have htr1_at : DifferentiableAt ℝ (fun t => ∂ₜ (IC.trajectory S) t) t := htr1 t
-    rw [fderiv_fun_sub hx1_at htr1_at]
-    -- Now we need to show fderiv of (fun t => fderiv ℝ x t 1) equals fderiv of (∂ₜ x)
-    -- This follows from Time.deriv f t = fderiv ℝ f t 1
-    simp only [sub_apply]
-    rw [Time.deriv, Time.deriv]
-
-  -- Newton form for y (linearity of force)
-  have hNewt_y : ∀ t, S.m • ∂ₜ (∂ₜ y) t = force S (y t) := by
-    intro t
-    have hy2t : ∂ₜ (∂ₜ y) t =
-        (∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t) := by
-      simpa using congrFun hy_deriv2 t
-
-    -- Expand and substitute Newton laws for x and traj, then fold back using force_eq_linear
-    calc
-      S.m • ∂ₜ (∂ₜ y) t
-          = S.m • (∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t) := by
-              simp [hy2t]
-      _ = (S.m • ∂ₜ (∂ₜ x) t) - (S.m • ∂ₜ (∂ₜ (IC.trajectory S)) t) := by
-              simp [smul_sub]
-      _ = force S (x t) - force S ((IC.trajectory S) t) := by
-              simp [hNewt_x t, hNewt_traj t]
-      _ = force S (y t) := by
-              -- force = -k•x, so it is linear: force(x) - force(traj) = force(x-traj)
-              -- and y t = x t - traj t by definition
-              simp [hydef, force_eq_linear, smul_sub]
-
-  -- Turn Newton form back into EquationOfMotion for y
+  have hyContDiff : ContDiff ℝ ∞ y := hx.sub hTraj
+  have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t :=
+    dsub x _ (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
+  have hy_deriv2 : ∂ₜ (∂ₜ y) = fun t => ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
+    rw [hy_deriv]
+    exact dsub _ _ (deriv_differentiable_of_contDiff _ hx)
+      (deriv_differentiable_of_contDiff _ hTraj)
+  have hNewt_x := (S.equationOfMotion_iff_newtons_2nd_law x hx).1 hEOM
+  have hNewt_traj := (S.equationOfMotion_iff_newtons_2nd_law (IC.trajectory S) hTraj).1
+    (trajectory_equationOfMotion S IC)
   have hEOM_y : S.EquationOfMotion y :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := y) hyContDiff).2 hNewt_y
-
-  -- Initial conditions for y are zero
-  have hy0 : y 0 = 0 := by
-    -- y 0 = x 0 - traj 0 = IC.x₀ - IC.x₀
-    simp [hydef, hx0]
-
-  have hyv0 : ∂ₜ y 0 = 0 := by
-    -- ∂ₜ y 0 = ∂ₜ x 0 - ∂ₜ traj 0 = IC.v₀ - IC.v₀
-    rw [congr_fun hy_deriv 0]
-    rw [hv0, trajectory_velocity_at_zero S IC]
-    simp
-
-  -- Energy at time 0 is 0
-  have hE0 : S.energy y 0 = 0 := by
-    -- unfold energy, kinetic, potential and use hy0, hyv0
-    simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,
-      HarmonicOscillator.potentialEnergy, hy0, hyv0, one_div, smul_eq_mul]
-
-  -- Energy is constant, hence always 0
-  have hE : ∀ t, S.energy y t = 0 := by
-    intro t
-    have ht := S.energy_conservation_of_equationOfMotion' (xₜ := y) hyContDiff hEOM_y t
-    simpa [hE0] using ht
-
-  -- From energy=0 and positivity => y(t)=0
-  have hy_all : ∀ t, y t = 0 := by
-    intro t
-    have hEt : S.energy y t = 0 := hE t
-
-    have hk_nonneg : 0 ≤ S.kineticEnergy y t := by
-      unfold HarmonicOscillator.kineticEnergy
-      have hcoeff : 0 ≤ (1 / (2 : ℝ)) * S.m := by
-        exact mul_nonneg (by norm_num) (le_of_lt S.m_pos)
-      -- Use the same approach as for potential energy below
-      have hin : 0 ≤ inner ℝ (∂ₜ y t) (∂ₜ y t) := by
-        -- For EuclideanSpace ℝ (Fin 1), inner product with itself is nonnegative
-        exact real_inner_self_nonneg (x := ∂ₜ y t)
-      exact mul_nonneg hcoeff hin
-
-    have hp_nonneg : 0 ≤ S.potentialEnergy (y t) := by
-      unfold HarmonicOscillator.potentialEnergy
-      -- potentialEnergy = (1/2) * k * ⟪y,y⟫
-      simp only [one_div, smul_eq_mul]
-      -- Goal is 0 ≤ 2⁻¹ * (S.k * inner ℝ (y t) (y t))
-      apply mul_nonneg
-      · norm_num -- 0 ≤ 2⁻¹
-      · -- 0 ≤ S.k * inner ℝ (y t) (y t)
-        have hk_pos : 0 ≤ S.k := le_of_lt S.k_pos
-        have hin : 0 ≤ inner ℝ (y t) (y t) := by
-          -- For EuclideanSpace ℝ (Fin 1), inner product with itself is nonnegative
-          exact real_inner_self_nonneg (x := y t)
-        exact mul_nonneg hk_pos hin
-
-    have hp_le : S.potentialEnergy (y t) ≤ S.energy y t := by
-      unfold HarmonicOscillator.energy
-      exact le_add_of_nonneg_left hk_nonneg
-
-    have hp0 : S.potentialEnergy (y t) = 0 := by
-      have : S.potentialEnergy (y t) ≤ 0 := by
-        calc
-          S.potentialEnergy (y t) ≤ S.energy y t := hp_le
-          _ = 0 := hEt
-      exact le_antisymm this hp_nonneg
-
-    -- extract ⟪y,y⟫ = 0 from potentialEnergy = 0, then y=0
-    have hy_inner0 : inner ℝ (y t) (y t) = 0 := by
-      -- potentialEnergy = (1/2) * k * ⟪y,y⟫
-      have hmul : ((1 / (2 : ℝ)) * S.k) * inner ℝ (y t) (y t) = 0 := by
-        simpa [HarmonicOscillator.potentialEnergy, one_div, smul_eq_mul, mul_assoc] using hp0
-      have hcoeff : ((1 / (2 : ℝ)) * S.k) ≠ 0 := by
-        exact mul_ne_zero (by norm_num) (S.k_ne_zero)
-      rcases mul_eq_zero.mp hmul with hcoeff0 | hinner
-      · exact (False.elim (hcoeff hcoeff0))
-      · exact hinner
-
-    exact (inner_self_eq_zero.mp hy_inner0)
-
-  -- Conclude x = traj
+    (S.equationOfMotion_iff_newtons_2nd_law y hyContDiff).2 fun t => by
+      rw [hy_deriv2]
+      simp [smul_sub, hNewt_x, hNewt_traj, hydef, force_eq_linear]
+  have hE : ∀ t, S.energy y t = 0 := fun t =>
+    (S.energy_conservation_of_equationOfMotion' y hyContDiff hEOM_y t).trans <| by
+      have hy0 : y 0 = 0 := by simp [hydef, hx0]
+      have hyv0 : ∂ₜ y 0 = 0 := by
+        rw [congrFun hy_deriv 0, hv0, trajectory_velocity_at_zero S IC]; simp
+      simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,
+        HarmonicOscillator.potentialEnergy, hy0, hyv0, one_div, smul_eq_mul]
+  -- Both energies are nonnegative, so a vanishing total energy forces `y t = 0`.
   funext t
-  have : y t = 0 := hy_all t
-  -- y t = x t - traj t
-  simpa [hydef] using (sub_eq_zero.mp this)
+  have hk : 0 ≤ S.kineticEnergy y t := by
+    simp only [HarmonicOscillator.kineticEnergy]
+    exact mul_nonneg (mul_nonneg (by norm_num) S.m_pos.le) real_inner_self_nonneg
+  have hp : 0 ≤ S.potentialEnergy (y t) := by
+    simp only [HarmonicOscillator.potentialEnergy, smul_eq_mul]
+    exact mul_nonneg (by norm_num) (mul_nonneg S.k_pos.le real_inner_self_nonneg)
+  have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp (hE t)).2
+  simp only [HarmonicOscillator.potentialEnergy, smul_eq_mul] at hpe
+  rcases mul_eq_zero.mp hpe with h | h
+  · norm_num at h
+  · have hyt : x t - IC.trajectory S t = 0 :=
+      inner_self_eq_zero.mp ((mul_eq_zero.mp h).resolve_left S.k_ne_zero)
+    exact sub_eq_zero.mp hyt
 
 /-!
 

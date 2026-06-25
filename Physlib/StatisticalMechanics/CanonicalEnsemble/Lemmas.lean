@@ -248,76 +248,15 @@ theorem helmholtzFreeEnergy_eq_meanEnergy_sub_temp_mul_thermodynamicEntropy
     (hE : Integrable 𝓒.energy (𝓒.μProd T)) :
     𝓒.helmholtzFreeEnergy T
       = 𝓒.meanEnergy T - T.val * 𝓒.thermodynamicEntropy T := by
-  have hSdiff :=
-    𝓒.differentialEntropy_eq_kB_beta_meanEnergy_add_kB_log_mathZ
-      (T:=T) (hE:=hE)
-  have hScorr :=
-    𝓒.thermodynamicEntropy_eq_differentialEntropy_sub_correction
-      (T:=T) (hE:=hE)
-  have hkβ : (kB : ℝ) * (T.β : ℝ) = 1 / T.val :=
-    kB_mul_beta T hT
-  have hTne : (T.val : ℝ) ≠ 0 := by exact_mod_cast (ne_of_gt hT)
-  have hS_form :
-      𝓒.thermodynamicEntropy T
-        = kB * (T.β : ℝ) * 𝓒.meanEnergy T
-            + kB * Real.log (𝓒.mathematicalPartitionFunction T)
-            - kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit := by
-    calc
-      𝓒.thermodynamicEntropy T
-          = 𝓒.differentialEntropy T
-              - kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit := hScorr
-      _ = (kB * (T.β : ℝ) * 𝓒.meanEnergy T
-              + kB * Real.log (𝓒.mathematicalPartitionFunction T))
-            - kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit := by
-              simp [hSdiff]
-      _ = _ := by
-              simp [add_comm, sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc]
-  have hkβT : T.val * (kB * (T.β : ℝ)) = 1 := by
-    simp [hkβ, hTne]
-  have h_rhs :
-      𝓒.meanEnergy T - T.val * 𝓒.thermodynamicEntropy T
-        = -kB * T.val *
-            (Real.log (𝓒.mathematicalPartitionFunction T)
-              - (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit) := by
-    have := hS_form
-    calc
-      𝓒.meanEnergy T - T.val * 𝓒.thermodynamicEntropy T
-          = 𝓒.meanEnergy T -
-              T.val *
-                (kB * (T.β : ℝ) * 𝓒.meanEnergy T
-                  + kB * Real.log (𝓒.mathematicalPartitionFunction T)
-                  - kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit) := by
-                rw [this]
-      _ = 𝓒.meanEnergy T
-            - T.val * (kB * (T.β : ℝ)) * 𝓒.meanEnergy T
-            - T.val * kB * Real.log (𝓒.mathematicalPartitionFunction T)
-            + T.val * kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit := by
-              ring
-      _ = 𝓒.meanEnergy T - 1 * 𝓒.meanEnergy T
-            - T.val * kB * Real.log (𝓒.mathematicalPartitionFunction T)
-            + T.val * kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit := by
-              simp [hkβT, mul_comm, mul_assoc]
-      _ = -kB * T.val *
-            (Real.log (𝓒.mathematicalPartitionFunction T)
-              - (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit) := by
-              simp [sub_eq_add_neg, mul_comm, mul_assoc]
-              ring
   have hZpos := 𝓒.mathematicalPartitionFunction_pos T
   have hhpos : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := pow_pos 𝓒.hPos _
-  have hF_rewrite :
-      𝓒.helmholtzFreeEnergy T
-        = -kB * T.val *
-            (Real.log (𝓒.mathematicalPartitionFunction T)
-              - (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit) := by
-    have h_log_pow :
-        Real.log (𝓒.phaseSpaceunit ^ 𝓒.dof)
-          = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by simp
-    simp [helmholtzFreeEnergy, partitionFunction,
-          Real.log_div hZpos.ne' hhpos.ne', h_log_pow,
-          sub_eq_add_neg,
-          mul_add, add_comm,
-          mul_comm, mul_left_comm, mul_assoc]
-  rw [hF_rewrite, h_rhs]
+  have hTne : (T.val : ℝ) ≠ 0 := by exact_mod_cast hT.ne'
+  have hkβT : T.val * (kB * (T.β : ℝ)) = 1 := by
+    rw [kB_mul_beta T hT, mul_one_div, div_self hTne]
+  rw [helmholtzFreeEnergy_def, partitionFunction_def, Real.log_div hZpos.ne' hhpos.ne',
+    Real.log_pow, 𝓒.thermodynamicEntropy_eq_differentialEntropy_sub_correction (T := T) hE,
+    𝓒.differentialEntropy_eq_kB_beta_meanEnergy_add_kB_log_mathZ (T := T) hE]
+  linear_combination 𝓒.meanEnergy T * hkβT
 
 /-- **Theorem: Helmholtz identity with semi–classical correction term**.
 Physical identity (always true for `T > 0`) :

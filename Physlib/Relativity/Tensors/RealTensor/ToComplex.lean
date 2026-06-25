@@ -705,81 +705,22 @@ lemma prodT_toComplex {n m : ℕ}
     prodTColorToComplex (c := c) (c1 := c1)
       (toComplex (c := c) t) (toComplex (c := c1) t1) := by
   classical
-  -- Induction on the first tensor using the tensor basis.
-  let P : ℝT(3, c) → Prop := fun t =>
-    ∀ t1 : ℝT(3, c1),
-      toComplex (c := Fin.append c c1) (prodT (S := realLorentzTensor) t t1)
-        =
-      prodTColorToComplex (c := c) (c1 := c1)
-        (toComplex (c := c) t) (toComplex (c := c1) t1)
-  have hP : P t := by
-    -- `induction_on_basis` over the first tensor.
-    apply
-      induction_on_basis
-        (c := c)
-        (P := P)
-        (t := t)
-    · -- basis case for the first tensor and we must show the property for all `t1`
-      intro b t1
-      -- Define the property on the second tensor, with the first fixed to a basis vector.
-      let P1 : ℝT(3, c1) → Prop := fun t1' =>
-        toComplex (c := Fin.append c c1)
-            (prodT (S := realLorentzTensor)
-              ((Tensor.basis (S := realLorentzTensor) c) b) t1')
-          =
-        prodTColorToComplex (c := c) (c1 := c1)
-          (toComplex (c := c) ((Tensor.basis (S := realLorentzTensor) c) b))
-          (toComplex (c := c1) t1')
-      have hP1 : P1 t1 := by
-        -- Induction on the second tensor using the tensor basis.
-        apply
-          induction_on_basis
-            (c := c1)
-            (P := P1)
-            (t := t1)
-        · -- basis case for the second tensor
-          intro b1
-          -- Unfold `P1` and compute both sides explicitly on pure basis tensors.
-          dsimp [P1]
-          simp (config := { failIfUnchanged := false })
-            [prodTColorToComplex,
-            prodT_pure,
-            permT_pure,
-            Pure.prodP_basisVector,
-            Pure.permP_basisVector,
-            Tensor.basis_apply,
-            toComplex_pure_basisVector,
-            colorToComplex_append,
-            basisIdxCongr_eq_cast]
-        · -- zero tensor in the second argument
-          simp [P1, prodTColorToComplex]
-        · -- scalar multiplication in the second argument
-          intro r t1' ht'
-          dsimp [P1] at ht' ⊢
-          refine (by
-            simp [map_smul, ht', prodTColorToComplex])
-        · -- addition in the second argument
-          intro t1' t2' h1 h2
-          dsimp [P1] at h1 h2 ⊢
-          refine (by
-            simp [map_add, h1, h2, prodTColorToComplex])
-      -- Apply the resulting property to `t1`.
-      exact hP1
-    · -- zero tensor in the first argument
-      intro t1
-      simp [prodTColorToComplex]
-    · -- scalar multiplication in the first argument
-      intro r t ht t1
-      dsimp [P] at ht ⊢
-      refine (by
-        simp [map_smul, ht, prodTColorToComplex])
-    · -- addition in the first argument
-      intro t1 t2 h1 h2 t1'
-      dsimp [P] at h1 h2 ⊢
-      refine (by
-        simp [map_add, h1 t1', h2 t1', prodTColorToComplex])
-  -- Apply the resulting property to `t1`.
-  exact hP t1
+  -- Double induction on the tensor basis: first over `t`, then over `t1`. The zero, scalar and
+  -- additive cases follow from linearity of `prodT`, `toComplex` and `prodTColorToComplex`.
+  induction t using induction_on_basis with
+  | h b =>
+    induction t1 using induction_on_basis with
+    | h b1 =>
+      simp (config := { failIfUnchanged := false })
+        [prodTColorToComplex, prodT_pure, permT_pure, Pure.prodP_basisVector,
+          Pure.permP_basisVector, Tensor.basis_apply, toComplex_pure_basisVector,
+          colorToComplex_append, basisIdxCongr_eq_cast]
+    | hzero => simp [prodTColorToComplex]
+    | hsmul r ta hta => simp [map_smul, hta, prodTColorToComplex]
+    | hadd ta tb hta htb => simp [map_add, hta, htb, prodTColorToComplex]
+  | hzero => simp [prodTColorToComplex]
+  | hsmul r ta hta => simp [map_smul, hta, prodTColorToComplex]
+  | hadd ta tb hta htb => simp [map_add, hta, htb, prodTColorToComplex]
 
 /-!
 

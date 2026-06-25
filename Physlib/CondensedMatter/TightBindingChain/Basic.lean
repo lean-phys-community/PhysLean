@@ -337,78 +337,32 @@ def QuantaWaveNumber : Set ℝ := {x | (∃ n : Fin T.N,
 
 /-- The quantized wavenumbers form a subset of the `BrillouinZone`. -/
 lemma quantaWaveNumber_subset_brillouinZone : T.QuantaWaveNumber ⊆ T.BrillouinZone := by
-  intro x hx
-  obtain ⟨n, rfl⟩ := hx
-  apply And.intro
-  · have ht : T.N ≠ 0 := Ne.symm (NeZero.ne' T.N)
-    generalize T.N = x at *
-    have hT := T.a_pos
-    generalize T.a = a at *
-    apply le_of_eq_of_le (by ring : _ = (Real.pi / a) * (-1 : ℝ))
-    apply le_of_le_of_eq (b := (Real.pi / a) * (2 * ((n : ℝ) - (x /2 : ℕ))/ x))
+  rintro _ ⟨n, rfl⟩
+  have hT := T.a_pos
+  have hNpos : 0 < T.N := lt_of_le_of_lt (Nat.zero_le _) n.isLt
+  simp only [BrillouinZone, Set.mem_Ico]
+  generalize T.N = x at *
+  generalize T.a = a at *
+  have hx : (0 : ℝ) < x := by exact_mod_cast hNpos
+  have hn : (n : ℝ) + 1 ≤ x := by exact_mod_cast n.isLt
+  have hn0 : (0 : ℝ) ≤ n := by positivity
+  have hx2 : 2 * ((x / 2 : ℕ) : ℝ) ≤ x := by exact_mod_cast (by omega : 2 * (x / 2) ≤ x)
+  have hx2' : (x : ℝ) ≤ 2 * ((x / 2 : ℕ) : ℝ) + 1 := by
+    exact_mod_cast (by omega : x ≤ 2 * (x / 2) + 1)
+  refine ⟨?_, ?_⟩
+  · apply le_of_eq_of_le (by ring : _ = Real.pi / a * (-1 : ℝ))
+    apply le_of_le_of_eq (b := Real.pi / a * (2 * ((n : ℝ) - (x / 2 : ℕ)) / x))
     · apply mul_le_mul_of_nonneg_left
-      · have hk := Nat.even_or_odd' x
-        obtain ⟨k, hk⟩ := hk
-        rcases hk with ⟨k, rfl⟩ | ⟨k, rfl⟩
-        · simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, mul_div_cancel_left₀,
-            Nat.cast_mul, Nat.cast_ofNat]
-          have hl : 2 * (↑↑n - (k : ℝ)) / (2 * ↑k) = ↑↑n / ↑k - 1 := by
-            simp only [ne_eq, mul_eq_zero, OfNat.ofNat_ne_zero, false_or] at ht
-            field_simp
-          rw [hl, neg_le_sub_iff_le_add', le_add_iff_nonneg_right]
-          positivity
-        · have h0 : (2 * k + 1) / 2 = k := by omega
-          rw [h0, neg_le_iff_add_nonneg']
-          have hl : 1 + 2 * (↑↑n - (↑k : ℝ)) / ↑(2 * k + 1) =
-              (2 * k + 1 + 2 * (↑↑n - ↑k)) / ↑(2 * k + 1) := by
-            simp only [Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat, Nat.cast_one]
-            field_simp
-          rw [hl]
-          apply div_nonneg
-          · have hl : 2 * (k : ℝ) + 1 + 2 * (↑↑n - ↑k) = 1 + 2 * n := by ring
-            rw [hl]
-            positivity
-          · positivity
+      · rw [le_div_iff₀ hx]; linarith [hx2, hn0]
       · positivity
     · ring
-  · have ht : T.N ≠ 0 := Ne.symm (NeZero.ne' T.N)
-    generalize T.N = x at *
-    have hT := T.a_pos
-    generalize T.a = a at *
-    apply lt_of_lt_of_eq (b := (Real.pi / a) * (1 : ℝ))
+  · apply lt_of_lt_of_eq (b := Real.pi / a * (1 : ℝ))
     swap
     · ring
-    apply lt_of_eq_of_lt (b := (Real.pi / a) * (2 * ((n : ℝ) - (x /2 : ℕ))/ x))
+    apply lt_of_eq_of_lt (b := Real.pi / a * (2 * ((n : ℝ) - (x / 2 : ℕ)) / x))
     · ring
     apply mul_lt_mul_of_pos_left
-    · have hk := Nat.even_or_odd' x
-      obtain ⟨k, hk⟩ := hk
-      rcases hk with ⟨k, rfl⟩ | ⟨k, rfl⟩
-      · simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, mul_div_cancel_left₀,
-          Nat.cast_mul, Nat.cast_ofNat, gt_iff_lt]
-        have hl : 2 * (↑↑n - (k : ℝ)) / (2 * ↑k) = ↑↑n / ↑k - 1 := by
-          simp at ht
-          field_simp
-        rw [hl, sub_lt_iff_lt_add']
-        ring_nf
-        field_simp
-        refine (div_lt_iff₀' ?_).mpr ?_
-        · simp at ht
-          positivity
-        · have hn : n < k * 2 := by omega
-          simpa using (Nat.cast_lt (α := ℝ)).mpr hn
-      · have h0 : (2 * k + 1) / 2 = k := by omega
-        rw [h0]
-        refine (div_lt_one ?_).mpr ?_
-        · positivity
-        rw [mul_sub]
-        simp only [Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat, Nat.cast_one]
-        rw [sub_lt_iff_lt_add]
-        have hl : 2 * (↑k : ℝ) + 1 + 2 * ↑k = 4 * ↑k + 1 := by ring
-        rw [hl]
-        have hn' : 2 * n.val ≤ 4 * k := by omega
-        have hn'' : 2 * (n.val : ℝ) ≤ 4 * (k : ℝ) := by simpa using (Nat.cast_le (α := ℝ)).mpr hn'
-        simp [lt_of_le_of_lt hn'']
+    · rw [div_lt_one hx]; linarith [hn, hx2']
     · positivity
 
 /-!

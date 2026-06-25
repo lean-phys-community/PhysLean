@@ -9,6 +9,7 @@ public import Physlib.Relativity.MinkowskiMatrix
 public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.Topology.Instances.Matrix
+public import Mathlib.Topology.Maps.Basic
 /-!
 # The Lorentz Group
 
@@ -145,6 +146,34 @@ open minkowskiMatrix
 
 variable {Λ Λ' : LorentzGroup d}
 
+/-!
+
+## Lorentz group as a closed subset of matrices
+
+-/
+
+lemma continuous_self_mul_dual {d : ℕ} :
+    Continuous (fun Λ : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ => Λ * dual Λ) := by
+  unfold dual
+  fun_prop
+
+/-- The Lorentz group is closed in the ambient matrix space. -/
+lemma isClosed (d : ℕ) :
+    IsClosed (LorentzGroup d : Set (Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)) := by
+  rw [LorentzGroup]
+  exact isClosed_singleton.preimage continuous_self_mul_dual
+
+/-- The coercion from the Lorentz group to its ambient matrix space is a closed embedding. -/
+lemma isClosedEmbedding_val {d : ℕ} :
+    Topology.IsClosedEmbedding
+      (Subtype.val : LorentzGroup d → Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :=
+  (isClosed d).isClosedEmbedding_subtypeVal
+
+/-!
+
+## Inverses
+
+-/
 lemma inv_eq_dual (Λ : LorentzGroup d) :
     (Λ⁻¹ : LorentzGroup d) = ⟨minkowskiMatrix.dual Λ.1, LorentzGroup.dual_mem Λ.2⟩ := by
   rfl

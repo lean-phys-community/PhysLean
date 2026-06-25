@@ -693,6 +693,17 @@ lemma iteratedFDeriv_integrable {n} {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) 
 lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ)) :
     ∀ x, ∀ y, iteratedFDeriv ℝ n (fun x => ∫ (t : Time), η (t, x)) x y =
       ∫ (t : Time), (iteratedFDeriv ℝ n η (t, x)) (fun i => (0, y i)) := by
+  have hη_diff : ∀ m : ℕ, Differentiable ℝ (iteratedFDeriv ℝ m ⇑η) := by
+    intro m
+    refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
+    · exact Nat.cast_lt.mpr (by omega)
+    · exact η.smooth'.of_le (by exact ENat.LEInfty.out)
+  have hη_diff' : ∀ (m : ℕ) (t : Time),
+      Differentiable ℝ (iteratedFDeriv ℝ m (fun x => η (t, x))) := by
+    intro m t
+    refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
+    · exact Nat.cast_lt.mpr (by omega)
+    · exact (η.smooth'.of_le (by exact ENat.LEInfty.out)).comp (by fun_prop)
   induction n with
   | zero =>
     simp
@@ -722,14 +733,7 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
           continuousMultilinearCurryLeftEquiv_symm_apply]
         trans ((fderiv ℝ (fun x => iteratedFDeriv ℝ n (fun x => η (t, x)) x (Fin.tail y)) x) (y 0))
         · rw [fderiv_continuousMultilinear_apply_const_apply]
-          apply Differentiable.differentiableAt
-          apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-          refine Nat.cast_lt.mpr ?_
-          simp only [lt_add_iff_pos_right, zero_lt_one]
-          have hη := η.smooth'
-          apply ContDiff.comp
-          · exact hη.of_le (by exact ENat.LEInfty.out)
-          · fun_prop
+          exact (hη_diff' n t).differentiableAt
         conv_lhs =>
           enter [1, 2, x]
           rw [ih2]
@@ -743,25 +747,9 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
           _root_.zero_apply, ContinuousLinearMap.coe_id', id_eq]
         fun_prop
         fun_prop
-        · apply Differentiable.differentiableAt
-          apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-          refine Nat.cast_lt.mpr ?_
-          simp only [lt_add_iff_pos_right, zero_lt_one]
-          have hη := η.smooth'
-          apply ContDiff.comp
-          · exact hη.of_le (by exact ENat.LEInfty.out)
-          · fun_prop
+        · exact (hη_diff n).differentiableAt
         · fun_prop
-        · apply Differentiable.differentiableAt
-          refine Differentiable.fun_comp ?_ ?_
-          apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-          refine Nat.cast_lt.mpr ?_
-          simp only [lt_add_iff_pos_right, zero_lt_one]
-          have hη := η.smooth'
-          apply ContDiff.comp
-          · exact hη.of_le (by exact ENat.LEInfty.out)
-          · fun_prop
-          fun_prop
+        · exact ((hη_diff n).fun_comp (by fun_prop)).differentiableAt
     trans (fderiv ℝ (fun x => ∫ (t : Time),
         (LineDeriv.iteratedLineDerivOpCLM ℝ _ (fun i => ((0, Fin.tail y i) : Time × Space d))
           η (t, x)))) x (y 0)
@@ -788,25 +776,9 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
     rfl
     fun_prop
     fun_prop
-    · apply Differentiable.differentiableAt
-      apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-      refine Nat.cast_lt.mpr ?_
-      simp only [lt_add_iff_pos_right, zero_lt_one]
-      have hη := η.smooth'
-      apply ContDiff.comp
-      · exact hη.of_le (by exact ENat.LEInfty.out)
-      · fun_prop
+    · exact (hη_diff n).differentiableAt
     · fun_prop
-    · apply Differentiable.differentiableAt
-      refine Differentiable.fun_comp ?_ ?_
-      apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-      refine Nat.cast_lt.mpr ?_
-      simp only [lt_add_iff_pos_right, zero_lt_one]
-      have hη := η.smooth'
-      apply ContDiff.comp
-      · exact hη.of_le (by exact ENat.LEInfty.out)
-      · fun_prop
-      fun_prop
+    · exact ((hη_diff n).fun_comp (by fun_prop)).differentiableAt
     exact integrable_fderiv_space _ x
 
 lemma time_integral_iteratedFDeriv_eq {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ))
