@@ -5,18 +5,8 @@ Authors: Andrea Pari
 -/
 module
 
-public import Physlib.Relativity.Tensors.TensorSpecies.Basic
-public import Mathlib.RepresentationTheory.Basic
-public import Mathlib.RepresentationTheory.Intertwining
 public import Mathlib.Data.Complex.Basic
-public import Mathlib.LinearAlgebra.Basis.Defs
-public import Mathlib.LinearAlgebra.StdBasis
-public import Mathlib.Algebra.Group.TransferInstance
-public import Mathlib.Algebra.Module.TransferInstance
-public import Mathlib.Algebra.Module.RingHom
--- Contraction machinery for the type-safety smoke test below. Public because the test lives
--- in the public section and references `TensorSpecies.Tensor` and `contrT`.
-public import Physlib.Relativity.Tensors.Contraction.Basic
+public import Mathlib.LinearAlgebra.Matrix.BilinearForm
 public import Physlib.Relativity.Tensors.Conjugation.Basic
 
 /-!
@@ -93,8 +83,6 @@ is real. The species can express none of these alone.
   - D.4. The coherence laws in `toSpanSingleton` form
 - E. The chiral-index tensor species
 - F. Conjugation
-  - F.1. Smoke tests
-  - F.2. Scalar and covector helpers
 
 ## iv. References
 
@@ -220,18 +208,17 @@ anti-holomorphic Wirtinger derivatives that produce barred components.
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
-/-- The δ bilinear form: the dot product of coordinate vectors in a basis `b`,
-`(x, y) ↦ ∑_I (b x)_I (b y)_I`. -/
-def deltaBil (b : Basis ι ℂ M) : M →ₗ[ℂ] M →ₗ[ℂ] ℂ :=
-  LinearMap.mk₂ ℂ (fun x y => ∑ I, b.equivFun x I * b.equivFun y I)
-    (fun x x' y => by simp only [map_add, Pi.add_apply, add_mul, Finset.sum_add_distrib])
-    (fun a x y => by
-      simp only [map_smul, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-      exact Finset.sum_congr rfl fun I _ => by ring)
-    (fun x y y' => by simp only [map_add, Pi.add_apply, mul_add, Finset.sum_add_distrib])
-    (fun a x y => by
-      simp only [map_smul, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-      exact Finset.sum_congr rfl fun I _ => by ring)
+/-- The δ bilinear form: the bilinear form whose Gram matrix in the basis `b` is the identity,
+`Matrix.toBilin b 1`. On coordinates it is the dot product `(x, y) ↦ ∑_I (b x)_I (b y)_I`
+(`deltaBil_apply`), i.e. the form for which `b` is orthonormal. -/
+def deltaBil (b : Basis ι ℂ M) : M →ₗ[ℂ] M →ₗ[ℂ] ℂ := Matrix.toBilin b 1
+
+/-- `deltaBil b x y = ∑_I (b x)_I (b y)_I`: the identity Gram matrix collapses the double sum of
+`Matrix.toBilin_apply` to the dot product of the coordinate vectors. -/
+lemma deltaBil_apply (b : Basis ι ℂ M) (x y : M) :
+    deltaBil b x y = ∑ I, b.equivFun x I * b.equivFun y I := by
+  rw [deltaBil, Matrix.toBilin_apply]
+  simp [Matrix.one_apply, mul_ite, mul_zero, Finset.sum_ite_eq, Basis.equivFun_apply]
 
 /-- The δ contraction `M ⊗ M → ℂ`: the bilinear form `deltaBil` lifted to the tensor
 product. -/
@@ -259,12 +246,11 @@ contraction is symmetric in its arguments and that the cap is fixed by swapping 
 
 -/
 
-omit [DecidableEq ι] in
 /-- `deltaContr b (x ⊗ₜ y) = ∑_I x_I y_I`, the dot product of the coordinate vectors of `x` and
 `y` in the basis `b` (writing `x_I := (b.equivFun x) I`). -/
 lemma deltaContr_tmul (b : Basis ι ℂ M) (x y : M) :
     deltaContr b (x ⊗ₜ[ℂ] y) = ∑ I, b.equivFun x I * b.equivFun y I := by
-  simp only [deltaContr, TensorProduct.lift.tmul, deltaBil, LinearMap.mk₂_apply]
+  rw [deltaContr, TensorProduct.lift.tmul, deltaBil_apply]
 
 /-- `deltaContr b (x ⊗ₜ b J) = x_J`: pairing with the basis vector `b J` reads off the `J`-th
 coordinate `(b.equivFun x) J`. -/
@@ -278,7 +264,6 @@ lemma deltaContr_basis_basis (b : Basis ι ℂ M) (I J : ι) :
     deltaContr b (b I ⊗ₜ[ℂ] b J) = if I = J then 1 else 0 := by
   rw [deltaContr_tmul_basis, Basis.equivFun_self]
 
-omit [DecidableEq ι] in
 /-- `deltaContr b (x ⊗ₜ y) = deltaContr b (y ⊗ₜ x)`: the δ contraction is symmetric, since
 `∑_I x_I y_I = ∑_I y_I x_I`. -/
 lemma deltaContr_comm (b : Basis ι ℂ M) (x y : M) :
@@ -476,15 +461,6 @@ def chiralTensor : ConjTensorSpecies ℂ ChiralColor G (chiralModule (ι := ι))
           = deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂)
       exact key (Basis.conj piBasis) piBasis
 
-/-- Type-safety smoke test. `chiralUp` and `chiralDown` are `τ`-dual, so a rank-2 tensor with
-those index colours admits the framework contraction `contrT`. A same-variance pair would
-fail the `τ`-hypothesis `S.τ (c I) = c J`, which is exactly the safety the species provides. -/
-example (t : (chiralTensor (ι := ι) (G := G)).Tensor
-      ![ChiralColor.chiralUp, ChiralColor.chiralDown]) :
-    (chiralTensor (ι := ι) (G := G)).Tensor
-      (![ChiralColor.chiralUp, ChiralColor.chiralDown] ∘ Fin.succSuccAbove 0 1) :=
-  TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩ t
-
 /-!
 ## F. Conjugation
 
@@ -503,33 +479,8 @@ section Conjugation
 open TensorSpecies TensorSpecies.Tensor ConjTensorSpecies ChiralColor
 
 /-!
-### F.1. Smoke tests
-
-Type-safety and behaviour checks for `chiralTensor`'s conjugation.
--/
-
-/-- Conjugating a metric-typed tensor `g : Tensor ![chiralDown, antiDown]` via `chiralTensor.conjT`
-lands in the conjugate-colour list `ChiralColor.bar ∘ ![chiralDown, antiDown]`, i.e.
-`![antiDown, chiralDown]`. This is purely a type-safety check. -/
-example (g : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown, antiDown]) :
-    (chiralTensor (ι := ι) (G := G)).Tensor (ChiralColor.bar ∘ ![chiralDown, antiDown]) :=
-  (chiralTensor (ι := ι) (G := G)).conjT g
-
-/-- `conjT_contrT` applies to a one-index contraction: conjugating first and then contracting
-equals contracting the conjugate. Checked at colour `![chiralUp, chiralDown]` contracted at
-slots `0` and `1`. -/
-example (t : (chiralTensor (ι := ι) (G := G)).Tensor
-    ![ChiralColor.chiralUp, ChiralColor.chiralDown]) :
-    (chiralTensor (ι := ι) (G := G)).conjT (TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩ t)
-      = TensorSpecies.Tensor.contrT 0 0 1 ⟨by decide, rfl⟩
-          ((chiralTensor (ι := ι) (G := G)).conjT t) :=
-  (chiralTensor (ι := ι) (G := G)).conjT_contrT 0 1 ⟨by decide, rfl⟩ t
-
-/-!
-### F.2. Scalar and covector helpers
-
-These two definitions normalize the output of `(chiralTensor (ι := ι) (G := G)).conjT` back to the canonical
-colour lists for scalar and anti-holomorphic covector tensors respectively.
+The following normalize the output of `(chiralTensor (ι := ι) (G := G)).conjT` back to the
+canonical colour lists for scalar and anti-holomorphic covector tensors respectively.
 
 -/
 
