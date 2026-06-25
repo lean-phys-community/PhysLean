@@ -58,7 +58,7 @@ This is because:
 
 @[expose] public section
 
-variable {X} [NormedAddCommGroup X] [InnerProductSpace ℝ X] [CompleteSpace X]
+variable {X} [NormedAddCommGroup X] [InnerProductSpace ℝ X]
 
 namespace ClassicalMechanics
 
@@ -91,7 +91,6 @@ def IsTotalTimeDerivative
 
     δL(t, q, dₜ q) = fderiv ℝ F (t, q) (1, dₜ q)
 -/
--- omit [CompleteSpace X] in
 lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
@@ -111,83 +110,83 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
       _ = fderiv ℝ (fun (t' : Time) => (tq q t').1) t 1 := by rfl
       _ = (∂ₜ (tq q) t).1 := by
         rw [fderiv.fst]
-        simp
-        rfl
-        apply ContDiffAt.differentiableAt
-        apply ContDiff.contDiffAt
-        exact h_tq_contDiff q h_ContDiff_q
-        by_contra
-        rcases this
+        · simp
+          rfl
+        · apply ContDiffAt.differentiableAt
+          · apply ContDiff.contDiffAt
+            exact h_tq_contDiff q h_ContDiff_q
+          · by_contra
+            rcases this
     apply Eq.symm
     calc
        (1, ∂ₜ q t).2 = fderiv ℝ (fun t' => (tq q t').2) t 1 := by rfl
        _ = (∂ₜ (tq q) t).2 := by
         rw [fderiv.snd]
-        simp only [ContinuousLinearMap.coe_comp', ContinuousLinearMap.coe_snd', Function.comp_apply]
-        rfl
-        apply ContDiffAt.differentiableAt
-        apply ContDiff.contDiffAt
-        exact h_tq_contDiff q h_ContDiff_q
-        by_contra
-        rcases this
+        · simp only [ContinuousLinearMap.coe_comp', ContinuousLinearMap.coe_snd', Function.comp_apply]
+          rfl
+        · apply ContDiffAt.differentiableAt
+          · apply ContDiff.contDiffAt
+            exact h_tq_contDiff q h_ContDiff_q
+          · by_contra
+            rcases this
   have h_F_tq_der : ∀ (q : Time → X) (F : Time → X → ℝ) t, (ContDiff ℝ ∞ ↿F) → (ContDiff ℝ ∞ q)  →
       ∂ₜ (fun t' => ↿F (t', q t')) t = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t) := by
     intro q F t hF hq
     change  fderiv ℝ ((↿F) ∘ (tq q)) t 1 = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t)
     rw [fderiv_comp]
-    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
-    rw [← Time.deriv_eq,h_tq_der]
-    exact hq
-    apply ContDiffAt.differentiableAt
-    apply ContDiff.contDiffAt
-    exact hF
-    by_contra
-    rcases this
-    apply ContDiffAt.differentiableAt
-    apply ContDiff.contDiffAt
-    exact h_tq_contDiff q hq
-    by_contra
-    rcases this
+    · simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+      rw [← Time.deriv_eq,h_tq_der]
+      exact hq
+    · apply ContDiffAt.differentiableAt
+      · apply ContDiff.contDiffAt
+        exact hF
+      · by_contra
+        rcases this
+    · apply ContDiffAt.differentiableAt
+      · apply ContDiff.contDiffAt
+        exact h_tq_contDiff q hq
+      · by_contra
+        rcases this
   -- start of the proof
   constructor
   -- From total the total derivative to the explicit form
-  intro h
-  rcases h with ⟨F, hF⟩
-  rcases hF with ⟨hFdif, hFder⟩
-  use F
-  use hFdif
-  intro t q₀ v
-  let qv := fun (t' : Time) => (q₀ - t.val • v) + t'.val • v
-  have h_qv_contDiff : ContDiff ℝ ∞ qv := by
-    change ContDiff ℝ ∞ (((fun (tR : ℝ) => (q₀ - t.val • v) + tR • v)) ∘ Time.toRealCLE)
-    fun_prop
-  have h_qv_t : qv t = q₀ := by
-    calc
-      qv t = (q₀ - t.val • v) + t.val • v := by rfl
-      _ = q₀ := by module
-  have h_qv_der : ∂ₜ qv t = v := by
-    calc
-      ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v) t 1 := by rfl
-      _ = v := by
-        rw [fderiv_const_add,fderiv_smul_const]
-        simp only [ContinuousLinearMap.smulRight_apply, fderiv_val, one_smul]
-        fun_prop
-  rw [← h_qv_t, ← h_qv_der, hFder, ← h_F_tq_der]
-  rfl
-  exact hFdif
-  exact h_qv_contDiff
-  exact h_qv_contDiff
+  · intro h
+    rcases h with ⟨F, hF⟩
+    rcases hF with ⟨hFdif, hFder⟩
+    use F
+    use hFdif
+    intro t q₀ v
+    let qv := fun (t' : Time) => (q₀ - t.val • v) + t'.val • v
+    have h_qv_contDiff : ContDiff ℝ ∞ qv := by
+      change ContDiff ℝ ∞ (((fun (tR : ℝ) => (q₀ - t.val • v) + tR • v)) ∘ Time.toRealCLE)
+      fun_prop
+    have h_qv_t : qv t = q₀ := by
+      calc
+        qv t = (q₀ - t.val • v) + t.val • v := by rfl
+        _ = q₀ := by module
+    have h_qv_der : ∂ₜ qv t = v := by
+      calc
+        ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v) t 1 := by rfl
+        _ = v := by
+          rw [fderiv_const_add,fderiv_smul_const]
+          · simp only [ContinuousLinearMap.smulRight_apply, fderiv_val, one_smul]
+          · fun_prop
+    rw [← h_qv_t, ← h_qv_der, hFder, ← h_F_tq_der]
+    · rfl
+    · exact hFdif
+    · exact h_qv_contDiff
+    · exact h_qv_contDiff
   -- From the explicit form to the total derivative
-  intro h
-  rcases h with ⟨F, hF⟩
-  rcases hF with ⟨hFdif, hFder⟩
-  use F
-  use hFdif
-  intro t q hq_ContDiff
-  rw [hFder, ← h_F_tq_der]
-  rfl
-  exact hFdif
-  exact hq_ContDiff
+  · intro h
+    rcases h with ⟨F, hF⟩
+    rcases hF with ⟨hFdif, hFder⟩
+    use F
+    use hFdif
+    intro t q hq_ContDiff
+    rw [hFder, ← h_F_tq_der]
+    · rfl
+    · exact hFdif
+    · exact hq_ContDiff
 
 
 /-!
@@ -210,7 +209,7 @@ When δL depends only on velocity (the free particle case), the condition simpli
 
     WLOG, we assume `δL 0 = 0` since constants are total derivatives (c = d/dt(c·t))
     and can be absorbed without affecting the equations of motion. -/
-lemma isTotalTimeDerivativeVelocity
+lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
     (δL : X → ℝ)
     (hδL0 : δL 0 = 0)
     (h : IsTotalTimeDerivative (fun _ _ v => δL v)) :
