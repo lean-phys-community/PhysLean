@@ -180,17 +180,17 @@ lemma jetCoordinatesAt_add_smul (k : ℕ) (f g : Space d → EuclideanSpace ℝ 
   funext I
   funext a
   have hfa : ContDiff ℝ ∞ (fun y => (f y) a) := by
-    simpa using (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
+    exact (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
       (E := fun _ : Fin m => ℝ) (i := a)).comp hf
   have hga : ContDiff ℝ ∞ (fun y => (g y) a) := by
-    simpa using (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
+    exact (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
       (E := fun _ : Fin m => ℝ) (i := a)).comp hg
   have hadd :
       (fun y => (f y + s • g y) a) = (fun y => (f y) a) + s • fun y => (g y) a := by
     funext y
     simp [smul_eq_mul]
   have hsg : ContDiff ℝ ∞ (s • fun y => (g y) a) := by
-    simpa using hga.const_smul s
+    exact hga.const_smul s
   simp [jetCoordinatesAt]
   have hsum := congrFun (Space.iteratedDeriv_add I.1 hfa hsg) x
   have hsmul := congrFun (Space.iteratedDeriv_const_smul I.1 s hga) x
@@ -209,10 +209,10 @@ lemma jetAt_add_smul (k : ℕ) (f g : Space d → EuclideanSpace ℝ (Fin m))
   · simp [JetPoint.lineMap]
   · intro I a
     have hfa : ContDiff ℝ ∞ (fun y => (f y) a) := by
-      simpa using (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
+      exact (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
         (E := fun _ : Fin m => ℝ) (i := a)).comp hf
     have hga : ContDiff ℝ ∞ (fun y => (g y) a) := by
-      simpa using (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
+      exact (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
         (E := fun _ : Fin m => ℝ) (i := a)).comp hg
     have hadd :
         (fun y => (f y + s • g y) a) = (fun y => (f y) a) + s • fun y => (g y) a := by
@@ -223,7 +223,7 @@ lemma jetAt_add_smul (k : ℕ) (f g : Space d → EuclideanSpace ℝ (Fin m))
     rw [JetPoint.lineMap_coord, jetAt_coord, jetDirectionAt_coord]
     rw [hadd]
     have hsg : ContDiff ℝ ∞ (s • fun y => (g y) a) := by
-      simpa using hga.const_smul s
+      exact hga.const_smul s
     have hsum := congrFun (Space.iteratedDeriv_add I.1 hfa hsg) x
     have hsmul := congrFun (Space.iteratedDeriv_const_smul I.1 s hga) x
     calc

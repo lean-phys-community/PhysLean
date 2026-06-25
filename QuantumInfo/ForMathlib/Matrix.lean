@@ -287,7 +287,7 @@ theorem zero_dotProduct_zero_iff : (∀ x : m → 𝕜, 0 = star x ⬝ᵥ A.mulV
     ext i j
     have h₂ := fun x ↦ (PosSemidef.dotProduct_mulVec_zero_iff hA x).mp (h x).symm
     classical have : DecidableEq m := inferInstance
-    convert congrFun (h₂ (Pi.single j 1)) i using 1
+    convert! congrFun (h₂ (Pi.single j 1)) i using 1
     simp
   · rintro rfl
     simp
@@ -604,13 +604,13 @@ def traceRight (m : Matrix (d₁ × d) (d₂ × d) R) : Matrix d₁ d₂ R :=
 variable [Fintype d₁] [Fintype d₂] in
 @[simp]
 theorem traceLeft_trace (A : Matrix (d₁ × d₂) (d₁ × d₂) R) : A.traceLeft.trace = A.trace := by
-  convert (Fintype.sum_prod_type_right _).symm
+  convert! (Fintype.sum_prod_type_right _).symm
   rfl
 
 variable [Fintype d₁] [Fintype d₂] in
 @[simp]
 theorem traceRight_trace (A : Matrix (d₁ × d₂) (d₁ × d₂) R) : A.traceRight.trace = A.trace := by
-  convert (Fintype.sum_prod_type _).symm
+  convert! (Fintype.sum_prod_type _).symm
   rfl
 
 variable [StarAddMonoid R] in
@@ -808,7 +808,7 @@ lemma IsHermitian.eigenvalues_eq_of_unitary_similarity_diagonal {d 𝕜 : Type*}
         intro t
         have h_det : Matrix.det (t • 1 - U * Matrix.diagonal (fun i => (f i : 𝕜)) * Uᴴ) = Matrix.det (U * (t • 1 - Matrix.diagonal (fun i => (f i : 𝕜))) * Uᴴ) := by
           simp [ mul_sub, sub_mul, Matrix.mul_assoc ];
-          rw [ show U * Uᴴ = 1 from by simpa [mul_eq_one_comm] using hU.2 ];
+          rw [ show U * Uᴴ = 1 from by exact hU.2 ];
         rw [h_det, Matrix.det_mul_comm, ← mul_assoc]
         rw [← star_eq_conjTranspose, Matrix.UnitaryGroup.star_mul_self ⟨U, hU⟩]
         simp
@@ -1064,7 +1064,7 @@ private lemma spectrum_prod_le {d d₂ : Type*}
   obtain ⟨_, ha, _, hb, h₁, ⟨a', rfl⟩, ⟨b', rfl⟩⟩ : ∃ a ∈ spectrum 𝕜 A, ∃ b ∈ spectrum 𝕜 B,
       x = a * b ∧
       a ∈ Set.range (algebraMap ℝ 𝕜) ∧ b ∈ Set.range (algebraMap ℝ 𝕜) := by
-    obtain ⟨a, ha, b, hb, hx_eq⟩ := spectrum_prod_complex hA hB x (by convert hx using 1);
+    obtain ⟨a, ha, b, hb, hx_eq⟩ := spectrum_prod_complex hA hB x (by exact hx);
     have ha' := ha
     have hb' := hb
     rw [hA.spectrum_eq_image_range] at ha
@@ -1226,7 +1226,7 @@ lemma sub_iInf_eignevalues (hA : A.IsHermitian) :
       simp_all only [mul_assoc, mul_comm, mul_left_comm, RCLike.star_def] ;
       rw [ ← mul_assoc ];
       exact mul_nonneg h_nonneg ( sub_nonneg_of_le <| mod_cast h_eigenvalue i );
-    convert Finset.sum_nonneg fun i _ => h_sum_nonneg i;
+    convert! Finset.sum_nonneg fun i _ => h_sum_nonneg i;
     rw [ hΛ.1 ]
 
 lemma iInf_eigenvalues_le_dotProduct_mulVec (hA : A.IsHermitian) (v : d → ℂ) :
@@ -1312,7 +1312,6 @@ theorem IsHermitian.spectrum_subset_Ici_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
     intro v hv_nonzero
     have h_eigenvalue : (star v ⬝ᵥ (A.mulVec v)) ≥ (⨅ i, (hA.eigenvalues i)) * (star v ⬝ᵥ v) := by
       have h_expand : (star v ⬝ᵥ (A.mulVec v)) = ∑ i, (hA.eigenvalues i) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) := by
-        change (star v ⬝ᵥ (A.mulVec v)) = ∑ i, (hA.eigenvalues i) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i))
         have h_decomp : A = ∑ i, (hA.eigenvalues i) • (Matrix.of (fun j k => (hA.eigenvectorBasis i j) * (star (hA.eigenvectorBasis i k)))) := by
           convert Matrix.IsHermitian.spectral_theorem hA using 1;
           ext i j
@@ -1427,7 +1426,7 @@ theorem IsHermitian.spectrum_subset_Iic_of_sub {d 𝕜 : Type*} [Fintype d] [Dec
     intro μ hμ
     specialize h (Set.neg_mem_neg.mpr hμ)
     rw [← Set.mem_neg, Set.neg_Ici] at h
-    convert h
+    convert! h
     rw [iInf, iSup, ← spectrum_real_eq_range_eigenvalues, ← spectrum_real_eq_range_eigenvalues]
     rw [← spectrum.neg_eq, csInf_neg ?_ (A.finite_real_spectrum.bddAbove), neg_neg]
     exact ContinuousFunctionalCalculus.spectrum_nonempty _ hA

@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.Product
+public import Physlib.Relativity.Tensors.Evaluation
 public import Mathlib.Topology.Algebra.Module.FiniteDimension
 /-!
 
@@ -318,6 +319,38 @@ lemma prod_tensor_basis_eq_map_reindex {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Ty
   simp
   obtain ⟨⟨i, j⟩, rfl⟩ := ComponentIdx.prod.symm.surjective r
   simp [h, h2, tensorEquivProd, toTensor_tprod]
+
+attribute [-simp] Matrix.cons_val_zero Matrix.cons_val Fin.succAbove_zero
+
+open Tensor in
+/-- Double basis expansion of an element of a tensor product `M ⊗[k] M₂` of two `Tensorial`
+  one-index spaces. Given bases `b`, `b2` of `M`, `M₂` coming from the single-index tensor bases,
+  every `x : M ⊗[k] M₂` is the double sum over `i, j` of the iterated evaluation coefficient
+  `toField (evalT 0 j (evalT 0 i (toTensor x)))` times `b i ⊗ₜ b2 j`. -/
+lemma prod_eq_sum_eval {c c2 : C} {M₂ : Type}
+    [Tensorial S ![c] M] [AddCommMonoid M₂] [Module k M₂]
+    [Tensorial S ![c2] M₂] {b : Module.Basis (basisIdx c) k M}
+    {b2 : Module.Basis (basisIdx c2) k M₂}
+    (h : b = ((Tensor.basis (S := S) ![c]).map toTensor.symm).reindex ComponentIdx.single)
+    (h2 : b2 = ((Tensor.basis (S := S) ![c2]).map toTensor.symm).reindex ComponentIdx.single)
+    (x : M ⊗[k] M₂) : x = ∑ i : (basisIdx c), ∑ j : (basisIdx c2),
+    toField (evalT 0 (basisIdxCongr (by rfl) j)
+      (evalT 0 (basisIdxCongr (by rfl) i) (toTensor x))) • b i ⊗ₜ[k] b2 j := by
+  apply toTensor.injective
+  conv_lhs => rw [eq_sum_evalT_zero (toTensor x)]
+  simp only [map_sum, map_smul]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [eq_sum_evalT_zero ((evalT 0 i) (toTensor x))]
+  simp only [map_sum]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  simp only [prodT_zero_right, map_smul, permT_basis, prodT_basis']
+  congr 1
+  subst h h2
+  simp only [toTensor_tprod, Function.comp_apply, Module.Basis.coe_reindex, Module.Basis.map_apply,
+    LinearEquiv.apply_symm_apply, prodT_basis']
+  congr 1
+  funext i
+  fin_cases i <;> rfl
 
 /-!
 

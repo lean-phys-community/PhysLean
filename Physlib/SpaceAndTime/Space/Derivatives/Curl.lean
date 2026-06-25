@@ -84,7 +84,7 @@ macro (name := curlNotation) "∇" "⨯" f:term:100 : term => `(curl $f)
 lemma curl_zero : ∇ ⨯ (0 : Space → EuclideanSpace ℝ (Fin 3)) = 0 := by
   unfold curl Space.deriv
   simp only [Fin.isValue, Pi.zero_apply, PiLp.zero_apply, fderiv_fun_const,
-    ContinuousLinearMap.zero_apply, sub_self]
+    _root_.zero_apply, sub_self]
   rfl
 
 /-!
@@ -96,7 +96,7 @@ lemma curl_zero : ∇ ⨯ (0 : Space → EuclideanSpace ℝ (Fin 3)) = 0 := by
 @[simp]
 lemma curl_const : ∇ ⨯ (fun _ : Space => v₃) = 0 := by
   unfold curl Space.deriv
-  simp only [Fin.isValue, fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply,
+  simp only [Fin.isValue, fderiv_fun_const, Pi.zero_apply, _root_.zero_apply,
     sub_self]
   rfl
 
@@ -178,7 +178,7 @@ lemma deriv_coord_2nd_add (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
   repeat rw [deriv_eq_fderiv_fun]
   ext x
   rw [fderiv_fun_add, fderiv_fun_add]
-  simp only [ContinuousLinearMap.add_apply, Pi.add_apply]
+  simp only [_root_.add_apply, Pi.add_apply]
   ring
   repeat fun_prop
 
@@ -190,7 +190,7 @@ lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
   ext x
   simp only [Pi.sub_apply]
   rw [fderiv_fun_sub]
-  simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply]
+  simp only [FunLike.coe_sub, Pi.sub_apply]
   repeat fun_prop
 
 /-!
@@ -347,7 +347,7 @@ private lemma fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct
   · change _ = t • (fderiv ℝ (EuclideanSpace.proj i ∘
       (fun x => (WithLp.toLp 2 ((crossProduct (basis.repr x).ofLp) (f (t • x)).ofLp)))) x) y
     rw [fderiv_comp]
-    simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+    simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
       PiLp.proj_apply]
     · fun_prop
     · exact Differentiable.differentiableAt (cross_diff t)
@@ -364,8 +364,8 @@ private lemma fderiv_homotopyOperatorIntegrand_apply_eq {f : Space → Euclidean
     rw [fderiv_comp _ (by fun_prop) (by fun_prop),
       fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_fun_smul (by fun_prop) (by fun_prop)]
     simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_id, fderiv_fun_const,
-      Pi.zero_apply, ContinuousLinearMap.zero_smulRight, add_zero, ContinuousLinearMap.coe_comp',
-      ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_id', Pi.smul_apply, id_eq, map_smul,
+      Pi.zero_apply, ContinuousLinearMap.zero_smulRight, add_zero, ContinuousLinearMap.coe_comp,
+      FunLike.coe_smul, ContinuousLinearMap.coe_id', Pi.smul_apply, id_eq, map_smul,
       PiLp.proj_apply, smul_eq_mul]
   fin_cases i
   all_goals
@@ -386,7 +386,7 @@ private lemma continuous_uncurry_fderiv_homotopyOperatorIntegrand
   suffices h1 : Continuous ((PiLp.continuousLinearEquiv 2 ℝ _).symm ∘
     (PiLp.continuousLinearEquiv 2 ℝ _) ∘
     (fun p : Space × ℝ => fderiv ℝ (homotopyOperatorIntegrand f · p.2) p.1 y)) by
-    simpa using h1
+    exact h1
   apply Continuous.comp (by fun_prop) ?_
   apply continuous_pi
   intro i
@@ -491,8 +491,8 @@ lemma eq_neg_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
     rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_comp _ (by fun_prop) (by fun_prop),
       fderiv_fun_smul (by fun_prop) (by fun_prop)]
     simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_const, Pi.zero_apply,
-      fderiv_fun_id, ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
-      ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.zero_apply, smul_zero,
+      fderiv_fun_id, ContinuousLinearMap.coe_comp, _root_.add_apply,
+      FunLike.coe_smul, Pi.smul_apply, _root_.zero_apply, smul_zero,
       ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.coe_id', id_eq, one_smul, zero_add,
       PiLp.proj_apply]
   have hi (x : Space) (i : Fin 3) : ∫ (t : ℝ) in 0..1, (t * f (t • x) i * 2) -
@@ -548,8 +548,8 @@ lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
     rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_comp _ (by fun_prop) (by fun_prop),
       fderiv_fun_smul (by fun_prop) (by fun_prop)]
     simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_const, Pi.zero_apply,
-      fderiv_fun_id, ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
-      ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.zero_apply, smul_zero,
+      fderiv_fun_id, ContinuousLinearMap.coe_comp, _root_.add_apply,
+      FunLike.coe_smul, Pi.smul_apply, _root_.zero_apply, smul_zero,
       ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.coe_id', id_eq, one_smul, zero_add,
       PiLp.proj_apply]
   have hi (x : Space) (i : Fin 3) : ∫ (t : ℝ) in 0..1, (t * f (t • x) i * 2) -
@@ -633,13 +633,13 @@ lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
     calc _
       _ = (fderiv ℝ (InnerProductSpace.toDual ℝ _ ∘
         fun a => (basis.repr.symm (f a))) a x) y := by rfl
-    rw [fderiv_comp _ (by simpa using
+    rw [fderiv_comp _ (by exact
       (InnerProductSpace.toDual ℝ (Space)).differentiable.differentiableAt) (by fun_prop)]
     erw [(InnerProductSpace.toDual ℝ (Space)).fderiv]
-    simp only [ContinuousLinearMap.coe_comp', ContinuousLinearEquiv.coe_coe,
+    simp only [ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe,
       LinearIsometryEquiv.coe_toContinuousLinearEquiv, Function.comp_apply]
     erw [InnerProductSpace.toDual_apply_apply]
-    rw [fderiv_comp' _ (by fun_prop) (by fun_prop)]
+    rw [fderiv_fun_comp _ (by fun_prop) (by fun_prop)]
     simp
   have hdω: ∀ a ∈ s, ∀ (x y : Space), ((fderiv ℝ ω a) x) y = ((fderiv ℝ ω a) y) x := by
     intro a ha x y
@@ -706,11 +706,11 @@ noncomputable def distCurl : (Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) →�
       toFun dfdx := WithLp.toLp 2 fun i => dfdx (basis (i+2)) (i+1) - dfdx (basis (i+1)) (i+2)
       map_add' v1 v2 := by
         ext i
-        simp only [Fin.isValue, ContinuousLinearMap.add_apply, PiLp.add_apply]
+        simp only [Fin.isValue, _root_.add_apply, PiLp.add_apply]
         ring
       map_smul' a v := by
         ext i
-        simp only [Fin.isValue, ContinuousLinearMap.coe_smul', Pi.smul_apply, PiLp.smul_apply,
+        simp only [Fin.isValue, FunLike.coe_smul, Pi.smul_apply, PiLp.smul_apply,
           smul_eq_mul, RingHom.id_apply]
         ring
       cont := by
@@ -778,7 +778,7 @@ lemma distCurl_apply (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : �
 lemma distCurl_distGrad_eq_zero (f : (Space) →d[ℝ] ℝ) :
     ∇ᵈ ⨯ (∇ᵈ f) = 0 := by
   ext η i
-  simp only [distCurl_coord_apply, Fin.isValue, ContinuousLinearMap.zero_apply, PiLp.zero_apply]
+  simp only [distCurl_coord_apply, Fin.isValue, _root_.zero_apply, PiLp.zero_apply]
   rw [distGrad_eq_sum_basis, distGrad_eq_sum_basis]
   simp only [Fin.isValue, neg_smul, Finset.sum_neg_distrib, PiLp.neg_apply, WithLp.ofLp_sum,
     WithLp.ofLp_smul, PiLp.ofLp_single, Finset.sum_apply, Pi.smul_apply, Pi.single_apply,
@@ -787,7 +787,7 @@ lemma distCurl_distGrad_eq_zero (f : (Space) →d[ℝ] ℝ) :
   rw [← map_neg, ← map_add, ← ContinuousLinearMap.map_zero f]
   congr
   ext x
-  simp only [Fin.isValue, SchwartzMap.add_apply, SchwartzMap.neg_apply, SchwartzMap.zero_apply]
+  simp only [Fin.isValue, _root_.add_apply, _root_.neg_apply, _root_.zero_apply]
   rw [schwartMap_fderiv_comm]
   simp
 

@@ -142,7 +142,7 @@ def ofLinear (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
     refine hη.trans <| mul_le_mul_of_nonneg_left ((le_seminorm 𝕜 k n η x).trans ?_) hC
     rw [Seminorm.finset_sup_apply]
     refine (NNReal.coe_le_coe (r₁ := ⟨SchwartzMap.seminorm 𝕜 k n η, apply_nonneg _ _⟩)).2 ?_
-    convert s.le_sup hkn
+    exact s.le_sup hkn
       (f := fun kn : ℕ × ℕ ↦ (⟨SchwartzMap.seminorm 𝕜 kn.1 kn.2 η, apply_nonneg _ _⟩ : ℝ≥0))
 
 @[simp] lemma ofLinear_apply (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
@@ -217,7 +217,7 @@ def fderivD [FiniteDimensional ℝ E] : (E →d[𝕜] F) →ₗ[𝕜] (E →d[�
       ext x
       simp only [map_add, ContinuousLinearEquiv.neg_apply,
         LinearMap.coe_toContinuousLinearMap', LinearMap.coe_mk, AddHom.coe_mk,
-        ContinuousLinearMap.add_apply]
+        add_apply]
     map_smul' a η := by
       ext x
       simp
@@ -230,7 +230,7 @@ def fderivD [FiniteDimensional ℝ E] : (E →d[𝕜] F) →ₗ[𝕜] (E →d[�
   }
   map_add' u₁ u₂ := by
     ext η
-    simp only [ContinuousLinearMap.add_apply, ContinuousLinearEquiv.neg_apply, neg_add_rev,
+    simp only [add_apply, ContinuousLinearEquiv.neg_apply, neg_add_rev,
       ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk,
       LinearMap.coe_toContinuousLinearMap']
     abel
@@ -365,7 +365,7 @@ lemma fderivD_const [hμ : Measure.IsAddHaarMeasure (volume (α := E))]
     fderivD ℝ (const ℝ E c) = 0 := by
   ext η v
   rw [fderivD_apply, const_apply]
-  simp only [ContinuousLinearMap.zero_apply, neg_eq_zero]
+  simp only [zero_apply, neg_eq_zero]
   trans -∫ (x : E), η x • (fderiv ℝ (fun y => c) x) v ∂volume
   swap
   · simp

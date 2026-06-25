@@ -209,10 +209,11 @@ lemma HasDenseDomain.orthogonal_adjoint_ker [CompleteSpace H] [CompleteSpace H']
 ### B.2. Closability
 -/
 
-lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U := by
-  constructor <;> intro h'
-  · exact eq_of_eq_graph (h.graph_closure_eq_closure_graph ▸ h'.submodule_topologicalClosure_eq)
-  · exact h' ▸ h.closure_isClosed
+lemma IsClosed.closure_eq (h : U.IsClosed) : U.closure = U :=
+  eq_of_eq_graph (h.isClosable.graph_closure_eq_closure_graph ▸ h.submodule_topologicalClosure_eq)
+
+lemma IsClosable.isClosed_iff (h : U.IsClosable) : U.IsClosed ↔ U.closure = U :=
+  ⟨IsClosed.closure_eq, fun h' ↦ h' ▸ h.closure_isClosed⟩
 
 /-- A LinearPMap with densely-defined formal adjoint is closable. -/
 lemma isClosable_of_exists_dense_formalAdjoint [CompleteSpace H] [CompleteSpace H']
@@ -464,7 +465,7 @@ lemma IsClosed.isClosed_toFun_graph (hU : U.IsClosed) :
   refine isClosed_of_closure_subset fun ⟨x₁, x₂⟩ hx ↦ ?_
   simp only [SetLike.mem_coe, LinearMap.mem_graph_iff, toFun_eq_coe]
   suffices (↑x₁, x₂) ∈ U.graph.topologicalClosure by
-    simp_all [hU.isClosable.graph_closure_eq_closure_graph, hU.isClosable.isClosed_iff.mp hU]
+    simp_all [hU.isClosable.graph_closure_eq_closure_graph, hU.closure_eq]
   obtain ⟨b, hb, hbx⟩ := mem_closure_iff_seq_limit.mp hx
   apply mem_closure_iff_seq_limit.mpr
   rw [nhds_prod_eq] at *
@@ -531,7 +532,7 @@ lemma IsClosed.add_continuous [CompleteSpace H']
       _ < ε := dist_eq_norm (b n).1 (b N).1 ▸ (lt_inv_mul_iff₀ hM).mp (hN n hn)
   obtain ⟨y, hy⟩ := CompleteSpace.complete hCS
   have hU₁ : (x₁, x₂ - y) ∈ U₁.graph := by
-    rw [← h₁.isClosable.isClosed_iff.mp h₁, ← h₁.isClosable.graph_closure_eq_closure_graph]
+    rw [← h₁.closure_eq, ← h₁.isClosable.graph_closure_eq_closure_graph]
     apply mem_closure_iff_seq_limit.mpr
     refine ⟨fun n ↦ ((b n).1, (b n).2 - U₂ ⟨(b n).1, hb₁U₂ n⟩), fun n ↦ ?_, ?_⟩
     · simp_all [add_apply, eq_sub_iff_add_eq]
@@ -686,8 +687,7 @@ lemma IsSelfAdjoint.isUnbounded [CompleteSpace H] (h : IsSelfAdjoint T) : T.IsUn
 
 lemma IsSelfAdjoint.isEssentiallySelfAdjoint [CompleteSpace H] (h : IsSelfAdjoint T) :
     T.IsEssentiallySelfAdjoint :=
-  isEssentiallySelfAdjoint_def.mpr <|
-    ((IsSelfAdjoint.isClosable h).isClosed_iff.mp h.isClosed).symm ▸ h
+  isEssentiallySelfAdjoint_def.mpr (h.isClosed.closure_eq.symm ▸ h)
 
 @[aesop safe apply]
 lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† := by
@@ -735,8 +735,7 @@ lemma IsEssentiallySelfAdjoint.unique_self_adjoint_extension [CompleteSpace H]
     T₂ = T.closure := by
   have h_dense : T.HasDenseDomain := h.hasDenseDomain
   have h_cl : T₂.IsClosed := IsSelfAdjoint.isClosed h₂
-  have h_cl' : T₂.closure = T₂ := h_cl.isClosable.isClosed_iff.mp h_cl
-  have h_le' : T.closure ≤ T₂ := h_cl' ▸ h_cl.isClosable.closure_mono h_le
+  have h_le' : T.closure ≤ T₂ := h_cl.closure_eq ▸ h_cl.isClosable.closure_mono h_le
   exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl <| h_dense.closure) h_le') h_le'
 
 @[aesop safe apply]

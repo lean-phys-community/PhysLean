@@ -120,7 +120,7 @@ lemma continuous_time_integral {d} (η : 𝓢(Time × Space d, ℝ)) :
       · subst rt
         simp
       positivity
-    convert h0' using 1
+    convert! h0' using 1
     rw [mul_comm]
     congr
     simp only [Prod.norm_mk, norm_pow, Real.norm_eq_abs]
@@ -198,7 +198,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
       · subst rt
         simp
       positivity
-    convert h0' using 1
+    convert! h0' using 1
     rw [mul_comm]
     simp only [Prod.norm_mk, norm_pow, Real.norm_eq_abs, norm_iteratedFDeriv_one,
       mul_eq_mul_right_iff, norm_eq_zero]
@@ -248,7 +248,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
     · filter_upwards with t
       intro x _
       simp [F']
-      rw [fderiv_comp', DifferentiableAt.fderiv_prodMk]
+      rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk]
       simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id]
       trans ‖(fderiv ℝ ⇑η (t, x))‖ * ‖(ContinuousLinearMap.prod (0 : Space d →L[ℝ] Time)
         (ContinuousLinearMap.id ℝ (Space d)))‖
@@ -267,7 +267,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
         rw [@norm_ne_zero_iff]
         simp only [Nat.succ_eq_add_one, ne_eq]
         rw [@ContinuousLinearMap.ext_iff]
-        simp only [ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply,
+        simp only [ContinuousLinearMap.prod_apply, _root_.zero_apply,
           ContinuousLinearMap.coe_id', id_eq, Prod.mk_eq_zero, true_and, not_forall]
         use Space.basis 0
         by_contra hn
@@ -284,7 +284,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
           sup_of_le_right]
         ring
       refine mul_le_mul_of_nonneg ?_ ?_ (by positivity) (by positivity)
-      · convert h1 x t
+      · convert! h1 x t
         simp
       · rfl
       fun_prop
@@ -357,7 +357,7 @@ lemma integrable_fderiv_space {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : S
       · subst rt
         simp
       positivity
-    convert h0' using 1
+    convert! h0' using 1
     rw [mul_comm]
     simp only [Prod.norm_mk, norm_pow, Real.norm_eq_abs, norm_iteratedFDeriv_one,
       mul_eq_mul_right_iff, norm_eq_zero]
@@ -377,7 +377,7 @@ lemma integrable_fderiv_space {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : S
         rw [@norm_ne_zero_iff]
         simp only [Nat.succ_eq_add_one, ne_eq]
         rw [@ContinuousLinearMap.ext_iff]
-        simp only [ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply,
+        simp only [ContinuousLinearMap.prod_apply, _root_.zero_apply,
           ContinuousLinearMap.coe_id', id_eq, Prod.mk_eq_zero, true_and, not_forall]
         use Space.basis 0
         by_contra hn
@@ -392,14 +392,14 @@ lemma integrable_fderiv_space {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : S
       · apply le_of_eq
         ring
       refine mul_le_mul_of_nonneg ?_ ?_ (by positivity) (by positivity)
-      · convert h1 x t
+      · convert! h1 x t
         simp
       · rfl
   have h2 : ∀ x : Space d, ∀ t : Time, ‖fderiv ℝ (fun x => η (t, x)) x‖ ≤
       k * ‖ContinuousLinearMap.prod (0 : Space d →L[ℝ] Time)
         (ContinuousLinearMap.id ℝ (Space d))‖ * (|1 + ‖t‖| ^ rt)⁻¹ := by
     intro x t
-    rw [fderiv_comp', DifferentiableAt.fderiv_prodMk]
+    rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk]
     simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id]
     trans ‖(fderiv ℝ ⇑η (t, x))‖ * ‖(ContinuousLinearMap.prod (0 : Space d →L[ℝ] Time)
       (ContinuousLinearMap.id ℝ (Space d)))‖
@@ -477,9 +477,9 @@ lemma time_integral_contDiff {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ
         congr
         funext t
         simp only [LineDeriv.lineDerivOpCLM_apply]
-        rw [fderiv_comp', DifferentiableAt.fderiv_prodMk]
-        simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.coe_comp',
-          Function.comp_apply, ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply,
+        rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk]
+        simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.coe_comp,
+          Function.comp_apply, ContinuousLinearMap.prod_apply, _root_.zero_apply,
           ContinuousLinearMap.coe_id', id_eq, SchwartzMap.lineDerivOp_apply_eq_fderiv]
         fun_prop
         fun_prop
@@ -693,6 +693,17 @@ lemma iteratedFDeriv_integrable {n} {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) 
 lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ)) :
     ∀ x, ∀ y, iteratedFDeriv ℝ n (fun x => ∫ (t : Time), η (t, x)) x y =
       ∫ (t : Time), (iteratedFDeriv ℝ n η (t, x)) (fun i => (0, y i)) := by
+  have hη_diff : ∀ m : ℕ, Differentiable ℝ (iteratedFDeriv ℝ m ⇑η) := by
+    intro m
+    refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
+    · exact Nat.cast_lt.mpr (by omega)
+    · exact η.smooth'.of_le (by exact ENat.LEInfty.out)
+  have hη_diff' : ∀ (m : ℕ) (t : Time),
+      Differentiable ℝ (iteratedFDeriv ℝ m (fun x => η (t, x))) := by
+    intro m t
+    refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
+    · exact Nat.cast_lt.mpr (by omega)
+    · exact (η.smooth'.of_le (by exact ENat.LEInfty.out)).comp (by fun_prop)
   induction n with
   | zero =>
     simp
@@ -722,14 +733,7 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
           continuousMultilinearCurryLeftEquiv_symm_apply]
         trans ((fderiv ℝ (fun x => iteratedFDeriv ℝ n (fun x => η (t, x)) x (Fin.tail y)) x) (y 0))
         · rw [fderiv_continuousMultilinear_apply_const_apply]
-          apply Differentiable.differentiableAt
-          apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-          refine Nat.cast_lt.mpr ?_
-          simp only [lt_add_iff_pos_right, zero_lt_one]
-          have hη := η.smooth'
-          apply ContDiff.comp
-          · exact hη.of_le (by exact ENat.LEInfty.out)
-          · fun_prop
+          exact (hη_diff' n t).differentiableAt
         conv_lhs =>
           enter [1, 2, x]
           rw [ih2]
@@ -739,29 +743,13 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
         · rfl
         rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
         simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id,
-          ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.prod_apply,
-          ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id', id_eq]
+          ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.prod_apply,
+          _root_.zero_apply, ContinuousLinearMap.coe_id', id_eq]
         fun_prop
         fun_prop
-        · apply Differentiable.differentiableAt
-          apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-          refine Nat.cast_lt.mpr ?_
-          simp only [lt_add_iff_pos_right, zero_lt_one]
-          have hη := η.smooth'
-          apply ContDiff.comp
-          · exact hη.of_le (by exact ENat.LEInfty.out)
-          · fun_prop
+        · exact (hη_diff n).differentiableAt
         · fun_prop
-        · apply Differentiable.differentiableAt
-          refine Differentiable.fun_comp ?_ ?_
-          apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-          refine Nat.cast_lt.mpr ?_
-          simp only [lt_add_iff_pos_right, zero_lt_one]
-          have hη := η.smooth'
-          apply ContDiff.comp
-          · exact hη.of_le (by exact ENat.LEInfty.out)
-          · fun_prop
-          fun_prop
+        · exact ((hη_diff n).fun_comp (by fun_prop)).differentiableAt
     trans (fderiv ℝ (fun x => ∫ (t : Time),
         (LineDeriv.iteratedLineDerivOpCLM ℝ _ (fun i => ((0, Fin.tail y i) : Time × Space d))
           η (t, x)))) x (y 0)
@@ -788,25 +776,9 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
     rfl
     fun_prop
     fun_prop
-    · apply Differentiable.differentiableAt
-      apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-      refine Nat.cast_lt.mpr ?_
-      simp only [lt_add_iff_pos_right, zero_lt_one]
-      have hη := η.smooth'
-      apply ContDiff.comp
-      · exact hη.of_le (by exact ENat.LEInfty.out)
-      · fun_prop
+    · exact (hη_diff n).differentiableAt
     · fun_prop
-    · apply Differentiable.differentiableAt
-      refine Differentiable.fun_comp ?_ ?_
-      apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-      refine Nat.cast_lt.mpr ?_
-      simp only [lt_add_iff_pos_right, zero_lt_one]
-      have hη := η.smooth'
-      apply ContDiff.comp
-      · exact hη.of_le (by exact ENat.LEInfty.out)
-      · fun_prop
-      fun_prop
+    · exact ((hη_diff n).fun_comp (by fun_prop)).differentiableAt
     exact integrable_fderiv_space _ x
 
 lemma time_integral_iteratedFDeriv_eq {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ))
@@ -891,7 +863,7 @@ lemma time_integral_mul_pow_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) :
           exact hrt
         · refine Pi.le_def.mpr ?_
           intro t
-          convert hbound t using 1
+          convert! hbound t using 1
           simp
   apply le_of_eq
   rw [MeasureTheory.integral_const_mul]
@@ -909,12 +881,12 @@ def timeIntegralSchwartz {d : ℕ} :
     𝓢(Time × Space d, ℝ) →L[ℝ] 𝓢(Space d, ℝ) := by
   refine SchwartzMap.mkCLM (fun η x => ∫ (t : Time), η (t, x)) ?_ ?_ ?_ ?_
   · intro η1 η2 x
-    simp only [SchwartzMap.add_apply]
+    simp only [_root_.add_apply]
     rw [integral_add]
     · exact integrable_time_integral η1 x
     · exact integrable_time_integral η2 x
   · intro a η x
-    simp only [SchwartzMap.smul_apply, smul_eq_mul, RingHom.id_apply]
+    simp only [_root_.smul_apply, smul_eq_mul, RingHom.id_apply]
     rw [integral_const_mul]
   · intro η
     refine contDiff_infty.mpr ?_
@@ -991,8 +963,8 @@ lemma constantTime_distSpaceDeriv {M : Type} {d : ℕ} [NormedAddCommGroup M] [N
   funext t
   change (fderiv ℝ (η ∘ fun x => (t, x)) x) (basis i) = _
   rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.coe_comp',
-    Function.comp_apply, ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply,
+  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.coe_comp,
+    Function.comp_apply, ContinuousLinearMap.prod_apply, _root_.zero_apply,
     ContinuousLinearMap.coe_id', id_eq]
   · fun_prop
   · fun_prop
@@ -1071,8 +1043,8 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
       change _ = (fderiv ℝ (η ∘ fun t => (t, x)) t) 1
       rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
       simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
-        ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.prod_apply,
-        ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
+        ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.prod_apply,
+        ContinuousLinearMap.coe_id', id_eq, _root_.zero_apply]
       · fun_prop
       · fun_prop
       · apply Differentiable.differentiableAt
@@ -1091,8 +1063,8 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
             exact η.smooth'.differentiable (by simp))
             (by fun_prop), DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
           simp only [Nat.succ_eq_add_one, fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
-            ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.prod_apply,
-            ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
+            ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.prod_apply,
+            ContinuousLinearMap.coe_id', id_eq, _root_.zero_apply]
         exact integrable_time_integral (LineDeriv.lineDerivOpCLM ℝ _ ((1, 0) : Time × Space d) η) x
       · simp
         exact integrable_time_integral η x

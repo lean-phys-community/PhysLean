@@ -213,21 +213,33 @@ def noLintArray : IO (Array FilePath) := do
   let lines ← IO.FS.lines path
   return lines.map (fun l ↦ mkFilePath [l])
 
-def main (_ : List String) : IO UInt32 := do
-  initSearchPath (← findSysroot)
-  let mods : Name := `Physlib
+/-- The array of modules exempt from all linters, read from `scripts/LinterExemption.txt`.
+  This is used to lint `QuantumInfo` file-by-file. -/
+def linterExemptions : IO (Array FilePath) := do
+  let path := (mkFilePath ["scripts", "LinterExemption"]).addExtension "txt"
+  unless (← path.pathExists) do return #[]
+  let lines ← IO.FS.lines path
+  return lines.filterMap (fun l ↦ if l.trim == "" then none else some (mkFilePath [l.trim]))
+
+/-- The file paths of the modules imported into the module `mods` (e.g. `Physlib`). -/
+def importedFilePaths (mods : Name) : IO (Array FilePath) := do
   let imp : Import := {module := mods}
   let mFile ← findOLean imp.module
   unless (← mFile.pathExists) do
         throw <| IO.userError s!"object file '{mFile}' of module {imp.module} does not exist"
-  let (physlibMod, _) ← readModuleData mFile
-  let filePaths := physlibMod.imports.filterMap (fun imp ↦
+  let (modData, _) ← readModuleData mFile
+  return modData.imports.filterMap (fun imp ↦
     if imp.module == `Init then
       none
     else
       some ((mkFilePath (imp.module.toString.splitToList (· == '.'))).addExtension "lean"))
+
+def main (_ : List String) : IO UInt32 := do
+  initSearchPath (← findSysroot)
+  let filePaths := (← importedFilePaths `Physlib) ++ (← importedFilePaths `QuantumInfo)
   let noLint ← noLintArray
-  let modulesToCheck := filePaths.filter (fun p ↦ !noLint.contains p)
+  let exemptions ← linterExemptions
+  let modulesToCheck := filePaths.filter (fun p ↦ !noLint.contains p ∧ !exemptions.contains p)
   let errors := (← modulesToCheck.mapM checkHeadings).toList.flatten
   /- Printing the errors -/
   for eM in errors do

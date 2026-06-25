@@ -274,6 +274,8 @@ public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
 public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basic
+public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.SelfAdjoint
+public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.SpectralMeasure
 public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Symmetric
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.ExpectedValue
 public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.IsEigenvector
@@ -368,6 +370,7 @@ public import Physlib.Relativity.Tensors.OfInt
 public import Physlib.Relativity.Tensors.Product
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
+public import Physlib.Relativity.Tensors.RealTensor.CoVector.Representation
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
@@ -382,11 +385,13 @@ public import Physlib.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Contraction
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Pre.Modules
+public import Physlib.Relativity.Tensors.RealTensor.Vector.Representation
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Velocity.Basic
 public import Physlib.Relativity.Tensors.TensorSpecies.Basic
 public import Physlib.Relativity.Tensors.Tensorial
 public import Physlib.Relativity.Tensors.UnitTensor
+public import Physlib.SpaceAndTime.GalileanGroup.Basic
 public import Physlib.SpaceAndTime.Space.Basic
 public import Physlib.SpaceAndTime.Space.ConstantSliceDist
 public import Physlib.SpaceAndTime.Space.CrossProduct
@@ -427,6 +432,8 @@ public import Physlib.SpaceAndTime.Time.TimeTransMan
 public import Physlib.SpaceAndTime.Time.TimeUnit
 public import Physlib.SpaceAndTime.TimeAndSpace.Basic
 public import Physlib.SpaceAndTime.TimeAndSpace.ConstantTimeDist
+public import Physlib.SpaceAndTime.TimeAndSpace.EuclideanGroup.Action
+public import Physlib.SpaceAndTime.TimeAndSpace.EuclideanGroup.SchwartzAction
 public import Physlib.StatisticalMechanics.BoltzmannConstant
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Basic
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite

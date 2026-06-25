@@ -73,7 +73,7 @@ lemma isExtrema_iff_components {𝓕 : FreeSpace}
     simp [h]
   · intro h
     rw [isExtrema_iff_gradLagrangian]
-    ext ε
+    ext1 ε
     funext i
     match i with
     | Sum.inl 0 => exact h.1 ε
@@ -123,7 +123,7 @@ lemma isExtrema_iff_space_time {𝓕 : FreeSpace}
         ext x
         simp
     · intro h ε
-      convert h (SchwartzMap.compCLMOfContinuousLinearEquiv (F := ℝ) ℝ
+      convert! h (SchwartzMap.compCLMOfContinuousLinearEquiv (F := ℝ) ℝ
         (SpaceTime.toTimeAndSpace 𝓕.c (d := d)).symm ε) using 1
       · simp [SpaceTime.distTimeSlice_symm_apply]
         ring_nf
@@ -219,7 +219,7 @@ lemma isExterma_iff_tensor {𝓕 : FreeSpace}
     exact h1
   · intro h
     simp only [IsExtrema]
-    ext x
+    ext1 x
     funext ν
     rw [gradLagrangian_eq_tensor A J, h]
     simp
@@ -261,7 +261,7 @@ lemma isExterma_equivariant {𝓕 : FreeSpace}
     simp only [one_div, map_smul, map_neg,
       _root_.smul_add, actionT_smul, _root_.smul_neg, _root_.smul_zero]
     simpa only [Fin.isValue, schwartzAction_mul_apply, inv_mul_cancel, map_one,
-      ContinuousLinearMap.one_apply, smul_add, actionT_smul, smul_neg] using h (schwartzAction Λ x)
+      one_apply_eq_self, smul_add, actionT_smul, smul_neg] using h (schwartzAction Λ x)
   · intro h x
     rw [isExterma_iff_tensor A J] at h
     specialize h (schwartzAction Λ⁻¹ x)

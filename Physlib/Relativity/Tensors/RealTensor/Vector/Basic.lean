@@ -54,6 +54,12 @@ def equivEuclid (d : ℕ) :
 lemma equivEuclid_apply (d : ℕ) (v : Vector d) (i : Fin 1 ⊕ Fin d) :
     equivEuclid d v i = v i := rfl
 
+@[ext]
+lemma eq_of_apply_eq {d : ℕ} {v w : Vector d} (h : ∀ i, v i = w i) : v = w := by
+  apply (equivEuclid d).injective
+  ext i
+  simpa using h i
+
 instance (d : ℕ) : Norm (Vector d) where
   norm := fun v => ‖equivEuclid d v‖
 
@@ -249,7 +255,7 @@ lemma fderiv_apply {d : ℕ} {α : Type*}
     fderiv ℝ f x dt ν = fderiv ℝ (fun y => f y ν) x dt := by
   change _ = (fderiv ℝ (Lorentz.Vector.coordCLM ν ∘ f) x) dt
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
   rfl
 
 @[simp]

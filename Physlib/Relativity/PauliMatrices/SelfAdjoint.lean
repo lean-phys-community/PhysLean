@@ -330,30 +330,30 @@ lemma pauliBasis_minkowskiMetric_pauliBasis' (i : Fin 1 ⊕ Fin 3) :
     cases i with
     | inl val =>
       ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_apply, neg_neg]
+      simp_all only [NegMemClass.coe_neg, neg_neg]
     | inr val_1 =>
       ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_apply, neg_neg]
+      simp_all only [NegMemClass.coe_neg, neg_neg]
   | Sum.inr 1 =>
     simp only [pauliBasis, Fin.isValue, Basis.coe_mk, pauliSelfAdjoint, minkowskiMatrix.inr_i_inr_i,
       pauliBasis', pauliSelfAdjoint', neg_smul, one_smul]
     cases i with
     | inl val =>
       ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_apply, neg_neg]
+      simp_all only [NegMemClass.coe_neg, neg_neg]
     | inr val_1 =>
       ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_apply, neg_neg]
+      simp_all only [NegMemClass.coe_neg, neg_neg]
   | Sum.inr 2 =>
     simp only [pauliBasis, Fin.isValue, Basis.coe_mk, pauliSelfAdjoint, minkowskiMatrix.inr_i_inr_i,
       pauliBasis', pauliSelfAdjoint', neg_smul, one_smul]
     cases i with
     | inl val =>
       ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_apply, neg_neg]
+      simp_all only [NegMemClass.coe_neg, neg_neg]
     | inr val_1 =>
       ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_apply, neg_neg]
+      simp_all only [NegMemClass.coe_neg, neg_neg]
 
 end
 end PauliMatrix

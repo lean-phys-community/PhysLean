@@ -212,5 +212,23 @@ lemma regularityDomain_isConnected_of_bddAbove (h : BddAbove (Θᵣₑ T)) :
   apply hT.regularityDomain_isConnected_iff.mpr
   exact ⟨m + 1, hT.Ioi_subset_regularityDomain hm ⟨m + 1, by simp⟩⟩
 
+/-!
+## C. Point spectrum
+-/
+
+/-- Eigenvalues of a symmetric unbounded operator are real. -/
+lemma pointSpectrum_real : σᵖ T ⊆ range ofReal := by
+  intro z hz
+  apply hT.numericalRange_subset
+  obtain ⟨x, hx, hx₀⟩ := (Submodule.ne_bot_iff _).mp hz
+  suffices z = (‖x‖ ^ 2)⁻¹ * ⟪↑x, T ⟨x, x.2.1⟩⟫_ℂ by
+    exact this ▸ mem_numericalRange (T := T) (x := ⟨x, x.2.1⟩) (by simp [hx₀])
+  rw [ofReal_inv]
+  refine (eq_inv_mul_iff_mul_eq₀ (by simp [hx₀])).mpr (Eq.symm ?_)
+  calc
+    _ = ⟪↑x, (T - z • 1) x + z • x⟫_ℂ := by simp [sub_apply]
+    _ = ⟪x, z • x⟫_ℂ := by simp [← toFun_eq_coe, LinearMap.mem_ker.mp hx]
+    _ = ↑(‖x‖ ^ 2) * z := by simp [inner_smul_right, mul_comm]
+
 end IsSymmetric
 end LinearPMap

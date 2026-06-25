@@ -253,7 +253,7 @@ lemma map_minkowskiProduct_eq_self_forall_iff {d : ℕ} (f : Vector d →ₗ[ℝ
     (∀ p q : Vector d, ⟪f p, q⟫ₘ = ⟪p, q⟫ₘ) ↔ f = LinearMap.id := by
   constructor
   · intro h
-    ext p
+    ext1 p
     have h1 := h p
     have h2 : ∀ q, ⟪f p - p, q⟫ₘ = 0 := by
       intro q

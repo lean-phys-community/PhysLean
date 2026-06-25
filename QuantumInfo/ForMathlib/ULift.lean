@@ -7,6 +7,15 @@ module
 
 public import Mathlib
 
+/-!
+# Typeclass instances for `ULift`
+
+This file equips `ULift` with algebraic and analytic typeclass instances lifted from the
+underlying type, including `Star`, `StarMul`, `StarRing`, `NormedField`, `DenselyNormedField`
+and `RCLike` structures, together with the corresponding `simp` lemmas relating operations on
+`ULift.{v, u} α` to operations on the underlying `α`.
+-/
+
 @[expose] public section
 
 open ComplexOrder
@@ -22,7 +31,8 @@ instance ULift.instStar {𝕜 : Type u} [Star 𝕜] : Star (ULift.{v,u} 𝕜) wh
 theorem ULift.star_eq {𝕜 : Type u} [Star 𝕜] (x : ULift.{v,u} 𝕜) : star x = .up (star x.down) := by
   rfl
 
-instance ULift.instInvolutiveStar {𝕜 : Type u} [InvolutiveStar 𝕜] : InvolutiveStar (ULift.{v,u} 𝕜) where
+instance ULift.instInvolutiveStar {𝕜 : Type u} [InvolutiveStar 𝕜] :
+    InvolutiveStar (ULift.{v,u} 𝕜) where
   star_involutive x := by simp
 
 instance ULift.instStarMul {𝕜 : Type u} [Mul 𝕜] [StarMul 𝕜] : StarMul (ULift.{v,u} 𝕜) where

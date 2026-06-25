@@ -105,7 +105,7 @@ open Pointwise
 abbrev resolvent (T : H →ₗ.[ℂ] H) (z : ℂ) : H →ₗ.[ℂ] H := (T - z • 1).inverse
 
 @[inherit_doc resolvent]
-local notation "𝑅" => resolvent
+scoped notation "𝑅" => resolvent
 
 /-!
 ## A. Regularity domain
@@ -361,13 +361,14 @@ lemma defectNumber_closure [CompleteSpace H]
 lemma _root_.Submodule.inf_ne_bot_of_rank_lt
     {E F : Submodule ℂ H} [E.HasOrthogonalProjection] (h_rank : Module.rank ℂ E < Module.rank ℂ F) :
     Eᗮ ⊓ F ≠ ⊥ := by
-  let Φ : F →L[ℂ] E := E.orthogonalProjection ∘L F.subtypeL
+  let Φ : F →L[ℂ] E := E.orthogonalProjectionOnto ∘L F.subtypeL
   have hΦ : ¬(⇑Φ).Injective := fun h' ↦ not_le_of_gt h_rank (Φ.rank_le_of_injective h')
   obtain ⟨x₁, x₂, h, hx⟩ := Function.not_injective_iff.mp hΦ
   let y : H := x₁ - x₂
   have hy : y ≠ 0 := fun h' ↦ hx (SetLike.coe_eq_coe.mp <| sub_eq_zero.mp h')
   have hF : y ∈ F := sub_mem (coe_mem x₁) (coe_mem x₂)
-  have hE : y ∈ Eᗮ := orthogonalProjection_eq_zero_iff.mp (_root_.map_sub Φ _ _ ▸ sub_eq_zero.mpr h)
+  have hE : y ∈ Eᗮ := orthogonalProjectionOnto_eq_zero_iff.mp
+    (_root_.map_sub Φ _ _ ▸ sub_eq_zero.mpr h)
   exact fun hEF ↦ hy ((mem_bot ℂ).mp <| hEF ▸ ⟨hE, hF⟩)
 
 lemma IsClosed.exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H]
@@ -662,7 +663,7 @@ def resolventSet (T : H →ₗ.[ℂ] H) : Set ℂ :=
   {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)}
 
 @[inherit_doc resolventSet]
-local notation "ρ" => resolventSet
+scoped notation "ρ" => resolventSet
 
 lemma resolventSet_eq (T : H →ₗ.[ℂ] H) :
     ρ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)} :=
@@ -738,7 +739,7 @@ lemma resolventSet_isOpen [CompleteSpace H] (T : H →ₗ.[ℂ] H) : IsOpen (ρ 
 def spectrum (T : H →ₗ.[ℂ] H) : Set ℂ := (ρ T)ᶜ
 
 @[inherit_doc spectrum]
-local notation "σ" => spectrum
+scoped notation "σ" => spectrum
 
 lemma spectrum_eq (T : H →ₗ.[ℂ] H) : σ T = (ρ T)ᶜ := rfl
 
@@ -765,7 +766,7 @@ lemma spectrum_isClosed [CompleteSpace H] (T : H →ₗ.[ℂ] H) : _root_.IsClos
 def pointSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ := {z : ℂ | (T - z • 1).toFun.ker ≠ ⊥}
 
 @[inherit_doc pointSpectrum]
-local notation "σᵖ" => pointSpectrum
+scoped notation "σᵖ" => pointSpectrum
 
 lemma pointSpectrum_eq (T : H →ₗ.[ℂ] H) : σᵖ T = {z | (T - z • 1).toFun.ker ≠ ⊥} := rfl
 
@@ -787,7 +788,7 @@ def residualSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ :=
   {z : ℂ | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)}
 
 @[inherit_doc residualSpectrum]
-local notation "σʳ" => residualSpectrum
+scoped notation "σʳ" => residualSpectrum
 
 lemma residualSpectrum_eq (T : H →ₗ.[ℂ] H) :
     σʳ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)} :=
@@ -800,6 +801,9 @@ lemma mem_residualSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
 lemma residualSpectrum_subset_spectrum (T : H →ₗ.[ℂ] H) : σʳ T ⊆ σ T :=
   fun _ ⟨_, h, _⟩ ↦ mem_spectrum_iff.mpr (Or.inr <| Or.inl h)
 
+lemma residualSpectrum_subset_regularityDomain (T : H →ₗ.[ℂ] H) : σʳ T ⊆ T.regularityDomain :=
+  fun _ hz ↦ mem_regularityDomain_iff.mpr ⟨hz.1, hz.2.2⟩
+
 /-!
 #### D.2.3. Continuous spectrum
 -/
@@ -811,7 +815,7 @@ def continuousSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ :=
   {z : ℂ | ¬_root_.IsClosed ((T - z • 1).toFun.range : Set H)}
 
 @[inherit_doc continuousSpectrum]
-local notation "σᶜ" => continuousSpectrum
+scoped notation "σᶜ" => continuousSpectrum
 
 lemma continuousSpectrum_eq (T : H →ₗ.[ℂ] H) :
     σᶜ T = {z | ¬_root_.IsClosed ((T - z • 1).toFun.range : Set H)} := rfl

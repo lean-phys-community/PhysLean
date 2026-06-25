@@ -171,7 +171,7 @@ lemma constantEB_vectorPotential_space_deriv {c : SpeedOfLight}
   rw [Space.deriv_eq]
   rw [fderiv_const_mul (by fun_prop)]
   rw [fderiv_fun_sum (by fun_prop)]
-  simp only [one_div, ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_sum', Pi.smul_apply,
+  simp only [one_div, FunLike.coe_smul, FunLike.coe_sum, Pi.smul_apply,
     Finset.sum_apply, smul_eq_mul, mul_eq_mul_left_iff, inv_eq_zero, OfNat.ofNat_ne_zero, or_false]
   rw [Finset.sum_eq_single i]
   · rw [fderiv_const_mul (by fun_prop)]

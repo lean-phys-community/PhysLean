@@ -349,8 +349,7 @@ lemma quadSolsInclLinSols_injective (χ : ACCSystemQuad) :
     Function.Injective χ.quadSolsInclLinSols := by
   intro S T h
   ext
-  simpa [ACCSystemQuad.quadSolsInclLinSols] using
-    congrArg (fun X => X.val) h
+  exact congrArg (fun X => X.val) h
 
 /-!
 
@@ -386,7 +385,7 @@ lemma quadSolsIncl_injective (χ : ACCSystemQuad) :
   intro S T h
   have h' : χ.quadSolsInclLinSols S = χ.quadSolsInclLinSols T := by
     apply ACCSystemLinear.linSolsIncl_injective (χ := χ.toACCSystemLinear)
-    simpa [ACCSystemQuad.quadSolsIncl, MulActionHom.comp_apply] using h
+    exact h
   exact quadSolsInclLinSols_injective χ h'
 
 end ACCSystemQuad
@@ -491,7 +490,7 @@ lemma solsInclQuadSols_injective (χ : ACCSystem) :
   apply Sols.ext
   have hv : (χ.solsInclQuadSols S).val = (χ.solsInclQuadSols T).val :=
     congrArg (fun X => X.val) h
-  simpa [ACCSystem.solsInclQuadSols] using hv
+  exact hv
 
 /-!
 

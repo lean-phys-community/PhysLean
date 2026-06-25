@@ -135,9 +135,11 @@ lemma momentum_commutation_momentum : ⁅𝐩 i, 𝐩 j⁆ = 0 := by
 lemma momentum_comp_commute : 𝐩 i ∘L 𝐩 j = 𝐩 j ∘L 𝐩 i := by
   rw [comp_eq_comp_add_commute, momentum_commutation_momentum, add_zero]
 
+attribute [local instance 100] LieRing.ofAssociativeRing
+
 @[simp]
 lemma momentumSqr_commutation_momentum : ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐩 i⁆ = 0 := by
-  simp [dotProduct, mul_def, sum_lie, leibniz_lie]
+  simp  [dotProduct, mul_def, sum_lie, leibniz_lie]
 
 lemma momentumSqr_comp_momentum_commute : (𝐩 ⬝ᵥ 𝐩) ∘L 𝐩 i = 𝐩 i ∘L (𝐩 ⬝ᵥ 𝐩) := by
   rw [comp_eq_comp_add_commute, momentumSqr_commutation_momentum, add_zero]
@@ -304,10 +306,9 @@ lemma angularMomentum_commutation_angularMomentum : ⁅𝐋 i j, 𝐋 k l⁆ =
     lie_sub, lie_leibniz, comp_smul, smul_comp, comp_sub, sub_comp, ← smul_add, ← smul_sub]
   dsimp [angularMomentumOperator]
   ext
-  simp only [nsmul_eq_mul, coe_smul', coe_sub', Pi.smul_apply, Pi.sub_apply,
-    ContinuousLinearMap.add_apply, coe_mul', coe_comp', Function.comp_apply, natCast_apply,
-    SchwartzMap.smul_apply, SchwartzMap.sub_apply, SchwartzMap.add_apply, smul_eq_mul, smul_add,
-    map_comp_sub]
+  simp only [nsmul_eq_mul, smul_apply, sub_apply, add_apply, mul_apply_eq_comp, comp_apply,
+    _root_.natCast_apply, positionCLM_apply, momentumCLM_apply, neg_mul, mul_neg, smul_neg,
+    sub_neg_eq_add, smul_eq_mul, smul_add]
   ring
 
 @[simp]

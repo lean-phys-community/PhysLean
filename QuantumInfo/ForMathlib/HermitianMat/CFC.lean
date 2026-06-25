@@ -66,7 +66,6 @@ theorem cfc_eq_cfc_iff_eqOn (f g : ℝ → ℝ) :
   rw [HermitianMat.ext_iff, mat_cfc, mat_cfc]
   exact _root_.cfc_eq_cfc_iff_eqOn A.H
 
-@[gcongr]
 nonrec theorem cfc_congr (hfg : Set.EqOn f g (spectrum ℝ A.mat)) :
     A.cfc f = A.cfc g := by
   ext1
@@ -695,7 +694,7 @@ lemma spectrum_subset_of_isOpen (A₀ : HermitianMat d ℂ) (U : Set ℝ)
     generalize_proofs at *; (
     obtain ⟨ i, hi, hi' ⟩ := ht₂ x hx
     generalize_proofs at *; (
-    exact ⟨ ε i - |x - i|, sub_pos.mpr ( by simpa [ abs_sub_comm ] using hi' ), fun B hB s hs => h i ( ht₁ i hi ) B ( lt_of_lt_of_le hB ( min_le_of_left_le ( hδ_min i hi ) ) ) s ( by rw [ abs_lt ] at *; constructor <;> linarith [ abs_le.mp ( show |x - i| ≤ |x - i| by rfl ) ] ) ⟩))))))
+    exact ⟨ ε i - |x - i|, sub_pos.mpr ( by simp_all [ abs_sub_comm ]; exact hi' ), fun B hB s hs => h i ( ht₁ i hi ) B ( lt_of_lt_of_le hB ( min_le_of_left_le ( hδ_min i hi ) ) ) s ( by rw [ abs_lt ] at *; constructor <;> linarith [ abs_le.mp ( show |x - i| ≤ |x - i| by rfl ) ] ) ⟩))))))
   generalize_proofs at *; (
   -- For any $B$ with $\|B - A₀\| < \delta$, if $t \in \sigma(B)$, then $t \notin K$.
   have h_not_in_K : ∀ B : HermitianMat d ℂ, ‖B - A₀‖ < δ → ∀ t ∈ spectrum ℝ B.mat, t ∉ K := by
@@ -704,7 +703,7 @@ lemma spectrum_subset_of_isOpen (A₀ : HermitianMat d ℂ) (U : Set ℝ)
     have h_unit : IsUnit (B.mat - algebraMap ℝ (Matrix d d ℂ) t) := by
       exact hε_t B hB t ( by simpa using hε_t_pos )
     generalize_proofs at *; (
-    exact ht ( by simpa [ sub_eq_iff_eq_add ] using h_unit.neg ))
+    exact ht ( by have h1 := h_unit.neg; simp_all; exact h1 ))
   generalize_proofs at *; (
   filter_upwards [ Metric.ball_mem_nhds A₀ ( show 0 < Min.min δ 1 by positivity ) ] with B hB using fun t ht =>
       Classical.not_not.1 fun h => h_not_in_K B
@@ -865,9 +864,9 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
             · convert this.sub ( ContinuousWithinAt.comp ( show ContinuousWithinAt ( fun p : ℝ => f x₀ p ) T ( ( A x₀ ).H.eigenvalues i ) from ?_ ) ( continuousWithinAt_snd ) ?_ ) using 1 <;> norm_num +zetaDelta at *;
               · have := hf ( x₀, ( A x₀ ).H.eigenvalues i ) ⟨ hx₀, hA₁ x₀ hx₀ ((A x₀).H.eigenvalues_mem_spectrum_real i) ⟩
                 generalize_proofs at *; (
-                convert this.comp ( show ContinuousWithinAt ( fun p => ( x₀, p ) ) T ( ( A x₀ ).H.eigenvalues i ) from ?_ ) ?_ using 1 ;
+                convert! this.comp ( show ContinuousWithinAt ( fun p => ( x₀, p ) ) T ( ( A x₀ ).H.eigenvalues i ) from ?_ ) ?_ using 1 ;
                 generalize_proofs at *; (
-                exact ContinuousWithinAt.prodMk ( continuousWithinAt_const ) continuousWithinAt_id);
+                exact ContinuousWithinAt.prodMk ( continuousWithinAt_const ) (continuousWithinAt_id));
                 exact fun x hx => ⟨ hx₀, hx ⟩);
               · exact fun x hx => hx.2;
             · exact hA₁ x₀ hx₀ ((A x₀).H.eigenvalues_mem_spectrum_real i) )
@@ -1293,7 +1292,7 @@ lemma trace_cfc_eq (A : HermitianMat d ℂ) (f : ℝ → ℝ) :
   rw [HermitianMat.mat_cfc] at h1
   rw [h2] at h1
   have h3 : (Complex.ofReal) (A.cfc f).trace = Complex.ofReal (∑ i, f (A.H.eigenvalues (e i))) := by
-    convert h1 using 1
+    convert! h1 using 1
     simp
   have h4 := Complex.ofReal_injective h3
   rw [h4]
@@ -1355,7 +1354,7 @@ lemma cfc_mulVec_expansion (A : HermitianMat d ℂ) (f : ℝ → ℝ) (x : Eucli
     intro x; congr; ext y; simp [ Finset.sum_ite, Finset.filter_eq, Finset.filter_and ] ; ring_nf
     rw [ Finset.sum_eq_single y ] <;> aesop;
   simp_all [mul_comm, mul_left_comm ] ; ring_nf
-  convert congr_arg ( fun y => ∑ j, x.ofLp j * y j ) h_cfc_def using 1
+  convert! congr_arg ( fun y => ∑ j, x.ofLp j * y j ) h_cfc_def using 1
   simp [ Finset.mul_sum _ _ _, mul_assoc, mul_left_comm ]
   ring_nf!
   rw [ Finset.sum_comm, Finset.sum_congr rfl ]

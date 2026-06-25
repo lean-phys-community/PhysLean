@@ -299,7 +299,8 @@ lemma induction_on_pure {n : ℕ} {c : Fin n → C} {P : S.Tensor c → Prop}
     (hadd : ∀ t1 t2, P t1 → P t2 → P (t1 + t2)) (t : S.Tensor c) : P t := by
   refine PiTensorProduct.induction_on' t ?_ ?_
   · intro r p
-    simpa using hsmul r _ (h p)
+    simp only [PiTensorProduct.tprodCoeff_eq_smul_tprod]
+    exact hsmul r _ (h p)
   · intro t1 t2
     exact fun a a_1 => hadd t1 t2 a a_1
 
@@ -540,6 +541,10 @@ And their interactions with
 - actions
 -/
 
+TODO "Rename `PermCond` to `IsReindexing` (or similar)
+  and move it to it's own file system. Move the results from
+  ./Product related to `PermCond` to that file as well."
+
 /-- Given two lists of indices `c : Fin n → C` and `c1 : Fin m → C` a map
   `σ : Fin m → Fin n` satisfies the condition `PermCond c c1 σ` if it is:
 - A bijection
@@ -605,6 +610,7 @@ lemma PermCond.preserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   simp only [Function.comp_apply]
   rw [h.2]
 
+set_option warning.simp.varHead false in
 @[simp, nolint simpVarHead]
 lemma PermCond.inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (x : Fin n) :
@@ -615,6 +621,7 @@ lemma PermCond.inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
   rw [h.preserve_color]
   rfl
 
+set_option warning.simp.varHead false in
 @[simp, nolint simpVarHead]
 lemma PermCond.toEquiv_symm_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (x : Fin m) :
@@ -769,6 +776,27 @@ lemma PermCond.append_right_succSuccAbove {n n1 : ℕ} {c : Fin (n + 1 + 1) → 
       (Fin.append c1 (c ∘ (i.succSuccAbove j))) id := by
   apply And.intro (Function.bijective_id)
   simp [forall_fin_add, succSuccAbove_comm_natAdd i j, succSuccAbove_natAdd_apply_castAdd i j]
+
+/-- Splitting a list of colours `c : Fin (n + 1) → C` into its first `n` entries and its
+  last entry recovers `c`: the identity permutation matches
+  `Fin.append (c ∘ (Fin.last n).succAbove) ![c (Fin.last n)]` with `c`. -/
+lemma PermCond.append_succ_last {n : ℕ} (c : Fin (n + 1) → C) :
+    PermCond (Fin.append (c ∘ (Fin.last n).succAbove) ![c (Fin.last n)]) c id := by
+  rw [Fin.succAbove_last, on_id]
+  refine Fin.addCases (fun i => ?_) (fun i => ?_)
+  · simp only [Fin.append_left, Function.comp_apply]; rfl
+  · fin_cases i; simp only [Fin.append_right, Matrix.cons_val_fin_one]; rfl
+
+/-- Splitting a list of colours `c : Fin (n + 1) → C` into its first entry and its remaining
+  `n` entries recovers `c`: the canonical reindexing `Fin (1 + n) ≃ Fin (n + 1)` matches
+  `Fin.append ![c 0] (c ∘ Fin.succAbove 0)` with `c`. -/
+lemma PermCond.append_of_first {n : ℕ} (c : Fin (n + 1) → C) :
+    PermCond (Fin.append ![c 0] (c ∘ Fin.succAbove 0)) c (Fin.cast (by grind)) := by
+  refine ⟨(finCongr (by grind)).bijective, fun i => ?_⟩
+  rcases Fin.eq_zero_or_eq_succ i with rfl | ⟨i, rfl⟩
+  · rfl
+  · simpa using congrArg (Fin.append ![c 0] (c ∘ Fin.succ)) (a₁ := Fin.cast _ i.succ)
+      (a₂ := Fin.natAdd 1 i) (by ext; grind)
 
 TODO "Prove that if `σ` satisfies `PermCond c c1 σ` then `PermCond.inv σ h`
   satisfies `PermCond c1 c (PermCond.inv σ h)`."
@@ -1011,6 +1039,10 @@ lemma toField_default {c : Fin 0 → C} :
     toField (Pure.toTensor default : S.Tensor c) = 1 := by
   simp [toField, Pure.toTensor]
 
+lemma toField_injective {c : Fin 0 → C} :
+    Function.Injective (toField : S.Tensor c → k) :=
+  (PiTensorProduct.isEmptyEquiv (Fin 0)).injective
+
 @[simp]
 lemma toField_pure {c : Fin 0 → C} (p : Pure S c) :
     toField (p.toTensor : S.Tensor c) = 1 := by
@@ -1030,6 +1062,10 @@ lemma toField_permT {c c1 : Fin 0 → C} (σ : Fin 0 → Fin 0) (h : PermCond c 
 @[simp]
 lemma toField_basis_default {c : Fin 0 → C} :
     toField (basis c (@default (ComponentIdx (S := S) c) Unique.instInhabited)) = 1 := by
+  simp [basis_apply]
+
+lemma toField_basis {c : Fin 0 → C} (b : ComponentIdx (S := S) c) :
+    toField (basis c b) = 1 := by
   simp [basis_apply]
 
 lemma toField_eq_repr {c : Fin 0 → C} (t : Tensor S c) :
@@ -1055,6 +1091,11 @@ lemma toField_equivariant {c : Fin 0 → C} (g : G) (t : Tensor S c) :
     simp [hp]
   · intro t1 t2 hp1 hp2
     simp [hp1, hp2]
+
+lemma eq_smul_toField {c : Fin 0 → C} (t : Tensor S c) :
+    t = toField t • (basis c (@default (ComponentIdx (S := S) c) Unique.instInhabited)) := by
+  apply toField_injective
+  simp
 
 end Tensor
 

@@ -58,6 +58,10 @@ instance modulesModule (d : ℕ) : ∀ c, Module ℝ (modules d c)
 
 end realLorentzTensor
 
+TODO "Replace Lorentz.ContrMod and Lorentz.CoMod in the definition of realLorentzTensor
+  directly with Lorentz.Vector and Lorentz.Covector, and
+  representations defined on them."
+
 noncomputable section
 open realLorentzTensor in
 /-- The tensor structure for complex Lorentz tensors. -/

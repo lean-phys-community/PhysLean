@@ -50,6 +50,12 @@ def equivEuclid (d : ℕ) :
     CoVector d ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 1 ⊕ Fin d) :=
   (WithLp.linearEquiv _ _ _).symm
 
+@[ext]
+lemma eq_of_apply_eq {d : ℕ} {v w : CoVector d} (h : ∀ i, v i = w i) : v = w := by
+  apply (equivEuclid d).injective
+  ext i
+  exact h i
+
 instance (d : ℕ) : Norm (CoVector d) where
   norm := fun v => ‖equivEuclid d v‖
 
@@ -115,6 +121,10 @@ lemma apply_add {d : ℕ} (v w : CoVector d) (i : Fin 1 ⊕ Fin d) :
 @[simp]
 lemma apply_sub {d : ℕ} (v w : CoVector d) (i : Fin 1 ⊕ Fin d) :
     (v - w) i = v i - w i := by rfl
+
+@[simp]
+lemma apply_sum {d : ℕ} {ι : Type} [Fintype ι] (f : ι → CoVector d) (i : Fin 1 ⊕ Fin d) :
+    (∑ j, f j) i = ∑ j, f j i := Finset.sum_apply i Finset.univ f
 
 @[simp]
 lemma neg_apply {d : ℕ} (v : CoVector d) (i : Fin 1 ⊕ Fin d) :

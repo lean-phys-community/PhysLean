@@ -531,7 +531,7 @@ lemma det_timeSpaceBasisEquiv {d : ℕ} (c : SpeedOfLight) :
 lemma timeSpaceBasis_eq_map_basis {d : ℕ} (c : SpeedOfLight) :
     timeSpaceBasis (d := d) c =
     Module.Basis.map (Lorentz.Vector.basis (d := d)) (timeSpaceBasisEquiv c).toLinearEquiv := by
-  ext μ
+  ext1 μ
   match μ with
   | Sum.inl 0 =>
     simp [timeSpaceBasisEquiv]

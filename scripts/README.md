@@ -19,7 +19,7 @@ all of the following linters run correctly.
 - `lake exe lint_all` (**A PR must in general pass this linter**): This linter is split into seven steps, strictly speaking not all of these steps must be past for a PR to be merged, but it is best to just fix them all.
   - step 1: This checks for basic style mistakes such as double spaces and string combinations like `):`
   - step 2: This builds the project
-  - step 3: Checks all files are imported to `Physlib.lean` and that they are sorted correctly.
+  - step 3: Checks all files are imported to `Physlib.lean`.
   - step 4: Checks that no tags on TODO items are duplicates of one another.
   - step 5: Checks that all lemmas and definitions dependent on `sorry` or `Lean.ofReduceBool` are correctly attributed with `@[sorryful]` or `@[pseudo]`
   - step 6: Checks all Lean linters run without error, this picks up things like lack of doc-strings on definitions, or incompatible `@[simp]` attributes

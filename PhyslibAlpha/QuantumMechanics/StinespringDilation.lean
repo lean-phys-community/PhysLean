@@ -7,6 +7,7 @@ module
 public import Mathlib.Data.Matrix.PEquiv
 public import Mathlib.Probability.Distributions.Poisson.Basic
 public import Mathlib.Analysis.Normed.Lp.lpSpace
+public import Physlib.Meta.TODO.Basic
 public import Mathlib
 /-!
 # Stinespring dilation
@@ -14,6 +15,11 @@ public import Mathlib
 
 @[expose] public section
 noncomputable section
+
+TODO "There is a different version of the Stienspring dilation in
+  `QuantumInfo.Channels.CPTP`. We should unify the the version here with that one.
+  Some of the definitions here are more general then the ones in `QuantumInfo` as they
+  do not restrict to `ℂ`. This is something we should modify in `QuantumInfo`."
 
 open Matrix MatrixOrder ComplexOrder RCLike TensorProduct Kronecker
 
@@ -805,7 +811,7 @@ lemma partialTrace_tensor {R : Type*} [RCLike R] {m n : ℕ}
   unfold tr₂ trace kroneckerMap
   simp only [of_apply, diag_apply]
   ext i j
-  simp only [smul_apply, smul_eq_mul]
+  simp only [Matrix.smul_apply, smul_eq_mul]
   have := @Finset.sum_mul (a := A i j) (ι := Fin n)
     (s := Finset.univ) (f := fun k => B k k) _ _
   rw [this]
@@ -843,7 +849,7 @@ def krausCompletionChannelMap {R : Type*} [RCLike R] {q r : ℕ}
   · unfold QuantumChannel
     rw [← krausCompletion_isometry_of_TNI hK]
     ext x y
-    rw [mul_apply, Fintype.sum_prod_type, Finset.sum_comm, sum_apply]
+    rw [mul_apply, Fintype.sum_prod_type, Finset.sum_comm, Matrix.sum_apply]
     congr
 
 

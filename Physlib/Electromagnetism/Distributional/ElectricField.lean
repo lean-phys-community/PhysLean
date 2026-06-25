@@ -62,14 +62,14 @@ noncomputable def electricField {d} (c : SpeedOfLight) :
     Space.distTimeDeriv (A.vectorPotential c)
   map_add' A1 A2 := by
     ext ε i
-    simp only [map_add, neg_add_rev, ContinuousLinearMap.coe_sub', Pi.sub_apply,
-      ContinuousLinearMap.add_apply, ContinuousLinearMap.neg_apply, PiLp.sub_apply, PiLp.add_apply,
+    simp only [map_add, neg_add_rev, FunLike.coe_sub, Pi.sub_apply,
+      add_apply, _root_.neg_apply, PiLp.sub_apply, PiLp.add_apply,
       PiLp.neg_apply]
     ring
   map_smul' r A := by
     ext ε i
-    simp only [map_smul, ContinuousLinearMap.coe_sub', ContinuousLinearMap.coe_smul', Pi.sub_apply,
-      ContinuousLinearMap.neg_apply, Pi.smul_apply, PiLp.sub_apply, PiLp.neg_apply, PiLp.smul_apply,
+    simp only [map_smul, FunLike.coe_sub, FunLike.coe_smul, Pi.sub_apply,
+      _root_.neg_apply, Pi.smul_apply, PiLp.sub_apply, PiLp.neg_apply, PiLp.smul_apply,
       smul_eq_mul, Real.ringHom_apply]
     ring
 
@@ -81,9 +81,9 @@ lemma electricField_eq_fieldStrength {d} {c : SpeedOfLight}
     one_mul, inr_i_inr_i, neg_mul, sub_neg_eq_add]
   simp only [electricField, scalarPotential, Vector.temporalCLM, Fin.isValue, map_smul,
     ContinuousLinearMap.comp_smulₛₗ, Real.ringHom_apply, LinearMap.coe_mk, AddHom.coe_mk,
-    vectorPotential, Vector.spatialCLM, Space.distTimeDeriv_apply_CLM, ContinuousLinearMap.coe_sub',
-    ContinuousLinearMap.coe_comp', ContinuousLinearMap.coe_mk', Pi.sub_apply,
-    ContinuousLinearMap.neg_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply,
+    vectorPotential, Vector.spatialCLM, Space.distTimeDeriv_apply_CLM, FunLike.coe_sub,
+    ContinuousLinearMap.coe_comp, ContinuousLinearMap.coe_mk', Pi.sub_apply,
+    _root_.neg_apply, FunLike.coe_smul, Pi.smul_apply,
     Function.comp_apply, PiLp.sub_apply, PiLp.neg_apply, PiLp.smul_apply, Space.distSpaceGrad_apply,
     Space.distSpaceDeriv_apply_CLM, LinearMap.coe_toContinuousLinearMap', smul_eq_mul,
     ← distTimeSlice_apply, distTimeSlice_distDeriv_inl, one_div, Vector.apply_smul,

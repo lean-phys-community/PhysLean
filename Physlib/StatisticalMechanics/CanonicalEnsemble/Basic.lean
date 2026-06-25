@@ -660,7 +660,9 @@ lemma meanEnergy_add {T : Temperature}
   rw [integral_const]
   simp
   rfl
-  · simpa [μProd_add] using integrable_energy_add 𝓒 𝓒1 T h1 h2
+  · have h1 := integrable_energy_add 𝓒 𝓒1 T h1 h2
+    simp_all only [μProd_add]
+    exact h1
 
 lemma meanEnergy_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
     (𝓒.congr e).meanEnergy T = 𝓒.meanEnergy T := by

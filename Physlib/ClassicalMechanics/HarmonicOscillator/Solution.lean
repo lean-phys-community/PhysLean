@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith, Lode Vermeulen
+Authors: Nathaneal Sajan, Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
@@ -26,6 +26,9 @@ prove that they satisfy the equation of motion, and prove some properties of the
 - A. The initial conditions
   - A.1. Definition of the initial conditions
   - A.2. Relation to other types of initial conditions
+    - A.2.1. Initial conditions at arbitrary time
+    - A.2.2. Initial conditions from two positions at different times
+    - A.2.3. Initial conditions from two velocities at different times
   - A.3. The zero initial conditions
     - A.3.1. Simple results for the zero initial conditions
 - B. Trajectories associated with the initial conditions
@@ -39,6 +42,9 @@ prove that they satisfy the equation of motion, and prove some properties of the
 - C. Trajectories and Equation of motion
   - C.1. Uniqueness of the solutions
 - D. The energy of the trajectories
+  - D.1. Correctness of InitialConditionsAtTime conversion
+  - D.2. Correctness of InitialConditionsFromTwoPositions conversion
+  - D.3. Correctness of InitialConditionsFromTwoVelocities conversion
 - E. The trajectories at zero velocity
   - E.1. The times at which the velocity is zero
   - E.2. A time when the velocity is zero
@@ -105,10 +111,12 @@ Currently implemented:
 - **Initial conditions at arbitrary time**: Specify position and velocity at any time `t₀`,
   not necessarily at `t=0`.
   This is useful for problems where the natural reference time is not zero.
+- **Initial conditions from two positions at different times**: Specify the position at two
+  distinct times `t₁` and `t₂` that satisfy the non-degeneracy condition.
+- **Initial conditions from two velocities at different times**: Specify the velocity at two
+  distinct times `t₁` and `t₂` that satisfy the non-degeneracy condition.
 
 Future work (to be added in separate PRs) :
-- Initial conditions from two positions at different times
-- Initial conditions from two velocities at different times
 - Amplitude-phase parametrization
 
 All alternative forms can be converted to the standard `InitialConditions` type via conversion
@@ -123,6 +131,16 @@ the original specifications.
 
 We define a type for initial conditions specified at an arbitrary time `t₀`, rather than at `t=0`.
 This is useful when the natural reference point for a problem is not at time zero.
+
+The conversion to the standard `InitialConditions` works by "running the trajectory backward in
+time" from `t₀` to `0`. Given that we know `x(t₀)` and `v(t₀)`, we use the harmonic oscillator
+solution formula with time-reversal to determine what `x(0)` and `v(0)` must have been.
+
+Mathematically, if `x(t) = cos(ωt)·x₀ + (sin(ωt)/ω)·v₀`, then setting `t = t₀`:
+  `x(t₀) = cos(ωt₀)·x₀ + (sin(ωt₀)/ω)·v₀`
+  `v(t₀) = -ω·sin(ωt₀)·x₀ + cos(ωt₀)·v₀`
+
+Solving this linear system for `x₀` and `v₀` gives the formulas in `toInitialConditions` below.
 
 -/
 
@@ -140,24 +158,6 @@ This is useful when the natural reference point for a problem is not at time zer
   x_t₀ : EuclideanSpace ℝ (Fin 1)
   /-- The velocity at time t₀. -/
   v_t₀ : EuclideanSpace ℝ (Fin 1)
-
-/-!
-
-##### A.2.1.2. Conversion to standard initial conditions
-
-We now define the conversion from `InitialConditionsAtTime` to the standard `InitialConditions`.
-
-The conversion works by "running the trajectory backward in time" from `t₀` to `0`.
-Given that we know `x(t₀)` and `v(t₀)`, we use the harmonic oscillator solution formula
-with time-reversal to determine what `x(0)` and `v(0)` must have been.
-
-Mathematically, if `x(t) = cos(ωt)·x₀ + (sin(ωt)/ω)·v₀`, then setting `t = t₀`:
-  `x(t₀) = cos(ωt₀)·x₀ + (sin(ωt₀)/ω)·v₀`
-  `v(t₀) = -ω·sin(ωt₀)·x₀ + cos(ωt₀)·v₀`
-
-Solving this linear system for `x₀` and `v₀` gives the formulas below.
-
--/
 
 namespace InitialConditionsAtTime
 
@@ -179,12 +179,117 @@ The correctness proofs showing that the conversion produces the expected traject
 are given later in section D.1, after the trajectory machinery has been defined.
 -/
 
-TODO "Implement other initial conditions for the classical harmonic oscillator. For example:
-- Two positions at different times.
-- Two velocities at different times.
-And convert them into the type `InitialConditions` above."
-
 end InitialConditionsAtTime
+
+
+/-!
+
+#### A.2.2. Initial conditions from two positions at different times
+
+We define a type for initial conditions specified by two measured positions `x_t₁` and `x_t₂`
+at two distinct times `t₁` and `t₂`.
+
+The conversion to the standard `InitialConditions` is obtained by solving for `x₀` and `v₀` the
+two equations given by evaluating the trajectory at `t₁` and `t₂`:
+  `x_t₁ = cos(ωt₁)·x₀ + (sin(ωt₁)/ω)·v₀`
+  `x_t₂ = cos(ωt₂)·x₀ + (sin(ωt₂)/ω)·v₀`
+
+This linear system has determinant `(cos(ωt₁)·sin(ωt₂) - cos(ωt₂)·sin(ωt₁))/ω = sin(ω(t₂-t₁))/ω`.
+Writing `Δ = sin(ω(t₂-t₁))`, solving the system gives the formulas used below:
+  `x₀ = (sin(ωt₂)·x_t₁ - sin(ωt₁)·x_t₂)/Δ`
+  `v₀ = ω·(cos(ωt₁)·x_t₂ - cos(ωt₂)·x_t₁)/Δ`
+
+The conversion is defined as a total function, but it recovers the initial conditions only when
+`Δ = sin(ω(t₂-t₁)) ≠ 0`, i.e. when `t₂ - t₁` is not an integer multiple of half a period. The
+correctness proofs, under this nondegeneracy condition, are given later in section D.2.
+
+-/
+
+/-- Initial conditions for the harmonic oscillator specified by two positions
+  `x_t₁` and `x_t₂` measured at two times `t₁` and `t₂` respectively.
+
+  The conditions can be converted to the standard `InitialConditions` format
+  using the `toInitialConditions` function. -/
+@[ext] structure InitialConditionsFromTwoPositions where
+  /-- The first measurement time. -/
+  t₁ : Time
+  /-- The position at time `t₁`. -/
+  x_t₁ : EuclideanSpace ℝ (Fin 1)
+  /-- The second measurement time. -/
+  t₂ : Time
+  /-- The position at time `t₂`. -/
+  x_t₂ : EuclideanSpace ℝ (Fin 1)
+
+
+namespace InitialConditionsFromTwoPositions
+
+/-- Convert two-position initial conditions to standard initial conditions at `t = 0`.
+
+  Obtained by solving the 2×2 linear system from the trajectory formula at `t₁` and `t₂`.
+  See `toInitialConditions_trajectory_at_t₁` and `toInitialConditions_trajectory_at_t₂` in
+  section D.2 for the correctness proofs (valid under `sin (S.ω * (t₂ - t₁)) ≠ 0`). -/
+noncomputable def toInitialConditions (S : HarmonicOscillator)
+    (IC : InitialConditionsFromTwoPositions) : InitialConditions where
+  x₀ := (sin (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₁
+      - (sin (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₂
+  v₀ := (S.ω * cos (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₂
+      - (S.ω * cos (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.x_t₁
+
+end InitialConditionsFromTwoPositions
+
+/-!
+
+#### A.2.3. Initial conditions from two velocities at different times
+
+We define a type for initial conditions specified by two measured velocities `v_t₁` and `v_t₂`
+at two distinct times `t₁` and `t₂`.
+
+The conversion to the standard `InitialConditions` is obtained by solving for `x₀` and `v₀` the
+two equations given by evaluating the velocity of the trajectory at `t₁` and `t₂`:
+  `v_t₁ = -ω·sin(ωt₁)·x₀ + cos(ωt₁)·v₀`
+  `v_t₂ = -ω·sin(ωt₂)·x₀ + cos(ωt₂)·v₀`
+
+This linear system has determinant `ω·(cos(ωt₁)·sin(ωt₂) - cos(ωt₂)·sin(ωt₁)) = ω·sin(ω(t₂-t₁))`.
+Writing `Δ = sin(ω(t₂-t₁))`, solving the system gives the formulas used below:
+  `x₀ = (cos(ωt₂)·v_t₁ - cos(ωt₁)·v_t₂)/(ω·Δ)`
+  `v₀ = (sin(ωt₂)·v_t₁ - sin(ωt₁)·v_t₂)/Δ`
+
+The conversion is defined as a total function, but it recovers the initial conditions only when
+`Δ = sin(ω(t₂-t₁)) ≠ 0`, i.e. when `t₂ - t₁` is not an integer multiple of half a period. The
+correctness proofs, under this nondegeneracy condition, are given later in section D.3.
+
+-/
+
+/-- Initial conditions for the harmonic oscillator specified by two velocities
+  `v_t₁` and `v_t₂` measured at two times `t₁` and `t₂` respectively.
+
+  The conditions can be converted to the standard `InitialConditions` format
+  using the `toInitialConditions` function. -/
+@[ext] structure InitialConditionsFromTwoVelocities where
+  /-- The first measurement time. -/
+  t₁ : Time
+  /-- The velocity at time `t₁`. -/
+  v_t₁ : EuclideanSpace ℝ (Fin 1)
+  /-- The second measurement time. -/
+  t₂ : Time
+  /-- The velocity at time `t₂`. -/
+  v_t₂ : EuclideanSpace ℝ (Fin 1)
+
+namespace InitialConditionsFromTwoVelocities
+
+/-- Convert two-velocity initial conditions to standard initial conditions at `t = 0`.
+
+  Obtained by solving the 2×2 linear system from the velocity formula at `t₁` and `t₂`.
+  See `toInitialConditions_velocity_at_t₁` and `toInitialConditions_velocity_at_t₂` in
+  section D.3 for the correctness proofs (valid under `sin (S.ω * (t₂ - t₁)) ≠ 0`). -/
+noncomputable def toInitialConditions (S : HarmonicOscillator)
+    (IC : InitialConditionsFromTwoVelocities) : InitialConditions where
+  x₀ := (cos (S.ω * IC.t₂) / (S.ω * sin (S.ω * (IC.t₂ - IC.t₁)))) • IC.v_t₁
+      - (cos (S.ω * IC.t₁) / (S.ω * sin (S.ω * (IC.t₂ - IC.t₁)))) • IC.v_t₂
+  v₀ := (sin (S.ω * IC.t₂) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.v_t₁
+      - (sin (S.ω * IC.t₁) / sin (S.ω * (IC.t₂ - IC.t₁))) • IC.v_t₂
+
+end InitialConditionsFromTwoVelocities
 
 /-!
 
@@ -316,7 +421,7 @@ lemma trajectory_velocity (IC : InitialConditions) : ∂ₜ (IC.trajectory S) =
   rw [fderiv_cos (by fun_prop), fderiv_sin (by fun_prop),
     fderiv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [fderiv_fun_const, Pi.zero_apply, smul_zero, add_zero, neg_smul,
-    ContinuousLinearMap.neg_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply, fderiv_val,
+    _root_.neg_apply, FunLike.coe_smul, Pi.smul_apply, fderiv_val,
     smul_eq_mul, mul_one]
   field_simp
   ring_nf
@@ -337,12 +442,12 @@ lemma trajectory_acceleration (IC : InitialConditions) : ∂ₜ (∂ₜ (IC.traj
   rw [trajectory_velocity, Time.deriv, fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop), fderiv_fun_const_smul (by fun_prop),
     fderiv_smul_const (by fun_prop)]
-  simp only [neg_smul, ContinuousLinearMap.add_apply, ContinuousLinearMap.smulRight_apply]
+  simp only [neg_smul, add_apply, ContinuousLinearMap.smulRight_apply]
   rw [fderiv_cos (by fun_prop), fderiv_sin (by fun_prop),
     fderiv_fun_mul (by fun_prop) (by fun_prop)]
   field_simp [smul_smul]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, smul_zero, add_zero, ContinuousLinearMap.neg_apply,
-    ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
+  simp only [fderiv_fun_const, Pi.ofNat_apply, smul_zero, add_zero, _root_.neg_apply,
+    FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
     smul_eq_mul, mul_one, neg_smul]
   ring_nf
   module
@@ -396,188 +501,68 @@ lemma trajectory_equationOfMotion (IC : InitialConditions) :
 ### C.1. Uniqueness of the solutions
 
 We show that the trajectories are the unique solutions to the equation of motion
-for the given initial conditions. This is currently a TODO.
+for the given initial conditions.
 
 -/
 /-- The trajectories to the equation of motion for a given set of initial conditions
   are unique.
 
-  Semiformal implementation:
-  - One may needed the added condition of smoothness on `x` here.
-  - `EquationOfMotion` needs defining before this can be proved. -/
+  Given any smooth `x` satisfying the equation of motion with the same initial
+  position and velocity, the difference `y = x - IC.trajectory S` also solves the
+  equation of motion with zero initial conditions; energy conservation then forces
+  its energy, and hence `y`, to vanish identically, so `x = IC.trajectory S`. -/
 lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace ℝ (Fin 1))
     (hx : ContDiff ℝ ∞ x) :
     S.EquationOfMotion x ∧ x 0 = IC.x₀ ∧ ∂ₜ x 0 = IC.v₀ →
     x = IC.trajectory S := by
-  intro h
-  rcases h with ⟨hEOM, hx0, hv0⟩
-
-  -- Newton form for x
-  have hNewt_x :
-      ∀ t, S.m • ∂ₜ (∂ₜ x) t = force S (x t) :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := x) hx).1 hEOM
-
-  -- Newton form for the explicit trajectory
-  have hTrajContDiff : ContDiff ℝ ∞ (IC.trajectory S) := by
-    -- trajectory_contDiff already exists and is [fun_prop]
-    fun_prop
-
-  have hNewt_traj :
-      ∀ t, S.m • ∂ₜ (∂ₜ (IC.trajectory S)) t = force S ((IC.trajectory S) t) :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := IC.trajectory S) hTrajContDiff).1
-      (trajectory_equationOfMotion S IC)
-
-  -- Define the difference y = x - traj
+  rintro ⟨hEOM, hx0, hv0⟩
+  have hTraj : ContDiff ℝ ∞ (IC.trajectory S) := by fun_prop
+  -- Time-derivative of a difference of differentiable functions, used below on `x - traj`.
+  have dsub : ∀ f g : Time → EuclideanSpace ℝ (Fin 1),
+      Differentiable ℝ f → Differentiable ℝ g →
+      ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
+    intro f g hf hg
+    funext t
+    simp only [Time.deriv_eq, fderiv_fun_sub (hf t) (hg t), ContinuousLinearMap.sub_apply]
+  -- The difference `y := x - traj` is smooth, again solves the equation of motion (the force is
+  -- linear), and has vanishing initial data; energy conservation then forces `y = 0`.
   set y : Time → EuclideanSpace ℝ (Fin 1) := fun t => x t - IC.trajectory S t with hydef
-
-  have hyContDiff : ContDiff ℝ ∞ y := by
-    -- ContDiff closed under subtraction
-    simpa [hydef] using hx.sub hTrajContDiff
-
-  -- First derivative of y
-  have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t := by
-    funext t
-    -- same style as in trajectory_velocity: unfold Time.deriv and use fderiv_fun_sub
-    rw [hydef, Time.deriv]
-    -- ContDiff implies DifferentiableAt - use this explicitly since fun_prop can't infer it
-    -- ContDiff ℝ ∞ f implies ContDiffAt ℝ ∞ f t for any t
-    have hx_contDiffAt : ContDiffAt ℝ ∞ x t := hx.contDiffAt
-    have htraj_contDiffAt : ContDiffAt ℝ ∞ (IC.trajectory S) t := hTrajContDiff.contDiffAt
-    have hx_diff : DifferentiableAt ℝ x t :=
-      ContDiffAt.differentiableAt hx_contDiffAt (by simp)
-    have htraj_diff : DifferentiableAt ℝ (IC.trajectory S) t :=
-      ContDiffAt.differentiableAt htraj_contDiffAt (by simp)
-    rw [fderiv_fun_sub hx_diff htraj_diff]
-    simp only [ContinuousLinearMap.sub_apply, Time.deriv]
-
-  -- Second derivative of y
-  have hy_deriv2 :
-      ∂ₜ (∂ₜ y) = fun t => ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
-    funext t
-    rw [hy_deriv, Time.deriv]
-    -- now differentiate (∂ₜ x - ∂ₜ traj)
-    -- use differentiability of time-derivatives from ContDiff
-    have hx1 : Differentiable ℝ (fun t => ∂ₜ x t) :=
-      deriv_differentiable_of_contDiff x hx
-    have htr1 : Differentiable ℝ (fun t => ∂ₜ (IC.trajectory S) t) :=
-      deriv_differentiable_of_contDiff (IC.trajectory S) hTrajContDiff
-    -- Apply fderiv_fun_sub and use Time.deriv to convert back
-    -- Differentiable ℝ f means ∀ x, DifferentiableAt ℝ f x
-    -- In Mathlib, Differentiable is defined as ∀ x, DifferentiableAt, so we can apply directly
-    have hx1_at : DifferentiableAt ℝ (fun t => ∂ₜ x t) t := hx1 t
-    have htr1_at : DifferentiableAt ℝ (fun t => ∂ₜ (IC.trajectory S) t) t := htr1 t
-    rw [fderiv_fun_sub hx1_at htr1_at]
-    -- Now we need to show fderiv of (fun t => fderiv ℝ x t 1) equals fderiv of (∂ₜ x)
-    -- This follows from Time.deriv f t = fderiv ℝ f t 1
-    simp only [ContinuousLinearMap.sub_apply]
-    rw [Time.deriv, Time.deriv]
-
-  -- Newton form for y (linearity of force)
-  have hNewt_y : ∀ t, S.m • ∂ₜ (∂ₜ y) t = force S (y t) := by
-    intro t
-    have hy2t : ∂ₜ (∂ₜ y) t =
-        (∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t) := by
-      simpa using congrFun hy_deriv2 t
-
-    -- Expand and substitute Newton laws for x and traj, then fold back using force_eq_linear
-    calc
-      S.m • ∂ₜ (∂ₜ y) t
-          = S.m • (∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t) := by
-              simp [hy2t]
-      _ = (S.m • ∂ₜ (∂ₜ x) t) - (S.m • ∂ₜ (∂ₜ (IC.trajectory S)) t) := by
-              simp [smul_sub]
-      _ = force S (x t) - force S ((IC.trajectory S) t) := by
-              simp [hNewt_x t, hNewt_traj t]
-      _ = force S (y t) := by
-              -- force = -k•x, so it is linear: force(x) - force(traj) = force(x-traj)
-              -- and y t = x t - traj t by definition
-              simp [hydef, force_eq_linear, smul_sub]
-
-  -- Turn Newton form back into EquationOfMotion for y
+  have hyContDiff : ContDiff ℝ ∞ y := hx.sub hTraj
+  have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t :=
+    dsub x _ (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
+  have hy_deriv2 : ∂ₜ (∂ₜ y) = fun t => ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
+    rw [hy_deriv]
+    exact dsub _ _ (deriv_differentiable_of_contDiff _ hx)
+      (deriv_differentiable_of_contDiff _ hTraj)
+  have hNewt_x := (S.equationOfMotion_iff_newtons_2nd_law x hx).1 hEOM
+  have hNewt_traj := (S.equationOfMotion_iff_newtons_2nd_law (IC.trajectory S) hTraj).1
+    (trajectory_equationOfMotion S IC)
   have hEOM_y : S.EquationOfMotion y :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := y) hyContDiff).2 hNewt_y
-
-  -- Initial conditions for y are zero
-  have hy0 : y 0 = 0 := by
-    -- y 0 = x 0 - traj 0 = IC.x₀ - IC.x₀
-    simp [hydef, hx0]
-
-  have hyv0 : ∂ₜ y 0 = 0 := by
-    -- ∂ₜ y 0 = ∂ₜ x 0 - ∂ₜ traj 0 = IC.v₀ - IC.v₀
-    rw [congr_fun hy_deriv 0]
-    rw [hv0, trajectory_velocity_at_zero S IC]
-    simp
-
-  -- Energy at time 0 is 0
-  have hE0 : S.energy y 0 = 0 := by
-    -- unfold energy, kinetic, potential and use hy0, hyv0
-    simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,
-      HarmonicOscillator.potentialEnergy, hy0, hyv0, one_div, smul_eq_mul]
-
-  -- Energy is constant, hence always 0
-  have hE : ∀ t, S.energy y t = 0 := by
-    intro t
-    have ht := S.energy_conservation_of_equationOfMotion' (xₜ := y) hyContDiff hEOM_y t
-    simpa [hE0] using ht
-
-  -- From energy=0 and positivity => y(t)=0
-  have hy_all : ∀ t, y t = 0 := by
-    intro t
-    have hEt : S.energy y t = 0 := hE t
-
-    have hk_nonneg : 0 ≤ S.kineticEnergy y t := by
-      unfold HarmonicOscillator.kineticEnergy
-      have hcoeff : 0 ≤ (1 / (2 : ℝ)) * S.m := by
-        exact mul_nonneg (by norm_num) (le_of_lt S.m_pos)
-      -- Use the same approach as for potential energy below
-      have hin : 0 ≤ inner ℝ (∂ₜ y t) (∂ₜ y t) := by
-        -- For EuclideanSpace ℝ (Fin 1), inner product with itself is nonnegative
-        exact real_inner_self_nonneg (x := ∂ₜ y t)
-      exact mul_nonneg hcoeff hin
-
-    have hp_nonneg : 0 ≤ S.potentialEnergy (y t) := by
-      unfold HarmonicOscillator.potentialEnergy
-      -- potentialEnergy = (1/2) * k * ⟪y,y⟫
-      simp only [one_div, smul_eq_mul]
-      -- Goal is 0 ≤ 2⁻¹ * (S.k * inner ℝ (y t) (y t))
-      apply mul_nonneg
-      · norm_num -- 0 ≤ 2⁻¹
-      · -- 0 ≤ S.k * inner ℝ (y t) (y t)
-        have hk_pos : 0 ≤ S.k := le_of_lt S.k_pos
-        have hin : 0 ≤ inner ℝ (y t) (y t) := by
-          -- For EuclideanSpace ℝ (Fin 1), inner product with itself is nonnegative
-          exact real_inner_self_nonneg (x := y t)
-        exact mul_nonneg hk_pos hin
-
-    have hp_le : S.potentialEnergy (y t) ≤ S.energy y t := by
-      unfold HarmonicOscillator.energy
-      exact le_add_of_nonneg_left hk_nonneg
-
-    have hp0 : S.potentialEnergy (y t) = 0 := by
-      have : S.potentialEnergy (y t) ≤ 0 := by
-        calc
-          S.potentialEnergy (y t) ≤ S.energy y t := hp_le
-          _ = 0 := hEt
-      exact le_antisymm this hp_nonneg
-
-    -- extract ⟪y,y⟫ = 0 from potentialEnergy = 0, then y=0
-    have hy_inner0 : inner ℝ (y t) (y t) = 0 := by
-      -- potentialEnergy = (1/2) * k * ⟪y,y⟫
-      have hmul : ((1 / (2 : ℝ)) * S.k) * inner ℝ (y t) (y t) = 0 := by
-        simpa [HarmonicOscillator.potentialEnergy, one_div, smul_eq_mul, mul_assoc] using hp0
-      have hcoeff : ((1 / (2 : ℝ)) * S.k) ≠ 0 := by
-        exact mul_ne_zero (by norm_num) (S.k_ne_zero)
-      rcases mul_eq_zero.mp hmul with hcoeff0 | hinner
-      · exact (False.elim (hcoeff hcoeff0))
-      · exact hinner
-
-    exact (inner_self_eq_zero.mp hy_inner0)
-
-  -- Conclude x = traj
+    (S.equationOfMotion_iff_newtons_2nd_law y hyContDiff).2 fun t => by
+      rw [hy_deriv2]
+      simp [smul_sub, hNewt_x, hNewt_traj, hydef, force_eq_linear]
+  have hE : ∀ t, S.energy y t = 0 := fun t =>
+    (S.energy_conservation_of_equationOfMotion' y hyContDiff hEOM_y t).trans <| by
+      have hy0 : y 0 = 0 := by simp [hydef, hx0]
+      have hyv0 : ∂ₜ y 0 = 0 := by
+        rw [congrFun hy_deriv 0, hv0, trajectory_velocity_at_zero S IC]; simp
+      simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,
+        HarmonicOscillator.potentialEnergy, hy0, hyv0, one_div, smul_eq_mul]
+  -- Both energies are nonnegative, so a vanishing total energy forces `y t = 0`.
   funext t
-  have : y t = 0 := hy_all t
-  -- y t = x t - traj t
-  simpa [hydef] using (sub_eq_zero.mp this)
+  have hk : 0 ≤ S.kineticEnergy y t := by
+    simp only [HarmonicOscillator.kineticEnergy]
+    exact mul_nonneg (mul_nonneg (by norm_num) S.m_pos.le) real_inner_self_nonneg
+  have hp : 0 ≤ S.potentialEnergy (y t) := by
+    simp only [HarmonicOscillator.potentialEnergy, smul_eq_mul]
+    exact mul_nonneg (by norm_num) (mul_nonneg S.k_pos.le real_inner_self_nonneg)
+  have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp (hE t)).2
+  simp only [HarmonicOscillator.potentialEnergy, smul_eq_mul] at hpe
+  rcases mul_eq_zero.mp hpe with h | h
+  · norm_num at h
+  · have hyt : x t - IC.trajectory S t = 0 :=
+      inner_self_eq_zero.mp ((mul_eq_zero.mp h).resolve_left S.k_ne_zero)
+    exact sub_eq_zero.mp hyt
 
 /-!
 
@@ -655,6 +640,88 @@ lemma toInitialConditions_energy_at_t₀ (S : HarmonicOscillator)
   ring
 
 end InitialConditionsAtTime
+
+/-!
+
+## D.2. Correctness of InitialConditionsFromTwoPositions conversion
+
+The conversion recovers the initial conditions only when `sin (S.ω * (t₂ - t₁)) ≠ 0`. This
+condition fails exactly when `ω·(t₂ - t₁) = n·π` for some integer `n`, i.e. when `t₂ - t₁` is an
+integer multiple of half a period; in that case `x(t₂) = (-1)^n · x(t₁)` for every trajectory,
+independent of `v₀`, so the two positions do not determine the initial conditions.
+
+Under this nondegeneracy condition, we prove that the resulting trajectory passes through `x_t₁`
+at `t₁` and `x_t₂` at `t₂`.
+
+-/
+
+namespace InitialConditionsFromTwoPositions
+
+/-- The trajectory from `toInitialConditions` passes through `x_t₁` at time `t₁`,
+  provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
+lemma toInitialConditions_trajectory_at_t₁ (S : HarmonicOscillator)
+    (IC : InitialConditionsFromTwoPositions)
+    (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
+    (IC.toInitialConditions S).trajectory S IC.t₁ = IC.x_t₁ := by
+  rw [InitialConditions.trajectory_eq, toInitialConditions]
+  ext i
+  simp only [PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
+  field_simp [S.ω_ne_zero]
+  grind [mul_sub, Real.sin_sub]
+
+/-- The trajectory from `toInitialConditions` passes through `x_t₂` at time `t₂`,
+  provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
+lemma toInitialConditions_trajectory_at_t₂ (S : HarmonicOscillator)
+    (IC : InitialConditionsFromTwoPositions)
+    (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
+    (IC.toInitialConditions S).trajectory S IC.t₂ = IC.x_t₂ := by
+  rw [InitialConditions.trajectory_eq, toInitialConditions]
+  ext i
+  simp only [PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
+  field_simp [S.ω_ne_zero]
+  grind [mul_sub, Real.sin_sub]
+
+end InitialConditionsFromTwoPositions
+
+/-!
+
+## D.3. Correctness of InitialConditionsFromTwoVelocities conversion
+
+The conversion recovers the initial conditions only when `sin (S.ω * (t₂ - t₁)) ≠ 0`. Under this
+nondegeneracy condition, we prove that the resulting trajectory has velocity `v_t₁` at `t₁` and
+`v_t₂` at `t₂`.
+
+-/
+
+namespace InitialConditionsFromTwoVelocities
+
+/-- The trajectory from `toInitialConditions` has velocity `v_t₁` at time `t₁`,
+  provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
+lemma toInitialConditions_velocity_at_t₁ (S : HarmonicOscillator)
+    (IC : InitialConditionsFromTwoVelocities)
+    (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
+    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₁ = IC.v_t₁ := by
+  rw [InitialConditions.trajectory_velocity, toInitialConditions]
+  ext i
+  simp only [neg_smul, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, PiLp.sub_apply,
+    smul_eq_mul]
+  field_simp [S.ω_ne_zero]
+  grind [mul_sub, Real.sin_sub]
+
+/-- The trajectory from `toInitialConditions` has velocity `v_t₂` at time `t₂`,
+  provided `sin (S.ω * (t₂ - t₁)) ≠ 0`. -/
+lemma toInitialConditions_velocity_at_t₂ (S : HarmonicOscillator)
+    (IC : InitialConditionsFromTwoVelocities)
+    (hΔ : sin (S.ω * (IC.t₂ - IC.t₁)) ≠ 0) :
+    ∂ₜ ((IC.toInitialConditions S).trajectory S) IC.t₂ = IC.v_t₂ := by
+  rw [InitialConditions.trajectory_velocity, toInitialConditions]
+  ext i
+  simp only [neg_smul, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, PiLp.sub_apply,
+    smul_eq_mul]
+  field_simp [S.ω_ne_zero]
+  grind [mul_sub, Real.sin_sub]
+
+end InitialConditionsFromTwoVelocities
 
 namespace InitialConditions
 

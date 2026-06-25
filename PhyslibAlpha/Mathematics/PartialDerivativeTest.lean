@@ -1,0 +1,565 @@
+/-
+Copyright (c) 2026 Bjørn Kjos-Hanssen. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Bjørn Kjos-Hanssen
+-/
+module
+
+public import Mathlib.Analysis.Calculus.Gradient.Basic
+public import Mathlib.Analysis.Calculus.ContDiff.FTaylorSeries
+public import Mathlib.LinearAlgebra.QuadraticForm.Basic
+public import Mathlib.Analysis.Calculus.FDeriv.Analytic
+public import Mathlib.Analysis.Analytic.IteratedFDeriv
+public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+
+/-!
+# The Second Partial Derivatives Test
+
+We prove a version of the second partial derivative test from calculus for
+analytic functions `f : V → ℝ`, where `V` is a finite-dimensional vector space.
+
+## Main results
+
+* `second_derivative_test`:
+    Suppose `f` is a real-valued function on a
+    finite-dimensional inner product space that
+    has vanishing gradient at `x₀`, and has a power series on a ball of positive radius
+    around `x₀`. If the second Frechét derivative is positive definite at `x₀` then
+    `f` has  local minimum at `x₀`.
+
+## Tags
+partial derivative test, calculus
+-/
+
+@[expose] public section
+
+/-- Update a vector of length 2 in coordinate 0. -/
+@[simp]
+lemma Function.update₀ {α : Type*} {a b c : α} : Function.update ![a,b] 0 c = ![c,b] := by
+  ext i; fin_cases i <;> simp
+
+/-- Update a vector of length 2 in coordinate 1. -/
+@[simp]
+lemma Function.update₁ {α : Type*} {a b c : α} : Function.update ![a,b] 1 c = ![a,c] := by
+  ext i; fin_cases i <;> simp
+
+open Nat ContinuousMultilinearMap Finset Function
+
+
+/-- The Hessian companion as a bilinear map. -/
+noncomputable def hessianBilinearCompanion {V : Type*} [NormedAddCommGroup V]
+    [NormedSpace ℝ V] (f : V → ℝ) (x₀ : V) : V →ₗ[ℝ] V →ₗ[ℝ] ℝ :=
+  LinearMap.mk₂ ℝ (fun a b => iteratedFDeriv ℝ 2 f x₀ ![a,b] + iteratedFDeriv ℝ 2 f x₀ ![b,a])
+    (fun _ _ _ ↦ by
+        simp_rw [Matrix.vecCons, succ_eq_add_one, reduceAdd, ← curryLeft_apply,
+          map_add]
+        simp only [curryLeft_apply, succ_eq_add_one, reduceAdd,
+          ContinuousMultilinearMap.add_apply]
+        abel) (by
+        simp_rw [Matrix.vecCons, ← curryLeft_apply]
+        simp only [map_smul, curryLeft_apply, succ_eq_add_one, reduceAdd,
+          ContinuousMultilinearMap.smul_apply, smul_eq_mul]
+        ring_nf
+        simp) (fun _ _ _ ↦ by
+        simp_rw [Matrix.vecCons, succ_eq_add_one, reduceAdd, ← curryLeft_apply,
+          map_add]
+        simp only [ContinuousMultilinearMap.add_apply, curryLeft_apply, succ_eq_add_one, reduceAdd,
+          Matrix.Fin.cons_vecEmpty, Matrix.Fin.cons_vecCons]
+        abel) (by
+        simp_rw [Matrix.vecCons, ← curryLeft_apply]
+        simp only [map_smul, ContinuousMultilinearMap.smul_apply, curryLeft_apply, succ_eq_add_one,
+          reduceAdd, smul_eq_mul]
+        simp_rw [← mul_add]
+        simp)
+
+
+/-- The second iterated Frechét derivative as a quadratic map. -/
+noncomputable def iteratedFDerivQuadraticMap {V : Type*} [NormedAddCommGroup V]
+    [NormedSpace ℝ V] (f : V → ℝ) (x₀ : V) : QuadraticMap ℝ V ℝ := {
+  toFun := fun y => iteratedFDeriv ℝ 2 f x₀ ![y,y]
+  exists_companion' := ⟨hessianBilinearCompanion f x₀, fun x y => by
+    have ha (u v b) := (iteratedFDeriv ℝ 2 f x₀).map_update_add' ![u,v] b x y
+    have ha₀ := ha x (x + y) 0
+    have ha₁ (u) := ha u x 1
+    simp only [update₀, MultilinearMap.toFun_eq_coe, coe_coe, update₁, hessianBilinearCompanion]
+        at ha₀ ha₁ ha ⊢
+    rw [ha₀, ha₁, ha₁, add_assoc, add_assoc]
+    apply add_left_cancel_iff.mpr
+    rw [← add_assoc, add_comm]
+    simp⟩
+  toFun_smul := fun u v => by
+    have hsm (b c) := (iteratedFDeriv ℝ 2 f x₀).map_update_smul' ![b,v] c u v
+    have hsm₀ := hsm v 0
+    have hsm₁ := hsm (u • v) 1
+    simp only [update₀, update₁, MultilinearMap.toFun_eq_coe, coe_coe, smul_eq_mul]
+        at hsm₀ hsm₁ hsm
+    rw [smul_eq_mul, mul_assoc, ← hsm₀, hsm₁]}
+
+
+/-- A continuous multilinear map is bilinear. -/
+noncomputable def continuousBilinearMapOfContinuousMultilinearMap
+    {𝕜 : Type*} [NontriviallyNormedField 𝕜] [CompleteSpace 𝕜]
+    {V : Type*}
+    [NormedAddCommGroup V] [NormedSpace 𝕜 V] [FiniteDimensional 𝕜 V]
+    (g : ContinuousMultilinearMap 𝕜 (fun _ : Fin 2 => V) 𝕜) : V →L[𝕜] V →L[𝕜] 𝕜 := {
+  toFun := fun x => {
+    toFun := fun y => g.toFun ![x,y]
+    map_add' := fun a b => by simpa [update₁] using g.map_update_add ![x,b] 1 a b
+    map_smul' := fun m a => by simpa [update₁] using g.map_update_smul ![x,a] 1 m a
+    cont := g.cont.comp' <| continuous_const.matrixVecCons
+            <| continuous_id'.matrixVecCons continuous_const}
+  map_add' := fun a b => by ext c; simpa [update₀] using g.map_update_add ![a,c] 0 a b
+  map_smul' := fun c x => by ext y; simpa [update₀] using g.map_update_smul ![x,y] 0 c x
+  cont := continuous_clm_apply.mpr fun x => g.cont.comp'
+    <| continuous_id'.matrixVecCons continuous_const}
+
+/-- . -/
+def QuadraticMap.toMultilinearMap {V : Type*} [AddCommGroup V] [Module ℝ V]
+    (Q : QuadraticMap ℝ V ℝ) : MultilinearMap ℝ (fun _ : Fin 2 => V) ℝ := {
+  toFun := fun v => Q.polarBilin (v 0) (v 1)
+  map_update_add' := by simp
+  map_update_smul' := by simp}
+
+
+/-- . -/
+noncomputable def QuadraticMap.toMultilinearMapHalfPolarBilin
+    {V : Type*} [AddCommGroup V] [Module ℝ V]
+    (Q : QuadraticMap ℝ V ℝ) :
+    MultilinearMap ℝ (fun _ : Fin 2 => V) ℝ :=
+  let B := Q.polarBilin
+  { toFun := fun v => (1/2) * B (v 0) (v 1)
+    map_update_add' := by
+      simp +zetaDelta only [one_div, Fin.isValue, polarBilin_apply_apply, Fin.forall_fin_two,
+        update_self, ne_eq, one_ne_zero, not_false_eq_true, update_of_ne, polar_add_left,
+        zero_ne_one, polar_add_right, forall_const] at *
+      intro m
+      apply And.intro
+      · intro x y
+        exact Distrib.left_distrib 2⁻¹ _ _
+      · intro x y
+        exact Distrib.left_distrib 2⁻¹ _ _
+    map_update_smul' := by
+      simp +decide only [one_div, Fin.isValue, update_apply, smul_eq_mul, Fin.forall_fin_two,
+        ↓reduceIte, map_smul, one_ne_zero, LinearMap.smul_apply, zero_ne_one, forall_const]
+      intros
+      constructor
+      · intros
+        ring_nf
+      · intros
+        ring_nf
+      }
+
+/--
+The multilinear map associated to a quadratic map is continuous.
+-/
+theorem QuadraticMap.toMultilinearMap_continuous {V : Type*}
+    [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) : Continuous Q.toMultilinearMap := by
+  have h_bilinear : ∃ B : V →ₗ[ℝ] V →L[ℝ] ℝ, ∀ x y, B x y = Q.toMultilinearMap ![x, y] := by
+    have h_bilinear : ∃ B : V →ₗ[ℝ] V →L[ℝ] ℝ, ∀ x y, B x y = Q.polarBilin x y := by
+      have h_bilinear : ∀ x : V, ∃ Bx : V →L[ℝ] ℝ, ∀ y : V, Bx y = Q.polarBilin x y := by
+        intro x
+        use (by
+          apply ContinuousLinearMap.mk
+          swap
+          exact Q.polarBilin x
+          simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom]
+          exact LinearMap.continuous_of_finiteDimensional (Q.polarBilin x)
+        )
+        intro y;rfl
+        -- exact fun x => ⟨ ContinuousLinearMap.mk ( Q.polarBilin x ), fun y => rfl ⟩
+      choose B hB using h_bilinear;
+      refine ⟨ { toFun := B, map_add' := ?_, map_smul' := ?_ }, hB ⟩ <;> aesop;
+    aesop;
+  -- Since $B$ is a linear map between finite-dimensional spaces, it is continuous.
+  obtain ⟨B, hB⟩ := h_bilinear;
+  have hB_cont : Continuous B := by
+    exact B.continuous_of_finiteDimensional;
+  convert hB_cont.comp ( show Continuous fun v : Fin 2 → V => v 0 from continuous_apply 0 ) |>
+    Continuous.clm_apply <|
+      show Continuous fun v : Fin 2 → V => v 1 from continuous_apply 1 using 1; aesop
+
+
+/-- . -/
+theorem QuadraticMap.toMultilinearMapHalfPolarBilin_continuous {V : Type*}
+    [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) :
+    Continuous Q.toMultilinearMapHalfPolarBilin := by
+  have h_bilinear :
+    ∃ B : V →ₗ[ℝ] V →L[ℝ] ℝ, ∀ x y, B x y = Q.toMultilinearMapHalfPolarBilin ![x, y] := by
+    have h_bilinear : ∃ B : V →ₗ[ℝ] V →L[ℝ] ℝ, ∀ x y, B x y = (1/2) * Q.polarBilin x y := by
+      have h_bilinear : ∀ x : V, ∃ Bx : V →L[ℝ] ℝ, ∀ y : V, Bx y = (1/2) * Q.polarBilin x y := by
+        intro x
+        use (by
+          apply ContinuousLinearMap.mk (
+            toLinearMap := by
+            let q := fun y : V => (1/2) * Q.polarBilin x y
+            refine IsLinearMap.mk' q ?_
+            refine { map_add := ?_, map_smul := ?_ }
+            · intro a b
+              unfold q
+              have : Q.polarBilin x (a+b) =
+                    Q.polarBilin x a +
+                    Q.polarBilin x b := by exact LinearMap.map_add (Q.polarBilin x) a b
+              rw [this]
+              linarith
+            · intro c a
+              unfold q
+              simp only [one_div, map_smul, polarBilin_apply_apply, smul_eq_mul]
+              linarith
+
+          )
+            (by simp;apply LinearMap.continuous_of_finiteDimensional)
+            )
+        intro y;simp
+        -- refine ⟨ ContinuousLinearMap.mk (by
+        --   let q := fun y : V => (1/2) * Q.polarBilin x y
+        --   refine IsLinearMap.mk' q ?_
+        --   refine { map_add := ?_, map_smul := ?_ }
+        --   · intro a b
+        --     unfold q
+        --     have : Q.polarBilin x (a+b) =
+        --           Q.polarBilin x a +
+        --           Q.polarBilin x b := by exact LinearMap.map_add (Q.polarBilin x) a b
+        --     rw [this]
+        --     linarith
+        --   · intro c a
+        --     unfold q
+        --     simp
+        --     linarith), fun y => by simp ⟩
+      choose B hB using h_bilinear;
+      refine ⟨ { toFun := B, map_add' := ?_, map_smul' := ?_ }, hB ⟩
+      · intro x y
+        simp_all only [one_div, polarBilin_apply_apply]
+        ext i
+        rw [hB (x+y) i]
+        simp only [polar_add_left, _root_.add_apply]
+        rw [hB x i, hB y i]
+        linarith
+      intro m x
+      ext y
+      rw [hB (m • x), _root_.smul_apply, hB x y]
+      simp only [one_div, polarBilin_apply_apply, polar_smul_left, smul_eq_mul, RingHom.id_apply]
+      ring
+    simp_all only [one_div, polarBilin_apply_apply]
+    obtain ⟨w, h⟩ := h_bilinear
+    unfold QuadraticMap.toMultilinearMapHalfPolarBilin
+    simp only [one_div, Fin.isValue, polarBilin_apply_apply, MultilinearMap.coe_mk,
+      Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one]
+    use w
+  -- Since $B$ is a linear map between finite-dimensional spaces, it is continuous.
+  obtain ⟨B, hB⟩ := h_bilinear;
+  have hB_cont : Continuous B := by
+    exact B.continuous_of_finiteDimensional;
+  convert! hB_cont.comp ( show Continuous fun v : Fin 2 → V => v 0 from continuous_apply 0 ) |>
+    Continuous.clm_apply <|
+      show Continuous fun v : Fin 2 → V => v 1 from continuous_apply 1 using 1; aesop
+
+/--
+Construct a continuous multilinear map from a quadratic map on a finite dimensional space.
+-/
+def QuadraticMap.toContinuousMultilinearMap {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) :
+    ContinuousMultilinearMap ℝ (fun _ : Fin 2 ↦ V) ℝ :=
+  { Q.toMultilinearMap with
+    cont := Q.toMultilinearMap_continuous }
+
+/-- . -/
+noncomputable def QuadraticMap.toContinuousMultilinearMapHalfPolarBilin {V : Type*}
+    [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) :
+    ContinuousMultilinearMap ℝ (fun _ : Fin 2 ↦ V) ℝ :=
+  { Q.toMultilinearMapHalfPolarBilin with
+    cont := Q.toMultilinearMapHalfPolarBilin_continuous }
+
+/--
+The constructed continuous multilinear map agrees with the polar bilinear form.
+-/
+theorem QuadraticMap.toContinuousMultilinearMap_apply {V : Type*} [NormedAddCommGroup V]
+    [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) (x y : V) :
+    Q.toContinuousMultilinearMap ![x, y] = Q.polarBilin x y := by
+  rfl
+
+/-- . -/
+theorem QuadraticMap.toContinuousMultilinearMap_applyHalf {V : Type*} [NormedAddCommGroup V]
+    [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Q : QuadraticMap ℝ V ℝ) (x y : V) :
+    Q.toContinuousMultilinearMapHalfPolarBilin ![x, y] = (1/2) * Q.polarBilin x y := by
+  rfl
+
+
+/-- . -/
+lemma coercive_of_posdefHalf {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [FiniteDimensional ℝ V] {F : QuadraticMap ℝ V ℝ}
+    (hf' : F.PosDef) :
+    IsCoercive (continuousBilinearMapOfContinuousMultilinearMap
+        F.toContinuousMultilinearMapHalfPolarBilin) := by
+  obtain hsub | hnt := subsingleton_or_nontrivial V
+  · exact ⟨1, one_pos, fun u => by rw [Subsingleton.elim u 0]; simp⟩
+  haveI := hnt
+  have h₀ : ∃ x : ↑(Metric.sphere 0 1), ∀ (y : ↑(Metric.sphere 0 1)),
+    (fun y ↦ F.toContinuousMultilinearMapHalfPolarBilin ![y, y]) x.1 ≤
+      (fun y ↦ F.toContinuousMultilinearMapHalfPolarBilin ![y, y])
+      y.1 := by
+    obtain ⟨x,hx⟩ := IsCompact.exists_isMinOn
+      (f := (fun y => F.toContinuousMultilinearMapHalfPolarBilin ![y, y]))
+      (isCompact_sphere (0:V) 1) (NormedSpace.sphere_nonempty.mpr (by simp))
+      (Continuous.continuousOn <| by
+        refine Continuous.comp ?_
+          (continuous_id.matrixVecCons (continuous_id.matrixVecCons continuous_const))
+        exact map_continuous _)
+    use ⟨x,hx.1⟩
+    intro y
+    simp only [mem_sphere_iff_norm, sub_zero, IsMinOn, IsMinFilter,
+      Filter.eventually_principal] at hx
+    apply hx.2
+    simp
+  simp only [Subtype.forall, mem_sphere_iff_norm, sub_zero, Subtype.exists, exists_prop] at h₀
+  obtain ⟨m,hm⟩ := h₀
+  use F.toContinuousMultilinearMapHalfPolarBilin ![m, m]
+  rw [continuousBilinearMapOfContinuousMultilinearMap]
+  constructor
+  ·   unfold QuadraticMap.toContinuousMultilinearMapHalfPolarBilin
+        QuadraticMap.toMultilinearMapHalfPolarBilin
+      change 0 < (fun v ↦ (1/2) * (F (v 0 + v 1) - F (v 0) - F (v 1))) ![m,m]
+      have (x y : V) : F (x + y) = F x + F y + F.polarBilin x y := QuadraticMap.map_add (⇑F) x y
+      simp only [succ_eq_add_one, reduceAdd, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one,
+        Matrix.cons_val_fin_one, gt_iff_lt]
+      rw [this]
+      ring_nf
+      suffices 0 < (F.polarBilin m) m by linarith
+      simp only [QuadraticMap.polarBilin, LinearMap.mk₂_apply, QuadraticMap.polar_self,
+        nsmul_eq_mul, cast_ofNat, ofNat_pos, mul_pos_iff_of_pos_left]
+      apply hf'
+      intro hc
+      subst hc
+      simp at hm
+  · intro u
+    by_cases hu : u = 0
+    · subst hu
+      unfold QuadraticMap.toContinuousMultilinearMapHalfPolarBilin
+        QuadraticMap.toMultilinearMapHalfPolarBilin
+      simp [QuadraticMap.polar]
+    · have h₁ : ‖u‖ * ‖u‖⁻¹ = 1 := CommGroupWithZero.mul_inv_cancel _ <| norm_ne_zero_iff.mpr hu
+      repeat (
+        refine le_of_mul_le_mul_right ?_ <|Right.inv_pos.mpr <| norm_pos_iff.mpr hu
+        rw [mul_assoc, h₁]
+        simp only [mul_one, MultilinearMap.toFun_eq_coe, coe_coe,
+          ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk])
+      have h₂ := update₁ ▸ update₁ ▸
+        F.toContinuousMultilinearMapHalfPolarBilin.map_update_smul' ![‖u‖⁻¹ • u,u] 1 ‖u‖⁻¹ u
+      simp only [MultilinearMap.toFun_eq_coe, coe_coe, smul_eq_mul] at h₂
+      have : F.toContinuousMultilinearMapHalfPolarBilin ![u, u] * ‖u‖⁻¹
+           = F.toContinuousMultilinearMapHalfPolarBilin ![‖u‖⁻¹ • u, u] := by
+        simp_rw [Matrix.vecCons, ← curryLeft_apply, mul_comm]
+        simp
+      rw [this, mul_comm, ← h₂]
+      exact hm.2 (‖u‖⁻¹ • u) (by
+        rw [← h₁, norm_smul, mul_comm]
+        congr
+        refine Real.norm_of_nonneg ?_
+        simp)
+
+
+/--
+The polar bilinear form of the second-derivative quadratic map is the symmetrized
+Hessian.
+-/
+lemma polarBilin_iteratedFDerivQuadraticMap {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    (f : V → ℝ) (x₀ : V) (x y : V) :
+    (iteratedFDerivQuadraticMap f x₀).polarBilin x y
+      = iteratedFDeriv ℝ 2 f x₀ ![x, y] + iteratedFDeriv ℝ 2 f x₀ ![y, x] := by
+  unfold iteratedFDerivQuadraticMap;
+  simp +decide [ QuadraticMap.polarBilin, QuadraticMap.polar ];
+  simp +decide [ iteratedFDeriv_succ_apply_right, sub_eq_iff_eq_add ];
+  simp +decide [ Fin.init ];
+  ring
+
+/--
+Symmetry of the second iterated Fréchet derivative (Schwarz's theorem).
+-/
+lemma iteratedFDeriv_two_swap {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {f : V → ℝ} {x₀ : V} (hf : ContDiffAt ℝ ⊤ f x₀) (x y : V) :
+    iteratedFDeriv ℝ 2 f x₀ ![y, x] = iteratedFDeriv ℝ 2 f x₀ ![x, y] := by
+  convert hf.isSymmSndFDerivAt le_top using 1;
+  rw [ isSymmSndFDerivAt_iff_iteratedFDeriv ];
+  constructor <;> intro h;
+  · convert hf.isSymmSndFDerivAt le_top using 1;
+    rw [ isSymmSndFDerivAt_iff_iteratedFDeriv ];
+  · convert congr_arg ( fun g => g ![y, x] ) h.symm using 1;
+    simp only [domDomCongr_apply, Fin.revPerm_apply]
+    exact congr_arg _ (by ext i; fin_cases i <;> rfl)
+
+
+/-- Positive definiteness implies coercivity.
+  The proof uses the general fact `coercive_of_posdefHalf`
+  but requires a differentiability assumption on `f`.
+-/
+lemma coercive_of_posdef_of_contdiff {V : Type*}
+    [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [FiniteDimensional ℝ V] {f : V → ℝ} {x₀ : V}
+    (hf : ContDiffAt ℝ ⊤ f x₀)
+    (hf' : (iteratedFDerivQuadraticMap f x₀).PosDef) :
+    IsCoercive (continuousBilinearMapOfContinuousMultilinearMap
+        (iteratedFDeriv ℝ 2 f x₀)) := by
+  have key : ∀ x y : V,
+      (iteratedFDerivQuadraticMap f x₀).toContinuousMultilinearMapHalfPolarBilin ![x, y]
+        = iteratedFDeriv ℝ 2 f x₀ ![x, y] := by
+    intro x y
+    rw [QuadraticMap.toContinuousMultilinearMap_applyHalf,
+      polarBilin_iteratedFDerivQuadraticMap, iteratedFDeriv_two_swap hf]
+    ring
+  have heq : continuousBilinearMapOfContinuousMultilinearMap
+        (iteratedFDerivQuadraticMap f x₀).toContinuousMultilinearMapHalfPolarBilin
+      = continuousBilinearMapOfContinuousMultilinearMap (iteratedFDeriv ℝ 2 f x₀) := by
+    ext x y
+    simpa [continuousBilinearMapOfContinuousMultilinearMap] using key x y
+  rw [← heq]
+  exact coercive_of_posdefHalf hf'
+
+/-- Positive definiteness implies coercivity. -/
+lemma coercive_of_posdef {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    [FiniteDimensional ℝ V] {f : V → ℝ} {x₀ : V}
+    (hf' : (iteratedFDerivQuadraticMap f x₀).PosDef) :
+    IsCoercive (continuousBilinearMapOfContinuousMultilinearMap
+        (iteratedFDeriv ℝ 2 f x₀)) := by
+  obtain hsub | hnt := subsingleton_or_nontrivial V
+  · exact ⟨1, one_pos, fun u => by rw [Subsingleton.elim u 0]; simp⟩
+  haveI := hnt
+  have h₀ : ∃ x : ↑(Metric.sphere 0 1), ∀ (y : ↑(Metric.sphere 0 1)),
+    (fun y ↦ (iteratedFDeriv ℝ 2 f x₀) ![y, y]) x.1 ≤ (fun y ↦ (iteratedFDeriv ℝ 2 f x₀) ![y, y])
+      y.1 := by
+    obtain ⟨x,hx⟩ := IsCompact.exists_isMinOn (f := (fun y => (iteratedFDeriv ℝ 2 f x₀) ![y, y]))
+      (isCompact_sphere (0:V) 1) (NormedSpace.sphere_nonempty.mpr (by simp))
+      (Continuous.continuousOn <| by
+        refine Continuous.comp ?_
+          (continuous_id.matrixVecCons (continuous_id.matrixVecCons continuous_const))
+        exact map_continuous _)
+    use ⟨x,hx.1⟩
+    intro y
+    simp only [mem_sphere_iff_norm, sub_zero, IsMinOn, IsMinFilter,
+      Filter.eventually_principal] at hx
+    apply hx.2
+    simp
+  simp only [Subtype.forall, mem_sphere_iff_norm, sub_zero, Subtype.exists, exists_prop] at h₀
+  obtain ⟨m,hm⟩ := h₀
+  use iteratedFDeriv ℝ 2 f x₀ ![m, m]
+  rw [continuousBilinearMapOfContinuousMultilinearMap]
+  constructor
+  · exact hf' m (by intro hc;simp [hc] at hm)
+  · intro u
+    by_cases hu : u = 0
+    · simp [hu, iteratedFDeriv_succ_apply_left]
+    · have h₁ : ‖u‖ * ‖u‖⁻¹ = 1 := CommGroupWithZero.mul_inv_cancel _ <| norm_ne_zero_iff.mpr hu
+      repeat (
+        refine le_of_mul_le_mul_right ?_ <|Right.inv_pos.mpr <| norm_pos_iff.mpr hu
+        rw [mul_assoc, h₁]
+        simp only [mul_one, MultilinearMap.toFun_eq_coe, coe_coe,
+          ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk])
+      have h₂ := update₁ ▸ update₁ ▸
+        (iteratedFDeriv ℝ 2 f x₀).map_update_smul' ![‖u‖⁻¹ • u,u] 1 ‖u‖⁻¹ u
+      simp only [MultilinearMap.toFun_eq_coe, coe_coe, smul_eq_mul] at h₂
+      have : (iteratedFDeriv ℝ 2 f x₀) ![u, u] * ‖u‖⁻¹
+           = (iteratedFDeriv ℝ 2 f x₀) ![‖u‖⁻¹ • u, u] := by
+        simp_rw [Matrix.vecCons, ← curryLeft_apply, mul_comm]
+        simp
+      rw [this, mul_comm, ← h₂]
+      exact hm.2 (‖u‖⁻¹ • u) (by
+        rw [← h₁, norm_smul, mul_comm]
+        congr
+        refine Real.norm_of_nonneg ?_
+        simp)
+
+/-- . -/
+theorem le_of_littleO {V : Type*}
+    [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+    {f : V → ℝ} {x₀ x : V} {C : ℝ}
+    (hx : C * (‖x - x₀‖ ^ 2) ≤ iteratedFDeriv ℝ 2 f x₀ fun _ ↦ x - x₀)
+    (hx₀ : fderiv ℝ f x₀ x = fderiv ℝ f x₀ x₀)
+    (h₁ : ‖f x - ∑ i ∈ range 3, 1 / ↑i ! * iteratedFDeriv ℝ i f x₀ fun _ ↦ x - x₀‖
+      ≤ C / 2 * ‖x - x₀‖ ^ 2) :
+  f x₀ ≤ f x := by
+  have rev_ineq {a b c d : ℝ} (h : a + b ≤ c + d) (h' : d ≤ b) : a ≤ c := by
+    linarith
+  refine rev_ineq ?_ <| mul_le_mul_of_nonneg_right (by convert hx using 2) (show 0 ≤ 1/2 by simp)
+  simp only [range_add_one, range_zero, insert_empty_eq, one_div, mem_insert, OfNat.ofNat_ne_one,
+    mem_singleton, OfNat.ofNat_ne_zero, or_self, not_false_eq_true, sum_insert, factorial_two,
+    cast_ofNat, one_ne_zero, factorial_one, cast_one, inv_one, iteratedFDeriv_one_apply, map_sub,
+    one_mul, sum_singleton, factorial_zero, iteratedFDeriv_zero_apply, Real.norm_eq_abs] at h₁
+  have := le_of_max_le_right (hx₀ ▸ h₁)
+  linarith
+
+
+/-- Second partial derivative test, "little oh" form. -/
+theorem isLocalMin_of_posDef_of_littleo {V : Type*} [NormedAddCommGroup V]
+    [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] {f : V → ℝ} {x₀ : V}
+    (h : (fun x => f x - ∑ i ∈ range 3, 1 / (i)! * iteratedFDeriv ℝ i f x₀ fun _ => x - x₀)
+      =o[nhds x₀] fun x => ‖x - x₀‖ ^ 2) (h₀ : gradient f x₀ = 0) (hcd : ContDiffAt ℝ ⊤ f x₀)
+    (hf : (iteratedFDerivQuadraticMap f x₀).PosDef) : IsLocalMin f x₀ := by
+  have ⟨C,hC⟩ := coercive_of_posdef hf
+  have ⟨C,hC⟩ := coercive_of_posdef_of_contdiff hcd hf
+  simp only [Asymptotics.IsLittleO, Asymptotics.IsBigOWith] at h
+  apply (h (half_pos hC.1)).mono
+  intro x
+  have hx := hC.2 (x - x₀)
+  simp only [continuousBilinearMapOfContinuousMultilinearMap, MultilinearMap.toFun_eq_coe,
+    coe_coe, ContinuousLinearMap.coe_mk', LinearMap.coe_mk,
+    AddHom.coe_mk] at hx
+  rw [mul_assoc,show ![x - x₀, x - x₀] = fun _ => x - x₀ by
+    ext i; fin_cases i <;> simp] at hx
+  have hx₀ : inner ℝ (gradient f x₀) (x - x₀) = fderiv ℝ f x₀ (x - x₀) := by simp [gradient]
+  simp only [h₀, inner_zero_left, map_sub] at hx₀
+  simp only [norm_pow, norm_norm]
+  rw [← pow_two] at hx
+  exact le_of_littleO hx <| sub_eq_zero.mp hx₀.symm
+
+
+/-- Having a power series implies quadratic approximation. -/
+lemma littleO_of_powerseries {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {f : V → ℝ} {x₀ : V} {p : FormalMultilinearSeries ℝ V ℝ}
+    {r : NNReal} (h : HasFPowerSeriesOnBall f p x₀ r) :
+    (fun x => f x - p.partialSum 3 (x - x₀)) =o[nhds x₀] fun x => ‖x - x₀‖ ^ 2 := by
+      have hbig : (fun y => f (x₀ + y) - p.partialSum 3 y) =O[nhds 0] fun y => ‖y‖ ^ 3 :=
+        HasFPowerSeriesAt.isBigO_sub_partialSum_pow h.hasFPowerSeriesAt _
+      convert hbig.comp_tendsto (show Filter.Tendsto (fun x : V => x - x₀) (nhds x₀) (nhds 0) from
+        tendsto_sub_nhds_zero_iff.mpr Filter.tendsto_id) |> fun h => h.trans_isLittleO _ using 1
+      · aesop
+      · rw [Asymptotics.isLittleO_iff_tendsto'] <;> norm_num
+        simpa [pow_succ, mul_div_assoc] using tendsto_norm_sub_self x₀
+
+@[nontriviality]
+lemma isLocalMin.of_subsingleton {V : Type*} [TopologicalSpace V]
+    [Subsingleton V] {f : V → ℝ} {x₀ : V} : IsLocalMin f x₀ := by
+  simp [IsLocalMin, IsMinFilter]
+
+/-- The second partial derivative test. -/
+theorem second_derivative_test {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+    [FiniteDimensional ℝ V] {f : V → ℝ} {x₀ : V} {p : FormalMultilinearSeries ℝ V ℝ}
+    (h₀ : gradient f x₀ = 0) {r : NNReal}
+    (h₁ : HasFPowerSeriesOnBall f p x₀ r)
+    (hf : (iteratedFDerivQuadraticMap f x₀).PosDef) : IsLocalMin f x₀ := by
+  nontriviality V
+  have h₂ (x : V) (i : ℕ) : p i (fun _ => x - x₀)
+      = 1 / (i)! * iteratedFDeriv ℝ i f x₀ fun _ => x - x₀ := by
+    rw [← HasFPowerSeriesOnBall.factorial_smul h₁ (x - x₀) i]
+    ring_nf
+    field_simp
+  have h₃ (x : V) : ∑ i ∈ range 3, p i (fun _ => x - x₀)
+                  = ∑ i ∈ range 3, 1 / (i)! * iteratedFDeriv ℝ i f x₀ fun _ => x - x₀ := by
+    congr
+    ext
+    rw [h₂]
+  have h₄ (x : V) := congrArg (HSub.hSub (f x)) (h₃ x)
+  exact isLocalMin_of_posDef_of_littleo (funext_iff.mpr h₄ ▸ littleO_of_powerseries h₁) h₀
+    h₁.analyticAt.contDiffAt hf
+
+/--
+A more convenient form of the second partial derivative test: it suffices that `f`
+is analytic at `x₀` (so that an explicit power series need not be produced by hand).
+-/
+theorem second_derivative_test_analyticAt {V : Type*} [NormedAddCommGroup V]
+    [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] {f : V → ℝ} {x₀ : V}
+    (h₀ : gradient f x₀ = 0) (han : AnalyticAt ℝ f x₀)
+    (hf : (iteratedFDerivQuadraticMap f x₀).PosDef) : IsLocalMin f x₀ := by
+  obtain ⟨p, r, hr⟩ := han
+  obtain ⟨r', hr'0, hr'lt⟩ := ENNReal.lt_iff_exists_nnreal_btwn.mp hr.r_pos
+  exact second_derivative_test h₀ (hr.mono (by exact_mod_cast hr'0) hr'lt.le) hf

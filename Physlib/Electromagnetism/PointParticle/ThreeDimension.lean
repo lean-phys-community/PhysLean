@@ -99,8 +99,8 @@ lemma threeDimPointParticleCurrentDensity_chargeDensity (c : SpeedOfLight) (q : 
   ext ε
   simp only [DistLorentzCurrentDensity.chargeDensity, one_div, Lorentz.Vector.temporalCLM,
     Fin.isValue, threeDimPointParticleCurrentDensity, map_smul, LinearMap.coe_mk, AddHom.coe_mk,
-    ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
+    ContinuousLinearEquiv.apply_symm_apply, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
     Function.comp_apply, constantTime_apply, diracDelta'_apply, Lorentz.Vector.apply_smul,
     Lorentz.Vector.basis_apply, ↓reduceIte, mul_one, smul_eq_mul, diracDelta_apply]
   field_simp
@@ -181,13 +181,13 @@ lemma threeDimPointParticle_scalarPotential (𝓕 : FreeSpace) (q : ℝ) (r₀ :
   ext ε
   simp only [scalarPotential, Lorentz.Vector.temporalCLM, Fin.isValue, map_smul,
     ContinuousLinearMap.comp_smulₛₗ, ringHom_apply, threeDimPointParticle, LinearMap.coe_mk,
-    AddHom.coe_mk, ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
+    AddHom.coe_mk, ContinuousLinearEquiv.apply_symm_apply, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, LinearMap.coe_toContinuousLinearMap', Pi.smul_apply,
     Function.comp_apply, constantTime_apply, distOfFunction_vector_eval, Lorentz.Vector.apply_smul,
     Lorentz.Vector.basis_apply, ↓reduceIte, mul_one, smul_eq_mul]
   rw [distOfFunction_mul_fun _ (IsDistBounded.inv_shift _),
     distOfFunction_mul_fun _ (IsDistBounded.inv_shift _)]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   ring_nf
   simp only [𝓕.c_sq, one_div, mul_inv_rev, mul_eq_mul_right_iff, inv_eq_zero, OfNat.ofNat_ne_zero,
     or_false]
@@ -305,9 +305,9 @@ lemma threeDimPointParticle_isExterma (𝓕 : FreeSpace) (q : ℝ) (r₀ : Space
   · intro ε
     rw [gradLagrangian_sum_inl_0]
     simp only [one_div, mul_inv_rev, threeDimPointParticleCurrentDensity_chargeDensity, map_smul,
-      ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+      FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     rw [threeDimPointParticle_div_electricField]
-    simp only [one_div, map_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [one_div, map_smul, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     field_simp
     simp [𝓕.c_sq]
     right

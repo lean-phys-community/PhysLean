@@ -88,7 +88,7 @@ theorem Equiv.Perm.permMatrix_mem_unitaryGroup (e : Perm d) :
       ext i j; simp [Equiv.Perm.permMatrix] ; aesop;
     simp_all [mul_eq_one_comm]
   · simp_all only [Matrix.transpose_permMatrix]
-    convert h_perm_ortho using 2;
+    convert! h_perm_ortho using 2;
     simp [Matrix.star_eq_conjTranspose, Equiv.Perm.permMatrix]
 
 omit [Fintype d₃] [DecidableEq d₂] in
@@ -269,7 +269,9 @@ theorem Matrix.cfc_conj_unitary (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
 
 theorem Matrix.cfc_conj_unitary' (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
     cfc f (uᴴ * A * u.val) = uᴴ * (cfc f A) * u.val := by
-  simpa only [inv_inv] using cfc_conj_unitary f u⁻¹
+  have h1 := cfc_conj_unitary (A := A) f u⁻¹
+  simp_all only [inv_inv]
+  exact h1
 
 theorem Matrix.cfc_reindex (f : ℝ → ℝ) (e : d ≃ d₂) :
     cfc f (reindex e e A) = reindex e e (cfc f A) := by
@@ -374,7 +376,7 @@ theorem LinearMap.IsSymmetric.directSum_isInternal_of_commute' {𝕜 E : Type*} 
     simp only [DirectSum.coeAddMonoidHom_eq_dfinsuppSum, ZeroMemClass.coe_zero, implies_true,
       DFinsupp.sum_eq_sum_fintype, DFinsupp.equivFunOnFintype_apply]
     -- Since the decomposition is orthogonal, the inner product of x μ₁₂ with any other component is zero. Therefore, the sum simplifies to just the inner product of x μ₁₂ with itself.
-    rw [inner_sum, Finset.sum_eq_add_sum_diff_singleton _ _ (by simp)]
+    rw [inner_sum, Finset.sum_eq_add_sum_sdiff_singleton _ _ (by simp)]
     rw [Finset.sdiff_singleton_eq_erase, left_eq_add]
     apply Finset.sum_eq_zero
     intro μ hμ
@@ -396,7 +398,7 @@ theorem LinearMap.IsSymmetric.directSum_isInternal_of_commute' {𝕜 E : Type*} 
     specialize h_sum x
     rw [Submodule.mem_iSup_iff_exists_finsupp] at h_sum
     rcases h_sum with ⟨f, hf₁, hf₂⟩
-    exact ⟨∑ i ∈ f.support, .of _ i ⟨f i, hf₁ i⟩, by simpa using hf₂⟩
+    exact ⟨∑ i ∈ f.support, .of _ i ⟨f i, hf₁ i⟩, by simp_all; exact hf₂⟩
 
 noncomputable def LinearMap.sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[𝕜] EuclideanSpace 𝕜 d}
   (hA : A.IsSymmetric) (hB : B.IsSymmetric) (hAB : Commute A B) :
@@ -564,14 +566,14 @@ theorem star_shared_mul_B_mul_IsDiag : IsDiag
     simp
     ext j
     have := mul_eq_one_comm.mp ( show ( Matrix.sharedEigenvectorUnitary hA hB hAB : Matrix d d 𝕜 ) * ( Matrix.sharedEigenvectorUnitary hA hB hAB : Matrix d d 𝕜 )ᴴ = 1 from ?_ );
-    · convert congr_fun ( congr_fun this j ) i using 1;
+    · convert! congr_fun ( congr_fun this j ) i using 1;
       simp [ Pi.single_apply, Matrix.one_apply ];
     · exact Matrix.mem_unitaryGroup_iff.mp ( Matrix.sharedEigenvectorUnitary hA hB hAB ).2;
   simp_all [ Matrix.mulVec, funext_iff ];
   simp_all [ Matrix.mul_apply, dotProduct ];
   by_cases hij : i = j
   · simp [ hij ];
-    simp [ hij, Pi.single_apply, Matrix.mulVec, dotProduct ];
+    simp [Matrix.mulVec, dotProduct ];
     simp only [Finset.mul_sum, mul_left_comm];
     rw [ Finset.sum_comm ]
     simp [ mul_comm, mul_left_comm, Finset.mul_sum]
@@ -590,9 +592,9 @@ theorem Commute.exists_unitary (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : 
     ∃ U : Matrix.unitaryGroup d 𝕜, (U.val * A * Uᴴ).IsDiag ∧ (U.val * B * Uᴴ).IsDiag := by
   use (Matrix.sharedEigenvectorUnitary hA hB hAB)⁻¹
   constructor
-  · convert Matrix.SharedEigenbasis.star_shared_mul_A_mul_IsDiag hA hB hAB
+  · convert! Matrix.SharedEigenbasis.star_shared_mul_A_mul_IsDiag hA hB hAB
     simp [Matrix.star_eq_conjTranspose]
-  · convert Matrix.SharedEigenbasis.star_shared_mul_B_mul_IsDiag hA hB hAB
+  · convert! Matrix.SharedEigenbasis.star_shared_mul_B_mul_IsDiag hA hB hAB
     simp [Matrix.star_eq_conjTranspose]
 
 variable (U : Matrix.unitaryGroup d 𝕜)

@@ -111,7 +111,6 @@ theorem one_rpow : (1 : HermitianMat d 𝕜) ^ r = 1 := by
   · apply Subsingleton.allEq
   · nth_rw 2 [← HermitianMat.cfc_id (1 : HermitianMat d 𝕜)]
     rw [rpow_eq_cfc]
-    gcongr
     simp
 
 @[simp]
@@ -151,7 +150,7 @@ theorem pow_half_mul (hA : 0 ≤ A) :
   · norm_num
 
 theorem rpow_pos {A : HermitianMat d 𝕜} (hA : 0 < A) {p : ℝ} : 0 < A ^ p := by
-  convert cfc_pos_of_pos hA _ _
+  convert! cfc_pos_of_pos hA _ _
   · exact fun i hi => Real.rpow_pos_of_pos hi _
   · rcases eq_or_ne p 0 with h | h <;> simp [h]
 
@@ -203,7 +202,7 @@ lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-
   -- By definition of matrix inverse, if $(A^p) * (A^{-p}) = 1$, then $(A^{-p})$ is the inverse of $(A^p)$.
   have h_inv_def : (A ^ p).mat⁻¹ = (A ^ (-p)).mat := by
     exact Matrix.inv_eq_right_inv h_inv;
-  convert congr_fun ( congr_fun h_inv_def i ) j using 1
+  convert! congr_fun ( congr_fun h_inv_def i ) j using 1
 
 open ComplexOrder in
 lemma sandwich_le_one (hB : B.mat.PosDef) (h : A ≤ B) :
@@ -227,7 +226,7 @@ lemma rpow_neg_mul_rpow_self (hA : A.mat.PosDef) (p : ℝ) :
         exact Matrix.IsHermitian.cfc_eigenvalues (H A) fun x => x.rpow p;
       aesop;
     exact h_pos_def p hA;
-  convert Matrix.nonsing_inv_mul _ _;
+  convert! Matrix.nonsing_inv_mul _ _;
   exact isUnit_iff_ne_zero.mpr h_pos_def.det_pos.ne'
 
 open ComplexOrder in
@@ -856,10 +855,14 @@ private lemma compound_top_singular_le_posDef
       rw [hNk_conj, hAk_eq_zero]
       simp [rpow_eq_cfc, cfc_apply_zero, Real.zero_rpow hr0.ne']
     have htop : singularValuesSorted Nk (compoundZero k hk) ≤ 0 := by
-      simpa using
+      have h1 :=
         top_singular_le_of_self_mul_le_smul_one Nk (show 0 ≤ (0 : ℝ) by norm_num)
           (by simp [hNk_zero])
           (compound_card_pos k hk)
+      simp_all only [Std.le_refl, map_zero, mat_zero, Matrix.conjTranspose_mul_self_eq_zero,
+        conj_apply_mat, conjTranspose_mat, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+        _root_.zero_pow, zero_smul, Real.sqrt_zero, ge_iff_le]
+      exact h1
     change singularValuesSorted Nk (compoundZero k hk) ≤ c ^ r
     rw [hc_zero, Real.zero_rpow hr0.ne']
     exact htop
@@ -927,7 +930,9 @@ private lemma trace_conj_rpow_eq_sum_singularValuesSorted
   let M : Matrix d d ℂ := (A ^ (1 / 2 : ℝ)).mat * B.mat
   let H : HermitianMat d ℂ :=
     ⟨M.conjTranspose * M, by
-      simpa using Matrix.isHermitian_mul_conjTranspose_self M.conjTranspose⟩
+      have h1 := Matrix.isHermitian_mul_conjTranspose_self M.conjTranspose
+      simp_all only [Matrix.conjTranspose_conjTranspose]
+      exact h1⟩
   have hH : H = A.conj B.mat := by
     ext1; dsimp [H, M]
     exact conjTranspose_half_mul_eq_conj (A := A) (B := B) hA
@@ -961,7 +966,7 @@ private lemma lieb_thirring_le_one_posDef
     calc
       ∏ i : Fin k, singularValuesSorted N ⟨i.val, by omega⟩
         = singularValuesSorted (compoundMatrix N k) (compoundZero k hk) := by
-            simpa [N] using prod_singularValuesSorted_eq_compoundSV N k hk
+            exact prod_singularValuesSorted_eq_compoundSV N k hk
       _ ≤ singularValuesSorted (compoundMatrix M k) (compoundZero k hk) ^ r := by
             simpa [M, N] using compound_top_singular_le_posDef hA hB hr0 hr1 k hk
       _ = ∏ i : Fin k, (singularValuesSorted M ⟨i.val, by omega⟩) ^ r := by
@@ -969,7 +974,7 @@ private lemma lieb_thirring_le_one_posDef
             have hrpow := (Real.finsetProd_rpow (s := Finset.univ)
               (f := fun i : Fin k => singularValuesSorted M ⟨i.val, by omega⟩)
               (fun i _ => singularValuesSorted_nonneg M _) r)
-            simpa using hprod.trans hrpow.symm
+            exact hprod.trans hrpow.symm
   have hsum :
       ∑ i : Fin (Fintype.card d), singularValuesSorted N i ^ 2 ≤
       ∑ i : Fin (Fintype.card d), (singularValuesSorted M i ^ r) ^ 2 := by

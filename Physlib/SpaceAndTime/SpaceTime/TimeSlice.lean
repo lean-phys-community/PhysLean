@@ -125,13 +125,13 @@ noncomputable def distTimeSlice {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
       (F := ℝ) ℝ (SpaceTime.toTimeAndSpace c (d := d)).symm
   left_inv f := by
     ext κ
-    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+    simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
     congr
     ext x
     simp [compCLMOfContinuousLinearEquiv_apply]
   right_inv f := by
     ext κ
-    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+    simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
     congr
     ext x
     simp
@@ -165,7 +165,7 @@ lemma distTimeSlice_distDeriv_inl {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
     (1/c.val) • Space.distTimeDeriv (distTimeSlice c f) := by
   ext κ
   rw [distTimeSlice_apply, distDeriv_apply, fderivD_apply]
-  simp only [Fin.isValue, one_div, ContinuousLinearMap.coe_smul', Pi.smul_apply]
+  simp only [Fin.isValue, one_div, FunLike.coe_smul, Pi.smul_apply]
   rw [distTimeDeriv_apply, fderivD_apply, distTimeSlice_apply]
   simp only [Fin.isValue, smul_neg, neg_inj]
   rw [← map_smul]
@@ -174,7 +174,7 @@ lemma distTimeSlice_distDeriv_inl {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
   change fderiv ℝ (κ ∘ toTimeAndSpace c) x (Lorentz.Vector.basis (Sum.inl 0)) =
     c.val⁻¹ • fderiv ℝ κ (toTimeAndSpace c x) (1, 0)
   rw [fderiv_comp]
-  simp only [toTimeAndSpace_fderiv, Fin.isValue, ContinuousLinearMap.coe_comp',
+  simp only [toTimeAndSpace_fderiv, Fin.isValue, ContinuousLinearMap.coe_comp,
     ContinuousLinearEquiv.coe_coe, Function.comp_apply, smul_eq_mul]
   rw [toTimeAndSpace_basis_inl']
   rw [map_smul]
@@ -217,7 +217,7 @@ lemma distTimeSlice_distDeriv_inr {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
   change fderiv ℝ (κ ∘ toTimeAndSpace c) x (Lorentz.Vector.basis (Sum.inr i)) =
     fderiv ℝ κ (toTimeAndSpace c x) (0, Space.basis i)
   rw [fderiv_comp]
-  simp only [toTimeAndSpace_fderiv, ContinuousLinearMap.coe_comp', ContinuousLinearEquiv.coe_coe,
+  simp only [toTimeAndSpace_fderiv, ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe,
     Function.comp_apply]
   rw [toTimeAndSpace_basis_inr]
   · apply Differentiable.differentiableAt

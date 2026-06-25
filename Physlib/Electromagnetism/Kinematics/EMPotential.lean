@@ -161,7 +161,8 @@ noncomputable def ofPotentials {d} (c : SpeedOfLight) (ϕ : Time → Space d →
 lemma ofPotentials_eq_add {d} (c : SpeedOfLight) (ϕ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
     ofPotentials c ϕ A = ofScalarPotential c ϕ + ofVectorPotential c A := by
-  ext x
+  ext1
+  ext1 x
   refine Lorentz.Vector.ext_of_apply (fun i => ?_)
   match i with
   | Sum.inl 0 =>
@@ -195,9 +196,6 @@ noncomputable def ofElectromagneticField (c : SpeedOfLight)
 
 TODO "Write lemmas for the various properties (e.g. the electric field) of
   the electromagnetic potential from the various constructors."
-
-TODO "Define constructors for the distributional electromagnetic potential, similar
-  to e.g. `ofScalarPotential` and `ofVectorPotential` for `ElectromagneticPotential`."
 
 /-!
 
@@ -425,7 +423,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
       conv_lhs =>
         enter [1, 2, i]
         rw [fderiv_const_mul (hdif i)]
-      simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_smul',
+      simp only [FunLike.coe_sum, FunLike.coe_smul,
         Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
       rw [Lorentz.Vector.smul_eq_sum]
       congr
@@ -504,7 +502,6 @@ lemma deriv_hasVarAdjDerivAt {d} (μ ν : Fin 1 ⊕ Fin d) (A : SpaceTime d → 
     Lorentz.Vector d) x => ∂_ μ A x ν)) h0' ?_
   intro φ hφ
   funext x
-  simp only
   rw [deriv_apply_eq μ ν φ]
   exact hφ.differentiable (by simp)
 

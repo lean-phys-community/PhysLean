@@ -7,7 +7,7 @@ module
 
 public import Physlib.Electromagnetism.Kinematics.EMPotential
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Field Strength Tensor
@@ -145,44 +145,14 @@ tensor in.
 
 -/
 
-TODO "Generalize the proof of `toFieldStrength_eq_sum_basis_eval` so that any tensor
-  can easily be written as the sum of its components times the basis.
-  The likely location for this is in the `Tensorial` module.
-  The TODO item with tag: 8285454220008908699 is likely a prerequisite to this."
-
 /-- The statement that `F = F^{μν} eᵤ ⊗ eᵥ` written explicitly, with
   the components extracted via `toField`. -/
 lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
     A.toFieldStrength = fun x => ∑ μ, ∑ ν, toField {A.toFieldStrength x| [μ] [ν]}ᵀ •
       Vector.basis μ ⊗ₜ[ℝ] Vector.basis ν := by
   ext x
-  /- This is a fairly general proof, so we can generalize our tensor. -/
-  generalize (A.toFieldStrength x) = t
-  apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
-  ext ⟨μ, ν⟩
-  simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
-    Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, Finsupp.single_apply,
-    smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel, Finset.sum_ite_eq',
-    Finset.mem_univ, ↓reduceIte, Finset.sum_const_zero]
-  obtain ⟨t, rfl⟩ := toTensor.symm.surjective t
-  induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
-  · simp only [LinearEquiv.apply_symm_apply, basis_apply, evalT_pure, Pure.evalP, map_smul,
-      toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
-    change _ = _ * (Lorentz.contrBasis d).repr (Lorentz.contrBasis d (b 1)) ν
-    /- Transforming the basis -/
-    let e := ComponentIdx.prod.trans ((Vector.indexEquiv (d := d)).prodCongr Vector.indexEquiv)
-    simp only [prod_basis_of_map_reindex Vector.basis_eq_map_tensor_basis
-        Vector.basis_eq_map_tensor_basis, Basis.repr_reindex, Basis.map_repr,
-      LinearEquiv.symm_symm, LinearEquiv.trans_apply, LinearEquiv.apply_symm_apply,
-      Finsupp.mapDomain_equiv_apply, basis_repr_pure, Pure.component_basisVector, Fin.isValue,
-      Pure.basisVector, Basis.repr_self, Finsupp.single_apply, mul_ite, mul_one, mul_zero]
-    simp only [Equiv.eq_symm_apply,
-      show ComponentIdx.prod.trans ((Vector.indexEquiv (d := d)).prodCongr Vector.indexEquiv) b
-        = (b 0, b 1) from rfl]
-    by_cases hμ : b 0 = μ <;> by_cases hν : b 1 = ν <;> simp_all
-  · simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
-  · simp only [map_smul, h, smul_eq_mul, Finsupp.coe_smul, Pi.smul_apply]
-  · simp only [map_add, h1, h2, Finsupp.coe_add, Pi.add_apply]
+  exact prod_eq_sum_eval Vector.basis_eq_map_tensor_basis
+      Vector.basis_eq_map_tensor_basis (A.toFieldStrength x)
 
 /-- The statement that `F = F^{μν} eᵤ ⊗ eᵥ` written explicitly, with
   the components given by `∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)`. -/
@@ -608,7 +578,7 @@ lemma toFieldStrength_add {d} (A1 A2 : ElectromagneticPotential d)
   repeat rw [SpaceTime.deriv_eq]
   simp only [add_val]
   rw [fderiv_add]
-  simp only [ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add]
+  simp only [_root_.add_apply, Lorentz.Vector.apply_add]
   ring
   · exact hA1.differentiableAt
   · exact hA2.differentiableAt
@@ -635,7 +605,7 @@ lemma toFieldStrength_smul {d} (c : ℝ) (A : ElectromagneticPotential d)
   repeat rw [SpaceTime.deriv_eq]
   simp only [smul_val]
   rw [fderiv_const_smul]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, Lorentz.Vector.apply_smul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, Lorentz.Vector.apply_smul]
   ring
   exact hA.differentiableAt
 

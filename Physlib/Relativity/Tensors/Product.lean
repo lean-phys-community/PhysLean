@@ -612,21 +612,17 @@ noncomputable def prodT {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
   refine PiTensorProduct.lift (MultilinearMap.mk' (fun p1 => PiTensorProduct.lift
     (MultilinearMap.mk' (fun p2 => (Pure.prodP p1 p2).toTensor) ?_ ?_)) ?_ ?_)
   · intro p2 i x y
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
   · intro p2 i r p2'
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
   · intro p1 i x y
     ext p2
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
   · intro p1 i r p1'
     ext p2
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
 
@@ -657,6 +653,12 @@ lemma prodT_basis {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
   congr
   rw [Pure.prodP_basisVector]
 
+lemma prodT_basis' {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
+    (b : ComponentIdx c) (b1 : ComponentIdx (S := S) c1) :
+    (basis c b).prodT (basis c1 b1) =
+    basis (Fin.append c c1) (ComponentIdx.prod.symm (b, b1)) := by
+  rw [prodT_basis]
+  simp [basis_apply]
 /-!
 
 ### C.5. The product as an equivalence
@@ -819,6 +821,17 @@ lemma prodT_default_right {n} {c : Fin n → C}
     simp_all only [map_smul, LinearMap.smul_apply, P]
   · intro t1 t2 h1 h2
     simp_all only [map_add, LinearMap.add_apply, P]
+
+lemma prodT_zero_right {n} {c : Fin n → C}
+    {c1 : Fin 0 → C} (t : S.Tensor c) (t1 : S.Tensor c1) :
+    prodT t t1 = (toField t1) • permT id (Pure.prodP_zero_right_permCond) t := by
+  conv_lhs => rw [Tensor.eq_smul_toField t1]
+  rw [map_smul]
+  congr 1
+  convert prodT_default_right _
+  simp only [basis_apply]
+  congr
+  exact Unique.eq_default (Pure.basisVector c1 default)
 
 /-!
 

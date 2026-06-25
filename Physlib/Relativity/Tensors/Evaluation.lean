@@ -142,8 +142,111 @@ lemma evalT_basis {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
     zero_smul]
   rfl
 
+
 TODO "Add lemmas related to the interaction of evalT and permT, prodT and contrT."
 
-end Tensor
 
+attribute [-simp] Matrix.cons_val_zero Matrix.cons_val Fin.succAbove_zero
+/-- Evaluating the single-index basis tensor `basis ![c] (single.symm b)` at the index `x`
+  yields the field element `1` if `b = x` (transported across `![c] 0 = c`) and `0` otherwise:
+  evaluation of a one-index basis tensor is the Kronecker delta. -/
+lemma evalT_basis_single {c : C} (b : basisIdx c) (x : basisIdx (![c] 0)) :
+    (evalT 0 x (basis (S := S) ![c] (ComponentIdx.single.symm b))).toField =
+    if basisIdxCongr (by simp) b =  x then 1 else 0 := by
+  rw [evalT_basis]
+  simp only [ComponentIdx.single_symm_apply]
+  split_ifs
+  · exact toField_basis _
+  · simp
+
+/-- Basis expansion of a one-index tensor: every `t : Tensor S ![c]` is the sum over basis
+  indices `i` of its evaluation coefficient `toField (evalT 0 i t)` times the corresponding
+  basis tensor. -/
+lemma eq_sum_evalT_of_single_tensor_basis {c : C} (t : Tensor S ![c]) :
+    t = ∑ i, toField (evalT 0 i t) • basis ![c] (ComponentIdx.single.symm
+      (basisIdxCongr (by simp) i)) := by
+  induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
+  · obtain ⟨i, rfl⟩ := ComponentIdx.single.symm.surjective b
+    conv_rhs => enter [2, i]; rw [evalT_basis_single]
+    simp
+  · simp
+  · conv_lhs => rw [h]
+    simp [Finset.smul_sum, smul_smul]
+  · simp [add_smul, Finset.sum_add_distrib]
+    grind
+
+/-- Reconstruction of a tensor from the evaluations of its last index: every `t : Tensor S c`
+  is the sum over basis indices `i` of the evaluation `evalT (Fin.last n) i t` tensored with
+  the basis covector `basis ![c (Fin.last n)] (single.symm i)`, with the appended index
+  permuted back into the last slot. -/
+lemma eq_sum_evalT {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
+    t = ∑ i, permT id (PermCond.append_succ_last c) (prodT (evalT (Fin.last n) i t)
+      (basis ![c (Fin.last n)] (ComponentIdx.single.symm i)))   := by
+  induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
+  · conv_rhs => enter [2, i]; rw [evalT_basis]
+    generalize_proofs h1 h2 h3
+    rw [Finset.sum_eq_single (b (Fin.last n))]
+    · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, ↓reduceIte]
+      rw [prodT_basis, basis_apply, permT_pure]
+      congr
+      funext i
+      simp only [Pure.basisVector, Pure.permP_basisVector]
+      congr
+      refine Fin.addCases (fun j => ?_) (fun j => ?_) i
+      · simp only [id_eq, ComponentIdx.prod_symm_castAdd, Function.comp_apply]
+        erw [basisIdxCongr_apply_apply]
+        exact ComponentIdx.congr_right b _ _ (by rw [Fin.succAbove_last]; rfl)
+      · simp only [id_eq, ComponentIdx.prod_symm_natAdd, ComponentIdx.single_symm_apply,
+          basisIdxCongr_apply_apply]
+        erw [basisIdxCongr_apply_apply]
+        exact ComponentIdx.congr_right _ _ _ (by fin_cases j; rfl)
+    · intro j h1 h1
+      rw [if_neg (by grind)]
+      simp
+    · simp
+  · simp
+  · conv_lhs => rw [h]
+    simp [Finset.smul_sum]
+  · simp [Finset.sum_add_distrib]
+    grind
+
+/-- Reconstruction of a tensor from the evaluations of its first index: every `t : Tensor S c`
+  is the sum over basis indices `i` of the basis covector `basis ![c 0] (single.symm i)` tensored
+  with the evaluation `evalT 0 i t`, with the prepended index permuted back into the first slot.
+  This is the first-index analogue of `eq_sum_evalT`. -/
+lemma eq_sum_evalT_zero {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
+    t = ∑ i, permT _ (PermCond.append_of_first c)
+    (prodT (basis ![c 0] (ComponentIdx.single.symm i)) (evalT 0 i t))  := by
+  induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
+  · conv_rhs => enter [2, i]; rw [evalT_basis]
+    generalize_proofs h1 h2 h3
+    rw [Finset.sum_eq_single (b 0)]
+    · simp only [↓reduceIte]
+      rw [prodT_basis, basis_apply, permT_pure]
+      congr
+      funext i
+      simp only [Pure.basisVector, Pure.permP_basisVector]
+      congr
+      refine Fin.cases ?_ ?_ i
+      · simp only [ComponentIdx.prod, Equiv.coe_fn_symm_mk, Fin.cast_zero, Fin.addCases,
+          ComponentIdx.single_symm_apply, basisIdxCongr_apply_apply]
+        exact ComponentIdx.congr_right b 0 0 rfl
+      · intro j
+        simp only [ComponentIdx.prod, Equiv.coe_fn_symm_mk, Fin.addCases]
+        rw [dif_neg (by simp)]
+        simp only [eqRec_eq_cast, basisIdxCongr, Equiv.cast_apply, cast_cast]
+        symm
+        rw [cast_eq_iff_heq]
+        congr 1
+    · intro j h1 h1
+      rw [if_neg (by grind)]
+      simp
+    · simp
+  · simp
+  · conv_lhs => rw [h]
+    simp [Finset.smul_sum]
+  · simp [Finset.sum_add_distrib]
+    grind
+
+end Tensor
 end TensorSpecies
