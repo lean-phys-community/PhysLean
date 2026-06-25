@@ -523,7 +523,7 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
       ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
     intro f g hf hg
     funext t
-    simp only [Time.deriv_eq, fderiv_fun_sub (hf t) (hg t), ContinuousLinearMap.sub_apply]
+    simp only [Time.deriv_eq, fderiv_fun_sub (hf t) (hg t), sub_apply]
   -- The difference `y := x - traj` is smooth, again solves the equation of motion (the force is
   -- linear), and has vanishing initial data; energy conservation then forces `y = 0`.
   set y : Time → EuclideanSpace ℝ (Fin 1) := fun t => x t - IC.trajectory S t with hydef

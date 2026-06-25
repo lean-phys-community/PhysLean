@@ -294,8 +294,7 @@ def quadBiLin : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
     simp only [toSMSpecies_apply, Fin.isValue, neg_mul, one_mul, Hd_apply, Fin.reduceFinMk,
       Hu_apply]
     congr 1
-    · simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand, Fin.zero_eta,
-      Fin.mk_one]
+    · simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand]
       ring
     · ring)
 
