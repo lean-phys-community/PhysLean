@@ -91,7 +91,7 @@ def IsTotalTimeDerivative
 
     δL(t, q, dₜ q) = fderiv ℝ F (t, q) (1, dₜ q)
 -/
-lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
+lemma IsTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
   -- Preliminary construction: properties of the function t => (t, q t)
@@ -122,7 +122,8 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
        (1, ∂ₜ q t).2 = fderiv ℝ (fun t' => (tq q t').2) t 1 := by rfl
        _ = (∂ₜ (tq q) t).2 := by
         rw [fderiv.snd]
-        · simp only [ContinuousLinearMap.coe_comp', ContinuousLinearMap.coe_snd', Function.comp_apply]
+        · simp only [ContinuousLinearMap.coe_comp', ContinuousLinearMap.coe_snd',
+              Function.comp_apply]
           rfl
         · apply ContDiffAt.differentiableAt
           · apply ContDiff.contDiffAt
@@ -147,7 +148,7 @@ lemma IsTotalTimeDerivativeExplicit {δL : Time → X → X → ℝ} :
         exact h_tq_contDiff q hq
       · by_contra
         rcases this
-  -- start of the proof
+  -- beginning of the proof
   constructor
   -- From total the total derivative to the explicit form
   · intro h
@@ -215,7 +216,7 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
     (h : IsTotalTimeDerivative (fun _ _ v => δL v)) :
     ∃ g : X, ∀ v, δL v = ⟪g, v⟫_ℝ := by
   classical
-  rcases (IsTotalTimeDerivativeExplicit.mp h) with ⟨F, hFdiff, hEq⟩
+  rcases (IsTotalTimeDerivative_explicit.mp h) with ⟨F, hFdiff, hEq⟩
 
   -- Derivative of F at (0,0)
   let dF : (Time  × X) →L[ℝ] ℝ :=
