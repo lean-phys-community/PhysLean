@@ -71,10 +71,15 @@ def δ₁₃ (V : Quotient CKMMatrixSetoid) : ℝ :=
 
 section sines
 
+/-- The first-row normalization rewritten: `1 - |ub|²` equals `|ud|² + |us|²`. -/
+private lemma one_sub_VubAbs_sq (V : Quotient CKMMatrixSetoid) :
+    1 - VubAbs V ^ 2 = VudAbs V ^ 2 + VusAbs V ^ 2 := by
+  linear_combination - (VAbs_sum_sq_row_eq_one V 0)
+
 /-- For a CKM matrix `sin θ₁₂` is non-negative. -/
 lemma S₁₂_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₁₂ V := by
-  rw [S₁₂, div_nonneg_iff]
-  exact .inl (.intro (VAbs_ge_zero 0 1 V) (Real.sqrt_nonneg (VudAbs V ^ 2 + VusAbs V ^ 2)))
+  rw [S₁₂]
+  exact div_nonneg (VAbs_ge_zero 0 1 V) (Real.sqrt_nonneg _)
 
 /-- For a CKM matrix `sin θ₁₃` is non-negative. -/
 lemma S₁₃_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₁₃ V :=
@@ -85,24 +90,16 @@ lemma S₂₃_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₂₃ V := by
   by_cases ha : VubAbs V = 1
   · rw [S₂₃, if_pos ha]
     exact VAbs_ge_zero 1 0 V
-  · rw [S₂₃, if_neg ha, @div_nonneg_iff]
-    exact .inl (.intro (VAbs_ge_zero 1 2 V) (Real.sqrt_nonneg (VudAbs V ^ 2 + VusAbs V ^ 2)))
+  · rw [S₂₃, if_neg ha]
+    exact div_nonneg (VAbs_ge_zero 1 2 V) (Real.sqrt_nonneg _)
 
 /-- For a CKM matrix `sin θ₁₂` is less than or equal to 1. -/
 lemma S₁₂_leq_one (V : Quotient CKMMatrixSetoid) : S₁₂ V ≤ 1 := by
-  rw [S₁₂, @div_le_one_iff]
-  by_cases h1 : √(VudAbs V ^ 2 + VusAbs V ^ 2) = 0
-  · simp [h1]
-  · have h3 : 0 < √(VudAbs V ^ 2 + VusAbs V ^ 2) := by
-      have h2 := le_iff_eq_or_lt.mp (Real.sqrt_nonneg (VudAbs V ^ 2 + VusAbs V ^ 2))
-      cases' h2 with h2 h2
-      simp_all only [VudAbs, VusAbs, not_true_eq_false]
-      exact h2
-    left
-    simp_all only [VudAbs, VusAbs, Real.sqrt_pos, true_and]
-    rw [Real.le_sqrt (VAbs_ge_zero 0 1 V) (le_of_lt h3)]
-    simp only [Fin.isValue, le_add_iff_nonneg_left]
-    exact sq_nonneg (VAbs 0 0 V)
+  rw [S₁₂]
+  apply div_le_one_of_le₀ _ (Real.sqrt_nonneg _)
+  calc VusAbs V = √(VusAbs V ^ 2) := (Real.sqrt_sq (VAbs_ge_zero 0 1 V)).symm
+    _ ≤ √(VudAbs V ^ 2 + VusAbs V ^ 2) :=
+      Real.sqrt_le_sqrt (by nlinarith [sq_nonneg (VudAbs V)])
 
 /-- For a CKM matrix `sin θ₁₃` is less than or equal to 1. -/
 lemma S₁₃_leq_one (V : Quotient CKMMatrixSetoid) : S₁₃ V ≤ 1 :=
@@ -113,21 +110,12 @@ lemma S₂₃_leq_one (V : Quotient CKMMatrixSetoid) : S₂₃ V ≤ 1 := by
   by_cases ha : VubAbs V = 1
   · rw [S₂₃, if_pos ha]
     exact VAbs_leq_one 1 0 V
-  · rw [S₂₃, if_neg ha, @div_le_one_iff]
-    by_cases h1 : √(VudAbs V ^ 2 + VusAbs V ^ 2) = 0
-    · simp only [VudAbs, Fin.isValue, VusAbs, h1, lt_self_iff_false, VcbAbs, false_and, or_false,
-      or_true]
-    · have h2 := le_iff_eq_or_lt.mp (Real.sqrt_nonneg (VudAbs V ^ 2 + VusAbs V ^ 2))
-      have h3 : 0 < √(VudAbs V ^ 2 + VusAbs V ^ 2) := by
-        cases' h2 with h2 h2
-        simp_all only [VubAbs, VudAbs, VusAbs, not_true_eq_false]
-        exact h2
-      apply Or.inl
-      simp_all only [VubAbs, VudAbs, VusAbs, or_true, Real.sqrt_pos, VcbAbs, true_and]
-      rw [Real.le_sqrt (VAbs_ge_zero 1 2 V) (le_of_lt h3)]
-      rw [VudAbs_sq_add_VusAbs_sq, ← VcbAbs_sq_add_VtbAbs_sq]
-      simp only [Fin.isValue, VcbAbs, VtbAbs, le_add_iff_nonneg_right]
-      exact sq_nonneg (VAbs 2 2 V)
+  · rw [S₂₃, if_neg ha]
+    apply div_le_one_of_le₀ _ (Real.sqrt_nonneg _)
+    rw [VudAbs_sq_add_VusAbs_sq, ← VcbAbs_sq_add_VtbAbs_sq]
+    calc VcbAbs V = √(VcbAbs V ^ 2) := (Real.sqrt_sq (VAbs_ge_zero 1 2 V)).symm
+      _ ≤ √(VcbAbs V ^ 2 + VtbAbs V ^ 2) :=
+        Real.sqrt_le_sqrt (by nlinarith [sq_nonneg (VtbAbs V)])
 
 lemma S₁₂_eq_sin_θ₁₂ (V : Quotient CKMMatrixSetoid) : Real.sin (θ₁₂ V) = S₁₂ V :=
   Real.sin_arcsin (le_trans (by simp) (S₁₂_nonneg V)) (S₁₂_leq_one V)
@@ -150,25 +138,20 @@ lemma S₂₃_eq_ℂsin_θ₂₃ (V : Quotient CKMMatrixSetoid) : Complex.sin (�
 lemma complexAbs_sin_θ₁₂ (V : Quotient CKMMatrixSetoid) :
     norm (Complex.sin (θ₁₂ V)) = sin (θ₁₂ V) := by
   rw [S₁₂_eq_ℂsin_θ₁₂, Complex.norm_real, ofReal_inj]
-  refine Real.norm_of_nonneg ?_
-  exact S₁₂_nonneg _
+  exact Real.norm_of_nonneg (S₁₂_nonneg _)
 
 lemma complexAbs_sin_θ₁₃ (V : Quotient CKMMatrixSetoid) :
     norm (Complex.sin (θ₁₃ V)) = sin (θ₁₃ V) := by
   rw [S₁₃_eq_ℂsin_θ₁₃, Complex.norm_real, ofReal_inj]
-  refine Real.norm_of_nonneg ?_
-  exact S₁₃_nonneg _
+  exact Real.norm_of_nonneg (S₁₃_nonneg _)
 
 lemma complexAbs_sin_θ₂₃ (V : Quotient CKMMatrixSetoid) :
     norm (Complex.sin (θ₂₃ V)) = sin (θ₂₃ V) := by
   rw [S₂₃_eq_ℂsin_θ₂₃, Complex.norm_real, ofReal_inj]
-  refine Real.norm_of_nonneg ?_
-  exact S₂₃_nonneg _
+  exact Real.norm_of_nonneg (S₂₃_nonneg _)
 
 lemma S₁₂_of_Vub_one {V : Quotient CKMMatrixSetoid} (ha : VubAbs V = 1) : S₁₂ V = 0 := by
-  have h1 : 1 - VubAbs V ^ 2 = VudAbs V ^ 2 + VusAbs V ^ 2 := by
-    linear_combination - (VAbs_sum_sq_row_eq_one V 0)
-  simp [S₁₂, ← h1, ha]
+  simp [S₁₂, ← one_sub_VubAbs_sq V, ha]
 
 lemma S₁₃_of_Vub_one {V : Quotient CKMMatrixSetoid} (ha : VubAbs V = 1) : S₁₃ V = 1 := by
   rw [S₁₃, ha]
@@ -197,22 +180,19 @@ lemma complexAbs_cos_θ₁₂ (V : Quotient CKMMatrixSetoid) : norm (Complex.cos
     cos (θ₁₂ V) := by
   rw [C₁₂_eq_ℂcos_θ₁₂, Complex.norm_real]
   simp only [ofReal_inj]
-  refine Real.norm_of_nonneg ?_
-  exact Real.cos_arcsin_nonneg _
+  exact Real.norm_of_nonneg (Real.cos_arcsin_nonneg _)
 
 lemma complexAbs_cos_θ₁₃ (V : Quotient CKMMatrixSetoid) : norm (Complex.cos (θ₁₃ V)) =
     cos (θ₁₃ V) := by
   rw [C₁₃_eq_ℂcos_θ₁₃, Complex.norm_real]
   simp only [ofReal_inj]
-  refine Real.norm_of_nonneg ?_
-  exact Real.cos_arcsin_nonneg _
+  exact Real.norm_of_nonneg (Real.cos_arcsin_nonneg _)
 
 lemma complexAbs_cos_θ₂₃ (V : Quotient CKMMatrixSetoid) : norm (Complex.cos (θ₂₃ V)) =
     cos (θ₂₃ V) := by
   rw [C₂₃_eq_ℂcos_θ₂₃, Complex.norm_real]
   simp only [ofReal_inj]
-  refine Real.norm_of_nonneg ?_
-  exact Real.cos_arcsin_nonneg _
+  exact Real.norm_of_nonneg (Real.cos_arcsin_nonneg _)
 
 lemma S₁₂_sq_add_C₁₂_sq (V : Quotient CKMMatrixSetoid) : S₁₂ V ^ 2 + C₁₂ V ^ 2 = 1 := by
   rw [← S₁₂_eq_sin_θ₁₂ V, C₁₂]
@@ -249,10 +229,7 @@ lemma C₁₂_eq_Vud_div_sqrt {V : Quotient CKMMatrixSetoid} (ha : VubAbs V ≠ 
 
 --rename
 lemma C₁₃_eq_add_sq (V : Quotient CKMMatrixSetoid) : C₁₃ V = √ (VudAbs V ^ 2 + VusAbs V ^ 2) := by
-  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₃]
-  have h1 : 1 - VubAbs V ^ 2 = VudAbs V ^ 2 + VusAbs V ^ 2 := by
-    linear_combination - (VAbs_sum_sq_row_eq_one V 0)
-  rw [h1]
+  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, one_sub_VubAbs_sq V]
 
 lemma C₂₃_of_Vub_ne_one {V : Quotient CKMMatrixSetoid} (ha : VubAbs V ≠ 1) :
     C₂₃ V = VtbAbs V / √ (VudAbs V ^ 2 + VusAbs V ^ 2) := by
@@ -277,26 +254,19 @@ lemma VudAbs_eq_C₁₂_mul_C₁₃ (V : Quotient CKMMatrixSetoid) : VudAbs V = 
     rw [VAbs_thd_eq_one_fst_eq_zero ha]
     rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, ha]
     simp only [one_pow, sub_self, Real.sqrt_zero, mul_zero]
-  · rw [C₁₂_eq_Vud_div_sqrt ha, C₁₃, θ₁₃, Real.cos_arcsin, S₁₃]
-    have h1 : 1 - VubAbs V ^ 2 = VudAbs V ^ 2 + VusAbs V ^ 2 := by
-      linear_combination - (VAbs_sum_sq_row_eq_one V 0)
-    rw [h1, mul_comm]
+  · rw [C₁₂_eq_Vud_div_sqrt ha, C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, one_sub_VubAbs_sq V, mul_comm]
     exact (mul_div_cancel₀ (VudAbs V) (VAbsub_ne_zero_sqrt_Vud_Vus_ne_zero ha)).symm
 
 lemma VusAbs_eq_S₁₂_mul_C₁₃ (V : Quotient CKMMatrixSetoid) : VusAbs V = S₁₂ V * C₁₃ V := by
-  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₂, S₁₃]
-  have h1 : 1 - VubAbs V ^ 2 = VudAbs V ^ 2 + VusAbs V ^ 2 := by
-    linear_combination - (VAbs_sum_sq_row_eq_one V 0)
-  rw [h1]
-  rw [mul_comm]
+  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₂, S₁₃, one_sub_VubAbs_sq V, mul_comm]
   by_cases ha : VubAbs V = 1
-  · rw [ha] at h1
-    simp only [one_pow, sub_self] at h1
-    rw [← h1]
+  · have h0 : VudAbs V ^ 2 + VusAbs V ^ 2 = 0 := by
+      rw [← one_sub_VubAbs_sq V, ha]
+      ring
+    rw [h0]
     simp only [Real.sqrt_zero, div_zero, mul_zero]
     exact VAbs_thd_eq_one_snd_eq_zero ha
-  · have h2 := VAbsub_ne_zero_sqrt_Vud_Vus_ne_zero ha
-    exact (mul_div_cancel₀ (VusAbs V) h2).symm
+  · exact (mul_div_cancel₀ (VusAbs V) (VAbsub_ne_zero_sqrt_Vud_Vus_ne_zero ha)).symm
 
 lemma VubAbs_eq_S₁₃ (V : Quotient CKMMatrixSetoid) : VubAbs V = S₁₃ V := rfl
 
@@ -408,138 +378,68 @@ lemma on_param_cos_θ₁₃_eq_zero {V : CKMMatrix} (δ₁₃ : ℝ) (h : Real.c
   have hS12 := congrArg ofReal (S₁₂_of_Vub_one (VubAbs_of_cos_θ₁₃_zero h))
   simp only [← S₁₂_eq_ℂsin_θ₁₂] at hS12
   use 0, 0, 0, δ₁₃, 0, -δ₁₃
-  simp only [standParam, standParamAsMatrix, ofReal_cos, hC12, h, ofReal_zero, mul_zero, ofReal_sin,
-    hS12, hS13, neg_mul, neg_zero, zero_mul, mul_one, zero_sub, sub_zero, phaseShift,
-    phaseShiftMatrix, exp_zero, Submonoid.mk_mul_mk, ofReal_neg, mul_neg, Subtype.mk.injEq]
+  apply CKMMatrix_ext
   funext i j
   fin_cases i <;> fin_cases j <;>
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, cons_val',
-      cons_val_zero, empty_val', cons_val_fin_one, mul_apply, Fin.sum_univ_three, one_mul,
-      cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, head_fin_const,
-      vecCons_const, mul_zero, tail_val', head_val', zero_add, Fin.mk_one, Fin.reduceFinMk,
-      neg_mul, mul_one]
-  · simp_all only [ofReal_one, ofReal_zero, one_mul]
-    rfl
-  · rfl
+    simp [standParam, standParamAsMatrix, phaseShift, phaseShiftMatrix, mul_apply,
+      Fin.sum_univ_three, ofReal_cos, ofReal_sin, hC12, hS12, hS13, h, exp_neg]
 
 lemma on_param_cos_θ₁₂_eq_zero {V : CKMMatrix} (δ₁₃ : ℝ) (h : Real.cos (θ₁₂ ⟦V⟧) = 0) :
     standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) δ₁₃ ≈ standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) 0 := by
   use 0, δ₁₃, δ₁₃, -δ₁₃, 0, - δ₁₃
   have hb := exp_ne_zero (I * δ₁₃)
-  simp only [standParam, standParamAsMatrix, h, ofReal_zero, ofReal_cos, zero_mul, ofReal_sin,
-    neg_mul, exp_neg, sub_zero, zero_sub, neg_zero, phaseShift, phaseShiftMatrix, mul_zero,
-    exp_zero, mul_one, Submonoid.mk_mul_mk, ofReal_neg, mul_neg, Subtype.mk.injEq]
+  apply CKMMatrix_ext
   funext i j
   fin_cases i <;> fin_cases j <;>
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, cons_val',
-      cons_val_zero, empty_val', cons_val_fin_one, mul_apply, Fin.sum_univ_three, one_mul,
-      cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, head_fin_const,
-      vecCons_const, mul_zero, tail_val', head_val', zero_add, zero_eq_mul, mul_neg, neg_mul,
-      mul_one, neg_inj, Fin.mk_one, Fin.reduceFinMk]
-  · exact Or.inr rfl
-  · change _ = _ + _ * 0
-    simp only [mul_zero, add_zero, neg_inj]
+    simp [standParam, standParamAsMatrix, phaseShift, phaseShiftMatrix, mul_apply,
+      Fin.sum_univ_three, h, exp_neg] <;>
     field_simp
-  · ring
-  · field_simp
-  · ring_nf
-    change _ = _ + _ * 0
-    simp
-  · ring
-  · field_simp
 
 lemma on_param_cos_θ₂₃_eq_zero {V : CKMMatrix} (δ₁₃ : ℝ) (h : Real.cos (θ₂₃ ⟦V⟧) = 0) :
     standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) δ₁₃ ≈ standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) 0 := by
   use 0, δ₁₃, 0, 0, 0, - δ₁₃
   have hb := exp_ne_zero (I * δ₁₃)
-  simp only [standParam, standParamAsMatrix, ofReal_cos, ofReal_sin, neg_mul, exp_neg, h,
-    ofReal_zero, mul_zero, zero_sub, zero_mul, sub_zero, phaseShift, phaseShiftMatrix, exp_zero,
-    mul_one, Submonoid.mk_mul_mk, ofReal_neg, mul_neg, Subtype.mk.injEq]
+  apply CKMMatrix_ext
   funext i j
   fin_cases i <;> fin_cases j <;>
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, cons_val',
-      cons_val_zero, empty_val', cons_val_fin_one, mul_apply, Fin.sum_univ_three, one_mul,
-      cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, head_fin_const,
-      vecCons_const, mul_one, mul_zero, tail_val', head_val', left_eq_add, mul_eq_zero,
-      zero_add, mul_neg, neg_inj, Fin.mk_one, Fin.reduceFinMk]
-  · exact Or.inr rfl
-  · ring_nf
-    change _ = _ + _ * 0
-    simp only [mul_zero, add_zero]
-  · ring
-  · field_simp
+    simp [standParam, standParamAsMatrix, phaseShift, phaseShiftMatrix, mul_apply,
+      Fin.sum_univ_three, h, exp_neg] <;>
+    field_simp
 
 lemma on_param_sin_θ₁₃_eq_zero {V : CKMMatrix} (δ₁₃ : ℝ) (h : Real.sin (θ₁₃ ⟦V⟧) = 0) :
     standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) δ₁₃ ≈ standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) 0 := by
   use 0, 0, 0, 0, 0, 0
-  simp only [standParam, standParamAsMatrix, ofReal_cos, ofReal_sin, h, ofReal_zero, neg_mul,
-    exp_neg, zero_mul, mul_zero, sub_zero, phaseShift, phaseShiftMatrix, exp_zero, mul_one,
-    Submonoid.mk_mul_mk, Subtype.mk.injEq]
+  apply CKMMatrix_ext
   funext i j
   fin_cases i <;> fin_cases j <;>
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, cons_val',
-      cons_val_zero, empty_val', cons_val_fin_one, mul_apply, Fin.sum_univ_three, one_mul,
-      cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, head_fin_const,
-      vecCons_const, mul_one, mul_zero, tail_val', head_val', zero_add, left_eq_add,
-      mul_eq_zero, Fin.mk_one, Fin.reduceFinMk]
-  · exact Or.inr rfl
-  · exact Or.inr rfl
+    simp [standParam, standParamAsMatrix, phaseShift, phaseShiftMatrix, mul_apply,
+      Fin.sum_univ_three, h, exp_neg]
 
 lemma on_param_sin_θ₁₂_eq_zero {V : CKMMatrix} (δ₁₃ : ℝ) (h : Real.sin (θ₁₂ ⟦V⟧) = 0) :
     standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) δ₁₃ ≈ standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) 0 := by
   use 0, δ₁₃, δ₁₃, 0, -δ₁₃, - δ₁₃
   have hb := exp_ne_zero (I * δ₁₃)
-  simp only [standParam, standParamAsMatrix, ofReal_cos, h, ofReal_zero, zero_mul, ofReal_sin,
-    neg_mul, exp_neg, neg_zero, zero_sub, sub_zero, phaseShift, phaseShiftMatrix, mul_zero,
-    exp_zero, mul_one, Submonoid.mk_mul_mk, ofReal_neg, mul_neg, Subtype.mk.injEq]
+  apply CKMMatrix_ext
   funext i j
   fin_cases i <;> fin_cases j <;>
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, cons_val',
-      cons_val_zero, empty_val', cons_val_fin_one, mul_apply, Fin.sum_univ_three, one_mul,
-      cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, head_fin_const,
-      vecCons_const, mul_one, mul_zero, tail_val', head_val', left_eq_add, mul_eq_zero,
-      Fin.mk_one, zero_add, Fin.reduceFinMk, mul_neg, neg_mul, neg_inj]
-  · apply Or.inr rfl
-  · change _ = _ + _ * 0
-    simp only [mul_zero, add_zero, neg_inj]
-    ring
-  · field_simp
-  · ring_nf
-    field_simp
-  · ring_nf
-    change _ = _ + _ * 0
-    simp only [mul_zero, add_zero]
-  · ring_nf
-    field_simp
-  · ring_nf
+    simp [standParam, standParamAsMatrix, phaseShift, phaseShiftMatrix, mul_apply,
+      Fin.sum_univ_three, h, exp_neg] <;>
     field_simp
 
 lemma on_param_sin_θ₂₃_eq_zero {V : CKMMatrix} (δ₁₃ : ℝ) (h : Real.sin (θ₂₃ ⟦V⟧) = 0) :
     standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) δ₁₃ ≈ standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) 0 := by
   use 0, 0, δ₁₃, 0, 0, - δ₁₃
   have hb := exp_ne_zero (I * δ₁₃)
-  simp only [standParam, standParamAsMatrix, ofReal_cos, ofReal_sin, neg_mul, exp_neg, h,
-    ofReal_zero, mul_zero, zero_mul, sub_zero, zero_sub, phaseShift, phaseShiftMatrix, exp_zero,
-    mul_one, Submonoid.mk_mul_mk, ofReal_neg, mul_neg, Subtype.mk.injEq]
+  apply CKMMatrix_ext
   funext i j
   fin_cases i <;> fin_cases j <;>
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, cons_val',
-      cons_val_zero, empty_val', cons_val_fin_one, mul_apply, Fin.sum_univ_three, one_mul,
-      cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, head_fin_const,
-      vecCons_const, mul_one, mul_zero, tail_val', head_val', left_eq_add, mul_eq_zero,
-      Fin.mk_one, zero_add, Fin.reduceFinMk, mul_neg, neg_inj]
-  · exact Or.inr rfl
-  · change _ = _ + _ * 0
-    simp only [mul_zero, add_zero, neg_inj]
-    ring
-  · ring
-  · field_simp
+    simp [standParam, standParamAsMatrix, phaseShift, phaseShiftMatrix, mul_apply,
+      Fin.sum_univ_three, h, exp_neg] <;>
+    field_simp
 
 lemma eq_standParam_of_fstRowThdColRealCond {V : CKMMatrix} (hb : [V]ud ≠ 0 ∨ [V]us ≠ 0)
     (hV : FstRowThdColRealCond V) : V = standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) (- arg [V]ub) := by
-  have hb' : VubAbs ⟦V⟧ ≠ 1 := by
-    rw [ud_us_ne_zero_iff_ub_ne_one] at hb
-    exact hb
+  have hb' : VubAbs ⟦V⟧ ≠ 1 := (ud_us_ne_zero_iff_ub_ne_one V).mp hb
   have h1 : ofRealHom (√(VAbs 0 0 ⟦V⟧ ^ 2 + VAbs 0 1 ⟦V⟧ ^ 2) *
     ↑√(VAbs 0 0 ⟦V⟧ ^ 2 + VAbs 0 1 ⟦V⟧ ^ 2)) = ofRealHom (VAbs 0 0 ⟦V⟧ ^ 2 + VAbs 0 1 ⟦V⟧ ^ 2) := by
     rw [Real.mul_self_sqrt]
@@ -549,17 +449,9 @@ lemma eq_standParam_of_fstRowThdColRealCond {V : CKMMatrix} (hb : [V]ud ≠ 0 �
   refine eq_rows V ?_ ?_ hV.2.2.2.2
   · funext i
     fin_cases i
-    · simp only [uRow, Fin.isValue, Fin.zero_eta, cons_val_zero, standParam, standParamAsMatrix,
-        ofReal_cos, ofReal_sin, ofReal_neg, mul_neg, neg_mul, neg_neg, cons_val', empty_val',
-        cons_val_fin_one, cons_val_one, head_cons, cons_val_two, tail_cons]
-      rw [hV.1, VudAbs_eq_C₁₂_mul_C₁₃ ⟦V⟧]
-      simp [C₁₂, C₁₃]
-    · simp only [uRow, Fin.isValue, Fin.mk_one, cons_val_one, head_cons, standParam,
-      standParamAsMatrix, ofReal_cos, ofReal_sin, ofReal_neg, mul_neg, neg_mul, neg_neg, cons_val',
-      cons_val_zero, empty_val', cons_val_fin_one, cons_val_two, Nat.succ_eq_add_one, Nat.reduceAdd,
-      tail_cons]
-      rw [hV.2.1, VusAbs_eq_S₁₂_mul_C₁₃ ⟦V⟧, ← S₁₂_eq_sin_θ₁₂ ⟦V⟧, C₁₃]
-      simp only [ofReal_mul, ofReal_sin, ofReal_cos]
+    · simp [uRow, standParam, standParamAsMatrix, hV.1, VudAbs_eq_C₁₂_mul_C₁₃ ⟦V⟧, C₁₂, C₁₃]
+    · simp [uRow, standParam, standParamAsMatrix, hV.2.1, VusAbs_eq_S₁₂_mul_C₁₃ ⟦V⟧,
+        ← S₁₂_eq_sin_θ₁₂ ⟦V⟧, C₁₃]
     · simp only [uRow, Fin.isValue, Fin.reduceFinMk, cons_val_two, Nat.succ_eq_add_one,
       Nat.reduceAdd, tail_cons, head_cons, standParam, standParamAsMatrix, ofReal_cos, ofReal_sin,
       ofReal_neg, mul_neg, neg_mul, neg_neg, cons_val', cons_val_zero, empty_val', cons_val_fin_one,
@@ -600,13 +492,8 @@ lemma eq_standParam_of_fstRowThdColRealCond {V : CKMMatrix} (hb : [V]ud ≠ 0 �
       simp only [Fin.isValue, sq]
       field_simp
       ring_nf
-    · simp only [cRow, Fin.isValue, Fin.reduceFinMk, cons_val_two, Nat.succ_eq_add_one,
-      Nat.reduceAdd, tail_cons, head_cons, standParam, standParamAsMatrix, ofReal_cos, ofReal_sin,
-      ofReal_neg, mul_neg, neg_mul, neg_neg, cons_val', cons_val_zero, empty_val', cons_val_fin_one,
-      cons_val_one]
-      rw [hV.2.2.1]
-      rw [VcbAbs_eq_S₂₃_mul_C₁₃ ⟦V⟧, S₂₃_eq_ℂsin_θ₂₃ ⟦V⟧, C₁₃]
-      simp
+    · simp [cRow, standParam, standParamAsMatrix, hV.2.2.1, VcbAbs_eq_S₂₃_mul_C₁₃ ⟦V⟧,
+        S₂₃_eq_ℂsin_θ₂₃ ⟦V⟧, C₁₃]
 
 lemma eq_standParam_of_ubOnePhaseCond {V : CKMMatrix} (hV : ubOnePhaseCond V) :
     V = standParam (θ₁₂ ⟦V⟧) (θ₁₃ ⟦V⟧) (θ₂₃ ⟦V⟧) 0 := by
@@ -675,27 +562,17 @@ theorem exists_δ₁₃ (V : CKMMatrix) :
   obtain ⟨U, hU⟩ := fstRowThdColRealCond_holds_up_to_equiv V
   have hUV : ⟦U⟧ = ⟦V⟧ := (Quotient.eq.mpr (phaseShiftRelation_equiv.symm hU.1))
   by_cases ha : [V]ud ≠ 0 ∨ [V]us ≠ 0
-  · have haU : [U]ud ≠ 0 ∨ [U]us ≠ 0 := by -- should be much simpler
-      by_contra hn
-      simp only [Fin.isValue, ne_eq, not_or, Decidable.not_not] at hn
-      have hna : VudAbs ⟦U⟧ = 0 ∧ VusAbs ⟦U⟧ =0 := by
-        simp only [VudAbs, VAbs, VAbs', Fin.isValue, Quotient.lift_mk, norm_eq_zero, VusAbs]
-        exact hn
-      rw [hUV] at hna
-      simp only [VudAbs, VAbs, VAbs', Fin.isValue, Quotient.lift_mk, VusAbs] at hna
-      simp_all
+  · have haU : [U]ud ≠ 0 ∨ [U]us ≠ 0 := by
+      rw [ud_us_ne_zero_iff_ub_ne_one] at ha ⊢
+      rwa [show norm [U]ub = VubAbs ⟦U⟧ from rfl, hUV]
     have hU' := eq_standParam_of_fstRowThdColRealCond haU hU.2
     rw [hU'] at hU
     use (- arg ([U]ub))
     rw [← hUV]
     exact hU.1
-  · have haU : ¬ ([U]ud ≠ 0 ∨ [U]us ≠ 0) := by -- should be much simpler
-      simp only [Fin.isValue, ne_eq, not_or, Decidable.not_not] at ha
-      have h1 : VudAbs ⟦U⟧ = 0 ∧ VusAbs ⟦U⟧ = 0 := by
-        rw [hUV]
-        simp only [VudAbs, VAbs, VAbs', Fin.isValue, Quotient.lift_mk, norm_eq_zero, VusAbs]
-        exact ha
-      simpa [not_or, VAbs] using h1
+  · have haU : ¬ ([U]ud ≠ 0 ∨ [U]us ≠ 0) := by
+      rw [ud_us_ne_zero_iff_ub_ne_one] at ha ⊢
+      rwa [show norm [U]ub = VubAbs ⟦U⟧ from rfl, hUV]
     have ⟨U2, hU2⟩ := ubOnePhaseCond_hold_up_to_equiv_of_ub_one haU hU.2
     have hUVa2 : V ≈ U2 := phaseShiftRelation_equiv.trans hU.1 hU2.1
     have hUV2 : ⟦U2⟧ = ⟦V⟧ := (Quotient.eq.mpr (phaseShiftRelation_equiv.symm hUVa2))
