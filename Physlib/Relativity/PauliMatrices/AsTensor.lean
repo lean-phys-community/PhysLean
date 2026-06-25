@@ -60,16 +60,14 @@ lemma leftRightToMatrix_σSA_inr_0_expand : leftRightToMatrix.symm (pauliBasis (
 /-- The expansion of the pauli matrix `σ₂` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inr_1_expand : leftRightToMatrix.symm (pauliBasis (Sum.inr 1)) =
     -(I • leftBasis 0 ⊗ₜ[ℂ] rightBasis 1) + I • leftBasis 1 ⊗ₜ[ℂ] rightBasis 0 := by
-  rw [leftRightToMatrix_symm_expand_tmul]
-  simp [pauliBasis, pauliSelfAdjoint, pauliMatrix]
+  simp [leftRightToMatrix_symm_expand_tmul, pauliBasis, pauliSelfAdjoint, pauliMatrix]
   module
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of the pauli matrix `σ₃` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inr_2_expand : leftRightToMatrix.symm (pauliBasis (Sum.inr 2)) =
     leftBasis 0 ⊗ₜ rightBasis 0 - leftBasis 1 ⊗ₜ rightBasis 1 := by
-  rw [leftRightToMatrix_symm_expand_tmul]
-  simp [pauliBasis, pauliSelfAdjoint, pauliMatrix]
+  simp [leftRightToMatrix_symm_expand_tmul, pauliBasis, pauliSelfAdjoint, pauliMatrix]
   module
 
 /-- The expansion of `asTensor` into complexContrBasis basis of tensor product vectors. -/
@@ -134,29 +132,20 @@ def asConsTensor :
             refine Finset.sum_congr rfl (fun i _ => ?_)
             rw [tmul_sum]
             rfl
-        _ = ∑ x, ∑ i, ∑ j, ((SL2C.toLorentzGroup M).1 i x • (complexContrBasis i)) ⊗ₜ[ℂ]
-              ((SL2C.toLorentzGroup M⁻¹).1 x j • leftRightToMatrix.symm ((pauliBasis j))) := by
-            refine Finset.sum_congr rfl (fun x _ => (Finset.sum_congr rfl (fun i _ =>
-              (Finset.sum_congr rfl (fun j _ => ?_)))))
-            simp only [SL2C.toLorentzGroup_apply_coe, map_inv, LorentzGroup.inv_eq_dual,
-              LinearMap.map_smul_of_tower, LinearEquiv.coe_coe]
         _ = ∑ x, ∑ i, ∑ j, ((SL2C.toLorentzGroup M).1 i x * (SL2C.toLorentzGroup M⁻¹).1 x j)
             • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) := by
             refine Finset.sum_congr rfl (fun x _ => (Finset.sum_congr rfl (fun i _ =>
               (Finset.sum_congr rfl (fun j _ => ?_)))))
+            simp only [SL2C.toLorentzGroup_apply_coe, map_inv, LorentzGroup.inv_eq_dual,
+              LinearMap.map_smul_of_tower, LinearEquiv.coe_coe]
             rw [smul_tmul, smul_smul, ← tmul_smul]
-        _ = ∑ i, ∑ x, ∑ j, ((SL2C.toLorentzGroup M).1 i x * (SL2C.toLorentzGroup M⁻¹).1 x j)
-            • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) :=
-              Finset.sum_comm
         _ = ∑ i, ∑ j, ∑ x, ((SL2C.toLorentzGroup M).1 i x * (SL2C.toLorentzGroup M⁻¹).1 x j)
-            • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) :=
-              Finset.sum_congr rfl (fun x _ => Finset.sum_comm)
+            • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) := by
+            rw [Finset.sum_comm]
+            exact Finset.sum_congr rfl (fun x _ => Finset.sum_comm)
         _ = ∑ i, ∑ j, ∑ x, (((SL2C.toLorentzGroup M).1 i x *
             (SL2C.toLorentzGroup M⁻¹).1 x j : ℝ) : ℂ)
-            • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) := by
-            refine Finset.sum_congr rfl (fun i _ => (Finset.sum_congr rfl (fun j _ => ?_)))
-            rfl
-
+            • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) := rfl
         _ = ∑ i, ∑ j, (∑ x, (SL2C.toLorentzGroup M).1 i x * (SL2C.toLorentzGroup M⁻¹).1 x j : ℂ)
             • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis j)) := by
             refine Finset.sum_congr rfl (fun i _ => (Finset.sum_congr rfl (fun j _ => ?_)))
@@ -174,16 +163,13 @@ def asConsTensor :
             change ((SL2C.toLorentzGroup M) * (SL2C.toLorentzGroup M⁻¹)).1 i j = _
             rw [← SL2C.toLorentzGroup.map_mul]
             simp only [mul_inv_cancel, _root_.map_one, lorentzGroupIsGroup_one_coe]
-        _ = ∑ i, ((1 : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ) i i)
-          • ((complexContrBasis i)) ⊗ₜ[ℂ] leftRightToMatrix.symm ((pauliBasis i)) := by
-            refine Finset.sum_congr rfl (fun i _ => ?_)
-            refine Finset.sum_eq_single i (fun b _ hb => ?_) (fun hb => ?_)
-            · simp [one_apply_ne' hb]
-              module
-            · simp only [Finset.mem_univ, not_true_eq_false] at hb
         _ = asTensor := by
           refine Finset.sum_congr rfl (fun i _ => ?_)
-          simp only [one_apply_eq, one_smul]
+          rw [Finset.sum_eq_single i (fun b _ hb => ?_) (fun hb => ?_)]
+          · simp only [one_apply_eq, one_smul]
+          · simp [one_apply_ne' hb]
+            module
+          · simp only [Finset.mem_univ, not_true_eq_false] at hb
 
 /-- The map `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ leftHanded ⊗ rightHanded` corresponding
   to Pauli matrices, when evaluated on `1` corresponds to the tensor `PauliMatrix.asTensor`. -/
