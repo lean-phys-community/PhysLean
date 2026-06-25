@@ -29,80 +29,44 @@ open ComplexConjugate
 section phaseShiftApply
 variable (u c t d s b : ℝ)
 
+/-- Multiplying a complex number `z` by the phase `cexp ((p + q) I)` with `p + q = - arg z`
+yields its modulus `‖z‖`. -/
+lemma cexp_phase_mul_eq_norm {z : ℂ} {p q : ℝ} (h : p + q = - arg z) :
+    cexp ((p : ℂ) * I + q * I) * z = ‖z‖ := by
+  conv_lhs => rw [← norm_mul_exp_arg_mul_I z]
+  rw [mul_left_comm, ← exp_add]
+  rw [show (p : ℂ) * I + q * I + arg z * I = 0 from by
+    have hc : (p : ℂ) + q + arg z = 0 := by exact_mod_cast (show p + q + arg z = (0 : ℝ) by linarith)
+    linear_combination hc * I, exp_zero, mul_one]
+
 lemma shift_ud_phase_zero (V : CKMMatrix) (h1 : u + d = - arg [V]ud) :
     [phaseShiftApply V u c t d s b]ud = VudAbs ⟦V⟧ := by
-  rw [phaseShiftApply.ud]
-  rw [← norm_mul_exp_arg_mul_I [V]ud]
-  rw [mul_comm, mul_assoc, ← exp_add]
-  have h2 : ↑(arg (V.1 0 0)) * I + (↑u * I + ↑d * I) = ↑(arg (V.1 0 0) + (u + d)) * I := by
-    simp only [Fin.isValue, ofReal_add]
-    ring
-  rw [h2, h1]
-  simp only [Fin.isValue, add_neg_cancel, ofReal_zero, zero_mul, exp_zero, mul_one, VudAbs,
-    ofReal_inj]
+  rw [phaseShiftApply.ud, cexp_phase_mul_eq_norm h1]
   rfl
 
 lemma shift_us_phase_zero {V : CKMMatrix} (h1 : u + s = - arg [V]us) :
     [phaseShiftApply V u c t d s b]us = VusAbs ⟦V⟧ := by
-  rw [phaseShiftApply.us, ← norm_mul_exp_arg_mul_I [V]us, mul_comm, mul_assoc, ← exp_add]
-  have h2 : ↑(arg [V]us) * I + (↑u * I + ↑s * I) = ↑(arg [V]us + (u + s)) * I := by
-    simp only [Fin.isValue, ofReal_add]
-    ring
-  rw [h2, h1]
-  simp only [Fin.isValue, add_neg_cancel, ofReal_zero, zero_mul, exp_zero, mul_one, VusAbs,
-    ofReal_inj]
+  rw [phaseShiftApply.us, cexp_phase_mul_eq_norm h1]
   rfl
 
 lemma shift_ub_phase_zero {V : CKMMatrix} (h1 : u + b = - arg [V]ub) :
     [phaseShiftApply V u c t d s b]ub = VubAbs ⟦V⟧ := by
-  rw [phaseShiftApply.ub]
-  rw [← norm_mul_exp_arg_mul_I [V]ub]
-  rw [mul_comm, mul_assoc, ← exp_add]
-  have h2 : ↑(arg [V]ub) * I + (↑u * I + ↑b * I) = ↑(arg [V]ub + (u + b)) * I := by
-    simp only [Fin.isValue, ofReal_add]
-    ring
-  rw [h2, h1]
-  simp only [Fin.isValue, add_neg_cancel, ofReal_zero, zero_mul, exp_zero, mul_one, VubAbs,
-    ofReal_inj]
+  rw [phaseShiftApply.ub, cexp_phase_mul_eq_norm h1]
   rfl
 
 lemma shift_cs_phase_zero {V : CKMMatrix} (h1 : c + s = - arg [V]cs) :
     [phaseShiftApply V u c t d s b]cs = VcsAbs ⟦V⟧ := by
-  rw [phaseShiftApply.cs]
-  rw [← norm_mul_exp_arg_mul_I [V]cs]
-  rw [mul_comm, mul_assoc, ← exp_add]
-  have h2 : ↑(arg [V]cs) * I + (↑c * I + ↑s * I) = ↑(arg [V]cs + (c + s)) * I := by
-    simp only [Fin.isValue, ofReal_add]
-    ring
-  rw [h2, h1]
-  simp only [Fin.isValue, add_neg_cancel, ofReal_zero, zero_mul, exp_zero, mul_one, VcsAbs,
-    ofReal_inj]
+  rw [phaseShiftApply.cs, cexp_phase_mul_eq_norm h1]
   rfl
 
 lemma shift_cb_phase_zero {V : CKMMatrix} (h1 : c + b = - arg [V]cb) :
     [phaseShiftApply V u c t d s b]cb = VcbAbs ⟦V⟧ := by
-  rw [phaseShiftApply.cb]
-  rw [← norm_mul_exp_arg_mul_I [V]cb]
-  rw [mul_comm, mul_assoc, ← exp_add]
-  have h2 : ↑(arg [V]cb) * I + (↑c * I + ↑b * I) = ↑(arg [V]cb + (c + b)) * I := by
-    simp only [Fin.isValue, ofReal_add]
-    ring
-  rw [h2, h1]
-  simp only [Fin.isValue, add_neg_cancel, ofReal_zero, zero_mul, exp_zero, mul_one, VcbAbs,
-    ofReal_inj]
+  rw [phaseShiftApply.cb, cexp_phase_mul_eq_norm h1]
   rfl
 
 lemma shift_tb_phase_zero {V : CKMMatrix} (h1 : t + b = - arg [V]tb) :
     [phaseShiftApply V u c t d s b]tb = VtbAbs ⟦V⟧ := by
-  rw [phaseShiftApply.tb]
-  rw [← norm_mul_exp_arg_mul_I [V]tb]
-  rw [mul_comm, mul_assoc, ← exp_add]
-  have h2 : ↑(arg [V]tb) * I + (↑t * I + ↑b * I) = ↑(arg [V]tb + (t + b)) * I := by
-    simp only [Fin.isValue, ofReal_add]
-    ring
-  rw [h2, h1]
-  simp only [Fin.isValue, add_neg_cancel, ofReal_zero, zero_mul, exp_zero, mul_one, VtbAbs,
-    ofReal_inj]
+  rw [phaseShiftApply.tb, cexp_phase_mul_eq_norm h1]
   rfl
 
 lemma shift_cd_phase_pi {V : CKMMatrix} (h1 : c + d = Real.pi - arg [V]cd) :
