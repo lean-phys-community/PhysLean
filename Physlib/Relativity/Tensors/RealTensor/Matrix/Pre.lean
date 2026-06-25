@@ -20,6 +20,25 @@ open Matrix Module MatrixGroups Complex TensorProduct CategoryTheory.MonoidalCat
 
 namespace Lorentz
 
+/-- Expanding the inverse of the canonical equivalence from a tensor product of two
+based real modules to matrices, in terms of the standard basis tensors. Every
+`*ToMatrixRe` below is definitionally this composition, so each
+`*ToMatrixRe_symm_expand_tmul` lemma is a direct specialization. -/
+lemma tensorBasis_toMatrixRe_symm_expand
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℝ V₁] [AddCommGroup V₂] [Module ℝ V₂]
+    (b₁ : Basis ι₁ ℝ V₁) (b₂ : Basis ι₂ ℝ V₂) (M : Matrix ι₁ ι₂ ℝ) :
+    ((Basis.tensorProduct b₁ b₂).repr ≪≫ₗ
+      Finsupp.linearEquivFunOnFinite ℝ ℝ (ι₁ × ι₂) ≪≫ₗ
+      LinearEquiv.curry ℝ ℝ ι₁ ι₂).symm M =
+    ∑ i, ∑ j, M i j • (b₁ i ⊗ₜ[ℝ] b₂ j) := by
+  simp only [LinearEquiv.trans_symm, LinearEquiv.trans_apply, Basis.repr_symm_apply]
+  rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
+  · rw [Fintype.sum_prod_type]
+    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+    exact congrArg _ (Basis.tensorProduct_apply b₁ b₂ i j)
+  · simp
+
 /-- Equivalence of `Contr ⊗ Contr` to `(1 + d) x (1 + d)` real matrices. -/
 def contrContrToMatrixRe {d : ℕ} : (ContrMod d ⊗[ℝ] ContrMod d) ≃ₗ[ℝ]
     Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
@@ -30,14 +49,7 @@ def contrContrToMatrixRe {d : ℕ} : (ContrMod d ⊗[ℝ] ContrMod d) ≃ₗ[ℝ
 /-- Expanding `contrContrToMatrixRe` in terms of the standard basis. -/
 lemma contrContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     contrContrToMatrixRe.symm M = ∑ i, ∑ j, M i j • (contrBasis d i ⊗ₜ[ℝ] contrBasis d j) := by
-  simp only [contrContrToMatrixRe, LinearEquiv.trans_symm,
-    LinearEquiv.trans_apply, Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply (contrBasis d) (contrBasis d) i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrixRe_symm_expand (contrBasis d) (contrBasis d) M
 
 /-- Equivalence of `Co ⊗ Co` to `(1 + d) x (1 + d)` real matrices. -/
 def coCoToMatrixRe {d : ℕ} : (Co d ⊗ Co d).V ≃ₗ[ℝ]
@@ -49,13 +61,7 @@ def coCoToMatrixRe {d : ℕ} : (Co d ⊗ Co d).V ≃ₗ[ℝ]
 /-- Expanding `coCoToMatrixRe` in terms of the standard basis. -/
 lemma coCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     coCoToMatrixRe.symm M = ∑ i, ∑ j, M i j • (coBasis d i ⊗ₜ[ℝ] coBasis d j) := by
-  simp only [coCoToMatrixRe, LinearEquiv.trans_symm, LinearEquiv.trans_apply, Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply (coBasis d) (coBasis d) i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrixRe_symm_expand (coBasis d) (coBasis d) M
 
 /-- Equivalence of `Contr d ⊗ Co d` to `(1 + d) x (1 + d)` real matrices. -/
 def contrCoToMatrixRe {d : ℕ} : (Contr d ⊗ Co d).V ≃ₗ[ℝ]
@@ -67,14 +73,7 @@ def contrCoToMatrixRe {d : ℕ} : (Contr d ⊗ Co d).V ≃ₗ[ℝ]
 /-- Expansion of ` (coBasis d) (coBasis d)` in terms of the standard basis. -/
 lemma contrCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     contrCoToMatrixRe.symm M = ∑ i, ∑ j, M i j • (contrBasis d i ⊗ₜ[ℝ] coBasis d j) := by
-  simp only [contrCoToMatrixRe, LinearEquiv.trans_symm,
-    LinearEquiv.trans_apply, Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply _ _ i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrixRe_symm_expand (contrBasis d) (coBasis d) M
 
 /-- Equivalence of `Co d ⊗ Contr d` to `(1 + d) x (1 + d)` real matrices. -/
 def coContrToMatrixRe : (Co d ⊗ Contr d).V ≃ₗ[ℝ]
@@ -86,14 +85,7 @@ def coContrToMatrixRe : (Co d ⊗ Contr d).V ≃ₗ[ℝ]
 /-- Expansion of `coContrToMatrixRe` in terms of the standard basis. -/
 lemma coContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     coContrToMatrixRe.symm M = ∑ i, ∑ j, M i j • (coBasis d i ⊗ₜ[ℝ] contrBasis d j) := by
-  simp only [coContrToMatrixRe, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply _ _ i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrixRe_symm_expand (coBasis d) (contrBasis d) M
 
 /-!
 

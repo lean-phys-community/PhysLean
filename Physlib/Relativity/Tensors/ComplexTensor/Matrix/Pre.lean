@@ -23,6 +23,25 @@ open CategoryTheory.MonoidalCategory
 
 namespace Lorentz
 
+/-- Expanding the inverse of the canonical equivalence from a tensor product of two
+based modules to matrices, in terms of the standard basis tensors. Every `*ToMatrix`
+below is definitionally this composition, so each `*ToMatrix_symm_expand_tmul` lemma
+is a direct specialization. -/
+lemma tensorBasis_toMatrix_symm_expand
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
+    (b₁ : Basis ι₁ ℂ V₁) (b₂ : Basis ι₂ ℂ V₂) (M : Matrix ι₁ ι₂ ℂ) :
+    ((Basis.tensorProduct b₁ b₂).repr ≪≫ₗ
+      Finsupp.linearEquivFunOnFinite ℂ ℂ (ι₁ × ι₂) ≪≫ₗ
+      LinearEquiv.curry ℂ ℂ ι₁ ι₂).symm M =
+    ∑ i, ∑ j, M i j • (b₁ i ⊗ₜ[ℂ] b₂ j) := by
+  simp only [LinearEquiv.trans_symm, LinearEquiv.trans_apply, Basis.repr_symm_apply]
+  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
+  · rw [Fintype.sum_prod_type]
+    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+    exact congrArg _ (Basis.tensorProduct_apply b₁ b₂ i j)
+  · simp
+
 /-- Equivalence of `complexContr ⊗ complexContr` to `4 x 4` complex matrices. -/
 def contrContrToMatrix : (ContrℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
     Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ :=
@@ -34,14 +53,7 @@ def contrContrToMatrix : (ContrℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
 lemma contrContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     contrContrToMatrix.symm M =
     ∑ i, ∑ j, M i j • (complexContrBasis i ⊗ₜ[ℂ] complexContrBasis j) := by
-  simp only [contrContrToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexContrBasis complexContrBasis i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrix_symm_expand complexContrBasis complexContrBasis M
 
 /-- Equivalence of `complexCo ⊗ complexCo` to `4 x 4` complex matrices. -/
 def coCoToMatrix : (CoℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
@@ -53,13 +65,7 @@ def coCoToMatrix : (CoℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
 /-- Expanding `coCoToMatrix` in terms of the standard basis. -/
 lemma coCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     coCoToMatrix.symm M = ∑ i, ∑ j, M i j • (complexCoBasis i ⊗ₜ[ℂ] complexCoBasis j) := by
-  simp only [coCoToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply, Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexCoBasis complexCoBasis i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrix_symm_expand complexCoBasis complexCoBasis M
 
 /-- Equivalence of `complexContr ⊗ complexCo` to `4 x 4` complex matrices. -/
 def contrCoToMatrix : (ContrℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
@@ -71,14 +77,7 @@ def contrCoToMatrix : (ContrℂModule ⊗[ℂ] CoℂModule) ≃ₗ[ℂ]
 /-- Expansion of `contrCoToMatrix` in terms of the standard basis. -/
 lemma contrCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     contrCoToMatrix.symm M = ∑ i, ∑ j, M i j • (complexContrBasis i ⊗ₜ[ℂ] complexCoBasis j) := by
-  simp only [contrCoToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexContrBasis complexCoBasis i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrix_symm_expand complexContrBasis complexCoBasis M
 
 /-- Equivalence of `complexCo ⊗ complexContr` to `4 x 4` complex matrices. -/
 def coContrToMatrix : (CoℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
@@ -90,14 +89,7 @@ def coContrToMatrix : (CoℂModule ⊗[ℂ] ContrℂModule) ≃ₗ[ℂ]
 /-- Expansion of `coContrToMatrix` in terms of the standard basis. -/
 lemma coContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) :
     coContrToMatrix.symm M = ∑ i, ∑ j, M i j • (complexCoBasis i ⊗ₜ[ℂ] complexContrBasis j) := by
-  simp only [coContrToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexCoBasis complexContrBasis i j]
-    rfl
-  · simp
+  exact tensorBasis_toMatrix_symm_expand complexCoBasis complexContrBasis M
 
 /-!
 
