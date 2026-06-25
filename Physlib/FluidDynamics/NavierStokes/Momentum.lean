@@ -244,7 +244,7 @@ theorem momentumEquation_iff_convectiveMomentumEquation
   · intro hConservative t x
     have hMassFluxSpace :
         DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
-      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
+      exact (hMomentumDensity t).differentiableAt
     have hResidual : continuityResidual d data.toFluidState t x = 0 := by
       simpa [continuityResidual] using
         hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace
@@ -262,7 +262,7 @@ theorem momentumEquation_iff_convectiveMomentumEquation
   · intro hConvective t x
     have hMassFluxSpace :
         DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
-      simpa [momentumDensity] using (hMomentumDensity t).differentiableAt
+      exact (hMomentumDensity t).differentiableAt
     have hResidual : continuityResidual d data.toFluidState t x = 0 := by
       simpa [continuityResidual] using
         hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace

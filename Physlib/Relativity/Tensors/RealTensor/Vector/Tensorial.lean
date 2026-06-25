@@ -214,7 +214,7 @@ lemma _root_.LorentzGroup.eq_of_action_vector_eq {d : ℕ}
     {Λ Λ' : LorentzGroup d} (h : ∀ p : Vector d, Λ • p = Λ' • p) :
     Λ = Λ' := by
   apply LorentzGroup.eq_of_mulVec_eq
-  simpa only [smul_eq_mulVec] using fun x => h x
+  simp_all [smul_eq_mulVec]
 
 /-!
 

@@ -33,7 +33,7 @@ open scoped InnerProductSpace RealInnerProductSpace Kronecker Matrix
 The operator norm of a matrix is the operator norm of the linear map it represents, with respect to the Euclidean norm.
 -/
 /-- The operator norm of a matrix, with respect to the Euclidean norm (l2 norm) on the domain and codomain. -/
-noncomputable def Matrix.opNorm [RCLike 𝕜] (A : Matrix m n 𝕜) : ℝ :=
+noncomputable def Matrix.opNorm (A : Matrix m n 𝕜) : ℝ :=
   ‖LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin A)‖
 
 /-
@@ -208,8 +208,10 @@ V_sigma is an isometry.
 -/
 theorem V_sigma_isometry [Nonempty dB] (σBC : HermitianMat (dB × dC) ℂ) (hσ : σBC.mat.PosDef) :
     (V_sigma σBC).conjTranspose * (V_sigma σBC) = 1 := by
-  simp [V_sigma]
-  exact V_rho_isometry _ (hσ.reindex _)
+  rw [V_sigma, Matrix.reindex_apply, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv,
+    V_rho_isometry (σBC.reindex (Equiv.prodComm dB dC))
+      (by rw [HermitianMat.mat_reindex]; exact hσ.reindex _)]
+  simp
 
 /-
 Definition of W_mat with correct reindexing.
@@ -242,14 +244,11 @@ theorem Matrix.opNorm_mul_le {l m n 𝕜 : Type*} [Fintype l] [Fintype m] [Finty
     [DecidableEq l] [DecidableEq m] [DecidableEq n] [RCLike 𝕜]
     (A : Matrix l m 𝕜) (B : Matrix m n 𝕜) :
     Matrix.opNorm (A * B) ≤ Matrix.opNorm A * Matrix.opNorm B := by
-  have h_opNorm_mul_le : ∀ (A : Matrix l m 𝕜) (B : Matrix m n 𝕜), Matrix.opNorm (A * B) ≤ Matrix.opNorm A * Matrix.opNorm B := by
-    intro A B
-    have h_comp : Matrix.toEuclideanLin (A * B) = Matrix.toEuclideanLin A ∘ₗ Matrix.toEuclideanLin B := by
-      ext; simp [toEuclideanLin]
-    convert ContinuousLinearMap.opNorm_comp_le ( Matrix.toEuclideanLin A |> LinearMap.toContinuousLinearMap ) ( Matrix.toEuclideanLin B |> LinearMap.toContinuousLinearMap ) using 1;
-    unfold Matrix.opNorm;
-    exact congr_arg _ ( by aesop );
-  exact h_opNorm_mul_le A B
+  have h_comp : Matrix.toEuclideanLin (A * B) = Matrix.toEuclideanLin A ∘ₗ Matrix.toEuclideanLin B := by
+    ext; simp [toEuclideanLin]
+  simp only [Matrix.opNorm, h_comp]
+  exact ContinuousLinearMap.opNorm_comp_le (LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin A))
+    (LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin B))
 
 theorem Matrix.opNorm_reindex_proven {l m n p : Type*} [Fintype l] [Fintype m] [Fintype n] [Fintype p]
     [DecidableEq l] [DecidableEq m] [DecidableEq n] [DecidableEq p]
@@ -373,7 +372,7 @@ theorem HermitianMat.PosDef_reindex {d d₂ : Type*} [Fintype d] [DecidableEq d]
     [Fintype d₂] [DecidableEq d₂] (A : HermitianMat d ℂ) (e : d ≃ d₂)
     (hA : A.mat.PosDef) :
     (A.reindex e).mat.PosDef := by
-  convert hA.reindex e
+  convert! hA.reindex e
 
 /-- The sandwich matrix S used in the proof of intermediate_ineq.
   This is derived from W_mat_sq_le_one by algebraic manipulation (conjugation and simplification). -/
@@ -400,8 +399,8 @@ private lemma W_mat_sq_eq_conj [Nonempty dA] [Nonempty dB] [Nonempty dC]
       have h_inv_pos : (σBC.traceLeft⁻¹ : HermitianMat dC ℂ).mat.PosDef := by
         have h_inv_pos : (σBC.traceLeft : Matrix dC dC ℂ).PosDef := by
           exact PosDef_traceLeft σBC hσ;
-        convert h_inv_pos.inv using 1;
-      convert h_inv_pos.posSemidef using 1;
+        convert! h_inv_pos.inv using 1;
+      convert! h_inv_pos.posSemidef using 1;
       exact zero_le_iff;
   have h_simp : (ρAB.sqrt : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹.sqrt : Matrix dC dC ℂ) * (ρAB.sqrt : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹.sqrt : Matrix dC dC ℂ) = (ρAB : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹ : Matrix dC dC ℂ) := by
     have h_simp : ∀ (A B C D : Matrix (dA × dB) (dA × dB) ℂ) (E F : Matrix dC dC ℂ), (A ⊗ₖ E) * (B ⊗ₖ F) = (A * B) ⊗ₖ (E * F) := by
@@ -434,7 +433,7 @@ private lemma S_mat_conj_rhs_eq_one [Nonempty dA] [Nonempty dB] [Nonempty dC]
             rw [h_inv];
           convert h_inv using 1 ; simp [ mul_assoc, hσ.det_pos.ne' ]
         exact h_inv.symm;
-      convert h_comm_inv h_comm using 1;
+      convert! h_comm_inv h_comm using 1;
     exact h_comm_inv h_comm;
   have h_comm : σBC.sqrt.mat * σBC⁻¹.mat * σBC.sqrt.mat = σBC.mat * σBC⁻¹.mat := by
     rw [ mul_assoc, ← h_comm.eq ];
@@ -540,10 +539,8 @@ private lemma T₁_isometry [Nonempty dB]
     · ext i j
       simp [Matrix.one_apply]
       aesop
-  convert congr_arg (Matrix.reindex (Equiv.prodAssoc dA dB dC).symm (Equiv.prodAssoc dA dB dC).symm) h_kron using 1
-  ext i j
-  simp [Matrix.one_apply]
-  aesop
+  rw [T₁_mat, Matrix.reindex_apply, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv,
+    h_kron, Matrix.submatrix_one_equiv]
 
 set_option maxHeartbeats 400000 in
 private lemma T₂_sq_le_one [Nonempty dB]
@@ -769,14 +766,14 @@ theorem intermediate_ineq [Nonempty dA] [Nonempty dB] [Nonempty dC]
       (ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm := by
   have h_sorted : (ρAB.traceRight⁻¹.sqrt.mat ⊗ₖ σBC.sqrt.mat).reindex (Equiv.prodAssoc dA dB dC).symm (Equiv.prodAssoc dA dB dC).symm * (ρAB ⊗ₖ (σBC.traceLeft)⁻¹).mat * (ρAB.traceRight⁻¹.sqrt.mat ⊗ₖ σBC.sqrt.mat).reindex (Equiv.prodAssoc dA dB dC).symm (Equiv.prodAssoc dA dB dC).symm ≤ (1 : Matrix ((dA × dB) × dC) ((dA × dB) × dC) ℂ) := by
     convert W_mat_sq_le_one ρAB σBC hρ hσ using 1;
-    convert W_mat_sq_eq_conj ρAB σBC hρ hσ |> Eq.symm using 1;
+    convert! W_mat_sq_eq_conj ρAB σBC hρ hσ |> Eq.symm using 1;
   convert h_sorted using 1;
   rw [HermitianMat.le_iff];
   rw [ ← S_mat_conj_rhs_eq_one ρAB σBC hρ hσ ];
   simp only [ Matrix.posSemidef_iff_dotProduct_mulVec ]
   constructor <;> intro h <;> simp_all
-  · convert h_sorted using 1;
-    convert S_mat_conj_rhs_eq_one ρAB σBC hρ hσ using 1;
+  · convert! h_sorted using 1;
+    convert! S_mat_conj_rhs_eq_one ρAB σBC hρ hσ using 1;
   · have := S_mat_isUnit ρAB σBC hρ hσ;
     cases' this.nonempty_invertible with u hu;
     have h_pos_semidef : Matrix.PosSemidef ((S_mat ρAB σBC)⁻¹ * (S_mat ρAB σBC * ((ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm).mat * S_mat ρAB σBC - S_mat ρAB σBC * (ρAB ⊗ₖ (σBC.traceLeft)⁻¹).mat * S_mat ρAB σBC) * (S_mat ρAB σBC)⁻¹ᴴ) := by
@@ -819,7 +816,7 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
     · apply HermitianMat.inv_reindex
     · convert rfl;
       apply HermitianMat.ext;
-      convert Matrix.nonsing_inv_nonsing_inv _ _;
+      convert! Matrix.nonsing_inv_nonsing_inv _ _;
       exact isUnit_iff_ne_zero.mpr ( hσ.det_pos.ne' );
   have h_inv_symm : (ρAB ⊗ₖ σBC.traceLeft⁻¹)⁻¹ = ρAB⁻¹ ⊗ₖ σBC.traceLeft := by
     have h_inv_symm : (ρAB ⊗ₖ σBC.traceLeft⁻¹)⁻¹ = ρAB⁻¹ ⊗ₖ (σBC.traceLeft⁻¹)⁻¹ := by
@@ -829,7 +826,7 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
           exact PosDef_traceLeft σBC hσ;
         -- Since σBC.traceLeft is positive definite, its inverse is also positive definite, and hence non-singular.
         have h_inv_pos_def : (σBC.traceLeft⁻¹).mat.PosDef := by
-          convert h_inv_symm.inv using 1;
+          convert! h_inv_symm.inv using 1;
         exact nonSingular_of_posDef h_inv_pos_def;
     convert h_inv_symm using 1;
     have h_inv_symm : (σBC.traceLeft⁻¹)⁻¹ = σBC.traceLeft := by
@@ -837,7 +834,7 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
         have h_inv_symm : (σBC.traceLeft⁻¹).mat * σBC.traceLeft.mat = 1 := by
           have h_inv_symm : σBC.traceLeft.mat.PosDef := by
             exact PosDef_traceLeft σBC hσ
-          convert Matrix.nonsing_inv_mul _ _;
+          convert! Matrix.nonsing_inv_mul _ _;
           exact isUnit_iff_ne_zero.mpr h_inv_symm.det_pos.ne';
         exact h_inv_symm
       have h_inv_symm : (σBC.traceLeft⁻¹ : HermitianMat dC ℂ).mat⁻¹ = σBC.traceLeft.mat := by
@@ -846,7 +843,7 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
     rw [h_inv_symm];
   have h_inv_symm : (ρAB.traceRight⁻¹ ⊗ₖ σBC).reindex (Equiv.prodAssoc dA dB dC).symm ≤ ρAB⁻¹ ⊗ₖ σBC.traceLeft := by
     aesop;
-  convert HermitianMat.reindex_le_reindex_iff ( Equiv.prodAssoc dA dB dC ) _ _ |>.2 h_inv_symm using 1
+  convert! HermitianMat.reindex_le_reindex_iff ( Equiv.prodAssoc dA dB dC ) _ _ |>.2 h_inv_symm using 1
 
 open scoped InnerProductSpace RealInnerProductSpace
 
@@ -865,7 +862,8 @@ private lemma inner_kron_one_eq_inner_traceRight
     simp [ Matrix.traceRight, Matrix.one_apply, mul_comm ];
     simp only [Finset.sum_sigma', Finset.mul_sum _ _ _];
     rw [ ← Finset.sum_filter ];
-    refine' Finset.sum_bij ( fun x _ => ⟨ x.snd.1, x.fst.1, x.fst.2 ⟩ ) _ _ _ _ <;> aesop_cat;
+    refine' Finset.sum_bij ( fun x _ => ⟨ x.snd.1, x.fst.1, x.fst.2 ⟩ ) _ _ _ _ <;>
+      aesop (add simp [Finset.mem_filter, Sigma.ext_iff, Prod.ext_iff]);
   exact congr_arg Complex.re h_partial_trace
 
 omit [DecidableEq d₂] in
@@ -873,7 +871,7 @@ open HermitianMat in
 private lemma inner_one_kron_eq_inner_traceLeft
     (B : HermitianMat d₂ ℂ) (M : HermitianMat (d₁ × d₂) ℂ) :
     ⟪(1 : HermitianMat d₁ ℂ) ⊗ₖ B, M⟫ = ⟪B, M.traceLeft⟫ := by
-  convert inner_kron_one_eq_inner_traceRight B ( M.reindex ( Equiv.prodComm d₁ d₂ ) ) using 1;
+  convert! inner_kron_one_eq_inner_traceRight B ( M.reindex ( Equiv.prodComm d₁ d₂ ) ) using 1;
   refine' congr_arg ( fun x : ℂ => x.re ) _;
   refine' Finset.sum_bij ( fun x y => ( x.2, x.1 ) ) _ _ _ _ <;> simp [ Matrix.mul_apply ];
   intro a b; rw [ ← Equiv.sum_comp ( Equiv.prodComm d₁ d₂ ) ]
@@ -890,7 +888,7 @@ private lemma hermitianMat_log_inv_eq_neg
     rw [ h_log_inv, HermitianMat.log ];
     exact Eq.symm (HermitianMat.cfc_comp A (fun x => x⁻¹) Real.log);
   simp [ HermitianMat.log ];
-  convert congr_arg ( fun f => A.cfc f ) ( show Real.log ∘ ( fun x => x⁻¹ ) = -Real.log from funext fun x => ?_ ) using 1
+  convert! congr_arg ( fun f => A.cfc f ) ( show Real.log ∘ ( fun x => x⁻¹ ) = -Real.log from funext fun x => ?_ ) using 1
   · exact Eq.symm (HermitianMat.cfc_neg A Real.log);
   · by_cases hx : x = 0 <;> simp [ hx, Real.log_inv ]
 
@@ -899,17 +897,17 @@ private lemma PosDef_assoc'_traceRight
     ρ.assoc'.traceRight.M.mat.PosDef := by
   have _ := ρ.nonempty |> nonempty_prod.mp |>.right |> nonempty_prod.mp |>.right
   apply PosDef_traceRight
-  convert hρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm
+  convert! hρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm
 
 private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪(-ρ.assoc'.traceRight.M.traceRight.log) ⊗ₖ (1 : HermitianMat (d₂ × d₃) ℂ) +
      (1 : HermitianMat d₁ ℂ) ⊗ₖ ρ.traceLeft.M.log, ρ.M⟫ =
     Sᵥₙ ρ.traceRight - Sᵥₙ ρ.traceLeft := by
-  convert congr_arg₂ ( · + · ) _ _ using 1;
-  convert inner_add_left _ _ _ using 1;
+  convert! congr_arg₂ ( · + · ) _ _ using 1;
+  convert! inner_add_left _ _ _ using 1;
   · rw [ Sᵥₙ_eq_neg_trace_log ];
-    convert inner_kron_one_eq_inner_traceRight _ _ using 1;
+    convert! inner_kron_one_eq_inner_traceRight _ _ using 1;
     simp [ HermitianMat.traceRight ];
     congr! 2;
     ext i j; simp [ Matrix.traceRight ] ;
@@ -987,7 +985,7 @@ private lemma MState.approx_by_pd
           exact add_pos_of_nonneg_of_pos ( mul_nonneg ( sub_nonneg.2 <| mod_cast hε.2.le ) <| mod_cast hA.2 x ) <| mul_pos ( mod_cast hε.1 ) <| mod_cast hB.2 hx_ne_zero;
         convert h_pos using 1 ; simp [ Matrix.add_mulVec ] ; ring_nf!
         simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm, sub_mul, mul_sub ] ; ring!;
-    convert h_pos_def _ _ _ _ _ ⟨ _, _ ⟩ <;> norm_num [ * ];
+    convert! h_pos_def _ _ _ _ _ ⟨ _, _ ⟩ <;> norm_num [ * ];
     congr! 1
     exact psd ρ
     · exact uniform_posDef;
@@ -1047,7 +1045,7 @@ private lemma MState.assoc'_continuous :
   have h_reindex_cont : Continuous (fun ρ : HermitianMat (d₁ × d₂ × d₃) ℂ => ρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm) := by
     apply continuous_induced_rng.mpr;
     fun_prop (disch := norm_num);
-  convert h_reindex_cont.comp _ using 2;
+  convert! h_reindex_cont.comp _ using 2;
   exact Continuous_HermitianMat
 
 /-- Weak monotonicity, version with partial traces. -/
@@ -1061,7 +1059,7 @@ lemma Sᵥₙ_wm (ρ : MState (d₁ × d₂ × d₃)) :
     constructor <;> refine' Filter.Tendsto.add _ _;
     · exact Sᵥₙ_continuous.continuousAt.tendsto.comp ( MState.traceRight_continuous.continuousAt.tendsto.comp hρn );
     · exact Sᵥₙ_continuous.comp ( MState.traceLeft_continuous.comp ( MState.traceLeft_continuous ) ) |> fun h => h.continuousAt.tendsto.comp hρn;
-    · convert Sᵥₙ_continuous.continuousAt.tendsto.comp ( MState.traceRight_continuous.continuousAt.tendsto.comp ( MState.assoc'_continuous.continuousAt.tendsto.comp hρn ) ) using 1;
+    · convert! Sᵥₙ_continuous.continuousAt.tendsto.comp ( MState.traceRight_continuous.continuousAt.tendsto.comp ( MState.assoc'_continuous.continuousAt.tendsto.comp hρn ) ) using 1;
     · exact Sᵥₙ_continuous.continuousAt.tendsto.comp ( MState.traceLeft_continuous.continuousAt.tendsto.comp hρn );
   have ⟨_, hn23⟩ := nonempty_prod.mp h_ne123
   have ⟨_, _⟩ := nonempty_prod.mp hn23
@@ -1242,7 +1240,10 @@ theorem Sᵥₙ_weak_monotonicity (ρ : MState (dA × dB × dC)) :
   simp only [qConditionalEnt, MState.traceRight_left_assoc', Sᵥₙ_of_SWAP_eq]
   rw [add_sub, sub_add_eq_add_sub, le_sub_iff_add_le, le_sub_iff_add_le, zero_add]
   nth_rw 2 [add_comm]
-  simpa using Sᵥₙ_wm ρ.SWAP.assoc.SWAP.assoc
+  have := Sᵥₙ_wm ρ.SWAP.assoc.SWAP.assoc
+  simp_all only [MState.traceRight_assoc, MState.traceRight_SWAP, MState.traceLeft_right_assoc,
+    MState.traceLeft_left_assoc, MState.traceLeft_SWAP, MState.assoc'_assoc, ge_iff_le]
+  exact this
 
 /-- Strong subadditivity, stated in terms of conditional entropies.
   Also called the data processing inequality. H(A|BC) ≤ H(A|B). -/

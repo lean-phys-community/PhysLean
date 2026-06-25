@@ -186,9 +186,9 @@ private lemma exp_decay_smul_velocity
   rw [Time.deriv]
   rw [fderiv_fun_smul (by fun_prop) (hy t)]
   rw [fderiv_exp (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smulRight_apply,
+  simp only [add_apply, ContinuousLinearMap.smulRight_apply,
     fderiv_fun_neg, fderiv_fun_const, Pi.zero_apply, Time.fderiv_val,
-    ContinuousLinearMap.neg_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    _root_.neg_apply, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   rw [← Time.deriv_eq]
   simp [smul_sub, smul_smul]
   module
@@ -209,10 +209,10 @@ private lemma exp_decay_smul_acceleration
   rw [fderiv_fun_const_smul (hy t)]
   have hy''_t := congrFun hy'' t
   rw [Time.deriv] at hy''_t
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.sub_apply,
+  simp only [add_apply, _root_.sub_apply,
     ContinuousLinearMap.smulRight_apply, fderiv_fun_neg, fderiv_fun_const,
-    Pi.zero_apply, Time.fderiv_val, ContinuousLinearMap.neg_apply,
-    ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    Pi.zero_apply, Time.fderiv_val, _root_.neg_apply,
+    FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   rw [hy''_t, ← Time.deriv_eq]
   simp [smul_add, smul_sub, smul_smul]
   module

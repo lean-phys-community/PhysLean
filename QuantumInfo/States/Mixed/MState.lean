@@ -152,8 +152,9 @@ instance instMixable : Mixable (HermitianMat d ℂ) (MState d) where
       h.casesOn fun t ht ↦ ht ▸ t.tr⟩, rfl⟩
   convex := convex d
 
---An MState is a witness that d is nonempty.
-instance nonempty : Nonempty d := by
+/-- An MState is a witness that d is nonempty. -/
+@[implicit_reducible]
+def nonempty : Nonempty d := by
   by_contra h
   simpa [HermitianMat.trace_eq_re_trace, not_nonempty_iff.mp h] using ρ.tr
 
@@ -166,7 +167,7 @@ set_option backward.isDefEq.respectTransparency false in
 -- Could have used properties of ρ.spectrum
 theorem eigenvalue_le_one : ∀ i, ρ.Hermitian.eigenvalues i ≤ 1 := by
   intro i
-  convert Finset.single_le_sum (fun y _ ↦ ρ.psd.eigenvalues_nonneg y) (Finset.mem_univ i)
+  convert! Finset.single_le_sum (fun y _ ↦ ρ.psd.eigenvalues_nonneg y) (Finset.mem_univ i)
   rw [ρ.M.sum_eigenvalues_eq_trace, ρ.tr]
 
 theorem le_one : ρ.M ≤ 1 := by
@@ -284,7 +285,7 @@ theorem pure_inner : ⟪pure ψ, pure φ⟫_Prob = ‖Braket.dot ψ φ‖^2 := b
       conj (((ψ : Bra d) : d → ℂ) ⬝ᵥ (φ : d → ℂ))
     rw [Matrix.dotProduct_star (ψ : d → ℂ) (φ : d → ℂ)]
     congr 1
-    simpa [Bra.eq_conj] using dotProduct_comm (φ : d → ℂ) (star (ψ : d → ℂ))]
+    exact dotProduct_comm (φ : d → ℂ) (star (ψ : d → ℂ))]
   simpa [Complex.normSq_apply] using
     Complex.normSq_eq_norm_sq (((ψ : Bra d) : d → ℂ) ⬝ᵥ (φ : d → ℂ))
 
@@ -448,7 +449,7 @@ theorem pure_iff_purity_one : (∃ ψ, ρ = pure ψ) ↔ ρ.purity = 1 := by
           conv_rhs => rw [ this ];
           simp [ Matrix.trace_mul_comm, Matrix.mul_assoc ];
           exact Finset.sum_congr rfl fun _ _ => by ring;
-        convert congr_arg Complex.re h_eigenvalues using 1;
+        convert! congr_arg Complex.re h_eigenvalues using 1;
       simp_all only [Set.Icc.coe_one]
     have h_eigenvalues : ∑ i, (ρ.spectrum i).val * ((ρ.spectrum i).val - 1) = 0 := by
       simp_all [ sq, mul_sub ];
@@ -508,7 +509,7 @@ theorem spectralDecomposition (ρ : MState d) :
   congr!
   simp only [Matrix.mul_diagonal, Matrix.IsHermitian.eigenvectorUnitary_apply,
     mul_comm, Matrix.star_apply, RCLike.star_def]
-  simp only [Function.comp_apply, mat_M, mat_apply, smul_apply, Complex.real_smul]
+  simp only [Function.comp_apply, mat_M, mat_apply, HermitianMat.smul_apply, Complex.real_smul]
   rw [mul_assoc]
   rfl
 
@@ -781,7 +782,7 @@ theorem pure_eq_pure_iff {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d)
       simp [ *, Complex.ext_iff ];
       intro i j; rw [ Complex.norm_def ] at left; simp_all [ Complex.normSq ];
       grind +ring;
-    exact MState.ext_m ( by ext i j; simpa [ Matrix.vecMulVec ] using h_simp i j )
+    exact MState.ext_m ( by ext i j; exact h_simp i j )
 
 /-- Two kets are phase-equivalent if and only if their pure states are equal. -/
 theorem PhaseEquiv_iff_pure_eq {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d) :
@@ -863,10 +864,10 @@ theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d�
   obtain ⟨ z, hz₁, hz₂ ⟩ := h_eq_ket;
   use ⟨ fun i => z * ξ' i, ?_ ⟩, φ';
   ext ⟨ i, j ⟩ ; simp [ Ket.prod ];
-  convert congr_fun hz₂ ( i, j ) using 1;
+  convert! congr_fun hz₂ ( i, j ) using 1;
   exact mul_assoc _ _ _;
   simp [ hz₁]
-  simpa [ Complex.normSq_eq_norm_sq ] using ξ'.normalized'
+  exact ξ'.normalized'
 
 /-- A pure state is separable iff the ket is a product state. -/
 theorem pure_separable_iff_IsProd (ψ : Ket (d₁ × d₂)) :
@@ -919,7 +920,7 @@ theorem pure_iff_rank_eq_one {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
             rw [ Fintype.card_subtype ] at h_diag ; exact h_diag;
           obtain ⟨i, hi⟩ : ∃ i : d, h_herm.eigenvalues i ≠ 0 := by
             exact not_forall.mp fun h => by simp [ h ] at h_diag;
-          rw [ Finset.sum_eq_add_sum_diff_singleton i _ (by simp) ] at h_diag;
+          rw [ Finset.sum_eq_add_sum_sdiff_singleton i _ (by simp) ] at h_diag;
           exact ⟨i, hi, fun j hj => Classical.not_not.1 fun hj' =>
             absurd h_diag ( by rw [ if_neg hi ] ; exact ne_of_gt ( lt_add_of_pos_right _ ( lt_of_lt_of_le ( by simp [ hj' ] ) ( Finset.single_le_sum ( fun x _ => by positivity ) ( Finset.mem_sdiff.2 ⟨ Finset.mem_univ j, by simp [ hj ] ⟩ ) ) ) ) ) ⟩;
         -- Since the diagonal matrix in the spectral theorem has exactly one non-zero entry, we can write ρ.m as |ψ⟩⟨ψ| for some ket ψ.
@@ -966,7 +967,7 @@ theorem Ket.IsProd_iff_rank_eq_one {d₁ d₂ : Type*} [Fintype d₁] [Fintype d
         exact ⟨ ∑ j, ψ' j * y j, by ext i; simp [ Matrix.mulVec, dotProduct, mul_comm, mul_left_comm, Finset.mul_sum _ _ _ ] ⟩;
       exact le_trans ( Submodule.finrank_mono h_range ) ( finrank_span_le_card _ ) |> le_trans <| by norm_num;
     cases h_rank.eq_or_lt <;> simp_all [ Matrix.rank, Submodule.eq_bot_iff ];
-    · convert ‹Module.finrank ℂ ( LinearMap.range ( Matrix.mulVecLin ( Matrix.of fun i j => ξ i * ψ' j ) ) ) = 1› using 3 ; aesop;
+    · convert! ‹Module.finrank ℂ ( LinearMap.range ( Matrix.mulVecLin ( Matrix.of fun i j => ξ i * ψ' j ) ) ) = 1› using 3 ; aesop;
       · aesop;
       · ext; simp [hξψ'];
     · have := ψ.exists_ne_zero
@@ -1049,7 +1050,7 @@ theorem purify_spec (ρ : MState d) : (pure ρ.purify).traceRight = ρ := by
     intro i j
     have h_eigenvectorUnitary : ρ.M = Matrix.of (fun i j => ∑ x, ρ.Hermitian.eigenvectorUnitary i x * ρ.Hermitian.eigenvalues x * starRingEnd ℂ (ρ.Hermitian.eigenvectorUnitary j x)) := by
       have := ρ.Hermitian.spectral_theorem;
-      convert this using 1;
+      convert! this using 1;
       ext i j; simp [ Matrix.mul_apply, Matrix.diagonal ] ;
     replace h_eigenvectorUnitary := congr_fun ( congr_fun h_eigenvectorUnitary i ) j
     simp_all only [mat_apply, Matrix.IsHermitian.eigenvectorUnitary_apply, Matrix.of_apply]
@@ -1057,7 +1058,9 @@ theorem purify_spec (ρ : MState d) : (pure ρ.purify).traceRight = ρ := by
     norm_num [ Complex.ext_iff, sq ];
     exact Or.inl (Real.mul_self_sqrt (ρ.psd.eigenvalues_nonneg _))
   simp_all [ Complex.normSq, sq ];
-  simpa only [ mul_assoc ] using h_eigenvectorUnitary i j
+  have h1 := h_eigenvectorUnitary i j
+  convert! h1 using 1;
+  simp [mul_assoc]
 
 /-- `MState.purify` bundled with its defining property `MState.traceRight_of_purify`. -/
 def purifyX (ρ : MState d) : { ψ : Ket (d × d) // (pure ψ).traceRight = ρ } :=
@@ -1216,8 +1219,7 @@ theorem assoc'_assoc (ρ : MState ((d₁ × d₂) × d₃)) : ρ.assoc.assoc' = 
 theorem traceLeft_right_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
     ρ.assoc.traceLeft.traceRight = ρ.traceRight.traceLeft := by
   ext
-  simpa [assoc, relabel, Matrix.traceLeft, traceLeft, Matrix.traceRight, traceRight]
-    using Finset.sum_comm
+  exact Finset.sum_comm
 
 @[simp]
 theorem traceRight_left_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
@@ -1233,7 +1235,7 @@ theorem traceRight_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
 @[simp]
 theorem traceLeft_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
     ρ.assoc'.traceLeft = ρ.traceLeft.traceLeft := by
-  convert ρ.SWAP.assoc.SWAP.traceRight_assoc
+  convert! ρ.SWAP.assoc.SWAP.traceRight_assoc
   simp
 
 @[simp]

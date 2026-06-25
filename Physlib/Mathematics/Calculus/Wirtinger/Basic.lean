@@ -227,37 +227,37 @@ rule.
 differentiability hypothesis, since `fderiv` of a negation is unconditional. -/
 @[simp] lemma dWirtingerDir_neg (g : V → ℂ) (v u : V) :
     dWirtingerDir (fun p => -(g p)) v u = -(dWirtingerDir g v u) := by
-  simp only [dWirtingerDir_apply, fderiv_fun_neg, ContinuousLinearMap.neg_apply]; ring
+  simp only [dWirtingerDir_apply, fderiv_fun_neg, _root_.neg_apply]; ring
 
 /-- `dWirtingerAntiDir` of a negated function, `∂̄_v(−g) = −∂̄_v g`. -/
 @[simp] lemma dWirtingerAntiDir_neg (g : V → ℂ) (v u : V) :
     dWirtingerAntiDir (fun p => -(g p)) v u = -(dWirtingerAntiDir g v u) := by
-  simp only [dWirtingerAntiDir_apply, fderiv_fun_neg, ContinuousLinearMap.neg_apply]; ring
+  simp only [dWirtingerAntiDir_apply, fderiv_fun_neg, _root_.neg_apply]; ring
 
 /-- Additivity of `dWirtingerDir`, `∂_v(g + h) = ∂_v g + ∂_v h`. -/
 lemma dWirtingerDir_add {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
     (hh : DifferentiableAt ℝ h u) (v : V) :
     dWirtingerDir (g + h) v u = dWirtingerDir g v u + dWirtingerDir h v u := by
-  simp only [dWirtingerDir_apply, fderiv_add hg hh, ContinuousLinearMap.add_apply]; ring
+  simp only [dWirtingerDir_apply, fderiv_add hg hh, add_apply]; ring
 
 /-- Additivity of `dWirtingerAntiDir`, `∂̄_v(g + h) = ∂̄_v g + ∂̄_v h`. -/
 lemma dWirtingerAntiDir_add {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
     (hh : DifferentiableAt ℝ h u) (v : V) :
     dWirtingerAntiDir (g + h) v u = dWirtingerAntiDir g v u + dWirtingerAntiDir h v u := by
-  simp only [dWirtingerAntiDir_apply, fderiv_add hg hh, ContinuousLinearMap.add_apply]; ring
+  simp only [dWirtingerAntiDir_apply, fderiv_add hg hh, add_apply]; ring
 
 /-- Compatibility of `dWirtingerDir` with complex scalar multiplication,
 `∂_v(c·g) = c·∂_v g`. -/
 lemma dWirtingerDir_smul (c : ℂ) {g : V → ℂ} (hg : DifferentiableAt ℝ g u) (v : V) :
     dWirtingerDir (c • g) v u = c • dWirtingerDir g v u := by
-  simp only [dWirtingerDir_apply, fderiv_const_smul hg c, ContinuousLinearMap.smul_apply,
+  simp only [dWirtingerDir_apply, fderiv_const_smul hg c, _root_.smul_apply,
     smul_eq_mul]; ring
 
 /-- Compatibility of `dWirtingerAntiDir` with complex scalar multiplication,
 `∂̄_v(c·g) = c·∂̄_v g`. -/
 lemma dWirtingerAntiDir_smul (c : ℂ) {g : V → ℂ} (hg : DifferentiableAt ℝ g u) (v : V) :
     dWirtingerAntiDir (c • g) v u = c • dWirtingerAntiDir g v u := by
-  simp only [dWirtingerAntiDir_apply, fderiv_const_smul hg c, ContinuousLinearMap.smul_apply,
+  simp only [dWirtingerAntiDir_apply, fderiv_const_smul hg c, _root_.smul_apply,
     smul_eq_mul]; ring
 
 omit [NormedSpace ℂ V] in
@@ -286,14 +286,14 @@ lemma dWirtingerAntiDir_mul {g h : V → ℂ} (hg : DifferentiableAt ℝ g u)
 lemma dWirtingerDir_fun_sum {α : Type*} {s : Finset α} {F : α → V → ℂ}
     (hF : ∀ a ∈ s, DifferentiableAt ℝ (F a) u) (v : V) :
     dWirtingerDir (fun p => ∑ a ∈ s, F a p) v u = ∑ a ∈ s, dWirtingerDir (F a) v u := by
-  simp only [dWirtingerDir_apply, fderiv_fun_sum hF, ContinuousLinearMap.sum_apply]
+  simp only [dWirtingerDir_apply, fderiv_fun_sum hF, sum_apply]
   rw [Finset.mul_sum, ← Finset.sum_sub_distrib, Finset.mul_sum]
 
 /-- Finite-sum rule for `dWirtingerAntiDir`, `∂̄_v(∑ₐ Fₐ) = ∑ₐ ∂̄_v Fₐ`. -/
 lemma dWirtingerAntiDir_fun_sum {α : Type*} {s : Finset α} {F : α → V → ℂ}
     (hF : ∀ a ∈ s, DifferentiableAt ℝ (F a) u) (v : V) :
     dWirtingerAntiDir (fun p => ∑ a ∈ s, F a p) v u = ∑ a ∈ s, dWirtingerAntiDir (F a) v u := by
-  simp only [dWirtingerAntiDir_apply, fderiv_fun_sum hF, ContinuousLinearMap.sum_apply]
+  simp only [dWirtingerAntiDir_apply, fderiv_fun_sum hF, sum_apply]
   rw [Finset.mul_sum, ← Finset.sum_add_distrib, Finset.mul_sum]
 
 /-!
@@ -658,8 +658,8 @@ private lemma fderiv_weightedDirDeriv (hf' : DifferentiableAt ℝ (fderiv ℝ f)
       = (1 / 2 : ℂ) * (fderiv ℝ (fderiv ℝ f) u a b₁
           + c * fderiv ℝ (fderiv ℝ f) u a b₂) := by
   rw [(hasFDerivAt_weightedDirDeriv hf' c b₁ b₂).fderiv]
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply,
-    ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.apply_apply,
+  simp only [add_apply, _root_.smul_apply,
+    ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.apply_apply,
     smul_eq_mul, mul_add]
 
 /-- A directional derivative is a `weightedDirDeriv`: anti-holomorphic with `c = i`. -/

@@ -70,9 +70,8 @@ def FamilyPermutations (n : ℕ) : ACCSystemGroupAction (PureU1 n) where
   rep := permCharges
   linearInvariant := by
     intro i
-    simp only [PureU1_numberLinear] at i
     match i with
-    | 0 => exact accGrav_invariant
+    | ⟨0, _⟩ => exact accGrav_invariant
   quadInvariant := by
     intro i
     simp only [PureU1_numberQuadratic] at i

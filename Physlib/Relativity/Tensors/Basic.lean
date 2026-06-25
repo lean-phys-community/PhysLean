@@ -299,7 +299,8 @@ lemma induction_on_pure {n : ℕ} {c : Fin n → C} {P : S.Tensor c → Prop}
     (hadd : ∀ t1 t2, P t1 → P t2 → P (t1 + t2)) (t : S.Tensor c) : P t := by
   refine PiTensorProduct.induction_on' t ?_ ?_
   · intro r p
-    simpa using hsmul r _ (h p)
+    simp only [PiTensorProduct.tprodCoeff_eq_smul_tprod]
+    exact hsmul r _ (h p)
   · intro t1 t2
     exact fun a a_1 => hadd t1 t2 a a_1
 
@@ -609,6 +610,7 @@ lemma PermCond.preserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   simp only [Function.comp_apply]
   rw [h.2]
 
+set_option warning.simp.varHead false in
 @[simp, nolint simpVarHead]
 lemma PermCond.inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (x : Fin n) :
@@ -619,6 +621,7 @@ lemma PermCond.inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
   rw [h.preserve_color]
   rfl
 
+set_option warning.simp.varHead false in
 @[simp, nolint simpVarHead]
 lemma PermCond.toEquiv_symm_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : PermCond c c1 σ) (x : Fin m) :

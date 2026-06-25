@@ -72,8 +72,8 @@ lemma memHS_iff {f : Space d → ℂ} : MemHS f ↔
 @[simp]
 lemma zero_memHS : MemHS (d := d) 0 := by
   rw [memHS_iff]
-  simp only [Pi.zero_apply, norm_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
-    integrable_zero, and_true]
+  simp only [Pi.ofNat_apply, norm_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
+    integrable_fun_zero, and_true]
   fun_prop
 
 @[simp]
