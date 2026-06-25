@@ -171,20 +171,14 @@ lemma unique
 
   obtain ⟨K, cK, hK⟩ := hF.ext' {x} (isCompact_singleton)
   obtain ⟨L, cL, hL⟩ := hG.ext' {x} (isCompact_singleton)
-  -- have hK : x ∈ {x} K := by
-  -- exact? Set.mem_singleton x
   have hnonempty : Set.Nonempty ({0} ∪ (K ∪ L)) := by simp
 
-  -- prepare test function that is one on `D ∪ D'`
+  -- prepare test function that is one on `K ∪ L`
   let r := sSup ((fun x => ‖x‖) '' ({0} ∪ (K ∪ L)))
-  have : 0 ≤ r := by
-    obtain ⟨x, h1, h2, h3⟩ := IsCompact.exists_sSup_image_eq_and_ge (s := {0} ∪ (K ∪ L))
-      (IsCompact.union (by simp) (IsCompact.union cK cL)) hnonempty
-      (f := fun x => ‖x‖) (by fun_prop)
-    unfold r
-    apply le_of_le_of_eq (b := ‖x‖)
-    · exact norm_nonneg x
-    · rw [← h2]
+  obtain ⟨y₀, -, hr, hsup⟩ := IsCompact.exists_sSup_image_eq_and_ge (s := {0} ∪ (K ∪ L))
+    (IsCompact.union (by simp) (IsCompact.union cK cL)) hnonempty
+    (f := fun x => ‖x‖) (by fun_prop)
+  have hr0 : 0 ≤ r := le_of_le_of_eq (norm_nonneg y₀) hr.symm
 
   let φ : ContDiffBump (0 : Y) := {
     rIn := r + 1,
@@ -193,36 +187,21 @@ lemma unique
     rIn_lt_rOut := by linarith}
 
   -- few properties about `φ`
-  let φ' := fun x => φ.toFun x
-  have hφ : IsTestFunction (fun x : Y => φ x) := by
-    constructor
-    apply ContDiffBump.contDiff
-    apply ContDiffBump.hasCompactSupport
+  have hφ : IsTestFunction (fun x : Y => φ x) :=
+    ⟨ContDiffBump.contDiff φ, ContDiffBump.hasCompactSupport φ⟩
   have hφ' : ∀ x, x ∈ K ∪ L → x ∈ Metric.closedBall 0 φ.rIn := by
     intro x hx
-    simp [φ, r, -Set.singleton_union]
-    obtain ⟨y, h1, h2, h3⟩ := IsCompact.exists_sSup_image_eq_and_ge (s := {0} ∪ (K ∪ L))
-      (IsCompact.union (by simp) (IsCompact.union cK cL)) hnonempty
-      (f := fun x => ‖x‖) (by fun_prop)
-    rw [h2]
-    have h3' := h3 x (by simp[hx])
-    apply le_trans h3'
-    simp
+    simp only [φ, Metric.mem_closedBall, dist_zero_right]
+    have hxr : ‖x‖ ≤ r := le_of_le_of_eq (hsup x (by simp [hx])) hr.symm
+    linarith
 
   let ψ := fun x => φ x • f x
   have hψ : IsTestFunction (fun x : Y => ψ x) := by fun_prop
-  have hψK : ∀ x ∈ K, f x = ψ x := by
-    intros x hx; unfold ψ
-    rw[ContDiffBump.one_of_mem_closedBall]
-    · simp
-    · apply hφ'; simp [hx]
-  have hψL : ∀ x ∈ L, f x = ψ x := by
-    intros x hx; unfold ψ
-    rw[ContDiffBump.one_of_mem_closedBall]
-    · simp
-    · apply hφ'; simp [hx]
-
-  simp only [hK f ψ hψK x rfl, hL f ψ hψL x rfl, unique_on_test_functions hF hG ψ hψ]
+  have hψeq : ∀ x ∈ K ∪ L, f x = ψ x := fun x hx => by
+    rw [show ψ x = φ x • f x from rfl, ContDiffBump.one_of_mem_closedBall φ (hφ' x hx), one_smul]
+  simp only [hK f ψ (fun z hz => hψeq z (by simp [hz])) x rfl,
+    hL f ψ (fun z hz => hψeq z (by simp [hz])) x rfl,
+    unique_on_test_functions hF hG ψ hψ]
 
 lemma neg {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)}
     (hF : HasVarAdjoint F F') :
@@ -387,23 +366,8 @@ lemma smul_left {F : (X → U) → (X → V)} {ψ : X → ℝ} {F' : (X → V) �
 
 lemma smul_right {F : (X → U) → (X → V)} {ψ : X → ℝ} {F' : (X → V) → (X → U)}
     (hF : HasVarAdjoint F F') (hψ : ContDiff ℝ ∞ ψ) :
-    HasVarAdjoint (fun φ x => ψ x • F φ x) (fun φ x => F' (fun x' => ψ x' • φ x') x) where
-  test_fun_preserving φ hφ := by
-    have := hF.test_fun_preserving φ hφ
-    fun_prop
-  test_fun_preserving' φ hφ := by
-    apply hF.test_fun_preserving' _ _
-    fun_prop
-  adjoint φ ψ hφ hψ := by
-    simp_rw[inner_smul_left', ← inner_smul_right']
-    rw [hF.adjoint]
-    · rfl
-    · exact hφ
-    · simp; fun_prop
-  ext' := by
-    intro K cK
-    obtain ⟨L,cL,h⟩ := hF.ext' K cK
-    exact ⟨L,cL,by intro _ _ hφ _ _; apply h <;> simp_all⟩
+    HasVarAdjoint (fun φ x => ψ x • F φ x) (fun φ x => F' (fun x' => ψ x' • φ x') x) :=
+  smul_left hF hψ
   -- ext := IsLocalizedFunctionTransform.smul_left hF.ext
 
 attribute [fun_prop] LinearIsometryEquiv.contDiff
@@ -413,10 +377,7 @@ lemma clm_apply
     [CompleteSpace U] [CompleteSpace V] (f : X → (U →L[ℝ] V))
     (hf : ContDiff ℝ ∞ f) :
     HasVarAdjoint (fun (φ : X → U) x => f x (φ x)) (fun ψ x => _root_.adjoint ℝ (f x) (ψ x)) where
-  test_fun_preserving φ hφ := by
-    apply IsTestFunction.family_linearMap_comp
-    · exact hφ
-    · exact hf
+  test_fun_preserving φ hφ := IsTestFunction.family_linearMap_comp hφ hf
   test_fun_preserving' φ hφ := by
     conv =>
       enter [1, x]
@@ -451,17 +412,10 @@ lemma clm_apply
 
 protected lemma deriv :
     HasVarAdjoint (fun φ : ℝ → U => deriv φ) (fun φ x => - deriv φ x) where
-  test_fun_preserving _ hφ := by
-    have ⟨h,h'⟩ := hφ
-    constructor
-    · fun_prop
-    · exact HasCompactSupport.deriv h'
-  test_fun_preserving' _ hφ := by
-    have ⟨h,h'⟩ := hφ
-    constructor
-    · fun_prop
-    · apply HasCompactSupport.neg
-      apply HasCompactSupport.deriv h'
+  test_fun_preserving _ hφ :=
+    ⟨by fun_prop, HasCompactSupport.deriv hφ.supp⟩
+  test_fun_preserving' _ hφ :=
+    ⟨by fun_prop, (HasCompactSupport.deriv hφ.supp).neg⟩
   adjoint φ ψ hφ hψ := by
     trans ∫ (x : ℝ), ⟪deriv φ x, ψ x⟫_ℝ
     · congr
@@ -541,39 +495,27 @@ lemma adjFDeriv_apply
     use (Metric.cthickening 1 K)
     constructor
     · exact IsCompact.cthickening cK
-    · intro φ φ' hφ
-      have h : ∀ x ∈ K, φ =ᶠ[nhds x] φ' := by
-        intro x hx
-        apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-        refine mem_interior_iff_mem_nhds.mp ?_
-        rw [@mem_interior]
-        use Metric.thickening 1 K
-        simp only [subset_refl, true_and]
-        apply And.intro
-        · exact Metric.isOpen_thickening
-        · rw [@Metric.mem_thickening_iff_exists_edist_lt]
-          use x
-          simpa using hx
-        · intro x hx
-          have hx' : x ∈ Metric.cthickening 1 K := Metric.thickening_subset_cthickening 1 K hx
-          exact hφ x hx'
-      intro x hx; dsimp[divergence]; congr 4
-      rw [Filter.EventuallyEq.fderiv_eq (h x hx)]
+    · intro φ φ' hφ x hx
+      dsimp[divergence]; congr 4
+      rw [Filter.EventuallyEq.fderiv_eq
+        (IsLocalizedFunctionTransform.eventuallyEq_of_eq_on_cthickening hφ hx)]
   adjoint φ ψ hφ hψ := by
     obtain ⟨s, ⟨bX⟩⟩ := Basis.exists_basis ℝ X
     haveI : Fintype s := FiniteDimensional.fintypeBasisIndex bX
     let f (i : s) : X →ₗ[ℝ] ℝ := {
       toFun := (bX.repr · i)
       map_add' := by simp
-      map_smul' := by simp
-
-    }
+      map_smul' := by simp }
     let f' (i : s) : X →L[ℝ] ℝ := (f i).toContinuousLinearMap
+    have hfψ : ∀ i, IsTestFunction fun y => f' i (ψ y) := fun i =>
+      IsTestFunction.comp_left hψ (by simp) (by fun_prop)
+    have hinner : IsTestFunction fun y => ⟪dy, φ y⟫_ℝ :=
+      IsTestFunction.inner_left (by fun_prop) hφ
     calc _ = ∫ (y : X), ⟪dy, fderiv ℝ φ y (ψ y)⟫_ℝ := by
             congr
             funext y
-            have h1 := DifferentiableAt.hasAdjFDerivAt (hφ.differentiable y)
-            rw [h1.hasAdjoint_fderiv.adjoint_inner_left]
+            rw [(DifferentiableAt.hasAdjFDerivAt
+              (hφ.differentiable y)).hasAdjoint_fderiv.adjoint_inner_left]
         _ = ∑ i, ∫ (y : X), bX.repr (ψ y) i * fderiv ℝ (fun y' => ⟪dy, φ y' ⟫_ℝ) y (bX i) := by
             have h (y : X) : ψ y = ∑ i, bX.repr (ψ y) i • bX i := by
               exact Eq.symm (Basis.sum_equivFun bX (ψ y))
@@ -597,11 +539,7 @@ lemma adjFDeriv_apply
               apply IsTestFunction.integrable
               simp [inner_smul_right']
               apply IsTestFunction.mul_right
-              · change IsTestFunction fun x => f' i (ψ x)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
+              · exact hfψ i
               · fun_prop
         _ = ∑ i, ∫ (y : X), - fderiv ℝ (fun y' => bX.repr (ψ y') i) y (bX i) * ⟪dy, φ y⟫_ℝ := by
             congr; funext i
@@ -609,40 +547,16 @@ lemma adjFDeriv_apply
             · simp[integral_neg]
             · apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                apply IsTestFunction.fderiv_apply
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.inner_left
-                · fun_prop
-                · exact hφ
+              · exact ((hfψ i).fderiv_apply (bX i)).smooth
+              · exact hinner
             · apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.fderiv_apply
-                apply IsTestFunction.comp_left
-                · exact hφ
-                · simp
-                · fun_prop
+              · exact (hfψ i).smooth
+              · exact hinner.fderiv_apply (bX i)
             · apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.inner_left
-                · fun_prop
-                · exact hφ
+              · exact (hfψ i).smooth
+              · exact hinner
             · intro _ _
               apply Differentiable.differentiableAt
               change Differentiable ℝ fun y => f' i (ψ y)
@@ -658,17 +572,8 @@ lemma adjFDeriv_apply
             · intro i _
               apply IsTestFunction.integrable
               apply IsTestFunction.mul_left
-              · apply IsTestFunction.smooth
-                apply IsTestFunction.neg
-                apply IsTestFunction.fderiv_apply
-                change IsTestFunction fun y => f' i (ψ y)
-                apply IsTestFunction.comp_left
-                · exact hψ
-                · simp
-                · fun_prop
-              · apply IsTestFunction.inner_left
-                · fun_prop
-                · exact hφ
+              · exact (((hfψ i).fderiv_apply (bX i)).neg).smooth
+              · exact hinner
         _ = _ := by
             congr
             funext y
