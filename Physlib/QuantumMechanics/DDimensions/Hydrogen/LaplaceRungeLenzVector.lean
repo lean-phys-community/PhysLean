@@ -285,15 +285,12 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) :
     ext
     simp only [sub_apply, add_apply, smul_apply, smul_eq_mul, smul_add]
     ring
-  rw [positionCompMomentumSqr_comm]
-  rw [positionDotMomentumCompMomentum_comm]
-  rw [positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add]
-  rw [positionCompMomentumSqr_comm_momentum_add]
-  rw [positionDotMomentumCompMomentum_comm_momentum_add]
-  rw [positionCompMomentumSqr_comm_radiusRegInvCompPosition_add]
-  rw [positionDotMomentumCompMomentum_comm_radiusRegInvCompPosition_add]
-  rw [momentum_comm_radiusRegInvCompPosition_add]
-  rw [radiusRegInvCompPosition_comm]
+  rw [positionCompMomentumSqr_comm, positionDotMomentumCompMomentum_comm,
+    positionCompMomentumSqr_comm_positionDotMomentumCompMomentum_add,
+    positionCompMomentumSqr_comm_momentum_add, positionDotMomentumCompMomentum_comm_momentum_add,
+    positionCompMomentumSqr_comm_radiusRegInvCompPosition_add,
+    positionDotMomentumCompMomentum_comm_radiusRegInvCompPosition_add,
+    momentum_comm_radiusRegInvCompPosition_add, radiusRegInvCompPosition_comm]
   subst c₁ c₂
   simp_rw [hamiltonianRegCLM_eq, smul_zero, add_zero, sub_zero, ← sub_smul, ← Complex.coe_smul,
     ofReal_inv, ofReal_mul, ofReal_ofNat, smul_sub, smul_smul, add_comp, sub_comp, smul_comp]
