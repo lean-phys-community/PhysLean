@@ -35,7 +35,6 @@ QuantumInfo/ForMathlib/HayataGroup/TraceInequality/OperatorGeometricMean.lean
 QuantumInfo/ForMathlib/HermitianMat.lean
 QuantumInfo/ForMathlib/HermitianMat/Basic.lean
 QuantumInfo/ForMathlib/HermitianMat/CFC.lean
-QuantumInfo/ForMathlib/HermitianMat/CompoundMatrix.lean
 QuantumInfo/ForMathlib/HermitianMat/Inner.lean
 QuantumInfo/ForMathlib/HermitianMat/Jordan.lean
 QuantumInfo/ForMathlib/HermitianMat/LiebConcavity.lean
