@@ -68,8 +68,8 @@ def conjEquiv : M ≃ₛₗ[starRingEnd k] ConjModule M where
 namespace ConjModule
 
 /-- Conjugating twice returns the original module: the `k`-linear isomorphism
-`ConjModule (ConjModule M) ≃ₗ[k] M`. It is `k`-linear, not merely semilinear, because `starRingEnd k`
-composed with itself is the identity. -/
+`ConjModule (ConjModule M) ≃ₗ[k] M`. It is `k`-linear, not merely semilinear, because
+`starRingEnd k` composed with itself is the identity. -/
 def involution : ConjModule (ConjModule M) ≃ₗ[k] M :=
   ((conjEquiv (k := k) (M := M)).trans (conjEquiv (k := k) (M := ConjModule M))).symm
 

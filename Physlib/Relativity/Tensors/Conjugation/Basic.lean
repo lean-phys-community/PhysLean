@@ -49,8 +49,8 @@ genuinely bilinear and `IsHermitian` an honest conjugate-transpose.
 - `ConjTensorSpecies.conjT` is the conjugation of a tensor.
 - `ConjTensorSpecies.conjT_conjT` proves that conjugation is an involution.
 - `ConjTensorSpecies.conjT_contrT` proves that conjugation commutes with contraction.
-- `ConjTensorSpecies.conjT_eq_permT_iff` is the componentwise criterion for `conjT t = permT σ h t'`,
-  the workhorse for proving reality and Hermiticity conditions.
+- `ConjTensorSpecies.conjT_eq_permT_iff` is the componentwise criterion for
+  `conjT t = permT σ h t'`, the workhorse for proving reality and Hermiticity conditions.
 - `ConjTensorSpecies.slotConj` is the single-slot conjugate-linear isomorphism `V c ≃ₛₗ V (bar c)`.
 - `ConjTensorSpecies.IsHermitian` is the structural conjugate-transpose condition on a metric slot.
 
@@ -74,8 +74,9 @@ open Module TensorSpecies TensorSpecies.Tensor
 
 ## A. The conjugation structure
 
-A `ConjTensorSpecies` bundles a `TensorSpecies` (`extends`) with the conjugation data. Conjugation is
-defined at the basis level, where it is "`star` the components" (§B). Four of the new fields are
+A `ConjTensorSpecies` bundles a `TensorSpecies` (`extends`) with the conjugation data.
+Conjugation is defined at the basis level, where it is "`star` the components" (§B). Four of the
+new fields are
 bookkeeping on colours and index sets, trivial to supply per instance: `bar` (the conjugate-colour
 involution), `bar_involution`, `bar_tau` (it commutes with `τ`), and `barIdx_eq` (a colour and its
 conjugate share basis labels). The one substantive field is `conj_contrComm`, that the contraction
