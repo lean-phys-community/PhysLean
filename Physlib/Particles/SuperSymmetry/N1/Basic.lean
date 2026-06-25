@@ -39,17 +39,18 @@ configuration.
 The index data is packaged as a `ConjTensorSpecies` over `ChiralColor`. The chiral
 colours carry the standard carrier `ι → ℂ`; the anti colours carry its conjugate
 module `ConjModule (ι → ℂ)`, where `i` acts as `−i`, so anti-holomorphy is genuine
-carrier data and complex conjugation is an honest linear map between the two. Each
-carries the trivial `G`-representation, so `G` acts as the identity and the chiral
-scalars hold no `G`-charge. Contracting a colour against its `τ`-dual is the dot
+carrier data. Complex conjugation is then the conjugate-linear identity
+`conjEquiv : (ι → ℂ) ≃ₛₗ[starRingEnd ℂ] ConjModule (ι → ℂ)`: the anti basis is its transport
+`Basis.conj piBasis`, and the species' holomorphy flip (`slotConj`, hence `conjT`) is built from it. Each
+colour carries the trivial representation over the trivial group `Unit`, so the chiral scalars hold no
+charge. Contracting a colour against its `τ`-dual is the dot
 product of their coordinate vectors in that colour's basis, which on basis labels is
 the Kronecker `δ_{IJ}`. The `metric` and `unit` fields are both the δ "cap"
 `∑_I b_I ⊗ b_I` whose components are `δ^{IJ}`. Supplying this instance equips the
 chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, and so on).
 
-Conjugation is intrinsic species data, bundled into the same object: `chiralTensor`
-is a `ConjTensorSpecies`, a `TensorSpecies` extended with the conjugate-colour
-involution `ChiralColor.bar` and its coherence. The framework then supplies the
+Conjugation is intrinsic species data: a `ConjTensorSpecies` is a `TensorSpecies`
+extended with the conjugate-colour involution `ChiralColor.bar` and its coherence. The framework then supplies the
 map `conjT` (conjugate the components and flip each index's holomorphy by `bar`)
 and its laws. `bar` is the holomorphy dual, distinct from and commuting with the
 variance dual `τ`; it is not used in contraction.
@@ -105,7 +106,6 @@ through it to `α → ℂ` and applies Mathlib's function-space calculus lemmas 
 abbrev ChiralScalarConfiguration (ChiralIndexingType : Type*) := ChiralIndexingType → ℂ
 
 variable (ι : Type) [Fintype ι] [DecidableEq ι]
-variable (G : Type) [Group G]
 
 /-!
 ## B. The chiral colours and the dual involution
@@ -145,15 +145,15 @@ def bar : ChiralColor → ChiralColor
 
 end ChiralColor
 
-variable {ι G}
+variable {ι}
 
 /-!
 ## C. Carrier, representation, and basis
 
-A `TensorSpecies` takes, for each colour `c`, a carrier module, a `G`-representation on it, and a
+A `TensorSpecies` takes, for each colour `c`, a carrier module, a group representation on it, and a
 basis. The carrier depends on holomorphy: chiral colours carry the standard `ι → ℂ`, anti colours
 its conjugate module `ConjModule (ι → ℂ)` (so anti-holomorphy is genuine carrier data). The
-`G`-representation is trivial (no `G`-charge) for every colour; the basis is the indicator basis
+representation is trivial over the trivial group `Unit` (no charge) for every colour; the basis is the indicator basis
 `piBasis` on the chiral carrier and its conjugate `Basis.conj piBasis` on the anti carrier. Variance
 (`τ`) preserves holomorphy, so it never leaves a colour's carrier; conjugation (`bar`) flips
 holomorphy and so maps a carrier to its conjugate.
@@ -176,10 +176,10 @@ noncomputable instance instModuleChiralModule : ∀ c, Module ℂ (chiralModule 
   | .chiralUp | .chiralDown => inferInstance
   | .antiUp | .antiDown => inferInstance
 
-/-- The `G`-representation on each colour, taken trivial: the chiral scalars carry no
-`G`-charge in this sector. -/
-def chiralRep : (c : ChiralColor) → Representation ℂ G (chiralModule (ι := ι) c) :=
-  fun _ => Representation.trivial ℂ G _
+/-- The representation on each colour, taken trivial over the trivial group `Unit`: the chiral
+scalars carry no charge in this sector. -/
+def chiralRep : (c : ChiralColor) → Representation ℂ Unit (chiralModule (ι := ι) c) :=
+  fun _ => Representation.trivial ℂ Unit _
 
 /-- The standard basis of the chiral carrier `ι → ℂ` (the indicator functions). -/
 def piBasis : Basis ι ℂ (ι → ℂ) := Pi.basisFun ℂ ι
@@ -404,8 +404,8 @@ The conjugation flips holomorphy (`ChiralColor.bar`) while preserving variance; 
 is shared, so `barIdx_eq` is `rfl`, and `conj_contrComm` is `star δ = δ`. Instantiating
 `ConjTensorSpecies` this way gives the chiral sector both the framework's generic tensor API and
 its conjugation API (`conjT` and its laws) on one object. -/
-def chiralTensor : ConjTensorSpecies ℂ ChiralColor G (chiralModule (ι := ι)) (fun _ => ι)
-    (chiralRep (ι := ι) (G := G)) (chiralBasis (ι := ι)) where
+def chiralTensor : ConjTensorSpecies ℂ ChiralColor Unit (chiralModule (ι := ι)) (fun _ => ι)
+    (chiralRep (ι := ι)) (chiralBasis (ι := ι)) where
   τ := ChiralColor.tau
   τ_involution c := by cases c <;> rfl
   -- The δ data at each colour's own basis: `piBasis` on the chiral carrier, `Basis.conj piBasis`
@@ -464,6 +464,13 @@ def chiralTensor : ConjTensorSpecies ℂ ChiralColor G (chiralModule (ι := ι))
 /-!
 ## F. Conjugation
 
+Reality is a physical input the bare species cannot express: that the anti-chiral fields are the
+complex conjugates of the chiral ones, that the Kähler metric is Hermitian, that the F-term
+potential is real. Each is a statement that some quantity equals its own conjugate, so it can only
+be phrased once conjugation is available. This section exposes that operation for the two shapes the
+sector actually conjugates — the scalar `W` and the holomorphic covector `D_I W` — and certifies on
+components that it is honest complex conjugation.
+
 Conjugation is bundled into `chiralTensor` itself (§E): as a `ConjTensorSpecies` it carries `bar`
 beside `τ`, and the framework supplies the conjugation map `conjT` and its laws (`conjT_smul`,
 `conjT_conjT`, `conjT_contrT`, `conjT_eq_permT_iff`) once, abstractly, against any
@@ -479,50 +486,50 @@ section Conjugation
 open TensorSpecies TensorSpecies.Tensor ConjTensorSpecies ChiralColor
 
 /-!
-The following normalize the output of `(chiralTensor (ι := ι) (G := G)).conjT` back to the
+The following normalize the output of `(chiralTensor (ι := ι)).conjT` back to the
 canonical colour lists for scalar and anti-holomorphic covector tensors respectively.
 
 -/
 
 /-- Conjugation of a scalar tensor, normalized back to the scalar colour list `![]`. -/
-def conjScalar (t : (chiralTensor (ι := ι) (G := G)).Tensor ![]) :
-    (chiralTensor (ι := ι) (G := G)).Tensor ![] :=
+def conjScalar (t : (chiralTensor (ι := ι)).Tensor ![]) :
+    (chiralTensor (ι := ι)).Tensor ![] :=
   permT id ⟨Function.bijective_id, fun i => by fin_cases i⟩
-    ((chiralTensor (ι := ι) (G := G)).conjT t)
+    ((chiralTensor (ι := ι)).conjT t)
 
 /-- Conjugation of a holomorphic covector, normalized to the anti-holomorphic covector colour
 list `![antiDown]`. -/
 def conjChiralCovector
-    (t : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) :
-    (chiralTensor (ι := ι) (G := G)).Tensor ![antiDown] :=
+    (t : (chiralTensor (ι := ι)).Tensor ![chiralDown]) :
+    (chiralTensor (ι := ι)).Tensor ![antiDown] :=
   permT ![0] ⟨by decide, fun i => by fin_cases i; rfl⟩
-    ((chiralTensor (ι := ι) (G := G)).conjT t)
+    ((chiralTensor (ι := ι)).conjT t)
 
 /-- For scalar tensors, `toField` of the normalized tensor conjugate is the complex conjugate of
 `toField`. -/
-theorem toField_conjScalar (t : (chiralTensor (ι := ι) (G := G)).Tensor ![]) :
+lemma toField_conjScalar (t : (chiralTensor (ι := ι)).Tensor ![]) :
     (conjScalar t).toField = star t.toField := by
   rw [conjScalar, toField_permT]
   rw [toField_eq_repr, toField_eq_repr]
-  change componentMap (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies)
-      ((chiralTensor (ι := ι) (G := G)).bar ∘ ![]) ((chiralTensor (ι := ι) (G := G)).conjT t) (fun j => Fin.elim0 j) =
-    star ((basis (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies) ![]).repr t (fun j => Fin.elim0 j))
-  rw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι) (G := G))]
+  change componentMap (S := (chiralTensor (ι := ι)).toTensorSpecies)
+      ((chiralTensor (ι := ι)).bar ∘ ![]) ((chiralTensor (ι := ι)).conjT t) (fun j => Fin.elim0 j) =
+    star ((basis (S := (chiralTensor (ι := ι)).toTensorSpecies) ![]).repr t (fun j => Fin.elim0 j))
+  rw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι))]
   rfl
 
 /-- Component formula for the holomorphic covector conjugate: the `![I]` basis component of
 `conjChiralCovector t` is the complex conjugate of the `![I]` component of `t`. -/
-theorem repr_conjChiralCovector
-    (t : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) (I : ι) :
-    (basis (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies) ![antiDown]).repr
+lemma repr_conjChiralCovector
+    (t : (chiralTensor (ι := ι)).Tensor ![chiralDown]) (I : ι) :
+    (basis (S := (chiralTensor (ι := ι)).toTensorSpecies) ![antiDown]).repr
         (conjChiralCovector t) ![I] =
-      star ((basis (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies) ![chiralDown]).repr t ![I]) := by
+      star ((basis (S := (chiralTensor (ι := ι)).toTensorSpecies) ![chiralDown]).repr t ![I]) := by
   rw [conjChiralCovector, permT_basis_repr_symm_apply]
-  change componentMap (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies)
-      ((chiralTensor (ι := ι) (G := G)).bar ∘ ![chiralDown]) ((chiralTensor (ι := ι) (G := G)).conjT t) _ = _
-  rw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι) (G := G))]
+  change componentMap (S := (chiralTensor (ι := ι)).toTensorSpecies)
+      ((chiralTensor (ι := ι)).bar ∘ ![chiralDown]) ((chiralTensor (ι := ι)).conjT t) _ = _
+  rw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι))]
   apply congrArg star
-  apply congrArg (fun idx => componentMap (S := (chiralTensor (ι := ι) (G := G)).toTensorSpecies)
+  apply congrArg (fun idx => componentMap (S := (chiralTensor (ι := ι)).toTensorSpecies)
     ![chiralDown] t idx)
   funext i
   fin_cases i
@@ -530,19 +537,19 @@ theorem repr_conjChiralCovector
 
 /-- Conjugation of a holomorphic covector is additive. -/
 @[simp]
-theorem conjChiralCovector_add
-    (t₁ t₂ : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) :
+lemma conjChiralCovector_add
+    (t₁ t₂ : (chiralTensor (ι := ι)).Tensor ![chiralDown]) :
     conjChiralCovector (t₁ + t₂) = conjChiralCovector t₁ + conjChiralCovector t₂ := by
-  rw [conjChiralCovector, (chiralTensor (ι := ι) (G := G)).conjT_add]
+  rw [conjChiralCovector, (chiralTensor (ι := ι)).conjT_add]
   simp [conjChiralCovector, map_add]
 
 /-- Conjugation of a holomorphic covector is conjugate-linear: a scalar `r` pulls out as
 `star r`. -/
 @[simp]
-theorem conjChiralCovector_smul (r : ℂ)
-    (t : (chiralTensor (ι := ι) (G := G)).Tensor ![chiralDown]) :
+lemma conjChiralCovector_smul (r : ℂ)
+    (t : (chiralTensor (ι := ι)).Tensor ![chiralDown]) :
     conjChiralCovector (r • t) = star r • conjChiralCovector t := by
-  rw [conjChiralCovector, (chiralTensor (ι := ι) (G := G)).conjT_smul]
+  rw [conjChiralCovector, (chiralTensor (ι := ι)).conjT_smul]
   simp [conjChiralCovector]
 
 end Conjugation

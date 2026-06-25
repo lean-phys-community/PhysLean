@@ -36,6 +36,13 @@ coefficients survive `star` (`conj_contrComm`), which together make conjugation 
 contraction. `conjT` is then `conj`-semilinear, involutive, and commutes with contraction; the
 last makes reality and Hermiticity compatible with raising and lowering indices.
 
+At the single-index level, `slotConj : V c ≃ₛₗ V (bar c)` realises this conjugation: it reads a
+vector's coordinates, conjugates them with `ConjModule.starFinsupp`, and re-seats them at the
+conjugate colour. It rests on the conjugate module `ConjModule` (`Physlib.Mathematics.ConjModule`),
+the same vectors with the scalar action twisted by conjugation (`i` acts as `−i`). Equipping the
+conjugate colours with such conjugate-module carriers is what makes a metric `V c ⊗ V (bar c) → k`
+genuinely bilinear and `IsHermitian` an honest conjugate-transpose.
+
 ## ii. Key results
 
 - `ConjTensorSpecies` is a tensor species bundled with its conjugation.
@@ -82,7 +89,8 @@ structure ConjTensorSpecies (k : Type) [CommRing k] [StarRing k] (C : Type) (G :
     (basisIdx : C → Type) [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
     (rep : (c : C) → Representation k G (V c)) (b : (c : C) → Basis (basisIdx c) k (V c))
     extends TensorSpecies k C G V basisIdx rep b where
-  /-- The conjugate colour: flips holomorphy, preserves variance. -/
+  /-- The conjugate colour: the colour an index transforms in under complex conjugation; preserves
+  variance (commutes with `τ`). -/
   bar : C → C
   /-- `bar` is an involution. -/
   bar_involution : Function.Involutive bar
@@ -323,11 +331,11 @@ basis coordinates of `b c i` are the indicator at `i` and `star` fixes `0` and `
 
 ## F. Hermitian pairings
 
-A metric slot pairs a colour `c` with its conjugate `bar c` (e.g. a chiral index with the
-anti-chiral one). `IsHermitian` is the structural form of `g_{IJ̄} = conj g_{JĪ}`: conjugating and
-swapping the two slots through `slotConj` returns `g`'s `star`. Because `V c` and `V (bar c)` are
-genuinely different modules this is the honest conjugate-transpose, not a bare `g = g.flip`. The
-seam is locked here as `IsHermitian`; the Kähler-metric layer instantiates it for the δ pairing.
+A metric slot pairs a colour `c` with its conjugate `bar c`. `IsHermitian` is the structural form of
+`g_{IJ̄} = conj g_{JĪ}`: conjugating and swapping the two slots through `slotConj` returns `g`'s
+`star`. Because `V c` and `V (bar c)` are genuinely different modules this is the honest
+conjugate-transpose, not a bare `g = g.flip`. The seam is locked here as `IsHermitian`; a downstream
+metric layer instantiates it for a concrete pairing.
 
 -/
 
