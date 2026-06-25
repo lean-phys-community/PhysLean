@@ -136,31 +136,33 @@ lemma inv_charge (d : Dimension) : d⁻¹.charge = -d.charge := rfl
 @[simp]
 lemma inv_temperature (d : Dimension) : d⁻¹.temperature = -d.temperature := rfl
 
-@[simp]
-lemma div_length (d1 d2 : Dimension) : (d1 / d2).length = d1.length - d2.length := by
-  rw [div_eq_mul_inv, length_mul, inv_length]
+/-- A dimension exponent that is additive over multiplication and negates inverses
+respects division: `f (d₁ / d₂) = f d₁ - f d₂`. -/
+lemma div_proj (f : Dimension → ℚ) (hmul : ∀ a b, f (a * b) = f a + f b)
+    (hinv : ∀ a, f a⁻¹ = - f a) (d1 d2 : Dimension) : f (d1 / d2) = f d1 - f d2 := by
+  rw [div_eq_mul_inv, hmul, hinv]
   ring
 
 @[simp]
-lemma div_time (d1 d2 : Dimension) : (d1 / d2).time = d1.time - d2.time := by
-  rw [div_eq_mul_inv, time_mul, inv_time]
-  ring
+lemma div_length (d1 d2 : Dimension) : (d1 / d2).length = d1.length - d2.length :=
+  div_proj _ length_mul inv_length d1 d2
 
 @[simp]
-lemma div_mass (d1 d2 : Dimension) : (d1 / d2).mass = d1.mass - d2.mass := by
-  rw [div_eq_mul_inv, mass_mul, inv_mass]
-  ring
+lemma div_time (d1 d2 : Dimension) : (d1 / d2).time = d1.time - d2.time :=
+  div_proj _ time_mul inv_time d1 d2
 
 @[simp]
-lemma div_charge (d1 d2 : Dimension) : (d1 / d2).charge = d1.charge - d2.charge := by
-  rw [div_eq_mul_inv, charge_mul, inv_charge]
-  ring
+lemma div_mass (d1 d2 : Dimension) : (d1 / d2).mass = d1.mass - d2.mass :=
+  div_proj _ mass_mul inv_mass d1 d2
+
+@[simp]
+lemma div_charge (d1 d2 : Dimension) : (d1 / d2).charge = d1.charge - d2.charge :=
+  div_proj _ charge_mul inv_charge d1 d2
 
 @[simp]
 lemma div_temperature (d1 d2 : Dimension) :
-    (d1 / d2).temperature = d1.temperature - d2.temperature := by
-  rw [div_eq_mul_inv, temperature_mul, inv_temperature]
-  ring
+    (d1 / d2).temperature = d1.temperature - d2.temperature :=
+  div_proj _ temperature_mul inv_temperature d1 d2
 
 /-- A dimension exponent that is additive over multiplication and vanishes at `1`
 respects powers: `f (d ^ n) = n • f d`. -/
