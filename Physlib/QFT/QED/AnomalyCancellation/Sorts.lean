@@ -46,7 +46,6 @@ lemma sort_apply {n : ℕ} (S : (PureU1 n).Charges) (j : Fin n) :
     sort S j = S ((Tuple.sort S) j) := by
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma sort_zero {n : ℕ} (S : (PureU1 n).Charges) (hS : sort S = 0) : S = 0 := by
   funext i
   have hj : ∀ j, sort S j = 0 := by

@@ -1255,7 +1255,6 @@ We show that the divergence of `x ↦ ‖x‖ ^ (- d) • x` is equal to a multi
 at `0`.
 
 -/
-set_option backward.isDefEq.respectTransparency false in
 /-- Auxiliary lemma with dimension defined as d.succ to handle `homeomorphUnitSphereProd`.
 The dimension correct version is declared in `distDiv_inv_pow_eq_dim`. -/
 private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :

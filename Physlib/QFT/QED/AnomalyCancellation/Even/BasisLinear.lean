@@ -782,7 +782,6 @@ lemma swap!_as_add {S S' : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     accCubeTriLinSymm (P g) (P g) (basis!AsCharges j)
     = g (j.succ) ^ 2 - g (j.castSucc) ^ 2 := by
@@ -799,7 +798,6 @@ lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     simp only [mul_zero, add_zero]
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma P_P!_P!_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
     accCubeTriLinSymm (P! g) (P! g) (basisAsCharges j)
     = (P! g (evenFst j))^2 - (P! g (evenSnd j))^2 := by
