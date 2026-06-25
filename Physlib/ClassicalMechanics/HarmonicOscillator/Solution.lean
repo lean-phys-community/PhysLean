@@ -421,7 +421,7 @@ lemma trajectory_velocity (IC : InitialConditions) : ∂ₜ (IC.trajectory S) =
   rw [fderiv_cos (by fun_prop), fderiv_sin (by fun_prop),
     fderiv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [fderiv_fun_const, Pi.zero_apply, smul_zero, add_zero, neg_smul,
-    ContinuousLinearMap.neg_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply, fderiv_val,
+    _root_.neg_apply, FunLike.coe_smul, Pi.smul_apply, fderiv_val,
     smul_eq_mul, mul_one]
   field_simp
   ring_nf
@@ -442,12 +442,12 @@ lemma trajectory_acceleration (IC : InitialConditions) : ∂ₜ (∂ₜ (IC.traj
   rw [trajectory_velocity, Time.deriv, fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop), fderiv_fun_const_smul (by fun_prop),
     fderiv_smul_const (by fun_prop)]
-  simp only [neg_smul, ContinuousLinearMap.add_apply, ContinuousLinearMap.smulRight_apply]
+  simp only [neg_smul, add_apply, ContinuousLinearMap.smulRight_apply]
   rw [fderiv_cos (by fun_prop), fderiv_sin (by fun_prop),
     fderiv_fun_mul (by fun_prop) (by fun_prop)]
   field_simp [smul_smul]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, smul_zero, add_zero, ContinuousLinearMap.neg_apply,
-    ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
+  simp only [fderiv_fun_const, Pi.ofNat_apply, smul_zero, add_zero, _root_.neg_apply,
+    FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
     smul_eq_mul, mul_one, neg_smul]
   ring_nf
   module

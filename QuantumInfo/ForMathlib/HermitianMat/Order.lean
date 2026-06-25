@@ -526,7 +526,7 @@ open MatrixOrder in
 theorem eigenvalues_le_imp_le_smul_one [DecidableEq n] (A : HermitianMat n ℂ) (M : ℝ)
     (h : ∀ i, A.H.eigenvalues i ≤ M) :
     A ≤ M • (1 : HermitianMat n ℂ) := by
-  simpa [HermitianMat.mat_one] using
+  exact
     (Matrix.PosSemidef.le_smul_one_of_eigenvalues_iff A.H M).mp h
 
 --TODO: Positivity extensions for traceLeft, traceRight, rpow, nat powers, inverse function,

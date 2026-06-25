@@ -112,7 +112,7 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
     let x₂ := f₂ x₀
   -- x₂ ≠ 0 because `fromL2 (toL2 (f x₀)) = f x₀`
     have hx2 : x₂ ≠ 0 := by
-      intro h; apply hx0; simpa [fromL2_toL2, LinearMap.map_zero] using congrArg (fromL2 ℝ) h
+      intro h; apply hx0; exact congrArg (fromL2 ℝ) h
   -- continuity of f₂ at x₀
     have f₂_cont : Continuous f₂ := (toL2 ℝ).continuous.comp hf
     have hcont₂₀ : ∀ x, ContinuousAt f₂ x := by
@@ -178,8 +178,7 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
             apply div_pos hδ₂_pos
             linarith
           have h_rIn_lt_rOut : rIn < rOut := by
-              have : (1 : ℝ) / 4 < 1 / 2 := by norm_num
-              simpa [rIn, rOut] using mul_lt_mul_of_pos_left this hδ₂_pos
+              exact mul_lt_mul_of_pos_left (by grind) hδ₂_pos
           let φ1 : ContDiffBump x₀ := ⟨rIn, rOut, h_rIn_pos, h_rIn_lt_rOut⟩
           let φ : Y → ℝ := φ1.toFun
         -- Show the five required properties.

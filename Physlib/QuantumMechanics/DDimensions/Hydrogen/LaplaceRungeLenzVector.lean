@@ -35,6 +35,8 @@ open ContinuousLinearMap SchwartzMap
 
 variable (H : HydrogenAtom)
 
+attribute [local instance 100] LieRing.ofAssociativeRing
+
 /-- The (regularized) Laplace-Runge-Lenz vector operator for the `d`-dimensional hydrogen atom,
   `𝐀(ε)ᵢ ≔ ½(𝐩ⱼ𝐋ᵢⱼ + 𝐋ᵢⱼ𝐩ⱼ) - mk·𝐫(ε)⁻¹𝐱ᵢ`. -/
 def lrlOperator (ε : ℝˣ) (i : Fin H.d) : 𝓢(Space H.d, ℂ) →L[ℂ] 𝓢(Space H.d, ℂ) :=
@@ -83,9 +85,9 @@ lemma lrlOperator_eq'' (ε : ℝˣ) (i : Fin H.d) : H.lrlOperator ε i =
   simp only [lrlOperator, smul_add, smul_sub, smul_smul]
   ring_nf
   ext
-  simp only [one_smul, coe_sub', coe_smul', Pi.sub_apply, ContinuousLinearMap.add_apply,
-    Pi.smul_apply, SchwartzMap.sub_apply, SchwartzMap.add_apply, SchwartzMap.smul_apply, real_smul,
-    ofReal_mul, ofReal_ofNat]
+  simp only [one_smul, one_div, sub_apply, add_apply, smul_apply, comp_apply, radiusRegPowCLM_apply,
+    positionCLM_apply, real_smul, ofReal_mul, ofReal_ofNat, momentumCLM_apply, neg_mul, smul_eq_mul,
+    mul_neg, sub_neg_eq_add]
   ring
 
 /-
@@ -281,8 +283,7 @@ lemma lrl_commutation_lrl (ε : ℝˣ) (i j : Fin H.d) :
       momentum_commutation_momentum, smul_zero, add_zero, ← Complex.coe_smul, ofReal_mul]
     subst c₁ c₂
     ext
-    simp only [coe_sub', coe_smul', Pi.sub_apply, ContinuousLinearMap.add_apply, Pi.smul_apply,
-      SchwartzMap.sub_apply, SchwartzMap.add_apply, SchwartzMap.smul_apply, smul_eq_mul]
+    simp only [sub_apply, add_apply, smul_apply, smul_eq_mul, smul_add]
     ring
   rw [positionCompMomentumSqr_comm]
   rw [positionDotMomentumCompMomentum_comm]
@@ -515,8 +516,8 @@ lemma lrlOperatorSqr_eq (ε : ℝˣ) : H.lrlOperator ε ⬝ᵥ H.lrlOperator ε 
     hamiltonianRegCLM_eq, ofReal_inv, ofReal_ofNat]
   ring_nf
   ext
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, SchwartzMap.add_apply,
-    SchwartzMap.smul_apply, Function.comp_apply, coe_comp', coe_id', smul_eq_mul, ofReal_add,
+  simp only [add_apply, _root_.smul_apply, _root_.add_apply,
+    _root_.smul_apply, Function.comp_apply, coe_comp, coe_id', smul_eq_mul, ofReal_add,
     ofReal_neg, ofReal_one, ofReal_natCast]
   grind [I_sq, H.m_ne_zero, mul_inv_cancel₀, ofReal_eq_zero]
 

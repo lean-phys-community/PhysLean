@@ -79,9 +79,9 @@ lemma leftMetricVal_expand_tmul : leftMetricVal =
     - leftBasis 0 ⊗ₜ[ℂ] leftBasis 1 + leftBasis 1 ⊗ₜ[ℂ] leftBasis 0 := by
   simp only [leftMetricVal, Fin.isValue]
   rw [leftLeftToMatrix_symm_expand_tmul]
-  simp only [metricRaw, neg_apply, of_apply, cons_val', empty_val', cons_val_fin_one,
+  simp only [metricRaw, Matrix.neg_apply, of_apply, cons_val', empty_val', cons_val_fin_one,
     Fin.sum_univ_two, Fin.isValue, cons_val_zero, cons_val_one, neg_zero, zero_smul, zero_add,
-    neg_neg, one_smul, add_zero]
+    neg_neg, one_smul, add_zero, add_left_inj]
   module
 
 lemma leftMetricVal_expand_tmul' : leftMetricVal = leftBasis 1 ⊗ₜ[ℂ] leftBasis 0
@@ -169,9 +169,9 @@ lemma rightMetricVal_expand_tmul : rightMetricVal =
     - rightBasis 0 ⊗ₜ[ℂ] rightBasis 1 + rightBasis 1 ⊗ₜ[ℂ] rightBasis 0 := by
   simp only [rightMetricVal, Fin.isValue]
   rw [rightRightToMatrix_symm_expand_tmul]
-  simp only [metricRaw, neg_apply, of_apply, cons_val', empty_val', cons_val_fin_one,
+  simp only [metricRaw, Matrix.neg_apply, of_apply, cons_val', empty_val', cons_val_fin_one,
     Fin.sum_univ_two, Fin.isValue, cons_val_zero, cons_val_one, neg_zero, zero_smul, zero_add,
-    neg_neg, one_smul, add_zero]
+    neg_neg, one_smul, add_zero, add_left_inj]
   module
 
 lemma rightMetricVal_expand_tmul' : rightMetricVal = rightBasis 1 ⊗ₜ[ℂ] rightBasis 0

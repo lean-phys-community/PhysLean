@@ -297,7 +297,7 @@ private lemma liebExtension_bridge [Nonempty d]
     have h_rewrite : IsSelfAdjoint (Φ K.mat) := by
       exact Φ_isSelfAdjoint K
     exact h_rewrite
-  convert h_joint_concave (Φ_mem_pdSet σ₁ hσ₁) (Φ_mem_pdSet σ₂ hσ₂)
+  convert! h_joint_concave (Φ_mem_pdSet σ₁ hσ₁) (Φ_mem_pdSet σ₂ hσ₂)
     (Φ_mem_pdSet Z₁ hZ₁) (Φ_mem_pdSet Z₂ hZ₂) hθ₀ hθ₁ using 1
   · rw [h_rewrite σ₁ Z₁ (by
       constructor

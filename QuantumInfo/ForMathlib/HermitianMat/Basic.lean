@@ -58,7 +58,7 @@ theorem H (A : HermitianMat n α) : A.mat.IsHermitian :=
 
 instance instFun : FunLike (HermitianMat n α) n (n → α) where
   coe M := (M : Matrix n n α)
-  coe_injective' _ _ h := HermitianMat.ext h
+  coe_injective _ _ h := HermitianMat.ext h
 
 @[simp]
 theorem mat_apply {A : HermitianMat n α} {i j : n} : A.mat i j = A i j := by
@@ -500,7 +500,7 @@ theorem ker_orthogonal_eq_support : A.kerᗮ = A.support := by
 @[simp]
 theorem support_orthogonal_eq_range : A.supportᗮ = A.ker := by
   rw [ker, support]
-  convert ContinuousLinearMap.orthogonal_range A.lin
+  convert! ContinuousLinearMap.orthogonal_range A.lin
   simp
 
 end eigenspace

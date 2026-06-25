@@ -80,7 +80,6 @@ def powOneMul : 𝓢(ℝ, 𝕜) →L[𝕜] 𝓢(ℝ, 𝕜) := by
     simp only [smul_apply, smul_eq_mul, RingHom.id_apply]
     ring
   · intro ψ
-    simp only
     apply ContDiff.mul
     · change ContDiff ℝ _ RCLike.ofRealCLM
       fun_prop

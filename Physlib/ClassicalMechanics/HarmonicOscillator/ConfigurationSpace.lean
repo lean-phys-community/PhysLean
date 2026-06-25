@@ -230,10 +230,8 @@ noncomputable def valHomeomorphism : ConfigurationSpace ≃ₜ ℝ where
   right_inv := by
     intro t
     rfl
-  continuous_toFun := by
-    simpa [toRealCLM, toRealLM] using toRealCLM.continuous
-  continuous_invFun := by
-    simpa [fromRealCLM, fromRealLM] using fromRealCLM.continuous
+  continuous_toFun := toRealCLM.continuous
+  continuous_invFun := fromRealCLM.continuous
 
 /-- The structure of a charted space on `ConfigurationSpace`. -/
 noncomputable instance : ChartedSpace ℝ ConfigurationSpace where
@@ -260,7 +258,7 @@ instance : FiniteDimensional ℝ ConfigurationSpace := by
   refine FiniteDimensional.of_injective toRealLM ?_
   intro x y h
   ext
-  simpa using h
+  exact h
 
 instance : CompleteSpace ConfigurationSpace := by
   classical

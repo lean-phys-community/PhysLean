@@ -616,7 +616,8 @@ lemma join_singleton_getDual?_right {φs : List 𝓕.FieldOp}
 lemma exists_contraction_pair_of_card_ge_zero {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length) (h : 0 < φsΛ.1.card) :
     ∃ a, a ∈ φsΛ.1 := by
-  simpa using h
+  simp_all only [Finset.card_pos]
+  exact h
 
 set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 400000 in
