@@ -22,7 +22,6 @@ QuantumInfo/Entropy/VonNeumann.lean
 QuantumInfo/ForMathlib/ComplexLaplaceTransform.lean
 QuantumInfo/ForMathlib/ContinuousSup.lean
 QuantumInfo/ForMathlib/Filter.lean
-QuantumInfo/ForMathlib/HayataGroup/TraceInequality/BlockDiagonal.lean
 QuantumInfo/ForMathlib/HayataGroup/TraceInequality/GeneralizedPerspectiveFunction.lean
 QuantumInfo/ForMathlib/HayataGroup/TraceInequality/HilbertSchmidtOperatorSpace.lean
 QuantumInfo/ForMathlib/HayataGroup/TraceInequality/JensenOperatorInequality.lean
