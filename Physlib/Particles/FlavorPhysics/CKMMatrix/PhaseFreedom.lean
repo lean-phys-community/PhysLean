@@ -36,7 +36,8 @@ lemma cexp_phase_mul_eq_norm {z : ℂ} {p q : ℝ} (h : p + q = - arg z) :
   conv_lhs => rw [← norm_mul_exp_arg_mul_I z]
   rw [mul_left_comm, ← exp_add]
   rw [show (p : ℂ) * I + q * I + arg z * I = 0 from by
-    have hc : (p : ℂ) + q + arg z = 0 := by exact_mod_cast (show p + q + arg z = (0 : ℝ) by linarith)
+    have hc : (p : ℂ) + q + arg z = 0 := by
+      exact_mod_cast (show p + q + arg z = (0 : ℝ) by linarith)
     linear_combination hc * I, exp_zero, mul_one]
 
 lemma shift_ud_phase_zero (V : CKMMatrix) (h1 : u + d = - arg [V]ud) :
