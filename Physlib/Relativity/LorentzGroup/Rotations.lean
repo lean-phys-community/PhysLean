@@ -39,9 +39,7 @@ def Rotations (d) : Subgroup (LorentzGroup d) where
       rw [h1.1]
     · exact isProper_mul h1.2 h2.2
   one_mem' := by
-    constructor
-    · simp
-    · simp
+    constructor <;> simp
   inv_mem' {Λ} h := by
     constructor
     · simp [inv_eq_dual, minkowskiMatrix.dual_apply, h.1]
