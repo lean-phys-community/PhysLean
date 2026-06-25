@@ -78,8 +78,6 @@ is real. The species can express none of these alone.
 - B. The chiral colours and the dual involution
 - C. Carrier, representation, and basis
 - D. The δ structure on based finite modules
-  - D.1. The cap
-  - D.2. The δ pairing across two based modules
 - E. The chiral-index tensor species
 - F. Conjugation
 
@@ -202,11 +200,10 @@ Kähler metric `g_{IJ̄}`, which is built downstream on top of this sector. A co
 colour with its variance dual `τ c`, whose carriers are *distinct* (a module and its dual, or their
 conjugates) but share the index `ι`, so the pairing is the dot product *across two based modules*
 `(M, b)` and `(N, b')`, `(x, y) ↦ ∑_I (b x)_I (b' y)_I`, with cap `∑_I b_I ⊗ b'_I ∈ M ⊗ N`. The
-single-module case `b = b'` (§D.1) is what `metric c` uses, since its two slots are the same colour;
-the genuinely two-module pairing (§D.2) is what `contr` and `unit` use. The δ data stays within one
-holomorphy and needs no conjugation; conjugation is carried instead by the tensor `conjT` (§F).
-
-### D.1. The cap
+single-colour cap `deltaCap` (`b = b'`) is what `metric c` uses, since its two slots are the same
+colour; the two-module pairing `deltaContr₂`/`deltaCap₂` is what `contr` and `unit` use. The δ data
+stays within one holomorphy and needs no conjugation; conjugation is carried instead by the tensor
+`conjT` (§F).
 
 -/
 
@@ -217,18 +214,6 @@ components in the basis `b` are `δⁱʲ`. It is an element of `M ⊗ M` (the in
 not a linear map, and serves as the `metric` field of the species (whose two slots share a
 colour). -/
 def deltaCap (b : Basis ι ℂ M) : M ⊗[ℂ] M := ∑ I, b I ⊗ₜ[ℂ] b I
-
-/-!
-### D.2. The δ pairing across two based modules
-
-A contraction pairs a colour with its variance dual `τ c`, whose carriers are *distinct* types —
-e.g. the holomorphic vectors `ι → ℂ` and the holomorphic covectors `Module.Dual ℂ (ι → ℂ)` — so the
-δ pairing runs between two based modules `(M, b)` and `(N, b')` sharing the index `ι`:
-`(x, y) ↦ ∑_I (b x)_I (b' y)_I`, with cap `∑_I b_I ⊗ b'_I ∈ M ⊗ N`. Setting `b = b'` recovers §D.1.
-This is the data of `contr` (the pairing `M ⊗ N → ℂ`) and `unit` (the cap), and the coherence laws
-the species demands of them, proved here once over abstract `(M, b)`, `(N, b')`.
-
--/
 
 variable {N : Type*} [AddCommGroup N] [Module ℂ N]
 
@@ -337,7 +322,7 @@ lemma deltaContr₂_metric (b : Basis ι ℂ M) (b' : Basis ι ℂ N) :
 pairing of a colour against its variance dual `τ c` (`V c ⊗ V (τ c) → ℂ`); `unit c` is the δ cap
 across those two carriers; `metric c` is the single-colour δ cap `∑_I b_I ⊗ b_I`. Each
 `TensorSpecies` coherence law reduces, by case analysis on the colour, to the corresponding abstract
-two-module δ lemma of §D.2. The conjugation flips holomorphy (`ChiralColor.bar`) while preserving
+two-module δ lemma of §D. The conjugation flips holomorphy (`ChiralColor.bar`) while preserving
 variance; every basis is indexed by `ι`, so `barIdx_eq` is `rfl`, and `conj_contrComm` is
 `star δ = δ`. Instantiating `ConjTensorSpecies` this way gives the chiral sector both the framework's
 generic tensor API and its conjugation API (`conjT` and its laws) on one object. -/
