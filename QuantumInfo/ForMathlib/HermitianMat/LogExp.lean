@@ -127,7 +127,7 @@ theorem log_one : (1 : HermitianMat d 𝕜).log = 0 := by
 theorem log_smul_of_pos (A : HermitianMat d 𝕜) (hx : x ≠ 0) :
     (x • A).log = Real.log x • A.supportProj + A.log := by
   ext1
-  convert A.H.log_smul_of_ne_zero hx
+  convert! A.H.log_smul_of_ne_zero hx
   simp [cfc, log, supportProj_eq_cfc]
 
 theorem log_smul {A : HermitianMat d 𝕜} {x : ℝ} (hx : x ≠ 0) [NonSingular A] :
@@ -143,7 +143,8 @@ theorem inv_antitone (hA : A.mat.PosDef) (h : A ≤ B) : B⁻¹ ≤ A⁻¹ := by
   obtain ⟨C, hC⟩ : ∃ C : Matrix d d 𝕜, B.mat - A.mat = C.conjTranspose * C := by
     classical
     apply CStarAlgebra.nonneg_iff_eq_star_mul_self.mp
-    simpa using h
+    simp_all only [sub_nonneg]
+    exact h
   -- Using the fact that $B = A + C^*C$, we can write $B^{-1}$ as $(A + C^*C)^{-1}$.
   have h_inv_posDef : (1 + C * A.mat⁻¹ * C.conjTranspose).PosDef := by
     exact Matrix.PosDef.one.add_posSemidef (hA.inv.posSemidef.mul_mul_conjTranspose_same C)
@@ -361,7 +362,7 @@ theorem logApprox_eq_log_add_error
     (x : HermitianMat d 𝕜) (hx : x.mat.PosDef) (T : ℝ) (hT : 0 < T) :
     logApprox x T = x.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) := by
   have h_logApprox : ∫ t in (0)..T, ((1 + t)⁻¹ • (1 : HermitianMat d 𝕜) - (x + t • 1)⁻¹) = x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) := by
-    convert logApprox_eq_cfc_scalar x hx T hT using 1;
+    convert! logApprox_eq_cfc_scalar x hx T hT using 1;
     apply cfc_congr_of_posDef hx;
     exact fun u hu => Eq.symm ( scalarLogApprox_eq u T hu.out hT );
   have h_cfc_add : x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) = x.cfc Real.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) := by
@@ -416,7 +417,7 @@ theorem log_mono (hA : A.mat.PosDef) (hAB : A ≤ B) : A.log ≤ B.log := by
   have hB : B.mat.PosDef := posDef_of_posDef_le hA hAB
   apply le_of_tendsto_of_tendsto (tendsto_logApprox hA) (tendsto_logApprox hB)
   rw [Filter.EventuallyLE, Filter.eventually_atTop]
-  exact ⟨1, fun T hT => by simpa using logApprox_mono hA hB hAB T ( zero_lt_one.trans_le hT )⟩
+  exact ⟨1, fun T hT => by exact logApprox_mono hA hB hAB T ( zero_lt_one.trans_le hT )⟩
 
 /-- Monotonicity of exp on commuting operators. -/
 theorem le_of_exp_commute (hAB₂ : A.exp ≤ B.exp) :
@@ -549,7 +550,7 @@ lemma integrable_inv_shift {A : HermitianMat d 𝕜} (hA : A.mat.PosDef) (b : �
   have h_inv : ∀ t : ℝ, 0 ≤ t → IsUnit (A + t • 1).mat := by
     intro t ht
     have h_pos_def : (A + t • 1).mat.PosDef := by
-      convert hA.add_posSemidef _ using 1
+      convert! hA.add_posSemidef _ using 1
       constructor <;> simp [*]
       · simp [ Matrix.IsHermitian];
       · simp [ Matrix.one_apply, Finsupp.sum ];
@@ -603,7 +604,7 @@ theorem logApprox_concave {n 𝕜 : Type*} [Fintype n] [DecidableEq n] [RCLike �
     · exact ( (h_integrable hx).1.smul a |> fun h => h.add ( (h_integrable hy).1.smul b ) ) |> fun h => h.mono_measure ( MeasureTheory.Measure.restrict_mono ( Set.Ioc_subset_Ioc le_rfl le_rfl ) le_rfl );
     · exact h_int2.1.mono_set (Set.Ioc_subset_Ioc le_rfl le_rfl)
     · filter_upwards [ MeasureTheory.ae_restrict_mem measurableSet_Ioc ] with t ht using h_integral_mono t <| Set.Ioc_subset_Icc_self ht;
-  convert h_integral_mono using 1;
+  convert! h_integral_mono using 1;
   rw [ intervalIntegral.integral_add ( by exact (h_integrable hx).smul a ) ( by exact (h_integrable hy).smul b ), intervalIntegral.integral_smul, intervalIntegral.integral_smul ]
   rw [logApprox, logApprox]
 

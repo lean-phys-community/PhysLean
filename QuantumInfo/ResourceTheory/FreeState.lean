@@ -372,7 +372,7 @@ noncomputable instance Inhabited_IsFree : Inhabited (IsFree (i := i)) :=
 
 theorem IsFree.of_unique [Unique (H i)] (ρ : MState (H i)) : ρ ∈ IsFree := by
   obtain ⟨σ, h₁, h₂⟩ := free_fullRank i
-  convert h₂
+  convert! h₂
   apply Subsingleton.allEq
 
 /--The set of free states is compact because it's a closed subset of a compact space. -/
@@ -387,7 +387,7 @@ theorem IsFree.mix {ι : Type*} [FreeStateTheory ι] {i : ι} {σ₁ σ₂ : MSt
   obtain ⟨m, hm₁, hm₂⟩ := free_convex (i := i) ⟨σ₁, hσ₁, rfl⟩ ⟨σ₂, hσ₂, rfl⟩ p.zero_le (1 - p).zero_le (by simp)
   simp [Mixable.mix, Mixable.mix_ab, MState.instMixable]
   simp at hm₂
-  convert ← hm₁
+  convert! ← hm₁
 
 end FreeStateTheory
 
@@ -462,14 +462,11 @@ theorem RelativeEntResource.Subadditive (ρ : MState (H i)) : Subadditive fun n 
     spacePow_add m n
   have ht := congrArg H ht₁
   refine le_trans (biInf_le (i := (σ₂ ⊗ᵣ σ₃).relabel (Equiv.cast ht)) _ ?_) ?_
-  · simpa [ht₁] using free_prod hσ₂f hσ₃f
+  · simp only [ht₁, relabel_cast_isFree]
+    exact free_prod hσ₂f hσ₃f
   · apply le_of_eq
     rw [← qRelEntropy_prodRelabel]
-    gcongr
-    · apply statePow_add
-    · rw [← eq_cast_iff_heq]
-      apply MState.relabel_cast
-      rw [spacePow_add]
+    exact qRelEntropy_heq_congr ht (statePow_add ρ m n) (by rw [MState.relabel_cast]; exact cast_heq _ _)
 
 noncomputable def RegularizedRelativeEntResource (ρ : MState (H i)) : ℝ≥0 :=
   ⟨(RelativeEntResource.Subadditive ρ).lim, by

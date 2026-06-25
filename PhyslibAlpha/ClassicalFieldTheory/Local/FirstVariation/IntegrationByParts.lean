@@ -155,13 +155,10 @@ lemma hasTermwiseIntegratedByPartsFormula_of_contDiff_coordDeriv
       apply ContDiff.mul
       · fun_prop
       · exact htd
-    simpa [g, h, eulerLagrangeTerm, ClassicalFieldTheory.Local.iteratedTotalDerivative,
-      ClassicalFieldTheory.Local.evalOnJet] using
+    exact
       (IsTestFunction.integrable (μ := volume) <|
         IsTestFunction.mul_left htdSign hh)
-  · simpa [g, h, firstVariationDensityTerm, eulerLagrangeTerm,
-      ClassicalFieldTheory.Local.iteratedTotalDerivative,
-      ClassicalFieldTheory.Local.evalOnJet] using
+  · exact
       integral_mul_iteratedDeriv_eq_sign I.1 hg hh
 
 lemma hasTermwiseIntegratedByPartsFormula_of_regular

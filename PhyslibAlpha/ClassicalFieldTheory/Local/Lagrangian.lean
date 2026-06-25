@@ -125,7 +125,7 @@ lemma continuousAlongField_of_inCoordinates (L : Lagrangian d m k)
     (hcont : ContinuousInCoordinates L) (f : Space d → EuclideanSpace ℝ (Fin m))
     (hf : ContDiff ℝ ∞ f) :
     Continuous (fun x : Space d => L (jetAt k f x)) := by
-  simpa only [Function.comp, jetAt_eq_ofBaseCoordinates] using
+  exact
     hcont.comp (jetBaseCoordinates_contDiff k f hf).continuous
 
 lemma contDiffCoordDerivAlongField_of_inCoordinates (L : Lagrangian d m k)
@@ -137,7 +137,7 @@ lemma contDiffCoordDerivAlongField_of_inCoordinates (L : Lagrangian d m k)
     jetBaseCoordinates_contDiff k f hf
   have hcomp :=
     (hcoord I a).comp hjet
-  simpa only [Function.comp, jetAt_eq_ofBaseCoordinates] using hcomp
+  exact hcomp
 
 lemma continuousCoordDerivAlongFamily_of_inCoordinates (L : Lagrangian d m k)
     (hcoord : ContDiffCoordDerivInCoordinates L)

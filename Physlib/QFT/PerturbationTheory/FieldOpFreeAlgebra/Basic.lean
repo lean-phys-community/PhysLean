@@ -67,7 +67,9 @@ lemma universality {A : Type} [Semiring A] [Algebra ℂ A] (f : 𝓕.CrAnFieldOp
     simp [ofCrAnOpF]
   · intro g hg
     ext x
-    simpa using congrFun hg x
+    have h1 := congrFun hg x
+    simp_all only [Function.comp_apply, FreeAlgebra.lift_ι_apply]
+    exact h1
 
 /-- For a field specification `𝓕`, and a list `φs` of `𝓕.CrAnFieldOp`,
   `ofCrAnListF φs` is defined as the element of `𝓕.FieldOpFreeAlgebra`

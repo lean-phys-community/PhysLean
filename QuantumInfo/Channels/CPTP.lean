@@ -134,7 +134,7 @@ instance instMixable : Mixable (Matrix (dOut × dIn) (dOut × dIn) ℂ) (CPTPMap
           convert Λ₁.TP using 1;
           rw [ ← hΛ₁, MatrixMap.IsTracePreserving_iff_trace_choi ]
         have h_trace_N : N.traceLeft = 1 := by
-          convert Λ₂.map.IsTracePreserving_iff_trace_choi.1 Λ₂.TP;
+          convert! Λ₂.map.IsTracePreserving_iff_trace_choi.1 Λ₂.TP;
           exact hΛ₂.symm;
         convert congr_arg₂ ( fun x y : Matrix dIn dIn ℂ => a • x + b • y ) h_trace_M h_trace_N using 1;
         · ext i j
@@ -363,7 +363,7 @@ theorem prod_apply_prod (Λ₁ : CPTPMap dI₁ dO₁) (Λ₂ : CPTPMap dI₂ dO�
     (ρ₁ : MState dI₁) (ρ₂ : MState dI₂) :
     (Λ₁ ⊗ᶜᵖ Λ₂) (ρ₁ ⊗ᴹ ρ₂) = (Λ₁ ρ₁) ⊗ᴹ (Λ₂ ρ₂) := by
   apply MState.ext_m
-  simpa [CPTPMap.prod, MState.prod] using
+  exact
     MatrixMap.kron_map_of_kron_state Λ₁.map Λ₂.map ρ₁.m ρ₂.m
 
 end prod
@@ -400,7 +400,7 @@ theorem fin_1_piProd
     Fintype.prod_subsingleton _ (0 : Fin 1),
     MatrixMap.choi_matrix, LinearMap.comp_apply,
     MatrixMap.submatrix_apply, Matrix.submatrix_apply, Matrix.single]
-  convert rfl
+  convert! rfl
   ext
   simp [funext_iff]
 
@@ -415,7 +415,7 @@ theorem piProd_comp
   (Λ₁ : ∀ i, CPTPMap (d₁ i) (d₂ i)) (Λ₂ : ∀ i, CPTPMap (d₂ i) (d₃ i)) :
   piProd (fun i => (Λ₂ i) ∘ₘ (Λ₁ i)) = (piProd Λ₂) ∘ₘ (piProd Λ₁) := by
     apply CPTPMap.ext
-    convert MatrixMap.piProd_comp _ _;
+    convert! MatrixMap.piProd_comp _ _;
     infer_instance
 
 @[simp]
@@ -549,7 +549,8 @@ private lemma exists_unitary_extending_isometry
       rw [ orthonormal_iff_ite ];
       intro i j
       replace hV := congr_fun (congr_fun hV i) j
-      simpa only [ mul_comm, Matrix.mul_apply ] using hV
+      simp_all only  [ mul_comm, Matrix.mul_apply ]
+      exact hV
     have := Orthonormal.exists_orthonormalBasis_extension_of_card_eq (𝕜 := ℂ) (E := EuclideanSpace ℂ m) (ι := m)
     simp only [finrank_euclideanSpace, forall_const] at this
     contrapose! this
@@ -570,7 +571,9 @@ private lemma exists_unitary_extending_isometry
   refine ⟨⟨Matrix.of (fun i j ↦ b j i), ?_⟩, ?_⟩
   · simp only [Matrix.mem_unitaryGroup_iff]
     ext1 i j
-    simpa [inner] using b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)
+    have := b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)
+    simp_all [inner]
+    exact this
   · simp [hb, u]
 
 omit [DecidableEq dOut] [Inhabited dOut] in
@@ -660,7 +663,7 @@ private lemma purify_conj_entry (X : Matrix dIn dIn ℂ) (U : 𝐔[dIn × dOut �
       (ofUnitary U).map ((prep ∘ₘ append).map X) i j =
       ∑ k, ∑ l, U.val i k * (X ⊗ₖ (MState.pure (Ket.basis (default : dOut × dOut))).m) k l * starRingEnd ℂ (U.val j l) := by
     simp [h_conj, Matrix.kroneckerMap]
-    convert congr_arg (fun m : Matrix (dIn × dOut × dOut) (dIn × dOut × dOut) ℂ => m i j) (show (U.val * (Matrix.of fun i j => X i.1 j.1 * ((Ket.basis default) i.2 * (starRingEnd ℂ) ((Ket.basis default) j.2))) * U.val.conjTranspose) = _ from rfl) using 1
+    convert! congr_arg (fun m : Matrix (dIn × dOut × dOut) (dIn × dOut × dOut) ℂ => m i j) (show (U.val * (Matrix.of fun i j => X i.1 j.1 * ((Ket.basis default) i.2 * (starRingEnd ℂ) ((Ket.basis default) j.2))) * U.val.conjTranspose) = _ from rfl) using 1
     simp [Matrix.mul_apply, Matrix.conjTranspose_apply]
     ring_nf!
     exact Finset.sum_comm.trans (Finset.sum_congr rfl fun _ _ => by rw [Finset.sum_mul])
@@ -671,7 +674,7 @@ private lemma purify_conj_entry (X : Matrix dIn dIn ℂ) (U : 𝐔[dIn × dOut �
   simp_all [Finset.sum_ite]
   convert h_conj using 1
   · congr! 1
-    convert congr_arg (fun f => (U.val * f * U.val.conjTranspose)) ‹_› using 1
+    convert! congr_arg (fun f => (U.val * f * U.val.conjTranspose)) ‹_› using 1
   · rw [← Finset.sum_product', ← Finset.sum_product']
     apply Finset.sum_bij (fun x _ => ((x.1, default, default), (x.2, default, default)))
     · simp

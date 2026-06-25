@@ -612,21 +612,17 @@ noncomputable def prodT {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
   refine PiTensorProduct.lift (MultilinearMap.mk' (fun p1 => PiTensorProduct.lift
     (MultilinearMap.mk' (fun p2 => (Pure.prodP p1 p2).toTensor) ?_ ?_)) ?_ ?_)
   · intro p2 i x y
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
   · intro p2 i r p2'
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
   · intro p1 i x y
     ext p2
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
   · intro p1 i r p1'
     ext p2
-    simp only
     repeat rw [← Pure.update_eq_function_update (S := S)]
     simp
 

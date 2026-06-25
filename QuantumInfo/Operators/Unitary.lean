@@ -70,7 +70,7 @@ theorem no_cloning {U : 𝐔[d × d]}
   have h2 : (⟪pure (ψ ⊗ᵠ ψ), pure (φ ⊗ᵠ φ)⟫_Prob : ℝ) = ⟪U ◃ pure (ψ ⊗ᵠ f), U ◃ pure (φ ⊗ᵠ f)⟫_Prob := by
     grind only [pure_prod_pure]
   replace h2 : ((pure (ψ ⊗ᵠ ψ)).m * (pure (φ ⊗ᵠ φ)).m).trace.re = (ρψ.m * ρφ.m).trace.re := by
-    convert ← h2
+    convert! ← h2
     simp +zetaDelta only [inner_U_conj, pure_prod_pure, prod]
     simp [inner, ← Matrix.mul_kronecker_mul, pure_mul_self,
       Matrix.trace_kronecker]

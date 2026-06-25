@@ -58,7 +58,7 @@ lemma jetCoordinatesAt_contDiff (k : ℕ) (g : Space d → EuclideanSpace ℝ (F
   refine contDiff_pi.2 ?_
   intro a
   have hga : ContDiff ℝ ∞ (fun y => (g y) a) := by
-    simpa using (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
+    exact (contDiff_piLp_apply (𝕜 := ℝ) (n := ∞) (p := 2)
       (E := fun _ : Fin m => ℝ) (i := a)).comp hg
   simpa [jetCoordinatesAt] using Space.iteratedDeriv_contDiff I.1 hga
 

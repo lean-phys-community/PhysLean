@@ -83,7 +83,7 @@ noncomputable def gradKineticTerm {d} (𝓕 : FreeSpace) :
     cont := by fun_prop}
   map_add' A1 A2 := by
     ext1 ε
-    simp only [one_div, map_add, ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add,
+    simp only [one_div, map_add, add_apply, Lorentz.Vector.apply_add,
       ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
     rw [← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl (fun ν _ => ?_)
@@ -93,7 +93,7 @@ noncomputable def gradKineticTerm {d} (𝓕 : FreeSpace) :
     ring_nf
   map_smul' r A := by
     ext1 ε
-    simp only [one_div, map_smul, ContinuousLinearMap.smul_apply, Lorentz.Vector.apply_smul,
+    simp only [one_div, map_smul, _root_.smul_apply, Lorentz.Vector.apply_smul,
       ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
     simp [Finset.smul_sum, smul_smul]
     apply Finset.sum_congr rfl (fun ν _ => ?_)

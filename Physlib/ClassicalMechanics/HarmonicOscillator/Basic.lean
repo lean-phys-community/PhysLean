@@ -7,7 +7,7 @@ module
 
 public import Physlib.ClassicalMechanics.EulerLagrange
 public import Physlib.ClassicalMechanics.HamiltonsEquations
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Classical Harmonic Oscillator
@@ -265,8 +265,8 @@ lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : Con
   change (fderiv ℝ ((fun x => 2⁻¹ * S.m * ⟪x, x⟫_ℝ) ∘ (fun t => ∂ₜ xₜ t)) t) 1 = _
   rw [fderiv_comp]
   rw [fderiv_const_mul (by fun_prop)]
-  simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
+  simp only [ContinuousLinearMap.smul_comp, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
   simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
   rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right]
@@ -283,8 +283,8 @@ lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : C
   change (fderiv ℝ ((fun x => 2⁻¹ * (S.k * ⟪x, x⟫_ℝ)) ∘ (fun t => xₜ t)) t) 1 = _
   rw [fderiv_comp]
   rw [fderiv_const_mul (by fun_prop), fderiv_const_mul (by fun_prop)]
-  simp only [ContinuousLinearMap.smul_comp, ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', Pi.smul_apply, Function.comp_apply, smul_eq_mul]
+  simp only [ContinuousLinearMap.smul_comp, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
   simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
   trans S.k * ⟪xₜ t, ∂ₜ xₜ t⟫_ℝ
@@ -304,7 +304,7 @@ lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff �
   funext t
   rw [Time.deriv_eq]
   rw [fderiv_fun_add (by fun_prop) (by apply S.potentialEnergy_differentiable xₜ hx)]
-  simp only [ContinuousLinearMap.add_apply]
+  simp only [_root_.add_apply]
   rw [← Time.deriv_eq, ← Time.deriv_eq]
   rw [potentialEnergy_deriv, kineticEnergy_deriv]
   simp only
@@ -589,7 +589,7 @@ lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx :
       ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
           = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
       _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          simpa using congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
+          exact congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
       _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
 
 /-!
@@ -657,7 +657,7 @@ lemma energy_conservation_of_equationOfMotion' (xₜ : Time → EuclideanSpace �
   · exact energy_differentiable S xₜ hx
   intro t
   ext p
-  simp only [ContinuousLinearMap.zero_apply]
+  simp only [_root_.zero_apply]
   have hp : p = p.val • 1 := by ext; simp
   rw [hp]
   simp only [map_smul, smul_eq_mul, mul_eq_zero]
@@ -876,7 +876,7 @@ lemma equationOfMotion_iff_hamiltonEqOp_eq_zero (xₜ : Time → EuclideanSpace 
       ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
           = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
       _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          simpa using congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
+          exact congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
       _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
   simp [hderiv_smul, force_eq_linear]
 

@@ -228,10 +228,11 @@ lemma directSum_eq_bosonic_plus_fermionic
     simp only [C]
     match i with
     | bosonic =>
-      simp only [DirectSum.of_eq_same, left_eq_add]
+      simp only [DirectSum.of_eq_same]
       rw [DirectSum.of_eq_of_ne]
       simp only [map_zero]
-      simp
+      grind
+      grind
     | fermionic =>
       simp only [DirectSum.of_eq_same]
       rw [DirectSum.of_eq_of_ne]

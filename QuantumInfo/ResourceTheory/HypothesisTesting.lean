@@ -157,7 +157,7 @@ theorem exists_min' (ρ : MState d) (ε : Prob) (S : Set (MState d)):
       simp_rw [← iSup_subtype'', subtype_val_iSup' (ι := S)]
       refine Continuous.subtype_mk ?_ _
       refine Continuous.comp (g := fun T ↦ ⨆ (i : S), i.val.exp_val T) ?_ continuous_subtype_val
-      convert h with T
+      convert! h with T
       rw [← sSup_image' (s := S) (f := fun i ↦ i.exp_val T)]
       rw [← sSup_image' (s := (MState.M '' S)) (f := fun i ↦ i.innerₗ T)]
       simp [Set.image, MState.exp_val, HermitianMat.innerₗ]
@@ -348,7 +348,7 @@ theorem optimalHypothesisRate_antitone (ρ σ : MState d) (ℰ : CPTPMap d d₂)
       simpa [hℰd] using hm₁
     · rintro ⟨m, hm₁, hm₂⟩
       rfl
-  convert le_iInf_comp _ ℰdualSubtype
+  convert! le_iInf_comp _ ℰdualSubtype
   rename_i T'
   specialize h T'
   rw [h]

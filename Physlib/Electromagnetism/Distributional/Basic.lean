@@ -82,7 +82,7 @@ noncomputable def ofScalarPotential {d} (c : SpeedOfLight) :
   map_smul' r φ := by
     ext ε
     simp only [one_div, map_smul, ContinuousLinearMap.comp_smulₛₗ, map_inv₀, RingHom.id_apply,
-      ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_comp', Pi.smul_apply,
+      FunLike.coe_smul, ContinuousLinearMap.coe_comp, Pi.smul_apply,
       Function.comp_apply]
     rw [smul_comm]
 

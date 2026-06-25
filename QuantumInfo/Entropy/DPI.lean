@@ -319,7 +319,7 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
           intro i j; exact (by
           have h_support : A.kerProj + A.supportProj = 1 := by
             exact kerProj_add_supportProj A
-          convert congr_arg (fun f => f i j) h_support using 1)
+          convert! congr_arg (fun f => f i j) h_support using 1)
         rw [← Matrix.add_mulVec, h_support, Matrix.one_mulVec]
       have hsup : B.mat *ᵥ (A.kerProj.mat *ᵥ x.ofLp) = 0 := by
         convert hker _ _
@@ -483,7 +483,7 @@ theorem f_alpha_convex_in_sigma (hα : 1 < α) (H : HermitianMat d ℂ) (hH : 0 
     (by simp [hw_sum])
     (fun i _ => (σs i).nonneg)
   rw [← hσ_mix] at h_jensen
-  convert h_jensen using 1
+  convert! h_jensen using 1
 
 /-
 **Step 4 (Joint convexity of f_α)**: For fixed `H ≥ 0` and `α > 1`, the map
@@ -630,7 +630,7 @@ private lemma twirlingU_conj_entry (X : HermitianMat dB ℂ) (σ : Equiv.Perm dB
       u.val * X.mat * u.val.conjTranspose := by
     intro u
     simp_all only [conj_apply_mat]
-  convert congr_fun (congr_fun (h_conj_apply (twirlingU σ f)) p) q using 1
+  convert! congr_fun (congr_fun (h_conj_apply (twirlingU σ f)) p) q using 1
   unfold twirlingU
   simp [Matrix.mul_apply, Matrix.diagonal]
   simp [Finset.sum_ite]
@@ -755,9 +755,9 @@ private lemma twirling_identity [Nonempty dB] (X : HermitianMat dB ℂ) :
   convert congr_arg ((2⁻¹ ^ Fintype.card dB * (Fintype.card dB |> Nat.factorial : ℂ)⁻¹) * ·)
       (twirling_sum_eq X p q) using 1
   · norm_num [Matrix.one_apply]
-    convert Or.inl rfl
+    convert! Or.inl rfl
     induction (Finset.univ : Finset (Equiv.Perm dB × (dB → Bool))) using Finset.induction
-    · simp_all only [Finset.sum_empty, zero_apply]
+    · simp_all only [Finset.sum_empty, HermitianMat.zero_apply]
     · rename_i a s a_1 a_2
       obtain ⟨fst, snd⟩ := a
       simp only [not_false_eq_true, Finset.sum_insert, *]
@@ -1039,9 +1039,9 @@ theorem twirling_average_eq [Nonempty dB]
     · classical induction (Finset.univ : Finset κ) using Finset.induction
       · simp_all
       · simp_all
-        convert congr_arg₂ (· + ·) rfl ‹_› using 1
+        convert! congr_arg₂ (· + ·) rfl ‹_› using 1
         simp [Algebra.smul_def]
-    · convert prod_traceRight_uniform_entry ρ a₁ a₂ b₁ b₂ using 1
+    · convert! prod_traceRight_uniform_entry ρ a₁ a₂ b₁ b₂ using 1
       ring
 
 end twirling
@@ -1277,7 +1277,7 @@ theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
     grind only [log_conj_unitary, inner_conj_unitary]
   · ext1
     congr 3
-    convert congr_arg Real.log (sandwichedTraceFunctional_conj_unitary_MState U ρ σ) using 1
+    convert! congr_arg Real.log (sandwichedTraceFunctional_conj_unitary_MState U ρ σ) using 1
 
 /-
 The sandwiched Rényi divergence is invariant under tensoring with a fixed pure state:
@@ -1361,7 +1361,7 @@ theorem sandwichedRenyiEntropy_DPI_gt_one (hα : 1 < α) (ρ σ : MState d₁) (
     _ = D̃_ α((Φ.purify ((prep ∘ₘ append) ρ)).traceLeft.traceLeft‖
             (Φ.purify ((prep ∘ₘ append) σ)).traceLeft.traceLeft) := by
         have h_trace (ξ) : Φ ξ = (Φ.purify ((prep ∘ₘ append) ξ)).traceLeft.traceLeft := by
-          simpa using congr($Φ.purify_trace ξ)
+          exact congr($Φ.purify_trace ξ)
         rw [h_trace ρ, h_trace σ]
     _ = D̃_ α(((ρ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft‖
              ((σ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft) := by
