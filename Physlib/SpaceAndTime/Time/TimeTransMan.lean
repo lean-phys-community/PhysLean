@@ -151,8 +151,7 @@ instance : IsManifold 𝓘(ℝ, ℝ) ω TimeTransMan where
 
 lemma val_contDiff : ContMDiff 𝓘(ℝ, ℝ) 𝓘(ℝ, ℝ) ω TimeTransMan.val := by
   refine contMDiffOn_univ.mp ?_
-  convert contMDiffOn_chart (x := (⟨0⟩ : TimeTransMan))
-  exact instIsManifoldRealModelWithCornersSelfTopWithTopENat
+  exact contMDiffOn_chart (x := (⟨0⟩ : TimeTransMan))
 
 /-- The choice of map `Time.val` from `TimeTransMan` to `ℝ` as a diffeomorphism. -/
 noncomputable def valDiffeomorphism : TimeTransMan ≃ₘ^ω⟮𝓘(ℝ, ℝ), 𝓘(ℝ, ℝ)⟯ ℝ where
@@ -160,8 +159,7 @@ noncomputable def valDiffeomorphism : TimeTransMan ≃ₘ^ω⟮𝓘(ℝ, ℝ), �
   contMDiff_toFun := val_contDiff
   contMDiff_invFun := by
     refine contMDiffOn_univ.mp ?_
-    convert contMDiffOn_chart_symm (x := (⟨0⟩ : TimeTransMan))
-    exact instIsManifoldRealModelWithCornersSelfTopWithTopENat
+    exact contMDiffOn_chart_symm (x := (⟨0⟩ : TimeTransMan))
 
 /-!
 

@@ -64,8 +64,8 @@ noncomputable def hessianBilinearCompanion {V : Type*} [NormedAddCommGroup V]
         simp) (fun _ _ _ ↦ by
         simp_rw [Matrix.vecCons, succ_eq_add_one, reduceAdd, ← curryLeft_apply,
           map_add]
-        simp only [add_apply, curryLeft_apply, succ_eq_add_one, reduceAdd, Matrix.Fin.cons_vecEmpty,
-          Matrix.Fin.cons_vecCons]
+        simp only [ContinuousMultilinearMap.add_apply, curryLeft_apply, succ_eq_add_one, reduceAdd,
+          Matrix.Fin.cons_vecEmpty, Matrix.Fin.cons_vecCons]
         abel) (by
         simp_rw [Matrix.vecCons, ← curryLeft_apply]
         simp only [map_smul, ContinuousMultilinearMap.smul_apply, curryLeft_apply, succ_eq_add_one,
@@ -234,12 +234,12 @@ theorem QuadraticMap.toMultilinearMapHalfPolarBilin_continuous {V : Type*}
         simp_all only [one_div, polarBilin_apply_apply]
         ext i
         rw [hB (x+y) i]
-        simp only [polar_add_left, ContinuousLinearMap.add_apply]
+        simp only [polar_add_left, _root_.add_apply]
         rw [hB x i, hB y i]
         linarith
       intro m x
       ext y
-      rw [hB (m • x), ContinuousLinearMap.smul_apply, hB x y]
+      rw [hB (m • x), _root_.smul_apply, hB x y]
       simp only [one_div, polarBilin_apply_apply, polar_smul_left, smul_eq_mul, RingHom.id_apply]
       ring
     simp_all only [one_div, polarBilin_apply_apply]
@@ -252,7 +252,7 @@ theorem QuadraticMap.toMultilinearMapHalfPolarBilin_continuous {V : Type*}
   obtain ⟨B, hB⟩ := h_bilinear;
   have hB_cont : Continuous B := by
     exact B.continuous_of_finiteDimensional;
-  convert hB_cont.comp ( show Continuous fun v : Fin 2 → V => v 0 from continuous_apply 0 ) |>
+  convert! hB_cont.comp ( show Continuous fun v : Fin 2 → V => v 0 from continuous_apply 0 ) |>
     Continuous.clm_apply <|
       show Continuous fun v : Fin 2 → V => v 1 from continuous_apply 1 using 1; aesop
 

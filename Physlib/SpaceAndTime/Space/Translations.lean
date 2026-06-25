@@ -70,7 +70,6 @@ noncomputable def translateSchwartz {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :
             positivity
           ring_nf
           rfl) (by
-          simp only
           use 1, (1 + ‖a‖)
           intro x
           simp only [pow_one]

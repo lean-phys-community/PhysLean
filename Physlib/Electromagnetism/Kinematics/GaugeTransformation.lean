@@ -126,7 +126,7 @@ lemma ofGradient_add {d} {χ₁ χ₂ : SpaceTime d → ℝ}
   apply eq_of_val_eq; funext x μ
   show ofGradient (χ₁ + χ₂) x μ = ofGradient χ₁ x μ + ofGradient χ₂ x μ
   simp only [ofGradient_apply, SpaceTime.deriv_eq,
-    fderiv_add hχ₁.differentiableAt hχ₂.differentiableAt, ContinuousLinearMap.add_apply,
+    fderiv_add hχ₁.differentiableAt hχ₂.differentiableAt, _root_.add_apply,
     mul_add]
 
 /-!
@@ -172,7 +172,7 @@ lemma toFieldStrength_ofGradient {d} {χ : SpaceTime d → ℝ} (hχ : ContDiff 
   simp only [ofGradient_apply]
   rw [fderiv_const_mul (SpaceTime.differentiable_deriv μν.1 χ hχ).differentiableAt,
     fderiv_const_mul (SpaceTime.differentiable_deriv μν.2 χ hχ).differentiableAt]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   -- simplify repr 0 to 0
   conv_rhs => rw [show (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr
       (0 : Lorentz.Vector d ⊗[ℝ] Lorentz.Vector d) = 0 from map_zero _]
@@ -383,7 +383,7 @@ lemma fieldStrengthMatrix_bareGradient_inl_inr {d : ℕ} (i : Fin d)
     exact h
   simp only [SpaceTime.deriv_eq, B]
   simp_rw [hfderiv]
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_smul',
+  simp only [_root_.add_apply, FunLike.coe_smul,
     Pi.smul_apply, Lorentz.Vector.coordCLM_apply, smul_eq_mul, Lorentz.Vector.basis_apply]
   simp only [mul_ite, mul_one, mul_zero, ite_add, zero_add, if_true]
   simp only [minkowskiMatrix.inl_0_inl_0, minkowskiMatrix.inr_i_inr_i]

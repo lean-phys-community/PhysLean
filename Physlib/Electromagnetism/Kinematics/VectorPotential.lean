@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Kinematics.EMPotential
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The vector Potential
@@ -215,7 +215,7 @@ lemma time_deriv_vectorPotential_inner_radial_eq_zero_ofElectromagneticField
     Space.basis.repr x⟫_ℝ) t
   · rw [Time.deriv, Time.deriv]
     rw [fderiv_inner_apply]
-    simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
+    simp only [fderiv_fun_const, Pi.zero_apply, _root_.zero_apply, inner_zero_right,
       zero_add]
     apply Differentiable.differentiableAt
     fun_prop

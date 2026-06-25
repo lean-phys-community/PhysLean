@@ -92,8 +92,8 @@ theorem blockOp_ext {T S : L (HSum ℋ)}
     T = S := by
   ext z i
   fin_cases i
-  · simpa using h0 z
-  · simpa using h1 z
+  · exact h0 z
+  · exact h1 z
 
 omit [Nontrivial ℋ] in
 @[simp] theorem blockDiagonal_star (A B : L ℋ) :
@@ -120,7 +120,7 @@ noncomputable def blockDiagonalHom : (L ℋ × L ℋ) →⋆ₐ[ℝ] L (HSum ℋ
     intro p q
     ext z i
     fin_cases i <;>
-      simp [blockDiagonal, hsumProj, hsumIncl, hsumEquiv, ContinuousLinearMap.add_apply]
+      simp [blockDiagonal, hsumProj, hsumIncl, hsumEquiv, add_apply]
   commutes' := by
     intro r
     ext z i
@@ -172,7 +172,7 @@ theorem blockDiagonal_nonneg {A B : L ℋ} (hA : 0 ≤ A) (hB : 0 ≤ B) :
     simp [hsumProj, hsumIncl, hsumEquiv, PiLp.inner_apply]
   constructor
   · dsimp [blockDiagonal]
-    rw [inner_add_left, hz0, hz1]
+    erw [inner_add_left, hz0, hz1]
     calc
       ↑(RCLike.re
           (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z) +
@@ -190,7 +190,7 @@ theorem blockDiagonal_nonneg {A B : L ℋ} (hA : 0 ≤ A) (hB : 0 ≤ B) :
                   simp
             rw [hsumre, hAz.1, hBz.1]
   · dsimp [blockDiagonal]
-    rw [inner_add_left, hz0, hz1]
+    erw [inner_add_left, hz0, hz1]
     exact add_nonneg hAz.2 hBz.2
 
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in

@@ -231,7 +231,6 @@ def EoF : MState (d₁ × d₂) → ℝ≥0 :=
   convex_roof (KetUpToPhase.lift
     (fun ψ ↦ ⟨Sᵥₙ (pure ψ).traceRight, Sᵥₙ_nonneg (pure ψ).traceRight⟩)
     (fun ψ φ h ↦ by
-      simp only
       congr 1
       congr 1
       exact congrArg MState.traceRight ((MState.PhaseEquiv_iff_pure_eq ψ φ).mp h)))
@@ -254,7 +253,7 @@ theorem traceRight_pure_MES (d : Type*) [Fintype d] [DecidableEq d] [Nonempty d]
     · grind
   unfold MState.pure MState.traceRight MState.uniform
   ext i j
-  convert h_partial_trace i j
+  convert! h_partial_trace i j
   simp_all only [Pi.star_apply, RCLike.star_def, one_div, Complex.ofReal_inv,
     Complex.ofReal_natCast, mul_ite, mul_one, mul_zero, HermitianMat.mat_apply,
     coe_ofClassical, ProbDistribution.uniform_def, Finset.card_univ]

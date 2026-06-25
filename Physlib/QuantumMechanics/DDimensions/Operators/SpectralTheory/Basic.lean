@@ -361,13 +361,14 @@ lemma defectNumber_closure [CompleteSpace H]
 lemma _root_.Submodule.inf_ne_bot_of_rank_lt
     {E F : Submodule ℂ H} [E.HasOrthogonalProjection] (h_rank : Module.rank ℂ E < Module.rank ℂ F) :
     Eᗮ ⊓ F ≠ ⊥ := by
-  let Φ : F →L[ℂ] E := E.orthogonalProjection ∘L F.subtypeL
+  let Φ : F →L[ℂ] E := E.orthogonalProjectionOnto ∘L F.subtypeL
   have hΦ : ¬(⇑Φ).Injective := fun h' ↦ not_le_of_gt h_rank (Φ.rank_le_of_injective h')
   obtain ⟨x₁, x₂, h, hx⟩ := Function.not_injective_iff.mp hΦ
   let y : H := x₁ - x₂
   have hy : y ≠ 0 := fun h' ↦ hx (SetLike.coe_eq_coe.mp <| sub_eq_zero.mp h')
   have hF : y ∈ F := sub_mem (coe_mem x₁) (coe_mem x₂)
-  have hE : y ∈ Eᗮ := orthogonalProjection_eq_zero_iff.mp (_root_.map_sub Φ _ _ ▸ sub_eq_zero.mpr h)
+  have hE : y ∈ Eᗮ := orthogonalProjectionOnto_eq_zero_iff.mp
+    (_root_.map_sub Φ _ _ ▸ sub_eq_zero.mpr h)
   exact fun hEF ↦ hy ((mem_bot ℂ).mp <| hEF ▸ ⟨hE, hF⟩)
 
 lemma IsClosed.exists_inner_eq_zero_of_defectNumber_lt [CompleteSpace H]

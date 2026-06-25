@@ -43,18 +43,17 @@ variable {n : ℕ}
 /-- The charges in `(SMNoGrav n).LinSols` satisfy the `SU(2)` anomaly-equation. -/
 lemma SU2Sol (S : (SMNoGrav n).LinSols) : accSU2 S.val = 0 := by
   have hS := S.linearSol
-  simp only [SMNoGrav_numberLinear, SMNoGrav_linearACCs, Fin.isValue] at hS
-  exact hS 0
+  simp only [SMNoGrav_linearACCs] at hS
+  exact hS ⟨0, by simp⟩
 
 /-- The charges in `(SMNoGrav n).LinSols` satisfy the `SU(3)` anomaly-equation. -/
 lemma SU3Sol (S : (SMNoGrav n).LinSols) : accSU3 S.val = 0 := by
   have hS := S.linearSol
-  simp only [SMNoGrav_numberLinear, SMNoGrav_linearACCs, Fin.isValue] at hS
-  exact hS 1
+  simp only [SMNoGrav_linearACCs] at hS
+  exact hS ⟨1, by simp⟩
 
 /-- The charges in `(SMNoGrav n).Sols` satisfy the cubic anomaly-equation. -/
-lemma cubeSol (S : (SMNoGrav n).Sols) : accCube S.val = 0 := by
-  exact S.cubicSol
+lemma cubeSol (S : (SMNoGrav n).Sols) : accCube S.val = 0 := S.cubicSol
 
 /-- An element of `charges` which satisfies the linear ACCs
   gives us a element of `AnomalyFreeLinear`. -/
@@ -62,10 +61,9 @@ def chargeToLinear (S : (SMNoGrav n).Charges) (hSU2 : accSU2 S = 0) (hSU3 : accS
     (SMNoGrav n).LinSols :=
   ⟨S, by
     intro i
-    simp only [SMNoGrav_numberLinear] at i
     match i with
-    | 0 => exact hSU2
-    | 1 => exact hSU3⟩
+    | ⟨0, _⟩ => exact hSU2
+    | ⟨1, _⟩ => exact hSU3⟩
 
 /-- An element of `AnomalyFreeLinear` which satisfies the quadratic ACCs
   gives us a element of `AnomalyFreeQuad`. -/

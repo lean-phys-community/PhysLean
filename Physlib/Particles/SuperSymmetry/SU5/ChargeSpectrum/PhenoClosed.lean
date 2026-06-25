@@ -191,7 +191,7 @@ lemma containsPhenoCompletionsOfMinimallyAllows_iff_completionsTopYukawa {S5 S10
 
 -/
 
-instance [DecidableEq 𝓩] {S5 S10 : Finset 𝓩} {charges : Multiset (ChargeSpectrum 𝓩)} :
+instance {S5 S10 : Finset 𝓩} {charges : Multiset (ChargeSpectrum 𝓩)} :
     Decidable (ContainsPhenoCompletionsOfMinimallyAllows S5 S10 charges) :=
   decidable_of_iff _ (containsPhenoCompletionsOfMinimallyAllows_iff_completionsTopYukawa).symm
 

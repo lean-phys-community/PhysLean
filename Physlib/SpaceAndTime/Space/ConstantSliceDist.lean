@@ -192,7 +192,7 @@ lemma schwartzMap_fderiv_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ
     calc _
         _ ≤ ‖(fderiv ℝ ⇑η (((slice i).symm (r, x))))‖ *
           ‖fderiv ℝ (fun x => (slice i).symm (r, x)) x‖ := by
-          rw [fderiv_comp' _ _ (by fun_prop)]; swap
+          rw [fderiv_fun_comp _ _ (by fun_prop)]; swap
           · apply Differentiable.differentiableAt
             exact η.smooth'.differentiable (by simp)
           exact ContinuousLinearMap.opNorm_comp_le (fderiv ℝ ⇑η (((slice i).symm (r, x)))) _
@@ -209,7 +209,7 @@ lemma schwartzMap_fderiv_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ
           (ContinuousLinearMap.id ℝ (Space d)))‖ := by
             apply le_of_eq
             congr
-            rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
+            rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
             simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
               fderiv_fun_id]
             fun_prop
@@ -227,7 +227,7 @@ lemma schwartzMap_fderiv_left_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d
       apply Differentiable.differentiableAt
       exact η.smooth'.differentiable (by simp))
       (by fun_prop)]
-    simp only [Nat.succ_eq_add_one, ContinuousLinearMap.coe_comp', Function.comp_apply,
+    simp only [Nat.succ_eq_add_one, ContinuousLinearMap.coe_comp, Function.comp_apply,
       fderiv_slice_symm_left_apply]
     change (SchwartzMap.evalCLM ℝ (Space d.succ) ℝ (((slice i).symm (1, 0)))).comp
       (SchwartzMap.fderivCLM ℝ (Space d.succ) ℝ) η (((slice i).symm (r, x)))
@@ -328,7 +328,7 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
         _ ≤ ‖(fderiv ℝ ⇑η (((slice i).symm (r, x))))‖ *
           ‖fderiv ℝ (fun x => (slice i).symm (r, x)) x‖ := by
           simp [F']
-          rw [fderiv_comp' _ _ (by fun_prop)]; swap
+          rw [fderiv_fun_comp _ _ (by fun_prop)]; swap
           · apply Differentiable.differentiableAt
             exact η.smooth'.differentiable (by simp)
           exact ContinuousLinearMap.opNorm_comp_le (fderiv ℝ ⇑η (((slice i).symm (r, x)))) _
@@ -347,7 +347,7 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
           (ContinuousLinearMap.id ℝ (Space d)))‖ := by
           apply le_of_eq
           congr 1
-          rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
+          rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
           simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
             fderiv_fun_id]
           fun_prop
@@ -411,8 +411,8 @@ lemma schwartzMap_slice_integral_contDiff {d : ℕ} (n : ℕ) (η : 𝓢(Space d
         congr
         funext t
         simp only [Nat.succ_eq_add_one, LineDeriv.lineDerivOpCLM_apply]
-        rw [fderiv_comp']
-        simp only [ContinuousLinearMap.coe_comp', Function.comp_apply,
+        rw [fderiv_fun_comp]
+        simp only [ContinuousLinearMap.coe_comp, Function.comp_apply,
           fderiv_slice_symm_right_apply, Nat.succ_eq_add_one]
         rw [SchwartzMap.lineDerivOp_apply_eq_fderiv]
         · apply Differentiable.differentiableAt
@@ -583,7 +583,8 @@ lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m :
         · refine Pi.le_def.mpr ?_
           intro t
           convert hbound x t using 1
-          simp
+          · rfl
+          · simp
   apply le_of_eq
   rw [MeasureTheory.integral_const_mul]
   ring
@@ -600,12 +601,12 @@ def sliceSchwartz {d : ℕ} (i : Fin d.succ) :
     𝓢(Space d.succ, ℝ) →L[ℝ] 𝓢(Space d, ℝ) := by
   refine SchwartzMap.mkCLM (fun η x => ∫ (r : ℝ), η ((slice i).symm (r, x))) ?_ ?_ ?_ ?_
   · intro η1 η2 x
-    simp only [Nat.succ_eq_add_one, SchwartzMap.add_apply]
+    simp only [Nat.succ_eq_add_one, _root_.add_apply]
     rw [integral_add]
     · exact schwartzMap_integrable_slice_symm i η1 x
     · exact schwartzMap_integrable_slice_symm i η2 x
   · intro a η x
-    simp only [Nat.succ_eq_add_one, SchwartzMap.smul_apply, smul_eq_mul, RingHom.id_apply]
+    simp only [Nat.succ_eq_add_one, _root_.smul_apply, smul_eq_mul, RingHom.id_apply]
     rw [integral_const_mul]
   · intro η
     simp only [Nat.succ_eq_add_one]

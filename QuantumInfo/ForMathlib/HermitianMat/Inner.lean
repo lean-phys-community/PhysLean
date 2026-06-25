@@ -167,7 +167,7 @@ theorem inner_eq_re_trace : ⟪A, B⟫ = RCLike.re (A.mat * B.mat).trace := by
 
 theorem inner_eq_trace_rc : ⟪A, B⟫ = (A.mat * B.mat).trace := by
   rw [inner_eq_re_trace, ← RCLike.conj_eq_iff_re]
-  convert (Matrix.trace_conjTranspose (A.mat * B.mat)).symm using 1
+  convert! (Matrix.trace_conjTranspose (A.mat * B.mat)).symm using 1
   rw [Matrix.conjTranspose_mul, A.H, B.H, Matrix.trace_mul_comm]
 
 theorem inner_self_nonneg: 0 ≤ ⟪A, A⟫ := by
@@ -383,7 +383,7 @@ noncomputable instance instNormedGroup : NormedAddCommGroup (HermitianMat d 𝕜
 
 theorem norm_eq_frobenius (A : HermitianMat d 𝕜) :
     ‖A‖ = (∑ i : d, ∑ j : d, ‖A i j‖ ^ 2) ^ (1 / 2 : ℝ) := by
-  convert ← Matrix.frobenius_norm_def A.mat
+  convert! ← Matrix.frobenius_norm_def A.mat
   exact Real.rpow_ofNat _ 2
 
 theorem norm_eq_sqrt_inner_self (A : HermitianMat d 𝕜) : ‖A‖ = √(⟪A, A⟫) := by
@@ -447,7 +447,7 @@ theorem Matrix.IsHermitian_isClosed : IsClosed { A : Matrix n n 𝕜 | A.IsHermi
   conv =>
     enter [1, 1, A]
     rw [Matrix.IsHermitian, ← sub_eq_zero]
-  convert isClosed_singleton.preimage (f := fun (x : Matrix n n 𝕜) ↦ (x.conjTranspose - x))
+  convert! isClosed_singleton.preimage (f := fun (x : Matrix n n 𝕜) ↦ (x.conjTranspose - x))
     (by fun_prop) using 1
 
 open ComplexOrder
@@ -539,7 +539,7 @@ lemma inner_eq_doubly_stochastic_sum {d : Type*} [Fintype d] [DecidableEq d]
   -- Since $B$ is Hermitian, its eigenvector matrix is unitary, and thus $(A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)$ is diagonal with the eigenvalues of $B$ on the diagonal.
   have h_diag_B : (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ) = (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (B.H.eigenvectorUnitary : Matrix d d ℂ) * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * (B.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (A.H.eigenvectorUnitary : Matrix d d ℂ) := by
     have h_diag_B : B.mat = (B.H.eigenvectorUnitary : Matrix d d ℂ) * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * (B.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose := by
-      convert B.H.spectral_theorem using 1;
+      convert! B.H.spectral_theorem using 1;
     grind;
   -- Since $C = U_A^* U_B$ is unitary, we have $C_{ij} = \langle u_i, v_j \rangle$ where $u_i$ and $v_j$ are the eigenvectors of $A$ and $B$, respectively.
   set C : Matrix d d ℂ := (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (B.H.eigenvectorUnitary : Matrix d d ℂ)
@@ -553,7 +553,7 @@ lemma inner_eq_doubly_stochastic_sum {d : Type*} [Fintype d] [DecidableEq d]
     simp [ Matrix.trace, Matrix.mul_apply, hC_norm ];
     simp [ Matrix.diagonal, Finset.sum_ite_eq ];
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring;
-  convert congr_arg Complex.re hC_trace using 1;
-  convert congr_arg Complex.re h_trace_diag using 1;
+  convert! congr_arg Complex.re hC_trace using 1;
+  convert! congr_arg Complex.re h_trace_diag using 1;
   rw [ h_diag_A, h_diag_B ] ; simp [ Matrix.mul_assoc ] ;
   simp +zetaDelta at *

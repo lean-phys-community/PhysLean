@@ -29,17 +29,15 @@ open BigOperators
 
 variable {n : ℕ}
 /-- A helper function for what follows. -/
-@[simp]
 def α₁ (S : (PlusU1 n).QuadSols) : ℚ := - 3 * cubeTriLin S.val S.val (BL n).val
 
 /-- A helper function for what follows. -/
-@[simp]
 def α₂ (S : (PlusU1 n).QuadSols) : ℚ := accCube S.val
 
 lemma cube_α₁_α₂_zero (S : (PlusU1 n).QuadSols) (a b : ℚ) (h1 : α₁ S = 0) (h2 : α₂ S = 0) :
     accCube (BL.addQuad S a b).val = 0 := by
   erw [BL.add_AFL_cube]
-  simp_all
+  simp_all [α₁, α₂]
 
 lemma α₂_AF (S : (PlusU1 n).Sols) : α₂ S.toQuadSols = 0 := S.2
 

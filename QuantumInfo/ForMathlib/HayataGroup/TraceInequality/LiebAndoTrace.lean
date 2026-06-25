@@ -71,7 +71,7 @@ private lemma rightMulHS_real_smul_one (r : ℝ) :
     ofOp (toOp T * ((algebraMap ℝ (L ℋ)) r))
         = ofOp (((algebraMap ℝ (L ℋ)) r * toOp T) * (1 : L ℋ)) := by
             have hcomm := Algebra.commutes (R := ℝ) (A := L ℋ) r (toOp T)
-            simpa [mul_assoc] using congrArg (fun X => X * (1 : L ℋ)) hcomm.symm
+            exact congrArg (fun X => X * (1 : L ℋ)) hcomm.symm
     _ = r • ofOp (toOp T) := by
           delta HSOp
           rfl
@@ -115,7 +115,9 @@ private lemma rightMulHS_le_rightMulHS {A B : L ℋ} (hAB : A ≤ B) :
       rightMulHS (ℋ := ℋ) B - rightMulHS (ℋ := ℋ) A =
         rightMulHS (ℋ := ℋ) (B - A) := by
     ext T
-    simpa [sub_eq_add_neg] using (mul_add (toOp T) B (-A)).symm
+    have h1 := (mul_add (toOp T) B (-A)).symm
+    simp_all only [sub_eq_add_neg, mul_neg, add_apply, rightMulHS_apply, neg_apply]
+    exact h1
   exact sub_nonneg.mp (by simpa [hsub] using hnonneg)
 
 private lemma rightMulHS_pdSet {A : L ℋ} (hA : A ∈ pdSet (ℋ := ℋ)) :
@@ -190,7 +192,7 @@ private lemma leftMulHS_rankOne (A : L ℋ) (x y : ℋ) :
     leftMulHS (ℋ := ℋ) A (ofOp (InnerProductSpace.rankOne ℂ x y)) =
       ofOp (InnerProductSpace.rankOne ℂ (A x) y) := by
   change (A * InnerProductSpace.rankOne ℂ x y) = InnerProductSpace.rankOne ℂ (A x) y
-  simpa [leftMulHS_apply] using
+  exact
     (InnerProductSpace.comp_rankOne (𝕜 := ℂ) (x := x) (y := y) (f := A))
 
 omit [Nontrivial ℋ] in
@@ -198,7 +200,7 @@ private lemma rightMulHS_rankOne (B : L ℋ) (x y : ℋ) :
     rightMulHS (ℋ := ℋ) B (ofOp (InnerProductSpace.rankOne ℂ x y)) =
       ofOp (InnerProductSpace.rankOne ℂ x ((star B) y)) := by
   change (InnerProductSpace.rankOne ℂ x y * B) = InnerProductSpace.rankOne ℂ x ((star B) y)
-  simpa [rightMulHS_apply, ContinuousLinearMap.star_eq_adjoint] using
+  exact
     (InnerProductSpace.rankOne_comp (𝕜 := ℂ) (x := x) (y := y) (f := B))
 
 private lemma re_inner_nonneg_of_nonneg

@@ -512,8 +512,7 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     (v : ℝT(3, c)) (Λ : SL(2, ℂ)) :
     Λ • (toComplex v) = toComplex (Lorentz.SL2C.toLorentzGroup Λ • v) := by
   induction' v using induction_on_pure with p r t h t1 t2
-  · simp only
-    rw [actionT_pure, toComplex_pure, actionT_pure, actionP_toComplexPure, toComplex_pure]
+  · rw [actionT_pure, toComplex_pure, actionT_pure, actionP_toComplexPure, toComplex_pure]
   · simp
     rw [← h]
     change Λ • (r : ℂ) • toComplex t = _
