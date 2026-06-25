@@ -188,119 +188,68 @@ lemma equiv (V : CKMMatrix) (a b c d e f : ℝ) :
   use a, b, c, d, e, f
   rfl
 
+/-- The `(i, j)` entry of a phase-shifted CKM matrix: the row phase `i` and column phase
+`j` multiply the original entry. -/
+lemma phaseShiftApply_apply (V : CKMMatrix) (a b c d e f : ℝ) (i j : Fin 3) :
+    (phaseShiftApply V a b c d e f).1 i j =
+      cexp (![a, b, c] i * I) * cexp (![d, e, f] j * I) * V.1 i j := by
+  simp only [phaseShiftApply_coe]
+  fin_cases i <;> fin_cases j <;>
+    simp [mul_apply, Fin.sum_univ_three] <;> ring_nf
+
 /-- The `ud` component of the CKM matrix obtained after applying a phase shift. -/
 lemma ud (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 0 0 = cexp (a * I + d * I) * V.1 0 0 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_one, zero_mul, add_zero, cons_val_two, tail_cons, head_cons, mul_zero, tail_val',
-    head_val']
-  change _ + _ * _ * 0 = _
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `us` component of the CKM matrix obtained after applying a phase shift. -/
 lemma us (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 0 1 = cexp (a * I + e * I) * V.1 0 1 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, mul_zero, zero_add,
-    head_fin_const]
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `ub` component of the CKM matrix obtained after applying a phase shift. -/
 lemma ub (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 0 2 = cexp (a * I + f * I) * V.1 0 2 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_one, head_cons, zero_mul, add_zero, cons_val_two, tail_cons, mul_zero, head_fin_const,
-    zero_add]
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `cd` component of the CKM matrix obtained after applying a phase shift. -/
 lemma cd (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 1 0= cexp (b * I + d * I) * V.1 1 0 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_one, zero_mul, zero_add, cons_val_two, tail_cons, head_cons, add_zero, mul_zero,
-    tail_val', head_val']
-  change _ + _ * _ * 0 = _
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `cs` component of the CKM matrix obtained after applying a phase shift. -/
 lemma cs (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 1 1 = cexp (b * I + e * I) * V.1 1 1 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_one, head_fin_const, zero_mul, head_cons, zero_add, cons_val_two, tail_cons, add_zero,
-    mul_zero]
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `cb` component of the CKM matrix obtained after applying a phase shift. -/
 lemma cb (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 1 2 = cexp (b * I + f * I) * V.1 1 2 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_one, head_fin_const, zero_mul, head_cons, zero_add, cons_val_two, tail_cons, add_zero,
-    mul_zero]
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `td` component of the CKM matrix obtained after applying a phase shift. -/
 lemma td (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 2 0= cexp (c * I + d * I) * V.1 2 0 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_two, tail_val', head_val', cons_val_one, head_cons, tail_cons, head_fin_const,
-    zero_mul, add_zero, mul_zero]
-  change (0 * _ + _) * _ + (0 * _ + _) * 0 = _
-  simp only [Fin.isValue, zero_mul, zero_add, mul_zero, add_zero]
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `ts` component of the CKM matrix obtained after applying a phase shift. -/
 lemma ts (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 2 1 = cexp (c * I + e * I) * V.1 2 1 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_two, tail_val', head_val', cons_val_one, head_cons, tail_cons, head_fin_const,
-    zero_mul, add_zero, mul_zero, zero_add]
-  change (0 * _ + _) * _ = _
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 /-- The `tb` component of the CKM matrix obtained after applying a phase shift. -/
 lemma tb (V : CKMMatrix) (a b c d e f : ℝ) :
     (phaseShiftApply V a b c d e f).1 2 2 = cexp (c * I + f * I) * V.1 2 2 := by
-  simp only [Fin.isValue, phaseShiftApply_coe]
-  rw [mul_apply, Fin.sum_univ_three]
-  rw [mul_apply, mul_apply, mul_apply, Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-  simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one, vecCons_const,
-    cons_val_two, tail_val', head_val', cons_val_one, head_cons, tail_cons, head_fin_const,
-    zero_mul, add_zero, mul_zero, zero_add]
-  change (0 * _ + _) * _ = _
-  rw [exp_add]
-  ring_nf
+  rw [phaseShiftApply_apply, ← exp_add]
+  simp
 
 end phaseShiftApply
 
