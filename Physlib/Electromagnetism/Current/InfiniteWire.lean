@@ -192,7 +192,7 @@ lemma infiniteWire_vectorPotential_distTimeDeriv (𝓕 : FreeSpace) (I : ℝ) :
     distTimeDeriv ((infiniteWire 𝓕 I).vectorPotential 𝓕.c) = 0 := by
   ext1 η
   ext i
-  simp only [ContinuousLinearMap.zero_apply, PiLp.zero_apply]
+  simp only [_root_.zero_apply, PiLp.zero_apply]
   rw [infiniteWire_vectorPotential _ I, constantTime_distTimeDeriv]
   simp
 
@@ -230,7 +230,7 @@ lemma infiniteWire_electricField (𝓕 : FreeSpace) (I : ℝ) :
 lemma infiniteWire_isExterma {𝓕 : FreeSpace} {I : ℝ} :
     IsExtrema 𝓕 (infiniteWire 𝓕 I) (wireCurrentDensity 𝓕.c I) := by
   simp only [isExtrema_iff_vectorPotential, infiniteWire_electricField, map_zero,
-    ContinuousLinearMap.zero_apply, one_div, wireCurrentDensity_chargeDesnity, mul_zero,
+    _root_.zero_apply, one_div, wireCurrentDensity_chargeDesnity, mul_zero,
     implies_true, PiLp.zero_apply, zero_sub, true_and]
   intro ε i
   field_simp
@@ -242,7 +242,7 @@ lemma infiniteWire_isExterma {𝓕 : FreeSpace} {I : ℝ} :
     field_simp
     simp only [constantTime_distSpaceDeriv, mul_assoc]
     congr
-    rw [← ContinuousLinearMap.add_apply, ← map_add constantTime]
+    rw [← _root_.add_apply, ← map_add constantTime]
     trans (constantTime ((constantSliceDist 0) ((2 * Real.pi) • diracDelta ℝ 0))) ε;swap
     · simp
       ring
@@ -269,13 +269,13 @@ lemma infiniteWire_isExterma {𝓕 : FreeSpace} {I : ℝ} :
     simp at h1
     simp [h1]
   · simp only [Fin.mk_one, Fin.isValue, neg_sub, Finset.sum_sub_distrib, Fin.sum_univ_three,
-    infiniteWire_vectorPotential_distSpaceDeriv_0, map_zero, ContinuousLinearMap.zero_apply,
+    infiniteWire_vectorPotential_distSpaceDeriv_0, map_zero, _root_.zero_apply,
     PiLp.zero_apply, zero_add, wireCurrentDensity_currentDensity_snd, mul_zero]
     ring_nf
     rw [distSpaceDeriv_commute]
     simp [distSpaceDeriv_apply']
   · simp only [Fin.reduceFinMk, Fin.isValue, neg_sub, Finset.sum_sub_distrib, Fin.sum_univ_three,
-    infiniteWire_vectorPotential_distSpaceDeriv_0, map_zero, ContinuousLinearMap.zero_apply,
+    infiniteWire_vectorPotential_distSpaceDeriv_0, map_zero, _root_.zero_apply,
     PiLp.zero_apply, zero_add, add_sub_add_right_eq_sub, wireCurrentDensity_currentDensity_thrd,
     mul_zero]
     ring_nf

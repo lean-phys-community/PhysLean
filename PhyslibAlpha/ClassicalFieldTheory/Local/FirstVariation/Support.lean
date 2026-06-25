@@ -72,7 +72,7 @@ lemma contDiff_space_deriv {g : Space d → ℝ} (hg : ContDiff ℝ ∞ g)
     (i : Fin d) : ContDiff ℝ ∞ (∂[i] g) := by
   have hfamily : ContDiff ℝ ∞ (fun x : Space d => fun j : Fin d => ∂[j] g x) := by
     simpa using (Space.deriv_contDiff (n := ∞) hg)
-  simpa using (contDiff_apply ℝ ℝ i).comp hfamily
+  exact (contDiff_apply ℝ ℝ i).comp hfamily
 
 lemma isTestFunction_space_deriv {g : Space d → ℝ} (hg : IsTestFunction g) (i : Fin d) :
     IsTestFunction (∂[i] g) := by
@@ -133,7 +133,7 @@ lemma firstVariationDensityTerm_integrable_of_continuous_coordDeriv
     hcont.mul hψcont
   have hsupp : HasCompactSupport (fun x => L.coordDeriv I a (jetAt k f x) * ψ x) :=
     HasCompactSupport.mul_left hψ.supp
-  simpa [firstVariationDensityTerm, ψ] using
+  exact
     htermCont.integrable_of_hasCompactSupport hsupp
 
 /-!
@@ -167,7 +167,7 @@ lemma continuous_jetBaseCoordinates_variedField
         (p.2, jetCoordinatesAt k f p.2 + p.1 • jetCoordinatesAt k η p.2)) := by
     funext p
     congr 1
-    simpa [variedField] using
+    exact
       (jetCoordinatesAt_add_smul k f η p.2 p.1 hf η.isTestFunction.contDiff)
   rw [heq]
   exact hpair

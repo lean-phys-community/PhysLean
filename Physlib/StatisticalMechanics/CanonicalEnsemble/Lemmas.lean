@@ -488,8 +488,7 @@ lemma meanEnergy_eq_ratio_of_integrals
   have h_den :
       (𝓒.μBolt T Set.univ).toReal
         = ∫ x, Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ := by
-    simpa [CanonicalEnsemble.mathematicalPartitionFunction]
-      using (mathematicalPartitionFunction_eq_integral (𝓒:=𝓒) (T:=T))
+    exact (mathematicalPartitionFunction_eq_integral (𝓒:=𝓒) (T:=T))
   have h_inv_toReal :
       ((𝓒.μBolt T Set.univ)⁻¹).toReal
         = 1 / (𝓒.μBolt T Set.univ).toReal := by

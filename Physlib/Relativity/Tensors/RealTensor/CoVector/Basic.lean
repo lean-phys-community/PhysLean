@@ -54,7 +54,7 @@ def equivEuclid (d : ℕ) :
 lemma eq_of_apply_eq {d : ℕ} {v w : CoVector d} (h : ∀ i, v i = w i) : v = w := by
   apply (equivEuclid d).injective
   ext i
-  simpa using h i
+  exact h i
 
 instance (d : ℕ) : Norm (CoVector d) where
   norm := fun v => ‖equivEuclid d v‖

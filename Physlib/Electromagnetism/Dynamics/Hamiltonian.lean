@@ -114,11 +114,11 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
     simp only [lagrangian, Fin.isValue, map_add, map_smul,
       LinearMap.smul_apply, smul_eq_mul]
     rw [fderiv_fun_sub hx (by simp [freeCurrentPotential]; fun_prop)]
-    simp only [Fin.isValue, freeCurrentPotential, map_add, map_smul, ContinuousLinearMap.add_apply,
-      ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul, fderiv_const_add,
-      ContinuousLinearMap.coe_sub', Pi.sub_apply]
+    simp only [Fin.isValue, freeCurrentPotential, map_add, map_smul, _root_.add_apply,
+      FunLike.coe_smul, Pi.smul_apply, smul_eq_mul, fderiv_const_add,
+      FunLike.coe_sub, Pi.sub_apply]
     rw [fderiv_const_mul (by fun_prop)]
-  simp only [Fin.isValue, ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+  simp only [Fin.isValue, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   rw [fderiv_fun_sub (by fun_prop) (by fun_prop)]
   simp
 

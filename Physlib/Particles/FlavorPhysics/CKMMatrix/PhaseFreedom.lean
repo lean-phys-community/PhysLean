@@ -306,7 +306,8 @@ lemma ubOnePhaseCond_hold_up_to_equiv_of_ub_one {V : CKMMatrix} (hb : ¬ ([V]ud 
         ring
       rw [hU1]
       have h1:= (ud_us_ne_zero_iff_ub_ne_one V).mpr.mt hb
-      simpa using h1
+      simp_all only [Fin.isValue, ne_eq, not_or, Decidable.not_not, VubAbs, ofReal_eq_one]
+      exact h1
     apply And.intro
     · have hτ : [V]t = cexp ((0 : ℝ) * I) • (conj ([V]u) ⨯₃ conj ([V]c)) := by
         simp only [ofReal_zero, zero_mul, exp_zero, one_smul]

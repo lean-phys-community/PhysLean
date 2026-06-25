@@ -7,7 +7,7 @@ module
 
 public import Physlib.Electromagnetism.Kinematics.EMPotential
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Field Strength Tensor
@@ -578,7 +578,7 @@ lemma toFieldStrength_add {d} (A1 A2 : ElectromagneticPotential d)
   repeat rw [SpaceTime.deriv_eq]
   simp only [add_val]
   rw [fderiv_add]
-  simp only [ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add]
+  simp only [_root_.add_apply, Lorentz.Vector.apply_add]
   ring
   · exact hA1.differentiableAt
   · exact hA2.differentiableAt
@@ -605,7 +605,7 @@ lemma toFieldStrength_smul {d} (c : ℝ) (A : ElectromagneticPotential d)
   repeat rw [SpaceTime.deriv_eq]
   simp only [smul_val]
   rw [fderiv_const_smul]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, Lorentz.Vector.apply_smul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, Lorentz.Vector.apply_smul]
   ring
   exact hA.differentiableAt
 

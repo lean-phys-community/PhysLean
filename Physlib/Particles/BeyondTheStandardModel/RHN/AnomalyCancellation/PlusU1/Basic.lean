@@ -43,28 +43,28 @@ variable {n : ℕ}
 
 lemma gravSol (S : (PlusU1 n).LinSols) : accGrav S.val = 0 := by
   have hS := S.linearSol
-  simp only [PlusU1_numberLinear, PlusU1_linearACCs, Fin.isValue] at hS
-  exact hS 0
+  simp only [PlusU1_linearACCs] at hS
+  exact hS ⟨0, by simp⟩
 
 lemma SU2Sol (S : (PlusU1 n).LinSols) : accSU2 S.val = 0 := by
   have hS := S.linearSol
-  simp only [PlusU1_numberLinear, PlusU1_linearACCs, Fin.isValue] at hS
-  exact hS 1
+  simp only [PlusU1_linearACCs] at hS
+  exact hS ⟨1, by simp⟩
 
 lemma SU3Sol (S : (PlusU1 n).LinSols) : accSU3 S.val = 0 := by
   have hS := S.linearSol
-  simp only [PlusU1_numberLinear, PlusU1_linearACCs, Fin.isValue] at hS
-  exact hS 2
+  simp only [PlusU1_linearACCs] at hS
+  exact hS ⟨2, by simp⟩
 
 lemma YYsol (S : (PlusU1 n).LinSols) : accYY S.val = 0 := by
   have hS := S.linearSol
-  simp only [PlusU1_numberLinear, PlusU1_linearACCs, Fin.isValue] at hS
-  exact hS 3
+  simp only [PlusU1_linearACCs] at hS
+  exact hS ⟨3, by simp⟩
 
 lemma quadSol (S : (PlusU1 n).QuadSols) : accQuad S.val = 0 := by
   have hS := S.quadSol
-  simp only [PlusU1_numberQuadratic, HomogeneousQuadratic.eq_1, PlusU1_quadraticACCs] at hS
-  exact hS 0
+  simp only [PlusU1_quadraticACCs] at hS
+  exact hS ⟨0, by simp⟩
 
 lemma cubeSol (S : (PlusU1 n).Sols) : accCube S.val = 0 := by
   exact S.cubicSol
@@ -76,12 +76,11 @@ def chargeToLinear (S : (PlusU1 n).Charges) (hGrav : accGrav S = 0)
     (PlusU1 n).LinSols :=
   ⟨S, by
     intro i
-    simp only [PlusU1_numberLinear] at i
     match i with
-    | 0 => exact hGrav
-    | 1 => exact hSU2
-    | 2 => exact hSU3
-    | 3 => exact hYY⟩
+    | ⟨0, _⟩ => exact hGrav
+    | ⟨1, _⟩ => exact hSU2
+    | ⟨2, _⟩ => exact hSU3
+    | ⟨3, _⟩ => exact hYY⟩
 
 /-- An element of `LinSols` which satisfies the quadratic ACCs
   gives us a element of `AnomalyFreeQuad`. -/
@@ -89,9 +88,8 @@ def linearToQuad (S : (PlusU1 n).LinSols) (hQ : accQuad S.val = 0) :
     (PlusU1 n).QuadSols :=
   ⟨S, by
     intro i
-    simp only [PlusU1_numberQuadratic] at i
     match i with
-    | 0 => exact hQ⟩
+    | ⟨0, _⟩ => exact hQ⟩
 
 /-- An element of `QuadSols` which satisfies the quadratic ACCs
   gives us a element of `Sols`. -/
@@ -125,17 +123,15 @@ def perm (n : ℕ) : ACCSystemGroupAction (PlusU1 n) where
   rep := repCharges
   linearInvariant := by
     intro i
-    simp only [PlusU1_numberLinear] at i
     match i with
-    | 0 => exact accGrav_invariant
-    | 1 => exact accSU2_invariant
-    | 2 => exact accSU3_invariant
-    | 3 => exact accYY_invariant
+    | ⟨0, _⟩ => exact accGrav_invariant
+    | ⟨1, _⟩ => exact accSU2_invariant
+    | ⟨2, _⟩ => exact accSU3_invariant
+    | ⟨3, _⟩ => exact accYY_invariant
   quadInvariant := by
     intro i
-    simp only [PlusU1_numberQuadratic] at i
     match i with
-    | 0 => exact accQuad_invariant
+    | ⟨0, _⟩ => exact accQuad_invariant
   cubicInvariant := accCube_invariant
 
 end PlusU1

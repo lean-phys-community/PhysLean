@@ -160,7 +160,7 @@ lemma deriv_normPowerSeries {d} (n : ℕ) (x : Space d) (i : Fin d) :
   rw [deriv_eq_fderiv_basis]
   rw [normPowerSeries_eq]
   rw [fderiv_sqrt]
-  simp only [one_div, mul_inv_rev, fderiv_add_const, ContinuousLinearMap.coe_smul', Pi.smul_apply,
+  simp only [one_div, mul_inv_rev, fderiv_add_const, FunLike.coe_smul, Pi.smul_apply,
     smul_eq_mul]
   rw [← deriv_eq_fderiv_basis]
   rw [deriv_norm_sq]
@@ -441,7 +441,7 @@ lemma deriv_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) (x : Space d) (i 
   rw [deriv_eq_fderiv_basis]
   change (fderiv ℝ ((fun x => x ^ m) ∘ normPowerSeries n) x) (basis i) = _
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv, deriv_zpow',
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, deriv_zpow',
     smul_eq_mul]
   rw [fderiv_normPowerSeries]
   simp only [basis_inner]
@@ -474,7 +474,7 @@ lemma deriv_log_normPowerSeries {d : ℕ} {n : ℕ} (x : Space d) (i : Fin d) :
   rw [deriv_eq_fderiv_basis]
   change (fderiv ℝ (Real.log ∘ normPowerSeries n) x) (basis i) = _
   rw [fderiv_comp,]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv,
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv,
     Real.deriv_log', smul_eq_mul, Int.reduceNeg, zpow_neg]
   rw [fderiv_normPowerSeries]
   simp [zpow_ofNat, sq]
@@ -1078,7 +1078,9 @@ private lemma radial_power_deriv_integral_by_parts
         fun_prop
       have hlim := tendsto_nhdsWithin_of_tendsto_nhds
         (s := Set.Ioi (0 : ℝ)) hcont.tendsto
-      simpa [Pi.mul_apply, hη'_apply, hp.ne'] using hlim
+      simp_all only [Nat.succ_eq_add_one, ne_eq, hp.ne', not_false_eq_true, zero_pow, zero_smul,
+        zero_mul]
+      exact hlim
     · have hzero :
           Filter.Tendsto (fun x : ℝ => x ^ p * η' x) Filter.atTop (𝓝 (0 : ℝ)) := by
         have hsch :
@@ -1089,7 +1091,8 @@ private lemma radial_power_deriv_integral_by_parts
             atTop_le_cocompact
         exact hsch.congr' (Filter.Eventually.of_forall (fun x => by
           rw [hmul_iter_apply p x]))
-      simpa [hη'_apply, Pi.mul_apply] using hzero
+      simp_all only [Nat.succ_eq_add_one]
+      exact hzero
   calc
     -∫ (x : ℝ) in Set.Ioi (0 : ℝ),
         x ^ p * _root_.deriv (fun a => η (a • n.1)) x
@@ -1129,8 +1132,8 @@ private lemma distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv
         ∂(Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1)))
         ∂(volume (α := Space d.succ).toSphere) := by
           rw [MeasureTheory.integral_prod]
-          convert integrable_isDistBounded_inner_grad_schwartzMap_spherical
-            (IsDistBounded.zpow_smul_repr_self q (by omega)) η using 1
+          exact integrable_isDistBounded_inner_grad_schwartzMap_spherical
+            (IsDistBounded.zpow_smul_repr_self q (by omega)) η
     _ = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
         r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
         ∂(.comap Subtype.val volume))
@@ -1288,14 +1291,7 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
           change f x.1
         rw [MeasureTheory.integral_subtype_comap (by simp), ← setIntegral_univ]
         change ∫ x in Set.univ, f x = ∫ (x : Space d.succ) in _, f x
-        refine (setIntegral_congr_set ?_)
-        rw [← MeasureTheory.ae_eq_set_compl]
-        trans (∅ : Set (Space d.succ))
-        · apply Filter.EventuallyEq.of_eq
-          rw [← Set.compl_empty]
-          exact compl_compl _
-        · symm
-          simp
+        exact setIntegral_congr_set (MeasureTheory.ae_eq_univ.mpr (by simp)).symm
       _ = - ∫ n, (∫ r, ‖r.1‖⁻¹ ^ d *
         (_root_.deriv (fun a => η (a • n)) ‖r.1‖)
         ∂((Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))))
@@ -1310,7 +1306,6 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
         let x : Space d.succ := r.2.1 • r.1.1
         have hr := r.2.2
         simp [-Subtype.coe_prop] at hr
-        have hr2 : r.2.1 ≠ 0 := by exact Ne.symm (ne_of_lt hr)
         rw [abs_of_nonneg (le_of_lt hr)]
         trans (r.2.1 ^ d)⁻¹ * _root_.deriv (fun a => η (a • ‖↑x‖⁻¹ • ↑x)) ‖x‖
         · simp [x, norm_smul]
@@ -1323,8 +1318,7 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
           field_simp
           simp only [one_smul]
           rw [abs_of_nonneg (le_of_lt hr)]
-        rw [← grad_inner_space_unit_vector]
-        rw [real_inner_comm]
+        rw [← grad_inner_space_unit_vector, real_inner_comm]
         simp [inner_smul_left, x, norm_smul, abs_of_nonneg (le_of_lt hr)]
         field_simp
         ring
@@ -1340,23 +1334,8 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
         funext r
         have hr := r.2
         simp [-Subtype.coe_prop] at hr
-        trans ((r.1 ^ d).toNNReal : ℝ) • ((r.1 ^ d)⁻¹ * _root_.deriv (fun a => η (a • ↑n)) |r.1|)
-        · rw [NNReal.smul_def]
-          simp only [Real.coe_toNNReal', smul_eq_mul, Nat.succ_eq_add_one, mul_eq_mul_left_iff,
-            mul_eq_mul_right_iff, inv_inj, sup_eq_right]
-          rw [abs_of_nonneg (le_of_lt hr)]
-          simp
-        trans ((r.1 ^ d) : ℝ) • ((r.1 ^ d)⁻¹ * _root_.deriv (fun a => η (a • ↑n)) |r.1|)
-        · congr
-          rw [Real.coe_toNNReal']
-          rw [max_eq_left]
-          apply pow_nonneg
-          grind
-        have h1 : r.1 ≠ 0 := by exact ne_of_gt r.2
-        simp only [smul_eq_mul]
-        field_simp
-        congr
-        rw [abs_of_nonneg (le_of_lt hr)]
+        rw [abs_of_nonneg hr.le, NNReal.smul_def, Real.coe_toNNReal _ (by positivity),
+          smul_eq_mul, ← mul_assoc, mul_inv_cancel₀ (pow_ne_zero d hr.ne'), one_mul]
         fun_prop
       _ = - ∫ n, (-η 0) ∂(volume (α := Space d.succ).toSphere) := by
         congr
@@ -1383,8 +1362,8 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
                 simp [fderiv_smul_const]
               rw [iteratedFDeriv_succ_const]
               rfl) (by use 1, 1; simp [norm_smul]) η
-        rw [MeasureTheory.integral_subtype_comap (by simp)]
-        rw [MeasureTheory.integral_Ioi_of_hasDerivAt_of_tendsto (f := fun a => η (a • n)) (m := 0)]
+        rw [MeasureTheory.integral_subtype_comap (by simp),
+          MeasureTheory.integral_Ioi_of_hasDerivAt_of_tendsto (f := fun a => η (a • n)) (m := 0)]
         · simp
         · refine ContinuousAt.continuousWithinAt ?_
           fun_prop
@@ -1398,7 +1377,7 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
         simp only [Nat.succ_eq_add_one, integral_const, Measure.toSphere_real_apply_univ,
           finrank_eq_dim, Nat.cast_add, Nat.cast_one, smul_eq_mul, mul_neg, neg_neg]
         ring
-  simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, ContinuousLinearMap.coe_smul',
+  simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, FunLike.coe_smul,
     Pi.smul_apply, diracDelta_apply, smul_eq_mul]
   ring
 
@@ -1459,7 +1438,7 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
         (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))) =
         (d.succ.succ.succ * (volume (α := Space d.succ.succ.succ)).real
           (Metric.ball 0 1)) • diracDelta ℝ 0 := by
-    convert distDiv_inv_pow_eq_dim (d := d.succ.succ.succ) using 1
+    exact distDiv_inv_pow_eq_dim (d := d.succ.succ.succ)
   rw [hdiv]
   rw [smul_smul]
   ring_nf
@@ -1475,9 +1454,9 @@ lemma distLaplacian_fundamentalSolution_norm_zpow_of_three_le {d : ℕ} (hd : 3 
   · omega
   · omega
   · omega
-  · convert distLaplacian_fundamentalSolution_norm_zpow (d := d) using 1
+  · convert! distLaplacian_fundamentalSolution_norm_zpow (d := d) using 1
     ext x
-    simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one]
     ring_nf
 

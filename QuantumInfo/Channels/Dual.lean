@@ -284,8 +284,8 @@ lemma Module.Basis.dualMap_toDualEquiv_symm_comp_toDualEquiv {ι R M : Type*} [F
   ext x f;
   -- Since $b.toDual$ and $b.toDualEquiv.symm$ are inverses, we have $b.toDual (b.toDualEquiv.symm f) = f$.
   have h_inv : b.toDual (b.toDualEquiv.symm f) = f := by
-    convert LinearEquiv.apply_symm_apply b.toDualEquiv f;
-  convert congr_arg ( fun g => g x ) h_inv using 1;
+    convert! LinearEquiv.apply_symm_apply b.toDualEquiv f;
+  convert! congr_arg ( fun g => g x ) h_inv using 1;
   -- By definition of the dual basis, we know that $(b.toDual x) (b.toDualEquiv.symm f) = f x$.
   simp [Module.Basis.toDual];
   ac_rfl

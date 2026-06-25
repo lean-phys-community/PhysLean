@@ -100,7 +100,6 @@ lemma HasVarGradientAt.sum {ι : Type} [Fintype ι] (F : ι → (X → U) → (X
       apply HasVarAdjDerivAt.const
       fun_prop
       fun_prop
-      simp
       rfl
     · intro i ι' hp F F' u hu ih
       simp only [Fintype.sum_option]

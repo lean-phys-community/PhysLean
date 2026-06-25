@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Distributional.Basic
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Scalar Potential
@@ -67,7 +67,7 @@ noncomputable def scalarPotential {d} (c : SpeedOfLight) :
   map_smul' r A := by
     ext ε
     simp only [distTimeSlice, map_smul, ContinuousLinearEquiv.coe_mk, LinearEquiv.coe_mk,
-      LinearMap.coe_mk, AddHom.coe_mk, ContinuousLinearMap.coe_comp', ContinuousLinearMap.coe_smul',
+      LinearMap.coe_mk, AddHom.coe_mk, ContinuousLinearMap.coe_comp, FunLike.coe_smul,
       Function.comp_apply, Pi.smul_apply, smul_eq_mul, Real.ringHom_apply]
     ring
 

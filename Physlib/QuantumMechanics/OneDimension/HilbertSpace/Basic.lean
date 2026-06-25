@@ -77,8 +77,8 @@ lemma memHS_iff {f : ℝ → ℂ} : MemHS f ↔
 lemma zero_memHS : MemHS 0 := by
   change MemHS (fun x => (0 : ℂ))
   rw [memHS_iff]
-  simp only [norm_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, integrable_zero,
-    and_true]
+  simp only [norm_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
+    integrable_fun_zero, and_true]
   fun_prop
 
 @[simp]

@@ -119,7 +119,7 @@ noncomputable def tangentInnerCore (g : RiemannianMetric I n M) (x : M) :
     · simp [hv, map_zero]
     · exact le_of_lt (g.pos_def x v hv)
   add_left := λ u v w => by
-    simp only [inner_apply, map_add, ContinuousLinearMap.add_apply]
+    simp only [inner_apply, map_add, add_apply]
   smul_left := λ r u v => by
     simp only [inner_apply, map_smul, conj_trivial]
     rfl

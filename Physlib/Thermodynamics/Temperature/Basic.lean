@@ -63,6 +63,10 @@ noncomputable def β (T : Temperature) : ℝ≥0 :=
       · exact kB_nonneg
       · simp [toReal]⟩
 
+lemma β_toReal (T : Temperature) : (β T : ℝ) = 1 / (kB * (T : ℝ)) := by
+  simp [β, toReal]
+  rfl
+
 /-- The temperature associated with a given inverse temperature `β`. -/
 noncomputable def ofβ (β : ℝ≥0) : Temperature :=
   ⟨⟨1 / (kB * β), by
@@ -88,6 +92,10 @@ lemma β_ofβ (β' : ℝ≥0) : β (ofβ β') = β' := by
   show 1 / (kB * (1 / (↑β' * kB))) = ↑β'
   field_simp [kB_ne_zero]
 
+lemma ofβ_toReal (β : ℝ≥0) : (ofβ β).toReal = 1 / (kB * (β : ℝ)) := by
+  simp [ofβ, toReal]
+  rfl
+
 @[simp]
 lemma ofβ_β (T : Temperature) : ofβ (β T) = T := by
   ext
@@ -101,7 +109,13 @@ lemma ofβ_β (T : Temperature) : ofβ (β T) = T := by
 lemma beta_pos (T : Temperature) (hT_pos : 0 < T.val) : 0 < (T.β : ℝ) := by
   unfold Temperature.β
   have h_prod : 0 < (kB : ℝ) * T.val := mul_pos kB_pos hT_pos
-  simpa [Temperature.β] using inv_pos.mpr h_prod
+  have h1 :  0 < T.toReal⁻¹ * kB⁻¹ := by
+    have h1 := inv_pos.mpr h_prod
+    simp_all
+    simpa [Temperature.toReal] using hT_pos
+  convert h1
+  simp only [one_div, mul_inv_rev]
+  rfl
 
 /-! ### Regularity of `ofβ` -/
 
@@ -166,7 +180,7 @@ lemma eventually_pos_ofβ : ∀ᶠ b : ℝ≥0 in atTop, ((Temperature.ofβ b : 
   have hbpos : 0 < (b : ℝ) := (zero_lt_one.trans_le hb)
   have hden : 0 < kB * (b : ℝ) := mul_pos kB_pos hbpos
   have : 0 < (1 : ℝ) / (kB * (b : ℝ)) := one_div_pos.mpr hden
-  simpa [Temperature.ofβ, one_div, Temperature.toReal] using this
+  simpa [ofβ_toReal] using this
 
 /-- General helper: for any `a > 0`, we have `1 / (a * b) → 0` as `b → ∞` in `ℝ≥0`. -/
 private lemma tendsto_const_inv_mul_atTop (a : ℝ) (ha : 0 < a) :
@@ -354,10 +368,13 @@ lemma chain_rule_T_beta {F : ℝ → ℝ} {F' : ℝ}
   have h_beta_at_T : betaFromReal (T.val : ℝ) = (T.β : ℝ) := by
     have hTposR : 0 < (T.val : ℝ) := hT_pos
     have h_eqt := beta_fun_T_eq_on_Ioi hTposR
-    simpa [Temperature.β, Temperature.toReal] using h_eqt
+    rw [h_eqt]
+    simp [β_toReal]
+    left
+    rfl
   have hF_deriv' : HasDerivWithinAt F F' (Set.Ioi 0) (betaFromReal (T.val : ℝ)) := by
     simpa [h_beta_at_T] using hF_deriv
   have h_comp := hF_deriv'.comp (T.val : ℝ) hβ_deriv h_map
-  simpa [mul_comm] using h_comp
+  exact h_comp
 
 end Temperature
