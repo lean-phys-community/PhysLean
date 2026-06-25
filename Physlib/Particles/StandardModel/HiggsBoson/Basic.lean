@@ -611,7 +611,9 @@ We prove some smoothness properties of the components of a Higgs field.
 @[fun_prop]
 lemma contDiff (φ : HiggsField) :
     ContDiff ℝ ⊤ φ := by
-  simpa [contMDiff_iff_contDiff] using φ.toHiggsVec_smooth
+  have h1 := φ.toHiggsVec_smooth
+  simp_all only [contMDiff_iff_contDiff]
+  exact h1
 
 lemma toVec_smooth (φ : HiggsField) :
     ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, EuclideanSpace ℂ (Fin 2)) ⊤ φ :=

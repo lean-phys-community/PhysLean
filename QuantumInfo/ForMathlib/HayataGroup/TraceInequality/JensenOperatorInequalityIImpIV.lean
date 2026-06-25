@@ -129,7 +129,7 @@ private lemma blockOp_smulR
     intros; rfl
   ext z i
   fin_cases i <;> {
-    simp only [blockOp, ContinuousLinearMap.add_apply, ContinuousLinearMap.comp_apply,
+    simp only [blockOp, add_apply, ContinuousLinearMap.comp_apply,
       smul_add, coe_smul_hsum, coe_smul_h]
     simp [hsumProj, hsumIncl, hsumEquiv]
   }

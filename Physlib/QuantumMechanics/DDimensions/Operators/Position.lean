@@ -85,8 +85,9 @@ notation "𝐱[" d' "]" => positionCLM (d := d')
 
 lemma positionCLM_apply_fun (ψ : 𝓢(Space d, ℂ)) : 𝐱 i ψ = (fun x : Space d ↦ x i) • ⇑ψ := by
   ext
-  simp [positionCLM, coordCLM_apply, coord_apply,
-    smulLeftCLM_apply_apply (g := Complex.ofRealCLM ∘ (coordCLM i)) (by fun_prop)]
+  simp only [positionCLM]
+  erw [smulLeftCLM_apply_apply (g := Complex.ofRealCLM ∘ (coordCLM i)) (by fun_prop)]
+  simp [coordCLM_apply, coord_apply]
 
 @[simp]
 lemma positionCLM_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐱 i ψ x = x i * ψ x := by

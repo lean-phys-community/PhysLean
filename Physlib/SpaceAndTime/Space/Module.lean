@@ -599,7 +599,7 @@ lemma fderiv_space_components {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     fderiv ℝ f m dm μ = fderiv ℝ (fun m' => f m' μ) m dm := by
   trans fderiv ℝ (Space.coordCLM μ ∘ fun m' => f m') m dm
   · rw [fderiv_comp _ (by fun_prop) (by fun_prop), ContinuousLinearMap.fderiv,
-      ContinuousLinearMap.coe_comp', Function.comp_apply]
+      ContinuousLinearMap.coe_comp, Function.comp_apply]
     simp [coordCLM, coord_apply]
   · congr
     ext i
@@ -749,14 +749,15 @@ lemma basis_eq_mfderiv_modelDiffeo_single (d : ℕ) (μ : Fin d) (x : Space d) :
     PartialEquiv.trans_refl, PartialEquiv.refl_coe, Homeomorph.symm_toOpenPartialHomeomorph,
     OpenPartialHomeomorph.symm_toPartialEquiv, PartialEquiv.symm_symm,
     OpenPartialHomeomorph.toFun_eq_coe, Homeomorph.toOpenPartialHomeomorph_apply,
-    CompTriple.comp_eq, modelWithCornersSelf_coe, Set.range_id, OpenPartialHomeomorph.coe_coe_symm,
-    Homeomorph.toOpenPartialHomeomorph_symm_apply, fderivWithin_univ]
+    CompTriple.comp_eq, modelWithCornersSelf_coe, Set.range_id,
+    OpenPartialHomeomorph.coe_toPartialEquiv_symm, Homeomorph.toOpenPartialHomeomorph_symm_apply,
+    fderivWithin_univ]
   rw [if_pos (modelDiffeo.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt]
   ext i
   have h := fderiv_space_components i ((⇑modelDiffeo ∘ ⇑(homEuclideanSpaceSpace d)))
     (by simpa [Function.comp_def, homEuclideanSpaceSpace] using by fun_prop)
     (((homEuclideanSpaceSpace d).symm x)) ((EuclideanSpace.single μ 1))
-  convert h.symm
+  convert! h.symm
   simp only [basis_apply, homEuclideanSpaceSpace, PiLp.continuousLinearEquiv_symm_apply,
     Homeomorph.homeomorph_mk_coe, Equiv.coe_fn_mk, Function.comp_apply, modelDiffeo_apply,
     PiLp.continuousLinearEquiv_apply, Homeomorph.homeomorph_mk_coe_symm, Equiv.symm_mk]
@@ -792,7 +793,6 @@ lemma differentiable_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
 lemma fderiv_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
     fderiv ℝ (fun s => v +ᵥ s) = fun (_ : Space d) => ContinuousLinearMap.id ℝ _ := by
   ext s ds i
-  change fderiv ℝ (fun s => v +ᵥ s) s ds i = _
   rw [fderiv_space_components]
   simp only [vadd_apply, fderiv_const_add, ContinuousLinearMap.coe_id', id_eq]
   trans fderiv ℝ (coordCLM i) s ds

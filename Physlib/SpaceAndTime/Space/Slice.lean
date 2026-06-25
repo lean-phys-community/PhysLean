@@ -177,21 +177,21 @@ lemma fderiv_slice_symm {d : ℕ} (i : Fin d.succ) (p1 : ℝ × Space d) :
 
 lemma fderiv_slice_symm_left_apply {d : ℕ} (i : Fin d.succ) (x : Space d) (r1 r2 : ℝ) :
     (fderiv ℝ (fun r => (slice i).symm (r, x))) r1 r2 = (slice i).symm (r2, 0) := by
-  rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop)]
+  rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop)]
   simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
-    ContinuousLinearMap.coe_comp', ContinuousLinearEquiv.coe_coe, Function.comp_apply,
+    ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe, Function.comp_apply,
     ContinuousLinearMap.prod_apply, ContinuousLinearMap.coe_id', id_eq,
-    ContinuousLinearMap.zero_apply]
+    _root_.zero_apply]
   repeat' fun_prop
 
 @[simp]
 lemma fderiv_slice_symm_right_apply {d : ℕ} (i : Fin d.succ) (r : ℝ)
     (x1 x2 : Space d) :
     (fderiv ℝ (fun x => (slice i).symm (r, x))) x1 x2 = (slice i).symm (0, x2) := by
-  rw [fderiv_comp', DifferentiableAt.fderiv_prodMk (by fun_prop)]
+  rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop)]
   simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply, fderiv_fun_id,
-    ContinuousLinearMap.coe_comp', ContinuousLinearEquiv.coe_coe, Function.comp_apply,
-    ContinuousLinearMap.prod_apply, ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id',
+    ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe, Function.comp_apply,
+    ContinuousLinearMap.prod_apply, _root_.zero_apply, ContinuousLinearMap.coe_id',
     id_eq]
   repeat' fun_prop
 
@@ -199,8 +199,8 @@ lemma fderiv_fun_slice_symm_right_apply {d : ℕ} (i : Fin d.succ) (r : ℝ)
     (x1 x2 : Space d) (f : Space d.succ → F) (hf : DifferentiableAt ℝ f ((slice i).symm (r, x1))) :
     (fderiv ℝ (fun x => f ((slice i).symm (r, x)))) x1 x2 =
     fderiv ℝ f ((slice i).symm (r, x1)) ((slice i).symm (0, x2)) := by
-  rw [fderiv_comp' _ _ (by fun_prop)]
-  simp only [Nat.succ_eq_add_one, ContinuousLinearMap.coe_comp', Function.comp_apply,
+  rw [fderiv_fun_comp _ _ (by fun_prop)]
+  simp only [Nat.succ_eq_add_one, ContinuousLinearMap.coe_comp, Function.comp_apply,
     fderiv_slice_symm_right_apply]
   fun_prop
 
@@ -208,8 +208,8 @@ lemma fderiv_fun_slice_symm_left_apply {d : ℕ} (i : Fin d.succ) (r1 r2 : ℝ)
     (x : Space d) (f : Space d.succ → F) (hf : DifferentiableAt ℝ f ((slice i).symm (r1, x))) :
     (fderiv ℝ (fun r => f ((slice i).symm (r, x)))) r1 r2 =
     fderiv ℝ f ((slice i).symm (r1, x)) ((slice i).symm (r2, 0)) := by
-  rw [fderiv_comp' _ _ (by fun_prop)]
-  simp only [Nat.succ_eq_add_one, ContinuousLinearMap.coe_comp', Function.comp_apply,
+  rw [fderiv_fun_comp _ _ (by fun_prop)]
+  simp only [Nat.succ_eq_add_one, ContinuousLinearMap.coe_comp, Function.comp_apply,
     fderiv_slice_symm_left_apply]
   fun_prop
 

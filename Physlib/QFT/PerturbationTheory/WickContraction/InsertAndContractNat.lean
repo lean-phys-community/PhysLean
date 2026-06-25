@@ -579,7 +579,8 @@ lemma erase_insert (c : WickContraction n.succ) (i : Fin n.succ) :
         simp
       · obtain ⟨a', ha', ha''⟩ := ha
         subst ha''
-        simpa [erase] using ha'
+        simp_all only [Nat.succ_eq_add_one, erase, Finset.mem_filter, Finset.mem_univ, true_and]
+        exact ha'
     · intro ha
       simp only [Finset.mem_insert, Finset.mem_map, RelEmbedding.coe_toEmbedding]
       by_cases hia : a = {i, (c.getDual? i).get hi}

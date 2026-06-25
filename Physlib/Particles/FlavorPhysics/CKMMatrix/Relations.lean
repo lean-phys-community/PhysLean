@@ -38,7 +38,9 @@ lemma VAbs_sum_sq_row_eq_one (V : Quotient CKMMatrixSetoid) (i : Fin 3) :
   rw [mul_conj, mul_conj, mul_conj] at ht
   repeat rw [← Complex.sq_norm] at ht
   rw [← ofReal_inj]
-  simpa using ht
+  simp_all only [SetLike.coe_mem, Unitary.mul_star_self_of_mem, Fin.isValue, ofReal_pow, ofReal_add,
+    ofReal_one]
+  exact ht
 
 /-- The absolute value squared of the first row of a CKM matrix is `1`, in terms of `norm`. -/
 lemma fst_row_normalized_abs (V : CKMMatrix) :
@@ -119,7 +121,9 @@ lemma VAbsub_ne_zero_Vud_Vus_ne_zero {V : Quotient CKMMatrixSetoid}
   change VubAbs ⟦V⟧ ≠ 1 at hV
   simp only [VubAbs, VAbs, VAbs', Fin.isValue, Quotient.lift_mk] at hV
   rw [← ud_us_ne_zero_iff_ub_ne_one V] at hV
-  simpa [← Complex.sq_norm] using (normSq_Vud_plus_normSq_Vus_ne_zero_ℝ hV)
+  have := (normSq_Vud_plus_normSq_Vus_ne_zero_ℝ hV)
+  simp_all only [Fin.isValue, ne_eq, ← Complex.sq_norm, VudAbs, VusAbs]
+  exact this
 
 lemma VAbsub_ne_zero_sqrt_Vud_Vus_ne_zero {V : Quotient CKMMatrixSetoid}
     (hV : VAbs 0 2 V ≠ 1) : √(VudAbs V ^ 2 + VusAbs V ^ 2) ≠ 0 := by
@@ -128,7 +132,9 @@ lemma VAbsub_ne_zero_sqrt_Vud_Vus_ne_zero {V : Quotient CKMMatrixSetoid}
   change VubAbs ⟦V⟧ ≠ 1 at hV
   simp only [VubAbs, VAbs, VAbs', Fin.isValue, Quotient.lift_mk] at hV
   rw [← ud_us_ne_zero_iff_ub_ne_one V] at hV
-  simpa [← Complex.sq_norm] using (normSq_Vud_plus_normSq_Vus_ne_zero_ℝ hV)
+  have := (normSq_Vud_plus_normSq_Vus_ne_zero_ℝ hV)
+  simp_all only [Fin.isValue, ne_eq, ← Complex.sq_norm, VudAbs, VusAbs]
+  exact this
 
 lemma normSq_Vud_plus_normSq_Vus_ne_zero_ℂ {V : CKMMatrix} (hb : [V]ud ≠ 0 ∨ [V]us ≠ 0) :
     (normSq [V]ud : ℂ) + normSq [V]us ≠ 0 := by
@@ -290,7 +296,9 @@ lemma VAbs_sum_sq_col_eq_one (V : Quotient CKMMatrixSetoid) (i : Fin 3) :
   rw [mul_comm, mul_conj, mul_comm, mul_conj, mul_comm, mul_conj] at ht
   repeat rw [← Complex.sq_norm] at ht
   rw [← ofReal_inj]
-  simpa using ht
+  simp_all only [SetLike.coe_mem, Unitary.star_mul_self_of_mem, Fin.isValue, ofReal_pow, ofReal_add,
+    ofReal_one]
+  exact ht
 
 lemma thd_col_normalized_abs (V : CKMMatrix) :
     norm [V]ub ^ 2 + norm [V]cb ^ 2 + norm [V]tb ^ 2 = 1 := by

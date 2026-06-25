@@ -83,7 +83,7 @@ lemma actionVariation_hasDerivAt_of_dominated_loc_of_deriv_le
         HasDerivAt (fun r : ℝ => actionDensity L (variedField f η r) x) (F' s x) s) :
     HasDerivAt (actionVariation L f η) (∫ x, F' 0 x) 0 := by
   have hs : Metric.ball (0 : ℝ) ε ∈ nhds (0 : ℝ) := Metric.ball_mem_nhds _ hε
-  simpa [actionVariation, action, actionDensity] using
+  exact
     (hasDerivAt_integral_of_dominated_loc_of_deriv_le
       (μ := volume) (F := fun s x => actionDensity L (variedField f η s) x)
       (x₀ := (0 : ℝ)) (s := Metric.ball (0 : ℝ) ε) hs
@@ -264,7 +264,7 @@ lemma hasDerivAt_actionDensity_variedField_zero_of_contDiff
       ∀ s : ℝ, jetAt k (variedField f η s) x =
         (jetAt k f x).lineMap (jetDirectionAt k η x) s := by
     intro s
-    simpa [variedField] using jetAt_add_smul k f η x s hf η.isTestFunction.contDiff
+    exact jetAt_add_smul k f η x s hf η.isTestFunction.contDiff
   have hfun :
       (fun s : ℝ => actionDensity L (variedField f η s) x) =
         fun s : ℝ => L ((jetAt k f x).lineMap (jetDirectionAt k η x) s) := by

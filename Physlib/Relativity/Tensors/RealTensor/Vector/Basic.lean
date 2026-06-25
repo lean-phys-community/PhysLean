@@ -255,7 +255,7 @@ lemma fderiv_apply {d : ℕ} {α : Type*}
     fderiv ℝ f x dt ν = fderiv ℝ (fun y => f y ν) x dt := by
   change _ = (fderiv ℝ (Lorentz.Vector.coordCLM ν ∘ f) x) dt
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
   rfl
 
 @[simp]

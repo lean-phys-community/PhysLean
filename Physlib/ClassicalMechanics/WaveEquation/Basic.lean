@@ -136,8 +136,8 @@ lemma planeWave_time_deriv {d f₀ c x} {s : Direction d}
   change fderiv ℝ (f₀ ∘ fun t : Time => (inner ℝ x s.unit - c * t)) t 1 i = _
   rw [fderiv_comp, fderiv_const_sub, fderiv_const_mul]
   simp only [ContinuousLinearMap.comp_neg, ContinuousLinearMap.comp_smulₛₗ,
-    RingHom.id_apply, ContinuousLinearMap.neg_apply,
-    ContinuousLinearMap.coe_smul', Pi.smul_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul,
+    RingHom.id_apply, _root_.neg_apply,
+    FunLike.coe_smul, Pi.smul_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul,
     neg_mul, neg_inj, mul_eq_mul_left_iff]
   left
   simp
@@ -152,8 +152,8 @@ lemma planeWave_time_deriv_time_deriv {d f₀ c x} {s : Direction d}
     rw [planeWave_time_deriv (h'.differentiable (by simp))]
   ext t i
   rw [Time.deriv_eq, fderiv_const_smul (by fun_prop)]
-  simp only [fderiv_eq_smul_deriv, one_smul, neg_smul, ContinuousLinearMap.neg_apply,
-    ContinuousLinearMap.coe_smul', Pi.smul_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul]
+  simp only [fderiv_eq_smul_deriv, one_smul, neg_smul, _root_.neg_apply,
+    FunLike.coe_smul, Pi.smul_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul]
   rw [← Time.deriv_eq, planeWave_time_deriv (by fun_prop)]
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, PiLp.smul_apply, smul_eq_mul, neg_mul,
     mul_neg, neg_neg]
@@ -181,11 +181,11 @@ lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
   change fderiv ℝ
     (f₀ ∘ fun x : Space d => (inner ℝ x s.unit - c * t)) x (Space.basis i) j = _
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv,
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv,
     PiLp.smul_apply, smul_eq_mul, one_smul, Pi.smul_apply]
   rw [fderiv_sub_const]
   rw [fderiv_inner_apply]
-  simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
+  simp only [fderiv_fun_const, Pi.zero_apply, _root_.zero_apply, inner_zero_right,
     fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add, mul_eq_mul_left_iff]
   left
   simp [planeWave_eq]
@@ -199,7 +199,7 @@ lemma planeWave_apply_space_deriv {d f₀ c} {s : Direction d}
   rw [Space.deriv_eq_fderiv_basis]
   change fderiv ℝ (EuclideanSpace.proj j ∘ fun x => (planeWave f₀ c s t x)) x (basis i) = _
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
     PiLp.proj_apply, fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
   rw [← Space.deriv_eq_fderiv_basis, planeWave_space_deriv]
   rfl
@@ -216,7 +216,7 @@ lemma planeWave_space_deriv_space_deriv {d f₀ c} {s : Direction d}
     rw [planeWave_space_deriv (h'.differentiable (by simp)) i]
   funext x
   rw [Space.deriv_eq_fderiv_basis, fderiv_const_smul]
-  simp only [fderiv_eq_smul_deriv, one_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply]
+  simp only [fderiv_eq_smul_deriv, one_smul, FunLike.coe_smul, Pi.smul_apply]
   rw [← Space.deriv_eq_fderiv_basis, planeWave_space_deriv]
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply]
   rw [smul_smul]
@@ -238,7 +238,7 @@ lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
     rw [planeWave_apply_space_deriv (h'.differentiable (by simp)) i]
   funext x
   rw [Space.deriv_eq_fderiv_basis, fderiv_const_smul]
-  simp only [fderiv_eq_smul_deriv, one_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply,
+  simp only [fderiv_eq_smul_deriv, one_smul, FunLike.coe_smul, Pi.smul_apply,
     smul_eq_mul]
   rw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv]
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
@@ -312,12 +312,12 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
     change (fderiv ℝ ((fun x' => f₀' x' (s.unit u)) ∘
         fun x' => (inner ℝ x' s.unit - c * t)) x) (Space.basis u) = _
     rw [fderiv_comp, fderiv_fun_sub]
-    simp only [fderiv_fun_const, Pi.ofNat_apply, sub_zero, ContinuousLinearMap.coe_comp',
+    simp only [fderiv_fun_const, Pi.ofNat_apply, sub_zero, ContinuousLinearMap.coe_comp,
       Function.comp_apply]
     rw [fderiv_inner_apply]
     simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
     trans (fderiv ℝ (fun x' => (f₀' x') (s.unit u • 1)) (inner ℝ x s.unit - c * t)) (s.unit u • 1)
-    simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
+    simp only [fderiv_fun_const, Pi.ofNat_apply, _root_.zero_apply, inner_zero_right,
       basis_inner, zero_add, fderiv_eq_smul_deriv, smul_eq_mul, mul_one]
     conv_lhs =>
       enter [1, 2, x']
@@ -334,7 +334,7 @@ lemma wave_dx2 {u v : Fin d} {s : Direction d}
     · exact wave_differentiable
   rw [hdi']
   simp only [PiLp.inner_apply, fderiv_fun_const, Pi.zero_apply,
-    ContinuousLinearMap.zero_apply, inner_zero_right, PiLp.smul_apply, smul_eq_mul,
+    _root_.zero_apply, inner_zero_right, PiLp.smul_apply, smul_eq_mul,
     PiLp.single_apply, zero_add]
   change DifferentiableAt ℝ ((fun x' => f₀' x' (s.unit u)) ∘
       (fun x => (inner ℝ x s.unit - c * t))) x
@@ -417,15 +417,15 @@ lemma wave_fderiv_inner_eq_inner_fderiv_proj {f₀ : ℝ → EuclideanSpace ℝ 
       inner ℝ y s.unit * (fderiv ℝ ((EuclideanSpace.proj i) ∘
       fun x => f₀ (inner ℝ x s.unit - c * t)) x) (Space.basis i)
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
     PiLp.proj_apply]
   change s.unit i * (fderiv ℝ (f₀ ∘ fun x => (inner ℝ x s.unit - c * t)) x) y i =
       inner ℝ y s.unit * (fderiv ℝ (f₀ ∘ fun x => (inner ℝ x s.unit - c * t)) x)
       (Space.basis i) i
   rw [fderiv_comp, fderiv_fun_sub]
-  simp only [fderiv_fun_const, Pi.zero_apply, sub_zero, ContinuousLinearMap.coe_comp',
+  simp only [fderiv_fun_const, Pi.zero_apply, sub_zero, ContinuousLinearMap.coe_comp,
     Function.comp_apply, differentiableAt_fun_id, differentiableAt_const, fderiv_inner_apply,
-    ContinuousLinearMap.zero_apply, inner_zero_right, fderiv_fun_id, ContinuousLinearMap.coe_id',
+    _root_.zero_apply, inner_zero_right, fderiv_fun_id, ContinuousLinearMap.coe_id',
     id_eq, zero_add]
   simp only [fderiv_eq_smul_deriv, PiLp.smul_apply, smul_eq_mul, basis_inner]
   rw [← mul_one (s.unit i), ← smul_eq_mul (s.unit i)]

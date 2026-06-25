@@ -31,11 +31,11 @@ For a positive Hermitian matrix A, ||A||_p = (Tr(A^p))^(1/p).
 -/
 theorem schattenNorm_hermitian_pow {A : HermitianMat d ℂ} (hA : 0 ≤ A) {p : ℝ} (hp : 0 < p) :
     schattenNorm A.mat p = (A ^ p).trace ^ (1/p) := by
-  convert congr_arg (· ^ (1 / p)) _ using 1
-  convert congr_arg _ (A.cfc_sq_rpow_eq_cfc_rpow hA p hp.le) using 1
+  convert! congr_arg (· ^ (1 / p)) _ using 1
+  convert! congr_arg _ (A.cfc_sq_rpow_eq_cfc_rpow hA p hp.le) using 1
   unfold HermitianMat.trace
-  convert rfl
-  convert (A ^ 2).mat_cfc (· ^ (p / 2))
+  convert! rfl
+  convert! (A ^ 2).mat_cfc (· ^ (p / 2))
   ext
   simp only [HermitianMat.conjTranspose_mat, HermitianMat.mat_pow]
   convert rfl using 2
@@ -99,7 +99,7 @@ lemma schattenNorm_rpow_eq_sum_singularValues (A : Matrix d d ℂ) {p : ℝ} (hp
     exact Matrix.eigenvalues_conjTranspose_mul_self_nonneg A i;
   · have h_nonneg : ∀ i : d, 0 ≤ ((Matrix.isHermitian_mul_conjTranspose_self A.conjTranspose).eigenvalues i) ^ (p / 2) := by
       exact fun i => Real.rpow_nonneg ( by have := Matrix.eigenvalues_conjTranspose_mul_self_nonneg A; aesop ) _;
-    convert Finset.sum_nonneg fun i _ => h_nonneg i using 1;
+    convert! Finset.sum_nonneg fun i _ => h_nonneg i using 1;
     convert schattenNorm_trace_as_eigenvalue_sum A p using 1
 
 /- The Schatten p-norm equals the ℓ^p quasi-norm of the singular values:
@@ -151,7 +151,7 @@ lemma HermitianMat.trace_young
     refine h_young _ _ ?_ ?_ hp hpq
     · exact (zero_le_iff.mp hA).eigenvalues_nonneg _
     · exact (zero_le_iff.mp hB).eigenvalues_nonneg _
-  convert Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => mul_le_mul_of_nonneg_right ( h_schatten i j ) ( show 0 ≤ ‖(A.H.eigenvectorUnitary.val.conjTranspose * B.H.eigenvectorUnitary.val) i j‖ ^ 2 by positivity ) using 1;
+  convert! Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => mul_le_mul_of_nonneg_right ( h_schatten i j ) ( show 0 ≤ ‖(A.H.eigenvectorUnitary.val.conjTranspose * B.H.eigenvectorUnitary.val) i j‖ ^ 2 by positivity ) using 1;
   convert HermitianMat.inner_eq_doubly_stochastic_sum A B using 1;
   simp [ Finset.sum_add_distrib, add_mul, Finset.mul_sum, div_eq_mul_inv, mul_assoc, mul_comm, HermitianMat.trace_rpow_eq_sum ];
   simp [ ← Finset.mul_sum, ← Finset.sum_comm, ];

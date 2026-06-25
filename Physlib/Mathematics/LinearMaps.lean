@@ -33,7 +33,7 @@ variable {V : Type} [AddCommMonoid V] [Module ℚ V]
 /-- A homogeneous quadratic equation can be treated as a function from `V` to `ℚ`. -/
 instance instFun : FunLike (HomogeneousQuadratic V) V ℚ where
   coe f := f.toFun
-  coe_injective' f g h := by
+  coe_injective f g h := by
     cases f
     cases g
     simp_all
@@ -60,7 +60,7 @@ variable {V : Type} [AddCommMonoid V] [Module ℚ V]
 instance instFun (V : Type) [AddCommMonoid V] [Module ℚ V] :
     FunLike (BiLinearSymm V) V (V →ₗ[ℚ] ℚ) where
   coe f := f.toFun
-  coe_injective' f g h := by
+  coe_injective f g h := by
     cases f
     cases g
     simp_all
@@ -152,7 +152,7 @@ variable {V : Type} [AddCommMonoid V] [Module ℚ V]
 /-- A homogeneous cubic equation can be treated as a function from `V` to `ℚ`. -/
 instance instFun : FunLike (HomogeneousCubic V) V ℚ where
   coe f := f.toFun
-  coe_injective' f g h := by
+  coe_injective f g h := by
     cases f
     cases g
     simp_all
@@ -175,7 +175,7 @@ variable {V : Type} [AddCommMonoid V] [Module ℚ V]
 /-- A symmetric trilinear form can be treated as a function from `V` to `V →ₗ[ℚ] V →ₗ[ℚ] ℚ`. -/
 instance instFun : FunLike (TriLinearSymm V) V (V →ₗ[ℚ] V →ₗ[ℚ] ℚ) where
   coe f := f.toFun
-  coe_injective' f g h := by
+  coe_injective f g h := by
     cases f
     cases g
     simp_all
@@ -190,11 +190,9 @@ def mk₃ (f : V × V × V→ ℚ) (map_smul : ∀ a S T L, f (a • S, T, L) = 
   toFun := fun S => (BiLinearSymm.mk₂ (fun T => f (S, T))
     (by
       intro a T L
-      simp only
       rw [swap₁, map_smul, swap₁])
     (by
       intro S1 S2 T
-      simp only
       rw [swap₁, map_add, swap₁, swap₁ S2 S T])
     (by exact fun L T ↦ swap₂ S L T)).toLinearMap
   map_add' S1 S2 := LinearMap.ext fun T ↦ LinearMap.ext fun L => map_add S1 S2 T L
