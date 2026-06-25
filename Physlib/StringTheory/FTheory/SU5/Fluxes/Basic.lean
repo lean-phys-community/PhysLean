@@ -218,6 +218,17 @@ end Fluxes
 
 -/
 
+/-- The sum of the nonnegative part of a multiset of integers equals the total sum minus
+  the sum of the negative part. Used to relate chiral and anti-chiral counts. -/
+private lemma sum_filter_nonneg_eq_sum_sub (s : Multiset ℤ) :
+    (s.filter (fun x => 0 ≤ x)).sum = s.sum - (s.filter (fun x => x < 0)).sum := by
+  have hfilter : s.filter (fun x => ¬ 0 ≤ x) = s.filter (fun x => x < 0) :=
+    Multiset.filter_congr (fun x _ => by simp [not_le])
+  have hs : s.sum =
+      (s.filter (fun x => 0 ≤ x)).sum + (s.filter (fun x => x < 0)).sum := by
+    rw [← hfilter, ← Multiset.sum_add, Multiset.filter_add_not (fun x => 0 ≤ x) s]
+  omega
+
 /-- The fluxes `(M, N)` of the 5-bar matter curves of a theory. -/
 abbrev FluxesFive : Type := Multiset Fluxes
 
@@ -287,13 +298,8 @@ def numAntiChiralD (F : FluxesFive) : ℤ :=
 -/
 
 lemma numChiralD_eq_sum_sub_numAntiChiralD (F : FluxesFive) :
-    F.numChiralD = (chiralIndicesOfD F).sum - F.numAntiChiralD := by
-  have h1 : (chiralIndicesOfD F) =
-    (chiralIndicesOfD F).filter (fun x => 0 ≤ x) +
-    (chiralIndicesOfD F).filter (fun x => ¬ 0 ≤ x) := by
-      exact Eq.symm (Multiset.filter_add_not (fun x => 0 ≤ x) F.chiralIndicesOfD)
-  rw [h1]
-  simp [chiralIndicesOfD, numChiralD, numAntiChiralD]
+    F.numChiralD = (chiralIndicesOfD F).sum - F.numAntiChiralD :=
+  sum_filter_nonneg_eq_sum_sub _
 
 /-!
 
@@ -340,13 +346,8 @@ def numAntiChiralL (F : FluxesFive) : ℤ :=
 -/
 
 lemma numChiralL_eq_sum_sub_numAntiChiralL (F : FluxesFive) :
-    F.numChiralL = (chiralIndicesOfL F).sum - F.numAntiChiralL := by
-  have h1 : (chiralIndicesOfL F) =
-    (chiralIndicesOfL F).filter (fun x => 0 ≤ x) +
-    (chiralIndicesOfL F).filter (fun x => ¬ 0 ≤ x) := by
-      exact Eq.symm (Multiset.filter_add_not (fun x => 0 ≤ x) F.chiralIndicesOfL)
-  rw [h1]
-  simp [chiralIndicesOfL, numChiralL, numAntiChiralL]
+    F.numChiralL = (chiralIndicesOfL F).sum - F.numAntiChiralL :=
+  sum_filter_nonneg_eq_sum_sub _
 
 /-!
 
@@ -440,13 +441,8 @@ def numAntiChiralQ (F : FluxesTen) : ℤ := ((chiralIndicesOfQ F).filter (fun x 
 -/
 
 lemma numChiralQ_eq_sum_sub_numAntiChiralQ (F : FluxesTen) :
-    F.numChiralQ = (chiralIndicesOfQ F).sum - F.numAntiChiralQ := by
-  have h1 : (chiralIndicesOfQ F) =
-    (chiralIndicesOfQ F).filter (fun x => 0 ≤ x) +
-    (chiralIndicesOfQ F).filter (fun x => ¬ 0 ≤ x) := by
-      exact Eq.symm (Multiset.filter_add_not (fun x => 0 ≤ x) F.chiralIndicesOfQ)
-  rw [h1]
-  simp [chiralIndicesOfQ, numChiralQ, numAntiChiralQ]
+    F.numChiralQ = (chiralIndicesOfQ F).sum - F.numAntiChiralQ :=
+  sum_filter_nonneg_eq_sum_sub _
 
 /-!
 
@@ -491,13 +487,8 @@ def numAntiChiralU (F : FluxesTen) : ℤ := ((chiralIndicesOfU F).filter (fun x 
 -/
 
 lemma numChiralU_eq_sum_sub_numAntiChiralU (F : FluxesTen) :
-    F.numChiralU = (chiralIndicesOfU F).sum - F.numAntiChiralU := by
-  have h1 : (chiralIndicesOfU F) =
-    (chiralIndicesOfU F).filter (fun x => 0 ≤ x) +
-    (chiralIndicesOfU F).filter (fun x => ¬ 0 ≤ x) := by
-      exact Eq.symm (Multiset.filter_add_not (fun x => 0 ≤ x) F.chiralIndicesOfU)
-  rw [h1]
-  simp [chiralIndicesOfU, numChiralU, numAntiChiralU]
+    F.numChiralU = (chiralIndicesOfU F).sum - F.numAntiChiralU :=
+  sum_filter_nonneg_eq_sum_sub _
 /-!
 
 ### C.5. The SM representation `E = (1,1)_{1}`
@@ -541,13 +532,8 @@ def numAntiChiralE (F : FluxesTen) : ℤ := ((chiralIndicesOfE F).filter (fun x 
 -/
 
 lemma numChiralE_eq_sum_sub_numAntiChiralE (F : FluxesTen) :
-    F.numChiralE = (chiralIndicesOfE F).sum - F.numAntiChiralE := by
-  have h1 : (chiralIndicesOfE F) =
-    (chiralIndicesOfE F).filter (fun x => 0 ≤ x) +
-    (chiralIndicesOfE F).filter (fun x => ¬ 0 ≤ x) := by
-      exact Eq.symm (Multiset.filter_add_not (fun x => 0 ≤ x) F.chiralIndicesOfE)
-  rw [h1]
-  simp [chiralIndicesOfE, numChiralE, numAntiChiralE]
+    F.numChiralE = (chiralIndicesOfE F).sum - F.numAntiChiralE :=
+  sum_filter_nonneg_eq_sum_sub _
 
 /-!
 
