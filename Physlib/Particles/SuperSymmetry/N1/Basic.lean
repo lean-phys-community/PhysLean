@@ -18,11 +18,14 @@ public import Physlib.Relativity.Tensors.Conjugation.Basic
 This file fixes the data that indexes the scalars of the N=1 chiral sector,
 makes their contractions type-safe, and equips them with conjugation.
 
-A single finite type `ι` indexes the chiral scalars; it appears as
-`ChiralIndexingType` in the signatures. It is the only index type. Variance
-(upper versus lower) and holomorphy (a scalar versus its complex conjugate) are
-not separate index types but the two axes of a four-element type `ChiralColor`,
-the product of `chiral`/`anti` with `up`/`down`.
+A single finite type `ι` indexes the chiral scalars (written `ChiralIndexingType`
+in signatures) — the only index type. Variance (upper versus lower) and holomorphy
+(a scalar versus its complex conjugate) are not separate index types but the two
+axes of a four-element type `ChiralColor`, the product of `chiral`/`anti` with
+`up`/`down`. Each axis is realized as a genuine carrier distinction, not a label:
+variance as a module versus its dual (`ι → ℂ` versus `Module.Dual ℂ (ι → ℂ)`),
+holomorphy as a module versus its complex conjugate (`ConjModule`, where `i` acts
+as `−i`).
 
 The dual-colour involution `τ` flips variance and preserves holomorphy. Two
 indices may contract exactly when their colours are `τ`-related, so a holomorphic
@@ -36,19 +39,15 @@ The physical field content is the configuration `ChiralScalarConfiguration ι =
 scalars are the complex conjugates of this data, never an independent
 configuration.
 
-The index data is packaged as a `ConjTensorSpecies` over `ChiralColor`. The four colours carry four
-distinct carriers, recording both axes as genuine type data: the holomorphic vectors `ι → ℂ` (up)
-and their dual `Module.Dual ℂ (ι → ℂ)` (down) on the chiral side, and the conjugate modules
-`ConjModule …` of each on the anti side, where `i` acts as `−i`. Variance is thus the vector/dual
-distinction and holomorphy the conjugate-module distinction, so an upper index pairs only with a
-lower one of the same holomorphy. Complex conjugation is the conjugate-linear identity
-`conjEquiv : M ≃ₛₗ[starRingEnd ℂ] ConjModule M` on each carrier (anti basis = `Basis.conj`), and the
-species' holomorphy flip (`slotConj`, hence `conjT`) is built from it. Each colour carries the
-trivial representation over the trivial group `Unit`, so the chiral scalars hold no charge.
-Contracting a colour against its `τ`-dual is the dot product of the two coordinate vectors, the
-Kronecker `δ_{IJ}` on basis labels: `contr` is that pairing `V c ⊗ V (τ c) → ℂ`, `unit` its cap in
-`V (τ c) ⊗ V c`, and `metric` the cap `∑_I b_I ⊗ b_I` in `V c ⊗ V c`. Supplying this instance equips
-the chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, and so on).
+The index data is packaged as a `ConjTensorSpecies` over `ChiralColor`, each colour carrying its
+distinct carrier from above. Complex conjugation is the conjugate-linear identity
+`conjEquiv : M ≃ₛₗ[starRingEnd ℂ] ConjModule M` on each carrier (anti basis `Basis.conj`); the
+species' holomorphy flip (`slotConj`, hence `conjT`) is built from it. Every
+colour carries the trivial representation over the trivial group `Unit`, so the chiral scalars hold
+no charge. Contracting a colour against its `τ`-dual is the dot product of the two coordinate
+vectors, the Kronecker `δ_{IJ}` on basis labels: `contr` is that pairing `V c ⊗ V (τ c) → ℂ`, `unit`
+its cap in `V (τ c) ⊗ V c`, and `metric` the cap `∑_I b_I ⊗ b_I` in `V c ⊗ V c`. This instance equips
+the chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, …).
 
 Conjugation is intrinsic species data: a `ConjTensorSpecies` is a `TensorSpecies`
 extended with the conjugate-colour involution `ChiralColor.bar` and its coherence. The framework then supplies the
@@ -79,7 +78,7 @@ is real. The species can express none of these alone.
 - B. The chiral colours and the dual involution
 - C. Carrier, representation, and basis
 - D. The δ structure on based finite modules
-  - D.1. The bilinear form and the cap
+  - D.1. The cap
   - D.2. The δ pairing across two based modules
 - E. The chiral-index tensor species
 - F. Conjugation
@@ -101,7 +100,8 @@ namespace SUSY.N1
 
 /-- The chiral scalar configuration: a complex value for each chiral label. This is
 the sector's only field data. Declared as an `abbrev` so that unification sees
-through it to `α → ℂ` and applies Mathlib's function-space calculus lemmas directly. -/
+through it to `ChiralIndexingType → ℂ` and applies Mathlib's function-space calculus
+lemmas directly. -/
 abbrev ChiralScalarConfiguration (ChiralIndexingType : Type*) := ChiralIndexingType → ℂ
 
 variable (ι : Type) [Fintype ι] [DecidableEq ι]
@@ -180,7 +180,8 @@ scalars carry no charge in this sector. -/
 def chiralRep : (c : ChiralColor) → Representation ℂ Unit (chiralModule (ι := ι) c) :=
   fun _ => Representation.trivial ℂ Unit _
 
-/-- The standard basis of the chiral carrier `ι → ℂ` (the indicator functions). -/
+/-- The standard basis of the vector carrier `ι → ℂ` (the indicator functions); the basis of
+`chiralUp` and the reference basis for the δ pairing. -/
 def piBasis : Basis ι ℂ (ι → ℂ) := Pi.basisFun ℂ ι
 
 /-- The basis of each colour's carrier, all indexed by `ι`: `piBasis` on the holomorphic vectors,
@@ -195,32 +196,21 @@ noncomputable def chiralBasis : (c : ChiralColor) → Basis ι ℂ (chiralModule
 /-!
 ## D. The δ structure on based finite modules
 
-The contraction, unit, and metric are one δ structure in basis coordinates. A contraction pairs a
+The contraction, unit, and metric are one δ structure in basis coordinates. Here `metric` is the
+`TensorSpecies` field of that name — the δ index-raising tensor `δ^{IJ}` — and is *not* the physical
+Kähler metric `g_{IJ̄}`, which is built downstream on top of this sector. A contraction pairs a
 colour with its variance dual `τ c`, whose carriers are *distinct* (a module and its dual, or their
 conjugates) but share the index `ι`, so the pairing is the dot product *across two based modules*
 `(M, b)` and `(N, b')`, `(x, y) ↦ ∑_I (b x)_I (b' y)_I`, with cap `∑_I b_I ⊗ b'_I ∈ M ⊗ N`. The
 single-module case `b = b'` (§D.1) is what `metric c` uses, since its two slots are the same colour;
 the genuinely two-module pairing (§D.2) is what `contr` and `unit` use. The δ data stays within one
-holomorphy and needs no conjugation; conjugation is carried instead by the tensor `conjT` and the
-anti-holomorphic Wirtinger derivatives that produce barred components.
+holomorphy and needs no conjugation; conjugation is carried instead by the tensor `conjT` (§F).
 
-### D.1. The bilinear form and the cap
+### D.1. The cap
 
 -/
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
-
-/-- The δ bilinear form: the bilinear form whose Gram matrix in the basis `b` is the identity,
-`Matrix.toBilin b 1`. On coordinates it is the dot product `(x, y) ↦ ∑_I (b x)_I (b y)_I`
-(`deltaBil_apply`), i.e. the form for which `b` is orthonormal. -/
-def deltaBil (b : Basis ι ℂ M) : M →ₗ[ℂ] M →ₗ[ℂ] ℂ := Matrix.toBilin b 1
-
-/-- `deltaBil b x y = ∑_I (b x)_I (b y)_I`: the identity Gram matrix collapses the double sum of
-`Matrix.toBilin_apply` to the dot product of the coordinate vectors. -/
-lemma deltaBil_apply (b : Basis ι ℂ M) (x y : M) :
-    deltaBil b x y = ∑ I, b.equivFun x I * b.equivFun y I := by
-  rw [deltaBil, Matrix.toBilin_apply]
-  simp [Matrix.one_apply, mul_ite, mul_zero, Finset.sum_ite_eq, Basis.equivFun_apply]
 
 /-- The δ cap `∑_I b_I ⊗ b_I`: the rank-2 tensor in `M ⊗ M` with two upper indices, whose
 components in the basis `b` are `δⁱʲ`. It is an element of `M ⊗ M` (the inverse-metric "cap"),
@@ -243,17 +233,20 @@ the species demands of them, proved here once over abstract `(M, b)`, `(N, b')`.
 variable {N : Type*} [AddCommGroup N] [Module ℂ N]
 
 /-- The δ pairing between two based modules sharing the index `ι`: the dot product of coordinate
-vectors `(x, y) ↦ ∑_I (b x)_I (b' y)_I`, built by reading both sides into `ι → ℂ` and applying the
-reference dot product `deltaBil piBasis`. Equals `deltaBil b` when `b = b'`. -/
+vectors `(x, y) ↦ ∑_I (b x)_I (b' y)_I`. Built from Mathlib's `Basis.toDual b` (the canonical δ map
+`M → Module.Dual M`, sending `b` to its dual basis) precomposed on the second slot with the basis
+transport `b' ≃ b`. -/
 def deltaBil₂ (b : Basis ι ℂ M) (b' : Basis ι ℂ N) : M →ₗ[ℂ] N →ₗ[ℂ] ℂ :=
-  ((deltaBil piBasis).comp b.equivFun.toLinearMap).compl₂ b'.equivFun.toLinearMap
+  b.toDual.compl₂ (b'.equiv b (Equiv.refl ι)).toLinearMap
 
 /-- `deltaBil₂ b b' x y = ∑_I (b x)_I (b' y)_I`. -/
 lemma deltaBil₂_apply (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (x : M) (y : N) :
     deltaBil₂ b b' x y = ∑ I, b.equivFun x I * b'.equivFun y I := by
-  rw [deltaBil₂, LinearMap.compl₂_apply, LinearMap.comp_apply, LinearEquiv.coe_coe,
-    LinearEquiv.coe_coe, deltaBil_apply]
-  simp only [piBasis, Pi.basisFun_equivFun, LinearEquiv.refl_apply]
+  rw [deltaBil₂, LinearMap.compl₂_apply, LinearEquiv.coe_coe]
+  conv_lhs => rw [← b'.sum_equivFun y]
+  simp_rw [map_sum, map_smul, Basis.equiv_apply, Equiv.refl_apply, Basis.toDual_eq_equivFun,
+    smul_eq_mul]
+  exact Finset.sum_congr rfl fun J _ => mul_comm _ _
 
 /-- The two-module δ contraction `M ⊗ N → ℂ`. -/
 def deltaContr₂ (b : Basis ι ℂ M) (b' : Basis ι ℂ N) : M ⊗[ℂ] N →ₗ[ℂ] ℂ :=
