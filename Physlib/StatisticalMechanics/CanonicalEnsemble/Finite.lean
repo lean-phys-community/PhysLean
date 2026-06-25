@@ -521,7 +521,7 @@ lemma deriv_meanEnergyBetaReal (b : ℝ) :
   have hquot' :
       deriv (fun x => Num x / Z x) b =
         (deriv Num b * Z b - Num b * deriv Z b) / (Z b)^2 := by
-    simpa using deriv_div hN_diff hZ_diff hZ_ne_zero
+    exact deriv_div hN_diff hZ_diff hZ_ne_zero
   have hquot'' := hquot'
   have hnum := deriv_meanEnergyNumerator (𝓒 := 𝓒) b
   have hz := deriv_mathematicalPartitionFunctionBetaReal (𝓒 := 𝓒) b

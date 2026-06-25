@@ -77,7 +77,7 @@ instance halfPlaneMeasure_hasTemperateGrowth :
     (μ := volume (α := Space 2))
   use n
   rw [MeasurableEmbedding.integrable_map_iff halfPlane_measurableEmbedding]
-  convert hn.restrict using 1
+  convert! hn.restrict using 1
   ext x
   simp [norm_halfPlane]
 

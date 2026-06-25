@@ -212,9 +212,11 @@ def fromL2 : WithLp 2 E →L[𝕜] E where
         have h := Real.sqrt_le_sqrt (h ((WithLp.equiv 2 E) x)).1
         simp [smul_eq_mul] at h
         apply (le_inv_mul_iff₀' hc).2
-        convert h using 1
-        simp only [WithLp.equiv_apply]
-        ring
+        apply le_of_eq_of_le (b :=  √c * ‖x.ofLp‖ )
+        · simp [WithLp.equiv_apply]
+          ring
+        · apply h.trans
+          rfl
 
 lemma fromL2_inner_left (x : WithLp 2 E) (y : E) : ⟪fromL2 𝕜 x, y⟫ = ⟪x, toL2 𝕜 y⟫ := rfl
 
@@ -269,7 +271,7 @@ lemma ext_inner_left' {x y : E} (h : ∀ v, ⟪v, x⟫ = ⟪v, y⟫) : x = y :=
 variable (𝕜) in
 lemma ext_inner_right' {x y : E} (h : ∀ v, ⟪x, v⟫ = ⟪y, v⟫) : x = y :=
   (WithLp.equiv 2 E).symm.injective <| ext_inner_right (E := WithLp 2 E) 𝕜 <| by
-  simpa [← ofLp_inner_left] using fun v => h (WithLp.ofLp v)
+  exact fun v => h (WithLp.ofLp v)
 
 @[simp]
 lemma inner_conj_symm' (x y : E) : ⟪y, x⟫† = ⟪x, y⟫ :=
@@ -324,7 +326,9 @@ lemma inner_sum'{ι : Type*} [Fintype ι] (x : E) (g : ι → E) :
   simp only
   congr
   change _ = (WithLp.linearEquiv 2 𝕜 E) _
-  simp
+  simp only [map_sum, WithLp.linearEquiv_apply, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
+    EquivLike.coe_coe, WithLp.addEquiv_apply]
+  rfl
 
 @[fun_prop]
 lemma Continuous.inner' {α} [TopologicalSpace α] (f g : α → E)
@@ -527,7 +531,6 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
             (WithLp.toLp 2 (x i)) (WithLp.toLp 2 (x i))))
           (s := {i}) (by
             intro i
-            simp only
             exact InnerProductSpace.Core.inner_self_nonneg)
 
         apply le_trans _ (le_trans h1 _)

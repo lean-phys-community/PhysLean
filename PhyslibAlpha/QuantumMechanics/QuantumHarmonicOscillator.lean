@@ -401,7 +401,7 @@ def coherentState_ℓ2 (α : ℂ) : lp (fun _ : ℕ => ℂ) 2 := {
     rw [← Complex.ofReal_pow]
     generalize ‖α‖^2 = A
     simp only [Nat.cast_nonneg, Real.sq_sqrt, Complex.norm_exp_ofReal]
-    convert NormedSpace.expSeries_hasSum_exp (𝕂 := ℝ) A
+    convert! NormedSpace.expSeries_hasSum_exp (𝕂 := ℝ) A
     · simp [NormedSpace.expSeries]
       field_simp
     · exact Real.exp_eq_exp_ℝ

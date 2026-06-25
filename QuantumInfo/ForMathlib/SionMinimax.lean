@@ -56,9 +56,10 @@ theorem ciInf_eq_min_cInf_inter_diff (S T : Set ι)
     constructor
     <;> (
       apply le_ciInf
-      simp only [Subtype.forall, Set.mem_diff, Set.mem_inter_iff, and_imp]
+      simp only [Subtype.forall, Set.mem_sdiff, Set.mem_inter_iff, and_imp]
       refine fun a ha hb ↦ ciInf_le ?_ (⟨a, ha⟩ : S)
-      simpa [Set.range] using hf;
+      simp_all [Set.range]
+      exact hf
     )
   · have _ : Nonempty S := .map (fun (x : (S ∩ T : Set _)) ↦ ⟨x, x.2.1⟩) ‹_›
     apply le_csInf (Set.range_nonempty _)
@@ -141,7 +142,7 @@ theorem LowerSemicontinuousOn.bddBelow {α : Type*} [TopologicalSpace α] {S : S
 theorem LowerSemicontinuousOn.max {α : Type*} [TopologicalSpace α] {S : Set α} {f g : α → ℝ}
     (hf : LowerSemicontinuousOn f S) (hg : LowerSemicontinuousOn g S) :
     LowerSemicontinuousOn (fun x ↦ max (f x) (g x)) S := by
-  convert lowerSemicontinuousOn_ciSup (s := S) (f := fun (i : Bool) x' ↦ if i then f x' else g x') ?_ ?_
+  convert! lowerSemicontinuousOn_ciSup (s := S) (f := fun (i : Bool) x' ↦ if i then f x' else g x') ?_ ?_
   · rw [ciSup_eq_of_forall_le_of_forall_lt_exists_gt] <;> aesop
   · simp
   · simp [hf, hg]
@@ -203,7 +204,7 @@ theorem ciInf_le_ciInf_of_subset {α β : Type*} [ConditionallyCompleteLattice �
     intro y hy
     obtain ⟨w_1, ⟨left_1, right_1⟩⟩ : f y ∈ f '' t := by
       use y, hst hy
-    exact le_trans ( ciInf_le (by simpa [ Set.range ] using hf ) ⟨ w_1, left_1 ⟩ ) ( by simp[right_1] );
+    exact le_trans ( ciInf_le (by simp_all [ Set.range ]; exact hf ) ⟨ w_1, left_1 ⟩ ) ( by simp[right_1] );
   apply le_csInf
   · exact ⟨_, ⟨⟨_, hs.choose_spec⟩, rfl⟩⟩;
   · aesop
@@ -354,7 +355,9 @@ private theorem sion_exists_min_lowerSemi (a : ℝ) (hc : ∀ y₀ : T, ⨅ (x :
       refine abs_le.mpr ⟨?_, ?_⟩ <;> linarith [h_lower_bound (xn (1 / (n + 1))), hxn (1 / (n + 1)) (by positivity)]
     obtain ⟨x, subseq, hsubseq₁, hsubseq₂⟩ : ∃ x : S, ∃ subseq : ℕ → ℕ,
         StrictMono subseq ∧ Filter.Tendsto (fun n => xn (subseq n)) Filter.atTop (nhds x) := by
-      simpa using (isCompact_iff_isCompact_univ.mp hS₁).isSeqCompact (x := xn) fun _ ↦ trivial
+      have h1 := (isCompact_iff_isCompact_univ.mp hS₁).isSeqCompact (x := xn) fun _ ↦ trivial
+      simp_all only [Subtype.coe_prop, implies_true, Set.mem_univ, true_and, Subtype.exists]
+      exact h1
     use x
     refine le_of_forall_pos_le_add fun ε εpos ↦ ?_
     rw [← tsub_le_iff_right]
@@ -573,7 +576,7 @@ private lemma sion_exists_min_fin
       use ⟨yₙ, hyₙ⟩
       rw [lt_ciInf_iff]; swap
       · --BddBelow (Set.range fun x : S => f (↑x) yₙ)
-        convert (hfc₂ yₙ hyₙ).bddBelow hS₁
+        convert! (hfc₂ yₙ hyₙ).bddBelow hS₁
         ext; simp
       use b, hab
       intro i
@@ -613,7 +616,7 @@ private lemma sion_exists_min_fin
         refine ciInf_le_of_le ?_ ⟨x.val, hS'_sub x.2⟩ ?_
         · --BddBelow (Set.range fun x => max (f (↑x) yₙ) (⨆ a, f ↑x ↑a))
           apply BddBelow.range_mono (h := fun x ↦ le_max_left _ _)
-          convert (hfc₂ yₙ hyₙ).bddBelow hS₁
+          convert! (hfc₂ yₙ hyₙ).bddBelow hS₁
           ext; simp
         · have := x.2.2
           simp [this, hb.le.trans this]
@@ -632,7 +635,7 @@ private lemma sion_exists_min_fin
       apply hy₀'.trans_le
       gcongr
       · --BddBelow (Set.range fun x : S => f (↑x) y₀')
-        convert (hfc₂ y₀' y₀'.2).bddBelow hS₁
+        convert! (hfc₂ y₀' y₀'.2).bddBelow hS₁
         ext; simp
       exact le_sup_left
     have hS_diff_ne : (S \ S').Nonempty :=

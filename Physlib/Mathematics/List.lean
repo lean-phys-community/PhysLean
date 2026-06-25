@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 public import Physlib.Mathematics.Fin
-public import Mathlib.Data.Nat.Lattice
+public import Mathlib.Order.Lattice.Nat
 public import Mathlib.Data.List.TakeWhile
 import all Mathlib.Data.List.Sort
 /-!
@@ -167,7 +167,7 @@ lemma orderedInsertPos_cons {I : Type} (le1 : I → I → Prop) [DecidableRel le
     (r : List I) (r0 r1 : I) :
     (orderedInsertPos le1 (r1 ::r) r0).val =
     if le1 r0 r1 then ⟨0, by simp⟩ else (Fin.succ (orderedInsertPos le1 r r0)) := by
-  simp only [List.orderedInsert.eq_2, orderedInsertPos, List.takeWhile, decide_not, Fin.zero_eta,
+  simp only [orderedInsertPos, List.takeWhile, decide_not, Fin.zero_eta,
     Fin.succ_mk]
   by_cases h : le1 r0 r1
   · simp [h]
@@ -372,11 +372,14 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   simp only [List.length_cons, orderedInsertEquiv, Nat.succ_eq_add_one, Equiv.trans_apply]
   match r with
   | [] =>
-    simp [List.orderedInsert.eq_1]
+    simp only [List.length_nil, Nat.reduceAdd, Fin.castOrderIso_refl, OrderIso.refl_toEquiv,
+      Fin.val_eq_zero, Fin.zero_eta, Fin.isValue, Equiv.symm_apply_apply, Fin.zero_succAbove,
+      Fin.succ_mk, Fin.cast_eq_self]
+    rfl
   | r1 :: r =>
-    simp only [List.orderedInsert.eq_2, List.length_cons]
+    simp only [List.length_cons]
     rw [finExtractOne_apply_neq]
-    simp only [List.orderedInsert.eq_2, orderedInsertPos, decide_not, Nat.succ_eq_add_one,
+    simp only [orderedInsertPos, decide_not, Nat.succ_eq_add_one,
       finExtractOne_symm_inr_apply]
     rfl
     exact ne_of_beq_false rfl
@@ -390,11 +393,14 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   simp only [orderedInsertEquiv, Equiv.trans_apply]
   match r with
   | [] =>
-    simp [List.orderedInsert.eq_1]
+    simp only [List.length_cons, List.length_nil, Nat.reduceAdd, Fin.castOrderIso_refl,
+      OrderIso.refl_toEquiv, Fin.val_eq_zero, Fin.zero_eta, Fin.isValue, Equiv.symm_apply_apply,
+      Fin.eta, Fin.zero_succAbove, Fin.cast_eq_self]
+    rfl
   | r1 :: r =>
-    simp only [List.orderedInsert.eq_2, List.length_cons, Fin.eta]
+    simp only [List.length_cons, Fin.eta]
     rw [finExtractOne_apply_neq]
-    simp only [orderedInsertPos, List.orderedInsert.eq_2, decide_not, Nat.succ_eq_add_one,
+    simp only [orderedInsertPos, decide_not, Nat.succ_eq_add_one,
       finExtractOne_symm_inr_apply]
     rfl
     exact ne_of_beq_false rfl
@@ -633,7 +639,6 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
     simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta,
       Equiv.trans_apply, equivCons_zero] at hij'
     have hx := orderedInsertEquiv_zero r (List.insertionSort r as) a
-    simp only at hx
     convert lt_orderedInsertPos_rel_fin r a (List.insertionSort r as) _ hij'
     change _ = ((List.insertionSort r (a :: as))).get ((insertionSortEquiv r (a :: as)) ⟨j + 1, hj⟩)
     rw [← insertionSortEquiv_get]

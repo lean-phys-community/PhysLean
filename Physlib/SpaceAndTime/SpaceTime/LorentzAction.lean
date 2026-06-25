@@ -174,7 +174,7 @@ instance : DistribMulAction (LorentzGroup d) ((SpaceTime d) →d[ℝ] M) where
   smul_add Λ f1 f2 := by
     ext η
     rw [lorentzGroup_smul_dist_apply]
-    simp only [ContinuousLinearMap.add_apply, smul_add, lorentzGroup_smul_dist_apply]
+    simp only [_root_.add_apply, smul_add, lorentzGroup_smul_dist_apply]
 
 /-!
 
@@ -201,7 +201,7 @@ def distActionLinearMap {d} {M : Type} [NormedAddCommGroup M]
   toFun f := Λ • f
   map_add' f1 f2 := by
     ext η
-    simp [lorentzGroup_smul_dist_apply, ContinuousLinearMap.add_apply, smul_add]
+    simp [lorentzGroup_smul_dist_apply, _root_.add_apply, smul_add]
   map_smul' a f := by
     ext η
     simp [lorentzGroup_smul_dist_apply]

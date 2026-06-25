@@ -102,8 +102,8 @@ notation "𝐋²[" d' "]" => angularMomentumOperatorSqr (d := d')
 lemma angularMomentumOperatorSqr_apply_fun {d : ℕ} (ψ : 𝓢(Space d, ℂ)) :
     𝐋² ψ = (2 : ℂ)⁻¹ • ∑ i, ∑ j, 𝐋 i j (𝐋 i j ψ) := by
   dsimp only [angularMomentumOperatorSqr]
-  simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_smul',
-    ContinuousLinearMap.coe_comp', Finset.sum_apply, Pi.smul_apply, Function.comp_apply]
+  simp only [FunLike.coe_sum, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, Finset.sum_apply, Pi.smul_apply, Function.comp_apply]
 
 lemma angularMomentumOperatorSqr_apply {d : ℕ} (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
     𝐋² ψ x = (2 : ℂ)⁻¹ * ∑ i, ∑ j, 𝐋 i j (𝐋 i j ψ) x := by

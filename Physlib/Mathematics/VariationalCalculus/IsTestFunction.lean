@@ -259,7 +259,7 @@ lemma IsTestFunction.adjFDeriv {f : X → U} [InnerProductSpace' ℝ X]
   conv =>
     enter [1, x]
     rw [adjoint_eq_clm_adjoint]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
   apply IsTestFunction.comp_left
   · constructor
     · apply ContDiff.clm_apply
@@ -287,25 +287,20 @@ lemma IsTestFunction.divergence {f : X → X} [FiniteDimensional ℝ X] (hf : Is
     rw [divergence_eq_sum_fderiv' bX]
   apply IsTestFunction.sum
   intro i
-  let f : X →ₗ[ℝ] ℝ := {
+  let reprMap : X →ₗ[ℝ] ℝ := {
       toFun := (bX.repr · i)
       map_add' := by simp
       map_smul' := by simp
 
     }
-  let f' : X →L[ℝ] ℝ := (f).toContinuousLinearMap
-  change IsTestFunction (fun x => f' _)
+  let f' : X →L[ℝ] ℝ := reprMap.toContinuousLinearMap
+  have h_trace_contDiff : ContDiff ℝ ∞ f' := f'.contDiff
+  change IsTestFunction (fun x => f' ((fderiv ℝ f x) (bX i)))
   apply IsTestFunction.comp_left
-  fun_prop
-  simp only [map_zero]
-  fun_prop
-  /-unfold _root_.divergence
-  apply IsTestFunction.comp_left
-    (f:=fun x : X => (fderiv ℝ f x)) (g:=fun f : X →L[ℝ] X => LinearMap.trace _ _ f.toLinearMap)
+    (f:=fun x : X => (fderiv ℝ f x) (bX i)) (g:=f')
   · fun_prop
-  · simp
-  · sorry -- missing mathlib API-/
-
+  · simp [f']
+  · exact h_trace_contDiff
 @[fun_prop]
 lemma IsTestFunction.gradient {d : ℕ} (φ : Space d → ℝ)
     (hφ : IsTestFunction φ) :

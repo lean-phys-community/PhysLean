@@ -210,7 +210,7 @@ private lemma traceLeft_eq_transpose_conjTranspose_mul (ψ : Ket (d₁ × d₂))
     (MState.pure ψ).traceLeft.M.val =
     ((vecToMat ψ.vec).conjTranspose * (vecToMat ψ.vec)).transpose := by
   norm_num +zetaDelta at *;
-  convert traceLeft_eq_transpose_mul_conj ψ using 1
+  convert! traceLeft_eq_transpose_mul_conj ψ using 1
 
 /--
 Shannon entropy is determined by the multiset of non-zero probabilities.
@@ -277,7 +277,7 @@ private lemma charpoly_roots_filter_ne_zero_eq_eigenvalues_filter_ne_zero {d : T
   rw [ multiset_filter_map_ofReal_eq ];
   -- Since A is Hermitian, its characteristic polynomial is equal to the product of (X - eigenvalue) over all eigenvalues.
   have h_charpoly : A.charpoly = Multiset.prod (Multiset.map (fun i => Polynomial.X - Polynomial.C (RCLike.ofReal (hA.eigenvalues i))) (Finset.univ.val)) := by
-    convert Matrix.IsHermitian.charpoly_eq hA using 1;
+    convert! Matrix.IsHermitian.charpoly_eq hA using 1;
   rw [ h_charpoly, Polynomial.roots_multiset_prod ];
   · simp [ Multiset.bind_map ];
   · simp [ Polynomial.X_sub_C_ne_zero ]

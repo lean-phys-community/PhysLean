@@ -147,7 +147,7 @@ lemma integrable_spherical_of_integrable {d : ℕ} {F : Type*}
     · convert h1
       simp only [Function.comp_apply, Homeomorph.symm_apply_apply]
     · exact Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space d))
-  convert hcomp using 1
+  exact hcomp
 
 lemma integral_volume_eq_spherical_iterated {d : ℕ} [NeZero d] {F : Type*}
     [NormedAddCommGroup F] [NormedSpace ℝ F] (f : Space d → F)

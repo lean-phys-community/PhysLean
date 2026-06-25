@@ -297,11 +297,11 @@ lemma ext_Rows {U V : CKMMatrix} (hu : [U]u = [V]u) (hc : [U]c = [V]c) (ht : [U]
   funext i j
   fin_cases i
   · have h1 := congrFun hu j
-    fin_cases j <;> simpa using h1
+    fin_cases j <;> exact h1
   · have h1 := congrFun hc j
-    fin_cases j <;> simpa using h1
+    fin_cases j <;> exact h1
   · have h1 := congrFun ht j
-    fin_cases j <;> simpa using h1
+    fin_cases j <;> exact h1
 
 end CKMMatrix
 

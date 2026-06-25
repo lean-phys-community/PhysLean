@@ -50,7 +50,6 @@ QuantumInfo/ForMathlib/HermitianMat/Schatten.lean
 QuantumInfo/ForMathlib/HermitianMat/Sqrt.lean
 QuantumInfo/ForMathlib/HermitianMat/Trace.lean
 QuantumInfo/ForMathlib/HermitianMat/Unitary.lean
-QuantumInfo/ForMathlib/IsMaximalSelfAdjoint.lean
 QuantumInfo/ForMathlib/Isometry.lean
 QuantumInfo/ForMathlib/LimSupInf.lean
 QuantumInfo/ForMathlib/Majorization.lean

@@ -69,12 +69,12 @@ lemma continuous_eulerLagrangeTerm_of_regular
     Continuous (eulerLagrangeTerm L I a f) := by
   have htd : ContDiff ℝ ∞
       (iteratedTotalDerivative k I.1 (L.coordDeriv I a) f) := by
-    simpa [iteratedTotalDerivative, evalOnJet] using
+    exact
       Space.iteratedDeriv_contDiff I.1 (hcoeff I a)
   have hsign : ContDiff ℝ ∞
       (fun _ : Space d => (-1 : ℝ) ^ I.1.order) := by
     fun_prop
-  simpa [eulerLagrangeTerm] using (hsign.mul htd).continuous
+  exact (hsign.mul htd).continuous
 
 lemma continuous_eulerLagrangeComponent_of_regular
     (L : Lagrangian d m k) (f : Space d → EuclideanSpace ℝ (Fin m))

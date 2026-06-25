@@ -204,8 +204,8 @@ lemma fderiv_physHermite
   simp +unfoldPartialApp only [Function.comp] at h
   ext dx
   simp only [h, Polynomial.fderiv_aeval, derivative_physHermite, nsmul_eq_mul, map_mul, map_natCast,
-    ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.smulRight_apply,
-    ContinuousLinearMap.one_apply, smul_eq_mul, ContinuousLinearMap.coe_smul', Pi.smul_apply]
+    ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.smulRight_apply,
+    one_apply_eq_self, smul_eq_mul, FunLike.coe_smul, Pi.smul_apply]
   simp only [aeval, aevalEquiv, Equiv.coe_fn_mk, eval₂AlgHom_apply, Algebra.toRingHom_ofId,
     algebraMap_int_eq, eval₂_ofNat]
   ring

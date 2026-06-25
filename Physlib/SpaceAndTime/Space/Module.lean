@@ -12,6 +12,7 @@ public import Mathlib.Analysis.Distribution.TemperateGrowth
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 public import Mathlib.Analysis.Calculus.ContDiff.WithLp
 public import Mathlib.Tactic.Cases
+public import Mathlib.Analysis.Calculus.FDeriv.WithLp
 /-!
 
 # The structure of a module on Space
@@ -598,7 +599,7 @@ lemma fderiv_space_components {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     fderiv ℝ f m dm μ = fderiv ℝ (fun m' => f m' μ) m dm := by
   trans fderiv ℝ (Space.coordCLM μ ∘ fun m' => f m') m dm
   · rw [fderiv_comp _ (by fun_prop) (by fun_prop), ContinuousLinearMap.fderiv,
-      ContinuousLinearMap.coe_comp', Function.comp_apply]
+      ContinuousLinearMap.coe_comp, Function.comp_apply]
     simp [coordCLM, coord_apply]
   · congr
     ext i
@@ -718,24 +719,21 @@ lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume v
 
 open Manifold in
 /-- A diffeomorphism between the two different manifold structures on `Space d`,
-  that equivalent to `manifoldStructure d` and that equivalent to `𝓘(ℝ, Space d)` -/
-noncomputable def modelDiffeo {d} :
-    Diffeomorph (manifoldStructure d) 𝓘(ℝ, Space d) (Space d) (Space d) ⊤ where
+  that equivalent to `𝓡 d` and that equivalent to `𝓘(ℝ, Space d)` -/
+noncomputable def modelDiffeo {d} : Diffeomorph (𝓡 d) 𝓘(ℝ, Space d) (Space d) (Space d) ⊤ where
   toFun p := p
   invFun p := p
   left_inv _ := rfl
   right_inv _ := rfl
   contMDiff_toFun := by
     refine contMDiff_iff.mpr ⟨continuous_id', fun x y => ?_⟩
-    simp [manifoldStructure]
-    fun_prop
+    simpa [← Function.id_def, homEuclideanSpaceSpace] using by fun_prop
   contMDiff_invFun := by
-    refine contMDiff_iff.mpr ⟨continuous_id', fun x y => ?_⟩
-    simp [manifoldStructure]
-    fun_prop
+    apply contMDiff_iff.mpr ⟨by simpa using by fun_prop, fun x y => ?_⟩
+    simpa [homEuclideanSpaceSpace] using by fun_prop
 
 @[simp]
-lemma modelDiffeo_apply (p : Space d) :
+lemma modelDiffeo_apply {d : ℕ} (p : Space d) :
     modelDiffeo p = p := rfl
 
 open Manifold in
@@ -743,17 +741,28 @@ open Manifold in
   `Space d` and `EuclideanSpace ℝ (Fin d)`. This equivalences takes the basis
   of `EuclideanSpace ℝ (Fin d)` to the basis of `Space d`, and vice versa. -/
 lemma basis_eq_mfderiv_modelDiffeo_single (d : ℕ) (μ : Fin d) (x : Space d) :
-    basis μ = mfderiv (manifoldStructure d) 𝓘(ℝ, Space d) (modelDiffeo (d := d)) x
+    basis μ = mfderiv (𝓡 d) 𝓘(ℝ, Space d) (modelDiffeo (d := d)) x
       (EuclideanSpace.single μ 1) := by
-  simp [mfderiv]
+  simp only [modelDiffeo_apply, mfderiv, writtenInExtChartAt, extChartAt,
+    OpenPartialHomeomorph.extend, OpenPartialHomeomorph.refl_partialEquiv, PartialEquiv.refl_source,
+    OpenPartialHomeomorph.singletonChartedSpace_chartAt_eq, modelWithCornersSelf_partialEquiv,
+    PartialEquiv.trans_refl, PartialEquiv.refl_coe, Homeomorph.symm_toOpenPartialHomeomorph,
+    OpenPartialHomeomorph.symm_toPartialEquiv, PartialEquiv.symm_symm,
+    OpenPartialHomeomorph.toFun_eq_coe, Homeomorph.toOpenPartialHomeomorph_apply,
+    CompTriple.comp_eq, modelWithCornersSelf_coe, Set.range_id,
+    OpenPartialHomeomorph.coe_toPartialEquiv_symm, Homeomorph.toOpenPartialHomeomorph_symm_apply,
+    fderivWithin_univ]
   rw [if_pos (modelDiffeo.mdifferentiable (WithTop.top_ne_zero)).mdifferentiableAt]
-  change _ = fderiv ℝ (manifoldStructure d).symm (manifoldStructure d x) (EuclideanSpace.single μ 1)
-  simp [manifoldStructure]
   ext i
-  rw [fderiv_space_components _ _ (by fun_prop)]
-  simp only [vadd_apply, fderiv_add_const]
-  change _ = fderiv ℝ (EuclideanSpace.proj i) (x -ᵥ Classical.choice _) (EuclideanSpace.single μ 1)
-  simp only [basis_apply, ContinuousLinearMap.fderiv, PiLp.proj_apply, PiLp.single_apply]
+  have h := fderiv_space_components i ((⇑modelDiffeo ∘ ⇑(homEuclideanSpaceSpace d)))
+    (by simpa [Function.comp_def, homEuclideanSpaceSpace] using by fun_prop)
+    (((homEuclideanSpaceSpace d).symm x)) ((EuclideanSpace.single μ 1))
+  convert! h.symm
+  simp only [basis_apply, homEuclideanSpaceSpace, PiLp.continuousLinearEquiv_symm_apply,
+    Homeomorph.homeomorph_mk_coe, Equiv.coe_fn_mk, Function.comp_apply, modelDiffeo_apply,
+    PiLp.continuousLinearEquiv_apply, Homeomorph.homeomorph_mk_coe_symm, Equiv.symm_mk]
+  change _ = fderiv ℝ (EuclideanSpace.proj i) _ (EuclideanSpace.single μ 1)
+  simp only [ContinuousLinearMap.fderiv, PiLp.proj_apply, PiLp.single_apply]
   congr 1
   exact Eq.propIntro (fun a => Eq.symm a) fun a => (Eq.symm a)
 
@@ -784,7 +793,6 @@ lemma differentiable_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
 lemma fderiv_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
     fderiv ℝ (fun s => v +ᵥ s) = fun (_ : Space d) => ContinuousLinearMap.id ℝ _ := by
   ext s ds i
-  change fderiv ℝ (fun s => v +ᵥ s) s ds i = _
   rw [fderiv_space_components]
   simp only [vadd_apply, fderiv_const_add, ContinuousLinearMap.coe_id', id_eq]
   trans fderiv ℝ (coordCLM i) s ds
