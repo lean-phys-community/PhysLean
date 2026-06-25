@@ -97,38 +97,53 @@ lemma coContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ 
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
-lemma contrContrToMatrix_ρ (v : (ContrℂModule ⊗[ℂ] ContrℂModule)) (M : SL(2,ℂ)) :
-    contrContrToMatrix (TensorProduct.map (ContrℂModule.SL2CRep M) (ContrℂModule.SL2CRep M) v) =
-    (LorentzGroup.toComplex (SL2C.toLorentzGroup M)) * contrContrToMatrix v *
-    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ := by
-  nth_rewrite 1 [contrContrToMatrix]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)) ((LinearMap.toMatrix
-      (complexContrBasis.tensorProduct complexContrBasis)
-      (complexContrBasis.tensorProduct complexContrBasis)
-      (TensorProduct.map (ContrℂModule.SL2CRep M) (ContrℂModule.SL2CRep M)))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)))
-      ((complexContrBasis.tensorProduct complexContrBasis).repr v)))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr (complexContrBasis.tensorProduct complexContrBasis)
-      (complexContrBasis.tensorProduct complexContrBasis)
-      (TensorProduct.map (ContrℂModule.SL2CRep M) (ContrℂModule.SL2CRep M)) v)
+/-- Common core for the `*ToMatrix_ρ` lemmas: the `ToMatrix` equivalence intertwines
+`TensorProduct.map f g` with conjugation by the matrices of `f` and `g`, where the
+equivalence is the canonical triple composition built from the bases `b₁`, `b₂`. -/
+private lemma tensorBasis_toMatrix_map
+    {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
+    (b₁ : Basis (Fin 1 ⊕ Fin 3) ℂ V₁) (b₂ : Basis (Fin 1 ⊕ Fin 3) ℂ V₂)
+    (f : V₁ →ₗ[ℂ] V₁) (g : V₂ →ₗ[ℂ] V₂)
+    (eqv : (V₁ ⊗[ℂ] V₂) ≃ₗ[ℂ] Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ)
+    (heqv : eqv = (b₁.tensorProduct b₂).repr ≪≫ₗ
+      Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ
+      LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3))
+    (v : V₁ ⊗[ℂ] V₂) :
+    eqv (TensorProduct.map f g v) =
+    (LinearMap.toMatrix b₁ b₁ f) * eqv v * (LinearMap.toMatrix b₂ b₂ g)ᵀ := by
+  have hpt : ∀ (w : V₁ ⊗[ℂ] V₂) (i j : Fin 1 ⊕ Fin 3), eqv w i j =
+      (((b₁.tensorProduct b₂).repr ≪≫ₗ
+        Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ
+        LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)) w) i j := by
+    intro w i j
+    rw [heqv]
+    rfl
+  funext i j
+  have key : eqv (TensorProduct.map f g v) i j =
+      ((LinearMap.toMatrix (b₁.tensorProduct b₂) (b₁.tensorProduct b₂)
+        (TensorProduct.map f g))
+        *ᵥ ((Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)))
+        ((b₁.tensorProduct b₂).repr v))) (i, j) := by
+    rw [hpt (TensorProduct.map f g v) i j]
+    simp only [LinearEquiv.trans_apply]
+    have h1 := (LinearMap.toMatrix_mulVec_repr (b₁.tensorProduct b₂)
+      (b₁.tensorProduct b₂) (TensorProduct.map f g) v)
     erw [h1]
     rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
+  rw [key, TensorProduct.toMatrix_map]
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix complexContrBasis complexContrBasis) (ContrℂModule.SL2CRep M))
-        ((LinearMap.toMatrix complexContrBasis complexContrBasis)
-          (ContrℂModule.SL2CRep M)) (i, j) k)
-        * contrContrToMatrix v k.1 k.2) = _
+        ((LinearMap.toMatrix b₁ b₁) f)
+        ((LinearMap.toMatrix b₂ b₂) g) (i, j) k)
+        * (((b₁.tensorProduct b₂).repr ≪≫ₗ
+          Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≪≫ₗ
+          LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)) v) k.1 k.2) = _
+  simp_rw [← hpt v]
   rw [Fintype.sum_prod_type]
   simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
-  have h1 : ∑ x, (∑ x1, LorentzGroup.toComplex (SL2C.toLorentzGroup M) i x1 *
-      contrContrToMatrix v x1 x) * LorentzGroup.toComplex (SL2C.toLorentzGroup M) j x
-      = ∑ x, ∑ x1, (LorentzGroup.toComplex (SL2C.toLorentzGroup M) i x1
-      * contrContrToMatrix v x1 x) * LorentzGroup.toComplex (SL2C.toLorentzGroup M) j x := by
+  have h1 : ∑ x, (∑ x1, (LinearMap.toMatrix b₁ b₁) f i x1 * eqv v x1 x)
+      * (LinearMap.toMatrix b₂ b₂) g j x
+      = ∑ x, ∑ x1, ((LinearMap.toMatrix b₁ b₁) f i x1 * eqv v x1 x)
+      * (LinearMap.toMatrix b₂ b₂) g j x := by
     congr
     funext x
     rw [Finset.sum_mul]
@@ -138,138 +153,67 @@ lemma contrContrToMatrix_ρ (v : (ContrℂModule ⊗[ℂ] ContrℂModule)) (M : 
   funext x
   congr
   funext x1
-  simp only [complexContrBasis_ρ_apply]
   ring
+
+set_option backward.isDefEq.respectTransparency false in
+lemma contrContrToMatrix_ρ (v : (ContrℂModule ⊗[ℂ] ContrℂModule)) (M : SL(2,ℂ)) :
+    contrContrToMatrix (TensorProduct.map (ContrℂModule.SL2CRep M) (ContrℂModule.SL2CRep M) v) =
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M)) * contrContrToMatrix v *
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ := by
+  rw [tensorBasis_toMatrix_map complexContrBasis complexContrBasis (ContrℂModule.SL2CRep M)
+    (ContrℂModule.SL2CRep M) contrContrToMatrix rfl v]
+  have h : (LinearMap.toMatrix complexContrBasis complexContrBasis) (ContrℂModule.SL2CRep M)
+      = LorentzGroup.toComplex (SL2C.toLorentzGroup M) := by
+    ext i j
+    simp
+  rw [h]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma coCoToMatrix_ρ (v : (CoℂModule ⊗[ℂ] CoℂModule)) (M : SL(2,ℂ)) :
     coCoToMatrix (TensorProduct.map (CoℂModule.SL2CRep M) (CoℂModule.SL2CRep M) v) =
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ * coCoToMatrix v *
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ := by
-  nth_rewrite 1 [coCoToMatrix]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)) ((LinearMap.toMatrix
-      (complexCoBasis.tensorProduct complexCoBasis)
-      (complexCoBasis.tensorProduct complexCoBasis)
-      (TensorProduct.map (CoℂModule.SL2CRep M) (CoℂModule.SL2CRep M))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)))
-      ((complexCoBasis.tensorProduct complexCoBasis).repr v))))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr (complexCoBasis.tensorProduct complexCoBasis)
-      (complexCoBasis.tensorProduct complexCoBasis)
-      (TensorProduct.map (CoℂModule.SL2CRep M) (CoℂModule.SL2CRep M)) v)
-    erw [h1]
-    rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
-  change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M))
-        ((LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M)) (i, j) k)
-        * coCoToMatrix v k.1 k.2) = _
-  rw [Fintype.sum_prod_type]
-  simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
-  have h1 : ∑ x, (∑ x1, (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x1 i *
-      coCoToMatrix v x1 x) * (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x j
-      = ∑ x, ∑ x1, ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x1 i
-      * coCoToMatrix v x1 x) * (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x j := by
-    congr
-    funext x
-    rw [Finset.sum_mul]
-  erw [h1]
-  rw [Finset.sum_comm]
-  congr
-  funext x
-  congr
-  funext x1
-  simp only [complexCoBasis_ρ_apply, transpose_apply]
-  ring
+  rw [tensorBasis_toMatrix_map complexCoBasis complexCoBasis (CoℂModule.SL2CRep M)
+    (CoℂModule.SL2CRep M) coCoToMatrix rfl v]
+  have h : (LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M)
+      = (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ := by
+    ext i j
+    simp
+  rw [h, transpose_transpose]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma contrCoToMatrix_ρ (v : (ContrℂModule ⊗[ℂ] CoℂModule)) (M : SL(2,ℂ)) :
     contrCoToMatrix (TensorProduct.map (ContrℂModule.SL2CRep M) (CoℂModule.SL2CRep M) v) =
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M)) * contrCoToMatrix v *
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ := by
-  nth_rewrite 1 [contrCoToMatrix]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)) ((LinearMap.toMatrix
-      (complexContrBasis.tensorProduct complexCoBasis)
-      (complexContrBasis.tensorProduct complexCoBasis)
-      (TensorProduct.map (ContrℂModule.SL2CRep M) (CoℂModule.SL2CRep M))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)))
-      ((complexContrBasis.tensorProduct complexCoBasis).repr v))))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr (complexContrBasis.tensorProduct complexCoBasis)
-      (complexContrBasis.tensorProduct complexCoBasis)
-      (TensorProduct.map (ContrℂModule.SL2CRep M) (CoℂModule.SL2CRep M)) v)
-    erw [h1]
-    rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
-  change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix complexContrBasis complexContrBasis) (ContrℂModule.SL2CRep M))
-        ((LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M)) (i, j) k)
-        * contrCoToMatrix v k.1 k.2) = _
-  rw [Fintype.sum_prod_type]
-  simp_rw [kroneckerMap_apply, Matrix.mul_apply]
-  have h1 : ∑ x, (∑ x1, LorentzGroup.toComplex (SL2C.toLorentzGroup M) i x1 *
-      contrCoToMatrix v x1 x) * (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x j
-      = ∑ x, ∑ x1, (LorentzGroup.toComplex (SL2C.toLorentzGroup M) i x1
-      * contrCoToMatrix v x1 x) * (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x j := by
-    congr
-    funext x
-    rw [Finset.sum_mul]
-  erw [h1]
-  rw [Finset.sum_comm]
-  congr
-  funext x
-  congr
-  funext x1
-  simp only [complexContrBasis_ρ_apply, complexCoBasis_ρ_apply, transpose_apply]
-  ring
+  rw [tensorBasis_toMatrix_map complexContrBasis complexCoBasis (ContrℂModule.SL2CRep M)
+    (CoℂModule.SL2CRep M) contrCoToMatrix rfl v]
+  have h1 : (LinearMap.toMatrix complexContrBasis complexContrBasis) (ContrℂModule.SL2CRep M)
+      = LorentzGroup.toComplex (SL2C.toLorentzGroup M) := by
+    ext i j
+    simp
+  have h2 : (LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M)
+      = (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ := by
+    ext i j
+    simp
+  rw [h1, h2, transpose_transpose]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma coContrToMatrix_ρ (v : (CoℂModule ⊗[ℂ] ContrℂModule)) (M : SL(2,ℂ)) :
     coContrToMatrix (TensorProduct.map (CoℂModule.SL2CRep M) (ContrℂModule.SL2CRep M) v) =
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ * coContrToMatrix v *
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ := by
-  nth_rewrite 1 [coContrToMatrix]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℂ ℂ (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)) ((LinearMap.toMatrix
-      (complexCoBasis.tensorProduct complexContrBasis)
-      (complexCoBasis.tensorProduct complexContrBasis)
-      (TensorProduct.map (CoℂModule.SL2CRep M) (ContrℂModule.SL2CRep M))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℂ ℂ ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)))
-      ((complexCoBasis.tensorProduct complexContrBasis).repr v))))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr (complexCoBasis.tensorProduct complexContrBasis)
-      (complexCoBasis.tensorProduct complexContrBasis)
-      (TensorProduct.map (CoℂModule.SL2CRep M) (ContrℂModule.SL2CRep M)) v)
-    erw [h1]
-    rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
-  change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M))
-        ((LinearMap.toMatrix complexContrBasis complexContrBasis)
-          (ContrℂModule.SL2CRep M)) (i, j) k)
-        * coContrToMatrix v k.1 k.2) = _
-  rw [Fintype.sum_prod_type]
-  simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
-  have h1 : ∑ x, (∑ x1, (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x1 i *
-      coContrToMatrix v x1 x) * (LorentzGroup.toComplex (SL2C.toLorentzGroup M)) j x
-      = ∑ x, ∑ x1, ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ x1 i
-      * coContrToMatrix v x1 x) * (LorentzGroup.toComplex (SL2C.toLorentzGroup M)) j x := by
-    congr
-    funext x
-    rw [Finset.sum_mul]
-  erw [h1]
-  rw [Finset.sum_comm]
-  congr
-  funext x
-  congr
-  funext x1
-  simp only [complexCoBasis_ρ_apply, complexContrBasis_ρ_apply, transpose_apply]
-  ring
+  rw [tensorBasis_toMatrix_map complexCoBasis complexContrBasis (CoℂModule.SL2CRep M)
+    (ContrℂModule.SL2CRep M) coContrToMatrix rfl v]
+  have h1 : (LinearMap.toMatrix complexCoBasis complexCoBasis) (CoℂModule.SL2CRep M)
+      = (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ := by
+    ext i j
+    simp
+  have h2 : (LinearMap.toMatrix complexContrBasis complexContrBasis) (ContrℂModule.SL2CRep M)
+      = LorentzGroup.toComplex (SL2C.toLorentzGroup M) := by
+    ext i j
+    simp
+  rw [h1, h2]
 
 /-!
 
