@@ -162,50 +162,33 @@ lemma div_temperature (d1 d2 : Dimension) :
   rw [div_eq_mul_inv, temperature_mul, inv_temperature]
   ring
 
-@[simp]
-lemma npow_length (d : Dimension) (n : ℕ) : (d ^ n).length = n • d.length := by
+/-- A dimension exponent that is additive over multiplication and vanishes at `1`
+respects powers: `f (d ^ n) = n • f d`. -/
+lemma npow_proj (f : Dimension → ℚ) (hmul : ∀ a b, f (a * b) = f a + f b) (hone : f 1 = 0)
+    (d : Dimension) (n : ℕ) : f (d ^ n) = n • f d := by
   induction n with
-  | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+  | zero => simpa using hone
+  | succ n ih => rw [pow_succ, hmul, ih, succ_nsmul]
 
 @[simp]
-lemma npow_time (d : Dimension) (n : ℕ) : (d ^ n).time = n • d.time := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+lemma npow_length (d : Dimension) (n : ℕ) : (d ^ n).length = n • d.length :=
+  npow_proj _ length_mul rfl d n
 
 @[simp]
-lemma npow_mass (d : Dimension) (n : ℕ) : (d ^ n).mass = n • d.mass := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+lemma npow_time (d : Dimension) (n : ℕ) : (d ^ n).time = n • d.time :=
+  npow_proj _ time_mul rfl d n
 
 @[simp]
-lemma npow_charge (d : Dimension) (n : ℕ) : (d ^ n).charge = n • d.charge := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+lemma npow_mass (d : Dimension) (n : ℕ) : (d ^ n).mass = n • d.mass :=
+  npow_proj _ mass_mul rfl d n
 
 @[simp]
-lemma npow_temperature (d : Dimension) (n : ℕ) : (d ^ n).temperature = n • d.temperature := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+lemma npow_charge (d : Dimension) (n : ℕ) : (d ^ n).charge = n • d.charge :=
+  npow_proj _ charge_mul rfl d n
+
+@[simp]
+lemma npow_temperature (d : Dimension) (n : ℕ) : (d ^ n).temperature = n • d.temperature :=
+  npow_proj _ temperature_mul rfl d n
 
 instance : Pow Dimension ℚ where
   pow d n := ⟨d.length * n, d.time * n, d.mass * n, d.charge * n, d.temperature * n⟩
