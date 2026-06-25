@@ -221,42 +221,41 @@ lemma coContrToMatrix_ρ (v : (CoℂModule ⊗[ℂ] ContrℂModule)) (M : SL(2,�
 
 -/
 
+/-- A `_ρ` group-action law on a `*ToMatrix` equivalence transports through the inverse: if
+  `eqv (ρ w) = A * eqv w * B` then `ρ (eqv.symm v) = eqv.symm (A * v * B)`. Used to derive the
+  `_ρ_symm` lemmas from their `_ρ` counterparts. -/
+private lemma map_symm_of_ρ {n : Type*} [Fintype n] [DecidableEq n] {W : Type*}
+    [AddCommGroup W] [Module ℂ W] (eqv : W ≃ₗ[ℂ] Matrix n n ℂ) (ρ : W →ₗ[ℂ] W)
+    {A B : Matrix n n ℂ} (hρ : ∀ w, eqv (ρ w) = A * eqv w * B) (v : Matrix n n ℂ) :
+    ρ (eqv.symm v) = eqv.symm (A * v * B) := by
+  have h1 := hρ (eqv.symm v)
+  simp only [LinearEquiv.apply_symm_apply] at h1
+  rw [← h1, LinearEquiv.symm_apply_apply]
+
 lemma contrContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (ContrℂModule.SL2CRep M) (ContrℂModule.SL2CRep M)
       (contrContrToMatrix.symm v) =
     contrContrToMatrix.symm ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) * v *
-    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ) := by
-  have h1 := contrContrToMatrix_ρ (contrContrToMatrix.symm v) M
-  simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ) :=
+  map_symm_of_ρ contrContrToMatrix _ (fun w => contrContrToMatrix_ρ w M) v
 
 lemma coCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (CoℂModule.SL2CRep M) (CoℂModule.SL2CRep M) (coCoToMatrix.symm v) =
     coCoToMatrix.symm ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ * v *
-    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹) := by
-  have h1 := coCoToMatrix_ρ (coCoToMatrix.symm v) M
-  simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹) :=
+  map_symm_of_ρ coCoToMatrix _ (fun w => coCoToMatrix_ρ w M) v
 
 lemma contrCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (ContrℂModule.SL2CRep M) (CoℂModule.SL2CRep M) (contrCoToMatrix.symm v) =
     contrCoToMatrix.symm ((LorentzGroup.toComplex (SL2C.toLorentzGroup M)) * v *
-    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹) := by
-  have h1 := contrCoToMatrix_ρ (contrCoToMatrix.symm v) M
-  simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹) :=
+  map_symm_of_ρ contrCoToMatrix _ (fun w => contrCoToMatrix_ρ w M) v
 
 lemma coContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (CoℂModule.SL2CRep M) (ContrℂModule.SL2CRep M) (coContrToMatrix.symm v) =
     coContrToMatrix.symm ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ * v *
-    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ) := by
-  have h1 := coContrToMatrix_ρ (coContrToMatrix.symm v) M
-  simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ) :=
+  map_symm_of_ρ coContrToMatrix _ (fun w => coContrToMatrix_ρ w M) v
 
 end Lorentz
 end

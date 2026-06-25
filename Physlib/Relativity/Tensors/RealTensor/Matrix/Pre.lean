@@ -214,14 +214,22 @@ lemma coContrToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Contr d)).V) (M : Lorentz
 
 -/
 
+/-- A `_ρ` group-action law on a `*ToMatrixRe` equivalence transports through the inverse: if
+  `eqv (ρ w) = A * eqv w * B` then `ρ (eqv.symm v) = eqv.symm (A * v * B)`. Used to derive the
+  `_ρ_symm` lemmas from their `_ρ` counterparts. -/
+private lemma map_symm_of_ρ {n : Type*} [Fintype n] [DecidableEq n] {W : Type*}
+    [AddCommGroup W] [Module ℝ W] (eqv : W ≃ₗ[ℝ] Matrix n n ℝ) (ρ : W →ₗ[ℝ] W)
+    {A B : Matrix n n ℝ} (hρ : ∀ w, eqv (ρ w) = A * eqv w * B) (v : Matrix n n ℝ) :
+    ρ (eqv.symm v) = eqv.symm (A * v * B) := by
+  have h1 := hρ (eqv.symm v)
+  simp only [LinearEquiv.apply_symm_apply] at h1
+  rw [← h1, LinearEquiv.symm_apply_apply]
+
 lemma contrContrToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
     TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M) (contrContrToMatrixRe.symm v) =
-    contrContrToMatrixRe.symm (M.1 * v * M.1ᵀ) := by
-  have h1 := contrContrToMatrixRe_ρ (contrContrToMatrixRe.symm v) M
-  simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+    contrContrToMatrixRe.symm (M.1 * v * M.1ᵀ) :=
+  map_symm_of_ρ contrContrToMatrixRe _ (fun w => contrContrToMatrixRe_ρ w M) v
 
 lemma coCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
@@ -236,20 +244,14 @@ lemma coCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ 
 lemma contrCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
     TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M) (contrCoToMatrixRe.symm v) =
-    contrCoToMatrixRe.symm (M.1 * v * M.1⁻¹) := by
-  have h1 := contrCoToMatrixRe_ρ (contrCoToMatrixRe.symm v) M
-  simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+    contrCoToMatrixRe.symm (M.1 * v * M.1⁻¹) :=
+  map_symm_of_ρ contrCoToMatrixRe _ (fun w => contrCoToMatrixRe_ρ w M) v
 
 lemma coContrToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
     (M : LorentzGroup d) :
     TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M) (coContrToMatrixRe.symm v) =
-    coContrToMatrixRe.symm (M.1⁻¹ᵀ * v * M.1ᵀ) := by
-  have h1 := coContrToMatrixRe_ρ (coContrToMatrixRe.symm v) M
-  simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+    coContrToMatrixRe.symm (M.1⁻¹ᵀ * v * M.1ᵀ) :=
+  map_symm_of_ρ coContrToMatrixRe _ (fun w => coContrToMatrixRe_ρ w M) v
 
 end Lorentz
 end
