@@ -34,9 +34,12 @@ partial def addModulesIn (recurse : Bool) (prev : Array Name) (root : Name := .a
       if recurse then
         r ← addModulesIn recurse r (root.mkStr entry.fileName) entry.path
     else
-      let .some mod := FilePath.fileStem entry.fileName
-        | continue
-      r := r.push (root.mkStr mod)
+      -- Only `.lean` files correspond to modules; skip any other files (e.g. an
+      -- `API-map.yaml` sitting at the top of an API directory).
+      if entry.path.extension == some "lean" then
+        let .some mod := FilePath.fileStem entry.fileName
+          | continue
+        r := r.push (root.mkStr mod)
   pure r
 
 /-- Compute imports expected by `Physlib.lean` by looking at file structure. -/
@@ -48,9 +51,8 @@ def expectedPhyslibImports : IO (Array Name) := do
       let root :=  nm.mkStr rootname.toString
       if ← top.path.isDir then
         needed ← addModulesIn (recurse := true) needed (root := root) top.path
-      else
-        needed :=
-        needed.push root
+      else if top.path.extension == some "lean" then
+        needed := needed.push root
   pure needed
 
 def listDif : (a: List String) → (b : List String) → (List String × List String)
