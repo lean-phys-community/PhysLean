@@ -140,10 +140,7 @@ lemma rows_linearly_independent (V : CKMMatrix) : LinearIndependent ℂ (rows V)
   rw [tRow_normalized, tRow_uRow_orthog, tRow_cRow_orthog] at h2
   simp only [Fin.isValue, mul_one, mul_zero, add_zero, zero_add] at h0 h1 h2
   intro i
-  fin_cases i
-  · exact h0
-  · exact h1
-  · exact h2
+  fin_cases i <;> assumption
 
 /-- The rows of a CKM matrix as a basis of `ℂ³`. -/
 @[simps!]
