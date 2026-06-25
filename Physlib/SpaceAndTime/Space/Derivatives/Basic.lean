@@ -397,9 +397,7 @@ lemma inner_apply_differentiableAt {d : ℕ} [NormedAddCommGroup M]
     {f : M → Space d} {g : M → Space d} (x : M)
     (hf : DifferentiableAt ℝ f x) (hg : DifferentiableAt ℝ g x) :
     DifferentiableAt ℝ (fun y : M => ⟪f y, g y⟫_ℝ) x := by
-  apply DifferentiableAt.inner
-  · fun_prop
-  · fun_prop
+  apply DifferentiableAt.inner <;> fun_prop
 
 @[fun_prop]
 lemma inner_apply_differentiable {d : ℕ} [NormedAddCommGroup M]
@@ -407,15 +405,11 @@ lemma inner_apply_differentiable {d : ℕ} [NormedAddCommGroup M]
     {f : M → Space d} {g : M → Space d}
     (hf : Differentiable ℝ f) (hg : Differentiable ℝ g) :
     Differentiable ℝ (fun y : M => ⟪f y, g y⟫_ℝ) := by
-  apply Differentiable.inner
-  · fun_prop
-  · fun_prop
+  apply Differentiable.inner <;> fun_prop
 @[fun_prop]
 lemma inner_contDiff {n : WithTop ℕ∞} {d : ℕ} :
     ContDiff ℝ n (fun y : Space d => ⟪y, y⟫_ℝ) := by
-  apply ContDiff.inner
-  · fun_prop
-  · fun_prop
+  apply ContDiff.inner <;> fun_prop
 
 @[fun_prop]
 lemma inner_apply_contDiff {n : WithTop ℕ∞} {d : ℕ} [NormedAddCommGroup M]
@@ -423,9 +417,7 @@ lemma inner_apply_contDiff {n : WithTop ℕ∞} {d : ℕ} [NormedAddCommGroup M]
     {f : M → Space d} {g : M → Space d}
     (hf : ContDiff ℝ n f) (hg : ContDiff ℝ n g) :
     ContDiff ℝ n (fun y : M => ⟪f y, g y⟫_ℝ) := by
-  apply ContDiff.inner
-  · fun_prop
-  · fun_prop
+  apply ContDiff.inner <;> fun_prop
 /-!
 
 #### A.10.2. Derivative of the inner product function
