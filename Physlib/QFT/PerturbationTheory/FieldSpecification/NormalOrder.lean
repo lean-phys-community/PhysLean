@@ -251,7 +251,7 @@ lemma orderedInsert_create (φ : 𝓕.CrAnFieldOp)
     (φs : List 𝓕.CrAnFieldOp) → List.orderedInsert normalOrderRel φ φs = φ :: φs
   | [] => rfl
   | φ' :: φs => by
-    dsimp only [List.orderedInsert.eq_2]
+    simp only [List.orderedInsert.eq_2]
     rw [if_pos]
     dsimp only [normalOrderRel]
     rw [hφ]
@@ -270,7 +270,7 @@ lemma orderedInsert_append_annihilate (φ' φ : 𝓕.CrAnFieldOp)
   | [] => by
     simp [normalOrderRel, hφ]
   | φ'' :: φs => by
-    dsimp only [List.cons_append, List.orderedInsert.eq_2]
+    simp only [List.cons_append, List.orderedInsert.eq_2]
     have hi := orderedInsert_append_annihilate φ' φ hφ φs
     rw [hi]
     split
@@ -300,7 +300,7 @@ lemma normalOrder_swap_create_annihilate_fst (φc φa : 𝓕.CrAnFieldOp)
   have hi := normalOrderList_cons_create φc hφc φs
   rw [normalOrderList] at hi
   rw [hi]
-  dsimp only [List.orderedInsert.eq_2]
+  simp only [List.orderedInsert.eq_2]
   split
   · rename_i h
     rw [normalOrderRel, hφa, hφc] at h
@@ -374,7 +374,7 @@ lemma orderedInsert_createFilter_append_annihilate (φ : 𝓕.CrAnFieldOp)
   | φ' :: φs, φs' => by
     rcases CreateAnnihilate.eq_create_or_annihilate (𝓕 |>ᶜ φ') with hφ' | hφ'
     · rw [createFilter_cons_create hφ']
-      dsimp only [List.cons_append, List.orderedInsert.eq_2]
+      simp only [List.cons_append, List.orderedInsert.eq_2]
       rw [if_neg, orderedInsert_createFilter_append_annihilate φ hφ φs φs']
       simp [normalOrderRel, hφ, hφ', CreateAnnihilate.normalOrder]
     · rw [createFilter_cons_annihilate hφ', orderedInsert_createFilter_append_annihilate φ hφ φs]
@@ -387,7 +387,7 @@ lemma orderedInsert_annihilateFilter (φ : 𝓕.CrAnFieldOp) : (φs : List 𝓕.
     rcases CreateAnnihilate.eq_create_or_annihilate (𝓕 |>ᶜ φ') with hφ' | hφ'
     · rw [annihilateFilter_cons_create hφ', orderedInsert_annihilateFilter φ φs]
     · rw [annihilateFilter_cons_annihilate hφ']
-      dsimp only [List.orderedInsert.eq_2]
+      simp only [List.orderedInsert.eq_2]
       rw [if_pos]
       dsimp only [normalOrderRel]
       rw [hφ']

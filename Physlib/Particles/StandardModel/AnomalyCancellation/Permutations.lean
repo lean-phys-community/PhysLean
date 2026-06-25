@@ -55,7 +55,7 @@ def repCharges {n : ℕ} : Representation ℚ (PermGroup n) (SMCharges n).Charge
     rw [charges_eq_toSpecies_eq]
     intro i
     simp only [chargeMap_apply, Pi.inv_apply, Module.End.mul_apply]
-    rw [toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv]
+    erw [toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv]
     rfl
   map_one' := by
     apply LinearMap.ext

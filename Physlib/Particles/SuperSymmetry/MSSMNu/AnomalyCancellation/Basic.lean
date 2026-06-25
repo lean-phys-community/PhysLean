@@ -29,6 +29,13 @@ def MSSMSpecies : ACCSystemCharges := ⟨3⟩
 
 namespace MSSMCharges
 
+lemma sum_MSSMSpecies_numberCharges_eq_expand [AddCommMonoid M]
+    (f : Fin MSSMSpecies.numberCharges → M) :
+    ∑ i, f i = f ⟨0, by simp⟩ + f ⟨1, by simp⟩ + f ⟨2, by simp⟩ := by
+  change ∑ (i : Fin 3), f i = f ⟨0, by simp⟩ + f ⟨1, by simp⟩ + f ⟨2, by simp⟩
+  simp only [Fin.sum_univ_three]
+  rfl
+
 /-- An equivalence between `MSSMCharges.charges` and the space of maps
 `(Fin 18 ⊕ Fin 2 → ℚ)`. The first 18 factors corresponds to the SM fermions, while the last two
 are the higgsions. -/
@@ -132,21 +139,20 @@ namespace MSSMACCs
 open MSSMCharges
 
 /-- The gravitational anomaly equation. -/
-@[simp]
 def accGrav : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (6 * Q S i + 3 * U S i + 3 * D S i
     + 2 * L S i + E S i + N S i) + 2 * (Hd S + Hu S)
   map_add' S T := by
     repeat rw [map_add]
-    simp only [MSSMSpecies_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add,
-      toSMSpecies_apply, reduceMul, Fin.isValue, mul_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add, toSMSpecies_apply, reduceMul, Fin.isValue,
+      mul_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
     repeat rw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
     repeat rw [(toSMSpecies _).map_smul]
     simp_rw [Hd.map_smul, Hu.map_smul]
-    simp only [MSSMSpecies_numberCharges, HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply,
-      reduceMul, Hd_apply, Fin.reduceFinMk, Hu_apply, eq_ratCast, Rat.cast_eq_id, id_eq]
+    simp only [HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply, reduceMul, Hd_apply,
+      Fin.reduceFinMk, Hu_apply, eq_ratCast, Rat.cast_eq_id, id_eq]
     repeat rw [Finset.sum_add_distrib]
     repeat rw [← Finset.mul_sum]
     ring
@@ -156,27 +162,25 @@ lemma accGrav_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
     (hd : Hd S = Hd T) (hu : Hu S = Hu T) :
     accGrav S = accGrav T := by
-  simp only [accGrav, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
-    LinearMap.coe_mk, AddHom.coe_mk]
+  simp only [accGrav, toSMSpecies_apply, Fin.isValue, LinearMap.coe_mk, AddHom.coe_mk]
   repeat rw [Finset.sum_add_distrib]
   repeat rw [← Finset.mul_sum]
   simp_all
 
 /-- The anomaly cancellation condition for SU(2) anomaly. -/
-@[simp]
 def accSU2 : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (3 * Q S i + L S i) + Hd S + Hu S
   map_add' S T := by
     repeat rw [map_add]
-    simp only [MSSMSpecies_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add,
-      toSMSpecies_apply, reduceMul, Fin.isValue, mul_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add, toSMSpecies_apply, reduceMul, Fin.isValue,
+      mul_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
     repeat rw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
     repeat rw [(toSMSpecies _).map_smul]
     rw [Hd.map_smul, Hu.map_smul]
-    simp only [MSSMSpecies_numberCharges, HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply,
-      reduceMul, Hd_apply, Fin.reduceFinMk, Hu_apply, eq_ratCast, Rat.cast_eq_id, id_eq]
+    simp only [HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply, reduceMul, Hd_apply,
+      Fin.reduceFinMk, Hu_apply, eq_ratCast, Rat.cast_eq_id, id_eq]
     repeat rw [Finset.sum_add_distrib]
     repeat rw [← Finset.mul_sum]
     --rw [show Rat.cast a = a from rfl]
@@ -187,26 +191,24 @@ lemma accSU2_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
     (hd : Hd S = Hd T) (hu : Hu S = Hu T) :
     accSU2 S = accSU2 T := by
-  simp only [accSU2, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
-    LinearMap.coe_mk, AddHom.coe_mk]
+  simp only [accSU2, toSMSpecies_apply, Fin.isValue, LinearMap.coe_mk, AddHom.coe_mk]
   repeat rw [Finset.sum_add_distrib]
   repeat rw [← Finset.mul_sum]
   simp_all
 
 /-- The anomaly cancellation condition for SU(3) anomaly. -/
-@[simp]
 def accSU3 : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (2 * (Q S i) + (U S i) + (D S i))
   map_add' S T := by
     repeat rw [map_add]
-    simp only [MSSMSpecies_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add,
-      toSMSpecies_apply, reduceMul, Fin.isValue, mul_add]
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add, toSMSpecies_apply, reduceMul, Fin.isValue,
+      mul_add]
     repeat rw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
     repeat rw [(toSMSpecies _).map_smul]
-    simp only [MSSMSpecies_numberCharges, HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply,
-      reduceMul, eq_ratCast, Rat.cast_eq_id, id_eq]
+    simp only [HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply, reduceMul, eq_ratCast,
+      Rat.cast_eq_id, id_eq]
     repeat rw [Finset.sum_add_distrib]
     repeat rw [← Finset.mul_sum]
     --rw [show Rat.cast a = a from rfl]
@@ -216,28 +218,26 @@ def accSU3 : MSSMCharges.Charges →ₗ[ℚ] ℚ where
 lemma accSU3_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i) :
     accSU3 S = accSU3 T := by
-  simp only [accSU3, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, LinearMap.coe_mk,
-    AddHom.coe_mk]
+  simp only [accSU3, toSMSpecies_apply, Fin.isValue, LinearMap.coe_mk, AddHom.coe_mk]
   repeat rw [Finset.sum_add_distrib]
   repeat rw [← Finset.mul_sum]
   simp_all
 
 /-- The ACC for `Y²`. -/
-@[simp]
 def accYY : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, ((Q S) i + 8 * (U S) i + 2 * (D S) i + 3 * (L S) i
     + 6 * (E S) i) + 3 * (Hd S + Hu S)
   map_add' S T := by
     repeat rw [map_add]
-    simp only [MSSMSpecies_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add,
-      toSMSpecies_apply, reduceMul, Fin.isValue, mul_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add, toSMSpecies_apply, reduceMul, Fin.isValue,
+      mul_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
     repeat rw [Finset.sum_add_distrib]
     ring
   map_smul' a S := by
     repeat rw [(toSMSpecies _).map_smul]
     rw [Hd.map_smul, Hu.map_smul]
-    simp only [MSSMSpecies_numberCharges, HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply,
-      reduceMul, Hd_apply, Fin.reduceFinMk, Hu_apply, eq_ratCast, Rat.cast_eq_id, id_eq]
+    simp only [HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply, reduceMul, Hd_apply,
+      Fin.reduceFinMk, Hu_apply, eq_ratCast, Rat.cast_eq_id, id_eq]
     repeat rw [Finset.sum_add_distrib]
     repeat rw [← Finset.mul_sum]
     -- rw [show Rat.cast a = a from rfl]
@@ -248,8 +248,7 @@ lemma accYY_ext {S T : MSSMCharges.Charges}
     (hj : ∀ (j : Fin 6), ∑ i, (toSMSpecies j) S i = ∑ i, (toSMSpecies j) T i)
     (hd : Hd S = Hd T) (hu : Hu S = Hu T) :
     accYY S = accYY T := by
-  simp only [accYY, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
-    LinearMap.coe_mk, AddHom.coe_mk]
+  simp only [accYY, toSMSpecies_apply, Fin.isValue, LinearMap.coe_mk, AddHom.coe_mk]
   repeat rw [Finset.sum_add_distrib]
   repeat rw [← Finset.mul_sum]
   simp_all
@@ -293,11 +292,11 @@ def quadBiLin : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
       ring)
   (by
     intro S L
-    simp only [MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, neg_mul, one_mul,
-      Hd_apply, Fin.reduceFinMk, Hu_apply]
+    simp only [toSMSpecies_apply, Fin.isValue, neg_mul, one_mul, Hd_apply, Fin.reduceFinMk,
+      Hu_apply]
     congr 1
-    · rw [Fin.sum_univ_three, Fin.sum_univ_three]
-      simp only [reduceMul, Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
+    · simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand, Fin.zero_eta,
+      Fin.mk_one]
       ring
     · ring)
 
@@ -322,7 +321,6 @@ lemma accQuad_ext {S T : (MSSMCharges).Charges}
   rw [hd, hu]
 
 /-- The function underlying the symmetric trilinear form used to define the cubic ACC. -/
-@[simp]
 def cubeTriLinToFun
     (S : MSSMCharges.Charges × MSSMCharges.Charges × MSSMCharges.Charges) : ℚ :=
   ∑ i, (6 * (Q S.1 i * Q S.2.1 i * Q S.2.2 i)
@@ -369,22 +367,18 @@ lemma cubeTriLinToFun_map_add₁ (S T R L : MSSMCharges.Charges) :
 set_option backward.isDefEq.respectTransparency false in
 lemma cubeTriLinToFun_swap1 (S T R : MSSMCharges.Charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (T, S, R) := by
-  simp only [cubeTriLinToFun, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply,
-    Fin.reduceFinMk, Hu_apply]
+  simp only [cubeTriLinToFun, toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk, Hu_apply]
   congr 1
-  · rw [Fin.sum_univ_three, Fin.sum_univ_three]
-    simp only [reduceMul, Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
+  · simp only [sum_MSSMSpecies_numberCharges_eq_expand]
     ring
   · ring
 
 set_option backward.isDefEq.respectTransparency false in
 lemma cubeTriLinToFun_swap2 (S T R : MSSMCharges.Charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (S, R, T) := by
-  simp only [cubeTriLinToFun, MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply,
-    Fin.reduceFinMk, Hu_apply]
+  simp only [cubeTriLinToFun, toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk, Hu_apply]
   congr 1
-  · rw [Fin.sum_univ_three, Fin.sum_univ_three]
-    simp only [reduceMul, Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
+  · simp only [sum_MSSMSpecies_numberCharges_eq_expand]
     ring
   · ring
 
@@ -443,8 +437,8 @@ lemma cubicACC_apply (S : MSSMACC.Charges) : MSSMACC.cubicACC S = cubeTriLin.toC
 
 lemma quadSol (S : MSSMACC.QuadSols) : accQuad S.val = 0 := by
   have hS := S.quadSol
-  simp only [MSSMACC_numberQuadratic, HomogeneousQuadratic, MSSMACC_quadraticACCs] at hS
-  exact hS 0
+  simp only [HomogeneousQuadratic, MSSMACC_quadraticACCs] at hS
+  exact hS ⟨0, by simp⟩
 
 /-- A solution from a charge satisfying the ACCs. -/
 @[simp]
@@ -453,16 +447,14 @@ def AnomalyFreeMk (S : MSSMACC.Charges) (hg : accGrav S = 0)
     (hquad : accQuad S = 0) (hcube : accCube S = 0) : MSSMACC.Sols :=
   ⟨⟨⟨S, by
     intro i
-    simp only [MSSMACC_numberLinear] at i
     match i with
-    | 0 => exact hg
-    | 1 => exact hsu2
-    | 2 => exact hsu3
-    | 3 => exact hyy⟩, by
+    | ⟨0, _⟩ => exact hg
+    | ⟨1, _⟩ => exact hsu2
+    | ⟨2, _⟩ => exact hsu3
+    | ⟨3, _⟩ => exact hyy⟩, by
     intro i
-    simp only [MSSMACC_numberQuadratic] at i
     match i with
-    | 0 => exact hquad⟩, hcube⟩
+    | ⟨0, _⟩ => exact hquad⟩, hcube⟩
 
 lemma AnomalyFreeMk_val (S : MSSMACC.Charges) (hg : accGrav S = 0)
     (hsu2 : accSU2 S = 0) (hsu3 : accSU3 S = 0) (hyy : accYY S = 0)
@@ -476,9 +468,8 @@ def AnomalyFreeQuadMk' (S : MSSMACC.LinSols) (hquad : accQuad S.val = 0) :
     MSSMACC.QuadSols :=
   ⟨S, by
     intro i
-    simp only [MSSMACC_numberQuadratic] at i
     match i with
-    | 0 => exact hquad⟩
+    | ⟨0, _⟩ => exact hquad⟩
 
 /-- A `Sol` from a `LinSol` satisfying the quadratic and cubic ACCs. -/
 @[simp]
@@ -486,9 +477,8 @@ def AnomalyFreeMk' (S : MSSMACC.LinSols) (hquad : accQuad S.val = 0)
     (hcube : accCube S.val = 0) : MSSMACC.Sols :=
   ⟨⟨S, by
     intro i
-    simp only [MSSMACC_numberQuadratic] at i
     match i with
-    | 0 => exact hquad⟩, hcube⟩
+    | ⟨0, _⟩ => exact hquad⟩, hcube⟩
 
 /-- A `Sol` from a `QuadSol` satisfying the cubic ACCs. -/
 @[simp]
@@ -509,26 +499,26 @@ def dot : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
     + N S.1 i * N S.2 i) + Hd S.1 * Hd S.2 + Hu S.1 * Hu S.2)
   (by
     intro a S T
-    simp only [MSSMSpecies_numberCharges]
     repeat rw [(toSMSpecies _).map_smul]
     rw [Hd.map_smul, Hu.map_smul]
-    rw [Fin.sum_univ_three, Fin.sum_univ_three]
-    simp only [HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply, Hd_apply, Fin.reduceFinMk,
-      Hu_apply]
+    simp only [Fin.isValue, toSMSpecies_apply, reduceMul, sum_MSSMSpecies_numberCharges_eq_expand,
+      Fin.zero_eta, Fin.mk_one, Hd_apply, Fin.reduceFinMk, smul_eq_mul, Hu_apply]
+    simp only [HSMul.hSMul, SMul.smul, Fin.isValue, toSMSpecies_apply]
     ring)
   (by
     intro S1 S2 T
-    simp only [MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue,
+    simp only [toSMSpecies_apply, Fin.isValue,
       ACCSystemCharges.chargesAddCommMonoid_add, map_add, Hd_apply, Fin.reduceFinMk, Hu_apply]
-    rw [Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three]
-    simp only [reduceMul, Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
+    simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand, Fin.zero_eta,
+      Fin.mk_one]
+    simp only [Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
     ring)
   (by
     intro S T
-    simp only [MSSMSpecies_numberCharges, toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk,
-      Hu_apply]
-    rw [Fin.sum_univ_three, Fin.sum_univ_three]
-    simp only [reduceMul, Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
+    simp only [toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk, Hu_apply]
+    simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand, Fin.zero_eta,
+      Fin.mk_one]
+    simp only [Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
     ring)
 
 end MSSMACC

@@ -84,7 +84,7 @@ lemma div_eq_sum_fderiv {d} (f : Space d → EuclideanSpace ℝ (Fin d))
 @[simp]
 lemma div_zero : ∇ ⬝ (0 : Space d → EuclideanSpace ℝ (Fin d)) = 0 := by
   unfold div Space.deriv Finset.sum
-  simp only [Pi.ofNat_apply, fderiv_fun_const, ContinuousLinearMap.zero_apply, Multiset.map_const',
+  simp only [Pi.ofNat_apply, fderiv_fun_const, _root_.zero_apply, Multiset.map_const',
     Finset.card_val, Finset.card_univ, Fintype.card_fin, Multiset.sum_replicate, smul_zero]
   rfl
 
@@ -97,7 +97,7 @@ lemma div_zero : ∇ ⬝ (0 : Space d → EuclideanSpace ℝ (Fin d)) = 0 := by
 @[simp]
 lemma div_const : ∇ ⬝ (fun _ : Space d => v) = 0 := by
   unfold div Space.deriv Finset.sum
-  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.zero_apply, Multiset.map_const',
+  simp only [fderiv_fun_const, Pi.ofNat_apply, _root_.zero_apply, Multiset.map_const',
     Finset.card_val, Finset.card_univ, Fintype.card_fin, Multiset.sum_replicate, smul_zero]
   rfl
 
@@ -119,7 +119,7 @@ lemma div_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
   funext i
   simp [Space.deriv]
   rw [fderiv_fun_add]
-  simp only [ContinuousLinearMap.add_apply]
+  simp only [_root_.add_apply]
   · fun_prop
   · fun_prop
 
@@ -141,7 +141,7 @@ lemma div_smul (f : Space d → EuclideanSpace ℝ (Fin d)) (k : ℝ)
   funext i
   simp [Space.deriv]
   rw [fderiv_const_mul]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   · fun_prop
 
 /-!
@@ -180,11 +180,11 @@ noncomputable def distDiv {d} :
     let trace : (Space d →L[ℝ] (EuclideanSpace ℝ (Fin d))) →L[ℝ] ℝ := {
       toFun v := ∑ i, ⟪v (basis i), EuclideanSpace.single i 1⟫_ℝ
       map_add' v1 v2 := by
-        simp only [ContinuousLinearMap.add_apply, EuclideanSpace.inner_single_right, PiLp.add_apply,
+        simp only [_root_.add_apply, EuclideanSpace.inner_single_right, PiLp.add_apply,
           conj_trivial, one_mul]
         rw [Finset.sum_add_distrib]
       map_smul' a v := by
-        simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, EuclideanSpace.inner_single_right,
+        simp only [FunLike.coe_smul, Pi.smul_apply, EuclideanSpace.inner_single_right,
           PiLp.smul_apply, smul_eq_mul, conj_trivial, one_mul, RingHom.id_apply]
         rw [Finset.mul_sum]
       cont := by fun_prop}

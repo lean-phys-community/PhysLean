@@ -250,9 +250,10 @@ def basisAsCharges (j : Fin n.succ) : (PureU1 (2 * n.succ)).Charges :=
 lemma basis_on_evenFst_self (j : Fin n.succ) : basisAsCharges j (evenFst j) = 1 := by
   simp [basisAsCharges]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_evenFst_other {k j : Fin n.succ} (h : k ≠ j) :
     basisAsCharges k (evenFst j) = 0 := by
-  simp only [basisAsCharges, succ_eq_add_one, PureU1_numberCharges, evenFst, evenSnd]
+  simp only [basisAsCharges, succ_eq_add_one, evenFst, evenSnd]
   split
   · rename_i h1
     rw [Fin.ext_iff] at h1
@@ -268,14 +269,16 @@ lemma basis_on_evenFst_other {k j : Fin n.succ} (h : k ≠ j) :
       omega
     · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_other {k : Fin n.succ} {j : Fin (2 * n.succ)} (h1 : j ≠ evenFst k)
     (h2 : j ≠ evenSnd k) : basisAsCharges k j = 0 := by
-  simp only [basisAsCharges, succ_eq_add_one, PureU1_numberCharges]
+  simp only [basisAsCharges, succ_eq_add_one]
   simp_all only [ne_eq, ↓reduceIte]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_evenSnd_eq_neg_evenFst (j i : Fin n.succ) :
     basisAsCharges j (evenSnd i) = - basisAsCharges j (evenFst i) := by
-  simp only [basisAsCharges, succ_eq_add_one, PureU1_numberCharges, evenSnd, evenFst]
+  simp only [basisAsCharges, succ_eq_add_one, evenSnd, evenFst]
   split <;> split
   any_goals split
   any_goals rfl
@@ -333,10 +336,8 @@ lemma basis_accCube (j : Fin n.succ) :
 def basis (j : Fin n.succ) : (PureU1 (2 * n.succ)).LinSols :=
   ⟨basisAsCharges j, by
     intro i
-    simp only [succ_eq_add_one, PureU1_numberLinear] at i
     match i with
-    | 0 =>
-    exact basis_linearACC j⟩
+    | ⟨0, _⟩ => exact basis_linearACC j⟩
 
 /-!
 
@@ -375,7 +376,7 @@ lemma P_evenSnd (f : Fin n.succ → ℚ) (j : Fin n.succ) : P f (evenSnd j) = - 
 
 lemma P_evenSnd_evenFst (f : Fin n.succ → ℚ) : P f ∘ evenSnd = - P f ∘ evenFst := by
   funext j
-  simp only [PureU1_numberCharges, Function.comp_apply, Pi.neg_apply]
+  simp only [Function.comp_apply, Pi.neg_apply]
   rw [P_evenFst, P_evenSnd]
 
 /-!
@@ -497,14 +498,16 @@ def basis!AsCharges (j : Fin n) : (PureU1 (2 * n.succ)).Charges :=
 lemma basis!_on_evenShiftFst_self (j : Fin n) : basis!AsCharges j (evenShiftFst j) = 1 := by
   simp [basis!AsCharges]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_other {k : Fin n} {j : Fin (2 * n.succ)} (h1 : j ≠ evenShiftFst k)
     (h2 : j ≠ evenShiftSnd k) : basis!AsCharges k j = 0 := by
-  simp only [basis!AsCharges, succ_eq_add_one, PureU1_numberCharges]
+  simp only [basis!AsCharges, succ_eq_add_one]
   simp_all only [ne_eq, ↓reduceIte]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_evenShiftFst_other {k j : Fin n} (h : k ≠ j) :
     basis!AsCharges k (evenShiftFst j) = 0 := by
-  simp only [basis!AsCharges, succ_eq_add_one, PureU1_numberCharges]
+  simp only [basis!AsCharges, succ_eq_add_one]
   simp only [evenShiftFst, succ_eq_add_one, evenShiftSnd]
   split
   · rename_i h1
@@ -520,9 +523,10 @@ lemma basis!_on_evenShiftFst_other {k j : Fin n} (h : k ≠ j) :
       omega
     · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis!_evenShftSnd_eq_neg_evenShiftFst (j i : Fin n) :
     basis!AsCharges j (evenShiftSnd i) = - basis!AsCharges j (evenShiftFst i) := by
-  simp only [basis!AsCharges, succ_eq_add_one, PureU1_numberCharges, evenShiftSnd, evenShiftFst]
+  simp only [basis!AsCharges, succ_eq_add_one, evenShiftSnd, evenShiftFst]
   split <;> split
   any_goals split
   any_goals split
@@ -549,8 +553,9 @@ lemma basis!_on_evenShiftSnd_other {k j : Fin n} (h : k ≠ j) :
   rw [basis!_evenShftSnd_eq_neg_evenShiftFst, basis!_on_evenShiftFst_other h]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_evenShiftZero (j : Fin n) : basis!AsCharges j evenShiftZero = 0 := by
-  simp only [basis!AsCharges, succ_eq_add_one, PureU1_numberCharges]
+  simp only [basis!AsCharges, succ_eq_add_one]
   split<;> rename_i h
   · simp only [evenShiftZero, succ_eq_add_one, Fin.isValue, evenShiftFst, Fin.ext_iff,
     Fin.val_cast, Fin.val_castAdd, Fin.val_eq_zero, Fin.val_natAdd] at h
@@ -561,8 +566,9 @@ lemma basis!_on_evenShiftZero (j : Fin n) : basis!AsCharges j evenShiftZero = 0 
       omega
     · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_evenShiftLast (j : Fin n) : basis!AsCharges j evenShiftLast = 0 := by
-  simp only [basis!AsCharges, succ_eq_add_one, PureU1_numberCharges]
+  simp only [basis!AsCharges, succ_eq_add_one]
   split <;> rename_i h
   · rw [Fin.ext_iff] at h
     simp only [succ_eq_add_one, evenShiftLast, Fin.isValue, Fin.val_cast, Fin.val_natAdd,
@@ -609,15 +615,14 @@ lemma basis!_accCube (j : Fin n) :
 ### C.6. The vectors as linear solutions
 
 -/
+
 /-- The second part of the basis as `LinSols`. -/
 @[simps!]
 def basis! (j : Fin n) : (PureU1 (2 * n.succ)).LinSols :=
   ⟨basis!AsCharges j, by
     intro i
-    simp only [succ_eq_add_one, PureU1_numberLinear] at i
     match i with
-    | 0 =>
-    exact basis!_linearACC j⟩
+    | ⟨0, _⟩ => exact basis!_linearACC j⟩
 
 /-!
 
@@ -781,9 +786,9 @@ set_option backward.isDefEq.respectTransparency false in
 lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     accCubeTriLinSymm (P g) (P g) (basis!AsCharges j)
     = g (j.succ) ^ 2 - g (j.castSucc) ^ 2 := by
-  simp only [succ_eq_add_one, accCubeTriLinSymm, PureU1Charges_numberCharges,
+  simp only [succ_eq_add_one, accCubeTriLinSymm,
     TriLinearSymm.mk₃_toFun_apply_apply]
-  rw [sum_evenShift, basis!_on_evenShiftZero, basis!_on_evenShiftLast]
+  erw [sum_evenShift, basis!_on_evenShiftZero, basis!_on_evenShiftLast]
   simp only [mul_zero, add_zero, Function.comp_apply, zero_add]
   rw [Finset.sum_eq_single j, basis!_on_evenShiftFst_self, basis!_on_evenShiftSnd_self]
   · simp only [evenShiftFst_eq_evenFst_succ, mul_one, evenShiftSnd_eq_evenSnd_castSucc, mul_neg]
@@ -798,9 +803,9 @@ set_option backward.isDefEq.respectTransparency false in
 lemma P_P!_P!_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
     accCubeTriLinSymm (P! g) (P! g) (basisAsCharges j)
     = (P! g (evenFst j))^2 - (P! g (evenSnd j))^2 := by
-  simp only [succ_eq_add_one, accCubeTriLinSymm, PureU1Charges_numberCharges,
+  simp only [succ_eq_add_one, accCubeTriLinSymm,
     TriLinearSymm.mk₃_toFun_apply_apply]
-  rw [sum_even]
+  erw [sum_even]
   simp only [Function.comp_apply]
   rw [Finset.sum_eq_single j, basis_on_evenFst_self, basis_on_evenSnd_self]
   · simp only [mul_one, mul_neg]

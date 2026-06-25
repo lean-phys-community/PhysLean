@@ -104,7 +104,7 @@ lemma variedField_contDiff (f : Space d → EuclideanSpace ℝ (Fin m))
     (s : ℝ)
     (hf : ContDiff ℝ ∞ f) :
     ContDiff ℝ ∞ (variedField f η s) := by
-  simpa [variedField] using hf.add (η.isTestFunction.contDiff.const_smul s)
+  exact hf.add (η.isTestFunction.contDiff.const_smul s)
 
 /-- The action of a field under an admissible variation. -/
 noncomputable def actionVariation (L : Lagrangian d m k)
@@ -147,7 +147,8 @@ lemma hasFiniteActionVariation_of_hasFiniteAction_of_compactlySupportedDifferenc
           (actionDensity L (variedField f η s) x - actionDensity L f x)
             + actionDensity L f x) := by
     exact hsub.add hbase
-  simpa [sub_eq_add_neg, add_assoc, add_left_comm] using hadd
+  simp_all [sub_eq_add_neg, add_assoc]
+  exact hadd
 
 @[simp]
 lemma variedField_apply (f : Space d → EuclideanSpace ℝ (Fin m))
@@ -168,8 +169,9 @@ lemma jetAt_variedField_eq_of_notMem_tsupport
     jetAt k (variedField f η s) x = jetAt k f x := by
   have hcoords :
       jetCoordinatesAt k (variedField f η s) x = jetCoordinatesAt k f x := by
-    simpa [variedField, jetCoordinatesAt_eq_zero_of_notMem_tsupport k η.toFun hx] using
-      jetCoordinatesAt_add_smul k f η.toFun x s hf η.isTestFunction.contDiff
+    have h1 := jetCoordinatesAt_add_smul k f η.toFun x s hf η.isTestFunction.contDiff
+    simp_all [jetCoordinatesAt_eq_zero_of_notMem_tsupport k η.toFun hx]
+    exact h1
   rw [jetAt_eq_ofBaseCoordinates, jetAt_eq_ofBaseCoordinates]
   exact congrArg (JetPoint.ofBaseCoordinates x) hcoords
 
@@ -188,10 +190,9 @@ lemma hasCompactlySupportedActionVariationDifference_of_continuousInCoordinates
     HasCompactlySupportedActionVariationDifference L f η := by
   intro s
   have hbaseCont : Continuous (actionDensity L f) := by
-    simpa [actionDensity] using Lagrangian.continuousAlongField_of_inCoordinates L hcontL f hf
+    exact Lagrangian.continuousAlongField_of_inCoordinates L hcontL f hf
   have hvarCont : Continuous (actionDensity L (variedField f η s)) := by
-    simpa [actionDensity] using
-      Lagrangian.continuousAlongField_of_inCoordinates L hcontL (variedField f η s)
+    exact Lagrangian.continuousAlongField_of_inCoordinates L hcontL (variedField f η s)
         (variedField_contDiff f η s hf)
   refine ⟨hvarCont.sub hbaseCont, ?_⟩
   refine η.hasCompactSupport.of_isClosed_subset (isClosed_tsupport _) ?_

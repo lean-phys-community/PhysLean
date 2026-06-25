@@ -135,7 +135,8 @@ lemma Multiset.map_univ_eq_iff {α β : Type*} [Fintype α] (f g : α → β) :
         intro y;
         replace a := congr_arg ( fun m => m.count y ) a;
         simp_all ( config := { decide := Bool.true } ) [ Multiset.count_map ];
-        simpa [ eq_comm, Finset.filter_congr ] using a;
+        simp_all [ eq_comm ]
+        exact a
       have h_perm : ∀ y : β, ∃ e : { x : α // f x = y } ≃ { x : α // g x = y }, True := by
         intro y
         simp_all only [exists_const_iff, and_true]
@@ -147,7 +148,7 @@ lemma Multiset.map_univ_eq_iff {α β : Type*} [Fintype α] (f g : α → β) :
       specialize e ( f x )
       rename_i e_1
       simp_all only [implies_true, Equiv.trans_apply, Equiv.sigmaCongrRight_apply,
-        Equiv.sigmaFiberEquiv_symm_apply_fst, Equiv.sigmaFiberEquiv_apply]
+        Equiv.sigmaFiberEquiv_apply]
       exact Eq.symm ( e_1 ( f x ) ⟨ x, rfl ⟩ |>.2 );
     exact ⟨ h_perm.choose, funext h_perm.choose_spec ⟩;
   · intro a
@@ -179,4 +180,4 @@ lemma exists_equiv_of_multiset_map_eq {α β γ : Type*} [Fintype α] [Fintype �
   -- By `Multiset.map_univ_eq_iff`, there exists `e' : α ≃ α` such that `f = (g ∘ σ) ∘ e'`.
   obtain ⟨e', he'⟩ : ∃ e' : α ≃ α, f = (g ∘ σ) ∘ e' := by
     exact (Multiset.map_univ_eq_iff f (g ∘ ⇑σ)).mp hσ;
-  exact ⟨ e'.trans σ, by simpa [ Function.comp ] using he' ⟩
+  exact ⟨ e'.trans σ, by simp_all [ Function.comp ]; grind⟩

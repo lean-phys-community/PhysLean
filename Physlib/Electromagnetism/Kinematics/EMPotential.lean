@@ -423,7 +423,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
       conv_lhs =>
         enter [1, 2, i]
         rw [fderiv_const_mul (hdif i)]
-      simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_smul',
+      simp only [FunLike.coe_sum, FunLike.coe_smul,
         Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
       rw [Lorentz.Vector.smul_eq_sum]
       congr
@@ -502,7 +502,6 @@ lemma deriv_hasVarAdjDerivAt {d} (μ ν : Fin 1 ⊕ Fin d) (A : SpaceTime d → 
     Lorentz.Vector d) x => ∂_ μ A x ν)) h0' ?_
   intro φ hφ
   funext x
-  simp only
   rw [deriv_apply_eq μ ν φ]
   exact hφ.differentiable (by simp)
 

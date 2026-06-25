@@ -46,11 +46,12 @@ i.e. a matrix that squares to itself, preserves vectors in the submodule, and ze
 in the orthogonal complement of that submodule.
 -/
 noncomputable def projector (S : Submodule 𝕜 (EuclideanSpace 𝕜 n)) : HermitianMat n 𝕜 :=
-  let P := S.subtypeL.comp S.orthogonalProjection
+  let P := S.subtypeL.comp S.orthogonalProjectionOnto
   ⟨P.toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis, by
     ext i j
-    simpa [EuclideanSpace.inner_single_right, EuclideanSpace.inner_single_left] using
-      S.inner_starProjection_left_eq_right (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)⟩
+    have h1 := S.inner_starProjection_left_eq_right (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)
+    simp_all [EuclideanSpace.inner_single_right, EuclideanSpace.inner_single_left]
+    exact h1⟩
 
 theorem projector_add_orthogonal : projector S + projector Sᗮ = 1 := by
   unfold projector;
@@ -60,7 +61,7 @@ theorem projector_add_orthogonal : projector S + projector Sᗮ = 1 := by
 theorem projector_nonneg : 0 ≤ projector S := by
   rw [zero_le_iff]
   unfold projector
-  let P := S.subtypeL.comp S.orthogonalProjection
+  let P := S.subtypeL.comp S.orthogonalProjectionOnto
   have hP : P.toLinearMap.IsSymmetricProjection := by
     simpa [Submodule.starProjection, P] using
       (Submodule.isSymmetricProjection_starProjection (U := S))
@@ -72,21 +73,21 @@ theorem projector_ker : (projector S).ker = Sᗮ := by
   ext v
   change (Matrix.toEuclideanLin
       (LinearMap.toMatrix (PiLp.basisFun 2 𝕜 n) (PiLp.basisFun 2 𝕜 n)
-        (S.subtypeL.comp S.orthogonalProjection)) v = 0 ↔ v ∈ Sᗮ)
+        (S.subtypeL.comp S.orthogonalProjectionOnto)) v = 0 ↔ v ∈ Sᗮ)
   rw [show Matrix.toEuclideanLin = Matrix.toLpLin (2 : ENNReal) (2 : ENNReal) from rfl,
     Matrix.toLpLin_eq_toLin, Matrix.toLin_toMatrix]
   exact Submodule.starProjection_apply_eq_zero_iff (K := S)
 
 @[simp]
 theorem trace_projector : (projector S).trace = (Module.finrank 𝕜 S : ℝ) := by
-  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by
+  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjectionOnto).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by
     simp [projector, trace_eq_re_trace, h_trace]
-  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjection).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = (LinearMap.id.toMatrix (Module.finBasis 𝕜 S) (Module.finBasis 𝕜 S)).trace by
+  suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjectionOnto).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = (LinearMap.id.toMatrix (Module.finBasis 𝕜 S) (Module.finBasis 𝕜 S)).trace by
     simp [h_trace]
   rw [LinearMap.toMatrix_comp _ (Module.finBasis 𝕜 ↥S), Matrix.trace_mul_comm, ← LinearMap.toMatrix_comp]
   congr 2
   ext1
-  simp [Submodule.orthogonalProjection_mem_subspace_eq_self]
+  simp [Submodule.orthogonalProjectionOnto_mem_subspace_eq_self]
 
 /--
 The `HermitianMat.projector` for the `HermitianMat.support` submodule.
@@ -129,14 +130,14 @@ theorem projector_eq_sum_rankOne (b : OrthonormalBasis ι 𝕜 S) :
   field_simp;
   simp [Matrix.vecMulVec]
   -- By definition of orthogonal projection, we can write the projection of $e_j$ onto $S$ as $\sum_{k} \langle e_j, b_k \rangle b_k$.
-  have h_proj : ∀ j : n, S.orthogonalProjection (EuclideanSpace.single j 1) = ∑ k, (star (b k |>.1 j)) • (b k |>.1) := by
+  have h_proj : ∀ j : n, S.orthogonalProjectionOnto (EuclideanSpace.single j 1) = ∑ k, (star (b k |>.1 j)) • (b k |>.1) := by
     intro j
-    have h_proj : S.orthogonalProjection (EuclideanSpace.single j 1) = ∑ k, (inner 𝕜 (b k |>.1) (EuclideanSpace.single j 1)) • (b k |>.1) := by
-      convert b.sum_repr ( S.orthogonalProjection ( EuclideanSpace.single j 1 ) ) using 1;
+    have h_proj : S.orthogonalProjectionOnto (EuclideanSpace.single j 1) = ∑ k, (inner 𝕜 (b k |>.1) (EuclideanSpace.single j 1)) • (b k |>.1) := by
+      convert b.sum_repr ( S.orthogonalProjectionOnto ( EuclideanSpace.single j 1 ) ) using 1;
       constructor <;> intro h <;> simp_all [ Subtype.ext_iff, b.repr_apply_apply ];
-    convert h_proj using 3
+    convert! h_proj using 3
     simp [ inner];
-  convert congr_arg ( fun x : EuclideanSpace ( _ ) n => x i ) ( h_proj j ) using 1
+  convert! congr_arg ( fun x : EuclideanSpace ( _ ) n => x i ) ( h_proj j ) using 1
   simp [ Matrix.sum_apply, mul_comm ]
 
 set_option backward.isDefEq.respectTransparency false in
@@ -187,7 +188,7 @@ lemma projector_support_eq_sum : A.supportProj.mat =
       exact hx fun i hi => ⟨ _, hp i hi, rfl ⟩;
   obtain ⟨ b, hb ⟩ := h_orthonormal_basis
   have h_sum_rankOne : (projector A.support).mat = ∑ i, Matrix.vecMulVec (b i) (star (b i)) := by
-    convert projector_eq_sum_rankOne _ b using 1
+    convert! projector_eq_sum_rankOne _ b using 1
     simp [h_support] at *
   simp_all [ Finset.sum_ite ];
   convert h_sum_rankOne using 1;

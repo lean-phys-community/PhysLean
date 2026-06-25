@@ -132,8 +132,8 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
         calc _
           _ = ⟪x • zero.1 + (t : ℝ) • u.1, x • zero.1 + (t : ℝ) • u.1⟫ₘ := by rfl
           _ = x ^ 2 + (t : ℝ) ^ 2 + 2 * x * (t : ℝ) * u.1 (Sum.inl 0) := by
-            simp only [zero, Fin.isValue, map_add, map_smul, ContinuousLinearMap.add_apply,
-              ContinuousLinearMap.coe_smul', Pi.smul_apply, minkowskiProduct_basis_right,
+            simp only [zero, Fin.isValue, map_add, map_smul, _root_.add_apply,
+              FunLike.coe_smul, Pi.smul_apply, minkowskiProduct_basis_right,
               minkowskiMatrix.inl_0_inl_0, basis_apply, ↓reduceIte, mul_one, smul_eq_mul, one_mul,
               minkowskiProduct_basis_left, minkowskiProduct_self_eq_one]
             ring

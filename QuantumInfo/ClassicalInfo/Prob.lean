@@ -457,7 +457,7 @@ theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENN
         replace h := Real.strictMonoOn_log hp (Real.exp_pos _) h
         rw [Real.log_exp] at h
         rw [← ENNReal.toReal_lt_toReal ofReal_ne_top coe_ne_top, toReal_ofReal hx]
-        simpa using lt_neg_of_lt_neg h
+        exact lt_neg_of_lt_neg h
       · apply le_of_eq
         conv_rhs =>
           enter [1, 1]
@@ -470,7 +470,9 @@ theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENN
 
 @[aesop (rule_sets := [finiteness]) safe apply]
 theorem negLog_ne_top {p : Prob} (hp : 0 < p.val) : —log p ≠ ∞ := by
-  simpa [negLog] using ne_of_gt hp
+  have h1 := ne_of_gt hp
+  simp_all only [unitInterval.coe_pos, ne_eq, Set.Icc.coe_eq_zero, negLog_eq_top_iff]
+  exact h1
 
 theorem negLog_eq_neg_ENNReal_log (p : Prob) : —log p = -ENNReal.log p := by
   rw [negLog]

@@ -82,7 +82,7 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
   erw [h1]
   simp only [List.length_cons, Nat.succ_eq_add_one, List.get_eq_getElem]
   apply insertionSortEquiv_order
-  simpa using h
+  exact h
   simp only [List.length_cons, finCongr_apply]
   apply lt_of_eq_of_lt (insertionSortMinPos_insertionSortEquiv r a l)
   apply insertionSortEquiv_gt_zero_of_ne_insertionSortMinPos r a l
@@ -348,8 +348,9 @@ lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Pro
       omega))
       ((insertionSortEquiv r (a :: l1 ++ a2 :: l2)) ⟨l1.length + 1, by simp⟩)
   | [], l2 => by
-    simp only [List.orderedInsert.eq_1, List.cons_append, List.nil_append, List.insertionSort,
-      List.length_cons, List.length_nil, zero_add, Fin.mk_one, finCongr_refl, Equiv.refl_apply]
+    simp only [List.insertionSort, List.length_nil, zero_add, Fin.mk_one, List.cons_append,
+      List.nil_append, List.foldr_cons, finCongr_refl, List.length_cons]
+    rfl
   | b :: l1, l2 => by
     by_cases h : r a b
     · have h1 : (List.orderedInsert r a (b :: l1) ++ a2 :: l2) = (a :: b :: l1 ++ a2 :: l2) := by
@@ -360,7 +361,7 @@ lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Pro
         (b :: List.orderedInsert r a (l1) ++ a2 :: l2) := by
         simp [h]
       rw [insertionSortEquiv_congr _ _ h1]
-      simp only [List.orderedInsert.eq_2, List.cons_append, List.length_cons,
+      simp only [List.cons_append, List.length_cons,
         Equiv.trans_apply, RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply, Fin.cast_mk,
         finCongr_apply]
       conv_lhs => simp [insertionSortEquiv]

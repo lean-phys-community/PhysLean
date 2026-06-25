@@ -55,27 +55,25 @@ def accCubeTriLinSymm {n : ℕ} : TriLinearSymm (PureU1Charges n).Charges := Tri
   (fun S => ∑ i, S.1 i * S.2.1 i * S.2.2 i)
   (by
     intro a S L T
-    simp only [PureU1Charges_numberCharges, HSMul.hSMul, ACCSystemCharges.chargesModule_smul]
+    simp only [HSMul.hSMul, ACCSystemCharges.chargesModule_smul]
     rw [Finset.mul_sum]
     apply Fintype.sum_congr
     intro i
     ring)
   (by
     intro S L T R
-    simp only [PureU1Charges_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add]
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add]
     rw [← Finset.sum_add_distrib]
     apply Fintype.sum_congr
     intro i
     ring)
   (by
     intro S L T
-    simp only [PureU1Charges_numberCharges]
     apply Fintype.sum_congr
     intro i
     ring)
   (by
     intro S L T
-    simp only [PureU1Charges_numberCharges]
     apply Fintype.sum_congr
     intro i
     ring)
@@ -92,7 +90,7 @@ lemma accCube_explicit (n : ℕ) (S : (PureU1Charges n).Charges) :
   rw [accCube, TriLinearSymm.toCubic]
   change accCubeTriLinSymm S S S = _
   rw [accCubeTriLinSymm]
-  simp only [PureU1Charges_numberCharges, TriLinearSymm.mk₃_toFun_apply_apply]
+  simp only [TriLinearSymm.mk₃_toFun_apply_apply]
   exact Finset.sum_congr rfl fun x _ => Eq.symm (pow_three' (S x))
 
 end PureU1
@@ -125,8 +123,8 @@ open BigOperators
 lemma pureU1_linear {n : ℕ} (S : (PureU1 n).LinSols) :
     ∑ (i : Fin n), S.val i = 0 := by
   have hS := S.linearSol
-  simp only [PureU1_numberLinear, PureU1_linearACCs] at hS
-  exact hS 0
+  simp only [PureU1_linearACCs] at hS
+  exact hS ⟨0, by simp⟩
 
 /-- A solution to the pure U(1) accs satisfies the cubic ACCs. -/
 lemma pureU1_cube {n : ℕ} (S : (PureU1 n).Sols) :
