@@ -51,23 +51,24 @@ lemma hamiltonEqOp_eq_zero_iff_hamiltons_equations (H : Time → X → X → ℝ
     hamiltonEqOp H p q = 0 ↔
     (∀ t, ∂ₜ q t = gradient (fun x => H t x (q t)) (p t)) ∧
     (∀ t, ∂ₜ p t = -gradient (fun x => H t (p t) x) (q t)) := by
-  simp [hamiltonEqOp_eq]
-  simp_all only [Time.deriv_eq]
-  rw [funext_iff]
-  simp_all only [Pi.zero_apply, Prod.mk_eq_zero]
-  apply Iff.intro
-  · intro h1
-    apply And.intro
-    · intro t
-      conv_rhs =>
-        rw [← add_zero (gradient (fun x => H t x (q t)) (p t)), ← (h1 t).1]
-      simp
-    · intro t
-      conv_lhs =>
-        rw [← add_zero (fderiv ℝ p t 1), ← (h1 t).2]
-      simp
-  · intro a x
-    simp_all only [add_neg_cancel, neg_neg, and_self]
+  simp [hamiltonEqOp_eq, funext_iff, Prod.mk_eq_zero, forall_and, add_eq_zero_iff_neg_eq]
+
+/-- A smooth (`C^∞`) function is differentiable at every point. -/
+private lemma differentiableAt_of_contDiff {W Z : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W]
+    [NormedAddCommGroup Z] [NormedSpace ℝ Z] {g : W → Z} {y : W} (hg : ContDiff ℝ ∞ g) :
+    DifferentiableAt ℝ g y :=
+  (hg.differentiable (by simp)).differentiableAt
+
+/-- `HasVarAdjDerivAt.fmap` specialized to a smooth uncurried family `f`, with the pointwise
+  adjoint given by `adjFDeriv`. The differentiability of each slice `f x` follows from
+  smoothness of `↿f`. -/
+private lemma hasVarAdjDerivAt_fmap_uncurry {U V : Type*}
+    [NormedAddCommGroup U] [NormedSpace ℝ U] [InnerProductSpace' ℝ U] [CompleteSpace U]
+    [NormedAddCommGroup V] [NormedSpace ℝ V] [InnerProductSpace' ℝ V] [CompleteSpace V]
+    (f : Time → U → V) (u : Time → U) (hu : ContDiff ℝ ∞ u) (hf : ContDiff ℝ ∞ ↿f) :
+    HasVarAdjDerivAt (fun φ x => f x (φ x)) (fun ψ x => adjFDeriv ℝ (f x) (u x) (ψ x)) u :=
+  HasVarAdjDerivAt.fmap f u hu hf fun x _ =>
+    (differentiableAt_of_contDiff (hf.comp (contDiff_prodMk_right x))).hasAdjFDerivAt
 
 theorem hamiltons_equations_varGradient
     (H : Time → X → X → ℝ) (pq : Time → X × X) (hp : ContDiff ℝ ∞ pq)
@@ -81,42 +82,16 @@ theorem hamiltons_equations_varGradient
       apply HasVarAdjDerivAt.comp
         (F := fun (φ : Time → X × X) t => i t (φ t))
         (G := fun (φ : Time → X × X) t => ((φ t).1, fderiv ℝ (Prod.snd ∘ φ) t 1))
-      · apply HasVarAdjDerivAt.fmap
-        · fun_prop
-        · fun_prop
-        intro t x
-        apply DifferentiableAt.hasAdjFDerivAt
-        fun_prop
+      · exact hasVarAdjDerivAt_fmap_uncurry _ _ (by fun_prop) (by fun_prop)
       · apply HasVarAdjDerivAt.prod
-        · apply HasVarAdjDerivAt.fst
-          apply HasVarAdjDerivAt.id
-          fun_prop
+        · exact HasVarAdjDerivAt.fst (HasVarAdjDerivAt.id _ (by fun_prop))
         · apply HasVarAdjDerivAt.fderiv' (F := fun (φ : Time → X × X) t => (φ t).2)
-          apply HasVarAdjDerivAt.fmap
-          · fun_prop
-          · fun_prop
-          intro t x
-          apply DifferentiableAt.hasAdjFDerivAt
-          fun_prop
+          exact hasVarAdjDerivAt_fmap_uncurry _ _ (by fun_prop) (by fun_prop)
     · apply HasVarAdjDerivAt.neg
-      let H' := fun t => ↿(H t)
-      change HasVarAdjDerivAt (fun φ x => H' x (φ x)) _ pq
-      apply HasVarAdjDerivAt.fmap
-      · fun_prop
-      · fun_prop
-      intro x u
-      apply DifferentiableAt.hasAdjFDerivAt
-      apply Differentiable.differentiableAt
-      apply ContDiff.differentiable
-      fun_prop
-      simp
+      exact hasVarAdjDerivAt_fmap_uncurry (fun t => ↿(H t)) _ (by fun_prop) (by fun_prop)
   · simp only [adjFDeriv_prod_snd, Prod.mk_add_mk, add_zero, zero_add]
     funext x
-    rw [adjFDeriv_uncurry]
-    swap
-    · apply ContDiff.differentiable
-      fun_prop
-      simp
+    rw [adjFDeriv_uncurry (differentiableAt_of_contDiff (by fun_prop))]
     simp only [Prod.neg_mk, Prod.mk_add_mk]
     rw [adjFDeriv_inner]
     simp only [one_smul]
@@ -126,11 +101,6 @@ theorem hamiltons_equations_varGradient
       simp
     rw [← gradient_eq_adjFDeriv, ← gradient_eq_adjFDeriv]
     rfl
-    · apply ContDiff.differentiable
-      fun_prop
-      simp
-    · apply ContDiff.differentiable
-      fun_prop
-      simp
+    all_goals exact differentiableAt_of_contDiff (by fun_prop)
 
 end ClassicalMechanics
