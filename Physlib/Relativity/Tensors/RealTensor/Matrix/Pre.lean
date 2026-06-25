@@ -93,153 +93,120 @@ lemma coContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
-lemma contrContrToMatrixRe_ρ {d : ℕ} (v : (Contr d ⊗ Contr d).V) (M : LorentzGroup d) :
-    contrContrToMatrixRe (TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M) v) =
-    M.1 * contrContrToMatrixRe v * Mᵀ := by
-  nth_rewrite 1 [contrContrToMatrixRe]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) ((LinearMap.toMatrix
-      ((contrBasis d).tensorProduct (contrBasis d))
-      ((contrBasis d).tensorProduct (contrBasis d))
-      (TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M)))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)))
-      (((contrBasis d).tensorProduct (contrBasis d)).repr v)))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr ((contrBasis d).tensorProduct (contrBasis d))
-      ((contrBasis d).tensorProduct (contrBasis d))
-      (TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M)) v)
+/-- Common core for the `*ToMatrixRe_ρ` lemmas: the `ToMatrixRe` equivalence intertwines
+`TensorProduct.map f g` with conjugation by the matrices of `f` and `g`, where the
+equivalence is the canonical triple composition built from the bases `b₁`, `b₂`. -/
+private lemma tensorBasis_toMatrixRe_map {d : ℕ}
+    {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℝ V₁] [AddCommGroup V₂] [Module ℝ V₂]
+    (b₁ : Basis (Fin 1 ⊕ Fin d) ℝ V₁) (b₂ : Basis (Fin 1 ⊕ Fin d) ℝ V₂)
+    (f : V₁ →ₗ[ℝ] V₁) (g : V₂ →ₗ[ℝ] V₂)
+    (eqv : (V₁ ⊗[ℝ] V₂) ≃ₗ[ℝ] Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
+    (heqv : eqv = (b₁.tensorProduct b₂).repr ≪≫ₗ
+      Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
+      LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d))
+    (v : V₁ ⊗[ℝ] V₂) :
+    eqv (TensorProduct.map f g v) =
+    (LinearMap.toMatrix b₁ b₁ f) * eqv v * (LinearMap.toMatrix b₂ b₂ g)ᵀ := by
+  have hpt : ∀ (w : V₁ ⊗[ℝ] V₂) (i j : Fin 1 ⊕ Fin d), eqv w i j =
+      (((b₁.tensorProduct b₂).repr ≪≫ₗ
+        Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
+        LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) w) i j := by
+    intro w i j
+    rw [heqv]
+    rfl
+  funext i j
+  have key : eqv (TensorProduct.map f g v) i j =
+      ((LinearMap.toMatrix (b₁.tensorProduct b₂) (b₁.tensorProduct b₂)
+        (TensorProduct.map f g))
+        *ᵥ ((Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)))
+        ((b₁.tensorProduct b₂).repr v))) (i, j) := by
+    rw [hpt (TensorProduct.map f g v) i j]
+    simp only [LinearEquiv.trans_apply]
+    have h1 := (LinearMap.toMatrix_mulVec_repr (b₁.tensorProduct b₂)
+      (b₁.tensorProduct b₂) (TensorProduct.map f g) v)
     erw [h1]
     rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
+  rw [key, TensorProduct.toMatrix_map]
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M))
-        ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M)) (i, j) k)
-        * contrContrToMatrixRe v k.1 k.2) = _
+        ((LinearMap.toMatrix b₁ b₁) f)
+        ((LinearMap.toMatrix b₂ b₂) g) (i, j) k)
+        * (((b₁.tensorProduct b₂).repr ≪≫ₗ
+          Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
+          LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) v) k.1 k.2) = _
+  simp_rw [← hpt v]
   rw [Fintype.sum_prod_type]
   simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
-  conv_rhs =>
-    enter [2, x]
+  have h1 : ∑ x, (∑ x1, (LinearMap.toMatrix b₁ b₁) f i x1 * eqv v x1 x)
+      * (LinearMap.toMatrix b₂ b₂) g j x
+      = ∑ x, ∑ x1, ((LinearMap.toMatrix b₁ b₁) f i x1 * eqv v x1 x)
+      * (LinearMap.toMatrix b₂ b₂) g j x := by
+    congr
+    funext x
     rw [Finset.sum_mul]
+  erw [h1]
   rw [Finset.sum_comm]
   congr
   funext x
   congr
   funext x1
-  simp only [contrBasis_ρ_apply]
   ring
+
+set_option backward.isDefEq.respectTransparency false in
+lemma contrContrToMatrixRe_ρ {d : ℕ} (v : (Contr d ⊗ Contr d).V) (M : LorentzGroup d) :
+    contrContrToMatrixRe (TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M) v) =
+    M.1 * contrContrToMatrixRe v * Mᵀ := by
+  rw [show contrContrToMatrixRe ((TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M)) v)
+    = _ from tensorBasis_toMatrixRe_map (contrBasis d) (contrBasis d) _ _
+    contrContrToMatrixRe rfl v]
+  have h : (LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M) = M.1 := by
+    ext i j
+    simp
+  rw [h]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma coCoToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Co d)).V) (M : LorentzGroup d) :
     coCoToMatrixRe (TensorProduct.map ((Co d).ρ M) ((Co d).ρ M) v) =
     M.1⁻¹ᵀ * coCoToMatrixRe v * M⁻¹ := by
-  nth_rewrite 1 [coCoToMatrixRe]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) ((LinearMap.toMatrix
-      ((coBasis d).tensorProduct (coBasis d))
-      ((coBasis d).tensorProduct (coBasis d))
-      (TensorProduct.map ((Co d).ρ M) ((Co d).ρ M))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)))
-      (((coBasis d).tensorProduct (coBasis d)).repr v))))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr ((coBasis d).tensorProduct (coBasis d))
-      ((coBasis d).tensorProduct (coBasis d))
-      (TensorProduct.map ((Co d).ρ M) ((Co d).ρ M)) v)
-    erw [h1]
-    rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
-  change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M))
-        ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M)) (i, j) k)
-        * coCoToMatrixRe v k.1 k.2) = _
-  rw [Fintype.sum_prod_type]
-  simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
-  conv_rhs =>
-    enter [2, x]
-    rw [Finset.sum_mul]
-  rw [Finset.sum_comm]
-  congr
-  funext x
-  congr
-  funext x1
-  simp only [coBasis_ρ_apply, ← LorentzGroup.coe_inv, transpose_apply]
-  ring
+  rw [show coCoToMatrixRe ((TensorProduct.map ((Co d).ρ M) ((Co d).ρ M)) v)
+    = _ from tensorBasis_toMatrixRe_map (coBasis d) (coBasis d) _ _
+    coCoToMatrixRe rfl v]
+  have h : (LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M) = M.1⁻¹ᵀ := by
+    ext i j
+    simp [← LorentzGroup.coe_inv]
+  rw [h, transpose_transpose, ← LorentzGroup.coe_inv]
+  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma contrCoToMatrixRe_ρ {d : ℕ} (v : ((Contr d) ⊗ (Co d)).V) (M : LorentzGroup d) :
     contrCoToMatrixRe (TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M) v) =
     M.1 * contrCoToMatrixRe v * M.1⁻¹ := by
-  nth_rewrite 1 [contrCoToMatrixRe]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) ((LinearMap.toMatrix
-      ((contrBasis d).tensorProduct (coBasis d))
-      ((contrBasis d).tensorProduct (coBasis d))
-      (TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)))
-      (((contrBasis d).tensorProduct (coBasis d)).repr v))))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr ((contrBasis d).tensorProduct (coBasis d))
-      ((contrBasis d).tensorProduct (coBasis d))
-      (TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M)) v)
-    erw [h1]
-    rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
-  change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M))
-        ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M)) (i, j) k)
-        * contrCoToMatrixRe v k.1 k.2) = _
-  rw [Fintype.sum_prod_type]
-  simp_rw [kroneckerMap_apply, Matrix.mul_apply]
-  conv_rhs =>
-    enter [2, x]
-    rw [Finset.sum_mul]
-  rw [Finset.sum_comm]
-  congr
-  funext x
-  congr
-  funext x1
-  simp only [contrBasis_ρ_apply, coBasis_ρ_apply, transpose_apply]
-  ring
+  rw [show contrCoToMatrixRe ((TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M)) v)
+    = _ from tensorBasis_toMatrixRe_map (contrBasis d) (coBasis d) _ _
+    contrCoToMatrixRe rfl v]
+  have h1 : (LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M) = M.1 := by
+    ext i j
+    simp
+  have h2 : (LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M) = M.1⁻¹ᵀ := by
+    ext i j
+    simp [← LorentzGroup.coe_inv]
+  rw [h1, h2, transpose_transpose]
+  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma coContrToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Contr d)).V) (M : LorentzGroup d) :
     coContrToMatrixRe (TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M) v) =
     M.1⁻¹ᵀ * coContrToMatrixRe v * M.1ᵀ := by
-  nth_rewrite 1 [coContrToMatrixRe]
-  simp only [LinearEquiv.trans_apply]
-  trans (LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) ((LinearMap.toMatrix
-      ((coBasis d).tensorProduct (contrBasis d))
-      ((coBasis d).tensorProduct (contrBasis d))
-      (TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M))
-      *ᵥ ((Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)))
-      (((coBasis d).tensorProduct (contrBasis d)).repr v))))
-  · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr ((coBasis d).tensorProduct (contrBasis d))
-      ((coBasis d).tensorProduct (contrBasis d))
-      (TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M)) v)
-    erw [h1]
-    rfl
-  rw [TensorProduct.toMatrix_map]
-  funext i j
-  change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
-        ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M))
-        ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M)) (i, j) k)
-        * coContrToMatrixRe v k.1 k.2) = _
-  rw [Fintype.sum_prod_type]
-  simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
-  conv_rhs =>
-    enter [2, x]
-    rw [Finset.sum_mul]
-  rw [Finset.sum_comm]
-  congr
-  funext x
-  congr
-  funext x1
-  simp only [coBasis_ρ_apply, contrBasis_ρ_apply, transpose_apply]
-  ring
+  rw [show coContrToMatrixRe ((TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M)) v)
+    = _ from tensorBasis_toMatrixRe_map (coBasis d) (contrBasis d) _ _
+    coContrToMatrixRe rfl v]
+  have h1 : (LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M) = M.1⁻¹ᵀ := by
+    ext i j
+    simp [← LorentzGroup.coe_inv]
+  have h2 : (LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M) = M.1 := by
+    ext i j
+    simp
+  rw [h1, h2]
+  rfl
 
 /-!
 
