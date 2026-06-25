@@ -145,9 +145,7 @@ lemma trajectory_eq_of_criticallyDamped (IC : InitialConditions) (hS : S.IsCriti
       fun t : Time => exp (-S.decayRate * t) • S.criticallyDampedBase IC t := by
   classical
   have hnotUnder : ¬ S.IsUnderdamped := by
-    intro hUnder
-    rw [IsUnderdamped] at hUnder
-    rw [IsCriticallyDamped] at hS
+    rw [IsUnderdamped, IsCriticallyDamped] at *
     linarith
   simp [trajectory, hnotUnder, hS]
 
@@ -156,15 +154,12 @@ lemma trajectory_eq_of_overdamped (IC : InitialConditions) (hS : S.IsOverdamped)
     S.trajectory IC =
       fun t : Time => exp (-S.decayRate * t) • S.overdampedBase IC t := by
   classical
+  rw [IsOverdamped] at hS
   have hnotUnder : ¬ S.IsUnderdamped := by
-    intro hUnder
-    rw [IsUnderdamped] at hUnder
-    rw [IsOverdamped] at hS
+    rw [IsUnderdamped]
     linarith
   have hnotCritical : ¬ S.IsCriticallyDamped := by
-    intro hCritical
-    rw [IsCriticallyDamped] at hCritical
-    rw [IsOverdamped] at hS
+    rw [IsCriticallyDamped]
     linarith
   simp [trajectory, hnotUnder, hnotCritical]
 
@@ -230,6 +225,29 @@ private lemma exp_decay_smul_equationOfMotion
   simp [smul_add, smul_sub, smul_smul]
   module
 
+/-- The time derivative of a scalar function precomposed with `Time.val` is the ordinary
+derivative evaluated at `t.val`. -/
+private lemma deriv_real_comp_val (g : ℝ → ℝ) (t : Time)
+    (hg : DifferentiableAt ℝ g t.val) :
+    ∂ₜ (fun t : Time => g t.val) t = _root_.deriv g t.val := by
+  rw [Time.deriv_eq, fderiv_fun_comp t hg (by fun_prop),
+    ContinuousLinearMap.comp_apply, Time.fderiv_val]
+  simp
+
+/-- The base trajectories all have the shape `a t.val • x + b t.val • w` for scalar
+coefficient functions `a, b`. Its time derivative is obtained by differentiating each
+coefficient. -/
+private lemma deriv_smul_add_smul (a b : ℝ → ℝ) (t : Time)
+    (x w : EuclideanSpace ℝ (Fin 1))
+    (ha : DifferentiableAt ℝ a t.val) (hb : DifferentiableAt ℝ b t.val) :
+    ∂ₜ (fun t : Time => a t.val • x + b t.val • w) t =
+      _root_.deriv a t.val • x + _root_.deriv b t.val • w := by
+  rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
+    fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
+  simp only [add_apply, ContinuousLinearMap.smulRight_apply]
+  rw [← Time.deriv_eq, ← Time.deriv_eq, deriv_real_comp_val a t ha,
+    deriv_real_comp_val b t hb]
+
 /-!
 
 ### B.4. Derivatives of the base trajectories
@@ -245,10 +263,8 @@ private lemma criticallyDampedBase_velocity (IC : InitialConditions) :
   funext t
   change ∂ₜ (fun t : Time =>
     IC.x₀ + t.val • (IC.v₀ + S.decayRate • IC.x₀)) t = _
-  rw [Time.deriv]
-  rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
-  rw [fderiv_fun_const]
-  rw [fderiv_smul_const (by fun_prop)]
+  rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
+    fderiv_fun_const, fderiv_smul_const (by fun_prop)]
   simp
 
 private lemma criticallyDampedBase_acceleration (IC : InitialConditions) :
@@ -267,39 +283,12 @@ private lemma underdampedBase_velocity (IC : InitialConditions) (hS : S.IsUnderd
       (-S.angularFrequency * sin (S.angularFrequency * t.val)) • IC.x₀ +
         cos (S.angularFrequency * t.val) •
           (IC.v₀ + S.decayRate • IC.x₀) := by
-  funext t
-  rw [Time.deriv]
-  rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
   have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_underdamped hS
-  have hcos :
-      (fderiv ℝ (fun y : Time => cos (S.angularFrequency * y.val)) t) 1 =
-        -S.angularFrequency *
-          sin (S.angularFrequency * t.val) := by
-    rw [fderiv_cos (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [mul_comm]
-  have hsin :
-      (fderiv ℝ (fun y : Time =>
-          sin (S.angularFrequency * y.val) /
-            S.angularFrequency) t) 1 =
-        cos (S.angularFrequency * t.val) := by
-    have hscale :
-        fderiv ℝ (fun y : Time =>
-            sin (S.angularFrequency * y.val) /
-              S.angularFrequency) t =
-          (1 / S.angularFrequency) •
-            fderiv ℝ (fun y : Time =>
-              sin (S.angularFrequency * y.val)) t := by
-      rw [← fderiv_mul_const]
-      congr
-      funext y
-      field_simp [hΩ]
-      ring_nf
-      fun_prop
-    rw [hscale, fderiv_sin (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [hΩ, mul_comm]
-  simp [hcos, hsin]
+  funext t
+  rw [deriv_smul_add_smul (fun s => cos (S.angularFrequency * s))
+    (fun s => sin (S.angularFrequency * s) / S.angularFrequency) t _ _
+    (by fun_prop) (by fun_prop)]
+  simp [mul_comm, hΩ]
 
 private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUnderdamped) :
     ∂ₜ (∂ₜ (fun t : Time =>
@@ -310,26 +299,12 @@ private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUn
       (cos (S.angularFrequency * t.val) • IC.x₀ +
         (sin (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀)) := by
-  funext t
-  rw [S.underdampedBase_velocity IC hS]
-  rw [Time.deriv]
-  rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
   have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_underdamped hS
-  have hsin :
-      (fderiv ℝ (fun y : Time =>
-        S.angularFrequency * sin (S.angularFrequency * y.val)) t) 1 =
-      S.angularFrequency^2 * cos (S.angularFrequency * t.val) := by
-    rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    rw [fderiv_sin (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [pow_two, mul_comm, mul_assoc]
-  have hcos :
-      (fderiv ℝ (fun y : Time => cos (S.angularFrequency * y.val)) t) 1 =
-      -S.angularFrequency * sin (S.angularFrequency * t.val) := by
-    rw [fderiv_cos (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [mul_comm]
-  simp [hsin, hcos, smul_add, smul_smul]
+  rw [S.underdampedBase_velocity IC hS]
+  funext t
+  rw [deriv_smul_add_smul (fun s => -S.angularFrequency * sin (S.angularFrequency * s))
+    (fun s => cos (S.angularFrequency * s)) t _ _ (by fun_prop) (by fun_prop)]
+  simp [mul_comm, smul_smul, smul_add]
   field_simp [hΩ]
 
 private lemma overdampedBase_velocity (IC : InitialConditions) (hS : S.IsOverdamped) :
@@ -341,35 +316,12 @@ private lemma overdampedBase_velocity (IC : InitialConditions) (hS : S.IsOverdam
       (S.angularFrequency * sinh (S.angularFrequency * t.val)) • IC.x₀ +
         cosh (S.angularFrequency * t.val) •
           (IC.v₀ + S.decayRate • IC.x₀) := by
+  have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
   funext t
-  rw [Time.deriv]
-  rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
-  have hLambda : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
-  have hcosh :
-      (fderiv ℝ (fun y : Time => cosh (S.angularFrequency * y.val)) t) 1 =
-        S.angularFrequency * sinh (S.angularFrequency * t.val) := by
-    rw [fderiv_cosh (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [mul_comm]
-  have hsinh :
-      (fderiv ℝ (fun y : Time =>
-          sinh (S.angularFrequency * y.val) / S.angularFrequency) t) 1 =
-        cosh (S.angularFrequency * t.val) := by
-    have hscale :
-        fderiv ℝ (fun y : Time =>
-            sinh (S.angularFrequency * y.val) / S.angularFrequency) t =
-          (1 / S.angularFrequency) •
-            fderiv ℝ (fun y : Time => sinh (S.angularFrequency * y.val)) t := by
-      rw [← fderiv_mul_const]
-      congr
-      funext y
-      field_simp [hLambda]
-      ring_nf
-      fun_prop
-    rw [hscale, fderiv_sinh (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [hLambda, mul_comm]
-  simp [hcosh, hsinh]
+  rw [deriv_smul_add_smul (fun s => cosh (S.angularFrequency * s))
+    (fun s => sinh (S.angularFrequency * s) / S.angularFrequency) t _ _
+    (by fun_prop) (by fun_prop)]
+  simp [mul_comm, hΩ]
 
 private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOverdamped) :
     ∂ₜ (∂ₜ (fun t : Time =>
@@ -380,27 +332,13 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
       (cosh (S.angularFrequency * t.val) • IC.x₀ +
         (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
           (IC.v₀ + S.decayRate • IC.x₀)) := by
-  funext t
+  have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
   rw [S.overdampedBase_velocity IC hS]
-  rw [Time.deriv]
-  rw [fderiv_fun_add (by fun_prop) (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
-  rw [fderiv_smul_const (by fun_prop)]
-  have hLambda : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
-  have hsinh :
-      (fderiv ℝ (fun y : Time =>
-        S.angularFrequency * sinh (S.angularFrequency * y.val)) t) 1 =
-      S.angularFrequency^2 * cosh (S.angularFrequency * t.val) := by
-    rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    rw [fderiv_sinh (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [pow_two, mul_comm, mul_assoc]
-  have hcosh :
-      (fderiv ℝ (fun y : Time => cosh (S.angularFrequency * y.val)) t) 1 =
-      S.angularFrequency * sinh (S.angularFrequency * t.val) := by
-    rw [fderiv_cosh (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-    simp [mul_comm]
-  simp [hsinh, hcosh, smul_add, smul_smul]
-  field_simp [hLambda]
+  funext t
+  rw [deriv_smul_add_smul (fun s => S.angularFrequency * sinh (S.angularFrequency * s))
+    (fun s => cosh (S.angularFrequency * s)) t _ _ (by fun_prop) (by fun_prop)]
+  simp [mul_comm, smul_smul, smul_add]
+  field_simp [hΩ]
 
 /-!
 ## C. Trajectories and equation of motion
@@ -420,19 +358,14 @@ lemma trajectory_equationOfMotion_of_criticallyDamped (IC : InitialConditions)
   have hγ : S.γ = 2 * S.m * S.decayRate := S.gamma_eq_two_mul_m_mul_decayRate
   have hk : S.k = S.m * (S.decayRate^2 - 0) := by
     simpa [sub_zero] using S.k_eq_m_mul_decayRate_sq_of_criticallyDamped hS
-  have hbase :
-      ∂ₜ (∂ₜ (S.criticallyDampedBase IC)) =
-        fun t => (0 : ℝ) • S.criticallyDampedBase IC t := by
-    simpa using S.criticallyDampedBase_acceleration IC
-  exact S.exp_decay_smul_equationOfMotion S.decayRate 0 (S.criticallyDampedBase IC)
+  refine S.exp_decay_smul_equationOfMotion S.decayRate 0 (S.criticallyDampedBase IC)
     (by
-      change Differentiable ℝ (fun t : Time =>
-        IC.x₀ + t.val • (IC.v₀ + S.decayRate • IC.x₀))
+      unfold criticallyDampedBase
       fun_prop)
     (by
       rw [S.criticallyDampedBase_velocity IC]
-      fun_prop)
-    hbase hγ hk
+      fun_prop) ?_ hγ hk
+  simpa using S.criticallyDampedBase_acceleration IC
 
 /-- In the underdamped regime, the selected trajectory satisfies the damped equation of
 motion. -/
@@ -444,34 +377,14 @@ lemma trajectory_equationOfMotion_of_underdamped (IC : InitialConditions)
   have hk : S.k = S.m * (S.decayRate^2 - (-S.angularFrequency^2)) := by
     rw [S.k_eq_m_mul_ω_sq, S.angularFrequency_sq_of_underdamped hS]
     ring
-  have hbase :
-      ∂ₜ (∂ₜ (S.underdampedBase IC)) =
-        fun t => (-S.angularFrequency^2) • S.underdampedBase IC t := by
-    change ∂ₜ (∂ₜ (fun t : Time =>
-        cos (S.angularFrequency * t.val) • IC.x₀ +
-          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀))) =
-      fun t => -S.angularFrequency^2 •
-        (cos (S.angularFrequency * t.val) • IC.x₀ +
-          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀))
-    exact S.underdampedBase_acceleration IC hS
-  exact S.exp_decay_smul_equationOfMotion S.decayRate
+  refine S.exp_decay_smul_equationOfMotion S.decayRate
     (-S.angularFrequency^2) (S.underdampedBase IC)
     (by
-      change Differentiable ℝ (fun t : Time =>
-        cos (S.angularFrequency * t.val) • IC.x₀ +
-          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀))
-      fun_prop)
-    (by
-      change Differentiable ℝ (∂ₜ (fun t : Time =>
-        cos (S.angularFrequency * t.val) • IC.x₀ +
-          (sin (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀)))
-      rw [S.underdampedBase_velocity IC hS]
-      fun_prop)
-    hbase hγ hk
+      unfold underdampedBase
+      fun_prop) ?_
+    (S.underdampedBase_acceleration IC hS) hγ hk
+  rw [show ∂ₜ (S.underdampedBase IC) = _ from S.underdampedBase_velocity IC hS]
+  fun_prop
 
 /-- In the overdamped regime, the selected trajectory satisfies the damped equation of
 motion. -/
@@ -483,34 +396,14 @@ lemma trajectory_equationOfMotion_of_overdamped (IC : InitialConditions)
   have hk : S.k = S.m * (S.decayRate^2 - S.angularFrequency^2) := by
     rw [S.k_eq_m_mul_ω_sq, S.angularFrequency_sq_of_overdamped hS]
     ring
-  have hbase :
-      ∂ₜ (∂ₜ (S.overdampedBase IC)) =
-        fun t => S.angularFrequency^2 • S.overdampedBase IC t := by
-    change ∂ₜ (∂ₜ (fun t : Time =>
-        cosh (S.angularFrequency * t.val) • IC.x₀ +
-          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀))) =
-      fun t => S.angularFrequency^2 •
-        (cosh (S.angularFrequency * t.val) • IC.x₀ +
-          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀))
-    exact S.overdampedBase_acceleration IC hS
-  exact S.exp_decay_smul_equationOfMotion S.decayRate (S.angularFrequency^2)
+  refine S.exp_decay_smul_equationOfMotion S.decayRate (S.angularFrequency^2)
     (S.overdampedBase IC)
     (by
-      change Differentiable ℝ (fun t : Time =>
-        cosh (S.angularFrequency * t.val) • IC.x₀ +
-          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀))
-      fun_prop)
-    (by
-      change Differentiable ℝ (∂ₜ (fun t : Time =>
-        cosh (S.angularFrequency * t.val) • IC.x₀ +
-          (sinh (S.angularFrequency * t.val) / S.angularFrequency) •
-            (IC.v₀ + S.decayRate • IC.x₀)))
-      rw [S.overdampedBase_velocity IC hS]
-      fun_prop)
-    hbase hγ hk
+      unfold overdampedBase
+      fun_prop) ?_
+    (S.overdampedBase_acceleration IC hS) hγ hk
+  rw [show ∂ₜ (S.overdampedBase IC) = _ from S.overdampedBase_velocity IC hS]
+  fun_prop
 
 /-- The selected trajectory satisfies the damped equation of motion. -/
 lemma trajectory_equationOfMotion (IC : InitialConditions) :
@@ -520,11 +413,8 @@ lemma trajectory_equationOfMotion (IC : InitialConditions) :
   · by_cases hCritical : S.IsCriticallyDamped
     · exact S.trajectory_equationOfMotion_of_criticallyDamped IC hCritical
     · have hOver : S.IsOverdamped := by
-        rw [IsOverdamped, IsUnderdamped, IsCriticallyDamped] at *
-        by_contra hNotOver
-        have hNonneg : 0 ≤ S.discriminant := le_of_not_gt hUnder
-        have hNonpos : S.discriminant ≤ 0 := le_of_not_gt hNotOver
-        exact hCritical (le_antisymm hNonpos hNonneg)
+        rw [IsOverdamped, IsUnderdamped] at *
+        exact lt_of_le_of_ne (not_lt.mp hUnder) (Ne.symm hCritical)
       exact S.trajectory_equationOfMotion_of_overdamped IC hOver
 
 /-!
