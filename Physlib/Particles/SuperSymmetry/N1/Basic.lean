@@ -242,11 +242,6 @@ the species demands of them, proved here once over abstract `(M, b)`, `(N, b')`.
 
 variable {N : Type*} [AddCommGroup N] [Module ℂ N]
 
-omit [DecidableEq ι] in
-/-- `piBasis.equivFun` is the identity readout of coordinates: `(piBasis.equivFun v) I = v I`. -/
-lemma piBasis_equivFun (v : ι → ℂ) (I : ι) : (piBasis (ι := ι)).equivFun v I = v I := by
-  simp [piBasis]
-
 /-- The δ pairing between two based modules sharing the index `ι`: the dot product of coordinate
 vectors `(x, y) ↦ ∑_I (b x)_I (b' y)_I`, built by reading both sides into `ι → ℂ` and applying the
 reference dot product `deltaBil piBasis`. Equals `deltaBil b` when `b = b'`. -/
@@ -258,7 +253,7 @@ lemma deltaBil₂_apply (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (x : M) (y : 
     deltaBil₂ b b' x y = ∑ I, b.equivFun x I * b'.equivFun y I := by
   rw [deltaBil₂, LinearMap.compl₂_apply, LinearMap.comp_apply, LinearEquiv.coe_coe,
     LinearEquiv.coe_coe, deltaBil_apply]
-  exact Finset.sum_congr rfl fun I _ => by rw [piBasis_equivFun, piBasis_equivFun]
+  simp only [piBasis, Pi.basisFun_equivFun, LinearEquiv.refl_apply]
 
 /-- The two-module δ contraction `M ⊗ N → ℂ`. -/
 def deltaContr₂ (b : Basis ι ℂ M) (b' : Basis ι ℂ N) : M ⊗[ℂ] N →ₗ[ℂ] ℂ :=
