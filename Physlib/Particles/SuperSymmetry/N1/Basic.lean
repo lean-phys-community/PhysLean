@@ -46,12 +46,12 @@ species' holomorphy flip (`slotConj`, hence `conjT`) is built from it. Every
 colour carries the trivial representation over the trivial group `Unit`, so the chiral scalars hold
 no charge. Contracting a colour against its `τ`-dual is the dot product of the two coordinate
 vectors, the Kronecker `δ_{IJ}` on basis labels: `contr` is that pairing `V c ⊗ V (τ c) → ℂ`, `unit`
-its cap in `V (τ c) ⊗ V c`, and `metric` the cap `∑_I b_I ⊗ b_I` in `V c ⊗ V c`. This instance equips
-the chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, …).
+its cap in `V (τ c) ⊗ V c`, and `metric` the cap `∑_I b_I ⊗ b_I` in `V c ⊗ V c`. This instance
+equips the chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, …).
 
 Conjugation is intrinsic species data: a `ConjTensorSpecies` is a `TensorSpecies`
-extended with the conjugate-colour involution `ChiralColor.bar` and its coherence. The framework then supplies the
-map `conjT` (conjugate the components and flip each index's holomorphy by `bar`)
+extended with the conjugate-colour involution `ChiralColor.bar` and its coherence. The framework
+then supplies the map `conjT` (conjugate the components and flip each index's holomorphy by `bar`)
 and its laws. `bar` is the holomorphy dual, distinct from and commuting with the
 variance dual `τ`; it is not used in contraction.
 
@@ -324,14 +324,15 @@ across those two carriers; `metric c` is the single-colour δ cap `∑_I b_I ⊗
 `TensorSpecies` coherence law reduces, by case analysis on the colour, to the corresponding abstract
 two-module δ lemma of §D. The conjugation flips holomorphy (`ChiralColor.bar`) while preserving
 variance; every basis is indexed by `ι`, so `barIdx_eq` is `rfl`, and `conj_contrComm` is
-`star δ = δ`. Instantiating `ConjTensorSpecies` this way gives the chiral sector both the framework's
-generic tensor API and its conjugation API (`conjT` and its laws) on one object. -/
+`star δ = δ`. Instantiating `ConjTensorSpecies` this way gives the chiral sector both
+the framework's generic tensor API and its conjugation API (`conjT` and its laws) on one object. -/
 def chiralTensor : ConjTensorSpecies ℂ ChiralColor Unit (chiralModule (ι := ι)) (fun _ => ι)
     (chiralRep (ι := ι)) (chiralBasis (ι := ι)) where
   τ := ChiralColor.tau
   τ_involution c := by cases c <;> rfl
-  -- `contr` pairs a colour with its variance dual `τ c` (distinct carriers, e.g. `ι → ℂ` against its
-  -- dual); `unit` is the δ cap across those two carriers; `metric` the δ cap of a colour with itself.
+  -- `contr` pairs a colour with its variance dual `τ c` (distinct carriers, e.g. `ι → ℂ`
+  -- against its dual); `unit` is the δ cap across those two carriers; `metric` the δ cap of a
+  -- colour with itself.
   contr c := { deltaContr₂ (chiralBasis c) (chiralBasis (ChiralColor.tau c)) with
       isIntertwining' g := by ext v; simp [Representation.tprod_apply, chiralRep] }
   unit c := { LinearMap.toSpanSingleton ℂ _
@@ -339,7 +340,8 @@ def chiralTensor : ConjTensorSpecies ℂ ChiralColor Unit (chiralModule (ι := �
       isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap₂] }
   metric c := { LinearMap.toSpanSingleton ℂ _ (deltaCap (chiralBasis c)) with
       isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
-  -- Each coherence law reduces, by case analysis on `c`, to the matching abstract two-module δ lemma.
+  -- Each coherence law reduces, by case analysis on `c`, to the matching abstract two-module
+  -- δ lemma.
   contr_tmul_symm c x y := by cases c <;> exact deltaContr₂_comm _ _ _ _
   unit_symm c := by cases c <;> exact deltaUnit₂_symm _ _
   contr_unit c x := by cases c <;> exact deltaContr₂_unit _ _ x
@@ -353,7 +355,8 @@ def chiralTensor : ConjTensorSpecies ℂ ChiralColor Unit (chiralModule (ι := �
     intro d x₁ x₂
     -- The contraction at every colour is the real δ pairing of two `ι`-bases, so `star` fixes it.
     -- The `key` lemma evaluates both sides by `deltaContr₂_basis_basis` (a syntactic rewrite to
-    -- `if x₁ = x₂ then 1 else 0`), so the heavy `Basis.conj`/`dualBasis` carriers are never `whnf`'d.
+    -- `if x₁ = x₂ then 1 else 0`), so the heavy `Basis.conj`/`dualBasis` carriers are never
+    -- `whnf`'d.
     have key : ∀ {M₁ M₁' M₂ M₂' : Type} [AddCommGroup M₁] [Module ℂ M₁] [AddCommGroup M₁']
         [Module ℂ M₁'] [AddCommGroup M₂] [Module ℂ M₂] [AddCommGroup M₂'] [Module ℂ M₂']
         (B₁ : Basis ι ℂ M₁) (B₁' : Basis ι ℂ M₁') (B₂ : Basis ι ℂ M₂) (B₂' : Basis ι ℂ M₂'),

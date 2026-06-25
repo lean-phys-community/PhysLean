@@ -26,8 +26,8 @@ while fixing a real vector colour. Variance is untouched, so `bar` commutes with
 chiral sector `bar` swaps chiral and anti-chiral indices.
 
 `conjT` conjugates a tensor at the basis level: `star` each coordinate in the species basis and
-place it at the conjugate colour. Reality and Hermiticity are stated through it, a tensor is real
-when conjugation fixes it and a metric is Hermitian when conjugating it swaps its two indices.
+place it at the conjugate colour. Reality and Hermiticity are stated through it: a tensor is real
+when conjugation fixes it, and a metric is Hermitian when conjugating it swaps its two indices.
 
 Conjugation is intrinsic species data, not a detachable add-on: a `ConjTensorSpecies` is a
 `TensorSpecies` bundled (`extends`) with the conjugate-colour involution `bar` and the coherence
@@ -51,6 +51,8 @@ genuinely bilinear and `IsHermitian` an honest conjugate-transpose.
 - `ConjTensorSpecies.conjT_contrT` proves that conjugation commutes with contraction.
 - `ConjTensorSpecies.conjT_eq_permT_iff` is the componentwise criterion for `conjT t = permT σ h t'`,
   the workhorse for proving reality and Hermiticity conditions.
+- `ConjTensorSpecies.slotConj` is the single-slot conjugate-linear isomorphism `V c ≃ₛₗ V (bar c)`.
+- `ConjTensorSpecies.IsHermitian` is the structural conjugate-transpose condition on a metric slot.
 
 ## iii. Table of contents
 
@@ -58,6 +60,8 @@ genuinely bilinear and `IsHermitian` an honest conjugate-transpose.
 - B. Conjugation of tensors
 - C. The involution law
 - D. Commutation with contraction
+- E. The slot conjugation
+- F. Hermitian pairings
 
 -/
 
@@ -317,7 +321,7 @@ involutivity together with `bar`'s.
 
 /-- The conjugate-linear slot isomorphism `V c ≃ₛₗ[starRingEnd k] V (bar c)`: conjugate the
 coordinates in the species basis and relabel to the conjugate colour via `barIdx_eq`. -/
-noncomputable def slotConj {c : C} : V c ≃ₛₗ[starRingEnd k] V (S.bar c) :=
+def slotConj {c : C} : V c ≃ₛₗ[starRingEnd k] V (S.bar c) :=
   ((b c).repr.trans (ConjModule.starFinsupp (k := k))).trans
     ((Finsupp.domLCongr (Equiv.cast (S.barIdx_eq c).symm)).trans (b (S.bar c)).repr.symm)
 
@@ -334,8 +338,8 @@ basis coordinates of `b c i` are the indicator at `i` and `star` fixes `0` and `
 A metric slot pairs a colour `c` with its conjugate `bar c`. `IsHermitian` is the structural form of
 `g_{IJ̄} = conj g_{JĪ}`: conjugating and swapping the two slots through `slotConj` returns `g`'s
 `star`. Because `V c` and `V (bar c)` are genuinely different modules this is the honest
-conjugate-transpose, not a bare `g = g.flip`. The seam is locked here as `IsHermitian`; a downstream
-metric layer instantiates it for a concrete pairing.
+conjugate-transpose, not a bare `g = g.flip`. The condition is fixed here as `IsHermitian`; a
+downstream metric layer instantiates it for a concrete pairing.
 
 -/
 
