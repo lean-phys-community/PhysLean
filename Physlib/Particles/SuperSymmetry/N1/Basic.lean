@@ -6,7 +6,6 @@ Authors: Andrea Pari
 module
 
 public import Mathlib.Data.Complex.Basic
-public import Mathlib.LinearAlgebra.Matrix.BilinearForm
 public import Physlib.Relativity.Tensors.Conjugation.Basic
 
 /-!
