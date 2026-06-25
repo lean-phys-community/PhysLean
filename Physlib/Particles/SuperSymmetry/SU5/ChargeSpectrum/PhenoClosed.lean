@@ -137,8 +137,7 @@ lemma isPhenClosedQ10_of_isPhenoConstrainedQ10 {S10 : Finset 𝓩}
       IsPhenoConstrainedQ10 x q10 ∨ y ∈ charges ∨ YukawaGeneratesDangerousAtLevel y 1) :
     IsPhenoClosedQ10 S10 charges := by
   intro q10 hq10 x hx
-  have h' := h q10 hq10 x hx
-  rcases h' with h'| h' | h'
+  rcases h q10 hq10 x hx with h'| h' | h'
   · left
     rw [isPhenoConstrained_insertQ10_iff_isPhenoConstrainedQ10]
     left
@@ -283,6 +282,23 @@ lemma completeMinSubset_containsPhenoCompletionsOfMinimallyAllows (S5 S10 : Fins
 
 -/
 
+/-- If applying `f` to every element of `charges` either gives a phenomenologically constrained
+  charge, an element again in `charges`, or one which generates dangerous couplings, then the
+  multiset of images which are not in `charges` and are phenomenologically unconstrained
+  (and do not generate dangerous couplings) is empty. -/
+private lemma map_filter_isPhenoClosed_eq_empty {charges : Multiset (ChargeSpectrum 𝓩)}
+    (f : ChargeSpectrum 𝓩 → ChargeSpectrum 𝓩)
+    (hf : ∀ z ∈ charges, IsPhenoConstrained (f z) ∨ f z ∈ charges ∨
+      YukawaGeneratesDangerousAtLevel (f z) 1) :
+    Multiset.filter (fun y => y ∉ charges ∧ ¬ y.IsPhenoConstrained ∧
+      ¬ y.YukawaGeneratesDangerousAtLevel 1) (charges.map f) = ∅ := by
+  rw [Multiset.empty_eq_zero, Multiset.eq_zero_iff_forall_notMem]
+  simp only [Multiset.mem_filter, Multiset.mem_map, not_and, Decidable.not_not,
+    forall_exists_index, and_imp, forall_apply_eq_imp_iff₂]
+  intro z hz hzP h2
+  have h1 := hf z hz
+  simp_all
+
 /-!
 The multiset of charges `charges` contains precisely those charges (given a finite set
 of allowed charges) which
@@ -339,20 +355,10 @@ lemma completeness_of_isPhenoClosedQ5_isPhenoClosedQ10
       · intro x
         exact fun a => charges_complete x a
       · exact y_mem
-      · intro q10
-        rw [Multiset.empty_eq_zero, Multiset.eq_zero_iff_forall_notMem]
-        simp only [Multiset.mem_filter, Multiset.mem_map, not_and, Decidable.not_not,
-          forall_exists_index, and_imp, forall_apply_eq_imp_iff₂]
-        intro z hz hzP h2
-        have h1 := charges_isPhenoClosedQ10 q10 q10.2 z hz
-        simp_all
-      · intro q5
-        rw [Multiset.empty_eq_zero, Multiset.eq_zero_iff_forall_notMem]
-        simp only [Multiset.mem_filter, Multiset.mem_map, not_and, Decidable.not_not,
-          forall_exists_index, and_imp, forall_apply_eq_imp_iff₂]
-        intro z hz hzP h2
-        have h1 := charges_isPhenoClosedQ5 q5 q5.2 z hz
-        simp_all
+      · exact fun q10 => map_filter_isPhenoClosed_eq_empty _
+          fun z hz => charges_isPhenoClosedQ10 q10 q10.2 z hz
+      · exact fun q5 => map_filter_isPhenoClosed_eq_empty _
+          fun z hz => charges_isPhenoClosedQ5 q5 q5.2 z hz
     /- Getting the subset of `x` which minimally allows the top Yukawa. -/
     obtain ⟨y, hyMem, hysubsetx⟩ : ∃ y ∈ (minimallyAllowsTermsOfFinset S5 S10 topYukawa),
         y ⊆ x := by
