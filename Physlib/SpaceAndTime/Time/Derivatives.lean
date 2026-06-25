@@ -180,9 +180,7 @@ lemma deriv_contDiff_of_contDiff {M : Type}
     ContDiff ℝ ∞ (∂ₜ f) := by
   unfold deriv
   change ContDiff ℝ ∞ ((fun x => x 1) ∘ (fun t => fderiv ℝ f t))
-  apply ContDiff.comp
-  · fun_prop
-  · fun_prop
+  apply ContDiff.comp <;> fun_prop
 
 @[fun_prop]
 lemma deriv_contDiff_of_space {n} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]

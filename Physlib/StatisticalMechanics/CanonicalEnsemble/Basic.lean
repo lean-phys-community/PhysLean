@@ -595,9 +595,7 @@ lemma integrable_energy_add (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)]
       funext i
       simp
     rw [h1]
-    apply Integrable.mul_prod (f := (fun (i : ι) => 1)) (g := 𝓒1.energy)
-    · fun_prop
-    · fun_prop
+    apply Integrable.mul_prod (f := (fun (i : ι) => 1)) (g := 𝓒1.energy) <;> fun_prop
 
 @[fun_prop]
 lemma integrable_energy_congr (T : Temperature) (e : ι1 ≃ᵐ ι)

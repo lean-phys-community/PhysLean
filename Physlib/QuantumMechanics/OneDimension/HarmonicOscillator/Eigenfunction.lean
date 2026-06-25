@@ -145,9 +145,7 @@ lemma eigenfunction_aeStronglyMeasurable (n : ℕ) :
 /-- The eigenfunctions are members of the Hilbert space. -/
 lemma eigenfunction_memHS (n : ℕ) : MemHS (Q.eigenfunction n) := by
   rw [memHS_iff]
-  apply And.intro
-  · fun_prop
-  · fun_prop
+  apply And.intro <;> fun_prop
 
 /-- The eigenfunctions are differentiable. -/
 @[fun_prop]

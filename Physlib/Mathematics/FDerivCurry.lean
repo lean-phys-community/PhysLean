@@ -166,9 +166,7 @@ lemma function_differentiableAt_fst (f : X → Y → Z) (x : X) (y : Y) (hf : Di
     rfl
   rw [hl]
   apply Differentiable.differentiableAt
-  apply Differentiable.comp
-  · fun_prop
-  · fun_prop
+  apply Differentiable.comp <;> fun_prop
 
 lemma function_differentiableAt_snd (f : X → Y → Z) (x : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
     DifferentiableAt 𝕜 (fun y' => f x y') y := by
@@ -177,9 +175,7 @@ lemma function_differentiableAt_snd (f : X → Y → Z) (x : X) (y : Y) (hf : Di
     rfl
   rw [hl]
   apply Differentiable.differentiableAt
-  apply Differentiable.comp
-  · fun_prop
-  · fun_prop
+  apply Differentiable.comp <;> fun_prop
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_fst (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
