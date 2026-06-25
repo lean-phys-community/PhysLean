@@ -29,6 +29,25 @@ open CategoryTheory.MonoidalCategory
 
 -/
 
+/-- Expanding the inverse of the canonical equivalence from a tensor product of two
+based modules to matrices, in terms of the standard basis tensors. Every `*ToMatrix`
+below is definitionally this composition, so each `*ToMatrix_symm_expand_tmul` lemma
+is a direct specialization. -/
+lemma tensorBasis_toMatrix_symm_expand
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
+    (b₁ : Basis ι₁ ℂ V₁) (b₂ : Basis ι₂ ℂ V₂) (M : Matrix ι₁ ι₂ ℂ) :
+    ((Basis.tensorProduct b₁ b₂).repr ≪≫ₗ
+      Finsupp.linearEquivFunOnFinite ℂ ℂ (ι₁ × ι₂) ≪≫ₗ
+      LinearEquiv.curry ℂ ℂ ι₁ ι₂).symm M =
+    ∑ i, ∑ j, M i j • (b₁ i ⊗ₜ[ℂ] b₂ j) := by
+  simp only [LinearEquiv.trans_symm, LinearEquiv.trans_apply, Basis.repr_symm_apply]
+  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
+  · rw [Fintype.sum_prod_type]
+    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+    exact congrArg _ (Basis.tensorProduct_apply b₁ b₂ i j)
+  · simp
+
 /-- Equivalence of `leftHanded ⊗ leftHanded` to `2 x 2` complex matrices. -/
 def leftLeftToMatrix : (LeftHandedWeyl ⊗[ℂ] LeftHandedWeyl) ≃ₗ[ℂ] Matrix (Fin 2) (Fin 2) ℂ :=
   (Basis.tensorProduct leftBasis leftBasis).repr ≪≫ₗ
@@ -38,13 +57,7 @@ def leftLeftToMatrix : (LeftHandedWeyl ⊗[ℂ] LeftHandedWeyl) ≃ₗ[ℂ] Matr
 /-- Expanding `leftLeftToMatrix` in terms of the standard basis. -/
 lemma leftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftLeftToMatrix.symm M = ∑ i, ∑ j, M i j • (leftBasis i ⊗ₜ[ℂ] leftBasis j) := by
-  simp only [leftLeftToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply leftBasis leftBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand leftBasis leftBasis M
 
 /-- Equivalence of `dualLeftHanded ⊗ dualLeftHanded` to `2 x 2` complex matrices. -/
 def dualLeftdualLeftToMatrix : (DualLeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) ≃ₗ[ℂ]
@@ -57,13 +70,7 @@ def dualLeftdualLeftToMatrix : (DualLeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) 
 lemma dualLeftdualLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualLeftdualLeftToMatrix.symm M = ∑ i, ∑ j, M i j •
       (dualLeftBasis i ⊗ₜ[ℂ] dualLeftBasis j) := by
-  simp only [dualLeftdualLeftToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply dualLeftBasis dualLeftBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand dualLeftBasis dualLeftBasis M
 
 /-- Equivalence of `leftHanded ⊗ dualLeftHanded` to `2 x 2` complex matrices. -/
 def leftDualLeftToMatrix : (LeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) ≃ₗ[ℂ]
@@ -75,13 +82,7 @@ def leftDualLeftToMatrix : (LeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) ≃ₗ[�
 /-- Expanding `leftDualLeftToMatrix` in terms of the standard basis. -/
 lemma leftDualLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftDualLeftToMatrix.symm M = ∑ i, ∑ j, M i j • (leftBasis i ⊗ₜ[ℂ] dualLeftBasis j) := by
-  simp only [leftDualLeftToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply leftBasis dualLeftBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand leftBasis dualLeftBasis M
 
 /-- Equivalence of `dualLeftHanded ⊗ leftHanded` to `2 x 2` complex matrices. -/
 def dualLeftLeftToMatrix : (DualLeftHandedWeyl ⊗[ℂ] LeftHandedWeyl) ≃ₗ[ℂ]
@@ -93,13 +94,7 @@ def dualLeftLeftToMatrix : (DualLeftHandedWeyl ⊗[ℂ] LeftHandedWeyl) ≃ₗ[�
 /-- Expanding `dualLeftLeftToMatrix` in terms of the standard basis. -/
 lemma dualLeftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualLeftLeftToMatrix.symm M = ∑ i, ∑ j, M i j • (dualLeftBasis i ⊗ₜ[ℂ] leftBasis j) := by
-  simp only [dualLeftLeftToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply dualLeftBasis leftBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand dualLeftBasis leftBasis M
 
 /-- Equivalence of `rightHanded ⊗ rightHanded` to `2 x 2` complex matrices. -/
 def rightRightToMatrix : (RightHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃ₗ[ℂ]
@@ -111,13 +106,7 @@ def rightRightToMatrix : (RightHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃ₗ[ℂ]
 /-- Expanding `rightRightToMatrix` in terms of the standard basis. -/
 lemma rightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     rightRightToMatrix.symm M = ∑ i, ∑ j, M i j • (rightBasis i ⊗ₜ[ℂ] rightBasis j) := by
-  simp only [rightRightToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply rightBasis rightBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand rightBasis rightBasis M
 
 /-- Equivalence of `dualRightHanded ⊗ dualRightHanded` to `2 x 2` complex matrices. -/
 def dualRightDualRightToMatrix : (DualRightHandedWeyl ⊗[ℂ] DualRightHandedWeyl) ≃ₗ[ℂ]
@@ -130,13 +119,7 @@ def dualRightDualRightToMatrix : (DualRightHandedWeyl ⊗[ℂ] DualRightHandedWe
 lemma dualRightDualRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualRightDualRightToMatrix.symm M =
     ∑ i, ∑ j, M i j • (dualRightBasis i ⊗ₜ[ℂ] dualRightBasis j) := by
-  simp only [dualRightDualRightToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply dualRightBasis dualRightBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand dualRightBasis dualRightBasis M
 
 /-- Equivalence of `rightHanded ⊗ dualRightHanded` to `2 x 2` complex matrices. -/
 def rightDualRightToMatrix : (RightHandedWeyl ⊗[ℂ] DualRightHandedWeyl) ≃ₗ[ℂ]
@@ -148,13 +131,7 @@ def rightDualRightToMatrix : (RightHandedWeyl ⊗[ℂ] DualRightHandedWeyl) ≃�
 /-- Expanding `rightDualRightToMatrix` in terms of the standard basis. -/
 lemma rightDualRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     rightDualRightToMatrix.symm M = ∑ i, ∑ j, M i j • (rightBasis i ⊗ₜ[ℂ] dualRightBasis j) := by
-  simp only [rightDualRightToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply rightBasis dualRightBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand rightBasis dualRightBasis M
 
 /-- Equivalence of `dualRightHanded ⊗ rightHanded` to `2 x 2` complex matrices. -/
 def dualRightRightToMatrix : (DualRightHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃ₗ[ℂ]
@@ -166,13 +143,7 @@ def dualRightRightToMatrix : (DualRightHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃�
 /-- Expanding `dualRightRightToMatrix` in terms of the standard basis. -/
 lemma dualRightRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualRightRightToMatrix.symm M = ∑ i, ∑ j, M i j • (dualRightBasis i ⊗ₜ[ℂ] rightBasis j) := by
-  simp only [dualRightRightToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply dualRightBasis rightBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand dualRightBasis rightBasis M
 
 /-- Equivalence of `dualLeftHanded ⊗ dualRightHanded` to `2 x 2` complex matrices. -/
 def dualLeftDualRightToMatrix : (DualLeftHandedWeyl ⊗[ℂ] DualRightHandedWeyl) ≃ₗ[ℂ]
@@ -185,13 +156,7 @@ def dualLeftDualRightToMatrix : (DualLeftHandedWeyl ⊗[ℂ] DualRightHandedWeyl
 lemma dualLeftDualRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     dualLeftDualRightToMatrix.symm M = ∑ i, ∑ j, M i j •
       (dualLeftBasis i ⊗ₜ[ℂ] dualRightBasis j) := by
-  simp only [dualLeftDualRightToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply dualLeftBasis dualRightBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand dualLeftBasis dualRightBasis M
 
 /-- Equivalence of `leftHanded ⊗ rightHanded` to `2 x 2` complex matrices. -/
 def leftRightToMatrix : (LeftHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃ₗ[ℂ] Matrix (Fin 2) (Fin 2) ℂ :=
@@ -202,13 +167,7 @@ def leftRightToMatrix : (LeftHandedWeyl ⊗[ℂ] RightHandedWeyl) ≃ₗ[ℂ] Ma
 /-- Expanding `leftRightToMatrix` in terms of the standard basis. -/
 lemma leftRightToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     leftRightToMatrix.symm M = ∑ i, ∑ j, M i j • (leftBasis i ⊗ₜ[ℂ] rightBasis j) := by
-  simp only [leftRightToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply,
-    Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
-  · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply leftBasis rightBasis i j)
-  · simp
+  exact tensorBasis_toMatrix_symm_expand leftBasis rightBasis M
 
 /-!
 
