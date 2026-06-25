@@ -212,7 +212,7 @@ open scoped Matrix in
 theorem X_controllize_X : (X ⊗ᵤ 1) * C[g] * (X ⊗ᵤ 1) = (1 ⊗ᵤ g) * C[g⁻¹] := by
   matrix_expand [X, -Complex.ext_iff] with ki kj;
   suffices (1 : Matrix k k ℂ) ki kj = (g * g⁻¹) ki kj by
-    convert this
+    convert! this
   simp
 
 end Qubit

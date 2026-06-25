@@ -505,7 +505,7 @@ theorem theorem_2_6_forward_jointlyConcaveOn_psd_pd
   have hfneg : CondIAll.{u} (fun x : ℝ ↦ -f x) := by
     refine ⟨?_, ?_⟩
     · intro K _ _ _ _
-      simpa [OperatorConcave] using (hfconc (K := K))
+      exact (hfconc (K := K))
     · simpa using (neg_nonpos.mpr hf0)
   have hconv_neg :
       JointlyConvexOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ))
@@ -528,7 +528,7 @@ theorem theorem_2_6_forward_jointlyConcaveOn_psd_pd_Ici
   have hfneg : CondIciAll.{u} (fun x : ℝ ↦ -f x) := by
     refine ⟨?_, ?_, ?_⟩
     · intro K _ _ _ _
-      simpa [OperatorConcaveOn, OperatorConvexOn] using (hfconc (K := K))
+      exact (hfconc (K := K))
     · simpa using hfcont.neg
     · simpa using (neg_nonpos.mpr hf0)
   have hconv_neg :

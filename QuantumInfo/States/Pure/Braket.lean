@@ -71,13 +71,13 @@ variable {d : Type*} [Fintype d]
 
 instance instFunLikeKet : FunLike (Ket d) d ℂ where
   coe ψ := ψ.vec
-  coe_injective' _ _ h := by rwa [Ket.mk.injEq]
+  coe_injective _ _ h := by rwa [Ket.mk.injEq]
 
 lemma _root_.Ket.coe_fun_eq (ψ : Ket d) : (ψ : d → ℂ) = ψ.vec := rfl
 
 instance instFunLikeBra : FunLike (Bra d) d ℂ where
   coe ψ := ψ.vec
-  coe_injective' _ _ h := by rwa [Bra.mk.injEq]
+  coe_injective _ _ h := by rwa [Bra.mk.injEq]
 
 lemma _root_.Bra.coe_fun_eq (ψ : Bra d) : (ψ : d → ℂ) = ψ.vec := rfl
 
@@ -122,12 +122,12 @@ theorem Bra.normalized (ψ : Bra d) : ∑ x, Complex.normSq (ψ x) = 1 := by
 /-- Any Bra can be turned into a Ket by conjugating the elements. -/
 @[coe]
 def Ket.to_bra (ψ : Ket d) : Bra d :=
-  ⟨conj ψ, by simpa using ψ.2⟩
+  ⟨conj ψ, by simp_all; exact ψ.2⟩
 
 /-- Any Ket can be turned into a Bra by conjugating the elements. -/
 @[coe]
 def Bra.to_ket (ψ : Bra d) : Ket d :=
-  ⟨conj ψ, by simpa using ψ.2⟩
+  ⟨conj ψ, by simp_all; exact ψ.2⟩
 
 instance instBraOfKet : Coe (Ket d) (Bra d) := ⟨Ket.to_bra⟩
 
@@ -224,7 +224,7 @@ def Bra.basis (i : d) : Bra d :=
 /-- A Bra can be viewed as a function from Ket's to ℂ. -/
 instance instFunLikeBraket : FunLike (Bra d) (Ket d) ℂ where
   coe ξ := dot ξ
-  coe_injective' x y h := by
+  coe_injective x y h := by
     ext i
     simpa [Ket.basis, dot, Ket.apply] using congrFun h (Ket.basis i)
 
@@ -428,8 +428,8 @@ private def ketToEuclidean (ψ : Ket d) : EuclideanSpace ℂ d :=
   (WithLp.equiv 2 _).symm ψ.vec
 
 private lemma ketToEuclidean_norm (ψ : Ket d) : ‖ketToEuclidean ψ‖ = 1 := by
-  rw [EuclideanSpace.norm_eq]; convert Real.sqrt_one
-  simp only [ketToEuclidean]; convert ψ.normalized'
+  rw [EuclideanSpace.norm_eq]; convert! Real.sqrt_one
+  simp only [ketToEuclidean]; convert! ψ.normalized'
 
 private lemma dot_eq_euclidean_inner (ψ₁ ψ₂ : Ket d) :
     〈ψ₁‖ψ₂〉 = @inner ℂ (EuclideanSpace ℂ d) _

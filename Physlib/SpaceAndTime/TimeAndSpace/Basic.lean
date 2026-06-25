@@ -124,10 +124,10 @@ lemma fderiv_space_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M
     fderiv ℝ (fun x' => f t x') x dx = fderiv ℝ ↿f (t, x) (0, dx) := by
   change fderiv ℝ (↿f ∘ fun x' => (t, x')) x dx = _
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
   rw [DifferentiableAt.fderiv_prodMk]
   simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.prod_apply,
-    ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id', id_eq]
+    _root_.zero_apply, ContinuousLinearMap.coe_id', id_eq]
   repeat' fun_prop
 
 lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
@@ -136,10 +136,10 @@ lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     fderiv ℝ (fun t' => f t' x) t dt = fderiv ℝ ↿f (t, x) (dt, 0) := by
   change fderiv ℝ (↿f ∘ fun t' => (t', x)) t dt = _
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
   rw [DifferentiableAt.fderiv_prodMk]
   simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
-    ContinuousLinearMap.coe_id', id_eq, ContinuousLinearMap.zero_apply]
+    ContinuousLinearMap.coe_id', id_eq, _root_.zero_apply]
   repeat' fun_prop
 
 /-!
@@ -212,7 +212,7 @@ lemma space_deriv_differentiable_time {d i} {M} [NormedAddCommGroup M] [NormedSp
     have h1 (t : Time) : fderiv ℝ (fun x => f t x) x
       = fderiv ℝ (↿f) (t, x) ∘L (ContinuousLinearMap.inr ℝ Time (Space d)) := by
       ext w
-      simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.inr_apply]
+      simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.inr_apply]
       rw [← fderiv_space_eq_fderiv_curry f t x w hdd]
     conv =>
       enter [2, y]
@@ -233,7 +233,7 @@ lemma time_deriv_differentiable_space {d } {M} [NormedAddCommGroup M] [NormedSpa
     have h1 (x : Space d) : fderiv ℝ (fun t => f t x) t
       = fderiv ℝ (↿f) (t, x) ∘L (ContinuousLinearMap.inl ℝ Time (Space d)) := by
       ext w
-      simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.inl_apply]
+      simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.inl_apply]
       rw [← fderiv_time_eq_fderiv_curry f t w x hdd]
     conv =>
       enter [2, t']
@@ -308,7 +308,7 @@ lemma space_fun_of_time_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [NormedSpac
   · fun_prop
   intro t
   ext r
-  simp only [ContinuousLinearMap.zero_apply]
+  simp only [_root_.zero_apply]
   trans r.val • (fderiv ℝ (fun t' => f t' x) t) 1
   · rw [← map_smul]
     congr
@@ -409,7 +409,7 @@ noncomputable def distTimeDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     let ev : ((Time × Space d) →L[ℝ] M) →L[ℝ] M := {
       toFun v := v (1, 0)
       map_add' v1 v2 := by
-        simp only [ContinuousLinearMap.add_apply]
+        simp only [_root_.add_apply]
       map_smul' a v := by
         simp
     }
@@ -461,7 +461,7 @@ noncomputable def distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M
     let ev : (Time × Space d →L[ℝ] M) →L[ℝ] M := {
       toFun v := v (0, basis i)
       map_add' v1 v2 := by
-        simp only [ContinuousLinearMap.add_apply]
+        simp only [_root_.add_apply]
       map_smul' a v := by
         simp
     }
@@ -657,14 +657,14 @@ noncomputable def distSpaceCurl : ((Time × Space 3) →d[ℝ] (EuclideanSpace �
     ext x i
     fin_cases i
     all_goals
-      simp only [Fin.isValue, map_add, ContinuousLinearMap.add_apply, PiLp.add_apply, Fin.zero_eta,
+      simp only [Fin.isValue, map_add, _root_.add_apply, PiLp.add_apply, Fin.zero_eta,
         ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
       ring
   map_smul' a f := by
     ext x i
     fin_cases i
     all_goals
-      simp only [Fin.isValue, map_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply,
+      simp only [Fin.isValue, map_smul, FunLike.coe_smul, Pi.smul_apply,
         PiLp.smul_apply, smul_eq_mul, Fin.reduceFinMk, ContinuousLinearMap.coe_mk',
         LinearMap.coe_mk, AddHom.coe_mk, RingHom.id_apply]
       ring

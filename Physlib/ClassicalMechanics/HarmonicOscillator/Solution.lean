@@ -421,7 +421,7 @@ lemma trajectory_velocity (IC : InitialConditions) : ∂ₜ (IC.trajectory S) =
   rw [fderiv_cos (by fun_prop), fderiv_sin (by fun_prop),
     fderiv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [fderiv_fun_const, Pi.zero_apply, smul_zero, add_zero, neg_smul,
-    ContinuousLinearMap.neg_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply, fderiv_val,
+    _root_.neg_apply, FunLike.coe_smul, Pi.smul_apply, fderiv_val,
     smul_eq_mul, mul_one]
   field_simp
   ring_nf
@@ -442,12 +442,12 @@ lemma trajectory_acceleration (IC : InitialConditions) : ∂ₜ (∂ₜ (IC.traj
   rw [trajectory_velocity, Time.deriv, fderiv_fun_add (by fun_prop) (by fun_prop)]
   rw [fderiv_smul_const (by fun_prop), fderiv_fun_const_smul (by fun_prop),
     fderiv_smul_const (by fun_prop)]
-  simp only [neg_smul, ContinuousLinearMap.add_apply, ContinuousLinearMap.smulRight_apply]
+  simp only [neg_smul, add_apply, ContinuousLinearMap.smulRight_apply]
   rw [fderiv_cos (by fun_prop), fderiv_sin (by fun_prop),
     fderiv_fun_mul (by fun_prop) (by fun_prop)]
   field_simp [smul_smul]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, smul_zero, add_zero, ContinuousLinearMap.neg_apply,
-    ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
+  simp only [fderiv_fun_const, Pi.ofNat_apply, smul_zero, add_zero, _root_.neg_apply,
+    FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
     smul_eq_mul, mul_one, neg_smul]
   ring_nf
   module
@@ -554,7 +554,7 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
     have htraj_diff : DifferentiableAt ℝ (IC.trajectory S) t :=
       ContDiffAt.differentiableAt htraj_contDiffAt (by simp)
     rw [fderiv_fun_sub hx_diff htraj_diff]
-    simp only [ContinuousLinearMap.sub_apply, Time.deriv]
+    simp only [_root_.sub_apply, Time.deriv]
 
   -- Second derivative of y
   have hy_deriv2 :
@@ -575,7 +575,7 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
     rw [fderiv_fun_sub hx1_at htr1_at]
     -- Now we need to show fderiv of (fun t => fderiv ℝ x t 1) equals fderiv of (∂ₜ x)
     -- This follows from Time.deriv f t = fderiv ℝ f t 1
-    simp only [ContinuousLinearMap.sub_apply]
+    simp only [sub_apply]
     rw [Time.deriv, Time.deriv]
 
   -- Newton form for y (linearity of force)

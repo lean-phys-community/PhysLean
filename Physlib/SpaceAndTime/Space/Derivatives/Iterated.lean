@@ -72,10 +72,7 @@ private lemma iteratedDerivList_contDiff (L : List (Fin d)) {f : Space d → ℝ
       have hfamily : ContDiff ℝ ∞
           (fun x : Space d => fun j : Fin d => deriv j (L.foldr (fun j g => deriv j g) f) x) := by
         simpa using (Space.deriv_contDiff (n := ∞) htail)
-      have hfixed : ContDiff ℝ ∞
-          (fun x => deriv i (L.foldr (fun j g => deriv j g) f) x) := by
-        simpa using (contDiff_apply ℝ ℝ i).comp hfamily
-      simpa using hfixed
+      exact (contDiff_apply ℝ ℝ i).comp hfamily
 
 private lemma iteratedDerivList_add (L : List (Fin d)) {f g : Space d → ℝ}
     (hf : ContDiff ℝ ∞ f) (hg : ContDiff ℝ ∞ g) :

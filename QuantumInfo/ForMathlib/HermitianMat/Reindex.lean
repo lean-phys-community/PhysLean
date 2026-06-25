@@ -44,7 +44,7 @@ theorem reindex_refl (A : HermitianMat d 𝕜) :
 @[simp]
 theorem reindex_reindex (A : HermitianMat d 𝕜) (e : d ≃ d₂) (f : d₂ ≃ d₃) :
     (A.reindex e).reindex f = A.reindex (e.trans f) := by
-  ext1; simp; rfl
+  ext1; simp
 
 @[simp]
 theorem reindex_zero : (0 : HermitianMat d 𝕜).reindex e = 0 := by

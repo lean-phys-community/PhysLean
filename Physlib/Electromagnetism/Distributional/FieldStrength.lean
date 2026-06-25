@@ -7,7 +7,7 @@ module
 
 public import Physlib.Electromagnetism.Distributional.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Field Strength Tensor
@@ -219,7 +219,7 @@ noncomputable def fieldStrength {d} :
     apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
     ext μν
     simp only [ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk,
-      fieldStrengthAux_basis_repr_apply_eq_single, map_add, ContinuousLinearMap.add_apply,
+      fieldStrengthAux_basis_repr_apply_eq_single, map_add, add_apply,
       Lorentz.Vector.apply_add, Finsupp.coe_add, Pi.add_apply]
     ring
   map_smul' c A := by
@@ -227,7 +227,7 @@ noncomputable def fieldStrength {d} :
     apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
     ext μν
     simp only [ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk,
-      fieldStrengthAux_basis_repr_apply_eq_single, map_smul, ContinuousLinearMap.coe_smul',
+      fieldStrengthAux_basis_repr_apply_eq_single, map_smul, FunLike.coe_smul,
       Pi.smul_apply, Lorentz.Vector.apply_smul, Real.ringHom_apply, Finsupp.coe_smul, smul_eq_mul]
     ring
 

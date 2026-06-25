@@ -421,7 +421,7 @@ lemma clm_apply
     conv =>
       enter [1, x]
       rw [adjoint_eq_clm_adjoint]
-    simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+    simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
     apply IsTestFunction.comp_left
     · constructor
       · apply ContDiff.clm_apply
@@ -589,7 +589,7 @@ lemma adjFDeriv_apply
             simp [inner_smul_right']
             left
             rw [fderiv_inner_apply']
-            simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply,
+            simp only [fderiv_fun_const, Pi.zero_apply, _root_.zero_apply,
               inner_zero_left', add_zero]
             · fun_prop
             · exact hφ.differentiable y
@@ -681,7 +681,7 @@ lemma adjFDeriv_apply
             trans (fderiv ℝ (f' i ∘ ψ) y) (bX i)
             · rfl
             rw [fderiv_comp]
-            simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp',
+            simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp,
               Function.comp_apply]
             simp [f',f]
             · exact ContinuousLinearMap.differentiableAt _
@@ -720,7 +720,7 @@ lemma grad {d} : HasVarAdjoint (fun (φ : Space d → ℝ) x => Space.grad φ x)
     rw [real_inner_comm, ← Space.basis_repr_inner_eq, real_inner_comm]
   simp [hx] at h1
   have h2 := HasVarAdjoint.comp h1 (HasVarAdjoint.gradient (d := d))
-  convert h2 using 1
+  convert! h2 using 1
   · funext x t
     rw [Space.grad_eq_gradient]
     simp

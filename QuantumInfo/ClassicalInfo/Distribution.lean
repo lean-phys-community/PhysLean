@@ -52,7 +52,7 @@ def mk' (f : α → ℝ) (h₁ : ∀i, 0 ≤ f i) (hN : ∑ i, f i = 1) : ProbDi
 
 instance instFunLikeProb : FunLike (ProbDistribution α) α Prob where
   coe p a := p.1 a
-  coe_injective' _ _ h :=
+  coe_injective _ _ h :=
     Subtype.ext <| funext fun v ↦ by
       simpa only [Subtype.mk.injEq, coe_inj] using congrFun h v
 

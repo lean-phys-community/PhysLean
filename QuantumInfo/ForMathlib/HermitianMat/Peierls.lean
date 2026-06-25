@@ -59,8 +59,8 @@ theorem peierls_inequality (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : Conv
         have := congr_fun (congr_fun A.H.eigenvectorUnitary.2.2 i) i
         simp_all [Matrix.mul_apply, Complex.mul_conj, Complex.normSq_eq_norm_sq]
         exact_mod_cast this
-      convert hg.map_sum_le _ _ _ <;> simp_all [mul_comm]
-    convert Finset.sum_le_sum fun i _ => h_jensen i using 1
+      convert! hg.map_sum_le _ _ _ <;> simp_all [mul_comm]
+    convert! Finset.sum_le_sum fun i _ => h_jensen i using 1
     rw [Finset.sum_comm, Finset.sum_congr rfl]; intros; rw [Finset.mul_sum]; ac_rfl
   have h_unitary : ∀ (j : d), ∑ i, ‖(A.H.eigenvectorUnitary.val i j)‖^2 = 1 := by
     exact fun j => Matrix.unitaryGroup_row_norm (H A).eigenvectorUnitary j
@@ -92,14 +92,14 @@ theorem peierls_inequality_ici (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : 
         replace this := congr_fun (congr_fun A.H.eigenvectorUnitary.2.2 i) i
         simp_all [Matrix.mul_apply, Complex.mul_conj, Complex.normSq_eq_norm_sq]
         exact_mod_cast this
-      convert hg.map_sum_le _ _ _
+      convert! hg.map_sum_le _ _ _
       · simp_all [mul_comm]
       · simp
       · simpa
       · simp
         intro i
         exact A.eigenvalues_nonneg hA i
-    convert Finset.sum_le_sum fun i _ => h_jensen i using 1
+    convert! Finset.sum_le_sum fun i _ => h_jensen i using 1
     rw [Finset.sum_comm, Finset.sum_congr rfl]; intros; rw [Finset.mul_sum]; ac_rfl
   have h_unitary : ∀ (j : d), ∑ i, ‖(A.H.eigenvectorUnitary.val i j)‖^2 = 1 := by
     exact fun j => Matrix.unitaryGroup_row_norm (H A).eigenvectorUnitary j
@@ -158,8 +158,10 @@ theorem trace_function_convex_univ (g : ℝ → ℝ) (hg : ConvexOn ℝ Set.univ
     rotate_right
     exact C.H.eigenvectorUnitary
     simp [conj_conj]
-  simpa only [h_trace] using h_sum.trans
+  have h1 := h_sum.trans
     (add_le_add (mul_le_mul_of_nonneg_left hAtr ha) (mul_le_mul_of_nonneg_left hBtr hb))
+  simp_all only
+  exact h1
 
 open ComplexOrder in
 /--
@@ -224,8 +226,10 @@ theorem trace_function_convex_ici {g : ℝ → ℝ} (hg : ConvexOn ℝ (Set.Ici 
       _ = (B.cfc g).trace :=
           trace_cfc_conj_unitary B g ⟨star C.H.eigenvectorUnitary.val, by
             rw [Matrix.mem_unitaryGroup_iff, star_star]; exact C.H.eigenvectorUnitary.prop.1⟩
-  simpa only [h_trace] using h_sum.trans
+  have h1 := h_sum.trans
     (add_le_add (mul_le_mul_of_nonneg_left hAtr ha) (mul_le_mul_of_nonneg_left hBtr hb))
+  simp_all only
+  exact h1
 
 -- /-- Strict convexity of trace functions: if `g` is strictly convex on `ℝ₊`, then
 -- `A ↦ Tr[g(A)]` is strictly convex on PSD matrices. -/
