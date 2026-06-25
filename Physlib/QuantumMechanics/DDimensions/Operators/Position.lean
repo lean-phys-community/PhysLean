@@ -215,6 +215,14 @@ lemma radiusPowLM_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space 
   rw [radiusPowLM_apply_fun]
   exact StronglyMeasurable.smul (by measurability) ψ.continuous.stronglyMeasurable
 
+private lemma lintegral_lt_top_aux {d : ℕ} {S : Set (Space d)} {C p : ℝ}
+    (hp : IntegrableOn (fun x ↦ ‖x‖ ^ p) S) {G : Space d → ENNReal}
+    (hG : ∫⁻ x in S, G x ≤ ∫⁻ x in S, ‖C ^ 2‖ₑ * ‖‖x‖ ^ p‖ₑ) :
+    ∫⁻ x in S, G x < ⊤ := by
+  refine hG.trans_lt ?_
+  rw [lintegral_const_mul _ (by fun_prop)]
+  exact ENNReal.mul_lt_top enorm_lt_top hp.hasFiniteIntegral
+
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)
     (hψ : ψ ∈ polyBddSchwartzMap d a) (h : 0 < d + 2 * (a + s)) :
@@ -232,13 +240,8 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
     · -- `‖x‖ < 1`: bound `‖ψ x‖` by `‖x‖ᵃ`
       obtain ⟨C, hC_pos, hC⟩ := hψ a (le_refl _)
       suffices hBound : ∀ᵐ x, ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * (a + s))‖ₑ by
-        calc
-          _ ≤ ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖C ^ 2‖ₑ * ‖‖x‖ ^ (2 * (a + s))‖ₑ :=
-            setLIntegral_mono_ae' measurableSet_ball (Eventually.mono hBound fun _ h' _ ↦ h')
-          _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1), ‖‖x‖ ^ (2 * (a + s))‖ₑ :=
-            lintegral_const_mul _ (by fun_prop)
-        apply ENNReal.mul_lt_top enorm_lt_top
-        exact ((integrableOn_norm_rpow_ball_iff Real.zero_lt_one _).mpr h).hasFiniteIntegral
+        exact lintegral_lt_top_aux ((integrableOn_norm_rpow_ball_iff Real.zero_lt_one _).mpr h)
+          (setLIntegral_mono_ae' measurableSet_ball (Eventually.mono hBound fun _ h' _ ↦ h'))
       apply ae_iff.mpr
       refine measure_mono_null ?_ (measure_singleton 0)
       intro x hx
@@ -259,14 +262,9 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
       simp only [norm_iteratedFDeriv_zero, ← Real.rpow_natCast, Nat.cast_add] at hC
       suffices hBound : ∀ x ∈ (Metric.ball 0 1)ᶜ,
           ‖‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s)‖ₑ ≤ ‖C ^ 2‖ₑ * ‖‖x‖ ^ (-2 * d : ℝ)‖ₑ by
-        calc
-          _ ≤ ∫⁻ (x : Space d) in (Metric.ball 0 1)ᶜ, ‖C ^ 2‖ₑ * ‖‖x‖ ^ (-2 * d : ℝ)‖ₑ :=
-            setLIntegral_mono' (by measurability) hBound
-          _ = ‖C ^ 2‖ₑ * ∫⁻ (x : Space d) in (Metric.ball 0 1)ᶜ, ‖‖x‖ ^ (-2 * d : ℝ)‖ₑ :=
-            lintegral_const_mul _ (by fun_prop)
-        apply ENNReal.mul_lt_top enorm_lt_top
         have hd' : (d + -2 * d : ℝ) < 0 := by simp [hd]
-        exact ((integrableOn_norm_rpow_ball_compl_iff zero_lt_one _).mpr hd').hasFiniteIntegral
+        exact lintegral_lt_top_aux ((integrableOn_norm_rpow_ball_compl_iff zero_lt_one _).mpr hd')
+          (setLIntegral_mono' (by measurability) hBound)
       intro x hx
       simp only [Set.mem_compl_iff, Metric.mem_ball, dist_zero_right, not_lt] at hx
       simp_rw [← enorm_mul, enorm_le_iff_norm_le, norm_mul, norm_pow, Real.norm_eq_abs, sq_abs,
@@ -287,13 +285,7 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
           mul_pos (sq_pos_of_pos hC_pos) (Real.rpow_pos_of_pos hx' _)
         apply (mul_le_iff_le_one_right h').mpr
         exact Real.rpow_le_one_of_one_le_of_nonpos hx (by linarith)
-      rcases lt_or_ge 0 s with (hs | hs)
-      · have hs' : ⌈s⌉.toNat = (⌈s⌉ : ℝ) :=
-          Int.cast_inj.mpr <| Int.toNat_of_nonneg <| Int.ceil_nonneg hs.le
-        exact hs' ▸ Int.le_ceil s
-      · have hs' : ⌈s⌉.toNat = (0 : ℝ) :=
-          Nat.cast_eq_zero.mpr <| Int.toNat_of_nonpos <| Int.ceil_le.mpr (by rwa [Int.cast_zero])
-        exact hs' ▸ hs
+      exact (Int.le_ceil s).trans (by exact_mod_cast Int.self_le_toNat ⌈s⌉)
 
 /-!
 #### A.3.1. As limit of regularized operators
@@ -307,8 +299,7 @@ instance : NeBot nhdsZeroUnits := by
   refine comap_neBot fun t ht ↦ ?_
   obtain ⟨ε, hε_pos, hε⟩ := Metric.mem_nhds_iff.mp ht
   use Units.mk0 (ε / 2) (by linarith)
-  apply hε
-  simp [abs_of_pos, hε_pos]
+  exact hε (by simp [abs_of_pos, hε_pos])
 
 /-- `𝐫[ε,s] ψ` converges pointwise to `𝐫[s] ψ` as `ε → 0` except perhaps at `x = 0`. -/
 lemma radiusRegPow_tendsto_radiusPow {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) {x : Space d}
@@ -341,9 +332,7 @@ lemma radiusRegPow_ae_tendsto_radiusPow {d : ℕ} [NeZero d] (s : ℝ) (ψ : �
     ∀ᵐ x, Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x)) := by
   apply ae_iff.mpr
   suffices h : {x | ¬Tendsto (fun ε ↦ 𝐫₀ ε s ψ x) nhdsZeroUnits (nhds (𝐫 s ψ x))} ⊆ {0} by
-    rcases Set.subset_singleton_iff_eq.mp h with (h' | h')
-    · exact h' ▸ measure_empty
-    · exact h' ▸ measure_singleton 0
+    exact measure_mono_null h (measure_singleton 0)
   intro x hx
   by_contra hx'
   exact hx <| radiusRegPow_tendsto_radiusPow s ψ hx'
@@ -411,8 +400,8 @@ notation "𝓡₀[" d' "]" => radiusRegPowOperator (d := d')
 lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
-lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝓡₀[d] ε s) := by
-  refine mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
+lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝓡₀[d] ε s) :=
+  mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
 lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).IsUnbounded :=
   LinearPMap.IsSelfAdjoint.isUnbounded (radiusRegPowOperator_isSelfAdjoint ε s)
@@ -431,17 +420,11 @@ notation "𝓡" => radiusPowOperator
 @[inherit_doc radiusPowOperator]
 notation "𝓡[" d' "]" => radiusPowOperator (d := d')
 
-lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝓡[d] s).HasDenseDomain := by
-  refine mulOperator_hasDenseDomain ?_
-  suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
-  ext x
-  simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
+lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝓡[d] s).HasDenseDomain :=
+  mulOperator_hasDenseDomain (Measurable.aestronglyMeasurable (by fun_prop))
 
-lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝓡[d] s) := by
-  refine mulOperator_isSelfAdjoint_ofReal ?_ (by ext; simp)
-  suffices (fun x ↦ ‖x‖ ^ s) = normRegularizedPow d 0 s by rw[this]; fun_prop
-  ext x
-  simp [normRegularizedPow, ← Real.rpow_natCast_mul (norm_nonneg x), mul_div_cancel₀ s two_ne_zero]
+lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝓡[d] s) :=
+  mulOperator_isSelfAdjoint_ofReal (Measurable.aestronglyMeasurable (by fun_prop)) (by ext; simp)
 
 lemma radiusPowOperator_isUnbounded (s : ℝ) : (𝓡[d] s).IsUnbounded :=
   LinearPMap.IsSelfAdjoint.isUnbounded (radiusPowOperator_isSelfAdjoint s)
