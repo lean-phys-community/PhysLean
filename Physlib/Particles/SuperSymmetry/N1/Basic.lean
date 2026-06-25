@@ -36,18 +36,19 @@ The physical field content is the configuration `ChiralScalarConfiguration ι =
 scalars are the complex conjugates of this data, never an independent
 configuration.
 
-The index data is packaged as a `ConjTensorSpecies` over `ChiralColor`. The chiral
-colours carry the standard carrier `ι → ℂ`; the anti colours carry its conjugate
-module `ConjModule (ι → ℂ)`, where `i` acts as `−i`, so anti-holomorphy is genuine
-carrier data. Complex conjugation is then the conjugate-linear identity
-`conjEquiv : (ι → ℂ) ≃ₛₗ[starRingEnd ℂ] ConjModule (ι → ℂ)`: the anti basis is its transport
-`Basis.conj piBasis`, and the species' holomorphy flip (`slotConj`, hence `conjT`) is built from it. Each
-colour carries the trivial representation over the trivial group `Unit`, so the chiral scalars hold no
-charge. Contracting a colour against its `τ`-dual is the dot
-product of their coordinate vectors in that colour's basis, which on basis labels is
-the Kronecker `δ_{IJ}`. The `metric` and `unit` fields are both the δ "cap"
-`∑_I b_I ⊗ b_I` whose components are `δ^{IJ}`. Supplying this instance equips the
-chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, and so on).
+The index data is packaged as a `ConjTensorSpecies` over `ChiralColor`. The four colours carry four
+distinct carriers, recording both axes as genuine type data: the holomorphic vectors `ι → ℂ` (up)
+and their dual `Module.Dual ℂ (ι → ℂ)` (down) on the chiral side, and the conjugate modules
+`ConjModule …` of each on the anti side, where `i` acts as `−i`. Variance is thus the vector/dual
+distinction and holomorphy the conjugate-module distinction, so an upper index pairs only with a
+lower one of the same holomorphy. Complex conjugation is the conjugate-linear identity
+`conjEquiv : M ≃ₛₗ[starRingEnd ℂ] ConjModule M` on each carrier (anti basis = `Basis.conj`), and the
+species' holomorphy flip (`slotConj`, hence `conjT`) is built from it. Each colour carries the
+trivial representation over the trivial group `Unit`, so the chiral scalars hold no charge.
+Contracting a colour against its `τ`-dual is the dot product of the two coordinate vectors, the
+Kronecker `δ_{IJ}` on basis labels: `contr` is that pairing `V c ⊗ V (τ c) → ℂ`, `unit` its cap in
+`V (τ c) ⊗ V c`, and `metric` the cap `∑_I b_I ⊗ b_I` in `V c ⊗ V c`. Supplying this instance equips
+the chiral sector with the framework's generic tensor API (`.Tensor`, `.contrT`, and so on).
 
 Conjugation is intrinsic species data: a `ConjTensorSpecies` is a `TensorSpecies`
 extended with the conjugate-colour involution `ChiralColor.bar` and its coherence. The framework then supplies the
@@ -77,11 +78,9 @@ is real. The species can express none of these alone.
 - A. The chiral scalar configuration
 - B. The chiral colours and the dual involution
 - C. Carrier, representation, and basis
-- D. The δ structure on a based finite module
-  - D.1. The bilinear form, contraction, and cap
-  - D.2. Computation lemmas
-  - D.3. The coherence laws
-  - D.4. The coherence laws in `toSpanSingleton` form
+- D. The δ structure on based finite modules
+  - D.1. The bilinear form and the cap
+  - D.2. The δ pairing across two based modules
 - E. The chiral-index tensor species
 - F. Conjugation
 
@@ -151,30 +150,30 @@ variable {ι}
 ## C. Carrier, representation, and basis
 
 A `TensorSpecies` takes, for each colour `c`, a carrier module, a group representation on it, and a
-basis. The carrier depends on holomorphy: chiral colours carry the standard `ι → ℂ`, anti colours
-its conjugate module `ConjModule (ι → ℂ)` (so anti-holomorphy is genuine carrier data). The
-representation is trivial over the trivial group `Unit` (no charge) for every colour; the basis is the indicator basis
-`piBasis` on the chiral carrier and its conjugate `Basis.conj piBasis` on the anti carrier. Variance
-(`τ`) preserves holomorphy, so it never leaves a colour's carrier; conjugation (`bar`) flips
-holomorphy and so maps a carrier to its conjugate.
+basis. The carrier depends on *both* axes: variance gives the vector/dual distinction (`ι → ℂ`
+versus `Module.Dual ℂ (ι → ℂ)`) and holomorphy the conjugate-module distinction (`ConjModule …`,
+where `i` acts as `−i`), so all four colours have distinct carriers. The representation is trivial
+over the trivial group `Unit` (no charge) for every colour; each basis is indexed by `ι` —
+`piBasis`, its dual `piBasis.dualBasis`, and the `Basis.conj` of each. Variance (`τ`) sends a
+carrier to its dual; conjugation (`bar`) sends it to its conjugate module.
 
 -/
 
-/-- The carrier module of each colour. The chiral colours carry the standard `ι → ℂ`; the anti
-colours carry its conjugate module `ConjModule (ι → ℂ)`, where `i` acts as `−i`. This makes
-anti-holomorphy genuine carrier data — complex conjugation is an honest linear map into the
-conjugate carrier — rather than a label tracked separately. -/
+/-- The carrier module of each colour, distinct for all four: the holomorphic vectors `ι → ℂ` and
+their dual `Module.Dual ℂ (ι → ℂ)` on the chiral side, and the conjugate module `ConjModule …` of
+each (where `i` acts as `−i`) on the anti side. Variance is the vector/dual axis, holomorphy the
+conjugate-module axis; both are genuine carrier data, not labels tracked separately. -/
 abbrev chiralModule : ChiralColor → Type
-  | .chiralUp | .chiralDown => ι → ℂ
-  | .antiUp | .antiDown => ConjModule (ι → ℂ)
+  | .chiralUp   => ι → ℂ
+  | .chiralDown => Module.Dual ℂ (ι → ℂ)
+  | .antiUp     => ConjModule (ι → ℂ)
+  | .antiDown   => ConjModule (Module.Dual ℂ (ι → ℂ))
 
 instance instAddCommGroupChiralModule : ∀ c, AddCommGroup (chiralModule (ι := ι) c)
-  | .chiralUp | .chiralDown => inferInstance
-  | .antiUp | .antiDown => inferInstance
+  | .chiralUp | .chiralDown | .antiUp | .antiDown => inferInstance
 
 noncomputable instance instModuleChiralModule : ∀ c, Module ℂ (chiralModule (ι := ι) c)
-  | .chiralUp | .chiralDown => inferInstance
-  | .antiUp | .antiDown => inferInstance
+  | .chiralUp | .chiralDown | .antiUp | .antiDown => inferInstance
 
 /-- The representation on each colour, taken trivial over the trivial group `Unit`: the chiral
 scalars carry no charge in this sector. -/
@@ -184,25 +183,28 @@ def chiralRep : (c : ChiralColor) → Representation ℂ Unit (chiralModule (ι 
 /-- The standard basis of the chiral carrier `ι → ℂ` (the indicator functions). -/
 def piBasis : Basis ι ℂ (ι → ℂ) := Pi.basisFun ℂ ι
 
-/-- The basis of each colour's carrier: the chiral colours use the indicator basis `piBasis`; the
-anti colours use its conjugate `Basis.conj piBasis`, whose coordinates are the `star` of the
-indicator coordinates. -/
+/-- The basis of each colour's carrier, all indexed by `ι`: `piBasis` on the holomorphic vectors,
+its dual `piBasis.dualBasis` on the holomorphic covectors, and the `Basis.conj` of each on the
+anti-holomorphic side (coordinates `star`-ed). -/
 noncomputable def chiralBasis : (c : ChiralColor) → Basis ι ℂ (chiralModule (ι := ι) c)
-  | .chiralUp | .chiralDown => piBasis
-  | .antiUp | .antiDown => Basis.conj piBasis
+  | .chiralUp   => piBasis
+  | .chiralDown => piBasis.dualBasis
+  | .antiUp     => Basis.conj piBasis
+  | .antiDown   => Basis.conj piBasis.dualBasis
 
 /-!
-## D. The δ structure on a based finite module
+## D. The δ structure on based finite modules
 
-The contraction, unit, and metric are the same δ structure, written in basis coordinates: the
-contraction is the Kronecker δ pairing `(x, y) ↦ ∑_I x_I y_I`, while the unit and metric are both
-the matching δ "cap" `∑_I b_I ⊗ b_I`. They are defined once below over an abstract based module
-`(M, b)`, then used at `piBasis` to build the species' fields in §E. A contraction only ever pairs
-a colour with its `τ`-dual (same holomorphy, opposite variance), so it stays within one holomorphy
-and needs no conjugation; conjugation is carried instead by the tensor `conjT` and the
+The contraction, unit, and metric are one δ structure in basis coordinates. A contraction pairs a
+colour with its variance dual `τ c`, whose carriers are *distinct* (a module and its dual, or their
+conjugates) but share the index `ι`, so the pairing is the dot product *across two based modules*
+`(M, b)` and `(N, b')`, `(x, y) ↦ ∑_I (b x)_I (b' y)_I`, with cap `∑_I b_I ⊗ b'_I ∈ M ⊗ N`. The
+single-module case `b = b'` (§D.1) is what `metric c` uses, since its two slots are the same colour;
+the genuinely two-module pairing (§D.2) is what `contr` and `unit` use. The δ data stays within one
+holomorphy and needs no conjugation; conjugation is carried instead by the tensor `conjT` and the
 anti-holomorphic Wirtinger derivatives that produce barred components.
 
-### D.1. The bilinear form, contraction, and cap
+### D.1. The bilinear form and the cap
 
 -/
 
@@ -220,216 +222,155 @@ lemma deltaBil_apply (b : Basis ι ℂ M) (x y : M) :
   rw [deltaBil, Matrix.toBilin_apply]
   simp [Matrix.one_apply, mul_ite, mul_zero, Finset.sum_ite_eq, Basis.equivFun_apply]
 
-/-- The δ contraction `M ⊗ M → ℂ`: the bilinear form `deltaBil` lifted to the tensor
-product. -/
-def deltaContr (b : Basis ι ℂ M) : M ⊗[ℂ] M →ₗ[ℂ] ℂ := TensorProduct.lift (deltaBil b)
-
 /-- The δ cap `∑_I b_I ⊗ b_I`: the rank-2 tensor in `M ⊗ M` with two upper indices, whose
-components in the basis `b` are `δⁱʲ`. It is an element of `M ⊗ M` (the inverse-metric "cap"
-dual to `deltaContr`), not a linear map, and serves as both the metric and the unit of the
-species. -/
+components in the basis `b` are `δⁱʲ`. It is an element of `M ⊗ M` (the inverse-metric "cap"),
+not a linear map, and serves as the `metric` field of the species (whose two slots share a
+colour). -/
 def deltaCap (b : Basis ι ℂ M) : M ⊗[ℂ] M := ∑ I, b I ⊗ₜ[ℂ] b I
 
 /-!
-### D.2. Computation lemmas
+### D.2. The δ pairing across two based modules
 
-Rewrite rules that evaluate the abstractly-defined `deltaContr` and `deltaCap` on concrete
-inputs, together with their two symmetries. They are the only place that unfolds the δ
-definitions and the basis coordinate facts; the coherence laws of §D.3 are assembled entirely
-from them.
-
-`deltaContr_tmul` is the base rule, `deltaContr b (x ⊗ₜ y) = ∑_I x_I y_I`. Specializing the
-second argument to a basis vector (`deltaContr_tmul_basis`) reads off one coordinate, and
-specializing both (`deltaContr_basis_basis`) gives the Kronecker `δ_{IJ}`, i.e. the basis is
-orthonormal for the δ pairing. `deltaContr_comm` and `deltaCap_comm` record that the
-contraction is symmetric in its arguments and that the cap is fixed by swapping its factors.
+A contraction pairs a colour with its variance dual `τ c`, whose carriers are *distinct* types —
+e.g. the holomorphic vectors `ι → ℂ` and the holomorphic covectors `Module.Dual ℂ (ι → ℂ)` — so the
+δ pairing runs between two based modules `(M, b)` and `(N, b')` sharing the index `ι`:
+`(x, y) ↦ ∑_I (b x)_I (b' y)_I`, with cap `∑_I b_I ⊗ b'_I ∈ M ⊗ N`. Setting `b = b'` recovers §D.1.
+This is the data of `contr` (the pairing `M ⊗ N → ℂ`) and `unit` (the cap), and the coherence laws
+the species demands of them, proved here once over abstract `(M, b)`, `(N, b')`.
 
 -/
 
-/-- `deltaContr b (x ⊗ₜ y) = ∑_I x_I y_I`, the dot product of the coordinate vectors of `x` and
-`y` in the basis `b` (writing `x_I := (b.equivFun x) I`). -/
-lemma deltaContr_tmul (b : Basis ι ℂ M) (x y : M) :
-    deltaContr b (x ⊗ₜ[ℂ] y) = ∑ I, b.equivFun x I * b.equivFun y I := by
-  rw [deltaContr, TensorProduct.lift.tmul, deltaBil_apply]
+variable {N : Type*} [AddCommGroup N] [Module ℂ N]
 
-/-- `deltaContr b (x ⊗ₜ b J) = x_J`: pairing with the basis vector `b J` reads off the `J`-th
-coordinate `(b.equivFun x) J`. -/
-lemma deltaContr_tmul_basis (b : Basis ι ℂ M) (x : M) (J : ι) :
-    deltaContr b (x ⊗ₜ[ℂ] b J) = b.equivFun x J := by
-  simp [deltaContr_tmul, Basis.equivFun_self]
+omit [DecidableEq ι] in
+/-- `piBasis.equivFun` is the identity readout of coordinates: `(piBasis.equivFun v) I = v I`. -/
+lemma piBasis_equivFun (v : ι → ℂ) (I : ι) : (piBasis (ι := ι)).equivFun v I = v I := by
+  simp [piBasis]
 
-/-- `deltaContr b (b I ⊗ₜ b J) = δ_{IJ}` (`if I = J then 1 else 0`): the basis vectors are
-orthonormal for the δ pairing. -/
-lemma deltaContr_basis_basis (b : Basis ι ℂ M) (I J : ι) :
-    deltaContr b (b I ⊗ₜ[ℂ] b J) = if I = J then 1 else 0 := by
-  rw [deltaContr_tmul_basis, Basis.equivFun_self]
+/-- The δ pairing between two based modules sharing the index `ι`: the dot product of coordinate
+vectors `(x, y) ↦ ∑_I (b x)_I (b' y)_I`, built by reading both sides into `ι → ℂ` and applying the
+reference dot product `deltaBil piBasis`. Equals `deltaBil b` when `b = b'`. -/
+def deltaBil₂ (b : Basis ι ℂ M) (b' : Basis ι ℂ N) : M →ₗ[ℂ] N →ₗ[ℂ] ℂ :=
+  ((deltaBil piBasis).comp b.equivFun.toLinearMap).compl₂ b'.equivFun.toLinearMap
 
-/-- `deltaContr b (x ⊗ₜ y) = deltaContr b (y ⊗ₜ x)`: the δ contraction is symmetric, since
-`∑_I x_I y_I = ∑_I y_I x_I`. -/
-lemma deltaContr_comm (b : Basis ι ℂ M) (x y : M) :
-    deltaContr b (x ⊗ₜ[ℂ] y) = deltaContr b (y ⊗ₜ[ℂ] x) := by
-  rw [deltaContr_tmul, deltaContr_tmul]
+/-- `deltaBil₂ b b' x y = ∑_I (b x)_I (b' y)_I`. -/
+lemma deltaBil₂_apply (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (x : M) (y : N) :
+    deltaBil₂ b b' x y = ∑ I, b.equivFun x I * b'.equivFun y I := by
+  rw [deltaBil₂, LinearMap.compl₂_apply, LinearMap.comp_apply, LinearEquiv.coe_coe,
+    LinearEquiv.coe_coe, deltaBil_apply]
+  exact Finset.sum_congr rfl fun I _ => by rw [piBasis_equivFun, piBasis_equivFun]
+
+/-- The two-module δ contraction `M ⊗ N → ℂ`. -/
+def deltaContr₂ (b : Basis ι ℂ M) (b' : Basis ι ℂ N) : M ⊗[ℂ] N →ₗ[ℂ] ℂ :=
+  TensorProduct.lift (deltaBil₂ b b')
+
+/-- `deltaContr₂ b b' (x ⊗ₜ y) = ∑_I (b x)_I (b' y)_I`. -/
+lemma deltaContr₂_tmul (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (x : M) (y : N) :
+    deltaContr₂ b b' (x ⊗ₜ[ℂ] y) = ∑ I, b.equivFun x I * b'.equivFun y I := by
+  rw [deltaContr₂, TensorProduct.lift.tmul, deltaBil₂_apply]
+
+/-- `deltaContr₂ b b' (x ⊗ₜ b' J) = x_J`: pairing with the second basis reads off a coordinate. -/
+lemma deltaContr₂_tmul_basis (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (x : M) (J : ι) :
+    deltaContr₂ b b' (x ⊗ₜ[ℂ] b' J) = b.equivFun x J := by
+  simp [deltaContr₂_tmul, Basis.equivFun_self]
+
+/-- `deltaContr₂ b b' (b I ⊗ₜ b' J) = δ_{IJ}`: the two bases are δ-dual. -/
+lemma deltaContr₂_basis_basis (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (I J : ι) :
+    deltaContr₂ b b' (b I ⊗ₜ[ℂ] b' J) = if I = J then 1 else 0 := by
+  rw [deltaContr₂_tmul_basis, Basis.equivFun_self]
+
+/-- `deltaContr₂ b b' (x ⊗ₜ y) = deltaContr₂ b' b (y ⊗ₜ x)`: swapping slots swaps the two bases. -/
+lemma deltaContr₂_comm (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (x : M) (y : N) :
+    deltaContr₂ b b' (x ⊗ₜ[ℂ] y) = deltaContr₂ b' b (y ⊗ₜ[ℂ] x) := by
+  rw [deltaContr₂_tmul, deltaContr₂_tmul]
   exact Finset.sum_congr rfl fun I _ => mul_comm _ _
 
+/-- The two-module δ cap `∑_I b_I ⊗ b'_I ∈ M ⊗ N`. -/
+def deltaCap₂ (b : Basis ι ℂ M) (b' : Basis ι ℂ N) : M ⊗[ℂ] N := ∑ I, b I ⊗ₜ[ℂ] b' I
+
 omit [DecidableEq ι] in
-/-- `comm (deltaCap b) = deltaCap b`: swapping the two tensor factors fixes the cap, since
-every summand `b_I ⊗ b_I` is symmetric. -/
-lemma deltaCap_comm (b : Basis ι ℂ M) :
-    TensorProduct.comm ℂ M M (deltaCap b) = deltaCap b := by
-  rw [deltaCap, map_sum]
+/-- `comm (deltaCap₂ b b') = deltaCap₂ b' b`: swapping the two factors swaps the two bases. -/
+lemma deltaCap₂_comm (b : Basis ι ℂ M) (b' : Basis ι ℂ N) :
+    TensorProduct.comm ℂ M N (deltaCap₂ b b') = deltaCap₂ b' b := by
+  rw [deltaCap₂, map_sum]
   exact Finset.sum_congr rfl fun I _ => by rw [TensorProduct.comm_tmul]
 
-/-!
-### D.3. The coherence laws
-
-The three nontrivial axioms a `TensorSpecies` demands of its `unit`, `contr`, and `metric`,
-proved here for the δ structure over an abstract based module `(M, b)` so that every colour
-inherits them. Each corresponds to one species field:
-
-- `deltaCap_unit_symm` (`unit_symm`): the cap is unchanged by swapping its factors;
-- `deltaContr_deltaCap` (`contr_unit`): the snake identity, contracting the cap against a
-  vector returns that vector;
-- `deltaCap_contr_deltaCap` (`contr_metric`): contracting two adjacent caps yields one cap.
-
-The fourth axiom, `contr_tmul_symm`, is just `deltaContr_comm` from §D.2 and is not repeated
-here. These statements use `deltaCap`/`deltaContr` directly; §D.4 repackages them into the
-`toSpanSingleton` form the species fields literally require.
-
--/
-
 omit [DecidableEq ι] in
-/-- The `unit_symm` law for the δ cap: `deltaCap b = lTensor M id (comm (deltaCap b))`.
-On the right, `comm` swaps the cap's two tensor factors and `lTensor M id` applies the identity
-to the left factor (it is the identity because `τ` here keeps the carrier fixed, so the
-species' type-cast is trivial). Both operations leave the cap alone, so the law reduces to
-`comm (deltaCap b) = deltaCap b` (`deltaCap_comm`): swapping the two legs of `∑_I b_I ⊗ b_I`
-leaves it unchanged. -/
-lemma deltaCap_unit_symm (b : Basis ι ℂ M) :
-    deltaCap b = LinearMap.lTensor M (LinearEquiv.refl ℂ M).toLinearMap
-      (TensorProduct.comm ℂ M M (deltaCap b)) := by
-  simp only [deltaCap_comm, LinearEquiv.refl_toLinearMap, LinearMap.lTensor_id, LinearMap.id_coe,
-    id_eq]
+/-- The `unit_symm` law (two-module, `toSpanSingleton` form): `deltaCap₂ b' b` is the swap of
+`deltaCap₂ b b'`. -/
+lemma deltaUnit₂_symm (b : Basis ι ℂ M) (b' : Basis ι ℂ N) :
+    LinearMap.toSpanSingleton ℂ _ (deltaCap₂ b' b) 1 =
+      LinearMap.lTensor N (LinearEquiv.refl ℂ M).toLinearMap
+        (TensorProduct.comm ℂ M N (LinearMap.toSpanSingleton ℂ _ (deltaCap₂ b b') 1)) := by
+  simp only [LinearMap.toSpanSingleton_apply_one]
+  rw [deltaCap₂_comm]
+  simp only [LinearEquiv.refl_toLinearMap, LinearMap.lTensor_id, LinearMap.id_coe, id_eq]
 
-/-- The snake identity `∑_I (x · b_I) b_I = ∑_I x_I b_I = x` (the `contr_unit` law): contracting
-`x` into the left leg of the cap `∑_I b_I ⊗ b_I` and keeping the right leg returns `x`. The
-displayed term is the framework's spelling of this via `assoc`/`lid`. -/
-lemma deltaContr_deltaCap (b : Basis ι ℂ M) (x : M) :
-    (TensorProduct.lid ℂ M) ((deltaContr b).rTensor M
-      ((TensorProduct.assoc ℂ M M M).symm (x ⊗ₜ[ℂ] deltaCap b))) = x := by
-  rw [deltaCap, TensorProduct.tmul_sum, map_sum, map_sum, map_sum]
+/-- The snake identity (two-module, `contr_unit` law): contracting `x ∈ M` into the `M`-leg of
+`deltaCap₂ b' b ∈ N ⊗ M` returns `x`. -/
+lemma deltaContr₂_unit (b : Basis ι ℂ M) (b' : Basis ι ℂ N) (x : M) :
+    (TensorProduct.lid ℂ M) ((deltaContr₂ b b').rTensor M
+      ((TensorProduct.assoc ℂ M N M).symm
+        (x ⊗ₜ[ℂ] LinearMap.toSpanSingleton ℂ _ (deltaCap₂ b' b) 1))) = x := by
+  rw [LinearMap.toSpanSingleton_apply_one, deltaCap₂, TensorProduct.tmul_sum, map_sum, map_sum,
+    map_sum]
   conv_rhs => rw [← b.sum_equivFun x]
   refine Finset.sum_congr rfl fun I _ => ?_
   rw [TensorProduct.assoc_symm_tmul, LinearMap.rTensor_tmul, TensorProduct.lid_tmul,
-    deltaContr_tmul_basis]
+    deltaContr₂_tmul_basis]
 
-/-- `∑_{IJ} (b_I · b_J) b_I ⊗ b_J = ∑_I b_I ⊗ b_I = deltaCap b` (the `contr_metric` law):
-contracting the two inner legs of `deltaCap b ⊗ deltaCap b` collapses it to a single cap, using
-`b_I · b_J = δ_{IJ}`. -/
-lemma deltaCap_contr_deltaCap (b : Basis ι ℂ M) :
-    (TensorProduct.comm ℂ M M ((TensorProduct.lid ℂ M).lTensor M
-      (((deltaContr b).rTensor M).lTensor M
-        (((TensorProduct.assoc ℂ M M M).symm.toLinearMap.lTensor M)
-          ((TensorProduct.assoc ℂ M M (M ⊗[ℂ] M))
-            (deltaCap b ⊗ₜ[ℂ] deltaCap b)))))) = deltaCap b := by
-  conv_lhs => rw [deltaCap, TensorProduct.sum_tmul]
-  conv_rhs => rw [deltaCap]
+/-- The `contr_metric` law (two-module): contracting the inner `M`/`N` legs of
+`deltaCap b ⊗ deltaCap b'` yields `deltaCap₂ b' b`. -/
+lemma deltaContr₂_metric (b : Basis ι ℂ M) (b' : Basis ι ℂ N) :
+    (TensorProduct.comm ℂ M N ((TensorProduct.lid ℂ N).lTensor M
+      (((deltaContr₂ b b').rTensor N).lTensor M
+        (((TensorProduct.assoc ℂ M N N).symm.toLinearMap.lTensor M)
+          ((TensorProduct.assoc ℂ M M (N ⊗[ℂ] N))
+            (LinearMap.toSpanSingleton ℂ _ (deltaCap b) 1 ⊗ₜ[ℂ]
+              LinearMap.toSpanSingleton ℂ _ (deltaCap b') 1)))))) =
+      LinearMap.toSpanSingleton ℂ _ (deltaCap₂ b' b) 1 := by
+  rw [LinearMap.toSpanSingleton_apply_one, LinearMap.toSpanSingleton_apply_one,
+    LinearMap.toSpanSingleton_apply_one]
+  conv_lhs => rw [deltaCap, deltaCap, TensorProduct.sum_tmul]
+  conv_rhs => rw [deltaCap₂]
   simp only [TensorProduct.tmul_sum, map_sum]
   simp [TensorProduct.assoc_tmul, LinearEquiv.lTensor_tmul, LinearMap.lTensor_tmul,
     TensorProduct.assoc_symm_tmul, LinearMap.rTensor_tmul, TensorProduct.lid_tmul,
-    TensorProduct.comm_tmul, deltaContr_basis_basis, ite_smul]
+    TensorProduct.comm_tmul, deltaContr₂_basis_basis, ite_smul]
   simp [TensorProduct.ite_tmul, Finset.sum_ite_eq]
-
-/-!
-### D.4. The coherence laws in `toSpanSingleton` form
-
-The species' `unit` and `metric` fields are not the bare element `deltaCap b` but the map
-`toSpanSingleton ℂ _ (deltaCap b)` sending `1 ↦ deltaCap b`, so the coherence goals mention
-`toSpanSingleton _ (deltaCap b) 1` wherever §D.3 has `deltaCap b`. These three lemmas bridge
-that gap: each rewrites `toSpanSingleton_apply_one` (`toSpanSingleton _ v 1 = v`) and then
-applies the matching §D.3 law, restating it in the exact shape the fields require.
-
-- `deltaUnit_symm` ← `deltaCap_unit_symm` (`unit_symm`);
-- `deltaContr_unit` ← `deltaContr_deltaCap` (`contr_unit`);
-- `deltaContr_metric` ← `deltaCap_contr_deltaCap` (`contr_metric`).
-
-Stated abstractly over `(M, b)`, they reduce each coherence field of `chiralTensor` to a single
-`cases c <;> exact …`. The fourth law, `contr_tmul_symm`, needs no adapter and uses
-`deltaContr_comm` from §D.2 directly.
-
--/
-
-omit [DecidableEq ι] in
-/-- The `unit_symm` law with `unit = toSpanSingleton _ (deltaCap b)`: evaluated at `1` it is
-`deltaCap b = lTensor M id (comm (deltaCap b))` (`deltaCap_unit_symm`). -/
-lemma deltaUnit_symm (b : Basis ι ℂ M) :
-    LinearMap.toSpanSingleton ℂ _ (deltaCap b) 1 =
-      LinearMap.lTensor M (LinearEquiv.refl ℂ M).toLinearMap
-        (TensorProduct.comm ℂ M M (LinearMap.toSpanSingleton ℂ _ (deltaCap b) 1)) := by
-  simp only [LinearMap.toSpanSingleton_apply_one]
-  exact deltaCap_unit_symm b
-
-/-- The `contr_unit` law with the cap as `toSpanSingleton _ (deltaCap b)`: at `1` it is
-`∑_I (x · b_I) b_I = x` (`deltaContr_deltaCap`). -/
-lemma deltaContr_unit (b : Basis ι ℂ M) (x : M) :
-    (TensorProduct.lid ℂ M) ((deltaContr b).rTensor M
-      ((TensorProduct.assoc ℂ M M M).symm
-        (x ⊗ₜ[ℂ] LinearMap.toSpanSingleton ℂ _ (deltaCap b) 1))) = x := by
-  rw [LinearMap.toSpanSingleton_apply_one]
-  exact deltaContr_deltaCap b x
-
-/-- The `contr_metric` law with the metric as `toSpanSingleton _ (deltaCap b)`: at `1` it is
-`∑_{IJ} (b_I · b_J) b_I ⊗ b_J = deltaCap b` (`deltaCap_contr_deltaCap`). -/
-lemma deltaContr_metric (b : Basis ι ℂ M) :
-    (TensorProduct.comm ℂ M M ((TensorProduct.lid ℂ M).lTensor M
-      (((deltaContr b).rTensor M).lTensor M
-        (((TensorProduct.assoc ℂ M M M).symm.toLinearMap.lTensor M)
-          ((TensorProduct.assoc ℂ M M (M ⊗[ℂ] M))
-            (LinearMap.toSpanSingleton ℂ _ (deltaCap b) 1 ⊗ₜ[ℂ]
-              LinearMap.toSpanSingleton ℂ _ (deltaCap b) 1)))))) =
-      LinearMap.toSpanSingleton ℂ _ (deltaCap b) 1 := by
-  rw [LinearMap.toSpanSingleton_apply_one]
-  exact deltaCap_contr_deltaCap b
 
 /-!
 ## E. The chiral-index tensor species
 
 -/
 
-/-- The chiral-index tensor species, bundled with its conjugation. Its colours are
-`chiral`/`anti` × `up`/`down`; the chiral carriers are `ι → ℂ`, the anti carriers their conjugate
-module `ConjModule (ι → ℂ)`. Every colour contracts by the δ pairing at its own basis (the conjugate
-basis on the anti side), with the δ cap serving as both metric and unit. Each `TensorSpecies`
-coherence law reduces, by case analysis on the colour, to the corresponding abstract δ lemma above.
-The conjugation flips holomorphy (`ChiralColor.bar`) while preserving variance; the index type `ι`
-is shared, so `barIdx_eq` is `rfl`, and `conj_contrComm` is `star δ = δ`. Instantiating
-`ConjTensorSpecies` this way gives the chiral sector both the framework's generic tensor API and
-its conjugation API (`conjT` and its laws) on one object. -/
+/-- The chiral-index tensor species, bundled with its conjugation. Its four colours
+`chiral`/`anti` × `up`/`down` carry the four distinct carriers of §C. `contr c` is the two-module δ
+pairing of a colour against its variance dual `τ c` (`V c ⊗ V (τ c) → ℂ`); `unit c` is the δ cap
+across those two carriers; `metric c` is the single-colour δ cap `∑_I b_I ⊗ b_I`. Each
+`TensorSpecies` coherence law reduces, by case analysis on the colour, to the corresponding abstract
+two-module δ lemma of §D.2. The conjugation flips holomorphy (`ChiralColor.bar`) while preserving
+variance; every basis is indexed by `ι`, so `barIdx_eq` is `rfl`, and `conj_contrComm` is
+`star δ = δ`. Instantiating `ConjTensorSpecies` this way gives the chiral sector both the framework's
+generic tensor API and its conjugation API (`conjT` and its laws) on one object. -/
 def chiralTensor : ConjTensorSpecies ℂ ChiralColor Unit (chiralModule (ι := ι)) (fun _ => ι)
     (chiralRep (ι := ι)) (chiralBasis (ι := ι)) where
   τ := ChiralColor.tau
   τ_involution c := by cases c <;> rfl
-  -- The δ data at each colour's own basis: `piBasis` on the chiral carrier, `Basis.conj piBasis`
-  -- on the anti carrier. `τ` preserves holomorphy, so both contracted slots share the carrier.
-  contr c := match c with
-    | .chiralUp | .chiralDown => { deltaContr piBasis with
-        isIntertwining' g := by ext v; simp [Representation.tprod_apply, chiralRep] }
-    | .antiUp | .antiDown => { deltaContr (Basis.conj piBasis) with
-        isIntertwining' g := by ext v; simp [Representation.tprod_apply, chiralRep] }
-  unit c := match c with
-    | .chiralUp | .chiralDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap piBasis) with
-        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
-    | .antiUp | .antiDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap (Basis.conj piBasis)) with
-        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
-  metric c := match c with
-    | .chiralUp | .chiralDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap piBasis) with
-        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
-    | .antiUp | .antiDown => { LinearMap.toSpanSingleton ℂ _ (deltaCap (Basis.conj piBasis)) with
-        isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
-  -- Each coherence law reduces, by case analysis on `c`, to the matching abstract δ lemma.
-  contr_tmul_symm c x y := by cases c <;> exact deltaContr_comm _ _ _
-  unit_symm c := by cases c <;> exact deltaUnit_symm _
-  contr_unit c x := by cases c <;> exact deltaContr_unit _ x
-  contr_metric c := by cases c <;> exact deltaContr_metric _
+  -- `contr` pairs a colour with its variance dual `τ c` (distinct carriers, e.g. `ι → ℂ` against its
+  -- dual); `unit` is the δ cap across those two carriers; `metric` the δ cap of a colour with itself.
+  contr c := { deltaContr₂ (chiralBasis c) (chiralBasis (ChiralColor.tau c)) with
+      isIntertwining' g := by ext v; simp [Representation.tprod_apply, chiralRep] }
+  unit c := { LinearMap.toSpanSingleton ℂ _
+        (deltaCap₂ (chiralBasis (ChiralColor.tau c)) (chiralBasis c)) with
+      isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap₂] }
+  metric c := { LinearMap.toSpanSingleton ℂ _ (deltaCap (chiralBasis c)) with
+      isIntertwining' g := by ext; simp [Representation.tprod_apply, chiralRep, deltaCap] }
+  -- Each coherence law reduces, by case analysis on `c`, to the matching abstract two-module δ lemma.
+  contr_tmul_symm c x y := by cases c <;> exact deltaContr₂_comm _ _ _ _
+  unit_symm c := by cases c <;> exact deltaUnit₂_symm _ _
+  contr_unit c x := by cases c <;> exact deltaContr₂_unit _ _ x
+  contr_metric c := by cases c <;> exact deltaContr₂_metric _ _
   -- Conjugation data: `bar` flips holomorphy, the index set is shared (`rfl`), `star δ = δ`.
   bar := ChiralColor.bar
   bar_involution := ChiralColor.bar_bar
@@ -437,29 +378,17 @@ def chiralTensor : ConjTensorSpecies ℂ ChiralColor Unit (chiralModule (ι := �
   barIdx_eq _ := rfl
   conj_contrComm := by
     intro d x₁ x₂
-    -- The contraction at every colour is the real δ at that colour's basis, so `star` fixes it. Each
-    -- case is restated (`show`) in `deltaContr`-at-basis form — cheap, since the `IntertwiningMap`
-    -- coercion is `rfl` and the `bar`-side casts (`barIdx_eq`/`bar_tau`) are `rfl`. Then the *lemma*
-    -- `deltaContr_basis_basis` evaluates both sides by a syntactic rewrite, so the heavy `Basis.conj`
-    -- is never `whnf`'d (which is what made `exact`/unification time out).
-    have key : ∀ {M₁ M₂ : Type} [AddCommGroup M₁] [Module ℂ M₁] [AddCommGroup M₂] [Module ℂ M₂]
-        (B₁ : Basis ι ℂ M₁) (B₂ : Basis ι ℂ M₂),
-        star (deltaContr B₁ (B₁ x₁ ⊗ₜ[ℂ] B₁ x₂)) = deltaContr B₂ (B₂ x₁ ⊗ₜ[ℂ] B₂ x₂) := by
-      intro M₁ M₂ _ _ _ _ B₁ B₂
-      rw [deltaContr_basis_basis, deltaContr_basis_basis]; split <;> simp
-    cases d
-    · show star (deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂))
-          = deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂)
-      exact key piBasis (Basis.conj piBasis)
-    · show star (deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂))
-          = deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂)
-      exact key piBasis (Basis.conj piBasis)
-    · show star (deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂))
-          = deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂)
-      exact key (Basis.conj piBasis) piBasis
-    · show star (deltaContr (Basis.conj piBasis) (Basis.conj piBasis x₁ ⊗ₜ[ℂ] Basis.conj piBasis x₂))
-          = deltaContr piBasis (piBasis x₁ ⊗ₜ[ℂ] piBasis x₂)
-      exact key (Basis.conj piBasis) piBasis
+    -- The contraction at every colour is the real δ pairing of two `ι`-bases, so `star` fixes it.
+    -- The `key` lemma evaluates both sides by `deltaContr₂_basis_basis` (a syntactic rewrite to
+    -- `if x₁ = x₂ then 1 else 0`), so the heavy `Basis.conj`/`dualBasis` carriers are never `whnf`'d.
+    have key : ∀ {M₁ M₁' M₂ M₂' : Type} [AddCommGroup M₁] [Module ℂ M₁] [AddCommGroup M₁']
+        [Module ℂ M₁'] [AddCommGroup M₂] [Module ℂ M₂] [AddCommGroup M₂'] [Module ℂ M₂']
+        (B₁ : Basis ι ℂ M₁) (B₁' : Basis ι ℂ M₁') (B₂ : Basis ι ℂ M₂) (B₂' : Basis ι ℂ M₂'),
+        star (deltaContr₂ B₁ B₁' (B₁ x₁ ⊗ₜ[ℂ] B₁' x₂))
+          = deltaContr₂ B₂ B₂' (B₂ x₁ ⊗ₜ[ℂ] B₂' x₂) := by
+      intro M₁ M₁' M₂ M₂' _ _ _ _ _ _ _ _ B₁ B₁' B₂ B₂'
+      rw [deltaContr₂_basis_basis, deltaContr₂_basis_basis]; split <;> simp
+    cases d <;> exact key _ _ _ _
 
 /-!
 ## F. Conjugation
