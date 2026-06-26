@@ -608,42 +608,23 @@ lemma _root_.isBoundedBilinearMap_inner' :
         rfl
       · rw [norm_withLp2_eq_norm2]
         rfl
-    · have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := by
+    · have key (z : E) : |‖z‖₂| ≤ √ d * ‖z‖ := by
         apply le_of_sq_le_sq
         · simp [@mul_pow]
           rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
           simp only [re_to_real]
-          apply (h x).2.trans
+          apply (h z).2.trans
           apply le_of_eq
           simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
             pow_eq_zero_iff, norm_eq_zero]
           left
           refine Eq.symm (Real.sq_sqrt ?_)
           linarith
-        · apply mul_nonneg
-          · exact Real.sqrt_nonneg d
-          · exact norm_nonneg x
-      have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := by
-        apply le_of_sq_le_sq
-        · simp [@mul_pow]
-          rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
-          simp only [re_to_real]
-          apply (h y).2.trans
-          apply le_of_eq
-          simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-            pow_eq_zero_iff, norm_eq_zero]
-          left
-          refine Eq.symm (Real.sq_sqrt ?_)
-          linarith
-        · apply mul_nonneg
-          · exact Real.sqrt_nonneg d
-          · exact norm_nonneg y
+        · positivity
+      have h1 := key x
+      have h2 := key y
       trans (√ d * ‖x‖) * (√ d * ‖y‖)
-      · refine mul_le_mul_of_nonneg h1 h2 ?_ ?_
-        · exact abs_nonneg ‖x‖₂
-        · apply mul_nonneg
-          · exact Real.sqrt_nonneg d
-          · exact norm_nonneg y
+      · exact mul_le_mul_of_nonneg h1 h2 (by positivity) (by positivity)
       · apply le_of_eq
         ring_nf
         rw [Real.sq_sqrt]
