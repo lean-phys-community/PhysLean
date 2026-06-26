@@ -164,7 +164,7 @@ lemma velocity_const_of_zero_acc (q : Time → ℝ) (h : ∀ t, deriv (deriv q) 
     fun_prop
   · intro t
     ext p
-    simp only [ContinuousLinearMap.zero_apply]
+    simp only [zero_apply]
     have hp : p = p.val • (1 : Time) := by
       ext
       simp
