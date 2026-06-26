@@ -72,7 +72,7 @@ lemma dropPair_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1 + 1) → C}
     let i1' := (predPredAbove i2' j2' hi2j2' i1 (by simp [i2', j2']));
     let j1' := (predPredAbove i2' j2' hi2j2' j1 (by simp [i2', j2']));
     dropPair i2 j2 hij2 (dropPair i1 j1 hij1 p) =
-    permP id (PermCond.succSuccAbove_comm i1 j1 i2 j2 hij1 hij2)
+    permP id (IsReindexing.succSuccAbove_comm i1 j1 i2 j2 hij1 hij2)
     ((dropPair i1' j1' (by simp [i1', j1', hij1]) (dropPair i2' j2' hi2j2' p))) := by
   ext m
   simp only [Function.comp_apply, dropPair, permP, id_eq]
@@ -123,7 +123,7 @@ TODO "Prove lemmas relating to the commutation rules of `dropPair` and `prodP`."
 @[simp]
 lemma dropPair_permP {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin (n1 + 1 + 1) → C} (i j : Fin (n1 + 1 + 1)) (hij : i ≠ j)
-    (σ : Fin (n1 + 1 + 1) → Fin (n + 1 + 1)) (hσ : PermCond c c1 σ) (p : Pure S c) :
+    (σ : Fin (n1 + 1 + 1) → Fin (n + 1 + 1)) (hσ : IsReindexing c c1 σ) (p : Pure S c) :
     dropPair i j hij (permP σ hσ p) = permP _ (hσ.succSuccAbove i j hij)
     (dropPair (σ i) (σ j) (by simp [hσ.1.injective.eq_iff, hij]) p) := by
   ext m
@@ -151,7 +151,7 @@ attribute [-simp] LinearEquiv.cast_apply
 @[simp]
 lemma contrPCoeff_permP {n n1 : ℕ} {c : Fin n → C}
     {c1 : Fin n1 → C} (i j : Fin n1) (hij : i ≠ j ∧ S.τ (c1 i) = c1 j)
-    (σ : Fin n1 → Fin n) (hσ : PermCond c c1 σ) (p : Pure S c) :
+    (σ : Fin n1 → Fin n) (hσ : IsReindexing c c1 σ) (p : Pure S c) :
     contrPCoeff i j hij (permP σ hσ p) =
     contrPCoeff (σ i) (σ j) (by simp [hσ.1.injective.eq_iff, hij, hσ.2]) p := by
   simp only [contrPCoeff, permP]

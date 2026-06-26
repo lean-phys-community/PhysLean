@@ -8,7 +8,7 @@ module
 public import Mathlib.RepresentationTheory.Rep.Basic
 public import Physlib.Mathematics.PiTensorProduct
 public import Mathlib.Algebra.Lie.OfAssociative
-
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Tensor species
@@ -25,6 +25,9 @@ public import Mathlib.Algebra.Lie.OfAssociative
 
 open Module
 open scoped TensorProduct
+
+TODO "Include in the condition of `TensorSpecies` a relationship between
+  the metrics and the basis vectors."
 
 /-- The structure `TensorSpecies` contains the necessary structure needed to define
   a system of tensors with index notation. Examples of `TensorSpecies` include real Lorentz tensors,

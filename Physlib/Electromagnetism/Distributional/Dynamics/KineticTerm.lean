@@ -179,11 +179,11 @@ attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue in
 lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) (ν : Fin 1 ⊕ Fin d) :
     A.gradKineticTerm 𝓕 ε ν = η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) •
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) •
     distTensorDeriv A.fieldStrength ε | κ κ ν'}ᵀ)) ν := by
   trans η ν ν * (Lorentz.Vector.basis.repr
     ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength ε | κ κ ν'}ᵀ))) ν
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength ε | κ κ ν'}ᵀ))) ν
   swap
   · rfl
   simp [Lorentz.Vector.basis_eq_map_tensor_basis]

@@ -166,7 +166,7 @@ lemma succSuccAbove_symm (i j : Fin (n + 1 + 1)) :
 
 set_option warning.simp.varHead false in
 @[simp, nolint simpVarHead]
-lemma permCond_succSuccAbove_symm {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
+lemma apply_succSuccAbove_symm {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
     (k : Fin n) : c (succSuccAbove i j k) = c (succSuccAbove j i k) := by
   rw [succSuccAbove_symm]
 

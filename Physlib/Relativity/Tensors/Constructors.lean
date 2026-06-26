@@ -71,14 +71,20 @@ lemma fromSingleT_eq_pureT {c : C} (x : V c) :
 lemma actionT_fromSingleT {c : C} (x : V c) (g : G) :
     g • fromSingleT (S := S) x = fromSingleT (rep c g x) := by
   rw [fromSingleT_eq_pureT, actionT_pure, fromSingleT_eq_pureT]
-  exact congrArg Pure.toTensor (by funext x; fin_cases x; rfl)
+  congr
+  funext x
+  fin_cases x
+  rfl
 
 lemma fromSingleT_map {c c1 : C}
     (h : c = c1) (x : V c) :
     fromSingleT (LinearEquiv.cast (R := k) h x) =
     permT id (by simp [h]) (fromSingleT (S := S) x) := by
   rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, permT_pure]
-  exact congrArg Pure.toTensor (by funext i; fin_cases i; rfl)
+  congr
+  funext i
+  fin_cases i
+  rfl
 
 lemma contrT_fromSingleT_fromSingleT {c : C} (x : V c)
     (y : V (S.τ c)) :
@@ -87,6 +93,7 @@ lemma contrT_fromSingleT_fromSingleT {c : C} (x : V c)
   rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, prodT_pure, contrT_pure, Pure.contrP,
     Pure.contrPCoeff]
   congr 1
+  simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue]
   congr
   ext i
   fin_cases i
@@ -122,6 +129,15 @@ lemma fromPairT_tmul {c1 c2 : C} (x : V c1)
     (prodT (fromSingleT (S := S) x) (fromSingleT y)) := by
   rfl
 
+lemma fromPairT_eq_pure {c1 c2 : C} (x : V c1) (y : V c2) :
+    fromPairT (S := S) (x ⊗ₜ[k] y) = Pure.toTensor (fun | 0 => x | 1 => y) := by
+  rw [fromPairT_tmul, fromSingleT_eq_pureT, fromSingleT_eq_pureT, prodT_pure, permT_pure]
+  congr
+  funext i
+  fin_cases i
+  · rfl
+  · rfl
+
 lemma actionT_fromPairT {c1 c2 : C}
     (x : V c1 ⊗[k]V c2)
     (g : G) :
@@ -146,26 +162,17 @@ lemma fromPairT_map_right {c1 c2 c2' : C} (h :c2 = c2')
     fromPairT (TensorProduct.map LinearMap.id
       (LinearEquiv.cast (R := k) (M := V) h) x : _ ⊗[k] V c2') =
     permT id (by simp [h]) (fromPairT (S := S) x) := by
-  let P (x : V c1 ⊗[k] V c2) : Prop :=
-    fromPairT (TensorProduct.map LinearMap.id (LinearEquiv.cast
-      (R := k) (M := V) h).toLinearMap x) =
-    permT id (by simp [h])
-    (fromPairT (S := S) x)
-  change P x
-  apply TensorProduct.induction_on
-  · simp [P]
-  · intro x y
-    simp [P]
-    rw [fromPairT_tmul]
-    conv_lhs =>
-      enter [2, 2]
-      erw [fromSingleT_map]
-    rw [prodT_permT_right, permT_permT]
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, prodRightMap_id, CompTriple.comp_eq]
-    rw [fromPairT_tmul, permT_permT]
-    rfl
-  · intro x y hx hy
-    simp [P, hx, hy]
+  induction' x using TensorProduct.induction_on with x y  x1 x2 h1 h2
+  · simp
+  · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, map_tmul, LinearMap.id_coe, id_eq,
+    LinearEquiv.coe_coe]
+    rw [fromPairT_tmul, fromPairT_tmul]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, permT_permT, CompTriple.comp_eq]
+    rw [fromSingleT_map, prodT_permT_right, permT_permT]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, CompTriple.comp_eq]
+    congr
+    exact List.ofFn_inj.mp rfl
+  · simp [h1, h2]
 
 lemma fromPairT_comm {c1 c2 : C}
     (x : V c1 ⊗[k] V c2) :
@@ -181,9 +188,14 @@ lemma fromPairT_comm {c1 c2 : C}
   · simp [P]
   · intro x y
     simp [P]
-    rw [fromPairT_tmul, fromPairT_tmul, prodT_swap]
+    rw [fromPairT_tmul, fromPairT_tmul]
+    rw [prodT_swap]
     simp only [Nat.succ_eq_add_one, Nat.reduceAdd, permT_permT, CompTriple.comp_eq, Fin.isValue]
-    exact permT_congr (by ext i; fin_cases i <;> rfl) rfl
+    congr
+    ext i
+    fin_cases i
+    · rfl
+    · rfl
   · intro x y hx hy
     simp [P, hx, hy]
 
@@ -207,6 +219,12 @@ lemma fromSingleTContrFromPairT_tmul {c c2 : C}
     fromSingleTContrFromPairT x (y1 ⊗ₜ[k] y2) =
     S.contr c (x ⊗ₜ[k] y1) • fromSingleT y2 := by
   rw [fromSingleTContrFromPairT]
+  conv_lhs =>
+    enter [2, 2, 2]
+    change (x ⊗ₜ[k] y1) ⊗ₜ[k] y2
+  conv_lhs =>
+    enter [2, 2]
+    change (S.contr c) (x ⊗ₜ[k] y1) ⊗ₜ[k] y2
   conv_lhs =>
     enter [2]
     change (S.contr c) (x ⊗ₜ[k] y1) • y2
@@ -233,17 +251,10 @@ lemma fromSingleT_contr_fromPairT_tmul {c c2 : C}
       rw [contrT_permT]
       enter [2]
       change contrT 1 0 1 _ _
-    rw [permT_permT, permT_permT, permT_permT, fromPairT_tmul]
+    conv_rhs =>
+      rw [permT_permT, permT_permT, permT_permT]
+    rw [fromPairT_tmul]
     symm
-    have h1 : Fin.funPredPredAbove 1 2 (by simp)
-        (prodSwapMap (Nat.succ 0) (0 + 1 + 1)) (by decide) ∘
-        id ∘ prodSwapMap 0 (Nat.succ 0) ∘ id = id := by
-      ext i
-      fin_cases i
-      simp [Fin.funPredPredAbove]
-    conv_lhs =>
-      enter [1, 1]
-      rw [h1]
     conv_rhs =>
       enter [2]
       rw [prodT_permT_right]
@@ -252,8 +263,12 @@ lemma fromSingleT_contr_fromPairT_tmul {c c2 : C}
     conv_rhs =>
       enter [2]
       rw [permT_permT]
-    rw [contrT_permT]
-    exact permT_congr (by ext i; simp) rfl
+    conv_rhs =>
+      rw [contrT_permT]
+    apply permT_congr
+    · ext i
+      simp
+    · rfl
   · rw [contrT_fromSingleT_fromSingleT]
     simp only [map_smul, LinearMap.smul_apply]
     rw [fromSingleTContrFromPairT_tmul]
@@ -261,7 +276,10 @@ lemma fromSingleT_contr_fromPairT_tmul {c c2 : C}
     congr 1
     rw [prodT_swap, permT_permT]
     simp only [Fin.isValue, Nat.add_zero, CompTriple.comp_eq, prodT_default_right, permT_permT]
-    exact permT_congr (by ext i; simp) rfl
+    apply permT_congr
+    · ext i
+      simp
+    · rfl
 
 lemma contrT_fromSingleT_fromPairT {c c2 : C}
     (x : V c)
@@ -291,9 +309,7 @@ lemma contrT_fromSingleT_fromPairT {c c2 : C}
 -/
 
 /-- The contraction of tensors with two indices defined categorically. -/
-noncomputable def fromPairTContr {c c1 c2 : C}
-    (x : V c1 ⊗[k] V c)
-    (y : V (S.τ c) ⊗[k] V c2) :
+noncomputable def fromPairTContr {c c1 c2 : C}(x : V c1 ⊗[k] V c) (y : V (S.τ c) ⊗[k] V c2) :
     S.Tensor ![c1, c2] :=
   let V1 := (V c1)
   let V2 := (V c)
@@ -306,69 +322,38 @@ noncomputable def fromPairTContr {c c1 c2 : C}
   let T5 : V1 ⊗[k] V3 := (TensorProduct.lid _ _).lTensor _ T4
   fromPairT T5
 
-lemma fromPairTContr_tmul_tmul {c c1 c2 : C}
-    (x1 : V c1)
-    (x2 : V c)
-    (y1 : V (S.τ c))
-    (y2 : V c2) :
-    fromPairTContr (x1 ⊗ₜ[k] x2) (y1 ⊗ₜ[k] y2) =
+lemma fromPairTContr_tmul_tmul {c c1 c2 : C} (x1 : V c1) (x2 : V c) (y1 : V (S.τ c))
+    (y2 : V c2) : fromPairTContr (x1 ⊗ₜ[k] x2) (y1 ⊗ₜ[k] y2) =
     (S.contr c) (x2 ⊗ₜ[k] y1) • fromPairT (x1 ⊗ₜ[k] y2) := by
   rw [fromPairTContr]
+  conv_lhs =>
+    enter [2, 2, 2, 2]
+    change x1 ⊗ₜ[k] (x2 ⊗ₜ[k] (y1 ⊗ₜ[k] y2))
+  conv_lhs =>
+    enter [2, 2, 2]
+    change x1 ⊗ₜ[k] ((x2 ⊗ₜ[k] y1) ⊗ₜ[k] y2)
+  conv_lhs =>
+    enter [2, 2]
+    change x1 ⊗ₜ[k] ((S.contr c) (x2 ⊗ₜ[k] y1) ⊗ₜ[k] y2)
   conv_lhs =>
     enter [2]
     change x1 ⊗ₜ[k] (((S.contr c) (x2 ⊗ₜ[k] y1) :k) • y2)
     rw [tmul_smul (R := k) (R' := k)]
   simp
 
-set_option backward.isDefEq.respectTransparency false in
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : C)
-    (x1 : V c1)
-    (x2 : V c)
-    (y1 : V (S.τ c))
+    (x1 : V c1) (x2 : V c) (y1 : V (S.τ c))
     (y2 : V c2) :
-    contrT 2 1 2 (by simp; rfl)
-      (prodT (fromPairT (x1 ⊗ₜ[k] x2)) (fromPairT (y1 ⊗ₜ[k] y2))) =
+    contrT 2 1 2 (by simp; rfl) (prodT (fromPairT (x1 ⊗ₜ[k] x2)) (fromPairT (y1 ⊗ₜ[k] y2))) =
     permT id (by simp; exact ⟨rfl, rfl⟩)
     (fromPairTContr (x1 ⊗ₜ[k] x2) (y1 ⊗ₜ[k] y2)) := by
-  rw [fromPairT_tmul, fromPairT_tmul, prodT_permT_left, prodT_permT_right, permT_permT]
-  conv_lhs => simp only [prodLeftMap_id, prodRightMap_id]
-  conv_lhs => rw [contrT_permT]
-  have h1 : ((contrT 2 1 2 (by simp; rfl))
-    ((prodT ((prodT (fromSingleT x1)) (fromSingleT x2)))
-    ((prodT (fromSingleT y1)) (fromSingleT y2))))
-    = permT id (by simp; exact ⟨rfl, rfl⟩) (prodT (prodT (fromSingleT x1)
-      (contrT 0 0 1 (by simp; rfl) (prodT (fromSingleT x2) (fromSingleT y1))))
-      (fromSingleT y2)) := by
-    conv_rhs => enter [2]; rw [prodT_contrT_snd, prodT_permT_left]
-    conv_rhs => rw [permT_permT]
-    conv_rhs => enter [2]; rw [prodT_swap]
-    conv_rhs => enter [2, 2]; rw [prodT_contrT_snd]
-    conv_rhs => enter [2]; rw [permT_permT]
-    conv_rhs => rw [permT_permT]
-    conv_rhs => enter [2, 2]; rw [prodT_swap]
-    conv_rhs => enter [2, 2, 2, 1, 2]; rw [prodT_assoc']
-    conv_rhs =>
-      enter [2, 2, 2]
-      rw [prodT_permT_left]
-      rw [prodT_assoc]
-      rw [permT_permT]
-    rw [permT_permT]
-    conv_rhs =>
-      rw [contrT_permT, permT_permT]
-      enter [2, 1]
-      change contrT 2 1 2 _
-    symm
-    apply permT_congr_eq_id
-    ext i
-    fin_cases i <;> rfl
-  simp only [Fin.isValue, Function.comp_id,
-    Fin.funPredPredAbove_id, Function.comp_apply, id_eq]
-  rw [h1, contrT_fromSingleT_fromSingleT]
-  simp only [map_smul, prodT_default_right, LinearMap.smul_apply]
-  rw [prodT_permT_left, permT_permT]
-  simp only [prodLeftMap_id, CompTriple.comp_eq]
-  rw [fromPairTContr_tmul_tmul, fromPairT_tmul]
-  simp only [permT_permT, map_smul]
+  simp only [map_smul, fromPairTContr_tmul_tmul, fromPairT_eq_pure, permT_pure,
+    Pure.contrP, contrT_pure, prodT_pure]
+  congr
+  funext i
+  fin_cases i
+  · rfl
+  · rfl
 
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : C)
     (x : V c1 ⊗[k] V c)
@@ -424,8 +409,11 @@ lemma fromPairT_basis_repr {c c1 : C}
       left
       right
       rw [fromPairT_tmul]
-    rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, prodT_pure, permT_pure, basis_repr_pure]
-    simp [Pure.component, mul_comm]
+    rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT]
+    rw [prodT_pure, permT_pure]
+    rw [basis_repr_pure]
+    simp [Pure.component]
+    rw [mul_comm]
     rfl
   · intro x y hx hy
     simp_all [P]
@@ -441,7 +429,8 @@ lemma fromPairT_apply_basis_repr {c c1 : C}
   simp [Finsupp.single_apply]
   conv_rhs =>
     enter [1]
-    rw [funext_iff, Fin.forall_fin_two]
+    rw [funext_iff]
+    rw [Fin.forall_fin_two]
     simp
   split
   next h =>
@@ -545,8 +534,10 @@ lemma fromTripleT_basis_repr {c c1 c2 : C}
     · simp [P1, P]
     · intro y z
       simp [P1, P]
-      rw [fromTripleT_tmul, fromSingleT_eq_pureT, fromSingleT_eq_pureT, fromSingleT_eq_pureT]
-      rw [prodT_pure, prodT_pure, permT_pure, basis_repr_pure]
+      rw [fromTripleT_tmul]
+      rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, fromSingleT_eq_pureT]
+      rw [prodT_pure, prodT_pure, permT_pure]
+      rw [basis_repr_pure]
       simp [Pure.component, Fin.prod_univ_three]
       conv_rhs =>
         rw [mul_assoc, mul_comm]
@@ -575,7 +566,8 @@ lemma fromTripleT_apply_basis {c c1 c2 : C}
   simp [Finsupp.single_apply]
   conv_rhs =>
     enter [1]
-    rw [funext_iff, Fin.forall_fin_succ, Fin.forall_fin_two]
+    rw [funext_iff]
+    rw [Fin.forall_fin_succ, Fin.forall_fin_two]
     simp
   split
   next h =>

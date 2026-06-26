@@ -66,14 +66,14 @@ attribute [-simp] Nat.succ_eq_add_one
 noncomputable def fieldStrengthAux {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) : Lorentz.Vector d ⊗[ℝ] Lorentz.Vector d :=
   Tensorial.toTensor.symm
-      (permT id (PermCond.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν) + -
+      (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν) + -
       (η d | ν ν' ⊗ distTensorDeriv A ε | ν' μ)}ᵀ)
 
 lemma fieldStrengthAux_eq_add {d} (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) :
     fieldStrengthAux A ε =
     Tensorial.toTensor.symm
-      (permT id (PermCond.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
-    - Tensorial.toTensor.symm (permT ![1, 0] (PermCond.auto)
+      (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
+    - Tensorial.toTensor.symm (permT ![1, 0] (IsReindexing.auto)
       {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ) := by
   rw [fieldStrengthAux]
   simp only [map_add, map_neg]
@@ -86,8 +86,8 @@ lemma fieldStrengthAux_eq_add {d} (A : DistElectromagneticPotential d) (ε : �
 lemma toTensor_fieldStrengthAux {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
     Tensorial.toTensor (fieldStrengthAux A ε) =
-    (permT id (PermCond.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
-    - (permT ![1, 0] (PermCond.auto)
+    (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
+    - (permT ![1, 0] (IsReindexing.auto)
       {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ) := by
   rw [fieldStrengthAux_eq_add]
   simp

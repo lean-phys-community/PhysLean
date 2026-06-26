@@ -138,9 +138,9 @@ lemma gradFreeCurrentPotential_eq_tensor {d}
     (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ))
     (ν : Fin 1 ⊕ Fin d) :
     gradFreeCurrentPotential J ε ν = η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {J ε | ν'}ᵀ)) ν:= by
+    (permT id (IsReindexing.auto) {J ε | ν'}ᵀ)) ν:= by
   trans η ν ν * (Lorentz.Vector.basis.repr ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {J ε | ν'}ᵀ))) ν
+    (permT id (IsReindexing.auto) {J ε | ν'}ᵀ))) ν
   swap
   · simp [Lorentz.Vector.basis_repr_apply]
   simp [Lorentz.Vector.basis_repr_apply]
@@ -192,7 +192,7 @@ lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (ε : 𝓢(SpaceTime d, ℝ)) (ν : Fin 1 ⊕ Fin d) :
     A.gradLagrangian 𝓕 J ε ν =
     η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • (distTensorDeriv A.fieldStrength ε) | κ κ ν') +
+    (permT id (IsReindexing.auto) {((1/ 𝓕.μ₀ : ℝ) • (distTensorDeriv A.fieldStrength ε) | κ κ ν') +
     - (J ε | ν')}ᵀ)) ν := by
   rw [gradLagrangian]
   simp only [FunLike.coe_sub, Pi.sub_apply, apply_sub, one_div,

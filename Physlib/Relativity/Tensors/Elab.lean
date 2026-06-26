@@ -455,12 +455,12 @@ def actionTermMap (c T : Term) : Term :=
 
 /-- The syntax for a equality of tensor trees. -/
 def addTermMap (P : Term) (T1 T2 : Term) : TermElabM Term := do
-  let RHS := Syntax.mkApp (mkIdent ``Tensor.permT) #[P, (mkIdent ``PermCond.auto), T2]
+  let RHS := Syntax.mkApp (mkIdent ``Tensor.permT) #[P, (mkIdent ``IsReindexing.auto), T2]
   return Syntax.mkApp (mkIdent ``HAdd.hAdd) #[T1, RHS]
 
 /-- The syntax for a equality of tensor trees. -/
 def equalTermMap (P : Term) (T1 T2 : Term) : TermElabM Term := do
-  let X2' := Syntax.mkApp (mkIdent ``Tensor.permT) #[P, (mkIdent ``PermCond.auto), T2]
+  let X2' := Syntax.mkApp (mkIdent ``Tensor.permT) #[P, (mkIdent ``IsReindexing.auto), T2]
   return Syntax.mkApp (mkIdent ``Eq) #[T1, X2']
 
 /-!

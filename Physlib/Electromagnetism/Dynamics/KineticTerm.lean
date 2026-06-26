@@ -973,10 +973,11 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d) (x : SpaceTime d)
     (hA : ContDiff ℝ ∞ A) (ν : Fin 1 ⊕ Fin d) :
     A.gradKineticTerm 𝓕 x ν = η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ)) ν := by
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) •
+      tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ)) ν := by
   trans η ν ν * (Lorentz.Vector.basis.repr
     ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ))) ν
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ))) ν
   swap
   · simp [Lorentz.Vector.basis_repr_apply]
   simp [Lorentz.Vector.basis_eq_map_tensor_basis]

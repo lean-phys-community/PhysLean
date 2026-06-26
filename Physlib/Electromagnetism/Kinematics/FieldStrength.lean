@@ -80,7 +80,8 @@ under Lorentz transformations.
 noncomputable def toFieldStrength {d} (A : ElectromagneticPotential d) :
     SpaceTime d → Lorentz.Vector d ⊗[ℝ] Lorentz.Vector d := fun x =>
   Tensorial.toTensor.symm
-  (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν) + - (η d | ν ν' ⊗ A.deriv x | ν' μ)}ᵀ)
+  (permT id (IsReindexing.auto)
+    {(η d | μ μ' ⊗ A.deriv x | μ' ν) + - (η d | ν ν' ⊗ A.deriv x | ν' μ)}ᵀ)
 
 /-!
 
@@ -95,21 +96,21 @@ of the API within this module.
 
 lemma toFieldStrength_eq_deriv {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id PermCond.auto {(η d | μ μ' ⊗ A.deriv x | μ' ν)
+    Tensorial.toTensor.symm (permT id IsReindexing.auto {(η d | μ μ' ⊗ A.deriv x | μ' ν)
     + - (η d | ν ν' ⊗ A.deriv x | ν' μ)}ᵀ) := by
   rw [toFieldStrength]
 
 lemma toFieldStrength_eq_tensorDeriv {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id PermCond.auto {(η d | μ μ' ⊗ tensorDeriv A x | μ' ν)
+    Tensorial.toTensor.symm (permT id IsReindexing.auto {(η d | μ μ' ⊗ tensorDeriv A x | μ' ν)
     + - (η d | ν ν' ⊗ tensorDeriv A x | ν' μ)}ᵀ) := by
   rw [toFieldStrength_eq_deriv, deriv_eq_tensorDeriv _ hA]
 
 lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
-    - Tensorial.toTensor.symm (permT ![1, 0] (PermCond.auto)
+    Tensorial.toTensor.symm (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
+    - Tensorial.toTensor.symm (permT ![1, 0] (IsReindexing.auto)
       {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ) := by
   rw [toFieldStrength]
   simp only [map_add, map_neg]
@@ -122,16 +123,16 @@ lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime
 lemma toFieldStrength_eq_sub_tensorDeriv {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id PermCond.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
-    - Tensorial.toTensor.symm (permT ![1, 0] PermCond.auto
+    Tensorial.toTensor.symm (permT id IsReindexing.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
+    - Tensorial.toTensor.symm (permT ![1, 0] IsReindexing.auto
     {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := by
   simp only [toFieldStrength_eq_tensorDeriv hA, map_add, map_neg, sub_eq_add_neg, permT_permT]
   rfl
 
 lemma toTensor_toFieldStrength {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     Tensorial.toTensor (toFieldStrength A x) =
-    (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
-    - (permT ![1, 0] (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ) := by
+    (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
+    - (permT ![1, 0] (IsReindexing.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ) := by
   rw [toFieldStrength_eq_add]
   simp
 

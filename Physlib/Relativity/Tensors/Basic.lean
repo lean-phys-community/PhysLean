@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.ComponentIdx.Single
+public import Physlib.Relativity.Tensors.Reindexing
 public import Physlib.Relativity.Tensors.Contraction.SuccSuccAbove
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
@@ -533,280 +534,6 @@ noncomputable instance : DistribMulAction G (S.Tensor c) where
   smul_zero g := by simp [actionT_zero]
   smul_add g t1 t2 := by simp [actionT_add]
 
-/-!
-
-## Permutations
-
-And their interactions with
-- actions
--/
-
-TODO "Rename `PermCond` to `IsReindexing` (or similar)
-  and move it to it's own file system. Move the results from
-  ./Product related to `PermCond` to that file as well."
-
-/-- Given two lists of indices `c : Fin n → C` and `c1 : Fin m → C` a map
-  `σ : Fin m → Fin n` satisfies the condition `PermCond c c1 σ` if it is:
-- A bijection
-- Forms a commutative triangle with `c` and `c1`.
--/
-def PermCond {n m : ℕ} (c : Fin n → C) (c1 : Fin m → C)
-    (σ : Fin m → Fin n) : Prop :=
-  Function.Bijective σ ∧ ∀ i, c (σ i) = c1 i
-
-lemma PermCond.auto {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ := by {simp [PermCond]; try decide}) :
-    PermCond c c1 σ := h
-
-lemma PermCond.injective {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) : Function.Injective σ := h.1.1
-
-lemma PermCond.surjective {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) : Function.Surjective σ := h.1.2
-
-@[simp]
-lemma PermCond.on_id {n : ℕ} {c c1 : Fin n → C} :
-    PermCond c c1 (id : Fin n → Fin n) ↔ ∀ i, c i = c1 i := by
-  simp [PermCond]
-
-lemma PermCond.on_id_symm {n : ℕ} {c c1 : Fin n → C} (h : PermCond c1 c id) :
-    PermCond c c1 (id : Fin n → Fin n) := by
-  simp at h ⊢
-  exact fun i => (h i).symm
-
-/-- For a map `σ` satisfying `PermCond c c1 σ`, the inverse of that map. -/
-def PermCond.inv {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) : Fin n → Fin m :=
-  Fintype.bijInv h.1
-
-/-- For a map `σ : Fin m → Fin n` satisfying `PermCond c c1 σ`,
-  that map lifted to an equivalence between
-  `Fin n` and `Fin m`. -/
-def PermCond.toEquiv {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) :
-    Fin n ≃ Fin m where
-  toFun := PermCond.inv σ h
-  invFun := σ
-  left_inv := Fintype.rightInverse_bijInv h.1
-  right_inv := Fintype.leftInverse_bijInv h.1
-
-lemma PermCond.apply_inv_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) (x : Fin m) :
-    h.inv σ (σ x) = x := by
-  change h.toEquiv (h.toEquiv.symm x) = x
-  simp
-
-lemma PermCond.inv_apply_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) (x : Fin n) :
-    σ (h.inv σ x) = x := by
-  change h.toEquiv.symm (h.toEquiv x) = x
-  simp
-
-lemma PermCond.preserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) :
-    ∀ (x : Fin m), c1 x = (c ∘ σ) x := by
-  intro x
-  obtain ⟨y, rfl⟩ := h.toEquiv.surjective x
-  simp only [Function.comp_apply]
-  rw [h.2]
-
-set_option warning.simp.varHead false in
-@[simp, nolint simpVarHead]
-lemma PermCond.inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (x : Fin n) :
-    c1 (h.inv σ x) = c x := by
-  obtain ⟨x, rfl⟩ := h.toEquiv.symm.surjective x
-  change c1 (h.toEquiv _) = _
-  simp only [Equiv.apply_symm_apply]
-  rw [h.preserve_color]
-  rfl
-
-set_option warning.simp.varHead false in
-@[simp, nolint simpVarHead]
-lemma PermCond.toEquiv_symm_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (x : Fin m) :
-    c (h.toEquiv.symm x) = c1 x := by
-  obtain ⟨x, rfl⟩ := h.toEquiv.surjective x
-  rw [h.preserve_color]
-  rfl
-
-lemma PermCond.symm {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) :
-    PermCond c1 c (h.inv σ) := by
-  apply And.intro
-  · refine Function.bijective_iff_has_inverse.mpr ?_
-    use σ
-    apply And.intro
-    · intro x
-      simp [inv_apply_apply]
-    · intro x
-      simp [apply_inv_apply]
-  · intro x
-    rw [h.inv_perserve_color]
-
-/-- The composition of two maps satisfying `PermCond` also satisfies the `PermCond`. -/
-lemma PermCond.comp {n n1 n2 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C}
-    {c2 : Fin n2 → C} {σ : Fin n1 → Fin n} {σ2 : Fin n2 → Fin n1}
-    (h : PermCond c c1 σ) (h2 : PermCond c1 c2 σ2) :
-    PermCond c c2 (σ ∘ σ2) := by
-  apply And.intro
-  · refine Function.Bijective.comp h.1 h2.1
-  · intro x
-    simp only [Function.comp_apply]
-    rw [h.2, h2.2]
-
-open Fin in
-lemma PermCond.snoc {n1} {n : ℕ} {c : Fin (n + 1) → C} {c1 : Fin n1 → C}
-    {σ : Fin n1 → Fin n} (i : Fin (n + 1)) (h : PermCond (c ∘ i.succAbove) c1 σ) :
-    PermCond c (snoc (α := fun _ ↦ C) c1 (c i))
-      (snoc (α := fun _ ↦ Fin (n+1)) (i.succAbove ∘ σ ) i) := by
-  refine ⟨⟨?_, ?_⟩, ?_⟩
-  · apply Fin.snoc_injective_of_injective
-    · exact (Fin.succAbove_right_injective (p := i)).comp h.injective
-    · simp
-  · intro k
-    rcases Fin.eq_self_or_eq_succAbove i k with (rfl | ⟨k, rfl⟩)
-    · use Fin.last n1
-      simp
-    · obtain ⟨j, rfl⟩ := h.surjective k
-      use Fin.castSucc j
-      simp
-  · intro j
-    rcases Fin.eq_castSucc_or_eq_last j with (⟨j, rfl⟩ | rfl)
-    · simp [h.preserve_color]
-    · simp
-
-lemma PermCond.succAbove_of_eq_zero {n n1 : ℕ} {c : Fin (n + 1) → C} {c1 : Fin (n1 + 1) → C}
-    {σ : Fin (n1 + 1) → Fin (n + 1)} (i : Fin (n1 + 1))
-    (h : PermCond c c1 σ) (hi : σ i = 0) :
-    PermCond (c ∘ Fin.succ) (c1 ∘ i.succAbove)
-      (fun j => (σ (i.succAbove j)).pred (by simp [← hi, h.injective.eq_iff])) := by
-  refine ⟨⟨?_, ?_⟩, ?_⟩
-  · intro x1 x2 h1
-    simpa [h.injective.eq_iff] using h1
-  · intro k
-    suffices ha : ∃ a, σ (i.succAbove a) = k.succ by
-      obtain ⟨a, ha⟩ := ha
-      use a
-      simp [ha]
-    obtain ⟨j, hj⟩ := h.surjective k.succ
-    simp only [← hj, h.injective.eq_iff, Fin.exists_succAbove_eq_iff, ne_eq]
-    grind
-  · intro x
-    simp [h.preserve_color]
-
-lemma PermCond.succAbove_of_neq_zero {n n1 : ℕ} {c : Fin (n + 1) → C} {c1 : Fin (n1 + 1) → C}
-    {σ : Fin (n1 + 1) → Fin (n + 1)} (i : Fin (n1 + 1))
-    (h : PermCond c c1 σ) (hi : σ i ≠ 0) :
-    PermCond (c ∘ (σ i).succAbove) (c1 ∘ i.succAbove)
-      ((Fin.pred (σ i) hi).predAbove  ∘ σ ∘ i.succAbove) := by
-  have hpr : σ i = ((σ i).pred hi).succ := (Fin.succ_pred _ _).symm
-  have hne : ∀ x, σ (i.succAbove x) ≠ σ i := fun x heq =>
-    Fin.succAbove_ne i x (h.injective heq)
-  refine ⟨⟨?_, ?_⟩, ?_⟩
-  · intro x1 x2 h2
-    simp only [Function.comp_apply] at h2
-    apply i.succAbove_right_injective (h.injective ?_)
-    suffices h' :
-        ((σ i).pred hi).succ.succAbove (((σ i).pred hi).predAbove (σ (i.succAbove x1))) =
-        ((σ i).pred hi).succ.succAbove (((σ i).pred hi).predAbove (σ (i.succAbove x2))) by
-      rwa [Fin.succ_succAbove_predAbove (hpr ▸ hne x1),
-        Fin.succ_succAbove_predAbove (hpr ▸ hne x2)] at h'
-    simpa using h2
-  · intro k
-    simp only [Function.comp_apply]
-    suffices h' : ∃ a, σ (i.succAbove a) = (σ i).succAbove k by
-      conv => enter [1, a]; rw [← ((σ i).pred hi).succ.succAbove_right_injective.eq_iff]
-      obtain ⟨a, h'⟩ := h'
-      exact ⟨a, by rw [Fin.succ_succAbove_predAbove (hpr ▸ hne a), ← hpr]; exact h'⟩
-    obtain ⟨j, hj⟩ := h.surjective ((σ i).succAbove k)
-    simp only [← hj, h.injective.eq_iff, Fin.exists_succAbove_eq_iff, ne_eq]
-    rintro rfl
-    simp at hj
-  · intro x
-    simp only [h.preserve_color, Function.comp_apply]
-    congr 1
-    conv_lhs => enter[1]; rw [hpr]
-    exact Fin.succ_succAbove_predAbove (hpr ▸ hne x)
-
-lemma PermCond.succAbove {n n1 : ℕ} {c : Fin (n + 1) → C} {c1 : Fin (n1 + 1) → C}
-    {σ : Fin (n1 + 1) → Fin (n + 1)} (i : Fin (n1 + 1))
-    (h : PermCond c c1 σ) :
-    PermCond (c ∘ (σ i).succAbove) (c1 ∘ i.succAbove)
-      (if hi : σ i = 0 then fun j => (σ (i.succAbove j)).pred (by simp [← hi, h.injective.eq_iff])
-      else (Fin.pred (σ i) hi).predAbove  ∘ σ ∘ i.succAbove) := by
-  by_cases hi : σ i = 0
-  · simpa [hi] using PermCond.succAbove_of_eq_zero i h hi
-  · simpa [hi] using PermCond.succAbove_of_neq_zero i h hi
-
-lemma PermCond.succSuccAbove {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
-    {c1 : Fin (n1 + 1 + 1) → C}
-    (i j : Fin (n1 + 1 + 1)) (hij : i ≠ j)
-    {σ : Fin (n1 + 1 + 1) → Fin (n + 1 + 1)} (hσ : PermCond c c1 σ) :
-    PermCond (c ∘  (σ i).succSuccAbove (σ j))
-      (c1 ∘ i.succSuccAbove j) (i.funPredPredAbove j hij σ hσ.1) := by
-  apply And.intro
-  · exact Fin.funPredPredAbove_bijective i j hij σ hσ.left
-  · intro m
-    simp [Fin.funPredPredAbove, hσ.2]
-
-open Fin in
-lemma PermCond.succSuccAbove_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1 + 1) → C}
-    (i1 j1 : Fin (n + 1 + 1 + 1 + 1)) (i2 j2 : Fin (n + 1 + 1))
-    (hij1 : i1 ≠ j1) (hij2 : i2 ≠ j2) :
-    let i2' := (i1.succSuccAbove j1 i2);
-    let j2' := (i1.succSuccAbove j1 j2);
-    have hi2j2' : i2' ≠ j2' := by simp [i2', j2', hij2];
-    let i1' := (predPredAbove i2' j2' hi2j2' i1 (by simp [i2', j2']));
-    let j1' := (predPredAbove i2' j2' hi2j2' j1 (by simp [i2', j2']));
-    PermCond ((c ∘ i2'.succSuccAbove j2') ∘ i1'.succSuccAbove j1')
-      ((c ∘ i1.succSuccAbove j1) ∘ i2.succSuccAbove j2) id := by
-  apply And.intro (Function.bijective_id)
-  simp only [id_eq, Function.comp_apply]
-  intro i
-  rw [succSuccAbove_comm_apply]
-  · simp [hij1]
-  · simp [hij2]
-
-open Fin in
-lemma PermCond.append_right_succSuccAbove {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
-    {c1 : Fin n1 → C} (i j : Fin (n + 1 + 1)) :
-    PermCond (Fin.append c1 c ∘ (Fin.succSuccAbove (finSumFinEquiv (m := n1) (Sum.inr i))
-        (finSumFinEquiv (m := n1) (Sum.inr j))))
-      (Fin.append c1 (c ∘ (i.succSuccAbove j))) id := by
-  apply And.intro (Function.bijective_id)
-  simp [forall_fin_add, succSuccAbove_comm_natAdd i j, succSuccAbove_natAdd_apply_castAdd i j]
-
-/-- Splitting a list of colours `c : Fin (n + 1) → C` into its first `n` entries and its
-  last entry recovers `c`: the identity permutation matches
-  `Fin.append (c ∘ (Fin.last n).succAbove) ![c (Fin.last n)]` with `c`. -/
-lemma PermCond.append_succ_last {n : ℕ} (c : Fin (n + 1) → C) :
-    PermCond (Fin.append (c ∘ (Fin.last n).succAbove) ![c (Fin.last n)]) c id := by
-  rw [Fin.succAbove_last, on_id]
-  refine Fin.addCases (fun i => ?_) (fun i => ?_)
-  · simp only [Fin.append_left, Function.comp_apply]; rfl
-  · fin_cases i; simp only [Fin.append_right, Matrix.cons_val_fin_one]; rfl
-
-/-- Splitting a list of colours `c : Fin (n + 1) → C` into its first entry and its remaining
-  `n` entries recovers `c`: the canonical reindexing `Fin (1 + n) ≃ Fin (n + 1)` matches
-  `Fin.append ![c 0] (c ∘ Fin.succAbove 0)` with `c`. -/
-lemma PermCond.append_of_first {n : ℕ} (c : Fin (n + 1) → C) :
-    PermCond (Fin.append ![c 0] (c ∘ Fin.succAbove 0)) c (Fin.cast (by grind)) := by
-  refine ⟨(finCongr (by grind)).bijective, fun i => ?_⟩
-  rcases Fin.eq_zero_or_eq_succ i with rfl | ⟨i, rfl⟩
-  · rfl
-  · simpa using congrArg (Fin.append ![c 0] (c ∘ Fin.succ)) (a₁ := Fin.cast _ i.succ)
-      (a₂ := Fin.natAdd 1 i) (by ext; grind)
-
-TODO "Prove that if `σ` satisfies `PermCond c c1 σ` then `PermCond.inv σ h`
-  satisfies `PermCond c1 c (PermCond.inv σ h)`."
-
-lemma fin_cast_permCond (n n1 : ℕ) {c : Fin n → C} (h : n1 = n) :
-    PermCond c (c ∘ Fin.cast h) (Fin.cast h) := by
-  apply And.intro
-  · exact Equiv.bijective (finCongr h)
-  · intro i
-    rfl
 
 /-!
 
@@ -814,18 +541,18 @@ lemma fin_cast_permCond (n n1 : ℕ) {c : Fin n → C} (h : n1 = n) :
 
 -/
 
-/-- Given a permutation `σ : Fin m → Fin n` of indices satisfying `PermCond` through `h`,
+/-- Given a permutation `σ : Fin m → Fin n` of indices satisfying `IsReindexing` through `h`,
   and a pure tensor `p`, `permP σ h p` is the pure tensor permuted according to `σ`.
 
   For example if `m = n = 2` and `σ = ![1, 0]`, and `p = v ⊗ₜ w` then
   `permP σ _ p = w ⊗ₜ v`. -/
 def Pure.permP {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) (p : Pure S c) : Pure S c1 :=
+    (σ : Fin m → Fin n) (h : IsReindexing c c1 σ) (p : Pure S c) : Pure S c1 :=
   fun i => LinearEquiv.cast (R := k) (by simp [h.preserve_color]) (p (σ i))
 
 @[simp]
 lemma Pure.permP_basisVector {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) (φ : ComponentIdx (S := S) c) :
+    (σ : Fin m → Fin n) (h : IsReindexing c c1 σ) (φ : ComponentIdx (S := S) c) :
     Pure.permP σ h (Pure.basisVector c φ) =
     Pure.basisVector c1 (fun i => basisIdxCongr (by simp [h.preserve_color]) (φ (σ i))) := by
   ext i
@@ -839,7 +566,7 @@ lemma Pure.permP_basisVector {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   simp [h.preserve_color]
 
 lemma Pure.permP_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (g : G) (p : Pure S c) :
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (g : G) (p : Pure S c) :
     Pure.permP σ h (g • p) = g • Pure.permP σ h p := by
   ext i
   simp only [permP, actionP_eq]
@@ -850,16 +577,16 @@ lemma Pure.permP_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   subst h2
   simp
 
-/-- Given a permutation `σ : Fin m → Fin n` of indices satisfying `PermCond` through `h`,
+/-- Given a permutation `σ : Fin m → Fin n` of indices satisfying `IsReindexing` through `h`,
   and a tensor `t`, `permT σ h t` is the tensor tensor permuted according to `σ`. -/
 noncomputable def permT {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    (σ : Fin m → Fin n) (h : PermCond c c1 σ) : S.Tensor c →ₗ[k] S.Tensor c1 :=
+    (σ : Fin m → Fin n) (h : IsReindexing c c1 σ) : S.Tensor c →ₗ[k] S.Tensor c1 :=
   PiTensorProduct.map (fun i => LinearEquiv.cast (R := k) (M := V)
     (by simp : c (h.toEquiv.symm i) = c1 i)) ∘ₗ
   (PiTensorProduct.reindex k _ h.toEquiv).toLinearMap
 
 lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (p : Pure S c) :
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (p : Pure S c) :
     permT σ h p.toTensor = (p.permP σ h).toTensor := by
   simp only [permT, Pure.toTensor, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
     PiTensorProduct.reindex_tprod, PiTensorProduct.map_tprod, LinearEquiv.cast_apply]
@@ -868,14 +595,14 @@ lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_id_self {n : ℕ} {c : Fin n → C} (p : Pure S c) :
-    Pure.permP (id : Fin n → Fin n) (by simp : PermCond c c id) p = p := by
+    Pure.permP (id : Fin n → Fin n) (by simp : IsReindexing c c id) p = p := by
   ext i
   simp [Pure.permP]
 
 @[simp]
 lemma permT_id_self {n : ℕ} {c : Fin n → C} (t : S.Tensor c) :
-    permT (id : Fin n → Fin n) (by simp : PermCond c c id) t = t := by
-  let P (t : S.Tensor c) := permT (id : Fin n → Fin n) (by simp : PermCond c c id) t = t
+    permT (id : Fin n → Fin n) (by simp : IsReindexing c c id) t = t := by
+  let P (t : S.Tensor c) := permT (id : Fin n → Fin n) (by simp : IsReindexing c c id) t = t
   change P t
   apply induction_on_pure
   · intro p
@@ -888,20 +615,20 @@ lemma permT_id_self {n : ℕ} {c : Fin n → C} (t : S.Tensor c) :
     simp [P, h1, h2]
 
 lemma permT_congr_eq_id {n : ℕ} {c : Fin n → C} (t : S.Tensor c)
-    (σ : Fin n → Fin n) (hσ : PermCond c c σ) (h : σ = id) :
+    (σ : Fin n → Fin n) (hσ : IsReindexing c c σ) (h : σ = id) :
     permT σ (hσ) t = t := by
   subst h
   simp
 
 lemma permT_congr_eq_id' {n : ℕ} {c : Fin n → C} (t t1 : S.Tensor c)
-    (σ : Fin n → Fin n) (hσ : PermCond c c σ) (h : σ = id) (ht : t = t1) :
+    (σ : Fin n → Fin n) (hσ : IsReindexing c c σ) (h : σ = id) (ht : t = t1) :
     permT σ (hσ) t = t1 := by
   subst h ht
   simp
 
 @[simp]
 lemma permT_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (g : G) (t : S.Tensor c) :
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (g : G) (t : S.Tensor c) :
     permT σ h (g • t) = g • permT σ h t := by
   apply induction_on_pure (t := t)
   · intro p
@@ -916,7 +643,7 @@ lemma permT_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 
 @[congr]
 lemma Pure.permP_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ σ1 : Fin m → Fin n} {h : PermCond c c1 σ} {h1 : PermCond c c1 σ1}
+    {σ σ1 : Fin m → Fin n} {h : IsReindexing c c1 σ} {h1 : IsReindexing c c1 σ1}
     {p p1 : Pure S c} (hmap : σ = σ1) (hpure : p = p1) :
     Pure.permP σ h p = Pure.permP σ1 h1 p1 := by
   subst hmap hpure
@@ -924,7 +651,7 @@ lemma Pure.permP_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 
 @[congr]
 lemma permT_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ σ1 : Fin m → Fin n} {h : PermCond c c1 σ} {h1 : PermCond c c1 σ1}
+    {σ σ1 : Fin m → Fin n} {h : IsReindexing c c1 σ} {h1 : IsReindexing c c1 σ1}
     (hmap : σ = σ1) {t t1: S.Tensor c} (htensor : t = t1) :
     permT σ h t = permT σ1 h1 t1 := by
   subst hmap htensor
@@ -933,18 +660,18 @@ lemma permT_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_permP {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fin m2 → C}
-    {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : PermCond c c1 σ) (h2 : PermCond c1 c2 σ2)
-    (p : Pure S c) :
-    Pure.permP σ2 h2 (Pure.permP σ h p) = Pure.permP (σ ∘ σ2) (PermCond.comp h h2) p := by
+    {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : IsReindexing c c1 σ)
+    (h2 : IsReindexing c1 c2 σ2) (p : Pure S c) :
+    Pure.permP σ2 h2 (Pure.permP σ h p) = Pure.permP (σ ∘ σ2) (h.comp h2) p := by
   ext i
   simp [permP, Pure.permP, Function.comp_apply]
 
 @[simp]
 lemma permT_permT {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fin m2 → C}
-    {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : PermCond c c1 σ) (h2 : PermCond c1 c2 σ2)
-    (t : S.Tensor c) :
-    permT σ2 h2 (permT σ h t) = permT (σ ∘ σ2) (PermCond.comp h h2) t := by
-  let P (t : S.Tensor c) := permT σ2 h2 (permT σ h t) = permT (σ ∘ σ2) (PermCond.comp h h2) t
+    {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : IsReindexing c c1 σ)
+    (h2 : IsReindexing c1 c2 σ2) (t : S.Tensor c) :
+    permT σ2 h2 (permT σ h t) = permT (σ ∘ σ2) (h.comp h2) t := by
+  let P (t : S.Tensor c) := permT σ2 h2 (permT σ h t) = permT (σ ∘ σ2) (h.comp h2) t
   change P t
   apply induction_on_basis
   · intro b
@@ -959,11 +686,11 @@ lemma permT_permT {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fi
     simp_all [P]
 
 lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (t : S.Tensor c)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (t : S.Tensor c)
     (φ : ComponentIdx c1) :
     (basis c1).repr (permT σ h t) φ =
     (basis c).repr t (fun i =>
-      basisIdxCongr (by simp [PermCond.inv_perserve_color]) (φ (h.inv σ i))) := by
+      basisIdxCongr (by simp [IsReindexing.inv_perserve_color]) (φ (h.inv σ i))) := by
   apply induction_on_basis (t := t)
   · intro b'
     rw [basis_apply]
@@ -975,10 +702,12 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
     apply Iff.intro
     · intro h'
       funext x
-      simpa [← h'] using ComponentIdx.congr_right _ _ _ (PermCond.inv_apply_apply σ h x).symm
+      simpa [← h'] using ComponentIdx.congr_right _ _ _
+        (IsReindexing.inv_apply_apply σ h x).symm
     · intro h'
       funext x
-      simpa [h'] using (ComponentIdx.congr_right _ _ _ (PermCond.apply_inv_apply σ h x).symm).symm
+      simpa [h'] using (ComponentIdx.congr_right _ _ _
+        (IsReindexing.apply_inv_apply σ h x).symm).symm
   · simp
   · intro r t h
     simp [h]
@@ -986,7 +715,7 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
     simp [h1, h2]
 
 lemma permT_basis {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (b : ComponentIdx c) :
     (permT σ h) (basis (S := S) c b) = basis c1 (fun i =>
       basisIdxCongr (by simp [h.2]) (b (σ i))) := by
@@ -1001,24 +730,24 @@ lemma permT_basis {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     rw [h]
     ext i
     simp only [basisIdxCongr_apply_apply]
-    refine Eq.symm (ComponentIdx.congr_right b' i (PermCond.inv σ _ (σ i)) ?_)
-    simp [PermCond.apply_inv_apply]
+    refine Eq.symm (ComponentIdx.congr_right b' i (IsReindexing.inv σ _ (σ i)) ?_)
+    simp [IsReindexing.apply_inv_apply]
   · rintro rfl
     ext i
     simp only [basisIdxCongr_apply_apply]
     apply ComponentIdx.congr_right
-    simp [PermCond.inv_apply_apply]
+    simp [IsReindexing.inv_apply_apply]
 
 lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (t : S.Tensor c) :
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (t : S.Tensor c) :
     permT σ h t = 0 ↔ t = 0 := by
   apply Iff.intro
   · intro h'
-    trans permT (h.inv σ) (PermCond.symm h) ((permT σ h) t)
+    trans permT (h.inv σ) (IsReindexing.symm h) ((permT σ h) t)
     · rw [permT_permT]
       rw [permT_congr_eq_id']
       · funext x
-        simp [PermCond.inv_apply_apply]
+        simp [IsReindexing.inv_apply_apply]
       · rfl
     · rw [h']
       simp
@@ -1051,7 +780,8 @@ lemma toField_pure {c : Fin 0 → C} (p : Pure S c) :
   ext i
   exact Fin.elim0 i
 
-lemma toField_permT {c c1 : Fin 0 → C} (σ : Fin 0 → Fin 0) (h : PermCond c c1 σ) (t : S.Tensor c) :
+lemma toField_permT {c c1 : Fin 0 → C} (σ : Fin 0 → Fin 0)
+    (h : IsReindexing c c1 σ) (t : S.Tensor c) :
     toField (permT σ h t) = toField t := by
   induction' t using induction_on_basis with b r t ht t1 t2 h1 h2
   · simp [toField_pure, basis_apply, permT_pure]

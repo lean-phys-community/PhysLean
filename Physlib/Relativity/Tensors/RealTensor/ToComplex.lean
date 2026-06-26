@@ -525,16 +525,16 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
 ## C. Compatibility with permutations: `permT`
 
 We first show that complexification is compatible with permutation of tensor
-slots. On colours this is encoded in the `PermCond` predicate, and on tensors
+slots. On colours this is encoded in the `IsReindexing` predicate, and on tensors
 by the operator `permT`.
 
 -/
 
-/-- The `PermCond` condition is preserved under `colorToComplex`. -/
-@[simp] lemma permCond_colorToComplex {n m : ℕ}
+/-- The `IsReindexing` condition is preserved under `colorToComplex`. -/
+@[simp] lemma isReindexing_colorToComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) :
-    PermCond (colorToComplex ∘ c) (colorToComplex ∘ c1) σ := by
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) :
+    IsReindexing (colorToComplex ∘ c) (colorToComplex ∘ c1) σ := by
   refine And.intro h.1 ?_
   intro i
   simpa [Function.comp_apply] using congrArg colorToComplex (h.2 i)
@@ -542,7 +542,7 @@ by the operator `permT`.
 /-- `permT` sends basis vectors to basis vectors. -/
 @[simp] lemma permT_basis_real {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (b : ComponentIdx (S := realLorentzTensor) c) :
     permT (S := realLorentzTensor) σ h ((Tensor.basis (S := realLorentzTensor) c) b)
     = (Tensor.basis (S := realLorentzTensor) c1)
@@ -552,7 +552,7 @@ by the operator `permT`.
 
 @[simp] lemma permT_basis_complex {n m : ℕ}
     {c : Fin n → complexLorentzTensor.Color} {c1 : Fin m → complexLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (b : ComponentIdx (S := complexLorentzTensor) c) :
     permT (S := complexLorentzTensor) σ h ((Tensor.basis (S := complexLorentzTensor) c) b)
       =
@@ -570,14 +570,14 @@ by the operator `permT`.
 lemma permT_toComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color}
     {c1 : Fin m → realLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (t : ℝT(3, c)) :
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (t : ℝT(3, c)) :
     toComplex (permT (S := realLorentzTensor) σ h t)
       =
-    permT (S := complexLorentzTensor) σ (permCond_colorToComplex (c := c) (c1 := c1) h)
+    permT (S := complexLorentzTensor) σ (isReindexing_colorToComplex (c := c) (c1 := c1) h)
       (toComplex (c := c) t) := by
   classical
-  let h' : PermCond (colorToComplex ∘ c) (colorToComplex ∘ c1) σ :=
-    permCond_colorToComplex (c := c) (c1 := c1) h
+  let h' : IsReindexing (colorToComplex ∘ c) (colorToComplex ∘ c1) σ :=
+    isReindexing_colorToComplex (c := c) (c1 := c1) h
   let P : ℝT(3, c) → Prop := fun t =>
     toComplex (permT (S := realLorentzTensor) σ h t)
       =
@@ -625,14 +625,14 @@ lemma colorToComplex_append {n m : ℕ}
   · -- right case: x = natAdd n j
     simp [Fin.append, Function.comp_apply]
 
-lemma permCond_prodTColorToComplex {n m : ℕ}
+lemma isReindexing_prodTColorToComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color} :
-    PermCond (Fin.append (colorToComplex ∘ c) (colorToComplex ∘ c1))
+    IsReindexing (Fin.append (colorToComplex ∘ c) (colorToComplex ∘ c1))
       (colorToComplex ∘ Fin.append c c1)
       (id : Fin (n + m) → Fin (n + m)) := by
-  -- For `σ = id`, `PermCond.on_id` reduces the goal to pointwise color equality.
+  -- For `σ = id`, `IsReindexing.on_id` reduces the goal to pointwise color equality.
   -- Here that equality is exactly `colorToComplex_append`.
-  apply (PermCond.on_id
+  apply (IsReindexing.on_id
     (c := Fin.append (colorToComplex ∘ c) (colorToComplex ∘ c1))
     (c1 := colorToComplex ∘ Fin.append c c1)).2
   intro x
@@ -649,7 +649,7 @@ noncomputable def prodTColorToComplex {n m : ℕ}
     ℂT(colorToComplex ∘ c) → ℂT(colorToComplex ∘ c1) → ℂT(colorToComplex ∘ Fin.append c c1) :=
   fun x y =>
     permT (S := complexLorentzTensor) (σ := (id : Fin (n + m) → Fin (n + m)))
-      (permCond_prodTColorToComplex (c := c) (c1 := c1))
+      (isReindexing_prodTColorToComplex (c := c) (c1 := c1))
       (prodT (S := complexLorentzTensor) x y)
 
 private lemma cast_componentIdx_apply {n : ℕ} {c c' : Fin n → complexLorentzTensor.Color}
