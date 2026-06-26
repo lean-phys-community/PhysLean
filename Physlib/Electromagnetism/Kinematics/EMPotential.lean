@@ -94,6 +94,15 @@ instance {d} : CoeFun (ElectromagneticPotential d)
     (fun _ => SpaceTime d → Lorentz.Vector d) where
   coe A := A.val
 
+instance {d} : Zero (ElectromagneticPotential d) where
+  zero := ⟨fun _ => 0⟩
+
+@[simp]
+lemma zero_val {d} : (0 : ElectromagneticPotential d).val = 0 := rfl
+
+@[simp]
+lemma zero_apply {d} (x : SpaceTime d) : (0 : ElectromagneticPotential d) x = 0 := rfl
+
 instance {d} : Add (ElectromagneticPotential d) where
   add A B := ⟨fun x => A x + B x⟩
 
@@ -101,8 +110,50 @@ instance {d} : Add (ElectromagneticPotential d) where
 lemma add_val {d} (A B : ElectromagneticPotential d) :
     (A + B).val = A.val + B.val := rfl
 
+@[simp]
 lemma add_apply {d} (A B : ElectromagneticPotential d) (x : SpaceTime d) :
     (A + B) x = A x + B x := by simp
+
+instance {d} : Neg (ElectromagneticPotential d) where
+  neg A := ⟨fun x => - A x⟩
+
+@[simp]
+lemma neg_val {d} (A : ElectromagneticPotential d) :
+    (- A).val = - A.val := rfl
+
+@[simp]
+lemma neg_apply {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
+    (- A) x = - A x := rfl
+
+instance {d} : Sub (ElectromagneticPotential d) where
+  sub A B := ⟨fun x => A x - B x⟩
+
+@[simp]
+lemma sub_val {d} (A B : ElectromagneticPotential d) :
+    (A - B).val = A.val - B.val := rfl
+
+@[simp]
+lemma sub_apply {d} (A B : ElectromagneticPotential d) (x : SpaceTime d) :
+    (A - B) x = A x - B x := rfl
+
+instance {d} : AddCommGroup (ElectromagneticPotential d) where
+  add_assoc A B C := by
+    ext x μ
+    simp [add_assoc]
+  zero_add A := by
+    ext x μ
+    simp
+  add_zero A := by
+    ext x μ
+    simp
+  neg_add_cancel A := by
+    ext x μ
+    simp
+  add_comm A B := by
+    ext x μ
+    simp [add_comm]
+  nsmul := nsmulRec
+  zsmul := zsmulRec
 
 noncomputable instance {d} : SMul ℝ (ElectromagneticPotential d) where
   smul r A := ⟨fun x => r • A x⟩
@@ -111,6 +162,7 @@ noncomputable instance {d} : SMul ℝ (ElectromagneticPotential d) where
 lemma smul_val {d} (r : ℝ) (A : ElectromagneticPotential d) :
     (r • A).val = r • A.val := rfl
 
+@[simp]
 lemma smul_apply {d} (r : ℝ) (A : ElectromagneticPotential d) (x : SpaceTime d) :
     (r • A) x = r • A x := by simp
 

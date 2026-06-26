@@ -32,6 +32,7 @@ We define a tensor version and a matrix version and prover various properties of
   - A.3. The group action acting on the field strength tensor
   - A.4. Differentiability and smoothness of the field strength tensor
   - A.5. Elements of the field strength tensor in terms of basis
+    - A.5.1. Index evaluation
   - A.6. The field strength matrix
     - A.6.1. Differentiability of the field strength matrix
   - A.7. The antisymmetry of the field strength tensor
@@ -201,9 +202,6 @@ lemma toFieldStrength_eq_sum_basis_single {d} {A : ElectromagneticPotential d}
     exact id (Ne.symm hb)
   · simp
 
-TODO "Add a section in this file on the evaluation of the field strength tensor's indices.
-  I.e. equalitites related to `toField {A.toFieldStrength x| [μ] [ν]}ᵀ`."
-
 /-!
 
 ## A.3. The group action acting on the field strength tensor
@@ -369,6 +367,47 @@ lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) �
 
 /-!
 
+#### A.5.1. Index evaluation
+
+These lemmas express the components of the field strength tensor using index evaluation.
+
+-/
+
+/-- Evaluating both tensor indices of the field strength gives the coefficient in the
+standard tensor-product basis. -/
+lemma toFieldStrength_eval_eq_basis_repr {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
+    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr
+      (A.toFieldStrength x) (μ, ν) := by
+  trans (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr
+    (A.toFieldStrength x) (μ, ν)
+  · conv_rhs =>
+      rw [prod_eq_sum_eval Vector.basis_eq_map_tensor_basis
+        Vector.basis_eq_map_tensor_basis (A.toFieldStrength x)]
+    simp [Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
+  · rfl
+
+/-- The evaluated components of the field strength tensor in terms of derivatives of the
+electromagnetic potential. -/
+lemma toFieldStrength_eval_apply {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
+    ∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ) := by
+  rw [toFieldStrength_eval_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply (μν := (μ, ν)) A x
+
+/-- The evaluated components of the field strength tensor after using diagonal form of the
+Minkowski metric. -/
+lemma toFieldStrength_eval_apply_eq_single {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
+    η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ := by
+  rw [toFieldStrength_eval_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply_eq_single (μν := (μ, ν)) A x
+
+/-!
+
 ### A.6. The field strength matrix
 
 We define the field strength matrix to be the matrix representation of the field strength tensor
@@ -385,6 +424,13 @@ noncomputable abbrev fieldStrengthMatrix {d} (A : ElectromagneticPotential d) (x
 lemma fieldStrengthMatrix_eq {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     A.fieldStrengthMatrix x =
     (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x) := by rfl
+
+/-- Index evaluation of the field strength tensor agrees with the corresponding component of
+the field strength matrix. -/
+lemma toFieldStrength_eval_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ = A.fieldStrengthMatrix x (μ, ν) := by
+  rw [toFieldStrength_eval_eq_basis_repr, fieldStrengthMatrix_eq]
 
 lemma fieldStrengthMatrix_eq_tensor_basis_repr {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (μ ν : (Fin 1 ⊕ Fin d)) :
