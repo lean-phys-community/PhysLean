@@ -32,7 +32,7 @@ We define a tensor version and a matrix version and prover various properties of
   - A.3. The group action acting on the field strength tensor
   - A.4. Differentiability and smoothness of the field strength tensor
   - A.5. Elements of the field strength tensor in terms of basis
-    - A.5.1. Component evaluations
+    - A.5.1. Index evaluation
   - A.6. The field strength matrix
     - A.6.1. Differentiability of the field strength matrix
   - A.7. The antisymmetry of the field strength tensor
@@ -367,42 +367,46 @@ lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) �
 
 /-!
 
-#### A.5.1. Component evaluations
+#### A.5.1. Index evaluation
+
+These lemmas express the components of the field strength tensor using index evaluation.
 
 -/
 
-open ContDiff
-
-/-- Tensor-index evaluation of the field strength agrees with its standard basis coefficient. -/
-lemma toField_toFieldStrength_eq_basis_repr {d} (A : ElectromagneticPotential d)
+/-- Evaluating both tensor indices of the field strength gives the coefficient in the
+standard tensor-product basis. -/
+lemma toFieldStrength_eval_eq_basis_repr {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
-    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x)
-      (μ, ν) := by
-  rw [show A.toFieldStrength x = ∑ μ, ∑ ν,
-    toField {A.toFieldStrength x | [μ] [ν]}ᵀ •
-      Lorentz.Vector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν by
-    simpa using congrFun (toFieldStrength_eq_sum_basis_eval (A := A)) x]
-  simp [Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
+    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr
+      (A.toFieldStrength x) (μ, ν) := by
+  trans (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr
+    (A.toFieldStrength x) (μ, ν)
+  · conv_rhs =>
+      rw [prod_eq_sum_eval Vector.basis_eq_map_tensor_basis
+        Vector.basis_eq_map_tensor_basis (A.toFieldStrength x)]
+    simp [Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
+  · rfl
 
-/-- The component form of the field strength tensor, evaluated using tensor index notation. -/
-lemma toField_toFieldStrength_apply {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
-    (μ ν : Fin 1 ⊕ Fin d) :
+/-- The evaluated components of the field strength tensor in terms of derivatives of the
+electromagnetic potential. -/
+lemma toFieldStrength_eval_apply {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
-    ∑ κ, ((η μ κ * ∂_ κ A x ν) - η ν κ * ∂_ κ A x μ) := by
-  rw [toField_toFieldStrength_eq_basis_repr]
-  exact toFieldStrength_basis_repr_apply A x
+    ∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ) := by
+  rw [toFieldStrength_eval_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply (μν := (μ, ν)) A x
 
-/-- The component form of the field strength tensor, using the diagonal form of the
+/-- The evaluated components of the field strength tensor after using diagonal form of the
 Minkowski metric. -/
-lemma toField_toFieldStrength_apply_eq_single {d} (A : ElectromagneticPotential d)
+lemma toFieldStrength_eval_apply_eq_single {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
     η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ := by
-  rw [toField_toFieldStrength_eq_basis_repr]
-  exact toFieldStrength_basis_repr_apply_eq_single A x
+  rw [toFieldStrength_eval_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply_eq_single (μν := (μ, ν)) A x
 
-lemma differentiable_toField_toFieldStrength {d} {A : ElectromagneticPotential d}
+lemma differentiable_toFieldStrength_eval {d} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ 2 A) :
     Differentiable ℝ (fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) := by
   have diff_partial (μ) :
@@ -412,7 +416,7 @@ lemma differentiable_toField_toFieldStrength {d} {A : ElectromagneticPotential d
     · exact ((contDiff_succ_iff_fderiv (n := 1)).mp hA).2.2.differentiable
         (by simp)
     · fun_prop
-  conv => enter [2, x]; rw [toField_toFieldStrength_apply_eq_single,
+  conv => enter [2, x]; rw [toFieldStrength_eval_apply_eq_single,
     SpaceTime.deriv_eq, SpaceTime.deriv_eq]
   apply Differentiable.sub
   apply Differentiable.const_mul
@@ -420,7 +424,7 @@ lemma differentiable_toField_toFieldStrength {d} {A : ElectromagneticPotential d
   apply Differentiable.const_mul
   · exact diff_partial _ _
 
-lemma differentiable_space_toField_toFieldStrength {d} {A : ElectromagneticPotential d}
+lemma differentiable_space_toFieldStrength_eval {d} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ 2 A) (t : Time) {c : SpeedOfLight} :
     Differentiable ℝ
       (fun x => toField {A.toFieldStrength ((toTimeAndSpace c).symm (t, x)) | [μ] [ν]}ᵀ) := by
@@ -428,10 +432,10 @@ lemma differentiable_space_toField_toFieldStrength {d} {A : ElectromagneticPoten
     ((fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) ∘
       fun x => (toTimeAndSpace c).symm (t, x))
   refine Differentiable.comp ?_ ?_
-  · exact differentiable_toField_toFieldStrength hA
+  · exact differentiable_toFieldStrength_eval hA
   · fun_prop
 
-lemma differentiable_time_toField_toFieldStrength {d} {A : ElectromagneticPotential d}
+lemma differentiable_time_toFieldStrength_eval {d} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ 2 A) (x : Space d) {c : SpeedOfLight} :
     Differentiable ℝ
       (fun t => toField {A.toFieldStrength ((toTimeAndSpace c).symm (t, x)) | [μ] [ν]}ᵀ) := by
@@ -439,13 +443,13 @@ lemma differentiable_time_toField_toFieldStrength {d} {A : ElectromagneticPotent
     ((fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) ∘
       fun t => (toTimeAndSpace c).symm (t, x))
   refine Differentiable.comp ?_ ?_
-  · exact differentiable_toField_toFieldStrength hA
+  · exact differentiable_toFieldStrength_eval hA
   · fun_prop
 
-lemma contDiff_toField_toFieldStrength {d} {n : WithTop ℕ∞} {A : ElectromagneticPotential d}
+lemma contDiff_toFieldStrength_eval {d} {n : WithTop ℕ∞} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ (n + 1) A) :
     ContDiff ℝ n (fun x => toField {A.toFieldStrength x | [μ] [ν]}ᵀ) := by
-  conv => enter [3, x]; rw [toField_toFieldStrength_apply_eq_single,
+  conv => enter [3, x]; rw [toFieldStrength_eval_apply_eq_single,
     SpaceTime.deriv_eq, SpaceTime.deriv_eq]
   apply ContDiff.sub
   apply ContDiff.mul
@@ -463,20 +467,20 @@ lemma contDiff_toField_toFieldStrength {d} {n : WithTop ℕ∞} {A : Electromagn
     · exact ContDiff.fderiv_right (m := n) hA (by rfl)
     · fun_prop
 
-lemma toField_toFieldStrength_antisymm {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
+lemma toFieldStrength_eval_antisymm {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
     - toField {A.toFieldStrength x | [ν] [μ]}ᵀ := by
-  rw [toField_toFieldStrength_apply, toField_toFieldStrength_apply]
+  rw [toFieldStrength_eval_apply, toFieldStrength_eval_apply]
   rw [← Finset.sum_neg_distrib]
   apply Finset.sum_congr rfl (fun κ _ => ?_)
   simp
 
 @[simp]
-lemma toField_toFieldStrength_diag_eq_zero {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
+lemma toFieldStrength_eval_diag_eq_zero {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (μ : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [μ]}ᵀ = 0 := by
-  rw [toField_toFieldStrength_apply_eq_single]
+  rw [toFieldStrength_eval_apply_eq_single]
   simp
 
 /-!
@@ -496,6 +500,13 @@ noncomputable abbrev fieldStrengthMatrix {d} (A : ElectromagneticPotential d) (x
 lemma fieldStrengthMatrix_eq {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     A.fieldStrengthMatrix x =
     (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x) := by rfl
+
+/-- Index evaluation of the field strength tensor agrees with the corresponding component of
+the field strength matrix. -/
+lemma toFieldStrength_eval_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ = A.fieldStrengthMatrix x (μ, ν) := by
+  rw [toFieldStrength_eval_eq_basis_repr, fieldStrengthMatrix_eq]
 
 lemma fieldStrengthMatrix_eq_tensor_basis_repr {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (μ ν : (Fin 1 ⊕ Fin d)) :

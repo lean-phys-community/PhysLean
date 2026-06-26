@@ -322,13 +322,13 @@ lemma inner_sum'{ι : Type*} [Fintype ι] (x : E) (g : ι → E) :
   have h1 := inner_sum (𝕜 := 𝕜) (E:=WithLp 2 E) (x := WithLp.toLp 2 x)
     (f := fun i => WithLp.toLp 2 (g i))
   convert h1 (Finset.univ)
-  rw [← ofLp_inner_left]
-  simp only
-  congr
-  change _ = (WithLp.linearEquiv 2 𝕜 E) _
-  simp only [map_sum, WithLp.linearEquiv_apply, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
-    EquivLike.coe_coe, WithLp.addEquiv_apply]
-  rfl
+  · rw [← ofLp_inner_left]
+    simp only
+    congr
+    change _ = (WithLp.linearEquiv 2 𝕜 E) _
+    simp only [map_sum, WithLp.linearEquiv_apply, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
+      EquivLike.coe_coe, WithLp.addEquiv_apply]
+  · rfl
 
 @[fun_prop]
 lemma Continuous.inner' {α} [TopologicalSpace α] (f g : α → E)
@@ -598,56 +598,56 @@ lemma _root_.isBoundedBilinearMap_inner' :
     simp_all
     intro x y
     trans |‖x‖₂| * |‖y‖₂|
-    change |@inner ℝ (WithLp 2 E) _ _ _| ≤ _
-    have h1 := norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x) (WithLp.toLp 2 y)
-    simp at h1
-    apply h1.trans
-    apply le_of_eq
-    congr
-    rw [norm_withLp2_eq_norm2]
-    rfl
-    rw [norm_withLp2_eq_norm2]
-    rfl
-    have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := by
-      apply le_of_sq_le_sq
-      simp [@mul_pow]
-      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
-      simp only [re_to_real]
-      apply (h x).2.trans
+    · change |@inner ℝ (WithLp 2 E) _ _ _| ≤ _
+      have h1 := norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x) (WithLp.toLp 2 y)
+      simp at h1
+      apply h1.trans
       apply le_of_eq
-      simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-        pow_eq_zero_iff, norm_eq_zero]
-      left
-      refine Eq.symm (Real.sq_sqrt ?_)
-      linarith
-      apply mul_nonneg
-      exact Real.sqrt_nonneg d
-      exact norm_nonneg x
-    have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := by
-      apply le_of_sq_le_sq
-      simp [@mul_pow]
-      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
-      simp only [re_to_real]
-      apply (h y).2.trans
-      apply le_of_eq
-      simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-        pow_eq_zero_iff, norm_eq_zero]
-      left
-      refine Eq.symm (Real.sq_sqrt ?_)
-      linarith
-      apply mul_nonneg
-      exact Real.sqrt_nonneg d
-      exact norm_nonneg y
-    trans (√ d * ‖x‖) * (√ d * ‖y‖)
-    refine mul_le_mul_of_nonneg h1 h2 ?_ ?_
-    exact abs_nonneg ‖x‖₂
-    apply mul_nonneg
-    exact Real.sqrt_nonneg d
-    exact norm_nonneg y
-    apply le_of_eq
-    ring_nf
-    rw [Real.sq_sqrt]
-    ring
-    linarith
+      congr
+      · rw [norm_withLp2_eq_norm2]
+        rfl
+      · rw [norm_withLp2_eq_norm2]
+        rfl
+    · have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := by
+        apply le_of_sq_le_sq
+        · simp [@mul_pow]
+          rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
+          simp only [re_to_real]
+          apply (h x).2.trans
+          apply le_of_eq
+          simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+            pow_eq_zero_iff, norm_eq_zero]
+          left
+          refine Eq.symm (Real.sq_sqrt ?_)
+          linarith
+        · apply mul_nonneg
+          · exact Real.sqrt_nonneg d
+          · exact norm_nonneg x
+      have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := by
+        apply le_of_sq_le_sq
+        · simp [@mul_pow]
+          rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
+          simp only [re_to_real]
+          apply (h y).2.trans
+          apply le_of_eq
+          simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+            pow_eq_zero_iff, norm_eq_zero]
+          left
+          refine Eq.symm (Real.sq_sqrt ?_)
+          linarith
+        · apply mul_nonneg
+          · exact Real.sqrt_nonneg d
+          · exact norm_nonneg y
+      trans (√ d * ‖x‖) * (√ d * ‖y‖)
+      · refine mul_le_mul_of_nonneg h1 h2 ?_ ?_
+        · exact abs_nonneg ‖x‖₂
+        · apply mul_nonneg
+          · exact Real.sqrt_nonneg d
+          · exact norm_nonneg y
+      · apply le_of_eq
+        ring_nf
+        rw [Real.sq_sqrt]
+        · ring
+        · linarith
 
 end Constructions
