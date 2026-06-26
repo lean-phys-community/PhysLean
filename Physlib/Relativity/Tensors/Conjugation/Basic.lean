@@ -36,7 +36,7 @@ coefficients survive `star` (`conj_contrComm`), which together make conjugation 
 contraction. `conjT` is then `conj`-semilinear, involutive, and commutes with contraction; the
 last makes reality and Hermiticity compatible with raising and lowering indices.
 
-At the single-index level, `slotConj : V c ≃ₛₗ V (bar c)` realises this conjugation: it reads a
+At the single-index level, `conjEquiv : V c ≃ₛₗ V (bar c)` realises this conjugation: it reads a
 vector's coordinates, conjugates them with `ConjModule.starFinsupp`, and re-seats them at the
 conjugate colour. It rests on the conjugate module `ConjModule` (`Physlib.Mathematics.ConjModule`),
 the same vectors with the scalar action twisted by conjugation (`i` acts as `−i`). Equipping the
@@ -51,7 +51,7 @@ genuinely bilinear and `IsHermitian` an honest conjugate-transpose.
 - `ConjTensorSpecies.conjT_contrT` proves that conjugation commutes with contraction.
 - `ConjTensorSpecies.conjT_eq_permT_iff` is the componentwise criterion for
   `conjT t = permT σ h t'`, the workhorse for proving reality and Hermiticity conditions.
-- `ConjTensorSpecies.slotConj` is the single-slot conjugate-linear isomorphism `V c ≃ₛₗ V (bar c)`.
+- `ConjTensorSpecies.conjEquiv` is the single-slot conjugate-linear isomorphism `V c ≃ₛₗ V (bar c)`.
 - `ConjTensorSpecies.IsHermitian` is the structural conjugate-transpose condition on a metric slot.
 
 ## iii. Table of contents
@@ -114,30 +114,6 @@ structure ConjTensorSpecies (k : Type) [CommRing k] [StarRing k] (C : Type) (G :
             b (toTensorSpecies.τ (bar d)) (basisIdxCongr (bar_tau d)
               ((Equiv.cast (barIdx_eq (toTensorSpecies.τ d))).symm x₂)))
 
-namespace TensorSpecies
-
-variable {k : Type} [CommRing k] [StarRing k] {C : Type} {G : Type} [Group G]
-    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
-    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
-    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
-    {S : TensorSpecies k C G V basisIdx rep b}
-
-omit [StarRing k] in
-/-- `componentMap` is the basis representation `(Tensor.basis c).repr` definitionally; this bridges
-the two notations in the contraction and involution proofs below, and in the consuming reality and
-Hermiticity proofs. -/
-lemma componentMap_eq_repr {n : ℕ} (c : Fin n → C) (t : S.Tensor c)
-    (ψ : ComponentIdx (S := S) c) : componentMap c t ψ = (Tensor.basis c).repr t ψ := rfl
-
-omit [StarRing k] in
-/-- Two tensors with the same colour sequence are equal when all their components agree. -/
-private lemma componentMap_ext {n : ℕ} {c : Fin n → C} {t₁ t₂ : S.Tensor c}
-    (h : ∀ b, componentMap c t₁ b = componentMap c t₂ b) : t₁ = t₂ := by
-  rw [← ofComponents_componentMap c t₁, ← ofComponents_componentMap c t₂]
-  congr 1; funext b; exact h b
-
-end TensorSpecies
-
 namespace ConjTensorSpecies
 
 open Tensor
@@ -178,14 +154,14 @@ def conjT {n : ℕ} {c : Fin n → C} (t : S.Tensor c) : S.Tensor (S.bar ∘ c) 
 /-- Conjugation is semilinear: scalar multiplication pulls out as `star r`. -/
 @[simp] lemma conjT_smul {n : ℕ} {c : Fin n → C} (r : k) (t : S.Tensor c) :
     S.conjT (r • t) = star r • S.conjT t := by
-  apply TensorSpecies.componentMap_ext
+  apply componentMap_ext
   intro b
   simp only [componentMap_conjT, map_smul, Pi.smul_apply, smul_eq_mul, star_mul']
 
 /-- Conjugation is additive. -/
 @[simp] lemma conjT_add {n : ℕ} {c : Fin n → C} (t₁ t₂ : S.Tensor c) :
     S.conjT (t₁ + t₂) = S.conjT t₁ + S.conjT t₂ := by
-  apply TensorSpecies.componentMap_ext
+  apply componentMap_ext
   intro b
   simp only [componentMap_conjT, map_add, Pi.add_apply, star_add]
 
@@ -206,7 +182,7 @@ lemma conjT_eq_permT_iff {n m : ℕ} {c : Fin n → C} {c' : Fin m → C}
   · intro H φ
     rw [← H, ← componentMap_eq_repr, componentMap_conjT]
   · intro H
-    apply TensorSpecies.componentMap_ext
+    apply componentMap_ext
     intro φ
     rw [componentMap_conjT]
     exact H φ
@@ -239,7 +215,7 @@ lemma permCond_bar_bar {n : ℕ} (c : Fin n → C) :
 lemma conjT_conjT {n : ℕ} {c : Fin n → C} (t : S.Tensor c) :
     S.conjT (S.conjT t)
       = permT id (S.permCond_bar_bar c) t := by
-  apply TensorSpecies.componentMap_ext
+  apply componentMap_ext
   intro φ
   rw [componentMap_conjT, componentMap_conjT, star_star]
   rw [componentMap_eq_repr (S.bar ∘ S.bar ∘ c), permT_basis_repr_symm_apply,
@@ -274,7 +250,7 @@ lemma conjT_contrT {n : ℕ} {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
     (h : i ≠ j ∧ S.τ (c i) = c j) (t : S.Tensor c) :
     S.conjT (contrT n i j h t)
       = contrT n i j (S.contrCond_bar h) (S.conjT t) := by
-  apply TensorSpecies.componentMap_ext
+  apply componentMap_ext
   intro φ
   rw [componentMap_conjT, componentMap_eq_repr, Tensor.contrT_basis_repr_apply]
   have hrhs := Tensor.contrT_basis_repr_apply (S := S.toTensorSpecies) (c := S.bar ∘ c)
@@ -311,7 +287,7 @@ lemma conjT_contrT {n : ℕ} {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
 
 ## E. The slot conjugation
 
-`slotConj` is the conjugate-linear isomorphism `V c ≃ₛₗ[starRingEnd k] V (bar c)`: read off the
+`conjEquiv` is the conjugate-linear isomorphism `V c ≃ₛₗ[starRingEnd k] V (bar c)`: read off the
 coordinates of a vector in the species basis, conjugate them (`star`), and re-seat them as the
 coordinates at the conjugate colour (the index sets agree by `barIdx_eq`). It is the single-slot
 shadow of `conjT`, packaged as a bundled equivalence so the Hermitian-metric layer can apply it to a
@@ -322,22 +298,22 @@ involutivity together with `bar`'s.
 
 /-- The conjugate-linear slot isomorphism `V c ≃ₛₗ[starRingEnd k] V (bar c)`: conjugate the
 coordinates in the species basis and relabel to the conjugate colour via `barIdx_eq`. -/
-def slotConj {c : C} : V c ≃ₛₗ[starRingEnd k] V (S.bar c) :=
+def conjEquiv {c : C} : V c ≃ₛₗ[starRingEnd k] V (S.bar c) :=
   ((b c).repr.trans (ConjModule.starFinsupp (k := k))).trans
     ((Finsupp.domLCongr (Equiv.cast (S.barIdx_eq c).symm)).trans (b (S.bar c)).repr.symm)
 
-/-- `slotConj` on a basis vector: `b c i ↦ b (bar c) i` (relabelled through `barIdx_eq`), since the
+/-- `conjEquiv` on a basis vector: `b c i ↦ b (bar c) i` (relabelled through `barIdx_eq`), since the
 basis coordinates of `b c i` are the indicator at `i` and `star` fixes `0` and `1`. -/
-@[simp] lemma slotConj_basis {c : C} (i : basisIdx c) :
-    S.slotConj (b c i) = b (S.bar c) (Equiv.cast (S.barIdx_eq c).symm i) := by
-  simp [slotConj, ConjModule.starFinsupp, Finsupp.domLCongr_apply, Finsupp.mapRange_single]
+@[simp] lemma conjEquiv_basis {c : C} (i : basisIdx c) :
+    S.conjEquiv (b c i) = b (S.bar c) (Equiv.cast (S.barIdx_eq c).symm i) := by
+  simp [conjEquiv, ConjModule.starFinsupp, Finsupp.domLCongr_apply, Finsupp.mapRange_single]
 
 /-!
 
 ## F. Hermitian pairings
 
 A metric slot pairs a colour `c` with its conjugate `bar c`. `IsHermitian` is the structural form of
-`g_{IJ̄} = conj g_{JĪ}`: conjugating and swapping the two slots through `slotConj` returns `g`'s
+`g_{IJ̄} = conj g_{JĪ}`: conjugating and swapping the two slots through `conjEquiv` returns `g`'s
 `star`. Because `V c` and `V (bar c)` are genuinely different modules this is the honest
 conjugate-transpose, not a bare `g = g.flip`. The condition is fixed here as `IsHermitian`; a
 downstream metric layer instantiates it for a concrete pairing.
@@ -346,10 +322,10 @@ downstream metric layer instantiates it for a concrete pairing.
 
 open scoped TensorProduct in
 /-- A pairing `g : V c ⊗ V (bar c) → k` is Hermitian when conjugating and swapping its two slots
-via `slotConj` returns its `star`: `g (x ⊗ y) = star (g (slotConj.symm y ⊗ slotConj x))`. -/
+via `conjEquiv` returns its `star`: `g (x ⊗ y) = star (g (conjEquiv.symm y ⊗ conjEquiv x))`. -/
 def IsHermitian {c : C} (g : V c ⊗[k] V (S.bar c) →ₗ[k] k) : Prop :=
   ∀ (x : V c) (y : V (S.bar c)),
-    g (x ⊗ₜ[k] y) = star (g (S.slotConj.symm y ⊗ₜ[k] S.slotConj x))
+    g (x ⊗ₜ[k] y) = star (g (S.conjEquiv.symm y ⊗ₜ[k] S.conjEquiv x))
 
 end ConjTensorSpecies
 end

@@ -411,6 +411,17 @@ lemma induction_on_basis {n : ℕ} {c : Fin n → C} {P : S.Tensor c → Prop}
   · intro r t ht
     exact fun a => hsmul r t a
 
+/-- `componentMap` is the basis representation `(basis c).repr` definitionally; this bridges the two
+notations wherever a component computation meets a `repr` rewrite. -/
+lemma componentMap_eq_repr {n : ℕ} (c : Fin n → C) (t : S.Tensor c)
+    (ψ : ComponentIdx (S := S) c) : componentMap c t ψ = (basis c).repr t ψ := rfl
+
+/-- Two tensors with the same colour sequence are equal when all their components agree. -/
+lemma componentMap_ext {n : ℕ} {c : Fin n → C} {t₁ t₂ : S.Tensor c}
+    (h : ∀ b, componentMap c t₁ b = componentMap c t₂ b) : t₁ = t₂ := by
+  rw [← ofComponents_componentMap c t₁, ← ofComponents_componentMap c t₂]
+  congr 1; funext b; exact h b
+
 end Basis
 
 /-!

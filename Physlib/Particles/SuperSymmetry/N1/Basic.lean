@@ -41,7 +41,7 @@ configuration.
 The index data is packaged as a `ConjTensorSpecies` over `ChiralColor`, each colour carrying its
 distinct carrier from above. Complex conjugation is the conjugate-linear identity
 `conjEquiv : M ≃ₛₗ[starRingEnd ℂ] ConjModule M` on each carrier (anti basis `Basis.conj`); the
-species' holomorphy flip (`slotConj`, hence `conjT`) is built from it. Every
+species' holomorphy flip (`conjEquiv`, hence `conjT`) is built from it. Every
 colour carries the trivial representation over the trivial group `Unit`, so the chiral scalars hold
 no charge. Contracting a colour against its `τ`-dual is the dot product of the two coordinate
 vectors, the Kronecker `δ_{IJ}` on basis labels: `contr` is that pairing `V c ⊗ V (τ c) → ℂ`, `unit`
