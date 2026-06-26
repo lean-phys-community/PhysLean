@@ -47,7 +47,7 @@ theorem ge_zero : 0 ≤ TrDistance ρ σ := by
 theorem le_one : TrDistance ρ σ ≤ 1 := by
   have htri := Matrix.traceNorm_add_le ρ.m (-σ.m)
   simp [TrDistance, sub_eq_add_neg, Matrix.traceNorm_neg,
-    ρ.traceNorm_eq_1, σ.traceNorm_eq_1] at htri ⊢
+    ρ.traceNorm_eq_one, σ.traceNorm_eq_one] at htri ⊢
   linarith
 
 /-- The trace distance, as a `Prob` probability with value between 0 and 1. -/
