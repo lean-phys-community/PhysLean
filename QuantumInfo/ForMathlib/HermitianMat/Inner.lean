@@ -214,85 +214,42 @@ private theorem inner_zero_iff_aux_lemma [DecidableEq n] (hA₁ : A.mat.PosSemid
   RCLike.re (A.val * B.val).trace = 0 ↔
     LinearMap.range (Matrix.toEuclideanLin A.val) ≤
       LinearMap.ker (Matrix.toEuclideanLin B.val) := by
+  -- The kernel inclusion `range ≤ ker` says `(toEuclideanLin B) ∘ (toEuclideanLin A) = 0`, i.e.
+  -- `B * A = 0`, which by Hermitianness of `A` and `B` is `A * B = 0`.
+  rw [LinearMap.range_le_ker_iff,
+    show Matrix.toEuclideanLin B.val ∘ₗ Matrix.toEuclideanLin A.val
+        = Matrix.toEuclideanLin (B.val * A.val) from by
+      ext v; simp [Matrix.toLpLin_apply, Matrix.mulVec_mulVec, Matrix.toEuclideanLin],
+    LinearEquiv.map_eq_zero_iff,
+    show B.val * A.val = (A.val * B.val).conjTranspose from by simp [Matrix.conjTranspose_mul],
+    Matrix.conjTranspose_eq_zero]
+  -- Factoring `A = Cᴴ C` and `B = Dᴴ D`, a cyclic trace identity gives `tr (A * B) = tr (Eᴴ E)`
+  -- where `E = D Cᴴ`, so `re (tr (A * B)) = 0` forces `E = 0` and hence `A * B = 0`.
   open MatrixOrder in
-  --Thanks Aristotle
-  have h_trace_zero : (RCLike.re ((A.val * B.val).trace)) = 0 ↔ (A.val * B.val) = 0 := by
-    -- Since $A$ and $B$ are positive semidefinite, we can write them as $A = C^* C$ and $B = D^* D$ for some matrices $C$ and $D$.
-    obtain ⟨C, hC⟩ : ∃ C : Matrix n n 𝕜, A.val = C.conjTranspose * C := by
-      rw [← Matrix.nonneg_iff_posSemidef] at hA₁
-      exact CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hA₁
-    obtain ⟨D, hD⟩ : ∃ D : Matrix n n 𝕜, B.val = D.conjTranspose * D := by
-      erw [← Matrix.nonneg_iff_posSemidef] at hB₁
-      exact CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hB₁
-    have h_trace_zero_iff : (RCLike.re ((A.val * B.val).trace)) = 0 ↔ (D * C.conjTranspose) = 0 := by
-      -- Since $\operatorname{Tr}((DC)^* DC) = \sum_{i,j} |(DC)_{ij}|^2$, and this sum is zero if and only if each term is zero, we have $\operatorname{Tr}((DC)^* DC) = 0$ if and only if $DC = 0$.
-      have h_trace_zero_iff : (RCLike.re ((D * C.conjTranspose).conjTranspose * (D * C.conjTranspose)).trace) = 0 ↔ (D * C.conjTranspose) = 0 := by
-        have h_trace_zero_iff : ∀ (M : Matrix n n 𝕜), (RCLike.re (M.conjTranspose * M).trace) = 0 ↔ M = 0 := by
-          simp [ Matrix.trace, Matrix.mul_apply ];
-          intro M
-          -- simp_all only
-          obtain ⟨val, property⟩ := A
-          obtain ⟨val_1, property_1⟩ := B
-          subst hD hC
-          apply Iff.intro
-          · intro a
-            rw [ Finset.sum_eq_zero_iff_of_nonneg fun i _ => Finset.sum_nonneg fun j _ => add_nonneg ( mul_self_nonneg _ ) ( mul_self_nonneg _ )] at a
-            ext i j
-            specialize a j
-            rw [ Finset.sum_eq_zero_iff_of_nonneg fun _ _ => add_nonneg ( mul_self_nonneg _ ) ( mul_self_nonneg _ ) ] at a
-            simp_all only [Finset.mem_univ, forall_const, Matrix.zero_apply]
-            exact RCLike.ext ( by norm_num; nlinarith only [ a i ] ) ( by norm_num; nlinarith only [ a i ] );
-          · intro a
-            subst a
-            simp_all only [Matrix.zero_apply, map_zero, mul_zero, add_zero, Finset.sum_const_zero]
-        exact h_trace_zero_iff _;
-      convert h_trace_zero_iff using 3
-      simp [ Matrix.mul_assoc ];
-      rw [ ← Matrix.trace_mul_comm ]
-      have h_trace_cyclic : Matrix.trace (D.conjTranspose * D * C.conjTranspose * C) = Matrix.trace (C * D.conjTranspose * D * C.conjTranspose) := by
-        rw [ ← Matrix.trace_mul_comm ]
-        simp [ Matrix.mul_assoc ] ;
-      simp_all [ Matrix.mul_assoc ]
-    simp_all only
-    obtain ⟨val, property⟩ := A
-    obtain ⟨val_1, property_1⟩ := B
-    subst hD hC
-    apply Iff.intro
-    · intro a
-      simp_all only [iff_true]
-      simp [ ← Matrix.mul_assoc, ← Matrix.conjTranspose_inj, a ];
-    · intro a
-      simp_all only [Matrix.trace_zero, map_zero, true_iff]
-  have h_range_ker : (LinearMap.range (Matrix.toEuclideanLin A.val)) ≤ (LinearMap.ker (Matrix.toEuclideanLin B.val)) → (A.val * B.val) = 0 := by
-    intro h_range_ker
-    have hAB_zero : ∀ v, (Matrix.toEuclideanLin B.val) ((Matrix.toEuclideanLin A.val) v) = 0 := by
-      exact fun v => h_range_ker ( LinearMap.mem_range_self _ v )
-    have h_herm : A.val * B.val = (B.val * A.val).conjTranspose := by
-      simp [Matrix.conjTranspose_mul]
-    have hBA_zero : (B.val * A.val) = 0 := by
-      ext i j
-      specialize hAB_zero (EuclideanSpace.single j 1)
-      have h1 := hAB_zero
-      simp only [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mulVec_mulVec] at h1
-      have h2 := congr_fun (congrArg WithLp.ofLp h1) i
-      simp only [WithLp.ofLp_zero, EuclideanSpace.single] at h2
-      simpa [Matrix.mul_apply, Matrix.mulVec, dotProduct, Pi.single_apply] using h2
-    rw [h_herm, hBA_zero, Matrix.conjTranspose_zero]
-  simp_all only
-  obtain ⟨val, property⟩ := A
-  obtain ⟨val_1, property_1⟩ := B
-  simp_all only
-  apply Iff.intro
-  · rintro a _ ⟨y, rfl⟩
-    have h_comm : val_1 * val = 0 := by
-      rw [← Matrix.conjTranspose_inj]
-      have h_conj_transpose : val.conjTranspose = val ∧ val_1.conjTranspose = val_1 := by
-        aesop
-      simp [h_conj_transpose, Matrix.conjTranspose_mul, a]
-    simp only [LinearMap.mem_ker]
-    show (Matrix.toEuclideanLin val_1) ((Matrix.toEuclideanLin val) y) = 0
-    simp [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mulVec_mulVec, h_comm]
-  · exact h_range_ker
+  obtain ⟨C, hC⟩ : ∃ C : Matrix n n 𝕜, A.val = C.conjTranspose * C :=
+    CStarAlgebra.nonneg_iff_eq_star_mul_self.mp (Matrix.nonneg_iff_posSemidef.mpr hA₁)
+  open MatrixOrder in
+  obtain ⟨D, hD⟩ : ∃ D : Matrix n n 𝕜, B.val = D.conjTranspose * D :=
+    CStarAlgebra.nonneg_iff_eq_star_mul_self.mp (Matrix.nonneg_iff_posSemidef.mpr hB₁)
+  have htr : (A.val * B.val).trace
+      = ((D * C.conjTranspose).conjTranspose * (D * C.conjTranspose)).trace := by
+    rw [hC, hD, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+      show C.conjTranspose * C * (D.conjTranspose * D)
+          = C.conjTranspose * (C * D.conjTranspose * D) from by simp [Matrix.mul_assoc],
+      Matrix.trace_mul_comm,
+      show C * D.conjTranspose * D * C.conjTranspose
+          = C * D.conjTranspose * (D * C.conjTranspose) from by simp [Matrix.mul_assoc]]
+  refine ⟨fun h => ?_, fun h => by rw [h]; simp⟩
+  have hE0 : D * C.conjTranspose = 0 :=
+    Matrix.trace_conjTranspose_mul_self_eq_zero_iff.mp <| RCLike.ext
+      (by rw [← htr]; simpa using h)
+      (by simpa using (RCLike.nonneg_iff.mp
+        (Matrix.posSemidef_conjTranspose_mul_self (D * C.conjTranspose)).trace_nonneg).2)
+  have hE0' : C * D.conjTranspose = 0 := by
+    simpa [Matrix.conjTranspose_mul] using congrArg Matrix.conjTranspose hE0
+  rw [hC, hD, show C.conjTranspose * C * (D.conjTranspose * D)
+      = C.conjTranspose * (C * D.conjTranspose) * D from by simp [Matrix.mul_assoc], hE0']
+  simp
 
 /-- The inner product of two PSD matrices is zero iff they have disjoint support, i.e., each lives entirely
 in the other's kernel. -/
