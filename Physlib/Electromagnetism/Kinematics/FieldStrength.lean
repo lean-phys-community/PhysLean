@@ -373,12 +373,25 @@ lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) �
 
 open ContDiff
 
+/-- Tensor-index evaluation of the field strength agrees with its standard basis coefficient. -/
+lemma toField_toFieldStrength_eq_basis_repr {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
+    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x)
+      (μ, ν) := by
+  rw [show A.toFieldStrength x = ∑ μ, ∑ ν,
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ •
+      Lorentz.Vector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν by
+    simpa using congrFun (toFieldStrength_eq_sum_basis_eval (A := A)) x]
+  simp [Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
+
 /-- The component form of the field strength tensor, evaluated using tensor index notation. -/
 lemma toField_toFieldStrength_apply {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
     ∑ κ, ((η μ κ * ∂_ κ A x ν) - η ν κ * ∂_ κ A x μ) := by
-  simpa using (toFieldStrength_basis_repr_apply (μν := (μ, ν)) A x)
+  rw [toField_toFieldStrength_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply A x
 
 /-- The component form of the field strength tensor, using the diagonal form of the
 Minkowski metric. -/
@@ -386,7 +399,8 @@ lemma toField_toFieldStrength_apply_eq_single {d} (A : ElectromagneticPotential 
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
     η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ := by
-  simpa using (toFieldStrength_basis_repr_apply_eq_single (μν := (μ, ν)) A x)
+  rw [toField_toFieldStrength_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply_eq_single A x
 
 lemma differentiable_toField_toFieldStrength {d} {A : ElectromagneticPotential d}
     {μ ν : Fin 1 ⊕ Fin d} (hA : ContDiff ℝ 2 A) :
@@ -436,16 +450,14 @@ lemma contDiff_toField_toFieldStrength {d} {n : WithTop ℕ∞} {A : Electromagn
   apply ContDiff.sub
   apply ContDiff.mul
   · fun_prop
-  · simp only
-    revert ν
+  · revert ν
     rw [SpaceTime.contDiff_vector]
     apply ContDiff.clm_apply
     · exact ContDiff.fderiv_right (m := n) hA (by rfl)
     · fun_prop
   apply ContDiff.mul
   · fun_prop
-  · simp only
-    revert μ
+  · revert μ
     rw [SpaceTime.contDiff_vector]
     apply ContDiff.clm_apply
     · exact ContDiff.fderiv_right (m := n) hA (by rfl)
