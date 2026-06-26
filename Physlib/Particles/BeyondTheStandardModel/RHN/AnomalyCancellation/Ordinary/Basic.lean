@@ -40,18 +40,18 @@ variable {n : ℕ}
 
 lemma gravSol (S : (SM n).LinSols) : accGrav S.val = 0 := by
   have hS := S.linearSol
-  simp only [SM_numberLinear, SM_linearACCs, Fin.isValue] at hS
-  exact hS 0
+  simp only [SM_linearACCs] at hS
+  exact hS ⟨0, by simp⟩
 
 lemma SU2Sol (S : (SM n).LinSols) : accSU2 S.val = 0 := by
   have hS := S.linearSol
-  simp only [SM_numberLinear, SM_linearACCs, Fin.isValue] at hS
-  exact hS 1
+  simp only [SM_linearACCs] at hS
+  exact hS ⟨1, by simp⟩
 
 lemma SU3Sol (S : (SM n).LinSols) : accSU3 S.val = 0 := by
   have hS := S.linearSol
-  simp only [SM_numberLinear, SM_linearACCs, Fin.isValue] at hS
-  exact hS 2
+  simp only [SM_linearACCs] at hS
+  exact hS ⟨2, by simp⟩
 
 lemma cubeSol (S : (SM n).Sols) : accCube S.val = 0 := S.cubicSol
 
@@ -61,11 +61,10 @@ def chargeToLinear (S : (SM n).Charges) (hGrav : accGrav S = 0)
     (hSU2 : accSU2 S = 0) (hSU3 : accSU3 S = 0) : (SM n).LinSols :=
   ⟨S, by
     intro i
-    simp only [SM_numberLinear] at i
     match i with
-    | 0 => exact hGrav
-    | 1 => exact hSU2
-    | 2 => exact hSU3⟩
+    | ⟨0, _⟩ => exact hGrav
+    | ⟨1, _⟩ => exact hSU2
+    | ⟨2, _⟩ => exact hSU3⟩
 
 /-- An element of `LinSols` which satisfies the quadratic ACCs
   gives us a element of `QuadSols`. -/
@@ -103,11 +102,10 @@ def perm (n : ℕ) : ACCSystemGroupAction (SM n) where
   rep := repCharges
   linearInvariant := by
     intro i
-    simp only [SM_numberLinear] at i
     match i with
-    | 0 => exact accGrav_invariant
-    | 1 => exact accSU2_invariant
-    | 2 => exact accSU3_invariant
+    | ⟨0, _⟩ => exact accGrav_invariant
+    | ⟨1, _⟩ => exact accSU2_invariant
+    | ⟨2, _⟩ => exact accSU3_invariant
   quadInvariant := by
     intro i
     simp only [SM_numberQuadratic] at i

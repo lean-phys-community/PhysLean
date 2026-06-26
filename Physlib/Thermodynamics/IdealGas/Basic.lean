@@ -55,115 +55,17 @@ theorem adiabatic_relation_log
       entropy c R s0 U0 V0 N0 Ua Va N =
       entropy c R s0 U0 V0 N0 Ub Vb N) :
     c * log (Ua / Ub) + log (Va / Vb) = 0 := by
-  -- Step 1: cancel `N * s0` and isolate the `N * R * (...)` pieces.
-  have h1 :
-      N * R *
-          (c * log (Ua / U0) +
-            log (Va / V0) -
-            (c + 1) * log (N / N0)) =
-        N * R *
-          (c * log (Ub / U0) +
-            log (Vb / V0) -
-            (c + 1) * log (N / N0)) := by
-    -- unfold entropy and use `add_left_cancel` to cancel `N * s0`
-    unfold entropy at hS
-    -- now `hS` is: N*s0 + N*R*(...) = N*s0 + N*R*(...)`
-    -- cancel `N*s0` from both sides
-    exact add_left_cancel hS
-
-  -- Step 2: cancel the common factor `N * R`.
-  have hNR : N * R ≠ 0 :=
-    mul_ne_zero (ne_of_gt hN) (ne_of_gt hR)
-  have h2 :
-      c * log (Ua / U0) +
-        log (Va / V0) -
-        (c + 1) * log (N / N0) =
-      c * log (Ub / U0) +
-        log (Vb / V0) -
-        (c + 1) * log (N / N0) :=
-    mul_left_cancel₀ hNR h1
-
-  -- Step 3: cancel the common `-(c+1) * log (N/N0)` term.
-  have h3 :
-      c * log (Ua / U0) + log (Va / V0) =
-      c * log (Ub / U0) + log (Vb / V0) := by
-
-    -- rewrite with `sub_eq_add_neg` so we can use `add_right_cancel`
-
-    have h2' :
-        c * log (Ua / U0) + log (Va / V0)
-          - (c + 1) * log (N / N0) =
-        c * log (Ub / U0) + log (Vb / V0)
-          - (c + 1) * log (N / N0) := by
-      simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using h2
-    -- now cancel the same term on the right
-    exact add_right_cancel h2'
-
-  -- Step 4: turn this equality into a “difference = 0” form
-  -- and rearrange algebraically.
-  have h4 :
-      c * (log (Ua / U0) - log (Ub / U0)) +
-        (log (Va / V0) - log (Vb / V0)) = 0 := by
-    -- from `a = b`, we get `a - b = 0`
-    have h4' :
-        (c * log (Ua / U0) + log (Va / V0)) -
-          (c * log (Ub / U0) + log (Vb / V0)) = 0 :=
-      sub_eq_zero.mpr h3
-    -- expand `a - b` and simplify
-    simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
-          mul_add, add_mul, mul_comm, mul_left_comm, mul_assoc] using h4'
-
-  -- Step 5: use `log_div` to turn differences of logs into logs of ratios.
-  have hUaU0 : 0 < Ua / U0 := div_pos hUa hU0
-  have hUbU0 : 0 < Ub / U0 := div_pos hUb hU0
-  have hVaV0 : 0 < Va / V0 := div_pos hVa hV0
-  have hVbV0 : 0 < Vb / V0 := div_pos hVb hV0
-
-  have hU :
-      log (Ua / U0) - log (Ub / U0) =
-        log ((Ua / U0) / (Ub / U0)) := by
-    -- log_div hx hy : log (x / y) = log x - log y
-    -- log_div needs ≠ 0, not just positivity
-    have hneqx : Ua / U0 ≠ 0 := ne_of_gt hUaU0
-    have hneqy : Ub / U0 ≠ 0 := ne_of_gt hUbU0
-
-    have h := Real.log_div (x := Ua / U0) (y := Ub / U0) hneqx hneqy
-    -- we want "difference = log(ratio)", so flip and rewrite
-    simpa [sub_eq_add_neg] using h.symm
-
-  have hV :
-      log (Va / V0) - log (Vb / V0) =
-        log ((Va / V0) / (Vb / V0)) := by
-    -- log_div hx hy : log (x / y) = log x - log y
-    -- log_div needs ≠ 0, not just positivity
-    have hneqxV : Va / V0 ≠ 0 := ne_of_gt hVaV0
-    have hneqyV : Vb / V0 ≠ 0 := ne_of_gt hVbV0
-
-    have h := Real.log_div (x := Va / V0) (y := Vb / V0) hneqxV hneqyV
-
-    simpa [sub_eq_add_neg] using h.symm
-
-  have h5 :
-      c * log ((Ua / U0) / (Ub / U0)) +
-        log ((Va / V0) / (Vb / V0)) = 0 := by
-    simpa [hU, hV] using h4
-
-  -- Step 6: simplify the ratios to Ua/Ub and Va/Vb using `field_simp`.
-  have h_ratio_U :
-      (Ua / U0) / (Ub / U0) = Ua / Ub := by
-    -- `field_simp` uses the nonzero denominators in the context
-    field_simp [div_eq_mul_inv]
-
-  have h_ratio_V :
-      (Va / V0) / (Vb / V0) = Va / Vb := by
-    field_simp [div_eq_mul_inv]
-
-  have h6 :
-      c * log (Ua / Ub) + log (Va / Vb) = 0 := by
-    -- rewrite the log arguments using the two equalities above
-    simpa [h_ratio_U, h_ratio_V] using h5
-
-  exact h6
+  -- Unfold the entropy and expand every `log (x / y)` into `log x - log y`,
+  -- so both `hS` and the goal become linear in the individual logarithms.
+  unfold entropy at hS
+  rw [Real.log_div hUa.ne' hU0.ne', Real.log_div hUb.ne' hU0.ne',
+      Real.log_div hVa.ne' hV0.ne', Real.log_div hVb.ne' hV0.ne'] at hS
+  rw [Real.log_div hUa.ne' hUb.ne', Real.log_div hVa.ne' hVb.ne']
+  -- The difference of the two entropies is `N * R` times the goal, so the
+  -- goal is exactly the second factor of a vanishing product.
+  have key : N * R * (c * (log Ua - log Ub) + (log Va - log Vb)) = 0 := by
+    linear_combination hS
+  exact (mul_eq_zero.mp key).resolve_left (mul_ne_zero hN.ne' hR.ne')
 
 /-- Adiabatic relation in product form:
     If S(Ua,Va,N) = S(Ub,Vb,N) with N fixed,

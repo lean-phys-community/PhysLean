@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.MinkowskiMatrix
+public import Mathlib.Algebra.Lie.SerreConstruction
 /-!
 # The Lorentz Algebra
 
@@ -23,6 +24,8 @@ We define
 open Matrix
 open TensorProduct
 
+attribute [local instance 100] LieRing.ofAssociativeRing
+
 /-- The Lorentz algebra as a subalgebra of `Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ`. -/
 def lorentzAlgebra : LieSubalgebra ℝ (Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ) :=
   (LieAlgebra.Orthogonal.so' (Fin 1) (Fin 3) ℝ)
@@ -37,7 +40,10 @@ lemma transpose_eta (A : lorentzAlgebra) : A.1ᵀ * η = - η * A.1 := by
 
 lemma mem_of_transpose_eta_eq_eta_mul_self {A : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ}
     (h : Aᵀ * η = - η * A) : A ∈ lorentzAlgebra := by
-  simpa [lorentzAlgebra, LieAlgebra.Orthogonal.so', Matrix.IsSkewAdjoint, IsAdjointPair] using h
+  simp_all only [neg_mul, lorentzAlgebra, LieAlgebra.Orthogonal.so',
+    mem_skewAdjointMatricesLieSubalgebra, mem_skewAdjointMatricesSubmodule, Matrix.IsSkewAdjoint,
+    IsAdjointPair, mul_neg]
+  exact h
 
 lemma mem_iff {A : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ} :
     A ∈ lorentzAlgebra ↔ Aᵀ * η = - η * A :=

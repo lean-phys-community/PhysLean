@@ -67,7 +67,7 @@ lemma fderiv_cross_commute {t : Time} {s : EuclideanSpace ℝ (Fin 3)}
       s j * (fderiv ℝ (fun u => f u) t) 1 i
       = (fderiv ℝ (fun t => s i * f t j - s j * f t i) t) 1:= by
     rw [fderiv_fun_sub, fderiv_const_mul, fderiv_const_mul]
-    simp only [ContinuousLinearMap.coe_sub', ContinuousLinearMap.coe_smul', Pi.sub_apply,
+    simp only [FunLike.coe_sub, FunLike.coe_smul, Pi.sub_apply,
       Pi.smul_apply, smul_eq_mul]
     rw [Time.fderiv_euclid, Time.fderiv_euclid]
     intro i

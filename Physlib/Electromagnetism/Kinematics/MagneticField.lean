@@ -154,7 +154,7 @@ lemma ofElectromagneticField_magneticField {c : SpeedOfLight}
       let u := p.2
       (u • basis.repr x) ⨯ₑ₃ B t (u • x)
   suffices h : ContDiff ℝ 1 (fun x => C x i) by
-    convert h using 1
+    convert! h using 1
     simp [C]
     rfl
   fin_cases i
@@ -287,11 +287,11 @@ lemma magneticField_curl_eq_magneticFieldMatrix{c : SpeedOfLight} (A : Electroma
     (∇ ⨯ A.magneticField c t) x i = ∑ j, Space.deriv j (A.magneticFieldMatrix c t · (j, i)) x:= by
   rw [magneticField_eq_magneticFieldMatrix A (hA.differentiable (by simp))]
   simp only [curl, Fin.isValue, deriv_eq_fderiv_basis, fderiv_fun_neg,
-    ContinuousLinearMap.neg_apply, sub_neg_eq_add, Fin.sum_univ_three]
+    _root_.neg_apply, sub_neg_eq_add, Fin.sum_univ_three]
   fin_cases i <;>
   · simp only [Fin.reduceFinMk, Fin.isValue, Fin.reduceAdd, zero_add,
     magneticFieldMatrix_diag_eq_zero, fderiv_fun_const, Pi.ofNat_apply,
-    ContinuousLinearMap.zero_apply, add_zero]
+    _root_.zero_apply, add_zero]
     conv_lhs =>
       enter [1, 1, 1, 2, x]
       rw [magneticFieldMatrix_antisymm]
@@ -467,7 +467,7 @@ lemma time_deriv_magneticFieldMatrix {d : ℕ} {c : SpeedOfLight} (A : Electroma
           exact scalarPotential_contDiff_space c A hA t), fderiv_fun_neg]
       conv_lhs =>
         enter [1]
-        simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply, ContinuousLinearMap.neg_apply]
+        simp only [FunLike.coe_sub, Pi.sub_apply, _root_.neg_apply]
         enter [2]
         rw [← Space.deriv_eq_fderiv_basis, Space.deriv_commute _
           (scalarPotential_contDiff_space c A hA t)]

@@ -41,14 +41,15 @@ lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).Sols} : Q S.val (0 : Fin 1) = 0 ↔
 lemma accGrav_Q_zero {S : (SMNoGrav 1).Sols} (hQ : Q S.val (0 : Fin 1) = 0) :
     accGrav S.val = 0 := by
   rw [accGrav]
-  simp only [SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-    Finset.sum_singleton, LinearMap.coe_mk, AddHom.coe_mk]
-  rw [hQ, E_zero_iff_Q_zero.mp hQ]
+  have hE := E_zero_iff_Q_zero.mp hQ
+  simp_all only [toSpecies_apply_eq, Fin.isValue, sum_SMSpecies_numberCharges_one, LinearMap.coe_mk,
+    AddHom.coe_mk]
+  erw [hQ, hE]
   have h1 := SU2Sol S.1.1
   have h2 := SU3Sol S.1.1
-  simp only [accSU2, SMSpecies_numberCharges, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-      Finset.sum_singleton, LinearMap.coe_mk, AddHom.coe_mk, accSU3] at h1 h2
-  rw [hQ] at h1 h2
+  simp only [accSU2, toSpecies_apply_eq, Fin.isValue, sum_SMSpecies_numberCharges_one,
+    LinearMap.coe_mk, AddHom.coe_mk, accSU3] at h1 h2
+  erw [hQ] at h1 h2
   simp_all
   linear_combination 3 * h2
 

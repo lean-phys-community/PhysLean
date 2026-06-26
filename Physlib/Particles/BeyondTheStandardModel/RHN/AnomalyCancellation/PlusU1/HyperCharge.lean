@@ -35,17 +35,15 @@ def Y₁ : (PlusU1 1).Sols where
     | (5 : Fin 6) => 0
   linearSol := by
     intro i
-    simp only [PlusU1_numberLinear] at i
     match i with
-    | 0 => with_unfolding_all rfl
-    | 1 => with_unfolding_all rfl
-    | 2 => with_unfolding_all rfl
-    | 3 => with_unfolding_all rfl
+    | ⟨0, _⟩ => with_unfolding_all rfl
+    | ⟨1, _⟩ => with_unfolding_all rfl
+    | ⟨2, _⟩ => with_unfolding_all rfl
+    | ⟨3, _⟩ => with_unfolding_all rfl
   quadSol := by
     intro i
-    simp only [PlusU1_numberQuadratic] at i
     match i with
-    | 0 => with_unfolding_all rfl
+    | ⟨0, _⟩ => with_unfolding_all rfl
   cubicSol := by with_unfolding_all rfl
 
 /-- The hypercharge for `n` family. -/
@@ -61,7 +59,7 @@ lemma on_quadBiLin (S : (PlusU1 n).Charges) :
     quadBiLin (Y n).val S = accYY S := by
   erw [familyUniversal_quadBiLin]
   rw [accYY_decomp]
-  simp only [Fin.isValue, Y₁_val, SMνSpecies_numberCharges, toSpecies_apply, one_mul, mul_neg,
+  simp only [Fin.isValue, Y₁_val, toSpecies_apply, one_mul, mul_neg,
     neg_mul, sub_neg_eq_add, add_left_inj, add_right_inj, mul_eq_mul_right_iff]
   ring_nf
   simp
@@ -92,7 +90,7 @@ lemma on_cubeTriLin (S : (PlusU1 n).Charges) :
     cubeTriLin (Y n).val (Y n).val S = 6 * accYY S := by
   erw [familyUniversal_cubeTriLin']
   rw [accYY_decomp]
-  simp only [Fin.isValue, Y₁_val, mul_one, SMνSpecies_numberCharges, toSpecies_apply, mul_neg,
+  simp only [Fin.isValue, Y₁_val, mul_one, toSpecies_apply, mul_neg,
     neg_mul, neg_neg, mul_zero, zero_mul, add_zero]
   ring
 
@@ -105,7 +103,7 @@ lemma on_cubeTriLin' (S : (PlusU1 n).Charges) :
     cubeTriLin (Y n).val S S = 6 * accQuad S := by
   erw [familyUniversal_cubeTriLin]
   rw [accQuad_decomp]
-  simp only [Fin.isValue, Y₁_val, mul_one, SMνSpecies_numberCharges, toSpecies_apply, mul_neg,
+  simp only [Fin.isValue, Y₁_val, mul_one, toSpecies_apply, mul_neg,
     neg_mul, zero_mul, add_zero]
   ring_nf
 

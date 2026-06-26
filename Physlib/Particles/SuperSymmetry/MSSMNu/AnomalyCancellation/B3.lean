@@ -66,9 +66,8 @@ lemma B₃_val : B₃.val = B₃AsCharge := by
 
 set_option backward.isDefEq.respectTransparency false in
 lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) : cubeTriLin B₃.val B₃.val R.val = 0 := by
-  simp only [cubeTriLin, TriLinearSymm.mk₃_toFun_apply_apply, cubeTriLinToFun,
-    MSSMSpecies_numberCharges]
-  rw [Fin.sum_univ_three]
+  simp only [cubeTriLin, TriLinearSymm.mk₃_toFun_apply_apply, cubeTriLinToFun]
+  erw [Fin.sum_univ_three]
   rw [B₃_val]
   rw [B₃AsCharge]
   repeat rw [toSMSpecies_toSpecies_inv]
@@ -76,13 +75,13 @@ lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) : cubeTriLin B₃.val B₃.val
   simp only [mul_one, Fin.isValue, toSMSpecies_apply, one_mul, mul_neg, neg_neg, neg_mul, Hd_apply,
     Fin.reduceFinMk, Hu_apply]
   have hLin := R.linearSol
-  simp only [MSSMACC_numberLinear, MSSMACC_linearACCs, Nat.reduceMul, Fin.isValue,
-    Fin.reduceFinMk] at hLin
-  have h0 := hLin 0
-  have h2 := hLin 2
-  simp only [Fin.isValue, Fin.sum_univ_three, Prod.mk_zero_zero, Prod.mk_one_one, LinearMap.coe_mk,
-    AddHom.coe_mk] at h0 h2
+  simp only [MSSMACC_linearACCs] at hLin
+  have h0 := hLin ⟨0, by simp⟩
+  have h2 := hLin ⟨2, by simp⟩
+  simp only [accGrav, LinearMap.coe_mk, AddHom.coe_mk, accSU3] at h0 h2
+  erw [Fin.sum_univ_three] at h0 h2
+  simp only [Fin.isValue, toSMSpecies_apply, Nat.reduceMul, Hd_apply, Fin.reduceFinMk,
+    Hu_apply] at h0 h2
   linear_combination (norm := ring_nf) 9 * (h0) - 24 * (h2)
-  simp [Fin.isValue, Prod.mk_zero_zero, Prod.mk_one_one]
 
 end MSSMACC

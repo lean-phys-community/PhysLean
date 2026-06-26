@@ -91,10 +91,10 @@ private lemma distLaplacian_norm_zpow_odd_boundary (m : ℕ) :
       (IsDistBounded.pow 1 (by omega)))) = _
     rw [distGrad_distOfFunction_norm_zpow 1 (by omega)]
     simp only [Int.cast_one, one_mul]
-    convert distDiv_inv_pow_eq_dim (d := 1) using 1
+    convert! distDiv_inv_pow_eq_dim (d := 1) using 1
     · ext x
       ring_nf
-  · convert distLaplacian_fundamentalSolution_norm_zpow_of_three_le
+  · convert! distLaplacian_fundamentalSolution_norm_zpow_of_three_le
       (d := 2 * m.succ + 1) (by omega) using 4
     · simp [Nat.succ_eq_add_one]
       ring

@@ -219,7 +219,9 @@ theorem exists_svd_sqrt_eigenvalues (A : Matrix n n ℂ) :
   let V : Matrix.unitaryGroup n ℂ := ⟨Matrix.of (fun i j ↦ b j i), by
     simp only [Matrix.mem_unitaryGroup_iff]
     ext i j
-    simpa [inner] using b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)⟩
+    have h1 := b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)
+    simp_all [inner]
+    exact h1⟩
   let W : Matrix.unitaryGroup n ℂ := hH.eigenvectorUnitary
   have hAW : A * W.val = V.val * Matrix.diagonal s := by
     ext i j

@@ -4,6 +4,7 @@ public import PhyslibAlpha.Basic
 public import PhyslibAlpha.ClassicalFieldTheory.Local.FirstVariation
 public import PhyslibAlpha.ClassicalFieldTheory.Local.Action
 public import PhyslibAlpha.ClassicalFieldTheory.Local.EulerLagrange
+public import PhyslibAlpha.ClassicalFieldTheory.Local.FirstOrder
 public import PhyslibAlpha.ClassicalFieldTheory.Local.FirstVariation.Basic
 public import PhyslibAlpha.ClassicalFieldTheory.Local.FirstVariation.Criterion
 public import PhyslibAlpha.ClassicalFieldTheory.Local.FirstVariation.Density

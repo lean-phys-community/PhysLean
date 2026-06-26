@@ -214,7 +214,7 @@ private lemma trace_conj_rpow_eq_inner (hα₀ : 0 < α) (hα : α < 1) :
       rw [ ← h_trace, Matrix.mul_assoc ];
       rw [ ← Matrix.trace_mul_comm ]
       simp [ Matrix.mul_assoc ]
-    convert congr_arg Complex.re h_trace using 1;
+    convert! congr_arg Complex.re h_trace using 1;
     simp [ Matrix.trace, Matrix.mul_apply ];
   · exact HermitianMat.inner_eq_re_trace _ _
 
@@ -268,7 +268,7 @@ lemma HermitianMat.rpow_neg_mul_rpow_eq_supportProj
   have h_cfc_eq : (A.cfc (fun x => x ^ (-p) * x ^ p)) = (A.cfc (fun x => if x = 0 then 0 else 1)) := by
     apply cfc_congr_of_nonneg hA;
     exact fun x hx => h_cfc x hx;
-  convert congr_arg ( fun x : HermitianMat d ℂ => x.val ) h_cfc_eq using 1;
+  convert! congr_arg ( fun x : HermitianMat d ℂ => x.val ) h_cfc_eq using 1;
   exact congr_arg ( fun x : HermitianMat d ℂ => x.val ) ( supportProj_eq_cfc A )
 
 lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
@@ -279,11 +279,11 @@ lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
       exact ⟨ _, rfl ⟩
     have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), v ∈ LinearMap.range A.val.toEuclideanLin → (A.supportProj.val.toEuclideanLin v) = v := by
       intro v hv
-      have h_supportProj_mul_A : (A.supportProj.val.toEuclideanLin v) = (Submodule.orthogonalProjection (LinearMap.range A.val.toEuclideanLin) v) := by
-        simp only [val_eq_coe, Submodule.coe_orthogonalProjection_apply]
+      have h_supportProj_mul_A : (A.supportProj.val.toEuclideanLin v) = (Submodule.orthogonalProjectionOnto (LinearMap.range A.val.toEuclideanLin) v) := by
+        simp only [val_eq_coe, Submodule.coe_orthogonalProjectionOnto_apply]
         simp [supportProj, projector]
         simp only [Submodule.starProjection]
-        simp [-Submodule.coe_orthogonalProjection_apply]
+        simp
         have key : ∀ (f : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d),
             Matrix.toEuclideanLin
               ((LinearMap.toMatrix (EuclideanSpace.basisFun d ℂ).toBasis (EuclideanSpace.basisFun d ℂ).toBasis) f) = f := by
@@ -347,7 +347,8 @@ lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
     replace h_supportProj_mul_B := congr(Matrix.mulVec $h_supportProj_mul_B w)
     replace hw := congr(WithLp.ofLp $hw)
     simp only [ContinuousLinearMap.coe_coe] at hw
-    simpa only [← hw, ← Matrix.mulVec_mulVec] using h_supportProj_mul_B
+    simp_all only [← hw, ← Matrix.mulVec_mulVec]
+    exact h_supportProj_mul_B
   -- By definition of matrix multiplication, if B.supportProj * A * v = A * v for all vectors v, then B.supportProj * A = A.
   have h_matrix_eq : ∀ (M N : Matrix d d ℂ), (∀ v : EuclideanSpace ℂ d, M.mulVec (N.mulVec v) = N.mulVec v) → M * N = N := by
     intro M N hMN
@@ -434,7 +435,8 @@ private theorem sandwichedRelRentropy_nonneg_α_lt_1 (h : σ.M.ker ≤ ρ.M.ker)
 private theorem sandwichedRelRentropy_nonneg_α_gt_1 (h : σ.M.ker ≤ ρ.M.ker) (hα : α > 1) :
     0 ≤ ((ρ.M.conj (σ.M ^ ((1 - α)/(2 * α)) ).mat) ^ α).trace.log / (α - 1) := by
   grw [← sandwiched_trace_of_gt_1 h hα]
-  simp
+  positivity
+  positivity
 
 private lemma sandwichedRelRentropy.trace_at_one (ρ σ : MState d) :
     ((ρ.M.conj (σ.M ^ ((1 - (1:ℝ)) / (2 * (1:ℝ)))).mat) ^ (1:ℝ)).trace = 1 := by
@@ -473,14 +475,14 @@ private lemma hasDerivAt_trace_rpow_at_one (B : HermitianMat d ℂ) (hB : 0 ≤ 
   have h_deriv : ∀ i, HasDerivAt (fun α : ℝ => (B.H.eigenvalues i) ^ α) (B.H.eigenvalues i * Real.log (B.H.eigenvalues i)) 1 := by
     intro i
     by_cases h_pos : 0 < B.H.eigenvalues i;
-    · convert HasDerivAt.rpow ( hasDerivAt_const _ _ ) ( hasDerivAt_id 1 ) h_pos using 1
+    · convert! HasDerivAt.rpow ( hasDerivAt_const _ _ ) ( hasDerivAt_id 1 ) h_pos using 1
       simp only [id_eq, mul_one, sub_self, Real.rpow_zero, Real.rpow_one, one_mul, zero_add]
     · have h_zero : B.H.eigenvalues i = 0 := by
         exact le_antisymm ( le_of_not_gt h_pos ) ( by simpa using hB.eigenvalues_nonneg i )
       simp [h_zero]
       exact (hasDerivAt_const _ _).congr_of_eventuallyEq (Filter.eventuallyEq_of_mem ( Ioi_mem_nhds zero_lt_one ) fun x hx => Real.zero_rpow hx.out.ne' )
   simp only [HermitianMat.trace_rpow_eq_sum, ← Finset.sum_apply]
-  convert HasDerivAt.sum fun i _ => h_deriv i using 1
+  convert! HasDerivAt.sum fun i _ => h_deriv i using 1
 
 /-
 PROBLEM
@@ -586,10 +588,10 @@ private lemma hasDerivAt_inner_rpow_at_zero (h : σ.M.ker ≤ ρ.M.ker) :
       intro i
       rcases (σ.eigenvalue_nonneg i).lt_or_eq' with h_pos | h_zero
       · simp only [h_pos, Real.rpow_def_of_pos, mul_comm]
-        convert ((hasDerivAt_id 0).mul (hasDerivAt_const _ _)).exp.const_mul (eigenWeight ρ σ i ) using 1
+        convert! ((hasDerivAt_id 0).mul (hasDerivAt_const _ _)).exp.const_mul (eigenWeight ρ σ i ) using 1
         simp
       · simp [Real.rpow_def_of_nonpos, mul_comm, h_zero]
-        convert hasDerivAt_const (0 : ℝ) (0 : ℝ) using 1
+        convert! hasDerivAt_const (0 : ℝ) (0 : ℝ) using 1
         ext1 u
         split_ifs with hu
         · simp [eigenWeight_zero_of_eigenvalue_zero h h_zero]
@@ -613,7 +615,10 @@ private lemma hasDerivAt_trace_conj_at_one {ρ σ : MState d}
   have h_chain : HasDerivAt (fun α : ℝ => ⟪ρ.M, σ.M ^ ((1 - α) / α)⟫) (⟪ρ.M, σ.M.log⟫ * (-1)) 1 := by
     apply HasDerivAt.comp (h₂ := fun u => ⟪ρ.M, σ.M ^ u⟫) (h := fun α => (1 - α) / α)
     · simpa using hasDerivAt_inner_rpow_at_zero h
-    · simpa using HasDerivAt.div ( hasDerivAt_id ( 1 : ℝ ) |> HasDerivAt.const_sub 1 ) ( hasDerivAt_id ( 1 : ℝ ) ) ( by norm_num )
+    · have h1 := HasDerivAt.div ( hasDerivAt_id ( 1 : ℝ ) |> HasDerivAt.const_sub 1 )
+        ( hasDerivAt_id ( 1 : ℝ ) ) ( by norm_num )
+      simp_all only [id_eq, mul_one, sub_self, sub_zero, one_pow, div_one]
+      exact h1
   ring_nf at h_chain
   apply h_chain.congr_of_eventuallyEq _
   filter_upwards [ lt_mem_nhds zero_lt_one ] with α hα
@@ -632,7 +637,10 @@ private lemma scalar_rpow_cross_term {b : ℝ → ℝ} {c : ℝ}
     (hb : HasDerivAt b (deriv b 1) 1) (hc : b 1 = c) (hc_pos : 0 < c) :
     HasDerivAt (fun α => b α ^ α - b α) (c * Real.log c) 1 := by
   subst c
-  simpa using (hb.rpow (hasDerivAt_id 1) hc_pos).sub hb
+  have := (hb.rpow (hasDerivAt_id 1) hc_pos).sub hb
+  simp_all only [hasDerivAt_deriv_iff, id_eq, mul_one, sub_self, Real.rpow_zero, Real.rpow_one,
+    one_mul, add_sub_cancel_left]
+  exact this
 
 /-- For a PSD matrix A, Tr[A^s] - Tr[A] has derivative ⟪A, log A⟫ at s = 1.
     This generalizes `hasDerivAt_trace_rpow_at_one` to give the derivative of the
@@ -737,7 +745,7 @@ private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
       have h_bound : ∀ᶠ α in nhds 1, 0 ≤ b α ∧ b α ≤ 1 ∧ |α - 1| ≤ 1 / 2 := by
         have h_bound : ∀ᶠ α in nhds 1, 0 ≤ b α ∧ b α ≤ 1 := by
           filter_upwards [ hb_nonneg, hb_cont.eventually ( Metric.ball_mem_nhds _ zero_lt_one ) ] with α hα₁ hα₂ using ⟨ hα₁, by linarith [ abs_lt.mp hα₂ ] ⟩;
-        filter_upwards [ h_bound, Metric.ball_mem_nhds 1 ( show ( 0 : ℝ ) < 1 / 2 by norm_num ) ] with α hα₁ hα₂ using ⟨ hα₁.1, hα₁.2, by simpa using hα₂.out.le ⟩;
+        filter_upwards [ h_bound, Metric.ball_mem_nhds 1 ( show ( 0 : ℝ ) < 1 / 2 by norm_num ) ] with α hα₁ hα₂ using ⟨ hα₁.1, hα₁.2, by exact hα₂.out.le ⟩;
       filter_upwards [ h_bound, ‹∀ᶠ α in nhds 1, 0 ≤ b α ∧ b α ≤ 1 ∧ |α - 1| ≤ 1 / 2 → |b α ^ α - b α| ≤ |α - 1| * Real.sqrt ( b α ) * |Real.log ( b α )|› ] with α hα₁ hα₂ using by simpa [ abs_of_nonneg hα₁.1 ] using hα₂ hα₁;
     -- Use the fact that $\sqrt{|b(α)|} \cdot |\log(|b(α)|)| \to 0$ as $b(α) \to 0$.
     have h_sqrt_log : Filter.Tendsto (fun α => Real.sqrt (|b α|) * |Real.log (|b α|)|) (nhds 1) (nhds 0) := by
@@ -812,9 +820,9 @@ private lemma conj_rpow_continuousAt_zero
   have h_conj : Filter.Tendsto (fun r : ℝ => A ^ r) (nhdsWithin 0 {0}ᶜ) (nhds A.supportProj) := by
     convert rpow_tendsto_supportProj A using 1;
   have h_conj : Filter.Tendsto (fun r : ℝ => (HermitianMat.conj (A ^ r).mat) ρM) (nhdsWithin 0 {0}ᶜ) (nhds ρM) := by
-    convert Filter.Tendsto.comp ( show Filter.Tendsto ( fun M : { M : Matrix d d ℂ // M.IsHermitian } ↦ ( HermitianMat.conj M.val ) ρM ) ( nhds ( A.supportProj ) ) ( nhds ρM ) from ?_ ) h_conj using 2;
+    convert! Filter.Tendsto.comp ( show Filter.Tendsto ( fun M : { M : Matrix d d ℂ // M.IsHermitian } ↦ ( HermitianMat.conj M.val ) ρM ) ( nhds ( A.supportProj ) ) ( nhds ρM ) from ?_ ) h_conj using 2;
     convert Continuous.tendsto _ _;
-    · convert conj_supportProj_eq_of_ker_le A ρM hker |> Eq.symm;
+    · convert! conj_supportProj_eq_of_ker_le A ρM hker |> Eq.symm;
     · fun_prop;
   rw [ Metric.tendsto_nhdsWithin_nhds ] at *;
   exact Metric.tendsto_nhds_nhds.mpr fun ε hε => by rcases h_conj ε hε with ⟨ δ, hδ, H ⟩ ; exact ⟨ δ, hδ, by intro x hx; by_cases hx' : x = 0 <;> aesop ⟩ ;
@@ -841,7 +849,7 @@ private lemma trace_cfc_sub_le (A : HermitianMat d ℂ) (f g : ℝ → ℝ) :
     |(A.cfc f).trace - (A.cfc g).trace| ≤
       (Fintype.card d : ℝ) * (⨆ i, |f (A.H.eigenvalues i) - g (A.H.eigenvalues i)|) := by
   rw [HermitianMat.trace_cfc_eq, HermitianMat.trace_cfc_eq]
-  convert Finset.abs_sum_le_sum_abs _ Finset.univ |> le_trans <| Finset.sum_le_card_nsmul _ _ _ fun i _ => show |f ( A.H.eigenvalues i ) - g ( A.H.eigenvalues i )| ≤ ⨆ i, |f ( A.H.eigenvalues i ) - g ( A.H.eigenvalues i )| from le_ciSup ( Finite.bddAbove_range fun i => |f ( A.H.eigenvalues i ) - g ( A.H.eigenvalues i )| ) i using 1
+  convert! Finset.abs_sum_le_sum_abs _ Finset.univ |> le_trans <| Finset.sum_le_card_nsmul _ _ _ fun i _ => show |f ( A.H.eigenvalues i ) - g ( A.H.eigenvalues i )| ≤ ⨆ i, |f ( A.H.eigenvalues i ) - g ( A.H.eigenvalues i )| from le_ciSup ( Finite.bddAbove_range fun i => |f ( A.H.eigenvalues i ) - g ( A.H.eigenvalues i )| ) i using 1
   · simp [← Finset.sum_sub_distrib]
   · simp
 
@@ -919,7 +927,7 @@ private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
       obtain ⟨ δ₂, δ₂_pos, H ⟩ := this; exact ⟨ δ₂, δ₂_pos, fun x hx₁ hx₂ hx₃ => by linarith [ abs_lt.mp ( H hx₂ ( by simpa [ abs_of_pos hx₂ ] using hx₃ ) ) ] ⟩ ;
     obtain ⟨δ₃, δ₃_pos, hδ₃⟩ : ∃ δ₃ > 0, ∀ x ∈ Set.Icc 0 K, 0 < x → x < δ₃ → ∀ h, 0 < |h| → |h| < 1 / 2 → |(x ^ (1 + h) - x) / h| ≤ x * (|Real.log x| + 1) * Real.exp (|h| * (|Real.log x| + 1)) := by
       obtain ⟨ δ₃, δ₃_pos, hδ₃ ⟩ := h_bound;
-      exact ⟨ δ₃, δ₃_pos, fun x hx hx' hx'' h hh hh' => by rw [ abs_div, div_le_iff₀ ( by positivity ) ] ; convert hδ₃ x hx hx' hx'' h hh hh' using 1 ; ring ⟩;
+      exact ⟨ δ₃, δ₃_pos, fun x hx hx' hx'' h hh hh' => by rw [ abs_div, div_le_iff₀ ( by positivity ) ] ; convert! hδ₃ x hx hx' hx'' h hh hh' using 1 ; ring ⟩;
     refine' ⟨ Min.min δ₁ ( Min.min δ₂ δ₃ ), lt_min δ₁_pos ( lt_min δ₂_pos δ₃_pos ), fun x hx hx' hx'' => ⟨ hδ₁ x hx hx' ( lt_of_lt_of_le hx'' ( min_le_left _ _ ) ), fun h hh₁ hh₂ => lt_of_le_of_lt ( hδ₃ x hx hx' ( lt_of_lt_of_le hx'' ( min_le_right _ _ |> le_trans <| min_le_right _ _ ) ) h hh₁ hh₂ ) _ ⟩ ⟩;
     exact lt_of_le_of_lt ( mul_le_mul_of_nonneg_left ( Real.exp_le_exp.mpr <| mul_le_mul_of_nonneg_right hh₂.le <| by positivity ) <| by positivity ) <| hδ₂ x hx hx' <| lt_of_lt_of_le hx'' <| min_le_right _ _ |> le_trans <| min_le_left _ _;
   obtain ⟨δ₂, δ₂_pos, hδ₂⟩ : ∃ δ₂ > 0, ∀ x ∈ Set.Icc δ₁ K, ∀ h, 0 < |h| → |h| < δ₂ → |(x ^ (1 + h) - x) / h - x * Real.log x| < ε / 4 := by
@@ -936,11 +944,11 @@ private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
               intro y hy; nlinarith [ Real.exp_pos y, Real.exp_neg y, mul_inv_cancel₀ ( ne_of_gt ( Real.exp_pos y ) ), Real.add_one_le_exp y, Real.add_one_le_exp ( -y ), mul_nonneg hy ( Real.exp_nonneg y ), mul_nonneg hy ( Real.exp_nonneg ( -y ) ) ] ;
             linarith [ h_taylor y ( by linarith ) ];
           · nlinarith [ Real.exp_pos y, Real.exp_neg y, mul_inv_cancel₀ ( ne_of_gt ( Real.exp_pos y ) ), Real.add_one_le_exp y, Real.add_one_le_exp ( -y ) ];
-        convert mul_le_mul_of_nonneg_left ( h_exp_ineq ( h * Real.log x ) ) ( inv_nonneg.mpr h_pos.le ) using 1 <;> norm_num [ Real.rpow_def_of_pos ( show 0 < x from lt_of_lt_of_le δ₁_pos hx.1 ), mul_comm ] ; ring_nf
+        convert! mul_le_mul_of_nonneg_left ( h_exp_ineq ( h * Real.log x ) ) ( inv_nonneg.mpr h_pos.le ) using 1 <;> norm_num [ Real.rpow_def_of_pos ( show 0 < x from lt_of_lt_of_le δ₁_pos hx.1 ), mul_comm ] ; ring_nf
         · rw [ ← abs_inv, ← abs_mul ] ; ring_nf;
           by_cases hh : h = 0 <;> aesop;
         · simp [ sq, mul_assoc, mul_comm, mul_left_comm, h_pos.ne' ];
-      convert mul_le_mul_of_nonneg_left h_mean_value ( show 0 ≤ x by linarith [ hx.1 ] ) using 1 <;> ring_nf
+      convert! mul_le_mul_of_nonneg_left h_mean_value ( show 0 ≤ x by linarith [ hx.1 ] ) using 1 <;> ring_nf
 
       rw [ show x ^ (1 + h) * h⁻¹ - x * h⁻¹ - x * Real.log x = x * ( -h⁻¹ + ( h⁻¹ * x ^ h - Real.log x ) ) by rw [ Real.rpow_add ( by linarith [ hx.1 ] ), Real.rpow_one ] ; ring ]
       rw [ abs_mul, abs_of_nonneg ( by linarith [ hx.1 ] : 0 ≤ x ) ]
@@ -989,7 +997,7 @@ private lemma trace_cfc_tendsto_of_tendsto (f : ℝ → ℝ)
   have h_trace_cont : Continuous (fun A : HermitianMat d ℂ => A.trace) := by
     exact HermitianMat.trace_Continuous;
   have h_comp_cont : Filter.Tendsto (fun α => (M α).cfc f) (nhds 1) (nhds ((ρ : HermitianMat d ℂ).cfc f)) := by
-    convert h_cfc_cont.tendsto.comp _ using 2;
+    convert! h_cfc_cont.tendsto.comp _ using 2;
     exact tendsto_nhdsWithin_iff.mpr ⟨ hM_cont.tendsto.trans ( by simp [ hM_one ] ), hM_nonneg ⟩;
   exact h_trace_cont.continuousAt.tendsto.comp h_comp_cont
 
@@ -1089,7 +1097,7 @@ private lemma hasDerivAt_trace_rpow_sub_trace_variable_base
   have h_deriv : HasDerivAt (fun α : ℝ => ((M α) ^ α).trace - (M α).trace - ((ρ.M) ^ α).trace + ρ.M.trace) 0 1 := by
     convert hasDerivAt_iff_tendsto_slope_zero.mpr _ using 1
     convert cross_term_slope_tendsto_zero hM_nonneg hM_cont hM_one using 2 ; norm_num [ hM_one ] ; ring!
-  convert h_deriv.add ( hasDerivAt_trace_rpow_sub_trace ρ.M ρ.nonneg ) using 1 <;> norm_num
+  convert! h_deriv.add ( hasDerivAt_trace_rpow_sub_trace ρ.M ρ.nonneg ) using 1 <;> norm_num
   ring_nf
   ext; norm_num; ring
 
@@ -1112,7 +1120,7 @@ private lemma rpow_trace_cross_term_vanishes {ρ σ : MState d}
       · convert B_of_continuousAt ρ σ h using 1;
       · simp [ HermitianMat.conj ];
     · convert hasDerivAt_trace_rpow_at_one ρ.M ( by exact ρ.nonneg ) using 1
-  convert HasDerivAt.add ( HasDerivAt.sub h_cross_term.1 h_cross_term.2 ) ( hasDerivAt_const _ _ ) using 1
+  convert! HasDerivAt.add ( HasDerivAt.sub h_cross_term.1 h_cross_term.2 ) ( hasDerivAt_const _ _ ) using 1
   ring
 
 private theorem sandwichedRelRentropy.hasDerivAt_trace_at_one {ρ σ : MState d}
@@ -1126,7 +1134,7 @@ private theorem sandwichedRelRentropy.hasDerivAt_trace_at_one {ρ σ : MState d}
     have h_conj := hasDerivAt_trace_conj_at_one h
     have h_rpow := hasDerivAt_trace_rpow_at_one ρ.M ρ.nonneg
     (h_cross_term.add (h_conj.add h_rpow)).sub (hasDerivAt_const 1 1)
-  convert h_deriv using 2
+  convert! h_deriv using 2
   · simp only [Pi.sub_apply, Pi.add_apply]
     ring
   · simp only [inner_sub_right]
@@ -1260,7 +1268,7 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
         exact σ₂.pos.ne' h_contra;
       · have h_contra : ρ₂.M = 0 := by
           ext i j; simp_all [ Submodule.eq_top_iff' ] ;
-          convert congr(WithLp.ofLp $(h_top (WithLp.toLp 2 ( Pi.single j 1 )) ) i) using 1
+          convert! congr(WithLp.ofLp $(h_top (WithLp.toLp 2 ( Pi.single j 1 )) ) i) using 1
           simp
           simp [ HermitianMat.lin ];
           rfl
@@ -1297,8 +1305,8 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
     have h_kronecker : ∀ (A : Matrix d₁ d₁ ℂ) (B : Matrix d₂ d₂ ℂ) (u : d₁ → ℂ) (v : d₂ → ℂ), (A.kronecker B).mulVec (fun p => u p.1 * v p.2) = fun p => (A.mulVec u) p.1 * (B.mulVec v) p.2 := by
       intro A B u v; ext ⟨ i, j ⟩ ; simp [ Matrix.mulVec, dotProduct, Finset.mul_sum, mul_comm, mul_left_comm ] ;
       exact Fintype.sum_prod_type_right fun x => A i x.1 * (B j x.2 * (u x.1 * v x.2));
-    convert congr_fun ( h_kronecker σ₁.1.mat σ₂.1.mat u v ) ( i, j ) using 1 ; simp
-    exact Or.inl ( by simpa [ Matrix.mulVec ] using congr(WithLp.ofLp $hu i) );
+    convert! congr_fun ( h_kronecker σ₁.1.mat σ₂.1.mat u v ) ( i, j ) using 1 ; simp
+    exact Or.inl ( by exact congr(WithLp.ofLp $hu i) );
   have hz' : z ∈ (ρ₁ ⊗ᴹ ρ₂ : HermitianMat (d₁ × d₂) ℂ).ker := by
     exact h hz;
   have hz'' : ∀ a b, (ρ₁.M.val.mulVec u) a * (ρ₂.M.val.mulVec v) b = 0 := by
@@ -1309,11 +1317,11 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
       simp [ z, Finset.mul_sum, mul_assoc, mul_left_comm ];
       erw [ Finset.sum_product ] ; simp
       exact rfl;
-    exact hz''.trans ( by simpa using congr(WithLp.ofLp $hz' ( a, b )) );
+    exact hz''.trans ( by exact congr(WithLp.ofLp $hz' ( a, b )) );
   ext a; specialize hz'' a; simp_all [ Matrix.mulVec, dotProduct ] ;
   contrapose! hv;
   intro hv'; ext b; specialize hz'' b; simp_all
-  exact hz''.resolve_left ( by simpa [ Matrix.mulVec, dotProduct ] using hv )
+  exact hz''.resolve_left ( by exact hv )
 
 
 --TODO: Generalize to arbitrary PSD matrices.
@@ -1333,7 +1341,7 @@ lemma ker_le_of_ker_kron_le_right (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSt
         have h_contra : ρ.M = 0 := by
           ext i j
           simp_all [ Submodule.eq_top_iff' ] ;
-          convert congr(WithLp.ofLp $(hρ_top ( EuclideanSpace.single j 1 ) ) i) using 1
+          convert! congr(WithLp.ofLp $(hρ_top ( EuclideanSpace.single j 1 ) ) i) using 1
           simp
           erw [ Matrix.toLpLin_apply ]
           aesop
@@ -1369,9 +1377,9 @@ lemma ker_le_of_ker_kron_le_right (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSt
     ext ⟨ a, b ⟩
     specialize hz_mul a b
     simp_all [ dotProduct]
-    convert hz_mul using 1;
+    convert! hz_mul using 1;
     simp_all only [zero_eq_mul]
-    exact Or.inr ( by simpa [ Matrix.mulVec, dotProduct ] using congr(WithLp.ofLp $hv b) );
+    exact Or.inr ( by exact congr(WithLp.ofLp $hv b) );
   have hz' : z ∈ (ρ₁ ⊗ᴹ ρ₂).M.ker := by
     exact h hz;
   have hz'' : ∀ i j, (ρ₁.M.val.mulVec u) i * (ρ₂.M.val.mulVec v) j = 0 := by
@@ -1387,7 +1395,7 @@ lemma ker_le_of_ker_kron_le_right (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSt
       · intro _ _
         simp only [MState.m, HermitianMat.mat_apply]
         ring_nf
-    exact hz''.symm.trans ( by simpa using congr(WithLp.ofLp $hz' ( i, j )) );
+    exact hz''.symm.trans ( by exact congr(WithLp.ofLp $hz' ( i, j )) );
   contrapose! hz'';
   obtain ⟨ i, hi ⟩ := Function.ne_iff.mp ( show ρ₁.M.val.mulVec u ≠ 0 from fun h => hu₃ <| congr(WithLp.toLp 2 $h))
   obtain ⟨ j, hj ⟩ := Function.ne_iff.mp ( show ρ₂.M.val.mulVec v ≠ 0 from fun h => hz'' <| congr(WithLp.toLp 2 $h))
@@ -1402,7 +1410,7 @@ lemma ker_prod_le_iff (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂) :
     (σ₁ ⊗ᴹ σ₂).M.ker ≤ (ρ₁ ⊗ᴹ ρ₂).M.ker ↔ σ₁.M.ker ≤ ρ₁.M.ker ∧ σ₂.M.ker ≤ ρ₂.M.ker := by
   constructor <;> intro h;
   · exact ⟨ ker_le_of_ker_kron_le_left ρ₁ σ₁ ρ₂ σ₂ h, ker_le_of_ker_kron_le_right ρ₁ σ₁ ρ₂ σ₂ h ⟩;
-  · convert ker_kron_le_of_le _ _ _ _ h.1 h.2 using 1
+  · convert! ker_kron_le_of_le _ _ _ _ h.1 h.2 using 1
 
 --TODO: Generalize to RCLike.
 omit [DecidableEq d₁] [DecidableEq d₂] in
@@ -1571,16 +1579,15 @@ theorem qRelativeEnt_additive (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState 
 theorem sandwichedRelRentropy_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
     D̃_ α(ρ.relabel e‖σ.relabel e) = D̃_ α(ρ‖σ) := by
   simp only [SandwichedRelRentropy, MState.relabel_M]
-  have := HermitianMat.ker_reindex_le_iff  (σ : HermitianMat d ℂ ) ↑ρ e.symm
-  split_ifs <;> simp_all [HermitianMat.conj_submatrix]
+  split_ifs <;> simp_all [HermitianMat.conj_submatrix] <;>
+    exact (HermitianMat.ker_reindex_le_iff σ.M ρ.M e.symm).mp ‹_›
 
 @[simp]
 theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
   --Technically this holds for all α except for `-1` and `0`. But those are stupid.
   --TODO: Maybe SandwichedRelRentropy should actually be defined differently for α = 0?
     D̃_ α(ρ‖ρ) = 0 := by
-  simp? [SandwichedRelRentropy, NNReal.eq_iff, hα, -NNReal.coe_eq_zero] says
-    simp only [SandwichedRelRentropy, hα, ↓reduceDIte, Std.le_refl, sub_self, inner_zero_right,
+  simp only [SandwichedRelRentropy, hα, ↓reduceDIte, Std.le_refl, sub_self, inner_zero_right,
       ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_zero]
   simp [NNReal.toReal]
   intro hα
@@ -1819,7 +1826,6 @@ theorem sandwichedRelRentropy_heq_congr
   obtain ⟨_, rfl⟩ := hσ
   simp [← MState.relabel_cast _ hd]
 
-@[gcongr]
 theorem sandwichedRelRentropy_congr {α : ℝ}
       {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
       {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂)
@@ -1828,7 +1834,6 @@ theorem sandwichedRelRentropy_congr {α : ℝ}
   subst ρ₁ σ₁
   simp
 
-@[gcongr]
 theorem qRelEntropy_heq_congr {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
       {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂) (hρ : ρ₁ ≍ ρ₂) (hσ : σ₁ ≍ σ₂) :
     𝐃(ρ₁‖σ₁) = 𝐃(ρ₂‖σ₂) := by
@@ -2014,8 +2019,9 @@ private lemma inner_cfc_approxLog_tendsto_bot (ρ x : MState d) (hx : ¬(x.M.ker
     have h_split_sum : Filter.Tendsto (fun N : ℕ => ∑ i ∈ Finset.univ.filter (fun i => x.M.H.eigenvalues i = 0), (-↑N) * eigenWeight ρ x i) Filter.atTop Filter.atBot := by
       have h_split_sum : ∑ i ∈ Finset.univ.filter (fun i => x.M.H.eigenvalues i = 0), eigenWeight ρ x i > 0 := by
         obtain ⟨ i, hi, hi' ⟩ := neg_ker_exists_eigenWeight_pos ρ x hx; exact lt_of_lt_of_le hi' ( Finset.single_le_sum ( fun i _ => eigenWeight_nonneg ρ x i ) ( by aesop ) ) ;
-      simp only [neg_mul];
-      simpa only [ Finset.sum_neg_distrib, Finset.mul_sum _ _ _ ] using Filter.tendsto_neg_atTop_atBot.comp ( tendsto_natCast_atTop_atTop.atTop_mul_const h_split_sum );
+      simp_rw [← Finset.mul_sum, neg_mul]
+      exact Filter.tendsto_neg_atTop_atBot.comp
+        (tendsto_natCast_atTop_atTop.atTop_mul_const h_split_sum)
     apply h_split_sum.congr'
     filter_upwards [ Filter.eventually_gt_atTop 0 ] with N hN
     refine Finset.sum_congr rfl fun i hi => ?_
@@ -2094,7 +2100,9 @@ theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous f
     have h₂ := qRelativeEnt_lowerSemicontinuous_2 ρ x hx y hy
     filter_upwards [h₂] with x' hx'
     split_ifs with h₁ junk
-    · simpa [← EReal.coe_ennreal_lt_coe_ennreal_iff, h₁] using hx'
+    · simp_all only [gt_iff_lt, ← EReal.coe_ennreal_lt_coe_ennreal_iff, EReal.coe_ennreal_top,
+      ↓reduceIte]
+      exact hx'
     · simp at junk
     · exact hy
 
@@ -2143,26 +2151,22 @@ private lemma inner_one_kron_eq_inner_traceLeft
 private lemma fixed_support_kron_right (ρ : MState (dA × dB))
     {x : EuclideanSpace ℂ (dA × dB)} (hx : x ∈ ρ.M.support) :
     (ρ.traceRight.M.supportProj ⊗ₖ (1 : HermitianMat dB ℂ)).lin x = x := by
-  let K : HermitianMat (dA × dB) ℂ := ρ.traceRight.M.kerProj ⊗ₖ (1 : HermitianMat dB ℂ)
-  simpa [Matrix.toEuclideanLin,
-    show K.mat.toEuclideanLin x = 0 by
-      simpa [HermitianMat.lin] using
-        ((HermitianMat.inner_zero_iff ρ.nonneg (by
-          simpa [K] using HermitianMat.kronecker_nonneg
-            (by simpa [HermitianMat.kerProj] using
-              (HermitianMat.projector_nonneg (S := ρ.traceRight.M.ker)))
-            (by rw [HermitianMat.zero_le_iff]; exact Matrix.PosSemidef.one))).1 (by
-          rw [HermitianMat.inner_comm, inner_kron_one_eq_inner_traceRight,
-            HermitianMat.inner_comm]
-          simpa [K, MState.exp_val] using
-            (ρ.traceRight.exp_val_eq_zero_iff
-              (by simpa [HermitianMat.kerProj] using
-                (HermitianMat.projector_nonneg (S := ρ.traceRight.M.ker)))).2
-              (by simp)) hx)] using
-    congrArg (fun T : HermitianMat (dA × dB) ℂ => T.mat.toEuclideanLin x)
-      (show K + ρ.traceRight.M.supportProj ⊗ₖ (1 : HermitianMat dB ℂ) = 1 by
-        simp only [K, ← HermitianMat.add_kronecker,
-          ρ.traceRight.M.kerProj_add_supportProj, HermitianMat.kronecker_one_one])
+  set K : HermitianMat (dA × dB) ℂ := ρ.traceRight.M.kerProj ⊗ₖ (1 : HermitianMat dB ℂ) with hKdef
+  have hKx : x ∈ K.ker := by
+    refine (HermitianMat.inner_zero_iff ρ.nonneg (HermitianMat.kronecker_nonneg
+      (by simpa [HermitianMat.kerProj] using
+        (HermitianMat.projector_nonneg (S := ρ.traceRight.M.ker)))
+      (by rw [HermitianMat.zero_le_iff]; exact Matrix.PosSemidef.one))).1 ?_ hx
+    rw [HermitianMat.inner_comm, inner_kron_one_eq_inner_traceRight, HermitianMat.inner_comm]
+    simpa [hKdef, MState.exp_val] using
+      (ρ.traceRight.exp_val_eq_zero_iff (by simpa [HermitianMat.kerProj] using
+        (HermitianMat.projector_nonneg (S := ρ.traceRight.M.ker)))).2 (by simp)
+  have hsum : K + ρ.traceRight.M.supportProj ⊗ₖ (1 : HermitianMat dB ℂ) = 1 := by
+    rw [hKdef, ← HermitianMat.add_kronecker, ρ.traceRight.M.kerProj_add_supportProj,
+      HermitianMat.kronecker_one_one]
+  have key := congrArg (fun T : HermitianMat (dA × dB) ℂ => T.lin x) hsum
+  simpa [HermitianMat.lin, HermitianMat.mat_add, map_add, LinearMap.add_apply,
+    Matrix.toLpLin_apply, (K.mem_ker_iff_mulVec_zero x).1 hKx] using key
 
 private lemma fixed_support_kron_left (ρ : MState (dA × dB))
     {x : EuclideanSpace ℂ (dA × dB)} (hx : x ∈ ρ.M.support) :
@@ -2176,20 +2180,17 @@ private lemma fixed_support_kron_left (ρ : MState (dA × dB))
       (by simpa [HermitianMat.kerProj] using
         (HermitianMat.projector_nonneg (S := ρ.traceLeft.M.ker)))
   have hsum : K + P = 1 := by
-    show K + P = 1
     simp only [K, P, ← HermitianMat.kronecker_add, ρ.traceLeft.M.kerProj_add_supportProj,
       HermitianMat.kronecker_one_one]
-  simpa [P, Matrix.toEuclideanLin,
-    show K.mat.toEuclideanLin x = 0 by
-      simpa [HermitianMat.lin] using ((HermitianMat.inner_zero_iff ρ.nonneg hK_nonneg).1 (by
-      rw [HermitianMat.inner_comm, inner_one_kron_eq_inner_traceLeft]
-      rw [HermitianMat.inner_comm]
-      simpa [K, MState.exp_val] using
-        (ρ.traceLeft.exp_val_eq_zero_iff
-          (by simpa [HermitianMat.kerProj] using
-            (HermitianMat.projector_nonneg (S := ρ.traceLeft.M.ker)))).2
-          (by simp)) hx)] using
-    congrArg (fun T : HermitianMat (dA × dB) ℂ => T.mat.toEuclideanLin x) hsum
+  have hKx : x ∈ K.ker := by
+    refine (HermitianMat.inner_zero_iff ρ.nonneg hK_nonneg).1 ?_ hx
+    rw [HermitianMat.inner_comm, inner_one_kron_eq_inner_traceLeft, HermitianMat.inner_comm]
+    simpa [K, MState.exp_val] using
+      (ρ.traceLeft.exp_val_eq_zero_iff (by simpa [HermitianMat.kerProj] using
+        (HermitianMat.projector_nonneg (S := ρ.traceLeft.M.ker)))).2 (by simp)
+  have key := congrArg (fun T : HermitianMat (dA × dB) ℂ => T.lin x) hsum
+  simpa [P, HermitianMat.lin, HermitianMat.mat_add, map_add, LinearMap.add_apply,
+    Matrix.toLpLin_apply, (K.mem_ker_iff_mulVec_zero x).1 hKx] using key
 
 /-- `I(A:B) = 𝐃(ρᴬᴮ‖ρᴬ ⊗ ρᴮ)` -/
 theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :

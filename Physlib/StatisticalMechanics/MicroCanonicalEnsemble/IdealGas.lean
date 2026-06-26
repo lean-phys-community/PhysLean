@@ -116,7 +116,7 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
       else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) := by
     apply Measurable.ite
     · simp_rw [measurableSet_setOf]
-      convert Measurable.comp h_measurable_box measurable_fst
+      convert! Measurable.comp h_measurable_box measurable_fst
     · fun_prop
     · fun_prop
   rw [MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
@@ -173,7 +173,7 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
       exact Fintype.prod_boole.symm
     simp only [not_exists, not_lt] at h_integrand_prod
     simp_rw [h_integrand_prod]; clear h_integrand_prod
-    convert ← MeasureTheory.integral_fintype_prod_eq_prod (ι := Fin n × Fin 3) (𝕜 := ℝ)
+    convert! ← MeasureTheory.integral_fintype_prod_eq_prod (ι := Fin n × Fin 3) (𝕜 := ℝ)
       (f := fun _ r ↦ if |r| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0); swap
     · infer_instance
     rw [Finset.prod_const]
