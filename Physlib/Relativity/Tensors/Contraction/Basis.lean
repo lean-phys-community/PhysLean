@@ -51,12 +51,10 @@ lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (
       rw [basis_apply, contrT_pure]
       simp [Pure.contrP, Pure.dropPair_basisVector]
       change if b'.dropPair i j = φ then _ else 0
-    split_ifs
-    · rename_i h
-      subst h
+    split_ifs with hd
+    · subst hd
       rw [Finset.sum_eq_single ⟨b', by simp⟩]
-      · simp [Pure.contrPCoeff]
-        simp [Pure.basisVector]
+      · simp [Pure.contrPCoeff, Pure.basisVector]
         congr 2
         generalize_proofs h1 h2
         generalize b' j = bj
@@ -64,38 +62,19 @@ lemma contrT_basis_repr_apply {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (
         subst h2
         rfl
       · intro b'' _ hb
-        simp only [Basis.repr_self]
-        apply mul_eq_zero_of_left
-        rw [@MonoidAlgebra.single_apply]
-        rw [if_neg]
-        by_contra hn
-        apply hb
-        exact Subtype.coe_eq_of_eq_mk (id (Eq.symm hn))
+        rw [Basis.repr_self, Finsupp.single_eq_of_ne fun h => hb (Subtype.ext h), zero_mul]
       · simp
     · symm
       apply Finset.sum_eq_zero
-      intro b'' hbf
-      apply mul_eq_zero_of_left
-      simp only [Basis.repr_self]
-      rw [@MonoidAlgebra.single_apply]
-      rw [if_neg]
-      by_contra hn
-      obtain ⟨b'', hb''⟩ := b''
-      subst hn
-      simp [DropPairSection] at hb''
-      rename_i _ hb _
-      exact hb hb''
+      intro b'' _
+      rw [Basis.repr_self, Finsupp.single_eq_of_ne ?_, zero_mul]
+      exact fun h => hd (h ▸ (Finset.mem_filter.mp b''.2).2)
   · simp
   · intro r t h1
-    simp only [map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul]
-    rw [h1, Finset.mul_sum]
-    ring_nf
+    simp only [map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, h1, Finset.mul_sum,
+      mul_assoc]
   · intro t1 t2 h1 h2
-    simp only [map_add, Finsupp.coe_add, Pi.add_apply]
-    rw [h1, h2, ← Finset.sum_add_distrib]
-    congr 1
-    funext x
-    rw [← add_mul]
+    simp only [map_add, Finsupp.coe_add, Pi.add_apply, h1, h2, add_mul, ← Finset.sum_add_distrib]
 
 lemma contrT_basis_repr_apply_eq_sum_fin {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (h : i ≠ j ∧ S.τ (c i) = c j) (t : Tensor S c)
