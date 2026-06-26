@@ -10,6 +10,53 @@ public import Physlib.Relativity.Tensors.Contraction.Pure
 
 # Contractions on tensors
 
+## i. Overview
+
+This file defines tensor contraction for an arbitrary `TensorSpecies`.
+
+The colors of a tensor record the type of each index. A pair of positions can be
+contracted when their colors are dual, expressed by a proof
+`S.τ (c i) = c j`, where `S.τ` is the color involution in the tensor species.
+For a tensor with colors `c : Fin (n + 1 + 1) → C`, contraction at positions
+`i` and `j` produces a tensor with two fewer indices and colors
+`c ∘ Fin.succSuccAbove i j`.
+
+The construction is first made on pure tensors in
+`Physlib.Relativity.Tensors.Contraction.Pure`. There, `Pure.dropPair` removes the
+two contracted factors from the remaining pure tensor, `Pure.contrPCoeff`
+computes the scalar contraction of the two removed factors using `S.contr`, and
+`Pure.contrP` multiplies that scalar by the dropped tensor. This file extends the
+operation linearly to arbitrary tensors via `contrT`.
+
+## ii. Key results
+
+- `TensorSpecies.Tensor.contrT` is the linear contraction map on tensors.
+- `TensorSpecies.Tensor.contrT_pure` identifies `contrT` on pure tensors with
+  `Pure.contrP`.
+- `TensorSpecies.Tensor.contrT_equivariant` says contraction commutes with the
+  symmetry-group action.
+- `TensorSpecies.Tensor.contrT_permT`, `TensorSpecies.Tensor.contrT_symm`, and
+  `TensorSpecies.Tensor.contrT_comm` describe the interaction of contraction with
+  reindexing, swapping the contracted pair, and performing two contractions.
+
+## iii. Related files
+
+- `Physlib.Relativity.Tensors.Contraction.SuccSuccAbove` contains the finite-index
+  maps used to drop two positions.
+- `Physlib.Relativity.Tensors.Contraction.Pure` defines `Pure.dropPair`,
+  `Pure.contrPCoeff`, `Pure.contrP`, and the multilinear map used to define
+  `contrT`.
+- `Physlib.Relativity.Tensors.Contraction.Products` proves compatibility between
+  contractions and tensor products.
+
+## iv. Table of contents
+
+- A. Tensor contraction
+
+## v. References
+
+There are no known references for the material in this module.
+
 -/
 
 @[expose] public section
@@ -23,14 +70,11 @@ variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
     {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Basis (basisIdx c) k (V c)}
     {S : TensorSpecies k C G V basisIdx rep b}
 
-TODO "docs: The files on contractions of tensors are currently lacking documentation.
-  These should be added, mirroring good examples within Physlib."
-
 namespace Tensor
 open Fin
 /-!
 
-## contrT
+## A. Tensor contraction
 
 -/
 
