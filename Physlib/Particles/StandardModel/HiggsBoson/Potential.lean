@@ -283,21 +283,21 @@ lemma isBounded_𝓵_nonneg (h : P.IsBounded) : 0 ≤ P.𝓵 := by
   by_contra hl
   rw [not_le] at hl
   obtain ⟨c, hc⟩ := h
-  have key : ∀ v : ℝ, ((0 < P.μ2 ∧ v ≤ 0) ∨
+  have c_le_of_attainable : ∀ v : ℝ, ((0 < P.μ2 ∧ v ≤ 0) ∨
       (P.μ2 ≤ 0 ∧ v ≤ - P.μ2 ^ 2 / (4 * P.𝓵))) → c ≤ v := by
     intro v hv
     obtain ⟨φ, x, rfl⟩ := (P.neg_𝓵_sol_exists_iff hl v).mpr hv
     exact hc φ x
   by_cases hμ : P.μ2 ≤ 0
   · by_cases hcz : c ≤ - P.μ2 ^ 2 / (4 * P.𝓵)
-    · linarith [key (c - 1) (Or.inr ⟨hμ, by linarith⟩)]
+    · linarith [c_le_of_attainable (c - 1) (Or.inr ⟨hμ, by linarith⟩)]
     · rw [not_le] at hcz
-      linarith [key (- P.μ2 ^ 2 / (4 * P.𝓵) - 1) (Or.inr ⟨hμ, by linarith⟩)]
+      linarith [c_le_of_attainable (- P.μ2 ^ 2 / (4 * P.𝓵) - 1) (Or.inr ⟨hμ, by linarith⟩)]
   · rw [not_le] at hμ
     by_cases hcz : c ≤ 0
-    · linarith [key (c - 1) (Or.inl ⟨hμ, by linarith⟩)]
+    · linarith [c_le_of_attainable (c - 1) (Or.inl ⟨hμ, by linarith⟩)]
     · rw [not_le] at hcz
-      linarith [key 0 (Or.inl ⟨hμ, by linarith⟩)]
+      linarith [c_le_of_attainable 0 (Or.inl ⟨hμ, by linarith⟩)]
 
 /-- Given a element `P` of `Potential` with `0 < 𝓵`, then the potential is bounded. -/
 lemma isBounded_of_𝓵_pos (h : 0 < P.𝓵) : P.IsBounded := by
@@ -335,7 +335,7 @@ lemma isMinOn_iff_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤
     (x : SpaceTime) : IsMinOn (fun (φ, x) => P.toFun φ x) Set.univ (φ, x)
     ↔ P.toFun φ x = 0 := by
   have h1 := P.pos_𝓵_sol_exists_iff h𝓵
-  have key : ∀ v : ℝ, ((P.μ2 < 0 ∧ 0 ≤ v) ∨
+  have attainable_nonneg : ∀ v : ℝ, ((P.μ2 < 0 ∧ 0 ≤ v) ∨
       (0 ≤ P.μ2 ∧ - P.μ2 ^ 2 / (4 * P.𝓵) ≤ v)) → 0 ≤ v := by
     rintro v (⟨_, hv⟩ | ⟨h0, hv⟩)
     · exact hv
@@ -344,10 +344,10 @@ lemma isMinOn_iff_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤
   simp only [Prod.forall]
   refine Iff.intro (fun h => ?_) (fun h => ?_)
   · have h1' : P.toFun φ x ≤ 0 := by simpa using h 0 0
-    have h1'' := key _ ((h1 (P.toFun φ x)).mp ⟨φ, x, rfl⟩)
+    have h1'' := attainable_nonneg _ ((h1 (P.toFun φ x)).mp ⟨φ, x, rfl⟩)
     linarith
   · rw [h]
-    exact fun φ' x' => key _ ((h1 (P.toFun φ' x')).mp ⟨φ', x', rfl⟩)
+    exact fun φ' x' => attainable_nonneg _ ((h1 (P.toFun φ' x')).mp ⟨φ', x', rfl⟩)
 
 lemma isMinOn_iff_field_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤ 0) (φ : HiggsField)
     (x : SpaceTime) : IsMinOn (fun (φ, x) => P.toFun φ x) Set.univ (φ, x)

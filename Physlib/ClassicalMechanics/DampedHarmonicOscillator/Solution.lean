@@ -262,7 +262,7 @@ private lemma underdampedBase_velocity (IC : InitialConditions) (hS : S.IsUnderd
           (IC.v₀ + S.decayRate • IC.x₀) := by
   have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_underdamped hS
   funext t
-  have key : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
+  have fderiv_comp_val_eq_deriv : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
       (fderiv ℝ (fun s : Time => g s.val) t) 1 = _root_.deriv g t.val := by
     intro g hg
     rw [fderiv_fun_comp t hg (by fun_prop), ContinuousLinearMap.comp_apply, Time.fderiv_val]
@@ -270,8 +270,8 @@ private lemma underdampedBase_velocity (IC : InitialConditions) (hS : S.IsUnderd
   rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
-  rw [key (fun s => cos (S.angularFrequency * s)) (by fun_prop),
-    key (fun s => sin (S.angularFrequency * s) / S.angularFrequency) (by fun_prop)]
+  rw [fderiv_comp_val_eq_deriv (fun s => cos (S.angularFrequency * s)) (by fun_prop),
+    fderiv_comp_val_eq_deriv (fun s => sin (S.angularFrequency * s) / S.angularFrequency) (by fun_prop)]
   simp [mul_comm, hΩ]
 
 private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUnderdamped) :
@@ -286,7 +286,7 @@ private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUn
   have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_underdamped hS
   rw [S.underdampedBase_velocity IC hS]
   funext t
-  have key : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
+  have fderiv_comp_val_eq_deriv : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
       (fderiv ℝ (fun s : Time => g s.val) t) 1 = _root_.deriv g t.val := by
     intro g hg
     rw [fderiv_fun_comp t hg (by fun_prop), ContinuousLinearMap.comp_apply, Time.fderiv_val]
@@ -294,8 +294,8 @@ private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUn
   rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
-  rw [key (fun s => -S.angularFrequency * sin (S.angularFrequency * s)) (by fun_prop),
-    key (fun s => cos (S.angularFrequency * s)) (by fun_prop)]
+  rw [fderiv_comp_val_eq_deriv (fun s => -S.angularFrequency * sin (S.angularFrequency * s)) (by fun_prop),
+    fderiv_comp_val_eq_deriv (fun s => cos (S.angularFrequency * s)) (by fun_prop)]
   simp [mul_comm, smul_smul, smul_add]
   field_simp [hΩ]
 
@@ -310,7 +310,7 @@ private lemma overdampedBase_velocity (IC : InitialConditions) (hS : S.IsOverdam
           (IC.v₀ + S.decayRate • IC.x₀) := by
   have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
   funext t
-  have key : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
+  have fderiv_comp_val_eq_deriv : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
       (fderiv ℝ (fun s : Time => g s.val) t) 1 = _root_.deriv g t.val := by
     intro g hg
     rw [fderiv_fun_comp t hg (by fun_prop), ContinuousLinearMap.comp_apply, Time.fderiv_val]
@@ -318,8 +318,8 @@ private lemma overdampedBase_velocity (IC : InitialConditions) (hS : S.IsOverdam
   rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
-  rw [key (fun s => cosh (S.angularFrequency * s)) (by fun_prop),
-    key (fun s => sinh (S.angularFrequency * s) / S.angularFrequency) (by fun_prop)]
+  rw [fderiv_comp_val_eq_deriv (fun s => cosh (S.angularFrequency * s)) (by fun_prop),
+    fderiv_comp_val_eq_deriv (fun s => sinh (S.angularFrequency * s) / S.angularFrequency) (by fun_prop)]
   simp [mul_comm, hΩ]
 
 private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOverdamped) :
@@ -334,7 +334,7 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
   have hΩ : S.angularFrequency ≠ 0 := S.angularFrequency_ne_zero_of_overdamped hS
   rw [S.overdampedBase_velocity IC hS]
   funext t
-  have key : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
+  have fderiv_comp_val_eq_deriv : ∀ g : ℝ → ℝ, DifferentiableAt ℝ g t.val →
       (fderiv ℝ (fun s : Time => g s.val) t) 1 = _root_.deriv g t.val := by
     intro g hg
     rw [fderiv_fun_comp t hg (by fun_prop), ContinuousLinearMap.comp_apply, Time.fderiv_val]
@@ -342,8 +342,8 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
   rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
-  rw [key (fun s => S.angularFrequency * sinh (S.angularFrequency * s)) (by fun_prop),
-    key (fun s => cosh (S.angularFrequency * s)) (by fun_prop)]
+  rw [fderiv_comp_val_eq_deriv (fun s => S.angularFrequency * sinh (S.angularFrequency * s)) (by fun_prop),
+    fderiv_comp_val_eq_deriv (fun s => cosh (S.angularFrequency * s)) (by fun_prop)]
   simp [mul_comm, smul_smul, smul_add]
   field_simp [hΩ]
 

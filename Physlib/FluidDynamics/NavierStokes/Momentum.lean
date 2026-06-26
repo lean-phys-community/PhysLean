@@ -239,7 +239,7 @@ theorem momentumEquation_iff_convectiveMomentumEquation
       Differentiable ℝ (momentumDensity d data.toFluidState t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
     MomentumEquation d data ↔ ConvectiveMomentumEquation d data := by
-  have key : ∀ t x, conservativeMomentumLHS d data.toFluidState t x =
+  have conservative_eq_convective_lhs : ∀ t x, conservativeMomentumLHS d data.toFluidState t x =
       convectiveMomentumLHS d data.toFluidState t x := by
     intro t x
     have hResidual : continuityResidual d data.toFluidState t x = 0 := by
@@ -248,7 +248,8 @@ theorem momentumEquation_iff_convectiveMomentumEquation
     rw [conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
         d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
         (hMomentumDensity t) (hVelocitySpace t), hResidual, zero_smul, add_zero]
-  exact ⟨fun h t x => (key t x).symm.trans (h t x), fun h t x => (key t x).trans (h t x)⟩
+  exact ⟨fun h t x => (conservative_eq_convective_lhs t x).symm.trans (h t x),
+    fun h t x => (conservative_eq_convective_lhs t x).trans (h t x)⟩
 
 end NavierStokes
 end FluidDynamics

@@ -299,7 +299,7 @@ lemma FluxesFive.chiralIndicesOfD_subset_sum_le_three_of_noExotics (F : FluxesFi
   have hpos : 0 ≤ (F.chiralIndicesOfD - S.map (fun x => x.1)).sum :=
     Multiset.sum_nonneg fun x hx =>
       chiralIndicesOfD_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
-  have key : (S.map (fun x => x.1)).sum +
+  have sum_add_compl_eq_three : (S.map (fun x => x.1)).sum +
       (F.chiralIndicesOfD - S.map (fun x => x.1)).sum = 3 := by
     rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
       F.chiralIndicesOfD_sum_eq_three_of_noExotics hF]
@@ -312,7 +312,7 @@ lemma FluxesFive.chiralIndicesOfL_subset_sum_le_three_of_noExotics (F : FluxesFi
   have hpos : 0 ≤ (F.chiralIndicesOfL - S.map (fun x => (x.1 + x.2))).sum :=
     Multiset.sum_nonneg fun x hx =>
       chiralIndicesOfL_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
-  have key : (S.map (fun x => (x.1 + x.2))).sum +
+  have sum_add_compl_eq_three : (S.map (fun x => (x.1 + x.2))).sum +
       (F.chiralIndicesOfL - S.map (fun x => (x.1 + x.2))).sum = 3 := by
     rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
       F.chiralIndicesOfL_sum_eq_three_of_noExotics hF]
@@ -325,7 +325,7 @@ lemma FluxesTen.chiralIndicesOfQ_subset_sum_le_three_of_noExotics (F : FluxesTen
   have hpos : 0 ≤ (F.chiralIndicesOfQ - S.map (fun x => x.1)).sum :=
     Multiset.sum_nonneg fun x hx =>
       chiralIndicesOfQ_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
-  have key : (S.map (fun x => x.1)).sum +
+  have sum_add_compl_eq_three : (S.map (fun x => x.1)).sum +
       (F.chiralIndicesOfQ - S.map (fun x => x.1)).sum = 3 := by
     rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
       F.chiralIndicesOfQ_sum_eq_three_of_noExotics hF]
@@ -338,7 +338,7 @@ lemma FluxesTen.chiralIndicesOfU_subset_sum_le_three_of_noExotics (F : FluxesTen
   have hpos : 0 ≤ (F.chiralIndicesOfU - S.map (fun x => (x.1 - x.2))).sum :=
     Multiset.sum_nonneg fun x hx =>
       chiralIndicesOfU_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
-  have key : (S.map (fun x => (x.1 - x.2))).sum +
+  have sum_add_compl_eq_three : (S.map (fun x => (x.1 - x.2))).sum +
       (F.chiralIndicesOfU - S.map (fun x => (x.1 - x.2))).sum = 3 := by
     rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
       F.chiralIndicesOfU_sum_eq_three_of_noExotics hF]
@@ -351,7 +351,7 @@ lemma FluxesTen.chiralIndicesOfE_subset_sum_le_three_of_noExotics (F : FluxesTen
   have hpos : 0 ≤ (F.chiralIndicesOfE - S.map (fun x => (x.1 + x.2))).sum :=
     Multiset.sum_nonneg fun x hx =>
       chiralIndicesOfE_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
-  have key : (S.map (fun x => (x.1 + x.2))).sum +
+  have sum_add_compl_eq_three : (S.map (fun x => (x.1 + x.2))).sum +
       (F.chiralIndicesOfE - S.map (fun x => (x.1 + x.2))).sum = 3 := by
     rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
       F.chiralIndicesOfE_sum_eq_three_of_noExotics hF]

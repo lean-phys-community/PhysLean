@@ -997,7 +997,7 @@ lemma anomalyCoefficient_of_map {𝓩 𝓩1 : Type} [CommRing 𝓩] [CommRing �
 
 lemma anomalyCoefficient_of_reduce (F : FiveQuanta 𝓩) [DecidableEq 𝓩] :
     F.reduce.anomalyCoefficient = F.anomalyCoefficient := by
-  have key : ∀ h : 𝓩 → 𝓩, (F.reduce.map fun x => (x.2.N : 𝓩) * h x.1).sum =
+  have reduce_sum_N_mul_eq : ∀ h : 𝓩 → 𝓩, (F.reduce.map fun x => (x.2.N : 𝓩) * h x.1).sum =
       (F.map fun x => (x.2.N : 𝓩) * h x.1).sum := by
     intro h
     let f : 𝓩 → Fluxes →+ 𝓩 := fun q5 =>
@@ -1008,7 +1008,7 @@ lemma anomalyCoefficient_of_reduce (F : FiveQuanta 𝓩) [DecidableEq 𝓩] :
           simp [add_mul] }
     simpa [f] using reduce_sum_eq_sum_toCharges F f
   simp [anomalyCoefficient]
-  exact ⟨key fun q => q, key fun q => q * q⟩
+  exact ⟨reduce_sum_N_mul_eq fun q => q, reduce_sum_N_mul_eq fun q => q * q⟩
 
 end ACCs
 

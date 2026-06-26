@@ -136,12 +136,12 @@ lemma smul_eq_sum {d : ℕ} (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : Vec
   rw [smul_toTensor_symm]
   apply induction_on_pure (t := p)
   · intro p
-    have key : ∀ (q : Pure (realLorentzTensor d) ![.up]) (j : Fin 1 ⊕ Fin d),
+    have toTensor_symm_pure_val : ∀ (q : Pure (realLorentzTensor d) ![.up]) (j : Fin 1 ⊕ Fin d),
         (toTensor (self := tensorial)).symm q.toTensor j = (q 0).val j := fun q j => by
       rw [toTensor_symm_pure, contrBasis_repr_apply]
       rfl
     rw [actionT_pure]
-    simp only [key]
+    simp only [toTensor_symm_pure_val]
     show (Λ.1 *ᵥ (p 0)).val i = ∑ j, Λ.1 i j * (p 0).val j
     rw [ContrMod.mulVec_val, mulVec_eq_sum]
     simp only [Finset.sum_apply, Pi.smul_apply, transpose_apply,

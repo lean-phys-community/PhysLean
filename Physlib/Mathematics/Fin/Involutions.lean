@@ -321,7 +321,7 @@ def involutionNoFixedSetOne {n : ℕ} :
     (∀ i, f i ≠ i) ∧ f 0 = 1} ≃ {f : Fin n → Fin n // Function.Involutive f ∧
     (∀ i, f i ≠ i)} where
   toFun f := by
-    have key (i : Fin n) : f.1 i.succ.succ ≠ 0 ∧ f.1 i.succ.succ ≠ 1 := by
+    have f_succ_succ_ne_zero_one (i : Fin n) : f.1 i.succ.succ ≠ 0 ∧ f.1 i.succ.succ ≠ 1 := by
       have hf1 : f.1 1 = 0 := by
         simp only [← f.2.2.2]
         rw [f.2.1]
@@ -329,11 +329,11 @@ def involutionNoFixedSetOne {n : ℕ} :
       · simpa [Fin.ext_iff] using f.2.1.injective (hn.trans hf1.symm)
       · simpa [Fin.ext_iff] using f.2.1.injective (hn.trans f.2.2.2.symm)
     let f' := f.1 ∘ Fin.succ ∘ Fin.succ
-    have hf' (i : Fin n) : f' i ≠ 0 := (key i).1
+    have hf' (i : Fin n) : f' i ≠ 0 := (f_succ_succ_ne_zero_one i).1
     let f'' := fun i => (f' i).pred (hf' i)
     have hf'' (i : Fin n) : f'' i ≠ 0 := by
       rw [ne_eq, Fin.pred_eq_iff_eq_succ, Fin.succ_zero_eq_one]
-      exact (key i).2
+      exact (f_succ_succ_ne_zero_one i).2
     let f''' := fun i => (f'' i).pred (hf'' i)
     refine ⟨f''', ?_, ?_⟩
     · intro i

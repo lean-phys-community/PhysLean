@@ -109,20 +109,20 @@ lemma isExtrema_iff_space_time {𝓕 : FreeSpace}
   have hgauss : ∀ a b : ℝ,
       1 / (𝓕.μ₀ * 𝓕.c.val) * a - 𝓕.c.val * b = 0 ↔ a = 1 / 𝓕.ε₀ * b := by
     intro a b
-    have key : 𝓕.c.val * b * (𝓕.μ₀ * 𝓕.c.val) = 1 / 𝓕.ε₀ * b := by
+    have c_sq_mul_eq : 𝓕.c.val * b * (𝓕.μ₀ * 𝓕.c.val) = 1 / 𝓕.ε₀ * b := by
       have hcb : 𝓕.c.val * b * (𝓕.μ₀ * 𝓕.c.val) = 𝓕.μ₀ * 𝓕.c.val ^ 2 * b := by ring
       rw [hcb, 𝓕.c_sq]
       field_simp
     rw [sub_eq_zero, div_mul_eq_mul_div, one_mul,
-      div_eq_iff (mul_ne_zero 𝓕.μ₀_ne_zero 𝓕.c.val_ne_zero), key]
+      div_eq_iff (mul_ne_zero 𝓕.μ₀_ne_zero 𝓕.c.val_ne_zero), c_sq_mul_eq]
   have hampere : ∀ T S C : ℝ, 𝓕.μ₀⁻¹ * (1 / 𝓕.c.val ^ 2 * T - S) + C = 0 ↔
       𝓕.μ₀ * 𝓕.ε₀ * T - S + 𝓕.μ₀ * C = 0 := by
     intro T S C
-    have key : 𝓕.μ₀ * 𝓕.ε₀ * T - S + 𝓕.μ₀ * C
+    have mu0_factor_eq : 𝓕.μ₀ * 𝓕.ε₀ * T - S + 𝓕.μ₀ * C
         = 𝓕.μ₀ * (𝓕.μ₀⁻¹ * (1 / 𝓕.c.val ^ 2 * T - S) + C) := by
       rw [𝓕.c_sq]
       field_simp
-    rw [key, mul_eq_zero, or_iff_right 𝓕.μ₀_ne_zero]
+    rw [mu0_factor_eq, mul_eq_zero, or_iff_right 𝓕.μ₀_ne_zero]
   refine and_congr ?_ ?_
   · simp only [gradLagrangian_sum_inl_0, SpaceTime.distTimeSlice_symm_apply]
     rw [hsurj.forall]

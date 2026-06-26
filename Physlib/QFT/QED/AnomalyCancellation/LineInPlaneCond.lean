@@ -127,14 +127,14 @@ lemma linesInPlane_four (S : (PureU1 4).Sols) (hS : LineInPlaneCond S.1.1) :
   simp only [LineInPlaneProp, hn.1, hn.2, false_or] at l012 l013
   -- `l012`, `l013` force `S.val 2 = S.val 3 = -(S.val 0 + S.val 1) / 2`; substituting into the
   -- cube constraint yields `3 (S.val 0 - S.val 1)² (S.val 0 + S.val 1) = 0`, contradicting `hn`.
-  have key : (S.val (0 : Fin 4) - S.val (1 : Fin 4)) ^ 2 *
+  have diff_sq_mul_sum_eq_zero : (S.val (0 : Fin 4) - S.val (1 : Fin 4)) ^ 2 *
       (S.val (0 : Fin 4) + S.val (1 : Fin 4)) = 0 := by
     linear_combination 4 / 3 * hcube -
       (2 * S.val (2 : Fin 4) ^ 2 - S.val (2 : Fin 4) * (S.val (0 : Fin 4) + S.val (1 : Fin 4)) +
         (S.val (0 : Fin 4) + S.val (1 : Fin 4)) ^ 2 / 2) / 3 * l012 -
       (2 * S.val (3 : Fin 4) ^ 2 - S.val (3 : Fin 4) * (S.val (0 : Fin 4) + S.val (1 : Fin 4)) +
         (S.val (0 : Fin 4) + S.val (1 : Fin 4)) ^ 2 / 2) / 3 * l013
-  rcases mul_eq_zero.mp key with h | h
+  rcases mul_eq_zero.mp diff_sq_mul_sum_eq_zero with h | h
   · exact hn.1 (sub_eq_zero.mp (sq_eq_zero_iff.mp h))
   · exact hn.2 (by linarith)
 

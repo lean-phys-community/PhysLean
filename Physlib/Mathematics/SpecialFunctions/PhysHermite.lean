@@ -296,7 +296,7 @@ lemma guassian_integrable_polynomial {b : ℝ} (hb : 0 < b) (P : Polynomial ℤ)
 lemma physHermite_gaussian_integrable (n p m : ℕ) :
     MeasureTheory.Integrable (deriv^[m] (physHermite p) * deriv^[n] fun x => Real.exp (-x ^ 2))
     MeasureTheory.volume := by
-  have key : (deriv^[m] (physHermite p) * deriv^[n] fun x => Real.exp (-x ^ 2)) =
+  have prod_eq_smul_aeval_mul_gaussian : (deriv^[m] (physHermite p) * deriv^[n] fun x => Real.exp (-x ^ 2)) =
       (-1 : ℝ) ^ n • fun x => (derivative^[m] (physHermite p) * physHermite n).aeval x *
       Real.exp (-1 * x ^ 2) := by
     funext x
@@ -304,7 +304,7 @@ lemma physHermite_gaussian_integrable (n p m : ℕ) :
     simp only [Pi.mul_apply, deriv_gaussian_eq_physHermite_mul_gaussian, map_mul, Pi.smul_apply,
       smul_eq_mul, neg_one_mul]
     ring
-  rw [key]
+  rw [prod_eq_smul_aeval_mul_gaussian]
   exact MeasureTheory.Integrable.smul _ (guassian_integrable_polynomial Real.zero_lt_one _)
 
 lemma integral_physHermite_mul_physHermite_eq_integral_deriv_exp (n m : ℕ) :

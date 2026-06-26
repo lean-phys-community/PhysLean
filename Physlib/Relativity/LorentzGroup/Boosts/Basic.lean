@@ -47,12 +47,6 @@ lemma γ_det_not_zero (β : ℝ) (hβ : |β| < 1) : (1 - β^2) ≠ 0 := by
   simp at h1
   aesop
 
-/-- The defining identity of the Lorentz factor: `(γ β)² (1 - β²) = 1` when `|β| < 1`. -/
-private lemma γ_sq_mul_det {β : ℝ} (hβ : |β| < 1) : (γ β) ^ 2 - (γ β) ^ 2 * β ^ 2 = 1 := by
-  have hd := γ_det_not_zero β hβ
-  rw [show (γ β) ^ 2 - (γ β) ^ 2 * β ^ 2 = (γ β) ^ 2 * (1 - β ^ 2) by ring, γ_sq β hβ]
-  field_simp
-
 /-- The Lorentz boost with in the space direction `i` with speed `β` with
   `|β| < 1`. -/
 def boost (i : Fin d) (β : ℝ) (hβ : |β| < 1) : LorentzGroup d :=
@@ -80,6 +74,10 @@ where
       enter [2, 2, x]
       rw [minkowskiMatrix.inr_i_inr_i]
     simp only [Fin.isValue, mul_neg, mul_one, neg_mul, neg_neg]
+    have hγ : (γ β) ^ 2 - (γ β) ^ 2 * β ^ 2 = 1 := by
+      have hd := γ_det_not_zero β hβ
+      rw [show (γ β) ^ 2 - (γ β) ^ 2 * β ^ 2 = (γ β) ^ 2 * (1 - β ^ 2) by ring, γ_sq β hβ]
+      field_simp
     by_cases hj : j = Sum.inl 0
     · subst hj
       simp only [Fin.isValue, ↓reduceIte, minkowskiMatrix.inl_0_inl_0, one_mul, true_and,
@@ -89,7 +87,7 @@ where
         by_cases hk : k = Sum.inl 0
         · subst hk
           simp only [Fin.isValue, ↓reduceIte, one_apply_eq]
-          linear_combination γ_sq_mul_det hβ
+          linear_combination hγ
         · simp only [Fin.isValue, hk, ↓reduceIte]
           by_cases hk' : k = Sum.inr i
           · simp only [hk', ↓reduceIte, Fin.isValue, ne_eq, reduceCtorEq, not_false_eq_true,
@@ -119,7 +117,7 @@ where
           · subst hk
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, neg_mul, one_mul, neg_neg, and_true,
               and_self, one_apply_eq]
-            linear_combination γ_sq_mul_det hβ
+            linear_combination hγ
           · rw [one_apply]
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, Sum.inr.injEq, hk, and_true, and_self,
               neg_mul, one_mul, neg_neg, zero_add]

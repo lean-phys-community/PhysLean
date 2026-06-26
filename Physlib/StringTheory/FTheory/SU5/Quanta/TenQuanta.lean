@@ -423,19 +423,19 @@ lemma reduce_numChiralU_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
     (hx : F.toFluxesTen ∈ FluxesTen.elemsNoExotics) :
     F.reduce.toFluxesTen.numChiralU = 3 := by
   have hE : F.toFluxesTen.NoExotics := ((FluxesTen.noExotics_iff_mem_elemsNoExotics _).mpr hx).1
-  have key := F.toFluxesTen.numChiralU_eq_sum_sub_numAntiChiralU
-  rw [hE.2.2.1, hE.2.2.2.1, sub_zero, FluxesTen.chiralIndicesOfU] at key
+  have numChiralU_eq_sum := F.toFluxesTen.numChiralU_eq_sum_sub_numAntiChiralU
+  rw [hE.2.2.1, hE.2.2.2.1, sub_zero, FluxesTen.chiralIndicesOfU] at numChiralU_eq_sum
   have hmap : (F.reduce.toFluxesTen.map (fun f => f.M - f.N)).sum =
       (F.toFluxesTen.map (fun f => f.M - f.N)).sum := by
     have h := reduce_sum_eq_sum_toCharges F
       (fun _ => (⟨⟨fun f => f.M - f.N, by simp⟩, fun a b => by simp; ring⟩ : Fluxes →+ ℤ))
     simpa [toFluxesTen, Multiset.map_map, Function.comp] using h
   rw [FluxesTen.numChiralU, FluxesTen.chiralIndicesOfU, Multiset.filter_eq_self.mpr, hmap]
-  · exact key.symm
+  · exact numChiralU_eq_sum.symm
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
   replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
-  clear ha hmap key hE
+  clear ha hmap numChiralU_eq_sum hE
   generalize F.toFluxesTen = G at *
   revert f
   revert G
@@ -471,19 +471,19 @@ lemma reduce_numChiralQ_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
     (hx : F.toFluxesTen ∈ FluxesTen.elemsNoExotics) :
     F.reduce.toFluxesTen.numChiralQ = 3 := by
   have hE : F.toFluxesTen.NoExotics := ((FluxesTen.noExotics_iff_mem_elemsNoExotics _).mpr hx).1
-  have key := F.toFluxesTen.numChiralQ_eq_sum_sub_numAntiChiralQ
-  rw [hE.1, hE.2.1, sub_zero, FluxesTen.chiralIndicesOfQ] at key
+  have numChiralQ_eq_sum := F.toFluxesTen.numChiralQ_eq_sum_sub_numAntiChiralQ
+  rw [hE.1, hE.2.1, sub_zero, FluxesTen.chiralIndicesOfQ] at numChiralQ_eq_sum
   have hmap : (F.reduce.toFluxesTen.map (fun f => f.M)).sum =
       (F.toFluxesTen.map (fun f => f.M)).sum := by
     have h := reduce_sum_eq_sum_toCharges F
       (fun _ => (⟨⟨fun f => f.M, by simp⟩, fun a b => by simp⟩ : Fluxes →+ ℤ))
     simpa [toFluxesTen, Multiset.map_map, Function.comp] using h
   rw [FluxesTen.numChiralQ, FluxesTen.chiralIndicesOfQ, Multiset.filter_eq_self.mpr, hmap]
-  · exact key.symm
+  · exact numChiralQ_eq_sum.symm
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
   replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
-  clear ha hmap key hE
+  clear ha hmap numChiralQ_eq_sum hE
   generalize F.toFluxesTen = G at *
   revert f
   revert G
@@ -519,19 +519,19 @@ lemma reduce_numChiralE_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
     (hx : F.toFluxesTen ∈ FluxesTen.elemsNoExotics) :
     F.reduce.toFluxesTen.numChiralE = 3 := by
   have hE : F.toFluxesTen.NoExotics := ((FluxesTen.noExotics_iff_mem_elemsNoExotics _).mpr hx).1
-  have key := F.toFluxesTen.numChiralE_eq_sum_sub_numAntiChiralE
-  rw [hE.2.2.2.2.1, hE.2.2.2.2.2, sub_zero, FluxesTen.chiralIndicesOfE] at key
+  have numChiralE_eq_sum := F.toFluxesTen.numChiralE_eq_sum_sub_numAntiChiralE
+  rw [hE.2.2.2.2.1, hE.2.2.2.2.2, sub_zero, FluxesTen.chiralIndicesOfE] at numChiralE_eq_sum
   have hmap : (F.reduce.toFluxesTen.map (fun f => f.M + f.N)).sum =
       (F.toFluxesTen.map (fun f => f.M + f.N)).sum := by
     have h := reduce_sum_eq_sum_toCharges F
       (fun _ => (⟨⟨fun f => f.M + f.N, by simp⟩, fun a b => by simp; ring⟩ : Fluxes →+ ℤ))
     simpa [toFluxesTen, Multiset.map_map, Function.comp] using h
   rw [FluxesTen.numChiralE, FluxesTen.chiralIndicesOfE, Multiset.filter_eq_self.mpr, hmap]
-  · exact key.symm
+  · exact numChiralE_eq_sum.symm
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
   replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
-  clear ha hmap key hE
+  clear ha hmap numChiralE_eq_sum hE
   generalize F.toFluxesTen = G at *
   revert f
   revert G
@@ -1123,7 +1123,7 @@ lemma anomalyCoefficient_of_map {𝓩 𝓩1 : Type} [CommRing 𝓩] [CommRing �
 
 lemma anomalyCoefficient_of_reduce [DecidableEq 𝓩] (F : TenQuanta 𝓩) :
     F.reduce.anomalyCoefficient = F.anomalyCoefficient := by
-  have key : ∀ w : 𝓩 → 𝓩,
+  have weighted_N_sum_eq : ∀ w : 𝓩 → 𝓩,
       (Multiset.map (fun x => (x.2.N : 𝓩) * w x.1) F.reduce).sum =
       (Multiset.map (fun x => (x.2.N : 𝓩) * w x.1) F).sum := fun w =>
     reduce_sum_eq_sum_toCharges F fun q5 =>
@@ -1131,7 +1131,7 @@ lemma anomalyCoefficient_of_reduce [DecidableEq 𝓩] (F : TenQuanta 𝓩) :
         map_zero' := by simp
         map_add' := fun x y => by simp [add_mul] }
   simp [anomalyCoefficient]
-  exact ⟨key fun q => q, congrArg (3 * ·) (key fun q => q * q)⟩
+  exact ⟨weighted_N_sum_eq fun q => q, congrArg (3 * ·) (weighted_N_sum_eq fun q => q * q)⟩
 
 end ACCs
 
