@@ -209,6 +209,11 @@ noncomputable instance {d} : SMul (LorentzGroup d) (ElectromagneticPotential d) 
 lemma action_val {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d) :
     (Λ • A).val = fun x => Λ • A (Λ⁻¹ • x) := rfl
 
+@[simp]
+lemma action_apply {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
+    (x : SpaceTime d) :
+    (Λ • A) x = Λ • A (Λ⁻¹ • x) := rfl
+
 noncomputable instance {d} : MulAction (LorentzGroup d) (ElectromagneticPotential d) where
   mul_smul Λ₁ Λ₂ A := by
     ext i
@@ -217,7 +222,14 @@ noncomputable instance {d} : MulAction (LorentzGroup d) (ElectromagneticPotentia
     ext i
     simp [action_val, one_smul]
 
-TODO "Lift the action on `ElectromagneticPotential d` to a `DistribMulAction`."
+noncomputable instance {d} :
+    DistribMulAction (LorentzGroup d) (ElectromagneticPotential d) where
+  smul_zero Λ := by
+    ext x μ
+    simp
+  smul_add Λ A B := by
+    ext x μ
+    simp [Lorentz.Vector.smul_add]
 
 /-!
 
