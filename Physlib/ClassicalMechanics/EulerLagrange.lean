@@ -45,8 +45,7 @@ theorem euler_lagrange_varGradient
     (L : Time → X → X → ℝ) (q : Time → X)
     (hq : ContDiff ℝ ∞ q) (hL : ContDiff ℝ ∞ ↿L) :
     (δ (q':=q), ∫ t, L t (q' t) (fderiv ℝ q' t 1)) = eulerLagrangeOp L q := by
-  rw [eulerLagrangeOp_eq]
-  simp only [Time.deriv_eq]
+  simp only [eulerLagrangeOp_eq, Time.deriv_eq]
   apply HasVarGradientAt.varGradient
   apply HasVarGradientAt.intro _
   · apply HasVarAdjDerivAt.comp
@@ -57,25 +56,17 @@ theorem euler_lagrange_varGradient
       · fun_prop
       intro x u
       apply DifferentiableAt.hasAdjFDerivAt
-      apply Differentiable.differentiableAt
-      apply ContDiff.differentiable
-      fun_prop
-      simp
+      apply ContDiff.differentiable (n := ∞) (by fun_prop) (by simp)
     · apply HasVarAdjDerivAt.prod (F:=fun φ => φ)
       · apply HasVarAdjDerivAt.id _ hq
-      · apply HasVarAdjDerivAt.fderiv
-        · exact hq
+      · apply HasVarAdjDerivAt.fderiv (hu := hq)
   case hgrad =>
     funext t
-    simp (disch:=fun_prop) only
-    simp[sub_eq_add_neg]
+    simp (disch := fun_prop) [sub_eq_add_neg]
     congr
-    rw [gradient_eq_adjFDeriv, adjFDeriv_uncurry]
-    apply ContDiff.differentiable (n := ∞) (by fun_prop) (by simp)
-    apply ContDiff.differentiable (n := ∞) (by fun_prop) (by simp)
-    funext t
-    rw [gradient_eq_adjFDeriv, adjFDeriv_uncurry]
-    apply ContDiff.differentiable (n := ∞) (by fun_prop) (by simp)
-    apply ContDiff.differentiable (n := ∞) (by fun_prop) (by simp)
+    all_goals
+      try funext t
+      rw [gradient_eq_adjFDeriv, adjFDeriv_uncurry] <;>
+        apply ContDiff.differentiable (n := ∞) (by fun_prop) (by simp)
 
 end ClassicalMechanics
