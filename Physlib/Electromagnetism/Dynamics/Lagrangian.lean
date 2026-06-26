@@ -385,7 +385,8 @@ lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     - (J x | ν')}ᵀ)) ν := by
   rw [gradLagrangian_eq_kineticTerm_sub _ hA _ hJ]
   simp only [Pi.sub_apply, apply_sub, one_div, map_smul,
-    map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul, neg_apply]
+    map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul,
+    Lorentz.Vector.neg_apply]
   rw [gradKineticTerm_eq_tensorDeriv A x hA]
   rw [gradFreeCurrentPotential_eq_tensor A hA J hJ x ν]
   simp only [one_div, map_smul, apply_smul,
