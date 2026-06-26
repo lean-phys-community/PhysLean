@@ -50,7 +50,7 @@ open TensorSpecies
 open Tensor
 open SpaceTime
 open TensorProduct
-open minkowskiMatrix
+open minkowskiMatrix Tensorial
 attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
