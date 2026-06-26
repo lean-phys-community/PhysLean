@@ -427,8 +427,8 @@ lemma div_electricField_eq_toFieldStrength {d} {A : ElectromagneticPotential d}
       ((toTimeAndSpace c).symm (t, x))) := by
   rw [Finset.mul_sum]
   simp only [Fin.isValue, Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero,
-    Finset.sum_singleton, toField_toFieldStrength_diag_eq_zero, SpaceTime.deriv_zero, Pi.ofNat_apply,
-    mul_zero, zero_add]
+    Finset.sum_singleton, toField_toFieldStrength_diag_eq_zero, SpaceTime.deriv_zero,
+    Pi.ofNat_apply, mul_zero, zero_add]
   conv_rhs =>
     enter [2, i]
     rw [SpaceTime.deriv_sum_inr c _ (differentiable_toField_toFieldStrength hA)]
