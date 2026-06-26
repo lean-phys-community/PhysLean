@@ -84,35 +84,8 @@ theorem adiabatic_relation_UaUbVaVb
       entropy c R s0 U0 V0 N0 Ua Va N =
       entropy c R s0 U0 V0 N0 Ub Vb N) :
     (Real.rpow (Ua / Ub) c) * (Va / Vb) = 1 := by
-    have hlog := adiabatic_relation_log
-      (Ua := Ua) (Ub := Ub) (Va := Va) (Vb := Vb) (N := N)
-      hUa hUb hVa hVb hN hU0 hV0 hR hS
-
-    have hUaUb_pos : 0 < Ua / Ub := div_pos hUa hUb
-    have hVaVb_pos : 0 < Va / Vb := div_pos hVa hVb
-
-      -- exponentiate both sides and rewrite with `rpow`
-    have h := congrArg Real.exp hlog
-    have h' :
-        Real.exp (c * log (Ua / Ub) + log (Va / Vb)) = 1 := by
-      simpa using h
-
-    -- use `exp_add` and `exp_log` / `rpow_def_of_pos` to rewrite
-    have hx :
-        Real.exp (c * log (Ua / Ub)) = (Ua / Ub) ^ c := by
-      -- rpow_def_of_pos: x^y = exp (y * log x) for x>0
-      simp [Real.rpow_def_of_pos hUaUb_pos, mul_comm]
-
-    have hy :
-        Real.exp (log (Va / Vb)) = Va / Vb := by
-      have : Va / Vb ≠ 0 := ne_of_gt hVaVb_pos
-      simpa using Real.exp_log hVaVb_pos
-
-    -- now simplify the LHS of h'
-    have :
-        (Ua / Ub) ^ c * (Va / Vb) = 1 := by
-      have := h'
-      -- rewrite LHS using `exp_add`, `hx`, `hy`
-      simpa [Real.exp_add, hx, hy, mul_comm, mul_left_comm, mul_assoc] using this
-
-    exact this
+    have hlog := adiabatic_relation_log hUa hUb hVa hVb hN hU0 hV0 hR hS
+    -- The product is `exp` of the left-hand side of `hlog`, i.e. `exp 0 = 1`.
+    show (Ua / Ub) ^ c * (Va / Vb) = 1
+    rw [Real.rpow_def_of_pos (div_pos hUa hUb), ← Real.exp_log (div_pos hVa hVb),
+        ← Real.exp_add, mul_comm (log (Ua / Ub)) c, hlog, Real.exp_zero]
