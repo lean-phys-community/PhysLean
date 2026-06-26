@@ -57,23 +57,6 @@ The chiral indices of all the SM representations are non-negative if there are n
 
 -/
 
-/-- A multiset of integers that contains a negative element has a strictly negative sum
-over its negative part. -/
-lemma sum_filter_neg_lt {s : Multiset ℤ} {ci : ℤ} (hci : ci ∈ s) (hneg : ci < 0) :
-    (s.filter (· < 0)).sum < 0 := by
-  apply lt_of_eq_of_lt (b := (Multiset.map id (s.filter (· < 0))).sum)
-  · simp
-  apply lt_of_lt_of_eq (b := (Multiset.map (fun _ => 0) (s.filter (· < 0))).sum)
-  swap
-  · simp
-  apply Multiset.sum_lt_sum_of_nonempty
-  · intro h
-    have hmem : ci ∈ s.filter (· < 0) := Multiset.mem_filter.mpr ⟨hci, hneg⟩
-    rw [h] at hmem
-    simp at hmem
-  · intro i hi
-    exact (Multiset.mem_filter.mp hi).2
-
 /-- The chiral indices of the representations `D = (bar 3,1)_{1/3}` are all non-negative if
   there are no chiral exotics in the spectrum. -/
 lemma FluxesFive.chiralIndicesOfD_noneg_of_noExotics (F : FluxesFive) (hF : NoExotics F)
@@ -82,7 +65,14 @@ lemma FluxesFive.chiralIndicesOfD_noneg_of_noExotics (F : FluxesFive) (hF : NoEx
   simp only [not_le] at hn
   have hF1 := hF.2.2.2
   simp [numAntiChiralD] at hF1
-  have h1 := sum_filter_neg_lt hci hn
+  have h1 := Multiset.sum_le_card_nsmul
+    (Multiset.filter (fun x => x < 0) F.chiralIndicesOfD) (-1)
+    (fun x hx => by
+      have := (Multiset.mem_filter.mp hx).2
+      omega)
+  rw [nsmul_eq_mul] at h1
+  have h2 : 0 < Multiset.card (Multiset.filter (fun x => x < 0) F.chiralIndicesOfD) :=
+    Multiset.card_pos_iff_exists_mem.mpr ⟨ci, Multiset.mem_filter.mpr ⟨hci, hn⟩⟩
   omega
 
 /-- The chiral indices of the representations `L = (1,2)_{-1/2}` are all non-negative if
@@ -93,7 +83,14 @@ lemma FluxesFive.chiralIndicesOfL_noneg_of_noExotics (F : FluxesFive) (hF : NoEx
   simp only [not_le] at hn
   have hF1 := hF.2.1
   simp [numAntiChiralL] at hF1
-  have h1 := sum_filter_neg_lt hci hn
+  have h1 := Multiset.sum_le_card_nsmul
+    (Multiset.filter (fun x => x < 0) F.chiralIndicesOfL) (-1)
+    (fun x hx => by
+      have := (Multiset.mem_filter.mp hx).2
+      omega)
+  rw [nsmul_eq_mul] at h1
+  have h2 : 0 < Multiset.card (Multiset.filter (fun x => x < 0) F.chiralIndicesOfL) :=
+    Multiset.card_pos_iff_exists_mem.mpr ⟨ci, Multiset.mem_filter.mpr ⟨hci, hn⟩⟩
   omega
 
 /-- The chiral indices of the representations `Q = (3,2)_{1/6}` are all non-negative if
@@ -104,7 +101,14 @@ lemma FluxesTen.chiralIndicesOfQ_noneg_of_noExotics (F : FluxesTen) (hF : NoExot
   simp only [not_le] at hn
   have hF1 := hF.2.1
   simp [numAntiChiralQ] at hF1
-  have h1 := sum_filter_neg_lt hci hn
+  have h1 := Multiset.sum_le_card_nsmul
+    (Multiset.filter (fun x => x < 0) F.chiralIndicesOfQ) (-1)
+    (fun x hx => by
+      have := (Multiset.mem_filter.mp hx).2
+      omega)
+  rw [nsmul_eq_mul] at h1
+  have h2 : 0 < Multiset.card (Multiset.filter (fun x => x < 0) F.chiralIndicesOfQ) :=
+    Multiset.card_pos_iff_exists_mem.mpr ⟨ci, Multiset.mem_filter.mpr ⟨hci, hn⟩⟩
   omega
 
 /-- The chiral indices of the representations `U = (bar 3,1)_{-2/3}` are all non-negative if
@@ -115,7 +119,14 @@ lemma FluxesTen.chiralIndicesOfU_noneg_of_noExotics (F : FluxesTen) (hF : NoExot
   simp only [not_le] at hn
   have hF1 := hF.2.2.2
   simp [numAntiChiralU] at hF1
-  have h1 := sum_filter_neg_lt hci hn
+  have h1 := Multiset.sum_le_card_nsmul
+    (Multiset.filter (fun x => x < 0) F.chiralIndicesOfU) (-1)
+    (fun x hx => by
+      have := (Multiset.mem_filter.mp hx).2
+      omega)
+  rw [nsmul_eq_mul] at h1
+  have h2 : 0 < Multiset.card (Multiset.filter (fun x => x < 0) F.chiralIndicesOfU) :=
+    Multiset.card_pos_iff_exists_mem.mpr ⟨ci, Multiset.mem_filter.mpr ⟨hci, hn⟩⟩
   omega
 
 lemma FluxesTen.chiralIndicesOfE_noneg_of_noExotics (F : FluxesTen) (hF : NoExotics F)
@@ -124,7 +135,14 @@ lemma FluxesTen.chiralIndicesOfE_noneg_of_noExotics (F : FluxesTen) (hF : NoExot
   simp only [not_le] at hn
   have hF1 := hF.2.2.2.2.2
   simp [numAntiChiralE] at hF1
-  have h1 := sum_filter_neg_lt hci hn
+  have h1 := Multiset.sum_le_card_nsmul
+    (Multiset.filter (fun x => x < 0) F.chiralIndicesOfE) (-1)
+    (fun x hx => by
+      have := (Multiset.mem_filter.mp hx).2
+      omega)
+  rw [nsmul_eq_mul] at h1
+  have h2 : 0 < Multiset.card (Multiset.filter (fun x => x < 0) F.chiralIndicesOfE) :=
+    Multiset.card_pos_iff_exists_mem.mpr ⟨ci, Multiset.mem_filter.mpr ⟨hci, hn⟩⟩
   omega
 
 /-!
@@ -274,49 +292,70 @@ lemma FluxesTen.mem_chiralIndicesOfE_mem_of_noExotics (F : FluxesTen)
 
 -/
 
-/-- A sub-multiset of a multiset of nonnegative integers summing to `3` has sum `≤ 3`. -/
-lemma submultiset_sum_le_three {s t : Multiset ℤ} (hs : s ≤ t) (hnn : ∀ x ∈ t, 0 ≤ x)
-    (h3 : t.sum = 3) : s.sum ≤ 3 := by
-  have hpos : 0 ≤ (t - s).sum :=
-    Multiset.sum_nonneg fun x hx => hnn x (Multiset.mem_of_le tsub_le_self hx)
-  have heq : t.sum = s.sum + (t - s).sum := by
-    rw [← Multiset.sum_add, add_tsub_cancel_of_le hs]
-  omega
-
 lemma FluxesFive.chiralIndicesOfD_subset_sum_le_three_of_noExotics (F : FluxesFive)
     (hF : NoExotics F) (S : Multiset Fluxes)
-    (hSle : S ≤ F) : (S.map (fun x => x.1)).sum ≤ 3 :=
-  submultiset_sum_le_three (Multiset.map_le_map hSle)
-    (fun x hx => chiralIndicesOfD_noneg_of_noExotics F hF x hx)
-    (F.chiralIndicesOfD_sum_eq_three_of_noExotics hF)
+    (hSle : S ≤ F) : (S.map (fun x => x.1)).sum ≤ 3 := by
+  have hs : S.map (fun x => x.1) ≤ F.chiralIndicesOfD := Multiset.map_le_map hSle
+  have hpos : 0 ≤ (F.chiralIndicesOfD - S.map (fun x => x.1)).sum :=
+    Multiset.sum_nonneg fun x hx =>
+      chiralIndicesOfD_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
+  have key : (S.map (fun x => x.1)).sum +
+      (F.chiralIndicesOfD - S.map (fun x => x.1)).sum = 3 := by
+    rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
+      F.chiralIndicesOfD_sum_eq_three_of_noExotics hF]
+  omega
 
 lemma FluxesFive.chiralIndicesOfL_subset_sum_le_three_of_noExotics (F : FluxesFive)
     (hF : NoExotics F) (S : Multiset Fluxes)
-    (hSle : S ≤ F) : (S.map (fun x => (x.1 + x.2))).sum ≤ 3 :=
-  submultiset_sum_le_three (Multiset.map_le_map hSle)
-    (fun x hx => chiralIndicesOfL_noneg_of_noExotics F hF x hx)
-    (F.chiralIndicesOfL_sum_eq_three_of_noExotics hF)
+    (hSle : S ≤ F) : (S.map (fun x => (x.1 + x.2))).sum ≤ 3 := by
+  have hs : S.map (fun x => (x.1 + x.2)) ≤ F.chiralIndicesOfL := Multiset.map_le_map hSle
+  have hpos : 0 ≤ (F.chiralIndicesOfL - S.map (fun x => (x.1 + x.2))).sum :=
+    Multiset.sum_nonneg fun x hx =>
+      chiralIndicesOfL_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
+  have key : (S.map (fun x => (x.1 + x.2))).sum +
+      (F.chiralIndicesOfL - S.map (fun x => (x.1 + x.2))).sum = 3 := by
+    rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
+      F.chiralIndicesOfL_sum_eq_three_of_noExotics hF]
+  omega
 
 lemma FluxesTen.chiralIndicesOfQ_subset_sum_le_three_of_noExotics (F : FluxesTen)
     (hF : NoExotics F) (S : Multiset Fluxes)
-    (hSle : S ≤ F) : (S.map (fun x => x.1)).sum ≤ 3 :=
-  submultiset_sum_le_three (Multiset.map_le_map hSle)
-    (fun x hx => chiralIndicesOfQ_noneg_of_noExotics F hF x hx)
-    (F.chiralIndicesOfQ_sum_eq_three_of_noExotics hF)
+    (hSle : S ≤ F) : (S.map (fun x => x.1)).sum ≤ 3 := by
+  have hs : S.map (fun x => x.1) ≤ F.chiralIndicesOfQ := Multiset.map_le_map hSle
+  have hpos : 0 ≤ (F.chiralIndicesOfQ - S.map (fun x => x.1)).sum :=
+    Multiset.sum_nonneg fun x hx =>
+      chiralIndicesOfQ_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
+  have key : (S.map (fun x => x.1)).sum +
+      (F.chiralIndicesOfQ - S.map (fun x => x.1)).sum = 3 := by
+    rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
+      F.chiralIndicesOfQ_sum_eq_three_of_noExotics hF]
+  omega
 
 lemma FluxesTen.chiralIndicesOfU_subset_sum_le_three_of_noExotics (F : FluxesTen)
     (hF : NoExotics F) (S : Multiset Fluxes)
-    (hSle : S ≤ F) : (S.map (fun x => (x.1 - x.2))).sum ≤ 3 :=
-  submultiset_sum_le_three (Multiset.map_le_map hSle)
-    (fun x hx => chiralIndicesOfU_noneg_of_noExotics F hF x hx)
-    (F.chiralIndicesOfU_sum_eq_three_of_noExotics hF)
+    (hSle : S ≤ F) : (S.map (fun x => (x.1 - x.2))).sum ≤ 3 := by
+  have hs : S.map (fun x => (x.1 - x.2)) ≤ F.chiralIndicesOfU := Multiset.map_le_map hSle
+  have hpos : 0 ≤ (F.chiralIndicesOfU - S.map (fun x => (x.1 - x.2))).sum :=
+    Multiset.sum_nonneg fun x hx =>
+      chiralIndicesOfU_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
+  have key : (S.map (fun x => (x.1 - x.2))).sum +
+      (F.chiralIndicesOfU - S.map (fun x => (x.1 - x.2))).sum = 3 := by
+    rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
+      F.chiralIndicesOfU_sum_eq_three_of_noExotics hF]
+  omega
 
 lemma FluxesTen.chiralIndicesOfE_subset_sum_le_three_of_noExotics (F : FluxesTen)
     (hF : NoExotics F) (S : Multiset Fluxes)
-    (hSle : S ≤ F) : (S.map (fun x => (x.1 + x.2))).sum ≤ 3 :=
-  submultiset_sum_le_three (Multiset.map_le_map hSle)
-    (fun x hx => chiralIndicesOfE_noneg_of_noExotics F hF x hx)
-    (F.chiralIndicesOfE_sum_eq_three_of_noExotics hF)
+    (hSle : S ≤ F) : (S.map (fun x => (x.1 + x.2))).sum ≤ 3 := by
+  have hs : S.map (fun x => (x.1 + x.2)) ≤ F.chiralIndicesOfE := Multiset.map_le_map hSle
+  have hpos : 0 ≤ (F.chiralIndicesOfE - S.map (fun x => (x.1 + x.2))).sum :=
+    Multiset.sum_nonneg fun x hx =>
+      chiralIndicesOfE_noneg_of_noExotics F hF x (Multiset.mem_of_le tsub_le_self hx)
+  have key : (S.map (fun x => (x.1 + x.2))).sum +
+      (F.chiralIndicesOfE - S.map (fun x => (x.1 + x.2))).sum = 3 := by
+    rw [← Multiset.sum_add, add_tsub_cancel_of_le hs,
+      F.chiralIndicesOfE_sum_eq_three_of_noExotics hF]
+  omega
 
 end SU5
 

@@ -40,17 +40,15 @@ lemma gramMatrix_selfAdjoint (H : TwoHiggsDoublet) :
   ext i j
   fin_cases i <;> fin_cases j <;> simp [inner_conj_symm]
 
-/-- Two vectors with equal self-inner-products have equal norms. -/
-lemma norm_eq_of_inner_self_eq {x y : HiggsVec} (h : ⟪x, x⟫_ℂ = ⟪y, y⟫_ℂ) : ‖x‖ = ‖y‖ := by
-  rw [norm_eq_sqrt_re_inner (𝕜 := ℂ) x, norm_eq_sqrt_re_inner (𝕜 := ℂ) y, h]
-
 lemma eq_fst_norm_of_eq_gramMatrix {H1 H2 : TwoHiggsDoublet}
-    (h : H1.gramMatrix = H2.gramMatrix) : ‖H1.Φ1‖ = ‖H2.Φ1‖ :=
-  norm_eq_of_inner_self_eq (show ⟪H1.Φ1, H1.Φ1⟫_ℂ = ⟪H2.Φ1, H2.Φ1⟫_ℂ from congrArg (· 0 0) h)
+    (h : H1.gramMatrix = H2.gramMatrix) : ‖H1.Φ1‖ = ‖H2.Φ1‖ := by
+  have hinner : ⟪H1.Φ1, H1.Φ1⟫_ℂ = ⟪H2.Φ1, H2.Φ1⟫_ℂ := congrArg (· 0 0) h
+  rw [norm_eq_sqrt_re_inner (𝕜 := ℂ) H1.Φ1, norm_eq_sqrt_re_inner (𝕜 := ℂ) H2.Φ1, hinner]
 
 lemma eq_snd_norm_of_eq_gramMatrix {H1 H2 : TwoHiggsDoublet}
-    (h : H1.gramMatrix = H2.gramMatrix) : ‖H1.Φ2‖ = ‖H2.Φ2‖ :=
-  norm_eq_of_inner_self_eq (show ⟪H1.Φ2, H1.Φ2⟫_ℂ = ⟪H2.Φ2, H2.Φ2⟫_ℂ from congrArg (· 1 1) h)
+    (h : H1.gramMatrix = H2.gramMatrix) : ‖H1.Φ2‖ = ‖H2.Φ2‖ := by
+  have hinner : ⟪H1.Φ2, H1.Φ2⟫_ℂ = ⟪H2.Φ2, H2.Φ2⟫_ℂ := congrArg (· 1 1) h
+  rw [norm_eq_sqrt_re_inner (𝕜 := ℂ) H1.Φ2, norm_eq_sqrt_re_inner (𝕜 := ℂ) H2.Φ2, hinner]
 
 @[simp]
 lemma gaugeGroupI_smul_gramMatrix (g : StandardModel.GaugeGroupI) (H : TwoHiggsDoublet) :
@@ -318,7 +316,11 @@ lemma gramMatrix_eq_component_gramVector (H : TwoHiggsDoublet) :
 lemma gramVector_inl_eq_trace_gramMatrix (H : TwoHiggsDoublet) :
     H.gramVector (Sum.inl 0) = H.gramMatrix.trace.re := by
   rw [gramMatrix_eq_component_gramVector, Matrix.trace_fin_two]
-  simp
+  simp only [Fin.isValue, one_div, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
+    Matrix.cons_val_fin_one, Matrix.cons_val_one, Complex.add_re, Complex.mul_re, Complex.inv_re,
+    Complex.re_ofNat, Complex.normSq_ofNat, div_self_mul_self', Complex.ofReal_re, Complex.inv_im,
+    Complex.im_ofNat, neg_zero, zero_div, Complex.add_im, Complex.ofReal_im, add_zero, mul_zero,
+    sub_zero, Complex.sub_re, Complex.sub_im, sub_self]
   ring
 
 lemma gramVector_inl_nonneg (H : TwoHiggsDoublet) :

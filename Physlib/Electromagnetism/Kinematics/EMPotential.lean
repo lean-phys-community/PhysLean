@@ -475,24 +475,20 @@ noncomputable def deriv {d} (A : ElectromagneticPotential d) :
     SpaceTime d → Lorentz.CoVector d ⊗[ℝ] Lorentz.Vector d := fun x =>
   ∑ μ, ∑ ν, (∂_ μ A x ν) • Lorentz.CoVector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν
 
-/-- The equivalence between component indices of `∂_μ A^ν` and pairs of Lorentz indices. -/
-private noncomputable def basisIndexEquiv (d : ℕ) :
-    ComponentIdx (S := realLorentzTensor d) (Fin.append ![Color.down] ![Color.up])
-      ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prod.trans <|
-  Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
-
 lemma deriv_eq_tensorDeriv {d} (A : ElectromagneticPotential d)
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
     A.deriv x = tensorDeriv A.val x := by
   rw [deriv, tensorDeriv_eq_sum_tensor_basis (by fun_prop)]
   /- Match the basis sum. -/
-  let e := basisIndexEquiv d
+  let e : ComponentIdx (Fin.append ![Color.down] ![Color.up])
+      ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prod.trans <|
+    Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
   rw [← e.symm.sum_comp, Fintype.sum_prod_type]
   /- Getting rid of the sums -/
   refine Finset.sum_congr rfl (fun μ _ => Finset.sum_congr rfl (fun ν _ => ?_))
   congr
   /- The coefficients. -/
-  · simp [e, basisIndexEquiv]
+  · simp [e]
     rw [deriv_apply_eq _ _ _ (by fun_prop)]
     congr
     simp [Lorentz.Vector.tensor_basis_repr_toTensor_apply]
@@ -501,7 +497,7 @@ lemma deriv_eq_tensorDeriv {d} (A : ElectromagneticPotential d)
       (Tensorial.toTensor (M := (Lorentz.CoVector d) ⊗[ℝ] (Lorentz.Vector d))).symm) (e.symm (μ, ν))
     rw [Tensorial.basis_map_prod, ← Lorentz.Vector.toTensor_symm_basis,
       ← Lorentz.CoVector.toTensor_symm_basis]
-    simp [e, basisIndexEquiv]
+    simp [e]
 
 /-!
 
@@ -544,13 +540,14 @@ lemma tensorDeriv_eval_eq {d} {A : ElectromagneticPotential d} (hA : Differentia
       toField_pure, smul_eq_mul, mul_one, Pure.evalPCoeff]
     change _ * (Lorentz.contrBasis d).repr (Lorentz.contrBasis d (b 1)) ν = _
     /- Transforming the basis -/
-    let e := basisIndexEquiv d
+    let e : ComponentIdx (Fin.append ![Color.down] ![Color.up])
+      ≃ (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) := ComponentIdx.prod.trans <|
+      Lorentz.CoVector.indexEquiv.prodCongr Lorentz.Vector.indexEquiv
     have h1 : Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis =
         (((Tensor.basis (Fin.append ![Color.down] ![Color.up]))).map toTensor.symm).reindex e := by
       ext ⟨i, j⟩
       simp_rw [Tensorial.basis_map_prod, Basis.tensorProduct_apply,
-        ← Lorentz.Vector.toTensor_symm_basis, ← Lorentz.CoVector.toTensor_symm_basis,
-        e, basisIndexEquiv]
+        ← Lorentz.Vector.toTensor_symm_basis, ← Lorentz.CoVector.toTensor_symm_basis, e]
       simp
     simp [Pure.basisVector, h1, Finsupp.single_apply]
     by_cases hμ : b 0 = μ <;> by_cases hν : b 1 = ν <;>

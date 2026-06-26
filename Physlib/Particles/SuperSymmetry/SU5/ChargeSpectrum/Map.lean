@@ -194,30 +194,22 @@ lemma map_subset {f : 𝓩 →+ 𝓩1} {x y : ChargeSpectrum 𝓩} (h : x ⊆ y)
 
 -/
 
-/-- The charges of a potential term commute with mapping by `f`, at the level of underlying
-  finite sets: the finite set of charges of `ofPotentialTerm' (map f x) T` is the `f`-image of
-  the finite set of charges of `ofPotentialTerm' x T`. -/
-lemma map_ofPotentialTerm'_toFinset_aux [DecidableEq 𝓩]
+lemma map_ofPotentialTerm_toFinset [DecidableEq 𝓩]
     (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :
-    (ofPotentialTerm' (map f x) T).toFinset = (ofPotentialTerm' x T).toFinset.image f := by
+    (ofPotentialTerm (map f x) T).toFinset = (ofPotentialTerm x T).toFinset.image f := by
+  have heq : ∀ {W : Type} [AddCommGroup W] [DecidableEq W] (y : ChargeSpectrum W)
+      (S : PotentialTerm), (ofPotentialTerm y S).toFinset = (ofPotentialTerm' y S).toFinset := by
+    intro W _ _ y S
+    ext i
+    simp only [Multiset.mem_toFinset]
+    rw [mem_ofPotentialTerm_iff_mem_ofPotentialTerm]
+  rw [heq, heq]
   rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> cases T <;>
     simp only [ofPotentialTerm', map, Option.map_eq_map, Option.map_some, Option.map_none,
       Multiset.toFinset_map, Finset.val_toFinset, Function.comp_def, map_add, map_sub, map_neg,
       Multiset.toFinset_singleton, Finset.image_singleton, Finset.product_eq_sprod,
       ← Finset.prodMap_image_product, Finset.image_image, Prod.map_fst, Prod.map_snd] <;>
     simp
-
-/-- The underlying finite set of `ofPotentialTerm` and `ofPotentialTerm'` agree. -/
-lemma ofPotentialTerm_toFinset_eq [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :
-    (ofPotentialTerm x T).toFinset = (ofPotentialTerm' x T).toFinset := by
-  ext i
-  simp only [Multiset.mem_toFinset]
-  rw [mem_ofPotentialTerm_iff_mem_ofPotentialTerm]
-
-lemma map_ofPotentialTerm_toFinset [DecidableEq 𝓩]
-    (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :
-    (ofPotentialTerm (map f x) T).toFinset = (ofPotentialTerm x T).toFinset.image f := by
-  rw [ofPotentialTerm_toFinset_eq, ofPotentialTerm_toFinset_eq, map_ofPotentialTerm'_toFinset_aux]
 
 lemma mem_map_ofPotentialTerm_iff [DecidableEq 𝓩]
     (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :

@@ -54,35 +54,6 @@ lemma transpose_mem_rotations {d} (Λ : LorentzGroup d) :
     transpose Λ ∈ Rotations d ↔ Λ ∈ Rotations d := by
   simp [mem_rotations_iff, LorentzGroup.transpose_val, IsProper]
 
-/-- A Lorentz transformation fixing the time component (`Λ (inl 0) (inl 0) = 1`) is block
-  diagonal: it equals `fromBlocks 1 0 0 M` where `M` is its spatial block. -/
-private lemma fromBlocks_spatial_eq {d} (Λ : LorentzGroup d)
-    (h : Λ.1 (Sum.inl 0) (Sum.inl 0) = 1) :
-    Matrix.fromBlocks 1 0 0 (fun i j => Λ.1 (Sum.inr i) (Sum.inr j)) = Λ.1 := by
-  have h1 : LorentzGroup.toVector Λ = Lorentz.Vector.basis (Sum.inl 0) := by
-    rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
-    exact h
-  have h2 : LorentzGroup.toVector (LorentzGroup.transpose Λ) =
-      Lorentz.Vector.basis (Sum.inl 0) := by
-    rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
-    exact h
-  funext i j
-  match i, j with
-  | .inl 0, .inl 0 => simp [h]
-  | .inl 0, .inr j =>
-    simp only [Fin.isValue, Matrix.fromBlocks_apply₁₂, Matrix.zero_apply]
-    trans (Lorentz.Vector.basis (Sum.inl 0)) (Sum.inr j)
-    · simp
-    rw [← h2]
-    simp [LorentzGroup.transpose_val]
-  | .inr i, .inl 0 =>
-    simp only [Fin.isValue, Matrix.fromBlocks_apply₂₁, Matrix.zero_apply]
-    trans (Lorentz.Vector.basis (Sum.inl 0)) (Sum.inr i)
-    · simp
-    rw [← h1]
-    simp
-  | .inr i, .inr j => rfl
-
 /-- The group homomorphism from the special orthogonal group to the Lorentz group. -/
 def ofSpecialOrthogonal {d} :
     Matrix.specialOrthogonalGroup (Fin d) ℝ ≃* Rotations d where
@@ -105,7 +76,30 @@ def ofSpecialOrthogonal {d} :
     match Λ with
     | ⟨Λ, h⟩ =>
     let M : Matrix (Fin d) (Fin d) ℝ := fun i j => Λ.1 (Sum.inr i) (Sum.inr j)
-    have h1 : Matrix.fromBlocks 1 0 0 M = Λ.1 := fromBlocks_spatial_eq Λ h.1
+    have h1 : Matrix.fromBlocks 1 0 0 M = Λ.1 := by
+      have h1 : LorentzGroup.toVector Λ = Lorentz.Vector.basis (Sum.inl 0) := by
+        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
+        exact h.1
+      have h2 : LorentzGroup.toVector (LorentzGroup.transpose Λ) =
+          Lorentz.Vector.basis (Sum.inl 0) := by
+        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
+        exact h.1
+      funext i j
+      match i, j with
+      | .inl 0, .inl 0 => simp [h.1]
+      | .inl 0, .inr j =>
+        simp only [Fin.isValue, Matrix.fromBlocks_apply₁₂, Matrix.zero_apply]
+        trans (Lorentz.Vector.basis (Sum.inl 0)) (Sum.inr j)
+        · simp
+        rw [← h2]
+        simp [LorentzGroup.transpose_val]
+      | .inr i, .inl 0 =>
+        simp only [Fin.isValue, Matrix.fromBlocks_apply₂₁, Matrix.zero_apply]
+        trans (Lorentz.Vector.basis (Sum.inl 0)) (Sum.inr i)
+        · simp
+        rw [← h1]
+        simp
+      | .inr i, .inr j => rfl
     · rw [Matrix.mem_specialOrthogonalGroup_iff]
       constructor
       · rw [Matrix.mem_orthogonalGroup_iff]
@@ -135,7 +129,30 @@ def ofSpecialOrthogonal {d} :
     match Λ with
     | ⟨Λ, h⟩ =>
     let M : Matrix (Fin d) (Fin d) ℝ := fun i j => Λ.1 (Sum.inr i) (Sum.inr j)
-    have h1 : Matrix.fromBlocks 1 0 0 M = Λ.1 := fromBlocks_spatial_eq Λ h.1
+    have h1 : Matrix.fromBlocks 1 0 0 M = Λ.1 := by
+      have h1 : LorentzGroup.toVector Λ = Lorentz.Vector.basis (Sum.inl 0) := by
+        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
+        exact h.1
+      have h2 : LorentzGroup.toVector (LorentzGroup.transpose Λ) =
+          Lorentz.Vector.basis (Sum.inl 0) := by
+        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
+        exact h.1
+      funext i j
+      match i, j with
+      | .inl 0, .inl 0 => simp [h.1]
+      | .inl 0, .inr j =>
+        simp only [Fin.isValue, Matrix.fromBlocks_apply₁₂, Matrix.zero_apply]
+        trans (Lorentz.Vector.basis (Sum.inl 0)) (Sum.inr j)
+        · simp
+        rw [← h2]
+        simp [LorentzGroup.transpose_val]
+      | .inr i, .inl 0 =>
+        simp only [Fin.isValue, Matrix.fromBlocks_apply₂₁, Matrix.zero_apply]
+        trans (Lorentz.Vector.basis (Sum.inl 0)) (Sum.inr i)
+        · simp
+        rw [← h1]
+        simp
+      | .inr i, .inr j => rfl
     apply Subtype.ext
     simp only
     exact eq_of_mulVec_eq (congrFun (congrArg Matrix.mulVec h1))

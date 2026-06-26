@@ -309,17 +309,6 @@ lemma self_subset_mem_completions (S5 S10 : Finset 𝓩) (x y : ChargeSpectrum �
     · simp_all
     · simp_all
 
-omit [DecidableEq 𝓩] in
-/-- If `x1.toFinset ⊆ (some y1).toFinset` and `y1 ∈ S5`, then `some y1` lies in the set of
-  candidate `qHd`/`qHu` charges used to define `completions`. -/
-private lemma some_mem_completions_option {x1 : Option 𝓩} {y1 : 𝓩} {S5 : Finset 𝓩}
-    (hsub : x1.toFinset ⊆ (some y1).toFinset) (hmem : y1 ∈ S5) :
-    some y1 ∈ if x1.isSome = true then ({x1} : Multiset (Option 𝓩))
-      else Multiset.map (fun y => some y) S5.val := by
-  match x1 with
-  | none => simpa using hmem
-  | some a => simp_all
-
 /-- If `x` is a subset of `y` and `y` is complete, then there is a completion of `x` which is also
   a subset of `y`. -/
 lemma exist_completions_subset_of_complete (S5 S10 : Finset 𝓩) (x y : ChargeSpectrum 𝓩)
@@ -347,8 +336,16 @@ lemma exist_completions_subset_of_complete (S5 S10 : Finset 𝓩) (x y : ChargeS
   have hz4Mem : z4 ∈ S10 := by
     apply hy.2.2.2
     simp_all
-  have hy1' := some_mem_completions_option hsubset.1 hy.1
-  have hy2' := some_mem_completions_option hsubset.2.1 hy.2.1
+  have hy1' : some y1 ∈ if x1.isSome = true then {x1} else
+      Multiset.map (fun y => some y) S5.val := by
+    match x1 with
+    | none => simpa using hy.1
+    | some a => simp_all
+  have hy2' : some y2 ∈ if x2.isSome = true then {x2} else
+      Multiset.map (fun y => some y) S5.val := by
+    match x2 with
+    | none => simpa using hy.2.1
+    | some a => simp_all
   simp_all
   refine ⟨⟨y1, y2, if x3 = ∅ then {z3} else x3, if x4 = ∅ then {z4} else x4⟩, ?_, ?_⟩
   · rw [mem_completions_iff]

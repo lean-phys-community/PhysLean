@@ -46,50 +46,83 @@ def tRow (V : CKMMatrix) : Fin 3 → ℂ := ![[V]td, [V]ts, [V]tb]
 /-- The `t`th row of the CKM matrix. -/
 scoped[CKMMatrix] notation (name := t_row) "[" V "]t" => tRow V
 
-/-- The rows of a CKM matrix are orthonormal: `∑ₖ conj (Vᵢₖ) * Vⱼₖ` is `1` when `i = j`
-and `0` otherwise. This is the entrywise form of the unitarity `V * Vᴴ = 1`. -/
-lemma conj_row_dotProduct_row (V : CKMMatrix) (i j : Fin 3) :
-    ∑ k, conj (V.1 i k) * V.1 j k = if i = j then 1 else 0 := by
-  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) j) i
-  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply, eq_comm] at ht
-  rw [Fin.sum_univ_three]
-  linear_combination ht.symm
-
 /-- The up-quark row of the CKM matrix is normalized to `1`. -/
-lemma uRow_normalized (V : CKMMatrix) : conj [V]u ⬝ᵥ [V]u = 1 :=
-  conj_row_dotProduct_row V 0 0
+lemma uRow_normalized (V : CKMMatrix) : conj [V]u ⬝ᵥ [V]u = 1 := by
+  show ∑ k, conj (V.1 0 k) * V.1 0 k = 1
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 0) 0
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_eq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The charm-quark row of the CKM matrix is normalized to `1`. -/
-lemma cRow_normalized (V : CKMMatrix) : conj [V]c ⬝ᵥ [V]c = 1 :=
-  conj_row_dotProduct_row V 1 1
+lemma cRow_normalized (V : CKMMatrix) : conj [V]c ⬝ᵥ [V]c = 1 := by
+  show ∑ k, conj (V.1 1 k) * V.1 1 k = 1
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 1) 1
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_eq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The top-quark row of the CKM matrix is normalized to `1`. -/
-lemma tRow_normalized (V : CKMMatrix) : conj [V]t ⬝ᵥ [V]t = 1 :=
-  conj_row_dotProduct_row V 2 2
+lemma tRow_normalized (V : CKMMatrix) : conj [V]t ⬝ᵥ [V]t = 1 := by
+  show ∑ k, conj (V.1 2 k) * V.1 2 k = 1
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 2) 2
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_eq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The up-quark row of the CKM matrix is orthogonal to the charm-quark row. -/
-lemma uRow_cRow_orthog (V : CKMMatrix) : conj [V]u ⬝ᵥ [V]c = 0 :=
-  conj_row_dotProduct_row V 0 1
+lemma uRow_cRow_orthog (V : CKMMatrix) : conj [V]u ⬝ᵥ [V]c = 0 := by
+  show ∑ k, conj (V.1 0 k) * V.1 1 k = 0
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 1) 0
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_ne, ne_eq,
+    not_false_eq_true, Fin.reduceEq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The up-quark row of the CKM matrix is orthogonal to the top-quark row. -/
-lemma uRow_tRow_orthog (V : CKMMatrix) : conj [V]u ⬝ᵥ [V]t = 0 :=
-  conj_row_dotProduct_row V 0 2
+lemma uRow_tRow_orthog (V : CKMMatrix) : conj [V]u ⬝ᵥ [V]t = 0 := by
+  show ∑ k, conj (V.1 0 k) * V.1 2 k = 0
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 2) 0
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_ne, ne_eq,
+    not_false_eq_true, Fin.reduceEq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The charm-quark row of the CKM matrix is orthogonal to the up-quark row. -/
-lemma cRow_uRow_orthog (V : CKMMatrix) : conj [V]c ⬝ᵥ [V]u = 0 :=
-  conj_row_dotProduct_row V 1 0
+lemma cRow_uRow_orthog (V : CKMMatrix) : conj [V]c ⬝ᵥ [V]u = 0 := by
+  show ∑ k, conj (V.1 1 k) * V.1 0 k = 0
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 0) 1
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_ne, ne_eq,
+    not_false_eq_true, Fin.reduceEq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The charm-quark row of the CKM matrix is orthogonal to the top-quark row. -/
-lemma cRow_tRow_orthog (V : CKMMatrix) : conj [V]c ⬝ᵥ [V]t = 0 :=
-  conj_row_dotProduct_row V 1 2
+lemma cRow_tRow_orthog (V : CKMMatrix) : conj [V]c ⬝ᵥ [V]t = 0 := by
+  show ∑ k, conj (V.1 1 k) * V.1 2 k = 0
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 2) 1
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_ne, ne_eq,
+    not_false_eq_true, Fin.reduceEq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The top-quark row of the CKM matrix is orthogonal to the up-quark row. -/
-lemma tRow_uRow_orthog (V : CKMMatrix) : conj [V]t ⬝ᵥ [V]u = 0 :=
-  conj_row_dotProduct_row V 2 0
+lemma tRow_uRow_orthog (V : CKMMatrix) : conj [V]t ⬝ᵥ [V]u = 0 := by
+  show ∑ k, conj (V.1 2 k) * V.1 0 k = 0
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 0) 2
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_ne, ne_eq,
+    not_false_eq_true, Fin.reduceEq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 /-- The top-quark row of the CKM matrix is orthogonal to the charm-quark row. -/
-lemma tRow_cRow_orthog (V : CKMMatrix) : conj [V]t ⬝ᵥ [V]c = 0 :=
-  conj_row_dotProduct_row V 2 1
+lemma tRow_cRow_orthog (V : CKMMatrix) : conj [V]t ⬝ᵥ [V]c = 0 := by
+  show ∑ k, conj (V.1 2 k) * V.1 1 k = 0
+  have ht := congrFun (congrFun (mem_unitaryGroup_iff.mp V.prop) 1) 2
+  simp only [mul_apply, star_apply, RCLike.star_def, Fin.sum_univ_three, one_apply_ne, ne_eq,
+    not_false_eq_true, Fin.reduceEq] at ht
+  rw [Fin.sum_univ_three]
+  linear_combination ht
 
 lemma uRow_cross_cRow_conj (V : CKMMatrix) : conj (conj [V]u ⨯₃ conj [V]c) = [V]u ⨯₃ [V]c := by
   simp only [crossProduct, Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, LinearMap.mk₂_apply,

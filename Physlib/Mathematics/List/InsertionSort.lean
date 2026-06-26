@@ -19,9 +19,6 @@ open Fin
 open Physlib
 variable {n : Nat}
 
-private lemma rel_of_not_rel {α : Type} {r : α → α → Prop} [Std.Total r] {a b : α} (hr : ¬ r a b) :
-    r b a := (Std.Total.total a b).resolve_left hr
-
 lemma insertionSortMin_lt_length_succ {α : Type} (r : α → α → Prop) [DecidableRel r]
     (i : α) (l : List α) :
     insertionSortMinPos r i l < (insertionSortDropMinPos r i l).length.succ := by
@@ -103,10 +100,10 @@ lemma orderedInsert_commute {α : Type} (r : α → α → Prop) [DecidableRel r
     List.orderedInsert r a (List.orderedInsert r b l) =
       List.orderedInsert r b (List.orderedInsert r a l)
   | [] => by
-    have hrb : r b a := rel_of_not_rel hr
+    have hrb : r b a := (Std.Total.total a b).resolve_left hr
     simp [hr, hrb]
   | c :: l => by
-    have hrb : r b a := rel_of_not_rel hr
+    have hrb : r b a := (Std.Total.total a b).resolve_left hr
     simp only [List.orderedInsert]
     by_cases h : r a c
     · simp only [h, ↓reduceIte, List.orderedInsert.eq_2, hrb]
@@ -173,7 +170,8 @@ lemma takeWhile_orderedInsert {α : Type} (r : α → α → Prop) [DecidableRel
     by_cases h : r b c
     · simp [h, hr]
     · simp only [h, ↓reduceIte]
-      have hl : ¬ r a c := fun hn => h (IsTrans.trans _ _ _ (rel_of_not_rel hr) hn)
+      have hl : ¬ r a c :=
+        fun hn => h (IsTrans.trans _ _ _ ((Std.Total.total a b).resolve_left hr) hn)
       simp only [hl, decide_false, Bool.not_false, List.takeWhile_cons_of_pos, List.length_cons,
         add_left_inj]
       exact takeWhile_orderedInsert r a b hr l
@@ -184,9 +182,9 @@ lemma takeWhile_orderedInsert' {α : Type} (r : α → α → Prop) [DecidableRe
     (List.takeWhile (fun c => !decide (r b c)) (List.orderedInsert r a l)).length =
     (List.takeWhile (fun c => !decide (r b c)) l).length
   | [] => by
-    simp [List.orderedInsert, rel_of_not_rel hr]
+    simp [List.orderedInsert, (Std.Total.total a b).resolve_left hr]
   | c :: l => by
-    have hrba : r b a := rel_of_not_rel hr
+    have hrba : r b a := (Std.Total.total a b).resolve_left hr
     simp only [List.orderedInsert]
     by_cases h : r b c
     · by_cases hac : r a c <;> simp [h, hac, hrba]
@@ -196,18 +194,13 @@ lemma takeWhile_orderedInsert' {α : Type} (r : α → α → Prop) [DecidableRe
         List.length_cons, add_left_inj]
         exact takeWhile_orderedInsert' r a b hr l
 
-private lemma val_succAbove {m : ℕ} (p : Fin (m + 1)) (i : Fin m) :
-    (p.succAbove i).1 = if i.1 < p.1 then i.1 else i.1 + 1 := by
-  rw [Fin.succAbove]
-  split <;> simp_all [Fin.lt_def]
-
 set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_commute {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (a b : α) (hr : ¬ r a b) (n : ℕ) : (l : List α) →
     (hn : n + 2 < (a :: b :: l).length) →
     insertionSortEquiv r (a :: b :: l) ⟨n + 2, hn⟩ = (finCongr (by simp))
     (insertionSortEquiv r (b :: a :: l) ⟨n + 2, hn⟩) := by
-  have hrba : r b a := rel_of_not_rel hr
+  have hrba : r b a := (Std.Total.total a b).resolve_left hr
   intro l hn
   simp only [List.insertionSort, List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one,
     equivCons_trans, Equiv.trans_apply, equivCons_succ, finCongr_apply]
@@ -268,6 +261,10 @@ lemma insertionSortEquiv_commute {α : Type} (r : α → α → Prop) [Decidable
   let n := ((insertionSortEquiv r l) ⟨n, by simpa using hn⟩)
   change (a1.succAbove ⟨b1.succAbove n, _⟩).1 = (b2.succAbove ⟨a2.succAbove n, _⟩).1
   have hba : b2.1 ≤ a2.1 := hb ▸ ha1
+  have val_succAbove {m : ℕ} (p : Fin (m + 1)) (i : Fin m) :
+      (p.succAbove i).1 = if i.1 < p.1 then i.1 else i.1 + 1 := by
+    rw [Fin.succAbove]
+    split <;> simp_all [Fin.lt_def]
   simp only [val_succAbove, ha2, hb]
   split_ifs <;> omega
 

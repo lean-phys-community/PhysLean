@@ -148,10 +148,6 @@ lemma normPowerSeries_inv_tendsto {d} (x : Space d) (hx : x ≠ 0) :
   · exact normPowerSeries_tendsto x hx
   · simpa using hx
 
-private lemma normPowerSeries_rpow_tendsto {d} (x : Space d) (hx : x ≠ 0) (r : ℝ) :
-    Filter.Tendsto (fun n => normPowerSeries n x ^ r) Filter.atTop (𝓝 (‖x‖ ^ r)) :=
-  Filter.Tendsto.rpow (normPowerSeries_tendsto x hx) tendsto_const_nhds (Or.inl (by simpa using hx))
-
 /-!
 
 ### A.3. The derivative of the norm power series
@@ -545,14 +541,6 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
 
 -/
 
-/-- To prove a property holds `volume`-almost everywhere on `Space d.succ` it suffices to prove it
-for all nonzero points, since `{0}` is null. -/
-private lemma ae_of_forall_ne_zero {d : ℕ} {P : Space d.succ → Prop} (h : ∀ x, x ≠ 0 → P x) :
-    ∀ᵐ x ∂(volume : Measure (Space d.succ)), P x := by
-  rw [Filter.eventually_iff_exists_mem]
-  refine ⟨{0}ᶜ, ?_, fun x hx => h x (by simpa using hx)⟩
-  rw [compl_mem_ae_iff, measure_singleton]
-
 lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} (m : ℤ)
     (hm : - (d.succ - 1 : ℕ) ≤ m) (η : 𝓢(Space d.succ, ℝ))
     (y : EuclideanSpace ℝ (Fin d.succ)) :
@@ -587,18 +575,24 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} (m : �
     rw [abs_of_nonneg (by positivity)]
     fun_prop
   · intro n
-    apply ae_of_forall_ne_zero
+    rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     simp at hx
     simp
     apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
     rw [abs_of_nonneg (by simp)]
     exact normPowerSeries_zpow_le_norm_sq_add_one n m x hx
-  · apply ae_of_forall_ne_zero
+  · rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
-    simpa using normPowerSeries_rpow_tendsto x hx (m : ℝ)
+    have h1 : Filter.Tendsto (fun n => normPowerSeries n x ^ (m : ℝ))
+        Filter.atTop (𝓝 (‖x‖ ^ (m : ℝ))) :=
+      Filter.Tendsto.rpow (normPowerSeries_tendsto x hx) tendsto_const_nhds
+        (Or.inl (by simpa using hx))
+    simpa using h1
 
 lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.succ - 1 : ℕ) + 1 ≤ m)
     (η : 𝓢(Space d.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ)) :
@@ -682,7 +676,8 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.
     simp only [true_or]
     fun_prop
   · intro n
-    apply ae_of_forall_ne_zero
+    rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     simp at hx
     simp [mul_assoc]
@@ -691,7 +686,8 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.
     apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
     rw [abs_of_nonneg (by simp)]
     exact normPowerSeries_zpow_le_norm_sq_add_one n (m - 2) x hx
-  · apply ae_of_forall_ne_zero
+  · rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
@@ -701,7 +697,10 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.
     ring_nf
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
-    have h1 := normPowerSeries_rpow_tendsto x hx ((m - 2 : ℤ) : ℝ)
+    have h1 : Filter.Tendsto (fun n => normPowerSeries n x ^ ((m - 2 : ℤ) : ℝ))
+        Filter.atTop (𝓝 (‖x‖ ^ ((m - 2 : ℤ) : ℝ))) :=
+      Filter.Tendsto.rpow (normPowerSeries_tendsto x hx) tendsto_const_nhds
+        (Or.inl (by simpa using hx))
     simp [-Int.cast_sub, Real.rpow_intCast] at h1
     convert h1 using 3
     · ring
@@ -787,13 +786,15 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ}
     rw [abs_of_nonneg (by positivity)]
     fun_prop
   · intro n
-    apply ae_of_forall_ne_zero
+    rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     simp at hx
     simp
     apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
     exact normPowerSeries_log_le n x hx
-  · apply ae_of_forall_ne_zero
+  · rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
@@ -853,7 +854,8 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ}
     simp only [true_or]
     fun_prop
   · intro n
-    apply ae_of_forall_ne_zero
+    rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     simp at hx
     simp [mul_assoc]
@@ -861,7 +863,8 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ}
     apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
     rw [abs_of_nonneg (by simp)]
     exact normPowerSeries_zpow_le_norm_sq_add_one n (- 2 : ℤ) x hx
-  · apply ae_of_forall_ne_zero
+  · rw [Filter.eventually_iff_exists_mem]
+    refine ⟨{0}ᶜ, by rw [compl_mem_ae_iff, measure_singleton], ?_⟩
     intro x hx
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
@@ -869,7 +872,11 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ}
     rw [mul_comm]
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
-    simpa using normPowerSeries_rpow_tendsto x hx ((- 2 : ℤ) : ℝ)
+    have h1 : Filter.Tendsto (fun n => normPowerSeries n x ^ ((- 2 : ℤ) : ℝ))
+        Filter.atTop (𝓝 (‖x‖ ^ ((- 2 : ℤ) : ℝ))) :=
+      Filter.Tendsto.rpow (normPowerSeries_tendsto x hx) tendsto_const_nhds
+        (Or.inl (by simpa using hx))
+    simpa using h1
 
 /-!
 
@@ -928,39 +935,6 @@ private lemma integrable_real_pow_mul_schwartz
   filter_upwards with x
   simp [norm_mul, norm_pow]
 
-/-- The one-dimensional Schwartz map `a ↦ η (a • n.1)` obtained by precomposing a Schwartz map
-`η` on `Space d.succ` with the line through a sphere point `n`. -/
-private def schwartzCompSmulSphere {d : ℕ} (n : ↑(Metric.sphere (0 : Space d.succ) 1))
-    (η : 𝓢(Space d.succ, ℝ)) : 𝓢(ℝ, ℝ) :=
-  SchwartzMap.compCLM (g := fun a => a • n.1) ℝ (by
-    refine ⟨by fun_prop, fun n' => ?_⟩
-    match n' with
-    | 0 =>
-      use 1, 1
-      simp [norm_smul]
-    | 1 =>
-      use 0, 1
-      intro x
-      simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right]
-      rw [(continuousMultilinearCurryRightEquiv' ℝ 0 ℝ (Space d.succ)).symm.norm_map]
-      simp [ContinuousLinearMap.norm_smulRight_apply]
-    | n' + 1 + 1 =>
-      use 0, 0
-      intro x
-      simp only [Real.norm_eq_abs, pow_zero, mul_one, norm_le_zero_iff]
-      rw [iteratedFDeriv_succ_eq_comp_right]
-      conv_lhs =>
-        enter [2, 3, y]
-        simp [fderiv_smul_const]
-      rw [iteratedFDeriv_succ_const]
-      rfl) (by use 1, 1; simp [norm_smul]) η
-
-@[simp]
-private lemma schwartzCompSmulSphere_apply {d : ℕ}
-    (n : ↑(Metric.sphere (0 : Space d.succ) 1)) (η : 𝓢(Space d.succ, ℝ)) (x : ℝ) :
-    schwartzCompSmulSphere n η x = η (x • n.1) := by
-  simp [schwartzCompSmulSphere]
-
 private lemma radial_power_deriv_integral_by_parts
     {d : ℕ} (η : 𝓢(Space d.succ, ℝ))
     (n : ↑(Metric.sphere (0 : Space d.succ) 1))
@@ -972,8 +946,32 @@ private lemma radial_power_deriv_integral_by_parts
       (p : ℝ) * ∫ (r : Set.Ioi (0 : ℝ)),
         r.1 ^ (p - 1) * η (r.1 • n.1)
         ∂(.comap Subtype.val volume) := by
-  let η' : 𝓢(ℝ, ℝ) := schwartzCompSmulSphere n η
-  have hη'_apply (x : ℝ) : η' x = η (x • n.1) := schwartzCompSmulSphere_apply n η x
+  let η' : 𝓢(ℝ, ℝ) := SchwartzMap.compCLM (g := fun a => a • n.1) ℝ (by
+    apply And.intro
+    · fun_prop
+    · intro n'
+      match n' with
+      | 0 =>
+        use 1, 1
+        simp [norm_smul]
+      | 1 =>
+        use 0, 1
+        intro x
+        simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right]
+        rw [(continuousMultilinearCurryRightEquiv' ℝ 0 ℝ (Space d.succ)).symm.norm_map]
+        simp [ContinuousLinearMap.norm_smulRight_apply]
+      | n' + 1 + 1 =>
+        use 0, 0
+        intro x
+        simp only [Real.norm_eq_abs, pow_zero, mul_one, norm_le_zero_iff]
+        rw [iteratedFDeriv_succ_eq_comp_right]
+        conv_lhs =>
+          enter [2, 3, y]
+          simp [fderiv_smul_const]
+        rw [iteratedFDeriv_succ_const]
+        rfl) (by use 1, 1; simp [norm_smul]) η
+  have hη'_apply (x : ℝ) : η' x = η (x • n.1) := by
+    simp [η']
   have hmul_iter_apply :
       ∀ k x, ((Physlib.Distribution.powOneMul ℝ)^[k] η') x = x ^ k * η' x := by
     intro k
@@ -1164,16 +1162,6 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
 
 -/
 
-/-- Pulling a real scalar out of `distOfFunction (fun x => (c * ‖x‖ ^ k) • basis.repr x)`. -/
-private lemma distOfFunction_const_mul_zpow_smul_repr_eq {d : ℕ} (c : ℝ) (k : ℤ)
-    (h1 : IsDistBounded (fun x : Space d => (c * ‖x‖ ^ k) • basis.repr x))
-    (h2 : IsDistBounded (fun x : Space d => ‖x‖ ^ k • basis.repr x)) :
-    distOfFunction (fun x : Space d => (c * ‖x‖ ^ k) • basis.repr x) h1 =
-      c • distOfFunction (fun x : Space d => ‖x‖ ^ k • basis.repr x) h2 := by
-  convert distOfFunction_smul_fun (fun x : Space d => ‖x‖ ^ k • basis.repr x) h2 c using 1
-  ext x
-  simp [smul_smul]
-
 lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} (m : ℤ)
     (hm : - (d.succ - 1 : ℕ) + 1 ≤ m)
     (hdiv : 0 < m - 2 + (d.succ : ℤ)) :
@@ -1186,8 +1174,23 @@ lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} (m : ℤ)
   change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space d.succ => ‖x‖ ^ m)
     (IsDistBounded.pow m (by simp_all; omega)))) = _
   rw [distGrad_distOfFunction_norm_zpow m hm]
-  rw [distOfFunction_const_mul_zpow_smul_repr_eq (m : ℝ) (m - 2) _
-    (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega))]
+  have hdist :
+      distOfFunction (fun x : Space d.succ => (m * ‖x‖ ^ (m - 2)) • basis.repr x)
+          (by
+            simp [← smul_smul]
+            refine IsDistBounded.const_fun_smul ?_ ↑m
+            apply IsDistBounded.zpow_smul_repr_self
+            simp_all
+            omega) =
+        (m : ℝ) • distOfFunction
+          (fun x : Space d.succ => ‖x‖ ^ (m - 2) • basis.repr x)
+          (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) := by
+    convert distOfFunction_smul_fun
+      (fun x : Space d.succ => ‖x‖ ^ (m - 2) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) (m : ℝ) using 1
+    ext x
+    simp [smul_smul]
+  rw [hdist]
   rw [map_smul]
   rw [distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv]
   rw [smul_smul]
@@ -1284,6 +1287,28 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
       _ = - ∫ n, (-η 0) ∂(volume (α := Space d.succ).toSphere) := by
         congr
         funext n
+        let η' (n : ↑(Metric.sphere 0 1)) : 𝓢(ℝ, ℝ) := compCLM (g := fun a => a • n.1) ℝ (by
+          apply And.intro
+          · fun_prop
+          · intro n'
+            match n' with
+            | 0 =>
+              use 1, 1
+              simp [norm_smul]
+            | 1 =>
+              use 0, 1
+              intro x
+              simp [fderiv_smul_const]
+            | n' + 1 + 1 =>
+              use 0, 0
+              intro x
+              simp only [Real.norm_eq_abs, pow_zero, mul_one, norm_le_zero_iff]
+              rw [iteratedFDeriv_succ_eq_comp_right]
+              conv_lhs =>
+                enter [2, 3, y]
+                simp [fderiv_smul_const]
+              rw [iteratedFDeriv_succ_const]
+              rfl) (by use 1, 1; simp [norm_smul]) η
         rw [MeasureTheory.integral_subtype_comap (by simp),
           MeasureTheory.integral_Ioi_of_hasDerivAt_of_tendsto (f := fun a => η (a • n)) (m := 0)]
         · simp
@@ -1293,9 +1318,8 @@ private lemma distDiv_inv_pow_eq_dim' {d : ℕ} :
           refine DifferentiableAt.hasDerivAt ?_
           have := η.differentiable
           fun_prop
-        · exact (integrable ((derivCLM ℝ ℝ) (schwartzCompSmulSphere n η))).integrableOn
-        · exact Filter.Tendsto.mono_left
-            (schwartzCompSmulSphere n η).toZeroAtInfty.zero_at_infty' atTop_le_cocompact
+        · exact (integrable ((derivCLM ℝ ℝ) (η' n))).integrableOn
+        · exact Filter.Tendsto.mono_left (η' n).toZeroAtInfty.zero_at_infty' atTop_le_cocompact
       _ = η 0 * (d.succ * (volume (α := Space d.succ)).real (Metric.ball 0 1)) := by
         simp only [Nat.succ_eq_add_one, integral_const, Measure.toSphere_real_apply_univ,
           finrank_eq_dim, Nat.cast_add, Nat.cast_one, smul_eq_mul, mul_neg, neg_neg]
@@ -1331,8 +1355,28 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
     (IsDistBounded.pow (- (d.succ : ℤ)) (by omega)))) = _
   rw [distGrad_distOfFunction_norm_zpow (- (d.succ : ℤ)) (by omega)]
   simp only [Int.cast_neg, Int.cast_natCast]
-  rw [distOfFunction_const_mul_zpow_smul_repr_eq (- (d.succ : ℝ)) ((- (d.succ : ℤ)) - 2) _
-    (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))]
+  have hdist :
+      distOfFunction
+        (fun x : Space d.succ.succ.succ =>
+          (- (d.succ : ℝ) * ‖x‖ ^ ((- (d.succ : ℤ)) - 2)) • basis.repr x)
+        (by
+          simpa [smul_smul] using
+            (IsDistBounded.const_fun_smul
+              (F := EuclideanSpace ℝ (Fin d.succ.succ.succ))
+              (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))
+              (- (d.succ : ℝ)))) =
+        (- (d.succ : ℝ)) • distOfFunction
+          (fun x : Space d.succ.succ.succ =>
+            ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+          (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega)) := by
+    convert distOfFunction_smul_fun
+      (fun x : Space d.succ.succ.succ =>
+        ‖x‖ ^ ((- (d.succ : ℤ)) - 2) • basis.repr x)
+      (IsDistBounded.zpow_smul_repr_self ((- (d.succ : ℤ)) - 2) (by omega))
+      (- (d.succ : ℝ)) using 1
+    ext x
+    simp [smul_smul]
+  rw [hdist]
   rw [map_smul]
   have hdiv :
       ∇ᵈ ⬝ (distOfFunction

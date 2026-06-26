@@ -556,15 +556,6 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [hE : InnerProductSpace' ℝ E]
 local notation "⟪" x ", " y "⟫" => inner ℝ x y
 open InnerProductSpace'
-
-/-- Bound on the L₂ norm by the given norm, used in `isBoundedBilinearMap_inner'`. -/
-private lemma abs_norm₂_le {d : ℝ} (hd : 0 ≤ d) (v : E) (hv : re ⟪v, v⟫ ≤ d * ‖v‖ ^ 2) :
-    |‖v‖₂| ≤ √d * ‖v‖ := by
-  apply le_of_sq_le_sq _ (by positivity)
-  simp only [mul_pow, sq_abs]
-  rw [norm₂_sq_eq_re_inner (𝕜 := ℝ), re_to_real, Real.sq_sqrt hd]
-  exact hv
-
 lemma _root_.isBoundedBilinearMap_inner' :
     IsBoundedBilinearMap ℝ fun p : E × E => ⟪p.1, p.2⟫ where
   add_left := inner_add_left'
@@ -586,8 +577,16 @@ lemma _root_.isBoundedBilinearMap_inner' :
     apply le_of_eq
     rw [norm_withLp2_eq_norm2, norm_withLp2_eq_norm2]
     rfl
-    have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := abs_norm₂_le hd.le x (h x).2
-    have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := abs_norm₂_le hd.le y (h y).2
+    have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := by
+      apply le_of_sq_le_sq _ (by positivity)
+      simp only [mul_pow, sq_abs]
+      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ), re_to_real, Real.sq_sqrt hd.le]
+      exact (h x).2
+    have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := by
+      apply le_of_sq_le_sq _ (by positivity)
+      simp only [mul_pow, sq_abs]
+      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ), re_to_real, Real.sq_sqrt hd.le]
+      exact (h y).2
     trans (√ d * ‖x‖) * (√ d * ‖y‖)
     · exact mul_le_mul_of_nonneg h1 h2 (abs_nonneg _) (by positivity)
     apply le_of_eq

@@ -194,21 +194,6 @@ lemma harmonicWaveX_vectorPotential_succ' {d} (𝓕 : FreeSpace) (k : ℝ)
 -/
 
 open Space
-
-/-- A spatial derivative in a successor (hence non-zero) direction of a function that
-depends on space only through the zeroth coordinate vanishes. -/
-private lemma space_deriv_succ_comp {d} (g : ℝ → ℝ) (hg : Differentiable ℝ g)
-    (l : Fin d) (x : Space d.succ) :
-    Space.deriv l.succ (fun y => g (y 0)) x = 0 := by
-  rw [Space.deriv_eq, show (fun y : Space d.succ => g (y 0)) = g ∘ (fun y => y 0) from rfl,
-    fderiv_comp _ hg.differentiableAt (by fun_prop)]
-  simp [← Space.deriv_eq, Space.deriv_component, Fin.succ_ne_zero]
-
-/-- Specialisation of `space_deriv_succ_comp` to `fun x => C * cos (a - k * x 0 + b)`. -/
-private lemma deriv_succ_const_cos {d} (C a k b : ℝ) (l : Fin d) (x : Space d.succ) :
-    Space.deriv l.succ (fun x => C * Real.cos (a - k * x 0 + b)) x = 0 :=
-  space_deriv_succ_comp (fun u => C * Real.cos (a - k * u + b)) (by fun_prop) l x
-
 @[simp]
 lemma harmonicWaveX_vectorPotential_space_deriv_succ {d} (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) (t : Time) (x : Space d.succ) (j : Fin d)
@@ -218,10 +203,16 @@ lemma harmonicWaveX_vectorPotential_space_deriv_succ {d} (𝓕 : FreeSpace) (k :
   match i with
   | 0 => simp
   | ⟨Nat.succ i, hi⟩ =>
+    have key : ∀ (g : ℝ → ℝ), Differentiable ℝ g →
+        Space.deriv j.succ (fun y => g (y 0)) x = 0 := by
+      intro g hg
+      rw [Space.deriv_eq, show (fun y : Space d.succ => g (y 0)) = g ∘ (fun y => y 0) from rfl,
+        fderiv_comp _ hg.differentiableAt (by fun_prop)]
+      simp [← Space.deriv_eq, Space.deriv_component, Fin.succ_ne_zero]
     simp only [harmonicWaveX_vectorPotential_succ', mul_one]
-    exact space_deriv_succ_comp
+    exact key
       (fun u => -E₀ ⟨i, by grind⟩ / (𝓕.c.val * k) *
-        sin (k * (t.val * 𝓕.c.val - u) + φ ⟨i, by grind⟩)) (by fun_prop) _ _
+        sin (k * (t.val * 𝓕.c.val - u) + φ ⟨i, by grind⟩)) (by fun_prop)
 
 open Space
 @[simp]
@@ -297,11 +288,18 @@ lemma harmonicWaveX_electricField_space_deriv_same {d} (𝓕 : FreeSpace) (k : �
   match i with
   | 0 => simp [harmonicWaveX_electricField_zero]
   | ⟨Nat.succ i, hi⟩ =>
+    have key : ∀ (C a k b : ℝ) (l : Fin d) (y : Space d.succ),
+        Space.deriv l.succ (fun x => C * Real.cos (a - k * x 0 + b)) y = 0 := by
+      intro C a k b l y
+      rw [Space.deriv_eq, show (fun x : Space d.succ => C * Real.cos (a - k * x 0 + b))
+          = (fun u => C * Real.cos (a - k * u + b)) ∘ (fun x => x 0) from rfl,
+        fderiv_comp _ (by fun_prop) (by fun_prop)]
+      simp [← Space.deriv_eq, Space.deriv_component, Fin.succ_ne_zero]
     rw [← Fin.succ_mk _ _ (by grind)]
     conv_lhs =>
       enter [2, x]
       rw [harmonicWaveX_electricField_succ _ _ hk]
-    apply deriv_succ_const_cos
+    apply key
 
 /-!
 
@@ -412,18 +410,32 @@ lemma harmonicWaveX_magneticFieldMatrix_space_deriv_succ {d} (𝓕 : FreeSpace) 
       rw [harmonicWaveX_magneticFieldMatrix_succ_succ _ _]
     simp
   | 0, ⟨Nat.succ j, hj⟩ =>
+    have key : ∀ (C a k b : ℝ) (l : Fin d) (y : Space d.succ),
+        Space.deriv l.succ (fun x => C * Real.cos (a - k * x 0 + b)) y = 0 := by
+      intro C a k b l y
+      rw [Space.deriv_eq, show (fun x : Space d.succ => C * Real.cos (a - k * x 0 + b))
+          = (fun u => C * Real.cos (a - k * u + b)) ∘ (fun x => x 0) from rfl,
+        fderiv_comp _ (by fun_prop) (by fun_prop)]
+      simp [← Space.deriv_eq, Space.deriv_component, Fin.succ_ne_zero]
     conv_lhs =>
       enter [2, x]
       rw [← Fin.succ_mk _ _ (by grind)]
       rw [harmonicWaveX_magneticFieldMatrix_zero_succ _ k hk]
-    apply deriv_succ_const_cos
+    apply key
 
   | ⟨Nat.succ j, hj⟩, 0 =>
+    have key : ∀ (C a k b : ℝ) (l : Fin d) (y : Space d.succ),
+        Space.deriv l.succ (fun x => C * Real.cos (a - k * x 0 + b)) y = 0 := by
+      intro C a k b l y
+      rw [Space.deriv_eq, show (fun x : Space d.succ => C * Real.cos (a - k * x 0 + b))
+          = (fun u => C * Real.cos (a - k * u + b)) ∘ (fun x => x 0) from rfl,
+        fderiv_comp _ (by fun_prop) (by fun_prop)]
+      simp [← Space.deriv_eq, Space.deriv_component, Fin.succ_ne_zero]
     conv_lhs =>
       enter [2, x]
       rw [← Fin.succ_mk _ _ (by grind)]
       rw [harmonicWaveX_magneticFieldMatrix_succ_zero _ k hk]
-    apply deriv_succ_const_cos
+    apply key
 
 lemma harmonicWaveX_magneticFieldMatrix_zero_succ_space_deriv_zero {d} (𝓕 : FreeSpace) (k : ℝ)
     (hk : k ≠ 0)

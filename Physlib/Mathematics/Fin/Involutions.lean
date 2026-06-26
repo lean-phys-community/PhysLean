@@ -314,19 +314,6 @@ def involutionNoFixedZeroSetEquivSetOne {n : ℕ} (k : Fin n.succ) :
   · exact Ne.symm (Fin.succ_ne_zero k)
   · exact Fin.zero_ne_one
 
-/-- For a fixed-point free involution `f` of `Fin n.succ.succ` with `f 0 = 1`, the value
-  `f i.succ.succ` is never `0` or `1`, so it lies in the image of `Fin.succ ∘ Fin.succ`. -/
-lemma involutionNoFixedSetOne_apply_ne {n : ℕ}
-    (f : {f : Fin n.succ.succ → Fin n.succ.succ // Function.Involutive f ∧
-      (∀ i, f i ≠ i) ∧ f 0 = 1}) (i : Fin n) :
-    f.1 i.succ.succ ≠ 0 ∧ f.1 i.succ.succ ≠ 1 := by
-  have hf1 : f.1 1 = 0 := by
-    simp only [← f.2.2.2]
-    rw [f.2.1]
-  refine ⟨fun hn => ?_, fun hn => ?_⟩
-  · simpa [Fin.ext_iff] using f.2.1.injective (hn.trans hf1.symm)
-  · simpa [Fin.ext_iff] using f.2.1.injective (hn.trans f.2.2.2.symm)
-
 /-- Fixed point involutions of `Fin n.succ.succ` fixing `f 0 = 1` are equivalent to
   fixed point involutions of `Fin n`. -/
 def involutionNoFixedSetOne {n : ℕ} :
@@ -334,12 +321,19 @@ def involutionNoFixedSetOne {n : ℕ} :
     (∀ i, f i ≠ i) ∧ f 0 = 1} ≃ {f : Fin n → Fin n // Function.Involutive f ∧
     (∀ i, f i ≠ i)} where
   toFun f := by
+    have key (i : Fin n) : f.1 i.succ.succ ≠ 0 ∧ f.1 i.succ.succ ≠ 1 := by
+      have hf1 : f.1 1 = 0 := by
+        simp only [← f.2.2.2]
+        rw [f.2.1]
+      refine ⟨fun hn => ?_, fun hn => ?_⟩
+      · simpa [Fin.ext_iff] using f.2.1.injective (hn.trans hf1.symm)
+      · simpa [Fin.ext_iff] using f.2.1.injective (hn.trans f.2.2.2.symm)
     let f' := f.1 ∘ Fin.succ ∘ Fin.succ
-    have hf' (i : Fin n) : f' i ≠ 0 := (involutionNoFixedSetOne_apply_ne f i).1
+    have hf' (i : Fin n) : f' i ≠ 0 := (key i).1
     let f'' := fun i => (f' i).pred (hf' i)
     have hf'' (i : Fin n) : f'' i ≠ 0 := by
       rw [ne_eq, Fin.pred_eq_iff_eq_succ, Fin.succ_zero_eq_one]
-      exact (involutionNoFixedSetOne_apply_ne f i).2
+      exact (key i).2
     let f''' := fun i => (f'' i).pred (hf'' i)
     refine ⟨f''', ?_, ?_⟩
     · intro i

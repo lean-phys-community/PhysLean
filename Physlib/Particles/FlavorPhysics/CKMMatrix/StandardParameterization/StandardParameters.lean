@@ -71,11 +71,6 @@ def δ₁₃ (V : Quotient CKMMatrixSetoid) : ℝ :=
 
 section sines
 
-/-- The first-row normalization rewritten: `1 - |ub|²` equals `|ud|² + |us|²`. -/
-private lemma one_sub_VubAbs_sq (V : Quotient CKMMatrixSetoid) :
-    1 - VubAbs V ^ 2 = VudAbs V ^ 2 + VusAbs V ^ 2 := by
-  linear_combination - (VAbs_sum_sq_row_eq_one V 0)
-
 /-- For a CKM matrix `sin θ₁₂` is non-negative. -/
 lemma S₁₂_nonneg (V : Quotient CKMMatrixSetoid) : 0 ≤ S₁₂ V := by
   rw [S₁₂]
@@ -151,7 +146,7 @@ lemma complexAbs_sin_θ₂₃ (V : Quotient CKMMatrixSetoid) :
   exact Real.norm_of_nonneg (S₂₃_nonneg _)
 
 lemma S₁₂_of_Vub_one {V : Quotient CKMMatrixSetoid} (ha : VubAbs V = 1) : S₁₂ V = 0 := by
-  simp [S₁₂, ← one_sub_VubAbs_sq V, ha]
+  simp [S₁₂, VudAbs_sq_add_VusAbs_sq, ha]
 
 lemma S₁₃_of_Vub_one {V : Quotient CKMMatrixSetoid} (ha : VubAbs V = 1) : S₁₃ V = 1 := by
   rw [S₁₃, ha]
@@ -229,7 +224,7 @@ lemma C₁₂_eq_Vud_div_sqrt {V : Quotient CKMMatrixSetoid} (ha : VubAbs V ≠ 
 
 --rename
 lemma C₁₃_eq_add_sq (V : Quotient CKMMatrixSetoid) : C₁₃ V = √ (VudAbs V ^ 2 + VusAbs V ^ 2) := by
-  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, one_sub_VubAbs_sq V]
+  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, ← VudAbs_sq_add_VusAbs_sq]
 
 lemma C₂₃_of_Vub_ne_one {V : Quotient CKMMatrixSetoid} (ha : VubAbs V ≠ 1) :
     C₂₃ V = VtbAbs V / √ (VudAbs V ^ 2 + VusAbs V ^ 2) := by
@@ -254,14 +249,14 @@ lemma VudAbs_eq_C₁₂_mul_C₁₃ (V : Quotient CKMMatrixSetoid) : VudAbs V = 
     rw [VAbs_thd_eq_one_fst_eq_zero ha]
     rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, ha]
     simp only [one_pow, sub_self, Real.sqrt_zero, mul_zero]
-  · rw [C₁₂_eq_Vud_div_sqrt ha, C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, one_sub_VubAbs_sq V, mul_comm]
+  · rw [C₁₂_eq_Vud_div_sqrt ha, C₁₃, θ₁₃, Real.cos_arcsin, S₁₃, ← VudAbs_sq_add_VusAbs_sq, mul_comm]
     exact (mul_div_cancel₀ (VudAbs V) (VAbsub_ne_zero_sqrt_Vud_Vus_ne_zero ha)).symm
 
 lemma VusAbs_eq_S₁₂_mul_C₁₃ (V : Quotient CKMMatrixSetoid) : VusAbs V = S₁₂ V * C₁₃ V := by
-  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₂, S₁₃, one_sub_VubAbs_sq V, mul_comm]
+  rw [C₁₃, θ₁₃, Real.cos_arcsin, S₁₂, S₁₃, ← VudAbs_sq_add_VusAbs_sq, mul_comm]
   by_cases ha : VubAbs V = 1
   · have h0 : VudAbs V ^ 2 + VusAbs V ^ 2 = 0 := by
-      rw [← one_sub_VubAbs_sq V, ha]
+      rw [VudAbs_sq_add_VusAbs_sq, ha]
       ring
     rw [h0]
     simp only [Real.sqrt_zero, div_zero, mul_zero]

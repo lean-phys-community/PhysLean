@@ -101,25 +101,17 @@ lemma actionT_contrMetric {d} (g : LorentzGroup d) : g • η d = η d := by
 
 -/
 
-/-- The basis representation of the diagonal metric value `∑ i, ηᵢᵢ • (B i ⊗ B i)` at `(p, q)`
-  is the Minkowski matrix entry `η p q`. Shared core of the `co`/`contr` metric component lemmas. -/
-private lemma tensorProduct_repr_minkowskiMatrix_diag {d : ℕ} {M : Type*}
-    [AddCommGroup M] [Module ℝ M] (B : Basis (Fin 1 ⊕ Fin d) ℝ M) (p q : Fin 1 ⊕ Fin d) :
-    (B.tensorProduct B).repr (∑ i, minkowskiMatrix i i • (B i ⊗ₜ[ℝ] B i)) (p, q) =
-    minkowskiMatrix p q := by
-  simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_smul, Finsupp.coe_smul,
-    Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, Finsupp.single_apply,
-    smul_eq_mul]
-  rw [Finset.sum_eq_single p] <;>
-    simp +contextual [minkowskiMatrix.as_diagonal, Matrix.diagonal_apply]
-
 lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.down, Color.down]) :
     (Tensor.basis _).repr (coMetric d) b =
     minkowskiMatrix (b 0) (b 1) := by
   rw [coMetric_eq_fromPairT, fromPairT_basis_repr,
     Lorentz.preCoMetricVal_expand_tmul_minkowskiMatrix]
-  exact tensorProduct_repr_minkowskiMatrix_diag _ _ _
+  simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_smul, Finsupp.coe_smul,
+    Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, Finsupp.single_apply,
+    smul_eq_mul]
+  rw [Finset.sum_eq_single (b 0)] <;>
+    simp +contextual [minkowskiMatrix.as_diagonal, Matrix.diagonal_apply]
 
 lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.up, Color.up]) :
@@ -127,6 +119,10 @@ lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     minkowskiMatrix (b 0) (b 1) := by
   rw [contrMetric_eq_fromPairT, fromPairT_basis_repr,
     Lorentz.preContrMetricVal_expand_tmul_minkowskiMatrix]
-  exact tensorProduct_repr_minkowskiMatrix_diag _ _ _
+  simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_smul, Finsupp.coe_smul,
+    Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, Finsupp.single_apply,
+    smul_eq_mul]
+  rw [Finset.sum_eq_single (b 0)] <;>
+    simp +contextual [minkowskiMatrix.as_diagonal, Matrix.diagonal_apply]
 
 end realLorentzTensor

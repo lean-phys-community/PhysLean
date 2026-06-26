@@ -137,17 +137,6 @@ def minTopBottom (S5 S10 : Finset 𝓩) : Multiset (ChargeSpectrum 𝓩) := Mult
   (S5.val ×ˢ S5.val ×ˢ S5.val ×ˢ S10.val).map
     (fun x => ⟨x.1, x.2.1, {x.2.2.1}, {- x.1 - x.2.2.1, x.2.2.2, x.2.1 - x.2.2.2}⟩)
 
-private lemma allowsTerm_topYukawa_of_form (qHd qHu q5 q10 : 𝓩) :
-    (⟨some qHd, some qHu, {q5}, {-qHd - q5, q10, qHu - q10}⟩ :
-      ChargeSpectrum 𝓩).AllowsTerm topYukawa := by
-  simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
-  exact ⟨-qHu, by simp, q10, by simp⟩
-
-private lemma allowsTerm_bottomYukawa_of_form (qHd qHu q5 q10 : 𝓩) :
-    (⟨some qHd, some qHu, {q5}, {-qHd - q5, q10, qHu - q10}⟩ :
-      ChargeSpectrum 𝓩).AllowsTerm bottomYukawa := by
-  simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
-
 /-!
 
 ### B.2. Every element of `minTopBottom` allows a top Yukawa
@@ -159,7 +148,8 @@ lemma allowsTerm_topYukawa_of_mem_minTopBottom {S5 S10 : Finset 𝓩}
     x.AllowsTerm topYukawa := by
   simp [minTopBottom] at h
   obtain ⟨qHd, qHu, q5, q10, _, rfl⟩ := h
-  exact allowsTerm_topYukawa_of_form qHd qHu q5 q10
+  simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
+  exact ⟨-qHu, by simp, q10, by simp⟩
 
 /-!
 
@@ -172,7 +162,7 @@ lemma allowsTerm_bottomYukawa_of_mem_minTopBottom {S5 S10 : Finset 𝓩}
     x.AllowsTerm bottomYukawa := by
   simp [minTopBottom] at h
   obtain ⟨qHd, qHu, q5, q10, _, rfl⟩ := h
-  exact allowsTerm_bottomYukawa_of_form qHd qHu q5 q10
+  simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
 
 /-!
 
@@ -205,8 +195,9 @@ lemma mem_minTopBottom_of_minimallyAllowsFinsetTerms
     exact ⟨h5.1, Finset.insert_subset h5.2 (hn ▸ h10)⟩
   · intro T hT
     fin_cases hT
-    · exact allowsTerm_topYukawa_of_form qHd qHu q5 q10
-    · exact allowsTerm_bottomYukawa_of_form qHd qHu q5 q10
+    · simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
+      exact ⟨-qHu, by simp, q10, by simp⟩
+    · simp [allowsTerm_iff_subset_allowsTermForm, allowsTermForm, subset_def]
 
 end ChargeSpectrum
 

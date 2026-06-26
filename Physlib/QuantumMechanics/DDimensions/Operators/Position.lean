@@ -215,14 +215,6 @@ lemma radiusPowLM_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space 
   rw [radiusPowLM_apply_fun]
   exact StronglyMeasurable.smul (by measurability) ψ.continuous.stronglyMeasurable
 
-private lemma lintegral_lt_top_aux {d : ℕ} {S : Set (Space d)} {C p : ℝ}
-    (hp : IntegrableOn (fun x ↦ ‖x‖ ^ p) S) {G : Space d → ENNReal}
-    (hG : ∫⁻ x in S, G x ≤ ∫⁻ x in S, ‖C ^ 2‖ₑ * ‖‖x‖ ^ p‖ₑ) :
-    ∫⁻ x in S, G x < ⊤ := by
-  refine hG.trans_lt ?_
-  rw [lintegral_const_mul _ (by fun_prop)]
-  exact ENNReal.mul_lt_top enorm_lt_top hp.hasFiniteIntegral
-
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)
     (hψ : ψ ∈ polyBddSchwartzMap d a) (h : 0 < d + 2 * (a + s)) :
@@ -235,6 +227,14 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
       have hInt (x : Space d) : ‖𝐫 s ψ x‖ ^ 2 = ‖ψ x‖ ^ 2 * ‖x‖ ^ (2 * s) := by
         simp [radiusPowLM, mul_pow, mul_comm, Real.rpow_mul]
       simpa only [HasFiniteIntegral, hInt]
+    have lintegral_lt_top_aux : ∀ {S : Set (Space d)} {C p : ℝ},
+        IntegrableOn (fun x ↦ ‖x‖ ^ p) S → ∀ {G : Space d → ENNReal},
+        ∫⁻ x in S, G x ≤ ∫⁻ x in S, ‖C ^ 2‖ₑ * ‖‖x‖ ^ p‖ₑ →
+        ∫⁻ x in S, G x < ⊤ := by
+      intro S C p hp G hG
+      refine hG.trans_lt ?_
+      rw [lintegral_const_mul _ (by fun_prop)]
+      exact ENNReal.mul_lt_top enorm_lt_top hp.hasFiniteIntegral
     rw [← lintegral_add_compl _ (measurableSet_ball (x := 0) (ε := 1)), ENNReal.add_lt_top]
     constructor
     · -- `‖x‖ < 1`: bound `‖ψ x‖` by `‖x‖ᵃ`

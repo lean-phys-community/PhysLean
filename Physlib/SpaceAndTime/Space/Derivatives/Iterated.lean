@@ -68,10 +68,6 @@ private lemma iteratedDerivList_contDiff (L : List (Fin d)) {f : Space d → ℝ
   | nil => simpa using hf
   | cons i L ih => exact (contDiff_apply ℝ ℝ i).comp (Space.deriv_contDiff (n := ∞) (ih hf))
 
-private lemma iteratedDerivList_differentiable (L : List (Fin d)) {f : Space d → ℝ}
-    (hf : ContDiff ℝ ∞ f) : Differentiable ℝ (L.foldr (fun i g => deriv i g) f) :=
-  (iteratedDerivList_contDiff L hf).differentiable (by simp)
-
 private lemma iteratedDerivList_add (L : List (Fin d)) {f g : Space d → ℝ}
     (hf : ContDiff ℝ ∞ f) (hg : ContDiff ℝ ∞ g) :
     L.foldr (fun i h => deriv i h) (f + g) =
@@ -80,8 +76,8 @@ private lemma iteratedDerivList_add (L : List (Fin d)) {f g : Space d → ℝ}
   | nil => rfl
   | cons i L ih =>
       simp only [List.foldr, ih hf hg]
-      exact Space.deriv_add _ _ (iteratedDerivList_differentiable L hf)
-        (iteratedDerivList_differentiable L hg)
+      exact Space.deriv_add _ _ ((iteratedDerivList_contDiff L hf).differentiable (by simp))
+        ((iteratedDerivList_contDiff L hg).differentiable (by simp))
 
 private lemma iteratedDerivList_const_smul (L : List (Fin d)) (c : ℝ) {f : Space d → ℝ}
     (hf : ContDiff ℝ ∞ f) :
@@ -91,7 +87,7 @@ private lemma iteratedDerivList_const_smul (L : List (Fin d)) (c : ℝ) {f : Spa
   | nil => rfl
   | cons i L ih =>
       simp only [List.foldr, ih hf]
-      exact Space.deriv_const_smul c (iteratedDerivList_differentiable L hf)
+      exact Space.deriv_const_smul c ((iteratedDerivList_contDiff L hf).differentiable (by simp))
 
 @[simp]
 lemma iteratedDeriv_zero [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]

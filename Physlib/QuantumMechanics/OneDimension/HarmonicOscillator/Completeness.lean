@@ -256,13 +256,6 @@ lemma orthogonal_power_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
 
 open Finset
 
-/-- The norm of a partial sum of the exponential series is bounded by `exp ‖z‖`. -/
-private lemma norm_sum_pow_div_factorial_le_exp_norm (z : ℂ) (n : ℕ) :
-    ‖∑ i ∈ range n, z ^ i / (i ! : ℂ)‖ ≤ Real.exp ‖z‖ := by
-  refine (norm_sum_le_of_le _ fun i _ => le_of_eq ?_).trans
-    (Real.sum_le_exp_of_nonneg (norm_nonneg z) n)
-  rw [norm_div, norm_pow, RCLike.norm_natCast]
-
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then it is orthogonal to
 
@@ -327,7 +320,12 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       by_cases hf : norm (f y) = 0
       · simp [hf]
       rw [mul_le_mul_iff_left₀]
-      · refine (norm_sum_pow_div_factorial_le_exp_norm (Complex.I * (↑c * ↑y)) n).trans_eq ?_
+      · have hnorm : ‖∑ i ∈ range n, (Complex.I * (↑c * ↑y)) ^ i / (i ! : ℂ)‖ ≤
+          Real.exp ‖Complex.I * (↑c * ↑y)‖ := by
+          refine (norm_sum_le_of_le _ fun i _ => le_of_eq ?_).trans
+            (Real.sum_le_exp_of_nonneg (norm_nonneg _) n)
+          rw [norm_div, norm_pow, RCLike.norm_natCast]
+        refine hnorm.trans_eq ?_
         rw [Complex.norm_mul, Complex.norm_I, one_mul, Complex.norm_mul, Complex.norm_real,
           Complex.norm_real, Real.norm_eq_abs, Real.norm_eq_abs, abs_mul]
       · exact mul_pos ((norm_nonneg (f y)).lt_of_ne' hf) (Real.exp_pos _)

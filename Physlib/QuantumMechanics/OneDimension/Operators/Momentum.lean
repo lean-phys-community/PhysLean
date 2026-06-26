@@ -121,14 +121,12 @@ lemma planeWaveFunctional_generalized_eigenvector_momentumOperatorUnbounded (k :
 
 -/
 
-/-- The pointwise product of the conjugate of a Schwartz map with a Schwartz map is integrable. -/
-private lemma integrable_star_mul (f g : 𝓢(ℝ, ℂ)) :
-    MeasureTheory.Integrable (fun x => star (f x) * g x) MeasureTheory.volume :=
-  ((ContinuousLinearEquiv.integrable_comp_iff (starL' ℝ)).mpr
-    (SchwartzMap.integrable f)).mul_of_top_left (SchwartzMap.memLp_top g)
-
 lemma momentumOperatorUnbounded_isSelfAdjoint : momentumOperatorUnbounded.IsSelfAdjoint := by
   intro ψ1 ψ2
+  have hint : ∀ f g : 𝓢(ℝ, ℂ),
+      MeasureTheory.Integrable (fun x => star (f x) * g x) MeasureTheory.volume :=
+    fun f g => ((ContinuousLinearEquiv.integrable_comp_iff (starL' ℝ)).mpr
+      (SchwartzMap.integrable f)).mul_of_top_left (SchwartzMap.memLp_top g)
   dsimp [momentumOperatorUnbounded]
   rw [schwartzIncl_inner, schwartzIncl_inner]
   conv_rhs =>
@@ -140,9 +138,9 @@ lemma momentumOperatorUnbounded_isSelfAdjoint : momentumOperatorUnbounded.IsSelf
   simp only [starRingEnd_apply, fderiv_star]
   simp [momentumOperatorSchwartz_apply, mul_assoc]
   · simp only [starRingEnd_apply, fderiv_star]
-    exact integrable_star_mul (SchwartzMap.derivCLM ℂ ℂ ψ1) ψ2
-  · exact integrable_star_mul ψ1 (SchwartzMap.derivCLM ℂ ℂ ψ2)
-  · exact integrable_star_mul ψ1 ψ2
+    exact hint (SchwartzMap.derivCLM ℂ ℂ ψ1) ψ2
+  · exact hint ψ1 (SchwartzMap.derivCLM ℂ ℂ ψ2)
+  · exact hint ψ1 ψ2
   · exact fun x _ => (SchwartzMap.differentiable ψ1).star x
   · fun_prop
 

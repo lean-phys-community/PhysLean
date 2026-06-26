@@ -233,29 +233,24 @@ lemma differentiable_deriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 -/
 
-/-- The mixed second `fderiv` along two basis directions is symmetric for a `C^2` map. -/
-private lemma fderiv_fderiv_basis_comm {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
-    {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) (g : SpaceTime d → M) (hg : ContDiff ℝ 2 g) (x : SpaceTime d) :
-    fderiv ℝ (fun y => fderiv ℝ g y (Lorentz.Vector.basis ν)) x (Lorentz.Vector.basis μ) =
-    fderiv ℝ (fun y => fderiv ℝ g y (Lorentz.Vector.basis μ)) x (Lorentz.Vector.basis ν) := by
-  rw [fderiv_clm_apply, fderiv_clm_apply]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
-    ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt
-    exact hg.contDiffAt
-    simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
-  · have h1 := hg.differentiable (by norm_cast); fun_prop
-  · fun_prop
-  · have h1 := hg.differentiable (by norm_cast); fun_prop
-  · fun_prop
-
 /-- Derivatives on spacetime commute with one another (Clairaut's theorem). -/
 lemma deriv_commute {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : ℕ}
     (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (hf : ContDiff ℝ 2 f) :
     ∂_ μ (∂_ ν f) = ∂_ ν (∂_ μ f) := by
   ext x
-  exact fderiv_fderiv_basis_comm μ ν f hf x
+  show fderiv ℝ (fun y => fderiv ℝ f y (Lorentz.Vector.basis ν)) x (Lorentz.Vector.basis μ) =
+    fderiv ℝ (fun y => fderiv ℝ f y (Lorentz.Vector.basis μ)) x (Lorentz.Vector.basis ν)
+  rw [fderiv_clm_apply, fderiv_clm_apply]
+  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
+    ContinuousLinearMap.flip_apply]
+  rw [IsSymmSndFDerivAt.eq]
+  · apply ContDiffAt.isSymmSndFDerivAt
+    exact hf.contDiffAt
+    simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
+  · have h1 := hf.differentiable (by norm_cast); fun_prop
+  · fun_prop
+  · have h1 := hf.differentiable (by norm_cast); fun_prop
+  · fun_prop
 
 /-!
 
@@ -425,7 +420,7 @@ lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   simp only [neg_neg]
   congr 1
   ext x
-  exact fderiv_fderiv_basis_comm ν μ κ (smooth κ 2) x
+  exact congrFun (deriv_commute ν μ ⇑κ (smooth κ 2)) x
 
 /-!
 

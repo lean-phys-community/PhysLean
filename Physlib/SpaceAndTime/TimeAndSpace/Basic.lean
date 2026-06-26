@@ -148,18 +148,6 @@ lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 -/
 
-/-- For a `C²` function the two iterated partial derivatives commute (symmetry of the
-second derivative), phrased via nested `fderiv` applications. -/
-private lemma fderiv_fderiv_apply_comm {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    {M : Type*} [NormedAddCommGroup M] [NormedSpace ℝ M] {F : E → M} (hF : ContDiff ℝ 2 F)
-    (y a b : E) :
-    fderiv ℝ (fun p => fderiv ℝ F p a) y b = fderiv ℝ (fun p => fderiv ℝ F p b) y a := by
-  rw [fderiv_clm_apply, fderiv_clm_apply]
-  · simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
-      ContinuousLinearMap.flip_apply]
-    exact (hF.contDiffAt.isSymmSndFDerivAt (by simp)).eq b a
-  all_goals fun_prop
-
 /-- Derivatives along space coordinates and time commute. -/
 lemma fderiv_time_commute_fderiv_space {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Time → Space d → M) (t dt : Time) (x dx : Space d)
@@ -179,7 +167,11 @@ lemma fderiv_time_commute_fderiv_space {M} [NormedAddCommGroup M] [NormedSpace �
     exact fderiv_time_eq_fderiv_curry f t dt x' (hf.differentiable (by simp))
   trans fderiv ℝ (fun t => (fderiv ℝ (↿f) t (dt, 0))) (t, x) (0, dx)
   · exact fderiv_space_eq_fderiv_curry (fun t x => fderiv ℝ ↿f (t, x) (dt, 0)) t x dx (by fun_prop)
-  exact fderiv_fderiv_apply_comm hf (t, x) (dt, 0) (0, dx)
+  rw [fderiv_clm_apply, fderiv_clm_apply]
+  · simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
+      ContinuousLinearMap.flip_apply]
+    exact (hf.contDiffAt.isSymmSndFDerivAt (by simp)).eq (0, dx) (dt, 0)
+  all_goals fun_prop
 
 lemma time_deriv_comm_space_deriv {d i} {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {f : Time → Space d → M} (hf : ContDiff ℝ 2 ↿f) (t : Time) (x : Space d) :
@@ -479,7 +471,12 @@ lemma distSpaceDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   ext x
   change fderiv ℝ (fun x => fderiv ℝ κ x (0, basis i)) x (0, basis j) =
     fderiv ℝ (fun x => fderiv ℝ κ x (0, basis j)) x (0, basis i)
-  exact fderiv_fderiv_apply_comm (smooth κ 2) x (0, basis i) (0, basis j)
+  have h1 := smooth κ 2
+  rw [fderiv_clm_apply, fderiv_clm_apply]
+  · simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
+      ContinuousLinearMap.flip_apply]
+    exact (h1.contDiffAt.isSymmSndFDerivAt (by simp)).eq (0, basis j) (0, basis i)
+  all_goals fun_prop
 
 /-!
 
@@ -511,7 +508,12 @@ lemma distTimeDeriv_commute_distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedS
   ext x
   change fderiv ℝ (fun x => fderiv ℝ κ x (1, 0)) x (0, basis i) =
     fderiv ℝ (fun x => fderiv ℝ κ x (0, basis i)) x (1, 0)
-  exact fderiv_fderiv_apply_comm (smooth κ 2) x (1, 0) (0, basis i)
+  have h1 := smooth κ 2
+  rw [fderiv_clm_apply, fderiv_clm_apply]
+  · simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
+      ContinuousLinearMap.flip_apply]
+    exact (h1.contDiffAt.isSymmSndFDerivAt (by simp)).eq (0, basis i) (1, 0)
+  all_goals fun_prop
 
 /-!
 

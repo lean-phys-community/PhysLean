@@ -183,14 +183,13 @@ lemma magneticFunction_unique {d : ℕ} {𝓕 : FreeSpace}
 
 -/
 
-/-- Helper: the propagator-composed field `u ↦ g ⟨-u/c⟩ 0` is differentiable whenever
-  the uncurried field `↿g` is. Used for both the electric and magnetic functions. -/
-private lemma propagator_comp_differentiable {d : ℕ} {𝓕 : FreeSpace} {F : Type*}
-    [NormedAddCommGroup F] [NormedSpace ℝ F] {g : Time → Space d → F}
-    (hg : Differentiable ℝ ↿g) :
-    Differentiable ℝ (fun u : ℝ => g ⟨-u / 𝓕.c.val⟩ (0 : Space d)) := by
-  change Differentiable ℝ (↿g ∘ fun u => ({ val := -u / 𝓕.c.val }, 0))
-  apply hg.comp
+lemma electricFunction_differentiable {d : ℕ}
+    {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
+    {s : Direction d} (P : IsPlaneWave 𝓕 A s) (hA : ContDiff ℝ 2 A) :
+    Differentiable ℝ P.electricFunction := by
+  rw [electricFunction_eq_electricField]
+  change Differentiable ℝ (↿(electricField 𝓕.c A) ∘ fun u => ({ val := -u / 𝓕.c.val }, 0))
+  apply (electricField_differentiable hA).comp
   refine Differentiable.prodMk ?_ ?_
   · change Differentiable ℝ (Time.toRealCLE.symm ∘ fun u => -u / 𝓕.c.val)
     apply Differentiable.comp
@@ -198,20 +197,22 @@ private lemma propagator_comp_differentiable {d : ℕ} {𝓕 : FreeSpace} {F : T
     · fun_prop
   · fun_prop
 
-lemma electricFunction_differentiable {d : ℕ}
-    {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
-    {s : Direction d} (P : IsPlaneWave 𝓕 A s) (hA : ContDiff ℝ 2 A) :
-    Differentiable ℝ P.electricFunction := by
-  rw [electricFunction_eq_electricField]
-  exact propagator_comp_differentiable (electricField_differentiable hA)
-
 lemma magneticFunction_differentiable {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
     {s : Direction d} (P : IsPlaneWave 𝓕 A s) (hA : ContDiff ℝ 2 A)
     (ij : Fin d × Fin d) :
     Differentiable ℝ (fun u => P.magneticFunction u ij) := by
   rw [magneticFunction_eq_magneticFieldMatrix]
-  exact propagator_comp_differentiable (magneticFieldMatrix_differentiable A hA ij)
+  simp only
+  change Differentiable ℝ (↿(fun t x => A.magneticFieldMatrix 𝓕.c t x ij) ∘
+    fun u => ({ val := -u / 𝓕.c.val }, 0))
+  apply (magneticFieldMatrix_differentiable A hA ij).comp
+  refine Differentiable.prodMk ?_ ?_
+  · change Differentiable ℝ (Time.toRealCLE.symm ∘ fun u => -u / 𝓕.c.val)
+    apply Differentiable.comp
+    · fun_prop
+    · fun_prop
+  · fun_prop
 
 /-!
 
@@ -219,13 +220,15 @@ lemma magneticFunction_differentiable {d : ℕ}
 
 -/
 
-/-- Helper: time derivative of the propagator-composed field `t ↦ f (⟪x,s⟫ - c·t)`.
-  Used for both the electric and magnetic functions. -/
-private lemma deriv_time_propagator {d : ℕ} {𝓕 : FreeSpace} {s : Direction d} {F : Type}
-    [NormedAddCommGroup F] [NormedSpace ℝ F] {f : ℝ → F}
-    (hf : Differentiable ℝ f) (x : Space d) (t : Time) :
-    ∂ₜ (fun t : Time => f (⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val)) t = - 𝓕.c.val •
-    fderiv ℝ f (⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) 1 := by
+lemma electricField_time_deriv {d : ℕ}
+    {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
+    {s : Direction d} (P : IsPlaneWave 𝓕 A s) (hA : ContDiff ℝ 2 A) (t : Time)
+    (x : Space d) :
+    ∂ₜ (A.electricField 𝓕.c · x) t = - 𝓕.c.val •
+    fderiv ℝ P.electricFunction (⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) 1 := by
+  conv_lhs =>
+    enter [1, t]
+    rw [P.electricField_eq_electricFunction]
   rw [Time.deriv_eq]
   rw [fderiv_fun_comp]
   simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, one_smul,
@@ -238,19 +241,8 @@ private lemma deriv_time_propagator {d : ℕ} {𝓕 : FreeSpace} {s : Direction 
   · fun_prop
   · fun_prop
   · fun_prop
-  · exact hf.differentiableAt
+  · exact (P.electricFunction_differentiable hA).differentiableAt
   · fun_prop
-
-lemma electricField_time_deriv {d : ℕ}
-    {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
-    {s : Direction d} (P : IsPlaneWave 𝓕 A s) (hA : ContDiff ℝ 2 A) (t : Time)
-    (x : Space d) :
-    ∂ₜ (A.electricField 𝓕.c · x) t = - 𝓕.c.val •
-    fderiv ℝ P.electricFunction (⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) 1 := by
-  conv_lhs =>
-    enter [1, t]
-    rw [P.electricField_eq_electricFunction]
-  exact deriv_time_propagator (P.electricFunction_differentiable hA) x t
 
 lemma magneticFieldMatrix_time_deriv {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
@@ -261,32 +253,29 @@ lemma magneticFieldMatrix_time_deriv {d : ℕ}
   conv_lhs =>
     enter [1, t]
     rw [P.magneticFieldMatrix_eq_magneticFunction]
-  exact deriv_time_propagator (magneticFunction_differentiable P hA (i, j)) x t
+  rw [Time.deriv_eq]
+  change fderiv ℝ ((fun u => P.magneticFunction u (i, j)) ∘
+    fun t => ⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) t 1 = _
+  rw [fderiv_comp]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul,
+    one_mul, neg_mul]
+  rw [fderiv_fun_sub]
+  simp only [fderiv_fun_const, Pi.zero_apply, zero_sub, _root_.neg_apply, neg_mul,
+    neg_inj, mul_eq_mul_right_iff]
+  rw [fderiv_const_mul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, Time.fderiv_val, smul_eq_mul, mul_one,
+    true_or]
+  · fun_prop
+  · fun_prop
+  · fun_prop
+  · exact (magneticFunction_differentiable P hA (i, j)).differentiableAt
+  · fun_prop
 
 /-!
 
 ### A.4. Space derivative of electric and magnetic fields of a plane wave
 
 -/
-
-/-- Helper: spatial derivative of the propagator-composed field `y ↦ f (⟪y,s⟫ - c·t)`.
-  Used for both the electric and magnetic functions. -/
-private lemma deriv_space_propagator {d : ℕ} {𝓕 : FreeSpace} {s : Direction d} {F : Type*}
-    [NormedAddCommGroup F] [NormedSpace ℝ F] {f : ℝ → F}
-    (hf : Differentiable ℝ f) (x : Space d) (t : Time) (i : Fin d) :
-    ∂[i] (fun y : Space d => f (⟪y, s.unit⟫_ℝ - 𝓕.c.val * t.val)) x = s.unit i •
-    fderiv ℝ f (⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) 1 := by
-  rw [Space.deriv_eq_fderiv_basis]
-  rw [fderiv_fun_comp]
-  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, one_smul]
-  rw [fderiv_fun_sub]
-  simp only [fderiv_fun_const, Pi.zero_apply, sub_zero]
-  rw [← Space.deriv_eq_fderiv_basis]
-  simp only [deriv_inner_left]
-  · fun_prop
-  · fun_prop
-  · exact hf.differentiableAt
-  · fun_prop
 
 lemma electricField_space_deriv {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
@@ -297,7 +286,17 @@ lemma electricField_space_deriv {d : ℕ}
   conv_lhs =>
     enter [2, t]
     rw [P.electricField_eq_electricFunction]
-  exact deriv_space_propagator (P.electricFunction_differentiable hA) x t i
+  rw [Space.deriv_eq_fderiv_basis]
+  rw [fderiv_fun_comp]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, one_smul]
+  rw [fderiv_fun_sub]
+  simp only [fderiv_fun_const, Pi.zero_apply, sub_zero]
+  rw [← Space.deriv_eq_fderiv_basis]
+  simp only [deriv_inner_left]
+  · fun_prop
+  · fun_prop
+  · exact (P.electricFunction_differentiable hA).differentiableAt
+  · fun_prop
 
 lemma magneticFieldMatrix_space_deriv {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
@@ -309,7 +308,20 @@ lemma magneticFieldMatrix_space_deriv {d : ℕ}
   conv_lhs =>
     enter [2, t]
     rw [P.magneticFieldMatrix_eq_magneticFunction]
-  exact deriv_space_propagator (magneticFunction_differentiable P hA (i, j)) x t k
+  rw [Space.deriv_eq_fderiv_basis]
+  change fderiv ℝ ((fun u => P.magneticFunction u (i, j)) ∘
+    fun x => ⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) x _ = _
+  rw [fderiv_comp]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul,
+    one_mul, mul_eq_mul_right_iff]
+  rw [fderiv_fun_sub]
+  simp only [fderiv_fun_const, Pi.zero_apply, sub_zero]
+  rw [← Space.deriv_eq_fderiv_basis]
+  simp only [deriv_inner_left, true_or]
+  · fun_prop
+  · fun_prop
+  · exact (magneticFunction_differentiable P hA (i, j)).differentiableAt
+  · fun_prop
 
 /-!
 

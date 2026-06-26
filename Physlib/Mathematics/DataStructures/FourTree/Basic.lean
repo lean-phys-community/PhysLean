@@ -233,31 +233,27 @@ instance [DecidableEq α1] [DecidableEq α2] [DecidableEq α3] [DecidableEq α4]
     (T : FourTree α1 α2 α3 α4) (x : α1 × α2 × α3 × α4) : Decidable (x ∈ T) :=
   Multiset.decidableExistsMultiset
 
-private lemma Leaf.mem_iff (l : Leaf α4) (x : α4) : l.mem x ↔ l.1 = x := by
-  cases l
-  rfl
-
-private lemma Twig.mem_iff (t : Twig α3 α4) (x : α3 × α4) :
-    t.mem x ↔ t.1 = x.1 ∧ ∃ l ∈ t.2, l.mem x.2 := by
-  cases t
-  rfl
-
-private lemma Branch.mem_iff (b : Branch α2 α3 α4) (x : α2 × α3 × α4) :
-    b.mem x ↔ b.1 = x.1 ∧ ∃ t ∈ b.2, t.mem x.2 := by
-  cases b
-  rfl
-
-private lemma Trunk.mem_iff (k : Trunk α1 α2 α3 α4) (x : α1 × α2 × α3 × α4) :
-    k.mem x ↔ k.1 = x.1 ∧ ∃ b ∈ k.2, b.mem x.2 := by
-  cases k
-  rfl
-
 lemma mem_iff_mem_toMultiset (T : FourTree α1 α2 α3 α4) (x : α1 × α2 × α3 × α4) :
     x ∈ T ↔ x ∈ T.toMultiset := by
+  have leaf_iff : ∀ (l : Leaf α4) (y : α4), l.mem y ↔ l.1 = y := by
+    rintro ⟨_⟩ _
+    rfl
+  have twig_iff : ∀ (t : Twig α3 α4) (y : α3 × α4),
+      t.mem y ↔ t.1 = y.1 ∧ ∃ l ∈ t.2, l.mem y.2 := by
+    rintro ⟨_, _⟩ _
+    rfl
+  have branch_iff : ∀ (b : Branch α2 α3 α4) (y : α2 × α3 × α4),
+      b.mem y ↔ b.1 = y.1 ∧ ∃ t ∈ b.2, t.mem y.2 := by
+    rintro ⟨_, _⟩ _
+    rfl
+  have trunk_iff : ∀ (k : Trunk α1 α2 α3 α4) (y : α1 × α2 × α3 × α4),
+      k.mem y ↔ k.1 = y.1 ∧ ∃ b ∈ k.2, b.mem y.2 := by
+    rintro ⟨_, _⟩ _
+    rfl
   obtain ⟨trunks⟩ := T
   show (∃ trunk ∈ trunks, trunk.mem x) ↔ x ∈ (root trunks).toMultiset
   simp only [toMultiset, Multiset.mem_bind, Multiset.mem_map,
-    Trunk.mem_iff, Branch.mem_iff, Twig.mem_iff, Leaf.mem_iff, Prod.ext_iff]
+    trunk_iff, branch_iff, twig_iff, leaf_iff, Prod.ext_iff]
   tauto
 
 lemma mem_of_parts {T : FourTree α1 α2 α3 α4} {C : α1 × α2 × α3 × α4}

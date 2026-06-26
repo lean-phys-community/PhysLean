@@ -358,6 +358,21 @@ lemma reduce_toChargeMap_eq (x : FiveQuanta 𝓩) :
 
 -/
 
+lemma mem_powerset_sum_of_mem_reduce_toFluxesFive {F : FiveQuanta 𝓩}
+    {f : Fluxes} (hf : f ∈ F.reduce.toFluxesFive) :
+    f ∈ (Multiset.powerset F.toFluxesFive).map fun s => s.sum := by
+  rw [toFluxesFive, Multiset.mem_map] at hf
+  obtain ⟨⟨q, f⟩, hp, rfl⟩ := hf
+  rw [mem_reduce_iff] at hp
+  simp at hp
+  obtain ⟨hq, rfl⟩ := hp
+  simp only [Multiset.mem_map, Multiset.mem_powerset]
+  use (Multiset.map (fun x => x.2) (Multiset.filter (fun x => x.1 = q) F))
+  simp only [and_true]
+  rw [toFluxesFive]
+  refine Multiset.map_le_map ?_
+  exact Multiset.filter_le (fun x => x.1 = q) F
+
 lemma mem_powerset_sum_of_mem_reduce_toFluxesFive_filter {F : FiveQuanta 𝓩}
     {f : Fluxes} (hf : f ∈ F.reduce.toFluxesFive) :
     f ∈ (F.toFluxesFive.powerset.filter fun s => s ≠ ∅).map fun s => s.sum := by
@@ -381,35 +396,11 @@ lemma mem_powerset_sum_of_mem_reduce_toFluxesFive_filter {F : FiveQuanta 𝓩}
   obtain ⟨a, ha, rfl⟩ := hq
   use a.2
 
-lemma mem_powerset_sum_of_mem_reduce_toFluxesFive {F : FiveQuanta 𝓩}
-    {f : Fluxes} (hf : f ∈ F.reduce.toFluxesFive) :
-    f ∈ (Multiset.powerset F.toFluxesFive).map fun s => s.sum :=
-  Multiset.mem_of_le (Multiset.map_le_map (Multiset.filter_le _ _))
-    (mem_powerset_sum_of_mem_reduce_toFluxesFive_filter hf)
-
 /-!
 
 ### B.10. No exotics condition on the reduced `FiveQuanta`
 
 -/
-
-/-- The chirality index `f.M` and total chiral index `f.M + f.N` of any flux `f` in the
-  reduction of a `FiveQuanta` with no exotics are non-negative. -/
-lemma reduce_toFluxesFive_nonneg {F : FiveQuanta 𝓩}
-    (hx : F.toFluxesFive ∈ FluxesFive.elemsNoExotics) {f : Fluxes}
-    (hf : f ∈ F.reduce.toFluxesFive) : 0 ≤ f.M ∧ 0 ≤ f.M + f.N := by
-  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesFive hf
-  generalize F.toFluxesFive = G at *
-  revert f
-  revert G
-  decide
-
-/-- Summing an additive map over the fluxes of `reduce` agrees with summing it over the
-  original fluxes. -/
-lemma reduce_toFluxesFive_map_sum (F : FiveQuanta 𝓩) (g : Fluxes →+ ℤ) :
-    (F.reduce.toFluxesFive.map g).sum = (F.toFluxesFive.map g).sum := by
-  rw [toFluxesFive, toFluxesFive, Multiset.map_map, Multiset.map_map]
-  exact reduce_sum_eq_sum_toCharges F (fun _ => g)
 
 /-!
 
@@ -424,11 +415,17 @@ lemma reduce_numChiralL_of_mem_elemsNoExotics {F : FiveQuanta 𝓩}
   have hnn : ∀ a ∈ F.reduce.toFluxesFive.map (fun f => f.M + f.N), 0 ≤ a := by
     intro a ha
     obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-    exact (reduce_toFluxesFive_nonneg hx hf).2
+    replace hf := mem_powerset_sum_of_mem_reduce_toFluxesFive hf
+    clear ha hE
+    generalize F.toFluxesFive = G at *
+    revert f
+    revert G
+    decide
   rw [FluxesFive.numChiralL, FluxesFive.chiralIndicesOfL, Multiset.filter_eq_self.mpr hnn,
-    ← FluxesFive.chiralIndicesOfL_sum_eq_three_of_noExotics _ hE, FluxesFive.chiralIndicesOfL]
-  exact reduce_toFluxesFive_map_sum F
-    ⟨⟨fun f => f.M + f.N, by simp⟩, fun x y => by simp [add_add_add_comm]⟩
+    ← FluxesFive.chiralIndicesOfL_sum_eq_three_of_noExotics _ hE, FluxesFive.chiralIndicesOfL,
+    toFluxesFive, toFluxesFive, Multiset.map_map, Multiset.map_map]
+  exact reduce_sum_eq_sum_toCharges F (fun _ =>
+    ⟨⟨fun f => f.M + f.N, by simp⟩, fun x y => by simp [add_add_add_comm]⟩)
 
 /-!
 
@@ -443,7 +440,12 @@ lemma reduce_numAntiChiralL_of_mem_elemsNoExotics {F : FiveQuanta 𝓩}
     Multiset.filter_eq_nil.mpr ?_, Multiset.sum_zero]
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  exact not_lt.mpr (reduce_toFluxesFive_nonneg hx hf).2
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesFive hf
+  clear ha
+  generalize F.toFluxesFive = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 
@@ -458,10 +460,16 @@ lemma reduce_numChiralD_of_mem_elemsNoExotics {F : FiveQuanta 𝓩}
   have hnn : ∀ a ∈ F.reduce.toFluxesFive.map (fun f => f.M), 0 ≤ a := by
     intro a ha
     obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-    exact (reduce_toFluxesFive_nonneg hx hf).1
+    replace hf := mem_powerset_sum_of_mem_reduce_toFluxesFive hf
+    clear ha hE
+    generalize F.toFluxesFive = G at *
+    revert f
+    revert G
+    decide
   rw [FluxesFive.numChiralD, FluxesFive.chiralIndicesOfD, Multiset.filter_eq_self.mpr hnn,
-    ← FluxesFive.chiralIndicesOfD_sum_eq_three_of_noExotics _ hE, FluxesFive.chiralIndicesOfD]
-  exact reduce_toFluxesFive_map_sum F ⟨⟨fun f => f.M, by simp⟩, fun x y => by simp⟩
+    ← FluxesFive.chiralIndicesOfD_sum_eq_three_of_noExotics _ hE, FluxesFive.chiralIndicesOfD,
+    toFluxesFive, toFluxesFive, Multiset.map_map, Multiset.map_map]
+  exact reduce_sum_eq_sum_toCharges F (fun _ => ⟨⟨fun f => f.M, by simp⟩, fun x y => by simp⟩)
 
 /-!
 
@@ -476,7 +484,12 @@ lemma reduce_numAntiChiralD_of_mem_elemsNoExotics {F : FiveQuanta 𝓩}
     Multiset.filter_eq_nil.mpr ?_, Multiset.sum_zero]
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  exact not_lt.mpr (reduce_toFluxesFive_nonneg hx hf).1
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesFive hf
+  clear ha
+  generalize F.toFluxesFive = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 
@@ -780,24 +793,6 @@ lemma exists_toCharges_toFluxesFive_of_mem_liftCharge (c : Finset 𝓩) {x : Fiv
     simp [toFluxesFive, s1_card, s2_card]
     decide
 
-/-- Re-pairing the first components of the elements of a `FiveQuanta` filtered to have a fixed
-  flux `v` recovers that filtered `FiveQuanta`. -/
-lemma map_mk_fst_filter_snd_eq {𝓩 : Type} (x : FiveQuanta 𝓩) (v : Fluxes) :
-    Multiset.map (fun y => (y.1, v)) (x.filter (fun y => y.2 = v)) =
-    x.filter (fun y => y.2 = v) := by
-  trans Multiset.map (fun y => y) (x.filter (fun y => y.2 = v))
-  · refine Multiset.map_congr rfl fun y hy => ?_
-    simp only [Multiset.mem_filter] at hy
-    rw [← hy.2]
-  · simp
-
-/-- Filtering a `FiveQuanta` by a fixed flux `v` has the same cardinality as filtering its
-  underlying fluxes by `v`. -/
-lemma card_filter_snd_eq {𝓩 : Type} (x : FiveQuanta 𝓩) (v : Fluxes) :
-    (x.filter (fun y => y.2 = v)).card = (x.toFluxesFive.filter (fun y => y = v)).card := by
-  rw [toFluxesFive, Multiset.filter_map]
-  simp
-
 lemma mem_liftCharge_of_exists_toCharges_toFluxesFive (c : Finset 𝓩) {x : FiveQuanta 𝓩}
     (h : ∃ a : FiveQuanta 𝓩, a.reduce = x ∧ a.toCharges.toFinset = c ∧ a.toFluxesFive =
       {⟨1, -1⟩, ⟨1, -1⟩, ⟨1, -1⟩, ⟨0, 1⟩, ⟨0, 1⟩, ⟨0, 1⟩}) :
@@ -810,6 +805,19 @@ lemma mem_liftCharge_of_exists_toCharges_toFluxesFive (c : Finset 𝓩) {x : Fiv
   let s1 := (x.filter (fun y => y.2 = ⟨1, -1⟩)).map Prod.fst
   let s2 := (x.filter (fun y => y.2 = ⟨0, 1⟩)).map Prod.fst
   use s1, s2
+  have hcard : ∀ v : Fluxes, (x.filter (fun y => y.2 = v)).card =
+      (x.toFluxesFive.filter (fun y => y = v)).card := by
+    intro v
+    rw [toFluxesFive, Multiset.filter_map]
+    simp
+  have hmap : ∀ v : Fluxes, Multiset.map (fun y => (y.1, v)) (x.filter (fun y => y.2 = v)) =
+      x.filter (fun y => y.2 = v) := by
+    intro v
+    trans Multiset.map (fun y => y) (x.filter (fun y => y.2 = v))
+    · refine Multiset.map_congr rfl fun y hy => ?_
+      simp only [Multiset.mem_filter] at hy
+      rw [← hy.2]
+    · simp
   have hx : Multiset.filter (fun y => y.2 = ⟨0, 1⟩) x
         = Multiset.filter (fun y => ¬ y.2 = ⟨1, -1⟩) x := by
     refine Multiset.filter_congr ?_
@@ -823,11 +831,11 @@ lemma mem_liftCharge_of_exists_toCharges_toFluxesFive (c : Finset 𝓩) {x : Fiv
   refine ⟨⟨⟨⟨?_, ?_⟩, ⟨?_, ?_⟩⟩, ?_⟩, ?_⟩
   · simp [s1, ← h, toCharges]
   · simp [s1]
-    rw [card_filter_snd_eq x ⟨1, -1⟩, h2]
+    rw [hcard ⟨1, -1⟩, h2]
     decide
   · simp [s2, ← h, toCharges]
   · simp [s2]
-    rw [card_filter_snd_eq x ⟨0, 1⟩, h2]
+    rw [hcard ⟨0, 1⟩, h2]
     decide
   · rw [← h]
     simp [s1, s2, toCharges]
@@ -838,7 +846,7 @@ lemma mem_liftCharge_of_exists_toCharges_toFluxesFive (c : Finset 𝓩) {x : Fiv
     rw [hx, Multiset.filter_add_not]
     exact fun ⦃a⦄ a => a
   · simp [s1, s2]
-    rw [map_mk_fst_filter_snd_eq x ⟨1, -1⟩, map_mk_fst_filter_snd_eq x ⟨0, 1⟩, hx]
+    rw [hmap ⟨1, -1⟩, hmap ⟨0, 1⟩, hx]
     exact Multiset.filter_add_not (fun y => y.2 = ⟨1, -1⟩) x
 
 lemma mem_liftCharge_iff_exists (c : Finset 𝓩) {x : FiveQuanta 𝓩} :
@@ -987,23 +995,20 @@ lemma anomalyCoefficient_of_map {𝓩 𝓩1 : Type} [CommRing 𝓩] [CommRing �
 
 -/
 
-/-- For any `h : 𝓩 → 𝓩`, the sum of `x.2.N • h x.1` over a `FiveQuanta` is unchanged by
-  `reduce`. -/
-lemma reduce_sum_mul_eq (F : FiveQuanta 𝓩) [DecidableEq 𝓩] (h : 𝓩 → 𝓩) :
-    (F.reduce.map fun x => (x.2.N : 𝓩) * h x.1).sum =
-    (F.map fun x => (x.2.N : 𝓩) * h x.1).sum := by
-  let f : 𝓩 → Fluxes →+ 𝓩 := fun q5 =>
-    { toFun := fun x => x.N • h q5
-      map_zero' := by simp
-      map_add' := by
-        intros x y
-        simp [add_mul] }
-  simpa [f] using reduce_sum_eq_sum_toCharges F f
-
 lemma anomalyCoefficient_of_reduce (F : FiveQuanta 𝓩) [DecidableEq 𝓩] :
     F.reduce.anomalyCoefficient = F.anomalyCoefficient := by
+  have key : ∀ h : 𝓩 → 𝓩, (F.reduce.map fun x => (x.2.N : 𝓩) * h x.1).sum =
+      (F.map fun x => (x.2.N : 𝓩) * h x.1).sum := by
+    intro h
+    let f : 𝓩 → Fluxes →+ 𝓩 := fun q5 =>
+      { toFun := fun x => x.N • h q5
+        map_zero' := by simp
+        map_add' := by
+          intros x y
+          simp [add_mul] }
+    simpa [f] using reduce_sum_eq_sum_toCharges F f
   simp [anomalyCoefficient]
-  exact ⟨reduce_sum_mul_eq F fun q => q, reduce_sum_mul_eq F fun q => q * q⟩
+  exact ⟨key fun q => q, key fun q => q * q⟩
 
 end ACCs
 

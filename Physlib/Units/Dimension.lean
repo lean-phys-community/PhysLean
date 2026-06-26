@@ -136,61 +136,56 @@ lemma inv_charge (d : Dimension) : d⁻¹.charge = -d.charge := rfl
 @[simp]
 lemma inv_temperature (d : Dimension) : d⁻¹.temperature = -d.temperature := rfl
 
-/-- A dimension exponent that is additive over multiplication and negates inverses
-respects division: `f (d₁ / d₂) = f d₁ - f d₂`. -/
-lemma div_proj (f : Dimension → ℚ) (hmul : ∀ a b, f (a * b) = f a + f b)
-    (hinv : ∀ a, f a⁻¹ = - f a) (d1 d2 : Dimension) : f (d1 / d2) = f d1 - f d2 := by
-  rw [div_eq_mul_inv, hmul, hinv]
-  ring
+@[simp]
+lemma div_length (d1 d2 : Dimension) : (d1 / d2).length = d1.length - d2.length := by
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
-lemma div_length (d1 d2 : Dimension) : (d1 / d2).length = d1.length - d2.length :=
-  div_proj _ length_mul inv_length d1 d2
+lemma div_time (d1 d2 : Dimension) : (d1 / d2).time = d1.time - d2.time := by
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
-lemma div_time (d1 d2 : Dimension) : (d1 / d2).time = d1.time - d2.time :=
-  div_proj _ time_mul inv_time d1 d2
+lemma div_mass (d1 d2 : Dimension) : (d1 / d2).mass = d1.mass - d2.mass := by
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
-lemma div_mass (d1 d2 : Dimension) : (d1 / d2).mass = d1.mass - d2.mass :=
-  div_proj _ mass_mul inv_mass d1 d2
-
-@[simp]
-lemma div_charge (d1 d2 : Dimension) : (d1 / d2).charge = d1.charge - d2.charge :=
-  div_proj _ charge_mul inv_charge d1 d2
+lemma div_charge (d1 d2 : Dimension) : (d1 / d2).charge = d1.charge - d2.charge := by
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
 lemma div_temperature (d1 d2 : Dimension) :
-    (d1 / d2).temperature = d1.temperature - d2.temperature :=
-  div_proj _ temperature_mul inv_temperature d1 d2
+    (d1 / d2).temperature = d1.temperature - d2.temperature := by
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
-/-- A dimension exponent that is additive over multiplication and vanishes at `1`
-respects powers: `f (d ^ n) = n • f d`. -/
-lemma npow_proj (f : Dimension → ℚ) (hmul : ∀ a b, f (a * b) = f a + f b) (hone : f 1 = 0)
-    (d : Dimension) (n : ℕ) : f (d ^ n) = n • f d := by
+@[simp]
+lemma npow_length (d : Dimension) (n : ℕ) : (d ^ n).length = n • d.length := by
   induction n with
-  | zero => simpa using hone
-  | succ n ih => rw [pow_succ, hmul, ih, succ_nsmul]
+  | zero => simp
+  | succ n ih => rw [pow_succ, length_mul, ih, succ_nsmul]
 
 @[simp]
-lemma npow_length (d : Dimension) (n : ℕ) : (d ^ n).length = n • d.length :=
-  npow_proj _ length_mul rfl d n
+lemma npow_time (d : Dimension) (n : ℕ) : (d ^ n).time = n • d.time := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [pow_succ, time_mul, ih, succ_nsmul]
 
 @[simp]
-lemma npow_time (d : Dimension) (n : ℕ) : (d ^ n).time = n • d.time :=
-  npow_proj _ time_mul rfl d n
+lemma npow_mass (d : Dimension) (n : ℕ) : (d ^ n).mass = n • d.mass := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [pow_succ, mass_mul, ih, succ_nsmul]
 
 @[simp]
-lemma npow_mass (d : Dimension) (n : ℕ) : (d ^ n).mass = n • d.mass :=
-  npow_proj _ mass_mul rfl d n
+lemma npow_charge (d : Dimension) (n : ℕ) : (d ^ n).charge = n • d.charge := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [pow_succ, charge_mul, ih, succ_nsmul]
 
 @[simp]
-lemma npow_charge (d : Dimension) (n : ℕ) : (d ^ n).charge = n • d.charge :=
-  npow_proj _ charge_mul rfl d n
-
-@[simp]
-lemma npow_temperature (d : Dimension) (n : ℕ) : (d ^ n).temperature = n • d.temperature :=
-  npow_proj _ temperature_mul rfl d n
+lemma npow_temperature (d : Dimension) (n : ℕ) : (d ^ n).temperature = n • d.temperature := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [pow_succ, temperature_mul, ih, succ_nsmul]
 
 instance : Pow Dimension ℚ where
   pow d n := ⟨d.length * n, d.time * n, d.mass * n, d.charge * n, d.temperature * n⟩

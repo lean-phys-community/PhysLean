@@ -29,45 +29,70 @@ open ComplexConjugate
 section phaseShiftApply
 variable (u c t d s b : ℝ)
 
-/-- Multiplying a complex number `z` by the phase `cexp ((p + q) I)` with `p + q = - arg z`
-yields its modulus `‖z‖`. -/
-lemma cexp_phase_mul_eq_norm {z : ℂ} {p q : ℝ} (h : p + q = - arg z) :
-    cexp ((p : ℂ) * I + q * I) * z = ‖z‖ := by
-  conv_lhs => rw [← norm_mul_exp_arg_mul_I z]
-  rw [mul_left_comm, ← exp_add]
-  rw [show (p : ℂ) * I + q * I + arg z * I = 0 from by
-    have hc : (p : ℂ) + q + arg z = 0 := by
-      exact_mod_cast (show p + q + arg z = (0 : ℝ) by linarith)
-    linear_combination hc * I, exp_zero, mul_one]
-
 lemma shift_ud_phase_zero (V : CKMMatrix) (h1 : u + d = - arg [V]ud) :
     [phaseShiftApply V u c t d s b]ud = VudAbs ⟦V⟧ := by
-  rw [phaseShiftApply.ud, cexp_phase_mul_eq_norm h1]
+  rw [phaseShiftApply.ud]
+  conv_lhs => rw [← norm_mul_exp_arg_mul_I [V]ud]
+  rw [mul_left_comm, ← exp_add]
+  rw [show (u : ℂ) * I + d * I + arg [V]ud * I = 0 from by
+    have hc : (u : ℂ) + d + arg [V]ud = 0 := by
+      exact_mod_cast (show u + d + arg [V]ud = (0 : ℝ) by linarith)
+    linear_combination hc * I, exp_zero, mul_one]
   rfl
 
 lemma shift_us_phase_zero {V : CKMMatrix} (h1 : u + s = - arg [V]us) :
     [phaseShiftApply V u c t d s b]us = VusAbs ⟦V⟧ := by
-  rw [phaseShiftApply.us, cexp_phase_mul_eq_norm h1]
+  rw [phaseShiftApply.us]
+  conv_lhs => rw [← norm_mul_exp_arg_mul_I [V]us]
+  rw [mul_left_comm, ← exp_add]
+  rw [show (u : ℂ) * I + s * I + arg [V]us * I = 0 from by
+    have hc : (u : ℂ) + s + arg [V]us = 0 := by
+      exact_mod_cast (show u + s + arg [V]us = (0 : ℝ) by linarith)
+    linear_combination hc * I, exp_zero, mul_one]
   rfl
 
 lemma shift_ub_phase_zero {V : CKMMatrix} (h1 : u + b = - arg [V]ub) :
     [phaseShiftApply V u c t d s b]ub = VubAbs ⟦V⟧ := by
-  rw [phaseShiftApply.ub, cexp_phase_mul_eq_norm h1]
+  rw [phaseShiftApply.ub]
+  conv_lhs => rw [← norm_mul_exp_arg_mul_I [V]ub]
+  rw [mul_left_comm, ← exp_add]
+  rw [show (u : ℂ) * I + b * I + arg [V]ub * I = 0 from by
+    have hc : (u : ℂ) + b + arg [V]ub = 0 := by
+      exact_mod_cast (show u + b + arg [V]ub = (0 : ℝ) by linarith)
+    linear_combination hc * I, exp_zero, mul_one]
   rfl
 
 lemma shift_cs_phase_zero {V : CKMMatrix} (h1 : c + s = - arg [V]cs) :
     [phaseShiftApply V u c t d s b]cs = VcsAbs ⟦V⟧ := by
-  rw [phaseShiftApply.cs, cexp_phase_mul_eq_norm h1]
+  rw [phaseShiftApply.cs]
+  conv_lhs => rw [← norm_mul_exp_arg_mul_I [V]cs]
+  rw [mul_left_comm, ← exp_add]
+  rw [show (c : ℂ) * I + s * I + arg [V]cs * I = 0 from by
+    have hc : (c : ℂ) + s + arg [V]cs = 0 := by
+      exact_mod_cast (show c + s + arg [V]cs = (0 : ℝ) by linarith)
+    linear_combination hc * I, exp_zero, mul_one]
   rfl
 
 lemma shift_cb_phase_zero {V : CKMMatrix} (h1 : c + b = - arg [V]cb) :
     [phaseShiftApply V u c t d s b]cb = VcbAbs ⟦V⟧ := by
-  rw [phaseShiftApply.cb, cexp_phase_mul_eq_norm h1]
+  rw [phaseShiftApply.cb]
+  conv_lhs => rw [← norm_mul_exp_arg_mul_I [V]cb]
+  rw [mul_left_comm, ← exp_add]
+  rw [show (c : ℂ) * I + b * I + arg [V]cb * I = 0 from by
+    have hc : (c : ℂ) + b + arg [V]cb = 0 := by
+      exact_mod_cast (show c + b + arg [V]cb = (0 : ℝ) by linarith)
+    linear_combination hc * I, exp_zero, mul_one]
   rfl
 
 lemma shift_tb_phase_zero {V : CKMMatrix} (h1 : t + b = - arg [V]tb) :
     [phaseShiftApply V u c t d s b]tb = VtbAbs ⟦V⟧ := by
-  rw [phaseShiftApply.tb, cexp_phase_mul_eq_norm h1]
+  rw [phaseShiftApply.tb]
+  conv_lhs => rw [← norm_mul_exp_arg_mul_I [V]tb]
+  rw [mul_left_comm, ← exp_add]
+  rw [show (t : ℂ) * I + b * I + arg [V]tb * I = 0 from by
+    have hc : (t : ℂ) + b + arg [V]tb = 0 := by
+      exact_mod_cast (show t + b + arg [V]tb = (0 : ℝ) by linarith)
+    linear_combination hc * I, exp_zero, mul_one]
   rfl
 
 lemma shift_cd_phase_pi {V : CKMMatrix} (h1 : c + d = Real.pi - arg [V]cd) :

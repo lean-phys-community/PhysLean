@@ -700,31 +700,6 @@ protected lemma fderiv' (F : (X → U) → (X → V)) (F') (u) (dx : X)
   have hG := HasVarAdjDerivAt.fderiv (F u) dx (hF.apply_smooth_self)
   exact comp hG hF
 
-private lemma deriv_sum_smul_const {d} {E} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    {φ : ℝ → Space d → ℝ} (hφ : ContDiff ℝ ∞ ↿φ) (x : Space d) (b : Fin d → E) :
-    deriv (fun s => ∑ i, Space.deriv i (φ s) x • b i) 0
-    = ∑ i, Space.deriv i (fun x' => deriv (fun x => φ x x') 0) x • b i := by
-  rw [deriv_fun_sum]
-  · congr
-    funext i
-    rw [deriv_smul_const]
-    · congr
-      simp [Space.deriv]
-      rw [← fderiv_apply_one_eq_deriv]
-      rw [fderiv_swap]
-      · simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
-      · exact hφ.of_le ENat.LEInfty.out
-    · simp [Space.deriv]
-      apply Differentiable.differentiableAt
-      apply fderiv_uncurry_differentiable_snd_comp_fst_apply
-      exact hφ.of_le ENat.LEInfty.out
-  · intro i _
-    apply Differentiable.differentiableAt
-    apply Differentiable.smul_const
-    simp [Space.deriv]
-    apply fderiv_uncurry_differentiable_snd_comp_fst_apply
-    exact hφ.of_le ENat.LEInfty.out
-
 protected lemma gradient {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
     HasVarAdjDerivAt
       (fun (φ : Space d → ℝ) x => gradient φ x)
@@ -752,7 +727,27 @@ protected lemma gradient {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
   · intro φ hφ x
     rw [Space.gradient_eq_sum]
     conv_lhs => enter [1, x]; rw [Space.gradient_eq_sum]
-    exact deriv_sum_smul_const hφ x _
+    rw [deriv_fun_sum]
+    congr
+    funext i
+    rw [deriv_smul_const]
+    congr
+    simp [Space.deriv]
+    rw [← fderiv_apply_one_eq_deriv]
+    rw [fderiv_swap]
+    simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
+    · apply ContDiff.of_le hφ
+      exact ENat.LEInfty.out
+    · simp [Space.deriv]
+      apply Differentiable.differentiableAt
+      apply fderiv_uncurry_differentiable_snd_comp_fst_apply
+      exact hφ.of_le ENat.LEInfty.out
+    · intro i _
+      apply Differentiable.differentiableAt
+      apply Differentiable.smul_const
+      simp [Space.deriv]
+      apply fderiv_uncurry_differentiable_snd_comp_fst_apply
+      exact hφ.of_le ENat.LEInfty.out
   · exact hu
   · exact HasVarAdjoint.gradient
 
@@ -777,7 +772,27 @@ protected lemma grad {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
   · intro φ hφ x
     rw [Space.grad_eq_sum]
     conv_lhs => enter [1, x]; rw [Space.grad_eq_sum]
-    exact deriv_sum_smul_const hφ x _
+    rw [deriv_fun_sum]
+    congr
+    funext i
+    rw [deriv_smul_const]
+    congr
+    simp [Space.deriv]
+    rw [← fderiv_apply_one_eq_deriv]
+    rw [fderiv_swap]
+    simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
+    · apply ContDiff.of_le hφ
+      exact ENat.LEInfty.out
+    · simp [Space.deriv]
+      apply Differentiable.differentiableAt
+      apply fderiv_uncurry_differentiable_snd_comp_fst_apply
+      exact hφ.of_le ENat.LEInfty.out
+    · intro i _
+      apply Differentiable.differentiableAt
+      apply Differentiable.smul_const
+      simp [Space.deriv]
+      apply fderiv_uncurry_differentiable_snd_comp_fst_apply
+      exact hφ.of_le ENat.LEInfty.out
   · exact hu
   · exact HasVarAdjoint.grad
 lemma div {d} (u : Space d → EuclideanSpace ℝ (Fin d)) (hu : ContDiff ℝ ∞ u) :

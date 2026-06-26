@@ -315,14 +315,6 @@ lemma reduce_sum_eq_sum_toCharges {M} [AddCommMonoid M] (x : TenQuanta 𝓩) (f 
           · simp_all
           · simp_all
 
-/-- A sum over the fluxes of `x.reduce` of an additive function equals the sum over the
-  fluxes of `x`. A specialisation of `reduce_sum_eq_sum_toCharges` to a charge-independent map. -/
-private lemma reduce_toFluxesTen_map_sum (x : TenQuanta 𝓩) (g : Fluxes → ℤ)
-    (h0 : g 0 = 0) (hadd : ∀ a b, g (a + b) = g a + g b) :
-    (x.reduce.toFluxesTen.map g).sum = (x.toFluxesTen.map g).sum := by
-  have h := reduce_sum_eq_sum_toCharges x (fun _ => (⟨⟨g, h0⟩, hadd⟩ : Fluxes →+ ℤ))
-  simpa [toFluxesTen, Multiset.map_map, Function.comp] using h
-
 /-!
 
 ### B.7. Reduction does nothing if no duplicate charges
@@ -382,43 +374,38 @@ lemma reduce_toChargeMap_eq (x : TenQuanta 𝓩) :
 
 -/
 
-/-- A flux of `F.reduce` is the nonzero sum of a sub-`FluxesTen` of `F`, namely the fluxes of
-  `F` sharing its charge. The two `mem_powerset_sum_*` lemmas are immediate corollaries. -/
-private lemma exists_le_toFluxesTen_of_mem_reduce {F : TenQuanta 𝓩} {f : Fluxes}
-    (hf : f ∈ F.reduce.toFluxesTen) :
-    ∃ s ≤ F.toFluxesTen, s ≠ 0 ∧ s.sum = f := by
+lemma mem_powerset_sum_of_mem_reduce_toFluxesTen {F : TenQuanta 𝓩}
+    {f : Fluxes} (hf : f ∈ F.reduce.toFluxesTen) :
+    f ∈ (Multiset.powerset F.toFluxesTen).map fun s => s.sum := by
   rw [toFluxesTen, Multiset.mem_map] at hf
   obtain ⟨⟨q, f⟩, hp, rfl⟩ := hf
   rw [mem_reduce_iff] at hp
   simp at hp
   obtain ⟨hq, rfl⟩ := hp
-  refine ⟨Multiset.map (fun x => x.2) (Multiset.filter (fun x => x.1 = q) F), ?_, ?_, rfl⟩
-  · rw [toFluxesTen]
-    exact Multiset.map_le_map (Multiset.filter_le _ F)
-  · simpa [toCharges] using hq
-
-lemma mem_powerset_sum_of_mem_reduce_toFluxesTen {F : TenQuanta 𝓩}
-    {f : Fluxes} (hf : f ∈ F.reduce.toFluxesTen) :
-    f ∈ (Multiset.powerset F.toFluxesTen).map fun s => s.sum := by
-  obtain ⟨s, hs, _, rfl⟩ := exists_le_toFluxesTen_of_mem_reduce hf
-  exact Multiset.mem_map_of_mem _ (Multiset.mem_powerset.mpr hs)
+  simp only [Multiset.mem_map, Multiset.mem_powerset]
+  use (Multiset.map (fun x => x.2) (Multiset.filter (fun x => x.1 = q) F))
+  simp only [and_true]
+  rw [toFluxesTen]
+  refine Multiset.map_le_map ?_
+  exact Multiset.filter_le (fun x => x.1 = q) F
 
 lemma mem_powerset_sum_of_mem_reduce_toFluxesTen_filter {F : TenQuanta 𝓩}
     {f : Fluxes} (hf : f ∈ F.reduce.toFluxesTen) :
     f ∈ (F.toFluxesTen.powerset.filter fun s => s ≠ 0).map fun s => s.sum := by
-  obtain ⟨s, hs, hs0, rfl⟩ := exists_le_toFluxesTen_of_mem_reduce hf
-  exact Multiset.mem_map_of_mem _ (Multiset.mem_filter.mpr ⟨Multiset.mem_powerset.mpr hs, hs0⟩)
-
-/-- Every flux of `F.reduce` arising from a no-exotics `F` has nonnegative `U`, `Q` and `E`
-  chiral indices. This single decidable fact powers all six `numChiral`/`numAntiChiral` lemmas. -/
-private lemma reduce_toFluxesTen_nonneg {F : TenQuanta 𝓩}
-    (hx : F.toFluxesTen ∈ FluxesTen.elemsNoExotics) {f : Fluxes} (hf : f ∈ F.reduce.toFluxesTen) :
-    0 ≤ f.M - f.N ∧ 0 ≤ f.M ∧ 0 ≤ f.M + f.N := by
-  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
-  generalize F.toFluxesTen = G at *
-  revert f
-  revert G
-  decide
+  rw [toFluxesTen, Multiset.mem_map] at hf
+  obtain ⟨⟨q, f⟩, hp, rfl⟩ := hf
+  rw [mem_reduce_iff] at hp
+  simp at hp
+  obtain ⟨hq, rfl⟩ := hp
+  simp only [Multiset.mem_map]
+  use (Multiset.map (fun x => x.2) (Multiset.filter (fun x => x.1 = q) F))
+  simp only [ne_eq, Multiset.mem_filter, Multiset.mem_powerset, Multiset.map_eq_zero,
+    Multiset.filter_eq_nil, Prod.forall, not_forall, Decidable.not_not, and_true]
+  apply And.intro
+  rw [toFluxesTen]
+  refine Multiset.map_le_map ?_
+  exact Multiset.filter_le (fun x => x.1 = q) F
+  simpa [toCharges] using hq
 
 /-!
 
@@ -438,12 +425,21 @@ lemma reduce_numChiralU_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
   have hE : F.toFluxesTen.NoExotics := ((FluxesTen.noExotics_iff_mem_elemsNoExotics _).mpr hx).1
   have key := F.toFluxesTen.numChiralU_eq_sum_sub_numAntiChiralU
   rw [hE.2.2.1, hE.2.2.2.1, sub_zero, FluxesTen.chiralIndicesOfU] at key
-  rw [FluxesTen.numChiralU, FluxesTen.chiralIndicesOfU, Multiset.filter_eq_self.mpr,
-    reduce_toFluxesTen_map_sum F (fun f => f.M - f.N) (by simp) (fun a b => by simp; ring)]
+  have hmap : (F.reduce.toFluxesTen.map (fun f => f.M - f.N)).sum =
+      (F.toFluxesTen.map (fun f => f.M - f.N)).sum := by
+    have h := reduce_sum_eq_sum_toCharges F
+      (fun _ => (⟨⟨fun f => f.M - f.N, by simp⟩, fun a b => by simp; ring⟩ : Fluxes →+ ℤ))
+    simpa [toFluxesTen, Multiset.map_map, Function.comp] using h
+  rw [FluxesTen.numChiralU, FluxesTen.chiralIndicesOfU, Multiset.filter_eq_self.mpr, hmap]
   · exact key.symm
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  exact (reduce_toFluxesTen_nonneg hx hf).1
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
+  clear ha hmap key hE
+  generalize F.toFluxesTen = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 
@@ -458,8 +454,12 @@ lemma reduce_numAntiChiralU_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
     Multiset.sum_zero]
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  have := (reduce_toFluxesTen_nonneg hx hf).1
-  omega
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
+  clear ha
+  generalize F.toFluxesTen = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 
@@ -473,12 +473,21 @@ lemma reduce_numChiralQ_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
   have hE : F.toFluxesTen.NoExotics := ((FluxesTen.noExotics_iff_mem_elemsNoExotics _).mpr hx).1
   have key := F.toFluxesTen.numChiralQ_eq_sum_sub_numAntiChiralQ
   rw [hE.1, hE.2.1, sub_zero, FluxesTen.chiralIndicesOfQ] at key
-  rw [FluxesTen.numChiralQ, FluxesTen.chiralIndicesOfQ, Multiset.filter_eq_self.mpr,
-    reduce_toFluxesTen_map_sum F (fun f => f.M) (by simp) (fun a b => by simp)]
+  have hmap : (F.reduce.toFluxesTen.map (fun f => f.M)).sum =
+      (F.toFluxesTen.map (fun f => f.M)).sum := by
+    have h := reduce_sum_eq_sum_toCharges F
+      (fun _ => (⟨⟨fun f => f.M, by simp⟩, fun a b => by simp⟩ : Fluxes →+ ℤ))
+    simpa [toFluxesTen, Multiset.map_map, Function.comp] using h
+  rw [FluxesTen.numChiralQ, FluxesTen.chiralIndicesOfQ, Multiset.filter_eq_self.mpr, hmap]
   · exact key.symm
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  exact (reduce_toFluxesTen_nonneg hx hf).2.1
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
+  clear ha hmap key hE
+  generalize F.toFluxesTen = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 
@@ -493,8 +502,12 @@ lemma reduce_numAntiChiralQ_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
     Multiset.sum_zero]
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  have := (reduce_toFluxesTen_nonneg hx hf).2.1
-  omega
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
+  clear ha
+  generalize F.toFluxesTen = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 
@@ -508,12 +521,21 @@ lemma reduce_numChiralE_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
   have hE : F.toFluxesTen.NoExotics := ((FluxesTen.noExotics_iff_mem_elemsNoExotics _).mpr hx).1
   have key := F.toFluxesTen.numChiralE_eq_sum_sub_numAntiChiralE
   rw [hE.2.2.2.2.1, hE.2.2.2.2.2, sub_zero, FluxesTen.chiralIndicesOfE] at key
-  rw [FluxesTen.numChiralE, FluxesTen.chiralIndicesOfE, Multiset.filter_eq_self.mpr,
-    reduce_toFluxesTen_map_sum F (fun f => f.M + f.N) (by simp) (fun a b => by simp; ring)]
+  have hmap : (F.reduce.toFluxesTen.map (fun f => f.M + f.N)).sum =
+      (F.toFluxesTen.map (fun f => f.M + f.N)).sum := by
+    have h := reduce_sum_eq_sum_toCharges F
+      (fun _ => (⟨⟨fun f => f.M + f.N, by simp⟩, fun a b => by simp; ring⟩ : Fluxes →+ ℤ))
+    simpa [toFluxesTen, Multiset.map_map, Function.comp] using h
+  rw [FluxesTen.numChiralE, FluxesTen.chiralIndicesOfE, Multiset.filter_eq_self.mpr, hmap]
   · exact key.symm
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  exact (reduce_toFluxesTen_nonneg hx hf).2.2
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
+  clear ha hmap key hE
+  generalize F.toFluxesTen = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 
@@ -528,8 +550,12 @@ lemma reduce_numAntiChiralE_of_mem_elemsNoExotics {F : TenQuanta 𝓩}
     Multiset.sum_zero]
   intro a ha
   obtain ⟨f, hf, rfl⟩ := Multiset.mem_map.mp ha
-  have := (reduce_toFluxesTen_nonneg hx hf).2.2
-  omega
+  replace hf := mem_powerset_sum_of_mem_reduce_toFluxesTen hf
+  clear ha
+  generalize F.toFluxesTen = G at *
+  revert f
+  revert G
+  decide
 
 /-!
 

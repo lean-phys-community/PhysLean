@@ -244,7 +244,8 @@ lemma deriv_gaussian_eq_physHermite_mul_gaussian (n : ℕ) (x : ℝ) :
     have deriv_gaussian :
       deriv (fun y => Real.exp (-(y ^ 2))) x = -2 * x * Real.exp (-(x ^ 2)) := by
       rw [deriv_exp (by simp)]
-      simp
+      simp only [deriv.fun_neg', differentiableAt_fun_id, deriv_fun_pow, cast_ofNat,
+        Nat.add_one_sub_one, pow_one, deriv_id'', mul_one, mul_neg, neg_mul, neg_inj]
       ring
     rw [Function.iterate_succ_apply', ih, deriv_const_mul_field, deriv_fun_mul, pow_succ (-1 : ℝ),
       deriv_gaussian, physHermite_succ]
@@ -375,11 +376,9 @@ theorem physHermite_orthogonal {n m : ℕ} (hnm : n ≠ m) :
       rw [mul_comm]
     rw [physHermite_orthogonal_lt hmn]
 
-/-- Change of variables `x ↦ c * x` for an integral of a product of two Physicists Hermite
-polynomials against a Gaussian weight. -/
-private lemma integral_physHermite_comp_mul_left (n m : ℕ) (c : ℝ) :
-    ∫ x : ℝ, (physHermite n (c * x) * physHermite m (c * x)) * Real.exp (- c ^ 2 * x ^ 2) =
-    |c⁻¹| • ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (- x ^ 2) := by
+lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
+    ∫ x : ℝ, (physHermite n (c * x) * physHermite m (c * x)) *
+    Real.exp (- c ^ 2 * x ^ 2) = 0 := by
   trans ∫ x : ℝ, (fun x => (physHermite n x * physHermite m x) * Real.exp (- x^2)) (c * x)
   · congr
     funext x
@@ -388,11 +387,8 @@ private lemma integral_physHermite_comp_mul_left (n m : ℕ) (c : ℝ) :
     exact Eq.symm (mul_pow c x 2)
   rw [MeasureTheory.Measure.integral_comp_mul_left
     (fun x => physHermite n x * physHermite m x * Real.exp (-x ^ 2)) c]
-
-lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
-    ∫ x : ℝ, (physHermite n (c * x) * physHermite m (c * x)) *
-    Real.exp (- c ^ 2 * x ^ 2) = 0 := by
-  rw [integral_physHermite_comp_mul_left, physHermite_orthogonal hnm, smul_zero]
+  rw [physHermite_orthogonal hnm]
+  simp
 
 theorem physHermite_norm (n : ℕ) :
     ∫ x : ℝ, (physHermite n x * physHermite n x) * Real.exp (- x ^ 2) =
@@ -411,7 +407,15 @@ theorem physHermite_norm (n : ℕ) :
 lemma physHermite_norm_cons (n : ℕ) (c : ℝ) :
     ∫ x : ℝ, (physHermite n (c * x) * physHermite n (c * x)) * Real.exp (- c ^ 2 * x ^ 2) =
     |c⁻¹| • (↑n ! * 2 ^ n * √Real.pi) := by
-  rw [integral_physHermite_comp_mul_left, physHermite_norm]
+  trans ∫ x : ℝ, (fun x => (physHermite n x * physHermite n x) * Real.exp (- x^2)) (c * x)
+  · congr
+    funext x
+    simp only [neg_mul, mul_eq_mul_left_iff, Real.exp_eq_exp, neg_inj, _root_.mul_eq_zero, or_self]
+    left
+    exact Eq.symm (mul_pow c x 2)
+  rw [MeasureTheory.Measure.integral_comp_mul_left
+    (fun x => physHermite n x * physHermite n x * Real.exp (-x ^ 2)) c]
+  rw [physHermite_norm]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ) →

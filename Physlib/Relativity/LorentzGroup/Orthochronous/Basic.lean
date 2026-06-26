@@ -180,25 +180,19 @@ lemma isOrthochronous_mul {Λ Λ' : LorentzGroup d} (h : IsOrthochronous Λ)
     (orthochronoustoVelocity h').1⟫ₘ
   exact Lorentz.Velocity.zero_le_minkowskiProduct _ _
 
-private lemma coe_neg_mul_neg (Λ Λ' : LorentzGroup d) : -Λ * -Λ' = Λ * Λ' :=
-  Subtype.ext (by simp)
-
-private lemma coe_neg_mul (Λ Λ' : LorentzGroup d) : -Λ * Λ' = -(Λ * Λ') :=
-  Subtype.ext (by simp)
-
-private lemma coe_mul_neg (Λ Λ' : LorentzGroup d) : Λ * -Λ' = -(Λ * Λ') :=
-  Subtype.ext (by simp)
-
 lemma isOrthochronous_mul_iff {Λ Λ' : LorentzGroup d} :
     IsOrthochronous (Λ * Λ') ↔ (IsOrthochronous Λ = IsOrthochronous Λ') := by
   by_cases h : IsOrthochronous Λ <;> by_cases h' : IsOrthochronous Λ'
     <;> simp [h, h']
   · exact isOrthochronous_mul h h'
-  · rw [← neg_isOrthochronous_iff_not, ← coe_mul_neg]
+  · have hmn : (Λ * -Λ' : LorentzGroup d) = -(Λ * Λ') := Subtype.ext (by simp)
+    rw [← neg_isOrthochronous_iff_not, ← hmn]
     exact isOrthochronous_mul h (neg_isOrthochronous_iff_not.mpr h')
-  · rw [← neg_isOrthochronous_iff_not, ← coe_neg_mul]
+  · have hnm : (-Λ * Λ' : LorentzGroup d) = -(Λ * Λ') := Subtype.ext (by simp)
+    rw [← neg_isOrthochronous_iff_not, ← hnm]
     exact isOrthochronous_mul (neg_isOrthochronous_iff_not.mpr h) h'
-  · rw [← coe_neg_mul_neg]
+  · have hnn : (-Λ * -Λ' : LorentzGroup d) = Λ * Λ' := Subtype.ext (by simp)
+    rw [← hnn]
     refine isOrthochronous_mul ?_ ?_ <;> rwa [neg_isOrthochronous_iff_not]
 
 /-- The homomorphism from `LorentzGroup` to `ℤ₂`. -/

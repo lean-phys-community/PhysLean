@@ -388,31 +388,33 @@ lemma differentiable_meanEnergyNumerator :
   unfold meanEnergyNumerator
   refine Differentiable.fun_sum ?_; intro i _; apply Differentiable.const_mul; simp
 
-/-- Derivative of `x ↦ exp (-x * c)`, the building block for the partition-function
-derivatives below. -/
-private lemma hasDerivAt_exp_neg_mul (c b : ℝ) :
-    HasDerivAt (fun x => Real.exp (-x * c)) (-c * Real.exp (-b * c)) b := by
-  have h : HasDerivAt (fun x => -x * c) (-c) b := by
-    simpa using (hasDerivAt_id b).neg.mul_const c
-  simpa [mul_comm] using h.exp
-
 lemma deriv_mathematicalPartitionFunctionBetaReal (b : ℝ) :
     deriv 𝓒.mathematicalPartitionFunctionBetaReal b = -𝓒.meanEnergyNumerator b := by
   unfold mathematicalPartitionFunctionBetaReal meanEnergyNumerator
+  have hd : ∀ c : ℝ, HasDerivAt (fun x => Real.exp (-x * c)) (-c * Real.exp (-b * c)) b := by
+    intro c
+    have h : HasDerivAt (fun x => -x * c) (-c) b := by
+      simpa using (hasDerivAt_id b).neg.mul_const c
+    simpa [mul_comm] using h.exp
   have h_sum : HasDerivAt (fun x => ∑ i, Real.exp (-x * 𝓒.energy i))
       (∑ i, -𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b :=
-    HasDerivAt.fun_sum fun i _ => hasDerivAt_exp_neg_mul (𝓒.energy i) b
+    HasDerivAt.fun_sum fun i _ => hd (𝓒.energy i)
   simpa [Finset.sum_neg_distrib] using h_sum.deriv
 
 lemma deriv_meanEnergyNumerator (b : ℝ) :
     deriv 𝓒.meanEnergyNumerator b =
       -∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i) := by
   unfold meanEnergyNumerator
+  have hd : ∀ c : ℝ, HasDerivAt (fun x => Real.exp (-x * c)) (-c * Real.exp (-b * c)) b := by
+    intro c
+    have h : HasDerivAt (fun x => -x * c) (-c) b := by
+      simpa using (hasDerivAt_id b).neg.mul_const c
+    simpa [mul_comm] using h.exp
   have h_sum : HasDerivAt (fun x => ∑ i, 𝓒.energy i * Real.exp (-x * 𝓒.energy i))
       (∑ i, -(𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) b := by
     refine HasDerivAt.fun_sum fun i _ => ?_
     simpa [sq, mul_comm, mul_left_comm, mul_assoc] using
-      (hasDerivAt_exp_neg_mul (𝓒.energy i) b).const_mul (𝓒.energy i)
+      (hd (𝓒.energy i)).const_mul (𝓒.energy i)
   simpa [Finset.sum_neg_distrib, sq, mul_comm, mul_left_comm, mul_assoc] using h_sum.deriv
 
 /-! Quotient rule: dU/db = U^2 - ⟨E^2⟩_β -/

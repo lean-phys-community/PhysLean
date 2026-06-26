@@ -589,12 +589,8 @@ a complicated expression involving `fderiv`. This is not very useful in itself,
 but acts as a starting point for further simplifications.
 
 -/
-
-/-- The shared `HasVarGradientAt` witness for the kinetic term, used both to compute the
-variational gradient (`gradKineticTerm_eq_sum_fderiv`) and to record the `HasVarGradientAt`
-statement (`kineticTerm_hasVarGradientAt`). -/
-private lemma kineticTerm_hasVarGradientAt_aux {d} {𝓕 : FreeSpace}
-    (A : ElectromagneticPotential d) (hA : ContDiff ℝ ∞ A) :
+lemma gradKineticTerm_eq_sum_fderiv {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
+    (hA : ContDiff ℝ ∞ A) :
     let F' : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) → (SpaceTime d → ℝ) →
     SpaceTime d → Lorentz.Vector d := fun μν => (fun ψ x =>
     -(fderiv ℝ (fun x' => (fun x' => η μν.1 μν.1 * η μν.2 μν.2 * ψ x') x' * ∂_ μν.1 A x' μν.2) x)
@@ -607,8 +603,8 @@ private lemma kineticTerm_hasVarGradientAt_aux {d} {𝓕 : FreeSpace}
         Lorentz.Vector.basis μν.2 +
           -(fderiv ℝ (fun x' => ∂_ μν.1 A x' μν.2 * ψ x') x) (Lorentz.Vector.basis μν.2) •
           Lorentz.Vector.basis μν.1))
-    HasVarGradientAt (fun A' => kineticTerm 𝓕 ⟨A'⟩)
-      (fun x => ∑ μν, F' μν (fun x' => -1/(2 * 𝓕.μ₀) * (fun _ => 1) x') x) A := by
+    A.gradKineticTerm 𝓕 = fun x => ∑ μν, F' μν (fun x' => -1/(2 * 𝓕.μ₀) * (fun _ => 1) x') x := by
+  apply HasVarGradientAt.varGradient
   change HasVarGradientAt (fun A' x => ElectromagneticPotential.kineticTerm 𝓕 ⟨A'⟩ x) _ A
   conv =>
     enter [1, A', x]
@@ -650,24 +646,6 @@ private lemma kineticTerm_hasVarGradientAt_aux {d} {𝓕 : FreeSpace}
   change HasVarGradientAt (fun A' x => -1 / (2 * 𝓕.μ₀) * ∑ μ, ∑ ν, F (μ, ν) A' x) _ A
   apply HasVarGradientAt.intro _ hF_mul
   rfl
-
-lemma gradKineticTerm_eq_sum_fderiv {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
-    (hA : ContDiff ℝ ∞ A) :
-    let F' : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) → (SpaceTime d → ℝ) →
-    SpaceTime d → Lorentz.Vector d := fun μν => (fun ψ x =>
-    -(fderiv ℝ (fun x' => (fun x' => η μν.1 μν.1 * η μν.2 μν.2 * ψ x') x' * ∂_ μν.1 A x' μν.2) x)
-              (Lorentz.Vector.basis μν.1) •
-          Lorentz.Vector.basis μν.2 +
-        -(fderiv ℝ (fun x' => ∂_ μν.1 A x' μν.2 *
-          (fun x' => η μν.1 μν.1 * η μν.2 μν.2 * ψ x') x') x)
-              (Lorentz.Vector.basis μν.1) • Lorentz.Vector.basis μν.2 +
-      -(-(fderiv ℝ (fun x' => ψ x' * ∂_ μν.2 A x' μν.1) x) (Lorentz.Vector.basis μν.1) •
-        Lorentz.Vector.basis μν.2 +
-          -(fderiv ℝ (fun x' => ∂_ μν.1 A x' μν.2 * ψ x') x) (Lorentz.Vector.basis μν.2) •
-          Lorentz.Vector.basis μν.1))
-    A.gradKineticTerm 𝓕 = fun x => ∑ μν, F' μν (fun x' => -1/(2 * 𝓕.μ₀) * (fun _ => 1) x') x := by
-  apply HasVarGradientAt.varGradient
-  exact kineticTerm_hasVarGradientAt_aux A hA
 
 /-!
 
@@ -942,7 +920,47 @@ lemma kineticTerm_hasVarGradientAt {d} {𝓕 : FreeSpace} (A : ElectromagneticPo
     (hA : ContDiff ℝ ∞ A) :
     HasVarGradientAt (fun A => kineticTerm 𝓕 ⟨A⟩) (A.gradKineticTerm 𝓕) A := by
   rw [gradKineticTerm_eq_sum_fderiv A hA]
-  exact kineticTerm_hasVarGradientAt_aux A hA
+  change HasVarGradientAt (fun A' x => ElectromagneticPotential.kineticTerm 𝓕 ⟨A'⟩ x) _ A
+  conv =>
+    enter [1, A', x]
+    rw [kineticTerm_eq_sum_potential]
+  let F : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) → (SpaceTime d → Lorentz.Vector d) →
+    SpaceTime d → ℝ := fun (μ, ν) A' x =>
+        (η μ μ * η ν ν * ∂_ μ A' x ν ^ 2 - ∂_ μ A' x ν * ∂_ ν A' x μ)
+  let F' : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d) → (SpaceTime d → ℝ) →
+    SpaceTime d → Lorentz.Vector d := fun μν => (fun ψ x =>
+    -(fderiv ℝ (fun x' => (fun x' => η μν.1 μν.1 * η μν.2 μν.2 * ψ x') x' * ∂_ μν.1 A x' μν.2) x)
+              (Lorentz.Vector.basis μν.1) •
+          Lorentz.Vector.basis μν.2 +
+        -(fderiv ℝ (fun x' => ∂_ μν.1 A x' μν.2 *
+          (fun x' => η μν.1 μν.1 * η μν.2 μν.2 * ψ x') x') x)
+              (Lorentz.Vector.basis μν.1) • Lorentz.Vector.basis μν.2 +
+      -(-(fderiv ℝ (fun x' => ψ x' * ∂_ μν.2 A x' μν.1) x) (Lorentz.Vector.basis μν.1) •
+        Lorentz.Vector.basis μν.2 +
+          -(fderiv ℝ (fun x' => ∂_ μν.1 A x' μν.2 * ψ x') x) (Lorentz.Vector.basis μν.2) •
+            Lorentz.Vector.basis μν.1))
+  have F_hasVarAdjDerivAt (μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) :
+      HasVarAdjDerivAt (F μν) (F' μν) A := by
+    have h1 :=
+      HasVarAdjDerivAt.mul _ _ _ _ A (deriv_hasVarAdjDerivAt μν.1 μν.2 A hA)
+        (deriv_hasVarAdjDerivAt μν.1 μν.2 A hA)
+    have h1' := HasVarAdjDerivAt.const_mul _ _ A h1 (c := η μν.1 μν.1 * η μν.2 μν.2)
+    have h2 :=
+      HasVarAdjDerivAt.mul _ _ _ _ A (deriv_hasVarAdjDerivAt μν.1 μν.2 A hA)
+        (deriv_hasVarAdjDerivAt μν.2 μν.1 A hA)
+    have h3 := HasVarAdjDerivAt.neg _ _ A h2
+    have h4 := HasVarAdjDerivAt.add _ _ _ _ _ h1' h3
+    convert h4
+    simp [F]
+    ring
+  have F_sum_hasVarAdjDerivAt :
+      HasVarAdjDerivAt (fun A' x => ∑ μ, ∑ ν, F (μ, ν) A' x) (fun ψ x => ∑ μν, F' μν ψ x) A := by
+    convert HasVarAdjDerivAt.sum _ _ A (hA) (fun i => F_hasVarAdjDerivAt i)
+    exact Eq.symm (Fintype.sum_prod_type fun x => F x _ _)
+  have hF_mul := HasVarAdjDerivAt.const_mul _ _ A F_sum_hasVarAdjDerivAt (c := -1/(2 * 𝓕.μ₀))
+  change HasVarGradientAt (fun A' x => -1 / (2 * 𝓕.μ₀) * ∑ μ, ∑ ν, F (μ, ν) A' x) _ A
+  apply HasVarGradientAt.intro _ hF_mul
+  rfl
 
 /-!
 

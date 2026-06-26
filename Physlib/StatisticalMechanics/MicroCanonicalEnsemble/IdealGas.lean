@@ -50,72 +50,6 @@ open NVEHamiltonian
 
 variable (n : ℕ) {V β T : ℝ}
 
-/-- The box indicator `if ∀ axes, |aₓ| ≤ c then 1 else 0` is measurable. -/
-private lemma measurable_box_indicator (c : ℝ) :
-    Measurable fun a : Fin n × Fin 3 → ℝ =>
-      if ∀ (x : Fin n) (x_1 : Fin 3), |a (x, x_1)| ≤ c then (1 : ℝ) else 0 := by
-  apply Measurable.ite ?_ measurable_const measurable_const
-  simp_rw [Set.setOf_forall]
-  exact MeasurableSet.iInter fun i => MeasurableSet.iInter fun j =>
-    measurableSet_le (by fun_prop) measurable_const
-
-open MeasureTheory in
-/-- The configuration-space integral over the cubical box of half-side `V ^ (1/3) / 2`:
-integrating the indicator of the box gives its volume `V ^ n`. -/
-private lemma integral_box_eq (hV : 0 < V) :
-    (∫ (a : Fin n × Fin 3 → ℝ),
-        if ∀ (x : Fin n) (x_1 : Fin 3), |a (x, x_1)| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0) =
-      V ^ n := by
-  have h_integrand_prod : ∀ (a : Fin n × Fin 3 → ℝ),
-      (if ∀ (x : Fin n) (x_1 : Fin 3), |a (x, x_1)| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0) =
-      (∏ xy, if |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0 : ℝ) := by
-    intro a
-    simp_rw [← Prod.forall (p := fun xy ↦ |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2)]
-    exact Fintype.prod_boole.symm
-  simp_rw [h_integrand_prod]
-  convert! ← MeasureTheory.integral_fintype_prod_eq_prod (ι := Fin n × Fin 3) (𝕜 := ℝ)
-    (f := fun _ r ↦ if |r| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0)
-  swap
-  · infer_instance
-  have h_integral_1d :
-      (∫ (x : ℝ), if |x| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0) = V ^ (3⁻¹ : ℝ) := by
-    have h_indicator := integral_indicator (f := fun _ ↦ (1:ℝ)) (μ := by volume_tac)
-      (measurableSet_Icc (a := -(V ^ (3⁻¹ : ℝ) / 2)) (b := (V ^ (3⁻¹ : ℝ) / 2)))
-    simp_rw [Set.indicator] at h_indicator
-    simp_rw [abs_le, ← Set.mem_Icc, h_indicator]
-    simp only [integral_const, MeasurableSet.univ, measureReal_restrict_apply, Set.univ_inter,
-      Real.volume_real_Icc, sub_neg_eq_add, add_halves, smul_eq_mul, mul_one, sup_eq_left,
-      ge_iff_le]
-    positivity
-  rw [Finset.prod_const, Finset.card_univ, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin,
-    h_integral_1d, ← Real.rpow_mul_natCast hV.le]
-  field_simp
-  simp
-
-open MeasureTheory in
-/-- The Gaussian momentum integral: integrating `exp(-β ∑ pᵢ²/2)` over all momenta gives
-`(2π/β) ^ (3n/2)`. -/
-private lemma integral_gaussian_eq (hβ : 0 < β) :
-    (∫ (a : Fin n × Fin 3 → ℝ), Real.exp (-(β * ∑ x, a x ^ 2 / 2))) =
-      (2 * Real.pi / β) ^ (3 * n / 2 : ℝ) := by
-  have h_gaussian :=
-    GaussianFourier.integral_rexp_neg_mul_sq_norm
-      (V := PiLp 2 (fun (_ : Fin n × Fin 3) ↦ ℝ)) (half_pos hβ)
-  apply (Eq.trans ?_ h_gaussian).trans ?_
-  · have := EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp (Fin n × Fin 3)
-    rw [← this.integral_comp (MeasurableEquiv.measurableEmbedding _)]
-    congr! 3 with x
-    simp_rw [div_eq_inv_mul, ← Finset.mul_sum, ← mul_assoc, neg_mul, mul_comm,
-      PiLp.norm_sq_eq_of_L2]
-    congr! 3
-    simp only [Real.norm_eq_abs, sq_abs]
-    congr
-  · field_simp
-    congr
-    simp only [finrank_euclideanSpace, Fintype.card_prod, Fintype.card_fin, Nat.cast_mul,
-      Nat.cast_ofNat]
-    ring_nf
-
 open MeasureTheory in
 /-- The partition function Z for an ideal gas. -/
 lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
@@ -187,11 +121,57 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
   · exact Filter.Eventually.of_forall fun _ => by positivity
   · exact Measurable.aestronglyMeasurable (by fun_prop)
   · exact Filter.Eventually.of_forall fun _ => by positivity
-  · exact (measurable_box_indicator n _).aestronglyMeasurable
-  · exact (measurable_box_indicator n _).ennreal_ofReal
+  · refine (Measurable.ite ?_ measurable_const measurable_const).aestronglyMeasurable
+    simp_rw [Set.setOf_forall]
+    exact MeasurableSet.iInter fun i => MeasurableSet.iInter fun j =>
+      measurableSet_le (by fun_prop) measurable_const
+  · refine (Measurable.ite ?_ measurable_const measurable_const).ennreal_ofReal
+    simp_rw [Set.setOf_forall]
+    exact MeasurableSet.iInter fun i => MeasurableSet.iInter fun j =>
+      measurableSet_le (by fun_prop) measurable_const
   congr 1
-  · exact integral_box_eq n hV
-  · exact integral_gaussian_eq n hβ
+  · have h_integrand_prod : ∀ (a : Fin n × Fin 3 → ℝ),
+        (if ∀ (x : Fin n) (x_1 : Fin 3), |a (x, x_1)| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0) =
+        (∏ xy, if |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0 : ℝ) := by
+      intro a
+      simp_rw [← Prod.forall (p := fun xy ↦ |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2)]
+      exact Fintype.prod_boole.symm
+    simp_rw [h_integrand_prod]
+    convert! ← MeasureTheory.integral_fintype_prod_eq_prod (ι := Fin n × Fin 3) (𝕜 := ℝ)
+      (f := fun _ r ↦ if |r| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0)
+    swap
+    · infer_instance
+    have h_integral_1d :
+        (∫ (x : ℝ), if |x| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0) = V ^ (3⁻¹ : ℝ) := by
+      have h_indicator := integral_indicator (f := fun _ ↦ (1:ℝ)) (μ := by volume_tac)
+        (measurableSet_Icc (a := -(V ^ (3⁻¹ : ℝ) / 2)) (b := (V ^ (3⁻¹ : ℝ) / 2)))
+      simp_rw [Set.indicator] at h_indicator
+      simp_rw [abs_le, ← Set.mem_Icc, h_indicator]
+      simp only [integral_const, MeasurableSet.univ, measureReal_restrict_apply, Set.univ_inter,
+        Real.volume_real_Icc, sub_neg_eq_add, add_halves, smul_eq_mul, mul_one, sup_eq_left,
+        ge_iff_le]
+      positivity
+    rw [Finset.prod_const, Finset.card_univ, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin,
+      h_integral_1d, ← Real.rpow_mul_natCast hV.le]
+    field_simp
+    simp
+  · have h_gaussian :=
+      GaussianFourier.integral_rexp_neg_mul_sq_norm
+        (V := PiLp 2 (fun (_ : Fin n × Fin 3) ↦ ℝ)) (half_pos hβ)
+    apply (Eq.trans ?_ h_gaussian).trans ?_
+    · have := EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp (Fin n × Fin 3)
+      rw [← this.integral_comp (MeasurableEquiv.measurableEmbedding _)]
+      congr! 3 with x
+      simp_rw [div_eq_inv_mul, ← Finset.mul_sum, ← mul_assoc, neg_mul, mul_comm,
+        PiLp.norm_sq_eq_of_L2]
+      congr! 3
+      simp only [Real.norm_eq_abs, sq_abs]
+      congr
+    · field_simp
+      congr
+      simp only [finrank_euclideanSpace, Fintype.card_prod, Fintype.card_fin, Nat.cast_mul,
+        Nat.cast_ofNat]
+      ring_nf
 
 /-- The Helmholtz Free Energy A for an ideal gas. -/
 lemma helmholtzA_eq (hV : 0 < V) (hT : 0 < T) : IdealGas.helmholtzA (n,V) T =

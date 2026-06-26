@@ -20,13 +20,6 @@ open Fin
 open Physlib
 variable {n : Nat}
 
-/-- The monotonicity hypothesis used by `takeWile_eraseIdx`/`dropWile_eraseIdx` is inherited by
-  the tail of the list. -/
-private lemma mono_tail {I : Type} (P : I → Prop) (a : I) (l : List I)
-    (h : ∀ i j : Fin (a :: l).length, i < j → P ((a :: l).get j) → P ((a :: l).get i)) :
-    ∀ i j : Fin l.length, i < j → P (l.get j) → P (l.get i) :=
-  fun i j hij hP => by simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP)
-
 lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.takeWhile P (List.eraseIdx l i) = (List.takeWhile P l).eraseIdx i
@@ -51,7 +44,8 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     by_cases hPa : P a
     · dsimp only [List.takeWhile]
       simp only [hPa, decide_true, List.eraseIdx_cons_succ, List.cons.injEq, true_and]
-      exact takeWile_eraseIdx P (b :: l) n (mono_tail P a (b :: l) h)
+      exact takeWile_eraseIdx P (b :: l) n fun i j hij hP => by
+        simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP)
     · simp [hPa]
 
 lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
@@ -79,12 +73,14 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
         simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp only [List.dropWhile, hPa, decide_true, List.takeWhile, hPb, List.length_cons,
         add_le_add_iff_right, Nat.reduceSubDiff]
-      rw [dropWile_eraseIdx P (b :: l) n (mono_tail P a (b :: l) h)]
+      rw [dropWile_eraseIdx P (b :: l) n (fun i j hij hP => by
+        simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP))]
       simp_all only [List.length_cons, List.get_eq_getElem, decide_true, List.takeWhile_cons_of_pos,
         List.dropWhile_cons_of_pos]
     · simp only [List.dropWhile, List.takeWhile, hPb, decide_false]
       by_cases hPa : P a
-      · rw [dropWile_eraseIdx P (b :: l) n (mono_tail P a (b :: l) h)]
+      · rw [dropWile_eraseIdx P (b :: l) n (fun i j hij hP => by
+          simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP))]
         simp only [hPa, decide_true, hPb, decide_false, Bool.false_eq_true, not_false_eq_true,
           List.takeWhile_cons_of_neg, List.length_nil, zero_le, ↓reduceIte, List.dropWhile,
           tsub_zero, List.length_singleton, le_add_iff_nonneg_left, add_tsub_cancel_right]

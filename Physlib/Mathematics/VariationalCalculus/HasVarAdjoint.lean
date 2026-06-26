@@ -497,8 +497,13 @@ lemma adjFDeriv_apply
     · exact IsCompact.cthickening cK
     · intro φ φ' hφ x hx
       dsimp[divergence]; congr 4
-      rw [Filter.EventuallyEq.fderiv_eq
-        (IsLocalizedFunctionTransform.eventuallyEq_of_eq_on_cthickening hφ hx)]
+      have heq : φ =ᶠ[nhds x] φ' := by
+        apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
+        · exact Metric.isOpen_thickening.mem_nhds
+            (Metric.self_subset_thickening one_pos K hx)
+        · intro y hy
+          exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
+      rw [Filter.EventuallyEq.fderiv_eq heq]
   adjoint φ ψ hφ hψ := by
     obtain ⟨s, ⟨bX⟩⟩ := Basis.exists_basis ℝ X
     haveI : Fintype s := FiniteDimensional.fintypeBasisIndex bX

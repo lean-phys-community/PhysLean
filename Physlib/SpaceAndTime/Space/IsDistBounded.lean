@@ -148,35 +148,6 @@ lemma aeStronglyMeasurable_time_schwartzMap_smul {d : ℕ} {f : Space d → F}
 
 -/
 
-/-- Reduce integrability of `fun x => η x • f (proj x)` to integrability of each radial-power
-term `fun x => η x * ‖proj x + c‖ ^ p`, using the `IsDistBounded` bound on `f`. -/
-private lemma integrable_smul_proj_of_radial_power {d : ℕ} {X : Type}
-    [NormedAddCommGroup X] [NormedSpace ℝ X] [MeasurableSpace X] {μ : Measure X}
-    {proj : X → Space d}
-    {f : Space d → F} (hf : IsDistBounded f) (η : 𝓢(X, ℝ))
-    (hmeas : AEStronglyMeasurable (fun x => η x • f (proj x)) μ)
-    (h2 : ∀ (p : ℤ), - (d - 1 : ℕ) ≤ p → ∀ c,
-      Integrable (fun x => η x * ‖proj x + c‖ ^ p) μ)
-    (hmeas2 : ∀ (p : ℤ) (c : Space d),
-      AEStronglyMeasurable (fun x => η x * ‖proj x + c‖ ^ p) μ) :
-    Integrable (fun x => η x • f (proj x)) μ := by
-  obtain ⟨n, c, g, p, c_nonneg, p_bound, bound⟩ := hf.2
-  apply Integrable.mono (g := fun x => ∑ i, (c i * (‖η x‖ * ‖proj x + g i‖ ^ p i))) _ hmeas
-  · filter_upwards with x
-    rw [norm_smul]
-    apply le_trans (mul_le_mul_of_nonneg_left (bound (proj x)) (norm_nonneg (η x)))
-    apply le_of_eq
-    simp only [Real.norm_eq_abs]
-    rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
-      Finset.mul_sum]
-    ring_nf
-  · apply MeasureTheory.integrable_finsetSum
-    intro i _
-    apply Integrable.const_mul
-    have h2' := h2 (p i) (p_bound i) (g i)
-    rw [← MeasureTheory.integrable_norm_iff (hmeas2 (p i) (g i))] at h2'
-    simpa using h2'
-
 @[fun_prop]
 lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
     (η : 𝓢(Space d, ℝ)) :
@@ -184,8 +155,25 @@ lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
   /- Reducing the problem to `Integrable (fun x : Space d => η x * ‖x + c‖ ^ p)` -/
   suffices h2 : ∀ (p : ℤ) (hp : - (d - 1 : ℕ) ≤ p) (c : Space d) (η : 𝓢(Space d, ℝ)),
       Integrable (fun x : Space d => η x * ‖x + c‖ ^ p) volume by
-    exact integrable_smul_proj_of_radial_power (proj := fun x => x) hf η (by fun_prop)
-      (fun p hp c => h2 p hp c η) (fun p c => AEMeasurable.aestronglyMeasurable (by fun_prop))
+    obtain ⟨n, c, g, p, c_nonneg, p_bound, bound⟩ := hf.2
+    apply Integrable.mono (g := fun x => ∑ i, (c i * (‖η x‖ * ‖x + g i‖ ^ p i))) _
+    · fun_prop
+    · filter_upwards with x
+      rw [norm_smul]
+      apply le_trans (mul_le_mul_of_nonneg_left (bound x) (norm_nonneg (η x)))
+      apply le_of_eq
+      simp only [Real.norm_eq_abs]
+      rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
+        Finset.mul_sum]
+      ring_nf
+    · apply MeasureTheory.integrable_finsetSum
+      intro i _
+      apply Integrable.const_mul
+      specialize h2 (p i) (p_bound i) (g i) η
+      rw [← MeasureTheory.integrable_norm_iff] at h2
+      simpa using h2
+      apply AEMeasurable.aestronglyMeasurable
+      fun_prop
   /- Reducing the problem to `Integrable (fun x : Space d => η x * ‖x‖ ^ p)` -/
   suffices h0 : ∀ (p : ℤ) (hp : - (d - 1 : ℕ) ≤ p) (η : 𝓢(Space d, ℝ)),
       Integrable (fun x : Space d => η x * ‖x‖ ^ p) volume by
@@ -306,9 +294,25 @@ lemma integrable_time_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
   /- Reducing the problem to `Integrable (fun x : Time × Space d => η x * ‖x.2 + c‖ ^ p)` -/
   suffices h2 : ∀ (p : ℤ) (hp : - (d - 1 : ℕ) ≤ p) (c : Space d) (η : 𝓢(Time × Space d, ℝ)),
       Integrable (fun x : Time × Space d => η x * ‖x.2 + c‖ ^ p) volume by
-    refine integrable_smul_proj_of_radial_power (proj := Prod.snd) hf η ?_
-      (fun p hp c => h2 p hp c η) (fun p c => AEMeasurable.aestronglyMeasurable (by fun_prop))
-    fun_prop
+    obtain ⟨n, c, g, p, c_nonneg, p_bound, bound⟩ := hf.2
+    apply Integrable.mono (g := fun x => ∑ i, (c i * (‖η x‖ * ‖x.2 + g i‖ ^ p i))) _
+    · fun_prop
+    · filter_upwards with x
+      rw [norm_smul]
+      apply le_trans (mul_le_mul_of_nonneg_left (bound x.2) (norm_nonneg (η x)))
+      apply le_of_eq
+      simp only [Real.norm_eq_abs]
+      rw [Finset.abs_sum_of_nonneg (fun i _ => mul_nonneg (c_nonneg i) (by positivity)),
+        Finset.mul_sum]
+      ring_nf
+    · apply MeasureTheory.integrable_finsetSum
+      intro i _
+      apply Integrable.const_mul
+      specialize h2 (p i) (p_bound i) (g i) η
+      rw [← MeasureTheory.integrable_norm_iff] at h2
+      simpa using h2
+      apply AEMeasurable.aestronglyMeasurable
+      fun_prop
   /- Reducing the problem to `Integrable (fun x : Space d => η x * ‖x‖ ^ p)` -/
   suffices h0 : ∀ (p : ℤ) (hp : - (d - 1 : ℕ) ≤ p) (η : 𝓢(Time × Space d, ℝ)),
       Integrable (fun x : Time × Space d => η x * ‖x.2‖ ^ p) volume by

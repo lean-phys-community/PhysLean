@@ -53,23 +53,6 @@ lemma hamiltonEqOp_eq_zero_iff_hamiltons_equations (H : Time → X → X → ℝ
     (∀ t, ∂ₜ p t = -gradient (fun x => H t (p t) x) (q t)) := by
   simp [hamiltonEqOp_eq, funext_iff, Prod.mk_eq_zero, forall_and, add_eq_zero_iff_neg_eq]
 
-/-- A smooth (`C^∞`) function is differentiable at every point. -/
-private lemma differentiableAt_of_contDiff {W Z : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W]
-    [NormedAddCommGroup Z] [NormedSpace ℝ Z] {g : W → Z} {y : W} (hg : ContDiff ℝ ∞ g) :
-    DifferentiableAt ℝ g y :=
-  (hg.differentiable (by simp)).differentiableAt
-
-/-- `HasVarAdjDerivAt.fmap` specialized to a smooth uncurried family `f`, with the pointwise
-  adjoint given by `adjFDeriv`. The differentiability of each slice `f x` follows from
-  smoothness of `↿f`. -/
-private lemma hasVarAdjDerivAt_fmap_uncurry {U V : Type*}
-    [NormedAddCommGroup U] [NormedSpace ℝ U] [InnerProductSpace' ℝ U] [CompleteSpace U]
-    [NormedAddCommGroup V] [NormedSpace ℝ V] [InnerProductSpace' ℝ V] [CompleteSpace V]
-    (f : Time → U → V) (u : Time → U) (hu : ContDiff ℝ ∞ u) (hf : ContDiff ℝ ∞ ↿f) :
-    HasVarAdjDerivAt (fun φ x => f x (φ x)) (fun ψ x => adjFDeriv ℝ (f x) (u x) (ψ x)) u :=
-  HasVarAdjDerivAt.fmap f u hu hf fun x _ =>
-    (differentiableAt_of_contDiff (hf.comp (contDiff_prodMk_right x))).hasAdjFDerivAt
-
 theorem hamiltons_equations_varGradient
     (H : Time → X → X → ℝ) (pq : Time → X × X) (hp : ContDiff ℝ ∞ pq)
     (hL : ContDiff ℝ ∞ ↿H) :
@@ -82,16 +65,21 @@ theorem hamiltons_equations_varGradient
       apply HasVarAdjDerivAt.comp
         (F := fun (φ : Time → X × X) t => i t (φ t))
         (G := fun (φ : Time → X × X) t => ((φ t).1, fderiv ℝ (Prod.snd ∘ φ) t 1))
-      · exact hasVarAdjDerivAt_fmap_uncurry _ _ (by fun_prop) (by fun_prop)
+      · exact HasVarAdjDerivAt.fmap _ _ (by fun_prop) (by fun_prop)
+          fun x _ => (by fun_prop : DifferentiableAt ℝ _ _).hasAdjFDerivAt
       · apply HasVarAdjDerivAt.prod
         · exact HasVarAdjDerivAt.fst (HasVarAdjDerivAt.id _ (by fun_prop))
         · apply HasVarAdjDerivAt.fderiv' (F := fun (φ : Time → X × X) t => (φ t).2)
-          exact hasVarAdjDerivAt_fmap_uncurry _ _ (by fun_prop) (by fun_prop)
+          exact HasVarAdjDerivAt.fmap _ _ (by fun_prop) (by fun_prop)
+            fun x _ => (by fun_prop : DifferentiableAt ℝ _ _).hasAdjFDerivAt
     · apply HasVarAdjDerivAt.neg
-      exact hasVarAdjDerivAt_fmap_uncurry (fun t => ↿(H t)) _ (by fun_prop) (by fun_prop)
+      exact HasVarAdjDerivAt.fmap (fun t => ↿(H t)) _ (by fun_prop) (by fun_prop)
+        fun x _ => (((by fun_prop : ContDiff ℝ ∞ _).differentiable
+          (by simp)).differentiableAt).hasAdjFDerivAt
   · simp only [adjFDeriv_prod_snd, Prod.mk_add_mk, add_zero, zero_add]
     funext x
-    rw [adjFDeriv_uncurry (differentiableAt_of_contDiff (by fun_prop))]
+    rw [adjFDeriv_uncurry
+      ((by fun_prop : ContDiff ℝ ∞ _).differentiable (by simp)).differentiableAt]
     simp only [Prod.neg_mk, Prod.mk_add_mk]
     rw [adjFDeriv_inner]
     simp only [one_smul]
@@ -101,6 +89,6 @@ theorem hamiltons_equations_varGradient
       simp
     rw [← gradient_eq_adjFDeriv, ← gradient_eq_adjFDeriv]
     rfl
-    all_goals exact differentiableAt_of_contDiff (by fun_prop)
+    all_goals exact ((by fun_prop : ContDiff ℝ ∞ _).differentiable (by simp)).differentiableAt
 
 end ClassicalMechanics

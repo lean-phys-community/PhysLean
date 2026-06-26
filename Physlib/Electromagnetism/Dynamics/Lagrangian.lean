@@ -235,7 +235,8 @@ lemma lagrangian_eq_electric_magnetic {d} {𝓕 : FreeSpace}
     - A.scalarPotential 𝓕.c (x.time 𝓕.c) x.space * J.chargeDensity 𝓕.c (x.time 𝓕.c) x.space
     + ∑ i, A.vectorPotential 𝓕.c (x.time 𝓕.c) x.space i *
         J.currentDensity 𝓕.c (x.time 𝓕.c) x.space i := by
-  rw [lagrangian, kineticTerm_eq_electricMatrix_magneticFieldMatrix _ _ (hA.differentiable (by simp)),
+  rw [lagrangian,
+    kineticTerm_eq_electricMatrix_magneticFieldMatrix _ _ (hA.differentiable (by simp)),
     freeCurrentPotential_eq_sum_scalarPotential_vectorPotential 𝓕 A J x]
   ring
 
