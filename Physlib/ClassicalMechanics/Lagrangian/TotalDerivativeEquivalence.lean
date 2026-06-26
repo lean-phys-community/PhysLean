@@ -107,63 +107,19 @@ lemma isTotalTimeDerivativeVelocity {n : ℕ}
     (hδL0 : δL 0 = 0)
     (h : IsTotalTimeDerivative (fun _ v _ => δL v)) :
     ∃ g : EuclideanSpace ℝ (Fin n), ∀ v, δL v = ⟪g, v⟫_ℝ := by
-  classical
-  rcases h with ⟨F, hFdiff, hEq⟩
-
-  -- Derivative of F at (0,0)
-  let dF : (EuclideanSpace ℝ (Fin n) × ℝ) →L[ℝ] ℝ :=
-    fderiv ℝ F ((0 : EuclideanSpace ℝ (Fin n)), (0 : ℝ))
-
-  -- The "time-direction" derivative must vanish because δL 0 = 0.
-  have h_time : dF ((0 : EuclideanSpace ℝ (Fin n)), (1 : ℝ)) = 0 := by
-    have h0 :
-        δL (0 : EuclideanSpace ℝ (Fin n)) =
-          fderiv ℝ F ((0 : EuclideanSpace ℝ (Fin n)), (0 : ℝ))
-            ((0 : EuclideanSpace ℝ (Fin n)), (1 : ℝ)) := by
-      simpa using (hEq (0 : EuclideanSpace ℝ (Fin n))
-        (0 : EuclideanSpace ℝ (Fin n)) (0 : ℝ))
-    have : dF ((0 : EuclideanSpace ℝ (Fin n)), (1 : ℝ)) =
-        δL (0 : EuclideanSpace ℝ (Fin n)) := by
-      simpa [dF] using h0.symm
-    simpa [hδL0] using this
-
-  -- Induced continuous linear functional on velocity: v ↦ dF (v,0).
-  let φ : (EuclideanSpace ℝ (Fin n)) →L[ℝ] ℝ :=
-    dF.comp (ContinuousLinearMap.inl ℝ (EuclideanSpace ℝ (Fin n)) ℝ)
-
-  -- Show δL v = φ v for all v.
-  have hφ : ∀ v : EuclideanSpace ℝ (Fin n), δL v = φ v := by
-    intro v
-    have hv :
-        δL v =
-          fderiv ℝ F ((0 : EuclideanSpace ℝ (Fin n)), (0 : ℝ))
-            (v, (1 : ℝ)) := by
-      simpa using (hEq (0 : EuclideanSpace ℝ (Fin n)) v (0 : ℝ))
-    have hv' : δL v = dF (v, (1 : ℝ)) := by
-      simpa [dF] using hv
-    calc
-      δL v = dF (v, (1 : ℝ)) := hv'
-      _ = dF ((v, (0 : ℝ)) + ((0 : EuclideanSpace ℝ (Fin n)), (1 : ℝ))) := by
-        simp
-      _ = dF (v, (0 : ℝ)) + dF ((0 : EuclideanSpace ℝ (Fin n)), (1 : ℝ)) := by
-        simpa using
-          (dF.map_add (v, (0 : ℝ)) ((0 : EuclideanSpace ℝ (Fin n)), (1 : ℝ)))
-      _ = dF (v, (0 : ℝ)) := by
-        simp [h_time]
-      _ = φ v := by
-        simp [φ]
-
-  -- Frechet–Riesz: represent φ as inner product with some g.
-  refine ⟨(InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin n))).symm φ, ?_⟩
-  intro v
-  have hinner :
-      ⟪(InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin n))).symm φ, v⟫_ℝ = φ v := by
-    rw [InnerProductSpace.toDual_symm_apply (𝕜 := ℝ)
-        (E := EuclideanSpace ℝ (Fin n)) (x := v) (y := φ)]
-  calc
-    δL v = φ v := hφ v
-    _ = ⟪(InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin n))).symm φ, v⟫_ℝ := by
-      rw [hinner.symm]
+  obtain ⟨F, -, hEq⟩ := h
+  -- Evaluating at the base point `(0, 0)`: `δL v = fderiv ℝ F (0, 0) (v, 1)`.
+  have key : ∀ v : EuclideanSpace ℝ (Fin n),
+      δL v = fderiv ℝ F (0, 0) (v, 1) := fun v => by simpa using hEq 0 v 0
+  -- The "time-direction" derivative vanishes because `δL 0 = 0`.
+  have h_time : fderiv ℝ F (0, 0) (0, 1) = (0 : ℝ) := by rw [← key 0, hδL0]
+  -- Frechet–Riesz: represent the velocity-direction functional `v ↦ dF (v, 0)`.
+  refine ⟨(toDual ℝ _).symm
+      ((fderiv ℝ F (0, 0)).comp (.inl ℝ (EuclideanSpace ℝ (Fin n)) ℝ)), fun v => ?_⟩
+  rw [toDual_symm_apply, key v]
+  show fderiv ℝ F (0, 0) (v, 1) = fderiv ℝ F (0, 0) (v, 0)
+  rw [← sub_eq_zero, ← map_sub]
+  simpa using h_time
 
 end Lagrangian
 
