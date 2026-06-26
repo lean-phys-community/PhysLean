@@ -52,43 +52,16 @@ lemma planeY₃B₃_val_eq' (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) (hR' : R
   rw [planeY₃B₃_val, planeY₃B₃_val] at h
   have h1 := congrArg (fun S => dot Y₃.val S) h
   have h2 := congrArg (fun S => dot B₃.val S) h
-  rw [dot.map_add₂, dot.map_add₂] at h1 h2
-  rw [dot.map_add₂ Y₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h1
-  rw [dot.map_add₂ B₃.val (a' • Y₃.val + b' • B₃.val) (c' • R.val)] at h2
-  rw [dot.map_add₂] at h1 h2
-  rw [dot.map_smul₂, dot.map_smul₂, dot.map_smul₂] at h1 h2
-  rw [dot.map_smul₂, dot.map_smul₂, dot.map_smul₂] at h1 h2
-  rw [R.perpY₃] at h1
-  rw [R.perpB₃] at h2
-  rw [show dot Y₃.val Y₃.val = 216 by with_unfolding_all rfl] at h1
-  rw [show dot B₃.val B₃.val = 108 by with_unfolding_all rfl] at h2
-  rw [show dot Y₃.val B₃.val = 108 by with_unfolding_all rfl] at h1
-  rw [show dot B₃.val Y₃.val = 108 by with_unfolding_all rfl] at h2
-  simp_all
-  have ha : a = a' := by
-    linear_combination h1 / 108 + -1 * h2 / 108
-  have hb : b = b' := by
-    linear_combination -1 * h1 / 108 + h2 / 54
+  simp only [dot.map_add₂, dot.map_smul₂, R.perpY₃, R.perpB₃,
+    show dot Y₃.val Y₃.val = 216 by with_unfolding_all rfl,
+    show dot B₃.val B₃.val = 108 by with_unfolding_all rfl,
+    show dot Y₃.val B₃.val = 108 by with_unfolding_all rfl,
+    show dot B₃.val Y₃.val = 108 by with_unfolding_all rfl,
+    mul_zero, add_zero] at h1 h2
+  have ha : a = a' := by linarith
+  have hb : b = b' := by linarith
   rw [ha, hb] at h
-  have h1 := add_left_cancel h
-  have h1i : c • R.val + (- c') • R.val = 0 := by
-    rw [h1]
-    rw [← Module.add_smul]
-    simp
-  rw [← Module.add_smul] at h1i
-  have hR : ∃ i, R.val i ≠ 0 := Function.ne_iff.mp hR'
-  obtain ⟨i, hi⟩ := hR
-  have h2 := congrArg (fun S => S i) h1i
-  change _ = 0 at h2
-  simp only [HSMul.hSMul, ACCSystemCharges.chargesModule_smul, mul_eq_zero] at h2
-  have hc : c + -c' = 0 := by
-    cases h2 <;> rename_i h2
-    exact h2
-    exact (hi h2).elim
-  have hc : c = c' := by
-    linear_combination hc
-  rw [ha, hb, hc]
-  simp
+  exact ⟨ha, hb, smul_left_injective ℚ hR' (add_left_cancel h)⟩
 
 set_option backward.isDefEq.respectTransparency false in
 lemma planeY₃B₃_quad (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
