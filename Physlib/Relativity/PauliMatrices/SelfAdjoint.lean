@@ -321,39 +321,9 @@ lemma pauliBasis'_repr_inr_2 (M : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
   `pauliBasis'` of covariant Pauli matrices is by multiplication by the Minkowski matrix. -/
 lemma pauliBasis_minkowskiMetric_pauliBasis' (i : Fin 1 ⊕ Fin 3) :
     pauliBasis i = minkowskiMatrix i i • pauliBasis' i := by
-  match i with
-  | Sum.inl 0 =>
-    simp [pauliSelfAdjoint', pauliSelfAdjoint, pauliBasis, pauliBasis']
-  | Sum.inr 0 =>
-    simp only [pauliBasis, Fin.isValue, Basis.coe_mk, pauliSelfAdjoint, minkowskiMatrix.inr_i_inr_i,
-      pauliBasis', pauliSelfAdjoint', neg_smul, one_smul]
-    cases i with
-    | inl val =>
-      ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_neg]
-    | inr val_1 =>
-      ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_neg]
-  | Sum.inr 1 =>
-    simp only [pauliBasis, Fin.isValue, Basis.coe_mk, pauliSelfAdjoint, minkowskiMatrix.inr_i_inr_i,
-      pauliBasis', pauliSelfAdjoint', neg_smul, one_smul]
-    cases i with
-    | inl val =>
-      ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_neg]
-    | inr val_1 =>
-      ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_neg]
-  | Sum.inr 2 =>
-    simp only [pauliBasis, Fin.isValue, Basis.coe_mk, pauliSelfAdjoint, minkowskiMatrix.inr_i_inr_i,
-      pauliBasis', pauliSelfAdjoint', neg_smul, one_smul]
-    cases i with
-    | inl val =>
-      ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_neg]
-    | inr val_1 =>
-      ext i j : 2
-      simp_all only [NegMemClass.coe_neg, neg_neg]
+  fin_cases i <;>
+    simp [pauliSelfAdjoint', pauliSelfAdjoint, pauliBasis, pauliBasis',
+      minkowskiMatrix.inr_i_inr_i, Subtype.ext_iff, NegMemClass.coe_neg, neg_neg]
 
 end
 end PauliMatrix

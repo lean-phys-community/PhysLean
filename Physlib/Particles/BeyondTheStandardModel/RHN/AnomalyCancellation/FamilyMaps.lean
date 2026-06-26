@@ -53,7 +53,6 @@ def speciesFamilyProj {m n : ℕ} (h : n ≤ m) :
 def familyProjection {m n : ℕ} (h : n ≤ m) : (SMνCharges m).Charges →ₗ[ℚ] (SMνCharges n).Charges :=
   chargesMapOfSpeciesMap (speciesFamilyProj h)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For species, the embedding of the `m`-family charges onto the `n`-family charges, with all
 other charges zero. -/
 @[simps!]

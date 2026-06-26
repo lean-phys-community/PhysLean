@@ -438,9 +438,8 @@ theorem pure_iff_purity_one : (∃ ψ, ρ = pure ψ) ↔ ρ.purity = 1 := by
     dsimp [purity, inner]
     have := pure_mul_self w
     aesop;
-  · --TODO Cleanup
-    -- Apply the theorem that states a mixed state is pure if and only if its spectrum is constant.
-    apply (pure_iff_constant_spectrum ρ).mpr;
+  · -- A state is pure iff its spectrum is constant.
+    apply (pure_iff_constant_spectrum ρ).mpr
     have h_eigenvalues : ∑ i, (ρ.spectrum i).val ^ 2 = 1 := by
       -- By definition of purity, we know that the sum of the squares of the eigenvalues is equal to the trace of ρ squared.
       have h_trace_sq : ∑ i, (ρ.spectrum i).val ^ 2 = ρ.purity := by
@@ -451,45 +450,25 @@ theorem pure_iff_purity_one : (∃ ψ, ρ = pure ψ) ↔ ρ.purity = 1 := by
           exact Finset.sum_congr rfl fun _ _ => by ring;
         convert! congr_arg Complex.re h_eigenvalues using 1;
       simp_all only [Set.Icc.coe_one]
-    have h_eigenvalues : ∑ i, (ρ.spectrum i).val * ((ρ.spectrum i).val - 1) = 0 := by
-      simp_all [ sq, mul_sub ];
-    -- Since each term in the sum is non-positive and their sum is zero, each term must be zero.
-    have h_each_zero : ∀ i, (ρ.spectrum i).val * ((ρ.spectrum i).val - 1) = 0 := by
-      have h_each_zero : ∀ i, (ρ.spectrum i).val * ((ρ.spectrum i).val - 1) ≤ 0 := by
-        exact fun i => by nlinarith only [ show ( ρ.spectrum i : ℝ ) ≥ 0 by exact_mod_cast ( ρ.spectrum i ) |>.2.1, show ( ρ.spectrum i : ℝ ) ≤ 1 by exact_mod_cast ( ρ.spectrum i ) |>.2.2 ] ;
-      exact fun i => le_antisymm ( h_each_zero i ) ( by simpa [ h_eigenvalues ] using Finset.single_le_sum ( fun i _ => neg_nonneg.mpr ( h_each_zero i ) ) ( Finset.mem_univ i ) );
-    -- Since each term in the sum is non-positive and their sum is zero, each term must be zero. Therefore, for each i, either (ρ.spectrum i).val = 0 or (ρ.spectrum i).val = 1.
-    have h_each_zero : ∀ i, (ρ.spectrum i).val = 0 ∨ (ρ.spectrum i).val = 1 := by
-      exact fun i => mul_eq_zero.mp ( h_each_zero i ) |> Or.imp id fun h => by linarith;
-    have h_sum_one : ∑ i, (ρ.spectrum i).val = 1 := by
-      grind;
+    -- Each eigenvalue satisfies `λᵢ (1 - λᵢ) ≥ 0`, and these terms sum to
+    -- `∑ λᵢ - ∑ λᵢ² = 1 - 1 = 0`, so every `λᵢ` is `0` or `1`.
+    have hbin : ∀ i, (ρ.spectrum i).val = 0 ∨ (ρ.spectrum i).val = 1 := by
+      have hnn : ∀ i ∈ Finset.univ, 0 ≤ (ρ.spectrum i).val * (1 - (ρ.spectrum i).val) :=
+        fun i _ => mul_nonneg (ρ.spectrum i).2.1 (by linarith [(ρ.spectrum i).2.2])
+      have hz : ∑ i, (ρ.spectrum i).val * (1 - (ρ.spectrum i).val) = 0 := by
+        have e : ∑ i, (ρ.spectrum i).val * (1 - (ρ.spectrum i).val)
+            = (∑ i, (ρ.spectrum i : ℝ)) - ∑ i, (ρ.spectrum i).val ^ 2 := by
+          rw [← Finset.sum_sub_distrib]
+          exact Finset.sum_congr rfl fun i _ => by ring
+        rw [e, h_eigenvalues, ρ.spectrum.normalized]; norm_num
+      exact fun i => (mul_eq_zero.mp ((Finset.sum_eq_zero_iff_of_nonneg hnn).mp hz i
+        (Finset.mem_univ i))).imp id fun h => by linarith
+    -- Since `∑ λᵢ = 1`, not all eigenvalues vanish, so one of them equals `1`.
     obtain ⟨i, hi⟩ : ∃ i, (ρ.spectrum i).val = 1 := by
-      contrapose! h_sum_one; aesop;
-    -- Since the sum of the eigenvalues is 1 and one of them is 1, the remaining eigenvalues must sum to 0. Given that each eigenvalue is either 0 or 1, the only way their sum can be 0 is if all of them are 0.
-    have h_sum_zero : ∑ j ∈ Finset.univ.erase i, (ρ.spectrum j).val = 0 := by
-      rw [ ← Finset.sum_erase_add _ _ ( Finset.mem_univ i ), hi ] at h_sum_one ; linarith;
-    rw [ Finset.sum_eq_zero_iff_of_nonneg ] at h_sum_zero
-    · simp_all only [Finset.sum_const_zero, mul_eq_zero, Set.Icc.coe_eq_zero, Set.Icc.coe_eq_one,
-        ProbDistribution.normalized, Finset.mem_erase, ne_eq, Finset.mem_univ, and_true]
-      apply Exists.intro
-      · ext x : 2
-        simp_all only [ProbDistribution.constant_eq]
-        split
-        next h_1 =>
-          subst h_1
-          simp_all only [Set.Icc.coe_one, Set.Icc.coe_eq_one]
-          exact hi
-        next h_1 =>
-          simp_all only [Set.Icc.coe_zero, Set.Icc.coe_eq_zero]
-          apply h_sum_zero
-          apply Aesop.BuiltinRules.not_intro
-          intro a
-          subst a
-          simp_all only [not_true_eq_false]
-    · intro i_1 a
-      simp_all only [Finset.sum_const_zero, mul_eq_zero, Set.Icc.coe_eq_zero, Set.Icc.coe_eq_one,
-        ProbDistribution.normalized, Finset.mem_univ, Finset.sum_erase_eq_sub, Set.Icc.coe_one, sub_self, Finset.mem_erase,
-        ne_eq, and_true, Prob.zero_le_coe]
+      by_contra hcon
+      simp only [not_exists] at hcon
+      simpa [fun i => (hbin i).resolve_right (hcon i)] using ρ.spectrum.normalized
+    exact ⟨i, ProbDistribution.constant_of_exists_one (Subtype.ext hi)⟩
 
 set_option backward.isDefEq.respectTransparency false in
 --TODO: Would be better if there was an `MState.eigenstate` or similar (maybe extending

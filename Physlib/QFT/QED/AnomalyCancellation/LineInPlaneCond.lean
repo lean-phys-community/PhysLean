@@ -115,7 +115,6 @@ theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols
   · rw [hij]
   · exact linesInPlane_eq_sq hS i j hij
 
-set_option backward.isDefEq.respectTransparency false in
 lemma linesInPlane_four (S : (PureU1 4).Sols) (hS : LineInPlaneCond S.1.1) :
     ConstAbsProp (S.val (0 : Fin 4), S.val (1 : Fin 4)) := by
   simp only [ConstAbsProp, Fin.isValue]

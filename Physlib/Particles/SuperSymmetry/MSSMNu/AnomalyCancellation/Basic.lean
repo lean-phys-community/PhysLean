@@ -253,7 +253,6 @@ lemma accYY_ext {S T : MSSMCharges.Charges}
   repeat rw [← Finset.mul_sum]
   simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The symmetric bilinear function used to define the quadratic ACC. -/
 @[simps!]
 def quadBiLin : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
@@ -295,8 +294,7 @@ def quadBiLin : BiLinearSymm MSSMCharges.Charges := BiLinearSymm.mk₂
     simp only [toSMSpecies_apply, Fin.isValue, neg_mul, one_mul, Hd_apply, Fin.reduceFinMk,
       Hu_apply]
     congr 1
-    · simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand, Fin.zero_eta,
-      Fin.mk_one]
+    · simp only [reduceMul, Fin.isValue, sum_MSSMSpecies_numberCharges_eq_expand]
       ring
     · ring)
 
@@ -364,7 +362,6 @@ lemma cubeTriLinToFun_map_add₁ (S T R L : MSSMCharges.Charges) :
   · rw [Hd.map_add, Hu.map_add]
     ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma cubeTriLinToFun_swap1 (S T R : MSSMCharges.Charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (T, S, R) := by
   simp only [cubeTriLinToFun, toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk, Hu_apply]
@@ -373,7 +370,6 @@ lemma cubeTriLinToFun_swap1 (S T R : MSSMCharges.Charges) :
     ring
   · ring
 
-set_option backward.isDefEq.respectTransparency false in
 lemma cubeTriLinToFun_swap2 (S T R : MSSMCharges.Charges) :
     cubeTriLinToFun (S, T, R) = cubeTriLinToFun (S, R, T) := by
   simp only [cubeTriLinToFun, toSMSpecies_apply, Fin.isValue, Hd_apply, Fin.reduceFinMk, Hu_apply]

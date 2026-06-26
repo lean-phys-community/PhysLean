@@ -22,6 +22,8 @@ distributions on `SpaceTime d`.
 ## ii. Key results
 
 - `deriv` : The derivative of a function `SpaceTime d → M` along the `μ` coordinate.
+- `manifoldDeriv` : The derivative of a function from `SpaceTime d` to a manifold along
+  the `μ` coordinate.
 - `contDiff_deriv` : If `f` is `C^{n+1}` then `∂_ μ f` is `C^n`.
 - `differentiable_deriv` : If `f` is `C^2` then `∂_ μ f` is differentiable.
 - `deriv_commute` : Derivatives on `SpaceTime d` commute (Clairaut's theorem).
@@ -83,6 +85,50 @@ noncomputable def deriv {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalS
 @[inherit_doc deriv]
 scoped notation "∂_" => deriv
 
+lemma deriv_eq {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
+    {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
+    ∂_ μ f y =
+    fderiv ℝ f y (Lorentz.Vector.basis μ) := by
+  rfl
+
+/-- The derivative of a function from `SpaceTime d` to a manifold along the `μ`
+coordinate, as a tangent vector at the value of the function. -/
+noncomputable def manifoldDeriv {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → N) :
+    (y : SpaceTime d) → TangentSpace I (f y) :=
+  fun y => mfderiv 𝓘(ℝ, SpaceTime d) I f y
+    ((Lorentz.Vector.basis μ : SpaceTime d) : TangentSpace 𝓘(ℝ, SpaceTime d) y)
+
+lemma manifoldDeriv_eq {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → N)
+    (y : SpaceTime d) :
+    manifoldDeriv I μ f y =
+      mfderiv 𝓘(ℝ, SpaceTime d) I f y
+        ((Lorentz.Vector.basis μ : SpaceTime d) : TangentSpace 𝓘(ℝ, SpaceTime d) y) := rfl
+
+/-- The spacetime derivative is the manifold derivative for functions into normed spaces. -/
+lemma deriv_eq_mfderiv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
+    deriv μ f y =
+      mfderiv 𝓘(ℝ, SpaceTime d) 𝓘(ℝ, M) f y
+        ((Lorentz.Vector.basis μ : SpaceTime d) : TangentSpace 𝓘(ℝ, SpaceTime d) y) := by
+  rw [deriv_eq, ← mfderiv_eq_fderiv]
+  rfl
+
+lemma deriv_eq_manifoldDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
+    deriv μ f y = manifoldDeriv 𝓘(ℝ, M) μ f y := by
+  rw [deriv_eq_mfderiv, manifoldDeriv_eq]
+
+@[simp]
+lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] {d : ℕ} (μ : Fin 1 ⊕ Fin d) (n : N) (y : SpaceTime d) :
+    manifoldDeriv I μ (fun _ : SpaceTime d => n) y = 0 := by
+  simp [manifoldDeriv]
+
 /-!
 
 ### A.2. Basic equality lemmas
@@ -90,10 +136,6 @@ scoped notation "∂_" => deriv
 -/
 
 variable {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
-lemma deriv_eq {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
-    ∂_ μ f y =
-    fderiv ℝ f y (Lorentz.Vector.basis μ) := by
-  rfl
 
 lemma differentiable_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d) :
     (∀ ν, Differentiable ℝ (fun x => f x ν)) ↔ Differentiable ℝ f := by

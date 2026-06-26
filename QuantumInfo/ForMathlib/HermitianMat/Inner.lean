@@ -524,36 +524,38 @@ lemma inner_eq_doubly_stochastic_sum {d : Type*} [Fintype d] [DecidableEq d]
     let C := A.H.eigenvectorUnitary.val.conjTranspose * B.H.eigenvectorUnitary.val
     ⟪A, B⟫_ℝ = ∑ i, ∑ j,
       A.H.eigenvalues i * B.H.eigenvalues j * (‖C i j‖^2) := by
-  -- By the properties of the trace and diagonalization, we can rewrite the trace of AB as the sum of the products of the eigenvalues of A and B, multiplied by the squared norms of the entries of the product of their eigenvector matrices.
-  have h_trace_diag : Matrix.trace (A.mat * B.mat) = Matrix.trace ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ) * ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ))) := by
-    have h_trace_diag : Matrix.trace (A.mat * B.mat) = Matrix.trace ((A.H.eigenvectorUnitary : Matrix d d ℂ) * ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)) * ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)) * (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose) := by
-      simp [ Matrix.mul_assoc ];
-      simp [ ← Matrix.mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ];
-    rw [ h_trace_diag, Matrix.trace_mul_comm ];
-    simp [ ← mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ];
-  -- Since $A$ is Hermitian, its eigenvector matrix is unitary, and thus $(A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)$ is diagonal with the eigenvalues of $A$ on the diagonal.
-  have h_diag_A : (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ) = Matrix.diagonal (fun i => A.H.eigenvalues i : d → ℂ) := by
-    have := A.H.spectral_theorem;
-    convert congr_arg ( fun x : Matrix d d ℂ => ( A.H.eigenvectorUnitary : Matrix d d ℂ ).conjTranspose * x * ( A.H.eigenvectorUnitary : Matrix d d ℂ ) ) this using 1 ; simp [ Matrix.mul_assoc ];
-    simp [ ← Matrix.mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ];
-  -- Since $B$ is Hermitian, its eigenvector matrix is unitary, and thus $(A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)$ is diagonal with the eigenvalues of $B$ on the diagonal.
-  have h_diag_B : (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ) = (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (B.H.eigenvectorUnitary : Matrix d d ℂ) * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * (B.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (A.H.eigenvectorUnitary : Matrix d d ℂ) := by
-    have h_diag_B : B.mat = (B.H.eigenvectorUnitary : Matrix d d ℂ) * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * (B.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose := by
-      convert! B.H.spectral_theorem using 1;
-    grind;
-  -- Since $C = U_A^* U_B$ is unitary, we have $C_{ij} = \langle u_i, v_j \rangle$ where $u_i$ and $v_j$ are the eigenvectors of $A$ and $B$, respectively.
-  set C : Matrix d d ℂ := (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (B.H.eigenvectorUnitary : Matrix d d ℂ)
-  have hC_unitary : C * C.conjTranspose = 1 := by
-    simp +zetaDelta at *;
-    simp [ Matrix.mul_assoc ];
-    simp [ ← Matrix.mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ]
-  have hC_norm : ∀ i j, ‖C i j‖ ^ 2 = (C i j) * (star (C i j)) := by
-    simp [ Complex.mul_conj, Complex.normSq_eq_norm_sq ]
-  have hC_trace : Matrix.trace (Matrix.diagonal (fun i => A.H.eigenvalues i : d → ℂ) * C * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * C.conjTranspose) = ∑ i, ∑ j, A.H.eigenvalues i * B.H.eigenvalues j * ‖C i j‖ ^ 2 := by
-    simp [ Matrix.trace, Matrix.mul_apply, hC_norm ];
-    simp [ Matrix.diagonal, Finset.sum_ite_eq ];
-    exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring;
-  convert! congr_arg Complex.re hC_trace using 1;
-  convert! congr_arg Complex.re h_trace_diag using 1;
-  rw [ h_diag_A, h_diag_B ] ; simp [ Matrix.mul_assoc ] ;
-  simp +zetaDelta at *
+  intro C
+  set U : Matrix d d ℂ := A.H.eigenvectorUnitary.val
+  set V : Matrix d d ℂ := B.H.eigenvectorUnitary.val
+  -- `U`, `V` are unitary and diagonalize `A`, `B`; `C = Uᴴ V`.
+  have hUU : star U * U = 1 := A.H.eigenvectorUnitary.2.1
+  have hUU' : U * star U = 1 := A.H.eigenvectorUnitary.2.2
+  have hAeq : A.mat = U * Matrix.diagonal (RCLike.ofReal ∘ A.H.eigenvalues) * star U := by
+    simpa [Unitary.conjStarAlgAut_apply] using A.H.spectral_theorem
+  have hBeq : B.mat = V * Matrix.diagonal (RCLike.ofReal ∘ B.H.eigenvalues) * star V := by
+    simpa [Unitary.conjStarAlgAut_apply] using B.H.spectral_theorem
+  have hC : C = star U * V := rfl
+  have hCH : C.conjTranspose = star V * U := by
+    simp [hC, Matrix.conjTranspose_mul, Matrix.star_eq_conjTranspose]
+  -- Conjugating `A * B` by `U` turns it into a product of two diagonals and `C`, `Cᴴ`.
+  have key : A.mat * B.mat =
+      U * (Matrix.diagonal (RCLike.ofReal ∘ A.H.eigenvalues) * C *
+        Matrix.diagonal (RCLike.ofReal ∘ B.H.eigenvalues) * C.conjTranspose) * star U := by
+    conv_lhs => rw [hAeq, hBeq]
+    rw [hCH, hC]
+    simp only [Matrix.mul_assoc, hUU', mul_one]
+  have hC_norm : ∀ i j, (‖C i j‖ ^ 2 : ℂ) = C i j * star (C i j) := fun i j => by
+    simp [Complex.mul_conj, Complex.normSq_eq_norm_sq]
+  -- The trace of the diagonal product expands entrywise to the doubly-stochastic sum.
+  have hC_trace : (Matrix.diagonal (RCLike.ofReal ∘ A.H.eigenvalues) * C *
+      Matrix.diagonal (RCLike.ofReal ∘ B.H.eigenvalues) * C.conjTranspose).trace =
+      ((∑ i, ∑ j, A.H.eigenvalues i * B.H.eigenvalues j * ‖C i j‖ ^ 2 : ℝ) : ℂ) := by
+    push_cast
+    simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, hC_norm]
+    simp only [Matrix.diagonal_apply, ite_mul, zero_mul, mul_ite, mul_zero,
+      Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true, Function.comp_apply,
+      Matrix.conjTranspose_apply]
+    exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by
+      simp only [RCLike.ofReal_eq_complex_ofReal]; ring
+  rw [inner_eq_re_trace, key, Matrix.trace_mul_cycle, hUU, one_mul, hC_trace]
+  exact Complex.ofReal_re _

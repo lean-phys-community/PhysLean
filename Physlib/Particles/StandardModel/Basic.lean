@@ -16,7 +16,6 @@ This file defines the basic properties of the standard model in particle physics
 -/
 
 @[expose] public section
-TODO "Redefine the gauge group as a quotient of SU(3) x SU(2) x U(1) by a subgroup of ℤ₆."
 
 namespace StandardModel
 
@@ -612,6 +611,98 @@ def GaugeGroup : GaugeGroupQuot → Type
 
 noncomputable instance (q : GaugeGroupQuot) : Group (GaugeGroup q) := by
   cases q <;> dsimp [GaugeGroup] <;> infer_instance
+
+namespace GaugeGroupQuot
+
+/-- The central subgroup of `GaugeGroupI` quotiented by a gauge-group quotient choice. -/
+noncomputable def subgroup : GaugeGroupQuot → Subgroup GaugeGroupI
+  | .ℤ₆ => gaugeGroupℤ₆SubGroup
+  | .ℤ₂ => gaugeGroupℤ₂SubGroup
+  | .ℤ₃ => gaugeGroupℤ₃SubGroup
+  | .I => ⊥
+
+/-- The subgroup attached to a gauge-group quotient choice lies in the center of `GaugeGroupI`. -/
+lemma subgroup_le_center (q : GaugeGroupQuot) :
+    subgroup q ≤ Subgroup.center GaugeGroupI := by
+  cases q
+  · exact gaugeGroupℤ₆SubGroup_le_center
+  · exact gaugeGroupℤ₂SubGroup_le_center
+  · exact gaugeGroupℤ₃SubGroup_le_center
+  · intro g hg
+    change g ∈ (⊥ : Subgroup GaugeGroupI) at hg
+    rw [Subgroup.mem_bot] at hg
+    simp [hg]
+
+/-- The subgroup attached to a gauge-group quotient choice is normal in `GaugeGroupI`. -/
+instance subgroup_normal (q : GaugeGroupQuot) : (subgroup q).Normal := by
+  cases q
+  · exact gaugeGroupℤ₆SubGroup_normal
+  · exact gaugeGroupℤ₂SubGroup_normal
+  · exact gaugeGroupℤ₃SubGroup_normal
+  · change (⊥ : Subgroup GaugeGroupI).Normal
+    infer_instance
+
+/-- The quotient map from `GaugeGroupI` to the gauge group selected by a quotient choice. -/
+noncomputable def quotientMap (q : GaugeGroupQuot) : GaugeGroupI →* GaugeGroup q :=
+  match q with
+  | .ℤ₆ => GaugeGroupℤ₆.mk
+  | .ℤ₂ => GaugeGroupℤ₂.mk
+  | .ℤ₃ => GaugeGroupℤ₃.mk
+  | .I => MonoidHom.id GaugeGroupI
+
+@[simp]
+lemma quotientMap_I_apply (g : GaugeGroupI) :
+    quotientMap .I g = g := rfl
+
+@[simp]
+lemma quotientMap_ℤ₆_gaugeGroupℤ₆OfRoot (α : rootsOfUnity 6 ℂ) :
+    quotientMap .ℤ₆ (gaugeGroupℤ₆OfRoot α) = 1 :=
+  GaugeGroupℤ₆.mk_gaugeGroupℤ₆OfRoot α
+
+@[simp]
+lemma quotientMap_ℤ₂_gaugeGroupℤ₂OfRoot (α : rootsOfUnity 2 ℂ) :
+    quotientMap .ℤ₂ (gaugeGroupℤ₂OfRoot α) = 1 :=
+  GaugeGroupℤ₂.mk_gaugeGroupℤ₂OfRoot α
+
+@[simp]
+lemma quotientMap_ℤ₃_gaugeGroupℤ₃OfRoot (α : rootsOfUnity 3 ℂ) :
+    quotientMap .ℤ₃ (gaugeGroupℤ₃OfRoot α) = 1 :=
+  GaugeGroupℤ₃.mk_gaugeGroupℤ₃OfRoot α
+
+/-- The kernel of the quotient map is the subgroup selected by the quotient choice. -/
+lemma mem_subgroup_iff_quotientMap_eq_one (q : GaugeGroupQuot) (g : GaugeGroupI) :
+    g ∈ subgroup q ↔ quotientMap q g = 1 := by
+  cases q
+  · change g ∈ gaugeGroupℤ₆SubGroup ↔
+      ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) = 1
+    exact (QuotientGroup.eq_one_iff g).symm
+  · change g ∈ gaugeGroupℤ₂SubGroup ↔
+      ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) = 1
+    exact (QuotientGroup.eq_one_iff g).symm
+  · change g ∈ gaugeGroupℤ₃SubGroup ↔
+      ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup) = 1
+    exact (QuotientGroup.eq_one_iff g).symm
+  · change g ∈ (⊥ : Subgroup GaugeGroupI) ↔ (MonoidHom.id GaugeGroupI) g = 1
+    simp
+
+/-- Two representatives have the same image under the selected quotient map exactly when their
+quotient lies in the subgroup selected by the quotient choice. -/
+lemma quotientMap_eq_iff (q : GaugeGroupQuot) (g h : GaugeGroupI) :
+    quotientMap q g = quotientMap q h ↔ g / h ∈ subgroup q := by
+  cases q
+  · change ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) =
+      ((h : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) ↔ g / h ∈ gaugeGroupℤ₆SubGroup
+    exact QuotientGroup.eq_iff_div_mem
+  · change ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) =
+      ((h : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) ↔ g / h ∈ gaugeGroupℤ₂SubGroup
+    exact QuotientGroup.eq_iff_div_mem
+  · change ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup) =
+      ((h : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup) ↔ g / h ∈ gaugeGroupℤ₃SubGroup
+    exact QuotientGroup.eq_iff_div_mem
+  · change g = h ↔ g / h ∈ (⊥ : Subgroup GaugeGroupI)
+    rw [Subgroup.mem_bot, div_eq_one]
+
+end GaugeGroupQuot
 
 /-!
 

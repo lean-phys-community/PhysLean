@@ -481,8 +481,8 @@ The trajectories satisfy the equation of motion for the harmonic oscillator.
 
 lemma trajectory_equationOfMotion (IC : InitialConditions) :
     EquationOfMotion S (IC.trajectory S) := by
-  rw [EquationOfMotion,
-    gradLagrangian_eq_force (S := S) (xₜ := IC.trajectory S) (trajectory_contDiff S IC)]
+  have hcont : ContDiff ℝ ∞ (IC.trajectory S) := trajectory_contDiff S IC
+  rw [EquationOfMotion, gradLagrangian_eq_force (S := S) (xₜ := IC.trajectory S) hcont]
   funext t
   simp only [Pi.zero_apply]
   rw [trajectory_acceleration, force_eq_linear]
@@ -504,20 +504,6 @@ We show that the trajectories are the unique solutions to the equation of motion
 for the given initial conditions.
 
 -/
-
-private lemma deriv_sub_eq {f g : Time → EuclideanSpace ℝ (Fin 1)}
-    (hf : Differentiable ℝ f) (hg : Differentiable ℝ g) :
-    ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
-  funext t
-  rw [Time.deriv_eq, fderiv_fun_sub (hf t) (hg t)]
-  rfl
-
-/-- A vector in `EuclideanSpace ℝ (Fin 1)` vanishes as soon as its single component does. -/
-private lemma eucl_fin_one_eq_zero {v : EuclideanSpace ℝ (Fin 1)} (h : v 0 = 0) : v = 0 := by
-  ext i
-  fin_cases i
-  simpa using h
-
 /-- The trajectories to the equation of motion for a given set of initial conditions
   are unique.
 
@@ -529,76 +515,54 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
     (hx : ContDiff ℝ ∞ x) :
     S.EquationOfMotion x ∧ x 0 = IC.x₀ ∧ ∂ₜ x 0 = IC.v₀ →
     x = IC.trajectory S := by
-  intro h
-  rcases h with ⟨hEOM, hx0, hv0⟩
-
-  -- Newton form for x
-  have hNewt_x :
-      ∀ t, S.m • ∂ₜ (∂ₜ x) t = force S (x t) :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := x) hx).1 hEOM
-
-  -- Newton form for the explicit trajectory
-  have hTrajContDiff : ContDiff ℝ ∞ (IC.trajectory S) := trajectory_contDiff S IC
-
-  have hNewt_traj :
-      ∀ t, S.m • ∂ₜ (∂ₜ (IC.trajectory S)) t = force S ((IC.trajectory S) t) :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := IC.trajectory S) hTrajContDiff).1
-      (trajectory_equationOfMotion S IC)
-
-  -- Define the difference y = x - traj
+  rintro ⟨hEOM, hx0, hv0⟩
+  have hTraj : ContDiff ℝ ∞ (IC.trajectory S) := by fun_prop
+  -- Time-derivative of a difference of differentiable functions, used below on `x - traj`.
+  have dsub : ∀ f g : Time → EuclideanSpace ℝ (Fin 1),
+      Differentiable ℝ f → Differentiable ℝ g →
+      ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
+    intro f g hf hg
+    funext t
+    simp only [Time.deriv_eq, fderiv_fun_sub (hf t) (hg t), sub_apply]
+  -- The difference `y := x - traj` is smooth, again solves the equation of motion (the force is
+  -- linear), and has vanishing initial data; energy conservation then forces `y = 0`.
   set y : Time → EuclideanSpace ℝ (Fin 1) := fun t => x t - IC.trajectory S t with hydef
-
-  have hyContDiff : ContDiff ℝ ∞ y := hx.sub hTrajContDiff
-
-  -- First and second derivatives of y, via linearity of the time derivative
-  have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t := by
-    rw [hydef]
-    exact deriv_sub_eq (hx.differentiable (by simp)) (hTrajContDiff.differentiable (by simp))
-
-  have hy_deriv2 :
-      ∂ₜ (∂ₜ y) = fun t => ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
+  have hyContDiff : ContDiff ℝ ∞ y := hx.sub hTraj
+  have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t :=
+    dsub x _ (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
+  have hy_deriv2 : ∂ₜ (∂ₜ y) = fun t => ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
     rw [hy_deriv]
-    exact deriv_sub_eq (deriv_differentiable_of_contDiff x hx)
-      (deriv_differentiable_of_contDiff (IC.trajectory S) hTrajContDiff)
-
-  -- Newton form for y (linearity of force)
-  have hNewt_y : ∀ t, S.m • ∂ₜ (∂ₜ y) t = force S (y t) := by
-    intro t
-    rw [congrFun hy_deriv2 t, smul_sub, hNewt_x t, hNewt_traj t]
-    simp [hydef, force_eq_linear, smul_sub]
-
-  -- Turn Newton form back into EquationOfMotion for y
+    exact dsub _ _ (deriv_differentiable_of_contDiff _ hx)
+      (deriv_differentiable_of_contDiff _ hTraj)
+  have hNewt_x := (S.equationOfMotion_iff_newtons_2nd_law x hx).1 hEOM
+  have hNewt_traj := (S.equationOfMotion_iff_newtons_2nd_law (IC.trajectory S) hTraj).1
+    (trajectory_equationOfMotion S IC)
   have hEOM_y : S.EquationOfMotion y :=
-    (S.equationOfMotion_iff_newtons_2nd_law (xₜ := y) hyContDiff).2 hNewt_y
-
-  -- Energy at time 0 is 0 (both initial position and velocity of y vanish)
-  have hE0 : S.energy y 0 = 0 := by
-    have hy0 : y 0 = 0 := by simp [hydef, hx0]
-    have hyv0 : ∂ₜ y 0 = 0 := by
-      rw [congr_fun hy_deriv 0, hv0, trajectory_velocity_at_zero S IC]
-      simp
-    simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,
-      HarmonicOscillator.potentialEnergy, hy0, hyv0, one_div, smul_eq_mul]
-
-  -- Energy is constant, hence always 0
-  have hE : ∀ t, S.energy y t = 0 := fun t => by
-    simpa [hE0] using S.energy_conservation_of_equationOfMotion' (xₜ := y) hyContDiff hEOM_y t
-
-  -- From energy=0 and positivity, y(t)=0 for every t, hence x = traj
+    (S.equationOfMotion_iff_newtons_2nd_law y hyContDiff).2 fun t => by
+      rw [hy_deriv2]
+      simp [smul_sub, hNewt_x, hNewt_traj, hydef, force_eq_linear]
+  have hE : ∀ t, S.energy y t = 0 := fun t =>
+    (S.energy_conservation_of_equationOfMotion' y hyContDiff hEOM_y t).trans <| by
+      have hy0 : y 0 = 0 := by simp [hydef, hx0]
+      have hyv0 : ∂ₜ y 0 = 0 := by
+        rw [congrFun hy_deriv 0, hv0, trajectory_velocity_at_zero S IC]; simp
+      simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,
+        HarmonicOscillator.potentialEnergy, hy0, hyv0, one_div, smul_eq_mul]
+  -- Both energies are nonnegative, so a vanishing total energy forces `y t = 0`.
   funext t
-  -- both energies are nonnegative, and their sum vanishes, so the potential energy is zero
-  have hk_nonneg : 0 ≤ S.kineticEnergy y t := by
-    simp only [kineticEnergy_eq, real_inner_self_eq_norm_sq]
-    have := S.m_pos
-    positivity
-  have hp0 : S.potentialEnergy (y t) = 0 :=
-    le_antisymm (by have := hE t; unfold HarmonicOscillator.energy at this; linarith)
-      (by rw [potentialEnergy_eq, real_inner_self_eq_norm_sq]; have := S.k_pos; positivity)
-  -- potentialEnergy (y t) = (1/2)•k•⟪y t, y t⟫, and (1/2)•k ≠ 0, so ⟪y t, y t⟫ = 0, so y t = 0
-  rw [potentialEnergy_eq, smul_smul, smul_eq_mul] at hp0
-  have hkne : (1 / (2 : ℝ)) * S.k ≠ 0 := mul_ne_zero (by norm_num) S.k_ne_zero
-  have hyt : y t = 0 := inner_self_eq_zero.mp ((mul_eq_zero.mp hp0).resolve_left hkne)
-  simpa [hydef] using sub_eq_zero.mp hyt
+  have hk : 0 ≤ S.kineticEnergy y t := by
+    simp only [HarmonicOscillator.kineticEnergy]
+    exact mul_nonneg (mul_nonneg (by norm_num) S.m_pos.le) real_inner_self_nonneg
+  have hp : 0 ≤ S.potentialEnergy (y t) := by
+    simp only [HarmonicOscillator.potentialEnergy, smul_eq_mul]
+    exact mul_nonneg (by norm_num) (mul_nonneg S.k_pos.le real_inner_self_nonneg)
+  have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp (hE t)).2
+  simp only [HarmonicOscillator.potentialEnergy, smul_eq_mul] at hpe
+  rcases mul_eq_zero.mp hpe with h | h
+  · norm_num at h
+  · have hyt : x t - IC.trajectory S t = 0 :=
+      inner_self_eq_zero.mp ((mul_eq_zero.mp h).resolve_left S.k_ne_zero)
+    exact sub_eq_zero.mp hyt
 
 /-!
 
@@ -642,7 +606,9 @@ lemma toInitialConditions_trajectory_at_t₀ (S : HarmonicOscillator)
   have h1 : cos (S.ω * IC.t₀.val) ^ 2 + sin (S.ω * IC.t₀.val) ^ 2 = 1 :=
     cos_sq_add_sin_sq (S.ω * IC.t₀.val)
   field_simp [S.ω_ne_zero]
-  linear_combination (S.ω * IC.x_t₀.ofLp i) * h1
+  nth_rw 2 [← mul_one (S.ω * IC.x_t₀.ofLp i)]
+  rw [← h1]
+  ring
 
 /-- The trajectory resulting from `toInitialConditions` has the specified
   velocity `v_t₀` at time `t₀`. -/
@@ -657,7 +623,9 @@ lemma toInitialConditions_velocity_at_t₀ (S : HarmonicOscillator)
   have h1 : cos (S.ω * IC.t₀.val) ^ 2 + sin (S.ω * IC.t₀.val) ^ 2 = 1 :=
     cos_sq_add_sin_sq (S.ω * IC.t₀.val)
   field_simp [S.ω_ne_zero]
-  linear_combination (IC.v_t₀.ofLp i) * h1
+  nth_rw 3 [← mul_one (IC.v_t₀.ofLp i)]
+  rw [← h1]
+  ring
 
 /-- The energy of the trajectory at time `t₀` equals the energy computed from the
   initial conditions at `t₀`. -/
@@ -781,10 +749,15 @@ lemma tan_time_eq_of_trajectory_velocity_eq_zero (IC : InitialConditions) (t : T
     tan (S.ω * t) = IC.v₀ 0 / (S.ω * IC.x₀ 0) := by
   rw [trajectory_velocity] at h
   simp at h
-  have hx : S.ω ≠ 0 := ω_ne_zero S
+  have hx : S.ω ≠ 0 := by exact ω_ne_zero S
   by_cases h1 : IC.x₀ ≠ 0
   by_cases h2 : IC.v₀ ≠ 0
-  have h1' : IC.x₀ 0 ≠ 0 := mt eucl_fin_one_eq_zero h1
+  have h1' : IC.x₀ 0 ≠ 0 := by
+    intro hn
+    apply h1
+    ext i
+    fin_cases i
+    simp [hn]
   have hcos : cos (S.ω * t.val) ≠ 0 := by
     by_contra hn
     rw [hn] at h
@@ -821,7 +794,7 @@ lemma trajectory_velocity_eq_zero_at_arctan (IC : InitialConditions) (hx : IC.x�
     (∂ₜ (IC.trajectory S)) (arctan (IC.v₀ 0 / (S.ω * IC.x₀ 0)) / S.ω) = 0 := by
   rw [trajectory_velocity]
   simp [neg_smul]
-  have hx' : S.ω ≠ 0 := ω_ne_zero S
+  have hx' : S.ω ≠ 0 := by exact ω_ne_zero S
   field_simp
   rw [Real.sin_arctan, Real.cos_arctan]
   ext i
@@ -834,7 +807,12 @@ lemma trajectory_velocity_eq_zero_at_arctan (IC : InitialConditions) (hx : IC.x�
   simp [mul_eq_zero, inv_eq_zero]
   left
   field_simp
-  have hx : IC.x₀ 0 ≠ 0 := mt eucl_fin_one_eq_zero hx
+  have hx : IC.x₀ 0 ≠ 0 := by
+    intro hn
+    apply hx
+    ext i
+    fin_cases i
+    simp [hn]
   field_simp
   ring
 
@@ -850,33 +828,84 @@ the velocity is zero.
 lemma trajectory_velocity_eq_zero_iff (IC : InitialConditions) (t : Time) :
     ∂ₜ (IC.trajectory S) t = 0 ↔
     ‖(IC.trajectory S) t‖ = √(‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2) := by
-  have hm := S.m_ne_zero
-  have hω := S.ω_ne_zero
-  have hk : S.k = S.m * S.ω ^ 2 := by rw [ω_sq]; field_simp
-  have hrhs : 0 ≤ ‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2 := by positivity
-  -- The energy at time `t`, computed two ways, gives a quadratic identity in the norms.
-  have h_energy_t := congrFun (energy_eq S (trajectory S IC)) t
-  simp only [kineticEnergy_eq, one_div, potentialEnergy_eq, smul_eq_mul,
-    real_inner_self_eq_norm_sq] at h_energy_t
-  have h_init := congrFun (trajectory_energy S IC) t
-  rw [hk] at h_energy_t h_init
-  -- after cancelling the common mass factor, an identity free of `S.m`
-  have key : ‖∂ₜ (trajectory S IC) t‖ ^ 2 + S.ω ^ 2 * ‖trajectory S IC t‖ ^ 2
-      = ‖IC.v₀‖ ^ 2 + S.ω ^ 2 * ‖IC.x₀‖ ^ 2 := by
-    apply mul_left_cancel₀ hm
-    linear_combination 2 * h_init - 2 * h_energy_t
-  -- both sides of the iff are equalities of squared norms, related linearly by `key`
-  rw [← Real.sqrt_sq (norm_nonneg (trajectory S IC t)), Real.sqrt_inj (by positivity) hrhs,
-    ← norm_eq_zero (a := ∂ₜ (trajectory S IC) t), ← sq_eq_zero_iff (a := ‖∂ₜ (trajectory S IC) t‖)]
+  have := by exact energy_eq S (trajectory S IC)
+  have h_energy_t := congrFun this t
+  simp only [kineticEnergy_eq, one_div, potentialEnergy_eq, smul_eq_mul] at h_energy_t
+  rw [real_inner_self_eq_norm_sq (trajectory S IC t)] at h_energy_t
+  have := by exact trajectory_energy S IC
+  have h_init := congrFun this t
+  have h_ω := by exact ω_sq S
   constructor
-  · intro h
-    field_simp
-    linear_combination key - h
-  · intro h
-    have : S.ω ^ 2 * ‖trajectory S IC t‖ ^ 2 = S.ω ^ 2 * ‖IC.x₀‖ ^ 2 + ‖IC.v₀‖ ^ 2 := by
-      rw [h]
+  · intro h_partial
+    rw [h_partial, inner_zero_left, mul_zero, zero_add] at h_energy_t
+    have h₁ : ‖trajectory S IC t‖ ^ 2 = S.energy (trajectory S IC) t * 2 * (1 / S.k) := by
+      simp [h_energy_t]
       field_simp
-    linear_combination key - this
+    symm
+    refine (sqrt_eq_iff_mul_self_eq ?_ ?_).mpr ?_
+    · apply add_nonneg <;> apply sq_nonneg
+    · apply norm_nonneg
+    rw [← pow_two]
+    rw [h₁, h_init]
+    ring_nf
+    rw [mul_assoc]
+    rw [mul_inv_cancel₀]
+    · rw [mul_one, inv_eq_one_div S.k, mul_assoc]
+      rw [mul_one_div S.m S.k, ← inverse_ω_sq]
+      ring
+    · exact k_ne_zero S
+  · intro h_norm
+    apply norm_eq_zero.mp
+    rw [real_inner_self_eq_norm_sq (∂ₜ (trajectory S IC) t)] at h_energy_t
+    have energies : S.energy (trajectory S IC) t = S.energy (trajectory S IC) t := by rfl
+    nth_rewrite 1 [h_energy_t] at energies
+    nth_rewrite 1 [h_init] at energies
+    rw [h_norm] at energies
+    have h₁ : S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2 + S.k * (√(‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) ^ 2)
+            = S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2 := by
+      calc
+        S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2 + S.k * (√(‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) ^ 2)
+            = 2 * (2⁻¹ * S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2
+            + 2⁻¹ * (S.k * √(‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) ^ 2)) := by
+          simp [mul_add]
+          rw [← mul_assoc, ← mul_assoc]
+          rw [mul_inv_cancel_of_invertible 2, one_mul]
+      _ = 2 * (1 / 2 * (S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2)) := by rw [energies]
+      _ = S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2 := by simp
+    have h₂ : S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2 + S.k * (‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2)
+        = S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2 := by
+      rw [← h₁, sq_sqrt ?_]
+      apply add_nonneg
+      apply sq_nonneg
+      apply sq_nonneg
+    have h₃: ‖∂ₜ (trajectory S IC) t‖ ^ 2 = ‖IC.v₀‖ ^ 2 - (S.k / S.m) * (‖IC.v₀‖ / S.ω) ^ 2 := by
+      calc
+        ‖∂ₜ (trajectory S IC) t‖ ^ 2 = (1 / S.m) * (S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2
+        + S.k * (‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) - S.k * (‖IC.x₀‖ ^ 2
+        + (‖IC.v₀‖ / S.ω) ^ 2)) := by simp
+        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2
+          - S.k * (‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2)) := by rw [h₂]
+        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2
+          - S.k * ‖IC.x₀‖ ^ 2 - S.k * (‖IC.v₀‖ / S.ω) ^ 2) := by
+          rw [mul_add S.k (‖IC.x₀‖ ^ 2) ((‖IC.v₀‖ /S.ω) ^2)]
+          rw [← sub_sub_sub_eq (S.m * ‖IC.v₀‖ ^ 2) (S.k * ‖IC.x₀‖ ^ 2)
+          (S.k * (‖IC.v₀‖ / S.ω) ^ 2) (S.k * ‖IC.x₀‖ ^ 2)]
+          simp only [one_div, sub_sub_sub_cancel_right, add_sub_cancel_right]
+        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2 - S.k * (‖IC.v₀‖ / S.ω) ^ 2) := by simp
+        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2) - (1 / S.m) * (S.k * (‖IC.v₀‖ / S.ω) ^ 2) := by
+          rw [mul_sub (1 / S.m) (S.m * ‖IC.v₀‖ ^ 2) (S.k * (‖IC.v₀‖ / S.ω) ^ 2)]
+        _ = ‖IC.v₀‖ ^ 2 - (S.k / S.m) * (‖IC.v₀‖ / S.ω) ^ 2 := by
+          simp only [one_div, ne_eq, m_ne_zero, not_false_eq_true, inv_mul_cancel_left₀,
+            sub_right_inj]
+          rw [← mul_assoc, inv_mul_eq_div S.m S.k]
+    rw [← ω_sq, div_pow ‖IC.v₀‖ S.ω 2] at h₃
+    rw [mul_div_cancel₀ (‖IC.v₀‖ ^ 2) ?_] at h₃
+    rw [sub_self (‖IC.v₀‖ ^ 2)] at h₃
+    rw [sq_eq_zero_iff] at h₃
+    exact h₃
+    rw [pow_ne_zero_iff ?_]
+    apply ω_ne_zero
+    exact Ne.symm (Nat.zero_ne_add_one 1)
 end InitialConditions
 
 /--
@@ -913,50 +942,81 @@ a multiple of its period
 lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v₀ ≠ 0)
     (t : Time) (ht : IC.trajectory S t = IC.x₀ ∧ ∂ₜ (IC.trajectory S) t = IC.v₀) :
     ∃ n : ℤ,  (n : ℝ) * (T S) = t := by
-  obtain ⟨htx, htv⟩ := ht
+  have htx := ht.left
+  have htv := ht.right
   rw [InitialConditions.trajectory_eq] at htx
   rw [InitialConditions.trajectory_velocity] at htv
-  simp at htx htv
+  simp at htx
+  simp at htv
   set c := cos (S.ω * t)
   set s :=  sin (S.ω * t)
   set xx := inner ℝ IC.x₀ IC.x₀
   set vv := inner ℝ IC.v₀ IC.v₀
   set xv := inner ℝ IC.x₀ IC.v₀
   set det := vv + xx *  S.ω^2
-  have hxx0 : 0 ≤ xx := real_inner_self_nonneg
-  have hvv0 : 0 ≤ vv := real_inner_self_nonneg
-  have hω2 : 0 < S.ω ^ 2 := pow_pos S.ω_pos 2
-  have zero_lt_det : 0 < det := by
-    simp only [det]
-    rcases non_trivial with hx | hv
-    · nlinarith [real_inner_self_pos.mpr hx]
-    · nlinarith [real_inner_self_pos.mpr hv]
+  have zero_lt_det :  0 < det := by
+   cases non_trivial with
+   | inl hx =>
+    have  xx_gt_zero : 0 < xx  := by
+        apply real_inner_self_pos.mpr
+        exact hx
+    calc
+      0 < xx * S.ω^2 := by bound
+      _ ≤  ‖IC.v₀‖^2 +   xx * S.ω^2  := by bound
+      _ = vv +   xx * S.ω^2 := by rw [← real_inner_self_eq_norm_sq IC.v₀]
+      _ = det := by rfl
+   | inr hv =>
+     have vv_gt_zero : 0 < vv := by
+        apply real_inner_self_pos.mpr
+        exact hv
+     calc
+        0 <  vv := vv_gt_zero
+        _ ≤ vv +   ‖IC.x₀‖^2 * S.ω^2 := by bound
+        _ = vv +   xx * S.ω^2  := by rw [← real_inner_self_eq_norm_sq IC.x₀]
+        _ = det := by rfl
   have det_ne_zero : det ≠ 0 := by bound
-  -- take ⟪·, x₀⟫ of `htx` and ⟪·, v₀⟫ of `htv`
   have hxx : c * xx + (s / S.ω) * xv = xx := by
-    have := congrArg (inner ℝ · IC.x₀ : EuclideanSpace ℝ (Fin 1) → ℝ) htx
-    simpa [inner_add_left, real_inner_smul_left, real_inner_comm IC.v₀ IC.x₀, xx, xv]
-      using this
+    calc
+     c * xx + (s / S.ω) * xv =  (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * xv := by
+       rw[real_inner_smul_left]
+     (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * xv =
+       (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * inner ℝ  IC.v₀ IC.x₀ := by
+         rw [real_inner_comm IC.x₀ IC.v₀]
+     _  = (inner ℝ (c • IC.x₀) IC.x₀) +  inner ℝ  ((s / S.ω)  • IC.v₀) IC.x₀ := by
+       rw [real_inner_smul_left IC.v₀]
+     _ = (inner ℝ (c • IC.x₀ + (s / S.ω)  • IC.v₀) IC.x₀) := by rw [inner_add_left]
+     _ = xx := by rw [htx]
   have hvv : - S.ω * s * xv + c * vv = vv := by
-    have := congrArg (inner ℝ · IC.v₀ : EuclideanSpace ℝ (Fin 1) → ℝ) htv
-    simpa [inner_add_left, real_inner_smul_left, mul_assoc, vv, xv] using this
+    calc
+     - S.ω * s * xv + c * vv = - S.ω * (s * xv) + c * vv := by ring_nf
+     _ = - S.ω * inner ℝ (s • IC.x₀) IC.v₀ + c * vv := by rw[real_inner_smul_left]
+     _ = inner ℝ  (- S.ω • s • IC.x₀ ) IC.v₀ + c * vv := by rw [← real_inner_smul_left]
+     _ = inner ℝ  (- S.ω • s • IC.x₀ ) IC.v₀ + inner ℝ (c • IC.v₀) IC.v₀ := by
+       rw [← real_inner_smul_left]
+     _ = inner ℝ (- S.ω • s • IC.x₀ + c • IC.v₀) IC.v₀ := by rw [inner_add_left]
+     _ = inner ℝ (-( S.ω • s • IC.x₀) + c • IC.v₀) IC.v₀ := by rw [neg_smul]
+     _ = vv := by rw [htv]
   have hcos : 1 = cos (S.ω * t) := by
-    -- `⟪·,x₀⟫` (×ω) and `⟪·,v₀⟫` combine so that `det·(c-1) = 0`
-    have hxxω : c * xx * S.ω + s * xv = xx * S.ω := by
-      have h := hxx
-      field_simp [S.ω_ne_zero] at h
-      linarith [h]
-    have hc1 : det * (c - 1) = 0 := by
-      simp only [det]
-      linear_combination S.ω * hxxω + hvv
-    rcases mul_eq_zero.mp hc1 with h | h
-    · exact absurd h det_ne_zero
-    · linarith [h]
-  obtain ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp hcos.symm
-  refine ⟨n, ?_⟩
-  rw [period_eq]
-  field_simp [S.ω_ne_zero]
-  linear_combination hn
+    calc
+    1 =  det / det := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self]
+    _ = (vv + xx * S.ω^2 ) / det := by rfl
+    _ = c * ((vv + xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
+      nth_rewrite 1 [← hvv, ← hxx]
+      ring_nf
+    _ = c * ((vv + xx * S.ω^2) / det ) := by
+      simp only [ne_eq, S.ω_ne_zero, not_false_eq_true,
+        div_self, sub_self, mul_zero, zero_div, add_zero]
+    _ = c * (det / det) := by rfl
+    _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
+    _ = _ := by rfl
+  let ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp (Eq.symm hcos)
+  use n
+  calc
+    (n : ℝ) * (T S) = (n : ℝ) * (2 * π / S.ω) := by rfl
+    _ = ((n : ℝ) * (2 * π)) / S.ω := by ring_nf
+    _ = (S.ω * t) / S.ω := by rw [hn]
+    _ = t * (S.ω / S.ω) := by ring_nf
+    _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
 
 
 /-!

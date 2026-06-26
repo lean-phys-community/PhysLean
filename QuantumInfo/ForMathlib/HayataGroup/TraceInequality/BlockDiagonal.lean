@@ -7,6 +7,27 @@ module
 
 public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.LownerHeinzTheorem
 
+/-!
+# `2 × 2` block operators on a Hilbert sum
+
+This file develops the operator-matrix ("block operator") calculus on the two-fold Hilbert
+sum `ℋ ⊕ ℋ`, the main tool in the block-operator proof of the Jensen operator inequality.
+
+## Main definitions
+
+* `HSum ℋ`: the `ℓ²` direct sum `ℋ ⊕ ℋ` of two copies of a Hilbert space `ℋ`, realised as
+  `PiLp 2 (fun _ : Fin 2 => ℋ)`.
+* `hsumProj`, `hsumIncl`: the coordinate projections `HSum ℋ →L[ℂ] ℋ` and inclusions
+  `ℋ →L[ℂ] HSum ℋ` exhibiting `HSum ℋ` as a direct sum; they are mutually adjoint.
+* `blockDiagonal A B`: the block-diagonal operator `diag(A, B)` on `HSum ℋ`.
+* `blockOp A00 A01 A10 A11`: a general `2 × 2` block operator on `HSum ℋ`.
+* `blockDiagonalHom`: the `⋆`-algebra homomorphism `(A, B) ↦ diag(A, B)`.
+
+Here `L ℋ = ℋ →L[ℂ] ℋ` is the algebra of bounded operators (quantum observables) on `ℋ`;
+representing a pair of observables as a block-diagonal operator on `ℋ ⊕ ℋ` is the dilation
+trick underlying the operator inequalities used throughout quantum information theory.
+-/
+
 @[expose] public section
 
 namespace JensenOperatorInequality
@@ -19,19 +40,28 @@ variable {ℋ : Type u}
 variable [NormedAddCommGroup ℋ] [InnerProductSpace ℂ ℋ] [CompleteSpace ℋ]
 variable [Nontrivial ℋ]
 
-/-- A two-fold Hilbert sum used for the block-operator proof of Jensen's inequality. -/
+/-- A two-fold Hilbert sum used for the block-operator proof of Jensen's inequality.
+The inner-product instance on `ℋ` is unused by the underlying type synonym but kept to
+document that `HSum ℋ` is the `ℓ²` direct sum of two copies of a Hilbert space. -/
+@[nolint unusedArguments]
 abbrev HSum (ℋ : Type u) [NormedAddCommGroup ℋ] [InnerProductSpace ℂ ℋ] : Type u :=
   PiLp 2 (fun _ : Fin 2 => ℋ)
 
+/-- The continuous linear equivalence between the Hilbert sum `HSum ℋ` and the plain
+function space `Fin 2 → ℋ`, forgetting the `ℓ²` inner-product structure on the index. -/
 noncomputable def hsumEquiv (ℋ : Type u) [NormedAddCommGroup ℋ] [InnerProductSpace ℂ ℋ] :
     HSum ℋ ≃L[ℂ] (Fin 2 → ℋ) :=
   PiLp.continuousLinearEquiv (p := (2 : ENNReal)) (𝕜 := ℂ) (β := fun _ : Fin 2 => ℋ)
 
+/-- The `i`-th coordinate projection `HSum ℋ →L[ℂ] ℋ` of the Hilbert sum onto its
+`i`-th summand. -/
 noncomputable def hsumProj (ℋ : Type u) [NormedAddCommGroup ℋ] [InnerProductSpace ℂ ℋ]
     (i : Fin 2) : HSum ℋ →L[ℂ] ℋ :=
   (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin 2 => ℋ) i) ∘L
     (hsumEquiv ℋ).toContinuousLinearMap
 
+/-- The `i`-th coordinate inclusion `ℋ →L[ℂ] HSum ℋ`, embedding `ℋ` as the `i`-th summand
+of the Hilbert sum and placing `0` in the other summand. -/
 noncomputable def hsumIncl (ℋ : Type u) [NormedAddCommGroup ℋ] [InnerProductSpace ℂ ℋ]
     (i : Fin 2) : ℋ →L[ℂ] HSum ℋ :=
   (hsumEquiv ℋ).symm.toContinuousLinearMap ∘L
@@ -103,6 +133,8 @@ omit [Nontrivial ℋ] in
   · simp [blockDiagonal, ContinuousLinearMap.star_eq_adjoint, ContinuousLinearMap.adjoint_comp]
   · simp [blockDiagonal, ContinuousLinearMap.star_eq_adjoint, ContinuousLinearMap.adjoint_comp]
 
+/-- The `ℝ`-`⋆`-algebra homomorphism sending a pair of operators `(A, B)` to the
+block-diagonal operator `diag(A, B)` on the Hilbert sum. -/
 noncomputable def blockDiagonalHom : (L ℋ × L ℋ) →⋆ₐ[ℝ] L (HSum ℋ) where
   toFun p := blockDiagonal (ℋ := ℋ) p.1 p.2
   map_one' := by

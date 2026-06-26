@@ -753,7 +753,6 @@ theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma P_P_P!_accCube (g : Fin n → ℚ) (j : Fin n) :
     accCubeTriLinSymm (P g) (P g) (basis!AsCharges j)
     = (P g (oddShiftFst j))^2 - (g j)^2 := by

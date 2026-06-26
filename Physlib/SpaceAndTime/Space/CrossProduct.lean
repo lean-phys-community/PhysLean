@@ -67,11 +67,16 @@ lemma fderiv_cross_commute {t : Time} {s : EuclideanSpace ℝ (Fin 3)}
       s j * (fderiv ℝ (fun u => f u) t) 1 i
       = (fderiv ℝ (fun t => s i * f t j - s j * f t i) t) 1:= by
     rw [fderiv_fun_sub, fderiv_const_mul, fderiv_const_mul]
-    simp only [FunLike.coe_sub, FunLike.coe_smul, Pi.sub_apply,
-      Pi.smul_apply, smul_eq_mul]
-    rw [Time.fderiv_euclid, Time.fderiv_euclid]
-    intro i
-    repeat fun_prop
+    · simp only [FunLike.coe_sub, FunLike.coe_smul, Pi.sub_apply,
+        Pi.smul_apply, smul_eq_mul]
+      rw [Time.fderiv_euclid, Time.fderiv_euclid]
+      · intro i
+        repeat fun_prop
+      · fun_prop
+    · fun_prop
+    · fun_prop
+    · fun_prop
+    · fun_prop
   rw [crossProduct]
   ext i
   fin_cases i <;>
@@ -85,8 +90,11 @@ lemma fderiv_cross_commute {t : Time} {s : EuclideanSpace ℝ (Fin 3)}
     apply Time.differentiable_euclid
     intro i
     fin_cases i
-    all_goals
-      simp [Fin.zero_eta, Fin.isValue]
+    · simp [Fin.zero_eta, Fin.isValue]
+      fun_prop
+    · simp [Fin.isValue]
+      fun_prop
+    · simp [Fin.isValue]
       fun_prop
 
 /-- Cross product and time derivative commute. -/

@@ -321,7 +321,6 @@ lemma orderedInsertEquiv_zero {I : Type} (le1 : I → I → Prop) [DecidableRel 
     (r0 : I) : orderedInsertEquiv le1 r r0 0 = orderedInsertPos le1 r r0 := by
   simp [orderedInsertEquiv]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
     (r0 : I) (n : ℕ) (hn : Nat.succ n < (r0 :: r).length) :
     orderedInsertEquiv le1 r r0 ⟨Nat.succ n, hn⟩ =
@@ -331,10 +330,9 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   simp only [List.length_cons, orderedInsertEquiv, Nat.succ_eq_add_one, Equiv.trans_apply]
   match r with
   | [] =>
-    simp only [List.length_nil, Nat.reduceAdd, Fin.castOrderIso_refl, OrderIso.refl_toEquiv,
-      Fin.val_eq_zero, Fin.zero_eta, Fin.isValue, Equiv.symm_apply_apply, Fin.zero_succAbove,
-      Fin.succ_mk, Fin.cast_eq_self]
-    rfl
+    simp only [List.length_nil, Nat.reduceAdd, Fin.val_eq_zero, Fin.zero_eta, Fin.isValue,
+      Equiv.symm_apply_apply, OrderIso.coe_symm_toEquiv, Fin.symm_castOrderIso,
+      Fin.castOrderIso_apply, Fin.cast_mk, Fin.zero_succAbove, Fin.succ_mk]
   | r1 :: r =>
     simp only [List.length_cons]
     rw [finExtractOne_apply_neq]
@@ -343,7 +341,6 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
     rfl
     exact ne_of_beq_false rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
     (r0 : I) (n : Fin r.length) :
     orderedInsertEquiv le1 r r0 n.succ = Fin.cast (List.orderedInsert_length le1 r r0).symm
@@ -352,10 +349,9 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   simp only [orderedInsertEquiv, Equiv.trans_apply]
   match r with
   | [] =>
-    simp only [List.length_cons, List.length_nil, Nat.reduceAdd, Fin.castOrderIso_refl,
-      OrderIso.refl_toEquiv, Fin.val_eq_zero, Fin.zero_eta, Fin.isValue, Equiv.symm_apply_apply,
-      Fin.eta, Fin.zero_succAbove, Fin.cast_eq_self]
-    rfl
+    simp only [List.length_cons, List.length_nil, Nat.reduceAdd, Fin.val_eq_zero, Fin.zero_eta,
+      Fin.isValue, Equiv.symm_apply_apply, OrderIso.coe_symm_toEquiv, Fin.symm_castOrderIso,
+      Fin.castOrderIso_apply, Fin.eta, Fin.zero_succAbove]
   | r1 :: r =>
     simp only [List.length_cons, Fin.eta]
     rw [finExtractOne_apply_neq]

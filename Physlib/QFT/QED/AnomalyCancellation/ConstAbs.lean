@@ -211,7 +211,6 @@ theorem AFL_odd (A : (PureU1 (2 * n + 1)).LinSols) (h : ConstAbsSorted A.val) :
   apply ACCSystemLinear.LinSols.ext
   exact is_zero h (AFL_odd_zero h)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma AFL_even_Boundary {A : (PureU1 (2 * n.succ)).LinSols} (h : ConstAbsSorted A.val)
     (hA : A.val (0 : Fin (2 * n.succ)) ≠ 0) {k : Fin (2 * n + 1)} (hk : Boundary A.val k) :
     k.val = n := by
