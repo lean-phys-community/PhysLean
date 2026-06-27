@@ -172,7 +172,7 @@ component of `t` matches the corresponding component of `permT σ h t'`. This pa
 proofs downstream would otherwise repeat by hand; the caller is left only with the species-specific
 permutation bookkeeping on the right-hand side. -/
 lemma conjT_eq_permT_iff {n m : ℕ} {c : Fin n → C} {c' : Fin m → C}
-    {σ : Fin n → Fin m} (h : PermCond c' (S.bar ∘ c) σ)
+    {σ : Fin n → Fin m} (h : IsReindexing c' (S.bar ∘ c) σ)
     (t : S.Tensor c) (t' : S.Tensor c') :
     S.conjT t = permT σ h t' ↔
       ∀ φ : ComponentIdx (S := S.toTensorSpecies) (S.bar ∘ c),
@@ -204,17 +204,17 @@ private lemma barIdx_involutive_symm (c : C) (y : basisIdx (S.bar (S.bar c))) :
       = basisIdxCongr (S.bar_involution c) y := by
   simp only [basisIdxCongr, Equiv.cast_apply, cast_cast]
 
-/-- The identity permutation satisfies `PermCond` from `c` to `bar ∘ bar ∘ c`, as `bar` is an
+/-- The identity permutation satisfies `IsReindexing` from `c` to `bar ∘ bar ∘ c`, as `bar` is an
 involution. -/
-lemma permCond_bar_bar {n : ℕ} (c : Fin n → C) :
-    PermCond c (S.bar ∘ S.bar ∘ c) (id : Fin n → Fin n) :=
+lemma isReindexing_bar_bar {n : ℕ} (c : Fin n → C) :
+    IsReindexing c (S.bar ∘ S.bar ∘ c) (id : Fin n → Fin n) :=
   ⟨Function.bijective_id, fun i => (S.bar_involution (c i)).symm⟩
 
 /-- Conjugation is an involution: conjugating twice returns the original tensor, up to the
 `bar_involution` recolouring (the identity permutation `permT`). -/
 lemma conjT_conjT {n : ℕ} {c : Fin n → C} (t : S.Tensor c) :
     S.conjT (S.conjT t)
-      = permT id (S.permCond_bar_bar c) t := by
+      = permT id (S.isReindexing_bar_bar c) t := by
   apply componentMap_ext
   intro φ
   rw [componentMap_conjT, componentMap_conjT, star_star]
@@ -222,8 +222,8 @@ lemma conjT_conjT {n : ℕ} {c : Fin n → C} (t : S.Tensor c) :
     ← componentMap_eq_repr c]
   refine congrArg (fun ψ => (componentMap c) t ψ) ?_
   funext i
-  have hinv : (PermCond.inv id (S.permCond_bar_bar c)) i = i :=
-    PermCond.inv_apply_apply id _ i
+  have hinv : (IsReindexing.inv id (S.isReindexing_bar_bar c)) i = i :=
+    IsReindexing.inv_apply_apply id _ i
   show Equiv.cast (S.barIdx_eq (c i)) (Equiv.cast (S.barIdx_eq (S.bar (c i))) (φ i)) = _
   rw [S.barIdx_involutive_symm]
   exact basisIdxCongr_heq_arg _ _ (by rw [hinv]; exact HEq.rfl)
