@@ -5,7 +5,7 @@ Authors: Florian Wiesner, Michał Mogielnicki
 -/
 module
 
-public import Physlib.FluidDynamics.Basic
+public import Physlib.FluidDynamics.FluidFlow.Basic
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
 /-!
 

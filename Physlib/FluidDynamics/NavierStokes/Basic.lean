@@ -5,7 +5,8 @@ Authors: Florian Wiesner
 -/
 module
 
-public import Physlib.FluidDynamics.CauchyMomentum
+public import Physlib.FluidDynamics.CauchyFlow.Momentum
+public import Physlib.FluidDynamics.CauchyFlow.Newtonian
 /-!
 
 # The Navier-Stokes equations
@@ -22,10 +23,6 @@ stress law. The Cauchy momentum equation supplies the balance-law layer, while
 
 ## ii. Key results
 
-- `CauchyFlow.velocityGradient` : The spatial velocity-gradient matrix.
-- `CauchyFlow.newtonianStressTensor` : The Newtonian stress tensor determined by pressure and
-  viscosity.
-- `CauchyFlow.IsNewtonian` : Predicate saying the Cauchy stress has Newtonian constitutive form.
 - `NavierStokes` : Classical continuity, Cauchy momentum, and Newtonian stress together.
 - `ConvectiveNavierStokes` : Classical continuity, convective Cauchy momentum, and Newtonian
   stress together.
@@ -34,9 +31,8 @@ stress law. The Cauchy momentum equation supplies the balance-law layer, while
 
 ## iii. Table of contents
 
-- A. Newtonian stress law
-- B. Navier-Stokes equations
-- C. Equivalence of conservative and convective Navier-Stokes forms
+- A. Navier-Stokes equations
+- B. Equivalence of conservative and convective Navier-Stokes forms
 
 ## iv. References
 
@@ -44,50 +40,11 @@ stress law. The Cauchy momentum equation supplies the balance-law layer, while
 
 @[expose] public section
 
-open Space
-
 namespace FluidDynamics
 
-namespace CauchyFlow
-
 /-!
 
-## A. Newtonian stress law
-
--/
-
-/-- The spatial velocity-gradient matrix, with entries `partial_j u_i`. -/
-noncomputable def velocityGradient (d : ℕ) (flow : FluidFlow d) :
-    Time → Space d → Matrix (Fin d) (Fin d) ℝ :=
-  fun t x i j => ∂[j] (fun x' => flow.velocity t x' i) x
-
-/-- The Newtonian stress tensor
-`-p I + mu (grad u + grad u^T) + lambda (div u) I`.
-
-The scalar fields are pressure, shear viscosity, and second viscosity.
--/
-noncomputable def newtonianStressTensor (d : ℕ) (flow : FluidFlow d)
-    (pressure shearViscosity secondViscosity : ScalarField d) : StressTensor d :=
-  fun t x =>
-    (-(pressure t x)) • (1 : Matrix (Fin d) (Fin d) ℝ) +
-      shearViscosity t x •
-        (velocityGradient d flow t x + Matrix.transpose (velocityGradient d flow t x)) +
-        (secondViscosity t x * (∇ ⬝ flow.velocity t) x) •
-          (1 : Matrix (Fin d) (Fin d) ℝ)
-
-/-- A Cauchy flow is Newtonian when its stress tensor has the Newtonian constitutive form. -/
-def IsNewtonian
-    (d : ℕ) (flow : CauchyFlow d)
-    (pressure shearViscosity secondViscosity : ScalarField d) : Prop :=
-  ∀ t x,
-    flow.stress t x =
-      newtonianStressTensor d flow.toFluidFlow pressure shearViscosity secondViscosity t x
-
-end CauchyFlow
-
-/-!
-
-## B. Navier-Stokes equations
+## A. Navier-Stokes equations
 
 -/
 
@@ -111,7 +68,7 @@ def ConvectiveNavierStokes
 
 /-!
 
-## C. Equivalence of conservative and convective Navier-Stokes forms
+## B. Equivalence of conservative and convective Navier-Stokes forms
 
 -/
 

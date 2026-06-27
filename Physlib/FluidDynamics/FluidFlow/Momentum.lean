@@ -5,7 +5,7 @@ Authors: Florian Wiesner
 -/
 module
 
-public import Physlib.FluidDynamics.Continuity
+public import Physlib.FluidDynamics.FluidFlow.Continuity
 public import Physlib.SpaceAndTime.Space.Derivatives.MatrixDiv
 /-!
 

@@ -5,7 +5,8 @@ Authors: Florian Wiesner
 -/
 module
 
-public import Physlib.FluidDynamics.Momentum
+public import Physlib.FluidDynamics.CauchyFlow.Basic
+public import Physlib.FluidDynamics.FluidFlow.Momentum
 /-!
 
 # Cauchy momentum equations
