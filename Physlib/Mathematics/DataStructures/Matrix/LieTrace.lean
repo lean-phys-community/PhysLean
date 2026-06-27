@@ -158,7 +158,7 @@ lemma det_exp_of_blockTriangular_id {A : Matrix m m 𝕂} (hA : BlockTriangular 
     diag_exp_of_blockTriangular_id hA
   simp_rw [← diag_apply]
   simp_rw [h_diag_exp]
-  erw [← NormedSpace.exp_sum Finset.univ]
+  rw [← NormedSpace.exp_sum Finset.univ]
   congr 1
 
 /-- The trace is invariant under unitary conjugation. -/
@@ -202,9 +202,9 @@ theorem det_exp {𝕂 m : Type*} [RCLike 𝕂] [IsAlgClosed 𝕂] [Fintype m] [L
   have h_prop : T.val.IsUpperTriangular := T.property
   have h_conj : A = U * T * star U := schur_triangulation A
   have h_trace_invariant : A.trace = T.val.trace := by
-    erw [h_conj, trace_unitary_conj]
+    rw [h_conj, Unitary.coe_star, trace_unitary_conj]
   have h_det_invariant : (NormedSpace.exp A).det = (NormedSpace.exp T.val).det := by
-    erw [h_conj, det_exp_unitary_conj]
+    rw [h_conj, Unitary.coe_star, det_exp_unitary_conj]
   have h_triangular_case : (NormedSpace.exp T.val).det = NormedSpace.exp T.val.trace :=
     det_exp_of_blockTriangular_id h_prop
   rw [h_det_invariant, h_triangular_case, h_trace_invariant]
@@ -273,9 +273,7 @@ theorem det_exp_real {n : Type*} [Fintype n] [LinearOrder n]
   rw [h_trace_comm] at h_complex
   have h_exp_comm : Complex.exp ((algebraMap ℝ ℂ) A.trace) =
       (algebraMap ℝ ℂ) (Real.exp A.trace) := by
-    erw [← Complex.ofReal_exp]
-    simp_all only [Complex.coe_algebraMap, Algebra.algebraMap_self, RingHom.id_apply,
-      Complex.ofReal_exp, A_ℂ]
+    rw [Complex.coe_algebraMap, ← Complex.ofReal_exp]
   rw [h_exp_comm] at h_complex
   exact Complex.ofReal_injective h_complex
 
