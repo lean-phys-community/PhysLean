@@ -212,9 +212,11 @@ def fromL2 : WithLp 2 E →L[𝕜] E where
         have h := Real.sqrt_le_sqrt (h ((WithLp.equiv 2 E) x)).1
         simp [smul_eq_mul] at h
         apply (le_inv_mul_iff₀' hc).2
-        convert h using 1
-        simp only [WithLp.equiv_apply]
-        ring
+        apply le_of_eq_of_le (b :=  √c * ‖x.ofLp‖ )
+        · simp [WithLp.equiv_apply]
+          ring
+        · apply h.trans
+          rfl
 
 lemma fromL2_inner_left (x : WithLp 2 E) (y : E) : ⟪fromL2 𝕜 x, y⟫ = ⟪x, toL2 𝕜 y⟫ := rfl
 
@@ -269,7 +271,7 @@ lemma ext_inner_left' {x y : E} (h : ∀ v, ⟪v, x⟫ = ⟪v, y⟫) : x = y :=
 variable (𝕜) in
 lemma ext_inner_right' {x y : E} (h : ∀ v, ⟪x, v⟫ = ⟪y, v⟫) : x = y :=
   (WithLp.equiv 2 E).symm.injective <| ext_inner_right (E := WithLp 2 E) 𝕜 <| by
-  simpa [← ofLp_inner_left] using fun v => h (WithLp.ofLp v)
+  exact fun v => h (WithLp.ofLp v)
 
 @[simp]
 lemma inner_conj_symm' (x y : E) : ⟪y, x⟫† = ⟪x, y⟫ :=
@@ -320,11 +322,13 @@ lemma inner_sum'{ι : Type*} [Fintype ι] (x : E) (g : ι → E) :
   have h1 := inner_sum (𝕜 := 𝕜) (E:=WithLp 2 E) (x := WithLp.toLp 2 x)
     (f := fun i => WithLp.toLp 2 (g i))
   convert h1 (Finset.univ)
-  rw [← ofLp_inner_left]
-  simp only
-  congr
-  change _ = (WithLp.linearEquiv 2 𝕜 E) _
-  simp
+  · rw [← ofLp_inner_left]
+    simp only
+    congr
+    change _ = (WithLp.linearEquiv 2 𝕜 E) _
+    simp only [map_sum, WithLp.linearEquiv_apply, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
+      EquivLike.coe_coe, WithLp.addEquiv_apply]
+  · rfl
 
 @[fun_prop]
 lemma Continuous.inner' {α} [TopologicalSpace α] (f g : α → E)
@@ -527,7 +531,6 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
             (WithLp.toLp 2 (x i)) (WithLp.toLp 2 (x i))))
           (s := {i}) (by
             intro i
-            simp only
             exact InnerProductSpace.Core.inner_self_nonneg)
 
         apply le_trans _ (le_trans h1 _)
@@ -595,56 +598,56 @@ lemma _root_.isBoundedBilinearMap_inner' :
     simp_all
     intro x y
     trans |‖x‖₂| * |‖y‖₂|
-    change |@inner ℝ (WithLp 2 E) _ _ _| ≤ _
-    have h1 := norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x) (WithLp.toLp 2 y)
-    simp at h1
-    apply h1.trans
-    apply le_of_eq
-    congr
-    rw [norm_withLp2_eq_norm2]
-    rfl
-    rw [norm_withLp2_eq_norm2]
-    rfl
-    have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := by
-      apply le_of_sq_le_sq
-      simp [@mul_pow]
-      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
-      simp only [re_to_real]
-      apply (h x).2.trans
+    · change |@inner ℝ (WithLp 2 E) _ _ _| ≤ _
+      have h1 := norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x) (WithLp.toLp 2 y)
+      simp at h1
+      apply h1.trans
       apply le_of_eq
-      simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-        pow_eq_zero_iff, norm_eq_zero]
-      left
-      refine Eq.symm (Real.sq_sqrt ?_)
-      linarith
-      apply mul_nonneg
-      exact Real.sqrt_nonneg d
-      exact norm_nonneg x
-    have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := by
-      apply le_of_sq_le_sq
-      simp [@mul_pow]
-      rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
-      simp only [re_to_real]
-      apply (h y).2.trans
-      apply le_of_eq
-      simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-        pow_eq_zero_iff, norm_eq_zero]
-      left
-      refine Eq.symm (Real.sq_sqrt ?_)
-      linarith
-      apply mul_nonneg
-      exact Real.sqrt_nonneg d
-      exact norm_nonneg y
-    trans (√ d * ‖x‖) * (√ d * ‖y‖)
-    refine mul_le_mul_of_nonneg h1 h2 ?_ ?_
-    exact abs_nonneg ‖x‖₂
-    apply mul_nonneg
-    exact Real.sqrt_nonneg d
-    exact norm_nonneg y
-    apply le_of_eq
-    ring_nf
-    rw [Real.sq_sqrt]
-    ring
-    linarith
+      congr
+      · rw [norm_withLp2_eq_norm2]
+        rfl
+      · rw [norm_withLp2_eq_norm2]
+        rfl
+    · have h1 : |‖x‖₂| ≤ √ d * ‖x‖ := by
+        apply le_of_sq_le_sq
+        · simp [@mul_pow]
+          rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
+          simp only [re_to_real]
+          apply (h x).2.trans
+          apply le_of_eq
+          simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+            pow_eq_zero_iff, norm_eq_zero]
+          left
+          refine Eq.symm (Real.sq_sqrt ?_)
+          linarith
+        · apply mul_nonneg
+          · exact Real.sqrt_nonneg d
+          · exact norm_nonneg x
+      have h2 : |‖y‖₂| ≤ √ d * ‖y‖ := by
+        apply le_of_sq_le_sq
+        · simp [@mul_pow]
+          rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
+          simp only [re_to_real]
+          apply (h y).2.trans
+          apply le_of_eq
+          simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+            pow_eq_zero_iff, norm_eq_zero]
+          left
+          refine Eq.symm (Real.sq_sqrt ?_)
+          linarith
+        · apply mul_nonneg
+          · exact Real.sqrt_nonneg d
+          · exact norm_nonneg y
+      trans (√ d * ‖x‖) * (√ d * ‖y‖)
+      · refine mul_le_mul_of_nonneg h1 h2 ?_ ?_
+        · exact abs_nonneg ‖x‖₂
+        · apply mul_nonneg
+          · exact Real.sqrt_nonneg d
+          · exact norm_nonneg y
+      · apply le_of_eq
+        ring_nf
+        rw [Real.sq_sqrt]
+        · ring
+        · linarith
 
 end Constructions

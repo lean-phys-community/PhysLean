@@ -22,6 +22,8 @@ distributions on `SpaceTime d`.
 ## ii. Key results
 
 - `deriv` : The derivative of a function `SpaceTime d → M` along the `μ` coordinate.
+- `manifoldDeriv` : The derivative of a function from `SpaceTime d` to a manifold along
+  the `μ` coordinate.
 - `contDiff_deriv` : If `f` is `C^{n+1}` then `∂_ μ f` is `C^n`.
 - `differentiable_deriv` : If `f` is `C^2` then `∂_ μ f` is differentiable.
 - `deriv_commute` : Derivatives on `SpaceTime d` commute (Clairaut's theorem).
@@ -83,6 +85,50 @@ noncomputable def deriv {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalS
 @[inherit_doc deriv]
 scoped notation "∂_" => deriv
 
+lemma deriv_eq {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
+    {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
+    ∂_ μ f y =
+    fderiv ℝ f y (Lorentz.Vector.basis μ) := by
+  rfl
+
+/-- The derivative of a function from `SpaceTime d` to a manifold along the `μ`
+coordinate, as a tangent vector at the value of the function. -/
+noncomputable def manifoldDeriv {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → N) :
+    (y : SpaceTime d) → TangentSpace I (f y) :=
+  fun y => mfderiv 𝓘(ℝ, SpaceTime d) I f y
+    ((Lorentz.Vector.basis μ : SpaceTime d) : TangentSpace 𝓘(ℝ, SpaceTime d) y)
+
+lemma manifoldDeriv_eq {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → N)
+    (y : SpaceTime d) :
+    manifoldDeriv I μ f y =
+      mfderiv 𝓘(ℝ, SpaceTime d) I f y
+        ((Lorentz.Vector.basis μ : SpaceTime d) : TangentSpace 𝓘(ℝ, SpaceTime d) y) := rfl
+
+/-- The spacetime derivative is the manifold derivative for functions into normed spaces. -/
+lemma deriv_eq_mfderiv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
+    deriv μ f y =
+      mfderiv 𝓘(ℝ, SpaceTime d) 𝓘(ℝ, M) f y
+        ((Lorentz.Vector.basis μ : SpaceTime d) : TangentSpace 𝓘(ℝ, SpaceTime d) y) := by
+  rw [deriv_eq, ← mfderiv_eq_fderiv]
+  rfl
+
+lemma deriv_eq_manifoldDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
+    deriv μ f y = manifoldDeriv 𝓘(ℝ, M) μ f y := by
+  rw [deriv_eq_mfderiv, manifoldDeriv_eq]
+
+@[simp]
+lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
+    [ChartedSpace H N] {d : ℕ} (μ : Fin 1 ⊕ Fin d) (n : N) (y : SpaceTime d) :
+    manifoldDeriv I μ (fun _ : SpaceTime d => n) y = 0 := by
+  simp [manifoldDeriv]
+
 /-!
 
 ### A.2. Basic equality lemmas
@@ -90,10 +136,6 @@ scoped notation "∂_" => deriv
 -/
 
 variable {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
-lemma deriv_eq {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
-    ∂_ μ f y =
-    fderiv ℝ f y (Lorentz.Vector.basis μ) := by
-  rfl
 
 lemma differentiable_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d) :
     (∀ ν, Differentiable ℝ (fun x => f x ν)) ↔ Differentiable ℝ f := by
@@ -128,7 +170,7 @@ lemma deriv_apply_eq {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → Lo
   rw [deriv_eq]
   change _ = (fderiv ℝ (Lorentz.Vector.coordCLM ν ∘ f) y) (Lorentz.Vector.basis μ)
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
   rfl
 
 lemma fderiv_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d)
@@ -136,7 +178,7 @@ lemma fderiv_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d)
     fderiv ℝ f y dt ν = fderiv ℝ (fun x => f x ν) y dt := by
   change _ = (fderiv ℝ (Lorentz.Vector.coordCLM ν ∘ f) y) dt
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
   rfl
 
 @[simp]
@@ -227,7 +269,7 @@ lemma deriv_comp_lorentz_action {M : Type} [NormedAddCommGroup M] [NormedSpace �
   change fderiv ℝ (f ∘ Lorentz.Vector.actionCLM Λ) x (Lorentz.Vector.basis μ) = _
   rw [fderiv_comp]
   simp only [Lorentz.Vector.actionCLM_apply, ContinuousLinearMap.fderiv,
-    ContinuousLinearMap.coe_comp', Function.comp_apply]
+    ContinuousLinearMap.coe_comp, Function.comp_apply]
     -- Fintype.sum_sum_type
   rw [Lorentz.Vector.smul_basis]
   simp
@@ -272,18 +314,18 @@ lemma deriv_sum_inr {d : ℕ} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ
     = Space.deriv i (fun y => f ((toTimeAndSpace c).symm ((toTimeAndSpace c x).1, y)))
       (toTimeAndSpace c x).2 := by
   rw [deriv_eq, Space.deriv_eq]
-  conv_rhs => rw [fderiv_comp' _ (by fun_prop) (by fun_prop)]
-  simp only [Prod.mk.eta, ContinuousLinearEquiv.symm_apply_apply, ContinuousLinearMap.coe_comp',
+  conv_rhs => rw [fderiv_fun_comp _ (by fun_prop) (by fun_prop)]
+  simp only [Prod.mk.eta, ContinuousLinearEquiv.symm_apply_apply, ContinuousLinearMap.coe_comp,
     Function.comp_apply]
   congr 1
-  rw [fderiv_comp']
-  simp only [Prod.mk.eta, toTimeAndSpace_symm_fderiv, ContinuousLinearMap.coe_comp',
+  rw [fderiv_fun_comp]
+  simp only [Prod.mk.eta, toTimeAndSpace_symm_fderiv, ContinuousLinearMap.coe_comp,
     ContinuousLinearEquiv.coe_coe, Function.comp_apply]
   change _ = (toTimeAndSpace c).symm ((fderiv ℝ ((toTimeAndSpace c x).1, ·) (toTimeAndSpace c x).2)
     (Space.basis i))
   rw [DifferentiableAt.fderiv_prodMk]
   simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.prod_apply,
-    ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id', id_eq]
+    _root_.zero_apply, ContinuousLinearMap.coe_id', id_eq]
   trans (toTimeAndSpace c).symm (0, Space.basis i)
   · rw [← toTimeAndSpace_basis_inr (c := c)]
     simp
@@ -297,9 +339,9 @@ lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
     = (1/(c : ℝ)) • Time.deriv (fun t => f ((toTimeAndSpace c).symm (t, (toTimeAndSpace c x).2)))
       (toTimeAndSpace c x).1 := by
   rw [deriv_eq, Time.deriv_eq]
-  conv_rhs => rw [fderiv_comp' _ (by fun_prop) (by fun_prop)]
+  conv_rhs => rw [fderiv_fun_comp _ (by fun_prop) (by fun_prop)]
   simp only [Fin.isValue, Prod.mk.eta, ContinuousLinearEquiv.symm_apply_apply,
-    ContinuousLinearMap.coe_comp', Function.comp_apply]
+    ContinuousLinearMap.coe_comp, Function.comp_apply]
   trans
     (fderiv ℝ f x)
       ((1 / c.val) • (fderiv ℝ (fun t => (toTimeAndSpace c).symm (t, ((toTimeAndSpace c) x).2))
@@ -308,13 +350,13 @@ lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
   · exact ContinuousLinearMap.map_smul_of_tower (fderiv ℝ f x) (1 / c.val) _
   congr 1
 
-  rw [fderiv_comp']
-  simp only [Fin.isValue, Prod.mk.eta, toTimeAndSpace_symm_fderiv, ContinuousLinearMap.coe_comp',
+  rw [fderiv_fun_comp]
+  simp only [Fin.isValue, Prod.mk.eta, toTimeAndSpace_symm_fderiv, ContinuousLinearMap.coe_comp,
     ContinuousLinearEquiv.coe_coe, Function.comp_apply]
   rw [DifferentiableAt.fderiv_prodMk]
   simp only [Fin.isValue, fderiv_fun_id, fderiv_fun_const, Pi.zero_apply,
     ContinuousLinearMap.prod_apply, ContinuousLinearMap.coe_id', id_eq,
-    ContinuousLinearMap.zero_apply]
+    _root_.zero_apply]
   rw [← map_smul]
   rw [← toTimeAndSpace_basis_inl' (c := c)]
   simp only [Fin.isValue, ContinuousLinearEquiv.symm_apply_apply]
@@ -336,7 +378,7 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     let ev : (SpaceTime d →L[ℝ] M) →L[ℝ] M := {
       toFun v := v (Lorentz.Vector.basis μ)
       map_add' v1 v2 := by
-        simp only [ContinuousLinearMap.add_apply]
+        simp only [_root_.add_apply]
       map_smul' a v := by
         simp
     }
@@ -422,8 +464,8 @@ lemma distDeriv_comp_lorentz_action {μ : Fin 1 ⊕ Fin d} (Λ : LorentzGroup d)
     lorentzGroup_smul_dist_apply]
   rw [← smul_neg]
   congr
-  rw [ContinuousLinearMap.sum_apply]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply]
+  rw [_root_.sum_apply]
+  simp only [FunLike.coe_smul, Pi.smul_apply]
   conv_lhs =>
     enter [2, x]
     rw [distDeriv_apply, fderivD_apply]
@@ -435,14 +477,14 @@ lemma distDeriv_comp_lorentz_action {μ : Fin 1 ⊕ Fin d} (Λ : LorentzGroup d)
   congr
   /- Reduced to Schwartz maps -/
   ext x
-  rw [SchwartzMap.sum_apply]
+  rw [_root_.sum_apply]
   symm
   simp [schwartzAction_apply]
   change ∂_ μ η (Λ • x) = ∑ ν, Λ⁻¹.1 ν μ • ∂_ ν (schwartzAction Λ⁻¹ η) (x)
   obtain ⟨η, rfl⟩ := schwartzAction_surjective Λ η
   simp only [smul_eq_mul]
   rw [schwartzAction_mul_apply]
-  simp only [inv_mul_cancel, map_one, ContinuousLinearMap.one_apply]
+  simp only [inv_mul_cancel, map_one, one_apply_eq_self]
   change ∂_ μ (fun x => η (Λ⁻¹ • x)) (Λ • x) = _
   rw [deriv_comp_lorentz_action]
   simp only [inv_smul_smul, smul_eq_mul]
@@ -510,7 +552,7 @@ lemma tensorDeriv_toTensor_basis_repr
       rw [h1 x]
     conv_rhs =>
       rw [deriv_eq]
-      rw [fderiv_comp' _ (by fun_prop) (by fun_prop)]
+      rw [fderiv_fun_comp _ (by fun_prop) (by fun_prop)]
     rw [ContinuousLinearMap.fderiv]
     simp [deriv_eq]
   · intro b' _ hb
@@ -582,7 +624,7 @@ lemma distTensorDeriv_equivariant {M : Type} [NormedAddCommGroup M]
   conv_lhs =>
     enter [2, μ]
     rw [distDeriv_comp_lorentz_action]
-    simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_smul', Finset.sum_apply,
+    simp only [FunLike.coe_sum, FunLike.coe_smul, Finset.sum_apply,
       Pi.smul_apply]
     rw [tmul_sum]
     enter [2, ν]
@@ -592,7 +634,7 @@ lemma distTensorDeriv_equivariant {M : Type} [NormedAddCommGroup M]
     enter [2, ν]
     rw [← sum_tmul, ← Lorentz.CoVector.smul_basis, ← Tensorial.smul_prod]
   change _ = (TensorSpecies.Tensorial.smulLinearMap Λ) _
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, ContinuousLinearMap.coe_comp, LinearMap.coe_comp,
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, ContinuousLinearMap.coe_comp,
     ContinuousLinearMap.coe_coe, Function.comp_apply]
   rw [distTensorDeriv_apply]
   simp only [map_sum]

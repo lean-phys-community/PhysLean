@@ -7,7 +7,7 @@ module
 
 public import Physlib.Electromagnetism.Kinematics.EMPotential
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Field Strength Tensor
@@ -32,6 +32,7 @@ We define a tensor version and a matrix version and prover various properties of
   - A.3. The group action acting on the field strength tensor
   - A.4. Differentiability and smoothness of the field strength tensor
   - A.5. Elements of the field strength tensor in terms of basis
+    - A.5.1. Index evaluation
   - A.6. The field strength matrix
     - A.6.1. Differentiability of the field strength matrix
   - A.7. The antisymmetry of the field strength tensor
@@ -80,7 +81,8 @@ under Lorentz transformations.
 noncomputable def toFieldStrength {d} (A : ElectromagneticPotential d) :
     SpaceTime d → Lorentz.Vector d ⊗[ℝ] Lorentz.Vector d := fun x =>
   Tensorial.toTensor.symm
-  (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν) + - (η d | ν ν' ⊗ A.deriv x | ν' μ)}ᵀ)
+  (permT id (IsReindexing.auto)
+    {(η d | μ μ' ⊗ A.deriv x | μ' ν) + - (η d | ν ν' ⊗ A.deriv x | ν' μ)}ᵀ)
 
 /-!
 
@@ -95,21 +97,21 @@ of the API within this module.
 
 lemma toFieldStrength_eq_deriv {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id PermCond.auto {(η d | μ μ' ⊗ A.deriv x | μ' ν)
+    Tensorial.toTensor.symm (permT id IsReindexing.auto {(η d | μ μ' ⊗ A.deriv x | μ' ν)
     + - (η d | ν ν' ⊗ A.deriv x | ν' μ)}ᵀ) := by
   rw [toFieldStrength]
 
 lemma toFieldStrength_eq_tensorDeriv {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id PermCond.auto {(η d | μ μ' ⊗ tensorDeriv A x | μ' ν)
+    Tensorial.toTensor.symm (permT id IsReindexing.auto {(η d | μ μ' ⊗ tensorDeriv A x | μ' ν)
     + - (η d | ν ν' ⊗ tensorDeriv A x | ν' μ)}ᵀ) := by
   rw [toFieldStrength_eq_deriv, deriv_eq_tensorDeriv _ hA]
 
 lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
-    - Tensorial.toTensor.symm (permT ![1, 0] (PermCond.auto)
+    Tensorial.toTensor.symm (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
+    - Tensorial.toTensor.symm (permT ![1, 0] (IsReindexing.auto)
       {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ) := by
   rw [toFieldStrength]
   simp only [map_add, map_neg]
@@ -122,16 +124,16 @@ lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime
 lemma toFieldStrength_eq_sub_tensorDeriv {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
     toFieldStrength A x =
-    Tensorial.toTensor.symm (permT id PermCond.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
-    - Tensorial.toTensor.symm (permT ![1, 0] PermCond.auto
+    Tensorial.toTensor.symm (permT id IsReindexing.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
+    - Tensorial.toTensor.symm (permT ![1, 0] IsReindexing.auto
     {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := by
   simp only [toFieldStrength_eq_tensorDeriv hA, map_add, map_neg, sub_eq_add_neg, permT_permT]
   rfl
 
 lemma toTensor_toFieldStrength {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     Tensorial.toTensor (toFieldStrength A x) =
-    (permT id (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
-    - (permT ![1, 0] (PermCond.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ) := by
+    (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ)
+    - (permT ![1, 0] (IsReindexing.auto) {(η d | μ μ' ⊗ A.deriv x | μ' ν)}ᵀ) := by
   rw [toFieldStrength_eq_add]
   simp
 
@@ -199,9 +201,6 @@ lemma toFieldStrength_eq_sum_basis_single {d} {A : ElectromagneticPotential d}
     simp only [zero_mul]
     exact id (Ne.symm hb)
   · simp
-
-TODO "Add a section in this file on the evaluation of the field strength tensor's indices.
-  I.e. equalitites related to `toField {A.toFieldStrength x| [μ] [ν]}ᵀ`."
 
 /-!
 
@@ -368,6 +367,47 @@ lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) �
 
 /-!
 
+#### A.5.1. Index evaluation
+
+These lemmas express the components of the field strength tensor using index evaluation.
+
+-/
+
+/-- Evaluating both tensor indices of the field strength gives the coefficient in the
+standard tensor-product basis. -/
+lemma toFieldStrength_eval_eq_basis_repr {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
+    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr
+      (A.toFieldStrength x) (μ, ν) := by
+  trans (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr
+    (A.toFieldStrength x) (μ, ν)
+  · conv_rhs =>
+      rw [prod_eq_sum_eval Vector.basis_eq_map_tensor_basis
+        Vector.basis_eq_map_tensor_basis (A.toFieldStrength x)]
+    simp [Basis.tensorProduct_repr_tmul_apply, Finsupp.single_apply]
+  · rfl
+
+/-- The evaluated components of the field strength tensor in terms of derivatives of the
+electromagnetic potential. -/
+lemma toFieldStrength_eval_apply {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
+    ∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ) := by
+  rw [toFieldStrength_eval_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply (μν := (μ, ν)) A x
+
+/-- The evaluated components of the field strength tensor after using diagonal form of the
+Minkowski metric. -/
+lemma toFieldStrength_eval_apply_eq_single {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
+    η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ := by
+  rw [toFieldStrength_eval_eq_basis_repr]
+  exact toFieldStrength_basis_repr_apply_eq_single (μν := (μ, ν)) A x
+
+/-!
+
 ### A.6. The field strength matrix
 
 We define the field strength matrix to be the matrix representation of the field strength tensor
@@ -384,6 +424,13 @@ noncomputable abbrev fieldStrengthMatrix {d} (A : ElectromagneticPotential d) (x
 lemma fieldStrengthMatrix_eq {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     A.fieldStrengthMatrix x =
     (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x) := by rfl
+
+/-- Index evaluation of the field strength tensor agrees with the corresponding component of
+the field strength matrix. -/
+lemma toFieldStrength_eval_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d)
+    (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
+    toField {A.toFieldStrength x | [μ] [ν]}ᵀ = A.fieldStrengthMatrix x (μ, ν) := by
+  rw [toFieldStrength_eval_eq_basis_repr, fieldStrengthMatrix_eq]
 
 lemma fieldStrengthMatrix_eq_tensor_basis_repr {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (μ ν : (Fin 1 ⊕ Fin d)) :
@@ -578,7 +625,7 @@ lemma toFieldStrength_add {d} (A1 A2 : ElectromagneticPotential d)
   repeat rw [SpaceTime.deriv_eq]
   simp only [add_val]
   rw [fderiv_add]
-  simp only [ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add]
+  simp only [_root_.add_apply, Lorentz.Vector.apply_add]
   ring
   · exact hA1.differentiableAt
   · exact hA2.differentiableAt
@@ -605,7 +652,7 @@ lemma toFieldStrength_smul {d} (c : ℝ) (A : ElectromagneticPotential d)
   repeat rw [SpaceTime.deriv_eq]
   simp only [smul_val]
   rw [fderiv_const_smul]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, Lorentz.Vector.apply_smul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, Lorentz.Vector.apply_smul]
   ring
   exact hA.differentiableAt
 

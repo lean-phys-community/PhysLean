@@ -51,7 +51,6 @@ def speciesFamilyProj {m n : ℕ} (h : n ≤ m) :
 def familyProjection {m n : ℕ} (h : n ≤ m) : (SMCharges m).Charges →ₗ[ℚ] (SMCharges n).Charges :=
   chargesMapOfSpeciesMap (speciesFamilyProj h)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For species, the embedding of the `m`-family charges onto the `n`-family charges, with all
 other charges zero. -/
 @[simps!]
@@ -64,15 +63,14 @@ def speciesEmbed (m n : ℕ) :
       0
   map_add' S T := by
     funext i
-    simp only [SMSpecies_numberCharges, ACCSystemCharges.chargesAddCommMonoid_add]
+    simp only [ACCSystemCharges.chargesAddCommMonoid_add]
     by_cases hi : i.val < m
     · rw [dif_pos hi, dif_pos hi, dif_pos hi]
     · rw [dif_neg hi, dif_neg hi, dif_neg hi]
       with_unfolding_all rfl
   map_smul' a S := by
     funext i
-    simp only [SMSpecies_numberCharges, HSMul.hSMul, ACCSystemCharges.chargesModule_smul,
-      eq_ratCast, Rat.cast_eq_id, id_eq]
+    simp only [HSMul.hSMul, ACCSystemCharges.chargesModule_smul, eq_ratCast, Rat.cast_eq_id, id_eq]
     by_cases hi : i.val < m
     · rw [dif_pos hi, dif_pos hi]
     · rw [dif_neg hi, dif_neg hi]

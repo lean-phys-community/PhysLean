@@ -103,7 +103,7 @@ lemma comp_of_disjoint
 
 lemma comp_eq_of_inter {A B : Set α} (hA : MeasurableSet A) (hB : MeasurableSet B) :
     μS A ∘L μS B = μS (A ∩ B) := by
-  nth_rw 1 [← inter_union_diff B A, ← inter_union_diff A B]
+  nth_rw 1 [← inter_union_sdiff B A, ← inter_union_sdiff A B]
   simp only [μS.of_union, hA.inter hB, hB.inter hA, hA.diff hB, hB.diff hA,
     disjoint_sdiff_inter.symm, add_comp, comp_add]
   rw [inter_comm B A, μS.comp_of_disjoint disjoint_sdiff_inter (hA.diff hB) (hA.inter hB)]

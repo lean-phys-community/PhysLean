@@ -456,7 +456,7 @@ to `AllowsTerm` and its decidability.
 
 /-- The proposition for which says, given a charge `x` adding a charge `q5` permits the
   existence of a potential term `T` due to the addition of that charge. -/
-def AllowsTermQ5 [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) : Prop :=
+def AllowsTermQ5 (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) : Prop :=
   match T with
   | .μ => false
   | .β =>
@@ -493,7 +493,7 @@ We show that if the type `𝓩` has decidable equality, then the proposition
 potential term `T`.
 
 -/
-instance [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) :
+instance (x : ChargeSpectrum 𝓩) (q5 : 𝓩) (T : PotentialTerm) :
     Decidable (AllowsTermQ5 x q5 T) :=
   match T with
   | .μ => isFalse fun h => by simp [AllowsTermQ5] at h
@@ -759,7 +759,7 @@ to `AllowsTerm` and its decidability.
 
 /-- The proposition for which says, given a charge `x` adding a charge `q5` permits the
   existence of a potential term `T` due to the addition of that charge. -/
-def AllowsTermQ10 [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) : Prop :=
+def AllowsTermQ10 (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) : Prop :=
   match T with
   | .μ => false
   | .β => false
@@ -798,7 +798,7 @@ potential term `T`.
 
 -/
 
-instance [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) :
+instance (x : ChargeSpectrum 𝓩) (q10 : 𝓩) (T : PotentialTerm) :
     Decidable (AllowsTermQ10 x q10 T) :=
   match T with
   | .μ => isFalse fun h => by simp [AllowsTermQ10] at h

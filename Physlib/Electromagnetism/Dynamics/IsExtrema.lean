@@ -135,7 +135,7 @@ lemma isExtrema_iff_tensors {𝓕 : FreeSpace}
     simp only [IsExtrema] at h
     intro x
     have h1 : ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-        (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
+        (permT id (IsReindexing.auto) {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
         - (J x | ν')}ᵀ)) = 0 := by
       funext ν
       have h2 : gradLagrangian 𝓕 A J x ν = 0 := by simp [h]
@@ -427,7 +427,7 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
       1 / 𝓕.ε₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by
       rw [Time.deriv_eq]
       rw [fderiv_fun_sub]
-      simp only [one_div, mul_inv_rev, ContinuousLinearMap.coe_sub', Pi.sub_apply]
+      simp only [one_div, mul_inv_rev, FunLike.coe_sub, Pi.sub_apply]
       rw [fderiv_const_mul (by
         apply Differentiable.fun_sum
         intro j _
@@ -454,7 +454,7 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
       congr
       rw [Time.deriv_eq]
       rw [fderiv_fun_sum]
-      simp only [ContinuousLinearMap.coe_sum', Finset.sum_apply]
+      simp only [FunLike.coe_sum, Finset.sum_apply]
       rfl
       intro i _
       apply Differentiable.differentiableAt

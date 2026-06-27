@@ -7,7 +7,7 @@ module
 
 public import Mathlib.Analysis.InnerProductSpace.Basic
 public import Mathlib.Analysis.Normed.Module.FiniteDimension
-public import Mathlib.Data.Real.StarOrdered
+public import Mathlib.Algebra.Order.Star.Real
 public import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
 
 @[expose] public section

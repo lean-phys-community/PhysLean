@@ -263,7 +263,10 @@ lemma self_parity_eq_zero_iff : ⟪y, (Contr d).ρ LorentzGroup.parity y⟫ₘ =
     simp only [true_iff] at hn
     apply ContrMod.ext
     funext i
-    simpa using congrFun hn i
+    have h1 := congrFun hn i
+    simp only [Pi.zero_apply, mul_eq_zero, or_self] at h1
+    simp only [h1]
+    rfl
   · rw [h]
     simp only [map_zero, tmul_zero]
 
@@ -420,13 +423,14 @@ lemma same_eq_det_toSelfAdjoint (x : ContrMod 3) :
     PauliMatrix.pauliMatrix, PauliMatrix.pauliMatrix, PauliMatrix.pauliMatrix,
     PauliMatrix.pauliMatrix, ContrMod.toSpace,
     ContrMod.toFin1dℝ_eq_val]
-  simp only [Fin.isValue, PiLp.inner_apply, Function.comp_apply, RCLike.inner_apply, conj_trivial,
-    Fin.sum_univ_three, ofReal_sub, ofReal_mul, ofReal_add, smul_of, smul_cons, smul_zero,
-    real_smul, mul_one, smul_empty, smul_neg, sub_apply, smul_apply, one_apply_eq, of_apply,
-    cons_val', cons_val_zero, cons_val_fin_one, sub_zero, cons_val_one, sub_neg_eq_add, ne_eq,
-    zero_ne_one, not_false_eq_true, one_apply_ne, zero_sub, one_ne_zero]
+  simp only [Fin.isValue, PiLp.inner_apply, Fin.sum_univ_three, ofReal_sub, ofReal_mul, smul_of,
+    smul_cons, smul_zero, real_smul, mul_one, smul_empty, smul_neg, Matrix.sub_apply,
+    Matrix.smul_apply, one_apply_eq, of_apply, cons_val', cons_val_zero, cons_val_fin_one, sub_zero,
+    cons_val_one, sub_neg_eq_add, ne_eq, zero_ne_one, not_false_eq_true, one_apply_ne, zero_sub,
+    one_ne_zero]
   ring_nf
-  simp only [Fin.isValue, I_sq, mul_neg, mul_one, sub_left_inj]
+  simp only [Fin.isValue, Function.comp_apply, inner_self_eq_norm_sq_to_K, Real.norm_eq_abs,
+    RCLike.ofReal_real_eq_id, id_eq, sq_abs, ofReal_add, ofReal_pow, I_sq, mul_neg, mul_one]
   ring
 
 end contrContrContractField

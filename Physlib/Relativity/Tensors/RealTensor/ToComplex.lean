@@ -512,8 +512,7 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
     (v : ℝT(3, c)) (Λ : SL(2, ℂ)) :
     Λ • (toComplex v) = toComplex (Lorentz.SL2C.toLorentzGroup Λ • v) := by
   induction' v using induction_on_pure with p r t h t1 t2
-  · simp only
-    rw [actionT_pure, toComplex_pure, actionT_pure, actionP_toComplexPure, toComplex_pure]
+  · rw [actionT_pure, toComplex_pure, actionT_pure, actionP_toComplexPure, toComplex_pure]
   · simp
     rw [← h]
     change Λ • (r : ℂ) • toComplex t = _
@@ -526,16 +525,16 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
 ## C. Compatibility with permutations: `permT`
 
 We first show that complexification is compatible with permutation of tensor
-slots. On colours this is encoded in the `PermCond` predicate, and on tensors
+slots. On colours this is encoded in the `IsReindexing` predicate, and on tensors
 by the operator `permT`.
 
 -/
 
-/-- The `PermCond` condition is preserved under `colorToComplex`. -/
-@[simp] lemma permCond_colorToComplex {n m : ℕ}
+/-- The `IsReindexing` condition is preserved under `colorToComplex`. -/
+@[simp] lemma isReindexing_colorToComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) :
-    PermCond (colorToComplex ∘ c) (colorToComplex ∘ c1) σ := by
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) :
+    IsReindexing (colorToComplex ∘ c) (colorToComplex ∘ c1) σ := by
   refine And.intro h.1 ?_
   intro i
   simpa [Function.comp_apply] using congrArg colorToComplex (h.2 i)
@@ -543,7 +542,7 @@ by the operator `permT`.
 /-- `permT` sends basis vectors to basis vectors. -/
 @[simp] lemma permT_basis_real {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (b : ComponentIdx (S := realLorentzTensor) c) :
     permT (S := realLorentzTensor) σ h ((Tensor.basis (S := realLorentzTensor) c) b)
     = (Tensor.basis (S := realLorentzTensor) c1)
@@ -553,7 +552,7 @@ by the operator `permT`.
 
 @[simp] lemma permT_basis_complex {n m : ℕ}
     {c : Fin n → complexLorentzTensor.Color} {c1 : Fin m → complexLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (b : ComponentIdx (S := complexLorentzTensor) c) :
     permT (S := complexLorentzTensor) σ h ((Tensor.basis (S := complexLorentzTensor) c) b)
       =
@@ -571,14 +570,14 @@ by the operator `permT`.
 lemma permT_toComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color}
     {c1 : Fin m → realLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ) (t : ℝT(3, c)) :
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (t : ℝT(3, c)) :
     toComplex (permT (S := realLorentzTensor) σ h t)
       =
-    permT (S := complexLorentzTensor) σ (permCond_colorToComplex (c := c) (c1 := c1) h)
+    permT (S := complexLorentzTensor) σ (isReindexing_colorToComplex (c := c) (c1 := c1) h)
       (toComplex (c := c) t) := by
   classical
-  let h' : PermCond (colorToComplex ∘ c) (colorToComplex ∘ c1) σ :=
-    permCond_colorToComplex (c := c) (c1 := c1) h
+  let h' : IsReindexing (colorToComplex ∘ c) (colorToComplex ∘ c1) σ :=
+    isReindexing_colorToComplex (c := c) (c1 := c1) h
   let P : ℝT(3, c) → Prop := fun t =>
     toComplex (permT (S := realLorentzTensor) σ h t)
       =
@@ -626,14 +625,14 @@ lemma colorToComplex_append {n m : ℕ}
   · -- right case: x = natAdd n j
     simp [Fin.append, Function.comp_apply]
 
-lemma permCond_prodTColorToComplex {n m : ℕ}
+lemma isReindexing_prodTColorToComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color} :
-    PermCond (Fin.append (colorToComplex ∘ c) (colorToComplex ∘ c1))
+    IsReindexing (Fin.append (colorToComplex ∘ c) (colorToComplex ∘ c1))
       (colorToComplex ∘ Fin.append c c1)
       (id : Fin (n + m) → Fin (n + m)) := by
-  -- For `σ = id`, `PermCond.on_id` reduces the goal to pointwise color equality.
+  -- For `σ = id`, `IsReindexing.on_id` reduces the goal to pointwise color equality.
   -- Here that equality is exactly `colorToComplex_append`.
-  apply (PermCond.on_id
+  apply (IsReindexing.on_id
     (c := Fin.append (colorToComplex ∘ c) (colorToComplex ∘ c1))
     (c1 := colorToComplex ∘ Fin.append c c1)).2
   intro x
@@ -650,7 +649,7 @@ noncomputable def prodTColorToComplex {n m : ℕ}
     ℂT(colorToComplex ∘ c) → ℂT(colorToComplex ∘ c1) → ℂT(colorToComplex ∘ Fin.append c c1) :=
   fun x y =>
     permT (S := complexLorentzTensor) (σ := (id : Fin (n + m) → Fin (n + m)))
-      (permCond_prodTColorToComplex (c := c) (c1 := c1))
+      (isReindexing_prodTColorToComplex (c := c) (c1 := c1))
       (prodT (S := complexLorentzTensor) x y)
 
 private lemma cast_componentIdx_apply {n : ℕ} {c c' : Fin n → complexLorentzTensor.Color}
@@ -706,81 +705,22 @@ lemma prodT_toComplex {n m : ℕ}
     prodTColorToComplex (c := c) (c1 := c1)
       (toComplex (c := c) t) (toComplex (c := c1) t1) := by
   classical
-  -- Induction on the first tensor using the tensor basis.
-  let P : ℝT(3, c) → Prop := fun t =>
-    ∀ t1 : ℝT(3, c1),
-      toComplex (c := Fin.append c c1) (prodT (S := realLorentzTensor) t t1)
-        =
-      prodTColorToComplex (c := c) (c1 := c1)
-        (toComplex (c := c) t) (toComplex (c := c1) t1)
-  have hP : P t := by
-    -- `induction_on_basis` over the first tensor.
-    apply
-      induction_on_basis
-        (c := c)
-        (P := P)
-        (t := t)
-    · -- basis case for the first tensor and we must show the property for all `t1`
-      intro b t1
-      -- Define the property on the second tensor, with the first fixed to a basis vector.
-      let P1 : ℝT(3, c1) → Prop := fun t1' =>
-        toComplex (c := Fin.append c c1)
-            (prodT (S := realLorentzTensor)
-              ((Tensor.basis (S := realLorentzTensor) c) b) t1')
-          =
-        prodTColorToComplex (c := c) (c1 := c1)
-          (toComplex (c := c) ((Tensor.basis (S := realLorentzTensor) c) b))
-          (toComplex (c := c1) t1')
-      have hP1 : P1 t1 := by
-        -- Induction on the second tensor using the tensor basis.
-        apply
-          induction_on_basis
-            (c := c1)
-            (P := P1)
-            (t := t1)
-        · -- basis case for the second tensor
-          intro b1
-          -- Unfold `P1` and compute both sides explicitly on pure basis tensors.
-          dsimp [P1]
-          simp (config := { failIfUnchanged := false })
-            [prodTColorToComplex,
-            prodT_pure,
-            permT_pure,
-            Pure.prodP_basisVector,
-            Pure.permP_basisVector,
-            Tensor.basis_apply,
-            toComplex_pure_basisVector,
-            colorToComplex_append,
-            basisIdxCongr_eq_cast]
-        · -- zero tensor in the second argument
-          simp [P1, prodTColorToComplex]
-        · -- scalar multiplication in the second argument
-          intro r t1' ht'
-          dsimp [P1] at ht' ⊢
-          refine (by
-            simp [map_smul, ht', prodTColorToComplex])
-        · -- addition in the second argument
-          intro t1' t2' h1 h2
-          dsimp [P1] at h1 h2 ⊢
-          refine (by
-            simp [map_add, h1, h2, prodTColorToComplex])
-      -- Apply the resulting property to `t1`.
-      exact hP1
-    · -- zero tensor in the first argument
-      intro t1
-      simp [prodTColorToComplex]
-    · -- scalar multiplication in the first argument
-      intro r t ht t1
-      dsimp [P] at ht ⊢
-      refine (by
-        simp [map_smul, ht, prodTColorToComplex])
-    · -- addition in the first argument
-      intro t1 t2 h1 h2 t1'
-      dsimp [P] at h1 h2 ⊢
-      refine (by
-        simp [map_add, h1 t1', h2 t1', prodTColorToComplex])
-  -- Apply the resulting property to `t1`.
-  exact hP t1
+  -- Double induction on the tensor basis: first over `t`, then over `t1`. The zero, scalar and
+  -- additive cases follow from linearity of `prodT`, `toComplex` and `prodTColorToComplex`.
+  induction t using induction_on_basis with
+  | h b =>
+    induction t1 using induction_on_basis with
+    | h b1 =>
+      simp (config := { failIfUnchanged := false })
+        [prodTColorToComplex, prodT_pure, permT_pure, Pure.prodP_basisVector,
+          Pure.permP_basisVector, Tensor.basis_apply, toComplex_pure_basisVector,
+          colorToComplex_append, basisIdxCongr_eq_cast]
+    | hzero => simp [prodTColorToComplex]
+    | hsmul r ta hta => simp [map_smul, hta, prodTColorToComplex]
+    | hadd ta tb hta htb => simp [map_add, hta, htb, prodTColorToComplex]
+  | hzero => simp [prodTColorToComplex]
+  | hsmul r ta hta => simp [map_smul, hta, prodTColorToComplex]
+  | hadd ta tb hta htb => simp [map_add, hta, htb, prodTColorToComplex]
 
 /-!
 

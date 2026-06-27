@@ -40,8 +40,10 @@ lemma B₀_cubic (S T : (SM 3).Charges) : cubeTriLin B₀ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, zero_mul, Nat.reduceMod,
-    Nat.mod_succ, Fin.sum_univ_three, Fin.zero_eta, one_mul, Fin.mk_one, neg_mul, mul_neg,
-    Fin.reduceFinMk]
+    Fin.mk_eq_zero, Nat.div_eq_zero_iff, OfNat.ofNat_ne_zero, false_or, imp_false, isEmpty_Prop,
+    not_lt, le_add_iff_nonneg_left, zero_le, IsEmpty.forall_iff, Fin.mk_eq_one, Nat.mod_succ,
+    Fin.sum_univ_three, Nat.zero_div, Fin.zero_eta, one_mul, Nat.reduceDiv, Fin.mk_one, neg_mul,
+    mul_neg, Fin.reduceFinMk]
   ring
 
 /-- A charge assignment forming one of the basis elements of the plane. -/
@@ -58,8 +60,8 @@ lemma B₁_cubic (S T : (SM 3).Charges) : cubeTriLin B₁ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, Nat.reduceMod, Nat.mod_succ,
-    Fin.sum_univ_three, Fin.zero_eta, zero_mul, zero_add, Fin.reduceFinMk, one_mul, Fin.mk_one,
-    Nat.reduceAdd, neg_mul, mul_neg]
+    Fin.sum_univ_three, Nat.zero_div, Fin.zero_eta, zero_mul, zero_add, Fin.mk_one, Fin.reduceFinMk,
+    one_mul, Nat.reduceDiv, Nat.reduceAdd, neg_mul, mul_neg]
   ring
 
 /-- A charge assignment forming one of the basis elements of the plane. -/
@@ -76,8 +78,8 @@ lemma B₂_cubic (S T : (SM 3).Charges) : cubeTriLin B₂ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, Nat.reduceMod, Nat.mod_succ,
-    Fin.sum_univ_three, Fin.zero_eta, zero_mul, zero_add, Fin.reduceFinMk, one_mul, Fin.mk_one,
-    Nat.reduceAdd, neg_mul, mul_neg]
+    Fin.sum_univ_three, Nat.zero_div, Fin.zero_eta, zero_mul, zero_add, Fin.mk_one, Fin.reduceFinMk,
+    Nat.reduceDiv, one_mul, Nat.reduceAdd, neg_mul, mul_neg]
   ring
 
 /-- A charge assignment forming one of the basis elements of the plane. -/
@@ -94,8 +96,8 @@ lemma B₃_cubic (S T : (SM 3).Charges) : cubeTriLin B₃ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, Nat.reduceMod, Nat.mod_succ,
-    Fin.sum_univ_three, Fin.zero_eta, zero_mul, zero_add, Fin.reduceFinMk, one_mul, Fin.mk_one,
-    Nat.reduceAdd, neg_mul, mul_neg]
+    Fin.sum_univ_three, Nat.zero_div, Fin.zero_eta, zero_mul, zero_add, Fin.mk_one, Fin.reduceFinMk,
+    Nat.reduceDiv, one_mul, Nat.reduceAdd, neg_mul, mul_neg]
   ring_nf
 
 /-- A charge assignment forming one of the basis elements of the plane. -/
@@ -112,8 +114,8 @@ lemma B₄_cubic (S T : (SM 3).Charges) : cubeTriLin B₄ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, Nat.reduceMod, Nat.mod_succ,
-    Fin.sum_univ_three, Fin.zero_eta, zero_mul, zero_add, Fin.reduceFinMk, one_mul, Fin.mk_one,
-    Nat.reduceAdd, neg_mul]
+    Fin.sum_univ_three, Nat.zero_div, Fin.zero_eta, zero_mul, zero_add, Fin.mk_one, Fin.reduceFinMk,
+    Nat.reduceDiv, one_mul, Nat.reduceAdd, neg_mul]
   ring_nf
 
 /-- A charge assignment forming one of the basis elements of the plane. -/
@@ -130,8 +132,8 @@ lemma B₅_cubic (S T : (SM 3).Charges) : cubeTriLin B₅ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, Nat.reduceMod, Nat.mod_succ,
-    Fin.sum_univ_three, Fin.zero_eta, zero_mul, zero_add, Fin.reduceFinMk, one_mul, Fin.mk_one,
-    Nat.reduceAdd, neg_mul]
+    Fin.sum_univ_three, Nat.zero_div, Fin.zero_eta, zero_mul, zero_add, Fin.mk_one, Fin.reduceFinMk,
+    Nat.reduceDiv, one_mul, Nat.reduceAdd, neg_mul]
   ring_nf
 
 /-- A charge assignment forming one of the basis elements of the plane. -/
@@ -148,8 +150,8 @@ lemma B₆_cubic (S T : (SM 3).Charges) : cubeTriLin B₆ S T =
     toSpeciesEquiv_apply, Nat.reduceMul, finProdFinEquiv, Fin.divNat, Fin.modNat, Equiv.coe_fn_mk,
     Fin.coe_ofNat_eq_mod, Nat.zero_mod, mul_zero, add_zero, toSpeciesEquiv_symm_apply, Nat.one_mod,
     mul_one, Nat.ofNat_pos, Nat.add_div_right, Nat.add_mod_right, Nat.reduceMod, Nat.mod_succ,
-    Fin.sum_univ_three, Fin.zero_eta, zero_mul, zero_add, Fin.reduceFinMk, Fin.mk_one,
-    Nat.reduceAdd, one_mul, neg_mul, mul_neg]
+    Fin.sum_univ_three, Nat.zero_div, Fin.zero_eta, zero_mul, zero_add, Fin.mk_one, Fin.reduceFinMk,
+    Nat.reduceDiv, Nat.reduceAdd, one_mul, neg_mul, mul_neg]
   ring_nf
 
 TODO "Remove the definitions of elements `(SM 3).Charges` B₀, B₁ etc, here are
@@ -300,17 +302,18 @@ theorem basis_linear_independent : LinearIndependent ℚ B := by
     ACCSystemCharges.chargesModule_smul] at h0 h1 h2 h3 h4 h5 h6
   rw [B₀, B₁, B₂, B₃, B₄, B₅, B₆] at h0 h1 h2 h3 h4 h5 h6
   simp only [Fin.isValue, Equiv.invFun_as_coe, toSpeciesEquiv_symm_apply, Fin.divNat, Nat.reduceMul,
-    Fin.val_zero, Nat.zero_div, Fin.zero_eta, Fin.modNat, Nat.zero_mod, mul_one, mul_zero, add_zero,
-    zero_add,] at h0 h1 h2 h3 h4 h5 h6
+    Fin.coe_ofNat_eq_mod, Nat.zero_mod, Nat.zero_div, Fin.zero_eta, Fin.modNat, mul_one, mul_zero,
+    add_zero, Nat.reduceMod, Nat.ofNat_pos, Nat.div_self, Fin.mk_one, Nat.mod_self, zero_add,
+    Nat.reduceDiv, Fin.reduceFinMk] at h0 h1 h2 h3 h4 h5 h6
   intro i
   match i with
-  | 0 => exact h0
-  | 1 => exact h1
-  | 2 => exact h2
-  | 3 => exact h3
-  | 4 => exact h4
-  | 5 => exact h5
-  | 6 => exact h6
+  | ⟨0, _⟩ => exact h0
+  | ⟨1, _⟩ => exact h1
+  | ⟨2, _⟩ => exact h2
+  | ⟨3, _⟩ => exact h3
+  | ⟨4, _⟩ => exact h4
+  | ⟨5, _⟩ => exact h5
+  | ⟨6, _⟩ => exact h6
 
 end PlaneSeven
 

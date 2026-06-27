@@ -115,18 +115,16 @@ theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols
   intro i j
   by_cases hij : i ≠ j
   · exact linesInPlane_eq_sq hS i j hij
-  · simp only [Nat.succ_eq_add_one, PureU1_numberCharges, ne_eq, Decidable.not_not] at hij
+  · simp only [Nat.succ_eq_add_one, ne_eq, Decidable.not_not] at hij
     rw [hij]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma linesInPlane_four (S : (PureU1 4).Sols) (hS : LineInPlaneCond S.1.1) :
     ConstAbsProp (S.val (0 : Fin 4), S.val (1 : Fin 4)) := by
   simp only [ConstAbsProp, Fin.isValue]
   by_contra hn
   have hLin := pureU1_linear S.1.1
   have hcube := pureU1_cube S
-  simp only [PureU1_numberCharges] at hLin hcube
-  rw [Fin.sum_univ_four] at hLin hcube
+  erw [Fin.sum_univ_four] at hLin hcube
   rw [sq_eq_sq_iff_eq_or_eq_neg] at hn
   simp only [Fin.isValue, not_or] at hn
   have l012 := hS 0 1 2 (ne_of_beq_false rfl) (ne_of_beq_false rfl) (ne_of_beq_false rfl)
@@ -175,7 +173,7 @@ lemma linesInPlane_constAbs_four (S : (PureU1 4).Sols)
   intro i j
   by_cases hij : i ≠ j
   · exact linesInPlane_eq_sq_four hS i j hij
-  · simp only [PureU1_numberCharges, ne_eq, Decidable.not_not] at hij
+  · simp only [ne_eq, Decidable.not_not] at hij
     rw [hij]
 
 theorem linesInPlane_constAbs_AF (S : (PureU1 (n.succ.succ.succ.succ)).Sols)

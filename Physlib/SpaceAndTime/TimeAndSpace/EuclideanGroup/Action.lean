@@ -22,10 +22,13 @@ the time coordinate and acts on the space coordinate by the usual Euclidean-grou
 - `TimeAndSpace.instMulActionEuclideanGroup` : The action of the Euclidean group on
   `TimeAndSpace d`.
 - `TimeAndSpace.dist_smul` : The Euclidean group action on `TimeAndSpace d` preserves distance.
+- `TimeAndSpace.smul_hasTemperateGrowth` : The Euclidean group action has temperate growth.
+- `TimeAndSpace.antilipschitz_smul` : The Euclidean group action is antilipschitz.
 
 ## iii. Table of contents
 
 - A. The Euclidean group action
+- B. Temperate growth of the coordinate action
 
 ## iv. References
 
@@ -94,5 +97,56 @@ lemma dist_smul (g : EuclideanGroup d) (tx ty : TimeAndSpace d) :
   rcases ty with ⟨t', x'⟩
   show dist ((t, g • x) : TimeAndSpace d) (t', g • x') = dist (t, x) (t', x')
   rw [Prod.dist_eq, Prod.dist_eq, EuclideanGroup.dist_smul]
+
+/-!
+
+## B. Temperate growth of the coordinate action
+
+-/
+
+/-- The linear part of the Euclidean-group action on `TimeAndSpace d`. -/
+noncomputable def actionLinearMap (g : EuclideanGroup d) :
+    TimeAndSpace d →L[ℝ] TimeAndSpace d :=
+  ContinuousLinearMap.prod (ContinuousLinearMap.fst ℝ Time (Space d))
+    (Space.basis.repr.symm.toContinuousLinearMap.comp
+      ((EuclideanGroup.orthogonalToLinearIsometryEquiv g.linear).toContinuousLinearMap.comp
+        (Space.basis.repr.toContinuousLinearMap.comp
+          (ContinuousLinearMap.snd ℝ Time (Space d)))))
+
+/-- The translation part of the Euclidean-group action on `TimeAndSpace d`. -/
+noncomputable def actionTranslation (g : EuclideanGroup d) : TimeAndSpace d :=
+  (0, Space.basis.repr.symm g.translation)
+
+lemma smul_eq_actionLinearMap_add (g : EuclideanGroup d) (tx : TimeAndSpace d) :
+    g • tx = actionLinearMap g tx + actionTranslation g := by
+  refine Prod.ext ?_ ?_
+  · simp [actionLinearMap, actionTranslation]
+  · ext i
+    have hx : tx.2 -ᵥ (0 : Space d) = Space.basis.repr tx.2 := by
+      ext j
+      simp [Space.vsub_apply, Space.zero_apply, Space.basis_repr_apply]
+    rw [TimeAndSpace.snd_smul, EuclideanGroup.smul_apply]
+    simp [actionLinearMap, actionTranslation, hx, Space.add_apply, Space.basis_repr_symm_apply]
+
+/-- The Euclidean-group action on `TimeAndSpace d` has temperate growth. -/
+lemma smul_hasTemperateGrowth (g : EuclideanGroup d) :
+    Function.HasTemperateGrowth (fun tx : TimeAndSpace d => g • tx) := by
+  have hfun : (fun tx : TimeAndSpace d => g • tx) =
+      fun tx => actionLinearMap g tx + actionTranslation g := by
+    funext tx
+    exact smul_eq_actionLinearMap_add g tx
+  rw [hfun]
+  exact Function.HasTemperateGrowth.add (actionLinearMap g).hasTemperateGrowth
+    (Function.HasTemperateGrowth.const (actionTranslation g))
+
+/-- The Euclidean-group action on `TimeAndSpace d` is an isometry. -/
+lemma isometry_smul (g : EuclideanGroup d) :
+    Isometry (fun tx : TimeAndSpace d => g • tx) :=
+  Isometry.of_dist_eq (TimeAndSpace.dist_smul g)
+
+/-- The Euclidean-group action on `TimeAndSpace d` is antilipschitz. -/
+lemma antilipschitz_smul (g : EuclideanGroup d) :
+    AntilipschitzWith 1 (fun tx : TimeAndSpace d => g • tx) :=
+  (isometry_smul g).antilipschitz
 
 end TimeAndSpace

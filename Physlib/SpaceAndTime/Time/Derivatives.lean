@@ -139,7 +139,7 @@ lemma deriv_div {c g : Time → ℝ}
   repeat rw [Time.deriv_eq]
   ring_nf
   simp [fderiv_fun_mul hc (DifferentiableAt.fun_inv (by fun_prop) hgz),
-    fderiv_comp' t (differentiableAt_inv hgz) hg]
+    fderiv_fun_comp t (differentiableAt_inv hgz) hg]
   field_simp
   ring
 
@@ -209,7 +209,7 @@ lemma deriv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
   rw [deriv_eq]
   change fderiv ℝ (EuclideanSpace.proj μ ∘ fun x => f x) t 1 = _
   rw [fderiv_comp]
-  · simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+  · simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
     PiLp.proj_apply]
     rw [← deriv_eq]
   · fun_prop

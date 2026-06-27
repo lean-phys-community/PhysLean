@@ -83,7 +83,7 @@ noncomputable def gradKineticTerm {d} (𝓕 : FreeSpace) :
     cont := by fun_prop}
   map_add' A1 A2 := by
     ext1 ε
-    simp only [one_div, map_add, ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add,
+    simp only [one_div, map_add, add_apply, Lorentz.Vector.apply_add,
       ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
     rw [← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl (fun ν _ => ?_)
@@ -93,7 +93,7 @@ noncomputable def gradKineticTerm {d} (𝓕 : FreeSpace) :
     ring_nf
   map_smul' r A := by
     ext1 ε
-    simp only [one_div, map_smul, ContinuousLinearMap.smul_apply, Lorentz.Vector.apply_smul,
+    simp only [one_div, map_smul, _root_.smul_apply, Lorentz.Vector.apply_smul,
       ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
     simp [Finset.smul_sum, smul_smul]
     apply Finset.sum_congr rfl (fun ν _ => ?_)
@@ -186,11 +186,11 @@ attribute [-simp] Nat.reduceAdd Nat.reduceSucc Fin.isValue in
 lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) (ν : Fin 1 ⊕ Fin d) :
     A.gradKineticTerm 𝓕 ε ν = η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) •
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) •
     distTensorDeriv A.fieldStrength ε | κ κ ν'}ᵀ)) ν := by
   trans η ν ν * (Lorentz.Vector.basis.repr
     ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength ε | κ κ ν'}ᵀ))) ν
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength ε | κ κ ν'}ᵀ))) ν
   swap
   · rfl
   simp [Lorentz.Vector.basis_eq_map_tensor_basis]

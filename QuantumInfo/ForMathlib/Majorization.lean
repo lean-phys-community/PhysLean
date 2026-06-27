@@ -269,7 +269,7 @@ lemma compoundMatrix_diagonal (f : d → ℂ) (k : ℕ) :
     -- Since the row corresponding to $i$ in the submatrix is all zeros, the determinant of this submatrix is zero.
     have h_det_zero : Matrix.det (Matrix.of (fun i j => if (S.val.orderEmbOfFin S.2 i) = (T.val.orderEmbOfFin T.2 j) then f (T.val.orderEmbOfFin T.2 j) else 0) : Matrix (Fin k) (Fin k) ℂ) = 0 := by
       rw [Matrix.det_eq_zero_of_row_eq_zero j]; aesop
-    convert h_det_zero using 1
+    exact h_det_zero
 
 /-- The compound matrix of a unitary matrix is unitary. -/
 lemma compoundMatrix_unitary (U : Matrix d d ℂ)
@@ -277,7 +277,7 @@ lemma compoundMatrix_unitary (U : Matrix d d ℂ)
     compoundMatrix U k ∈ Matrix.unitaryGroup {S : Finset d // S.card = k} ℂ := by
   rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose,
     ← compoundMatrix_conjTranspose, ← compoundMatrix_mul,
-    show Uᴴ * U = 1 by simpa using Matrix.mem_unitaryGroup_iff'.mp hU]
+    show Uᴴ * U = 1 by exact Matrix.mem_unitaryGroup_iff'.mp hU]
   simpa using compoundMatrix_diagonal (1 : d → ℂ) k
 
 /-- The `k`-th compound matrix bundled as a unitary. -/
@@ -719,7 +719,7 @@ lemma quadratic_form_le_singularValuesSorted_sq {e : Type*} [Fintype e] [Decidab
     simp [Matrix.IsHermitian]) h v)
   apply_rules [mul_le_mul_of_nonneg_right, Finset.sup'_le]
   · intro i _
-    convert eigenvalue_le_singularValuesSorted_sq A h i using 1
+    convert! eigenvalue_le_singularValuesSorted_sq A h i using 1
     simp [Matrix.conjTranspose_conjTranspose]
   · simp [dotProduct]
     exact Finset.sum_nonneg fun _ _ => add_nonneg (mul_self_nonneg _) (mul_self_nonneg _)

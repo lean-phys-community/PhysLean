@@ -347,7 +347,9 @@ lemma crAnTimeOrderList_swap_eq_time {φ ψ : 𝓕.CrAnFieldOp}
     · have h1' (b : 𝓕.CrAnFieldOp) : (crAnTimeOrderRel φ b) ↔ (crAnTimeOrderRel ψ b) :=
         Iff.intro (fun h => IsTrans.trans _ _ _ h2 h) (fun h => IsTrans.trans _ _ _ h1 h)
       simp only [← h1', decide_not]
-      simpa using orderedInsert_swap_eq_time h2 h1 _
+      have h2 := orderedInsert_swap_eq_time h2 h1
+      simp_all
+      exact (List.append_left_inj _).mpr rfl
   | φ'' :: φs, φs' => by
     rw [crAnTimeOrderList, crAnTimeOrderList]
     simp only [List.cons_append, List.insertionSort_cons]

@@ -7,7 +7,7 @@ module
 
 public import Physlib.Electromagnetism.Distributional.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The Field Strength Tensor
@@ -66,14 +66,14 @@ attribute [-simp] Nat.succ_eq_add_one
 noncomputable def fieldStrengthAux {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) : Lorentz.Vector d ⊗[ℝ] Lorentz.Vector d :=
   Tensorial.toTensor.symm
-      (permT id (PermCond.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν) + -
+      (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν) + -
       (η d | ν ν' ⊗ distTensorDeriv A ε | ν' μ)}ᵀ)
 
 lemma fieldStrengthAux_eq_add {d} (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) :
     fieldStrengthAux A ε =
     Tensorial.toTensor.symm
-      (permT id (PermCond.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
-    - Tensorial.toTensor.symm (permT ![1, 0] (PermCond.auto)
+      (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
+    - Tensorial.toTensor.symm (permT ![1, 0] (IsReindexing.auto)
       {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ) := by
   rw [fieldStrengthAux]
   simp only [map_add, map_neg]
@@ -86,8 +86,8 @@ lemma fieldStrengthAux_eq_add {d} (A : DistElectromagneticPotential d) (ε : �
 lemma toTensor_fieldStrengthAux {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
     Tensorial.toTensor (fieldStrengthAux A ε) =
-    (permT id (PermCond.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
-    - (permT ![1, 0] (PermCond.auto)
+    (permT id (IsReindexing.auto) {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ)
+    - (permT ![1, 0] (IsReindexing.auto)
       {(η d | μ μ' ⊗ distTensorDeriv A ε | μ' ν)}ᵀ) := by
   rw [fieldStrengthAux_eq_add]
   simp
@@ -219,7 +219,7 @@ noncomputable def fieldStrength {d} :
     apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
     ext μν
     simp only [ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk,
-      fieldStrengthAux_basis_repr_apply_eq_single, map_add, ContinuousLinearMap.add_apply,
+      fieldStrengthAux_basis_repr_apply_eq_single, map_add, add_apply,
       Lorentz.Vector.apply_add, Finsupp.coe_add, Pi.add_apply]
     ring
   map_smul' c A := by
@@ -227,7 +227,7 @@ noncomputable def fieldStrength {d} :
     apply (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr.injective
     ext μν
     simp only [ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk,
-      fieldStrengthAux_basis_repr_apply_eq_single, map_smul, ContinuousLinearMap.coe_smul',
+      fieldStrengthAux_basis_repr_apply_eq_single, map_smul, FunLike.coe_smul,
       Pi.smul_apply, Lorentz.Vector.apply_smul, Real.ringHom_apply, Finsupp.coe_smul, smul_eq_mul]
     ring
 

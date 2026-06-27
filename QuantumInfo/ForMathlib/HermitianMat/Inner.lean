@@ -167,7 +167,7 @@ theorem inner_eq_re_trace : ⟪A, B⟫ = RCLike.re (A.mat * B.mat).trace := by
 
 theorem inner_eq_trace_rc : ⟪A, B⟫ = (A.mat * B.mat).trace := by
   rw [inner_eq_re_trace, ← RCLike.conj_eq_iff_re]
-  convert (Matrix.trace_conjTranspose (A.mat * B.mat)).symm using 1
+  convert! (Matrix.trace_conjTranspose (A.mat * B.mat)).symm using 1
   rw [Matrix.conjTranspose_mul, A.H, B.H, Matrix.trace_mul_comm]
 
 theorem inner_self_nonneg: 0 ≤ ⟪A, A⟫ := by
@@ -214,85 +214,42 @@ private theorem inner_zero_iff_aux_lemma [DecidableEq n] (hA₁ : A.mat.PosSemid
   RCLike.re (A.val * B.val).trace = 0 ↔
     LinearMap.range (Matrix.toEuclideanLin A.val) ≤
       LinearMap.ker (Matrix.toEuclideanLin B.val) := by
+  -- The kernel inclusion `range ≤ ker` says `(toEuclideanLin B) ∘ (toEuclideanLin A) = 0`, i.e.
+  -- `B * A = 0`, which by Hermitianness of `A` and `B` is `A * B = 0`.
+  rw [LinearMap.range_le_ker_iff,
+    show Matrix.toEuclideanLin B.val ∘ₗ Matrix.toEuclideanLin A.val
+        = Matrix.toEuclideanLin (B.val * A.val) from by
+      ext v; simp [Matrix.toLpLin_apply, Matrix.mulVec_mulVec, Matrix.toEuclideanLin],
+    LinearEquiv.map_eq_zero_iff,
+    show B.val * A.val = (A.val * B.val).conjTranspose from by simp [Matrix.conjTranspose_mul],
+    Matrix.conjTranspose_eq_zero]
+  -- Factoring `A = Cᴴ C` and `B = Dᴴ D`, a cyclic trace identity gives `tr (A * B) = tr (Eᴴ E)`
+  -- where `E = D Cᴴ`, so `re (tr (A * B)) = 0` forces `E = 0` and hence `A * B = 0`.
   open MatrixOrder in
-  --Thanks Aristotle
-  have h_trace_zero : (RCLike.re ((A.val * B.val).trace)) = 0 ↔ (A.val * B.val) = 0 := by
-    -- Since $A$ and $B$ are positive semidefinite, we can write them as $A = C^* C$ and $B = D^* D$ for some matrices $C$ and $D$.
-    obtain ⟨C, hC⟩ : ∃ C : Matrix n n 𝕜, A.val = C.conjTranspose * C := by
-      rw [← Matrix.nonneg_iff_posSemidef] at hA₁
-      exact CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hA₁
-    obtain ⟨D, hD⟩ : ∃ D : Matrix n n 𝕜, B.val = D.conjTranspose * D := by
-      erw [← Matrix.nonneg_iff_posSemidef] at hB₁
-      exact CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hB₁
-    have h_trace_zero_iff : (RCLike.re ((A.val * B.val).trace)) = 0 ↔ (D * C.conjTranspose) = 0 := by
-      -- Since $\operatorname{Tr}((DC)^* DC) = \sum_{i,j} |(DC)_{ij}|^2$, and this sum is zero if and only if each term is zero, we have $\operatorname{Tr}((DC)^* DC) = 0$ if and only if $DC = 0$.
-      have h_trace_zero_iff : (RCLike.re ((D * C.conjTranspose).conjTranspose * (D * C.conjTranspose)).trace) = 0 ↔ (D * C.conjTranspose) = 0 := by
-        have h_trace_zero_iff : ∀ (M : Matrix n n 𝕜), (RCLike.re (M.conjTranspose * M).trace) = 0 ↔ M = 0 := by
-          simp [ Matrix.trace, Matrix.mul_apply ];
-          intro M
-          -- simp_all only
-          obtain ⟨val, property⟩ := A
-          obtain ⟨val_1, property_1⟩ := B
-          subst hD hC
-          apply Iff.intro
-          · intro a
-            rw [ Finset.sum_eq_zero_iff_of_nonneg fun i _ => Finset.sum_nonneg fun j _ => add_nonneg ( mul_self_nonneg _ ) ( mul_self_nonneg _ )] at a
-            ext i j
-            specialize a j
-            rw [ Finset.sum_eq_zero_iff_of_nonneg fun _ _ => add_nonneg ( mul_self_nonneg _ ) ( mul_self_nonneg _ ) ] at a
-            simp_all only [Finset.mem_univ, forall_const, Matrix.zero_apply]
-            exact RCLike.ext ( by norm_num; nlinarith only [ a i ] ) ( by norm_num; nlinarith only [ a i ] );
-          · intro a
-            subst a
-            simp_all only [Matrix.zero_apply, map_zero, mul_zero, add_zero, Finset.sum_const_zero]
-        exact h_trace_zero_iff _;
-      convert h_trace_zero_iff using 3
-      simp [ Matrix.mul_assoc ];
-      rw [ ← Matrix.trace_mul_comm ]
-      have h_trace_cyclic : Matrix.trace (D.conjTranspose * D * C.conjTranspose * C) = Matrix.trace (C * D.conjTranspose * D * C.conjTranspose) := by
-        rw [ ← Matrix.trace_mul_comm ]
-        simp [ Matrix.mul_assoc ] ;
-      simp_all [ Matrix.mul_assoc ]
-    simp_all only
-    obtain ⟨val, property⟩ := A
-    obtain ⟨val_1, property_1⟩ := B
-    subst hD hC
-    apply Iff.intro
-    · intro a
-      simp_all only [iff_true]
-      simp [ ← Matrix.mul_assoc, ← Matrix.conjTranspose_inj, a ];
-    · intro a
-      simp_all only [Matrix.trace_zero, map_zero, true_iff]
-  have h_range_ker : (LinearMap.range (Matrix.toEuclideanLin A.val)) ≤ (LinearMap.ker (Matrix.toEuclideanLin B.val)) → (A.val * B.val) = 0 := by
-    intro h_range_ker
-    have hAB_zero : ∀ v, (Matrix.toEuclideanLin B.val) ((Matrix.toEuclideanLin A.val) v) = 0 := by
-      exact fun v => h_range_ker ( LinearMap.mem_range_self _ v )
-    have h_herm : A.val * B.val = (B.val * A.val).conjTranspose := by
-      simp [Matrix.conjTranspose_mul]
-    have hBA_zero : (B.val * A.val) = 0 := by
-      ext i j
-      specialize hAB_zero (EuclideanSpace.single j 1)
-      have h1 := hAB_zero
-      simp only [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mulVec_mulVec] at h1
-      have h2 := congr_fun (congrArg WithLp.ofLp h1) i
-      simp only [WithLp.ofLp_zero, EuclideanSpace.single] at h2
-      simpa [Matrix.mul_apply, Matrix.mulVec, dotProduct, Pi.single_apply] using h2
-    rw [h_herm, hBA_zero, Matrix.conjTranspose_zero]
-  simp_all only
-  obtain ⟨val, property⟩ := A
-  obtain ⟨val_1, property_1⟩ := B
-  simp_all only
-  apply Iff.intro
-  · rintro a _ ⟨y, rfl⟩
-    have h_comm : val_1 * val = 0 := by
-      rw [← Matrix.conjTranspose_inj]
-      have h_conj_transpose : val.conjTranspose = val ∧ val_1.conjTranspose = val_1 := by
-        aesop
-      simp [h_conj_transpose, Matrix.conjTranspose_mul, a]
-    simp only [LinearMap.mem_ker]
-    show (Matrix.toEuclideanLin val_1) ((Matrix.toEuclideanLin val) y) = 0
-    simp [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mulVec_mulVec, h_comm]
-  · exact h_range_ker
+  obtain ⟨C, hC⟩ : ∃ C : Matrix n n 𝕜, A.val = C.conjTranspose * C :=
+    CStarAlgebra.nonneg_iff_eq_star_mul_self.mp (Matrix.nonneg_iff_posSemidef.mpr hA₁)
+  open MatrixOrder in
+  obtain ⟨D, hD⟩ : ∃ D : Matrix n n 𝕜, B.val = D.conjTranspose * D :=
+    CStarAlgebra.nonneg_iff_eq_star_mul_self.mp (Matrix.nonneg_iff_posSemidef.mpr hB₁)
+  have htr : (A.val * B.val).trace
+      = ((D * C.conjTranspose).conjTranspose * (D * C.conjTranspose)).trace := by
+    rw [hC, hD, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+      show C.conjTranspose * C * (D.conjTranspose * D)
+          = C.conjTranspose * (C * D.conjTranspose * D) from by simp [Matrix.mul_assoc],
+      Matrix.trace_mul_comm,
+      show C * D.conjTranspose * D * C.conjTranspose
+          = C * D.conjTranspose * (D * C.conjTranspose) from by simp [Matrix.mul_assoc]]
+  refine ⟨fun h => ?_, fun h => by rw [h]; simp⟩
+  have hE0 : D * C.conjTranspose = 0 :=
+    Matrix.trace_conjTranspose_mul_self_eq_zero_iff.mp <| RCLike.ext
+      (by rw [← htr]; simpa using h)
+      (by simpa using (RCLike.nonneg_iff.mp
+        (Matrix.posSemidef_conjTranspose_mul_self (D * C.conjTranspose)).trace_nonneg).2)
+  have hE0' : C * D.conjTranspose = 0 := by
+    simpa [Matrix.conjTranspose_mul] using congrArg Matrix.conjTranspose hE0
+  rw [hC, hD, show C.conjTranspose * C * (D.conjTranspose * D)
+      = C.conjTranspose * (C * D.conjTranspose) * D from by simp [Matrix.mul_assoc], hE0']
+  simp
 
 /-- The inner product of two PSD matrices is zero iff they have disjoint support, i.e., each lives entirely
 in the other's kernel. -/
@@ -383,7 +340,7 @@ noncomputable instance instNormedGroup : NormedAddCommGroup (HermitianMat d 𝕜
 
 theorem norm_eq_frobenius (A : HermitianMat d 𝕜) :
     ‖A‖ = (∑ i : d, ∑ j : d, ‖A i j‖ ^ 2) ^ (1 / 2 : ℝ) := by
-  convert ← Matrix.frobenius_norm_def A.mat
+  convert! ← Matrix.frobenius_norm_def A.mat
   exact Real.rpow_ofNat _ 2
 
 theorem norm_eq_sqrt_inner_self (A : HermitianMat d 𝕜) : ‖A‖ = √(⟪A, A⟫) := by
@@ -447,7 +404,7 @@ theorem Matrix.IsHermitian_isClosed : IsClosed { A : Matrix n n 𝕜 | A.IsHermi
   conv =>
     enter [1, 1, A]
     rw [Matrix.IsHermitian, ← sub_eq_zero]
-  convert isClosed_singleton.preimage (f := fun (x : Matrix n n 𝕜) ↦ (x.conjTranspose - x))
+  convert! isClosed_singleton.preimage (f := fun (x : Matrix n n 𝕜) ↦ (x.conjTranspose - x))
     (by fun_prop) using 1
 
 open ComplexOrder
@@ -524,36 +481,38 @@ lemma inner_eq_doubly_stochastic_sum {d : Type*} [Fintype d] [DecidableEq d]
     let C := A.H.eigenvectorUnitary.val.conjTranspose * B.H.eigenvectorUnitary.val
     ⟪A, B⟫_ℝ = ∑ i, ∑ j,
       A.H.eigenvalues i * B.H.eigenvalues j * (‖C i j‖^2) := by
-  -- By the properties of the trace and diagonalization, we can rewrite the trace of AB as the sum of the products of the eigenvalues of A and B, multiplied by the squared norms of the entries of the product of their eigenvector matrices.
-  have h_trace_diag : Matrix.trace (A.mat * B.mat) = Matrix.trace ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ) * ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ))) := by
-    have h_trace_diag : Matrix.trace (A.mat * B.mat) = Matrix.trace ((A.H.eigenvectorUnitary : Matrix d d ℂ) * ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)) * ((A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)) * (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose) := by
-      simp [ Matrix.mul_assoc ];
-      simp [ ← Matrix.mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ];
-    rw [ h_trace_diag, Matrix.trace_mul_comm ];
-    simp [ ← mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ];
-  -- Since $A$ is Hermitian, its eigenvector matrix is unitary, and thus $(A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)$ is diagonal with the eigenvalues of $A$ on the diagonal.
-  have h_diag_A : (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * A.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ) = Matrix.diagonal (fun i => A.H.eigenvalues i : d → ℂ) := by
-    have := A.H.spectral_theorem;
-    convert congr_arg ( fun x : Matrix d d ℂ => ( A.H.eigenvectorUnitary : Matrix d d ℂ ).conjTranspose * x * ( A.H.eigenvectorUnitary : Matrix d d ℂ ) ) this using 1 ; simp [ Matrix.mul_assoc ];
-    simp [ ← Matrix.mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ];
-  -- Since $B$ is Hermitian, its eigenvector matrix is unitary, and thus $(A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ)$ is diagonal with the eigenvalues of $B$ on the diagonal.
-  have h_diag_B : (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * B.mat * (A.H.eigenvectorUnitary : Matrix d d ℂ) = (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (B.H.eigenvectorUnitary : Matrix d d ℂ) * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * (B.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (A.H.eigenvectorUnitary : Matrix d d ℂ) := by
-    have h_diag_B : B.mat = (B.H.eigenvectorUnitary : Matrix d d ℂ) * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * (B.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose := by
-      convert B.H.spectral_theorem using 1;
-    grind;
-  -- Since $C = U_A^* U_B$ is unitary, we have $C_{ij} = \langle u_i, v_j \rangle$ where $u_i$ and $v_j$ are the eigenvectors of $A$ and $B$, respectively.
-  set C : Matrix d d ℂ := (A.H.eigenvectorUnitary : Matrix d d ℂ).conjTranspose * (B.H.eigenvectorUnitary : Matrix d d ℂ)
-  have hC_unitary : C * C.conjTranspose = 1 := by
-    simp +zetaDelta at *;
-    simp [ Matrix.mul_assoc ];
-    simp [ ← Matrix.mul_assoc, Matrix.IsHermitian.eigenvectorUnitary ]
-  have hC_norm : ∀ i j, ‖C i j‖ ^ 2 = (C i j) * (star (C i j)) := by
-    simp [ Complex.mul_conj, Complex.normSq_eq_norm_sq ]
-  have hC_trace : Matrix.trace (Matrix.diagonal (fun i => A.H.eigenvalues i : d → ℂ) * C * Matrix.diagonal (fun i => B.H.eigenvalues i : d → ℂ) * C.conjTranspose) = ∑ i, ∑ j, A.H.eigenvalues i * B.H.eigenvalues j * ‖C i j‖ ^ 2 := by
-    simp [ Matrix.trace, Matrix.mul_apply, hC_norm ];
-    simp [ Matrix.diagonal, Finset.sum_ite_eq ];
-    exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring;
-  convert congr_arg Complex.re hC_trace using 1;
-  convert congr_arg Complex.re h_trace_diag using 1;
-  rw [ h_diag_A, h_diag_B ] ; simp [ Matrix.mul_assoc ] ;
-  simp +zetaDelta at *
+  intro C
+  set U : Matrix d d ℂ := A.H.eigenvectorUnitary.val
+  set V : Matrix d d ℂ := B.H.eigenvectorUnitary.val
+  -- `U`, `V` are unitary and diagonalize `A`, `B`; `C = Uᴴ V`.
+  have hUU : star U * U = 1 := A.H.eigenvectorUnitary.2.1
+  have hUU' : U * star U = 1 := A.H.eigenvectorUnitary.2.2
+  have hAeq : A.mat = U * Matrix.diagonal (RCLike.ofReal ∘ A.H.eigenvalues) * star U := by
+    simpa [Unitary.conjStarAlgAut_apply] using A.H.spectral_theorem
+  have hBeq : B.mat = V * Matrix.diagonal (RCLike.ofReal ∘ B.H.eigenvalues) * star V := by
+    simpa [Unitary.conjStarAlgAut_apply] using B.H.spectral_theorem
+  have hC : C = star U * V := rfl
+  have hCH : C.conjTranspose = star V * U := by
+    simp [hC, Matrix.conjTranspose_mul, Matrix.star_eq_conjTranspose]
+  -- Conjugating `A * B` by `U` turns it into a product of two diagonals and `C`, `Cᴴ`.
+  have key : A.mat * B.mat =
+      U * (Matrix.diagonal (RCLike.ofReal ∘ A.H.eigenvalues) * C *
+        Matrix.diagonal (RCLike.ofReal ∘ B.H.eigenvalues) * C.conjTranspose) * star U := by
+    conv_lhs => rw [hAeq, hBeq]
+    rw [hCH, hC]
+    simp only [Matrix.mul_assoc, hUU', mul_one]
+  have hC_norm : ∀ i j, (‖C i j‖ ^ 2 : ℂ) = C i j * star (C i j) := fun i j => by
+    simp [Complex.mul_conj, Complex.normSq_eq_norm_sq]
+  -- The trace of the diagonal product expands entrywise to the doubly-stochastic sum.
+  have hC_trace : (Matrix.diagonal (RCLike.ofReal ∘ A.H.eigenvalues) * C *
+      Matrix.diagonal (RCLike.ofReal ∘ B.H.eigenvalues) * C.conjTranspose).trace =
+      ((∑ i, ∑ j, A.H.eigenvalues i * B.H.eigenvalues j * ‖C i j‖ ^ 2 : ℝ) : ℂ) := by
+    push_cast
+    simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, hC_norm]
+    simp only [Matrix.diagonal_apply, ite_mul, zero_mul, mul_ite, mul_zero,
+      Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true, Function.comp_apply,
+      Matrix.conjTranspose_apply]
+    exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by
+      simp only [RCLike.ofReal_eq_complex_ofReal]; ring
+  rw [inner_eq_re_trace, key, Matrix.trace_mul_cycle, hUU, one_mul, hC_trace]
+  exact Complex.ofReal_re _

@@ -180,7 +180,7 @@ lemma eq_sum_evalT_of_single_tensor_basis {c : C} (t : Tensor S ![c]) :
   the basis covector `basis ![c (Fin.last n)] (single.symm i)`, with the appended index
   permuted back into the last slot. -/
 lemma eq_sum_evalT {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
-    t = ∑ i, permT id (PermCond.append_succ_last c) (prodT (evalT (Fin.last n) i t)
+    t = ∑ i, permT id (IsReindexing.append_succ_last c) (prodT (evalT (Fin.last n) i t)
       (basis ![c (Fin.last n)] (ComponentIdx.single.symm i)))   := by
   induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
   · conv_rhs => enter [2, i]; rw [evalT_basis]
@@ -215,7 +215,7 @@ lemma eq_sum_evalT {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
   with the evaluation `evalT 0 i t`, with the prepended index permuted back into the first slot.
   This is the first-index analogue of `eq_sum_evalT`. -/
 lemma eq_sum_evalT_zero {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
-    t = ∑ i, permT _ (PermCond.append_of_first c)
+    t = ∑ i, permT _ (IsReindexing.append_of_first c)
     (prodT (basis ![c 0] (ComponentIdx.single.symm i)) (evalT 0 i t))  := by
   induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
   · conv_rhs => enter [2, i]; rw [evalT_basis]

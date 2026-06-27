@@ -259,7 +259,7 @@ lemma IsTestFunction.adjFDeriv {f : X → U} [InnerProductSpace' ℝ X]
   conv =>
     enter [1, x]
     rw [adjoint_eq_clm_adjoint]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
   apply IsTestFunction.comp_left
   · constructor
     · apply ContDiff.clm_apply

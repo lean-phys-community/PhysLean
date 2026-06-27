@@ -187,9 +187,9 @@ lemma gradFreeCurrentPotential_eq_tensor {d} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
     (hJ : ContDiff ℝ ∞ J) (x : SpaceTime d) (ν : Fin 1 ⊕ Fin d) :
     A.gradFreeCurrentPotential J x ν = η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {J x | ν'}ᵀ)) ν := by
+    (permT id (IsReindexing.auto) {J x | ν'}ᵀ)) ν := by
   trans η ν ν * (Lorentz.Vector.basis.repr ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {J x | ν'}ᵀ))) ν
+    (permT id (IsReindexing.auto) {J x | ν'}ᵀ))) ν
   swap
   · simp [Lorentz.Vector.basis_repr_apply]
   simp [Lorentz.Vector.basis_repr_apply]
@@ -381,11 +381,12 @@ lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
     (hJ : ContDiff ℝ ∞ J) (x : SpaceTime d) (ν : Fin 1 ⊕ Fin d) :
     A.gradLagrangian 𝓕 J x ν =
     η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
+    (permT id (IsReindexing.auto) {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
     - (J x | ν')}ᵀ)) ν := by
   rw [gradLagrangian_eq_kineticTerm_sub _ hA _ hJ]
   simp only [Pi.sub_apply, apply_sub, one_div, map_smul,
-    map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul, neg_apply]
+    map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul,
+    Lorentz.Vector.neg_apply]
   rw [gradKineticTerm_eq_tensorDeriv A x hA]
   rw [gradFreeCurrentPotential_eq_tensor A hA J hJ x ν]
   simp only [one_div, map_smul, apply_smul,

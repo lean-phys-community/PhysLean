@@ -54,9 +54,9 @@ lemma lightlike_eq_spatial_norm_of_eq_time {d : ℕ} {v w : Vector d}
     ⟪spatialPart v, spatialPart v⟫_ℝ = ⟪spatialPart w, spatialPart w⟫_ℝ := by
   rw [lightLike_iff_norm_sq_zero, minkowskiProduct_toCoord] at hv hw
   have hv_eq : v (Sum.inl 0) * v (Sum.inl 0) = ∑ i, v (Sum.inr i) * v (Sum.inr i) := by
-    dsimp only [Fin.isValue]; linarith
+    linarith
   have hw_eq : w (Sum.inl 0) * w (Sum.inl 0) = ∑ i, w (Sum.inr i) * w (Sum.inr i) := by
-    dsimp only [Fin.isValue];linarith
+    linarith
   have h_time_sq : v (Sum.inl 0) * v (Sum.inl 0) = w (Sum.inl 0) * w (Sum.inl 0) := by
     change timeComponent v * timeComponent v = timeComponent w * timeComponent w
     rw [h_time]

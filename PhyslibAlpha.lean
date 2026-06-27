@@ -16,6 +16,7 @@ public import PhyslibAlpha.ClassicalFieldTheory.Local.JetPointFiber
 public import PhyslibAlpha.ClassicalFieldTheory.Local.JetPointRegularity
 public import PhyslibAlpha.ClassicalFieldTheory.Local.Lagrangian
 public import PhyslibAlpha.ClassicalFieldTheory.Local.TotalDerivative
+public import PhyslibAlpha.ClassicalFieldTheory.Local.TotalDivergence
 public import PhyslibAlpha.ClassicalFieldTheory.Local.Variation
 public import PhyslibAlpha.SpaceAndTime.Space.Surfaces.HalfPlane
 public import PhyslibAlpha.SpaceAndTime.Space.Surfaces.Line

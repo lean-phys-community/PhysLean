@@ -811,7 +811,7 @@ lemma partialTrace_tensor {R : Type*} [RCLike R] {m n : ℕ}
   unfold tr₂ trace kroneckerMap
   simp only [of_apply, diag_apply]
   ext i j
-  simp only [smul_apply, smul_eq_mul]
+  simp only [Matrix.smul_apply, smul_eq_mul]
   have := @Finset.sum_mul (a := A i j) (ι := Fin n)
     (s := Finset.univ) (f := fun k => B k k) _ _
   rw [this]
@@ -849,7 +849,7 @@ def krausCompletionChannelMap {R : Type*} [RCLike R] {q r : ℕ}
   · unfold QuantumChannel
     rw [← krausCompletion_isometry_of_TNI hK]
     ext x y
-    rw [mul_apply, Fintype.sum_prod_type, Finset.sum_comm, sum_apply]
+    rw [mul_apply, Fintype.sum_prod_type, Finset.sum_comm, Matrix.sum_apply]
     congr
 
 

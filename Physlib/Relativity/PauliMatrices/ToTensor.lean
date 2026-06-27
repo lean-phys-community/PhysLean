@@ -227,21 +227,21 @@ lemma toTensor_smul_eq_self (Λ : SL(2,ℂ)) : Λ • σ^^^ = σ^^^ := by
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ^α^{dot β}`. -/
 abbrev pauliCo : ℂT[.down, .upL, .upR] :=
-  permT id (PermCond.auto) {η' | μ ν ⊗ σ^^^ | ν α β}ᵀ
+  permT id (IsReindexing.auto) {η' | μ ν ⊗ σ^^^ | ν α β}ᵀ
 
 @[inherit_doc pauliCo]
 scoped[PauliMatrix] notation "σ_^^" => PauliMatrix.pauliCo
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ_{dot β}_α`. -/
 abbrev pauliCoDown : ℂT[.down, .downR, .downL] :=
-  permT id (PermCond.auto) {σ_^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α' }ᵀ
+  permT id (IsReindexing.auto) {σ_^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α' }ᵀ
 
 @[inherit_doc pauliCoDown]
 scoped[PauliMatrix] notation "σ___" => PauliMatrix.pauliCoDown
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ^μ_{dot β}_α`. -/
 abbrev pauliContrDown : ℂT[.up, .downR, .downL] :=
-    permT id (PermCond.auto) {σ^^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α'}ᵀ
+    permT id (IsReindexing.auto) {σ^^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α'}ᵀ
 
 @[inherit_doc pauliContrDown]
 scoped[PauliMatrix] notation "σ^__" => PauliMatrix.pauliContrDown

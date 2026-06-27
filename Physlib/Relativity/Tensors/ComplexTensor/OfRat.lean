@@ -164,10 +164,10 @@ lemma contrT_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.Color
 
 lemma permT_ofRat {n m : ℕ} {c : Fin n → complexLorentzTensor.Color}
     {c1 : Fin m → complexLorentzTensor.Color}
-    {σ : Fin m → Fin n} (h : PermCond c c1 σ)
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (f : ComponentIdx c → RatComplexNum) :
     (permT σ h ((ofRat f))) =
-    ((ofRat (fun b => f (fun i => Fin.cast (by simp [PermCond.inv_perserve_color])
+    ((ofRat (fun b => f (fun i => Fin.cast (by simp [IsReindexing.inv_perserve_color])
       (b (h.inv σ i)))))) := by
   apply (Tensor.basis _).repr.injective
   ext b

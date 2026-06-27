@@ -98,12 +98,10 @@ instance {d} : Zero (ElectromagneticPotential d) where
   zero := ⟨fun _ => 0⟩
 
 @[simp]
-lemma zero_val {d} :
-    (0 : ElectromagneticPotential d).val = 0 := rfl
+lemma zero_val {d} : (0 : ElectromagneticPotential d).val = 0 := rfl
 
 @[simp]
-lemma zero_apply {d} (x : SpaceTime d) :
-    (0 : ElectromagneticPotential d) x = 0 := rfl
+lemma zero_apply {d} (x : SpaceTime d) : (0 : ElectromagneticPotential d) x = 0 := rfl
 
 instance {d} : Add (ElectromagneticPotential d) where
   add A B := ⟨fun x => A x + B x⟩
@@ -116,7 +114,29 @@ lemma add_val {d} (A B : ElectromagneticPotential d) :
 lemma add_apply {d} (A B : ElectromagneticPotential d) (x : SpaceTime d) :
     (A + B) x = A x + B x := by simp
 
-instance {d} : AddCommMonoid (ElectromagneticPotential d) where
+instance {d} : Neg (ElectromagneticPotential d) where
+  neg A := ⟨fun x => - A x⟩
+
+@[simp]
+lemma neg_val {d} (A : ElectromagneticPotential d) :
+    (- A).val = - A.val := rfl
+
+@[simp]
+lemma neg_apply {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
+    (- A) x = - A x := rfl
+
+instance {d} : Sub (ElectromagneticPotential d) where
+  sub A B := ⟨fun x => A x - B x⟩
+
+@[simp]
+lemma sub_val {d} (A B : ElectromagneticPotential d) :
+    (A - B).val = A.val - B.val := rfl
+
+@[simp]
+lemma sub_apply {d} (A B : ElectromagneticPotential d) (x : SpaceTime d) :
+    (A - B) x = A x - B x := rfl
+
+instance {d} : AddCommGroup (ElectromagneticPotential d) where
   add_assoc A B C := by
     ext x μ
     simp [add_assoc]
@@ -126,10 +146,14 @@ instance {d} : AddCommMonoid (ElectromagneticPotential d) where
   add_zero A := by
     ext x μ
     simp
+  neg_add_cancel A := by
+    ext x μ
+    simp
   add_comm A B := by
     ext x μ
     simp [add_comm]
   nsmul := nsmulRec
+  zsmul := zsmulRec
 
 noncomputable instance {d} : SMul ℝ (ElectromagneticPotential d) where
   smul r A := ⟨fun x => r • A x⟩
@@ -463,7 +487,7 @@ lemma spaceTime_deriv_action_eq_sum {d} {μ ν : Fin 1 ⊕ Fin d} {x : SpaceTime
       conv_lhs =>
         enter [1, 2, i]
         rw [fderiv_const_mul (hdif i)]
-      simp only [ContinuousLinearMap.coe_sum', ContinuousLinearMap.coe_smul',
+      simp only [FunLike.coe_sum, FunLike.coe_smul,
         Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
       rw [Lorentz.Vector.smul_eq_sum]
       congr
@@ -542,7 +566,6 @@ lemma deriv_hasVarAdjDerivAt {d} (μ ν : Fin 1 ⊕ Fin d) (A : SpaceTime d → 
     Lorentz.Vector d) x => ∂_ μ A x ν)) h0' ?_
   intro φ hφ
   funext x
-  simp only
   rw [deriv_apply_eq μ ν φ]
   exact hφ.differentiable (by simp)
 

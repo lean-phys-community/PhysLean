@@ -32,19 +32,19 @@ open TensorSpecies
 open Tensor
 
 /-- A bispinor `pᵃᵃ` created from a lorentz vector `p^μ`. -/
-def contrBispinorUp (p : ℂT[.up]) : ℂT[.upL, .upR] := permT id (PermCond.auto)
+def contrBispinorUp (p : ℂT[.up]) : ℂT[.upL, .upR] := permT id (IsReindexing.auto)
   {pauliCo | μ α β ⊗ p | μ}ᵀ
 
 /-- A bispinor `pₐₐ` created from a lorentz vector `p^μ`. -/
-def contrBispinorDown (p : ℂT[.up]) : ℂT[.downL, .downR] := permT id (PermCond.auto)
+def contrBispinorDown (p : ℂT[.up]) : ℂT[.downL, .downR] := permT id (IsReindexing.auto)
   {εL' | α α' ⊗ εR' | β β' ⊗ contrBispinorUp p | α β}ᵀ
 
 /-- A bispinor `pᵃᵃ` created from a lorentz vector `p_μ`. -/
-def coBispinorUp (p : ℂT[.down]) : ℂT[.upL, .upR] := permT id (PermCond.auto)
+def coBispinorUp (p : ℂT[.down]) : ℂT[.upL, .upR] := permT id (IsReindexing.auto)
   {σ^^^ | μ α β ⊗ p | μ}ᵀ
 
 /-- A bispinor `pₐₐ` created from a lorentz vector `p_μ`. -/
-def coBispinorDown (p : ℂT[.down]) : ℂT[.downL, .downR] := permT id (PermCond.auto)
+def coBispinorDown (p : ℂT[.down]) : ℂT[.downL, .downR] := permT id (IsReindexing.auto)
   {εL' | α α' ⊗ εR' | β β' ⊗ coBispinorUp p | α β}ᵀ
 
 /-!

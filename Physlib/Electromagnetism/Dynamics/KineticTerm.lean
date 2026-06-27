@@ -452,7 +452,7 @@ lemma kineticTerm_add_time_mul_const {d} {𝓕 : FreeSpace} (A : Electromagnetic
     rw [SpaceTime.deriv_eq]
 
     rw [fderiv_fun_add _ (by fun_prop)]
-    simp only [Fin.isValue, ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add, Pi.add_apply]
+    simp only [Fin.isValue, _root_.add_apply, Lorentz.Vector.apply_add, Pi.add_apply]
     congr
     rw [fderiv_smul_const (by fun_prop)]
     simp [Lorentz.Vector.coordCLM]
@@ -462,7 +462,7 @@ lemma kineticTerm_add_time_mul_const {d} {𝓕 : FreeSpace} (A : Electromagnetic
     funext x ν
     rw [SpaceTime.deriv_eq]
     rw [fderiv_fun_add _ (by fun_prop)]
-    simp only [Fin.isValue, ContinuousLinearMap.add_apply, Lorentz.Vector.apply_add]
+    simp only [Fin.isValue, _root_.add_apply, Lorentz.Vector.apply_add]
     rw [fderiv_smul_const (by fun_prop)]
     simp only [Fin.isValue, ContinuousLinearMap.smulRight_apply,
       Lorentz.Vector.apply_smul]
@@ -777,7 +777,7 @@ lemma gradKineticTerm_eq_fieldStrength {d} {𝓕 : FreeSpace} (A : Electromagnet
         apply Finset.sum_congr rfl (fun μ _ => ?_)
         congr
         rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_fun_sub]
-        simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply]
+        simp only [FunLike.coe_sub, Pi.sub_apply]
         · fun_prop
         · fun_prop
     _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
@@ -977,10 +977,11 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d) (x : SpaceTime d)
     (hA : ContDiff ℝ ∞ A) (ν : Fin 1 ⊕ Fin d) :
     A.gradKineticTerm 𝓕 x ν = η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ)) ν := by
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) •
+      tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ)) ν := by
   trans η ν ν * (Lorentz.Vector.basis.repr
     ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-    (permT id (PermCond.auto) {(1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ))) ν
+    (permT id (IsReindexing.auto) {(1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν'}ᵀ))) ν
   swap
   · simp [Lorentz.Vector.basis_repr_apply]
   simp [Lorentz.Vector.basis_eq_map_tensor_basis]

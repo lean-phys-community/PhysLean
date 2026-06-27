@@ -232,14 +232,14 @@ lemma electricField_time_deriv {d : ℕ}
     enter [1, t]
     rw [P.electricField_eq_electricFunction]
   rw [Time.deriv_eq]
-  rw [fderiv_comp']
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv, one_smul,
+  rw [fderiv_fun_comp]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, one_smul,
     neg_smul]
   rw [fderiv_fun_sub]
-  simp only [fderiv_fun_const, Pi.zero_apply, zero_sub, ContinuousLinearMap.neg_apply, neg_smul,
+  simp only [fderiv_fun_const, Pi.zero_apply, zero_sub, _root_.neg_apply, neg_smul,
     neg_inj]
   rw [fderiv_const_mul]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, Time.fderiv_val, smul_eq_mul, mul_one]
+  simp only [FunLike.coe_smul, Pi.smul_apply, Time.fderiv_val, smul_eq_mul, mul_one]
   · fun_prop
   · fun_prop
   · fun_prop
@@ -260,13 +260,13 @@ lemma magneticFieldMatrix_time_deriv {d : ℕ}
   change fderiv ℝ ((fun u => P.magneticFunction u (i, j)) ∘
     fun t => ⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) t 1 = _
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul,
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul,
     one_mul, neg_mul]
   rw [fderiv_fun_sub]
-  simp only [fderiv_fun_const, Pi.zero_apply, zero_sub, ContinuousLinearMap.neg_apply, neg_mul,
+  simp only [fderiv_fun_const, Pi.zero_apply, zero_sub, _root_.neg_apply, neg_mul,
     neg_inj, mul_eq_mul_right_iff]
   rw [fderiv_const_mul]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, Time.fderiv_val, smul_eq_mul, mul_one,
+  simp only [FunLike.coe_smul, Pi.smul_apply, Time.fderiv_val, smul_eq_mul, mul_one,
     true_or]
   · fun_prop
   · fun_prop
@@ -291,8 +291,8 @@ lemma electricField_space_deriv {d : ℕ}
     enter [2, t]
     rw [P.electricField_eq_electricFunction]
   rw [Space.deriv_eq_fderiv_basis]
-  rw [fderiv_comp']
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv, one_smul]
+  rw [fderiv_fun_comp]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, one_smul]
   rw [fderiv_fun_sub]
   simp only [fderiv_fun_const, Pi.zero_apply, sub_zero]
   rw [← Space.deriv_eq_fderiv_basis]
@@ -317,7 +317,7 @@ lemma magneticFieldMatrix_space_deriv {d : ℕ}
   change fderiv ℝ ((fun u => P.magneticFunction u (i, j)) ∘
     fun x => ⟪x, s.unit⟫_ℝ - 𝓕.c.val * t.val) x _ = _
   rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul,
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul,
     one_mul, mul_eq_mul_right_iff]
   rw [fderiv_fun_sub]
   simp only [fderiv_fun_const, Pi.zero_apply, sub_zero]
@@ -500,14 +500,14 @@ lemma time_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
     = ∑ j, ∂ₜ (A.magneticFieldMatrix 𝓕.c · x (i, j)) t * s.unit j := by
     rw [Time.deriv_eq]
     rw [fderiv_fun_sum]
-    simp only [ContinuousLinearMap.coe_sum', Finset.sum_apply]
+    simp only [FunLike.coe_sum, Finset.sum_apply]
     conv_lhs =>
       enter [2, k]
       rw [fderiv_mul_const (by
         apply Differentiable.differentiableAt
         apply magneticFieldMatrix_differentiable_time
         exact (hA.of_le ENat.LEInfty.out))]
-    simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+    simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     congr
     funext i
     ring_nf
@@ -566,7 +566,7 @@ lemma space_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
   congr
   funext j
   rw [fderiv_mul_const, fderiv_const_mul, fderiv_mul_const]
-  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply, smul_eq_mul]
+  simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   rw [← Space.deriv_eq_fderiv_basis]
   rw [P.magneticFieldMatrix_space_deriv_eq_time_deriv hA2 t x i j k]
   simp [← Time.deriv_eq]

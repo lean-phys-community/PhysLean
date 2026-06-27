@@ -56,7 +56,7 @@ lemma couplingPotential_hasFDerivAt (x : EuclideanSpace ℝ (Fin 2)) :
   have h1 : HasFDerivAt (fun x : EuclideanSpace ℝ (Fin 2) => x 1)
     (EuclideanSpace.proj (𝕜 := ℝ) 1) x := by
     norm_num [hasFDerivAt_iff_isLittleO_nhds_zero];
-  convert HasFDerivAt.add (HasFDerivAt.add (h0.pow 2) (h0.mul h1)) (h1.pow 2) using 1
+  convert! HasFDerivAt.add (HasFDerivAt.add (h0.pow 2) (h0.mul h1)) (h1.pow 2) using 1
   ext; norm_num; ring
 
 /-
@@ -64,8 +64,8 @@ The gradient of the coupling potential vanishes at the origin.
 -/
 lemma couplingPotential_gradient_zero :
     gradient couplingPotential (!₂[0, 0] : EuclideanSpace ℝ (Fin 2)) = 0 := by
-  convert (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin 2))).symm_apply_eq.mpr ?_;
-  convert HasFDerivAt.fderiv (couplingPotential_hasFDerivAt _) using 1
+  convert! (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin 2))).symm_apply_eq.mpr ?_;
+  convert! HasFDerivAt.fderiv (couplingPotential_hasFDerivAt _) using 1
   norm_num [fderiv_apply_one_eq_deriv]
 
 /-
@@ -105,12 +105,12 @@ lemma couplingPotential_posDef :
     (iteratedFDerivQuadraticMap couplingPotential
     (!₂[0, 0] : EuclideanSpace ℝ (Fin 2))).PosDef := by
   intros y hy;
-  convert (show 0 < 2 * y 0 ^ 2 + 2 * y 0 * y 1 + 2 * y 1 ^ 2 by
+  convert! (show 0 < 2 * y 0 ^ 2 + 2 * y 0 * y 1 + 2 * y 1 ^ 2 by
               exact not_le.mp fun h => hy <| by
                 ext i
                 fin_cases i <;> norm_num <;> nlinarith! [sq_nonneg (y.ofLp 0 + y.ofLp 1)]) using 1
   generalize_proofs at *;
-  convert couplingPotential_iteratedFDeriv_two !₂[0, 0] y y using 1; ring!
+  convert! couplingPotential_iteratedFDeriv_two !₂[0, 0] y y using 1; ring!
 
 lemma coupled_spring_potential :
     let U := fun x : EuclideanSpace ℝ (Fin 2) => (x 0)^2 + x 0 * x 1 + (x 1)^2

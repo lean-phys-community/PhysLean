@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Electromagnetism.Distributional.Basic
-public import Mathlib.Data.Real.Hom
+public import Mathlib.Algebra.Order.Archimedean.Real.Hom
 /-!
 
 # The vector Potential
@@ -68,7 +68,7 @@ noncomputable def vectorPotential {d} (c : SpeedOfLight) :
   map_smul' r A := by
     ext ε i
     simp only [distTimeSlice, map_smul, ContinuousLinearEquiv.coe_mk, LinearEquiv.coe_mk,
-      LinearMap.coe_mk, AddHom.coe_mk, ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_comp',
+      LinearMap.coe_mk, AddHom.coe_mk, FunLike.coe_smul, ContinuousLinearMap.coe_comp,
       Pi.smul_apply, Function.comp_apply,
       Real.ringHom_apply, PiLp.smul_apply, smul_eq_mul]
 
