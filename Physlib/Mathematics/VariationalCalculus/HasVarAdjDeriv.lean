@@ -756,14 +756,14 @@ protected lemma fderiv (u : X → U) (dx : X) (hu : ContDiff ℝ ∞ u)
   · intro φ1 φ2 h1 h2
     funext x
     simp only [Pi.add_apply]
-    erw [fderiv_add]
+    rw [fderiv_add]
     simp only [add_apply]
     · exact (h1.differentiable (by simp)).differentiableAt
     · exact (h2.differentiable (by simp)).differentiableAt
   · intro c φ hφ
     funext x
     simp only [Pi.smul_apply]
-    erw [fderiv_const_smul]
+    rw [fderiv_const_smul]
     simp only [FunLike.coe_smul, Pi.smul_apply]
     exact (hφ.differentiable (by simp)).differentiableAt
   · intro φ hφ x
