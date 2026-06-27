@@ -223,10 +223,10 @@ lemma distDiv_apply_eq_sum_distDeriv {d}
 -/
 
 /-- The divergence of a distribution from a bounded function. -/
-lemma distDiv_ofFunction {dm1 : ℕ} {f : Space dm1.succ → EuclideanSpace ℝ (Fin dm1.succ)}
-    {hf : IsDistBounded f} (η : 𝓢(Space dm1.succ, ℝ)) :
+lemma distDiv_ofFunction {d : ℕ} {f : Space d → EuclideanSpace ℝ (Fin d)}
+    {hf : IsDistBounded f} (η : 𝓢(Space d, ℝ)) :
     (∇ᵈ ⬝ (distOfFunction f hf)) η =
-    - ∫ x : Space dm1.succ, ⟪f x, ∇ η x⟫_ℝ := by
+    - ∫ x : Space d, ⟪f x, ∇ η x⟫_ℝ := by
   rw [distDiv_apply_eq_sum_fderivD]
   conv_rhs =>
     enter [1, 2, x]
@@ -235,10 +235,10 @@ lemma distDiv_ofFunction {dm1 : ℕ} {f : Space dm1.succ → EuclideanSpace ℝ 
     enter [2, i]
     rw [fderivD_apply, distOfFunction_apply]
   /- The following lemma could probably be moved out of this result. -/
-  have integrable_lemma (i j : Fin (dm1 + 1)) :
+  have integrable_lemma (i j : Fin d) :
       Integrable (fun x =>
-        (((SchwartzMap.evalCLM ℝ (Space dm1.succ) ℝ (basis i))
-        ((fderivCLM ℝ (Space dm1.succ) ℝ) η)) x • f x) j) volume := by
+        (((SchwartzMap.evalCLM ℝ (Space d) ℝ (basis i))
+        ((fderivCLM ℝ (Space d) ℝ) η)) x • f x) j) volume := by
     simp only [PiLp.smul_apply]
     exact (hf.pi_comp j).integrable_space _
   rw [MeasureTheory.integral_finsetSum]
@@ -254,13 +254,12 @@ lemma distDiv_ofFunction {dm1 : ℕ} {f : Space dm1.succ → EuclideanSpace ℝ 
     · intro j
       exact integrable_lemma i j
   · intro i hi
-    simp only [Nat.succ_eq_add_one, inner_smul_right, EuclideanSpace.inner_single_right]
+    simp only [inner_smul_right, EuclideanSpace.inner_single_right, conj_trivial, one_mul]
     convert integrable_lemma i i using 2
     rename_i x
-    simp only [conj_trivial, one_mul, Nat.succ_eq_add_one, PiLp.smul_apply, smul_eq_mul,
+    simp only [evalCLM_apply_apply, fderivCLM_apply, PiLp.smul_apply, smul_eq_mul,
       mul_eq_mul_right_iff]
     left
     rw [deriv_eq_fderiv_basis]
-    rfl
 
 end Space

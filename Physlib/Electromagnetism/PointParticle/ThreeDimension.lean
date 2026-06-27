@@ -234,7 +234,7 @@ lemma threeDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : S
     (distOfFunction (fun x => ‖x‖⁻¹) (IsDistBounded.inv)))
   · simp [distTranslate_ofFunction]
   rw [Space.distTranslate_distGrad]
-  have := Space.distGrad_distOfFunction_norm_zpow (d := 2) (-1) (by grind)
+  have := Space.distGrad_distOfFunction_norm_zpow (d := 3) (-1) (by grind)
   simp_all [distOfFunction_neg, distTranslate_ofFunction]
 
 /-!
