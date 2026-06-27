@@ -97,22 +97,24 @@ noncomputable def ofStaticScalarPotential {d} (c : SpeedOfLight) :
 If the function is distribution-bounded, it is first promoted to a distribution using
 `Space.distOfFunction`. Otherwise the constructor returns zero. -/
 noncomputable def ofStaticScalarPotentialFunction {d} (c : SpeedOfLight)
-    (φ : Space d → ℝ) : DistElectromagneticPotential d :=
-  if hφ : Space.IsDistBounded φ then
-    ofStaticScalarPotential c (Space.distOfFunction φ hφ)
-  else 0
+    (φ : Space d → ℝ) : DistElectromagneticPotential d := by
+  classical
+  exact if hφ : Space.IsDistBounded φ then
+    ofStaticScalarPotential c (Space.distOfFunction φ hφ) else 0
 
 @[simp]
 lemma ofStaticScalarPotentialFunction_of_isDistBounded {d} (c : SpeedOfLight)
     (φ : Space d → ℝ) (hφ : Space.IsDistBounded φ) :
     ofStaticScalarPotentialFunction c φ =
       ofStaticScalarPotential c (Space.distOfFunction φ hφ) := by
+  classical
   simp [ofStaticScalarPotentialFunction, hφ]
 
 @[simp]
 lemma ofStaticScalarPotentialFunction_eq_zero_of_not_isDistBounded {d}
     (c : SpeedOfLight) (φ : Space d → ℝ) (hφ : ¬ Space.IsDistBounded φ) :
     ofStaticScalarPotentialFunction c φ = 0 := by
+  classical
   simp [ofStaticScalarPotentialFunction, hφ]
 
 /-- The creation of an electromagnetic potential from a vector potential. -/
