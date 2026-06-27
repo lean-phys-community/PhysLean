@@ -160,7 +160,7 @@ lemma distDeriv_distOfFunction {d : ℕ} (μ : Fin d) (f : Space d → F)
     (hf_diff : Differentiable ℝ f) :
     ∂ᵈ[μ] (distOfFunction f hf) = distOfFunction (∂[μ] f) hf_deriv := by
   ext η
-  rw [distDeriv_apply, Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_apply]
+  rw [distDeriv_apply, Physlib.Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_apply]
   change -∫ (x : Space d), fderiv ℝ η x (basis μ) • f x =
     ∫ (x : Space d), η x • fderiv ℝ f x (basis μ)
   rw [integral_smul_fderiv_eq_neg_fderiv_smul_of_integrable]
