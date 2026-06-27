@@ -571,7 +571,6 @@ lemma fieldStrengthComponent_antisymm {d} (A : ElectromagneticPotential d) (x : 
   apply Finset.sum_congr rfl (fun κ _ => ?_)
   simp
 
-@[simp]
 lemma toFieldStrength_eval_diag_eq_zero {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (μ : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [μ]}ᵀ = 0 := by
@@ -732,7 +731,6 @@ lemma fieldStrengthMatrix_antisymm {d} (A : ElectromagneticPotential d) (x : Spa
   apply Finset.sum_congr rfl (fun κ _ => ?_)
   simp
 
-@[simp]
 lemma fieldStrengthMatrix_diag_eq_zero {d} (A : ElectromagneticPotential d) (x : SpaceTime d)
     (μ : Fin 1 ⊕ Fin d) :
     A.fieldStrengthMatrix x (μ, μ) = 0 := by
