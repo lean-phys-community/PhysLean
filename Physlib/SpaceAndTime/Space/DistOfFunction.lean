@@ -169,7 +169,8 @@ lemma distDeriv_distOfFunction {d : ℕ} (μ : Fin d) (f : Space d → F)
   · exact hf_deriv.integrable_space η
   · exact hf.integrable_space η
   · fun_prop
-  · exact hf_diff
+  · intro x _
+    exact hf_diff.differentiableAt
 
 /-!
 
