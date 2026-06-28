@@ -185,7 +185,7 @@ lemma position_commutation_momentumSqr : ⁅𝐱 i, 𝐩 ⬝ᵥ 𝐩⁆ = (2 * I
 lemma radiusRegPow_commutation_momentum :
     ⁅𝐫₀[d] ε s, 𝐩 i⁆ = (s * I * ℏ) • 𝐫₀ ε (s-2) ∘L 𝐱 i := by
   ext ψ x
-  have hne := Ne.symm (ne_of_lt <| norm_sq_add_unit_sq_pos ε x)
+  have hne := Ne.symm (ne_of_lt <| Space.norm_sq_add_unit_sq_pos ε x)
   have hdiff1 : DifferentiableAt ℝ (fun x => (‖x‖ ^ 2 + ↑ε ^ 2) ^ (s / 2)) x := by
     refine DifferentiableAt.rpow_const ?_ (Or.intro_left _ hne)
     exact Differentiable.differentiableAt (by fun_prop)

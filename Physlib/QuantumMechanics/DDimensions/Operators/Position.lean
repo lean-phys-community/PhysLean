@@ -7,8 +7,7 @@ module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
-public import Physlib.SpaceAndTime.Space.Integrals.NormPow
-public import Physlib.SpaceAndTime.Space.Derivatives.Basic
+public import Physlib.SpaceAndTime.Space.Norm.Basic
 /-!
 
 # Position operators
@@ -96,42 +95,6 @@ lemma positionCLM_apply (ψ : 𝓢(Space d, ℂ)) (x : Space d) : 𝐱 i ψ x = 
 /-!
 ### A.2. Radius powers (regularized)
 -/
-TODO "Incorporate normRegularizedPow into Space.Norm"
-
-/-- Power of regularized norm, `(‖x‖² + ε²)^(s/2)`. -/
-def normRegularizedPow (d : ℕ) (ε s : ℝ) : Space d → ℝ :=
-  fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)
-
-lemma normRegularizedPow_eq (d : ℕ) (ε s : ℝ) :
-    normRegularizedPow d ε s = fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) := rfl
-
-lemma norm_sq_add_unit_sq_pos {d : ℕ} (ε : ℝˣ) (x : Space d) : 0 < ‖x‖ ^ 2 + ε ^ 2 :=
-    Left.add_pos_of_nonneg_of_pos (sq_nonneg ‖x‖) (sq_pos_iff.mpr <| Units.ne_zero ε)
-
-lemma normRegularizedPow_pos (d : ℕ) (ε : ℝˣ) (s : ℝ) (x : Space d) :
-    0 < normRegularizedPow d ε s x :=
-  Real.rpow_pos_of_pos (norm_sq_add_unit_sq_pos ε x) (s / 2)
-
-lemma normRegularizedPow_hasTemperateGrowth (d : ℕ) (ε : ℝˣ) (s : ℝ) :
-    HasTemperateGrowth (normRegularizedPow d ε s) := by
-  -- Write `normRegularizedPow` as the composition of three simple functions
-  -- to take advantage of `hasTemperateGrowth_one_add_norm_sq_rpow`.
-  let f1 := fun (x : ℝ) ↦ (ε ^ 2) ^ (s / 2) * x
-  let f2 := fun (x : Space d) ↦ (1 + ‖x‖ ^ 2) ^ (s / 2)
-  let f3 := fun (x : Space d) ↦ ε.1⁻¹ • x
-  have h123 : normRegularizedPow d ε s = f1 ∘ f2 ∘ f3 := by
-    ext
-    simp only [normRegularizedPow, f1, f2, f3, comp_apply, norm_smul, norm_inv, Real.norm_eq_abs]
-    rw [← Real.mul_rpow (sq_nonneg ↑ε) (add_nonneg (zero_le_one' _) (sq_nonneg _))]
-    simp [mul_add, mul_pow, add_comm]
-  rw [h123]
-  fun_prop
-
-@[fun_prop]
-lemma normRegularizedPow_measurable (d : ℕ) (ε s : ℝ) :
-    Measurable (normRegularizedPow d ε s) := by
-  rw [normRegularizedPow_eq]
-  fun_prop
 
 /-- The radius operator to power `s`, regularized by `ε ≠ 0`, is the continuous linear map
   from `𝓢(Space d, ℂ)` to itself which maps `ψ` to `(‖x‖² + ε²)^(s/2) • ψ`. -/
