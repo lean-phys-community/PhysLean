@@ -210,7 +210,8 @@ private lemma integrable_neg_pow_on_ioi (n : ℕ) :
   have hpre : (fun x : ℝ => (1 : ℝ) + x) ⁻¹' Set.Ioi 1 = Set.Ioi 0 := by
     ext x
     simp
-  have integrableOn_rpow_neg : IntegrableOn (fun x : ℝ => ((1 : ℝ) + x) ^ (- (n + 2) : ℝ)) (Set.Ioi 0) := by
+  have integrableOn_rpow_neg :
+      IntegrableOn (fun x : ℝ => ((1 : ℝ) + x) ^ (- (n + 2) : ℝ)) (Set.Ioi 0) := by
     rw [← hpre]
     exact ((measurePreserving_add_left volume (1 : ℝ)).integrableOn_comp_preimage
       (measurableEmbedding_addLeft 1)

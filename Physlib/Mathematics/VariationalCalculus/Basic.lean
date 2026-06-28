@@ -135,8 +135,10 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
       have hcs : -(‖f₂ x - x₂‖ * ‖x₂‖) ≤ ⟪f₂ x - x₂, x₂⟫_ℝ :=
         neg_le_of_abs_le (abs_real_inner_le_norm _ _)
       have hxp : 0 < ‖x₂‖ := norm_pos_iff.mpr hx2
-      have inner_eq_self_add_diff : ⟪f₂ x, x₂⟫_ℝ = ⟪x₂, x₂⟫_ℝ + ⟪f₂ x - x₂, x₂⟫_ℝ := by rw [← inner_add_left]; simp
-      nlinarith [inner_eq_self_add_diff, hcs, hself, hclose, hxp, mul_lt_mul_of_pos_right hclose hxp]
+      have inner_eq_self_add_diff : ⟪f₂ x, x₂⟫_ℝ = ⟪x₂, x₂⟫_ℝ + ⟪f₂ x - x₂, x₂⟫_ℝ := by
+        rw [← inner_add_left]; simp
+      nlinarith [inner_eq_self_add_diff, hcs, hself, hclose, hxp,
+        mul_lt_mul_of_pos_right hclose hxp]
   -- pull `inner_pos₂` back to V via `fromL2`:
     have inner_pos_V : ∀ x ∈ Metric.ball x₀ δ₂, 0 < ⟪f x, f x₀⟫_ℝ := fun x hx => inner_pos₂ x hx
     -- now we have a genuine positive integrand on a set of positive measure.

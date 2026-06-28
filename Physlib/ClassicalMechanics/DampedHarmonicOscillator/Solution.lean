@@ -271,7 +271,8 @@ private lemma underdampedBase_velocity (IC : InitialConditions) (hS : S.IsUnderd
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
   rw [fderiv_comp_val_eq_deriv (fun s => cos (S.angularFrequency * s)) (by fun_prop),
-    fderiv_comp_val_eq_deriv (fun s => sin (S.angularFrequency * s) / S.angularFrequency) (by fun_prop)]
+    fderiv_comp_val_eq_deriv (fun s => sin (S.angularFrequency * s) / S.angularFrequency)
+      (by fun_prop)]
   simp [mul_comm, hΩ]
 
 private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUnderdamped) :
@@ -294,7 +295,8 @@ private lemma underdampedBase_acceleration (IC : InitialConditions) (hS : S.IsUn
   rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
-  rw [fderiv_comp_val_eq_deriv (fun s => -S.angularFrequency * sin (S.angularFrequency * s)) (by fun_prop),
+  rw [fderiv_comp_val_eq_deriv (fun s => -S.angularFrequency * sin (S.angularFrequency * s))
+      (by fun_prop),
     fderiv_comp_val_eq_deriv (fun s => cos (S.angularFrequency * s)) (by fun_prop)]
   simp [mul_comm, smul_smul, smul_add]
   field_simp [hΩ]
@@ -319,7 +321,8 @@ private lemma overdampedBase_velocity (IC : InitialConditions) (hS : S.IsOverdam
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
   rw [fderiv_comp_val_eq_deriv (fun s => cosh (S.angularFrequency * s)) (by fun_prop),
-    fderiv_comp_val_eq_deriv (fun s => sinh (S.angularFrequency * s) / S.angularFrequency) (by fun_prop)]
+    fderiv_comp_val_eq_deriv (fun s => sinh (S.angularFrequency * s) / S.angularFrequency)
+      (by fun_prop)]
   simp [mul_comm, hΩ]
 
 private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOverdamped) :
@@ -342,7 +345,8 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
   rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by fun_prop),
     fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply]
-  rw [fderiv_comp_val_eq_deriv (fun s => S.angularFrequency * sinh (S.angularFrequency * s)) (by fun_prop),
+  rw [fderiv_comp_val_eq_deriv (fun s => S.angularFrequency * sinh (S.angularFrequency * s))
+      (by fun_prop),
     fderiv_comp_val_eq_deriv (fun s => cosh (S.angularFrequency * s)) (by fun_prop)]
   simp [mul_comm, smul_smul, smul_add]
   field_simp [hΩ]
