@@ -29,13 +29,15 @@ which facts are data and which facts are proved.
 
 - `ClassicalFieldTheory.Local.HasTotalDivergenceDifference`
 - `ClassicalFieldTheory.Local.IsEulerLagrangeEquivalent`
+- `ClassicalFieldTheory.Local.IsEulerLagrangeEquivalent.isCritical_iff`
 - `ClassicalFieldTheory.Local.TotalDivergenceEquivalence`
 - `ClassicalFieldTheory.Local.TotalDivergenceEquivalence.isCritical_iff`
 
 ## iii. Table of contents
 
 - A. Equivalence predicates
-- B. Packaged total-divergence equivalences
+- B. Euler-Lagrange equivalence API
+- C. Packaged total-divergence equivalences
 
 ## iv. References
 
@@ -71,7 +73,47 @@ def IsEulerLagrangeEquivalent (source target : Lagrangian d m k) : Prop :=
     eulerLagrangeOp target f = eulerLagrangeOp source f
 
 /-!
-## B. Packaged total-divergence equivalences
+## B. Euler-Lagrange equivalence API
+
+-/
+
+namespace IsEulerLagrangeEquivalent
+
+variable {d m k : ℕ}
+
+lemma refl (L : Lagrangian d m k) : IsEulerLagrangeEquivalent L L := by
+  intro f
+  rfl
+
+lemma symm {L1 L2 : Lagrangian d m k} (h : IsEulerLagrangeEquivalent L1 L2) :
+    IsEulerLagrangeEquivalent L2 L1 := by
+  intro f
+  exact (h f).symm
+
+lemma trans {L1 L2 L3 : Lagrangian d m k}
+    (h12 : IsEulerLagrangeEquivalent L1 L2) (h23 : IsEulerLagrangeEquivalent L2 L3) :
+    IsEulerLagrangeEquivalent L1 L3 := by
+  intro f
+  exact (h23 f).trans (h12 f)
+
+lemma isCritical_iff {source target : Lagrangian d m k}
+    (h : IsEulerLagrangeEquivalent source target)
+    (f : Space d → EuclideanSpace ℝ (Fin m))
+    (hsourcef : IsAdmissibleForAction source f)
+    (htargetf : IsAdmissibleForAction target f)
+    (hsource : Lagrangian.SmoothInCoordinates source)
+    (htarget : Lagrangian.SmoothInCoordinates target) :
+    IsCritical target f ↔ IsCritical source f := by
+  rw [isCritical_iff_eulerLagrange_zero_of_admissibleForAction_and_smoothInCoordinates
+      target f htargetf htarget,
+    isCritical_iff_eulerLagrange_zero_of_admissibleForAction_and_smoothInCoordinates
+      source f hsourcef hsource,
+    h f]
+
+end IsEulerLagrangeEquivalent
+
+/-!
+## C. Packaged total-divergence equivalences
 
 -/
 
@@ -117,11 +159,7 @@ lemma isCritical_iff (E : TotalDivergenceEquivalence d m k)
     (hsource : Lagrangian.SmoothInCoordinates E.source)
     (htarget : Lagrangian.SmoothInCoordinates E.target) :
     IsCritical E.target f ↔ IsCritical E.source f := by
-  rw [isCritical_iff_eulerLagrange_zero_of_admissibleForAction_and_smoothInCoordinates
-      E.target f htargetf htarget,
-    isCritical_iff_eulerLagrange_zero_of_admissibleForAction_and_smoothInCoordinates
-      E.source f hsourcef hsource,
-    E.eulerLagrangeOp_eq f]
+  exact E.sameEulerLagrangeOp.isCritical_iff f hsourcef htargetf hsource htarget
 
 end TotalDivergenceEquivalence
 
