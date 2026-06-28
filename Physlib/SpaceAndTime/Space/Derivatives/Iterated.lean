@@ -107,9 +107,10 @@ lemma iteratedDeriv_zero [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
   simp [iteratedDeriv, Physlib.MultiIndex.toList_zero]
 
 @[simp]
-lemma iteratedDeriv_increment_zero [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
-    (I : MultiIndex d.succ) (f : Space d.succ → M) :
+lemma iteratedDeriv_increment_zero [NeZero d] [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
+    (I : MultiIndex d) (f : Space d → M) :
     ∂^[MultiIndex.increment I 0] f = ∂[0] (∂^[I] f) := by
+  obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (NeZero.ne d)
   simp [iteratedDeriv, Physlib.MultiIndex.toList_increment_zero]
 
 @[simp]
