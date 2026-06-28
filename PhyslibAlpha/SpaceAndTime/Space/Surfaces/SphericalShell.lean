@@ -31,8 +31,8 @@ open MeasureTheory Real
 
 -/
 
-/-- The map embedding the unit sphere in `Space d.succ` into `Space d.succ`. -/
-def sphericalShell (d : ℕ) : Metric.sphere (0 : Space d.succ) 1 → Space d.succ := fun x => x.1
+/-- The inclusion into `Space d` of its unit sphere `S^{d-1}` (the subtype coercion `x ↦ x.1`). -/
+def sphericalShell (d : ℕ) : Metric.sphere (0 : Space d) 1 → Space d := fun x => x.1
 
 lemma sphericalShell_injective (d : ℕ) : Function.Injective (sphericalShell d) := by
   intro x y h
@@ -47,7 +47,7 @@ lemma sphericalShell_measurableEmbedding (d : ℕ) : MeasurableEmbedding (spheri
   · exact sphericalShell_injective d
 
 @[simp]
-lemma norm_sphericalShell (d : ℕ) (x : Metric.sphere (0 : Space d.succ) 1) :
+lemma norm_sphericalShell (d : ℕ) (x : Metric.sphere (0 : Space d) 1) :
     ‖sphericalShell d x‖ = 1 := by
   simp [sphericalShell, Metric.sphere]
 
@@ -57,8 +57,8 @@ lemma norm_sphericalShell (d : ℕ) (x : Metric.sphere (0 : Space d.succ) 1) :
 
 -/
 
-/-- The measure on `Space d.succ` corresponding to integration around a spherical shell. -/
-def sphericalShellMeasure (d : ℕ) : Measure (Space d.succ) :=
+/-- The measure on `Space d` corresponding to integration around a spherical shell. -/
+def sphericalShellMeasure (d : ℕ) : Measure (Space d) :=
   MeasureTheory.Measure.map (sphericalShell d) (MeasureTheory.Measure.toSphere volume)
 
 instance sphericalShellMeasure_hasTemperateGrowth (d : ℕ) :
@@ -78,15 +78,15 @@ instance sphericalShellMeasure_hasTemperateGrowth (d : ℕ) :
   One can roughly think of this distribution as the distribution which
   takes test functions `f (r)` to `∫ d³r f(r) ρ(r)` where `ρ(r)` is the
   mass, charge or current etc. distribution. -/
-def sphericalShellDist (d : ℕ) : (Space d.succ) →d[ℝ] ℝ  :=
+def sphericalShellDist (d : ℕ) : (Space d) →d[ℝ] ℝ  :=
   SchwartzMap.integralCLM ℝ (sphericalShellMeasure d)
 
 
-lemma sphericalShellDist_apply_eq_integral_sphericalShellMeasure (d : ℕ) (f : 𝓢(Space d.succ, ℝ)) :
+lemma sphericalShellDist_apply_eq_integral_sphericalShellMeasure (d : ℕ) (f : 𝓢(Space d, ℝ)) :
     sphericalShellDist d f = ∫ x, f x ∂sphericalShellMeasure d := by
   rw [sphericalShellDist, SchwartzMap.integralCLM_apply]
 
-lemma sphericalShellDist_apply_eq_integral_sphere_volume (d : ℕ) (f : 𝓢(Space d.succ, ℝ)) :
+lemma sphericalShellDist_apply_eq_integral_sphere_volume (d : ℕ) (f : 𝓢(Space d, ℝ)) :
     sphericalShellDist d f =
     ∫ x, f (sphericalShell d x) ∂(MeasureTheory.Measure.toSphere volume) := by
   rw [sphericalShellDist_apply_eq_integral_sphericalShellMeasure, sphericalShellMeasure,

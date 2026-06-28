@@ -36,16 +36,16 @@ open MeasureTheory Real
 
 /-- The map embedding the unit circular shell extruded along the axis into `Space 3`. -/
 def sphericalCylinder : Metric.sphere (0 : Space 2) 1 × ℝ → Space 3 := fun x =>
-  (slice 2).symm (x.2, sphericalShell 1 x.1)
+  (slice 2).symm (x.2, sphericalShell 2 x.1)
 
 lemma sphericalCylinder_eq :
-    sphericalCylinder = (slice 2).symm ∘ (fun x => (x.2, sphericalShell 1 x.1)) := rfl
+    sphericalCylinder = (slice 2).symm ∘ (fun x => (x.2, sphericalShell 2 x.1)) := rfl
 
 lemma sphericalCylinder_injective : Function.Injective sphericalCylinder := by
   intro x y h
   have h' := congrArg (slice 2) h
   simp [sphericalCylinder] at h'
-  exact Prod.ext (sphericalShell_injective 1 h'.2) h'.1
+  exact Prod.ext (sphericalShell_injective 2 h'.2) h'.1
 
 @[fun_prop]
 lemma sphericalCylinder_continuous : Continuous sphericalCylinder := by

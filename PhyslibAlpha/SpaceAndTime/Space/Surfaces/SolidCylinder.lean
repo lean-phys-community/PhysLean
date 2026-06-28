@@ -76,7 +76,7 @@ lemma norm_solidCylinder (x : Space 2 × ℝ) :
   pushforward of the product of the solid-sphere (closed unit disk) measure on `Space 2` with the
   line measure along the axis. -/
 def solidCylinderMeasure : Measure (Space 3) :=
-  MeasureTheory.Measure.map solidCylinder ((solidSphereMeasure 1).prod (volume (α := ℝ)))
+  MeasureTheory.Measure.map solidCylinder ((solidSphereMeasure 2).prod (volume (α := ℝ)))
 
 instance solidCylinderMeasure_hasTemperateGrowth :
     solidCylinderMeasure.HasTemperateGrowth := by
@@ -88,8 +88,8 @@ instance solidCylinderMeasure_hasTemperateGrowth :
   rw [MeasurableEmbedding.integrable_map_iff solidCylinder_measurableEmbedding]
   change Integrable
     (fun x : Space 2 × ℝ => (1 + ‖solidCylinder x‖) ^ (-(n : ℝ)))
-    ((solidSphereMeasure 1).prod (volume (α := ℝ)))
-  apply Integrable.mono' (hn.comp_snd (solidSphereMeasure 1))
+    ((solidSphereMeasure 2).prod (volume (α := ℝ)))
+  apply Integrable.mono' (hn.comp_snd (solidSphereMeasure 2))
   · apply AEMeasurable.aestronglyMeasurable
     exact ((continuous_const.add solidCylinder_continuous.norm).rpow_const
       (fun x => Or.inl (by positivity : (1 : ℝ) + ‖solidCylinder x‖ ≠ 0))).aemeasurable
@@ -105,7 +105,7 @@ instance solidCylinderMeasure_hasTemperateGrowth :
 
 instance solidCylinderMeasure_sFinite : SFinite solidCylinderMeasure := by
   rw [solidCylinderMeasure]
-  exact Measure.instSFiniteMap ((solidSphereMeasure 1).prod (volume (α := ℝ))) solidCylinder
+  exact Measure.instSFiniteMap ((solidSphereMeasure 2).prod (volume (α := ℝ))) solidCylinder
 
 /-!
 
@@ -125,7 +125,7 @@ lemma solidCylinderDist_apply_eq_integral_solidCylinderMeasure (f : 𝓢(Space 3
 
 lemma solidCylinderDist_apply_eq_integral_disk_volume (f : 𝓢(Space 3, ℝ)) :
     solidCylinderDist f =
-    ∫ x, f (solidCylinder x) ∂((solidSphereMeasure 1).prod (volume (α := ℝ))) := by
+    ∫ x, f (solidCylinder x) ∂((solidSphereMeasure 2).prod (volume (α := ℝ))) := by
   rw [solidCylinderDist_apply_eq_integral_solidCylinderMeasure, solidCylinderMeasure,
     MeasurableEmbedding.integral_map solidCylinder_measurableEmbedding]
 
@@ -138,7 +138,7 @@ lemma solidCylinderDist_apply_eq_integral_disk_volume (f : 𝓢(Space 3, ℝ)) :
 lemma solidCylinderMeasure_univ_pos : 0 < solidCylinderMeasure Set.univ := by
   rw [solidCylinderMeasure, Measure.map_apply solidCylinder_measurableEmbedding.measurable
     MeasurableSet.univ, Set.preimage_univ, ← Set.univ_prod_univ, Measure.prod_prod]
-  refine ENNReal.mul_pos (solidSphereMeasure_univ_pos 1).ne' ?_
+  refine ENNReal.mul_pos (solidSphereMeasure_univ_pos 2).ne' ?_
   simp
 
 end Space

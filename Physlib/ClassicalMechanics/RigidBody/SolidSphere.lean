@@ -43,12 +43,11 @@ noncomputable def solidSphere (d : ℕ) (m R : ℝ≥0) : RigidBody d where
       rw [integral_const_mul]
       ring⟩
 
-lemma solidSphere_mass {d : ℕ} (m R : ℝ≥0) (hr : R ≠ 0) : (solidSphere d.succ m R).mass = m := by
+lemma solidSphere_mass {d : ℕ} (m R : ℝ≥0) (hr : R ≠ 0) : (solidSphere d m R).mass = m := by
   simp only [mass, solidSphere]
-  simp only [Nat.succ_eq_add_one, LinearMap.coe_mk, AddHom.coe_mk, ContMDiffMap.coeFn_mk,
-    integral_const, MeasurableSet.univ, measureReal_restrict_apply, Set.univ_inter, smul_eq_mul,
-    mul_one]
-  have h1 : (@volume (Space d.succ) measureSpaceOfInnerProductSpace).real
+  simp only [LinearMap.coe_mk, AddHom.coe_mk, ContMDiffMap.coeFn_mk, integral_const,
+    MeasurableSet.univ, measureReal_restrict_apply, Set.univ_inter, smul_eq_mul, mul_one]
+  have h1 : (@volume (Space d) measureSpaceOfInnerProductSpace).real
       (Metric.closedBall 0 R) ≠ 0 := by
     refine (measureReal_ne_zero_iff ?_).mpr ?_
     · apply measure_closedBall_lt_top.ne
@@ -59,15 +58,15 @@ lemma solidSphere_mass {d : ℕ} (m R : ℝ≥0) (hr : R ≠ 0) : (solidSphere d
   field_simp
 
 /-- The center of mass of a solid sphere located at the origin is `0`. -/
-lemma solidSphere_centerOfMass {d : ℕ} (m R : ℝ≥0) : (solidSphere d.succ m R).centerOfMass = 0 := by
+lemma solidSphere_centerOfMass {d : ℕ} (m R : ℝ≥0) : (solidSphere d m R).centerOfMass = 0 := by
   ext i
-  simp only [Nat.succ_eq_add_one, centerOfMass, solidSphere, one_div, LinearMap.coe_mk,
-    AddHom.coe_mk, ContMDiffMap.coeFn_mk, smul_eq_mul, Space.zero_apply, mul_eq_zero, inv_eq_zero,
-    div_eq_zero_iff, coe_eq_zero]
+  simp only [centerOfMass, solidSphere, one_div, LinearMap.coe_mk, AddHom.coe_mk,
+    ContMDiffMap.coeFn_mk, smul_eq_mul, Space.zero_apply, mul_eq_zero, inv_eq_zero, div_eq_zero_iff,
+    coe_eq_zero]
   right
   right
-  suffices ∫ x in Metric.closedBall (0 : Space d.succ) R, x i ∂MeasureSpace.volume
-    = -∫ x in Metric.closedBall (0 : Space d.succ) R, x i ∂MeasureSpace.volume by linarith
+  suffices ∫ x in Metric.closedBall (0 : Space d) R, x i ∂MeasureSpace.volume
+    = -∫ x in Metric.closedBall (0 : Space d) R, x i ∂MeasureSpace.volume by linarith
   rw [← integral_neg]
   simp only [← integral_indicator measurableSet_closedBall, Set.indicator, Metric.mem_closedBall]
   rw [← integral_neg_eq_self]
