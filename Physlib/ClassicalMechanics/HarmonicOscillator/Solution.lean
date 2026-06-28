@@ -51,11 +51,15 @@ prove that they satisfy the equation of motion, and prove some properties of the
   - E.2. Conversion to standard initial conditions
   - E.3. The trajectory in normal form
   - E.4. Recovering the amplitude and phase
-- F. The trajectories at zero velocity
-  - F.1. The times at which the velocity is zero
-  - F.2. A time when the velocity is zero
+- F. Special conditions of the trajectory
+  - F.1. Normal form for standard initial conditions
+  - F.2. Times at which the velocity is zero
   - F.3. The position when the velocity is zero
-- G. Some open TODOs
+  - F.4. Times at which the trajectory passes through zero
+- G. Periodicity and recurrence
+  - G.1. The period
+  - G.2. Periodicity of the trajectory
+  - G.3. Return to the initial state
 
 ## iv. References
 
@@ -1118,6 +1122,25 @@ lemma trajectory_eq_zero_iff_exists_int (IC : InitialConditions)
 
 end InitialConditions
 
+/-!
+
+## G. Periodicity and recurrence
+
+Every trajectory is a shifted cosine of angular frequency `ω`, so it repeats after a fixed period
+`T = 2π / ω`. We record the period, show the trajectory is periodic, and prove that — for
+non-trivial initial data — the trajectory returns to its initial position and velocity exactly at
+integer multiples of the period.
+
+-/
+
+/-!
+
+### G.1. The period
+
+The period `T = 2π / ω` is the time for one complete oscillation; it is positive since `ω > 0`.
+
+-/
+
 /--
 The period of a harmonic oscillator is `2 * π / ω`.
 -/
@@ -1133,6 +1156,15 @@ lemma period_pos : 0 < T S := by
   rw [period_eq]
   positivity
 
+/-!
+
+### G.2. Periodicity of the trajectory
+
+The trajectory satisfies `x(t + T) = x(t)`: advancing time by one period shifts the phase `ω t`
+by `2π`, leaving `cos` and `sin` unchanged.
+
+-/
+
 /--
 The trajectory of the harmonic oscillator is periodic with period of `2 * π / ω`.
 -/
@@ -1143,6 +1175,15 @@ lemma trajectory_periodic (IC : InitialConditions) :
     ring_nf; field_simp
   rw [InitialConditions.trajectory, add_val, period_eq, h, cos_add_two_pi, sin_add_two_pi]
   rfl
+
+/-!
+
+### G.3. Return to the initial state
+
+For non-trivial initial data, the trajectory returns to its initial position and velocity only at
+integer multiples of the period.
+
+-/
 
 /--
 Assuming that the initial coordinate and velocity are not simultaneously zero,
@@ -1227,8 +1268,6 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
     _ = (S.ω * t) / S.ω := by rw [hn]
     _ = t * (S.ω / S.ω) := by ring_nf
     _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
-
-
 end HarmonicOscillator
 
 end ClassicalMechanics
