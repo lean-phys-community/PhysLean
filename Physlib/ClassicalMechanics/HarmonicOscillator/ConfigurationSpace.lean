@@ -82,7 +82,6 @@ underlying coordinate. This mirrors the function-like use of `EuclideanSpace ℝ
 instance : CoeFun ConfigurationSpace (fun _ => Fin 1 → ℝ) where
   coe x := fun i => x.val i
 
-@[simp]
 lemma coe_apply (x : ConfigurationSpace) (i : Fin 1) : x i = x.val i := rfl
 
 /-!
@@ -317,7 +316,6 @@ concrete coordinate model.
 /-- The position in one-dimensional space associated to the configuration. -/
 def toSpace (q : ConfigurationSpace) : Space 1 := ⟨fun i => q.val i⟩
 
-@[simp]
 lemma toSpace_apply (q : ConfigurationSpace) (i : Fin 1) : q.toSpace i = q.val i := rfl
 
 end ConfigurationSpace
