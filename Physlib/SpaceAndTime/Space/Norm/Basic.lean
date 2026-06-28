@@ -18,13 +18,11 @@ The main content of this file is defining `Space.normPowerSeries`, a power serie
 differentiable everywhere, and which tends to the norm in the limit as `n → ∞`.
 
 We use properties of this power series to prove various results about distributions involving norms.
-This file also contains basic API for regularized powers of the norm.
 
 ## ii. Key results
 
 - `normPowerSeries` : A power series which is differentiable everywhere, and in the limit
   as `n → ∞` tends to `‖x‖`.
-- `normRegularizedPow` : The regularized norm power `x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)`.
 - `normPowerSeries_differentiable` : The power series is differentiable everywhere.
 - `normPowerSeries_tendsto` : The power series tends to the norm in the limit as `n → ∞`.
 - `distGrad_distOfFunction_norm_zpow` : The gradient of the distribution defined by a power of the
@@ -43,7 +41,6 @@ This file also contains basic API for regularized powers of the norm.
 ## iii. Table of contents
 
 - A. The norm as a power series
-  - A.0. Regularized powers of the norm
   - A.1. Differentiability of the norm power series
   - A.2. The limit of the norm power series
   - A.3. The derivative of the norm power series
@@ -79,53 +76,13 @@ variable (𝕜 : Type) {E F F' : Type} [RCLike 𝕜] [NormedAddCommGroup E] [Nor
 
 namespace Space
 
-open MeasureTheory Function
+open MeasureTheory
 
 /-!
 
 ## A. The norm as a power series
 
 -/
-
-/-!
-### A.0. Regularized powers of the norm
--/
-
-/-- Power of regularized norm, `(‖x‖² + ε²)^(s/2)`. -/
-def normRegularizedPow (d : ℕ) (ε s : ℝ) : Space d → ℝ :=
-  fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2)
-
-lemma normRegularizedPow_eq (d : ℕ) (ε s : ℝ) :
-    normRegularizedPow d ε s = fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) := rfl
-
-/-- For a nonzero regularization parameter, `‖x‖² + ε²` is positive. -/
-lemma norm_sq_add_unit_sq_pos {d : ℕ} (ε : ℝˣ) (x : Space d) : 0 < ‖x‖ ^ 2 + ε ^ 2 :=
-    Left.add_pos_of_nonneg_of_pos (sq_nonneg ‖x‖) (sq_pos_iff.mpr <| Units.ne_zero ε)
-
-/-- The regularized norm power is positive for nonzero regularization parameter. -/
-lemma normRegularizedPow_pos (d : ℕ) (ε : ℝˣ) (s : ℝ) (x : Space d) :
-    0 < normRegularizedPow d ε s x :=
-  Real.rpow_pos_of_pos (norm_sq_add_unit_sq_pos ε x) (s / 2)
-
-/-- The regularized norm power has temperate growth. -/
-lemma normRegularizedPow_hasTemperateGrowth (d : ℕ) (ε : ℝˣ) (s : ℝ) :
-    HasTemperateGrowth (normRegularizedPow d ε s) := by
-  let f1 := fun (x : ℝ) ↦ (ε ^ 2) ^ (s / 2) * x
-  let f2 := fun (x : Space d) ↦ (1 + ‖x‖ ^ 2) ^ (s / 2)
-  let f3 := fun (x : Space d) ↦ ε.1⁻¹ • x
-  have h123 : normRegularizedPow d ε s = f1 ∘ f2 ∘ f3 := by
-    ext
-    simp only [normRegularizedPow, f1, f2, f3, comp_apply, norm_smul, norm_inv, Real.norm_eq_abs]
-    rw [← Real.mul_rpow (sq_nonneg ↑ε) (add_nonneg (zero_le_one' _) (sq_nonneg _))]
-    simp [mul_add, mul_pow, add_comm]
-  rw [h123]
-  fun_prop
-
-@[fun_prop]
-lemma normRegularizedPow_measurable (d : ℕ) (ε s : ℝ) :
-    Measurable (normRegularizedPow d ε s) := by
-  rw [normRegularizedPow_eq]
-  fun_prop
 
 /-- A power series which is differentiable everywhere, and in the limit
   as `n → ∞` tends to `‖x‖`. -/

@@ -420,6 +420,7 @@ public import Physlib.SpaceAndTime.Space.LengthUnit
 public import Physlib.SpaceAndTime.Space.Module
 public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
+public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.Origin
 public import Physlib.SpaceAndTime.Space.Slice
 public import Physlib.SpaceAndTime.Space.Translations

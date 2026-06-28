@@ -7,7 +7,7 @@ module
 
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
-public import Physlib.SpaceAndTime.Space.Norm.Basic
+public import Physlib.SpaceAndTime.Space.Norm.Regularized
 /-!
 
 # Position operators
