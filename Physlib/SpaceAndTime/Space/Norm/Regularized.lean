@@ -33,6 +33,8 @@ This file contains basic API for regularized powers of the norm on `Space d`, na
 
 @[expose] public section
 
+noncomputable section
+
 namespace Space
 
 open MeasureTheory Function
