@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Nicola Bernini. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Nicola Bernini
+Authors: Nicola Bernini, Nathaneal Sajan
 -/
 module
 
@@ -10,8 +10,36 @@ public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 # Configuration space of the harmonic oscillator
 
-The configuration space is defined as a one-dimensional smooth manifold,
-modeled on `ℝ`, with a chosen coordinate.
+## i. Overview
+
+The configuration space `Q` of the one-dimensional harmonic oscillator is the space of
+possible positions of the oscillator, formalised here as a one-dimensional smooth manifold.
+
+`Q` carries a single chosen global coordinate, modeled by `EuclideanSpace ℝ (Fin 1)`, from
+which it inherits its algebraic, metric, inner-product and smooth-manifold structure.
+
+## ii. Key results
+
+- `ConfigurationSpace` : the configuration space, wrapping the chosen
+  `EuclideanSpace ℝ (Fin 1)` coordinate.
+- `ConfigurationSpace.valLinearIsometryEquiv` : the linear isometry identifying `Q` with
+  its coordinate.
+- the `InnerProductSpace ℝ ConfigurationSpace` and `IsManifold` instances, exhibiting `Q`
+  as a one-dimensional real inner-product space and an analytic manifold.
+- `ConfigurationSpace.toSpace` : the point of physical `Space 1` determined by a
+  configuration.
+
+## iii. Table of contents
+
+- A. The configuration space type
+- B. Algebraic structure
+- C. Norm and metric structure
+- D. Inner product structure
+  - D.1. The inner product and inner-product-space instance
+  - D.2. Smoothness of the inner product
+- E. The coordinate isometry
+- F. Smooth manifold structure
+- G. Map to physical space
 -/
 
 @[expose] public section
@@ -20,17 +48,25 @@ namespace ClassicalMechanics
 
 namespace HarmonicOscillator
 
-TODO "Configuration Space should be refactored to take `EuclideanSpace ℝ (Fin 1)`
-    as its value."
-
 TODO "The API around the configuration space
     should be improved to allow further development of a proper
     geometric model of the Harmonic Oscillator."
 
-/-- The configuration space of the harmonic oscillator. -/
+/-!
+## A. The configuration space type
+
+`ConfigurationSpace` wraps a single chosen global coordinate valued in
+`EuclideanSpace ℝ (Fin 1)`. We record extensionality in this coordinate together with a
+function-like coordinate access mirroring that of `EuclideanSpace ℝ (Fin 1)`.
+-/
+
+/-- The one-dimensional configuration space `Q` of the harmonic oscillator: the space of
+possible positions of the oscillator, equipped with a single chosen global coordinate
+modeled by `EuclideanSpace ℝ (Fin 1)`. -/
 structure ConfigurationSpace where
-  /-- The underlying real coordinate. -/
-  val : ℝ
+  /-- The chosen global coordinate of the configuration, valued in
+  `EuclideanSpace ℝ (Fin 1)`. -/
+  val : EuclideanSpace ℝ (Fin 1)
 
 namespace ConfigurationSpace
 
@@ -38,11 +74,22 @@ namespace ConfigurationSpace
 lemma ext {x y : ConfigurationSpace} (h : x.val = y.val) : x = y := by
   cases x
   cases y
-  simp at h
-  simp [h]
+  subst h
+  rfl
+
+/-- A configuration may be applied like a function `Fin 1 → ℝ`, evaluating its
+underlying coordinate. This mirrors the function-like use of `EuclideanSpace ℝ (Fin 1)`. -/
+instance : CoeFun ConfigurationSpace (fun _ => Fin 1 → ℝ) where
+  coe x := fun i => x.val i
+
+lemma coe_apply (x : ConfigurationSpace) (i : Fin 1) : x i = x.val i := rfl
 
 /-!
-## Algebraic and analytical structure
+## B. Algebraic structure
+
+The additive group, real scalar action and `Module ℝ` structure, each defined
+coordinatewise on the underlying `EuclideanSpace ℝ (Fin 1)` value. Physically this is the
+vector-space structure on displacements of the oscillator about a reference configuration.
 -/
 
 instance : Zero ConfigurationSpace := { zero := ⟨0⟩ }
@@ -71,19 +118,10 @@ instance : Sub ConfigurationSpace where
 lemma sub_val (x y : ConfigurationSpace) : (x - y).val = x.val - y.val := rfl
 
 instance : SMul ℝ ConfigurationSpace where
-  smul r x := ⟨r * x.val⟩
+  smul r x := ⟨r • x.val⟩
 
 @[simp]
-lemma smul_val (r : ℝ) (x : ConfigurationSpace) : (r • x).val = r * x.val := rfl
-
-instance : CoeFun ConfigurationSpace (fun _ => Fin 1 → ℝ) where
-  coe x := fun _ => x.val
-
-@[simp]
-lemma apply_zero (x : ConfigurationSpace) : x 0 = x.val := rfl
-
-@[simp]
-lemma apply_eq_val (x : ConfigurationSpace) (i : Fin 1) : x i = x.val := rfl
+lemma smul_val (r : ℝ) (x : ConfigurationSpace) : (r • x).val = r • x.val := rfl
 
 instance : AddGroup ConfigurationSpace where
   add_assoc x y z := by ext; simp [add_assoc]
@@ -98,75 +136,88 @@ instance : AddCommGroup ConfigurationSpace where
 
 instance : Module ℝ ConfigurationSpace where
   one_smul x := by ext; simp
-  smul_add r x y := by ext; simp [mul_add]
-  smul_zero r := by ext; simp [mul_zero]
-  add_smul r s x := by ext; simp [add_mul]
-  mul_smul r s x := by ext; simp [mul_assoc]
+  smul_add r x y := by ext; simp [smul_add]
+  smul_zero r := by ext; simp
+  add_smul r s x := by ext; simp [add_smul]
+  mul_smul r s x := by ext; simp [mul_smul]
   zero_smul x := by ext; simp
 
-instance : Norm ConfigurationSpace where
+/-!
+## C. Norm and metric structure
+
+The norm, distance and resulting `NormedAddCommGroup`/`NormedSpace ℝ` structure, all
+inherited from the underlying Euclidean coordinate. The norm corresponds to a choice of
+length unit on configuration space.
+-/
+
+noncomputable instance : Norm ConfigurationSpace where
   norm x := ‖x.val‖
 
-instance : Dist ConfigurationSpace where
-  dist x y := ‖x - y‖
+@[simp]
+lemma norm_val (x : ConfigurationSpace) : ‖x‖ = ‖x.val‖ := rfl
 
-lemma dist_eq_val (x y : ConfigurationSpace) :
-    dist x y = ‖x.val - y.val‖ := rfl
+noncomputable instance : Dist ConfigurationSpace where
+  dist x y := dist x.val y.val
 
-instance : SeminormedAddCommGroup ConfigurationSpace where
-  dist_self x := by simp [dist_eq_val]
-  dist_comm x y := by
-    simpa [dist_eq_val, Real.dist_eq] using (dist_comm x.val y.val)
-  dist_triangle x y z := by
-    simpa [dist_eq_val, Real.dist_eq] using (dist_triangle x.val y.val z.val)
+@[simp]
+lemma dist_val (x y : ConfigurationSpace) : dist x y = dist x.val y.val := rfl
+
+noncomputable instance : SeminormedAddCommGroup ConfigurationSpace where
+  dist_self x := by simp
+  dist_comm x y := by simpa using dist_comm x.val y.val
+  dist_triangle x y z := by simpa using dist_triangle x.val y.val z.val
   dist_eq x y := by
-    simp [dist_eq_val, norm]
-    refine abs_eq_abs.mpr ?_
-    ring_nf
-    simp
+    rw [dist_val, dist_eq_norm, norm_val, add_val, neg_val,
+      show -x.val + y.val = -(x.val - y.val) by abel, norm_neg]
 
-instance : NormedAddCommGroup ConfigurationSpace where
+noncomputable instance : NormedAddCommGroup ConfigurationSpace where
   eq_of_dist_eq_zero := by
     intro a b h
-    ext
-    have h' : dist a.val b.val = 0 := by
-      simpa [dist_eq_val, Real.dist_eq] using h
-    exact dist_eq_zero.mp h'
+    have h' : dist a.val b.val = 0 := by simpa using h
+    exact ext (dist_eq_zero.mp h')
   dist_eq x y := by
-    simp [dist_eq_val, norm]
-    refine abs_eq_abs.mpr ?_
-    ring_nf
-    simp
+    rw [dist_val, dist_eq_norm, norm_val, add_val, neg_val,
+      show -x.val + y.val = -(x.val - y.val) by abel, norm_neg]
 
 instance : NormedSpace ℝ ConfigurationSpace where
   norm_smul_le r x := by
-    simp [norm, smul_val, abs_mul]
+    simp [norm_val, smul_val, norm_smul]
+
+/-!
+## D. Inner product structure
+
+### D.1. The inner product and inner-product-space instance
+
+The inner product is that of the underlying Euclidean coordinate, making
+`ConfigurationSpace` a real inner-product space. Physically this is the metric used to form
+kinetic energy and to identify configuration space with its dual.
+-/
 
 open InnerProductSpace
 
-instance : Inner ℝ ConfigurationSpace where
-  inner x y := x.val * y.val
+noncomputable instance : Inner ℝ ConfigurationSpace where
+  inner x y := ⟪x.val, y.val⟫_ℝ
 
 @[simp]
-lemma inner_def (x y : ConfigurationSpace) : ⟪x, y⟫_ℝ = x.val * y.val := rfl
+lemma inner_def (x y : ConfigurationSpace) : ⟪x, y⟫_ℝ = ⟪x.val, y.val⟫_ℝ := rfl
 
 noncomputable instance : InnerProductSpace ℝ ConfigurationSpace where
-  norm_sq_eq_re_inner := by
-    intro x
-    have hx : ‖x‖ ^ 2 = x.val ^ 2 := by
-      simp [norm, sq_abs]
-    simpa [inner_def, pow_two] using hx
-  conj_inner_symm := by
-    intro x y
-    simp [inner_def]
-    ring
-  add_left := by
-    intro x y z
-    simp [inner_def, add_mul]
-  smul_left := by
-    intro x y r
-    simp [inner_def]
-    ring
+  norm_sq_eq_re_inner x := by
+    simp [inner_def, norm_val]
+  conj_inner_symm x y := by
+    simpa [inner_def] using inner_conj_symm (𝕜 := ℝ) x.val y.val
+  add_left x y z := by
+    simpa [inner_def, add_val] using inner_add_left (𝕜 := ℝ) x.val y.val z.val
+  smul_left x y r := by
+    simpa [inner_def, smul_val] using inner_smul_left (𝕜 := ℝ) x.val y.val r
+
+/-!
+### D.2. Smoothness of the inner product
+
+The self-inner-product `q ↦ ⟪q, q⟫` is differentiable and smooth of every order. These
+lemmas are tagged `@[fun_prop]` so the `fun_prop` automation can discharge differentiability
+side-goals about it.
+-/
 
 @[fun_prop]
 lemma differentiable_inner_self :
@@ -189,52 +240,45 @@ lemma contDiff_inner_self (n : WithTop ℕ∞) :
   simpa using (ContDiff.inner (𝕜:=ℝ) (f:=fun x : ConfigurationSpace => x)
     (g:=fun x : ConfigurationSpace => x) h_id h_id)
 
-/-- Linear map sending a configuration space element to its underlying real value. -/
-noncomputable def toRealLM : ConfigurationSpace →ₗ[ℝ] ℝ :=
-  { toFun := ConfigurationSpace.val
-    map_add' := by simp
-    map_smul' := by simp }
+/-!
+## E. The coordinate isometry
 
-/-- Linear map embedding a real value into the configuration space. -/
-noncomputable def fromRealLM : ℝ →ₗ[ℝ] ConfigurationSpace :=
-  { toFun := fun x => ⟨x⟩
-    map_add' := by
-      intro x y
-      ext
-      simp
-    map_smul' := by
-      intro r x
-      ext
-      simp }
+`ConfigurationSpace` is linearly isometric to its `EuclideanSpace ℝ (Fin 1)` coordinate.
+Because the norm is defined to be that of the coordinate, the identification is
+definitional, and it supplies the homeomorphism underlying the manifold chart.
+-/
 
-/-- Continuous linear map sending a configuration space element to its underlying real value. -/
-noncomputable def toRealCLM : ConfigurationSpace →L[ℝ] ℝ :=
-  toRealLM.mkContinuous 1 (by
-    intro x
-    simp [toRealLM, norm])
-
-/-- Continuous linear map embedding a real value into the configuration space. -/
-noncomputable def fromRealCLM : ℝ →L[ℝ] ConfigurationSpace :=
-  fromRealLM.mkContinuous 1 (by
-    intro x
-    simp [fromRealLM, norm])
-
-/-- Homeomorphism between configuration space and `ℝ` given by `ConfigurationSpace.val`. -/
-noncomputable def valHomeomorphism : ConfigurationSpace ≃ₜ ℝ where
+/-- The configuration space is linearly isometric to its `EuclideanSpace ℝ (Fin 1)`
+coordinate, with the isometry given by `ConfigurationSpace.val`. Because the norm on
+configuration space is defined to be that of the underlying coordinate, this isometry
+is definitional. -/
+noncomputable def valLinearIsometryEquiv : ConfigurationSpace ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 1) where
   toFun := ConfigurationSpace.val
-  invFun := fun t => ⟨t⟩
-  left_inv := by
-    intro t
-    cases t
-    rfl
-  right_inv := by
-    intro t
-    rfl
-  continuous_toFun := toRealCLM.continuous
-  continuous_invFun := fromRealCLM.continuous
+  invFun v := ⟨v⟩
+  map_add' x y := rfl
+  map_smul' r x := rfl
+  left_inv x := by cases x; rfl
+  right_inv v := rfl
+  norm_map' x := rfl
 
-/-- The structure of a charted space on `ConfigurationSpace`. -/
-noncomputable instance : ChartedSpace ℝ ConfigurationSpace where
+/-- Homeomorphism between configuration space and its `EuclideanSpace ℝ (Fin 1)`
+coordinate, induced by the linear isometry `valLinearIsometryEquiv`. This underlies the
+chart used to give `ConfigurationSpace` its smooth-manifold structure. -/
+noncomputable def valHomeomorphism : ConfigurationSpace ≃ₜ EuclideanSpace ℝ (Fin 1) :=
+  valLinearIsometryEquiv.toHomeomorph
+
+/-!
+## F. Smooth manifold structure
+
+`ConfigurationSpace` is an analytic manifold modeled on `EuclideanSpace ℝ (Fin 1)`, via the
+single global chart `valHomeomorphism`. With one chart the only coordinate change is the
+chart's self-transition, which is analytic, so chart compatibility is immediate. We also
+record that `Q` is finite-dimensional and complete.
+-/
+
+/-- The structure of a charted space on `ConfigurationSpace`, modeled on its
+`EuclideanSpace ℝ (Fin 1)` coordinate via the single global chart `valHomeomorphism`. -/
+noncomputable instance : ChartedSpace (EuclideanSpace ℝ (Fin 1)) ConfigurationSpace where
   atlas := { valHomeomorphism.toOpenPartialHomeomorph }
   chartAt _ := valHomeomorphism.toOpenPartialHomeomorph
   mem_chart_source := by
@@ -245,34 +289,34 @@ noncomputable instance : ChartedSpace ℝ ConfigurationSpace where
 
 open Manifold ContDiff
 
-/-- The structure of a smooth manifold on `ConfigurationSpace`. -/
-noncomputable instance : IsManifold 𝓘(ℝ, ℝ) ω ConfigurationSpace where
+/-- The structure of a smooth manifold on `ConfigurationSpace`. With a single global
+chart, the only coordinate change is the chart's self-transition, which is analytic. -/
+noncomputable instance : IsManifold 𝓘(ℝ, EuclideanSpace ℝ (Fin 1)) ω ConfigurationSpace where
   compatible := by
     intro e1 e2 h1 h2
     simp [atlas, ChartedSpace.atlas] at h1 h2
     subst h1 h2
     exact symm_trans_mem_contDiffGroupoid valHomeomorphism.toOpenPartialHomeomorph
 
-instance : FiniteDimensional ℝ ConfigurationSpace := by
-  classical
-  refine FiniteDimensional.of_injective toRealLM ?_
-  intro x y h
-  ext
-  exact h
+instance : FiniteDimensional ℝ ConfigurationSpace :=
+  LinearEquiv.finiteDimensional valLinearIsometryEquiv.symm.toLinearEquiv
 
 instance : CompleteSpace ConfigurationSpace := by
   classical
   simpa using (FiniteDimensional.complete ℝ ConfigurationSpace)
 
 /-!
-## Map to space
+## G. Map to physical space
+
+The point of one-dimensional physical `Space 1` determined by a configuration, obtained by
+reading off the underlying coordinate. This links the abstract configuration space to the
+concrete coordinate model.
 -/
 
 /-- The position in one-dimensional space associated to the configuration. -/
-def toSpace (q : ConfigurationSpace) : Space 1 := ⟨fun _ => q.val⟩
+def toSpace (q : ConfigurationSpace) : Space 1 := ⟨fun i => q.val i⟩
 
-@[simp]
-lemma toSpace_apply (q : ConfigurationSpace) (i : Fin 1) : q.toSpace i = q.val := rfl
+lemma toSpace_apply (q : ConfigurationSpace) (i : Fin 1) : q.toSpace i = q.val i := rfl
 
 end ConfigurationSpace
 

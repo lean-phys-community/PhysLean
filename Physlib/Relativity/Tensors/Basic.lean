@@ -36,16 +36,15 @@ For `S : TensorSpecies` and a list of index colors `c : Fin n → C`:
   `v₀ ⊗ₜ v₁ ⊗ₜ v₂ …`.
 - `ComponentIdx S c` is the type of allowed component labels for those indices.
 
+This file realizes `Tensor S c` as a `PiTensorProduct`, relates pure tensors to
+their components, constructs the component basis, and supplies the inherited
+finite-dimensional and module-topology instances. It also defines the natural
+action of `G` on pure tensors and tensors, the associated permutation maps, and
+the map from rank-zero tensors to the base field.
+
 From this setup we get the usual index-notation operations in a uniform way:
 contraction, raising/lowering, and permutation of indices.
 -/
-
-TODO "In this file (Physlib/Relativity/Tensors/Basic.lean), write an overview of the
-  implementation of tensors in Physlib. It should cover the main points:
-- the definition of a tensor species,
-- the meaning of color,
-- the tensorial instances,
-- other key definitions."
 
 @[expose] public section
 
