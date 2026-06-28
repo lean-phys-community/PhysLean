@@ -897,51 +897,34 @@ We study the properties of the trajectories when the velocity is zero.
 
 /-!
 
-### F.1. The times at which the velocity is zero
+### F.1. Normal form for standard initial conditions
 
-We show that if the velocity of the trajectory is zero, then the time satisfies
-the condition that
-```
-tan (S.ω * t) = IC.v₀ 0 / (S.ω * IC.x₀ 0)
-```
+The amplitude-phase normal form was first proved for data already expressed as an
+`AmplitudePhase`. We now transport those identities back to ordinary `InitialConditions` using
+`AmplitudePhase.fromInitialConditions`.
 
 -/
-lemma tan_time_eq_of_trajectory_velocity_eq_zero (IC : InitialConditions) (t : Time)
-    (h : ∂ₜ (IC.trajectory S) t = 0) (hx : IC.x₀ ≠ 0 ∨ IC.v₀ ≠ 0) :
-    tan (S.ω * t) = IC.v₀ 0 / (S.ω * IC.x₀ 0) := by
-  rw [trajectory_velocity] at h
-  simp at h
-  have hx : S.ω ≠ 0 := by exact ω_ne_zero S
-  by_cases h1 : IC.x₀ ≠ 0
-  by_cases h2 : IC.v₀ ≠ 0
-  have h1' : IC.x₀ 0 ≠ 0 := by
-    intro hn
-    apply h1
-    ext i
-    fin_cases i
-    simp [hn]
-  have hcos : cos (S.ω * t.val) ≠ 0 := by
-    by_contra hn
-    rw [hn] at h
-    rw [Real.cos_eq_zero_iff_sin_eq] at hn
-    simp_all
-  rw [tan_eq_sin_div_cos]
-  field_simp
-  trans (sin (S.ω * t.val) * (S.ω * IC.x₀ 0)) +
-    (-(S.ω • sin (S.ω * t.val) • IC.x₀) + cos (S.ω * t.val) • IC.v₀) 0
-  · rw [h]
-    simp only [Fin.isValue, PiLp.zero_apply, add_zero]
-    ring_nf
-  · simp only [Fin.isValue, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul]
-    ring_nf
-  simp at h2
-  rw [h2] at h ⊢
-  simp_all
-  simp [tan_eq_sin_div_cos, h]
-  simp at h1
-  rw [h1] at h ⊢
-  simp_all
-  simp [tan_eq_sin_div_cos, h]
+
+/-- Every trajectory of the harmonic oscillator is a single shifted cosine after converting its
+  initial conditions to amplitude-phase form. -/
+lemma trajectory_eq_cos (IC : InitialConditions) (t : Time) :
+    IC.trajectory S t =
+      EuclideanSpace.single 0 ((AmplitudePhase.fromInitialConditions S IC).A *
+        cos (S.ω * t - (AmplitudePhase.fromInitialConditions S IC).φ)) := by
+  conv_lhs =>
+    rw [← AmplitudePhase.toInitialConditions_fromInitialConditions S IC]
+  exact AmplitudePhase.toInitialConditions_trajectory_eq_cos S
+    (AmplitudePhase.fromInitialConditions S IC) t
+
+/-- The velocity of every trajectory is the corresponding shifted sine in amplitude-phase form. -/
+lemma trajectory_velocity_eq_sin (IC : InitialConditions) (t : Time) :
+    ∂ₜ (IC.trajectory S) t =
+      EuclideanSpace.single 0 (-((AmplitudePhase.fromInitialConditions S IC).A * S.ω *
+        sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ))) := by
+  conv_lhs =>
+    rw [← AmplitudePhase.toInitialConditions_fromInitialConditions S IC]
+  exact AmplitudePhase.toInitialConditions_velocity_eq_sin S
+    (AmplitudePhase.fromInitialConditions S IC) t
 
 /-!
 
