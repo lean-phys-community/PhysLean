@@ -34,7 +34,7 @@ def line (d : ℕ) [NeZero d] : ℝ → Space d := fun r =>
   r • basis (0 : Fin d)
 
 lemma line_eq_smul_basis (d : ℕ) [NeZero d] :
-  line d = fun r => r • basis (0 : Fin d) := rfl
+    line d = fun r => r • basis (0 : Fin d) := rfl
 
 lemma line_injective (d : ℕ) [NeZero d] : Function.Injective (line d) := by
   intro x y h
