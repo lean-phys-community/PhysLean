@@ -335,6 +335,7 @@ end
 -/
 
 noncomputable section
+open Space
 
 /-!
 ### B.1. Position vector
