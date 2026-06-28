@@ -1229,18 +1229,6 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
     _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
 
 
-/-!
-
-## G. Some open TODOs
-
-We give some open TODOs for the classical harmonic oscillator.
-
--/
-
-
-TODO "For the classical harmonic oscillator find the times for
-  which it passes through zero."
-
 end HarmonicOscillator
 
 end ClassicalMechanics
