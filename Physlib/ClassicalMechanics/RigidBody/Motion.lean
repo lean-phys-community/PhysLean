@@ -81,20 +81,8 @@ body-fixed mass distribution along the rigid displacement, acting on a test func
 noncomputable def massDistribution {d : ℕ} (M : RigidBodyMotion d) (t : Time) : RigidBody d where
   ρ :=
     { toFun := fun f => M.ρ (f.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩)
-      map_add' := by
-        intro f g
-        have h : (f + g).comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ =
-            f.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ +
-            g.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ := by
-          ext y; simp
-        rw [h, map_add]
-      map_smul' := by
-        intro r f
-        have h : (r • f).comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ =
-            r • f.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ := by
-          ext y; simp
-        rw [h]
-        exact map_smul M.ρ r _ }
+      map_add' := fun f g => by rw [ContMDiffMap.add_comp, map_add]
+      map_smul' := fun r f => by rw [ContMDiffMap.smul_comp, map_smul, RingHom.id_apply] }
 
 /-- The motion preserves the total mass: the mass distribution at any time `t` has the same total
 mass as the body. -/
@@ -103,5 +91,78 @@ lemma massDistribution_mass {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
     (M.massDistribution t).mass = M.mass := by
   simp only [RigidBody.mass, massDistribution, LinearMap.coe_mk, AddHom.coe_mk]
   congr 1
+
+/-- Bundle a smooth real-valued function on `Space d` as an element of the space of test
+functions. Keeping this as a named constructor ensures the resulting type head stays
+`ContMDiffMap`, so the module/ring operations and `comp` resolve correctly. -/
+private def cmap {d : ℕ} (f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f) :
+    C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯ := ⟨f, hf.contMDiff⟩
+
+@[simp]
+private lemma cmap_apply {d : ℕ} (f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f) (y : Space d) :
+    cmap f hf y = f y := rfl
+
+/-- Evaluation commutes with finite sums of smooth functions. -/
+private lemma contMDiffMap_sum_apply {d : ℕ} {ι : Type*} (s : Finset ι)
+    (f : ι → C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯) (y : Space d) :
+    (∑ j ∈ s, f j) y = ∑ j ∈ s, f j y := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih =>
+    simp only [Finset.sum_insert ha, ContMDiffMap.coe_add, Pi.add_apply, ih]
+
+/-- The `k`-th coordinate of the rigid displacement applied to `y`. -/
+private lemma displacement_apply {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d)
+    (k : Fin d) :
+    M.displacement t y k =
+      (∑ j, (M.orientation t).val k j * (y j - M.centerOfMass j)) + M.comTrajectory t k := rfl
+
+/-- The first moment of the body-fixed distribution about its own centre of mass vanishes:
+for nonzero mass, `ρ` of the centred `j`-th coordinate function is zero. -/
+private lemma rho_coord_sub_centerOfMass {d : ℕ} (R : RigidBody d) (h : R.mass ≠ 0) (j : Fin d) :
+    R.ρ (cmap (fun y => y j - R.centerOfMass j) (by fun_prop)) = 0 := by
+  have hsplit : cmap (fun y => y j - R.centerOfMass j) (by fun_prop)
+        = cmap (fun y => y j) (by fun_prop)
+          - R.centerOfMass j • (1 : C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯) := by
+    ext y
+    simp only [cmap_apply, ContMDiffMap.coe_sub, ContMDiffMap.coe_smul,
+      ContMDiffMap.coe_one, Pi.sub_apply, Pi.smul_apply, Pi.one_apply, smul_eq_mul, mul_one]
+  have hmass : R.ρ (1 : C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯) = R.mass := rfl
+  have hcoord : R.ρ (cmap (fun y => y j) (by fun_prop)) = R.mass * R.centerOfMass j := by
+    have hc : R.centerOfMass j = (1 / R.mass) • R.ρ (cmap (fun y => y j) (by fun_prop)) := rfl
+    rw [hc, smul_eq_mul, one_div, ← mul_assoc, mul_inv_cancel₀ h, one_mul]
+  rw [hsplit, map_sub, map_smul, hmass, hcoord, smul_eq_mul]
+  ring
+
+/-- The centre of mass of the moving mass distribution tracks the prescribed trajectory: for a
+body of nonzero mass, the centre of mass of `massDistribution M t` is exactly `comTrajectory t`.
+This is the decisive check that `comTrajectory` and `orientation` are wired correctly in
+`RigidBodyMotion`. -/
+lemma massDistribution_centerOfMass {d : ℕ} (M : RigidBodyMotion d) (t : Time) (h : M.mass ≠ 0) :
+    (M.massDistribution t).centerOfMass = M.comTrajectory t := by
+  ext i
+  have hone : M.ρ (1 : C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯) = M.mass := rfl
+  have hdecomp :
+      ContMDiffMap.comp (cmap (fun x => x i) (by fun_prop))
+          ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩
+        = (∑ j, (M.orientation t).val i j •
+              cmap (fun y => y j - M.centerOfMass j) (by fun_prop))
+            + M.comTrajectory t i • (1 : C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯) := by
+    ext y
+    simp only [ContMDiffMap.comp_apply, cmap_apply, ContMDiffMap.coeFn_mk, displacement_apply,
+      ContMDiffMap.coe_add, ContMDiffMap.coe_smul, ContMDiffMap.coe_one, Pi.add_apply,
+      Pi.smul_apply, Pi.one_apply, smul_eq_mul, mul_one, contMDiffMap_sum_apply]
+  have key : (M.massDistribution t).ρ (cmap (fun x => x i) (by fun_prop))
+      = M.comTrajectory t i * M.mass := by
+    simp only [massDistribution, LinearMap.coe_mk, AddHom.coe_mk]
+    rw [hdecomp, map_add, map_sum, map_smul, hone]
+    simp only [map_smul, rho_coord_sub_centerOfMass M.toRigidBody h, smul_eq_mul, mul_zero,
+      Finset.sum_const_zero, zero_add]
+  rw [show (M.massDistribution t).centerOfMass i
+      = (1 / (M.massDistribution t).mass) •
+          (M.massDistribution t).ρ (cmap (fun x => x i) (by fun_prop)) from rfl,
+    massDistribution_mass, key, smul_eq_mul, mul_comm, mul_one_div, mul_div_assoc, div_self h,
+    mul_one]
 
 end RigidBodyMotion
