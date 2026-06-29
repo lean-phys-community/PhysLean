@@ -117,6 +117,37 @@ instance (d : Dimension) (M : Type) [AddCommGroup M] :
     ext
     simp [add_comm]
 
+instance (d : Dimension) (M : Type) [LE M] : LE (WithDim d M) where
+  le m1 m2 := m1.val ≤ m2.val
+
+@[simp]
+lemma le_def {d : Dimension} {M : Type} [LE M] (m1 m2 : WithDim d M) :
+    m1 ≤ m2 ↔ m1.val ≤ m2.val := Iff.rfl
+
+instance (d : Dimension) (M : Type) [LT M] : LT (WithDim d M) where
+  lt m1 m2 := m1.val < m2.val
+
+@[simp]
+lemma lt_def {d : Dimension} {M : Type} [LT M] (m1 m2 : WithDim d M) :
+    m1 < m2 ↔ m1.val < m2.val := Iff.rfl
+
+instance (d : Dimension) (M : Type) [Preorder M] :
+    Preorder (WithDim d M) where
+  le_refl m := by
+    exact le_refl m.val
+  le_trans m1 m2 m3 h12 h23 := by
+    change m1.val ≤ m3.val
+    exact le_trans h12 h23
+  lt_iff_le_not_ge m1 m2 := by
+    change m1.val < m2.val ↔ m1.val ≤ m2.val ∧ ¬ m2.val ≤ m1.val
+    exact lt_iff_le_not_ge
+
+instance (d : Dimension) (M : Type) [PartialOrder M] :
+    PartialOrder (WithDim d M) where
+  le_antisymm m1 m2 h12 h21 := by
+    ext
+    exact le_antisymm h12 h21
+
 instance (d : Dimension) (M : Type) [MulAction ℝ≥0 M] : MulAction ℝ≥0 (WithDim d M) where
   smul a m := ⟨a • m.val⟩
   one_smul m := ext _ _ (one_smul ℝ≥0 m.val)
@@ -236,7 +267,7 @@ lemma cast_scaleUnit {d d2 : Dimension} {M : Type} [MulAction ℝ≥0 M] (m : Wi
   subst h
   simp
 
-TODO "Induce further non-additive algebraic, order and topological instances on `WithDim d M`
+TODO "Induce further non-additive algebraic, additional order, and topological instances on `WithDim d M`
   from instances on `M`."
 
 end WithDim
