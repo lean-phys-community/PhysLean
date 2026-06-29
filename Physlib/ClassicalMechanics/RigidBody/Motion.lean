@@ -26,7 +26,7 @@ a rigid motion into a translation of the centre of mass plus a rotation about it
 
 @[expose] public section
 
-open Time
+open Time Manifold
 
 /-- A motion of a rigid body in `d`-dimensional space: the body together with the inertial-frame
 trajectory of its centre of mass and its time-dependent orientation (a rotation about the centre
@@ -62,5 +62,46 @@ noncomputable def linearMomentum {d : ℕ} (M : RigidBodyMotion d) : Time → Sp
 
 lemma linearMomentum_eq {d : ℕ} (M : RigidBodyMotion d) :
     M.linearMomentum = fun t => M.mass • M.centerOfMassVelocity t := rfl
+
+/-- The rigid displacement carrying the body frame into the inertial frame at time `t`: the
+rotation `orientation t` about the centre of mass, followed by the translation placing the centre
+of mass at `comTrajectory t`. -/
+noncomputable def displacement {d : ℕ} (M : RigidBodyMotion d) (t : Time) : Space d → Space d :=
+  fun y => ⟨fun k => ∑ j, (M.orientation t).val k j * (y j - M.centerOfMass j) +
+    M.comTrajectory t k⟩
+
+lemma displacement_contDiff {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
+    ContDiff ℝ ⊤ (M.displacement t) := by
+  unfold displacement
+  fun_prop
+
+/-- The mass distribution of the rigid body in motion at time `t`: the pushforward of the
+body-fixed mass distribution along the rigid displacement, acting on a test function `f` by
+`f ↦ ρ (f ∘ displacement t)`. -/
+noncomputable def massDistribution {d : ℕ} (M : RigidBodyMotion d) (t : Time) : RigidBody d where
+  ρ :=
+    { toFun := fun f => M.ρ (f.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩)
+      map_add' := by
+        intro f g
+        have h : (f + g).comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ =
+            f.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ +
+            g.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ := by
+          ext y; simp
+        rw [h, map_add]
+      map_smul' := by
+        intro r f
+        have h : (r • f).comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ =
+            r • f.comp ⟨M.displacement t, (M.displacement_contDiff t).contMDiff⟩ := by
+          ext y; simp
+        rw [h]
+        exact map_smul M.ρ r _ }
+
+/-- The motion preserves the total mass: the mass distribution at any time `t` has the same total
+mass as the body. -/
+@[simp]
+lemma massDistribution_mass {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
+    (M.massDistribution t).mass = M.mass := by
+  simp only [RigidBody.mass, massDistribution, LinearMap.coe_mk, AddHom.coe_mk]
+  congr 1
 
 end RigidBodyMotion
