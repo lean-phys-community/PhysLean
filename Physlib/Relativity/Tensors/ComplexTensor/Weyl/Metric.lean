@@ -222,7 +222,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma dualRightMetricVal_expand_tmul : dualRightMetricVal =
     dualRightBasis 0 ⊗ₜ[ℂ] dualRightBasis 1 - dualRightBasis 1 ⊗ₜ[ℂ] dualRightBasis 0 := by
   simp only [dualRightMetricVal, Fin.isValue]
-  erw [dualRightDualRightToMatrix_symm_expand_tmul]
+  rw [dualRightDualRightToMatrix_symm_expand_tmul]
   simp only [metricRaw, of_apply, cons_val', empty_val', cons_val_fin_one, Fin.sum_univ_two,
     Fin.isValue, cons_val_zero, cons_val_one, zero_smul, one_smul, zero_add, add_zero]
   module
@@ -286,10 +286,9 @@ lemma leftDualContraction_apply_metric :
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
-  simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [leftDualContraction_basis]
+  simp only [leftDualContraction_basis]
   simp only [Fin.isValue, Fin.val_one, Fin.val_zero, one_ne_zero, ↓reduceIte, one_smul, zero_ne_one]
-  erw [dualLeftLeftUnit_apply_one, dualLeftLeftUnitVal_expand_tmul]
+  rw [dualLeftLeftUnit_apply_one, dualLeftLeftUnitVal_expand_tmul]
   rw [add_comm]
   module
 
@@ -306,12 +305,10 @@ lemma dualLeftContraction_apply_metric :
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
-  simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [dualLeftContraction_basis]
+  simp only [dualLeftContraction_basis]
   simp only [Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.mod_succ, ↓reduceIte, one_smul, Nat.zero_mod,
-    zero_ne_one, zero_smul, sub_zero, one_ne_zero, zero_sub, sub_neg_eq_add,
-    Representation.IntertwiningMap.coe_toLinearMap]
-  erw [leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
+    zero_ne_one, zero_smul, sub_zero, one_ne_zero, zero_sub, sub_neg_eq_add]
+  rw [leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma rightDualContraction_apply_metric :
@@ -327,11 +324,10 @@ lemma rightDualContraction_apply_metric :
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
-  simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [rightDualContraction_basis]
+  simp only [rightDualContraction_basis]
   simp only [Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.mod_succ, Nat.zero_mod, one_ne_zero, ↓reduceIte,
     one_smul, zero_ne_one]
-  erw [dualRightRightUnit_apply_one, dualRightRightUnitVal_expand_tmul]
+  rw [dualRightRightUnit_apply_one, dualRightRightUnitVal_expand_tmul]
   rw [add_comm]
   module
 
@@ -348,12 +344,10 @@ lemma dualRightContraction_apply_metric :
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
     map_smul, comm_tmul]
-  simp only [← Representation.IntertwiningMap.toLinearMap_apply]
-  repeat erw [dualRightContraction_basis]
+  simp only [dualRightContraction_basis]
   simp only [Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.mod_succ, ↓reduceIte, one_smul, Nat.zero_mod,
-    zero_ne_one, zero_smul, sub_zero, one_ne_zero, zero_sub, sub_neg_eq_add,
-    Representation.IntertwiningMap.coe_toLinearMap]
-  erw [rightDualRightUnit_apply_one, rightDualRightUnitVal_expand_tmul]
+    zero_ne_one, zero_smul, sub_zero, one_ne_zero, zero_sub, sub_neg_eq_add]
+  rw [rightDualRightUnit_apply_one, rightDualRightUnitVal_expand_tmul]
 
 end
 end Fermion
