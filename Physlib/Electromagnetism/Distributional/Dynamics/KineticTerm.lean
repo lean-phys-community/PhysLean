@@ -69,26 +69,20 @@ noncomputable def gradKineticTerm {d} (𝓕 : FreeSpace) :
       (1 / (𝓕.μ₀) * (η μ μ * η ν ν * distDeriv μ (distDeriv μ A) ε ν -
       distDeriv μ (distDeriv ν A) ε μ)) • Lorentz.Vector.basis ν
     map_add' ε1 ε2 := by
-      rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl (fun ν _ => ?_)
-      rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl (fun μ _ => ?_)
+      simp only [← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun ν _ => Finset.sum_congr rfl fun μ _ => ?_
       simp only [one_div, map_add, Lorentz.Vector.apply_add, ← add_smul]
       ring_nf
     map_smul' r ε := by
       simp [Finset.smul_sum, smul_smul]
-      apply Finset.sum_congr rfl (fun ν _ => ?_)
-      apply Finset.sum_congr rfl (fun μ _ => ?_)
+      refine Finset.sum_congr rfl fun ν _ => Finset.sum_congr rfl fun μ _ => ?_
       ring_nf
     cont := by fun_prop}
   map_add' A1 A2 := by
     ext1 ε
     simp only [one_div, map_add, add_apply, Lorentz.Vector.apply_add,
-      ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
-    rw [← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl (fun ν _ => ?_)
-    rw [← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl (fun μ _ => ?_)
+      ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun ν _ => Finset.sum_congr rfl fun μ _ => ?_
     simp only [← add_smul]
     ring_nf
   map_smul' r A := by
@@ -96,8 +90,7 @@ noncomputable def gradKineticTerm {d} (𝓕 : FreeSpace) :
     simp only [one_div, map_smul, _root_.smul_apply, Lorentz.Vector.apply_smul,
       ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
     simp [Finset.smul_sum, smul_smul]
-    apply Finset.sum_congr rfl (fun ν _ => ?_)
-    apply Finset.sum_congr rfl (fun μ _ => ?_)
+    refine Finset.sum_congr rfl fun ν _ => Finset.sum_congr rfl fun μ _ => ?_
     ring_nf
 
 lemma gradKineticTerm_eq_sum_sum {d} {𝓕 : FreeSpace}
@@ -200,16 +193,12 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
     simp [Lorentz.Vector.apply_sum]
   ring_nf
   congr 1
-  congr
-  funext μ
+  refine Finset.sum_congr rfl fun μ _ => ?_
   rw [distTensorDeriv_toTensor_basis_repr]
-  conv_rhs =>
-    enter [1, 2, 2]
   trans (Tensor.basis _).repr (Tensorial.toTensor (distDeriv μ (A.fieldStrength) ε))
       (fun | 0 => μ | 1 => ν)
   · generalize (distDeriv μ (A.fieldStrength) ε) = t at *
-    rw [Tensorial.basis_toTensor_apply]
-    rw [Tensorial.basis_map_prod]
+    rw [Tensorial.basis_toTensor_apply, Tensorial.basis_map_prod]
     simp only [Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
       Equiv.symm_symm]
     rw [Lorentz.Vector.tensor_basis_map_eq_basis_reindex]
@@ -218,35 +207,22 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
         (Lorentz.Vector.basis.reindex Lorentz.Vector.indexEquiv.symm)) =
         ((Lorentz.Vector.basis (d := d)).tensorProduct (Lorentz.Vector.basis (d := d))).reindex
         (Lorentz.Vector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := by
-      ext b
-      match b with
-      | ⟨i, j⟩ =>
+      ext ⟨i, j⟩
       simp
-    rw [hb]
-    rw [Module.Basis.repr_reindex_apply]
+    rw [hb, Module.Basis.repr_reindex_apply]
     rfl
   apply congr
   · simp
     rfl
   funext x
-  fin_cases x
-  · simp only [Function.comp_apply]
-    simp [ComponentIdx.prod]
-    simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
-    intro _ h
-    apply False.elim
-    apply h
-    decide
-  · simp only [Function.comp_apply]
-    simp [ComponentIdx.prod]
-    simp [ComponentIdx.DropPairSection.ofFinEquiv, ComponentIdx.DropPairSection.ofFin]
-    split_ifs
-    · rename_i h
-      suffices ¬ (finSumFinEquiv (Sum.inr 1) = (0 : Fin (1 + 1 + 1))) from False.elim (this h)
-      decide
-    · rename_i h h2
-      suffices ¬ (finSumFinEquiv (Sum.inr 1) = (1 : Fin (1 + 1 + 1))) from False.elim (this h2)
-      decide
+  fin_cases x <;>
+    simp [Function.comp_apply, ComponentIdx.prod, ComponentIdx.DropPairSection.ofFinEquiv,
+      ComponentIdx.DropPairSection.ofFin]
+  · intro _ h
+    exact absurd (by decide) h
+  · split_ifs with h1 h2
+    · exact absurd h1 (by decide)
+    · exact absurd h2 (by decide)
     · rfl
 
 end DistElectromagneticPotential

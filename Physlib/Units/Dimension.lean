@@ -138,74 +138,54 @@ lemma inv_temperature (d : Dimension) : d⁻¹.temperature = -d.temperature := r
 
 @[simp]
 lemma div_length (d1 d2 : Dimension) : (d1 / d2).length = d1.length - d2.length := by
-  rw [div_eq_mul_inv, length_mul, inv_length]
-  ring
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
 lemma div_time (d1 d2 : Dimension) : (d1 / d2).time = d1.time - d2.time := by
-  rw [div_eq_mul_inv, time_mul, inv_time]
-  ring
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
 lemma div_mass (d1 d2 : Dimension) : (d1 / d2).mass = d1.mass - d2.mass := by
-  rw [div_eq_mul_inv, mass_mul, inv_mass]
-  ring
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
 lemma div_charge (d1 d2 : Dimension) : (d1 / d2).charge = d1.charge - d2.charge := by
-  rw [div_eq_mul_inv, charge_mul, inv_charge]
-  ring
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
 lemma div_temperature (d1 d2 : Dimension) :
     (d1 / d2).temperature = d1.temperature - d2.temperature := by
-  rw [div_eq_mul_inv, temperature_mul, inv_temperature]
-  ring
+  simp [div_eq_mul_inv, sub_eq_add_neg]
 
 @[simp]
 lemma npow_length (d : Dimension) (n : ℕ) : (d ^ n).length = n • d.length := by
   induction n with
   | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+  | succ n ih => rw [pow_succ, length_mul, ih, succ_nsmul]
 
 @[simp]
 lemma npow_time (d : Dimension) (n : ℕ) : (d ^ n).time = n • d.time := by
   induction n with
   | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+  | succ n ih => rw [pow_succ, time_mul, ih, succ_nsmul]
 
 @[simp]
 lemma npow_mass (d : Dimension) (n : ℕ) : (d ^ n).mass = n • d.mass := by
   induction n with
   | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+  | succ n ih => rw [pow_succ, mass_mul, ih, succ_nsmul]
 
 @[simp]
 lemma npow_charge (d : Dimension) (n : ℕ) : (d ^ n).charge = n • d.charge := by
   induction n with
   | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+  | succ n ih => rw [pow_succ, charge_mul, ih, succ_nsmul]
 
 @[simp]
 lemma npow_temperature (d : Dimension) (n : ℕ) : (d ^ n).temperature = n • d.temperature := by
   induction n with
   | zero => simp
-  | succ n ih =>
-    rw [@pow_add]
-    simp [ih]
-    ring
+  | succ n ih => rw [pow_succ, temperature_mul, ih, succ_nsmul]
 
 instance : Pow Dimension ℚ where
   pow d n := ⟨d.length * n, d.time * n, d.mass * n, d.charge * n, d.temperature * n⟩

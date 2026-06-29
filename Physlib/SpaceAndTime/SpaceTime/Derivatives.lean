@@ -163,16 +163,6 @@ lemma contDiff_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d) :
     · fun_prop
     · exact h
 
-lemma deriv_apply_eq {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → Lorentz.Vector d)
-    (hf : Differentiable ℝ f)
-    (y : SpaceTime d) :
-    ∂_ μ f y ν = fderiv ℝ (fun x => f x ν) y (Lorentz.Vector.basis μ) := by
-  rw [deriv_eq]
-  change _ = (fderiv ℝ (Lorentz.Vector.coordCLM ν ∘ f) y) (Lorentz.Vector.basis μ)
-  rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
-  rfl
-
 lemma fderiv_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d)
     (hf : Differentiable ℝ f) (y dt : SpaceTime d) (ν : Fin 1 ⊕ Fin d) :
     fderiv ℝ f y dt ν = fderiv ℝ (fun x => f x ν) y dt := by
@@ -180,6 +170,13 @@ lemma fderiv_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d)
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
   simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
   rfl
+
+lemma deriv_apply_eq {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → Lorentz.Vector d)
+    (hf : Differentiable ℝ f)
+    (y : SpaceTime d) :
+    ∂_ μ f y ν = fderiv ℝ (fun x => f x ν) y (Lorentz.Vector.basis μ) := by
+  rw [deriv_eq]
+  exact fderiv_vector f hf y _ ν
 
 @[simp]
 lemma deriv_coord {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) :
@@ -423,23 +420,7 @@ lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   simp only [neg_neg]
   congr 1
   ext x
-  change fderiv ℝ (fun x => fderiv ℝ κ x (Lorentz.Vector.basis μ)) x (Lorentz.Vector.basis ν) =
-    fderiv ℝ (fun x => fderiv ℝ κ x (Lorentz.Vector.basis ν)) x (Lorentz.Vector.basis μ)
-  rw [fderiv_clm_apply, fderiv_clm_apply]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
-    ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt (n := ∞)
-    apply ContDiff.contDiffAt
-    exact smooth κ ⊤
-    simp only [minSmoothness_of_isRCLikeNormedField]
-    exact ENat.LEInfty.out
-  · have h1 := smooth κ 2
-    fun_prop
-  · fun_prop
-  · have h1 := smooth κ 2
-    fun_prop
-  · fun_prop
+  exact congrFun (deriv_commute ν μ ⇑κ (smooth κ 2)) x
 
 /-!
 

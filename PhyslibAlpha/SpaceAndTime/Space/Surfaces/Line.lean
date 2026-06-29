@@ -29,37 +29,30 @@ open MeasureTheory Real
 
 -/
 
-/-- The coordinate line embedded in `Space d.succ.succ`. -/
-def line (d : ℕ) : ℝ → Space d.succ.succ := fun r =>
-  (slice (0 : Fin d.succ.succ)).symm (r, 0)
+/-- The coordinate line embedded in `Space d`. -/
+def line (d : ℕ) [NeZero d] : ℝ → Space d := fun r =>
+  r • basis (0 : Fin d)
 
-lemma line_eq (d : ℕ) :
-    line d = (slice (0 : Fin d.succ.succ)).symm ∘ (fun r : ℝ => (r, 0)) := rfl
+lemma line_eq_smul_basis (d : ℕ) [NeZero d] :
+    line d = fun r => r • basis (0 : Fin d) := rfl
 
-lemma line_injective (d : ℕ) : Function.Injective (line d) := by
+lemma line_injective (d : ℕ) [NeZero d] : Function.Injective (line d) := by
   intro x y h
-  have h0 := congrArg (fun p : Space d.succ.succ => p (0 : Fin d.succ.succ)) h
+  have h0 := congrArg (fun p : Space d => p (0 : Fin d)) h
   simpa [line] using h0
 
 @[fun_prop]
-lemma line_continuous (d : ℕ) : Continuous (line d) := by
-  rw [line_eq]
+lemma line_continuous (d : ℕ) [NeZero d] : Continuous (line d) := by
+  rw [line_eq_smul_basis]
   fun_prop
 
-lemma line_measurableEmbedding (d : ℕ) : MeasurableEmbedding (line d) :=
+lemma line_measurableEmbedding (d : ℕ) [NeZero d] : MeasurableEmbedding (line d) :=
   Continuous.measurableEmbedding (line_continuous d) (line_injective d)
 
 @[simp]
-lemma norm_line (d : ℕ) (r : ℝ) : ‖line d r‖ = ‖r‖ := by
-  rw [line, norm_slice_symm_eq]
-  simp [Real.sqrt_sq_eq_abs]
-
-lemma line_eq_smul_basis (d : ℕ) (r : ℝ) :
-    line d r = r • basis (0 : Fin d.succ.succ) := by
-  rw [line, basis_self_eq_slice]
-  change (slice (0 : Fin d.succ.succ)).symm (r, 0) =
-    r • (slice (0 : Fin d.succ.succ)).symm (1, 0)
-  simpa using ((slice (0 : Fin d.succ.succ)).symm.map_smul r (1, (0 : Space d.succ)))
+lemma norm_line (d : ℕ) [NeZero d] (r : ℝ) : ‖line d r‖ = ‖r‖ := by
+  rw [line, norm_smul]
+  simp
 
 /-!
 
@@ -67,11 +60,11 @@ lemma line_eq_smul_basis (d : ℕ) (r : ℝ) :
 
 -/
 
-/-- The measure on `Space d.succ.succ` corresponding to integration along a coordinate line. -/
-def lineMeasure (d : ℕ) : Measure (Space d.succ.succ) :=
+/-- The measure on `Space d` corresponding to integration along a coordinate line. -/
+def lineMeasure (d : ℕ) [NeZero d] : Measure (Space d) :=
   MeasureTheory.Measure.map (line d) volume
 
-instance lineMeasure_hasTemperateGrowth (d : ℕ) :
+instance lineMeasure_hasTemperateGrowth (d : ℕ) [NeZero d] :
     (lineMeasure d).HasTemperateGrowth := by
   rw [lineMeasure]
   refine { exists_integrable := ?_ }
@@ -89,17 +82,17 @@ instance lineMeasure_hasTemperateGrowth (d : ℕ) :
 
 -/
 
-/-- The distribution on `Space d.succ.succ` corresponding to integration along a coordinate line.
+/-- The distribution on `Space d` corresponding to integration along a coordinate line.
   One can roughly think of this distribution as taking a test function `f` to its integral against
   a mass, charge or current density concentrated on a line. -/
-def lineDist (d : ℕ) : (Space d.succ.succ) →d[ℝ] ℝ :=
+def lineDist (d : ℕ) [NeZero d] : (Space d) →d[ℝ] ℝ :=
   SchwartzMap.integralCLM ℝ (lineMeasure d)
 
-lemma lineDist_apply_eq_integral_lineMeasure (d : ℕ) (f : 𝓢(Space d.succ.succ, ℝ)) :
+lemma lineDist_apply_eq_integral_lineMeasure (d : ℕ) [NeZero d] (f : 𝓢(Space d, ℝ)) :
     lineDist d f = ∫ x, f x ∂lineMeasure d := by
   rw [lineDist, SchwartzMap.integralCLM_apply]
 
-lemma lineDist_apply_eq_integral_volume (d : ℕ) (f : 𝓢(Space d.succ.succ, ℝ)) :
+lemma lineDist_apply_eq_integral_volume (d : ℕ) [NeZero d] (f : 𝓢(Space d, ℝ)) :
     lineDist d f = ∫ r : ℝ, f (line d r) := by
   rw [lineDist_apply_eq_integral_lineMeasure, lineMeasure,
     MeasurableEmbedding.integral_map (line_measurableEmbedding d)]
@@ -110,34 +103,35 @@ lemma lineDist_apply_eq_integral_volume (d : ℕ) (f : 𝓢(Space d.succ.succ, �
 
 -/
 
-/-- The linear subspace spanned by the coordinate line in `Space d.succ.succ`. -/
-def lineSubmodule (d : ℕ) : Submodule ℝ (Space d.succ.succ) :=
-  ℝ ∙ basis (0 : Fin d.succ.succ)
+/-- The linear subspace spanned by the coordinate line in `Space d`. -/
+def lineSubmodule (d : ℕ) [NeZero d] : Submodule ℝ (Space d) :=
+  ℝ ∙ basis (0 : Fin d)
 
-lemma line_mem_lineSubmodule (d : ℕ) (r : ℝ) : line d r ∈ lineSubmodule d := by
+lemma line_mem_lineSubmodule (d : ℕ) [NeZero d] (r : ℝ) : line d r ∈ lineSubmodule d := by
   rw [line_eq_smul_basis]
-  exact Submodule.smul_mem _ r (Submodule.mem_span_singleton_self (basis (0 : Fin d.succ.succ)))
+  exact Submodule.smul_mem _ r (Submodule.mem_span_singleton_self (basis (0 : Fin d)))
 
-lemma range_line_subset_lineSubmodule (d : ℕ) :
-    Set.range (line d) ⊆ (lineSubmodule d : Set (Space d.succ.succ)) := by
+lemma range_line_subset_lineSubmodule (d : ℕ) [NeZero d] :
+    Set.range (line d) ⊆ (lineSubmodule d : Set (Space d)) := by
   rintro x ⟨r, rfl⟩
   exact line_mem_lineSubmodule d r
 
-lemma lineSubmodule_ne_top (d : ℕ) : lineSubmodule d ≠ ⊤ := by
+lemma lineSubmodule_ne_top (d : ℕ) [NeZero d] (hd : 2 ≤ d) : lineSubmodule d ≠ ⊤ := by
   intro htop
-  have hbasis : basis (1 : Fin d.succ.succ) ∈ lineSubmodule d := by
+  have hbasis : basis (1 : Fin d) ∈ lineSubmodule d := by
     rw [htop]
     exact Submodule.mem_top
   obtain ⟨c, hc⟩ := (Submodule.mem_span_singleton.mp hbasis)
-  have hcoord := congrArg (fun p : Space d.succ.succ => p (1 : Fin d.succ.succ)) hc
-  simp [basis_apply] at hcoord
+  have hcoord := congrArg (fun p : Space d => p (1 : Fin d)) hc
+  have hd1 : d ≠ 1 := by omega
+  simp [basis_apply, hd1] at hcoord
 
-lemma volume_line_range (d : ℕ) :
-    volume (Set.range (line d) : Set (Space d.succ.succ)) = 0 := by
+lemma volume_line_range (d : ℕ) [NeZero d] (hd : 2 ≤ d) :
+    volume (Set.range (line d) : Set (Space d)) = 0 := by
   refine measure_mono_null (range_line_subset_lineSubmodule d) ?_
   rw [volume_eq_addHaar]
   exact MeasureTheory.Measure.addHaar_submodule
-    (Space.basis.toBasis.addHaar : Measure (Space d.succ.succ))
-    (lineSubmodule d) (lineSubmodule_ne_top d)
+    (Space.basis.toBasis.addHaar : Measure (Space d))
+    (lineSubmodule d) (lineSubmodule_ne_top d hd)
 
 end Space

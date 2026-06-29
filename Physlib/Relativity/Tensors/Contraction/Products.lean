@@ -126,27 +126,23 @@ lemma prodT_contrT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     prodT t1 t)
   let P1 (t : Tensor S c) := P t t1
   change P1 t
-  refine induction_on_pure ?_
-    (fun r t h1 => by
-      dsimp only [P1, P] at h1
-      simp only [h1, map_smul, P1, P])
-    (fun t1 t2 h1 h2 => by
-      dsimp only [P1, P] at h1 h2
-      simp only [h1, h2, map_add, P1, P]) t
-  intro p
-  let P2 (t1 : Tensor S c1) := P p.toTensor t1
-  change P2 t1
-  refine induction_on_pure ?_
-    (fun r t h1 => by
-      dsimp only [P1, P, P2] at h1
-      simp only [h1, map_smul, LinearMap.smul_apply, P, P2])
-    (fun t1 t2 h1 h2 => by
-      dsimp only [P1, P, P2] at h1 h2
-      simp only [map_add, LinearMap.add_apply, h1, h2, P2, P]) t1
-  intro p1
-  simp only [Nat.add_eq, finSumFinEquiv_apply_right, contrT_pure, P2, P]
-  rw [Pure.prodP_contrP_snd, prodT_pure, contrT_pure]
-  rfl
+  apply induction_on_pure
+  · intro p
+    let P2 (t1 : Tensor S c1) := P p.toTensor t1
+    change P2 t1
+    apply induction_on_pure
+    · intro p1
+      simp only [Nat.add_eq, finSumFinEquiv_apply_right, contrT_pure, P2, P]
+      rw [Pure.prodP_contrP_snd, prodT_pure, contrT_pure]
+      rfl
+    · intro r t h1
+      simp_all only [map_smul, LinearMap.smul_apply, P2, P]
+    · intro t1 t2 h1 h2
+      simp_all only [map_add, LinearMap.add_apply, P2, P]
+  · intro r t h1
+    simp_all only [map_smul, P1, P]
+  · intro t1 t2 h1 h2
+    simp_all only [map_add, P1, P]
 
 lemma contrT_prodT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C} (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)

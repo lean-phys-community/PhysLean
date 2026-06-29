@@ -114,12 +114,7 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
     have hx2 : x₂ ≠ 0 := by
       intro h; apply hx0; exact congrArg (fromL2 ℝ) h
   -- continuity of f₂ at x₀
-    have f₂_cont : Continuous f₂ := (toL2 ℝ).continuous.comp hf
-    have hcont₂₀ : ∀ x, ContinuousAt f₂ x := by
-    -- turn `Continuous f₂` into `∀ x, ContinuousAt f₂ x`
-      rwa [continuous_iff_continuousAt] at f₂_cont
-  -- now apply it at x₀
-    have hcont₂ : ContinuousAt f₂ x₀ := hcont₂₀ x₀
+    have hcont₂ : ContinuousAt f₂ x₀ := ((toL2 ℝ).continuous.comp hf).continuousAt
 
   -- [2] find open neighborhood guaranteeing positive inner product with the center, based on
   -- which the test function `g` will be constructed.
@@ -136,32 +131,16 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
         convert hδ₂ hx using 1
         exact mem_sphere_iff_norm.mp rfl
       have hself : ⟪x₂, x₂⟫_ℝ = ‖x₂‖^2 := real_inner_self_eq_norm_sq (x₂ : WithLp 2 V)
-
-      let u := f₂ x - x₂
-      let v := x₂
-      have hlow : -‖u‖ * ‖v‖ ≤ ⟪u, v⟫_ℝ := by
-        have hpos' : ⟪-u, v⟫_ℝ ≤ ‖-u‖ * ‖v‖ := real_inner_le_norm (-u) v
-        rw [norm_neg] at hpos'
-        rw [inner_neg_left] at hpos'
-        linarith [hpos']
-      calc
-      -- start with the raw inner product
-        ⟪f₂ x, x₂⟫_ℝ = ⟪x₂ + (f₂ x - x₂), x₂⟫_ℝ := by simp
-        _ = ⟪x₂, x₂⟫_ℝ + ⟪f₂ x - x₂, x₂⟫_ℝ := inner_add_left x₂ (f₂ x - x₂) x₂
-        _ = ‖x₂‖^2 + ⟪f₂ x - x₂, x₂⟫_ℝ := by rw [hself]
-        _ ≥ ‖x₂‖^2 - ‖f₂ x - x₂‖ * ‖x₂‖ := by
-              -- Cauchy–Schwarz in WithLp 2 V
-              linarith [hlow]
-        _ > ‖x₂‖^2 - (‖x₂‖ / 2) * ‖x₂‖ := by
-              -- subtract a strictly smaller term
-              have hmul := mul_lt_mul_of_pos_left hclose (norm_pos_iff.mpr hx2)
-              linarith [sub_lt_sub_left hmul (‖x₂‖^2)]
-        _ = ‖x₂‖^2 / 2 := by ring
-        _ > 0 := by positivity
+      -- Cauchy–Schwarz in `WithLp 2 V` bounds the cross term from below
+      have hcs : -(‖f₂ x - x₂‖ * ‖x₂‖) ≤ ⟪f₂ x - x₂, x₂⟫_ℝ :=
+        neg_le_of_abs_le (abs_real_inner_le_norm _ _)
+      have hxp : 0 < ‖x₂‖ := norm_pos_iff.mpr hx2
+      have inner_eq_self_add_diff : ⟪f₂ x, x₂⟫_ℝ = ⟪x₂, x₂⟫_ℝ + ⟪f₂ x - x₂, x₂⟫_ℝ := by
+        rw [← inner_add_left]; simp
+      nlinarith [inner_eq_self_add_diff, hcs, hself, hclose, hxp,
+        mul_lt_mul_of_pos_right hclose hxp]
   -- pull `inner_pos₂` back to V via `fromL2`:
-    have inner_pos_V : ∀ x ∈ Metric.ball x₀ δ₂, 0 < ⟪f x, f x₀⟫_ℝ := by
-      rintro x hx
-      apply inner_pos₂ x hx
+    have inner_pos_V : ∀ x ∈ Metric.ball x₀ δ₂, 0 < ⟪f x, f x₀⟫_ℝ := fun x hx => inner_pos₂ x hx
     -- now we have a genuine positive integrand on a set of positive measure.
 
   -- [3] `g` construction using bump function.
@@ -171,73 +150,34 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
         (∀ x ∈ Metric.closedBall x₀ (δ₂/4), 0 < φ x) := by
         -- use `hasContDiffBump_of_innerProductSpace`, leveraging `[innerProductSpace Y]`
           haveI : HasContDiffBump Y := hasContDiffBump_of_innerProductSpace Y
-          let rIn : ℝ := δ₂ / 4
-          let rOut : ℝ := δ₂ / 2
-          have h_rIn_pos : 0 < rIn := by
-            dsimp [rIn]
-            apply div_pos hδ₂_pos
-            linarith
-          have h_rIn_lt_rOut : rIn < rOut := by
-              exact mul_lt_mul_of_pos_left (by grind) hδ₂_pos
-          let φ1 : ContDiffBump x₀ := ⟨rIn, rOut, h_rIn_pos, h_rIn_lt_rOut⟩
-          let φ : Y → ℝ := φ1.toFun
-        -- Show the five required properties.
-          use φ
-          constructor
-          · -- `ϕ` is a smooth function with compact support, i.e. a test function
-            -- uses `ContDiffBump.hasCompactSupport` from `Analysis.Calculus.BumpFunction.Basic`,
-            -- which needs `[FiniteDimensional ℝ Y]`.
-            exact ⟨ContDiffBump.contDiff φ1, ContDiffBump.hasCompactSupport φ1⟩
-          constructor
-          · exact φ1.pos_of_mem_ball (Metric.mem_ball_self φ1.rOut_pos)
-          constructor
-          · -- ∀ x ∈ Function.support φ, 0 ≤ φ x
-            intros x hx
-            exact φ1.nonneg
-          constructor
-          · rw [ContDiffBump.support_eq]
-          · intros x hx
-            have h_in_support : x ∈ Metric.ball x₀ φ1.rOut := by
-              rw [Metric.mem_ball]
-              calc dist x x₀ ≤ δ₂ / 4 := by rwa [Metric.mem_closedBall] at hx
-                              _ = rIn := by simp [rIn]
-                              _ < rOut := h_rIn_lt_rOut
-                              _ = φ1.rOut := by
-                                congr 1
-            exact φ1.pos_of_mem_ball h_in_support
+          let φ1 : ContDiffBump x₀ :=
+            ⟨δ₂ / 4, δ₂ / 2, by positivity, by linarith⟩
+          refine ⟨φ1.toFun, ⟨φ1.contDiff, φ1.hasCompactSupport⟩,
+            φ1.pos_of_mem_ball (Metric.mem_ball_self φ1.rOut_pos), fun x _ => φ1.nonneg,
+            by rw [ContDiffBump.support_eq], fun x hx => φ1.pos_of_mem_ball ?_⟩
+        -- the closed ball of radius `δ₂/4` lies in the open ball of radius `rOut = δ₂/2`
+          rw [Metric.mem_closedBall] at hx
+          exact Metric.mem_ball.mpr (lt_of_le_of_lt hx (by show δ₂ / 4 < δ₂ / 2; linarith))
     obtain ⟨φ, hφ_testfun, hφ_pos_x₀, hφ_non_neg, hφ_support_subset, hφ_pos_inner⟩ :=
       bump_exists
   -- Define test function g(x) = φ(x) * f(x₀)
     let g : Y → V := fun x => φ x • f x₀
-  -- Show that g is a test function
-    have hg_test : IsTestFunction g := by
-    -- Use the smul_right lemma, noting: `φ` is a test function and `f x₀` is smooth (constant)
-      apply IsTestFunction.smul_right hφ_testfun
-      exact contDiff_const
+  -- Show that g is a test function: `φ` is a test function and `f x₀` is smooth (constant)
+    have hg_test : IsTestFunction g := IsTestFunction.smul_right hφ_testfun contDiff_const
 
   -- [4] Derive contradiction. First compute the integral ∫ ⟪f x, g x⟫
   -- [4.1] ∫ φ x * ⟪f x, f x₀⟫ = 0
     have key_integral := hg g hg_test
-    simp [g] at key_integral
-  -- We have ∫ ⟪f x, φ x • f x₀⟫ = ∫ φ x * ⟪f x, f x₀⟫ = 0
-  -- This follows from linearity of inner product in the second argument
-    have integral_rewrite : ∫ x, ⟪f x, φ x • f x₀⟫_ℝ ∂μ = ∫ x, φ x * ⟪f x, f x₀⟫_ℝ ∂μ := by
-      congr 1
-      ext x
-      have : ⟪f x, φ x • f x₀⟫_ℝ = φ x * ⟪f x, f x₀⟫_ℝ := by
-        apply inner_smul_right' (f x) (f x₀) (φ x)
-      exact this
-    rw [integral_rewrite] at key_integral
+  -- linearity of inner product in the second argument turns the integrand into `φ x * ⟪f x, f x₀⟫`
+    simp only [g, inner_smul_right'] at key_integral
 
   -- [4.2] 0 < ∫ x, φ x * ⟪f x, f x₀⟫_ℝ ∂μ. Sketch: on the support of φ (which is contained in
   -- B(x₀, δ/2) ⊆ B(x₀, δ)), we have ⟪f x, f x₀⟫ > ‖f x₀‖²/2 > 0 by our choice of δ.
   -- Since φ is nonnegative on its support and positive somewhere, this gives the contradiction.
 
   -- [4.2.1] Integrability of the integrand: `integrable_prod` .
-    have support_subset : Function.support φ ⊆ Metric.ball x₀ δ₂ := by
-      trans Metric.ball x₀ (δ₂/2)
-      · exact hφ_support_subset
-      · exact Metric.ball_subset_ball (by linarith)
+    have support_subset : Function.support φ ⊆ Metric.ball x₀ δ₂ :=
+      hφ_support_subset.trans (Metric.ball_subset_ball (by linarith))
     have supp_subset2 : Function.support (fun x => φ x * ⟪f x, f x₀⟫_ℝ) ⊆ Function.support φ := by
       intro x hprod hφ0
     -- if φ x = 0 then φ x * inner = 0, contradiction
@@ -251,33 +191,20 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
         (hφ_testfun.supp.mono supp_subset2)
 
   -- [4.2.2] Nonnegativity everywhere (`h_nonneg`)
-    have hφ_zero_outside : ∀ x, x ∉ Function.support φ → φ x = 0 := by
-      intro xs hx
-      exact Function.notMem_support.mp hx
     have h_nonneg : ∀ x, 0 ≤ φ x * ⟪f x, f x₀⟫_ℝ := by
       intro x
       by_cases hx : x ∈ Function.support φ
       · -- on the support, φ ≥ 0 and ⟪f x, f x₀⟫ > 0
-        have hφx : 0 ≤ φ x := hφ_non_neg x hx
-        have hball : x ∈ Metric.ball x₀ δ₂ := by exact support_subset hx
-        have hin : 0 < ⟪f x, f x₀⟫_ℝ := inner_pos_V x hball
-        exact mul_nonneg hφx hin.le
+        exact mul_nonneg (hφ_non_neg x hx) (inner_pos_V x (support_subset hx)).le
       · -- off the support, φ x = 0 so the product is 0
-        apply hφ_zero_outside at hx
-        rw [hx]
-        linarith
+        simp [Function.notMem_support.mp hx]
 
   -- [4.2.3] That closed ball has positive measure, and is contained in the support
-    have hμ_ball : 0 < μ (Metric.ball x₀ (δ₂/4)) := by
-    -- Use the fact that every nonempty open set has positive measure
-      apply IsOpen.measure_pos
-      exact Metric.isOpen_ball
-      refine Metric.nonempty_ball.mpr ?_
-      linarith
-    have hμ : 0 < μ (Metric.closedBall x₀ (δ₂/4)) := by
-      calc μ (Metric.closedBall x₀ (δ₂/4))
-        _ ≥ μ (Metric.ball x₀ (δ₂/4)) := measure_mono Metric.ball_subset_closedBall
-        _ > 0 := hμ_ball
+    -- every nonempty open set has positive measure
+    have hμ_ball : 0 < μ (Metric.ball x₀ (δ₂/4)) :=
+      Metric.isOpen_ball.measure_pos μ (Metric.nonempty_ball.mpr (by linarith))
+    have hμ : 0 < μ (Metric.closedBall x₀ (δ₂/4)) :=
+      lt_of_lt_of_le hμ_ball (measure_mono Metric.ball_subset_closedBall)
     have closedBall_subset_support :
         Metric.closedBall x₀ (δ₂/4)
           ⊆ Function.support (fun x => φ x * ⟪f x, f x₀⟫_ℝ) := by
@@ -287,16 +214,13 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
           inner_pos_V x (Metric.closedBall_subset_ball (by linarith) hx)
         simp only [Function.support_mul, Set.mem_inter_iff, Function.mem_support, ne_eq]
         constructor
-        linarith; linarith
+        · linarith
+        · linarith
 
-  -- [4.2.4] putting everything together
-    have integral_pos : 0 < ∫ x, φ x * ⟪f x, f x₀⟫_ℝ ∂μ := by
-      refine (integral_pos_iff_support_of_nonneg h_nonneg ?_).mpr ?_
-      · exact integrable_prod -- Goal 1: Integrable (fun i => φ i * ⟪f i, f x₀⟫_ℝ) μ
-      · calc -- Goal 2: 0 < μ (Function.support fun i => φ i * ⟪f i, f x₀⟫_ℝ)
-        0 < μ (Metric.closedBall x₀ (δ₂/4)) := hμ
-        _ ≤ μ (Function.support fun x => φ x * ⟪f x, f x₀⟫_ℝ) :=
-          measure_mono closedBall_subset_support
+  -- [4.2.4] putting everything together: positivity contradicts `key_integral : ∫ ... = 0`
+    have integral_pos : 0 < ∫ x, φ x * ⟪f x, f x₀⟫_ℝ ∂μ :=
+      (integral_pos_iff_support_of_nonneg h_nonneg integrable_prod).mpr
+        (lt_of_lt_of_le hμ (measure_mono closedBall_subset_support))
     linarith
 
 /- A version of `fundamental_theorem_of_variational_calculus` for test functions `f`.

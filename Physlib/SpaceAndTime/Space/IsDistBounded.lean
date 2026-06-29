@@ -384,9 +384,7 @@ lemma integrable_time_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
     fun_prop
   filter_upwards with x
   simp only [Real.norm_eq_abs, norm_iteratedFDeriv_zero]
-  rw [mul_comm]
-  rw [← zpow_natCast]
-  rw [abs_of_nonneg (by positivity)]
+  rw [mul_comm, ← zpow_natCast, abs_of_nonneg (by positivity)]
   apply mul_le_mul _ (by rfl) (by positivity) (by positivity)
   rw [zpow_natCast]
   trans ‖x.2‖ ^ ((p + (d - 1 : ℕ)).toNat : ℤ)
@@ -519,9 +517,8 @@ lemma integrable_mul_inv_pow {d : ℕ}
     · simp
       positivity
     trans (2 ^ (q + m - 1) * (‖v‖ ^ (q + m) + 1)) * (1 + ‖x - v‖ ^ (q + m))
-    · ring_nf
-      apply le_of_eq
-      rfl
+    · apply le_of_eq
+      ring
     refine mul_le_mul_of_nonneg (by rfl) ?_ ?_ ?_
     · trans 1 ^ (q + m) + ‖x - v‖ ^ (q + m)
       · simp

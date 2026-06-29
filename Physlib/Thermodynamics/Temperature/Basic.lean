@@ -56,25 +56,13 @@ instance : Zero Temperature := ⟨⟨0⟩⟩
 /-- The inverse temperature defined as `1/(kB * T)` in a given, but arbitrary set of units.
   This has dimensions equivalent to `Energy`. -/
 noncomputable def β (T : Temperature) : ℝ≥0 :=
-  ⟨1 / (kB * (T : ℝ)), by
-    apply div_nonneg
-    · exact zero_le_one
-    · apply mul_nonneg
-      · exact kB_nonneg
-      · simp [toReal]⟩
+  ⟨1 / (kB * (T : ℝ)), div_nonneg zero_le_one (mul_nonneg kB_nonneg T.val.2)⟩
 
-lemma β_toReal (T : Temperature) : (β T : ℝ) = 1 / (kB * (T : ℝ)) := by
-  simp [β, toReal]
-  rfl
+lemma β_toReal (T : Temperature) : (β T : ℝ) = 1 / (kB * (T : ℝ)) := rfl
 
 /-- The temperature associated with a given inverse temperature `β`. -/
 noncomputable def ofβ (β : ℝ≥0) : Temperature :=
-  ⟨⟨1 / (kB * β), by
-      apply div_nonneg
-      · exact zero_le_one
-      · apply mul_nonneg
-        · exact kB_nonneg
-        · exact β.2⟩⟩
+  ⟨⟨1 / (kB * β), div_nonneg zero_le_one (mul_nonneg kB_nonneg β.2)⟩⟩
 
 lemma ofβ_eq : ofβ = fun β => ⟨⟨1 / (kB * β), by
     apply div_nonneg
@@ -86,72 +74,38 @@ lemma ofβ_eq : ofβ = fun β => ⟨⟨1 / (kB * β), by
 
 @[simp]
 lemma β_ofβ (β' : ℝ≥0) : β (ofβ β') = β' := by
-  simp [β, ofβ, toReal]
-  field_simp [kB_ne_zero]
-  ext
-  show 1 / (kB * (1 / (↑β' * kB))) = ↑β'
-  field_simp [kB_ne_zero]
+  apply NNReal.coe_injective
+  show 1 / (kB * (1 / (kB * ↑β'))) = ↑β'
+  rw [mul_one_div, one_div_div, mul_div_cancel_left₀ _ kB_ne_zero]
 
-lemma ofβ_toReal (β : ℝ≥0) : (ofβ β).toReal = 1 / (kB * (β : ℝ)) := by
-  simp [ofβ, toReal]
-  rfl
+lemma ofβ_toReal (β : ℝ≥0) : (ofβ β).toReal = 1 / (kB * (β : ℝ)) := rfl
 
 @[simp]
 lemma ofβ_β (T : Temperature) : ofβ (β T) = T := by
-  ext
-  change ((1 : ℝ) / (kB * ((β T : ℝ)))) = (T : ℝ)
-  have : (β T : ℝ) = (1 : ℝ) / (kB * (T : ℝ)) := rfl
-  simpa [this] using
-    show (1 / (kB * (1 / (kB * (T : ℝ))))) = (T : ℝ) from by
-      field_simp [kB_ne_zero]
+  apply Temperature.ext
+  apply NNReal.coe_injective
+  show 1 / (kB * (1 / (kB * (T : ℝ)))) = (T : ℝ)
+  rw [mul_one_div, one_div_div, mul_div_cancel_left₀ _ kB_ne_zero]
 
 /-- Positivity of `β` from positivity of temperature. -/
 lemma beta_pos (T : Temperature) (hT_pos : 0 < T.val) : 0 < (T.β : ℝ) := by
-  unfold Temperature.β
-  have h_prod : 0 < (kB : ℝ) * T.val := mul_pos kB_pos hT_pos
-  have h1 :  0 < T.toReal⁻¹ * kB⁻¹ := by
-    have h1 := inv_pos.mpr h_prod
-    simp_all
-    simpa [Temperature.toReal] using hT_pos
-  convert h1
-  simp only [one_div, mul_inv_rev]
-  rfl
+  rw [β_toReal]
+  exact one_div_pos.mpr (mul_pos kB_pos (by exact_mod_cast hT_pos))
 
 /-! ### Regularity of `ofβ` -/
 
 open Filter Topology
 
 lemma ofβ_continuousOn : ContinuousOn (ofβ : ℝ≥0 → Temperature) (Set.Ioi 0) := by
-  rw [ofβ_eq]
-  refine continuousOn_of_forall_continuousAt ?_
-  intro x hx
-  have h1 : ContinuousAt (fun t : ℝ => 1 / (kB * t)) x.1 := by
-    refine ContinuousAt.div₀ ?_ ?_ ?_
-    · fun_prop
-    · fun_prop
-    · simp
-      constructor
-      · exact kB_ne_zero
-      · exact ne_of_gt hx
-  have hℝ : ContinuousAt (fun b : ℝ≥0 => (1 : ℝ) / (kB * (b : ℝ))) x :=
-    h1.comp (continuous_subtype_val.continuousAt)
-  have hNN :
-      ContinuousAt (fun b : ℝ≥0 =>
-          (⟨(1 : ℝ) / (kB * (b : ℝ)),
-            by
-              have hb : 0 ≤ kB * (b : ℝ) :=
-                mul_nonneg kB_nonneg (by exact_mod_cast (show 0 ≤ b from b.2))
-              exact div_nonneg zero_le_one hb⟩ : ℝ≥0)) x :=
-    hℝ.codRestrict (fun b => by
-      have hb : 0 ≤ kB * (b : ℝ) :=
-        mul_nonneg kB_nonneg (by exact_mod_cast (show 0 ≤ b from b.2))
-      exact div_nonneg zero_le_one hb)
+  have hg : ContinuousOn (fun b : ℝ≥0 => (1 : ℝ) / (kB * (b : ℝ))) (Set.Ioi 0) := by
+    apply ContinuousOn.div continuousOn_const (by fun_prop)
+    intro b hb
+    exact ne_of_gt (mul_pos kB_pos (by exact_mod_cast hb))
   have hind : Topology.IsInducing (fun T : Temperature => (T.val : ℝ≥0)) := ⟨rfl⟩
-  have : Tendsto (fun b : ℝ≥0 => ofβ b) (𝓝 x) (𝓝 (ofβ x)) := by
-    simp [hind.nhds_eq_comap, ofβ_eq]
-    simp_all only [Set.mem_Ioi, one_div, mul_inv_rev, val_eq_coe]
-    exact hNN
-  exact this
+  rw [hind.continuousOn_iff]
+  refine (continuous_real_toNNReal.comp_continuousOn hg).congr ?_
+  intro b hb
+  exact (Real.toNNReal_of_nonneg (div_nonneg zero_le_one (mul_nonneg kB_nonneg b.2))).symm
 
 lemma ofβ_differentiableOn :
     DifferentiableOn ℝ (fun (x : ℝ) => ((ofβ (Real.toNNReal x)).val : ℝ)) (Set.Ioi 0) := by
@@ -160,13 +114,10 @@ lemma ofβ_differentiableOn :
     · fun_prop
     · fun_prop
     · intro x hx
-      have hx0 : x ≠ 0 := ne_of_gt (by simpa using hx)
-      simp [mul_eq_zero, kB_ne_zero, hx0]
+      exact mul_ne_zero kB_ne_zero (ne_of_gt hx)
   · intro x hx
-    simp at hx
-    have hx' : 0 < x := by simpa using hx
-    simp [ofβ_eq, hx'.le, Real.toNNReal, NNReal.coe_mk]
-    norm_cast
+    rw [show ((ofβ (Real.toNNReal x)).val : ℝ) = (ofβ (Real.toNNReal x)).toReal from rfl,
+        ofβ_toReal, Real.coe_toNNReal x hx.le]
 
 /-! ### Convergence -/
 
@@ -174,94 +125,30 @@ open Filter Topology
 
 /-- Eventually, `ofβ β` is positive as β → ∞`. -/
 lemma eventually_pos_ofβ : ∀ᶠ b : ℝ≥0 in atTop, ((Temperature.ofβ b : Temperature) : ℝ) > 0 := by
-  have hge : ∀ᶠ b : ℝ≥0 in atTop, (1 : ℝ≥0) ≤ b := Filter.eventually_ge_atTop 1
-  refine hge.mono ?_
-  intro b hb
-  have hbpos : 0 < (b : ℝ) := (zero_lt_one.trans_le hb)
-  have hden : 0 < kB * (b : ℝ) := mul_pos kB_pos hbpos
-  have : 0 < (1 : ℝ) / (kB * (b : ℝ)) := one_div_pos.mpr hden
+  filter_upwards [eventually_gt_atTop 0] with b hb
+  have : 0 < (1 : ℝ) / (kB * (b : ℝ)) := one_div_pos.mpr (mul_pos kB_pos (by exact_mod_cast hb))
   simpa [ofβ_toReal] using this
 
 /-- General helper: for any `a > 0`, we have `1 / (a * b) → 0` as `b → ∞` in `ℝ≥0`. -/
 private lemma tendsto_const_inv_mul_atTop (a : ℝ) (ha : 0 < a) :
     Tendsto (fun b : ℝ≥0 => (1 : ℝ) / (a * (b : ℝ))) atTop (𝓝 (0 : ℝ)) := by
-  refine Metric.tendsto_nhds.2 ?_
-  intro ε hε
-  have hεpos : 0 < ε := hε
-  let Breal : ℝ := (1 / (a * ε)) + 1
-  have hBpos : 0 < Breal := by
-    have : 0 < (1 / (a * ε)) := by
-      have : 0 < a * ε := mul_pos ha hεpos
-      exact one_div_pos.mpr this
-    linarith
-  let B : ℝ≥0 := ⟨Breal, le_of_lt hBpos⟩
-  have h_ev : ∀ᶠ b : ℝ≥0 in atTop, b ≥ B := Filter.eventually_ge_atTop B
-  refine h_ev.mono ?_
-  intro b hb
-  have hBposR : 0 < (B : ℝ) := hBpos
-  have hbposR : 0 < (b : ℝ) := by
-    have hBB : (B : ℝ) ≤ (b : ℝ) := by exact_mod_cast hb
-    exact lt_of_lt_of_le hBposR hBB
-  have hb0 : 0 < (a * (b : ℝ)) := mul_pos ha hbposR
-  have hB0 : 0 < (a * (B : ℝ)) := mul_pos ha hBposR
-  have hmono : (1 : ℝ) / (a * (b : ℝ)) ≤ (1 : ℝ) / (a * (B : ℝ)) := by
-    have hBB : (B : ℝ) ≤ (b : ℝ) := by exact_mod_cast hb
-    have hden_le : (a * (B : ℝ)) ≤ (a * (b : ℝ)) :=
-      mul_le_mul_of_nonneg_left hBB (le_of_lt ha)
-    simpa [one_div] using one_div_le_one_div_of_le hB0 hden_le
-  have hB_gt_base : (1 / (a * ε)) < (B : ℝ) := by
-    simp [B, Breal, NNReal.toReal]
-  have hden_gt : (1 / ε) < (a * (B : ℝ)) := by
-    have h' := mul_lt_mul_of_pos_left hB_gt_base ha
-    have hane : a ≠ 0 := ne_of_gt ha
-    have hx' : a * (ε⁻¹ * a⁻¹) = (1 / ε) := by
-      have : a * (ε⁻¹ * a⁻¹) = ε⁻¹ := by
-        simp [mul_comm, hane]
-      simpa [one_div] using this
-    simpa [hx'] using h'
-  have hpos : 0 < (1 / ε) := by simpa [one_div] using inv_pos.mpr hεpos
-  have hBbound : (1 : ℝ) / (a * (B : ℝ)) < ε := by
-    have := one_div_lt_one_div_of_lt hpos hden_gt
-    simpa [one_div, inv_div] using this
-  set A : ℝ := (1 : ℝ) / (a * (b : ℝ)) with hA
-  have hA_nonneg : 0 ≤ A := by
-    have : 0 ≤ a * (b : ℝ) :=
-      mul_nonneg (le_of_lt ha) (by exact_mod_cast (show 0 ≤ b from b.2))
-    simpa [hA] using div_nonneg zero_le_one this
-  have hxlt : A < ε := by
-    have := lt_of_le_of_lt hmono hBbound
-    simpa [hA] using this
-  have hAbs : |A| < ε := by
-    simpa [abs_of_nonneg hA_nonneg] using hxlt
-  have hAbs' : |A - 0| < ε := by simpa [sub_zero] using hAbs
-  have hdist : dist A 0 < ε := by simpa [Real.dist_eq] using hAbs'
-  simpa [Real.dist_eq, hA, one_div, mul_comm, mul_left_comm, mul_assoc] using hdist
+  have h : Tendsto (fun b : ℝ≥0 => a * (b : ℝ)) atTop atTop :=
+    (NNReal.tendsto_coe_atTop.2 tendsto_id).const_mul_atTop ha
+  simp only [one_div]
+  exact h.inv_tendsto_atTop
 
 /-- Core convergence: as β → ∞, `toReal (ofβ β) → 0` in `ℝ`. -/
 lemma tendsto_toReal_ofβ_atTop :
     Tendsto (fun b : ℝ≥0 => (Temperature.ofβ b : ℝ))
-      atTop (𝓝 (0 : ℝ)) := by
-  have hform :
-      (fun b : ℝ≥0 => (Temperature.ofβ b : ℝ))
-        = (fun b : ℝ≥0 => (1 : ℝ) / (kB * (b : ℝ))) := by
-    funext b; simp [Temperature.ofβ, Temperature.toReal]; norm_cast
-  have hsrc :
-      Tendsto (fun b : ℝ≥0 => (1 : ℝ) / (kB * (b : ℝ))) atTop (𝓝 (0 : ℝ)) :=
-    tendsto_const_inv_mul_atTop kB kB_pos
-  simpa [hform] using hsrc
+      atTop (𝓝 (0 : ℝ)) :=
+  tendsto_const_inv_mul_atTop kB kB_pos
 
 /-- As β → ∞, T = ofβ β → 0+ in ℝ (within Ioi 0). -/
 lemma tendsto_ofβ_atTop :
     Tendsto (fun b : ℝ≥0 => (Temperature.ofβ b : ℝ))
       atTop (nhdsWithin 0 (Set.Ioi 0)) := by
-  have h_to0 := tendsto_toReal_ofβ_atTop
-  have h_into :
-      Tendsto (fun b : ℝ≥0 => (Temperature.ofβ b : ℝ)) atTop (𝓟 (Set.Ioi (0 : ℝ))) :=
-    tendsto_principal.2 (by simpa using Temperature.eventually_pos_ofβ)
-  have : Tendsto (fun b : ℝ≥0 => (Temperature.ofβ b : ℝ))
-      atTop ((nhds (0 : ℝ)) ⊓ 𝓟 (Set.Ioi (0 : ℝ))) :=
-    tendsto_inf.2 ⟨h_to0, h_into⟩
-  simpa [nhdsWithin] using this
+  refine tendsto_nhdsWithin_iff.2 ⟨tendsto_toReal_ofβ_atTop, ?_⟩
+  simpa using eventually_pos_ofβ
 
 /-! ### Conversion to and from `ℝ≥0` -/
 
@@ -301,12 +188,7 @@ noncomputable def betaFromReal (t : ℝ) : ℝ :=
 /-- Explicit closed-form for `Beta_fun_T t` when `t > 0`. -/
 lemma beta_fun_T_formula (t : ℝ) (ht : 0 < t) :
     betaFromReal t = 1 / (kB * t) := by
-  have ht0 : (0 : ℝ) ≤ t := ht.le
-  have : ((Temperature.ofNNReal (Real.toNNReal t)).β : ℝ) = 1 / (kB * t) := by
-    simp [Temperature.β, Temperature.ofNNReal, Temperature.toReal,
-      Real.toNNReal_of_nonneg ht0, one_div, mul_comm]
-    norm_cast
-  simpa [betaFromReal] using this
+  simp only [betaFromReal, β_toReal, Temperature.toReal, ofNNReal_val, Real.coe_toNNReal t ht.le]
 
 /-- On `Ioi 0`, `Beta_fun_T t` equals `1 / (kB * t)`. -/
 lemma beta_fun_T_eq_on_Ioi :
@@ -316,39 +198,20 @@ lemma beta_fun_T_eq_on_Ioi :
 
 lemma deriv_beta_wrt_T (T : Temperature) (hT_pos : 0 < T.val) :
     HasDerivWithinAt betaFromReal (-1 / (kB * (T.val : ℝ)^2)) (Set.Ioi 0) (T.val : ℝ) := by
-  let f : ℝ → ℝ := fun t => 1 / (kB * t)
-  have h_eq : EqOn betaFromReal f (Set.Ioi 0) := beta_fun_T_eq_on_Ioi
   have hTne : (T.val : ℝ) ≠ 0 := ne_of_gt hT_pos
-  have hf_def : f = fun t : ℝ => (kB)⁻¹ * t⁻¹ := by
-    funext t
-    by_cases ht : t = 0
-    · simp [f, ht]
-    · simp [f, one_div, *] at *
+  have hg : HasDerivAt (fun t : ℝ => kB * t) kB (T.val : ℝ) := by
+    simpa using (hasDerivAt_id (T.val : ℝ)).const_mul kB
+  have h_deriv : HasDerivAt (fun t : ℝ => 1 / (kB * t))
+      (-1 / (kB * (T.val : ℝ) ^ 2)) (T.val : ℝ) := by
+    have h := (hasDerivAt_const (T.val : ℝ) (1 : ℝ)).div hg (mul_ne_zero kB_ne_zero hTne)
+    have hval : (-1 : ℝ) / (kB * (T.val : ℝ) ^ 2)
+        = (0 * (kB * (T.val : ℝ)) - 1 * kB) / (kB * (T.val : ℝ)) ^ 2 := by
+      rw [mul_pow]
+      field_simp
       ring
-  have h_inv :
-      HasDerivAt (fun t : ℝ => t⁻¹)
-        (-((T.val : ℝ) ^ 2)⁻¹) (T.val : ℝ) := by
-    simpa using (hasDerivAt_inv (x := (T.val : ℝ)) hTne)
-  have h_deriv_aux :
-      HasDerivAt (fun t : ℝ => (kB)⁻¹ * t⁻¹)
-        ((kB)⁻¹ * (-((T.val : ℝ) ^ 2)⁻¹)) (T.val : ℝ) :=
-    h_inv.const_mul ((kB)⁻¹)
-  have h_pow_simp :
-      (kB)⁻¹ * (-((T.val : ℝ) ^ 2)⁻¹) = -1 / (kB * (T.val : ℝ)^2) := by
-    calc
-      (kB)⁻¹ * (-((T.val : ℝ) ^ 2)⁻¹)
-          = -((kB)⁻¹ * ((T.val : ℝ) ^ 2)⁻¹) := by
-            ring
-      _ = -(1 / kB * (1 / (T.val : ℝ) ^ 2)) := by
-            simp [one_div]
-      _ = -1 / (kB * (T.val : ℝ) ^ 2) := by
-        rw [one_div]
-        field_simp [pow_two, mul_comm, mul_left_comm, mul_assoc, kB_ne_zero, hTne]
-  have h_deriv_f :
-      HasDerivAt f (-1 / (kB * (T.val : ℝ)^2)) (T.val : ℝ) := by
-    simpa [hf_def, h_pow_simp] using h_deriv_aux
-  have h_mem : (T.val : ℝ) ∈ Set.Ioi (0 : ℝ) := hT_pos
-  exact (h_deriv_f.hasDerivWithinAt).congr h_eq (h_eq h_mem)
+    rw [hval]
+    exact h
+  exact (h_deriv.hasDerivWithinAt).congr beta_fun_T_eq_on_Ioi (beta_fun_T_eq_on_Ioi hT_pos)
 
 /-- Chain rule for β(T) : d/dT F(β(T)) = F'(β(T)) * (-1 / (kB * T^2)), within `Ioi 0`. -/
 lemma chain_rule_T_beta {F : ℝ → ℝ} {F' : ℝ}
@@ -356,25 +219,17 @@ lemma chain_rule_T_beta {F : ℝ → ℝ} {F' : ℝ}
     (hF_deriv : HasDerivWithinAt F F' (Set.Ioi 0) (T.β : ℝ)) :
     HasDerivWithinAt (fun t : ℝ => F (betaFromReal t))
       (F' * (-1 / (kB * (T.val : ℝ)^2))) (Set.Ioi 0) (T.val : ℝ) := by
-  have hβ_deriv := deriv_beta_wrt_T (T:=T) hT_pos
   have h_map : Set.MapsTo betaFromReal (Set.Ioi 0) (Set.Ioi 0) := by
     intro t ht
-    have ht_pos : 0 < t := ht
-    have : 0 < 1 / (kB * t) := by
-      have : 0 < kB * t := mul_pos kB_pos ht_pos
-      exact one_div_pos.mpr this
-    have h_eqt : betaFromReal t = 1 / (kB * t) := beta_fun_T_eq_on_Ioi ht
-    simpa [h_eqt] using this
+    show 0 < betaFromReal t
+    rw [beta_fun_T_eq_on_Ioi ht]
+    exact one_div_pos.mpr (mul_pos kB_pos ht)
   have h_beta_at_T : betaFromReal (T.val : ℝ) = (T.β : ℝ) := by
-    have hTposR : 0 < (T.val : ℝ) := hT_pos
-    have h_eqt := beta_fun_T_eq_on_Ioi hTposR
-    rw [h_eqt]
-    simp [β_toReal]
-    left
+    rw [beta_fun_T_eq_on_Ioi (show (T.val : ℝ) ∈ Set.Ioi 0 from hT_pos), β_toReal]
     rfl
   have hF_deriv' : HasDerivWithinAt F F' (Set.Ioi 0) (betaFromReal (T.val : ℝ)) := by
-    simpa [h_beta_at_T] using hF_deriv
-  have h_comp := hF_deriv'.comp (T.val : ℝ) hβ_deriv h_map
-  exact h_comp
+    rw [h_beta_at_T]
+    exact hF_deriv
+  exact hF_deriv'.comp (T.val : ℝ) (deriv_beta_wrt_T (T := T) hT_pos) h_map
 
 end Temperature

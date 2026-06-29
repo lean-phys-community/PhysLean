@@ -156,30 +156,7 @@ lemma toTensor_eq_asConsTensor :
   rw [show complexContrBasis (Sum.inr 0) = complexContrBasisFin4 1 by {simp}]
   rw [show complexContrBasis (Sum.inr 1) = complexContrBasisFin4 2 by {simp}]
   rw [show complexContrBasis (Sum.inr 2) = complexContrBasisFin4 3 by {simp}]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 1, 1, 1]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 1, 1, 2]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 1, 2]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 1, 2]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 1, 2]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 1, 2]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [1, 2]
-    rw [fromTripleT_apply_basis]
-  conv_lhs =>
-    enter [2]
-    rw [fromTripleT_apply_basis]
+  simp only [fromTripleT_apply_basis]
   rfl
 
 lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>

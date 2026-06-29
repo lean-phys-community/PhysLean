@@ -94,11 +94,11 @@ private lemma distLaplacian_norm_zpow_odd_boundary (m : ℕ) :
     convert! distDiv_inv_pow_eq_dim (d := 1) using 1
     · ext x
       ring_nf
-  · convert! distLaplacian_fundamentalSolution_norm_zpow_of_three_le
-      (d := 2 * m.succ + 1) (by omega) using 4
-    · simp [Nat.succ_eq_add_one]
-      ring
-    · simp [Nat.succ_eq_add_one]
+  · convert! distLaplacian_fundamentalSolution_norm_zpow
+      (d := 2 * m.succ + 1) using 4
+    · simp; ring_nf
+    · simp; ring
+    · simp
 
 private lemma iterated_distLaplacian_norm_zpow_odd_until_boundary
     (m k : ℕ) (hk : k ≤ m) :
@@ -119,7 +119,7 @@ private lemma iterated_distLaplacian_norm_zpow_odd_until_boundary
       rw [ih hk_le]
       rw [map_smul]
       rw [distLaplacian_distOfFunction_norm_zpow
-        (d := 2 * m) ((1 : ℤ) - 2 * (k : ℤ)) (by omega) (by omega)]
+        (d := 2 * m + 1) ((1 : ℤ) - 2 * (k : ℤ)) (by omega)]
       rw [smul_smul]
       have hdist :
           distOfFunction

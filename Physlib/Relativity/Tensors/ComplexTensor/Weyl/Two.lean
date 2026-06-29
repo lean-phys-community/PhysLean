@@ -646,8 +646,7 @@ lemma leftLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) 
     leftLeftToMatrix.symm (M.1 * v * (M.1)ᵀ) := by
   have h1 := leftLeftToMatrix_ρ (leftLeftToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma dualLeftdualLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (dualLeftHandedRep M) (dualLeftHandedRep M)
@@ -655,32 +654,28 @@ lemma dualLeftdualLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(
     dualLeftdualLeftToMatrix.symm ((M.1⁻¹)ᵀ * v * (M.1⁻¹)) := by
   have h1 := dualLeftdualLeftToMatrix_ρ (dualLeftdualLeftToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma leftDualLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (leftHandedRep M) (dualLeftHandedRep M) (leftDualLeftToMatrix.symm v) =
     leftDualLeftToMatrix.symm (M.1 * v * (M.1⁻¹)) := by
   have h1 := leftDualLeftToMatrix_ρ (leftDualLeftToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma dualLeftLeftToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (dualLeftHandedRep M) (leftHandedRep M) (dualLeftLeftToMatrix.symm v) =
     dualLeftLeftToMatrix.symm ((M.1⁻¹)ᵀ * v * (M.1)ᵀ) := by
   have h1 := dualLeftLeftToMatrix_ρ (dualLeftLeftToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma rightRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (rightHandedRep M) (rightHandedRep M) (rightRightToMatrix.symm v) =
     rightRightToMatrix.symm ((M.1.map star) * v * ((M.1.map star))ᵀ) := by
   have h1 := rightRightToMatrix_ρ (rightRightToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma dualRightDualRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (dualRightHandedRep M) (dualRightHandedRep M)
@@ -688,24 +683,21 @@ lemma dualRightDualRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : S
     dualRightDualRightToMatrix.symm (((M.1⁻¹).conjTranspose) * v * ((M.1⁻¹).conjTranspose)ᵀ) := by
   have h1 := dualRightDualRightToMatrix_ρ (dualRightDualRightToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma rightDualRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (rightHandedRep M) (dualRightHandedRep M) (rightDualRightToMatrix.symm v) =
     rightDualRightToMatrix.symm ((M.1.map star) * v * (((M.1⁻¹).conjTranspose)ᵀ)) := by
   have h1 := rightDualRightToMatrix_ρ (rightDualRightToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma dualRightRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (dualRightHandedRep M) (rightHandedRep M) (dualRightRightToMatrix.symm v) =
     dualRightRightToMatrix.symm (((M.1⁻¹).conjTranspose) * v * (M.1.map star)ᵀ) := by
   have h1 := dualRightRightToMatrix_ρ (dualRightRightToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma dualLeftDualRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (dualLeftHandedRep M) (dualRightHandedRep M)
@@ -713,16 +705,14 @@ lemma dualLeftDualRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL
     dualLeftDualRightToMatrix.symm ((M.1⁻¹)ᵀ * v * ((M.1⁻¹).conjTranspose)ᵀ) := by
   have h1 := dualLeftDualRightToMatrix_ρ (dualLeftDualRightToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma leftRightToMatrix_ρ_symm (v : Matrix (Fin 2) (Fin 2) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (leftHandedRep M) (rightHandedRep M) (leftRightToMatrix.symm v) =
     leftRightToMatrix.symm (M.1 * v * (M.1)ᴴ) := by
   have h1 := leftRightToMatrix_ρ (leftRightToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 open Lorentz
 

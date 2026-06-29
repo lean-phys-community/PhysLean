@@ -289,24 +289,16 @@ lemma superCommute_crPart_crPart (φ φ' : 𝓕.FieldOp) : [crPart φ, crPart φ
     simp
   | FieldOp.position φ, FieldOp.position φ' =>
     simp only [crPart_position]
-    apply superCommute_create_create
-    · rfl
-    · rfl
+    apply superCommute_create_create <;> rfl
   | FieldOp.position φ, FieldOp.inAsymp φ' =>
     simp only [crPart_position, crPart_inAsymp]
-    apply superCommute_create_create
-    · rfl
-    · rfl
+    apply superCommute_create_create <;> rfl
   | FieldOp.inAsymp φ, FieldOp.inAsymp φ' =>
     simp only [crPart_inAsymp]
-    apply superCommute_create_create
-    · rfl
-    · rfl
+    apply superCommute_create_create <;> rfl
   | FieldOp.inAsymp φ, FieldOp.position φ' =>
     simp only [crPart_inAsymp, crPart_position]
-    apply superCommute_create_create
-    · rfl
-    · rfl
+    apply superCommute_create_create <;> rfl
 
 @[simp]
 lemma superCommute_anPart_anPart (φ φ' : 𝓕.FieldOp) : [anPart φ, anPart φ']ₛ = 0 := by
@@ -317,24 +309,16 @@ lemma superCommute_anPart_anPart (φ φ' : 𝓕.FieldOp) : [anPart φ, anPart φ
     simp
   | FieldOp.position φ, FieldOp.position φ' =>
     simp only [anPart_position]
-    apply superCommute_annihilate_annihilate
-    · rfl
-    · rfl
+    apply superCommute_annihilate_annihilate <;> rfl
   | FieldOp.position φ, FieldOp.outAsymp φ' =>
     simp only [anPart_position, anPart_outAsymp]
-    apply superCommute_annihilate_annihilate
-    · rfl
-    · rfl
+    apply superCommute_annihilate_annihilate <;> rfl
   | FieldOp.outAsymp φ, FieldOp.outAsymp φ' =>
     simp only [anPart_outAsymp]
-    apply superCommute_annihilate_annihilate
-    · rfl
-    · rfl
+    apply superCommute_annihilate_annihilate <;> rfl
   | FieldOp.outAsymp φ, FieldOp.position φ' =>
     simp only [anPart_outAsymp, anPart_position]
-    apply superCommute_annihilate_annihilate
-    · rfl
-    · rfl
+    apply superCommute_annihilate_annihilate <;> rfl
 
 lemma superCommute_crPart_ofFieldOpList (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
     [crPart φ, ofFieldOpList φs]ₛ = crPart φ * ofFieldOpList φs -

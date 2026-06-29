@@ -100,8 +100,7 @@ noncomputable def freeCurrentPotential (A : ElectromagneticPotential d)
 lemma freeCurrentPotential_add_const (A : ElectromagneticPotential d)
     (J : LorentzCurrentDensity d) (c : Lorentz.Vector d) (x : SpaceTime d) :
     freeCurrentPotential ⟨fun x => A x + c⟩ J x = freeCurrentPotential A J x + ⟪c, J x⟫ₘ := by
-  rw [freeCurrentPotential, freeCurrentPotential]
-  simp
+  simp [freeCurrentPotential]
 
 /-!
 
@@ -165,8 +164,7 @@ lemma gradFreeCurrentPotential_eq_sum_basis {d} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
     (hJ : ContDiff ℝ ∞ J) :
     A.gradFreeCurrentPotential J = (∑ μ, fun x => (η μ μ * J x μ) • Lorentz.Vector.basis μ) := by
-  apply HasVarGradientAt.varGradient
-  apply freeCurrentPotential_hasVarGradientAt A hA J hJ
+  exact (freeCurrentPotential_hasVarGradientAt A hA J hJ).varGradient
 
 lemma gradFreeCurrentPotential_eq_chargeDensity_currentDensity {d}
     (𝓕 : FreeSpace) (A : ElectromagneticPotential d)
@@ -179,9 +177,8 @@ lemma gradFreeCurrentPotential_eq_chargeDensity_currentDensity {d}
   rw [Fintype.sum_sum_type]
   simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, Finset.sum_singleton,
     inl_0_inl_0, one_mul, inr_i_inr_i, neg_mul, _root_.neg_smul, Pi.add_apply, Finset.sum_apply]
-  congr
-  · simp [LorentzCurrentDensity.chargeDensity]
-  · simp [LorentzCurrentDensity.currentDensity]
+  congr <;>
+    simp [LorentzCurrentDensity.chargeDensity, LorentzCurrentDensity.currentDensity]
 
 lemma gradFreeCurrentPotential_eq_tensor {d} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
@@ -238,9 +235,9 @@ lemma lagrangian_eq_electric_magnetic {d} {𝓕 : FreeSpace}
     - A.scalarPotential 𝓕.c (x.time 𝓕.c) x.space * J.chargeDensity 𝓕.c (x.time 𝓕.c) x.space
     + ∑ i, A.vectorPotential 𝓕.c (x.time 𝓕.c) x.space i *
         J.currentDensity 𝓕.c (x.time 𝓕.c) x.space i := by
-  rw [lagrangian]
-  rw[kineticTerm_eq_electricMatrix_magneticFieldMatrix _ _ (hA.differentiable (by simp))]
-  rw [freeCurrentPotential_eq_sum_scalarPotential_vectorPotential 𝓕 A J x]
+  rw [lagrangian,
+    kineticTerm_eq_electricMatrix_magneticFieldMatrix _ _ (hA.differentiable (by simp)),
+    freeCurrentPotential_eq_sum_scalarPotential_vectorPotential 𝓕 A J x]
   ring
 
 /-!
@@ -289,8 +286,7 @@ lemma gradLagrangian_eq_kineticTerm_sub {𝓕 : FreeSpace} (A : ElectromagneticP
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
     (hJ : ContDiff ℝ ∞ J) :
     A.gradLagrangian 𝓕 J = A.gradKineticTerm 𝓕 - A.gradFreeCurrentPotential J := by
-  apply HasVarGradientAt.varGradient
-  apply lagrangian_hasVarGradientAt_eq_add_gradKineticTerm A hA J hJ
+  exact (lagrangian_hasVarGradientAt_eq_add_gradKineticTerm A hA J hJ).varGradient
 
 /-!
 
@@ -322,8 +318,7 @@ lemma gradLagrangian_eq_sum_fieldStrengthMatrix {𝓕 : FreeSpace} (A : Electrom
   simp only [one_div, Finset.sum_apply]
   rw [← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl (fun ν _ => ?_)
-  rw [smul_smul, smul_smul, ← sub_smul]
-  ring_nf
+  module
   exact hA
 
 /-!
@@ -345,29 +340,15 @@ lemma gradLagrangian_eq_electricField_magneticField {𝓕 : FreeSpace}
       ∑ j, ∂[j] (magneticFieldMatrix 𝓕.c A (x.time 𝓕.c) · (j, i)) x.space) +
       J.currentDensity 𝓕.c (x.time 𝓕.c) x.space i) •
         Lorentz.Vector.basis (Sum.inr i) := by
-  rw [gradLagrangian_eq_kineticTerm_sub A hA J hJ]
-  simp only [Pi.sub_apply, one_div, mul_inv_rev, neg_mul, Fin.isValue]
-  rw [gradKineticTerm_eq_electric_magnetic _ _ hA]
-  rw [gradFreeCurrentPotential_eq_chargeDensity_currentDensity 𝓕 A hA J hJ x]
-  conv_lhs =>
-    enter [2]
-    rw [add_comm]
-  rw [add_sub_assoc]
-  conv_lhs =>
-    enter [2]
-    rw [sub_add_eq_sub_sub]
-    rw [← Finset.sum_sub_distrib]
-    rw [← neg_add_eq_sub]
-  rw [← add_assoc]
-  conv_lhs =>
-    enter [1, 2]
-    rw [← _root_.neg_smul]
-  rw [← add_smul]
-  conv_lhs =>
-    enter [2, 2, i]
-    rw [← sub_smul]
-    simp [FreeSpace.c_sq]
-  ring_nf
+  rw [gradLagrangian_eq_kineticTerm_sub A hA J hJ, Pi.sub_apply,
+    gradKineticTerm_eq_electric_magnetic _ _ hA,
+    gradFreeCurrentPotential_eq_chargeDensity_currentDensity 𝓕 A hA J hJ x,
+    add_sub_add_comm, ← Finset.sum_sub_distrib]
+  congr 1
+  · module
+  · refine Finset.sum_congr rfl fun i _ => ?_
+    rw [𝓕.c_sq, one_div_one_div]
+    module
 
 /-!
 

@@ -39,8 +39,7 @@ lemma contrContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 �
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexContrBasis complexContrBasis i j]
-    rfl
+    exact congrArg _ (Basis.tensorProduct_apply complexContrBasis complexContrBasis i j)
   · simp
 
 /-- Equivalence of `complexCo ⊗ complexCo` to `4 x 4` complex matrices. -/
@@ -57,8 +56,7 @@ lemma coCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexCoBasis complexCoBasis i j]
-    rfl
+    exact congrArg _ (Basis.tensorProduct_apply complexCoBasis complexCoBasis i j)
   · simp
 
 /-- Equivalence of `complexContr ⊗ complexCo` to `4 x 4` complex matrices. -/
@@ -76,8 +74,7 @@ lemma contrCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ 
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexContrBasis complexCoBasis i j]
-    rfl
+    exact congrArg _ (Basis.tensorProduct_apply complexContrBasis complexCoBasis i j)
   · simp
 
 /-- Equivalence of `complexCo ⊗ complexContr` to `4 x 4` complex matrices. -/
@@ -95,8 +92,7 @@ lemma coContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ 
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply complexCoBasis complexContrBasis i j]
-    rfl
+    exact congrArg _ (Basis.tensorProduct_apply complexCoBasis complexContrBasis i j)
   · simp
 
 /-!
@@ -292,8 +288,7 @@ lemma contrContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3)
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ) := by
   have h1 := contrContrToMatrix_ρ (contrContrToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma coCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (CoℂModule.SL2CRep M) (CoℂModule.SL2CRep M) (coCoToMatrix.symm v) =
@@ -301,8 +296,7 @@ lemma coCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) 
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹) := by
   have h1 := coCoToMatrix_ρ (coCoToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma contrCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (ContrℂModule.SL2CRep M) (CoℂModule.SL2CRep M) (contrCoToMatrix.symm v) =
@@ -310,8 +304,7 @@ lemma contrCoToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) �
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹) := by
   have h1 := contrCoToMatrix_ρ (contrCoToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 lemma coContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℂ) (M : SL(2,ℂ)) :
     TensorProduct.map (CoℂModule.SL2CRep M) (ContrℂModule.SL2CRep M) (coContrToMatrix.symm v) =
@@ -319,8 +312,7 @@ lemma coContrToMatrix_ρ_symm (v : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) �
     (LorentzGroup.toComplex (SL2C.toLorentzGroup M))ᵀ) := by
   have h1 := coContrToMatrix_ρ (coContrToMatrix.symm v) M
   simp only [LinearEquiv.apply_symm_apply] at h1
-  rw [← h1]
-  simp
+  rw [← h1, LinearEquiv.symm_apply_apply]
 
 end Lorentz
 end

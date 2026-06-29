@@ -23,8 +23,7 @@ lemma insertionSortMin_lt_length_succ {α : Type} (r : α → α → Prop) [Deci
     (i : α) (l : List α) :
     insertionSortMinPos r i l < (insertionSortDropMinPos r i l).length.succ := by
   rw [insertionSortMinPos]
-  simp only [List.length_cons, insertionSortDropMinPos,
-    Nat.succ_eq_add_one]
+  simp only [List.length_cons, insertionSortDropMinPos, Nat.succ_eq_add_one]
   rw [eraseIdx_length']
   simp
 
@@ -38,9 +37,7 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos {α : Type} (r : α → α
     [Std.Total r] [IsTrans α r] (a : α) (l : List α)
     (i : Fin (insertionSortDropMinPos r a l).length) :
     r (insertionSortMin r a l) ((insertionSortDropMinPos r a l)[i]) := by
-  let l1 := List.insertionSort r (a :: l)
-  have hl1 : l1.Pairwise r := List.pairwise_insertionSort r (a :: l)
-  simp only [l1] at hl1
+  have hl1 : (List.insertionSort r (a :: l)).Pairwise r := List.pairwise_insertionSort r (a :: l)
   rw [insertionSort_eq_insertionSortMin_cons r a l] at hl1
   simp only [List.pairwise_cons, List.mem_insertionSort] at hl1
   apply hl1.1 ((insertionSortDropMinPos r a l)[i])
@@ -103,14 +100,10 @@ lemma orderedInsert_commute {α : Type} (r : α → α → Prop) [DecidableRel r
     List.orderedInsert r a (List.orderedInsert r b l) =
       List.orderedInsert r b (List.orderedInsert r a l)
   | [] => by
-    have hrb : r b a := by
-      have ht := Std.Total.total (r := r) a b
-      simp_all
+    have hrb : r b a := (Std.Total.total a b).resolve_left hr
     simp [hr, hrb]
   | c :: l => by
-    have hrb : r b a := by
-      have ht := Std.Total.total (r := r) a b
-      simp_all
+    have hrb : r b a := (Std.Total.total a b).resolve_left hr
     simp only [List.orderedInsert]
     by_cases h : r a c
     · simp only [h, ↓reduceIte, List.orderedInsert.eq_2, hrb]
@@ -175,18 +168,10 @@ lemma takeWhile_orderedInsert {α : Type} (r : α → α → Prop) [DecidableRel
   | c :: l => by
     simp only [List.orderedInsert]
     by_cases h : r b c
+    · simp [h, hr]
     · simp only [h, ↓reduceIte]
-      rw [List.takeWhile_cons_of_pos]
-      simp only [List.length_cons]
-      simp [hr]
-    · simp only [h, ↓reduceIte]
-      have hrba : r b a:= by
-        have ht := Std.Total.total (r := r) a b
-        simp_all
-      have hl : ¬ r a c := by
-        by_contra hn
-        apply h
-        exact IsTrans.trans _ _ _ hrba hn
+      have hl : ¬ r a c :=
+        fun hn => h (IsTrans.trans _ _ _ ((Std.Total.total a b).resolve_left hr) hn)
       simp only [hl, decide_false, Bool.not_false, List.takeWhile_cons_of_pos, List.length_cons,
         add_left_inj]
       exact takeWhile_orderedInsert r a b hr l
@@ -197,28 +182,14 @@ lemma takeWhile_orderedInsert' {α : Type} (r : α → α → Prop) [DecidableRe
     (List.takeWhile (fun c => !decide (r b c)) (List.orderedInsert r a l)).length =
     (List.takeWhile (fun c => !decide (r b c)) l).length
   | [] => by
-    simp only [List.orderedInsert, List.takeWhile_nil, List.length_nil, List.length_eq_zero_iff,
-      List.takeWhile_eq_nil_iff, List.length_singleton, zero_lt_one, Fin.zero_eta, Fin.isValue,
-      List.get_eq_getElem, Fin.val_eq_zero, List.getElem_cons_zero, Bool.not_eq_eq_eq_not,
-      Bool.not_true, decide_eq_false_iff_not, Decidable.not_not, forall_const]
-    have ht := Std.Total.total (r := r) a b
-    simp_all
+    simp [List.orderedInsert, (Std.Total.total a b).resolve_left hr]
   | c :: l => by
-    have hrba : r b a:= by
-      have ht := Std.Total.total (r := r) a b
-      simp_all
+    have hrba : r b a := (Std.Total.total a b).resolve_left hr
     simp only [List.orderedInsert]
     by_cases h : r b c
-    · simp only [h, decide_true, Bool.not_true, Bool.false_eq_true, not_false_eq_true,
-      List.takeWhile_cons_of_neg, List.length_nil, List.length_eq_zero_iff,
-      List.takeWhile_eq_nil_iff,
-      List.get_eq_getElem, Bool.not_eq_eq_eq_not, decide_eq_false_iff_not, Decidable.not_not]
-      by_cases hac : r a c
-      · simp [hac, hrba]
-      · simp [hac, h]
+    · by_cases hac : r a c <;> simp [h, hac, hrba]
     · by_cases hac : r a c
-      · refine False.elim (h ?_)
-        exact IsTrans.trans _ _ _ hrba hac
+      · exact absurd (IsTrans.trans _ _ _ hrba hac) h
       · simp only [hac, ↓reduceIte, h, decide_false, Bool.not_false, List.takeWhile_cons_of_pos,
         List.length_cons, add_left_inj]
         exact takeWhile_orderedInsert' r a b hr l
@@ -229,9 +200,7 @@ lemma insertionSortEquiv_commute {α : Type} (r : α → α → Prop) [Decidable
     (hn : n + 2 < (a :: b :: l).length) →
     insertionSortEquiv r (a :: b :: l) ⟨n + 2, hn⟩ = (finCongr (by simp))
     (insertionSortEquiv r (b :: a :: l) ⟨n + 2, hn⟩) := by
-  have hrba : r b a:= by
-    have ht := Std.Total.total (r := r) a b
-    simp_all
+  have hrba : r b a := (Std.Total.total a b).resolve_left hr
   intro l hn
   simp only [List.insertionSort, List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one,
     equivCons_trans, Equiv.trans_apply, equivCons_succ, finCongr_apply]
@@ -291,51 +260,13 @@ lemma insertionSortEquiv_commute {α : Type} (r : α → α → Prop) [Decidable
     exact hr
   let n := ((insertionSortEquiv r l) ⟨n, by simpa using hn⟩)
   change (a1.succAbove ⟨b1.succAbove n, _⟩).1 = (b2.succAbove ⟨a2.succAbove n, _⟩).1
-  trans if (b1.succAbove n).1 < a1.1 then (b1.succAbove n).1 else (b1.succAbove n).1 + 1
-  · rw [Fin.succAbove]
-    simp only [Fin.castSucc_mk, Fin.lt_def, Fin.succ_mk]
-    by_cases ha : (b1.succAbove n).1 < a1.1
-    · simp [ha]
-    · simp [ha]
-  trans if (a2.succAbove n).1 < b2.1 then (a2.succAbove n).1 else (a2.succAbove n).1 + 1
-  swap
-  · conv_rhs => rw [Fin.succAbove]
-    simp only [Fin.castSucc_mk, Fin.lt_def, Fin.succ_mk]
-    by_cases ha : (a2.succAbove n).1 < b2.1
-    · simp [ha]
-    · simp [ha]
-  have hbs1 : (b1.succAbove n).1 = if n.1 < b1.1 then n.1 else n.1 + 1 := by
+  have hba : b2.1 ≤ a2.1 := hb ▸ ha1
+  have val_succAbove {m : ℕ} (p : Fin (m + 1)) (i : Fin m) :
+      (p.succAbove i).1 = if i.1 < p.1 then i.1 else i.1 + 1 := by
     rw [Fin.succAbove]
-    simp only [Fin.lt_def]
-    by_cases ha : n.1 < b1.1
-    · simp [ha]
-    · simp [ha]
-  have has2 : (a2.succAbove n).1 = if n.1 < a2.1 then n.1 else n.1 + 1 := by
-    rw [Fin.succAbove]
-    simp only [Fin.lt_def]
-    by_cases ha : n.1 < a2.1
-    · simp [ha]
-    · simp [ha]
-  rw [hbs1, has2, hb, ha2]
-  have hnat (a2 b2 n : ℕ) (h : b2 ≤ a2) : (if (if ↑n < ↑b2 then ↑n else ↑n + 1) < ↑a2 + 1 then
-      if ↑n < ↑b2 then ↑n else ↑n + 1
-      else (if ↑n < ↑b2 then ↑n else ↑n + 1) + 1) =
-      if (if ↑n < ↑a2 then ↑n else ↑n + 1) < ↑b2 then if ↑n < ↑a2 then ↑n else ↑n + 1
-      else (if ↑n < ↑a2 then ↑n else ↑n + 1) + 1 := by
-    by_cases hnb2 : n < b2
-    · simp only [hnb2, ↓reduceIte]
-      have h1 : n < a2 + 1 := by omega
-      have h2 : n < a2 := by omega
-      simp [h1, h2, hnb2]
-    · simp only [hnb2, ↓reduceIte, add_lt_add_iff_right]
-      by_cases ha2 : n < a2
-      · simp [ha2, hnb2]
-      · simp only [ha2, ↓reduceIte]
-        rw [if_neg]
-        omega
-  apply hnat
-  rw [← hb]
-  exact ha1
+    split <;> simp_all [Fin.lt_def]
+  simp only [val_succAbove, ha2, hb]
+  split_ifs <;> omega
 
 set_option backward.isDefEq.respectTransparency false in
 lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Prop) [DecidableRel r]
@@ -487,18 +418,13 @@ lemma insertionSort_filter {α : Type} (r : α → α → Prop) [DecidableRel r]
   | a :: l => by
     simp only [List.insertionSort_cons]
     by_cases h : p a
-    · rw [orderedInsert_filter_of_pos]
-      rw [List.filter_cons_of_pos]
+    · rw [orderedInsert_filter_of_pos r a p h _ (List.pairwise_insertionSort r l)]
+      rw [List.filter_cons_of_pos (by simpa using h)]
       simp only [List.insertionSort_cons]
       rw [insertionSort_filter]
-      simp_all only [decide_true]
-      simp_all only
-      exact List.pairwise_insertionSort r l
-    · rw [orderedInsert_filter_of_neg]
-      rw [List.filter_cons_of_neg]
+    · rw [orderedInsert_filter_of_neg r a p h]
+      rw [List.filter_cons_of_neg (by simpa using h)]
       rw [insertionSort_filter]
-      simp_all only [decide_false, Bool.false_eq_true, not_false_eq_true]
-      exact h
 
 lemma takeWhile_sorted_eq_filter {α : Type} (r : α → α → Prop) [DecidableRel r]
     [IsTrans α r] (a : α) : (l : List α) → (hl : l.Pairwise r) →
@@ -640,10 +566,6 @@ lemma insertionSort_of_eq_list {α : Type} (r : α → α → Prop) [DecidableRe
     ++ l
     ++ (List.filter (fun c => r a c ∧ r c a) l2)
     ++ (List.filter (fun c => r a c ∧ ¬ r c a) ((l1 ++ l2).insertionSort r)) := by
-  have hl : List.insertionSort r (l1 ++ l ++ l2) =
-    List.takeWhile (fun c => ¬ r a c) ((l1 ++ l ++ l2).insertionSort r) ++
-    List.dropWhile (fun c => ¬ r a c) ((l1 ++ l ++ l2).insertionSort r) := by
-    exact Eq.symm List.takeWhile_append_dropWhile
   have hlt : List.takeWhile (fun c => ¬ r a c) ((l1 ++ l ++ l2).insertionSort r)
       = List.takeWhile (fun c => ¬ r a c) ((l1 ++ l2).insertionSort r) := by
     rw [takeWhile_sorted_eq_filter, takeWhile_sorted_eq_filter]
@@ -655,7 +577,8 @@ lemma insertionSort_of_eq_list {α : Type} (r : α → α → Prop) [DecidableRe
     exact fun b hb => (h b hb).1
     exact List.pairwise_insertionSort r (l1 ++ l2)
     exact List.pairwise_insertionSort r (l1 ++ l ++ l2)
-  conv_lhs => rw [hl, hlt]
+  conv_lhs => rw [← List.takeWhile_append_dropWhile (p := fun c => decide ¬ r a c)
+    (l := (l1 ++ l ++ l2).insertionSort r), hlt]
   simp only [decide_not, Bool.decide_and]
   simp only [List.append_assoc, List.append_cancel_left_eq]
   have h1 := dropWhile_sorted_eq_filter r a (List.insertionSort r (l1 ++ (l ++ l2)))

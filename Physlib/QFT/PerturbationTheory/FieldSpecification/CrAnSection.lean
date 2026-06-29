@@ -337,9 +337,7 @@ def appendEquiv {φs φs' : List 𝓕.FieldOp} : CrAnSection (φs ++ φs') ≃
     match ψsψs' with
     | (ψs, ψs') =>
     simp only [take_left, drop_left, Prod.mk.injEq]
-    refine And.intro (Subtype.ext ?_) (Subtype.ext ?_)
-    · simp
-    · simp
+    refine And.intro (Subtype.ext ?_) (Subtype.ext ?_) <;> simp
 
 @[simp]
 lemma _root_.List.map_eraseIdx {α β : Type} (f : α → β) : (l : List α) → (n : ℕ) →

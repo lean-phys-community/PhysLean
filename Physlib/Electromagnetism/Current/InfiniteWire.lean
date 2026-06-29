@@ -159,12 +159,7 @@ lemma infiniteWire_vectorPotential (𝓕 : FreeSpace) (I : ℝ) :
   ext η i
   simp [vectorPotential, infiniteWire, constantTime_apply,
   constantSliceDist_apply, Lorentz.Vector.spatialCLM, distOfFunction_vector_eval,
-  distOfFunction_eculid_eval]
-  left
-  congr
-  funext x
-  congr 1
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  distOfFunction_eculid_eval, eq_comm]
 
 lemma infiniteWire_vectorPotential_fst (𝓕 : FreeSpace) (I : ℝ)(η : 𝓢(Time × Space 3, ℝ)) :
     (infiniteWire 𝓕 I).vectorPotential 𝓕.c η 0 =
@@ -192,18 +187,14 @@ lemma infiniteWire_vectorPotential_distTimeDeriv (𝓕 : FreeSpace) (I : ℝ) :
     distTimeDeriv ((infiniteWire 𝓕 I).vectorPotential 𝓕.c) = 0 := by
   ext1 η
   ext i
-  simp only [_root_.zero_apply, PiLp.zero_apply]
   rw [infiniteWire_vectorPotential _ I, constantTime_distTimeDeriv]
-  simp
 
 @[simp]
 lemma infiniteWire_vectorPotential_distSpaceDeriv_0 (𝓕 : FreeSpace) (I : ℝ) :
     distSpaceDeriv 0 ((infiniteWire 𝓕 I).vectorPotential 𝓕.c) = 0 := by
   ext1 η
-  simp [infiniteWire_vectorPotential _ I]
-  right
-  rw [constantTime_distSpaceDeriv, distDeriv_constantSliceDist_same]
-  simp
+  simp [infiniteWire_vectorPotential _ I, constantTime_distSpaceDeriv,
+    distDeriv_constantSliceDist_same]
 
 /-!
 
@@ -233,7 +224,6 @@ lemma infiniteWire_isExterma {𝓕 : FreeSpace} {I : ℝ} :
     _root_.zero_apply, one_div, wireCurrentDensity_chargeDesnity, mul_zero,
     implies_true, PiLp.zero_apply, zero_sub, true_and]
   intro ε i
-  field_simp
   rw [neg_add_eq_zero]
   fin_cases i
   · simp [Fin.sum_univ_three]
@@ -257,27 +247,15 @@ lemma infiniteWire_isExterma {𝓕 : FreeSpace} {I : ℝ} :
     · ext ε
       simp [distDiv_apply_eq_sum_distDeriv]
       rw [add_comm]
-      congr
-      · rw [distDeriv_apply, fderivD_apply]
-        conv_rhs => rw [distDeriv_apply, fderivD_apply]
-        simp [distGrad_apply]
-      · rw [distDeriv_apply, fderivD_apply]
-        conv_rhs => rw [distDeriv_apply, fderivD_apply]
-        simp [distGrad_apply]
+      congr 1 <;>
+        simp [distDeriv_apply, fderivD_apply, distGrad_apply]
     rw [distGrad_distOfFunction_log_norm]
-    have h1 := distDiv_inv_pow_eq_dim (d := 2)
-    simp at h1
-    simp [h1]
-  · simp only [Fin.mk_one, Fin.isValue, neg_sub, Finset.sum_sub_distrib, Fin.sum_univ_three,
-    infiniteWire_vectorPotential_distSpaceDeriv_0, map_zero, _root_.zero_apply,
-    PiLp.zero_apply, zero_add, wireCurrentDensity_currentDensity_snd, mul_zero]
-    ring_nf
-    rw [distSpaceDeriv_commute]
-    simp [distSpaceDeriv_apply']
-  · simp only [Fin.reduceFinMk, Fin.isValue, neg_sub, Finset.sum_sub_distrib, Fin.sum_univ_three,
-    infiniteWire_vectorPotential_distSpaceDeriv_0, map_zero, _root_.zero_apply,
-    PiLp.zero_apply, zero_add, add_sub_add_right_eq_sub, wireCurrentDensity_currentDensity_thrd,
-    mul_zero]
+    simpa using distDiv_inv_pow_eq_dim (d := 2)
+  all_goals
+    simp only [Fin.mk_one, Fin.reduceFinMk, Fin.isValue, neg_sub, Finset.sum_sub_distrib,
+      Fin.sum_univ_three, infiniteWire_vectorPotential_distSpaceDeriv_0, map_zero,
+      _root_.zero_apply, PiLp.zero_apply, zero_add, add_sub_add_right_eq_sub,
+      wireCurrentDensity_currentDensity_snd, wireCurrentDensity_currentDensity_thrd, mul_zero]
     ring_nf
     rw [distSpaceDeriv_commute]
     simp [distSpaceDeriv_apply']

@@ -42,34 +42,13 @@ lemma gramMatrix_selfAdjoint (H : TwoHiggsDoublet) :
 
 lemma eq_fst_norm_of_eq_gramMatrix {H1 H2 : TwoHiggsDoublet}
     (h : H1.gramMatrix = H2.gramMatrix) : ‖H1.Φ1‖ = ‖H2.Φ1‖ := by
-  rw [gramMatrix, gramMatrix] at h
-  have h1 := congrArg (fun x => x 0 0) h
-  simp only [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Fin.isValue] at h1
-  rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K] at h1
-  rw [sq_eq_sq_iff_eq_or_eq_neg] at h1
-  rcases h1 with h1 | h1
-  · simpa using h1
-  · rw [← RCLike.ofReal_neg] at h1
-    have hnorm1 : 0 ≤ ‖H1.Φ1‖ := norm_nonneg H1.Φ1
-    have hnorm2 : 0 ≤ ‖H2.Φ1‖ := norm_nonneg H2.Φ1
-    have hl : ‖H1.Φ1‖ = (-‖H2.Φ1‖) := Eq.symm
-      ((fun {z w} => Complex.ofReal_inj.mp) (id (Eq.symm h1)))
-    grind
+  have hinner : ⟪H1.Φ1, H1.Φ1⟫_ℂ = ⟪H2.Φ1, H2.Φ1⟫_ℂ := congrArg (· 0 0) h
+  rw [norm_eq_sqrt_re_inner (𝕜 := ℂ) H1.Φ1, norm_eq_sqrt_re_inner (𝕜 := ℂ) H2.Φ1, hinner]
 
 lemma eq_snd_norm_of_eq_gramMatrix {H1 H2 : TwoHiggsDoublet}
     (h : H1.gramMatrix = H2.gramMatrix) : ‖H1.Φ2‖ = ‖H2.Φ2‖ := by
-  rw [gramMatrix, gramMatrix] at h
-  have h1 := congrArg (fun x => x 1 1) h
-  simp [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_one, Fin.isValue] at h1
-  rw [sq_eq_sq_iff_eq_or_eq_neg] at h1
-  rcases h1 with h1 | h1
-  · simpa using h1
-  · erw [← RCLike.ofReal_neg] at h1
-    have hnorm1 : 0 ≤ ‖H1.Φ2‖ := norm_nonneg H1.Φ2
-    have hnorm2 : 0 ≤ ‖H2.Φ2‖ := norm_nonneg H2.Φ2
-    have hl : ‖H1.Φ2‖ = (-‖H2.Φ2‖) := Eq.symm
-      ((fun {z w} => Complex.ofReal_inj.mp) (id (Eq.symm h1)))
-    grind
+  have hinner : ⟪H1.Φ2, H1.Φ2⟫_ℂ = ⟪H2.Φ2, H2.Φ2⟫_ℂ := congrArg (· 1 1) h
+  rw [norm_eq_sqrt_re_inner (𝕜 := ℂ) H1.Φ2, norm_eq_sqrt_re_inner (𝕜 := ℂ) H2.Φ2, hinner]
 
 @[simp]
 lemma gaugeGroupI_smul_gramMatrix (g : StandardModel.GaugeGroupI) (H : TwoHiggsDoublet) :
@@ -84,8 +63,7 @@ lemma gramMatrix_det_eq (H : TwoHiggsDoublet) :
   simp only [inner_self_eq_norm_sq_to_K, Complex.coe_algebraMap, Fin.isValue, Matrix.of_apply,
     Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_fin_one, Matrix.cons_val_one,
     sub_right_inj]
-  rw [← Complex.conj_mul']
-  simp only [inner_conj_symm]
+  rw [← Complex.conj_mul', inner_conj_symm]
 
 lemma gramMatrix_det_eq_real (H : TwoHiggsDoublet) :
     H.gramMatrix.det.re = ‖H.Φ1‖ ^ 2 * ‖H.Φ2‖ ^ 2 - ‖⟪H.Φ1, H.Φ2⟫_ℂ‖ ^ 2 := by
@@ -106,12 +84,8 @@ lemma gramMatrix_tr_nonneg (H : TwoHiggsDoublet) :
   rw [gramMatrix, Matrix.trace_fin_two]
   simp only [inner_self_eq_norm_sq_to_K, Complex.coe_algebraMap, Fin.isValue, Matrix.of_apply,
     Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_fin_one, Matrix.cons_val_one,
-    Complex.add_re]
-  apply add_nonneg
-  · rw [← Complex.ofReal_pow, Complex.ofReal_re]
-    exact sq_nonneg ‖H.Φ1‖
-  · rw [← Complex.ofReal_pow, Complex.ofReal_re]
-    exact sq_nonneg ‖H.Φ2‖
+    Complex.add_re, ← Complex.ofReal_pow, Complex.ofReal_re]
+  positivity
 
 lemma gaugeGroupI_exists_fst_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
     ∃ g : StandardModel.GaugeGroupI,
@@ -150,16 +124,10 @@ lemma gaugeGroupI_exists_fst_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
     field_simp
   have habc (a b c : ℝ) (ha : 0 ≤ a) (hx : a ^ 2 = b / c ^2) (hc : c ≠ 0) (hc : 0 < c) :
       a = Real.sqrt b / c := by
-    field_simp
-    symm
-    have hb : b = a ^ 2 * c ^ 2 := by
-      rw [hx]
+    have hb : b = (a * c) ^ 2 := by
+      rw [mul_pow, hx]
       field_simp
-    subst hb
-    rw [Real.sqrt_eq_iff_eq_sq]
-    · ring
-    · positivity
-    · positivity
+    rw [hb, Real.sqrt_sq (mul_nonneg ha hc.le), mul_div_assoc, div_self hc.ne', mul_one]
   apply habc
   rw [h0]
   ring_nf
@@ -211,7 +179,7 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
       refine inv_smul_eq_iff.mpr ?_
       simp at hg1 hg2
       simp [hg1, hg2]
-      exact eq_snd_norm_of_eq_gramMatrix (id (Eq.symm h))
+      exact eq_snd_norm_of_eq_gramMatrix h.symm
   · intro h
     obtain ⟨g1, H1_Φ1, H1_Φ2⟩ := gaugeGroupI_exists_fst_eq_snd_eq (H := H1) Φ1_zero
     have Φ2_nezero : H2.Φ1 ≠ 0 := by
@@ -227,7 +195,7 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
     · simp [mul_smul]
       refine inv_smul_eq_iff.mpr ?_
       simp [H1_Φ1, H2_Φ1]
-      apply eq_fst_norm_of_eq_gramMatrix (id (Eq.symm h))
+      apply eq_fst_norm_of_eq_gramMatrix h.symm
     · simp [mul_smul]
       refine inv_smul_eq_iff.mpr ?_
       simp [H1_Φ2, H2_Φ2]
@@ -236,10 +204,10 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
         · symm
           exact congrArg (fun x => x 1 0) h
         · simp only [Complex.ofReal_inj]
-          exact eq_fst_norm_of_eq_gramMatrix (id (Eq.symm h))
+          exact eq_fst_norm_of_eq_gramMatrix h.symm
       · congr 2
         · simp [h]
-        · exact eq_fst_norm_of_eq_gramMatrix (id (Eq.symm h))
+        · exact eq_fst_norm_of_eq_gramMatrix h.symm
 
 /-!
 
@@ -253,24 +221,15 @@ lemma gramMatrix_surjective_det_tr (K : Matrix (Fin 2) (Fin 2) ℂ)
     (hKs : IsSelfAdjoint K) (hKdet : 0 ≤ K.det.re) (hKtr : 0 ≤ K.trace.re) :
     ∃ H : TwoHiggsDoublet, H.gramMatrix = K := by
   /- Basic results related to K. -/
-  have hK_explicit : K = !![K 0 0, K 0 1; K 1 0, K 1 1] := by
-    ext i j
-    fin_cases i <;> fin_cases j <;> simp
-  have hK_star_explicit : star K = !![star (K 0 0), star (K 1 0); star (K 0 1), star (K 1 1)] := by
-    ext i j
-    fin_cases i <;> fin_cases j <;> simp
-  rw [isSelfAdjoint_iff, hK_star_explicit] at hKs
-  conv_rhs at hKs => rw [hK_explicit]
-  simp at hKs
+  rw [isSelfAdjoint_iff] at hKs
+  have hcomp : ∀ i j, (starRingEnd ℂ) (K j i) = K i j := fun i j => congrFun (congrFun hKs i) j
   have hK_explicit2 : K = !![((K 0 0).re : ℂ), K 0 1; conj (K 0 1), ((K 1 1).re : ℂ)] := by
-    conv_lhs => rw [hK_explicit]
-    simp [hKs]
-    apply And.intro
-    · refine Eq.symm ((fun {z} => Complex.conj_eq_iff_re.mp) ?_)
-      simp [hKs]
-    · refine Eq.symm ((fun {z} => Complex.conj_eq_iff_re.mp) ?_)
-      simp [hKs]
-  clear hK_explicit hK_star_explicit hKs
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp
+    · exact (Complex.conj_eq_iff_re.mp (hcomp 0 0)).symm
+    · exact (hcomp 1 0).symm
+    · exact (Complex.conj_eq_iff_re.mp (hcomp 1 1)).symm
+  clear hKs hcomp
   generalize (K 0 0).re = a at *
   generalize (K 1 1).re = b at *
   generalize K 0 1 = c at *
@@ -306,15 +265,11 @@ lemma gramMatrix_surjective_det_tr (K : Matrix (Fin 2) (Fin 2) ℂ)
     field_simp
   · simp [PiLp.inner_apply]
     field_simp
-  · rw [Real.sq_sqrt, abs_of_nonneg, abs_of_nonneg]
+  · have hD : (0 : ℝ) ≤ a * b - ‖c‖ ^ 2 := by linarith
+    rw [Real.sq_sqrt (by positivity), div_pow, div_pow, sq_abs, sq_abs,
+      Real.sq_sqrt ha_nonneg, Real.sq_sqrt hD]
     field_simp
-    rw [Real.sq_sqrt, Real.sq_sqrt]
     ring
-    · positivity
-    · nlinarith
-    · exact Real.sqrt_nonneg (a * b - ‖c‖ ^ 2)
-    · positivity
-    · positivity
 
 /-!
 
@@ -345,9 +300,7 @@ lemma gramMatrix_eq_gramVector_sum_pauliMatrix (H : TwoHiggsDoublet) :
   simp [-Module.Basis.sum_repr] at h1
   rw [← h1]
   simp [gramVector, smul_smul, Finset.smul_sum]
-  congr 1
-  · simp [PauliMatrix.pauliBasis, PauliMatrix.pauliSelfAdjoint]
-  · simp [PauliMatrix.pauliBasis, PauliMatrix.pauliSelfAdjoint]
+  congr 1 <;> simp [PauliMatrix.pauliBasis, PauliMatrix.pauliSelfAdjoint]
 
 lemma gramMatrix_eq_component_gramVector (H : TwoHiggsDoublet) :
     gramMatrix H =
@@ -356,12 +309,7 @@ lemma gramMatrix_eq_component_gramVector (H : TwoHiggsDoublet) :
       (1 / 2 : ℂ) * (H.gramVector (Sum.inr 0) + Complex.I * H.gramVector (Sum.inr 1)),
       (1 / 2 : ℂ) * (H.gramVector (Sum.inl 0) - H.gramVector (Sum.inr 2))] := by
   rw [gramMatrix_eq_gramVector_sum_pauliMatrix]
-  simp only [one_div, PauliMatrix.pauliMatrix, Matrix.one_fin_two, Fintype.sum_sum_type,
-    Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, Finset.sum_singleton, Matrix.smul_of,
-    Matrix.smul_cons, Complex.real_smul, mul_one, smul_zero, Matrix.smul_empty, Fin.sum_univ_three,
-    smul_neg, Matrix.of_add_of, Matrix.add_cons, Matrix.head_cons, add_zero, Matrix.tail_cons,
-    Matrix.empty_add_empty, zero_add, smul_add, Complex.ofReal_inv, Complex.ofReal_ofNat,
-    EmbeddingLike.apply_eq_iff_eq, Matrix.vecCons_inj, and_true]
+  simp [PauliMatrix.pauliMatrix, Fin.sum_univ_three, Complex.real_smul, Matrix.one_fin_two]
   ring_nf
   simp
 
@@ -369,9 +317,11 @@ lemma gramVector_inl_eq_trace_gramMatrix (H : TwoHiggsDoublet) :
     H.gramVector (Sum.inl 0) = H.gramMatrix.trace.re := by
   rw [gramMatrix_eq_component_gramVector, Matrix.trace_fin_two]
   simp only [Fin.isValue, one_div, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-    Matrix.cons_val_fin_one, Matrix.cons_val_one]
-  ring_nf
-  simp
+    Matrix.cons_val_fin_one, Matrix.cons_val_one, Complex.add_re, Complex.mul_re, Complex.inv_re,
+    Complex.re_ofNat, Complex.normSq_ofNat, div_self_mul_self', Complex.ofReal_re, Complex.inv_im,
+    Complex.im_ofNat, neg_zero, zero_div, Complex.add_im, Complex.ofReal_im, add_zero, mul_zero,
+    sub_zero, Complex.sub_re, Complex.sub_im, sub_self]
+  ring
 
 lemma gramVector_inl_nonneg (H : TwoHiggsDoublet) :
     0 ≤ H.gramVector (Sum.inl 0) := by
@@ -381,16 +331,14 @@ lemma gramVector_inl_nonneg (H : TwoHiggsDoublet) :
 lemma normSq_Φ1_eq_gramVector (H : TwoHiggsDoublet) :
     ‖H.Φ1‖ ^ 2 = (1/2 : ℝ) * (H.gramVector (Sum.inl 0) + H.gramVector (Sum.inr 2)) := by
   trans (gramMatrix H 0 0).re
-  · simp [gramMatrix]
-    rw [← Complex.ofReal_pow, Complex.ofReal_re]
+  · simp [gramMatrix, ← Complex.ofReal_pow]
   · rw [gramMatrix_eq_component_gramVector]
     simp
 
 lemma normSq_Φ2_eq_gramVector (H : TwoHiggsDoublet) :
     ‖H.Φ2‖ ^ 2 = (1/2 : ℝ) * (H.gramVector (Sum.inl 0) - H.gramVector (Sum.inr 2)) := by
   trans (gramMatrix H 1 1).re
-  · simp [gramMatrix]
-    rw [← Complex.ofReal_pow, Complex.ofReal_re]
+  · simp [gramMatrix, ← Complex.ofReal_pow]
   · rw [gramMatrix_eq_component_gramVector]
     simp
 
@@ -418,11 +366,7 @@ lemma Φ1_inner_Φ2_normSq_eq_gramVector (H : TwoHiggsDoublet) :
     rfl
   rw [conj_inner_symm H.Φ2 H.Φ1]
   rw [Φ1_inner_Φ2_eq_gramVector, Φ2_inner_Φ1_eq_gramVector]
-  simp only [one_div, Complex.ofReal_inv, Complex.ofReal_ofNat, Fin.isValue, Complex.mul_re,
-    Complex.inv_re, Complex.re_ofNat, Complex.normSq_ofNat, div_self_mul_self', Complex.add_re,
-    Complex.ofReal_re, Complex.I_re, zero_mul, Complex.I_im, Complex.ofReal_im, mul_zero, sub_self,
-    add_zero, Complex.inv_im, Complex.im_ofNat, neg_zero, zero_div, Complex.add_im, Complex.mul_im,
-    one_mul, zero_add, sub_zero, Complex.sub_re, Complex.sub_im, zero_sub, mul_neg, sub_neg_eq_add]
+  simp [Complex.mul_re]
   ring
 
 lemma gramVector_inl_zero_eq (H : TwoHiggsDoublet) :
@@ -474,14 +418,9 @@ lemma gramMatrix_det_eq_gramVector (H : TwoHiggsDoublet) :
 
 lemma gramVector_inr_sum_sq_le_inl (H : TwoHiggsDoublet) :
     ∑ μ : Fin 3, H.gramVector (Sum.inr μ) ^ 2 ≤ H.gramVector (Sum.inl 0) ^ 2 := by
-  apply sub_nonneg.mp
-  trans (4 : ℝ) * H.gramMatrix.det.re
-  · apply mul_nonneg
-    · norm_num
-    · exact gramMatrix_det_nonneg H
-  apply (le_of_eq _)
-  rw [gramMatrix_det_eq_gramVector]
-  ring
+  have h := gramMatrix_det_nonneg H
+  rw [gramMatrix_det_eq_gramVector] at h
+  linarith
 
 lemma gramVector_surjective (v : Fin 1 ⊕ Fin 3 → ℝ)
     (h_inl : 0 ≤ v (Sum.inl 0))
@@ -491,15 +430,11 @@ lemma gramVector_surjective (v : Fin 1 ⊕ Fin 3 → ℝ)
       (1 / 2 : ℂ) * (v (Sum.inr 0) - Complex.I * v (Sum.inr 1));
       (1 / 2 : ℂ) * (v (Sum.inr 0) + Complex.I * v (Sum.inr 1)),
       (1 / 2 : ℂ) * (v (Sum.inl 0) - v (Sum.inr 2))]
-  have K_star : star K = !![(1 / 2 : ℂ) * (v (Sum.inl 0) + v (Sum.inr 2)),
-      (1 / 2 : ℂ) * (v (Sum.inr 0) - Complex.I * v (Sum.inr 1));
-      (1 / 2 : ℂ) * (v (Sum.inr 0) + Complex.I * v (Sum.inr 1)),
-      (1 / 2 : ℂ) * (v (Sum.inl 0) - v (Sum.inr 2))] := by
+  have hK_selfAdjoint : IsSelfAdjoint K := by
+    rw [isSelfAdjoint_iff]
     ext i j
     fin_cases i <;> fin_cases j <;> simp [K]
     ring
-  have hK_selfAdjoint : IsSelfAdjoint K := by
-    exact K_star
   have hK_det_nonneg : 0 ≤ K.det.re := by
     simp [K]
     simp [Fin.sum_univ_three] at h_det
@@ -523,9 +458,7 @@ lemma mem_orbit_gaugeGroupI_iff_gramVector (H1 H2 : TwoHiggsDoublet) :
   rw [mem_orbit_gaugeGroupI_iff_gramMatrix]
   constructor
   · intro h
-    rw [gramVector_eq, gramVector_eq]
-    funext μ
-    congr
+    simp only [gramVector_eq, h]
   · intro h
     rw [gramMatrix_eq_gramVector_sum_pauliMatrix,
       gramMatrix_eq_gramVector_sum_pauliMatrix, h]

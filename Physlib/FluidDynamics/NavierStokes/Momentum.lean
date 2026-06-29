@@ -156,12 +156,11 @@ lemma spaceDeriv_momentumFlux_component (d : ℕ) (fluid : FluidState d)
     ∂[j] (fun x' => momentumFlux d fluid t x' i j) x =
       fluid.velocity t x i • ∂[j] (fun x' => momentumDensity d fluid t x' j) x +
       ∂[j] (fun x' => fluid.velocity t x' i) x • momentumDensity d fluid t x j := by
-  have hProduct := Space.deriv_smul (u := j) (x := x)
+  rw [← Space.deriv_smul (u := j) (x := x)
     (c := fun x' => fluid.velocity t x' i)
     (f := fun x' => momentumDensity d fluid t x' j)
     ((differentiable_euclidean.mp hVelocity i).differentiableAt)
-    ((differentiable_euclidean.mp hMomentumDensity j).differentiableAt)
-  rw [← hProduct]
+    ((differentiable_euclidean.mp hMomentumDensity j).differentiableAt)]
   congr
   funext x'
   simp [momentumFlux, momentumDensity, Matrix.vecMulVec_apply, mul_left_comm]
@@ -218,9 +217,9 @@ lemma conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_sm
     (hVelocitySpace : Differentiable ℝ (fluid.velocity t)) :
     conservativeMomentumLHS d fluid t x =
       convectiveMomentumLHS d fluid t x + continuityResidual d fluid t x • fluid.velocity t x := by
-  rw [conservativeMomentumLHS, convectiveMomentumLHS, continuityResidual]
-  rw [timeDeriv_momentumDensity d fluid t x hRhoTime hVelocityTime]
-  rw [matrixDiv_momentumFlux d fluid t x hMomentumDensity hVelocitySpace]
+  rw [conservativeMomentumLHS, convectiveMomentumLHS, continuityResidual,
+    timeDeriv_momentumDensity d fluid t x hRhoTime hVelocityTime,
+    matrixDiv_momentumFlux d fluid t x hMomentumDensity hVelocitySpace]
   ext i
   simp [materialAcceleration, convectiveTerm, div, momentumDensity, smul_eq_mul]
   ring_nf
@@ -240,43 +239,17 @@ theorem momentumEquation_iff_convectiveMomentumEquation
       Differentiable ℝ (momentumDensity d data.toFluidState t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
     MomentumEquation d data ↔ ConvectiveMomentumEquation d data := by
-  constructor
-  · intro hConservative t x
-    have hMassFluxSpace :
-        DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
-      exact (hMomentumDensity t).differentiableAt
+  have conservative_eq_convective_lhs : ∀ t x, conservativeMomentumLHS d data.toFluidState t x =
+      convectiveMomentumLHS d data.toFluidState t x := by
+    intro t x
     have hResidual : continuityResidual d data.toFluidState t x = 0 := by
       simpa [continuityResidual] using
-        hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace
-    have hLhs := conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-      d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
-      (hMomentumDensity t) (hVelocitySpace t)
-    have hLhs' :
-        conservativeMomentumLHS d data.toFluidState t x =
-          convectiveMomentumLHS d data.toFluidState t x := by
-      rw [hLhs, hResidual, zero_smul, add_zero]
-    change convectiveMomentumLHS d data.toFluidState t x =
-      matrixDiv d (data.stress t) x + data.rho t x • data.bodyForce t x
-    rw [← hLhs']
-    exact hConservative t x
-  · intro hConvective t x
-    have hMassFluxSpace :
-        DifferentiableAt ℝ (fun x' => data.rho t x' • data.velocity t x') x := by
-      exact (hMomentumDensity t).differentiableAt
-    have hResidual : continuityResidual d data.toFluidState t x = 0 := by
-      simpa [continuityResidual] using
-        hContinuity t x (by simpa using hRhoTime t x) hMassFluxSpace
-    have hLhs := conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
-      d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
-      (hMomentumDensity t) (hVelocitySpace t)
-    have hLhs' :
-        conservativeMomentumLHS d data.toFluidState t x =
-          convectiveMomentumLHS d data.toFluidState t x := by
-      rw [hLhs, hResidual, zero_smul, add_zero]
-    change conservativeMomentumLHS d data.toFluidState t x =
-      matrixDiv d (data.stress t) x + data.rho t x • data.bodyForce t x
-    rw [hLhs']
-    exact hConvective t x
+        hContinuity t x (by simpa using hRhoTime t x) (hMomentumDensity t).differentiableAt
+    rw [conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
+        d data.toFluidState t x (hRhoTime t x) (hVelocityTime t x)
+        (hMomentumDensity t) (hVelocitySpace t), hResidual, zero_smul, add_zero]
+  exact ⟨fun h t x => (conservative_eq_convective_lhs t x).symm.trans (h t x),
+    fun h t x => (conservative_eq_convective_lhs t x).trans (h t x)⟩
 
 end NavierStokes
 end FluidDynamics

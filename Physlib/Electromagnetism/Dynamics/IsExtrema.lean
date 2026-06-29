@@ -315,6 +315,13 @@ lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : Electromagneti
     ∂ₜ (∂ₜ (A.magneticFieldMatrix 𝓕.c · x (i, j))) t =
     𝓕.c ^ 2 * ∑ k, ∂[k] (∂[k] (A.magneticFieldMatrix 𝓕.c t · (i, j))) x +
     𝓕.ε₀⁻¹ * (∂[j] (J.currentDensity 𝓕.c t · i) x - ∂[i] (J.currentDensity 𝓕.c t · j) x) := by
+  have hcd : ∀ ij, ContDiff ℝ 2 (fun y => A.magneticFieldMatrix 𝓕.c t y ij) :=
+    fun ij => magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)) t ij
+  have hsd : ∀ ij k, Differentiable ℝ (∂[k] (fun y => A.magneticFieldMatrix 𝓕.c t y ij)) :=
+    fun ij k => Space.deriv_differentiable (hcd ij) k
+  have hJd : ∀ i, Differentiable ℝ (fun x => J.currentDensity 𝓕.c t x i) :=
+    fun i => LorentzCurrentDensity.currentDensity_apply_differentiable_space
+      (hJ.differentiable (by simp)) t i
   rw [time_deriv_time_deriv_magneticFieldMatrix A (hA.of_le (ENat.LEInfty.out))]
   conv_lhs =>
     enter [2, 2, x]
@@ -323,49 +330,19 @@ lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : Electromagneti
     enter [1, 2, x]
     rw [time_deriv_electricField_of_isExtrema hA J hJ h]
   rw [Space.deriv_eq_fderiv_basis]
-  rw [fderiv_fun_sub (by
-        apply Differentiable.const_mul
-        apply Differentiable.fun_sum
-        intro i _
-        apply Space.deriv_differentiable
-        apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))
-          ((LorentzCurrentDensity.currentDensity_apply_differentiable_space
-          (hJ.differentiable (by simp)) _ _).const_mul _).differentiableAt,
-    fderiv_const_mul (by
-        apply Differentiable.fun_sum
-        intro i _
-        apply Space.deriv_differentiable
-        apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl))),
-    fderiv_const_mul (by
-        apply (LorentzCurrentDensity.currentDensity_apply_differentiable_space
-        (hJ.differentiable (by simp)) _ _).differentiableAt),
-    fderiv_fun_sum fun i _ => by
-        apply Differentiable.differentiableAt
-        apply Space.deriv_differentiable
-        apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl))]
+  rw [fderiv_fun_sub ((Differentiable.fun_sum fun i _ => hsd _ i).const_mul _).differentiableAt
+      ((hJd _).const_mul _).differentiableAt,
+    fderiv_const_mul (Differentiable.fun_sum fun i _ => hsd _ i).differentiableAt,
+    fderiv_const_mul (hJd _).differentiableAt,
+    fderiv_fun_sum fun i _ => (hsd _ i).differentiableAt]
   conv_lhs =>
     enter [2]
     rw [Space.deriv_eq_fderiv_basis]
-    rw [fderiv_fun_sub (by
-        apply Differentiable.const_mul
-        apply Differentiable.fun_sum
-        intro i _
-        apply Space.deriv_differentiable
-        apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))
-          ((LorentzCurrentDensity.currentDensity_apply_differentiable_space
-          (hJ.differentiable (by simp)) _ _).const_mul _).differentiableAt,
-    fderiv_const_mul (by
-        apply Differentiable.fun_sum
-        intro i _
-        apply Space.deriv_differentiable
-        apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl))),
-    fderiv_const_mul (by
-        apply (LorentzCurrentDensity.currentDensity_apply_differentiable_space
-        (hJ.differentiable (by simp)) _ _).differentiableAt),
-    fderiv_fun_sum fun i _ => by
-        apply Differentiable.differentiableAt
-        apply Space.deriv_differentiable
-        apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl))]
+    rw [fderiv_fun_sub ((Differentiable.fun_sum fun i _ => hsd _ i).const_mul _).differentiableAt
+        ((hJd _).const_mul _).differentiableAt,
+    fderiv_const_mul (Differentiable.fun_sum fun i _ => hsd _ i).differentiableAt,
+    fderiv_const_mul (hJd _).differentiableAt,
+    fderiv_fun_sum fun i _ => (hsd _ i).differentiableAt]
   simp [← Space.deriv_eq_fderiv_basis, FreeSpace.c_sq]
   field_simp
   conv_rhs =>
@@ -374,18 +351,11 @@ lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : Electromagneti
   conv_rhs =>
     enter [1, 2, k]
     rw [Space.deriv_eq_fderiv_basis]
-    rw [fderiv_fun_sub (by
-      apply Space.deriv_differentiable
-      apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))
-      (by
-      apply Space.deriv_differentiable
-      apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))]
+    rw [fderiv_fun_sub (hsd _ _).differentiableAt (hsd _ _).differentiableAt]
     simp [← Space.deriv_eq_fderiv_basis]
-    rw [Space.deriv_commute _ (by
-      apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))]
+    rw [Space.deriv_commute _ (hcd _)]
     enter [2]
-    rw [Space.deriv_commute _ (by
-      apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))]
+    rw [Space.deriv_commute _ (hcd _)]
   simp only [Finset.sum_sub_distrib]
   ring
 
@@ -412,6 +382,16 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
       𝓕.c ^ 2 * ∑ j, (∂[j] (∂[j] (A.electricField 𝓕.c t · i)) x) -
       𝓕.c ^ 2 / 𝓕.ε₀ * ∂[i] (J.chargeDensity 𝓕.c t ·) x -
       𝓕.c ^ 2 * 𝓕.μ₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by
+  have hEs : ∀ j, ContDiff ℝ 2 (fun y => A.electricField 𝓕.c t y j) :=
+    fun j => electricField_apply_contDiff_space (i := j) (hA.of_le (right_eq_inf.mp rfl)) t
+  have hEd : ∀ j k, Differentiable ℝ (∂[k] (fun y => A.electricField 𝓕.c t y j)) :=
+    fun j k => Space.deriv_differentiable (hEs j) k
+  have hBt : ∀ j, Differentiable ℝ
+      (fun s => ∂[j] (fun y => A.magneticFieldMatrix 𝓕.c s y (j, i)) x) :=
+    fun j => Space.space_deriv_differentiable_time (i := j)
+      (magneticFieldMatrix_contDiff _ (hA.of_le (right_eq_inf.mp rfl)) (j, i)) x
+  have hJt : Differentiable ℝ (fun s => J.currentDensity 𝓕.c s x i) :=
+    LorentzCurrentDensity.currentDensity_apply_differentiable_time (hJ.differentiable (by simp)) x i
   calc _
     _= ∂ₜ (fun t =>
       1 / (𝓕.μ₀ * 𝓕.ε₀) * ∑ j, Space.deriv j (fun x => magneticFieldMatrix 𝓕.c A t x (j, i)) x -
@@ -428,39 +408,18 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
       rw [Time.deriv_eq]
       rw [fderiv_fun_sub]
       simp only [one_div, mul_inv_rev, FunLike.coe_sub, Pi.sub_apply]
-      rw [fderiv_const_mul (by
-        apply Differentiable.fun_sum
-        intro j _
-        apply Space.space_deriv_differentiable_time
-        apply magneticFieldMatrix_contDiff
-        apply hA.of_le (right_eq_inf.mp rfl))]
-      rw [fderiv_const_mul (by
-        apply Differentiable.differentiableAt
-        apply LorentzCurrentDensity.currentDensity_apply_differentiable_time
-        exact hJ.differentiable (by simp))]
+      rw [fderiv_const_mul (Differentiable.fun_sum fun j _ => hBt j).differentiableAt]
+      rw [fderiv_const_mul hJt.differentiableAt]
       simp [Time.deriv_eq]
-      · apply Differentiable.const_mul
-        apply Differentiable.fun_sum
-        intro j _
-        apply Space.space_deriv_differentiable_time
-        apply magneticFieldMatrix_contDiff
-        apply hA.of_le (right_eq_inf.mp rfl)
-      · apply DifferentiableAt.const_mul
-        apply Differentiable.differentiableAt
-        apply LorentzCurrentDensity.currentDensity_apply_differentiable_time
-        exact hJ.differentiable (by simp)
+      · exact ((Differentiable.fun_sum fun j _ => hBt j).const_mul _).differentiableAt
+      · exact hJt.differentiableAt.const_mul _
     _ = 1 / (𝓕.μ₀ * 𝓕.ε₀) * ((∑ j, ∂ₜ (fun t => ∂[j] (A.magneticFieldMatrix 𝓕.c t · (j, i)) x)) t) -
       1 / 𝓕.ε₀ * (∂ₜ (J.currentDensity 𝓕.c · x i) t) := by
       congr
       rw [Time.deriv_eq]
-      rw [fderiv_fun_sum]
+      rw [fderiv_fun_sum fun i _ => (hBt i).differentiableAt]
       simp only [FunLike.coe_sum, Finset.sum_apply]
       rfl
-      intro i _
-      apply Differentiable.differentiableAt
-      apply Space.space_deriv_differentiable_time
-      apply magneticFieldMatrix_contDiff
-      apply hA.of_le (right_eq_inf.mp rfl)
     _ = 1 / (𝓕.μ₀ * 𝓕.ε₀) * (∑ j, ∂[j] (fun x => ∂ₜ (A.magneticFieldMatrix 𝓕.c · x (j, i)) t)) x -
         1 / 𝓕.ε₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by
       congr
@@ -488,14 +447,8 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
         congr
         funext j
         rw [Space.deriv_eq_fderiv_basis]
-        rw [fderiv_fun_sub]
+        rw [fderiv_fun_sub (hEd _ _).differentiableAt (hEd _ _).differentiableAt]
         simp [← Space.deriv_eq_fderiv_basis]
-        all_goals
-        · apply Differentiable.differentiableAt
-          apply Space.deriv_differentiable
-          apply electricField_apply_contDiff_space
-          apply hA.of_le
-          exact right_eq_inf.mp rfl
     _ = 1 / (𝓕.μ₀ * 𝓕.ε₀) * ∑ j, (∂[j] (fun x => ∂[j] (A.electricField 𝓕.c t · i) x) x) -
           1 / (𝓕.μ₀ * 𝓕.ε₀) * ∑ j, (∂[j] (fun x => ∂[i] (A.electricField 𝓕.c t · j) x) x) -
           1 / 𝓕.ε₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by simp [mul_sub]
@@ -504,10 +457,7 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
         1 / 𝓕.ε₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by
         congr
         funext j
-        rw [Space.deriv_commute _ (by
-          apply electricField_apply_contDiff_space
-          apply hA.of_le
-          exact right_eq_inf.mp rfl), Space.deriv_eq_fderiv_basis]
+        rw [Space.deriv_commute _ (hEs _), Space.deriv_eq_fderiv_basis]
       _ = 1 / (𝓕.μ₀ * 𝓕.ε₀) * ∑ j, (∂[j] (fun x => ∂[j] (A.electricField 𝓕.c t · i) x) x) -
           1 / (𝓕.μ₀ * 𝓕.ε₀) * (∂[i] (fun x => ∑ j, ∂[j] (A.electricField 𝓕.c t · j) x) x) -
           1 / 𝓕.ε₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by
@@ -515,12 +465,8 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
         rw [Space.deriv_eq_fderiv_basis]
         rw [fderiv_fun_sum]
         simp [← Space.deriv_eq_fderiv_basis]
-        intro i _
-        apply Differentiable.differentiableAt
-        apply Space.deriv_differentiable
-        apply electricField_apply_contDiff_space
-        apply hA.of_le
-        exact right_eq_inf.mp rfl
+        intro j _
+        exact (hEd j j).differentiableAt
       _ = 1 / (𝓕.μ₀ * 𝓕.ε₀) * ∑ j, (∂[j] (fun x => ∂[j] (A.electricField 𝓕.c t · i) x) x) -
           1 / (𝓕.μ₀ * 𝓕.ε₀) * (∂[i] (fun x => (∇ ⬝ (A.electricField 𝓕.c t)) x) x) -
           1 / 𝓕.ε₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by

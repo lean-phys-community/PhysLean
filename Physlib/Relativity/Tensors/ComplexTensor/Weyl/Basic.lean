@@ -8,6 +8,7 @@ module
 public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Modules
 public import Physlib.Relativity.SL2C.Basic
 public import Physlib.Meta.Informal.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Weyl fermions
@@ -26,6 +27,12 @@ open Module Matrix
 open MatrixGroups
 open Complex
 open TensorProduct
+
+TODO "Rename the Weyl fermion representations `leftHandedRep`, `dualLeftHandedRep`,
+  `rightHandedRep` and `dualRightHandedRep` to `LeftHandedWeyl.rep`,
+  `DualLeftHandedWeyl.rep`, `RightHandedWeyl.rep` and `DualRightHandedWeyl.rep`
+  respectively, so that each representation lives in the namespace of the module it
+  acts on, and update all references accordingly."
 
 /-- The vector space ℂ^2 carrying the fundamental representation of SL(2,C).
   In index notation corresponds to a Weyl fermion with indices ψ^a. -/

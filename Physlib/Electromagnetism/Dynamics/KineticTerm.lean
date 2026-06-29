@@ -481,11 +481,7 @@ lemma kineticTerm_add_time_mul_const {d} {𝓕 : FreeSpace} (A : Electromagnetic
     ∑ μ, ∑ ν, (η μ μ * η ν ν * (∂_ μ A x + if μ = Sum.inl 0 then c else 0) ν ^ 2 -
           (∂_ μ A x + if μ = Sum.inl 0 then c else 0) ν *
           (∂_ ν A x + if ν = Sum.inl 0 then c else 0) μ) := by
-      congr
-      funext μ
-      congr
-      funext ν
-      rw [hdiff μ, hdiff ν]
+      simp only [hdiff]
     _ = -1 / (2 * 𝓕.μ₀) *
       ∑ μ, ∑ ν, (η μ μ * η ν ν * (∂_ μ A x ν + if μ = Sum.inl 0 then c ν else 0) ^ 2 -
           (∂_ μ A x ν + if μ = Sum.inl 0 then c ν else 0) *

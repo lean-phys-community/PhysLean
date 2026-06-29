@@ -52,16 +52,16 @@ private lemma npow_indicator_rpow_eq {n : ℕ} {s : Set ℝ} (hs : 0 ∉ s) (p :
   · simp [hr]
 
 lemma radial_jacobian_zpow_mul_self
-    {d p : ℕ} {q : ℤ} (hp_int : (p : ℤ) = q + (d.succ : ℤ))
+    {d p : ℕ} [NeZero d] {q : ℤ} (hp_int : (p : ℤ) = q + (d : ℤ))
     {r : ℝ} (hr : 0 < r) :
-    r ^ d * (r ^ q * r) = r ^ p := by
+    r ^ (d - 1) * (r ^ q * r) = r ^ p := by
   have hz : r ≠ 0 := ne_of_gt hr
   calc
-    r ^ d * (r ^ q * r)
-        = r ^ (d : ℤ) * (r ^ q * r ^ (1 : ℤ)) := by
-            rw [zpow_natCast, zpow_one]
-    _ = r ^ ((d : ℤ) + (q + 1)) := by
-            rw [← zpow_add₀ hz q 1, ← zpow_add₀ hz (d : ℤ) (q + 1)]
+    r ^ (d - 1) * (r ^ q * r)
+        = r ^ (d - 1: ℤ) * (r ^ q * r ^ (1 : ℤ)) := by
+            rw [← zpow_natCast, zpow_one, ← Nat.cast_pred (Nat.pos_of_neZero d)]
+    _ = r ^ ((d - 1: ℤ) + (q + 1)) := by
+            rw [← zpow_add₀ hz q 1, ← zpow_add₀ hz (d - 1: ℤ) (q + 1)]
     _ = r ^ (p : ℤ) := by
             congr 1; omega
     _ = r ^ p := by

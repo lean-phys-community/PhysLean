@@ -56,13 +56,7 @@ lemma isOrthochronous_iff_ge_one :
   have h1 := one_le_abs_timeComponent Λ
   rw [le_abs'] at h1
   simp [IsOrthochronous]
-  constructor
-  · intro h
-    rcases h1 with h1 | h1
-    · linarith
-    · linarith
-  · intro h
-    linarith
+  constructor <;> intro h <;> rcases h1 with h1 | h1 <;> linarith
 
 /-- The `Lorentz.Velocity` from `Lorentz.toVector` of a orthochronous lorentz
   transformation. -/
@@ -79,13 +73,7 @@ lemma not_isOrthochronous_iff_le_neg_one :
   have h1 := one_le_abs_timeComponent Λ
   rw [le_abs'] at h1
   simp [IsOrthochronous]
-  constructor
-  · intro h
-    rcases h1 with h1 | h1
-    · linarith
-    · linarith
-  · intro h
-    linarith
+  constructor <;> intro h <;> rcases h1 with h1 | h1 <;> linarith
 
 lemma isOrthochronous_iff_not_neg :
     IsOrthochronous Λ ↔ ¬ IsOrthochronous (- Λ) := by
@@ -103,15 +91,7 @@ lemma not_isOrthochronous_iff_le_zero : ¬ IsOrthochronous Λ ↔ Λ.1 (Sum.inl 
   have h1 := one_le_abs_timeComponent Λ
   rw [le_abs'] at h1
   simp [IsOrthochronous]
-  constructor
-  · intro h
-    rcases h1 with h1 | h1
-    · linarith
-    · linarith
-  · intro h
-    rcases h1 with h1 | h1
-    · linarith
-    · linarith
+  constructor <;> intro h <;> rcases h1 with h1 | h1 <;> linarith
 
 lemma not_isOrthochronous_iff_toVector_timeComponet_nonpos :
     ¬ IsOrthochronous Λ ↔ (toVector Λ).timeComponent ≤ 0:= by
@@ -138,12 +118,9 @@ lemma stepFunction_continuous : Continuous stepFunction := by
   apply Continuous.if ?_ continuous_const (Continuous.if ?_ continuous_const continuous_id)
     <;> intro a ha
   · rw [@Set.Iic_def, @frontier_Iic, @Set.mem_singleton_iff] at ha
-    rw [ha]
-    simp only [le_neg_self_iff, id_eq]
-    have h1 : ¬ (1 : ℝ) ≤ 0 := by simp
-    exact Eq.symm (if_neg h1)
+    simp [ha]
   · rw [Set.Ici_def, @frontier_Ici, @Set.mem_singleton_iff] at ha
-    exact id (Eq.symm ha)
+    simp [ha]
 
 /-- The continuous map from `lorentzGroup` to `ℝ` wh
 taking Orthochronous elements to `1` and non-orthochronous to `-1`. -/
@@ -155,16 +132,14 @@ lemma orthchroMapReal_on_IsOrthochronous {Λ : LorentzGroup d} (h : IsOrthochron
     orthchroMapReal Λ = 1 := by
   rw [isOrthochronous_iff_ge_one] at h
   change stepFunction (Λ.1 _ _) = 1
-  rw [stepFunction, if_pos h, if_neg]
-  linarith
+  rw [stepFunction, if_pos h, if_neg (by linarith)]
 
 /-- A Lorentz transformation which is not-orthochronous maps under `orthchroMapReal` to `- 1`. -/
 lemma orthchroMapReal_on_not_IsOrthochronous {Λ : LorentzGroup d} (h : ¬ IsOrthochronous Λ) :
     orthchroMapReal Λ = - 1 := by
   rw [not_isOrthochronous_iff_le_neg_one] at h
-  change stepFunction _ = - 1
-  rw [stepFunction, if_pos]
-  exact h
+  change stepFunction (Λ.1 _ _) = - 1
+  rw [stepFunction, if_pos h]
 
 /-- Every Lorentz transformation maps under `orthchroMapReal` to either `1` or `-1`. -/
 lemma orthchroMapReal_minus_one_or_one (Λ : LorentzGroup d) :
@@ -193,82 +168,42 @@ lemma orthchroMap_not_IsOrthochronous {Λ : LorentzGroup d} (h : ¬ IsOrthochron
     orthchroMap Λ = Additive.toMul (1 : ZMod 2) := by
   simp only [orthchroMap, ContinuousMap.comp_apply, ContinuousMap.coe_mk,
     orthchroMapReal_on_not_IsOrthochronous h, coeForℤ₂_apply, Subtype.mk.injEq, Nat.reduceAdd]
-  rw [if_neg]
-  · rfl
-  · linarith
+  rw [if_neg (by norm_num)]
+  rfl
 
 /-- The product of two orthochronous Lorentz transformations is orthochronous. -/
 lemma isOrthochronous_mul {Λ Λ' : LorentzGroup d} (h : IsOrthochronous Λ)
     (h' : IsOrthochronous Λ') : IsOrthochronous (Λ * Λ') := by
-  rw [isOrthochronous_iff_toVector_timeComponet_nonneg]
-  rw [toVector_mul, smul_timeComponent_eq_toVector_minkowskiProduct]
+  rw [isOrthochronous_iff_toVector_timeComponet_nonneg, toVector_mul,
+    smul_timeComponent_eq_toVector_minkowskiProduct]
   change _ ≤ ⟪orthochronoustoVelocity (isOrthochronous_inv_iff.mpr h),
     (orthochronoustoVelocity h').1⟫ₘ
-  exact Lorentz.Velocity.zero_le_minkowskiProduct
-    (orthochronoustoVelocity (isOrthochronous_inv_iff.mpr h)) (orthochronoustoVelocity h')
+  exact Lorentz.Velocity.zero_le_minkowskiProduct _ _
 
 lemma isOrthochronous_mul_iff {Λ Λ' : LorentzGroup d} :
     IsOrthochronous (Λ * Λ') ↔ (IsOrthochronous Λ = IsOrthochronous Λ') := by
   by_cases h : IsOrthochronous Λ <;> by_cases h' : IsOrthochronous Λ'
     <;> simp [h, h']
-  · rw [isOrthochronous_iff_toVector_timeComponet_nonneg]
-    rw [toVector_mul, smul_timeComponent_eq_toVector_minkowskiProduct]
-    trans ⟪orthochronoustoVelocity (isOrthochronous_inv_iff.mpr h),
-      (orthochronoustoVelocity h').1⟫ₘ
-    · exact Lorentz.Velocity.zero_le_minkowskiProduct
-        (orthochronoustoVelocity (isOrthochronous_inv_iff.mpr h)) (orthochronoustoVelocity h')
-    · rfl
-  · rw [not_isOrthochronous_iff_toVector_timeComponet_nonpos]
-    rw [toVector_mul, smul_timeComponent_eq_toVector_minkowskiProduct]
-    trans - ⟪orthochronoustoVelocity (isOrthochronous_inv_iff.mpr h),
-      (orthochronoustoVelocity (neg_isOrthochronous_iff_not.mpr h')).1⟫ₘ
-    · simp [orthochronoustoVelocity, toVector_neg]
-    · simp
-      exact Lorentz.Velocity.zero_le_minkowskiProduct _ _
-  · rw [not_isOrthochronous_iff_toVector_timeComponet_nonpos]
-    rw [toVector_mul, smul_timeComponent_eq_toVector_minkowskiProduct]
-    trans - ⟪orthochronoustoVelocity
-      (isOrthochronous_inv_iff.mpr (neg_isOrthochronous_iff_not.mpr h)),
-      (orthochronoustoVelocity h').1⟫ₘ
-    · simp only [orthochronoustoVelocity, inv_neg, toVector_neg]
-      simp
-    · simp
-      exact Lorentz.Velocity.zero_le_minkowskiProduct _ _
-  · rw [isOrthochronous_iff_toVector_timeComponet_nonneg]
-    rw [toVector_mul, smul_timeComponent_eq_toVector_minkowskiProduct]
-    trans ⟪orthochronoustoVelocity
-      (isOrthochronous_inv_iff.mpr (neg_isOrthochronous_iff_not.mpr h)),
-      (orthochronoustoVelocity (neg_isOrthochronous_iff_not.mpr h')).1⟫ₘ
-    · exact Lorentz.Velocity.zero_le_minkowskiProduct _ _
-    · simp [orthochronoustoVelocity, toVector_neg, LorentzGroup.inv_neg]
+  · exact isOrthochronous_mul h h'
+  · have hmn : (Λ * -Λ' : LorentzGroup d) = -(Λ * Λ') := Subtype.ext (by simp)
+    rw [← neg_isOrthochronous_iff_not, ← hmn]
+    exact isOrthochronous_mul h (neg_isOrthochronous_iff_not.mpr h')
+  · have hnm : (-Λ * Λ' : LorentzGroup d) = -(Λ * Λ') := Subtype.ext (by simp)
+    rw [← neg_isOrthochronous_iff_not, ← hnm]
+    exact isOrthochronous_mul (neg_isOrthochronous_iff_not.mpr h) h'
+  · have hnn : (-Λ * -Λ' : LorentzGroup d) = Λ * Λ' := Subtype.ext (by simp)
+    rw [← hnn]
+    refine isOrthochronous_mul ?_ ?_ <;> rwa [neg_isOrthochronous_iff_not]
 
 /-- The homomorphism from `LorentzGroup` to `ℤ₂`. -/
 def orthchroRep : LorentzGroup d →* ℤ₂ where
   toFun := orthchroMap
   map_one' := orthchroMap_IsOrthochronous (by simp [IsOrthochronous])
   map_mul' Λ Λ' := by
-    by_cases h : IsOrthochronous Λ
-      <;> by_cases h' : IsOrthochronous Λ'
-    · rw [orthchroMap_IsOrthochronous h, orthchroMap_IsOrthochronous h',
-        orthchroMap_IsOrthochronous]
-      · rfl
-      · rw [isOrthochronous_mul_iff]
-        simp_all
-    · rw [orthchroMap_IsOrthochronous h, orthchroMap_not_IsOrthochronous h',
-        orthchroMap_not_IsOrthochronous]
-      · rfl
-      · rw [isOrthochronous_mul_iff]
-        simp_all
-    · rw [orthchroMap_not_IsOrthochronous h, orthchroMap_IsOrthochronous h',
-        orthchroMap_not_IsOrthochronous]
-      · rfl
-      · rw [isOrthochronous_mul_iff]
-        simp_all
-    · rw [orthchroMap_not_IsOrthochronous h, orthchroMap_not_IsOrthochronous h',
-        orthchroMap_IsOrthochronous]
-      · rfl
-      · rw [isOrthochronous_mul_iff]
-        simp_all
+    by_cases h : IsOrthochronous Λ <;> by_cases h' : IsOrthochronous Λ' <;>
+      simp_all [orthchroMap_IsOrthochronous, orthchroMap_not_IsOrthochronous,
+        isOrthochronous_mul_iff]
+    rfl
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The orthochronous Lorentz transformations form the kernel of the homomorphism from
@@ -286,13 +221,10 @@ lemma IsOrthochronous.iff_in_orthchroRep_ker : IsOrthochronous Λ ↔ Λ ∈ ort
 /-- The homomorphism from `LorentzGroup` to `ℤ₂` assigns the same value to any Lorentz
   transformation and its inverse. -/
 lemma orthchroRep_inv_eq_self (Λ : LorentzGroup d) : orthchroRep Λ = orthchroRep Λ⁻¹ := by
-  by_cases h_orth : IsOrthochronous Λ
-  · have hΛ_1 : orthchroRep Λ = (1 : ℤ₂) := by exact orthchroMap_IsOrthochronous h_orth
-    rw [map_inv orthchroRep Λ, hΛ_1]
-    rfl
-  · have hΛ_0 : orthchroRep Λ = (1 : ZMod 2) := by exact orthchroMap_not_IsOrthochronous h_orth
-    rw [map_inv orthchroRep Λ, hΛ_0]
-    rfl
+  rw [map_inv]
+  generalize orthchroRep Λ = x
+  revert x
+  decide
 
 /-- Two Lorentz transformations are both orthochronous or both not orthochronous if they are mapped
 to the same element via the homomorphism from `LorentzGroup` to `ℤ₂`. -/

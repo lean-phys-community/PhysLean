@@ -93,6 +93,13 @@ lemma basisIdxCongr_apply_apply {c c1 c2 : C} (h1 : c = c1) (h2 : c1 = c2) (i : 
     basisIdxCongr h2 (basisIdxCongr h1 i) = basisIdxCongr (by simp [h1, h2]) i := by
   simp [basisIdxCongr]
 
+/-- `basisIdxCongr` only depends on its endpoints up to `HEq` of the arguments: equal target
+colours and heterogeneously equal labels give equal casts. -/
+lemma basisIdxCongr_heq_arg {c1 c2 d : C} (h1 : c1 = d) (h2 : c2 = d)
+    {x : basisIdx c1} {y : basisIdx c2} (hxy : HEq x y) :
+    basisIdxCongr h1 x = basisIdxCongr h2 y := by
+  subst h1; subst h2; cases hxy; rfl
+
 variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
     {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
     {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]

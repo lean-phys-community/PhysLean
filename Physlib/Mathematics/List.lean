@@ -27,37 +27,25 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     rfl
   | a :: [], 0, h => by
     simp only [List.takeWhile, List.eraseIdx_zero]
-    split
-    · rfl
-    · rfl
+    split <;> rfl
   | a :: [], Nat.succ n, h => by
     simp only [Nat.succ_eq_add_one, List.eraseIdx_cons_succ, List.eraseIdx_nil]
-    rw [List.eraseIdx_of_length_le]
-    have h1 : (List.takeWhile P [a]).length ≤ [a].length :=
-        List.Sublist.length_le (List.takeWhile_sublist _)
-    simp only [List.length_singleton] at h1
-    omega
+    rw [List.eraseIdx_of_length_le ((List.takeWhile_sublist _).length_le.trans (by simp))]
   | a :: b :: l, 0, h => by
     simp only [List.takeWhile, List.eraseIdx_zero]
     by_cases hPb : P b
     · have hPa : P a := by
         simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp [hPb, hPa]
-    · simp only [hPb, decide_false]
-      simp_all only [List.length_cons, List.get_eq_getElem, List.tail_cons, decide_false,
-        Bool.false_eq_true, not_false_eq_true, List.takeWhile_cons_of_neg, List.nil_eq]
-      split
-      · rfl
-      · rfl
+    · simp [hPb]
+      split <;> rfl
   | a :: b :: l, Nat.succ n, h => by
     simp only [Nat.succ_eq_add_one, List.eraseIdx_cons_succ]
     by_cases hPa : P a
     · dsimp only [List.takeWhile]
       simp only [hPa, decide_true, List.eraseIdx_cons_succ, List.cons.injEq, true_and]
-      rw [takeWile_eraseIdx]
-      · rfl
-      · intro i j hij hP
-        simpa using h (Fin.succ i) (Fin.succ j) (by simpa using hij) (by simpa using hP)
+      exact takeWile_eraseIdx P (b :: l) n fun i j hij hP => by
+        simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP)
     · simp [hPa]
 
 lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
@@ -69,42 +57,15 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
   | [], _, h => by
     simp
   | a :: [], 0, h => by
-    simp only [List.eraseIdx_zero, nonpos_iff_eq_zero, List.length_eq_zero_iff,
-      List.takeWhile_eq_nil_iff, List.length_singleton, zero_lt_one, Fin.zero_eta, Fin.isValue,
-      List.get_eq_getElem, Fin.val_eq_zero, List.getElem_cons_zero, decide_eq_true_eq, forall_const,
-      List.dropWhile, zero_le, Nat.sub_eq_zero_of_le, ite_not]
-    simp_all only [List.length_cons, List.length_nil, List.get_eq_getElem, Fin.val_eq_zero,
-      List.getElem_cons_zero, implies_true, List.tail_cons, List.dropWhile_nil, decide_true,
-      decide_false, ite_self]
+    by_cases hPa : P a <;> simp [hPa]
   | a :: [], Nat.succ n, h => by
-    simp only [List.dropWhile, List.takeWhile, Nat.succ_eq_add_one]
-    rw [List.eraseIdx_of_length_le]
-    simp_all only [List.length_singleton, List.get_eq_getElem, Fin.val_eq_zero,
-      List.getElem_cons_zero, implies_true]
-    split
-    next x heq =>
-      simp_all only [decide_eq_true_eq, decide_true, List.dropWhile_cons_of_pos, List.dropWhile_nil,
-        List.length_singleton, le_add_iff_nonneg_left, zero_le, ↓reduceIte,
-        add_tsub_cancel_right, List.eraseIdx_nil]
-    next x heq =>
-      simp_all only [decide_eq_false_iff_not, decide_false, Bool.false_eq_true, not_false_eq_true,
-        List.dropWhile_cons_of_neg, List.length_nil, le_add_iff_nonneg_left,
-        zero_le, ↓reduceIte, tsub_zero, List.eraseIdx_cons_succ, List.eraseIdx_nil]
-    exact Nat.le_add_left [a].length n
+    by_cases hPa : P a <;> simp [hPa, List.eraseIdx_of_length_le]
   | a :: b :: l, 0, h => by
-    simp only [List.dropWhile, List.takeWhile, nonpos_iff_eq_zero, List.length_eq_zero_iff, zero_le,
-      Nat.sub_eq_zero_of_le, List.eraseIdx_zero]
     by_cases hPb : P b
     · have hPa : P a := by
         simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp [hPb, hPa]
-    · simp only [List.tail_cons, hPb, decide_false, Bool.false_eq_true, not_false_eq_true,
-      List.dropWhile_cons_of_neg]
-      simp_all only [List.length_cons, List.get_eq_getElem]
-      split
-      next x heq =>
-        simp_all only [decide_eq_true_eq, List.cons_ne_self, ↓reduceIte]
-      next x heq => simp_all only [decide_eq_false_iff_not, ↓reduceIte, List.tail_cons]
+    · by_cases hPa : P a <;> simp [hPa, hPb]
   | a :: b :: l, Nat.succ n, h => by
     simp only [Nat.succ_eq_add_one, List.eraseIdx_cons_succ]
     by_cases hPb : P b
@@ -112,19 +73,17 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
         simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp only [List.dropWhile, hPa, decide_true, List.takeWhile, hPb, List.length_cons,
         add_le_add_iff_right, Nat.reduceSubDiff]
-      rw [dropWile_eraseIdx]
+      rw [dropWile_eraseIdx P (b :: l) n (fun i j hij hP => by
+        simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP))]
       simp_all only [List.length_cons, List.get_eq_getElem, decide_true, List.takeWhile_cons_of_pos,
         List.dropWhile_cons_of_pos]
-      intro i j hij hP
-      simpa using h (Fin.succ i) (Fin.succ j) (by simpa using hij) (by simpa using hP)
     · simp only [List.dropWhile, List.takeWhile, hPb, decide_false]
       by_cases hPa : P a
-      · rw [dropWile_eraseIdx]
+      · rw [dropWile_eraseIdx P (b :: l) n (fun i j hij hP => by
+          simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP))]
         simp only [hPa, decide_true, hPb, decide_false, Bool.false_eq_true, not_false_eq_true,
           List.takeWhile_cons_of_neg, List.length_nil, zero_le, ↓reduceIte, List.dropWhile,
           tsub_zero, List.length_singleton, le_add_iff_nonneg_left, add_tsub_cancel_right]
-        intro i j hij hP
-        simpa using h (Fin.succ i) (Fin.succ j) (by simpa using hij) (by simpa using hP)
       · simp [hPa]
 
 lemma insertionSort_length {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (l : List I) :
@@ -169,9 +128,7 @@ lemma orderedInsertPos_cons {I : Type} (le1 : I → I → Prop) [DecidableRel le
     if le1 r0 r1 then ⟨0, by simp⟩ else (Fin.succ (orderedInsertPos le1 r r0)) := by
   simp only [orderedInsertPos, List.takeWhile, decide_not, Fin.zero_eta,
     Fin.succ_mk]
-  by_cases h : le1 r0 r1
-  · simp [h]
-  · simp [h]
+  by_cases h : le1 r0 r1 <;> simp [h]
 
 lemma orderedInsertPos_sigma {I : Type} {f : I → Type}
     (le1 : I → I → Prop) [DecidableRel le1] (l : List (Σ i, f i))
@@ -186,9 +143,7 @@ lemma orderedInsertPos_sigma {I : Type} {f : I → Type}
     simp only [List.takeWhile]
     obtain ⟨fst, snd⟩ := a
     simp_all only
-    split
-    next x heq => simp_all
-    next x heq => simp_all
+    split <;> simp_all
 
 set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_get_lt {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
@@ -518,9 +473,7 @@ lemma orderedInsertEquiv_sigma {I : Type} {f : I → Type}
     simp only [orderedInsertPos_sigma, Fin.val_cast]
     rw [Fin.succAbove, Fin.succAbove]
     simp only [Fin.castSucc_mk, Fin.mk_lt_mk, Fin.succ_mk]
-    split
-    · rfl
-    · rfl
+    split <;> rfl
 
 set_option maxHeartbeats 350000
 lemma orderedInsert_eq_insertIdx_orderedInsertPos {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
@@ -715,10 +668,8 @@ lemma eraseIdx_insertionSort {I : Type} (le1 : I → I → Prop) [DecidableRel l
     intro i j hij hn
     have hx := List.Pairwise.rel_get_of_lt (R := le1) (l := (List.insertionSort le1 r))
       (List.pairwise_insertionSort le1 r) hij
-    have ht (i j k : I) (hij : le1 i j) (hjk : ¬ le1 k j) : ¬ le1 k i := by
-      intro hik
-      have ht := IsTrans.trans (r := le1) k i j hik hij
-      exact hjk ht
+    have ht (i j k : I) (hij : le1 i j) (hjk : ¬ le1 k j) : ¬ le1 k i :=
+      fun hik => hjk (IsTrans.trans (r := le1) k i j hik hij)
     exact ht ((List.insertionSort le1 r).get i) ((List.insertionSort le1 r).get j) r0 hx hn
 
 lemma eraseIdx_insertionSort_fin {I : Type} (le1 : I → I → Prop) [DecidableRel le1]

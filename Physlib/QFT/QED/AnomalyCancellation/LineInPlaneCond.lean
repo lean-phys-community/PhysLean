@@ -44,8 +44,7 @@ lemma lineInPlaneCond_perm {S : (PureU1 n).LinSols} (hS : LineInPlaneCond S)
     (M : (FamilyPermutations n).group) :
     LineInPlaneCond ((FamilyPermutations n).linSolRep M S) := by
   intro i1 i2 i3 h1 h2 h3
-  rw [FamilyPermutations_anomalyFreeLinear_apply, FamilyPermutations_anomalyFreeLinear_apply,
-    FamilyPermutations_anomalyFreeLinear_apply]
+  simp only [FamilyPermutations_anomalyFreeLinear_apply]
   refine hS (M.invFun i1) (M.invFun i2) (M.invFun i3) ?_ ?_ ?_
   all_goals simp_all only [ne_eq, Equiv.invFun_as_coe, EmbeddingLike.apply_eq_iff_eq,
     not_false_eq_true]
@@ -89,7 +88,6 @@ lemma lineInPlaneCond_eq_last {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols
   have hx : ((2 : ℚ) - ↑(n + 3)) ≠ 0 := by
     rw [Nat.cast_add]
     simp only [Nat.cast_ofNat, ne_eq]
-    apply Not.intro
     intro a
     linarith
   have ht : S.val ((Fin.last n.succ.succ.succ).succ) =
@@ -113,50 +111,32 @@ lemma linesInPlane_eq_sq {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols}
 theorem linesInPlane_constAbs {S : (PureU1 (n.succ.succ.succ.succ.succ)).LinSols}
     (hS : LineInPlaneCond S) : ConstAbs S.val := by
   intro i j
-  by_cases hij : i ≠ j
+  rcases eq_or_ne i j with hij | hij
+  · rw [hij]
   · exact linesInPlane_eq_sq hS i j hij
-  · simp only [Nat.succ_eq_add_one, ne_eq, Decidable.not_not] at hij
-    rw [hij]
 
 lemma linesInPlane_four (S : (PureU1 4).Sols) (hS : LineInPlaneCond S.1.1) :
     ConstAbsProp (S.val (0 : Fin 4), S.val (1 : Fin 4)) := by
   simp only [ConstAbsProp, Fin.isValue]
   by_contra hn
-  have hLin := pureU1_linear S.1.1
   have hcube := pureU1_cube S
-  erw [Fin.sum_univ_four] at hLin hcube
-  rw [sq_eq_sq_iff_eq_or_eq_neg] at hn
-  simp only [Fin.isValue, not_or] at hn
+  erw [Fin.sum_univ_four] at hcube
+  rw [sq_eq_sq_iff_eq_or_eq_neg, not_or] at hn
   have l012 := hS 0 1 2 (ne_of_beq_false rfl) (ne_of_beq_false rfl) (ne_of_beq_false rfl)
   have l013 := hS 0 1 3 (ne_of_beq_false rfl) (ne_of_beq_false rfl) (ne_of_beq_false rfl)
-  have l023 := hS 0 2 3 (ne_of_beq_false rfl) (ne_of_beq_false rfl) (ne_of_beq_false rfl)
-  simp_all [LineInPlaneProp]
-  have h1 : S.val (2 : Fin 4) = S.val (3 : Fin 4) := by
-    linear_combination l012 / 2 + -1 * l013 / 2
-  by_cases h2 : S.val (0 : Fin 4) = S.val (2 : Fin 4)
-  · simp_all
-    have h3 : S.val (1 : Fin 4) = - 3 * S.val (2 : Fin 4) := by
-      linear_combination l012 + 3 * h1
-    rw [← h1, h3] at hcube
-    have h4 : S.val (2 : Fin 4) ^ 3 = 0 := by
-      linear_combination -1 * hcube / 24
-    simp only [Fin.isValue, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff] at h4
-    simp_all only [neg_mul, neg_neg, add_eq_right, add_eq_left, not_true_eq_false, false_and]
-  · by_cases h3 : S.val (0 : Fin 4) = - S.val (2 : Fin 4)
-    · simp_all
-      have h4 : S.val (1 : Fin 4) = - S.val (2 : Fin 4) := by
-        linear_combination l012 + h1
-      simp_all
-    · simp_all
-      have h4 : S.val (0 : Fin 4) = - 3 * S.val (3 : Fin 4) := by
-        linear_combination l023
-      have h5 : S.val (1 : Fin 4) = S.val (3 : Fin 4) := by
-        linear_combination l013 - 1 * h4
-      rw [h4, h5] at hcube
-      have h6 : S.val (3 : Fin 4) ^ 3 = 0 := by
-        linear_combination -1 * hcube / 24
-      simp only [Fin.isValue, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff] at h6
-      simp_all
+  simp only [LineInPlaneProp, hn.1, hn.2, false_or] at l012 l013
+  -- `l012`, `l013` force `S.val 2 = S.val 3 = -(S.val 0 + S.val 1) / 2`; substituting into the
+  -- cube constraint yields `3 (S.val 0 - S.val 1)² (S.val 0 + S.val 1) = 0`, contradicting `hn`.
+  have diff_sq_mul_sum_eq_zero : (S.val (0 : Fin 4) - S.val (1 : Fin 4)) ^ 2 *
+      (S.val (0 : Fin 4) + S.val (1 : Fin 4)) = 0 := by
+    linear_combination 4 / 3 * hcube -
+      (2 * S.val (2 : Fin 4) ^ 2 - S.val (2 : Fin 4) * (S.val (0 : Fin 4) + S.val (1 : Fin 4)) +
+        (S.val (0 : Fin 4) + S.val (1 : Fin 4)) ^ 2 / 2) / 3 * l012 -
+      (2 * S.val (3 : Fin 4) ^ 2 - S.val (3 : Fin 4) * (S.val (0 : Fin 4) + S.val (1 : Fin 4)) +
+        (S.val (0 : Fin 4) + S.val (1 : Fin 4)) ^ 2 / 2) / 3 * l013
+  rcases mul_eq_zero.mp diff_sq_mul_sum_eq_zero with h | h
+  · exact hn.1 (sub_eq_zero.mp (sq_eq_zero_iff.mp h))
+  · exact hn.2 (by linarith)
 
 lemma linesInPlane_eq_sq_four {S : (PureU1 4).Sols}
     (hS : LineInPlaneCond S.1.1) : ∀ (i j : Fin 4) (_ : i ≠ j),
@@ -164,17 +144,14 @@ lemma linesInPlane_eq_sq_four {S : (PureU1 4).Sols}
   refine Prop_two ConstAbsProp Fin.zero_ne_one ?_
   intro M
   let S' := (FamilyPermutations 4).solAction.toFun _ _ S M
-  have hS' : LineInPlaneCond S'.1.1 :=
-    (lineInPlaneCond_perm hS M)
-  exact linesInPlane_four S' hS'
+  exact linesInPlane_four S' (lineInPlaneCond_perm hS M)
 
 lemma linesInPlane_constAbs_four (S : (PureU1 4).Sols)
     (hS : LineInPlaneCond S.1.1) : ConstAbs S.val := by
   intro i j
-  by_cases hij : i ≠ j
+  rcases eq_or_ne i j with hij | hij
+  · rw [hij]
   · exact linesInPlane_eq_sq_four hS i j hij
-  · simp only [ne_eq, Decidable.not_not] at hij
-    rw [hij]
 
 theorem linesInPlane_constAbs_AF (S : (PureU1 (n.succ.succ.succ.succ)).Sols)
     (hS : LineInPlaneCond S.1.1) : ConstAbs S.val := by

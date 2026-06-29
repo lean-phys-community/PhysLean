@@ -189,14 +189,13 @@ lemma electricFunction_differentiable {d : ℕ}
     Differentiable ℝ P.electricFunction := by
   rw [electricFunction_eq_electricField]
   change Differentiable ℝ (↿(electricField 𝓕.c A) ∘ fun u => ({ val := -u / 𝓕.c.val }, 0))
-  apply Differentiable.comp
-  · exact electricField_differentiable hA
-  · refine Differentiable.prodMk ?_ ?_
-    · change Differentiable ℝ (Time.toRealCLE.symm ∘ fun u => -u / 𝓕.c.val)
-      apply Differentiable.comp
-      · fun_prop
-      · fun_prop
+  apply (electricField_differentiable hA).comp
+  refine Differentiable.prodMk ?_ ?_
+  · change Differentiable ℝ (Time.toRealCLE.symm ∘ fun u => -u / 𝓕.c.val)
+    apply Differentiable.comp
     · fun_prop
+    · fun_prop
+  · fun_prop
 
 lemma magneticFunction_differentiable {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d}
@@ -207,14 +206,13 @@ lemma magneticFunction_differentiable {d : ℕ}
   simp only
   change Differentiable ℝ (↿(fun t x => A.magneticFieldMatrix 𝓕.c t x ij) ∘
     fun u => ({ val := -u / 𝓕.c.val }, 0))
-  apply Differentiable.comp
-  · exact magneticFieldMatrix_differentiable A hA ij
-  · refine Differentiable.prodMk ?_ ?_
-    · change Differentiable ℝ (Time.toRealCLE.symm ∘ fun u => -u / 𝓕.c.val)
-      apply Differentiable.comp
-      · fun_prop
-      · fun_prop
+  apply (magneticFieldMatrix_differentiable A hA ij).comp
+  refine Differentiable.prodMk ?_ ?_
+  · change Differentiable ℝ (Time.toRealCLE.symm ∘ fun u => -u / 𝓕.c.val)
+    apply Differentiable.comp
     · fun_prop
+    · fun_prop
+  · fun_prop
 
 /-!
 
@@ -243,8 +241,7 @@ lemma electricField_time_deriv {d : ℕ}
   · fun_prop
   · fun_prop
   · fun_prop
-  · apply Differentiable.differentiableAt
-    exact IsPlaneWave.electricFunction_differentiable P hA
+  · exact (P.electricFunction_differentiable hA).differentiableAt
   · fun_prop
 
 lemma magneticFieldMatrix_time_deriv {d : ℕ}
@@ -271,8 +268,7 @@ lemma magneticFieldMatrix_time_deriv {d : ℕ}
   · fun_prop
   · fun_prop
   · fun_prop
-  · apply Differentiable.differentiableAt
-    exact magneticFunction_differentiable P hA (i, j)
+  · exact (magneticFunction_differentiable P hA (i, j)).differentiableAt
   · fun_prop
 
 /-!
@@ -299,8 +295,7 @@ lemma electricField_space_deriv {d : ℕ}
   simp only [deriv_inner_left]
   · fun_prop
   · fun_prop
-  · apply Differentiable.differentiableAt
-    exact IsPlaneWave.electricFunction_differentiable P hA
+  · exact (P.electricFunction_differentiable hA).differentiableAt
   · fun_prop
 
 lemma magneticFieldMatrix_space_deriv {d : ℕ}
@@ -325,8 +320,7 @@ lemma magneticFieldMatrix_space_deriv {d : ℕ}
   simp only [deriv_inner_left, true_or]
   · fun_prop
   · fun_prop
-  · apply Differentiable.differentiableAt
-    exact magneticFunction_differentiable P hA (i, j)
+  · exact (magneticFunction_differentiable P hA (i, j)).differentiableAt
   · fun_prop
 
 /-!
@@ -487,6 +481,8 @@ lemma time_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
     (t : Time) (x : Space d) (i : Fin d) :
     ∂ₜ (A.electricField 𝓕.c · x i) t =
     ∂ₜ (fun t => 𝓕.c * ∑ j, A.magneticFieldMatrix 𝓕.c t x (i, j) * s.unit j) t := by
+  have hBd : ∀ k, Differentiable ℝ (fun t => A.magneticFieldMatrix 𝓕.c t x (i, k)) :=
+    fun k => magneticFieldMatrix_differentiable_time A (hA.of_le ENat.LEInfty.out) x (i, k)
   rw [Time.deriv_euclid]
   rw [time_deriv_electricField_of_isExtrema hA 0 _ h t x i]
   simp only [one_div, _root_.mul_inv_rev, LorentzCurrentDensity.currentDensity_zero, Pi.zero_apply,
@@ -503,10 +499,7 @@ lemma time_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
     simp only [FunLike.coe_sum, Finset.sum_apply]
     conv_lhs =>
       enter [2, k]
-      rw [fderiv_mul_const (by
-        apply Differentiable.differentiableAt
-        apply magneticFieldMatrix_differentiable_time
-        exact (hA.of_le ENat.LEInfty.out))]
+      rw [fderiv_mul_const (hBd _).differentiableAt]
     simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
     congr
     funext i
@@ -514,9 +507,7 @@ lemma time_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
     rfl
     · intro k _
       apply DifferentiableAt.mul_const
-      apply Differentiable.differentiableAt
-      apply magneticFieldMatrix_differentiable_time
-      exact (hA.of_le ENat.LEInfty.out)
+      exact (hBd k).differentiableAt
 
   rw [h1, Finset.mul_sum, Finset.mul_sum,← Finset.sum_neg_distrib]
   field_simp
@@ -533,9 +524,7 @@ lemma time_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
   · refine DifferentiableAt.fun_sum ?_
     intro k _
     apply DifferentiableAt.mul_const
-    apply Differentiable.differentiableAt
-    apply magneticFieldMatrix_differentiable_time
-    exact (hA.of_le ENat.LEInfty.out)
+    exact (hBd k).differentiableAt
   · change ContDiff ℝ ∞ (fun _ => 0)
     fun_prop
   · exact electricField_differentiable_time (hA.of_le (ENat.LEInfty.out)) x

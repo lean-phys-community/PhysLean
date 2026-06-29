@@ -114,20 +114,9 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
     induction n with
     | zero =>
       haveI : Subsingleton (Fin 0 → ι) := ⟨by intro f g; funext i; exact Fin.elim0 i⟩
-      have h_cases :
-          ∀ s : Set (Fin 0 → ι), s = ∅ ∨ s = Set.univ := by
-        intro s;
-        by_cases hne : s.Nonempty
-        · right
-          ext x; constructor
-          · intro _; trivial
-          · intro _; obtain ⟨y, hy⟩ := hne
-            have : x = y := Subsingleton.elim _ _
-            simpa [this] using hy
-        · left
-          ext x; constructor
-          · intro hx; exact (hne ⟨x, hx⟩).elim
-          · intro hx; cases hx
+      have h_cases : ∀ s : Set (Fin 0 → ι), s = ∅ ∨ s = Set.univ := fun s =>
+        s.eq_empty_or_nonempty.imp_right fun ⟨y, hy⟩ =>
+          Set.eq_univ_of_forall fun x => by rwa [Subsingleton.elim x y]
       refine Measure.ext (fun s _ => ?_)
       rcases h_cases s with hs | hs
       · subst hs
@@ -177,8 +166,7 @@ noncomputable def shannonEntropy (T : Temperature) : ℝ :=
 
 lemma mathematicalPartitionFunction_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.mathematicalPartitionFunction T = ∑ i, exp (- β T * 𝓒.energy i) := by
-  rw [mathematicalPartitionFunction_eq_integral]
-  rw [MeasureTheory.integral_fintype]
+  rw [mathematicalPartitionFunction_eq_integral, MeasureTheory.integral_fintype]
   simp [IsFinite.μ_eq_count]
   · rw [IsFinite.μ_eq_count]
     exact Integrable.of_finite
@@ -207,8 +195,7 @@ lemma μProd_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
     (𝓒.μProd T).real {i} = 𝓒.probability T i := by
   rw [μProd]
   simp [probability]
-  ring_nf
-  rw [mul_comm]
+  rw [inv_mul_eq_div]
   rfl
 
 lemma meanEnergy_of_fintype [IsFinite 𝓒] (T : Temperature) :
@@ -237,33 +224,13 @@ lemma entropy_of_fintype (T : Temperature) :
 lemma probability_le_one
     [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
     𝓒.probability T i ≤ 1 := by
-  unfold probability
-  have hnum_le :
-      Real.exp (- T.β * 𝓒.energy i) ≤ 𝓒.mathematicalPartitionFunction T := by
-    rw [mathematicalPartitionFunction_of_fintype (𝓒:=𝓒) T]
-    simpa using
-      (Finset.single_le_sum
-        (s := Finset.univ)
-        (f := fun j : ι => Real.exp (- β T * 𝓒.energy j))
-        (by intro _ _; exact Real.exp_nonneg _)
-        (Finset.mem_univ i))
-  have hZpos :
-      0 < 𝓒.mathematicalPartitionFunction T := by
-    rw [mathematicalPartitionFunction_of_fintype (𝓒:=𝓒) T]
-    obtain ⟨j₀⟩ := (inferInstance : Nonempty ι)
-    have hterm_pos : 0 < Real.exp (- β T * 𝓒.energy j₀) := Real.exp_pos _
-    have hle :
-        Real.exp (- β T * 𝓒.energy j₀)
-          ≤ ∑ j, Real.exp (- β T * 𝓒.energy j) := by
-      have := (Finset.single_le_sum
-        (s := Finset.univ)
-        (f := fun j : ι => Real.exp (- β T * 𝓒.energy j))
-        (by intro _ _; exact Real.exp_nonneg _)
-        (Finset.mem_univ j₀))
-      simpa using this
-    exact lt_of_lt_of_le hterm_pos hle
-  have := (div_le_div_iff_of_pos_right hZpos).mpr hnum_le
-  simpa [div_self hZpos.ne'] using this
+  have hZpos : 0 < 𝓒.mathematicalPartitionFunction T := by
+    rw [mathematicalPartitionFunction_of_fintype]
+    exact Finset.sum_pos (fun j _ => Real.exp_pos _) Finset.univ_nonempty
+  rw [probability, div_le_one hZpos, mathematicalPartitionFunction_of_fintype]
+  simpa [neg_mul] using Finset.single_le_sum
+    (f := fun j : ι => Real.exp (- β T * 𝓒.energy j)) (fun j _ => Real.exp_nonneg _)
+    (Finset.mem_univ i)
 
 /-- Finite specialization: strict positivity of the mathematical partition function. -/
 lemma mathematicalPartitionFunction_pos_finite
@@ -291,45 +258,20 @@ lemma probability_nonneg_finite
 lemma sum_probability_eq_one
     [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
     ∑ i, 𝓒.probability T i = 1 := by
-  simp_rw [probability]
-  rw [← Finset.sum_div]
-  have hZdef := mathematicalPartitionFunction_of_fintype (𝓒:=𝓒) T
-  have hZpos := mathematicalPartitionFunction_pos_finite (𝓒:=𝓒) (T:=T)
-  have hZne : 𝓒.mathematicalPartitionFunction T ≠ 0 := hZpos.ne'
-  simp [hZdef]
-  simp_all only [neg_mul, ne_eq, not_false_eq_true]
+  have hZne : 𝓒.mathematicalPartitionFunction T ≠ 0 :=
+    (mathematicalPartitionFunction_pos_finite 𝓒 T).ne'
+  simp_rw [probability, ← Finset.sum_div, ← mathematicalPartitionFunction_of_fintype]
+  exact div_self hZne
 
 /-- The entropy of a finite canonical ensemble (Shannon entropy) is non-negative. -/
 lemma entropy_nonneg [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
     0 ≤ 𝓒.shannonEntropy T := by
-  unfold shannonEntropy
-  set p : ι → ℝ := fun i => 𝓒.probability T i
-  have h_term_le_zero :
-      ∀ i : ι, p i * Real.log (p i) ≤ 0 := by
-    intro i
-    have hp_le_one : p i ≤ 1 := probability_le_one (𝓒:=𝓒) (T:=T) i
-    have hp_pos : 0 < p i := by
-      have num_pos : 0 < Real.exp (- T.β * 𝓒.energy i) := Real.exp_pos _
-      have denom_pos : 0 < 𝓒.mathematicalPartitionFunction T :=
-        mathematicalPartitionFunction_pos_finite (𝓒:=𝓒) (T:=T)
-      have : 0 < Real.exp (- T.β * 𝓒.energy i) / 𝓒.mathematicalPartitionFunction T :=
-        div_pos num_pos denom_pos
-      simpa [p, probability] using this
-    have hlog_le_zero : Real.log (p i) ≤ 0 := by
-      have hlog_le : Real.log (p i) ≤ Real.log 1 :=
-      log_le_log hp_pos hp_le_one
-      simpa [Real.log_one] using hlog_le
-    have hp_nonneg : 0 ≤ p i := hp_pos.le
-    have := mul_le_mul_of_nonneg_left hlog_le_zero hp_nonneg
-    simpa using this
-  have h_sum_le_zero :
-      ∑ i, p i * Real.log (p i) ≤ 0 :=
-    Fintype.sum_nonpos h_term_le_zero
-  have hkBpos : 0 < (kB : ℝ) := kB_pos
-  have : 0 ≤ (kB : ℝ) * (-(∑ i, p i * Real.log (p i))) :=
-    mul_nonneg hkBpos.le (neg_nonneg.mpr h_sum_le_zero)
-  simpa [p, shannonEntropy, mul_comm, mul_left_comm, mul_assoc, neg_mul,
-        sub_eq_add_neg] using this
+  have hsum : ∑ i, 𝓒.probability T i * log (𝓒.probability T i) ≤ 0 :=
+    Fintype.sum_nonpos fun i =>
+      mul_nonpos_iff.2 <| Or.inl ⟨probability_nonneg_finite 𝓒 T i,
+        Real.log_nonpos (probability_nonneg_finite 𝓒 T i) (probability_le_one 𝓒 T i)⟩
+  rw [shannonEntropy, neg_mul, neg_nonneg]
+  exact mul_nonpos_iff.2 <| Or.inl ⟨kB_pos.le, hsum⟩
 
 lemma shannonEntropy_eq_differentialEntropy
     [MeasurableSingletonClass ι] [IsFinite 𝓒] (T : Temperature) :
@@ -448,59 +390,32 @@ lemma differentiable_meanEnergyNumerator :
 
 lemma deriv_mathematicalPartitionFunctionBetaReal (b : ℝ) :
     deriv 𝓒.mathematicalPartitionFunctionBetaReal b = -𝓒.meanEnergyNumerator b := by
-  classical
   unfold mathematicalPartitionFunctionBetaReal meanEnergyNumerator
-  have h_each (i : ι) :
-      HasDerivAt (fun b => Real.exp (-b * 𝓒.energy i))
-        (-𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b := by
-    have h_lin : HasDerivAt (fun b => (-𝓒.energy i) * b) (-𝓒.energy i) b := by
-      simpa using (hasDerivAt_id b).const_mul (-𝓒.energy i)
-    have h_exp :
-        HasDerivAt (fun b => Real.exp ((-𝓒.energy i) * b))
-          (Real.exp ((-𝓒.energy i) * b) * (-𝓒.energy i)) b := h_lin.exp
-    have h_eq :
-        (fun b => Real.exp (-b * 𝓒.energy i))
-          = (fun b => Real.exp ((-𝓒.energy i) * b)) := by
-      funext x; ring_nf
-    simpa [h_eq, mul_comm, mul_left_comm, mul_assoc]
-      using h_exp
-  have h_sum :
-      HasDerivAt (fun b => ∑ i, Real.exp (-b * 𝓒.energy i))
-        (∑ i, -𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b :=
-    HasDerivAt.fun_sum fun i a => h_each i
-  have h_deriv := h_sum.deriv
-  simpa [Finset.sum_neg_distrib] using h_deriv
+  have hd : ∀ c : ℝ, HasDerivAt (fun x => Real.exp (-x * c)) (-c * Real.exp (-b * c)) b := by
+    intro c
+    have h : HasDerivAt (fun x => -x * c) (-c) b := by
+      simpa using (hasDerivAt_id b).neg.mul_const c
+    simpa [mul_comm] using h.exp
+  have h_sum : HasDerivAt (fun x => ∑ i, Real.exp (-x * 𝓒.energy i))
+      (∑ i, -𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b :=
+    HasDerivAt.fun_sum fun i _ => hd (𝓒.energy i)
+  simpa [Finset.sum_neg_distrib] using h_sum.deriv
 
 lemma deriv_meanEnergyNumerator (b : ℝ) :
     deriv 𝓒.meanEnergyNumerator b =
       -∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i) := by
-  classical
   unfold meanEnergyNumerator
-  have h_each (i : ι) :
-      HasDerivAt (fun b => 𝓒.energy i * Real.exp (-b * 𝓒.energy i))
-        (-(𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) b := by
-    have h_lin : HasDerivAt (fun b => (-𝓒.energy i) * b) (-𝓒.energy i) b := by
-      simpa using (hasDerivAt_id b).const_mul (-𝓒.energy i)
-    have h_exp' :
-        HasDerivAt (fun b => Real.exp ((-𝓒.energy i) * b))
-          (Real.exp ((-𝓒.energy i) * b) * (-𝓒.energy i)) b := h_lin.exp
-    have h_eq :
-        (fun b => Real.exp (-b * 𝓒.energy i))
-          = (fun b => Real.exp ((-𝓒.energy i) * b)) := by
-      funext x; ring_nf
-    have h_exp :
-        HasDerivAt (fun b => Real.exp (-b * 𝓒.energy i))
-          (-𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b := by
-      simpa [h_eq, mul_comm, mul_left_comm, mul_assoc] using h_exp'
-    have h_prod := h_exp.const_mul (𝓒.energy i)
-    simpa [sq, mul_comm, mul_left_comm, mul_assoc] using h_prod
-  have h_sum :
-      HasDerivAt (fun b => ∑ i, 𝓒.energy i * Real.exp (-b * 𝓒.energy i))
-        (∑ i, -(𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) b :=
-    HasDerivAt.fun_sum fun i a => h_each i
-  have h_deriv := h_sum.deriv
-  simpa [Finset.sum_neg_distrib, pow_two, mul_comm, mul_left_comm, mul_assoc]
-    using h_deriv
+  have hd : ∀ c : ℝ, HasDerivAt (fun x => Real.exp (-x * c)) (-c * Real.exp (-b * c)) b := by
+    intro c
+    have h : HasDerivAt (fun x => -x * c) (-c) b := by
+      simpa using (hasDerivAt_id b).neg.mul_const c
+    simpa [mul_comm] using h.exp
+  have h_sum : HasDerivAt (fun x => ∑ i, 𝓒.energy i * Real.exp (-x * 𝓒.energy i))
+      (∑ i, -(𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) b := by
+    refine HasDerivAt.fun_sum fun i _ => ?_
+    simpa [sq, mul_comm, mul_left_comm, mul_assoc] using
+      (hd (𝓒.energy i)).const_mul (𝓒.energy i)
+  simpa [Finset.sum_neg_distrib, sq, mul_comm, mul_left_comm, mul_assoc] using h_sum.deriv
 
 /-! Quotient rule: dU/db = U^2 - ⟨E^2⟩_β -/
 
@@ -509,62 +424,24 @@ variable [Nonempty ι]
 lemma deriv_meanEnergyBetaReal (b : ℝ) :
     deriv 𝓒.meanEnergyBetaReal b =
     (𝓒.meanEnergyBetaReal b)^2 - ∑ i, (𝓒.energy i)^2 * 𝓒.probabilityBetaReal b i := by
-  let Z := 𝓒.mathematicalPartitionFunctionBetaReal
-  let Num := 𝓒.meanEnergyNumerator
-  have hZ_diff := (differentiable_mathematicalPartitionFunctionBetaReal 𝓒) b
   have hN_diff := (differentiable_meanEnergyNumerator 𝓒) b
-  have hZ_ne_zero : Z b ≠ 0 := (mathematicalPartitionFunctionBetaReal_pos 𝓒 b).ne'
-  have hU_eq_div : 𝓒.meanEnergyBetaReal = fun x => Num x / Z x := by
+  have hZ_diff := (differentiable_mathematicalPartitionFunctionBetaReal 𝓒) b
+  have hZ_ne : 𝓒.mathematicalPartitionFunctionBetaReal b ≠ 0 :=
+    (mathematicalPartitionFunctionBetaReal_pos 𝓒 b).ne'
+  have hU : 𝓒.meanEnergyBetaReal
+      = 𝓒.meanEnergyNumerator / 𝓒.mathematicalPartitionFunctionBetaReal := by
     funext x
-    unfold meanEnergyBetaReal probabilityBetaReal Num Z mathematicalPartitionFunctionBetaReal
-    simp [meanEnergyNumerator, Finset.sum_div, mul_div_assoc]
-  have hquot' :
-      deriv (fun x => Num x / Z x) b =
-        (deriv Num b * Z b - Num b * deriv Z b) / (Z b)^2 := by
-    exact deriv_div hN_diff hZ_diff hZ_ne_zero
-  have hquot'' := hquot'
-  have hnum := deriv_meanEnergyNumerator (𝓒 := 𝓒) b
-  have hz := deriv_mathematicalPartitionFunctionBetaReal (𝓒 := 𝓒) b
-  simp [Num, Z, hnum, hz, sub_eq_add_neg, mul_comm] at hquot''
-  have h₁ :
-      deriv (fun x => Num x / Z x) b =
-        (-(Z b * ∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) + Num b * Num b) / (Z b)^2 := by
-    simpa [Num, Z] using hquot''
-  have hprob :
-      ∑ i, (𝓒.energy i)^2 * 𝓒.probabilityBetaReal b i
-        = (∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) / Z b := by
-    unfold probabilityBetaReal Z
-    calc
-      ∑ i, (𝓒.energy i)^2 * (Real.exp (-b * 𝓒.energy i) / Z b)
-          = ∑ i, ((𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) / Z b := by
-            refine Finset.sum_congr rfl ?_
-            intro i _
-            simpa [mul_comm, mul_left_comm, mul_assoc] using
-              (mul_div_assoc ((𝓒.energy i)^2) (Real.exp (-(b * 𝓒.energy i))) (Z b)).symm
-      _ = (∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) / Z b := by
-            simp [Finset.sum_div]
-  have h2 :
-      deriv (fun x => Num x / Z x) b =
-        (Num b / Z b)^2 - (∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) / Z b := by
-    rw [h₁]
-    field_simp [hZ_ne_zero, pow_two, sub_eq_add_neg]
-    all_goals
-      have hsym :
-          (∑ i, (𝓒.energy i)^2 * Real.exp (-(𝓒.energy i * b)))
-            = (∑ i, (𝓒.energy i)^2 * Real.exp (-(b * 𝓒.energy i))) := by
-        refine Finset.sum_congr rfl ?_; intro i _; simp [mul_comm]
-      try
-        (first
-          | simpa [hsym, pow_two, mul_comm, mul_left_comm, mul_assoc]
-          | simp [pow_two, mul_comm, mul_assoc])
-      exact
-        neg_add_eq_sub (Z b * ∑ x, 𝓒.energy x * (𝓒.energy x * rexp (-(b * 𝓒.energy x))))
-          (Num b * Num b)
-  have htarget :
-      deriv (fun x => Num x / Z x) b =
-        (Num b / Z b)^2 - ∑ i, (𝓒.energy i)^2 * 𝓒.probabilityBetaReal b i := by
-    simpa [hprob] using h2
-  simpa [hU_eq_div] using htarget
+    simp [meanEnergyBetaReal, probabilityBetaReal, meanEnergyNumerator,
+          mathematicalPartitionFunctionBetaReal, Pi.div_apply, Finset.sum_div, mul_div_assoc]
+  have hprob : ∑ i, (𝓒.energy i)^2 * 𝓒.probabilityBetaReal b i
+      = (∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i))
+          / 𝓒.mathematicalPartitionFunctionBetaReal b := by
+    simp [probabilityBetaReal, Finset.sum_div, mul_div_assoc]
+  rw [hprob, hU, deriv_div hN_diff hZ_diff hZ_ne, deriv_meanEnergyNumerator,
+      deriv_mathematicalPartitionFunctionBetaReal, Pi.div_apply]
+  set S2 := ∑ i, (𝓒.energy i) ^ 2 * Real.exp (-b * 𝓒.energy i)
+  field_simp
+  ring
 
 /-- (∂U/∂β) = -Var(E) for finite systems. -/
 lemma derivWithin_meanEnergy_Beta_eq_neg_variance

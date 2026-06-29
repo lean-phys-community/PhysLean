@@ -189,31 +189,17 @@ lemma schwartzMap_fderiv_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ
     · exact (η.smooth'.of_le (by simp)).comp ((slice i).symm.contDiff)
     · fun_prop
   · filter_upwards with r
-    calc _
-        _ ≤ ‖(fderiv ℝ ⇑η (((slice i).symm (r, x))))‖ *
-          ‖fderiv ℝ (fun x => (slice i).symm (r, x)) x‖ := by
-          rw [fderiv_fun_comp _ _ (by fun_prop)]; swap
-          · apply Differentiable.differentiableAt
-            exact η.smooth'.differentiable (by simp)
-          exact ContinuousLinearMap.opNorm_comp_le (fderiv ℝ ⇑η (((slice i).symm (r, x)))) _
-        _ ≤ ‖iteratedFDeriv ℝ 1 (⇑η) ((((slice i).symm (r, x))))‖ *
-            ‖fderiv ℝ (fun x => (slice i).symm (r, x)) x‖ := by
-          apply le_of_eq
-          congr 1
-          simp only [Nat.succ_eq_add_one]
-          rw [← iteratedFDerivWithin_univ, norm_iteratedFDerivWithin_one, fderivWithin_univ]
-          exact uniqueDiffWithinAt_univ
-        _ ≤ ‖iteratedFDeriv ℝ 1 (⇑η) ((((slice i).symm (r, x))))‖
-            * ‖(slice i).symm.toContinuousLinearMap.comp
+    have heq : fderiv ℝ (fun x => (slice i).symm (r, x)) x =
+        (slice i).symm.toContinuousLinearMap.comp
           (ContinuousLinearMap.prod (0 : Space d →L[ℝ] ℝ)
-          (ContinuousLinearMap.id ℝ (Space d)))‖ := by
-            apply le_of_eq
-            congr
-            rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
-            simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
-              fderiv_fun_id]
-            fun_prop
-            fun_prop
+            (ContinuousLinearMap.id ℝ (Space d))) := by
+      rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
+      · simp only [fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply, fderiv_fun_id]
+      · fun_prop
+      · fun_prop
+    rw [norm_iteratedFDeriv_one, fderiv_fun_comp _ _ (by fun_prop), heq]
+    · exact ContinuousLinearMap.opNorm_comp_le _ _
+    · exact (η.smooth'.differentiable (by simp)).differentiableAt
 
 @[fun_prop]
 lemma schwartzMap_fderiv_left_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d.succ, ℝ)) (x : Space d)
@@ -293,13 +279,9 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
     fun x₀ r => fderiv ℝ (fun x : Space d => η ((slice i).symm (r, x))) x₀
   have hF : ∀ t, ∀ x, HasFDerivAt (F · t) (F' x t) x := by
     intro t x
-    dsimp [F, F']
+    dsimp only [F, F']
     refine DifferentiableAt.hasFDerivAt ?_
-    have hf := η.smooth'
-    apply Differentiable.differentiableAt
-    apply Differentiable.comp
-    · exact hf.differentiable (by simp)
-    · fun_prop
+    exact ((η.smooth'.differentiable (by simp)).comp (by fun_prop)).differentiableAt
   obtain ⟨rt, hrt⟩ := schwartzMap_slice_bound (m := 0) (n := 1) (d := d) i
   obtain ⟨k, hrt, hbound, k_eq⟩ := hrt η
   suffices h1 : HasFDerivAt (fun x => ∫ (a : ℝ), F x a) (∫ (a : ℝ), F' x₀ a) x₀ by exact h1
@@ -315,46 +297,30 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
   · simp [F']
     apply Continuous.aestronglyMeasurable
     refine Continuous.fderiv_one ?_ ?_
-    · apply ContDiff.comp
-      change ContDiff ℝ 1 η
-      apply η.smooth'.of_le (by simp)
-      apply ContDiff.comp
-      · exact ContinuousLinearEquiv.contDiff (slice i).symm
-      · fun_prop
+    · exact (η.smooth'.of_le (by simp)).comp ((slice i).symm.contDiff)
     · fun_prop
   · filter_upwards with r
     intro x _
-    calc _
-        _ ≤ ‖(fderiv ℝ ⇑η (((slice i).symm (r, x))))‖ *
-          ‖fderiv ℝ (fun x => (slice i).symm (r, x)) x‖ := by
-          simp [F']
-          rw [fderiv_fun_comp _ _ (by fun_prop)]; swap
-          · apply Differentiable.differentiableAt
-            exact η.smooth'.differentiable (by simp)
-          exact ContinuousLinearMap.opNorm_comp_le (fderiv ℝ ⇑η (((slice i).symm (r, x)))) _
-        _ ≤ ‖iteratedFDeriv ℝ 1 (⇑η) ((((slice i).symm (r, x))))‖ *
-            ‖fderiv ℝ (fun x => (slice i).symm (r, x)) x‖ := by
-          apply le_of_eq
-          congr 1
-          simp only [Nat.succ_eq_add_one]
-          rw [← iteratedFDerivWithin_univ, norm_iteratedFDerivWithin_one, fderivWithin_univ]
-          exact uniqueDiffWithinAt_univ
-        _ ≤ k * (|1 + ‖r‖| ^ rt)⁻¹ * ‖fderiv ℝ (fun x => (slice i).symm (r, x)) x‖ := by
-          refine mul_le_mul_of_nonneg_right ?_ (by positivity)
-          simpa using hbound x r
-        _ ≤ k * (|1 + ‖r‖| ^ rt)⁻¹ * ‖(slice i).symm.toContinuousLinearMap.comp
+    have hb : ‖fderiv ℝ (fun x => η ((slice i).symm (r, x))) x‖ ≤
+        ‖iteratedFDeriv ℝ 1 ⇑η ((slice i).symm (r, x))‖ *
+        ‖(slice i).symm.toContinuousLinearMap.comp
           (ContinuousLinearMap.prod (0 : Space d →L[ℝ] ℝ)
-          (ContinuousLinearMap.id ℝ (Space d)))‖ := by
-          apply le_of_eq
-          congr 1
-          rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
-          simp only [Nat.succ_eq_add_one, fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply,
-            fderiv_fun_id]
-          fun_prop
-          fun_prop
-    apply le_of_eq
-    simp only [norm_eq_abs, Nat.succ_eq_add_one, norm_pow]
-    ring
+            (ContinuousLinearMap.id ℝ (Space d)))‖ := by
+      have heq : fderiv ℝ (fun x => (slice i).symm (r, x)) x =
+          (slice i).symm.toContinuousLinearMap.comp
+            (ContinuousLinearMap.prod (0 : Space d →L[ℝ] ℝ)
+              (ContinuousLinearMap.id ℝ (Space d))) := by
+        rw [fderiv_fun_comp, DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
+        · simp only [fderiv_slice_symm, fderiv_fun_const, Pi.zero_apply, fderiv_fun_id]
+        · fun_prop
+        · fun_prop
+      rw [norm_iteratedFDeriv_one, fderiv_fun_comp _ _ (by fun_prop), heq]
+      · exact ContinuousLinearMap.opNorm_comp_le _ _
+      · exact (η.smooth'.differentiable (by simp)).differentiableAt
+    refine le_trans hb ?_
+    rw [mul_right_comm]
+    gcongr
+    simpa using hbound x r
   · apply Integrable.const_mul
     convert hrt using 1
     funext t
@@ -415,8 +381,7 @@ lemma schwartzMap_slice_integral_contDiff {d : ℕ} (n : ℕ) (η : 𝓢(Space d
         simp only [ContinuousLinearMap.coe_comp, Function.comp_apply,
           fderiv_slice_symm_right_apply, Nat.succ_eq_add_one]
         rw [SchwartzMap.lineDerivOp_apply_eq_fderiv]
-        · apply Differentiable.differentiableAt
-          exact η.smooth'.differentiable (by simp)
+        · exact (η.smooth'.differentiable (by simp)).differentiableAt
         fun_prop
       rw [hl2]
       apply ih
@@ -437,15 +402,17 @@ lemma schwartzMap_slice_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 
     simp
   | succ n ih =>
     intro x y
+    have hdiff : Differentiable ℝ (iteratedFDeriv ℝ n (⇑η : Space d.succ → ℝ)) := by
+      apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
+      · exact Nat.cast_lt.mpr (by omega)
+      · exact η.smooth'.of_le ENat.LEInfty.out
     calc _
       _ = ((fderiv ℝ (fun x => iteratedFDeriv ℝ n
           (fun x => ∫ (r : ℝ), η ((slice i).symm (r, x))) x (Fin.tail y)) x) (y 0)) := by
         rw [iteratedFDeriv_succ_apply_left]
         refine Eq.symm (fderiv_continuousMultilinear_apply_const_apply ?_ (Fin.tail y) (y 0))
-        apply Differentiable.differentiableAt
-        apply (schwartzMap_slice_integral_contDiff (n + 1) η i).differentiable_iteratedFDeriv
-        refine Nat.cast_lt.mpr ?_
-        omega
+        exact ((schwartzMap_slice_integral_contDiff (n + 1) η i).differentiable_iteratedFDeriv
+          (Nat.cast_lt.mpr (by omega))).differentiableAt
       _ = (fderiv ℝ (fun x => ∫ (r : ℝ), (iteratedFDeriv ℝ n (⇑η) ((slice i).symm (r, x)))
           fun j => (slice i).symm (0, Fin.tail y j)) x) (y 0) := by
         conv_lhs =>
@@ -476,31 +443,11 @@ lemma schwartzMap_slice_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 
           erw [SchwartzMap.iteratedLineDerivOp_eq_iteratedFDeriv]
     rw [iteratedFDeriv_succ_apply_left]
     simp only [Nat.succ_eq_add_one]
-    rw [← fderiv_continuousMultilinear_apply_const_apply]
-    rw [← fderiv_fun_slice_symm_right_apply]
+    rw [← fderiv_continuousMultilinear_apply_const_apply, ← fderiv_fun_slice_symm_right_apply]
     rfl
-    · apply Differentiable.differentiableAt
-      refine Differentiable.continuousMultilinear_apply_const ?_
-          (Fin.tail fun j => (slice i).symm (0, y j))
-      refine Differentiable.fun_comp ?_ ?_
-      apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-      refine Nat.cast_lt.mpr ?_
-      simp only [lt_add_iff_pos_right, zero_lt_one]
-      have hη := η.smooth'
-      apply ContDiff.comp
-      · exact hη.of_le (by exact ENat.LEInfty.out)
-      · fun_prop
-      fun_prop
-    · apply Differentiable.differentiableAt
-      refine Differentiable.fun_comp ?_ ?_
-      apply ContDiff.differentiable_iteratedFDeriv (n := (n + 1 : ℕ))
-      refine Nat.cast_lt.mpr ?_
-      simp only [lt_add_iff_pos_right, zero_lt_one]
-      have hη := η.smooth'
-      apply ContDiff.comp
-      · exact hη.of_le (by exact ENat.LEInfty.out)
-      · fun_prop
-      fun_prop
+    · exact (hdiff.continuousMultilinear_apply_const
+        (Fin.tail fun j => (slice i).symm (0, y j))).differentiableAt
+    · exact hdiff.differentiableAt
 
 lemma schwartzMap_slice_integral_iteratedFDeriv {d : ℕ} (n : ℕ) (η : 𝓢(Space d.succ, ℝ))
     (i : Fin d.succ) (x : Space d) :
@@ -509,11 +456,9 @@ lemma schwartzMap_slice_integral_iteratedFDeriv {d : ℕ} (n : ℕ) (η : 𝓢(S
       (fun _ => (slice i).symm.toContinuousLinearMap.comp
       (ContinuousLinearMap.prod (0 : Space d →L[ℝ] ℝ) (ContinuousLinearMap.id ℝ (Space d)))) := by
   ext y
-  rw [schwartzMap_slice_integral_iteratedFDeriv_apply]
-  rw [← ContinuousMultilinearMap.integral_apply]
-  rfl
-  simp only [Nat.succ_eq_add_one]
-  exact schwartzMap_iteratedFDeriv_slice_symm_integrable η x i
+  rw [schwartzMap_slice_integral_iteratedFDeriv_apply, ← ContinuousMultilinearMap.integral_apply]
+  · rfl
+  · exact schwartzMap_iteratedFDeriv_slice_symm_integrable η x i
 
 lemma schwartzMap_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n : ℕ) (η : 𝓢(Space d.succ, ℝ))
     (i : Fin d.succ) (x : Space d) :
@@ -624,8 +569,7 @@ def sliceSchwartz {d : ℕ} (i : Fin d.succ) :
     apply And.intro
     · positivity
     intro η x
-    specialize hrt η x
-    obtain ⟨hrt1, hbound⟩ := hrt
+    obtain ⟨hrt1, hbound⟩ := hrt η x
     apply le_trans hbound
     apply le_of_eq
     ring_nf
@@ -679,8 +623,7 @@ lemma distDeriv_constantSliceDist_same {M : Type} [NormedAddCommGroup M] [Normed
         congr
         funext r
         rw [basis_self_eq_slice, fderiv_fun_slice_symm_left_apply]
-        apply Differentiable.differentiableAt
-        exact η.differentiable
+        exact η.differentiable.differentiableAt
     _ = ∫ (r : ℝ), (fun r => 1) r * fderiv ℝ (fun r => η ((slice i).symm (r, x))) r 1 := by simp
     _ = - ∫ (r : ℝ), fderiv ℝ (fun t => 1) r 1 * (fun r => η ((slice i).symm (r, x))) r := by
       rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]
@@ -710,8 +653,7 @@ lemma distDeriv_constantSliceDist_succAbove {M : Type} [NormedAddCommGroup M] [N
   rw [basis_succAbove_eq_slice]
   funext r
   rw [fderiv_fun_slice_symm_right_apply]
-  · apply Differentiable.differentiableAt
-    exact η.differentiable
+  · exact η.differentiable.differentiableAt
   · exact schwartzMap_fderiv_integrable_slice_symm η x i
 
 end Space

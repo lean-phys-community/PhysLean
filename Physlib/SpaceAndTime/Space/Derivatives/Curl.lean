@@ -736,23 +736,17 @@ lemma distCurl_coord_apply {i : Fin 3}
     (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : 𝓢(Space, ℝ)) :
     (∇ᵈ ⨯ f) η i = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis (i+2)) (fderivCLM ℝ Space ℝ η)) (i+1)
     + f (SchwartzMap.evalCLM ℝ Space ℝ (basis (i+1)) (fderivCLM ℝ Space ℝ η)) (i+2) := by
-  simp [distCurl]
-  rw [fderivD_apply, fderivD_apply]
-  simp
+  simp [distCurl, fderivD_apply]
 
 lemma distCurl_apply_one (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : 𝓢(Space, ℝ)) :
     (∇ᵈ ⨯ f) η 1 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 0) (fderivCLM ℝ Space ℝ η)) 2
     + f (SchwartzMap.evalCLM ℝ Space ℝ (basis 2) (fderivCLM ℝ Space ℝ η)) 0 := by
-  simp [distCurl]
-  rw [fderivD_apply, fderivD_apply]
-  simp
+  simpa using distCurl_coord_apply (i := 1) f η
 
 lemma distCurl_apply_two (f : Space →d[ℝ] (EuclideanSpace ℝ (Fin 3))) (η : 𝓢(Space, ℝ)) :
     (∇ᵈ ⨯ f) η 2 = - f (SchwartzMap.evalCLM ℝ Space ℝ (basis 1) (fderivCLM ℝ Space ℝ η)) 0
     + f (SchwartzMap.evalCLM ℝ Space ℝ (basis 0) (fderivCLM ℝ Space ℝ η)) 1 := by
-  simp [distCurl]
-  rw [fderivD_apply, fderivD_apply]
-  simp
+  simpa using distCurl_coord_apply (i := 2) f η
 
 /-!
 

@@ -92,9 +92,7 @@ lemma planeWave_differentiable_time {d f₀ c x} {s : Direction d}
     (h' : Differentiable ℝ f₀) :
     Differentiable ℝ (fun t => planeWave f₀ c s t x) := by
   simp only [planeWave_eq]
-  apply Differentiable.comp
-  · fun_prop
-  · fun_prop
+  apply Differentiable.comp <;> fun_prop
 
 @[fun_prop]
 lemma planeWave_differentiable_space {d f₀ c t} {s : Direction d}

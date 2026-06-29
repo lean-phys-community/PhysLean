@@ -74,19 +74,10 @@ where
       enter [2, 2, x]
       rw [minkowskiMatrix.inr_i_inr_i]
     simp only [Fin.isValue, mul_neg, mul_one, neg_mul, neg_neg]
-    have hb1 : √(1 - β ^ 2) ^ 2 = 1 - β ^ 2 := by
-      refine Real.sq_sqrt ?_
-      simp only [sub_nonneg, sq_le_one_iff_abs_le_one]
-      exact le_of_lt hβ
-    have hb2 : 1 - β ^ 2 ≠ 0 := by
-      simp only [ne_eq, sub_ne_zero]
-      by_contra h
-      have hl : 1 ^ 2 = β ^ 2 := by
-        rw [← h]
-        simp
-      rw [sq_eq_sq_iff_abs_eq_abs] at hl
-      rw [← hl] at hβ
-      simp at hβ
+    have hγ : (γ β) ^ 2 - (γ β) ^ 2 * β ^ 2 = 1 := by
+      have hd := γ_det_not_zero β hβ
+      rw [show (γ β) ^ 2 - (γ β) ^ 2 * β ^ 2 = (γ β) ^ 2 * (1 - β ^ 2) by ring, γ_sq β hβ]
+      field_simp
     by_cases hj : j = Sum.inl 0
     · subst hj
       simp only [Fin.isValue, ↓reduceIte, minkowskiMatrix.inl_0_inl_0, one_mul, true_and,
@@ -96,10 +87,7 @@ where
         by_cases hk : k = Sum.inl 0
         · subst hk
           simp only [Fin.isValue, ↓reduceIte, one_apply_eq]
-          ring_nf
-          simp [γ]
-          rw [hb1]
-          field_simp
+          linear_combination hγ
         · simp only [Fin.isValue, hk, ↓reduceIte]
           by_cases hk' : k = Sum.inr i
           · simp only [hk', ↓reduceIte, Fin.isValue, ne_eq, reduceCtorEq, not_false_eq_true,
@@ -119,12 +107,6 @@ where
       rw [minkowskiMatrix.inr_i_inr_i, Finset.sum_eq_single j]
       · by_cases hj' : j = i
         · subst hj'
-          conv_lhs =>
-            enter [1, 1, 2]
-            simp only [Fin.isValue]
-          conv_lhs =>
-            enter [2, 1, 1, 2]
-            simp only [Fin.isValue]
           match k with
           | Sum.inl 0 =>
             simp only [Fin.isValue, ↓reduceIte, reduceCtorEq, neg_mul, one_mul, neg_neg, and_self,
@@ -135,21 +117,12 @@ where
           · subst hk
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, neg_mul, one_mul, neg_neg, and_true,
               and_self, one_apply_eq]
-            ring_nf
-            simp [γ]
-            rw [hb1]
-            field_simp
+            linear_combination hγ
           · rw [one_apply]
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, Sum.inr.injEq, hk, and_true, and_self,
               neg_mul, one_mul, neg_neg, zero_add]
             rw [if_neg (fun a => hk (id (Eq.symm a))), if_neg (fun a => hk (id (Eq.symm a)))]
-        · conv_lhs =>
-            enter [1, 1, 2]
-            simp only [Fin.isValue]
-          conv_lhs =>
-            enter [2, 1, 1, 2]
-            simp only [Fin.isValue]
-          rw [one_apply]
+        · rw [one_apply]
           simp [hj']
       · intro b _ hb
         simp only [Fin.isValue, reduceCtorEq, false_and, ↓reduceIte, Sum.inr.injEq, neg_mul,
@@ -182,13 +155,8 @@ lemma boost_transpose_eq_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
   | Sum.inr i, Sum.inl 0 =>
     simp
   | Sum.inr j, Sum.inr k =>
-    simp only [Fin.isValue, reduceCtorEq, and_self, ↓reduceIte, Sum.inr.injEq, false_and, and_false]
-    conv_lhs =>
-      enter [1]
-      rw [and_comm]
-    conv_lhs =>
-      enter [3, 1]
-      rw [eq_comm]
+    simp only [Fin.isValue, reduceCtorEq, and_self, ↓reduceIte, Sum.inr.injEq, false_and,
+      and_false, and_comm (a := k = i), eq_comm (a := k) (b := j)]
 
 @[simp]
 lemma boost_transpose_matrix_eq_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
@@ -227,32 +195,17 @@ lemma boost_inverse (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
     rw [minkowskiMatrix.inl_0_inl_0, minkowskiMatrix.inr_i_inr_i]
     simp only [boost, Fin.isValue, neg_mul, reduceCtorEq, and_false, ↓reduceIte, Sum.inr.injEq,
       true_and, and_self, false_and, mul_ite, mul_neg, one_mul, mul_zero, mul_one, neg_neg,
-      and_true]
-    split
-    · simp
-    · simp
+      and_true, γ_neg]
+    split <;> simp
   | Sum.inr j, Sum.inl 0 =>
     rw [minkowskiMatrix.inl_0_inl_0, minkowskiMatrix.inr_i_inr_i]
     simp [boost]
   | Sum.inr j, Sum.inr k =>
     rw [minkowskiMatrix.inr_i_inr_i, minkowskiMatrix.inr_i_inr_i]
     simp only [boost, Fin.isValue, neg_mul, reduceCtorEq, and_self, ↓reduceIte, Sum.inr.injEq,
-      false_and, and_false, mul_ite, one_mul, mul_one, mul_zero, mul_neg, neg_neg]
-    split
-    · simp
-      rw [if_pos]
-      simp_all [not_true_eq_false, imp_false, IsEmpty.forall_iff]
-      simp_all only
-    · rename_i h
-      conv_rhs =>
-        rw [if_neg (fun a => h (And.symm a))]
-      split
-      · rename_i h2
-        rw [if_pos (Eq.symm h2)]
-        simp
-      · rename_i h2
-        rw [if_neg (fun a => h2 (Eq.symm a))]
-        simp
+      false_and, and_false, mul_ite, one_mul, mul_one, mul_zero, mul_neg, neg_neg, γ_neg,
+      and_comm (a := k = i), eq_comm (a := k) (b := j)]
+    split <;> [skip; split] <;> simp
 
 @[simp]
 lemma boost_inl_0_inl_0 (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
@@ -284,9 +237,7 @@ lemma boost_inr_other_inl_0 {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j �
 
 lemma boost_inr_self_inr_other {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
     (boost i β hβ).1 (Sum.inr i) (Sum.inr j) = 0 := by
-  simp only [boost, Fin.isValue, neg_mul, reduceCtorEq, and_self, ↓reduceIte, and_true,
-    Sum.inr.injEq, hij, ite_eq_right_iff, one_ne_zero, imp_false]
-  exact id (Ne.symm hij)
+  simp [boost, hij, Ne.symm hij]
 
 lemma boost_inr_other_inr_self {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
     (boost i β hβ).1 (Sum.inr j) (Sum.inr i) = 0 := by
@@ -310,60 +261,49 @@ lemma boost_inr_inr_other {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j �
 
 @[simp]
 lemma boost_zero_inl_0_inr_succ {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : Fin d) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inl 0) (Sum.inr i.succ) = 0 := by
-  rw [boost_inl_0_inr_other]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inl 0) (Sum.inr i.succ) = 0 :=
+  boost_inl_0_inr_other hβ (Fin.succ_ne_zero i)
 
 @[simp]
 lemma boost_zero_inr_succ_inl_0{d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : Fin d) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr i.succ) (Sum.inl 0) = 0 := by
-  rw [boost_inr_other_inl_0]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr i.succ) (Sum.inl 0) = 0 :=
+  boost_inr_other_inl_0 hβ (Fin.succ_ne_zero i)
 
 @[simp]
 lemma boost_zero_inl_0_inr_nat_succ {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : ℕ) (h : i + 1 < d + 1) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inl 0) (Sum.inr ⟨i + 1, h⟩) = 0 := by
-  rw [boost_inl_0_inr_other]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inl 0) (Sum.inr ⟨i + 1, h⟩) = 0 :=
+  boost_inl_0_inr_other hβ (Fin.ne_of_val_ne (Nat.succ_ne_zero i))
 
 @[simp]
 lemma boost_zero_inr_nat_succ_inl_0 {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : ℕ) (h : i + 1 < d + 1) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr ⟨i + 1, h⟩) (Sum.inl 0) = 0 := by
-  rw [boost_inr_other_inl_0]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr ⟨i + 1, h⟩) (Sum.inl 0) = 0 :=
+  boost_inr_other_inl_0 hβ (Fin.ne_of_val_ne (Nat.succ_ne_zero i))
 
 @[simp]
 lemma boost_zero_inr_0_inr_succ {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : Fin d) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr 0) (Sum.inr i.succ) = 0 := by
-  rw [boost_inr_self_inr_other]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr 0) (Sum.inr i.succ) = 0 :=
+  boost_inr_self_inr_other hβ (Fin.succ_ne_zero i)
 
 @[simp]
 lemma boost_zero_inr_succ_inr_0 {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : Fin d) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr i.succ) (Sum.inr 0) = 0 := by
-  rw [boost_inr_other_inr_self]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr i.succ) (Sum.inr 0) = 0 :=
+  boost_inr_other_inr_self hβ (Fin.succ_ne_zero i)
 
 @[simp]
 lemma boost_zero_inr_0_inr_nat_succ {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : ℕ) (h : i + 1 < d + 1) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr 0) (Sum.inr ⟨i + 1, h⟩) = 0 := by
-  rw [boost_inr_self_inr_other]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr 0) (Sum.inr ⟨i + 1, h⟩) = 0 :=
+  boost_inr_self_inr_other hβ (Fin.ne_of_val_ne (Nat.succ_ne_zero i))
 
 @[simp]
 lemma boost_zero_inr_nat_succ_inr_0 {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : ℕ) (h : i + 1 < d + 1) :
-    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr ⟨i + 1, h⟩) (Sum.inr 0) = 0 := by
-  rw [boost_inr_other_inr_self]
-  simp
+    (boost (0 : Fin d.succ) β hβ).1 (Sum.inr ⟨i + 1, h⟩) (Sum.inr 0) = 0 :=
+  boost_inr_other_inr_self hβ (Fin.ne_of_val_ne (Nat.succ_ne_zero i))
 
 lemma boost_zero_inr_succ_inr_succ {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i1 i2 : Fin d) :
     (boost (0 : Fin d.succ) β hβ).1 (Sum.inr i1.succ) (Sum.inr i2.succ) =
     if i1 = i2 then 1 else 0 := by
-  rw [boost_inr_inr_other]
-  simp only [Nat.succ_eq_add_one, Fin.succ_inj]
-  congr 1
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
-  simp
+  rw [boost_inr_inr_other hβ (Fin.succ_ne_zero i2)]
+  simp [Fin.succ_inj, eq_comm]
 
 end LorentzGroup
 

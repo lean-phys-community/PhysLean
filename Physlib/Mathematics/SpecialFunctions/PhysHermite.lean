@@ -129,9 +129,7 @@ lemma iterate_derivative_physHermite_self {n : ℕ} :
   match m with
   | 0 =>
     rw [Polynomial.coeff_C_zero]
-    simp only [zero_add, coeff_physHermite_self_succ, nsmul_eq_mul, mul_eq_mul_right_iff,
-      Nat.cast_inj, pow_eq_zero_iff', OfNat.ofNat_ne_zero, ne_eq, false_and, or_false]
-    rw [Nat.descFactorial_self]
+    simp [coeff_physHermite_self_succ, Nat.descFactorial_self]
   | m + 1 =>
     rw [coeff_physHermite_of_lt (by omega), Polynomial.coeff_C_of_ne_zero (by omega)]
     rfl
@@ -205,9 +203,7 @@ lemma fderiv_physHermite
   ext dx
   simp only [h, Polynomial.fderiv_aeval, derivative_physHermite, nsmul_eq_mul, map_mul, map_natCast,
     ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.smulRight_apply,
-    one_apply_eq_self, smul_eq_mul, FunLike.coe_smul, Pi.smul_apply]
-  simp only [aeval, aevalEquiv, Equiv.coe_fn_mk, eval₂AlgHom_apply, Algebra.toRingHom_ofId,
-    algebraMap_int_eq, eval₂_ofNat]
+    one_apply_eq_self, smul_eq_mul, FunLike.coe_smul, Pi.smul_apply, map_ofNat]
   ring
 
 @[simp]
@@ -254,11 +250,8 @@ lemma deriv_gaussian_eq_physHermite_mul_gaussian (n : ℕ) (x : ℝ) :
     rw [Function.iterate_succ_apply', ih, deriv_const_mul_field, deriv_fun_mul, pow_succ (-1 : ℝ),
       deriv_gaussian, physHermite_succ]
     · rw [derivative_physHermite,]
-      simp only [neg_mul, mul_neg, mul_one, nsmul_eq_mul, cast_ofNat]
-      simp only [Polynomial.deriv_aeval, derivative_physHermite, nsmul_eq_mul, map_mul, map_natCast,
-        map_sub, aeval_X]
-      simp only [aeval, aevalEquiv, Equiv.coe_fn_mk, eval₂AlgHom_apply, Algebra.toRingHom_ofId,
-        algebraMap_int_eq, eval₂_ofNat]
+      simp only [Polynomial.deriv_aeval, derivative_physHermite, nsmul_eq_mul, map_mul,
+        map_natCast, map_sub, aeval_X, map_ofNat]
       ring
     · exact Polynomial.differentiable_aeval ..
     · simp [DifferentiableAt.exp]
@@ -275,24 +268,6 @@ lemma physHermite_eq_deriv_gaussian' (n : ℕ) (x : ℝ) :
     Real.exp (x ^ 2) := by
   rw [physHermite_eq_deriv_gaussian, Real.exp_neg]
   field_simp [Real.exp_ne_zero]
-
-@[fun_prop]
-lemma guassian_integrable_polynomial {b : ℝ} (hb : 0 < b) (P : Polynomial ℤ) :
-    MeasureTheory.Integrable fun x : ℝ => (P.aeval x) * Real.exp (-b * x ^ 2) := by
-  conv =>
-    enter [1, x]
-    rw [Polynomial.aeval_eq_sum_range, Finset.sum_mul]
-  apply MeasureTheory.integrable_finsetSum
-  intro i hi
-  have h2 : (fun a => P.coeff i • a ^ i * Real.exp (-b * a ^ 2)) =
-      (P.coeff i : ℝ) • (fun x => (x ^ (i : ℝ) * Real.exp (-b * x ^ 2))) := by
-    funext x
-    simp [mul_assoc]
-  rw [h2]
-  refine MeasureTheory.Integrable.smul (P.coeff i : ℝ) ?_
-  apply integrable_rpow_mul_exp_neg_mul_sq
-  · exact hb
-  · exact lt_of_le_of_lt' (Nat.cast_nonneg' i) neg_one_lt_zero
 
 @[fun_prop]
 lemma guassian_integrable_polynomial_cons {b c : ℝ} (hb : 0 < b) (P : Polynomial ℤ) :
@@ -313,36 +288,25 @@ lemma guassian_integrable_polynomial_cons {b c : ℝ} (hb : 0 < b) (P : Polynomi
   · exact lt_of_le_of_lt' (Nat.cast_nonneg' i) neg_one_lt_zero
 
 @[fun_prop]
+lemma guassian_integrable_polynomial {b : ℝ} (hb : 0 < b) (P : Polynomial ℤ) :
+    MeasureTheory.Integrable fun x : ℝ => (P.aeval x) * Real.exp (-b * x ^ 2) := by
+  simpa using guassian_integrable_polynomial_cons (c := 1) hb P
+
+@[fun_prop]
 lemma physHermite_gaussian_integrable (n p m : ℕ) :
     MeasureTheory.Integrable (deriv^[m] (physHermite p) * deriv^[n] fun x => Real.exp (-x ^ 2))
     MeasureTheory.volume := by
-  have h1 : (deriv^[m] (physHermite p) * deriv^[n] fun x => Real.exp (-x ^ 2))
-    = deriv^[m] (physHermite p) *
-    ((-1 : ℝ) ^ n • physHermite n * (fun x => Real.exp (- x ^ 2))) := by
+  have prod_eq_smul_aeval_mul_gaussian :
+      (deriv^[m] (physHermite p) * deriv^[n] fun x => Real.exp (-x ^ 2)) =
+      (-1 : ℝ) ^ n • fun x => (derivative^[m] (physHermite p) * physHermite n).aeval x *
+      Real.exp (-1 * x ^ 2) := by
     funext x
-    simp only [Pi.mul_apply, deriv_gaussian_eq_physHermite_mul_gaussian, Algebra.smul_mul_assoc,
-      Pi.smul_apply, smul_eq_mul, mul_eq_mul_left_iff]
-    ring_nf
-    left
-    trivial
-  rw [h1]
-  simp only [Algebra.smul_mul_assoc, Algebra.mul_smul_comm]
-  refine MeasureTheory.Integrable.smul ((-1) ^ n) ?_
-  have h2 : deriv^[m] (physHermite p) * (physHermite n : ℝ → ℝ) =
-      fun x => (derivative^[m] (physHermite p) * physHermite n).aeval x := by
     rw [iterated_deriv_physHermite_eq_aeval]
-    funext x
-    simp
-  conv =>
-    enter [1, x]
-    rw [← mul_assoc, h2]
-  have h0 : ((fun x => (aeval x)
-      ((⇑derivative)^[m] (physHermite p) * physHermite n)) * fun x => Real.exp (-x ^ 2))
-      = fun x => ((⇑derivative)^[m] (physHermite p) * physHermite n).aeval x *
-      Real.exp (- (1 : ℝ) * x ^ 2) := by
-    funext x
-    simp
-  exact h0 ▸ guassian_integrable_polynomial Real.zero_lt_one ..
+    simp only [Pi.mul_apply, deriv_gaussian_eq_physHermite_mul_gaussian, map_mul, Pi.smul_apply,
+      smul_eq_mul, neg_one_mul]
+    ring
+  rw [prod_eq_smul_aeval_mul_gaussian]
+  exact MeasureTheory.Integrable.smul _ (guassian_integrable_polynomial Real.zero_lt_one _)
 
 lemma integral_physHermite_mul_physHermite_eq_integral_deriv_exp (n m : ℕ) :
     ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (-x ^ 2) =
@@ -354,9 +318,7 @@ lemma integral_physHermite_mul_physHermite_eq_integral_deriv_exp (n m : ℕ) :
       rw [physHermite_eq_deriv_gaussian']
     rw [mul_assoc, mul_assoc, ← Real.exp_add, add_neg_cancel, Real.exp_zero, mul_one]
     ring
-  simp only [h1]
-  exact MeasureTheory.integral_const_mul ((-1) ^ m) fun a =>
-      physHermite n a * deriv^[m] (fun x => Real.exp (-x ^ 2)) a
+  simp only [h1, MeasureTheory.integral_const_mul]
 
 lemma integral_physHermite_mul_physHermite_eq_integral_deriv_inductive (n m : ℕ) :
     (p : ℕ) → (hpm : p ≤ m) →
@@ -440,10 +402,7 @@ theorem physHermite_norm (n : ℕ) :
     simp
   rw [MeasureTheory.integral_const_mul]
   have h1 : ∫ (x : ℝ), Real.exp (- x^2) = Real.sqrt (Real.pi) := by
-    trans ∫ (x : ℝ), Real.exp (- 1 * x^2)
-    · simp
-    rw [integral_gaussian]
-    simp
+    simpa using integral_gaussian 1
   rw [h1]
 
 lemma physHermite_norm_cons (n : ℕ) (c : ℝ) :
@@ -464,18 +423,15 @@ lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ)
     (hn : P.natDegree = n) →
     (P : ℝ → ℝ) ∈ Submodule.span ℝ (Set.range (fun n => (physHermite n : ℝ → ℝ)))
   | 0, h => by
-    rw [natDegree_eq_zero] at h
-    obtain ⟨x, rfl⟩ := h
-    refine Finsupp.mem_span_range_iff_exists_finsupp.mpr ?_
-    use Finsupp.single 0 x
+    obtain ⟨x, rfl⟩ := natDegree_eq_zero.mp h
+    refine Finsupp.mem_span_range_iff_exists_finsupp.mpr ⟨Finsupp.single 0 x, ?_⟩
     funext y
     simp
   | n + 1, h => by
     by_cases hP0 : P = 0
     · subst hP0
       simp only [map_zero]
-      change 0 ∈ _
-      exact Submodule.zero_mem (Submodule.span ℝ (Set.range (fun n => (physHermite n : ℝ → ℝ))))
+      exact Submodule.zero_mem _
     let P' := ((coeff (physHermite (n + 1)) (n + 1)) • P -
         (coeff P (n + 1)) • physHermite (n + 1))
     have hP'mem : (fun x => P'.aeval x) ∈ Submodule.span ℝ
@@ -483,8 +439,7 @@ lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ)
       by_cases hP' : P' = 0
       · rw [hP']
         simp only [map_zero]
-        change 0 ∈ _
-        exact Submodule.zero_mem (Submodule.span ℝ (Set.range (fun n => (physHermite n : ℝ → ℝ))))
+        exact Submodule.zero_mem _
       · exact polynomial_mem_physHermite_span_induction P' P'.natDegree (by rfl)
     simp only [P'] at hP'mem
     have hl : (fun x => (aeval x) ((physHermite (n + 1)).coeff (n + 1) • P -
@@ -492,19 +447,13 @@ lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ)
         = (2 ^ (n + 1) : ℝ) • (fun (x : ℝ) => (aeval x) P) - ↑(P.coeff (n + 1) : ℝ) •
         (fun (x : ℝ)=> (aeval x) (physHermite (n + 1))) := by
       funext x
-      simp only [coeff_physHermite_self_succ, zsmul_eq_mul, Int.cast_pow, Int.cast_ofNat, map_sub,
-        map_mul, map_pow, map_intCast, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, sub_left_inj,
-        mul_eq_mul_right_iff]
-      simp [aeval, aevalEquiv]
+      simp [coeff_physHermite_self_succ, map_ofNat]
     rw [hl] at hP'mem
     rw [Submodule.sub_mem_iff_left] at hP'mem
     · rw [Submodule.smul_mem_iff] at hP'mem
       · exact hP'mem
       · simp
-    apply Submodule.smul_mem
-    refine Finsupp.mem_span_range_iff_exists_finsupp.mpr ?_
-    use Finsupp.single (n + 1) 1
-    simp
+    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨n + 1, rfl⟩)
 decreasing_by
   rw [Polynomial.natDegree_lt_iff_degree_lt]
   · apply (Polynomial.degree_lt_iff_coeff_zero _ _).mpr
@@ -516,15 +465,8 @@ decreasing_by
     · subst hm
       simp only [smul_eq_mul, coeff_physHermite_self_succ]
       ring
-    · rw [coeff_eq_zero_of_degree_lt, coeff_eq_zero_of_degree_lt (n := m)]
-      · simp only [smul_eq_mul, mul_zero, sub_self]
-      · rw [← Polynomial.natDegree_lt_iff_degree_lt]
-        · simp only [natDegree_physHermite]
-          omega
-        · simp
-      · rw [← Polynomial.natDegree_lt_iff_degree_lt]
-        · omega
-        · exact hP0
+    · rw [coeff_eq_zero_of_natDegree_lt (by omega), coeff_physHermite_of_lt (by omega)]
+      simp
   · exact hP'
 
 lemma polynomial_mem_physHermite_span (P : Polynomial ℤ) :
@@ -555,11 +497,10 @@ lemma cos_mem_physHermite_span_topologicalClosure (c : ℝ) :
     apply Submodule.sum_mem
     intro l hl
     apply Submodule.smul_mem
-    let P : Polynomial ℤ := X ^ (2 * l)
-    have hy : (fun y => y ^ (2 * l)) = (fun (y : ℝ) => P.aeval y) := by
+    have hy : (fun (y : ℝ) => y ^ (2 * l)) = fun y => ((X ^ (2 * l) : Polynomial ℤ)).aeval y := by
       funext y
-      simp [P]
-    exact hy ▸ polynomial_mem_physHermite_span P
+      simp
+    exact hy ▸ polynomial_mem_physHermite_span _
   exact mem_closure_of_tendsto h1 (Filter.Eventually.of_forall h2)
 
 end Physlib

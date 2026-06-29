@@ -197,90 +197,19 @@ lemma map_subset {f : 𝓩 →+ 𝓩1} {x y : ChargeSpectrum 𝓩} (h : x ⊆ y)
 lemma map_ofPotentialTerm_toFinset [DecidableEq 𝓩]
     (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :
     (ofPotentialTerm (map f x) T).toFinset = (ofPotentialTerm x T).toFinset.image f := by
-  ext i
-  simp [Multiset.mem_toFinset]
-  rw [mem_ofPotentialTerm_iff_mem_ofPotentialTerm]
-  conv_rhs =>
-    enter [1, a]
+  have heq : ∀ {W : Type} [AddCommGroup W] [DecidableEq W] (y : ChargeSpectrum W)
+      (S : PotentialTerm), (ofPotentialTerm y S).toFinset = (ofPotentialTerm' y S).toFinset := by
+    intro W _ _ y S
+    ext i
+    simp only [Multiset.mem_toFinset]
     rw [mem_ofPotentialTerm_iff_mem_ofPotentialTerm]
-  constructor
-  · intro h
-    cases T
-    all_goals
-      try simp [ofPotentialTerm'_W2_finset, ofPotentialTerm'_W3_finset,
-      ofPotentialTerm'_β_finset, ofPotentialTerm'_μ_finset,
-      ofPotentialTerm'_W4_finset, ofPotentialTerm'_K2_finset,
-      ofPotentialTerm'_topYukawa_finset, ofPotentialTerm'_bottomYukawa_finset] at h
-      try simp [ofPotentialTerm'] at h
-    case' μ | β =>
-      obtain ⟨q1, q2, ⟨q1_mem, q2_mem⟩, q_sum⟩ := h
-      simp [map] at q1_mem q2_mem
-      obtain ⟨q1, q1_mem, rfl⟩ := q1_mem
-      obtain ⟨q2, q2_mem, rfl⟩ := q2_mem
-    case' μ => use q1 - q2
-    case' β => use -q1 + q2
-    case' Λ | W3 | W4 | K1 | K2 | topYukawa | bottomYukawa =>
-      obtain ⟨q1, q2, q3, ⟨q1_mem, q2_mem, q3_mem⟩, q_sum⟩ := h
-      simp [map] at q1_mem q2_mem q3_mem
-      obtain ⟨q1, q1_mem, rfl⟩ := q1_mem
-      obtain ⟨q2, q2_mem, rfl⟩ := q2_mem
-      obtain ⟨q3, q3_mem, rfl⟩ := q3_mem
-    case' Λ | K2 | bottomYukawa => use q1 + q2 + q3
-    case' W3 => use - q1 - q1 + q2 + q3
-    case' W4 => use q1 - q2 - q2 + q3
-    case' K1 | topYukawa => use - q1 + q2 + q3
-    case' W1 | W2 =>
-      obtain ⟨q1, q2, q3, q4, ⟨q1_mem, q2_mem, q3_mem, q4_mem⟩, q_sum⟩ := h
-      simp [map] at q1_mem q2_mem q3_mem q4_mem
-      obtain ⟨q1, q1_mem, rfl⟩ := q1_mem
-      obtain ⟨q2, q2_mem, rfl⟩ := q2_mem
-      obtain ⟨q3, q3_mem, rfl⟩ := q3_mem
-      obtain ⟨q4, q4_mem, rfl⟩ := q4_mem
-      use q1 + q2 + q3 + q4
-    all_goals
-      subst i
-      try simp [ofPotentialTerm'_W2_finset, ofPotentialTerm'_W3_finset,
-      ofPotentialTerm'_β_finset, ofPotentialTerm'_μ_finset,
-      ofPotentialTerm'_W4_finset, ofPotentialTerm'_K2_finset,
-      ofPotentialTerm'_topYukawa_finset, ofPotentialTerm'_bottomYukawa_finset]
-      try simp [ofPotentialTerm']
-      use q1, q2
-    · use q3, q4
-    · use q3, q4
-    all_goals use q3
-  · intro h
-    obtain ⟨a, h, rfl⟩ := h
-    cases T
-    all_goals
-      try simp [ofPotentialTerm'_W2_finset, ofPotentialTerm'_W3_finset,
-      ofPotentialTerm'_β_finset, ofPotentialTerm'_μ_finset,
-      ofPotentialTerm'_W4_finset, ofPotentialTerm'_K2_finset,
-      ofPotentialTerm'_topYukawa_finset, ofPotentialTerm'_bottomYukawa_finset] at h
-      try simp [ofPotentialTerm'] at h
-      try simp [ofPotentialTerm'_W2_finset, ofPotentialTerm'_W3_finset,
-      ofPotentialTerm'_β_finset, ofPotentialTerm'_μ_finset,
-      ofPotentialTerm'_W4_finset, ofPotentialTerm'_K2_finset,
-      ofPotentialTerm'_topYukawa_finset, ofPotentialTerm'_bottomYukawa_finset]
-      try simp [ofPotentialTerm']
-    case' μ | β =>
-      obtain ⟨q1, q2, ⟨q1_mem, q2_mem⟩, q_sum⟩ := h
-      use f q1, f q2
-    case' Λ | W3 | W4 | K1 | K2 | topYukawa | bottomYukawa =>
-      obtain ⟨q1, q2, q3, ⟨q1_mem, q2_mem, q3_mem⟩, q_sum⟩ := h
-      use f q1, f q2, f q3
-    case' W1 | W2 =>
-      obtain ⟨q1, q2, q3, q4, ⟨q1_mem, q2_mem, q3_mem, q4_mem⟩, q_sum⟩ := h
-      use f q1, f q2, f q3, f q4
-    all_goals
-      simp only [map]
-      subst a
-      simp_all
-    case W1 => refine ⟨⟨q1, q1_mem, rfl⟩, ⟨q2, q2_mem, rfl⟩, ⟨q3, q3_mem, rfl⟩, ⟨q4, q4_mem, rfl⟩⟩
-    case W2 => refine ⟨⟨q2, q2_mem, rfl⟩, ⟨q3, q3_mem, rfl⟩, ⟨q4, q4_mem, rfl⟩⟩
-    case Λ | K1 => refine ⟨⟨q1, q1_mem, rfl⟩, ⟨q2, q2_mem, rfl⟩, ⟨q3, q3_mem, rfl⟩⟩
-    case W3 | topYukawa | bottomYukawa => refine ⟨⟨q2, q2_mem, rfl⟩, ⟨q3, q3_mem, rfl⟩⟩
-    case W4 | K2 => refine ⟨q3, q3_mem, rfl⟩
-    case β => refine ⟨q2, q2_mem, rfl⟩
+  rw [heq, heq]
+  rcases x with ⟨_ | qHd, _ | qHu, Q5, Q10⟩ <;> cases T <;>
+    simp only [ofPotentialTerm', map, Option.map_eq_map, Option.map_some, Option.map_none,
+      Multiset.toFinset_map, Finset.val_toFinset, Function.comp_def, map_add, map_sub, map_neg,
+      Multiset.toFinset_singleton, Finset.image_singleton, Finset.product_eq_sprod,
+      ← Finset.prodMap_image_product, Finset.image_image, Prod.map_fst, Prod.map_snd] <;>
+    simp
 
 lemma mem_map_ofPotentialTerm_iff [DecidableEq 𝓩]
     (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :

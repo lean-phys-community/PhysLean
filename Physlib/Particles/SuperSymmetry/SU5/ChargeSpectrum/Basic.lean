@@ -113,13 +113,9 @@ lemma eq_of_parts {x y : ChargeSpectrum 𝓩} (h1 : x.qHd = y.qHd) (h2 : x.qHu =
   simp_all
 
 lemma eq_iff {x y : ChargeSpectrum 𝓩} :
-    x = y ↔ x.qHd = y.qHd ∧ x.qHu = y.qHu ∧ x.Q5 = y.Q5 ∧ x.Q10 = y.Q10 := by
-  constructor
-  · intro h
-    subst h
-    simp
-  · rintro ⟨h1, h2, h3, h4⟩
-    exact eq_of_parts h1 h2 h3 h4
+    x = y ↔ x.qHd = y.qHd ∧ x.qHu = y.qHu ∧ x.Q5 = y.Q5 ∧ x.Q10 = y.Q10 :=
+  ⟨fun h => ⟨congrArg qHd h, congrArg qHu h, congrArg Q5 h, congrArg Q10 h⟩,
+    fun ⟨h1, h2, h3, h4⟩ => eq_of_parts h1 h2 h3 h4⟩
 
 instance [DecidableEq 𝓩] : DecidableEq (ChargeSpectrum 𝓩) := fun _ _ =>
   decidable_of_iff _ eq_iff.symm
@@ -188,30 +184,17 @@ lemma subset_refl (x : ChargeSpectrum 𝓩) : x ⊆ x := ⟨by rfl, by rfl, by r
 
 lemma _root_.Option.toFinset_inj {x y : Option 𝓩} :
     x = y ↔ x.toFinset = y.toFinset := by
-  match x, y with
-  | none, none => simp [Option.toFinset]
-  | none, some a =>
-    rw [show (none = some a) ↔ False by simp]
-    simp only [Option.toFinset_none, Option.toFinset_some, false_iff, ne_eq]
-    rw [Finset.eq_singleton_iff_unique_mem]
-    simp
-  | some _, none => simp [Option.toFinset]
-  | some _, some _ => simp [Option.toFinset]
+  cases x <;> cases y <;> simp [Option.toFinset]
 
 lemma subset_trans {x y z : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyz : y ⊆ z) : x ⊆ z := by
   simp_all [Subset]
 
-lemma subset_antisymm {x y : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyx : y ⊆ x) : x = y := by
-  rw [Subset] at hxy hyx
-  dsimp [hasSubset] at hxy hyx
-  rcases x with ⟨x1, x2, x3, x4⟩
-  rcases y with ⟨y1, y2, y3, y4⟩
-  have hx1 : x1.toFinset = y1.toFinset := Finset.Subset.antisymm_iff.mpr ⟨hxy.1, hyx.1⟩
-  have hx2 : x2.toFinset = y2.toFinset := Finset.Subset.antisymm_iff.mpr ⟨hxy.2.1, hyx.2.1⟩
-  have hx3 : x3 = y3 := Finset.Subset.antisymm_iff.mpr ⟨hxy.2.2.1, hyx.2.2.1⟩
-  have hx4 : x4 = y4 := Finset.Subset.antisymm_iff.mpr ⟨hxy.2.2.2, hyx.2.2.2⟩
-  rw [← Option.toFinset_inj] at hx1 hx2
-  simp_all
+lemma subset_antisymm {x y : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyx : y ⊆ x) : x = y :=
+  eq_of_parts
+    (Option.toFinset_inj.mpr (Finset.Subset.antisymm hxy.1 hyx.1))
+    (Option.toFinset_inj.mpr (Finset.Subset.antisymm hxy.2.1 hyx.2.1))
+    (Finset.Subset.antisymm hxy.2.2.1 hyx.2.2.1)
+    (Finset.Subset.antisymm hxy.2.2.2 hyx.2.2.2)
 
 /-!
 
@@ -231,14 +214,9 @@ lemma empty_subset (x : ChargeSpectrum 𝓩) : ∅ ⊆ x := by
 @[simp]
 lemma subset_of_empty_iff_empty {x : ChargeSpectrum 𝓩} :
     x ⊆ ∅ ↔ x = ∅ := by
-  constructor
-  · intro h
-    apply subset_antisymm
-    · exact h
-    · exact empty_subset x
-  · intro h
-    subst h
-    simp
+  refine ⟨fun h => subset_antisymm h (empty_subset x), ?_⟩
+  rintro rfl
+  simp
 
 @[simp]
 lemma empty_qHd : (∅ : ChargeSpectrum 𝓩).qHd = none := by
@@ -272,36 +250,24 @@ lemma card_empty : card (∅ : ChargeSpectrum 𝓩) = 0 := by
   simp [card, empty_eq]
 
 lemma card_mono {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) : card x ≤ card y := by
-  simp [subset_def] at h
   have h1 := Finset.card_le_card h.1
   have h2 := Finset.card_le_card h.2.1
   have h3 := Finset.card_le_card h.2.2.1
   have h4 := Finset.card_le_card h.2.2.2
-  simp [card]
+  simp only [card]
   omega
 
 lemma eq_of_subset_card {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) (hcard : card x = card y) : x = y := by
-  simp [card] at hcard
-  have h1 := Finset.card_le_card h.1
-  have h2 := Finset.card_le_card h.2.1
-  have h3 := Finset.card_le_card h.2.2.1
-  have h4 := Finset.card_le_card h.2.2.2
-  have h1 : x.1.toFinset = y.1.toFinset := by
-    apply Finset.eq_of_subset_of_card_le h.1
-    omega
-  have h2 : x.qHu.toFinset = y.qHu.toFinset := by
-    apply Finset.eq_of_subset_of_card_le h.2.1
-    omega
-  have h3 : x.Q5 = y.Q5 := by
-    apply Finset.eq_of_subset_of_card_le h.2.2.1
-    omega
-  have h4 : x.Q10 = y.Q10 := by
-    apply Finset.eq_of_subset_of_card_le h.2.2.2
-    omega
-  match x, y with
-  | ⟨x1, x2, x3, x4⟩, ⟨y1, y2, y3, y4⟩ =>
-  rw [← Option.toFinset_inj] at h1 h2
-  simp_all
+  simp only [card] at hcard
+  have c1 := Finset.card_le_card h.1
+  have c2 := Finset.card_le_card h.2.1
+  have c3 := Finset.card_le_card h.2.2.1
+  have c4 := Finset.card_le_card h.2.2.2
+  refine eq_of_parts (Option.toFinset_inj.mpr ?_) (Option.toFinset_inj.mpr ?_) ?_ ?_
+  · exact Finset.eq_of_subset_of_card_le h.1 (by omega)
+  · exact Finset.eq_of_subset_of_card_le h.2.1 (by omega)
+  · exact Finset.eq_of_subset_of_card_le h.2.2.1 (by omega)
+  · exact Finset.eq_of_subset_of_card_le h.2.2.2 (by omega)
 
 /-!
 
@@ -320,16 +286,8 @@ def _root_.Option.powerset (x : Option 𝓩) : Finset (Option 𝓩) :=
 
 @[simp]
 lemma _root_.Option.mem_powerset_iff {x : Option 𝓩} (y : Option 𝓩) :
-    y ∈ x.powerset ↔ y.toFinset ⊆ x.toFinset :=
-  match x, y with
-  | none, none => by
-    simp [Option.powerset]
-  | none, some _ => by
-    simp [Option.powerset]
-  | some _, none => by
-    simp [Option.powerset]
-  | some _, some _ => by
-    simp [Option.powerset]
+    y ∈ x.powerset ↔ y.toFinset ⊆ x.toFinset := by
+  cases x <;> cases y <;> simp [Option.powerset]
 
 /-- The powerset of a charge . Given a charge `x : Charges`
   it's powerset is the finite set of all `Charges` which are subsets of `x`. -/
@@ -348,9 +306,7 @@ lemma mem_powerset_iff {x y : ChargeSpectrum 𝓩} :
 @[simp]
 lemma mem_powerset_iff_subset {x y : ChargeSpectrum 𝓩} :
     x ∈ powerset y ↔ x ⊆ y := by
-  cases x
-  cases y
-  simp [mem_powerset_iff, Subset]
+  simp [mem_powerset_iff, subset_def]
 
 lemma self_mem_powerset (x : ChargeSpectrum 𝓩) :
     x ∈ powerset x := by simp
@@ -368,78 +324,23 @@ lemma powerset_mono {x y : ChargeSpectrum 𝓩} :
     powerset x ⊆ powerset y ↔ x ⊆ y := by
   constructor
   · intro h
-    rw [← mem_powerset_iff_subset]
-    apply h
-    simp
-  · intro h z
-    simp only [mem_powerset_iff_subset]
-    intro h1
-    exact subset_trans h1 h
+    exact mem_powerset_iff_subset.mp (h (self_mem_powerset x))
+  · intro h z hz
+    exact mem_powerset_iff_subset.mpr (subset_trans (mem_powerset_iff_subset.mp hz) h)
 
 lemma min_exists_inductive (S : Finset (ChargeSpectrum 𝓩)) (hS : S ≠ ∅) :
     (n : ℕ) → (hn : S.card = n) →
-    ∃ y ∈ S, powerset y ∩ S = {y}
-  | 0, h => by simp_all
-  | 1, h => by
-    rw [Finset.card_eq_one] at h
-    obtain ⟨y, rfl⟩ := h
-    use y
-    simp
-  | n + 1 + 1, h => by
-    rw [← Finset.nonempty_iff_ne_empty] at hS
-    obtain ⟨y, hy⟩ := hS
-    have hSremo : (S.erase y).card = n + 1 := by
-      rw [Finset.card_erase_eq_ite]
-      simp_all
-    have hSeraseNeEmpty : (S.erase y) ≠ ∅ := by
-        simp only [ne_eq]
-        rw [← Finset.card_eq_zero]
-        omega
-    obtain ⟨x, hx1, hx2⟩ := min_exists_inductive (S.erase y) hSeraseNeEmpty (n + 1) hSremo
-    have hxy : x ≠ y := by
-      by_contra hn
-      subst hn
-      simp at hx1
-    by_cases hyPx : y ∈ powerset x
-    · use y
-      constructor
-      · exact hy
-      · ext z
-        constructor
-        · intro hz
-          simp at hz
-          simp only [Finset.mem_singleton]
-          rw [Finset.inter_erase] at hx2
-          by_cases hn : z = y
-          · exact hn
-          apply False.elim
-          have hlz : z ∈ (x.powerset ∩ S).erase y := by
-            simp [hn, hz.2]
-            simp at hyPx
-            exact subset_trans hz.1 hyPx
-          rw [hx2] at hlz
-          simp at hlz
-          simp_all
-          have hx : y = x := by
-            apply subset_antisymm
-            · exact hyPx
-            · exact hz
-          exact hxy (id (Eq.symm hx))
-        · intro hz
-          simp at hz
-          subst hz
-          simp_all
-    · use x
-      constructor
-      · apply Finset.erase_subset y S
-        exact hx1
-      · rw [← hx2]
-        ext z
-        simp only [Finset.mem_inter, mem_powerset_iff_subset, Finset.mem_erase, ne_eq,
-          and_congr_right_iff, iff_and_self]
-        intro hzx hzS hzy
-        subst hzy
-        simp_all
+    ∃ y ∈ S, powerset y ∩ S = {y} := by
+  intro _ _
+  obtain ⟨y, hyS, hy⟩ := S.exists_min_image card (Finset.nonempty_iff_ne_empty.mpr hS)
+  refine ⟨y, hyS, ?_⟩
+  ext z
+  simp only [Finset.mem_inter, mem_powerset_iff_subset, Finset.mem_singleton]
+  constructor
+  · rintro ⟨hzy, hzS⟩
+    exact eq_of_subset_card hzy (le_antisymm (card_mono hzy) (hy z hzS))
+  · rintro rfl
+    exact ⟨subset_refl z, hyS⟩
 
 lemma min_exists (S : Finset (ChargeSpectrum 𝓩)) (hS : S ≠ ∅) :
     ∃ y ∈ S, powerset y ∩ S = {y} := min_exists_inductive S hS S.card rfl
@@ -466,24 +367,16 @@ def ofFinset (S5 S10 : Finset 𝓩) : Finset (ChargeSpectrum 𝓩) :=
 lemma mem_ofFinset_iff {S5 S10 : Finset 𝓩} {x : ChargeSpectrum 𝓩} :
     x ∈ ofFinset S5 S10 ↔ x.qHd.toFinset ⊆ S5 ∧ x.qHu.toFinset ⊆ S5 ∧
       x.Q5 ⊆ S5 ∧ x.Q10 ⊆ S10 := by
-  simp only [ofFinset, Finset.singleton_union, Finset.product_eq_sprod, Finset.mem_map,
-    Finset.mem_product, Finset.mem_insert, Finset.mem_map, Function.Embedding.coeFn_mk,
-    Finset.mem_powerset, Prod.exists]
-  have hoption (x : Option 𝓩) (S : Finset 𝓩) :
-      x ∈ ({none} : Finset (Option 𝓩)) ∪ S.map ⟨Option.some, Option.some_injective 𝓩⟩ ↔
-      x.toFinset ⊆ S := by cases x <;> simp
-  constructor
-  · rintro ⟨qHd', qHu', Q5', Q10', h, rfl⟩
-    simp_all [toProd]
-  · intro h
-    use x.qHd, x.qHu, x.Q5, x.Q10
-    simp_all [toProd]
+  have hoption (a : Option 𝓩) (S : Finset 𝓩) :
+      a ∈ ({none} : Finset (Option 𝓩)) ∪ S.map ⟨Option.some, Option.some_injective 𝓩⟩ ↔
+      a.toFinset ⊆ S := by cases a <;> simp
+  simp only [ofFinset, Finset.mem_map_equiv, Equiv.symm_symm, toProd, Equiv.coe_fn_mk,
+    Finset.product_eq_sprod, Finset.mem_product, hoption, Finset.mem_powerset]
 
 lemma mem_ofFinset_antitone (S5 S10 : Finset 𝓩)
     {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) (hy : y ∈ ofFinset S5 S10) :
     x ∈ ofFinset S5 S10 := by
   rw [mem_ofFinset_iff] at hy ⊢
-  simp [subset_def] at h
   exact ⟨h.1.trans hy.1, h.2.1.trans hy.2.1, h.2.2.1.trans hy.2.2.1, h.2.2.2.trans hy.2.2.2⟩
 
 lemma ofFinset_subset_of_subset {S5 S5' S10 S10' : Finset 𝓩}

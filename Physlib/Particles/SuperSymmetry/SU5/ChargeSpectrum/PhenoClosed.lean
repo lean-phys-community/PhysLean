@@ -137,8 +137,7 @@ lemma isPhenClosedQ10_of_isPhenoConstrainedQ10 {S10 : Finset 𝓩}
       IsPhenoConstrainedQ10 x q10 ∨ y ∈ charges ∨ YukawaGeneratesDangerousAtLevel y 1) :
     IsPhenoClosedQ10 S10 charges := by
   intro q10 hq10 x hx
-  have h' := h q10 hq10 x hx
-  rcases h' with h'| h' | h'
+  rcases h q10 hq10 x hx with h'| h' | h'
   · left
     rw [isPhenoConstrained_insertQ10_iff_isPhenoConstrainedQ10]
     left

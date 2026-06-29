@@ -194,9 +194,7 @@ noncomputable def RotationsAbout : Subgroup (EuclideanGroup n) where
     simp only [ofAdd_neg, map_inv, conj_mul, Subgroup.coe_mul]
   one_mem' := by
     simp; use 1
-    constructor
-    · simp
-    · simp
+    constructor <;> simp
   inv_mem' {a} ha := by
     obtain ⟨ra, hra⟩ := ha
     use ra⁻¹

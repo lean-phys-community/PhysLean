@@ -314,35 +314,21 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
         rw [mul_assoc]
       have h1 : (norm (f y) * norm (Complex.exp (-(↑y ^ 2) / (2 * Q.ξ^2))))
         = norm (f y) * Real.exp (-(y ^ 2) / (2 * Q.ξ^2)) := by
-        simp only [mul_eq_mul_left_iff]
-        left
-        rw [Complex.norm_exp]
-        congr
-        trans (Complex.ofReal (- y ^ 2 / (2 * Q.ξ^2))).re
-        · congr
-          simp
-        · rw [Complex.ofReal_re]
+        rw [Complex.norm_exp, show (-(↑y ^ 2) / (2 * (Q.ξ : ℂ)^2)) =
+          ((-y ^ 2 / (2 * Q.ξ^2) : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re]
       rw [h1]
       by_cases hf : norm (f y) = 0
       · simp [hf]
       rw [mul_le_mul_iff_left₀]
-      · have h1 := Real.sum_le_exp_of_nonneg (x := |c * y|) (abs_nonneg (c * y)) n
-        refine le_trans ?_ h1
-        have h2 : norm (∑ i ∈ range n, (Complex.I * (↑c * ↑y)) ^ i / ↑i !) ≤
-          ∑ i ∈ range n, norm ((Complex.I * (↑c * ↑y)) ^ i / ↑i !) := by
-          exact norm_sum_le _ _
-        refine le_trans h2 ?_
-        apply le_of_eq
-        congr
-        funext i
-        simp only [Complex.norm_div, norm_pow, Complex.norm_mul, Complex.norm_I, Complex.norm_real,
-          Real.norm_eq_abs, one_mul, RCLike.norm_natCast]
-        congr
-        rw [abs_mul]
-      · refine mul_pos ?_ ?_
-        have h1 : 0 ≤ norm (f y) := norm_nonneg (f y)
-        apply lt_of_le_of_ne h1 (fun a => hf (id (Eq.symm a)))
-        exact Real.exp_pos (- y ^ 2 / (2 * Q.ξ^2))
+      · have hnorm : ‖∑ i ∈ range n, (Complex.I * (↑c * ↑y)) ^ i / (i ! : ℂ)‖ ≤
+          Real.exp ‖Complex.I * (↑c * ↑y)‖ := by
+          refine (norm_sum_le_of_le _ fun i _ => le_of_eq ?_).trans
+            (Real.sum_le_exp_of_nonneg (norm_nonneg _) n)
+          rw [norm_div, norm_pow, RCLike.norm_natCast]
+        refine hnorm.trans_eq ?_
+        rw [Complex.norm_mul, Complex.norm_I, one_mul, Complex.norm_mul, Complex.norm_real,
+          Complex.norm_real, Real.norm_eq_abs, Real.norm_eq_abs, abs_mul]
+      · exact mul_pos ((norm_nonneg (f y)).lt_of_ne' hf) (Real.exp_pos _)
     · apply Filter.Eventually.of_forall
       intro y
       exact h1 y
@@ -412,15 +398,14 @@ lemma zero_of_orthogonal_mk (f : ℝ → ℂ) (hf : MemHS f)
     congr
     field_simp
     simp
+  have hInt : MemLp (fun x => f x * Real.exp (- x^2 / (2 * Q.ξ^2))) 1 volume := by
+    rw [hf']
+    exact HilbertSpace.mul_gaussian_mem_Lp_one f hf (1/ (2 * Q.ξ^2)) 0 (by simp)
   have h1 : eLpNorm (fun x => f x * Real.exp (- x^2 / (2 * Q.ξ^2))) 2 volume = 0 := by
     rw [← plancherel_theorem]
     rw [Q.fourierIntegral_zero_of_mem_orthogonal f hf hOrth]
     simp only [eLpNorm_zero]
-    · /- f x * Real.exp (- x^2 / (2 * ξ^2)) is integrable -/
-      rw [hf']
-      rw [← memLp_one_iff_integrable]
-      apply HilbertSpace.mul_gaussian_mem_Lp_one f hf (1/ (2 * Q.ξ^2)) 0
-      simp
+    · exact memLp_one_iff_integrable.mp hInt
     · /- f x * Real.exp (- x^2 / (2 * ξ^2)) is square-integrable -/
       rw [hf']
       refine HilbertSpace.mul_gaussian_mem_Lp_two f hf (1 / (2 * Q.ξ^2)) 0 ?_
@@ -435,12 +420,7 @@ lemma zero_of_orthogonal_mk (f : ℝ → ℂ) (hf : MemHS f)
     exact h1
     exact aeStronglyMeasurable_of_memHS hf
     simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true]
-    · /- f x * Real.exp (- x^2 / (2 * ξ^2)) is strongly measurable -/
-      rw [hf']
-      apply Integrable.aestronglyMeasurable
-      rw [← memLp_one_iff_integrable]
-      apply HilbertSpace.mul_gaussian_mem_Lp_one f hf (1/ (2 * Q.ξ^2)) 0
-      simp
+    · exact hInt.aestronglyMeasurable
     · simp
   rw [h2]
   simp

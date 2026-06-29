@@ -367,17 +367,9 @@ lemma quarticTerm_stabilityCounterExample (H : TwoHiggsDoublet) :
       - 2 * (‖H.Φ1‖ ^ 2 + ‖H.Φ2‖ ^ 2) * ((⟪H.Φ1, H.Φ2⟫_ℂ).re + (⟪H.Φ2, H.Φ1⟫_ℂ).re) := by
         have h1 : 2 * ‖⟪H.Φ1, H.Φ2⟫_ℂ‖ ^ 2
             + (⟪H.Φ1, H.Φ2⟫_ℂ ^ 2 + ⟪H.Φ2, H.Φ1⟫_ℂ ^ 2).re = 4 * (⟪H.Φ1, H.Φ2⟫_ℂ).re ^ 2 := by
-          rw [show ⟪H.Φ2, H.Φ1⟫_ℂ = conj ⟪H.Φ1, H.Φ2⟫_ℂ from Eq.symm (conj_inner_symm H.Φ2 H.Φ1)]
-          generalize ⟪H.Φ1, H.Φ2⟫_ℂ = z
-          have hz : z = z.re + z.im * Complex.I := by exact Eq.symm (Complex.re_add_im z)
-          generalize z.re = x at hz
-          generalize z.im = y at hz
-          subst hz
-          have h0 : ‖↑x + ↑y * Complex.I‖ ^ 2 = x ^ 2 + y ^ 2 := by
-            rw [Complex.norm_add_mul_I, Real.sq_sqrt]
-            positivity
-          rw [h0]
-          simp [Complex.add_re, sq]
+          rw [show ⟪H.Φ2, H.Φ1⟫_ℂ = conj ⟪H.Φ1, H.Φ2⟫_ℂ from Eq.symm (conj_inner_symm H.Φ2 H.Φ1),
+            ← Complex.normSq_eq_norm_sq, Complex.normSq_apply, sq, sq, sq]
+          simp only [Complex.add_re, Complex.mul_re, Complex.conj_re, Complex.conj_im]
           ring
         rw [← h1]
         ring
@@ -486,31 +478,17 @@ lemma stabilityCounterExample_not_potentialIsStable :
   intro c
   /- The angle t and properties thereof. -/
   let t := Real.arctan (2 * Real.sqrt (|c| + 1))⁻¹
-  have t_pos : 0 < t := by
-    simp [t]
-    grind
+  have t_pos : 0 < t := arctan_pos.mpr (by positivity)
   have t_le_pi_div_2 : t ≤ Real.pi / 2 := by
     simpa [t] using le_of_lt <| arctan_lt_pi_div_two ((√(|c| + 1))⁻¹ * 2⁻¹)
-  have t_ne_zero : t ≠ 0 := by
-    simp [t]
-    grind
-  have sin_t_pos : 0 < sin t := by
-    simp [t]
-    grind
-  have cos_t_pos : 0 < cos t := by
-    simp [t]
-    exact cos_arctan_pos ((√(|c| + 1))⁻¹ * 2⁻¹)
+  have t_ne_zero : t ≠ 0 := t_pos.ne'
+  have sin_t_pos : 0 < sin t :=
+    Real.sin_pos_of_pos_of_lt_pi t_pos (by nlinarith [Real.pi_pos])
+  have cos_t_pos : 0 < cos t := cos_arctan_pos (2 * Real.sqrt (|c| + 1))⁻¹
   have t_mul_sin_t_nonneg : 0 ≤ 2 * t * sin t - t ^ 2 := by
-    rw [sub_nonneg]
-    trans 2 * t * (2 / Real.pi * t)
-    · ring_nf
-      rw [mul_assoc]
-      apply le_mul_of_one_le_right
-      · positivity
-      · field_simp
-        exact Real.pi_le_four
-    · have := Real.mul_le_sin (le_of_lt t_pos) t_le_pi_div_2
-      nlinarith
+    have hs := Real.mul_le_sin t_pos.le t_le_pi_div_2
+    rw [div_mul_eq_mul_div, div_le_iff₀ Real.pi_pos] at hs
+    nlinarith [mul_le_mul_of_nonneg_left hs t_pos.le, Real.pi_le_four]
   /- The Two Higgs doublet violating stability.
     The two Higgs doublet is constructed so that for the gram vector
     `v` we have:
@@ -524,8 +502,7 @@ lemma stabilityCounterExample_not_potentialIsStable :
       √(2 * t * sin t - t ^ 2)] }
   have Φ1_norm_sq : ‖H.Φ1‖ ^ 2 = cos t/(4 * t * (sin t)^2) := by
     simp [H, PiLp.norm_sq_eq_of_L2]
-    rw [sq_sqrt]
-    positivity
+    rw [sq_sqrt (by positivity)]
   have Φ2_norm_sq : ‖H.Φ2‖ ^ 2 = cos t/(4 * t * (sin t)^2) := by
     simp [H, norm_smul, mul_pow]
     rw [sq_sqrt (by positivity)]
@@ -533,16 +510,11 @@ lemma stabilityCounterExample_not_potentialIsStable :
     rw [sq_sqrt (by positivity)]
     have h0 : ‖1 - ↑t * Complex.sin ↑t - Complex.I * ↑t * Complex.cos ↑t‖ ^ 2 =
         1 + t ^ 2 - 2 * t * sin t := by
-      rw [← Complex.normSq_eq_norm_sq]
-      trans Complex.normSq (Complex.ofReal (1 - t * sin t) +
-        Complex.ofReal (-t * cos t) * Complex.I)
-      · simp
-        ring_nf
-      rw [Complex.normSq_add_mul_I]
-      trans 1 + t ^2 * (sin t ^2 + cos t ^2) - 2 *(t * sin t)
-      · ring
-      rw [sin_sq_add_cos_sq]
-      ring
+      rw [← Complex.normSq_eq_norm_sq, Complex.normSq_apply]
+      simp only [Complex.sub_re, Complex.sub_im, Complex.mul_re, Complex.mul_im, Complex.I_re,
+        Complex.I_im, Complex.ofReal_re, Complex.ofReal_im, Complex.one_re, Complex.one_im,
+        Complex.sin_ofReal_re, Complex.sin_ofReal_im, Complex.cos_ofReal_re, Complex.cos_ofReal_im]
+      nlinarith [Real.sin_sq_add_cos_sq t]
     rw [h0]
     field_simp
     ring
@@ -569,12 +541,12 @@ lemma stabilityCounterExample_not_potentialIsStable :
     rw [potential, massTerm_stabilityCounterExample, quarticTerm_stabilityCounterExample]
     rw [Φ1_norm_sq, Φ2_norm_sq, Φ1_inner_Φ2_re, Φ1_inner_Φ2_im]
     field
-  have potential_H_tan : potential .stabilityCounterExample H =
-      - 1/(4 * tan t ^ 2) := by
-    rw [potential_H_cos_sin, tan_eq_sin_div_cos]
-    field
   have potential_eq_c : potential .stabilityCounterExample H = - (|c| + 1) := by
-    rw [potential_H_tan, tan_arctan]
+    have htan : sin t / cos t = (2 * √(|c| + 1))⁻¹ := by
+      rw [← tan_eq_sin_div_cos]
+      exact tan_arctan _
+    rw [potential_H_cos_sin, show -cos t ^ 2 / (4 * sin t ^ 2) = -1 / (4 * (sin t / cos t) ^ 2) by
+      field, htan]
     field_simp
     rw [sq_sqrt (by positivity)]
     ring

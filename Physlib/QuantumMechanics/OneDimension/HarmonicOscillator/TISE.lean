@@ -39,30 +39,17 @@ lemma deriv_eigenfunction_zero : deriv (Q.eigenfunction 0) =
   ext x
   have h1 : deriv (fun (x : ℝ) => Complex.exp (- x ^ 2 / (2 * Q.ξ ^ 2))) x =
       - x /Q.ξ^2 * Complex.exp (- x ^ 2 / (2 * Q.ξ ^ 2)) := by
-    trans deriv (Complex.exp ∘ (fun (x : ℝ) => - x ^ 2 / (2 * Q.ξ ^ 2))) x
-    · rfl
-    rw [deriv_comp]
+    rw [show (fun (x : ℝ) => Complex.exp (- x ^ 2 / (2 * Q.ξ ^ 2)))
+          = Complex.exp ∘ (fun (x : ℝ) => - x ^ 2 / (2 * Q.ξ ^ 2)) from rfl,
+      deriv_comp _ (by fun_prop) (by fun_prop)]
     simp only [Complex.deriv_exp, deriv_div_const, deriv.fun_neg']
     have h1' : deriv (fun x => (Complex.ofReal x) ^ 2) x = 2 * x := by
-      trans deriv (fun x => Complex.ofReal x * Complex.ofReal x) x
-      · apply congr
-        apply congrArg
-        funext x
-        ring
-        rfl
-      rw [deriv_fun_mul]
+      simp only [pow_two]
+      rw [deriv_fun_mul Complex.differentiableAt_ofReal Complex.differentiableAt_ofReal]
       simp only [Complex.deriv_ofReal, one_mul, mul_one]
       ring
-      · exact Complex.differentiableAt_ofReal
-      · exact Complex.differentiableAt_ofReal
     rw [h1']
     field_simp
-    ring_nf
-    exact Complex.differentiableAt_exp
-    refine DifferentiableAt.mul_const ?_ _
-    refine differentiableAt_neg_iff.mpr ?_
-    refine DifferentiableAt.pow ?_ 2
-    exact Complex.differentiableAt_ofReal
   simp only [Pi.smul_apply, Pi.mul_apply, smul_eq_mul]
   rw [h1]
   simp only [Real.sqrt_nonneg, Real.sqrt_mul, Complex.ofReal_mul, one_div, mul_inv_rev,
@@ -73,44 +60,19 @@ lemma deriv_eigenfunction_zero' : deriv (Q.eigenfunction 0) =
     (- √2 / (2 * Q.ξ) : ℂ) • Q.eigenfunction 1 := by
   rw [deriv_eigenfunction_zero]
   funext x
-  simp only [Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_one, Complex.ofReal_pow,
-    eigenfunction_eq, pow_zero, factorial_zero, cast_one, mul_one, Real.sqrt_one, ne_eq,
-    one_ne_zero, not_false_eq_true, div_self, Real.sqrt_nonneg, Real.sqrt_mul, Complex.ofReal_mul,
-    one_div, mul_inv_rev, one_mul, Polynomial.aeval, Polynomial.aevalEquiv, Equiv.coe_fn_mk,
-    physHermite_zero, eq_intCast, Int.cast_one, Polynomial.eval₂AlgHom_apply,
-    Algebra.toRingHom_ofId, algebraMap_int_eq, Polynomial.eval₂_one, Complex.ofReal_exp,
-    Complex.ofReal_ofNat, Pi.mul_apply, Pi.smul_apply, smul_eq_mul, pow_one, factorial_one,
-    physHermite_one, Polynomial.eval₂_mul, Polynomial.eval₂_ofNat, Polynomial.eval₂_X]
+  simp [eigenfunction_eq, physHermite_zero, physHermite_one, map_ofNat]
   ring_nf
   simp
 
 lemma deriv_physHermite_characteristic_length (n : ℕ) :
     deriv (fun x => Complex.ofReal (physHermite n (x/Q.ξ))) = fun x =>
     Complex.ofReal (1/Q.ξ) * 2 * n * physHermite (n-1) (x/Q.ξ) := by
-  match n with
-  | 0 =>
-    rw [physHermite_zero]
-    simp only [map_one, Complex.ofReal_one, deriv_const', one_div,
-      Complex.ofReal_inv, CharP.cast_eq_zero, mul_zero, mul_one]
-  | n + 1 =>
-    funext x
-    trans deriv (Complex.ofReal ∘ physHermite (n + 1) ∘
-      fun (x : ℝ) => ((1/Q.ξ) * x)) x
-    · congr
-      funext x
-      simp only [one_div, Function.comp_apply, Complex.ofReal_inj]
-      ring_nf
-    rw [fderiv_comp_deriv _ (by fun_prop) (by fun_prop)]
-    rw [fderiv_comp_deriv _ (by fun_prop) (by fun_prop)]
-    simp only [Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul, Complex.deriv_ofReal,
-      Complex.real_smul, Complex.ofReal_mul, mul_one]
-    rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
-    simp only [deriv_const', zero_mul, deriv_id'', mul_one, zero_add]
-    rw [deriv_physHermite]
-    simp only [Pi.natCast_def, Pi.mul_apply, Pi.ofNat_apply, Complex.ofReal_mul,
-      Complex.ofReal_ofNat, Complex.ofReal_natCast]
-    simp only [cast_add, cast_one, add_tsub_cancel_right]
-    ring_nf
+  funext x
+  have hd : DifferentiableAt ℝ (fun x => physHermite n (x / Q.ξ)) x := by fun_prop
+  rw [(hd.hasDerivAt.ofReal_comp).deriv, deriv_physHermite' x (fun x => x / Q.ξ) (by fun_prop)]
+  simp only [deriv_div_const, deriv_id'']
+  push_cast
+  ring
 
 lemma deriv_eigenfunction_succ (n : ℕ) :
     deriv (Q.eigenfunction (n + 1)) = fun x =>
@@ -151,8 +113,7 @@ lemma deriv_deriv_eigenfunction_zero (x : ℝ) : deriv (deriv (Q.eigenfunction 0
   rw [deriv_eigenfunction_zero]
   simp only [Complex.ofReal_div, Complex.ofReal_neg, Pi.mul_apply, Pi.smul_apply, smul_eq_mul,
     neg_mul]
-  ring_nf
-  simp only [Complex.ofReal_one, Complex.ofReal_pow, one_mul, one_pow, inv_pow]
+  push_cast
   ring
 
 lemma deriv_deriv_eigenfunction_succ (n : ℕ) (x : ℝ) :
@@ -198,39 +159,13 @@ lemma deriv_deriv_eigenfunction (n : ℕ) (x : ℝ) :
       congr 1
       rw [← mul_assoc]
       congr 1
-      trans ((1 / Q.ξ) * 2 * (n + 1) * ((1 / Q.ξ) *
-        2 * n * (physHermite (n - 1) (x/Q.ξ))) +
-        (- (1 / Q.ξ^2)) * (1/Q.ξ) * (4 * (n + 1) * x) *
-        (physHermite n (x/Q.ξ)) +
-        (- (1/Q.ξ^2)) * (1 + (-(1/Q.ξ^2)) * x ^ 2) *
-        (physHermite (n + 1) (x/Q.ξ)))
-      · rw [deriv_physHermite_characteristic_length]
-        simp only [one_div, Complex.ofReal_inv, neg_mul]
-        ring
-      trans ((1/ Q.ξ^2) * 2 * (n + 1) * (2 * n *
-          (physHermite (n - 1) (x/Q.ξ))) +
-          (- 1 / Q.ξ^2) * (1/Q.ξ) * (4 * (n + 1) * x) *
-          (physHermite n (x/Q.ξ)) +
-          (- 1/ Q.ξ^2) * (1 + (- 1 / Q.ξ^2) * x ^ 2) *
-          (physHermite (n + 1) ((1/Q.ξ) * x)))
-      · ring_nf
-      trans (- 1/ Q.ξ^2) * (2 * (n + 1) *
-            (2 * ((1 / Q.ξ) * x) * (physHermite n (x/Q.ξ)) -
-            2 * n * (physHermite (n - 1) (x/Q.ξ)))
-            + (1 + (- 1 / Q.ξ^2) * x ^ 2) * (physHermite (n + 1) (x/Q.ξ)))
-      · ring_nf
-      trans (- 1 / Q.ξ^2) * (2 * (n + 1) * (physHermite (n + 1) (x/Q.ξ))
-            + (1 + (- 1/ Q.ξ^2) * x ^ 2) * (physHermite (n + 1) (x/Q.ξ)))
-      · congr
-        conv_rhs =>
-          rw [physHermite_succ]
-        simp only [nsmul_eq_mul, cast_ofNat, derivative_physHermite, map_sub, map_mul,
-          Polynomial.aeval_X, map_natCast, Complex.ofReal_sub, Complex.ofReal_mul,
-          Complex.ofReal_natCast]
-        rw [show (Polynomial.aeval (x / Q.ξ)) 2 = 2 by
-          simp [Polynomial.aevalEquiv, Polynomial.aeval]]
-        simp only [one_div, Complex.ofReal_ofNat, Complex.ofReal_div]
-        field_simp
+      rw [deriv_physHermite_characteristic_length]
+      have hr : (physHermite (n + 1) (x / Q.ξ) : ℝ) =
+          2 * (x / Q.ξ) * physHermite n (x / Q.ξ) - 2 * n * physHermite (n - 1) (x / Q.ξ) := by
+        rw [physHermite_succ_fun']
+        simp [nsmul_eq_mul]
+      rw [hr]
+      push_cast
       ring
     · rw [Q.eigenfunction_eq_mul_eigenfunction_zero (n + 1)]
       simp only [ofNat_nonneg, pow_nonneg, Real.sqrt_mul, one_div, mul_inv_rev, Complex.ofReal_mul,

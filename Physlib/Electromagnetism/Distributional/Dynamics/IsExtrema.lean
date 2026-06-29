@@ -67,17 +67,13 @@ lemma isExtrema_iff_components {𝓕 : FreeSpace}
     (J : DistLorentzCurrentDensity d) :
     IsExtrema 𝓕 A J ↔ (∀ ε, A.gradLagrangian 𝓕 J ε (Sum.inl 0) = 0)
     ∧ (∀ ε i, A.gradLagrangian 𝓕 J ε (Sum.inr i) = 0) := by
-  apply Iff.intro
-  · intro h
-    rw [isExtrema_iff_gradLagrangian] at h
-    simp [h]
-  · intro h
-    rw [isExtrema_iff_gradLagrangian]
-    ext1 ε
-    funext i
-    match i with
-    | Sum.inl 0 => exact h.1 ε
-    | Sum.inr j => exact h.2 ε j
+  rw [isExtrema_iff_gradLagrangian]
+  refine ⟨fun h => by simp [h], fun h => ?_⟩
+  ext1 ε
+  funext i
+  match i with
+  | Sum.inl 0 => exact h.1 ε
+  | Sum.inr j => exact h.2 ε j
 /-!
 
 ### A.1. IsExtrema and Gauss's law and Ampère's law
@@ -103,51 +99,37 @@ lemma isExtrema_iff_space_time {𝓕 : FreeSpace}
         ((Space.distSpaceDeriv j (A.magneticFieldMatrix 𝓕.c)) ε) (j, i) +
       𝓕.μ₀ * J.currentDensity 𝓕.c ε i = 0) := by
   rw [isExtrema_iff_components]
+  have hsurj : Function.Surjective (SchwartzMap.compCLMOfContinuousLinearEquiv (F := ℝ) ℝ
+      (SpaceTime.toTimeAndSpace 𝓕.c (d := d)).symm) := by
+    intro f
+    refine ⟨SchwartzMap.compCLMOfContinuousLinearEquiv ℝ
+      (SpaceTime.toTimeAndSpace 𝓕.c (d := d)).symm.symm f, ?_⟩
+    ext x
+    simp
+  have hgauss : ∀ a b : ℝ,
+      1 / (𝓕.μ₀ * 𝓕.c.val) * a - 𝓕.c.val * b = 0 ↔ a = 1 / 𝓕.ε₀ * b := by
+    intro a b
+    have c_sq_mul_eq : 𝓕.c.val * b * (𝓕.μ₀ * 𝓕.c.val) = 1 / 𝓕.ε₀ * b := by
+      have hcb : 𝓕.c.val * b * (𝓕.μ₀ * 𝓕.c.val) = 𝓕.μ₀ * 𝓕.c.val ^ 2 * b := by ring
+      rw [hcb, 𝓕.c_sq]
+      field_simp
+    rw [sub_eq_zero, div_mul_eq_mul_div, one_mul,
+      div_eq_iff (mul_ne_zero 𝓕.μ₀_ne_zero 𝓕.c.val_ne_zero), c_sq_mul_eq]
+  have hampere : ∀ T S C : ℝ, 𝓕.μ₀⁻¹ * (1 / 𝓕.c.val ^ 2 * T - S) + C = 0 ↔
+      𝓕.μ₀ * 𝓕.ε₀ * T - S + 𝓕.μ₀ * C = 0 := by
+    intro T S C
+    have mu0_factor_eq : 𝓕.μ₀ * 𝓕.ε₀ * T - S + 𝓕.μ₀ * C
+        = 𝓕.μ₀ * (𝓕.μ₀⁻¹ * (1 / 𝓕.c.val ^ 2 * T - S) + C) := by
+      rw [𝓕.c_sq]
+      field_simp
+    rw [mu0_factor_eq, mul_eq_zero, or_iff_right 𝓕.μ₀_ne_zero]
   refine and_congr ?_ ?_
-  · simp [gradLagrangian_sum_inl_0]
-    field_simp
-    simp [𝓕.c_sq]
-    field_simp
-    simp [sub_eq_zero]
-    apply Iff.intro
-    · intro h ε
-      convert h (SchwartzMap.compCLMOfContinuousLinearEquiv (F := ℝ) ℝ
-        (SpaceTime.toTimeAndSpace 𝓕.c (d := d)) ε) using 1
-      · simp [SpaceTime.distTimeSlice_symm_apply]
-        ring_nf
-        congr
-        ext x
-        simp
-      · simp [SpaceTime.distTimeSlice_symm_apply]
-        congr
-        ext x
-        simp
-    · intro h ε
-      convert! h (SchwartzMap.compCLMOfContinuousLinearEquiv (F := ℝ) ℝ
-        (SpaceTime.toTimeAndSpace 𝓕.c (d := d)).symm ε) using 1
-      · simp [SpaceTime.distTimeSlice_symm_apply]
-        ring_nf
-  · apply Iff.intro
-    · intro h ε i
-      specialize h (SchwartzMap.compCLMOfContinuousLinearEquiv (F := ℝ) ℝ
-        (SpaceTime.toTimeAndSpace 𝓕.c (d := d)) ε) i
-      linear_combination (norm := field_simp) (𝓕.μ₀) * h
-      simp [gradLagrangian_sum_inr_i, SpaceTime.distTimeSlice_symm_apply]
-      have hx : (SchwartzMap.compCLMOfContinuousLinearEquiv ℝ (SpaceTime.toTimeAndSpace 𝓕.c).symm)
-          ((SchwartzMap.compCLMOfContinuousLinearEquiv ℝ (SpaceTime.toTimeAndSpace 𝓕.c)) ε)
-          = ε := by
-        ext i
-        simp
-      simp [hx, 𝓕.c_sq]
-      field_simp
-      ring
-    · intro h ε i
-      specialize h (SchwartzMap.compCLMOfContinuousLinearEquiv (F := ℝ) ℝ
-        (SpaceTime.toTimeAndSpace 𝓕.c (d := d)).symm ε) i
-      linear_combination (norm := field_simp) (𝓕.μ₀⁻¹) * h
-      simp [gradLagrangian_sum_inr_i, SpaceTime.distTimeSlice_symm_apply, 𝓕.c_sq]
-      field_simp
-      ring
+  · simp only [gradLagrangian_sum_inl_0, SpaceTime.distTimeSlice_symm_apply]
+    rw [hsurj.forall]
+    exact forall_congr' fun ε => hgauss _ _
+  · simp only [gradLagrangian_sum_inr_i, SpaceTime.distTimeSlice_symm_apply]
+    rw [hsurj.forall]
+    exact forall_congr' fun ε => forall_congr' fun i => hampere _ _ _
 
 /-!
 

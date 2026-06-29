@@ -73,7 +73,7 @@ def neg : Potential where
 
 @[simp]
 lemma toFun_neg (φ : HiggsField) (x : SpaceTime) : P.neg.toFun φ x = - P.toFun φ x := by
-  simp only [toFun, neg, neg_neg, normSq, neg_mul, neg_add_rev]
+  simp only [toFun, neg]
   ring
 
 @[simp]
@@ -101,7 +101,7 @@ lemma complete_square (h : P.𝓵 ≠ 0) (φ : HiggsField) (x : SpaceTime) :
 /-- The quadratic equation satisfied by the Higgs potential at a spacetime point `x`. -/
 lemma as_quad (φ : HiggsField) (x : SpaceTime) :
     P.𝓵 * ‖φ‖_H^2 x * ‖φ‖_H^2 x + (- P.μ2) * ‖φ‖_H^2 x + (- P.toFun φ x) = 0 := by
-  simp only [normSq, neg_mul, toFun, neg_add_rev, neg_neg]
+  simp only [toFun]
   ring
 
 /-- The Higgs potential is zero iff and only if the higgs field is zero, or the
@@ -111,23 +111,15 @@ lemma toFun_eq_zero_iff (h : P.𝓵 ≠ 0) (φ : HiggsField) (x : SpaceTime) :
   refine Iff.intro (fun hV => ?_) (fun hD => ?_)
   · have h1 := P.as_quad φ x
     rw [hV] at h1
-    have h2 : ‖φ‖_H^2 x * (P.𝓵 * ‖φ‖_H^2 x + - P.μ2) = 0 := by
-      linear_combination h1
-    simp only [normSq, mul_eq_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff,
-      norm_eq_zero] at h2
-    cases' h2 with h2 h2
-    · simp_all
-    · apply Or.inr
-      field_simp at h2 ⊢
-      ring_nf
-      simp only [normSq]
-      linear_combination h2
+    have h2 : ‖φ‖_H^2 x * (P.𝓵 * ‖φ‖_H^2 x + - P.μ2) = 0 := by linear_combination h1
+    rcases mul_eq_zero.mp h2 with h2 | h2
+    · exact Or.inl (by simpa [normSq] using h2)
+    · exact Or.inr (by rw [eq_div_iff h]; linear_combination h2)
   · cases' hD with hD hD
     · simp [toFun, hD]
-    · simp only [toFun, neg_mul]
-      rw [hD]
+    · simp only [toFun, hD]
       field_simp
-      simp
+      ring
 
 /-!
 
@@ -157,9 +149,9 @@ lemma quadDiscrim_eq_zero_iff (h : P.𝓵 ≠ 0) (φ : HiggsField) (x : SpaceTim
   refine Iff.intro (fun hD => ?_) (fun hV => ?_)
   · field_simp
     linear_combination hD
-  · simp only [even_two, Even.neg_pow, hV, mul_neg, sub_neg_eq_add]
+  · rw [hV]
     field_simp
-    simp
+    ring
 
 lemma quadDiscrim_eq_zero_iff_normSq (h : P.𝓵 ≠ 0) (φ : HiggsField) (x : SpaceTime) :
     P.quadDiscrim φ x = 0 ↔ ‖φ‖_H^2 x = P.μ2 / (2 * P.𝓵) := by
@@ -181,12 +173,8 @@ lemma neg_𝓵_quadDiscrim_zero_bound (h : P.𝓵 < 0) (φ : HiggsField) (x : Sp
     P.toFun φ x ≤ - P.μ2 ^ 2 / (4 * P.𝓵) := by
   have h1 := P.quadDiscrim_nonneg (ne_of_lt h) φ x
   simp only [quadDiscrim, discrim, even_two, Even.neg_pow] at h1
-  ring_nf at h1
-  rw [← neg_le_iff_add_nonneg',
-    show P.𝓵 * P.toFun φ x * 4 = (- 4 * P.𝓵) * (- P.toFun φ x) by ring] at h1
-  have h2 := le_neg_of_le_neg <| (div_le_iff₀' (by linarith : 0 < - 4 * P.𝓵)).mpr h1
-  ring_nf at h2 ⊢
-  exact h2
+  rw [le_div_iff_of_neg (show (4:ℝ) * P.𝓵 < 0 by linarith)]
+  nlinarith [h1]
 
 /-- For an element `P` of `Potential`, if `0 < l` then the following lower bound for the potential
   exists
@@ -205,15 +193,10 @@ lemma neg_𝓵_toFun_neg (h : P.𝓵 < 0) (φ : HiggsField) (x : SpaceTime) :
     (0 < P.μ2 ∧ P.toFun φ x ≤ 0) ∨ P.μ2 ≤ 0 := by
   by_cases hμ2 : P.μ2 ≤ 0
   · simp [hμ2]
-  simp only [toFun, normSq, neg_mul, neg_add_le_iff_le_add, add_zero, hμ2, or_false]
-  apply And.intro (lt_of_not_ge hμ2)
-  have h1 : 0 ≤ P.μ2 * ‖φ x‖ ^ 2 := by
-    refine Left.mul_nonneg ?ha ?hb
-    · exact le_of_not_ge hμ2
-    · exact sq_nonneg ‖φ x‖
-  refine le_trans ?_ h1
-  exact mul_nonpos_of_nonpos_of_nonneg (mul_nonpos_of_nonpos_of_nonneg (le_of_lt h)
-    (sq_nonneg ‖φ x‖)) (sq_nonneg ‖φ x‖)
+  refine Or.inl ⟨lt_of_not_ge hμ2, ?_⟩
+  simp only [toFun, normSq, neg_mul]
+  nlinarith [mul_nonneg (sq_nonneg ‖φ x‖) (sq_nonneg ‖φ x‖), sq_nonneg ‖φ x‖,
+    h, lt_of_not_ge hμ2]
 
 /-- If `P.𝓵` is bigger then zero, then if `P.μ2` is less than zero, for all space-time points,
   the potential is positive `0 ≤ P.toFun φ x`. -/
@@ -232,35 +215,21 @@ lemma pos_𝓵_toFun_pos (h : 0 < P.𝓵) (φ : HiggsField) (x : SpaceTime) :
 lemma neg_𝓵_sol_exists_iff (h𝓵 : P.𝓵 < 0) (c : ℝ) : (∃ φ x, P.toFun φ x = c) ↔ (0 < P.μ2 ∧ c ≤ 0) ∨
     (P.μ2 ≤ 0 ∧ c ≤ - P.μ2 ^ 2 / (4 * P.𝓵)) := by
   refine Iff.intro (fun ⟨φ, x, hV⟩ => ?_) (fun h => ?_)
-  · rcases P.neg_𝓵_toFun_neg h𝓵 φ x with hr | hr
-    · rw [← hV]
-      exact Or.inl hr
-    · rw [← hV]
-      exact Or.inr (And.intro hr (P.neg_𝓵_quadDiscrim_zero_bound h𝓵 φ x))
+  · rw [← hV]
+    rcases P.neg_𝓵_toFun_neg h𝓵 φ x with hr | hr
+    · exact Or.inl hr
+    · exact Or.inr ⟨hr, P.neg_𝓵_quadDiscrim_zero_bound h𝓵 φ x⟩
   · simp only [toFun, neg_mul]
     simp only [← sub_eq_zero, sub_zero]
-    ring_nf
     let a := (P.μ2 - Real.sqrt (discrim P.𝓵 (- P.μ2) (- c))) / (2 * P.𝓵)
     have ha : 0 ≤ a := by
       simp only [discrim, even_two, Even.neg_pow, mul_neg, sub_neg_eq_add, a]
       rw [div_nonneg_iff]
-      refine Or.inr (And.intro ?_ ?_)
-      · rw [sub_nonpos]
-        by_cases hμ : P.μ2 < 0
-        · have h1 : 0 ≤ √(P.μ2 ^ 2 + 4 * P.𝓵 * c) := Real.sqrt_nonneg (P.μ2 ^ 2 + 4 * P.𝓵 * c)
-          linarith
-        · refine Real.le_sqrt_of_sq_le ?_
-          rw [le_add_iff_nonneg_right]
-          refine mul_nonneg_of_nonpos_of_nonpos ?_ ?_
-          · refine mul_nonpos_of_nonneg_of_nonpos ?_ ?_
-            · linarith
-            · linarith
-          · rcases h with h | h
-            · linarith
-            · have h1 : P.μ2 = 0 := by linarith
-              rw [h1] at h
-              simpa using h.2
-      · linarith
+      refine Or.inr ⟨?_, by linarith⟩
+      rw [sub_nonpos]
+      rcases h with h | h
+      · exact Real.le_sqrt_of_sq_le (by nlinarith [h.2])
+      · exact h.1.trans (Real.sqrt_nonneg _)
     use (const (HiggsVec.ofReal a))
     use 0
     simp [HiggsVec.ofReal_normSq ha]
@@ -269,16 +238,11 @@ lemma neg_𝓵_sol_exists_iff (h𝓵 : P.𝓵 < 0) (c : ℝ) : (∃ φ x, P.toFu
     have hd : 0 ≤ (discrim P.𝓵 (- P.μ2) (-c)) := by
       simp only [discrim, even_two, Even.neg_pow, mul_neg, sub_neg_eq_add]
       rcases h with h | h
-      · refine Left.add_nonneg (sq_nonneg P.μ2) ?_
-        refine mul_nonneg_of_nonpos_of_nonpos ?_ h.2
-        linarith
-      · rw [← @neg_le_iff_add_nonneg']
-        rw [← le_div_iff_of_neg']
+      · nlinarith [sq_nonneg P.μ2, h.2]
+      · rw [← @neg_le_iff_add_nonneg', ← le_div_iff_of_neg']
         · exact h.2
         · linarith
-    have hdd : discrim P.𝓵 (- P.μ2) (-c) = Real.sqrt (discrim P.𝓵 (- P.μ2) (-c))
-        * Real.sqrt (discrim P.𝓵 (- P.μ2) (-c)) := by
-      exact (Real.mul_self_sqrt hd).symm
+    have hdd := (Real.mul_self_sqrt hd).symm
     rw [mul_assoc]
     refine (quadratic_eq_zero_iff (ne_of_gt h𝓵).symm hdd _).mpr ?_
     simp only [neg_neg, or_true, a]
@@ -319,45 +283,21 @@ lemma isBounded_𝓵_nonneg (h : P.IsBounded) : 0 ≤ P.𝓵 := by
   by_contra hl
   rw [not_le] at hl
   obtain ⟨c, hc⟩ := h
+  have c_le_of_attainable : ∀ v : ℝ, ((0 < P.μ2 ∧ v ≤ 0) ∨
+      (P.μ2 ≤ 0 ∧ v ≤ - P.μ2 ^ 2 / (4 * P.𝓵))) → c ≤ v := by
+    intro v hv
+    obtain ⟨φ, x, rfl⟩ := (P.neg_𝓵_sol_exists_iff hl v).mpr hv
+    exact hc φ x
   by_cases hμ : P.μ2 ≤ 0
   · by_cases hcz : c ≤ - P.μ2 ^ 2 / (4 * P.𝓵)
-    · have hcm1 : ∃ φ x, P.toFun φ x = c - 1 := by
-        rw [P.neg_𝓵_sol_exists_iff hl (c - 1)]
-        apply Or.inr
-        simp_all only [tsub_le_iff_right, true_and]
-        linarith
-      obtain ⟨φ, x, hφ⟩ := hcm1
-      have hc2 := hc φ x
-      rw [hφ] at hc2
-      linarith
+    · linarith [c_le_of_attainable (c - 1) (Or.inr ⟨hμ, by linarith⟩)]
     · rw [not_le] at hcz
-      have hcm1 : ∃ φ x, P.toFun φ x = - P.μ2 ^ 2 / (4 * P.𝓵) - 1 := by
-        rw [P.neg_𝓵_sol_exists_iff hl _]
-        apply Or.inr
-        simp_all
-      obtain ⟨φ, x, hφ⟩ := hcm1
-      have hc2 := hc φ x
-      rw [hφ] at hc2
-      linarith
+      linarith [c_le_of_attainable (- P.μ2 ^ 2 / (4 * P.𝓵) - 1) (Or.inr ⟨hμ, by linarith⟩)]
   · rw [not_le] at hμ
     by_cases hcz : c ≤ 0
-    · have hcm1 : ∃ φ x, P.toFun φ x = c - 1 := by
-        rw [P.neg_𝓵_sol_exists_iff hl (c - 1)]
-        apply Or.inl
-        simp_all only [tsub_le_iff_right, zero_add, true_and]
-        linarith
-      obtain ⟨φ, x, hφ⟩ := hcm1
-      have hc2 := hc φ x
-      rw [hφ] at hc2
-      linarith
-    · have hcm1 : ∃ φ x, P.toFun φ x = 0 := by
-        rw [P.neg_𝓵_sol_exists_iff hl 0]
-        apply Or.inl
-        simp_all
-      obtain ⟨φ, x, hφ⟩ := hcm1
-      have hc2 := hc φ x
-      rw [hφ] at hc2
-      linarith
+    · linarith [c_le_of_attainable (c - 1) (Or.inl ⟨hμ, by linarith⟩)]
+    · rw [not_le] at hcz
+      linarith [c_le_of_attainable 0 (Or.inl ⟨hμ, by linarith⟩)]
 
 /-- Given a element `P` of `Potential` with `0 < 𝓵`, then the potential is bounded. -/
 lemma isBounded_of_𝓵_pos (h : 0 < P.𝓵) : P.IsBounded := by
@@ -387,37 +327,27 @@ lemma eq_zero_iff_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤
   rw [P.toFun_eq_zero_iff (ne_of_lt h𝓵).symm]
   simp only [or_iff_left_iff_imp]
   intro h
-  have h1 := div_nonpos_of_nonpos_of_nonneg hμ2 (le_of_lt h𝓵)
-  rw [← h] at h1
-  have hx := normSq_nonneg φ x
-  have hx' : ‖φ‖_H^2 x = 0 := by linarith
+  have hx' : ‖φ‖_H^2 x = 0 :=
+    le_antisymm (h.trans_le (div_nonpos_of_nonpos_of_nonneg hμ2 h𝓵.le)) (normSq_nonneg φ x)
   simpa using hx'
 
 lemma isMinOn_iff_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤ 0) (φ : HiggsField)
     (x : SpaceTime) : IsMinOn (fun (φ, x) => P.toFun φ x) Set.univ (φ, x)
     ↔ P.toFun φ x = 0 := by
   have h1 := P.pos_𝓵_sol_exists_iff h𝓵
+  have attainable_nonneg : ∀ v : ℝ, ((P.μ2 < 0 ∧ 0 ≤ v) ∨
+      (0 ≤ P.μ2 ∧ - P.μ2 ^ 2 / (4 * P.𝓵) ≤ v)) → 0 ≤ v := by
+    rintro v (⟨_, hv⟩ | ⟨h0, hv⟩)
+    · exact hv
+    · simpa [le_antisymm hμ2 h0] using hv
   rw [isMinOn_univ_iff]
   simp only [Prod.forall]
   refine Iff.intro (fun h => ?_) (fun h => ?_)
-  · have h1' : P.toFun φ x ≤ 0 := by
-      simpa using h 0 0
-    have h1'' : 0 ≤ P.toFun φ x := by
-      have hx := (h1 (P.toFun φ x)).mp ⟨φ, x, rfl⟩
-      rcases hx with hx | hx
-      · exact hx.2
-      · have hμ2' : P.μ2 = 0 := by
-          linarith
-        simpa [hμ2'] using hx.2
+  · have h1' : P.toFun φ x ≤ 0 := by simpa using h 0 0
+    have h1'' := attainable_nonneg _ ((h1 (P.toFun φ x)).mp ⟨φ, x, rfl⟩)
     linarith
   · rw [h]
-    intro φ' x'
-    have h1' := (h1 (P.toFun φ' x')).mp ⟨φ', x', rfl⟩
-    rcases h1' with h1' | h1'
-    · exact h1'.2
-    · have hμ2' : P.μ2 = 0 := by
-        linarith
-      simpa [hμ2'] using h1'.2
+    exact fun φ' x' => attainable_nonneg _ ((h1 (P.toFun φ' x')).mp ⟨φ', x', rfl⟩)
 
 lemma isMinOn_iff_field_of_μSq_nonpos_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : P.μ2 ≤ 0) (φ : HiggsField)
     (x : SpaceTime) : IsMinOn (fun (φ, x) => P.toFun φ x) Set.univ (φ, x)

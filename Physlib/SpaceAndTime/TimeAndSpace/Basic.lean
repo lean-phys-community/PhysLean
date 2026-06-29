@@ -157,35 +157,21 @@ lemma fderiv_time_commute_fderiv_space {M} [NormedAddCommGroup M] [NormedSpace �
   trans fderiv ℝ (fun t' => (fderiv ℝ (↿f) (t', x) (0, dx))) t dt
   · congr
     funext t'
-    apply fderiv_space_eq_fderiv_curry
-    exact hf.differentiable (by simp)
+    exact fderiv_space_eq_fderiv_curry f t' x dx (hf.differentiable (by simp))
   trans fderiv ℝ (fun x => (fderiv ℝ (↿f) x (0, dx))) (t, x) (dt, 0)
-  · let f' : Time → Space d → M := fun t x => fderiv ℝ (↿f) (t, x) (0, dx)
-    change (fderiv ℝ (fun t' => f' t' x) t) dt = _
-    rw [fderiv_time_eq_fderiv_curry]
-    rfl
-    fun_prop
+  · exact fderiv_time_eq_fderiv_curry (fun t x => fderiv ℝ ↿f (t, x) (0, dx)) t dt x (by fun_prop)
   symm
   trans fderiv ℝ (fun x' => (fderiv ℝ (↿f) (t, x') (dt, 0))) x dx
   · congr
     funext x'
-    apply fderiv_time_eq_fderiv_curry
-    exact hf.differentiable (by simp)
+    exact fderiv_time_eq_fderiv_curry f t dt x' (hf.differentiable (by simp))
   trans fderiv ℝ (fun t => (fderiv ℝ (↿f) t (dt, 0))) (t, x) (0, dx)
-  · let f'' : Time → Space d → M := fun t x => fderiv ℝ (↿f) (t, x) (dt, 0)
-    change (fderiv ℝ (fun x' => f'' t x') x) dx = _
-    rw [fderiv_space_eq_fderiv_curry]
-    rfl
-    fun_prop
+  · exact fderiv_space_eq_fderiv_curry (fun t x => fderiv ℝ ↿f (t, x) (dt, 0)) t x dx (by fun_prop)
   rw [fderiv_clm_apply, fderiv_clm_apply]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
-    ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt
-    apply ContDiff.contDiffAt
-    exact hf
-    simp
-  repeat' fun_prop
+  · simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
+      ContinuousLinearMap.flip_apply]
+    exact (hf.contDiffAt.isSymmSndFDerivAt (by simp)).eq (0, dx) (dt, 0)
+  all_goals fun_prop
 
 lemma time_deriv_comm_space_deriv {d i} {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {f : Time → Space d → M} (hf : ContDiff ℝ 2 ↿f) (t : Time) (x : Space d) :
@@ -270,23 +256,17 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
   · fin_cases i
     all_goals
     simp [curl]
-    rw [Time.deriv_eq]
-    rw [fderiv_fun_sub]
+    rw [Time.deriv_eq, fderiv_fun_sub]
     simp [← Time.deriv_eq]
     rw [time_deriv_comm_space_deriv, time_deriv_comm_space_deriv]
-    congr
-    · funext x'
-      rw [Time.deriv_euclid]
-      have h1 := hf.differentiable (by simp)
-      fun_prop
-    · funext x'
-      rw [Time.deriv_euclid]
-      have h1 := hf.differentiable (by simp)
-      fun_prop
+    congr <;>
+      (funext x'
+       rw [Time.deriv_euclid]
+       have h1 := hf.differentiable (by simp)
+       fun_prop)
     repeat' fun_prop
-    · apply Differentiable.differentiableAt
-      fun_prop
-    · apply Differentiable.differentiableAt
+    all_goals
+      apply Differentiable.differentiableAt
       fun_prop
   · fun_prop
 
@@ -314,10 +294,7 @@ lemma space_fun_of_time_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [NormedSpac
     congr
     ext
     simp
-  simp only [smul_eq_zero]
-  right
-  rw [← h t x]
-  rfl
+  rw [← Time.deriv_eq, h t x, smul_zero]
 
 lemma time_fun_of_space_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {f : Time → Space d → M} (hf : Differentiable ℝ ↿f)
@@ -330,16 +307,12 @@ lemma time_fun_of_space_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [NormedSpac
   apply is_const_of_fderiv_eq_zero (f := fun x' => f t x') (𝕜 := ℝ)
   · fun_prop
   intro x
-  have h1 : (fderiv ℝ (fun x' => f t x') x).toLinearMap = 0 := by
-    apply (Space.basis (d := d)).toBasis.ext
-    intro i
-    simp only [OrthonormalBasis.coe_toBasis, ContinuousLinearMap.coe_coe, LinearMap.zero_apply]
-    rw [← h t x i]
-    rw [Space.deriv_eq_fderiv_basis]
-  ext r
-  change (fderiv ℝ (fun x' => f t x') x).toLinearMap r = 0
-  rw [h1]
-  simp
+  apply ContinuousLinearMap.coe_injective
+  apply (Space.basis (d := d)).toBasis.ext
+  intro i
+  simp only [ContinuousLinearMap.toLinearMap_zero, OrthonormalBasis.coe_toBasis,
+    ContinuousLinearMap.coe_coe, LinearMap.zero_apply]
+  rw [← h t x i, Space.deriv_eq_fderiv_basis]
 
 lemma const_of_time_deriv_space_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {f : Time → Space d → M} (hf : Differentiable ℝ ↿f)
@@ -350,12 +323,8 @@ lemma const_of_time_deriv_space_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [No
   obtain ⟨k, hk⟩ := time_fun_of_space_deriv_eq_zero hf h₂
   use g 0
   intro t x
-  have h1 : ∀ t x, g x = k t := by
-    intro t x
-    rw [← hg t x]
-    rw [hk t x]
-  rw [hk]
-  rw [← h1 t 0]
+  have h1 : ∀ t x, g x = k t := fun t x => by rw [← hg t x, hk t x]
+  rw [hk, ← h1 t 0]
 
 /-!
 
@@ -377,17 +346,13 @@ lemma equal_up_to_const_of_deriv_eq {d} {M} [NormedAddCommGroup M] [NormedSpace 
   apply const_of_time_deriv_space_deriv_eq_zero
   · exact Differentiable.fun_sub hf hg
   · intro t x
-    rw [Time.deriv_eq]
-    rw [fderiv_fun_sub]
+    rw [Time.deriv_eq, fderiv_fun_sub]
     simp [← Time.deriv_eq, h₁]
-    · fun_prop
-    · fun_prop
+    all_goals fun_prop
   · intro t x i
-    rw [Space.deriv_eq_fderiv_basis]
-    rw [fderiv_fun_sub]
+    rw [Space.deriv_eq_fderiv_basis, fderiv_fun_sub]
     simp [← Space.deriv_eq_fderiv_basis, h₂]
-    · fun_prop
-    · fun_prop
+    all_goals fun_prop
 /-!
 
 ## B. Derivatives of distributions on Time × Space d
@@ -506,21 +471,12 @@ lemma distSpaceDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   ext x
   change fderiv ℝ (fun x => fderiv ℝ κ x (0, basis i)) x (0, basis j) =
     fderiv ℝ (fun x => fderiv ℝ κ x (0, basis j)) x (0, basis i)
+  have h1 := smooth κ 2
   rw [fderiv_clm_apply, fderiv_clm_apply]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
-    ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt
-    apply ContDiff.contDiffAt
-    exact smooth κ ⊤
-    simp only [minSmoothness_of_isRCLikeNormedField]
-    exact ENat.LEInfty.out
-  · have h1 := smooth κ 2
-    fun_prop
-  · fun_prop
-  · have h1 := smooth κ 2
-    fun_prop
-  · fun_prop
+  · simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
+      ContinuousLinearMap.flip_apply]
+    exact (h1.contDiffAt.isSymmSndFDerivAt (by simp)).eq (0, basis j) (0, basis i)
+  all_goals fun_prop
 
 /-!
 
@@ -552,21 +508,12 @@ lemma distTimeDeriv_commute_distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedS
   ext x
   change fderiv ℝ (fun x => fderiv ℝ κ x (1, 0)) x (0, basis i) =
     fderiv ℝ (fun x => fderiv ℝ κ x (0, basis i)) x (1, 0)
+  have h1 := smooth κ 2
   rw [fderiv_clm_apply, fderiv_clm_apply]
-  simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
-    ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt
-    apply ContDiff.contDiffAt
-    exact smooth κ ⊤
-    simp only [minSmoothness_of_isRCLikeNormedField]
-    exact ENat.LEInfty.out
-  · have h1 := smooth κ 2
-    fun_prop
-  · fun_prop
-  · have h1 := smooth κ 2
-    fun_prop
-  · fun_prop
+  · simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
+      ContinuousLinearMap.flip_apply]
+    exact (h1.contDiffAt.isSymmSndFDerivAt (by simp)).eq (0, basis i) (1, 0)
+  all_goals fun_prop
 
 /-!
 

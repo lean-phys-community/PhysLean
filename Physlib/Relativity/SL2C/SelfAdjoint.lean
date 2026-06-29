@@ -121,16 +121,9 @@ lemma toSelfAdjointMap_det_one' {M : ℂ²ˣ²} (hM : M.IsUpperTriangular) (detM
   have he : M = !![x, _; 0, y] := Matrix.ext fun | 0, 0 | 0, 1 | 1, 1 => rfl | 1, 0 => hM10
   have he' : Mᴴ = !![conj x, 0; _, conj y] :=
     Matrix.ext fun | 0, 0 | 1, 0 | 1, 1 => rfl | 0, 1 => by simp [hM10]
-  have detA_one : normSq x * normSq y = 1 := congrArg Complex.re <|
-    calc ↑(normSq x * normSq y)
-      _ = x * conj x * (y * conj y) := by simp [Complex.mul_conj]
-      _ = x * y * (conj y * conj x) := by ring
-      _ = x * y * conj (x * y) := congrArg _ (StarMul.star_mul ..).symm
-      _ = 1 := suffices x * y = 1 by simp [this]
-        calc x * y
-          _ = !![x, _; 0, y].det := by simp
-          _ = M.det := congrArg _ he.symm
-          _ = 1 := detM
+  have hxy : x * y = 1 := by rw [show x * y = M.det by rw [he]; simp, detM]
+  have detA_one : normSq x * normSq y = 1 := by
+    rw [← Complex.normSq_mul, hxy, Complex.normSq_one]
   have detD_one : D.det = 1 :=
     let z := x * conj y
     have k₀ : (M * E₂ * Mᴴ) 0 1 = z := by rw [he', he]; simp [E₂, z]

@@ -490,8 +490,7 @@ lemma mem_numericalRange {T : H →ₗ.[ℂ] H} {x : T.domain} (hx : x ≠ 0) :
     (‖x‖ ^ 2)⁻¹ * ⟪↑x, T x⟫_ℂ ∈ Θ T := by
   refine ⟨ofReal ‖x‖⁻¹ • x, ?_, ?_⟩
   · simp [norm_smul, inv_mul_cancel₀, hx]
-  · simp_rw [map_smul]
-    simp [inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
+  · simp [map_smul, inner_smul_left, inner_smul_right, ← mul_assoc, pow_two]
 
 lemma numericalRange_nonempty {T : H →ₗ.[ℂ] H} (hT : T.domain ≠ ⊥) : (Θ T).Nonempty := by
   obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot hT
@@ -534,9 +533,7 @@ lemma compl_closure_numericalRange_subset_regularityDomain (T : H →ₗ.[ℂ] H
       rcases eq_or_ne x 0 with rfl | hx
       · simp
       · let y : T.domain := ofReal ‖x‖⁻¹ • x
-        have hy : ‖y‖ = 1 := by
-          simp only [y, norm_smul, ofReal_inv, norm_inv, norm_real, norm_norm]
-          exact inv_mul_cancel₀ (norm_ne_zero_iff.mpr hx)
+        have hy : ‖y‖ = 1 := by simp [y, norm_smul, inv_mul_cancel₀, hx]
         have hy' : ‖x‖ ^ 2 * ⟪↑y, T y⟫_ℂ = ⟪↑x, T x⟫_ℂ := by
           simp_rw [y, map_smul, SetLike.val_smul, inner_smul_left, inner_smul_right, conj_ofReal,
             ← mul_assoc, pow_two, ← ofReal_mul]
@@ -559,15 +556,13 @@ lemma compl_closure_numericalRange_subset_regularityDomain (T : H →ₗ.[ℂ] H
 private lemma exists_phase_add_im_eq_zero (z₁ z₂ : ℂ) :
     ∃ θ : ℝ, (exp (I * θ) * z₁ + exp (-I * θ) * z₂).im = 0 := by
   let g : ℝ → ℝ := fun θ ↦ (exp (I * θ) * z₁ + exp (-I * θ) * z₂).im
-  suffices ∃ θ ∈ Icc 0 Real.pi, g θ = 0 by exact ⟨this.choose, this.choose_spec.2⟩
   have hg : g Real.pi = -g 0 := by simp [g, mul_comm I, exp_neg, add_comm]
-  have hg' : Continuous g := by fun_prop
-  rcases le_or_gt (g 0) 0 with hle | hlt
-  · have hIVT := hg ▸ intermediate_value_Icc Real.pi_nonneg hg'.continuousOn
-    exact (mem_image _ _ _).mp (hIVT ⟨by linarith, by linarith⟩)
-  · simp_rw [← neg_eq_zero (a := g _)]
-    have hIVT := neg_neg (g 0) ▸ hg ▸ intermediate_value_Icc Real.pi_nonneg hg'.neg.continuousOn
-    exact (mem_image _ _ _).mp (hIVT ⟨by linarith, by linarith⟩)
+  have hmem : (0 : ℝ) ∈ Set.uIcc (g 0) (g Real.pi) := by
+    rw [hg]
+    rcases le_total (g 0) 0 with h | h
+    exacts [Set.mem_uIcc.mpr (.inl ⟨h, by linarith⟩), Set.mem_uIcc.mpr (.inr ⟨by linarith, h⟩)]
+  obtain ⟨θ, -, hθ⟩ := intermediate_value_uIcc (by fun_prop : Continuous g).continuousOn hmem
+  exact ⟨θ, hθ⟩
 
 /-- The Toeplitz-Hausdorff theorem. -/
 theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ (Θ T) := by
@@ -588,9 +583,7 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ (Θ T) := by
     suffices ofReal '' unitInterval ⊆ Θ S by
       have hba : a = 1 - b := by linarith
       rw [numericalRange_smul, numericalRange_sub_const] at this
-      obtain ⟨c, hc, hca⟩ := (image_subset_iff.mp this) ⟨hb, by linarith⟩
-      obtain ⟨d, hd, hdc⟩ := hc
-      obtain ⟨x, hx, hxd⟩ := hd
+      obtain ⟨c, ⟨d, ⟨x, hx, hxd⟩, hdc⟩, hca⟩ := (image_subset_iff.mp this) ⟨hb, by linarith⟩
       simp only [mem_singleton_iff, exists_eq_left] at hca hdc hxd
       simp only [real_smul, smul_eq_mul] at *
       use x, hx
@@ -640,8 +633,7 @@ theorem numericalRange_convex (T : H →ₗ.[ℂ] H) : Convex ℝ (Θ T) := by
       simp_rw [g, ofReal_div, mul_div_cancel₀ _ hf_sq, add_comm (r ^ 2)]
       simp only [f, map_add, map_smul, coe_add, inner_add_left, inner_add_right,
         SetLike.val_smul, inner_smul_left, inner_smul_right, h₀, h₂]
-      nth_rw 1 [← re_add_im ⟪↑y₀, S y₂⟫_ℂ]
-      nth_rw 1 [← re_add_im ⟪↑y₂, S y₀⟫_ℂ]
+      nth_rw 1 [← re_add_im ⟪↑y₀, S y₂⟫_ℂ, ← re_add_im ⟪↑y₂, S y₀⟫_ℂ]
       simp only [hy_im, mul_add, RingHom.map_sub, RingHom.map_one, conj_ofReal, mul_zero,
         zero_add, ofReal_neg, neg_mul, mul_neg, mul_one, add_re, ofReal_add, ofReal_mul,
         ofReal_sub, ofReal_one, ofReal_pow]

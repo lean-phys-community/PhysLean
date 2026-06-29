@@ -36,16 +36,15 @@ For `S : TensorSpecies` and a list of index colors `c : Fin n → C`:
   `v₀ ⊗ₜ v₁ ⊗ₜ v₂ …`.
 - `ComponentIdx S c` is the type of allowed component labels for those indices.
 
+This file realizes `Tensor S c` as a `PiTensorProduct`, relates pure tensors to
+their components, constructs the component basis, and supplies the inherited
+finite-dimensional and module-topology instances. It also defines the natural
+action of `G` on pure tensors and tensors, the associated permutation maps, and
+the map from rank-zero tensors to the base field.
+
 From this setup we get the usual index-notation operations in a uniform way:
 contraction, raising/lowering, and permutation of indices.
 -/
-
-TODO "In this file (Physlib/Relativity/Tensors/Basic.lean), write an overview of the
-  implementation of tensors in Physlib. It should cover the main points:
-- the definition of a tensor species,
-- the meaning of color,
-- the tensorial instances,
-- other key definitions."
 
 @[expose] public section
 
@@ -410,6 +409,17 @@ lemma induction_on_basis {n : ℕ} {c : Fin n → C} {P : S.Tensor c → Prop}
     exact fun a a_1 => hadd t1 t2 a a_1
   · intro r t ht
     exact fun a => hsmul r t a
+
+/-- `componentMap` is the basis representation `(basis c).repr` definitionally; this bridges the two
+notations wherever a component computation meets a `repr` rewrite. -/
+lemma componentMap_eq_repr {n : ℕ} (c : Fin n → C) (t : S.Tensor c)
+    (ψ : ComponentIdx (S := S) c) : componentMap c t ψ = (basis c).repr t ψ := rfl
+
+/-- Two tensors with the same colour sequence are equal when all their components agree. -/
+lemma componentMap_ext {n : ℕ} {c : Fin n → C} {t₁ t₂ : S.Tensor c}
+    (h : ∀ b, componentMap c t₁ b = componentMap c t₂ b) : t₁ = t₂ := by
+  rw [← ofComponents_componentMap c t₁, ← ofComponents_componentMap c t₂]
+  congr 1; funext b; exact h b
 
 end Basis
 

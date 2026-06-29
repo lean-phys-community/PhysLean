@@ -182,9 +182,7 @@ private lemma dense_zero_top :
   refine Submodule.eq_top_iff'.mpr (fun f k hk ↦ ?_)
   refine ⟨1 + ‖f 0‖, by positivity, fun x ↦ ?_⟩
   simp only [Space.point_dim_zero_eq, norm_zero, zpow_neg, zpow_natCast]
-  rcases eq_or_ne k 0 with (rfl | hk')
-  · simp
-  · simp [hk', add_nonneg]
+  rcases k with _ | k <;> simp [add_nonneg]
 
 lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) := by
   rcases eq_zero_or_pos d with (rfl | hd)
@@ -220,12 +218,12 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
         exact le_of_eq_of_le (b := 0) (by simp [hg, h_one]) (by positivity)
       · refine mul_le_mul_of_nonneg ?_ ?_ (by positivity) hC_pos.le
         · rw [← inv_zpow', zpow_natCast]
-          refine pow_le_pow_left₀ (by positivity) ?_ k
+          gcongr
           exact (inv_lt_of_inv_lt₀ (Nat.cast_add_one_pos n) hx).le
         · refine le_trans ?_ (hC x)
-          rw [sub_apply, ← one_mul (f n x), hg, ← sub_mul]
-          simp_rw [norm_mul, ← ofReal_one, ← ofReal_sub, norm_real, Real.norm_eq_abs, abs_one]
-          refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
+          rw [sub_apply, ← one_mul (f n x), hg, ← sub_mul, norm_mul, norm_mul, norm_one]
+          gcongr
+          rw [← ofReal_one, ← ofReal_sub, norm_real, Real.norm_eq_abs]
           exact abs_sub_le_of_nonneg_of_le zero_le_one le_rfl (b n).nonneg (b n).le_one
     · refine tendsto_of_sub_tendsto_zero ξ hψξ ?_
       rw [sub_sub_cancel_left, Pi.neg_def, ← neg_zero, tendsto_neg_iff]
@@ -233,8 +231,8 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
       let s (n : ℕ) : Space d → ℂ := fun x ↦ b n x * ξ x
       let σ (n : ℕ) : SpaceDHilbertSpace d := by
         refine mk (f := s n) ⟨?_, ?_⟩
-        · refine Continuous.comp_aestronglyMeasurable₂ (by fun_prop) ?_ ξ.val.aestronglyMeasurable
-          exact continuous_ofReal.comp_aestronglyMeasurable (b n).continuous.aestronglyMeasurable
+        · exact (continuous_ofReal.comp (b n).continuous).aestronglyMeasurable.mul
+            ξ.val.aestronglyMeasurable
         · refine lt_of_le_of_lt ?_ (coe_hilbertSpace_memHS ξ).2
           exact eLpNorm_mono_enorm (enorm_bump_mul_le_enorm (b n) ξ)
       have hψ_ae (n : ℕ) : ψ n =ᵐ[volume] f n := (schwartzEquiv_symm_coe_ae ⟨ψ n, hψ n⟩).symm
@@ -251,10 +249,9 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
         let B (n : ℕ) : Set (Space d) := Metric.ball 0 (b n).rOut
         have hξB : Tendsto (fun n ↦ ∫⁻ x in B n, ‖ξ x‖ₑ ^ 2) atTop (nhds 0) := by
           refine tendsto_setLIntegral_zero ?_ ?_
-          · apply lt_top_iff_ne_top.mp
-            have hξ := L2.eLpNorm_rpow_two_norm_lt_top ξ
-            simp_rw [eLpNorm_one_eq_lintegral_enorm, Real.rpow_ofNat, enorm_pow, enorm_norm] at hξ
-            exact hξ
+          · refine lt_top_iff_ne_top.mp ?_
+            simpa [eLpNorm_one_eq_lintegral_enorm, Real.rpow_ofNat, enorm_pow, enorm_norm]
+              using L2.eLpNorm_rpow_two_norm_lt_top ξ
           · have : NeZero d := ⟨hd.ne'⟩
             let C : ℝ := (ENNReal.ofReal (√Real.pi ^ d / Real.Gamma (d / 2 + 1))).toReal
             have hvolB : ⇑volume ∘ B = fun n ↦ ENNReal.ofReal (C * (b n).rOut ^ d) := by
