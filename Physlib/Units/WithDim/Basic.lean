@@ -267,7 +267,7 @@ lemma cast_scaleUnit {d d2 : Dimension} {M : Type} [MulAction ℝ≥0 M] (m : Wi
   subst h
   simp
 
-TODO "Induce further non-additive algebraic, additional order, and topological instances on `WithDim d M`
-  from instances on `M`."
+TODO "Induce further non-additive algebraic, additional order, and topological instances
+  on `WithDim d M` from instances on `M`."
 
 end WithDim
