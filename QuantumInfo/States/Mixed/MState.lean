@@ -1228,7 +1228,7 @@ theorem traceRight_right_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
   simp [assoc']
 
 @[simp]
-theorem traceNorm_eq_1 (ρ : MState d) : ρ.m.traceNorm = 1 :=
+theorem traceNorm_eq_one (ρ : MState d) : ρ.m.traceNorm = 1 :=
   have := calc (ρ.m.traceNorm : ℂ)
     _ = ρ.m.trace := ρ.psd.traceNorm_eq_trace
     _ = 1 := ρ.tr'

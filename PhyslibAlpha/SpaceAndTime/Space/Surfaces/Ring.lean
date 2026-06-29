@@ -29,11 +29,11 @@ open MeasureTheory Real
 
 -/
 
-/-- The map embedding the unit ring in `Space d.succ` into `Space d.succ`. -/
+/-- The embedding of the unit ring (a circle `S¹` in `Space 2`) into `Space 3`. -/
 def ring : Metric.sphere (0 : Space 2) 1 → Space 3 := fun x =>
-  (slice 2).symm (0, Space.sphericalShell 1 x)
+  (slice 2).symm (0, Space.sphericalShell 2 x)
 
-lemma ring_eq : ring = (slice 2).symm ∘ (fun x => (0, sphericalShell 1 x)) := rfl
+lemma ring_eq : ring = (slice 2).symm ∘ (fun x => (0, sphericalShell 2 x)) := rfl
 
 lemma ring_injective : Function.Injective ring := by
   intro x y h

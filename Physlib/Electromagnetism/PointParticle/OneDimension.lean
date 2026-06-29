@@ -168,7 +168,7 @@ lemma oneDimPointParticle_electricField (𝓕 : FreeSpace) (q : ℝ) (r₀ : Spa
     ((q * 𝓕.μ₀ * 𝓕.c ^ 2) / 2) • constantTime (distOfFunction (fun x : Space 1 =>
       ‖x - r₀‖ ^ (- 1 : ℤ) • basis.repr (x - r₀))
       ((IsDistBounded.zpow_smul_repr_self (- 1 : ℤ) (by omega)).comp_sub_right r₀)) := by
-  have h1 := Space.distGrad_distOfFunction_norm_zpow (d := 0) 1 (by grind)
+  have h1 := Space.distGrad_distOfFunction_norm_zpow (d := 1) 1 (by grind)
   simp at h1
   simp only [electricField, LinearMap.coe_mk, AddHom.coe_mk, oneDimPointParticle_scalarPotential,
     smul_eq_mul, neg_mul, oneDimPointParticle_vectorPotential, map_zero, sub_zero, Int.reduceNeg,

@@ -56,19 +56,27 @@ noncomputable def oddNormIteratedLaplacianCoeff (m : ℕ) : ℝ :=
 private lemma oddNormIteratedLaplacianCoeff_factor_ne_zero {m k : ℕ} (hk : k < m) :
     ((((1 : ℤ) - 2 * (k : ℤ) : ℤ) : ℝ) *
       ((((1 : ℤ) - 2 * (k : ℤ) - 2 + (2 * m + 1 : ℤ) : ℤ) : ℝ))) ≠ 0 := by
-  apply mul_ne_zero <;> rw [Int.cast_ne_zero] <;> omega
+  apply mul_ne_zero
+  · have h : (1 : ℤ) - 2 * (k : ℤ) ≠ 0 := by omega
+    exact_mod_cast h
+  · have h : (1 : ℤ) - 2 * (k : ℤ) - 2 + (2 * m + 1 : ℤ) ≠ 0 := by omega
+    exact_mod_cast h
 
 /-- The scalar factor in the odd-dimensional iterated Laplacian of the norm is nonzero. -/
 lemma oddNormIteratedLaplacianCoeff_ne_zero (m : ℕ) :
     oddNormIteratedLaplacianCoeff m ≠ 0 := by
   unfold oddNormIteratedLaplacianCoeff
-  refine mul_ne_zero (Finset.prod_ne_zero_iff.mpr fun k hk =>
-      oddNormIteratedLaplacianCoeff_factor_ne_zero (Finset.mem_range.mp hk))
-    (mul_ne_zero (mul_ne_zero ?_ ?_) ?_)
-  · exact_mod_cast show (1 : ℤ) - 2 * (m : ℤ) ≠ 0 by omega
-  · positivity
-  · exact (ENNReal.toReal_pos (Metric.measure_ball_pos volume 0 one_pos).ne'
-      measure_ball_lt_top.ne).ne'
+  apply mul_ne_zero
+  · rw [Finset.prod_ne_zero_iff]
+    intro k hk
+    exact oddNormIteratedLaplacianCoeff_factor_ne_zero (by simpa using hk)
+  · repeat' apply mul_ne_zero
+    · have h : (1 : ℤ) - 2 * (m : ℤ) ≠ 0 := by omega
+      exact_mod_cast h
+    · exact_mod_cast (by omega : (2 * m + 1 : ℕ) ≠ 0)
+    · exact ne_of_gt <| ENNReal.toReal_pos
+        (Metric.measure_ball_pos volume 0 one_pos).ne'
+        measure_ball_lt_top.ne
 
 private lemma distLaplacian_norm_zpow_odd_boundary (m : ℕ) :
     Δᵈ (distOfFunction (fun x : Space (2 * m + 1) =>
@@ -78,16 +86,19 @@ private lemma distLaplacian_norm_zpow_odd_boundary (m : ℕ) :
         (volume (α := Space (2 * m + 1))).real (Metric.ball 0 1)) •
           diracDelta ℝ 0 := by
   rcases m with _ | m
-  · change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space 1 => ‖x‖ ^ (1 : ℤ))
+  · rw [distLaplacian]
+    change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space 1 => ‖x‖ ^ (1 : ℤ))
       (IsDistBounded.pow 1 (by omega)))) = _
     rw [distGrad_distOfFunction_norm_zpow 1 (by omega)]
     simp only [Int.cast_one, one_mul]
     convert! distDiv_inv_pow_eq_dim (d := 1) using 1
     · ext x
       ring_nf
-  · convert! distLaplacian_fundamentalSolution_norm_zpow_of_three_le
-      (d := 2 * m.succ + 1) (by omega) using 4 <;> simp [Nat.succ_eq_add_one]
-    ring
+  · convert! distLaplacian_fundamentalSolution_norm_zpow
+      (d := 2 * m.succ + 1) using 4
+    · simp; ring_nf
+    · simp; ring
+    · simp
 
 private lemma iterated_distLaplacian_norm_zpow_odd_until_boundary
     (m k : ℕ) (hk : k ≤ m) :
@@ -103,9 +114,13 @@ private lemma iterated_distLaplacian_norm_zpow_odd_until_boundary
   | zero =>
       simp
   | succ k ih =>
-      rw [Function.iterate_succ_apply', ih (Nat.le_of_succ_le hk), map_smul,
-        distLaplacian_distOfFunction_norm_zpow (d := 2 * m) ((1 : ℤ) - 2 * (k : ℤ))
-          (by omega) (by omega), smul_smul]
+      have hk_le : k ≤ m := Nat.le_of_succ_le hk
+      rw [Function.iterate_succ_apply']
+      rw [ih hk_le]
+      rw [map_smul]
+      rw [distLaplacian_distOfFunction_norm_zpow
+        (d := 2 * m + 1) ((1 : ℤ) - 2 * (k : ℤ)) (by omega)]
+      rw [smul_smul]
       have hdist :
           distOfFunction
               (fun x : Space (2 * m + 1) => ‖x‖ ^ ((1 : ℤ) - 2 * (k : ℤ) - 2))
@@ -116,10 +131,12 @@ private lemma iterated_distLaplacian_norm_zpow_odd_until_boundary
         have hexp :
             ((1 : ℤ) - 2 * (k : ℤ) - 2) =
               ((1 : ℤ) - 2 * ((k + 1 : ℕ) : ℤ)) := by
-          omega
+          norm_num
+          ring
         ext η
         simp [distOfFunction_apply, hexp]
-      rw [hdist, Finset.prod_range_succ]
+      rw [hdist]
+      rw [Finset.prod_range_succ]
       congr 1
 
 /-- In dimension `2 * m + 1`, the `(m + 1)`-fold distributional Laplacian of the
@@ -129,9 +146,11 @@ lemma iterated_distLaplacian_norm_zpow_odd_eq_smul_diracDelta (m : ℕ) :
       (distOfFunction (fun x : Space (2 * m + 1) => ‖x‖ ^ (1 : ℤ))
         (IsDistBounded.pow 1 (by omega))) =
       oddNormIteratedLaplacianCoeff m • diracDelta ℝ 0 := by
-  rw [Function.iterate_succ_apply',
-    iterated_distLaplacian_norm_zpow_odd_until_boundary m m le_rfl, map_smul,
-    distLaplacian_norm_zpow_odd_boundary m, smul_smul]
+  rw [Function.iterate_succ_apply']
+  rw [iterated_distLaplacian_norm_zpow_odd_until_boundary m m le_rfl]
+  rw [map_smul]
+  rw [distLaplacian_norm_zpow_odd_boundary m]
+  rw [smul_smul]
   unfold oddNormIteratedLaplacianCoeff
   rfl
 

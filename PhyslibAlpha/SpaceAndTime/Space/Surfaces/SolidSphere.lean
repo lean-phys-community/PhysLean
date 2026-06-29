@@ -11,7 +11,7 @@ public import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
 ## Solid sphere surfaces in `Space d`
 
-The solid sphere is the closed unit ball in `Space d.succ`. Unlike the line or the spherical
+The solid sphere is the closed unit ball in `Space d`. Unlike the line or the spherical
 shell, it is a region of positive ambient volume, so the measure associated with it is the
 ambient volume restricted to the ball rather than a pushforward of a lower-dimensional measure.
 The requirement that the surface has ambient measure zero is therefore not applicable here, and
@@ -35,8 +35,8 @@ open MeasureTheory Real
 
 -/
 
-/-- The map embedding the closed unit ball in `Space d.succ` into `Space d.succ`. -/
-def solidSphere (d : ℕ) : Metric.closedBall (0 : Space d.succ) 1 → Space d.succ := fun x => x.1
+/-- The inclusion into `Space d` of its closed unit ball `B^d` (the subtype coercion `x ↦ x.1`). -/
+def solidSphere (d : ℕ) : Metric.closedBall (0 : Space d) 1 → Space d := fun x => x.1
 
 lemma solidSphere_injective (d : ℕ) : Function.Injective (solidSphere d) := by
   intro x y h
@@ -51,7 +51,7 @@ lemma solidSphere_measurableEmbedding (d : ℕ) : MeasurableEmbedding (solidSphe
   · exact solidSphere_injective d
 
 @[simp]
-lemma norm_solidSphere_le (d : ℕ) (x : Metric.closedBall (0 : Space d.succ) 1) :
+lemma norm_solidSphere_le (d : ℕ) (x : Metric.closedBall (0 : Space d) 1) :
     ‖solidSphere d x‖ ≤ 1 := by
   have hx := x.2
   rw [Metric.mem_closedBall, dist_eq_norm, sub_zero] at hx
@@ -63,10 +63,10 @@ lemma norm_solidSphere_le (d : ℕ) (x : Metric.closedBall (0 : Space d.succ) 1)
 
 -/
 
-/-- The measure on `Space d.succ` corresponding to integration over a solid sphere, i.e. the
+/-- The measure on `Space d` corresponding to integration over a solid sphere, i.e. the
   ambient volume measure restricted to the closed unit ball. -/
-def solidSphereMeasure (d : ℕ) : Measure (Space d.succ) :=
-  volume.restrict (Metric.closedBall (0 : Space d.succ) 1)
+def solidSphereMeasure (d : ℕ) : Measure (Space d) :=
+  volume.restrict (Metric.closedBall (0 : Space d) 1)
 
 instance solidSphereMeasure_isFiniteMeasure (d : ℕ) :
     IsFiniteMeasure (solidSphereMeasure d) := by
@@ -83,18 +83,18 @@ instance solidSphereMeasure_hasTemperateGrowth (d : ℕ) :
 
 -/
 
-/-- The distribution on `Space d.succ` corresponding to integration over a solid sphere.
+/-- The distribution on `Space d` corresponding to integration over a solid sphere.
   One can roughly think of this distribution as taking a test function `f` to its integral against
   a mass, charge or current density spread over a solid ball. -/
-def solidSphereDist (d : ℕ) : (Space d.succ) →d[ℝ] ℝ :=
+def solidSphereDist (d : ℕ) : (Space d) →d[ℝ] ℝ :=
   SchwartzMap.integralCLM ℝ (solidSphereMeasure d)
 
-lemma solidSphereDist_apply_eq_integral_solidSphereMeasure (d : ℕ) (f : 𝓢(Space d.succ, ℝ)) :
+lemma solidSphereDist_apply_eq_integral_solidSphereMeasure (d : ℕ) (f : 𝓢(Space d, ℝ)) :
     solidSphereDist d f = ∫ x, f x ∂solidSphereMeasure d := by
   rw [solidSphereDist, SchwartzMap.integralCLM_apply]
 
-lemma solidSphereDist_apply_eq_integral_closedBall (d : ℕ) (f : 𝓢(Space d.succ, ℝ)) :
-    solidSphereDist d f = ∫ x in Metric.closedBall (0 : Space d.succ) 1, f x := by
+lemma solidSphereDist_apply_eq_integral_closedBall (d : ℕ) (f : 𝓢(Space d, ℝ)) :
+    solidSphereDist d f = ∫ x in Metric.closedBall (0 : Space d) 1, f x := by
   rw [solidSphereDist_apply_eq_integral_solidSphereMeasure, solidSphereMeasure]
 
 /-!
@@ -104,8 +104,8 @@ lemma solidSphereDist_apply_eq_integral_closedBall (d : ℕ) (f : 𝓢(Space d.s
 -/
 
 lemma solidSphere_volume_pos (d : ℕ) :
-    0 < volume (Metric.closedBall (0 : Space d.succ) 1) := by
-  apply lt_of_lt_of_le (b := volume (Metric.ball (0 : Space d.succ) 1))
+    0 < volume (Metric.closedBall (0 : Space d) 1) := by
+  apply lt_of_lt_of_le (b := volume (Metric.ball (0 : Space d) 1))
   · exact (Metric.isOpen_ball).measure_pos volume (Metric.nonempty_ball.mpr one_pos)
   · exact measure_mono Metric.ball_subset_closedBall
 

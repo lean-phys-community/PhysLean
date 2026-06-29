@@ -58,7 +58,8 @@ def parityOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
     use 1, 1
     intro x
     simp only [pow_one, one_mul]
-    erw [iteratedFDeriv_neg_apply]
+    rw [show (fun x : ℝ => -x) = -(fun x : ℝ => x) from rfl]
+    rw [iteratedFDeriv_neg_apply]
     simp only [norm_neg]
     match n with
     | 0 => simp

@@ -6,6 +6,7 @@ Authors: Nathaneal Sajan, Joseph Tooby-Smith, Lode Vermeulen
 module
 
 public import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
+public import Mathlib.Analysis.SpecialFunctions.Complex.Arg
 /-!
 
 # Solutions to the classical harmonic oscillator
@@ -45,11 +46,20 @@ prove that they satisfy the equation of motion, and prove some properties of the
   - D.1. Correctness of InitialConditionsAtTime conversion
   - D.2. Correctness of InitialConditionsFromTwoPositions conversion
   - D.3. Correctness of InitialConditionsFromTwoVelocities conversion
-- E. The trajectories at zero velocity
-  - E.1. The times at which the velocity is zero
-  - E.2. A time when the velocity is zero
-  - E.3. The position when the velocity is zero
-- F. Some open TODOs
+- E. Amplitude–phase parametrization
+  - E.1. The amplitude–phase initial conditions
+  - E.2. Conversion to standard initial conditions
+  - E.3. The trajectory in normal form
+  - E.4. Recovering the amplitude and phase
+- F. Special conditions of the trajectory
+  - F.1. Normal form for standard initial conditions
+  - F.2. Times at which the velocity is zero
+  - F.3. The position when the velocity is zero
+  - F.4. Times at which the trajectory passes through zero
+- G. Periodicity and recurrence
+  - G.1. The period
+  - G.2. Periodicity of the trajectory
+  - G.3. Return to the initial state
 
 ## iv. References
 
@@ -115,9 +125,8 @@ Currently implemented:
   distinct times `t₁` and `t₂` that satisfy the non-degeneracy condition.
 - **Initial conditions from two velocities at different times**: Specify the velocity at two
   distinct times `t₁` and `t₂` that satisfy the non-degeneracy condition.
-
-Future work (to be added in separate PRs) :
-- Amplitude-phase parametrization
+- **Amplitude–phase parametrization**: Specify the solution as a single shifted cosine
+  `x(t) = A cos (ω t - φ)` with amplitude `A` and phase `φ`.
 
 All alternative forms can be converted to the standard `InitialConditions` type via conversion
 functions, and we prove that the converted initial conditions produce trajectories that satisfy
@@ -584,7 +593,7 @@ end InitialConditions
 
 /-!
 
-## D.1. Correctness of InitialConditionsAtTime conversion
+### D.1. Correctness of InitialConditionsAtTime conversion
 
 We now prove the correctness lemmas for the `InitialConditionsAtTime.toInitialConditions`
 conversion function. These show that the conversion produces a trajectory that passes through
@@ -643,7 +652,7 @@ end InitialConditionsAtTime
 
 /-!
 
-## D.2. Correctness of InitialConditionsFromTwoPositions conversion
+### D.2. Correctness of InitialConditionsFromTwoPositions conversion
 
 The conversion recovers the initial conditions only when `sin (S.ω * (t₂ - t₁)) ≠ 0`. This
 condition fails exactly when `ω·(t₂ - t₁) = n·π` for some integer `n`, i.e. when `t₂ - t₁` is an
@@ -685,7 +694,7 @@ end InitialConditionsFromTwoPositions
 
 /-!
 
-## D.3. Correctness of InitialConditionsFromTwoVelocities conversion
+### D.3. Correctness of InitialConditionsFromTwoVelocities conversion
 
 The conversion recovers the initial conditions only when `sin (S.ω * (t₂ - t₁)) ≠ 0`. Under this
 nondegeneracy condition, we prove that the resulting trajectory has velocity `v_t₁` at `t₁` and
@@ -723,190 +732,414 @@ lemma toInitialConditions_velocity_at_t₂ (S : HarmonicOscillator)
 
 end InitialConditionsFromTwoVelocities
 
-namespace InitialConditions
-
 /-!
 
-## E. The trajectories at zero velocity
+## E. Amplitude–phase parametrization
 
-We study the properties of the trajectories when the velocity is zero.
+The state of the harmonic oscillator at `t = 0` is captured by `InitialConditions` as a position
+`x₀` and a velocity `v₀`. An equivalent and often more physical description writes the solution as
+a single shifted cosine of amplitude `A` and phase `φ`:
+  `x(t) = A cos (ω t - φ)`.
+
+Expanding with the angle-subtraction identity,
+  `A cos (ω t - φ) = (A cos φ) cos (ω t) + (A sin φ) sin (ω t)`,
+and matching coefficients against the standard solution
+  `x(t) = cos (ω t) x₀ + (sin (ω t) / ω) v₀`
+gives the change of coordinates
+  `x₀ = A cos φ`,   `v₀ = A ω sin φ`.
+
+We implement the forward map `(A, φ) ↦ (x₀, v₀)` as `toInitialConditions`, prove the resulting
+trajectory is the cosine normal form above (with velocity `-A ω sin (ω t - φ)`), and implement the
+inverse map `(x₀, v₀) ↦ (A, φ)` as `fromInitialConditions`, recovering `A` and `φ` as the polar
+coordinates of the phase vector `(x₀, v₀ / ω)`.
 
 -/
 
 /-!
 
-### E.1. The times at which the velocity is zero
+### E.1. The amplitude–phase initial conditions
 
-We show that if the velocity of the trajectory is zero, then the time satisfies
-the condition that
-```
-tan (S.ω * t) = IC.v₀ 0 / (S.ω * IC.x₀ 0)
-```
+We define a type for initial conditions specified by an amplitude `A` and a phase angle `φ`. Being
+an amplitude and an angle, these are stored as scalars, rather than as vectors as for the other
+initial-condition types.
 
 -/
-lemma tan_time_eq_of_trajectory_velocity_eq_zero (IC : InitialConditions) (t : Time)
-    (h : ∂ₜ (IC.trajectory S) t = 0) (hx : IC.x₀ ≠ 0 ∨ IC.v₀ ≠ 0) :
-    tan (S.ω * t) = IC.v₀ 0 / (S.ω * IC.x₀ 0) := by
-  rw [trajectory_velocity] at h
-  simp at h
-  have hx : S.ω ≠ 0 := by exact ω_ne_zero S
-  by_cases h1 : IC.x₀ ≠ 0
-  by_cases h2 : IC.v₀ ≠ 0
-  have h1' : IC.x₀ 0 ≠ 0 := by
-    intro hn
-    apply h1
-    ext i
-    fin_cases i
-    simp [hn]
-  have hcos : cos (S.ω * t.val) ≠ 0 := by
-    by_contra hn
-    rw [hn] at h
-    rw [Real.cos_eq_zero_iff_sin_eq] at hn
-    simp_all
-  rw [tan_eq_sin_div_cos]
-  field_simp
-  trans (sin (S.ω * t.val) * (S.ω * IC.x₀ 0)) +
-    (-(S.ω • sin (S.ω * t.val) • IC.x₀) + cos (S.ω * t.val) • IC.v₀) 0
-  · rw [h]
-    simp only [Fin.isValue, PiLp.zero_apply, add_zero]
-    ring_nf
-  · simp only [Fin.isValue, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul]
-    ring_nf
-  simp at h2
-  rw [h2] at h ⊢
-  simp_all
-  simp [tan_eq_sin_div_cos, h]
-  simp at h1
-  rw [h1] at h ⊢
-  simp_all
-  simp [tan_eq_sin_div_cos, h]
+
+/-- Initial conditions for the harmonic oscillator specified by an amplitude `A` and a phase
+  offset `φ`, describing the solution `x(t) = A cos (ω t - φ)`.
+
+  The conditions can be converted to the standard `InitialConditions` format using the
+  `toInitialConditions` function. -/
+@[ext] structure AmplitudePhase where
+  /-- The amplitude of the oscillation. -/
+  A : ℝ
+  /-- The phase offset of the oscillation. -/
+  φ : ℝ
+
+namespace AmplitudePhase
 
 /-!
 
-### E.2. A time when the velocity is zero
+### E.2. Conversion to standard initial conditions
 
-We show that as long as the initial position is non-zero, then at
-the time `arctan (IC.v₀ 0 / (S.ω * IC.x₀ 0)) / S.ω` the velocity is zero.
+Using `x₀ = A cos φ` and `v₀ = A ω sin φ`, we convert amplitude–phase data to the standard initial
+position and velocity at `t = 0`.
 
 -/
 
-lemma trajectory_velocity_eq_zero_at_arctan (IC : InitialConditions) (hx : IC.x₀ ≠ 0) :
-    (∂ₜ (IC.trajectory S)) (arctan (IC.v₀ 0 / (S.ω * IC.x₀ 0)) / S.ω) = 0 := by
-  rw [trajectory_velocity]
-  simp [neg_smul]
-  have hx' : S.ω ≠ 0 := by exact ω_ne_zero S
-  field_simp
-  rw [Real.sin_arctan, Real.cos_arctan]
+/-- Convert amplitude–phase initial conditions to standard initial conditions at `t = 0`, via
+  `x₀ = A cos φ` and `v₀ = A ω sin φ`.
+
+  See `toInitialConditions_trajectory_eq_cos` and `toInitialConditions_velocity_eq_sin` in
+  section E.3 for the correctness proofs. -/
+noncomputable def toInitialConditions (S : HarmonicOscillator) (IC : AmplitudePhase) :
+    InitialConditions where
+  x₀ := EuclideanSpace.single 0 (IC.A * cos IC.φ)
+  v₀ := EuclideanSpace.single 0 (IC.A * S.ω * sin IC.φ)
+
+/-!
+
+### E.3. The trajectory in normal form
+
+The trajectory built from amplitude–phase data is exactly the single cosine
+`x(t) = A cos (ω t - φ)`, with velocity `v(t) = -A ω sin (ω t - φ)`. In the position identity the
+factor `1 / ω` of the standard solution cancels the `ω` in `v₀ = A ω sin φ`, which uses `ω ≠ 0`.
+
+-/
+
+/-- The trajectory of amplitude–phase initial conditions is the cosine normal form
+  `x(t) = A cos (ω t - φ)`. -/
+lemma toInitialConditions_trajectory_eq_cos (S : HarmonicOscillator) (IC : AmplitudePhase)
+    (t : Time) :
+    (IC.toInitialConditions S).trajectory S t
+      = EuclideanSpace.single 0 (IC.A * cos (S.ω * t - IC.φ)) := by
+  rw [InitialConditions.trajectory_eq, toInitialConditions]
   ext i
-  simp [one_div]
-  trans (-(S.ω * (IC.v₀ 0 / (S.ω * IC.x₀ 0) * IC.x₀ 0)) + IC.v₀ 0) *
-    (√(1 + (IC.v₀ 0 / (S.ω * IC.x₀ 0)) ^ 2))⁻¹
-  · fin_cases i
-    simp only [Fin.isValue, Fin.zero_eta]
-    ring
-  simp [mul_eq_zero, inv_eq_zero]
-  left
-  field_simp
-  have hx : IC.x₀ 0 ≠ 0 := by
-    intro hn
-    apply hx
-    ext i
-    fin_cases i
-    simp [hn]
-  field_simp
+  fin_cases i
+  simp [Real.cos_sub]
+  field_simp [S.ω_ne_zero]
+
+/-- The velocity of the amplitude–phase trajectory is `v(t) = -A ω sin (ω t - φ)`. -/
+lemma toInitialConditions_velocity_eq_sin (S : HarmonicOscillator) (IC : AmplitudePhase)
+    (t : Time) :
+    ∂ₜ ((IC.toInitialConditions S).trajectory S) t
+      = EuclideanSpace.single 0 (-(IC.A * S.ω * sin (S.ω * t.val - IC.φ))) := by
+  rw [InitialConditions.trajectory_velocity, toInitialConditions]
+  ext i
+  fin_cases i
+  simp [Real.sin_sub]
   ring
 
 /-!
 
-### E.3. The position when the velocity is zero
+### E.4. Recovering the amplitude and phase
 
-We show that the position is equal to `√(‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2) ` when
-the velocity is zero.
+The inverse map `(x₀, v₀) ↦ (A, φ)` must solve `x₀ = A cos φ` and `v₀ / ω = A sin φ`. Recovering
+the angle with the real `arctan` covers only `(-π/2, π/2)` and forces a case split at `x₀ = 0`; we
+instead embed the phase vector as the complex number `z = x₀ + (v₀ / ω) i` and read off `A = ‖z‖`
+and `φ = Complex.arg z`, with `arg` in the canonical range `(-π, π]`. The degenerate state
+`x₀ = v₀ = 0` is covered by the convention `arg 0 = 0`, so no case split is needed.
+
+We prove that converting initial conditions to amplitude–phase form and back returns the original
+initial conditions.
 
 -/
 
-lemma trajectory_velocity_eq_zero_iff (IC : InitialConditions) (t : Time) :
+/-- Recover amplitude–phase data from standard initial conditions, as the polar coordinates of the
+  phase vector `(x₀, v₀ / ω)` embedded as `z = x₀ + (v₀ / ω) i`: the amplitude is `‖z‖` and the
+  phase is `Complex.arg z`.
+
+  See `toInitialConditions_fromInitialConditions` for the right-inverse identity. -/
+noncomputable def fromInitialConditions (S : HarmonicOscillator) (IC : InitialConditions) :
+    AmplitudePhase where
+  A := ‖(⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)‖
+  φ := Complex.arg (⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)
+
+/-- `fromInitialConditions` is a right inverse of `toInitialConditions`: converting initial
+  conditions to amplitude–phase form and back recovers them exactly. -/
+lemma toInitialConditions_fromInitialConditions (S : HarmonicOscillator)
+    (IC : InitialConditions) :
+    (fromInitialConditions S IC).toInitialConditions S = IC := by
+  have hω : S.ω ≠ 0 := S.ω_ne_zero
+  set z : ℂ := (⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)
+  -- polar identities
+  have hcos : ‖z‖ * cos (Complex.arg z) = z.re := by
+    rcases eq_or_ne z 0 with h | h
+    · simp [h]
+    · rw [Complex.cos_arg h]; field_simp
+  have hsin : ‖z‖ * sin (Complex.arg z) = z.im := by
+    rcases eq_or_ne z 0 with h | h
+    · simp [h]
+    · rw [Complex.sin_arg]; field_simp
+  -- By construction the parts of `z` are exactly the original data.
+  have hre : z.re = IC.x₀ 0 := rfl
+  have him : z.im = IC.v₀ 0 / S.ω := rfl
+  apply InitialConditions.ext
+  · -- Position: `‖z‖ cos (arg z) = Re z = IC.x₀ 0`, and `single 0 (IC.x₀ 0) = IC.x₀`.
+    show EuclideanSpace.single 0 (‖z‖ * cos (Complex.arg z)) = IC.x₀
+    rw [hcos, hre]
+    ext i; fin_cases i; simp
+  · -- Velocity: `‖z‖ ω sin (arg z) = ω · Im z = ω · (v₀ / ω) = IC.v₀ 0`, then reassemble.
+    show EuclideanSpace.single 0 (‖z‖ * S.ω * sin (Complex.arg z)) = IC.v₀
+    have hv : ‖z‖ * S.ω * sin (Complex.arg z) = IC.v₀ 0 := by
+      rw [mul_right_comm, hsin, him]; field_simp
+    rw [hv]
+    ext i; fin_cases i; simp
+
+end AmplitudePhase
+
+
+namespace InitialConditions
+
+/-!
+
+## F. Special conditions of the trajectory
+
+We use the amplitude-phase parametrization from section E to describe the special times of a
+trajectory. After converting arbitrary initial conditions to amplitude and phase, every trajectory
+has the form `x(t) = A cos (ω t - φ)` and its velocity has the form `v(t) = -Aω sin (ω t - φ)`.
+
+Thus the turning points of the motion are controlled by the zeros of `sin (ω t - φ)`, while the
+times at which the trajectory passes through the origin are controlled by the zeros of
+`cos (ω t - φ)`.
+
+-/
+
+/-!
+
+### F.1. Normal form for standard initial conditions
+
+The amplitude-phase normal form was first proved for data already expressed as an
+`AmplitudePhase`. We now transport those identities back to ordinary `InitialConditions` using
+`AmplitudePhase.fromInitialConditions`.
+
+-/
+
+/-- Every trajectory of the harmonic oscillator is a single shifted cosine after converting its
+  initial conditions to amplitude-phase form. -/
+lemma trajectory_eq_cos (IC : InitialConditions) (t : Time) :
+    IC.trajectory S t =
+      EuclideanSpace.single 0 ((AmplitudePhase.fromInitialConditions S IC).A *
+        cos (S.ω * t - (AmplitudePhase.fromInitialConditions S IC).φ)) := by
+  conv_lhs =>
+    rw [← AmplitudePhase.toInitialConditions_fromInitialConditions S IC]
+  exact AmplitudePhase.toInitialConditions_trajectory_eq_cos S
+    (AmplitudePhase.fromInitialConditions S IC) t
+
+/-- The velocity of every trajectory is the corresponding shifted sine in amplitude-phase form. -/
+lemma trajectory_velocity_eq_sin (IC : InitialConditions) (t : Time) :
+    ∂ₜ (IC.trajectory S) t =
+      EuclideanSpace.single 0 (-((AmplitudePhase.fromInitialConditions S IC).A * S.ω *
+        sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ))) := by
+  conv_lhs =>
+    rw [← AmplitudePhase.toInitialConditions_fromInitialConditions S IC]
+  exact AmplitudePhase.toInitialConditions_velocity_eq_sin S
+    (AmplitudePhase.fromInitialConditions S IC) t
+
+/-!
+
+### F.2. Times at which the velocity is zero
+
+In amplitude-phase form the velocity is `v(t) = -Aω sin (ω t - φ)`. For nonzero amplitude this
+vanishes exactly when `sin (ω t - φ) = 0`, equivalently when `ω t - φ` is an
+integer multiple of `π`.
+
+-/
+
+/-- For nonzero amplitude, the velocity vanishes exactly when the sine factor in
+  amplitude-phase form vanishes. -/
+lemma trajectory_velocity_eq_zero_iff_sin_eq_zero (IC : InitialConditions)
+    (hA : (AmplitudePhase.fromInitialConditions S IC).A ≠ 0) (t : Time) :
     ∂ₜ (IC.trajectory S) t = 0 ↔
-    ‖(IC.trajectory S) t‖ = √(‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2) := by
-  have := by exact energy_eq S (trajectory S IC)
-  have h_energy_t := congrFun this t
-  simp only [kineticEnergy_eq, one_div, potentialEnergy_eq, smul_eq_mul] at h_energy_t
-  rw [real_inner_self_eq_norm_sq (trajectory S IC t)] at h_energy_t
-  have := by exact trajectory_energy S IC
-  have h_init := congrFun this t
-  have h_ω := by exact ω_sq S
+      sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
+  rw [trajectory_velocity_eq_sin]
   constructor
-  · intro h_partial
-    rw [h_partial, inner_zero_left, mul_zero, zero_add] at h_energy_t
-    have h₁ : ‖trajectory S IC t‖ ^ 2 = S.energy (trajectory S IC) t * 2 * (1 / S.k) := by
-      simp [h_energy_t]
-      field_simp
-    symm
-    refine (sqrt_eq_iff_mul_self_eq ?_ ?_).mpr ?_
-    · apply add_nonneg <;> apply sq_nonneg
-    · apply norm_nonneg
-    rw [← pow_two]
-    rw [h₁, h_init]
-    ring_nf
-    rw [mul_assoc]
-    rw [mul_inv_cancel₀]
-    · rw [mul_one, inv_eq_one_div S.k, mul_assoc]
-      rw [mul_one_div S.m S.k, ← inverse_ω_sq]
-      ring
-    · exact k_ne_zero S
-  · intro h_norm
-    apply norm_eq_zero.mp
-    rw [real_inner_self_eq_norm_sq (∂ₜ (trajectory S IC) t)] at h_energy_t
-    have energies : S.energy (trajectory S IC) t = S.energy (trajectory S IC) t := by rfl
-    nth_rewrite 1 [h_energy_t] at energies
-    nth_rewrite 1 [h_init] at energies
-    rw [h_norm] at energies
-    have h₁ : S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2 + S.k * (√(‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) ^ 2)
-            = S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2 := by
+  · intro h
+    have hscalar :
+        -((AmplitudePhase.fromInitialConditions S IC).A * S.ω *
+          sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ)) = 0 := by
+      simpa using congrArg (fun x : EuclideanSpace ℝ (Fin 1) => x 0) h
+    have hprod :
+        (AmplitudePhase.fromInitialConditions S IC).A * S.ω *
+          sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
+      simpa only [neg_eq_zero] using hscalar
+    rcases mul_eq_zero.mp hprod with hAω | hsin
+    · rcases mul_eq_zero.mp hAω with hA0 | hω
+      · exact (hA hA0).elim
+      · exact (S.ω_ne_zero hω).elim
+    · exact hsin
+  · intro h
+    ext i
+    fin_cases i
+    simp [h]
+
+/-- For nonzero amplitude, the velocity is zero exactly at phase times `φ + nπ`. -/
+lemma trajectory_velocity_eq_zero_iff_exists_int (IC : InitialConditions)
+    (hA : (AmplitudePhase.fromInitialConditions S IC).A ≠ 0) (t : Time) :
+    ∂ₜ (IC.trajectory S) t = 0 ↔
+      ∃ n : ℤ,
+        (t : ℝ) =
+          ((AmplitudePhase.fromInitialConditions S IC).φ + n * π) / S.ω := by
+  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t]
+  constructor
+  · intro h
+    obtain ⟨n, hn⟩ := Real.sin_eq_zero_iff.mp h
+    use n
+    have hω : S.ω ≠ 0 := S.ω_ne_zero
+    have ht :
+        S.ω * t.val = (AmplitudePhase.fromInitialConditions S IC).φ + n * π := by
+      linarith
+    calc
+      (t : ℝ) = (S.ω * t) / S.ω := by field_simp [hω]
+      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + n * π) / S.ω := by
+        rw [ht]
+  · intro h
+    obtain ⟨n, hn⟩ := h
+    rw [Real.sin_eq_zero_iff]
+    use n
+    have hω : S.ω ≠ 0 := S.ω_ne_zero
+    rw [hn]
+    field_simp [hω]
+    ring
+
+/-!
+
+### F.3. The position when the velocity is zero
+
+The zeros of the velocity are the turning points of the oscillator. In amplitude-phase form,
+these are the times when `sin (ω t - φ) = 0`; equivalently, `cos (ω t - φ)` is `1` or `-1`.
+At exactly those times the trajectory has maximal norm, equal to the amplitude `A`.
+
+The statement also covers the degenerate case `A = 0`: then the trajectory and its velocity are
+identically zero, so both sides of the equivalence hold at every time.
+
+-/
+
+/-- The velocity vanishes exactly when the trajectory has norm equal to the amplitude. -/
+lemma trajectory_velocity_eq_zero_iff_norm_eq_amplitude (IC : InitialConditions)
+    (t : Time) :
+    ∂ₜ (IC.trajectory S) t = 0 ↔
+      ‖IC.trajectory S t‖ = (AmplitudePhase.fromInitialConditions S IC).A := by
+  by_cases hA : (AmplitudePhase.fromInitialConditions S IC).A = 0
+  · constructor
+    · intro _
+      rw [trajectory_eq_cos]
+      simp [hA]
+    · intro _
+      rw [trajectory_velocity_eq_sin]
+      ext i
+      fin_cases i
+      simp [hA]
+  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t]
+  rw [trajectory_eq_cos]
+  set A := (AmplitudePhase.fromInitialConditions S IC).A
+  set θ := S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ
+  show sin θ = 0 ↔ ‖EuclideanSpace.single 0 (A * cos θ)‖ = A
+  have hA' : A ≠ 0 := by simpa [A] using hA
+  have hA_nonneg : 0 ≤ A := by
+    show 0 ≤ ‖(⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)‖
+    exact norm_nonneg _
+  have hA_pos : 0 < A := lt_of_le_of_ne hA_nonneg (Ne.symm hA')
+  constructor
+  · intro hsin
+    rcases Real.sin_eq_zero_iff_cos_eq.mp hsin with hcos | hcos
+    · simp [hcos, abs_of_pos hA_pos]
+    · simp [hcos, abs_of_pos hA_pos]
+  · intro hnorm
+    have hnorm' : |A * cos θ| = A := by
+      simpa using hnorm
+    have hcos_abs : |cos θ| = 1 := by
       calc
-        S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2 + S.k * (√(‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) ^ 2)
-            = 2 * (2⁻¹ * S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2
-            + 2⁻¹ * (S.k * √(‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) ^ 2)) := by
-          simp [mul_add]
-          rw [← mul_assoc, ← mul_assoc]
-          rw [mul_inv_cancel_of_invertible 2, one_mul]
-      _ = 2 * (1 / 2 * (S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2)) := by rw [energies]
-      _ = S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2 := by simp
-    have h₂ : S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2 + S.k * (‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2)
-        = S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2 := by
-      rw [← h₁, sq_sqrt ?_]
-      apply add_nonneg
-      apply sq_nonneg
-      apply sq_nonneg
-    have h₃: ‖∂ₜ (trajectory S IC) t‖ ^ 2 = ‖IC.v₀‖ ^ 2 - (S.k / S.m) * (‖IC.v₀‖ / S.ω) ^ 2 := by
-      calc
-        ‖∂ₜ (trajectory S IC) t‖ ^ 2 = (1 / S.m) * (S.m * ‖∂ₜ (trajectory S IC) t‖ ^ 2
-        + S.k * (‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2) - S.k * (‖IC.x₀‖ ^ 2
-        + (‖IC.v₀‖ / S.ω) ^ 2)) := by simp
-        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2
-          - S.k * (‖IC.x₀‖ ^ 2 + (‖IC.v₀‖ / S.ω) ^ 2)) := by rw [h₂]
-        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2 + S.k * ‖IC.x₀‖ ^ 2
-          - S.k * ‖IC.x₀‖ ^ 2 - S.k * (‖IC.v₀‖ / S.ω) ^ 2) := by
-          rw [mul_add S.k (‖IC.x₀‖ ^ 2) ((‖IC.v₀‖ /S.ω) ^2)]
-          rw [← sub_sub_sub_eq (S.m * ‖IC.v₀‖ ^ 2) (S.k * ‖IC.x₀‖ ^ 2)
-          (S.k * (‖IC.v₀‖ / S.ω) ^ 2) (S.k * ‖IC.x₀‖ ^ 2)]
-          simp only [one_div, sub_sub_sub_cancel_right, add_sub_cancel_right]
-        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2 - S.k * (‖IC.v₀‖ / S.ω) ^ 2) := by simp
-        _ = (1 / S.m) * (S.m * ‖IC.v₀‖ ^ 2) - (1 / S.m) * (S.k * (‖IC.v₀‖ / S.ω) ^ 2) := by
-          rw [mul_sub (1 / S.m) (S.m * ‖IC.v₀‖ ^ 2) (S.k * (‖IC.v₀‖ / S.ω) ^ 2)]
-        _ = ‖IC.v₀‖ ^ 2 - (S.k / S.m) * (‖IC.v₀‖ / S.ω) ^ 2 := by
-          simp only [one_div, ne_eq, m_ne_zero, not_false_eq_true, inv_mul_cancel_left₀,
-            sub_right_inj]
-          rw [← mul_assoc, inv_mul_eq_div S.m S.k]
-    rw [← ω_sq, div_pow ‖IC.v₀‖ S.ω 2] at h₃
-    rw [mul_div_cancel₀ (‖IC.v₀‖ ^ 2) ?_] at h₃
-    rw [sub_self (‖IC.v₀‖ ^ 2)] at h₃
-    rw [sq_eq_zero_iff] at h₃
-    exact h₃
-    rw [pow_ne_zero_iff ?_]
-    apply ω_ne_zero
-    exact Ne.symm (Nat.zero_ne_add_one 1)
+        |cos θ| = |A * cos θ| / A := by
+          rw [abs_mul, abs_of_pos hA_pos]
+          field_simp [hA']
+        _ = A / A := by rw [hnorm']
+        _ = 1 := by field_simp [hA']
+    obtain ⟨n, hn⟩ := Real.abs_cos_eq_one_iff.mp hcos_abs
+    exact Real.sin_eq_zero_iff.mpr ⟨n, hn⟩
+
+/-!
+
+### F.4. Times at which the trajectory passes through zero
+
+In amplitude-phase form the trajectory is `x(t) = A cos (ω t - φ).` For nonzero amplitude this
+vanishes exactly when `cos (ω t - φ) = 0`, equivalently when the phase is an odd multiple
+of `π / 2`.
+
+-/
+
+/-- For nonzero amplitude, the trajectory passes through zero exactly when the cosine factor in
+  amplitude-phase form vanishes. -/
+lemma trajectory_eq_zero_iff_cos_eq_zero (IC : InitialConditions)
+    (hA : (AmplitudePhase.fromInitialConditions S IC).A ≠ 0) (t : Time) :
+    IC.trajectory S t = 0 ↔
+      cos (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
+  rw [trajectory_eq_cos]
+  constructor
+  · intro h
+    have hscalar :
+        (AmplitudePhase.fromInitialConditions S IC).A *
+          cos (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
+      simpa using congrArg (fun x : EuclideanSpace ℝ (Fin 1) => x 0) h
+    rcases mul_eq_zero.mp hscalar with hA0 | hcos
+    · exact (hA hA0).elim
+    · exact hcos
+  · intro h
+    ext i
+    fin_cases i
+    simp [h]
+
+/-- For nonzero amplitude, the trajectory passes through zero exactly at phase times
+  `φ + (2n + 1)π / 2`. -/
+lemma trajectory_eq_zero_iff_exists_int (IC : InitialConditions)
+    (hA : (AmplitudePhase.fromInitialConditions S IC).A ≠ 0) (t : Time) :
+    IC.trajectory S t = 0 ↔
+      ∃ n : ℤ,
+        (t : ℝ) =
+          ((AmplitudePhase.fromInitialConditions S IC).φ + (2 * n + 1) * π / 2) / S.ω := by
+  rw [trajectory_eq_zero_iff_cos_eq_zero S IC hA t]
+  constructor
+  · intro h
+    obtain ⟨n, hn⟩ := Real.cos_eq_zero_iff.mp h
+    use n
+    have hω : S.ω ≠ 0 := S.ω_ne_zero
+    have ht :
+        S.ω * t.val =
+          (AmplitudePhase.fromInitialConditions S IC).φ + (2 * n + 1) * π / 2 := by
+      linarith
+    calc
+      (t : ℝ) = (S.ω * t) / S.ω := by field_simp [hω]
+      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + (2 * n + 1) * π / 2) / S.ω := by
+        rw [ht]
+  · intro h
+    obtain ⟨n, hn⟩ := h
+    rw [Real.cos_eq_zero_iff]
+    use n
+    have hω : S.ω ≠ 0 := S.ω_ne_zero
+    rw [hn]
+    field_simp [hω]
+    ring
+
 end InitialConditions
+
+/-!
+
+## G. Periodicity and recurrence
+
+Every trajectory is a shifted cosine of angular frequency `ω`, so it repeats after a fixed period
+`T = 2π / ω`. We record the period, show the trajectory is periodic, and prove that — for
+non-trivial initial data — the trajectory returns to its initial position and velocity exactly at
+integer multiples of the period.
+
+-/
+
+/-!
+
+### G.1. The period
+
+The period `T = 2π / ω` is the time for one complete oscillation; it is positive since `ω > 0`.
+
+-/
 
 /--
 The period of a harmonic oscillator is `2 * π / ω`.
@@ -923,6 +1156,15 @@ lemma period_pos : 0 < T S := by
   rw [period_eq]
   positivity
 
+/-!
+
+### G.2. Periodicity of the trajectory
+
+The trajectory satisfies `x(t + T) = x(t)`: advancing time by one period shifts the phase `ω t`
+by `2π`, leaving `cos` and `sin` unchanged.
+
+-/
+
 /--
 The trajectory of the harmonic oscillator is periodic with period of `2 * π / ω`.
 -/
@@ -933,6 +1175,15 @@ lemma trajectory_periodic (IC : InitialConditions) :
     ring_nf; field_simp
   rw [InitialConditions.trajectory, add_val, period_eq, h, cos_add_two_pi, sin_add_two_pi]
   rfl
+
+/-!
+
+### G.3. Return to the initial state
+
+For non-trivial initial data, the trajectory returns to its initial position and velocity only at
+integer multiples of the period.
+
+-/
 
 /--
 Assuming that the initial coordinate and velocity are not simultaneously zero,
@@ -1017,20 +1268,6 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
     _ = (S.ω * t) / S.ω := by rw [hn]
     _ = t * (S.ω / S.ω) := by ring_nf
     _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
-
-
-/-!
-
-## F. Some open TODOs
-
-We give some open TODOs for the classical harmonic oscillator.
-
--/
-
-
-TODO "For the classical harmonic oscillator find the times for
-  which it passes through zero."
-
 end HarmonicOscillator
 
 end ClassicalMechanics
