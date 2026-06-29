@@ -191,9 +191,22 @@ lemma fieldStrengthMatrix_eq_electric_magnetic {c} (A : ElectromagneticPotential
     field_simp
     rw [fieldStrengthMatrix_antisymm]
   | Sum.inr i, Sum.inr j =>
-    fin_cases i <;> fin_cases j <;>
-    simp [magneticField_coord_eq_fieldStrengthMatrix A t x hA,
-      fieldStrengthMatrix_diag_eq_zero, fieldStrengthMatrix_antisymm]
+    fin_cases i <;> fin_cases j
+    · exact fieldStrengthMatrix_diag_eq_zero A ((toTimeAndSpace c).symm (t, x)) (Sum.inr 0)
+    · rw [magneticField_coord_eq_fieldStrengthMatrix (i := 2) A t x hA]
+      ring
+    · rw [fieldStrengthMatrix_antisymm]
+      simpa using (magneticField_coord_eq_fieldStrengthMatrix (i := 1) A t x hA).symm
+    · rw [fieldStrengthMatrix_antisymm]
+      simpa using (magneticField_coord_eq_fieldStrengthMatrix (i := 2) A t x hA).symm
+    · exact fieldStrengthMatrix_diag_eq_zero A ((toTimeAndSpace c).symm (t, x)) (Sum.inr 1)
+    · rw [magneticField_coord_eq_fieldStrengthMatrix (i := 0) A t x hA]
+      ring
+    · rw [magneticField_coord_eq_fieldStrengthMatrix (i := 1) A t x hA]
+      ring
+    · rw [fieldStrengthMatrix_antisymm]
+      simpa using (magneticField_coord_eq_fieldStrengthMatrix (i := 0) A t x hA).symm
+    · exact fieldStrengthMatrix_diag_eq_zero A ((toTimeAndSpace c).symm (t, x)) (Sum.inr 2)
 
 lemma fieldStrengthMatrix_eq_electric_magnetic_of_spaceTime (c : SpeedOfLight)
     (A : ElectromagneticPotential)
