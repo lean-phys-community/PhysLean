@@ -265,18 +265,21 @@ lemma electricField_contDiff {n} {c : SpeedOfLight} {A : ElectromagneticPotentia
     (hA : ContDiff ℝ (n + 1) A) : ContDiff ℝ n ↿(A.electricField c) := by
   rw [@contDiff_euclidean]
   intro i
+  let μ0 : Fin 1 ⊕ Fin d := Sum.inl 0
+  let μi : Fin 1 ⊕ Fin d := Sum.inr i
   conv =>
     enter [3, x];
     change A.electricField c x.1 x.2 i
     rw [electricField_eq_toFieldStrength (A) x.1 x.2 i (hA.differentiable (by simp))]
-    change - c * (let μ0 : Fin 1 ⊕ Fin d := Sum.inl 0
-      let μi : Fin 1 ⊕ Fin d := Sum.inr i
-      toField {A.toFieldStrength ((toTimeAndSpace c).symm (x.1, x.2)) | [μ0] [μi]}ᵀ)
+    change - c * toField {A.toFieldStrength ((toTimeAndSpace c).symm (x.1, x.2)) |
+      [μ0] [μi]}ᵀ
   apply ContDiff.mul
   · fun_prop
-  simpa only [Function.comp_apply] using
+  change ContDiff ℝ n ((fun x => toField {A.toFieldStrength x | [μ0] [μi]}ᵀ) ∘
+    (toTimeAndSpace c (d := d)).symm)
+  exact
     ContDiff.comp
-      (contDiff_toFieldStrength_eval (A := A) (μ := Sum.inl 0) (ν := Sum.inr i) hA)
+      (contDiff_toFieldStrength_eval (A := A) (μ := μ0) (ν := μi) hA)
       (ContinuousLinearEquiv.contDiff (toTimeAndSpace c).symm)
 
 lemma electricField_apply_contDiff {n} {c : SpeedOfLight} {A : ElectromagneticPotential d}
@@ -317,18 +320,21 @@ lemma electricField_differentiable {A : ElectromagneticPotential d} {c : SpeedOf
     (hA : ContDiff ℝ 2 A) : Differentiable ℝ (↿(A.electricField c)) := by
   rw [differentiable_euclidean]
   intro i
+  let μ0 : Fin 1 ⊕ Fin d := Sum.inl 0
+  let μi : Fin 1 ⊕ Fin d := Sum.inr i
   conv =>
     enter [2, x];
     change A.electricField c x.1 x.2 i
     rw [electricField_eq_toFieldStrength (A) x.1 x.2 i (hA.differentiable (by simp))]
-    change - c * (let μ0 : Fin 1 ⊕ Fin d := Sum.inl 0
-      let μi : Fin 1 ⊕ Fin d := Sum.inr i
-      toField {A.toFieldStrength ((toTimeAndSpace c).symm (x.1, x.2)) | [μ0] [μi]}ᵀ)
+    change - c * toField {A.toFieldStrength ((toTimeAndSpace c).symm (x.1, x.2)) |
+      [μ0] [μi]}ᵀ
   apply Differentiable.mul
   · fun_prop
-  simpa only [Function.comp_apply] using
+  change Differentiable ℝ ((fun x => toField {A.toFieldStrength x | [μ0] [μi]}ᵀ) ∘
+    (toTimeAndSpace c (d := d)).symm)
+  exact
     Differentiable.comp
-      (differentiable_toFieldStrength_eval (A := A) (μ := Sum.inl 0) (ν := Sum.inr i) hA)
+      (differentiable_toFieldStrength_eval (A := A) (μ := μ0) (ν := μi) hA)
       (ContinuousLinearEquiv.differentiable (toTimeAndSpace c).symm)
 
 lemma electricField_differentiable_time {A : ElectromagneticPotential d} {c : SpeedOfLight}
@@ -433,10 +439,10 @@ lemma time_deriv_electricField_eq_fieldStrengthMatrix {d} {A : ElectromagneticPo
     ∂ₜ (fun t => A.electricField c t x) t i =
     - c ^ 2 * ∂_ (Sum.inl 0) (fun x => (A.fieldStrengthMatrix x) (Sum.inl 0, Sum.inr i))
   ((toTimeAndSpace c).symm (t, x)) := by
-  conv_rhs =>
-    enter [2, 2, y]
-    rw [← toFieldStrength_eval_eq_fieldStrengthMatrix A y (Sum.inl 0) (Sum.inr i)]
-  exact time_deriv_electricField_eq_toFieldStrength hA t x i
+  rw [time_deriv_electricField_eq_toFieldStrength hA t x i]
+  congr 2
+  funext y
+  exact toFieldStrength_eval_eq_fieldStrengthMatrix A y (Sum.inl 0) (Sum.inr i)
 
 lemma div_electricField_eq_toFieldStrength {d} {A : ElectromagneticPotential d}
     {c : SpeedOfLight} (hA : ContDiff ℝ 2 A) (t : Time) (x : Space d) :
@@ -473,10 +479,13 @@ lemma div_electricField_eq_fieldStrengthMatrix{d} {A : ElectromagneticPotential 
     {c : SpeedOfLight} (hA : ContDiff ℝ 2 A) (t : Time) (x : Space d) :
     (∇ ⬝ A.electricField c t) x = c * ∑ (μ : (Fin 1 ⊕ Fin d)),
       (∂_ μ (A.fieldStrengthMatrix · (μ, Sum.inl 0)) ((toTimeAndSpace c).symm (t, x))) := by
-  conv_rhs =>
-    enter [2, μ, 2, y]
-    rw [← toFieldStrength_eval_eq_fieldStrengthMatrix A y μ (Sum.inl 0)]
-  exact div_electricField_eq_toFieldStrength hA t x
+  rw [div_electricField_eq_toFieldStrength hA t x]
+  congr 1
+  apply Finset.sum_congr rfl
+  intro μ _
+  congr 1
+  funext y
+  exact toFieldStrength_eval_eq_fieldStrengthMatrix A y μ (Sum.inl 0)
 end ElectromagneticPotential
 
 end Electromagnetism
