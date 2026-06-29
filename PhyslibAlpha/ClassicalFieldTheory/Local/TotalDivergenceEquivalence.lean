@@ -29,6 +29,7 @@ which facts are data and which facts are proved.
 
 - `ClassicalFieldTheory.Local.HasTotalDivergenceDifference`
 - `ClassicalFieldTheory.Local.IsEulerLagrangeEquivalent`
+- `ClassicalFieldTheory.Local.IsEulerLagrangeEquivalent.eulerLagrangeOp_eq_zero_iff`
 - `ClassicalFieldTheory.Local.IsEulerLagrangeEquivalent.isCritical_iff`
 - `ClassicalFieldTheory.Local.TotalDivergenceEquivalence`
 - `ClassicalFieldTheory.Local.TotalDivergenceEquivalence.isCritical_iff`
@@ -96,6 +97,18 @@ lemma trans {L1 L2 L3 : Lagrangian d m k}
   intro f
   exact (h23 f).trans (h12 f)
 
+lemma eulerLagrangeOp_eq {source target : Lagrangian d m k}
+    (h : IsEulerLagrangeEquivalent source target)
+    (f : Space d → EuclideanSpace ℝ (Fin m)) :
+    eulerLagrangeOp target f = eulerLagrangeOp source f :=
+  h f
+
+lemma eulerLagrangeOp_eq_zero_iff {source target : Lagrangian d m k}
+    (h : IsEulerLagrangeEquivalent source target)
+    (f : Space d → EuclideanSpace ℝ (Fin m)) :
+    eulerLagrangeOp target f = 0 ↔ eulerLagrangeOp source f = 0 := by
+  rw [h.eulerLagrangeOp_eq f]
+
 lemma isCritical_iff {source target : Lagrangian d m k}
     (h : IsEulerLagrangeEquivalent source target)
     (f : Space d → EuclideanSpace ℝ (Fin m))
@@ -109,6 +122,28 @@ lemma isCritical_iff {source target : Lagrangian d m k}
     isCritical_iff_eulerLagrange_zero_of_admissibleForAction_and_smoothInCoordinates
       source f hsourcef hsource,
     h f]
+
+lemma isCritical_target_of_source {source target : Lagrangian d m k}
+    (h : IsEulerLagrangeEquivalent source target)
+    (f : Space d → EuclideanSpace ℝ (Fin m))
+    (hsourcef : IsAdmissibleForAction source f)
+    (htargetf : IsAdmissibleForAction target f)
+    (hsource : Lagrangian.SmoothInCoordinates source)
+    (htarget : Lagrangian.SmoothInCoordinates target)
+    (hcrit : IsCritical source f) :
+    IsCritical target f :=
+  (h.isCritical_iff f hsourcef htargetf hsource htarget).2 hcrit
+
+lemma isCritical_source_of_target {source target : Lagrangian d m k}
+    (h : IsEulerLagrangeEquivalent source target)
+    (f : Space d → EuclideanSpace ℝ (Fin m))
+    (hsourcef : IsAdmissibleForAction source f)
+    (htargetf : IsAdmissibleForAction target f)
+    (hsource : Lagrangian.SmoothInCoordinates source)
+    (htarget : Lagrangian.SmoothInCoordinates target)
+    (hcrit : IsCritical target f) :
+    IsCritical source f :=
+  (h.isCritical_iff f hsourcef htargetf hsource htarget).1 hcrit
 
 end IsEulerLagrangeEquivalent
 
@@ -152,6 +187,11 @@ lemma eulerLagrangeOp_eq (E : TotalDivergenceEquivalence d m k)
     eulerLagrangeOp E.target f = eulerLagrangeOp E.source f :=
   E.sameEulerLagrangeOp f
 
+lemma eulerLagrangeOp_eq_zero_iff (E : TotalDivergenceEquivalence d m k)
+    (f : Space d → EuclideanSpace ℝ (Fin m)) :
+    eulerLagrangeOp E.target f = 0 ↔ eulerLagrangeOp E.source f = 0 :=
+  E.sameEulerLagrangeOp.eulerLagrangeOp_eq_zero_iff f
+
 lemma isCritical_iff (E : TotalDivergenceEquivalence d m k)
     (f : Space d → EuclideanSpace ℝ (Fin m))
     (hsourcef : IsAdmissibleForAction E.source f)
@@ -160,6 +200,26 @@ lemma isCritical_iff (E : TotalDivergenceEquivalence d m k)
     (htarget : Lagrangian.SmoothInCoordinates E.target) :
     IsCritical E.target f ↔ IsCritical E.source f := by
   exact E.sameEulerLagrangeOp.isCritical_iff f hsourcef htargetf hsource htarget
+
+lemma isCritical_target_of_source (E : TotalDivergenceEquivalence d m k)
+    (f : Space d → EuclideanSpace ℝ (Fin m))
+    (hsourcef : IsAdmissibleForAction E.source f)
+    (htargetf : IsAdmissibleForAction E.target f)
+    (hsource : Lagrangian.SmoothInCoordinates E.source)
+    (htarget : Lagrangian.SmoothInCoordinates E.target)
+    (hcrit : IsCritical E.source f) :
+    IsCritical E.target f :=
+  E.sameEulerLagrangeOp.isCritical_target_of_source f hsourcef htargetf hsource htarget hcrit
+
+lemma isCritical_source_of_target (E : TotalDivergenceEquivalence d m k)
+    (f : Space d → EuclideanSpace ℝ (Fin m))
+    (hsourcef : IsAdmissibleForAction E.source f)
+    (htargetf : IsAdmissibleForAction E.target f)
+    (hsource : Lagrangian.SmoothInCoordinates E.source)
+    (htarget : Lagrangian.SmoothInCoordinates E.target)
+    (hcrit : IsCritical E.target f) :
+    IsCritical E.source f :=
+  E.sameEulerLagrangeOp.isCritical_source_of_target f hsourcef htargetf hsource htarget hcrit
 
 end TotalDivergenceEquivalence
 
