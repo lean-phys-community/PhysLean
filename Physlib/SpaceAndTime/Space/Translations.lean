@@ -89,9 +89,7 @@ lemma translateSchwartz_apply {d : ℕ} (a : EuclideanSpace ℝ (Fin d))
 
 lemma translateSchwartz_coe_eq {d : ℕ} (a : EuclideanSpace ℝ (Fin d))
     (η : 𝓢(Space d, X)) :
-    (translateSchwartz a η : Space d → X) = fun x => η (x - basis.repr.symm a) := by
-  ext
-  simp
+    (translateSchwartz a η : Space d → X) = fun x => η (x - basis.repr.symm a) := rfl
 
 /-- The continuous linear map translating distributions. -/
 noncomputable def distTranslate {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :

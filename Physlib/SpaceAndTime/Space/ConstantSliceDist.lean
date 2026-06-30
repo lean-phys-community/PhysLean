@@ -576,8 +576,7 @@ def sliceSchwartz {d : ℕ} (i : Fin d.succ) :
     rfl
 
 lemma sliceSchwartz_apply {d : ℕ} (i : Fin d.succ) (η : 𝓢(Space d.succ, ℝ)) (x : Space d) :
-    sliceSchwartz i η x = ∫ (r : ℝ), η ((slice i).symm (r, x)) := by
-  rfl
+    sliceSchwartz i η x = ∫ (r : ℝ), η ((slice i).symm (r, x)) := rfl
 /-!
 
 ## B. Constant slice distribution
@@ -598,8 +597,7 @@ def constantSliceDist {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d :
 
 lemma constantSliceDist_apply {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {d : ℕ} (i : Fin d.succ) (f : (Space d) →d[ℝ] M) (η : 𝓢(Space d.succ, ℝ)) :
-    constantSliceDist i f η = f (sliceSchwartz i η) := by
-  rfl
+    constantSliceDist i f η = f (sliceSchwartz i η) := rfl
 
 /-!
 

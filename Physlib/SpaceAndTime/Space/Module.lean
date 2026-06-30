@@ -90,9 +90,8 @@ lemma eq_vadd_zero {d} (s : Space d) :
 
 @[simp]
 lemma add_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
-    (v1 +ᵥ (0 : Space d)) + (v2 +ᵥ (0 : Space d)) = (v1 + v2) +ᵥ (0 : Space d) := by
-  ext i
-  simp
+    (v1 +ᵥ (0 : Space d)) + (v2 +ᵥ (0 : Space d)) = (v1 + v2) +ᵥ (0 : Space d) :=
+  eq_of_apply fun i => by simp
 
 /-!
 
@@ -450,8 +449,7 @@ lemma coord_contDiff {i} : ContDiff ℝ ∞ (fun x : Space d => x.coord i) := by
   fun_prop
 
 lemma coordCLM_apply (μ : Fin d) (p : Space d) :
-    coordCLM μ p = coord μ p := by
-  rfl
+    coordCLM μ p = coord μ p := rfl
 
 @[inherit_doc coord]
 scoped notation "𝔁" => coord
@@ -596,8 +594,8 @@ noncomputable def oneEquiv : Space 1 ≃ₗᵢ[ℝ] ℝ where
   left_inv x := by
     ext i; fin_cases i; simp
   right_inv x := by simp
-  map_add' x y := by rfl
-  map_smul' c x := by rfl
+  map_add' x y := rfl
+  map_smul' c x := rfl
   norm_map' x := by
     simp only [Fin.isValue, LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, Real.norm_eq_abs]
     rw [norm_eq]
@@ -605,12 +603,10 @@ noncomputable def oneEquiv : Space 1 ≃ₗᵢ[ℝ] ℝ where
     exact Eq.symm (Real.sqrt_sq_eq_abs (x 0))
 
 lemma oneEquiv_coe :
-    (oneEquiv : Space 1 → ℝ) = fun x => x 0 := by
-  rfl
+    (oneEquiv : Space 1 → ℝ) = fun x => x 0 := rfl
 
 lemma oneEquiv_symm_coe :
-    (oneEquiv.symm : ℝ → Space 1) = (fun x => ⟨fun _ => x⟩) := by
-  rfl
+    (oneEquiv.symm : ℝ → Space 1) = (fun x => ⟨fun _ => x⟩) := rfl
 
 lemma oneEquiv_symm_apply (x : ℝ) (i : Fin 1) :
     oneEquiv.symm x i = x := by
@@ -661,8 +657,8 @@ lemma oneEquiv_symm_measurableEmbedding : MeasurableEmbedding oneEquiv.symm wher
 lemma oneEquiv_measurePreserving : MeasurePreserving oneEquiv volume volume :=
   LinearIsometryEquiv.measurePreserving oneEquiv
 
-lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume volume := by
-  exact LinearIsometryEquiv.measurePreserving oneEquiv.symm
+lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume volume :=
+  LinearIsometryEquiv.measurePreserving oneEquiv.symm
 
 /-!
 

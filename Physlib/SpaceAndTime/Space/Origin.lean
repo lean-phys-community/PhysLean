@@ -33,8 +33,7 @@ lemma zero_val {d : ℕ} : (0 : Space d).val = fun _ => 0 := rfl
 
 @[simp]
 lemma zero_apply {d : ℕ} (i : Fin d) :
-    (0 : Space d) i = 0 := by
-  simp [zero_val]
+    (0 : Space d) i = 0 := rfl
 
 /-- A Euclidean vector, based at the chosen origin, viewed as a point of `Space d`. -/
 noncomputable def vectorToSpace {d : ℕ} (v : EuclideanSpace ℝ (Fin d)) : Space d :=
@@ -48,7 +47,6 @@ lemma vectorToSpace_apply {d : ℕ} (v : EuclideanSpace ℝ (Fin d)) (i : Fin d)
 @[simp]
 lemma vectorToSpace_vsub_zero {d : ℕ} (v : EuclideanSpace ℝ (Fin d)) :
     vectorToSpace v -ᵥ (0 : Space d) = v := by
-  ext i
   simp [vectorToSpace]
 
 /-- The standard chart `Space d ≃ᵃⁱ[ℝ] EuclideanSpace ℝ (Fin d)`, `p ↦ p -ᵥ 0`, identifying a point
