@@ -194,21 +194,18 @@ lemma card_perm_eq {φs φs' : List 𝓕.FieldOp} (h : φs.Perm φs') :
 @[simp]
 lemma sum_nil (f : CrAnSection (𝓕 := 𝓕) [] → M) [AddCommMonoid M] :
     ∑ (s : CrAnSection []), f s = f ⟨[], rfl⟩ := by
-  rw [← nilEquiv.symm.sum_comp]
-  simp only [Finset.univ_unique, PUnit.default_eq_unit, Finset.sum_singleton]
-  rfl
+  simpa [nilEquiv] using Eq.symm (Equiv.sum_comp nilEquiv.symm f)
 
 lemma sum_cons (f : CrAnSection (φ :: φs) → M) [AddCommMonoid M] :
     ∑ (s : CrAnSection (φ :: φs)), f s = ∑ (a : 𝓕.fieldOpToCrAnType φ),
     ∑ (s : CrAnSection φs), f (cons a s) := by
-  rw [← consEquiv.symm.sum_comp, Fintype.sum_prod_type]
-  rfl
+  simpa [Fintype.sum_prod_type, consEquiv] using
+    Eq.symm (Equiv.sum_comp consEquiv.symm f)
 
 lemma sum_over_length {s : CrAnSection φs} (f : Fin s.1.length → M)
     [AddCommMonoid M] : ∑ (n : Fin s.1.length), f n =
     ∑ (n : Fin φs.length), f (Fin.cast (length_eq s).symm n) := by
-  rw [← (finCongr (length_eq s)).sum_comp]
-  rfl
+  exact Eq.symm (Equiv.sum_comp (finCongr (length_eq s)).symm f)
 
 /-- The equivalence between `CrAnSection φs` and
   `CrAnSection φs'` induced by an equality `φs = φs'`. -/
@@ -421,8 +418,8 @@ lemma sum_eraseIdxEquiv (n : ℕ) (φs : List 𝓕.FieldOp) (hn : n < φs.length
     (f : CrAnSection φs → M) [AddCommMonoid M] : ∑ (s : CrAnSection φs), f s =
     ∑ (a : 𝓕.fieldOpToCrAnType φs[n]), ∑ (s : CrAnSection (φs.eraseIdx n)),
     f ((eraseIdxEquiv n φs hn).symm ⟨a, s⟩) := by
-  rw [← (eraseIdxEquiv n φs hn).symm.sum_comp]
-  rw [Fintype.sum_prod_type]
+  simpa [Fintype.sum_prod_type] using
+    Eq.symm (Equiv.sum_comp (eraseIdxEquiv n φs hn).symm f)
 
 end CrAnSection
 

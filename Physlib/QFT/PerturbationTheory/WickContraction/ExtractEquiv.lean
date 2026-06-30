@@ -108,9 +108,7 @@ lemma sum_extractEquiv_congr [AddCommMonoid M] {n m : ℕ} (i : Fin n) (f : Wick
     ∑ c, f c = ∑ (c : WickContraction m), ∑ (k : Option c.uncontracted),
     f (congr h.symm ((extractEquiv (finCongr h i)).symm ⟨c, k⟩)) := by
   subst h
-  simp only [finCongr_refl, Equiv.refl_apply, congr_refl]
-  rw [← (extractEquiv i).symm.sum_comp]
-  rw [Finset.sum_sigma']
+  rw [← (extractEquiv i).symm.sum_comp, Finset.sum_sigma']
   rfl
 
 /-- For `n = 3` there are `4` possible Wick contractions:
