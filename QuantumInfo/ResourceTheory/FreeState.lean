@@ -193,15 +193,13 @@ noncomputable def spacePow (i : ι) (n : ℕ) : ι :=
 scoped notation i "⊗^H[" n "]" => spacePow i n
 
 @[simp]
-theorem spacePow_zero (i : ι) : i ^ 0 = 1 := by
-  rfl
+theorem spacePow_zero (i : ι) : i ^ 0 = 1 := rfl
 
 @[simp]
 theorem spacePow_one (i : ι) : i ^ 1 = i := by
   simp
 
-theorem spacePow_succ (i : ι) (n : ℕ) : i ^ (n + 1) = (i ^ n) * i := by
-  rfl
+theorem spacePow_succ (i : ι) (n : ℕ) : i ^ (n + 1) = (i ^ n) * i := rfl
 
 theorem spacePow_add (m n : ℕ) :
     i ^ (m + n) = (i ^ m) * (i ^ n) := by
@@ -233,8 +231,7 @@ theorem statePow_one (ρ : MState (H i)) : ρ ⊗ᵣ^[1] ≍ ρ := by
   · rw [eq_cast_iff_heq, statePow]
     exact default_prod ρ
 
-theorem statePow_succ (ρ : MState (H i)) (n : ℕ) : ρ ⊗ᵣ^[n + 1] = ρ ⊗ᵣ^[n] ⊗ᵣ ρ := by
-  rfl
+theorem statePow_succ (ρ : MState (H i)) (n : ℕ) : ρ ⊗ᵣ^[n + 1] = ρ ⊗ᵣ^[n] ⊗ᵣ ρ := rfl
 
 theorem statePow_add (ρ : MState (H i)) (m n : ℕ) : ρ ⊗ᵣ^[m + n] ≍ ρ ⊗ᵣ^[m] ⊗ᵣ ρ ⊗ᵣ^[n] := by
   rw [← eq_cast_iff_heq]; swap

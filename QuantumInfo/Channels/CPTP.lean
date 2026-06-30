@@ -154,8 +154,7 @@ def id : CPTPMap dIn dIn where
 
 /-- The map `CPTPMap.id` leaves any matrix unchanged. -/
 @[simp]
-theorem id_map : (id (dIn := dIn)).map = LinearMap.id := by
-  rfl
+theorem id_map : (id (dIn := dIn)).map = LinearMap.id := rfl
 
 /-- The map `CPTPMap.id` leaves the input state unchanged. -/
 @[simp]

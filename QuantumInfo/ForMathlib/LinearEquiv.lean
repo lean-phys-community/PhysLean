@@ -61,8 +61,7 @@ def euclidean_of_relabel (e : d ≃ d₂) : EuclideanSpace 𝕜 d₂ ≃ₗ[𝕜
   (WithLp.linearEquiv 2 𝕜 _).trans ((of_relabel _ e).trans (WithLp.linearEquiv 2 𝕜 _).symm)
 
 @[simp]
-theorem of_relabel_refl : of_relabel R (.refl d) = LinearEquiv.refl R (d → R) := by
-  rfl
+theorem of_relabel_refl : of_relabel R (.refl d) = LinearEquiv.refl R (d → R) := rfl
 
 @[simp]
 theorem euclidean_of_relabel_refl : euclidean_of_relabel 𝕜 (.refl d) =

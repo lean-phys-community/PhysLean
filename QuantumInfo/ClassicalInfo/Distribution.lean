@@ -87,12 +87,10 @@ def constant (x : α) : ProbDistribution α :=
   ⟨fun y ↦ if x = y then 1 else 0,
     by simp [apply_ite]⟩
 
-theorem constant_def (x : α) : (constant x : α → Prob) = fun y ↦ if x = y then 1 else 0 := by
-  rfl
+theorem constant_def (x : α) : (constant x : α → Prob) = fun y ↦ if x = y then 1 else 0 := rfl
 
 @[simp]
-theorem constant_eq (x : α) : constant x y = if x = y then 1 else 0 := by
-  rfl
+theorem constant_eq (x : α) : constant x y = if x = y then 1 else 0 := rfl
 
 @[simp]
 theorem constant_def' (x y : α) : (constant x : α → Prob) y = if x = y then 1 else 0 := by
@@ -181,8 +179,7 @@ def congr (σ : α ≃ β) : ProbDistribution α ≃ ProbDistribution β := by
     simp only [← fun_eq_val, Equiv.apply_symm_apply, Subtype.coe_eta]
 
 @[simp]
-theorem congr_apply (σ : α ≃ β) (d : ProbDistribution α) (j : β): (congr σ d) j = d (σ.symm j) := by
-  rfl
+theorem congr_apply (σ : α ≃ β) (d : ProbDistribution α) (j : β): (congr σ d) j = d (σ.symm j) := rfl
 
 /-- The inverse and congruence operations for distributions commute -/
 @[simp]

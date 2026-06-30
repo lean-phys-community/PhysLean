@@ -58,7 +58,6 @@ theorem trivial_selfadjMap {R} [Star R] [TrivialStar R] [CommSemiring R] :
   rfl
 
 @[simp]
-theorem RCLike_selfadjMap {α} [RCLike α] : (selfadjMap : α →+ ℝ) = RCLike.re := by
-  rfl
+theorem RCLike_selfadjMap {α} [RCLike α] : (selfadjMap : α →+ ℝ) = RCLike.re := rfl
 
 end IsMaximalSelfAdjoint

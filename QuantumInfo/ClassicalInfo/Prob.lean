@@ -170,8 +170,7 @@ instance instSub : Sub Prob where
     simpa using le_add_of_le_of_nonneg p.2.2 q.2.1
   ⟩
 
-theorem coe_sub (p q : Prob) : (p - q : Prob)  = (p.val - q.val) ⊔ (0 : ℝ) := by
-  rfl
+theorem coe_sub (p q : Prob) : (p - q : Prob)  = (p.val - q.val) ⊔ (0 : ℝ) := rfl
 
 @[simp, norm_cast]
 theorem coe_one_minus (p : Prob) : (1 - p : Prob) = 1 - (p : ℝ) := by
@@ -200,8 +199,7 @@ instance : Nontrivial Prob where
   exists_pair_ne := ⟨0, 1, by simp [← Prob.ne_iff]⟩
 
 @[simp]
-theorem top_eq_one : (⊤ : Prob) = 1 := by
-  rfl
+theorem top_eq_one : (⊤ : Prob) = 1 := rfl
 
 @[simp]
 theorem sub_zero (p : Prob) : p - 0 = p := by

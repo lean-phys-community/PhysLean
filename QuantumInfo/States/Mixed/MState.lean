@@ -83,8 +83,7 @@ attribute [simp] MState.tr
 def m (ρ : MState d) : Matrix d d ℂ := ρ.M.mat
 
 @[simp]
-theorem mat_M : ρ.M.mat = ρ.m := by
-  rfl
+theorem mat_M : ρ.M.mat = ρ.m := rfl
 
 theorem pos (ρ : MState d) : 0 < ρ.M := by
   apply ρ.nonneg.lt_of_ne'
@@ -191,8 +190,7 @@ theorem inner_def : ⟪ρ, σ⟫_Prob = ⟨⟪ρ.M, σ.M⟫,
     (inner_le_mul_trace ρ.nonneg σ.nonneg).trans (by simp)⟩ := by
   rfl
 
-theorem val_inner : (⟪ρ, σ⟫_Prob : ℝ) = ⟪ρ.M, σ.M⟫ := by
-  rfl
+theorem val_inner : (⟪ρ, σ⟫_Prob : ℝ) = ⟪ρ.M, σ.M⟫ := rfl
 
 section exp_val
 
@@ -290,8 +288,7 @@ theorem pure_inner : ⟪pure ψ, pure φ⟫_Prob = ‖Braket.dot ψ φ‖^2 := b
     Complex.normSq_eq_norm_sq (((ψ : Bra d) : d → ℂ) ⬝ᵥ (φ : d → ℂ))
 
 @[simp]
-theorem pure_apply {i j : d} : (pure ψ).m i j = (ψ i) * conj (ψ j) := by
-  rfl
+theorem pure_apply {i j : d} : (pure ψ).m i j = (ψ i) * conj (ψ j) := rfl
 
 theorem pure_mul_self : (pure ψ).m * (pure ψ).m = (pure ψ : Matrix d d ℂ) := by
   dsimp [pure, MState.m]
@@ -1187,12 +1184,10 @@ def assoc' (ρ : MState (d₁ × d₂ × d₃)) : MState ((d₁ × d₂) × d₃
   ρ.SWAP.assoc.SWAP.assoc.SWAP
 
 @[simp]
-theorem assoc_assoc' (ρ : MState (d₁ × d₂ × d₃)) : ρ.assoc'.assoc = ρ := by
-  rfl
+theorem assoc_assoc' (ρ : MState (d₁ × d₂ × d₃)) : ρ.assoc'.assoc = ρ := rfl
 
 @[simp]
-theorem assoc'_assoc (ρ : MState ((d₁ × d₂) × d₃)) : ρ.assoc.assoc' = ρ := by
-  rfl
+theorem assoc'_assoc (ρ : MState ((d₁ × d₂) × d₃)) : ρ.assoc.assoc' = ρ := rfl
 
 @[simp]
 theorem traceLeft_right_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
@@ -1282,8 +1277,7 @@ instance : CompactSpace (MState d) := by
 noncomputable instance : MetricSpace (MState d) :=
   MetricSpace.induced MState.M MState.M_Injective inferInstance
 
-theorem dist_eq (x y : MState d) : dist x y = dist x.M y.M := by
-  rfl
+theorem dist_eq (x y : MState d) : dist x y = dist x.M y.M := rfl
 
 set_option backward.isDefEq.respectTransparency false in
 instance : BoundedSpace (MState d) where

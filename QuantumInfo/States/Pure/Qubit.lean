@@ -180,20 +180,16 @@ lemma CNOT_matrix :
 variable (g : 𝐔[k]) (j₁ j₂ : k)
 
 @[simp]
-theorem controllize_apply_zero_zero : C[g] (0, j₁) (0, j₂) = (1 : 𝐔[k]) j₁ j₂ := by
-  rfl
+theorem controllize_apply_zero_zero : C[g] (0, j₁) (0, j₂) = (1 : 𝐔[k]) j₁ j₂ := rfl
 
 @[simp]
-theorem controllize_apply_zero_one : C[g] (0, j₁) (1, j₂) = 0 := by
-  rfl
+theorem controllize_apply_zero_one : C[g] (0, j₁) (1, j₂) = 0 := rfl
 
 @[simp]
-theorem controllize_apply_one_zero : C[g] (1, j₁) (0, j₂) = 0 := by
-  rfl
+theorem controllize_apply_one_zero : C[g] (1, j₁) (0, j₂) = 0 := rfl
 
 @[simp]
-theorem controllize_apply_one_one : C[g] (1, j₁) (1, j₂) = g j₁ j₂ := by
-  rfl
+theorem controllize_apply_one_one : C[g] (1, j₁) (1, j₂) = g j₁ j₂ := rfl
 
 @[simp]
 theorem controllize_mul (g₁ g₂ : 𝐔[k]) : C[g₁] * C[g₂] = C[g₁ * g₂] := by

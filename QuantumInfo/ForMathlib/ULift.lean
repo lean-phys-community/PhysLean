@@ -28,8 +28,7 @@ instance ULift.instStar {𝕜 : Type u} [Star 𝕜] : Star (ULift.{v,u} 𝕜) wh
   star x := .up (star x.down)
 
 @[simp]
-theorem ULift.star_eq {𝕜 : Type u} [Star 𝕜] (x : ULift.{v,u} 𝕜) : star x = .up (star x.down) := by
-  rfl
+theorem ULift.star_eq {𝕜 : Type u} [Star 𝕜] (x : ULift.{v,u} 𝕜) : star x = .up (star x.down) := rfl
 
 instance ULift.instInvolutiveStar {𝕜 : Type u} [InvolutiveStar 𝕜] :
     InvolutiveStar (ULift.{v,u} 𝕜) where

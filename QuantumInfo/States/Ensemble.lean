@@ -118,8 +118,7 @@ theorem average_of_pure_ensemble {T : Type _} {U : Type*} [AddCommGroup U] [Modu
 variable {ψ : Ket d}
 
 @[simp]
-theorem distr_toMEnsemble (e : PEnsemble d α) : (toMEnsemble e).distr = e.distr := by
-  rfl
+theorem distr_toMEnsemble (e : PEnsemble d α) : (toMEnsemble e).distr = e.distr := rfl
 
 /-
 A pure-state ensemble mixes into a pure state if and only if
