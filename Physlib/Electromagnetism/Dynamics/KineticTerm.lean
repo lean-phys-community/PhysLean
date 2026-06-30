@@ -362,6 +362,7 @@ lemma kineticTerm_eq_electricMatrix_magneticFieldMatrix_time_space {𝓕 : FreeS
   simp [FreeSpace.c_sq]
   field_simp
   ring_nf
+  rfl
 
 lemma kineticTerm_eq_electricMatrix_magneticFieldMatrix {𝓕 : FreeSpace}
     (A : ElectromagneticPotential d) (x : SpaceTime d)
