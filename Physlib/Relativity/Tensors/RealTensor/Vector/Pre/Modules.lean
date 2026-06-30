@@ -142,13 +142,11 @@ scoped[Lorentz] infixr:73 " *ᵥ " => ContrMod.mulVec
 
 @[simp]
 lemma mulVec_toFin1dℝ (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : ContrMod d) :
-    (M *ᵥ v).toFin1dℝ = M *ᵥ v.toFin1dℝ := by
-  rfl
+    (M *ᵥ v).toFin1dℝ = M *ᵥ v.toFin1dℝ := rfl
 
 @[simp]
 lemma mulVec_val (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : ContrMod d) :
-    (M *ᵥ v).val = M *ᵥ v.val := by
-  rfl
+    (M *ᵥ v).val = M *ᵥ v.val := rfl
 
 lemma mulVec_sub (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v w : ContrMod d) :
     M *ᵥ (v - w) = M *ᵥ v - M *ᵥ w := by
@@ -206,8 +204,7 @@ def rep : Representation ℝ (LorentzGroup d) (ContrMod d) where
     simp only [lorentzGroupIsGroup_mul_coe, _root_.map_mul]
 
 lemma rep_apply_toFin1dℝ (g : LorentzGroup d) (ψ : ContrMod d) :
-    (rep g ψ).toFin1dℝ = g.1 *ᵥ ψ.toFin1dℝ := by
-  rfl
+    (rep g ψ).toFin1dℝ = g.1 *ᵥ ψ.toFin1dℝ := rfl
 
 /-!
 
@@ -403,13 +400,11 @@ scoped[Lorentz] infixr:73 " *ᵥ " => CoMod.mulVec
 
 @[simp]
 lemma mulVec_toFin1dℝ (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : CoMod d) :
-    (M *ᵥ v).toFin1dℝ = M *ᵥ v.toFin1dℝ := by
-  rfl
+    (M *ᵥ v).toFin1dℝ = M *ᵥ v.toFin1dℝ := rfl
 
 @[simp]
 lemma mulVec_val (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : CoMod d) :
-    (M *ᵥ v).val = M *ᵥ v.val := by
-  rfl
+    (M *ᵥ v).val = M *ᵥ v.val := rfl
 /-!
 
 ## The representation

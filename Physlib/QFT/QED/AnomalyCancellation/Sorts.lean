@@ -43,8 +43,7 @@ lemma sort_perm {n : ℕ} (S : (PureU1 n).Charges) (M :(FamilyPermutations n).gr
   @Tuple.comp_perm_comp_sort_eq_comp_sort n ℚ _ S M⁻¹
 
 lemma sort_apply {n : ℕ} (S : (PureU1 n).Charges) (j : Fin n) :
-    sort S j = S ((Tuple.sort S) j) := by
-  rfl
+    sort S j = S ((Tuple.sort S) j) := rfl
 
 lemma sort_zero {n : ℕ} (S : (PureU1 n).Charges) (hS : sort S = 0) : S = 0 := by
   funext i
@@ -65,8 +64,7 @@ lemma sort_projection {n : ℕ} (S : (PureU1 n).Charges) : sort (sort S) = sort 
 def sortAFL {n : ℕ} (S : (PureU1 n).LinSols) : (PureU1 n).LinSols :=
   ((FamilyPermutations n).linSolRep (Tuple.sort S.val).symm S)
 
-lemma sortAFL_val {n : ℕ} (S : (PureU1 n).LinSols) : (sortAFL S).val = sort S.val := by
-  rfl
+lemma sortAFL_val {n : ℕ} (S : (PureU1 n).LinSols) : (sortAFL S).val = sort S.val := rfl
 
 lemma sortAFL_zero {n : ℕ} (S : (PureU1 n).LinSols) (hS : sortAFL S = 0) : S = 0 := by
   apply ACCSystemLinear.LinSols.ext

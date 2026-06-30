@@ -125,12 +125,10 @@ lemma charges_eq_toSpecies_eq (S T : MSSMCharges.Charges) :
       | 1 => exact h.2.2
 
 lemma Hd_toSpecies_inv (f : (Fin 6 → Fin 3 → ℚ) × (Fin 2 → ℚ)) :
-    Hd (toSpecies.symm f) = f.2 0 := by
-  rfl
+    Hd (toSpecies.symm f) = f.2 0 := rfl
 
 lemma Hu_toSpecies_inv (f : (Fin 6 → Fin 3 → ℚ) × (Fin 2 → ℚ)) :
-    Hu (toSpecies.symm f) = f.2 1 := by
-  rfl
+    Hu (toSpecies.symm f) = f.2 1 := rfl
 
 end MSSMCharges
 
@@ -455,8 +453,7 @@ def AnomalyFreeMk (S : MSSMACC.Charges) (hg : accGrav S = 0)
 lemma AnomalyFreeMk_val (S : MSSMACC.Charges) (hg : accGrav S = 0)
     (hsu2 : accSU2 S = 0) (hsu3 : accSU3 S = 0) (hyy : accYY S = 0)
     (hquad : accQuad S = 0) (hcube : accCube S = 0) :
-    (AnomalyFreeMk S hg hsu2 hsu3 hyy hquad hcube).val = S := by
-  rfl
+    (AnomalyFreeMk S hg hsu2 hsu3 hyy hquad hcube).val = S := rfl
 
 /-- A `QuadSol` from a `LinSol` satisfying the quadratic ACC. -/
 @[simp]
@@ -483,8 +480,7 @@ def AnomalyFreeMk'' (S : MSSMACC.QuadSols) (hcube : accCube S.val = 0) : MSSMACC
 
 lemma AnomalyFreeMk''_val (S : MSSMACC.QuadSols)
     (hcube : accCube S.val = 0) :
-    (AnomalyFreeMk'' S hcube).val = S.val := by
-  rfl
+    (AnomalyFreeMk'' S hcube).val = S.val := rfl
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The dot product on the vector space of charges. -/

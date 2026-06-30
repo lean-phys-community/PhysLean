@@ -46,8 +46,7 @@ def Rotations (d) : Subgroup (LorentzGroup d) where
     · simpa [inv_eq_dual, IsProper] using h.2
 
 lemma mem_rotations_iff {d} (Λ : LorentzGroup d) :
-    Λ ∈ Rotations d ↔ Λ.1 (Sum.inl 0) (Sum.inl 0) = 1 ∧ IsProper Λ := by
-  rfl
+    Λ ∈ Rotations d ↔ Λ.1 (Sum.inl 0) (Sum.inl 0) = 1 ∧ IsProper Λ := Iff.rfl
 
 @[simp]
 lemma transpose_mem_rotations {d} (Λ : LorentzGroup d) :

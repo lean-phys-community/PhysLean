@@ -84,8 +84,7 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
   apply lt_of_eq_of_lt (insertionSortMinPos_insertionSortEquiv r a l)
   apply insertionSortEquiv_gt_zero_of_ne_insertionSortMinPos r a l
   simp only [List.length_cons, ne_eq, Fin.ext_iff, Fin.val_cast]
-  have hl : (insertionSortMinPos r a l).val = (insertionSortMinPosFin r a l).val := by
-    rfl
+  have hl : (insertionSortMinPos r a l).val = (insertionSortMinPosFin r a l).val := rfl
   simp only [hl, Nat.succ_eq_add_one, Fin.val_eq_val, ne_eq]
   exact Fin.succAbove_ne (insertionSortMinPosFin r a l) i
 

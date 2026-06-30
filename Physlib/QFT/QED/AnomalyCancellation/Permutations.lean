@@ -80,13 +80,11 @@ def FamilyPermutations (n : ℕ) : ACCSystemGroupAction (PureU1 n) where
 
 lemma FamilyPermutations_charges_apply (S : (PureU1 n).Charges)
     (i : Fin n) (f : (FamilyPermutations n).group) :
-    ((FamilyPermutations n).rep f S) i = S (f.invFun i) := by
-  rfl
+    ((FamilyPermutations n).rep f S) i = S (f.invFun i) := rfl
 
 lemma FamilyPermutations_anomalyFreeLinear_apply (S : (PureU1 n).LinSols)
     (i : Fin n) (f : (FamilyPermutations n).group) :
-    ((FamilyPermutations n).linSolRep f S).val i = S.val (f.invFun i) := by
-  rfl
+    ((FamilyPermutations n).linSolRep f S).val i = S.val (f.invFun i) := rfl
 
 /-- A permutation of fermions which takes one ordered subset into another. -/
 noncomputable def permOfInjection (f g : Fin m ↪ Fin n) : (FamilyPermutations n).group :=

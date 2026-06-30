@@ -264,8 +264,7 @@ noncomputable def componentMap {n : ℕ} (c : Fin n → C) :
 
 @[simp]
 lemma componentMap_apply {n : ℕ} (c : Fin n → C)
-    (p : Pure S c) : componentMap c p = p.component := by
-  rfl
+    (p : Pure S c) : componentMap c p = p.component := rfl
 
 /-- Given an component idx `b` in `ComponentIdx c`, `basisVector c b` is the pure tensor
   formed by `S.basis (c i) (b i)`. -/

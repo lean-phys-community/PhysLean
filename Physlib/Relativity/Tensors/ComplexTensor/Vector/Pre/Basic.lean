@@ -46,8 +46,7 @@ lemma complexContrBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
 
 lemma complexContrBasis_ρ_val (M : SL(2,ℂ)) (v : ContrℂModule) :
     ((ContrℂModule.SL2CRep M) v).val =
-    LorentzGroup.toComplex (SL2C.toLorentzGroup M) *ᵥ v.val := by
-  rfl
+    LorentzGroup.toComplex (SL2C.toLorentzGroup M) *ᵥ v.val := rfl
 
 /-- The standard basis of complex contravariant Lorentz vectors indexed by `Fin 4`. -/
 def complexContrBasisFin4 : Basis (Fin 4) ℂ ContrℂModule :=
@@ -112,8 +111,7 @@ lemma complexCoBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :
 
 lemma CoℂModule.SL2CRep_val (M : SL(2,ℂ)) (v : CoℂModule) :
     ((CoℂModule.SL2CRep M) v).val =
-    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ v.val := by
-  rfl
+    (LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ v.val := rfl
 
 /-- The standard basis of complex covariant Lorentz vectors indexed by `Fin 4`. -/
 def complexCoBasisFin4 : Basis (Fin 4) ℂ CoℂModule :=

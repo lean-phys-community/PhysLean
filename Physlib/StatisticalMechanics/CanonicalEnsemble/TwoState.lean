@@ -50,12 +50,10 @@ lemma twoState_partitionFunction_apply_eq_cosh (E₀ E₁ : ℝ) (T : Temperatur
   ring_nf
 
 @[simp]
-lemma twoState_energy_fst (E₀ E₁ : ℝ) : (twoState E₀ E₁).energy 0 = E₀ := by
-  rfl
+lemma twoState_energy_fst (E₀ E₁ : ℝ) : (twoState E₀ E₁).energy 0 = E₀ := rfl
 
 @[simp]
-lemma twoState_energy_snd (E₀ E₁ : ℝ) : (twoState E₀ E₁).energy 1 = E₁ := by
-  rfl
+lemma twoState_energy_snd (E₀ E₁ : ℝ) : (twoState E₀ E₁).energy 1 = E₁ := rfl
 
 /-- Probability of the first state (energy `E₀`) in closed form. -/
 lemma twoState_probability_fst (E₀ E₁ : ℝ) (T : Temperature) :

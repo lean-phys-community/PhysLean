@@ -60,13 +60,11 @@ open Tensor
 
 lemma coMetric_eq_fromConstPair {d : ℕ} :
     η' d = fromConstPair (S := realLorentzTensor d) (c1 := .down) (c2 := .down)
-      (Lorentz.preCoMetric d) := by
-  rfl
+      (Lorentz.preCoMetric d) := rfl
 
 lemma contrMetric_eq_fromConstPair {d : ℕ} :
     η d = fromConstPair (S := realLorentzTensor d)
-      (c1 := .up) (c2 := .up) (Lorentz.preContrMetric d) := by
-  rfl
+      (c1 := .up) (c2 := .up) (Lorentz.preContrMetric d) := rfl
 
 lemma coMetric_eq_fromPairT {d : ℕ} :
     η' d = fromPairT (S := realLorentzTensor d) (c1 := .down) (c2 := .down)

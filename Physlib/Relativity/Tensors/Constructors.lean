@@ -126,8 +126,7 @@ noncomputable def fromPairT {c1 c2 : C} :
 lemma fromPairT_tmul {c1 c2 : C} (x : V c1)
     (y : V c2) : fromPairT (x ⊗ₜ[k] y) =
     permT id (And.intro Function.bijective_id (fun i => by fin_cases i <;> rfl))
-    (prodT (fromSingleT (S := S) x) (fromSingleT y)) := by
-  rfl
+    (prodT (fromSingleT (S := S) x) (fromSingleT y)) := rfl
 
 lemma fromPairT_eq_pure {c1 c2 : C} (x : V c1) (y : V c2) :
     fromPairT (S := S) (x ⊗ₜ[k] y) = Pure.toTensor (fun | 0 => x | 1 => y) := by
@@ -485,8 +484,7 @@ lemma fromTripleT_tmul {c1 c2 c3 : C} (x : V c1)
     (y : V c2) (z : V c3) :
     fromTripleT (x ⊗ₜ[k] (y ⊗ₜ[k] z)) =
     permT id (And.intro Function.bijective_id (fun i => by fin_cases i <;> rfl))
-      (prodT (fromSingleT (S := S) x) (prodT (fromSingleT y) (fromSingleT z))) := by
-  rfl
+      (prodT (fromSingleT (S := S) x) (prodT (fromSingleT y) (fromSingleT z))) := rfl
 
 lemma actionT_fromTripleT {c1 c2 c3 : C}
     (x : V c1 ⊗[k] (V c2 ⊗[k] V c3)) (g : G) :

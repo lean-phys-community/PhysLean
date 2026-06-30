@@ -61,8 +61,7 @@ def B₃ : MSSMACC.Sols :=
     (by with_unfolding_all rfl) (by with_unfolding_all rfl) (by with_unfolding_all rfl)
     (by with_unfolding_all rfl) (by with_unfolding_all rfl)
 
-lemma B₃_val : B₃.val = B₃AsCharge := by
-  rfl
+lemma B₃_val : B₃.val = B₃AsCharge := rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma doublePoint_B₃_B₃ (R : MSSMACC.LinSols) : cubeTriLin B₃.val B₃.val R.val = 0 := by

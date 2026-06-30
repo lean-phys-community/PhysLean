@@ -61,8 +61,7 @@ def Y₃ : MSSMACC.Sols :=
     (by with_unfolding_all rfl) (by with_unfolding_all rfl) (by with_unfolding_all rfl)
     (by with_unfolding_all rfl) (by with_unfolding_all rfl) (by with_unfolding_all rfl)
 
-lemma Y₃_val : Y₃.val = Y₃AsCharge := by
-  rfl
+lemma Y₃_val : Y₃.val = Y₃AsCharge := rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma doublePoint_Y₃_Y₃ (R : MSSMACC.LinSols) :

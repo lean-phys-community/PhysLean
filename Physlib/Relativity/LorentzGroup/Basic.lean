@@ -175,8 +175,7 @@ lemma isClosedEmbedding_val {d : ℕ} :
 
 -/
 lemma inv_eq_dual (Λ : LorentzGroup d) :
-    (Λ⁻¹ : LorentzGroup d) = ⟨minkowskiMatrix.dual Λ.1, LorentzGroup.dual_mem Λ.2⟩ := by
-  rfl
+    (Λ⁻¹ : LorentzGroup d) = ⟨minkowskiMatrix.dual Λ.1, LorentzGroup.dual_mem Λ.2⟩ := rfl
 
 lemma coe_inv : (Λ⁻¹).1 = Λ.1⁻¹:= (inv_eq_left_inv (mem_iff_dual_mul_self.mp Λ.2)).symm
 

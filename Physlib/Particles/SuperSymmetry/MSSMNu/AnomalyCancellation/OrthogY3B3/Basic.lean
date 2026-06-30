@@ -58,8 +58,7 @@ def proj (T : MSSMACC.LinSols) : MSSMACC.AnomalyFreePerp :=
 lemma proj_val (T : MSSMACC.LinSols) :
     (proj T).val = (dot B₃.val T.val - dot Y₃.val T.val) • Y₃.val +
     (dot Y₃.val T.val - 2 * dot B₃.val T.val) • B₃.val +
-    dot Y₃.val B₃.val • T.val := by
-  rfl
+    dot Y₃.val B₃.val • T.val := rfl
 
 lemma Y₃_plus_B₃_plus_proj (T : MSSMACC.LinSols) (a b c : ℚ) :
     a • Y₃.val + b • B₃.val + c • (proj T).val =

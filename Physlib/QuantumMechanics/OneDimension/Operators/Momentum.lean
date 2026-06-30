@@ -42,8 +42,7 @@ open HilbertSpace SchwartzMap
 def momentumOperator (ψ : ℝ → ℂ) : ℝ → ℂ := fun x ↦ - Complex.I * ℏ * deriv ψ x
 
 lemma momentumOperator_eq_smul (ψ : ℝ → ℂ) :
-    momentumOperator ψ = fun x => (- Complex.I * ℏ) • deriv ψ x := by
-  rfl
+    momentumOperator ψ = fun x => (- Complex.I * ℏ) • deriv ψ x := rfl
 
 @[fun_prop]
 lemma continuous_momentumOperator (ψ : ℝ → ℂ) (hψ : ContDiff ℝ 1 ψ) :

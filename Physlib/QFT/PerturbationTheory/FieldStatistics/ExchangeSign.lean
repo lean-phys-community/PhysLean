@@ -81,8 +81,7 @@ lemma bosonic_exchangeSign (a : FieldStatistic) : 𝓢(bosonic, a) = 1 := by
   rw [exchangeSign_symm, exchangeSign_bosonic]
 
 @[simp]
-lemma fermionic_exchangeSign_fermionic : 𝓢(fermionic, fermionic) = - 1 := by
-  rfl
+lemma fermionic_exchangeSign_fermionic : 𝓢(fermionic, fermionic) = - 1 := rfl
 
 lemma exchangeSign_eq_if (a b : FieldStatistic) :
     𝓢(a, b) = if a = fermionic ∧ b = fermionic then - 1 else 1 := by

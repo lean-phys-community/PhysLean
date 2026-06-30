@@ -82,8 +82,7 @@ def asLinear (S : linearParameters) : (SMNoGrav 1).LinSols :=
       LinearMap.coe_mk, AddHom.coe_mk, speciesVal, asCharges, neg_add_rev]
     ring)
 
-lemma asLinear_val (S : linearParameters) : S.asLinear.val = S.asCharges := by
-  rfl
+lemma asLinear_val (S : linearParameters) : S.asLinear.val = S.asCharges := rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma cubic (S : linearParameters) :

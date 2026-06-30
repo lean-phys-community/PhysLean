@@ -43,8 +43,7 @@ noncomputable def hamiltonEqOp (H : Time → X → X → ℝ) (p : Time → X) (
 
 lemma hamiltonEqOp_eq (H : Time → X → X → ℝ) (p : Time → X) (q : Time → X) :
     hamiltonEqOp H p q = fun t => (∂ₜ q t + -gradient (fun x => H t x (q t)) (p t),
-      - ∂ₜ p t + -gradient (fun x => H t (p t) x) (q t)) := by
-  rfl
+      - ∂ₜ p t + -gradient (fun x => H t (p t) x) (q t)) := rfl
 
 lemma hamiltonEqOp_eq_zero_iff_hamiltons_equations (H : Time → X → X → ℝ)
     (p : Time → X) (q : Time → X) :

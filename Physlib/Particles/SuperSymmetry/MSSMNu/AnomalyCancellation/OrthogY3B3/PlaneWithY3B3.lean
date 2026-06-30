@@ -30,8 +30,7 @@ def planeY₃B₃ (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) : MSSMACC.LinSols 
   a • Y₃.1.1 + b • B₃.1.1 + c • R.1
 
 lemma planeY₃B₃_val (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
-    (planeY₃B₃ R a b c).val = a • Y₃.val + b • B₃.val + c • R.val := by
-  rfl
+    (planeY₃B₃ R a b c).val = a • Y₃.val + b • B₃.val + c • R.val := rfl
 
 lemma planeY₃B₃_smul (R : MSSMACC.AnomalyFreePerp) (a b c d : ℚ) :
     planeY₃B₃ R (d * a) (d * b) (d * c) = d • planeY₃B₃ R a b c := by
@@ -118,8 +117,7 @@ lemma lineQuad_val (R : MSSMACC.AnomalyFreePerp) (c1 c2 c3 : ℚ) :
     (lineQuad R c1 c2 c3).val = (planeY₃B₃ R
     (c2 * quadBiLin R.val R.val - 2 * c3 * quadBiLin B₃.val R.val)
     (2 * c3 * quadBiLin Y₃.val R.val - c1 * quadBiLin R.val R.val)
-    (2 * c1 * quadBiLin B₃.val R.val - 2 * c2 * quadBiLin Y₃.val R.val)).val := by
-  rfl
+    (2 * c1 * quadBiLin B₃.val R.val - 2 * c2 * quadBiLin Y₃.val R.val)).val := rfl
 
 lemma lineQuad_smul (R : MSSMACC.AnomalyFreePerp) (a b c d : ℚ) :
     lineQuad R (d * a) (d * b) (d * c) = d • lineQuad R a b c := by

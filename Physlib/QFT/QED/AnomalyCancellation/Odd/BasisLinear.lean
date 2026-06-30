@@ -219,8 +219,7 @@ lemma oddShiftShiftFst_eq_oddFst_succ (j : Fin n) :
   exact Nat.add_comm 1 ↑j
 
 lemma oddShiftShiftFst_eq_oddShiftFst_castSucc (j : Fin n) :
-    oddShiftShiftFst j = oddShiftFst j.castSucc := by
-  rfl
+    oddShiftShiftFst j = oddShiftFst j.castSucc := rfl
 
 lemma oddShiftShiftMid_eq_oddMid : @oddShiftShiftMid n = oddMid := by
   rw [Fin.ext_iff]
@@ -228,8 +227,7 @@ lemma oddShiftShiftMid_eq_oddMid : @oddShiftShiftMid n = oddMid := by
     Fin.val_natAdd, Fin.val_eq_zero, add_zero, oddMid]
   exact Nat.add_comm 1 n
 
-lemma oddShiftShiftMid_eq_oddShiftFst_last : oddShiftShiftMid = oddShiftFst (Fin.last n) := by
-  rfl
+lemma oddShiftShiftMid_eq_oddShiftFst_last : oddShiftShiftMid = oddShiftFst (Fin.last n) := rfl
 
 lemma oddShiftShiftSnd_eq_oddSnd (j : Fin n.succ) : oddShiftShiftSnd j = oddSnd j := by
   rw [Fin.ext_iff]

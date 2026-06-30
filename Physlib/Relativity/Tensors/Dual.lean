@@ -37,8 +37,7 @@ noncomputable def fromDualMap {c : C} : S.Tensor ![S.τ c] →ₗ[k] S.Tensor ![
 
 lemma fromDualMap_apply {c : C} (t : S.Tensor ![S.τ c]) :
     fromDualMap t = permT id (by simp; rfl)
-      (contrT 1 1 2 (by simp; rfl) (prodT (metricTensor c) t)) := by
-  rfl
+      (contrT 1 1 2 (by simp; rfl) (prodT (metricTensor c) t)) := rfl
 
 /-- The linear map taking a tensor based on the color `c` to a tensor
   based on the color `S.τ c`, defined by contraction with the metric tensor. -/
@@ -56,8 +55,7 @@ lemma toDualMap_apply {c : C} (t : S.Tensor ![c]) :
     toDualMap t = permT id (by
       simp; rfl) (contrT 1 1 2 (by
       change _ ∧ S.τ (S.τ c) = c
-      simp) (prodT (metricTensor (S.τ c)) t)) := by
-  rfl
+      simp) (prodT (metricTensor (S.τ c)) t)) := rfl
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]

@@ -42,8 +42,7 @@ lemma asTensor_expand_complexContrBasis : asTensor =
     complexContrBasis (Sum.inl 0) ⊗ₜ leftRightToMatrix.symm (pauliBasis (Sum.inl 0))
     + complexContrBasis (Sum.inr 0) ⊗ₜ leftRightToMatrix.symm (pauliBasis (Sum.inr 0))
     + complexContrBasis (Sum.inr 1) ⊗ₜ leftRightToMatrix.symm (pauliBasis (Sum.inr 1))
-    + complexContrBasis (Sum.inr 2) ⊗ₜ leftRightToMatrix.symm (pauliBasis (Sum.inr 2)) := by
-  rfl
+    + complexContrBasis (Sum.inr 2) ⊗ₜ leftRightToMatrix.symm (pauliBasis (Sum.inr 2)) := rfl
 
 /-- The expansion of the pauli matrix `σ₀` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inl_0_expand : leftRightToMatrix.symm (pauliBasis (Sum.inl 0)) =
