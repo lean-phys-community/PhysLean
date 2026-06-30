@@ -101,25 +101,20 @@ open TensorSpecies
   This is denoted `𝔁 μ p`, where `𝔁` is typed with `\MCx`. -/
 def coord {d : ℕ} (μ : Fin (1 + d)) : SpaceTime d →ₗ[ℝ] ℝ where
   toFun x := x (finSumFinEquiv.symm μ)
-  map_add' x1 x2 := by
-    simp
-  map_smul' c x := by
-    simp
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
 
 @[inherit_doc coord]
 scoped notation "𝔁" => coord
 
 lemma coord_apply {d : ℕ} (μ : Fin (1 + d)) (y : SpaceTime d) :
-    𝔁 μ y = y (finSumFinEquiv.symm μ) := by
-  rfl
+    𝔁 μ y = y (finSumFinEquiv.symm μ) := rfl
 
 /-- The continuous linear map from a point in space time to one of its coordinates. -/
 def coordCLM (μ : Fin 1 ⊕ Fin d) : SpaceTime d →L[ℝ] ℝ where
   toFun x := x μ
-  map_add' x1 x2 := by
-    simp
-  map_smul' c x := by
-    simp
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
   cont := by
     fun_prop
 
