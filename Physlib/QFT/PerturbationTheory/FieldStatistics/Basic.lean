@@ -88,8 +88,7 @@ instance : Fintype FieldStatistic where
     intro c
     cases c
     · exact Finset.mem_insert_self bosonic {fermionic}
-    · refine Finset.insert_eq_self.mp ?_
-      exact rfl
+    · exact Finset.insert_eq_self.mp rfl
 
 @[simp]
 lemma fermionic_not_eq_bonsic : ¬ fermionic = bosonic := by

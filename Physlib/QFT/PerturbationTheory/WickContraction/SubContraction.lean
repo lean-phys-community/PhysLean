@@ -158,8 +158,8 @@ lemma quotContraction_fstFieldOfContract_uncontractedListEmd {S : Finset (Finset
     (uncontractedListEmd ((quotContraction S hs).sndFieldOfContract a))
   · simp only [Finset.mem_map', fstFieldOfContract_mem]
   · simp
-  · apply uncontractedListEmd_strictMono
-    exact fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a
+  · exact uncontractedListEmd_strictMono
+      (fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a)
 
 @[simp]
 lemma quotContraction_sndFieldOfContract_uncontractedListEmd {S : Finset (Finset (Fin φs.length))}
@@ -172,8 +172,8 @@ lemma quotContraction_sndFieldOfContract_uncontractedListEmd {S : Finset (Finset
     (uncontractedListEmd ((quotContraction S hs).fstFieldOfContract a))
   · simp only [Finset.mem_map', fstFieldOfContract_mem]
   · simp
-  · apply uncontractedListEmd_strictMono
-    exact fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a
+  · exact uncontractedListEmd_strictMono
+      (fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a)
 
 lemma quotContraction_gradingCompliant {S : Finset (Finset (Fin φs.length))} {hs : S ⊆ φsΛ.1}
     (hsΛ : φsΛ.GradingCompliant) :

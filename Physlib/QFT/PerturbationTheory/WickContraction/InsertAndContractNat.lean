@@ -667,8 +667,7 @@ lemma insertAndContractNat_fstFieldOfContract (c : WickContraction n) (i : Fin n
   · simp only [Nat.succ_eq_add_one, insertLift, Finset.mem_map, Fin.succAboveEmb_apply]
     use (c.sndFieldOfContract a)
     simp
-  · refine Fin.succAbove_lt_succAbove_iff.mpr ?_
-    exact fstFieldOfContract_lt_sndFieldOfContract c a
+  · exact Fin.succAbove_lt_succAbove_iff.mpr (fstFieldOfContract_lt_sndFieldOfContract c a)
 
 @[simp]
 lemma insertAndContractNat_sndFieldOfContract (c : WickContraction n) (i : Fin n.succ)
@@ -683,8 +682,7 @@ lemma insertAndContractNat_sndFieldOfContract (c : WickContraction n) (i : Fin n
   · simp only [Nat.succ_eq_add_one, insertLift, Finset.mem_map, Fin.succAboveEmb_apply]
     use (c.sndFieldOfContract a)
     simp
-  · refine Fin.succAbove_lt_succAbove_iff.mpr ?_
-    exact fstFieldOfContract_lt_sndFieldOfContract c a
+  · exact Fin.succAbove_lt_succAbove_iff.mpr (fstFieldOfContract_lt_sndFieldOfContract c a)
 
 /-- Given a contracted pair for a Wick contraction `WickContraction n`, the
   corresponding contracted pair of a wick contraction `(c.insert i (some j))` formed

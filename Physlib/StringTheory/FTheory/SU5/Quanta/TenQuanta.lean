@@ -215,8 +215,7 @@ lemma reduce_filter (x : TenQuanta 𝓩) (q : 𝓩) (h : q ∈ x.toCharges) :
   simp only [Function.comp_apply]
   have hx : (Multiset.filter (fun x => x = q) x.toCharges.dedup) = {q} := by
     refine (Multiset.Nodup.ext ?_ ?_).mpr ?_
-    · refine Multiset.Nodup.filter (fun x => x = q) ?_
-      exact Multiset.nodup_dedup x.toCharges
+    · exact Multiset.Nodup.filter (fun x => x = q) (Multiset.nodup_dedup x.toCharges)
     · exact Multiset.nodup_singleton q
     intro a
     simp only [Multiset.mem_filter, Multiset.mem_dedup, Multiset.mem_singleton,

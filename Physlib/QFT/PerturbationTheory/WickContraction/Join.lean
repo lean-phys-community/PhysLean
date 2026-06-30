@@ -204,8 +204,7 @@ lemma join_fstFieldOfContract_joinLiftRight {φs : List 𝓕.FieldOp} (φsΛ : W
   apply eq_fstFieldOfContract_of_mem _ _ _ (uncontractedListEmd (φsucΛ.sndFieldOfContract a))
   · simp [joinLiftRight]
   · simp [joinLiftRight]
-  · apply uncontractedListEmd_strictMono
-    exact fstFieldOfContract_lt_sndFieldOfContract φsucΛ a
+  · exact uncontractedListEmd_strictMono (fstFieldOfContract_lt_sndFieldOfContract φsucΛ a)
 
 @[simp]
 lemma join_sndFieldOfContract_joinLiftRight {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
@@ -215,8 +214,7 @@ lemma join_sndFieldOfContract_joinLiftRight {φs : List 𝓕.FieldOp} (φsΛ : W
   apply eq_sndFieldOfContract_of_mem _ _ (uncontractedListEmd (φsucΛ.fstFieldOfContract a))
   · simp [joinLiftRight]
   · simp [joinLiftRight]
-  · apply uncontractedListEmd_strictMono
-    exact fstFieldOfContract_lt_sndFieldOfContract φsucΛ a
+  · exact uncontractedListEmd_strictMono (fstFieldOfContract_lt_sndFieldOfContract φsucΛ a)
 
 @[simp]
 lemma join_fstFieldOfContract_joinLiftLeft {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)

@@ -207,8 +207,7 @@ lemma signInsertNone_eq_filter_map (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     · simp only [map_one]
   · rename_i h
     simp [h]
-  · refine List.Nodup.filter _ ?_
-    exact List.nodup_finRange φs.length
+  · exact List.Nodup.filter _ (List.nodup_finRange φs.length)
   · exact hG
 
 /-- The following signs for a grading compliant Wick contraction are equal:
