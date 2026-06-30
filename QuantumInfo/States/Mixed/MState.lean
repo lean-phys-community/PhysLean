@@ -750,8 +750,8 @@ theorem pure_eq_pure_iff {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d)
     specialize h_eq i k
     simp_all
     -- Since $\overline{z} \cdot \overline{\varphi_k} \neq 0$, we can divide both sides of the equation by $\overline{z} \cdot \overline{\varphi_k}$.
-    have h_div : ψ.vec i * starRingEnd ℂ z = φ.vec i := by
-      exact mul_left_cancel₀ ( show starRingEnd ℂ ( φ.vec k ) ≠ 0 from by simpa [ Complex.ext_iff ] using hk ) ( by linear_combination' h_eq );
+    have h_div : ψ.vec i * starRingEnd ℂ z = φ.vec i :=
+      mul_left_cancel₀ ( show starRingEnd ℂ ( φ.vec k ) ≠ 0 from by simpa [ Complex.ext_iff ] using hk ) ( by linear_combination' h_eq );
     rw [ ← h_div, mul_left_comm, Complex.mul_conj, Complex.normSq_eq_norm_sq ] ; aesop;
   · cases h
     rename_i h
@@ -788,8 +788,8 @@ theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d�
   obtain ⟨ ρLRs, ps, hps ⟩ := h;
   -- Since `pure ψ` is pure (`purity = 1`), by `MState.eq_of_sum_eq_pure`, for any `k` with `p_k > 0`, we have `pure ψ = ρL_k ⊗ᴹ ρR_k`.
   obtain ⟨k, hk⟩ : ∃ k : { x : MState d₁ × MState d₂ // x ∈ ρLRs }, 0 < (ps k : ℝ) ∧ (MState.pure ψ).M = (k.val.1).M ⊗ₖ (k.val.2).M := by
-    have h_pure : (MState.pure ψ).purity = 1 := by
-      exact ( pure_iff_purity_one _ ).mp ⟨ ψ, rfl ⟩;
+    have h_pure : (MState.pure ψ).purity = 1 :=
+      ( pure_iff_purity_one _ ).mp ⟨ ψ, rfl ⟩;
     obtain ⟨k, hk⟩ : ∃ k : { x : MState d₁ × MState d₂ // x ∈ ρLRs }, 0 < (ps k : ℝ) := by
       exact ⟨ Classical.choose ( show ∃ k : ρLRs, 0 < ( ps k : ℝ ) from by exact not_forall_not.mp fun h => by have := ps.2; simp_all ), Classical.choose_spec ( show ∃ k : ρLRs, 0 < ( ps k : ℝ ) from by exact not_forall_not.mp fun h => by have := ps.2; simp_all) ⟩;
     refine' ⟨ k, hk, _ ⟩;
@@ -816,15 +816,15 @@ theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d�
     have h_purity : (pure ψ).purity = (k.val.1).purity * (k.val.2).purity := by
       convert MState.purity_prod _ _;
       exact MState.ext hk.2;
-    have h_purity_one : (pure ψ).purity = 1 := by
-      exact ( pure_iff_purity_one _ ).mp ⟨ ψ, rfl ⟩;
+    have h_purity_one : (pure ψ).purity = 1 :=
+      ( pure_iff_purity_one _ ).mp ⟨ ψ, rfl ⟩;
     rw [ h_purity, Prob.mul_eq_one_iff ] at h_purity_one ; aesop
   obtain ⟨φ, hφ⟩ : ∃ φ : MState d₂, k.val.2 = φ ∧ φ.purity = 1 := by
     have h_purity_prod : (pure ψ).purity = (k.val.1).purity * (k.val.2).purity := by
       convert MState.purity_prod _ _;
       exact MState.ext hk.2;
-    have h_purity_one : (MState.pure ψ).purity = 1 := by
-      exact pure_iff_purity_one _ |>.1 ⟨ ψ, rfl ⟩;
+    have h_purity_one : (MState.pure ψ).purity = 1 :=
+      pure_iff_purity_one _ |>.1 ⟨ ψ, rfl ⟩;
     aesop;
   -- Since `ξ` and `φ` are pure states, we have `ξ = pure ξ'` and `φ = pure φ'` for some `ξ', φ'`.
   obtain ⟨ξ', hξ'⟩ : ∃ ξ' : Ket d₁, ξ = MState.pure ξ' := by
@@ -884,15 +884,15 @@ theorem pure_iff_rank_eq_one {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
       -- Since ρ is Hermitian and has rank 1, it must be of the form |ψ⟩⟨ψ| for some ket ψ. Use this fact.
       have h_pure : ∃ ψ : d → ℂ, ρ.m = Matrix.of (fun i j => ψ i * star (ψ j)) := by
         have h_rank : ρ.m.rank = 1 := h
-        have h_herm : ρ.m.IsHermitian := by
-          exact ρ.M.property
+        have h_herm : ρ.m.IsHermitian :=
+          ρ.M.property
         have := h_herm.spectral_theorem;
         -- Since the rank of ρ.m is 1, the diagonal matrix in the spectral theorem must have exactly one non-zero entry.
         obtain ⟨i, hi⟩ : ∃ i : d, h_herm.eigenvalues i ≠ 0 ∧ ∀ j : d, j ≠ i → h_herm.eigenvalues j = 0 := by
           have h_diag : ∑ i : d, (if h_herm.eigenvalues i = 0 then 0 else 1) = 1 := by
             have h_diag : Matrix.rank (Matrix.diagonal (h_herm.eigenvalues)) = 1 := by
-              have h_diag : Matrix.rank (Matrix.diagonal (h_herm.eigenvalues)) = Matrix.rank (ρ.m) := by
-                exact Eq.symm (Matrix.IsHermitian.rank_eq_rank_diagonal h_herm);
+              have h_diag : Matrix.rank (Matrix.diagonal (h_herm.eigenvalues)) = Matrix.rank (ρ.m) :=
+                Eq.symm (Matrix.IsHermitian.rank_eq_rank_diagonal h_herm);
               exact h_diag.trans h_rank;
             rw [ Matrix.rank_diagonal ] at h_diag;
             simp [ Finset.sum_ite ];
@@ -1132,8 +1132,8 @@ The multiset of values in the spectrum of a relabeled state is the same as the m
 lemma multiset_spectrum_relabel_eq {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
     (ρ : MState d₁) (e : d₂ ≃ d₁) :
     Multiset.map (ρ.relabel e).spectrum Finset.univ.val = Multiset.map ρ.spectrum Finset.univ.val := by
-  have h_charpoly : Matrix.charpoly (ρ.relabel e).m = Matrix.charpoly ρ.m := by
-    exact Matrix.charpoly_reindex e.symm ρ.m
+  have h_charpoly : Matrix.charpoly (ρ.relabel e).m = Matrix.charpoly ρ.m :=
+    Matrix.charpoly_reindex e.symm ρ.m
   have h_eigenvalues : Multiset.map (ρ.relabel e).M.H.eigenvalues Finset.univ.val = Multiset.map ρ.M.H.eigenvalues Finset.univ.val := by
     have h_eigenvalues : Polynomial.roots (Matrix.charpoly (ρ.relabel e).m) = Polynomial.roots (Matrix.charpoly ρ.m) := by
       rw [h_charpoly];

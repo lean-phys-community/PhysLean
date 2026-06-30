@@ -286,12 +286,12 @@ The von Neumann entropy of a classical state (diagonal in the basis) is equal to
 theorem Sᵥₙ_ofClassical {d : Type*} [Fintype d] [DecidableEq d] (dist : ProbDistribution d) :
     Sᵥₙ (MState.ofClassical dist) = Hₛ dist := by
   -- Let's unfold the definition of `Sᵥₙ` using `Sᵥₙ_eq_trace_cfc`.
-  have h_def : Sᵥₙ (MState.ofClassical dist) = (HermitianMat.cfc (MState.ofClassical dist).M Real.negMulLog).trace := by
-    exact Sᵥₙ_eq_trace_cfc (ofClassical dist);
+  have h_def : Sᵥₙ (MState.ofClassical dist) = (HermitianMat.cfc (MState.ofClassical dist).M Real.negMulLog).trace :=
+    Sᵥₙ_eq_trace_cfc (ofClassical dist);
   convert h_def using 1;
   -- By definition of $MState.ofClassical$, we know that $(MState.ofClassical dist).M$ is a diagonal matrix with entries $dist i$.
-  have h_diag : (MState.ofClassical dist).M = HermitianMat.diagonal ℂ (fun x => dist x) := by
-    exact rfl;
+  have h_diag : (MState.ofClassical dist).M = HermitianMat.diagonal ℂ (fun x => dist x) :=
+    rfl;
   rw [ h_diag, HermitianMat.cfc_diagonal, HermitianMat.trace_diagonal ] ; aesop
 
 /-- The entanglement of formation of the maximally entangled state with on-site dimension 𝕕 is log(𝕕). -/
