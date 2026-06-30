@@ -539,8 +539,7 @@ lemma schwartMap_fderiv_comm {d}
     ContinuousLinearMap.flip_apply]
   rw [IsSymmSndFDerivAt.eq]
   apply ContDiffAt.isSymmSndFDerivAt (n := 2)
-  · refine ContDiff.contDiffAt ?_
-    exact h2
+  · exact h2.contDiffAt
   · simp
   · fun_prop
   · exact differentiableAt_const (basis μ)

@@ -72,9 +72,8 @@ lemma exp_mul_gaussian_integrable (b c : ℝ) (hb : 0 < b) :
     field_simp
     ring
   rw [h1]
-  apply MeasureTheory.Integrable.const_mul
-  exact Integrable.comp_sub_right (f := (fun x => Real.exp (- b * x ^ 2)))
-    (integrable_exp_neg_mul_sq hb) (c / (2 * b))
+  exact (Integrable.comp_sub_right (f := (fun x => Real.exp (- b * x ^ 2)))
+    (integrable_exp_neg_mul_sq hb) (c / (2 * b))).const_mul _
 
 lemma exp_abs_mul_gaussian_integrable (b c : ℝ) (hb : 0 < b) :
     MeasureTheory.Integrable (fun x => Real.exp (|c * x|) * Real.exp (- b * x ^ 2)) := by
