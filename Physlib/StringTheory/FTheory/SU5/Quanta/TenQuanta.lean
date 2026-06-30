@@ -953,8 +953,7 @@ lemma mem_liftCharge_of_exists_toCharges_toFluxesTen (c : Finset 𝓩) {x : TenQ
           refine (Multiset.cons_le_of_notMem ?_).mpr ⟨?_, ?_⟩
           · simp
           · rw [← hp2_2]
-            apply Multiset.erase_subset p1 x
-            exact hp2
+            exact Multiset.erase_subset p1 x hp2
           simp only [Multiset.singleton_le]
           rw [← hp3_2]
           apply Multiset.erase_subset p1 x

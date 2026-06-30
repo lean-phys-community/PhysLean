@@ -114,8 +114,7 @@ lemma allowsTerm_of_has_minimallyAllowsTerm_subset
     (hx : ∃ y ∈ powerset x, y.MinimallyAllowsTerm T) : x.AllowsTerm T := by
   obtain ⟨y, hy⟩ := hx
   simp only [mem_powerset_iff_subset] at hy
-  apply allowsTerm_mono hy.1
-  exact allowsTerm_of_minimallyAllowsTerm hy.2
+  exact allowsTerm_mono hy.1 (allowsTerm_of_minimallyAllowsTerm hy.2)
 
 /-!
 

@@ -230,9 +230,9 @@ def completeMinSubset (S5 S10 : Finset 𝓩) : Multiset (ChargeSpectrum 𝓩) :=
 lemma completeMinSubset_nodup {S5 S10 : Finset 𝓩} :
     (completeMinSubset S5 S10).Nodup := by
   simp [completeMinSubset]
-  apply Multiset.Nodup.filter
-  exact Multiset.nodup_dedup
-      ((minimallyAllowsTermsOfFinset S5 S10 topYukawa).bind (completionsTopYukawa S5))
+  exact Multiset.Nodup.filter _
+    (Multiset.nodup_dedup
+      ((minimallyAllowsTermsOfFinset S5 S10 topYukawa).bind (completionsTopYukawa S5)))
 
 /-!
 

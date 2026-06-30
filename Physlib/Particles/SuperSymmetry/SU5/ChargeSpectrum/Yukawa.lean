@@ -84,11 +84,9 @@ lemma ofYukawaTerms_subset_of_subset [DecidableEq 𝓩] {x y : ChargeSpectrum �
   intro hr
   rcases hr with hr | hr
   · left
-    apply ofPotentialTerm'_mono h
-    exact hr
+    exact ofPotentialTerm'_mono h topYukawa hr
   · right
-    apply ofPotentialTerm'_mono h
-    exact hr
+    exact ofPotentialTerm'_mono h bottomYukawa hr
 
 /-!
 
@@ -131,8 +129,7 @@ lemma ofYukawaTermsNSum_subset_of_subset [DecidableEq 𝓩] {x y : ChargeSpectru
     · exact ih hz1
     use z2
     simp_all only [and_true]
-    apply ofYukawaTerms_subset_of_subset h
-    exact hz2
+    exact ofYukawaTerms_subset_of_subset h hz2
 
 /-!
 
