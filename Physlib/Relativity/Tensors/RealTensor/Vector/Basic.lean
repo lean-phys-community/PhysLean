@@ -340,8 +340,8 @@ lemma spatialPart_basis_sum_inl {d : ℕ} (i : Fin d) :
 /-- The spatial part of a Lorentz vector as a continuous linear map. -/
 def spatialCLM (d : ℕ) : Vector d →L[ℝ] EuclideanSpace ℝ (Fin d) where
   toFun v := WithLp.toLp 2 fun i => v (Sum.inr i)
-  map_add' v1 v2 := by rfl
-  map_smul' c v := by rfl
+  map_add' v1 v2 := rfl
+  map_smul' c v := rfl
   cont := by fun_prop
 
 lemma spatialCLM_apply_eq_spatialPart {d : ℕ} (v : Vector d) (i : Fin d) :

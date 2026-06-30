@@ -255,8 +255,8 @@ def IsLorentz {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) :
     Prop := ∀ p q : Vector d, ⟪f p, f q⟫ₘ = ⟪p, q⟫ₘ
 
 lemma isLorentz_iff {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) :
-    IsLorentz f ↔ ∀ p q : Vector d, ⟪f p, f q⟫ₘ = ⟪p, q⟫ₘ := by
-  rfl
+    IsLorentz f ↔ ∀ p q : Vector d, ⟪f p, f q⟫ₘ = ⟪p, q⟫ₘ :=
+  Iff.rfl
 
 lemma isLorentz_iff_basis {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) :
     IsLorentz f ↔ ∀ μ ν : Fin 1 ⊕ Fin d, ⟪f (basis μ), f (basis ν)⟫ₘ = ⟪basis μ, basis ν⟫ₘ := by

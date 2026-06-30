@@ -46,7 +46,7 @@ noncomputable def Pure.fromSingleP {c : C} : V c ≃ₗ[k] Pure S ![c] where
     ext i
     fin_cases i
     rfl
-  left_inv x := by rfl
+  left_inv x := rfl
   right_inv x := by
     ext i
     fin_cases i
