@@ -198,8 +198,7 @@ lemma compRestricted_domain : (g ∘ᵣ f).domain = (g.domain.comap f.toFun).map
   exact h.choose
 
 lemma mem_compRestricted_domain_iff {x : E} :
-    x ∈ (v ∘ᵣ u).domain ↔ ∃ h : x ∈ u.domain, u ⟨x, h⟩ ∈ v.domain := by
-  simp [compRestricted_domain]
+    x ∈ (v ∘ᵣ u).domain ↔ ∃ h : x ∈ u.domain, u ⟨x, h⟩ ∈ v.domain := by simp [compRestricted_domain]
 
 lemma mem_compRestricted_domain_iff' {x : E} :
     x ∈ (v ∘ᵣ u).domain ↔ ∃ y : u.domain, x = y ∧ ∃ y' : v.domain, u y = y' := by

@@ -41,13 +41,11 @@ noncomputable def vectorToSpace {d : ℕ} (v : EuclideanSpace ℝ (Fin d)) : Spa
 
 @[simp]
 lemma vectorToSpace_apply {d : ℕ} (v : EuclideanSpace ℝ (Fin d)) (i : Fin d) :
-    vectorToSpace v i = v i := by
-  simp [vectorToSpace]
+    vectorToSpace v i = v i := by simp [vectorToSpace]
 
 @[simp]
 lemma vectorToSpace_vsub_zero {d : ℕ} (v : EuclideanSpace ℝ (Fin d)) :
-    vectorToSpace v -ᵥ (0 : Space d) = v := by
-  simp [vectorToSpace]
+    vectorToSpace v -ᵥ (0 : Space d) = v := by simp [vectorToSpace]
 
 /-- The standard chart `Space d ≃ᵃⁱ[ℝ] EuclideanSpace ℝ (Fin d)`, `p ↦ p -ᵥ 0`, identifying a point
 with its coordinate vector relative to the origin (the vector-space zero `(0 : Space d)`). -/

@@ -109,20 +109,17 @@ open Finset
 variable [AddCommMonoid M]
 
 @[simp]
-lemma sum_mul [Fintype α] (i j : α) : ∑ k : α, δ[i,k] * δ[k,j] = δ[i,j] := by
-  simp [kroneckerDelta]
+lemma sum_mul [Fintype α] (i j : α) : ∑ k : α, δ[i,k] * δ[k,j] = δ[i,j] := by simp [kroneckerDelta]
 
 @[simp]
 lemma sum_smul [Fintype α] (i : α) (f : α → M) : ∑ j : α, δ[i,j] • f j = f i := by
   simp [kroneckerDelta]
 
 lemma sum_sum_smul_eq_zero [Fintype α] {f : α → α → M} (hf : ∀ i : α, f i i = 0) :
-    ∑ i : α, ∑ j : α, δ[i,j] • f i j = 0 := by
-  simp [sum_smul, hf, sum_const_zero]
+    ∑ i : α, ∑ j : α, δ[i,j] • f i j = 0 := by simp [sum_smul, hf, sum_const_zero]
 
 lemma finset_sum_smul (s : Finset α) (i : α) (f : α → M) :
-    ∑ j ∈ s, δ[i,j] • f j = if i ∈ s then f i else 0 := by
-  simp [kroneckerDelta]
+    ∑ j ∈ s, δ[i,j] • f j = if i ∈ s then f i else 0 := by simp [kroneckerDelta]
 
 lemma finset_sum_sum_smul_eq_zero {s s' : Finset α} {f : α → α → M}
     (hf : ∀ i ∈ s ∩ s', f i i = 0) : ∑ i ∈ s, ∑ j ∈ s', δ[i,j] • f i j = 0 := by
