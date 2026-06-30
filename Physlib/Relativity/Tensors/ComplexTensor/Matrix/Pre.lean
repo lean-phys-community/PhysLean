@@ -38,8 +38,8 @@ lemma contrContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 �
     Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply complexContrBasis complexContrBasis i j)
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ =>
+      congrArg _ (Basis.tensorProduct_apply complexContrBasis complexContrBasis i j)
   · simp
 
 /-- Equivalence of `complexCo ⊗ complexCo` to `4 x 4` complex matrices. -/
@@ -55,8 +55,8 @@ lemma coCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin
   simp only [coCoToMatrix, LinearEquiv.trans_symm, LinearEquiv.trans_apply, Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply complexCoBasis complexCoBasis i j)
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ =>
+      congrArg _ (Basis.tensorProduct_apply complexCoBasis complexCoBasis i j)
   · simp
 
 /-- Equivalence of `complexContr ⊗ complexCo` to `4 x 4` complex matrices. -/
@@ -73,8 +73,8 @@ lemma contrCoToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ 
     Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply complexContrBasis complexCoBasis i j)
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ =>
+      congrArg _ (Basis.tensorProduct_apply complexContrBasis complexCoBasis i j)
   · simp
 
 /-- Equivalence of `complexCo ⊗ complexContr` to `4 x 4` complex matrices. -/
@@ -91,8 +91,8 @@ lemma coContrToMatrix_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ 
     Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply complexCoBasis complexContrBasis i j)
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ =>
+      congrArg _ (Basis.tensorProduct_apply complexCoBasis complexContrBasis i j)
   · simp
 
 /-!

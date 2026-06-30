@@ -42,8 +42,8 @@ lemma leftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
     Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    exact congrArg _ (Basis.tensorProduct_apply leftBasis leftBasis i j)
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ =>
+      congrArg _ (Basis.tensorProduct_apply leftBasis leftBasis i j)
   · simp
 
 /-- Equivalence of `dualLeftHanded ⊗ dualLeftHanded` to `2 x 2` complex matrices. -/
