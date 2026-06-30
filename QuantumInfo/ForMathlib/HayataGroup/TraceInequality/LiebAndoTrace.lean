@@ -147,8 +147,8 @@ private lemma phiK_nonneg (K : L ℋ) {T : L (HSOp ℋ)} (hT : 0 ≤ T) :
     0 ≤ phiK (ℋ := ℋ) K T := by
   dsimp [phiK]
   have hpos : T.IsPositive := (ContinuousLinearMap.nonneg_iff_isPositive T).1 hT
-  have hnonneg : 0 ≤ Complex.re (inner ℂ (T (ofOp (star K))) (ofOp (star K))) := by
-    exact ((ContinuousLinearMap.isPositive_iff_complex T).1 hpos (ofOp (star K))).2
+  have hnonneg : 0 ≤ Complex.re (inner ℂ (T (ofOp (star K))) (ofOp (star K))) :=
+    ((ContinuousLinearMap.isPositive_iff_complex T).1 hpos (ofOp (star K))).2
   have hre :
       Complex.re (inner ℂ (ofOp (star K)) (T (ofOp (star K)))) =
         Complex.re (inner ℂ (T (ofOp (star K))) (ofOp (star K))) := by
@@ -309,11 +309,11 @@ private lemma hmiddle_leftMul_rightMul
       leftMulHS (ℋ := ℋ) (A ^ s) * rightMulHS (ℋ := ℋ) (B ^ (-s)) := by
   rcases hA with ⟨hA_sa, hA_spec⟩
   rcases hB with ⟨hB_sa, hB_spec⟩
-  have hA0 : 0 ≤ A := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
+  have hA0 : 0 ≤ A :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
       (by intro x hx; exact (hA_spec hx).le)
-  have hB0 : 0 ≤ B := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
+  have hB0 : 0 ≤ B :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
       (by intro x hx; exact (hB_spec hx).le)
   have hright_negHalf :
       cfcR (ℋ := HSOp ℋ) (fun x : ℝ ↦ x ^ ((-1 : ℝ) / 2)) (rightMulHS (ℋ := ℋ) B) =
@@ -444,12 +444,12 @@ private lemma hmiddle_leftMul_rightMul
     · simp [D, hxzero]
     have hxv0 : Module.End.HasEigenvector T0 α x := ⟨hx0, hxzero⟩
     have hxv1 : Module.End.HasEigenvector T1 β x := ⟨hx1, hxzero⟩
-    have hαeq : α = (α.re : ℂ) := by
-      exact (RCLike.conj_eq_iff_re.mp
+    have hαeq : α = (α.re : ℂ) :=
+      (RCLike.conj_eq_iff_re.mp
         (hT0_symm.conj_eigenvalue_eq_self (Module.End.hasEigenvalue_of_hasEigenvector hxv0))
         ).symm
-    have hβeq : β = (β.re : ℂ) := by
-      exact (RCLike.conj_eq_iff_re.mp
+    have hβeq : β = (β.re : ℂ) :=
+      (RCLike.conj_eq_iff_re.mp
         (hT1_symm.conj_eigenvalue_eq_self (Module.End.hasEigenvalue_of_hasEigenvector hxv1))
         ).symm
     have hx0r : x ∈ eigenspace T0 (α.re : ℂ) := by
@@ -470,12 +470,12 @@ private lemma hmiddle_leftMul_rightMul
         re_inner_nonneg_of_nonneg
           (T := rightMulHS (ℋ := ℋ) (B ^ (-1 : ℝ)))
           (rightMulHS_nonneg (ℋ := ℋ) hBinv0) y
-    have hαnonneg : 0 ≤ α.re := by
-      exact eigenvalue_nonneg_of_nonneg
+    have hαnonneg : 0 ≤ α.re :=
+      eigenvalue_nonneg_of_nonneg
         (Module.End.hasEigenvalue_of_hasEigenvector ⟨hx0r, hxzero⟩)
         hT0_nonneg_re
-    have hβnonneg : 0 ≤ β.re := by
-      exact eigenvalue_nonneg_of_nonneg
+    have hβnonneg : 0 ≤ β.re :=
+      eigenvalue_nonneg_of_nonneg
         (Module.End.hasEigenvalue_of_hasEigenvector ⟨hx1r, hxzero⟩)
         hT1_nonneg_re
     have hxprod :
@@ -559,11 +559,11 @@ private lemma phiK_operatorPowerMean_eq_liebTraceMap
       liebTraceMap (ℋ := ℋ) s K A B := by
   rcases hA with ⟨hA_sa, hA_spec⟩
   rcases hB with ⟨hB_sa, hB_spec⟩
-  have hA0 : 0 ≤ A := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
+  have hA0 : 0 ≤ A :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
       (by intro x hx; exact (hA_spec hx).le)
-  have hB0 : 0 ≤ B := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
+  have hB0 : 0 ≤ B :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
       (by intro x hx; exact (hB_spec hx).le)
   have hright_half :
       cfcR (ℋ := HSOp ℋ) (fun x : ℝ ↦ x ^ ((1 : ℝ) / 2)) (rightMulHS (ℋ := ℋ) B) =
@@ -838,8 +838,8 @@ private lemma pdSet_rpow_of_mem_Icc_zero_one
     {p : ℝ} (hp : p ∈ Set.Icc (0 : ℝ) 1) {A : L ℋ} (hA : A ∈ pdSet (ℋ := ℋ)) :
     A ^ p ∈ pdSet (ℋ := ℋ) := by
   rcases hA with ⟨hA_sa, hA_spec⟩
-  have hA0 : 0 ≤ A := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
+  have hA0 : 0 ≤ A :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
       (by intro x hx; exact (hA_spec hx).le)
   have hApow0 : 0 ≤ A ^ p := by
     simp
@@ -885,14 +885,14 @@ private lemma liebTraceMap_mono_right
   rcases hA with ⟨hA_sa, hA_spec⟩
   rcases hB₁ with ⟨hB₁_sa, hB₁_spec⟩
   rcases hB₂ with ⟨hB₂_sa, hB₂_spec⟩
-  have hA0 : 0 ≤ A := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
+  have hA0 : 0 ≤ A :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
       (by intro x hx; exact (hA_spec hx).le)
-  have hB₁0 : 0 ≤ B₁ := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₁ (ha := hB₁_sa)).2
+  have hB₁0 : 0 ≤ B₁ :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₁ (ha := hB₁_sa)).2
       (by intro x hx; exact (hB₁_spec hx).le)
-  have hB₂0 : 0 ≤ B₂ := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₂ (ha := hB₂_sa)).2
+  have hB₂0 : 0 ≤ B₂ :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₂ (ha := hB₂_sa)).2
       (by intro x hx; exact (hB₂_spec hx).le)
   have hcfc :=
     power_Icc_zero_one_operatorMonotoneOn_Ici (ℋ := ℋ) (1 - s) hs
@@ -956,8 +956,8 @@ private lemma liebTraceMap_antitone_right
   rcases hA with ⟨hA_sa, hA_spec⟩
   rcases hB₁ with ⟨hB₁_sa, hB₁_spec⟩
   rcases hB₂ with ⟨hB₂_sa, hB₂_spec⟩
-  have hA0 : 0 ≤ A := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
+  have hA0 : 0 ≤ A :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A (ha := hA_sa)).2
       (by intro x hx; exact (hA_spec hx).le)
   have hcfc :=
     power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi (ℋ := ℋ) (1 - s) hs
@@ -1220,14 +1220,14 @@ theorem liebExtensionTrace_jointlyConcaveOn_pdSet
   rcases hB₁ with ⟨hB₁_sa, hB₁_spec⟩
   rcases hB₂ with ⟨hB₂_sa, hB₂_spec⟩
   rcases hB_combo with ⟨hB_combo_sa, hB_combo_spec⟩
-  have hB₁0 : 0 ≤ B₁ := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₁ (ha := hB₁_sa)).2
+  have hB₁0 : 0 ≤ B₁ :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₁ (ha := hB₁_sa)).2
       (by intro x hx; exact (hB₁_spec hx).le)
-  have hB₂0 : 0 ≤ B₂ := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₂ (ha := hB₂_sa)).2
+  have hB₂0 : 0 ≤ B₂ :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₂ (ha := hB₂_sa)).2
       (by intro x hx; exact (hB₂_spec hx).le)
-  have hBcombo0 : 0 ≤ ((1 - θ) • B₁ + θ • B₂) := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) ((1 - θ) • B₁ + θ • B₂)
+  have hBcombo0 : 0 ≤ ((1 - θ) • B₁ + θ • B₂) :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) ((1 - θ) • B₁ + θ • B₂)
       (ha := hB_combo_sa)).2
       (by intro x hx; exact (hB_combo_spec hx).le)
   have hpow_conc :=
@@ -1281,8 +1281,8 @@ theorem liebExtensionTrace_jointlyConcaveOn_pdSet
           liebExtensionTraceMap (ℋ := ℋ) q p K A B := by
     intro A B hB
     rcases hB with ⟨hB_sa, hB_spec⟩
-    have hB0 : 0 ≤ B := by
-      exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
+    have hB0 : 0 ≤ B :=
+      (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
         (by intro x hx; exact (hB_spec hx).le)
     have hpow :
         (B ^ β) ^ (1 - q) = B ^ p := by
@@ -1346,14 +1346,14 @@ theorem andoTrace_jointlyConvexOn_pdSet
     rcases hB₁ with ⟨hB₁_sa, hB₁_spec⟩
     rcases hB₂ with ⟨hB₂_sa, hB₂_spec⟩
     rcases hB_combo with ⟨hB_combo_sa, hB_combo_spec⟩
-    have hB₁0 : 0 ≤ B₁ := by
-      exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₁ (ha := hB₁_sa)).2
+    have hB₁0 : 0 ≤ B₁ :=
+      (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₁ (ha := hB₁_sa)).2
         (by intro x hx; exact (hB₁_spec hx).le)
-    have hB₂0 : 0 ≤ B₂ := by
-      exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₂ (ha := hB₂_sa)).2
+    have hB₂0 : 0 ≤ B₂ :=
+      (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B₂ (ha := hB₂_sa)).2
         (by intro x hx; exact (hB₂_spec hx).le)
-    have hBcombo0 : 0 ≤ ((1 - θ) • B₁ + θ • B₂) := by
-      exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) ((1 - θ) • B₁ + θ • B₂)
+    have hBcombo0 : 0 ≤ ((1 - θ) • B₁ + θ • B₂) :=
+      (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) ((1 - θ) • B₁ + θ • B₂)
         (ha := hB_combo_sa)).2
         (by intro x hx; exact (hB_combo_spec hx).le)
     have hpow_conc :=
@@ -1407,8 +1407,8 @@ theorem andoTrace_jointlyConvexOn_pdSet
             andoTraceMap (ℋ := ℋ) q r K A B := by
       intro A B hB
       rcases hB with ⟨hB_sa, hB_spec⟩
-      have hB0 : 0 ≤ B := by
-        exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
+      have hB0 : 0 ≤ B :=
+        (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) B (ha := hB_sa)).2
           (by intro x hx; exact (hB_spec hx).le)
       have hBunit : IsUnit B := by
         refine spectrum.isUnit_of_zero_notMem (R := ℝ) ?_
