@@ -118,8 +118,8 @@ lemma momentumOperator_isSymmetric : (𝓟 i).IsSymmetric := by
   have hI₃ : Integrable fun x ↦ g x * fderiv ℝ (star ∘ f) x (basis i) := by
     simp_rw [heq]
     refine Integrable.mul_of_top_right ?_ g.memLp_top
-    apply (starL' ℝ).integrable_comp_iff.mpr
-    exact ((f.fderivCLM ℂ _ _).evalCLM ℂ _ _ _).integrable
+    exact (starL' ℝ).integrable_comp_iff.mpr
+      ((f.fderivCLM ℂ _ _).evalCLM ℂ _ _ _).integrable
   have hI₄ : Integrable fun x ↦ g x * star (f x) := hI₁.mul_of_top_right g.memLp_top
   trans I * ℏ * ∫ x, g x * fderiv ℝ (star ∘ f) x (basis i)
   · simp_rw [← integral_const_mul_of_integrable hI₃, heq]

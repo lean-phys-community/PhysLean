@@ -109,8 +109,7 @@ lemma mul_polynomial_integrable (f : ℝ → ℂ) (hf : MemHS f) (P : Polynomial
     simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
       Complex.ofReal_mul, Complex.ofReal_ofNat, Complex.real_smul]
   rw [hf']
-  apply MeasureTheory.Integrable.fun_smul
-  exact Q.mul_physHermite_integrable f hf i
+  exact (Q.mul_physHermite_integrable f hf i).fun_smul (a i)
 
 lemma mul_power_integrable (f : ℝ → ℂ) (hf : MemHS f) (r : ℕ) :
     MeasureTheory.Integrable (fun x => x ^ r * (f x * Real.exp (- x^2 / (2 * Q.ξ^2)))) volume := by
