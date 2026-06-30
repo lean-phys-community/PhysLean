@@ -244,16 +244,16 @@ lemma fieldStrength_eq_basis {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
     A.fieldStrength ε = ∑ μ, ∑ ν,
       ((η μ μ * distDeriv μ A ε ν) - η ν ν * distDeriv ν A ε μ)
-      • Lorentz.Vector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν := by
-  rw [fieldStrength]
-  exact fieldStrengthAux_eq_basis A ε
+      • Lorentz.Vector.basis μ ⊗ₜ[ℝ] Lorentz.Vector.basis ν :=
+  (fieldStrength_eq_fieldStrengthAux A ε).trans (fieldStrengthAux_eq_basis A ε)
 
 lemma fieldStrength_basis_repr_eq_single {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : DistElectromagneticPotential d) (ε : 𝓢(SpaceTime d, ℝ)) :
     (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr (A.fieldStrength ε) μν =
-    ((η μν.1 μν.1 * distDeriv μν.1 A ε μν.2) - η μν.2 μν.2 * distDeriv μν.2 A ε μν.1) := by
-  rw [fieldStrength]
-  exact fieldStrengthAux_basis_repr_apply_eq_single A ε
+    ((η μν.1 μν.1 * distDeriv μν.1 A ε μν.2) - η μν.2 μν.2 * distDeriv μν.2 A ε μν.1) :=
+  (congrArg (fun F => (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr F μν)
+    (fieldStrength_eq_fieldStrengthAux A ε)).trans
+    (fieldStrengthAux_basis_repr_apply_eq_single A ε)
 
 @[simp]
 lemma fieldStrength_diag_zero {d} (A : DistElectromagneticPotential d)

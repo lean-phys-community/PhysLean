@@ -151,10 +151,9 @@ tensor in.
   the components extracted via `toField`. -/
 lemma toFieldStrength_eq_sum_basis_eval {d} {A : ElectromagneticPotential d} :
     A.toFieldStrength = fun x => ∑ μ, ∑ ν, toField {A.toFieldStrength x| [μ] [ν]}ᵀ •
-      Vector.basis μ ⊗ₜ[ℝ] Vector.basis ν := by
-  ext x
-  exact prod_eq_sum_eval Vector.basis_eq_map_tensor_basis
-      Vector.basis_eq_map_tensor_basis (A.toFieldStrength x)
+      Vector.basis μ ⊗ₜ[ℝ] Vector.basis ν :=
+  funext fun x => prod_eq_sum_eval Vector.basis_eq_map_tensor_basis
+    Vector.basis_eq_map_tensor_basis (A.toFieldStrength x)
 
 /-- The statement that `F = F^{μν} eᵤ ⊗ eᵥ` written explicitly, with
   the components given by `∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ)`. -/
@@ -393,18 +392,18 @@ electromagnetic potential. -/
 lemma toFieldStrength_eval_apply {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
-    ∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ) := by
-  rw [toFieldStrength_eval_eq_basis_repr]
-  exact toFieldStrength_basis_repr_apply (μν := (μ, ν)) A x
+    ∑ κ, (η μ κ * ∂_ κ A x ν - η ν κ * ∂_ κ A x μ) :=
+  (toFieldStrength_eval_eq_basis_repr A x μ ν).trans
+    (toFieldStrength_basis_repr_apply (μν := (μ, ν)) A x)
 
 /-- The evaluated components of the field strength tensor after using diagonal form of the
 Minkowski metric. -/
 lemma toFieldStrength_eval_apply_eq_single {d} (A : ElectromagneticPotential d)
     (x : SpaceTime d) (μ ν : Fin 1 ⊕ Fin d) :
     toField {A.toFieldStrength x | [μ] [ν]}ᵀ =
-    η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ := by
-  rw [toFieldStrength_eval_eq_basis_repr]
-  exact toFieldStrength_basis_repr_apply_eq_single (μν := (μ, ν)) A x
+    η μ μ * ∂_ μ A x ν - η ν ν * ∂_ ν A x μ :=
+  (toFieldStrength_eval_eq_basis_repr A x μ ν).trans
+    (toFieldStrength_basis_repr_apply_eq_single (μν := (μ, ν)) A x)
 
 /-!
 
