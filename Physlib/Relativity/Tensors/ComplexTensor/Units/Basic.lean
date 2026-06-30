@@ -173,26 +173,22 @@ lemma contrCoUnit_eq_complexContrBasisFin4_complexCoBasisFin4 : δ =
 open Fermion in
 lemma dualLeftLeftUnit_eq_dualLeftBasis_leftBasis : δL' =
     ∑ i, fromPairT (dualLeftBasis i ⊗ₜ[ℂ] leftBasis i) := by
-  rw [dualLeftLeftUnit_eq_fromPairT, dualLeftLeftUnitVal_expand_tmul]
-  rfl
+  simp [dualLeftLeftUnit_eq_fromPairT, dualLeftLeftUnitVal_expand_tmul]
 
 open Fermion in
 lemma leftDualLeftUnit_eq_leftBasis_dualLeftBasis : δL =
     ∑ i, fromPairT (leftBasis i ⊗ₜ[ℂ] dualLeftBasis i) := by
-  rw [leftDualLeftUnit_eq_fromPairT, leftDualLeftUnitVal_expand_tmul]
-  rfl
+  simp [leftDualLeftUnit_eq_fromPairT, leftDualLeftUnitVal_expand_tmul]
 
 open Fermion in
 lemma dualRightRightUnit_eq_dualRightBasis_rightBasis : δR' =
     ∑ i, fromPairT (dualRightBasis i ⊗ₜ[ℂ] rightBasis i) := by
-  rw [dualRightRightUnit_eq_fromPairT, dualRightRightUnitVal_expand_tmul]
-  rfl
+  simp [dualRightRightUnit_eq_fromPairT, dualRightRightUnitVal_expand_tmul]
 
 open Fermion in
 lemma rightDualRightUnit_eq_rightBasis_dualRightBasis : δR =
     ∑ i, fromPairT (rightBasis i ⊗ₜ[ℂ] dualRightBasis i) := by
-  rw [rightDualRightUnit_eq_fromPairT, rightDualRightUnitVal_expand_tmul]
-  rfl
+  simp [rightDualRightUnit_eq_fromPairT, rightDualRightUnitVal_expand_tmul]
 
 /-!
 

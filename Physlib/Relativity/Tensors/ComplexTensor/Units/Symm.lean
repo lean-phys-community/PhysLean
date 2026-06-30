@@ -28,38 +28,32 @@ open Tensor
 
 /-- Swapping indices of `coContrUnit` returns `contrCoUnit`: `{δ' | μ ν = δ | ν μ}ᵀ`. -/
 lemma coContrUnit_symm : {δ' | μ ν = δ | ν μ}ᵀ := by
-  rw [coContrUnit, unitTensor_eq_permT_dual]
-  rfl
+  exact unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.up
 
 /-- Swapping indices of `contrCoUnit` returns `coContrUnit`: `{δ | μ ν = δ' | ν μ}ᵀ`. -/
 lemma contrCoUnit_symm : {δ | μ ν = δ' | ν μ}ᵀ := by
-  rw [contrCoUnit, unitTensor_eq_permT_dual]
-  rfl
+  exact unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.down
 
 /-- Swapping indices of `dualLeftLeftUnit` returns
   `leftDualLeftUnit`: `{δL' | α α' = δL | α' α}ᵀ`. -/
 lemma dualLeftLeftUnit_symm : {δL' | α α' = δL | α' α}ᵀ := by
-  rw [dualLeftLeftUnit, unitTensor_eq_permT_dual]
-  rfl
+  exact unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.upL
 
 /-- Swapping indices of `leftDualLeftUnit` returns
   `dualLeftLeftUnit`: `{δL | α α' = δL' | α' α}ᵀ`. -/
 lemma leftDualLeftUnit_symm : {δL | α α' = δL' | α' α}ᵀ := by
-  rw [leftDualLeftUnit, unitTensor_eq_permT_dual]
-  rfl
+  exact unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.downL
 
 /-- Swapping indices of `dualRightRightUnit` returns `rightDualRightUnit`:
 `{δR' | β β' = δR | β' β}ᵀ`.
 -/
 lemma dualRightRightUnit_symm : {δR' | β β' = δR | β' β}ᵀ := by
-  rw [dualRightRightUnit, unitTensor_eq_permT_dual]
-  rfl
+  exact unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.upR
 
 /-- Swapping indices of `rightDualRightUnit` returns `dualRightRightUnit`:
 `{δR | β β' = δR' | β' β}ᵀ`.
 -/
 lemma rightDualRightUnit_symm : {δR | β β' = δR' | β' β}ᵀ := by
-  rw [rightDualRightUnit, unitTensor_eq_permT_dual]
-  rfl
+  exact unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.downR
 
 end complexLorentzTensor
