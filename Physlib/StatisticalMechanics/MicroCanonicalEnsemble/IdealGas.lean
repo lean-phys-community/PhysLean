@@ -91,13 +91,12 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
     show ∀ (x y i m_i), eq_pm (x, y) (i, Sum.inr m_i) = y (i, m_i) from fun _ _ _ _ => rfl]
   have h_measurable_box : Measurable fun (a : (Fin n × Fin 3 → ℝ))
       => ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |a (x_1, x_2)| := by
-    refine Measurable.exists fun i => Measurable.exists fun j => ?_
-    exact measurable_const.lt (by fun_prop)
+    exact Measurable.exists fun i => Measurable.exists fun j => measurable_const.lt (by fun_prop)
   have h_measurability : Measurable fun x : (Fin n × Fin 3 → ℝ) × (Fin n × Fin 3 → ℝ) =>
       if ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |x.1 (x_1, x_2)| then 0
       else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) := by
-    refine Measurable.ite (measurableSet_setOf.mpr ?_) (by fun_prop) (by fun_prop)
-    exact h_measurable_box.comp measurable_fst
+    exact Measurable.ite (measurableSet_setOf.mpr (h_measurable_box.comp measurable_fst))
+      (by fun_prop) (by fun_prop)
   rw [MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
   rotate_left
   · exact Filter.Eventually.of_forall fun _ => by positivity

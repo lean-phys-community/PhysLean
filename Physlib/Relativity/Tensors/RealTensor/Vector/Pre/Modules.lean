@@ -111,8 +111,8 @@ lemma stdBasis_apply (μ ν : Fin 1 ⊕ Fin d) : (stdBasis μ).val ν = if μ = 
   simp only [stdBasis, Basis.coe_ofEquivFun]
   change Pi.single μ 1 ν = _
   simp only [Pi.single_apply]
-  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
+    (congrFun rfl) (congrFun rfl)
 
 /-- Decomposition of a contravariant Lorentz vector into the standard basis. -/
 lemma stdBasis_decomp (v : ContrMod d) : v = ∑ i, v.toFin1dℝ i • stdBasis i := by
@@ -369,8 +369,8 @@ lemma stdBasis_apply (μ ν : Fin 1 ⊕ Fin d) : (stdBasis μ).val ν = if μ = 
   simp only [stdBasis, Basis.coe_ofEquivFun]
   change Pi.single μ 1 ν = _
   simp only [Pi.single_apply]
-  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
+    (congrFun rfl) (congrFun rfl)
 
 /-- Decomposition of a covariant Lorentz vector into the standard basis. -/
 lemma stdBasis_decomp (v : CoMod d) : v = ∑ i, v.toFin1dℝ i • stdBasis i := by

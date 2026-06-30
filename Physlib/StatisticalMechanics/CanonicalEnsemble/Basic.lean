@@ -268,8 +268,8 @@ lemma nsmul_succ (n : ℕ) [SigmaFinite 𝓒.μ] : nsmul n.succ 𝓒 = (𝓒 + n
   · simp [Nat.succ_eq_add_one, Nat.succ_mul, dof_nsmul, add_comm]
   · simp
   · refine Eq.symm (MeasureTheory.MeasurePreserving.map_eq ?_)
-    refine MeasurePreserving.symm _ ?_
-    exact MeasureTheory.measurePreserving_piFinSuccAbove (n := n) (fun _ => 𝓒.μ) 0
+    exact MeasurePreserving.symm _
+      (MeasureTheory.measurePreserving_piFinSuccAbove (n := n) (fun _ => 𝓒.μ) 0)
 
 /-!
 
