@@ -33,8 +33,8 @@ def subContraction (S : Finset (Finset (Fin φs.length))) (ha : S ⊆ φsΛ.1) :
     exact φsΛ.2.2 i (ha hi) j (ha hj)⟩
 
 lemma mem_of_mem_subContraction {S : Finset (Finset (Fin φs.length))} {hs : S ⊆ φsΛ.1}
-    {a : Finset (Fin φs.length)} (ha : a ∈ (φsΛ.subContraction S hs).1) : a ∈ φsΛ.1 := by
-  exact hs ha
+    {a : Finset (Fin φs.length)} (ha : a ∈ (φsΛ.subContraction S hs).1) : a ∈ φsΛ.1 :=
+  hs ha
 
 /-- Given a Wick contraction `φsΛ`, and a subset `S` of `φsΛ.1`, the Wick contraction
   on the uncontracted list `[φsΛ.subContraction S ha]ᵘᶜ`

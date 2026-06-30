@@ -140,8 +140,8 @@ lemma timeOrder_haveEqTime_split (φs : List 𝓕.FieldOp) :
       φssucΛ.1.wickTerm) := by
   rw [wicks_theorem]
   simp only [wickTerm]
-  let e1 : WickContraction φs.length ≃ {φsΛ // HaveEqTime φsΛ} ⊕ {φsΛ // ¬ HaveEqTime φsΛ} := by
-    exact (Equiv.sumCompl HaveEqTime).symm
+  let e1 : WickContraction φs.length ≃ {φsΛ // HaveEqTime φsΛ} ⊕ {φsΛ // ¬ HaveEqTime φsΛ} :=
+    (Equiv.sumCompl HaveEqTime).symm
   rw [← e1.symm.sum_comp]
   simp only [Equiv.symm_symm, Algebra.smul_mul_assoc, Fintype.sum_sum_type,
     Equiv.sumCompl_apply_inl, Equiv.sumCompl_apply_inr, ne_eq, e1]

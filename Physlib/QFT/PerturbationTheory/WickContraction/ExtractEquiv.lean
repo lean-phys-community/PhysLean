@@ -58,8 +58,8 @@ def extractEquiv (i : Fin n.succ) : WickContraction n.succ ≃
 
 lemma extractEquiv_symm_none_uncontracted (i : Fin n.succ) (c : WickContraction n) :
     ((extractEquiv i).symm ⟨c, none⟩).uncontracted =
-    (Insert.insert i (c.uncontracted.map i.succAboveEmb)) := by
-  exact insertAndContractNat_none_uncontracted c i
+    (Insert.insert i (c.uncontracted.map i.succAboveEmb)) :=
+  insertAndContractNat_none_uncontracted c i
 
 @[simp]
 lemma extractEquiv_apply_congr_symm_apply {n m : ℕ} (k : ℕ)

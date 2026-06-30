@@ -192,8 +192,8 @@ lemma timeOrder_timeContract_mul_of_eqTimeOnly_mid_induction {φs : List 𝓕.Fi
 lemma timeOrder_timeContract_mul_of_eqTimeOnly_mid {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
     (hl : φsΛ.EqTimeOnly) (a b : 𝓕.WickAlgebra) :
-    𝓣(a * φsΛ.timeContract.1 * b) = φsΛ.timeContract.1 * 𝓣(a * b) := by
-  exact timeOrder_timeContract_mul_of_eqTimeOnly_mid_induction φsΛ hl a b φsΛ.1.card rfl
+    𝓣(a * φsΛ.timeContract.1 * b) = φsΛ.timeContract.1 * 𝓣(a * b) :=
+  timeOrder_timeContract_mul_of_eqTimeOnly_mid_induction φsΛ hl a b φsΛ.1.card rfl
 
 /-- Let `φs` be a list of `𝓕.FieldOp`, `φsΛ` a `WickContraction` of `φs` within
   which every contraction involves two `𝓕.FieldOp`s that have the same time and
@@ -476,8 +476,8 @@ lemma quotContraction_eqTimeContractSet_not_haveEqTime {φs : List 𝓕.FieldOp}
     quotContraction_sndFieldOfContract_uncontractedListEmd]
   simp only [quotContraction, Finset.mem_filter, Finset.mem_univ, true_and] at ha
   have hn' : Finset.map uncontractedListEmd a ∉
-      (φsΛ.subContraction (eqTimeContractSet φsΛ) (eqTimeContractSet_subset φsΛ)).1 := by
-    exact uncontractedListEmd_finset_not_mem a
+      (φsΛ.subContraction (eqTimeContractSet φsΛ) (eqTimeContractSet_subset φsΛ)).1 :=
+    uncontractedListEmd_finset_not_mem a
   simp only [subContraction, eqTimeContractSet, Fin.getElem_fin, Finset.mem_filter, Finset.mem_univ,
     true_and, not_and, not_forall] at hn'
   have hn'' := hn' ha

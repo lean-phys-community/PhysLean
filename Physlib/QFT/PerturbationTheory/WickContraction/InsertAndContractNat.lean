@@ -651,8 +651,8 @@ lemma insertLift_none_surjective {c : WickContraction n} (i : Fin n.succ) :
   exact Subtype.ext ha''
 
 lemma insertLift_none_bijective {c : WickContraction n} (i : Fin n.succ) :
-    Function.Bijective (c.insertLift i none) := by
-  exact ⟨insertLift_injective i none, insertLift_none_surjective i⟩
+    Function.Bijective (c.insertLift i none) :=
+  ⟨insertLift_injective i none, insertLift_none_surjective i⟩
 
 @[simp]
 lemma insertAndContractNat_fstFieldOfContract (c : WickContraction n) (i : Fin n.succ)
