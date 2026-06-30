@@ -38,8 +38,8 @@ lemma stat_ofFinset_eq_one_of_gradingCompliant (φs : List 𝓕.FieldOp)
     (hsom : ∀ i, (h : (φsΛ.getDual? i).isSome) → i ∈ a → (φsΛ.getDual? i).get h ∈ a) :
     (𝓕 |>ₛ ⟨φs.get, a⟩) = 1 := by
   rw [ofFinset_eq_prod]
-  let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} := by
-    exact (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
+  let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} :=
+    (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
   rw [← e2.symm.prod_comp]
   simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_lhs =>
@@ -368,8 +368,8 @@ lemma signInsertSomeProd_eq_prod_fin (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldO
   rw [signInsertSomeProd_eq_prod_prod]
   rw [Finset.prod_sigma']
   erw [← φsΛ.sigmaContractedEquiv.symm.prod_comp]
-  let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} := by
-    exact (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
+  let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} :=
+    (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
   rw [← e2.symm.prod_comp]
   simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_rhs =>

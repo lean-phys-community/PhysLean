@@ -52,13 +52,11 @@ def join {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
       right
       symm
       rw [Finset.mapEmbedding_apply]
-      apply uncontractedListEmd_finset_disjoint_left
-      exact ha
+      exact uncontractedListEmd_finset_disjoint_left b a ha
     · obtain ⟨a, ha, rfl⟩ := ha
       right
       rw [Finset.mapEmbedding_apply]
-      apply uncontractedListEmd_finset_disjoint_left
-      exact hb
+      exact uncontractedListEmd_finset_disjoint_left a b hb
     · obtain ⟨a, ha, rfl⟩ := ha
       obtain ⟨b, hb, rfl⟩ := hb
       simp only [EmbeddingLike.apply_eq_iff_eq]
@@ -113,8 +111,7 @@ lemma jointLiftLeft_disjoint_joinLiftRight {φs : List 𝓕.FieldOp} {φsΛ : Wi
     Disjoint (@joinLiftLeft _ _ _ φsucΛ a).1 (joinLiftRight b).1 := by
   simp only [joinLiftLeft, joinLiftRight]
   symm
-  apply uncontractedListEmd_finset_disjoint_left
-  exact a.2
+  exact uncontractedListEmd_finset_disjoint_left b.1 a.1 a.2
 
 lemma jointLiftLeft_ne_joinLiftRight {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} (a : φsΛ.1) (b : φsucΛ.1) :

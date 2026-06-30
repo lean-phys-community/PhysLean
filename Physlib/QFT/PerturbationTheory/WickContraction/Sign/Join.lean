@@ -306,8 +306,8 @@ lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
     joinSignLeftExtra h φsucΛ = joinSignRightExtra h φsucΛ := by
   /- Simplifying joinSignLeftExtra. -/
   let e2 : Fin φs.length ≃ {x // (((singleton h).join φsucΛ).getDual? x).isSome} ⊕
-    {x // ¬ (((singleton h).join φsucΛ).getDual? x).isSome} := by
-    exact (Equiv.sumCompl fun a => (((singleton h).join φsucΛ).getDual? a).isSome = true).symm
+    {x // ¬ (((singleton h).join φsucΛ).getDual? x).isSome} :=
+    (Equiv.sumCompl fun a => (((singleton h).join φsucΛ).getDual? a).isSome = true).symm
   rw [joinSignLeftExtra, ofFinset_eq_prod, map_prod, ← e2.symm.prod_comp]
   simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_lhs =>
@@ -339,8 +339,7 @@ lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
   have hjneqsnd := singleton_uncontractedEmd_ne_right h (φsucΛ.sndFieldOfContract a)
   have hl : uncontractedListEmd (φsucΛ.fstFieldOfContract a) <
       uncontractedListEmd (φsucΛ.sndFieldOfContract a) := by
-    apply uncontractedListEmd_strictMono
-    exact fstFieldOfContract_lt_sndFieldOfContract φsucΛ a
+    exact uncontractedListEmd_strictMono (fstFieldOfContract_lt_sndFieldOfContract φsucΛ a)
   by_cases hj1 : ¬ uncontractedListEmd (φsucΛ.fstFieldOfContract a) < j
   · have hi1 : ¬ uncontractedListEmd (φsucΛ.fstFieldOfContract a) < i := by omega
     simp [hj1, hi1]
@@ -418,8 +417,7 @@ lemma join_sign_induction {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs
     simp only [mul_eq_mul_left_iff]
     left
     left
-    apply sign_congr
-    exact join_uncontractedListGet (singleton hij) φsucΛ'
+    exact sign_congr (join_uncontractedListGet (singleton hij) φsucΛ') φsucΛ
 
 /-- For a list `φs` of `𝓕.FieldOp`, a grading compliant Wick contraction `φsΛ` of `φs`,
   and a Wick contraction `φsucΛ` of `[φsΛ]ᵘᶜ`, the following relation holds
