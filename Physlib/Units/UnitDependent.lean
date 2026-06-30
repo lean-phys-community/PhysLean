@@ -315,11 +315,9 @@ noncomputable instance {M1 M2 : Type} [AddCommMonoid M1] [Module ℝ M1]
   scaleUnit_trans' u1 u2 u3 f := LinearMap.ext fun m1 =>
     scaleUnit_trans' u1 u2 u3 (f m1)
   scaleUnit_id u f := LinearMap.ext fun m1 => scaleUnit_id u (f m1)
-  scaleUnit_add u1 u2 f1 f2 := by
-    ext m
+  scaleUnit_add u1 u2 f1 f2 := LinearMap.ext fun m => by
     simp [scaleUnit_add]
-  scaleUnit_smul u1 u2 r f := by
-    ext m
+  scaleUnit_smul u1 u2 r f := LinearMap.ext fun m => by
     simp [scaleUnit_smul]
 
 open LinearUnitDependent ContinuousLinearUnitDependent in
