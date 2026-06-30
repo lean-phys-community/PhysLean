@@ -63,12 +63,20 @@ noncomputable def linearMomentum {d : ℕ} (M : RigidBodyMotion d) : Time → Sp
 lemma linearMomentum_eq {d : ℕ} (M : RigidBodyMotion d) :
     M.linearMomentum = fun t => M.mass • M.centerOfMassVelocity t := rfl
 
+TODO "Define an action of the rotation and translation groups on `RigidBodyMotion`, and recover
+  `displacement` as the composite of those group actions."
+
 /-- The rigid displacement carrying the body frame into the inertial frame at time `t`: the
 rotation `orientation t` about the centre of mass, followed by the translation placing the centre
 of mass at `comTrajectory t`. -/
 noncomputable def displacement {d : ℕ} (M : RigidBodyMotion d) (t : Time) : Space d → Space d :=
   fun y => ⟨fun k => ∑ j, (M.orientation t).val k j * (y j - M.centerOfMass j) +
     M.comTrajectory t k⟩
+
+/-- The `k`-th coordinate of the rigid displacement applied to `y`. -/
+lemma displacement_apply {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d) (k : Fin d) :
+    M.displacement t y k =
+      (∑ j, (M.orientation t).val k j * (y j - M.centerOfMass j)) + M.comTrajectory t k := rfl
 
 lemma displacement_contDiff {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
     ContDiff ℝ ⊤ (M.displacement t) := by
@@ -111,12 +119,6 @@ private lemma contMDiffMap_sum_apply {d : ℕ} {ι : Type*} (s : Finset ι)
   | empty => simp
   | insert a s ha ih =>
     simp only [Finset.sum_insert ha, ContMDiffMap.coe_add, Pi.add_apply, ih]
-
-/-- The `k`-th coordinate of the rigid displacement applied to `y`. -/
-private lemma displacement_apply {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d)
-    (k : Fin d) :
-    M.displacement t y k =
-      (∑ j, (M.orientation t).val k j * (y j - M.centerOfMass j)) + M.comTrajectory t k := rfl
 
 /-- The first moment of the body-fixed distribution about its own centre of mass vanishes:
 for nonzero mass, `ρ` of the centred `j`-th coordinate function is zero. -/
