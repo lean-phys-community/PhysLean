@@ -321,10 +321,8 @@ noncomputable def neg (zero : TimeTransMan) (t : TimeTransMan) : TimeTransMan :=
   negMetric zero default t
 
 lemma neg_eq_negMetric (zero : TimeTransMan) (x : TimeUnit) (t : TimeTransMan) :
-    neg zero t = negMetric zero x t := by
-  simp [neg, negMetric]
-  ext
-  simp [addTime_val, diff_eq_val]
+    neg zero t = negMetric zero x t :=
+  ext_of (by simp [neg, negMetric, addTime_val, diff_eq_val])
 
 /-!
 
@@ -367,23 +365,18 @@ noncomputable def toTime (zero : TimeTransMan) (x : TimeUnit) : TimeTransMan ≃
 
 @[simp]
 lemma toTime_zero (zero : TimeTransMan) (x : TimeUnit) :
-    toTime zero x zero = 0 := by
-  ext
-  simp [toTime, diff_eq_val]
+    toTime zero x zero = 0 := Time.ext (by simp [toTime, diff_eq_val])
 
 @[simp]
 lemma toTime_symm_zero_add (zero : TimeTransMan) (x : TimeUnit) :
-    (toTime zero x).symm 0 = zero := by
-  ext
-  simp [toTime, addTime_val, diff_eq_val]
+    (toTime zero x).symm 0 = zero :=
+  ext_of (by simp [toTime, addTime_val, diff_eq_val])
 
 lemma toTime_val (zero : TimeTransMan) (x : TimeUnit) (t : TimeTransMan) :
-    (toTime zero x t).val = diff x t zero := by rfl
+    (toTime zero x t).val = diff x t zero := rfl
 
 lemma toTime_symm_val (zero : TimeTransMan) (x : TimeUnit) (r : Time) :
-    (toTime zero x).symm r = addTime x r zero := by
-  ext
-  simp [toTime, addTime_val, diff_eq_val]
+    (toTime zero x).symm r = addTime x r zero := rfl
 
 @[simp]
 lemma toTime_addTime (zero : TimeTransMan) (x : TimeUnit) (r : ℝ) (τ : TimeTransMan) :
@@ -422,9 +415,8 @@ lemma toTime_neg (zero : TimeTransMan) (x : TimeUnit) (t : TimeTransMan) :
   ring
 
 lemma toTime_symm_neg (zero : TimeTransMan) (x : TimeUnit) (t : Time) :
-    (toTime zero x).symm (- t) = neg zero ((toTime zero x).symm t) := by
-  ext
-  simp [toTime_symm_val, addTime_val, diff_eq_val, neg, negMetric]
+    (toTime zero x).symm (- t) = neg zero ((toTime zero x).symm t) :=
+  ext_of (by simp [toTime_symm_val, addTime_val, diff_eq_val, neg, negMetric])
 
 lemma toTime_symm_sub (zero : TimeTransMan) (x : TimeUnit)
     (t1 t2 : Time) : (toTime zero x).symm (t1 - t2) =
