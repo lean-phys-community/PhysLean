@@ -191,15 +191,14 @@ lemma orderedInsert_eq_insertIdx_of_fin_list_sorted (l : List (Fin n)) (hl : l.P
 def uncontractedList : List (Fin n) := List.filter (fun x => x ∈ c.uncontracted) (List.finRange n)
 
 lemma uncontractedList_mem_iff (i : Fin n) :
-    i ∈ c.uncontractedList ↔ i ∈ c.uncontracted := by
-  simp [uncontractedList]
+    i ∈ c.uncontractedList ↔ i ∈ c.uncontracted := by simp [uncontractedList]
 
 @[simp]
-lemma uncontractedList_empty : (empty (n := n)).uncontractedList = List.finRange n := by
-  simp [uncontractedList]
+lemma uncontractedList_empty :
+    (empty (n := n)).uncontractedList = List.finRange n := by simp [uncontractedList]
 
-lemma nil_zero_uncontractedList : (empty (n := 0)).uncontractedList = [] := by
-  simp [empty, uncontractedList]
+lemma nil_zero_uncontractedList :
+    (empty (n := 0)).uncontractedList = [] := by simp [empty, uncontractedList]
 
 lemma congr_uncontractedList {n m : ℕ} (h : n = m) (c : WickContraction n) :
     ((congr h) c).uncontractedList = List.map (finCongr h) c.uncontractedList := by
@@ -228,8 +227,7 @@ lemma uncontractedList_nodup : c.uncontractedList.Nodup := by
   exact List.Nodup.filter (fun x => decide (x ∈ c.uncontracted)) (List.nodup_finRange n)
 
 lemma uncontractedList_toFinset (c : WickContraction n) :
-    c.uncontractedList.toFinset = c.uncontracted := by
-  simp [uncontractedList]
+    c.uncontractedList.toFinset = c.uncontracted := by simp [uncontractedList]
 
 lemma uncontractedList_eq_sort (c : WickContraction n) :
     c.uncontractedList = c.uncontracted.sort (· ≤ ·) := by
@@ -323,8 +321,7 @@ scoped[WickContraction] notation "[" φsΛ "]ᵘᶜ" => uncontractedListGet φs�
 
 @[simp]
 lemma uncontractedListGet_empty {φs : List 𝓕.FieldOp} :
-    (empty (n := φs.length)).uncontractedListGet = φs := by
-  simp [uncontractedListGet]
+    (empty (n := φs.length)).uncontractedListGet = φs := by simp [uncontractedListGet]
 
 /-!
 
@@ -342,8 +339,7 @@ def uncontractedFieldOpEquiv (φs : List 𝓕.FieldOp) (φsΛ : WickContraction 
 
 @[simp]
 lemma uncontractedFieldOpEquiv_none (φs : List 𝓕.FieldOp) (φsΛ : WickContraction φs.length) :
-    (uncontractedFieldOpEquiv φs φsΛ).toFun none = none := by
-  simp [uncontractedFieldOpEquiv]
+    (uncontractedFieldOpEquiv φs φsΛ).toFun none = none := by simp [uncontractedFieldOpEquiv]
 
 lemma uncontractedFieldOpEquiv_list_sum [AddCommMonoid α] (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (f : Option (Fin [φsΛ]ᵘᶜ.length) → α) :
