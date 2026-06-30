@@ -397,14 +397,16 @@ private lemma W_mat_sq_eq_conj [Nonempty dA] [Nonempty dB] [Nonempty dC]
     · exact sqrt_sq (by positivity)
     · convert sqrt_sq ( show 0 ≤ ( σBC.traceLeft⁻¹ : HermitianMat dC ℂ ) from ?_ ) using 1;
       have h_inv_pos : (σBC.traceLeft⁻¹ : HermitianMat dC ℂ).mat.PosDef := by
-        have h_inv_pos : (σBC.traceLeft : Matrix dC dC ℂ).PosDef := by
-          exact PosDef_traceLeft σBC hσ;
+        have h_inv_pos : (σBC.traceLeft : Matrix dC dC ℂ).PosDef :=
+          PosDef_traceLeft σBC hσ
         convert! h_inv_pos.inv using 1;
       convert! h_inv_pos.posSemidef using 1;
       exact zero_le_iff;
   have h_simp : (ρAB.sqrt : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹.sqrt : Matrix dC dC ℂ) * (ρAB.sqrt : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹.sqrt : Matrix dC dC ℂ) = (ρAB : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹ : Matrix dC dC ℂ) := by
-    have h_simp : ∀ (A B C D : Matrix (dA × dB) (dA × dB) ℂ) (E F : Matrix dC dC ℂ), (A ⊗ₖ E) * (B ⊗ₖ F) = (A * B) ⊗ₖ (E * F) := by
-      exact fun A B C D E F => Eq.symm (Matrix.mul_kronecker_mul A B E F);
+    have h_simp :
+        ∀ (A B C D : Matrix (dA × dB) (dA × dB) ℂ) (E F : Matrix dC dC ℂ),
+          (A ⊗ₖ E) * (B ⊗ₖ F) = (A * B) ⊗ₖ (E * F) :=
+      fun A B _ _ E F => Eq.symm (Matrix.mul_kronecker_mul A B E F)
     aesop;
   simp_all [ ← Matrix.mul_assoc ]
 
@@ -417,8 +419,8 @@ private lemma S_mat_conj_rhs_eq_one [Nonempty dA] [Nonempty dB] [Nonempty dC]
     S_mat ρAB σBC * ((ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm).mat *
       S_mat ρAB σBC = 1 := by
   have h_comm : Commute (σBC.sqrt.mat) (σBC⁻¹.mat) := by
-    have h_comm : Commute (σBC.sqrt.mat) (σBC.mat) := by
-      exact commute_sqrt_left rfl;
+    have h_comm : Commute (σBC.sqrt.mat) (σBC.mat) :=
+      commute_sqrt_left rfl
     have h_comm_inv : Commute (σBC.sqrt.mat) (σBC.mat) → Commute (σBC.sqrt.mat) (σBC⁻¹.mat) := by
       intro h_comm
       have h_comm_inv : Commute (σBC.sqrt.mat) (σBC.mat) → Commute (σBC.sqrt.mat) (σBC.mat⁻¹) := by
@@ -747,12 +749,12 @@ private lemma S_mat_isUnit [Nonempty dA] [Nonempty dB] [Nonempty dC]
     constructor;
     · have h_det_ne_zero : ∀ (A : HermitianMat (dA) ℂ), A.mat.PosDef → (A.sqrt).mat.det ≠ 0 := by
         intro A hA
-        have h_det_ne_zero : (A.sqrt).mat.PosDef := by
-          exact sqrt_posDef hA;
+        have h_det_ne_zero : (A.sqrt).mat.PosDef :=
+          sqrt_posDef hA
         exact h_det_ne_zero.det_pos.ne';
       exact isUnit_iff_ne_zero.mpr ( h_det_ne_zero _ <| by simpa using PosDef_traceRight _ hρ |> fun h => h.inv );
-    · have h_inv_sqrt : σBC.sqrt.mat.PosDef := by
-        exact sqrt_posDef hσ;
+    · have h_inv_sqrt : σBC.sqrt.mat.PosDef :=
+        sqrt_posDef hσ
       exact isUnit_iff_ne_zero.mpr h_inv_sqrt.det_pos.ne';
   unfold S_mat;
   simp_all [ Matrix.det_kronecker]
@@ -804,12 +806,12 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
       convert HermitianMat.inv_kronecker _ _ using 1;
       · infer_instance;
       · exact ⟨ ⟨ Classical.arbitrary dB, Classical.arbitrary dC ⟩ ⟩;
-      · have h_trace_right_pos_def : (ρAB.traceRight).mat.PosDef := by
-          exact PosDef_traceRight ρAB hρ
+      · have h_trace_right_pos_def : (ρAB.traceRight).mat.PosDef :=
+          PosDef_traceRight ρAB hρ
         exact ⟨by exact PosDef_traceRight ρAB hρ |>.isUnit⟩
       · have h_inv_symm : σBC⁻¹.NonSingular := by
-          have h_inv_symm : σBC.NonSingular := by
-            exact nonSingular_of_posDef hσ
+          have h_inv_symm : σBC.NonSingular :=
+            nonSingular_of_posDef hσ
           exact nonSingular_iff_inv.mpr h_inv_symm;
         exact h_inv_symm;
     convert congr_arg ( fun x : HermitianMat _ _ => x.reindex ( Equiv.prodAssoc dA dB dC ).symm ) h_inv_symm using 1;
@@ -822,8 +824,8 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
     have h_inv_symm : (ρAB ⊗ₖ σBC.traceLeft⁻¹)⁻¹ = ρAB⁻¹ ⊗ₖ (σBC.traceLeft⁻¹)⁻¹ := by
       convert HermitianMat.inv_kronecker ρAB ( σBC.traceLeft⁻¹ ) using 1;
       · exact nonSingular_of_posDef hρ;
-      · have h_inv_symm : σBC.traceLeft.mat.PosDef := by
-          exact PosDef_traceLeft σBC hσ;
+      · have h_inv_symm : σBC.traceLeft.mat.PosDef :=
+          PosDef_traceLeft σBC hσ
         -- Since σBC.traceLeft is positive definite, its inverse is also positive definite, and hence non-singular.
         have h_inv_pos_def : (σBC.traceLeft⁻¹).mat.PosDef := by
           convert! h_inv_symm.inv using 1;
@@ -832,8 +834,8 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
     have h_inv_symm : (σBC.traceLeft⁻¹)⁻¹ = σBC.traceLeft := by
       have h_inv_symm : (σBC.traceLeft⁻¹).mat * σBC.traceLeft.mat = 1 := by
         have h_inv_symm : (σBC.traceLeft⁻¹).mat * σBC.traceLeft.mat = 1 := by
-          have h_inv_symm : σBC.traceLeft.mat.PosDef := by
-            exact PosDef_traceLeft σBC hσ
+          have h_inv_symm : σBC.traceLeft.mat.PosDef :=
+            PosDef_traceLeft σBC hσ
           convert! Matrix.nonsing_inv_mul _ _;
           exact isUnit_iff_ne_zero.mpr h_inv_symm.det_pos.ne';
         exact h_inv_symm
@@ -883,8 +885,8 @@ private lemma hermitianMat_log_inv_eq_neg
     (A : HermitianMat d₁ ℂ) [A.NonSingular] : A⁻¹.log = -A.log := by
   -- By the property of continuous functional calculus, the logarithm of the inverse of a matrix is the negative of the logarithm of the matrix.
   have h_log_inv : A⁻¹.log = A.cfc (Real.log ∘ (·⁻¹)) := by
-    have h_log_inv : A⁻¹ = A.cfc (·⁻¹) := by
-      exact Eq.symm HermitianMat.cfc_inv;
+    have h_log_inv : A⁻¹ = A.cfc (·⁻¹) :=
+      Eq.symm HermitianMat.cfc_inv
     rw [ h_log_inv, HermitianMat.log ];
     exact Eq.symm (HermitianMat.cfc_comp A (fun x => x⁻¹) Real.log);
   simp [ HermitianMat.log ];
@@ -1126,8 +1128,8 @@ private lemma purify_AB_traceRight_eq (ρ : MState (dA × dB × dC)) :
     Sᵥₙ ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceRight =
     Sᵥₙ ρ.assoc'.traceRight := by
   have h_traceRight : ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceRight = ρ.assoc'.traceRight := by
-    have h_traceRight : (MState.pure ρ.purify).traceRight = ρ := by
-      exact MState.purify_spec ρ;
+    have h_traceRight : (MState.pure ρ.purify).traceRight = ρ :=
+      MState.purify_spec ρ
     convert congr_arg ( fun m => m.assoc'.traceRight ) h_traceRight using 1;
     ext i j; simp [ MState.traceRight, MState.assoc' ] ;
     simp [ HermitianMat.traceRight, MState.SWAP, MState.assoc ];
