@@ -162,8 +162,8 @@ def reduce (x : FiveQuanta 𝓩) : FiveQuanta 𝓩 :=
 
 lemma reduce_nodup (x : FiveQuanta 𝓩) : x.reduce.Nodup := by
   rw [reduce]
-  refine Multiset.Nodup.map (fun q1 q2 h => ?_) (Multiset.nodup_dedup x.toCharges)
-  exact congrArg Prod.fst h
+  exact Multiset.Nodup.map (fun q1 q2 h => congrArg Prod.fst h)
+    (Multiset.nodup_dedup x.toCharges)
 
 @[simp]
 lemma reduce_dedup (x : FiveQuanta 𝓩) : x.reduce.dedup = x.reduce :=
@@ -282,8 +282,8 @@ lemma reduce_sum_eq_sum_toCharges {M} [AddCommMonoid M] (x : FiveQuanta 𝓩) (f
           rw [Multiset.sum_map_eq_nsmul_single p.1]
           simp only [↓reduceIte, smul_eq_mul]
           have h_count_one : Multiset.count p.1 (Multiset.map Prod.fst x).dedup = 1 := by
-            refine Multiset.count_eq_one_of_mem ?_ h_mem_dedup
-            exact Multiset.nodup_dedup (Multiset.map Prod.fst x)
+            exact Multiset.count_eq_one_of_mem (Multiset.nodup_dedup (Multiset.map Prod.fst x))
+              h_mem_dedup
           simp [h_count_one]
           intro q5' h h2
           simp_all [eq_comm]
@@ -370,8 +370,7 @@ lemma mem_powerset_sum_of_mem_reduce_toFluxesFive {F : FiveQuanta 𝓩}
   use (Multiset.map (fun x => x.2) (Multiset.filter (fun x => x.1 = q) F))
   simp only [and_true]
   rw [toFluxesFive]
-  refine Multiset.map_le_map ?_
-  exact Multiset.filter_le (fun x => x.1 = q) F
+  exact Multiset.map_le_map (Multiset.filter_le (fun x => x.1 = q) F)
 
 lemma mem_powerset_sum_of_mem_reduce_toFluxesFive_filter {F : FiveQuanta 𝓩}
     {f : Fluxes} (hf : f ∈ F.reduce.toFluxesFive) :
@@ -388,8 +387,7 @@ lemma mem_powerset_sum_of_mem_reduce_toFluxesFive_filter {F : FiveQuanta 𝓩}
   apply And.intro
   simp only [Multiset.mem_powerset]
   rw [toFluxesFive]
-  refine Multiset.map_le_map ?_
-  exact Multiset.filter_le (fun x => x.1 = q) F
+  exact Multiset.map_le_map (Multiset.filter_le (fun x => x.1 = q) F)
   simp [Multiset.empty_eq_zero, ne_eq, Multiset.map_eq_zero, Multiset.filter_eq_nil,
     Prod.forall, not_forall, Decidable.not_not]
   rw [toCharges, Multiset.mem_map] at hq

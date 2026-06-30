@@ -297,8 +297,8 @@ lemma reduce_sum_eq_sum_toCharges {M} [AddCommMonoid M] (x : TenQuanta 𝓩) (f 
           rw [Multiset.sum_map_eq_nsmul_single p.1]
           simp only [↓reduceIte, smul_eq_mul]
           have h_count_one : Multiset.count p.1 (Multiset.map Prod.fst x).dedup = 1 := by
-            refine Multiset.count_eq_one_of_mem ?_ h_mem_dedup
-            exact Multiset.nodup_dedup (Multiset.map Prod.fst x)
+            exact Multiset.count_eq_one_of_mem (Multiset.nodup_dedup (Multiset.map Prod.fst x))
+              h_mem_dedup
           simp [h_count_one]
           intro q5' h h2
           simp_all [eq_comm]
@@ -386,8 +386,7 @@ lemma mem_powerset_sum_of_mem_reduce_toFluxesTen {F : TenQuanta 𝓩}
   use (Multiset.map (fun x => x.2) (Multiset.filter (fun x => x.1 = q) F))
   simp only [and_true]
   rw [toFluxesTen]
-  refine Multiset.map_le_map ?_
-  exact Multiset.filter_le (fun x => x.1 = q) F
+  exact Multiset.map_le_map (Multiset.filter_le (fun x => x.1 = q) F)
 
 lemma mem_powerset_sum_of_mem_reduce_toFluxesTen_filter {F : TenQuanta 𝓩}
     {f : Fluxes} (hf : f ∈ F.reduce.toFluxesTen) :
@@ -403,8 +402,7 @@ lemma mem_powerset_sum_of_mem_reduce_toFluxesTen_filter {F : TenQuanta 𝓩}
     Multiset.filter_eq_nil, Prod.forall, not_forall, Decidable.not_not, and_true]
   apply And.intro
   rw [toFluxesTen]
-  refine Multiset.map_le_map ?_
-  exact Multiset.filter_le (fun x => x.1 = q) F
+  exact Multiset.map_le_map (Multiset.filter_le (fun x => x.1 = q) F)
   simpa [toCharges] using hq
 
 /-!
