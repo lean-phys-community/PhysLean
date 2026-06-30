@@ -422,8 +422,7 @@ private lemma hmiddle_leftMul_rightMul
           exact spectrum.zero_notMem (R := ℝ) hBinv_unit (by simpa [hx0] using hx)
         exact (Real.continuousAt_rpow_const x s (Or.inl hx0)).continuousWithinAt)).symm
   have hprod0 :
-      0 ≤ leftMulHS (ℋ := ℋ) A * rightMulHS (ℋ := ℋ) (B ^ (-1 : ℝ)) := by
-    exact (leftMulHS_rightMulHS_commute (ℋ := ℋ) A (B ^ (-1 : ℝ))).mul_nonneg
+      0 ≤ leftMulHS (ℋ := ℋ) A * rightMulHS (ℋ := ℋ) (B ^ (-1 : ℝ)) := (leftMulHS_rightMulHS_commute (ℋ := ℋ) A (B ^ (-1 : ℝ))).mul_nonneg
       (leftMulHS_nonneg (ℋ := ℋ) hA0)
       (rightMulHS_nonneg (ℋ := ℋ) hBinv0)
   have hprod_sa :
@@ -431,8 +430,7 @@ private lemma hmiddle_leftMul_rightMul
         (leftMulHS (ℋ := ℋ) A * rightMulHS (ℋ := ℋ) (B ^ (-1 : ℝ))) :=
     IsSelfAdjoint.of_nonneg hprod0
   have htop :
-      (⨆ α, ⨆ β, eigenspace T0 α ⊓ eigenspace T1 β) = ⊤ := by
-    exact LinearMap.IsSymmetric.iSup_iSup_eigenspace_inf_eigenspace_eq_top_of_commute
+      (⨆ α, ⨆ β, eigenspace T0 α ⊓ eigenspace T1 β) = ⊤ := LinearMap.IsSymmetric.iSup_iSup_eigenspace_inf_eigenspace_eq_top_of_commute
       hT0_symm hT1_symm hcomm
   have hjoint_ker :
       ∀ α β,
@@ -530,8 +528,7 @@ private lemma hmiddle_leftMul_rightMul
       simp [mul_comm]
     have hscal :
         (((α.re * β.re : ℝ) ^ s : ℝ) : ℂ) =
-          ((((α.re ^ s) * (β.re ^ s) : ℝ)) : ℂ) := by
-      exact congrArg (fun t : ℝ => (t : ℂ)) (Real.mul_rpow hαnonneg hβnonneg)
+          ((((α.re ^ s) * (β.re ^ s) : ℝ)) : ℂ) := congrArg (fun t : ℝ => (t : ℂ)) (Real.mul_rpow hαnonneg hβnonneg)
     simpa [D] using
       sub_eq_zero.mpr (hlhsx.trans (hscal ▸ hrhsx.symm))
   have hker_top : LinearMap.ker D.toLinearMap = ⊤ := by
@@ -617,8 +614,7 @@ private lemma phiK_operatorPowerMean_eq_liebTraceMap
     simp
   have hBinv_sa : IsSelfAdjoint (B ^ (-1 : ℝ)) := IsSelfAdjoint.of_nonneg hBinv0
   have hright_invHalf0 :
-      0 ≤ rightMulHS (ℋ := ℋ) (B ^ ((-1 : ℝ) / 2)) := by
-    exact rightMulHS_nonneg (ℋ := ℋ) hBinvHalf0
+      0 ≤ rightMulHS (ℋ := ℋ) (B ^ ((-1 : ℝ) / 2)) := rightMulHS_nonneg (ℋ := ℋ) hBinvHalf0
   have hmid_nonneg :
       0 ≤ cfcR (ℋ := HSOp ℋ) (fun x : ℝ ↦ x ^ ((-1 : ℝ) / 2)) (rightMulHS (ℋ := ℋ) B) *
           leftMulHS (ℋ := ℋ) A *
@@ -650,8 +646,7 @@ private lemma phiK_operatorPowerMean_eq_liebTraceMap
           (cfcR (ℋ := HSOp ℋ) (fun x : ℝ ↦ x ^ ((-1 : ℝ) / 2)) (rightMulHS (ℋ := ℋ) B) *
             leftMulHS (ℋ := ℋ) A *
             cfcR (ℋ := HSOp ℋ) (fun x : ℝ ↦ x ^ ((-1 : ℝ) / 2)) (rightMulHS (ℋ := ℋ) B)) =
-        leftMulHS (ℋ := ℋ) (A ^ s) * rightMulHS (ℋ := ℋ) (B ^ (-s)) := by
-    exact hmiddle_leftMul_rightMul (ℋ := ℋ) (s := s) ⟨hA_sa, hA_spec⟩ ⟨hB_sa, hB_spec⟩
+        leftMulHS (ℋ := ℋ) (A ^ s) * rightMulHS (ℋ := ℋ) (B ^ (-s)) := hmiddle_leftMul_rightMul (ℋ := ℋ) (s := s) ⟨hA_sa, hA_spec⟩ ⟨hB_sa, hB_spec⟩
   have happly :
       operatorPowerMean (ℋ := HSOp ℋ) s 1
           (leftMulHS (ℋ := ℋ) A) (rightMulHS (ℋ := ℋ) B) (ofOp (star K)) =
@@ -914,8 +909,7 @@ private lemma liebTraceMap_mono_right
   have hdiff0 : 0 ≤ B₂ ^ (1 - s) - B₁ ^ (1 - s) := sub_nonneg.mpr hpow
   have hprod0 :
       0 ≤ leftMulHS (ℋ := ℋ) (A ^ s) *
-          rightMulHS (ℋ := ℋ) (B₂ ^ (1 - s) - B₁ ^ (1 - s)) := by
-    exact (leftMulHS_rightMulHS_commute (ℋ := ℋ) (A ^ s) (B₂ ^ (1 - s) - B₁ ^ (1 - s))).mul_nonneg
+          rightMulHS (ℋ := ℋ) (B₂ ^ (1 - s) - B₁ ^ (1 - s)) := (leftMulHS_rightMulHS_commute (ℋ := ℋ) (A ^ s) (B₂ ^ (1 - s) - B₁ ^ (1 - s))).mul_nonneg
       (leftMulHS_nonneg (ℋ := ℋ) hApow0)
       (rightMulHS_nonneg (ℋ := ℋ) hdiff0)
   have hphi : 0 ≤
@@ -992,8 +986,7 @@ private lemma liebTraceMap_antitone_right
   have hdiff0 : 0 ≤ B₁ ^ (1 - s) - B₂ ^ (1 - s) := sub_nonneg.mpr hpow
   have hprod0 :
       0 ≤ leftMulHS (ℋ := ℋ) (A ^ s) *
-          rightMulHS (ℋ := ℋ) (B₁ ^ (1 - s) - B₂ ^ (1 - s)) := by
-    exact (leftMulHS_rightMulHS_commute (ℋ := ℋ) (A ^ s) (B₁ ^ (1 - s) - B₂ ^ (1 - s))).mul_nonneg
+          rightMulHS (ℋ := ℋ) (B₁ ^ (1 - s) - B₂ ^ (1 - s)) := (leftMulHS_rightMulHS_commute (ℋ := ℋ) (A ^ s) (B₁ ^ (1 - s) - B₂ ^ (1 - s))).mul_nonneg
       (leftMulHS_nonneg (ℋ := ℋ) hApow0)
       (rightMulHS_nonneg (ℋ := ℋ) hdiff0)
   have hphi : 0 ≤
@@ -1067,11 +1060,9 @@ theorem liebTrace_jointlyConcaveOn_pdSet
       toOp T * ((1 - θ) • B₁ + θ • B₂)
     rw [mul_add, mul_smul_comm, mul_smul_comm]
   have hA_combo :
-      ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := by
-    exact pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
+      ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
   have hB_combo :
-      ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := by
-    exact pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
+      ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
   letI : Nontrivial (HSOp ℋ) := by
     delta HSOp
     infer_instance
@@ -1104,8 +1095,7 @@ theorem liebTrace_jointlyConcaveOn_pdSet
         phiK (ℋ := ℋ) K
           (operatorPowerMean (ℋ := HSOp ℋ) s 1
             (leftMulHS (ℋ := ℋ) ((1 - θ) • A₁ + θ • A₂))
-            (rightMulHS (ℋ := ℋ) ((1 - θ) • B₁ + θ • B₂))) := by
-    exact phiK_mono (ℋ := ℋ) K hconc
+            (rightMulHS (ℋ := ℋ) ((1 - θ) • B₁ + θ • B₂))) := phiK_mono (ℋ := ℋ) K hconc
   rw [phiK_weightedSum_operatorPowerMean_eq (ℋ := ℋ) (s := s) (θ := θ) K A₁ A₂ B₁ B₂
       hA₁ hA₂ hB₁ hB₂] at hphi_mono
   rw [phiK_operatorPowerMean_eq_liebTraceMap (ℋ := ℋ) (s := s) K
@@ -1132,11 +1122,9 @@ theorem liebTrace_jointlyConvexOn_pdSet
       toOp T * ((1 - θ) • B₁ + θ • B₂)
     rw [mul_add, mul_smul_comm, mul_smul_comm]
   have hA_combo :
-      ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := by
-    exact pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
+      ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
   have hB_combo :
-      ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := by
-    exact pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
+      ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
   letI : Nontrivial (HSOp ℋ) := by
     delta HSOp
     infer_instance
@@ -1169,8 +1157,7 @@ theorem liebTrace_jointlyConvexOn_pdSet
           ((1 - θ) • operatorPowerMean (ℋ := HSOp ℋ) s 1
               (leftMulHS (ℋ := ℋ) A₁) (rightMulHS (ℋ := ℋ) B₁) +
             θ • operatorPowerMean (ℋ := HSOp ℋ) s 1
-              (leftMulHS (ℋ := ℋ) A₂) (rightMulHS (ℋ := ℋ) B₂)) := by
-    exact phiK_mono (ℋ := ℋ) K hconv
+              (leftMulHS (ℋ := ℋ) A₂) (rightMulHS (ℋ := ℋ) B₂)) := phiK_mono (ℋ := ℋ) K hconv
   rw [phiK_operatorPowerMean_eq_liebTraceMap (ℋ := ℋ) (s := s) K
       ((1 - θ) • A₁ + θ • A₂) ((1 - θ) • B₁ + θ • B₂) hA_combo hB_combo] at hphi_mono
   rw [phiK_weightedSum_operatorPowerMean_eq (ℋ := ℋ) (s := s) (θ := θ) K A₁ A₂ B₁ B₂
@@ -1198,11 +1185,9 @@ theorem liebExtensionTrace_jointlyConcaveOn_pdSet
     field_simp [h1q.ne']
   intro A₁ A₂ B₁ B₂ θ hA₁ hA₂ hB₁ hB₂ hθ0 hθ1
   have hA_combo :
-      ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := by
-    exact pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
+      ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
   have hB_combo :
-      ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := by
-    exact pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
+      ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
   have hB₁β : B₁ ^ β ∈ pdSet (ℋ := ℋ) :=
     pdSet_rpow_of_mem_Icc_zero_one (ℋ := ℋ) hβ hB₁
   have hB₂β : B₂ ^ β ∈ pdSet (ℋ := ℋ) :=
@@ -1211,8 +1196,7 @@ theorem liebExtensionTrace_jointlyConcaveOn_pdSet
       (((1 - θ) • B₁ + θ • B₂) ^ β) ∈ pdSet (ℋ := ℋ) :=
     pdSet_rpow_of_mem_Icc_zero_one (ℋ := ℋ) hβ hB_combo
   have hBpow_combo :
-      ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β)) ∈ pdSet (ℋ := ℋ) := by
-    exact pdSet_convexCombo (ℋ := ℋ) hB₁β hB₂β hθ0 hθ1
+      ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β)) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hB₁β hB₂β hθ0 hθ1
   have hB₁_mem := hB₁
   have hB₂_mem := hB₂
   have hB_combo_mem := hB_combo
@@ -1264,8 +1248,7 @@ theorem liebExtensionTrace_jointlyConcaveOn_pdSet
           ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β)) ≤
         liebTraceMap (ℋ := ℋ) q K
           ((1 - θ) • A₁ + θ • A₂)
-          (((1 - θ) • B₁ + θ • B₂) ^ β) := by
-    exact liebTraceMap_mono_right (ℋ := ℋ) (s := q) hsmono K
+          (((1 - θ) • B₁ + θ • B₂) ^ β) := liebTraceMap_mono_right (ℋ := ℋ) (s := q) hsmono K
       ((1 - θ) • A₁ + θ • A₂)
       ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β))
       (((1 - θ) • B₁ + θ • B₂) ^ β)
@@ -1324,11 +1307,9 @@ theorem andoTrace_jointlyConvexOn_pdSet
       ring
     intro A₁ A₂ B₁ B₂ θ hA₁ hA₂ hB₁ hB₂ hθ0 hθ1
     have hA_combo :
-        ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := by
-      exact pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
+        ((1 - θ) • A₁ + θ • A₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hA₁ hA₂ hθ0 hθ1
     have hB_combo :
-        ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := by
-      exact pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
+        ((1 - θ) • B₁ + θ • B₂) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hB₁ hB₂ hθ0 hθ1
     have hB₁β : B₁ ^ β ∈ pdSet (ℋ := ℋ) :=
       pdSet_rpow_of_mem_Icc_zero_one (ℋ := ℋ) hβ hB₁
     have hB₂β : B₂ ^ β ∈ pdSet (ℋ := ℋ) :=
@@ -1337,8 +1318,7 @@ theorem andoTrace_jointlyConvexOn_pdSet
         (((1 - θ) • B₁ + θ • B₂) ^ β) ∈ pdSet (ℋ := ℋ) :=
       pdSet_rpow_of_mem_Icc_zero_one (ℋ := ℋ) hβ hB_combo
     have hBpow_combo :
-        ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β)) ∈ pdSet (ℋ := ℋ) := by
-      exact pdSet_convexCombo (ℋ := ℋ) hB₁β hB₂β hθ0 hθ1
+        ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β)) ∈ pdSet (ℋ := ℋ) := pdSet_convexCombo (ℋ := ℋ) hB₁β hB₂β hθ0 hθ1
     have hB₁_mem := hB₁
     have hB₂_mem := hB₂
     have hB_combo_mem := hB_combo
@@ -1390,8 +1370,7 @@ theorem andoTrace_jointlyConvexOn_pdSet
             (((1 - θ) • B₁ + θ • B₂) ^ β) ≤
           liebTraceMap (ℋ := ℋ) q K
             ((1 - θ) • A₁ + θ • A₂)
-            ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β)) := by
-      exact liebTraceMap_antitone_right (ℋ := ℋ) (s := q) hsanti K
+            ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β)) := liebTraceMap_antitone_right (ℋ := ℋ) (s := q) hsanti K
         ((1 - θ) • A₁ + θ • A₂)
         ((1 - θ) • (B₁ ^ β) + θ • (B₂ ^ β))
         (((1 - θ) • B₁ + θ • B₂) ^ β)
