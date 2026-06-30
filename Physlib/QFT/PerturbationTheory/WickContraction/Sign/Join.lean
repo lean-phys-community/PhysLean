@@ -193,10 +193,8 @@ lemma join_singleton_sign_left {φs : List 𝓕.FieldOp}
     (φsucΛ : WickContraction [singleton h]ᵘᶜ.length) :
     (singleton h).sign = 𝓢(𝓕 |>ₛ φs[j],
     (𝓕 |>ₛ ⟨φs.get, (join (singleton h) φsucΛ).signFinset i j⟩)) * (joinSignLeftExtra h φsucΛ) := by
-  rw [singleton_sign_expand]
-  rw [join_singleton_left_signFinset_eq_filter h φsucΛ]
-  rw [map_mul]
-  rfl
+  simpa [joinSignLeftExtra, join_singleton_left_signFinset_eq_filter h φsucΛ, map_mul] using
+    singleton_sign_expand h
 
 lemma join_singleton_sign_right {φs : List 𝓕.FieldOp}
     {i j : Fin φs.length} (h : i < j)
@@ -206,8 +204,7 @@ lemma join_singleton_sign_right {φs : List 𝓕.FieldOp}
     (∏ a, 𝓢(𝓕|>ₛ [singleton h]ᵘᶜ[φsucΛ.sndFieldOfContract a], 𝓕|>ₛ ⟨φs.get,
       ((join (singleton h) φsucΛ).signFinset (uncontractedListEmd (φsucΛ.fstFieldOfContract a))
         (uncontractedListEmd (φsucΛ.sndFieldOfContract a)))⟩)) := by
-  rw [sign_right_eq_prod_mul_prod]
-  rfl
+  exact sign_right_eq_prod_mul_prod (singleton h) φsucΛ
 
 lemma joinSignRightExtra_eq_i_j_finset_eq_if {φs : List 𝓕.FieldOp}
     {i j : Fin φs.length} (h : i < j) (φsucΛ : WickContraction [singleton h]ᵘᶜ.length) :

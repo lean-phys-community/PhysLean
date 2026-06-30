@@ -34,8 +34,8 @@ lemma normalOrder_eq_ι_normalOrderF (a : 𝓕.FieldOpFreeAlgebra) :
 
 lemma normalOrder_ofCrAnList (φs : List 𝓕.CrAnFieldOp) :
     𝓝(ofCrAnList φs) = normalOrderSign φs • ofCrAnList (normalOrderList φs) := by
-  rw [ofCrAnList, normalOrder_eq_ι_normalOrderF, normalOrderF_ofCrAnListF]
-  rfl
+  simpa [ofCrAnList, normalOrder_eq_ι_normalOrderF] using
+    congrArg ι (normalOrderF_ofCrAnListF φs)
 
 @[simp]
 lemma normalOrder_one_eq_one : normalOrder (𝓕 := 𝓕) 1 = 1 := by

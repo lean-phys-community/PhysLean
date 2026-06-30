@@ -73,8 +73,7 @@ instance : Setoid (FieldOpFreeAlgebra 𝓕) := (TwoSidedIdeal.span 𝓕.fieldOpI
 
 lemma equiv_iff_sub_mem_ideal (x y : FieldOpFreeAlgebra 𝓕) :
     x ≈ y ↔ x - y ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
-  rw [← TwoSidedIdeal.rel_iff]
-  rfl
+  exact (TwoSidedIdeal.span 𝓕.fieldOpIdealSet).rel_iff x y
 
 lemma equiv_iff_exists_add (x y : FieldOpFreeAlgebra 𝓕) :
     x ≈ y ↔ ∃ a, x = y + a ∧ a ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
