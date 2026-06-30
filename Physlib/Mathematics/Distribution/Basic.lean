@@ -316,10 +316,8 @@ def const [hμ : Measure.HasTemperateGrowth (volume (α := E))] (c : F) : E →d
     · subst hc
       simp
     rw [MeasureTheory.integral_add]
-    · refine (integrable_smul_const hc).mpr ?_
-      exact integrable η1
-    · refine (integrable_smul_const hc).mpr ?_
-      exact integrable η2
+    · exact (integrable_smul_const hc).mpr (integrable η1)
+    · exact (integrable_smul_const hc).mpr (integrable η2)
   · intro a η
     simp only [smul_apply, RingHom.id_apply, smul_assoc]
     rw [MeasureTheory.integral_smul]
@@ -370,12 +368,13 @@ lemma fderivD_const [hμ : Measure.IsAddHaarMeasure (volume (α := E))]
   · simp
   rw [integral_smul_fderiv_eq_neg_fderiv_smul_of_integrable]
   simp only [evalCLM_apply_apply, fderivCLM_apply, neg_neg]
-  · apply MeasureTheory.Integrable.smul_const
-    change Integrable (SchwartzMap.evalCLM (𝕜 := ℝ) E ℝ v (SchwartzMap.fderivCLM ℝ E ℝ η)) volume
-    exact integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))
+  · exact (show
+      Integrable
+        (SchwartzMap.evalCLM (𝕜 := ℝ) E ℝ v
+          (SchwartzMap.fderivCLM ℝ E ℝ η)) volume from
+        integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))).smul_const _
   · simp
-  · apply MeasureTheory.Integrable.smul_const
-    exact integrable η
+  · exact (integrable η).smul_const _
   · fun_prop
   · simp
 
@@ -440,10 +439,8 @@ def heavisideStep (d : ℕ) : (EuclideanSpace ℝ (Fin d.succ)) →d[ℝ] ℝ :=
   · intro η1 η2
     simp only [Nat.succ_eq_add_one, add_apply]
     rw [MeasureTheory.integral_add]
-    · apply MeasureTheory.Integrable.restrict
-      exact integrable η1
-    · apply MeasureTheory.Integrable.restrict
-      exact integrable η2
+    · exact (integrable η1).restrict
+    · exact (integrable η2).restrict
   · intro a η
     simp only [smul_apply, RingHom.id_apply]
     rw [MeasureTheory.integral_smul]
