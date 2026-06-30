@@ -40,8 +40,7 @@ lemma createFilter_cons_annihilate {φ : 𝓕.CrAnFieldOp}
 
 lemma createFilter_append (φs φs' : List 𝓕.CrAnFieldOp) :
     createFilter (φs ++ φs') = createFilter φs ++ createFilter φs' := by
-  rw [createFilter, List.filter_append]
-  rfl
+  simp [createFilter, List.filter_append]
 
 lemma createFilter_singleton_create (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.create) :
@@ -76,8 +75,7 @@ lemma annihilateFilter_cons_annihilate {φ : 𝓕.CrAnFieldOp}
 
 lemma annihilateFilter_append (φs φs' : List 𝓕.CrAnFieldOp) :
     annihilateFilter (φs ++ φs') = annihilateFilter φs ++ annihilateFilter φs' := by
-  rw [annihilateFilter, List.filter_append]
-  rfl
+  simp [annihilateFilter, List.filter_append]
 
 lemma annihilateFilter_singleton_create (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.create) :

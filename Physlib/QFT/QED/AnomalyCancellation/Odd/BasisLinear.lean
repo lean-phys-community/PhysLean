@@ -345,8 +345,7 @@ lemma basis_on_oddSnd_self (j : Fin n) : basisAsCharges j (oddSnd j) = - 1 := by
   rw [basis_oddSnd_eq_minus_oddFst, basis_on_oddFst_self]
 
 lemma basis_on_oddSnd_other {k j : Fin n} (h : k ≠ j) : basisAsCharges k (oddSnd j) = 0 := by
-  rw [basis_oddSnd_eq_minus_oddFst, basis_on_oddFst_other h]
-  rfl
+  simp [basis_oddSnd_eq_minus_oddFst, basis_on_oddFst_other h]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_oddMid (j : Fin n) : basisAsCharges j oddMid = 0 := by
@@ -569,8 +568,7 @@ lemma basis!_on_oddShiftSnd_self (j : Fin n) : basis!AsCharges j (oddShiftSnd j)
 
 lemma basis!_on_oddShiftSnd_other {k j : Fin n} (h : k ≠ j) :
     basis!AsCharges k (oddShiftSnd j) = 0 := by
-  rw [basis!_oddShiftSnd_eq_minus_oddShiftFst, basis!_on_oddShiftFst_other h]
-  rfl
+  simp [basis!_oddShiftSnd_eq_minus_oddShiftFst, basis!_on_oddShiftFst_other h]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_oddShiftZero (j : Fin n) : basis!AsCharges j oddShiftZero = 0 := by

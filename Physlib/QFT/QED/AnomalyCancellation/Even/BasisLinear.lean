@@ -298,8 +298,7 @@ lemma basis_on_evenSnd_self (j : Fin n.succ) : basisAsCharges j (evenSnd j) = - 
   rw [basis_evenSnd_eq_neg_evenFst, basis_on_evenFst_self]
 
 lemma basis_on_evenSnd_other {k j : Fin n.succ} (h : k ≠ j) : basisAsCharges k (evenSnd j) = 0 := by
-  rw [basis_evenSnd_eq_neg_evenFst, basis_on_evenFst_other h]
-  rfl
+  simp [basis_evenSnd_eq_neg_evenFst, basis_on_evenFst_other h]
 
 /-!
 
@@ -550,8 +549,7 @@ lemma basis!_on_evenShiftSnd_self (j : Fin n) : basis!AsCharges j (evenShiftSnd 
 
 lemma basis!_on_evenShiftSnd_other {k j : Fin n} (h : k ≠ j) :
     basis!AsCharges k (evenShiftSnd j) = 0 := by
-  rw [basis!_evenShftSnd_eq_neg_evenShiftFst, basis!_on_evenShiftFst_other h]
-  rfl
+  simp [basis!_evenShftSnd_eq_neg_evenShiftFst, basis!_on_evenShiftFst_other h]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_evenShiftZero (j : Fin n) : basis!AsCharges j evenShiftZero = 0 := by

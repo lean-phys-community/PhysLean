@@ -73,8 +73,7 @@ noncomputable
 def coordinateMap : (PureU1 n.succ).LinSols ≃ₗ[ℚ] Fin n →₀ ℚ where
   toFun S := (Finsupp.linearEquivFunOnFinite ℚ ℚ (Fin n)).symm (S.1 ∘ Fin.castSucc)
   map_add' S T := by
-    rw [← map_add]
-    rfl
+    exact map_add _ _ _
   map_smul' a S := by
     rw [← map_smul]
     rfl
