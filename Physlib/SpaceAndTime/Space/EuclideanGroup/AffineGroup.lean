@@ -76,12 +76,8 @@ noncomputable def toAffineIsometryHom :
       AffineIsometryEquiv ℝ (EuclideanSpace ℝ (Fin n)) (EuclideanSpace ℝ (Fin n)) where
   toFun A := AffineIsometryEquiv.constVAdd ℝ (EuclideanSpace ℝ (Fin n)) A.translation *
     (orthogonalToLinearIsometryEquiv A.linear).toAffineIsometryEquiv
-  map_one' := by
-    apply AffineIsometryEquiv.ext
-    intro x; simp
-  map_mul' A B := by
-    apply AffineIsometryEquiv.ext
-    intro x
+  map_one' := AffineIsometryEquiv.ext fun x => by simp
+  map_mul' A B := AffineIsometryEquiv.ext fun x => by
     simp [mul_smul, add_assoc]
 
 /-- Unfolds `toAffineIsometryHom` into its translation and linear factors. -/
@@ -96,10 +92,8 @@ noncomputable def _root_.AffineIsometryEquiv.toAffineEquivHom :
     AffineIsometryEquiv ℝ (EuclideanSpace ℝ (Fin n)) (EuclideanSpace ℝ (Fin n)) →*
       AffineEquiv ℝ (EuclideanSpace ℝ (Fin n)) (EuclideanSpace ℝ (Fin n)) where
   toFun e := e.toAffineEquiv
-  map_one' := by
-    apply AffineEquiv.ext; intro x; trivial
-  map_mul' e e' := by
-    apply AffineEquiv.ext; intro x; simp
+  map_one' := AffineEquiv.ext fun x => by trivial
+  map_mul' e e' := AffineEquiv.ext fun x => by simp
 
 /-- The inclusion of the Euclidean group into Mathlib's affine automorphism group: the composite
 of the two legs `toAffineIsometryHom` and `AffineIsometryEquiv.toAffineEquivHom`. -/

@@ -125,7 +125,7 @@ noncomputable def TranslationGroup.incl (n : ℕ) :
 def translationVector.incl (n : ℕ) :
     Multiplicative (EuclideanSpace ℝ (Fin n)) →* EuclideanGroup n where
   toFun v := ⟨v.toAdd, 1⟩
-  map_one' := by rfl
+  map_one' := rfl
   map_mul' x y := by
     refine EuclideanGroup.ext ?_ ?_
     · show Multiplicative.toAdd (x * y) =
@@ -355,10 +355,8 @@ noncomputable def specialOrthogonal.fromRotation (n : ℕ) :
 the forward leg of the isomorphism `specialOrthogonalEquiv`. -/
 lemma specialOrthogonal.fromRotation_comp_toRotation :
     (specialOrthogonal.fromRotation n).comp (specialOrthogonal.toRotation n) =
-      MonoidHom.id (Matrix.specialOrthogonalGroup (Fin n) ℝ) := by
-  apply MonoidHom.ext
-  intro x
-  rfl
+      MonoidHom.id (Matrix.specialOrthogonalGroup (Fin n) ℝ) :=
+  MonoidHom.ext fun _ => rfl
 
 /-- `specialOrthogonal.fromRotation n` followed by `specialOrthogonal.toRotation n` is the identity;
 the backward leg of the isomorphism `specialOrthogonalEquiv`. -/
