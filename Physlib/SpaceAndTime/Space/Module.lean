@@ -350,18 +350,15 @@ lemma basis_apply {d} (i j : Fin d) :
   exact Lean.Grind.eq_congr' rfl rfl
 
 @[simp]
-lemma basis_self {d} (i : Fin d) : basis i i = 1 := by
-  simp [basis_apply]
+lemma basis_self {d} (i : Fin d) : basis i i = 1 := by simp [basis_apply]
 
 @[simp high]
 lemma inner_basis {d} (p : Space d) (i : Fin d) :
-    inner ℝ p (basis i) = p i := by
-  simp [inner_eq_sum, basis_apply]
+    inner ℝ p (basis i) = p i := by simp [inner_eq_sum, basis_apply]
 
 @[simp high]
 lemma basis_inner {d} (i : Fin d) (p : Space d) :
-    inner ℝ (basis i) p = p i := by
-  simp [inner_eq_sum, basis_apply]
+    inner ℝ (basis i) p = p i := by simp [inner_eq_sum, basis_apply]
 
 open InnerProductSpace
 
@@ -427,8 +424,7 @@ noncomputable def coord (μ : Fin d) (p : Space d) : ℝ :=
   inner ℝ p (basis μ)
 
 lemma coord_apply (μ : Fin d) (p : Space d) :
-    coord μ p = p μ := by
-  simp [coord]
+    coord μ p = p μ := by simp [coord]
 
 /-- The standard coordinate functions of Space based on `Fin d`, as a continuous linear map. -/
 noncomputable def coordCLM {d} (μ : Fin d) : Space d →L[ℝ] ℝ where

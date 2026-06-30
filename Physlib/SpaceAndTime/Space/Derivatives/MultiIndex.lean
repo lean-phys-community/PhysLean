@@ -97,17 +97,14 @@ lemma add_apply (I J : MultiIndex d) (i : Fin d) : (I + J) i = I i + J i := rfl
 
 @[simp]
 lemma increment_apply_same (I : MultiIndex d) (i : Fin d) :
-    increment I i i = I i + 1 := by
-  simp [increment]
+    increment I i i = I i + 1 := by simp [increment]
 
 @[simp]
 lemma increment_apply_ne (I : MultiIndex d) {i j : Fin d} (h : j ≠ i) :
-    increment I i j = I j := by
-  simp [increment, Pi.single_eq_of_ne h]
+    increment I i j = I j := by simp [increment, Pi.single_eq_of_ne h]
 
 @[simp]
-lemma order_zero : order (0 : MultiIndex d) = 0 := by
-  simp [order]
+lemma order_zero : order (0 : MultiIndex d) = 0 := by simp [order]
 
 lemma order_add (I J : MultiIndex d) : order (I + J) = order I + order J := by
   simp [order, Finset.sum_add_distrib]
@@ -125,8 +122,7 @@ lemma order_single (i : Fin d) : order (⟨Pi.single i 1⟩ : MultiIndex d) = 1 
 
 @[simp]
 lemma order_increment (I : MultiIndex d) (i : Fin d) :
-    order (increment I i) = order I + 1 := by
-  simp [increment, order, Finset.sum_add_distrib]
+    order (increment I i) = order I + 1 := by simp [increment, order, Finset.sum_add_distrib]
 
 /-!
 ### A.3. Canonical ordered lists of directions
