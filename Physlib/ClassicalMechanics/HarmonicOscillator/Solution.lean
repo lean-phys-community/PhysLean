@@ -386,8 +386,7 @@ The trajectory for zero initial conditions is the zero function.
 
 /-- For zero initial conditions, the trajectory is zero. -/
 @[simp]
-lemma trajectory_zero : trajectory S 0 = fun _ => 0 := by
-  simp [trajectory_eq]
+lemma trajectory_zero : trajectory S 0 = fun _ => 0 := by simp [trajectory_eq]
 
 /-!
 

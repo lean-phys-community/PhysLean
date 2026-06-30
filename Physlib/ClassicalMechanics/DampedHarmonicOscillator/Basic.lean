@@ -454,8 +454,7 @@ lemma toUndamped_equationOfMotion (S : DampedHarmonicOscillator) (hS : S.IsUndam
     calc
       S.m • ∂ₜ (∂ₜ xₜ) t = (S.toUndamped hS).m • ∂ₜ (∂ₜ xₜ) t := rfl
       _ = HarmonicOscillator.force (S.toUndamped hS) (xₜ t) := h t
-      _ = force S xₜ t := by
-        simp [force, HarmonicOscillator.force_eq_linear, toUndamped, hγ]
+      _ = force S xₜ t := by simp [force, HarmonicOscillator.force_eq_linear, toUndamped, hγ]
 
 end DampedHarmonicOscillator
 
