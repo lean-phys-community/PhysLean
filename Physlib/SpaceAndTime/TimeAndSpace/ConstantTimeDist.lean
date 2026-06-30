@@ -272,8 +272,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
       · rfl
       fun_prop
       fun_prop
-      · apply Differentiable.differentiableAt
-        exact η.smooth'.differentiable (by simp)
+      · exact (η.smooth'.differentiable (by simp)).differentiableAt
       fun_prop
     · apply Integrable.const_mul
       convert hrt using 1
@@ -379,8 +378,7 @@ lemma integrable_fderiv_space {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : S
     · exact hx x t
     · fun_prop
     · fun_prop
-    · apply Differentiable.differentiableAt
-      exact η.smooth'.differentiable (by simp)
+    · exact (η.smooth'.differentiable (by simp)).differentiableAt
     · fun_prop
   rw [← MeasureTheory.integrable_norm_iff]
   apply Integrable.mono' (g := fun t => k * ‖ContinuousLinearMap.prod (0 : Space d →L[ℝ] Time)
@@ -448,8 +446,7 @@ lemma time_integral_contDiff {d : ℕ} (n : ℕ) (η : 𝓢(Time × Space d, ℝ
           ContinuousLinearMap.coe_id', id_eq, SchwartzMap.lineDerivOp_apply_eq_fderiv]
         fun_prop
         fun_prop
-        · apply Differentiable.differentiableAt
-          exact η.smooth'.differentiable (by simp)
+        · exact (η.smooth'.differentiable (by simp)).differentiableAt
         fun_prop
       rw [hl2]
       apply ih
@@ -933,8 +930,7 @@ lemma constantTime_distSpaceDeriv {M : Type} {d : ℕ} [NormedAddCommGroup M] [N
     ContinuousLinearMap.coe_id', id_eq]
   · fun_prop
   · fun_prop
-  · apply Differentiable.differentiableAt
-    exact η.smooth'.differentiable (by simp)
+  · exact (η.smooth'.differentiable (by simp)).differentiableAt
   · fun_prop
 
 /-!
@@ -1012,8 +1008,7 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
         ContinuousLinearMap.coe_id', id_eq, _root_.zero_apply]
       · fun_prop
       · fun_prop
-      · apply Differentiable.differentiableAt
-        exact η.smooth'.differentiable (by simp)
+      · exact (η.smooth'.differentiable (by simp)).differentiableAt
       · fun_prop
     _ = ∫ (t : Time), (fun t => 1) t * fderiv ℝ (fun t => η (t, x)) t 1 := by simp
     _ = - ∫ (t : Time), fderiv ℝ (fun t => 1) t 1 * (fun t => η (t, x)) t := by
