@@ -194,16 +194,16 @@ lemma fieldStrengthMatrix_eq_electric_magnetic {c} (A : ElectromagneticPotential
     fin_cases i <;> fin_cases j
     · exact fieldStrengthMatrix_diag_eq_zero A ((toTimeAndSpace c).symm (t, x)) (Sum.inr 0)
     · rw [magneticField_coord_eq_fieldStrengthMatrix (i := 2) A t x hA]
-      ring
+      simpa
     · rw [fieldStrengthMatrix_antisymm]
       simpa using (magneticField_coord_eq_fieldStrengthMatrix (i := 1) A t x hA).symm
     · rw [fieldStrengthMatrix_antisymm]
       simpa using (magneticField_coord_eq_fieldStrengthMatrix (i := 2) A t x hA).symm
     · exact fieldStrengthMatrix_diag_eq_zero A ((toTimeAndSpace c).symm (t, x)) (Sum.inr 1)
     · rw [magneticField_coord_eq_fieldStrengthMatrix (i := 0) A t x hA]
-      ring
+      simpa
     · rw [magneticField_coord_eq_fieldStrengthMatrix (i := 1) A t x hA]
-      ring
+      simpa
     · rw [fieldStrengthMatrix_antisymm]
       simpa using (magneticField_coord_eq_fieldStrengthMatrix (i := 0) A t x hA).symm
     · exact fieldStrengthMatrix_diag_eq_zero A ((toTimeAndSpace c).symm (t, x)) (Sum.inr 2)
