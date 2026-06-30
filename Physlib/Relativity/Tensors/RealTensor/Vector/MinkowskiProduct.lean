@@ -128,8 +128,7 @@ lemma minkowskiProduct_apply {d : ℕ} (p q : Vector d) :
 
 lemma minkowskiProduct_symm {d : ℕ} (p q : Vector d) :
     ⟪p, q⟫ₘ = ⟪q, p⟫ₘ := by
-  rw [minkowskiProduct_apply, minkowskiProductMap_symm]
-  rfl
+  exact minkowskiProductMap_symm p q
 
 lemma minkowskiProduct_toCoord {d : ℕ} (p q : Vector d) :
     ⟪p, q⟫ₘ = p (Sum.inl 0) * q (Sum.inl 0) - ∑ i, p (Sum.inr i) * q (Sum.inr i) := by

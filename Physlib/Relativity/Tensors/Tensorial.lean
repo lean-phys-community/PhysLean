@@ -109,7 +109,6 @@ noncomputable instance self {n : ℕ} (S : TensorSpecies k C G V basisIdx rep b)
 lemma self_toTensor_apply {n : ℕ} (S : TensorSpecies k C G V basisIdx rep b)
     (c : Fin n → C) (t : S.Tensor c) :
     Tensorial.toTensor t = t := by
-  rw [Tensorial.toTensor]
   rfl
 
 /-!
@@ -152,7 +151,6 @@ noncomputable instance mulAction [Tensorial S c M] : MulAction G M where
 
 lemma smul_eq {g : G} {t : M} [Tensorial S c M] :
     g • t = toTensor.symm (g • toTensor t) := by
-  rw [Tensorial.toTensor]
   rfl
 
 lemma toTensor_smul {g : G} {t : M} [Tensorial S c M] :
