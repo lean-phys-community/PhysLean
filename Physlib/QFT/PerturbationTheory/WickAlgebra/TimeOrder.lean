@@ -71,9 +71,8 @@ lemma ι_timeOrderF_superCommuteF_superCommuteF_eq_time_ofCrAnListF {φ1 φ2 φ3
     simp only [decide_not,
       Bool.decide_and, ofCrAnListF_append, map_smul, map_mul, l1, l2, mul_assoc]
     congr 1
-    have hp : List.Perm [φ1, φ3, φ2] [φ1, φ2, φ3] := by
-      refine List.Perm.cons φ1 ?_
-      exact List.Perm.swap φ2 φ3 []
+    have hp : List.Perm [φ1, φ3, φ2] [φ1, φ2, φ3] :=
+      List.Perm.cons φ1 (List.Perm.swap φ2 φ3 [])
     rw [crAnTimeOrderSign, Wick.koszulSign_perm_eq _ _ φ1 _ _ _ _ _ hp, ← crAnTimeOrderSign]
     · simp
     · intro φ4 hφ4
@@ -82,10 +81,9 @@ lemma ι_timeOrderF_superCommuteF_superCommuteF_eq_time_ofCrAnListF {φ1 φ2 φ3
       all_goals
         subst hφ4
         simp_all
-  have hp231 : List.Perm [φ2, φ3, φ1] [φ1, φ2, φ3] := by
-      refine List.Perm.trans (l₂ := [φ2, φ1, φ3]) ?_ ?_
-      refine List.Perm.cons φ2 (List.Perm.swap φ1 φ3 [])
-      exact List.Perm.swap φ1 φ2 [φ3]
+  have hp231 : List.Perm [φ2, φ3, φ1] [φ1, φ2, φ3] :=
+      List.Perm.trans (List.Perm.cons φ2 (List.Perm.swap φ1 φ3 []))
+        (List.Perm.swap φ1 φ2 [φ3])
   have h231 : ι 𝓣ᶠ(ofCrAnListF (φs1 ++ φ2 :: φ3 :: φ1 :: φs2)) =
       crAnTimeOrderSign (φs1 ++ φ1 :: φ2 :: φ3 :: φs2)
       • (ι (ofCrAnListF l1) * ι (ofCrAnListF [φ2, φ3, φ1]) * ι (ofCrAnListF l2)) := by
@@ -114,9 +112,8 @@ lemma ι_timeOrderF_superCommuteF_superCommuteF_eq_time_ofCrAnListF {φ1 φ2 φ3
     simp only [decide_not,
       Bool.decide_and, ofCrAnListF_append, map_smul, map_mul, l1, l2, mul_assoc]
     congr 1
-    have hp : List.Perm [φ3, φ2, φ1] [φ1, φ2, φ3] := by
-      refine List.Perm.trans ?_ hp231
-      exact List.Perm.swap φ2 φ3 [φ1]
+    have hp : List.Perm [φ3, φ2, φ1] [φ1, φ2, φ3] :=
+      List.Perm.trans (List.Perm.swap φ2 φ3 [φ1]) hp231
     rw [crAnTimeOrderSign, Wick.koszulSign_perm_eq _ _ φ1 _ _ _ _ _ hp, ← crAnTimeOrderSign]
     · simp
     · intro φ4 hφ4

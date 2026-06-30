@@ -289,8 +289,7 @@ lemma timeOrderF_superCommuteF_ofCrAnOpF_superCommuteF_all_not_crAnTimeOrderRel
       exact h21 (IsTrans.trans φ2 φ3 φ1 h23 h31)
     rw [timeOrderF_superCommuteF_ofCrAnOpF_superCommuteF_not_crAnTimeOrderRel' h21 h31]
   simp_all only [Decidable.not_not, forall_const]
-  refine False.elim (h ?_)
-  exact IsTrans.trans φ3 φ2 φ1 h32 h21
+  exact False.elim (h (IsTrans.trans φ3 φ2 φ1 h32 h21))
 
 lemma timeOrderF_superCommuteF_ofCrAnOpF_ofCrAnOpF_eq_time
     {φ ψ : 𝓕.CrAnFieldOp} (h1 : crAnTimeOrderRel φ ψ) (h2 : crAnTimeOrderRel ψ φ) :
