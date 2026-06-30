@@ -92,9 +92,9 @@ lemma hectare_in_SI : hectare.1 SI = ⟨10000⟩ := by
 
 @[simp]
 lemma acre_in_SI : acre.1 SI = ⟨4046.8564224⟩ := by
-  simp [acre, dimScale, LengthUnit.miles, toDimensionful_apply_apply]
   ext
-  simp [NNReal.coe_ofScientific]
+  norm_num [acre, dimScale, LengthUnit.miles, toDimensionful_apply_apply,
+    NNReal.coe_ofScientific]
   rw [toReal]
   norm_num
 
