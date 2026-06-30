@@ -56,8 +56,8 @@ def normalOrderSign (φs : List 𝓕.CrAnFieldOp) : ℂ :=
 
 @[simp]
 lemma normalOrderSign_mul_self (φs : List 𝓕.CrAnFieldOp) :
-    normalOrderSign φs * normalOrderSign φs = 1 := by
-  simp [normalOrderSign, Wick.koszulSign_mul_self]
+    normalOrderSign φs * normalOrderSign φs =
+      1 := by simp [normalOrderSign, Wick.koszulSign_mul_self]
 
 lemma koszulSignInsert_create (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.create) : (φs : List 𝓕.CrAnFieldOp) →
@@ -73,12 +73,13 @@ lemma koszulSignInsert_create (φ : 𝓕.CrAnFieldOp)
 
 lemma normalOrderSign_cons_create (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.create) (φs : List 𝓕.CrAnFieldOp) :
-    normalOrderSign (φ :: φs) = normalOrderSign φs := by
-  simp [normalOrderSign, Wick.koszulSign, koszulSignInsert_create φ hφ φs]
+    normalOrderSign (φ :: φs) =
+      normalOrderSign φs := by simp [normalOrderSign, Wick.koszulSign,
+        koszulSignInsert_create φ hφ φs]
 
 @[simp]
-lemma normalOrderSign_singleton (φ : 𝓕.CrAnFieldOp) : normalOrderSign [φ] = 1 := by
-  simp [normalOrderSign]
+lemma normalOrderSign_singleton (φ : 𝓕.CrAnFieldOp) :
+    normalOrderSign [φ] = 1 := by simp [normalOrderSign]
 
 @[simp]
 lemma normalOrderSign_nil : normalOrderSign (𝓕 := 𝓕) [] = 1 := rfl
@@ -236,13 +237,11 @@ def normalOrderList (φs : List 𝓕.CrAnFieldOp) : List 𝓕.CrAnFieldOp :=
   List.insertionSort 𝓕.normalOrderRel φs
 
 @[simp]
-lemma normalOrderList_nil : normalOrderList (𝓕 := 𝓕) [] = [] := by
-  simp [normalOrderList]
+lemma normalOrderList_nil : normalOrderList (𝓕 := 𝓕) [] = [] := by simp [normalOrderList]
 
 @[simp]
 lemma normalOrderList_statistics (φs : List 𝓕.CrAnFieldOp) :
-    (𝓕 |>ₛ (normalOrderList φs)) = 𝓕 |>ₛ φs := by
-  simp [normalOrderList]
+    (𝓕 |>ₛ (normalOrderList φs)) = 𝓕 |>ₛ φs := by simp [normalOrderList]
 
 lemma orderedInsert_create (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.create) :
