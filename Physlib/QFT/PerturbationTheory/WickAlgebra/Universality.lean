@@ -40,7 +40,8 @@ def universalLiftMap {A : Type} [Semiring A] [Algebra ℂ A] (f : 𝓕.CrAnField
 @[simp]
 lemma universalLiftMap_ι {A : Type} [Semiring A] [Algebra ℂ A] (f : 𝓕.CrAnFieldOp → A)
     (h1 : ∀ a ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet, FreeAlgebra.lift ℂ f a = 0) :
-    universalLiftMap f h1 (ι a) = FreeAlgebra.lift ℂ f a := by rfl
+    universalLiftMap f h1 (ι a) = FreeAlgebra.lift ℂ f a :=
+  rfl
 
 /-- For a field specification, `𝓕`, given an algebra `A` and a function `f : 𝓕.CrAnFieldOp → A`
   such that the lift of `f` to `FreeAlgebra.lift ℂ f : FreeAlgebra ℂ 𝓕.CrAnFieldOp → A` is
@@ -74,7 +75,8 @@ def universalLift {A : Type} [Semiring A] [Algebra ℂ A] (f : 𝓕.CrAnFieldOp 
 @[simp]
 lemma universalLift_ι {A : Type} [Semiring A] [Algebra ℂ A] (f : 𝓕.CrAnFieldOp → A)
     (h1 : ∀ a ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet, FreeAlgebra.lift ℂ f a = 0) :
-    universalLift f h1 (ι a) = FreeAlgebra.lift ℂ f a := by rfl
+    universalLift f h1 (ι a) = FreeAlgebra.lift ℂ f a :=
+  rfl
 
 /--
 For a field specification, `𝓕`, the algebra `𝓕.WickAlgebra` satisfies the following universal

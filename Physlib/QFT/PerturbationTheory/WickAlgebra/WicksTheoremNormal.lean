@@ -90,7 +90,7 @@ lemma timeOrder_ofFieldOpList_eq_eqTimeOnly_empty (φs : List 𝓕.FieldOp) :
   · let e2 : { φsΛ : {φsΛ : WickContraction φs.length // φsΛ.EqTimeOnly} // ¬ φsΛ.1 = empty } ≃
       {φsΛ // φsΛ.EqTimeOnly ∧ φsΛ ≠ empty} := {
         toFun := fun x => ⟨x, ⟨x.1.2, x.2⟩⟩, invFun := fun x => ⟨⟨x.1, x.2.1⟩, x.2.2⟩,
-        left_inv a := by rfl, right_inv a := by rfl }
+        left_inv a := rfl, right_inv a := rfl }
     rw [← e2.symm.sum_comp]
     rfl
 
@@ -211,7 +211,7 @@ lemma wicks_theorem_normal_order_empty : 𝓣(𝓝(ofFieldOpList [])) =
   simp only [Finset.univ_unique, PUnit.default_eq_unit, List.length_nil, Equiv.coe_fn_symm_mk,
     sign_empty, timeContract_empty, OneMemClass.coe_one, one_smul, uncontractedListGet_empty,
     one_mul, Finset.sum_const, Finset.card_singleton, e2]
-  have h1' : ofFieldOpList (𝓕 := 𝓕) [] = ofCrAnList [] := by rfl
+  have h1' : ofFieldOpList (𝓕 := 𝓕) [] = ofCrAnList [] := rfl
   rw [h1']
   rw [normalOrder_ofCrAnList]
   simp only [normalOrderSign_nil, normalOrderList_nil, one_smul]

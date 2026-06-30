@@ -43,8 +43,8 @@ def chargeMap {n : ℕ} (f : PermGroup n) :
 @[simp]
 def permCharges {n : ℕ} : Representation ℚ (PermGroup n) (PureU1 n).Charges where
   toFun f := chargeMap f⁻¹
-  map_mul' f g := by rfl
-  map_one' := by rfl
+  map_mul' _ _ := rfl
+  map_one' := rfl
 
 lemma accGrav_invariant {n : ℕ} (f : (PermGroup n)) (S : (PureU1 n).Charges) :
     PureU1.accGrav n (permCharges f S) = accGrav n S := by

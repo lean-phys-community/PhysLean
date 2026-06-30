@@ -70,10 +70,12 @@ noncomputable def superCommuteRight (a : 𝓕.FieldOpFreeAlgebra) :
     simp
 
 lemma superCommuteRight_apply_ι (a b : 𝓕.FieldOpFreeAlgebra) :
-    superCommuteRight a (ι b) = ι [a, b]ₛF := by rfl
+    superCommuteRight a (ι b) = ι [a, b]ₛF :=
+  rfl
 
 lemma superCommuteRight_apply_quot (a b : 𝓕.FieldOpFreeAlgebra) :
-    superCommuteRight a ⟦b⟧= ι [a, b]ₛF := by rfl
+    superCommuteRight a ⟦b⟧= ι [a, b]ₛF :=
+  rfl
 
 lemma superCommuteRight_eq_of_equiv (a1 a2 : 𝓕.FieldOpFreeAlgebra) (h : a1 ≈ a2) :
     superCommuteRight a1 = superCommuteRight a2 := by
