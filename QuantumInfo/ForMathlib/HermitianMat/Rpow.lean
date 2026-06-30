@@ -187,10 +187,10 @@ lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-
   ext i j;
   have h_inv : (A ^ p).mat * (A ^ (-p)).mat = 1 := by
     have h_inv : (A ^ p).mat * (A ^ (-p)).mat = 1 := by
-      have h_pow : (A ^ p).mat = A.cfc (fun x => x ^ p) := by
-        exact rfl
-      have h_pow_neg : (A ^ (-p)).mat = A.cfc (fun x => x ^ (-p)) := by
-        exact rfl
+      have h_pow : (A ^ p).mat = A.cfc (fun x => x ^ p) :=
+        rfl
+      have h_pow_neg : (A ^ (-p)).mat = A.cfc (fun x => x ^ (-p)) :=
+        rfl
       have h_inv : (A ^ p).mat * (A ^ (-p)).mat = A.cfc (fun x => x ^ p * x ^ (-p)) := by
         rw [ h_pow, h_pow_neg, ← mat_cfc_mul ];
         rfl;
@@ -201,8 +201,8 @@ lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-
       rw [ h_inv, cfc_const ] ; norm_num;
     exact h_inv;
   -- By definition of matrix inverse, if $(A^p) * (A^{-p}) = 1$, then $(A^{-p})$ is the inverse of $(A^p)$.
-  have h_inv_def : (A ^ p).mat⁻¹ = (A ^ (-p)).mat := by
-    exact Matrix.inv_eq_right_inv h_inv;
+  have h_inv_def : (A ^ p).mat⁻¹ = (A ^ (-p)).mat :=
+    Matrix.inv_eq_right_inv h_inv
   convert! congr_fun ( congr_fun h_inv_def i ) j using 1
 
 open ComplexOrder in
@@ -219,12 +219,13 @@ lemma rpow_neg_mul_rpow_self (hA : A.mat.PosDef) (p : ℝ) :
   have h_pos_def : (A ^ p).mat.PosDef := by
     have h_pos_def : ∀ p : ℝ, A.mat.PosDef → (A ^ p).mat.PosDef := by
       intro p hA_pos_def
-      have h_eigenvalues_pos : ∀ i, 0 < (A.H.eigenvalues i) ^ p := by
-        exact fun i => Real.rpow_pos_of_pos ( by exact Matrix.PosDef.eigenvalues_pos hA i ) _;
-      have h_eigenvalues_pos : (A ^ p).mat.PosDef ↔ ∀ i, 0 < (A ^ p).H.eigenvalues i := by
-        exact Matrix.IsHermitian.posDef_iff_eigenvalues_pos (H (A ^ p));
-      have h_eigenvalues_pos : ∃ e : d ≃ d, (A ^ p).H.eigenvalues = fun i => (A.H.eigenvalues (e i)) ^ p := by
-        exact Matrix.IsHermitian.cfc_eigenvalues (H A) fun x => x.rpow p;
+      have h_eigenvalues_pos : ∀ i, 0 < (A.H.eigenvalues i) ^ p :=
+        fun i => Real.rpow_pos_of_pos (Matrix.PosDef.eigenvalues_pos hA i) _
+      have h_eigenvalues_pos : (A ^ p).mat.PosDef ↔ ∀ i, 0 < (A ^ p).H.eigenvalues i :=
+        Matrix.IsHermitian.posDef_iff_eigenvalues_pos (H (A ^ p))
+      have h_eigenvalues_pos :
+          ∃ e : d ≃ d, (A ^ p).H.eigenvalues = fun i => (A.H.eigenvalues (e i)) ^ p :=
+        Matrix.IsHermitian.cfc_eigenvalues (H A) fun x => x.rpow p
       aesop;
     exact h_pos_def p hA;
   convert! Matrix.nonsing_inv_mul _ _;
@@ -233,13 +234,13 @@ lemma rpow_neg_mul_rpow_self (hA : A.mat.PosDef) (p : ℝ) :
 open ComplexOrder in
 lemma isUnit_rpow_toMat (hA : A.mat.PosDef) (p : ℝ) : IsUnit (A ^ p).mat := by
   have hA_inv : IsUnit (A ^ (-p)).mat := by
-    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 := by
-      exact rpow_neg_mul_rpow_self hA p
+    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 :=
+      rpow_neg_mul_rpow_self hA p
     exact IsUnit.of_mul_eq_one _ hA_inv
   -- Since $(A^{-p}) (A^p) = 1$, we have that $(A^p)$ is the inverse of $(A^{-p})$.
   have hA_inv : (A ^ p).mat = (A ^ (-p)).mat⁻¹ := by
-    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 := by
-      exact rpow_neg_mul_rpow_self hA p;
+    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 :=
+      rpow_neg_mul_rpow_self hA p
     exact Eq.symm (Matrix.inv_eq_right_inv hA_inv);
   aesop
 
