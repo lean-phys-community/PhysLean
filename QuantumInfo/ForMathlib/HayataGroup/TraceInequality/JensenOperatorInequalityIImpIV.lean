@@ -329,8 +329,7 @@ private lemma complex_I_smul_real_I_smul_invTwo (r : ℝ) (T : L ℋ) :
     simpa using (smul_comm r (Complex.I : ℂ) ((2⁻¹ : ℝ) • T x))
   calc
     Complex.I • r • Complex.I • (2⁻¹ : ℝ) • T x
-        = Complex.I • (r • (Complex.I • ((2⁻¹ : ℝ) • T x))) := by
-            rfl
+        = Complex.I • (r • (Complex.I • ((2⁻¹ : ℝ) • T x))) := rfl
     _ = Complex.I • (Complex.I • (r • ((2⁻¹ : ℝ) • T x))) := by
             rw [hcomm]
     _ = ((Complex.I : ℂ) * Complex.I) • (r • ((2⁻¹ : ℝ) • T x)) := by
@@ -354,8 +353,7 @@ private lemma real_smul_complex_I_real_smul_complex_I_comm (s r : ℝ) (T : L �
             rw [smul_comm (s : ℝ) r (Complex.I • T)]
     _ = Complex.I • (r • (Complex.I • ((s : ℝ) • T))) := by
             rw [smul_comm (s : ℝ) (Complex.I : ℂ) T]
-    _ = Complex.I • r • Complex.I • (s : ℝ) • T := by
-            rfl
+    _ = Complex.I • r • Complex.I • (s : ℝ) • T := rfl
 
 omit [CompleteSpace ℋ] in
 private lemma half_add_half_eq (T : L ℋ) :

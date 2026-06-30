@@ -781,14 +781,12 @@ private theorem log_le_f (n : ℕ) (lam : ℝ) : Real.log lam ≤ f_map i n lam 
   _ ≤ (⌈Real.log lam / (σ₁_c i n)⌉) * σ₁_c i n := by
     rw [← mul_inv_le_iff₀ (σ₁_c_pos i n)]
     apply Int.le_ceil _
-  _ = _ := by
-    rfl
+  _ = _ := rfl
 
 /-- (S46), part 2 -/
 private theorem f_le_log (n : ℕ) (lam : ℝ) : f_map i n lam < Real.log lam + σ₁_c i n :=
   calc
-  _ = ⌈Real.log lam / σ₁_c i n⌉ * σ₁_c i n := by
-    rfl
+  _ = ⌈Real.log lam / σ₁_c i n⌉ * σ₁_c i n := rfl
   _ < (Real.log lam / σ₁_c i n + 1) * σ₁_c i n := by
     gcongr
     · exact σ₁_c_pos i n

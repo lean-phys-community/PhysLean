@@ -750,8 +750,7 @@ private lemma phiK_operatorPowerMean_eq_liebTraceMap
               congrArg Complex.re
                 (LinearMap.trace_mul_comm (R := ℂ) (M := ℋ) K.toLinearMap X.toLinearMap)
           simpa [X, mul_assoc] using htrace'.trans hcycle
-    _ = liebTraceMap (ℋ := ℋ) s K A B := by
-          rfl
+    _ = liebTraceMap (ℋ := ℋ) s K A B := rfl
 
 omit [FiniteDimensional ℂ ℋ] in
 /-- Convex combinations preserve `pdSet` (strict positivity). -/

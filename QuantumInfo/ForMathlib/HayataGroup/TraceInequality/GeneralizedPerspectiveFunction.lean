@@ -423,8 +423,7 @@ private theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
             rw [Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
       _ = (1 - θ) • (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) := by
             simp [mul_assoc, hSIR, hIRS]
-      _ = (1 - θ) • ((f Δ h) A₁ B₁) := by
-            rfl
+      _ = (1 - θ) • ((f Δ h) A₁ B₁) := rfl
   have hright₂ :
       S * (star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S =
         θ • ((f Δ h) A₂ B₂) := by
@@ -437,15 +436,13 @@ private theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
             rw [Real.mul_self_sqrt hθ0]
       _ = θ • (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) := by
             simp [mul_assoc, hSIR, hIRS]
-      _ = θ • ((f Δ h) A₂ B₂) := by
-            rfl
+      _ = θ • ((f Δ h) A₂ B₂) := rfl
   have hright :
       S * (star T₁ * cfcR (ℋ := ℋ) f M₁ * T₁ + star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S =
         (1 - θ) • ((f Δ h) A₁ B₁) + θ • ((f Δ h) A₂ B₂) := by
     rw [mul_add, add_mul, hright₁, hright₂]
   have hleft :
-      S * cfcR (ℋ := ℋ) f (IR * A * IR) * S = (f Δ h) A B := by
-    rfl
+      S * cfcR (ℋ := ℋ) f (IR * A * IR) * S = (f Δ h) A B := rfl
   simpa [hleft, hright] using houter
 
 -- Restricted forward form of Theorem 2.5 on the positive cone.
