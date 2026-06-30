@@ -120,8 +120,7 @@ theorem ne_iff {x y : Prob} : (x : ℝ) ≠ (y : ℝ) ↔ x ≠ y :=
   not_congr <| Prob.ext_iff.symm
 
 @[simp, norm_cast]
-theorem toReal_mul (x y : Prob) : (x * y : Prob) = (x : ℝ) * (y : ℝ) := by
-  simp only [coe_mul]
+theorem toReal_mul (x y : Prob) : (x * y : Prob) = (x : ℝ) * (y : ℝ) := by simp only [coe_mul]
 
 /-- Coercion `Prob → ℝ≥0`. -/
 @[coe] def toNNReal : Prob → ℝ≥0 :=
@@ -173,11 +172,9 @@ instance instSub : Sub Prob where
 theorem coe_sub (p q : Prob) : (p - q : Prob)  = (p.val - q.val) ⊔ (0 : ℝ) := rfl
 
 @[simp, norm_cast]
-theorem coe_one_minus (p : Prob) : (1 - p : Prob) = 1 - (p : ℝ) := by
-  simp [coe_sub]
+theorem coe_one_minus (p : Prob) : (1 - p : Prob) = 1 - (p : ℝ) := by simp [coe_sub]
 
-theorem add_one_minus (p : Prob) : p.val + (1 - p).val = 1 := by
-  simp
+theorem add_one_minus (p : Prob) : p.val + (1 - p).val = 1 := by simp
 
 @[simp]
 theorem one_minus_inv (p : Prob) : 1 - (1 - p) = p := by
@@ -421,20 +418,16 @@ theorem negLog_Antitone : Antitone negLog := by
     <;> exact lt_of_le_of_ne zero_le (unitInterval.coe_ne_zero.mpr (by assumption)).symm
 
 @[simp]
-theorem negLog_zero : —log (0 : Prob) = ⊤ := by
-  simp [negLog]
+theorem negLog_zero : —log (0 : Prob) = ⊤ := by simp [negLog]
 
 @[simp]
-theorem negLog_one : —log 1 = 0 := by
-  simp [negLog]; rfl
+theorem negLog_one : —log 1 = 0 := by simp [negLog]; rfl
 
 @[simp]
-theorem negLog_eq_top_iff {p : Prob} : —log p = ⊤ ↔ p = 0 := by
-  simp [negLog]
+theorem negLog_eq_top_iff {p : Prob} : —log p = ⊤ ↔ p = 0 := by simp [negLog]
 
 theorem negLog_pos_ENNReal {p : Prob} (hp : p ≠ 0) : —log p = .ofNNReal ⟨-Real.log p,
-    Left.nonneg_neg_iff.mpr (Real.log_nonpos p.2.1 p.2.2)⟩ := by
-  simp [negLog, hp]
+    Left.nonneg_neg_iff.mpr (Real.log_nonpos p.2.1 p.2.2)⟩ := by simp [negLog, hp]
 
 @[simp]
 theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by

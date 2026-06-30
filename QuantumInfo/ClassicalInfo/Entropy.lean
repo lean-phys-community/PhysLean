@@ -31,13 +31,11 @@ def H₁ : Prob → ℝ :=
 
 /-- H₁ of 0 is zero.-/
 @[simp]
-def H₁_zero_eq_zero : H₁ 0 = 0 := by
-  simp [H₁]
+def H₁_zero_eq_zero : H₁ 0 = 0 := by simp [H₁]
 
 /-- H₁ of 1 is zero.-/
 @[simp]
-def H₁_one_eq_zero : H₁ 1 = 0 := by
-  simp [H₁]
+def H₁_one_eq_zero : H₁ 1 = 0 := by simp [H₁]
 
 /-- Entropy is nonnegative. -/
 theorem H₁_nonneg (p : Prob) : 0 ≤ H₁ p := by
@@ -112,17 +110,14 @@ theorem Hₛ_le_log_d (d : ProbDistribution α) : Hₛ d ≤ Real.log (Fintype.c
 
 /-- The shannon entropy of a constant variable is zero. -/
 @[simp]
-theorem Hₛ_constant_eq_zero {i : α} : Hₛ (ProbDistribution.constant i) = 0 := by
-  simp [Hₛ, apply_ite]
+theorem Hₛ_constant_eq_zero {i : α} : Hₛ (ProbDistribution.constant i) = 0 := by simp [Hₛ, apply_ite]
 
 /-- Shannon entropy of a uniform distribution is ln d. -/
 theorem Hₛ_uniform [Nonempty α] :
-    Hₛ (ProbDistribution.uniform (α := α)) = Real.log (Finset.univ.card (α := α)) := by
-  simp [Hₛ, ProbDistribution.prob, H₁, Real.negMulLog]
+    Hₛ (ProbDistribution.uniform (α := α)) = Real.log (Finset.univ.card (α := α)) := by simp [Hₛ, ProbDistribution.prob, H₁, Real.negMulLog]
 
 /-- Shannon entropy of two-event distribution. -/
-theorem Hₛ_coin (p : Prob) : Hₛ (ProbDistribution.coin p) = Real.binEntropy p := by
-  simp [Hₛ, H₁, ProbDistribution.coin, Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub]
+theorem Hₛ_coin (p : Prob) : Hₛ (ProbDistribution.coin p) = Real.binEntropy p := by simp [Hₛ, H₁, ProbDistribution.coin, Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub]
 
 lemma Hₛ_eq_of_multiset_map_eq (d₁ : ProbDistribution α) (d₂ : ProbDistribution β)
     (h : Multiset.map d₁.prob Finset.univ.val = Multiset.map d₂.prob Finset.univ.val) :
