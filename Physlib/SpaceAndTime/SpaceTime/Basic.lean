@@ -599,10 +599,8 @@ lemma spaceTime_integral_eq_time_space_integral {M} [NormedAddCommGroup M]
     apply MeasureTheory.MeasurePreserving.integral_comp
     · refine { measurable := ?_, map_eq := ?_ }
       · fun_prop
-      have hs : volume (α := Space d) = Space.basis.toBasis.addHaar := by
-        exact Space.volume_eq_addHaar
-      have ht : volume (α := Time) = Time.basis.toBasis.addHaar := by
-        exact Time.volume_eq_basis_addHaar
+      have hs : volume (α := Space d) = Space.basis.toBasis.addHaar := Space.volume_eq_addHaar
+      have ht : volume (α := Time) = Time.basis.toBasis.addHaar := Time.volume_eq_basis_addHaar
       rw [hs, ht]
       rw [← Module.Basis.prod_addHaar]
       rw [Module.Basis.map_addHaar]

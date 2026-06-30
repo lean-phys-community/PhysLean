@@ -332,8 +332,8 @@ lemma ι_timeOrderF_superCommuteF_ne_time {φ ψ : 𝓕.CrAnFieldOp}
     (hφψ : ¬ (crAnTimeOrderRel φ ψ ∧ crAnTimeOrderRel ψ φ)) (a b : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓣ᶠ(a * [ofCrAnOpF φ, ofCrAnOpF ψ]ₛF * b) = 0 := by
   rw [timeOrderF_timeOrderF_mid]
-  have hφψ : ¬ (crAnTimeOrderRel φ ψ) ∨ ¬ (crAnTimeOrderRel ψ φ) := by
-    exact Decidable.not_and_iff_or_not.mp hφψ
+  have hφψ : ¬ (crAnTimeOrderRel φ ψ) ∨ ¬ (crAnTimeOrderRel ψ φ) :=
+    Decidable.not_and_iff_or_not.mp hφψ
   rcases hφψ with hφψ | hφψ
   · rw [timeOrderF_superCommuteF_ofCrAnOpF_ofCrAnOpF_not_crAnTimeOrderRel]
     simp_all only [false_and, not_false_eq_true, mul_zero, zero_mul, map_zero]

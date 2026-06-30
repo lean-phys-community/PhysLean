@@ -59,10 +59,9 @@ lemma matrix_tsum_apply
   have h_row_summable : Summable (fun n ↦ (f n) i) := by
     have h := Pi.summable.1 hf
     exact h i
-  have h₁ : ((∑' n, f n) : Matrix m m 𝕂) i = (∑' n, (f n) i) := by
-    exact tsum_apply hf
-  have h₂ : ((∑' n, (f n) i) : m → 𝕂) j = (∑' n, (f n) i j) := by
-    exact tsum_apply h_row_summable
+  have h₁ : ((∑' n, f n) : Matrix m m 𝕂) i = (∑' n, (f n) i) := tsum_apply hf
+  have h₂ : ((∑' n, (f n) i) : m → 𝕂) j = (∑' n, (f n) i j) :=
+    tsum_apply h_row_summable
   rw [h₁, h₂]
 
 variable [Fintype m] [LinearOrder m]
@@ -242,8 +241,8 @@ lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
   letI : NormedAlgebra ℂ (Matrix n n ℂ) := Matrix.linftyOpNormedAlgebra
   letI : CompleteSpace (Matrix n n ℂ) := inferInstance
   simp only [exp_eq_tsum ℝ]
-  have hs : Summable (fun k => (k.factorial : ℝ)⁻¹ • A ^ k) := by
-    exact NormedSpace.expSeries_summable' A
+  have hs : Summable (fun k => (k.factorial : ℝ)⁻¹ • A ^ k) :=
+    NormedSpace.expSeries_summable' A
   erw [Matrix.map_tsum (algebraMap ℝ ℂ).toAddMonoidHom RCLike.continuous_ofReal hs]
   apply tsum_congr
   intro k

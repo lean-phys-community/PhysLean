@@ -210,8 +210,7 @@ lemma koszulSign_eraseIdx [Std.Total le] [IsTrans 𝓕 le] (φs : List 𝓕) (n 
     𝓢(q (φs.get n), ofList q (List.take (↑(insertionSortEquiv le φs n))
     (List.insertionSort le φs))) := by
   let φs' := φs.eraseIdx ↑n
-  have hφs : List.insertIdx φs' n (φs.get n) = φs := by
-    exact insertIdx_eraseIdx n.1 φs n.prop
+  have hφs : List.insertIdx φs' n (φs.get n) = φs := insertIdx_eraseIdx n.1 φs n.prop
   conv_rhs =>
     lhs
     lhs

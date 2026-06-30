@@ -273,8 +273,8 @@ lemma join_card {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
   simp only [Finset.mem_map, RelEmbedding.coe_toEmbedding, not_exists, not_and]
   intro x hx
   by_contra hn
-  have hdis : Disjoint (Finset.map uncontractedListEmd x) a := by
-    exact uncontractedListEmd_finset_disjoint_left x a ha
+  have hdis : Disjoint (Finset.map uncontractedListEmd x) a :=
+    uncontractedListEmd_finset_disjoint_left x a ha
   rw [Finset.mapEmbedding_apply] at hn
   rw [hn] at hdis
   simp only [disjoint_self, Finset.bot_eq_empty] at hdis
@@ -347,8 +347,7 @@ lemma mem_join_uncontracted_of_mem_right_uncontracted {φs : List 𝓕.FieldOp}
   simp only [join, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
     RelEmbedding.coe_toEmbedding] at hp
   rcases hp with hp | hp
-  · have hi : uncontractedListEmd i ∈ φsΛ.uncontracted := by
-      exact uncontractedListEmd_mem_uncontracted i
+  · have hi : uncontractedListEmd i ∈ φsΛ.uncontracted := uncontractedListEmd_mem_uncontracted i
     rw [mem_uncontracted_iff_not_contracted] at hi
     exact hi p hp
   · obtain ⟨p, hp, rfl⟩ := hp

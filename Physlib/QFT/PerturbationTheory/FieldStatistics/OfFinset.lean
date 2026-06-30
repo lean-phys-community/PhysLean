@@ -74,8 +74,7 @@ lemma ofFinset_insert (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finse
 lemma ofFinset_erase (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finset (Fin φs.length))
     (i : Fin φs.length) (h : i ∈ a) :
     ofFinset q φs.get (a.erase i) = (q φs[i]) * ofFinset q φs.get a := by
-  have ha : a = Insert.insert i (a.erase i) := by
-    exact Eq.symm (Finset.insert_erase h)
+  have ha : a = Insert.insert i (a.erase i) := Eq.symm (Finset.insert_erase h)
   conv_rhs => rw [ha]
   rw [ofFinset_insert]
   rw [← mul_assoc]

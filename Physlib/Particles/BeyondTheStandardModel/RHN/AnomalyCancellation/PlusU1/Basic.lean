@@ -66,8 +66,8 @@ lemma quadSol (S : (PlusU1 n).QuadSols) : accQuad S.val = 0 := by
   simp only [PlusU1_quadraticACCs] at hS
   exact hS ⟨0, by simp⟩
 
-lemma cubeSol (S : (PlusU1 n).Sols) : accCube S.val = 0 := by
-  exact S.cubicSol
+lemma cubeSol (S : (PlusU1 n).Sols) : accCube S.val = 0 :=
+  S.cubicSol
 
 /-- An element of `charges` which satisfies the linear ACCs
   gives us a element of `LinSols`. -/

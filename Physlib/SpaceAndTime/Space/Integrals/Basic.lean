@@ -109,8 +109,7 @@ lemma integral_volume_eq_spherical (d : ℕ) [NeZero d] (f : Space d → F)
   rw [MeasureTheory.integral_subtype_comap (by simp), ← setIntegral_univ]
   simp [f']
   refine integral_congr_ae ?_
-  have h1 : ∀ᵐ x ∂(volume (α := Space d)), x ≠ 0 := by
-    exact Measure.ae_ne volume 0
+  have h1 : ∀ᵐ x ∂(volume (α := Space d)), x ≠ 0 := Measure.ae_ne volume 0
   filter_upwards [Measure.ae_ne volume 0] with x hx
   congr
   simp [smul_smul]

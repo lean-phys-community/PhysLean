@@ -131,8 +131,8 @@ lemma join_singleton_signFinset_eq_filter {φs : List 𝓕.FieldOp}
   · intro h1 h2
     rcases h1 with h1 | h1
     · simp only [h1, Option.isSome_none, Bool.false_eq_true, IsEmpty.exists_iff]
-      have h2' : ¬ (((singleton h).join φsucΛ).getDual? a).isSome := by
-        exact Option.not_isSome_iff_eq_none.mpr h1
+      have h2' : ¬ (((singleton h).join φsucΛ).getDual? a).isSome :=
+        Option.not_isSome_iff_eq_none.mpr h1
       exact h2' h2
     use h2
     have h1 := h1 h2

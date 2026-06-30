@@ -451,8 +451,8 @@ private lemma deriv_intervalIntegral_homotopyOperatorIntegrand_sub
     fderiv ℝ (homotopyOperatorIntegrand f · t) x₀ (basis j) m) ∂(volume) := by
   let F : Space → ℝ → EuclideanSpace ℝ (Fin 3) := homotopyOperatorIntegrand f
   let F' : Space → ℝ → Space →L[ℝ] EuclideanSpace ℝ (Fin 3) := fun x t => fderiv ℝ (F · t) x
-  have F'_continuous : Continuous (Function.uncurry F') := by
-    exact continuous_uncurry_fderiv_homotopyOperatorIntegrand (hf)
+  have F'_continuous : Continuous (Function.uncurry F') :=
+    continuous_uncurry_fderiv_homotopyOperatorIntegrand (hf)
   have hfderiv (x₀ : Space) : HasFDerivAt (fun (x : Space) => ∫ (t : ℝ) in 0..1, F x t ∂(volume))
       (∫ (t : ℝ) in 0..1, F' x₀ t ∂(volume)) x₀ := by
     exact hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) x₀

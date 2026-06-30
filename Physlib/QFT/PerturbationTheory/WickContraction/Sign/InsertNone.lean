@@ -58,8 +58,7 @@ lemma signFinset_insertAndContract_none (φ : 𝓕.FieldOp) (φs : List 𝓕.Fie
       · simp only [Nat.succ_eq_add_one, finCongr_apply, Finset.mem_insert, Fin.ext_iff,
         Fin.val_cast, or_iff_right_iff_imp]
         intro h
-        have h1 : i.succAbove k ≠ i := by
-          exact Fin.succAbove_ne i k
+        have h1 : i.succAbove k ≠ i := Fin.succAbove_ne i k
         omega
       · simp
     rw [h1]
