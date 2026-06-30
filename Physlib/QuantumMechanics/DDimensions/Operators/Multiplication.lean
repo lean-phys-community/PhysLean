@@ -200,8 +200,8 @@ private lemma exists_monotone_sets_hasFiniteIntegral
       simp_rw [norm_pow, norm_norm, RCLike.norm_natCast]
       refine pow_le_pow_left₀ (norm_nonneg _) ?_ 2
       rcases hk <;> simp_all
-    · refine ENNReal.mul_lt_top (by norm_num) ?_
-      exact measure_inter_lt_top_of_left_ne_top measure_closedBall_lt_top.ne
+    · exact ENNReal.mul_lt_top (by norm_num)
+        (measure_inter_lt_top_of_left_ne_top measure_closedBall_lt_top.ne)
 
 open Complex InnerProductSpace in
 lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :

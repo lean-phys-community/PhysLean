@@ -279,8 +279,7 @@ lemma normPowerSeries_zpow_le_norm_sq_add_one {d} (n : ℕ) (m : ℤ) (x : Space
   | .ofNat m =>
     trans (‖x‖ + 1) ^ m
     · simp
-      refine pow_le_pow_left₀ (by simp) ?_ m
-      exact normPowerSeries_le_norm_sq_add_one n x
+      exact pow_le_pow_left₀ (by simp) (normPowerSeries_le_norm_sq_add_one n x) m
     · simp
   | .negSucc m =>
     trans (‖x‖ ^ (m + 1))⁻¹; swap
@@ -289,8 +288,7 @@ lemma normPowerSeries_zpow_le_norm_sq_add_one {d} (n : ℕ) (m : ℤ) (x : Space
     simp only [zpow_negSucc]
     refine inv_anti₀ ?_ ?_
     · positivity
-    refine pow_le_pow_left₀ (by simp) ?_ (m + 1)
-    exact norm_le_normPowerSeries n x
+    exact pow_le_pow_left₀ (by simp) (norm_le_normPowerSeries n x) (m + 1)
 
 lemma normPowerSeries_inv_le {d} (n : ℕ) (x : Space d) (hx : x ≠ 0) :
     (normPowerSeries n x)⁻¹ ≤ ‖x‖⁻¹ := by
