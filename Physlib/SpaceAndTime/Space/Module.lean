@@ -149,8 +149,8 @@ lemma norm_sq_eq {d} (p : Space d) :
   refine Real.sq_sqrt ?_
   positivity
 
-lemma point_dim_zero_eq (p : Space 0) : p = 0 := by
-  exact eq_of_apply fun i => by fin_cases i
+lemma point_dim_zero_eq (p : Space 0) : p = 0 :=
+  eq_of_apply fun i => by fin_cases i
 
 @[simp]
 lemma norm_vadd_zero {d} (v : EuclideanSpace ℝ (Fin d)) :
@@ -366,8 +366,8 @@ lemma basis_inner {d} (i : Fin d) (p : Space d) :
 open InnerProductSpace
 
 lemma basis_repr_inner_eq {d} (p : Space d) (v : EuclideanSpace ℝ (Fin d)) :
-    ⟪basis.repr p, v⟫_ℝ = ⟪p, basis.repr.symm v⟫_ℝ := by
-  exact LinearIsometryEquiv.inner_map_eq_flip basis.repr p v
+    ⟪basis.repr p, v⟫_ℝ = ⟪p, basis.repr.symm v⟫_ℝ :=
+  LinearIsometryEquiv.inner_map_eq_flip basis.repr p v
 
 instance {d : ℕ} : FiniteDimensional ℝ (Space d) :=
   Module.Basis.finiteDimensional_of_finite (h := basis.toBasis)
