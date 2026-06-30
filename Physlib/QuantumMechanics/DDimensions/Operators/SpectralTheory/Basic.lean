@@ -227,8 +227,8 @@ lemma regularityDomain_isOpen (T : H →ₗ.[ℂ] H) : IsOpen T.regularityDomain
 /-- `T` and `T.closure` have the same regularity domain. -/
 lemma regularityDomain_closure (T : H →ₗ.[ℂ] H) :
     T.closure.regularityDomain = T.regularityDomain := by
-  refine eq_of_le_of_ge (regularityDomain_antitone T.le_closure) ?_
-  exact fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
+  exact eq_of_le_of_ge (regularityDomain_antitone T.le_closure)
+    fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
 
 lemma IsClosable.closure_range_sub_eq_range_closure_sub [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z : ℂ} (hz : z ∈ T.regularityDomain) :
@@ -401,8 +401,9 @@ lemma IsClosable.defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[�
       · exact hT.closure_isClosed.exists_inner_eq_zero_of_defectNumber_lt hz₂ hle
     refine not_le (a := ‖z₁ - z₂‖ * ‖x‖).mpr ?_ le_rfl
     refine lt_of_lt_of_le (b := ‖Tcl x - z₁ • x‖) ?_ ?_
-    · refine lt_of_lt_of_le ?_ (isLowerBound_closure h x)
-      exact (mul_lt_mul_iff_left₀ <| norm_pos_iff.mpr hx).mpr (mem_ball_iff_norm'.mp h_ball)
+    · exact lt_of_lt_of_le
+        ((mul_lt_mul_iff_left₀ <| norm_pos_iff.mpr hx).mpr (mem_ball_iff_norm'.mp h_ball))
+        (isLowerBound_closure h x)
     · rcases eq_or_ne (Tcl x - z₁ • x) 0 with heq | hne
       · exact heq ▸ norm_zero (E := H) ▸ mul_nonneg (norm_nonneg _) (norm_nonneg x)
       · apply (mul_le_mul_iff_left₀ (norm_pos_iff.mpr hne)).mp
