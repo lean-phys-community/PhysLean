@@ -163,8 +163,7 @@ lemma joinLift_surjective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs
   · rw [Finset.mapEmbedding_apply] at ha3
     use Sum.inr ⟨a2, ha3.1⟩
     simp only [joinLift, joinLiftRight]
-    refine Subtype.ext ?_
-    exact ha3.2
+    exact Subtype.ext ha3.2
 
 lemma joinLift_bijective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} : Function.Bijective (@joinLift _ _ φsΛ φsucΛ) := by

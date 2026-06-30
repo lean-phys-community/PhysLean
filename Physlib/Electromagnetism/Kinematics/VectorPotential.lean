@@ -239,8 +239,7 @@ lemma vectorPotential_contDiff {n} {d} {c : SpeedOfLight} (A : ElectromagneticPo
     (hA : ContDiff ℝ n A) : ContDiff ℝ n ↿(A.vectorPotential c) := by
   simp [vectorPotential]
   apply timeSlice_contDiff
-  refine contDiff_euclidean.mpr ?_
-  exact fun i => (SpaceTime.contDiff_vector A).mpr hA (Sum.inr i)
+  exact contDiff_euclidean.mpr fun i => (SpaceTime.contDiff_vector A).mpr hA (Sum.inr i)
 
 open ContDiff
 @[fun_prop]
@@ -287,8 +286,7 @@ lemma vectorPotential_differentiable {d} {c : SpeedOfLight} (A : Electromagnetic
     (hA : Differentiable ℝ A) : Differentiable ℝ ↿(A.vectorPotential c) := by
   simp [vectorPotential]
   apply timeSlice_differentiable
-  refine differentiable_euclidean.mpr ?_
-  exact fun i => (SpaceTime.differentiable_vector A).mpr hA (Sum.inr i)
+  exact differentiable_euclidean.mpr fun i => (SpaceTime.differentiable_vector A).mpr hA (Sum.inr i)
 
 lemma vectorPotential_differentiable_time {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
     (hA : Differentiable ℝ A) (x : Space d) : Differentiable ℝ (A.vectorPotential c · x) :=

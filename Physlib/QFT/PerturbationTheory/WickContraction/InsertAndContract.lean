@@ -352,14 +352,12 @@ lemma stat_ofFinset_of_insertAndContractLiftFinset (φ : 𝓕.FieldOp) (φs : Li
       fin_list_sorted_monotone_sorted (a.sort (fun x1 x2 => x1 ≤ x2)) ?hl
         (⇑(finCongr (Eq.symm (insertIdx_length_fin φ φs i))) ∘ i.succAbove) ?hf
     exact a.pairwise_sort (fun x1 x2 => x1 ≤ x2)
-    refine StrictMono.comp (fun ⦃a b⦄ a => a) ?hf.hf
-    exact Fin.strictMono_succAbove i
+    exact StrictMono.comp (fun ⦃a b⦄ a => a) (Fin.strictMono_succAbove i)
   have h2 : (List.map (⇑(finCongr (insertIdx_length_fin φ φs i).symm))
       (List.map i.succAbove (a.sort (fun x1 x2 => x1 ≤ x2)))).Nodup := by
     simp only [Nat.succ_eq_add_one, List.map_map]
     refine List.Nodup.map ?_ ?_
-    apply (Equiv.comp_injective _ (finCongr _)).mpr
-    exact Fin.succAbove_right_injective
+    exact (Equiv.comp_injective _ (finCongr _)).mpr Fin.succAbove_right_injective
     exact a.sort_nodup (fun x1 x2 => x1 ≤ x2)
   have h3 : (List.map (⇑(finCongr (insertIdx_length_fin φ φs i).symm))
       (List.map i.succAbove (a.sort (fun x1 x2 => x1 ≤ x2)))).toFinset

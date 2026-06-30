@@ -358,8 +358,7 @@ lemma inl_sq_eq (v : Contr d) : v.val (Sum.inl 0) ^ 2 =
 lemma le_inl_sq (v : Contr d) : ⟪v, v⟫ₘ ≤ v.val (Sum.inl 0) ^ 2 := by
   rw [inl_sq_eq]
   apply (le_add_iff_nonneg_right _).mpr
-  refine Fintype.sum_nonneg ?hf
-  exact fun i => pow_two_nonneg (v.val (Sum.inr i))
+  exact Fintype.sum_nonneg fun i => pow_two_nonneg (v.val (Sum.inr i))
 
 lemma ge_abs_inner_product (v w : Contr d) : v.val (Sum.inl 0) * w.val (Sum.inl 0) -
     ‖⟪v.toSpace, w.toSpace⟫_ℝ‖ ≤ ⟪v, w⟫ₘ := by
