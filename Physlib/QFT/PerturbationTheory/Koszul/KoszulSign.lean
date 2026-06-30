@@ -323,8 +323,8 @@ lemma koszulSign_of_sorted : (φs : List 𝓕)
 
 @[simp]
 lemma koszulSign_of_insertionSort [Std.Total le] [IsTrans 𝓕 le] (φs : List 𝓕) :
-    koszulSign q le (List.insertionSort le φs) = 1 := by
-  exact koszulSign_of_sorted q le _ (List.pairwise_insertionSort le φs)
+    koszulSign q le (List.insertionSort le φs) = 1 :=
+  koszulSign_of_sorted q le _ (List.pairwise_insertionSort le φs)
 
 lemma koszulSign_of_append_eq_insertionSort_left [Std.Total le] [IsTrans 𝓕 le] :
     (φs φs' : List 𝓕) → koszulSign q le (φs ++ φs') =

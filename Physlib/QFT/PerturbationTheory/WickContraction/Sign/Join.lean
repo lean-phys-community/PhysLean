@@ -338,8 +338,8 @@ lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
   funext a
   have hjneqsnd := singleton_uncontractedEmd_ne_right h (φsucΛ.sndFieldOfContract a)
   have hl : uncontractedListEmd (φsucΛ.fstFieldOfContract a) <
-      uncontractedListEmd (φsucΛ.sndFieldOfContract a) := by
-    exact uncontractedListEmd_strictMono (fstFieldOfContract_lt_sndFieldOfContract φsucΛ a)
+      uncontractedListEmd (φsucΛ.sndFieldOfContract a) :=
+    uncontractedListEmd_strictMono (fstFieldOfContract_lt_sndFieldOfContract φsucΛ a)
   by_cases hj1 : ¬ uncontractedListEmd (φsucΛ.fstFieldOfContract a) < j
   · have hi1 : ¬ uncontractedListEmd (φsucΛ.fstFieldOfContract a) < i := by omega
     simp [hj1, hi1]
