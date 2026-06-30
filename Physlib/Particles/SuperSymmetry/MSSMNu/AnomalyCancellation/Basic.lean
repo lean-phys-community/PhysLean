@@ -75,8 +75,8 @@ corresponding SM species of charges. -/
 @[simps!]
 def toSMSpecies (i : Fin 6) : MSSMCharges.Charges →ₗ[ℚ] MSSMSpecies.Charges where
   toFun S := (Prod.fst ∘ toSpecies) S i
-  map_add' _ _ := by rfl
-  map_smul' _ _ := by rfl
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
 
 lemma toSMSpecies_toSpecies_inv (i : Fin 6) (f : (Fin 6 → Fin 3 → ℚ) × (Fin 2 → ℚ)) :
     (toSMSpecies i) (toSpecies.symm f) = f.1 i := by
@@ -100,15 +100,15 @@ abbrev N := toSMSpecies 5
 @[simps!]
 def Hd : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := S ⟨18, Nat.lt_of_sub_eq_succ rfl⟩
-  map_add' _ _ := by rfl
-  map_smul' _ _ := by rfl
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
 
 /-- The charge `Hu`. -/
 @[simps!]
 def Hu : MSSMCharges.Charges →ₗ[ℚ] ℚ where
   toFun S := S ⟨19, Nat.lt_of_sub_eq_succ rfl⟩
-  map_add' _ _ := by rfl
-  map_smul' _ _ := by rfl
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
 
 lemma charges_eq_toSpecies_eq (S T : MSSMCharges.Charges) :
     S = T ↔ (∀ i, toSMSpecies i S = toSMSpecies i T) ∧ Hd S = Hd T ∧ Hu S = Hu T := by

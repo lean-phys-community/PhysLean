@@ -49,11 +49,12 @@ def toSpeciesEquiv : (SMCharges n).Charges ≃ (Fin 5 → Fin (SMSpecies n).numb
 @[simps!]
 def toSpecies (i : Fin 5) : (SMCharges n).Charges →ₗ[ℚ] (SMSpecies n).Charges where
   toFun S := toSpeciesEquiv S i
-  map_add' _ _ := by rfl
-  map_smul' _ _ := by rfl
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
 
 lemma toSpecies_apply_eq (i : Fin 5) (S : (SMCharges n).Charges) :
-    toSpecies i S = fun j => toSpeciesEquiv S i j := by rfl
+    toSpecies i S = fun j => toSpeciesEquiv S i j :=
+  rfl
 
 lemma charges_eq_toSpecies_eq (S T : (SMCharges n).Charges) :
     S = T ↔ ∀ i, toSpecies i S = toSpecies i T := by
