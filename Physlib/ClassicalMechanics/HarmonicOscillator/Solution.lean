@@ -1217,18 +1217,14 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
   have zero_lt_det :  0 < det := by
    cases non_trivial with
    | inl hx =>
-    have  xx_gt_zero : 0 < xx  := by
-        apply real_inner_self_pos.mpr
-        exact hx
+    have  xx_gt_zero : 0 < xx  := real_inner_self_pos.mpr hx
     calc
       0 < xx * S.ω^2 := by bound
       _ ≤  ‖IC.v₀‖^2 +   xx * S.ω^2  := by bound
       _ = vv +   xx * S.ω^2 := by rw [← real_inner_self_eq_norm_sq IC.v₀]
       _ = det := rfl
    | inr hv =>
-     have vv_gt_zero : 0 < vv := by
-        apply real_inner_self_pos.mpr
-        exact hv
+     have vv_gt_zero : 0 < vv := real_inner_self_pos.mpr hv
      calc
         0 <  vv := vv_gt_zero
         _ ≤ vv +   ‖IC.x₀‖^2 * S.ω^2 := by bound

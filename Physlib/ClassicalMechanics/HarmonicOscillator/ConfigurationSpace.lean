@@ -119,8 +119,7 @@ def valHomeomorphism : ConfigurationSpace ≃ₜ EuclideanSpace ℝ (Fin 1) wher
   toEquiv := valEquiv
   continuous_toFun := continuous_induced_dom
   continuous_invFun := by
-    apply continuous_induced_rng.mpr
-    exact continuous_id
+    exact continuous_induced_rng.mpr continuous_id
 
 /-- Configuration space is Hausdorff, transported from `EuclideanSpace ℝ (Fin 1)` across the
 coordinate homeomorphism. -/

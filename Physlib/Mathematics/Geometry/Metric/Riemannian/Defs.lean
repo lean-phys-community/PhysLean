@@ -93,8 +93,7 @@ lemma toQuadraticForm_posDef (g : RiemannianMetric I n M) (x : M) :
 
 lemma riemannian_metric_negDim_zero (g : RiemannianMetric I n M) (x : M) :
     (g.toQuadraticForm x).negDim = 0 := by
-  apply QuadraticForm.rankNeg_eq_zero
-  exact g.toQuadraticForm_posDef x
+  exact QuadraticForm.rankNeg_eq_zero (g.toQuadraticForm_posDef x)
 
 /-! ## InnerProductSpace structure from RiemannianMetric -/
 

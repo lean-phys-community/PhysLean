@@ -381,8 +381,7 @@ lemma μBolt_ne_zero_of_μ_ne_zero (T : Temperature) (h : 𝓒.μ ≠ 0) :
 
 instance (T : Temperature) [NeZero 𝓒.μ] : NeZero (𝓒.μBolt T) := by
   refine { out := ?_ }
-  apply μBolt_ne_zero_of_μ_ne_zero
-  exact Ne.symm (NeZero.ne' 𝓒.μ)
+  exact μBolt_ne_zero_of_μ_ne_zero 𝓒 T (Ne.symm (NeZero.ne' 𝓒.μ))
 
 instance (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [IsFiniteMeasure (𝓒1.μBolt T)] :
     IsFiniteMeasure ((𝓒 + 𝓒1).μBolt T) := by

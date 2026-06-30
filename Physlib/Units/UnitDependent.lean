@@ -279,8 +279,7 @@ noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M]
       enter [1, m]
       rw [toDimensionful_apply_apply]
     change Continuous fun m => (u1.dimScale u2 (dim M)).1 • m
-    apply Continuous.const_smul
-    exact continuous_id'
+    exact Continuous.const_smul continuous_id' _
 
 /-!
 
