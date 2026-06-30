@@ -140,8 +140,7 @@ def consEquiv {φ : 𝓕.FieldOp} {φs : List 𝓕.FieldOp} : CrAnSection (φ ::
     match ψψs with
     | (ψ, ψs) => cons ψ ψs
   left_inv ψs := by
-    apply Subtype.ext
-    exact Eq.symm eq_head_cons_tail
+    exact Subtype.ext (Eq.symm eq_head_cons_tail)
   right_inv ψψs := by
     match ψψs with
     | (ψ, ψs) => rfl
