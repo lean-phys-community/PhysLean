@@ -285,37 +285,29 @@ theorem kron_def [CommSemiring R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D
 section kron_lemmas
 variable [CommSemiring R]
 
-theorem add_kron (ML₁ ML₂ : MatrixMap A B R) (MR : MatrixMap C D R) : (ML₁ + ML₂) ⊗ₖₘ MR = ML₁ ⊗ₖₘ MR + ML₂ ⊗ₖₘ MR := by
-  simp [kron, TensorProduct.map_add_left, Matrix.submatrix_add]
+theorem add_kron (ML₁ ML₂ : MatrixMap A B R) (MR : MatrixMap C D R) : (ML₁ + ML₂) ⊗ₖₘ MR = ML₁ ⊗ₖₘ MR + ML₂ ⊗ₖₘ MR := by simp [kron, TensorProduct.map_add_left, Matrix.submatrix_add]
 
-theorem kron_add (ML : MatrixMap A B R) (MR₁ MR₂ : MatrixMap C D R) : ML ⊗ₖₘ (MR₁ + MR₂) = ML ⊗ₖₘ MR₁ + ML ⊗ₖₘ  MR₂ := by
-  simp [kron, TensorProduct.map_add_right, Matrix.submatrix_add]
+theorem kron_add (ML : MatrixMap A B R) (MR₁ MR₂ : MatrixMap C D R) : ML ⊗ₖₘ (MR₁ + MR₂) = ML ⊗ₖₘ MR₁ + ML ⊗ₖₘ  MR₂ := by simp [kron, TensorProduct.map_add_right, Matrix.submatrix_add]
 
-theorem smul_kron (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : (r • ML) ⊗ₖₘ MR = r • (ML ⊗ₖₘ MR) := by
-  simp [kron, TensorProduct.map_smul_left, Matrix.submatrix_smul]
+theorem smul_kron (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : (r • ML) ⊗ₖₘ MR = r • (ML ⊗ₖₘ MR) := by simp [kron, TensorProduct.map_smul_left, Matrix.submatrix_smul]
 
-theorem kron_smul (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : ML ⊗ₖₘ (r • MR) = r • (ML ⊗ₖₘ MR) := by
-  simp [kron, TensorProduct.map_smul_right, Matrix.submatrix_smul]
+theorem kron_smul (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : ML ⊗ₖₘ (r • MR) = r • (ML ⊗ₖₘ MR) := by simp [kron, TensorProduct.map_smul_right, Matrix.submatrix_smul]
 
 @[simp]
-theorem zero_kron (MR : MatrixMap C D R) : (0 : MatrixMap A B R) ⊗ₖₘ MR = 0 := by
-  simp [kron]
+theorem zero_kron (MR : MatrixMap C D R) : (0 : MatrixMap A B R) ⊗ₖₘ MR = 0 := by simp [kron]
 
 @[simp]
-theorem kron_zero (ML : MatrixMap A B R) : ML ⊗ₖₘ (0 : MatrixMap C D R) = 0 := by
-  simp [kron]
+theorem kron_zero (ML : MatrixMap A B R) : ML ⊗ₖₘ (0 : MatrixMap C D R) = 0 := by simp [kron]
 
 variable [DecidableEq B] in
-theorem kron_id_id : (id A R ⊗ₖₘ id B R) = id (A × B) R := by
-  simp [kron]
+theorem kron_id_id : (id A R ⊗ₖₘ id B R) = id (A × B) R := by simp [kron]
 
 variable {Dl₁ Dl₂ Dl₃ Dr₁ Dr₂ Dr₃ : Type*}
   [Fintype Dl₁] [Fintype Dl₂] [Fintype Dl₃] [Fintype Dr₁] [Fintype Dr₂] [Fintype Dr₃]
   [DecidableEq Dl₁] [DecidableEq Dl₂] [DecidableEq Dr₁] [DecidableEq Dr₂] in
 /-- For maps L₁, L₂, R₁, and R₂, the product (L₂ ∘ₗ L₁) ⊗ₖₘ (R₂ ∘ₗ R₁) = (L₂ ⊗ₖₘ R₂) ∘ₗ (L₁ ⊗ₖₘ R₁) -/
 theorem kron_comp_distrib (L₁ : MatrixMap Dl₁ Dl₂ R) (L₂ : MatrixMap Dl₂ Dl₃ R) (R₁ : MatrixMap Dr₁ Dr₂ R)
-    (R₂ : MatrixMap Dr₂ Dr₃ R) : (L₂ ∘ₗ L₁) ⊗ₖₘ (R₂ ∘ₗ R₁) = (L₂ ⊗ₖₘ R₂) ∘ₗ (L₁ ⊗ₖₘ R₁) := by
-  simp [kron, TensorProduct.map_comp, ← Matrix.toLin_mul, Matrix.submatrix_mul_equiv, ← LinearMap.toMatrix_comp]
+    (R₂ : MatrixMap Dr₂ Dr₃ R) : (L₂ ∘ₗ L₁) ⊗ₖₘ (R₂ ∘ₗ R₁) = (L₂ ⊗ₖₘ R₂) ∘ₗ (L₁ ⊗ₖₘ R₁) := by simp [kron, TensorProduct.map_comp, ← Matrix.toLin_mul, Matrix.submatrix_mul_equiv, ← LinearMap.toMatrix_comp]
 
 end kron_lemmas
 
@@ -394,12 +386,10 @@ theorem submatrix_kron_submatrix [CommSemiring R] (f : B → A) (g : D → C) :
   simp [Prod.map, Matrix.single, ite_and]
 
 theorem submatrix_kron_id [CommSemiring R] (f : B → A) :
-    submatrix R f ⊗ₖₘ id C R = submatrix R (Prod.map f _root_.id) := by
-  simp [← submatrix_kron_submatrix]
+    submatrix R f ⊗ₖₘ id C R = submatrix R (Prod.map f _root_.id) := by simp [← submatrix_kron_submatrix]
 
 theorem id_kron_submatrix [CommSemiring R] (f : B → A) :
-    id C R ⊗ₖₘ submatrix R f = submatrix R (Prod.map _root_.id f) := by
-  simp [← submatrix_kron_submatrix]
+    id C R ⊗ₖₘ submatrix R f = submatrix R (Prod.map _root_.id f) := by simp [← submatrix_kron_submatrix]
 
 end kron
 
@@ -453,8 +443,7 @@ theorem piProd_comp
   [∀ i, Fintype (d₂ i)] [∀ i, DecidableEq (d₂ i)]
   [∀ i, Fintype (d₃ i)] [∀ i, DecidableEq (d₃ i)]
   (Λ₁ : ∀ i, MatrixMap (d₁ i) (d₂ i) R) (Λ₂ : ∀ i, MatrixMap (d₂ i) (d₃ i) R) :
-    piProd (fun i ↦ (Λ₂ i) ∘ₗ (Λ₁ i)) = (piProd Λ₂) ∘ₗ (piProd Λ₁) := by
-  simp [piProd, PiTensorProduct.map_comp, ← Matrix.toLin_mul, ← LinearMap.toMatrix_comp]
+    piProd (fun i ↦ (Λ₂ i) ∘ₗ (Λ₁ i)) = (piProd Λ₂) ∘ₗ (piProd Λ₁) := by simp [piProd, PiTensorProduct.map_comp, ← Matrix.toLin_mul, ← LinearMap.toMatrix_comp]
 
 @[simp]
 theorem piProd_id :
