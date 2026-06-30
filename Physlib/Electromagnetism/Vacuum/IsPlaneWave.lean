@@ -93,9 +93,8 @@ lemma electricField_eq_electricFunction {d : ℕ} {𝓕 : FreeSpace}
     {A : ElectromagneticPotential d} {s : Direction d}
     (P : IsPlaneWave 𝓕 A s) (t : Time) (x : Space d) :
     A.electricField 𝓕.c t x =
-    P.electricFunction (⟪x, s.unit⟫_ℝ - 𝓕.c * t) := by
-  rw [Classical.choose_spec P.1]
-  rfl
+    P.electricFunction (⟪x, s.unit⟫_ℝ - 𝓕.c * t) :=
+  congrFun (congrFun (Classical.choose_spec P.1) t) x
 
 /-- The corresponding magnetic field function from `ℝ` to
   `Fin d × Fin d → ℝ` of a plane wave. -/
@@ -108,9 +107,8 @@ lemma magneticFieldMatrix_eq_magneticFunction {d : ℕ}
     {𝓕 : FreeSpace} {A : ElectromagneticPotential d} {s : Direction d}
     (P : IsPlaneWave 𝓕 A s) (t : Time) (x : Space d) :
     A.magneticFieldMatrix 𝓕.c t x =
-    P.magneticFunction (⟪x, s.unit⟫_ℝ - 𝓕.c * t) := by
-  rw [Classical.choose_spec P.2 t x]
-  rfl
+    P.magneticFunction (⟪x, s.unit⟫_ℝ - 𝓕.c * t) :=
+  Classical.choose_spec P.2 t x
 
 /-!
 
