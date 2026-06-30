@@ -227,11 +227,9 @@ lemma mem_map_ofPotentialTerm'_iff[DecidableEq 𝓩]
   simp only [Multiset.mem_map]
   constructor
   · intro ⟨a, h, h1⟩
-    refine ⟨a, ?_, h1⟩
-    exact mem_ofPotentialTerm_iff_mem_ofPotentialTerm.mp h
+    exact ⟨a, mem_ofPotentialTerm_iff_mem_ofPotentialTerm.mp h, h1⟩
   · intro ⟨a, h, h1⟩
-    refine ⟨a, ?_, h1⟩
-    exact mem_ofPotentialTerm_iff_mem_ofPotentialTerm.mpr h
+    exact ⟨a, mem_ofPotentialTerm_iff_mem_ofPotentialTerm.mpr h, h1⟩
 
 lemma map_ofPotentialTerm'_toFinset [DecidableEq 𝓩]
     (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :

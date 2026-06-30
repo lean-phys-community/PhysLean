@@ -37,8 +37,7 @@ lemma properTime_pos_ofTimeLike {d : ℕ} (q p : SpaceTime d)
     (h : causalCharacter (p - q) = .timeLike) :
     0 < properTime q p := by
   rw [properTime]
-  refine sqrt_pos_of_pos ?_
-  exact (timeLike_iff_norm_sq_pos (p - q)).mp h
+  exact sqrt_pos_of_pos ((timeLike_iff_norm_sq_pos (p - q)).mp h)
 
 lemma properTime_zero_ofLightLike {d : ℕ} (q p : SpaceTime d)
     (h : causalCharacter (p - q) = .lightLike) :

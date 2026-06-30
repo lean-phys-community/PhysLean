@@ -217,8 +217,7 @@ lemma normalOrderSign_swap_annihilate_annihilate (φa φa' : 𝓕.CrAnFieldOp)
     simp only [mul_eq_mul_right_iff]
     apply Or.inl
     apply Wick.koszulSignInsert_eq_perm
-    refine List.Perm.append_left φs ?h.h.a
-    exact List.Perm.swap φa' φa φs'
+    exact List.Perm.append_left φs (List.Perm.swap φa' φa φs')
 open FieldStatistic
 
 /-!

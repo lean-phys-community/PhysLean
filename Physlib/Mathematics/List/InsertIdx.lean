@@ -42,8 +42,7 @@ lemma eraseIdx_sorted {I : Type} (le : I → I → Prop) :
     simp only [List.pairwise_cons] at h
     refine And.intro ?_ (eraseIdx_sorted le as n h.2)
     intro b hb
-    refine h.1 _ ?_
-    exact List.mem_of_mem_eraseIdx hb
+    exact h.1 _ (List.mem_of_mem_eraseIdx hb)
 
 lemma mem_eraseIdx_nodup {I : Type} (i : I) :
     (l : List I) → (n : ℕ) → (hn : n < l.length) → (h : List.Nodup l) →
@@ -190,7 +189,7 @@ lemma take_insert_let {I : Type} (i : I) :
     have hp : (i :: a :: List.take n as).Perm (a :: i :: List.take n as) :=
       List.Perm.swap a i (List.take n as)
     refine List.Perm.trans ?_ hp.symm
-    refine List.Perm.cons a ?_
-    exact take_insert_let i n m (Nat.le_of_succ_le_succ h) as (Nat.le_of_succ_le_succ hm)
+    exact List.Perm.cons a
+      (take_insert_let i n m (Nat.le_of_succ_le_succ h) as (Nat.le_of_succ_le_succ hm))
 
 end Physlib.List
