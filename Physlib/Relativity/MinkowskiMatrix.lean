@@ -140,8 +140,7 @@ as well as other properties related to squaring the Minkowski matrix.
 
 /-- The Minkowski matrix is self-inverting. -/
 @[simp]
-lemma sq : @minkowskiMatrix d * minkowskiMatrix = 1 := by
-  simp [as_block, fromBlocks_multiply]
+lemma sq : @minkowskiMatrix d * minkowskiMatrix = 1 := by simp [as_block, fromBlocks_multiply]
 
 /-- Multiplying any element on the diagonal of the Minkowski matrix by itself gives `1`. -/
 @[simp]
@@ -162,8 +161,7 @@ The Minkowski matrix is symmetric, due to it being diagonal.
 
 /-- The Minkowski matrix is symmetric. -/
 @[simp]
-lemma eq_transpose : minkowskiMatrixᵀ = @minkowskiMatrix d := by
-  simp [as_diagonal]
+lemma eq_transpose : minkowskiMatrixᵀ = @minkowskiMatrix d := by simp [as_diagonal]
 
 /-!
 
@@ -177,8 +175,7 @@ We show the determinant of the Minkowski matrix is equal to `(-1)^d` where
 /-- The determinant of the Minkowski matrix is equal to `-1` to the power
   of the number of spatial dimensions. -/
 @[simp]
-lemma det_eq_neg_one_pow_d : (@minkowskiMatrix d).det = (- 1) ^ d := by
-  simp [as_diagonal]
+lemma det_eq_neg_one_pow_d : (@minkowskiMatrix d).det = (- 1) ^ d := by simp [as_diagonal]
 
 /-!
 
@@ -285,8 +282,7 @@ lemma dual_dual : Function.Involutive (@dual d) := by
 
 /-- The Minkowski dual commutes with the transpose. -/
 @[simp]
-lemma dual_transpose : dual Λᵀ = (dual Λ)ᵀ := by
-  simp [dual, mul_assoc]
+lemma dual_transpose : dual Λᵀ = (dual Λ)ᵀ := by simp [dual, mul_assoc]
 
 /-!
 
@@ -296,8 +292,7 @@ lemma dual_transpose : dual Λᵀ = (dual Λ)ᵀ := by
 
 /-- The Minkowski dual preserves the Minkowski matrix. -/
 @[simp]
-lemma dual_eta : @dual d η = η := by
-  simp [dual]
+lemma dual_eta : @dual d η = η := by simp [dual]
 
 /-!
 
@@ -324,13 +319,11 @@ We show a number of properties related to the components of the duals.
 /-- Expansion of the components of the Minkowski dual in terms of the components
   of the original matrix. -/
 lemma dual_apply (μ ν : Fin 1 ⊕ Fin d) :
-    dual Λ μ ν = η μ μ * Λ ν μ * η ν ν := by
-  simp [dual, as_diagonal]
+    dual Λ μ ν = η μ μ * Λ ν μ * η ν ν := by simp [dual, as_diagonal]
 
 /-- The components of the Minkowski dual of a matrix multiplied by the Minkowski matrix
   in terms of the original matrix. -/
 lemma dual_apply_minkowskiMatrix (μ ν : Fin 1 ⊕ Fin d) :
-    dual Λ μ ν * η ν ν = η μ μ * Λ ν μ := by
-  simp [dual_apply, mul_assoc]
+    dual Λ μ ν * η ν ν = η μ μ * Λ ν μ := by simp [dual_apply, mul_assoc]
 
 end minkowskiMatrix
