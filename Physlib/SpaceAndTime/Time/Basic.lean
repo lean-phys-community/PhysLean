@@ -250,23 +250,23 @@ lemma smul_real_val (k : ℝ) (t : Time) :
 -/
 
 instance : AddGroup Time where
-  add_assoc t1 t2 t3 := by ext; simp [add_assoc]
-  zero_add t := by ext; simp [zero_add]
-  add_zero t := by ext; simp [add_zero]
-  neg_add_cancel t := by ext; simp [neg_add_cancel]
+  add_assoc t1 t2 t3 := Time.ext (by simp [add_assoc])
+  zero_add t := Time.ext (by simp)
+  add_zero t := Time.ext (by simp)
+  neg_add_cancel t := Time.ext (by simp)
   nsmul := nsmulRec
   zsmul := zsmulRec
 
 instance : AddCommGroup Time where
-  add_comm := by intros; ext; simp [add_comm]
+  add_comm t1 t2 := Time.ext (by simp [add_comm])
 
 instance : Module ℝ Time where
-  one_smul t := by ext; simp
-  smul_add k t1 t2 := by ext; simp [mul_add]
-  smul_zero k := by ext; simp [mul_zero]
-  add_smul k1 k2 t := by ext; simp [add_mul]
-  mul_smul k1 k2 t := by ext; simp [mul_assoc]
-  zero_smul t := by ext; simp
+  one_smul t := Time.ext (by simp)
+  smul_add k t1 t2 := Time.ext (by simp [mul_add])
+  smul_zero k := Time.ext (by simp)
+  add_smul k1 k2 t := Time.ext (by simp [add_mul])
+  mul_smul k1 k2 t := Time.ext (by simp [mul_assoc])
+  zero_smul t := Time.ext (by simp)
 
 /-!
 
@@ -464,9 +464,7 @@ noncomputable def toRealLIE : Time ≃ₗᵢ[ℝ] ℝ where
   norm_map' x := rfl
 
 lemma eq_one_smul (t : Time) :
-    t = t.val • 1 := by
-  ext
-  simp [one_val]
+    t = t.val • 1 := Time.ext (by simp [one_val])
 
 @[fun_prop]
 lemma val_measurable : Measurable Time.val := by
