@@ -82,9 +82,8 @@ scoped[Space] notation "∇" => grad
 
 @[simp]
 lemma grad_zero : ∇ (0 : Space d → ℝ) = 0 := by
-  unfold grad Space.deriv
-  simp only [fderiv_zero, Pi.zero_apply, _root_.zero_apply]
-  rfl
+  ext x i
+  simp [grad, Space.deriv]
 
 /-!
 
@@ -113,9 +112,8 @@ lemma grad_fun_add_const (f : Space d → ℝ) (c : ℝ) :
 
 @[simp]
 lemma grad_const : ∇ (fun _ : Space d => c) = 0 := by
-  unfold grad Space.deriv
-  simp only [fderiv_fun_const, Pi.ofNat_apply, _root_.zero_apply]
-  rfl
+  ext x i
+  simp [grad, Space.deriv]
 
 /-!
 
@@ -139,11 +137,8 @@ lemma grad_smul (f : Space d → ℝ) (k : ℝ)
 @[to_fun]
 lemma grad_neg (f : Space d → ℝ) :
     ∇ (- f) = - ∇ f := by
-  unfold grad
   ext x i
-  simp only [Pi.neg_apply]
-  rw [Space.deriv_eq, fderiv_neg]
-  rfl
+  simp [grad, Space.deriv, fderiv_neg]
 
 /-!
 
@@ -186,9 +181,7 @@ open InnerProductSpace
 
 lemma grad_inner_single {d} (f : Space d → ℝ) (x : Space d) (i : Fin d) :
     ⟪∇ f x, EuclideanSpace.single i 1⟫_ℝ = ∂[i] f x := by
-  simp only [EuclideanSpace.inner_single_right, conj_trivial,
-    one_mul]
-  exact rfl
+  simpa only [EuclideanSpace.inner_single_right, conj_trivial, one_mul] using grad_apply f x i
 
 lemma grad_inner_eq {d} (f : Space d → ℝ) (x : Space d) (y : EuclideanSpace ℝ (Fin d)) :
     ⟪∇ f x, y⟫_ℝ = ∑ i, y i * ∂[i] f x:= by

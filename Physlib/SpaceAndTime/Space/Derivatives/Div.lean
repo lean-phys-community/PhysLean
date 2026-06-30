@@ -83,10 +83,8 @@ lemma div_eq_sum_fderiv {d} (f : Space d → EuclideanSpace ℝ (Fin d))
 
 @[simp]
 lemma div_zero : ∇ ⬝ (0 : Space d → EuclideanSpace ℝ (Fin d)) = 0 := by
-  unfold div Space.deriv Finset.sum
-  simp only [Pi.ofNat_apply, fderiv_fun_const, _root_.zero_apply, Multiset.map_const',
-    Finset.card_val, Finset.card_univ, Fintype.card_fin, Multiset.sum_replicate, smul_zero]
-  rfl
+  ext x
+  simp [div, Space.deriv]
 
 /-!
 
@@ -96,10 +94,8 @@ lemma div_zero : ∇ ⬝ (0 : Space d → EuclideanSpace ℝ (Fin d)) = 0 := by
 
 @[simp]
 lemma div_const : ∇ ⬝ (fun _ : Space d => v) = 0 := by
-  unfold div Space.deriv Finset.sum
-  simp only [fderiv_fun_const, Pi.ofNat_apply, _root_.zero_apply, Multiset.map_const',
-    Finset.card_val, Finset.card_univ, Fintype.card_fin, Multiset.sum_replicate, smul_zero]
-  rfl
+  ext x
+  simp [div, Space.deriv]
 
 /-!
 

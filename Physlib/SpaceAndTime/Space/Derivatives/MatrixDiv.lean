@@ -69,8 +69,7 @@ noncomputable def matrixDiv (d : ℕ) (T : Space d → Matrix (Fin d) (Fin d) �
 @[simp]
 lemma matrixDiv_apply (d : ℕ) (T : Space d → Matrix (Fin d) (Fin d) ℝ)
     (x : Space d) (i : Fin d) :
-    matrixDiv d T x i = ∑ j, ∂[j] (fun x => T x i j) x := by
-  simp [matrixDiv, div]
+    matrixDiv d T x i = ∑ j, ∂[j] (fun x => T x i j) x := rfl
 
 /-!
 
@@ -82,7 +81,6 @@ lemma matrixDiv_apply (d : ℕ) (T : Space d → Matrix (Fin d) (Fin d) ℝ)
 lemma matrixDiv_zero (d : ℕ) :
     matrixDiv d (0 : Space d → Matrix (Fin d) (Fin d) ℝ) = 0 := by
   ext x i
-  change (∑ j : Fin d, ∂[j] (fun _ : Space d => (0 : ℝ)) x) = 0
   simp
 
 /-!
@@ -95,7 +93,6 @@ lemma matrixDiv_zero (d : ℕ) :
 lemma matrixDiv_const (d : ℕ) (T : Matrix (Fin d) (Fin d) ℝ) :
     matrixDiv d (fun _ : Space d => T) = 0 := by
   ext x i
-  change (∑ j : Fin d, ∂[j] (fun _ : Space d => T i j) x) = 0
   simp
 
 /-!

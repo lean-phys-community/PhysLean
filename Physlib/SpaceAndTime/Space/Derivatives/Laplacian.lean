@@ -57,9 +57,7 @@ scoped[Space] notation "Δ" => laplacian
 -/
 
 lemma laplacian_eq_sum_snd_deriv {d} (f : Space d → ℝ) :
-    Δ f = fun x => ∑ i, ∂[i] (∂[i] f) x := by
-  unfold laplacian div grad
-  simp
+    Δ f = fun x => ∑ i, ∂[i] (∂[i] f) x := rfl
 
 /-!
 

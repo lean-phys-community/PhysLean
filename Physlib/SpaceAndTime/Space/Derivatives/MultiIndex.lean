@@ -142,9 +142,7 @@ def toList : {d : ℕ} → MultiIndex d → List (Fin d)
   | _ + 1, I => List.replicate (I 0) 0 ++ (toList (tail I)).map Fin.succ
 
 @[simp]
-lemma tail_zero : tail (0 : MultiIndex d.succ) = 0 := by
-  ext i
-  rfl
+lemma tail_zero : tail (0 : MultiIndex d.succ) = 0 := rfl
 
 @[simp]
 lemma tail_increment_zero (I : MultiIndex d.succ) : tail (increment I 0) = tail I := by
