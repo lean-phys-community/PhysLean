@@ -90,8 +90,8 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
 
 lemma insertionSort_insertionSort {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (l1 : List α) :
-    List.insertionSort r (List.insertionSort r l1) = List.insertionSort r l1 := by
-  exact List.Pairwise.insertionSort_eq (List.pairwise_insertionSort r l1)
+    List.insertionSort r (List.insertionSort r l1) = List.insertionSort r l1 :=
+  List.Pairwise.insertionSort_eq (List.pairwise_insertionSort r l1)
 
 lemma orderedInsert_commute {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (a b : α) (hr : ¬ r a b) : (l : List α) →
@@ -152,8 +152,8 @@ lemma insertionSort_append_insertionSort_append {α : Type} (r : α → α → P
 
 @[simp]
 lemma orderedInsert_length {α : Type} (r : α → α → Prop) [DecidableRel r] (a : α) (l : List α) :
-    (List.orderedInsert r a l).length = (a :: l).length := by
-  exact List.Perm.length_eq (List.perm_orderedInsert r a l)
+    (List.orderedInsert r a l).length = (a :: l).length :=
+  List.Perm.length_eq (List.perm_orderedInsert r a l)
 
 lemma takeWhile_orderedInsert {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r]
@@ -295,8 +295,8 @@ lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Pro
       conv_lhs => simp [insertionSortEquiv]
       rw [insertionSortEquiv_orderedInsert_append r a]
       have hl : (List.insertionSort r (List.orderedInsert r a l1 ++ a2 :: l2)) =
-        List.insertionSort r (a :: l1 ++ a2 :: l2) := by
-        exact insertionSort_orderedInsert_append r a l1 (a2 :: l2)
+        List.insertionSort r (a :: l1 ++ a2 :: l2) :=
+        insertionSort_orderedInsert_append r a l1 (a2 :: l2)
       rw [orderedInsertEquiv_congr _ _ _ hl]
       conv_lhs =>
         enter [2, 1, 2, 1]
@@ -332,8 +332,8 @@ lemma insertionSortEquiv_insertionSort_append {α : Type} (r : α → α → Pro
       equivCons_succ]
     erw [ih]
     have hl : (List.insertionSort r (List.insertionSort r l1 ++ a :: l2)) =
-        (List.insertionSort r (l1 ++ a :: l2)) := by
-      exact insertionSort_insertionSort_append r l1 (a :: l2)
+        (List.insertionSort r (l1 ++ a :: l2)) :=
+      insertionSort_insertionSort_append r l1 (a :: l2)
     erw [orderedInsertEquiv_congr _ _ _ hl]
     simp only [List.foldr_cons, finCongr_apply]
     rfl
@@ -380,8 +380,8 @@ lemma orderedInsert_filter_of_pos {α : Type} (r : α → α → Prop) [Decidabl
         simp only [List.pairwise_cons] at hl
         apply hl.1
         have hlf : (List.filter (fun b => decide (p b)) l)[0] ∈
-            (List.filter (fun b => decide (p b)) l) := by
-          exact List.getElem_mem c
+            (List.filter (fun b => decide (p b)) l) :=
+          List.getElem_mem c
         simp only [List.mem_filter, decide_eq_true_eq] at hlf
         exact hlf.1
       rw [hl]
