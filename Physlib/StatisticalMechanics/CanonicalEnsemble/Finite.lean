@@ -187,8 +187,7 @@ lemma μBolt_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
 
 instance {T} [IsFinite 𝓒] : IsFiniteMeasure (𝓒.μBolt T) := by
   rw [μBolt]
-  refine isFiniteMeasure_withDensity_ofReal ?_
-  exact HasFiniteIntegral.of_finite
+  exact isFiniteMeasure_withDensity_ofReal HasFiniteIntegral.of_finite
 
 @[simp]
 lemma μProd_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
