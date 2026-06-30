@@ -415,7 +415,7 @@ def parity : LorentzGroup d := ⟨minkowskiMatrix, by
 -/
 
 lemma eq_of_mulVec_eq {Λ Λ' : LorentzGroup d}
-    (h : ∀ (x : Fin 1 ⊕ Fin d → ℝ), Λ.1 *ᵥ x = Λ'.1 *ᵥ x) : Λ = Λ' := by
-  exact Subtype.ext (ext_of_mulVec_single fun i => h (Pi.single i 1))
+    (h : ∀ (x : Fin 1 ⊕ Fin d → ℝ), Λ.1 *ᵥ x = Λ'.1 *ᵥ x) : Λ = Λ' :=
+  Subtype.ext (ext_of_mulVec_single fun i => h (Pi.single i 1))
 
 end LorentzGroup

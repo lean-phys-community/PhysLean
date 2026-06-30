@@ -87,16 +87,16 @@ def mk₂ (f : V × V → ℚ) (map_smul : ∀ a S T, f (a • S, T) = a * f (S,
   map_add' := fun S1 S2 => LinearMap.ext fun T => map_add S1 S2 T
   swap' := swap
 
-lemma map_smul₁ (f : BiLinearSymm V) (a : ℚ) (S T : V) : f (a • S) T = a * f S T := by
-  exact (congrArg (fun g : V →ₗ[ℚ] ℚ => g T) (f.map_smul a S)).trans (by rfl)
+lemma map_smul₁ (f : BiLinearSymm V) (a : ℚ) (S T : V) : f (a • S) T = a * f S T :=
+  (congrArg (fun g : V →ₗ[ℚ] ℚ => g T) (f.map_smul a S)).trans (by rfl)
 
 lemma swap (f : BiLinearSymm V) (S T : V) : f S T = f T S := f.swap' S T
 
 lemma map_smul₂ (f : BiLinearSymm V) (a : ℚ) (S : V) (T : V) : f S (a • T) = a * f S T := by
   rw [f.swap, f.map_smul₁, f.swap]
 
-lemma map_add₁ (f : BiLinearSymm V) (S1 S2 T : V) : f (S1 + S2) T = f S1 T + f S2 T := by
-  exact (congrArg (fun g : V →ₗ[ℚ] ℚ => g T) (f.map_add S1 S2)).trans (by rfl)
+lemma map_add₁ (f : BiLinearSymm V) (S1 S2 T : V) : f (S1 + S2) T = f S1 T + f S2 T :=
+  (congrArg (fun g : V →ₗ[ℚ] ℚ => g T) (f.map_add S1 S2)).trans (by rfl)
 
 lemma map_add₂ (f : BiLinearSymm V) (S : V) (T1 T2 : V) :
     f S (T1 + T2) = f S T1 + f S T2 := by

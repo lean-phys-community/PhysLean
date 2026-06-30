@@ -104,9 +104,9 @@ lemma harmonicWaveX_inr_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → 
 
 lemma harmonicWaveX_differentiable {d} (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) :
-    Differentiable ℝ (harmonicWaveX 𝓕 k E₀ φ) := by
-  exact (Lorentz.Vector.differentiable_apply _).mp fun μ => by
-    match μ with
+    Differentiable ℝ (harmonicWaveX 𝓕 k E₀ φ) :=
+  (Lorentz.Vector.differentiable_apply _).mp fun μ => by
+  match μ with
   | Sum.inl 0 => simp
   | Sum.inr ⟨0, h⟩ => simp
   | Sum.inr ⟨Nat.succ i, h⟩ =>
@@ -122,9 +122,9 @@ lemma harmonicWaveX_differentiable {d} (𝓕 : FreeSpace) (k : ℝ)
 
 lemma harmonicWaveX_contDiff {d} (n : WithTop ℕ∞) (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) :
-    ContDiff ℝ n (harmonicWaveX 𝓕 k E₀ φ) := by
-  exact (Lorentz.Vector.contDiff_apply _).mp fun μ => by
-    match μ with
+    ContDiff ℝ n (harmonicWaveX 𝓕 k E₀ φ) :=
+  (Lorentz.Vector.contDiff_apply _).mp fun μ => by
+  match μ with
   | Sum.inl 0 => simp [harmonicWaveX]; fun_prop
   | Sum.inr ⟨0, h⟩ => simp [harmonicWaveX]; fun_prop
   | Sum.inr ⟨Nat.succ i, h⟩ =>
