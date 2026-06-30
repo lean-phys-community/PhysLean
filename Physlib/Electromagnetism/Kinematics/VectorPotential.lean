@@ -92,8 +92,8 @@ lemma ofVectorPotential_vectorPotential {d} (c : SpeedOfLight)
 @[simp]
 lemma ofStaticVectorPotential_vectorPotential {d} (c : SpeedOfLight)
     (A : Space d → EuclideanSpace ℝ (Fin d)) :
-    (ofStaticVectorPotential c A).vectorPotential c = fun _ => A := by
-  simp [ofStaticVectorPotential]
+    (ofStaticVectorPotential c A).vectorPotential c =
+      fun _ => A := by simp [ofStaticVectorPotential]
 
 @[simp]
 lemma ofPotentials_vectorPotential {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
@@ -105,8 +105,8 @@ lemma ofPotentials_vectorPotential {d} (c : SpeedOfLight) (φ : Time → Space d
 @[simp]
 lemma ofStaticPotentials_vectorPotential {d} (c : SpeedOfLight) (φ : Space d → ℝ)
     (A : Space d → EuclideanSpace ℝ (Fin d)) :
-    (ofStaticPotentials c φ A).vectorPotential c = fun _ => A := by
-  simp [ofStaticPotentials_eq_ofPotentials]
+    (ofStaticPotentials c φ A).vectorPotential c =
+      fun _ => A := by simp [ofStaticPotentials_eq_ofPotentials]
 
 /-!
 

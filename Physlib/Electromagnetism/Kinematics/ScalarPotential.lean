@@ -79,8 +79,8 @@ lemma ofScalarPotential_scalarPotential {d} (c : SpeedOfLight)
 
 @[simp]
 lemma ofStaticScalarPotential_scalarPotential {d} (c : SpeedOfLight)
-    (φ : Space d → ℝ) : (ofStaticScalarPotential c φ).scalarPotential c = fun _ => φ := by
-  simp [ofStaticScalarPotential]
+    (φ : Space d → ℝ) : (ofStaticScalarPotential c φ).scalarPotential c =
+      fun _ => φ := by simp [ofStaticScalarPotential]
 
 @[simp]
 lemma ofVectorPotential_scalarPotential {d} (c : SpeedOfLight)
@@ -92,8 +92,7 @@ lemma ofVectorPotential_scalarPotential {d} (c : SpeedOfLight)
 @[simp]
 lemma ofStaticVectorPotential_scalarPotential {d} (c : SpeedOfLight)
     (A : Space d → EuclideanSpace ℝ (Fin d)) :
-    (ofStaticVectorPotential c A).scalarPotential = 0 := by
-  simp [ofStaticVectorPotential]
+    (ofStaticVectorPotential c A).scalarPotential = 0 := by simp [ofStaticVectorPotential]
 
 @[simp]
 lemma ofPotentials_scalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
@@ -106,16 +105,15 @@ lemma ofPotentials_scalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d
 @[simp]
 lemma ofStaticPotentials_scalarPotential {d} (c : SpeedOfLight) (φ : Space d → ℝ)
     (A : Space d → EuclideanSpace ℝ (Fin d)) :
-    (ofStaticPotentials c φ A).scalarPotential c = fun _ => φ := by
-  simp [ofStaticPotentials_eq_ofPotentials]
+    (ofStaticPotentials c φ A).scalarPotential c =
+      fun _ => φ := by simp [ofStaticPotentials_eq_ofPotentials]
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma ofElectromagneticField_scalarPotential (c : SpeedOfLight)
     (E : Time → Space → EuclideanSpace ℝ (Fin 3))
     (B : Time → Space → EuclideanSpace ℝ (Fin 3)) :
     (ofElectromagneticField c E B).scalarPotential c = fun t x =>
-    - ∫ u in (0 : ℝ)..1, ⟪E t (u • x), basis.repr x⟫_ℝ ∂(volume) := by
-  simp [ofElectromagneticField]
+    - ∫ u in (0 : ℝ)..1, ⟪E t (u • x), basis.repr x⟫_ℝ ∂(volume) := by simp [ofElectromagneticField]
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma ofElectromagneticField_scalarPotential_eq_add_vectorPotential (c : SpeedOfLight)
