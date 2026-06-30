@@ -806,8 +806,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     intro x hx
     simp at hx
     simp
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    exact normPowerSeries_log_le n x hx
+    exact mul_le_mul (by rfl) (normPowerSeries_log_le n x hx) (by positivity) (by positivity)
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
     constructor

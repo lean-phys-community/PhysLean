@@ -1037,8 +1037,7 @@ lemma zpow_smul_self {d : ℕ} (n : ℤ) (hn : - (d - 1 : ℕ) - 1 ≤ n) :
 lemma zpow_smul_repr_self {d : ℕ} (n : ℤ) (hn : - (d - 1 : ℕ) - 1 ≤ n) :
     IsDistBounded (d := d) (fun x => ‖x‖ ^ n • basis.repr x) := by
   apply IsDistBounded.congr (f := fun x => ‖x‖ ^ n • x)
-  · apply zpow_smul_self
-    exact hn
+  · exact zpow_smul_self n hn
   · apply AEMeasurable.aestronglyMeasurable
     fun_prop
   · intro x
@@ -1117,8 +1116,8 @@ lemma norm_smul_zpow {d} (p : ℤ) (c : Space d) (hn : - (d - 1 : ℕ) ≤ p) :
       ring
     suffices h0 : IsDistBounded (fun x => ‖x‖ * (‖x‖ ^ (p + 1))⁻¹) by
       apply h0.add
-      · apply IsDistBounded.const_mul_fun
-        exact IsDistBounded.pow (d := d) (n := -(p + 1)) (by grind)
+      · exact IsDistBounded.const_mul_fun
+          (IsDistBounded.pow (d := d) (n := -(p + 1)) (by grind)) ‖c‖
     by_cases hp : p = 0
     · subst hp
       simp only [zero_add, pow_one]
@@ -1157,8 +1156,7 @@ lemma norm_smul_isDistBounded {d : ℕ} [NormedSpace ℝ F] {f : Space d → F}
   · apply IsDistBounded.congr (f := fun x => ∑ i, (c i * (‖x‖ * ‖x + g i‖ ^ (p i))))
     · apply IsDistBounded.sum_fun
       intro i _
-      apply IsDistBounded.const_mul_fun
-      exact norm_smul_zpow (p i) (g i) (p_bound i)
+      exact IsDistBounded.const_mul_fun (norm_smul_zpow (p i) (g i) (p_bound i)) (c i)
     · fun_prop
     · intro x
       congr
@@ -1197,8 +1195,7 @@ lemma component_smul_isDistBounded {d : ℕ} [NormedSpace ℝ F] {f : Space d �
     · fun_prop
   · intro x
     simp [norm_smul]
-    apply mul_le_mul ?_ (by rfl) (by positivity) (by positivity)
-    exact abs_eval_le_norm x i
+    exact mul_le_mul (abs_eval_le_norm x i) (by rfl) (by positivity) (by positivity)
 
 @[fun_prop]
 lemma component_mul_isDistBounded {d : ℕ} {f : Space d → ℝ}
@@ -1259,8 +1256,7 @@ lemma isDistBounded_smul_inner_of_smul_norm {d : ℕ} [NormedSpace ℝ F] {f : S
   · fun_prop
   · intro x
     simp [norm_smul]
-    refine mul_le_mul_of_nonneg_right ?_ (by positivity)
-    exact abs_eval_le_norm x i
+    exact mul_le_mul_of_nonneg_right (abs_eval_le_norm x i) (by positivity)
 
 @[fun_prop]
 lemma isDistBounded_mul_inner {d : ℕ} {f : Space d → ℝ}
@@ -1299,8 +1295,7 @@ lemma mul_inner_pow_neg_two {d : ℕ} (y : Space d) (hd : 2 ≤ d := by omega) :
     fun_prop
   · intro x
     simp
-    apply mul_le_mul_of_nonneg _ (by rfl) (by positivity) (by positivity)
-    exact abs_real_inner_le_norm y x
+    exact mul_le_mul_of_nonneg (abs_real_inner_le_norm y x) (by rfl) (by positivity) (by positivity)
 
 end constructors
 end IsDistBounded
