@@ -85,8 +85,8 @@ lemma ofCrAnListF_cons (φ : 𝓕.CrAnFieldOp) (φs : List 𝓕.CrAnFieldOp) :
     ofCrAnListF (φ :: φs) = ofCrAnOpF φ * ofCrAnListF φs := rfl
 
 lemma ofCrAnListF_append (φs φs' : List 𝓕.CrAnFieldOp) :
-    ofCrAnListF (φs ++ φs') = ofCrAnListF φs * ofCrAnListF φs' := by
-  simp [ofCrAnListF, List.map_append]
+    ofCrAnListF (φs ++ φs') =
+      ofCrAnListF φs * ofCrAnListF φs' := by simp [ofCrAnListF, List.map_append]
 
 lemma ofCrAnListF_singleton (φ : 𝓕.CrAnFieldOp) :
     ofCrAnListF [φ] = ofCrAnOpF φ := by simp [ofCrAnListF]
@@ -155,19 +155,16 @@ def crPartF : 𝓕.FieldOp → 𝓕.FieldOpFreeAlgebra := fun φ =>
 
 @[simp]
 lemma crPartF_negAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    crPartF (FieldOp.inAsymp φ) = ofCrAnOpF ⟨FieldOp.inAsymp φ, ()⟩ := by
-  simp [crPartF]
+    crPartF (FieldOp.inAsymp φ) = ofCrAnOpF ⟨FieldOp.inAsymp φ, ()⟩ := by simp [crPartF]
 
 @[simp]
 lemma crPartF_position (φ : (Σ f, 𝓕.PositionLabel f) × SpaceTime) :
     crPartF (FieldOp.position φ) =
-    ofCrAnOpF ⟨FieldOp.position φ, CreateAnnihilate.create⟩ := by
-  simp [crPartF]
+    ofCrAnOpF ⟨FieldOp.position φ, CreateAnnihilate.create⟩ := by simp [crPartF]
 
 @[simp]
 lemma crPartF_posAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    crPartF (FieldOp.outAsymp φ) = 0 := by
-  simp [crPartF]
+    crPartF (FieldOp.outAsymp φ) = 0 := by simp [crPartF]
 
 /-- The algebra map taking an element of the free-state algebra to
   the part of it in the creation and annihilation free algebra
@@ -180,19 +177,16 @@ def anPartF : 𝓕.FieldOp → 𝓕.FieldOpFreeAlgebra := fun φ =>
 
 @[simp]
 lemma anPartF_negAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    anPartF (FieldOp.inAsymp φ) = 0 := by
-  simp [anPartF]
+    anPartF (FieldOp.inAsymp φ) = 0 := by simp [anPartF]
 
 @[simp]
 lemma anPartF_position (φ : (Σ f, 𝓕.PositionLabel f) × SpaceTime) :
     anPartF (FieldOp.position φ) =
-    ofCrAnOpF ⟨FieldOp.position φ, CreateAnnihilate.annihilate⟩ := by
-  simp [anPartF]
+    ofCrAnOpF ⟨FieldOp.position φ, CreateAnnihilate.annihilate⟩ := by simp [anPartF]
 
 @[simp]
 lemma anPartF_posAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    anPartF (FieldOp.outAsymp φ) = ofCrAnOpF ⟨FieldOp.outAsymp φ, ()⟩ := by
-  simp [anPartF]
+    anPartF (FieldOp.outAsymp φ) = ofCrAnOpF ⟨FieldOp.outAsymp φ, ()⟩ := by simp [anPartF]
 
 lemma ofFieldOpF_eq_crPartF_add_anPartF (φ : 𝓕.FieldOp) :
     ofFieldOpF φ = crPartF φ + anPartF φ := by
