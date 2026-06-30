@@ -489,9 +489,8 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
           rw [fderiv_const_mul]
           simp [← Space.deriv_eq_fderiv_basis]
           field_simp
-          apply Differentiable.differentiableAt
-          apply LorentzCurrentDensity.chargeDensity_differentiable_space
-          exact hJ.differentiable (by simp)
+          exact (LorentzCurrentDensity.chargeDensity_differentiable_space
+            (hJ.differentiable (by simp)) _).differentiableAt
         · exact hA
         · exact hJ
       _ = 𝓕.c ^ 2 * ∑ j, (∂[j] (∂[j] (A.electricField 𝓕.c t · i)) x) -

@@ -103,8 +103,7 @@ lemma chargeDensity_differentiable {d : ℕ} {c : SpeedOfLight} {J : LorentzCurr
     (hJ : Differentiable ℝ J) : Differentiable ℝ ↿(J.chargeDensity c) := by
   rw [chargeDensity_eq_timeSlice]
   apply timeSlice_differentiable
-  apply Differentiable.fun_const_smul
-  exact (SpaceTime.differentiable_vector J).mpr hJ (Sum.inl 0)
+  exact Differentiable.fun_const_smul ((SpaceTime.differentiable_vector J).mpr hJ (Sum.inl 0)) _
 
 lemma chargeDensity_differentiable_space {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (t : Time) :
@@ -121,8 +120,7 @@ lemma chargeDensity_contDiff {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDen
     (hJ : ContDiff ℝ n J) : ContDiff ℝ n ↿(J.chargeDensity c) := by
   rw [chargeDensity_eq_timeSlice]
   apply timeSlice_contDiff
-  apply ContDiff.const_smul
-  exact (SpaceTime.contDiff_vector J).mpr hJ (Sum.inl 0)
+  exact ContDiff.const_smul _ ((SpaceTime.contDiff_vector J).mpr hJ (Sum.inl 0))
 
 /-!
 
@@ -159,8 +157,8 @@ lemma currentDensity_zero {d : ℕ} {c : SpeedOfLight}:
 lemma currentDensity_differentiable {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) : Differentiable ℝ ↿(J.currentDensity c) := by
   rw [currentDensity_eq_timeSlice]
-  apply timeSlice_differentiable
-  exact differentiable_euclidean.mpr fun i => (SpaceTime.differentiable_vector J).mpr hJ (Sum.inr i)
+  exact timeSlice_differentiable c _
+    (differentiable_euclidean.mpr fun i => (SpaceTime.differentiable_vector J).mpr hJ (Sum.inr i))
 
 lemma currentDensity_apply_differentiable {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (i : Fin d) :
@@ -201,8 +199,8 @@ lemma currentDensity_apply_differentiable_time {d : ℕ} {c : SpeedOfLight}
 lemma currentDensity_ContDiff {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : ContDiff ℝ n J) : ContDiff ℝ n ↿(J.currentDensity c) := by
   rw [currentDensity_eq_timeSlice]
-  apply timeSlice_contDiff
-  exact contDiff_euclidean.mpr fun i => (SpaceTime.contDiff_vector J).mpr hJ (Sum.inr i)
+  exact timeSlice_contDiff c _
+    (contDiff_euclidean.mpr fun i => (SpaceTime.contDiff_vector J).mpr hJ (Sum.inr i))
 
 end LorentzCurrentDensity
 
