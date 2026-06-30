@@ -560,7 +560,7 @@ noncomputable def distSpaceDiv {d} :
 
 lemma distSpaceDiv_apply_eq_sum_distSpaceDeriv {d}
     (f : (Time × Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) (η : 𝓢(Time ×Space d, ℝ)) :
-    distSpaceDiv f η = ∑ i, distSpaceDeriv i f η i := by rfl
+    distSpaceDiv f η = ∑ i, distSpaceDeriv i f η i := rfl
 
 /-!
 

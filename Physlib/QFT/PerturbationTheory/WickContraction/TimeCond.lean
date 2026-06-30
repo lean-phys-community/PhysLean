@@ -388,7 +388,7 @@ lemma join_eqTimeContractSet {φs : List 𝓕.FieldOp} (φsΛ : WickContraction 
       · intro h'
         have h2 := h1.2 h1.1
         have hj : ⟨(Finset.mapEmbedding uncontractedListEmd) b, h'⟩
-          = joinLiftRight ⟨b, h1.1⟩ := by rfl
+          = joinLiftRight ⟨b, h1.1⟩ := rfl
         simp only [hj, join_fstFieldOfContract_joinLiftRight, getElem_uncontractedListEmd,
           join_sndFieldOfContract_joinLiftRight]
         simpa using h2

@@ -422,7 +422,7 @@ noncomputable abbrev fieldStrengthMatrix {d} (A : ElectromagneticPotential d) (x
 
 lemma fieldStrengthMatrix_eq {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     A.fieldStrengthMatrix x =
-    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x) := by rfl
+    (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x) := rfl
 
 /-- Index evaluation of the field strength tensor agrees with the corresponding component of
 the field strength matrix. -/

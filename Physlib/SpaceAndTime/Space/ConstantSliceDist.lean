@@ -616,7 +616,7 @@ lemma distDeriv_constantSliceDist_same {M : Type} [NormedAddCommGroup M] [Normed
   ext x
   simp [sliceSchwartz_apply]
   calc _
-    _ = ∫ r, fderiv ℝ η ((slice i).symm (r, x)) (basis i) := by rfl
+    _ = ∫ r, fderiv ℝ η ((slice i).symm (r, x)) (basis i) := rfl
     _ = ∫ r, fderiv ℝ (fun r => η ((slice i).symm (r, x))) r 1 := by
         congr
         funext r

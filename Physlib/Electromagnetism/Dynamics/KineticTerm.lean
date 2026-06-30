@@ -341,7 +341,7 @@ lemma kineticTerm_eq_electricMatrix_magneticFieldMatrix_time_space {𝓕 : FreeS
   simp only [Fin.isValue, Finset.sum_neg_distrib]
   have h1 : ∑ i, ∑ j, magneticFieldMatrix 𝓕.c A t x (i, j) ^ 2
       = ∑ i, ∑ j, (A.fieldStrengthMatrix ((toTimeAndSpace 𝓕.c).symm (t, x)))
-        (Sum.inr i, Sum.inr j) ^ 2 := by rfl
+        (Sum.inr i, Sum.inr j) ^ 2 := rfl
   rw [h1]
   ring_nf
   have h2 : ‖electricField 𝓕.c A t x‖ ^ 2 = 𝓕.c.val ^ 2 *

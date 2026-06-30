@@ -140,7 +140,7 @@ instance {d : ℕ} : MeasurableSpace (SpaceTime d) := borel (SpaceTime d)
 -/
 
 instance {d : ℕ} : BorelSpace (SpaceTime d) where
-  measurable_eq := by rfl
+  measurable_eq := rfl
 
 /-!
 
@@ -315,12 +315,12 @@ lemma time_toTimeAndSpace_symm {d : ℕ} {c : SpeedOfLight} (t : Time) (s : Spac
 
 @[simp]
 lemma toTimeAndSpace_symm_apply_inl {d : ℕ} {c : SpeedOfLight} (t : Time) (s : Space d) :
-    (toTimeAndSpace c).symm (t, s) (Sum.inl 0) = c * t := by rfl
+    (toTimeAndSpace c).symm (t, s) (Sum.inl 0) = c * t := rfl
 
 @[simp]
 lemma toTimeAndSpace_symm_apply_inr {d : ℕ} {c : SpeedOfLight} (t : Time) (x : Space d)
     (i : Fin d) :
-    (toTimeAndSpace c).symm (t, x) (Sum.inr i) = x i := by rfl
+    (toTimeAndSpace c).symm (t, x) (Sum.inr i) = x i := rfl
 /-!
 
 #### B.3.1. Derivative of `toTimeAndSpace`

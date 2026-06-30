@@ -60,7 +60,7 @@ def IsExtrema {d} (𝓕 : FreeSpace)
 lemma isExtrema_iff_gradLagrangian {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d)
     (J : DistLorentzCurrentDensity d) :
-    IsExtrema 𝓕 A J ↔ A.gradLagrangian 𝓕 J = 0 := by rfl
+    IsExtrema 𝓕 A J ↔ A.gradLagrangian 𝓕 J = 0 := Iff.rfl
 
 lemma isExtrema_iff_components {𝓕 : FreeSpace}
     (A : DistElectromagneticPotential d)

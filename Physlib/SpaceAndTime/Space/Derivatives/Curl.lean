@@ -280,7 +280,7 @@ private noncomputable def homotopyOperatorIntegrand (f : Space → EuclideanSpac
   Space → ℝ → EuclideanSpace ℝ (Fin 3) := fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x)
 
 private lemma homotopyOperatorIntegrand_eq (f : Space → EuclideanSpace ℝ (Fin 3)) :
-    homotopyOperatorIntegrand f = fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x) := by rfl
+    homotopyOperatorIntegrand f = fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x) := rfl
 @[fun_prop]
 private lemma differentiable_homotopyOperatorIntegrand_space {f : Space → EuclideanSpace ℝ (Fin 3)}
     (hf : Differentiable ℝ f) (t : ℝ) :
@@ -632,7 +632,7 @@ lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
       ⟪(basis.repr.symm (fderiv ℝ f a x)), y⟫_ℝ:= by
     calc _
       _ = (fderiv ℝ (InnerProductSpace.toDual ℝ _ ∘
-        fun a => (basis.repr.symm (f a))) a x) y := by rfl
+        fun a => (basis.repr.symm (f a))) a x) y := rfl
     rw [fderiv_comp _ (by exact
       (InnerProductSpace.toDual ℝ (Space)).differentiable.differentiableAt) (by fun_prop)]
     erw [(InnerProductSpace.toDual ℝ (Space)).fderiv]
