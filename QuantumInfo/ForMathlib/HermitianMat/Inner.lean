@@ -63,12 +63,10 @@ protected theorem inner_add_left : ⟪A + B, C⟫_R = ⟪A, C⟫_R + ⟪B, C⟫_
   simp [inner_def, right_distrib]
 
 @[simp]
-protected theorem inner_zero_right : ⟪A, 0⟫_R = 0 := by
-  simp [inner_def]
+protected theorem inner_zero_right : ⟪A, 0⟫_R = 0 := by simp [inner_def]
 
 @[simp]
-protected theorem inner_zero_left : ⟪0, A⟫_R = 0 := by
-  simp [inner_def]
+protected theorem inner_zero_left : ⟪0, A⟫_R = 0 := by simp [inner_def]
 
 end semiring
 section ring
@@ -77,12 +75,10 @@ variable [CommRing R] [Ring α] [StarAddMonoid α] [Algebra R α] [IsMaximalSelf
 variable (A B C : HermitianMat n α)
 
 @[simp]
-protected theorem inner_neg_left : ⟪-A, B⟫_R = -⟪A, B⟫_R := by
-  simp [inner_def]
+protected theorem inner_neg_left : ⟪-A, B⟫_R = -⟪A, B⟫_R := by simp [inner_def]
 
 @[simp]
-protected theorem inner_neg_right : ⟪A, -B⟫_R = -⟪A, B⟫_R := by
-  simp [inner_def]
+protected theorem inner_neg_right : ⟪A, -B⟫_R = -⟪A, B⟫_R := by simp [inner_def]
 
 protected theorem inner_sub_left : ⟪A, B - C⟫_R = ⟪A, B⟫_R - ⟪A, C⟫_R := by
   simp [inner_def, mul_sub]
@@ -118,12 +114,10 @@ variable [CommSemiring R] [Ring α] [StarRing α] [Algebra R α] [IsMaximalSelfA
 variable (A B : HermitianMat n α)
 
 @[simp]
-theorem inner_one : ⟪A, 1⟫_R = A.trace := by
-  simp only [inner_def, mat_one,  mul_one, trace]
+theorem inner_one : ⟪A, 1⟫_R = A.trace := by simp only [inner_def, mat_one,  mul_one, trace]
 
 @[simp]
-theorem one_inner : ⟪1, A⟫_R = A.trace := by
-  simp only [inner_def, one_mul, mat_one, trace]
+theorem one_inner : ⟪1, A⟫_R = A.trace := by simp only [inner_def, one_mul, mat_one, trace]
 
 end starring
 section commring
