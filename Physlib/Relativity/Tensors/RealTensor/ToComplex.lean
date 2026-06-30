@@ -411,7 +411,7 @@ lemma toComplexPure_component {c : Fin n → Color} (p : Pure realLorentzTensor 
   ↑(((b' c).repr
         px)
       φx)
-  suffices h : P (c x) px φx h2 by exact h
+  suffices h : P (c x) px φx h2 from h
   generalize c x = c at *
   fin_cases c
   · simp only [colorToComplex, toComplexVector, Nat.reduceAdd, Fin.cast_eq_self, P, b, b']

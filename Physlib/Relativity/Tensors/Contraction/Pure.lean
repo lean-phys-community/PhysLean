@@ -224,7 +224,7 @@ lemma contrPCoeff_dropPair {n : ℕ} {c : Fin (n + 1 + 1) → C}
     (i j : Fin n) (hij : i ≠ j ∧ S.τ (c (succSuccAbove a b i)) = (c (succSuccAbove a b j)))
     (p : Pure S c) : (p.dropPair a b hab).contrPCoeff i j hij =
     p.contrPCoeff (succSuccAbove a b i) (succSuccAbove a b j)
-      (by simpa using hij) := by rfl
+      (by simpa using hij) := rfl
 
 lemma contrPCoeff_symm {n : ℕ} {c : Fin n → C} {i j : Fin n} {hij : i ≠ j ∧ S.τ (c i) = c j}
     {p : Pure S c} :
