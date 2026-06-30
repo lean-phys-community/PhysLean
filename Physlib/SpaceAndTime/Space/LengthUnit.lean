@@ -125,8 +125,7 @@ lemma scale_div_scale (x1 x2 : LengthUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0
 @[simp]
 lemma scale_scale (x : LengthUnit) (r1 r2 : ℝ) (hr1 : 0 < r1) (hr2 : 0 < r2) :
     scale r1 (scale r2 x hr2) hr1 = scale (r1 * r2) x (mul_pos hr1 hr2) := by
-  simp [scale]
-  ring
+  simp [scale, mul_assoc]
 /-!
 
 ## Specific choices of Length units
