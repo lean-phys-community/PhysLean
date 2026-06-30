@@ -43,8 +43,8 @@ local notation "ℤ₂" => Multiplicative (ZMod 2)
 instance : TopologicalSpace ℤ₂ := instTopologicalSpaceFin
 
 /-- The topological space defined by `ℤ₂` is discrete. -/
-instance : DiscreteTopology ℤ₂ := by
-  exact discreteTopology_iff_forall_isOpen.mpr fun _ => trivial
+instance : DiscreteTopology ℤ₂ :=
+  discreteTopology_iff_forall_isOpen.mpr fun _ => trivial
 
 /-- The instance of a topological group on `ℤ₂` defined via the discrete topology. -/
 instance : IsTopologicalGroup ℤ₂ := IsTopologicalGroup.mk

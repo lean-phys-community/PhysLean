@@ -241,8 +241,8 @@ lemma toLorentzGroup_fst_col (M : SL(2, ℂ)) :
 /-- The first element of the image of `SL(2, ℂ)` in the Lorentz group. -/
 lemma toLorentzGroup_inl_inl (M : SL(2, ℂ)) :
     (toLorentzGroup M).1 (Sum.inl 0) (Sum.inl 0) =
-    ((‖M.1 0 0‖ ^ 2 + ‖M.1 0 1‖ ^ 2 + ‖M.1 1 0‖ ^ 2 + ‖M.1 1 1‖ ^ 2) / 2) := by
-  exact congrFun (toLorentzGroup_fst_col M) (Sum.inl 0)
+    ((‖M.1 0 0‖ ^ 2 + ‖M.1 0 1‖ ^ 2 + ‖M.1 1 0‖ ^ 2 + ‖M.1 1 1‖ ^ 2) / 2) :=
+  congrFun (toLorentzGroup_fst_col M) (Sum.inl 0)
 
 /-- The image of `SL(2, ℂ)` in the Lorentz group is orthochronous. -/
 lemma toLorentzGroup_isOrthochronous (M : SL(2, ℂ)) :

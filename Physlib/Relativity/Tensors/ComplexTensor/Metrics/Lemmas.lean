@@ -105,38 +105,38 @@ lemma dualRightMetric_antisymm : {εR' | α α' = - (εR' | α' α)}ᵀ := by
 /-- The contraction of the covariant metric with the contravariant metric is the unit
 `{η' | μ ρ ⊗ η | ρ ν = δ' | μ ν}ᵀ`.
 -/
-lemma coMetric_contr_contrMetric : {η' | μ ρ ⊗ η | ρ ν = δ' | μ ν}ᵀ := by
-  exact contrT_metricTensor_metricTensor_eq_dual_unit
+lemma coMetric_contr_contrMetric : {η' | μ ρ ⊗ η | ρ ν = δ' | μ ν}ᵀ :=
+  contrT_metricTensor_metricTensor_eq_dual_unit
 
 /-- The contraction of the contravariant metric with the covariant metric is the unit
 `{η | μ ρ ⊗ η' | ρ ν = δ | μ ν}ᵀ`.
 -/
-lemma contrMetric_contr_coMetric : {η | μ ρ ⊗ η' | ρ ν = δ | μ ν}ᵀ := by
-  exact contrT_metricTensor_metricTensor_eq_dual_unit
+lemma contrMetric_contr_coMetric : {η | μ ρ ⊗ η' | ρ ν = δ | μ ν}ᵀ :=
+  contrT_metricTensor_metricTensor_eq_dual_unit
 
 /-- The contraction of the left metric with the dual-left metric is the unit
 `{εL | α β ⊗ εL' | β γ = δL | α γ}ᵀ`.
 -/
-lemma leftMetric_contr_dualLeftMetric : {εL | α β ⊗ εL' | β γ = δL | α γ}ᵀ := by
-  exact contrT_metricTensor_metricTensor_eq_dual_unit
+lemma leftMetric_contr_dualLeftMetric : {εL | α β ⊗ εL' | β γ = δL | α γ}ᵀ :=
+  contrT_metricTensor_metricTensor_eq_dual_unit
 
 /-- The contraction of the right metric with the dual-right metric is the unit
 `{εR | α β ⊗ εR' | β γ = δR | α γ}ᵀ`.
 -/
-lemma rightMetric_contr_dualRightMetric : {εR | α β ⊗ εR' | β γ = δR | α γ}ᵀ := by
-  exact contrT_metricTensor_metricTensor_eq_dual_unit
+lemma rightMetric_contr_dualRightMetric : {εR | α β ⊗ εR' | β γ = δR | α γ}ᵀ :=
+  contrT_metricTensor_metricTensor_eq_dual_unit
 
 /-- The contraction of the dual-left metric with the left metric is the unit
 `{εL' | α β ⊗ εL | β γ = δL' | α γ}ᵀ`.
 -/
-lemma dualLeftMetric_contr_leftMetric : {εL' | α β ⊗ εL | β γ = δL' | α γ}ᵀ := by
-  exact contrT_metricTensor_metricTensor_eq_dual_unit
+lemma dualLeftMetric_contr_leftMetric : {εL' | α β ⊗ εL | β γ = δL' | α γ}ᵀ :=
+  contrT_metricTensor_metricTensor_eq_dual_unit
 
 /-- The contraction of the dual-right metric with the right metric is the unit
 `{εR' | α β ⊗ εR | β γ = δR' | α γ}ᵀ`.
 -/
-lemma dualRightMetric_contr_rightMetric : {εR' | α β ⊗ εR | β γ = δR' | α γ}ᵀ := by
-  exact contrT_metricTensor_metricTensor_eq_dual_unit
+lemma dualRightMetric_contr_rightMetric : {εR' | α β ⊗ εR | β γ = δR' | α γ}ᵀ :=
+  contrT_metricTensor_metricTensor_eq_dual_unit
 
 /-!
 

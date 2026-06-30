@@ -72,8 +72,8 @@ instance : TopologicalSpace (Contr d) := TopologicalSpace.induced
   ContrMod.toFin1dℝEquiv (Pi.topologicalSpace)
 
 lemma continuous_contr {T : Type} [TopologicalSpace T] (f : T → Contr d)
-    (h : Continuous (fun i => (f i).toFin1dℝ)) : Continuous f := by
-  exact continuous_induced_rng.mpr h
+    (h : Continuous (fun i => (f i).toFin1dℝ)) : Continuous f :=
+  continuous_induced_rng.mpr h
 
 set_option backward.isDefEq.respectTransparency false in
 lemma contr_continuous {T : Type} [TopologicalSpace T] (f : Contr d → T)

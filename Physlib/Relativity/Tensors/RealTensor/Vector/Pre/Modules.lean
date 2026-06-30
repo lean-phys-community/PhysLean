@@ -290,8 +290,8 @@ instance : TopologicalSpace (ContrMod d) := TopologicalSpace.induced
 
 open Topology
 
-lemma toFin1dℝEquiv_isInducing : IsInducing (@ContrMod.toFin1dℝEquiv d) := by
-  exact { eq_induced := rfl }
+lemma toFin1dℝEquiv_isInducing : IsInducing (@ContrMod.toFin1dℝEquiv d) :=
+  { eq_induced := rfl }
 
 lemma toFin1dℝEquiv_symm_isInducing : IsInducing ((@ContrMod.toFin1dℝEquiv d).symm) := by
   let x := Equiv.toHomeomorphOfIsInducing (@ContrMod.toFin1dℝEquiv d).toEquiv

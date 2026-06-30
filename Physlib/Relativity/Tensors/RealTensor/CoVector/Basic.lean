@@ -158,8 +158,8 @@ lemma basis_repr_apply {d : ℕ} (p : CoVector d) (μ : Fin 1 ⊕ Fin d) :
   erw [Pi.basisFun_repr]
 
 lemma map_apply_eq_basis_mulVec {d : ℕ} (f : CoVector d →ₗ[ℝ] CoVector d) (p : CoVector d) :
-    (f p) = (LinearMap.toMatrix basis basis) f *ᵥ p := by
-  exact Eq.symm (LinearMap.toMatrix_mulVec_repr basis basis f p)
+    (f p) = (LinearMap.toMatrix basis basis) f *ᵥ p :=
+  Eq.symm (LinearMap.toMatrix_mulVec_repr basis basis f p)
 
 end CoVector
 
