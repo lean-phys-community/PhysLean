@@ -62,8 +62,8 @@ theorem peierls_inequality (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : Conv
       convert! hg.map_sum_le _ _ _ <;> simp_all [mul_comm]
     convert! Finset.sum_le_sum fun i _ => h_jensen i using 1
     rw [Finset.sum_comm, Finset.sum_congr rfl]; intros; rw [Finset.mul_sum]; ac_rfl
-  have h_unitary : ∀ (j : d), ∑ i, ‖(A.H.eigenvectorUnitary.val i j)‖^2 = 1 := by
-    exact fun j => Matrix.unitaryGroup_row_norm (H A).eigenvectorUnitary j
+  have h_unitary : ∀ (j : d), ∑ i, ‖(A.H.eigenvectorUnitary.val i j)‖^2 = 1 :=
+    fun j => Matrix.unitaryGroup_row_norm (H A).eigenvectorUnitary j
   simp_all [trace_cfc_eq]
 
 theorem peierls_inequality_ici (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : ConvexOn ℝ (Set.Ici 0) g)
@@ -101,8 +101,8 @@ theorem peierls_inequality_ici (A : HermitianMat d ℂ) (g : ℝ → ℝ) (hg : 
         exact A.eigenvalues_nonneg hA i
     convert! Finset.sum_le_sum fun i _ => h_jensen i using 1
     rw [Finset.sum_comm, Finset.sum_congr rfl]; intros; rw [Finset.mul_sum]; ac_rfl
-  have h_unitary : ∀ (j : d), ∑ i, ‖(A.H.eigenvectorUnitary.val i j)‖^2 = 1 := by
-    exact fun j => Matrix.unitaryGroup_row_norm (H A).eigenvectorUnitary j
+  have h_unitary : ∀ (j : d), ∑ i, ‖(A.H.eigenvectorUnitary.val i j)‖^2 = 1 :=
+    fun j => Matrix.unitaryGroup_row_norm (H A).eigenvectorUnitary j
   simp_all [trace_cfc_eq]
 
 /--
@@ -116,8 +116,8 @@ theorem trace_function_convex_univ (g : ℝ → ℝ) (hg : ConvexOn ℝ Set.univ
   -- Let $C = aA + bB$.
   set C : HermitianMat d ℂ := a • A + b • B
   -- By the properties of the trace and the convexity of $g$, we have:
-  have h_trace : (C.cfc g).trace = ∑ i, g (C.H.eigenvalues i) := by
-    exact trace_cfc_eq C g
+  have h_trace : (C.cfc g).trace = ∑ i, g (C.H.eigenvalues i) :=
+    trace_cfc_eq C g
   have h_sum : ∑ i, g (C.H.eigenvalues i) ≤
       a * ∑ i, g ((A.conj (star C.H.eigenvectorUnitary.val)).mat i i).re +
       b * ∑ i, g ((B.conj (star C.H.eigenvectorUnitary.val)).mat i i |> Complex.re) := by
@@ -174,8 +174,8 @@ theorem trace_function_convex_ici {g : ℝ → ℝ} (hg : ConvexOn ℝ (Set.Ici 
   -- Let $C = aA + bB$.
   set C : HermitianMat d ℂ := a • A + b • B
   -- By the properties of the trace and the convexity of $g$, we have:
-  have h_trace : (C.cfc g).trace = ∑ i, g (C.H.eigenvalues i) := by
-    exact trace_cfc_eq C g
+  have h_trace : (C.cfc g).trace = ∑ i, g (C.H.eigenvalues i) :=
+    trace_cfc_eq C g
   have h_sum : ∑ i, g (C.H.eigenvalues i) ≤
       a * ∑ i, g ((A.conj (star C.H.eigenvectorUnitary.val)).mat i i).re +
       b * ∑ i, g ((B.conj (star C.H.eigenvectorUnitary.val)).mat i i).re := by

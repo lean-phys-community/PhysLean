@@ -255,8 +255,8 @@ private lemma variational_eq_optimizer
   have h_exp : (X ^ p) ^ ((p - 1) / p) = X ^ (p - 1) := by
     rw [← rpow_mul hX, mul_div_cancel₀ _ (by positivity)]
   have h_inner : ⟪X, X ^ (p - 1)⟫_ℝ = (X ^ p).trace := by
-    have h_inner : ⟪X, X ^ (p - 1)⟫_ℝ = (X * (X ^ (p - 1)).mat).trace.re := by
-      exact Real.ext_cauchy rfl
+    have h_inner : ⟪X, X ^ (p - 1)⟫_ℝ = (X * (X ^ (p - 1)).mat).trace.re :=
+      Real.ext_cauchy rfl
     convert h_inner using 1
     have h_exp : (X ^ p).mat = X.mat * (X ^ (p - 1)).mat := by
       convert mat_rpow_add hX _
@@ -294,8 +294,8 @@ private lemma liebExtension_bridge [Nonempty d]
     rw [← traceRe_Φ_general]
     simp [liebExtensionTraceMap, Φ_rpow, hσ, hZ]
     rw [show star (Φ K.mat) = Φ K.mat from ?_]
-    have h_rewrite : IsSelfAdjoint (Φ K.mat) := by
-      exact Φ_isSelfAdjoint K
+    have h_rewrite : IsSelfAdjoint (Φ K.mat) :=
+      Φ_isSelfAdjoint K
     exact h_rewrite
   convert! h_joint_concave (Φ_mem_pdSet σ₁ hσ₁) (Φ_mem_pdSet σ₂ hσ₂)
     (Φ_mem_pdSet Z₁ hZ₁) (Φ_mem_pdSet Z₂ hZ₂) hθ₀ hθ₁ using 1
