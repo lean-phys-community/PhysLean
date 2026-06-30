@@ -365,12 +365,10 @@ theorem conj_conj {m l} [Fintype m] (B : Matrix m n α) (C : Matrix l m α) :
 variable (B : HermitianMat n α)
 
 @[simp]
-theorem conj_zero [DecidableEq n] : A.conj (0 : Matrix m n α) = 0 := by
-  simp [conj_apply]
+theorem conj_zero [DecidableEq n] : A.conj (0 : Matrix m n α) = 0 := by simp [conj_apply]
 
 @[simp]
-theorem conj_one [DecidableEq n] : A.conj 1 = A := by
-  simp [conj_apply]
+theorem conj_one [DecidableEq n] : A.conj 1 = A := by simp [conj_apply]
 
 @[simp]
 lemma conj_one_unitary [DecidableEq n] (U : Matrix.unitaryGroup n α) :
@@ -416,12 +414,10 @@ theorem isSymmetric : A.lin.IsSymmetric :=
   Matrix.isSymmetric_toEuclideanLin_iff.symm.mp A.H
 
 @[simp]
-theorem lin_zero : (0 : HermitianMat n 𝕜).lin = 0 := by
-  simp [lin]; rfl
+theorem lin_zero : (0 : HermitianMat n 𝕜).lin = 0 := by simp [lin]; rfl
 
 @[simp]
-theorem lin_one : (1 : HermitianMat n 𝕜).lin = 1 := by
-  simp [lin]; rfl
+theorem lin_one : (1 : HermitianMat n 𝕜).lin = 1 := by simp [lin]; rfl
 
 noncomputable def eigenspace (μ : 𝕜) : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   Module.End.eigenspace A.lin μ
@@ -440,12 +436,10 @@ theorem ker_eq_eigenspace_zero : A.ker = A.eigenspace 0 := by
   simp [ker, eigenspace]
 
 @[simp]
-theorem ker_zero : (0 : HermitianMat n 𝕜).ker = ⊤ := by
-  simp [ker]
+theorem ker_zero : (0 : HermitianMat n 𝕜).ker = ⊤ := by simp [ker]
 
 @[simp]
-theorem ker_one : (1 : HermitianMat n 𝕜).ker = ⊥ := by
-  simp [ker]; rfl
+theorem ker_one : (1 : HermitianMat n 𝕜).ker = ⊥ := by simp [ker]; rfl
 
 theorem ker_pos_smul {c : ℝ} (hc : c ≠ 0) : (c • A).ker = A.ker := by
   ext x
@@ -461,8 +455,7 @@ theorem support_eq_sup_eigenspace_nonzero : A.support = ⨆ μ ≠ 0, A.eigenspa
   A.lin.support_eq_sup_eigenspace_nonzero A.isSymmetric
 
 @[simp]
-theorem support_zero : (0 : HermitianMat n 𝕜).support = ⊥ := by
-  simp [support]
+theorem support_zero : (0 : HermitianMat n 𝕜).support = ⊥ := by simp [support]
 
 @[simp]
 theorem support_one : (1 : HermitianMat n 𝕜).support = ⊤ := by
