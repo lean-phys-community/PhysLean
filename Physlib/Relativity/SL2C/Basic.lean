@@ -200,8 +200,7 @@ lemma toSelfAdjointMap_pauliBasis (i : Fin 1 ⊕ Fin 3) :
   funext j
   rw [smul_smul, PauliMatrix.pauliBasis_minkowskiMetric_pauliBasis', smul_smul]
   apply congrFun
-  apply congrArg
-  exact Eq.symm (minkowskiMatrix.dual_apply_minkowskiMatrix ((toLorentzGroup M).1) i j)
+  exact congrArg _ (Eq.symm (minkowskiMatrix.dual_apply_minkowskiMatrix ((toLorentzGroup M).1) i j))
 
 /-- The first column of the Lorentz matrix formed from an element of `SL(2, ℂ)`. -/
 lemma toLorentzGroup_fst_col (M : SL(2, ℂ)) :

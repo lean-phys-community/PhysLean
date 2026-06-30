@@ -408,8 +408,8 @@ to the energy observable. -/
 lemma integral_energy_bolt
     {ι} [MeasurableSpace ι] (𝓒 : CanonicalEnsemble ι) (T : Temperature) :
     ∫ x, 𝓒.energy x ∂ 𝓒.μBolt T
-      = ∫ x, 𝓒.energy x * Real.exp (-T.β * 𝓒.energy x) ∂ 𝓒.μ := by
-  exact integral_bolt_eq_integral_mul_exp 𝓒 T 𝓒.energy
+      = ∫ x, 𝓒.energy x * Real.exp (-T.β * 𝓒.energy x) ∂ 𝓒.μ :=
+  integral_bolt_eq_integral_mul_exp 𝓒 T 𝓒.energy
 
 /-- The mean energy can be expressed as a ratio of integrals. -/
 lemma meanEnergy_eq_ratio_of_integrals
@@ -426,8 +426,8 @@ lemma meanEnergy_eq_ratio_of_integrals
     integral_energy_bolt (𝓒:=𝓒) (T:=T)
   have h_den :
       (𝓒.μBolt T Set.univ).toReal
-        = ∫ x, Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ := by
-    exact (mathematicalPartitionFunction_eq_integral (𝓒:=𝓒) (T:=T))
+        = ∫ x, Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ :=
+    mathematicalPartitionFunction_eq_integral (𝓒:=𝓒) (T:=T)
   have h_inv_toReal :
       ((𝓒.μBolt T Set.univ)⁻¹).toReal
         = 1 / (𝓒.μBolt T Set.univ).toReal := by

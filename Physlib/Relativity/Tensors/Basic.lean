@@ -102,8 +102,7 @@ lemma congr_mid {n : ℕ} {c : Fin n → C} (c' : C) (p : Pure S c)
   subst hi
   simp only [LinearEquiv.cast_apply, cast_eq]
   symm
-  apply congr_right
-  exact h
+  exact congr_right p i j h
 
 lemma map_mid_move_left {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C} (p : Pure S c)
     (p' : Pure S c1) {c' : C}
