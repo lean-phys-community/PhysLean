@@ -129,8 +129,8 @@ theorem sandwichedTraceFunctional_conj_unitary_hermitian
       (conj U.val A).conj ((conj U.val B).mat) = conj U.val (A.conj B.mat) := by
     intros A B U
     simp [conj]
-    have h_unitary : ∀ (U : Matrix.unitaryGroup d ℂ), U.val * U.val.conjTranspose = 1 := by
-      exact fun U => U.2.2
+    have h_unitary : ∀ (U : Matrix.unitaryGroup d ℂ), U.val * U.val.conjTranspose = 1 :=
+      fun U => U.2.2
     simp [← mul_assoc]
     have := h_unitary U; simp_all [Matrix.mul_assoc, mul_eq_one_comm.mp this]
   simp_all [conj_apply_mat, rpow_conj_unitary]
@@ -267,8 +267,9 @@ Proof: f_α(H_hat, ρ, σ) = α · Tr[(σ^γ ρ σ^γ)^α] - (α-1) · Tr[(σ^γ
 -/
 theorem f_alpha_at_optimizer (hα : 1 < α) (ρ σ : MState d) :
     f_alpha α (H_hat α ρ σ) ρ σ = Q̃_ α(ρ‖σ) := by
-  have h_inner : ⟪ρ.M, H_hat α ρ σ⟫_ℝ = ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace := by
-    exact inner_rho_H_hat hα ρ σ
+  have h_inner : ⟪ρ.M, H_hat α ρ σ⟫_ℝ =
+      ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace :=
+    inner_rho_H_hat hα ρ σ
   have h_conj : (H_hat α ρ σ).conj (σ.M ^ ((α - 1) / (2 * α))).mat =
       (ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ (α - 1) := by
     convert H_hat_conj_sigma (hα := hα) (ρ := ρ) (σ := σ) using 1
@@ -317,8 +318,8 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
           simp [add_comm]
           simp [← Matrix.ext_iff]
           intro i j; exact (by
-          have h_support : A.kerProj + A.supportProj = 1 := by
-            exact kerProj_add_supportProj A
+          have h_support : A.kerProj + A.supportProj = 1 :=
+            kerProj_add_supportProj A
           convert! congr_arg (fun f => f i j) h_support using 1)
         rw [← Matrix.add_mulVec, h_support, Matrix.one_mulVec]
       have hsup : B.mat *ᵥ (A.kerProj.mat *ᵥ x.ofLp) = 0 := by
@@ -326,8 +327,8 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
         have h_support : A.mat * A.kerProj.mat = 0 := by
           have h_support : A.mat * A.kerProj.mat = A.mat * (1 - A.supportProj.mat) := by
             congr
-            have h_support : A.kerProj + A.supportProj = 1 := by
-              exact kerProj_add_supportProj A
+            have h_support : A.kerProj + A.supportProj = 1 :=
+              kerProj_add_supportProj A
             exact eq_sub_of_add_eq <| congr_arg Subtype.val h_support
           rw [h_support, mul_sub, mul_one, sub_eq_zero]
           exact Eq.symm (mul_supportProj_of_ker_le fun ⦃x⦄ a => a)
@@ -342,8 +343,8 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
       · simp [Matrix.mulVec, dotProduct]
       · simp [Matrix.mulVec, dotProduct]
         rfl
-    have h_support : B.mat = B.mat.conjTranspose := by
-      exact B.2.symm
+    have h_support : B.mat = B.mat.conjTranspose :=
+      B.2.symm
     have h_support : (B.mat * A.supportProj.mat).conjTranspose = A.supportProj.mat * B.mat := by
       simp [Matrix.conjTranspose_mul]
     lia
@@ -1241,8 +1242,8 @@ theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
       · use (U.val.conjTranspose.toEuclideanLin x)
         simp_all [ker, Matrix.toEuclideanLin]
         simp_all [lin, Matrix.toLpLin]
-        have h_unitary : (U.val * U.val.conjTranspose) = 1 := by
-          exact U.2.2
+        have h_unitary : (U.val * U.val.conjTranspose) = 1 :=
+          U.2.2
         generalize_proofs at *; (
         apply_fun (U.val.conjTranspose *ᵥ ·) at hx
         simp_all [Matrix.mul_assoc, Matrix.mulVec_mulVec]
@@ -1360,8 +1361,8 @@ theorem sandwichedRenyiEntropy_DPI_gt_one (hα : 1 < α) (ρ σ : MState d₁) (
   calc D̃_ α(Φ ρ‖Φ σ)
     _ = D̃_ α((Φ.purify ((prep ∘ₘ append) ρ)).traceLeft.traceLeft‖
             (Φ.purify ((prep ∘ₘ append) σ)).traceLeft.traceLeft) := by
-        have h_trace (ξ) : Φ ξ = (Φ.purify ((prep ∘ₘ append) ξ)).traceLeft.traceLeft := by
-          exact congr($Φ.purify_trace ξ)
+        have h_trace (ξ) : Φ ξ = (Φ.purify ((prep ∘ₘ append) ξ)).traceLeft.traceLeft :=
+          congr($Φ.purify_trace ξ)
         rw [h_trace ρ, h_trace σ]
     _ = D̃_ α(((ρ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft‖
              ((σ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft) := by
