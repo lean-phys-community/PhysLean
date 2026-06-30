@@ -109,8 +109,8 @@ lemma contrCoContraction_basis' (i j : Fin 1 ⊕ Fin 3) :
   rw [contrCoContraction_hom_tmul]
   simp only [complexContrBasis_toFin13ℂ, complexCoBasis_toFin13ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
-  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
+    (congrFun rfl) (congrFun rfl)
 
 /-- The linear map from complexCo ⊗ complexContr to ℂ given by
     summing over components of covariant Lorentz vector and

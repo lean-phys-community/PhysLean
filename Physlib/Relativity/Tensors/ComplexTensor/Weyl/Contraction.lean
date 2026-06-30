@@ -149,8 +149,8 @@ lemma leftDualContraction_basis (i j : Fin 2) :
   simp only [leftBasis_toFin2ℂ, dualLeftBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
+    (congrFun rfl) (congrFun rfl)
 
 /-- The linear map from DualLeftHandedWeyl ⊗ leftHandedWeyl to ℂ given by
     summing over components of DualLeftHandedWeyl and leftHandedWeyl in the
@@ -175,8 +175,8 @@ lemma dualLeftContraction_basis (i j : Fin 2) :
   simp only [dualLeftBasis_toFin2ℂ, leftBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
+    (congrFun rfl) (congrFun rfl)
 
 /--
 The linear map from `rightHandedWeyl ⊗ DualRightHandedWeyl` to `ℂ` given by
@@ -216,8 +216,8 @@ lemma rightDualContraction_basis (i j : Fin 2) :
   simp only [rightBasis_toFin2ℂ, dualRightBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
+    (congrFun rfl) (congrFun rfl)
 
 /--
   The linear map from DualRightHandedWeyl ⊗ rightHandedWeyl to ℂ given by
@@ -257,8 +257,8 @@ lemma dualRightContraction_basis (i j : Fin 2) :
   simp only [dualRightBasis_toFin2ℂ, rightBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
-  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
+  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
+    (congrFun rfl) (congrFun rfl)
 
 /-!
 
