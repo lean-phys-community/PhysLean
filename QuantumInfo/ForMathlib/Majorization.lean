@@ -355,8 +355,8 @@ lemma prod_le_prod_sorted {n : ℕ} {f : Fin n → ℝ}
   -- And the product is preserved under sorting (it's the same set of values)
   have h_exists_sorted : ∃ (g' : Fin k → Fin n),
       Function.Injective g' ∧ StrictMono g' ∧
-      Finset.image g Finset.univ = Finset.image g' Finset.univ := by
-    exact ⟨Finset.orderEmbOfFin (Finset.image g Finset.univ) (by simp [Finset.card_image_of_injective _ hg]),
+      Finset.image g Finset.univ = Finset.image g' Finset.univ :=
+    ⟨Finset.orderEmbOfFin (Finset.image g Finset.univ) (by simp [Finset.card_image_of_injective _ hg]),
       fun a b h => by simpa using h,
       fun a b h => by simpa using h,
       by ext x; simp⟩

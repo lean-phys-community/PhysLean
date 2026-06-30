@@ -401,8 +401,8 @@ theorem rpowApprox_mono {A B : HermitianMat d ℂ} (hA : A.mat.PosDef) (hB : B.m
   have h_cont_tq : ContinuousOn (fun t : ℝ => t ^ q) (Set.Icc 0 T) :=
     continuousOn_id.rpow_const fun _ _ => Or.inr hq
   have h_cont_const :
-      ContinuousOn (fun t : ℝ => (1 + t)⁻¹ • (1 : HermitianMat d ℂ)) (Set.Icc 0 T) := by
-    exact ((continuousOn_const.add continuousOn_id).inv₀
+      ContinuousOn (fun t : ℝ => (1 + t)⁻¹ • (1 : HermitianMat d ℂ)) (Set.Icc 0 T) :=
+    ((continuousOn_const.add continuousOn_id).inv₀
       (fun t ht => by
         change (1 : ℝ) + t ≠ 0
         linarith [ht.1])).smul continuousOn_const
