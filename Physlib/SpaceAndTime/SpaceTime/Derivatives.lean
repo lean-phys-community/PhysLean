@@ -243,9 +243,8 @@ lemma deriv_commute {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : �
   simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
     ContinuousLinearMap.flip_apply]
   rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt
-    exact hf.contDiffAt
-    simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
+  · exact hf.contDiffAt.isSymmSndFDerivAt
+      (by simp only [minSmoothness_of_isRCLikeNormedField, le_refl])
   · have h1 := hf.differentiable (by norm_cast); fun_prop
   · fun_prop
   · have h1 := hf.differentiable (by norm_cast); fun_prop

@@ -102,8 +102,8 @@ lemma chargeDensity_zero {d : ℕ} {c : SpeedOfLight}:
 lemma chargeDensity_differentiable {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) : Differentiable ℝ ↿(J.chargeDensity c) := by
   rw [chargeDensity_eq_timeSlice]
-  apply timeSlice_differentiable
-  exact Differentiable.fun_const_smul ((SpaceTime.differentiable_vector J).mpr hJ (Sum.inl 0)) _
+  exact timeSlice_differentiable c _
+    (Differentiable.fun_const_smul ((SpaceTime.differentiable_vector J).mpr hJ (Sum.inl 0)) _)
 
 lemma chargeDensity_differentiable_space {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (t : Time) :
@@ -119,8 +119,8 @@ lemma chargeDensity_differentiable_space {d : ℕ} {c : SpeedOfLight} {J : Loren
 lemma chargeDensity_contDiff {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : ContDiff ℝ n J) : ContDiff ℝ n ↿(J.chargeDensity c) := by
   rw [chargeDensity_eq_timeSlice]
-  apply timeSlice_contDiff
-  exact ContDiff.const_smul _ ((SpaceTime.contDiff_vector J).mpr hJ (Sum.inl 0))
+  exact timeSlice_contDiff c _
+    (ContDiff.const_smul _ ((SpaceTime.contDiff_vector J).mpr hJ (Sum.inl 0)))
 
 /-!
 

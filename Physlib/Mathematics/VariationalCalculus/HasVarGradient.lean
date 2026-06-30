@@ -72,8 +72,7 @@ lemma HasVarGradientAt.add (F F' : (X → U) → (X → ℝ))
   obtain ⟨F1,hF1,eq1⟩ := h
   obtain ⟨F2,hF2,eq2⟩ := h'
   apply HasVarGradientAt.intro (F1 + F2)
-  · apply hF1.add (V := ℝ)
-    exact hF2
+  · exact HasVarAdjDerivAt.add (V := ℝ) F F' F1 F2 u hF1 hF2
   · simp
     rw [eq1, eq2]
 
