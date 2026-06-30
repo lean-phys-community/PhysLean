@@ -9,8 +9,8 @@ public import QuantumInfo.States.Mixed.MState
 
 /-! # Unitary operators on quantum state
 
-This file is intended for lemmas about unitary matrices (`Matrix.unitaryGroup`) and how they apply to
-`Bra`s, `Ket`s, and `MState` mixed states.
+This file is intended for lemmas about unitary matrices (`Matrix.unitaryGroup`) and how they
+apply to `Bra`s, `Ket`s, and `MState` mixed states.
 
 This is imported by `CPTPMap` to define things like unitary channels, Kraus operators, and
 complementary channels, so this file itself does not discuss channels yet. -/
@@ -54,20 +54,21 @@ theorem U_conj_spectrum_eq (ρ : MState d) (U : 𝐔[d]) :
 theorem inner_U_conj (ρ σ : MState d) (U : 𝐔[d]) : ⟪U ◃ ρ, U ◃ σ⟫_Prob = ⟪ρ, σ⟫_Prob := by
   simp [U_conj, inner_def]
 
-/-- The **No-cloning theorem**, saying that if states `ψ` and `φ` can both be perfectly cloned using a
-unitary `U` and a fiducial state `f`, and they aren't identical (their inner product is less than 1),
-then the two states must be orthogonal to begin with. In short: only orthogonal states can be simultaneously
-cloned. -/
+/-- The **No-cloning theorem**, saying that if states `ψ` and `φ` can both be perfectly cloned
+using a unitary `U` and a fiducial state `f`, and they aren't identical (their inner product is
+less than 1), then the two states must be orthogonal to begin with. In short: only orthogonal
+states can be simultaneously cloned. -/
 theorem no_cloning {U : 𝐔[d × d]}
-  (hψ : U ◃ pure (ψ ⊗ᵠ f) = pure (ψ ⊗ᵠ ψ))
-  (hφ : U ◃ pure (φ ⊗ᵠ f) = pure (φ ⊗ᵠ φ))
-  (H : ⟪pure ψ, pure φ⟫_Prob < (1 : ℝ)) :
+    (hψ : U ◃ pure (ψ ⊗ᵠ f) = pure (ψ ⊗ᵠ ψ))
+    (hφ : U ◃ pure (φ ⊗ᵠ f) = pure (φ ⊗ᵠ φ))
+    (H : ⟪pure ψ, pure φ⟫_Prob < (1 : ℝ)) :
     ⟪pure ψ, pure φ⟫_Prob = (0 : ℝ) := by
   set ρψ := pure ψ
   set ρφ := pure φ
   have h1 : ⟪ρψ, ρφ⟫_Prob * ⟪ρψ, ρφ⟫_Prob = ⟪pure (ψ ⊗ᵠ ψ), pure (φ ⊗ᵠ φ)⟫_Prob := by
     grind only [pure_prod_pure, prod_inner_prod]
-  have h2 : (⟪pure (ψ ⊗ᵠ ψ), pure (φ ⊗ᵠ φ)⟫_Prob : ℝ) = ⟪U ◃ pure (ψ ⊗ᵠ f), U ◃ pure (φ ⊗ᵠ f)⟫_Prob := by
+  have h2 : (⟪pure (ψ ⊗ᵠ ψ), pure (φ ⊗ᵠ φ)⟫_Prob : ℝ) =
+      ⟪U ◃ pure (ψ ⊗ᵠ f), U ◃ pure (φ ⊗ᵠ f)⟫_Prob := by
     grind only [pure_prod_pure]
   replace h2 : ((pure (ψ ⊗ᵠ ψ)).m * (pure (φ ⊗ᵠ φ)).m).trace.re = (ρψ.m * ρφ.m).trace.re := by
     convert! ← h2
