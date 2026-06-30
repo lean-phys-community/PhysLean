@@ -778,8 +778,8 @@ theorem intermediate_ineq [Nonempty dA] [Nonempty dB] [Nonempty dC]
     convert! S_mat_conj_rhs_eq_one ρAB σBC hρ hσ using 1;
   · have := S_mat_isUnit ρAB σBC hρ hσ;
     cases' this.nonempty_invertible with u hu;
-    have h_pos_semidef : Matrix.PosSemidef ((S_mat ρAB σBC)⁻¹ * (S_mat ρAB σBC * ((ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm).mat * S_mat ρAB σBC - S_mat ρAB σBC * (ρAB ⊗ₖ (σBC.traceLeft)⁻¹).mat * S_mat ρAB σBC) * (S_mat ρAB σBC)⁻¹ᴴ) := by
-      exact Matrix.PosSemidef.mul_mul_conjTranspose_same h (S_mat ρAB σBC)⁻¹;
+    have h_pos_semidef : Matrix.PosSemidef ((S_mat ρAB σBC)⁻¹ * (S_mat ρAB σBC * ((ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm).mat * S_mat ρAB σBC - S_mat ρAB σBC * (ρAB ⊗ₖ (σBC.traceLeft)⁻¹).mat * S_mat ρAB σBC) * (S_mat ρAB σBC)⁻¹ᴴ) :=
+      Matrix.PosSemidef.mul_mul_conjTranspose_same h (S_mat ρAB σBC)⁻¹;
     simp_all [ Matrix.mul_assoc, Matrix.sub_mul, Matrix.mul_sub ];
     simp_all [ Matrix.posSemidef_iff_dotProduct_mulVec, Matrix.IsHermitian ];
     have h_conj : (S_mat ρAB σBC)ᴴ = S_mat ρAB σBC := by
@@ -983,8 +983,8 @@ private lemma MState.approx_by_pd
       constructor <;> simp_all
       · simp_all [ Matrix.IsHermitian, Matrix.conjTranspose_add, Matrix.conjTranspose_smul ];
       · intro x hx_ne_zero
-        have h_pos : 0 < (1 - ε) * (star x ⬝ᵥ A *ᵥ x) + ε * (star x ⬝ᵥ B *ᵥ x) := by
-          exact add_pos_of_nonneg_of_pos ( mul_nonneg ( sub_nonneg.2 <| mod_cast hε.2.le ) <| mod_cast hA.2 x ) <| mul_pos ( mod_cast hε.1 ) <| mod_cast hB.2 hx_ne_zero;
+        have h_pos : 0 < (1 - ε) * (star x ⬝ᵥ A *ᵥ x) + ε * (star x ⬝ᵥ B *ᵥ x) :=
+          add_pos_of_nonneg_of_pos ( mul_nonneg ( sub_nonneg.2 <| mod_cast hε.2.le ) <| mod_cast hA.2 x ) <| mul_pos ( mod_cast hε.1 ) <| mod_cast hB.2 hx_ne_zero;
         convert h_pos using 1 ; simp [ Matrix.add_mulVec ] ; ring_nf!
         simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm, sub_mul, mul_sub ] ; ring!;
     convert! h_pos_def _ _ _ _ _ ⟨ _, _ ⟩ <;> norm_num [ * ];
@@ -994,8 +994,8 @@ private lemma MState.approx_by_pd
     · exact one_div_pos.mpr ( by linarith );
     · exact div_lt_one ( by positivity ) |>.2 ( by linarith )
   · -- Show that the sequence ρn converges to ρ.
-    have h_conv : Filter.Tendsto (fun n => εn n • (MState.uniform : MState d₁).M + (1 - εn n) • ρ.M) Filter.atTop (nhds ρ.M) := by
-      exact le_trans ( Filter.Tendsto.add ( Filter.Tendsto.smul ( tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ( Filter.Tendsto.smul ( tendsto_const_nhds.sub <| tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ) ( by simp );
+    have h_conv : Filter.Tendsto (fun n => εn n • (MState.uniform : MState d₁).M + (1 - εn n) • ρ.M) Filter.atTop (nhds ρ.M) :=
+      le_trans ( Filter.Tendsto.add ( Filter.Tendsto.smul ( tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ( Filter.Tendsto.smul ( tendsto_const_nhds.sub <| tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ) ( by simp );
     rw [ tendsto_iff_dist_tendsto_zero ] at *;
     convert h_conv using 1;
     ext n; simp [ρn, Mixable.mix];
@@ -1007,8 +1007,8 @@ private lemma MState.traceLeft_continuous :
     Continuous (MState.traceLeft : MState (d₁ × d₂) → MState d₂) := by
   -- Since the matrix traceLeft is continuous, the function that maps a state to its partial trace is also continuous.
   have h_traceLeft_cont : Continuous (fun ρ : HermitianMat (d₁ × d₂) ℂ => ρ.traceLeft) := by
-    have h_cont : Continuous (fun ρ : Matrix (d₁ × d₂) (d₁ × d₂) ℂ => ρ.traceLeft) := by
-      exact continuous_pi fun _ => continuous_pi fun _ => continuous_finsetSum _ fun _ _ => continuous_apply _ |> Continuous.comp <| continuous_apply _ |> Continuous.comp <| continuous_id';
+    have h_cont : Continuous (fun ρ : Matrix (d₁ × d₂) (d₁ × d₂) ℂ => ρ.traceLeft) :=
+      continuous_pi fun _ => continuous_pi fun _ => continuous_finsetSum _ fun _ _ => continuous_apply _ |> Continuous.comp <| continuous_apply _ |> Continuous.comp <| continuous_id';
     convert h_cont.comp ( show Continuous fun ρ : HermitianMat ( d₁ × d₂ ) ℂ => ρ.1 from ?_ ) using 1;
     · constructor <;> intro h <;> rw [ continuous_induced_rng ] at * <;> aesop;
     · fun_prop;

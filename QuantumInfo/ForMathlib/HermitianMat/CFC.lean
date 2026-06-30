@@ -785,8 +785,8 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
       exact ⟨ _, h_spectrum_subset, fun B hB => fun x hx => by simpa [ dist_eq_norm ] using Metric.mem_thickening_iff.mp ( hB hx ) ⟩)
     generalize_proofs at *; (
     refine' ⟨ U, hU.1, fun B hB => _ ⟩
-    have h_diff_small : ∀ x ∈ spectrum ℝ B.mat, |g x - h x| ≤ ε / (Real.sqrt (Fintype.card d) + 1) := by
-      exact fun x hx => le_of_lt ( hδ x ( hB.2 hx ) _ ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.left ) ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.right ) ) |> le_trans <| by norm_num;
+    have h_diff_small : ∀ x ∈ spectrum ℝ B.mat, |g x - h x| ≤ ε / (Real.sqrt (Fintype.card d) + 1) :=
+      fun x hx => le_of_lt ( hδ x ( hB.2 hx ) _ ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.left ) ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.right ) ) |> le_trans <| by norm_num;
     generalize_proofs at *; (
     have h_diff_small : ‖B.cfc g - B.cfc h‖ ≤ Real.sqrt (Fintype.card d) * (ε / (Real.sqrt (Fintype.card d) + 1)) := by
       apply_rules [ norm_cfc_sub_le_of_sup_le ];
