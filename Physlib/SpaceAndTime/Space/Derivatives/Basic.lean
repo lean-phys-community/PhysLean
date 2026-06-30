@@ -80,15 +80,15 @@ macro "∂[" i:term "]" : term => `(deriv $i)
 
 lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
-    deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
+    deriv μ f x = fderiv ℝ f x (basis μ) := rfl
 
 lemma deriv_eq_fderiv_fun [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) :
-    deriv μ f = fun x => fderiv ℝ (fun x => f x) x (basis μ) := by rfl
+    deriv μ f = fun x => fderiv ℝ (fun x => f x) x (basis μ) := rfl
 
 lemma deriv_eq_fderiv_basis [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
-    deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
+    deriv μ f x = fderiv ℝ f x (basis μ) := rfl
 
 lemma fderiv_eq_sum_deriv {M d} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (f : Space d → M) (x y : Space d) :

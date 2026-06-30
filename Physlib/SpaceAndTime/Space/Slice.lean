@@ -101,7 +101,7 @@ def slice {d} (i : Fin d.succ) : Space d.succ ≃L[ℝ] ℝ × Space d where
 
 lemma slice_symm_apply {d : ℕ} (i : Fin d.succ) (r : ℝ) (x : Space d) :
     (slice i).symm (r, x) = fun j =>
-      Fin.insertNthEquiv (fun _ => ℝ) i (r, x) j := by rfl
+      Fin.insertNthEquiv (fun _ => ℝ) i (r, x) j := rfl
 
 @[simp]
 lemma slice_symm_apply_self {d : ℕ} (i : Fin d.succ) (r : ℝ) (x : Space d) :

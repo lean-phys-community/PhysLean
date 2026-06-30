@@ -109,13 +109,12 @@ lemma smul_val {d : ℕ} (c : ℝ) (p : Space d) :
 
 @[simp]
 lemma smul_apply {d : ℕ} (c : ℝ) (p : Space d) (i : Fin d) :
-    (c • p) i = c * (p i) := by rfl
+    (c • p) i = c * (p i) := rfl
 
 @[simp]
 lemma smul_vadd_zero {d} (k : ℝ) (v : EuclideanSpace ℝ (Fin d)) :
-    k • (v +ᵥ (0 : Space d)) = (k • v) +ᵥ (0 : Space d) := by
-  ext i
-  simp
+    k • (v +ᵥ (0 : Space d)) = (k • v) +ᵥ (0 : Space d) :=
+  eq_of_apply fun i => by simp
 
 instance {d} : Module ℝ (Space d) where
   one_smul x := eq_of_apply fun i => by simp
@@ -152,8 +151,7 @@ lemma norm_sq_eq {d} (p : Space d) :
   positivity
 
 lemma point_dim_zero_eq (p : Space 0) : p = 0 := by
-  ext i
-  fin_cases i
+  exact eq_of_apply fun i => by fin_cases i
 
 @[simp]
 lemma norm_vadd_zero {d} (v : EuclideanSpace ℝ (Fin d)) :
@@ -188,8 +186,7 @@ noncomputable instance {d} : AddCommGroup (Space d) where
 
 @[simp]
 lemma sub_apply {d} (p q : Space d) (i : Fin d) :
-    (p - q) i = p i - q i := by
-  simp [sub_eq_add_neg, neg_apply, add_apply]
+    (p - q) i = p i - q i := rfl
 
 @[simp]
 lemma sub_val {d} (p q : Space d) :
@@ -197,9 +194,8 @@ lemma sub_val {d} (p q : Space d) :
 
 @[simp]
 lemma vadd_zero_sub_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
-    (v1 +ᵥ (0 : Space d)) - (v2 +ᵥ (0 : Space d)) = (v1 - v2) +ᵥ (0 : Space d) := by
-  ext i
-  simp [sub_apply, vadd_apply]
+    (v1 +ᵥ (0 : Space d)) - (v2 +ᵥ (0 : Space d)) = (v1 - v2) +ᵥ (0 : Space d) :=
+  eq_of_apply fun i => by simp [sub_apply, vadd_apply]
 
 @[simp]
 lemma dist_eq_norm {d} (p q : Space d) :
@@ -231,7 +227,7 @@ lemma inner_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
   ring
 
 lemma inner_apply {d} (p q : Space d) :
-    inner ℝ p q = ∑ i, p i * q i := by rfl
+    inner ℝ p q = ∑ i, p i * q i := rfl
 
 instance {d} : InnerProductSpace ℝ (Space d) where
   norm_smul_le a x := by
@@ -272,7 +268,7 @@ lemma norm_smul_sphere {d : ℕ} (n : ↑(Metric.sphere (0 : Space d) 1))
 noncomputable instance {d : ℕ} : MeasurableSpace (Space d) := borel (Space d)
 
 instance {d : ℕ} : BorelSpace (Space d) where
-  measurable_eq := by rfl
+  measurable_eq := rfl
 
 /-!
 
@@ -287,8 +283,7 @@ instance {d : ℕ} : BorelSpace (Space d) where
 -/
 
 lemma inner_eq_sum {d} (p q : Space d) :
-    inner ℝ p q = ∑ i, p i * q i := by
-  simp [inner]
+    inner ℝ p q = ∑ i, p i * q i := inner_apply p q
 
 @[simp]
 lemma sum_apply {ι : Type} [Fintype ι] (f : ι → Space d) (i : Fin d) :
@@ -330,34 +325,24 @@ noncomputable def basis {d} : OrthonormalBasis (Fin d) ℝ (Space d) where
   repr := {
     toFun p := WithLp.toLp 2 fun i => p i
     invFun := fun v => ⟨v⟩
-    left_inv := by
-      intro p
-      rfl
-    right_inv := by
-      intro v
-      rfl
-    map_add' := by
-      intro v1 v2
-      rfl
-    map_smul' := by
-      intro c v
-      rfl
+    left_inv := fun p => rfl
+    right_inv := fun v => rfl
+    map_add' := fun v1 v2 => rfl
+    map_smul' := fun c v => rfl
     norm_map' := by
       intro x
       simp [norm_eq, PiLp.norm_eq_of_L2]}
 
 lemma apply_eq_basis_repr_apply {d} (p : Space d) (i : Fin d) :
-    p i = basis.repr p i := by
-  simp [basis]
+    p i = basis.repr p i := rfl
 
 @[simp]
 lemma basis_repr_apply {d} (p : Space d) (i : Fin d) :
-    basis.repr p i = p i := by
-  simp [apply_eq_basis_repr_apply]
+    basis.repr p i = p i := rfl
 
 @[simp]
 lemma basis_repr_symm_apply {d} (v : EuclideanSpace ℝ (Fin d)) (i : Fin d) :
-    basis.repr.symm v i = v i := by rfl
+    basis.repr.symm v i = v i := rfl
 
 lemma basis_apply {d} (i j : Fin d) :
     basis i j = if i = j then 1 else 0 := by
