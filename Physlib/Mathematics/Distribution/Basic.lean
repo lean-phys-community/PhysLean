@@ -26,6 +26,7 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 - `E →d[𝕜] F` is the type of distributions from `E` to `F`.
 - `Distribution.derivative` and `Distribution.fourierTransform` allow us to make sense of these
   operations that might not make sense a priori on general functions.
+- `Distribution.ofFiniteMeasure` is the scalar distribution associated to a finite measure.
 
 ## iii. Table of Content
 
@@ -283,6 +284,7 @@ end Complex
 
 We now define specific distributions, which are used throughout physics. In particular, we define:
 - The constant distribution.
+- Distributions associated to finite measures.
 - The dirac delta distribution.
 - The heaviside step function.
 
@@ -384,7 +386,33 @@ end constant
 
 /-!
 
-### E.2. The dirac delta distribution
+### E.2. Distributions associated to finite measures
+
+Every finite measure has temperate growth, so integrating Schwartz maps against it defines a
+scalar distribution.
+
+-/
+section finiteMeasure
+
+open MeasureTheory
+
+variable [NormedSpace ℝ E] [MeasurableSpace E] [BorelSpace E] [SecondCountableTopology E]
+
+/-- The scalar distribution associated to a finite measure, acting on a Schwartz map by
+integration. -/
+def ofFiniteMeasure (μ : Measure E) [IsFiniteMeasure μ] : E →d[𝕜] 𝕜 :=
+  integralCLM 𝕜 μ
+
+@[simp]
+lemma ofFiniteMeasure_apply (μ : Measure E) [IsFiniteMeasure μ] (η : 𝓢(E, 𝕜)) :
+    ofFiniteMeasure 𝕜 μ η = ∫ x, η x ∂μ :=
+  rfl
+
+end finiteMeasure
+
+/-!
+
+### E.3. The dirac delta distribution
 
 The dirac delta distribution centered at `a : E` is the distribution which takes
 `η` to `η a`. We also define `diracDelta'` which takes in an element of `v` of `F` and
@@ -421,7 +449,7 @@ def diracDelta' (a : E) (v : F) : E →d[𝕜] F :=
 end DiracDelta
 /-!
 
-### E.3. The heviside step function
+### E.4. The heaviside step function
 
 The heaviside step function on `EuclideanSpace ℝ (Fin d.succ)` is the distribution
 from `EuclideanSpace ℝ (Fin d.succ)` to `ℝ` which takes a `η` to the integral of `η` in the
