@@ -377,19 +377,11 @@ lemma time_deriv_magneticFieldMatrix_eq_electricField_mul_propogator {d : ℕ}
   rw [P.electricField_space_deriv_eq_time_deriv, P.electricField_space_deriv_eq_time_deriv]
   conv_rhs =>
     rw [Time.deriv_eq]
-    rw [fderiv_fun_sub (by
-      apply Differentiable.differentiableAt
-      apply Differentiable.const_mul
-      exact electricField_apply_differentiable_time hA _ _) (by
-        apply Differentiable.differentiableAt
-        apply Differentiable.const_mul
-        exact electricField_apply_differentiable_time hA _ _)]
-    rw [fderiv_const_mul (by
-        apply Differentiable.differentiableAt
-        exact electricField_apply_differentiable_time hA _ _)]
-    rw [fderiv_const_mul (by
-        apply Differentiable.differentiableAt
-        exact electricField_apply_differentiable_time hA _ _)]
+    rw [fderiv_fun_sub
+      ((electricField_apply_differentiable_time hA _ _).const_mul _).differentiableAt
+      ((electricField_apply_differentiable_time hA _ _).const_mul _).differentiableAt]
+    rw [fderiv_const_mul (electricField_apply_differentiable_time hA _ _).differentiableAt]
+    rw [fderiv_const_mul (electricField_apply_differentiable_time hA _ _).differentiableAt]
   simp [← Time.deriv_eq]
   field_simp
   ring
@@ -444,12 +436,8 @@ lemma magneticFieldMatrix_eq_propogator_cross_electricField {d : ℕ}
       s.unit i * A.electricField 𝓕.c t x j) + C := by
   apply Space.equal_up_to_const_of_deriv_eq
   · exact magneticFieldMatrix_differentiable A hA (i, j)
-  · apply Differentiable.const_mul
-    apply Differentiable.sub
-    · apply Differentiable.const_mul
-      exact electricField_apply_differentiable hA
-    · apply Differentiable.const_mul
-      exact electricField_apply_differentiable hA
+  · exact (Differentiable.sub ((electricField_apply_differentiable hA).const_mul _)
+      ((electricField_apply_differentiable hA).const_mul _)).const_mul _
   · intro t x
     rw [P.time_deriv_magneticFieldMatrix_eq_electricField_mul_propogator hA t x i j]
     congr
@@ -504,8 +492,7 @@ lemma time_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
     ring_nf
     rfl
     · intro k _
-      apply DifferentiableAt.mul_const
-      exact (hBd k).differentiableAt
+      exact (hBd k).differentiableAt.mul_const _
 
   rw [h1, Finset.mul_sum, Finset.mul_sum,← Finset.sum_neg_distrib]
   field_simp
@@ -521,8 +508,7 @@ lemma time_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
   simp [← Time.deriv_eq]
   · refine DifferentiableAt.fun_sum ?_
     intro k _
-    apply DifferentiableAt.mul_const
-    exact (hBd k).differentiableAt
+    exact (hBd k).differentiableAt.mul_const _
   · change ContDiff ℝ ∞ (fun _ => 0)
     fun_prop
   · exact electricField_differentiable_time (hA.of_le (ENat.LEInfty.out)) x
@@ -560,22 +546,16 @@ lemma space_deriv_electricField_eq_magneticFieldMatrix {d : ℕ}
   field_simp
   any_goals apply Differentiable.differentiableAt
   · exact fieldStrengthMatrix_differentiable_space hA2 t
-  · apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_space hA2 t
+  · exact (fieldStrengthMatrix_differentiable_space hA2 t).mul_const _
   · exact fieldStrengthMatrix_differentiable_time hA2 x
   · intro i _
-    apply Differentiable.differentiableAt
-    apply Differentiable.const_mul
-    apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_space hA2 t
+    exact
+      (((fieldStrengthMatrix_differentiable_space hA2 t).mul_const _).const_mul _).differentiableAt
   · intro i _
-    apply Differentiable.differentiableAt
-    apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_time hA2 x
+    exact ((fieldStrengthMatrix_differentiable_time hA2 x).mul_const _).differentiableAt
   · apply Differentiable.fun_sum
     intro i _
-    apply Differentiable.mul_const
-    exact fieldStrengthMatrix_differentiable_time hA2 x
+    exact (fieldStrengthMatrix_differentiable_time hA2 x).mul_const _
 
 /-!
 
@@ -592,11 +572,8 @@ lemma electricField_eq_propogator_cross_magneticFieldMatrix {d : ℕ}
   have hA2 : ContDiff ℝ 2 A := hA.of_le ENat.LEInfty.out
   apply Space.equal_up_to_const_of_deriv_eq
   · exact electricField_apply_differentiable hA2
-  · apply Differentiable.const_mul
-    apply Differentiable.fun_sum
-    intro j _
-    apply Differentiable.mul_const
-    exact magneticFieldMatrix_differentiable A hA2 (i, j)
+  · exact ((Differentiable.fun_sum fun j _ =>
+      (magneticFieldMatrix_differentiable A hA2 (i, j)).mul_const _).const_mul _)
   · intro t x
     rw [P.time_deriv_electricField_eq_magneticFieldMatrix hA _ t x i]
     congr
