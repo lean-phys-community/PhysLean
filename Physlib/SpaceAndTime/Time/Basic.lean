@@ -287,7 +287,7 @@ lemma dist_eq_val (t1 t2 : Time) :
     dist t1 t2 = ‖t1.val - t2.val‖ := rfl
 
 lemma dist_eq_real_dist (t1 t2 : Time) :
-    dist t1 t2 = dist t1.val t2.val := by rfl
+    dist t1 t2 = dist t1.val t2.val := rfl
 
 instance : SeminormedAddCommGroup Time where
   dist_self t := by simp [dist_eq_real_dist]
@@ -351,7 +351,7 @@ noncomputable instance : DecidableEq Time := fun t1 t2 =>
 instance : MeasurableSpace Time := borel Time
 
 instance : BorelSpace Time where
-  measurable_eq := by rfl
+  measurable_eq := rfl
 
 /-!
 
@@ -439,29 +439,29 @@ lemma volume_eq_basis_addHaar :
 noncomputable def toRealCLM : Time →L[ℝ] ℝ := LinearMap.toContinuousLinearMap
   {
   toFun := Time.val
-  map_add' := by simp
-  map_smul' := by simp }
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl }
 
 /-- The continuous linear equivalence from `Time` to `ℝ`. -/
 noncomputable def toRealCLE : Time ≃L[ℝ] ℝ := LinearEquiv.toContinuousLinearEquiv
   {
   toFun := Time.val
   invFun := fun x => ⟨x⟩
-  left_inv x := by rfl
-  right_inv x := by rfl
-  map_add' := by simp
-  map_smul' := by simp
+  left_inv _ := rfl
+  right_inv _ := rfl
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
   }
 
 /-- The linear isometry equivalence from `Time` to `ℝ`. -/
 noncomputable def toRealLIE : Time ≃ₗᵢ[ℝ] ℝ where
   toFun := Time.val
   invFun := fun x => ⟨x⟩
-  left_inv x := by rfl
-  right_inv x := by rfl
-  map_add' := by simp
-  map_smul' := by simp
-  norm_map' x := rfl
+  left_inv _ := rfl
+  right_inv _ := rfl
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
+  norm_map' _ := rfl
 
 lemma eq_one_smul (t : Time) :
     t = t.val • 1 := Time.ext (by simp [one_val])
