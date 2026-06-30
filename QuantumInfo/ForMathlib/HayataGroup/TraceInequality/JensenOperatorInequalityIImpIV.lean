@@ -1015,8 +1015,8 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
   have hterm_nonpos : (f 0) • (R0 * R0) ≤ (0 : L ℋ) := by
     have hR0sq_nonneg : (0 : L ℋ) ≤ R0 * R0 := by
       simpa [hR0self.star_eq] using star_mul_self_nonneg R0
-    have hneg : (0 : L ℋ) ≤ (- (f 0)) • (R0 * R0) := by
-      exact smul_nonneg (by linarith [hf0]) hR0sq_nonneg
+    have hneg : (0 : L ℋ) ≤ (- (f 0)) • (R0 * R0) :=
+      smul_nonneg (by linarith [hf0]) hR0sq_nonneg
     exact (neg_nonneg.mp (by simpa [neg_smul] using hneg))
   have htop :
       cfcR (ℋ := ℋ) f (star X * A * X) ≤ star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) := by

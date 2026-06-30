@@ -292,8 +292,8 @@ lemma rpow_kron
     rw [← rpow_conj_unitary, Matrix.unitary_kron, conj_kron]
   rw [h_kron_r_pow]
   subst A B
-  have h_kron_r_pow_diag : (diagonal ℂ a ⊗ₖ diagonal ℂ b) ^ r = ((diagonal ℂ a) ^ r) ⊗ₖ ((diagonal ℂ b) ^ r) := by
-    exact rpow_kron_diagonal a b r ha hb
+  have h_kron_r_pow_diag : (diagonal ℂ a ⊗ₖ diagonal ℂ b) ^ r = ((diagonal ℂ a) ^ r) ⊗ₖ ((diagonal ℂ b) ^ r) :=
+    rpow_kron_diagonal a b r ha hb
   rw [h_kron_r_pow_diag, Matrix.unitary_kron]
   rw [rpow_conj_unitary, rpow_conj_unitary, ← conj_kron]
 
@@ -353,8 +353,8 @@ theorem cfc_sq_rpow_eq_cfc_rpow
     convert rfl;
     exact cfc_pow A;
   rw [ h_sqrt ];
-  have h_sqrt : ∀ (f g : ℝ → ℝ), Continuous f → Continuous g → ∀ (A : HermitianMat d 𝕜), (A.cfc f).cfc g = A.cfc (fun x => g (f x)) := by
-    exact fun f g a a A => Eq.symm (cfc_comp_apply A f g);
+  have h_sqrt : ∀ (f g : ℝ → ℝ), Continuous f → Continuous g → ∀ (A : HermitianMat d 𝕜), (A.cfc f).cfc g = A.cfc (fun x => g (f x)) :=
+    fun f g _ _ A => Eq.symm (cfc_comp_apply A f g);
   rw [ h_sqrt ];
   · have h_sqrt : ∀ x : ℝ, 0 ≤ x → (x ^ 2) ^ (p / 2) = x ^ p := by
       intro x hx
@@ -401,8 +401,8 @@ theorem rpowApprox_mono {A B : HermitianMat d ℂ} (hA : A.mat.PosDef) (hB : B.m
       · exact hA.add_posSemidef ( Matrix.PosSemidef.smul ( Matrix.PosSemidef.one ) ht.1.le )
       · exact add_le_add_left hAB _
     exact smul_le_smul_of_nonneg_left (sub_le_sub_left h_inv_antitone _) (Real.rpow_nonneg ht.1.le q)
-  have h_cont_tq : ContinuousOn (fun t : ℝ => t ^ q) (Set.Icc 0 T) := by
-    exact continuousOn_id.rpow_const fun _ _ => Or.inr hq
+  have h_cont_tq : ContinuousOn (fun t : ℝ => t ^ q) (Set.Icc 0 T) :=
+    continuousOn_id.rpow_const fun _ _ => Or.inr hq
   have h_cont_const :
       ContinuousOn (fun t : ℝ => (1 + t)⁻¹ • (1 : HermitianMat d ℂ)) (Set.Icc 0 T) := by
     exact ((continuousOn_const.add continuousOn_id).inv₀
@@ -445,12 +445,12 @@ theorem rpowApprox_eq_cfc_scalar (A : HermitianMat d ℂ) (hA : A.mat.PosDef) (q
           have h_inv_def : (A + t • 1)⁻¹ = (A.cfc (fun u => u + t))⁻¹ := by
             rw [ show ( fun u => u + t ) = ( fun u => u ) + fun u => t from rfl, cfc_add ] ; aesop;
           have h_inv_comp : (A.cfc (fun u => u + t))⁻¹ = A.cfc (fun u => (u + t)⁻¹) := by
-            have h_inv_smul : ∀ {f : ℝ → ℝ} (hf : ∀ i, f (A.H.eigenvalues i) ≠ 0), (A.cfc f)⁻¹ = A.cfc (fun u => (f u)⁻¹) := by
-              exact fun {f} hf => inv_cfc_eq_cfc_inv f hf
+            have h_inv_smul : ∀ {f : ℝ → ℝ} (hf : ∀ i, f (A.H.eigenvalues i) ≠ 0), (A.cfc f)⁻¹ = A.cfc (fun u => (f u)⁻¹) :=
+              fun {f} hf => inv_cfc_eq_cfc_inv f hf
             apply h_inv_smul
             intro i
-            have h_eigenvalue_pos : 0 < A.H.eigenvalues i := by
-              exact Matrix.PosDef.eigenvalues_pos hA i
+            have h_eigenvalue_pos : 0 < A.H.eigenvalues i :=
+              Matrix.PosDef.eigenvalues_pos hA i
             exact ne_of_gt (add_pos h_eigenvalue_pos ht.left);
           rw [h_inv_def, h_inv_comp];
         exact h_inv
@@ -463,8 +463,8 @@ theorem rpowApprox_eq_cfc_scalar (A : HermitianMat d ℂ) (hA : A.mat.PosDef) (q
     have h_integrable : ∀ u : d, IntervalIntegrable (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
       intro u
       have h_integrable : IntervalIntegrable (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
-        have h_pos : 0 < A.H.eigenvalues u := by
-          exact Matrix.PosDef.eigenvalues_pos hA u
+        have h_pos : 0 < A.H.eigenvalues u :=
+          Matrix.PosDef.eigenvalues_pos hA u
         exact ContinuousOn.intervalIntegrable ( by exact ContinuousOn.mul ( continuousOn_id.rpow_const fun x hx => Or.inr <| by linarith ) <| ContinuousOn.sub ( continuousOn_const.div ( continuousOn_const.add continuousOn_id ) fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] ) ( continuousOn_const.div ( continuousOn_const.add continuousOn_id ) fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] ) ) ..;
       exact h_integrable
     exact integral_cfc_eq_cfc_integral _ _ _ h_integrable
@@ -485,8 +485,8 @@ lemma rpowConst_integrableOn (hq : 0 < q) (hq1 : q < 1) :
     IntegrableOn (fun u : ℝ => u ^ (q - 1) / (1 + u)) (Set.Ioi 0) := by
   rw [← Set.Ioc_union_Ioi_eq_Ioi zero_le_one]
   apply IntegrableOn.union
-  · have h_integrable_0_1 : IntegrableOn (fun u : ℝ => u ^ (q - 1)) (Set.Ioc 0 1) := by
-      exact ( intervalIntegral.intervalIntegrable_rpow' ( by linarith ) ).1;
+  · have h_integrable_0_1 : IntegrableOn (fun u : ℝ => u ^ (q - 1)) (Set.Ioc 0 1) :=
+      ( intervalIntegral.intervalIntegrable_rpow' ( by linarith ) ).1;
     apply h_integrable_0_1.mono'
     · apply Measurable.aestronglyMeasurable
       fun_prop
@@ -517,8 +517,8 @@ open MeasureTheory in
 lemma rpowConst_pos (hq : 0 < q) (hq1 : q < 1) : 0 < rpowConst q := by
   unfold rpowConst;
   have h_nonzero : 0 < ∫ u in Set.Ioi (0 : ℝ), u ^ (q - 1) / (1 + u) := by
-    have h_integrable : IntegrableOn (fun u : ℝ => u ^ (q - 1) / (1 + u)) (Set.Ioi (0 : ℝ)) := by
-      exact rpowConst_integrableOn hq hq1
+    have h_integrable : IntegrableOn (fun u : ℝ => u ^ (q - 1) / (1 + u)) (Set.Ioi (0 : ℝ)) :=
+      rpowConst_integrableOn hq hq1
     rw [ integral_pos_iff_support_of_nonneg_ae ];
     · simp [Function.support]
       exact lt_of_lt_of_le ( by norm_num ) ( measure_mono <| show Set.Ioi ( 0 : ℝ ) ⊆ { x : ℝ | ¬x ^ ( q - 1 ) = 0 ∧ ¬1 + x = 0 } ∩ Set.Ioi 0 from fun x hx => ⟨ ⟨ ne_of_gt <| Real.rpow_pos_of_pos hx _, ne_of_gt <| add_pos zero_lt_one hx ⟩, hx ⟩ );
@@ -616,8 +616,8 @@ theorem rpow_le_rpow_of_posDef (hA : A.mat.PosDef) (hAB : A ≤ B)
       convert le_of_tendsto_of_tendsto ( tendsto_rpowApprox hA hq ( lt_of_le_of_ne hq1 hq_eq_one ) ) ( tendsto_rpowApprox ( posDef_of_posDef_le hA hAB ) hq ( lt_of_le_of_ne hq1 hq_eq_one ) ) _ using 1
       generalize_proofs at *; (
       filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using rpowApprox_mono hA ( posDef_of_posDef_le hA hAB ) hAB hq.le T hT |> le_trans <| by aesop;);
-    have h_rpow_pos : 0 < rpowConst q := by
-      exact rpowConst_pos hq ( lt_of_le_of_ne hq1 hq_eq_one );
+    have h_rpow_pos : 0 < rpowConst q :=
+      rpowConst_pos hq ( lt_of_le_of_ne hq1 hq_eq_one );
     simp_all
 
 open ComplexOrder Filter in
@@ -641,16 +641,16 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
           ring_nf
           simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm];
           simp [ Matrix.one_apply]
-        have h_inner_nonneg : 0 ≤ star x ⬝ᵥ A.mat.mulVec x := by
-          exact inner_mulVec_nonneg hA x
+        have h_inner_nonneg : 0 ≤ star x ⬝ᵥ A.mat.mulVec x :=
+          inner_mulVec_nonneg hA x
         have h_inner_pos : 0 < star x ⬝ᵥ x := by
           simp_all
         exact h_inner.symm ▸ add_pos_of_nonneg_of_pos h_inner_nonneg ( mul_pos ( mod_cast hε_pos ) ( mod_cast h_inner_pos ) ) |> lt_of_lt_of_le <| le_rfl;
     have h_pos_def_Bε : (Bε ε).mat.PosDef := by
       convert posDef_of_posDef_le h_pos_def_Aε _ using 1
       exact add_le_add_left hAB _ |> le_trans ( by simp [ Aε ] ) ;
-    have h_le_Aε_Bε : Aε ε ≤ Bε ε := by
-      exact add_le_add_left hAB _ |> le_trans <| by simp [ Bε ] ;
+    have h_le_Aε_Bε : Aε ε ≤ Bε ε :=
+      add_le_add_left hAB _ |> le_trans <| by simp [ Bε ] ;
     exact ⟨h_pos_def_Aε, h_pos_def_Bε, h_le_Aε_Bε⟩
   -- By the continuity of the function $M \mapsto M^q$, we have $(Aε ε)^q \to A^q$ and $(Bε ε)^q \to B^q$ as $\epsilon \to 0^+$.
   have h_cont : Filter.Tendsto (fun ε => (Aε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (A ^ q)) ∧ Filter.Tendsto (fun ε => (Bε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (B ^ q)) := by
@@ -659,8 +659,8 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
       apply rpow_const_continuous hq.le |> Continuous.continuousOn
     refine' ⟨ h_cont.continuousAt ( by simp ) |> fun h => h.tendsto.comp ( tendsto_nhdsWithin_of_tendsto_nhds <| Continuous.tendsto' _ _ _ _ ), h_cont.continuousAt ( by simp ) |> fun h => h.tendsto.comp ( tendsto_nhdsWithin_of_tendsto_nhds <| Continuous.tendsto' _ _ _ _ ) ⟩ <;> continuity;
   -- By the continuity of the function $M \mapsto M^q$, we have $(Aε ε)^q \leq (Bε ε)^q$ for all $\epsilon > 0$.
-  have h_le : ∀ ε > 0, (Aε ε) ^ q ≤ (Bε ε) ^ q := by
-    exact fun ε hε => rpow_le_rpow_of_posDef ( h_pos_def ε hε |>.1 ) ( h_pos_def ε hε |>.2.2 ) hq hq1 |> le_trans <| by simp [ * ] ;
+  have h_le : ∀ ε > 0, (Aε ε) ^ q ≤ (Bε ε) ^ q :=
+    fun ε hε => rpow_le_rpow_of_posDef ( h_pos_def ε hε |>.1 ) ( h_pos_def ε hε |>.2.2 ) hq hq1 |> le_trans <| by simp [ * ] ;
   exact le_of_tendsto_of_tendsto h_cont.1 h_cont.2 ( Filter.eventually_of_mem self_mem_nhdsWithin fun ε hε => h_le ε hε ) |> fun h => by simpa using h;
 
 end LoewnerHeinz
@@ -1223,8 +1223,8 @@ private lemma trace_mul_inv_shift_eq_sum_div {A : HermitianMat d ℂ} (hA : 0 �
     _ = ∑ i, A.H.eigenvalues i / (A.H.eigenvalues i + t) := by
           refine Finset.sum_congr rfl ?_
           intro i hi
-          have hpos : 0 < A.H.eigenvalues i + t := by
-            exact add_pos_of_nonneg_of_pos (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i) ht
+          have hpos : 0 < A.H.eigenvalues i + t :=
+            add_pos_of_nonneg_of_pos (by simpa using (zero_le_iff.mp hA).eigenvalues_nonneg i) ht
           rw [show ((↑(A.H.eigenvalues i) + ↑t : ℂ)) = ↑(A.H.eigenvalues i + t) by simp,
             Complex.normSq_ofReal]
           field_simp [hpos.ne', div_eq_mul_inv]
