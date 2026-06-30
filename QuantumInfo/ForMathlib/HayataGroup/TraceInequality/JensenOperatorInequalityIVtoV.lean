@@ -205,8 +205,8 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
     simpa [Atilde] using blockDiagonal_selfAdjoint (ℋ := ℋ) hA hB
   have hAtilde0 : (0 : L (HSum ℋ)) ≤ Atilde := by
     simpa [Atilde] using blockDiagonal_nonneg (ℋ := ℋ) hA0 hB0
-  have hAtilde_spec : spectrum ℝ Atilde ⊆ Set.Ici (0 : ℝ) := by
-    exact (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) Atilde (ha := hAtilde_sa)).1 hAtilde0
+  have hAtilde_spec : spectrum ℝ Atilde ⊆ Set.Ici (0 : ℝ) :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) Atilde (ha := hAtilde_sa)).1 hAtilde0
   have hXtilde_star_mul :
       star Xtilde * Xtilde =
         blockDiagonal (ℋ := ℋ) (star X * X + star Y * Y) 0 := by

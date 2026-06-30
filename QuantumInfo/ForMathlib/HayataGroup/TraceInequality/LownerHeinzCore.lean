@@ -1363,8 +1363,8 @@ private lemma convexOn_G_rpowIntegrand₀₁_mul {q : NNReal} (hq_real : (q : �
     Real.rpow_nonneg (le_of_lt htpos) _
   have hs : Convex ℝ (Set.Ici (0 : 𝓐)) := convex_Ici (𝕜 := ℝ) (0 : 𝓐)
   have h_aff : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ X - algebraMap ℝ (𝓐) t) := by
-    have hid : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ X) := by
-      exact convexOn_id (𝕜 := ℝ) (s := Set.Ici (0 : 𝓐)) hs
+    have hid : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ X) :=
+      convexOn_id (𝕜 := ℝ) (s := Set.Ici (0 : 𝓐)) hs
     have hconst : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun _ : 𝓐 ↦ -algebraMap ℝ (𝓐) t) :=
       convexOn_const (-algebraMap ℝ (𝓐) t) hs
     simp_all [sub_eq_add_neg]

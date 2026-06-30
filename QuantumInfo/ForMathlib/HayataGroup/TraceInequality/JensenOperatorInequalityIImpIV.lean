@@ -500,8 +500,8 @@ private lemma blockSwap_norm_le_one [Nontrivial ℋ] (X : L ℋ) (hX : ‖X‖ �
   have hSstarSle :
       star (blockSwap (ℋ := ℋ) X) * blockSwap (ℋ := ℋ) X ≤ (1 : L (HSum ℋ)) := by
     simpa [hSstarS] using hDiagLe
-  have hSstarSnonneg : 0 ≤ star (blockSwap (ℋ := ℋ) X) * blockSwap (ℋ := ℋ) X := by
-    exact star_mul_self_nonneg (blockSwap (ℋ := ℋ) X)
+  have hSstarSnonneg : 0 ≤ star (blockSwap (ℋ := ℋ) X) * blockSwap (ℋ := ℋ) X :=
+    star_mul_self_nonneg (blockSwap (ℋ := ℋ) X)
   have hnormSq : ‖star (blockSwap (ℋ := ℋ) X) * blockSwap (ℋ := ℋ) X‖ ≤ 1 :=
     (CStarAlgebra.norm_le_one_iff_of_nonneg _ hSstarSnonneg).2 hSstarSle
   have hnormSq' : ‖blockSwap (ℋ := ℋ) X‖ * ‖blockSwap (ℋ := ℋ) X‖ ≤ 1 := by
@@ -559,8 +559,8 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
     simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
   letI : Algebra ℝ (L (HSum ℋ)) := by
     infer_instance
-  have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) := by
-    exact IsSelfAdjoint.self_add_I_smul_cfcSqrt_sub_sq_mem_unitary S hSsa hSnorm
+  have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) :=
+    IsSelfAdjoint.self_add_I_smul_cfcSqrt_sub_sq_mem_unitary S hSsa hSnorm
   let U : unitary (L (HSum ℋ)) :=
     ⟨S + Complex.I • CFC.sqrt (1 - S ^ 2), hU_mem⟩
   let V : unitary (L (HSum ℋ)) := star U
@@ -786,8 +786,8 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
   have hterm_nonpos : (f 0) • (R0 * R0) ≤ (0 : L ℋ) := by
     have hR0sq_nonneg : (0 : L ℋ) ≤ R0 * R0 := by
       simpa [hR0self.star_eq] using star_mul_self_nonneg R0
-    have hneg : (0 : L ℋ) ≤ (- (f 0)) • (R0 * R0) := by
-      exact smul_nonneg (by linarith [hf0]) hR0sq_nonneg
+    have hneg : (0 : L ℋ) ≤ (- (f 0)) • (R0 * R0) :=
+      smul_nonneg (by linarith [hf0]) hR0sq_nonneg
     exact (neg_nonneg.mp (by simpa [neg_smul] using hneg))
   have htop :
       cfcR (ℋ := ℋ) f (star X * A * X) ≤ star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) := by
@@ -813,8 +813,8 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
     simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
   letI : Algebra ℝ (L (HSum ℋ)) := by
     infer_instance
-  have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) := by
-    exact IsSelfAdjoint.self_add_I_smul_cfcSqrt_sub_sq_mem_unitary S hSsa hSnorm
+  have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) :=
+    IsSelfAdjoint.self_add_I_smul_cfcSqrt_sub_sq_mem_unitary S hSsa hSnorm
   let U : unitary (L (HSum ℋ)) :=
     ⟨S + Complex.I • CFC.sqrt (1 - S ^ 2), hU_mem⟩
   let V : unitary (L (HSum ℋ)) := star U
