@@ -135,8 +135,7 @@ lemma update_eq_function_update {n : ℕ} {c : Fin n → C} [inst : DecidableEq 
 
 @[simp]
 lemma update_same {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c) (i : Fin n)
-    (x : V (c i)) : (update p i x) i = x := by
-  simp [update]
+    (x : V (c i)) : (update p i x) i = x := by simp [update]
 
 lemma update_diff {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c) (i j : Fin n)
     (x : V (c i)) (hij : i ≠ j) : (update p i x) j = p j := by
@@ -154,14 +153,13 @@ lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : Decidable
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (x y : V (c i)) :
-    (update p i (x + y)).toTensor = (update p i x).toTensor + (update p i y).toTensor := by
-  simp [toTensor, update]
+    (update p i (x + y)).toTensor =
+      (update p i x).toTensor + (update p i y).toTensor := by simp [toTensor, update]
 
 @[simp]
 lemma toTensor_update_smul {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (r : k) (y : V (c i)) :
-    (update p i (r • y)).toTensor = r • (update p i y).toTensor := by
-  simp [toTensor, update]
+    (update p i (r • y)).toTensor = r • (update p i y).toTensor := by simp [toTensor, update]
 
 /-- Given a list of indices `c` of length `n + 1`, a pure tensor `p` and an `i : Fin (n + 1)`, then
   `drop p i` is the tensor `p` with it's `i`th part dropped.
@@ -328,8 +326,7 @@ def ofComponents {n : ℕ} (c : Fin n → C) :
   toFun f := ∑ b, f b • (Pure.basisVector c b).toTensor
   map_add' fb gb := by
     simp [add_smul, Finset.sum_add_distrib]
-  map_smul' fb r := by
-    simp [smul_smul, Finset.smul_sum]
+  map_smul' fb r := by simp [smul_smul, Finset.smul_sum]
 
 @[simp]
 lemma componentMap_ofComponents {n : ℕ} (c : Fin n → C) (f : ComponentIdx c → k) :
@@ -530,8 +527,7 @@ lemma actionT_smul {g : G} {r : k} {t : S.Tensor c} :
   rw [actionT_eq, actionT_eq (S := S)]
   simp
 
-lemma actionT_zero {g : G} : g • (0 : S.Tensor c) = 0 := by
-  simp [actionT_eq]
+lemma actionT_zero {g : G} : g • (0 : S.Tensor c) = 0 := by simp [actionT_eq]
 
 lemma actionT_neg {g : G} {t : S.Tensor c} :
     g • (-t) = -(g • t) := by
@@ -774,8 +770,7 @@ noncomputable def toField {c : Fin 0 → C} : S.Tensor c →ₗ[k] k :=
   (PiTensorProduct.isEmptyEquiv (Fin 0)).toLinearMap
 
 lemma toField_default {c : Fin 0 → C} :
-    toField (Pure.toTensor default : S.Tensor c) = 1 := by
-  simp [toField, Pure.toTensor]
+    toField (Pure.toTensor default : S.Tensor c) = 1 := by simp [toField, Pure.toTensor]
 
 lemma toField_injective {c : Fin 0 → C} :
     Function.Injective (toField : S.Tensor c → k) :=
@@ -804,8 +799,7 @@ lemma toField_basis_default {c : Fin 0 → C} :
   simp [basis_apply]
 
 lemma toField_basis {c : Fin 0 → C} (b : ComponentIdx (S := S) c) :
-    toField (basis c b) = 1 := by
-  simp [basis_apply]
+    toField (basis c b) = 1 := by simp [basis_apply]
 
 lemma toField_eq_repr {c : Fin 0 → C} (t : Tensor S c) :
     t.toField = (basis c).repr t (fun j => Fin.elim0 j) := by
