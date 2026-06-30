@@ -351,7 +351,7 @@ def const [hμ : Measure.HasTemperateGrowth (volume (α := E))] (c : F) : E →d
 
 lemma const_apply [hμ : Measure.HasTemperateGrowth (volume (α := E))] (c : F)
     (η : 𝓢(E, 𝕜)) :
-    const 𝕜 E c η = ∫ x, η x • c ∂MeasureTheory.volume := by rfl
+    const 𝕜 E c η = ∫ x, η x • c ∂MeasureTheory.volume := rfl
 end
 section
 

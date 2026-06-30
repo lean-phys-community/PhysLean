@@ -345,7 +345,7 @@ def flat (g : PseudoRiemannianMetric E H M n I) (x : M) :
 
 @[simp]
 lemma flat_apply (g : PseudoRiemannianMetric E H M n I) (x : M) (v w : TangentSpace I x) :
-    (flat g x v) w = g.val x v w := by rfl
+    (flat g x v) w = g.val x v w := rfl
 
 /-- The musical isomorphism as a continuous linear map. -/
 def flatL (g : PseudoRiemannianMetric E H M n I) (x : M) :

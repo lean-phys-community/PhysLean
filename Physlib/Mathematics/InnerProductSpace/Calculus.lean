@@ -49,6 +49,5 @@ lemma deriv_inner_apply'
 @[fun_prop]
 lemma DifferentiableAt.inner' {f g : E → F} {x}
     (hf : DifferentiableAt ℝ f x) (hg : DifferentiableAt ℝ g x) :
-    DifferentiableAt ℝ (fun x => ⟪f x, g x⟫) x := by
-  apply HasFDerivAt.differentiableAt
-  exact hf.hasFDerivAt.inner' hg.hasFDerivAt
+    DifferentiableAt ℝ (fun x => ⟪f x, g x⟫) x :=
+  (hf.hasFDerivAt.inner' hg.hasFDerivAt).differentiableAt

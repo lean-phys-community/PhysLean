@@ -88,9 +88,7 @@ def mk₂ (f : V × V → ℚ) (map_smul : ∀ a S T, f (a • S, T) = a * f (S,
   swap' := swap
 
 lemma map_smul₁ (f : BiLinearSymm V) (a : ℚ) (S T : V) : f (a • S) T = a * f S T := by
-  have h : f (a • S) = a • (f S) := by
-    exact f.map_smul a S
-  simp [h]
+  exact (congrArg (fun g : V →ₗ[ℚ] ℚ => g T) (f.map_smul a S)).trans (by rfl)
 
 lemma swap (f : BiLinearSymm V) (S T : V) : f S T = f T S := f.swap' S T
 
@@ -98,9 +96,7 @@ lemma map_smul₂ (f : BiLinearSymm V) (a : ℚ) (S : V) (T : V) : f S (a • T)
   rw [f.swap, f.map_smul₁, f.swap]
 
 lemma map_add₁ (f : BiLinearSymm V) (S1 S2 T : V) : f (S1 + S2) T = f S1 T + f S2 T := by
-  have h : f (S1 + S2) = f S1 + f S2 := by
-    exact f.map_add S1 S2
-  simp [h]
+  exact (congrArg (fun g : V →ₗ[ℚ] ℚ => g T) (f.map_add S1 S2)).trans (by rfl)
 
 lemma map_add₂ (f : BiLinearSymm V) (S : V) (T1 T2 : V) :
     f S (T1 + T2) = f S T1 + f S T2 := by
@@ -194,7 +190,7 @@ def mk₃ (f : V × V × V→ ℚ) (map_smul : ∀ a S T L, f (a • S, T, L) = 
     (by
       intro S1 S2 T
       rw [swap₁, map_add, swap₁, swap₁ S2 S T])
-    (by exact fun L T ↦ swap₂ S L T)).toLinearMap
+    (fun L T ↦ swap₂ S L T)).toLinearMap
   map_add' S1 S2 := LinearMap.ext fun T ↦ LinearMap.ext fun L => map_add S1 S2 T L
   map_smul' a S :=
     LinearMap.ext fun T => LinearMap.ext fun L => map_smul a S T L
@@ -212,9 +208,8 @@ lemma swap₃ (f : TriLinearSymm V) (S T L : V) : f S T L = f L T S := by
 
 lemma map_smul₁ (f : TriLinearSymm V) (a : ℚ) (S T L : V) :
     f (a • S) T L = a * f S T L := by
-  have h : f (a • S) = a • (f S) := by
-    exact f.map_smul a S
-  simp [h]
+  exact
+    (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_smul a S)).trans (by rfl)
 
 lemma map_smul₂ (f : TriLinearSymm V) (S : V) (a : ℚ) (T L : V) :
     f S (a • T) L = a * f S T L := by
@@ -226,9 +221,8 @@ lemma map_smul₃ (f : TriLinearSymm V) (S T : V) (a : ℚ) (L : V) :
 
 lemma map_add₁ (f : TriLinearSymm V) (S1 S2 T L : V) :
     f (S1 + S2) T L = f S1 T L + f S2 T L := by
-  have h : f (S1 + S2) = f S1 + f S2 := by
-    exact f.map_add S1 S2
-  simp [h]
+  exact
+    (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_add S1 S2)).trans (by rfl)
 
 lemma map_add₂ (f : TriLinearSymm V) (S T1 T2 L : V) :
     f S (T1 + T2) L = f S T1 L + f S T2 L := by
@@ -242,9 +236,7 @@ lemma map_add₃ (f : TriLinearSymm V) (S T L1 L2 : V) :
 def toLinear₁ (f : TriLinearSymm V) (T L : V) : V →ₗ[ℚ] ℚ where
   toFun S := f S T L
   map_add' S1 S2 := map_add₁ f S1 S2 T L
-  map_smul' a S := by
-    simp only [f.map_smul₁]
-    rfl
+  map_smul' a S := by simp [f.map_smul₁]
 
 lemma toLinear₁_apply (f : TriLinearSymm V) (S T L : V) : f S T L = f.toLinear₁ T L S := rfl
 
