@@ -103,12 +103,10 @@ def scale (r : ℝ) (x : TimeUnit) (hr : 0 < r := by norm_num) : TimeUnit :=
 
 @[simp]
 lemma scale_div_self (x : TimeUnit) (r : ℝ) (hr : 0 < r) :
-    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
-  simp [scale, div_eq_val]
+    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by simp [scale, div_eq_val]
 
 @[simp]
-lemma scale_one (x : TimeUnit) : scale 1 x = x := by
-  simp [scale]
+lemma scale_one (x : TimeUnit) : scale 1 x = x := by simp [scale]
 
 @[simp]
 lemma scale_div_scale (x1 x2 : TimeUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :

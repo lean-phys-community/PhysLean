@@ -105,8 +105,7 @@ def scale (r : ℝ) (x : ChargeUnit) (hr : 0 < r := by norm_num) : ChargeUnit :=
 
 @[simp]
 lemma scale_div_self (x : ChargeUnit) (r : ℝ) (hr : 0 < r) :
-    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
-  simp [scale, div_eq_val]
+    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by simp [scale, div_eq_val]
 
 @[simp]
 lemma self_div_scale (x : ChargeUnit) (r : ℝ) (hr : 0 < r) :
@@ -115,8 +114,7 @@ lemma self_div_scale (x : ChargeUnit) (r : ℝ) (hr : 0 < r) :
   field_simp
 
 @[simp]
-lemma scale_one (x : ChargeUnit) : scale 1 x = x := by
-  simp [scale]
+lemma scale_one (x : ChargeUnit) : scale 1 x = x := by simp [scale]
 
 @[simp]
 lemma scale_div_scale (x1 x2 : ChargeUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
