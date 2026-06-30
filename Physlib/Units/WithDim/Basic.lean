@@ -75,47 +75,31 @@ lemma val_sub {d : Dimension} {M : Type} [Sub M] (m1 m2 : WithDim d M) :
 
 instance (d : Dimension) (M : Type) [AddSemigroup M] :
     AddSemigroup (WithDim d M) where
-  add_assoc m1 m2 m3 := by
-    ext
-    simp [add_assoc]
+  add_assoc m1 m2 m3 := WithDim.ext _ _ (add_assoc m1.val m2.val m3.val)
 
 instance (d : Dimension) (M : Type) [AddCommSemigroup M] :
     AddCommSemigroup (WithDim d M) where
-  add_comm m1 m2 := by
-    ext
-    simp [add_comm]
+  add_comm m1 m2 := WithDim.ext _ _ (add_comm m1.val m2.val)
 
 instance (d : Dimension) (M : Type) [AddMonoid M] :
     AddMonoid (WithDim d M) where
-  zero_add m := by
-    ext
-    simp [zero_add]
-  add_zero m := by
-    ext
-    simp [add_zero]
+  zero_add m := WithDim.ext _ _ (zero_add m.val)
+  add_zero m := WithDim.ext _ _ (add_zero m.val)
   nsmul := nsmulRec
 
 instance (d : Dimension) (M : Type) [AddCommMonoid M] :
     AddCommMonoid (WithDim d M) where
-  add_comm m1 m2 := by
-    ext
-    simp [add_comm]
+  add_comm m1 m2 := WithDim.ext _ _ (add_comm m1.val m2.val)
 
 instance (d : Dimension) (M : Type) [AddGroup M] :
     AddGroup (WithDim d M) where
-  sub_eq_add_neg m1 m2 := by
-    ext
-    simp [sub_eq_add_neg]
-  neg_add_cancel m := by
-    ext
-    simp [neg_add_cancel]
+  sub_eq_add_neg m1 m2 := WithDim.ext _ _ (sub_eq_add_neg m1.val m2.val)
+  neg_add_cancel m := WithDim.ext _ _ (neg_add_cancel m.val)
   zsmul := zsmulRec
 
 instance (d : Dimension) (M : Type) [AddCommGroup M] :
     AddCommGroup (WithDim d M) where
-  add_comm m1 m2 := by
-    ext
-    simp [add_comm]
+  add_comm m1 m2 := WithDim.ext _ _ (add_comm m1.val m2.val)
 
 instance (d : Dimension) (M : Type) [LE M] : LE (WithDim d M) where
   le m1 m2 := m1.val ≤ m2.val
@@ -133,27 +117,20 @@ lemma lt_def {d : Dimension} {M : Type} [LT M] (m1 m2 : WithDim d M) :
 
 instance (d : Dimension) (M : Type) [Preorder M] :
     Preorder (WithDim d M) where
-  le_refl m := by
-    exact le_refl m.val
-  le_trans m1 m2 m3 h12 h23 := by
-    change m1.val ≤ m3.val
-    exact le_trans h12 h23
+  le_refl m := le_refl m.val
+  le_trans m1 m2 m3 h12 h23 := le_trans h12 h23
   lt_iff_le_not_ge m1 m2 := by
     change m1.val < m2.val ↔ m1.val ≤ m2.val ∧ ¬ m2.val ≤ m1.val
     exact lt_iff_le_not_ge
 
 instance (d : Dimension) (M : Type) [PartialOrder M] :
     PartialOrder (WithDim d M) where
-  le_antisymm m1 m2 h12 h21 := by
-    ext
-    exact le_antisymm h12 h21
+  le_antisymm _ _ h12 h21 := WithDim.ext _ _ (le_antisymm h12 h21)
 
 instance (d : Dimension) (M : Type) [MulAction ℝ≥0 M] : MulAction ℝ≥0 (WithDim d M) where
   smul a m := ⟨a • m.val⟩
   one_smul m := ext _ _ (one_smul ℝ≥0 m.val)
-  mul_smul a b m := by
-    ext
-    exact mul_smul a b m.val
+  mul_smul a b m := WithDim.ext _ _ (mul_smul a b m.val)
 
 @[simp]
 lemma smul_val {d : Dimension} {M : Type} [MulAction ℝ≥0 M] (a : ℝ≥0) (m : WithDim d M) :
@@ -182,21 +159,19 @@ open UnitDependent
 
 @[simp]
 lemma val_mul_eq_mul {d1 d2 : Dimension} (m1 : WithDim d1 ℝ) (m2 : WithDim d2 ℝ) :
-    m1.val * m2.val = (m1 * m2).val := by
-  simp only [withDim_hMul_val]
+    m1.val * m2.val = (m1 * m2).val := rfl
 
 @[simp]
 lemma val_pow_two_eq_mul {d1 : Dimension} (m1 : WithDim d1 ℝ) :
     m1.val ^ 2 = (m1 * m1).val := by
-  rw [sq]
-  rfl
+  simp [sq]
 
 @[simp]
 lemma scaleUnit_val_eq_scaleUnit_val {d : Dimension} (M : Type) [MulAction ℝ≥0 M]
     (u1 u2 : UnitChoices) (m1 m2 : WithDim d M) :
     (scaleUnit u1 u2 m1).val = (scaleUnit u1 u2 m2).val ↔ m1.val = m2.val := by
   rw [← WithDim.ext_iff]
-  simp only [scaleUnit_injective]
+  rw [scaleUnit_injective]
   exact WithDim.ext_iff
 
 lemma scaleUnit_val_eq_scaleUnit_val_of_dim_eq {d1 d2 : Dimension} {M : Type} [MulAction ℝ≥0 M]

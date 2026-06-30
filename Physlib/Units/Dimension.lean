@@ -100,9 +100,7 @@ lemma one_temperature : (1 : Dimension).temperature = 0 := rfl
 instance : CommGroup Dimension where
   mul_assoc a b c := by
     ext
-    all_goals
-      simp only [length_mul, time_mul, mass_mul, charge_mul, temperature_mul]
-      ring
+    all_goals simp [add_assoc]
   one_mul a := by
     ext
     all_goals
@@ -117,9 +115,7 @@ instance : CommGroup Dimension where
     all_goals simp
   mul_comm a b := by
     ext
-    all_goals
-      simp only [length_mul, time_mul, mass_mul, charge_mul, temperature_mul]
-      ring
+    all_goals simp [add_comm]
 
 @[simp]
 lemma inv_length (d : Dimension) : d⁻¹.length = -d.length := rfl

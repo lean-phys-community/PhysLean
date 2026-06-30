@@ -81,9 +81,8 @@ structure Time where
 namespace Time
 
 lemma val_injective : Function.Injective val := by
-  intro t1 t2 h
-  ext
-  exact h
+  intro _ _ h
+  exact Time.ext h
 
 /-!
 
@@ -189,13 +188,8 @@ instance : PartialOrder Time where
 
 lemma lt_def (t1 t2 : Time) :
     t1 < t2 ↔ t1.val < t2.val := by
-  constructor
-  · intro h
-    exact lt_iff_le_not_ge.mpr h
-  · intro h
-    apply lt_iff_le_not_ge.mpr
-    simp_all [le_def]
-    apply le_of_lt h
+  change t1.val ≤ t2.val ∧ ¬ t2.val ≤ t1.val ↔ t1.val < t2.val
+  rw [lt_iff_le_not_ge]
 
 /-!
 
@@ -429,8 +423,7 @@ lemma finRank_eq_one : Module.finrank ℝ Time = 1 := by
     simp [one_val]
 
 instance : FiniteDimensional ℝ Time := by
-  refine Module.finite_of_rank_eq_one ?_
-  simp
+  exact Module.finite_of_rank_eq_one rank_eq_one
 
 lemma volume_eq_basis_addHaar :
     (volume (α := Time)) = basis.toBasis.addHaar := by
@@ -468,9 +461,7 @@ noncomputable def toRealLIE : Time ≃ₗᵢ[ℝ] ℝ where
   right_inv x := by rfl
   map_add' := by simp
   map_smul' := by simp
-  norm_map' x := by
-    simp
-    rfl
+  norm_map' x := rfl
 
 lemma eq_one_smul (t : Time) :
     t = t.val • 1 := by
