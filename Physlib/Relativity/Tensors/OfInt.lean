@@ -42,8 +42,7 @@ noncomputable def toTensor {n : ℕ} {c : Fin n → C} (f : TensorInt S c) :
 lemma basis_repr_apply {n : ℕ} {c : Fin n → C}
     (f : TensorInt S c) (b : ComponentIdx c) :
     (Tensor.basis c).repr (toTensor f) b = Int.cast (f b) := by
-  simp only [toTensor, Basis.repr_symm_apply, Basis.repr_linearCombination]
-  rfl
+  simp [toTensor]
 
 end TensorInt
 
