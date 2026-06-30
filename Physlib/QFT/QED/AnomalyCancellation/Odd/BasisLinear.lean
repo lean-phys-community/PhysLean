@@ -106,8 +106,7 @@ section theDeltas
 
 -/
 
-lemma odd_shift_eq (n : ℕ) : (1 + n) + n = 2 * n +1 := by
-  omega
+lemma odd_shift_eq (n : ℕ) : (1 + n) + n = 2 * n +1 := by omega
 
 /-- The inclusion of `Fin n` into `Fin ((n + 1) + n)` via the first `n`.
   This is then casted to `Fin (2 * n + 1)`. -/
@@ -178,8 +177,7 @@ lemma sum_oddShift (S : Fin (2 * n + 1) → ℚ) :
 
 -/
 
-lemma odd_shift_shift_eq (n : ℕ) : ((1+n)+1) + n.succ = 2 * n.succ + 1 := by
-  omega
+lemma odd_shift_shift_eq (n : ℕ) : ((1+n)+1) + n.succ = 2 * n.succ + 1 := by omega
 
 /-- The element representing the first `1` in `Fin (1 + n + 1 + n.succ)` casted
   to `Fin (2 * n.succ + 1)`. -/

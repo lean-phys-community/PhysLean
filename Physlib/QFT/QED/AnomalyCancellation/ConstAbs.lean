@@ -113,8 +113,7 @@ lemma boundary_succ {k : Fin n} (hk : Boundary S k) : S k.succ = - S (0 : Fin n.
   rw [opposite_signs_eq_neg hS (le_of_lt hk.left) (le_of_lt hk.right)] at hn
   linear_combination -(1 * hn)
 
-lemma boundary_split (k : Fin n) : k.succ.val + (n.succ - k.succ.val) = n.succ := by
-  omega
+lemma boundary_split (k : Fin n) : k.succ.val + (n.succ - k.succ.val) = n.succ := by omega
 
 set_option backward.isDefEq.respectTransparency false in
 lemma boundary_accGrav' (k : Fin n) : accGrav n.succ S =

@@ -127,8 +127,7 @@ lemma zero_val : val 0 = 0 := by
   norm_cast
 
 @[simp]
-lemma eq_zero_iff (t : Time) : t = 0 ↔ t.val = 0 := by
-  aesop
+lemma eq_zero_iff (t : Time) : t = 0 ↔ t.val = 0 := by aesop
 
 @[simp]
 lemma one_val : val 1 = 1 := by
@@ -136,8 +135,7 @@ lemma one_val : val 1 = 1 := by
   norm_cast
 
 @[simp]
-lemma eq_one_iff (t : Time) : t = 1 ↔ t.val = 1 := by
-  aesop
+lemma eq_one_iff (t : Time) : t = 1 ↔ t.val = 1 := by aesop
 
 /-!
 
