@@ -716,8 +716,7 @@ theorem _root_.Matrix.IsHermitian.spectrum_rcLike {A : Matrix n n 𝕜} (hA : A.
 of the real spectrum. -/
 @[simp]
 theorem spectrum_rcLike (A : HermitianMat n 𝕜) :
-    spectrum 𝕜 A.mat = RCLike.ofReal '' spectrum ℝ A.mat := by
-  exact A.H.spectrum_rcLike.symm
+    spectrum 𝕜 A.mat = RCLike.ofReal '' spectrum ℝ A.mat := A.H.spectrum_rcLike.symm
 
 theorem ne_zero_iff_ne_zero_spectrum (A : HermitianMat n 𝕜) :
     A ≠ 0 ↔ ∃ x ∈ spectrum ℝ A.mat, x ≠ 0 := by

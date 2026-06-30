@@ -329,8 +329,7 @@ def dual (M : CPTPMap dIn dOut) : CPUMap dOut dIn where
   cp := .dual M.cp
 
 theorem dual_pos (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T) :
-    0 ≤ M.dual T := by
-  exact M.dual.pos_Hermitian hT
+    0 ≤ M.dual T := M.dual.pos_Hermitian hT
 
 /-- The dual of a CPTP map preserves POVMs. Stated here just for two-element POVMs, that is, an
 operator `T` between 0 and 1. -/
@@ -489,8 +488,7 @@ def hermDual (M : PTPMap dIn dOut) : PUMap dOut dIn where
   unital := M.TP.hermDual
 
 theorem hermDual_pos (M : PTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T) :
-    0 ≤ M.hermDual T := by
-  exact M.hermDual.pos_Hermitian hT
+    0 ≤ M.hermDual T := M.hermDual.pos_Hermitian hT
 
 /-- The dual of a PTP map preserves POVMs. Stated here just for two-element POVMs, that is, an
 operator `T` between 0 and 1. -/

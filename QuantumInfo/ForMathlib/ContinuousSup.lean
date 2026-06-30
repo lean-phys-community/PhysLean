@@ -182,8 +182,7 @@ end ContinuousLinearMap
 theorem LinearMap.BilinForm.continuous_iSup_fst
   {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   (f : LinearMap.BilinForm ℝ E) {S : Set E} (hS : Bornology.IsBounded S) :
-    Continuous fun x ↦ ⨆ y : S, f y x := by
-  exact LinearMap.BilinForm.continuous_iSup f.flip hS
+    Continuous fun x ↦ ⨆ y : S, f y x := LinearMap.BilinForm.continuous_iSup f.flip hS
   --Old "direct" proof:
   -- -- Since $f$ is continuous, there exists $C > 0$ such that for all $y \in S$ and $x \in E$, $|f y x| \leq C \|y\| \|x\|$.
   -- obtain ⟨C, hC1, hC2⟩ : ∃ C > 0, ∀ y ∈ S, ∀ x : E, |f y x| ≤ C * ‖y‖ * ‖x‖ := by

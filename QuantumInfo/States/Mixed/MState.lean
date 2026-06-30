@@ -230,8 +230,7 @@ theorem exp_val_sub (A B : HermitianMat d ℂ) :
 /-- If a PSD observable `A` has expectation value of 0 on a state `ρ`, it must entirely contain the
 support of `ρ` in its kernel. -/
 theorem exp_val_eq_zero_iff {A : HermitianMat d ℂ} (hA₁ : 0 ≤ A) :
-    ρ.exp_val A = 0 ↔ ρ.M.support ≤ A.ker := by
-  exact inner_zero_iff ρ.nonneg hA₁
+    ρ.exp_val A = 0 ↔ ρ.M.support ≤ A.ker := inner_zero_iff ρ.nonneg hA₁
 
 /-- If an observable `A` has expectation value of 1 on a state `ρ`, it must entirely contain the
 support of `ρ` in its 1-eigenspace. -/
@@ -722,8 +721,8 @@ theorem eq_of_sum_eq_pure {d : Type*} [Fintype d] [DecidableEq d]
   exact MState.ext h_eq.symm
 
 theorem purity_prod {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] [DecidableEq d₁] [DecidableEq d₂]
-    (ρ₁ : MState d₁) (ρ₂ : MState d₂) : (ρ₁ ⊗ᴹ ρ₂).purity = ρ₁.purity * ρ₂.purity := by
-  exact prod_inner_prod ρ₁ ρ₁ ρ₂ ρ₂
+    (ρ₁ : MState d₁) (ρ₂ : MState d₂) : (ρ₁ ⊗ᴹ ρ₂).purity = ρ₁.purity * ρ₂.purity :=
+  prod_inner_prod ρ₁ ρ₁ ρ₂ ρ₂
 
 theorem pure_eq_pure_iff {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d) :
     pure ψ = pure φ ↔ ∃ z : ℂ, ‖z‖ = 1 ∧ ψ.vec = z • φ.vec := by
@@ -760,8 +759,8 @@ theorem pure_eq_pure_iff {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d)
 
 /-- Two kets are phase-equivalent if and only if their pure states are equal. -/
 theorem PhaseEquiv_iff_pure_eq {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d) :
-    Ket.PhaseEquiv.r ψ φ ↔ MState.pure ψ = MState.pure φ := by
-  exact (pure_eq_pure_iff ψ φ).symm
+    Ket.PhaseEquiv.r ψ φ ↔ MState.pure ψ = MState.pure φ :=
+  (pure_eq_pure_iff ψ φ).symm
 
 /-- `MState.pure` descends to the quotient `KetUpToPhase`. -/
 def pureQ {d : Type*} [Fintype d] [DecidableEq d] : KetUpToPhase d → MState d :=

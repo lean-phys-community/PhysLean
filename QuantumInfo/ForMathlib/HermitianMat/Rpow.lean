@@ -49,8 +49,8 @@ instance instRPow : Pow (HermitianMat d 𝕜) ℝ :=
   ⟨rpow⟩
 
 theorem rpow_conj_unitary (A : HermitianMat d 𝕜) (U : Matrix.unitaryGroup d 𝕜) (r : ℝ) :
-    (HermitianMat.conj U.val A) ^ r = HermitianMat.conj U.val (A ^ r) := by
-  exact A.cfc_conj_unitary (· ^ r) U
+    (HermitianMat.conj U.val A) ^ r = HermitianMat.conj U.val (A ^ r) :=
+  A.cfc_conj_unitary (· ^ r) U
 
 theorem pow_eq_rpow : A ^ r = A.rpow r :=
   rfl
@@ -119,8 +119,7 @@ lemma rpow_zero (A : HermitianMat d 𝕜) : A ^ (0 : ℝ) = 1 := by
   simp [rpow_eq_cfc]
 
 lemma rpow_diagonal (a : d → ℝ) (r : ℝ) :
-  (diagonal ℂ a) ^ r = diagonal ℂ (fun i => a i ^ r) := by
-    exact cfc_diagonal _ _
+  (diagonal ℂ a) ^ r = diagonal ℂ (fun i => a i ^ r) := cfc_diagonal _ _
 
 /-- Keeps in line with our simp-normal form for moving reindex outwards. -/
 @[simp]
@@ -207,8 +206,7 @@ lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-
 
 open ComplexOrder in
 lemma sandwich_le_one (hB : B.mat.PosDef) (h : A ≤ B) :
-    (A.conj (B ^ (-1/2 : ℝ)).mat) ≤ 1 := by
-  exact le_trans (conj_mono h) (sandwich_self hB).le
+    (A.conj (B ^ (-1/2 : ℝ)).mat) ≤ 1 := le_trans (conj_mono h) (sandwich_self hB).le
 
 open ComplexOrder in
 lemma rpow_neg_mul_rpow_self (hA : A.mat.PosDef) (p : ℝ) :
