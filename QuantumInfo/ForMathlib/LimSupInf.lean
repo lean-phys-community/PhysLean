@@ -105,8 +105,8 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
       exact le_trans ( hn _ ( le_of_lt ( h _ le_rfl ) ) ) ( le_of_lt ( hc₂ _ hx_pos _ hz _ ) ));
   -- Define $g(m) = 1/(k(m)+1)$ where $k(m)$ is the index such that $n_{k(m)} \leq m < n_{k(m)+1}$.
   set g : ℕ → ℝ≥0 := fun m => (Nat.findGreatest (fun k => m ≥ n k) m + 1 : ℝ≥0)⁻¹;
-  have hg_pos : ∀ m, g m > 0 := by
-    exact fun m => by positivity;;
+  have hg_pos : ∀ m, g m > 0 :=
+    fun _ => by positivity
   have hg_tendsto_zero : Filter.Tendsto g Filter.atTop (𝓝 0) := by
     -- Since $n$ is strictly monotone, $Nat.findGreatest (fun k => m ≥ n k) m$ tends to infinity as $m$ tends to infinity.
     have h_find_greatest_inf : Filter.Tendsto (fun m => Nat.findGreatest (fun k => m ≥ n k) m) Filter.atTop Filter.atTop := by
@@ -366,8 +366,8 @@ lemma limsup_le_of_block_sequence_bound {α : Type*} (y : ℝ≥0) (f : α → �
     -- Let $k$ be such that $b \in [T_k, T_{k+1})$.
     obtain ⟨k, hk⟩ : ∃ k, T k ≤ b ∧ b < T (k + 1) := by
       -- Since $T$ is strictly increasing and unbounded, the set $\{n \mid T n \leq b\}$ is finite and non-empty.
-      have h_finite : Set.Finite {n | T n ≤ b} := by
-        exact Set.finite_iff_bddAbove.2 ⟨ b, fun n hn => le_trans ( hT.id_le _ ) hn ⟩;
+      have h_finite : Set.Finite {n | T n ≤ b} :=
+        Set.finite_iff_bddAbove.2 ⟨b, fun n hn => le_trans (hT.id_le _) hn⟩
       exact ⟨ Finset.max' ( h_finite.toFinset ) ⟨ K, h_finite.mem_toFinset.mpr a ⟩, h_finite.mem_toFinset.mp ( Finset.max'_mem _ _ ), not_le.mp fun h => not_lt_of_ge ( Finset.le_max' _ _ ( h_finite.mem_toFinset.mpr h ) ) ( Nat.lt_succ_self _ ) ⟩;
     rw [ hg k b hk.1 hk.2 ];
     exact le_trans ( hbound k b hk.1 hk.2 ) ( add_le_add_right ( hK k ( le_of_not_gt fun hk' => by linarith [ hT.monotone hk'.nat_succ_le ] ) ) _ )
@@ -399,8 +399,8 @@ lemma exists_liminf_zero_of_forall_liminf_limsup_le_with_UB (y₁ y₂ : ℝ≥0
       · aesop
       · aesop
   obtain ⟨N0, hN0⟩ : ∃ N0 : ℕ → ℕ, ∀ k, ∀ n ≥ N0 k, f₂ (x k) n ≤ y₂ + (k + 1 : ℝ≥0)⁻¹ := by
-    have h_limsup : ∀ k, Filter.limsup (f₂ (x k)) Filter.atTop ≤ y₂ := by
-      exact fun k => hf₂ _ ( hx.1 k );
+    have h_limsup : ∀ k, Filter.limsup (f₂ (x k)) Filter.atTop ≤ y₂ :=
+      fun k => hf₂ _ (hx.1 k)
     have h_limsup_le : ∀ k, ∀ ε > 0, ∃ N, ∀ n ≥ N, f₂ (x k) n ≤ y₂ + ε := by
       intro k ε hε_pos
       have h_limsup_le : Filter.limsup (f₂ (x k)) Filter.atTop ≤ y₂ := h_limsup k;
