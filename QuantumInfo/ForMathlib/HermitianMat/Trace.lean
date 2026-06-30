@@ -57,24 +57,20 @@ section semiring
 variable [CommSemiring R] [Ring α] [StarAddMonoid α] [Algebra R α] [IsMaximalSelfAdjoint R α]
 
 @[simp]
-theorem trace_zero : (0 : HermitianMat n α).trace = 0 := by
-  simp [trace]
+theorem trace_zero : (0 : HermitianMat n α).trace = 0 := by simp [trace]
 
 @[simp]
-theorem trace_add (A B : HermitianMat n α) : (A + B).trace = A.trace + B.trace := by
-  simp [trace]
+theorem trace_add (A B : HermitianMat n α) : (A + B).trace = A.trace + B.trace := by simp [trace]
 
 end semiring
 section ring
 
 variable [CommRing R] [Ring α] [StarAddMonoid α] [Algebra R α] [IsMaximalSelfAdjoint R α]
 @[simp]
-theorem trace_neg (A : HermitianMat n α) : (-A).trace = -A.trace := by
-  simp [trace]
+theorem trace_neg (A : HermitianMat n α) : (-A).trace = -A.trace := by simp [trace]
 
 @[simp]
-theorem trace_sub (A B : HermitianMat n α) : (A - B).trace = A.trace - B.trace := by
-  simp [trace]
+theorem trace_sub (A B : HermitianMat n α) : (A - B).trace = A.trace - B.trace := by simp [trace]
 
 end ring
 section starring
@@ -151,8 +147,7 @@ theorem trace_eq_one_iff (A : HermitianMat n 𝕜) : A.trace = 1 ↔ A.mat.trace
 
 @[simp]
 theorem trace_reindex (A : HermitianMat n ℂ) (e : n ≃ m) :
-    (A.reindex e).trace = A.trace := by
-  simp [reindex, trace_eq_re_trace]
+    (A.reindex e).trace = A.trace := by simp [reindex, trace_eq_re_trace]
 
 end RCLike
 section partialTrace
@@ -219,12 +214,10 @@ theorem traceRight_smul (r : ℝ) : (r • A).traceRight = r • A.traceRight :=
   ext1; simp
 
 @[simp]
-theorem traceLeft_trace : A.traceLeft.trace = A.trace := by
-  simp [trace_eq_re_trace]
+theorem traceLeft_trace : A.traceLeft.trace = A.trace := by simp [trace_eq_re_trace]
 
 @[simp]
-theorem traceRight_trace : A.traceRight.trace = A.trace := by
-  simp [trace_eq_re_trace]
+theorem traceRight_trace : A.traceRight.trace = A.trace := by simp [trace_eq_re_trace]
 
 end rcLike
 section kron
