@@ -291,15 +291,11 @@ noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M]
 noncomputable instance {M1 M2 : Type} [UnitDependent M2] :
     UnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => scaleUnit u1 u2 (f m1)
-  scaleUnit_trans u1 u2 u3 f := by
-    funext m1
-    exact scaleUnit_trans u1 u2 u3 (f m1)
-  scaleUnit_trans' u1 u2 u3 f := by
-    funext m1
-    exact scaleUnit_trans' u1 u2 u3 (f m1)
-  scaleUnit_id u f := by
-    funext m1
-    exact scaleUnit_id u (f m1)
+  scaleUnit_trans u1 u2 u3 f := funext fun m1 =>
+    scaleUnit_trans u1 u2 u3 (f m1)
+  scaleUnit_trans' u1 u2 u3 f := funext fun m1 =>
+    scaleUnit_trans' u1 u2 u3 (f m1)
+  scaleUnit_id u f := funext fun m1 => scaleUnit_id u (f m1)
 
 @[simp]
 lemma UnitDependent.scaleUnit_apply_fun_right {M1 M2 : Type} [UnitDependent M2]
@@ -314,15 +310,11 @@ noncomputable instance {M1 M2 : Type} [AddCommMonoid M1] [Module ℝ M1]
       toFun m1 := scaleUnit u1 u2 (f m1)
       map_add' m1 m2 := by simp [scaleUnit_add]
       map_smul' := by simp [scaleUnit_smul]}
-  scaleUnit_trans u1 u2 u3 f := by
-    ext m1
-    exact scaleUnit_trans u1 u2 u3 (f m1)
-  scaleUnit_trans' u1 u2 u3 f := by
-    ext m1
-    exact scaleUnit_trans' u1 u2 u3 (f m1)
-  scaleUnit_id u f := by
-    ext m1
-    exact scaleUnit_id u (f m1)
+  scaleUnit_trans u1 u2 u3 f := LinearMap.ext fun m1 =>
+    scaleUnit_trans u1 u2 u3 (f m1)
+  scaleUnit_trans' u1 u2 u3 f := LinearMap.ext fun m1 =>
+    scaleUnit_trans' u1 u2 u3 (f m1)
+  scaleUnit_id u f := LinearMap.ext fun m1 => scaleUnit_id u (f m1)
   scaleUnit_add u1 u2 f1 f2 := by
     ext m
     simp [scaleUnit_add]
@@ -340,15 +332,11 @@ noncomputable instance {M1 M2 : Type} [AddCommGroup M1] [Module ℝ M1]
   scaleUnit u1 u2 f :=
     ContinuousLinearEquiv.arrowCongr (ContinuousLinearEquiv.refl ℝ _)
       (scaleUnitContLinearEquiv u1 u2) f
-  scaleUnit_trans u1 u2 u3 f := by
-    ext m1
-    exact scaleUnit_trans u1 u2 u3 (f m1)
-  scaleUnit_trans' u1 u2 u3 f := by
-    ext m1
-    exact scaleUnit_trans' u1 u2 u3 (f m1)
-  scaleUnit_id u f := by
-    ext m1
-    exact scaleUnit_id u (f m1)
+  scaleUnit_trans u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
+    scaleUnit_trans u1 u2 u3 (f m1)
+  scaleUnit_trans' u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
+    scaleUnit_trans' u1 u2 u3 (f m1)
+  scaleUnit_id u f := ContinuousLinearMap.ext fun m1 => scaleUnit_id u (f m1)
   scaleUnit_add u1 u2 f1 f2 := by simp
   scaleUnit_smul u1 u2 r f := by simp
   scaleUnit_cont u1 u2 := ContinuousLinearEquiv.continuous
