@@ -695,8 +695,7 @@ lemma fst {F'} {F : (X → U) → (X → W×V)}
     HasVarAdjoint
       (fun φ x => (F φ x).1)
       (fun φ x => F' (fun x' => (φ x', 0)) x) where
-  test_fun_preserving _ hφ := by
-    exact IsTestFunction.prod_fst (hF.test_fun_preserving _ hφ)
+  test_fun_preserving _ hφ := IsTestFunction.prod_fst (hF.test_fun_preserving _ hφ)
   test_fun_preserving' y hφ := by
     apply hF.test_fun_preserving'
     fun_prop
@@ -720,8 +719,7 @@ lemma snd {F'} {F : (X → U) → (X → W×V)}
     HasVarAdjoint
       (fun φ x => (F φ x).2)
       (fun φ x => F' (fun x' => (0, φ x')) x) where
-  test_fun_preserving _ hφ := by
-    exact IsTestFunction.prod_snd (hF.test_fun_preserving _ hφ)
+  test_fun_preserving _ hφ := IsTestFunction.prod_snd (hF.test_fun_preserving _ hφ)
   test_fun_preserving' y hφ := by
     apply hF.test_fun_preserving' _
     fun_prop

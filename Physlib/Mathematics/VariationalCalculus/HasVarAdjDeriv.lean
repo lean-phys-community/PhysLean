@@ -66,8 +66,8 @@ lemma apply_smooth_of_smooth {F : (X → U) → (X → V)} {F' : (X → V) → (
   fun_prop
 
 lemma apply_smooth_self {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)} {u : X → U}
-    (h : HasVarAdjDerivAt F F' u) : ContDiff ℝ ∞ (F u) := by
-  exact h.apply_smooth_of_smooth (h.smooth_at)
+    (h : HasVarAdjDerivAt F F' u) : ContDiff ℝ ∞ (F u) :=
+  h.apply_smooth_of_smooth (h.smooth_at)
 
 lemma smooth_R {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)} {u : X → U}
     (h : HasVarAdjDerivAt F F' u) {φ : ℝ → X → U} (hφ : ContDiff ℝ ∞ ↿φ) (x : X) :
@@ -96,8 +96,8 @@ lemma smooth_adjoint {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)
 
 lemma differentiable_linear {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)} {u : X → U}
     (h : HasVarAdjDerivAt F F' u) {φ : ℝ → X → U} (hφ : ContDiff ℝ ∞ ↿φ) (x : X) :
-    Differentiable ℝ (fun s' : ℝ => F (fun x => φ 0 x + s' • deriv (φ · x) 0) x) := by
-  exact fun x => (h.smooth_linear hφ).differentiable (by simp) x
+    Differentiable ℝ (fun s' : ℝ => F (fun x => φ 0 x + s' • deriv (φ · x) 0) x) :=
+  fun x => (h.smooth_linear hφ).differentiable (by simp) x
 
 omit [MeasureSpace X] [InnerProductSpace' ℝ U] [InnerProductSpace' ℝ V] in
 lemma linearize_of_linear {F : (X → U) → (X → V)}

@@ -41,8 +41,8 @@ lemma ι_superCommuteF_eq_zero_of_ι_left_zero (a b : 𝓕.FieldOpFreeAlgebra) (
 -/
 
 lemma ι_superCommuteF_right_zero_of_mem_ideal (a b : 𝓕.FieldOpFreeAlgebra)
-    (h : b ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet) : ι [a, b]ₛF = 0 := by
-  exact ι_superCommuteF_eq_zero_of_ι_right_zero a b ((ι_eq_zero_iff_mem_ideal b).mpr h)
+    (h : b ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet) : ι [a, b]ₛF = 0 :=
+  ι_superCommuteF_eq_zero_of_ι_right_zero a b ((ι_eq_zero_iff_mem_ideal b).mpr h)
 
 lemma ι_superCommuteF_eq_of_equiv_right (a b1 b2 : 𝓕.FieldOpFreeAlgebra) (h : b1 ≈ b2) :
     ι [a, b1]ₛF = ι [a, b2]ₛF := by
