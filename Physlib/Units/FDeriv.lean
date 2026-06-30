@@ -52,10 +52,10 @@ lemma fderiv_isDimensionallyCorrect (f : M1 → M2) (hf : IsDimensionallyCorrect
     IsDimensionallyCorrect (fderiv ℝ f) := by
   simp only [isDimensionallyCorrect_fun_iff]
   intro u1 u2 m
-  ext m'
-  simp only [ContinuousLinearUnitDependent.scaleUnit_apply_fun]
-  rw [fderiv_apply_scaleUnit u1 u2 m (scaleUnit u2 u1 m') f hf f_diff]
-  simp [HasDim.scaleUnit_apply, smul_smul]
+  exact ContinuousLinearMap.ext fun m' => by
+    simp only [ContinuousLinearUnitDependent.scaleUnit_apply_fun]
+    rw [fderiv_apply_scaleUnit u1 u2 m (scaleUnit u2 u1 m') f hf f_diff]
+    simp [HasDim.scaleUnit_apply, smul_smul]
 
 /-- The expression `fderiv ℝ f x dm = v.1` for a fixed `dm` and for
   `v` with dimension `d M2 * (d M1)⁻¹` is dimensionally correct. This is the
