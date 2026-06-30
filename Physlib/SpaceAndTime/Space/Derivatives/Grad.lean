@@ -445,8 +445,7 @@ lemma integrable_isDistBounded_inner_grad_schwartzMap_spherical {d : ℕ}
     change Integrable ((fun x => ⟪f x, Space.grad η x⟫_ℝ) ∘ Subtype.val)
       (.comap (Subtype.val (p := fun x => x ∈ ({0}ᶜ : Set _))) volume)
     rw [← MeasureTheory.integrableOn_iff_comap_subtypeVal]
-    apply Integrable.integrableOn
-    exact integrable_isDistBounded_inner_grad_schwartzMap hf η
+    exact Integrable.integrableOn (integrable_isDistBounded_inner_grad_schwartzMap hf η)
     simp
   have he := (MeasureTheory.Measure.measurePreserving_homeomorphUnitSphereProd
     (volume (α := Space d)))

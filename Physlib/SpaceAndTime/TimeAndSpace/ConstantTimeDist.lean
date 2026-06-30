@@ -210,8 +210,7 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
     · filter_upwards with x
       fun_prop
     · simp [F]
-      have hf : Integrable η (volume.prod volume) := by
-        exact η.integrable
+      have hf : Integrable η (volume.prod volume) := η.integrable
       apply MeasureTheory.Integrable.comp_measurable
       · haveI : (Measure.map (fun t => (t, x₀)) (volume (α := Time))).HasTemperateGrowth := by
           refine { exists_integrable := ?_ }
@@ -1025,8 +1024,7 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
           simp only [one_mul]
           change (fderiv ℝ (η ∘ fun t => (t, x)) t) 1
           rw [fderiv_comp _ (by
-            apply Differentiable.differentiableAt
-            exact η.smooth'.differentiable (by simp))
+            exact (η.smooth'.differentiable (by simp)).differentiableAt)
             (by fun_prop), DifferentiableAt.fderiv_prodMk (by fun_prop) (by fun_prop)]
           simp only [fderiv_fun_id, fderiv_fun_const, Pi.ofNat_apply,
             ContinuousLinearMap.comp_apply, ContinuousLinearMap.prod_apply,

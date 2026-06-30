@@ -210,8 +210,7 @@ lemma schwartzMap_fderiv_left_integrable_slice_symm {d : ℕ} (η : 𝓢(Space d
     simp only [Nat.succ_eq_add_one, one_mul]
     change fderiv ℝ (η ∘ fun r => ((slice i).symm (r, x))) r 1
     rw [fderiv_comp _ (by
-      apply Differentiable.differentiableAt
-      exact η.smooth'.differentiable (by simp))
+      exact (η.smooth'.differentiable (by simp)).differentiableAt)
       (by fun_prop)]
     simp only [Nat.succ_eq_add_one, ContinuousLinearMap.coe_comp, Function.comp_apply,
       fderiv_slice_symm_left_apply]

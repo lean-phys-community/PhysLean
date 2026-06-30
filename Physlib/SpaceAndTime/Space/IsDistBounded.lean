@@ -204,8 +204,7 @@ lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
   by_cases hp' : p = 0
   · subst hp'
     simp only [zpow_zero, mul_one]
-    apply Integrable.norm
-    exact η.integrable
+    exact Integrable.norm η.integrable
   suffices h1 : Integrable (fun x => ‖η x‖ * ‖x‖ ^ (p + d)) (radialAngularMeasure (d := (d + 1))) by
     rw [integrable_radialAngularMeasure_iff] at h1
     convert h1 using 1
