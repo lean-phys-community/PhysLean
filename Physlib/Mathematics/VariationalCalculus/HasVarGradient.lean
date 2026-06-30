@@ -103,9 +103,9 @@ lemma HasVarGradientAt.sum {ι : Type} [Fintype ι] (F : ι → (X → U) → (X
       rfl
     · intro i ι' hp F F' u hu ih
       simp only [Fintype.sum_option]
-      apply HasVarGradientAt.add
-      exact ih none
-      exact hp (fun i_1 => F (some i_1)) (fun i_1 => F' (some i_1)) u hu fun i_1 => ih (some i_1)
+      exact HasVarGradientAt.add _ _ (ih none)
+        (hp (fun i_1 => F (some i_1)) (fun i_1 => F' (some i_1)) u hu fun i_1 =>
+          ih (some i_1))
   exact hp F grad u hu h
 
 lemma HasVarGradientAt.neg {F : (X → U) → (X → ℝ)}

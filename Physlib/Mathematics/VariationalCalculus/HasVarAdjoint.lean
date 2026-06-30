@@ -696,8 +696,7 @@ lemma fst {F'} {F : (X → U) → (X → W×V)}
       (fun φ x => (F φ x).1)
       (fun φ x => F' (fun x' => (φ x', 0)) x) where
   test_fun_preserving _ hφ := by
-    apply IsTestFunction.prod_fst
-    exact hF.test_fun_preserving _ hφ
+    exact IsTestFunction.prod_fst (hF.test_fun_preserving _ hφ)
   test_fun_preserving' y hφ := by
     apply hF.test_fun_preserving'
     fun_prop
@@ -722,8 +721,7 @@ lemma snd {F'} {F : (X → U) → (X → W×V)}
       (fun φ x => (F φ x).2)
       (fun φ x => F' (fun x' => (0, φ x')) x) where
   test_fun_preserving _ hφ := by
-    apply IsTestFunction.prod_snd
-    exact hF.test_fun_preserving _ hφ
+    exact IsTestFunction.prod_snd (hF.test_fun_preserving _ hφ)
   test_fun_preserving' y hφ := by
     apply hF.test_fun_preserving' _
     fun_prop
