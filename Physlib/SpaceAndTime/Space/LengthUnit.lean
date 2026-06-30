@@ -36,8 +36,7 @@ structure LengthUnit where
 namespace LengthUnit
 
 @[simp]
-lemma val_ne_zero (x : LengthUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : LengthUnit) : x.val ≠ 0 := Ne.symm (ne_of_lt x.property)
 
 lemma val_pos (x : LengthUnit) : 0 < x.val := x.property
 

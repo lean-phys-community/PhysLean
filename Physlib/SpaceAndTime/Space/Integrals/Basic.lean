@@ -42,8 +42,8 @@ open InnerProductSpace MeasureTheory
 
 -/
 
-lemma volume_eq_addHaar {d} : (volume (α := Space d)) = Space.basis.toBasis.addHaar := by
-  exact (OrthonormalBasis.addHaar_eq_volume _).symm
+lemma volume_eq_addHaar {d} : (volume (α := Space d)) = Space.basis.toBasis.addHaar :=
+  (OrthonormalBasis.addHaar_eq_volume _).symm
 
 @[simp]
 lemma volume_metricBall_three :
@@ -58,8 +58,7 @@ lemma volume_metricBall_three :
 lemma volume_metricBall_two :
     volume (Metric.ball (0 : Space 2) 1) = ENNReal.ofReal Real.pi := by
   rw [InnerProductSpace.volume_ball_of_dim_even (k := 1)]
-  simp [finrank_eq_dim]
-  simp [finrank_eq_dim]
+  all_goals simp [finrank_eq_dim]
 
 @[simp]
 lemma volume_metricBall_two_real :

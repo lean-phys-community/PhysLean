@@ -69,8 +69,7 @@ def radialAngularMeasure {d : ℕ} : Measure (Space d) :=
 -/
 
 lemma radialAngularMeasure_eq_volume_withDensity {d : ℕ} : radialAngularMeasure =
-    volume.withDensity (fun x : Space d => ENNReal.ofReal (1 / ‖x‖ ^ (d - 1))) := by
-  rfl
+    volume.withDensity (fun x : Space d => ENNReal.ofReal (1 / ‖x‖ ^ (d - 1))) := rfl
 
 @[simp]
 lemma radialAngularMeasure_zero_eq_volume :

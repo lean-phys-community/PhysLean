@@ -116,8 +116,8 @@ lemma distOfFunction_smul_fun {d : ℕ} (f : Space d → F)
 
 lemma distOfFunction_mul_fun {d : ℕ} (f : Space d → ℝ)
     (hf : IsDistBounded f) (c : ℝ) :
-    distOfFunction (fun x => c * f x) (by fun_prop) = c • distOfFunction f hf := by
-  exact distOfFunction_smul_fun f hf c
+    distOfFunction (fun x => c * f x) (by fun_prop) = c • distOfFunction f hf :=
+  distOfFunction_smul_fun f hf c
 
 lemma distOfFunction_neg {d : ℕ} (f : Space d → F)
     (hf : IsDistBounded (fun x => - f x)) :
