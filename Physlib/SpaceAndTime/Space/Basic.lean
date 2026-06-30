@@ -151,7 +151,7 @@ lemma vadd_val {d} (v : EuclideanSpace ℝ (Fin d)) (s : Space d) :
 @[simp]
 lemma vadd_apply {d} (v : EuclideanSpace ℝ (Fin d))
     (s : Space d) (i : Fin d) :
-    (v +ᵥ s) i = v i + s i := by rfl
+    (v +ᵥ s) i = v i + s i := rfl
 
 lemma vadd_transitive {d} (s1 s2 : Space d) :
     ∃ v : EuclideanSpace ℝ (Fin d), v +ᵥ s1 = s2 := by
@@ -160,13 +160,8 @@ lemma vadd_transitive {d} (s1 s2 : Space d) :
   simp
 
 noncomputable instance : AddAction (EuclideanSpace ℝ (Fin d)) (Space d) where
-  zero_vadd s := by
-    ext i
-    simp
-  add_vadd v1 v2 s := by
-    ext i
-    simp only [vadd_apply, PiLp.add_apply]
-    ring
+  zero_vadd s := eq_of_apply fun i => by simp
+  add_vadd v1 v2 s := eq_of_apply fun i => by simp [add_assoc]
 
 /-!
 

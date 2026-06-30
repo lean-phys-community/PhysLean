@@ -68,22 +68,10 @@ lemma add_apply {d : ℕ} (x y : Space d) (i : Fin d) :
   simp [add_val]
 
 instance {d} : AddCommMonoid (Space d) where
-  add_assoc a b c:= by
-    apply eq_of_val
-    simp only [add_val]
-    ring
-  zero_add a := by
-    apply eq_of_val
-    simp only [zero_val, add_val, add_eq_right]
-    rfl
-  add_zero a := by
-    apply eq_of_val
-    simp only [zero_val, add_val, add_eq_left]
-    rfl
-  add_comm a b := by
-    apply eq_of_val
-    simp only [add_val]
-    ring
+  add_assoc a b c := eq_of_apply fun i => by simp [add_assoc]
+  zero_add a := eq_of_apply fun i => by simp
+  add_zero a := eq_of_apply fun i => by simp
+  add_comm a b := eq_of_apply fun i => by simp [add_comm]
   nsmul n a := ⟨fun i => n • a.val i⟩
 
 @[simp]
@@ -92,7 +80,7 @@ lemma nsmul_val {d : ℕ} (n : ℕ) (a : Space d) :
 
 @[simp]
 lemma nsmul_apply {d : ℕ} (n : ℕ) (a : Space d) (i : Fin d) :
-    (n • a) i = n • (a i) := by rfl
+    (n • a) i = n • (a i) := rfl
 
 lemma eq_vadd_zero {d} (s : Space d) :
     ∃ v : EuclideanSpace ℝ (Fin d), s = v +ᵥ (0 : Space d) := by
@@ -130,27 +118,12 @@ lemma smul_vadd_zero {d} (k : ℝ) (v : EuclideanSpace ℝ (Fin d)) :
   simp
 
 instance {d} : Module ℝ (Space d) where
-  one_smul x := by
-    ext i
-    simp
-  mul_smul a b x := by
-    ext i
-    simp only [smul_apply]
-    ring
-  smul_add a x y := by
-    ext i
-    simp only [smul_apply, add_apply]
-    ring
-  smul_zero a := by
-    ext i
-    simp
-  add_smul a b x := by
-    ext i
-    simp only [smul_apply, add_apply]
-    ring
-  zero_smul x := by
-    ext i
-    simp
+  one_smul x := eq_of_apply fun i => by simp
+  mul_smul a b x := eq_of_apply fun i => by simp [mul_assoc]
+  smul_add a x y := eq_of_apply fun i => by simp [mul_add]
+  smul_zero a := eq_of_apply fun i => by simp
+  add_smul a b x := eq_of_apply fun i => by simp [add_mul]
+  zero_smul x := eq_of_apply fun i => by simp
 
 /-!
 
@@ -161,8 +134,7 @@ instance {d} : Module ℝ (Space d) where
 noncomputable instance {d} : Norm (Space d) where
   norm p := √ (∑ i, (p i)^2)
 
-lemma norm_eq {d} (p : Space d) : ‖p‖ = √ (∑ i, (p i) ^ 2) := by
-  rfl
+lemma norm_eq {d} (p : Space d) : ‖p‖ = √ (∑ i, (p i) ^ 2) := rfl
 
 @[simp]
 lemma abs_eval_le_norm {d} (p : Space d) (i : Fin d) :
@@ -197,16 +169,12 @@ lemma neg_val {d : ℕ} (p : Space d) :
 
 @[simp]
 lemma neg_apply {d : ℕ} (p : Space d) (i : Fin d) :
-    (-p) i = - (p i) := by rfl
+    (-p) i = - (p i) := rfl
 
 noncomputable instance {d} : AddCommGroup (Space d) where
   zsmul z p := ⟨fun i => z * p.val i⟩
-  neg_add_cancel p := by
-    ext i
-    simp
-  zsmul_zero' p := by
-    ext i
-    simp
+  neg_add_cancel p := eq_of_apply fun i => by simp
+  zsmul_zero' p := eq_of_apply fun i => by simp
   zsmul_succ' n p := by
     ext i
     simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, Int.cast_add, Int.cast_natCast,
@@ -225,7 +193,7 @@ lemma sub_apply {d} (p q : Space d) (i : Fin d) :
 
 @[simp]
 lemma sub_val {d} (p q : Space d) :
-    (p - q).val = fun i => p.val i - q.val i := by rfl
+    (p - q).val = fun i => p.val i - q.val i := rfl
 
 @[simp]
 lemma vadd_zero_sub_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
