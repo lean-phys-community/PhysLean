@@ -282,8 +282,10 @@ theorem inner_cfc_pinching_right (ρ σ : MState d) (f : ℝ → ℝ) :
     ⟪(pinching_map σ ρ).M, σ.M.cfc f⟫ = ⟪ρ.M, σ.M.cfc f⟫ := by
   --TODO Cleanup
   -- By definition of pinching_map, we have pinching_map σ ρ = ∑ k, (pinching_kraus σ k).toMat * ρ.toMat * (pinching_kraus σ k).toMat.
-  have h_pinching_def : (pinching_map σ ρ).M = ∑ k, (pinching_kraus σ k).mat * ρ.M.mat * (pinching_kraus σ k).mat := by
-    exact pinching_eq_sum_conj σ ρ
+  have h_pinching_def :
+      (pinching_map σ ρ).M = ∑ k, (pinching_kraus σ k).mat * ρ.M.mat *
+        (pinching_kraus σ k).mat :=
+    pinching_eq_sum_conj σ ρ
   -- By definition of pinching_map, we know that (pinching_kraus σ k).toMat * (σ.M.cfc f).toMat = (σ.M.cfc f).toMat * (pinching_kraus σ k).toMat.
   have h_comm_cfc : ∀ k, (pinching_kraus σ k).mat * (σ.M.cfc f).mat = (σ.M.cfc f).mat * (pinching_kraus σ k).mat := by
     intro k
@@ -297,8 +299,11 @@ theorem inner_cfc_pinching_right (ρ σ : MState d) (f : ℝ → ℝ) :
     convert pinching_sum σ using 1;
     simp [HermitianMat.ext_iff ];
     -- Since each pinching_kraus is a projection, multiplying it by itself gives the same projection. Therefore, the sum of the squares is the same as the sum of the pinching_kraus themselves.
-    have h_proj : ∀ k : spectrum ℝ σ.m, (pinching_kraus σ k).mat * (pinching_kraus σ k).mat = (pinching_kraus σ k).mat := by
-      exact fun k => by simpa [ sq, -pinching_sq_eq_self ] using congr_arg ( fun x : HermitianMat d ℂ => x.mat ) ( pinching_sq_eq_self σ k ) ;
+    have h_proj : ∀ k : spectrum ℝ σ.m, (pinching_kraus σ k).mat *
+        (pinching_kraus σ k).mat = (pinching_kraus σ k).mat :=
+      fun k => by
+        simpa [sq, -pinching_sq_eq_self] using
+          congr_arg (fun x : HermitianMat d ℂ => x.mat) (pinching_sq_eq_self σ k)
     rw [ Finset.sum_congr rfl fun _ _ => h_proj _ ];
   convert congr_arg ( fun x : Matrix d d ℂ => x.trace.re ) ( congr_arg ( fun x : Matrix d d ℂ => x * ( ρ.m * cfc f σ.m ) ) h_sum_kraus ) using 1;
   · simp [Matrix.sum_mul]

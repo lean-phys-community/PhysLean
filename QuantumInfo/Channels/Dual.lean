@@ -151,8 +151,8 @@ theorem IsPositive.dual {M : MatrixMap dIn dOut ℂ} (h : M.IsPositive) : M.dual
 /-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
 theorem dual_Unital (h : M.IsTracePreserving) : M.dual.Unital := by
   -- By definition of dual, we know that for any matrix A, Tr(M(A) * I) = Tr(A * M*(I)).
-  have h_dual_trace : ∀ A : Matrix dIn dIn 𝕜, (M A * 1).trace = (A * M.dual 1).trace := by
-    exact fun A => Dual.trace_eq M A 1;
+  have h_dual_trace : ∀ A : Matrix dIn dIn 𝕜, (M A * 1).trace = (A * M.dual 1).trace :=
+    fun A => Dual.trace_eq M A 1
   ext i j
   specialize h_dual_trace ( Matrix.of ( fun k l => if k = j then if l = i then 1 else 0 else 0 ) )
   simp_all [ Matrix.trace, Matrix.mul_apply ] ;
@@ -170,11 +170,13 @@ lemma dual_unique
     (h : ∀ A B, (M A * B).trace = (A * M' B).trace) : M.dual = M' := by
   -- By definition of dual, we know that for any A and B, the trace of (M A) * B equals the trace of
   -- A * (M.dual B).
-  have h_dual : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜, (M A * B).trace = (A * M.dual B).trace := by
-    exact fun A B => Dual.trace_eq M A B;
+  have h_dual : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜,
+      (M A * B).trace = (A * M.dual B).trace :=
+    fun A B => Dual.trace_eq M A B
   -- Since these two linear maps agree on all bases, they must be equal.
-  have h_eq : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜, (A * M.dual B).trace = (A * M' B).trace := by
-    exact fun A B => h_dual A B ▸ h A B;
+  have h_eq : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜,
+      (A * M.dual B).trace = (A * M' B).trace :=
+    fun A B => h_dual A B ▸ h A B
   refine' LinearMap.ext fun B => _;
   exact Matrix.ext_iff_trace_mul_left.mpr fun x => h_eq x B
 
@@ -267,8 +269,8 @@ lemma dual_kron {A B C D : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D
 -- see Lemma 3.1 of https://www.math.uwaterloo.ca/~krdavids/Preprints/CDPRpositivereal.pdf
 theorem IsCompletelyPositive.dual {M : MatrixMap dIn dOut ℂ} (h : M.IsCompletelyPositive) : M.dual.IsCompletelyPositive := by
   intro n
-  have h_dual_pos : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ)).IsPositive := by
-    exact IsPositive.dual (h n);
+  have h_dual_pos : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ)).IsPositive :=
+    IsPositive.dual (h n)
   -- By definition of complete positivity, we know that $(M ⊗ₖₘ id) dually map = M.dual ⊗ₖₘ id.dual$.
   have h_dual_kron : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ)) = (MatrixMap.dual M) ⊗ₖₘ (MatrixMap.dual (MatrixMap.id (Fin n) ℂ)) := by
     convert dual_kron M ( MatrixMap.id ( Fin n ) ℂ ) using 1;
