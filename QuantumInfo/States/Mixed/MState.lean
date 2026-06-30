@@ -208,12 +208,10 @@ theorem exp_val_nonneg {T : HermitianMat d ℂ} (h : 0 ≤ T) : 0 ≤ ρ.exp_val
 -- to write first.)
 
 @[simp]
-theorem exp_val_zero : ρ.exp_val 0 = 0 := by
-  simp [MState.exp_val]
+theorem exp_val_zero : ρ.exp_val 0 = 0 := by simp [MState.exp_val]
 
 @[simp]
-theorem exp_val_one : ρ.exp_val 1 = 1 := by
-  simp [MState.exp_val]
+theorem exp_val_one : ρ.exp_val 1 = 1 := by simp [MState.exp_val]
 
 theorem exp_val_le_one {T : HermitianMat d ℂ} (h : T ≤ 1) : ρ.exp_val T ≤ 1 := by
   have hmono := inner_mono ρ.nonneg h
@@ -224,8 +222,7 @@ theorem exp_val_prob {T : HermitianMat d ℂ} (h : 0 ≤ T ∧ T ≤ 1) :
   ⟨ρ.exp_val_nonneg h.1, ρ.exp_val_le_one h.2⟩
 
 theorem exp_val_sub (A B : HermitianMat d ℂ) :
-    ρ.exp_val (A - B) = ρ.exp_val A - ρ.exp_val B := by
-  simp [exp_val, inner_sub_right]
+    ρ.exp_val (A - B) = ρ.exp_val A - ρ.exp_val B := by simp [exp_val, inner_sub_right]
 
 /-- If a PSD observable `A` has expectation value of 0 on a state `ρ`, it must entirely contain the
 support of `ρ` in its kernel. -/
@@ -241,13 +238,11 @@ theorem exp_val_eq_one_iff {A : HermitianMat d ℂ} (hA₂ : A ≤ 1) :
   rw [sub_eq_zero, eq_comm]
 
 theorem exp_val_add (A B : HermitianMat d ℂ) :
-    ρ.exp_val (A + B) = ρ.exp_val A + ρ.exp_val B := by
-  simp [exp_val, inner_add_right]
+    ρ.exp_val (A + B) = ρ.exp_val A + ρ.exp_val B := by simp [exp_val, inner_add_right]
 
 @[simp]
 theorem exp_val_smul (r : ℝ) (A : HermitianMat d ℂ) :
-    ρ.exp_val (r • A) = r * ρ.exp_val A := by
-  simp [MState.exp_val]
+    ρ.exp_val (r • A) = r * ρ.exp_val A := by simp [MState.exp_val]
 
 @[gcongr]
 theorem exp_val_le_exp_val (ρ : MState d) {A B : HermitianMat d ℂ} (h : A ≤ B) :
@@ -1209,13 +1204,11 @@ theorem traceLeft_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
 
 @[simp]
 theorem traceLeft_left_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
-    ρ.assoc.traceLeft.traceLeft = ρ.traceLeft := by
-  simp [← traceLeft_assoc']
+    ρ.assoc.traceLeft.traceLeft = ρ.traceLeft := by simp [← traceLeft_assoc']
 
 @[simp]
 theorem traceRight_right_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
-    ρ.assoc'.traceRight.traceRight = ρ.traceRight := by
-  simp [assoc']
+    ρ.assoc'.traceRight.traceRight = ρ.traceRight := by simp [assoc']
 
 @[simp]
 theorem traceNorm_eq_one (ρ : MState d) : ρ.m.traceNorm = 1 :=

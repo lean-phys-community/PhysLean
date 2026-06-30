@@ -342,8 +342,7 @@ is specifically the MES with an all-positive phase. For instance on `d := Fin 2`
 Bell state. -/
 def Ket.MES (d) [Fintype d] [Nonempty d] : Ket (d × d) where
   vec := fun (i,j) ↦ if i = j then 1 / Real.sqrt (Fintype.card (α := d)) else 0
-  normalized' := by
-    simp [apply_ite, Fintype.sum_prod_type]
+  normalized' := by simp [apply_ite, Fintype.sum_prod_type]
 
 /-- On any space of dimension at least two, the maximally entangled state `MES` is entangled. -/
 theorem Ket.MES_isEntangled [Nontrivial d] : (Ket.MES d).IsEntangled := by

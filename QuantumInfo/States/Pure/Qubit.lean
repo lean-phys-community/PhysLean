@@ -132,16 +132,13 @@ theorem H_mul_Z_eq_X_mul_H : H * Z = X * H := by
   matrix_expand [H, X, Z]
 
 @[simp]
-theorem S_Z_comm : Z * S = S * Z := by
-  simp [← S_sq, mul_assoc]
+theorem S_Z_comm : Z * S = S * Z := by simp [← S_sq, mul_assoc]
 
 @[simp]
-theorem T_Z_comm : Z * T = T * Z := by
-  simp [← S_sq, ← T_sq, mul_assoc]
+theorem T_Z_comm : Z * T = T * Z := by simp [← S_sq, ← T_sq, mul_assoc]
 
 @[simp]
-theorem S_T_comm : S * T = T * S := by
-  simp [← T_sq, mul_assoc]
+theorem S_T_comm : S * T = T * S := by simp [← T_sq, mul_assoc]
 
 /-- Given a unitary `U` on some Hilbert space `k`, we have the controllized version that acts on `Fin 2 ⊗ k`
 where `U` is conditionally applied if the first qubit is `1`. -/
@@ -200,8 +197,7 @@ theorem controllize_one : C[(1 : 𝐔[k])] = 1 := by
   matrix_expand
 
 @[simp]
-theorem controllize_mul_inv : C[g] * C[g⁻¹] = 1 := by
-  simp
+theorem controllize_mul_inv : C[g] * C[g⁻¹] = 1 := by simp
 
 open scoped Matrix in
 @[simp]

@@ -112,8 +112,7 @@ def pure_average_NNReal {d : Type _} [Fintype d] (f : Ket d → NNReal) (e : PEn
 is equal to averaging the restricted function over Kets `f ∘ pure : Ket d → T` on `e`. -/
 theorem average_of_pure_ensemble {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T]
   (f : MState d → T) (e : PEnsemble d α) :
-  average f (toMEnsemble e) = pure_average (f ∘ pure) e := by
-  simp only [average, pure_average, toMEnsemble, comp_map]
+  average f (toMEnsemble e) = pure_average (f ∘ pure) e := by simp only [average, pure_average, toMEnsemble, comp_map]
 
 variable {ψ : Ket d}
 
