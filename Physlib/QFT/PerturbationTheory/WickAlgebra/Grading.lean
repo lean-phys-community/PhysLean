@@ -44,8 +44,7 @@ lemma mem_bosonic_of_mem_free_bosonic (a : 𝓕.FieldOpFreeAlgebra)
     simp only [Set.mem_setOf_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p]
-    apply ofCrAnList_mem_statSubmodule_of_eq
-    exact h
+    exact ofCrAnList_mem_statSubmodule_of_eq φs bosonic h
   · simp only [map_zero, p]
     exact Submodule.zero_mem (statSubmodule bosonic)
   · intro x y hx hy hpx hpy
@@ -65,8 +64,7 @@ lemma mem_fermionic_of_mem_free_fermionic (a : 𝓕.FieldOpFreeAlgebra)
     simp only [Set.mem_setOf_eq] at hx
     obtain ⟨φs, rfl, h⟩ := hx
     simp [p]
-    apply ofCrAnList_mem_statSubmodule_of_eq
-    exact h
+    exact ofCrAnList_mem_statSubmodule_of_eq φs fermionic h
   · simp only [map_zero, p]
     exact Submodule.zero_mem (statSubmodule fermionic)
   · intro x y hx hy hpx hpy
@@ -292,14 +290,12 @@ lemma eq_zero_of_bosonic_and_fermionic {a : 𝓕.WickAlgebra}
 @[simp]
 lemma bosonicProj_fermionicProj_eq_zero (a : 𝓕.WickAlgebra) :
     bosonicProj (fermionicProj a).1 = 0 := by
-  apply bosonicProj_mem_fermionic
-  exact Submodule.coe_mem (fermionicProj a)
+  exact bosonicProj_mem_fermionic (fermionicProj a).1 (Submodule.coe_mem (fermionicProj a))
 
 @[simp]
 lemma fermionicProj_bosonicProj_eq_zero (a : 𝓕.WickAlgebra) :
     fermionicProj (bosonicProj a).1 = 0 := by
-  apply fermionicProj_mem_bosonic
-  exact Submodule.coe_mem (bosonicProj a)
+  exact fermionicProj_mem_bosonic (bosonicProj a).1 (Submodule.coe_mem (bosonicProj a))
 
 @[simp]
 lemma bosonicProj_bosonicProj_eq_bosonicProj (a : 𝓕.WickAlgebra) :
@@ -321,15 +317,13 @@ lemma bosonicProj_of_bosonic_part
 lemma bosonicProj_of_fermionic_part
     (a : DirectSum FieldStatistic (fun i => (statSubmodule (𝓕 := 𝓕) i))) :
     bosonicProj (a fermionic).1 = 0 := by
-  apply bosonicProj_mem_fermionic
-  exact Submodule.coe_mem (a.toFun fermionic)
+  exact bosonicProj_mem_fermionic (a.toFun fermionic).1 (Submodule.coe_mem (a.toFun fermionic))
 
 @[simp]
 lemma fermionicProj_of_bosonic_part
     (a : DirectSum FieldStatistic (fun i => (statSubmodule (𝓕 := 𝓕) i))) :
     fermionicProj (a bosonic).1 = 0 := by
-  apply fermionicProj_mem_bosonic
-  exact Submodule.coe_mem (a.toFun bosonic)
+  exact fermionicProj_mem_bosonic (a.toFun bosonic).1 (Submodule.coe_mem (a.toFun bosonic))
 
 @[simp]
 lemma fermionicProj_of_fermionic_part

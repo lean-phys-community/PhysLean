@@ -42,8 +42,7 @@ lemma ι_superCommuteF_eq_zero_of_ι_left_zero (a b : 𝓕.FieldOpFreeAlgebra) (
 
 lemma ι_superCommuteF_right_zero_of_mem_ideal (a b : 𝓕.FieldOpFreeAlgebra)
     (h : b ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet) : ι [a, b]ₛF = 0 := by
-  apply ι_superCommuteF_eq_zero_of_ι_right_zero
-  exact (ι_eq_zero_iff_mem_ideal b).mpr h
+  exact ι_superCommuteF_eq_zero_of_ι_right_zero a b ((ι_eq_zero_iff_mem_ideal b).mpr h)
 
 lemma ι_superCommuteF_eq_of_equiv_right (a b1 b2 : 𝓕.FieldOpFreeAlgebra) (h : b1 ≈ b2) :
     ι [a, b1]ₛF = ι [a, b2]ₛF := by
@@ -84,8 +83,8 @@ lemma superCommuteRight_eq_of_equiv (a1 a2 : 𝓕.FieldOpFreeAlgebra) (h : a1 �
   obtain ⟨b, rfl⟩ := ι_surjective b
   have ha1b1 : (superCommuteRight (a1 - a2)) (ι b) = 0 := by
     rw [superCommuteRight_apply_ι]
-    apply ι_superCommuteF_eq_zero_of_ι_left_zero
-    exact (ι_eq_zero_iff_mem_ideal (a1 - a2)).mpr h
+    exact ι_superCommuteF_eq_zero_of_ι_left_zero (a1 - a2) b
+      ((ι_eq_zero_iff_mem_ideal (a1 - a2)).mpr h)
   simp_all only [superCommuteRight_apply_ι, map_sub, LinearMap.sub_apply]
   trans ι ((superCommuteF a2) b) + 0
   rw [← ha1b1]

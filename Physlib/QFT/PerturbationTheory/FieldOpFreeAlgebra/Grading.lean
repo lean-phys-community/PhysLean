@@ -105,8 +105,7 @@ lemma bosonicProjF_of_bonosic_part
 lemma bosonicProjF_of_fermionic_part
     (a : DirectSum FieldStatistic (fun i => (statisticSubmodule (𝓕 := 𝓕) i))) :
     bosonicProjF (a fermionic).1 = 0 := by
-  apply bosonicProjF_of_mem_fermionic
-  exact Submodule.coe_mem (a.toFun fermionic)
+  exact bosonicProjF_of_mem_fermionic (a.toFun fermionic).1 (Submodule.coe_mem (a.toFun fermionic))
 
 /-- The projection of an element of `FieldOpFreeAlgebra` onto it's fermionic part. -/
 def fermionicProjF : 𝓕.FieldOpFreeAlgebra →ₗ[ℂ] statisticSubmodule (𝓕 := 𝓕) fermionic :=
@@ -172,8 +171,7 @@ lemma fermionicProjF_of_mem_bosonic (a : 𝓕.FieldOpFreeAlgebra)
 lemma fermionicProjF_of_bosonic_part
     (a : DirectSum FieldStatistic (fun i => (statisticSubmodule (𝓕 := 𝓕) i))) :
     fermionicProjF (a bosonic).1 = 0 := by
-  apply fermionicProjF_of_mem_bosonic
-  exact Submodule.coe_mem (a.toFun bosonic)
+  exact fermionicProjF_of_mem_bosonic (a.toFun bosonic).1 (Submodule.coe_mem (a.toFun bosonic))
 
 @[simp]
 lemma fermionicProjF_of_fermionic_part
