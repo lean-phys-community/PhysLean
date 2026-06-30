@@ -238,8 +238,8 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
         exact (le_mul_inv_iff₀' <| Real.rpow_pos_of_pos hx' _).mpr (hC x)
       calc
         _ ≤ (C * ‖x‖ ^ (-(⌈s⌉.toNat + d) : ℝ)) ^ 2 * ‖x‖ ^ (2 * s) := by
-          refine mul_le_mul_of_nonneg_right ?_ (Real.rpow_nonneg hx'.le _)
-          exact pow_le_pow_left₀ (norm_nonneg _) hψ 2
+          exact mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (norm_nonneg _) hψ 2)
+            (Real.rpow_nonneg hx'.le _)
         _ = C ^ 2 * ‖x‖ ^ (-2 * d : ℝ) * ‖x‖ ^ (2 * (s - ⌈s⌉.toNat) : ℝ) := by
           simp_rw [mul_pow, ← Real.rpow_mul_natCast hx'.le, mul_assoc, ← Real.rpow_add hx']
           ring_nf
@@ -271,8 +271,8 @@ lemma radiusRegPow_tendsto_radiusPow {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ
     simp [← Real.rpow_natCast_mul, mul_div_cancel₀]
   simp only [radiusRegPowCLM_apply, radiusPowLM_apply, Complex.real_smul, hpow]
   refine Tendsto.mul_const (ψ x) <| Tendsto.ofReal ?_
-  refine Tendsto.rpow_const ?_ (Or.inl <| by simp [hx])
-  exact Tendsto.const_add _ <| Tendsto.pow tendsto_comap 2
+  exact Tendsto.rpow_const (Tendsto.const_add _ <| Tendsto.pow tendsto_comap 2)
+    (Or.inl <| by simp [hx])
 
 /-- `𝐫[ε,s] ψ` converges pointwise to `𝐫[s] ψ` as `ε → 0` provided `𝐫[ε,s] ψ 0` is bounded. -/
 lemma radiusRegPow_tendsto_radiusPow' {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (h : 0 ≤ s ∨ ψ 0 = 0) :

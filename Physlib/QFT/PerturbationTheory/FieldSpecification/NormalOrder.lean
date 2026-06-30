@@ -215,9 +215,8 @@ lemma normalOrderSign_swap_annihilate_annihilate (φa φa' : 𝓕.CrAnFieldOp)
     dsimp only [normalOrderSign, Wick.koszulSign]
     rw [← normalOrderSign]
     simp only [mul_eq_mul_right_iff]
-    apply Or.inl
-    apply Wick.koszulSignInsert_eq_perm
-    exact List.Perm.append_left φs (List.Perm.swap φa' φa φs')
+    exact Or.inl (Wick.koszulSignInsert_eq_perm _ _ _ _ _
+      (List.Perm.append_left φs (List.Perm.swap φa' φa φs')))
 open FieldStatistic
 
 /-!
