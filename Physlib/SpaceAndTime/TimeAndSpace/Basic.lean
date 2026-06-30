@@ -379,13 +379,11 @@ noncomputable def distTimeDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     ev.comp (Distribution.fderivD ℝ f)
   map_add' _ _ := by
     simp
-  map_smul' _ _ := by
-    simp
+  map_smul' _ _ := by simp
 
 lemma distTimeDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
-    (distTimeDeriv f) ε = fderivD ℝ f ε (1, 0) := by
-  simp [distTimeDeriv]
+    (distTimeDeriv f) ε = fderivD ℝ f ε (1, 0) := by simp [distTimeDeriv]
 
 lemma distTimeDeriv_apply' {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
@@ -397,8 +395,7 @@ lemma distTimeDeriv_apply' {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
 lemma apply_fderiv_eq_distTimeDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
     f (SchwartzMap.evalCLM ℝ (Time × Space d) ℝ (1, 0) ((fderivCLM ℝ (Time × Space d) ℝ) ε)) =
-    - (distTimeDeriv f) ε := by
-  simp [distTimeDeriv_apply']
+    - (distTimeDeriv f) ε := by simp [distTimeDeriv_apply']
 
 /-!
 
@@ -430,13 +427,11 @@ noncomputable def distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M
     ev.comp (Distribution.fderivD ℝ f)
   map_add' _ _ := by
     simp
-  map_smul' _ _ := by
-    simp
+  map_smul' _ _ := by simp
 
 lemma distSpaceDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (i : Fin d) (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
-    (distSpaceDeriv i f) ε = fderivD ℝ f ε (0, basis i) := by
-  simp [distSpaceDeriv]
+    (distSpaceDeriv i f) ε = fderivD ℝ f ε (0, basis i) := by simp [distSpaceDeriv]
 
 lemma distSpaceDeriv_apply' {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (i : Fin d) (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
@@ -449,8 +444,7 @@ lemma apply_fderiv_eq_distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedSpace �
     (i : Fin d) (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
     f ((SchwartzMap.evalCLM ℝ (Time × Space d) ℝ (0, basis i))
     ((fderivCLM ℝ (Time × Space d) ℝ) ε)) =
-    - (distSpaceDeriv i f) ε := by
-  simp [distSpaceDeriv_apply']
+    - (distSpaceDeriv i f) ε := by simp [distSpaceDeriv_apply']
 
 /-!
 
