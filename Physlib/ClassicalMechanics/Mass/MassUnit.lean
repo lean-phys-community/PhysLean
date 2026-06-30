@@ -39,8 +39,7 @@ structure MassUnit where
 namespace MassUnit
 
 @[simp]
-lemma val_ne_zero (x : MassUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : MassUnit) : x.val ≠ 0 := Ne.symm (ne_of_lt x.property)
 
 lemma val_pos (x : MassUnit) : 0 < x.val := x.property
 

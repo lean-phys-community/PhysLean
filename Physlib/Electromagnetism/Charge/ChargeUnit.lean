@@ -44,8 +44,7 @@ structure ChargeUnit where
 namespace ChargeUnit
 
 @[simp]
-lemma val_ne_zero (x : ChargeUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : ChargeUnit) : x.val ≠ 0 := Ne.symm (ne_of_lt x.property)
 
 lemma val_pos (x : ChargeUnit) : 0 < x.val := x.property
 

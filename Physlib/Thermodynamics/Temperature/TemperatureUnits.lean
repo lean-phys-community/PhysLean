@@ -40,8 +40,7 @@ structure TemperatureUnit where
 namespace TemperatureUnit
 
 @[simp]
-lemma val_ne_zero (x : TemperatureUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : TemperatureUnit) : x.val ≠ 0 := Ne.symm (ne_of_lt x.property)
 
 lemma val_pos (x : TemperatureUnit) : 0 < x.val := x.property
 
