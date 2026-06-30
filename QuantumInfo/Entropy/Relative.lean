@@ -697,13 +697,13 @@ private lemma scalar_rpow_cross_term_of_continuous {b : ℝ → ℝ} {c : ℝ}
     ring_nf
     norm_num [ hc ]
   -- Use the fact that $b(1 + t) \to c$ as $t \to 0$.
-  have h_b : Filter.Tendsto (fun t => b (1 + t)) (nhdsWithin 0 {0}ᶜ) (nhds c) := by
-    exact hc ▸ hb_cont.tendsto.comp ( tendsto_nhdsWithin_of_tendsto_nhds ( by norm_num [ Filter.Tendsto ] ) );
+  have h_b : Filter.Tendsto (fun t => b (1 + t)) (nhdsWithin 0 {0}ᶜ) (nhds c) :=
+    hc ▸ hb_cont.tendsto.comp ( tendsto_nhdsWithin_of_tendsto_nhds ( by norm_num [ Filter.Tendsto ] ) );
   -- Use the fact that $b(1 + t)^t - 1 \sim t \log(b(1 + t))$ as $t \to 0$.
   have h_exp : Filter.Tendsto (fun t => t⁻¹ * (b (1 + t) ^ t - 1)) (nhdsWithin 0 {0}ᶜ) (nhds (Real.log c)) := by
     have h_exp : Filter.Tendsto (fun t => (b (1 + t) ^ t - 1) / t) (nhdsWithin 0 {0}ᶜ) (nhds (Real.log c)) := by
-      have h_log : Filter.Tendsto (fun t => (Real.log (b (1 + t)) * t) / t) (nhdsWithin 0 {0}ᶜ) (nhds (Real.log c)) := by
-        exact Filter.Tendsto.congr' ( by filter_upwards [ self_mem_nhdsWithin ] with t ht using by rw [ mul_div_cancel_right₀ _ ht ] ) ( Filter.Tendsto.log h_b hc_pos.ne' )
+      have h_log : Filter.Tendsto (fun t => (Real.log (b (1 + t)) * t) / t) (nhdsWithin 0 {0}ᶜ) (nhds (Real.log c)) :=
+        Filter.Tendsto.congr' ( by filter_upwards [ self_mem_nhdsWithin ] with t ht using by rw [ mul_div_cancel_right₀ _ ht ] ) ( Filter.Tendsto.log h_b hc_pos.ne' )
       have h_exp : Filter.Tendsto (fun t => (Real.exp (Real.log (b (1 + t)) * t) - 1) / t) (nhdsWithin 0 {0}ᶜ) (nhds (Real.log c)) := by
         have h_exp : HasDerivAt (fun t => Real.exp (Real.log (b (1 + t)) * t)) (Real.log c) 0 := by
           have h_log : HasDerivAt (fun t => Real.log (b (1 + t)) * t) (Real.log c) 0 := by
@@ -758,8 +758,8 @@ private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
         have h_sqrt_log : Filter.Tendsto (fun x => Real.sqrt x * Real.log x) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
           -- Let $y = \sqrt{x}$, so we can rewrite the limit as $\lim_{y \to 0^+} y \log(y^2) = \lim_{y \to 0^+} 2y \log(y)$.
           suffices h_log_y : Filter.Tendsto (fun y => 2 * y * Real.log y) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) by
-            have h_subst : Filter.Tendsto (fun x => 2 * Real.sqrt x * Real.log (Real.sqrt x)) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
-              exact h_log_y.comp <| Filter.Tendsto.inf ( Real.continuous_sqrt.tendsto' _ _ <| by norm_num ) <| Filter.tendsto_principal_principal.mpr fun x hx => Real.sqrt_pos.mpr hx;
+            have h_subst : Filter.Tendsto (fun x => 2 * Real.sqrt x * Real.log (Real.sqrt x)) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) :=
+              h_log_y.comp <| Filter.Tendsto.inf ( Real.continuous_sqrt.tendsto' _ _ <| by norm_num ) <| Filter.tendsto_principal_principal.mpr fun x hx => Real.sqrt_pos.mpr hx;
             generalize_proofs at *; (
             exact h_subst.congr' ( Filter.eventuallyEq_of_mem self_mem_nhdsWithin fun x hx => by rw [ Real.log_sqrt hx.out.le ] ; ring ) |> fun h => h.trans ( by norm_num ) ;);
           exact tendsto_nhdsWithin_of_tendsto_nhds ( by simpa [ mul_assoc ] using Filter.Tendsto.const_mul 2 ( Real.continuous_mul_log.tendsto 0 ) ) |> fun h => h.trans ( by norm_num ) ;
@@ -842,11 +842,10 @@ private lemma B_of_continuousAt (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ker) :
     ContinuousAt (B_of ρ σ) 1 := by
   -- Use the fact that the composition of continuous functions is continuous.
   have h_cont : ContinuousAt (fun α : ℝ => ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) 1 := by
-    have h_inner : ContinuousAt (fun r : ℝ => ρ.M.conj (σ.M ^ r).mat) 0 := by
-      -- Apply the hypothesis `h_cont` directly to conclude the proof.
-      exact conj_rpow_continuousAt_zero σ.M ρ.M h
-    have h_exp : ContinuousAt (fun α : ℝ => (1 - α) / (2 * α)) 1 := by
-      exact ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by norm_num )
+    have h_inner : ContinuousAt (fun r : ℝ => ρ.M.conj (σ.M ^ r).mat) 0 :=
+      conj_rpow_continuousAt_zero σ.M ρ.M h
+    have h_exp : ContinuousAt (fun α : ℝ => (1 - α) / (2 * α)) 1 :=
+      ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by norm_num )
     exact ContinuousAt.comp ( by simpa using h_inner ) h_exp |> ContinuousAt.congr <| Filter.eventuallyEq_of_mem ( Ioi_mem_nhds zero_lt_one ) fun x hx ↦ by aesop;
   exact h_cont
 
@@ -863,8 +862,8 @@ private lemma eigenvalues_bounded_near {M : ℝ → HermitianMat d ℂ}
     (hM_nonneg : ∀ᶠ α in nhds 1, 0 ≤ M α)
     (hM_cont : ContinuousAt M 1) :
     ∃ K > 0, ∀ᶠ α in nhds 1, ∀ i, 0 ≤ (M α).H.eigenvalues i ∧ (M α).H.eigenvalues i ≤ K := by
-  have h_op_norm_bound : ∃ K > 0, ∀ᶠ α in nhds 1, ‖M α‖ ≤ K := by
-    exact ⟨ ‖M 1‖ + 1, by positivity, hM_cont.norm.eventually ( ge_mem_nhds ( lt_add_one _ ) ) ⟩
+  have h_op_norm_bound : ∃ K > 0, ∀ᶠ α in nhds 1, ‖M α‖ ≤ K :=
+    ⟨ ‖M 1‖ + 1, by positivity, hM_cont.norm.eventually ( ge_mem_nhds ( lt_add_one _ ) ) ⟩
   have h_eigenvalue_bound : ∀ᶠ α in nhds 1, ∀ i, 0 ≤ (M α).H.eigenvalues i ∧ (M α).H.eigenvalues i ≤ ‖M α‖ := by
     have h_eigenvalue_bound : ∀ᶠ α in nhds 1, ∀ i, |(M α).H.eigenvalues i| ≤ ‖M α‖ := by
       filter_upwards [ hM_nonneg, h_op_norm_bound.choose_spec.2 ] with α hα₁ hα₂ i
@@ -884,8 +883,8 @@ private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
   intro ε ε_pos
   obtain ⟨δ₁, δ₁_pos, hδ₁⟩ : ∃ δ₁ > 0, ∀ x ∈ Set.Icc 0 K, 0 < x → x < δ₁ → |x * Real.log x| < ε / 4 ∧ ∀ h, 0 < |h| → |h| < 1 / 2 → |(x ^ (1 + h) - x) / h| < ε / 4 := by
     obtain ⟨δ₁, δ₁_pos, hδ₁⟩ : ∃ δ₁ > 0, ∀ x ∈ Set.Icc 0 K, 0 < x → x < δ₁ → |x * Real.log x| < ε / 4 := by
-      have h_cont : Filter.Tendsto (fun x => x * Real.log x) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
-        exact tendsto_nhdsWithin_of_tendsto_nhds ( by simpa using Real.continuous_mul_log.tendsto 0 );
+      have h_cont : Filter.Tendsto (fun x => x * Real.log x) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) :=
+        tendsto_nhdsWithin_of_tendsto_nhds ( by simpa using Real.continuous_mul_log.tendsto 0 );
       have := Metric.tendsto_nhdsWithin_nhds.mp h_cont ( ε / 4 ) ( by linarith );
       exact ⟨ this.choose, this.choose_spec.1, fun x hx₁ hx₂ hx₃ => by simpa [ abs_mul ] using this.choose_spec.2 hx₂ ( by simpa [ abs_of_pos hx₂ ] using hx₃ ) ⟩;
     have h_bound : ∃ δ₁ > 0, ∀ x ∈ Set.Icc 0 K, 0 < x → x < δ₁ → ∀ h, 0 < |h| → |h| < 1 / 2 → |x ^ (1 + h) - x| ≤ |h| * x * (|Real.log x| + 1) * Real.exp (|h| * (|Real.log x| + 1)) := by
@@ -911,8 +910,8 @@ private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
       have h_bound : Filter.Tendsto (fun x => x * (|Real.log x| + 1) * Real.exp (1 / 2 * (|Real.log x| + 1))) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
         -- Let $y = -\log x$, so we can rewrite the limit as $y \to \infty$.
         suffices h_log : Filter.Tendsto (fun y => Real.exp (-y) * (y + 1) * Real.exp ((y + 1) / 2)) Filter.atTop (nhds 0) by
-          have h_subst : Filter.Tendsto (fun x => Real.exp (-(-Real.log x)) * ((-Real.log x) + 1) * Real.exp ((-Real.log x + 1) / 2)) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
-            exact h_log.comp ( Filter.tendsto_neg_atBot_atTop.comp ( Real.tendsto_log_nhdsNE_zero.mono_left <| nhdsWithin_mono _ <| by norm_num ) );
+          have h_subst : Filter.Tendsto (fun x => Real.exp (-(-Real.log x)) * ((-Real.log x) + 1) * Real.exp ((-Real.log x + 1) / 2)) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) :=
+            h_log.comp ( Filter.tendsto_neg_atBot_atTop.comp ( Real.tendsto_log_nhdsNE_zero.mono_left <| nhdsWithin_mono _ <| by norm_num ) );
           refine' h_subst.congr' _;
           filter_upwards [ Ioo_mem_nhdsGT_of_mem ⟨ le_rfl, zero_lt_one ⟩ ] with x hx
           rw [ abs_of_nonpos ( Real.log_nonpos hx.1.le hx.2.le ) ]
@@ -963,8 +962,8 @@ private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
     obtain ⟨δ₂, δ₂_pos, hδ₂⟩ : ∃ δ₂ > 0, ∀ x ∈ Set.Icc δ₁ K, ∀ h, 0 < |h| → |h| < δ₂ → |h| * x * (Real.log x) ^ 2 * Real.exp (|h| * |Real.log x|) < ε / 4 := by
       -- Since $x * (\log x)^2 * \exp(|h| * |\log x|)$ is continuous on the compact interval $[\delta₁, K]$, it is bounded.
       obtain ⟨M, hM⟩ : ∃ M > 0, ∀ x ∈ Set.Icc δ₁ K, ∀ h, 0 < |h| → |h| < 1 / 2 → x * (Real.log x) ^ 2 * Real.exp (|h| * |Real.log x|) ≤ M := by
-        have h_cont : ContinuousOn (fun x => x * (Real.log x) ^ 2 * Real.exp (1 / 2 * |Real.log x|)) (Set.Icc δ₁ K) := by
-          exact ContinuousOn.mul ( ContinuousOn.mul continuousOn_id ( ContinuousOn.pow ( Real.continuousOn_log.mono ( by exact fun x hx => ne_of_gt <| lt_of_lt_of_le δ₁_pos hx.1 ) ) _ ) ) ( ContinuousOn.rexp <| ContinuousOn.mul continuousOn_const <| ContinuousOn.abs <| Real.continuousOn_log.mono ( by exact fun x hx => ne_of_gt <| lt_of_lt_of_le δ₁_pos hx.1 ) );
+        have h_cont : ContinuousOn (fun x => x * (Real.log x) ^ 2 * Real.exp (1 / 2 * |Real.log x|)) (Set.Icc δ₁ K) :=
+          ContinuousOn.mul ( ContinuousOn.mul continuousOn_id ( ContinuousOn.pow ( Real.continuousOn_log.mono ( by exact fun x hx => ne_of_gt <| lt_of_lt_of_le δ₁_pos hx.1 ) ) _ ) ) ( ContinuousOn.rexp <| ContinuousOn.mul continuousOn_const <| ContinuousOn.abs <| Real.continuousOn_log.mono ( by exact fun x hx => ne_of_gt <| lt_of_lt_of_le δ₁_pos hx.1 ) );
         obtain ⟨ M, hM ⟩ := IsCompact.exists_bound_of_continuousOn ( CompactIccSpace.isCompact_Icc ) h_cont;
         norm_num +zetaDelta at *;
         exact ⟨ Max.max M 1, by positivity, fun x hx₁ hx₂ h hh₁ hh₂ => le_trans ( by rw [ abs_of_nonneg ( by linarith : 0 ≤ x ) ] ; exact mul_le_mul_of_nonneg_left ( Real.exp_le_exp.mpr <| by nlinarith [ abs_nonneg ( Real.log x ) ] ) <| by nlinarith [ abs_nonneg ( Real.log x ) ] ) <| le_trans ( hM x hx₁ hx₂ ) <| le_max_left _ _ ⟩;
@@ -1659,8 +1658,8 @@ private theorem sandwichedRelRentropy.continuousOn_Ioi_1_aux (ρ σ : MState d) 
   have h_cont : ContinuousOn (fun α : ℝ => (HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M) (Set.Ioi 1) := by
     have h_cont : ContinuousOn (fun α : ℝ => (σ.M ^ ((1 - α) / (2 * α))).mat) (Set.Ioi 1) := by
       have h_cont : ContinuousOn (fun α : ℝ => σ.M ^ ((1 - α) / (2 * α))) (Set.Ioi 1) := by
-        have h_cont : ContinuousOn (fun α : ℝ => (1 - α) / (2 * α)) (Set.Ioi 1) := by
-          exact continuousOn_of_forall_continuousAt fun x hx => ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by linarith [ hx.out ] )
+        have h_cont : ContinuousOn (fun α : ℝ => (1 - α) / (2 * α)) (Set.Ioi 1) :=
+          continuousOn_of_forall_continuousAt fun x hx => ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by linarith [ hx.out ] )
         have h_cont : ContinuousOn (fun α : ℝ => (σ.M ^ α)) (Set.Iio 0) := by
           apply_rules [ HermitianMat.continuousOn_rpow_neg ];
         exact h_cont.comp ‹_› fun x hx => by rw [ Set.mem_Iio ] ; rw [ div_lt_iff₀ ] <;> linarith [ hx.out ] ;
@@ -1706,8 +1705,8 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1_aux (ρ σ : MState d
   have h_cont : ContinuousOn (fun α : ℝ => (HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M) (Set.Ioo 0 1) := by
     have h_cont : ContinuousOn (fun α : ℝ => (σ.M ^ ((1 - α) / (2 * α))).mat) (Set.Ioo 0 1) := by
       have h_cont : ContinuousOn (fun α : ℝ => σ.M ^ ((1 - α) / (2 * α))) (Set.Ioo 0 1) := by
-        have h_exp_cont : ContinuousOn (fun α : ℝ => (1 - α) / (2 * α)) (Set.Ioo 0 1) := by
-          exact continuousOn_of_forall_continuousAt fun x hx => ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by linarith [ hx.1 ] )
+        have h_exp_cont : ContinuousOn (fun α : ℝ => (1 - α) / (2 * α)) (Set.Ioo 0 1) :=
+          continuousOn_of_forall_continuousAt fun x hx => ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by linarith [ hx.1 ] )
         have h_rpow_cont : ContinuousOn (fun α : ℝ => (σ.M ^ α)) (Set.Ioi 0) := by
           apply_rules [ HermitianMat.continuousOn_rpow_pos ]
         exact h_rpow_cont.comp h_exp_cont fun x hx => by rw [ Set.mem_Ioi ] ; apply div_pos <;> linarith [ hx.1, hx.2 ]
@@ -1755,8 +1754,8 @@ private theorem sandwichedRelRentropy.continuousAt_1 (ρ σ : MState d) :
   · simp only [ContinuousWithinAt, SandwichedRelRentropy, dif_pos h, zero_lt_one, if_true]
     -- Use the fact that the limit of the real-valued function is the inner product.
     have h_real_limit : Filter.Tendsto (fun α : ℝ => if α = 1 then ⟪ρ.M, ρ.M.log - σ.M.log⟫ else Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1)) (nhdsWithin 1 (Set.Ioi 0)) (nhds ⟪ρ.M, ρ.M.log - σ.M.log⟫) := by
-      have h_real_limit : Filter.Tendsto (fun α : ℝ => Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1)) (nhdsWithin 1 (Set.Ioi 0 \ {1})) (nhds ⟪ρ.M, ρ.M.log - σ.M.log⟫) := by
-        exact sandwichedRelRentropy.limit_at_one ρ σ h
+      have h_real_limit : Filter.Tendsto (fun α : ℝ => Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1)) (nhdsWithin 1 (Set.Ioi 0 \ {1})) (nhds ⟪ρ.M, ρ.M.log - σ.M.log⟫) :=
+        sandwichedRelRentropy.limit_at_one ρ σ h
       rw [ Metric.tendsto_nhdsWithin_nhds ] at *
       intro ε hε
       rcases h_real_limit ε hε with ⟨δ, hδ, H⟩
@@ -1764,8 +1763,8 @@ private theorem sandwichedRelRentropy.continuousAt_1 (ρ σ : MState d) :
       intro x hx₁ hx₂
       by_cases hx₃ : x = 1 <;> simp [*]
     -- Since the real-valued function tends to the inner product, the ENNReal version should also tend to the same limit because the ENNReal conversion is continuous.
-    have h_ennreal_limit : Filter.Tendsto (fun α : ℝ => ENNReal.ofReal (if α = 1 then ⟪ρ.M, ρ.M.log - σ.M.log⟫ else Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1))) (nhdsWithin 1 (Set.Ioi 0)) (nhds (ENNReal.ofReal ⟪ρ.M, ρ.M.log - σ.M.log⟫)) := by
-      exact (ENNReal.tendsto_ofReal h_real_limit).comp Filter.tendsto_id
+    have h_ennreal_limit : Filter.Tendsto (fun α : ℝ => ENNReal.ofReal (if α = 1 then ⟪ρ.M, ρ.M.log - σ.M.log⟫ else Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1))) (nhdsWithin 1 (Set.Ioi 0)) (nhds (ENNReal.ofReal ⟪ρ.M, ρ.M.log - σ.M.log⟫)) :=
+      (ENNReal.tendsto_ofReal h_real_limit).comp Filter.tendsto_id
     convert h_ennreal_limit.congr' _ using 2
     · symm
       apply ENNReal.ofReal_eq_coe_nnreal
@@ -2019,8 +2018,8 @@ private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
 private lemma neg_ker_exists_eigenWeight_pos (ρ x : MState d) (hx : ¬(x.M.ker ≤ ρ.M.ker)) :
     ∃ i, x.M.H.eigenvalues i = 0 ∧ 0 < eigenWeight ρ x i := by
   -- By `ker_le_iff_eigenWeight_zero`, ¬(x.M.ker ≤ ρ.M.ker) iff ∃ i, eigenvalue_i = 0 ∧ eigenWeight ≠ 0. Use this fact.
-  have h_eigenWeight_ne_zero : ∃ i, x.M.H.eigenvalues i = 0 ∧ eigenWeight ρ x i ≠ 0 := by
-    exact Classical.not_forall_not.1 fun h => hx <| by simpa using ker_le_iff_eigenWeight_zero ρ x |>.2 fun i hi => Classical.not_not.1 fun hi' => h i ⟨ hi, hi' ⟩ ;
+  have h_eigenWeight_ne_zero : ∃ i, x.M.H.eigenvalues i = 0 ∧ eigenWeight ρ x i ≠ 0 :=
+    Classical.not_forall_not.1 fun h => hx <| by simpa using ker_le_iff_eigenWeight_zero ρ x |>.2 fun i hi => Classical.not_not.1 fun hi' => h i ⟨ hi, hi' ⟩ ;
   exact h_eigenWeight_ne_zero.imp fun i hi => ⟨ hi.1, lt_of_le_of_ne ( eigenWeight_nonneg ρ x i ) hi.2.symm ⟩
 
 private lemma approxLog_at_zero (N : ℕ) : approxLog N 0 = -(N : ℝ) := by
@@ -2054,8 +2053,8 @@ theorem qRelativeEnt_lowerSemicontinuous_2 (ρ x : MState d) (hx : ¬(x.M.ker �
   -- Since $y < \top$, we can choose a neighborhood around $x$ where the inner product is less than $y$.
   have h_inner_lt_y : ∀ᶠ x' in nhds x, x'.M.ker ≤ ρ.M.ker → ⟪ρ.M, ρ.M.log - x'.M.log⟫ > y.toReal := by
     have h_inner_lt_y : Filter.Tendsto (fun N : ℕ => ⟪ρ.M, ρ.M.log - x.M.cfc (approxLog N)⟫) Filter.atTop Filter.atTop := by
-      have h_inner_lt_y : Filter.Tendsto (fun N : ℕ => ⟪ρ.M, ρ.M.log⟫ - ⟪ρ.M, x.M.cfc (approxLog N)⟫) Filter.atTop Filter.atTop := by
-        exact Filter.Tendsto.add_atTop tendsto_const_nhds ( Filter.tendsto_neg_atBot_atTop.comp ( inner_cfc_approxLog_tendsto_bot ρ x hx ) ) |> Filter.Tendsto.congr ( by aesop ) ;
+      have h_inner_lt_y : Filter.Tendsto (fun N : ℕ => ⟪ρ.M, ρ.M.log⟫ - ⟪ρ.M, x.M.cfc (approxLog N)⟫) Filter.atTop Filter.atTop :=
+        Filter.Tendsto.add_atTop tendsto_const_nhds ( Filter.tendsto_neg_atBot_atTop.comp ( inner_cfc_approxLog_tendsto_bot ρ x hx ) ) |> Filter.Tendsto.congr ( by aesop ) ;
       convert h_inner_lt_y using 1
       ext1 N
       simp [inner_sub_right]
@@ -2064,8 +2063,8 @@ theorem qRelativeEnt_lowerSemicontinuous_2 (ρ x : MState d) (hx : ¬(x.M.ker �
     have h_cont : Continuous (fun σ : MState d => ⟪ρ.M, ρ.M.log - σ.M.cfc (approxLog N)⟫) := by
       simp only [inner_sub_right]
       exact continuous_const.sub (continuous_inner_cfc_approxLog ρ N)
-    have h_cont : ∀ᶠ x' in nhds x, ⟪ρ.M, ρ.M.log - x'.M.cfc (approxLog N)⟫ > y.toReal := by
-      exact h_cont.continuousAt.eventually ( lt_mem_nhds hN ) |> fun h => h.mono fun x' hx' => hx' |> fun hx'' => by simpa using hx'';
+    have h_cont : ∀ᶠ x' in nhds x, ⟪ρ.M, ρ.M.log - x'.M.cfc (approxLog N)⟫ > y.toReal :=
+      h_cont.continuousAt.eventually ( lt_mem_nhds hN ) |> fun h => h.mono fun x' hx' => hx' |> fun hx'' => by simpa using hx'';
     filter_upwards [h_cont] with x' hx' hx''
     apply lt_of_lt_of_le hx'
     have h_inner_le : ⟪ρ.M, x'.M.log⟫ ≤ ⟪ρ.M, x'.M.cfc (approxLog N)⟫ :=
