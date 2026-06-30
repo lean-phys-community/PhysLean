@@ -309,8 +309,7 @@ def HasDimension {M : Type} [CarriesDimension M] (f : UnitChoices → M) : Prop 
 
 lemma hasDimension_iff {M : Type} [CarriesDimension M] (f : UnitChoices → M) :
     HasDimension f ↔ ∀ u1 u2 : UnitChoices, f u2 =
-    UnitChoices.dimScale u1 u2 (dim M) • f u1 := by
-  rfl
+    UnitChoices.dimScale u1 u2 (dim M) • f u1 := Iff.rfl
 
 /-- The subtype of functions `UnitChoices → M`, for which `M` carries a dimension,
   which `HasDimension`. -/
@@ -365,4 +364,4 @@ noncomputable def CarriesDimension.toDimensionful {M : Type} [CarriesDimension M
 
 lemma CarriesDimension.toDimensionful_apply_apply
     {M : Type} [CarriesDimension M] (u1 u2 : UnitChoices) (m : M) :
-    (toDimensionful u1 m).1 u2 = (u1.dimScale u2 (dim M)) • m := by rfl
+    (toDimensionful u1 m).1 u2 = (u1.dimScale u2 (dim M)) • m := rfl

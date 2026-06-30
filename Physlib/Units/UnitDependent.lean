@@ -438,7 +438,7 @@ def IsDimensionallyCorrect {M : Type} [UnitDependent M] (m : M) : Prop :=
 
 lemma isDimensionallyCorrect_iff {M : Type} [UnitDependent M] (m : M) :
     IsDimensionallyCorrect m ↔ ∀ u1 u2 : UnitChoices,
-      scaleUnit u1 u2 m = m := by rfl
+      scaleUnit u1 u2 m = m := Iff.rfl
 
 @[simp]
 lemma isDimensionallyCorrect_fun_iff {M1 M2 : Type} [UnitDependent M1] [UnitDependent M2]
@@ -526,4 +526,5 @@ lemma scaleUnit_dimSet_val {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M]
   rfl
 
 lemma DimSet.mem_iff {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) (m : M) :
-    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m := by rfl
+    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m :=
+  Iff.rfl
