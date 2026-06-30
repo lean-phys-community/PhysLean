@@ -103,19 +103,13 @@ lemma chargeDensity_differentiable {d : ℕ} {c : SpeedOfLight} {J : LorentzCurr
     (hJ : Differentiable ℝ J) : Differentiable ℝ ↿(J.chargeDensity c) := by
   rw [chargeDensity_eq_timeSlice]
   apply timeSlice_differentiable
-  have h1 : ∀ i, Differentiable ℝ (fun x => J x i) := by
-    rw [SpaceTime.differentiable_vector]
-    exact hJ
   apply Differentiable.fun_const_smul
-  exact h1 (Sum.inl 0)
+  exact (SpaceTime.differentiable_vector J).mpr hJ (Sum.inl 0)
 
 lemma chargeDensity_differentiable_space {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (t : Time) :
-    Differentiable ℝ (fun x => J.chargeDensity c t x) := by
-  change Differentiable ℝ (↿(J.chargeDensity c) ∘ fun x => (t, x))
-  refine Differentiable.comp ?_ ?_
-  · exact chargeDensity_differentiable hJ
-  · fun_prop
+    Differentiable ℝ (fun x => J.chargeDensity c t x) :=
+  (chargeDensity_differentiable hJ).comp (f := fun x => (t, x)) (by fun_prop)
 
 /-!
 
@@ -127,11 +121,8 @@ lemma chargeDensity_contDiff {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDen
     (hJ : ContDiff ℝ n J) : ContDiff ℝ n ↿(J.chargeDensity c) := by
   rw [chargeDensity_eq_timeSlice]
   apply timeSlice_contDiff
-  have h1 : ∀ i, ContDiff ℝ n (fun x => J x i) := by
-    rw [SpaceTime.contDiff_vector]
-    exact hJ
   apply ContDiff.const_smul
-  exact h1 (Sum.inl 0)
+  exact (SpaceTime.contDiff_vector J).mpr hJ (Sum.inl 0)
 
 /-!
 
@@ -169,56 +160,37 @@ lemma currentDensity_differentiable {d : ℕ} {c : SpeedOfLight} {J : LorentzCur
     (hJ : Differentiable ℝ J) : Differentiable ℝ ↿(J.currentDensity c) := by
   rw [currentDensity_eq_timeSlice]
   apply timeSlice_differentiable
-  have h1 : ∀ i, Differentiable ℝ (fun x => J x i) := by
-    rw [SpaceTime.differentiable_vector]
-    exact hJ
-  exact differentiable_euclidean.mpr fun i => h1 (Sum.inr i)
+  exact differentiable_euclidean.mpr fun i => (SpaceTime.differentiable_vector J).mpr hJ (Sum.inr i)
 
 lemma currentDensity_apply_differentiable {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (i : Fin d) :
-    Differentiable ℝ ↿(fun t x => J.currentDensity c t x i) := by
-  change Differentiable ℝ (EuclideanSpace.proj i ∘ ↿(J.currentDensity c))
-  refine Differentiable.comp ?_ ?_
-  · exact ContinuousLinearMap.differentiable (𝕜 := ℝ) (EuclideanSpace.proj i)
-  · exact currentDensity_differentiable hJ
+    Differentiable ℝ ↿(fun t x => J.currentDensity c t x i) :=
+  (ContinuousLinearMap.differentiable (𝕜 := ℝ) (EuclideanSpace.proj i)).comp
+    (currentDensity_differentiable hJ)
 
 lemma currentDensity_differentiable_space {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (t : Time) :
-    Differentiable ℝ (fun x => J.currentDensity c t x) := by
-  change Differentiable ℝ (↿(J.currentDensity c) ∘ fun x => (t, x))
-  refine Differentiable.comp ?_ ?_
-  · exact currentDensity_differentiable hJ
-  · fun_prop
+    Differentiable ℝ (fun x => J.currentDensity c t x) :=
+  (currentDensity_differentiable hJ).comp (f := fun x => (t, x)) (by fun_prop)
 
 lemma currentDensity_apply_differentiable_space {d : ℕ} {c : SpeedOfLight}
     {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (t : Time) (i : Fin d) :
-    Differentiable ℝ (fun x => J.currentDensity c t x i) := by
-  change Differentiable ℝ (EuclideanSpace.proj i ∘ (↿(J.currentDensity c) ∘ fun x => (t, x)))
-  refine Differentiable.comp ?_ ?_
-  · exact ContinuousLinearMap.differentiable (𝕜 := ℝ) _
-  · apply Differentiable.comp ?_ ?_
-    · exact currentDensity_differentiable hJ
-    · fun_prop
+    Differentiable ℝ (fun x => J.currentDensity c t x i) :=
+  (ContinuousLinearMap.differentiable (𝕜 := ℝ) (EuclideanSpace.proj i)).comp
+    (currentDensity_differentiable_space hJ t)
 
 lemma currentDensity_differentiable_time {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (x : Space d) :
-    Differentiable ℝ (fun t => J.currentDensity c t x) := by
-  change Differentiable ℝ (↿(J.currentDensity c) ∘ fun t => (t, x))
-  refine Differentiable.comp ?_ ?_
-  · exact currentDensity_differentiable hJ
-  · fun_prop
+    Differentiable ℝ (fun t => J.currentDensity c t x) :=
+  (currentDensity_differentiable hJ).comp (f := fun t => (t, x)) (by fun_prop)
 
 lemma currentDensity_apply_differentiable_time {d : ℕ} {c : SpeedOfLight}
     {J : LorentzCurrentDensity d}
     (hJ : Differentiable ℝ J) (x : Space d) (i : Fin d) :
-    Differentiable ℝ (fun t => J.currentDensity c t x i) := by
-  change Differentiable ℝ (EuclideanSpace.proj i ∘ (↿(J.currentDensity c) ∘ fun t => (t, x)))
-  refine Differentiable.comp ?_ ?_
-  · exact ContinuousLinearMap.differentiable (𝕜 := ℝ) _
-  · apply Differentiable.comp ?_ ?_
-    · exact currentDensity_differentiable hJ
-    · fun_prop
+    Differentiable ℝ (fun t => J.currentDensity c t x i) :=
+  (ContinuousLinearMap.differentiable (𝕜 := ℝ) (EuclideanSpace.proj i)).comp
+    (currentDensity_differentiable_time hJ x)
 
 /-!
 
@@ -230,10 +202,7 @@ lemma currentDensity_ContDiff {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDe
     (hJ : ContDiff ℝ n J) : ContDiff ℝ n ↿(J.currentDensity c) := by
   rw [currentDensity_eq_timeSlice]
   apply timeSlice_contDiff
-  have h1 : ∀ i, ContDiff ℝ n (fun x => J x i) := by
-    rw [SpaceTime.contDiff_vector]
-    exact hJ
-  exact contDiff_euclidean.mpr fun i => h1 (Sum.inr i)
+  exact contDiff_euclidean.mpr fun i => (SpaceTime.contDiff_vector J).mpr hJ (Sum.inr i)
 
 end LorentzCurrentDensity
 
