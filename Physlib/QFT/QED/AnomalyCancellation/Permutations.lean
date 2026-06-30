@@ -108,8 +108,8 @@ lemma permTwoInj_fst : i ∈ Set.range ⇑(permTwoInj hij) := by
   rfl
 
 lemma permTwoInj_fst_apply :
-    (Function.Embedding.toEquivRange (permTwoInj hij)).symm ⟨i, permTwoInj_fst hij⟩ = 0 := by
-  exact (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permTwoInj hij))).mpr rfl
+    (Function.Embedding.toEquivRange (permTwoInj hij)).symm ⟨i, permTwoInj_fst hij⟩ = 0 :=
+  (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permTwoInj hij))).mpr rfl
 
 lemma permTwoInj_snd : j ∈ Set.range ⇑(permTwoInj hij) := by
   simp only [Set.mem_range]
@@ -118,8 +118,8 @@ lemma permTwoInj_snd : j ∈ Set.range ⇑(permTwoInj hij) := by
 
 lemma permTwoInj_snd_apply :
     (Function.Embedding.toEquivRange (permTwoInj hij)).symm
-    ⟨j, permTwoInj_snd hij⟩ = 1 := by
-  exact (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permTwoInj hij))).mpr rfl
+    ⟨j, permTwoInj_snd hij⟩ = 1 :=
+  (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permTwoInj hij))).mpr rfl
 
 /-- A permutation which swaps `i` with `i'` and `j` with `j'`. -/
 noncomputable def permTwo : (FamilyPermutations n).group :=
@@ -166,8 +166,8 @@ lemma permThreeInj_fst : i ∈ Set.range ⇑(permThreeInj hij hjk hik) := by
 
 lemma permThreeInj_fst_apply :
     (Function.Embedding.toEquivRange (permThreeInj hij hjk hik)).symm
-    ⟨i, permThreeInj_fst hij hjk hik⟩ = 0 := by
-  exact (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permThreeInj hij hjk hik))).mpr rfl
+    ⟨i, permThreeInj_fst hij hjk hik⟩ = 0 :=
+  (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permThreeInj hij hjk hik))).mpr rfl
 
 lemma permThreeInj_snd : j ∈ Set.range ⇑(permThreeInj hij hjk hik) := by
   simp only [Set.mem_range]
@@ -176,8 +176,8 @@ lemma permThreeInj_snd : j ∈ Set.range ⇑(permThreeInj hij hjk hik) := by
 
 lemma permThreeInj_snd_apply :
     (Function.Embedding.toEquivRange (permThreeInj hij hjk hik)).symm
-    ⟨j, permThreeInj_snd hij hjk hik⟩ = 1 := by
-  exact (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permThreeInj hij hjk hik))).mpr rfl
+    ⟨j, permThreeInj_snd hij hjk hik⟩ = 1 :=
+  (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permThreeInj hij hjk hik))).mpr rfl
 
 lemma permThreeInj_thd : k ∈ Set.range ⇑(permThreeInj hij hjk hik) := by
   simp only [Set.mem_range]
@@ -186,8 +186,8 @@ lemma permThreeInj_thd : k ∈ Set.range ⇑(permThreeInj hij hjk hik) := by
 
 lemma permThreeInj_thd_apply :
     (Function.Embedding.toEquivRange (permThreeInj hij hjk hik)).symm
-    ⟨k, permThreeInj_thd hij hjk hik⟩ = 2 := by
-  exact (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permThreeInj hij hjk hik))).mpr rfl
+    ⟨k, permThreeInj_thd hij hjk hik⟩ = 2 :=
+  (Equiv.symm_apply_eq (Function.Embedding.toEquivRange (permThreeInj hij hjk hik))).mpr rfl
 
 /-- A permutation which swaps three distinct elements with another three. -/
 noncomputable def permThree : (FamilyPermutations n).group :=
