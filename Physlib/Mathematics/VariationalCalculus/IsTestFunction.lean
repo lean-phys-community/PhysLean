@@ -232,8 +232,7 @@ lemma IsTestFunction.of_fderiv {f : X → U} (hf : IsTestFunction f) :
     · fun_prop
     · fun_prop
     · exact Preorder.le_refl (∞ + 1)
-  supp := by
-    exact HasCompactSupport.fderiv ℝ hf.supp
+  supp := HasCompactSupport.fderiv ℝ hf.supp
 
 @[fun_prop]
 lemma IsTestFunction.fderiv_apply {f : X → U} (hf : IsTestFunction f) (δx : X) :
@@ -244,8 +243,7 @@ lemma IsTestFunction.fderiv_apply {f : X → U} (hf : IsTestFunction f) (δx : X
     · fun_prop
     · fun_prop
     · exact Preorder.le_refl (∞ + 1)
-  supp := by
-    exact HasCompactSupport.fderiv_apply ℝ hf.supp δx
+  supp := HasCompactSupport.fderiv_apply ℝ hf.supp δx
 
 open InnerProductSpace' in
 @[fun_prop]

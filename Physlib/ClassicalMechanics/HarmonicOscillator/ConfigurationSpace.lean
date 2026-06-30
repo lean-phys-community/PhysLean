@@ -118,8 +118,7 @@ homeomorphism underlies the single global chart used for the smooth-manifold str
 def valHomeomorphism : ConfigurationSpace ≃ₜ EuclideanSpace ℝ (Fin 1) where
   toEquiv := valEquiv
   continuous_toFun := continuous_induced_dom
-  continuous_invFun := by
-    exact continuous_induced_rng.mpr continuous_id
+  continuous_invFun := continuous_induced_rng.mpr continuous_id
 
 /-- Configuration space is Hausdorff, transported from `EuclideanSpace ℝ (Fin 1)` across the
 coordinate homeomorphism. -/

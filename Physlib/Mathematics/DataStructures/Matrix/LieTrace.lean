@@ -133,8 +133,8 @@ lemma exp_series_diag_term_eq {A : Matrix m m 𝕂} (hA : BlockTriangular A id)
 /-- The diagonal of the matrix exponential series equals the scalar exponential series -/
 lemma matrix_exp_series_diag_eq_scalar_series {A : Matrix m m 𝕂} (hA : BlockTriangular A id)
     (i : m) :
-    (∑' n, ((n.factorial : 𝕂)⁻¹ • (A ^ n)) i i) = ∑' n, (n.factorial : 𝕂)⁻¹ • (A i i) ^ n := by
-  exact tsum_congr (exp_series_diag_term_eq hA · i)
+    (∑' n, ((n.factorial : 𝕂)⁻¹ • (A ^ n)) i i) = ∑' n, (n.factorial : 𝕂)⁻¹ • (A i i) ^ n :=
+  tsum_congr (exp_series_diag_term_eq hA · i)
 
 /-- The diagonal of the exponential of an upper-triangular matrix `A` consists of the
 exponentials of the diagonal entries of `A`. -/
