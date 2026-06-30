@@ -881,8 +881,8 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
         choose U_i V_i hU_i hV_i hx₀_i hV_i_i h_cont_i using h_cont; exact ⟨ U_i, V_i, hU_i, hV_i, hx₀_i, hV_i_i, h_cont_i ⟩ ;);
       -- The open set W := ⋃ᵢ V_i contains spectrum(A x₀) (since each λᵢ ∈ V_i and spectrum = range of eigenvalues). W is open as a union of open sets.
       set W := ⋃ i, V_i i with hW_def
-      have hW_open : IsOpen W := by
-        exact isOpen_iUnion hV_i
+      have hW_open : IsOpen W :=
+        isOpen_iUnion hV_i
       have hW_spectrum : spectrum ℝ (A x₀).mat ⊆ W := by
         intro t ht
         obtain ⟨i, hi⟩ : ∃ i, t = (A x₀).H.eigenvalues i := by
@@ -891,25 +891,27 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
           generalize_proofs at *; (
           exact h_eigenvalues.subset ht |> Exists.imp fun i hi => hi.symm)
         aesop
-      have hW_subset : ∀ᶠ B in nhds (A x₀), spectrum ℝ B.mat ⊆ W := by
-        exact spectrum_subset_of_isOpen (A x₀) W hW_open hW_spectrum
-      have hW_subset_S : ∀ᶠ y in nhdsWithin x₀ S, spectrum ℝ (A y).mat ⊆ W := by
-        exact Filter.mem_of_superset ( hA₂.continuousWithinAt hx₀ |> fun h => h.eventually ( hW_subset ) ) fun y hy => hy
+      have hW_subset : ∀ᶠ B in nhds (A x₀), spectrum ℝ B.mat ⊆ W :=
+        spectrum_subset_of_isOpen (A x₀) W hW_open hW_spectrum
+      have hW_subset_S : ∀ᶠ y in nhdsWithin x₀ S, spectrum ℝ (A y).mat ⊆ W :=
+        Filter.mem_of_superset (hA₂.continuousWithinAt hx₀ |> fun h => h.eventually hW_subset)
+          fun _ hy => hy
       obtain ⟨U', hU'⟩ : ∃ U' ∈ nhds x₀, ∀ y ∈ U' ∩ S, spectrum ℝ (A y).mat ⊆ W := by
         obtain ⟨ U', hU' ⟩ := mem_nhdsWithin_iff_exists_mem_nhds_inter.mp hW_subset_S; use U'; aesop;
       obtain ⟨U'', hU''⟩ : ∃ U'' ∈ nhds x₀, ∀ i, U'' ⊆ U_i i := by
         exact ⟨ ⋂ i, U_i i, Filter.mem_of_superset ( Filter.iInter_mem.mpr fun i => IsOpen.mem_nhds ( hU_i i ) ( h_cont.1 i ) ) fun x hx => by aesop, fun i => Set.iInter_subset _ i ⟩
       set U := U' ∩ U'' with hU_def
-      have hU_mem : U ∈ nhds x₀ := by
-        exact Filter.inter_mem hU'.1 hU''.1
-      have hU_subset : ∀ y ∈ U ∩ S, spectrum ℝ (A y).mat ⊆ W := by
-        exact fun y hy => hU'.2 y ⟨ hy.1.1, hy.2 ⟩ |> Set.Subset.trans <| by simp [ hW_def ] ;
+      have hU_mem : U ∈ nhds x₀ :=
+        Filter.inter_mem hU'.1 hU''.1
+      have hU_subset : ∀ y ∈ U ∩ S, spectrum ℝ (A y).mat ⊆ W :=
+        fun y hy => hU'.2 y ⟨hy.1.1, hy.2⟩ |> Set.Subset.trans <| by simp [hW_def]
       have hU_cont : ∀ y ∈ U ∩ S, ∀ t ∈ spectrum ℝ (A y).mat, ‖f y t - f x₀ t‖ < ε := by
         intro y hy t ht
         obtain ⟨i, hi⟩ : ∃ i, t ∈ V_i i := by
           exact Set.mem_iUnion.mp ( hU_subset y hy ht ) |> Exists.imp fun i => by tauto;
-        have h_cont_i : ‖f y t - f x₀ t‖ < ε := by
-          exact h_cont.2.2 i y ⟨ hU''.2 i ( by aesop ), hy.2 ⟩ t ⟨ hi, hA₁ y hy.2 ht ⟩ |> fun h => by simpa using h;
+        have h_cont_i : ‖f y t - f x₀ t‖ < ε :=
+          h_cont.2.2 i y ⟨hU''.2 i (by aesop), hy.2⟩ t ⟨hi, hA₁ y hy.2 ht⟩ |>
+            fun h => by simpa using h
         exact h_cont_i
       exact h_contra ⟨U, hU_mem, hU_cont⟩
 
@@ -983,8 +985,12 @@ theorem continuous_cfc_joint {X d : Type*} [TopologicalSpace X] [Fintype d] [Dec
           · exact abs_le.mpr ⟨ by linarith [ hU₂ x hx t ht ], by linarith [ hU₂ x hx t ht ] ⟩;
           · linarith [ ε_pos ]))
         generalize_proofs at *; (
-        have h_final : Filter.Tendsto (fun x => ‖(A x).cfc (f x) - (A x).cfc (f x₀)‖) (nhdsWithin x₀ S) (nhds 0) := by
-          exact squeeze_zero_norm' ( by filter_upwards [ h_triangle ] with x hx; simpa using hx ) ( by simpa using h_sup.const_mul _ ) |> fun h => h.trans ( by simp ) ;
+        have h_final :
+            Filter.Tendsto (fun x => ‖(A x).cfc (f x) - (A x).cfc (f x₀)‖)
+              (nhdsWithin x₀ S) (nhds 0) :=
+          squeeze_zero_norm' (by filter_upwards [h_triangle] with x hx; simpa using hx)
+              (by simpa using h_sup.const_mul _) |>
+            fun h => h.trans (by simp)
         generalize_proofs at *; (
         convert h_cont.add ( show ContinuousWithinAt ( fun x => ( A x |> HermitianMat.cfc ) ( f x ) - ( A x |> HermitianMat.cfc ) ( f x₀ ) ) S x₀ from ?_ ) using 1 ; aesop
         generalize_proofs at *; (
@@ -1031,10 +1037,16 @@ lemma inv_cfc_eq_cfc_inv (hf : ∀ i, f (A.H.eigenvalues i) ≠ 0) :
   suffices (A.cfc f).mat⁻¹ = (A.cfc (fun u ↦ 1 / f u)).mat by
     ext1
     simpa using this
-  have h_def : (A.cfc f).mat = ∑ i, f (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) := by
-    exact cfc_toMat_eq_sum_smul_proj A f;
-  have h_subst : (A.cfc (fun u ↦ 1 / f u)).mat = ∑ i, (1 / f (A.H.eigenvalues i)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) := by
-    exact cfc_toMat_eq_sum_smul_proj A fun u ↦ 1 / f u;
+  have h_def : (A.cfc f).mat =
+      ∑ i, f (A.H.eigenvalues i) •
+        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
+          A.H.eigenvectorUnitary.val.conjTranspose) :=
+    cfc_toMat_eq_sum_smul_proj A f
+  have h_subst : (A.cfc (fun u ↦ 1 / f u)).mat =
+      ∑ i, (1 / f (A.H.eigenvalues i)) •
+        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
+          A.H.eigenvectorUnitary.val.conjTranspose) :=
+    cfc_toMat_eq_sum_smul_proj A fun u ↦ 1 / f u
   have h_inv : (A.cfc f).mat * (A.cfc (fun u ↦ 1 / f u)).mat = 1 := by
     -- Since the eigenvectorUnitary is unitary, we have that the product of the projections is the identity matrix.
     have h_unitary : A.H.eigenvectorUnitary.val * A.H.eigenvectorUnitary.val.conjTranspose = 1 := by
@@ -1103,12 +1115,14 @@ lemma intervalIntegrable_toMat_iff (A : ℝ → HermitianMat d 𝕜) (T₁ T₂ 
           have h_toMat_linear : Function.Injective L := by
             intro x y hxy;
             simp_all only [HermitianMat.ext_iff]
-          have h_toMat_linear : ∃ (L_inv : Matrix d d 𝕜 →ₗ[ℝ] HermitianMat d 𝕜), L_inv.comp L = LinearMap.id := by
-            exact IsSemisimpleModule.extension_property L h_toMat_linear LinearMap.id;
+          have h_toMat_linear :
+              ∃ (L_inv : Matrix d d 𝕜 →ₗ[ℝ] HermitianMat d 𝕜),
+                L_inv.comp L = LinearMap.id :=
+            IsSemisimpleModule.extension_property L h_toMat_linear LinearMap.id
           exact ⟨ h_toMat_linear.choose, fun x ↦ by simpa using LinearMap.congr_fun h_toMat_linear.choose_spec x ⟩;
         obtain ⟨ L_inv, hL_inv ⟩ := h_toMat_linear;
-        have h_toMat_linear : IntegrableOn (fun t ↦ L_inv (L (A t))) (Set.uIoc T₁ T₂) μ := by
-          exact ContinuousLinearMap.integrable_comp ( L_inv.toContinuousLinearMap ) h_toMat_integrable;
+        have h_toMat_linear : IntegrableOn (fun t ↦ L_inv (L (A t))) (Set.uIoc T₁ T₂) μ :=
+          ContinuousLinearMap.integrable_comp L_inv.toContinuousLinearMap h_toMat_integrable
         aesop;
       aesop;
     exact h_toMat_integrable h;
@@ -1124,8 +1138,11 @@ The CFC of an integrable function family is integrable.
 lemma integrable_cfc (T₁ T₂ : ℝ) (f : ℝ → ℝ → ℝ) {μ : Measure ℝ}
     (hf : ∀ i, IntervalIntegrable (fun t ↦ f t (A.H.eigenvalues i)) μ T₁ T₂) :
     IntervalIntegrable (fun t ↦ A.cfc (f t)) μ T₁ T₂ := by
-  have h_expand : ∀ t, (A.cfc (f t)).mat = ∑ i, f t (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) := by
-    exact fun t ↦ cfc_toMat_eq_sum_smul_proj A (f t);
+  have h_expand : ∀ t, (A.cfc (f t)).mat =
+      ∑ i, f t (A.H.eigenvalues i) •
+        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
+          A.H.eigenvectorUnitary.val.conjTranspose) :=
+    fun t ↦ cfc_toMat_eq_sum_smul_proj A (f t)
   rw [ ← intervalIntegrable_toMat_iff ];
   rw [ funext h_expand ];
   apply intervalIntegrable_sum_smul_const
@@ -1245,18 +1262,18 @@ theorem inv_ge_one_of_le_one (hA : A.mat.PosDef) (h : A ≤ 1) : 1 ≤ A⁻¹ :=
     have h_cfc_nonneg : ∀ i, 0 ≤ (A.H.eigenvalues i)⁻¹ - 1 := by
       have h_pos : ∀ i, 0 < A.H.eigenvalues i ∧ A.H.eigenvalues i ≤ 1 := by
         -- Since $A$ is positive definite, all its eigenvalues are positive.
-        have h_pos : ∀ i, 0 < A.H.eigenvalues i := by
-          exact fun i => Matrix.PosDef.eigenvalues_pos hA i;
+        have h_pos : ∀ i, 0 < A.H.eigenvalues i :=
+          fun i => Matrix.PosDef.eigenvalues_pos hA i
         -- Since $A \leq 1$, for any eigenvalue $\lambda_i$ of $A$, we have $\lambda_i \leq 1$.
         have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
           have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
             intro i
-            have h_eigenvalue : A.mat.PosSemidef := by
-              exact hA.posSemidef
+            have h_eigenvalue : A.mat.PosSemidef :=
+              hA.posSemidef
             have h_eigenvalue_le_one : ∀ x : d → 𝕜, x ≠ 0 → (star x ⬝ᵥ A.mat.mulVec x) / (star x ⬝ᵥ x) ≤ 1 := by
               intro x hx_ne_zero
-              have h_eigenvalue_le_one : (star x ⬝ᵥ (1 - A.mat).mulVec x) ≥ 0 := by
-                exact Matrix.PosSemidef.dotProduct_mulVec_nonneg h x
+              have h_eigenvalue_le_one : (star x ⬝ᵥ (1 - A.mat).mulVec x) ≥ 0 :=
+                Matrix.PosSemidef.dotProduct_mulVec_nonneg h x
               generalize_proofs at *; (
               rw [ div_le_iff₀ ] <;> simp_all [ Matrix.sub_mulVec, dotProduct_sub ])
             generalize_proofs at *; (
@@ -1272,8 +1289,9 @@ theorem inv_ge_one_of_le_one (hA : A.mat.PosDef) (h : A ≤ 1) : 1 ≤ A⁻¹ :=
     exact (cfc_nonneg_iff A fun x => x⁻¹ - 1).mpr h_cfc_nonneg;
   -- Since $A.cfc (fun x => x⁻¹ - 1) \geq 0$, we have $A.cfc (fun x => x⁻¹) \geq 1$.
   have h_cfc_ge_one : A.cfc (fun x => x⁻¹) ≥ 1 := by
-    have h_cfc_sub : A.cfc (fun x => x⁻¹ - 1) = A.cfc (fun x => x⁻¹) - A.cfc (fun _ => 1) := by
-      exact cfc_sub_apply A Inv.inv fun x => 1;
+    have h_cfc_sub : A.cfc (fun x => x⁻¹ - 1) =
+        A.cfc (fun x => x⁻¹) - A.cfc (fun _ => 1) :=
+      cfc_sub_apply A Inv.inv fun x => 1
     aesop;
   convert h_cfc_ge_one.le using 1;
   convert cfc_inv.symm;
@@ -1371,8 +1389,8 @@ lemma ker_cfc_le_ker_on_set
     (A.cfc f).ker ≤ A.ker := by
   intro x hx
   have h_inner : ∀ i, A.H.eigenvalues i ≠ 0 → inner ℂ (A.H.eigenvectorBasis i) x = 0 := by
-    have h_inner_zero : (A.cfc f).mat.mulVec x = 0 := by
-      exact (mem_ker_iff_mulVec_zero (A.cfc f) x).mp hx
+    have h_inner_zero : (A.cfc f).mat.mulVec x = 0 :=
+      (mem_ker_iff_mulVec_zero (A.cfc f) x).mp hx
     have h_inner_zero_expansion : ∑ i, (f (A.H.eigenvalues i) : ℂ) • inner ℂ (A.H.eigenvectorBasis i) x • A.H.eigenvectorBasis i = 0 := by
       convert h_inner_zero using 1;
       rw [ cfc_mulVec_expansion ];
@@ -1408,8 +1426,8 @@ lemma ker_le_ker_cfc_on_set (hs : spectrum ℝ A.mat ⊆ s) (h : ∀ i ∈ s, i 
   intro x hx
   have h_inner_zero : ∀ i, A.H.eigenvalues i ≠ 0 → inner ℂ (A.H.eigenvectorBasis i) x = 0 := by
     intro i hi
-    have h_inner_zero : A.mat.mulVec x = 0 := by
-      exact (mem_ker_iff_mulVec_zero A x).mp hx;
+    have h_inner_zero : A.mat.mulVec x = 0 :=
+      (mem_ker_iff_mulVec_zero A x).mp hx
     have := mulVec_eq_zero_iff_inner_eigenvector_zero A x; aesop;
   have h_mulVec_zero : (A.cfc f).mat.mulVec x = ∑ i, (f (A.H.eigenvalues i) : ℂ) • inner ℂ (A.H.eigenvectorBasis i) x • A.H.eigenvectorBasis i := by
     convert cfc_mulVec_expansion A f x using 1;
