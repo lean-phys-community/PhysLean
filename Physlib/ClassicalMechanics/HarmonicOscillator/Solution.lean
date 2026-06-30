@@ -66,8 +66,6 @@ prove that they satisfy the equation of motion, and prove some properties of the
 References for the classical harmonic oscillator include:
 - Landau & Lifshitz, Mechanics, page 58, section 21.
 
-## v. TODOs
-
 -/
 
 TODO "Split this file into smaller modules, keeping `Solution.lean` as an umbrella import.
