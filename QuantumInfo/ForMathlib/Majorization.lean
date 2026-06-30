@@ -513,8 +513,8 @@ lemma exists_sorting_equiv (M : Matrix d d ℂ) :
       · norm_num [Function.Injective, Function.Surjective]
         exact fun i j hij => Fin.ext <| by simpa [Fin.ext_iff] using σ.injective <| Fin.ext hij
       · intro b
-        obtain ⟨a, ha⟩ : ∃ a : Fin (List.ofFn (singularValuesSorted M)).length, σ a = ⟨b, by simp⟩ := by
-          exact σ.surjective _
+        obtain ⟨a, ha⟩ : ∃ a : Fin (List.ofFn (singularValuesSorted M)).length, σ a = ⟨b, by simp⟩ :=
+          σ.surjective _
         use ⟨a, lt_of_lt_of_le a.2 (by simp)⟩
         exact Fin.ext (by simp [ha])
       · intro i

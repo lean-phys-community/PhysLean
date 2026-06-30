@@ -237,8 +237,8 @@ lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a :
         rw [Real.rpow_neg hx'.le]
         exact (le_mul_inv_iff₀' <| Real.rpow_pos_of_pos hx' _).mpr (hC x)
       calc
-        _ ≤ (C * ‖x‖ ^ (-(⌈s⌉.toNat + d) : ℝ)) ^ 2 * ‖x‖ ^ (2 * s) := by
-          exact mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (norm_nonneg _) hψ 2)
+        _ ≤ (C * ‖x‖ ^ (-(⌈s⌉.toNat + d) : ℝ)) ^ 2 * ‖x‖ ^ (2 * s) :=
+          mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (norm_nonneg _) hψ 2)
             (Real.rpow_nonneg hx'.le _)
         _ = C ^ 2 * ‖x‖ ^ (-2 * d : ℝ) * ‖x‖ ^ (2 * (s - ⌈s⌉.toNat) : ℝ) := by
           simp_rw [mul_pow, ← Real.rpow_mul_natCast hx'.le, mul_assoc, ← Real.rpow_add hx']

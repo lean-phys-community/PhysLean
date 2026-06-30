@@ -798,8 +798,8 @@ lemma time_integral_mul_pow_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) :
   have hk' : 0 ≤ k := by rw [← hk]; positivity
   calc _
       _ ≤ ‖x‖ ^ m * ((∫ (t : Time), ‖iteratedFDeriv ℝ n η (t, x)‖) *
-          ‖((0 : Space d →L[ℝ] Time).prod (.id ℝ (Space d)))‖ ^ n) := by
-        exact mul_le_mul_of_nonneg (by rfl) (time_integral_iteratedFDeriv_norm_le n η x)
+          ‖((0 : Space d →L[ℝ] Time).prod (.id ℝ (Space d)))‖ ^ n) :=
+        mul_le_mul_of_nonneg (by rfl) (time_integral_iteratedFDeriv_norm_le n η x)
           (by positivity) (by positivity)
       _ ≤ (∫ (t : Time), ‖x‖ ^ m * ‖iteratedFDeriv ℝ n η (t, x)‖) *
           ‖((0 : Space d →L[ℝ] Time).prod (.id ℝ (Space d)))‖ ^ n := by

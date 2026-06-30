@@ -964,8 +964,8 @@ private lemma lieb_thirring_le_one_posDef
     intro k hk
     calc
       ∏ i : Fin k, singularValuesSorted N ⟨i.val, by omega⟩
-        = singularValuesSorted (compoundMatrix N k) (compoundZero k hk) := by
-            exact prod_singularValuesSorted_eq_compoundSV N k hk
+        = singularValuesSorted (compoundMatrix N k) (compoundZero k hk) :=
+            prod_singularValuesSorted_eq_compoundSV N k hk
       _ ≤ singularValuesSorted (compoundMatrix M k) (compoundZero k hk) ^ r := by
             simpa [M, N] using compound_top_singular_le_posDef hA hB hr0 hr1 k hk
       _ = ∏ i : Fin k, (singularValuesSorted M ⟨i.val, by omega⟩) ^ r := by

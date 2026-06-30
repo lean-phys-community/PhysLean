@@ -490,8 +490,8 @@ lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m :
   calc _
       _ ≤ ‖x‖ ^ m * ((∫ (r : ℝ), ‖iteratedFDeriv ℝ n η ((slice i).symm (r, x))‖) *
           ‖(slice i).symm.toContinuousLinearMap.comp
-          ((0 : Space d →L[ℝ] ℝ).prod (ContinuousLinearMap.id ℝ (Space d)))‖ ^ n) := by
-        exact mul_le_mul_of_nonneg (by rfl)
+          ((0 : Space d →L[ℝ] ℝ).prod (ContinuousLinearMap.id ℝ (Space d)))‖ ^ n) :=
+        mul_le_mul_of_nonneg (by rfl)
           (schwartzMap_slice_integral_iteratedFDeriv_norm_le n η i x) (by positivity)
           (by positivity)
       _ ≤ (∫ (r : ℝ), ‖x‖ ^ m * ‖iteratedFDeriv ℝ n η ((slice i).symm (r, x))‖) *
