@@ -380,8 +380,7 @@ lemma ofFieldOpList_append (φs ψs : List 𝓕.FieldOp) :
   simp
 
 lemma ofFieldOpList_cons (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
-    ofFieldOpList (φ :: φs) = ofFieldOp φ * ofFieldOpList φs := by
-  aesop
+    ofFieldOpList (φ :: φs) = ofFieldOp φ * ofFieldOpList φs := by aesop
 
 lemma ofFieldOpList_singleton (φ : 𝓕.FieldOp) :
     ofFieldOpList [φ] = ofFieldOp φ := by
@@ -418,8 +417,7 @@ lemma ofCrAnList_append (φs ψs : List 𝓕.CrAnFieldOp) :
   simp
 
 lemma ofCrAnList_singleton (φ : 𝓕.CrAnFieldOp) :
-    ofCrAnList [φ] = ofCrAnOp φ := by
-  simp only [ofCrAnList, ofCrAnOp, ofCrAnListF_singleton]
+    ofCrAnList [φ] = ofCrAnOp φ := by simp only [ofCrAnList, ofCrAnOp, ofCrAnListF_singleton]
 
 lemma ofFieldOpList_eq_sum (φs : List 𝓕.FieldOp) :
     ofFieldOpList φs = ∑ s : CrAnSection φs, ofCrAnList s.1 := by
@@ -438,14 +436,12 @@ lemma anPart_eq_ι_anPartF (φ : 𝓕.FieldOp) : anPart φ = ι (anPartF φ) := 
 
 @[simp]
 lemma anPart_inAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    anPart (FieldOp.inAsymp φ) = 0 := by
-  simp [anPart, anPartF]
+    anPart (FieldOp.inAsymp φ) = 0 := by simp [anPart, anPartF]
 
 @[simp]
 lemma anPart_position (φ : (Σ f, 𝓕.PositionLabel f) × SpaceTime) :
     anPart (FieldOp.position φ) =
-    ofCrAnOp ⟨FieldOp.position φ, CreateAnnihilate.annihilate⟩ := by
-  simp [anPart, ofCrAnOp]
+    ofCrAnOp ⟨FieldOp.position φ, CreateAnnihilate.annihilate⟩ := by simp [anPart, ofCrAnOp]
 
 @[simp]
 lemma anPart_outAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
@@ -470,13 +466,11 @@ lemma crPart_inAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
 @[simp]
 lemma crPart_position (φ : (Σ f, 𝓕.PositionLabel f) × SpaceTime) :
     crPart (FieldOp.position φ) =
-    ofCrAnOp ⟨FieldOp.position φ, CreateAnnihilate.create⟩ := by
-  simp [crPart, ofCrAnOp]
+    ofCrAnOp ⟨FieldOp.position φ, CreateAnnihilate.create⟩ := by simp [crPart, ofCrAnOp]
 
 @[simp]
 lemma crPart_outAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    crPart (FieldOp.outAsymp φ) = 0 := by
-  simp [crPart]
+    crPart (FieldOp.outAsymp φ) = 0 := by simp [crPart]
 
 /-- For field specification `𝓕`, and an element `φ` of `𝓕.FieldOp` the following relation holds:
 
