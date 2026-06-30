@@ -459,8 +459,8 @@ def _root_.MatrixMap.conj (y : Matrix B A R) : MatrixMap A B R where
   map_smul' r x := by rw [RingHom.id_apply, Matrix.mul_smul, Matrix.smul_mul]
 
 omit [DecidableEq A] in
-theorem conj_isPositive (M : Matrix B A 𝕜) : (conj M).IsPositive := by
-  exact fun X hX => hX.mul_mul_conjTranspose_same M
+theorem conj_isPositive (M : Matrix B A 𝕜) : (conj M).IsPositive :=
+  fun _ hX => hX.mul_mul_conjTranspose_same M
 
 omit [DecidableEq A] in
 theorem IsPositive_sum {ι : Type*} [Fintype ι] (f : ι → MatrixMap A B ℂ) (h : ∀ i, (f i).IsPositive) :

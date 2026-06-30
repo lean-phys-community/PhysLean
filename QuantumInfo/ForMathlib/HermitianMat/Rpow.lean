@@ -64,8 +64,9 @@ theorem diagonal_pow (f : d → ℝ) :
   rfl
 
 @[fun_prop]
-theorem rpow_const_continuous {r : ℝ} (hr : 0 ≤ r) : Continuous (fun A : HermitianMat d ℂ ↦ A ^ r) := by
-  exact HermitianMat.cfc_continuous (Real.continuous_rpow_const hr)
+theorem rpow_const_continuous {r : ℝ} (hr : 0 ≤ r) :
+    Continuous (fun A : HermitianMat d ℂ ↦ A ^ r) :=
+  HermitianMat.cfc_continuous (Real.continuous_rpow_const hr)
 
 @[fun_prop]
 theorem const_rpow_continuous [NonSingular A] : Continuous (fun r : ℝ ↦ A ^ r) := by

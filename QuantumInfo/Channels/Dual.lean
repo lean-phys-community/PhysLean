@@ -214,8 +214,8 @@ lemma dual_choi_matrix_posSemidef_of_posSemidef (M : MatrixMap dIn dOut 𝕜) (h
 /--
 The dual of the identity map is the identity map.
 -/
-lemma dual_id : (MatrixMap.id dIn 𝕜).dual = MatrixMap.id dIn 𝕜 := by
-  exact dual_unique (id dIn 𝕜) (id dIn 𝕜) fun A_1 => congrFun rfl
+lemma dual_id : (MatrixMap.id dIn 𝕜).dual = MatrixMap.id dIn 𝕜 :=
+  dual_unique (id dIn 𝕜) (id dIn 𝕜) fun _ => congrFun rfl
 
 private theorem matrix_mem_span_kronecker {A C : Type*} [Fintype A] [Fintype C]
     [DecidableEq A] [DecidableEq C] (X : Matrix (A × C) (A × C) 𝕜) :

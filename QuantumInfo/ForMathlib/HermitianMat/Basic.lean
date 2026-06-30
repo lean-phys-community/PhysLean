@@ -480,8 +480,8 @@ noncomputable def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   LinearMap.range A.lin.toLinearMap
 
 /-- The support of a Hermitian matrix is the sum of its nonzero eigenspaces. -/
-theorem support_eq_sup_eigenspace_nonzero : A.support = ⨆ μ ≠ 0, A.eigenspace μ := by
-  exact A.lin.support_eq_sup_eigenspace_nonzero A.isSymmetric
+theorem support_eq_sup_eigenspace_nonzero : A.support = ⨆ μ ≠ 0, A.eigenspace μ :=
+  A.lin.support_eq_sup_eigenspace_nonzero A.isSymmetric
 
 @[simp]
 theorem support_zero : (0 : HermitianMat n 𝕜).support = ⊥ := by
