@@ -384,8 +384,7 @@ lemma quadSolsIncl_injective (χ : ACCSystemQuad) :
     Function.Injective χ.quadSolsIncl := by
   intro S T h
   have h' : χ.quadSolsInclLinSols S = χ.quadSolsInclLinSols T := by
-    apply ACCSystemLinear.linSolsIncl_injective (χ := χ.toACCSystemLinear)
-    exact h
+    exact ACCSystemLinear.linSolsIncl_injective (χ := χ.toACCSystemLinear) h
   exact quadSolsInclLinSols_injective χ h'
 
 end ACCSystemQuad

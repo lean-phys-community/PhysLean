@@ -917,8 +917,8 @@ def Pa' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n.succ)).LinSols :
     ∑ i, f i • basisa i
 
 lemma Pa'_P'_P!' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) :
-    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr) := by
-  exact Fintype.sum_sum_type _
+    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr) :=
+  Fintype.sum_sum_type _
 
 /-!
 
@@ -1037,9 +1037,7 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
       (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j ∧ g' = g := by
   let X := P! f + (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j
   have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) := by
-    apply Submodule.add_mem
-    exact (P!_in_span f)
-    exact (smul_basis!AsCharges_in_span S j)
+    exact Submodule.add_mem _ (P!_in_span f) (smul_basis!AsCharges_in_span S j)
   have hXsum := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hX
   obtain ⟨f', hf'⟩ := hXsum
   use g
@@ -1048,8 +1046,7 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
   erw [hf']
   simp only [and_self, and_true, X]
   rw [← add_assoc, ← h]
-  apply swap!_as_add at hS
-  exact hS
+  exact swap!_as_add j hS
 
 end VectorLikeEvenPlane
 

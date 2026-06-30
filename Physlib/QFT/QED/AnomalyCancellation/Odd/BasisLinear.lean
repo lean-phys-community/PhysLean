@@ -876,8 +876,8 @@ def Pa' (f : (Fin n) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n + 1)).LinSols :=
     ∑ i, f i • basisa i
 
 lemma Pa'_P'_P!' (f : (Fin n) ⊕ (Fin n) → ℚ) :
-    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr) := by
-  exact Fintype.sum_sum_type _
+    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr) :=
+  Fintype.sum_sum_type _
 
 /-!
 
@@ -1010,9 +1010,7 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).LinSols} (j : Fin n.succ)
     apply Submodule.subset_span
     simp_all only [Set.mem_range, exists_apply_eq_apply]
   have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) := by
-    apply Submodule.add_mem
-    exact hf
-    exact hP
+    exact Submodule.add_mem _ hf hP
   have hXsum := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hX
   obtain ⟨f', hf'⟩ := hXsum
   use g
@@ -1021,8 +1019,7 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).LinSols} (j : Fin n.succ)
   erw [hf']
   simp only [and_self, and_true, X]
   rw [← add_assoc, ← hS1]
-  apply swap!_as_add at hS
-  exact hS
+  exact swap!_as_add j hS
 
 end VectorLikeOddPlane
 
