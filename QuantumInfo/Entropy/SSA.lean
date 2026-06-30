@@ -188,8 +188,7 @@ lemma PosDef_traceRight [Nonempty dB] (A : HermitianMat (dA × dB) ℂ) (hA : A.
     rw [Finset.sum_comm_cycle]
 
 lemma PosDef_traceLeft [Nonempty dA] (A : HermitianMat (dA × dB) ℂ) (hA : A.mat.PosDef) :
-    A.traceLeft.mat.PosDef := by
-  exact PosDef_traceRight (A.reindex (Equiv.prodComm _ _)) (hA.reindex _)
+    A.traceLeft.mat.PosDef := PosDef_traceRight (A.reindex (Equiv.prodComm _ _)) (hA.reindex _)
 
 /--
 V_rho is an isometry.
@@ -364,8 +363,7 @@ theorem HermitianMat.PosDef_kronecker {m n : Type*} [Fintype m] [DecidableEq m]
     [Fintype n] [DecidableEq n]
     (A : HermitianMat m ℂ) (B : HermitianMat n ℂ)
     (hA : A.mat.PosDef) (hB : B.mat.PosDef) :
-    (A ⊗ₖ B).mat.PosDef := by
-  exact Matrix.PosDef.kron hA hB
+    (A ⊗ₖ B).mat.PosDef := Matrix.PosDef.kron hA hB
 
 /- Reindex of PosDef is PosDef. -/
 theorem HermitianMat.PosDef_reindex {d d₂ : Type*} [Fintype d] [DecidableEq d]

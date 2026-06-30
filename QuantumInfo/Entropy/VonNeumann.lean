@@ -257,8 +257,7 @@ the same von Neumann entropy.
 private lemma Sᵥₙ_eq_of_nonzero_eigenvalues_eq (ρ₁ : MState d₁) (ρ₂ : MState d₂)
     (h : (Finset.univ.val.map ρ₁.spectrum.prob).filter (· ≠ 0) =
       (Finset.univ.val.map ρ₂.spectrum.prob).filter (· ≠ 0)) :
-    Sᵥₙ ρ₁ = Sᵥₙ ρ₂ := by
-  exact Hₛ_eq_of_nonzero_multiset_eq _ _ h
+    Sᵥₙ ρ₁ = Sᵥₙ ρ₂ := Hₛ_eq_of_nonzero_multiset_eq _ _ h
 
 /--
 Filtering non-zero elements commutes with mapping `RCLike.ofReal` for multisets.
@@ -286,8 +285,8 @@ private lemma charpoly_roots_filter_ne_zero_eq_eigenvalues_filter_ne_zero {d : T
 Mapping `RCLike.ofReal` over a multiset is injective.
 -/
 private lemma multiset_map_ofReal_injective {R : Type*} [RCLike R] {M N : Multiset ℝ} :
-    M.map (RCLike.ofReal : ℝ → R) = N.map RCLike.ofReal ↔ M = N := by
-  exact ⟨fun h ↦ by simpa using congr(($h).map RCLike.re), fun h ↦ by rw [h]⟩
+    M.map (RCLike.ofReal : ℝ → R) = N.map RCLike.ofReal ↔ M = N :=
+  ⟨fun h ↦ by simpa using congr(($h).map RCLike.re), fun h ↦ by rw [h]⟩
 
 /--
 If the non-zero roots of the characteristic polynomials of two states are equal,

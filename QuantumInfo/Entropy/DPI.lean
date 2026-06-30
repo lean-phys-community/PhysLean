@@ -371,8 +371,8 @@ lemma inner_eq_inner_conj_of_ker_le (ρ σ : MState d)
   simp only [inner_def, conj_apply_mat]
   have h_support :
       σ.M.supportProj.mat * ρ.M.mat = ρ.M.mat ∧
-      ρ.M.mat * σ.M.supportProj.mat = ρ.M.mat := by
-    exact ⟨supportProj_mul_of_ker_le hker, mul_supportProj_of_ker_le hker⟩
+      ρ.M.mat * σ.M.supportProj.mat = ρ.M.mat :=
+    ⟨supportProj_mul_of_ker_le hker, mul_supportProj_of_ker_le hker⟩
   have h_trace_cyclic :
       Matrix.trace ((σ.M ^ γ).mat * ρ.M.mat * (σ.M ^ γ).mat *
         (σ.M ^ (-γ)).mat * H.mat * (σ.M ^ (-γ)).mat) =
@@ -516,8 +516,8 @@ This follows from the variational formula: the supremum equals `Q̃_α(ρ‖σ)`
 which is a finite real number.
 -/
 theorem f_alpha_bddAbove (hα : 1 < α) (ρ σ : MState d) (hker : σ.M.ker ≤ ρ.M.ker) :
-    BddAbove (Set.range (fun H : {H : HermitianMat d ℂ // 0 ≤ H} => f_alpha α H.1 ρ σ)) := by
-  exact ⟨_, Set.forall_mem_range.mpr fun H => f_alpha_le_at_optimizer hα ρ σ _ H.2 hker⟩
+    BddAbove (Set.range (fun H : {H : HermitianMat d ℂ // 0 ≤ H} => f_alpha α H.1 ρ σ)) :=
+  ⟨_, Set.forall_mem_range.mpr fun H => f_alpha_le_at_optimizer hα ρ σ _ H.2 hker⟩
 
 /-
 **Step 5 (Sup preserves convexity)**: The supremum over `H ≥ 0` of the jointly
@@ -827,8 +827,8 @@ The trace functional is multiplicative over tensor products:
 -/
 theorem sandwichedTraceFunctional_mul
     (ρ₁ σ₁ : MState dA) (ρ₂ σ₂ : MState dB) :
-    Q̃_ α(ρ₁ ⊗ᴹ ρ₂‖σ₁ ⊗ᴹ σ₂) = Q̃_ α(ρ₁‖σ₁) * Q̃_ α(ρ₂‖σ₂) := by
-  exact sandwiched_term_product ρ₁ σ₁ ρ₂ σ₂ α ((1 - α) / (2 * α))
+    Q̃_ α(ρ₁ ⊗ᴹ ρ₂‖σ₁ ⊗ᴹ σ₂) = Q̃_ α(ρ₁‖σ₁) * Q̃_ α(ρ₂‖σ₂) :=
+  sandwiched_term_product ρ₁ σ₁ ρ₂ σ₂ α ((1 - α) / (2 * α))
 
 /-
 The trace functional of a state with itself equals 1.
@@ -883,8 +883,8 @@ theorem MState.conjTensorUnitary_M (ρ : MState (dA × dB)) (V : Matrix.unitaryG
 /-- The trace functional is invariant under `1_A ⊗ V` conjugation. -/
 theorem sandwichedTraceFunctional_conj_tensorUnitary
     (ρ σ : MState (dA × dB)) (V : Matrix.unitaryGroup dB ℂ) :
-    Q̃_ α(ρ.conjTensorUnitary V‖σ.conjTensorUnitary V) = Q̃_ α(ρ‖σ) := by
-  exact sandwichedTraceFunctional_conj_unitary_MState _ ρ σ
+    Q̃_ α(ρ.conjTensorUnitary V‖σ.conjTensorUnitary V) = Q̃_ α(ρ‖σ) :=
+  sandwichedTraceFunctional_conj_unitary_MState _ ρ σ
 
 section twirling
 
@@ -1290,8 +1290,7 @@ theorem sandwichedRenyiEntropy_tensor_pure (hα : 0 < α) (ρ σ : MState d₁) 
 /-- The sandwiched Rényi divergence is invariant under SWAP. -/
 @[simp]
 theorem sandwichedRenyiEntropy_SWAP (ρ σ : MState (dA × dB)) :
-    D̃_ α(ρ.SWAP‖σ.SWAP) = D̃_ α(ρ‖σ) := by
-  exact sandwichedRelRentropy_relabel ρ σ _
+    D̃_ α(ρ.SWAP‖σ.SWAP) = D̃_ α(ρ‖σ) := sandwichedRelRentropy_relabel ρ σ _
 
 /-
 Monotonicity of the sandwiched Rényi divergence under traceRight for `α > 1`,

@@ -1820,8 +1820,7 @@ theorem sandwichedRelRentropy_of_unique [Unique d] (ρ σ : MState d) :
 
 @[simp]
 theorem qRelEntropy_of_unique [Unique d] (ρ σ : MState d) :
-    𝐃(ρ‖σ) = 0 := by
-  exact sandwichedRelRentropy_of_unique ρ σ
+    𝐃(ρ‖σ) = 0 := sandwichedRelRentropy_of_unique ρ σ
 
 theorem sandwichedRelRentropy_heq_congr
       {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
@@ -1845,9 +1844,8 @@ theorem sandwichedRelRentropy_congr {α : ℝ}
   simp
 
 theorem qRelEntropy_heq_congr {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
-      {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂) (hρ : ρ₁ ≍ ρ₂) (hσ : σ₁ ≍ σ₂) :
-    𝐃(ρ₁‖σ₁) = 𝐃(ρ₂‖σ₂) := by
-  exact sandwichedRelRentropy_heq_congr hd hρ hσ
+    {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂) (hρ : ρ₁ ≍ ρ₂) (hσ : σ₁ ≍ σ₂) :
+    𝐃(ρ₁‖σ₁) = 𝐃(ρ₂‖σ₂) := sandwichedRelRentropy_heq_congr hd hρ hσ
 
 /-- Quantum relative entropy when σ has full rank -/
 theorem qRelativeEnt_rank {ρ σ : MState d} [σ.M.NonSingular] :
@@ -2058,8 +2056,8 @@ theorem qRelativeEnt_lowerSemicontinuous_2 (ρ x : MState d) (hx : ¬(x.M.ker �
       convert h_inner_lt_y using 1
       ext1 N
       simp [inner_sub_right]
-    obtain ⟨N, hN⟩ : ∃ N : ℕ, ⟪ρ.M, ρ.M.log - x.M.cfc (approxLog N)⟫ > y.toReal := by
-      exact (h_inner_lt_y.eventually_gt_atTop _ ).exists
+    obtain ⟨N, hN⟩ : ∃ N : ℕ, ⟪ρ.M, ρ.M.log - x.M.cfc (approxLog N)⟫ > y.toReal :=
+      (h_inner_lt_y.eventually_gt_atTop _ ).exists
     have h_cont : Continuous (fun σ : MState d => ⟪ρ.M, ρ.M.log - σ.M.cfc (approxLog N)⟫) := by
       simp only [inner_sub_right]
       exact continuous_const.sub (continuous_inner_cfc_approxLog ρ N)
@@ -2326,8 +2324,7 @@ private lemma pos_of_MState_le_smul {σ₁ σ₂ : MState d} (hσ : σ₂.M ≤ 
 open ComplexOrder in
 private lemma HermitianMat.inner_log_mono_of_posDef_of_le {A B C : HermitianMat d 𝕜}
     (hC : 0 ≤ C) (hA : A.mat.PosDef) (hAB : A ≤ B) :
-    ⟪C, A.log⟫ ≤ ⟪C, B.log⟫ := by
-  exact inner_mono hC (log_mono hA hAB)
+    ⟪C, A.log⟫ ≤ ⟪C, B.log⟫ := inner_mono hC (log_mono hA hAB)
 
 open ComplexOrder in
 private lemma posDef_add_eps {A : HermitianMat d ℂ} (hA : 0 ≤ A) {ε : ℝ} (hε : 0 < ε) :
