@@ -98,8 +98,8 @@ lemma Φ_mem_pdSet [Nonempty d] (A : HermitianMat d ℂ) (hA : A.mat.PosDef) :
 set_option synthInstance.maxHeartbeats 80000 in
 /-- `Φ` commutes with CFC for Hermitian matrices. -/
 lemma Φ_cfc (A : HermitianMat d ℂ) (f : ℝ → ℝ) :
-    Φ (cfc f A.mat) = cfc f (Φ A.mat) := by
-  exact StarAlgHomClass.map_cfc Φ f A.mat (hφ := Φ_continuous)
+    Φ (cfc f A.mat) = cfc f (Φ A.mat) :=
+  StarAlgHomClass.map_cfc Φ f A.mat (hφ := Φ_continuous)
     (ha := A.H.isSelfAdjoint)
 
 set_option synthInstance.maxHeartbeats 80000 in
@@ -183,8 +183,8 @@ omit [Fintype d] in
 /-- σ + εI → σ as ε → 0+. -/
 private lemma tendsto_add_eps (σ : HermitianMat d ℂ) :
     Filter.Tendsto (fun ε : ℝ ↦ σ + ε • (1 : HermitianMat d ℂ))
-      (nhdsWithin 0 (Set.Ioi 0)) (nhds σ) := by
-  exact tendsto_nhdsWithin_of_tendsto_nhds
+      (nhdsWithin 0 (Set.Ioi 0)) (nhds σ) :=
+  tendsto_nhdsWithin_of_tendsto_nhds
     (Continuous.tendsto' (by continuity) _ _ (by simp))
 
 /-! ### Helper lemmas for the core concavity proof -/

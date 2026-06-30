@@ -68,11 +68,9 @@ theorem operatorPowerMean_jointlyConcaveOn_pdSet
         intro K _ _ _ _
         exact power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := K) α hα)
       (hfcont := rpow_continuousOn_Ici α hα.1)
-      (hf0 := by
-        exact Real.rpow_nonneg (show (0 : ℝ) ≤ 0 by simp) α)
-      (hconc := by
-        exact operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
-          (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
+      (hf0 := Real.rpow_nonneg (show (0 : ℝ) ≤ 0 by simp) α)
+      (hconc := operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
+        (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
       (hcont := by
         intro x hx
         exact (Real.continuousAt_rpow_const x β (Or.inl (ne_of_gt hx))).continuousWithinAt)
@@ -106,9 +104,8 @@ theorem operatorPowerMean_jointlyConvexOn_pdSet
         · have hα0 : α ≠ 0 := by linarith [hα.1]
           simp [Real.zero_rpow hα0]
       )
-      (hconc := by
-        exact operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
-          (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
+      (hconc := operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
+        (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
       (hcont := by
         intro x hx
         exact (Real.continuousAt_rpow_const x β (Or.inl (ne_of_gt hx))).continuousWithinAt)
