@@ -98,8 +98,7 @@ lemma mem_iff_apply_succSuccAbove_eq {n : ℕ} {c : Fin (n + 1 + 1) → C}
 lemma mem_self_of_dropPair {n : ℕ} {c : Fin (n + 1 + 1) → C}
     {i j : Fin (n + 1 + 1)}
     (b : ComponentIdx (c)) :
-    b ∈ DropPairSection (S := S) (b.dropPair i j) := by
-  simp [DropPairSection]
+    b ∈ DropPairSection (S := S) (b.dropPair i j) := by simp [DropPairSection]
 
 /-- Given a `b` in `ComponentIdx (c ∘ Fin.succSuccAbove i j))` and
   an `x` in `Fin (S.repDim (c i)) × Fin (S.repDim (c j))`, the corresponding
@@ -118,8 +117,7 @@ def ofFin {n : ℕ} {c : Fin (n + 1 + 1) → C}
 lemma ofFin_apply_fst {n : ℕ} {c : Fin (n + 1 + 1) → C}
     {i j : Fin (n + 1 + 1)} (hij : i ≠ j) (b : ComponentIdx (c ∘ Fin.succSuccAbove i j))
     (x : basisIdx (c i) × basisIdx (c j)) :
-    ofFin (S := S) hij b x i = x.1 := by
-  simp [ofFin]
+    ofFin (S := S) hij b x i = x.1 := by simp [ofFin]
 
 @[simp]
 lemma ofFin_apply_snd {n : ℕ} {c : Fin (n + 1 + 1) → C}
@@ -163,22 +161,19 @@ def ofFinEquiv {n : ℕ} {c : Fin n.succ.succ → C}
       symm
       apply ComponentIdx.congr_right
       simp
-  left_inv x := by
-    simp
+  left_inv x := by simp
 
 @[simp]
 lemma ofFinEquiv_apply_fst {n : ℕ} {c : Fin (n + 1 + 1) → C}
     {i j : Fin (n + 1 + 1)} (hij : i ≠ j) (b : ComponentIdx (c ∘ Fin.succSuccAbove i j))
     (x : basisIdx (c i) × basisIdx (c j)) :
-    (ofFinEquiv (S := S) hij b x).1 i = x.1 := by
-  simp [ofFinEquiv]
+    (ofFinEquiv (S := S) hij b x).1 i = x.1 := by simp [ofFinEquiv]
 
 @[simp]
 lemma ofFinEquiv_apply_snd {n : ℕ} {c : Fin (n + 1 + 1) → C}
     {i j : Fin (n + 1 + 1)} (hij : i ≠ j) (b : ComponentIdx (c ∘ Fin.succSuccAbove i j))
     (x : basisIdx (c i) × basisIdx (c j)) :
-    (ofFinEquiv (S := S) hij b x).1 j = x.2 := by
-  simp [ofFinEquiv]
+    (ofFinEquiv (S := S) hij b x).1 j = x.2 := by simp [ofFinEquiv]
 
 end DropPairSection
 
