@@ -238,8 +238,8 @@ the smoothness of the electromagnetic potential.
 lemma vectorPotential_contDiff {n} {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ n A) : ContDiff ℝ n ↿(A.vectorPotential c) := by
   simp [vectorPotential]
-  apply timeSlice_contDiff
-  exact contDiff_euclidean.mpr fun i => (SpaceTime.contDiff_vector A).mpr hA (Sum.inr i)
+  exact timeSlice_contDiff c _ (contDiff_euclidean.mpr fun i =>
+    (SpaceTime.contDiff_vector A).mpr hA (Sum.inr i))
 
 open ContDiff
 @[fun_prop]
@@ -285,8 +285,8 @@ the differentiablity of the electromagnetic potential.
 lemma vectorPotential_differentiable {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
     (hA : Differentiable ℝ A) : Differentiable ℝ ↿(A.vectorPotential c) := by
   simp [vectorPotential]
-  apply timeSlice_differentiable
-  exact differentiable_euclidean.mpr fun i => (SpaceTime.differentiable_vector A).mpr hA (Sum.inr i)
+  exact timeSlice_differentiable c _ (differentiable_euclidean.mpr fun i =>
+    (SpaceTime.differentiable_vector A).mpr hA (Sum.inr i))
 
 lemma vectorPotential_differentiable_time {d} {c : SpeedOfLight} (A : ElectromagneticPotential d)
     (hA : Differentiable ℝ A) (x : Space d) : Differentiable ℝ (A.vectorPotential c · x) :=

@@ -192,8 +192,7 @@ lemma comp {F : (Y → V) → (Z → W)} {G : (X → U) → (Y → V)} {u : X �
   smooth_at := hG.smooth_at
   diff := by
     intro φ hφ
-    apply hF.diff (φ := fun t x => G (φ t) x)
-    exact hG.diff φ hφ
+    exact hF.diff (φ := fun t x => G (φ t) x) (hG.diff φ hφ)
   linearize := by
     intro φ hφ x
     rw[hF.linearize (fun t x => G (φ t) x) (hG.diff φ hφ)]

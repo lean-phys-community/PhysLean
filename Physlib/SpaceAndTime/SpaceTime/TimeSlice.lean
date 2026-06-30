@@ -178,8 +178,7 @@ lemma distTimeSlice_distDeriv_inl {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
   rw [toTimeAndSpace_basis_inl']
   rw [map_smul]
   simp only [one_div, smul_eq_mul]
-  · apply Differentiable.differentiableAt
-    exact SchwartzMap.differentiable κ
+  · exact (SchwartzMap.differentiable κ).differentiableAt
   · fun_prop
 
 lemma distDeriv_inl_distTimeSlice_symm {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
@@ -219,8 +218,7 @@ lemma distTimeSlice_distDeriv_inr {M d} [NormedAddCommGroup M] [NormedSpace ℝ 
   simp only [toTimeAndSpace_fderiv, ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe,
     Function.comp_apply]
   rw [toTimeAndSpace_basis_inr]
-  · apply Differentiable.differentiableAt
-    exact SchwartzMap.differentiable κ
+  · exact (SchwartzMap.differentiable κ).differentiableAt
   · fun_prop
 
 lemma distDeriv_inr_distTimeSlice_symm {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]

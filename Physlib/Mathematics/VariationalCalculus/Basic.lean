@@ -245,5 +245,4 @@ lemma fundamental_theorem_of_variational_calculus {f : X → V}
   · intro x
     simp only [Pi.zero_apply]
     apply real_inner_self_nonneg'
-  · apply IsTestFunction.integrable
-    exact IsTestFunction.inner hf hf
+  · exact (IsTestFunction.inner hf hf).integrable μ
