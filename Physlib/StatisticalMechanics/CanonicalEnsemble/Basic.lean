@@ -938,7 +938,7 @@ lemma physicalProbability_nonneg
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
     0 ≤ 𝓒.physicalProbability T i := by
   have hp := 𝓒.probability_nonneg (T:=T) i
-  exact mul_nonneg hp (by exact pow_nonneg (le_of_lt 𝓒.hPos) _)
+  exact mul_nonneg hp (pow_nonneg (le_of_lt 𝓒.hPos) _)
 
 lemma physicalProbability_pos
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :

@@ -512,7 +512,7 @@ lemma filter_rel_eq_insertionSort {α : Type} (r : α → α → Prop) [Decidabl
     simp only [List.insertionSort]
     by_cases h : r a b ∧ r b a
     · have hl := orderedInsert_filter_of_pos r b (fun c => r a c ∧ r c a) h
-        (List.insertionSort r l) (by exact List.pairwise_insertionSort r l)
+        (List.insertionSort r l) (List.pairwise_insertionSort r l)
       simp only [Bool.decide_and] at hl ⊢
       erw [hl]
       rw [List.orderedInsert_eq_take_drop]

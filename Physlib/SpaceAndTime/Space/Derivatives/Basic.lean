@@ -464,7 +464,7 @@ lemma deriv_differentiable {M} [NormedAddCommGroup M]
     [NormedSpace ℝ M] {d : ℕ} {f : Space d → M}
     (hf : ContDiff ℝ 2 f) (i : Fin d) :
     Differentiable ℝ (deriv i f) := by
-  suffices h1 : Differentiable ℝ (fun x => fderiv ℝ f x (basis i)) by exact h1
+  suffices Differentiable ℝ (fun x => fderiv ℝ f x (basis i)) from this
   fun_prop
 
 open ContDiff

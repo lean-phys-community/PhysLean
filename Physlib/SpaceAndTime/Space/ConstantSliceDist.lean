@@ -284,7 +284,7 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
     exact ((η.smooth'.differentiable (by simp)).comp (by fun_prop)).differentiableAt
   obtain ⟨rt, hrt⟩ := schwartzMap_slice_bound (m := 0) (n := 1) (d := d) i
   obtain ⟨k, hrt, hbound, k_eq⟩ := hrt η
-  suffices h1 : HasFDerivAt (fun x => ∫ (a : ℝ), F x a) (∫ (a : ℝ), F' x₀ a) x₀ by exact h1
+  suffices HasFDerivAt (fun x => ∫ (a : ℝ), F x a) (∫ (a : ℝ), F' x₀ a) x₀ from this
   apply hasFDerivAt_integral_of_dominated_of_fderiv_le
     (bound := fun t => (k * ‖(slice i).symm.toContinuousLinearMap.comp
           (ContinuousLinearMap.prod (0 : Space d →L[ℝ] ℝ) (ContinuousLinearMap.id ℝ (Space d)))‖)

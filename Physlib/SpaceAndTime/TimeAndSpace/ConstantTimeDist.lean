@@ -663,13 +663,13 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
     intro m
     refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
     · exact Nat.cast_lt.mpr (by omega)
-    · exact η.smooth'.of_le (by exact ENat.LEInfty.out)
+    · exact η.smooth'.of_le ENat.LEInfty.out
   have hη_diff' : ∀ (m : ℕ) (t : Time),
       Differentiable ℝ (iteratedFDeriv ℝ m (fun x => η (t, x))) := by
     intro m t
     refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
     · exact Nat.cast_lt.mpr (by omega)
-    · exact (η.smooth'.of_le (by exact ENat.LEInfty.out)).comp (by fun_prop)
+    · exact (η.smooth'.of_le ENat.LEInfty.out).comp (by fun_prop)
   induction n with
   | zero =>
     simp
