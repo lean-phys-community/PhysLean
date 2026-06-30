@@ -39,24 +39,17 @@ lemma normalOrder_ofCrAnList (φs : List 𝓕.CrAnFieldOp) :
 
 @[simp]
 lemma normalOrder_one_eq_one : normalOrder (𝓕 := 𝓕) 1 = 1 := by
-  have h1 : 1 = ofCrAnList (𝓕 := 𝓕) [] := by simp [ofCrAnList]
-  rw [h1]
-  rw [normalOrder_ofCrAnList]
-  simp
+  simpa [ofCrAnList, normalOrderSign_nil, normalOrderList_nil, one_smul] using
+    normalOrder_ofCrAnList (𝓕 := 𝓕) []
 
 @[simp]
 lemma normalOrder_ofFieldOpList_nil : normalOrder (𝓕 := 𝓕) (ofFieldOpList []) = 1 := by
-  rw [ofFieldOpList]
-  rw [normalOrder_eq_ι_normalOrderF]
-  simp only [ofFieldOpListF_nil]
-  change normalOrder (𝓕 := 𝓕) 1 = _
-  simp
+  simp [ofFieldOpList, ofFieldOpListF_nil]
 
 @[simp]
 lemma normalOrder_ofCrAnList_nil : normalOrder (𝓕 := 𝓕) (ofCrAnList []) = 1 := by
-  rw [normalOrder_ofCrAnList]
-  simp only [normalOrderSign_nil, normalOrderList_nil, ofCrAnList_nil]
-  module
+  simpa only [normalOrderSign_nil, normalOrderList_nil, ofCrAnList_nil, one_smul] using
+    normalOrder_ofCrAnList (𝓕 := 𝓕) []
 
 lemma ofCrAnList_eq_normalOrder (φs : List 𝓕.CrAnFieldOp) :
     ofCrAnList (normalOrderList φs) = normalOrderSign φs • 𝓝(ofCrAnList φs) := by
@@ -76,23 +69,11 @@ lemma normalOrder_normalOrder_mid (a b c : 𝓕.WickAlgebra) :
 
 lemma normalOrder_normalOrder_left (a b : 𝓕.WickAlgebra) :
     𝓝(a * b) = 𝓝(𝓝(a) * b) := by
-  obtain ⟨a, rfl⟩ := ι_surjective a
-  obtain ⟨b, rfl⟩ := ι_surjective b
-  rw [normalOrder_eq_ι_normalOrderF]
-  simp only [← map_mul]
-  rw [normalOrder_eq_ι_normalOrderF]
-  rw [normalOrderF_normalOrderF_left]
-  rfl
+  simpa using normalOrder_normalOrder_mid (1 : 𝓕.WickAlgebra) a b
 
 lemma normalOrder_normalOrder_right (a b : 𝓕.WickAlgebra) :
     𝓝(a * b) = 𝓝(a * 𝓝(b)) := by
-  obtain ⟨a, rfl⟩ := ι_surjective a
-  obtain ⟨b, rfl⟩ := ι_surjective b
-  rw [normalOrder_eq_ι_normalOrderF]
-  simp only [← map_mul]
-  rw [normalOrder_eq_ι_normalOrderF]
-  rw [normalOrderF_normalOrderF_right]
-  rfl
+  simpa using normalOrder_normalOrder_mid a b (1 : 𝓕.WickAlgebra)
 
 lemma normalOrder_normalOrder (a : 𝓕.WickAlgebra) : 𝓝(𝓝(a)) = 𝓝(a) := by
   trans 𝓝(𝓝(a) * 1)

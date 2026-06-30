@@ -475,7 +475,7 @@ lemma timeOrder_ofFieldOpList_nil : 𝓣(ofFieldOpList (𝓕 := 𝓕) []) = 1 :=
 @[simp]
 lemma timeOrder_ofFieldOpList_singleton (φ : 𝓕.FieldOp) :
     𝓣(ofFieldOpList [φ]) = ofFieldOpList [φ] := by
-  rw [ofFieldOpList, timeOrder_eq_ι_timeOrderF, timeOrderF_ofFieldOpListF_singleton]
+  simp [ofFieldOpList, timeOrder_eq_ι_timeOrderF, timeOrderF_ofFieldOpListF_singleton]
 
 /-- For a field specification `𝓕`, the time order operator acting on a
   list of `𝓕.FieldOp`, `𝓣(φ₀…φₙ)`, is equal to
