@@ -88,8 +88,7 @@ scoped notation "∂_" => deriv
 lemma deriv_eq {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
     ∂_ μ f y =
-    fderiv ℝ f y (Lorentz.Vector.basis μ) := by
-  rfl
+    fderiv ℝ f y (Lorentz.Vector.basis μ) := rfl
 
 /-- The derivative of a function from `SpaceTime d` to a manifold along the `μ`
 coordinate, as a tangent vector at the value of the function. -/
@@ -374,15 +373,14 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   toFun f :=
     let ev : (SpaceTime d →L[ℝ] M) →L[ℝ] M := {
       toFun v := v (Lorentz.Vector.basis μ)
-      map_add' v1 v2 := by
-        simp only [_root_.add_apply]
-      map_smul' a v := by
-        simp
+      map_add' _ _ := rfl
+      map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' f1 f2 := by
+  map_add' _ _ := by
     simp
-  map_smul' a f := by simp
+  map_smul' _ _ := by
+    simp
 
 lemma distDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin 1 ⊕ Fin d) (f : (SpaceTime d) →d[ℝ] M) (ε : 𝓢(SpaceTime d, ℝ)) :

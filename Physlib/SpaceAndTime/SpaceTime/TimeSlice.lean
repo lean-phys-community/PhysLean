@@ -135,9 +135,8 @@ noncomputable def distTimeSlice {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     congr
     ext x
     simp
-  map_add' f1 f2 := by
-    simp
-  map_smul' a f := by simp
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
   continuous_toFun := ((compCLMOfContinuousLinearEquiv ℝ (toTimeAndSpace c)).precomp M).continuous
   continuous_invFun :=
     ((compCLMOfContinuousLinearEquiv ℝ (toTimeAndSpace c).symm).precomp M).continuous
