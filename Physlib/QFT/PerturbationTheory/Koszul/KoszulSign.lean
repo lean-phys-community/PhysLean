@@ -175,8 +175,8 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
       exact lt_orderedInsertPos_rel le φ1 rs ni hninro
     have hc2 (hninro : ¬ ni.castSucc < nro) : le φ1 φ := by
       rw [← hns]
-      refine gt_orderedInsertPos_rel le φ1 rs ?_ ni hninro
-      exact List.pairwise_insertionSort le (List.insertIdx φs n φ)
+      exact gt_orderedInsertPos_rel le φ1 rs
+        (List.pairwise_insertionSort le (List.insertIdx φs n φ)) ni hninro
     by_cases hn : ni.castSucc < nro
     · simp only [hn, ↓reduceIte, Fin.val_castSucc]
       rw [ofList_take_insertIdx_gt]
@@ -379,8 +379,7 @@ lemma koszulSign_of_append_eq_insertionSort [Std.Total le] [IsTrans 𝓕 le] : (
     congr 2
     apply koszulSignInsert_eq_perm
     refine (List.perm_append_right_iff φs').mpr ?_
-    refine List.Perm.append_left φs'' ?_
-    exact List.Perm.symm (List.perm_insertionSort le φs)
+    exact List.Perm.append_left φs'' (List.Perm.symm (List.perm_insertionSort le φs))
 
 /-!
 
@@ -413,8 +412,7 @@ lemma koszulSign_perm_eq_append [IsTrans 𝓕 le] (φ : 𝓕) (φs φs' φs2 : L
     simp_all only [and_self, implies_true, nonempty_prop, forall_const, motive]
     refine (ih2 ?_)
     intro φ' hφ
-    refine h φ' ?_
-    exact (List.Perm.mem_iff (id (List.Perm.symm h1))).mp hφ
+    exact h φ' ((List.Perm.mem_iff (id (List.Perm.symm h1))).mp hφ)
 
 lemma koszulSign_perm_eq [IsTrans 𝓕 le] (φ : 𝓕) : (φs1 φs φs' φs2 : List 𝓕) →
     (h : ∀ φ' ∈ φs, le φ φ' ∧ le φ' φ) → (hp : φs.Perm φs') →
@@ -428,7 +426,6 @@ lemma koszulSign_perm_eq [IsTrans 𝓕 le] (φ : 𝓕) : (φs1 φs φs' φs2 : L
     rw [ih]
     congr 1
     apply koszulSignInsert_eq_perm
-    refine (List.perm_append_right_iff φs2).mpr ?_
-    exact List.Perm.append_left φs1 hp
+    exact (List.perm_append_right_iff φs2).mpr (List.Perm.append_left φs1 hp)
 
 end Wick

@@ -188,8 +188,9 @@ lemma take_insert_let {I : Type} (i : I) :
     simp only [List.insertIdx_succ_cons, List.take_succ_cons]
     have hp : (i :: a :: List.take n as).Perm (a :: i :: List.take n as) :=
       List.Perm.swap a i (List.take n as)
-    refine List.Perm.trans ?_ hp.symm
-    exact List.Perm.cons a
-      (take_insert_let i n m (Nat.le_of_succ_le_succ h) as (Nat.le_of_succ_le_succ hm))
+    exact List.Perm.trans
+      (List.Perm.cons a
+        (take_insert_let i n m (Nat.le_of_succ_le_succ h) as (Nat.le_of_succ_le_succ hm)))
+      hp.symm
 
 end Physlib.List

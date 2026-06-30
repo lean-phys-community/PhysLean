@@ -180,8 +180,8 @@ lemma mem_toMultisetsThree_iff [DecidableEq 𝓩] {s : Finset 𝓩} (X : Multise
         simpa using hsub
       · right
         simp [@Finset.insert_subset_iff] at hsub
-        refine ⟨c, hsub.2, a, (Multiset.mem_erase_of_ne hac).mpr hsub.1, ?_⟩
-        exact congrArg (a ::ₘ ·) (Multiset.pair_comm c a)
+        exact ⟨c, hsub.2, a, (Multiset.mem_erase_of_ne hac).mpr hsub.1,
+          congrArg (a ::ₘ ·) (Multiset.pair_comm c a)⟩
     · rw [or_assoc]
       right
       by_cases hac : a = c
@@ -193,8 +193,8 @@ lemma mem_toMultisetsThree_iff [DecidableEq 𝓩] {s : Finset 𝓩} (X : Multise
         · subst hbc
           left
           simp [@Finset.insert_subset_iff] at hsub
-          refine ⟨a, hsub.1, b, (Multiset.mem_erase_of_ne (Ne.symm hac)).mpr hsub.2, ?_⟩
-          exact Multiset.cons_swap b a {b}
+          exact ⟨a, hsub.1, b, (Multiset.mem_erase_of_ne (Ne.symm hac)).mpr hsub.2,
+            Multiset.cons_swap b a {b}⟩
         · right
           refine (Multiset.le_iff_subset ?_).mpr ?_
           · simpa using ⟨⟨hab, hac⟩, hbc⟩
