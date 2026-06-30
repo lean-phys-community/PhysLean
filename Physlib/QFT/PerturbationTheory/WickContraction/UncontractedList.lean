@@ -44,8 +44,8 @@ lemma fin_list_sorted_monotone_sorted {n m : ℕ} (l: List (Fin n)) (hl : l.Pair
       exact ih hl.2
 
 lemma fin_list_sorted_succAboveEmb_sorted (l: List (Fin n)) (hl : l.Pairwise (· ≤ ·))
-    (i : Fin n.succ) : ((List.map i.succAboveEmb l)).Pairwise (· ≤ ·) := by
-  exact fin_list_sorted_monotone_sorted l hl i.succAboveEmb (Fin.strictMono_succAbove i)
+    (i : Fin n.succ) : ((List.map i.succAboveEmb l)).Pairwise (· ≤ ·) :=
+  fin_list_sorted_monotone_sorted l hl i.succAboveEmb (Fin.strictMono_succAbove i)
 
 lemma fin_finset_sort_map_monotone {n m : ℕ} (a : Finset (Fin n)) (f : Fin n ↪ Fin m)
     (hf : StrictMono f) : (a.sort (· ≤ ·)).map f =
@@ -248,11 +248,10 @@ lemma uncontractedList_length_eq_card (c : WickContraction n) :
 
 lemma filter_uncontractedList (c : WickContraction n) (p : Fin n → Prop) [DecidablePred p] :
     (c.uncontractedList.filter p) = (c.uncontracted.filter p).sort (· ≤ ·) := by
-  have h1 : (c.uncontractedList.filter p).Pairwise (· ≤ ·) := by
-    exact List.Pairwise.filter _ (uncontractedList_sorted c)
-  have h2 : (c.uncontractedList.filter p).Nodup := by
-    refine List.Nodup.filter _ ?_
-    exact uncontractedList_nodup c
+  have h1 : (c.uncontractedList.filter p).Pairwise (· ≤ ·) :=
+    List.Pairwise.filter _ (uncontractedList_sorted c)
+  have h2 : (c.uncontractedList.filter p).Nodup :=
+    List.Nodup.filter _ (uncontractedList_nodup c)
   have h3 : (c.uncontractedList.filter p).toFinset = (c.uncontracted.filter p) := by
     ext a
     simp only [List.toFinset_filter, decide_eq_true_eq, Finset.mem_filter, List.mem_toFinset,
@@ -443,8 +442,8 @@ lemma uncontractedListEmd_empty {φs : List 𝓕.FieldOp} :
 -/
 
 lemma uncontractedList_succAboveEmb_sorted (c : WickContraction n) (i : Fin n.succ) :
-    ((List.map i.succAboveEmb c.uncontractedList)).Pairwise (· ≤ ·) := by
-  exact fin_list_sorted_succAboveEmb_sorted c.uncontractedList (uncontractedList_sorted c) i
+    ((List.map i.succAboveEmb c.uncontractedList)).Pairwise (· ≤ ·) :=
+  fin_list_sorted_succAboveEmb_sorted c.uncontractedList (uncontractedList_sorted c) i
 
 lemma uncontractedList_succAboveEmb_nodup (c : WickContraction n) (i : Fin n.succ) :
     ((List.map i.succAboveEmb c.uncontractedList)).Nodup := by
@@ -530,8 +529,8 @@ lemma uncontractedList_succAboveEmb_eraseIdx_toFinset (c : WickContraction n) (i
   exact uncontractedList_succAboveEmb_nodup c i
 
 lemma uncontractedList_succAboveEmb_eraseIdx_sorted (c : WickContraction n) (i : Fin n.succ)
-    (k: ℕ) : ((List.map i.succAboveEmb c.uncontractedList).eraseIdx k).Pairwise (· ≤ ·) := by
-  exact Physlib.List.eraseIdx_sorted (· ≤ ·) _ k (uncontractedList_succAboveEmb_sorted c i)
+    (k: ℕ) : ((List.map i.succAboveEmb c.uncontractedList).eraseIdx k).Pairwise (· ≤ ·) :=
+  Physlib.List.eraseIdx_sorted (· ≤ ·) _ k (uncontractedList_succAboveEmb_sorted c i)
 
 lemma uncontractedList_succAboveEmb_eraseIdx_nodup (c : WickContraction n) (i : Fin n.succ) (k: ℕ) :
     ((List.map i.succAboveEmb c.uncontractedList).eraseIdx k).Nodup := by
@@ -603,11 +602,10 @@ lemma take_uncontractedListOrderPos_eq_filter_sort (c : WickContraction n) (i : 
     (c.uncontractedList.take (c.uncontractedListOrderPos i)) =
     (c.uncontracted.filter (fun x => x.1 < i.1)).sort (· ≤ ·) := by
   rw [take_uncontractedListOrderPos_eq_filter]
-  have h1 : (c.uncontractedList.filter (fun x => x.1 < i.1)).Pairwise (· ≤ ·) := by
-    exact List.Pairwise.filter _ (uncontractedList_sorted c)
-  have h2 : (c.uncontractedList.filter (fun x => x.1 < i.1)).Nodup := by
-    refine List.Nodup.filter _ ?_
-    exact uncontractedList_nodup c
+  have h1 : (c.uncontractedList.filter (fun x => x.1 < i.1)).Pairwise (· ≤ ·) :=
+    List.Pairwise.filter _ (uncontractedList_sorted c)
+  have h2 : (c.uncontractedList.filter (fun x => x.1 < i.1)).Nodup :=
+    List.Nodup.filter _ (uncontractedList_nodup c)
   have h3 : (c.uncontractedList.filter (fun x => x.1 < i.1)).toFinset =
     (c.uncontracted.filter (fun x => x.1 < i.1)) := by
     rw [uncontractedList_eq_sort]
