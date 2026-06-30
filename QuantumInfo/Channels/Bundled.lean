@@ -288,8 +288,7 @@ instance instMContinuousMapClass [DecidableEq dIn] [DecidableEq dOut] :
 
 -- @[norm_cast]
 theorem val_apply_MState [DecidableEq dIn] (M : PTPMap dIn dOut) (ρ : MState dIn) :
-    (M ρ : HermitianMat dOut ℂ) = (instFunLike.coe M) ρ := by
-  rfl
+    (M ρ : HermitianMat dOut ℂ) = (instFunLike.coe M) ρ := rfl
 
 --If we have a PTPMap, the input and output dimensions are always both nonempty (otherwise
 --we can't preserve trace) - or they're both empty. So `[Nonempty dIn]` will always suffice.

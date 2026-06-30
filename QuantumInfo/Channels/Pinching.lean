@@ -103,8 +103,7 @@ def pinching_map (ρ : MState d) : CPTPMap d d ℂ :=
 
 theorem pinchingMap_apply_M (σ ρ : MState d) : (pinching_map σ ρ).M =
   ⟨_, (MatrixMap.of_kraus_isCompletelyPositive
-    (HermitianMat.mat ∘ pinching_kraus σ)).IsPositive.IsHermitianPreserving ρ.M.H⟩ := by
-  rfl
+    (HermitianMat.mat ∘ pinching_kraus σ)).IsPositive.IsHermitianPreserving ρ.M.H⟩ := rfl
 
 theorem pinching_eq_sum_conj (σ ρ : MState d) : (pinching_map σ ρ).M =
     ∑ k, (pinching_kraus σ k).mat * ρ.M * (pinching_kraus σ k).mat := by

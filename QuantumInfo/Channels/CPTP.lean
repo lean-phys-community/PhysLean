@@ -189,8 +189,7 @@ def ofEquiv (σ : dIn ≃ dOut) : CPTPMap dIn dOut where
 
 @[simp]
 theorem ofEquiv_apply (σ : dIn ≃ dOut) (ρ : MState dIn) :
-    ofEquiv σ ρ = ρ.relabel σ.symm := by
-  rfl
+    ofEquiv σ ρ = ρ.relabel σ.symm := rfl
 
 @[simp]
 theorem equiv_inverse (σ : dIn ≃ dOut)  : (ofEquiv σ) ∘ (ofEquiv σ.symm) = id (dIn := dOut) := by
@@ -276,13 +275,11 @@ def traceRight : CPTPMap (d₁ × d₂) d₁ :=
 
 @[simp]
 theorem traceLeft_eq_MState_traceLeft (ρ : MState (d₁ × d₂)) :
-    traceLeft (d₁ := d₁) (d₂ := d₂) ρ = ρ.traceLeft := by
-  rfl
+    traceLeft (d₁ := d₁) (d₂ := d₂) ρ = ρ.traceLeft := rfl
 
 @[simp]
 theorem traceRight_eq_MState_traceRight (ρ : MState (d₁ × d₂)) :
-    traceRight (d₁ := d₁) (d₂ := d₂) ρ = ρ.traceRight := by
-  rfl --It's actually pretty crazy that this is a definitional equality, cool
+    traceRight (d₁ := d₁) (d₂ := d₂) ρ = ρ.traceRight := rfl
 
 end trace
 

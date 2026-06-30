@@ -187,8 +187,7 @@ scoped instance : Inner Prob (MState d) where
 
 theorem inner_def : ⟪ρ, σ⟫_Prob = ⟨⟪ρ.M, σ.M⟫,
     inner_ge_zero ρ.nonneg σ.nonneg,
-    (inner_le_mul_trace ρ.nonneg σ.nonneg).trans (by simp)⟩ := by
-  rfl
+    (inner_le_mul_trace ρ.nonneg σ.nonneg).trans (by simp)⟩ := rfl
 
 theorem val_inner : (⟪ρ, σ⟫_Prob : ℝ) = ⟪ρ.M, σ.M⟫ := rfl
 
@@ -526,8 +525,7 @@ def ofClassical (dist : ProbDistribution d) : MState d where
 
 @[simp]
 theorem coe_ofClassical (dist : ProbDistribution d) :
-    (ofClassical dist).M = diagonal ℂ (dist ·) := by
-  rfl
+    (ofClassical dist).M = diagonal ℂ (dist ·) := rfl
 
 theorem ofClassical_pow (dist : ProbDistribution d) (p : ℝ) :
     (ofClassical dist).M ^ p = diagonal ℂ (fun i ↦ (dist i) ^ p) := by
@@ -1052,8 +1050,7 @@ def relabel (ρ : MState d₁) (e : d₂ ≃ d₁) : MState d₂ where
 
 @[simp]
 theorem relabel_m (ρ : MState d₁) (e : d₂ ≃ d₁) :
-    (ρ.relabel e).m = ρ.m.submatrix e e := by
-  rfl
+    (ρ.relabel e).m = ρ.m.submatrix e e := rfl
 
 @[simp]
 theorem relabel_refl {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) :
@@ -1071,8 +1068,7 @@ theorem relabel_pure_exists (ψ : Ket d₁) (e : d₂ ≃ d₁) :
 @[simp]
 theorem relabel_relabel {d d₂ d₃ : Type*}
     [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂] [Fintype d₃] [DecidableEq d₃]
-    (ρ : MState d) (e : d₂ ≃ d) (e₂ : d₃ ≃ d₂) : (ρ.relabel e).relabel e₂ = ρ.relabel (e₂.trans e) := by
-  rfl
+    (ρ : MState d) (e : d₂ ≃ d) (e₂ : d₃ ≃ d₂) : (ρ.relabel e).relabel e₂ = ρ.relabel (e₂.trans e) := rfl
 
 theorem eq_relabel_iff {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
     (ρ : MState d₁) (σ : MState d₂) (h : d₁ ≃ d₂) :
@@ -1232,12 +1228,10 @@ theorem traceNorm_eq_one (ρ : MState d) : ρ.m.traceNorm = 1 :=
 --TODO: This naming is very inconsistent. Should be better about "prod" vs "kron"
 
 theorem relabel_kron (ρ : MState d₁) (σ : MState d₂) (e : d₃ ≃ d₁) :
-    ((ρ.relabel e) ⊗ᴹ σ) = (ρ ⊗ᴹ σ).relabel (e.prodCongr (Equiv.refl d₂)) := by
-  rfl --is this defeq abuse? I don't know
+    ((ρ.relabel e) ⊗ᴹ σ) = (ρ ⊗ᴹ σ).relabel (e.prodCongr (Equiv.refl d₂)) := rfl
 
 theorem kron_relabel (ρ : MState d₁) (σ : MState d₂) (e : d₃ ≃ d₂) :
-    (ρ ⊗ᴹ σ.relabel e) = (ρ ⊗ᴹ σ).relabel ((Equiv.refl d₁).prodCongr e) := by
-  rfl
+    (ρ ⊗ᴹ σ.relabel e) = (ρ ⊗ᴹ σ).relabel ((Equiv.refl d₁).prodCongr e) := rfl
 
 theorem prod_assoc (ρ : MState d₁) (σ : MState d₂) (τ : MState d₃) :
     (ρ ⊗ᴹ (σ ⊗ᴹ τ)) = (ρ ⊗ᴹ σ ⊗ᴹ τ).relabel (Equiv.prodAssoc d₁ d₂ d₃).symm := by

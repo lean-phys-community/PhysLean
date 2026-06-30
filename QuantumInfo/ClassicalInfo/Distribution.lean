@@ -184,8 +184,7 @@ theorem congr_apply (σ : α ≃ β) (d : ProbDistribution α) (j : β): (congr 
 /-- The inverse and congruence operations for distributions commute -/
 @[simp]
 theorem congr_symm_apply (σ : α ≃ β) :
-    (ProbDistribution.congr σ).symm = ProbDistribution.congr σ.symm := by
-  rfl
+    (ProbDistribution.congr σ).symm = ProbDistribution.congr σ.symm := rfl
 
 /-- The distribution on Fin 2 corresponding to a coin with probability p.
   Chance p of 1, 1-p of 0. -/
