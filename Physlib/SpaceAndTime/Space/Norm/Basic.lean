@@ -1016,8 +1016,8 @@ private lemma radial_power_deriv_integral_by_parts
           ∂(.comap Subtype.val volume)
         =
         ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
-          x ^ p * _root_.deriv (fun a => η (a • n.1)) x := by
-    exact MeasureTheory.integral_subtype_comap (μ := volume)
+          x ^ p * _root_.deriv (fun a => η (a • n.1)) x :=
+    MeasureTheory.integral_subtype_comap (μ := volume)
       (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
       (fun x : ℝ => x ^ p * _root_.deriv (fun a => η (a • n.1)) x)
   have hright_subtype :
@@ -1026,8 +1026,8 @@ private lemma radial_power_deriv_integral_by_parts
           ∂(.comap Subtype.val volume)
         =
         ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
-          x ^ (p - 1) * η (x • n.1) := by
-    exact MeasureTheory.integral_subtype_comap (μ := volume)
+          x ^ (p - 1) * η (x • n.1) :=
+    MeasureTheory.integral_subtype_comap (μ := volume)
       (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
       (fun x : ℝ => x ^ (p - 1) * η (x • n.1))
   rw [hleft_subtype, hright_subtype]
@@ -1179,8 +1179,8 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
         = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
             r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
             ∂(.comap Subtype.val volume))
-            ∂(volume (α := Space d).toSphere) := by
-          exact distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv q hq hp_int η
+            ∂(volume (α := Space d).toSphere) :=
+          distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv q hq hp_int η
     _ = ∫ n, (p : ℝ) * ∫ (r : Set.Ioi (0 : ℝ)),
             r.1 ^ (p - 1) * η (r.1 • n.1)
             ∂(.comap Subtype.val volume)
@@ -1444,8 +1444,8 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
             ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
           (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))) =
           (d * (volume (α := Space d)).real
-            (Metric.ball 0 1)) • diracDelta ℝ 0 := by
-      exact distDiv_inv_pow_eq_dim (d := d)
+            (Metric.ball 0 1)) • diracDelta ℝ 0 :=
+      distDiv_inv_pow_eq_dim (d := d)
     rw [hdiv]
     rw [smul_smul]
     ring_nf

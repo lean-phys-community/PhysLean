@@ -464,8 +464,8 @@ lemma uncontractedList_succAbove_orderedInsert_nodup (c : WickContraction n) (i 
 
 lemma uncontractedList_succAbove_orderedInsert_sorted (c : WickContraction n) (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i
-      (List.map i.succAboveEmb c.uncontractedList)).Pairwise (· ≤ ·) := by
-  exact List.Pairwise.orderedInsert i (List.map (⇑i.succAboveEmb) c.uncontractedList)
+      (List.map i.succAboveEmb c.uncontractedList)).Pairwise (· ≤ ·) :=
+  List.Pairwise.orderedInsert i (List.map (⇑i.succAboveEmb) c.uncontractedList)
     (uncontractedList_succAboveEmb_sorted c i)
 
 lemma uncontractedList_succAbove_orderedInsert_toFinset (c : WickContraction n) (i : Fin n.succ) :
@@ -531,8 +531,8 @@ lemma uncontractedList_succAboveEmb_eraseIdx_sorted (c : WickContraction n) (i :
   Physlib.List.eraseIdx_sorted (· ≤ ·) _ k (uncontractedList_succAboveEmb_sorted c i)
 
 lemma uncontractedList_succAboveEmb_eraseIdx_nodup (c : WickContraction n) (i : Fin n.succ) (k: ℕ) :
-    ((List.map i.succAboveEmb c.uncontractedList).eraseIdx k).Nodup := by
-  exact List.Nodup.eraseIdx k (uncontractedList_succAboveEmb_nodup c i)
+    ((List.map i.succAboveEmb c.uncontractedList).eraseIdx k).Nodup :=
+  List.Nodup.eraseIdx k (uncontractedList_succAboveEmb_nodup c i)
 
 lemma uncontractedList_succAboveEmb_eraseIdx_eq_sort (c : WickContraction n) (i : Fin n.succ)
     (k : ℕ) (hk : k < c.uncontractedList.length) :
