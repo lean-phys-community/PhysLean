@@ -83,10 +83,8 @@ noncomputable def chargeDensity {d : ℕ} (c : SpeedOfLight) :
 noncomputable def currentDensity (c : SpeedOfLight) :
     DistLorentzCurrentDensity d →ₗ[ℝ] (Time × Space d) →d[ℝ] EuclideanSpace ℝ (Fin d) where
   toFun J := Lorentz.Vector.spatialCLM d ∘L distTimeSlice c J
-  map_add' J1 J2 := by
-    simp
-  map_smul' r J := by
-    simp
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
 
 end DistLorentzCurrentDensity
 end Electromagnetism

@@ -281,7 +281,7 @@ noncomputable instance {d} :
     simp
   smul_add Λ A B := by
     ext x μ
-    simp [Lorentz.Vector.smul_add]
+    simp
 
 /-!
 
@@ -295,10 +295,8 @@ open ContDiff
 @[fun_prop]
 lemma differentiable_component {d : ℕ}
     (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) (μ : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => A x μ) := by
-  revert μ
-  rw [SpaceTime.differentiable_vector]
-  exact hA
+    Differentiable ℝ (fun x => A x μ) :=
+  (SpaceTime.differentiable_vector A).mpr hA μ
 
 @[fun_prop]
 lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
@@ -321,18 +319,15 @@ lemma contDiff_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
 @[fun_prop]
 lemma differentiable_deriv {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ 2 A) (μ ν : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  have diff_partial (μ) :
-      ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.differentiable_vector]
-    fun_prop
-  exact diff_partial μ ν
+    Differentiable ℝ (fun x => ∂_ μ A x ν) :=
+  (SpaceTime.differentiable_vector (fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ))).mpr
+    (by fun_prop) ν
 
 @[fun_prop]
 lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  apply differentiable_deriv (hA.of_le (ENat.LEInfty.out)) μ ν
+    Differentiable ℝ (fun x => ∂_ μ A x ν) :=
+  differentiable_deriv (hA.of_le (ENat.LEInfty.out)) μ ν
 
 @[fun_prop]
 lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
