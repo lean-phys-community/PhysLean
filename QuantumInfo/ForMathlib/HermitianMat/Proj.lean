@@ -162,8 +162,8 @@ lemma projector_support_eq_sum : A.supportProj.mat =
         convert h_orthogonal_complement ( A.H.eigenvectorBasis i ) _ using 1;
         exact (mem_ker_iff_mulVec_zero A ((H A).eigenvectorBasis i)).mpr h_eigenvector_zero;
       -- By definition of $A.ker$, we know that $x$ can be written as a linear combination of eigenvectors with non-zero eigenvalues.
-      have h_decomp : x = ∑ i, (inner (𝕜) (A.H.eigenvectorBasis i) x) • A.H.eigenvectorBasis i := by
-        exact Eq.symm (OrthonormalBasis.sum_repr' (H A).eigenvectorBasis x);
+      have h_decomp : x = ∑ i, (inner (𝕜) (A.H.eigenvectorBasis i) x) • A.H.eigenvectorBasis i :=
+        Eq.symm (OrthonormalBasis.sum_repr' (H A).eigenvectorBasis x)
       rw [ h_decomp ];
       exact Submodule.sum_mem _ fun i _ => if hi : A.H.eigenvalues i = 0 then by simp [h_orthogonal_zero_eigenvalues i hi ] else Submodule.smul_mem _ _ ( Submodule.subset_span ⟨ i, hi, rfl ⟩ );
     · rw [ Submodule.span_le, Set.image_subset_iff ];
