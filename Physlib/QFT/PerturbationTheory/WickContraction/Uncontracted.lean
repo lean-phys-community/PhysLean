@@ -30,8 +30,7 @@ lemma congr_uncontracted {n m : ℕ} (c : WickContraction n) (h : n = m) :
   simp
 
 lemma getDual?_eq_none_iff_mem_uncontracted (i : Fin n) :
-    c.getDual? i = none ↔ i ∈ c.uncontracted := by
-  simp [uncontracted]
+    c.getDual? i = none ↔ i ∈ c.uncontracted := by simp [uncontracted]
 
 /-- The equivalence of `Option c.uncontracted` for two propositionally equal Wick contractions. -/
 def uncontractedCongr {c c': WickContraction n} (h : c = c') :
@@ -40,13 +39,12 @@ def uncontractedCongr {c c': WickContraction n} (h : c = c') :
 
 @[simp]
 lemma uncontractedCongr_none {c c': WickContraction n} (h : c = c') :
-    (uncontractedCongr h) none = none := by
-  simp [uncontractedCongr]
+    (uncontractedCongr h) none = none := by simp [uncontractedCongr]
 
 @[simp]
 lemma uncontractedCongr_some {c c': WickContraction n} (h : c = c') (i : c.uncontracted) :
-    (uncontractedCongr h) (some i) = some (Equiv.subtypeEquivRight (by rw [h]; simp) i) := by
-  simp [uncontractedCongr]
+    (uncontractedCongr h) (some i) =
+      some (Equiv.subtypeEquivRight (by rw [h]; simp) i) := by simp [uncontractedCongr]
 
 lemma mem_uncontracted_iff_not_contracted (i : Fin n) :
     i ∈ c.uncontracted ↔ ∀ p ∈ c.1, i ∉ p := by
@@ -81,12 +79,11 @@ lemma mem_uncontracted_empty (i : Fin n) : i ∈ empty.uncontracted := by
   simp [empty] at hp
 
 @[simp]
-lemma getDual?_empty_eq_none (i : Fin n) : empty.getDual? i = none := by
-  simpa [uncontracted] using mem_uncontracted_empty i
+lemma getDual?_empty_eq_none (i : Fin n) :
+    empty.getDual? i = none := by simpa [uncontracted] using mem_uncontracted_empty i
 
 @[simp]
-lemma uncontracted_empty {n : ℕ} : (@empty n).uncontracted = Finset.univ := by
-  simp [uncontracted]
+lemma uncontracted_empty {n : ℕ} : (@empty n).uncontracted = Finset.univ := by simp [uncontracted]
 
 lemma uncontracted_card_le (c : WickContraction n) : c.uncontracted.card ≤ n := by
   simp only [uncontracted]
