@@ -91,8 +91,7 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
 lemma insertionSort_insertionSort {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (l1 : List α) :
     List.insertionSort r (List.insertionSort r l1) = List.insertionSort r l1 := by
-  apply List.Pairwise.insertionSort_eq
-  exact List.pairwise_insertionSort r l1
+  exact List.Pairwise.insertionSort_eq (List.pairwise_insertionSort r l1)
 
 lemma orderedInsert_commute {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r] (a b : α) (hr : ¬ r a b) : (l : List α) →
@@ -154,8 +153,7 @@ lemma insertionSort_append_insertionSort_append {α : Type} (r : α → α → P
 @[simp]
 lemma orderedInsert_length {α : Type} (r : α → α → Prop) [DecidableRel r] (a : α) (l : List α) :
     (List.orderedInsert r a l).length = (a :: l).length := by
-  apply List.Perm.length_eq
-  exact List.perm_orderedInsert r a l
+  exact List.Perm.length_eq (List.perm_orderedInsert r a l)
 
 lemma takeWhile_orderedInsert {α : Type} (r : α → α → Prop) [DecidableRel r]
     [Std.Total r] [IsTrans α r]

@@ -37,9 +37,7 @@ lemma fderiv_uncurry (f : X → Y → Z) (xy dxy : X × Y)
 lemma fderiv_curry_fst (f : X × Y → Z) (x : X) (y : Y)
     (h : DifferentiableAt 𝕜 f (x,y)) (dx : X) :
     fderiv 𝕜 (fun x' => Function.curry f x' y) x dx = fderiv 𝕜 f (x,y) (dx, 0) := by
-  have h1 : f = ↿(Function.curry f) := by
-    ext x
-    rfl
+  have h1 : f = ↿(Function.curry f) := rfl
   conv_rhs =>
     rw [h1]
   rw [fderiv_uncurry]
@@ -49,9 +47,7 @@ lemma fderiv_curry_fst (f : X × Y → Z) (x : X) (y : Y)
 lemma fderiv_curry_snd (f : X × Y → Z) (x : X) (y : Y)
     (h : DifferentiableAt 𝕜 f (x,y)) (dy : Y) :
     fderiv 𝕜 (Function.curry f x) y dy = fderiv 𝕜 (f) (x,y) (0, dy) := by
-  have h1 : f = ↿(Function.curry f) := by
-    ext x
-    rfl
+  have h1 : f = ↿(Function.curry f) := rfl
   conv_rhs =>
     rw [h1]
   rw [fderiv_uncurry]
@@ -157,21 +153,15 @@ lemma fderiv_inl_snd_clm (x : X) (y : Y) :
 
 lemma function_differentiableAt_fst (f : X → Y → Z) (x : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
     DifferentiableAt 𝕜 (fun x' => f x' y) x := by
-  have hl : (fun x' => f x' y) = ↿f ∘ (·, y) := by
-    funext x'
-    rfl
+  have hl : (fun x' => f x' y) = ↿f ∘ (·, y) := rfl
   rw [hl]
-  apply Differentiable.differentiableAt
-  apply Differentiable.comp <;> fun_prop
+  exact (Differentiable.comp (by fun_prop) (by fun_prop)).differentiableAt
 
 lemma function_differentiableAt_snd (f : X → Y → Z) (x : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
     DifferentiableAt 𝕜 (fun y' => f x y') y := by
-  have hl : (fun y' => f x y') = ↿f ∘ (x, ·) := by
-    funext y'
-    rfl
+  have hl : (fun y' => f x y') = ↿f ∘ (x, ·) := rfl
   rw [hl]
-  apply Differentiable.differentiableAt
-  apply Differentiable.comp <;> fun_prop
+  exact (Differentiable.comp (by fun_prop) (by fun_prop)).differentiableAt
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_fst (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
