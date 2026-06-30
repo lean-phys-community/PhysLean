@@ -380,8 +380,7 @@ lemma uncontractedListEmd_congr {φs : List 𝓕.FieldOp} {φsΛ φsΛ' : WickCo
 
 lemma uncontractedListEmd_toFun_eq_get (φs : List 𝓕.FieldOp) (φsΛ : WickContraction φs.length) :
     (uncontractedListEmd (φsΛ := φsΛ)).toFun =
-    φsΛ.uncontractedList.get ∘ (finCongr (by simp [uncontractedListGet])) := by
-  rfl
+    φsΛ.uncontractedList.get ∘ (finCongr (by simp [uncontractedListGet])) := rfl
 
 lemma uncontractedListEmd_strictMono {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {i j : Fin [φsΛ]ᵘᶜ.length} (h : i < j) : uncontractedListEmd i < uncontractedListEmd j := by

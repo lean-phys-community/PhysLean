@@ -140,8 +140,7 @@ lemma finExtractOne_symm_inr_apply {n : ℕ} (i : Fin n.succ) (x : Fin n) :
 
 @[simp]
 lemma finExtractOne_symm_inl_apply {n : ℕ} (i : Fin n.succ) :
-    (finExtractOne i).symm (Sum.inl 0) = i := by
-  rfl
+    (finExtractOne i).symm (Sum.inl 0) = i := rfl
 
 lemma finExtractOne_apply_neq {n : ℕ} (i j : Fin (n + 1 + 1)) (hij : i ≠ j) :
     finExtractOne i j = Sum.inr (predAboveI i j) := by

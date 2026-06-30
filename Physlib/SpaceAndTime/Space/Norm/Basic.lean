@@ -510,8 +510,7 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
   simp [distGrad_inner_eq]
   rw [Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_inner]
   calc _
-    _ = - ∫ (x : Space d), fderiv ℝ η x (basis.repr.symm y) * normPowerSeries n x ^ m := by
-      rfl
+    _ = - ∫ (x : Space d), fderiv ℝ η x (basis.repr.symm y) * normPowerSeries n x ^ m := rfl
     _ = ∫ (x : Space d), η x * fderiv ℝ (normPowerSeries n · ^ m) x (basis.repr.symm y) := by
       rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]
       · fun_prop
@@ -736,8 +735,7 @@ lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
   simp [distGrad_inner_eq]
   rw [Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_inner]
   calc _
-    _ = - ∫ (x : Space d), fderiv ℝ η x (basis.repr.symm y) * Real.log (normPowerSeries n x) := by
-      rfl
+    _ = - ∫ (x : Space d), fderiv ℝ η x (basis.repr.symm y) * Real.log (normPowerSeries n x) := rfl
     _ = ∫ (x : Space d), η x *
         fderiv ℝ (fun x => Real.log (normPowerSeries n x)) x (basis.repr.symm y) := by
       rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]

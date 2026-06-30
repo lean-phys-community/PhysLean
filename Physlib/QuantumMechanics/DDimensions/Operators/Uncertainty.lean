@@ -260,12 +260,10 @@ lemma inner_centered_commutator_of_raw_commutator :
   calc
     centeredCommutatorExpectation A B ψ hψB =
       ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ -
-        ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ := by
-          rfl
+        ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ := rfl
     _ =
       ⟪a - (μa : ℂ) • (ψ : H), b - (μb : ℂ) • (ψ : H)⟫_ℂ -
-        ⟪b - (μb : ℂ) • (ψ : H), a - (μa : ℂ) • (ψ : H)⟫_ℂ := by
-          rfl
+        ⟪b - (μb : ℂ) • (ψ : H), a - (μa : ℂ) • (ψ : H)⟫_ℂ := rfl
     _ = ⟪a, b⟫_ℂ - ⟪b, a⟫_ℂ :=
       sub_expectation_commutator_eq_raw (ψ : H) a b μa μb
         hμa_right hμa_left hμb_right hμb_left hψ_norm

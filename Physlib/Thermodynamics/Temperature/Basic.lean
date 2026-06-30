@@ -69,8 +69,7 @@ lemma ofβ_eq : ofβ = fun β => ⟨⟨1 / (kB * β), by
     · exact zero_le_one
     · apply mul_nonneg
       · exact kB_nonneg
-      · exact β.2⟩⟩ := by
-  rfl
+      · exact β.2⟩⟩ := rfl
 
 @[simp]
 lemma β_ofβ (β' : ℝ≥0) : β (ofβ β') = β' := by
