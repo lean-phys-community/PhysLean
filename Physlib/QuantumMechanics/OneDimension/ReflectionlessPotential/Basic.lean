@@ -77,8 +77,8 @@ noncomputable def mulByTemperateGrowth {g : ℝ → ℂ} (hg : g.HasTemperateGro
 
 -- First, you need a theorem that the scaled tanh has temperate growth
 lemma scaled_tanh_hasTemperateGrowth (κ : ℝ) :
-    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x))) := by
-  exact tanh_const_mul_hasTemperateGrowth κ
+    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x))) :=
+  tanh_const_mul_hasTemperateGrowth κ
 
 /-- This is a helper lemma to show that the embedding of a real function with temperate growth in ℂ
   also has temperate growth -/
