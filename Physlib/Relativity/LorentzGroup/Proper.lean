@@ -61,9 +61,9 @@ def detContinuous : C(𝓛 d, ℤ₂) :=
   ContinuousMap.comp coeForℤ₂ {
     toFun := fun Λ => ⟨Λ.1.det, Or.symm (LorentzGroup.det_eq_one_or_neg_one _)⟩,
     continuous_toFun :=
-      Continuous.subtype_mk (Continuous.matrix_det $
-        Continuous.comp' (continuous_iff_le_induced.mpr fun _ a => a) continuous_id'
-        ) _
+      Continuous.subtype_mk
+        (Continuous.matrix_det <|
+          Continuous.comp' (continuous_iff_le_induced.mpr fun _ a => a) continuous_id') _
       }
 
 lemma detContinuous_eq_one (Λ : LorentzGroup d) :
