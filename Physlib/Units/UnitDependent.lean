@@ -345,14 +345,11 @@ noncomputable instance {M1 M2 : Type} [AddCommGroup M1] [Module ℝ M1]
 noncomputable instance {M1 M2 : Type} [UnitDependent M1] :
     UnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => f (scaleUnit u2 u1 m1)
-  scaleUnit_trans u1 u2 u3 f := by
-    funext m1
+  scaleUnit_trans u1 u2 u3 f := funext fun m1 => by
     simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := by
-    funext m1
+  scaleUnit_trans' u1 u2 u3 f := funext fun m1 => by
     simp [scaleUnit_trans']
-  scaleUnit_id u f := by
-    funext m1
+  scaleUnit_id u f := funext fun m1 => by
     simp [scaleUnit_id]
 
 @[simp]
@@ -364,14 +361,11 @@ noncomputable instance instUnitDependentTwoSided
     {M1 M2 : Type} [UnitDependent M1] [UnitDependent M2] :
     UnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => scaleUnit u1 u2 (f (scaleUnit u2 u1 m1))
-  scaleUnit_trans u1 u2 u3 f := by
-    funext m1
+  scaleUnit_trans u1 u2 u3 f := funext fun m1 => by
     simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := by
-    funext m1
+  scaleUnit_trans' u1 u2 u3 f := funext fun m1 => by
     simp [scaleUnit_trans']
-  scaleUnit_id u f := by
-    funext m1
+  scaleUnit_id u f := funext fun m1 => by
     simp [scaleUnit_id]
 
 @[simp]
@@ -383,17 +377,13 @@ noncomputable instance instUnitDependentTwoSidedMul
     {M1 M2 : Type} [UnitDependent M1] [MulAction ℝ≥0 M2] [MulUnitDependent M2] :
     MulUnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => scaleUnit u1 u2 (f (scaleUnit u2 u1 m1))
-  scaleUnit_trans u1 u2 u3 f := by
-    funext m1
+  scaleUnit_trans u1 u2 u3 f := funext fun m1 => by
     simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := by
-    funext m1
+  scaleUnit_trans' u1 u2 u3 f := funext fun m1 => by
     simp [scaleUnit_trans']
-  scaleUnit_id u f := by
-    funext m1
+  scaleUnit_id u f := funext fun m1 => by
     simp [scaleUnit_id]
-  scaleUnit_mul u1 u2 r f := by
-    funext m1
+  scaleUnit_mul u1 u2 r f := funext fun m1 => by
     simp [MulUnitDependent.scaleUnit_mul]
 
 open LinearUnitDependent ContinuousLinearUnitDependent in
@@ -407,14 +397,11 @@ noncomputable instance instContinuousLinearUnitDependentMap
   scaleUnit u1 u2 f :=
     ContinuousLinearEquiv.arrowCongr (scaleUnitContLinearEquiv u1 u2)
       (scaleUnitContLinearEquiv u1 u2) f
-  scaleUnit_trans u1 u2 u3 f := by
-    ext m1
+  scaleUnit_trans u1 u2 u3 f := ContinuousLinearMap.ext fun m1 => by
     simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := by
-    ext m1
+  scaleUnit_trans' u1 u2 u3 f := ContinuousLinearMap.ext fun m1 => by
     simp [scaleUnit_trans']
-  scaleUnit_id u f := by
-    ext m1
+  scaleUnit_id u f := ContinuousLinearMap.ext fun m1 => by
     simp [scaleUnit_id]
   scaleUnit_add u1 u2 f1 f2 := by simp
   scaleUnit_smul u1 u2 r f := by simp
