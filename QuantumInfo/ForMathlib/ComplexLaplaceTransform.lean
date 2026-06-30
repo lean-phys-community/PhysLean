@@ -49,8 +49,8 @@ private theorem norm_complexLaplaceIntegrand_le_envelope
     set e : ℝ := (E x).untop h
     have hdist : ‖w - z‖ ≤ δ := by
       simpa [Metric.mem_closedBall, dist_eq_norm, norm_sub_rev] using hw
-    have hre_abs : |w.re - z.re| ≤ δ := by
-      exact (Complex.abs_re_le_norm (w - z)).trans (by simpa [Complex.sub_re] using hdist)
+    have hre_abs : |w.re - z.re| ≤ δ :=
+      (Complex.abs_re_le_norm (w - z)).trans (by simpa [Complex.sub_re] using hdist)
     rw [Complex.norm_exp, Complex.norm_exp, Complex.norm_exp]
     rcases le_total 0 e with he | he
     · refine le_add_of_le_of_nonneg ?_ (Real.exp_pos _).le
