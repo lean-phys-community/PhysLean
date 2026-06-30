@@ -209,43 +209,34 @@ lemma boost_inverse (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
 
 @[simp]
 lemma boost_inl_0_inl_0 (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
-    (boost i β hβ).1 (Sum.inl 0) (Sum.inl 0) = γ β := by
-  simp [boost]
+    (boost i β hβ).1 (Sum.inl 0) (Sum.inl 0) = γ β := by simp [boost]
 
 @[simp]
 lemma boost_inr_self_inr_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
-    (boost i β hβ).1 (Sum.inr i) (Sum.inr i) = γ β := by
-  simp [boost]
+    (boost i β hβ).1 (Sum.inr i) (Sum.inr i) = γ β := by simp [boost]
 
 @[simp]
 lemma boost_inl_0_inr_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
-    (boost i β hβ).1 (Sum.inl 0) (Sum.inr i) = - γ β * β := by
-  simp [boost]
+    (boost i β hβ).1 (Sum.inl 0) (Sum.inr i) = - γ β * β := by simp [boost]
 
 @[simp]
 lemma boost_inr_self_inl_0 (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
-    (boost i β hβ).1 (Sum.inr i) (Sum.inl 0) = - γ β * β := by
-  simp [boost]
+    (boost i β hβ).1 (Sum.inr i) (Sum.inl 0) = - γ β * β := by simp [boost]
 
 lemma boost_inl_0_inr_other {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
-    (boost i β hβ).1 (Sum.inl 0) (Sum.inr j) = 0 := by
-  simp [boost, hij]
+    (boost i β hβ).1 (Sum.inl 0) (Sum.inr j) = 0 := by simp [boost, hij]
 
 lemma boost_inr_other_inl_0 {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
-    (boost i β hβ).1 (Sum.inr j) (Sum.inl 0) = 0 := by
-  simp [boost, hij]
+    (boost i β hβ).1 (Sum.inr j) (Sum.inl 0) = 0 := by simp [boost, hij]
 
 lemma boost_inr_self_inr_other {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
-    (boost i β hβ).1 (Sum.inr i) (Sum.inr j) = 0 := by
-  simp [boost, hij, Ne.symm hij]
+    (boost i β hβ).1 (Sum.inr i) (Sum.inr j) = 0 := by simp [boost, hij, Ne.symm hij]
 
 lemma boost_inr_other_inr_self {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
-    (boost i β hβ).1 (Sum.inr j) (Sum.inr i) = 0 := by
-  simp [boost, hij]
+    (boost i β hβ).1 (Sum.inr j) (Sum.inr i) = 0 := by simp [boost, hij]
 
 lemma boost_inr_other_inr {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
-    (boost i β hβ).1 (Sum.inr j) (Sum.inr k) = if j = k then 1 else 0:= by
-  simp [boost, hij]
+    (boost i β hβ).1 (Sum.inr j) (Sum.inr k) = if j = k then 1 else 0:= by simp [boost, hij]
 
 lemma boost_inr_inr_other {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
     (boost i β hβ).1 (Sum.inr k) (Sum.inr j) = if j = k then 1 else 0:= by
