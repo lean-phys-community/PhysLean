@@ -1224,7 +1224,7 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
       0 < xx * S.ω^2 := by bound
       _ ≤  ‖IC.v₀‖^2 +   xx * S.ω^2  := by bound
       _ = vv +   xx * S.ω^2 := by rw [← real_inner_self_eq_norm_sq IC.v₀]
-      _ = det := by rfl
+      _ = det := rfl
    | inr hv =>
      have vv_gt_zero : 0 < vv := by
         apply real_inner_self_pos.mpr
@@ -1233,7 +1233,7 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
         0 <  vv := vv_gt_zero
         _ ≤ vv +   ‖IC.x₀‖^2 * S.ω^2 := by bound
         _ = vv +   xx * S.ω^2  := by rw [← real_inner_self_eq_norm_sq IC.x₀]
-        _ = det := by rfl
+        _ = det := rfl
   have det_ne_zero : det ≠ 0 := by bound
   have hxx : c * xx + (s / S.ω) * xv = xx := by
     calc
@@ -1259,20 +1259,20 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
   have hcos : 1 = cos (S.ω * t) := by
     calc
     1 =  det / det := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self]
-    _ = (vv + xx * S.ω^2 ) / det := by rfl
+    _ = (vv + xx * S.ω^2 ) / det := rfl
     _ = c * ((vv + xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
       nth_rewrite 1 [← hvv, ← hxx]
       ring_nf
     _ = c * ((vv + xx * S.ω^2) / det ) := by
       simp only [ne_eq, S.ω_ne_zero, not_false_eq_true,
         div_self, sub_self, mul_zero, zero_div, add_zero]
-    _ = c * (det / det) := by rfl
+    _ = c * (det / det) := rfl
     _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
-    _ = _ := by rfl
+    _ = _ := rfl
   let ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp (Eq.symm hcos)
   use n
   calc
-    (n : ℝ) * (T S) = (n : ℝ) * (2 * π / S.ω) := by rfl
+    (n : ℝ) * (T S) = (n : ℝ) * (2 * π / S.ω) := rfl
     _ = ((n : ℝ) * (2 * π)) / S.ω := by ring_nf
     _ = (S.ω * t) / S.ω := by rw [hn]
     _ = t * (S.ω / S.ω) := by ring_nf

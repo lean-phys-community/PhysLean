@@ -209,13 +209,16 @@ noncomputable def energy (xₜ : Time → EuclideanSpace ℝ (Fin 1)) : Time →
 -/
 
 lemma kineticEnergy_eq (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
-    kineticEnergy S xₜ = fun t => (1 / (2 : ℝ)) * S.m * ⟪∂ₜ xₜ t, ∂ₜ xₜ t⟫_ℝ:= by rfl
+    kineticEnergy S xₜ = fun t => (1 / (2 : ℝ)) * S.m * ⟪∂ₜ xₜ t, ∂ₜ xₜ t⟫_ℝ :=
+  rfl
 
 lemma potentialEnergy_eq (x : EuclideanSpace ℝ (Fin 1)) :
-    potentialEnergy S x = (1 / (2 : ℝ)) • S.k • ⟪x, x⟫_ℝ:= by rfl
+    potentialEnergy S x = (1 / (2 : ℝ)) • S.k • ⟪x, x⟫_ℝ :=
+  rfl
 
 lemma energy_eq (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
-    energy S xₜ = fun t => kineticEnergy S xₜ t + potentialEnergy S (xₜ t) := by rfl
+    energy S xₜ = fun t => kineticEnergy S xₜ t + potentialEnergy S (xₜ t) :=
+  rfl
 /-!
 
 ### C.3. Differentiability of the energies
@@ -513,7 +516,8 @@ We write a simple iff statement for the definition of the equation of motions.
 -/
 
 lemma equationOfMotion_iff_gradLagrangian_zero (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
-    S.EquationOfMotion xₜ ↔ S.gradLagrangian xₜ = 0 := by rfl
+    S.EquationOfMotion xₜ ↔ S.gradLagrangian xₜ = 0 :=
+  Iff.rfl
 
 /-!
 
@@ -588,8 +592,8 @@ lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx :
     calc
       ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
           = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
-      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          exact congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
+      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) :=
+          congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
       _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
 
 /-!
@@ -743,7 +747,7 @@ lemma hamiltonian_eq :
   funext t x p
   simp only [hamiltonian, toCanonicalMomentum, lagrangian_eq, one_div, LinearEquiv.coe_symm_mk',
     inner_smul_right, inner_smul_left, map_inv₀, ringHom_apply]
-  have hm : S.m ≠ 0 := by exact m_ne_zero S
+  have hm : S.m ≠ 0 := m_ne_zero S
   field_simp
   ring
 
@@ -875,8 +879,8 @@ lemma equationOfMotion_iff_hamiltonEqOp_eq_zero (xₜ : Time → EuclideanSpace 
     calc
       ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
           = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
-      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          exact congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
+      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) :=
+          congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
       _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
   simp [hderiv_smul, force_eq_linear]
 

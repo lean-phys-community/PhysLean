@@ -33,7 +33,8 @@ noncomputable def eulerLagrangeOp (L : Time → X → X → ℝ) (q : Time → X
 
 lemma eulerLagrangeOp_eq (L : Time → X → X → ℝ) (q : Time → X) :
     eulerLagrangeOp L q = fun t => gradient (L t · (∂ₜ q t)) (q t)
-    - ∂ₜ (fun t' => gradient (L t' (q t') ·) (∂ₜ q t')) t := by rfl
+    - ∂ₜ (fun t' => gradient (L t' (q t') ·) (∂ₜ q t')) t :=
+  rfl
 
 lemma eulerLagrangeOp_zero (q : Time → X) :
     eulerLagrangeOp (fun _ _ _ => 0) q = fun _ => 0 := by

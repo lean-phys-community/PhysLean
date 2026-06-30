@@ -107,7 +107,7 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
     calc
       (1 : Time) = fderiv ℝ (fun (t' : Time) => t') t 1 := by simp only [fderiv_fun_id,
         ContinuousLinearMap.coe_id', id_eq]
-      _ = fderiv ℝ (fun (t' : Time) => (tq q t').1) t 1 := by rfl
+      _ = fderiv ℝ (fun (t' : Time) => (tq q t').1) t 1 := rfl
       _ = (∂ₜ (tq q) t).1 := by
         rw [fderiv.fst]
         · simp
@@ -119,7 +119,7 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
             rcases this
     apply Eq.symm
     calc
-       (1, ∂ₜ q t).2 = fderiv ℝ (fun t' => (tq q t').2) t 1 := by rfl
+       (1, ∂ₜ q t).2 = fderiv ℝ (fun t' => (tq q t').2) t 1 := rfl
        _ = (∂ₜ (tq q) t).2 := by
         rw [fderiv.snd]
         · simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.coe_snd']
@@ -162,11 +162,11 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
       fun_prop
     have h_qv_t : qv t = q₀ := by
       calc
-        qv t = (q₀ - t.val • v) + t.val • v := by rfl
+        qv t = (q₀ - t.val • v) + t.val • v := rfl
         _ = q₀ := by module
     have h_qv_der : ∂ₜ qv t = v := by
       calc
-        ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v) t 1 := by rfl
+        ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v) t 1 := rfl
         _ = v := by
           rw [fderiv_const_add,fderiv_smul_const]
           · simp only [ContinuousLinearMap.smulRight_apply, fderiv_val, one_smul]
