@@ -468,8 +468,7 @@ lemma mathematicalPartitionFunction_comp_ofβ_apply (β : ℝ≥0) :
 measure is non-zero and the Boltzmann measure is finite. -/
 lemma mathematicalPartitionFunction_pos (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
-    0 < 𝓒.mathematicalPartitionFunction T := by
-  simp [mathematicalPartitionFunction]
+    0 < 𝓒.mathematicalPartitionFunction T := by simp [mathematicalPartitionFunction]
 
 open NNReal Constants
 
@@ -492,8 +491,7 @@ lemma probability_add {T : Temperature} (i : ι × ι1) :
 
 @[simp]
 lemma probability_congr (e : ι1 ≃ᵐ ι) (T : Temperature) (i : ι1) :
-    (𝓒.congr e).probability T i = 𝓒.probability T (e i) := by
-  simp [probability]
+    (𝓒.congr e).probability T i = 𝓒.probability T (e i) := by simp [probability]
 
 lemma probability_nsmul (n : ℕ) (T : Temperature) (f : Fin n → ι) :
     (nsmul n 𝓒).probability T f = ∏ i, 𝓒.probability T (f i) := by
@@ -770,8 +768,7 @@ lemma partitionFunction_pos
 
 lemma partitionFunction_congr
     (𝓒 : CanonicalEnsemble ι) (e : ι1 ≃ᵐ ι) (T : Temperature) :
-    (𝓒.congr e).partitionFunction T = 𝓒.partitionFunction T := by
-  simp [partitionFunction]
+    (𝓒.congr e).partitionFunction T = 𝓒.partitionFunction T := by simp [partitionFunction]
 
 lemma partitionFunction_add
     (𝓒 : CanonicalEnsemble ι) (𝓒1 : CanonicalEnsemble ι1)
@@ -996,18 +993,15 @@ lemma integral_physicalProbability_base
 
 lemma physicalProbability_dof_zero
     (T : Temperature) (h : 𝓒.dof = 0) (i : ι) :
-    𝓒.physicalProbability T i = 𝓒.probability T i := by
-  simp [physicalProbability, h]
+    𝓒.physicalProbability T i = 𝓒.probability T i := by simp [physicalProbability, h]
 
 lemma physicalProbability_phase_space_unit_one
     (T : Temperature) (h : 𝓒.phaseSpaceunit = 1) (i : ι) :
-    𝓒.physicalProbability T i = 𝓒.probability T i := by
-  simp [physicalProbability, h]
+    𝓒.physicalProbability T i = 𝓒.probability T i := by simp [physicalProbability, h]
 
 lemma physicalProbability_congr (e : ι1 ≃ᵐ ι) (T : Temperature) (i : ι1) :
     (𝓒.congr e).physicalProbability T i
-      = 𝓒.physicalProbability T (e i) := by
-  simp [physicalProbability, probability]
+      = 𝓒.physicalProbability T (e i) := by simp [physicalProbability, probability]
 
 lemma physicalProbability_add
     {ι1} [MeasurableSpace ι1]
