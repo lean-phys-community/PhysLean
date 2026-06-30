@@ -33,8 +33,8 @@ variable (A : HermitianMat d 𝕜) (f : ℝ → ℝ) (g : ℝ → ℝ) (q r : �
 /- Adding this to the `CStarAlgebra` aesop set allows `cfc_tac` to use it. -/
 omit [Fintype d] [DecidableEq d] in
 @[aesop safe apply (rule_sets := [CStarAlgebra])]
-theorem isSelfAdjoint : IsSelfAdjoint A.mat := by
-  exact A.H
+theorem isSelfAdjoint : IsSelfAdjoint A.mat :=
+  A.H
 
 /- Adding this to `fun_prop` allows `cfc_cont_tac` to use it. -/
 @[fun_prop]
@@ -44,8 +44,8 @@ theorem continuousOn_finite {α β : Type*} (f : α → β) (S : Set α)
   exact continuous_of_discreteTopology
 
 @[simp]
-theorem conjTranspose_cfc : (cfc f A.mat).conjTranspose = cfc f A.mat := by
-  exact cfc_predicate f A.mat
+theorem conjTranspose_cfc : (cfc f A.mat).conjTranspose = cfc f A.mat :=
+  cfc_predicate f A.mat
 
 protected def cfc : HermitianMat d 𝕜 :=
   ⟨cfc f A.mat, cfc_predicate _ _⟩
@@ -93,8 +93,8 @@ variable {A B : HermitianMat d 𝕜}
 
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.cfc_left (hAB : Commute A.mat B.mat) :
-    Commute (A.cfc f).mat B.mat := by
-  exact hAB.cfc_real f
+    Commute (A.cfc f).mat B.mat :=
+  hAB.cfc_real f
 
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.cfc_right (hAB : Commute A.mat B.mat) :
@@ -102,8 +102,8 @@ theorem _root_.Commute.cfc_right (hAB : Commute A.mat B.mat) :
   (hAB.symm.cfc_left f).symm
 
 theorem cfc_commute (f g : ℝ → ℝ) (hAB : Commute A.mat B.mat) :
-    Commute (A.cfc f).mat (B.cfc g).mat := by
-  exact (hAB.cfc_right g).cfc_left f
+    Commute (A.cfc f).mat (B.cfc g).mat :=
+  (hAB.cfc_right g).cfc_left f
 
 @[aesop safe apply (rule_sets := [Commutes])]
 theorem cfc_self_commute (A : HermitianMat d 𝕜) (f g : ℝ → ℝ) :
@@ -120,8 +120,8 @@ theorem cfc_reindex (e : d ≃ d₂) : (A.reindex e).cfc f = (A.cfc f).reindex e
   exact Matrix.cfc_reindex f e
 
 theorem spectrum_cfc_eq_image (A : HermitianMat d 𝕜) (f : ℝ → ℝ) :
-    spectrum ℝ (A.cfc f).mat = f '' (spectrum ℝ A.mat) := by
-  exact cfc_map_spectrum f A.mat
+    spectrum ℝ (A.cfc f).mat = f '' (spectrum ℝ A.mat) :=
+  cfc_map_spectrum f A.mat
 
 set_option backward.isDefEq.respectTransparency false in
 /--

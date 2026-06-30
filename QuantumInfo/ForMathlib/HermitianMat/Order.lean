@@ -75,11 +75,11 @@ theorem posSemidef_iff_spectrum_Ici [DecidableEq n] (A : HermitianMat n 𝕜) :
   simp [A.H, Set.Ici.eq_1]
 
 theorem posSemidef_iff_spectrum_nonneg [DecidableEq n] (A : HermitianMat n 𝕜) :
-    0 ≤ A ↔ ∀ x ∈ spectrum ℝ A.mat, 0 ≤ x := by
-  exact A.posSemidef_iff_spectrum_Ici
+    0 ≤ A ↔ ∀ x ∈ spectrum ℝ A.mat, 0 ≤ x :=
+  A.posSemidef_iff_spectrum_Ici
 
-theorem trace_nonneg (hA : 0 ≤ A) : 0 ≤ A.trace := by
-  exact (RCLike.nonneg_iff.mp (zero_le_iff.mp hA).trace_nonneg).1
+theorem trace_nonneg (hA : 0 ≤ A) : 0 ≤ A.trace :=
+  (RCLike.nonneg_iff.mp (zero_le_iff.mp hA).trace_nonneg).1
 
 theorem trace_pos (hA : 0 < A) : 0 < A.trace := by
   open ComplexOrder in

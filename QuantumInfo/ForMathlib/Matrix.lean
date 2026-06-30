@@ -59,8 +59,8 @@ variable (hA : A.IsHermitian) (hB : B.IsHermitian)
 
 include hA in
 omit [DecidableEq n] in
-theorem smul_selfAdjoint {c : 𝕜} (hc : _root_.IsSelfAdjoint c) : (c • A).IsHermitian := by
-  exact IsSelfAdjoint.smul hc hA
+theorem smul_selfAdjoint {c : 𝕜} (hc : _root_.IsSelfAdjoint c) : (c • A).IsHermitian :=
+  IsSelfAdjoint.smul hc hA
 
 include hA in
 omit [DecidableEq n] in
