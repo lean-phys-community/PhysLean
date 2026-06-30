@@ -113,8 +113,7 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
         · simp
           rfl
         · apply ContDiffAt.differentiableAt
-          · apply ContDiff.contDiffAt
-            exact h_tq_contDiff q h_ContDiff_q
+          · exact (h_tq_contDiff q h_ContDiff_q).contDiffAt
           · by_contra
             rcases this
     apply Eq.symm
@@ -125,8 +124,7 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
         · simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.coe_snd']
           rfl
         · apply ContDiffAt.differentiableAt
-          · apply ContDiff.contDiffAt
-            exact h_tq_contDiff q h_ContDiff_q
+          · exact (h_tq_contDiff q h_ContDiff_q).contDiffAt
           · by_contra
             rcases this
   have h_F_tq_der : ∀ (q : Time → X) (F : Time → X → ℝ) t, (ContDiff ℝ ∞ ↿F) → (ContDiff ℝ ∞ q)  →
@@ -138,13 +136,11 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
       rw [← Time.deriv_eq,h_tq_der]
       exact hq
     · apply ContDiffAt.differentiableAt
-      · apply ContDiff.contDiffAt
-        exact hF
+      · exact hF.contDiffAt
       · by_contra
         rcases this
     · apply ContDiffAt.differentiableAt
-      · apply ContDiff.contDiffAt
-        exact h_tq_contDiff q hq
+      · exact (h_tq_contDiff q hq).contDiffAt
       · by_contra
         rcases this
   -- beginning of the proof

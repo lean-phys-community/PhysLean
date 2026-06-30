@@ -67,12 +67,12 @@ theorem navierStokes_iff_convectiveNavierStokes
     NavierStokes d data ↔ ConvectiveNavierStokes d data := by
   constructor
   · intro hConservative
-    refine ⟨hConservative.1, ?_⟩
-    exact (FluidDynamics.NavierStokes.momentumEquation_iff_convectiveMomentumEquation d data
-      hConservative.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp hConservative.2
+    exact ⟨hConservative.1,
+      (FluidDynamics.NavierStokes.momentumEquation_iff_convectiveMomentumEquation d data
+        hConservative.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp hConservative.2⟩
   · intro hConvective
-    refine ⟨hConvective.1, ?_⟩
-    exact (FluidDynamics.NavierStokes.momentumEquation_iff_convectiveMomentumEquation d data
-      hConvective.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr hConvective.2
+    exact ⟨hConvective.1,
+      (FluidDynamics.NavierStokes.momentumEquation_iff_convectiveMomentumEquation d data
+        hConvective.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr hConvective.2⟩
 
 end FluidDynamics
