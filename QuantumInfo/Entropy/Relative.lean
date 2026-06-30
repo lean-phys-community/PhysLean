@@ -176,8 +176,11 @@ lemma HermitianMat.trace_rpow_le_trace_of_le_one
     (p : ℝ) (hp : 1 ≤ p) :
     (A ^ p).trace ≤ A.trace := by
   -- Rewrite both sides using trace_rpow_eq_sum: Tr[A^p] = ∑ λ_i^p and Tr[A] = ∑ λ_i (using trace_rpow_eq_sum and rpow_one for the latter).
-  have h_trace_eq_sum : (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p ∧ A.trace = ∑ i, (A.H.eigenvalues i) := by
-    exact ⟨ by rw [ HermitianMat.trace_rpow_eq_sum ], by rw [ show A.trace = ∑ i, ( A.H.eigenvalues i ) by simpa using HermitianMat.trace_rpow_eq_sum A 1 ] ⟩;
+  have h_trace_eq_sum : (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p ∧
+      A.trace = ∑ i, A.H.eigenvalues i :=
+    ⟨by rw [HermitianMat.trace_rpow_eq_sum],
+      by rw [show A.trace = ∑ i, A.H.eigenvalues i by
+        simpa using HermitianMat.trace_rpow_eq_sum A 1]⟩
   rw [ h_trace_eq_sum.1, h_trace_eq_sum.2 ];
   apply_rules [ Finset.sum_le_sum ];
   intro i hi; by_cases hi0 : A.H.eigenvalues i = 0 <;> simp_all
@@ -275,8 +278,8 @@ lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
     A.supportProj.mat * A.mat = A.mat := by
   have h_supportProj_mul_A : ∀ (v : d → ℂ), (A.supportProj.val.mulVec (A.val.mulVec v)) = (A.val.mulVec v) := by
     intro v
-    have h_range : WithLp.toLp 2 (A.val.mulVec v) ∈ LinearMap.range A.val.toEuclideanLin := by
-      exact ⟨ _, rfl ⟩
+    have h_range : WithLp.toLp 2 (A.val.mulVec v) ∈ LinearMap.range A.val.toEuclideanLin :=
+      ⟨_, rfl⟩
     have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), v ∈ LinearMap.range A.val.toEuclideanLin → (A.supportProj.val.toEuclideanLin v) = v := by
       intro v hv
       have h_supportProj_mul_A : (A.supportProj.val.toEuclideanLin v) = (Submodule.orthogonalProjectionOnto (LinearMap.range A.val.toEuclideanLin) v) := by
@@ -314,8 +317,8 @@ lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
     A.mat * B.supportProj.mat = A.mat := by
   -- Since $B.supportProj$ is the projection onto $range B$, we have $B.supportProj * B.mat = B.mat$.
-  have h_supportProj_mul_B : B.supportProj.mat * B.mat = B.mat := by
-    exact supportProj_mul_self B
+  have h_supportProj_mul_B : B.supportProj.mat * B.mat = B.mat :=
+    supportProj_mul_self B
   have h_range_A_subset_range_B : LinearMap.range A.lin.toLinearMap ≤ LinearMap.range B.lin.toLinearMap := by
     have h_orthogonal_complement : LinearMap.range (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) = (LinearMap.ker (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
       have h_orthogonal_complement : ∀ (T : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d), T = T.adjoint → LinearMap.range T = (LinearMap.ker T)ᗮ := by
@@ -477,8 +480,8 @@ private lemma hasDerivAt_trace_rpow_at_one (B : HermitianMat d ℂ) (hB : 0 ≤ 
     by_cases h_pos : 0 < B.H.eigenvalues i;
     · convert! HasDerivAt.rpow ( hasDerivAt_const _ _ ) ( hasDerivAt_id 1 ) h_pos using 1
       simp only [id_eq, mul_one, sub_self, Real.rpow_zero, Real.rpow_one, one_mul, zero_add]
-    · have h_zero : B.H.eigenvalues i = 0 := by
-        exact le_antisymm ( le_of_not_gt h_pos ) ( by simpa using hB.eigenvalues_nonneg i )
+    · have h_zero : B.H.eigenvalues i = 0 :=
+        le_antisymm (le_of_not_gt h_pos) (by simpa using hB.eigenvalues_nonneg i)
       simp [h_zero]
       exact (hasDerivAt_const _ _).congr_of_eventuallyEq (Filter.eventuallyEq_of_mem ( Ioi_mem_nhds zero_lt_one ) fun x hx => Real.zero_rpow hx.out.ne' )
   simp only [HermitianMat.trace_rpow_eq_sum, ← Finset.sum_apply]
@@ -508,14 +511,15 @@ private lemma trace_conj_eq_inner_rpow {ρ σ : MState d} {t : ℝ} (ht : t ≠ 
     rw [ h_cyclic, two_mul ]
     ring_nf
     have h_exp : (σ.M ^ (t + t)).mat = (σ.M ^ t).mat * (σ.M ^ t).mat := by
-      have h_nonneg : 0 ≤ σ.M := by
-        exact σ.nonneg
-      have h_ne_zero : t + t ≠ 0 := by
-        exact fun h => ht ( by linarith )
+      have h_nonneg : 0 ≤ σ.M :=
+        σ.nonneg
+      have h_ne_zero : t + t ≠ 0 :=
+        fun h => ht (by linarith)
       exact HermitianMat.mat_rpow_add h_nonneg h_ne_zero
     rw [ mul_two, h_exp ]
-  have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ = ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re := by
-    exact rfl
+  have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ =
+      ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re :=
+    rfl
   simp_all
   convert congr_arg Complex.re h_cyclic using 1 ; simp [ HermitianMat.conj ] ; ring!;
   rw [ Matrix.trace_mul_comm ]
@@ -527,8 +531,9 @@ private def eigenWeight (ρ σ : MState d) (i : d) : ℝ :=
 private lemma inner_cfc_eq_sum_eigenWeight (ρ σ : MState d) (f : ℝ → ℝ) :
     ⟪ρ.M, σ.M.cfc f⟫ = ∑ i, f (σ.M.H.eigenvalues i) * eigenWeight ρ σ i := by
   -- By definition of the inner product in the context of Hermitian matrices, we can expand it using the trace.
-  have h_inner : ⟪ρ.M, σ.M.cfc f⟫ = RCLike.re (Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat)) := by
-    exact rfl;
+  have h_inner : ⟪ρ.M, σ.M.cfc f⟫ =
+      RCLike.re (Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat)) :=
+    rfl
   have h_trace : Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat) = ∑ i, f (σ.M.H.eigenvalues i) * (star (σ.M.H.eigenvectorBasis i) ⬝ᵥ ρ.M.mat.mulVec (σ.M.H.eigenvectorBasis i)) := by
     rw [ Matrix.trace ];
     have h_cfc_def : (σ.M.cfc f).mat = ∑ i, (f (Matrix.IsHermitian.eigenvalues σ.M.H i)) • Matrix.of (fun x y => (σ.M.H.eigenvectorBasis i x) * (star (σ.M.H.eigenvectorBasis i y))) := by
@@ -658,8 +663,8 @@ private lemma B_of_one (ρ σ : MState d) : B_of ρ σ 1 = ρ.M := by
   simp [B_of, HermitianMat.rpow_zero, HermitianMat.conj_one]
 
 -- B(α) is nonneg for α > 0, because it's a conj of a nonneg matrix.
-private lemma B_of_nonneg (ρ σ : MState d) (α : ℝ) : 0 ≤ B_of ρ σ α := by
-  exact HermitianMat.conj_nonneg _ ρ.nonneg
+private lemma B_of_nonneg (ρ σ : MState d) (α : ℝ) : 0 ≤ B_of ρ σ α :=
+  HermitianMat.conj_nonneg _ ρ.nonneg
 
 -- The function g(M) = Tr[M^s] - Tr[M] satisfies g(M) = 0 when s = 1.
 private lemma trace_rpow_sub_trace_at_one (M : HermitianMat d ℂ) :
