@@ -231,9 +231,8 @@ noncomputable def ofStaticPotentials {d} (c : SpeedOfLight) (ϕ : Space d → �
 
 lemma ofStaticPotentials_eq_ofPotentials {d} (c : SpeedOfLight) (ϕ : Space d → ℝ)
     (A : Space d → EuclideanSpace ℝ (Fin d)) :
-    ofStaticPotentials c ϕ A = ofPotentials c (fun _ => ϕ) (fun _ => A) := by
-  rw [ofPotentials_eq_add]
-  rfl
+    ofStaticPotentials c ϕ A = ofPotentials c (fun _ => ϕ) (fun _ => A) :=
+  (ofPotentials_eq_add c (fun _ => ϕ) (fun _ => A)).symm
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 /-- The electromagnetic potential from an electric and a magnetic field.

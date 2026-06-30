@@ -477,19 +477,15 @@ lemma fieldStrengthMatrix_differentiable {d} {A : ElectromagneticPotential d}
 
 lemma fieldStrengthMatrix_differentiable_space {d} {A : ElectromagneticPotential d}
     {μν} (hA : ContDiff ℝ 2 A) (t : Time) {c : SpeedOfLight} :
-    Differentiable ℝ (fun x => A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x)) μν) := by
-  change Differentiable ℝ ((A.fieldStrengthMatrix · μν) ∘ fun x => (toTimeAndSpace c).symm (t, x))
-  refine Differentiable.comp ?_ ?_
-  · exact fieldStrengthMatrix_differentiable hA
-  · fun_prop
+    Differentiable ℝ (fun x => A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x)) μν) :=
+  (fieldStrengthMatrix_differentiable hA).comp (f := fun x => (toTimeAndSpace c).symm (t, x))
+    (by fun_prop)
 
 lemma fieldStrengthMatrix_differentiable_time {d} {A : ElectromagneticPotential d}
     {μν} (hA : ContDiff ℝ 2 A) (x : Space d) {c : SpeedOfLight} :
-    Differentiable ℝ (fun t => A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x)) μν) := by
-  change Differentiable ℝ ((A.fieldStrengthMatrix · μν) ∘ fun t => (toTimeAndSpace c).symm (t, x))
-  refine Differentiable.comp ?_ ?_
-  · exact fieldStrengthMatrix_differentiable hA
-  · fun_prop
+    Differentiable ℝ (fun t => A.fieldStrengthMatrix ((toTimeAndSpace c).symm (t, x)) μν) :=
+  (fieldStrengthMatrix_differentiable hA).comp (f := fun t => (toTimeAndSpace c).symm (t, x))
+    (by fun_prop)
 
 lemma fieldStrengthMatrix_contDiff {d} {n : WithTop ℕ∞} {A : ElectromagneticPotential d}
     {μν} (hA : ContDiff ℝ (n + 1) A) :
@@ -520,9 +516,8 @@ lemma fieldStrengthMatrix_contDiff {d} {n : WithTop ℕ∞} {A : Electromagnetic
 
 lemma fieldStrengthMatrix_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μν) :
-    ContDiff ℝ ∞ (A.fieldStrengthMatrix · μν) := by
-  apply fieldStrengthMatrix_contDiff
-  simpa using hA
+    ContDiff ℝ ∞ (A.fieldStrengthMatrix · μν) :=
+  fieldStrengthMatrix_contDiff (μν := μν) (by simpa using hA)
 
 /-!
 
