@@ -85,10 +85,8 @@ lemma val_inducing : Topology.IsInducing TimeTransMan.val where
   eq_induced := rfl
 
 lemma val_injective : Function.Injective TimeTransMan.val := by
-  intro t1 t2 h
-  cases t1
-  cases t2
-  simp_all
+  intro _ _ h
+  exact ext_of h
 
 lemma val_isOpenEmbedding : Topology.IsOpenEmbedding TimeTransMan.val where
   eq_induced := rfl
@@ -175,14 +173,8 @@ lemma vadd_val (p : ℝ) (t : TimeTransMan) :
     (p +ᵥ t).val = p + t.val := rfl
 
 instance : AddAction ℝ TimeTransMan where
-  zero_vadd t := by
-    cases t
-    ext
-    simp
-  add_vadd p1 p2 t := by
-    ext
-    simp only [vadd_val]
-    ring
+  zero_vadd t := ext_of (by simp)
+  add_vadd p1 p2 t := ext_of (by simp [add_assoc])
 
 /-!
 
