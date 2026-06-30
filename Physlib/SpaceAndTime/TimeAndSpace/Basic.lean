@@ -373,15 +373,14 @@ noncomputable def distTimeDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   toFun f :=
     let ev : ((Time × Space d) →L[ℝ] M) →L[ℝ] M := {
       toFun v := v (1, 0)
-      map_add' v1 v2 := by
-        simp only [_root_.add_apply]
-      map_smul' a v := by
-        simp
+      map_add' _ _ := rfl
+      map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' f1 f2 := by
+  map_add' _ _ := by
     simp
-  map_smul' a f := by simp
+  map_smul' _ _ := by
+    simp
 
 lemma distTimeDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
@@ -425,15 +424,14 @@ noncomputable def distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M
   toFun f :=
     let ev : (Time × Space d →L[ℝ] M) →L[ℝ] M := {
       toFun v := v (0, basis i)
-      map_add' v1 v2 := by
-        simp only [_root_.add_apply]
-      map_smul' a v := by
-        simp
+      map_add' _ _ := rfl
+      map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' f1 f2 := by
+  map_add' _ _ := by
     simp
-  map_smul' a f := by simp
+  map_smul' _ _ := by
+    simp
 
 lemma distSpaceDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (i : Fin d) (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
@@ -537,8 +535,7 @@ noncomputable def distSpaceGrad {d} :
     simp
 
 lemma distSpaceGrad_apply {d} (f : (Time × Space d) →d[ℝ] ℝ) (ε : 𝓢(Time × Space d, ℝ)) :
-    distSpaceGrad f ε = fun i => distSpaceDeriv i f ε := by
-  rfl
+    distSpaceGrad f ε = fun i => distSpaceDeriv i f ε := rfl
 
 /-!
 
