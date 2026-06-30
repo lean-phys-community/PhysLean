@@ -149,14 +149,12 @@ lemma koszulSignInsert_eq_perm (φs φs' : List 𝓕) (φ : 𝓕) (h : φs.Perm 
   intro h'
   have hg : ofList q (List.filter (fun i => !decide (le φ i)) φs) =
       ofList q (List.filter (fun i => !decide (le φ i)) φs') := by
-    apply ofList_perm
-    exact List.Perm.filter (fun i => !decide (le φ i)) h
+    exact ofList_perm q (List.Perm.filter (fun i => !decide (le φ i)) h)
   rw [hg]
 
 lemma koszulSignInsert_eq_sort (φs : List 𝓕) (φ : 𝓕) :
     koszulSignInsert q le φ φs = koszulSignInsert q le φ (List.insertionSort le φs) := by
-  apply koszulSignInsert_eq_perm
-  exact List.Perm.symm (List.perm_insertionSort le φs)
+  exact koszulSignInsert_eq_perm q le _ _ _ (List.Perm.symm (List.perm_insertionSort le φs))
 
 lemma koszulSignInsert_eq_exchangeSign_take [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) (φs : List 𝓕) :
     koszulSignInsert q le φ φs = 𝓢(q φ, ofList q
@@ -210,8 +208,7 @@ lemma koszulSignInsert_eq_exchangeSign_take [Std.Total le] [IsTrans 𝓕 le] (φ
 
 lemma koszulSignInsert_insertIdx (i j : 𝓕) (r : List 𝓕) (n : ℕ) (hn : n ≤ r.length) :
     koszulSignInsert q le j (List.insertIdx r n i) = koszulSignInsert q le j (i :: r) := by
-  apply koszulSignInsert_eq_perm
-  exact List.perm_insertIdx i r hn
+  exact koszulSignInsert_eq_perm q le _ _ _ (List.perm_insertIdx i r hn)
 
 /-- The difference in `koszulSignInsert` on inserting `r0` into `r` compared to
   into `r1 :: r` for any `r`. -/
