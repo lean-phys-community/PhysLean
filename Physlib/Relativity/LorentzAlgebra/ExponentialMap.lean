@@ -177,5 +177,5 @@ theorem exp_isOrthochronous (A : lorentzAlgebra) :
 restricted Lorentz group. -/
 theorem exp_mem_restricted_lorentzGroup (A : lorentzAlgebra) :
     (⟨NormedSpace.exp A.1, exp_mem_lorentzGroup A⟩ : LorentzGroup 3) ∈
-    LorentzGroup.restricted 3 := by
-  exact ⟨exp_isProper A, exp_isOrthochronous A⟩
+    LorentzGroup.restricted 3 :=
+  ⟨exp_isProper A, exp_isOrthochronous A⟩

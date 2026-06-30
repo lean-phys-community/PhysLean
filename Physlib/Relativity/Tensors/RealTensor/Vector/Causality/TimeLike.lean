@@ -27,8 +27,8 @@ namespace Vector
 @[simp]
 lemma timelike_neg_time_component_product {d : ℕ} (v w : Vector d)
     (hv_neg : v (Sum.inl 0) < 0) (hw_neg : w (Sum.inl 0) < 0) :
-    v (Sum.inl 0) * w (Sum.inl 0) > 0 := by
-  exact mul_pos_of_neg_of_neg hv_neg hw_neg
+    v (Sum.inl 0) * w (Sum.inl 0) > 0 :=
+  mul_pos_of_neg_of_neg hv_neg hw_neg
 
 /-- For timelike vectors, the Minkowski inner product is positive -/
 lemma timeLike_iff_norm_sq_pos {d : ℕ} (p : Vector d) :
@@ -60,8 +60,8 @@ lemma timelike_time_dominates_space {d : ℕ} {v : Vector d}
                   ∑ i, v (Sum.inr i) * v (Sum.inr i) := hv
   -- Rearrange the inequality
   have h : ∑ i, v (Sum.inr i) * v (Sum.inr i) <
-          v (Sum.inl 0) * v (Sum.inl 0) := by
-    exact lt_of_sub_pos h_norm_pos
+          v (Sum.inl 0) * v (Sum.inl 0) :=
+    lt_of_sub_pos h_norm_pos
   exact h
 
 /-- For nonzero timelike vectors, the time component is nonzero -/
@@ -102,8 +102,8 @@ lemma timeLike_iff_time_lt_space {d : ℕ} {v : Vector d} :
 @[simp]
 lemma timeComponent_squared_pos_of_timelike {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
-    0 < (timeComponent v)^2 := by
-  exact pow_two_pos_of_ne_zero (time_component_ne_zero_of_timelike hv)
+    0 < (timeComponent v)^2 :=
+  pow_two_pos_of_ne_zero (time_component_ne_zero_of_timelike hv)
 
 /-- For timelike vectors, the spatial norm squared is strictly less
     than the time component squared -/

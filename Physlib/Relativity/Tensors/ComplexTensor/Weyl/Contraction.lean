@@ -191,7 +191,7 @@ def rightDualContraction : (rightHandedRep.tprod dualRightHandedRep).Intertwinin
   isIntertwining' M := TensorProduct.ext' fun ψ φ => by
     change (M.1.map star *ᵥ ψ.toFin2ℂ) ⬝ᵥ (M.1⁻¹.conjTranspose *ᵥ φ.toFin2ℂ) =
       ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ
-    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := by rfl
+    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := rfl
     rw [dotProduct_mulVec, h1, vecMul_transpose, mulVec_mulVec]
     have h2 : ((M.1)⁻¹.map star * (M.1).map star) = 1 := by
       refine transpose_inj.mp ?_
@@ -232,7 +232,7 @@ def dualRightContraction : (dualRightHandedRep.tprod rightHandedRep).Intertwinin
   isIntertwining' M := TensorProduct.ext' fun φ ψ => by
     change (M.1⁻¹.conjTranspose *ᵥ φ.toFin2ℂ) ⬝ᵥ (M.1.map star *ᵥ ψ.toFin2ℂ) =
       φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ
-    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := by rfl
+    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := rfl
     rw [dotProduct_mulVec, h1, mulVec_transpose, vecMul_vecMul]
     have h2 : ((M.1)⁻¹.map star * (M.1).map star) = 1 := by
       refine transpose_inj.mp ?_
