@@ -115,34 +115,28 @@ lemma rightDualRightUnit_eq_fromConstPair : δR = fromConstPair Fermion.rightDua
 -/
 
 lemma coContrUnit_eq_fromPairT : δ' = fromPairT (Lorentz.coContrUnitVal) := by
-  rw [coContrUnit_eq_fromConstPair, fromConstPair]
-  congr 1
-  exact Lorentz.coContrUnit_apply_one
+  simpa only [coContrUnit_eq_fromConstPair, fromConstPair] using
+    congrArg fromPairT Lorentz.coContrUnit_apply_one
 
 lemma contrCoUnit_eq_fromPairT : δ = fromPairT (Lorentz.contrCoUnitVal) := by
-  rw [contrCoUnit_eq_fromConstPair, fromConstPair]
-  congr 1
-  exact Lorentz.contrCoUnit_apply_one
+  simpa only [contrCoUnit_eq_fromConstPair, fromConstPair] using
+    congrArg fromPairT Lorentz.contrCoUnit_apply_one
 
 lemma dualLeftLeftUnit_eq_fromPairT : δL' = fromPairT (Fermion.dualLeftLeftUnitVal) := by
-  rw [dualLeftLeftUnit_eq_fromConstPair, fromConstPair]
-  congr 1
-  exact Fermion.dualLeftLeftUnit_apply_one
+  simpa only [dualLeftLeftUnit_eq_fromConstPair, fromConstPair] using
+    congrArg fromPairT Fermion.dualLeftLeftUnit_apply_one
 
 lemma leftDualLeftUnit_eq_fromPairT : δL = fromPairT (Fermion.leftDualLeftUnitVal) := by
-  rw [leftDualLeftUnit_eq_fromConstPair, fromConstPair]
-  congr 1
-  exact Fermion.leftDualLeftUnit_apply_one
+  simpa only [leftDualLeftUnit_eq_fromConstPair, fromConstPair] using
+    congrArg fromPairT Fermion.leftDualLeftUnit_apply_one
 
 lemma dualRightRightUnit_eq_fromPairT : δR' = fromPairT (Fermion.dualRightRightUnitVal) := by
-  rw [dualRightRightUnit_eq_fromConstPair, fromConstPair]
-  congr 1
-  exact Fermion.dualRightRightUnit_apply_one
+  simpa only [dualRightRightUnit_eq_fromConstPair, fromConstPair] using
+    congrArg fromPairT Fermion.dualRightRightUnit_apply_one
 
 lemma rightDualRightUnit_eq_fromPairT : δR = fromPairT (Fermion.rightDualRightUnitVal) := by
-  rw [rightDualRightUnit_eq_fromConstPair, fromConstPair]
-  congr 1
-  exact Fermion.rightDualRightUnit_apply_one
+  simpa only [rightDualRightUnit_eq_fromConstPair, fromConstPair] using
+    congrArg fromPairT Fermion.rightDualRightUnit_apply_one
 
 /-!
 
