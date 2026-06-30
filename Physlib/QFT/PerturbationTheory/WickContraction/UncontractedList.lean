@@ -50,8 +50,8 @@ lemma fin_list_sorted_succAboveEmb_sorted (l: List (Fin n)) (hl : l.Pairwise (·
 lemma fin_finset_sort_map_monotone {n m : ℕ} (a : Finset (Fin n)) (f : Fin n ↪ Fin m)
     (hf : StrictMono f) : (a.sort (· ≤ ·)).map f =
     ((a.map f).sort (· ≤ ·)) := by
-  have h1 : ((a.sort (· ≤ ·)).map f).Pairwise (· ≤ ·) := by
-    exact fin_list_sorted_monotone_sorted _ (a.pairwise_sort (fun x1 x2 => x1 ≤ x2)) f hf
+  have h1 : ((a.sort (· ≤ ·)).map f).Pairwise (· ≤ ·) :=
+    fin_list_sorted_monotone_sorted _ (a.pairwise_sort (fun x1 x2 => x1 ≤ x2)) f hf
   have h2 : ((a.sort (· ≤ ·)).map f).Nodup := by
     refine (List.nodup_map_iff_inj_on ?_).mpr ?_
     exact a.sort_nodup (fun x1 x2 => x1 ≤ x2)
@@ -215,8 +215,7 @@ lemma uncontractedList_sorted : List.Pairwise (· ≤ ·) c.uncontractedList := 
   rw [uncontractedList]
   apply List.Pairwise.filter
   rw [← List.ofFn_id]
-  refine List.sortedLE_iff_pairwise.mp ?_
-  exact Monotone.sortedLE_ofFn fun ⦃a b⦄ a => a
+  exact List.sortedLE_iff_pairwise.mp (Monotone.sortedLE_ofFn fun ⦃a b⦄ a => a)
 
 lemma uncontractedList_sorted_lt : List.Pairwise (· < ·) c.uncontractedList := by
   rw [uncontractedList]
@@ -226,8 +225,7 @@ lemma uncontractedList_sorted_lt : List.Pairwise (· < ·) c.uncontractedList :=
 
 lemma uncontractedList_nodup : c.uncontractedList.Nodup := by
   rw [uncontractedList]
-  refine List.Nodup.filter (fun x => decide (x ∈ c.uncontracted)) ?_
-  exact List.nodup_finRange n
+  exact List.Nodup.filter (fun x => decide (x ∈ c.uncontracted)) (List.nodup_finRange n)
 
 lemma uncontractedList_toFinset (c : WickContraction n) :
     c.uncontractedList.toFinset = c.uncontracted := by
@@ -467,8 +465,8 @@ lemma uncontractedList_succAbove_orderedInsert_nodup (c : WickContraction n) (i 
 lemma uncontractedList_succAbove_orderedInsert_sorted (c : WickContraction n) (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i
       (List.map i.succAboveEmb c.uncontractedList)).Pairwise (· ≤ ·) := by
-  refine List.Pairwise.orderedInsert i (List.map (⇑i.succAboveEmb) c.uncontractedList) ?_
-  exact uncontractedList_succAboveEmb_sorted c i
+  exact List.Pairwise.orderedInsert i (List.map (⇑i.succAboveEmb) c.uncontractedList)
+    (uncontractedList_succAboveEmb_sorted c i)
 
 lemma uncontractedList_succAbove_orderedInsert_toFinset (c : WickContraction n) (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i (List.map i.succAboveEmb c.uncontractedList)).toFinset =
@@ -534,8 +532,7 @@ lemma uncontractedList_succAboveEmb_eraseIdx_sorted (c : WickContraction n) (i :
 
 lemma uncontractedList_succAboveEmb_eraseIdx_nodup (c : WickContraction n) (i : Fin n.succ) (k: ℕ) :
     ((List.map i.succAboveEmb c.uncontractedList).eraseIdx k).Nodup := by
-  refine List.Nodup.eraseIdx k ?_
-  exact uncontractedList_succAboveEmb_nodup c i
+  exact List.Nodup.eraseIdx k (uncontractedList_succAboveEmb_nodup c i)
 
 lemma uncontractedList_succAboveEmb_eraseIdx_eq_sort (c : WickContraction n) (i : Fin n.succ)
     (k : ℕ) (hk : k < c.uncontractedList.length) :
