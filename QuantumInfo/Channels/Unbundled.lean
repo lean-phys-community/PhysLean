@@ -86,8 +86,7 @@ theorem comp (h₁ : M.IsTracePreserving) (h₂ : M₂.IsTracePreserving) :
 
 /-- The identity MatrixMap IsTracePreserving. -/
 @[simp]
-theorem id : (id A R).IsTracePreserving := by
-  simp [IsTracePreserving, MatrixMap.id]
+theorem id : (id A R).IsTracePreserving := by simp [IsTracePreserving, MatrixMap.id]
 
 variable {R : Type*} [CommSemiring R] in
 /-- Unit linear combinations of IsTracePreserving maps are IsTracePreserving. -/
@@ -202,8 +201,7 @@ theorem map_1 (h : M.Unital) : M 1 = 1 :=
 
 /-- The identity `MatrixMap` is `Unital`. -/
 @[simp]
-theorem id : (id A R).Unital := by
-  simp [Unital, MatrixMap.id]
+theorem id : (id A R).Unital := by simp [Unital, MatrixMap.id]
 
 --TODO: Closed under composition, kronecker products, it's iff M.choi_matrix.traceLeft = 1...
 

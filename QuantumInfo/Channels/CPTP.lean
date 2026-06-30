@@ -440,8 +440,7 @@ def IsUnitary (Λ : CPTPMap dIn dIn) : Prop :=
   ∃ U, Λ = ofUnitary U
 
 /-- A channel is unitary iff it can be written as conjugation by a unitary. -/
-theorem IsUnitary_iff_U_conj (Λ : CPTPMap dIn dIn) : IsUnitary Λ ↔ ∃ U, ∀ ρ, Λ ρ = ρ.U_conj U := by
-  simp_rw [IsUnitary, ← ofUnitary_eq_conj, CPTPMap.funext_iff]
+theorem IsUnitary_iff_U_conj (Λ : CPTPMap dIn dIn) : IsUnitary Λ ↔ ∃ U, ∀ ρ, Λ ρ = ρ.U_conj U := by simp_rw [IsUnitary, ← ofUnitary_eq_conj, CPTPMap.funext_iff]
 
 theorem IsUnitary_equiv (σ : dIn ≃ dIn) : IsUnitary (ofEquiv σ) := by
   have h_unitary : ∃ U : Matrix dIn dIn ℂ, U * U.conjTranspose = 1 ∧ U.conjTranspose * U = 1 ∧ ∀ x : dIn, (∀ y : dIn, (U y x = 1) ↔ (y = σ x)) ∧ ∀ y : dIn, (U y x = 0) ↔ (y ≠ σ x) := by
@@ -783,8 +782,7 @@ theorem prep_append_map_entry (X : Matrix dIn dIn ℂ)
     let prep := (id ⊗ᶜᵖ zero_prep)
     let append : CPTPMap dIn (dIn × Unit) := CPTPMap.ofEquiv (Equiv.prodPUnit dIn).symm
     (prep ∘ₘ append).map X (a₁, b₁c₁) (a₂, b₂c₂) =
-    X a₁ a₂ * τ.m b₁c₁ b₂c₂ := by
-  simp [purify_prep_append_entry]
+    X a₁ a₂ * τ.m b₁c₁ b₂c₂ := by simp [purify_prep_append_entry]
 
 /-- The complementary channel comes from tracing out the other half (the right half) of the purified channel `purify`. -/
 def complementary (Λ : CPTPMap dIn dOut) : CPTPMap dIn (dIn × dOut) :=

@@ -161,8 +161,7 @@ noncomputable def measureDiscard (Λ : POVM X d) : CPTPMap d X :=
   CPTPMap.traceLeft ∘ₘ Λ.measurementMap
 
 theorem measureDiscard_apply (Λ : POVM X d) (ρ : MState d) :
-    Λ.measureDiscard ρ = MState.ofClassical (Λ.measure ρ) := by
-  simp [measureDiscard, traceLeft_measurementMap_eq_measure]
+    Λ.measureDiscard ρ = MState.ofClassical (Λ.measure ρ) := by simp [measureDiscard, traceLeft_measurementMap_eq_measure]
 
 /-- The action of measuring a state with the POVM `Λ`, forgetting the measurement outcome, and
 keeping the disturbed state. -/

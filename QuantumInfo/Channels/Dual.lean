@@ -429,8 +429,7 @@ def HPMap.hermDual : HPMap dOut dIn :=
   HPMap.ofHermitianMat (LinearMapClass.linearMap f).adjoint
 
 @[simp]
-theorem HPMap.hermDual_hermDual : f.hermDual.hermDual = f := by
-  simp [hermDual]
+theorem HPMap.hermDual_hermDual : f.hermDual.hermDual = f := by simp [hermDual]
 
 open RealInnerProductSpace
 
