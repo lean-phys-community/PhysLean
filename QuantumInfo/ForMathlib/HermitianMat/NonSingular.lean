@@ -187,8 +187,7 @@ theorem nonSingular_conj (hC : IsUnit C) : NonSingular (A.conj C) := by
   rwa [nonSingular_iff_conj hC]
 
 instance nonSingular_conj_isometry {B : HermitianMat n 𝕜} [NonSingular B] :
-    NonSingular (A.conj B.mat) := by
-  simpa [nonSingular_iff_conj]
+    NonSingular (A.conj B.mat) := by simpa [nonSingular_iff_conj]
 
 theorem nonSingular_zero_notMem_spectrum : 0 ∉ spectrum ℝ A.mat := by
   rwa [← nonSingular_iff_zero_notMem_spectrum]
