@@ -300,21 +300,15 @@ lemma differentiable_component {d : ℕ}
 
 @[fun_prop]
 lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
-    (hA : Differentiable ℝ A) : Differentiable ℝ (fun x => Λ • A (Λ⁻¹ • x)) := by
-  apply Differentiable.comp
-  · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ)
-  · apply Differentiable.comp
-    · exact hA
-    · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)
+    (hA : Differentiable ℝ A) : Differentiable ℝ (fun x => Λ • A (Λ⁻¹ • x)) :=
+  (ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ)).comp
+    (hA.comp (ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)))
 
 @[fun_prop]
 lemma contDiff_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
-    (hA : ContDiff ℝ n A) : ContDiff ℝ n (fun x => Λ • A (Λ⁻¹ • x)) := by
-  apply ContDiff.comp
-  · exact ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ)
-  · apply ContDiff.comp
-    · exact hA
-    · exact ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ⁻¹)
+    (hA : ContDiff ℝ n A) : ContDiff ℝ n (fun x => Λ • A (Λ⁻¹ • x)) :=
+  (ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ)).comp
+    (hA.comp (ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ⁻¹)))
 
 @[fun_prop]
 lemma differentiable_deriv {d} {A : ElectromagneticPotential d}
@@ -332,12 +326,9 @@ lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
 @[fun_prop]
 lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ (n + 1) A) (μ ν : Fin 1 ⊕ Fin d) :
-    ContDiff ℝ n (fun x => ∂_ μ A x ν) := by
-  have diff_partial (μ) :
-      ∀ ν, ContDiff ℝ n fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
-    rw [SpaceTime.contDiff_vector]
-    fun_prop
-  exact diff_partial μ ν
+    ContDiff ℝ n (fun x => ∂_ μ A x ν) :=
+  (SpaceTime.contDiff_vector (fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ))).mpr
+    (by fun_prop) ν
 
 TODO "Add results related to the differentiability of the
   derivative of the Electromagnetic potential."
@@ -351,60 +342,60 @@ TODO "Add results related to the differentiability of the
 lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : Differentiable ℝ ↿φ) : Differentiable ℝ (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
-  rw [← SpaceTime.differentiable_vector]
-  intro μ
-  match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr _ => fun_prop
+  exact (SpaceTime.differentiable_vector _).mp fun μ => by
+    rcases μ with μ | i
+    · fin_cases μ
+      fun_prop
+    · fun_prop
 
 lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : ContDiff ℝ n ↿φ) : ContDiff ℝ n (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
-  rw [← SpaceTime.contDiff_vector]
-  intro μ
-  match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr _ => fun_prop
+  exact (SpaceTime.contDiff_vector _).mp fun μ => by
+    rcases μ with μ | i
+    · fin_cases μ
+      fun_prop
+    · fun_prop
 
 lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofVectorPotential c A) := by
   simp [ofVectorPotential]
-  rw [← SpaceTime.differentiable_vector]
-  intro μ
-  match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  exact (SpaceTime.differentiable_vector _).mp fun μ => by
+    rcases μ with μ | i
+    · fin_cases μ
+      fun_prop
+    · fun_prop
 
 lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofVectorPotential c A) := by
   simp [ofVectorPotential]
-  rw [← SpaceTime.contDiff_vector]
-  intro μ
-  match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  exact (SpaceTime.contDiff_vector _).mp fun μ => by
+    rcases μ with μ | i
+    · fin_cases μ
+      fun_prop
+    · fun_prop
 
 lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : Differentiable ℝ ↿φ)
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofPotentials c φ A) := by
   simp [ofPotentials]
-  rw [← SpaceTime.differentiable_vector]
-  intro μ
-  match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  exact (SpaceTime.differentiable_vector _).mp fun μ => by
+    rcases μ with μ | i
+    · fin_cases μ
+      fun_prop
+    · fun_prop
 
 lemma contDiff_ofPotentials {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : ContDiff ℝ n ↿φ)
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofPotentials c φ A) := by
   simp [ofPotentials]
-  rw [← SpaceTime.contDiff_vector]
-  intro μ
-  match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  exact (SpaceTime.contDiff_vector _).mp fun μ => by
+    rcases μ with μ | i
+    · fin_cases μ
+      fun_prop
+    · fun_prop
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma contDiff_ofElectromagneticField {n : ℕ} (c : SpeedOfLight)
