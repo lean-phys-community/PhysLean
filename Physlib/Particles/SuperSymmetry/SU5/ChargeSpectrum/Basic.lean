@@ -207,8 +207,7 @@ instance emptyInst : EmptyCollection (ChargeSpectrum 𝓩) where
 lemma empty_eq : (∅ : ChargeSpectrum 𝓩) = ⟨none, none, {}, {}⟩ := rfl
 
 @[simp]
-lemma empty_subset (x : ChargeSpectrum 𝓩) : ∅ ⊆ x := by
-  simp [Subset, empty_eq]
+lemma empty_subset (x : ChargeSpectrum 𝓩) : ∅ ⊆ x := by simp [Subset, empty_eq]
 
 @[simp]
 lemma subset_of_empty_iff_empty {x : ChargeSpectrum 𝓩} :
@@ -218,20 +217,16 @@ lemma subset_of_empty_iff_empty {x : ChargeSpectrum 𝓩} :
   simp
 
 @[simp]
-lemma empty_qHd : (∅ : ChargeSpectrum 𝓩).qHd = none := by
-  simp [empty_eq]
+lemma empty_qHd : (∅ : ChargeSpectrum 𝓩).qHd = none := by simp [empty_eq]
 
 @[simp]
-lemma empty_qHu : (∅ : ChargeSpectrum 𝓩).qHu = none := by
-  simp [empty_eq]
+lemma empty_qHu : (∅ : ChargeSpectrum 𝓩).qHu = none := by simp [empty_eq]
 
 @[simp]
-lemma empty_Q5 : (∅ : ChargeSpectrum 𝓩).Q5 = ∅ := by
-  simp [empty_eq]
+lemma empty_Q5 : (∅ : ChargeSpectrum 𝓩).Q5 = ∅ := by simp [empty_eq]
 
 @[simp]
-lemma empty_Q10 : (∅ : ChargeSpectrum 𝓩).Q10 = ∅ := by
-  simp [empty_eq]
+lemma empty_Q10 : (∅ : ChargeSpectrum 𝓩).Q10 = ∅ := by simp [empty_eq]
 
 /-!
 
@@ -245,8 +240,7 @@ def card (x : ChargeSpectrum 𝓩) : Nat :=
   x.qHu.toFinset.card + x.qHd.toFinset.card + x.Q5.card + x.Q10.card
 
 @[simp]
-lemma card_empty : card (∅ : ChargeSpectrum 𝓩) = 0 := by
-  simp [card, empty_eq]
+lemma card_empty : card (∅ : ChargeSpectrum 𝓩) = 0 := by simp [card, empty_eq]
 
 lemma card_mono {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) : card x ≤ card y := by
   have h1 := Finset.card_le_card h.1
@@ -299,13 +293,11 @@ lemma mem_powerset_iff {x y : ChargeSpectrum 𝓩} :
     x.qHd ∈ y.qHd.powerset ∧
     x.qHu ∈ y.qHu.powerset ∧
     x.Q5 ∈ y.Q5.powerset ∧
-    x.Q10 ∈ y.Q10.powerset := by
-  simp [powerset, Finset.mem_product, toProd]
+    x.Q10 ∈ y.Q10.powerset := by simp [powerset, Finset.mem_product, toProd]
 
 @[simp]
 lemma mem_powerset_iff_subset {x y : ChargeSpectrum 𝓩} :
-    x ∈ powerset y ↔ x ⊆ y := by
-  simp [mem_powerset_iff, subset_def]
+    x ∈ powerset y ↔ x ⊆ y := by simp [mem_powerset_iff, subset_def]
 
 lemma self_mem_powerset (x : ChargeSpectrum 𝓩) :
     x ∈ powerset x := by simp
