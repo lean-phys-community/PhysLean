@@ -288,8 +288,8 @@ private theorem nontrivial_hsumL [Nontrivial ℋ] : Nontrivial (L (HSum ℋ)) :=
   have hdiag_ne_zero : (blockDiagonal (ℋ := ℋ) (1 : L ℋ) 0 : L (HSum ℋ)) ≠ 0 := by
     intro h0
     have hz :
-        blockDiagonal (ℋ := ℋ) (1 : L ℋ) 0 (hsumIncl ℋ 0 w) = 0 := by
-      exact congrArg (fun T : L (HSum ℋ) => T (hsumIncl ℋ 0 w)) h0
+        blockDiagonal (ℋ := ℋ) (1 : L ℋ) 0 (hsumIncl ℋ 0 w) = 0 :=
+      congrArg (fun T : L (HSum ℋ) => T (hsumIncl ℋ 0 w)) h0
     have hw0 : w = 0 := by
       have hz0 := congrArg (fun z : HSum ℋ => hsumProj ℋ 0 z) hz
       simpa [blockDiagonal] using hz0
@@ -788,8 +788,8 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
       smul_nonneg (by linarith [hf0]) hR0sq_nonneg
     exact (neg_nonneg.mp (by simpa [neg_smul] using hneg))
   have htop :
-      cfcR (ℋ := ℋ) f (star X * A * X) ≤ star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) := by
-    exact blockDiagonal_le_left (ℋ := ℋ) hcore
+      cfcR (ℋ := ℋ) f (star X * A * X) ≤ star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) :=
+    blockDiagonal_le_left (ℋ := ℋ) hcore
   have hdrop :
       star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) ≤ star X * cfcR (ℋ := ℋ) f A * X := by
     simpa [add_comm, add_left_comm, add_assoc] using
@@ -1017,8 +1017,8 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
       smul_nonneg (by linarith [hf0]) hR0sq_nonneg
     exact (neg_nonneg.mp (by simpa [neg_smul] using hneg))
   have htop :
-      cfcR (ℋ := ℋ) f (star X * A * X) ≤ star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) := by
-    exact blockDiagonal_le_left (ℋ := ℋ) hcore
+      cfcR (ℋ := ℋ) f (star X * A * X) ≤ star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) :=
+    blockDiagonal_le_left (ℋ := ℋ) hcore
   have hdrop :
       star X * cfcR (ℋ := ℋ) f A * X + (f 0) • (R0 * R0) ≤ star X * cfcR (ℋ := ℋ) f A * X := by
     simpa [add_comm, add_left_comm, add_assoc] using

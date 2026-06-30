@@ -364,8 +364,7 @@ theorem cfc_sq_rpow_eq_cfc_rpow
 
 /-- Tr[A^p] = ∑ᵢ λᵢ^p for a Hermitian matrix A. -/
 lemma trace_rpow_eq_sum (A : HermitianMat d ℂ) (p : ℝ) :
-    (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p := by
-  exact A.trace_cfc_eq (· ^ p)
+    (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p := A.trace_cfc_eq (· ^ p)
 
 /-! ## Loewner-Heinz Theorem
 The operator monotonicity of `x ↦ x ^ q` for `0 < q ≤ 1`:

@@ -270,11 +270,11 @@ theorem Sᵥₙ_eq_trace_cfc {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
   have h_def : Sᵥₙ ρ = Finset.sum Finset.univ (fun x ↦ Real.negMulLog (ρ.M.H.eigenvalues x)) := rfl
   -- By definition of trace, the trace of `cfc ρ.M Real.negMulLog` is the sum of its eigenvalues.
   have h_trace : (ρ.M.cfc Real.negMulLog).trace =
-      ∑ x, (ρ.M.cfc Real.negMulLog).H.eigenvalues x := by
-    exact (HermitianMat.sum_eigenvalues_eq_trace _).symm
+      ∑ x, (ρ.M.cfc Real.negMulLog).H.eigenvalues x :=
+    (HermitianMat.sum_eigenvalues_eq_trace _).symm
   obtain ⟨e, he⟩ : ∃ e : d ≃ d, (ρ.M.cfc Real.negMulLog).H.eigenvalues =
-      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e := by
-   exact Matrix.IsHermitian.cfc_eigenvalues _ _
+      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e :=
+    Matrix.IsHermitian.cfc_eigenvalues _ _
   rw [h_def, h_trace, he]
   simp only [Function.comp_apply]
   conv_lhs => rw [ ← Equiv.sum_comp e ]

@@ -550,8 +550,7 @@ private noncomputable def opStarHSAlgEquiv : L ℋ ≃ₐ[ℝ] (L ℋ)ᵐᵒᵖ 
 
 omit [FiniteDimensional ℂ ℋ] in
 lemma op_isSelfAdjoint (A : L ℋ) (hA : IsSelfAdjoint A) :
-    IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := by
-  exact congrArg MulOpposite.op hA.star_eq
+    IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := congrArg MulOpposite.op hA.star_eq
 
 private noncomputable def opStarHSLinearMap : L ℋ →ₗ[ℝ] (L ℋ)ᵐᵒᵖ where
   toFun := fun A => MulOpposite.op (star A)

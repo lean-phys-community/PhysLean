@@ -1077,8 +1077,8 @@ The integral of a Hermitian matrix function commutes with `toMat`.
 -/
 lemma integral_toMat (A : ℝ → HermitianMat d 𝕜) (T₁ T₂ : ℝ) {μ : Measure ℝ}
   (hA : IntervalIntegrable A μ T₁ T₂) :
-    (∫ t in T₁..T₂, A t ∂μ).mat = ∫ t in T₁..T₂, (A t).mat ∂μ := by
-  exact ((matₗ (R := ℝ)).intervalIntegral_comp_comm hA).symm
+    (∫ t in T₁..T₂, A t ∂μ).mat = ∫ t in T₁..T₂, (A t).mat ∂μ :=
+  ((matₗ (R := ℝ)).intervalIntegral_comp_comm hA).symm
 
 set_option backward.isDefEq.respectTransparency false in
 /--
@@ -1248,8 +1248,8 @@ theorem cfc_le_cfc_of_commute (hf : Monotone f) (hAB₁ : Commute A.mat B.mat) (
 open ComplexOrder in
 theorem cfc_monoOn_pos_of_monoOn_posDef {d : Type*} [Fintype d] [DecidableEq d]
   {f : ℝ → ℝ} (hf_is_operator_convex : False) :
-    MonotoneOn (HermitianMat.cfc · f) { A : HermitianMat d ℂ | A.mat.PosDef } := by
-  exact False.elim hf_is_operator_convex
+    MonotoneOn (HermitianMat.cfc · f) { A : HermitianMat d ℂ | A.mat.PosDef } :=
+  False.elim hf_is_operator_convex
 
 section uncategorized_cleanup
 
@@ -1411,8 +1411,7 @@ lemma ker_cfc_le_ker_on_set
   exact mem_ker_iff_mulVec_zero A x
 
 lemma ker_cfc_le_ker (h : ∀ i, f i = 0 → i = 0) :
-    (A.cfc f).ker ≤ A.ker := by
-  exact ker_cfc_le_ker_on_set (Set.subset_univ _) (by simpa using h)
+    (A.cfc f).ker ≤ A.ker := ker_cfc_le_ker_on_set (Set.subset_univ _) (by simpa using h)
 
 lemma ker_cfc_le_ker_nonneg (hA : 0 ≤ A) (h : ∀ i ≥ 0, f i = 0 → i = 0) :
     (A.cfc f).ker ≤ A.ker := by
@@ -1437,8 +1436,7 @@ lemma ker_le_ker_cfc_on_set (hs : spectrum ℝ A.mat ⊆ s) (h : ∀ i ∈ s, i 
   exact Or.inl ( h _ ( hs (Matrix.IsHermitian.eigenvalues_mem_spectrum_real (H A) j ) ) hj )
 
 lemma ker_le_ker_cfc (h : ∀ i, i = 0 → f i = 0) :
-    A.ker ≤ (A.cfc f).ker := by
-  exact ker_le_ker_cfc_on_set (Set.subset_univ _) (by simpa using h)
+    A.ker ≤ (A.cfc f).ker := ker_le_ker_cfc_on_set (Set.subset_univ _) (by simpa using h)
 
 lemma ker_le_ker_cfc_nonneg (hA : 0 ≤ A) (h : ∀ i ≥ 0, i = 0 → f i = 0) :
     A.ker ≤ (A.cfc f).ker := by
