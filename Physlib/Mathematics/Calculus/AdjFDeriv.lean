@@ -170,10 +170,7 @@ lemma adjFDeriv_comp [CompleteSpace E] [CompleteSpace F] [CompleteSpace G]
     {f : F → G} {g : E → F} {x : E}
     (hf : DifferentiableAt 𝕜 f (g x)) (hg : DifferentiableAt 𝕜 g x) :
     adjFDeriv 𝕜 (fun x => f (g x)) x = fun dy => adjFDeriv 𝕜 g x (adjFDeriv 𝕜 f (g x) dy) := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAdjFDerivAt.comp
-  apply hf.hasAdjFDerivAt
-  apply hg.hasAdjFDerivAt
+  exact (HasAdjFDerivAt.comp hf.hasAdjFDerivAt hg.hasAdjFDerivAt).adjFDeriv
 
 lemma HasAdjFDerivAt.prodMk {f : E → F} {g : E → G} {f' g'} {x : E}
     (hf : HasAdjFDerivAt 𝕜 f f' x) (hg : HasAdjFDerivAt 𝕜 g g' x) :
@@ -195,8 +192,7 @@ lemma HasAjdFDerivAt.fst {f : E → F×G} {f'} {x : E} (hf : HasAdjFDerivAt 𝕜
 lemma adjFDeriv_fst [CompleteSpace E] [CompleteSpace F] [CompleteSpace G]
     {f : E → F×G} {x : E} (hf : DifferentiableAt 𝕜 f x) :
     adjFDeriv 𝕜 (fun x => (f x).fst) x = fun dy => adjFDeriv 𝕜 f x (dy, 0) := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAjdFDerivAt.fst hf.hasAdjFDerivAt
+  exact (HasAjdFDerivAt.fst hf.hasAdjFDerivAt).adjFDeriv
 
 @[simp]
 lemma adjFDeriv_prod_fst [CompleteSpace E] [CompleteSpace F] {x : F × E} :
@@ -217,8 +213,7 @@ lemma HasAjdFDerivAt.snd {f : E → F×G} {f'} {x : E} (hf : HasAdjFDerivAt 𝕜
 lemma adjFDeriv_snd [CompleteSpace E] [CompleteSpace F] [CompleteSpace G]
     {f : E → F×G} {x : E} (hf : DifferentiableAt 𝕜 f x) :
     adjFDeriv 𝕜 (fun x => (f x).snd) x = fun dy => adjFDeriv 𝕜 f x (0, dy) := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAjdFDerivAt.snd hf.hasAdjFDerivAt
+  exact (HasAjdFDerivAt.snd hf.hasAdjFDerivAt).adjFDeriv
 
 @[simp]
 lemma adjFDeriv_prod_snd [CompleteSpace E] [CompleteSpace F] {x : F × E} :
@@ -263,8 +258,7 @@ lemma HasAdjFDerivAt.neg {f : E → F} {f'} {x : E} (hf : HasAdjFDerivAt 𝕜 f 
 lemma adjFDeriv_neg [CompleteSpace E] [CompleteSpace F]
     {f : E → F} {x : E} (hf : DifferentiableAt 𝕜 f x) :
     adjFDeriv 𝕜 (fun x => - f x) x = fun dy => - adjFDeriv 𝕜 f x dy := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAdjFDerivAt.neg hf.hasAdjFDerivAt
+  exact (HasAdjFDerivAt.neg hf.hasAdjFDerivAt).adjFDeriv
 
 lemma HasAjdFDerivAt.add {f g : E → F} {f' g'} {x : E}
     (hf : HasAdjFDerivAt 𝕜 f f' x) (hg : HasAdjFDerivAt 𝕜 g g' x) :
@@ -278,10 +272,7 @@ lemma adjFDeriv_add [CompleteSpace E] [CompleteSpace F]
     {f g : E → F} {x : E}
     (hf : DifferentiableAt 𝕜 f x) (hg : DifferentiableAt 𝕜 g x) :
     adjFDeriv 𝕜 (fun x => f x + g x) x = fun dy => adjFDeriv 𝕜 f x dy + adjFDeriv 𝕜 g x dy := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAjdFDerivAt.add
-  apply hf.hasAdjFDerivAt
-  apply hg.hasAdjFDerivAt
+  exact (HasAjdFDerivAt.add hf.hasAdjFDerivAt hg.hasAdjFDerivAt).adjFDeriv
 
 lemma HasAdjFDerivAt.sub
     {f g : E → F} {f' g'} {x : E}
@@ -295,10 +286,7 @@ lemma HasAdjFDerivAt.sub
 lemma adjFDeriv_sub [CompleteSpace E] [CompleteSpace F] {f g : E → F} {x : E}
     (hf : DifferentiableAt 𝕜 f x) (hg : DifferentiableAt 𝕜 g x) :
     adjFDeriv 𝕜 (fun x => f x - g x) x = fun dy => adjFDeriv 𝕜 f x dy - adjFDeriv 𝕜 g x dy := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAdjFDerivAt.sub
-  apply hf.hasAdjFDerivAt
-  apply hg.hasAdjFDerivAt
+  exact (HasAdjFDerivAt.sub hf.hasAdjFDerivAt hg.hasAdjFDerivAt).adjFDeriv
 
 open ComplexConjugate in
 lemma HasAdjFDerivAt.smul {f : E → F} {g : E → 𝕜} {f' g'}
@@ -318,10 +306,7 @@ lemma adjFDeriv_smul [CompleteSpace E] [CompleteSpace F]
     (hf : DifferentiableAt 𝕜 f x) (hg : DifferentiableAt 𝕜 g x) :
     adjFDeriv 𝕜 (fun x => g x • f x) x = fun dy => conj (g x) • adjFDeriv 𝕜 f x dy +
                                                   adjFDeriv 𝕜 g x (conj (inner 𝕜 dy (f x))) := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAdjFDerivAt.smul
-  apply hf.hasAdjFDerivAt
-  apply hg.hasAdjFDerivAt
+  exact (HasAdjFDerivAt.smul hf.hasAdjFDerivAt hg.hasAdjFDerivAt).adjFDeriv
 
 set_option backward.isDefEq.respectTransparency false in
 open InnerProductSpace in
@@ -348,6 +333,5 @@ open InnerProductSpace in
 lemma adjFDeriv_inner {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [InnerProductSpace' ℝ E]
     (x : E × E) :
     adjFDeriv ℝ (fun (x : E × E) => ⟪x.1, x.2⟫_ℝ) x =
-      fun y => y • (x.2, x.1) := by
-  apply HasAdjFDerivAt.adjFDeriv
-  apply HasAdjFDerivAt.inner
+      fun y => y • (x.2, x.1) :=
+  (HasAdjFDerivAt.inner x).adjFDeriv
