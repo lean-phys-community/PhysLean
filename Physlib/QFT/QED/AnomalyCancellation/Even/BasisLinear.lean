@@ -1036,8 +1036,8 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ)).LinSols} (j : Fin n)
       S'.val = P g' + P! f' ∧ P! f' = P! f +
       (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j ∧ g' = g := by
   let X := P! f + (S.val (evenShiftSnd j) - S.val (evenShiftFst j)) • basis!AsCharges j
-  have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) := by
-    exact Submodule.add_mem _ (P!_in_span f) (smul_basis!AsCharges_in_span S j)
+  have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) :=
+    Submodule.add_mem _ (P!_in_span f) (smul_basis!AsCharges_in_span S j)
   have hXsum := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hX
   obtain ⟨f', hf'⟩ := hXsum
   use g

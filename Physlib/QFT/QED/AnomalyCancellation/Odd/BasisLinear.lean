@@ -1009,8 +1009,8 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).LinSols} (j : Fin n.succ)
     apply SetLike.mem_of_subset
     apply Submodule.subset_span
     simp_all only [Set.mem_range, exists_apply_eq_apply]
-  have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) := by
-    exact Submodule.add_mem _ hf hP
+  have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) :=
+    Submodule.add_mem _ hf hP
   have hXsum := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hX
   obtain ⟨f', hf'⟩ := hXsum
   use g

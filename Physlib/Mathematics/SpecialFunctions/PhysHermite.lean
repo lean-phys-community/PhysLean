@@ -482,8 +482,8 @@ lemma cos_mem_physHermite_span_topologicalClosure (c : ℝ) :
   simp only [HasSum] at h1
   have h1 : Filter.Tendsto
       (fun s => fun y => ∑ x ∈ s, (-1) ^ x * (c * y) ^ (2 * x) / ((2 * x)! : ℝ))
-    Filter.atTop (nhds (fun x => Real.cos (c * x))) := by
-    exact tendsto_pi_nhds.mpr fun x => h1 (c * x)
+    Filter.atTop (nhds (fun x => Real.cos (c * x))) :=
+    tendsto_pi_nhds.mpr fun x => h1 (c * x)
   have h2 (z : Finset ℕ) : (fun y => ∑ x ∈ z, (-1) ^ x * (c * y) ^ (2 * x) / ↑(2 * x)!) ∈
       ↑(Submodule.span ℝ (Set.range (fun n => (physHermite n : ℝ → ℝ)))) := by
     have h0 : (fun y => ∑ x ∈ z, (-1) ^ x * (c * y) ^ (2 * x) / ↑(2 * x)!) =

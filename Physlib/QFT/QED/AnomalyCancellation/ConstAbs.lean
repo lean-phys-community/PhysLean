@@ -63,8 +63,8 @@ lemma lt_eq {k i : Fin n.succ} (hk : S k ≤ 0) (hik : i ≤ k) : S i = S k := b
   · linarith
 
 include hS in
-lemma val_le_zero {i : Fin n.succ} (hi : S i ≤ 0) : S i = S (0 : Fin n.succ) := by
-  exact (lt_eq hS hi (Fin.zero_le i)).symm
+lemma val_le_zero {i : Fin n.succ} (hi : S i ≤ 0) : S i = S (0 : Fin n.succ) :=
+  (lt_eq hS hi (Fin.zero_le i)).symm
 
 include hS in
 lemma gt_eq {k i: Fin n.succ} (hk : 0 ≤ S k) (hik : k ≤ i) : S i = S k := by
@@ -205,8 +205,8 @@ lemma AFL_odd_zero {A : (PureU1 (2 * n + 1)).LinSols} (h : ConstAbsSorted A.val)
   exact (AFL_odd_noBoundary h hn) (AFL_hasBoundary h hn)
 
 theorem AFL_odd (A : (PureU1 (2 * n + 1)).LinSols) (h : ConstAbsSorted A.val) :
-    A = 0 := by
-  exact ACCSystemLinear.LinSols.ext (is_zero h (AFL_odd_zero h))
+    A = 0 :=
+  ACCSystemLinear.LinSols.ext (is_zero h (AFL_odd_zero h))
 
 lemma AFL_even_Boundary {A : (PureU1 (2 * n.succ)).LinSols} (h : ConstAbsSorted A.val)
     (hA : A.val (0 : Fin (2 * n.succ)) ≠ 0) {k : Fin (2 * n + 1)} (hk : Boundary A.val k) :
