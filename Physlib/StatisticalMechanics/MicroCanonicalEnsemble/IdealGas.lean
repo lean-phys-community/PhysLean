@@ -90,12 +90,12 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
   simp_rw [show ∀ (x y i p_i), eq_pm (x, y) (i, Sum.inl p_i) = x (i, p_i) from fun _ _ _ _ => rfl,
     show ∀ (x y i m_i), eq_pm (x, y) (i, Sum.inr m_i) = y (i, m_i) from fun _ _ _ _ => rfl]
   have h_measurable_box : Measurable fun (a : (Fin n × Fin 3 → ℝ))
-      => ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |a (x_1, x_2)| := by
-    exact Measurable.exists fun i => Measurable.exists fun j => measurable_const.lt (by fun_prop)
+      => ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |a (x_1, x_2)| :=
+    Measurable.exists fun i => Measurable.exists fun j => measurable_const.lt (by fun_prop)
   have h_measurability : Measurable fun x : (Fin n × Fin 3 → ℝ) × (Fin n × Fin 3 → ℝ) =>
       if ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |x.1 (x_1, x_2)| then 0
-      else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) := by
-    exact Measurable.ite (measurableSet_setOf.mpr (h_measurable_box.comp measurable_fst))
+      else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) :=
+    Measurable.ite (measurableSet_setOf.mpr (h_measurable_box.comp measurable_fst))
       (by fun_prop) (by fun_prop)
   rw [MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
   rotate_left

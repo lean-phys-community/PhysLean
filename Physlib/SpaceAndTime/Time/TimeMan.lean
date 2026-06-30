@@ -128,8 +128,8 @@ instance : IsManifold 𝓘(ℝ, ℝ) ω TimeMan where
     subst h1 h2
     exact symm_trans_mem_contDiffGroupoid valHomeomorphism.toOpenPartialHomeomorph
 
-lemma val_contDiff : ContMDiff 𝓘(ℝ, ℝ) 𝓘(ℝ, ℝ) ω TimeMan.val := by
-  exact contMDiffOn_univ.mp (contMDiffOn_chart (x := (⟨0⟩ : TimeMan)))
+lemma val_contDiff : ContMDiff 𝓘(ℝ, ℝ) 𝓘(ℝ, ℝ) ω TimeMan.val :=
+  contMDiffOn_univ.mp (contMDiffOn_chart (x := (⟨0⟩ : TimeMan)))
 
 /-- The choice of map `Time.val` from `TimeMan` to `ℝ` as a diffeomorphism. -/
 noncomputable def valDiffeomorphism : TimeMan ≃ₘ^ω⟮𝓘(ℝ, ℝ), 𝓘(ℝ, ℝ)⟯ ℝ where
