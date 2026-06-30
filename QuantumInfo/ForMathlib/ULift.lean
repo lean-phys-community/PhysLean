@@ -42,8 +42,7 @@ instance {𝕜 : Type u} [NonUnitalNonAssocSemiring 𝕜] [StarRing 𝕜] : Star
 
 @[simp]
 theorem ULift.starRingEnd_down {𝕜 : Type u} (x : ULift.{v,u} 𝕜) [CommSemiring 𝕜] [StarRing 𝕜] :
-    ((starRingEnd (ULift.{v, u} 𝕜)) x).down = star x.down := by
-  rfl
+    ((starRingEnd (ULift.{v, u} 𝕜)) x).down = star x.down := rfl
 
 instance {𝕜 : Type u} [NormedField 𝕜] : NormedField (ULift.{v,u} 𝕜) where
   dist_eq x y := NormedField.dist_eq x.down y.down
@@ -54,8 +53,7 @@ instance {𝕜 : Type u} [DenselyNormedField 𝕜] : DenselyNormedField (ULift.{
 
 @[simp]
 theorem AddEquiv.ulift_apply {α : Type u} [Add α] (x : ULift.{v, u} α) :
-    AddEquiv.ulift.{u, v} x = x.down := by
-  rfl
+    AddEquiv.ulift.{u, v} x = x.down := rfl
 
 noncomputable instance {𝕜 : Type u} [RCLike 𝕜] : RCLike (ULift.{v,u} 𝕜) where
   re := RCLike.re.comp AddEquiv.ulift.toAddMonoidHom (N := 𝕜)

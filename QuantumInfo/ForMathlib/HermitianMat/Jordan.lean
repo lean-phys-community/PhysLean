@@ -45,8 +45,7 @@ theorem zero_symmMul : symmMul 0 A = 0 := by
   simp [symmMul]
 
 theorem symmMul_toMat : (A.symmMul B).mat =
-    (2 : 𝕜)⁻¹ • (A.mat * B.mat + B.mat * A.mat) := by
-  rfl
+    (2 : 𝕜)⁻¹ • (A.mat * B.mat + B.mat * A.mat) := rfl
 
 variable [Invertible (2 : 𝕜)]
 

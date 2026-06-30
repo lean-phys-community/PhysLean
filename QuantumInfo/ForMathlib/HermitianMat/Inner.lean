@@ -45,8 +45,7 @@ instance : Inner R (HermitianMat n α) where
   inner A B := selfadjMap (A.mat * B.mat).trace
 
 theorem inner_def (A B : HermitianMat n α) :
-    ⟪A, B⟫_R = selfadjMap (A.mat * B.mat).trace := by
-  rfl
+    ⟪A, B⟫_R = selfadjMap (A.mat * B.mat).trace := rfl
 
 end defs
 section semiring

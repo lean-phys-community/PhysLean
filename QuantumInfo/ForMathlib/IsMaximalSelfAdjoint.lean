@@ -54,8 +54,7 @@ namespace IsMaximalSelfAdjoint
 
 @[simp]
 theorem trivial_selfadjMap {R} [Star R] [TrivialStar R] [CommSemiring R] :
-    (selfadjMap : R →+ R) = .id R := by
-  rfl
+    (selfadjMap : R →+ R) = .id R := rfl
 
 @[simp]
 theorem RCLike_selfadjMap {α} [RCLike α] : (selfadjMap : α →+ ℝ) = RCLike.re := rfl

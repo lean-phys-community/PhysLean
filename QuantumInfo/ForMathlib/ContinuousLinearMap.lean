@@ -32,8 +32,7 @@ variable [TopologicalSpace M] [AddCommMonoid M] [TopologicalSpace M₂] [AddComm
 variable [Module R M] [Module S M₂]
 
 theorem ker_mk (f : M →ₛₗ[σ] M₂) (hf : Continuous f.toFun) :
-    (ContinuousLinearMap.mk f hf).ker = LinearMap.ker f := by
-  rfl
+    (ContinuousLinearMap.mk f hf).ker = LinearMap.ker f := rfl
 
 end ContinuousLinearMap
 

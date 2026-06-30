@@ -82,18 +82,15 @@ theorem zero_apply (i j : n) : (0 : HermitianMat n 𝕜) i j = 0 := rfl
 
 @[simp, norm_cast]
 theorem mat_add (A B : HermitianMat n α) :
-    (A + B).mat = A.mat + B.mat := by
-  rfl
+    (A + B).mat = A.mat + B.mat := rfl
 
 @[simp, norm_cast]
 theorem mat_sub (A B : HermitianMat n α) :
-    (A - B).mat = A.mat - B.mat := by
-  rfl
+    (A - B).mat = A.mat - B.mat := rfl
 
 @[simp, norm_cast]
 theorem mat_neg (A : HermitianMat n α) :
-    (-A).mat = -A.mat := by
-  rfl
+    (-A).mat = -A.mat := rfl
 
 section smul
 variable [SMul R α] [StarModule R α]
@@ -103,13 +100,11 @@ instance : SMul R (HermitianMat n α) :=
 
 @[simp, norm_cast]
 theorem mat_smul (c : R) (A : HermitianMat n α) :
-    (c • A).mat = c • A.mat := by
-  rfl
+    (c • A).mat = c • A.mat := rfl
 
 @[simp]
 theorem smul_apply (c : R) (A : HermitianMat n α) (i j : n) :
-    (c • A) i j = c • A i j := by
-  rfl
+    (c • A) i j = c • A i j := rfl
 end smul
 section topology
 
@@ -356,13 +351,11 @@ def conj {m} (B : Matrix m n α) : HermitianMat n α →+ HermitianMat m α wher
   map_zero' := by simp
 
 theorem conj_apply (B : Matrix m n α) (A : HermitianMat n α) :
-    conj B A = ⟨B * A.mat * B.conjTranspose, (conj B A).2⟩ := by
-  rfl
+    conj B A = ⟨B * A.mat * B.conjTranspose, (conj B A).2⟩ := rfl
 
 @[simp]
 theorem conj_apply_mat (B : Matrix m n α) (A : HermitianMat n α) :
-    (A.conj B).mat = B * A.mat * B.conjTranspose := by
-  rfl
+    (A.conj B).mat = B * A.mat * B.conjTranspose := rfl
 
 theorem conj_conj {m l} [Fintype m] (B : Matrix m n α) (C : Matrix l m α) :
     (A.conj B).conj C = A.conj (C * B) := by
@@ -556,8 +549,7 @@ scoped[HermitianMat] infixl:100 " ⊗ₖ " => HermitianMat.kronecker
 
 @[simp, norm_cast]
 theorem kronecker_mat (A : HermitianMat m α) (B : HermitianMat n α) :
-    (A ⊗ₖ B).mat = A.mat ⊗ₖ B.mat := by
-  rfl
+    (A ⊗ₖ B).mat = A.mat ⊗ₖ B.mat := rfl
 
 @[simp]
 theorem zero_kronecker (A : HermitianMat m α) : (0 : HermitianMat n α) ⊗ₖ A = 0 := by

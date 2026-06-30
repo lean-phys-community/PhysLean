@@ -37,8 +37,7 @@ we push it to the right side. One downside is that we're not as likely to hit `r
 
 @[simp]
 theorem reindex_refl (A : HermitianMat d 𝕜) :
-    A.reindex (.refl _) = A := by
-  rfl
+    A.reindex (.refl _) = A := rfl
 
 @[simp]
 theorem reindex_reindex (A : HermitianMat d 𝕜) (e : d ≃ d₂) (f : d₂ ≃ d₃) :

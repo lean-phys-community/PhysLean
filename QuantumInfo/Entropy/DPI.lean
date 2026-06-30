@@ -878,8 +878,7 @@ def MState.conjTensorUnitary (ρ : MState (dA × dB)) (V : Matrix.unitaryGroup d
 the twirling set gives `ρ_A ⊗ uniform_B`. We state the HermitianMat-level
 equality needed for the joint convexity argument. -/
 theorem MState.conjTensorUnitary_M (ρ : MState (dA × dB)) (V : Matrix.unitaryGroup dB ℂ) :
-    (ρ.conjTensorUnitary V).M = ρ.M.conj ((1 : Matrix.unitaryGroup dA ℂ) ⊗ᵤ V).val := by
-  rfl
+    (ρ.conjTensorUnitary V).M = ρ.M.conj ((1 : Matrix.unitaryGroup dA ℂ) ⊗ᵤ V).val := rfl
 
 /-- The trace functional is invariant under `1_A ⊗ V` conjugation. -/
 theorem sandwichedTraceFunctional_conj_tensorUnitary

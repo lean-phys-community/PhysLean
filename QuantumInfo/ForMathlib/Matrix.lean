@@ -748,8 +748,7 @@ theorem PosDef_iff_eigenvalues' (M : Matrix d d 𝕜) :
 --These is disgusting atm. There's cleaner versions of them headed to Mathlib. See #29526 and follow-ups
 theorem IsHermitian.cfc_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) (f : ℝ → ℝ) :
     ∃ (e : d ≃ d), Matrix.IsHermitian.eigenvalues (cfc_predicate f M) = f ∘ hM.eigenvalues ∘ e := by
-  have h_eigenvalues : Multiset.map hM.eigenvalues Finset.univ.val = Multiset.map (fun i => hM.eigenvalues i) Finset.univ.val := by
-    rfl
+  have h_eigenvalues : Multiset.map hM.eigenvalues Finset.univ.val = Multiset.map (fun i => hM.eigenvalues i) Finset.univ.val := rfl
   generalize_proofs at *;
   have h_eigenvalues_cfc : (IsHermitian.cfc hM f).charpoly.roots = Multiset.map (fun i => (f (hM.eigenvalues i) : 𝕜)) Finset.univ.val := by
     rw [ Matrix.IsHermitian.cfc, Matrix.charpoly ];
@@ -1446,8 +1445,7 @@ The right partial trace of a matrix is equal to the left partial trace of the ma
 -/
 theorem traceRight_eq_traceLeft_reindex {n m R : Type*} [Fintype m] [AddCommMonoid R]
   (M : Matrix (n × m) (n × m) R) :
-    M.traceRight = (M.reindex (.prodComm ..) (.prodComm ..)).traceLeft := by
-  rfl
+    M.traceRight = (M.reindex (.prodComm ..) (.prodComm ..)).traceLeft := rfl
 
 open ComplexOrder in
 theorem PosSemidef.trace_pos {n 𝕜 : Type*} [Fintype n] [RCLike 𝕜]

@@ -65,8 +65,7 @@ theorem of_relabel_refl : of_relabel R (.refl d) = LinearEquiv.refl R (d → R) 
 
 @[simp]
 theorem euclidean_of_relabel_refl : euclidean_of_relabel 𝕜 (.refl d) =
-    LinearEquiv.refl 𝕜 (EuclideanSpace 𝕜 d) := by
-  rfl
+    LinearEquiv.refl 𝕜 (EuclideanSpace 𝕜 d) := rfl
 
 end LinearEquiv
 

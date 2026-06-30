@@ -267,8 +267,7 @@ The von Neumann entropy of a state is equal to the trace of `ρ log ρ` (technic
 theorem Sᵥₙ_eq_trace_cfc {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) :
     Sᵥₙ ρ = (HermitianMat.cfc ρ.M Real.negMulLog).trace := by
   -- By definition of von Neumann entropy, we have Sᵥₙ ρ = Finset.sum Finset.univ (fun x ↦ Real.negMulLog (ρ.M.H.eigenvalues x)).
-  have h_def : Sᵥₙ ρ = Finset.sum Finset.univ (fun x ↦ Real.negMulLog (ρ.M.H.eigenvalues x)) := by
-    rfl
+  have h_def : Sᵥₙ ρ = Finset.sum Finset.univ (fun x ↦ Real.negMulLog (ρ.M.H.eigenvalues x)) := rfl
   -- By definition of trace, the trace of `cfc ρ.M Real.negMulLog` is the sum of its eigenvalues.
   have h_trace : (ρ.M.cfc Real.negMulLog).trace =
       ∑ x, (ρ.M.cfc Real.negMulLog).H.eigenvalues x := by

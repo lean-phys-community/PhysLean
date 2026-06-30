@@ -188,8 +188,7 @@ variable (A B : HermitianMat (n × m) α)
 
 @[simp]
 theorem traceRight_mat :
-    (traceRight A).mat = A.mat.traceRight := by
-  rfl
+    (traceRight A).mat = A.mat.traceRight := rfl
 
 @[simp]
 theorem traceRight_add : (A + B).traceRight = A.traceRight + B.traceRight := by
