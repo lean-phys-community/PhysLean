@@ -231,8 +231,8 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
       · intro z
         simp [sub_eq_add_neg]
     have hblock :
-        blockDiagonal (ℋ := ℋ) (star X * X + star Y * Y) 0 ≤ (1 : L (HSum ℋ)) := by
-      exact sub_nonneg.mp (by simpa [hsub] using hblock_nonneg)
+        blockDiagonal (ℋ := ℋ) (star X * X + star Y * Y) 0 ≤ (1 : L (HSum ℋ)) :=
+      sub_nonneg.mp (by simpa [hsub] using hblock_nonneg)
     simpa [hXtilde_star_mul] using hblock
   have hXtilde_star_mul_nonneg : (0 : L (HSum ℋ)) ≤ star Xtilde * Xtilde := by
     simp

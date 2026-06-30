@@ -102,8 +102,8 @@ lemma singularValuesSorted_antitone (A : Matrix d d ℂ) :
 lemma antitone_mul_of_antitone_nonneg {n : ℕ}
     {f g : Fin n → ℝ} (hf : Antitone f) (hg : Antitone g)
     (hf_nn : ∀ i, 0 ≤ f i) (hg_nn : ∀ i, 0 ≤ g i) :
-    Antitone (fun i => f i * g i) := by
-  exact fun i j hij => mul_le_mul (hf hij) (hg hij) (hg_nn _) (hf_nn _)
+    Antitone (fun i => f i * g i) :=
+  fun _ _ hij => mul_le_mul (hf hij) (hg hij) (hg_nn _) (hf_nn _)
 
 /-! ### Compound matrices and auxiliary lemmas for Horn's inequality
 
@@ -812,8 +812,8 @@ lemma horn_weak_log_majorization (A B : Matrix d d ℂ) (k : ℕ)
 lemma rpow_antitone_of_nonneg_antitone {n : ℕ}
     {f : Fin n → ℝ} (hf : Antitone f) (hf_nn : ∀ i, 0 ≤ f i)
     {r : ℝ} (hr : 0 < r) :
-    Antitone (fun i => f i ^ r) := by
-  exact fun i j hij => Real.rpow_le_rpow (hf_nn _) (hf hij) hr.le
+    Antitone (fun i => f i ^ r) :=
+  fun _ _ hij => Real.rpow_le_rpow (hf_nn _) (hf hij) hr.le
 
 /-- Weak log-majorization is preserved under positive powers. -/
 lemma rpow_preserves_weak_log_maj {n : ℕ}

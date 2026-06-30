@@ -454,8 +454,8 @@ private lemma deriv_intervalIntegral_homotopyOperatorIntegrand_sub
   have F'_continuous : Continuous (Function.uncurry F') :=
     continuous_uncurry_fderiv_homotopyOperatorIntegrand (hf)
   have hfderiv (x₀ : Space) : HasFDerivAt (fun (x : Space) => ∫ (t : ℝ) in 0..1, F x t ∂(volume))
-      (∫ (t : ℝ) in 0..1, F' x₀ t ∂(volume)) x₀ := by
-    exact hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) x₀
+      (∫ (t : ℝ) in 0..1, F' x₀ t ∂(volume)) x₀ :=
+    hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) x₀
   have F'_apply_apply (x₀ : Space) (y : Space) (i : Fin 3) :
       ((∫ (t : ℝ) in 0..1, F' x₀ t) y).ofLp i =
       (∫ (t : ℝ) in 0..1, F' x₀ t y i) := by

@@ -226,8 +226,8 @@ lemma regularityDomain_isOpen (T : H →ₗ.[ℂ] H) : IsOpen T.regularityDomain
 
 /-- `T` and `T.closure` have the same regularity domain. -/
 lemma regularityDomain_closure (T : H →ₗ.[ℂ] H) :
-    T.closure.regularityDomain = T.regularityDomain := by
-  exact eq_of_le_of_ge (regularityDomain_antitone T.le_closure)
+    T.closure.regularityDomain = T.regularityDomain :=
+  eq_of_le_of_ge (regularityDomain_antitone T.le_closure)
     fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
 
 lemma IsClosable.closure_range_sub_eq_range_closure_sub [CompleteSpace H]
