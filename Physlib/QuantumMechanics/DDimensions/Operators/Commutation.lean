@@ -187,8 +187,8 @@ lemma radiusRegPow_commutation_momentum :
   ext ψ x
   have hne := Ne.symm (ne_of_lt <| Space.norm_sq_add_unit_sq_pos ε x)
   have hdiff1 : DifferentiableAt ℝ (fun x => (‖x‖ ^ 2 + ↑ε ^ 2) ^ (s / 2)) x := by
-    refine DifferentiableAt.rpow_const ?_ (Or.intro_left _ hne)
-    exact Differentiable.differentiableAt (by fun_prop)
+    exact DifferentiableAt.rpow_const (Differentiable.differentiableAt (by fun_prop))
+      (Or.intro_left _ hne)
   have hdiff2 := Real.differentiableAt_rpow_const_of_ne (s / 2) hne
   have hdiff3 : DifferentiableAt ℝ (fun x ↦ ‖x‖ ^ 2 + ε ^ 2) x :=
     Differentiable.differentiableAt (by fun_prop)

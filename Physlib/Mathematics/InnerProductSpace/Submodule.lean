@@ -66,8 +66,8 @@ lemma submoduleToLp_closure :
     apply mem_nhds_iff.mp at ht
     rcases ht with ⟨t1, ht1, ht1', hx⟩
     have : ∃ t' ∈ nhds x, (∀ y ∈ t', y.ofLp ∈ t1) := by
-      refine Filter.eventually_iff_exists_mem.mp ?_
-      exact ContinuousAt.eventually_mem (by fun_prop) (IsOpen.mem_nhds ht1' hx)
+      exact Filter.eventually_iff_exists_mem.mp
+        (ContinuousAt.eventually_mem (by fun_prop) (IsOpen.mem_nhds ht1' hx))
     rcases this with ⟨t2, ht2, ht2'⟩
     rcases h t2 ht2 with ⟨w, hw⟩
     use w.ofLp

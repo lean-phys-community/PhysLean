@@ -76,8 +76,7 @@ def powOneMul : 𝓢(ℝ, 𝕜) →L[𝕜] 𝓢(ℝ, 𝕜) := by
         · exact SchwartzMap.smooth (ψ) ⊤
         · exact right_eq_inf.mp rfl
       · exact ContinuousMultilinearMap.opNorm_nonneg _
-      · refine pow_nonneg ?_ k
-        exact norm_nonneg x
+      · exact pow_nonneg (norm_nonneg x) k
     conv_lhs =>
       enter [2, 2, i, 1, 2]
       change ‖iteratedFDeriv ℝ i RCLike.ofRealCLM x‖
