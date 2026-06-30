@@ -97,8 +97,7 @@ scoped instance : CommMagma (HermitianMat d 𝕜) where
 -- scoped instance : Mul (HermitianMat d 𝕜) :=
   -- CommMagma.toMul
 
-theorem mul_eq_symmMul : A * B = A.symmMul B := by
-  rfl
+theorem mul_eq_symmMul : A * B = A.symmMul B := rfl
 
 scoped instance : IsCommJordan (HermitianMat d 𝕜) where
   lmul_comm_rmul_rmul a b := by

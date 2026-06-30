@@ -117,8 +117,7 @@ section RCLike
 
 variable {n m 𝕜 : Type*} [Fintype n] [Fintype m] [RCLike 𝕜]
 
-theorem trace_eq_re_trace (A : HermitianMat n 𝕜) : A.trace = RCLike.re A.mat.trace := by
-  rfl
+theorem trace_eq_re_trace (A : HermitianMat n 𝕜) : A.trace = RCLike.re A.mat.trace := rfl
 
 @[simp]
 theorem trace_one [DecidableEq n] : (1 : HermitianMat n 𝕜).trace = Fintype.card n := by
@@ -172,8 +171,7 @@ def traceRight (A : HermitianMat (m × n) α) : HermitianMat m α :=
 variable (A B : HermitianMat (m × n) α)
 
 @[simp]
-theorem traceLeft_mat : A.traceLeft.mat = A.mat.traceLeft := by
-  rfl
+theorem traceLeft_mat : A.traceLeft.mat = A.mat.traceLeft := rfl
 
 @[simp]
 theorem traceLeft_add : (A + B).traceLeft = A.traceLeft + B.traceLeft := by

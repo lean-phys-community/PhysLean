@@ -230,11 +230,9 @@ scoped notation "{" A " ≤ₚ " B "}" => projLE A B
 scoped notation "{" A " >ₚ " B "}" => projLT B A
 scoped notation "{" A " <ₚ " B "}" => projLT A B
 
-theorem projLE_def : {A ≤ₚ B} = (B - A).cfc (fun x ↦ if 0 ≤ x then 1 else 0) := by
-  rfl
+theorem projLE_def : {A ≤ₚ B} = (B - A).cfc (fun x ↦ if 0 ≤ x then 1 else 0) := rfl
 
-theorem projLT_def : {A <ₚ B} = (B - A).cfc (fun x ↦ if 0 < x then 1 else 0) := by
-  rfl
+theorem projLT_def : {A <ₚ B} = (B - A).cfc (fun x ↦ if 0 < x then 1 else 0) := rfl
 
 theorem projLE_sq : {A ≤ₚ B}^2 = {A ≤ₚ B} := by
   rw [projLE_def, ← cfc_pow, ← cfc_comp]
@@ -334,11 +332,9 @@ instance : PosPart (HermitianMat n 𝕜) where
 instance : NegPart (HermitianMat n 𝕜) where
   negPart A := A.cfc (fun x ↦ -x ⊔ 0)
 
-theorem posPart_eq_cfc_max : A⁺ = A.cfc (fun x ↦ x ⊔ 0) := by
-  rfl
+theorem posPart_eq_cfc_max : A⁺ = A.cfc (fun x ↦ x ⊔ 0) := rfl
 
-theorem negPart_eq_cfc_min : A⁻ = A.cfc (fun x ↦ -x ⊔ 0) := by
-  rfl
+theorem negPart_eq_cfc_min : A⁻ = A.cfc (fun x ↦ -x ⊔ 0) := rfl
 
 theorem posPart_eq_cfc_ite : A⁺ = A.cfc (fun x ↦ if 0 ≤ x then x else 0) := by
   simp only [← max_def', posPart_eq_cfc_max]

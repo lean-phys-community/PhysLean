@@ -20,8 +20,7 @@ variable {α : Type*} [NonUnitalNonAssocSemiring α] [StarRing α]
 variable {α β : Type*} [DecidableEq α] [Fintype α] [DecidableEq β] [Fintype β]
 
 @[simp]
-theorem neg_unitary_val (u : 𝐔[α]) : (-u).val = -u := by
-  rfl
+theorem neg_unitary_val (u : 𝐔[α]) : (-u).val = -u := rfl
 
 omit [DecidableEq α] [Fintype α] [DecidableEq β] [Fintype β] in
 open Kronecker in

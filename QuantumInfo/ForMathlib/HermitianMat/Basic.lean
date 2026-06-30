@@ -28,8 +28,7 @@ section addgroup
 
 variable [AddGroup α] [StarAddMonoid α]
 
-theorem eq_IsHermitian : HermitianMat n α  = { m : Matrix n n α // m.IsHermitian} := by
-  rfl
+theorem eq_IsHermitian : HermitianMat n α  = { m : Matrix n n α // m.IsHermitian} := rfl
 
 @[coe] def mat : HermitianMat n α → Matrix n n α :=
   Subtype.val
@@ -37,16 +36,13 @@ theorem eq_IsHermitian : HermitianMat n α  = { m : Matrix n n α // m.IsHermiti
 instance : Coe (HermitianMat n α) (Matrix n n α) := ⟨mat⟩
 
 @[simp]
-theorem val_eq_coe (A : HermitianMat n α) : A.val = A := by
-  rfl
+theorem val_eq_coe (A : HermitianMat n α) : A.val = A := rfl
 
 @[simp]
-theorem mat_mk (x : Matrix n n α) (h) : mat ⟨x, h⟩ = x := by
-  rfl
+theorem mat_mk (x : Matrix n n α) (h) : mat ⟨x, h⟩ = x := rfl
 
 @[simp]
-theorem mk_mat {A : HermitianMat n α} (h : A.mat.IsHermitian) : ⟨A.mat, h⟩ = A := by
-  rfl
+theorem mk_mat {A : HermitianMat n α} (h : A.mat.IsHermitian) : ⟨A.mat, h⟩ = A := rfl
 
 /-- Alias for HermitianMat.property or HermitianMat.2, this gets the fact that the value
   is actually `IsHermitian`.-/
@@ -61,8 +57,7 @@ instance instFun : FunLike (HermitianMat n α) n (n → α) where
   coe_injective _ _ h := HermitianMat.ext h
 
 @[simp]
-theorem mat_apply {A : HermitianMat n α} {i j : n} : A.mat i j = A i j := by
-  rfl
+theorem mat_apply {A : HermitianMat n α} {i j : n} : A.mat i j = A i j := rfl
 
 @[simp]
 theorem conjTranspose_mat (A : HermitianMat n α) :
@@ -77,16 +72,13 @@ instance [IsEmpty n] : Unique (HermitianMat n α) where
   uniq a := by ext; exact (IsEmpty.false ‹_›).elim
 
 @[simp, norm_cast]
-theorem mat_zero : (0 : HermitianMat n α).mat = 0 := by
-  rfl
+theorem mat_zero : (0 : HermitianMat n α).mat = 0 := rfl
 
 @[simp]
-theorem mk_zero (h : (0 : Matrix n n α).IsHermitian) : ⟨0, h⟩ = (0 : HermitianMat n α) := by
-  rfl
+theorem mk_zero (h : (0 : Matrix n n α).IsHermitian) : ⟨0, h⟩ = (0 : HermitianMat n α) := rfl
 
 @[simp]
-theorem zero_apply (i j : n) : (0 : HermitianMat n 𝕜) i j = 0 := by
-  rfl
+theorem zero_apply (i j : n) : (0 : HermitianMat n 𝕜) i j = 0 := rfl
 
 @[simp, norm_cast]
 theorem mat_add (A B : HermitianMat n α) :
@@ -223,16 +215,13 @@ instance : One (HermitianMat n α) :=
       Matrix.one_apply, apply_ite (β := α), eq_comm]⟩
 
 @[simp, norm_cast]
-theorem mat_one : (1 : HermitianMat n α).mat = 1 := by
-  rfl
+theorem mat_one : (1 : HermitianMat n α).mat = 1 := rfl
 
 @[simp]
-theorem mk_one (h : (1 : Matrix n n α).IsHermitian) : ⟨1, h⟩ = (1 : HermitianMat n α) := by
-  rfl
+theorem mk_one (h : (1 : Matrix n n α).IsHermitian) : ⟨1, h⟩ = (1 : HermitianMat n α) := rfl
 
 @[simp]
-theorem one_apply (i j : n) : (1 : HermitianMat n α) i j = (1 : Matrix n n α) i j := by
-  rfl
+theorem one_apply (i j : n) : (1 : HermitianMat n α) i j = (1 : Matrix n n α) i j := rfl
 
 noncomputable instance : AddCommMonoidWithOne (HermitianMat n 𝕜) where
 
@@ -251,8 +240,7 @@ noncomputable instance instInv : Inv (HermitianMat m α) :=
   ⟨fun x ↦ ⟨x⁻¹, x.H.inv⟩⟩
 
 @[simp, norm_cast]
-theorem mat_inv : (A⁻¹).mat = A.mat⁻¹ := by
-  rfl
+theorem mat_inv : (A⁻¹).mat = A.mat⁻¹ := rfl
 
 @[simp]
 theorem zero_inv : ((0 : HermitianMat m α)⁻¹) = 0 := by
@@ -266,8 +254,7 @@ noncomputable instance instPow : Pow (HermitianMat m α) ℕ :=
   ⟨fun x n ↦ ⟨x ^ n, x.H.pow n⟩⟩
 
 @[simp, norm_cast]
-theorem mat_pow (n : ℕ) : (A ^ n).mat = A.mat ^ n := by
-  rfl
+theorem mat_pow (n : ℕ) : (A ^ n).mat = A.mat ^ n := rfl
 
 @[simp]
 theorem pow_zero : A ^ 0 = 1 := by
@@ -285,12 +272,10 @@ noncomputable instance instZPow : Pow (HermitianMat m α) ℤ :=
   ⟨fun x z ↦ ⟨x ^ z, x.H.zpow z⟩⟩
 
 @[simp]
-theorem mat_zpow (z : ℤ) : (A ^ z).mat = A.mat ^ z := by
-  rfl
+theorem mat_zpow (z : ℤ) : (A ^ z).mat = A.mat ^ z := rfl
 
 @[simp, norm_cast]
-theorem zpow_natCast : A ^ (n : ℤ) = A ^ n := by
-  rfl
+theorem zpow_natCast : A ^ (n : ℤ) = A ^ n := rfl
 
 @[simp]
 theorem zpow_zero : A ^ (0 : ℤ) = 1 := by
@@ -411,8 +396,7 @@ def conjLinear {m} (B : Matrix m n α) : HermitianMat n α →ₗ[R] HermitianMa
     simp
 
 @[simp]
-theorem conjLinear_apply (B : Matrix m n α) : conjLinear R B A = conj B A  := by
-  rfl
+theorem conjLinear_apply (B : Matrix m n α) : conjLinear R B A = conj B A  := rfl
 
 @[fun_prop]
 lemma continuous_conj (ρ : HermitianMat n 𝕜) : Continuous (ρ.conj (m := m) ·) := by
@@ -517,8 +501,7 @@ def diagonal (f : n → ℝ) : HermitianMat n 𝕜 :=
 variable (f g : n → ℝ)
 
 @[simp]
-theorem diagonal_mat : (diagonal 𝕜 f).mat = Matrix.diagonal (f · : n → 𝕜) := by
-  rfl
+theorem diagonal_mat : (diagonal 𝕜 f).mat = Matrix.diagonal (f · : n → 𝕜) := rfl
 
 @[simp]
 theorem diagonal_zero : (diagonal 𝕜 0) = (0 : HermitianMat n 𝕜) := by

@@ -50,12 +50,10 @@ theorem conjTranspose_cfc : (cfc f A.mat).conjTranspose = cfc f A.mat :=
 protected def cfc : HermitianMat d 𝕜 :=
   ⟨cfc f A.mat, cfc_predicate _ _⟩
 
-theorem cfc_eq : A.cfc f = ⟨cfc f A.mat, cfc_predicate f A.mat⟩ := by
-  rfl
+theorem cfc_eq : A.cfc f = ⟨cfc f A.mat, cfc_predicate f A.mat⟩ := rfl
 
 @[simp]
-theorem mat_cfc : (A.cfc f).mat = _root_.cfc f A.mat := by
-  rfl
+theorem mat_cfc : (A.cfc f).mat = _root_.cfc f A.mat := rfl
 
 section congr
 

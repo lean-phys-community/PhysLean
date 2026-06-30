@@ -28,8 +28,7 @@ def reindex (e : d ≃ d₂) : HermitianMat d₂ 𝕜 :=
   ⟨A.mat.reindex e e, A.H.submatrix e.symm⟩
 
 @[simp]
-theorem mat_reindex : (A.reindex e).mat = A.mat.reindex e e := by
-  rfl
+theorem mat_reindex : (A.reindex e).mat = A.mat.reindex e e := rfl
 
 /-! Our simp-normal form for expressions involving `HermitianMat.reindex` is that we try to push
 the reindexing as far out as possible, so that it can be absorbed by `HermitianMat.trace`, or

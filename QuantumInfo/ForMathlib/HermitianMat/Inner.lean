@@ -162,8 +162,7 @@ open ComplexOrder
 
 variable {n 𝕜 : Type*} [Fintype n] [RCLike 𝕜] (A B C : HermitianMat n 𝕜)
 
-theorem inner_eq_re_trace : ⟪A, B⟫ = RCLike.re (A.mat * B.mat).trace := by
-  rfl
+theorem inner_eq_re_trace : ⟪A, B⟫ = RCLike.re (A.mat * B.mat).trace := rfl
 
 theorem inner_eq_trace_rc : ⟪A, B⟫ = (A.mat * B.mat).trace := by
   rw [inner_eq_re_trace, ← RCLike.conj_eq_iff_re]
