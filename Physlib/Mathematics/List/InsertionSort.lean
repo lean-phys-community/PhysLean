@@ -239,8 +239,7 @@ lemma insertionSortEquiv_commute {α : Type} (r : α → α → Prop) [Decidable
       funext c
       simp only [Bool.eq_self_and, Bool.not_eq_eq_eq_not, Bool.not_true, decide_eq_false_iff_not]
       intro hbc hac
-      refine hbc ?_
-      exact IsTrans.trans _ _ _ hrba hac
+      exact hbc (IsTrans.trans _ _ _ hrba hac)
   have ha1 : b1.1 ≤ a2.1 := by
     simp only [orderedInsertPos, decide_not, b1]
     rw [ht]
@@ -437,8 +436,7 @@ lemma takeWhile_sorted_eq_filter {α : Type} (r : α → α → Prop) [Decidable
       not_false_eq_true, List.takeWhile_cons_of_neg, List.filter_cons_of_neg, List.nil_eq,
       List.filter_eq_nil_iff, Bool.not_eq_eq_eq_not, decide_eq_false_iff_not]
       intro c hc
-      apply IsTrans.trans a b c hb
-      exact hl.1 c hc
+      exact IsTrans.trans a b c hb (hl.1 c hc)
 
 lemma dropWhile_sorted_eq_filter {α : Type} (r : α → α → Prop) [DecidableRel r]
     [IsTrans α r] (a : α) : (l : List α) → (hl : l.Pairwise r) →
@@ -457,8 +455,7 @@ lemma dropWhile_sorted_eq_filter {α : Type} (r : α → α → Prop) [Decidable
       rw [List.filter_eq_self]
       intro c hc
       simp only [decide_eq_true_eq]
-      apply IsTrans.trans a b c hb
-      exact hl.1 c hc
+      exact IsTrans.trans a b c hb (hl.1 c hc)
 
 lemma dropWhile_sorted_eq_filter_filter {α : Type} (r : α → α → Prop) [DecidableRel r]
     [IsTrans α r] (a : α) :(l : List α) → (hl : l.Pairwise r) →
@@ -490,8 +487,7 @@ lemma dropWhile_sorted_eq_filter_filter {α : Type} (r : α → α → Prop) [De
           simp only [Bool.and_eq_true, decide_eq_true_eq, not_and]
           intro hac hca
           apply hba
-          apply IsTrans.trans b c a _ hca
-          exact hl.1 c hc
+          exact IsTrans.trans b c a (hl.1 c hc) hca
         rw [h1]
         rw [dropWhile_sorted_eq_filter_filter]
         simp only [Bool.decide_and, h1, decide_not, List.nil_append]

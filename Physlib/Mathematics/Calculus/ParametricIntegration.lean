@@ -48,8 +48,7 @@ lemma hasFDerivAt_parametric_intervalIntegral_of_contDiff
     fun_prop
   · apply Continuous.intervalIntegrable
     fun_prop
-  · apply Continuous.aestronglyMeasurable
-    exact Continuous.uncurry_left x₀ (by fun_prop)
+  · exact (Continuous.uncurry_left x₀ (by fun_prop)).aestronglyMeasurable
   · filter_upwards with t h x hx
     exact ha.2 (Set.mk_mem_prod hx (Set.Ioc_subset_Icc_self (by simpa using h)))
   · exact intervalIntegrable_const
