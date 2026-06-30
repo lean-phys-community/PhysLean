@@ -81,9 +81,7 @@ def momentumOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) where
   cont := by fun_prop
 
 lemma momentumOperatorSchwartz_apply (ψ : 𝓢(ℝ, ℂ))
-    (x : ℝ) : (momentumOperatorSchwartz ψ) x = (- Complex.I * ℏ) * (deriv ψ x) := by
-  rw [momentumOperatorSchwartz]
-  rfl
+    (x : ℝ) : (momentumOperatorSchwartz ψ) x = (- Complex.I * ℏ) * (deriv ψ x) := rfl
 
 /-- The unbounded momentum operator, whose domain is Schwartz maps. -/
 def momentumOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_injective :=

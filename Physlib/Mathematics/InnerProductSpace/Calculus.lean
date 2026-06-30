@@ -35,8 +35,7 @@ lemma fderiv_inner_apply'
     {f g : E → F} {x : E}
     (hf : DifferentiableAt ℝ f x) (hg : DifferentiableAt ℝ g x) (y : E) :
     fderiv ℝ (fun t => ⟪f t, g t⟫) x y = ⟪f x, fderiv ℝ g x y⟫ + ⟪fderiv ℝ f x y, g x⟫ := by
-  rw [(hf.hasFDerivAt.inner' hg.hasFDerivAt).fderiv]
-  rfl
+  simpa [fderivInnerCLM'] using DFunLike.congr_fun (hf.hasFDerivAt.inner' hg.hasFDerivAt).fderiv y
 
 -- todo: move this
 lemma deriv_inner_apply'

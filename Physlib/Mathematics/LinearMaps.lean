@@ -242,8 +242,7 @@ lemma toLinear₁_apply (f : TriLinearSymm V) (S T L : V) : f S T L = f.toLinear
 
 lemma map_sum₁ {n : ℕ} (f : TriLinearSymm V) (S : Fin n → V) (T : V) (L : V) :
     f (∑ i, S i) T L = ∑ i, f (S i) T L := by
-  rw [f.toLinear₁_apply, map_sum]
-  rfl
+  simp [toLinear₁_apply, map_sum]
 
 lemma map_sum₂ {n : ℕ} (f : TriLinearSymm V) (S : Fin n → V) (T : V) (L : V) :
     f T (∑ i, S i) L = ∑ i, f T (S i) L := by

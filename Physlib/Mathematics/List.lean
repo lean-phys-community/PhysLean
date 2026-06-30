@@ -446,9 +446,7 @@ lemma orderedInsert_eraseIdx_orderedInsertEquiv_fin_succ
     (hr : ∀ (i j : Fin r.length), i < j → ¬le1 r0 (r.get j) → ¬le1 r0 (r.get i)) :
     (List.orderedInsert le1 r0 r).eraseIdx (orderedInsertEquiv le1 r r0 n.succ) =
     (List.orderedInsert le1 r0 (r.eraseIdx n)) := by
-  have hn : n.succ = ⟨n.val + 1, by omega⟩ := by
-    rw [Fin.ext_iff]
-    rfl
+  have hn : n.succ = ⟨n.val + 1, by omega⟩ := Fin.ext rfl
   rw [hn]
   exact orderedInsert_eraseIdx_orderedInsertEquiv_succ le1 r r0 n.val _ hr
 
