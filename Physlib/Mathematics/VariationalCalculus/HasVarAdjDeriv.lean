@@ -407,8 +407,7 @@ lemma deriv' (u : ℝ → U) (hu : ContDiff ℝ ∞ u) :
       rw [← fderiv_apply_one_eq_deriv]
     rw [fderiv_swap]
     simp only [fderiv_eq_smul_deriv, one_smul]
-    · apply ContDiff.of_le hφ
-      exact ENat.LEInfty.out
+    · exact hφ.of_le ENat.LEInfty.out
     · exact differentiableAt_id
   adjoint := by
     apply HasVarAdjoint.congr_fun (G := (fun δu x => deriv (fun x' => δu x') x))
@@ -685,8 +684,7 @@ protected lemma fderiv (u : X → U) (dx : X) (hu : ContDiff ℝ ∞ u)
     rw [← fderiv_apply_one_eq_deriv]
     rw [fderiv_swap]
     simp only [fderiv_eq_smul_deriv, one_smul]
-    · apply ContDiff.of_le hφ
-      exact ENat.LEInfty.out
+    · exact hφ.of_le ENat.LEInfty.out
   · exact hu
   · exact HasVarAdjoint.fderiv_apply
 
@@ -735,8 +733,7 @@ protected lemma gradient {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
     rw [← fderiv_apply_one_eq_deriv]
     rw [fderiv_swap]
     simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
-    · apply ContDiff.of_le hφ
-      exact ENat.LEInfty.out
+    · exact hφ.of_le ENat.LEInfty.out
     · simp [Space.deriv]
       apply Differentiable.differentiableAt
       apply fderiv_uncurry_differentiable_snd_comp_fst_apply
@@ -780,8 +777,7 @@ protected lemma grad {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
     rw [← fderiv_apply_one_eq_deriv]
     rw [fderiv_swap]
     simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
-    · apply ContDiff.of_le hφ
-      exact ENat.LEInfty.out
+    · exact hφ.of_le ENat.LEInfty.out
     · simp [Space.deriv]
       apply Differentiable.differentiableAt
       apply fderiv_uncurry_differentiable_snd_comp_fst_apply
@@ -834,8 +830,7 @@ lemma div {d} (u : Space d → EuclideanSpace ℝ (Fin d)) (hu : ContDiff ℝ �
       exact hφ.differentiable (by simp)
     · apply ContDiff.comp (g := EuclideanSpace.proj i)
       · fun_prop
-      · apply ContDiff.of_le hφ
-        exact ENat.LEInfty.out
+      · exact hφ.of_le ENat.LEInfty.out
     · intro i _
       apply Differentiable.differentiableAt
       simp [Space.deriv]
