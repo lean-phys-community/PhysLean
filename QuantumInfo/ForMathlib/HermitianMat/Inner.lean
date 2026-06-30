@@ -151,8 +151,7 @@ variable (A B : HermitianMat n α)
 
 /-- `HermitianMat.inner` reduces to `Matrix.trace (A * B)` when the elements are a `TrivialStar`. -/
 theorem inner_eq_trace_trivial : ⟪A, B⟫_α = (A.mat * B.mat).trace := by
-  rw [← inner_eq_trace_mul]
-  rfl
+  simpa using inner_eq_trace_mul A B
 
 end trivialstar
 

@@ -64,15 +64,11 @@ open SchwartzMap
 def positionOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := Distribution.powOneMul ℂ
 
 lemma positionOperatorSchwartz_apply_fun (ψ : 𝓢(ℝ, ℂ)) :
-    (positionOperatorSchwartz ψ) = fun x => x * ψ x := by
-  simp [positionOperatorSchwartz]
-  rfl
+    (positionOperatorSchwartz ψ) = fun x => x * ψ x := rfl
 
 @[simp]
 lemma positionOperatorSchwartz_apply (ψ : 𝓢(ℝ, ℂ)) (x : ℝ) :
-    (positionOperatorSchwartz ψ) x = x * ψ x := by
-  simp [positionOperatorSchwartz]
-  rfl
+    (positionOperatorSchwartz ψ) x = x * ψ x := rfl
 
 /-- The unbounded position operator, whose domain is Schwartz maps. -/
 def positionOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_injective :=

@@ -208,8 +208,7 @@ lemma deriv_smul [NormedAddCommGroup M] [NormedSpace ℝ M] [NontriviallyNormedF
     [NormedAlgebra ℝ 𝕜] [NormedSpace 𝕜 M] {c : Space d → 𝕜} {f : Space d → M}
     (hc : DifferentiableAt ℝ c x) (hf : DifferentiableAt ℝ f x) :
     ∂[u] (c • f) x = c x • ∂[u] f x + ∂[u] c x • f x := by
-  rw [deriv_eq_fderiv_basis, deriv_eq_fderiv_basis, deriv_eq_fderiv_basis, fderiv_smul hc hf]
-  rfl
+  simp [deriv_eq_fderiv_basis, fderiv_smul hc hf]
 
 /-- Space derivatives on scalar times function. -/
 lemma deriv_const_smul [NormedAddCommGroup M] [NormedSpace ℝ M] [Semiring R]

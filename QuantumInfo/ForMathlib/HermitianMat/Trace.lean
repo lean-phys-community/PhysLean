@@ -108,8 +108,7 @@ variable [Star α] [TrivialStar α] [CommSemiring α]
 /-- `HermitianMat.trace` reduces to `Matrix.trace` when the elements are a `TrivialStar`. -/
 @[simp]
 theorem trace_eq_trace_trivial (A : HermitianMat n ℝ) : A.trace = A.mat.trace := by
-  rw [← trace_eq_trace]
-  rfl
+  simpa using trace_eq_trace A
 
 end trivialstar
 

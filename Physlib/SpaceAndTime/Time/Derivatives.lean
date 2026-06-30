@@ -126,8 +126,7 @@ lemma deriv_smul (f : Time → EuclideanSpace ℝ (Fin d)) (k : ℝ)
 
 lemma deriv_neg [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) :
     ∂ₜ (-f) t = -∂ₜ f t := by
-  rw [deriv, fderiv_neg]
-  rfl
+  simp [deriv, fderiv_neg]
 
 /-- Quotient rule for `Time.deriv` on real-valued functions: if `c` and `g` are
   differentiable at `t` and `g t ≠ 0`, then
