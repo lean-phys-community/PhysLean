@@ -808,8 +808,7 @@ lemma time_integral_mul_pow_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) :
           ‖((0 : Space d →L[ℝ] Time).prod (.id ℝ (Space d)))‖ ^ n := by
         refine mul_le_mul_of_nonneg ?_ (by rfl) (by positivity) (by positivity)
         refine integral_mono ?_ ?_ ?_
-        · apply Integrable.const_mul
-          exact iteratedFDeriv_norm_integrable η x
+        · exact (iteratedFDeriv_norm_integrable η x).const_mul (‖x‖ ^ m)
         · exact iteratedFDeriv_norm_mul_pow_integrable n m η x
         · refine Pi.le_def.mpr ?_
           intro t
@@ -821,8 +820,7 @@ lemma time_integral_mul_pow_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) :
         refine mul_le_mul_of_nonneg ?_ (by rfl) (by positivity) (by positivity)
         refine integral_mono ?_ ?_ ?_
         · exact iteratedFDeriv_norm_mul_pow_integrable n m η x
-        · apply Integrable.const_mul
-          exact hrt
+        · exact hrt.const_mul k
         · refine Pi.le_def.mpr ?_
           intro t
           convert! hbound t using 1

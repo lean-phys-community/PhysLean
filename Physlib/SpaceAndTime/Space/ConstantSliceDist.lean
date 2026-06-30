@@ -157,10 +157,8 @@ lemma schwartzMap_mul_iteratedFDeriv_integrable_slice_symm {d : ℕ} (n m : ℕ)
     · fun_prop
     apply Continuous.norm
     apply Continuous.comp'
-    apply ContDiff.continuous_iteratedFDeriv (n := (n + 1 : ℕ))
-    exact Nat.cast_le.mpr (by omega)
-    have hη := η.smooth'
-    apply hη.of_le (ENat.LEInfty.out)
+    exact (η.smooth'.of_le (ENat.LEInfty.out)).continuous_iteratedFDeriv
+      (n := (n + 1 : ℕ)) (Nat.cast_le.mpr (by omega))
     fun_prop
   · filter_upwards with t
     apply le_trans _ (hbound x t)
@@ -235,10 +233,8 @@ lemma schwartzMap_iteratedFDeriv_slice_symm_integrable {n} {d : ℕ} (η : 𝓢(
   · fun_prop
   · apply Continuous.aestronglyMeasurable
     apply Continuous.comp'
-    apply ContDiff.continuous_iteratedFDeriv (n := (n + 1 : ℕ))
-    exact Nat.cast_le.mpr (by omega)
-    have hη := η.smooth'
-    apply hη.of_le (ENat.LEInfty.out)
+    exact (η.smooth'.of_le (ENat.LEInfty.out)).continuous_iteratedFDeriv
+      (n := (n + 1 : ℕ)) (Nat.cast_le.mpr (by omega))
     fun_prop
 
 /-!
@@ -279,8 +275,8 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
   have hF : ∀ t, ∀ x, HasFDerivAt (F · t) (F' x t) x := by
     intro t x
     dsimp only [F, F']
-    refine DifferentiableAt.hasFDerivAt ?_
-    exact ((η.smooth'.differentiable (by simp)).comp (by fun_prop)).differentiableAt
+    exact
+      ((η.smooth'.differentiable (by simp)).comp (by fun_prop)).differentiableAt.hasFDerivAt
   obtain ⟨rt, hrt⟩ := schwartzMap_slice_bound (m := 0) (n := 1) (d := d) i
   obtain ⟨k, hrt, hbound, k_eq⟩ := hrt η
   suffices HasFDerivAt (fun x => ∫ (a : ℝ), F x a) (∫ (a : ℝ), F' x₀ a) x₀ from this
@@ -522,8 +518,7 @@ lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m :
         refine mul_le_mul_of_nonneg ?_ (by rfl) (by positivity) (by positivity)
         refine integral_mono ?_ ?_ ?_
         · fun_prop
-        · apply Integrable.const_mul
-          exact hrt
+        · exact hrt.const_mul k
         · refine Pi.le_def.mpr ?_
           intro t
           convert hbound x t using 1
