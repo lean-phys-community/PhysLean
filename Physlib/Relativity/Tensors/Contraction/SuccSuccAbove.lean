@@ -197,8 +197,7 @@ lemma succSuccAbove_ne_fst (i j : Fin (n + 1 + 1)) (m : Fin n) :
 @[simp]
 lemma snd_ne_succSuccAbove_pre (i j : Fin (n + 1 + 1)) (m : Fin n) :
     ¬ j = (succSuccAbove i j) m := by
-  rw [succSuccAbove_symm]
-  exact fst_ne_succSuccAbove_pre j i m
+  simpa [succSuccAbove_symm] using fst_ne_succSuccAbove_pre j i m
 
 @[simp]
 lemma succSuccAbove_ne_snd (i j : Fin (n + 1 + 1)) (m : Fin n) :

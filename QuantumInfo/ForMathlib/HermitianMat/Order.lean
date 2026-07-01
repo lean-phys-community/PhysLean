@@ -42,9 +42,7 @@ theorem le_iff_mulVec_le : A ≤ B ↔
   simp [le_iff, Matrix.posSemidef_iff_dotProduct_mulVec, B.H.sub A.H, Matrix.sub_mulVec]
 
 instance [DecidableEq n] : ZeroLEOneClass (HermitianMat n 𝕜) where
-  zero_le_one := by
-    rw [zero_le_iff]
-    exact Matrix.PosSemidef.one
+  zero_le_one := by simpa [zero_le_iff] using Matrix.PosSemidef.one
 
 omit [Fintype n] in
 theorem lt_iff_posdef : A < B ↔ (B - A).mat.PosSemidef ∧ A ≠ B :=

@@ -132,8 +132,7 @@ lemma one_over_ξ : 1/Q.ξ = √(Q.m * Q.ω / ℏ) := by
   field_simp
 
 lemma ξ_inverse : Q.ξ⁻¹ = √(Q.m * Q.ω / ℏ) := by
-  rw [inv_eq_one_div]
-  exact one_over_ξ Q
+  simpa only [inv_eq_one_div] using one_over_ξ Q
 
 lemma one_over_ξ_sq : (1/Q.ξ)^2 = Q.m * Q.ω / ℏ := by
   rw [one_over_ξ]

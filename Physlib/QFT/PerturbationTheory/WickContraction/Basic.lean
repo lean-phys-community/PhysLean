@@ -257,8 +257,7 @@ lemma getDual?_isSome_iff (i : Fin n) : (c.getDual? i).isSome ↔ ∃ (a : c.1),
       simpa using hy ▸ a.2
 
 lemma getDual?_isSome_of_mem (a : c.1) (i : a.1) : (c.getDual? i).isSome := by
-  rw [getDual?_isSome_iff]
-  exact ⟨⟨a.1, a.2⟩, Finset.coe_mem ..⟩
+  exact (getDual?_isSome_iff (c := c) i).2 ⟨a, Finset.coe_mem i⟩
 
 @[simp]
 lemma getDual?_getDual?_get_get (i : Fin n) (h : (c.getDual? i).isSome) :

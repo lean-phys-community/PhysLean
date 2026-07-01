@@ -1290,9 +1290,7 @@ def piProd (ρi : (i:ι) → MState (dI i)) : MState ((i:ι) → dI i) where
     val := Matrix.piProd (fun i ↦ (ρi i).m)
     property := Matrix.IsHermitian.piProd (fun i ↦ (ρi i).Hermitian)
   }
-  nonneg := by
-    rw [zero_le_iff]
-    exact Matrix.PosSemidef.piProd (fun i => psd (ρi i))
+  nonneg := by simpa [zero_le_iff] using Matrix.PosSemidef.piProd (fun i => psd (ρi i))
   tr := by simp [trace, Matrix.trace_piProd]
 
 /-- The n-copy "power" of a mixed state, with the standard basis indexed by pi types. -/
