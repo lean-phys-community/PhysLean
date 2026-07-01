@@ -518,8 +518,7 @@ lemma actionT_smul {g : G} {r : k} {t : S.Tensor c} :
 lemma actionT_zero {g : G} : g • (0 : S.Tensor c) = 0 := by simp [actionT_eq]
 
 lemma actionT_neg {g : G} {t : S.Tensor c} :
-    g • (-t) = -(g • t) := by
-  simp [actionT_eq]
+    g • (-t) = -(g • t) := by simp [actionT_eq]
 
 noncomputable instance : DistribMulAction G (S.Tensor c) where
   smul_zero g := by simp [actionT_zero]

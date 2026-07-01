@@ -84,8 +84,7 @@ class ContinuousLinearUnitDependent (M : Type) [AddCommMonoid M] [Module ℝ M]
 @[simp]
 lemma UnitDependent.scaleUnit_symm_apply {M : Type} [UnitDependent M]
     (u1 u2 : UnitChoices) (m : M) :
-    scaleUnit u2 u1 (scaleUnit u1 u2 m) = m := by
-  rw [scaleUnit_trans, scaleUnit_id]
+    scaleUnit u2 u1 (scaleUnit u1 u2 m) = m := by rw [scaleUnit_trans, scaleUnit_id]
 
 @[simp]
 lemma UnitDependent.scaleUnit_injective {M : Type} [UnitDependent M]

@@ -258,8 +258,7 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
         (E := X) (x := v) (y := φ)]
   calc
     δL v = φ v := hφ v
-    _ = ⟪(InnerProductSpace.toDual ℝ (X)).symm φ, v⟫_ℝ := by
-      rw [hinner.symm]
+    _ = ⟪(InnerProductSpace.toDual ℝ (X)).symm φ, v⟫_ℝ := by rw [hinner.symm]
 
 end Lagrangian
 
