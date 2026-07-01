@@ -85,13 +85,12 @@ lemma contrMetric_eq_fromPairT {d : ℕ} :
 /-- The tensor `coMetric` is invariant under the action of `LorentzGroup d`. -/
 @[simp]
 lemma actionT_coMetric {d : ℕ} (g : LorentzGroup d) :
-    g • η' d = η' d:= by
-  erw [TensorSpecies.metricTensor_invariant]
+    g • η' d = η' d := TensorSpecies.metricTensor_invariant g
 
 /-- The tensor `contrMetric` is invariant under the action of `LorentzGroup d`. -/
 @[simp]
-lemma actionT_contrMetric {d} (g : LorentzGroup d) : g • η d = η d := by
-  erw [TensorSpecies.metricTensor_invariant]
+lemma actionT_contrMetric {d} (g : LorentzGroup d) : g • η d = η d :=
+  TensorSpecies.metricTensor_invariant g
 
 /-
 

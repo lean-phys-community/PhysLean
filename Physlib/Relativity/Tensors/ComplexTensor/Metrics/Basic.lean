@@ -85,14 +85,10 @@ open Tensor
 -/
 
 lemma coMetric_eq_fromConstPair : η' = fromConstPair (S := complexLorentzTensor)
-    (c1 := .down) (c2 := .down) Lorentz.coMetric := by
-  rw [Lorentz.coMetric]
-  rfl
+    (c1 := .down) (c2 := .down) Lorentz.coMetric := rfl
 
 lemma contrMetric_eq_fromConstPair : η = fromConstPair (S := complexLorentzTensor)
-    (c1 := .up) (c2 := .up) Lorentz.contrMetric := by
-  rw [Lorentz.contrMetric]
-  rfl
+    (c1 := .up) (c2 := .up) Lorentz.contrMetric := rfl
 
 lemma leftMetric_eq_fromConstPair : εL = fromConstPair Fermion.leftMetric := rfl
 

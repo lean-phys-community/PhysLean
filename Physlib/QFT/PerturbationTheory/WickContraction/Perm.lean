@@ -49,8 +49,7 @@ variable {φs : List 𝓕.FieldOp} {φsΛ φsΛ₁ φsΛ₂ φsΛ₃ : WickContr
 
 /-- The reflexivity of the `Perm` relation. -/
 @[refl]
-lemma refl : Perm φsΛ φsΛ := by
-  rw [Perm]
+lemma refl : Perm φsΛ φsΛ := rfl
 
 /-- The symmetry of the `Perm` relation. -/
 @[symm]
