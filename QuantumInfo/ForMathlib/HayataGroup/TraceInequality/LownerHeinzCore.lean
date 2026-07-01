@@ -1772,13 +1772,11 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
   let Aq : 𝓐 := cfcR  (fun x : ℝ ↦ x ^ q) A
   let Bq : 𝓐 := cfcR  (fun x : ℝ ↦ x ^ q) B
   have hAq0 : 0 ≤ Aq := by
-    dsimp [Aq, cfcR]
     refine cfc_nonneg ?_
     intro x hx
     have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using hspA hx
     exact le_of_lt (Real.rpow_pos_of_pos hx0 _)
   have hBq0 : 0 ≤ Bq := by
-    dsimp [Bq, cfcR]
     refine cfc_nonneg ?_
     intro x hx
     have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using hspB hx
@@ -1954,19 +1952,16 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
   have h_inv1 :
       cfcR  (fun x : ℝ ↦ 1 / x) Cr ≤ cfcR  (fun x : ℝ ↦ 1 / x) Dr := by
     have hCr0 : 0 ≤ Cr := by
-      dsimp [Cr, cfcR]
       refine cfc_nonneg ?_
       intro x hx
       have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using Cs hx
       exact le_of_lt (Real.rpow_pos_of_pos hx0 r)
     have hAr0 : 0 ≤ Ar := by
-      dsimp [Ar, cfcR]
       refine cfc_nonneg ?_
       intro x hx
       have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using As hx
       exact le_of_lt (Real.rpow_pos_of_pos hx0 r)
     have hBr0 : 0 ≤ Br := by
-      dsimp [Br, cfcR]
       refine cfc_nonneg ?_
       intro x hx
       have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using Bs hx
