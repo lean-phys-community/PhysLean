@@ -417,8 +417,7 @@ lemma gradient_const_mul_inner_self (c : ℝ) (x : EuclideanSpace ℝ (Fin 1)) :
           rw [fderiv_const_mul]; fun_prop
     _ = c • gradient (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) x := by
           simp only [gradient, map_smul]
-    _ = c • ((2 : ℝ) • x) := by
-          rw [gradient_inner_self]
+    _ = c • ((2 : ℝ) • x) := by rw [gradient_inner_self]
     _ = (2 * c) • x := by rw [smul_smul, mul_comm]
 
 /-!

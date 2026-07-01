@@ -121,10 +121,8 @@ lemma raw_commutator_eq_of_symmetric
   calc
     ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ - ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ =
       ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩⟫_ℂ -
-        ⟪(ψ : H), B ⟨A ψ, hBA⟩⟫_ℂ := by
-          rw [ha_pairing, hb_pairing]
-    _ = ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩ - B ⟨A ψ, hBA⟩⟫_ℂ := by
-          rw [inner_sub_right]
+        ⟪(ψ : H), B ⟨A ψ, hBA⟩⟫_ℂ := by rw [ha_pairing, hb_pairing]
+    _ = ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩ - B ⟨A ψ, hBA⟩⟫_ℂ := by rw [inner_sub_right]
     _ = Complex.I * c := h_raw
 
 /-- The scalar commutator of the centered vectors of `A` and `B` in the state `ψ`. -/
