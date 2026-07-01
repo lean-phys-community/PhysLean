@@ -251,24 +251,20 @@ theorem power_Icc_zero_one_operatorMonotoneOn_Ici : ∀ p ∈ Set.Icc (0 : ℝ) 
   fun p hp => LownerHeinzCore.power_Icc_zero_one_operatorMonotoneOn_Ici (𝓐 := L ℋ) p hp
 
 theorem power_Icc_zero_one_operatorConcaveOn_Ici : ∀ p ∈ Set.Icc (0 : ℝ) 1,
-    OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x ↦ x ^ p) := by
-  intro p hp
-  exact (LownerHeinzCore.power_Icc_zero_one_operatorConcaveOn_Ici (𝓐 := L ℋ) p hp)
+    OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x ↦ x ^ p) :=
+  fun p hp => LownerHeinzCore.power_Icc_zero_one_operatorConcaveOn_Ici (𝓐 := L ℋ) p hp
 
 theorem power_Icc_one_two_operatorConvexOn_Ici : ∀ p ∈ Set.Icc (1 : ℝ) 2,
-    OperatorConvexOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x ↦ x ^ p) := by
-  intro p hp
-  exact (LownerHeinzCore.power_Icc_one_two_operatorConvexOn_Ici (𝓐 := L ℋ) p hp)
+    OperatorConvexOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x ↦ x ^ p) :=
+  fun p hp => LownerHeinzCore.power_Icc_one_two_operatorConvexOn_Ici (𝓐 := L ℋ) p hp
 
 omit [Nontrivial ℋ] in
 theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-1 : ℝ) 0,
-    OperatorMonotoneOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x ↦ -(x ^ p)) := by
-  intro p hp
-  exact (LownerHeinzCore.power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi (𝓐 := L ℋ) p hp)
+    OperatorMonotoneOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x ↦ -(x ^ p)) :=
+  fun p hp => LownerHeinzCore.power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi (𝓐 := L ℋ) p hp
 
 theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1 : ℝ) 0,
-    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x ↦ -(x ^ p)) := by
-  intro p hp
-  exact (LownerHeinzCore.power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi (𝓐 := L ℋ) p hp)
+    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x ↦ -(x ^ p)) :=
+  fun p hp => LownerHeinzCore.power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi (𝓐 := L ℋ) p hp
 
 end LownerHeinzTheorem

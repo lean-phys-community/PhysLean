@@ -25,9 +25,8 @@ noncomputable def operatorPowerMean (α β : ℝ) (A B : L ℋ) : L ℋ :=
   GeneralizedPerspective (fun x : ℝ ↦ x ^ α) (fun x : ℝ ↦ x ^ β) A B
 
 private lemma rpow_continuousOn_Ici (p : ℝ) (hp : 0 ≤ p) :
-    ContinuousOn (fun x : ℝ ↦ x ^ p) (Set.Ici (0 : ℝ)) := by
-  intro x hx
-  exact (Real.continuousAt_rpow_const x p (Or.inr hp)).continuousWithinAt
+    ContinuousOn (fun x : ℝ ↦ x ^ p) (Set.Ici (0 : ℝ)) :=
+  fun x _ => (Real.continuousAt_rpow_const x p (Or.inr hp)).continuousWithinAt
 
 omit [Nontrivial ℋ] in
 private lemma operatorConcaveOn_Ioi_of_Ici {f : ℝ → ℝ}
