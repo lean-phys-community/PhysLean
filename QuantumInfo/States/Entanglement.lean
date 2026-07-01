@@ -179,7 +179,6 @@ theorem convex_roof_of_pure (ψ : Ket d) : convex_roof g (pure ψ) = g (KetUpToP
       conv_lhs =>
         enter [1, 1]
         rw [trivial_pEnsemble_average ψ _ 0]
-      rfl
   · apply le_convex_roof
     intro n hnpos e hmix
     apply le_of_eq
@@ -205,7 +204,6 @@ theorem mixed_convex_roof_of_pure (ψ : Ket d) : mixed_convex_roof f (pure ψ) =
       conv_lhs =>
         enter [1, 1]
         rw [trivial_mEnsemble_average _ (pure ψ) 0]
-      rfl
   · apply le_mixed_convex_roof
     intro n hnpos e hmix
     replace hpure := mix_mEnsemble_pure_iff_pure.mp hmix

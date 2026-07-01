@@ -100,7 +100,6 @@ theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val 
 @[simp]
 theorem of_empty {ρ : MState d} (ε : Prob) : β_ ε(ρ‖∅) = 0 := by
   simp [OptimalHypothesisRate]
-  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 theorem le_sup_exp_val {ρ : MState d} (ε : Prob) {S : Set (MState d)}

@@ -407,7 +407,6 @@ theorem pure_of_constant_spectrum (h : ∃ i, ρ.spectrum = ProbDistribution.con
     rw [if_neg hxnoti, Complex.ofReal_zero]
     ring
   simp_rw [←Finset.sum_subset (Finset.subset_univ {i}) hsum, Finset.sum_singleton, reduceIte, Complex.ofReal_one, mul_one]
-  rfl
 
 /-- A state ρ is pure iff its spectrum is (1,0,0,...) i.e. a constant distribution. -/
 theorem pure_iff_constant_spectrum : (∃ ψ, ρ = pure ψ) ↔

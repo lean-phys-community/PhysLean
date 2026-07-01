@@ -1255,7 +1255,6 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
           convert! congr(WithLp.ofLp $(h_top (WithLp.toLp 2 ( Pi.single j 1 )) ) i) using 1
           simp
           simp [ HermitianMat.lin ];
-          rfl
         exact ρ₂.pos.ne' h_contra;
     have h_union : ∀ (U V : Submodule ℂ (EuclideanSpace ℂ d₂)), U ≠ ⊤ → V ≠ ⊤ → ∃ v : EuclideanSpace ℂ d₂, v ∉ U ∧ v ∉ V := by
       intros U V hU hV;
