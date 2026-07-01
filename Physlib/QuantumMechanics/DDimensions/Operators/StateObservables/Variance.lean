@@ -135,8 +135,7 @@ lemma standardDeviation_nonneg (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
 @[simp]
 lemma standardDeviation_sq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
     standardDeviation T ψ ^ 2 = variance T ψ := by
-  rw [standardDeviation_eq_sqrt_variance, Real.sq_sqrt]
-  exact variance_nonneg T ψ
+  simpa [standardDeviation_eq_sqrt_variance] using Real.sq_sqrt (variance_nonneg T ψ)
 
 /-- Zero standard deviation is the same as a zero centered vector. -/
 lemma standardDeviation_eq_zero_iff_centered_eq_zero (T : H →ₗ.[ℂ] H)

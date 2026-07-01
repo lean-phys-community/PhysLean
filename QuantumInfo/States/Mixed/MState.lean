@@ -158,8 +158,7 @@ def nonempty : Nonempty d := by
 
 -- Could have used properties of ρ.spectrum
 theorem eigenvalue_nonneg : ∀ i, 0 ≤ ρ.Hermitian.eigenvalues i := by
-  rw [← Matrix.PosSemidef.nonneg_iff_eigenvalue_nonneg ρ.Hermitian]
-  exact ρ.nonneg
+  exact (zero_le_iff.mp ρ.nonneg).eigenvalues_nonneg
 
 set_option backward.isDefEq.respectTransparency false in
 -- Could have used properties of ρ.spectrum

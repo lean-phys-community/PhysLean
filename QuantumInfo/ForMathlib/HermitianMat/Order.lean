@@ -494,8 +494,7 @@ theorem ker_conj [DecidableEq n] (hA : 0 ≤ A) (B : Matrix n n 𝕜) :
     · exact Eq.symm (LinearMap.map_zero (Matrix.toEuclideanLin B))
 
 theorem ker_le_of_le_smul {α : ℝ} [DecidableEq n] (hα : α ≠ 0) (hA : 0 ≤ A) (hAB : A ≤ α • B) : B.ker ≤ A.ker := by
-  rw [← ker_pos_smul B hα]
-  exact ker_antitone hA hAB
+  simpa [← ker_pos_smul B hα] using ker_antitone hA hAB
 
 /-- If a Hermitian matrix is bounded by `M * I`, then all its eigenvalues are at most `M`. -/
 theorem le_smul_one_imp_eigenvalues_le [DecidableEq n] (A : HermitianMat n ℂ) (M : ℝ)

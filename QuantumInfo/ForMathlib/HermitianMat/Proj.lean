@@ -295,8 +295,7 @@ theorem projLE_mul_nonneg : 0 ≤ {A ≤ₚ B}.mat * (B - A).mat := by
 
 open MatrixOrder in
 theorem projLE_mul_le : {A ≤ₚ B}.mat * A.mat ≤ {A ≤ₚ B}.mat * B.mat := by
-  rw [← sub_nonneg, ← mul_sub_left_distrib]
-  exact projLE_mul_nonneg A B
+  simpa [← sub_nonneg, ← mul_sub_left_distrib] using projLE_mul_nonneg A B
 
 @[simp]
 theorem proj_le_add_lt : {A <ₚ B} + {B ≤ₚ A} = 1 := by
@@ -405,8 +404,7 @@ theorem projLE_inner_nonneg  : 0 ≤ ⟪{A ≤ₚ B}, (B - A)⟫ :=
   inner_mul_nonneg (projLE_mul_nonneg A B)
 
 theorem projLE_inner_le : ⟪{A ≤ₚ B}, A⟫ ≤ ⟪{A ≤ₚ B}, B⟫ := by
-  rw [← sub_nonneg, ← inner_sub_right]
-  exact projLE_inner_nonneg A B
+  simpa [← sub_nonneg, ← inner_sub_right] using projLE_inner_nonneg A B
 
 open RealInnerProductSpace in
 theorem inner_projLE_nonneg : 0 ≤ ⟪{A ≤ₚ B}, (B - A)⟫ :=
@@ -458,8 +456,7 @@ theorem projLT_mul_nonneg : 0 ≤ {A <ₚ B}.mat * (B - A).mat := by
 
 open MatrixOrder ComplexOrder in
 theorem proj_lt_mul_lt : {A <ₚ B}.mat * A.mat ≤ {A <ₚ B}.mat * B.mat := by
-  rw [← sub_nonneg, ← mul_sub_left_distrib]
-  exact A.projLT_mul_nonneg B
+  simpa [← sub_nonneg, ← mul_sub_left_distrib] using A.projLT_mul_nonneg B
 
 theorem inner_negPart_nonpos : ⟪A, A⁻⟫ ≤ 0 := by
   rw [← neg_le_neg_iff, neg_zero, ← inner_neg_right]
