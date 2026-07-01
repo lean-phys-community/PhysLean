@@ -45,10 +45,10 @@ noncomputable def conj_unitary_eigenspace_equiv (T : E →ₗ[𝕜] E) (U : unit
     have hv := v.2
     rw [mem_eigenspace_iff] at hv ⊢
     simpa using congrArg ((star U.val) ·) hv⟩
-  map_add' := by simp
-  map_smul' := by simp
-  left_inv _ := by simp
-  right_inv _ := by simp
+  map_add' v w := Subtype.ext (map_add U.val v.val w.val)
+  map_smul' c v := Subtype.ext (map_smul U.val c v.val)
+  left_inv v := Subtype.ext (unitary_star_apply_eq U v.val)
+  right_inv v := Subtype.ext (unitary_apply_star_eq U v.val)
 
 end unitary
 namespace IsSymmetric

@@ -32,7 +32,7 @@ theorem ULift.star_eq {𝕜 : Type u} [Star 𝕜] (x : ULift.{v,u} 𝕜) : star 
 
 instance ULift.instInvolutiveStar {𝕜 : Type u} [InvolutiveStar 𝕜] :
     InvolutiveStar (ULift.{v,u} 𝕜) where
-  star_involutive x := by simp
+  star_involutive x := congrArg ULift.up (star_star x.down)
 
 instance ULift.instStarMul {𝕜 : Type u} [Mul 𝕜] [StarMul 𝕜] : StarMul (ULift.{v,u} 𝕜) where
   star_mul x y := by simp; rfl
