@@ -126,8 +126,7 @@ theorem le_mixed_convex_roof (ρ : MState d) :
   unfold mixed_convex_roof
   rw [WithTop.le_untop_iff]
   apply le_iInf; intro ⟨n, hnpos⟩; apply le_iInf; intro e; apply le_iInf; intro hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h n hnpos e hmix
+  exact ENNReal.coe_le_coe.mpr (h n hnpos e hmix)
 
 set_option backward.isDefEq.respectTransparency false in
 theorem le_convex_roof (ρ : MState d) :
@@ -135,8 +134,7 @@ theorem le_convex_roof (ρ : MState d) :
   unfold convex_roof
   rw [WithTop.le_untop_iff]
   apply le_iInf; intro ⟨n, hnpos⟩; apply le_iInf; intro e; apply le_iInf; intro hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h n hnpos e hmix
+  exact ENNReal.coe_le_coe.mpr (h n hnpos e hmix)
 
 set_option backward.isDefEq.respectTransparency false in
 theorem convex_roof_le (ρ : MState d):
@@ -145,8 +143,7 @@ theorem convex_roof_le (ρ : MState d):
   unfold convex_roof
   rw [WithTop.untop_le_iff]
   apply iInf_le_of_le ⟨n, hnpos⟩; apply iInf_le_of_le e; apply iInf_le_of_le hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h
+  exact ENNReal.coe_le_coe.mpr h
 
 set_option backward.isDefEq.respectTransparency false in
 omit [Nonempty d] in
@@ -156,8 +153,7 @@ theorem mixed_convex_roof_le (ρ : MState d):
   unfold mixed_convex_roof
   rw [WithTop.untop_le_iff]
   apply iInf_le_of_le ⟨n, hnpos⟩; apply iInf_le_of_le e; apply iInf_le_of_le hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h
+  exact ENNReal.coe_le_coe.mpr h
 
 /-- The mixed convex roof extension of `f` is smaller than or equal to its convex roof extension, since
 the former minimizes over a larger set of ensembles. -/

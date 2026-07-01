@@ -166,8 +166,7 @@ lemma mathematicalPartitionFunction_of_fintype [IsFinite 𝓒] (T : Temperature)
     𝓒.mathematicalPartitionFunction T = ∑ i, exp (- β T * 𝓒.energy i) := by
   rw [mathematicalPartitionFunction_eq_integral, MeasureTheory.integral_fintype]
   simp [IsFinite.μ_eq_count]
-  · rw [IsFinite.μ_eq_count]
-    exact Integrable.of_finite
+  · simp [IsFinite.μ_eq_count]
 
 lemma partitionFunction_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.partitionFunction T = ∑ i, exp (- T.β * 𝓒.energy i) := by
@@ -184,8 +183,7 @@ lemma μBolt_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
   exact Real.exp_nonneg _
 
 instance {T} [IsFinite 𝓒] : IsFiniteMeasure (𝓒.μBolt T) := by
-  rw [μBolt]
-  exact isFiniteMeasure_withDensity_ofReal HasFiniteIntegral.of_finite
+  simpa [μBolt] using isFiniteMeasure_withDensity_ofReal HasFiniteIntegral.of_finite
 
 @[simp]
 lemma μProd_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
