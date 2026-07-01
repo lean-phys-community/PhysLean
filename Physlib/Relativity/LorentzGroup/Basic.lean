@@ -87,8 +87,7 @@ lemma mem_mul (hΛ : Λ ∈ LorentzGroup d) (hΛ' : Λ' ∈ LorentzGroup d) : Λ
   · rw [(mem_iff_dual_mul_self).mp hΛ]
     simp [(mem_iff_dual_mul_self).mp hΛ']
 
-lemma one_mem : 1 ∈ LorentzGroup d := by
-  simp [mem_iff_dual_mul_self]
+lemma one_mem : 1 ∈ LorentzGroup d := by simp [mem_iff_dual_mul_self]
 
 lemma dual_mem (h : Λ ∈ LorentzGroup d) : dual Λ ∈ LorentzGroup d := by
   rw [mem_iff_dual_mul_self, dual_dual]

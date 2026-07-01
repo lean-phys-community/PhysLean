@@ -50,8 +50,7 @@ noncomputable def ofRat {n : ℕ} {c : Fin n → complexLorentzTensor.Color} :
 lemma ofRat_basis_repr_apply {n : ℕ} {c : Fin n → complexLorentzTensor.Color}
     (f : (ComponentIdx c) → RatComplexNum)
     (b :(ComponentIdx c)) :
-  (Tensor.basis c).repr (ofRat f) b = toComplexNum (f b) := by
-  simp [ofRat]
+  (Tensor.basis c).repr (ofRat f) b = toComplexNum (f b) := by simp [ofRat]
 
 lemma basis_eq_ofRat {n : ℕ} {c : Fin n → complexLorentzTensor.Color}
     (b : (ComponentIdx c)) :

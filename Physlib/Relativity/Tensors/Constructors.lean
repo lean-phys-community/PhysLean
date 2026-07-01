@@ -475,10 +475,8 @@ noncomputable def fromTripleT {c1 c2 c3 : C} :
     let x2 :=
       TensorProduct.lift prodT (TensorProduct.map LinearMap.id (TensorProduct.lift prodT) x1)
     permT id (And.intro Function.bijective_id (fun i => by fin_cases i <;> rfl)) x2
-  map_add' x y := by
-    simp
-  map_smul' r x := by
-    simp
+  map_add' x y := by simp
+  map_smul' r x := by simp
 
 lemma fromTripleT_tmul {c1 c2 c3 : C} (x : V c1)
     (y : V c2) (z : V c3) :

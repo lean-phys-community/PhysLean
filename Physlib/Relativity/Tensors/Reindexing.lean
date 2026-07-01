@@ -72,8 +72,7 @@ lemma auto {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 
 @[simp]
 lemma on_id {n : ℕ} {c c1 : Fin n → C} :
-    IsReindexing c c1 (id : Fin n → Fin n) ↔ ∀ i, c i = c1 i := by
-  simp [IsReindexing]
+    IsReindexing c c1 (id : Fin n → Fin n) ↔ ∀ i, c i = c1 i := by simp [IsReindexing]
 
 lemma on_id_symm {n : ℕ} {c c1 : Fin n → C} (h : IsReindexing c1 c id) :
     IsReindexing c c1 (id : Fin n → Fin n) := by

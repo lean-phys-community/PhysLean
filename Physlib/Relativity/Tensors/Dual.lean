@@ -30,8 +30,7 @@ namespace Tensor
 noncomputable def fromDualMap {c : C} : S.Tensor ![S.τ c] →ₗ[k] S.Tensor ![c] where
   toFun t := permT id (by simp; rfl)
     (contrT 1 1 2 (by simp; rfl) (prodT (metricTensor c) t))
-  map_add' t1 t2 := by
-    simp
+  map_add' t1 t2 := by simp
   map_smul' r t := by simp
 
 lemma fromDualMap_apply {c : C} (t : S.Tensor ![S.τ c]) :
@@ -45,8 +44,7 @@ noncomputable def toDualMap {c : C} : S.Tensor ![c] →ₗ[k] S.Tensor ![S.τ c]
     simp; rfl) (contrT 1 1 2 (by
     change _ ∧ S.τ (S.τ c) = c
     simp) (prodT (metricTensor (S.τ c)) t))
-  map_add' t1 t2 := by
-    simp
+  map_add' t1 t2 := by simp
   map_smul' r t := by simp
 
 lemma toDualMap_apply {c : C} (t : S.Tensor ![c]) :

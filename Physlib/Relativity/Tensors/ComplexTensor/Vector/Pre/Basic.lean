@@ -31,8 +31,7 @@ def complexContrBasis : Basis (Fin 1 ⊕ Fin 3) ℂ ContrℂModule :=
 
 @[simp]
 lemma complexContrBasis_toFin13ℂ (i :Fin 1 ⊕ Fin 3) :
-    (complexContrBasis i).toFin13ℂ = Pi.single i 1 := by
-  simp [complexContrBasis]
+    (complexContrBasis i).toFin13ℂ = Pi.single i 1 := by simp [complexContrBasis]
 
 @[simp]
 lemma complexContrBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 1 ⊕ Fin 3) :

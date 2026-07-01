@@ -192,8 +192,7 @@ lemma isProper_iff (Λ : LorentzGroup d) : IsProper Λ ↔ detRep Λ = 1 := by
   simp only [IsProper, lorentzGroupIsGroup_one_coe, det_one]
 
 /-- The identity Lorentz transformation is proper. -/
-lemma isProper_id : @IsProper d 1 := by
-  simp [IsProper]
+lemma isProper_id : @IsProper d 1 := by simp [IsProper]
 
 /-- If two Lorentz transformations are in the same connected component, and one is proper then
   the other is also proper. -/

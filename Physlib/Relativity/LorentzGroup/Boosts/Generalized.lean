@@ -45,8 +45,7 @@ variable {d : ℕ}
 /-- An auxiliary linear map used in the definition of a generalised boost. -/
 def genBoostAux₁ (u v : Velocity d) : Vector d →ₗ[ℝ] Vector d where
   toFun x := (2 * ⟪x, u⟫ₘ) • v
-  map_add' x y := by
-    simp [map_add, mul_add, _root_.add_smul]
+  map_add' x y := by simp [map_add, mul_add, _root_.add_smul]
   map_smul' c x := by
     simp only [map_smul, RingHom.id_apply, smul_smul]
     simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]

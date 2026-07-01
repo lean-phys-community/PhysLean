@@ -347,8 +347,7 @@ lemma toComplexVector_up_eq_inclCongrRealLorentz (v : Lorentz.ContrMod 3) :
             Lorentz.complexContrBasisFin4, Lorentz.ContrMod.toFin1dℝ_eq_val]
           rfl
     _ = ∑ i, v.toFin1dℝ i • Lorentz.inclCongrRealLorentz
-        (Lorentz.ContrMod.stdBasis i) := by
-          simp only [Lorentz.complexContrBasis_of_real]
+        (Lorentz.ContrMod.stdBasis i) := by simp only [Lorentz.complexContrBasis_of_real]
     _ = Lorentz.inclCongrRealLorentz
         (∑ i, v.toFin1dℝ i • Lorentz.ContrMod.stdBasis i) := by
           rw [map_sum]
@@ -363,8 +362,7 @@ lemma toComplexVector_down_eq_inclCoRealLorentz (v : Lorentz.CoMod 3) :
           simp [toComplexVector, Lorentz.coBasis_repr_apply, Lorentz.complexCoBasisFin4]
           rfl
     _ = ∑ i, v.toFin1dℝ i • Lorentz.inclCoRealLorentz
-        (Lorentz.CoMod.stdBasis i) := by
-          simp only [Lorentz.complexCoBasis_of_real]
+        (Lorentz.CoMod.stdBasis i) := by simp only [Lorentz.complexCoBasis_of_real]
     _ = Lorentz.inclCoRealLorentz
         (∑ i, v.toFin1dℝ i • Lorentz.CoMod.stdBasis i) := by
           rw [map_sum]

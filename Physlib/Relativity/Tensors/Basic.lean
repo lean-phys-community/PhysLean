@@ -319,8 +319,7 @@ lemma componentMap_pure {n : ℕ} (c : Fin n → C)
 def ofComponents {n : ℕ} (c : Fin n → C) :
     (ComponentIdx (S := S) c → k) →ₗ[k] S.Tensor c where
   toFun f := ∑ b, f b • (Pure.basisVector c b).toTensor
-  map_add' fb gb := by
-    simp [add_smul, Finset.sum_add_distrib]
+  map_add' fb gb := by simp [add_smul, Finset.sum_add_distrib]
   map_smul' fb r := by simp [smul_smul, Finset.smul_sum]
 
 @[simp]
@@ -497,8 +496,7 @@ lemma actionT_eq {g : G} {t : S.Tensor c} : g • t =
     PiTensorProduct.map (fun i => rep (c i) g) t := rfl
 
 noncomputable instance actionT : MulAction G (S.Tensor c) where
-  one_smul t := by
-    simp [actionT_eq]
+  one_smul t := by simp [actionT_eq]
   mul_smul g g' t := by
     simp [actionT_eq]
     change _ = (PiTensorProduct.map (fun i => rep (c i) g) ∘ₗ

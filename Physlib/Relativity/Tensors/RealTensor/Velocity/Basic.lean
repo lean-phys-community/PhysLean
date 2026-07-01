@@ -51,8 +51,7 @@ lemma timeComponent_nonneg (v : Velocity d) : 0 ≤ v.1.timeComponent := by
 
 @[simp]
 lemma timeComponent_abs (v : Velocity d) :
-    |v.1.timeComponent| = v.1.timeComponent := by
-  simp
+    |v.1.timeComponent| = v.1.timeComponent := by simp
 
 lemma norm_spatialPart_le_timeComponent (v : Velocity d) :
     ‖v.1.spatialPart‖ ≤ ‖v.1.timeComponent‖ := by
@@ -154,8 +153,7 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
           · exact sq_nonneg _⟩
   continuous_toFun := by
     fun_prop
-  source' := by
-    simp
+  source' := by simp
   target' := by
     ext1
     simp only [Set.Icc.coe_one,

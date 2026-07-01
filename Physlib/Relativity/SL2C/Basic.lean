@@ -72,8 +72,7 @@ lemma toSelfAdjointMap_apply (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
         (star_eq_conjTranspose A.1).symm.trans $ selfAdjoint.mem_iff.mp A.2]⟩ := rfl
 
 lemma toSelfAdjointMap_apply_det (M : SL(2, ℂ)) (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
-    det ((toSelfAdjointMap M) A).1 = det A.1 := by
-  simp [toSelfAdjointMap]
+    det ((toSelfAdjointMap M) A).1 = det A.1 := by simp [toSelfAdjointMap]
 
 lemma toSelfAdjointMap_apply_pauliBasis'_inl (M : SL(2, ℂ)) :
     toSelfAdjointMap M (PauliMatrix.pauliBasis' (Sum.inl 0)) =

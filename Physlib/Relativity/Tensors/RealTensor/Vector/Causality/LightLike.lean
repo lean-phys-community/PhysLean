@@ -30,8 +30,7 @@ lemma lightLike_iff_norm_sq_zero {d : ℕ} (p : Vector d) :
   -- Zero vector has zero Minkowski norm squared
 @[simp]
 lemma causalCharacter_zero {d : ℕ} : causalCharacter (0 : Vector d) =
-    CausalCharacter.lightLike := by
-  simp [causalCharacter]
+    CausalCharacter.lightLike := by simp [causalCharacter]
 
 /-- Causally preceding is reflexive -/
 @[simp]

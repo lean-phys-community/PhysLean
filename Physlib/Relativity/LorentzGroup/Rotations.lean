@@ -121,8 +121,7 @@ def ofSpecialOrthogonal {d} :
     simp only [Submonoid.coe_mul, MulMemClass.mk_mul_mk]
     apply Subtype.ext
     simp [Matrix.fromBlocks_multiply]
-  left_inv Λ := by
-    simp
+  left_inv Λ := by simp
   right_inv Λ := by
     match Λ with
     | ⟨Λ, h⟩ =>
