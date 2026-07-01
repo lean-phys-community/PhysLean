@@ -38,8 +38,7 @@ lemma unitTensor_congr {c c1 : C} (h : c = c1) :
 lemma unitTensor_eq_permT_dual (c : C) :
     S.unitTensor c = permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> simp))
     (unitTensor (S.τ c)) := by
-  rw [unitTensor, fromConstPair, S.unit_symm]
-  rw [unitTensor, fromConstPair]
+  rw [unitTensor, fromConstPair, S.unit_symm, unitTensor, fromConstPair]
   simp [fromPairT]
   generalize (S.unit (S.τ c)) 1 = u at *
   induction' u using TensorProduct.induction_on with x y
@@ -65,8 +64,7 @@ lemma unitTensor_eq_permT_dual (c : C) :
 lemma dual_unitTensor_eq_permT_unitTensor (c : C) :
     S.unitTensor (S.τ c) = permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> simp))
       (unitTensor c) := by
-  rw [unitTensor_eq_permT_dual]
-  rw [unitTensor_congr (by simp : c = S.τ (S.τ c))]
+  rw [unitTensor_eq_permT_dual, unitTensor_congr (by simp : c = S.τ (S.τ c))]
   simp
 
 lemma unit_fromSingleTContrFromPairT_eq_fromSingleT {c : C} (x : V c) :

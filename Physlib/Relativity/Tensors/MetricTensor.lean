@@ -53,8 +53,7 @@ lemma fromPairTContr_metric_metric_eq_permT_unit {c : C} :
     ((S.metric (S.τ c)) (1 : k)) =
     permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> rfl))
     (unitTensor c) := by
-  rw [← permT_fromPairTContr_metric_metric]
-  rw [permT_permT]
+  rw [← permT_fromPairTContr_metric_metric, permT_permT]
   symm
   apply permT_congr_eq_id
   decide
@@ -66,8 +65,8 @@ lemma contrT_metricTensor_metricTensor {c : C} :
     contrT 2 1 2 (by simp; rfl) (prodT (metricTensor c) (metricTensor (S.τ c))) =
       permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> rfl))
       (unitTensor (S := S) c) := by
-  rw [metricTensor, metricTensor, fromConstPair, fromConstPair]
-  rw [fromPairT_contr_fromPairT_eq_fromPairTContr]
+  rw [metricTensor, metricTensor, fromConstPair, fromConstPair,
+    fromPairT_contr_fromPairT_eq_fromPairTContr]
   erw [fromPairTContr_metric_metric_eq_permT_unit]
   rw [permT_permT]
   rfl
@@ -80,9 +79,7 @@ lemma contrT_metricTensor_metricTensor_eq_dual_unit {c : C} :
           simp
         · rfl))
       (unitTensor (S := S) (S.τ c)) := by
-  rw [contrT_metricTensor_metricTensor]
-  rw [unitTensor_eq_permT_dual]
-  rw [permT_permT]
+  rw [contrT_metricTensor_metricTensor, unitTensor_eq_permT_dual, permT_permT]
   apply permT_congr
   · decide
   · rfl
