@@ -36,14 +36,8 @@ lemma ext {x y : RatComplexNum} (h1 : x.1 = y.1) (h2 : x.2 = y.2) : x = y := by
 def equivToProd : RatComplexNum ≃ ℚ × ℚ where
   toFun := fun x => (x.1, x.2)
   invFun := fun x => ⟨x.1, x.2⟩
-  left_inv := by
-    intro x
-    cases x
-    rfl
-  right_inv := by
-    intro x
-    cases x
-    rfl
+  left_inv := fun ⟨_, _⟩ => rfl
+  right_inv := fun ⟨_, _⟩ => rfl
 
 instance : DecidableEq RatComplexNum := Equiv.decidableEq equivToProd
 

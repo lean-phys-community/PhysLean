@@ -405,9 +405,7 @@ lemma clm_apply
     apply HasAdjoint.congr_adj
     apply ContinuousLinearMap.hasAdjoint
     funext y; simp[adjoint_eq_clm_adjoint]
-  ext' := by
-    intro K cK
-    exact ⟨K, cK, by intro _ _ hφ _ _; simp_all⟩
+  ext' := fun K cK => ⟨K, cK, by intro _ _ hφ _ _; simp_all⟩
   -- ext := IsLocalizedFunctionTransform.clm_apply _
 
 protected lemma deriv :

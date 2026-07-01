@@ -63,7 +63,7 @@ theorem reindex_exp (e : d ≃ d₂) : (A.reindex e).exp = A.exp.reindex e :=
 
 variable (A) in
 instance nonSingular_exp : NonSingular A.exp :=
-  cfc_nonSingular A Real.exp (fun i ↦ by positivity)
+  cfc_nonSingular A Real.exp (fun _ => Real.exp_ne_zero _)
 
 /-- The matrix exponential of a Hermitian matrix is nonnegative. -/
 theorem exp_nonneg (A : HermitianMat d 𝕜) : 0 ≤ A.exp := by

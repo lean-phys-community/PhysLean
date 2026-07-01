@@ -362,9 +362,7 @@ noncomputable def basis : OrthonormalBasis (Fin 1) ℝ Time where
   repr := {
     toFun := fun x => WithLp.toLp 2 (fun _ => x)
     invFun := fun f => ⟨f 0⟩
-    left_inv := by
-      intro x
-      rfl
+    left_inv := fun _ => rfl
     right_inv := by
       intro f
       ext i
