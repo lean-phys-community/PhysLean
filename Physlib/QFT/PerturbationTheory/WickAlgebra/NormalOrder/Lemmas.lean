@@ -102,8 +102,7 @@ lemma normalOrder_superCommute_eq_zero (a b : 𝓕.WickAlgebra) :
     𝓝([a, b]ₛ) = 0 := by
   obtain ⟨a, rfl⟩ := ι_surjective a
   obtain ⟨b, rfl⟩ := ι_surjective b
-  rw [superCommute_eq_ι_superCommuteF, normalOrder_eq_ι_normalOrderF]
-  simp
+  simp [superCommute_eq_ι_superCommuteF, normalOrder_eq_ι_normalOrderF]
 
 @[simp]
 lemma normalOrder_superCommute_left_eq_zero (a b c: 𝓕.WickAlgebra) :
@@ -111,8 +110,7 @@ lemma normalOrder_superCommute_left_eq_zero (a b c: 𝓕.WickAlgebra) :
   obtain ⟨a, rfl⟩ := ι_surjective a
   obtain ⟨b, rfl⟩ := ι_surjective b
   obtain ⟨c, rfl⟩ := ι_surjective c
-  rw [superCommute_eq_ι_superCommuteF, ← map_mul, normalOrder_eq_ι_normalOrderF]
-  simp
+  simp [superCommute_eq_ι_superCommuteF, ← map_mul, normalOrder_eq_ι_normalOrderF]
 
 @[simp]
 lemma normalOrder_superCommute_right_eq_zero (a b c: 𝓕.WickAlgebra) :
@@ -120,8 +118,7 @@ lemma normalOrder_superCommute_right_eq_zero (a b c: 𝓕.WickAlgebra) :
   obtain ⟨a, rfl⟩ := ι_surjective a
   obtain ⟨b, rfl⟩ := ι_surjective b
   obtain ⟨c, rfl⟩ := ι_surjective c
-  rw [superCommute_eq_ι_superCommuteF, ← map_mul, normalOrder_eq_ι_normalOrderF]
-  simp
+  simp [superCommute_eq_ι_superCommuteF, ← map_mul, normalOrder_eq_ι_normalOrderF]
 
 @[simp]
 lemma normalOrder_superCommute_mid_eq_zero (a b c d : 𝓕.WickAlgebra) :
@@ -130,8 +127,7 @@ lemma normalOrder_superCommute_mid_eq_zero (a b c d : 𝓕.WickAlgebra) :
   obtain ⟨b, rfl⟩ := ι_surjective b
   obtain ⟨c, rfl⟩ := ι_surjective c
   obtain ⟨d, rfl⟩ := ι_surjective d
-  rw [superCommute_eq_ι_superCommuteF, ← map_mul, ← map_mul, normalOrder_eq_ι_normalOrderF]
-  simp
+  simp [superCommute_eq_ι_superCommuteF, ← map_mul, ← map_mul, normalOrder_eq_ι_normalOrderF]
 
 /-!
 
@@ -403,8 +399,7 @@ lemma normalOrder_crPart_mul_anPart (φ φ' : 𝓕.FieldOp) :
 @[simp]
 lemma normalOrder_anPart_mul_crPart (φ φ' : 𝓕.FieldOp) :
     𝓝(anPart φ * crPart φ') = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • crPart φ' * anPart φ := by
-  rw [anPart, crPart, ← map_mul, normalOrder_eq_ι_normalOrderF, normalOrderF_anPartF_mul_crPartF]
-  simp
+  simp [anPart, crPart, ← map_mul, normalOrder_eq_ι_normalOrderF, normalOrderF_anPartF_mul_crPartF]
 
 lemma normalOrder_ofFieldOp_mul_ofFieldOp (φ φ' : 𝓕.FieldOp) : 𝓝(ofFieldOp φ * ofFieldOp φ') =
     crPart φ * crPart φ' + 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • (crPart φ' * anPart φ) +
