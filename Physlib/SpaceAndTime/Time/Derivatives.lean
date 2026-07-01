@@ -164,6 +164,11 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) :
 open MeasureTheory ContDiff InnerProductSpace Time
 
 @[fun_prop]
+lemma val_contDiff {n : WithTop ℕ∞} : ContDiff ℝ n Time.val := by
+  change ContDiff ℝ n toRealCLM
+  fun_prop
+
+@[fun_prop]
 lemma deriv_differentiable_of_contDiff {M : Type}
     [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) (hf : ContDiff ℝ ∞ f) :
     Differentiable ℝ (∂ₜ f) := by
