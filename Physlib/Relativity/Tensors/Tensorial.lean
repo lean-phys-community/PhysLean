@@ -388,7 +388,6 @@ def toTensorCLM [IsTopologicalAddGroup M]
   continuous_toFun := by
     let e : M →L[k] (S.Tensor c) := LinearMap.toContinuousLinearMap
       (Tensorial.toTensor (M := M))
-    change Continuous e
     exact ContinuousLinearMap.continuous e
   continuous_invFun := by apply IsModuleTopology.continuous_of_linearMap
 

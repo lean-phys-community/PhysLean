@@ -251,7 +251,6 @@ noncomputable def componentMap {n : ℕ} (c : Fin n → C) :
     exact component_update_add p i x y b
   map_update_smul' p i x y := by
     ext b
-    change component (update p i (x • y)) b = x * component (update p i y) b
     exact component_update_smul p i x y b
 
 @[simp]
