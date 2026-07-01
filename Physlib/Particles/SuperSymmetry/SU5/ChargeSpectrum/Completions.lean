@@ -293,7 +293,6 @@ lemma self_subset_mem_completions (S5 S10 : Finset 𝓩) (x y : ChargeSpectrum �
     (hy : y ∈ completions S5 S10 x) : x ⊆ y := by
   simp [mem_completions_iff] at hy
   rw [Subset]
-  dsimp [hasSubset]
   refine ⟨?_, ?_, ?_, ?_⟩
   · by_cases h : x.qHd.isSome
     · simp_all
@@ -352,7 +351,6 @@ lemma exist_completions_subset_of_complete (S5 S10 : Finset 𝓩) (x y : ChargeS
     · split_ifs with h3 <;> simp_all
     · split_ifs with h4 <;> simp_all
   · rw [Subset]
-    dsimp [hasSubset]
     refine ⟨by simp_all, by simp_all, ?_, ?_⟩
     · split_ifs with h3 <;> simp_all [Finset.singleton_subset_iff]
     · split_ifs with h4 <;> simp_all [Finset.singleton_subset_iff]

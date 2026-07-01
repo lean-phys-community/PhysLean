@@ -110,7 +110,6 @@ notation "𝐫₀[" d' "]" => radiusRegPowCLM (d := d')
 lemma radiusRegPowCLM_apply_fun {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     𝐫₀ ε s ψ = fun x ↦ (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
   ext x
-  dsimp [radiusRegPowCLM]
   refine smulLeftCLM_apply_apply ?_ ψ x
   exact HasTemperateGrowth.comp (by fun_prop) (normRegularizedPow_hasTemperateGrowth d ε s)
 

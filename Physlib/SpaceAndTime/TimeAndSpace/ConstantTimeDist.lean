@@ -152,7 +152,6 @@ lemma time_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x�
     fun x₀ t => fderiv ℝ (fun x : Space d => η (t, x)) x₀
   have hF : ∀ t, ∀ x, HasFDerivAt (F · t) (F' x t) x := by
     intro t x
-    dsimp [F, F']
     refine DifferentiableAt.hasFDerivAt ?_
     have hf := η.smooth'
     apply Differentiable.differentiableAt

@@ -271,7 +271,6 @@ private lemma posSemidef_block_one_inv {A : 𝓐} (hA : IsSelfAdjoint A)
             rw [← Real.rpow_add (As hx), show ((1 : ℝ) / 2 + (1 : ℝ) / 2 : ℝ) = 1 from by ring, Real.rpow_one]
       _ = A := cfc_id' (R := ℝ) (a := A) (ha := hA)
   have invA_eq : cfcR (fun x : ℝ ↦ x ^ (-1 : ℝ)) A = cfcR (fun x : ℝ ↦ x⁻¹) A := by
-    dsimp [cfcR]
     apply cfc_congr
     intro x hx
     have hxne : x ≠ 0 := ne_of_gt (As hx)
