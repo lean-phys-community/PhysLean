@@ -524,9 +524,8 @@ open MatrixOrder in
 /-- If all eigenvalues of a Hermitian matrix are at most `M`, then it is bounded by `M * I`. -/
 theorem eigenvalues_le_imp_le_smul_one [DecidableEq n] (A : HermitianMat n ℂ) (M : ℝ)
     (h : ∀ i, A.H.eigenvalues i ≤ M) :
-    A ≤ M • (1 : HermitianMat n ℂ) := by
-  exact
-    (Matrix.PosSemidef.le_smul_one_of_eigenvalues_iff A.H M).mp h
+    A ≤ M • (1 : HermitianMat n ℂ) :=
+  (Matrix.PosSemidef.le_smul_one_of_eigenvalues_iff A.H M).mp h
 
 --TODO: Positivity extensions for traceLeft, traceRight, rpow, nat powers, inverse function,
 -- the various `proj` function (in Proj.lean), and the inner product.

@@ -520,10 +520,9 @@ private lemma continuousOn_union_of_subset_Ici {f : ℝ → ℝ}
   · exact ht hx
 
 private lemma spectrum_Ici_of_nonneg {A : L ℋ} (hA0 : (0 : L ℋ) ≤ A) :
-    spectrum ℝ A ⊆ Set.Ici (0 : ℝ) := by
-  exact
-    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A
-      (ha := IsSelfAdjoint.of_nonneg hA0)).1 hA0
+    spectrum ℝ A ⊆ Set.Ici (0 : ℝ) :=
+  (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A
+    (ha := IsSelfAdjoint.of_nonneg hA0)).1 hA0
 
 variable [Nontrivial ℋ]
 

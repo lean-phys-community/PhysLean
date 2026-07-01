@@ -136,11 +136,9 @@ transport of `toAffineIsometryMulEquiv` acting on `EuclideanSpace`:
 lemma chartEuclidean_smul (g : EuclideanGroup d) (p : Space d) :
     Space.chartEuclidean d (g • p) = toAffineIsometryMulEquiv g (Space.chartEuclidean d p) := by
   rw [Space.chartEuclidean_apply, toAffineIsometryMulEquiv_apply, toAffineIsometryHom_apply]
-  have h_left : g • p -ᵥ (0 : Space d) = g.linear • (p -ᵥ (0 : Space d)) + g.translation := by
-    exact
-      (eq_vadd_iff_vsub_eq (g • p) (g.linear • (p -ᵥ (0 : Space d)) + g.translation)
-            ((0 : Space d))).mp
-        rfl
+  have h_left : g • p -ᵥ (0 : Space d) = g.linear • (p -ᵥ (0 : Space d)) + g.translation :=
+    (eq_vadd_iff_vsub_eq (g • p) (g.linear • (p -ᵥ (0 : Space d)) + g.translation)
+      ((0 : Space d))).mp rfl
   simp [h_left]
   exact add_comm' (g.linear • (p -ᵥ (0 : Space d))) g.translation
 end EuclideanGroup

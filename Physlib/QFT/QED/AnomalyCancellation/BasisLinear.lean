@@ -72,8 +72,7 @@ lemma sum_of_vectors {n : ℕ} (f : Fin k → (PureU1 n).LinSols) (j : Fin n) :
 noncomputable
 def coordinateMap : (PureU1 n.succ).LinSols ≃ₗ[ℚ] Fin n →₀ ℚ where
   toFun S := (Finsupp.linearEquivFunOnFinite ℚ ℚ (Fin n)).symm (S.1 ∘ Fin.castSucc)
-  map_add' S T := by
-    exact map_add _ _ _
+  map_add' S T := map_add _ _ _
   map_smul' a S := by
     rw [← map_smul]
     rfl
