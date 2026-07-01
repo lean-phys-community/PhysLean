@@ -98,8 +98,7 @@ def familyUniversal (n : ℕ) : (SMνCharges 1).Charges →ₗ[ℚ] (SMνCharges
 
 lemma toSpecies_familyUniversal {n : ℕ} (j : Fin 6) (S : (SMνCharges 1).Charges)
     (i : Fin n) : toSpecies j (familyUniversal n S) i = toSpecies j S ⟨0, by simp⟩ := by
-  rw [familyUniversal, chargesMapOfSpeciesMap_toSpecies]
-  rfl
+  exact congrFun (chargesMapOfSpeciesMap_toSpecies (speciesFamilyUniversial n) S j) i
 
 set_option backward.isDefEq.respectTransparency false in
 lemma sum_familyUniversal {n : ℕ} (m : ℕ) (S : (SMνCharges 1).Charges) (j : Fin 6) :
@@ -128,8 +127,7 @@ lemma sum_familyUniversal_two {n : ℕ} (S : (SMνCharges 1).Charges)
     Fin.isValue, Nat.reduceMul]
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
-  erw [toSpecies_familyUniversal]
-  rfl
+  exact congrArg (fun x => x * T (finProdFinEquiv (j, i))) (toSpecies_familyUniversal j S i)
 
 set_option backward.isDefEq.respectTransparency false in
 lemma sum_familyUniversal_three {n : ℕ} (S : (SMνCharges 1).Charges)
