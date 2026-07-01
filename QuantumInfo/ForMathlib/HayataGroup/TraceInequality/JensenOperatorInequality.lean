@@ -294,8 +294,7 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
 /-- Uniform consequence of Theorem 2.5.2: `(i) → (v)` via `(iv)`. -/
 theorem theorem_2_5_2_i_all_imp_v {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
     CondV (ℋ := ℋ) f := by
-  have hconv : OperatorConvex (ℋ := ℋ) f := by
-    exact hf.1
+  have hconv : OperatorConvex (ℋ := ℋ) f := hf.1
   have hcont : ContinuousOn f Set.univ :=
     operatorConvex_continuousOn_univ (ℋ := ℋ) hconv
   refine theorem_2_5_2_iv_imp_v (ℋ := ℋ) ?_ hcont

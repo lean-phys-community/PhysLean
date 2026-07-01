@@ -166,8 +166,7 @@ end AristotleLemmas
 theorem not_achievesRate_gt_log_dim_out (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₂) < R): ¬Λ.AchievesRate R := by
   intro h;
   -- We show that the identity channel on the output space `d₂` emulates `Λ`. Since capacity is monotonic under emulation, `Q(Λ) ≤ Q(id_{d₂})`.
-  have h_emulate : (CPTPMap.id (dIn := d₂)).Emulates Λ := by
-    exact ⟨Λ, CPTPMap.id, by simp⟩
+  have h_emulate : (CPTPMap.id (dIn := d₂)).Emulates Λ := ⟨Λ, CPTPMap.id, by simp⟩
   -- If `Λ` achieves rate `R`, then `id_{d₂}` achieves rate `R`. This follows because if `Λ^{\otimes n}` emulates `B`, and `id^{\otimes n}` emulates `Λ^{\otimes n}` (by functoriality of tensor product), then `id^{\otimes n}` emulates `B`.
   have h_id_achieves : (CPTPMap.id (dIn := d₂)).AchievesRate R := by
     intro ε hε_pos

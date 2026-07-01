@@ -269,8 +269,7 @@ theorem Sᵥₙ_eq_trace_cfc {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
       ∑ x, (ρ.M.cfc Real.negMulLog).H.eigenvalues x := by
     exact (HermitianMat.sum_eigenvalues_eq_trace _).symm
   obtain ⟨e, he⟩ : ∃ e : d ≃ d, (ρ.M.cfc Real.negMulLog).H.eigenvalues =
-      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e := by
-   exact Matrix.IsHermitian.cfc_eigenvalues _ _
+      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e := Matrix.IsHermitian.cfc_eigenvalues _ _
   rw [h_def, h_trace, he]
   simp only [Function.comp_apply]
   conv_lhs => rw [ ← Equiv.sum_comp e ]
