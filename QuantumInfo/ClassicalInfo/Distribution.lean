@@ -192,10 +192,10 @@ def coin (p : Prob) : ProbDistribution (Fin 2) :=
   ⟨(if · = 0 then p else 1 - p), by simp⟩
 
 @[simp]
-theorem coin_val_zero (p : Prob) : coin p 0 = p := by simp [coin]
+theorem coin_val_zero (p : Prob) : coin p 0 = p := rfl
 
 @[simp]
-theorem coin_val_one (p : Prob) : coin p 1 = 1 - p := by simp [coin]
+theorem coin_val_one (p : Prob) : coin p 1 = 1 - p := rfl
 
 /-- Every distribution on two variable is some coin. -/
 theorem fin_two_eq_coin (d : ProbDistribution (Fin 2)) : d = coin (d 0) := by

@@ -31,11 +31,11 @@ def H₁ : Prob → ℝ :=
 
 /-- H₁ of 0 is zero.-/
 @[simp]
-def H₁_zero_eq_zero : H₁ 0 = 0 := by simp [H₁]
+def H₁_zero_eq_zero : H₁ 0 = 0 := Real.negMulLog_zero
 
 /-- H₁ of 1 is zero.-/
 @[simp]
-def H₁_one_eq_zero : H₁ 1 = 0 := by simp [H₁]
+def H₁_one_eq_zero : H₁ 1 = 0 := Real.negMulLog_one
 
 /-- Entropy is nonnegative. -/
 theorem H₁_nonneg (p : Prob) : 0 ≤ H₁ p := by

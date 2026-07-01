@@ -120,7 +120,7 @@ theorem ne_iff {x y : Prob} : (x : ℝ) ≠ (y : ℝ) ↔ x ≠ y :=
   not_congr <| Prob.ext_iff.symm
 
 @[simp, norm_cast]
-theorem toReal_mul (x y : Prob) : (x * y : Prob) = (x : ℝ) * (y : ℝ) := by simp only [coe_mul]
+theorem toReal_mul (x y : Prob) : (x * y : Prob) = (x : ℝ) * (y : ℝ) := rfl
 
 /-- Coercion `Prob → ℝ≥0`. -/
 @[coe] def toNNReal : Prob → ℝ≥0 :=
