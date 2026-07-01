@@ -87,8 +87,7 @@ lemma normalOrder_mul_anPart (φ : 𝓕.FieldOp) (a : 𝓕.WickAlgebra) :
 lemma crPart_mul_normalOrder (φ : 𝓕.FieldOp) (a : 𝓕.WickAlgebra) :
     𝓝(crPart φ * a) = crPart φ * 𝓝(a) := by
   obtain ⟨a, rfl⟩ := ι_surjective a
-  rw [crPart, ← map_mul, normalOrder_eq_ι_normalOrderF, normalOrderF_crPartF_mul]
-  rfl
+  exact congrArg ι (normalOrderF_crPartF_mul _ _)
 
 /-!
 
@@ -165,12 +164,10 @@ lemma normalOrder_anPart_ofFieldOpList_swap (φ : 𝓕.FieldOp) (φ' : List 𝓕
     module
   | .position φ =>
     simp only [anPart_position]
-    rw [normalOrder_ofCrAnOp_ofFieldOpList_swap]
-    rfl
+    exact normalOrder_ofCrAnOp_ofFieldOpList_swap _ _
   | .outAsymp φ =>
     simp only [anPart_outAsymp]
-    rw [normalOrder_ofCrAnOp_ofFieldOpList_swap]
-    rfl
+    exact normalOrder_ofCrAnOp_ofFieldOpList_swap _ _
 
 lemma normalOrder_ofFieldOpList_anPart_swap (φ : 𝓕.FieldOp) (φ' : List 𝓕.FieldOp) :
     𝓝(ofFieldOpList φ' * anPart φ) = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • 𝓝(anPart φ * ofFieldOpList φ') := by
@@ -188,8 +185,7 @@ lemma anPart_mul_normalOrder_ofFieldOpList_eq_superCommute (φ : 𝓕.FieldOp)
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs') • 𝓝(ofFieldOpList φs' * anPart φ) +
     [anPart φ, 𝓝(ofFieldOpList φs')]ₛ := by
   rw [anPart, ofFieldOpList, normalOrder_eq_ι_normalOrderF, ← map_mul]
-  rw [anPartF_mul_normalOrderF_ofFieldOpListF_eq_superCommuteF]
-  rfl
+  exact congrArg ι (anPartF_mul_normalOrderF_ofFieldOpListF_eq_superCommuteF _ _)
 
 /-!
 
@@ -233,8 +229,7 @@ lemma ofCrAnOp_superCommute_normalOrder_ofCrAnList_sum (φ : 𝓕.CrAnFieldOp)
       𝓢(𝓕 |>ₛ (φs.get n), 𝓕 |>ₛ ((normalOrderList φs).take (normalOrderEquiv n))))
       * 𝓢(𝓕 |>ₛ (φs.get n), 𝓕 |>ₛ (φs.take n))
     · ring_nf
-      rw [hs]
-      rfl
+      simp [hs]
     · simp [hs]
   · erw [superCommute_diff_statistic hs]
     simp only [zero_mul, smul_zero]
