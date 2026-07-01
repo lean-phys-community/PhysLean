@@ -52,11 +52,9 @@ theorem rpow_conj_unitary (A : HermitianMat d 𝕜) (U : Matrix.unitaryGroup d �
     (HermitianMat.conj U.val A) ^ r = HermitianMat.conj U.val (A ^ r) := by
   exact A.cfc_conj_unitary (· ^ r) U
 
-theorem pow_eq_rpow : A ^ r = A.rpow r :=
-  rfl
+theorem pow_eq_rpow : A ^ r = A.rpow r := rfl
 
-theorem rpow_eq_cfc : A ^ r = A.cfc (· ^ r) :=
-  rfl
+theorem rpow_eq_cfc : A ^ r = A.cfc (· ^ r) := rfl
 
 theorem diagonal_pow (f : d → ℝ) :
     (diagonal 𝕜 f) ^ r = diagonal 𝕜 (fun i ↦ (f i) ^ r) := by

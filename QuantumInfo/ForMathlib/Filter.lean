@@ -53,7 +53,6 @@ theorem ENNReal.tendsto_toReal_iff_of_eventually_ne_top
     rw [EventuallyEq]
     peel hf with h
     simp [h]
-  have he₂ : (fun n ↦ (f n).toReal) = (fun n ↦ ((f n).toNNReal : ℝ≥0∞).toReal) :=
-    rfl
+  have he₂ : (fun n ↦ (f n).toReal) = (fun n ↦ ((f n).toNNReal : ℝ≥0∞).toReal) := rfl
   rw [Filter.tendsto_congr' he₁, he₂]
   exact tendsto_toReal_iff (by finiteness) hx

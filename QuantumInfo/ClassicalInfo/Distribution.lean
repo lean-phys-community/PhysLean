@@ -66,8 +66,7 @@ theorem fun_eq_val (d : ProbDistribution α) : d.val = d := rfl
 
 @[simp]
 theorem funlike_apply (d : α → Prob) (h : _) (x : α) :
-    DFunLike.coe (self := instFunLikeProb) ⟨d, h⟩ x = d x :=
-  rfl
+    DFunLike.coe (self := instFunLikeProb) ⟨d, h⟩ x = d x := rfl
 
 @[ext]
 theorem ext {p q : ProbDistribution α} (h : ∀ x, p x = q x) : p = q :=
@@ -132,8 +131,7 @@ def prod (d1 : ProbDistribution α) (d2 : ProbDistribution β) : ProbDistributio
     simp [← Finset.mul_sum, Fintype.sum_prod_type]⟩
 
 @[simp]
-theorem prod_def (x : α) (y : β) : prod d1 d2 ⟨x, y⟩ = (d1 x) * (d2 y) :=
-  rfl
+theorem prod_def (x : α) (y : β) : prod d1 d2 ⟨x, y⟩ = (d1 x) * (d2 y) := rfl
 
 /-- Given a distribution on α, extend it to a distribution on `Sum α β` by
   giving it no support on `β`. -/
