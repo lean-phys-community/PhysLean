@@ -516,8 +516,7 @@ instance (M : Type) [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) :
 @[simp]
 lemma scaleUnit_dimSet_val {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension)
     (m : DimSet M d) (u1 u2 : UnitChoices) :
-    (scaleUnit u1 u2 m).1 = scaleUnit u1 u2 m.1 := by
-  exact (m.2 u1 u2).symm
+    (scaleUnit u1 u2 m).1 = scaleUnit u1 u2 m.1 := (m.2 u1 u2).symm
 
 lemma DimSet.mem_iff {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) (m : M) :
     m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m := by rfl

@@ -100,8 +100,7 @@ lemma finExtractOne_symm_inr {n : ℕ} (i : Fin n.succ) :
   by_cases hi : x.1 < i.1
   · generalize_proofs hp
     have h1 : (finSumFinEquiv.symm (Fin.cast hp x)) =
-        Sum.inl ⟨x, hi⟩ := by
-      exact finSumFinEquiv_symm_apply_castAdd (n := n - i.1) (⟨x, hi⟩ : Fin i.1)
+        Sum.inl ⟨x, hi⟩ := finSumFinEquiv_symm_apply_castAdd (n := n - i.1) (⟨x, hi⟩ : Fin i.1)
     rw [h1]
     simp only [Nat.succ_eq_add_one, Equiv.sumAssoc_symm_apply_inr_inl, Sum.map_inl,
       Equiv.symm_trans_apply, Equiv.symm_symm, Equiv.sumComm_symm, Equiv.sumComm_apply,

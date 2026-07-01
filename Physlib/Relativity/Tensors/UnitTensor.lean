@@ -69,8 +69,7 @@ lemma dual_unitTensor_eq_permT_unitTensor (c : C) :
 
 lemma unit_fromSingleTContrFromPairT_eq_fromSingleT {c : C} (x : V c) :
     fromSingleTContrFromPairT x ((S.unit c) (1 : k)) =
-    fromSingleT x := by
-  exact congrArg fromSingleT (S.contr_unit c x)
+    fromSingleT x := congrArg fromSingleT (S.contr_unit c x)
 
 /-- This lemma represents the de-categorification of `S.contr_unit`. -/
 @[simp]
