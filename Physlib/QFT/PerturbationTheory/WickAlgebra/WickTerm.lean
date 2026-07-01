@@ -40,8 +40,7 @@ def wickTerm {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) : �
   corresponding to the empty set `∅` (the only Wick contraction of `[]`) is `1`. -/
 @[simp]
 lemma wickTerm_empty_nil :
-    wickTerm (empty (n := ([] : List 𝓕.FieldOp).length)) = 1 := by
-  simp [wickTerm, sign_empty]
+    wickTerm (empty (n := ([] : List 𝓕.FieldOp).length)) = 1 := by simp [wickTerm, sign_empty]
 
 /--
 For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of
@@ -83,8 +82,7 @@ lemma wickTerm_insert_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     · intro ha
       simp only [uncontracted, Finset.mem_filter, Finset.mem_univ, true_and, ha, and_true,
         forall_const]
-      have hx : φsΛ.getDual? a = none ↔ ¬ (φsΛ.getDual? a).isSome := by
-        simp
+      have hx : φsΛ.getDual? a = none ↔ ¬ (φsΛ.getDual? a).isSome := by simp
       rw [hx]
       simp only [Bool.not_eq_true, Bool.eq_false_or_eq_true_self, true_and]
       intro h1 h2

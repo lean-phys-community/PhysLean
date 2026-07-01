@@ -342,8 +342,7 @@ lemma insertAndContractNat_some_uncontracted (c : WickContraction n) (i : Fin n.
 set_option backward.isDefEq.respectTransparency false in
 lemma insertAndContractNat_none_getDual?_isNone (c : WickContraction n) (i : Fin n.succ) :
     ((insertAndContractNat c i none).getDual? i).isNone := by
-  have hi : i ∈ (insertAndContractNat c i none).uncontracted := by
-    simp
+  have hi : i ∈ (insertAndContractNat c i none).uncontracted := by simp
   simp only [Nat.succ_eq_add_one, uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hi
   rw [hi]
   simp
@@ -352,8 +351,7 @@ set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma insertAndContractNat_none_getDual?_eq_none (c : WickContraction n) (i : Fin n.succ) :
     (insertAndContractNat c i none).getDual? i = none := by
-  have hi : i ∈ (insertAndContractNat c i none).uncontracted := by
-    simp
+  have hi : i ∈ (insertAndContractNat c i none).uncontracted := by simp
   simp only [Nat.succ_eq_add_one, uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hi
   rw [hi]
 
@@ -769,8 +767,7 @@ lemma insertAndContractNat_surjective_on_nodual (i : Fin n.succ)
     obtain ⟨a', ha', rfl⟩ := h
     exact ha'
   · intro h
-    have hi : i ∈ c.uncontracted := by
-      simpa [uncontracted] using hc
+    have hi : i ∈ c.uncontracted := by simpa [uncontracted] using hc
     rw [mem_uncontracted_iff_not_contracted] at hi
     obtain ⟨j, hj⟩ := (@Fin.exists_succAbove_eq_iff _ i (c.fstFieldOfContract ⟨a, h⟩)).mpr
       (by

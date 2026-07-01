@@ -243,8 +243,7 @@ lemma joinSignRightExtra_eq_i_j_finset_eq_if {φs : List 𝓕.FieldOp}
       not_forall, not_lt]
     intro hxij h1 h2
     omega
-  · have hj1 : uncontractedListEmd (φsucΛ.fstFieldOfContract a) < j := by
-      omega
+  · have hj1 : uncontractedListEmd (φsucΛ.fstFieldOfContract a) < j := by omega
     by_cases hi1 : ¬ i < uncontractedListEmd (φsucΛ.sndFieldOfContract a)
     · simp only [hi1, and_false, ↓reduceIte, Finset.notMem_empty, or_false]
       have hj2 : ¬ j < uncontractedListEmd (φsucΛ.sndFieldOfContract a) := by omega
@@ -252,8 +251,7 @@ lemma joinSignRightExtra_eq_i_j_finset_eq_if {φs : List 𝓕.FieldOp}
         not_or, not_forall, not_lt]
       intro hxij h1 h2
       omega
-    · have hi1 : i < uncontractedListEmd (φsucΛ.sndFieldOfContract a) := by
-        omega
+    · have hi1 : i < uncontractedListEmd (φsucΛ.sndFieldOfContract a) := by omega
       simp only [hj1, true_and, hi1, and_true]
       by_cases hi2 : ¬ uncontractedListEmd (φsucΛ.fstFieldOfContract a) < i
       · simp only [hi2, and_false, ↓reduceIte, Finset.notMem_empty, or_self, iff_false, not_and,
@@ -406,8 +404,7 @@ lemma join_sign_induction {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs
     obtain ⟨i, j, hij, φsucΛ', rfl, h1, h2, h3⟩ :=
       exists_join_singleton_of_card_ge_zero φsΛ (by simp [hn]) hc
     rw [join_assoc, join_sign_singleton hij h1, join_sign_singleton hij h1]
-    have hn : φsucΛ'.1.card = n := by
-      omega
+    have hn : φsucΛ'.1.card = n := by omega
     rw [join_sign_induction φsucΛ' (congr (by simp [join_uncontractedListGet]) φsucΛ) h2
       n hn]
     rw [mul_assoc]

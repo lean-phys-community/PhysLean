@@ -99,8 +99,7 @@ def permTwoInj : Fin 2 ↪ Fin n where
   toFun s := match s with
     | 0 => i
     | 1 => j
-  inj' s1 s2 := by
-    aesop
+  inj' s1 s2 := by aesop
 
 lemma permTwoInj_fst : i ∈ Set.range ⇑(permTwoInj hij) := by
   simp only [Set.mem_range]
@@ -156,8 +155,7 @@ def permThreeInj : Fin 3 ↪ Fin n where
     | 0 => i
     | 1 => j
     | 2 => k
-  inj' s1 s2 := by
-    aesop
+  inj' s1 s2 := by aesop
 
 lemma permThreeInj_fst : i ∈ Set.range ⇑(permThreeInj hij hjk hik) := by
   simp only [Set.mem_range]

@@ -272,8 +272,7 @@ lemma ι_timeOrderF_superCommuteF_eq_time {φ ψ : 𝓕.CrAnFieldOp}
               ι (ofCrAnListF (List.filter (fun c => (crAnTimeOrderRel φ c ∧
                 crAnTimeOrderRel c φ)) φs)) *
               ι (ofCrAnListF (List.filter (fun c => (crAnTimeOrderRel φ c ∧ ¬crAnTimeOrderRel c φ))
-                (List.insertionSort crAnTimeOrderRel (φs' ++ φs))))) := by
-            simp [mul_sub, sub_mul]
+                (List.insertionSort crAnTimeOrderRel (φs' ++ φs))))) := by simp [mul_sub, sub_mul]
         _ = crAnTimeOrderSign (φs' ++ [φ, ψ] ++ φs) •
             (ι (ofCrAnListF (List.takeWhile (fun c => ¬crAnTimeOrderRel φ c)
                 (List.insertionSort crAnTimeOrderRel (φs' ++ φs)))) *
@@ -554,17 +553,14 @@ lemma timeOrder_timeOrder_mid (a b c : 𝓕.WickAlgebra) :
   ← map_mul, ← map_mul, timeOrder_eq_ι_timeOrderF, timeOrderF_timeOrderF_mid]
 
 lemma timeOrder_timeOrder_left (b c : 𝓕.WickAlgebra) :
-    𝓣(b * c) = 𝓣(𝓣(b) * c) := by
-  simpa using timeOrder_timeOrder_mid (1 : 𝓕.WickAlgebra) b c
+    𝓣(b * c) = 𝓣(𝓣(b) * c) := by simpa using timeOrder_timeOrder_mid (1 : 𝓕.WickAlgebra) b c
 
 lemma timeOrder_timeOrder_right (a b : 𝓕.WickAlgebra) :
-    𝓣(a * b) = 𝓣(a * 𝓣(b)) := by
-  simpa using timeOrder_timeOrder_mid a b (1 : 𝓕.WickAlgebra)
+    𝓣(a * b) = 𝓣(a * 𝓣(b)) := by simpa using timeOrder_timeOrder_mid a b (1 : 𝓕.WickAlgebra)
 
 /-- Time ordering is a projection. -/
 lemma timeOrder_timeOrder (a : 𝓕.WickAlgebra) :
-    𝓣(𝓣(a)) = 𝓣(a) := by
-  simpa using (timeOrder_timeOrder_left a (1 : 𝓕.WickAlgebra)).symm
+    𝓣(𝓣(a)) = 𝓣(a) := by simpa using (timeOrder_timeOrder_left a (1 : 𝓕.WickAlgebra)).symm
 
 end WickAlgebra
 end FieldSpecification

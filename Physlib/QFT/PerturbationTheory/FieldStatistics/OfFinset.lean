@@ -32,8 +32,7 @@ lemma ofFinset_empty (q : 𝓕 → FieldStatistic) (f : Fin n → 𝓕) :
   rfl
 
 lemma ofFinset_singleton {n : ℕ} (q : 𝓕 → FieldStatistic) (f : Fin n → 𝓕) (i : Fin n) :
-    ofFinset q f {i} = q (f i) := by
-  simp [ofFinset]
+    ofFinset q f {i} = q (f i) := by simp [ofFinset]
 
 lemma ofFinset_finset_map {n m : ℕ}
     (q : 𝓕 → FieldStatistic) (i : Fin m → Fin n) (hi : Function.Injective i)
@@ -59,8 +58,7 @@ lemma ofFinset_insert (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finse
   simp only [ofFinset, Fin.getElem_fin]
   rw [← ofList_cons_eq_mul]
   have h1 : (φs[↑i] :: List.map φs.get (a.sort (fun x1 x2 => x1 ≤ x2)))
-      = List.map φs.get (i :: a.sort (fun x1 x2 => x1 ≤ x2)) := by
-      simp
+      = List.map φs.get (i :: a.sort (fun x1 x2 => x1 ≤ x2)) := by simp
   erw [h1]
   apply ofList_perm
   refine List.Perm.map φs.get ?_

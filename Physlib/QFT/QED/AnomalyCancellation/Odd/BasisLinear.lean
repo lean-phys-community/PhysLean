@@ -291,8 +291,7 @@ def basisAsCharges (j : Fin n) : (PureU1 (2 * n + 1)).Charges :=
 
 -/
 
-lemma basis_on_oddFst_self (j : Fin n) : basisAsCharges j (oddFst j) = 1 := by
-  simp [basisAsCharges]
+lemma basis_on_oddFst_self (j : Fin n) : basisAsCharges j (oddFst j) = 1 := by simp [basisAsCharges]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_oddFst_other {k j : Fin n} (h : k ≠ j) :

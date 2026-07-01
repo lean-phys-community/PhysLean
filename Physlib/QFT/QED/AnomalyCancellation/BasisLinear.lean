@@ -33,8 +33,7 @@ def asCharges (j : Fin n) : (PureU1 n.succ).Charges :=
       else 0)
 
 lemma asCharges_eq_castSucc (j : Fin n) :
-    asCharges j (Fin.castSucc j) = 1 := by
-  simp [asCharges]
+    asCharges j (Fin.castSucc j) = 1 := by simp [asCharges]
 
 lemma asCharges_ne_castSucc {k j : Fin n} (h : k ≠ j) :
     asCharges k ⟨j, by simp⟩= 0 := by

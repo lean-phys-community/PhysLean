@@ -68,12 +68,10 @@ lemma normalOrder_normalOrder_mid (a b c : 𝓕.WickAlgebra) :
   rfl
 
 lemma normalOrder_normalOrder_left (a b : 𝓕.WickAlgebra) :
-    𝓝(a * b) = 𝓝(𝓝(a) * b) := by
-  simpa using normalOrder_normalOrder_mid (1 : 𝓕.WickAlgebra) a b
+    𝓝(a * b) = 𝓝(𝓝(a) * b) := by simpa using normalOrder_normalOrder_mid (1 : 𝓕.WickAlgebra) a b
 
 lemma normalOrder_normalOrder_right (a b : 𝓕.WickAlgebra) :
-    𝓝(a * b) = 𝓝(a * 𝓝(b)) := by
-  simpa using normalOrder_normalOrder_mid a b (1 : 𝓕.WickAlgebra)
+    𝓝(a * b) = 𝓝(a * 𝓝(b)) := by simpa using normalOrder_normalOrder_mid a b (1 : 𝓕.WickAlgebra)
 
 lemma normalOrder_normalOrder (a : 𝓕.WickAlgebra) : 𝓝(𝓝(a)) = 𝓝(a) := by
   simpa using (normalOrder_normalOrder_left a (1 : 𝓕.WickAlgebra)).symm
