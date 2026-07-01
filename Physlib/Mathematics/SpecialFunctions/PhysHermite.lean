@@ -211,9 +211,8 @@ lemma deriv_physHermite' (x : ℝ)
     (f : ℝ → ℝ) (hf : DifferentiableAt ℝ f x) (n : ℕ) :
     deriv (fun x => physHermite n (f x)) x
     = (2 * n * physHermite (n - 1) (f x)) * deriv f x := by
-  unfold deriv
-  rw [fderiv_physHermite (hf := by fun_prop)]
-  rfl
+  simpa only [deriv, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul] using
+    congrArg (fun g : ℝ →L[ℝ] ℝ => g 1) (fderiv_physHermite x f hf n)
 
 lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
     physHermite n (-x) = (-1)^n * physHermite n x

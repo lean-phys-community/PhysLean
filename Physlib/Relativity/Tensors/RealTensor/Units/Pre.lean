@@ -144,8 +144,7 @@ lemma contr_preContrCoUnit {d : ℕ} (x : CoMod d) :
   rw [h1]
   have h2 : coContrContract.toLinearMap.rTensor _ (∑ i, (x ⊗ₜ[ℝ] contrBasis d i) ⊗ₜ[ℝ] coBasis d i)
       = ∑ i, ((coContrContract) (x ⊗ₜ[ℝ] contrBasis d i)) ⊗ₜ[ℝ] coBasis d i := by
-    rw [map_sum]
-    rfl
+    exact map_sum _ _ _
   erw [h2]
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℝ).mp (Basis.mem_span (coBasis d) x)
   have h3 (i : Fin 1 ⊕ Fin d) : (coContrContract)
@@ -158,8 +157,7 @@ lemma contr_preContrCoUnit {d : ℕ} (x : CoMod d) :
   conv_lhs =>
     enter [2, 2, i]
     rw [h3 i]
-  rw [map_sum]
-  rfl
+  exact map_sum _ _ _
 
 /-- Contraction on the right with `coContrUnit`. -/
 lemma contr_preCoContrUnit {d : ℕ} (x : ContrMod d) :
@@ -178,8 +176,7 @@ lemma contr_preCoContrUnit {d : ℕ} (x : ContrMod d) :
   rw [h1]
   have h2 :contrCoContract.toLinearMap.rTensor _ (∑ i, (x ⊗ₜ[ℝ] coBasis d i) ⊗ₜ[ℝ] contrBasis d i)
       = ∑ i, ((contrCoContract) (x ⊗ₜ[ℝ] coBasis d i)) ⊗ₜ[ℝ] contrBasis d i := by
-    rw [map_sum]
-    rfl
+    exact map_sum _ _ _
   erw [h2]
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℝ).mp
     (Basis.mem_span (contrBasis d) x)
@@ -193,8 +190,7 @@ lemma contr_preCoContrUnit {d : ℕ} (x : ContrMod d) :
   conv_lhs =>
     enter [2, 2, i]
     rw [h3 i]
-  rw [map_sum]
-  rfl
+  exact map_sum _ _ _
 
 /-!
 
