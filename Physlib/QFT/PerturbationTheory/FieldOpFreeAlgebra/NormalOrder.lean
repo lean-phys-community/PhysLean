@@ -342,38 +342,32 @@ lemma normalOrderF_crPartF_mul_crPartF (φ φ' : 𝓕.FieldOp) :
     𝓝ᶠ(crPartF φ * crPartF φ') =
     crPartF φ * crPartF φ' := by
   rw [normalOrderF_crPartF_mul]
-  conv_lhs => rw [← mul_one (crPartF φ')]
-  rw [normalOrderF_crPartF_mul, normalOrderF_one]
-  simp
+  simpa [normalOrderF_one] using congrArg (fun x => crPartF φ * x)
+    (normalOrderF_crPartF_mul φ' (1 : 𝓕.FieldOpFreeAlgebra))
 
 @[simp]
 lemma normalOrderF_anPartF_mul_anPartF (φ φ' : 𝓕.FieldOp) :
     𝓝ᶠ(anPartF φ * anPartF φ') =
     anPartF φ * anPartF φ' := by
   rw [normalOrderF_mul_anPartF]
-  conv_lhs => rw [← one_mul (anPartF φ)]
-  rw [normalOrderF_mul_anPartF, normalOrderF_one]
-  simp
+  simpa [normalOrderF_one] using congrArg (fun x => x * anPartF φ')
+    (normalOrderF_mul_anPartF φ (1 : 𝓕.FieldOpFreeAlgebra))
 
 @[simp]
 lemma normalOrderF_crPartF_mul_anPartF (φ φ' : 𝓕.FieldOp) :
     𝓝ᶠ(crPartF φ * anPartF φ') =
     crPartF φ * anPartF φ' := by
   rw [normalOrderF_crPartF_mul]
-  conv_lhs => rw [← one_mul (anPartF φ')]
-  rw [normalOrderF_mul_anPartF, normalOrderF_one]
-  simp
+  simpa [normalOrderF_one] using congrArg (fun x => crPartF φ * x)
+    (normalOrderF_mul_anPartF φ' (1 : 𝓕.FieldOpFreeAlgebra))
 
 @[simp]
 lemma normalOrderF_anPartF_mul_crPartF (φ φ' : 𝓕.FieldOp) :
     𝓝ᶠ(anPartF φ * crPartF φ') =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') •
     (crPartF φ' * anPartF φ) := by
-  conv_lhs => rw [← one_mul (anPartF φ * crPartF φ')]
-  conv_lhs => rw [← mul_one (1 * (anPartF φ *
-    crPartF φ'))]
-  rw [← mul_assoc, normalOrderF_swap_anPartF_crPartF]
-  simp
+  simpa using normalOrderF_swap_anPartF_crPartF φ φ'
+    (1 : 𝓕.FieldOpFreeAlgebra) (1 : 𝓕.FieldOpFreeAlgebra)
 
 lemma normalOrderF_ofFieldOpF_mul_ofFieldOpF (φ φ' : 𝓕.FieldOp) :
     𝓝ᶠ(ofFieldOpF φ * ofFieldOpF φ') =

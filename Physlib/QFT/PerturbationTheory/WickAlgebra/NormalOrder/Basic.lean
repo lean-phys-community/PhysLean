@@ -156,26 +156,22 @@ lemma ι_normalOrderF_superCommuteF_eq_zero_mul
 @[simp]
 lemma ι_normalOrder_superCommuteF_eq_zero_mul_right (b c d : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓝ᶠ([d, c]ₛF * b) = 0 := by
-  rw [← ι_normalOrderF_superCommuteF_eq_zero_mul 1 b c d]
-  simp
+  simpa using ι_normalOrderF_superCommuteF_eq_zero_mul (1 : 𝓕.FieldOpFreeAlgebra) b c d
 
 @[simp]
 lemma ι_normalOrderF_superCommuteF_eq_zero_mul_left (a c d : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓝ᶠ(a * [d, c]ₛF) = 0 := by
-  rw [← ι_normalOrderF_superCommuteF_eq_zero_mul a 1 c d]
-  simp
+  simpa using ι_normalOrderF_superCommuteF_eq_zero_mul a (1 : 𝓕.FieldOpFreeAlgebra) c d
 
 @[simp]
 lemma ι_normalOrderF_superCommuteF_eq_zero_mul_mul_right (a b1 b2 c d: 𝓕.FieldOpFreeAlgebra) :
     ι 𝓝ᶠ(a * [d, c]ₛF * b1 * b2) = 0 := by
-  rw [← ι_normalOrderF_superCommuteF_eq_zero_mul a (b1 * b2) c d]
-  congr 2
-  noncomm_ring
+  simpa [mul_assoc] using ι_normalOrderF_superCommuteF_eq_zero_mul a (b1 * b2) c d
 
 @[simp]
 lemma ι_normalOrderF_superCommuteF_eq_zero (c d : 𝓕.FieldOpFreeAlgebra) : ι 𝓝ᶠ([d, c]ₛF) = 0 := by
-  rw [← ι_normalOrderF_superCommuteF_eq_zero_mul 1 1 c d]
-  simp
+  simpa using ι_normalOrderF_superCommuteF_eq_zero_mul
+    (1 : 𝓕.FieldOpFreeAlgebra) (1 : 𝓕.FieldOpFreeAlgebra) c d
 
 /-!
 
