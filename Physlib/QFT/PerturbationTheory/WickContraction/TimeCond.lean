@@ -205,10 +205,8 @@ lemma timeOrder_timeContract_mul_of_eqTimeOnly_left {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
     (hl : φsΛ.EqTimeOnly) (b : 𝓕.WickAlgebra) :
     𝓣(φsΛ.timeContract.1 * b) = φsΛ.timeContract.1 * 𝓣(b) := by
-  trans 𝓣(1 * φsΛ.timeContract.1 * b)
-  simp only [one_mul]
-  rw [timeOrder_timeContract_mul_of_eqTimeOnly_mid φsΛ hl]
-  simp
+  simpa using
+    timeOrder_timeContract_mul_of_eqTimeOnly_mid φsΛ hl (1 : 𝓕.WickAlgebra) b
 
 set_option maxHeartbeats 400000 in
 lemma exists_join_singleton_of_not_eqTimeOnly {φs : List 𝓕.FieldOp}

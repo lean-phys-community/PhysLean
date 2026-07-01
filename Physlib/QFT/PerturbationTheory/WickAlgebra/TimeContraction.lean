@@ -147,10 +147,7 @@ lemma timeOrder_timeContract_eq_time_mid {φ ψ : 𝓕.FieldOp}
 lemma timeOrder_timeContract_eq_time_left {φ ψ : 𝓕.FieldOp}
     (h1 : timeOrderRel φ ψ) (h2 : timeOrderRel ψ φ) (b : 𝓕.WickAlgebra) :
     𝓣(timeContract φ ψ * b) = timeContract φ ψ * 𝓣(b) := by
-  trans 𝓣(1 * timeContract φ ψ * b)
-  simp only [one_mul]
-  rw [timeOrder_timeContract_eq_time_mid h1 h2]
-  simp
+  simpa using timeOrder_timeContract_eq_time_mid h1 h2 (1 : 𝓕.WickAlgebra) b
 
 lemma timeOrder_timeContract_ne_time {φ ψ : 𝓕.FieldOp}
     (h1 : ¬ (timeOrderRel φ ψ ∧ timeOrderRel ψ φ)) :
