@@ -66,8 +66,7 @@ def linSolRep {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
   map_one' := by
     refine LinearMap.ext fun S ↦ ACCSystemLinear.LinSols.ext ?_
     change (G.rep.toFun 1) S.val = _
-    rw [G.rep.map_one']
-    rfl
+    simp only [G.rep.map_one', Module.End.one_apply]
 
 /-- The representation on the charges and anomaly free solutions
 commutes with the inclusion. -/
@@ -88,8 +87,7 @@ instance quadSolAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
   one_smul S := by
     apply ACCSystemQuad.QuadSols.ext
     change (G.rep.toFun 1) S.val = _
-    rw [G.rep.map_one']
-    rfl
+    simp only [G.rep.map_one', Module.End.one_apply]
 
 lemma linSolRep_quadSolAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.QuadSols) : χ.quadSolsInclLinSols (G.quadSolAction.toFun _ _ S g) =
@@ -113,8 +111,7 @@ instance solAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) : MulAction G.
   one_smul S := by
     apply ACCSystem.Sols.ext
     change (G.rep.toFun 1) S.val = _
-    rw [G.rep.map_one']
-    rfl
+    simp only [G.rep.map_one', Module.End.one_apply]
 
 lemma quadSolAction_solAction_commute {χ : ACCSystem} (G : ACCSystemGroupAction χ) (g : G.group)
     (S : χ.Sols) : χ.solsInclQuadSols (G.solAction.toFun _ _ S g) =
