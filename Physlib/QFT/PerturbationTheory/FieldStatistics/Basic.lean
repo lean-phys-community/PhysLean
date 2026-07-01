@@ -243,8 +243,7 @@ lemma ofList_map_eq_finset_prod (s : 𝓕 → FieldStatistic) :
     exact hl.2
 
 lemma ofList_pair (s : 𝓕 → FieldStatistic) (φ1 φ2 : 𝓕) :
-    ofList s [φ1, φ2] = s φ1 * s φ2 := by
-  rw [ofList_cons_eq_mul, ofList_singleton]
+    ofList s [φ1, φ2] = s φ1 * s φ2 := by rw [ofList_cons_eq_mul, ofList_singleton]
 
 /-!
 

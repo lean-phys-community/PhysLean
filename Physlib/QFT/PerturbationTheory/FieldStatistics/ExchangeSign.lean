@@ -97,8 +97,7 @@ lemma exchangeSign_mul_self_swap (a b : FieldStatistic) : 𝓢(a, b) * 𝓢(b, a
 
 lemma exchangeSign_ofList_cons (a : FieldStatistic)
     (s : 𝓕 → FieldStatistic) (φ : 𝓕) (φs : List 𝓕) :
-    𝓢(a, ofList s (φ :: φs)) = 𝓢(a, s φ) * 𝓢(a, ofList s φs) := by
-  rw [ofList_cons_eq_mul, map_mul]
+    𝓢(a, ofList s (φ :: φs)) = 𝓢(a, s φ) * 𝓢(a, ofList s φs) := by rw [ofList_cons_eq_mul, map_mul]
 
 /-- The exchange sign is a cocycle. -/
 lemma exchangeSign_cocycle (a b c : FieldStatistic) :

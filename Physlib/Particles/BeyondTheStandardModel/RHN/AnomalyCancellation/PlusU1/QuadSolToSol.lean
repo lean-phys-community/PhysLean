@@ -51,8 +51,7 @@ lemma BL_add_α₁_α₂_cube (S : (PlusU1 n).QuadSols) :
   ring
 
 lemma BL_add_α₁_α₂_AF (S : (PlusU1 n).Sols) :
-    BL.addQuad S.1 (α₁ S.1) (α₂ S.1) = (α₁ S.1) • S.1 := by
-  rw [α₂_AF, BL.addQuad_zero]
+    BL.addQuad S.1 (α₁ S.1) (α₂ S.1) = (α₁ S.1) • S.1 := by rw [α₂_AF, BL.addQuad_zero]
 
 /-- The construction of a `Sol` from a `QuadSol` in the generic case. -/
 def generic (S : (PlusU1 n).QuadSols) : (PlusU1 n).Sols :=
@@ -64,8 +63,7 @@ lemma generic_on_AF (S : (PlusU1 n).Sols) : generic S.1 = (α₁ S.1) • S := b
   exact congrArg (fun Q : (PlusU1 n).QuadSols => Q.val) (BL_add_α₁_α₂_AF S)
 
 lemma generic_on_AF_α₁_ne_zero (S : (PlusU1 n).Sols) (h : α₁ S.1 ≠ 0) :
-    (α₁ S.1)⁻¹ • generic S.1 = S := by
-  rw [generic_on_AF, smul_smul, inv_mul_cancel₀ h, one_smul]
+    (α₁ S.1)⁻¹ • generic S.1 = S := by rw [generic_on_AF, smul_smul, inv_mul_cancel₀ h, one_smul]
 
 /-- The construction of a `Sol` from a `QuadSol` in the case when `α₁ S = 0` and `α₂ S = 0`. -/
 def special (S : (PlusU1 n).QuadSols) (a b : ℚ) (h1 : α₁ S = 0) (h2 : α₂ S = 0) :
