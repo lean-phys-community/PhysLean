@@ -355,8 +355,7 @@ lemma exists_mem_left_uncontracted_of_mem_join_uncontracted {φs : List 𝓕.Fie
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) (i : Fin φs.length)
     (ha : i ∈ (join φsΛ φsucΛ).uncontracted) :
     i ∈ φsΛ.uncontracted := by
-  rw [@mem_uncontracted_iff_not_contracted]
-  rw [@mem_uncontracted_iff_not_contracted] at ha
+  rw [@mem_uncontracted_iff_not_contracted] at ha ⊢
   simp only [join, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
     RelEmbedding.coe_toEmbedding] at ha
   intro p hp
@@ -371,8 +370,7 @@ lemma exists_mem_right_uncontracted_of_mem_join_uncontracted {φs : List 𝓕.Fi
   obtain ⟨j, rfl⟩ := uncontractedListEmd_surjective_mem_uncontracted i hi'
   use j
   simp only [true_and]
-  rw [mem_uncontracted_iff_not_contracted] at hi
-  rw [mem_uncontracted_iff_not_contracted]
+  rw [mem_uncontracted_iff_not_contracted] at hi ⊢
   intro p hp
   have hip := hi (p.map uncontractedListEmd) (by
     simp only [join, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
@@ -386,8 +384,7 @@ lemma exists_mem_right_uncontracted_of_mem_join_uncontracted {φs : List 𝓕.Fi
 lemma join_uncontractedList {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) :
     (join φsΛ φsucΛ).uncontractedList = List.map uncontractedListEmd φsucΛ.uncontractedList := by
-  rw [uncontractedList_eq_sort]
-  rw [uncontractedList_eq_sort]
+  rw [uncontractedList_eq_sort, uncontractedList_eq_sort]
   rw [fin_finset_sort_map_monotone]
   congr
   ext a
@@ -592,19 +589,14 @@ lemma join_singleton_getDual?_left {φs : List 𝓕.FieldOp}
     {i j : Fin φs.length} (h : i < j)
     (φsucΛ : WickContraction [singleton h]ᵘᶜ.length) :
     (join (singleton h) φsucΛ).getDual? i = some j := by
-  rw [@getDual?_eq_some_iff_mem]
-  simp [singleton, join]
+  simp [getDual?_eq_some_iff_mem, singleton, join]
 
 @[simp]
 lemma join_singleton_getDual?_right {φs : List 𝓕.FieldOp}
     {i j : Fin φs.length} (h : i < j)
     (φsucΛ : WickContraction [singleton h]ᵘᶜ.length) :
     (join (singleton h) φsucΛ).getDual? j = some i := by
-  rw [@getDual?_eq_some_iff_mem]
-  simp only [join, singleton, Finset.le_eq_subset, Finset.mem_union, Finset.mem_singleton,
-    Finset.mem_map, RelEmbedding.coe_toEmbedding]
-  left
-  exact Finset.pair_comm j i
+  simp [getDual?_eq_some_iff_mem, join, singleton, Finset.pair_comm]
 
 lemma exists_contraction_pair_of_card_ge_zero {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length) (h : 0 < φsΛ.1.card) :
