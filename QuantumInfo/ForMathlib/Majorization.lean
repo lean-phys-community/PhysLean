@@ -914,8 +914,7 @@ lemma weak_log_maj_sum_le {n : ℕ}
     · simp [Fin.sum_univ_castSucc, h_last]
       refine le_add_of_le_of_nonneg (ih (fun i => hx_nn _) (fun i => hy_nn _) (fun i j hij => hx_anti hij) (fun i j hij => hy_anti hij) ?_) (hy_nn _)
       intro k hk
-      simp
-      exact h_log_maj k (by linarith)
+      simpa using h_log_maj k (by linarith)
     · -- Since $x_{\text{last}} > 0$, we have $x_i > 0$ for all $i$.
       have hx_pos : ∀ i, 0 < x i := by
         exact fun i => lt_of_lt_of_le (lt_of_le_of_ne (hx_nn _) (Ne.symm h_last)) (hx_anti (Fin.le_last _))

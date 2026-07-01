@@ -46,8 +46,7 @@ sum is 1. The fact that the values are at most 1 is derived as a consequence. -/
 def mk' (f : α → ℝ) (h₁ : ∀i, 0 ≤ f i) (hN : ∑ i, f i = 1) : ProbDistribution α :=
   have h₃ : ∀x, f x ≤ 1 := by
     intro x
-    simp [← hN, Fintype.sum_eq_sum_compl_add x]
-    exact Finset.sum_nonneg' h₁
+    simpa [← hN, Fintype.sum_eq_sum_compl_add x] using Finset.sum_nonneg' h₁
   ⟨ fun i ↦ ⟨f i, ⟨h₁ i, h₃ i⟩⟩, hN⟩
 
 instance instFunLikeProb : FunLike (ProbDistribution α) α Prob where

@@ -141,8 +141,7 @@ theorem trace_eq_zero_iff (A : HermitianMat n 𝕜) : A.trace = 0 ↔ A.mat.trac
   simp [← trace_eq_trace_rc]
 
 theorem trace_eq_one_iff (A : HermitianMat n 𝕜) : A.trace = 1 ↔ A.mat.trace = 1 := by
-  rw [← trace_eq_trace_rc]
-  exact ⟨mod_cast id, mod_cast id⟩
+  simp [← trace_eq_trace_rc]
 
 @[simp]
 theorem trace_reindex (A : HermitianMat n ℂ) (e : n ≃ m) :

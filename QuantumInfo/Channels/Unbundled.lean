@@ -310,8 +310,7 @@ theorem of_Fintype  {M : MatrixMap A B R} (h : IsCompletelyPositive M)
   · intro h x hx
     specialize h (hx.submatrix (fun p : A × Fin n => (p.1, e.symm p.2)))
     rw [h_submatrix]
-    simp only [LinearMap.coe_comp, Function.comp_apply, submatrix_apply]
-    exact h.submatrix _
+    simpa only [LinearMap.coe_comp, Function.comp_apply, submatrix_apply] using h.submatrix _
 
 /- Every `MatrixMap` that `IsCompletelyPositive` also `IsPositiveMap`. -/
 theorem IsPositive {M : MatrixMap A B R}

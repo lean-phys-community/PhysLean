@@ -431,8 +431,7 @@ theorem traceFunctional_eq_iSup_f_alpha (hα : 1 < α) (ρ σ : MState d) (hker 
     Q̃_ α(ρ‖σ) = ⨆ (H : {H : HermitianMat d ℂ // 0 ≤ H}), f_alpha α H.1 ρ σ := by
   rw [@ciSup_eq_of_forall_le_of_forall_lt_exists_gt]
   · intro i
-    rw [← f_alpha_at_optimizer hα ρ σ]
-    exact f_alpha_le_at_optimizer hα ρ σ i i.2 hker
+    simpa [← f_alpha_at_optimizer hα ρ σ] using f_alpha_le_at_optimizer hα ρ σ i i.2 hker
   · intro w hw
     exact ⟨⟨H_hat α ρ σ, H_hat_nonneg ρ σ⟩, hw.trans_le (f_alpha_at_optimizer hα ρ σ ▸ le_rfl)⟩
 

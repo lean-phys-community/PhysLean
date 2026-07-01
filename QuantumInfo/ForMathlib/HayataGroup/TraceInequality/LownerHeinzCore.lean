@@ -415,8 +415,7 @@ theorem one_div_operatorConvexOn_Ioi :
       -- rewrite the middle block matrix as `M`
       simpa [← hM] using posConj
     -- rewrite the goal using the computed conjugation
-    rw [← hconj]
-    exact posConj'
+    simpa [← hconj] using posConj'
   have hinvC : invC ≤ D := by
     have hDinvC : 0 ≤ D - invC := by
       simpa using

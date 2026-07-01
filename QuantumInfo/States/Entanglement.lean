@@ -84,8 +84,7 @@ theorem convex_roof_ne_top : ∀ ρ, convex_roof_ENNReal g ρ ≠ ∞ := fun ρ 
   simp only [convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall]
   use ⟨Fintype.card d, Fintype.card_pos⟩
   have ed : d ≃ Fin ↑(⟨Fintype.card d, Fintype.card_pos⟩ : ℕ+) := by
-    simp only
-    exact Fintype.equivFin d
+    simpa only using Fintype.equivFin d
   use (congrPEnsemble ed) <| spectral_ensemble ρ
   rw [mix_congrPEnsemble_eq_mix ed]
   push Not

@@ -199,8 +199,7 @@ theorem V_rho_isometry [Nonempty dB] (ρAB : HermitianMat (dA × dB) ℂ) (hρ :
   have h_pos_def : (ρAB.traceRight⁻¹.sqrt : Matrix dA dA ℂ) * (ρAB.traceRight : Matrix dA dA ℂ) * (ρAB.traceRight⁻¹.sqrt : Matrix dA dA ℂ) = 1 := by
     convert HermitianMat.sqrt_inv_mul_self_mul_sqrt_inv_eq_one _;
     exact PosDef_traceRight _ hρ
-  rw [← h_pos_def]
-  exact V_rho_conj_mul_self_eq ρAB hρ
+  simpa [← h_pos_def] using V_rho_conj_mul_self_eq ρAB hρ
 
 /--
 V_sigma is an isometry.

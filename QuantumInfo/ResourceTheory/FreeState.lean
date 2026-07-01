@@ -117,8 +117,7 @@ open ComplexOrder in
 theorem PosDef.prod {ρ : MState (H i)} {σ : MState (H j)} (hρ : ρ.m.PosDef) (hσ : σ.m.PosDef)
     : (ρ ⊗ᵣ σ).m.PosDef := by
   have : (ρ ⊗ᴹ σ).m.PosDef := MState.PosDef.kron hρ hσ
-  rw [prodRelabel]
-  exact MState.PosDef.relabel this (prodEquiv i j)
+  simpa [prodRelabel] using MState.PosDef.relabel this (prodEquiv i j)
 
 --BAD old attempt at PNat powers
 -- /-- Powers of spaces. Defined for `PNat` so that we don't have zeroth powers. -/
