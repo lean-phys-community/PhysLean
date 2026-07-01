@@ -59,8 +59,7 @@ noncomputable def singularValuesSorted (A : Matrix d d ℂ) :
 /-- Sorted singular values are nonneg. -/
 lemma singularValuesSorted_nonneg (A : Matrix d d ℂ) (i : Fin (Fintype.card d)) :
     0 ≤ singularValuesSorted A i := by
-  have h_nonneg : ∀ i, 0 ≤ (singularValues A i) := by
-    exact singularValues_nonneg A
+  have h_nonneg : ∀ i, 0 ≤ (singularValues A i) := singularValues_nonneg A
   have h_sorted_nonneg : ∀ {l : List ℝ}, (∀ x ∈ l, 0 ≤ x) → ∀ i < l.length, 0 ≤ l[i]! := by
     aesop
   contrapose! h_sorted_nonneg
@@ -102,8 +101,7 @@ lemma singularValuesSorted_antitone (A : Matrix d d ℂ) :
 lemma antitone_mul_of_antitone_nonneg {n : ℕ}
     {f g : Fin n → ℝ} (hf : Antitone f) (hg : Antitone g)
     (hf_nn : ∀ i, 0 ≤ f i) (hg_nn : ∀ i, 0 ≤ g i) :
-    Antitone (fun i => f i * g i) := by
-  exact fun i j hij => mul_le_mul (hf hij) (hg hij) (hg_nn _) (hf_nn _)
+    Antitone (fun i => f i * g i) := fun _ _ hij => mul_le_mul (hf hij) (hg hij) (hg_nn _) (hf_nn _)
 
 /-! ### Compound matrices and auxiliary lemmas for Horn's inequality
 
@@ -201,15 +199,13 @@ lemma cauchyBinet {m : ℕ} {n : Type*} [Fintype n] [DecidableEq n] [LinearOrder
           obtain ⟨a, ha⟩ : ∃ a : Fin m → Fin m, ∀ i, σ i = S.val.orderEmbOfFin S.property (a i) := by
             have h_exists_a : ∀ i, ∃ a : Fin m, σ i = S.val.orderEmbOfFin S.property a := by
               intro i
-              have h_exists_a : σ i ∈ S.val := by
-                exact hσ.2 ▸ Finset.mem_image_of_mem _ (Finset.mem_univ _)
+              have h_exists_a : σ i ∈ S.val := hσ.2 ▸ Finset.mem_image_of_mem _ (Finset.mem_univ _)
               have h_exists_a : Finset.image (fun a : Fin m => S.val.orderEmbOfFin S.property a) Finset.univ = S.val := by
                 refine' Finset.eq_of_subset_of_card_le (Finset.image_subset_iff.mpr fun a _ => Finset.orderEmbOfFin_mem _ _ _) _
                 rw [Finset.card_image_of_injective _ fun a b h => by simpa [Fin.ext_iff] using h]; simp [S.2]
               grind
             exact ⟨fun i => Classical.choose (h_exists_a i), fun i => Classical.choose_spec (h_exists_a i)⟩
-          have ha_inj : Function.Injective a := by
-            exact fun i j hij => hσ.1 <| by simp [ha, hij]
+          have ha_inj : Function.Injective a := fun i j hij => hσ.1 <| by simp [ha, hij]
           exact ⟨Equiv.ofBijective a ⟨ha_inj, Finite.injective_iff_surjective.mp ha_inj⟩, funext fun i => ha i ▸ rfl⟩
         · rintro ⟨a, rfl⟩
           constructor
@@ -799,8 +795,7 @@ lemma horn_weak_log_majorization (A B : Matrix d d ℂ) (k : ℕ)
 lemma rpow_antitone_of_nonneg_antitone {n : ℕ}
     {f : Fin n → ℝ} (hf : Antitone f) (hf_nn : ∀ i, 0 ≤ f i)
     {r : ℝ} (hr : 0 < r) :
-    Antitone (fun i => f i ^ r) := by
-  exact fun i j hij => Real.rpow_le_rpow (hf_nn _) (hf hij) hr.le
+    Antitone (fun i => f i ^ r) := fun _ _ hij => Real.rpow_le_rpow (hf_nn _) (hf hij) hr.le
 
 /-- Weak log-majorization is preserved under positive powers. -/
 lemma rpow_preserves_weak_log_maj {n : ℕ}
