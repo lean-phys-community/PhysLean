@@ -229,31 +229,26 @@ theorem one_div_operatorConvexOn_Ioi :
 
 omit [Nontrivial ℋ] in
 theorem one_div_add_t_operatorAntitoneOn_Ici : ∀ (t : ℝ), 0 < t →
-    OperatorAntitoneOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ 1 / (x + t)) := by
-  intro t ht
-  exact (LownerHeinzCore.one_div_add_t_operatorAntitoneOn_Ici (𝓐 := L ℋ) t ht)
+    OperatorAntitoneOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ 1 / (x + t)) :=
+  fun t ht => LownerHeinzCore.one_div_add_t_operatorAntitoneOn_Ici (𝓐 := L ℋ) t ht
 
 theorem one_div_add_t_operatorConvexOn_Ici : ∀ (t : ℝ), 0 < t →
-    OperatorConvexOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ 1 / (x + t)) := by
-  intro t ht
-  exact (LownerHeinzCore.one_div_add_t_operatorConvexOn_Ici (𝓐 := L ℋ) t ht)
+    OperatorConvexOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ 1 / (x + t)) :=
+  fun t ht => LownerHeinzCore.one_div_add_t_operatorConvexOn_Ici (𝓐 := L ℋ) t ht
 
 omit [Nontrivial ℋ] in
 theorem ratio_add_t_operatorMonotoneOn_Ici : ∀ (t : ℝ), 0 < t →
-    OperatorMonotoneOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ x / (x + t)) := by
-  intro t ht
-  exact (LownerHeinzCore.ratio_add_t_operatorMonotoneOn_Ici (𝓐 := L ℋ) t ht)
+    OperatorMonotoneOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ x / (x + t)) :=
+  fun t ht => LownerHeinzCore.ratio_add_t_operatorMonotoneOn_Ici (𝓐 := L ℋ) t ht
 
 theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
-    OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ x / (x + t)) := by
-  intro t ht
-  exact (LownerHeinzCore.ratio_add_t_operatorConcaveOn_Ici (𝓐 := L ℋ) t ht)
+    OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ x / (x + t)) :=
+  fun t ht => LownerHeinzCore.ratio_add_t_operatorConcaveOn_Ici (𝓐 := L ℋ) t ht
 
 omit [Nontrivial ℋ] in
 theorem power_Icc_zero_one_operatorMonotoneOn_Ici : ∀ p ∈ Set.Icc (0 : ℝ) 1,
-    OperatorMonotoneOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x ↦ x ^ p) := by
-  intro p hp
-  exact (LownerHeinzCore.power_Icc_zero_one_operatorMonotoneOn_Ici (𝓐 := L ℋ) p hp)
+    OperatorMonotoneOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x ↦ x ^ p) :=
+  fun p hp => LownerHeinzCore.power_Icc_zero_one_operatorMonotoneOn_Ici (𝓐 := L ℋ) p hp
 
 theorem power_Icc_zero_one_operatorConcaveOn_Ici : ∀ p ∈ Set.Icc (0 : ℝ) 1,
     OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) (fun x ↦ x ^ p) := by
