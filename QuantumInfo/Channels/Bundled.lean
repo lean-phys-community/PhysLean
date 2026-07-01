@@ -177,8 +177,7 @@ namespace PMap
 
 @[ext]
 theorem ext {Λ₁ Λ₂ : PMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  rw [PMap.mk.injEq]
-  exact HPMap.ext h
+  exact (mk.injEq _ _ _ _).mpr (HPMap.ext h)
 
 theorem injective_toHPMap : (PMap.toHPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
@@ -231,8 +230,7 @@ namespace PTPMap
 
 @[ext]
 theorem ext {Λ₁ Λ₂ : PTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  rw [PTPMap.mk.injEq]
-  exact PMap.ext h
+  exact (mk.injEq _ _ _ _).mpr (PMap.ext h)
 
 theorem injective_toPMap : (PTPMap.toPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
@@ -317,8 +315,7 @@ variable [DecidableEq dIn]
 /-- Two `CPTPMap`s are equal if their `MatrixMap`s are equal. -/
 @[ext]
 theorem ext {Λ₁ Λ₂ : CPTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  rw [CPTPMap.mk.injEq]
-  exact PTPMap.ext h
+  exact (mk.injEq _ _ _ _).mpr (PTPMap.ext h)
 
 theorem injective_toPTPMap : (CPTPMap.toPTPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
@@ -375,12 +372,10 @@ variable [DecidableEq dIn] [DecidableEq dOut]
 
 @[ext]
 theorem ext {Λ₁ Λ₂ : PUMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  rw [PUMap.mk.injEq]
-  exact PMap.ext h
+  exact (mk.injEq _ _ _ _).mpr (PMap.ext h)
 
-theorem injective_toPMap : (PUMap.toPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective := by
-  intro _ _ _
-  rwa [PUMap.mk.injEq]
+theorem injective_toPMap : (PUMap.toPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
+  fun _ _ ↦ (mk.injEq _ _ _ _).mpr
 
 /-- `PUMap`s are functions from `HermitianMat`s to `HermitianMat`s. -/
 noncomputable instance instFunLike : FunLike (PUMap dIn dOut ℂ) (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
