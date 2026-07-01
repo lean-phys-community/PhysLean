@@ -105,13 +105,11 @@ lemma slice_symm_apply {d : ℕ} (i : Fin d.succ) (r : ℝ) (x : Space d) :
 
 @[simp]
 lemma slice_symm_apply_self {d : ℕ} (i : Fin d.succ) (r : ℝ) (x : Space d) :
-    (slice i).symm (r, x) i = r := by
-  simp [slice_symm_apply]
+    (slice i).symm (r, x) i = r := by simp [slice_symm_apply]
 
 @[simp]
 lemma slice_symm_apply_succAbove {d : ℕ} (i : Fin d.succ) (r : ℝ) (x : Space d) (j : Fin d) :
-    (slice i).symm (r, x) (Fin.succAbove i j) = x j := by
-  simp [slice_symm_apply]
+    (slice i).symm (r, x) (Fin.succAbove i j) = x j := by simp [slice_symm_apply]
 
 /-!
 
@@ -172,8 +170,7 @@ lemma norm_left_le_norm_slice_symm {d : ℕ} (i : Fin d.succ) (r : ℝ) (x : Spa
 
 @[simp]
 lemma fderiv_slice_symm {d : ℕ} (i : Fin d.succ) (p1 : ℝ × Space d) :
-    fderiv ℝ (slice i).symm p1 = (slice i).symm := by
-  rw [ContinuousLinearEquiv.fderiv]
+    fderiv ℝ (slice i).symm p1 = (slice i).symm := by rw [ContinuousLinearEquiv.fderiv]
 
 lemma fderiv_slice_symm_left_apply {d : ℕ} (i : Fin d.succ) (x : Space d) (r1 r2 : ℝ) :
     (fderiv ℝ (fun r => (slice i).symm (r, x))) r1 r2 = (slice i).symm (r2, 0) := by

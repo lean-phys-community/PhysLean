@@ -100,16 +100,14 @@ lemma deriv_eq_mfderiv [NormedAddCommGroup M] [NormedSpace ℝ M]
 open Manifold in
 lemma deriv_eq_manifoldDeriv [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Time → M) (t : Time) :
-    deriv f t = manifoldDeriv 𝓘(ℝ, M) f t := by
-  rw [deriv_eq_mfderiv, manifoldDeriv_eq]
+    deriv f t = manifoldDeriv 𝓘(ℝ, M) f t := by rw [deriv_eq_mfderiv, manifoldDeriv_eq]
 
 open Manifold in
 @[simp]
 lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
     [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]
     [ChartedSpace H N] (n : N) :
-    manifoldDeriv I (fun _ : Time => n) t = 0 := by
-  simp [manifoldDeriv]
+    manifoldDeriv I (fun _ : Time => n) t = 0 := by simp [manifoldDeriv]
 
 /-!
 
@@ -125,8 +123,7 @@ lemma deriv_smul (f : Time → EuclideanSpace ℝ (Fin d)) (k : ℝ)
   fun_prop
 
 lemma deriv_neg [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) :
-    ∂ₜ (-f) t = -∂ₜ f t := by
-  simp [deriv, fderiv_neg]
+    ∂ₜ (-f) t = -∂ₜ f t := by simp [deriv, fderiv_neg]
 
 /-- Quotient rule for `Time.deriv` on real-valued functions: if `c` and `g` are
   differentiable at `t` and `g t ≠ 0`, then
