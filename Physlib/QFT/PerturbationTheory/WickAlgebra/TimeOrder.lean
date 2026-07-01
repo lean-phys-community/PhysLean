@@ -127,8 +127,7 @@ lemma ι_timeOrderF_superCommuteF_superCommuteF_eq_time_ofCrAnListF {φ1 φ2 φ3
     ι [ofCrAnOpF φ1, [ofCrAnOpF φ2, ofCrAnOpF φ3]ₛF]ₛF *
     ι (ofCrAnListF l2)); swap
   · simp
-  rw [mul_assoc]
-  rw [← ofCrAnListF_singleton, ← ofCrAnListF_singleton, ← ofCrAnListF_singleton]
+  rw [mul_assoc, ← ofCrAnListF_singleton, ← ofCrAnListF_singleton, ← ofCrAnListF_singleton]
   rw [superCommuteF_ofCrAnListF_ofCrAnListF]
   simp only [List.singleton_append, ofList_singleton, map_sub, map_smul]
   rw [superCommuteF_ofCrAnListF_ofCrAnListF, superCommuteF_ofCrAnListF_ofCrAnListF]
@@ -300,14 +299,12 @@ lemma ι_timeOrderF_superCommuteF_eq_time {φ ψ : 𝓕.CrAnFieldOp}
       rw [← ofCrAnListF_append, ← ofCrAnListF_append, ← ofCrAnListF_append]
       have h1 := insertionSort_of_takeWhile_filter 𝓕.crAnTimeOrderRel φ φs' φs
       simp [decide_not, Bool.decide_and, List.append_assoc, List.cons_append] at h1 ⊢
-      rw [← h1]
-      rw [← crAnTimeOrderList]
+      rw [← h1, ← crAnTimeOrderList]
       by_cases hq : (𝓕 |>ₛ φ) ≠ (𝓕 |>ₛ ψ)
       · rw [ι_superCommuteF_of_diff_statistic hq]
         simp
       · rw [crAnTimeOrderSign, Wick.koszulSign_eq_rel_eq_stat _ _, ← crAnTimeOrderSign]
-        rw [← ofCrAnListF_append]
-        rw [timeOrderF_ofCrAnListF]
+        rw [← ofCrAnListF_append, timeOrderF_ofCrAnListF]
         simp only [map_smul, Algebra.mul_smul_comm]
         exact hφψ
         exact hψφ
@@ -426,8 +423,7 @@ noncomputable def timeOrder : WickAlgebra 𝓕 →ₗ[ℂ] WickAlgebra 𝓕 wher
     obtain ⟨x, hx⟩ := ι_surjective x
     obtain ⟨y, hy⟩ := ι_surjective y
     subst hx hy
-    rw [← map_add, ι_apply, ι_apply, ι_apply]
-    rw [Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
+    rw [← map_add, ι_apply, ι_apply, ι_apply, Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
     simp
   map_smul' c y := by
     obtain ⟨y, hy⟩ := ι_surjective y
@@ -492,12 +488,10 @@ lemma timeOrder_superCommute_eq_time_mid {φ ψ : 𝓕.CrAnFieldOp}
     (hφψ : crAnTimeOrderRel φ ψ) (hψφ : crAnTimeOrderRel ψ φ) (a b : 𝓕.WickAlgebra) :
     𝓣(a * [ofCrAnOp φ, ofCrAnOp ψ]ₛ * b) =
     [ofCrAnOp φ, ofCrAnOp ψ]ₛ * 𝓣(a * b) := by
-  rw [ofCrAnOp, ofCrAnOp]
-  rw [superCommute_eq_ι_superCommuteF]
+  rw [ofCrAnOp, ofCrAnOp, superCommute_eq_ι_superCommuteF]
   obtain ⟨a, rfl⟩ := ι_surjective a
   obtain ⟨b, rfl⟩ := ι_surjective b
-  rw [← map_mul, ← map_mul, timeOrder_eq_ι_timeOrderF]
-  rw [ι_timeOrderF_superCommuteF_eq_time]
+  rw [← map_mul, ← map_mul, timeOrder_eq_ι_timeOrderF, ι_timeOrderF_superCommuteF_eq_time]
   rfl
   · simp_all
   · simp_all
@@ -514,9 +508,7 @@ lemma timeOrder_superCommute_eq_time_left {φ ψ : 𝓕.CrAnFieldOp}
 lemma timeOrder_superCommute_ne_time {φ ψ : 𝓕.CrAnFieldOp}
     (hφψ : ¬ (crAnTimeOrderRel φ ψ ∧ crAnTimeOrderRel ψ φ)) :
     𝓣([ofCrAnOp φ, ofCrAnOp ψ]ₛ) = 0 := by
-  rw [ofCrAnOp, ofCrAnOp]
-  rw [superCommute_eq_ι_superCommuteF]
-  rw [timeOrder_eq_ι_timeOrderF]
+  rw [ofCrAnOp, ofCrAnOp, superCommute_eq_ι_superCommuteF, timeOrder_eq_ι_timeOrderF]
   trans ι (timeOrderF (1 * (superCommuteF (ofCrAnOpF φ)) (ofCrAnOpF ψ) * 1))
   simp only [one_mul, mul_one]
   rw [ι_timeOrderF_superCommuteF_ne_time]
