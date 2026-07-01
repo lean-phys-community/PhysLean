@@ -187,8 +187,7 @@ lemma ofCliffordAlgebra_range_eq_top : ofCliffordAlgebra.range = ⊤ := by
 
 /-- The homomorphism `ofCliffordAlgebra` is surjective. -/
 theorem ofCliffordAlgebra_surjective : Function.Surjective ofCliffordAlgebra := by
-  rw [← AlgHom.range_eq_top]
-  exact ofCliffordAlgebra_range_eq_top
+  simpa [← AlgHom.range_eq_top] using ofCliffordAlgebra_range_eq_top
 
 end γ
 

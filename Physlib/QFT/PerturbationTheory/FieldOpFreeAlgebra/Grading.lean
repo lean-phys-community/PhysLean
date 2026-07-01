@@ -279,8 +279,7 @@ instance fieldOpFreeAlgebraGrade :
         cases f1 <;> cases f2 <;> rfl
       · simp [p]
       · intro x y hx hy hx1 hx2
-        simp only [add_mul, p]
-        exact Submodule.add_mem _ hx1 hx2
+        simpa only [add_mul, p] using Submodule.add_mem _ hx1 hx2
       · intro c a hx h1
         simp only [Algebra.smul_mul_assoc, p]
         exact Submodule.smul_mem _ _ h1

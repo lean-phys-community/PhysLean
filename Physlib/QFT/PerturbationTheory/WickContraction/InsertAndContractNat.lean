@@ -44,8 +44,7 @@ def insertAndContractNat (c : WickContraction n) (i : Fin n.succ) (j : Option (c
         forall_exists_index, and_imp, forall_apply_eq_imp_iff₂, f]
       intro a ha
       rw [Finset.mapEmbedding_apply]
-      simp only [Finset.card_map]
-      exact c.2.1 a ha
+      simpa only [Finset.card_map] using c.2.1 a ha
     | some j =>
       simp only [Finset.mem_insert, forall_eq_or_imp]
       apply And.intro

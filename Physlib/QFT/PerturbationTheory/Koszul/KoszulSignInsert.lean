@@ -258,8 +258,7 @@ lemma koszulSignInsert_eq_rel_eq_stat {ψ φ : 𝓕} [IsTrans 𝓕 le]
     · simp only [hr, ↓reduceIte]
       have h1' : le ψ φ' := by
         apply IsTrans.trans ψ φ φ' h2 hr
-      simp only [h1', ↓reduceIte]
-      exact koszulSignInsert_eq_rel_eq_stat h1 h2 hq φs
+      simpa only [h1', ↓reduceIte] using koszulSignInsert_eq_rel_eq_stat h1 h2 hq φs
     · have hψφ' : ¬ le ψ φ' := by
         intro hψφ'
         apply hr

@@ -68,8 +68,7 @@ def universalLift {A : Type} [Semiring A] [Algebra ℂ A] (f : 𝓕.CrAnFieldOp 
   commutes' r := by
     rw [Algebra.algebraMap_eq_smul_one r]
     rw [show r • 1 = ι (𝓕 := 𝓕) (r • 1) from rfl, universalLiftMap_ι]
-    simp only [map_smul, map_one]
-    exact Eq.symm (Algebra.algebraMap_eq_smul_one r)
+    simpa only [map_smul, map_one] using Eq.symm (Algebra.algebraMap_eq_smul_one r)
 
 @[simp]
 lemma universalLift_ι {A : Type} [Semiring A] [Algebra ℂ A] (f : 𝓕.CrAnFieldOp → A)

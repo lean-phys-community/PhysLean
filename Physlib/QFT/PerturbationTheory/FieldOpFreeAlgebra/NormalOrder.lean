@@ -167,8 +167,7 @@ lemma normalOrderF_crPartF_mul (φ : 𝓕.FieldOp) (a : FieldOpFreeAlgebra 𝓕)
     crPartF φ * 𝓝ᶠ(a) := by
   match φ with
   | .inAsymp φ =>
-    rw [crPartF]
-    exact normalOrderF_create_mul ⟨FieldOp.inAsymp φ, ()⟩ rfl a
+    simpa [crPartF] using normalOrderF_create_mul ⟨FieldOp.inAsymp φ, ()⟩ rfl a
   | .position φ =>
     rw [crPartF]
     exact normalOrderF_create_mul _ rfl _

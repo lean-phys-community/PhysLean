@@ -78,8 +78,7 @@ def consAddContract (i : Fin n.succ) (c : WickContraction n) :
     rcases h with h | h
     · obtain ⟨a, ha, rfl⟩ := h
       rw [Finset.mapEmbedding_apply, Finset.mapEmbedding_apply]
-      simp only [Finset.card_map]
-      exact c.2.1 a ha
+      simpa only [Finset.card_map] using c.2.1 a ha
     · subst h
       rw [@Finset.card_eq_two]
       use 0, i.succ

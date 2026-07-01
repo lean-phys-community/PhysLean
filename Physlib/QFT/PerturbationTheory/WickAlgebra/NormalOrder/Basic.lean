@@ -83,8 +83,7 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnOpF_eq_zero_mul (φa φa' : 𝓕.CrAnF
     simp only [mulLinearMap, FieldOpFreeAlgebra.ofListBasis_eq_ofList, LinearMap.coe_comp,
       Function.comp_apply, LinearMap.flip_apply, LinearMap.coe_mk, AddHom.coe_mk,
       AlgHom.toLinearMap_apply, LinearMap.zero_apply]
-    rw [← mul_assoc]
-    exact ι_normalOrderF_superCommuteF_ofCrAnListF_eq_zero φa φa' _ _
+    simpa [← mul_assoc] using ι_normalOrderF_superCommuteF_ofCrAnListF_eq_zero φa φa' _ _
   rw [hf]
   simp
 

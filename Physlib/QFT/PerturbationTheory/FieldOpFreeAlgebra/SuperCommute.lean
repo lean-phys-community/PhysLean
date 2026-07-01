@@ -515,8 +515,7 @@ lemma superCommuteF_grade {a b : 𝓕.FieldOpFreeAlgebra} {f1 f2 : FieldStatisti
         rw [mul_comm]
     · simp [p]
     · intro x y hx hy hp1 hp2
-      simp only [add_eq_mul, map_add, LinearMap.add_apply, p]
-      exact Submodule.add_mem _ hp1 hp2
+      simpa only [add_eq_mul, map_add, LinearMap.add_apply, p] using Submodule.add_mem _ hp1 hp2
     · intro c x hx hp1
       simp only [add_eq_mul, map_smul, LinearMap.smul_apply, p]
       exact Submodule.smul_mem _ c hp1

@@ -52,8 +52,7 @@ def toRotation {d} (Λ : LorentzGroup.restricted d) : Rotations d :=
     erw [generalizedBoost_apply_fst]
     simp
   · refine isProper_mul ?_ Λ.2.1
-    rw [generalizedBoost_inv]
-    exact generalizedBoost_isProper _ _⟩
+    simpa [generalizedBoost_inv] using generalizedBoost_isProper _ _⟩
 
 @[fun_prop]
 lemma toRotation_continuous {d} :

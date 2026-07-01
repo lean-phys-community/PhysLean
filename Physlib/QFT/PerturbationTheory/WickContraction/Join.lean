@@ -41,8 +41,7 @@ def join {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     · exact φsΛ.2.1 a ha
     · obtain ⟨a, ha, rfl⟩ := ha
       rw [Finset.mapEmbedding_apply]
-      simp only [Finset.card_map]
-      exact φsucΛ.2.1 a ha, by
+      simpa only [Finset.card_map] using φsucΛ.2.1 a ha, by
     intro a ha b hb
     simp only [Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
       RelEmbedding.coe_toEmbedding] at ha hb

@@ -268,8 +268,7 @@ lemma koszulSign_swap_eq_rel_cons {ψ φ : 𝓕}
 lemma koszulSign_swap_eq_rel {ψ φ : 𝓕} (h1 : le φ ψ) (h2 : le ψ φ) : (φs φs' : List 𝓕) →
     koszulSign q le (φs ++ φ :: ψ :: φs') = koszulSign q le (φs ++ ψ :: φ :: φs')
   | [], φs' => by
-    simp only [List.nil_append]
-    exact koszulSign_swap_eq_rel_cons q le h1 h2 φs'
+    simpa only [List.nil_append] using koszulSign_swap_eq_rel_cons q le h1 h2 φs'
   | φ'' :: φs, φs' => by
     simp only [List.cons_append, koszulSign]
     rw [koszulSign_swap_eq_rel h1 h2]

@@ -369,8 +369,7 @@ lemma stat_ofFinset_of_insertAndContractLiftFinset (φ : 𝓕.FieldOp) (φs : Li
       intro x hx
       refine Fin.ne_of_val_ne ?h.inl.h
       simp only [Fin.val_cast, ne_eq]
-      rw [Fin.val_eq_val]
-      exact Fin.succAbove_ne i x
+      exact fun h => Fin.succAbove_ne i x (Fin.ext h)
     · obtain ⟨k, hk⟩ := hk
       subst hk
       simp only [Nat.succ_eq_add_one]

@@ -388,8 +388,7 @@ lemma eraseIdxEquiv_symm_eq_take_cons_drop {n : ℕ} (φs : List 𝓕.FieldOp) (
   simp only [congr_fst]
   have hn : (List.take n φs).length = n := by
     rw [@List.length_take]
-    simp only [inf_eq_left]
-    exact Nat.le_of_succ_le hn
+    simpa only [inf_eq_left] using Nat.le_of_succ_le hn
   rw [hn]
 
 @[simp]
