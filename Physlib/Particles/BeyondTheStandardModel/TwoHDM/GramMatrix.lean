@@ -181,8 +181,7 @@ lemma mem_orbit_gaugeGroupI_iff_gramMatrix (H1 H2 : TwoHiggsDoublet) :
     obtain ⟨g1, H1_Φ1, H1_Φ2⟩ := gaugeGroupI_exists_fst_eq_snd_eq (H := H1) Φ1_zero
     have Φ2_nezero : H2.Φ1 ≠ 0 := by
       intro hzero
-      have hnorm : ‖H1.Φ1‖ = ‖H2.Φ1‖ := by
-        rw [← eq_fst_norm_of_eq_gramMatrix h]
+      have hnorm : ‖H1.Φ1‖ = ‖H2.Φ1‖ := by rw [← eq_fst_norm_of_eq_gramMatrix h]
       simp [hzero] at hnorm
       simp [hnorm] at Φ1_zero
     obtain ⟨g2, H2_Φ1, H2_Φ2⟩ := gaugeGroupI_exists_fst_eq_snd_eq (H := H2) Φ2_nezero

@@ -875,8 +875,7 @@ private lemma compound_top_singular_le_posDef
             c ^ (2 * r) = c ^ (r + r) := by ring_nf
             _ = c ^ r * c ^ r := by rw [Real.rpow_add hc_pos]
             _ = (c ^ r) ^ 2 := by ring
-        have hinv : (c⁻¹) ^ r = (c ^ r)⁻¹ := by
-          rw [Real.inv_rpow hc_nonneg]
+        have hinv : (c⁻¹) ^ r = (c ^ r)⁻¹ := by rw [Real.inv_rpow hc_nonneg]
         calc
           c ^ (2 * r) * ((c⁻¹) ^ r) ^ 2 = (c ^ r) ^ 2 * ((c ^ r)⁻¹) ^ 2 := by
             rw [hpow, hinv]

@@ -1112,8 +1112,7 @@ private lemma distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv
   calc
     (∇ᵈ ⬝ (distOfFunction (fun x : Space d => ‖x‖ ^ q • basis.repr x)
       (IsDistBounded.zpow_smul_repr_self q (by omega)))) η
-        = - ∫ x, F x := by
-            rw [distDiv_ofFunction]
+        = - ∫ x, F x := by rw [distDiv_ofFunction]
     _ = - ∫ r, F (r.2.1 • r.1.1)
         ∂(volume (α := Space d).toSphere.prod
           (Measure.volumeIoiPow (Module.finrank ℝ (Space d) - 1))) := by

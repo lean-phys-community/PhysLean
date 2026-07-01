@@ -60,8 +60,7 @@ lemma radial_jacobian_zpow_mul_self
     r ^ (d - 1) * (r ^ q * r)
         = r ^ (d - 1: ℤ) * (r ^ q * r ^ (1 : ℤ)) := by
             rw [← zpow_natCast, zpow_one, ← Nat.cast_pred (Nat.pos_of_neZero d)]
-    _ = r ^ ((d - 1: ℤ) + (q + 1)) := by
-            rw [← zpow_add₀ hz q 1, ← zpow_add₀ hz (d - 1: ℤ) (q + 1)]
+    _ = r ^ ((d - 1: ℤ) + (q + 1)) := by rw [← zpow_add₀ hz q 1, ← zpow_add₀ hz (d - 1: ℤ) (q + 1)]
     _ = r ^ (p : ℤ) := by
             congr 1; omega
     _ = r ^ p := by rw [zpow_natCast]
