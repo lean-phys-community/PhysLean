@@ -167,12 +167,10 @@ theorem one_div_operatorAntitoneOn_Ioi :
   let f : ℝ → ℝ := fun x ↦ x
   have hA_sa : IsSelfAdjoint A := IsSelfAdjoint.of_nonneg A_nonneg
   have hB_sa : IsSelfAdjoint B := IsSelfAdjoint.of_nonneg B_nonneg
-  have hA_ne0 : ∀ x ∈ spectrum ℝ A, f x ≠ 0 := by
-    intro x hx
-    exact ne_of_gt (As hx)
-  have hB_ne0 : ∀ x ∈ spectrum ℝ B, f x ≠ 0 := by
-    intro x hx
-    exact ne_of_gt (Bs hx)
+  have hA_ne0 : ∀ x ∈ spectrum ℝ A, f x ≠ 0 :=
+    fun _ hx => ne_of_gt (As hx)
+  have hB_ne0 : ∀ x ∈ spectrum ℝ B, f x ≠ 0 :=
+    fun _ hx => ne_of_gt (Bs hx)
   let uA : (𝓐)ˣ :=
     cfcUnits (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) f A hA_ne0 (ha := hA_sa)
   let uB : (𝓐)ˣ :=
@@ -444,12 +442,10 @@ theorem one_div_add_t_operatorAntitoneOn_Ici : ∀ (t : ℝ), 0 < t →
   let f : ℝ → ℝ := fun x => x + t
   have hA_sa : IsSelfAdjoint A := IsSelfAdjoint.of_nonneg A_nonneg
   have hB_sa : IsSelfAdjoint B := IsSelfAdjoint.of_nonneg B_nonneg
-  have hA_ne0 : ∀ x ∈ spectrum ℝ A, f x ≠ 0 := by
-    intro x hx
-    exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using As hx) ht)
-  have hB_ne0 : ∀ x ∈ spectrum ℝ B, f x ≠ 0 := by
-    intro x hx
-    exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Bs hx) ht)
+  have hA_ne0 : ∀ x ∈ spectrum ℝ A, f x ≠ 0 :=
+    fun _ hx => ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using As hx) ht)
+  have hB_ne0 : ∀ x ∈ spectrum ℝ B, f x ≠ 0 :=
+    fun _ hx => ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Bs hx) ht)
   let uA : (𝓐)ˣ :=
     cfcUnits (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) f A hA_ne0 (ha := hA_sa)
   let uB : (𝓐)ˣ :=

@@ -110,11 +110,8 @@ lemma polynomial_tanh_bounded (P : Polynomial ℝ) :
     ∃ C : ℝ, ∀ x : ℝ, |P.eval (Real.tanh x)| ≤ C := by
   -- Since tanh maps to (-1, 1), it maps to [-1+ε, 1-ε] for any ε > 0
   -- But more directly, tanh maps to (-1, 1) ⊆ [-1, 1]
-  have h_range : ∀ x : ℝ, Real.tanh x ∈ Set.Icc (-1) 1 := by
-    intro x
-    constructor
-    · exact le_of_lt (neg_one_lt_tanh x)
-    · exact le_of_lt (tanh_lt_one x)
+  have h_range : ∀ x : ℝ, Real.tanh x ∈ Set.Icc (-1) 1 :=
+    fun x => ⟨le_of_lt (neg_one_lt_tanh x), le_of_lt (tanh_lt_one x)⟩
   -- Apply polynomial boundedness on [-1, 1]
   obtain ⟨M, hM⟩ := polynomial_bounded_on_interval P (-1) 1
   use M
