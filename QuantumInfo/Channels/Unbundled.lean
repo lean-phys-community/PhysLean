@@ -356,8 +356,8 @@ theorem comp [DecidableEq B] {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (
 /-- The identity MatrixMap IsCompletelyPositive. -/
 @[simp]
 theorem id : (id A R).IsCompletelyPositive := by
-  intro n _ h
-  simpa [show LinearMap.id = MatrixMap.id (Fin n) R from rfl, kron_id_id] using h
+  intro n ρ h
+  rwa [show LinearMap.id = MatrixMap.id (Fin n) R from rfl, kron_id_id]
 
 /-- Sums of IsCompletelyPositive maps are IsCompletelyPositive. -/
 theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsCompletelyPositive) (h₂ : M₂.IsCompletelyPositive) :
@@ -368,9 +368,8 @@ theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsCompletelyPositive) (h�
 /-- Nonnegative scalings of `IsCompletelyPositive` maps are `IsCompletelyPositive`. -/
 theorem smul {M : MatrixMap A B R} (hM : M.IsCompletelyPositive) {x : R} (hx : 0 ≤ x) :
     (x • M).IsCompletelyPositive :=
-  fun n ρ h ↦ by
-    rw [MatrixMap.smul_kron]
-    exact (hM n h).smul hx
+  fun n _ h ↦ by
+    simpa only [smul_kron, LinearMap.smul_apply] using (hM n h).smul hx
 
 variable (A B) in
 /-- The zero map `IsCompletelyPositive`. -/
@@ -479,9 +478,7 @@ omit [DecidableEq A] in
 theorem of_kraus_isPositive (K : κ → Matrix B A ℂ) :
     (of_kraus K K).IsPositive := by
   rw [of_kraus]
-  apply IsPositive_sum
-  intro k
-  exact conj_isPositive (K k)
+  exact IsPositive_sum _ fun k => conj_isPositive (K k)
 
 theorem conj_kron (M : Matrix B A 𝕜) (N : Matrix D C 𝕜) [DecidableEq C] :
     conj M ⊗ₖₘ conj N = conj (M ⊗ₖ N) := by
@@ -549,14 +546,11 @@ theorem of_kraus_eq_sum_conj (K : κ → Matrix B A 𝕜) :
 
 theorem of_kraus_CP (K : κ → Matrix B A 𝕜) : (of_kraus K K).IsCompletelyPositive := by
   -- By definition of `MatrixMap.of_kraus`, we know that it is a sum of congruence maps.
-  have h_sum_congruence : MatrixMap.of_kraus K K = ∑ k, conj (K k) := by
-    -- By definition of `MatrixMap.of_kraus`, we know that it is equal to the sum of the congruence maps of each Kraus operator.
-    apply of_kraus_eq_sum_conj
-  have h_congruence_CP : ∀ k, (conj (K k)).IsCompletelyPositive := by
-    intro k; exact (by
-    convert congruence_CP ( K k ) using 1;
-    -- Since B is a finite type, we can use the fact that finite types have decidable equality.
-    apply Classical.decEq);
+  have h_sum_congruence : MatrixMap.of_kraus K K = ∑ k, conj (K k) :=
+    of_kraus_eq_sum_conj K
+  have h_congruence_CP : ∀ k, (conj (K k)).IsCompletelyPositive := fun k => by
+    convert congruence_CP (K k) using 1
+    exact Classical.decEq _
   exact h_sum_congruence.symm ▸ IsCompletelyPositive.finset_sum h_congruence_CP
 
 theorem exists_kraus_of_choi_PSD
@@ -595,8 +589,7 @@ theorem choi_PSD_iff_CP_map (M : MatrixMap A B R) :
     exact this ( Matrix.PosSemidef.outer_self_conj _ )
   · intro h_psd
     obtain ⟨K, hK⟩ := exists_kraus_of_choi_PSD M.choi_matrix h_psd
-    rw [choi_matrix_inj hK]
-    exact of_kraus_CP K
+    exact (choi_matrix_inj hK) ▸ of_kraus_CP K
 
 omit [Fintype B] [DecidableEq A] in
 theorem conj_eq_mulRightLinearMap_comp_mulRightLinearMap (y : Matrix B A R) :
