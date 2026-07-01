@@ -178,8 +178,7 @@ private lemma exp_decay_smul_velocity
     ∂ₜ (fun t : Time => exp (-a * t.val) • y t) =
       fun t : Time => exp (-a * t.val) • (∂ₜ y t - a • y t) := by
   funext t
-  rw [Time.deriv]
-  rw [fderiv_fun_smul (by fun_prop) (hy t)]
+  rw [Time.deriv, fderiv_fun_smul (by fun_prop) (hy t)]
   rw [fderiv_exp (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [add_apply, ContinuousLinearMap.smulRight_apply,
     fderiv_fun_neg, fderiv_fun_const, Pi.zero_apply, Time.fderiv_val,
@@ -197,8 +196,7 @@ private lemma exp_decay_smul_acceleration
         (μ • y t - (2 * a) • ∂ₜ y t + a^2 • y t) := by
   rw [exp_decay_smul_velocity a y hy]
   funext t
-  rw [Time.deriv]
-  rw [fderiv_fun_smul (by fun_prop) (by fun_prop)]
+  rw [Time.deriv, fderiv_fun_smul (by fun_prop) (by fun_prop)]
   rw [fderiv_exp (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
   rw [fderiv_fun_sub (hdy t) (by fun_prop)]
   rw [fderiv_fun_const_smul (hy t)]

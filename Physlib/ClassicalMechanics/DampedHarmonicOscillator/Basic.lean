@@ -269,8 +269,7 @@ lemma decayRate_nonneg : 0 ≤ S.decayRate := by
 
 /-- An undamped oscillator lies in the underdamped regime. -/
 lemma isUnderdamped_of_gamma_eq_zero (hγ : S.γ = 0) : S.IsUnderdamped := by
-  rw [IsUnderdamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq S, decayRate]
-  rw [hγ]
+  rw [IsUnderdamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq S, decayRate, hγ]
   ring_nf
   nlinarith [sq_pos_of_pos S.m_pos, sq_pos_of_pos S.ω_pos]
 
@@ -285,8 +284,7 @@ lemma isUnderdamped_decayRate (hS : S.IsUnderdamped) : S.decayRate < S.ω := by
 
 /-- A critically damped system has decay rate equal to the natural frequency. -/
 lemma isCriticallyDamped_decayRate (hS : S.IsCriticallyDamped) : S.ω = S.decayRate := by
-  rw [IsCriticallyDamped] at hS
-  rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
+  rw [IsCriticallyDamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
   have hm_sq_ne_zero : 4 * S.m^2 ≠ 0 := by
     have hm_sq_pos : 0 < 4 * S.m^2 := by
       have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
@@ -317,8 +315,7 @@ lemma k_eq_m_mul_decayRate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
 
 /-- An overdamped system has decay rate greater than the natural frequency. -/
 lemma isOverdamped_decayRate (hS : S.IsOverdamped) : S.ω < S.decayRate := by
-  rw [IsOverdamped] at hS
-  rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
+  rw [IsOverdamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
   have hm_sq_pos : 0 < 4 * S.m^2 := by
     have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
     nlinarith
