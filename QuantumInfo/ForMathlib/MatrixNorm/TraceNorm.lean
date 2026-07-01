@@ -285,8 +285,7 @@ theorem singularValues_le_opNorm [DecidableEq n] (A : Matrix n n ℂ) (i : n) :
   let hH : (Aᴴ * A).IsHermitian := by
     simpa using (Matrix.isHermitian_mul_conjTranspose_self A.conjTranspose)
   have hmem : hH.eigenvalues i ∈ spectrum ℝ (Aᴴ * A) := by
-    rw [hH.spectrum_real_eq_range_eigenvalues]
-    exact ⟨i, rfl⟩
+    simp [hH.spectrum_real_eq_range_eigenvalues]
   have hsq : singularValues A i * singularValues A i ≤ ‖A‖ * ‖A‖ := by
     have hsv_sq : singularValues A i * singularValues A i = hH.eigenvalues i := by
       dsimp [singularValues]

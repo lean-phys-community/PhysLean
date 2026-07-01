@@ -166,8 +166,8 @@ decreasing at that time. -/
 lemma energy_not_conserved (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time)
     (h1 : S.EquationOfMotion xₜ) (hx : ContDiff ℝ ∞ xₜ) (hdx : ∂ₜ xₜ t ≠ 0) (hγ : 0 < S.γ) :
     ∂ₜ (S.energy xₜ) t < 0 := by
-  rw [energy_dissipation_rate S xₜ t h1 hx, neg_mul]
-  exact neg_neg_of_pos (mul_pos hγ (real_inner_self_pos.mpr hdx))
+  simpa [energy_dissipation_rate S xₜ t h1 hx, neg_mul] using
+    neg_neg_of_pos (mul_pos hγ (real_inner_self_pos.mpr hdx))
 
 /-!
 ## C. Newton's second law

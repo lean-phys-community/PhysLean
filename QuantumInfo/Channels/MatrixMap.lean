@@ -163,8 +163,7 @@ theorem exists_kraus (Φ : MatrixMap A B R) :
           (M₀ ∘ e) x * Matrix.single i₁ i₂ (1 : R) * ((N₀ ∘ e) x).conjTranspose) j₁ j₂
         =
       ∑ y : K, (M₀ y * Matrix.single i₁ i₂ (1 : R) * (N₀ y).conjTranspose) j₁ j₂ := by
-    rw [Matrix.sum_apply]
-    exact e.sum_comp
+    simpa [Matrix.sum_apply] using e.sum_comp
       (fun y : K => (M₀ y * Matrix.single i₁ i₂ (1 : R) * (N₀ y).conjTranspose) j₁ j₂)
   rw [hsum_reindex, Fintype.sum_prod_type, Fintype.sum_prod_type, Fintype.sum_prod_type]
   simp [M₀, N₀, Matrix.mul_apply, Matrix.single, ite_and]

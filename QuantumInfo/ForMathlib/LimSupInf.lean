@@ -265,8 +265,7 @@ lemma tendsto_of_block_sequence {α : Type*} [TopologicalSpace α] {x : ℕ → 
   obtain ⟨k, hk⟩ : ∃ k, T k ≤ n ∧ n < T (k + 1) := by
     -- Since $T$ is strictly increasing, the set $\{k \mid T k \leq n\}$ is finite and non-empty.
     have h_finite : Set.Finite {k | T k ≤ n} := by
-      rw [Set.finite_iff_bddAbove]
-      exact ⟨_, (hT.id_le · |>.trans)⟩
+      exact Set.finite_iff_bddAbove.mpr ⟨_, (hT.id_le · |>.trans)⟩
     use h_finite.toFinset.max' ⟨a, h_finite.mem_toFinset.mpr hn⟩
     constructor
     · exact h_finite.mem_toFinset.mp (Finset.max'_mem _ _)
