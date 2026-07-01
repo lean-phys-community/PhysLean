@@ -25,17 +25,14 @@ open Vector
 def toVector {d : ℕ} (Λ : LorentzGroup d) : Lorentz.Vector d := Λ • basis (Sum.inl 0)
 
 lemma toVector_mul {d : ℕ} (Λ₁ Λ₂ : LorentzGroup d) :
-    toVector (Λ₁ * Λ₂) = Λ₁ • toVector Λ₂ := by
-  rw [toVector, toVector, smul_smul]
+    toVector (Λ₁ * Λ₂) = Λ₁ • toVector Λ₂ := by rw [toVector, toVector, smul_smul]
 
 lemma toVector_neg {d : ℕ} (Λ : LorentzGroup d) :
-    toVector (-Λ) = -toVector Λ := by
-  simp [toVector, neg_smul]
+    toVector (-Λ) = -toVector Λ := by simp [toVector, neg_smul]
 
 @[simp]
 lemma toVector_apply {d : ℕ} (Λ : LorentzGroup d)
-    (i : Fin 1 ⊕ Fin d) : (toVector Λ) i = Λ.1 i (Sum.inl 0) := by
-  simp [toVector, smul_eq_sum]
+    (i : Fin 1 ⊕ Fin d) : (toVector Λ) i = Λ.1 i (Sum.inl 0) := by simp [toVector, smul_eq_sum]
 
 lemma toVector_eq_fun {d : ℕ} (Λ : LorentzGroup d) :
     toVector Λ = (fun i => Λ.1 i (Sum.inl 0)) := by
@@ -54,13 +51,11 @@ lemma toVector_continuous {d : ℕ} : Continuous (toVector (d := d)) := by
   fun_prop
 
 lemma toVector_timeComponent {d : ℕ} (Λ : LorentzGroup d) :
-    (toVector Λ).timeComponent = Λ.1 (Sum.inl 0) (Sum.inl 0) := by
-  simp
+    (toVector Λ).timeComponent = Λ.1 (Sum.inl 0) (Sum.inl 0) := by simp
 
 @[simp]
 lemma toVector_minkowskiProduct_self {d : ℕ} (Λ : LorentzGroup d) :
-    ⟪toVector Λ, toVector Λ⟫ₘ = 1 := by
-  simp [toVector, minkowskiMatrix.inl_0_inl_0]
+    ⟪toVector Λ, toVector Λ⟫ₘ = 1 := by simp [toVector, minkowskiMatrix.inl_0_inl_0]
 
 lemma one_le_abs_timeComponent {d : ℕ} (Λ : LorentzGroup d) :
     1 ≤ |Λ.1 (Sum.inl 0) (Sum.inl 0)| := by
