@@ -42,18 +42,15 @@ def leftDualBi : LeftHandedWeyl →ₗ[ℂ] DualLeftHandedWeyl →ₗ[ℂ] ℂ w
       rw [dotProduct_add]
     map_smul' := by
       intro r φ
-      simp only [LinearEquiv.map_smul]
-      rw [dotProduct_smul]
-      rfl}
+      simp only [LinearEquiv.map_smul, dotProduct_smul, RingHom.id_apply]}
   map_add' ψ ψ':= by
     refine LinearMap.ext (fun φ => ?_)
     simp only [map_add, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
     rw [add_dotProduct]
   map_smul' r ψ := by
     refine LinearMap.ext (fun φ => ?_)
-    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk]
-    rw [smul_dotProduct]
-    rfl
+    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk, smul_dotProduct,
+      LinearMap.smul_apply, RingHom.id_apply]
 
 /-- The bi-linear map corresponding to contraction of a dual-left-handed Weyl fermion with a
   left-handed Weyl fermion. -/
@@ -66,9 +63,7 @@ def dualLeftBi : DualLeftHandedWeyl →ₗ[ℂ] LeftHandedWeyl →ₗ[ℂ] ℂ w
       rw [dotProduct_add]
     map_smul' := by
       intro r φ
-      simp only [LinearEquiv.map_smul]
-      rw [dotProduct_smul]
-      rfl}
+      simp only [LinearEquiv.map_smul, dotProduct_smul, RingHom.id_apply]}
   map_add' ψ ψ':= by
     refine LinearMap.ext (fun φ => ?_)
     simp only [map_add, add_dotProduct, vec2_dotProduct, Fin.isValue, LinearMap.coe_mk,
@@ -89,18 +84,15 @@ def rightDualBi : RightHandedWeyl →ₗ[ℂ] DualRightHandedWeyl →ₗ[ℂ] �
       rw [dotProduct_add]
     map_smul' := by
       intro r φ
-      simp only [LinearEquiv.map_smul]
-      rw [dotProduct_smul]
-      rfl}
+      simp only [LinearEquiv.map_smul, dotProduct_smul, RingHom.id_apply]}
   map_add' ψ ψ':= by
     refine LinearMap.ext (fun φ => ?_)
     simp only [map_add, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
     rw [add_dotProduct]
   map_smul' r ψ := by
     refine LinearMap.ext (fun φ => ?_)
-    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk]
-    rw [smul_dotProduct]
-    rfl
+    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk, smul_dotProduct,
+      LinearMap.smul_apply, RingHom.id_apply]
 
 /-- The bi-linear map corresponding to contraction of a dual-right-handed Weyl fermion with a
   right-handed Weyl fermion. -/
@@ -113,9 +105,7 @@ def dualRightBi : DualRightHandedWeyl →ₗ[ℂ] RightHandedWeyl →ₗ[ℂ] �
       rw [dotProduct_add]
     map_smul' := by
       intro r φ
-      simp only [LinearEquiv.map_smul]
-      rw [dotProduct_smul]
-      rfl}
+      simp only [LinearEquiv.map_smul, dotProduct_smul, RingHom.id_apply]}
   map_add' ψ ψ':= by
     refine LinearMap.ext (fun φ => ?_)
     simp only [map_add, add_dotProduct, vec2_dotProduct, Fin.isValue, LinearMap.coe_mk,

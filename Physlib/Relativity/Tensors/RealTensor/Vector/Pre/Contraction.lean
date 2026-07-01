@@ -38,18 +38,15 @@ def contrModCoModBi (d : ℕ) : ContrMod d →ₗ[ℝ] CoMod d →ₗ[ℝ] ℝ w
       rw [dotProduct_add]
     map_smul' := by
       intro r φ
-      simp only [LinearEquiv.map_smul]
-      rw [dotProduct_smul]
-      rfl}
+      simp only [LinearEquiv.map_smul, dotProduct_smul, RingHom.id_apply]}
   map_add' ψ ψ':= by
     refine LinearMap.ext (fun φ => ?_)
     simp only [map_add, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
     rw [add_dotProduct]
   map_smul' r ψ := by
     refine LinearMap.ext (fun φ => ?_)
-    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk]
-    rw [smul_dotProduct]
-    rfl
+    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk, smul_dotProduct,
+      LinearMap.smul_apply, RingHom.id_apply]
 
 /-- The bi-linear map corresponding to contraction of a covariant Lorentz vector with a
   contravariant Lorentz vector. -/
@@ -62,18 +59,15 @@ def coModContrModBi (d : ℕ) : CoMod d →ₗ[ℝ] ContrMod d →ₗ[ℝ] ℝ w
       rw [dotProduct_add]
     map_smul' := by
       intro r ψ
-      simp only [LinearEquiv.map_smul]
-      rw [dotProduct_smul]
-      rfl}
+      simp only [LinearEquiv.map_smul, dotProduct_smul, RingHom.id_apply]}
   map_add' φ φ' := by
     refine LinearMap.ext (fun ψ => ?_)
     simp only [map_add, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
     rw [add_dotProduct]
   map_smul' r φ := by
     refine LinearMap.ext (fun ψ => ?_)
-    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk]
-    rw [smul_dotProduct]
-    rfl
+    simp only [LinearEquiv.map_smul, LinearMap.coe_mk, AddHom.coe_mk, smul_dotProduct,
+      LinearMap.smul_apply, RingHom.id_apply]
 
 /-- The linear map from Contr d ⊗ Co d to ℝ given by
     summing over components of contravariant Lorentz vector and
