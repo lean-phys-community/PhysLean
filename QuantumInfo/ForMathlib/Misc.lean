@@ -181,6 +181,6 @@ lemma exists_equiv_of_multiset_map_eq {α β γ : Type*} [Fintype α] [Fintype �
       rw [ Multiset.map_map ]
     exact h.trans h_multiset_eq;
   -- By `Multiset.map_univ_eq_iff`, there exists `e' : α ≃ α` such that `f = (g ∘ σ) ∘ e'`.
-  obtain ⟨e', he'⟩ : ∃ e' : α ≃ α, f = (g ∘ σ) ∘ e' := by
-    exact (Multiset.map_univ_eq_iff f (g ∘ ⇑σ)).mp hσ;
+  obtain ⟨e', he'⟩ : ∃ e' : α ≃ α, f = (g ∘ σ) ∘ e' :=
+    (Multiset.map_univ_eq_iff f (g ∘ ⇑σ)).mp hσ
   exact ⟨ e'.trans σ, by simp_all [ Function.comp ]; grind⟩

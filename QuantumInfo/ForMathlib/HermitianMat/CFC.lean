@@ -521,8 +521,9 @@ lemma continuousOn_cfc_of_compact {K : Set ℝ} {g : ℝ → ℝ} (hK : IsCompac
   obtain ⟨p_n, hp_n⟩ : ∃ p_n : ℕ → Polynomial ℝ, (∀ n, ∀ x ∈ K, |(p_n n).eval x - g x| ≤ 1 / (n + 1)) := by
     have h_stone_weierstrass : ∀ ε > 0, ∃ p : Polynomial ℝ, ∀ x ∈ K, |p.eval x - g x| < ε := by
       have := @exists_polynomial_near_of_continuousOn;
-      obtain ⟨a, b, hab⟩ : ∃ a b : ℝ, K ⊆ Set.Icc a b := by
-        exact ⟨ hK.bddBelow.some, hK.bddAbove.some, fun x hx => ⟨ hK.bddBelow.choose_spec hx, hK.bddAbove.choose_spec hx ⟩ ⟩;
+      obtain ⟨a, b, hab⟩ : ∃ a b : ℝ, K ⊆ Set.Icc a b :=
+        ⟨hK.bddBelow.some, hK.bddAbove.some,
+          fun x hx => ⟨hK.bddBelow.choose_spec hx, hK.bddAbove.choose_spec hx⟩⟩
       -- Extend $g$ to a continuous function on $[a, b]$.
       obtain ⟨f, hf⟩ : ∃ f : ℝ → ℝ, ContinuousOn f (Set.Icc a b) ∧ ∀ x ∈ K, f x = g x := by
         have := @ContinuousMap.exists_restrict_eq;
@@ -905,8 +906,8 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
         fun y hy => hU'.2 y ⟨hy.1.1, hy.2⟩ |> Set.Subset.trans <| by simp [hW_def]
       have hU_cont : ∀ y ∈ U ∩ S, ∀ t ∈ spectrum ℝ (A y).mat, ‖f y t - f x₀ t‖ < ε := by
         intro y hy t ht
-        obtain ⟨i, hi⟩ : ∃ i, t ∈ V_i i := by
-          exact Set.mem_iUnion.mp ( hU_subset y hy ht ) |> Exists.imp fun i => by tauto;
+        obtain ⟨i, hi⟩ : ∃ i, t ∈ V_i i :=
+          Set.mem_iUnion.mp (hU_subset y hy ht) |> Exists.imp fun i => by tauto
         have h_cont_i : ‖f y t - f x₀ t‖ < ε :=
           h_cont.2.2 i y ⟨hU''.2 i (by aesop), hy.2⟩ t ⟨hi, hA₁ y hy.2 ht⟩ |>
             fun h => by simpa using h

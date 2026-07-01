@@ -771,8 +771,9 @@ private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
     intro ε hε_pos
     obtain ⟨δ₁, hδ₁_pos, hδ₁⟩ : ∃ δ₁ > 0, ∀ α, abs (α - 1) < δ₁ → Real.sqrt (|b α|) * |Real.log (|b α|)| < ε := by
       simpa using Metric.tendsto_nhds_nhds.mp h_sqrt_log ε hε_pos |> fun ⟨ δ₁, hδ₁₁, hδ₁₂ ⟩ => ⟨ δ₁, hδ₁₁, fun α hα => lt_of_abs_lt <| by simpa using hδ₁₂ hα ⟩;
-    obtain ⟨δ₂, hδ₂_pos, hδ₂⟩ : ∃ δ₂ > 0, ∀ α, abs (α - 1) < δ₂ → |b α ^ α - b α| ≤ |α - 1| * Real.sqrt (|b α|) * |Real.log (|b α|)| := by
-      exact Metric.mem_nhds_iff.mp h_bound |> fun ⟨ δ₂, hδ₂_pos, hδ₂ ⟩ => ⟨ δ₂, hδ₂_pos, fun α hα => hδ₂ hα ⟩;
+    obtain ⟨δ₂, hδ₂_pos, hδ₂⟩ : ∃ δ₂ > 0, ∀ α, abs (α - 1) < δ₂ → |b α ^ α - b α| ≤ |α - 1| * Real.sqrt (|b α|) * |Real.log (|b α|)| :=
+      Metric.mem_nhds_iff.mp h_bound |> fun ⟨δ₂, hδ₂_pos, hδ₂⟩ =>
+        ⟨δ₂, hδ₂_pos, fun α hα => hδ₂ hα⟩
     exact ⟨ Min.min δ₁ δ₂, lt_min hδ₁_pos hδ₂_pos, fun α hα => le_trans ( hδ₂ α ( lt_of_lt_of_le hα ( min_le_right _ _ ) ) ) ( by nlinarith [ hδ₁ α ( lt_of_lt_of_le hα ( min_le_left _ _ ) ), abs_nonneg ( α - 1 ) ] ) ⟩;
   rw [ hasDerivAt_iff_isLittleO_nhds_zero ];
   rw [ Asymptotics.isLittleO_iff ];
