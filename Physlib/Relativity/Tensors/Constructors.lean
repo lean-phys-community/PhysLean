@@ -412,8 +412,7 @@ lemma fromPairT_basis_repr {c c1 : C}
     rw [prodT_pure, permT_pure]
     rw [basis_repr_pure]
     simp [Pure.component]
-    rw [mul_comm]
-    rfl
+    exact mul_comm _ _
   · intro x y hx hy
     simp_all [P]
 
@@ -535,11 +534,7 @@ lemma fromTripleT_basis_repr {c c1 c2 : C}
       rw [prodT_pure, prodT_pure, permT_pure]
       rw [basis_repr_pure]
       simp [Pure.component, Fin.prod_univ_three]
-      conv_rhs =>
-        rw [mul_assoc, mul_comm]
-        enter [1]
-        rw [mul_comm]
-      rfl
+      ac_rfl
     · intro y1 y2 hx hy
       simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue,
         Basis.tensorProduct_repr_tmul_apply, smul_eq_mul, P1, P] at hx hy

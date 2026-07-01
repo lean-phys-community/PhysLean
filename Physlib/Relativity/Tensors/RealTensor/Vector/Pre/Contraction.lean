@@ -193,8 +193,7 @@ lemma as_sum_toSpace : ⟪x, y⟫ₘ = x.val (Sum.inl 0) * y.val (Sum.inl 0) -
   rw [as_sum]
   congr
   funext i
-  rw [mul_comm]
-  rfl
+  exact mul_comm _ _
 
 lemma stdBasis_inl {d : ℕ} :
     ⟪@ContrMod.stdBasis d (Sum.inl 0), ContrMod.stdBasis (Sum.inl 0)⟫ₘ = (1 : ℝ) := by

@@ -384,8 +384,7 @@ noncomputable def basis : OrthonormalBasis (Fin 1) ℝ Time where
       rw [@PiLp.norm_eq_of_L2]
       simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, Real.norm_eq_abs, sq_abs,
         Finset.sum_const, Finset.card_singleton, one_smul]
-      rw [Real.sqrt_sq_eq_abs]
-      rfl
+      exact Real.sqrt_sq_eq_abs _
   }
 
 @[simp]

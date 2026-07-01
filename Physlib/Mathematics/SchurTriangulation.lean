@@ -180,8 +180,7 @@ protected noncomputable def SchurTriangulationAux.of
         have hf {bi i' bj j'} (hi : e i = ⟨bi, i'⟩) (hj : e j = ⟨bj, j'⟩) :=
           calc toMatrixOrthonormal basis f i j
             _ = toMatrixOrthonormal bE f (e i) (e j) := by
-              rw [f.toMatrixOrthonormal_reindex]
-              rfl
+              exact congr_fun (congr_fun (f.toMatrixOrthonormal_reindex bE e.symm) i) j
             _ = ⟪bE (e i), f (bE (e j))⟫_𝕜 := f.toMatrixOrthonormal_apply_apply ..
             _ = ⟪(B bi i' : E), f (B bj j')⟫_𝕜 := by rw [hB, hB, hi, hj]
 

@@ -48,8 +48,7 @@ lemma schwartzIncl_inner (ψ1 ψ2 : 𝓢(ℝ, ℂ)) :
   filter_upwards [h1, h2] with _ h1 h2
   rw [← h1, ← h2]
   simp only [RCLike.inner_apply]
-  rw [mul_comm]
-  rfl
+  exact mul_comm _ _
 
 end HilbertSpace
 end

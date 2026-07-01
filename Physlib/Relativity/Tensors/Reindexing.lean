@@ -123,8 +123,7 @@ lemma inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   obtain ⟨x, rfl⟩ := h.toEquiv.symm.surjective x
   change c1 (h.toEquiv _) = _
   simp only [Equiv.apply_symm_apply]
-  rw [h.preserve_color]
-  rfl
+  exact h.preserve_color _
 
 set_option warning.simp.varHead false in
 @[simp, nolint simpVarHead]
@@ -132,8 +131,7 @@ lemma toEquiv_symm_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (x : Fin m) :
     c (h.toEquiv.symm x) = c1 x := by
   obtain ⟨x, rfl⟩ := h.toEquiv.surjective x
-  rw [h.preserve_color]
-  rfl
+  exact (h.preserve_color (h.toEquiv x)).symm
 
 /-!
 

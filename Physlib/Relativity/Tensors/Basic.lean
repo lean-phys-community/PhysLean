@@ -213,8 +213,7 @@ lemma component_eq_drop {n : ℕ} {c : Fin (n + 1) → C} (p : Pure S c) (i : Fi
     p.component φ = ((b (c i)).repr (p i) (φ i)) *
     ((drop p i).component (fun j => φ (i.succAbove j))) := by
   simp only [component, Function.comp_apply]
-  rw [Fin.prod_univ_succAbove _ i]
-  rfl
+  exact Fin.prod_univ_succAbove _ i
 
 @[simp]
 lemma component_update_add {n : ℕ} [inst : DecidableEq (Fin n)]
