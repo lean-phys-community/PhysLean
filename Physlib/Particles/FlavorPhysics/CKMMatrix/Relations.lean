@@ -221,8 +221,7 @@ lemma conj_Vtb_mul_Vud {V : CKMMatrix} {τ : ℝ}
   simp only [neg_mul, exp_neg, Fin.isValue, ne_eq, exp_ne_zero, not_false_eq_true,
     mul_inv_cancel_left₀]
   have h2 : ([V]cs * [V]ud - [V]us * [V]cd) * conj [V]ud = [V]cs
-      * [V]ud * conj [V]ud - [V]us * ([V]cd * conj [V]ud) := by
-    ring
+      * [V]ud * conj [V]ud - [V]us * ([V]cd * conj [V]ud) := by ring
   rw [h2, V.Vcd_mul_conj_Vud]
   rw [normSq_eq_conj_mul_self, normSq_eq_conj_mul_self]
   simp only [Fin.isValue, neg_mul]
@@ -236,8 +235,7 @@ lemma conj_Vtb_mul_Vus {V : CKMMatrix} {τ : ℝ}
   simp only [neg_mul, exp_neg, Fin.isValue, ne_eq, exp_ne_zero, not_false_eq_true,
     mul_inv_cancel_left₀, neg_add_rev]
   have h2 : ([V]cs * [V]ud - [V]us * [V]cd) * conj [V]us = ([V]cs
-      * conj [V]us) * [V]ud - [V]us * [V]cd * conj [V]us := by
-    ring
+      * conj [V]us) * [V]ud - [V]us * [V]cd * conj [V]us := by ring
   rw [h2, V.Vcs_mul_conj_Vus]
   rw [normSq_eq_conj_mul_self, normSq_eq_conj_mul_self]
   simp only [Fin.isValue, neg_mul]

@@ -89,8 +89,7 @@ lemma 𝓵_neg : P.neg.𝓵 = - P.𝓵 := by rfl
 -/
 
 @[simp]
-lemma toFun_zero (x : SpaceTime) : P.toFun 0 x = 0 := by
-  simp [toFun]
+lemma toFun_zero (x : SpaceTime) : P.toFun 0 x = 0 := by simp [toFun]
 
 lemma complete_square (h : P.𝓵 ≠ 0) (φ : HiggsField) (x : SpaceTime) :
     P.toFun φ x = P.𝓵 * (‖φ‖_H^2 x - P.μ2 / (2 * P.𝓵)) ^ 2 - P.μ2 ^ 2 / (4 * P.𝓵) := by

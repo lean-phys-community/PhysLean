@@ -99,18 +99,15 @@ lemma gaugeGroupI_exists_fst_eq {H : TwoHiggsDoublet} (h1 : H.Φ1 ≠ 0) :
   simp at h
   simp [h]
   have h_fst : (g • H.Φ2).ofLp 0 = ⟪H.Φ1, H.Φ2⟫_ℂ / ‖H.Φ1‖ := by
-    have h2 : ⟪H.Φ1, H.Φ2⟫_ℂ = ⟪g • H.Φ1, g • H.Φ2⟫_ℂ := by
-      simp
+    have h2 : ⟪H.Φ1, H.Φ2⟫_ℂ = ⟪g • H.Φ1, g • H.Φ2⟫_ℂ := by simp
     rw [h] at h2
     conv_rhs at h2 =>
       simp [PiLp.inner_apply]
     rw [h2]
-    have hx : (‖H.Φ1‖ : ℂ) ≠ 0 := by
-      simp_all
+    have hx : (‖H.Φ1‖ : ℂ) ≠ 0 := by simp_all
     field_simp
   apply And.intro h_fst
-  have hx : ‖g • H.Φ2‖ ^ 2 = ‖H.Φ2‖ ^ 2 := by
-    simp
+  have hx : ‖g • H.Φ2‖ ^ 2 = ‖H.Φ2‖ ^ 2 := by simp
   rw [PiLp.norm_sq_eq_of_L2] at hx
   simp at hx
   have hx0 : ‖(g • H.Φ2).ofLp 1‖ ^ 2 = ‖H.Φ2‖ ^ 2 - ‖(g • H.Φ2).ofLp 0‖ ^ 2 := by
@@ -236,8 +233,7 @@ lemma gramMatrix_surjective_det_tr (K : Matrix (Fin 2) (Fin 2) ℂ)
   have det_eq_abc : K.det = a * b - ‖c‖ ^ 2 := by
     simp [hK_explicit2]
     rw [Complex.mul_conj']
-  have tra_eq_abc : K.trace.re = a + b := by
-    simp [hK_explicit2]
+  have tra_eq_abc : K.trace.re = a + b := by simp [hK_explicit2]
   simp [det_eq_abc, ← Complex.ofReal_pow] at hKdet
   rw [tra_eq_abc] at hKtr
   rw [hK_explicit2]
@@ -255,8 +251,7 @@ lemma gramMatrix_surjective_det_tr (K : Matrix (Fin 2) (Fin 2) ℂ)
     simp [PiLp.norm_eq_of_L2, ← Complex.ofReal_pow]
     exact Real.sq_sqrt hb_nonneg
   /- The case when a ≠ 0. -/
-  have h1 : (√a : ℂ) ≠ 0 := by
-      simp_all
+  have h1 : (√a : ℂ) ≠ 0 := by simp_all
   use ⟨(!₂[√a, 0] : HiggsVec), !₂[conj c/ √a, √(a * b - ‖c‖ ^ 2) / √a]⟩
   ext i j
   fin_cases i <;> fin_cases j <;> simp [gramMatrix, PiLp.norm_eq_of_L2, ← Complex.ofReal_pow]

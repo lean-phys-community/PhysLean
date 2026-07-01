@@ -141,8 +141,7 @@ noncomputable def gaugeGroupℤ₆SU3OfRoot (α : rootsOfUnity 6 ℂ) :
   let z : ℂ := ((α : ℂˣ) : ℂ)
   ⟨scalar (Fin 3) (z ^ 2), by
     rw [mem_specialUnitaryGroup_iff]
-    have hz : ‖z‖ = 1 := by
-      simpa [z] using Complex.norm_eq_one_of_mem_rootsOfUnity α.prop
+    have hz : ‖z‖ = 1 := by simpa [z] using Complex.norm_eq_one_of_mem_rootsOfUnity α.prop
     have hz2 : star (z ^ 2) * z ^ 2 = 1 := by
       rw [RCLike.star_def, Complex.conj_mul', Complex.norm_pow, hz]
       norm_num
@@ -152,8 +151,7 @@ noncomputable def gaugeGroupℤ₆SU3OfRoot (α : rootsOfUnity 6 ℂ) :
         Matrix.diagonal_mul_diagonal, Matrix.diagonal_eq_one]
       funext i
       simpa [Pi.star_def] using hz2
-    · have hα : z ^ 6 = 1 := by
-        simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
+    · have hα : z ^ 6 = 1 := by simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
       rw [Matrix.scalar_apply, Matrix.det_diagonal, Fin.prod_univ_three]
       calc
         z ^ 2 * z ^ 2 * z ^ 2 = z ^ 6 := by ring
@@ -172,8 +170,7 @@ noncomputable def gaugeGroupℤ₆SU2OfRoot (α : rootsOfUnity 6 ℂ) :
       star ((u ^ 3 : unitary ℂ) : ℂ) = 1
     rw [star_star]
     exact (u ^ 3 : unitary ℂ).prop.2
-  have hα : z ^ 6 = 1 := by
-    simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
+  have hα : z ^ 6 = 1 := by simpa [z] using (mem_rootsOfUnity' 6 (α : ℂˣ)).mp α.prop
   have hw2 : w ^ 2 = 1 := by
     calc
       w ^ 2 = star (z ^ 6) := by

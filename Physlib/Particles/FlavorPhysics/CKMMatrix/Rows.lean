@@ -207,8 +207,7 @@ lemma cRow_cross_tRow_eq_uRow (V : CKMMatrix) :
       rw [← hg, smul_smul, inv_mul_cancel₀, one_smul]
       by_contra hn
       simp [hn] at h2
-    have hg2 : norm (g 0)⁻¹ = 1 := by
-      simp [h2]
+    have hg2 : norm (g 0)⁻¹ = 1 := by simp [h2]
     have hg22 : ∃ (τ : ℝ), (g 0)⁻¹ = Complex.exp (τ * I) := by
       rw [← norm_mul_exp_arg_mul_I (g 0)⁻¹, hg2]
       use arg (g 0)⁻¹
@@ -216,8 +215,7 @@ lemma cRow_cross_tRow_eq_uRow (V : CKMMatrix) :
     obtain ⟨τ, hτ⟩ := hg22
     use τ
     rw [hx, hτ]
-  · have hx : norm (g 0) = -1 := by
-      simp [← ofReal_inj, Fin.isValue, ofReal_neg, ofReal_one, h2]
+  · have hx : norm (g 0) = -1 := by simp [← ofReal_inj, Fin.isValue, ofReal_neg, ofReal_one, h2]
     have h3 := norm_nonneg (g 0)
     simp_all only [ofReal_neg, ofReal_one, Left.nonneg_neg_iff]
     have h4 : (0 : ℝ) < 1 := by norm_num
@@ -247,8 +245,7 @@ lemma uRow_cross_cRow_eq_tRow (V : CKMMatrix) :
     ofReal_eq_one] at h2
   cases' h2 with h2 h2
   swap
-  · have hx : norm (g 2) = -1 := by
-      simp [h2, ← ofReal_inj, Fin.isValue, ofReal_neg, ofReal_one]
+  · have hx : norm (g 2) = -1 := by simp [h2, ← ofReal_inj, Fin.isValue, ofReal_neg, ofReal_one]
     have h3 := norm_nonneg (g 2)
     simp_all only [ofReal_neg, ofReal_one, Left.nonneg_neg_iff]
     have h4 : (0 : ℝ) < 1 := by norm_num
@@ -257,8 +254,7 @@ lemma uRow_cross_cRow_eq_tRow (V : CKMMatrix) :
       rw [← hg, @smul_smul, inv_mul_cancel₀, one_smul]
       by_contra hn
       simp [hn] at h2
-    have hg2 : norm (g 2)⁻¹ = 1 := by
-      simp [h2]
+    have hg2 : norm (g 2)⁻¹ = 1 := by simp [h2]
     have hg22 : ∃ (τ : ℝ), (g 2)⁻¹ = Complex.exp (τ * I) := by
       rw [← norm_mul_exp_arg_mul_I (g 2)⁻¹]
       use arg (g 2)⁻¹

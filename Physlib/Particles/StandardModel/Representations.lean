@@ -40,8 +40,7 @@ noncomputable def repU1 : unitary ℂ →* unitaryGroup (Fin 2) ℂ where
   toFun g := repU1Map g
   map_mul' g h := by
     simp only [repU1Map, Submonoid.mk_mul_mk, mul_smul_one, smul_smul, mul_comm, ← mul_pow]
-  map_one' := by
-    simp only [repU1Map, one_pow, one_smul, Submonoid.mk_eq_one]
+  map_one' := by simp only [repU1Map, one_pow, one_smul, Submonoid.mk_eq_one]
 
 /-- The fundamental representation of SU(2) as a homomorphism to `unitaryGroup (Fin 2) ℂ`. -/
 @[simps!]
