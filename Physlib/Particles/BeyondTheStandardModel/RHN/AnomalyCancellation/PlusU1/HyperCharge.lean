@@ -76,8 +76,7 @@ lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
   simp
 
 lemma add_quad (S : (PlusU1 n).QuadSols) (a b : ℚ) :
-    accQuad (a • S.val + b • (Y n).val) = 0 := by
-  rw [add_AFL_quad, quadSol S]; simp
+    accQuad (a • S.val + b • (Y n).val) = 0 := by rw [add_AFL_quad, quadSol S]; simp
 
 /-- The `QuadSol` obtained by adding hypercharge to a `QuadSol`. -/
 def addQuad (S : (PlusU1 n).QuadSols) (a b : ℚ) : (PlusU1 n).QuadSols :=

@@ -381,12 +381,10 @@ instance (T : Temperature) [NeZero 𝓒.μ] : NeZero (𝓒.μBolt T) :=
   ⟨μBolt_ne_zero_of_μ_ne_zero 𝓒 T (Ne.symm (NeZero.ne' 𝓒.μ))⟩
 
 instance (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [IsFiniteMeasure (𝓒1.μBolt T)] :
-    IsFiniteMeasure ((𝓒 + 𝓒1).μBolt T) := by
-  simp only [μBolt_add]; infer_instance
+    IsFiniteMeasure ((𝓒 + 𝓒1).μBolt T) := by simp only [μBolt_add]; infer_instance
 
 instance (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] (n : ℕ) :
-    IsFiniteMeasure ((nsmul n 𝓒).μBolt T) := by
-  simp [μBolt_nsmul]; infer_instance
+    IsFiniteMeasure ((nsmul n 𝓒).μBolt T) := by simp [μBolt_nsmul]; infer_instance
 
 /-!
 

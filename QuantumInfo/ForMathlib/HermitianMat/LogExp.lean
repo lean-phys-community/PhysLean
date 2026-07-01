@@ -48,14 +48,12 @@ def exp (A : HermitianMat d 𝕜) : HermitianMat d 𝕜 :=
 /-- Primed because `Commute.exp_left` refers to `NormedSpace.exp` instead of `HermitianMat.exp`. -/
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.exp_left' (hAB : Commute A.mat B.mat) :
-    Commute (A.exp).mat B.mat := by
-  rw [exp]; commutes
+    Commute (A.exp).mat B.mat := by rw [exp]; commutes
 
 /-- Primed because `Commute.exp_right` refers to `NormedSpace.exp` instead of `HermitianMat.exp`. -/
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.exp_right' (hAB : Commute A.mat B.mat) :
-    Commute A.mat (B.exp).mat := by
-  rw [exp]; commutes
+    Commute A.mat (B.exp).mat := by rw [exp]; commutes
 
 @[simp]
 theorem reindex_exp (e : d ≃ d₂) : (A.reindex e).exp = A.exp.reindex e :=
@@ -102,13 +100,11 @@ def log (A : HermitianMat d 𝕜) : HermitianMat d 𝕜 :=
 
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.log_left (hAB : Commute A.mat B.mat) :
-    Commute (A.log).mat B.mat := by
-  rw [log]; commutes
+    Commute (A.log).mat B.mat := by rw [log]; commutes
 
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.log_right (hAB : Commute A.mat B.mat) :
-    Commute A.mat (B.log).mat := by
-  rw [log]; commutes
+    Commute A.mat (B.log).mat := by rw [log]; commutes
 
 @[simp]
 theorem reindex_log (e : d ≃ d₂) : (A.reindex e).log = A.log.reindex e :=
