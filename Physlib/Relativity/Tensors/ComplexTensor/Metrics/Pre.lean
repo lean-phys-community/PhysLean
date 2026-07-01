@@ -55,9 +55,7 @@ def contrMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
       a' • contrMetricVal
     map_add' := fun x y => by
       simp only [add_smul]
-    map_smul' := fun m x => by
-      simp only [smul_smul]
-      rfl
+    map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
     isIntertwining' M := by
       refine LinearMap.ext fun x : ℂ => ?_
       change x • contrMetricVal =
@@ -105,9 +103,7 @@ def coMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     a' • coMetricVal
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • coMetricVal =

@@ -53,9 +53,7 @@ def preContrCoUnit (d : ℕ := 3) :
   toFun := fun a => a • preContrCoUnitVal d
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℝ => ?_
     simp only [LinearMap.coe_comp, Function.comp_apply]
@@ -104,9 +102,7 @@ def preCoContrUnit (d : ℕ) : (Representation.trivial ℝ (LorentzGroup d) ℝ)
   toFun := fun a => a • preCoContrUnitVal d
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℝ => ?_
     simp only [LinearMap.coe_comp, Function.comp_apply]

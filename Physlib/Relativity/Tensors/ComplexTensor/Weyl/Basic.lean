@@ -206,8 +206,7 @@ def leftHandedToDual : leftHandedRep.IntertwiningMap dualLeftHandedRep where
     simp only [mulVec_add, LinearEquiv.map_add]
   map_smul' := by
     intro a ψ
-    simp only [mulVec_smul, LinearEquiv.map_smul]
-    rfl
+    simp only [mulVec_smul, LinearEquiv.map_smul, RingHom.id_apply]
   isIntertwining' := by
     intro M
     refine LinearMap.ext (fun ψ => ?_)
