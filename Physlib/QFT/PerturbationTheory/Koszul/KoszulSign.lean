@@ -118,8 +118,7 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
     simp
   | φ1 :: φs, n + 1, h => by
     conv_lhs =>
-      rw [List.insertIdx_succ_cons]
-      rw [koszulSign]
+      rw [List.insertIdx_succ_cons, koszulSign]
     rw [koszulSign_insertIdx _ _ _ (Nat.le_of_lt_succ h)]
     conv_rhs =>
       rhs

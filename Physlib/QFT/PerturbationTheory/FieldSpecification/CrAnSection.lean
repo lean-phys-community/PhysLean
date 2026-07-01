@@ -166,20 +166,17 @@ lemma card_eq_mul : {φs : List 𝓕.FieldOp} → Fintype.card (CrAnSection φs)
     simp
   | FieldOp.position _ :: φs => by
       simp only [statesIsPosition, List.countP_cons_of_pos]
-      rw [card_cons_eq]
-      rw [card_eq_mul]
+      rw [card_cons_eq, card_eq_mul]
       simp only [fieldOpToCrAnType]
       erw [CreateAnnihilate.CreateAnnihilate_card_eq_two]
       ring
   | FieldOp.inAsymp x_ :: φs => by
       simp only [statesIsPosition, Bool.false_eq_true, not_false_eq_true, List.countP_cons_of_neg]
-      rw [card_cons_eq]
-      rw [card_eq_mul]
+      rw [card_cons_eq, card_eq_mul]
       simp [fieldOpToCrAnType]
   | FieldOp.outAsymp _ :: φs => by
       simp only [statesIsPosition, Bool.false_eq_true, not_false_eq_true, List.countP_cons_of_neg]
-      rw [card_cons_eq]
-      rw [card_eq_mul]
+      rw [card_cons_eq, card_eq_mul]
       simp [fieldOpToCrAnType]
 
 lemma card_perm_eq {φs φs' : List 𝓕.FieldOp} (h : φs.Perm φs') :
@@ -413,8 +410,7 @@ lemma sum_eraseIdxEquiv (n : ℕ) (φs : List 𝓕.FieldOp) (hn : n < φs.length
     (f : CrAnSection φs → M) [AddCommMonoid M] : ∑ (s : CrAnSection φs), f s =
     ∑ (a : 𝓕.fieldOpToCrAnType φs[n]), ∑ (s : CrAnSection (φs.eraseIdx n)),
     f ((eraseIdxEquiv n φs hn).symm ⟨a, s⟩) := by
-  rw [← (eraseIdxEquiv n φs hn).symm.sum_comp]
-  rw [Fintype.sum_prod_type]
+  rw [← (eraseIdxEquiv n φs hn).symm.sum_comp, Fintype.sum_prod_type]
 
 end CrAnSection
 
