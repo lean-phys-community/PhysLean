@@ -149,8 +149,7 @@ lemma pureU1_anomalyFree_ext {n : ℕ} {S T : (PureU1 n.succ).LinSols}
   · obtain ⟨j, hj⟩ := hi
     subst hj
     exact h j
-  · rw [hi, pureU1_last, pureU1_last]
-    exact neg_inj.mpr (Finset.sum_congr rfl fun j _ => h j)
+  · simpa [hi, pureU1_last] using neg_inj.mpr (Finset.sum_congr rfl fun j _ => h j)
 
 namespace PureU1
 

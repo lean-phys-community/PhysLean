@@ -927,8 +927,7 @@ lemma Pa'_elim_eq_iff (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
 
 lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
     Pa g f = Pa g' f' ↔ g = g' ∧ f = f' := by
-  rw [← Pa'_elim_eq_iff, ← Sum.elim_eq_iff]
-  exact Pa'_eq _ _
+  simpa [← Pa'_elim_eq_iff, ← Sum.elim_eq_iff] using Pa'_eq _ _
 
 /-!
 
@@ -1004,8 +1003,7 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).LinSols} (j : Fin n.succ)
   change P! f' = _ at hf'
   erw [hf']
   simp only [and_self, and_true, X]
-  rw [← add_assoc, ← hS1]
-  exact swap!_as_add j hS
+  simpa [← add_assoc, ← hS1] using swap!_as_add j hS
 
 end VectorLikeOddPlane
 
