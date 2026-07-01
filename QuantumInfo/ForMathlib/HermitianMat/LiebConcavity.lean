@@ -363,9 +363,8 @@ private lemma liebExtension_bridge_psd [Nonempty d]
   open scoped Topology in
   have h_cont : ∀ (ε : ℝ), 0 < ε → (1 - θ) * ⟪(σ₁ ^ q).conj K, (Z₁ + ε • 1) ^ r⟫_ℝ +
       θ * ⟪(σ₂ ^ q).conj K, (Z₂ + ε • 1) ^ r⟫_ℝ ≤ ⟪(((1 - θ) • σ₁ + θ • σ₂) ^ q).conj K,
-      ((1 - θ) • (Z₁ + ε • 1) + θ • (Z₂ + ε • 1)) ^ r⟫_ℝ := by
-    intro ε hε_pos
-    exact liebExtension_bridge hq hr hqr K σ₁ σ₂ (Z₁ + ε • 1) (Z₂ + ε • 1) hσ₁ hσ₂
+      ((1 - θ) • (Z₁ + ε • 1) + θ • (Z₂ + ε • 1)) ^ r⟫_ℝ := fun ε hε_pos =>
+    liebExtension_bridge hq hr hqr K σ₁ σ₂ (Z₁ + ε • 1) (Z₂ + ε • 1) hσ₁ hσ₂
       (psd_add_eps_posdef Z₁ hZ₁ ε hε_pos) (psd_add_eps_posdef Z₂ hZ₂ ε hε_pos) θ hθ₀ hθ₁
   -- Apply the continuity results to take the limit as ε approaches 0.
   have h_lim :

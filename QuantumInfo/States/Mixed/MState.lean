@@ -127,7 +127,7 @@ theorem ext_m {ρ₁ ρ₂ : MState d} (h : ρ₁.m = ρ₂.m) : ρ₁ = ρ₂ :
 
 /-- The map from mixed states to their matrices is injective -/
 theorem m_inj : (MState.m (d := d)).Injective :=
-  fun _ _ h ↦ by ext1; ext1; exact h
+  fun _ _ h => ext_m h
 
 theorem M_Injective : Function.Injective (MState.M (d := d)) :=
   fun _ _ => MState.ext

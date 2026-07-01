@@ -899,14 +899,12 @@ theorem PosSemidef.pos_of_mem_spectrum {A : Matrix d d 𝕜} (hA : A.PosSemidef)
   exact hA.eigenvalues_nonneg i
 
 theorem PosSemidef.pow_add {A : Matrix d d 𝕜} (hA : A.PosSemidef) {x y : ℝ} (hxy : x + y ≠ 0) :
-    cfc (· ^ (x + y) : ℝ → ℝ) A = cfc (fun r ↦ r ^ x * r ^ y : ℝ → ℝ) A := by
-  refine cfc_congr fun r hr ↦ ?_
-  exact Real.rpow_add' (hA.pos_of_mem_spectrum r hr) hxy
+    cfc (· ^ (x + y) : ℝ → ℝ) A = cfc (fun r ↦ r ^ x * r ^ y : ℝ → ℝ) A :=
+  cfc_congr fun r hr => Real.rpow_add' (hA.pos_of_mem_spectrum r hr) hxy
 
 theorem PosSemidef.pow_mul {A : Matrix d d 𝕜} {x y : ℝ} (hA : A.PosSemidef) :
-    cfc (· ^ (x * y) : ℝ → ℝ) A = cfc (fun r ↦ (r ^ x) ^ y : ℝ → ℝ) A := by
-  refine cfc_congr fun r hr ↦ ?_
-  exact Real.rpow_mul (hA.pos_of_mem_spectrum r hr) x y
+    cfc (· ^ (x * y) : ℝ → ℝ) A = cfc (fun r ↦ (r ^ x) ^ y : ℝ → ℝ) A :=
+  cfc_congr fun r hr => Real.rpow_mul (hA.pos_of_mem_spectrum r hr) x y
 
 end more_cfc
 
