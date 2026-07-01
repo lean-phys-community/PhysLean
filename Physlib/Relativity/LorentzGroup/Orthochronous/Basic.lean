@@ -37,8 +37,7 @@ def IsOrthochronous : Prop := 0 ≤ Λ.1 (Sum.inl 0) (Sum.inl 0)
 /-- A Lorentz transformation is `orthochronous` if and only if its first column is
   future pointing. -/
 lemma isOrthochronous_iff_toVector_timeComponet_nonneg :
-    IsOrthochronous Λ ↔ 0 ≤ (toVector Λ).timeComponent := by
-  simp [IsOrthochronous, timeComponent]
+    IsOrthochronous Λ ↔ 0 ≤ (toVector Λ).timeComponent := by simp [IsOrthochronous, timeComponent]
 
 /-- A Lorentz transformation is orthochronous if and only if its transpose is orthochronous. -/
 lemma isOrthochronous_iff_transpose :
@@ -94,12 +93,10 @@ lemma not_isOrthochronous_iff_le_zero : ¬ IsOrthochronous Λ ↔ Λ.1 (Sum.inl 
   constructor <;> intro h <;> rcases h1 with h1 | h1 <;> linarith
 
 lemma not_isOrthochronous_iff_toVector_timeComponet_nonpos :
-    ¬ IsOrthochronous Λ ↔ (toVector Λ).timeComponent ≤ 0:= by
-  simp [not_isOrthochronous_iff_le_zero]
+    ¬ IsOrthochronous Λ ↔ (toVector Λ).timeComponent ≤ 0:= by simp [not_isOrthochronous_iff_le_zero]
 
 /-- The identity Lorentz transformation is orthochronous. -/
-lemma id_isOrthochronous : @IsOrthochronous d 1 := by
-  simp [IsOrthochronous]
+lemma id_isOrthochronous : @IsOrthochronous d 1 := by simp [IsOrthochronous]
 
 /-- The continuous map taking a Lorentz transformation to its `0 0` element. -/
 def timeCompCont : C(LorentzGroup d, ℝ) := ⟨fun Λ => Λ.1 (Sum.inl 0) (Sum.inl 0),
@@ -158,8 +155,7 @@ def orthchroMap : C(LorentzGroup d, ℤ₂) :=
 /-- A Lorentz transformation which is orthochronous maps under `orthchroMap` to `1`
   in `ℤ₂` (the identity element). -/
 lemma orthchroMap_IsOrthochronous {Λ : LorentzGroup d} (h : IsOrthochronous Λ) :
-    orthchroMap Λ = 1 := by
-  simp [orthchroMap, orthchroMapReal_on_IsOrthochronous h]
+    orthchroMap Λ = 1 := by simp [orthchroMap, orthchroMapReal_on_IsOrthochronous h]
 
 /-- A Lorentz transformation which is not-orthochronous maps under `orthchroMap` to
   the non-identity element of `ℤ₂`. -/

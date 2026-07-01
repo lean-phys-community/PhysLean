@@ -93,16 +93,14 @@ lemma colorToComplex_match_up {n} {c : Fin n → realLorentzTensor.Color} {j}
     (match c j with
       | .up => complexLorentzTensor.Color.up
       | .down => complexLorentzTensor.Color.down)
-      = complexLorentzTensor.Color.up := by
-  rw [hc]
+      = complexLorentzTensor.Color.up := by rw [hc]
 
 lemma colorToComplex_match_down {n} {c : Fin n → realLorentzTensor.Color} {j}
     (hc : c j = realLorentzTensor.Color.down) :
     (match c j with
       | .up => complexLorentzTensor.Color.up
       | .down => complexLorentzTensor.Color.down)
-      = complexLorentzTensor.Color.down := by
-  rw [hc]
+      = complexLorentzTensor.Color.down := by rw [hc]
 
 lemma colorToComplex_comp_eq_match {n} (c : Fin n → realLorentzTensor.Color) (j : Fin n) :
     (colorToComplex ∘ c) j =
@@ -355,8 +353,7 @@ lemma toComplexVector_up_eq_inclCongrRealLorentz (v : Lorentz.ContrMod 3) :
         (∑ i, v.toFin1dℝ i • Lorentz.ContrMod.stdBasis i) := by
           rw [map_sum]
           simp only [LinearMap.map_smulₛₗ, Complex.ofRealHom_eq_coe, Complex.coe_smul]
-    _ = Lorentz.inclCongrRealLorentz v := by
-          rw [← Lorentz.ContrMod.stdBasis_decomp v]
+    _ = Lorentz.inclCongrRealLorentz v := by rw [← Lorentz.ContrMod.stdBasis_decomp v]
 
 lemma toComplexVector_down_eq_inclCoRealLorentz (v : Lorentz.CoMod 3) :
     toComplexVector Color.down v = Lorentz.inclCoRealLorentz v := by
@@ -372,8 +369,7 @@ lemma toComplexVector_down_eq_inclCoRealLorentz (v : Lorentz.CoMod 3) :
         (∑ i, v.toFin1dℝ i • Lorentz.CoMod.stdBasis i) := by
           rw [map_sum]
           simp only [LinearMap.map_smulₛₗ, Complex.ofRealHom_eq_coe, Complex.coe_smul]
-    _ = Lorentz.inclCoRealLorentz v := by
-          rw [← Lorentz.CoMod.stdBasis_decomp v]
+    _ = Lorentz.inclCoRealLorentz v := by rw [← Lorentz.CoMod.stdBasis_decomp v]
 
 /-- The function which turns a real pure tensor into a complex one. -/
 noncomputable def toComplexPure {c : Fin n → Color} (p : Pure realLorentzTensor c) :
