@@ -195,13 +195,11 @@ lemma α₁_proj (T : MSSMACC.Sols) : α₁ (proj T.1.1) =
 
 lemma α₁_proj_zero (T : MSSMACC.Sols) (h1 : α₃ (proj T.1.1) = 0) :
     α₁ (proj T.1.1) = 0 := by
-  rw [α₁_proj, h1]
-  exact mul_eq_zero_of_left rfl ((dot B₃.val) T.val - (dot Y₃.val) T.val)
+  simp [α₁_proj, h1]
 
 lemma α₂_proj_zero (T : MSSMACC.Sols) (h1 : α₃ (proj T.1.1) = 0) :
     α₂ (proj T.1.1) = 0 := by
-  rw [α₂_proj, h1]
-  exact mul_eq_zero_of_left rfl ((dot Y₃.val) T.val - 2 * (dot B₃.val) T.val)
+  simp [α₂_proj, h1]
 
 end proj
 

@@ -147,8 +147,7 @@ lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : Decidable
     (p : Pure S c) (i : Fin (n + 1)) (j : Fin n) (x : V (c (i.succAbove j))) :
     update p (i.succAbove j) x i = p i := by
   simp only [update]
-  rw [Function.update_of_ne]
-  exact Fin.ne_succAbove i j
+  simp [Function.update_of_ne, Fin.ne_succAbove i j]
 
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
@@ -190,8 +189,7 @@ lemma update_drop_self {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fi
     (update p i x).drop i = p.drop i := by
   ext k
   simp only [Function.comp_apply, drop, update]
-  rw [Function.update_of_ne]
-  exact Fin.succAbove_ne i k
+  simp [Function.update_of_ne, Fin.succAbove_ne i k]
 
 /-!
 

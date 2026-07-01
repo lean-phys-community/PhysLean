@@ -70,8 +70,7 @@ lemma linEqPropSol_iff_proj_linEqProp (R : MSSMACC.Sols) :
     simp only [mul_eq_zero, OfNat.ofNat_ne_zero, false_or] at h
     rw [α₁_proj, α₂_proj, h]
     simp only [neg_zero, zero_mul, and_self]
-  · rw [h.2.2]
-    exact Rat.mul_zero ((dot Y₃.val) B₃.val)
+  · simp [h.2.2]
 
 /-- A condition which is satisfied if the plane spanned by `R`, `Y₃` and `B₃` lies
 entirely in the quadratic surface. -/
@@ -353,8 +352,7 @@ lemma inQuadCubeToSol_proj (T : InQuadCubeSol) :
   simp only [zero_smul, add_zero, zero_add]
   rw [← SemigroupAction.mul_smul, mul_comm, mul_inv_cancel₀]
   · exact MulAction.one_smul (T.1).val
-  · rw [show dot Y₃.val B₃.val = 108 by with_unfolding_all rfl]
-    exact Ne.symm (OfNat.zero_ne_ofNat 108)
+  · simp [show dot Y₃.val B₃.val = 108 by with_unfolding_all rfl]
 
 /-- A solution from an element of `MSSMACC.AnomalyFreePerp × ℚ × ℚ × ℚ`. We will
 show that this map is a surjection. -/
