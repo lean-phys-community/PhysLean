@@ -620,9 +620,8 @@ private lemma f_image_bound (mineig : ℝ) (n : ℕ) (h : 0 < mineig) (hn : 0 < 
         exact Real.log_nonpos ( by linarith [ pow_pos h n ] ) right_1;
       · have := h_f_le n 1
         simp_all only [Real.log_one, zero_div, Int.ceil_zero, Int.cast_zero, zero_mul, zero_add, lt_neg_add_iff_add_lt, add_zero]
-  have h_card_image : Set.ncard (Set.image (fun k : ℤ => Real.exp (k * (Real.log (1 / mineig) + Real.log 3 / (max n 1)))) (Set.Icc (⌈(n * Real.log mineig - Real.log 3) / (Real.log (1 / mineig) + Real.log 3 / (max n 1))⌉) 0)) ≤ Set.ncard (Set.Icc (⌈(n * Real.log mineig - Real.log 3) / (Real.log (1 / mineig) + Real.log 3 / (max n 1))⌉) 0) := by
-    apply Set.ncard_image_le;
-    exact Set.finite_Icc _ _;
+  have h_card_image : Set.ncard (Set.image (fun k : ℤ => Real.exp (k * (Real.log (1 / mineig) + Real.log 3 / (max n 1)))) (Set.Icc (⌈(n * Real.log mineig - Real.log 3) / (Real.log (1 / mineig) + Real.log 3 / (max n 1))⌉) 0)) ≤ Set.ncard (Set.Icc (⌈(n * Real.log mineig - Real.log 3) / (Real.log (1 / mineig) + Real.log 3 / (max n 1))⌉) 0) :=
+    Set.ncard_image_le (Set.finite_Icc _ _)
   simp_all +decide [ Set.ncard_eq_toFinset_card' ];
   refine le_trans h_card <| le_trans h_card_image ?_;
   rcases n with _ | n

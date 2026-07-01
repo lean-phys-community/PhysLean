@@ -268,9 +268,8 @@ lemma HermitianMat.rpow_neg_mul_rpow_eq_supportProj
   rw [ h_cfc, ← mat_cfc_mul ];
   have h_cfc : ∀ x : ℝ, 0 ≤ x → x ^ (-p) * x ^ p = if x = 0 then 0 else 1 := by
     intro x hx; by_cases hx' : x = 0 <;> simp [ hx', Real.rpow_neg, hx, hp ] ;
-  have h_cfc_eq : (A.cfc (fun x => x ^ (-p) * x ^ p)) = (A.cfc (fun x => if x = 0 then 0 else 1)) := by
-    apply cfc_congr_of_nonneg hA;
-    exact fun x hx => h_cfc x hx;
+  have h_cfc_eq : (A.cfc (fun x => x ^ (-p) * x ^ p)) = (A.cfc (fun x => if x = 0 then 0 else 1)) :=
+    cfc_congr_of_nonneg hA (fun x hx => h_cfc x hx)
   convert! congr_arg ( fun x : HermitianMat d ℂ => x.val ) h_cfc_eq using 1;
   exact congr_arg ( fun x : HermitianMat d ℂ => x.val ) ( supportProj_eq_cfc A )
 

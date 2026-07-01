@@ -146,9 +146,8 @@ theorem Sᵥₙ_relabel (ρ : MState d₁) (e : d₂ ≃ d₁) :
 
 /-- Von Neumann entropy is unchanged under SWAP. TODO: All unitaries-/
 @[simp]
-theorem Sᵥₙ_of_SWAP_eq (ρ : MState (d₁ × d₂)) : Sᵥₙ ρ.SWAP = Sᵥₙ ρ := by
-  apply Hₛ_eq_of_multiset_map_eq
-  exact ρ.multiset_spectrum_relabel_eq (Equiv.prodComm d₁ d₂).symm
+theorem Sᵥₙ_of_SWAP_eq (ρ : MState (d₁ × d₂)) : Sᵥₙ ρ.SWAP = Sᵥₙ ρ :=
+  Hₛ_eq_of_multiset_map_eq _ _ (ρ.multiset_spectrum_relabel_eq (Equiv.prodComm d₁ d₂).symm)
 
 /-- Von Neumann entropy is unchanged under assoc. -/
 @[simp]

@@ -371,8 +371,8 @@ theorem logApprox_eq_log_add_error
     convert! logApprox_eq_cfc_scalar x hx T hT using 1;
     apply cfc_congr_of_posDef hx;
     exact fun u hu => Eq.symm ( scalarLogApprox_eq u T hu.out hT );
-  have h_cfc_add : x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) = x.cfc Real.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) := by
-    apply cfc_add;
+  have h_cfc_add : x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) = x.cfc Real.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) :=
+    cfc_add x Real.log (fun u => Real.log ((1 + T) / (u + T)))
   exact h_logApprox.trans h_cfc_add
 
 open ComplexOrder Filter Topology in

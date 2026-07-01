@@ -536,9 +536,8 @@ theorem iSup_f_alpha_jointly_convex (hα : 1 < α)
       ∑ i, w i * (⨆ (H : {H : HermitianMat d ℂ // 0 ≤ H}), f_alpha α H.1 (ρs i) (σs i)) := by
   apply ciSup_le
   intro H
-  have h_sum : f_alpha α H.1 ρ_mix σ_mix ≤ ∑ i, w i * (f_alpha α H.1 (ρs i) (σs i)) := by
-    apply f_alpha_jointly_convex hα H.1 H.2 w hw_nonneg hw_sum ρs σs ρ_mix σ_mix hρ_mix hσ_mix
-  exact h_sum.trans (Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_left
+  exact (f_alpha_jointly_convex hα H.1 H.2 w hw_nonneg hw_sum ρs σs ρ_mix σ_mix
+    hρ_mix hσ_mix).trans (Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_left
     (le_ciSup (f_alpha_bddAbove hα (ρs i) (σs i) (hker i)) H) (hw_nonneg i))
 
 /-- If for all i, ker(σs i) ≤ ker(ρs i), then ker(∑ w i • σs i) ≤ ker(∑ w i • ρs i),

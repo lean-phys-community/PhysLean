@@ -710,9 +710,7 @@ theorem eq_of_sum_eq_pure {d : Type*} [Fintype d] [DecidableEq d]
         exact ⟨ by assumption, h_eq _ ( ρs i |>.2 ) ( ρs i |>.3 ) ⟩;
       linarith [ h_trace i hi hpi, (ρ.M - (ρs i).M).inner_self_nonneg ];
     -- Since the inner product of a matrix with itself is zero if and only if the matrix is zero, we have ρ.M - (ρs i).M = 0.
-    have h_zero : ρ.M - (ρs i).M = 0 := by
-      apply inner_self_eq_zero.mp h_eq;
-    exact eq_of_sub_eq_zero h_zero;
+    exact eq_of_sub_eq_zero (inner_self_eq_zero.mp h_eq);
   exact MState.ext h_eq.symm
 
 theorem purity_prod {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] [DecidableEq d₁] [DecidableEq d₂]
