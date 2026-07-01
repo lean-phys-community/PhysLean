@@ -61,8 +61,7 @@ lemma schattenNorm_pow_eq
     · rw [ mul_comm, ← HermitianMat.rpow_mul ];
       exact hA;
     · -- Since $A$ is positive, $A^{k*p}$ is also positive, and the trace of a positive matrix is non-negative.
-      have h_pos : 0 ≤ A ^ (k * p) := by
-        exact HermitianMat.rpow_nonneg hA;
+      have h_pos : 0 ≤ A ^ (k * p) := HermitianMat.rpow_nonneg hA
       exact HermitianMat.trace_nonneg h_pos;
   · exact HermitianMat.rpow_nonneg hA
 

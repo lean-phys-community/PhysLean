@@ -191,8 +191,7 @@ lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-
       rw [ h_inv, cfc_const ] ; norm_num;
     exact h_inv;
   -- By definition of matrix inverse, if $(A^p) * (A^{-p}) = 1$, then $(A^{-p})$ is the inverse of $(A^p)$.
-  have h_inv_def : (A ^ p).mat⁻¹ = (A ^ (-p)).mat := by
-    exact Matrix.inv_eq_right_inv h_inv;
+  have h_inv_def : (A ^ p).mat⁻¹ = (A ^ (-p)).mat := Matrix.inv_eq_right_inv h_inv
   convert! congr_fun ( congr_fun h_inv_def i ) j using 1
 
 open ComplexOrder in
@@ -226,8 +225,7 @@ lemma isUnit_rpow_toMat (hA : A.mat.PosDef) (p : ℝ) : IsUnit (A ^ p).mat := by
     exact IsUnit.of_mul_eq_one _ hA_inv
   -- Since $(A^{-p}) (A^p) = 1$, we have that $(A^p)$ is the inverse of $(A^{-p})$.
   have hA_inv : (A ^ p).mat = (A ^ (-p)).mat⁻¹ := by
-    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 := by
-      exact rpow_neg_mul_rpow_self hA p;
+    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 := rpow_neg_mul_rpow_self hA p
     exact Eq.symm (Matrix.inv_eq_right_inv hA_inv);
   aesop
 
@@ -600,8 +598,7 @@ theorem rpow_le_rpow_of_posDef (hA : A.mat.PosDef) (hAB : A ≤ B)
       convert le_of_tendsto_of_tendsto ( tendsto_rpowApprox hA hq ( lt_of_le_of_ne hq1 hq_eq_one ) ) ( tendsto_rpowApprox ( posDef_of_posDef_le hA hAB ) hq ( lt_of_le_of_ne hq1 hq_eq_one ) ) _ using 1
       generalize_proofs at *; (
       filter_upwards [ Filter.eventually_gt_atTop 0 ] with T hT using rpowApprox_mono hA ( posDef_of_posDef_le hA hAB ) hAB hq.le T hT |> le_trans <| by aesop;);
-    have h_rpow_pos : 0 < rpowConst q := by
-      exact rpowConst_pos hq ( lt_of_le_of_ne hq1 hq_eq_one );
+    have h_rpow_pos : 0 < rpowConst q := rpowConst_pos hq ( lt_of_le_of_ne hq1 hq_eq_one )
     simp_all
 
 open ComplexOrder Filter in
@@ -631,8 +628,7 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
     have h_pos_def_Bε : (Bε ε).mat.PosDef := by
       convert posDef_of_posDef_le h_pos_def_Aε _ using 1
       exact add_le_add_left hAB _ |> le_trans ( by simp [ Aε ] ) ;
-    have h_le_Aε_Bε : Aε ε ≤ Bε ε := by
-      exact add_le_add_left hAB _ |> le_trans <| by simp [ Bε ] ;
+    have h_le_Aε_Bε : Aε ε ≤ Bε ε := add_le_add_left hAB _ |> le_trans <| by simp [ Bε ]
     exact ⟨h_pos_def_Aε, h_pos_def_Bε, h_le_Aε_Bε⟩
   -- By the continuity of the function $M \mapsto M^q$, we have $(Aε ε)^q \to A^q$ and $(Bε ε)^q \to B^q$ as $\epsilon \to 0^+$.
   have h_cont : Filter.Tendsto (fun ε => (Aε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (A ^ q)) ∧ Filter.Tendsto (fun ε => (Bε ε) ^ q) (nhdsWithin 0 (Set.Ioi 0)) (nhds (B ^ q)) := by
