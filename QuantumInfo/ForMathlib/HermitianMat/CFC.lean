@@ -181,8 +181,7 @@ theorem mat_cfc_mul : (A.cfc (f * g)).mat = A.cfc f * A.cfc g := by
   simp only [mat_cfc]
   exact cfc_mul ..
 
-theorem mat_cfc_mul_apply : (A.cfc (fun x ↦ f x * g x)).mat = A.cfc f * A.cfc g := by
-  exact mat_cfc_mul ..
+theorem mat_cfc_mul_apply : (A.cfc (fun x ↦ f x * g x)).mat = A.cfc f * A.cfc g := mat_cfc_mul ..
 
 nonrec theorem cfc_comp : A.cfc (g ∘ f) = (A.cfc f).cfc g := by
   ext1; exact cfc_comp ..
@@ -881,8 +880,7 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
       obtain ⟨U'', hU''⟩ : ∃ U'' ∈ nhds x₀, ∀ i, U'' ⊆ U_i i := by
         exact ⟨ ⋂ i, U_i i, Filter.mem_of_superset ( Filter.iInter_mem.mpr fun i => IsOpen.mem_nhds ( hU_i i ) ( h_cont.1 i ) ) fun x hx => by aesop, fun i => Set.iInter_subset _ i ⟩
       set U := U' ∩ U'' with hU_def
-      have hU_mem : U ∈ nhds x₀ := by
-        exact Filter.inter_mem hU'.1 hU''.1
+      have hU_mem : U ∈ nhds x₀ := Filter.inter_mem hU'.1 hU''.1
       have hU_subset : ∀ y ∈ U ∩ S, spectrum ℝ (A y).mat ⊆ W := by
         exact fun y hy => hU'.2 y ⟨ hy.1.1, hy.2 ⟩ |> Set.Subset.trans <| by simp [ hW_def ] ;
       have hU_cont : ∀ y ∈ U ∩ S, ∀ t ∈ spectrum ℝ (A y).mat, ‖f y t - f x₀ t‖ < ε := by
@@ -1232,8 +1230,7 @@ theorem inv_ge_one_of_le_one (hA : A.mat.PosDef) (h : A ≤ 1) : 1 ≤ A⁻¹ :=
         have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
           have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
             intro i
-            have h_eigenvalue : A.mat.PosSemidef := by
-              exact hA.posSemidef
+            have h_eigenvalue : A.mat.PosSemidef := hA.posSemidef
             have h_eigenvalue_le_one : ∀ x : d → 𝕜, x ≠ 0 → (star x ⬝ᵥ A.mat.mulVec x) / (star x ⬝ᵥ x) ≤ 1 := by
               intro x hx_ne_zero
               have h_eigenvalue_le_one : (star x ⬝ᵥ (1 - A.mat).mulVec x) ≥ 0 := by
@@ -1351,8 +1348,7 @@ lemma ker_cfc_le_ker_on_set
     (A.cfc f).ker ≤ A.ker := by
   intro x hx
   have h_inner : ∀ i, A.H.eigenvalues i ≠ 0 → inner ℂ (A.H.eigenvectorBasis i) x = 0 := by
-    have h_inner_zero : (A.cfc f).mat.mulVec x = 0 := by
-      exact (mem_ker_iff_mulVec_zero (A.cfc f) x).mp hx
+    have h_inner_zero : (A.cfc f).mat.mulVec x = 0 := (mem_ker_iff_mulVec_zero (A.cfc f) x).mp hx
     have h_inner_zero_expansion : ∑ i, (f (A.H.eigenvalues i) : ℂ) • inner ℂ (A.H.eigenvectorBasis i) x • A.H.eigenvectorBasis i = 0 := by
       convert h_inner_zero using 1;
       rw [ cfc_mulVec_expansion ];

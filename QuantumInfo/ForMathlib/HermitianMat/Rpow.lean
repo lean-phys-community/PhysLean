@@ -630,8 +630,7 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
           ring_nf
           simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm];
           simp [ Matrix.one_apply]
-        have h_inner_nonneg : 0 ≤ star x ⬝ᵥ A.mat.mulVec x := by
-          exact inner_mulVec_nonneg hA x
+        have h_inner_nonneg : 0 ≤ star x ⬝ᵥ A.mat.mulVec x := inner_mulVec_nonneg hA x
         have h_inner_pos : 0 < star x ⬝ᵥ x := by
           simp_all
         exact h_inner.symm ▸ add_pos_of_nonneg_of_pos h_inner_nonneg ( mul_pos ( mod_cast hε_pos ) ( mod_cast h_inner_pos ) ) |> lt_of_lt_of_le <| le_rfl;
