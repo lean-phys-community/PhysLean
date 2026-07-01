@@ -66,8 +66,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma planeY₃B₃_quad (R : MSSMACC.AnomalyFreePerp) (a b c : ℚ) :
     accQuad (planeY₃B₃ R a b c).val = c * (2 * a * quadBiLin Y₃.val R.val
     + 2 * b * quadBiLin B₃.val R.val + c * quadBiLin R.val R.val) := by
-  rw [planeY₃B₃_val]
-  rw [accQuad, BiLinearSymm.toHomogeneousQuad_add]
+  rw [planeY₃B₃_val, accQuad, BiLinearSymm.toHomogeneousQuad_add]
   rw [← lineY₃B₃Charges_val, ← accQuad]
   rw [lineY₃B₃Charges_quad]
   rw [lineY₃B₃Charges_val, accQuad]

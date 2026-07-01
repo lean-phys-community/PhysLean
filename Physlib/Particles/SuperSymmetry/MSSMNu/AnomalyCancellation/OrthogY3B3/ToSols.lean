@@ -152,8 +152,7 @@ lemma inCubeSolProp_iff_cubicCoeff_zero (T : MSSMACC.Sols) :
 
 lemma inCubeSolProp_iff_proj_inCubeProp (R : MSSMACC.Sols) :
     InCubeSolProp R ↔ InCubeProp (proj R.1.1) := by
-  rw [InCubeSolProp, InCubeProp]
-  rw [cube_proj, cube_proj_proj_Y₃, cube_proj_proj_B₃]
+  rw [InCubeSolProp, InCubeProp, cube_proj, cube_proj_proj_Y₃, cube_proj_proj_B₃]
   refine Iff.intro (fun h => ?_) (fun h => ?_)
   · rw [h.1, h.2]
     simp only [mul_zero, add_zero, and_self]
@@ -199,8 +198,7 @@ def toSolNSQuad (R : MSSMACC.AnomalyFreePerp) : MSSMACC.QuadSols :=
 
 lemma toSolNSQuad_cube (R : MSSMACC.AnomalyFreePerp) :
     accCube (toSolNSQuad R).val = 0 := by
-  rw [toSolNSQuad]
-  rw [lineQuad_val]
+  rw [toSolNSQuad, lineQuad_val]
   rw [planeY₃B₃_cubic]
   ring
 

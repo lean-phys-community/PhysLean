@@ -139,8 +139,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma cube_proj_proj_B₃ (T : MSSMACC.LinSols) :
     cubeTriLin (proj T).val (proj T).val B₃.val =
     (dot Y₃.val B₃.val)^2 * cubeTriLin T.val T.val B₃.val := by
-  rw [proj_val]
-  rw [cubeTriLin.map_add₁, cubeTriLin.map_add₂]
+  rw [proj_val, cubeTriLin.map_add₁, cubeTriLin.map_add₂]
   rw [← lineY₃B₃_val, lineY₃B₃_doublePoint, lineY₃B₃_val]
   rw [cubeTriLin.map_add₂, cubeTriLin.swap₂, cubeTriLin.map_add₁, cubeTriLin.map_smul₁,
     cubeTriLin.map_smul₃, doublePoint_Y₃_B₃]
@@ -158,8 +157,7 @@ lemma cube_proj_proj_self (T : MSSMACC.Sols) :
     2 * dot Y₃.val B₃.val *
     ((dot B₃.val T.val - dot Y₃.val T.val) * cubeTriLin T.val T.val Y₃.val +
     (dot Y₃.val T.val - 2 * dot B₃.val T.val) * cubeTriLin T.val T.val B₃.val) := by
-  rw [proj_val]
-  rw [cubeTriLin.map_add₁, cubeTriLin.map_add₂]
+  rw [proj_val, cubeTriLin.map_add₁, cubeTriLin.map_add₂]
   rw [← lineY₃B₃_val, lineY₃B₃_doublePoint, lineY₃B₃_val]
   repeat rw [cubeTriLin.map_add₁]
   repeat rw [cubeTriLin.map_smul₁]
