@@ -799,8 +799,7 @@ lemma log_partitionFunction
   have hden : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := pow_pos 𝓒.hPos _
   have hlogpow :
       Real.log (𝓒.phaseSpaceunit ^ 𝓒.dof)
-        = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-    simp
+        = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by simp
   simp [partitionFunction, Real.log_div hZ.ne' hden.ne', hlogpow,
         sub_eq_add_neg]
 
@@ -866,8 +865,7 @@ lemma helmholtzFreeEnergy_add
           (Real.log (𝓒.partitionFunction T) + Real.log (𝓒1.partitionFunction T)) := by
           rw [Real.log_mul hpf₁.ne' hpf₂.ne']
     _ = (-kB * T.val) * Real.log (𝓒.partitionFunction T)
-        + (-kB * T.val) * Real.log (𝓒1.partitionFunction T) := by
-          ring
+        + (-kB * T.val) * Real.log (𝓒1.partitionFunction T) := by ring
     _ = 𝓒.helmholtzFreeEnergy T + 𝓒1.helmholtzFreeEnergy T := by
           simp [helmholtzFreeEnergy, mul_comm, mul_assoc]
 
@@ -886,8 +884,7 @@ lemma helmholtzFreeEnergy_nsmul
         = -kB * T.val * Real.log ((nsmul n 𝓒).partitionFunction T) := rfl
     _ = -kB * T.val * ((n : ℝ) * Real.log (𝓒.partitionFunction T)) := by
           rw [hlog]
-    _ = (n : ℝ) * (-kB * T.val * Real.log (𝓒.partitionFunction T)) := by
-          ring
+    _ = (n : ℝ) * (-kB * T.val * Real.log (𝓒.partitionFunction T)) := by ring
     _ = n * 𝓒.helmholtzFreeEnergy T := by
           simp [helmholtzFreeEnergy, mul_comm, mul_left_comm, mul_assoc]
 

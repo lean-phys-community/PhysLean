@@ -80,8 +80,7 @@ lemma helmholtzFreeEnergy_eq_helmholtzMathematicalFreeEnergy_add_correction (T :
   simp_rw [helmholtzFreeEnergy, mathematicalHelmholtzFreeEnergy, partitionFunction,
     Real.log_div hZ_pos.ne' h_pow_pos.ne']
   have h_log_pow : Real.log (𝓒.phaseSpaceunit ^ 𝓒.dof)
-      = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-    simp
+      = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by simp
   simp [sub_eq_add_neg, h_log_pow, mul_add, add_comm, mul_comm, mul_left_comm, mul_assoc]
 
 /-- General identity: S_diff = kB β ⟨E⟩ + kB log Z_math.
@@ -190,8 +189,7 @@ lemma thermodynamicEntropy_eq_differentialEntropy_sub_correction
     simp_all only [neg_mul, physicalProbability_def]
   have h_int_const_eval :
       ∫ _i, (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit ∂ 𝓒.μProd T
-        = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-    simp [integral_const]
+        = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by simp [integral_const]
   unfold thermodynamicEntropy differentialEntropy
   rw [h_int_rewrite,
       integral_add h_int_log_prob h_int_const,
@@ -201,8 +199,7 @@ lemma thermodynamicEntropy_eq_differentialEntropy_sub_correction
             (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit)
         =
         (-kB * ∫ i, Real.log (𝓒.probability T i) ∂ 𝓒.μProd T)
-          - kB * (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-    ring
+          - kB * (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by ring
   simp [this, sub_eq_add_neg, mul_assoc]
 
 /-- No semiclassical correction when `dof = 0`. -/
@@ -312,8 +309,7 @@ theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
     have hy : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := hpow_pos
     have hlog_pow :
         Real.log (𝓒.phaseSpaceunit ^ 𝓒.dof)
-          = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-      simp
+          = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by simp
     calc
       Real.log Zmath
           = Real.log (Zphys * 𝓒.phaseSpaceunit ^ 𝓒.dof) := by simp [hZdef]
@@ -385,8 +381,7 @@ lemma integral_bolt_eq_integral_mul_exp
   set f : ι → ℝ≥0∞ := fun x => ENNReal.ofReal (Real.exp (-T.β * 𝓒.energy x))
   have hf_meas : Measurable f := by
     fun_prop
-  have hf_lt_top : ∀ᵐ x ∂ 𝓒.μ, f x < ∞ := by
-    simp [f]
+  have hf_lt_top : ∀ᵐ x ∂ 𝓒.μ, f x < ∞ := by simp [f]
   have h :=
     integral_withDensity_eq_integral_toReal_smul
       (μ := 𝓒.μ) hf_meas hf_lt_top φ
@@ -419,8 +414,7 @@ lemma meanEnergy_eq_ratio_of_integrals
   unfold meanEnergy μProd
   have h_scale :
       ∫ x, 𝓒.energy x ∂ ((𝓒.μBolt T Set.univ)⁻¹ • 𝓒.μBolt T)
-        = ((𝓒.μBolt T Set.univ)⁻¹).toReal * ∫ x, 𝓒.energy x ∂ 𝓒.μBolt T := by
-    simp
+        = ((𝓒.μBolt T Set.univ)⁻¹).toReal * ∫ x, 𝓒.energy x ∂ 𝓒.μBolt T := by simp
   have h_energy_bolt_raw :=
     integral_energy_bolt (𝓒:=𝓒) (T:=T)
   have h_den :
@@ -429,17 +423,14 @@ lemma meanEnergy_eq_ratio_of_integrals
     exact (mathematicalPartitionFunction_eq_integral (𝓒:=𝓒) (T:=T))
   have h_inv_toReal :
       ((𝓒.μBolt T Set.univ)⁻¹).toReal
-        = 1 / (𝓒.μBolt T Set.univ).toReal := by
-    simp [one_div, ENNReal.toReal_inv]
+        = 1 / (𝓒.μBolt T Set.univ).toReal := by simp [one_div, ENNReal.toReal_inv]
   calc
     ∫ x, 𝓒.energy x ∂ ((𝓒.μBolt T Set.univ)⁻¹ • 𝓒.μBolt T)
         = ((𝓒.μBolt T Set.univ)⁻¹).toReal * ∫ x, 𝓒.energy x ∂ 𝓒.μBolt T := h_scale
     _ = ((𝓒.μBolt T Set.univ)⁻¹).toReal *
-          (∫ x, 𝓒.energy x * Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by
-          simp [h_energy_bolt_raw]
+          (∫ x, 𝓒.energy x * Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by simp [h_energy_bolt_raw]
     _ = (1 / (𝓒.μBolt T Set.univ).toReal) *
-          (∫ x, 𝓒.energy x * Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by
-          simp [h_inv_toReal]
+          (∫ x, 𝓒.energy x * Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by simp [h_inv_toReal]
     _ = (∫ x, 𝓒.energy x * Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) /
           (∫ x, Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by simp [h_den, div_eq_mul_inv, mul_comm]
 
@@ -535,8 +526,7 @@ lemma log_phys_eq_log_math_sub_const_on_Ioi
       (Set.Ioi (0 : ℝ)) := by
   intro β hβ
   have hβpos : 0 < β := hβ
-  have hβnn : Real.toNNReal β = β := by
-    simp [Real.toNNReal, hβpos.le]
+  have hβnn : Real.toNNReal β = β := by simp [Real.toNNReal, hβpos.le]
   have _inst : IsFiniteMeasure (𝓒.μBolt (Temperature.ofβ (Real.toNNReal β))) :=
     h_fin β hβpos
   have hZpos :
@@ -547,16 +537,14 @@ lemma log_phys_eq_log_math_sub_const_on_Ioi
   have h_pow_pos : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := pow_pos 𝓒.hPos _
   have h_log_pow :
       Real.log (𝓒.phaseSpaceunit ^ 𝓒.dof)
-        = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-    simp
+        = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by simp
   have :
       Real.log (𝓒.partitionFunction (Temperature.ofβ (Real.toNNReal β))) =
         -((𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit)
           + Real.log (∫ i, Real.exp (-β * 𝓒.energy i) ∂ 𝓒.μ) := by
     have h_integral_pos : 0 < ∫ i, Real.exp (-β * 𝓒.energy i) ∂ 𝓒.μ := by
       have h_eq : ∫ i, Real.exp (-β * 𝓒.energy i) ∂ 𝓒.μ =
-        ∫ i, Real.exp (-(Real.toNNReal β).val * 𝓒.energy i) ∂ 𝓒.μ := by
-        simp [hβnn]
+        ∫ i, Real.exp (-(Real.toNNReal β).val * 𝓒.energy i) ∂ 𝓒.μ := by simp [hβnn]
       rw [h_eq]
       simp [mathematicalPartitionFunction_eq_integral
         (𝓒:=𝓒) (T:=Temperature.ofβ (Real.toNNReal β))] at hZpos
@@ -671,8 +659,7 @@ theorem energyVariance_eq_meanSquareEnergy_sub_meanEnergy_sq
   rw [integral_const_mul]
   rw [integral_const]
   have hμProb : (𝓒.μProd T) Set.univ = 1 := by simp
-  have hμReal : (𝓒.μProd T).real Set.univ = 1 := by
-    simp [measureReal_def, hμProb]
+  have hμReal : (𝓒.μProd T).real Set.univ = 1 := by simp [measureReal_def, hμProb]
   calc
     ∫ i, (𝓒.energy i)^2 ∂𝓒.μProd T
         - 2 * U * ∫ i, 𝓒.energy i ∂𝓒.μProd T

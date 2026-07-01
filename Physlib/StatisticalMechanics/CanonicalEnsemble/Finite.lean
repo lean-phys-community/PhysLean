@@ -81,8 +81,7 @@ instance [IsFinite 𝓒] [IsFinite 𝓒1] : IsFinite (𝓒 + 𝓒1) where
     · exact ht
     · exact hs
     · exact MeasurableSet.prod hs ht
-  dof_eq_zero := by
-    simp [IsFinite.dof_eq_zero (𝓒:=𝓒), IsFinite.dof_eq_zero (𝓒:=𝓒1)]
+  dof_eq_zero := by simp [IsFinite.dof_eq_zero (𝓒:=𝓒), IsFinite.dof_eq_zero (𝓒:=𝓒1)]
   phase_space_unit_eq_one := by simp [IsFinite.phase_space_unit_eq_one (𝓒:=𝓒)]
 
 instance [IsFinite 𝓒] (e : ι1 ≃ᵐ ι) : IsFinite (congr 𝓒 e) where
@@ -103,8 +102,7 @@ instance [IsFinite 𝓒] (e : ι1 ≃ᵐ ι) : IsFinite (congr 𝓒 e) where
     · exact Set.toFinite (⇑e '' s)
     · exact hs
     · exact (MeasurableEquiv.measurableSet_preimage e.symm).mpr hs
-  dof_eq_zero := by
-    simp [IsFinite.dof_eq_zero (𝓒:=𝓒)]
+  dof_eq_zero := by simp [IsFinite.dof_eq_zero (𝓒:=𝓒)]
   phase_space_unit_eq_one := by simp [IsFinite.phase_space_unit_eq_one (𝓒:=𝓒)]
 
 instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
@@ -124,8 +122,7 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
     | succ n ih =>
       haveI : IsFinite (nsmul n 𝓒) := {
         μ_eq_count := ih
-        dof_eq_zero := by
-          simp [CanonicalEnsemble.dof_nsmul, IsFinite.dof_eq_zero (𝓒:=𝓒)]
+        dof_eq_zero := by simp [CanonicalEnsemble.dof_nsmul, IsFinite.dof_eq_zero (𝓒:=𝓒)]
         phase_space_unit_eq_one := by
           simp [CanonicalEnsemble.phase_space_unit_nsmul,
             IsFinite.phase_space_unit_eq_one (𝓒:=𝓒)]
@@ -136,8 +133,7 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
             (MeasurableEquiv.piFinSuccAbove (fun _ => ι) 0)).μ
           = Measure.count := by erw [IsFinite.μ_eq_count]; aesop
       rw [← h]; rw [← @nsmul_succ]
-  dof_eq_zero := by
-    simp [CanonicalEnsemble.dof_nsmul, IsFinite.dof_eq_zero (𝓒:=𝓒)]
+  dof_eq_zero := by simp [CanonicalEnsemble.dof_nsmul, IsFinite.dof_eq_zero (𝓒:=𝓒)]
   phase_space_unit_eq_one := by
     simp [CanonicalEnsemble.phase_space_unit_nsmul,
       IsFinite.phase_space_unit_eq_one (𝓒:=𝓒)]
@@ -151,8 +147,7 @@ instance [IsFinite 𝓒] [Nonempty ι] : NeZero 𝓒.μ := by
   refine ⟨?_⟩
   intro hμ
   obtain ⟨i₀⟩ := (inferInstance : Nonempty ι)
-  have hone : 𝓒.μ {i₀} = 1 := by
-    simp [IsFinite.μ_eq_count (𝓒:=𝓒)]
+  have hone : 𝓒.μ {i₀} = 1 := by simp [IsFinite.μ_eq_count (𝓒:=𝓒)]
   simp_all only [Measure.coe_zero, Pi.zero_apply, zero_ne_one]
 
 /-- The Shannon entropy of a finite canonical ensemble.
@@ -346,8 +341,7 @@ noncomputable def meanEnergyBetaReal (b : ℝ) : ℝ :=
 lemma meanEnergy_Beta_eq_finite [MeasurableSingletonClass ι] [IsFinite 𝓒] (b : ℝ) (hb : 0 < b) :
     𝓒.meanEnergyBeta b = 𝓒.meanEnergyBetaReal b := by
   let T := Temperature.ofβ (Real.toNNReal b)
-  have hT_beta : (T.β : ℝ) = b := by
-    simp [T, Real.toNNReal_of_nonneg hb.le]
+  have hT_beta : (T.β : ℝ) = b := by simp [T, Real.toNNReal_of_nonneg hb.le]
   rw [meanEnergyBeta, meanEnergy_of_fintype 𝓒 T, meanEnergyBetaReal]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [CanonicalEnsemble.probability, probabilityBetaReal,
@@ -386,8 +380,7 @@ lemma deriv_mathematicalPartitionFunctionBetaReal (b : ℝ) :
   unfold mathematicalPartitionFunctionBetaReal meanEnergyNumerator
   have hd : ∀ c : ℝ, HasDerivAt (fun x => Real.exp (-x * c)) (-c * Real.exp (-b * c)) b := by
     intro c
-    have h : HasDerivAt (fun x => -x * c) (-c) b := by
-      simpa using (hasDerivAt_id b).neg.mul_const c
+    have h : HasDerivAt (fun x => -x * c) (-c) b := by simpa using (hasDerivAt_id b).neg.mul_const c
     simpa [mul_comm] using h.exp
   have h_sum : HasDerivAt (fun x => ∑ i, Real.exp (-x * 𝓒.energy i))
       (∑ i, -𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b :=
@@ -400,8 +393,7 @@ lemma deriv_meanEnergyNumerator (b : ℝ) :
   unfold meanEnergyNumerator
   have hd : ∀ c : ℝ, HasDerivAt (fun x => Real.exp (-x * c)) (-c * Real.exp (-b * c)) b := by
     intro c
-    have h : HasDerivAt (fun x => -x * c) (-c) b := by
-      simpa using (hasDerivAt_id b).neg.mul_const c
+    have h : HasDerivAt (fun x => -x * c) (-c) b := by simpa using (hasDerivAt_id b).neg.mul_const c
     simpa [mul_comm] using h.exp
   have h_sum : HasDerivAt (fun x => ∑ i, 𝓒.energy i * Real.exp (-x * 𝓒.energy i))
       (∑ i, -(𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) b := by
