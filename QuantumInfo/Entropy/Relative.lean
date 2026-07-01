@@ -462,8 +462,7 @@ private lemma hasDerivAt_trace_rpow_at_one (B : HermitianMat d ℂ) (hB : 0 ≤ 
             simp [pow_one, HermitianMat.log]
           rw [h_log]
           exact (B.mat_cfc_mul_apply id Real.log).symm
-        rw [h_trace, ← HermitianMat.trace_eq_trace_rc]
-        rfl
+        exact h_trace.trans HermitianMat.trace_eq_trace_rc.symm
       simp_all [ HermitianMat.trace_cfc_eq ];
     exact_mod_cast h_inner_def.trans h_trace;
   have h_deriv : ∀ i, HasDerivAt (fun α : ℝ => (B.H.eigenvalues i) ^ α) (B.H.eigenvalues i * Real.log (B.H.eigenvalues i)) 1 := by
@@ -1665,8 +1664,7 @@ private theorem sandwichedRelRentropy.continuousOn_Ioi_1 (ρ σ : MState d) :
       have hα₀ : 0 < α := by linarith
       have hα₁ : α ≠ 1 := by linarith
       simp only [dif_pos hα₀, if_neg hα₁, ENNReal.ofReal]
-      rw [Real.toNNReal_of_nonneg]
-      rfl
+      exact Real.toNNReal_of_nonneg _
   · rw [continuousOn_congr (f := fun α ↦ ⊤)]
     · fun_prop
     · clear ρ σ hρ;
@@ -1711,8 +1709,7 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
       have hα₁ : α ≠ 1 := ne_of_lt hα.2
       split_ifs
       · norm_cast
-      · rw [ENNReal.ofReal, Real.toNNReal_of_nonneg]
-        rfl
+      · exact Real.toNNReal_of_nonneg _
   · rw [continuousOn_congr (f := fun α ↦ ⊤)]
     · fun_prop
     · intro x hx
@@ -1969,8 +1966,7 @@ private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
         replace h_eigenvalue := congr(WithLp.toLp 2 $h_eigenvalue)
         simp only [HermitianMat.val_eq_coe, MState.mat_M, WithLp.ofLp_sum, WithLp.ofLp_smul,
           WithLp.toLp_sum, WithLp.toLp_smul, WithLp.toLp_ofLp] at h_eigenvalue
-        rw [← h_eigenvalue, ← hv]
-        rfl
+        exact h_eigenvalue.symm.trans hv.symm
       have h_eigenvalue_zero : ∀ i, (x.M.H.eigenvalues i) • w i = 0 := by
         intro i
         have h_eigenvalue_zero : (x.M.H.eigenvalues i) • w i = inner ℂ (x.M.H.eigenvectorBasis i) (∑ j, (x.M.H.eigenvalues j) • w j • x.M.H.eigenvectorBasis j) := by

@@ -788,8 +788,7 @@ theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d�
       · intro a
         exact MState.ext_iff.mpr a.symm
       · intro a
-        rw [← a]
-        rfl
+        exact MState.ext_iff.mpr a
   -- Since `pure ψ` is pure (`purity = 1`), by `MState.pure_iff_purity_one`, `ρL_k = pure ξ` and `ρR_k = pure φ` for some `ξ, φ`.
   obtain ⟨ξ, hξ⟩ : ∃ ξ : MState d₁, k.val.1 = ξ ∧ ξ.purity = 1 := by
     have h_purity : (pure ψ).purity = (k.val.1).purity * (k.val.2).purity := by
