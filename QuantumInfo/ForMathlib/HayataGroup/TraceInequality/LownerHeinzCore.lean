@@ -364,10 +364,8 @@ theorem one_div_operatorConvexOn_Ioi :
   have hU : IsUnit U := by
     let V : Matrix (Fin 2) (Fin 2) (𝓐) := !![(1 : 𝓐), invC; 0, 1]
     refine ⟨⟨U, V, ?_, ?_⟩, rfl⟩
-    · dsimp [U, V]
-      simp [Matrix.one_fin_two]
-    · dsimp [U, V]
-      simp [Matrix.one_fin_two]
+    · simp [U, V, Matrix.one_fin_two]
+    · simp [U, V, Matrix.one_fin_two]
   have hconj :
       star U * (!![C, 1; 1, D] : Matrix (Fin 2) (Fin 2) (𝓐)) * U
         = Matrix.diagonal (fun i : Fin 2 => if i = 0 then C else D - invC) := by
@@ -579,13 +577,11 @@ theorem one_div_add_t_operatorConvexOn_Ici : ∀ (t : ℝ), 0 < t →
     have hval : cfc shift C = C + T := by simpa [cfcR, shift] using hC_shift
     simpa [cfcR, shift, hval] using h'
   have hA1_inv : cfcR (fun x : ℝ ↦ x⁻¹) A1 = Ring.inverse A1 := by
-    dsimp [cfcR]
-    simpa [cfc_id' (R := ℝ) (a := A1) (ha := hA1_sa)] using
+    simpa [cfcR, cfc_id' (R := ℝ) (a := A1) (ha := hA1_sa)] using
       (cfc_inv (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x)
         (a := A1) (fun x hx ↦ ne_of_gt (specA1 hx)) (ha := hA1_sa))
   have hB1_inv : cfcR (fun x : ℝ ↦ x⁻¹) B1 = Ring.inverse B1 := by
-    dsimp [cfcR]
-    simpa [cfc_id' (R := ℝ) (a := B1) (ha := hB1_sa)] using
+    simpa [cfcR, cfc_id' (R := ℝ) (a := B1) (ha := hB1_sa)] using
       (cfc_inv (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x)
         (a := B1) (fun x hx ↦ ne_of_gt (specB1 hx)) (ha := hB1_sa))
   have hA_eq : cfcR (fun x : ℝ ↦ (x + t)⁻¹) A = cfcR (fun x : ℝ ↦ x⁻¹) A1 := by
@@ -611,8 +607,7 @@ theorem one_div_add_t_operatorConvexOn_Ici : ∀ (t : ℝ), 0 < t →
   have hC1_ne0 : ∀ x ∈ spectrum ℝ C1, (x : ℝ) ≠ 0 := fun x hx ↦ ne_of_gt (specC1 hx)
   have hC1_sa : IsSelfAdjoint C1 := by simpa [hC1] using (hC.add hT)
   have hC1_inv : cfcR (fun x : ℝ ↦ x⁻¹) C1 = Ring.inverse C1 := by
-    dsimp [cfcR]
-    simpa [cfc_id' (R := ℝ) (a := C1) (ha := hC1_sa)] using
+    simpa [cfcR, cfc_id' (R := ℝ) (a := C1) (ha := hC1_sa)] using
       (cfc_inv (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x)
         (a := C1) hC1_ne0 (ha := hC1_sa))
   have hC_eq : cfcR (fun x : ℝ ↦ (x + t)⁻¹) C = cfcR (fun x : ℝ ↦ x⁻¹) C1 := by
