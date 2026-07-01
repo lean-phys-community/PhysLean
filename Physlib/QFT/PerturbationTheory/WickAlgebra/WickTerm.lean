@@ -41,8 +41,7 @@ def wickTerm {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) : �
 @[simp]
 lemma wickTerm_empty_nil :
     wickTerm (empty (n := ([] : List 𝓕.FieldOp).length)) = 1 := by
-  rw [wickTerm]
-  simp [sign_empty]
+  simp [wickTerm, sign_empty]
 
 /--
 For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of

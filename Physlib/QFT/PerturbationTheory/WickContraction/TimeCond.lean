@@ -95,8 +95,7 @@ lemma eqTimeOnly_iff_forall_finset {φs : List 𝓕.FieldOp} (φsΛ : WickContra
 
 @[simp]
 lemma empty_mem {φs : List 𝓕.FieldOp} : empty (n := φs.length).EqTimeOnly := by
-  rw [eqTimeOnly_iff_forall_finset]
-  simp [empty]
+  simp [eqTimeOnly_iff_forall_finset, empty]
 
 /-- Let `φs` be a list of `𝓕.FieldOp` and `φsΛ` a `WickContraction` of `φs` within
   which every contraction involves two `𝓕.FieldOp`s that have the same time, then
@@ -312,8 +311,7 @@ lemma haveEqTime_iff_finset {φs : List 𝓕.FieldOp} (φsΛ : WickContraction �
 @[simp]
 lemma empty_not_haveEqTime {φs : List 𝓕.FieldOp} :
     ¬ HaveEqTime (empty : WickContraction φs.length) := by
-  rw [haveEqTime_iff_finset]
-  simp [empty]
+  simp [haveEqTime_iff_finset, empty]
 
 /-- Given a Wick contraction the subset of contracted pairs between equal time fields. -/
 def eqTimeContractSet {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) :

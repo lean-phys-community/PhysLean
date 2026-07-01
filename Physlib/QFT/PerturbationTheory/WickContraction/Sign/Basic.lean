@@ -52,8 +52,7 @@ def sign (φs : List 𝓕.FieldOp) (φsΛ : WickContraction φs.length) : ℂ :=
 
 lemma sign_empty (φs : List 𝓕.FieldOp) :
     sign φs empty = 1 := by
-  rw [sign]
-  simp [empty]
+  simp [sign, empty]
 
 lemma sign_congr {φs φs' : List 𝓕.FieldOp} (h : φs = φs') (φsΛ : WickContraction φs.length) :
     sign φs' (congr (by simp [h]) φsΛ) = sign φs φsΛ := by

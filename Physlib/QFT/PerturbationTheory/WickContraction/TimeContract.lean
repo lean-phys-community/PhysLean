@@ -78,8 +78,7 @@ lemma timeContract_insertAndContract_some
 @[simp]
 lemma timeContract_empty (φs : List 𝓕.FieldOp) :
     (@empty φs.length).timeContract = 1 := by
-  rw [timeContract, empty]
-  simp
+  simp [timeContract, empty]
 
 open FieldStatistic
 
