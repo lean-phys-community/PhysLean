@@ -757,18 +757,15 @@ lemma superCommuteF_superCommuteF_ofCrAnOpF_bosonic_or_fermionic (φ1 φ2 φ3 : 
     rw [h]
     apply superCommuteF_grade h1 hs
   · right
-    have h : fermionic = fermionic + bosonic := by
-      rfl
+    have h : fermionic = fermionic + bosonic := rfl
     rw [h]
     apply superCommuteF_grade h1 hs
   · right
-    have h : fermionic = bosonic + fermionic := by
-      rfl
+    have h : fermionic = bosonic + fermionic := rfl
     rw [h]
     apply superCommuteF_grade h1 hs
   · left
-    have h : bosonic = fermionic + fermionic := by
-      rfl
+    have h : bosonic = fermionic + fermionic := rfl
     rw [h]
     apply superCommuteF_grade h1 hs
 

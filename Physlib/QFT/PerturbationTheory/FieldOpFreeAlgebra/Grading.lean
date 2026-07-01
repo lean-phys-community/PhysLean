@@ -348,15 +348,13 @@ lemma bosonicProjF_mul (a b : 𝓕.FieldOpFreeAlgebra) :
     right
     rw [bosonicProjF_of_mem_bosonic _
       (by
-      have h1 : bosonic = fermionic + fermionic := by
-        rfl
+      have h1 : bosonic = fermionic + fermionic := rfl
       conv_lhs => rw [h1]
       apply fieldOpFreeAlgebraGrade.mul_mem
       simp only [SetLike.coe_mem]
       simp)]
   simp only [ZeroMemClass.coe_zero, add_zero, zero_add]
-  · have h1 : bosonic = bosonic + bosonic := by
-      rfl
+  · have h1 : bosonic = bosonic + bosonic := rfl
     conv_lhs => rw [h1]
     apply fieldOpFreeAlgebraGrade.mul_mem
     simp only [SetLike.coe_mem]
