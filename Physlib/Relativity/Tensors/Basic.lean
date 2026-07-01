@@ -478,7 +478,6 @@ lemma drop_actionP {n : ℕ} {c : Fin (n + 1) → C} {i : Fin (n + 1)} {p : Pure
     (g • p).drop i = g • (p.drop i) := by
   ext j
   rw [drop, actionP_eq, actionP_eq]
-  simp only [Function.comp_apply]
   rfl
 
 end Pure
@@ -524,9 +523,7 @@ lemma actionT_zero {g : G} : g • (0 : S.Tensor c) = 0 := by simp [actionT_eq]
 
 lemma actionT_neg {g : G} {t : S.Tensor c} :
     g • (-t) = -(g • t) := by
-  rw [actionT_eq]
-  simp only [map_neg, neg_inj]
-  rfl
+  simp [actionT_eq]
 
 noncomputable instance : DistribMulAction G (S.Tensor c) where
   smul_zero g := by simp [actionT_zero]

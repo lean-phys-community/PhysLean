@@ -263,16 +263,14 @@ def leftHandedDualEquiv : leftHandedRep.Equiv dualLeftHandedRep := by
     rw [leftHandedDualTo_hom_apply, leftHandedToDual_hom_apply]
     rw [DualLeftHandedWeyl.toFin2ℂ, LinearEquiv.apply_symm_apply, mulVec_mulVec]
     rw [show (!![0, -1; (1 : ℂ), 0] * !![0, 1; -1, 0]) = 1 by simpa using Eq.symm one_fin_two]
-    rw [one_mulVec]
-    rfl
+    simp
   · intro ψ
     simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
       Representation.IntertwiningMap.coe_toLinearMap]
     rw [leftHandedDualTo_hom_apply, leftHandedToDual_hom_apply, LeftHandedWeyl.toFin2ℂ,
       LinearEquiv.apply_symm_apply, mulVec_mulVec]
     rw [show (!![0, (1 : ℂ); -1, 0] * !![0, -1; 1, 0]) = 1 by simpa using Eq.symm one_fin_two]
-    rw [one_mulVec]
-    rfl
+    simp
 
 /-- `leftHandedDualEquiv` acting on an element `ψ : leftHanded` corresponds
   to multiplying `ψ` by the matrix `!![0, 1; -1, 0]`. -/

@@ -85,8 +85,7 @@ def contrCoContract : ((ContrMod.rep).tprod (CoMod.rep)).IntertwiningMap
     change (Λ.1 *ᵥ ψ.toFin1dℝ) ⬝ᵥ ((LorentzGroup.transpose Λ⁻¹).1 *ᵥ φ.toFin1dℝ) = _
     rw [dotProduct_mulVec, LorentzGroup.transpose_val,
       vecMul_transpose, mulVec_mulVec, LorentzGroup.coe_inv, inv_mul_of_invertible Λ.1]
-    simp only [one_mulVec]
-    rfl
+    simp [contrModCoModBi]
 
 /-- Notation for `contrCoContract` acting on a tmul. -/
 local notation "⟪" ψ "," φ "⟫ₘ" => contrCoContract (ψ ⊗ₜ φ)
@@ -106,8 +105,7 @@ def coContrContract : ((CoMod.rep (d := d)).tprod (ContrMod.rep (d := d))).Inter
     change ((LorentzGroup.transpose Λ⁻¹).1 *ᵥ ψ.toFin1dℝ) ⬝ᵥ (Λ.1 *ᵥ φ.toFin1dℝ) = _
     rw [dotProduct_mulVec, LorentzGroup.transpose_val, mulVec_transpose, vecMul_vecMul,
       LorentzGroup.coe_inv, inv_mul_of_invertible Λ.1]
-    simp only [vecMul_one]
-    rfl
+    simp [coModContrModBi]
 
 /-- Notation for `coContrContract` acting on a tmul. -/
 local notation "⟪" φ "," ψ "⟫ₘ" => coContrContract (φ ⊗ₜ ψ)
@@ -151,7 +149,6 @@ local notation "⟪" ψ "," φ "⟫ₘ" => contrContrContractField (ψ ⊗ₜ φ
 lemma contrContrContract_hom_tmul (φ : Contr d) (ψ : Contr d) :
     ⟪φ, ψ⟫ₘ = φ.toFin1dℝ ⬝ᵥ η *ᵥ ψ.toFin1dℝ:= by
   simp only [contrContrContractField]
-  erw [contrCoContract_hom_tmul]
   rfl
 
 /-- The linear map from Co d ⊗ Co d to ℝ induced by the homomorphism
