@@ -233,8 +233,7 @@ lemma isExtrema_iff_gauss_ampere_magneticFieldMatrix {d} {𝓕 : FreeSpace}
     IsExtrema 𝓕 A J ↔ ∀ t, ∀ x, (∇ ⬝ (A.electricField 𝓕.c t)) x = J.chargeDensity 𝓕.c t x / 𝓕.ε₀
     ∧ ∀ i, 𝓕.μ₀ * 𝓕.ε₀ * ∂ₜ (fun t => A.electricField 𝓕.c t x) t i =
     ∑ j, ∂[j] (A.magneticFieldMatrix 𝓕.c t · (j, i)) x - 𝓕.μ₀ * J.currentDensity 𝓕.c t x i := by
-  rw [isExtrema_iff_gradLagrangian]
-  rw [funext_iff]
+  rw [isExtrema_iff_gradLagrangian, funext_iff]
   conv_lhs =>
     enter [x]
     rw [gradLagrangian_eq_electricField_magneticField (𝓕 := 𝓕) A hA J hJ]

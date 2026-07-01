@@ -121,8 +121,7 @@ lemma kineticTerm_eq_sum {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
       (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr (A.toFieldStrength x) (μ, ν)
       * (Lorentz.CoVector.basis.tensorProduct Lorentz.Vector.basis).repr
         (A.toFieldStrength x) (μ', ν') := by
-  rw [kineticTerm]
-  rw [toField_eq_repr]
+  rw [kineticTerm, toField_eq_repr]
   rw [contrT_basis_repr_apply_eq_fin]
   conv_lhs =>
     enter [2, 2, μ]

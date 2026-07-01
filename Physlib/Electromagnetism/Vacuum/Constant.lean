@@ -166,8 +166,7 @@ lemma constantEB_vectorPotential_space_deriv {c : SpeedOfLight}
     {B₀_antisymm : ∀ i j, B₀ (i, j) = - B₀ (j, i)} (t : Time) (x : Space d) (i j : Fin d) :
     Space.deriv i ((constantEB c E₀ B₀ B₀_antisymm).vectorPotential c t · j) x =
     (1 / 2) * B₀ (j, i) := by
-  rw [constantEB_vectorPotential]
-  rw [Space.deriv_eq]
+  rw [constantEB_vectorPotential, Space.deriv_eq]
   rw [fderiv_const_mul (by fun_prop)]
   rw [fderiv_fun_sum (by fun_prop)]
   simp only [one_div, FunLike.coe_smul, FunLike.coe_sum, Pi.smul_apply,

@@ -197,8 +197,7 @@ lemma vectorPotential_inner_radial_eq_zero_ofElectromagneticField
     {c : SpeedOfLight} {E B : Time → Space 3 → EuclideanSpace ℝ (Fin 3)}
     {t : Time} {x : Space 3} {a : ℝ} (hB : Continuous ↿B) :
     ⟪(ofElectromagneticField c E B).vectorPotential c t (a • x), Space.basis.repr x⟫_ℝ = 0 := by
-  rw [real_inner_comm]
-  rw [PiLp.inner_apply]
+  rw [real_inner_comm, PiLp.inner_apply]
   have h1 (a b : ℝ) : ⟪a, b⟫_ℝ = b * a := rfl
   simp only [Space.basis_repr_apply, ofElectromagneticField_vectorPotential_apply_eq_expand hB,
     Fin.isValue, Space.smul_apply, h1, Fin.sum_univ_three, zero_add, Fin.reduceAdd]

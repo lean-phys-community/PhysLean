@@ -104,8 +104,7 @@ lemma ofGradient_apply_sum {d} (χ : SpaceTime d → ℝ) (x : SpaceTime d) (μ 
   only the `κ = μ` term survives. -/
 lemma ofGradient_apply {d} (χ : SpaceTime d → ℝ) (x : SpaceTime d) (μ : Fin 1 ⊕ Fin d) :
     ofGradient χ x μ = η μ μ * ∂_ μ χ x := by
-  rw [ofGradient_apply_sum]
-  rw [Finset.sum_eq_single μ]
+  rw [ofGradient_apply_sum, Finset.sum_eq_single μ]
   · intro κ _ hκ
     rw [minkowskiMatrix.off_diag_zero (Ne.symm hκ)]
     simp
