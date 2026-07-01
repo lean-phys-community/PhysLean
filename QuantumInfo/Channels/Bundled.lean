@@ -176,8 +176,8 @@ variable [Fintype dIn] [Fintype dOut]
 namespace PMap
 
 @[ext]
-theorem ext {Λ₁ Λ₂ : PMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  exact (mk.injEq _ _ _ _).mpr (HPMap.ext h)
+theorem ext {Λ₁ Λ₂ : PMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ :=
+  (mk.injEq _ _ _ _).mpr (HPMap.ext h)
 
 theorem injective_toHPMap : (PMap.toHPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
@@ -229,8 +229,8 @@ end CPMap
 namespace PTPMap
 
 @[ext]
-theorem ext {Λ₁ Λ₂ : PTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  exact (mk.injEq _ _ _ _).mpr (PMap.ext h)
+theorem ext {Λ₁ Λ₂ : PTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ :=
+  (mk.injEq _ _ _ _).mpr (PMap.ext h)
 
 theorem injective_toPMap : (PTPMap.toPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
@@ -314,8 +314,8 @@ variable [DecidableEq dIn]
 
 /-- Two `CPTPMap`s are equal if their `MatrixMap`s are equal. -/
 @[ext]
-theorem ext {Λ₁ Λ₂ : CPTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  exact (mk.injEq _ _ _ _).mpr (PTPMap.ext h)
+theorem ext {Λ₁ Λ₂ : CPTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ :=
+  (mk.injEq _ _ _ _).mpr (PTPMap.ext h)
 
 theorem injective_toPTPMap : (CPTPMap.toPTPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
@@ -371,8 +371,8 @@ namespace PUMap
 variable [DecidableEq dIn] [DecidableEq dOut]
 
 @[ext]
-theorem ext {Λ₁ Λ₂ : PUMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  exact (mk.injEq _ _ _ _).mpr (PMap.ext h)
+theorem ext {Λ₁ Λ₂ : PUMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ :=
+  (mk.injEq _ _ _ _).mpr (PMap.ext h)
 
 theorem injective_toPMap : (PUMap.toPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
@@ -412,8 +412,8 @@ namespace CPUMap
 variable [DecidableEq dIn] [DecidableEq dOut]
 
 @[ext]
-theorem ext {Λ₁ Λ₂ : CPUMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  exact (mk.injEq _ _ _ _).mpr ((CPMap.mk.injEq _ _ _ _).mpr (PMap.ext h))
+theorem ext {Λ₁ Λ₂ : CPUMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ :=
+  (mk.injEq _ _ _ _).mpr ((CPMap.mk.injEq _ _ _ _).mpr (PMap.ext h))
 
 theorem injective_toPMap : (CPMap.toPMap ∘ CPUMap.toCPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
   fun _ _ h => (mk.injEq _ _ _ _).mpr ((CPMap.mk.injEq _ _ _ _).mpr h)
