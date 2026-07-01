@@ -57,8 +57,7 @@ def choi := Λ.map.choi_matrix
 
 /-- Two CPTPMaps are equal if their Choi matrices are equal. -/
 theorem choi_ext {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : Λ₁.choi = Λ₂.choi) : Λ₁ = Λ₂ := by
-  ext1
-  exact MatrixMap.choi_equiv.injective h
+  exact CPTPMap.ext (MatrixMap.choi_equiv.injective h)
 
 /-- The Choi matrix of a channel is PSD. -/
 theorem choi_PSD_of_CPTP : Λ.map.choi_matrix.PosSemidef :=
@@ -82,8 +81,7 @@ def CPTP_of_choi_PSD_Tr {M : Matrix (dOut × dIn) (dOut × dIn) ℂ} (h₁ : M.P
 @[simp]
 theorem choi_of_CPTP_of_choi (M : Matrix (dOut × dIn) (dOut × dIn) ℂ) {h₁} {h₂} :
     (CPTP_of_choi_PSD_Tr (M := M) h₁ h₂).choi = M := by
-  simp only [choi, CPTP_of_choi_PSD_Tr]
-  rw [MatrixMap.map_choi_inv]
+  exact MatrixMap.map_choi_inv M
 
 theorem mat_coe_eq_apply_mat [DecidableEq dOut] (ρ : MState dIn) : (Λ ρ).m = Λ.map ρ.m :=
   rfl
@@ -166,7 +164,7 @@ theorem id_MState (ρ : MState dIn) : CPTPMap.id (dIn := dIn) ρ = ρ := by
 /-- The map `CPTPMap.id` composed with any map is the same map. -/
 @[simp]
 theorem id_compose [DecidableEq dOut] (Λ : CPTPMap dIn dOut) : id ∘ₘ Λ = Λ := by
-  apply funext
+  ext ρ
   simp
 
 /-- Any map composed with `CPTPMap.id` is the same map. -/

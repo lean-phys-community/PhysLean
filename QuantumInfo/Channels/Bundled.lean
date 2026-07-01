@@ -413,12 +413,10 @@ variable [DecidableEq dIn] [DecidableEq dOut]
 
 @[ext]
 theorem ext {Λ₁ Λ₂ : CPUMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
-  rw [CPUMap.mk.injEq, CPMap.mk.injEq]
-  exact PMap.ext h
+  exact (mk.injEq _ _ _ _).mpr ((CPMap.mk.injEq _ _ _ _).mpr (PMap.ext h))
 
-theorem injective_toPMap : (CPMap.toPMap ∘ CPUMap.toCPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective := by
-  intro _ _ _
-  rwa [CPUMap.mk.injEq, CPMap.mk.injEq]
+theorem injective_toPMap : (CPMap.toPMap ∘ CPUMap.toCPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
+  fun _ _ h => (mk.injEq _ _ _ _).mpr ((CPMap.mk.injEq _ _ _ _).mpr h)
 
 /-- `CPUMap`s are functions from `HermitianMat`s to `HermitianMat`s. -/
 noncomputable instance instFunLike : FunLike (CPUMap dIn dOut ℂ) (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
