@@ -75,8 +75,7 @@ private theorem nontrivial_hsumL : Nontrivial (L (HSum ℋ)) := by
   have hdiag_ne_zero : (blockDiagonal (ℋ := ℋ) (1 : L ℋ) 0 : L (HSum ℋ)) ≠ 0 := by
     intro h0
     have hz :
-        blockDiagonal (ℋ := ℋ) (1 : L ℋ) 0 (hsumIncl ℋ 0 w) = 0 := by
-      simp [h0]
+        blockDiagonal (ℋ := ℋ) (1 : L ℋ) 0 (hsumIncl ℋ 0 w) = 0 := by simp [h0]
     have hw0 : w = 0 := by
       have hz0 := congrArg (fun z : HSum ℋ => hsumProj ℋ 0 z) hz
       simpa [blockDiagonal] using hz0
@@ -146,10 +145,8 @@ private lemma cfcR_blockDiagonal (f : ℝ → ℝ)
         (hab := hpair) (ha := hA) (hb := hB))
   calc
     cfcR (ℋ := HSum ℋ) f (blockDiagonal (ℋ := ℋ) A B)
-        = cfc (R := ℝ) (A := L (HSum ℋ)) (p := IsSelfAdjoint) f (φ (A, B)) := by
-            simp [cfcR, φ]
-    _ = φ (cfc (R := ℝ) (A := L ℋ × L ℋ) (p := IsSelfAdjoint) f (A, B)) := by
-            simpa using hmap.symm
+        = cfc (R := ℝ) (A := L (HSum ℋ)) (p := IsSelfAdjoint) f (φ (A, B)) := by simp [cfcR, φ]
+    _ = φ (cfc (R := ℝ) (A := L ℋ × L ℋ) (p := IsSelfAdjoint) f (A, B)) := by simpa using hmap.symm
     _ = φ (cfcR (ℋ := ℋ) f A, cfcR (ℋ := ℋ) f B) := by
             rw [hprod]
     _ = blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f A) (cfcR (ℋ := ℋ) f B) := by
@@ -234,15 +231,12 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
         blockDiagonal (ℋ := ℋ) (star X * X + star Y * Y) 0 ≤ (1 : L (HSum ℋ)) := by
       exact sub_nonneg.mp (by simpa [hsub] using hblock_nonneg)
     simpa [hXtilde_star_mul] using hblock
-  have hXtilde_star_mul_nonneg : (0 : L (HSum ℋ)) ≤ star Xtilde * Xtilde := by
-    simp
+  have hXtilde_star_mul_nonneg : (0 : L (HSum ℋ)) ≤ star Xtilde * Xtilde := by simp
   have hXtilde_norm : ‖Xtilde‖ ≤ 1 := by
     have hnormSq : ‖star Xtilde * Xtilde‖ ≤ 1 :=
       (CStarAlgebra.norm_le_one_iff_of_nonneg _ hXtilde_star_mul_nonneg).2 hXtilde_star_mul_le
-    have hnormSq' : ‖Xtilde‖ * ‖Xtilde‖ ≤ 1 := by
-      simpa [CStarRing.norm_star_mul_self] using hnormSq
-    have hsq : ‖Xtilde‖ ^ 2 ≤ 1 := by
-      simpa [pow_two] using hnormSq'
+    have hnormSq' : ‖Xtilde‖ * ‖Xtilde‖ ≤ 1 := by simpa [CStarRing.norm_star_mul_self] using hnormSq
+    have hsq : ‖Xtilde‖ ^ 2 ≤ 1 := by simpa [pow_two] using hnormSq'
     nlinarith [norm_nonneg Xtilde]
   have hiv_hsum : CondIV (ℋ := HSum ℋ) f := @hiv (HSum ℋ) _ _ _ _
   have hcore := hiv_hsum (A := Atilde) (X := Xtilde) hAtilde_sa hAtilde_spec hXtilde_norm

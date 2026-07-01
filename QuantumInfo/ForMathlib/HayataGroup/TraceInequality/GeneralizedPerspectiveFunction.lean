@@ -126,8 +126,7 @@ private lemma spectrum_convexCombo_Ioi {A B : L ℋ} {t : ℝ}
           (smul_le_smul_of_nonneg_left hrB_le ht0)
     have hLHS :
         (1 - t) • algebraMap ℝ (L ℋ) rA + t • algebraMap ℝ (L ℋ) rB =
-          algebraMap ℝ (L ℋ) rC := by
-      simp [rC, Algebra.smul_def]
+          algebraMap ℝ (L ℋ) rC := by simp [rC, Algebra.smul_def]
     simpa [hLHS] using hsum
   intro x hx
   simpa [C] using
@@ -249,8 +248,7 @@ omit [Nontrivial ℋ] in
 private lemma conj_le_conj {X Y T : L ℋ} (hXY : X ≤ Y) (hT : IsSelfAdjoint T) :
     T * X * T ≤ T * Y * T := by
   have hnonneg : 0 ≤ Y - X := sub_nonneg.mpr hXY
-  have hconj : 0 ≤ T * (Y - X) * T := by
-    simpa using hT.conjugate_nonneg hnonneg
+  have hconj : 0 ≤ T * (Y - X) * T := by simpa using hT.conjugate_nonneg hnonneg
   have hsub : T * (Y - X) * T = T * Y * T - T * X * T := by
     simp [sub_eq_add_neg, mul_add, add_mul, mul_assoc]
   exact sub_nonneg.mp (by simpa [hsub] using hconj)
@@ -421,8 +419,7 @@ private theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
                 simp [T₁, hS₁_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
       _ = (1 - θ) • (S * IR * (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) * IR * S) := by
             rw [Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
-      _ = (1 - θ) • (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) := by
-            simp [mul_assoc, hSIR, hIRS]
+      _ = (1 - θ) • (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) := by simp [mul_assoc, hSIR, hIRS]
       _ = (1 - θ) • ((f Δ h) A₁ B₁) := rfl
   have hright₂ :
       S * (star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S =
@@ -434,8 +431,7 @@ private theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
                 simp [T₂, hS₂_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
       _ = θ • (S * IR * (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) * IR * S) := by
             rw [Real.mul_self_sqrt hθ0]
-      _ = θ • (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) := by
-            simp [mul_assoc, hSIR, hIRS]
+      _ = θ • (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) := by simp [mul_assoc, hSIR, hIRS]
       _ = θ • ((f Δ h) A₂ B₂) := rfl
   have hright :
       S * (star T₁ * cfcR (ℋ := ℋ) f M₁ * T₁ + star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S =

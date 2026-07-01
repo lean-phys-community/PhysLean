@@ -185,10 +185,8 @@ private lemma cfcR_blockDiagonal (f : ℝ → ℝ)
         (hab := hpair) (ha := hA) (hb := hB))
   calc
     cfcR (ℋ := HSum ℋ) f (blockDiagonal (ℋ := ℋ) A B)
-        = cfc (R := ℝ) (A := L (HSum ℋ)) (p := IsSelfAdjoint) f (φ (A, B)) := by
-          simp [cfcR, φ]
-    _ = φ (cfc (R := ℝ) (A := L ℋ × L ℋ) (p := IsSelfAdjoint) f (A, B)) := by
-          simpa using hmap.symm
+        = cfc (R := ℝ) (A := L (HSum ℋ)) (p := IsSelfAdjoint) f (φ (A, B)) := by simp [cfcR, φ]
+    _ = φ (cfc (R := ℝ) (A := L ℋ × L ℋ) (p := IsSelfAdjoint) f (A, B)) := by simpa using hmap.symm
     _ = φ (cfcR (ℋ := ℋ) f A, cfcR (ℋ := ℋ) f B) := by
           rw [hprod]
     _ = blockDiagonal (ℋ := ℋ) (cfcR (ℋ := ℋ) f A) (cfcR (ℋ := ℋ) f B) := by
@@ -333,8 +331,7 @@ private lemma complex_I_smul_real_I_smul_invTwo (r : ℝ) (T : L ℋ) :
             rw [hcomm]
     _ = ((Complex.I : ℂ) * Complex.I) • (r • ((2⁻¹ : ℝ) • T x)) := by
             rw [smul_smul]
-    _ = (-1 : ℂ) • (r • ((2⁻¹ : ℝ) • T x)) := by
-            norm_num
+    _ = (-1 : ℂ) • (r • ((2⁻¹ : ℝ) • T x)) := by norm_num
     _ = (-1 : ℂ) • (((r * 2⁻¹ : ℝ)) • T x) := by
             rw [smul_smul]
     _ = -((2⁻¹ : ℝ) * r) • T x := by simp [neg_smul, mul_comm]
@@ -357,8 +354,7 @@ omit [CompleteSpace ℋ] in
 private lemma half_add_half_eq (T : L ℋ) :
     (2⁻¹ : ℝ) • T + (2⁻¹ : ℝ) • T = T := by
   calc
-    (2⁻¹ : ℝ) • T + (2⁻¹ : ℝ) • T = (2⁻¹ + 2⁻¹ : ℝ) • T := by
-      simp [add_smul]
+    (2⁻¹ : ℝ) • T + (2⁻¹ : ℝ) • T = (2⁻¹ + 2⁻¹ : ℝ) • T := by simp [add_smul]
     _ = (1 : ℝ) • T := by norm_num
     _ = T := by simp
 
@@ -367,8 +363,7 @@ private lemma half_mul_real_add_half_mul_real_eq (r : ℝ) (T : L ℋ) :
     ((2⁻¹ : ℝ) * r) • T + ((2⁻¹ : ℝ) * r) • T = r • T := by
   calc
     ((2⁻¹ : ℝ) * r) • T + ((2⁻¹ : ℝ) * r) • T =
-        (((2⁻¹ : ℝ) * r) + ((2⁻¹ : ℝ) * r)) • T := by
-          simp [add_smul]
+        (((2⁻¹ : ℝ) * r) + ((2⁻¹ : ℝ) * r)) • T := by simp [add_smul]
     _ = r • T := by ring_nf
 
 private lemma rightEval_topLeft_scalar
@@ -381,8 +376,7 @@ private lemma rightEval_topLeft_scalar
   have hP :
       (2⁻¹ : ℝ) • (star X * (T * X)) +
           (2⁻¹ : ℝ) • (star X * (T * X)) =
-        star X * (T * X) := by
-    simpa using half_add_half_eq (ℋ := ℋ) (star X * (T * X))
+        star X * (T * X) := by simpa using half_add_half_eq (ℋ := ℋ) (star X * (T * X))
   have hQhalf :
       -((2⁻¹ : ℝ) • Complex.I • r • Complex.I • (R0 * R0)) +
           -((2⁻¹ : ℝ) • Complex.I • r • Complex.I • (R0 * R0)) =
@@ -401,8 +395,7 @@ private lemma rightEval_topLeft_scalar
     calc
       -((2⁻¹ : ℝ) • Complex.I • r • Complex.I • (R0 * R0)) +
           -((2⁻¹ : ℝ) • Complex.I • r • Complex.I • (R0 * R0)) =
-        ((2⁻¹ : ℝ) * r) • (R0 * R0) + ((2⁻¹ : ℝ) * r) • (R0 * R0) := by
-          simp [hterm]
+        ((2⁻¹ : ℝ) * r) • (R0 * R0) + ((2⁻¹ : ℝ) * r) • (R0 * R0) := by simp [hterm]
       _ = r • (R0 * R0) := half_mul_real_add_half_mul_real_eq (ℋ := ℋ) r (R0 * R0)
   calc
     (2⁻¹ : ℝ) • (star X * (T * X)) +
@@ -429,8 +422,7 @@ private lemma rightEval_bottomRight_scalar
     simpa using half_mul_real_add_half_mul_real_eq (ℋ := ℋ) r (X * star X)
   have hT :
       (2⁻¹ : ℝ) • (R1 * (T * R1)) + (2⁻¹ : ℝ) • (R1 * (T * R1)) =
-        R1 * (T * R1) := by
-    simpa using half_add_half_eq (ℋ := ℋ) (R1 * (T * R1))
+        R1 * (T * R1) := by simpa using half_add_half_eq (ℋ := ℋ) (R1 * (T * R1))
   calc
     (2⁻¹ * r) • (X * star X) +
         ((2⁻¹ * r) • (X * star X) +
@@ -490,8 +482,7 @@ private lemma blockSwap_norm_le_one [Nontrivial ℋ] (X : L ℋ) (hX : ‖X‖ �
         simp [sub_eq_add_neg, add_left_comm, add_comm]
     have hle' :
         blockDiagonal (ℋ := ℋ) (star X * X) (X * star X) ≤
-          blockDiagonal (ℋ := ℋ) (1 : L ℋ) (1 : L ℋ) := by
-      simpa [hsum] using hle
+          blockDiagonal (ℋ := ℋ) (1 : L ℋ) (1 : L ℋ) := by simpa [hsum] using hle
     simpa [blockDiagonal_one] using hle'
   have hSstarSle :
       star (blockSwap (ℋ := ℋ) X) * blockSwap (ℋ := ℋ) X ≤ (1 : L (HSum ℋ)) := by
@@ -502,8 +493,7 @@ private lemma blockSwap_norm_le_one [Nontrivial ℋ] (X : L ℋ) (hX : ‖X‖ �
     (CStarAlgebra.norm_le_one_iff_of_nonneg _ hSstarSnonneg).2 hSstarSle
   have hnormSq' : ‖blockSwap (ℋ := ℋ) X‖ * ‖blockSwap (ℋ := ℋ) X‖ ≤ 1 := by
     simpa [CStarRing.norm_star_mul_self] using hnormSq
-  have hsq : ‖blockSwap (ℋ := ℋ) X‖ ^ 2 ≤ 1 := by
-    simpa [pow_two] using hnormSq'
+  have hsq : ‖blockSwap (ℋ := ℋ) X‖ ^ 2 ≤ 1 := by simpa [pow_two] using hnormSq'
   have hnonneg : 0 ≤ ‖blockSwap (ℋ := ℋ) X‖ := norm_nonneg _
   nlinarith
 
@@ -528,8 +518,7 @@ omit [CompleteSpace ℋ] in
 private lemma spectrum_zero_subset_Ici :
     spectrum ℝ (0 : L ℋ) ⊆ Set.Ici (0 : ℝ) := by
   intro x hx
-  have hx0 : x = 0 := by
-    simpa using hx
+  have hx0 : x = 0 := by simpa using hx
   simp [Set.Ici, hx0]
 
 
@@ -550,8 +539,7 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
   have hSsa : IsSelfAdjoint S := by
     change star S = S
     simpa [S] using blockSwap_star (ℋ := ℋ) X
-  have hSnorm : ‖S‖ ≤ 1 := by
-    simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
+  have hSnorm : ‖S‖ ≤ 1 := by simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
   letI : Algebra ℝ (L (HSum ℋ)) := by
     infer_instance
   have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) := by
@@ -648,8 +636,7 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
     · have hhalf : (2⁻¹ + 2⁻¹ : ℝ) = (1 : ℝ) := by norm_num
       calc
         (1 / 2 : ℝ) • (star X * A * X) + (1 / 2 : ℝ) • (star X * A * X)
-            = (2⁻¹ + 2⁻¹ : ℝ) • (star X * (A * X)) := by
-                simp [add_smul, mul_assoc]
+            = (2⁻¹ + 2⁻¹ : ℝ) • (star X * (A * X)) := by simp [add_smul, mul_assoc]
         _ = (1 : ℝ) • (star X * (A * X)) := by rw [hhalf]
         _ = star X * (A * X) := by simp
         _ = star X * A * X := by simp [mul_assoc]
@@ -804,8 +791,7 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
   have hSsa : IsSelfAdjoint S := by
     change star S = S
     simpa [S] using blockSwap_star (ℋ := ℋ) X
-  have hSnorm : ‖S‖ ≤ 1 := by
-    simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
+  have hSnorm : ‖S‖ ≤ 1 := by simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
   letI : Algebra ℝ (L (HSum ℋ)) := by
     infer_instance
   have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) := by
@@ -903,8 +889,7 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
     · have hhalf : (2⁻¹ + 2⁻¹ : ℝ) = (1 : ℝ) := by norm_num
       calc
         (1 / 2 : ℝ) • (star X * A * X) + (1 / 2 : ℝ) • (star X * A * X)
-            = (2⁻¹ + 2⁻¹ : ℝ) • (star X * (A * X)) := by
-                simp [add_smul, mul_assoc]
+            = (2⁻¹ + 2⁻¹ : ℝ) • (star X * (A * X)) := by simp [add_smul, mul_assoc]
         _ = (1 : ℝ) • (star X * (A * X)) := by rw [hhalf]
         _ = star X * (A * X) := by simp
         _ = star X * A * X := by simp [mul_assoc]

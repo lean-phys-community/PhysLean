@@ -158,10 +158,8 @@ theorem operatorConvex_convexOn_univ {f : ℝ → ℝ} (hf : OperatorConvex (ℋ
           (algebraMap ℝ (L ℋ) u) * (algebraMap ℝ (L ℋ) r) +
             (algebraMap ℝ (L ℋ) v) * (algebraMap ℝ (L ℋ) s) := by
               rw [Algebra.smul_def, Algebra.smul_def]
-      _ = algebraMap ℝ (L ℋ) (u * r) + algebraMap ℝ (L ℋ) (v * s) := by
-            simp
-      _ = algebraMap ℝ (L ℋ) (u * r + v * s) := by
-            simp
+      _ = algebraMap ℝ (L ℋ) (u * r) + algebraMap ℝ (L ℋ) (v * s) := by simp
+      _ = algebraMap ℝ (L ℋ) (u * r + v * s) := by simp
   have hop :
       cfcR (ℋ := ℋ) f
           ((1 - b) • (algebraMap ℝ (L ℋ) x) + b • (algebraMap ℝ (L ℋ) y)) ≤
@@ -183,8 +181,7 @@ theorem operatorConvex_convexOn_univ {f : ℝ → ℝ} (hf : OperatorConvex (ℋ
     halg_combo (u := 1 - b) (v := b) (r := f x) (s := f y)] at hop
   have hscalar :
       algebraMap ℝ (L ℋ) (f ((1 - b) * x + b * y)) ≤
-        algebraMap ℝ (L ℋ) ((1 - b) * f x + b * f y) := by
-    simpa [Algebra.smul_def] using hop
+        algebraMap ℝ (L ℋ) ((1 - b) * f x + b * f y) := by simpa [Algebra.smul_def] using hop
   have hspec_le :
       ∀ z ∈ spectrum ℝ (algebraMap ℝ (L ℋ) (f ((1 - b) * x + b * y))),
         z ≤ (1 - b) * f x + b * f y := by
