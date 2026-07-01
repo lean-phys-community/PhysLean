@@ -198,8 +198,7 @@ private lemma exp_decay_smul_acceleration
   funext t
   rw [Time.deriv, fderiv_fun_smul (by fun_prop) (by fun_prop)]
   rw [fderiv_exp (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
-  rw [fderiv_fun_sub (hdy t) (by fun_prop)]
-  rw [fderiv_fun_const_smul (hy t)]
+  rw [fderiv_fun_sub (hdy t) (by fun_prop), fderiv_fun_const_smul (hy t)]
   have hy''_t := congrFun hy'' t
   rw [Time.deriv] at hy''_t
   simp only [add_apply, _root_.sub_apply,
@@ -217,8 +216,7 @@ private lemma exp_decay_smul_equationOfMotion
     (hγ : S.γ = 2 * S.m * a) (hk : S.k = S.m * (a^2 - μ)) :
     S.EquationOfMotion (fun t : Time => exp (-a * t.val) • y t) := by
   intro t
-  rw [exp_decay_smul_acceleration a μ y hy hdy hy'']
-  rw [exp_decay_smul_velocity a y hy]
+  rw [exp_decay_smul_acceleration a μ y hy hdy hy'', exp_decay_smul_velocity a y hy]
   rw [hγ, hk]
   simp [smul_add, smul_sub, smul_smul]
   module

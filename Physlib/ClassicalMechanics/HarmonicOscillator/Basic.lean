@@ -262,8 +262,7 @@ lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : Con
   unfold kineticEnergy
   conv_lhs => simp only [Time.deriv, one_div, ringHom_apply]
   change (fderiv ℝ ((fun x => 2⁻¹ * S.m * ⟪x, x⟫_ℝ) ∘ (fun t => ∂ₜ xₜ t)) t) 1 = _
-  rw [fderiv_comp]
-  rw [fderiv_const_mul (by fun_prop)]
+  rw [fderiv_comp, fderiv_const_mul (by fun_prop)]
   simp only [ContinuousLinearMap.smul_comp, FunLike.coe_smul,
     ContinuousLinearMap.coe_comp, Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
@@ -280,8 +279,7 @@ lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : C
   unfold potentialEnergy
   conv_lhs => simp only [Time.deriv, one_div, smul_eq_mul]
   change (fderiv ℝ ((fun x => 2⁻¹ * (S.k * ⟪x, x⟫_ℝ)) ∘ (fun t => xₜ t)) t) 1 = _
-  rw [fderiv_comp]
-  rw [fderiv_const_mul (by fun_prop), fderiv_const_mul (by fun_prop)]
+  rw [fderiv_comp, fderiv_const_mul (by fun_prop), fderiv_const_mul (by fun_prop)]
   simp only [ContinuousLinearMap.smul_comp, FunLike.coe_smul,
     ContinuousLinearMap.coe_comp, Pi.smul_apply, Function.comp_apply, smul_eq_mul]
   rw [fderiv_inner_apply]
@@ -304,8 +302,7 @@ lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff �
   rw [Time.deriv_eq]
   rw [fderiv_fun_add (by fun_prop) (by apply S.potentialEnergy_differentiable xₜ hx)]
   simp only [_root_.add_apply]
-  rw [← Time.deriv_eq, ← Time.deriv_eq]
-  rw [potentialEnergy_deriv, kineticEnergy_deriv]
+  rw [← Time.deriv_eq, ← Time.deriv_eq, potentialEnergy_deriv, kineticEnergy_deriv]
   simp only
   rw [← inner_add_right]
   fun_prop
