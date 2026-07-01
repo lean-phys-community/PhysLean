@@ -236,8 +236,7 @@ open Complex
 /-- The inclusion of `RatComplexNum` into the complex numbers. -/
 noncomputable def toComplexNum : RatComplexNum →+* ℂ where
   toFun := fun x => x.fst + x.snd * I
-  map_one' := by
-    simp
+  map_one' := by simp
   map_add' a b := by
     simp only [add_fst, Rat.cast_add, add_snd]
     ring
@@ -246,8 +245,7 @@ noncomputable def toComplexNum : RatComplexNum →+* ℂ where
     ring_nf
     simp only [I_sq, mul_neg, mul_one]
     ring
-  map_zero' := by
-    simp
+  map_zero' := by simp
 
 @[simp]
 lemma I_mul_toComplexNum (a : RatComplexNum) : I * toComplexNum a = toComplexNum (⟨0, 1⟩ * a) := by

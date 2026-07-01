@@ -400,8 +400,7 @@ theorem physHermite_norm (n : ℕ) :
     rw [aeval_C]
     simp
   rw [MeasureTheory.integral_const_mul]
-  have h1 : ∫ (x : ℝ), Real.exp (- x^2) = Real.sqrt (Real.pi) := by
-    simpa using integral_gaussian 1
+  have h1 : ∫ (x : ℝ), Real.exp (- x^2) = Real.sqrt (Real.pi) := by simpa using integral_gaussian 1
   rw [h1]
 
 lemma physHermite_norm_cons (n : ℕ) (c : ℝ) :

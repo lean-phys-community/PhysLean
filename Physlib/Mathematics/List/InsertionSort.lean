@@ -285,8 +285,7 @@ lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Pro
       rw [insertionSortEquiv_congr _ _ h1]
       simp
     · have h1 : (List.orderedInsert r a (b :: l1) ++ a2 :: l2) =
-        (b :: List.orderedInsert r a (l1) ++ a2 :: l2) := by
-        simp [h]
+        (b :: List.orderedInsert r a (l1) ++ a2 :: l2) := by simp [h]
       rw [insertionSortEquiv_congr _ _ h1]
       simp only [List.cons_append, List.length_cons,
         Equiv.trans_apply, RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply, Fin.cast_mk,

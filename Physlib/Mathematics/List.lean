@@ -604,8 +604,7 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
   | some i => List.eraseIdx l i
 
 lemma eraseIdx_length' {I : Type} (l : List I) (i : Fin l.length) :
-    (List.eraseIdx l i).length = l.length - 1 := by
-  simp [List.length_eraseIdx]
+    (List.eraseIdx l i).length = l.length - 1 := by simp [List.length_eraseIdx]
 
 lemma eraseIdx_length {I : Type} (l : List I) (i : Fin l.length) :
     (List.eraseIdx l i).length + 1 = l.length := by
@@ -620,8 +619,7 @@ lemma eraseIdx_length_succ {I : Type} (l : List I) (i : Fin l.length) :
   omega
 
 lemma eraseIdx_cons_length {I : Type} (a : I) (l : List I) (i : Fin (a :: l).length) :
-    (List.eraseIdx (a :: l) i).length= l.length := by
-  simp [List.length_eraseIdx]
+    (List.eraseIdx (a :: l) i).length= l.length := by simp [List.length_eraseIdx]
 
 lemma eraseIdx_get {I : Type} (l : List I) (i : Fin l.length) :
     (List.eraseIdx l i).get = l.get ∘ (Fin.cast (eraseIdx_length l i)) ∘

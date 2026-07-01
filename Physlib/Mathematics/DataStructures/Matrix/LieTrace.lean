@@ -38,8 +38,7 @@ instance [UniformSpace 𝕂] : UniformSpace (Matrix m n 𝕂) := by unfold Matri
 lemma tsum_eq_zero
     {β : Type*} [TopologicalSpace β] [AddCommMonoid β]
     {f : ℕ → β} (h : ∀ n, f n = 0) :
-    (∑' n, f n) = 0 := by
-  simp_all only [tsum_zero]
+    (∑' n, f n) = 0 := by simp_all only [tsum_zero]
 
 /-!
   ### The determinant of the matrix exponential

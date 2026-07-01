@@ -215,8 +215,7 @@ rule.
 
 /-- Constants have zero holomorphic directional Wirtinger derivative, `∂_v c = 0`. -/
 @[simp] lemma dWirtingerDir_const (c : ℂ) (v u : V) :
-    dWirtingerDir (fun _ : V => c) v u = 0 := by
-  simp [dWirtingerDir_apply, fderiv_const_apply]
+    dWirtingerDir (fun _ : V => c) v u = 0 := by simp [dWirtingerDir_apply, fderiv_const_apply]
 
 /-- Constants have zero anti-holomorphic directional Wirtinger derivative, `∂̄_v c = 0`. -/
 @[simp] lemma dWirtingerAntiDir_const (c : ℂ) (v u : V) :
@@ -740,8 +739,7 @@ lemma differentiableAt_dWirtingerAntiDir (hf2 : ContDiffAt ℝ 2 f u) (w : V) :
 fields agreeing on a neighbourhood have equal derivative. -/
 lemma dWirtingerDir_congr_of_eventuallyEq {f₁ f₂ : V → ℂ} {u : V}
     (h : f₁ =ᶠ[nhds u] f₂) (v : V) :
-    dWirtingerDir f₁ v u = dWirtingerDir f₂ v u := by
-  simp only [dWirtingerDir_apply, h.fderiv_eq]
+    dWirtingerDir f₁ v u = dWirtingerDir f₂ v u := by simp only [dWirtingerDir_apply, h.fderiv_eq]
 
 /-- The anti-holomorphic directional derivative depends only on the field near the
 point; dual of `dWirtingerDir_congr_of_eventuallyEq`. -/

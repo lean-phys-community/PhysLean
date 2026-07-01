@@ -193,8 +193,7 @@ def pseudoRiemannianMetricValToQuadraticForm
     (symm : ∀ (x : M) (v w : TangentSpace I x), (val x v) w = (val x w) v)
     (x : M) : QuadraticForm ℝ (TangentSpace I x) where
   toFun v := val x v v
-  toFun_smul a v := by
-    simp only [ContinuousLinearMap.map_smul, _root_.smul_apply, smul_smul]
+  toFun_smul a v := by simp only [ContinuousLinearMap.map_smul, _root_.smul_apply, smul_smul]
   exists_companion' :=
       ⟨LinearMap.mk₂ ℝ (fun v y => val x v y + val x y v)
         (fun v₁ v₂ y => by simp only [map_add, add_apply]; ring)
@@ -602,8 +601,7 @@ lemma cotangentMetricVal_nondegenerate (g : PseudoRiemannianMetric E H M n I) (x
   have h_forall : ∀ w : TangentSpace I x, ω w = 0 := by
     intro w
     let ω' : TangentSpace I x →L[ℝ] ℝ := g.flatL x w
-    have this : g.sharpL x ω' = w := by
-      simp only [ω', sharpL_apply_flatL]
+    have this : g.sharpL x ω' = w := by simp only [ω', sharpL_apply_flatL]
     have h_apply : cotangentMetricVal g x ω ω' = 0 := h ω'
     simp only [cotangentMetricVal_eq_apply_sharp] at h_apply
     rw [this] at h_apply

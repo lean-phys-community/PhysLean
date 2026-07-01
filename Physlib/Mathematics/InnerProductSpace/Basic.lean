@@ -512,8 +512,7 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
           rw [hi]
           use i
           simp
-      have hj : ∀ j, ‖x j‖ ≤ ‖x i‖ := by
-        simpa [← hi] using fun j => norm_le_pi_norm x j
+      have hj : ∀ j, ‖x j‖ ≤ ‖x i‖ := by simpa [← hi] using fun j => norm_le_pi_norm x j
       rw [hi]
       constructor
       · apply le_trans (h (x i)).1
