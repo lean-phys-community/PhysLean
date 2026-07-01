@@ -332,34 +332,22 @@ lemma rightDualRightUnit_eq_ofRat : δR = ofRat fun f =>
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `coContrUnit` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_coContrUnit (g : SL(2,ℂ)) : g • δ' = δ' := by
-  rw [unitTensor_invariant]
+lemma actionT_coContrUnit (g : SL(2,ℂ)) : g • δ' = δ' := unitTensor_invariant g
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `contrCoUnit` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_contrCoUnit (g : SL(2,ℂ)) : g • δ = δ := by
-  rw [unitTensor_invariant]
+lemma actionT_contrCoUnit (g : SL(2,ℂ)) : g • δ = δ := unitTensor_invariant g
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `dualLeftLeftUnit` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_dualLeftLeftUnit (g : SL(2,ℂ)) : g • δL' = δL' := by
-  rw [unitTensor_invariant]
+lemma actionT_dualLeftLeftUnit (g : SL(2,ℂ)) : g • δL' = δL' := unitTensor_invariant g
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `leftDualLeftUnit` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_leftDualLeftUnit (g : SL(2,ℂ)) : g • δL = δL := by
-  rw [unitTensor_invariant]
+lemma actionT_leftDualLeftUnit (g : SL(2,ℂ)) : g • δL = δL := unitTensor_invariant g
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `dualRightRightUnit` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_dualRightRightUnit (g : SL(2,ℂ)) : g • δR' = δR' := by
-  rw [unitTensor_invariant]
+lemma actionT_dualRightRightUnit (g : SL(2,ℂ)) : g • δR' = δR' := unitTensor_invariant g
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `rightDualRightUnit` is invariant under the action of `SL(2,ℂ)`. -/
-lemma actionT_rightDualRightUnit (g : SL(2,ℂ)) : g • δR = δR := by
-  rw [unitTensor_invariant]
+lemma actionT_rightDualRightUnit (g : SL(2,ℂ)) : g • δR = δR := unitTensor_invariant g
 
 end complexLorentzTensor
