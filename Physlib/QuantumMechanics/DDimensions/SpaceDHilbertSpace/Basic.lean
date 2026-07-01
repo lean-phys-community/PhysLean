@@ -78,7 +78,7 @@ lemma toBra_symm_apply (f : StrongDual ℂ (SpaceDHilbertSpace d)) : ⟪toBra.sy
   to be true if the function `f` can be lifted to the Hilbert space. -/
 def MemHS (f : Space d → ℂ) : Prop := MemLp f 2 volume
 
-lemma memHS : MemHS ψ := Lp.memLp ψ
+lemma memHS_coe : MemHS ψ := Lp.memLp ψ
 
 /-- A function `f` satisfies `MemHS f` if and only if it is a.e. strongly measurable
   and square integrable. -/
@@ -129,7 +129,8 @@ lemma coeFn_mk : mk hf =ᵐ[volume] f := AEEqFun.coeFn_mk f hf.1
 
 lemma mk_eq_iff : mk hf = mk hg ↔ f =ᵐ[volume] g := by simp [mk]
 
-lemma mk_surjective : ∃ (f : Space d → ℂ) (hf : MemHS f), mk hf = ψ := ⟨ψ, memHS ψ, by simp [mk]⟩
+lemma mk_surjective : ∃ (f : Space d → ℂ) (hf : MemHS f), mk hf = ψ :=
+  ⟨ψ, memHS_coe ψ, by simp [mk]⟩
 
 lemma inner_mk_mk : ⟪mk hf, mk hg⟫_ℂ = ∫ x, starRingEnd ℂ (f x) * g x := by
   apply integral_congr_ae

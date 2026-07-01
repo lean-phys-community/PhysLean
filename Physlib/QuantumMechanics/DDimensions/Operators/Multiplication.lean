@@ -109,13 +109,13 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
   obtain ⟨u, hu, hfu⟩ := AEStronglyMeasurable.aemeasurable hf
   let s : ℕ → Set (Space d) := fun n ↦ u ⁻¹' (Metric.closedBall 0 n)
   let φ : ℕ → SpaceDHilbertSpace d := fun n ↦
-    mk ((memHS ψ).indicator (s := s n) (by measurability))
+    mk ((memHS_coe ψ).indicator (s := s n) (by measurability))
   have hφ : ∀ n, φ n =ᵐ[volume] (s n).indicator ψ := fun n ↦ coeFn_mk _
   use φ
   constructor
   · intro n
     refine memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
-    refine HasFiniteIntegral.mono (memHS_iff.mp <| memHS (n • φ n)).2.2 ?_
+    refine HasFiniteIntegral.mono (memHS_iff.mp <| memHS_coe (n • φ n)).2.2 ?_
     filter_upwards [hfu, coeFn_smul n (φ n), hφ n] with x h₁ h₂ h₃
     by_cases hx : x ∈ s n
     · simp_rw [norm_pow, norm_norm, sq_le_sq, abs_norm]
@@ -138,7 +138,7 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
     · intro n
       filter_upwards with x
       by_cases hx : x ∈ s n <;> simp [hx]
-    · have : ∫⁻ x, ‖‖ψ x‖ ^ 2‖ₑ ≠ ⊤ := (memHS_iff.mp <| memHS ψ).2.2.ne
+    · have : ∫⁻ x, ‖‖ψ x‖ ^ 2‖ₑ ≠ ⊤ := (memHS_iff.mp <| memHS_coe ψ).2.2.ne
       simp_all
     · filter_upwards with x
       rw [← zero_pow two_ne_zero, ← enorm_zero (E := ℂ)]
@@ -154,7 +154,7 @@ lemma mulOperator_domain_ge_of_hasTemperateGrowth
   obtain ⟨g, hg⟩ := schwartzEquiv.surjective ⟨ψ, hψ⟩
   let w : 𝓢(Space d, ℂ) := smulLeftCLM ℂ f g
   let φ : SpaceDHilbertSpace d := schwartzEquiv w
-  refine (memHS φ).ae_eq ?_
+  refine (memHS_coe φ).ae_eq ?_
   filter_upwards [schwartzEquiv_coe_ae w, schwartzEquiv_coe_ae g] with x h₁ h₂
   simp [w, φ, h₁, ← h₂, hg, smulLeftCLM_apply_apply hf]
 
@@ -230,7 +230,7 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
     exact setLIntegral_congr_fun (hs_meas n) fun x hx ↦ by simp [w, hx, ← mul_assoc, ← pow_two]
   suffices ∀ n, ∫⁻ x in s n, ‖‖f x‖ ^ 2 * ‖ψ x‖ ^ 2‖ₑ ≤ ∫⁻ x, ‖‖ξ x‖ ^ 2‖ₑ by
     refine memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
-    refine lt_of_le_of_lt ?_ (memHS_iff.mp <| memHS ξ).2.2
+    refine lt_of_le_of_lt ?_ (memHS_iff.mp <| memHS_coe ξ).2.2
     trans ⨆ n, ∫⁻ x in s n, ‖‖f x‖ ^ 2 * ‖ψ x‖ ^ 2‖ₑ
     · rw [← setLIntegral_univ, ← hs_univ,
         setLIntegral_iUnion_of_directed _ (directed_of_isDirected_le hs_mono)]
@@ -248,8 +248,8 @@ lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasur
           refine lintegral_congr_ae ?_
           filter_upwards [coeFn_mk (hw n)] with x h₁
           simp [φ, h₁]
-    · exact (memHS_iff.mp <| memHS (φ n)).2.2.ne
-    · exact (memHS_iff.mp <| memHS ξ).2.2.ne
+    · exact (memHS_iff.mp <| memHS_coe (φ n)).2.2.ne
+    · exact (memHS_iff.mp <| memHS_coe ξ).2.2.ne
     · suffices h : ∀ ψ : SpaceDHilbertSpace d, ‖ψ‖ ^ 2 = (∫⁻ x, ‖‖ψ x‖ ^ 2‖ₑ).toReal by
         simp only [← h, this]
       intro ψ
