@@ -293,8 +293,7 @@ lemma boost_zero_inr_nat_succ_inr_0 {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i : �
 lemma boost_zero_inr_succ_inr_succ {d : ℕ} {β : ℝ} (hβ : |β| < 1) (i1 i2 : Fin d) :
     (boost (0 : Fin d.succ) β hβ).1 (Sum.inr i1.succ) (Sum.inr i2.succ) =
     if i1 = i2 then 1 else 0 := by
-  rw [boost_inr_inr_other hβ (Fin.succ_ne_zero i2)]
-  simp [Fin.succ_inj, eq_comm]
+  simp [boost_inr_inr_other hβ (Fin.succ_ne_zero i2), Fin.succ_inj, eq_comm]
 
 end LorentzGroup
 

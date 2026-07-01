@@ -96,8 +96,7 @@ lemma not_isOrthochronous_iff_le_zero : ¬ IsOrthochronous Λ ↔ Λ.1 (Sum.inl 
 
 lemma not_isOrthochronous_iff_toVector_timeComponet_nonpos :
     ¬ IsOrthochronous Λ ↔ (toVector Λ).timeComponent ≤ 0:= by
-  rw [not_isOrthochronous_iff_le_zero]
-  simp
+  simp [not_isOrthochronous_iff_le_zero]
 
 /-- The identity Lorentz transformation is orthochronous. -/
 lemma id_isOrthochronous : @IsOrthochronous d 1 := by
