@@ -413,8 +413,7 @@ def conjChiralCovector
 `toField`. -/
 lemma toField_conjScalar (t : (chiralTensor (ι := ι)).Tensor ![]) :
     (conjScalar t).toField = star t.toField := by
-  rw [conjScalar, toField_permT]
-  rw [toField_eq_repr, toField_eq_repr]
+  rw [conjScalar, toField_permT, toField_eq_repr, toField_eq_repr]
   change componentMap (S := (chiralTensor (ι := ι)).toTensorSpecies)
       ((chiralTensor (ι := ι)).bar ∘ ![]) ((chiralTensor (ι := ι)).conjT t) (fun j => Fin.elim0 j) =
     star ((basis (S := (chiralTensor (ι := ι)).toTensorSpecies) ![]).repr t (fun j => Fin.elim0 j))

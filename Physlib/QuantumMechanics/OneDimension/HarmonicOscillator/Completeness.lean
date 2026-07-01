@@ -142,8 +142,7 @@ lemma mul_power_integrable (f : ℝ → ℂ) (hf : MemHS f) (r : ℕ) :
 lemma orthogonal_eigenfunction_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (n : ℕ) : ∫ (x : ℝ), Q.eigenfunction n x * f x = 0 := by
-  rw [← hOrth n]
-  rw [inner_mk_mk]
+  rw [← hOrth n, inner_mk_mk]
   simp
 
 local notation "m" => Q.m

@@ -97,8 +97,7 @@ lemma shift_tb_phase_zero {V : CKMMatrix} (h1 : t + b = - arg [V]tb) :
 
 lemma shift_cd_phase_pi {V : CKMMatrix} (h1 : c + d = Real.pi - arg [V]cd) :
     [phaseShiftApply V u c t d s b]cd = - VcdAbs ⟦V⟧ := by
-  rw [phaseShiftApply.cd]
-  rw [← norm_mul_exp_arg_mul_I [V]cd]
+  rw [phaseShiftApply.cd, ← norm_mul_exp_arg_mul_I [V]cd]
   rw [mul_comm, mul_assoc, ← exp_add]
   have h2 : ↑(arg [V]cd) * I + (↑c * I + ↑d * I) = ↑(arg [V]cd + (c + d)) * I := by
     simp only [Fin.isValue, ofReal_add]

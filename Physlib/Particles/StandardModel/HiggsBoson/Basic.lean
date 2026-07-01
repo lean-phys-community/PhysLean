@@ -176,8 +176,7 @@ lemma gaugeGroupI_smul_eq_U1_mul_SU2 (g : StandardModel.GaugeGroupI) (φ : Higgs
 
 lemma gaugeGroupI_smul_eq_U1_smul_SU2 (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
     g • φ = (WithLp.toLp 2 <| (g.toU1 ^ 3 • g.toSU2.1) *ᵥ φ.ofLp) := by
-  rw [gaugeGroupI_smul_eq]
-  rw [Matrix.smul_mulVec]
+  rw [gaugeGroupI_smul_eq, Matrix.smul_mulVec]
 
 instance : MulAction StandardModel.GaugeGroupI HiggsVec where
   one_smul φ := by simp [gaugeGroupI_smul_eq]
