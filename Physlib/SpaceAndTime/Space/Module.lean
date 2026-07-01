@@ -64,8 +64,7 @@ lemma add_val {d: ℕ} (x y : Space d) :
 
 @[simp]
 lemma add_apply {d : ℕ} (x y : Space d) (i : Fin d) :
-    (x + y) i = x i + y i := by
-  simp [add_val]
+    (x + y) i = x i + y i := by simp [add_val]
 
 instance {d} : AddCommMonoid (Space d) where
   add_assoc a b c := eq_of_apply fun i => by simp [add_assoc]
@@ -154,8 +153,7 @@ lemma point_dim_zero_eq (p : Space 0) : p = 0 :=
 
 @[simp]
 lemma norm_vadd_zero {d} (v : EuclideanSpace ℝ (Fin d)) :
-    ‖v +ᵥ (0 : Space d)‖ = ‖v‖ := by
-  simp [norm_eq, PiLp.norm_eq_of_L2]
+    ‖v +ᵥ (0 : Space d)‖ = ‖v‖ := by simp [norm_eq, PiLp.norm_eq_of_L2]
 
 instance : Neg (Space d) where
   neg p := ⟨fun i => - (p.val i)⟩

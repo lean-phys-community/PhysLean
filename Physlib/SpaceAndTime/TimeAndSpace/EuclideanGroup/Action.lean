@@ -82,13 +82,11 @@ lemma snd_smul (g : EuclideanGroup d) (tx : TimeAndSpace d) :
 
 /-- The Euclidean-group action fixes the time projection. -/
 lemma time_smul (g : EuclideanGroup d) (tx : TimeAndSpace d) :
-    time (g • tx) = time tx := by
-  simp [time]
+    time (g • tx) = time tx := by simp [time]
 
 /-- The Euclidean-group action applies to the space projection. -/
 lemma space_smul (g : EuclideanGroup d) (tx : TimeAndSpace d) :
-    space (g • tx) = g • space tx := by
-  simp [space]
+    space (g • tx) = g • space tx := by simp [space]
 
 /-- The Euclidean-group action on `TimeAndSpace d` preserves product distance. -/
 lemma dist_smul (g : EuclideanGroup d) (tx ty : TimeAndSpace d) :

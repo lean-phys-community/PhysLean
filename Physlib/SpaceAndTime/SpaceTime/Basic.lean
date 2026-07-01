@@ -253,8 +253,7 @@ def time {d : ℕ} (c : SpeedOfLight := 1) : SpaceTime d →ₗ[ℝ] Time where
 
 @[simp]
 lemma time_val_toCoord_symm {d : ℕ} (c : SpeedOfLight) (f : Fin 1 ⊕ Fin d → ℝ) :
-    (time c f).val = f (Sum.inl 0) / c := by
-  simp [time, Lorentz.Vector.timeComponent]
+    (time c f).val = f (Sum.inl 0) / c := by simp [time, Lorentz.Vector.timeComponent]
 
 /-!
 
@@ -290,8 +289,7 @@ def toTimeAndSpace {d : ℕ} (c : SpeedOfLight := 1) : SpaceTime d ≃L[ℝ] Tim
         simp
       ext i
       simp
-    map_smul' := by
-      simp
+    map_smul' := by simp
   }
 
 @[simp]

@@ -377,8 +377,7 @@ noncomputable def distTimeDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
       map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' f1 f2 := by
-    simp
+  map_add' f1 f2 := by simp
   map_smul' a f := by simp
 
 lemma distTimeDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
@@ -425,8 +424,7 @@ noncomputable def distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M
       map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' f1 f2 := by
-    simp
+  map_add' f1 f2 := by simp
   map_smul' a f := by simp
 
 lemma distSpaceDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]

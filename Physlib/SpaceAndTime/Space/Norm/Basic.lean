@@ -445,8 +445,7 @@ lemma deriv_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) (x : Space d) (i 
   simp only [basis_inner]
   field_simp
   ring_nf
-  have h1 : normPowerSeries n x ^ (-1 + m) = normPowerSeries n x ^ ((-2 + m) + 1) := by
-    ring_nf
+  have h1 : normPowerSeries n x ^ (-1 + m) = normPowerSeries n x ^ ((-2 + m) + 1) := by ring_nf
   rw [h1, zpow_add₀]
   simp only [Int.reduceNeg, zpow_one]
   ring
@@ -990,8 +989,7 @@ private lemma radial_power_deriv_integral_by_parts
           simp [fderiv_smul_const]
         rw [iteratedFDeriv_succ_const]
         rfl) (by use 1, 1; simp [norm_smul]) η
-  have hη'_apply (x : ℝ) : η' x = η (x • n.1) := by
-    simp [η']
+  have hη'_apply (x : ℝ) : η' x = η (x • n.1) := by simp [η']
   have hmul_iter_apply :
       ∀ k x, ((Physlib.Distribution.powOneMul ℝ)^[k] η') x = x ^ k * η' x := by
     intro k
@@ -1162,8 +1160,7 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
     dsimp [p]
     exact Int.toNat_of_nonneg (le_of_lt hq)
   have hp_pos : 0 < p := by
-    have : (0 : ℤ) < (p : ℤ) := by
-      simpa [hp_int] using hq
+    have : (0 : ℤ) < (p : ℤ) := by simpa [hp_int] using hq
     exact_mod_cast this
   have hcoef : (((q + d : ℤ) : ℝ)) = (p : ℝ) := by
     exact_mod_cast hp_int.symm

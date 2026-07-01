@@ -71,8 +71,7 @@ lemma val_injective : Function.Injective TimeMan.val := by
 
 lemma val_isOpenEmbedding : Topology.IsOpenEmbedding TimeMan.val where
   eq_induced := rfl
-  isOpen_range := by
-    simp
+  isOpen_range := by simp
   injective := val_injective
 
 lemma isOpen_iff {s : Set TimeMan} :
@@ -107,8 +106,7 @@ def valHomeomorphism : TimeMan ≃ₜ ℝ where
 instance : ChartedSpace ℝ TimeMan where
   atlas := { valHomeomorphism.toOpenPartialHomeomorph }
   chartAt _ := valHomeomorphism.toOpenPartialHomeomorph
-  mem_chart_source := by
-    simp
+  mem_chart_source := by simp
   chart_mem_atlas := by
     intro x
     simp

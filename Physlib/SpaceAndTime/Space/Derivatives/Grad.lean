@@ -192,8 +192,7 @@ lemma grad_inner_eq {d} (f : Space d → ℝ) (x : Space d) (y : EuclideanSpace 
   simp [inner_smul_right, grad_inner_single]
 
 lemma inner_grad_eq {d} (f : Space d → ℝ) (x : EuclideanSpace ℝ (Fin d)) (y : Space d) :
-    ⟪x, ∇ f y⟫_ℝ = ∑ i, x i * ∂[i] f y := by
-  simpa [← grad_inner_eq] using real_inner_comm (∇ f y) x
+    ⟪x, ∇ f y⟫_ℝ = ∑ i, x i * ∂[i] f y := by simpa [← grad_inner_eq] using real_inner_comm (∇ f y) x
 
 lemma grad_inner_repr_eq {d} (f : Space d → ℝ) (x y : Space d) :
     ⟪∇ f x, (Space.basis).repr y⟫_ℝ = fderiv ℝ f x y := by
@@ -238,8 +237,7 @@ lemma gradient_apply_eq_grad {d} (f : Space d → ℝ) (x : Space d) :
   simp
 
 lemma gradient_eq_sum {d} (f : Space d → ℝ) (x : Space d) :
-    gradient f x = ∑ i, ∂[i] f x • basis i := by
-  simp [gradient_eq_grad, grad_eq_sum f x]
+    gradient f x = ∑ i, ∂[i] f x • basis i := by simp [gradient_eq_grad, grad_eq_sum f x]
 
 lemma euclid_gradient_eq_sum {d} (f : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) :
     gradient f x = ∑ i, fderiv ℝ f x (EuclideanSpace.single i 1) • EuclideanSpace.single i 1 := by

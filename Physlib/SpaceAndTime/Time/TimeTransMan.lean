@@ -89,8 +89,7 @@ lemma val_injective : Function.Injective TimeTransMan.val :=
 
 lemma val_isOpenEmbedding : Topology.IsOpenEmbedding TimeTransMan.val where
   eq_induced := rfl
-  isOpen_range := by
-    simp
+  isOpen_range := by simp
   injective := val_injective
 
 lemma isOpen_iff {s : Set TimeTransMan} :
@@ -125,8 +124,7 @@ def valHomeomorphism : TimeTransMan ≃ₜ ℝ where
 instance : ChartedSpace ℝ TimeTransMan where
   atlas := { valHomeomorphism.toOpenPartialHomeomorph }
   chartAt _ := valHomeomorphism.toOpenPartialHomeomorph
-  mem_chart_source := by
-    simp
+  mem_chart_source := by simp
   chart_mem_atlas := by
     intro x
     simp
@@ -218,8 +216,7 @@ lemma diff_eq_val (x : TimeUnit) (t1 t2 : TimeTransMan) :
 
 @[simp]
 lemma diff_self (x : TimeUnit) (t : TimeTransMan) :
-    diff x t t = 0 := by
-  simp [diff_eq_val]
+    diff x t t = 0 := by simp [diff_eq_val]
 
 lemma diff_fst_injective (x : TimeUnit) (t : TimeTransMan) : Function.Injective (diff x · t) := by
   intro t1 t2 h

@@ -488,14 +488,11 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   toFun f :=
     let ev : (Space d →L[ℝ] M) →L[ℝ] M := {
       toFun v := v (basis μ)
-      map_add' v1 v2 := by
-        simp only [_root_.add_apply]
-      map_smul' a v := by
-        simp
+      map_add' v1 v2 := by simp only [_root_.add_apply]
+      map_smul' a v := by simp
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' f1 f2 := by
-    simp
+  map_add' f1 f2 := by simp
   map_smul' a f := by simp
 
 @[inherit_doc distDeriv]
@@ -509,8 +506,7 @@ macro "∂ᵈ[" i:term "]" : term => `(distDeriv $i)
 
 lemma distDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin d) (f : (Space d) →d[ℝ] M) (ε : 𝓢(Space d, ℝ)) :
-    (∂ᵈ[μ] f) ε = fderivD ℝ f ε (basis μ) := by
-  simp [distDeriv, Distribution.fderivD]
+    (∂ᵈ[μ] f) ε = fderivD ℝ f ε (basis μ) := by simp [distDeriv, Distribution.fderivD]
 
 /-!
 

@@ -113,8 +113,7 @@ lemma integral_volume_eq_spherical (d : ℕ) [NeZero d] (f : Space d → F)
   filter_upwards [Measure.ae_ne volume 0] with x hx
   congr
   simp [smul_smul]
-  have hx : ‖x‖ ≠ 0 := by
-    simpa using hx
+  have hx : ‖x‖ ≠ 0 := by simpa using hx
   field_simp
   simp
 
@@ -234,8 +233,7 @@ lemma lintegral_volume_eq_spherical (d : ℕ) [NeZero d]
   filter_upwards [Measure.ae_ne volume 0] with x hx
   congr
   simp [smul_smul]
-  have hx : ‖x‖ ≠ 0 := by
-    simpa using hx
+  have hx : ‖x‖ ≠ 0 := by simpa using hx
   field_simp
   rw [one_smul]
 
