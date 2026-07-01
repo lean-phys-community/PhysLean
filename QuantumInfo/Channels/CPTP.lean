@@ -56,8 +56,8 @@ variable (Λ : CPTPMap dIn dOut)
 def choi := Λ.map.choi_matrix
 
 /-- Two CPTPMaps are equal if their Choi matrices are equal. -/
-theorem choi_ext {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : Λ₁.choi = Λ₂.choi) : Λ₁ = Λ₂ := by
-  exact CPTPMap.ext (MatrixMap.choi_equiv.injective h)
+theorem choi_ext {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : Λ₁.choi = Λ₂.choi) : Λ₁ = Λ₂ :=
+  CPTPMap.ext (MatrixMap.choi_equiv.injective h)
 
 /-- The Choi matrix of a channel is PSD. -/
 theorem choi_PSD_of_CPTP : Λ.map.choi_matrix.PosSemidef :=
@@ -80,8 +80,8 @@ def CPTP_of_choi_PSD_Tr {M : Matrix (dOut × dIn) (dOut × dIn) ℂ} (h₁ : M.P
 
 @[simp]
 theorem choi_of_CPTP_of_choi (M : Matrix (dOut × dIn) (dOut × dIn) ℂ) {h₁} {h₂} :
-    (CPTP_of_choi_PSD_Tr (M := M) h₁ h₂).choi = M := by
-  exact MatrixMap.map_choi_inv M
+    (CPTP_of_choi_PSD_Tr (M := M) h₁ h₂).choi = M :=
+  MatrixMap.map_choi_inv M
 
 theorem mat_coe_eq_apply_mat [DecidableEq dOut] (ρ : MState dIn) : (Λ ρ).m = Λ.map ρ.m :=
   rfl
@@ -350,10 +350,8 @@ infixl:70 "⊗ᶜᵖ" => CPTPMap.prod
 @[simp]
 theorem prod_apply_prod (Λ₁ : CPTPMap dI₁ dO₁) (Λ₂ : CPTPMap dI₂ dO₂)
     (ρ₁ : MState dI₁) (ρ₂ : MState dI₂) :
-    (Λ₁ ⊗ᶜᵖ Λ₂) (ρ₁ ⊗ᴹ ρ₂) = (Λ₁ ρ₁) ⊗ᴹ (Λ₂ ρ₂) := by
-  apply MState.ext_m
-  exact
-    MatrixMap.kron_map_of_kron_state Λ₁.map Λ₂.map ρ₁.m ρ₂.m
+    (Λ₁ ⊗ᶜᵖ Λ₂) (ρ₁ ⊗ᴹ ρ₂) = (Λ₁ ρ₁) ⊗ᴹ (Λ₂ ρ₂) :=
+  MState.ext_m (MatrixMap.kron_map_of_kron_state Λ₁.map Λ₂.map ρ₁.m ρ₂.m)
 
 end prod
 
