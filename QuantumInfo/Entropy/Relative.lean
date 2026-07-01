@@ -1493,7 +1493,6 @@ private theorem sandwichedRelRentropy_additive_alpha_one (ρ₁ σ₁ : MState d
   <;> by_cases h2 : σ₂.M.ker ≤ ρ₂.M.ker
   · simp only [SandwichedRelRentropy, ↓reduceIte, ↓reduceDIte, h1, h2]
     split_ifs <;> simp_all [ ker_prod_le_iff ];
-    simp only [sandwichedRelRentropy_additive_alpha_one_aux ρ₁ σ₁ ρ₂ σ₂ h1 h2]
     rfl
   · simp only [SandwichedRelRentropy, zero_lt_one, ↓reduceDIte, ↓reduceIte, h1, h2,
       add_top, dite_eq_right_iff, ENNReal.coe_ne_top, imp_false]

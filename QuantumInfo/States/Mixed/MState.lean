@@ -476,7 +476,6 @@ theorem spectralDecomposition (ρ : MState d) :
   congr!
   simp only [Matrix.mul_diagonal, Matrix.IsHermitian.eigenvectorUnitary_apply,
     mul_comm, Matrix.star_apply, RCLike.star_def]
-  simp only [Function.comp_apply, mat_M, mat_apply, HermitianMat.smul_apply, Complex.real_smul]
   rfl
 
 end pure

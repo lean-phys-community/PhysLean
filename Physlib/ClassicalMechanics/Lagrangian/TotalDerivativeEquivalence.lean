@@ -121,8 +121,7 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
        (1, ∂ₜ q t).2 = fderiv ℝ (fun t' => (tq q t').2) t 1 := by rfl
        _ = (∂ₜ (tq q) t).2 := by
         rw [fderiv.snd]
-        · simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.coe_snd']
-          rfl
+        · rfl
         · apply ContDiffAt.differentiableAt
           · exact (h_tq_contDiff q h_ContDiff_q).contDiffAt
           · by_contra
