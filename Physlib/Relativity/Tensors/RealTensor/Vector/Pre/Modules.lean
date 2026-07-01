@@ -146,24 +146,20 @@ lemma mulVec_val (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : Contr
     (M *ᵥ v).val = M *ᵥ v.val := rfl
 
 lemma mulVec_sub (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v w : ContrMod d) :
-    M *ᵥ (v - w) = M *ᵥ v - M *ᵥ w := by
-  simp only [mulVec, LinearMap.map_sub]
+    M *ᵥ (v - w) = M *ᵥ v - M *ᵥ w := by simp only [mulVec, LinearMap.map_sub]
 
 lemma sub_mulVec (M N : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : ContrMod d) :
-    (M - N) *ᵥ v = M *ᵥ v - N *ᵥ v := by
-  simp only [mulVec, map_sub, LinearMap.sub_apply]
+    (M - N) *ᵥ v = M *ᵥ v - N *ᵥ v := by simp only [mulVec, map_sub, LinearMap.sub_apply]
 
 lemma mulVec_add (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v w : ContrMod d) :
-    M *ᵥ (v + w) = M *ᵥ v + M *ᵥ w := by
-  simp only [mulVec, LinearMap.map_add]
+    M *ᵥ (v + w) = M *ᵥ v + M *ᵥ w := by simp only [mulVec, LinearMap.map_add]
 
 @[simp]
 lemma one_mulVec (v : ContrMod d) : (1 : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) *ᵥ v = v := by
   simp [mulVec, _root_.map_one]
 
 lemma mulVec_mulVec (M N : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) (v : ContrMod d) :
-    M *ᵥ (N *ᵥ v) = (M * N) *ᵥ v := by
-  simp [mulVec, _root_.map_mul]
+    M *ᵥ (N *ᵥ v) = (M * N) *ᵥ v := by simp [mulVec, _root_.map_mul]
 
 /-!
 
@@ -197,8 +193,7 @@ def toSpace (v : ContrMod d) : EuclideanSpace ℝ (Fin d) := WithLp.toLp 2 (v.va
 def rep : Representation ℝ (LorentzGroup d) (ContrMod d) where
   toFun g := Matrix.toLinAlgEquiv stdBasis g
   map_one' := EmbeddingLike.map_eq_one_iff.mpr rfl
-  map_mul' x y := by
-    simp only [lorentzGroupIsGroup_mul_coe, _root_.map_mul]
+  map_mul' x y := by simp only [lorentzGroupIsGroup_mul_coe, _root_.map_mul]
 
 lemma rep_apply_toFin1dℝ (g : LorentzGroup d) (ψ : ContrMod d) :
     (rep g ψ).toFin1dℝ = g.1 *ᵥ ψ.toFin1dℝ := rfl
