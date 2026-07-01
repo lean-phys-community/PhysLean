@@ -76,8 +76,7 @@ def insertAndContractNat (c : WickContraction n) (i : Fin n.succ) (j : Option (c
       simp_all only [Finset.mem_insert, Nat.succ_eq_add_one]
       match ha, hb with
       | Or.inl ha, Or.inl hb =>
-        rw [ha, hb]
-        simp
+        simp [ha, hb]
       | Or.inl ha, Or.inr hb =>
         apply Or.inr
         subst ha
@@ -343,8 +342,7 @@ lemma insertAndContractNat_none_getDual?_isNone (c : WickContraction n) (i : Fin
     ((insertAndContractNat c i none).getDual? i).isNone := by
   have hi : i ∈ (insertAndContractNat c i none).uncontracted := by simp
   simp only [Nat.succ_eq_add_one, uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hi
-  rw [hi]
-  simp
+  simp [hi]
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
@@ -498,8 +496,7 @@ lemma insertAndContractNat_erase (c : WickContraction n) (i : Fin n.succ)
           intro x
           exact fun a => Fin.succAbove_ne i x
         refine False.elim (hin ?_)
-        rw [ha]
-        simp
+        simp [ha]
       · obtain ⟨a', ha', ha''⟩ := ha
         rw [Finset.mapEmbedding_apply] at ha''
         simp only [Finset.map_inj] at ha''
@@ -700,8 +697,7 @@ lemma insertLiftSome_injective {c : WickContraction n} (i : Fin n.succ) (j : c.u
     simp only [Finset.map_insert, Fin.succAboveEmb_apply, Finset.map_singleton] at hab
     have hi : i ∈ ({i.succAbove (c.fstFieldOfContract a),
         i.succAbove (c.sndFieldOfContract a)} : Finset (Fin (n + 1))) := by
-      rw [← hab]
-      simp
+      simp [← hab]
     simp only [Nat.succ_eq_add_one, Finset.mem_insert, Finset.mem_singleton] at hi
     rcases hi with hi | hi
     · exact False.elim (Fin.ne_succAbove _ _ hi)
@@ -712,8 +708,7 @@ lemma insertLiftSome_injective {c : WickContraction n} (i : Fin n.succ) (j : c.u
     simp only [Finset.map_insert, Fin.succAboveEmb_apply, Finset.map_singleton] at hab
     have hi : i ∈ ({i.succAbove (c.fstFieldOfContract a),
         i.succAbove (c.sndFieldOfContract a)} : Finset (Fin (n + 1))) := by
-      rw [hab]
-      simp
+      simp [hab]
     simp only [Nat.succ_eq_add_one, Finset.mem_insert, Finset.mem_singleton] at hi
     rcases hi with hi | hi
     · exact False.elim (Fin.ne_succAbove _ _ hi)
