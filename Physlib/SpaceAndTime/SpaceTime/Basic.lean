@@ -577,8 +577,7 @@ lemma toTimeAndSpace_symm_measurePreserving {d : ℕ} (c : SpeedOfLight) :
   · fun_prop
   rw [Space.volume_eq_addHaar, Time.volume_eq_basis_addHaar, ← Module.Basis.prod_addHaar,
     Module.Basis.map_addHaar]
-  rw [← timeSpaceBasis_addHaar c]
-  rfl
+  exact timeSpaceBasis_addHaar c
 
 /-!
 

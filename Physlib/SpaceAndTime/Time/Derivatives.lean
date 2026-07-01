@@ -118,9 +118,7 @@ lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ
 lemma deriv_smul (f : Time → EuclideanSpace ℝ (Fin d)) (k : ℝ)
     (hf : Differentiable ℝ f) :
     ∂ₜ (fun t => k • f t) t = k • ∂ₜ (fun t => f t) t := by
-  rw [deriv, fderiv_fun_const_smul]
-  rfl
-  fun_prop
+  exact congrArg (fun g => g 1) (fderiv_fun_const_smul (c := k) hf.differentiableAt)
 
 lemma deriv_neg [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) :
     ∂ₜ (-f) t = -∂ₜ f t := by simp [deriv, fderiv_neg]
