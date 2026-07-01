@@ -202,8 +202,7 @@ lemma getDual?_get_self_mem (i : Fin n) (h : (c.getDual? i).isSome) :
 
 @[simp]
 lemma self_getDual?_get_mem (i : Fin n) (h : (c.getDual? i).isSome) :
-    {i, (c.getDual? i).get h} ∈ c.1 := by
-  rw [← getDual?_eq_some_iff_mem, Option.some_get]
+    {i, (c.getDual? i).get h} ∈ c.1 := by rw [← getDual?_eq_some_iff_mem, Option.some_get]
 
 lemma getDual?_eq_some_neq (i j : Fin n) (h : c.getDual? i = some j) :
     ¬ i = j := by
@@ -260,16 +259,13 @@ lemma getDual?_isSome_of_mem (a : c.1) (i : a.1) : (c.getDual? i).isSome := by
 
 @[simp]
 lemma getDual?_getDual?_get_get (i : Fin n) (h : (c.getDual? i).isSome) :
-    c.getDual? ((c.getDual? i).get h) = some i := by
-  simp [getDual?_eq_some_iff_mem]
+    c.getDual? ((c.getDual? i).get h) = some i := by simp [getDual?_eq_some_iff_mem]
 
 lemma getDual?_getDual?_get_isSome (i : Fin n) (h : (c.getDual? i).isSome) :
-    (c.getDual? ((c.getDual? i).get h)).isSome := by
-  simp
+    (c.getDual? ((c.getDual? i).get h)).isSome := by simp
 
 lemma getDual?_getDual?_get_not_none (i : Fin n) (h : (c.getDual? i).isSome) :
-    ¬ (c.getDual? ((c.getDual? i).get h)) = none := by
-  simp
+    ¬ (c.getDual? ((c.getDual? i).get h)) = none := by simp
 
 /-!
 
@@ -366,8 +362,7 @@ lemma fstFieldOfContract_lt_sndFieldOfContract (c : WickContraction n) (a : c.1)
 
 @[simp]
 lemma fstFieldOfContract_mem (c : WickContraction n) (a : c.1) :
-    c.fstFieldOfContract a ∈ a.1 := by
-  simp [finset_eq_fstFieldOfContract_sndFieldOfContract]
+    c.fstFieldOfContract a ∈ a.1 := by simp [finset_eq_fstFieldOfContract_sndFieldOfContract]
 
 lemma fstFieldOfContract_getDual?_isSome (c : WickContraction n) (a : c.1) :
     (c.getDual? (c.fstFieldOfContract a)).isSome := by
@@ -380,8 +375,7 @@ lemma fstFieldOfContract_getDual? (c : WickContraction n) (a : c.1) :
 
 @[simp]
 lemma sndFieldOfContract_mem (c : WickContraction n) (a : c.1) :
-    c.sndFieldOfContract a ∈ a.1 := by
-  simp [finset_eq_fstFieldOfContract_sndFieldOfContract]
+    c.sndFieldOfContract a ∈ a.1 := by simp [finset_eq_fstFieldOfContract_sndFieldOfContract]
 
 lemma sndFieldOfContract_getDual?_isSome (c : WickContraction n) (a : c.1) :
     (c.getDual? (c.sndFieldOfContract a)).isSome := by
