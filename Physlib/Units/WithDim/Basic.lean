@@ -118,9 +118,8 @@ lemma lt_def {d : Dimension} {M : Type} [LT M] (m1 m2 : WithDim d M) :
 instance (d : Dimension) (M : Type) [Preorder M] :
     Preorder (WithDim d M) where
   le_refl m := le_refl m.val
-  le_trans m1 m2 m3 h12 h23 := le_trans h12 h23
-  lt_iff_le_not_ge m1 m2 := by
-    exact lt_iff_le_not_ge
+  le_trans _ _ _ h12 h23 := le_trans h12 h23
+  lt_iff_le_not_ge _ _ := lt_iff_le_not_ge
 
 instance (d : Dimension) (M : Type) [PartialOrder M] :
     PartialOrder (WithDim d M) where

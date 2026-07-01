@@ -184,8 +184,7 @@ instance : PartialOrder Time where
   le_antisymm t1 t2 h1 h2 := by simp_all [le_def]; ext; exact le_antisymm h1 h2
 
 lemma lt_def (t1 t2 : Time) :
-    t1 < t2 ↔ t1.val < t2.val := by
-  exact Iff.symm lt_iff_le_not_ge
+    t1 < t2 ↔ t1.val < t2.val := Iff.symm lt_iff_le_not_ge
 
 /-!
 

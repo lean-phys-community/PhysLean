@@ -33,8 +33,7 @@ namespace SMνCharges
 variable {n : ℕ}
 
 lemma sum_one  [AddCommMonoid M] (f : Fin (SMνSpecies 1).numberCharges → M) :
-    ∑ i, f i = f ⟨0, by simp⟩ := by
-  exact Fin.sum_univ_one f
+    ∑ i, f i = f ⟨0, by simp⟩ := Fin.sum_univ_one f
 
 /-- An equivalence between `(SMνCharges n).charges` and `(Fin 6 → Fin n → ℚ)`
 splitting the charges into species. -/
