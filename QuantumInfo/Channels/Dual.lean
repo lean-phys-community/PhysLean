@@ -137,11 +137,9 @@ theorem IsPositive.dual {M : MatrixMap dIn dOut ℂ} (h : M.IsPositive) : M.dual
   intro v
   have h_dual_pos : 0 ≤ (M (Matrix.vecMulVec v (star v)) * x).trace := by
     --TODO Cleanup. Should be all in terms of HermitianMat
-    apply Matrix.PosSemidef.trace_mul_nonneg;
-    · apply h;
-      exact Matrix.posSemidef_vecMulVec_self_star v;
-    · rw [← Matrix.posSemidef_iff_dotProduct_mulVec] at hx
-      exact hx;
+    exact Matrix.PosSemidef.trace_mul_nonneg
+      (h (Matrix.posSemidef_vecMulVec_self_star v))
+      (by rwa [← Matrix.posSemidef_iff_dotProduct_mulVec] at hx)
   convert h_dual_pos using 1;
   rw [ MatrixMap.Dual.trace_eq ];
   simp [ Matrix.vecMulVec, Matrix.mul_apply, Matrix.trace ];
@@ -170,13 +168,9 @@ lemma dual_unique
     (h : ∀ A B, (M A * B).trace = (A * M' B).trace) : M.dual = M' := by
   -- By definition of dual, we know that for any A and B, the trace of (M A) * B equals the trace of
   -- A * (M.dual B).
-  have h_dual : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜, (M A * B).trace = (A * M.dual B).trace := by
-    exact fun A B => Dual.trace_eq M A B;
-  -- Since these two linear maps agree on all bases, they must be equal.
-  have h_eq : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜, (A * M.dual B).trace = (A * M' B).trace := by
-    exact fun A B => h_dual A B ▸ h A B;
-  refine' LinearMap.ext fun B => _;
-  exact Matrix.ext_iff_trace_mul_left.mpr fun x => h_eq x B
+  refine LinearMap.ext fun B => ?_
+  exact Matrix.ext_iff_trace_mul_left.mpr fun A =>
+    (Dual.trace_eq M A B).symm.trans (h A B)
 
 /--
 The Choi matrix of the dual map is the transpose of the reindexed Choi matrix of the original map.
@@ -206,10 +200,8 @@ positive semidefinite.
 -/
 lemma dual_choi_matrix_posSemidef_of_posSemidef (M : MatrixMap dIn dOut 𝕜) (h : M.choi_matrix.PosSemidef) :
     M.dual.choi_matrix.PosSemidef := by
-  rw [ dual_choi_matrix ];
-  simp +zetaDelta at *;
-  apply_rules [ Matrix.PosSemidef.submatrix ];
-  convert h.transpose using 1
+  rw [dual_choi_matrix]
+  simpa +zetaDelta using Matrix.PosSemidef.submatrix h.transpose (Equiv.prodComm dIn dOut)
 
 /--
 The dual of the identity map is the identity map.
@@ -267,13 +259,11 @@ lemma dual_kron {A B C D : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D
 -- see Lemma 3.1 of https://www.math.uwaterloo.ca/~krdavids/Preprints/CDPRpositivereal.pdf
 theorem IsCompletelyPositive.dual {M : MatrixMap dIn dOut ℂ} (h : M.IsCompletelyPositive) : M.dual.IsCompletelyPositive := by
   intro n
-  have h_dual_pos : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ)).IsPositive :=
-    IsPositive.dual (h n)
   -- By definition of complete positivity, we know that $(M ⊗ₖₘ id) dually map = M.dual ⊗ₖₘ id.dual$.
-  have h_dual_kron : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ)) = (MatrixMap.dual M) ⊗ₖₘ (MatrixMap.dual (MatrixMap.id (Fin n) ℂ)) := by
-    convert dual_kron M ( MatrixMap.id ( Fin n ) ℂ ) using 1;
-  convert h_dual_pos using 1;
-  rw [ h_dual_kron, dual_id ]
+  convert IsPositive.dual (h n) using 1
+  rw [show MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ) =
+      MatrixMap.dual M ⊗ₖₘ MatrixMap.dual (MatrixMap.id (Fin n) ℂ) by
+    convert dual_kron M (MatrixMap.id (Fin n) ℂ) using 1, dual_id]
 
 /--
 The composition of the dual of the inverse of the dual basis isomorphism with the dual basis
@@ -464,8 +454,7 @@ theorem MatrixMap.IsPositive.hermDual (h : MatrixMap.IsPositive f.map) : f.hermD
 theorem HPMap.hermDual_Unital [DecidableEq dIn] [DecidableEq dOut] (h : MatrixMap.IsTracePreserving f.map) :
     f.hermDual.map.Unital := by
   suffices f.hermDual 1 = 1 by --todo: make this is an accessible 'constructor' for Unital
-    rw [HermitianMat.ext_iff] at this
-    exact this
+    rwa [HermitianMat.ext_iff] at this
   open RealInnerProductSpace in
   apply ext_inner_left ℝ
   intro v
