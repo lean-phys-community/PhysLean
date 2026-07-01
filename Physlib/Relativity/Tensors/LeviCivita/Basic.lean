@@ -50,8 +50,7 @@ scoped[realLorentzTensor] notation "ε4" => leviCivita
 lemma leviCivita_eq_ofInt : ε4 =
     TensorInt.toTensor (S := realLorentzTensor 3)
     (c := ![Color.up, Color.up, Color.up, Color.up]) fun f =>
-    generalizedKroneckerDelta (fun i => finSumFinEquiv (f i)) (id : Fin 4 → Fin 4) :=
-  rfl
+    generalizedKroneckerDelta (fun i => finSumFinEquiv (f i)) (id : Fin 4 → Fin 4) := rfl
 
 /-- The components of the Levi-Civita tensor in the standard basis are the generalized
 Kronecker delta of the multi-index against the identity. -/

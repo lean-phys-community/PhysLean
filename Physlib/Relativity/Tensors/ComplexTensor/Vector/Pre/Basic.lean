@@ -51,12 +51,10 @@ def complexContrBasisFin4 : Basis (Fin 4) ℂ ContrℂModule :=
   Basis.reindex complexContrBasis finSumFinEquiv
 
 lemma complexContrBasisFin4_eq_reindex :
-    complexContrBasisFin4 = complexContrBasis.reindex finSumFinEquiv :=
-  rfl
+    complexContrBasisFin4 = complexContrBasis.reindex finSumFinEquiv := rfl
 
 lemma complexContrBasis_reindex_apply_eq_fin4 (j : Fin 4) :
-    (complexContrBasis.reindex finSumFinEquiv) j = complexContrBasisFin4 j :=
-  rfl
+    (complexContrBasis.reindex finSumFinEquiv) j = complexContrBasisFin4 j := rfl
 
 @[simp]
 lemma complexContrBasisFin4_apply_zero :
@@ -111,12 +109,10 @@ def complexCoBasisFin4 : Basis (Fin 4) ℂ CoℂModule :=
   Basis.reindex complexCoBasis finSumFinEquiv
 
 lemma complexCoBasisFin4_eq_reindex :
-    complexCoBasisFin4 = complexCoBasis.reindex finSumFinEquiv :=
-  rfl
+    complexCoBasisFin4 = complexCoBasis.reindex finSumFinEquiv := rfl
 
 lemma complexCoBasis_reindex_apply_eq_fin4 (j : Fin 4) :
-    (complexCoBasis.reindex finSumFinEquiv) j = complexCoBasisFin4 j :=
-  rfl
+    (complexCoBasis.reindex finSumFinEquiv) j = complexCoBasisFin4 j := rfl
 
 @[simp]
 lemma complexCoBasisFin4_apply_zero :
