@@ -68,8 +68,7 @@ lemma norm_spatialPart_le_timeComponent (v : Velocity d) :
 
 lemma norm_spatialPart_sq_eq (v : Velocity d) :
     ‖v.1.spatialPart‖ ^ 2 = (v.1 (Sum.inl 0))^2 - 1 := by
-  rw [← minkowskiProduct_self_eq_one v]
-  rw [minkowskiProduct_self_eq_timeComponent_spatialPart]
+  rw [← minkowskiProduct_self_eq_one v, minkowskiProduct_self_eq_timeComponent_spatialPart]
   simp [timeComponent]
 
 lemma zero_le_minkowskiProduct (u v : Velocity d) :

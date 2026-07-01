@@ -76,8 +76,7 @@ lemma minkowskiProductMap_add_fst {d : ℕ} (p q r : Vector d) :
 @[simp]
 lemma minkowskiProductMap_add_snd {d : ℕ} (p q r : Vector d) :
     minkowskiProductMap p (q + r) = minkowskiProductMap p q + minkowskiProductMap p r := by
-  rw [minkowskiProductMap_symm, minkowskiProductMap_add_fst]
-  rw [minkowskiProductMap_symm q p, minkowskiProductMap_symm r p]
+  simpa [minkowskiProductMap_symm] using minkowskiProductMap_add_fst q r p
 
 @[simp]
 lemma minkowskiProductMap_smul_fst {d : ℕ} (c : ℝ) (p q : Vector d) :

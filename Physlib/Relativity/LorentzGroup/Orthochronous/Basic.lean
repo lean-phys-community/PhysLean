@@ -231,7 +231,6 @@ to the same element via the homomorphism from `LorentzGroup` to `ℤ₂`. -/
 lemma isOrthochronous_iff_of_orthchroMap_eq {Λ Λ' : LorentzGroup d}
     (h : orthchroMap Λ = orthchroMap Λ') : IsOrthochronous Λ ↔ IsOrthochronous Λ' := by
   rw [IsOrthochronous.iff_in_orthchroRep_ker, IsOrthochronous.iff_in_orthchroRep_ker]
-  rw [MonoidHom.mem_ker, MonoidHom.mem_ker]
   change orthchroMap Λ = 1 ↔ orthchroMap Λ' = 1
   rw [h]
 

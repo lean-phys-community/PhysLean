@@ -105,8 +105,7 @@ lemma genBoostAux₂_basis_minkowskiProduct (u v : Velocity d) (μ ν : Fin 1 �
     ⟪genBoostAux₂ u v (Vector.basis μ), genBoostAux₂ u v (Vector.basis ν)⟫ₘ =
     2 * η μ μ * η ν ν * (u.1 μ + v.1 μ) * (u.1 ν + v.1 ν)
     * (1 + ⟪u, v.1⟫ₘ)⁻¹ := by
-  rw [genBoostAux₂_apply_basis, genBoostAux₂_apply_basis]
-  rw [map_smul, map_smul]
+  rw [genBoostAux₂_apply_basis, genBoostAux₂_apply_basis, map_smul, map_smul]
   have h1 : ⟪u.1 + v.1, u.1 + v.1⟫ₘ = 2 * (1 + ⟪u.1, v.1⟫ₘ) := by
     simp only [map_add, add_apply, Velocity.minkowskiProduct_self_eq_one]
     rw [minkowskiProduct_symm]
@@ -124,8 +123,7 @@ lemma genBoostAux₂_basis_minkowskiProduct (u v : Velocity d) (μ ν : Fin 1 �
 lemma genBoostAux₁_basis_genBoostAux₂_minkowskiProduct (u v : Velocity d) (μ ν : Fin 1 ⊕ Fin d) :
     ⟪genBoostAux₁ u v (Vector.basis μ), genBoostAux₂ u v (Vector.basis ν)⟫ₘ =
     - 2 * η μ μ * η ν ν * u.1 μ * (u.1 ν + v.1 ν) := by
-  rw [genBoostAux₁_apply_basis, genBoostAux₂_apply_basis]
-  rw [map_smul, map_smul]
+  rw [genBoostAux₁_apply_basis, genBoostAux₂_apply_basis, map_smul, map_smul]
   have h1 : ⟪v.1, u.1 + v.1⟫ₘ = (1 + ⟪u.1, v.1⟫ₘ) := by
     simp only [map_add, Velocity.minkowskiProduct_self_eq_one]
     rw [minkowskiProduct_symm]
