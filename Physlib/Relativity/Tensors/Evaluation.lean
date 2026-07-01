@@ -142,6 +142,52 @@ lemma evalT_basis {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
     zero_smul]
   rfl
 
+/-- Evaluating an index in the right factor of a tensor product commutes with forming the
+  product, up to the identity reindexing which identifies the two ways of removing that
+  index from the appended color list. -/
+lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
+    (i : Fin (n1 + 1)) (x : basisIdx (c1 i)) (t : Tensor S c) (t1 : Tensor S c1) :
+    permT id (IsReindexing.append_succAbove_natAdd i)
+      (evalT (Fin.natAdd n i) x (prodT t t1)) =
+    prodT t (evalT i x t1) := by
+  induction' t using Tensor.induction_on_basis with b r t h t2 t3 h2 h3
+  · induction' t1 using Tensor.induction_on_basis with b1 r t h t2 t3 h2 h3
+    · by_cases hi : b1 i = x
+      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd n i) = x := by
+          simpa [ComponentIdx.prod] using hi
+        rw [prodT_basis', evalT_basis, if_pos hprod, permT_basis]
+        rw [evalT_basis, if_pos hi, prodT_basis']
+        congr
+        ext j
+        refine Fin.addCases (fun a => ?_) (fun a => ?_) j
+        · have hidx : (Fin.natAdd n i).succAbove (Fin.castAdd n1 a) =
+              Fin.castAdd (n1 + 1) a := by
+            rw [Fin.succAbove_of_castSucc_lt]
+            · ext
+              simp
+            · simp only [Fin.lt_def, Fin.val_castSucc, Fin.val_castAdd, Fin.val_natAdd]
+              omega
+          simp [ComponentIdx.prod, hidx]
+        · have hidx : (Fin.natAdd n i).succAbove (Fin.natAdd n a) =
+              Fin.natAdd n (i.succAbove a) := by
+            have hcond : ((Fin.natAdd n a).castSucc < Fin.natAdd n i) ↔
+                (a.castSucc < i) := by
+              simp only [Fin.lt_def, Fin.val_castSucc, Fin.val_natAdd]
+              omega
+            simp only [Fin.succAbove, hcond]
+            split_ifs <;> ext <;> simp [Nat.add_assoc]
+          simp [ComponentIdx.prod, hidx]
+      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd n i) ≠ x := by
+          intro hprod
+          exact hi (by simpa [ComponentIdx.prod] using hprod)
+        rw [prodT_basis', evalT_basis, if_neg hprod]
+        rw [evalT_basis, if_neg hi]
+        simp
+    · simp [map_smul, h]
+    · simp [map_add, h2, h3]
+  · simp [map_smul, h]
+  · simp [map_add, h2, h3]
+
 
 TODO "Add lemmas related to the interaction of evalT and permT, prodT and contrT."
 
