@@ -1486,9 +1486,8 @@ private lemma convexOn_rpow_Ioo_one_two {p : ℝ} (hp : p ∈ Set.Ioo (1 : ℝ) 
   -- reduce to the `ℝ≥0` exponent case with `p = 1 + q`, `q ∈ (0,1)`
   let q : NNReal := ⟨p - 1, sub_nonneg.mpr (le_of_lt hp.1)⟩
   have hq0 : (0 : NNReal) < q := by
-    have : (0 : ℝ) < (q : ℝ) := by
-      exact_mod_cast sub_pos.mpr hp.1
-    exact (NNReal.coe_pos).1 this
+    exact (NNReal.coe_pos).1 (show (0 : ℝ) < (q : ℝ) by
+      exact_mod_cast sub_pos.mpr hp.1)
   have hq1 : q < (1 : NNReal) := by
     have : (q : ℝ) < (1 : ℝ) := by
       have : p - 1 < (1 : ℝ) := by linarith [hp.2]

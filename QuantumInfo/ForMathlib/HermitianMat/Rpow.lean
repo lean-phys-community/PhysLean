@@ -1271,9 +1271,7 @@ private lemma tendsto_intervalIntegral_weighted_trace_mul_inv_shift {A : Hermiti
               apply intervalIntegral.integral_congr_ae
               filter_upwards with t ht
               rw [trace_mul_inv_shift_eq_sum_div hA (by
-                have htIoc : t ∈ Set.Ioc (0 : ℝ) T := by
-                  simpa [Set.uIoc_of_le hT.le] using ht
-                exact htIoc.1)]
+                exact (show t ∈ Set.Ioc (0 : ℝ) T by simpa [Set.uIoc_of_le hT.le] using ht).1)]
               simp [Finset.mul_sum]
       _ = ∑ i, ∫ t in (0)..T, t ^ (p - 1) * (A.H.eigenvalues i / (A.H.eigenvalues i + t)) := by
             rw [intervalIntegral.integral_finsetSum]

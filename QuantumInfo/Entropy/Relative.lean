@@ -2224,8 +2224,6 @@ theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
     have hP : ρ.M.support ≤ P.support := by
       intro x hx
       exact ⟨x, by simpa [P] using fixed_support_kron_prod hx⟩
-    have hkerP : P.ker ≤ ρ.M.ker := by
-      simpa [HermitianMat.support_orthogonal_eq_range] using Submodule.orthogonal_le hP
     exact (show (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.ker ≤ P.ker by
       change LinearMap.ker
           ((Matrix.kroneckerMap (· * ·) ρ.traceRight.M.mat ρ.traceLeft.M.mat).toEuclideanLin)
@@ -2238,7 +2236,8 @@ theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
             (show ρ.traceRight.M.ker ≤ ρ.traceRight.M.supportProj.ker by simp))
         (by
           simpa [HermitianMat.ker, HermitianMat.lin] using
-            (show ρ.traceLeft.M.ker ≤ ρ.traceLeft.M.supportProj.ker by simp))).trans hkerP
+            (show ρ.traceLeft.M.ker ≤ ρ.traceLeft.M.supportProj.ker by simp))).trans
+        (by simpa [HermitianMat.support_orthogonal_eq_range] using Submodule.orthogonal_le hP)
   have right_mul_eq_of_fixed_support {Q ρM : HermitianMat (dA × dB) ℂ}
       (hfix : ∀ x : EuclideanSpace ℂ (dA × dB), x ∈ ρM.support → Q.lin x = x) :
       ρM.mat * Q.mat = ρM.mat := by
@@ -2445,9 +2444,7 @@ theorem qRelEntropy_le_add_of_le_smul (ρ : MState d) {σ₁ σ₂ : MState d} (
         <;> simp only [sup_of_le_left, *]
         <;> norm_cast at *
         <;> linarith [Real.log_nonneg one_le_two]
-      have h_final' : qRelativeEnt ρ σ₁ ≤ qRelativeEnt ρ σ₂ + ENNReal.ofReal (Real.log α) := by
-        exact_mod_cast h_final
-      exact h_final'
+      exact_mod_cast h_final
     · by_contra h_contra;
       have hker_le : σ₁.M.ker ≤ σ₂.M.ker := by
         apply_rules [ HermitianMat.ker_le_of_le_smul, hσ ];
