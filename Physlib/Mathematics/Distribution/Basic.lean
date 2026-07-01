@@ -6,8 +6,7 @@ Authors: Kenny Lau, Joseph Tooby-Smith
 module
 
 public import Physlib.Meta.TODO.Basic
-public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
-public import Mathlib.Topology.Algebra.Module.Spaces.PointwiseConvergenceCLM
+public import Mathlib.Analysis.Distribution.TemperedDistribution
 /-!
 
 # Distributions
@@ -26,6 +25,8 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 - `E →d[𝕜] F` is the type of distributions from `E` to `F`.
 - `Distribution.derivative` and `Distribution.fourierTransform` allow us to make sense of these
   operations that might not make sense a priori on general functions.
+- `Distribution.toTemperedDistribution` converts a Physlib distribution to a Mathlib
+  tempered distribution.
 - `Distribution.ofFiniteMeasure` is the scalar distribution associated to a finite measure.
 
 ## iii. Table of Content
@@ -46,6 +47,7 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 @[expose] public section
 
 open SchwartzMap NNReal
+open scoped SchwartzMap FourierTransform
 noncomputable section
 
 /-!
@@ -280,6 +282,42 @@ end Complex
 
 /-!
 
+### D.1. Bridge to Mathlib tempered distributions
+
+Mathlib's tempered distributions use the pointwise convergence topology on the same underlying
+continuous linear maps. The following construction converts Physlib distributions to that API.
+
+-/
+section TemperedDistribution
+
+variable [NormedSpace ℝ E] [NormedSpace ℂ F]
+
+/-- The Mathlib tempered distribution associated to a Physlib distribution. -/
+def toTemperedDistribution (u : E →d[ℂ] F) : 𝓢'(E, F) :=
+  ContinuousLinearMap.toPointwiseConvergenceCLM _ _ _ _ u
+
+@[simp]
+lemma toTemperedDistribution_apply (u : E →d[ℂ] F) (η : 𝓢(E, ℂ)) :
+    u.toTemperedDistribution η = u η :=
+  rfl
+
+end TemperedDistribution
+
+section TemperedDistributionFourier
+
+variable [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
+  [NormedSpace ℂ F]
+
+/-- Conversion to Mathlib tempered distributions commutes with the Fourier transform. -/
+@[simp]
+lemma toTemperedDistribution_fourierTransform (u : E →d[ℂ] F) :
+    (u.fourierTransform E F).toTemperedDistribution = 𝓕 u.toTemperedDistribution :=
+  rfl
+
+end TemperedDistributionFourier
+
+/-!
+
 ## E. Specific distributions
 
 We now define specific distributions, which are used throughout physics. In particular, we define:
@@ -406,6 +444,13 @@ def ofFiniteMeasure (μ : Measure E) [IsFiniteMeasure μ] : E →d[𝕜] 𝕜 :=
 @[simp]
 lemma ofFiniteMeasure_apply (μ : Measure E) [IsFiniteMeasure μ] (η : 𝓢(E, 𝕜)) :
     ofFiniteMeasure 𝕜 μ η = ∫ x, η x ∂μ :=
+  rfl
+
+/-- The finite-measure distribution agrees with Mathlib's tempered distribution associated to the
+same measure. -/
+@[simp]
+lemma toTemperedDistribution_ofFiniteMeasure (μ : Measure E) [IsFiniteMeasure μ] :
+    (ofFiniteMeasure ℂ μ).toTemperedDistribution = μ.toTemperedDistribution :=
   rfl
 
 end finiteMeasure
