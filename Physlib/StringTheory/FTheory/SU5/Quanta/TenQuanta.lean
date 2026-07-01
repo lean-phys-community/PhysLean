@@ -304,8 +304,7 @@ lemma reduce_sum_eq_sum_toCharges {M} [AddCommMonoid M] (x : TenQuanta 𝓩) (f 
         · rw [Multiset.sum_eq_zero]
           refine Eq.symm (Multiset.count_eq_zero_of_notMem ?_)
           intro h
-          have h_mem : p.1 ∈ Multiset.map Prod.fst x := by
-            simp_all
+          have h_mem : p.1 ∈ Multiset.map Prod.fst x := by simp_all
           (expose_names; exact h_mem_1 h_mem)
           intro p' hp
           simp at hp
@@ -639,8 +638,7 @@ def decompose (x : TenQuanta 𝓩) : TenQuanta 𝓩 :=
 -/
 
 lemma decompose_add (x y : TenQuanta 𝓩) :
-    (x + y).decompose = x.decompose + y.decompose := by
-  simp [decompose]
+    (x + y).decompose = x.decompose + y.decompose := by simp [decompose]
 
 /-!
 

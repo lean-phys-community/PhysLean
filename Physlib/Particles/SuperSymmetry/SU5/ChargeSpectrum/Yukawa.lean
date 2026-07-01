@@ -188,8 +188,7 @@ lemma yukawaGeneratesDangerousAtLevel_iff_toFinset (x : ChargeSpectrum 𝓩) (n 
     ext i
     simp only [Finset.mem_inter, Multiset.mem_toFinset, Finset.notMem_empty, iff_false, not_and]
     intro h1 h2
-    have h3 : i ∈ (x.ofYukawaTermsNSum n) ∩ x.phenoConstrainingChargesSP := by
-      simpa using ⟨h1, h2⟩
+    have h3 : i ∈ (x.ofYukawaTermsNSum n) ∩ x.phenoConstrainingChargesSP := by simpa using ⟨h1, h2⟩
     simp_all
 
 /-!

@@ -87,8 +87,7 @@ The empty charge spectrum is not complete, since it has no charges present.
 -/
 
 @[simp]
-lemma not_isComplete_empty : ¬ IsComplete (∅ : ChargeSpectrum 𝓩) := by
-  simp [IsComplete]
+lemma not_isComplete_empty : ¬ IsComplete (∅ : ChargeSpectrum 𝓩) := by simp [IsComplete]
 
 /-!
 

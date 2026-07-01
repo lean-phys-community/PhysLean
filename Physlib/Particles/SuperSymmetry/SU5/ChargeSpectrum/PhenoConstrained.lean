@@ -138,8 +138,7 @@ def phenoConstrainingChargesSP (x : ChargeSpectrum 𝓩) : Multiset 𝓩 :=
 
 @[simp]
 lemma phenoConstrainingChargesSP_empty :
-    phenoConstrainingChargesSP (∅ : ChargeSpectrum 𝓩) = ∅ := by
-  simp [phenoConstrainingChargesSP]
+    phenoConstrainingChargesSP (∅ : ChargeSpectrum 𝓩) = ∅ := by simp [phenoConstrainingChargesSP]
 
 /-!
 
@@ -183,8 +182,7 @@ def IsPhenoConstrainedQ5 [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q5 : 𝓩
 lemma isPhenoConstrainedQ5_iff [DecidableEq 𝓩] (x : ChargeSpectrum 𝓩) (q5 : 𝓩) :
     x.IsPhenoConstrainedQ5 q5 ↔
     x.AllowsTermQ5 q5 β ∨ x.AllowsTermQ5 q5 Λ ∨ x.AllowsTermQ5 q5 W4 ∨
-    x.AllowsTermQ5 q5 K1 ∨ x.AllowsTermQ5 q5 W1 := by
-  simp [IsPhenoConstrainedQ5, AllowsTermQ5]
+    x.AllowsTermQ5 q5 K1 ∨ x.AllowsTermQ5 q5 W1 := by simp [IsPhenoConstrainedQ5, AllowsTermQ5]
 
 /-!
 

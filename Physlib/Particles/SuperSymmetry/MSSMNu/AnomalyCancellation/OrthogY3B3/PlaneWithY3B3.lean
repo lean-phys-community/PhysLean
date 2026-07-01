@@ -194,12 +194,10 @@ lemma α₁_proj (T : MSSMACC.Sols) : α₁ (proj T.1.1) =
   ring
 
 lemma α₁_proj_zero (T : MSSMACC.Sols) (h1 : α₃ (proj T.1.1) = 0) :
-    α₁ (proj T.1.1) = 0 := by
-  simp [α₁_proj, h1]
+    α₁ (proj T.1.1) = 0 := by simp [α₁_proj, h1]
 
 lemma α₂_proj_zero (T : MSSMACC.Sols) (h1 : α₃ (proj T.1.1) = 0) :
-    α₂ (proj T.1.1) = 0 := by
-  simp [α₂_proj, h1]
+    α₂ (proj T.1.1) = 0 := by simp [α₂_proj, h1]
 
 end proj
 

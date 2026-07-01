@@ -177,8 +177,7 @@ lemma minimallyAllowsTerm_iff_powerset_countP_eq_one :
       exact Eq.symm (Multiset.countP_eq_card_filter (fun y => y.AllowsTerm T) x.powerset.val)
     rw [Multiset.card_eq_one] at h1
     obtain ⟨a, ha⟩ := h1
-    have haMem : a ∈ Multiset.filter (fun y => y.AllowsTerm T) x.powerset.val := by
-      simp [ha]
+    have haMem : a ∈ Multiset.filter (fun y => y.AllowsTerm T) x.powerset.val := by simp [ha]
     simp at haMem
     have hxMem : x ∈ Multiset.filter (fun y => y.AllowsTerm T) x.powerset.val := by
       simpa using allowsTerm_mono haMem.1 haMem.2
@@ -240,8 +239,7 @@ lemma card_le_degree_of_minimallyAllowsTerm (h : x.MinimallyAllowsTerm T) :
     x.card ≤ T.degree := by
   obtain ⟨y, y_mem_power, y_card,y_present⟩ :=
     subset_card_le_degree_allowsTerm_of_allowsTerm (allowsTerm_of_minimallyAllowsTerm h)
-  have hy : y ∈ x.powerset.filter (fun y => y.AllowsTerm T) := by
-    simp_all
+  have hy : y ∈ x.powerset.filter (fun y => y.AllowsTerm T) := by simp_all
   rw [minimallyAllowsTerm_iff_powerset_filter_eq] at h
   rw [h] at hy
   simp at hy
@@ -271,8 +269,7 @@ lemma eq_allowsTermForm_of_minimallyAllowsTerm (h1 : x.MinimallyAllowsTerm T) :
   obtain ⟨a, b, c, h2, h3⟩ := allowsTermForm_subset_allowsTerm_of_allowsTerm
     (allowsTerm_of_minimallyAllowsTerm h1)
   use a, b, c
-  have hy : allowsTermForm a b c T ∈ x.powerset.filter (fun y => y.AllowsTerm T) := by
-    simp_all
+  have hy : allowsTermForm a b c T ∈ x.powerset.filter (fun y => y.AllowsTerm T) := by simp_all
   rw [minimallyAllowsTerm_iff_powerset_filter_eq] at h1
   rw [h1] at hy
   simp at hy

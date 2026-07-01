@@ -113,8 +113,7 @@ lemma map_empty (f : 𝓩 →+ 𝓩1) : map f (∅ : ChargeSpectrum 𝓩) = ∅ 
 -/
 
 lemma map_map (f : 𝓩 →+ 𝓩1) (g : 𝓩1 →+ 𝓩2) (x : ChargeSpectrum 𝓩) :
-    map g (map f x) = map (g.comp f) x := by
-  simp [map, Option.map_map, Finset.image_image]
+    map g (map f x) = map (g.comp f) x := by simp [map, Option.map_map, Finset.image_image]
 
 /-!
 
@@ -295,8 +294,7 @@ lemma not_isPhenoConstrained_of_map {f : 𝓩 →+ 𝓩1} {x : ChargeSpectrum �
 
 omit [DecidableEq 𝓩] in
 lemma map_isComplete_iff {f : 𝓩 →+ 𝓩1} {x : ChargeSpectrum 𝓩} :
-    (map f x).IsComplete ↔ x.IsComplete := by
-  simp [IsComplete, map]
+    (map f x).IsComplete ↔ x.IsComplete := by simp [IsComplete, map]
 
 /-!
 
