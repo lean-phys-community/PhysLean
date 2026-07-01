@@ -33,8 +33,7 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
   | a :: b :: l, 0, h => by
     simp only [List.takeWhile, List.eraseIdx_zero]
     by_cases hPb : P b
-    · have hPa : P a := by
-        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
+    · have hPa : P a := by simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp [hPb, hPa]
     · simp [hPb]
       split <;> rfl
@@ -61,15 +60,13 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     by_cases hPa : P a <;> simp [hPa, List.eraseIdx_of_length_le]
   | a :: b :: l, 0, h => by
     by_cases hPb : P b
-    · have hPa : P a := by
-        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
+    · have hPa : P a := by simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp [hPb, hPa]
     · by_cases hPa : P a <;> simp [hPa, hPb]
   | a :: b :: l, Nat.succ n, h => by
     simp only [Nat.succ_eq_add_one, List.eraseIdx_cons_succ]
     by_cases hPb : P b
-    · have hPa : P a := by
-        simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
+    · have hPa : P a := by simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) (by simpa using hPb)
       simp only [List.dropWhile, hPa, decide_true, List.takeWhile, hPb, List.length_cons,
         add_le_add_iff_right, Nat.reduceSubDiff]
       rw [dropWile_eraseIdx P (b :: l) n (fun i j hij hP => by
