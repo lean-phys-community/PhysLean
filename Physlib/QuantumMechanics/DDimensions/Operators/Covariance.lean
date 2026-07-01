@@ -62,8 +62,7 @@ def covariance : ℝ :=
 /-- Covariance, unfolded to the real part of the centered inner product. -/
 lemma covariance_eq_re_inner_centered :
     covariance A B ψ hψB =
-      (⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ).re :=
-  rfl
+      (⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ).re := rfl
 
 /-- Swapping the two observables does not change the covariance. -/
 lemma covariance_comm :

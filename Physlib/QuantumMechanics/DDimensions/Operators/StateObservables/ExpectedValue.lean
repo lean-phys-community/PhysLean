@@ -51,8 +51,7 @@ def expectedValue (T : H →ₗ.[ℂ] H) (ψ : T.domain) : ℝ :=
 
 /-- The expectation value, unfolded as a real part. -/
 lemma expectedValue_eq_re_inner (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    expectedValue T ψ = (⟪(ψ : H), T ψ⟫_ℂ).re :=
-  rfl
+    expectedValue T ψ = (⟪(ψ : H), T ψ⟫_ℂ).re := rfl
 
 /-- If `T` is symmetric, `⟪ψ, Tψ⟫_ℂ` is the expectation value, coerced to `ℂ`. -/
 lemma expectedValue_eq_inner (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric) (ψ : T.domain) :
@@ -73,8 +72,7 @@ def centered (T : H →ₗ.[ℂ] H) (ψ : T.domain) : H :=
 
 /-- The centered vector, unfolded to its raw expression. -/
 lemma centered_eq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    centered T ψ = T ψ - (expectedValue T ψ : ℂ) • (ψ : H) :=
-  rfl
+    centered T ψ = T ψ - (expectedValue T ψ : ℂ) • (ψ : H) := rfl
 
 /-- A centered vector vanishes exactly when `Tψ = ⟨T⟩_ψ ψ`. -/
 lemma centered_eq_zero_iff (T : H →ₗ.[ℂ] H) (ψ : T.domain) :

@@ -129,8 +129,7 @@ lemma ComponentIdx.complexify_apply {n} {c : Fin n → realLorentzTensor.Color}
 @[simp]
 lemma ComponentIdx.complexify_toFun_apply {n} {c : Fin n → realLorentzTensor.Color}
     (f : ComponentIdx (S := realLorentzTensor) c) (j : Fin n) :
-    (ComponentIdx.complexify.toFun f) j = (ComponentIdx.complexify f) j :=
-  rfl
+    (ComponentIdx.complexify.toFun f) j = (ComponentIdx.complexify f) j := rfl
 
 /-!
 
