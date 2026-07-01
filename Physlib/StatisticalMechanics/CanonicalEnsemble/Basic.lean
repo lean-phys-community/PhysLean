@@ -370,8 +370,7 @@ lemma μBolt_ne_zero_of_μ_ne_zero (T : Temperature) (h : 𝓒.μ ≠ 0) :
   simp only [Measure.coe_zero, Pi.zero_apply]
   have hs : {x | ENNReal.ofReal (rexp (-(↑T.β * 𝓒.energy x))) ≠ 0} = Set.univ := by
     ext i
-    simp only [ne_eq, ENNReal.ofReal_eq_zero, not_le, Set.mem_setOf_eq, Set.mem_univ, iff_true]
-    exact exp_pos _
+    simp [ENNReal.ofReal_eq_zero, exp_pos]
   conv =>
     enter [1, s]
     rw [MeasureTheory.withDensity_apply_eq_zero' (by fun_prop), hs]
@@ -449,8 +448,7 @@ lemma mathematicalPartitionFunction_eq_zero_iff (T : Temperature) [IsFiniteMeasu
   let s : Set ι := {x | 0 < rexp (-(T.β * 𝓒.energy x))}
   have h : s = Set.univ := by
     ext i
-    simp [s]
-    exact exp_pos (-(T.β * 𝓒.energy i))
+    simpa [s] using exp_pos (-(T.β * 𝓒.energy i))
   change 𝓒.μ s = 0 ↔ 𝓒.μ = 0
   rw [h]
   simp only [Measure.measure_univ_eq_zero]
@@ -598,8 +596,7 @@ lemma integrable_energy_congr (T : Temperature) (e : ι1 ≃ᵐ ι)
     Integrable (𝓒.congr e).energy ((𝓒.congr e).μProd T) := by
   simp [μProd_congr]
   refine (integrable_map_equiv e.symm (𝓒.congr e).energy).mpr ?_
-  simp only [congr_energy_comp_symmm]
-  exact h
+  simpa only [congr_energy_comp_symmm] using h
 
 @[fun_prop]
 lemma integrable_energy_nsmul (n : ℕ) (T : Temperature)

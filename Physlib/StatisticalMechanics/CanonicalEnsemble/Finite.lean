@@ -179,8 +179,7 @@ lemma μBolt_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
   rw [μBolt]
   simp only [neg_mul]
   rw [@measureReal_def]
-  simp [IsFinite.μ_eq_count]
-  exact Real.exp_nonneg _
+  simpa [IsFinite.μ_eq_count] using Real.exp_nonneg _
 
 instance {T} [IsFinite 𝓒] : IsFiniteMeasure (𝓒.μBolt T) := by
   simpa [μBolt] using isFiniteMeasure_withDensity_ofReal HasFiniteIntegral.of_finite
@@ -265,8 +264,7 @@ lemma entropy_nonneg [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι]
     Fintype.sum_nonpos fun i =>
       mul_nonpos_iff.2 <| Or.inl ⟨probability_nonneg_finite 𝓒 T i,
         Real.log_nonpos (probability_nonneg_finite 𝓒 T i) (probability_le_one 𝓒 T i)⟩
-  rw [shannonEntropy, neg_mul, neg_nonneg]
-  exact mul_nonpos_iff.2 <| Or.inl ⟨kB_pos.le, hsum⟩
+  simpa [shannonEntropy, neg_mul, neg_nonneg] using mul_nonpos_iff.2 <| Or.inl ⟨kB_pos.le, hsum⟩
 
 lemma shannonEntropy_eq_differentialEntropy
     [MeasurableSingletonClass ι] [IsFinite 𝓒] (T : Temperature) :
