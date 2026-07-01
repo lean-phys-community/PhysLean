@@ -2055,8 +2055,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         exact (Real.continuousAt_rpow_const x r (Or.inl (ne_of_gt hx0))).continuousWithinAt
       have hspec :
           spectrum ℝ Ar = (fun x : ℝ ↦ x ^ r) '' spectrum ℝ A := by
-        dsimp [Ar, cfcR]
-        simpa using
+        simpa [Ar, cfcR] using
           (cfc_map_spectrum (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x ^ r)
             (a := A) (ha := hA) (hf := hcontA))
       intro y hy
@@ -2071,8 +2070,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         exact (Real.continuousAt_rpow_const x r (Or.inl (ne_of_gt hx0))).continuousWithinAt
       have hspec :
           spectrum ℝ Br = (fun x : ℝ ↦ x ^ r) '' spectrum ℝ B := by
-        dsimp [Br, cfcR]
-        simpa using
+        simpa [Br, cfcR] using
           (cfc_map_spectrum (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x ^ r)
             (a := B) (ha := hB) (hf := hcontB))
       intro y hy
@@ -2101,8 +2099,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
     have hcomp :
         cfcR  (fun y : ℝ ↦ 1 / y) (cfcR  (fun x : ℝ ↦ x ^ r) A) =
           cfcR  (fun x : ℝ ↦ 1 / (x ^ r)) A := by
-      dsimp [cfcR]
-      simpa [Function.comp] using
+      simpa [cfcR, Function.comp] using
         (cfc_comp' (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (g := fun y : ℝ ↦ 1 / y)
           (f := fun x : ℝ ↦ x ^ r) (a := A) (hg := hg) (hf := hcontA) (ha := hA)).symm
     have hL :
@@ -2136,8 +2133,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
     have hcomp :
         cfcR  (fun y : ℝ ↦ 1 / y) (cfcR  (fun x : ℝ ↦ x ^ r) B) =
           cfcR  (fun x : ℝ ↦ 1 / (x ^ r)) B := by
-      dsimp [cfcR]
-      simpa [Function.comp] using
+      simpa [cfcR, Function.comp] using
         (cfc_comp' (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (g := fun y : ℝ ↦ 1 / y)
           (f := fun x : ℝ ↦ x ^ r) (a := B) (hg := hg) (hf := hcontB) (ha := hB)).symm
     have hL :
@@ -2171,8 +2167,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
     have hcomp :
         cfcR  (fun y : ℝ ↦ 1 / y) (cfcR  (fun x : ℝ ↦ x ^ r) C) =
           cfcR  (fun x : ℝ ↦ 1 / (x ^ r)) C := by
-      dsimp [cfcR]
-      simpa [Function.comp] using
+      simpa [cfcR, Function.comp] using
         (cfc_comp' (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (g := fun y : ℝ ↦ 1 / y)
           (f := fun x : ℝ ↦ x ^ r) (a := C) (hg := hg) (hf := hcontC) (ha := hC)).symm
     have hL :
