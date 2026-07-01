@@ -125,8 +125,7 @@ lemma toFieldStrength_eq_sub_tensorDeriv {d} {A : ElectromagneticPotential d}
     toFieldStrength A x =
     Tensorial.toTensor.symm (permT id IsReindexing.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
     - Tensorial.toTensor.symm (permT ![1, 0] IsReindexing.auto
-    {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := by
-  rfl
+    {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := rfl
 
 lemma toTensor_toFieldStrength {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     Tensorial.toTensor (toFieldStrength A x) =
@@ -428,8 +427,7 @@ lemma fieldStrengthMatrix_eq_tensor_basis_repr {d} (A : ElectromagneticPotential
     (x : SpaceTime d) (μ ν : (Fin 1 ⊕ Fin d)) :
     A.fieldStrengthMatrix x (μ, ν) =
     (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x))
-    (fun | 0 => μ | 1 => ν) := by
-  rfl
+    (fun | 0 => μ | 1 => ν) := rfl
 
 lemma toFieldStrength_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d) :
     toFieldStrength A = fun x => ∑ μ, ∑ ν,

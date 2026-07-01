@@ -196,8 +196,7 @@ lemma toTensor_distTensorDeriv_basis_repr_apply {d} (A : DistElectromagneticPote
       Lorentz.CoVector.indexEquiv.symm).tensorProduct
       (Lorentz.Vector.basis.reindex Lorentz.Vector.indexEquiv.symm)) =
       ((Lorentz.CoVector.basis (d := d)).tensorProduct (Lorentz.Vector.basis (d := d))).reindex
-      (Lorentz.CoVector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := by
-    rfl
+      (Lorentz.CoVector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := rfl
   rfl
 
 end DistElectromagneticPotential
