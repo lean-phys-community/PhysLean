@@ -177,8 +177,7 @@ private lemma hSqrt_selfAdjoint (h : ℝ → ℝ) (B : L ℋ) :
 omit [Nontrivial ℋ] in
 private lemma hInvSqrt_selfAdjoint (h : ℝ → ℝ) (B : L ℋ) :
     IsSelfAdjoint (hInvSqrt (ℋ := ℋ) h B) := by
-  dsimp [hInvSqrt, cfcR]
-  exact cfc_predicate _ _
+  simp [hInvSqrt, cfcR]
 
 omit [Nontrivial ℋ] in
 private lemma hSqrt_mul_hInvSqrt_eq_one

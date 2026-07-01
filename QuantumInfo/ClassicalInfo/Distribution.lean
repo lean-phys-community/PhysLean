@@ -173,8 +173,7 @@ def congr (σ : α ≃ β) : ProbDistribution α ≃ ProbDistribution β := by
   case right_inv =>
     intro d
     ext i
-    unfold relabel
-    simp only [← fun_eq_val, Equiv.apply_symm_apply, Subtype.coe_eta]
+    simp only [relabel, ← fun_eq_val, Equiv.apply_symm_apply, Subtype.coe_eta]
 
 @[simp]
 theorem congr_apply (σ : α ≃ β) (d : ProbDistribution α) (j : β): (congr σ d) j = d (σ.symm j) := rfl

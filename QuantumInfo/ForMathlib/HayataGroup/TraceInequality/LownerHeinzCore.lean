@@ -233,8 +233,7 @@ private lemma posSemidef_block_one_inv {A : 𝓐} (hA : IsSelfAdjoint A)
   have hsqrtA : IsSelfAdjoint sqrtA := by
     simp [sqrtA, cfcR]
   have hinvSqrtA : IsSelfAdjoint invSqrtA := by
-    dsimp [invSqrtA, cfcR]
-    exact cfc_predicate _ _
+    simp [invSqrtA, cfcR]
   have hcont_sqrt : ContinuousOn (fun x : ℝ ↦ x ^ ((1 : ℝ) / 2)) (spectrum ℝ A) :=
     fun x hx => (Real.continuousAt_rpow_const x _ (Or.inl (ne_of_gt (As hx)))).continuousWithinAt
   have hcont_invSqrt : ContinuousOn (fun x : ℝ ↦ x ^ ((-1 : ℝ) / 2)) (spectrum ℝ A) :=

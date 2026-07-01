@@ -153,8 +153,7 @@ lemma thermodynamicEntropy_eq_differentialEntropy_sub_correction
             - Real.log (𝓒.mathematicalPartitionFunction T) := by
     intro i
     have : 0 < 𝓒.mathematicalPartitionFunction T := hZpos
-    unfold probability
-    simp [Real.log_div (Real.exp_pos _).ne' this.ne', Real.log_exp, sub_eq_add_neg]
+    simp [probability, Real.log_div (Real.exp_pos _).ne' this.ne', Real.log_exp, sub_eq_add_neg]
   have h_log_phys_pt :
       ∀ i, Real.log (𝓒.physicalProbability T i)
         = Real.log (𝓒.probability T i)

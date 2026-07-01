@@ -247,8 +247,7 @@ lemma RotationsAbout.fromOrigin_comp_toOrigin :
   intro x
   apply Subtype.ext
   simp only [MonoidHom.coe_comp, Function.comp_apply, MonoidHom.id_apply, SetLike.coe_eq_coe]
-  unfold RotationsAbout.toOrigin
-  simp [RotationsAbout.fromOrigin, mul_assoc]
+  simp [RotationsAbout.toOrigin, RotationsAbout.fromOrigin, mul_assoc]
 
 /-- `RotationsAbout.fromOrigin p` followed by `RotationsAbout.toOrigin p` is the identity; the
 backward leg of the isomorphism `RotationsAboutEquiv`. -/
