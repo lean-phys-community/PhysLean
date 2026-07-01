@@ -84,29 +84,17 @@ scoped[complexLorentzTensor] notation "δR" => rightDualRightUnit
 
 -/
 
-lemma coContrUnit_eq_fromConstPair : δ' = fromConstPair Lorentz.coContrUnit := by
-  rw [Lorentz.coContrUnit]
-  rfl
+lemma coContrUnit_eq_fromConstPair : δ' = fromConstPair Lorentz.coContrUnit := rfl
 
-lemma contrCoUnit_eq_fromConstPair : δ = fromConstPair Lorentz.contrCoUnit := by
-  rw [Lorentz.contrCoUnit]
-  rfl
+lemma contrCoUnit_eq_fromConstPair : δ = fromConstPair Lorentz.contrCoUnit := rfl
 
-lemma dualLeftLeftUnit_eq_fromConstPair : δL' = fromConstPair Fermion.dualLeftLeftUnit := by
-  rw [Fermion.dualLeftLeftUnit]
-  rfl
+lemma dualLeftLeftUnit_eq_fromConstPair : δL' = fromConstPair Fermion.dualLeftLeftUnit := rfl
 
-lemma leftDualLeftUnit_eq_fromConstPair : δL = fromConstPair Fermion.leftDualLeftUnit := by
-  rw [Fermion.leftDualLeftUnit]
-  rfl
+lemma leftDualLeftUnit_eq_fromConstPair : δL = fromConstPair Fermion.leftDualLeftUnit := rfl
 
-lemma dualRightRightUnit_eq_fromConstPair : δR' = fromConstPair Fermion.dualRightRightUnit := by
-  rw [Fermion.dualRightRightUnit]
-  rfl
+lemma dualRightRightUnit_eq_fromConstPair : δR' = fromConstPair Fermion.dualRightRightUnit := rfl
 
-lemma rightDualRightUnit_eq_fromConstPair : δR = fromConstPair Fermion.rightDualRightUnit := by
-  rw [Fermion.rightDualRightUnit]
-  rfl
+lemma rightDualRightUnit_eq_fromConstPair : δR = fromConstPair Fermion.rightDualRightUnit := rfl
 
 /-!
 
