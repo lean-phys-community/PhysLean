@@ -157,9 +157,8 @@ theorem id_map : (id (dIn := dIn)).map = LinearMap.id := rfl
 /-- The map `CPTPMap.id` leaves the input state unchanged. -/
 @[simp]
 theorem id_MState (ρ : MState dIn) : CPTPMap.id (dIn := dIn) ρ = ρ := by
-  apply MState.ext_m
-  rw [mat_coe_eq_apply_mat]
-  simp
+  ext
+  rfl
 
 /-- The map `CPTPMap.id` composed with any map is the same map. -/
 @[simp]
@@ -183,7 +182,7 @@ variable [DecidableEq dOut]
 def ofEquiv (σ : dIn ≃ dOut) : CPTPMap dIn dOut where
   toLinearMap := MatrixMap.submatrix ℂ σ.symm
   cp := .submatrix σ.symm
-  TP x := by rw [MatrixMap.IsTracePreserving.submatrix]
+  TP := MatrixMap.IsTracePreserving.submatrix σ.symm
 
 @[simp]
 theorem ofEquiv_apply (σ : dIn ≃ dOut) (ρ : MState dIn) :
@@ -239,16 +238,12 @@ def traceLeft : CPTPMap (d₁ × d₂) d₂ :=
     --TODO: make Matrix.traceLeft a linear map, a `MatrixMap`.
   letI f (d) [Fintype d] [DecidableEq d]: Matrix (d₁ × d) (d₁ × d) ℂ →ₗ[ℂ] Matrix d d ℂ := {
     toFun x := Matrix.traceLeft x
-    map_add' := by
-      intros; ext
-      simp [Matrix.traceLeft, Finset.sum_add_distrib]
-    map_smul' := by
-      intros; ext
-      simp [Matrix.traceLeft, Finset.mul_sum]
+    map_add' x y := Matrix.traceLeft_add
+    map_smul' r x := Matrix.traceLeft_smul r
   }
   {
     toLinearMap := f d₂
-    TP := by intro; simp [f]
+    TP := Matrix.traceLeft_trace
     cp := by
       --(traceLeft ⊗ₖₘ I) = traceLeft ∘ₘ (ofEquiv prod_assoc)
       --Both go (A × B) × C → B × C
