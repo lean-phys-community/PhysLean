@@ -91,8 +91,7 @@ lemma harmonicWaveX_inl_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → 
 @[simp]
 lemma harmonicWaveX_inr_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → ℝ) (φ : Fin d → ℝ)
     (x : SpaceTime d.succ) :
-    harmonicWaveX 𝓕 k E₀ φ x (Sum.inr 0) = 0 := by
-  rfl
+    harmonicWaveX 𝓕 k E₀ φ x (Sum.inr 0) = 0 := rfl
 
 /-!
 
@@ -142,8 +141,7 @@ The scalar potential of the harmonic wave is zero.
 @[simp]
 lemma harmonicWaveX_scalarPotential_eq_zero {d} (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) :
-    (harmonicWaveX 𝓕 k E₀ φ).scalarPotential 𝓕.c = 0 := by
-  rfl
+    (harmonicWaveX 𝓕 k E₀ φ).scalarPotential 𝓕.c = 0 := rfl
 
 /-!
 
@@ -160,8 +158,7 @@ lemma harmonicWaveX_scalarPotential_eq_zero {d} (𝓕 : FreeSpace) (k : ℝ)
 @[simp]
 lemma harmonicWaveX_vectorPotential_zero_eq_zero {d} (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) (t : Time) (x : Space d.succ) :
-    (harmonicWaveX 𝓕 k E₀ φ).vectorPotential 𝓕.c t x 0 = 0 := by
-  rfl
+    (harmonicWaveX 𝓕 k E₀ φ).vectorPotential 𝓕.c t x 0 = 0 := rfl
 
 lemma harmonicWaveX_vectorPotential_succ {d} (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) (t : Time) (x : Space d.succ) (i : Fin d) :

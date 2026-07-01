@@ -90,8 +90,7 @@ lemma chargeDensity_eq_timeSlice {d : ℕ} {c : SpeedOfLight} {J : LorentzCurren
 
 @[simp]
 lemma chargeDensity_zero {d : ℕ} {c : SpeedOfLight}:
-    chargeDensity c (0 : LorentzCurrentDensity d) = 0 := by
-  rfl
+    chargeDensity c (0 : LorentzCurrentDensity d) = 0 := rfl
 
 /-!
 
@@ -144,8 +143,7 @@ lemma currentDensity_eq_timeSlice {d : ℕ} {J : LorentzCurrentDensity d} :
 
 @[simp]
 lemma currentDensity_zero {d : ℕ} {c : SpeedOfLight}:
-    currentDensity c (0 : LorentzCurrentDensity d) = 0 := by
-  rfl
+    currentDensity c (0 : LorentzCurrentDensity d) = 0 := rfl
 /-!
 
 ### C.2. Differentiability of the current density
