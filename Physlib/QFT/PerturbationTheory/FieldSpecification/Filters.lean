@@ -44,8 +44,7 @@ lemma createFilter_append (φs φs' : List 𝓕.CrAnFieldOp) :
 
 lemma createFilter_singleton_create (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.create) :
-    createFilter [φ] = [φ] := by
-  simp [createFilter, hφ]
+    createFilter [φ] = [φ] := by simp [createFilter, hφ]
 
 lemma createFilter_singleton_annihilate (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.annihilate) : createFilter [φ] = [] := by
@@ -79,12 +78,10 @@ lemma annihilateFilter_append (φs φs' : List 𝓕.CrAnFieldOp) :
 
 lemma annihilateFilter_singleton_create (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.create) :
-    annihilateFilter [φ] = [] := by
-  simp [annihilateFilter, hφ]
+    annihilateFilter [φ] = [] := by simp [annihilateFilter, hφ]
 
 lemma annihilateFilter_singleton_annihilate (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.annihilate) :
-    annihilateFilter [φ] = [φ] := by
-  simp [annihilateFilter, hφ]
+    annihilateFilter [φ] = [φ] := by simp [annihilateFilter, hφ]
 
 end FieldSpecification

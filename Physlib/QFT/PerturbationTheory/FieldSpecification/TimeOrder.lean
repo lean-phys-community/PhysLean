@@ -178,8 +178,7 @@ lemma timeOrderList_pair_not_ordered {φ ψ : 𝓕.FieldOp} (h : ¬ timeOrderRel
   exact fun h' => False.elim (h h')
 
 @[simp]
-lemma timeOrderList_nil : timeOrderList (𝓕 := 𝓕) [] = [] := by
-  simp [timeOrderList]
+lemma timeOrderList_nil : timeOrderList (𝓕 := 𝓕) [] = [] := by simp [timeOrderList]
 
 lemma timeOrderList_eq_maxTimeField_timeOrderList (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
     timeOrderList (φ :: φs) = maxTimeField φ φs :: timeOrderList (eraseMaxTimeField φ φs) := by
@@ -264,8 +263,7 @@ def crAnTimeOrderList (φs : List 𝓕.CrAnFieldOp) : List 𝓕.CrAnFieldOp :=
   List.insertionSort 𝓕.crAnTimeOrderRel φs
 
 @[simp]
-lemma crAnTimeOrderList_nil : crAnTimeOrderList (𝓕 := 𝓕) [] = [] := by
-  simp [crAnTimeOrderList]
+lemma crAnTimeOrderList_nil : crAnTimeOrderList (𝓕 := 𝓕) [] = [] := by simp [crAnTimeOrderList]
 
 lemma crAnTimeOrderList_pair_ordered {φ ψ : 𝓕.CrAnFieldOp} (h : crAnTimeOrderRel φ ψ) :
     crAnTimeOrderList [φ, ψ] = [φ, ψ] := by

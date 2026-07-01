@@ -40,12 +40,10 @@ def singleton {i j : Fin n} (hij : i < j) : WickContraction n :=
     simp_all⟩
 
 lemma mem_singleton {i j : Fin n} (hij : i < j) :
-    {i, j} ∈ (singleton hij).1 := by
-  simp [singleton]
+    {i, j} ∈ (singleton hij).1 := by simp [singleton]
 
 lemma mem_singleton_iff {i j : Fin n} (hij : i < j) {a : Finset (Fin n)} :
-    a ∈ (singleton hij).1 ↔ a = {i, j} := by
-  simp [singleton]
+    a ∈ (singleton hij).1 ↔ a = {i, j} := by simp [singleton]
 
 lemma of_singleton_eq {i j : Fin n} (hij : i < j) (a : (singleton hij).1) :
     a = ⟨{i, j}, mem_singleton hij⟩ := by
@@ -55,8 +53,7 @@ lemma of_singleton_eq {i j : Fin n} (hij : i < j) (a : (singleton hij).1) :
 
 lemma singleton_prod {φs : List 𝓕.FieldOp} {i j : Fin φs.length} (hij : i < j)
     (f : (singleton hij).1 → M) [CommMonoid M] :
-    ∏ a, f a = f ⟨{i,j}, mem_singleton hij⟩:= by
-  simp [singleton, of_singleton_eq]
+    ∏ a, f a = f ⟨{i,j}, mem_singleton hij⟩:= by simp [singleton, of_singleton_eq]
 
 @[simp]
 lemma singleton_fstFieldOfContract {i j : Fin n} (hij : i < j) :
