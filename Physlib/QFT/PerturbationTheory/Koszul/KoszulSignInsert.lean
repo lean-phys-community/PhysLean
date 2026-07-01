@@ -165,8 +165,7 @@ lemma koszulSignInsert_eq_exchangeSign_take [Std.Total le] [IsTrans 𝓕 le] (φ
       (List.insertionSort le φs))) = if FieldStatistic.ofList q [φ] = fermionic ∧
       FieldStatistic.ofList q (List.take (↑(orderedInsertPos le (List.insertionSort le φs) φ))
       (List.insertionSort le φs)) = fermionic then - 1 else 1 := by
-    rw [exchangeSign_eq_if]
-    simp
+    simp [exchangeSign_eq_if]
   rw [hx]
   congr
   simp only [List.filter_filter, Bool.and_self]

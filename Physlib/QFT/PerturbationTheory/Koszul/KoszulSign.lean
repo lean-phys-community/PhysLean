@@ -346,8 +346,7 @@ lemma koszulSign_of_append_eq_insertionSort_left [Std.Total le] [IsTrans 𝓕 le
     congr 3
     · have h2 : (List.insertionSort le φs ++ φ :: φs') =
           List.insertIdx (List.insertionSort le φs ++ φs') φs.length φ := by
-        rw [← insertIdx_length_fst_append]
-        simp
+        simp [← insertIdx_length_fst_append]
       rw [insertionSortEquiv_congr _ _ h2.symm]
       simp only [Equiv.trans_apply, RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply, Fin.cast_mk,
         Fin.val_cast]

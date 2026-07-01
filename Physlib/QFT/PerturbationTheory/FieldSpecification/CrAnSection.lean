@@ -151,14 +151,12 @@ instance fintype : (φs : List 𝓕.FieldOp) → Fintype (CrAnSection φs)
 
 @[simp]
 lemma card_nil_eq : Fintype.card (CrAnSection (𝓕 := 𝓕) []) = 1 := by
-  rw [Fintype.ofEquiv_card nilEquiv.symm]
-  simp
+  simpa using Fintype.ofEquiv_card nilEquiv.symm
 
 lemma card_cons_eq {φ : 𝓕.FieldOp} {φs : List 𝓕.FieldOp} :
     Fintype.card (CrAnSection (φ :: φs)) = Fintype.card (𝓕.fieldOpToCrAnType φ) *
     Fintype.card (CrAnSection φs) := by
-  rw [Fintype.ofEquiv_card consEquiv.symm]
-  simp
+  simpa using Fintype.ofEquiv_card consEquiv.symm
 
 lemma card_eq_mul : {φs : List 𝓕.FieldOp} → Fintype.card (CrAnSection φs) =
     2 ^ (List.countP 𝓕.statesIsPosition φs)
