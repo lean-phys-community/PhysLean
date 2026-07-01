@@ -180,8 +180,7 @@ lemma update_succAbove_drop {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableE
   · rw [Function.update_of_ne h, Function.update_of_ne]
     · rfl
     · simp only [ne_eq]
-      rw [Function.Injective.eq_iff (Fin.succAbove_right_injective (p := i))]
-      exact h
+      simpa [Function.Injective.eq_iff (Fin.succAbove_right_injective (p := i))] using h
 
 @[simp]
 lemma update_drop_self {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fin (n + 1))]
@@ -282,8 +281,7 @@ lemma component_basisVector {n : ℕ} (c : Fin n → C) (b1 b2 : ComponentIdx (S
       simp_all only [not_forall]
       obtain ⟨w, h⟩ := h
       refine Finset.prod_eq_zero (Finset.mem_univ i) ?_
-      rw [Finsupp.single_eq_of_ne]
-      exact fun a => hi (id (Eq.symm a))
+      exact Finsupp.single_eq_of_ne fun a => hi (id (Eq.symm a))
 
 end Pure
 

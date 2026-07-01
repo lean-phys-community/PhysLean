@@ -398,8 +398,7 @@ lemma ofPotentialTerm'_mono [DecidableEq 𝓩] {x y : ChargeSpectrum 𝓩}
     (h : x ⊆ y) (T : PotentialTerm) :
     x.ofPotentialTerm' T ⊆ y.ofPotentialTerm' T := by
   intro i
-  rw [← mem_ofPotentialTerm_iff_mem_ofPotentialTerm, ← mem_ofPotentialTerm_iff_mem_ofPotentialTerm]
-  exact fun a => ofPotentialTerm_mono h T a
+  simpa [← mem_ofPotentialTerm_iff_mem_ofPotentialTerm] using fun a => ofPotentialTerm_mono h T a
 
 end ChargeSpectrum
 

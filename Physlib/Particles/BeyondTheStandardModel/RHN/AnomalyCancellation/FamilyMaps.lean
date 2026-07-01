@@ -76,8 +76,7 @@ def speciesEmbed (m n : ℕ) :
       eq_ratCast, Rat.cast_eq_id, id_eq]
     by_cases hi : i.val < m
     · rw [dif_pos hi, dif_pos hi]
-    · rw [dif_neg hi, dif_neg hi]
-      exact Eq.symm (Rat.mul_zero a)
+    · simp [dif_neg hi]
 
 /-- The embedding of the `m`-family charges onto the `n`-family charges, with all
 other charges zero. -/
