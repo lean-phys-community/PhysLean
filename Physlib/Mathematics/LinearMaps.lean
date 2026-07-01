@@ -99,8 +99,7 @@ lemma map_add₁ (f : BiLinearSymm V) (S1 S2 T : V) : f (S1 + S2) T = f S1 T + f
   (congrArg (fun g : V →ₗ[ℚ] ℚ => g T) (f.map_add S1 S2)).trans (by rfl)
 
 lemma map_add₂ (f : BiLinearSymm V) (S : V) (T1 T2 : V) :
-    f S (T1 + T2) = f S T1 + f S T2 := by
-  rw [f.swap, f.map_add₁, f.swap T1 S, f.swap T2 S]
+    f S (T1 + T2) = f S T1 + f S T2 := by rw [f.swap, f.map_add₁, f.swap T1 S, f.swap T2 S]
 
 /-- Fixing the second input vectors, the resulting linear map. -/
 def toLinear₁ (f : BiLinearSymm V) (T : V) : V →ₗ[ℚ] ℚ where
@@ -111,8 +110,7 @@ def toLinear₁ (f : BiLinearSymm V) (T : V) : V →ₗ[ℚ] ℚ where
 lemma toLinear₁_apply (f : BiLinearSymm V) (S T : V) : f S T = f.toLinear₁ T S := rfl
 
 lemma map_sum₁ {n : ℕ} (f : BiLinearSymm V) (S : Fin n → V) (T : V) :
-    f (∑ i, S i) T = ∑ i, f (S i) T := by
-  simp [f.toLinear₁_apply, map_sum]
+    f (∑ i, S i) T = ∑ i, f (S i) T := by simp [f.toLinear₁_apply, map_sum]
 
 lemma map_sum₂ {n : ℕ} (f : BiLinearSymm V) (S : Fin n → V) (T : V) :
     f T (∑ i, S i) = ∑ i, f T (S i) := map_sum (f T) S Finset.univ
@@ -211,24 +209,20 @@ lemma map_smul₁ (f : TriLinearSymm V) (a : ℚ) (S T L : V) :
   (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_smul a S)).trans rfl
 
 lemma map_smul₂ (f : TriLinearSymm V) (S : V) (a : ℚ) (T L : V) :
-    f S (a • T) L = a * f S T L := by
-  rw [f.swap₁, f.map_smul₁, f.swap₁]
+    f S (a • T) L = a * f S T L := by rw [f.swap₁, f.map_smul₁, f.swap₁]
 
 lemma map_smul₃ (f : TriLinearSymm V) (S T : V) (a : ℚ) (L : V) :
-    f S T (a • L) = a * f S T L := by
-  rw [f.swap₃, f.map_smul₁, f.swap₃]
+    f S T (a • L) = a * f S T L := by rw [f.swap₃, f.map_smul₁, f.swap₃]
 
 lemma map_add₁ (f : TriLinearSymm V) (S1 S2 T L : V) :
     f (S1 + S2) T L = f S1 T L + f S2 T L :=
   (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_add S1 S2)).trans rfl
 
 lemma map_add₂ (f : TriLinearSymm V) (S T1 T2 L : V) :
-    f S (T1 + T2) L = f S T1 L + f S T2 L := by
-  rw [f.swap₁, f.map_add₁, f.swap₁ S T1, f.swap₁ S T2]
+    f S (T1 + T2) L = f S T1 L + f S T2 L := by rw [f.swap₁, f.map_add₁, f.swap₁ S T1, f.swap₁ S T2]
 
 lemma map_add₃ (f : TriLinearSymm V) (S T L1 L2 : V) :
-    f S T (L1 + L2) = f S T L1 + f S T L2 := by
-  rw [f.swap₃, f.map_add₁, f.swap₃, f.swap₃ L2 T S]
+    f S T (L1 + L2) = f S T L1 + f S T L2 := by rw [f.swap₃, f.map_add₁, f.swap₃, f.swap₃ L2 T S]
 
 /-- Fixing the second and third input vectors, the resulting linear map. -/
 def toLinear₁ (f : TriLinearSymm V) (T L : V) : V →ₗ[ℚ] ℚ where
@@ -239,8 +233,7 @@ def toLinear₁ (f : TriLinearSymm V) (T L : V) : V →ₗ[ℚ] ℚ where
 lemma toLinear₁_apply (f : TriLinearSymm V) (S T L : V) : f S T L = f.toLinear₁ T L S := rfl
 
 lemma map_sum₁ {n : ℕ} (f : TriLinearSymm V) (S : Fin n → V) (T : V) (L : V) :
-    f (∑ i, S i) T L = ∑ i, f (S i) T L := by
-  simp [toLinear₁_apply, map_sum]
+    f (∑ i, S i) T L = ∑ i, f (S i) T L := by simp [toLinear₁_apply, map_sum]
 
 lemma map_sum₂ {n : ℕ} (f : TriLinearSymm V) (S : Fin n → V) (T : V) (L : V) :
     f T (∑ i, S i) L = ∑ i, f T (S i) L := by
