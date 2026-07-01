@@ -778,8 +778,10 @@ theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d�
   obtain ⟨k, hk⟩ : ∃ k : { x : MState d₁ × MState d₂ // x ∈ ρLRs }, 0 < (ps k : ℝ) ∧ (MState.pure ψ).M = (k.val.1).M ⊗ₖ (k.val.2).M := by
     have h_pure : (MState.pure ψ).purity = 1 :=
       ( pure_iff_purity_one _ ).mp ⟨ ψ, rfl ⟩;
-    obtain ⟨k, hk⟩ : ∃ k : { x : MState d₁ × MState d₂ // x ∈ ρLRs }, 0 < (ps k : ℝ) := by
-      exact ⟨ Classical.choose ( show ∃ k : ρLRs, 0 < ( ps k : ℝ ) from by exact not_forall_not.mp fun h => by have := ps.2; simp_all ), Classical.choose_spec ( show ∃ k : ρLRs, 0 < ( ps k : ℝ ) from by exact not_forall_not.mp fun h => by have := ps.2; simp_all) ⟩;
+    obtain ⟨k, hk⟩ : ∃ k : { x : MState d₁ × MState d₂ // x ∈ ρLRs }, 0 < (ps k : ℝ) :=
+      not_forall_not.mp fun h => by
+        have := ps.2
+        simp_all
     refine' ⟨ k, hk, _ ⟩;
     convert MState.eq_of_sum_eq_pure h_pure _ _ _ k _ _;
     rotate_left;

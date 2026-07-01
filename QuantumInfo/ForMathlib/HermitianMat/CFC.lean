@@ -897,8 +897,12 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
           fun _ hy => hy
       obtain ⟨U', hU'⟩ : ∃ U' ∈ nhds x₀, ∀ y ∈ U' ∩ S, spectrum ℝ (A y).mat ⊆ W := by
         obtain ⟨ U', hU' ⟩ := mem_nhdsWithin_iff_exists_mem_nhds_inter.mp hW_subset_S; use U'; aesop;
-      obtain ⟨U'', hU''⟩ : ∃ U'' ∈ nhds x₀, ∀ i, U'' ⊆ U_i i := by
-        exact ⟨ ⋂ i, U_i i, Filter.mem_of_superset ( Filter.iInter_mem.mpr fun i => IsOpen.mem_nhds ( hU_i i ) ( h_cont.1 i ) ) fun x hx => by aesop, fun i => Set.iInter_subset _ i ⟩
+      obtain ⟨U'', hU''⟩ : ∃ U'' ∈ nhds x₀, ∀ i, U'' ⊆ U_i i :=
+        ⟨⋂ i, U_i i,
+          Filter.mem_of_superset
+            (Filter.iInter_mem.mpr fun i => IsOpen.mem_nhds (hU_i i) (h_cont.1 i))
+            fun x hx => by aesop,
+          fun i => Set.iInter_subset _ i⟩
       set U := U' ∩ U'' with hU_def
       have hU_mem : U ∈ nhds x₀ :=
         Filter.inter_mem hU'.1 hU''.1

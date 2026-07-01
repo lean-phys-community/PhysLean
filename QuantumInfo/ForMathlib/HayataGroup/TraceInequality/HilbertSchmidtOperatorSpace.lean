@@ -603,9 +603,8 @@ lemma cfc_op_eq_op_cfc [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint]
     cfc (R := ℝ) (A := (L ℋ)ᵐᵒᵖ) (p := IsSelfAdjoint) f (MulOpposite.op A) =
       MulOpposite.op (cfcR f A) := by
   let φ : L ℋ →⋆ₐ[ℝ] (L ℋ)ᵐᵒᵖ := opStarHSStarAlgHom (ℋ := ℋ)
-  have hφ : Continuous φ := by
-    exact
-      (LinearMap.continuous_of_finiteDimensional (opStarHSLinearMap (ℋ := ℋ)))
+  have hφ : Continuous φ :=
+    LinearMap.continuous_of_finiteDimensional (opStarHSLinearMap (ℋ := ℋ))
   have hopA : IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := op_isSelfAdjoint (A := A) hA
   have hφA : IsSelfAdjoint (φ A) := hA.map φ
   have hcfcA :
@@ -626,9 +625,8 @@ lemma leftMulHS_cfcR [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint] [N
     leftMulHS (ℋ := ℋ) (cfcR f A) =
       cfcR (ℋ := HSOp ℋ) f (leftMulHS (ℋ := ℋ) A) := by
   let φ : L ℋ →⋆ₐ[ℝ] L (HSOp ℋ) := leftMulHSStarAlgHom (ℋ := ℋ)
-  have hφ : Continuous φ := by
-    exact
-      (LinearMap.continuous_of_finiteDimensional (leftMulHSLinearMap (ℋ := ℋ)))
+  have hφ : Continuous φ :=
+    LinearMap.continuous_of_finiteDimensional (leftMulHSLinearMap (ℋ := ℋ))
   have hφA : IsSelfAdjoint (φ A) := hA.map φ
   have hmap := StarAlgHom.map_cfc (φ := φ) (f := f) (a := A)
     (hf := hf) (hφ := hφ) (ha := hA) (hφa := hφA)
@@ -641,9 +639,8 @@ lemma rightMulHS_cfcR [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint]
     rightMulHS (ℋ := ℋ) (cfcR f A) =
       cfcR (ℋ := HSOp ℋ) f (rightMulHS (ℋ := ℋ) A) := by
   let φ : (L ℋ)ᵐᵒᵖ →⋆ₐ[ℝ] L (HSOp ℋ) := rightMulHSStarAlgHom (ℋ := ℋ)
-  have hφ : Continuous φ := by
-    exact
-      (LinearMap.continuous_of_finiteDimensional (rightMulHSLinearMap (ℋ := ℋ)))
+  have hφ : Continuous φ :=
+    LinearMap.continuous_of_finiteDimensional (rightMulHSLinearMap (ℋ := ℋ))
   have hopA : IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := op_isSelfAdjoint (A := A) hA
   have hφA : IsSelfAdjoint (φ (MulOpposite.op A)) := hopA.map φ
   have hmap := StarAlgHom.map_cfc (φ := φ) (f := f) (a := MulOpposite.op A)

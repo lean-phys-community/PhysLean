@@ -372,7 +372,9 @@ set_option backward.isDefEq.respectTransparency false in
 lemma smul_pauliContrDown (g : SL(2,ℂ)) : g • pauliContrDown = pauliContrDown := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant,
     ← contrT_equivariant, ← prodT_equivariant]
-  simp only [Tensorial.self_toTensor_apply]
+  rw [show toTensor (toTensor σ) = toTensor σ from rfl,
+    show toTensor εR' = εR' from rfl,
+    show toTensor εL' = εL' from rfl]
   rw [toTensor_smul_eq_self, actionT_dualLeftMetric, actionT_dualRightMetric]
   rfl
 
