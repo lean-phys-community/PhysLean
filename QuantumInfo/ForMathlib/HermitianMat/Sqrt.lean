@@ -85,8 +85,6 @@ meta def evalHermitianMatSqrt : PositivityExt where eval {_u _α} _zα _pα e :=
   catch _ =>
     pure (.nonnegative (← mkAppM ``HermitianMat.sqrt_nonneg #[A]))
 
-example {A : HermitianMat d ℂ} : 0 ≤ A.sqrt := by
-  positivity
+example {A : HermitianMat d ℂ} : 0 ≤ A.sqrt := by positivity
 
-example [Nonempty d] {A : HermitianMat d ℂ} : 0 < (1 + A.sqrt).sqrt  := by
-  positivity
+example [Nonempty d] {A : HermitianMat d ℂ} : 0 < (1 + A.sqrt).sqrt  := by positivity

@@ -629,8 +629,7 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
           simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm];
           simp [ Matrix.one_apply]
         have h_inner_nonneg : 0 ≤ star x ⬝ᵥ A.mat.mulVec x := inner_mulVec_nonneg hA x
-        have h_inner_pos : 0 < star x ⬝ᵥ x := by
-          simp_all
+        have h_inner_pos : 0 < star x ⬝ᵥ x := by simp_all
         exact h_inner.symm ▸ add_pos_of_nonneg_of_pos h_inner_nonneg ( mul_pos ( mod_cast hε_pos ) ( mod_cast h_inner_pos ) ) |> lt_of_lt_of_le <| le_rfl;
     have h_pos_def_Bε : (Bε ε).mat.PosDef := by
       convert posDef_of_posDef_le h_pos_def_Aε _ using 1
@@ -701,8 +700,7 @@ private lemma conj_rpow_le_one_of_conj_le_one_posDef
     have hconj := HermitianMat.conj_mono (M := (B ^ (-1 : ℝ)).mat) hAB
     have hleft : (A.conj B.mat).conj (B ^ (-1 : ℝ)).mat = A := by
       rw [HermitianMat.conj_conj]
-      have hmul : (B ^ (-1 : ℝ)).mat * B.mat = 1 := by
-        simpa using rpow_neg_mul_rpow_self hB 1
+      have hmul : (B ^ (-1 : ℝ)).mat * B.mat = 1 := by simpa using rpow_neg_mul_rpow_self hB 1
       exact (HermitianMat.conj_one (A := A)).symm ▸ by simp [hmul]
     have hright : (1 : HermitianMat d ℂ).conj (B ^ (-1 : ℝ)).mat = B ^ (-2 : ℝ) := by
       ext1
@@ -754,8 +752,7 @@ private lemma top_singular_le_of_self_mul_le_smul_one
     (hcard : 0 < Fintype.card e) :
     singularValuesSorted X ⟨0, hcard⟩ ≤ Real.sqrt α := by
   letI : Nonempty e := Fintype.card_pos_iff.mp hcard
-  let hne : (Finset.univ : Finset e).Nonempty := by
-    simp
+  let hne : (Finset.univ : Finset e).Nonempty := by simp
   rw [singularValuesSorted_zero_eq_sup X hcard]
   refine Finset.sup'_le _ _ ?_
   intro i hi
@@ -835,8 +832,7 @@ private lemma compound_top_singular_le_posDef
       have hconj := congrArg (fun H : HermitianMat _ ℂ => H.conj (Bk ^ (-1 : ℝ)).mat) hMk_eq_zero
       have hleft : (Ak.conj Bk.mat).conj (Bk ^ (-1 : ℝ)).mat = Ak := by
         rw [HermitianMat.conj_conj]
-        have : (Bk ^ (-1 : ℝ)).mat * Bk.mat = 1 := by
-          simpa using rpow_neg_mul_rpow_self hBk 1
+        have : (Bk ^ (-1 : ℝ)).mat * Bk.mat = 1 := by simpa using rpow_neg_mul_rpow_self hBk 1
         simp [this, HermitianMat.conj_one (A := Ak)]
       simpa [hleft] using hconj
     have hNk_zero : Nk.conjTranspose * Nk = 0 := by
@@ -1236,8 +1232,7 @@ private lemma intervalIntegrable_weighted_trace_mul_inv_shift {A : HermitianMat 
             hp hT).add hs
   refine hg.congr ?_
   intro t ht
-  have htIoc : t ∈ Set.Ioc (0 : ℝ) T := by
-    simpa [Set.uIoc_of_le hT.le] using ht
+  have htIoc : t ∈ Set.Ioc (0 : ℝ) T := by simpa [Set.uIoc_of_le hT.le] using ht
   unfold g
   change ∑ i, t ^ (p - 1) * (A.H.eigenvalues i / (A.H.eigenvalues i + t)) =
     t ^ (p - 1) * (((A.mat * (A + t • 1).mat⁻¹).trace : ℂ)).re

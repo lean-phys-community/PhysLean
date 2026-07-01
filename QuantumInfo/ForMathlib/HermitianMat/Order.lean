@@ -341,27 +341,21 @@ meta def evalHermitianMatConj : PositivityExt where eval {_u _α} _zα _pα e :=
   pure (.nonnegative (← mkAppM ``HermitianMat.conj_nonneg #[M, pfNonneg]))
 
 open MatrixOrder in
-example {A : Matrix n n ℂ} (hA : A.PosSemidef) : 0 ≤ A := by
-  positivity
+example {A : Matrix n n ℂ} (hA : A.PosSemidef) : 0 ≤ A := by positivity
 
 open MatrixOrder in
-example {A : Matrix n n ℂ} [Nonempty n] (hA : A.PosDef) : 0 < A := by
-  positivity
+example {A : Matrix n n ℂ} [Nonempty n] (hA : A.PosDef) : 0 < A := by positivity
 
-example (hA : A.mat.PosSemidef) : 0 ≤ A := by
-  positivity
+example (hA : A.mat.PosSemidef) : 0 ≤ A := by positivity
 
-example [Nonempty n] (hA : A.mat.PosDef) : 0 < A := by
-  positivity
+example [Nonempty n] (hA : A.mat.PosDef) : 0 < A := by positivity
 
 example [DecidableEq n] [DecidableEq m] [Nonempty n] [Nonempty m]
   (A B : HermitianMat n ℂ) (hA : 0 ≤ A) (hB : 0 ≤ B) (M : Matrix m n ℂ) :
-    0 < (2 : HermitianMat (n × m) ℂ) + (3 • A) ⊗ₖ (Real.pi • B).conj M := by
-  positivity
+    0 < (2 : HermitianMat (n × m) ℂ) + (3 • A) ⊗ₖ (Real.pi • B).conj M := by positivity
 
 example (A B : HermitianMat n ℂ) (hA : 0 < A) (hB : 0 < B) :
-    0 < ((37 • A) ⊗ₖ ((38 : ℝ) • B)).trace := by
-  positivity
+    0 < ((37 • A) ⊗ₖ ((38 : ℝ) • B)).trace := by positivity
 
 omit [Fintype n] in
 theorem convex_cone (hA : 0 ≤ A) (hB : 0 ≤ B) {c₁ c₂ : ℝ} (hc₁ : 0 ≤ c₁) (hc₂ : 0 ≤ c₂) :
@@ -643,8 +637,7 @@ variable [DecidableEq n] [DecidableEq m]
 open MatrixOrder
 
 -- Test: eigenvalues nonneg from PSD HermitianMat
-example (A : HermitianMat n ℂ) (hA : 0 < A) (i : n) : 0 ≤ A.H.eigenvalues i := by
-  positivity
+example (A : HermitianMat n ℂ) (hA : 0 < A) (i : n) : 0 ≤ A.H.eigenvalues i := by positivity
 
 -- Test: A.mat nonneg from A nonneg
 example (A : HermitianMat n ℂ) (hA : 0 ≤ A) : 0 ≤ A.mat := by positivity
@@ -669,8 +662,7 @@ example (M : Matrix n m ℝ) :
   positivity
 
 example (M : Matrix n n ℂ) (i : n) (A : HermitianMat n ℂ) (hA : 0 ≤ A) :
-    0 ≤ (A + ⟨_, M.isHermitian_mul_conjTranspose_self⟩ + 0).H.eigenvalues i := by
-  positivity
+    0 ≤ (A + ⟨_, M.isHermitian_mul_conjTranspose_self⟩ + 0).H.eigenvalues i := by positivity
 
 end tests
 end MatrixPositivity
