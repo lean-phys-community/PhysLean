@@ -241,8 +241,7 @@ lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
   letI : NormedAlgebra ℂ (Matrix n n ℂ) := Matrix.linftyOpNormedAlgebra
   letI : CompleteSpace (Matrix n n ℂ) := inferInstance
   simp only [exp_eq_tsum ℝ]
-  have hs : Summable (fun k => (k.factorial : ℝ)⁻¹ • A ^ k) := by
-    exact NormedSpace.expSeries_summable' A
+  have hs : Summable (fun k => (k.factorial : ℝ)⁻¹ • A ^ k) := NormedSpace.expSeries_summable' A
   erw [Matrix.map_tsum (algebraMap ℝ ℂ).toAddMonoidHom RCLike.continuous_ofReal hs]
   apply tsum_congr
   intro k

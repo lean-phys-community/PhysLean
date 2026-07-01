@@ -66,8 +66,7 @@ lemma apply_smooth_of_smooth {F : (X → U) → (X → V)} {F' : (X → V) → (
   fun_prop
 
 lemma apply_smooth_self {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)} {u : X → U}
-    (h : HasVarAdjDerivAt F F' u) : ContDiff ℝ ∞ (F u) := by
-  exact h.apply_smooth_of_smooth (h.smooth_at)
+    (h : HasVarAdjDerivAt F F' u) : ContDiff ℝ ∞ (F u) := h.apply_smooth_of_smooth (h.smooth_at)
 
 lemma smooth_R {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)} {u : X → U}
     (h : HasVarAdjDerivAt F F' u) {φ : ℝ → X → U} (hφ : ContDiff ℝ ∞ ↿φ) (x : X) :
