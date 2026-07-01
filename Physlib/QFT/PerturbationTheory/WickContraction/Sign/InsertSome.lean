@@ -365,8 +365,7 @@ lemma signInsertSomeProd_eq_prod_fin (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldO
           then 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs[x.1])
           else 1
       else 1 := by
-  rw [signInsertSomeProd_eq_prod_prod]
-  rw [Finset.prod_sigma']
+  rw [signInsertSomeProd_eq_prod_prod, Finset.prod_sigma']
   erw [← φsΛ.sigmaContractedEquiv.symm.prod_comp]
   let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} :=
     (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
@@ -395,8 +394,7 @@ lemma signInsertSomeProd_eq_finset (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
       ∀ (h : (φsΛ.getDual? x).isSome),
       x < j ∧ (i.succAbove x < i ∧ i < i.succAbove ((φsΛ.getDual? x).get h)
       ∨ j < ((φsΛ.getDual? x).get h) ∧ ¬ i.succAbove x < i)))⟩) := by
-  rw [signInsertSomeProd_eq_prod_fin]
-  rw [ofFinset_eq_prod]
+  rw [signInsertSomeProd_eq_prod_fin, ofFinset_eq_prod]
   rw [map_prod]
   congr
   funext x
@@ -442,8 +440,7 @@ lemma stat_signFinset_insert_some_self_fst
   𝓕 |>ₛ ⟨φs.get,
     (Finset.univ.filter (fun x => i < i.succAbove x ∧ x < j ∧ ((φsΛ.getDual? x = none) ∨
       ∀ (h : (φsΛ.getDual? x).isSome), i < i.succAbove ((φsΛ.getDual? x).get h))))⟩ := by
-  rw [get_eq_insertIdx_succAbove φ _ i]
-  rw [ofFinset_finset_map]
+  rw [get_eq_insertIdx_succAbove φ _ i, ofFinset_finset_map]
   swap
   refine
     (Equiv.comp_injective i.succAbove (finCongr (Eq.symm (insertIdx_length_fin φ φs i)))).mpr ?hi.a

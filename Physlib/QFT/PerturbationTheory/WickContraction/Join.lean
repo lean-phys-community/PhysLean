@@ -384,8 +384,7 @@ lemma exists_mem_right_uncontracted_of_mem_join_uncontracted {φs : List 𝓕.Fi
 lemma join_uncontractedList {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) :
     (join φsΛ φsucΛ).uncontractedList = List.map uncontractedListEmd φsucΛ.uncontractedList := by
-  rw [uncontractedList_eq_sort, uncontractedList_eq_sort]
-  rw [fin_finset_sort_map_monotone]
+  rw [uncontractedList_eq_sort, uncontractedList_eq_sort, fin_finset_sort_map_monotone]
   congr
   ext a
   simp only [Finset.mem_map]

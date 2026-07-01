@@ -544,8 +544,7 @@ lemma uncontractedList_succAboveEmb_eraseIdx_eq_sort (c : WickContraction n) (i 
 lemma uncontractedList_extractEquiv_symm_some (c : WickContraction n) (i : Fin n.succ)
     (k : c.uncontracted) : ((extractEquiv i).symm ⟨c, some k⟩).uncontractedList =
     ((c.uncontractedList).map i.succAboveEmb).eraseIdx (c.uncontractedIndexEquiv.symm k) := by
-  rw [uncontractedList_eq_sort]
-  rw [uncontractedList_succAboveEmb_eraseIdx_eq_sort]
+  rw [uncontractedList_eq_sort, uncontractedList_succAboveEmb_eraseIdx_eq_sort]
   swap
   simp only [Fin.is_lt]
   congr
