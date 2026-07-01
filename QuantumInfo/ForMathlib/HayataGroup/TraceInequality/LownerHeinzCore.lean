@@ -501,18 +501,15 @@ theorem one_div_add_t_operatorConvexOn_Ici : ∀ (t : ℝ), 0 < t →
   have C_nonneg : 0 ≤ C := by
     simpa [C] using add_nonneg (smul_nonneg (sub_nonneg.mpr hθ1) A_nonneg) (smul_nonneg hθ0 B_nonneg)
   have hA_shift : cfcR shift A = A + T := by
-    dsimp [cfcR, shift, T]
-    simpa [cfc_id' (R := ℝ) (a := A) (ha := hA)] using
+    simpa [cfcR, shift, T, cfc_id' (R := ℝ) (a := A) (ha := hA)] using
       (cfc_add_const (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (r := t)
         (f := fun x : ℝ ↦ x) (a := A) (ha := hA))
   have hB_shift : cfcR shift B = B + T := by
-    dsimp [cfcR, shift, T]
-    simpa [cfc_id' (R := ℝ) (a := B) (ha := hB)] using
+    simpa [cfcR, shift, T, cfc_id' (R := ℝ) (a := B) (ha := hB)] using
       (cfc_add_const (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (r := t)
         (f := fun x : ℝ ↦ x) (a := B) (ha := hB))
   have hC_shift : cfcR shift C = C + T := by
-    dsimp [cfcR, shift, T]
-    simpa [cfc_id' (R := ℝ) (a := C) (ha := hC)] using
+    simpa [cfcR, shift, T, cfc_id' (R := ℝ) (a := C) (ha := hC)] using
       (cfc_add_const (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (r := t)
         (f := fun x : ℝ ↦ x) (a := C) (ha := hC))
   set A1 : 𝓐 := A + T
@@ -1846,8 +1843,7 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
     have hcomp :
         cfcR  (fun y : ℝ ↦ 1 / y) (cfcR  (fun x : ℝ ↦ x ^ q) A) =
           cfcR  (fun x : ℝ ↦ 1 / (x ^ q)) A := by
-      dsimp [cfcR]
-      simpa [Function.comp] using
+      simpa [cfcR, Function.comp] using
         (cfc_comp' (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (g := fun y : ℝ ↦ 1 / y)
           (f := fun x : ℝ ↦ x ^ q) (a := A) (hg := hg) (hf := hcontA) (ha := hA_sa)).symm
     have hL :
@@ -1882,8 +1878,7 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
     have hcomp :
         cfcR  (fun y : ℝ ↦ 1 / y) (cfcR  (fun x : ℝ ↦ x ^ q) B) =
           cfcR  (fun x : ℝ ↦ 1 / (x ^ q)) B := by
-      dsimp [cfcR]
-      simpa [Function.comp] using
+      simpa [cfcR, Function.comp] using
         (cfc_comp' (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (g := fun y : ℝ ↦ 1 / y)
           (f := fun x : ℝ ↦ x ^ q) (a := B) (hg := hg) (hf := hcontB) (ha := hB_sa)).symm
     have hL :
