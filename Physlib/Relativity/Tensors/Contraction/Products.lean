@@ -104,7 +104,7 @@ lemma Pure.dropPair_prodP {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   obtain ⟨x, rfl⟩ := finSumFinEquiv.surjective x
   rw [prodP_apply_finSumFinEquiv]
   simp only [Function.comp_apply, finSumFinEquiv_apply_left, finSumFinEquiv_apply_right, dropPair,
-    permP, Nat.add_eq, id_eq]
+    permP, Nat.add_eq]
   match x with
   | Sum.inl m =>
     simp only [finSumFinEquiv_apply_left]
