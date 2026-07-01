@@ -136,8 +136,7 @@ lemma timeOrderF_ofFieldOpF_ofFieldOpF_ordered {φ ψ : 𝓕.FieldOp} (h : timeO
   rw [← ofFieldOpListF_singleton, ← ofFieldOpListF_singleton, ← ofFieldOpListF_append,
     timeOrderF_ofFieldOpListF]
   simp only [List.singleton_append]
-  rw [timeOrderSign_pair_ordered h, timeOrderList_pair_ordered h]
-  simp
+  simp [timeOrderSign_pair_ordered h, timeOrderList_pair_ordered h]
 
 lemma timeOrderF_ofFieldOpF_ofFieldOpF_not_ordered {φ ψ : 𝓕.FieldOp} (h : ¬ timeOrderRel φ ψ) :
     𝓣ᶠ(ofFieldOpF φ * ofFieldOpF ψ) = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ψ) • ofFieldOpF ψ * ofFieldOpF φ := by
