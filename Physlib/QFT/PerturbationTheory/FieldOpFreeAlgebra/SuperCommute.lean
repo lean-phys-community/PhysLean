@@ -244,15 +244,13 @@ lemma superCommuteF_crPartF_ofFieldOpF (φ φ' : 𝓕.FieldOp) :
     [crPartF φ, ofFieldOpF φ']ₛF =
     crPartF φ * ofFieldOpF φ' -
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • ofFieldOpF φ' * crPartF φ := by
-  rw [← ofFieldOpListF_singleton, superCommuteF_crPartF_ofFieldOpListF]
-  simp
+  simpa [ofFieldOpListF_singleton] using superCommuteF_crPartF_ofFieldOpListF φ [φ']
 
 lemma superCommuteF_anPartF_ofFieldOpF (φ φ' : 𝓕.FieldOp) :
     [anPartF φ, ofFieldOpF φ']ₛF =
     anPartF φ * ofFieldOpF φ' -
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • ofFieldOpF φ' * anPartF φ := by
-  rw [← ofFieldOpListF_singleton, superCommuteF_anPartF_ofFieldOpListF]
-  simp
+  simpa [ofFieldOpListF_singleton] using superCommuteF_anPartF_ofFieldOpListF φ [φ']
 
 /-!
 
@@ -265,68 +263,61 @@ multiplication with a sign plus the super commutator.
 lemma ofCrAnListF_mul_ofCrAnListF_eq_superCommuteF (φs φs' : List 𝓕.CrAnFieldOp) :
     ofCrAnListF φs * ofCrAnListF φs' = 𝓢(𝓕 |>ₛ φs, 𝓕 |>ₛ φs') • ofCrAnListF φs' * ofCrAnListF φs
     + [ofCrAnListF φs, ofCrAnListF φs']ₛF := by
-  rw [superCommuteF_ofCrAnListF_ofCrAnListF]
-  simp [ofCrAnListF_append]
+  simp [superCommuteF_ofCrAnListF_ofCrAnListF, ofCrAnListF_append]
 
 lemma ofCrAnOpF_mul_ofCrAnListF_eq_superCommuteF (φ : 𝓕.CrAnFieldOp) (φs' : List 𝓕.CrAnFieldOp) :
     ofCrAnOpF φ * ofCrAnListF φs' = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs') • ofCrAnListF φs' * ofCrAnOpF φ
     + [ofCrAnOpF φ, ofCrAnListF φs']ₛF := by
-  rw [← ofCrAnListF_singleton, ofCrAnListF_mul_ofCrAnListF_eq_superCommuteF]
-  simp
+  simpa [ofCrAnListF_singleton] using
+    ofCrAnListF_mul_ofCrAnListF_eq_superCommuteF [φ] φs'
 
 lemma ofFieldOpListF_mul_ofFieldOpListF_eq_superCommuteF (φs φs' : List 𝓕.FieldOp) :
     ofFieldOpListF φs * ofFieldOpListF φs' =
     𝓢(𝓕 |>ₛ φs, 𝓕 |>ₛ φs') • ofFieldOpListF φs' * ofFieldOpListF φs
     + [ofFieldOpListF φs, ofFieldOpListF φs']ₛF := by
-  rw [superCommuteF_ofFieldOpListF_ofFieldOpFsList]
-  simp
+  simp [superCommuteF_ofFieldOpListF_ofFieldOpFsList]
 
 lemma ofFieldOpF_mul_ofFieldOpListF_eq_superCommuteF (φ : 𝓕.FieldOp) (φs' : List 𝓕.FieldOp) :
     ofFieldOpF φ * ofFieldOpListF φs' = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs') • ofFieldOpListF φs' * ofFieldOpF φ
     + [ofFieldOpF φ, ofFieldOpListF φs']ₛF := by
-  rw [superCommuteF_ofFieldOpF_ofFieldOpFsList]
-  simp
+  simpa [ofFieldOpListF_singleton] using
+    ofFieldOpListF_mul_ofFieldOpListF_eq_superCommuteF [φ] φs'
 
 lemma ofFieldOpListF_mul_ofFieldOpF_eq_superCommuteF (φs : List 𝓕.FieldOp) (φ : 𝓕.FieldOp) :
     ofFieldOpListF φs * ofFieldOpF φ = 𝓢(𝓕 |>ₛ φs, 𝓕 |>ₛ φ) • ofFieldOpF φ * ofFieldOpListF φs
     + [ofFieldOpListF φs, ofFieldOpF φ]ₛF := by
-  rw [superCommuteF_ofFieldOpListF_ofFieldOpF]
-  simp
+  simpa [ofFieldOpListF_singleton] using
+    ofFieldOpListF_mul_ofFieldOpListF_eq_superCommuteF φs [φ]
 
 lemma crPartF_mul_anPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     crPartF φ * anPartF φ' =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPartF φ' * crPartF φ +
     [crPartF φ, anPartF φ']ₛF := by
-  rw [superCommuteF_crPartF_anPartF]
-  simp
+  simp [superCommuteF_crPartF_anPartF]
 
 lemma anPartF_mul_crPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     anPartF φ * crPartF φ' =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') •
     crPartF φ' * anPartF φ +
     [anPartF φ, crPartF φ']ₛF := by
-  rw [superCommuteF_anPartF_crPartF]
-  simp
+  simp [superCommuteF_anPartF_crPartF]
 
 lemma crPartF_mul_crPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     crPartF φ * crPartF φ' =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • crPartF φ' * crPartF φ +
     [crPartF φ, crPartF φ']ₛF := by
-  rw [superCommuteF_crPartF_crPartF]
-  simp
+  simp [superCommuteF_crPartF_crPartF]
 
 lemma anPartF_mul_anPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     anPartF φ * anPartF φ' = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPartF φ' * anPartF φ +
     [anPartF φ, anPartF φ']ₛF := by
-  rw [superCommuteF_anPartF_anPartF]
-  simp
+  simp [superCommuteF_anPartF_anPartF]
 
 lemma ofCrAnListF_mul_ofFieldOpListF_eq_superCommuteF (φs : List 𝓕.CrAnFieldOp)
     (φs' : List 𝓕.FieldOp) : ofCrAnListF φs * ofFieldOpListF φs' =
     𝓢(𝓕 |>ₛ φs, 𝓕 |>ₛ φs') • ofFieldOpListF φs' * ofCrAnListF φs
     + [ofCrAnListF φs, ofFieldOpListF φs']ₛF := by
-  rw [superCommuteF_ofCrAnListF_ofFieldOpFsList]
-  simp
+  simp [superCommuteF_ofCrAnListF_ofFieldOpFsList]
 
 /-!
 
