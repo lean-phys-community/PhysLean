@@ -67,8 +67,7 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnListF_eq_zero
     exact ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnListF_eq_zero φa φa' φs l
   change (ι.toLinearMap ∘ₗ normalOrderF ∘ₗ
     mulLinearMap ((ofCrAnListF φs * [ofCrAnOpF φa, ofCrAnOpF φa']ₛF))) a = 0
-  rw [hf]
-  simp
+  simp [hf]
 
 lemma ι_normalOrderF_superCommuteF_ofCrAnOpF_eq_zero_mul (φa φa' : 𝓕.CrAnFieldOp)
     (a b : 𝓕.FieldOpFreeAlgebra) :
@@ -84,8 +83,7 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnOpF_eq_zero_mul (φa φa' : 𝓕.CrAnF
       Function.comp_apply, LinearMap.flip_apply, LinearMap.coe_mk, AddHom.coe_mk,
       AlgHom.toLinearMap_apply, LinearMap.zero_apply]
     simpa [← mul_assoc] using ι_normalOrderF_superCommuteF_ofCrAnListF_eq_zero φa φa' _ _
-  rw [hf]
-  simp
+  simp [hf]
 
 lemma ι_normalOrderF_superCommuteF_ofCrAnOpF_ofCrAnListF_eq_zero_mul (φa : 𝓕.CrAnFieldOp)
     (φs : List 𝓕.CrAnFieldOp) (a b : 𝓕.FieldOpFreeAlgebra) :
@@ -103,8 +101,7 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnOpF_eq_zero_mul (φa : �
   rw [← ofCrAnListF_singleton, superCommuteF_ofCrAnListF_ofCrAnListF_symm, ofCrAnListF_singleton]
   simp only [ofList_singleton, Algebra.mul_smul_comm, Algebra.smul_mul_assoc,
     map_smul]
-  rw [ι_normalOrderF_superCommuteF_ofCrAnOpF_ofCrAnListF_eq_zero_mul]
-  simp
+  simp [ι_normalOrderF_superCommuteF_ofCrAnOpF_ofCrAnListF_eq_zero_mul]
 
 lemma ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnListF_eq_zero_mul
     (φs φs' : List 𝓕.CrAnFieldOp) (a b : 𝓕.FieldOpFreeAlgebra) :
@@ -130,8 +127,7 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnListF_eq_zero_mul
       LinearMap.coe_comp, Function.comp_apply, LinearMap.flip_apply, AlgHom.toLinearMap_apply,
       LinearMap.zero_apply]
     rw [ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnListF_eq_zero_mul]
-  rw [hf]
-  simp
+  simp [hf]
 
 @[simp]
 lemma ι_normalOrderF_superCommuteF_eq_zero_mul
@@ -146,8 +142,7 @@ lemma ι_normalOrderF_superCommuteF_eq_zero_mul
       LinearMap.coe_comp, Function.comp_apply, LinearMap.flip_apply, AlgHom.toLinearMap_apply,
       LinearMap.zero_apply]
     rw [ι_normalOrderF_superCommuteF_ofCrAnListF_eq_zero_mul]
-  rw [hf]
-  simp
+  simp [hf]
 
 @[simp]
 lemma ι_normalOrder_superCommuteF_eq_zero_mul_right (b c d : 𝓕.FieldOpFreeAlgebra) :
@@ -166,8 +161,7 @@ lemma ι_normalOrderF_superCommuteF_eq_zero_mul_mul_right (a b1 b2 c d: 𝓕.Fie
 
 @[simp]
 lemma ι_normalOrderF_superCommuteF_eq_zero (c d : 𝓕.FieldOpFreeAlgebra) : ι 𝓝ᶠ([d, c]ₛF) = 0 := by
-  rw [← ι_normalOrderF_superCommuteF_eq_zero_mul 1 1 c d]
-  simp
+  simpa using ι_normalOrderF_superCommuteF_eq_zero_mul (1 : 𝓕.FieldOpFreeAlgebra) 1 c d
 
 /-!
 
