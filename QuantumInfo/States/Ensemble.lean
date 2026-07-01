@@ -137,8 +137,7 @@ theorem mix_pEnsemble_pure_iff_pure {e : PEnsemble d α} :
       refine Finset.sum_congr rfl fun i _ => ?_
       by_cases hi : e.distr i = 0
       · simp [hi]
-      · rw [← h i hi]
-        rfl
+      · exact h i hi
     simp [MState.ext_iff, h_sum, ← Finset.sum_smul]
 
 /- The theorem below is also false for the same reason as the original `mix_pEnsemble_pure_iff_pure`:

@@ -146,11 +146,7 @@ theorem pinching_self (ρ : MState d) : pinching_map ρ ρ = ρ := by
   simp only [HermitianMat.conjTranspose_mat, MState.mat_M, LinearMap.coe_sum,
     LinearMap.coe_mk, AddHom.coe_mk, Finset.sum_apply]
   simp_rw [(pinching_kraus_commutes ρ _).eq, mul_assoc, ← sq]
-  conv_lhs =>
-    enter [1, 2, x, 2]
-    change (pinching_kraus ρ x ^ 2).mat
-    rw [pinching_sq_eq_self]
-  rfl
+  simp_rw [pinching_sq_eq_self]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Lemma 3.10 of Hayashi's book "Quantum Information Theory - Mathematical Foundations".
@@ -387,8 +383,7 @@ theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ke
       rw! [← hk_zero] at h_proj_one
       simp only [Subtype.coe_eta] at h_proj_one
       simp only [← Matrix.mul_assoc, ← Matrix.mulVec_mulVec, ContinuousLinearMap.coe_coe]
-      rw [h_proj_one]
-      rfl
+      exact h_proj_one
     · simp
   · simp [← Matrix.mulVec_mulVec, h_proj_zero _ hk_zero]
 

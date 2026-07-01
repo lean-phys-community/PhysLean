@@ -90,8 +90,7 @@ theorem prodRelabel_assoc (ρ₁ : MState (H i)) (ρ₂ : MState (H j)) (ρ₃ :
   rw [← MState.relabel_cast]; swap
   · rw [mul_assoc]
   rw [MState.kron_relabel, MState.prod_assoc]
-  rw [MState.relabel_comp, MState.relabel_comp, MState.relabel_comp]
-  rfl
+  simp [MState.relabel_comp]
 
 /-- A `MState.relabel` can be distributed across a `prodRelabel`, if you have proofs that the factors
 correspond correctly. -/

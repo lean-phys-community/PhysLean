@@ -1139,8 +1139,7 @@ def spectrum_SWAP (ρ : MState (d₁ × d₂)) : ∃ e, ρ.SWAP.spectrum.relabel
     (ρ.multiset_spectrum_relabel_eq (Equiv.prodComm _ _).symm ▸ rfl)
   use w
   ext x
-  simp_rw [h]
-  rfl
+  exact h x
 
 @[simp]
 theorem SWAP_SWAP (ρ : MState (d₁ × d₂)) : ρ.SWAP.SWAP = ρ :=
