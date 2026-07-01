@@ -320,8 +320,8 @@ noncomputable instance {M1 M2 : Type} [AddCommMonoid M1] [Module ℝ M1]
   scaleUnit_id u f := LinearMap.ext fun m1 => scaleUnit_id u (f m1)
   scaleUnit_add u1 u2 f1 f2 := LinearMap.ext fun m =>
     scaleUnit_add u1 u2 (f1 m) (f2 m)
-  scaleUnit_smul u1 u2 r f := LinearMap.ext fun m => by
-    simp [scaleUnit_smul]
+  scaleUnit_smul u1 u2 r f := LinearMap.ext fun m =>
+    scaleUnit_smul u1 u2 r (f m)
 
 open LinearUnitDependent ContinuousLinearUnitDependent in
 noncomputable instance {M1 M2 : Type} [AddCommGroup M1] [Module ℝ M1]
@@ -338,8 +338,10 @@ noncomputable instance {M1 M2 : Type} [AddCommGroup M1] [Module ℝ M1]
   scaleUnit_trans' u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
     scaleUnit_trans' u1 u2 u3 (f m1)
   scaleUnit_id u f := ContinuousLinearMap.ext fun m1 => scaleUnit_id u (f m1)
-  scaleUnit_add u1 u2 f1 f2 := by simp
-  scaleUnit_smul u1 u2 r f := by simp
+  scaleUnit_add u1 u2 f1 f2 := ContinuousLinearMap.ext fun m =>
+    scaleUnit_add u1 u2 (f1 m) (f2 m)
+  scaleUnit_smul u1 u2 r f := ContinuousLinearMap.ext fun m =>
+    scaleUnit_smul u1 u2 r (f m)
   scaleUnit_cont u1 u2 := ContinuousLinearEquiv.continuous
       ((ContinuousLinearEquiv.refl ℝ M1).arrowCongr (scaleUnitContLinearEquiv u1 u2))
 
@@ -404,8 +406,10 @@ noncomputable instance instContinuousLinearUnitDependentMap
     simp [scaleUnit_trans']
   scaleUnit_id u f := ContinuousLinearMap.ext fun m1 => by
     simp [scaleUnit_id]
-  scaleUnit_add u1 u2 f1 f2 := by simp
-  scaleUnit_smul u1 u2 r f := by simp
+  scaleUnit_add u1 u2 f1 f2 := ContinuousLinearMap.ext fun m =>
+    scaleUnit_add u1 u2 (f1 (scaleUnit u2 u1 m)) (f2 (scaleUnit u2 u1 m))
+  scaleUnit_smul u1 u2 r f := ContinuousLinearMap.ext fun m =>
+    scaleUnit_smul u1 u2 r (f (scaleUnit u2 u1 m))
   scaleUnit_cont u1 u2 := ContinuousLinearEquiv.continuous
       ((scaleUnitContLinearEquiv u1 u2).arrowCongr (scaleUnitContLinearEquiv u1 u2))
 
