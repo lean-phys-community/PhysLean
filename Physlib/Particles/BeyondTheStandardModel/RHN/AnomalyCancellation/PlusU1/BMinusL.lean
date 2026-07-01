@@ -79,7 +79,7 @@ lemma add_AFL_quad (S : (PlusU1 n).LinSols) (a b : ℚ) :
 
 lemma add_quad (S : (PlusU1 n).QuadSols) (a b : ℚ) :
     accQuad (a • S.val + b • (BL n).val) = 0 := by
-  rw [add_AFL_quad, quadSol S]; simp
+  exact (add_AFL_quad S.1 a b).trans (mul_eq_zero_of_right (a ^ 2) (quadSol S))
 
 /-- The `QuadSol` obtained by adding $B-L$ to a `QuadSol`. -/
 def addQuad (S : (PlusU1 n).QuadSols) (a b : ℚ) : (PlusU1 n).QuadSols :=

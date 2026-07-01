@@ -242,8 +242,7 @@ lemma boost_inr_inr_other {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j �
     (boost i β hβ).1 (Sum.inr k) (Sum.inr j) = if j = k then 1 else 0:= by
   rw [← boost_transpose_eq_self]
   simp only [transpose, transpose_apply]
-  rw [boost_inr_other_inr]
-  exact hij
+  exact boost_inr_other_inr hβ hij
 /-!
 
 ## Properties of boosts in the zero-direction

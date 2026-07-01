@@ -226,8 +226,7 @@ lemma AFL_even_below' {A : (PureU1 (2 * n.succ)).LinSols} (h : ConstAbsSorted A.
   apply lt_eq h (le_of_lt hk.left)
   rw [Fin.le_def]
   simp only [Fin.val_cast, Fin.val_castAdd, mul_eq, Fin.val_castSucc]
-  rw [AFL_even_Boundary h hA hk]
-  exact Fin.is_le i
+  simpa [AFL_even_Boundary h hA hk] using Fin.is_le i
 
 lemma AFL_even_below (A : (PureU1 (2 * n.succ)).LinSols) (h : ConstAbsSorted A.val)
     (i : Fin n.succ) :
@@ -247,8 +246,7 @@ lemma AFL_even_above' {A : (PureU1 (2 * n.succ)).LinSols} (h : ConstAbsSorted A.
   apply gt_eq h (le_of_lt hk.right)
   rw [Fin.le_def]
   simp only [mul_eq, Fin.val_succ, Fin.val_cast, Fin.val_natAdd]
-  rw [AFL_even_Boundary h hA hk]
-  exact Nat.le_add_right (n + 1) ↑i
+  simp [AFL_even_Boundary h hA hk]
 
 lemma AFL_even_above (A : (PureU1 (2 * n.succ)).LinSols) (h : ConstAbsSorted A.val)
     (i : Fin n.succ) :

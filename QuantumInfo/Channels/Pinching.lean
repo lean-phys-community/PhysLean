@@ -223,8 +223,7 @@ theorem pinching_bound (ρ σ : MState d) : ρ.M ≤ (↑(Fintype.card (spectrum
     rw [Complex.mul_conj, Complex.norm_real, Real.norm_of_nonneg (Complex.normSq_nonneg _)]
     simp_rw [← Complex.mul_conj, map_sum, Finset.mul_sum, Finset.sum_mul]
     congr! with x _ y _
-    rw [← Matrix.mul_assoc]
-    exact h_mul x y
+    simpa [← Matrix.mul_assoc] using h_mul x y
   · simp
   · have hc (c d : ℂ) : d = starRingEnd ℂ d  → c = d → c = d.re := by
       rintro h rfl; simp [Complex.ext_iff] at h ⊢; linarith
@@ -239,8 +238,7 @@ theorem ker_le_ker_pinching_of_PosDef (ρ σ : MState d) (hpos : σ.m.PosDef) : 
     simp [LinearMap.ker_eq_bot', HermitianMat.ker] at this ⊢
     intro m hm
     simpa only [WithLp.ofLp_eq_zero] using this m congr($hm)
-  rw [h_ker]
-  exact bot_le
+  simp [h_ker]
 
 theorem pinching_idempotent (ρ σ : MState d) :
     (pinching_map σ) (pinching_map σ ρ) = (pinching_map σ ρ) := by

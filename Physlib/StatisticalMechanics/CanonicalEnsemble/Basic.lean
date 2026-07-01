@@ -285,8 +285,7 @@ instance [NeZero 𝓒.μ] [NeZero 𝓒1.μ] : NeZero (𝓒 + 𝓒1).μ := by
       (𝓒.μ Set.univ) * (𝓒1.μ Set.univ) := by
     rw [← @Measure.prod_prod]
     simp
-  rw [h1]
-  exact NeZero.pos (𝓒.μ Set.univ * 𝓒1.μ Set.univ)
+  simpa [h1] using NeZero.pos (𝓒.μ Set.univ * 𝓒1.μ Set.univ)
 
 instance μ_neZero_congr [NeZero 𝓒.μ] (e : ι1 ≃ᵐ ι) :
     NeZero (𝓒.congr e).μ := by

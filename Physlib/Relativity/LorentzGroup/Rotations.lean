@@ -178,8 +178,7 @@ lemma rotations_subset_restricted (d) : Rotations d ≤ LorentzGroup.restricted 
 @[simp]
 lemma toVector_rotation {d} (Λ : Rotations d) :
     LorentzGroup.toVector Λ.1= Lorentz.Vector.basis (Sum.inl 0) := by
-  rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
-  exact Λ.2.1
+  simpa [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one] using Λ.2.1
 
 end LorentzGroup
 

@@ -88,8 +88,7 @@ lemma dropPair_update_fst {n : ℕ} [inst : DecidableEq (Fin (n + 1 +1))] {c : F
     dropPair i j hij (p.update i x) = dropPair i j hij p := by
   ext m
   simp only [Function.comp_apply, dropPair, update]
-  rw [Function.update_of_ne]
-  exact Ne.symm (fst_ne_succSuccAbove_pre i j m)
+  simp [Function.update_of_ne, Ne.symm (fst_ne_succSuccAbove_pre i j m)]
 
 @[simp]
 lemma dropPair_update_snd {n : ℕ} [inst : DecidableEq (Fin (n + 1 +1))] {c : Fin (n + 1 + 1) → C}

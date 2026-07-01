@@ -266,8 +266,7 @@ lemma discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq :
 
 /-- The decay rate is nonnegative. -/
 lemma decayRate_nonneg : 0 ≤ S.decayRate := by
-  rw [decayRate]
-  exact div_nonneg S.γ_nonneg (by nlinarith [S.m_pos])
+  simpa [decayRate] using div_nonneg S.γ_nonneg (by nlinarith [S.m_pos])
 
 /-- An undamped oscillator lies in the underdamped regime. -/
 lemma isUnderdamped_of_gamma_eq_zero (hγ : S.γ = 0) : S.IsUnderdamped := by
