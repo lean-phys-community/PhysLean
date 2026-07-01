@@ -108,12 +108,12 @@ lemma Pure.dropPair_prodP {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   match x with
   | Sum.inl m =>
     simp only [finSumFinEquiv_apply_left]
-    rw [← congr_right (p.prodP p1) _ (Fin.castAdd n1 (i.succSuccAbove j m))
+    rw [← congr_right (p.prodP p1) _ (Fin.cast (by grind) (Fin.castAdd n1 (i.succSuccAbove j m)))
       (by rw [Fin.succSuccAbove_comm_castAdd i j])]
     simp [LinearEquiv.cast_apply]
   | Sum.inr m =>
     simp only [finSumFinEquiv_apply_right]
-    rw [← congr_right (p.prodP p1) _ (Fin.natAdd (n + 1 + 1) m)
+    rw [← congr_right (p.prodP p1) _ (Fin.cast (by grind) (Fin.natAdd (n + 1 + 1) m))
       (by rw [Fin.succSuccAbove_castAdd_apply_natAdd i j])]
     simp [LinearEquiv.cast_apply]
 

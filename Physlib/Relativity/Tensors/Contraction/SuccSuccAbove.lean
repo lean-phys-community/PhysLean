@@ -254,7 +254,7 @@ lemma succSuccAbove_comm_castAdd {n n1 : ℕ}
     (i j : Fin (n + 1 + 1)) (m : Fin n) :
     succSuccAbove (Fin.castAdd n1 i) (Fin.castAdd n1 j)
       (Fin.cast (by grind) (Fin.castAdd n1 m)) =
-    Fin.castAdd n1 (succSuccAbove i j m) := by
+    Fin.cast (by grind) (Fin.castAdd n1 (succSuccAbove i j m)) := by
   simp only [Fin.ext_iff, succSuccAbove_val, val_cast, castAdd]
   grind (splits := 20)
 
@@ -262,7 +262,7 @@ lemma succSuccAbove_castAdd_apply_natAdd {n n1 : ℕ}
     (i j : Fin (n + 1 + 1)) (m : Fin n1) :
     succSuccAbove (Fin.castAdd n1 i) (Fin.castAdd n1 j)
       (Fin.cast (by grind) (Fin.natAdd n m)) =
-    Fin.natAdd (n + 1 + 1) m := by
+    Fin.cast (by grind) (Fin.natAdd (n + 1 + 1) m) := by
   simp only [Fin.ext_iff, succSuccAbove_val, val_cast, natAdd, castAdd]
   grind (splits := 20)
 
