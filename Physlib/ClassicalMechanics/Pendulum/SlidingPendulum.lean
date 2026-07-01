@@ -5,7 +5,7 @@ Authors: Shlok Vaibhav Singh
 -/
 module
 
-public import Mathlib.Data.Real.Basic
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Angle
 /-!
 # Sliding Pendulum
 ### Tag: LnL_1.5.2
@@ -77,7 +77,7 @@ structure ConfigurationSpace where
   /-- The horizontal position `x₁` of the support mass. -/
   supportPosition : ℝ
   /-- The angle `φ` that the string makes with the vertical. -/
-  angle : ℝ
+  angle : Real.Angle
 
 end SlidingPendulum
 
