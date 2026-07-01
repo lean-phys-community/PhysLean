@@ -91,12 +91,10 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnOpF_ofCrAnListF_eq_zero_mul (φa : �
     (φs : List 𝓕.CrAnFieldOp) (a b : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓝ᶠ(a * [ofCrAnOpF φa, ofCrAnListF φs]ₛF * b) = 0 := by
   rw [← ofCrAnListF_singleton, superCommuteF_ofCrAnListF_ofCrAnListF_eq_sum]
-  rw [Finset.mul_sum, Finset.sum_mul]
-  rw [map_sum, map_sum]
+  rw [Finset.mul_sum, Finset.sum_mul, map_sum, map_sum]
   apply Fintype.sum_eq_zero
   intro n
-  rw [← mul_assoc, ← mul_assoc]
-  rw [mul_assoc _ _ b, ofCrAnListF_singleton]
+  rw [← mul_assoc, ← mul_assoc, mul_assoc _ _ b, ofCrAnListF_singleton]
   rw [ι_normalOrderF_superCommuteF_ofCrAnOpF_eq_zero_mul]
 
 lemma ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnOpF_eq_zero_mul (φa : 𝓕.CrAnFieldOp)
@@ -115,8 +113,7 @@ lemma ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnListF_eq_zero_mul
   rw [map_sum, map_sum]
   apply Fintype.sum_eq_zero
   intro n
-  rw [← mul_assoc, ← mul_assoc]
-  rw [mul_assoc _ _ b]
+  rw [← mul_assoc, ← mul_assoc, mul_assoc _ _ b]
   rw [ι_normalOrderF_superCommuteF_ofCrAnListF_ofCrAnOpF_eq_zero_mul]
 
 lemma ι_normalOrderF_superCommuteF_ofCrAnListF_eq_zero_mul
@@ -231,8 +228,7 @@ noncomputable def normalOrder : WickAlgebra 𝓕 →ₗ[ℂ] WickAlgebra 𝓕 wh
   map_add' x y := by
     obtain ⟨x, rfl⟩ := ι_surjective x
     obtain ⟨y, rfl⟩ := ι_surjective y
-    rw [← map_add, ι_apply, ι_apply, ι_apply]
-    rw [Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
+    rw [← map_add, ι_apply, ι_apply, ι_apply, Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
     simp
   map_smul' c y := by
     obtain ⟨y, rfl⟩ := ι_surjective y

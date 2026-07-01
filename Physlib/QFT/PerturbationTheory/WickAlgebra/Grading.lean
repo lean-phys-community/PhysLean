@@ -227,8 +227,7 @@ lemma fermionicProj_mem_fermionic (a : 𝓕.WickAlgebra) (ha : a ∈ statSubmodu
     simp only [p]
     apply Subtype.ext
     simp only
-    rw [ofCrAnList, fermionicProj_eq_fermionicProjFree]
-    rw [fermionicProjFree_eq_ι_fermionicProjF]
+    rw [ofCrAnList, fermionicProj_eq_fermionicProjFree, fermionicProjFree_eq_ι_fermionicProjF]
     rw [fermionicProjF_of_mem_fermionic]
     exact ofCrAnListF_mem_statisticSubmodule_of _ _ h
   · simp only [map_zero, p]
