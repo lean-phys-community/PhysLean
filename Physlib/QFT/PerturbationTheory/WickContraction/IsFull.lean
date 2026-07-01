@@ -42,10 +42,8 @@ lemma isFull_iff_equivInvolution_no_fixed_point :
 /-- The equivalence between full contractions and fixed-point free involutions. -/
 def isFullInvolutionEquiv : {c : WickContraction n // IsFull c} ≃
     {f : Fin n → Fin n // Function.Involutive f ∧ (∀ i, f i ≠ i)} where
-  toFun c := ⟨equivInvolution c.1, by
-    apply And.intro (equivInvolution c.1).2
-    rw [← isFull_iff_equivInvolution_no_fixed_point]
-    exact c.2⟩
+  toFun c := ⟨equivInvolution c.1,
+    ⟨(equivInvolution c.1).2, (isFull_iff_equivInvolution_no_fixed_point (c := c.1)).mp c.2⟩⟩
   invFun f := ⟨equivInvolution.symm ⟨f.1, f.2.1⟩, by
     rw [isFull_iff_equivInvolution_no_fixed_point]
     simpa using f.2.2⟩

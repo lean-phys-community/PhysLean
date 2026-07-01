@@ -48,8 +48,7 @@ lemma timeOrderRel_both_of_eqTimeOnly {i j : Fin φs.length} (h : {i, j} ∈ φs
   apply And.intro
   · exact timeOrderRel_of_eqTimeOnly_pair φsΛ h hc
   · apply timeOrderRel_of_eqTimeOnly_pair φsΛ _ hc
-    rw [@Finset.pair_comm]
-    exact h
+    simpa [@Finset.pair_comm] using h
 
 lemma eqTimeOnly_iff_forall_finset {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) :
     φsΛ.EqTimeOnly ↔ ∀ (a : φsΛ.1),
@@ -109,9 +108,8 @@ lemma staticContract_eq_timeContract_of_eqTimeOnly (h : φsΛ.EqTimeOnly) :
   simp only [List.get_eq_getElem]
   rw [timeContract_of_timeOrderRel]
   apply timeOrderRel_of_eqTimeOnly_pair φsΛ
-  rw [← finset_eq_fstFieldOfContract_sndFieldOfContract]
-  exact a.2
-  exact h
+  · simp [← finset_eq_fstFieldOfContract_sndFieldOfContract, a.2]
+  · exact h
 
 lemma eqTimeOnly_congr {φs φs' : List 𝓕.FieldOp} (h : φs = φs') (φsΛ : WickContraction φs.length) :
     (congr (by simp [h]) φsΛ).EqTimeOnly (φs := φs') ↔ φsΛ.EqTimeOnly := by
@@ -305,8 +303,7 @@ lemma haveEqTime_iff_finset {φs : List 𝓕.FieldOp} (φsΛ : WickContraction �
     use φsΛ.fstFieldOfContract ⟨a, h1⟩
     use φsΛ.sndFieldOfContract ⟨a, h1⟩
     simp_all only [and_true, true_and]
-    rw [← finset_eq_fstFieldOfContract_sndFieldOfContract]
-    exact h1
+    simpa [← finset_eq_fstFieldOfContract_sndFieldOfContract] using h1
 
 @[simp]
 lemma empty_not_haveEqTime {φs : List 𝓕.FieldOp} :
@@ -491,8 +488,7 @@ lemma join_haveEqTime_of_eqTimeOnly_nonEmpty {φs : List 𝓕.FieldOp} (φsΛ : 
   use i, j
   simp_all only [ne_eq, true_or, true_and]
   apply h1 j i
-  rw [Finset.pair_comm]
-  exact h
+  simpa [Finset.pair_comm] using h
 
 lemma hasEqTimeEquiv_ext_sigma {φs : List 𝓕.FieldOp} {x1 x2 :
     Σ (φsΛ : {φsΛ : WickContraction φs.length // φsΛ.EqTimeOnly ∧ φsΛ ≠ empty}),
