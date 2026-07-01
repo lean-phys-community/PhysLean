@@ -184,55 +184,35 @@ lemma coContrUnit_eq_basis : δ' =
     ∑ i, Tensor.basis (S := complexLorentzTensor)
       ![Color.down, Color.up] (fun | 0 => i | 1 => i) := by
   rw [coContrUnit_eq_complexCoBasisFin4_complexContrBasisFin4]
-  conv_lhs =>
-    enter [2, x]
-    change fromPairT ((complexLorentzTensor.basis .down x) ⊗ₜ[ℂ]
-      (complexLorentzTensor.basis .up _))
-    rw [fromPairT_apply_basis_repr]
+  simp [fromPairT_apply_basis_repr]
   rfl
 
 lemma contrCoUnit_eq_basis : δ =
     ∑ i, Tensor.basis (S := complexLorentzTensor)
       ![Color.up, Color.down] (fun | 0 => i | 1 => i) := by
   rw [contrCoUnit_eq_complexContrBasisFin4_complexCoBasisFin4]
-  conv_lhs =>
-    enter [2, x]
-    change fromPairT ((complexLorentzTensor.basis .up x) ⊗ₜ[ℂ]
-      (complexLorentzTensor.basis .down _))
-    rw [fromPairT_apply_basis_repr]
+  simp [fromPairT_apply_basis_repr]
   rfl
 
 lemma dualLeftLeftUnit_eq_basis : δL' =
     ∑ i, Tensor.basis (S := complexLorentzTensor)
       ![Color.downL, Color.upL] (fun | 0 => i | 1 => i) := by
   rw [dualLeftLeftUnit_eq_dualLeftBasis_leftBasis]
-  conv_lhs =>
-    enter [2, x]
-    change fromPairT ((complexLorentzTensor.basis .downL x) ⊗ₜ[ℂ]
-      (complexLorentzTensor.basis .upL _))
-    rw [fromPairT_apply_basis_repr]
+  simp [fromPairT_apply_basis_repr]
   rfl
 
 lemma leftDualLeftUnit_eq_basis : δL =
     ∑ i, Tensor.basis (S := complexLorentzTensor)
       ![Color.upL, Color.downL] (fun | 0 => i | 1 => i) := by
   rw [leftDualLeftUnit_eq_leftBasis_dualLeftBasis]
-  conv_lhs =>
-    enter [2, x]
-    change fromPairT ((complexLorentzTensor.basis .upL x) ⊗ₜ[ℂ]
-      (complexLorentzTensor.basis .downL _))
-    rw [fromPairT_apply_basis_repr]
+  simp [fromPairT_apply_basis_repr]
   rfl
 
 lemma dualRightRightUnit_eq_basis : δR' =
     ∑ i, Tensor.basis (S := complexLorentzTensor)
       ![Color.downR, Color.upR] (fun | 0 => i | 1 => i) := by
   rw [dualRightRightUnit_eq_dualRightBasis_rightBasis]
-  conv_lhs =>
-    enter [2, x]
-    change fromPairT ((complexLorentzTensor.basis .downR x) ⊗ₜ[ℂ]
-      (complexLorentzTensor.basis .upR _))
-    rw [fromPairT_apply_basis_repr]
+  simp [fromPairT_apply_basis_repr]
   rfl
 
 lemma rightDualRightUnit_eq_basis : δR =
