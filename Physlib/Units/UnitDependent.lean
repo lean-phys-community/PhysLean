@@ -449,24 +449,21 @@ lemma isDimensionallyCorrect_fun_iff {M1 M2 : Type} [UnitDependent M1] [UnitDepe
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f (scaleUnit u2 u1 m)) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp [IsDimensionallyCorrect, funext_iff]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_left {M1 M2 : Type} [UnitDependent M1]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, (f (scaleUnit u2 u1 m)) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp [IsDimensionallyCorrect, funext_iff]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_right {M1 M2 : Type} [UnitDependent M2]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f m) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp [IsDimensionallyCorrect, funext_iff]
 /-!
 
 ## Some type classes to help track dimensions

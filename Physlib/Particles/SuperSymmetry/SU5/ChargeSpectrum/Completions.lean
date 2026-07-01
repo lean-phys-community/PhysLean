@@ -209,8 +209,7 @@ lemma completions_eq_singleton_of_complete {S5 S10 : Finset 𝓩} (x : ChargeSpe
   case' neg => simp_all
   by_cases h4 : x.Q10 ≠ ∅
   case' neg => simp_all
-  simp_all
-  rfl
+  simp_all [toProd]
 
 /-!
 

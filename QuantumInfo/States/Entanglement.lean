@@ -254,7 +254,6 @@ theorem traceRight_pure_MES (d : Type*) [Fintype d] [DecidableEq d] [Nonempty d]
     coe_ofClassical, ProbDistribution.uniform_def, Finset.card_univ]
   unfold HermitianMat.diagonal
   simp_all only [map_inv₀, map_natCast]
-  rfl
 
 /-
 The von Neumann entropy of a state is equal to the trace of `ρ log ρ` (technically `cfc ρ negMulLog`).
