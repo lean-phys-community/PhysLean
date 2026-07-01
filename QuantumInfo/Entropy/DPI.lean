@@ -316,8 +316,7 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
           simp [add_comm]
           simp [← Matrix.ext_iff]
           intro i j; exact (by
-          have h_support : A.kerProj + A.supportProj = 1 := by
-            exact kerProj_add_supportProj A
+          have h_support : A.kerProj + A.supportProj = 1 := kerProj_add_supportProj A
           convert! congr_arg (fun f => f i j) h_support using 1)
         rw [← Matrix.add_mulVec, h_support, Matrix.one_mulVec]
       have hsup : B.mat *ᵥ (A.kerProj.mat *ᵥ x.ofLp) = 0 := by
@@ -325,8 +324,7 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
         have h_support : A.mat * A.kerProj.mat = 0 := by
           have h_support : A.mat * A.kerProj.mat = A.mat * (1 - A.supportProj.mat) := by
             congr
-            have h_support : A.kerProj + A.supportProj = 1 := by
-              exact kerProj_add_supportProj A
+            have h_support : A.kerProj + A.supportProj = 1 := kerProj_add_supportProj A
             exact eq_sub_of_add_eq <| congr_arg Subtype.val h_support
           rw [h_support, mul_sub, mul_one, sub_eq_zero]
           exact Eq.symm (mul_supportProj_of_ker_le fun ⦃x⦄ a => a)
@@ -341,8 +339,7 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
       · simp [Matrix.mulVec, dotProduct]
       · simp [Matrix.mulVec, dotProduct]
         rfl
-    have h_support : B.mat = B.mat.conjTranspose := by
-      exact B.2.symm
+    have h_support : B.mat = B.mat.conjTranspose := B.2.symm
     have h_support : (B.mat * A.supportProj.mat).conjTranspose = A.supportProj.mat * B.mat := by
       simp [Matrix.conjTranspose_mul]
     lia
@@ -847,8 +844,7 @@ theorem sandwichedTraceFunctional_self (hα : 0 < α) (ρ : MState d) :
       · exact div_ne_zero (sub_ne_zero_of_ne (Ne.symm h)) (mul_ne_zero two_ne_zero hα.ne')
       · nlinarith [mul_div_cancel₀ (1 - α) (by positivity : (2 * α) ≠ 0)]
     have h_simp : (ρ.M ^ (1 + 2 * ((1 - α) / (2 * α)))) ^ α =
-        ρ.M ^ ((1 + 2 * ((1 - α) / (2 * α))) * α) := by
-      exact (HermitianMat.rpow_mul (le_of_lt this)).symm
+        ρ.M ^ ((1 + 2 * ((1 - α) / (2 * α))) * α) := (HermitianMat.rpow_mul (le_of_lt this)).symm
     field_simp at *
     simp_all only [add_sub_cancel, one_div, rpow_one, MState.tr]
 
@@ -1235,8 +1231,7 @@ theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
       · use (U.val.conjTranspose.toEuclideanLin x)
         simp_all [ker, Matrix.toEuclideanLin]
         simp_all [lin, Matrix.toLpLin]
-        have h_unitary : (U.val * U.val.conjTranspose) = 1 := by
-          exact U.2.2
+        have h_unitary : (U.val * U.val.conjTranspose) = 1 := U.2.2
         generalize_proofs at *; (
         apply_fun (U.val.conjTranspose *ᵥ ·) at hx
         simp_all [Matrix.mul_assoc, Matrix.mulVec_mulVec]
