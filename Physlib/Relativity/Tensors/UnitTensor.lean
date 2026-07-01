@@ -87,12 +87,8 @@ set_option backward.isDefEq.respectTransparency false in
 lemma contrT_unitTensor_dual_single {c : C} (x : Tensor S ![S.τ c]) :
     contrT 1 1 2 (by simp; rfl) (prodT (unitTensor c) x) =
     permT id (by simp; rfl) x := by
-  rw [unitTensor_eq_permT_dual]
-  rw [prodT_permT_left]
-  rw [contrT_permT]
-  rw [prodT_swap]
-  rw [contrT_permT]
-  rw [permT_permT]
+  rw [unitTensor_eq_permT_dual, prodT_permT_left, contrT_permT, prodT_swap, contrT_permT,
+    permT_permT]
   conv_lhs =>
     enter [2]
     change contrT 1 1 0 _ _

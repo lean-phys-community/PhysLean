@@ -279,8 +279,7 @@ lemma isLorentz_iff_comp_adjoint_eq_id {d : ℕ} (f : Vector d →ₗ[ℝ] Vecto
 
 lemma isLorentz_iff_toMatrix_mem_lorentzGroup {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) :
     IsLorentz f ↔ LinearMap.toMatrix Vector.basis Vector.basis f ∈ LorentzGroup d := by
-  rw [isLorentz_iff_comp_adjoint_eq_id]
-  rw [LorentzGroup.mem_iff_dual_mul_self]
+  rw [isLorentz_iff_comp_adjoint_eq_id, LorentzGroup.mem_iff_dual_mul_self]
   trans LinearMap.toMatrix Vector.basis Vector.basis (adjoint f ∘ₗ f) =
     LinearMap.toMatrix Vector.basis Vector.basis (LinearMap.id : Vector d →ₗ[ℝ] Vector d)
   · exact Iff.symm (EmbeddingLike.apply_eq_iff_eq (LinearMap.toMatrix basis basis))

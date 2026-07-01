@@ -107,8 +107,7 @@ lemma fromDualMap_eq_permT_toDualMap {c : C} (t : S.Tensor ![S.τ c]) :
 
 lemma toDualMap_eq_permT_fromDualMap {c : C} (t : S.Tensor ![c]) :
     toDualMap t = (fromDualMap (permT id (by simp) t)) := by
-  rw [fromDualMap_eq_permT_toDualMap]
-  rw [toDualMap_apply, toDualMap_apply]
+  rw [fromDualMap_eq_permT_toDualMap, toDualMap_apply, toDualMap_apply]
   conv_rhs =>
     enter [2, 2]
     rw [prodT_permT_right]

@@ -209,16 +209,14 @@ lemma contr_preCoContrUnit {d : ℕ} (x : ContrMod d) :
 lemma preContrCoUnit_symm {d : ℕ} :
     (preContrCoUnit d) (1 : ℝ) = LinearMap.lTensor _ (LinearEquiv.cast (by rfl)).toLinearMap
       (TensorProduct.comm ℝ _ _ ((preCoContrUnit d) (1 : ℝ))) := by
-  rw [preContrCoUnit_apply_one, preContrCoUnitVal_expand_tmul]
-  rw [preCoContrUnit_apply_one, preCoContrUnitVal_expand_tmul]
-  simp
+  simp [preContrCoUnit_apply_one, preContrCoUnitVal_expand_tmul, preCoContrUnit_apply_one,
+    preCoContrUnitVal_expand_tmul]
 
 lemma preCoContrUnit_symm {d : ℕ} :
     (preCoContrUnit d) (1 : ℝ) = LinearMap.lTensor _ (LinearEquiv.cast (by simp)).toLinearMap
     (TensorProduct.comm ℝ _ _ ((preContrCoUnit d) (1 : ℝ))) := by
-  rw [preContrCoUnit_apply_one, preContrCoUnitVal_expand_tmul]
-  rw [preCoContrUnit_apply_one, preCoContrUnitVal_expand_tmul]
-  simp
+  simp [preContrCoUnit_apply_one, preContrCoUnitVal_expand_tmul, preCoContrUnit_apply_one,
+    preCoContrUnitVal_expand_tmul]
 
 end Lorentz
 end
