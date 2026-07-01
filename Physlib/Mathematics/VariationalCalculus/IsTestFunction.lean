@@ -85,10 +85,9 @@ lemma IsTestFunction.pi {ι} [Fintype ι] {φ : X → ι → U} (hφ : ∀ i, Is
     refine exists_compact_iff_hasCompactSupport.mp
       ⟨⋃ i, K i, isCompact_iUnion (fun i => (hK i).1), fun x hx => ?_⟩
     simp at hx
-    conv_lhs =>
-      enter [i]
-      rw [(hK i).2 x (hx i)]
-    rfl
+    apply funext
+    intro i
+    exact (hK i).2 x (hx i)
 
 lemma IsTestFunction.space_component {φ : X → Space d} (hφ : IsTestFunction φ) :
     IsTestFunction (fun x => φ x i) where

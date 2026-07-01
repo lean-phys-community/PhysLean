@@ -150,7 +150,6 @@ theorem pinching_self (ρ : MState d) : pinching_map ρ ρ = ρ := by
     enter [1, 2, x, 2]
     change (pinching_kraus ρ x ^ 2).mat
     rw [pinching_sq_eq_self]
-  simp_rw [← Finset.mul_sum, ← HermitianMat.mat_finset_sum]
   rfl
 
 set_option backward.isDefEq.respectTransparency false in

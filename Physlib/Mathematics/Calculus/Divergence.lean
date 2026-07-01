@@ -40,8 +40,7 @@ lemma divergence_eq_sum_fderiv {s : Finset E} (b : Basis s 𝕜 E) {f : E → E}
     divergence 𝕜 f = fun x => ∑ i : s, b.repr (fderiv 𝕜 f x (b i)) i := by
   funext x
   rw [divergence, LinearMap.trace_eq_matrix_trace_of_finset (s := s) _ b]
-  simp only [Matrix.trace, Matrix.diag, LinearMap.toMatrix_apply]
-  rfl
+  simp [Matrix.trace, Matrix.diag, LinearMap.toMatrix_apply]
 
 lemma divergence_eq_sum_fderiv' {ι} [Fintype ι] (b : Basis ι 𝕜 E) {f : E → E} :
     divergence 𝕜 f = fun x => ∑ i, b.repr (fderiv 𝕜 f x (b i)) i := by

@@ -68,8 +68,7 @@ theorem static_wick_theorem : (φs : List 𝓕.FieldOp) →
     rw [Finset.mul_sum]
     apply Finset.sum_congr rfl
     intro c _
-    rw [mul_staticWickTerm_eq_sum]
-    rfl
+    simp [mul_staticWickTerm_eq_sum]
 
 end WickAlgebra
 end FieldSpecification
