@@ -290,32 +290,27 @@ lemma ofFieldOpListF_mul_ofFieldOpF_eq_superCommuteF (φs : List 𝓕.FieldOp) (
 lemma crPartF_mul_anPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     crPartF φ * anPartF φ' =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPartF φ' * crPartF φ +
-    [crPartF φ, anPartF φ']ₛF := by
-  simp [superCommuteF_crPartF_anPartF]
+    [crPartF φ, anPartF φ']ₛF := by simp [superCommuteF_crPartF_anPartF]
 
 lemma anPartF_mul_crPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     anPartF φ * crPartF φ' =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') •
     crPartF φ' * anPartF φ +
-    [anPartF φ, crPartF φ']ₛF := by
-  simp [superCommuteF_anPartF_crPartF]
+    [anPartF φ, crPartF φ']ₛF := by simp [superCommuteF_anPartF_crPartF]
 
 lemma crPartF_mul_crPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     crPartF φ * crPartF φ' =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • crPartF φ' * crPartF φ +
-    [crPartF φ, crPartF φ']ₛF := by
-  simp [superCommuteF_crPartF_crPartF]
+    [crPartF φ, crPartF φ']ₛF := by simp [superCommuteF_crPartF_crPartF]
 
 lemma anPartF_mul_anPartF_eq_superCommuteF (φ φ' : 𝓕.FieldOp) :
     anPartF φ * anPartF φ' = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPartF φ' * anPartF φ +
-    [anPartF φ, anPartF φ']ₛF := by
-  simp [superCommuteF_anPartF_anPartF]
+    [anPartF φ, anPartF φ']ₛF := by simp [superCommuteF_anPartF_anPartF]
 
 lemma ofCrAnListF_mul_ofFieldOpListF_eq_superCommuteF (φs : List 𝓕.CrAnFieldOp)
     (φs' : List 𝓕.FieldOp) : ofCrAnListF φs * ofFieldOpListF φs' =
     𝓢(𝓕 |>ₛ φs, 𝓕 |>ₛ φs') • ofFieldOpListF φs' * ofCrAnListF φs
-    + [ofCrAnListF φs, ofFieldOpListF φs']ₛF := by
-  simp [superCommuteF_ofCrAnListF_ofFieldOpFsList]
+    + [ofCrAnListF φs, ofFieldOpListF φs']ₛF := by simp [superCommuteF_ofCrAnListF_ofFieldOpFsList]
 
 /-!
 
