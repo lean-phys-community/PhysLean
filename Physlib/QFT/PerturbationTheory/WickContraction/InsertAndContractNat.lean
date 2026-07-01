@@ -161,8 +161,7 @@ lemma self_mem_uncontracted_of_insertAndContractNat_none (c : WickContraction n)
 lemma self_not_mem_uncontracted_of_insertAndContractNat_some (c : WickContraction n)
     (i : Fin n.succ) (j : c.uncontracted) :
     i ∉ (insertAndContractNat c i (some j)).uncontracted := by
-  rw [mem_uncontracted_iff_not_contracted]
-  simp [insertAndContractNat]
+  simp [mem_uncontracted_iff_not_contracted, insertAndContractNat]
 
 lemma insertAndContractNat_succAbove_mem_uncontracted_iff (c : WickContraction n) (i : Fin n.succ)
     (j : Fin n) :
@@ -392,8 +391,7 @@ lemma insertAndContractNat_succAbove_getDual?_get (c : WickContraction n) (i : F
 lemma insertAndContractNat_some_getDual?_eq (c : WickContraction n) (i : Fin n.succ)
     (j : c.uncontracted) :
     (insertAndContractNat c i (some j)).getDual? i = some (i.succAbove j) := by
-  rw [getDual?_eq_some_iff_mem]
-  simp [insertAndContractNat]
+  simp [getDual?_eq_some_iff_mem, insertAndContractNat]
 
 lemma insertAndContractNat_some_getDual?_ne_none (c : WickContraction n) (i : Fin n.succ)
     (j : c.uncontracted) (k : Fin n) (hkj : k ≠ j.1) :

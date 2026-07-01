@@ -111,14 +111,12 @@ def consAddContract (i : Fin n.succ) (c : WickContraction n) :
 @[simp]
 lemma consAddContract_getDual?_zero (i : Fin n.succ) (c : WickContraction n) :
     (consAddContract i c).getDual? 0 = some i.succ := by
-  rw [getDual?_eq_some_iff_mem]
-  simp [consAddContract]
+  simp [getDual?_eq_some_iff_mem, consAddContract]
 
 @[simp]
 lemma consAddContract_getDual?_self_succ (i : Fin n.succ) (c : WickContraction n) :
     (consAddContract i c).getDual? i.succ = some 0 := by
-  rw [getDual?_eq_some_iff_mem]
-  simp [consAddContract, Finset.pair_comm]
+  simp [getDual?_eq_some_iff_mem, consAddContract, Finset.pair_comm]
 
 lemma mem_consAddContract_of_mem_iff (i : Fin n.succ) (c : WickContraction n) (a : Finset (Fin n)) :
     a ∈ c.1 ↔ (a.map i.succAboveEmb).map (Fin.succEmb n.succ) ∈ (consAddContract i c).1 := by

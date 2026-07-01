@@ -140,9 +140,7 @@ lemma insertAndContract_some_getDual?_some_eq (φ : 𝓕.FieldOp) (φs : List �
     ((φsΛ ↩Λ φ i (some j)).getDual?
       (Fin.cast (insertIdx_length_fin φ φs i).symm (i.succAbove j)))
     = some (Fin.cast (insertIdx_length_fin φ φs i).symm i) := by
-  rw [getDual?_eq_some_iff_mem]
-  rw [@Finset.pair_comm]
-  rw [← getDual?_eq_some_iff_mem]
+  rw [getDual?_eq_some_iff_mem, @Finset.pair_comm, ← getDual?_eq_some_iff_mem]
   simp
 
 @[simp]
