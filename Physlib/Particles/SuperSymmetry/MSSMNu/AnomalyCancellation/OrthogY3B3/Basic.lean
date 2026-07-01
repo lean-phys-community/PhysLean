@@ -65,15 +65,13 @@ lemma Y₃_plus_B₃_plus_proj (T : MSSMACC.LinSols) (a b c : ℚ) :
     (a + c * (dot B₃.val T.val - dot Y₃.val T.val)) • Y₃.val
     + (b + c * (dot Y₃.val T.val - 2 * dot B₃.val T.val)) • B₃.val
     + (dot Y₃.val B₃.val * c) • T.val:= by
-  rw [proj_val]
-  rw [DistribMulAction.smul_add, DistribMulAction.smul_add]
+  rw [proj_val, DistribMulAction.smul_add, DistribMulAction.smul_add]
   module
 
 set_option backward.isDefEq.respectTransparency false in
 lemma quad_Y₃_proj (T : MSSMACC.LinSols) :
     quadBiLin Y₃.val (proj T).val = dot Y₃.val B₃.val * quadBiLin Y₃.val T.val := by
-  rw [proj_val]
-  rw [quadBiLin.map_add₂, quadBiLin.map_add₂]
+  rw [proj_val, quadBiLin.map_add₂, quadBiLin.map_add₂]
   rw [quadBiLin.map_smul₂, quadBiLin.map_smul₂, quadBiLin.map_smul₂]
   rw [show quadBiLin Y₃.val B₃.val = 0 by with_unfolding_all rfl]
   rw [show quadBiLin Y₃.val Y₃.val = 0 by with_unfolding_all rfl]
@@ -82,8 +80,7 @@ lemma quad_Y₃_proj (T : MSSMACC.LinSols) :
 set_option backward.isDefEq.respectTransparency false in
 lemma quad_B₃_proj (T : MSSMACC.LinSols) :
     quadBiLin B₃.val (proj T).val = dot Y₃.val B₃.val * quadBiLin B₃.val T.val := by
-  rw [proj_val]
-  rw [quadBiLin.map_add₂, quadBiLin.map_add₂]
+  rw [proj_val, quadBiLin.map_add₂, quadBiLin.map_add₂]
   rw [quadBiLin.map_smul₂, quadBiLin.map_smul₂, quadBiLin.map_smul₂]
   rw [show quadBiLin B₃.val Y₃.val = 0 by with_unfolding_all rfl]
   rw [show quadBiLin B₃.val B₃.val = 0 by with_unfolding_all rfl]
@@ -94,8 +91,7 @@ lemma quad_self_proj (T : MSSMACC.Sols) :
     quadBiLin T.val (proj T.1.1).val =
     (dot B₃.val T.val - dot Y₃.val T.val) * quadBiLin Y₃.val T.val +
     (dot Y₃.val T.val - 2 * dot B₃.val T.val) * quadBiLin B₃.val T.val := by
-  rw [proj_val]
-  rw [quadBiLin.map_add₂, quadBiLin.map_add₂]
+  rw [proj_val, quadBiLin.map_add₂, quadBiLin.map_add₂]
   rw [quadBiLin.map_smul₂, quadBiLin.map_smul₂, quadBiLin.map_smul₂]
   rw [← quadBiLin.toHomogeneousQuad_apply]
   rw [← accQuad]
@@ -118,8 +114,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma cube_proj_proj_Y₃ (T : MSSMACC.LinSols) :
     cubeTriLin (proj T).val (proj T).val Y₃.val =
     (dot Y₃.val B₃.val)^2 * cubeTriLin T.val T.val Y₃.val := by
-  rw [proj_val]
-  rw [cubeTriLin.map_add₁, cubeTriLin.map_add₂]
+  rw [proj_val, cubeTriLin.map_add₁, cubeTriLin.map_add₂]
   conv_lhs =>
     enter [1, 1]
     change ((cubeTriLin (lineY₃B₃ _ _).val) (lineY₃B₃ _ _).val) _
