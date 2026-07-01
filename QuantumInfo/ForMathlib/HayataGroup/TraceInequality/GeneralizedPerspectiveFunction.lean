@@ -321,11 +321,9 @@ private theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
   have hIR₂S₂ : IR₂ * S₂ = (1 : L ℋ) :=
     hInvSqrt_mul_hSqrt_eq_one (ℋ := ℋ) hB₂_sa hB₂_spec hcont hpos
   have hM₁_nonneg : (0 : L ℋ) ≤ M₁ := by
-    dsimp [M₁]
-    simpa [mul_assoc] using hIR₁_sa.conjugate_nonneg hA₁_nonneg
+    simpa [M₁, mul_assoc] using hIR₁_sa.conjugate_nonneg hA₁_nonneg
   have hM₂_nonneg : (0 : L ℋ) ≤ M₂ := by
-    dsimp [M₂]
-    simpa [mul_assoc] using hIR₂_sa.conjugate_nonneg hA₂_nonneg
+    simpa [M₂, mul_assoc] using hIR₂_sa.conjugate_nonneg hA₂_nonneg
   have hM₁_sa : IsSelfAdjoint M₁ := IsSelfAdjoint.of_nonneg hM₁_nonneg
   have hM₂_sa : IsSelfAdjoint M₂ := IsSelfAdjoint.of_nonneg hM₂_nonneg
   have hM₁_spec : spectrum ℝ M₁ ⊆ Set.Ici (0 : ℝ) := by

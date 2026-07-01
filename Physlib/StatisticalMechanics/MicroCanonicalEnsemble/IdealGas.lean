@@ -195,8 +195,7 @@ theorem ideal_gas_law (hV : 0 < V) (hT : 0 < T) :
     let P := IdealGas.pressure (n,V) T;
     let R := 1;
     P * V = n * R * T := by
-  dsimp [pressure]
-  rw [← derivWithin_of_isOpen (s := Set.Ioi 0) isOpen_Ioi hV]
+  rw [pressure, ← derivWithin_of_isOpen (s := Set.Ioi 0) isOpen_Ioi hV]
   rw [derivWithin_congr (f := fun V' ↦ -n * T *
     (Real.log V' + (3/2) * Real.log (2 * Real.pi * T))) ?_ ?_]
   rw [derivWithin_of_isOpen (s := Set.Ioi 0) isOpen_Ioi hV]

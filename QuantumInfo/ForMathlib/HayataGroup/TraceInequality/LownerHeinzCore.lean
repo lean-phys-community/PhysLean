@@ -483,14 +483,12 @@ theorem one_div_add_t_operatorConvexOn_Ici : ∀ (t : ℝ), 0 < t →
       (hr := IsSelfAdjoint.all (t : ℝ)))
   have A_nonneg : 0 ≤ A := by
     have h0 : 0 ≤ cfcR (fun x : ℝ ↦ x) A := by
-      dsimp [cfcR]
       apply cfc_nonneg
       intro x hx
       simpa [Set.Ici] using (As hx)
     simpa [cfcR, cfc_id' (R := ℝ) (a := A) (ha := hA)] using h0
   have B_nonneg : 0 ≤ B := by
     have h0 : 0 ≤ cfcR (fun x : ℝ ↦ x) B := by
-      dsimp [cfcR]
       apply cfc_nonneg
       intro x hx
       simpa [Set.Ici] using (Bs hx)
