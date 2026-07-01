@@ -123,8 +123,7 @@ lemma fderiv_curry_comp_fst (f : X → Y → Z) (x dx : X) (y : Y)
     =
     (fderiv 𝕜 (↿f) ((·, y) x)) ((fderiv 𝕜 (·, y) x) dx) := by
   have hl (y : Y) : (fun x' => f x' y) = ↿f ∘ (·, y) := rfl
-  rw [hl]
-  rw [fderiv_comp]
+  rw [hl, fderiv_comp]
   simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
   · fun_prop
   · fun_prop
@@ -135,8 +134,7 @@ lemma fderiv_curry_comp_snd (f : X → Y → Z) (x : X) (y dy : Y)
     =
     (fderiv 𝕜 (↿f) ((x, ·) y)) ((fderiv 𝕜 (x, ·) y) dy) := by
   have hl (x : X) : (fun y' => f x y') = ↿f ∘ (x, ·) := rfl
-  rw [hl]
-  rw [fderiv_comp]
+  rw [hl, fderiv_comp]
   simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
   · fun_prop
   · fun_prop

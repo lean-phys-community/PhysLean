@@ -143,8 +143,7 @@ theorem diag_exp_of_blockTriangular_id
   funext i
   rw [NormedSpace.exp_eq_tsum 𝕂, diag_apply]
   simp_rw [matrix_tsum_apply (NormedSpace.expSeries_summable' A) i i]
-  rw [matrix_exp_series_diag_eq_scalar_series hA i]
-  rw [NormedSpace.exp_eq_tsum 𝕂]
+  rw [matrix_exp_series_diag_eq_scalar_series hA i, NormedSpace.exp_eq_tsum 𝕂]
 
 /-- Lie's trace formula for upper triangular matrices. -/
 lemma det_exp_of_blockTriangular_id {A : Matrix m m 𝕂} (hA : BlockTriangular A id) :
@@ -265,8 +264,7 @@ theorem det_exp_real {n : Type*} [Fintype n] [LinearOrder n]
   have h_det_comm : (algebraMap ℝ ℂ) ((NormedSpace.exp A).det) = (NormedSpace.exp A_ℂ).det := by
     rw [@RingHom.map_det]
     rw [← NormedSpace.exp_map_algebraMap]; rfl
-  rw [← h_det_comm] at h_complex
-  rw [h_trace_comm] at h_complex
+  rw [← h_det_comm, h_trace_comm] at h_complex
   have h_exp_comm : Complex.exp ((algebraMap ℝ ℂ) A.trace) =
       (algebraMap ℝ ℂ) (Real.exp A.trace) := by
     rw [Complex.coe_algebraMap, ← Complex.ofReal_exp]

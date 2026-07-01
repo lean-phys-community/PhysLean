@@ -77,8 +77,7 @@ lemma divergence_eq_space_div {d} (f : Space d → Space d)
     ext j
     simp only [Function.comp_apply]
     rw [Space.coordCLM_apply, Space.coord_apply]
-  rw [h1]
-  rw [fderiv_comp]
+  rw [h1, fderiv_comp]
   simp [Space.coordCLM_apply, Space.coord_apply]
   · fun_prop
   · exact h x
