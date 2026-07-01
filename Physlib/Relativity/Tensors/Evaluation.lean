@@ -150,9 +150,11 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
     permT id (IsReindexing.append_succAbove_natAdd (n := n) (n1 := n1) i)
       (evalT (Fin.natAdd (m := n1 + 1) n i) (basisIdxCongr (by simp) x) (prodT t t1)) =
     prodT t (evalT i x t1) := by
-  induction' t using Tensor.induction_on_basis with b r t h t2 t3 h2 h3
-  · induction' t1 using Tensor.induction_on_basis with b1 r t h t2 t3 h2 h3
-    · by_cases hi : b1 i = x
+  apply Tensor.induction_on_basis (t := t)
+  · intro b
+    apply Tensor.induction_on_basis (t := t1)
+    · intro b1
+      by_cases hi : b1 i = x
       · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) =
             basisIdxCongr (by simp) x := by
           simp [hi]
@@ -168,6 +170,7 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
               simp
             · simp only [Fin.lt_def, Fin.val_castSucc, Fin.val_castAdd, Fin.val_natAdd]
               omega
+          simp only [id_eq]
           rw [hidx]
           simp [ComponentIdx.prod]
         · have hidx : (Fin.natAdd (m := n1 + 1) n i).succAbove
@@ -180,6 +183,7 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
               omega
             simp only [Fin.succAbove, hcond]
             split_ifs <;> ext <;> simp [Nat.add_assoc]
+          simp only [id_eq]
           rw [hidx]
           simp [ComponentIdx.prod]
       · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) ≠
@@ -189,10 +193,15 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
         rw [prodT_basis', evalT_basis, if_neg hprod]
         rw [evalT_basis, if_neg hi]
         simp
-    · simp [map_smul, h]
-    · simp [map_add, h2, h3]
-  · simp [map_smul, h]
-  · simp [map_add, h2, h3]
+    · intro r t1 ht1
+      simp [ht1]
+    · intro t2 t3 ht2 ht3
+      simp [map_add, ht2, ht3]
+  · simp
+  · intro r t ht
+    simp [ht]
+  · intro t2 t3 ht2 ht3
+    simp [map_add, ht2, ht3]
 
 
 TODO "Add lemmas related to the interaction of evalT and permT, prodT and contrT."
