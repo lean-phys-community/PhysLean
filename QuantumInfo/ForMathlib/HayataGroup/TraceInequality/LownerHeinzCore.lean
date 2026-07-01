@@ -752,8 +752,7 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
               + t • cfcR (fun x : ℝ ↦ 1 / (x + t)) T := by simp [invfun]
     set AB : 𝓐 := (1 - u) • A + u • B
     have hAB : IsSelfAdjoint AB := by
-      dsimp [AB]
-      simpa using
+      simpa [AB] using
         (IsSelfAdjoint.smul (by simp [IsSelfAdjoint]) hA).add
           (IsSelfAdjoint.smul (by simp [IsSelfAdjoint]) hB)
     -- apply operator convexity of `-(x/(x+t))`
@@ -1766,10 +1765,8 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
   let q : ℝ := -p
   have hq : q ∈ Set.Icc (0 : ℝ) 1 := by
     constructor
-    · dsimp [q]
-      exact neg_nonneg.mpr hp.2
-    · dsimp [q]
-      simpa using (neg_le_neg hp.1)
+    · simpa [q] using neg_nonneg.mpr hp.2
+    · simpa [q] using (neg_le_neg hp.1)
   have hBAq : cfcR  (fun x : ℝ ↦ x ^ q) B ≤ cfcR  (fun x : ℝ ↦ x ^ q) A := by
     have hspA' : spectrum ℝ A ⊆ Set.Ici (0 : ℝ) := by
       intro x hx
@@ -1930,10 +1927,8 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
   let r : ℝ := -p
   have hr : r ∈ Set.Icc (0 : ℝ) 1 := by
     constructor
-    · dsimp [r]
-      exact neg_nonneg.mpr hp.2
-    · dsimp [r]
-      simpa using (neg_le_neg hp.1)
+    · simpa [r] using neg_nonneg.mpr hp.2
+    · simpa [r] using (neg_le_neg hp.1)
   -- convex combination
   set C : 𝓐 := (1 - t) • A + t • B
   have hC : IsSelfAdjoint C := by
