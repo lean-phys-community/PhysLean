@@ -90,6 +90,34 @@ lemma Pure.prodP_dropPair {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     simp [LinearEquiv.cast_apply]
 
 set_option backward.isDefEq.respectTransparency false in
+/-- Dropping a pair of indices in the left factor of a product of pure tensors agrees,
+  up to the canonical reindexing, with dropping the corresponding pair after taking
+  the product. -/
+lemma Pure.dropPair_prodP {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
+    {c1 : Fin n1 → C}
+    (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
+    (p : Pure S c) (p1 : Pure S c1) :
+    (dropPair i j hij.1 p).prodP p1 = permP _ (IsReindexing.append_succSuccAbove_castAdd i j)
+    (dropPair (Fin.castAdd n1 i) (Fin.castAdd n1 j)
+    (by simp_all [Fin.ext_iff]) (p.prodP p1)) := by
+  ext x
+  obtain ⟨x, rfl⟩ := finSumFinEquiv.surjective x
+  rw [prodP_apply_finSumFinEquiv]
+  simp only [Function.comp_apply, finSumFinEquiv_apply_left, finSumFinEquiv_apply_right, dropPair,
+    permP, Nat.add_eq, id_eq]
+  match x with
+  | Sum.inl m =>
+    simp only [finSumFinEquiv_apply_left]
+    rw [← congr_right (p.prodP p1) _ (Fin.castAdd n1 (i.succSuccAbove j m))
+      (by rw [Fin.succSuccAbove_comm_castAdd i j])]
+    simp [LinearEquiv.cast_apply]
+  | Sum.inr m =>
+    simp only [finSumFinEquiv_apply_right]
+    rw [← congr_right (p.prodP p1) _ (Fin.natAdd (n + 1 + 1) m)
+      (by rw [Fin.succSuccAbove_castAdd_apply_natAdd i j])]
+    simp [LinearEquiv.cast_apply]
+
+set_option backward.isDefEq.respectTransparency false in
 lemma Pure.prodP_contrP_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)

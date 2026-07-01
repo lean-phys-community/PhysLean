@@ -250,6 +250,20 @@ lemma succSuccAbove_comm_natAdd {n n1 : ℕ}
   simp only [succSuccAbove, val_natAdd, add_lt_add_iff_left, add_le_add_iff_left, Fin.ext_iff]
   grind
 
+lemma succSuccAbove_comm_castAdd {n n1 : ℕ}
+    (i j : Fin (n + 1 + 1)) (m : Fin n) :
+    succSuccAbove (n := n + n1) (Fin.castAdd n1 i) (Fin.castAdd n1 j) (Fin.castAdd n1 m)
+    = Fin.castAdd n1 (succSuccAbove i j m) := by
+  simp only [Fin.ext_iff, succSuccAbove_val, castAdd]
+  grind (splits := 20)
+
+lemma succSuccAbove_castAdd_apply_natAdd {n n1 : ℕ}
+    (i j : Fin (n + 1 + 1)) (m : Fin n1) :
+    succSuccAbove (n := n + n1) (Fin.castAdd n1 i) (Fin.castAdd n1 j) (Fin.natAdd n m)
+    = Fin.natAdd (n + 1 + 1) m := by
+  simp only [Fin.ext_iff, succSuccAbove_val, natAdd, castAdd]
+  grind (splits := 20)
+
 /-!
 
 ## predPredAbove

@@ -283,6 +283,18 @@ lemma append_succSuccAbove_natAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   apply And.intro (Function.bijective_id)
   simp [forall_fin_add, succSuccAbove_comm_natAdd i j, succSuccAbove_natAdd_apply_castAdd i j]
 
+/-- Removing two entries from the left component of `Fin.append c c1` commutes with the
+  append: removing the `i`-th and `j`-th entries of `c` and then appending `c1` matches
+  removing the corresponding entries of `Fin.append c c1`, via the identity permutation.
+  This is used for the commutation of taking a *product* of tensors
+  with *contraction* of indices. -/
+lemma append_succSuccAbove_castAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
+    {c1 : Fin n1 → C} (i j : Fin (n + 1 + 1)) :
+    IsReindexing (Fin.append c c1 ∘ (Fin.castAdd n1 i).succSuccAbove (Fin.castAdd n1 j))
+      (Fin.append (c ∘ i.succSuccAbove j) c1) id := by
+  apply And.intro (Function.bijective_id)
+  simp [forall_fin_add, succSuccAbove_comm_castAdd i j, succSuccAbove_castAdd_apply_natAdd i j]
+
 /-- Given a reindexing of `c` by `c1` via `σ` for which the index `i` is sent to `0`,
   removing the `i`-th entry of `c1` and the first entry of `c` yields a reindexing of
   `c ∘ Fin.succ` by `c1 ∘ i.succAbove` via the map sending `j` to the predecessor of
