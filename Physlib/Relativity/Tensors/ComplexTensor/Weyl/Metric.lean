@@ -107,8 +107,7 @@ def leftMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
       not_false_eq_true, mul_nonsing_inv, transpose_one, mul_one]
 
 lemma leftMetric_apply_one : leftMetric (1 : ℂ) = leftMetricVal := by
-  change (1 : ℂ) • leftMetricVal = leftMetricVal
-  simp only [one_smul]
+  simp [leftMetric]
 
 /-- The metric `εₐₐ` as an element of `(dualLeftHanded ⊗ dualLeftHanded).V`. -/
 def dualLeftMetricVal : (DualLeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) :=
@@ -148,8 +147,7 @@ def dualLeftMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
         not_false_eq_true, mul_nonsing_inv, mul_one]
 
 lemma dualLeftMetric_apply_one : dualLeftMetric (1 : ℂ) = dualLeftMetricVal := by
-  change (1 : ℂ) • dualLeftMetricVal = dualLeftMetricVal
-  simp only [one_smul]
+  simp [dualLeftMetric]
 
 /-- The metric `ε^{dot a}^{dot a}` as an element of `(rightHanded ⊗ rightHanded).V`. -/
 def rightMetricVal : (RightHandedWeyl ⊗[ℂ] RightHandedWeyl) :=
@@ -200,8 +198,7 @@ def rightMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     · rw [← rightRightToMatrix_ρ_symm metricRaw M]
 
 lemma rightMetric_apply_one : rightMetric (1 : ℂ) = rightMetricVal := by
-  change (1 : ℂ) • rightMetricVal = rightMetricVal
-  simp only [one_smul]
+  simp [rightMetric]
 
 /-- The metric `ε_{dot a}_{dot a}` as an element of `(dualRightHanded ⊗ dualRightHanded).V`. -/
 def dualRightMetricVal : DualRightHandedWeyl ⊗[ℂ] DualRightHandedWeyl :=
@@ -251,8 +248,7 @@ def dualRightMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
       rfl
 
 lemma dualRightMetric_apply_one : dualRightMetric (1 : ℂ) = dualRightMetricVal := by
-  change (1 : ℂ) • dualRightMetricVal = dualRightMetricVal
-  simp only [one_smul]
+  simp [dualRightMetric]
 
 /-!
 

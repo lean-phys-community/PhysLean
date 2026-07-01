@@ -68,8 +68,7 @@ def contrMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
       simp only [LorentzGroup.toComplex_mul_minkowskiMatrix_mul_transpose]
 
 lemma contrMetric_apply_one : contrMetric (1 : ℂ) = contrMetricVal := by
-  change (1 : ℂ) • contrMetricVal = contrMetricVal
-  simp only [one_smul]
+  simp [contrMetric]
 
 /-- The metric `ηᵢᵢ` as an element of `(complexCo ⊗ complexCo).V`. -/
 def coMetricVal : (CoℂModule ⊗[ℂ] CoℂModule) :=
@@ -118,8 +117,7 @@ def coMetric : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
       LorentzGroup.toComplex_transpose_mul_minkowskiMatrix_mul_self]
 
 lemma coMetric_apply_one : coMetric (1 : ℂ) = coMetricVal := by
-  change (1 : ℂ) • coMetricVal = coMetricVal
-  simp only [one_smul]
+  simp [coMetric]
 
 /-!
 

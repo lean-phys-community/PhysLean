@@ -60,8 +60,7 @@ def leftDualLeftUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMa
     simp
 
 lemma leftDualLeftUnit_apply_one : leftDualLeftUnit (1 : ℂ) = leftDualLeftUnitVal := by
-  change (1 : ℂ) • leftDualLeftUnitVal = leftDualLeftUnitVal
-  simp only [one_smul]
+  simp [leftDualLeftUnit]
 
 /-- The dual-left-left unit `δₐᵃ` as an element of `(dualLeftHanded ⊗ leftHanded).V`. -/
 def dualLeftLeftUnitVal : (DualLeftHandedWeyl ⊗[ℂ] LeftHandedWeyl) :=
@@ -100,8 +99,7 @@ def dualLeftLeftUnit :
 
 /-- Applying the morphism `dualLeftLeftUnit` to `1` returns `dualLeftLeftUnitVal`. -/
 lemma dualLeftLeftUnit_apply_one : dualLeftLeftUnit (1 : ℂ) = dualLeftLeftUnitVal := by
-  change (1 : ℂ) • dualLeftLeftUnitVal = dualLeftLeftUnitVal
-  simp only [one_smul]
+  simp [dualLeftLeftUnit]
 
 /-- The right-dual-right unit `δ^{dot a}_{dot a}` as an element of
   `(rightHanded ⊗ dualRightHanded).V`. -/
@@ -145,8 +143,7 @@ def rightDualRightUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).Intertwining
     simp
 
 lemma rightDualRightUnit_apply_one : rightDualRightUnit (1 : ℂ) = rightDualRightUnitVal := by
-  change (1 : ℂ) • rightDualRightUnitVal = rightDualRightUnitVal
-  simp only [one_smul]
+  simp [rightDualRightUnit]
 
 /-- The dual-right-right unit `δ_{dot a}^{dot a}` as an element of
   `(rightHanded ⊗ dualRightHanded).V`. -/
@@ -188,8 +185,7 @@ def dualRightRightUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).Intertwining
     simp
 
 lemma dualRightRightUnit_apply_one : dualRightRightUnit (1 : ℂ) = dualRightRightUnitVal := by
-  change (1 : ℂ) • dualRightRightUnitVal = dualRightRightUnitVal
-  simp only [one_smul]
+  simp [dualRightRightUnit]
 
 /-!
 
