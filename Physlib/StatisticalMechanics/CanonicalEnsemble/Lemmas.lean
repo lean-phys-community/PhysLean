@@ -698,8 +698,7 @@ lemma heatCapacity_eq_deriv_meanEnergyBeta
   unfold heatCapacity meanEnergy_T
   have h_U_eq_comp : (𝓒.meanEnergy_T) = fun t : ℝ => (𝓒.meanEnergyBeta) (betaFromReal t) := by
     funext t
-    dsimp [meanEnergy_T, meanEnergyBeta, betaFromReal]
-    simp
+    simp [meanEnergy_T, meanEnergyBeta, betaFromReal]
   let dUdβ := derivWithin (𝓒.meanEnergyBeta) (Set.Ioi 0) (T.β : ℝ)
   have h_chain := chain_rule_T_beta (F:=𝓒.meanEnergyBeta) (F':=dUdβ) T hT_pos hU_deriv
   have h_UD :

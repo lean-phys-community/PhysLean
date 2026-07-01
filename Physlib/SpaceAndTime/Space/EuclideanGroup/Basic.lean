@@ -258,9 +258,7 @@ lemma RotationsAbout.toOrigin_comp_fromOrigin :
   intro x
   apply Subtype.ext
   simp only [MonoidHom.coe_comp, Function.comp_apply, MonoidHom.id_apply, SetLike.coe_eq_coe]
-  unfold RotationsAbout.toOrigin
-  unfold RotationsAbout.fromOrigin
-  simp [mul_assoc]
+  simp [RotationsAbout.toOrigin, RotationsAbout.fromOrigin, mul_assoc]
 
 /-- API feature: conjugation by the translation `T(p)` exhibits the rotations about `p` as
 isomorphic to the rotations about the origin `RotationGroup n`. -/

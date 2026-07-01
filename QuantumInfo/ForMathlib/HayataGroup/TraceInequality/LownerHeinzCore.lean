@@ -372,8 +372,7 @@ theorem one_div_operatorConvexOn_Ioi :
       star U * (!![C, 1; 1, D] : Matrix (Fin 2) (Fin 2) (𝓐)) * U
         = Matrix.diagonal (fun i : Fin 2 => if i = 0 then C else D - invC) := by
     have hInvC_sa : IsSelfAdjoint invC := by
-      dsimp [invC, cfcR]
-      exact cfc_predicate _ _
+      simp [invC, cfcR]
     have hcont_inv : ContinuousOn (fun x : ℝ ↦ x⁻¹) (spectrum ℝ C) :=
       fun x hx => (continuousAt_inv₀ (ne_of_gt (specC hx))).continuousWithinAt
     have invC_mul_C : invC * C = (1 : 𝓐) := by
@@ -778,8 +777,7 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
       have hB0 : 0 ≤ B :=
         nonneg_of_spectrum_subset_Ici0 (T := B) hB Bs
       have hAB0 : 0 ≤ AB := by
-        dsimp [AB]
-        exact add_nonneg (smul_nonneg hu0' hA0) (smul_nonneg hu0 hB0)
+        simpa [AB] using add_nonneg (smul_nonneg hu0' hA0) (smul_nonneg hu0 hB0)
       have ABs : spectrum ℝ AB ⊆ Set.Ici (0 : ℝ) := by
         intro x hx
         have hx0 : (0 : ℝ) ≤ x :=
@@ -1991,8 +1989,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
       have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using Bs hx
       exact le_of_lt (Real.rpow_pos_of_pos hx0 r)
     have hDr0 : 0 ≤ Dr := by
-      dsimp [Dr]
-      exact add_nonneg (smul_nonneg (sub_nonneg.mpr ht1) hAr0) (smul_nonneg ht0 hBr0)
+      simpa [Dr] using add_nonneg (smul_nonneg (sub_nonneg.mpr ht1) hAr0) (smul_nonneg ht0 hBr0)
     have hCr_sa : IsSelfAdjoint Cr := by
       dsimp [Cr, cfcR]
       exact cfc_predicate _ _
