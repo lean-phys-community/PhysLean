@@ -449,8 +449,7 @@ def toRealScalars : HiggsVec →ₗ[ℝ] (Fin 4 → ℝ) where
     fin_cases i <;> simp
 
 lemma toRealScalars_smul_real (a : ℝ) (φ : HiggsVec) :
-    toRealScalars (a • φ) = a • toRealScalars φ := by
-  simp [toRealScalars]
+    toRealScalars (a • φ) = a • toRealScalars φ := by simp [toRealScalars]
 
 lemma ofReal_toRealScalars (a : ℝ) :
     toRealScalars (ofReal a) = !₄[Real.sqrt a, 0, 0, 0] := by
@@ -777,8 +776,7 @@ lemma normSq_expand (φ : HiggsField) :
 
 -/
 
-lemma normSq_nonneg (φ : HiggsField) (x : SpaceTime) : 0 ≤ ‖φ‖_H^2 x := by
-  simp [normSq]
+lemma normSq_nonneg (φ : HiggsField) (x : SpaceTime) : 0 ≤ ‖φ‖_H^2 x := by simp [normSq]
 
 /-!
 
@@ -816,8 +814,7 @@ lemma normSq_smooth (φ : HiggsField) : ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ,
 
 @[simp]
 lemma const_normSq (φ : HiggsVec) (x : SpaceTime) :
-    ‖const φ‖_H^2 x = ‖φ‖ ^ 2 := by
-  simp [normSq, const_apply]
+    ‖const φ‖_H^2 x = ‖φ‖ ^ 2 := by simp [normSq, const_apply]
 
 /-!
 
