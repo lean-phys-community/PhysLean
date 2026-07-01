@@ -276,7 +276,6 @@ instance (d : ℕ) : IsManifold (𝓡 d) ⊤ (Space d) :=
 
 lemma chartAt_eq (d : ℕ) (p : Space d) :
     chartAt (EuclideanSpace ℝ (Fin d)) p =
-    (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph :=
-  rfl
+    (homEuclideanSpaceSpace d).symm.toOpenPartialHomeomorph := rfl
 
 end Space

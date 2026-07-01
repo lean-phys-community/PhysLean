@@ -663,13 +663,11 @@ private lemma fderiv_weightedDirDeriv (hf' : DifferentiableAt ℝ (fderiv ℝ f)
 
 /-- A directional derivative is a `weightedDirDeriv`: anti-holomorphic with `c = i`. -/
 private lemma dWirtingerAntiDir_eq_weightedDirDeriv (w : V) :
-    (fun p => dWirtingerAntiDir f w p) = weightedDirDeriv f Complex.I w (Complex.I • w) :=
-  rfl
+    (fun p => dWirtingerAntiDir f w p) = weightedDirDeriv f Complex.I w (Complex.I • w) := rfl
 
 /-- A directional derivative is a `weightedDirDeriv`: holomorphic with `c = -i`. -/
 private lemma dWirtingerDir_eq_weightedDirDeriv (v : V) :
-    (fun p => dWirtingerDir f v p) = weightedDirDeriv f (-Complex.I) v (Complex.I • v) :=
-  rfl
+    (fun p => dWirtingerDir f v p) = weightedDirDeriv f (-Complex.I) v (Complex.I • v) := rfl
 
 /-- Differentiating the anti-holomorphic directional derivative lands on the second
 real Fréchet derivative in the two slots. -/

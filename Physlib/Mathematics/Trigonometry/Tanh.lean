@@ -206,8 +206,7 @@ lemma iteratedDeriv_tanh_const_mul (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
 lemma tanh_const_mul_hasTemperateGrowth (κ : ℝ) :
     Function.HasTemperateGrowth (fun x => Real.tanh (κ * x)) := by
   constructor
-  · have h : (fun x => Real.tanh (κ * x)) = (Real.tanh ∘ (fun x => κ * x)) :=
-      rfl
+  · have h : (fun x => Real.tanh (κ * x)) = (Real.tanh ∘ (fun x => κ * x)) := rfl
     have h' : ContDiff ℝ ∞ (fun x => κ * x) := by
       have h'': (fun x : ℝ => κ * x) = fun x => κ • x := rfl
       rw [contDiff_infty, h'']
