@@ -368,12 +368,10 @@ omit [Fintype m] [RCLike R] [DecidableEq n] in
 theorem traceNorm_sandwich_le [DecidableEq n] {S M T : Matrix n n ℂ} (hS : ‖S‖ ≤ 1)
     (hT : ‖T‖ ≤ 1) : (S * M * T).traceNorm ≤ M.traceNorm :=
   calc (S * M * T).traceNorm
-      ≤ (M * T).traceNorm := by
-        exact le_trans
+      ≤ (M * T).traceNorm := le_trans
           (by simpa [Matrix.mul_assoc] using Matrix.traceNorm_mul_le_opNorm_traceNorm S (M * T))
           (by simpa using mul_le_mul_of_nonneg_right hS (Matrix.traceNorm_nonneg (M * T)))
-    _ ≤ M.traceNorm := by
-        exact le_trans (traceNorm_mul_le_traceNorm_opNorm M T)
+    _ ≤ M.traceNorm := le_trans (traceNorm_mul_le_traceNorm_opNorm M T)
           (by simpa using mul_le_mul_of_nonneg_left hT (Matrix.traceNorm_nonneg M))
 
 end
@@ -396,8 +394,7 @@ theorem abs_trace_le_traceNorm (A : Matrix n n ℂ) :
       simpa [Matrix.trace] using norm_sum_le (s := Finset.univ) (f := fun i => (C.val * D) i i)
     _ = ∑ i, ‖C.val i i‖ * Real.sqrt (hH.eigenvalues i) := by
       simp [D, Matrix.mul_apply, Matrix.diagonal, Real.norm_eq_abs, abs_of_nonneg]
-    _ ≤ ∑ i, Real.sqrt (hH.eigenvalues i) := by
-      exact Finset.sum_le_sum (fun i _ => by
+    _ ≤ ∑ i, Real.sqrt (hH.eigenvalues i) := Finset.sum_le_sum (fun i _ => by
         simpa using mul_le_mul_of_nonneg_right
           (entry_norm_bound_of_unitary C.property i i)
           (Real.sqrt_nonneg _))
