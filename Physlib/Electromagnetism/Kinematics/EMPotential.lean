@@ -631,7 +631,6 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
     ext ⟨i, j⟩
     simp
   rw [hb]
-  rw [Module.Basis.repr_reindex_apply, deriv_basis_repr_apply]
   rfl
 
 end ElectromagneticPotential

@@ -118,8 +118,7 @@ lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime
   rw [sub_eq_add_neg]
   apply congrArg₂
   · rfl
-  · rw [permT_permT]
-    rfl
+  · rfl
 
 lemma toFieldStrength_eq_sub_tensorDeriv {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
@@ -127,7 +126,6 @@ lemma toFieldStrength_eq_sub_tensorDeriv {d} {A : ElectromagneticPotential d}
     Tensorial.toTensor.symm (permT id IsReindexing.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
     - Tensorial.toTensor.symm (permT ![1, 0] IsReindexing.auto
     {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := by
-  simp only [toFieldStrength_eq_tensorDeriv hA, map_add, map_neg, sub_eq_add_neg, permT_permT]
   rfl
 
 lemma toTensor_toFieldStrength {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
@@ -536,7 +534,6 @@ lemma toFieldStrength_antisymmetric {d} (A : ElectromagneticPotential d) (x : Sp
   rw [toTensor_toFieldStrength_basis_repr]
   rw [← Finset.sum_neg_distrib]
   apply Finset.sum_congr rfl (fun κ _ => ?_)
-  simp only [Fin.isValue, neg_sub]
   rfl
 
 lemma fieldStrengthMatrix_antisymm {d} (A : ElectromagneticPotential d) (x : SpaceTime d)

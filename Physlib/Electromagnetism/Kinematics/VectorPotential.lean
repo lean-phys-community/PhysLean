@@ -74,7 +74,6 @@ noncomputable def vectorPotential {d} (c : SpeedOfLight := 1) (A : Electromagnet
 @[simp]
 lemma ofScalarPotential_vectorPotential {d} (c : SpeedOfLight)
     (φ : Time → Space d → ℝ) : (ofScalarPotential c φ).vectorPotential c = 0 := by
-  simp only [vectorPotential, ofScalarPotential]
   rfl
 
 @[simp]

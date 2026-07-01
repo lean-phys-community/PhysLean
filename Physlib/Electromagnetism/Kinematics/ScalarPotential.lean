@@ -86,7 +86,6 @@ lemma ofStaticScalarPotential_scalarPotential {d} (c : SpeedOfLight)
 lemma ofVectorPotential_scalarPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
     (ofVectorPotential c A).scalarPotential = 0 := by
-  simp only [scalarPotential, SpeedOfLight.val_one, ofVectorPotential, Fin.isValue, mul_zero]
   rfl
 
 @[simp]
