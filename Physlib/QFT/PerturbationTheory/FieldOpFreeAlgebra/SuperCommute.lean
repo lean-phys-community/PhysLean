@@ -647,13 +647,11 @@ lemma bosonic_superCommuteF {a b : 𝓕.FieldOpFreeAlgebra} (ha : a ∈ statisti
 
 lemma superCommuteF_bonsonic_symm {a b : 𝓕.FieldOpFreeAlgebra}
     (hb : b ∈ statisticSubmodule bosonic) :
-    [a, b]ₛF = - [b, a]ₛF := by
-  simp [bosonic_superCommuteF hb, superCommuteF_bonsonic hb]
+    [a, b]ₛF = - [b, a]ₛF := by simp [bosonic_superCommuteF hb, superCommuteF_bonsonic hb]
 
 lemma bonsonic_superCommuteF_symm {a b : 𝓕.FieldOpFreeAlgebra}
     (ha : a ∈ statisticSubmodule bosonic) :
-    [a, b]ₛF = - [b, a]ₛF := by
-  simp [bosonic_superCommuteF ha, superCommuteF_bonsonic ha]
+    [a, b]ₛF = - [b, a]ₛF := by simp [bosonic_superCommuteF ha, superCommuteF_bonsonic ha]
 
 lemma superCommuteF_fermionic_fermionic {a b : 𝓕.FieldOpFreeAlgebra}
     (ha : a ∈ statisticSubmodule fermionic) (hb : b ∈ statisticSubmodule fermionic) :

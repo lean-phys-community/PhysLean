@@ -444,8 +444,7 @@ lemma anPart_position (φ : (Σ f, 𝓕.PositionLabel f) × SpaceTime) :
 
 @[simp]
 lemma anPart_outAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    anPart (FieldOp.outAsymp φ) = ofCrAnOp ⟨FieldOp.outAsymp φ, ()⟩ := by
-  simp [anPart, ofCrAnOp]
+    anPart (FieldOp.outAsymp φ) = ofCrAnOp ⟨FieldOp.outAsymp φ, ()⟩ := by simp [anPart, ofCrAnOp]
 
 /-- For a field specification `𝓕`, and an element `φ` of `𝓕.FieldOp`, the
   creation part of `𝓕.FieldOp` as an element of `𝓕.WickAlgebra`.
@@ -459,8 +458,7 @@ lemma crPart_eq_ι_crPartF (φ : 𝓕.FieldOp) : crPart φ = ι (crPartF φ) := 
 
 @[simp]
 lemma crPart_inAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
-    crPart (FieldOp.inAsymp φ) = ofCrAnOp ⟨FieldOp.inAsymp φ, ()⟩ := by
-  simp [crPart, ofCrAnOp]
+    crPart (FieldOp.inAsymp φ) = ofCrAnOp ⟨FieldOp.inAsymp φ, ()⟩ := by simp [crPart, ofCrAnOp]
 
 @[simp]
 lemma crPart_position (φ : (Σ f, 𝓕.PositionLabel f) × SpaceTime) :
