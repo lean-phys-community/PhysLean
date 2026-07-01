@@ -339,8 +339,7 @@ theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
             + kB * (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
               simp [hS_phys, add_comm, add_left_comm]
     _ = (E - 𝓒.helmholtzFreeEnergy T) / T.val
-            + kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit := by
-              rw [hEF]
+            + kB * 𝓒.dof * Real.log 𝓒.phaseSpaceunit := by rw [hEF]
 
 /-- Discrete / normalized specialization of the previous theorem.
 If either `dof = 0` (no semiclassical correction) or `phaseSpaceUnit = 1`
@@ -442,8 +441,7 @@ lemma meanEnergy_eq_ratio_of_integrals
           (∫ x, 𝓒.energy x * Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by
           simp [h_inv_toReal]
     _ = (∫ x, 𝓒.energy x * Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) /
-          (∫ x, Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by
-          simp [h_den, div_eq_mul_inv, mul_comm]
+          (∫ x, Real.exp (- T.β * 𝓒.energy x) ∂ 𝓒.μ) := by simp [h_den, div_eq_mul_inv, mul_comm]
 
 /-- The mean energy is the negative derivative of the logarithm of the
 (mathematical) partition function with respect to β = 1/(kB T).
@@ -509,8 +507,7 @@ lemma meanEnergy_eq_neg_deriv_log_mathZ_of_beta
             (- ∫ i, 𝓒.energy i * Real.exp (-(T.β : ℝ) * 𝓒.energy i) ∂𝓒.μ)) := by ring
     _ = - (derivWithin
             (fun β : ℝ => Real.log (∫ i, Real.exp (-β * 𝓒.energy i) ∂𝓒.μ))
-            (Set.Ioi 0) (T.β : ℝ)) := by
-          rw [h_deriv_log]
+            (Set.Ioi 0) (T.β : ℝ)) := by rw [h_deriv_log]
 
 section Ratios
 

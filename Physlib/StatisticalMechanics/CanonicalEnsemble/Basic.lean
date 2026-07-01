@@ -783,13 +783,11 @@ lemma partitionFunction_nsmul
 
 lemma partitionFunction_dof_zero
     (𝓒 : CanonicalEnsemble ι) (T : Temperature) (h : 𝓒.dof = 0) :
-    𝓒.partitionFunction T = 𝓒.mathematicalPartitionFunction T := by
-  simp [partitionFunction, h]
+    𝓒.partitionFunction T = 𝓒.mathematicalPartitionFunction T := by simp [partitionFunction, h]
 
 lemma partitionFunction_phase_space_unit_one
     (𝓒 : CanonicalEnsemble ι) (T : Temperature) (h : 𝓒.phaseSpaceunit = 1) :
-    𝓒.partitionFunction T = 𝓒.mathematicalPartitionFunction T := by
-  simp [partitionFunction, h]
+    𝓒.partitionFunction T = 𝓒.mathematicalPartitionFunction T := by simp [partitionFunction, h]
 
 lemma log_partitionFunction
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
@@ -835,8 +833,7 @@ lemma helmholtzFreeEnergy_def
 
 lemma helmholtzFreeEnergy_congr
     (𝓒 : CanonicalEnsemble ι) (e : ι1 ≃ᵐ ι) (T : Temperature) :
-    (𝓒.congr e).helmholtzFreeEnergy T = 𝓒.helmholtzFreeEnergy T := by
-  simp [helmholtzFreeEnergy]
+    (𝓒.congr e).helmholtzFreeEnergy T = 𝓒.helmholtzFreeEnergy T := by simp [helmholtzFreeEnergy]
 
 lemma helmholtzFreeEnergy_dof_zero
     (𝓒 : CanonicalEnsemble ι) (T : Temperature) (h : 𝓒.dof = 0) :
