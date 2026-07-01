@@ -717,29 +717,25 @@ lemma superCommuteF_ofCrAnListF_ofCrAnListF_bosonic_or_fermionic (φs φs' : Lis
     [ofCrAnListF φs, ofCrAnListF φs']ₛF ∈ statisticSubmodule fermionic := by
   by_cases h1 : (𝓕 |>ₛ φs) = bosonic <;> by_cases h2 : (𝓕 |>ₛ φs') = bosonic
   · left
-    have h : bosonic = bosonic + bosonic := by
-      rfl
+    have h : bosonic = bosonic + bosonic := rfl
     rw [h]
     apply superCommuteF_grade
     apply ofCrAnListF_mem_statisticSubmodule_of _ _ h1
     apply ofCrAnListF_mem_statisticSubmodule_of _ _ h2
   · right
-    have h : fermionic = bosonic + fermionic := by
-      rfl
+    have h : fermionic = bosonic + fermionic := rfl
     rw [h]
     apply superCommuteF_grade
     apply ofCrAnListF_mem_statisticSubmodule_of _ _ h1
     apply ofCrAnListF_mem_statisticSubmodule_of _ _ (by simpa using h2)
   · right
-    have h : fermionic = fermionic + bosonic := by
-      rfl
+    have h : fermionic = fermionic + bosonic := rfl
     rw [h]
     apply superCommuteF_grade
     apply ofCrAnListF_mem_statisticSubmodule_of _ _ (by simpa using h1)
     apply ofCrAnListF_mem_statisticSubmodule_of _ _ h2
   · left
-    have h : bosonic = fermionic + fermionic := by
-      rfl
+    have h : bosonic = fermionic + fermionic := rfl
     rw [h]
     apply superCommuteF_grade
     apply ofCrAnListF_mem_statisticSubmodule_of _ _ (by simpa using h1)
@@ -757,8 +753,7 @@ lemma superCommuteF_superCommuteF_ofCrAnOpF_bosonic_or_fermionic (φ1 φ2 φ3 : 
   rcases superCommuteF_ofCrAnOpF_ofCrAnOpF_bosonic_or_fermionic φ2 φ3 with hs | hs
     <;> rcases ofCrAnOpF_bosonic_or_fermionic φ1 with h1 | h1
   · left
-    have h : bosonic = bosonic + bosonic := by
-      rfl
+    have h : bosonic = bosonic + bosonic := rfl
     rw [h]
     apply superCommuteF_grade h1 hs
   · right
