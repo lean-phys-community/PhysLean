@@ -167,8 +167,7 @@ example (g : RiemannianMetric I n M) (x : M) (v : TangentSpace I x) :
 
 -- Example showing how to use the metric inner product space
 example (g : RiemannianMetric I n M) (x : M) (v w : TangentSpace I x) :
-    (TangentSpace.metricInnerProductSpace g x).inner v w = g.inner x v w := by
-  rfl
+    (TangentSpace.metricInnerProductSpace g x).inner v w = g.inner x v w := rfl
 
 /-- Helper function to compute the norm on a tangent space from a Riemannian metric,
     using the underlying `NormedAddCommGroup` structure. -/
@@ -192,8 +191,7 @@ example (g : RiemannianMetric I n M) (x : M) (v : TangentSpace I x) : ℝ :=
 
 lemma norm_eq_norm_of_metricNormedAddCommGroup (g : RiemannianMetric I n M) (x : M)
     (v : TangentSpace I x) : norm g x v = @Norm.norm (TangentSpace I x)
-    (@NormedAddCommGroup.toNorm _ (TangentSpace.metricNormedAddCommGroup g x)) v := by
-  rfl
+    (@NormedAddCommGroup.toNorm _ (TangentSpace.metricNormedAddCommGroup g x)) v := rfl
 
 end InnerProductSpace
 

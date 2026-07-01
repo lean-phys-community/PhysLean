@@ -511,8 +511,7 @@ lemma harmonicWaveX_isPlaneWave {d} (𝓕 : FreeSpace) (k : ℝ) (hk : k ≠ 0)
       | ⟨Nat.succ i, h⟩ => E₀ ⟨i, by grind⟩ * cos (-k * u + φ ⟨i, by grind⟩)
     ext t x i
     match i with
-    | 0 =>
-      rfl
+    | 0 => rfl
     | ⟨Nat.succ i, h⟩ =>
       simp only [Nat.succ_eq_add_one, neg_mul]
       rw [← Fin.succ_mk _ _ (by grind)]
@@ -532,8 +531,7 @@ lemma harmonicWaveX_isPlaneWave {d} (𝓕 : FreeSpace) (k : ℝ) (hk : k ≠ 0)
     intro t x
     ext ij
     match ij with
-    | (0, 0) =>
-      rfl
+    | (0, 0) => rfl
     | (⟨0, h0⟩, ⟨Nat.succ j, hj⟩) =>
       simp only [Nat.succ_eq_add_one, Fin.zero_eta, inner_basis, neg_mul]
       rw [← Fin.succ_mk _ _ (by grind)]

@@ -447,8 +447,7 @@ def timeSpaceBasisEquiv {d : ℕ} (c : SpeedOfLight) :
     match μ with
     | Sum.inl 0 =>
       field_simp
-    | Sum.inr i =>
-      rfl
+    | Sum.inr i => rfl
   map_add' x y := by
     funext μ
     match μ with
