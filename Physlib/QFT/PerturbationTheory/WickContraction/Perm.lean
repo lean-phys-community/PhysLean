@@ -53,16 +53,14 @@ lemma refl : Perm φsΛ φsΛ := rfl
 
 /-- The symmetry of the `Perm` relation. -/
 @[symm]
-lemma symm (h : Perm φsΛ₁ φsΛ₂) : Perm φsΛ₂ φsΛ₁ := by
-  rw [Perm] at h ⊢
-  exact h.symm
+lemma symm (h : Perm φsΛ₁ φsΛ₂) : Perm φsΛ₂ φsΛ₁ :=
+  show φsΛ₂.wickTerm = φsΛ₁.wickTerm from Eq.symm h
 
 /-- The transitivity of the `Perm` relation. -/
 @[trans]
 lemma trans (h12 : Perm φsΛ₁ φsΛ₂) (h23 : Perm φsΛ₂ φsΛ₃) :
-    Perm φsΛ₁ φsΛ₃ := by
-  rw [Perm] at h12 h23 ⊢
-  exact h12.trans h23
+    Perm φsΛ₁ φsΛ₃ :=
+  show φsΛ₁.wickTerm = φsΛ₃.wickTerm from Eq.trans h12 h23
 
 /-- If `Perm φsΛ₁ φsΛ₂` and both contractions are grading-compliant,
   then if `φsΛ₁` is a full Wick contraction, so is `φsΛ₂`. -/
