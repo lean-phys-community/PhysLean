@@ -119,8 +119,7 @@ noncomputable def tangentInnerCore (g : RiemannianMetric I n M) (x : M) :
   add_left := λ u v w => by
     simp only [inner_apply, map_add, add_apply]
   smul_left := λ r u v => by
-    simp only [inner_apply, map_smul, conj_trivial]
-    rfl
+    simp [inner_apply]
   definite := fun v (h_inner_zero : g.inner x v v = 0) => by
     by_contra h_v_ne_zero
     have h_pos : g.inner x v v > 0 := g.pos_def x v h_v_ne_zero
@@ -197,7 +196,6 @@ lemma norm_eq_norm_of_metricNormedAddCommGroup (g : RiemannianMetric I n M) (x :
     (@NormedAddCommGroup.toNorm _ (TangentSpace.metricNormedAddCommGroup g x)) v := by
   unfold norm
   let normed_group := TangentSpace.metricNormedAddCommGroup g x
-  simp only [inner_apply]
   rfl
 
 end InnerProductSpace

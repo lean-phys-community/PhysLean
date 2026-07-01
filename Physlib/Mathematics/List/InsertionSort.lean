@@ -74,7 +74,6 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
     simp only [Fin.getElem_fin, List.get_eq_getElem]
     simp only [insertionSortDropMinPos, List.length_cons, Nat.succ_eq_add_one, finCongr_apply]
     rw [eraseIdx_get]
-    simp only [List.length_cons, Function.comp_apply, List.get_eq_getElem, Fin.val_cast]
     rfl
   erw [h1]
   simp only [List.length_cons, Nat.succ_eq_add_one, List.get_eq_getElem]
@@ -332,7 +331,6 @@ lemma insertionSortEquiv_insertionSort_append {α : Type} (r : α → α → Pro
     have hl : (List.insertionSort r (List.insertionSort r l1 ++ a :: l2)) =
         (List.insertionSort r (l1 ++ a :: l2)) := insertionSort_insertionSort_append r l1 (a :: l2)
     erw [orderedInsertEquiv_congr _ _ _ hl]
-    simp only [List.foldr_cons, finCongr_apply]
     rfl
 
 /-!
