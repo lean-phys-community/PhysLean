@@ -163,8 +163,8 @@ noncomputable def gradFreeCurrentPotential {d} (A : ElectromagneticPotential d)
 lemma gradFreeCurrentPotential_eq_sum_basis {d} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
     (hJ : ContDiff ℝ ∞ J) :
-    A.gradFreeCurrentPotential J = (∑ μ, fun x => (η μ μ * J x μ) • Lorentz.Vector.basis μ) :=
-  (freeCurrentPotential_hasVarGradientAt A hA J hJ).varGradient
+    A.gradFreeCurrentPotential J = (∑ μ, fun x => (η μ μ * J x μ) • Lorentz.Vector.basis μ) := by
+  exact (freeCurrentPotential_hasVarGradientAt A hA J hJ).varGradient
 
 lemma gradFreeCurrentPotential_eq_chargeDensity_currentDensity {d}
     (𝓕 : FreeSpace) (A : ElectromagneticPotential d)
@@ -285,8 +285,8 @@ noncomputable def gradLagrangian {d} (𝓕 : FreeSpace) (A : ElectromagneticPote
 lemma gradLagrangian_eq_kineticTerm_sub {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
     (hJ : ContDiff ℝ ∞ J) :
-    A.gradLagrangian 𝓕 J = A.gradKineticTerm 𝓕 - A.gradFreeCurrentPotential J :=
-  (lagrangian_hasVarGradientAt_eq_add_gradKineticTerm A hA J hJ).varGradient
+    A.gradLagrangian 𝓕 J = A.gradKineticTerm 𝓕 - A.gradFreeCurrentPotential J := by
+  exact (lagrangian_hasVarGradientAt_eq_add_gradKineticTerm A hA J hJ).varGradient
 
 /-!
 

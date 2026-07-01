@@ -129,8 +129,8 @@ theorem sandwichedTraceFunctional_conj_unitary_hermitian
       (conj U.val A).conj ((conj U.val B).mat) = conj U.val (A.conj B.mat) := by
     intros A B U
     simp [conj]
-    have h_unitary : ∀ (U : Matrix.unitaryGroup d ℂ), U.val * U.val.conjTranspose = 1 :=
-      fun U => U.2.2
+    have h_unitary : ∀ (U : Matrix.unitaryGroup d ℂ), U.val * U.val.conjTranspose = 1 := by
+      exact fun U => U.2.2
     simp [← mul_assoc]
     have := h_unitary U; simp_all [Matrix.mul_assoc, mul_eq_one_comm.mp this]
   simp_all [conj_apply_mat, rpow_conj_unitary]
@@ -316,8 +316,8 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
           simp [add_comm]
           simp [← Matrix.ext_iff]
           intro i j; exact (by
-          have h_support : A.kerProj + A.supportProj = 1 :=
-            kerProj_add_supportProj A
+          have h_support : A.kerProj + A.supportProj = 1 := by
+            exact kerProj_add_supportProj A
           convert! congr_arg (fun f => f i j) h_support using 1)
         rw [← Matrix.add_mulVec, h_support, Matrix.one_mulVec]
       have hsup : B.mat *ᵥ (A.kerProj.mat *ᵥ x.ofLp) = 0 := by
@@ -325,8 +325,8 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
         have h_support : A.mat * A.kerProj.mat = 0 := by
           have h_support : A.mat * A.kerProj.mat = A.mat * (1 - A.supportProj.mat) := by
             congr
-            have h_support : A.kerProj + A.supportProj = 1 :=
-              kerProj_add_supportProj A
+            have h_support : A.kerProj + A.supportProj = 1 := by
+              exact kerProj_add_supportProj A
             exact eq_sub_of_add_eq <| congr_arg Subtype.val h_support
           rw [h_support, mul_sub, mul_one, sub_eq_zero]
           exact Eq.symm (mul_supportProj_of_ker_le fun ⦃x⦄ a => a)
@@ -341,8 +341,8 @@ lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
       · simp [Matrix.mulVec, dotProduct]
       · simp [Matrix.mulVec, dotProduct]
         rfl
-    have h_support : B.mat = B.mat.conjTranspose :=
-      B.2.symm
+    have h_support : B.mat = B.mat.conjTranspose := by
+      exact B.2.symm
     have h_support : (B.mat * A.supportProj.mat).conjTranspose = A.supportProj.mat * B.mat := by
       simp [Matrix.conjTranspose_mul]
     lia
@@ -369,8 +369,8 @@ lemma inner_eq_inner_conj_of_ker_le (ρ σ : MState d)
   simp only [inner_def, conj_apply_mat]
   have h_support :
       σ.M.supportProj.mat * ρ.M.mat = ρ.M.mat ∧
-      ρ.M.mat * σ.M.supportProj.mat = ρ.M.mat :=
-    ⟨supportProj_mul_of_ker_le hker, mul_supportProj_of_ker_le hker⟩
+      ρ.M.mat * σ.M.supportProj.mat = ρ.M.mat := by
+    exact ⟨supportProj_mul_of_ker_le hker, mul_supportProj_of_ker_le hker⟩
   have h_trace_cyclic :
       Matrix.trace ((σ.M ^ γ).mat * ρ.M.mat * (σ.M ^ γ).mat *
         (σ.M ^ (-γ)).mat * H.mat * (σ.M ^ (-γ)).mat) =
@@ -514,8 +514,8 @@ This follows from the variational formula: the supremum equals `Q̃_α(ρ‖σ)`
 which is a finite real number.
 -/
 theorem f_alpha_bddAbove (hα : 1 < α) (ρ σ : MState d) (hker : σ.M.ker ≤ ρ.M.ker) :
-    BddAbove (Set.range (fun H : {H : HermitianMat d ℂ // 0 ≤ H} => f_alpha α H.1 ρ σ)) :=
-  ⟨_, Set.forall_mem_range.mpr fun H => f_alpha_le_at_optimizer hα ρ σ _ H.2 hker⟩
+    BddAbove (Set.range (fun H : {H : HermitianMat d ℂ // 0 ≤ H} => f_alpha α H.1 ρ σ)) := by
+  exact ⟨_, Set.forall_mem_range.mpr fun H => f_alpha_le_at_optimizer hα ρ σ _ H.2 hker⟩
 
 /-
 **Step 5 (Sup preserves convexity)**: The supremum over `H ≥ 0` of the jointly
@@ -571,8 +571,8 @@ theorem sandwichedTraceFunctional_jointly_convex (hα : 1 < α) {ι : Type*} [Fi
     (hker : ∀ i, (σs i).M.ker ≤ (ρs i).M.ker) :
     Q̃_ α(ρ_mix‖σ_mix) ≤ ∑ i, w i * Q̃_ α(ρs i‖σs i) := by
   have hker' : σ_mix.M.ker ≤ ρ_mix.M.ker := by
-    simpa [hρ_mix, hσ_mix] using
-      ker_weighted_sum_le w hw_nonneg _ _ (fun i => (ρs i).nonneg) (fun i => (σs i).nonneg) hker
+    rw [hρ_mix, hσ_mix]
+    exact ker_weighted_sum_le w hw_nonneg _ _ (fun i => (ρs i).nonneg) (fun i => (σs i).nonneg) hker
   rw [traceFunctional_eq_iSup_f_alpha hα ρ_mix σ_mix hker']
   calc ⨆ H : {H : HermitianMat d ℂ // 0 ≤ H}, f_alpha α H.1 ρ_mix σ_mix
       ≤ ∑ i, w i * (⨆ H : {H : HermitianMat d ℂ // 0 ≤ H}, f_alpha α H.1 (ρs i) (σs i)) :=
@@ -824,8 +824,8 @@ The trace functional is multiplicative over tensor products:
 -/
 theorem sandwichedTraceFunctional_mul
     (ρ₁ σ₁ : MState dA) (ρ₂ σ₂ : MState dB) :
-    Q̃_ α(ρ₁ ⊗ᴹ ρ₂‖σ₁ ⊗ᴹ σ₂) = Q̃_ α(ρ₁‖σ₁) * Q̃_ α(ρ₂‖σ₂) :=
-  sandwiched_term_product ρ₁ σ₁ ρ₂ σ₂ α ((1 - α) / (2 * α))
+    Q̃_ α(ρ₁ ⊗ᴹ ρ₂‖σ₁ ⊗ᴹ σ₂) = Q̃_ α(ρ₁‖σ₁) * Q̃_ α(ρ₂‖σ₂) := by
+  exact sandwiched_term_product ρ₁ σ₁ ρ₂ σ₂ α ((1 - α) / (2 * α))
 
 /-
 The trace functional of a state with itself equals 1.
@@ -879,8 +879,8 @@ theorem MState.conjTensorUnitary_M (ρ : MState (dA × dB)) (V : Matrix.unitaryG
 /-- The trace functional is invariant under `1_A ⊗ V` conjugation. -/
 theorem sandwichedTraceFunctional_conj_tensorUnitary
     (ρ σ : MState (dA × dB)) (V : Matrix.unitaryGroup dB ℂ) :
-    Q̃_ α(ρ.conjTensorUnitary V‖σ.conjTensorUnitary V) = Q̃_ α(ρ‖σ) :=
-  sandwichedTraceFunctional_conj_unitary_MState _ ρ σ
+    Q̃_ α(ρ.conjTensorUnitary V‖σ.conjTensorUnitary V) = Q̃_ α(ρ‖σ) := by
+  exact sandwichedTraceFunctional_conj_unitary_MState _ ρ σ
 
 section twirling
 
@@ -1235,8 +1235,8 @@ theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
       · use (U.val.conjTranspose.toEuclideanLin x)
         simp_all [ker, Matrix.toEuclideanLin]
         simp_all [lin, Matrix.toLpLin]
-        have h_unitary : (U.val * U.val.conjTranspose) = 1 :=
-          U.2.2
+        have h_unitary : (U.val * U.val.conjTranspose) = 1 := by
+          exact U.2.2
         generalize_proofs at *; (
         apply_fun (U.val.conjTranspose *ᵥ ·) at hx
         simp_all [Matrix.mul_assoc, Matrix.mulVec_mulVec]
@@ -1353,8 +1353,8 @@ theorem sandwichedRenyiEntropy_DPI_gt_one (hα : 1 < α) (ρ σ : MState d₁) (
   calc D̃_ α(Φ ρ‖Φ σ)
     _ = D̃_ α((Φ.purify ((prep ∘ₘ append) ρ)).traceLeft.traceLeft‖
             (Φ.purify ((prep ∘ₘ append) σ)).traceLeft.traceLeft) := by
-        have h_trace (ξ) : Φ ξ = (Φ.purify ((prep ∘ₘ append) ξ)).traceLeft.traceLeft :=
-          congr($Φ.purify_trace ξ)
+        have h_trace (ξ) : Φ ξ = (Φ.purify ((prep ∘ₘ append) ξ)).traceLeft.traceLeft := by
+          exact congr($Φ.purify_trace ξ)
         rw [h_trace ρ, h_trace σ]
     _ = D̃_ α(((ρ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft‖
              ((σ ⊗ᴹ τ).U_conj U).traceLeft.traceLeft) := by

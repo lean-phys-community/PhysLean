@@ -35,8 +35,8 @@ variable {d : ℕ}
 noncomputable instance : TopologicalSpace (Velocity d) := instTopologicalSpaceSubtype
 
 @[ext]
-lemma ext {v w : Velocity d} (h : v.1 = w.1) : v = w :=
-  SetCoe.ext h
+lemma ext {v w : Velocity d} (h : v.1 = w.1) : v = w := by
+  exact SetCoe.ext h
 
 lemma mem_iff {v : Vector d} : v ∈ Velocity d ↔ ⟪v, v⟫ₘ = (1 : ℝ) ∧ 0 < v.timeComponent := Iff.rfl
 
@@ -128,7 +128,7 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
       apply And.intro
       · let x := (√(1 + t ^ 2 * ‖u.1.spatialPart‖ ^ 2) - u.1 (Sum.inl 0) * t)
         calc _
-          _ = ⟪x • zero.1 + (t : ℝ) • u.1, x • zero.1 + (t : ℝ) • u.1⟫ₘ := rfl
+          _ = ⟪x • zero.1 + (t : ℝ) • u.1, x • zero.1 + (t : ℝ) • u.1⟫ₘ := by rfl
           _ = x ^ 2 + (t : ℝ) ^ 2 + 2 * x * (t : ℝ) * u.1 (Sum.inl 0) := by
             simp only [zero, Fin.isValue, map_add, map_smul, _root_.add_apply,
               FunLike.coe_smul, Pi.smul_apply, minkowskiProduct_basis_right,

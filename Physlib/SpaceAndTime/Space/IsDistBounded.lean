@@ -235,20 +235,20 @@ lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
 @[fun_prop]
 lemma integrable_space_mul {d : ℕ} {f : Space d → ℝ} (hf : IsDistBounded f)
     (η : 𝓢(Space d, ℝ)) :
-    Integrable (fun x : Space d => η x * f x) volume :=
-  hf.integrable_space η
+    Integrable (fun x : Space d => η x * f x) volume := by
+  exact hf.integrable_space η
 
 @[fun_prop]
 lemma integrable_space_fderiv {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
     (η : 𝓢(Space d, ℝ)) (y : Space d) :
-    Integrable (fun x : Space d => fderiv ℝ η x y • f x) volume :=
-  hf.integrable_space (LineDeriv.lineDerivOpCLM ℝ _ y η)
+    Integrable (fun x : Space d => fderiv ℝ η x y • f x) volume := by
+  exact hf.integrable_space (LineDeriv.lineDerivOpCLM ℝ _ y η)
 
 @[fun_prop]
 lemma integrable_space_fderiv_mul {d : ℕ} {f : Space d → ℝ} (hf : IsDistBounded f)
     (η : 𝓢(Space d, ℝ)) (y : Space d) :
-    Integrable (fun x : Space d => fderiv ℝ η x y * f x) volume :=
-  hf.integrable_space (LineDeriv.lineDerivOpCLM ℝ _ y η)
+    Integrable (fun x : Space d => fderiv ℝ η x y * f x) volume := by
+  exact hf.integrable_space (LineDeriv.lineDerivOpCLM ℝ _ y η)
 
 /-!
 
@@ -634,8 +634,8 @@ lemma add {d : ℕ} {f g : Space d → F}
 
 @[fun_prop]
 lemma fun_add {d : ℕ} {f g : Space d → F}
-    (hf : IsDistBounded f) (hg : IsDistBounded g) : IsDistBounded (fun x => f x + g x) :=
-  hf.add hg
+    (hf : IsDistBounded f) (hg : IsDistBounded g) : IsDistBounded (fun x => f x + g x) := by
+  exact hf.add hg
 
 /-!
 
@@ -915,8 +915,8 @@ lemma inv_shift {d : ℕ} (g : Space d) (hd : 2 ≤ d := by omega) :
   simp
 @[fun_prop]
 lemma nat_pow {d : ℕ} (n : ℕ) :
-    IsDistBounded (d := d) (fun x => ‖x‖ ^ n) :=
-  IsDistBounded.pow (d := d) (n : ℤ) (by omega)
+    IsDistBounded (d := d) (fun x => ‖x‖ ^ n) := by
+  exact IsDistBounded.pow (d := d) (n : ℤ) (by omega)
 
 @[fun_prop]
 lemma norm_add_nat_pow {d : ℕ} (n : ℕ) (a : ℝ) :
@@ -948,8 +948,8 @@ lemma norm_add_pos_nat_zpow {d : ℕ} (n : ℤ) (a : ℝ) (ha : 0 < a) :
 @[fun_prop]
 lemma nat_pow_shift {d : ℕ} (n : ℕ)
     (g : Space d) :
-    IsDistBounded (d := d) (fun x => ‖x - g‖ ^ n) :=
-  IsDistBounded.pow_shift (d := d) (n : ℤ) g (by omega)
+    IsDistBounded (d := d) (fun x => ‖x - g‖ ^ n) := by
+  exact IsDistBounded.pow_shift (d := d) (n : ℤ) g (by omega)
 
 @[fun_prop]
 lemma norm_sub {d : ℕ} (g : Space d) :

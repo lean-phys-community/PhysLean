@@ -59,8 +59,8 @@ noncomputable def singularValuesSorted (A : Matrix d d ℂ) :
 /-- Sorted singular values are nonneg. -/
 lemma singularValuesSorted_nonneg (A : Matrix d d ℂ) (i : Fin (Fintype.card d)) :
     0 ≤ singularValuesSorted A i := by
-  have h_nonneg : ∀ i, 0 ≤ (singularValues A i) :=
-    singularValues_nonneg A
+  have h_nonneg : ∀ i, 0 ≤ (singularValues A i) := by
+    exact singularValues_nonneg A
   have h_sorted_nonneg : ∀ {l : List ℝ}, (∀ x ∈ l, 0 ≤ x) → ∀ i < l.length, 0 ≤ l[i]! := by
     aesop
   contrapose! h_sorted_nonneg
@@ -94,16 +94,16 @@ lemma sum_singularValues_rpow_eq_sum_sorted (A : Matrix d d ℂ) (p : ℝ) :
 lemma singularValuesSorted_antitone (A : Matrix d d ℂ) :
     Antitone (singularValuesSorted A) := by
   intro i j hij
-  have h_sorted : List.Pairwise (· ≥ ·) (Finset.univ.val.map (singularValues A) |>.sort (· ≥ ·)) :=
-    Multiset.pairwise_sort _ _
+  have h_sorted : List.Pairwise (· ≥ ·) (Finset.univ.val.map (singularValues A) |>.sort (· ≥ ·)) := by
+    exact Multiset.pairwise_sort _ _
   exact h_sorted.rel_get_of_le hij
 
 /-- The product of nonneg antitone sequences is antitone. -/
 lemma antitone_mul_of_antitone_nonneg {n : ℕ}
     {f g : Fin n → ℝ} (hf : Antitone f) (hg : Antitone g)
     (hf_nn : ∀ i, 0 ≤ f i) (hg_nn : ∀ i, 0 ≤ g i) :
-    Antitone (fun i => f i * g i) :=
-  fun _ _ hij => mul_le_mul (hf hij) (hg hij) (hg_nn _) (hf_nn _)
+    Antitone (fun i => f i * g i) := by
+  exact fun i j hij => mul_le_mul (hf hij) (hg hij) (hg_nn _) (hf_nn _)
 
 /-! ### Compound matrices and auxiliary lemmas for Horn's inequality
 
@@ -201,15 +201,15 @@ lemma cauchyBinet {m : ℕ} {n : Type*} [Fintype n] [DecidableEq n] [LinearOrder
           obtain ⟨a, ha⟩ : ∃ a : Fin m → Fin m, ∀ i, σ i = S.val.orderEmbOfFin S.property (a i) := by
             have h_exists_a : ∀ i, ∃ a : Fin m, σ i = S.val.orderEmbOfFin S.property a := by
               intro i
-              have h_exists_a : σ i ∈ S.val :=
-                hσ.2 ▸ Finset.mem_image_of_mem _ (Finset.mem_univ _)
+              have h_exists_a : σ i ∈ S.val := by
+                exact hσ.2 ▸ Finset.mem_image_of_mem _ (Finset.mem_univ _)
               have h_exists_a : Finset.image (fun a : Fin m => S.val.orderEmbOfFin S.property a) Finset.univ = S.val := by
                 refine' Finset.eq_of_subset_of_card_le (Finset.image_subset_iff.mpr fun a _ => Finset.orderEmbOfFin_mem _ _ _) _
                 rw [Finset.card_image_of_injective _ fun a b h => by simpa [Fin.ext_iff] using h]; simp [S.2]
               grind
             exact ⟨fun i => Classical.choose (h_exists_a i), fun i => Classical.choose_spec (h_exists_a i)⟩
-          have ha_inj : Function.Injective a :=
-            fun i j hij => hσ.1 <| by simp [ha, hij]
+          have ha_inj : Function.Injective a := by
+            exact fun i j hij => hσ.1 <| by simp [ha, hij]
           exact ⟨Equiv.ofBijective a ⟨ha_inj, Finite.injective_iff_surjective.mp ha_inj⟩, funext fun i => ha i ▸ rfl⟩
         · rintro ⟨a, rfl⟩
           constructor
@@ -352,8 +352,8 @@ lemma prod_le_prod_sorted {n : ℕ} {f : Fin n → ℝ}
   -- And the product is preserved under sorting (it's the same set of values)
   have h_exists_sorted : ∃ (g' : Fin k → Fin n),
       Function.Injective g' ∧ StrictMono g' ∧
-      Finset.image g Finset.univ = Finset.image g' Finset.univ :=
-    ⟨Finset.orderEmbOfFin (Finset.image g Finset.univ) (by simp [Finset.card_image_of_injective _ hg]),
+      Finset.image g Finset.univ = Finset.image g' Finset.univ := by
+    exact ⟨Finset.orderEmbOfFin (Finset.image g Finset.univ) (by simp [Finset.card_image_of_injective _ hg]),
       fun a b h => by simpa using h,
       fun a b h => by simpa using h,
       by ext x; simp⟩
@@ -389,8 +389,8 @@ lemma singularValuesSorted_zero_eq_sup {e : Type*} [Fintype e] [DecidableEq e]
     exact h_le_sup _ (by simp [singularValuesSorted])
   · have h_max_le_ge : ∀ i, singularValues A i ≤ singularValuesSorted A ⟨0, h⟩ := by
       intro i
-      have h_max_le_ge : ∀ j, singularValuesSorted A j ≤ singularValuesSorted A ⟨0, h⟩ :=
-        fun j => singularValuesSorted_antitone A (Nat.zero_le _)
+      have h_max_le_ge : ∀ j, singularValuesSorted A j ≤ singularValuesSorted A ⟨0, h⟩ := by
+        exact fun j => singularValuesSorted_antitone A (Nat.zero_le _)
       exact (by
       have h_max_le_ge : ∃ j, singularValues A i = singularValuesSorted A j := by
         have h_exists_j : singularValues A i ∈ Multiset.sort (Finset.univ.val.map (singularValues A)) (· ≥ ·) := by
@@ -505,8 +505,8 @@ lemma exists_sorting_equiv (M : Matrix d d ℂ) :
       · norm_num [Function.Injective, Function.Surjective]
         exact fun i j hij => Fin.ext <| by simpa [Fin.ext_iff] using σ.injective <| Fin.ext hij
       · intro b
-        obtain ⟨a, ha⟩ : ∃ a : Fin (List.ofFn (singularValuesSorted M)).length, σ a = ⟨b, by simp⟩ :=
-          σ.surjective _
+        obtain ⟨a, ha⟩ : ∃ a : Fin (List.ofFn (singularValuesSorted M)).length, σ a = ⟨b, by simp⟩ := by
+          exact σ.surjective _
         use ⟨a, lt_of_lt_of_le a.2 (by simp)⟩
         exact Fin.ext (by simp [ha])
       · intro i
@@ -799,8 +799,8 @@ lemma horn_weak_log_majorization (A B : Matrix d d ℂ) (k : ℕ)
 lemma rpow_antitone_of_nonneg_antitone {n : ℕ}
     {f : Fin n → ℝ} (hf : Antitone f) (hf_nn : ∀ i, 0 ≤ f i)
     {r : ℝ} (hr : 0 < r) :
-    Antitone (fun i => f i ^ r) :=
-  fun _ _ hij => Real.rpow_le_rpow (hf_nn _) (hf hij) hr.le
+    Antitone (fun i => f i ^ r) := by
+  exact fun i j hij => Real.rpow_le_rpow (hf_nn _) (hf hij) hr.le
 
 /-- Weak log-majorization is preserved under positive powers. -/
 lemma rpow_preserves_weak_log_maj {n : ℕ}

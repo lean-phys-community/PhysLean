@@ -303,7 +303,7 @@ lemma cubic (S : linearParametersQENeqZero) :
 lemma cubic_v_or_w_zero (S : linearParametersQENeqZero) (h : accCube (bijection S).1.val = 0) :
     S.v = 0 ∨ S.w = 0 := by
   rw [S.cubic] at h
-  have h1 : (-1)^3 = (-1 : ℚ) := rfl
+  have h1 : (-1)^3 = (-1 : ℚ) := by rfl
   rw [← h1] at h
   by_contra hn
   rw [not_or] at hn

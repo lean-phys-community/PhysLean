@@ -98,7 +98,7 @@ lemma insertIdx_length_fin {I : Type} (i : I) :
 lemma insertIdx_getElem_fin {I : Type} (i : I) :
     (r : List I) → (k : Fin r.length.succ) → (m : Fin r.length) →
     (List.insertIdx r k i)[(k.succAbove m).val] = r[m.val]
-  | [], 0, m => Fin.elim0 m
+  | [], 0, m => by exact Fin.elim0 m
   | a :: as, 0, m => by simp
   | a :: as, ⟨n + 1, h⟩, ⟨0, h0⟩ => by
     simp [Fin.succAbove, Fin.lt_def]
@@ -116,7 +116,7 @@ lemma insertIdx_getElem_fin {I : Type} (i : I) :
 lemma insertIdx_eraseIdx_fin {I : Type} :
     (r : List I) → (k : Fin r.length) →
     (List.eraseIdx r k).insertIdx k r[k] = r
-  | [], k => Fin.elim0 k
+  | [], k => by exact Fin.elim0 k
   | a :: as, ⟨0, h⟩ => by simp
   | a :: as, ⟨n + 1, h⟩ => by
     simp only [List.length_cons, Fin.getElem_fin, List.getElem_cons_succ, List.eraseIdx_cons_succ,
@@ -186,8 +186,8 @@ lemma take_insert_let {I : Type} (i : I) :
     simp at hm
   | n + 1, m + 1, h, a::as, hm => by
     simp only [List.insertIdx_succ_cons, List.take_succ_cons]
-    have hp : (i :: a :: List.take n as).Perm (a :: i :: List.take n as) :=
-      List.Perm.swap a i (List.take n as)
+    have hp : (i :: a :: List.take n as).Perm (a :: i :: List.take n as) := by
+      exact List.Perm.swap a i (List.take n as)
     refine List.Perm.trans ?_ hp.symm
     refine List.Perm.cons a ?_
     exact take_insert_let i n m (Nat.le_of_succ_le_succ h) as (Nat.le_of_succ_le_succ hm)

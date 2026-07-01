@@ -80,15 +80,15 @@ macro "∂[" i:term "]" : term => `(deriv $i)
 
 lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
-    deriv μ f x = fderiv ℝ f x (basis μ) := rfl
+    deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
 
 lemma deriv_eq_fderiv_fun [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) :
-    deriv μ f = fun x => fderiv ℝ (fun x => f x) x (basis μ) := rfl
+    deriv μ f = fun x => fderiv ℝ (fun x => f x) x (basis μ) := by rfl
 
 lemma deriv_eq_fderiv_basis [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
-    deriv μ f x = fderiv ℝ f x (basis μ) := rfl
+    deriv μ f x = fderiv ℝ f x (basis μ) := by rfl
 
 lemma fderiv_eq_sum_deriv {M d} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (f : Space d → M) (x y : Space d) :
@@ -458,7 +458,7 @@ lemma deriv_differentiable {M} [NormedAddCommGroup M]
     [NormedSpace ℝ M] {d : ℕ} {f : Space d → M}
     (hf : ContDiff ℝ 2 f) (i : Fin d) :
     Differentiable ℝ (deriv i f) := by
-  suffices Differentiable ℝ (fun x => fderiv ℝ f x (basis i)) from this
+  suffices h1 : Differentiable ℝ (fun x => fderiv ℝ f x (basis i)) by exact h1
   fun_prop
 
 open ContDiff

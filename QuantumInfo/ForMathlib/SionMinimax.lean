@@ -268,8 +268,8 @@ theorem LeftOrdContinuous.comp_lowerSemicontinuousOn_strong_assumptions {α γ �
         by_contra h_contra
         simp only [not_exists, not_and, not_lt] at h_contra
         have h_exists_z : ∃ z, z < f x ∧ g z > y := by
-          have h_lub : IsLUB (Set.Iio (f x)) (f x) :=
-            isLUB_Iio
+          have h_lub : IsLUB (Set.Iio (f x)) (f x) := by
+            exact isLUB_Iio
           have := hg h_lub;
           have := this.exists_between hy
           simp_all only [Set.mem_image, Set.mem_Iio, exists_exists_and_eq_and, gt_iff_lt]

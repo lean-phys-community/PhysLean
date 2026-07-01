@@ -364,4 +364,4 @@ noncomputable def CarriesDimension.toDimensionful {M : Type} [CarriesDimension M
 
 lemma CarriesDimension.toDimensionful_apply_apply
     {M : Type} [CarriesDimension M] (u1 u2 : UnitChoices) (m : M) :
-    (toDimensionful u1 m).1 u2 = (u1.dimScale u2 (dim M)) • m := rfl
+    (toDimensionful u1 m).1 u2 = (u1.dimScale u2 (dim M)) • m := by rfl

@@ -105,7 +105,7 @@ lemma contrT_unitTensor_dual_single {c : C} (x : Tensor S ![S.τ c]) :
 
 @[simp]
 lemma unitTensor_invariant {c : C} (g : G) :
-    g • S.unitTensor c = S.unitTensor c :=
-  actionT_fromConstPair (S.unit c) g
+    g • S.unitTensor c = S.unitTensor c := by
+  rw [unitTensor, actionT_fromConstPair]
 
 end TensorSpecies

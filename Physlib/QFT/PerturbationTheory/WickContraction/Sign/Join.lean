@@ -131,8 +131,8 @@ lemma join_singleton_signFinset_eq_filter {φs : List 𝓕.FieldOp}
   · intro h1 h2
     rcases h1 with h1 | h1
     · simp only [h1, Option.isSome_none, Bool.false_eq_true, IsEmpty.exists_iff]
-      have h2' : ¬ (((singleton h).join φsucΛ).getDual? a).isSome :=
-        Option.not_isSome_iff_eq_none.mpr h1
+      have h2' : ¬ (((singleton h).join φsucΛ).getDual? a).isSome := by
+        exact Option.not_isSome_iff_eq_none.mpr h1
       exact h2' h2
     use h2
     have h1 := h1 h2
@@ -303,8 +303,8 @@ lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
     joinSignLeftExtra h φsucΛ = joinSignRightExtra h φsucΛ := by
   /- Simplifying joinSignLeftExtra. -/
   let e2 : Fin φs.length ≃ {x // (((singleton h).join φsucΛ).getDual? x).isSome} ⊕
-    {x // ¬ (((singleton h).join φsucΛ).getDual? x).isSome} :=
-    (Equiv.sumCompl fun a => (((singleton h).join φsucΛ).getDual? a).isSome = true).symm
+    {x // ¬ (((singleton h).join φsucΛ).getDual? x).isSome} := by
+    exact (Equiv.sumCompl fun a => (((singleton h).join φsucΛ).getDual? a).isSome = true).symm
   rw [joinSignLeftExtra, ofFinset_eq_prod, map_prod, ← e2.symm.prod_comp]
   simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_lhs =>

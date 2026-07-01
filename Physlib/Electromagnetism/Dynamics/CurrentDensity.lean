@@ -80,7 +80,7 @@ noncomputable def chargeDensity (c : SpeedOfLight := 1)
   fun t x => (1 / (c : ℝ)) * J ((toTimeAndSpace c).symm (t, x)) (Sum.inl 0)
 
 lemma chargeDensity_eq_timeSlice {d : ℕ} {c : SpeedOfLight} {J : LorentzCurrentDensity d} :
-    J.chargeDensity c = timeSlice c (fun x => (1 / (c : ℝ)) • J x (Sum.inl 0)) := rfl
+    J.chargeDensity c = timeSlice c (fun x => (1 / (c : ℝ)) • J x (Sum.inl 0)) := by rfl
 
 /-!
 
@@ -135,7 +135,7 @@ noncomputable def currentDensity (c : SpeedOfLight := 1) (J : LorentzCurrentDens
 
 lemma currentDensity_eq_timeSlice {d : ℕ} {J : LorentzCurrentDensity d} :
     J.currentDensity c = timeSlice c (fun x => WithLp.toLp 2
-      fun i => J x (Sum.inr i)) := rfl
+      fun i => J x (Sum.inr i)) := by rfl
 
 /-!
 

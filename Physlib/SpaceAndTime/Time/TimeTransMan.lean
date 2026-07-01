@@ -364,7 +364,7 @@ lemma toTime_symm_zero_add (zero : TimeTransMan) (x : TimeUnit) :
   ext_of (by simp [toTime, addTime_val, diff_eq_val])
 
 lemma toTime_val (zero : TimeTransMan) (x : TimeUnit) (t : TimeTransMan) :
-    (toTime zero x t).val = diff x t zero := rfl
+    (toTime zero x t).val = diff x t zero := by rfl
 
 lemma toTime_symm_val (zero : TimeTransMan) (x : TimeUnit) (r : Time) :
     (toTime zero x).symm r = addTime x r zero := rfl

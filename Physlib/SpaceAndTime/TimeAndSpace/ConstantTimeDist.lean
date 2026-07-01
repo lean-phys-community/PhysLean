@@ -659,13 +659,13 @@ lemma time_integral_iteratedFDeriv_apply {d : ℕ} (n : ℕ) (η : 𝓢(Time × 
     intro m
     refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
     · exact Nat.cast_lt.mpr (by omega)
-    · exact η.smooth'.of_le ENat.LEInfty.out
+    · exact η.smooth'.of_le (by exact ENat.LEInfty.out)
   have hη_diff' : ∀ (m : ℕ) (t : Time),
       Differentiable ℝ (iteratedFDeriv ℝ m (fun x => η (t, x))) := by
     intro m t
     refine ContDiff.differentiable_iteratedFDeriv (n := (m + 1 : ℕ)) ?_ ?_
     · exact Nat.cast_lt.mpr (by omega)
-    · exact (η.smooth'.of_le ENat.LEInfty.out).comp (by fun_prop)
+    · exact (η.smooth'.of_le (by exact ENat.LEInfty.out)).comp (by fun_prop)
   induction n with
   | zero =>
     simp
@@ -797,9 +797,9 @@ lemma time_integral_mul_pow_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) :
   have hk' : 0 ≤ k := by rw [← hk]; positivity
   calc _
       _ ≤ ‖x‖ ^ m * ((∫ (t : Time), ‖iteratedFDeriv ℝ n η (t, x)‖) *
-          ‖((0 : Space d →L[ℝ] Time).prod (.id ℝ (Space d)))‖ ^ n) :=
-        mul_le_mul_of_nonneg (by rfl) (time_integral_iteratedFDeriv_norm_le n η x)
-          (by positivity) (by positivity)
+          ‖((0 : Space d →L[ℝ] Time).prod (.id ℝ (Space d)))‖ ^ n) := by
+        refine mul_le_mul_of_nonneg (by rfl) ?_ (by positivity) (by positivity)
+        exact time_integral_iteratedFDeriv_norm_le n η x
       _ ≤ (∫ (t : Time), ‖x‖ ^ m * ‖iteratedFDeriv ℝ n η (t, x)‖) *
           ‖((0 : Space d →L[ℝ] Time).prod (.id ℝ (Space d)))‖ ^ n := by
         apply le_of_eq
@@ -869,7 +869,7 @@ def timeIntegralSchwartz {d : ℕ} :
     rfl
 
 lemma timeIntegralSchwartz_apply {d : ℕ} (η : 𝓢(Time × Space d, ℝ)) (x : Space d) :
-    timeIntegralSchwartz η x = ∫ (t : Time), η (t, x) := rfl
+    timeIntegralSchwartz η x = ∫ (t : Time), η (t, x) := by rfl
 
 /-!
 
@@ -892,7 +892,7 @@ def constantTime {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : ℕ}
 lemma constantTime_apply {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
     {d : ℕ} (f : (Space d) →d[ℝ] M)
     (η : 𝓢(Time × Space d, ℝ)) :
-    constantTime f η = f (timeIntegralSchwartz η) := rfl
+    constantTime f η = f (timeIntegralSchwartz η) := by rfl
 
 /-!
 
@@ -912,7 +912,7 @@ lemma constantTime_distSpaceDeriv {M : Type} {d : ℕ} [NormedAddCommGroup M] [N
   symm
   change fderiv ℝ (timeIntegralSchwartz η) x (basis i) = _
   calc _
-      _ = fderiv ℝ (fun x => ∫ t, η (t, x) ∂volume) x (basis i) := rfl
+      _ = fderiv ℝ (fun x => ∫ t, η (t, x) ∂volume) x (basis i) := by rfl
       _ = (∫ t, fderiv ℝ (fun x => η (t, x)) x) (basis i) := by
         have h1 := time_integral_hasFDerivAt (η) x
         rw [h1.fderiv]
@@ -995,7 +995,7 @@ lemma constantTime_distTimeDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace 
   ext x
   rw [timeIntegralSchwartz_apply]
   calc _
-    _ = ∫ (t : Time), fderiv ℝ η (t, x) (1, 0) := rfl
+    _ = ∫ (t : Time), fderiv ℝ η (t, x) (1, 0) := by rfl
     _ = ∫ (t : Time), fderiv ℝ (fun t => η (t, x)) t 1 := by
       congr
       funext t

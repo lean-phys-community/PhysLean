@@ -173,8 +173,8 @@ lemma minimallyAllowsTerm_iff_powerset_countP_eq_one :
       simp
   · intro h
     have h1 : (Multiset.filter (fun y => y.AllowsTerm T) x.powerset.val).card = 1 := by
-      simpa [h] using
-        Eq.symm (Multiset.countP_eq_card_filter (fun y => y.AllowsTerm T) x.powerset.val)
+      rw [← h]
+      exact Eq.symm (Multiset.countP_eq_card_filter (fun y => y.AllowsTerm T) x.powerset.val)
     rw [Multiset.card_eq_one] at h1
     obtain ⟨a, ha⟩ := h1
     have haMem : a ∈ Multiset.filter (fun y => y.AllowsTerm T) x.powerset.val := by

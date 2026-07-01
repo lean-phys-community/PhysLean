@@ -280,7 +280,7 @@ noncomputable instance {d} :
     simp
   smul_add Λ A B := by
     ext x μ
-    simp
+    simp [Lorentz.Vector.smul_add]
 
 /-!
 
@@ -319,8 +319,8 @@ lemma differentiable_deriv {d} {A : ElectromagneticPotential d}
 @[fun_prop]
 lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ ∞ A) (μ ν : Fin 1 ⊕ Fin d) :
-    Differentiable ℝ (fun x => ∂_ μ A x ν) :=
-  differentiable_deriv (hA.of_le (ENat.LEInfty.out)) μ ν
+    Differentiable ℝ (fun x => ∂_ μ A x ν) := by
+  apply differentiable_deriv (hA.of_le (ENat.LEInfty.out)) μ ν
 
 @[fun_prop]
 lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
@@ -345,7 +345,7 @@ lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Spa
   intro μ
   match μ with
   | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  | Sum.inr _ => fun_prop
 
 lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : ContDiff ℝ n ↿φ) : ContDiff ℝ n (ofScalarPotential c φ) := by
@@ -354,7 +354,7 @@ lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space
   intro μ
   match μ with
   | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  | Sum.inr _ => fun_prop
 
 lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
@@ -364,7 +364,7 @@ lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
   intro μ
   match μ with
   | Sum.inl 0 => fun_prop
-  | Sum.inr _ => fun_prop
+  | Sum.inr i => fun_prop
 
 lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
@@ -374,7 +374,7 @@ lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
   intro μ
   match μ with
   | Sum.inl 0 => fun_prop
-  | Sum.inr _ => fun_prop
+  | Sum.inr i => fun_prop
 
 lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : Differentiable ℝ ↿φ)

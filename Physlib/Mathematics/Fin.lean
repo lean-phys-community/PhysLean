@@ -218,7 +218,7 @@ lemma finExtractTwo_symm_inl_inr_apply {n : ℕ} (i : Fin n.succ.succ) (j : Fin 
 
 @[simp]
 lemma finExtractTwo_symm_inl_inl_apply {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
-    (finExtractTwo i j).symm (Sum.inl (Sum.inl 0)) = i := rfl
+    (finExtractTwo i j).symm (Sum.inl (Sum.inl 0)) = i := by rfl
 
 @[simp]
 lemma finExtractTwo_apply_snd {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :

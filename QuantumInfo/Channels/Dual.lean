@@ -149,8 +149,8 @@ theorem IsPositive.dual {M : MatrixMap dIn dOut ℂ} (h : M.IsPositive) : M.dual
 /-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
 theorem dual_Unital (h : M.IsTracePreserving) : M.dual.Unital := by
   -- By definition of dual, we know that for any matrix A, Tr(M(A) * I) = Tr(A * M*(I)).
-  have h_dual_trace : ∀ A : Matrix dIn dIn 𝕜, (M A * 1).trace = (A * M.dual 1).trace :=
-    fun A => Dual.trace_eq M A 1
+  have h_dual_trace : ∀ A : Matrix dIn dIn 𝕜, (M A * 1).trace = (A * M.dual 1).trace := by
+    exact fun A => Dual.trace_eq M A 1;
   ext i j
   specialize h_dual_trace ( Matrix.of ( fun k l => if k = j then if l = i then 1 else 0 else 0 ) )
   simp_all [ Matrix.trace, Matrix.mul_apply ] ;
@@ -206,8 +206,8 @@ lemma dual_choi_matrix_posSemidef_of_posSemidef (M : MatrixMap dIn dOut 𝕜) (h
 /--
 The dual of the identity map is the identity map.
 -/
-lemma dual_id : (MatrixMap.id dIn 𝕜).dual = MatrixMap.id dIn 𝕜 :=
-  dual_unique (id dIn 𝕜) (id dIn 𝕜) fun _ => congrFun rfl
+lemma dual_id : (MatrixMap.id dIn 𝕜).dual = MatrixMap.id dIn 𝕜 := by
+  exact dual_unique (id dIn 𝕜) (id dIn 𝕜) fun A_1 => congrFun rfl
 
 private theorem matrix_mem_span_kronecker {A C : Type*} [Fintype A] [Fintype C]
     [DecidableEq A] [DecidableEq C] (X : Matrix (A × C) (A × C) 𝕜) :
@@ -260,10 +260,10 @@ lemma dual_kron {A B C D : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D
 theorem IsCompletelyPositive.dual {M : MatrixMap dIn dOut ℂ} (h : M.IsCompletelyPositive) : M.dual.IsCompletelyPositive := by
   intro n
   -- By definition of complete positivity, we know that $(M ⊗ₖₘ id) dually map = M.dual ⊗ₖₘ id.dual$.
-  convert IsPositive.dual (h n) using 1
-  rw [show MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ) =
-      MatrixMap.dual M ⊗ₖₘ MatrixMap.dual (MatrixMap.id (Fin n) ℂ) by
-    convert dual_kron M (MatrixMap.id (Fin n) ℂ) using 1, dual_id]
+  have h_dual_kron : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) ℂ)) = (MatrixMap.dual M) ⊗ₖₘ (MatrixMap.dual (MatrixMap.id (Fin n) ℂ)) := by
+    convert dual_kron M ( MatrixMap.id ( Fin n ) ℂ ) using 1;
+  convert h_dual_pos using 1;
+  rw [ h_dual_kron, dual_id ]
 
 /--
 The composition of the dual of the inverse of the dual basis isomorphism with the dual basis
@@ -288,8 +288,8 @@ lemma Module.Basis.toDualEquiv_symm_comp_dualMap_toDualEquiv {ι R M : Type*} [F
     b.toDualEquiv.symm.toLinearMap ∘ₗ b.toDualEquiv.toLinearMap.dualMap = (Module.evalEquiv R M).symm.toLinearMap := by
   simp [ LinearMap.ext_iff ];
   intro x
-  obtain ⟨y, hy⟩ : ∃ y, x = (Module.evalEquiv R M).toLinearMap y :=
-    ⟨_, Eq.symm <| LinearEquiv.apply_symm_apply (Module.evalEquiv R M) x⟩
+  obtain ⟨y, hy⟩ : ∃ y, x = (Module.evalEquiv R M).toLinearMap y := by
+    exact ⟨ _, Eq.symm <| LinearEquiv.apply_symm_apply ( Module.evalEquiv R M ) x ⟩;
   rw [ hy ];
   simp [ Module.evalEquiv, LinearEquiv.symm_apply_eq ];
   ext; simp [ Module.Dual.eval ] ;

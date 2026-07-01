@@ -200,8 +200,8 @@ private lemma exists_monotone_sets_hasFiniteIntegral
       simp_rw [norm_pow, norm_norm, RCLike.norm_natCast]
       refine pow_le_pow_left₀ (norm_nonneg _) ?_ 2
       rcases hk <;> simp_all
-    · exact ENNReal.mul_lt_top (by norm_num)
-        (measure_inter_lt_top_of_left_ne_top measure_closedBall_lt_top.ne)
+    · refine ENNReal.mul_lt_top (by norm_num) ?_
+      exact measure_inter_lt_top_of_left_ne_top measure_closedBall_lt_top.ne
 
 open Complex InnerProductSpace in
 lemma mulOperator_adjoint_domain_le {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
@@ -305,9 +305,9 @@ lemma mulOperator_isSelfAdjoint_ofReal
 -/
 
 lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (𝓜 f).IsClosable :=
-  isClosable_of_exists_dense_formalAdjoint (mulOperator_hasDenseDomain hf)
-    ⟨𝓜 (conj ∘ f), mulOperator_hasDenseDomain (by measurability),
+    (𝓜 f).IsClosable := by
+  refine isClosable_of_exists_dense_formalAdjoint (mulOperator_hasDenseDomain hf) ?_
+  exact ⟨𝓜 (conj ∘ f), mulOperator_hasDenseDomain (by measurability),
     mulOperator_adjoint_eq_conj hf ▸ adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)⟩
 
 lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :

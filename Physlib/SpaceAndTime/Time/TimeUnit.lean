@@ -41,8 +41,8 @@ structure TimeUnit : Type where
 namespace TimeUnit
 
 @[simp]
-lemma val_ne_zero (x : TimeUnit) : x.val ≠ 0 :=
-  Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : TimeUnit) : x.val ≠ 0 := by
+  exact Ne.symm (ne_of_lt x.property)
 
 lemma val_pos (x : TimeUnit) : 0 < x.val := x.property
 

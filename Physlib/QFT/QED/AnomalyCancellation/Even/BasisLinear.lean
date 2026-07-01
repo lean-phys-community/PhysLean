@@ -908,8 +908,8 @@ def Pa' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) : (PureU1 (2 * n.succ)).LinSols :
     ∑ i, f i • basisa i
 
 lemma Pa'_P'_P!' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) :
-    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr) :=
-  Fintype.sum_sum_type _
+    Pa' f = P' (f ∘ Sum.inl) + P!' (f ∘ Sum.inr) := by
+  exact Fintype.sum_sum_type _
 
 /-!
 
@@ -951,8 +951,8 @@ lemma Pa'_eq (f f' : (Fin n.succ) ⊕ (Fin n) → ℚ) : Pa' f = Pa' f' ↔ f = 
       rw [h]
       rw [← Finset.sum_add_distrib]
       simp
-    have h2 : ∀ i, (f i + (- f' i)) = 0 :=
-      Fintype.linearIndependent_iff.mp (@basisa_linear_independent n)
+    have h2 : ∀ i, (f i + (- f' i)) = 0 := by
+      exact Fintype.linearIndependent_iff.mp (@basisa_linear_independent n)
         (fun i => f i + -f' i) h1
     have h2i := h2 i
     linarith

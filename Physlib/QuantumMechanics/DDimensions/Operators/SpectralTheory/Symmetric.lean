@@ -186,15 +186,15 @@ lemma regularityDomain_isConnected_iff :
 lemma regularityDomain_isConnected_of_bddBelow (h : BddBelow (Θᵣₑ T)) :
     IsConnected T.regularityDomain := by
   obtain ⟨m, hm⟩ := h
-  exact hT.regularityDomain_isConnected_iff.mpr
-    ⟨m - 1, hT.Iio_subset_regularityDomain hm ⟨m - 1, by simp⟩⟩
+  apply hT.regularityDomain_isConnected_iff.mpr
+  exact ⟨m - 1, hT.Iio_subset_regularityDomain hm ⟨m - 1, by simp⟩⟩
 
 /-- The regularity domain of an upper semibounded symmetric operator is connected. -/
 lemma regularityDomain_isConnected_of_bddAbove (h : BddAbove (Θᵣₑ T)) :
     IsConnected T.regularityDomain := by
   obtain ⟨m, hm⟩ := h
-  exact hT.regularityDomain_isConnected_iff.mpr
-    ⟨m + 1, hT.Ioi_subset_regularityDomain hm ⟨m + 1, by simp⟩⟩
+  apply hT.regularityDomain_isConnected_iff.mpr
+  exact ⟨m + 1, hT.Ioi_subset_regularityDomain hm ⟨m + 1, by simp⟩⟩
 
 /-!
 ## C. Point spectrum

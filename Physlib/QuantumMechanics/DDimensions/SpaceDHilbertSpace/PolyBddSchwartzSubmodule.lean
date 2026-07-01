@@ -233,8 +233,8 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
         refine mk (f := s n) ⟨?_, ?_⟩
         · exact (continuous_ofReal.comp (b n).continuous).aestronglyMeasurable.mul
             ξ.val.aestronglyMeasurable
-        · exact lt_of_le_of_lt (eLpNorm_mono_enorm (enorm_bump_mul_le_enorm (b n) ξ))
-            (coe_hilbertSpace_memHS ξ).2
+        · refine lt_of_le_of_lt ?_ (coe_hilbertSpace_memHS ξ).2
+          exact eLpNorm_mono_enorm (enorm_bump_mul_le_enorm (b n) ξ)
       have hψ_ae (n : ℕ) : ψ n =ᵐ[volume] f n := (schwartzEquiv_symm_coe_ae ⟨ψ n, hψ n⟩).symm
       have hφ_ae (n : ℕ) : φ n =ᵐ[volume] g n := schwartzEquiv_coe_ae (g n)
       have hσ_ae (n : ℕ) : σ n =ᵐ[volume] s n := coe_mk_ae _
@@ -260,8 +260,8 @@ lemma dense_top (d : ℕ) : Dense (polyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
                 ENNReal.ofReal_pow (b n).rOut_pos.le]
             simp_rw [hvolB, ← ENNReal.ofReal_zero, b, ← one_div, mul_pow, ← mul_assoc]
             rw [← mul_zero (C * 2 ^ d), ← zero_pow (M₀ := ℝ) hd.ne']
-            exact ENNReal.tendsto_ofReal <| Tendsto.const_mul (C * 2 ^ d)
-              (tendsto_one_div_add_atTop_nhds_zero_nat.pow d)
+            refine ENNReal.tendsto_ofReal <| Tendsto.const_mul (C * 2 ^ d) ?_
+            exact tendsto_one_div_add_atTop_nhds_zero_nat.pow d
         refine Tendsto.squeeze tendsto_const_nhds hξB (zero_le) (fun n ↦ ?_)
         suffices ∫⁻ x, ‖σ n x‖ₑ ^ 2 = ∫⁻ x in B n, ‖σ n x‖ₑ ^ 2 by
           rw [this]

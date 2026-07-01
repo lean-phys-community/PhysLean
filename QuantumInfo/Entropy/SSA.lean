@@ -395,8 +395,8 @@ private lemma W_mat_sq_eq_conj [Nonempty dA] [Nonempty dB] [Nonempty dC]
     · exact sqrt_sq (by positivity)
     · convert sqrt_sq ( show 0 ≤ ( σBC.traceLeft⁻¹ : HermitianMat dC ℂ ) from ?_ ) using 1;
       have h_inv_pos : (σBC.traceLeft⁻¹ : HermitianMat dC ℂ).mat.PosDef := by
-        have h_inv_pos : (σBC.traceLeft : Matrix dC dC ℂ).PosDef :=
-          PosDef_traceLeft σBC hσ
+        have h_inv_pos : (σBC.traceLeft : Matrix dC dC ℂ).PosDef := by
+          exact PosDef_traceLeft σBC hσ;
         convert! h_inv_pos.inv using 1;
       convert! h_inv_pos.posSemidef using 1;
       exact zero_le_iff;
@@ -415,8 +415,8 @@ private lemma S_mat_conj_rhs_eq_one [Nonempty dA] [Nonempty dB] [Nonempty dC]
     S_mat ρAB σBC * ((ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm).mat *
       S_mat ρAB σBC = 1 := by
   have h_comm : Commute (σBC.sqrt.mat) (σBC⁻¹.mat) := by
-    have h_comm : Commute (σBC.sqrt.mat) (σBC.mat) :=
-      commute_sqrt_left rfl
+    have h_comm : Commute (σBC.sqrt.mat) (σBC.mat) := by
+      exact commute_sqrt_left rfl;
     have h_comm_inv : Commute (σBC.sqrt.mat) (σBC.mat) → Commute (σBC.sqrt.mat) (σBC⁻¹.mat) := by
       intro h_comm
       have h_comm_inv : Commute (σBC.sqrt.mat) (σBC.mat) → Commute (σBC.sqrt.mat) (σBC.mat⁻¹) := by
@@ -745,12 +745,12 @@ private lemma S_mat_isUnit [Nonempty dA] [Nonempty dB] [Nonempty dC]
     constructor;
     · have h_det_ne_zero : ∀ (A : HermitianMat (dA) ℂ), A.mat.PosDef → (A.sqrt).mat.det ≠ 0 := by
         intro A hA
-        have h_det_ne_zero : (A.sqrt).mat.PosDef :=
-          sqrt_posDef hA
+        have h_det_ne_zero : (A.sqrt).mat.PosDef := by
+          exact sqrt_posDef hA;
         exact h_det_ne_zero.det_pos.ne';
       exact isUnit_iff_ne_zero.mpr ( h_det_ne_zero _ <| by simpa using PosDef_traceRight _ hρ |> fun h => h.inv );
-    · have h_inv_sqrt : σBC.sqrt.mat.PosDef :=
-        sqrt_posDef hσ
+    · have h_inv_sqrt : σBC.sqrt.mat.PosDef := by
+        exact sqrt_posDef hσ;
       exact isUnit_iff_ne_zero.mpr h_inv_sqrt.det_pos.ne';
   unfold S_mat;
   simp_all [ Matrix.det_kronecker]
@@ -774,8 +774,8 @@ theorem intermediate_ineq [Nonempty dA] [Nonempty dB] [Nonempty dC]
     convert! S_mat_conj_rhs_eq_one ρAB σBC hρ hσ using 1;
   · have := S_mat_isUnit ρAB σBC hρ hσ;
     cases' this.nonempty_invertible with u hu;
-    have h_pos_semidef : Matrix.PosSemidef ((S_mat ρAB σBC)⁻¹ * (S_mat ρAB σBC * ((ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm).mat * S_mat ρAB σBC - S_mat ρAB σBC * (ρAB ⊗ₖ (σBC.traceLeft)⁻¹).mat * S_mat ρAB σBC) * (S_mat ρAB σBC)⁻¹ᴴ) :=
-      Matrix.PosSemidef.mul_mul_conjTranspose_same h (S_mat ρAB σBC)⁻¹;
+    have h_pos_semidef : Matrix.PosSemidef ((S_mat ρAB σBC)⁻¹ * (S_mat ρAB σBC * ((ρAB.traceRight ⊗ₖ σBC⁻¹).reindex (Equiv.prodAssoc dA dB dC).symm).mat * S_mat ρAB σBC - S_mat ρAB σBC * (ρAB ⊗ₖ (σBC.traceLeft)⁻¹).mat * S_mat ρAB σBC) * (S_mat ρAB σBC)⁻¹ᴴ) := by
+      exact Matrix.PosSemidef.mul_mul_conjTranspose_same h (S_mat ρAB σBC)⁻¹;
     simp_all [ Matrix.mul_assoc, Matrix.sub_mul, Matrix.mul_sub ];
     simp_all [ Matrix.posSemidef_iff_dotProduct_mulVec, Matrix.IsHermitian ];
     have h_conj : (S_mat ρAB σBC)ᴴ = S_mat ρAB σBC := by
@@ -802,12 +802,12 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
       convert HermitianMat.inv_kronecker _ _ using 1;
       · infer_instance;
       · exact ⟨ ⟨ Classical.arbitrary dB, Classical.arbitrary dC ⟩ ⟩;
-      · have h_trace_right_pos_def : (ρAB.traceRight).mat.PosDef :=
-          PosDef_traceRight ρAB hρ
+      · have h_trace_right_pos_def : (ρAB.traceRight).mat.PosDef := by
+          exact PosDef_traceRight ρAB hρ
         exact ⟨by exact PosDef_traceRight ρAB hρ |>.isUnit⟩
       · have h_inv_symm : σBC⁻¹.NonSingular := by
-          have h_inv_symm : σBC.NonSingular :=
-            nonSingular_of_posDef hσ
+          have h_inv_symm : σBC.NonSingular := by
+            exact nonSingular_of_posDef hσ
           exact nonSingular_iff_inv.mpr h_inv_symm;
         exact h_inv_symm;
     convert congr_arg ( fun x : HermitianMat _ _ => x.reindex ( Equiv.prodAssoc dA dB dC ).symm ) h_inv_symm using 1;
@@ -820,8 +820,8 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
     have h_inv_symm : (ρAB ⊗ₖ σBC.traceLeft⁻¹)⁻¹ = ρAB⁻¹ ⊗ₖ (σBC.traceLeft⁻¹)⁻¹ := by
       convert HermitianMat.inv_kronecker ρAB ( σBC.traceLeft⁻¹ ) using 1;
       · exact nonSingular_of_posDef hρ;
-      · have h_inv_symm : σBC.traceLeft.mat.PosDef :=
-          PosDef_traceLeft σBC hσ
+      · have h_inv_symm : σBC.traceLeft.mat.PosDef := by
+          exact PosDef_traceLeft σBC hσ;
         -- Since σBC.traceLeft is positive definite, its inverse is also positive definite, and hence non-singular.
         have h_inv_pos_def : (σBC.traceLeft⁻¹).mat.PosDef := by
           convert! h_inv_symm.inv using 1;
@@ -830,8 +830,8 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
     have h_inv_symm : (σBC.traceLeft⁻¹)⁻¹ = σBC.traceLeft := by
       have h_inv_symm : (σBC.traceLeft⁻¹).mat * σBC.traceLeft.mat = 1 := by
         have h_inv_symm : (σBC.traceLeft⁻¹).mat * σBC.traceLeft.mat = 1 := by
-          have h_inv_symm : σBC.traceLeft.mat.PosDef :=
-            PosDef_traceLeft σBC hσ
+          have h_inv_symm : σBC.traceLeft.mat.PosDef := by
+            exact PosDef_traceLeft σBC hσ
           convert! Matrix.nonsing_inv_mul _ _;
           exact isUnit_iff_ne_zero.mpr h_inv_symm.det_pos.ne';
         exact h_inv_symm
@@ -881,8 +881,8 @@ private lemma hermitianMat_log_inv_eq_neg
     (A : HermitianMat d₁ ℂ) [A.NonSingular] : A⁻¹.log = -A.log := by
   -- By the property of continuous functional calculus, the logarithm of the inverse of a matrix is the negative of the logarithm of the matrix.
   have h_log_inv : A⁻¹.log = A.cfc (Real.log ∘ (·⁻¹)) := by
-    have h_log_inv : A⁻¹ = A.cfc (·⁻¹) :=
-      Eq.symm HermitianMat.cfc_inv
+    have h_log_inv : A⁻¹ = A.cfc (·⁻¹) := by
+      exact Eq.symm HermitianMat.cfc_inv;
     rw [ h_log_inv, HermitianMat.log ];
     exact Eq.symm (HermitianMat.cfc_comp A (fun x => x⁻¹) Real.log);
   simp [ HermitianMat.log ];
@@ -979,8 +979,8 @@ private lemma MState.approx_by_pd
       constructor <;> simp_all
       · simp_all [ Matrix.IsHermitian, Matrix.conjTranspose_add, Matrix.conjTranspose_smul ];
       · intro x hx_ne_zero
-        have h_pos : 0 < (1 - ε) * (star x ⬝ᵥ A *ᵥ x) + ε * (star x ⬝ᵥ B *ᵥ x) :=
-          add_pos_of_nonneg_of_pos ( mul_nonneg ( sub_nonneg.2 <| mod_cast hε.2.le ) <| mod_cast hA.2 x ) <| mul_pos ( mod_cast hε.1 ) <| mod_cast hB.2 hx_ne_zero;
+        have h_pos : 0 < (1 - ε) * (star x ⬝ᵥ A *ᵥ x) + ε * (star x ⬝ᵥ B *ᵥ x) := by
+          exact add_pos_of_nonneg_of_pos ( mul_nonneg ( sub_nonneg.2 <| mod_cast hε.2.le ) <| mod_cast hA.2 x ) <| mul_pos ( mod_cast hε.1 ) <| mod_cast hB.2 hx_ne_zero;
         convert h_pos using 1 ; simp [ Matrix.add_mulVec ] ; ring_nf!
         simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm, sub_mul, mul_sub ] ; ring!;
     convert! h_pos_def _ _ _ _ _ ⟨ _, _ ⟩ <;> norm_num [ * ];
@@ -990,8 +990,8 @@ private lemma MState.approx_by_pd
     · exact one_div_pos.mpr ( by linarith );
     · exact div_lt_one ( by positivity ) |>.2 ( by linarith )
   · -- Show that the sequence ρn converges to ρ.
-    have h_conv : Filter.Tendsto (fun n => εn n • (MState.uniform : MState d₁).M + (1 - εn n) • ρ.M) Filter.atTop (nhds ρ.M) :=
-      le_trans ( Filter.Tendsto.add ( Filter.Tendsto.smul ( tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ( Filter.Tendsto.smul ( tendsto_const_nhds.sub <| tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ) ( by simp );
+    have h_conv : Filter.Tendsto (fun n => εn n • (MState.uniform : MState d₁).M + (1 - εn n) • ρ.M) Filter.atTop (nhds ρ.M) := by
+      exact le_trans ( Filter.Tendsto.add ( Filter.Tendsto.smul ( tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ( Filter.Tendsto.smul ( tendsto_const_nhds.sub <| tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ) ( by simp );
     rw [ tendsto_iff_dist_tendsto_zero ] at *;
     convert h_conv using 1;
     ext n; simp [ρn, Mixable.mix];
@@ -1003,8 +1003,8 @@ private lemma MState.traceLeft_continuous :
     Continuous (MState.traceLeft : MState (d₁ × d₂) → MState d₂) := by
   -- Since the matrix traceLeft is continuous, the function that maps a state to its partial trace is also continuous.
   have h_traceLeft_cont : Continuous (fun ρ : HermitianMat (d₁ × d₂) ℂ => ρ.traceLeft) := by
-    have h_cont : Continuous (fun ρ : Matrix (d₁ × d₂) (d₁ × d₂) ℂ => ρ.traceLeft) :=
-      continuous_pi fun _ => continuous_pi fun _ => continuous_finsetSum _ fun _ _ => continuous_apply _ |> Continuous.comp <| continuous_apply _ |> Continuous.comp <| continuous_id';
+    have h_cont : Continuous (fun ρ : Matrix (d₁ × d₂) (d₁ × d₂) ℂ => ρ.traceLeft) := by
+      exact continuous_pi fun _ => continuous_pi fun _ => continuous_finsetSum _ fun _ _ => continuous_apply _ |> Continuous.comp <| continuous_apply _ |> Continuous.comp <| continuous_id';
     convert h_cont.comp ( show Continuous fun ρ : HermitianMat ( d₁ × d₂ ) ℂ => ρ.1 from ?_ ) using 1;
     · constructor <;> intro h <;> rw [ continuous_induced_rng ] at * <;> aesop;
     · fun_prop;
@@ -1124,8 +1124,8 @@ private lemma purify_AB_traceRight_eq (ρ : MState (dA × dB × dC)) :
     Sᵥₙ ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceRight =
     Sᵥₙ ρ.assoc'.traceRight := by
   have h_traceRight : ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceRight = ρ.assoc'.traceRight := by
-    have h_traceRight : (MState.pure ρ.purify).traceRight = ρ :=
-      MState.purify_spec ρ
+    have h_traceRight : (MState.pure ρ.purify).traceRight = ρ := by
+      exact MState.purify_spec ρ;
     convert congr_arg ( fun m => m.assoc'.traceRight ) h_traceRight using 1;
     ext i j; simp [ MState.traceRight, MState.assoc' ] ;
     simp [ HermitianMat.traceRight, MState.SWAP, MState.assoc ];

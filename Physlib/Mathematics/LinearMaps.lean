@@ -190,7 +190,7 @@ def mk₃ (f : V × V × V→ ℚ) (map_smul : ∀ a S T L, f (a • S, T, L) = 
     (by
       intro S1 S2 T
       rw [swap₁, map_add, swap₁, swap₁ S2 S T])
-    (fun L T ↦ swap₂ S L T)).toLinearMap
+    (by exact fun L T ↦ swap₂ S L T)).toLinearMap
   map_add' S1 S2 := LinearMap.ext fun T ↦ LinearMap.ext fun L => map_add S1 S2 T L
   map_smul' a S :=
     LinearMap.ext fun T => LinearMap.ext fun L => map_smul a S T L

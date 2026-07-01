@@ -845,8 +845,8 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
             C + t • cfcR (fun x : ℝ ↦ 1 / (x + t)) AB
               ≤ C
                 + ((t * (1 - u)) • cfcR (fun x : ℝ ↦ 1 / (x + t)) A
-                  + (t * u) • cfcR (fun x : ℝ ↦ 1 / (x + t)) B) :=
-          add_le_add_right hscale C
+                  + (t * u) • cfcR (fun x : ℝ ↦ 1 / (x + t)) B) := by
+          exact add_le_add_right hscale C
         have hR :
             C
                 + ((t * (1 - u)) • cfcR (fun x : ℝ ↦ 1 / (x + t)) A
@@ -1341,8 +1341,8 @@ private lemma convexOn_G_rpowIntegrand₀₁_mul {q : NNReal} (hq_real : (q : �
     Real.rpow_nonneg (le_of_lt htpos) _
   have hs : Convex ℝ (Set.Ici (0 : 𝓐)) := convex_Ici (𝕜 := ℝ) (0 : 𝓐)
   have h_aff : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ X - algebraMap ℝ (𝓐) t) := by
-    have hid : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ X) :=
-      convexOn_id (𝕜 := ℝ) (s := Set.Ici (0 : 𝓐)) hs
+    have hid : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun X : 𝓐 ↦ X) := by
+      exact convexOn_id (𝕜 := ℝ) (s := Set.Ici (0 : 𝓐)) hs
     have hconst : ConvexOn ℝ (Set.Ici (0 : 𝓐)) (fun _ : 𝓐 ↦ -algebraMap ℝ (𝓐) t) :=
       convexOn_const (-algebraMap ℝ (𝓐) t) hs
     simp_all [sub_eq_add_neg]
@@ -1624,8 +1624,8 @@ private lemma square_convexity_diff_hCC_sum (A B : 𝓐) (u : ℝ) :
   have hAA' :
       ((1 - u) • A) * ((1 - u) • A) = ((1 - u) * (1 - u)) • (A * A) := by
     calc
-      ((1 - u) • A) * ((1 - u) • A) = (1 - u) • (A * ((1 - u) • A)) :=
-        Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) (1 - u) A ((1 - u) • A)
+      ((1 - u) • A) * ((1 - u) • A) = (1 - u) • (A * ((1 - u) • A)) := by
+        exact Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) (1 - u) A ((1 - u) • A)
       _ = (1 - u) • ((1 - u) • (A * A)) := by
         rw [Algebra.mul_smul_comm]
       _ = ((1 - u) * (1 - u)) • (A * A) := by
@@ -1633,8 +1633,8 @@ private lemma square_convexity_diff_hCC_sum (A B : 𝓐) (u : ℝ) :
   have hAB' :
       ((1 - u) • A) * (u • B) = ((1 - u) * u) • (A * B) := by
     calc
-      ((1 - u) • A) * (u • B) = (1 - u) • (A * (u • B)) :=
-        Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) (1 - u) A (u • B)
+      ((1 - u) • A) * (u • B) = (1 - u) • (A * (u • B)) := by
+        exact Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) (1 - u) A (u • B)
       _ = (1 - u) • (u • (A * B)) := by
         rw [Algebra.mul_smul_comm]
       _ = ((1 - u) * u) • (A * B) := by
@@ -1642,8 +1642,8 @@ private lemma square_convexity_diff_hCC_sum (A B : 𝓐) (u : ℝ) :
   have hBA' :
       (u • B) * ((1 - u) • A) = (u * (1 - u)) • (B * A) := by
     calc
-      (u • B) * ((1 - u) • A) = u • (B * ((1 - u) • A)) :=
-        Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) u B ((1 - u) • A)
+      (u • B) * ((1 - u) • A) = u • (B * ((1 - u) • A)) := by
+        exact Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) u B ((1 - u) • A)
       _ = u • ((1 - u) • (B * A)) := by
         simp [Algebra.mul_smul_comm]
       _ = (u * (1 - u)) • (B * A) := by
@@ -1651,8 +1651,8 @@ private lemma square_convexity_diff_hCC_sum (A B : 𝓐) (u : ℝ) :
   have hBB' :
       (u • B) * (u • B) = (u * u) • (B * B) := by
     calc
-      (u • B) * (u • B) = u • (B * (u • B)) :=
-        Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) u B (u • B)
+      (u • B) * (u • B) = u • (B * (u • B)) := by
+        exact Algebra.smul_mul_assoc (R := ℝ) (A := 𝓐) u B (u • B)
       _ = u • (u • (B * B)) := by
         simp [Algebra.mul_smul_comm]
       _ = (u * u) • (B * B) := by

@@ -512,8 +512,8 @@ lemma adjFDeriv_apply
             rw [(DifferentiableAt.hasAdjFDerivAt
               (hφ.differentiable y)).hasAdjoint_fderiv.adjoint_inner_left]
         _ = ∑ i, ∫ (y : X), bX.repr (ψ y) i * fderiv ℝ (fun y' => ⟪dy, φ y' ⟫_ℝ) y (bX i) := by
-            have h (y : X) : ψ y = ∑ i, bX.repr (ψ y) i • bX i :=
-              Eq.symm (Basis.sum_equivFun bX (ψ y))
+            have h (y : X) : ψ y = ∑ i, bX.repr (ψ y) i • bX i := by
+              exact Eq.symm (Basis.sum_equivFun bX (ψ y))
             conv_lhs =>
               enter [2, y]
               rw [h]

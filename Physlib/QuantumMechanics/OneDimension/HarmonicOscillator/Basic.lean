@@ -42,12 +42,12 @@ lemma Complex.ofReal_hasDerivAt : HasDerivAt Complex.ofReal 1 x := by
   exact hasDerivAt_id _
 
 @[simp]
-lemma Complex.deriv_ofReal : deriv Complex.ofReal x = 1 :=
-  HasDerivAt.deriv Complex.ofReal_hasDerivAt
+lemma Complex.deriv_ofReal : deriv Complex.ofReal x = 1 := by
+  exact HasDerivAt.deriv Complex.ofReal_hasDerivAt
 
 @[fun_prop]
-lemma Complex.differentiableAt_ofReal : DifferentiableAt ℝ Complex.ofReal x :=
-  HasFDerivAt.differentiableAt Complex.ofReal_hasDerivAt
+lemma Complex.differentiableAt_ofReal : DifferentiableAt ℝ Complex.ofReal x := by
+  exact HasFDerivAt.differentiableAt Complex.ofReal_hasDerivAt
 
 /-!
 

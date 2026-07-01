@@ -27,8 +27,8 @@ noncomputable section
 
 theorem Matrix.IsHermitian.log_smul_of_ne_zero {A : Matrix d d 𝕜} (hA : A.IsHermitian) (hx : x ≠ 0) :
     cfc Real.log (x • A) = (Real.log x) • cfc (if · = 0 then (0 : ℝ) else 1) A + cfc Real.log A := by
-  have hCFC : cfc (Real.log ∘ (x * ·)) A = cfc Real.log (x • A) :=
-    cfc_comp_smul x Real.log _ (by fun_prop) hA
+  have hCFC : cfc (Real.log ∘ (x * ·)) A = cfc Real.log (x • A) := by
+    exact cfc_comp_smul x Real.log _ (by fun_prop) hA
   rw [← hCFC, ← cfc_smul, ← cfc_add]
   apply cfc_congr
   intro t ht
@@ -62,8 +62,8 @@ theorem reindex_exp (e : d ≃ d₂) : (A.reindex e).exp = A.exp.reindex e :=
   cfc_reindex A Real.exp e
 
 variable (A) in
-instance nonSingular_exp : NonSingular A.exp :=
-  cfc_nonSingular A Real.exp (fun _ => Real.exp_ne_zero _)
+instance nonSingular_exp : NonSingular A.exp := by
+  exact cfc_nonSingular A Real.exp (fun i ↦ by positivity)
 
 /-- The matrix exponential of a Hermitian matrix is nonnegative. -/
 theorem exp_nonneg (A : HermitianMat d 𝕜) : 0 ≤ A.exp := by
@@ -145,8 +145,8 @@ theorem inv_antitone (hA : A.mat.PosDef) (h : A ≤ B) : B⁻¹ ≤ A⁻¹ := by
     simp_all only [sub_nonneg]
     exact h
   -- Using the fact that $B = A + C^*C$, we can write $B^{-1}$ as $(A + C^*C)^{-1}$.
-  have h_inv_posDef : (1 + C * A.mat⁻¹ * C.conjTranspose).PosDef :=
-    Matrix.PosDef.one.add_posSemidef (hA.inv.posSemidef.mul_mul_conjTranspose_same C)
+  have h_inv_posDef : (1 + C * A.mat⁻¹ * C.conjTranspose).PosDef := by
+    exact Matrix.PosDef.one.add_posSemidef (hA.inv.posSemidef.mul_mul_conjTranspose_same C)
   have hB_inv : B.mat⁻¹ = A.mat⁻¹ - A.mat⁻¹ * C.conjTranspose * (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ * C * A.mat⁻¹ := by
     have hB_inv : (A.mat + C.conjTranspose * C)⁻¹ = A.mat⁻¹ - A.mat⁻¹ * C.conjTranspose * (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ * C * A.mat⁻¹ := by
       have hB_inv : (A.mat + C.conjTranspose * C) * (A.mat⁻¹ - A.mat⁻¹ * C.conjTranspose * (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ * C * A.mat⁻¹) = 1 := by
@@ -220,10 +220,10 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
         refine' ContinuousAt.continuousWithinAt _;
         have h_inv_cont : ContinuousAt (fun m : Matrix d d 𝕜 => m⁻¹) m.mat := by
           have h_inv_cont : ContinuousAt (fun m : Matrix d d 𝕜 => m⁻¹) m.mat := by
-            have h_det_cont : ContinuousAt (fun m : Matrix d d 𝕜 => m.det) m.mat :=
-              Continuous.continuousAt continuous_id.matrix_det
-            have h_adj_cont : ContinuousAt (fun m : Matrix d d 𝕜 => m.adjugate) m.mat :=
-              Continuous.continuousAt continuous_id.matrix_adjugate
+            have h_det_cont : ContinuousAt (fun m : Matrix d d 𝕜 => m.det) m.mat := by
+              exact Continuous.continuousAt ( continuous_id.matrix_det )
+            have h_adj_cont : ContinuousAt (fun m : Matrix d d 𝕜 => m.adjugate) m.mat := by
+              exact Continuous.continuousAt ( continuous_id.matrix_adjugate )
             simp_all [ Matrix.inv_def ];
             exact ContinuousAt.smul ( h_det_cont.inv₀ ( by simpa using hm.det_pos.ne' ) ) h_adj_cont;
           exact h_inv_cont;
@@ -446,8 +446,8 @@ lemma inv_convex {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.mat.Pos
       have h_block_pos : ∀ A : Matrix d d 𝕜, A.PosDef → (Matrix.fromBlocks A 1 1 A⁻¹).PosSemidef := by
         intro A hA
         have h_block_pos : (Matrix.fromBlocks A (1 : Matrix d d 𝕜) (1 : Matrix d d 𝕜) (A⁻¹)).PosSemidef := by
-          have h_inv_pos : A⁻¹.PosSemidef :=
-            hA.inv.posSemidef
+          have h_inv_pos : A⁻¹.PosSemidef := by
+            exact hA.inv.posSemidef
           have h_block_pos : (Matrix.fromBlocks A (1 : Matrix d d 𝕜) (1 : Matrix d d 𝕜) (A⁻¹)) = (Matrix.fromBlocks 1 0 A⁻¹ 1) * (Matrix.fromBlocks A 0 0 (A⁻¹ - A⁻¹ * A * A⁻¹)) * (Matrix.fromBlocks 1 A⁻¹ 0 1) := by
             simp [ Matrix.fromBlocks_multiply ];
             have := hA.det_pos;
@@ -563,13 +563,13 @@ lemma integrable_inv_shift {A : HermitianMat d 𝕜} (hA : A.mat.PosDef) (b : �
     have h_inv_cont : ContinuousAt (fun t : ℝ => (A + t • 1).mat⁻¹) t := by
       have h_det_cont : ContinuousAt (fun t : ℝ => (A + t • 1).mat.det) t := by
         fun_prop (disch := solve_by_elim)
-      have h_adj_cont : ContinuousAt (fun t : ℝ => (A + t • 1).mat.adjugate) t :=
-        Continuous.continuousAt (Continuous.matrix_adjugate <| by continuity)
+      have h_adj_cont : ContinuousAt (fun t : ℝ => (A + t • 1).mat.adjugate) t := by
+        exact Continuous.continuousAt ( by exact Continuous.matrix_adjugate <| by continuity )
       simp_all [ Matrix.inv_def ];
       exact ContinuousAt.smul ( h_det_cont.inv₀ <| by simpa [ Matrix.isUnit_iff_isUnit_det ] using h_inv t ht.1 ) h_adj_cont
     exact h_inv_cont.continuousWithinAt
-  have h_inv_cont : ContinuousOn (fun t : ℝ => (A + t • 1)⁻¹) (Set.Icc 0 b) :=
-    (continuousOn_iff_coe fun t => (A + t • 1)⁻¹).mpr h_inv_cont
+  have h_inv_cont : ContinuousOn (fun t : ℝ => (A + t • 1)⁻¹) (Set.Icc 0 b) := by
+    exact (continuousOn_iff_coe fun t => (A + t • 1)⁻¹).mpr h_inv_cont
   exact h_inv_cont.intervalIntegrable_of_Icc hb
 
 open ComplexOrder in

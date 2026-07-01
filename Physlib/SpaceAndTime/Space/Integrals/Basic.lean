@@ -42,8 +42,8 @@ open InnerProductSpace MeasureTheory
 
 -/
 
-lemma volume_eq_addHaar {d} : (volume (α := Space d)) = Space.basis.toBasis.addHaar :=
-  (OrthonormalBasis.addHaar_eq_volume _).symm
+lemma volume_eq_addHaar {d} : (volume (α := Space d)) = Space.basis.toBasis.addHaar := by
+  exact (OrthonormalBasis.addHaar_eq_volume _).symm
 
 @[simp]
 lemma volume_metricBall_three :

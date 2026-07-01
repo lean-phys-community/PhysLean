@@ -57,8 +57,8 @@ theorem Matrix.submatrix_one_isometry {e : d₂ → d} {f : d₃ → d} (he : e.
     obtain ⟨ x, hx ⟩ := h_unique i;
     rw [show ( Finset.univ.filter fun y => e y = f i ) = { x } from Finset.eq_singleton_iff_unique_mem.2 ⟨ by aesop, fun y hy => hx.2 y <| Eq.symm <| Finset.mem_filter.1 hy |>.2.symm ⟩] ; simp ;
   next h => -- Since $e$ is injective and $e i \neq e j$, there is no $x$ such that $e i = f x$ and $e j = f x$.
-    have h_no_x : ∀ x : d₂, ¬(e x = f i ∧ e x = f j) :=
-      fun x hx => h ( hf ( hx.1.symm.trans hx.2 ) );
+    have h_no_x : ∀ x : d₂, ¬(e x = f i ∧ e x = f j) := by
+      exact fun x hx => h ( hf ( hx.1.symm.trans hx.2 ) );
     exact Finset.sum_eq_zero fun x hx => by specialize h_no_x x; aesop
 
 omit [DecidableEq d₂] in
@@ -135,8 +135,8 @@ theorem Matrix.IsHermitian.eigenvalue_ext (hA : A.IsHermitian)
         have h_diag : ∀ v : EuclideanSpace 𝕜 d, ∃ c : d → 𝕜, v = ∑ i, c i • (hA.eigenvectorBasis i) := by
           intro v
           set c := fun i => innerₛₗ 𝕜 (hA.eigenvectorBasis i) v
-          have hv : v = ∑ i, c i • (hA.eigenvectorBasis i) :=
-            Eq.symm (OrthonormalBasis.sum_repr' hA.eigenvectorBasis v)
+          have hv : v = ∑ i, c i • (hA.eigenvectorBasis i) := by
+            exact Eq.symm (OrthonormalBasis.sum_repr' hA.eigenvectorBasis v)
           use c;
         obtain ⟨c, hc⟩ := h_diag (WithLp.toLp 2 v)
         use c

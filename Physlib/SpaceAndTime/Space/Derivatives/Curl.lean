@@ -280,7 +280,7 @@ private noncomputable def homotopyOperatorIntegrand (f : Space → EuclideanSpac
   Space → ℝ → EuclideanSpace ℝ (Fin 3) := fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x)
 
 private lemma homotopyOperatorIntegrand_eq (f : Space → EuclideanSpace ℝ (Fin 3)) :
-    homotopyOperatorIntegrand f = fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x) := rfl
+    homotopyOperatorIntegrand f = fun x t => (t • basis.repr x) ⨯ₑ₃ f (t • x) := by rfl
 @[fun_prop]
 private lemma differentiable_homotopyOperatorIntegrand_space {f : Space → EuclideanSpace ℝ (Fin 3)}
     (hf : Differentiable ℝ f) (t : ℝ) :
@@ -451,11 +451,11 @@ private lemma deriv_intervalIntegral_homotopyOperatorIntegrand_sub
     fderiv ℝ (homotopyOperatorIntegrand f · t) x₀ (basis j) m) ∂(volume) := by
   let F : Space → ℝ → EuclideanSpace ℝ (Fin 3) := homotopyOperatorIntegrand f
   let F' : Space → ℝ → Space →L[ℝ] EuclideanSpace ℝ (Fin 3) := fun x t => fderiv ℝ (F · t) x
-  have F'_continuous : Continuous (Function.uncurry F') :=
-    continuous_uncurry_fderiv_homotopyOperatorIntegrand (hf)
+  have F'_continuous : Continuous (Function.uncurry F') := by
+    exact continuous_uncurry_fderiv_homotopyOperatorIntegrand (hf)
   have hfderiv (x₀ : Space) : HasFDerivAt (fun (x : Space) => ∫ (t : ℝ) in 0..1, F x t ∂(volume))
-      (∫ (t : ℝ) in 0..1, F' x₀ t ∂(volume)) x₀ :=
-    hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) x₀
+      (∫ (t : ℝ) in 0..1, F' x₀ t ∂(volume)) x₀ := by
+    exact hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) x₀
   have F'_apply_apply (x₀ : Space) (y : Space) (i : Fin 3) :
       ((∫ (t : ℝ) in 0..1, F' x₀ t) y).ofLp i =
       (∫ (t : ℝ) in 0..1, F' x₀ t y i) := by
@@ -632,7 +632,7 @@ lemma exists_grad_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
       ⟪(basis.repr.symm (fderiv ℝ f a x)), y⟫_ℝ:= by
     calc _
       _ = (fderiv ℝ (InnerProductSpace.toDual ℝ _ ∘
-        fun a => (basis.repr.symm (f a))) a x) y := rfl
+        fun a => (basis.repr.symm (f a))) a x) y := by rfl
     rw [fderiv_comp _ (by exact
       (InnerProductSpace.toDual ℝ (Space)).differentiable.differentiableAt) (by fun_prop)]
     erw [(InnerProductSpace.toDual ℝ (Space)).fderiv]

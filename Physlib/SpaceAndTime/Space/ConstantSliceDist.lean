@@ -275,11 +275,11 @@ lemma schwartzMap_slice_integral_hasFDerivAt {d : ℕ} (η : 𝓢(Space d.succ, 
   have hF : ∀ t, ∀ x, HasFDerivAt (F · t) (F' x t) x := by
     intro t x
     dsimp only [F, F']
-    exact
-      ((η.smooth'.differentiable (by simp)).comp (by fun_prop)).differentiableAt.hasFDerivAt
+    refine DifferentiableAt.hasFDerivAt ?_
+    exact ((η.smooth'.differentiable (by simp)).comp (by fun_prop)).differentiableAt
   obtain ⟨rt, hrt⟩ := schwartzMap_slice_bound (m := 0) (n := 1) (d := d) i
   obtain ⟨k, hrt, hbound, k_eq⟩ := hrt η
-  suffices HasFDerivAt (fun x => ∫ (a : ℝ), F x a) (∫ (a : ℝ), F' x₀ a) x₀ from this
+  suffices h1 : HasFDerivAt (fun x => ∫ (a : ℝ), F x a) (∫ (a : ℝ), F' x₀ a) x₀ by exact h1
   apply hasFDerivAt_integral_of_dominated_of_fderiv_le
     (bound := fun t => (k * ‖(slice i).symm.toContinuousLinearMap.comp
           (ContinuousLinearMap.prod (0 : Space d →L[ℝ] ℝ) (ContinuousLinearMap.id ℝ (Space d)))‖)
@@ -610,7 +610,7 @@ lemma distDeriv_constantSliceDist_same {M : Type} [NormedAddCommGroup M] [Normed
   ext x
   simp [sliceSchwartz_apply]
   calc _
-    _ = ∫ r, fderiv ℝ η ((slice i).symm (r, x)) (basis i) := rfl
+    _ = ∫ r, fderiv ℝ η ((slice i).symm (r, x)) (basis i) := by rfl
     _ = ∫ r, fderiv ℝ (fun r => η ((slice i).symm (r, x))) r 1 := by
         congr
         funext r

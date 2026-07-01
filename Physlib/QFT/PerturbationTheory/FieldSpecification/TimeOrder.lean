@@ -120,13 +120,13 @@ def maxTimeFieldPosFin (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
 lemma lt_maxTimeFieldPosFin_not_timeOrder (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (i : Fin (eraseMaxTimeField φ φs).length)
     (hi : (maxTimeFieldPosFin φ φs).succAbove i < maxTimeFieldPosFin φ φs) :
-    ¬ timeOrderRel ((eraseMaxTimeField φ φs)[i.val]) (maxTimeField φ φs) :=
-  insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt timeOrderRel φ φs i hi
+    ¬ timeOrderRel ((eraseMaxTimeField φ φs)[i.val]) (maxTimeField φ φs) := by
+  exact insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt timeOrderRel φ φs i hi
 
 lemma timeOrder_maxTimeField (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (i : Fin (eraseMaxTimeField φ φs).length) :
-    timeOrderRel (maxTimeField φ φs) ((eraseMaxTimeField φ φs)[i.val]) :=
-  insertionSortMin_lt_mem_insertionSortDropMinPos timeOrderRel φ φs _
+    timeOrderRel (maxTimeField φ φs) ((eraseMaxTimeField φ φs)[i.val]) := by
+  exact insertionSortMin_lt_mem_insertionSortDropMinPos timeOrderRel φ φs _
 
 /-- The sign associated with putting a list of states into time order (with
   the state of greatest time to the left).
@@ -182,8 +182,8 @@ lemma timeOrderList_nil : timeOrderList (𝓕 := 𝓕) [] = [] := by
   simp [timeOrderList]
 
 lemma timeOrderList_eq_maxTimeField_timeOrderList (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
-    timeOrderList (φ :: φs) = maxTimeField φ φs :: timeOrderList (eraseMaxTimeField φ φs) :=
-  insertionSort_eq_insertionSortMin_cons timeOrderRel φ φs
+    timeOrderList (φ :: φs) = maxTimeField φ φs :: timeOrderList (eraseMaxTimeField φ φs) := by
+  exact insertionSort_eq_insertionSortMin_cons timeOrderRel φ φs
 
 /-!
 
@@ -226,8 +226,8 @@ instance : IsTrans 𝓕.CrAnFieldOp 𝓕.crAnTimeOrderRel where
   trans a b c := IsTrans.trans (r := 𝓕.timeOrderRel) a.1 b.1 c.1
 
 @[simp]
-lemma crAnTimeOrderRel_refl (φ : 𝓕.CrAnFieldOp) : crAnTimeOrderRel φ φ :=
-  (Std.Total.to_refl (r := 𝓕.crAnTimeOrderRel)).refl φ
+lemma crAnTimeOrderRel_refl (φ : 𝓕.CrAnFieldOp) : crAnTimeOrderRel φ φ := by
+  exact (Std.Total.to_refl (r := 𝓕.crAnTimeOrderRel)).refl φ
 
 /-- For a field specification `𝓕`, and a list `φs` of `𝓕.CrAnFieldOp`,
   `𝓕.crAnTimeOrderSign φs` is the sign corresponding to the number of `ferimionic`-`fermionic`
@@ -255,8 +255,8 @@ lemma crAnTimeOrderSign_pair_not_ordered {φ ψ : 𝓕.CrAnFieldOp} (h : ¬ crAn
 
 lemma crAnTimeOrderSign_swap_eq_time {φ ψ : 𝓕.CrAnFieldOp}
     (h1 : crAnTimeOrderRel φ ψ) (h2 : crAnTimeOrderRel ψ φ) (φs φs' : List 𝓕.CrAnFieldOp) :
-    crAnTimeOrderSign (φs ++ φ :: ψ :: φs') = crAnTimeOrderSign (φs ++ ψ :: φ :: φs') :=
-  Wick.koszulSign_swap_eq_rel _ _ h1 h2 _ _
+    crAnTimeOrderSign (φs ++ φ :: ψ :: φs') = crAnTimeOrderSign (φs ++ ψ :: φ :: φs') := by
+  exact Wick.koszulSign_swap_eq_rel _ _ h1 h2 _ _
 
 /-- For a field specification `𝓕`, and a list `φs` of `𝓕.CrAnFieldOp`,
   `𝓕.crAnTimeOrderList φs` is the list `φs` time-ordered using the insertion sort algorithm. -/

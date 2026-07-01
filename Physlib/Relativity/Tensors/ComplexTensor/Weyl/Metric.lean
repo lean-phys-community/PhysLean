@@ -276,8 +276,8 @@ lemma leftDualContraction_apply_metric :
       (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
       TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
       (leftMetric 1) ⊗ₜ[ℂ] (dualLeftMetric 1)) = dualLeftLeftUnit (1 : ℂ) := by
-  rw [leftMetric_apply_one, dualLeftMetric_apply_one, leftMetricVal_expand_tmul',
-    dualLeftMetricVal_expand_tmul]
+  rw [leftMetric_apply_one, dualLeftMetric_apply_one]
+  rw [leftMetricVal_expand_tmul', dualLeftMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub, assoc_tmul, LinearMap.lTensor_tmul,
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,

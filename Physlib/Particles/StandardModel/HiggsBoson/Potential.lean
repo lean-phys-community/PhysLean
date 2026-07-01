@@ -77,10 +77,10 @@ lemma toFun_neg (φ : HiggsField) (x : SpaceTime) : P.neg.toFun φ x = - P.toFun
   ring
 
 @[simp]
-lemma μ2_neg : P.neg.μ2 = - P.μ2 := rfl
+lemma μ2_neg : P.neg.μ2 = - P.μ2 := by rfl
 
 @[simp]
-lemma 𝓵_neg : P.neg.𝓵 = - P.𝓵 := rfl
+lemma 𝓵_neg : P.neg.𝓵 = - P.𝓵 := by rfl
 
 /-!
 

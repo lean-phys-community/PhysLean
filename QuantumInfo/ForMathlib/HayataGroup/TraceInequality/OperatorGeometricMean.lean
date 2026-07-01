@@ -31,9 +31,9 @@ private lemma rpow_continuousOn_Ici (p : ℝ) (hp : 0 ≤ p) :
 omit [Nontrivial ℋ] in
 private lemma operatorConcaveOn_Ioi_of_Ici {f : ℝ → ℝ}
     (h : OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) f) :
-    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) f :=
-  fun _ _ _ hA hB ht0 ht1 hAs hBs =>
-    h hA hB ht0 ht1 (Set.Subset.trans hAs Set.Ioi_subset_Ici_self)
+    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) f := by
+  intro A B t hA hB ht0 ht1 hAs hBs
+  exact h hA hB ht0 ht1 (Set.Subset.trans hAs Set.Ioi_subset_Ici_self)
       (Set.Subset.trans hBs Set.Ioi_subset_Ici_self)
 
 omit [Nontrivial ℋ] in

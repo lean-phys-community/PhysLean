@@ -163,7 +163,7 @@ theorem id_MState (ρ : MState dIn) : CPTPMap.id (dIn := dIn) ρ = ρ := by
 /-- The map `CPTPMap.id` composed with any map is the same map. -/
 @[simp]
 theorem id_compose [DecidableEq dOut] (Λ : CPTPMap dIn dOut) : id ∘ₘ Λ = Λ := by
-  ext ρ
+  apply funext
   simp
 
 /-- Any map composed with `CPTPMap.id` is the same map. -/
@@ -182,7 +182,7 @@ variable [DecidableEq dOut]
 def ofEquiv (σ : dIn ≃ dOut) : CPTPMap dIn dOut where
   toLinearMap := MatrixMap.submatrix ℂ σ.symm
   cp := .submatrix σ.symm
-  TP := MatrixMap.IsTracePreserving.submatrix σ.symm
+  TP x := by rw [MatrixMap.IsTracePreserving.submatrix]
 
 @[simp]
 theorem ofEquiv_apply (σ : dIn ≃ dOut) (ρ : MState dIn) :

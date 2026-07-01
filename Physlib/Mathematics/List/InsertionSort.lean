@@ -294,8 +294,8 @@ lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Pro
       conv_lhs => simp [insertionSortEquiv]
       rw [insertionSortEquiv_orderedInsert_append r a]
       have hl : (List.insertionSort r (List.orderedInsert r a l1 ++ a2 :: l2)) =
-        List.insertionSort r (a :: l1 ++ a2 :: l2) :=
-        insertionSort_orderedInsert_append r a l1 (a2 :: l2)
+        List.insertionSort r (a :: l1 ++ a2 :: l2) := by
+        exact insertionSort_orderedInsert_append r a l1 (a2 :: l2)
       rw [orderedInsertEquiv_congr _ _ _ hl]
       conv_lhs =>
         enter [2, 1, 2, 1]
@@ -331,8 +331,8 @@ lemma insertionSortEquiv_insertionSort_append {α : Type} (r : α → α → Pro
       equivCons_succ]
     erw [ih]
     have hl : (List.insertionSort r (List.insertionSort r l1 ++ a :: l2)) =
-        (List.insertionSort r (l1 ++ a :: l2)) :=
-      insertionSort_insertionSort_append r l1 (a :: l2)
+        (List.insertionSort r (l1 ++ a :: l2)) := by
+      exact insertionSort_insertionSort_append r l1 (a :: l2)
     erw [orderedInsertEquiv_congr _ _ _ hl]
     simp only [List.foldr_cons, finCongr_apply]
     rfl
@@ -379,8 +379,8 @@ lemma orderedInsert_filter_of_pos {α : Type} (r : α → α → Prop) [Decidabl
         simp only [List.pairwise_cons] at hl
         apply hl.1
         have hlf : (List.filter (fun b => decide (p b)) l)[0] ∈
-            (List.filter (fun b => decide (p b)) l) :=
-          List.getElem_mem c
+            (List.filter (fun b => decide (p b)) l) := by
+          exact List.getElem_mem c
         simp only [List.mem_filter, decide_eq_true_eq] at hlf
         exact hlf.1
       rw [hl]
@@ -505,7 +505,7 @@ lemma filter_rel_eq_insertionSort {α : Type} (r : α → α → Prop) [Decidabl
     simp only [List.insertionSort]
     by_cases h : r a b ∧ r b a
     · have hl := orderedInsert_filter_of_pos r b (fun c => r a c ∧ r c a) h
-        (List.insertionSort r l) (List.pairwise_insertionSort r l)
+        (List.insertionSort r l) (by exact List.pairwise_insertionSort r l)
       simp only [Bool.decide_and] at hl ⊢
       erw [hl]
       rw [List.orderedInsert_eq_take_drop]

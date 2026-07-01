@@ -170,8 +170,8 @@ lemma signInsertNone_eq_prod_getDual?_Some (φ : 𝓕.FieldOp) (φs : List 𝓕.
   · rw [Finset.prod_sigma']
     rfl
   rw [← φsΛ.sigmaContractedEquiv.symm.prod_comp]
-  let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} :=
-    (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
+  let e2 : Fin φs.length ≃ {x // (φsΛ.getDual? x).isSome} ⊕ {x // ¬ (φsΛ.getDual? x).isSome} := by
+    exact (Equiv.sumCompl fun a => (φsΛ.getDual? a).isSome = true).symm
   rw [← e2.symm.prod_comp]
   simp only [Fin.getElem_fin, Fintype.prod_sum_type]
   conv_rhs =>

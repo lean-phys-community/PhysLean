@@ -595,8 +595,8 @@ lemma mem_viableCharges_iff' {I} {x : ChargeSpectrum} :
     ¬ IsPhenoConstrained x ∧ ¬ YukawaGeneratesDangerousAtLevel x 1 ∧ IsComplete x := by
   constructor
   · intro h
-    have h1 : x ∈ ofFinset I.allowedBarFiveCharges I.allowedTenCharges :=
-      viableCharges_mem_ofFinset I x h
+    have h1 : x ∈ ofFinset I.allowedBarFiveCharges I.allowedTenCharges := by
+      exact viableCharges_mem_ofFinset I x h
     rw [mem_viableCharges_iff h1] at h
     exact ⟨h1, h⟩
   · rintro ⟨h1, h⟩

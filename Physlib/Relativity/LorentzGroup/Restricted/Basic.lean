@@ -34,12 +34,12 @@ def restricted (d : ℕ) : Subgroup (LorentzGroup d) where
   mul_mem' := by
     rintro Λ₁ Λ₂ ⟨Λ₁_proper, Λ₁_ortho⟩ ⟨Λ₂_proper, Λ₂_ortho⟩
     exact ⟨
-      isProper_mul Λ₁_proper Λ₂_proper,
-      isOrthochronous_mul Λ₁_ortho Λ₂_ortho⟩
+      by exact isProper_mul Λ₁_proper Λ₂_proper,
+      by exact isOrthochronous_mul Λ₁_ortho Λ₂_ortho⟩
   inv_mem' := by
     rintro Λ ⟨Λ_proper, Λ_ortho⟩
 
-    have h_η₀₀ : @minkowskiMatrix d (Sum.inl 0) (Sum.inl 0) = 1 := rfl
+    have h_η₀₀ : @minkowskiMatrix d (Sum.inl 0) (Sum.inl 0) = 1 := by rfl
     have h_dual : (dual Λ.1) (Sum.inl 0) (Sum.inl 0) = Λ.1 (Sum.inl 0) (Sum.inl 0) := by
       rw [dual_apply, h_η₀₀, one_mul, mul_one]
 

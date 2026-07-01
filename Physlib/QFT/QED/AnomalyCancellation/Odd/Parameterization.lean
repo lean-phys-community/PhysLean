@@ -110,8 +110,8 @@ lemma generic_or_special (S : (PureU1 (2 * n.succ + 1)).Sols) :
     GenericCase S ∨ SpecialCase S := by
   obtain ⟨g, f, h⟩ := span_basis S.1.1
   have h1 : accCubeTriLinSymm (P g) (P g) (P! f) ≠ 0 ∨
-      accCubeTriLinSymm (P g) (P g) (P! f) = 0 :=
-    ne_or_eq _ _
+      accCubeTriLinSymm (P g) (P g) (P! f) = 0 := by
+    exact ne_or_eq _ _
   cases h1 <;> rename_i h1
   · exact Or.inl (genericCase_exists S ⟨g, f, h, h1⟩)
   · exact Or.inr (specialCase_exists S ⟨g, f, h, h1⟩)

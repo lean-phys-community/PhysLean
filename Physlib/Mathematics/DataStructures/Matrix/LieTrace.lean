@@ -133,8 +133,8 @@ lemma exp_series_diag_term_eq {A : Matrix m m 𝕂} (hA : BlockTriangular A id)
 /-- The diagonal of the matrix exponential series equals the scalar exponential series -/
 lemma matrix_exp_series_diag_eq_scalar_series {A : Matrix m m 𝕂} (hA : BlockTriangular A id)
     (i : m) :
-    (∑' n, ((n.factorial : 𝕂)⁻¹ • (A ^ n)) i i) = ∑' n, (n.factorial : 𝕂)⁻¹ • (A i i) ^ n :=
-  tsum_congr (exp_series_diag_term_eq hA · i)
+    (∑' n, ((n.factorial : 𝕂)⁻¹ • (A ^ n)) i i) = ∑' n, (n.factorial : 𝕂)⁻¹ • (A i i) ^ n := by
+  exact tsum_congr (exp_series_diag_term_eq hA · i)
 
 /-- The diagonal of the exponential of an upper-triangular matrix `A` consists of the
 exponentials of the diagonal entries of `A`. -/
@@ -241,8 +241,8 @@ lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
   letI : NormedAlgebra ℂ (Matrix n n ℂ) := Matrix.linftyOpNormedAlgebra
   letI : CompleteSpace (Matrix n n ℂ) := inferInstance
   simp only [exp_eq_tsum ℝ]
-  have hs : Summable (fun k => (k.factorial : ℝ)⁻¹ • A ^ k) :=
-    NormedSpace.expSeries_summable' A
+  have hs : Summable (fun k => (k.factorial : ℝ)⁻¹ • A ^ k) := by
+    exact NormedSpace.expSeries_summable' A
   erw [Matrix.map_tsum (algebraMap ℝ ℂ).toAddMonoidHom RCLike.continuous_ofReal hs]
   apply tsum_congr
   intro k

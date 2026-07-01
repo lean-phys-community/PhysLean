@@ -33,8 +33,8 @@ def subContraction (S : Finset (Finset (Fin φs.length))) (ha : S ⊆ φsΛ.1) :
     exact φsΛ.2.2 i (ha hi) j (ha hj)⟩
 
 lemma mem_of_mem_subContraction {S : Finset (Finset (Fin φs.length))} {hs : S ⊆ φsΛ.1}
-    {a : Finset (Fin φs.length)} (ha : a ∈ (φsΛ.subContraction S hs).1) : a ∈ φsΛ.1 :=
-  hs ha
+    {a : Finset (Fin φs.length)} (ha : a ∈ (φsΛ.subContraction S hs).1) : a ∈ φsΛ.1 := by
+  exact hs ha
 
 /-- Given a Wick contraction `φsΛ`, and a subset `S` of `φsΛ.1`, the Wick contraction
   on the uncontracted list `[φsΛ.subContraction S ha]ᵘᶜ`
@@ -158,8 +158,8 @@ lemma quotContraction_fstFieldOfContract_uncontractedListEmd {S : Finset (Finset
     (uncontractedListEmd ((quotContraction S hs).sndFieldOfContract a))
   · simp only [Finset.mem_map', fstFieldOfContract_mem]
   · simp
-  · exact uncontractedListEmd_strictMono
-      (fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a)
+  · apply uncontractedListEmd_strictMono
+    exact fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a
 
 @[simp]
 lemma quotContraction_sndFieldOfContract_uncontractedListEmd {S : Finset (Finset (Fin φs.length))}
@@ -172,8 +172,8 @@ lemma quotContraction_sndFieldOfContract_uncontractedListEmd {S : Finset (Finset
     (uncontractedListEmd ((quotContraction S hs).fstFieldOfContract a))
   · simp only [Finset.mem_map', fstFieldOfContract_mem]
   · simp
-  · exact uncontractedListEmd_strictMono
-      (fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a)
+  · apply uncontractedListEmd_strictMono
+    exact fstFieldOfContract_lt_sndFieldOfContract (quotContraction S hs) a
 
 lemma quotContraction_gradingCompliant {S : Finset (Finset (Fin φs.length))} {hs : S ⊆ φsΛ.1}
     (hsΛ : φsΛ.GradingCompliant) :

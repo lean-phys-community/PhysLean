@@ -44,7 +44,7 @@ theorem pinching_kraus_commutes (ρ : MState d) (i : spectrum ℝ ρ.m) :
 
 theorem pinching_kraus_mul_self (ρ : MState d) (i : spectrum ℝ ρ.m) :
     (pinching_kraus ρ i).mat * ρ.m = i.val • pinching_kraus ρ i := by
-  unfold MState.m
+  dsimp [MState.m]
   nth_rw 1 [← ρ.M.cfc_id]
   rw [pinching_kraus]
   rw [← ρ.M.mat_cfc_mul, ← HermitianMat.mat_smul]
@@ -123,7 +123,7 @@ theorem pinching_commutes_kraus (σ ρ : MState d) (i : spectrum ℝ σ.m) :
 
 theorem pinching_commutes (ρ σ : MState d) :
     Commute (pinching_map σ ρ).m σ.m := by
-  change (pinching_map σ ρ).M.mat * σ.M.mat = σ.M.mat * (pinching_map σ ρ).M.mat
+  dsimp [MState.m, Commute, SemiconjBy]
   rw [pinchingMap_apply_M]
   simp only [MatrixMap.of_kraus, Function.comp_apply]
   simp only [HermitianMat.conjTranspose_mat, MState.mat_M, LinearMap.coe_sum,
@@ -190,7 +190,7 @@ theorem pinching_bound (ρ σ : MState d) : ρ.M ≤ (↑(Fintype.card (spectrum
   simp only [HermitianMat.mat_finset_sum]
   simp only [Matrix.mul_sum, Matrix.sum_mul, Matrix.sum_mulVec, dotProduct_sum]
   simp only [MState.pure]
-  unfold MState.m
+  dsimp [MState.m]
   --This out to be Cauchy-Schwarz.
   have hschwarz := inner_mul_inner_self_le (𝕜 := ℂ) (E := EuclideanSpace ℂ (↑(spectrum ℝ σ.m)))
     (x := .toLp 2 fun i ↦ 1) (y := .toLp 2 fun k ↦ (
@@ -294,8 +294,8 @@ theorem inner_cfc_pinching_right (ρ σ : MState d) (f : ℝ → ℝ) :
     convert pinching_sum σ using 1;
     simp [HermitianMat.ext_iff ];
     -- Since each pinching_kraus is a projection, multiplying it by itself gives the same projection. Therefore, the sum of the squares is the same as the sum of the pinching_kraus themselves.
-    have h_proj : ∀ k : spectrum ℝ σ.m, (pinching_kraus σ k).mat * (pinching_kraus σ k).mat = (pinching_kraus σ k).mat :=
-      fun k => by simpa [ sq, -pinching_sq_eq_self ] using congr_arg ( fun x : HermitianMat d ℂ => x.mat ) ( pinching_sq_eq_self σ k ) ;
+    have h_proj : ∀ k : spectrum ℝ σ.m, (pinching_kraus σ k).mat * (pinching_kraus σ k).mat = (pinching_kraus σ k).mat := by
+      exact fun k => by simpa [ sq, -pinching_sq_eq_self ] using congr_arg ( fun x : HermitianMat d ℂ => x.mat ) ( pinching_sq_eq_self σ k ) ;
     rw [ Finset.sum_congr rfl fun _ _ => h_proj _ ];
   convert congr_arg ( fun x : Matrix d d ℂ => x.trace.re ) ( congr_arg ( fun x : Matrix d d ℂ => x * ( ρ.m * cfc f σ.m ) ) h_sum_kraus ) using 1;
   · simp [Matrix.sum_mul]

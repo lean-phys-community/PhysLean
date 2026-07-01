@@ -48,8 +48,8 @@ theorem _root_.IsCompact.exists_isMinOn_lowerSemicontinuousOn {α β : Type*}
     -- Since $s$ is compact, the open cover $\{U_x \cap s \mid x \in s\}$ has a finite subcover.
     obtain ⟨t, ht⟩ : ∃ t : Finset β, (∀ x ∈ t, x ∈ s) ∧ s ⊆ ⋃ x ∈ t, U x ∩ s := by
       -- Since $s$ is compact, the open cover $\{U_x \mid x \in s\}$ has a finite subcover.
-      obtain ⟨t, ht⟩ : ∃ t : Finset β, (∀ x ∈ t, x ∈ s) ∧ s ⊆ ⋃ x ∈ t, U x :=
-        hs.elim_nhds_subcover U fun x hx => IsOpen.mem_nhds (hU x hx |>.1) (hU x hx |>.2.1)
+      obtain ⟨t, ht⟩ : ∃ t : Finset β, (∀ x ∈ t, x ∈ s) ∧ s ⊆ ⋃ x ∈ t, U x := by
+        exact hs.elim_nhds_subcover U fun x hx => IsOpen.mem_nhds ( hU x hx |>.1 ) ( hU x hx |>.2.1 );
       exact ⟨ t, ht.1, fun x hx => by rcases Set.mem_iUnion₂.1 ( ht.2 hx ) with ⟨ y, hy, hy' ⟩ ; exact Set.mem_iUnion₂.2 ⟨ y, hy, ⟨ hy', hx ⟩ ⟩ ⟩;
     -- Since $t$ is finite, there exists $x \in t$ such that $f(g(x))$ is minimal.
     obtain ⟨x, hx⟩ : ∃ x ∈ t, ∀ y ∈ t, f (g x) ≤ f (g y) := by

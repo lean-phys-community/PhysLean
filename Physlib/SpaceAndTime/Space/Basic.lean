@@ -151,7 +151,7 @@ lemma vadd_val {d} (v : EuclideanSpace ℝ (Fin d)) (s : Space d) :
 @[simp]
 lemma vadd_apply {d} (v : EuclideanSpace ℝ (Fin d))
     (s : Space d) (i : Fin d) :
-    (v +ᵥ s) i = v i + s i := rfl
+    (v +ᵥ s) i = v i + s i := by rfl
 
 lemma vadd_transitive {d} (s1 s2 : Space d) :
     ∃ v : EuclideanSpace ℝ (Fin d), v +ᵥ s1 = s2 := by

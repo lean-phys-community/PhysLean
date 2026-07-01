@@ -232,7 +232,7 @@ noncomputable def fieldStrength {d} :
 
 lemma fieldStrength_eq_fieldStrengthAux {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :
-    A.fieldStrength ε = A.fieldStrengthAux ε := rfl
+    A.fieldStrength ε = A.fieldStrengthAux ε := by rfl
 /-!
 
 ### A.3. Field strength written in terms of a basis

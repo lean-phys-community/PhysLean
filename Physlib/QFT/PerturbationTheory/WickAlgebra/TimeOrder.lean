@@ -180,7 +180,7 @@ lemma ι_timeOrderF_superCommuteF_superCommuteF {φ1 φ2 φ3 : 𝓕.CrAnFieldOp}
     simp_all [pb]
 
 example (c1 c2 : ℂ) (a : 𝓕.WickAlgebra) : c1 • c2 • a =
-  c2 • c1 • a := smul_comm c1 c2 a
+  c2 • c1 • a := by exact smul_comm c1 c2 a
 lemma ι_timeOrderF_superCommuteF_eq_time {φ ψ : 𝓕.CrAnFieldOp}
     (hφψ : crAnTimeOrderRel φ ψ) (hψφ : crAnTimeOrderRel ψ φ) (a b : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓣ᶠ(a * [ofCrAnOpF φ, ofCrAnOpF ψ]ₛF * b) =
@@ -225,7 +225,7 @@ lemma ι_timeOrderF_superCommuteF_eq_time {φ ψ : 𝓕.CrAnFieldOp}
             trans crAnTimeOrderSign (φs' ++ [φ, ψ] ++ φs)
             simp only [List.append_assoc, List.cons_append, List.nil_append]
             rw [crAnTimeOrderSign]
-            have hp : List.Perm [φ,ψ] [ψ,φ] := List.Perm.swap ψ φ []
+            have hp : List.Perm [φ,ψ] [ψ,φ] := by exact List.Perm.swap ψ φ []
             rw [Wick.koszulSign_perm_eq _ _ φ _ _ _ _ _ hp]
             simp only [List.append_assoc, List.cons_append]
             rfl
@@ -328,8 +328,8 @@ lemma ι_timeOrderF_superCommuteF_ne_time {φ ψ : 𝓕.CrAnFieldOp}
     (hφψ : ¬ (crAnTimeOrderRel φ ψ ∧ crAnTimeOrderRel ψ φ)) (a b : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓣ᶠ(a * [ofCrAnOpF φ, ofCrAnOpF ψ]ₛF * b) = 0 := by
   rw [timeOrderF_timeOrderF_mid]
-  have hφψ : ¬ (crAnTimeOrderRel φ ψ) ∨ ¬ (crAnTimeOrderRel ψ φ) :=
-    Decidable.not_and_iff_or_not.mp hφψ
+  have hφψ : ¬ (crAnTimeOrderRel φ ψ) ∨ ¬ (crAnTimeOrderRel ψ φ) := by
+    exact Decidable.not_and_iff_or_not.mp hφψ
   rcases hφψ with hφψ | hφψ
   · rw [timeOrderF_superCommuteF_ofCrAnOpF_ofCrAnOpF_not_crAnTimeOrderRel]
     simp_all only [false_and, not_false_eq_true, mul_zero, zero_mul, map_zero]

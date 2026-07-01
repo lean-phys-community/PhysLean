@@ -80,7 +80,7 @@ lemma nsmul_val {d : ℕ} (n : ℕ) (a : Space d) :
 
 @[simp]
 lemma nsmul_apply {d : ℕ} (n : ℕ) (a : Space d) (i : Fin d) :
-    (n • a) i = n • (a i) := rfl
+    (n • a) i = n • (a i) := by rfl
 
 lemma eq_vadd_zero {d} (s : Space d) :
     ∃ v : EuclideanSpace ℝ (Fin d), s = v +ᵥ (0 : Space d) := by
@@ -108,7 +108,7 @@ lemma smul_val {d : ℕ} (c : ℝ) (p : Space d) :
 
 @[simp]
 lemma smul_apply {d : ℕ} (c : ℝ) (p : Space d) (i : Fin d) :
-    (c • p) i = c * (p i) := rfl
+    (c • p) i = c * (p i) := by rfl
 
 @[simp]
 lemma smul_vadd_zero {d} (k : ℝ) (v : EuclideanSpace ℝ (Fin d)) :
@@ -166,7 +166,7 @@ lemma neg_val {d : ℕ} (p : Space d) :
 
 @[simp]
 lemma neg_apply {d : ℕ} (p : Space d) (i : Fin d) :
-    (-p) i = - (p i) := rfl
+    (-p) i = - (p i) := by rfl
 
 noncomputable instance {d} : AddCommGroup (Space d) where
   zsmul z p := ⟨fun i => z * p.val i⟩
@@ -189,7 +189,7 @@ lemma sub_apply {d} (p q : Space d) (i : Fin d) :
 
 @[simp]
 lemma sub_val {d} (p q : Space d) :
-    (p - q).val = fun i => p.val i - q.val i := rfl
+    (p - q).val = fun i => p.val i - q.val i := by rfl
 
 @[simp]
 lemma vadd_zero_sub_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
@@ -226,7 +226,7 @@ lemma inner_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
   ring
 
 lemma inner_apply {d} (p q : Space d) :
-    inner ℝ p q = ∑ i, p i * q i := rfl
+    inner ℝ p q = ∑ i, p i * q i := by rfl
 
 instance {d} : InnerProductSpace ℝ (Space d) where
   norm_smul_le a x := by
@@ -267,7 +267,7 @@ lemma norm_smul_sphere {d : ℕ} (n : ↑(Metric.sphere (0 : Space d) 1))
 noncomputable instance {d : ℕ} : MeasurableSpace (Space d) := borel (Space d)
 
 instance {d : ℕ} : BorelSpace (Space d) where
-  measurable_eq := rfl
+  measurable_eq := by rfl
 
 /-!
 
@@ -341,7 +341,7 @@ lemma basis_repr_apply {d} (p : Space d) (i : Fin d) :
 
 @[simp]
 lemma basis_repr_symm_apply {d} (v : EuclideanSpace ℝ (Fin d)) (i : Fin d) :
-    basis.repr.symm v i = v i := rfl
+    basis.repr.symm v i = v i := by rfl
 
 lemma basis_apply {d} (i j : Fin d) :
     basis i j = if i = j then 1 else 0 := by
@@ -363,8 +363,8 @@ lemma basis_inner {d} (i : Fin d) (p : Space d) :
 open InnerProductSpace
 
 lemma basis_repr_inner_eq {d} (p : Space d) (v : EuclideanSpace ℝ (Fin d)) :
-    ⟪basis.repr p, v⟫_ℝ = ⟪p, basis.repr.symm v⟫_ℝ :=
-  LinearIsometryEquiv.inner_map_eq_flip basis.repr p v
+    ⟪basis.repr p, v⟫_ℝ = ⟪p, basis.repr.symm v⟫_ℝ := by
+  exact LinearIsometryEquiv.inner_map_eq_flip basis.repr p v
 
 instance {d : ℕ} : FiniteDimensional ℝ (Space d) :=
   Module.Basis.finiteDimensional_of_finite (h := basis.toBasis)
@@ -590,8 +590,8 @@ noncomputable def oneEquiv : Space 1 ≃ₗᵢ[ℝ] ℝ where
   left_inv x := by
     ext i; fin_cases i; simp
   right_inv x := by simp
-  map_add' x y := rfl
-  map_smul' c x := rfl
+  map_add' x y := by rfl
+  map_smul' c x := by rfl
   norm_map' x := by
     simp only [Fin.isValue, LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, Real.norm_eq_abs]
     rw [norm_eq]
@@ -653,8 +653,8 @@ lemma oneEquiv_symm_measurableEmbedding : MeasurableEmbedding oneEquiv.symm wher
 lemma oneEquiv_measurePreserving : MeasurePreserving oneEquiv volume volume :=
   LinearIsometryEquiv.measurePreserving oneEquiv
 
-lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume volume :=
-  LinearIsometryEquiv.measurePreserving oneEquiv.symm
+lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume volume := by
+  exact LinearIsometryEquiv.measurePreserving oneEquiv.symm
 
 /-!
 

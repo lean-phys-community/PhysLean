@@ -220,12 +220,12 @@ theorem operatorConvex_continuousOn_spectrum_union {f : ℝ → ℝ}
 
 omit [Nontrivial ℋ] in
 theorem one_div_operatorAntitoneOn_Ioi :
-    OperatorAntitoneOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x : ℝ ↦ 1 / x) :=
-  LownerHeinzCore.one_div_operatorAntitoneOn_Ioi (𝓐 := L ℋ)
+    OperatorAntitoneOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x : ℝ ↦ 1 / x) := by
+  exact (LownerHeinzCore.one_div_operatorAntitoneOn_Ioi (𝓐 := L ℋ))
 
 theorem one_div_operatorConvexOn_Ioi :
-    OperatorConvexOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x : ℝ ↦ 1 / x) :=
-  LownerHeinzCore.one_div_operatorConvexOn_Ioi (𝓐 := L ℋ)
+    OperatorConvexOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) (fun x : ℝ ↦ 1 / x) := by
+  exact (LownerHeinzCore.one_div_operatorConvexOn_Ioi (𝓐 := L ℋ))
 
 omit [Nontrivial ℋ] in
 theorem one_div_add_t_operatorAntitoneOn_Ici : ∀ (t : ℝ), 0 < t →

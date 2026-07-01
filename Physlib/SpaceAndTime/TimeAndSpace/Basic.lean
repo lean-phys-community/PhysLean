@@ -377,9 +377,9 @@ noncomputable def distTimeDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
       map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' _ _ := by
+  map_add' f1 f2 := by
     simp
-  map_smul' _ _ := by simp
+  map_smul' a f := by simp
 
 lemma distTimeDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
@@ -425,9 +425,9 @@ noncomputable def distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M
       map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' _ _ := by
+  map_add' f1 f2 := by
     simp
-  map_smul' _ _ := by simp
+  map_smul' a f := by simp
 
 lemma distSpaceDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (i : Fin d) (f : (Time × Space d) →d[ℝ] M) (ε : 𝓢(Time × Space d, ℝ)) :
@@ -554,7 +554,7 @@ noncomputable def distSpaceDiv {d} :
 
 lemma distSpaceDiv_apply_eq_sum_distSpaceDeriv {d}
     (f : (Time × Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) (η : 𝓢(Time ×Space d, ℝ)) :
-    distSpaceDiv f η = ∑ i, distSpaceDeriv i f η i := rfl
+    distSpaceDiv f η = ∑ i, distSpaceDeriv i f η i := by rfl
 
 /-!
 

@@ -190,37 +190,37 @@ instance : Pow Dimension ℚ where
 def L𝓭 : Dimension := ⟨1, 0, 0, 0, 0⟩
 
 @[simp]
-lemma L𝓭_length : L𝓭.length = 1 := rfl
+lemma L𝓭_length : L𝓭.length = 1 := by rfl
 
 @[simp]
-lemma L𝓭_time : L𝓭.time = 0 := rfl
+lemma L𝓭_time : L𝓭.time = 0 := by rfl
 
 @[simp]
-lemma L𝓭_mass : L𝓭.mass = 0 := rfl
+lemma L𝓭_mass : L𝓭.mass = 0 := by rfl
 
 @[simp]
-lemma L𝓭_charge : L𝓭.charge = 0 := rfl
+lemma L𝓭_charge : L𝓭.charge = 0 := by rfl
 
 @[simp]
-lemma L𝓭_temperature : L𝓭.temperature = 0 := rfl
+lemma L𝓭_temperature : L𝓭.temperature = 0 := by rfl
 
 /-- The dimension corresponding to time. -/
 def T𝓭 : Dimension := ⟨0, 1, 0, 0, 0⟩
 
 @[simp]
-lemma T𝓭_length : T𝓭.length = 0 := rfl
+lemma T𝓭_length : T𝓭.length = 0 := by rfl
 
 @[simp]
-lemma T𝓭_time : T𝓭.time = 1 := rfl
+lemma T𝓭_time : T𝓭.time = 1 := by rfl
 
 @[simp]
-lemma T𝓭_mass : T𝓭.mass = 0 := rfl
+lemma T𝓭_mass : T𝓭.mass = 0 := by rfl
 
 @[simp]
-lemma T𝓭_charge : T𝓭.charge = 0 := rfl
+lemma T𝓭_charge : T𝓭.charge = 0 := by rfl
 
 @[simp]
-lemma T𝓭_temperature : T𝓭.temperature = 0 := rfl
+lemma T𝓭_temperature : T𝓭.temperature = 0 := by rfl
 
 /-- The dimension corresponding to mass. -/
 def M𝓭 : Dimension := ⟨0, 0, 1, 0, 0⟩

@@ -72,11 +72,11 @@ theorem posSemidef_iff_spectrum_Ici [DecidableEq n] (A : HermitianMat n 𝕜) :
   simp [A.H, Set.Ici.eq_1]
 
 theorem posSemidef_iff_spectrum_nonneg [DecidableEq n] (A : HermitianMat n 𝕜) :
-    0 ≤ A ↔ ∀ x ∈ spectrum ℝ A.mat, 0 ≤ x :=
-  A.posSemidef_iff_spectrum_Ici
+    0 ≤ A ↔ ∀ x ∈ spectrum ℝ A.mat, 0 ≤ x := by
+  exact A.posSemidef_iff_spectrum_Ici
 
-theorem trace_nonneg (hA : 0 ≤ A) : 0 ≤ A.trace :=
-  (RCLike.nonneg_iff.mp (zero_le_iff.mp hA).trace_nonneg).1
+theorem trace_nonneg (hA : 0 ≤ A) : 0 ≤ A.trace := by
+  exact (RCLike.nonneg_iff.mp (zero_le_iff.mp hA).trace_nonneg).1
 
 theorem trace_pos (hA : 0 < A) : 0 < A.trace := by
   open ComplexOrder in
@@ -154,8 +154,8 @@ theorem kronecker_pos {A : HermitianMat m 𝕜} (hA : 0 < A) (hB : 0 < B) : 0 < 
 
 omit [Fintype n] in
 open MatrixOrder in
-theorem posSemidef_to_nonneg {A : Matrix n n 𝕜} (hA : A.PosSemidef) : 0 ≤ A :=
-  hA.nonneg
+theorem posSemidef_to_nonneg {A : Matrix n n 𝕜} (hA : A.PosSemidef) : 0 ≤ A := by
+  exact hA.nonneg
 
 open MatrixOrder in
 theorem posDef_to_pos {A : Matrix n n 𝕜} (hA : A.PosDef) [Nonempty n] : 0 < A := by
@@ -234,8 +234,8 @@ omit [Fintype n] in
 theorem mat_posSemidef_to_nonneg (hA : A.mat.PosSemidef) : 0 ≤ A :=
   zero_le_iff.mpr hA
 
-theorem mat_posDef_to_pos [Nonempty n] (hA : A.mat.PosDef) : 0 < A :=
-  posDef_to_pos hA
+theorem mat_posDef_to_pos [Nonempty n] (hA : A.mat.PosDef) : 0 < A := by
+  exact posDef_to_pos hA
 
 open Lean Meta in
 /-- Given an expression `e` (a `HermitianMat`) and a proof expression `p` whose type may be

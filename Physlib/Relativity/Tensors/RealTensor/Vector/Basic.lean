@@ -137,7 +137,7 @@ lemma apply_add {d : ℕ} (v w : Vector d) (i : Fin 1 ⊕ Fin d) :
 
 @[simp]
 lemma apply_sub {d : ℕ} (v w : Vector d) (i : Fin 1 ⊕ Fin d) :
-    (v - w) i = v i - w i := rfl
+    (v - w) i = v i - w i := by rfl
 
 lemma apply_sum {d : ℕ} {ι : Type} [Fintype ι] (f : ι → Vector d) (i : Fin 1 ⊕ Fin d) :
     (∑ j, f j) i = ∑ j, f j i := by
@@ -288,8 +288,8 @@ lemma basis_repr_apply {d : ℕ} (p : Vector d) (μ : Fin 1 ⊕ Fin d) :
   erw [Pi.basisFun_repr]
 
 lemma map_apply_eq_basis_mulVec {d : ℕ} (f : Vector d →ₗ[ℝ] Vector d) (p : Vector d) :
-    (f p) = (LinearMap.toMatrix basis basis) f *ᵥ p :=
-  Eq.symm (LinearMap.toMatrix_mulVec_repr basis basis f p)
+    (f p) = (LinearMap.toMatrix basis basis) f *ᵥ p := by
+  exact Eq.symm (LinearMap.toMatrix_mulVec_repr basis basis f p)
 
 lemma sum_basis_eq_zero_iff {d : ℕ} (f : Fin 1 ⊕ Fin d → ℝ) :
     (∑ μ, f μ • basis μ) = 0 ↔ ∀ μ, f μ = 0 := by
@@ -340,8 +340,8 @@ lemma spatialPart_basis_sum_inl {d : ℕ} (i : Fin d) :
 /-- The spatial part of a Lorentz vector as a continuous linear map. -/
 def spatialCLM (d : ℕ) : Vector d →L[ℝ] EuclideanSpace ℝ (Fin d) where
   toFun v := WithLp.toLp 2 fun i => v (Sum.inr i)
-  map_add' v1 v2 := rfl
-  map_smul' c v := rfl
+  map_add' v1 v2 := by rfl
+  map_smul' c v := by rfl
   cont := by fun_prop
 
 lemma spatialCLM_apply_eq_spatialPart {d : ℕ} (v : Vector d) (i : Fin d) :

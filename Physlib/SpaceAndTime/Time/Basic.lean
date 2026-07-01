@@ -247,10 +247,10 @@ lemma smul_real_val (k : ℝ) (t : Time) :
 -/
 
 instance : AddGroup Time where
-  add_assoc t1 t2 t3 := Time.ext (by simp [add_assoc])
-  zero_add t := Time.ext (by simp)
-  add_zero t := Time.ext (by simp)
-  neg_add_cancel t := Time.ext (by simp)
+  add_assoc t1 t2 t3 := by ext; simp [add_assoc]
+  zero_add t := by ext; simp [zero_add]
+  add_zero t := by ext; simp [add_zero]
+  neg_add_cancel t := by ext; simp [neg_add_cancel]
   nsmul := nsmulRec
   zsmul := zsmulRec
 
@@ -284,7 +284,7 @@ lemma dist_eq_val (t1 t2 : Time) :
     dist t1 t2 = ‖t1.val - t2.val‖ := rfl
 
 lemma dist_eq_real_dist (t1 t2 : Time) :
-    dist t1 t2 = dist t1.val t2.val := rfl
+    dist t1 t2 = dist t1.val t2.val := by rfl
 
 instance : SeminormedAddCommGroup Time where
   dist_self t := by simp [dist_eq_real_dist]
@@ -348,7 +348,7 @@ noncomputable instance : DecidableEq Time := fun t1 t2 =>
 instance : MeasurableSpace Time := borel Time
 
 instance : BorelSpace Time where
-  measurable_eq := rfl
+  measurable_eq := by rfl
 
 /-!
 
@@ -421,8 +421,8 @@ instance : FiniteDimensional ℝ Time :=
   Module.finite_of_rank_eq_one rank_eq_one
 
 lemma volume_eq_basis_addHaar :
-    (volume (α := Time)) = basis.toBasis.addHaar :=
-  (OrthonormalBasis.addHaar_eq_volume _).symm
+    (volume (α := Time)) = basis.toBasis.addHaar := by
+  exact (OrthonormalBasis.addHaar_eq_volume _).symm
 
 /-!
 
@@ -434,28 +434,28 @@ lemma volume_eq_basis_addHaar :
 noncomputable def toRealCLM : Time →L[ℝ] ℝ := LinearMap.toContinuousLinearMap
   {
   toFun := Time.val
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl }
+  map_add' := by simp
+  map_smul' := by simp }
 
 /-- The continuous linear equivalence from `Time` to `ℝ`. -/
 noncomputable def toRealCLE : Time ≃L[ℝ] ℝ := LinearEquiv.toContinuousLinearEquiv
   {
   toFun := Time.val
   invFun := fun x => ⟨x⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
+  left_inv x := by rfl
+  right_inv x := by rfl
+  map_add' := by simp
+  map_smul' := by simp
   }
 
 /-- The linear isometry equivalence from `Time` to `ℝ`. -/
 noncomputable def toRealLIE : Time ≃ₗᵢ[ℝ] ℝ where
   toFun := Time.val
   invFun := fun x => ⟨x⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
+  left_inv x := by rfl
+  right_inv x := by rfl
+  map_add' := by simp
+  map_smul' := by simp
   norm_map' _ := rfl
 
 lemma eq_one_smul (t : Time) :

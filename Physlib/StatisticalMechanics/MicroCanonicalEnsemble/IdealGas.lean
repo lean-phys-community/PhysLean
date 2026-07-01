@@ -94,9 +94,9 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
     Measurable.exists fun i => Measurable.exists fun j => measurable_const.lt (by fun_prop)
   have h_measurability : Measurable fun x : (Fin n × Fin 3 → ℝ) × (Fin n × Fin 3 → ℝ) =>
       if ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |x.1 (x_1, x_2)| then 0
-      else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) :=
-    Measurable.ite (measurableSet_setOf.mpr (h_measurable_box.comp measurable_fst))
-      (by fun_prop) (by fun_prop)
+      else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) := by
+    refine Measurable.ite (measurableSet_setOf.mpr ?_) (by fun_prop) (by fun_prop)
+    exact h_measurable_box.comp measurable_fst
   rw [MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
   rotate_left
   · exact Filter.Eventually.of_forall fun _ => by positivity

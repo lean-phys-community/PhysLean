@@ -125,7 +125,7 @@ noncomputable def TranslationGroup.incl (n : ℕ) :
 def translationVector.incl (n : ℕ) :
     Multiplicative (EuclideanSpace ℝ (Fin n)) →* EuclideanGroup n where
   toFun v := ⟨v.toAdd, 1⟩
-  map_one' := rfl
+  map_one' := by rfl
   map_mul' x y := by
     refine EuclideanGroup.ext ?_ ?_
     · show Multiplicative.toAdd (x * y) =

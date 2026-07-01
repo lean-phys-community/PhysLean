@@ -74,8 +74,8 @@ lemma oneMilePerHour_in_SI : oneMilePerHour SI = ⟨0.44704⟩ := by
 lemma oneKilometerPerHour_in_SI :
     oneKilometerPerHour SI = ⟨5/18⟩ := by
   ext
-  norm_num [oneKilometerPerHour, dimScale, LengthUnit.kilometers, TimeUnit.hours,
-    toDimensionful_apply_apply]
+  simp only [WithDim.smul_val, smul_eq_mul, mul_one, NNReal.coe_mul, coe_rpow, NNReal.coe_div,
+    NNReal.coe_ofNat]
   rw [toReal]
   norm_num
 

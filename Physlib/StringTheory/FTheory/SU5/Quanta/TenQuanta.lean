@@ -295,9 +295,9 @@ lemma reduce_sum_eq_sum_toCharges {M} [AddCommMonoid M] (x : TenQuanta 𝓩) (f 
         · have h_mem_dedup : p.1 ∈ (x.map Prod.fst).dedup := by rwa [Multiset.mem_dedup]
           rw [Multiset.sum_map_eq_nsmul_single p.1]
           simp only [↓reduceIte, smul_eq_mul]
-          have h_count_one : Multiset.count p.1 (Multiset.map Prod.fst x).dedup = 1 :=
-            Multiset.count_eq_one_of_mem (Multiset.nodup_dedup (Multiset.map Prod.fst x))
-              h_mem_dedup
+          have h_count_one : Multiset.count p.1 (Multiset.map Prod.fst x).dedup = 1 := by
+            refine Multiset.count_eq_one_of_mem ?_ h_mem_dedup
+            exact Multiset.nodup_dedup (Multiset.map Prod.fst x)
           simp [h_count_one]
           intro q5' h h2
           simp_all [eq_comm]

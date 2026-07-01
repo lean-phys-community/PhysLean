@@ -431,7 +431,7 @@ lemma quantaWaveNumber_exp_sub_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
 lemma quantaWaveNumber_exp_add_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
     Complex.exp (Complex.I * k * (n + 1).val * T.a) =
     Complex.exp (Complex.I * k * n * T.a) * Complex.exp (Complex.I * k * T.a) := by
-  have hn : n = (n + 1) - 1 := Eq.symm (add_sub_cancel_right n 1)
+  have hn : n = (n + 1) - 1 := by exact Eq.symm (add_sub_cancel_right n 1)
   conv_rhs =>
     rw [hn, quantaWaveNumber_exp_sub_one, mul_assoc, ← Complex.exp_add]
     simp

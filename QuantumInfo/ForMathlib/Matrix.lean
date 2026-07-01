@@ -59,8 +59,8 @@ variable (hA : A.IsHermitian) (hB : B.IsHermitian)
 
 include hA in
 omit [DecidableEq n] in
-theorem smul_selfAdjoint {c : 𝕜} (hc : _root_.IsSelfAdjoint c) : (c • A).IsHermitian :=
-  IsSelfAdjoint.smul hc hA
+theorem smul_selfAdjoint {c : 𝕜} (hc : _root_.IsSelfAdjoint c) : (c • A).IsHermitian := by
+  exact IsSelfAdjoint.smul hc hA
 
 include hA in
 omit [DecidableEq n] in
@@ -817,8 +817,8 @@ lemma IsHermitian.eigenvalues_eq_of_unitary_similarity_diagonal {d 𝕜 : Type*}
         exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
     rw [ h, h_char_poly ];
   -- The roots of the characteristic polynomial of A are its eigenvalues (by `IsHermitian.charpoly_roots_eq_eigenvalues`).
-  have h_eigenvalues : (Matrix.charpoly A).roots = Multiset.map (RCLike.ofReal ∘ hA.eigenvalues) Finset.univ.val :=
-    Matrix.IsHermitian.roots_charpoly_eq_eigenvalues hA;
+  have h_eigenvalues : (Matrix.charpoly A).roots = Multiset.map (RCLike.ofReal ∘ hA.eigenvalues) Finset.univ.val := by
+    exact Matrix.IsHermitian.roots_charpoly_eq_eigenvalues hA;
   -- The roots of the characteristic polynomial of D are the diagonal entries f.
   have h_diag_roots : (Matrix.charpoly (Matrix.diagonal fun i => (f i : 𝕜))).roots = Multiset.map (fun i => (f i : 𝕜)) Finset.univ.val := by
     simp [ Matrix.charpoly, Matrix.det_diagonal ];
@@ -1210,8 +1210,8 @@ lemma sub_iInf_eignevalues (hA : A.IsHermitian) :
     -- Since the eigenvalues are real and the sums involving Q and x are complex, the product of a complex number and its conjugate is non-negative.
     have h_nonneg : ∀ i, 0 ≤ (∑ x_2, Q x_2 i * star (x x_2)) * (∑ x_2, star (Q x_2 i) * x x_2) := by
       intro i
-      have h_nonneg : 0 ≤ (∑ x_2, Q x_2 i * star (x x_2)) * star (∑ x_2, Q x_2 i * star (x x_2)) :=
-        mul_star_self_nonneg (∑ x_2, Q x_2 i * star (x x_2))
+      have h_nonneg : 0 ≤ (∑ x_2, Q x_2 i * star (x x_2)) * star (∑ x_2, Q x_2 i * star (x x_2)) := by
+        exact mul_star_self_nonneg (∑ x_2, Q x_2 i * star (x x_2))
       convert h_nonneg using 1;
       simp [ mul_comm, Finset.mul_sum _ _ _];
     -- Since each term in the sum is a product of a non-negative number and a non-negative eigenvalue difference, the entire sum is non-negative.
@@ -1433,8 +1433,8 @@ theorem IsHermitian.spectrum_subset_of_mem_Icc {d 𝕜 : Type*} [Fintype d] [Dec
   {A B x : Matrix d d 𝕜} (hA : A.IsHermitian) (hB : B.IsHermitian)
   (hl : (x - A).PosSemidef) (hr : (B - x).PosSemidef) :
     spectrum ℝ x ⊆ Set.Icc (⨅ i, hA.eigenvalues i) (⨆ i, hB.eigenvalues i) := by
-  simpa [Set.Ici_inter_Iic] using
-    Set.subset_inter (hA.spectrum_subset_Ici_of_sub hl) (hB.spectrum_subset_Iic_of_sub hr)
+  rw [← Set.Ici_inter_Iic]
+  exact Set.subset_inter (hA.spectrum_subset_Ici_of_sub hl) (hB.spectrum_subset_Iic_of_sub hr)
 
 /--
 The right partial trace of a matrix is equal to the left partial trace of the matrix reindexed by swapping the tensor factors.

@@ -144,12 +144,12 @@ noncomputable def distTimeSlice {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
 lemma distTimeSlice_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (c : SpeedOfLight) (f : (SpaceTime d) →d[ℝ] M)
     (κ : 𝓢(Time × Space d, ℝ)) : distTimeSlice c f κ =
-    f (compCLMOfContinuousLinearEquiv ℝ (toTimeAndSpace c) κ) := rfl
+    f (compCLMOfContinuousLinearEquiv ℝ (toTimeAndSpace c) κ) := by rfl
 
 lemma distTimeSlice_symm_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (c : SpeedOfLight) (f : (Time × (Space d)) →d[ℝ] M)
     (κ : 𝓢(SpaceTime d, ℝ)) : (distTimeSlice c).symm f κ =
-    f (compCLMOfContinuousLinearEquiv ℝ (toTimeAndSpace c).symm κ) := rfl
+    f (compCLMOfContinuousLinearEquiv ℝ (toTimeAndSpace c).symm κ) := by rfl
 
 /-!
 

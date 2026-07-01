@@ -456,8 +456,8 @@ private lemma rexp_mul_smul_proj_lt_mul_sub_le_mul_sub {n : ℕ} {x : ℝ}
   dsimp
   gcongr
   apply Matrix.PosSemidef.trace_mono
-  rw [one_div, smul_mul_assoc, mul_smul_comm]
-  rw [inv_smul_le_iff_of_pos (mod_cast hn)]
+  rw [one_div, HermitianMat.mat_smul, smul_mul_assoc, mul_smul_comm]
+  rw [inv_smul_le_iff_of_pos (mod_cast hn), HermitianMat.mat_smul]
   rw [mul_smul_comm]
   obtain ⟨C, ⟨f, hf⟩, ⟨g, hg⟩⟩ := hℰσ.exists_HermitianMat_cfc
   rw [hf, hg] at hE ⊢
@@ -577,8 +577,8 @@ private lemma f_image_bound (mineig : ℝ) (n : ℕ) (h : 0 < mineig) (hn : 0 < 
         -- Since the interval [mineig^n / 3, 1] is closed and bounded, and the function Real.log x / (Real.log (1 / mineig) + Real.log 3 / (max n 1)) is continuous on this interval, it must attain a maximum and minimum value on this interval.
         have h_cont : ContinuousOn (fun x => Real.log x / (Real.log (1 / mineig) + Real.log 3 / (max n 1))) (Set.Icc (mineig^n / 3) 1) := by
           -- Since Real.log x is continuous on the interval (0, ∞) and the denominator is a non-zero constant, the function Real.log x / (Real.log (1 / mineig) + Real.log 3 / (max n 1)) is continuous on the interval [mineig^n / 3, 1].
-          have h_cont : ContinuousOn Real.log (Set.Icc (mineig^n / 3) 1) :=
-            continuousOn_of_forall_continuousAt fun x hx => Real.continuousAt_log ( by linarith [ hx.1, pow_pos h n ] );
+          have h_cont : ContinuousOn Real.log (Set.Icc (mineig^n / 3) 1) := by
+            exact continuousOn_of_forall_continuousAt fun x hx => Real.continuousAt_log ( by linarith [ hx.1, pow_pos h n ] );
           exact h_cont.div_const _;
         exact ⟨ ( InfSet.sInf <| ( fun x => Real.log x / ( Real.log ( 1 / mineig ) + Real.log 3 / ( max n 1 ) ) ) '' Set.Icc ( mineig ^ n / 3 ) 1 ), ( SupSet.sSup <| ( fun x => Real.log x / ( Real.log ( 1 / mineig ) + Real.log 3 / ( max n 1 ) ) ) '' Set.Icc ( mineig ^ n / 3 ) 1 ), fun x hx => ⟨ ( csInf_le <| IsCompact.bddBelow <| isCompact_Icc.image_of_continuousOn h_cont ) <| Set.mem_image_of_mem _ hx, ( le_csSup <| IsCompact.bddAbove <| isCompact_Icc.image_of_continuousOn h_cont ) <| Set.mem_image_of_mem _ hx ⟩ ⟩;
       obtain ⟨ m, M, hM ⟩ := h_bounded
@@ -611,8 +611,8 @@ private lemma f_image_bound (mineig : ℝ) (n : ℕ) (h : 0 < mineig) (hn : 0 < 
     · gcongr;
       · have := h_f_le n 1 ; norm_num at this ; linarith [ Real.log_le_sub_one_of_pos h ];
       · -- Taking the logarithm of both sides of the inequality $mineig^n / 3 \leq w$, we get $n \log(mineig) - \log(3) \leq \log(w)$.
-        have h_log : Real.log (mineig^n / 3) ≤ Real.log w :=
-          Real.log_le_log ( by positivity ) left;
+        have h_log : Real.log (mineig^n / 3) ≤ Real.log w := by
+          exact Real.log_le_log ( by positivity ) left;
         rwa [ Real.log_div ( by positivity ) ( by positivity ), Real.log_pow ] at h_log;
     · refine' Int.ceil_le.mpr _;
       rw [ div_le_iff₀ ]
@@ -646,8 +646,8 @@ private lemma c'_bounded {mineig : ℝ} {ε2 : ℕ → ℝ≥0}
   (∀ (n : ℕ), 0 < c n) →
     ∃ (C : NNReal), ∀ᶠ (n : ℕ) in Filter.atTop, c' (↑(ε2 n)) n ≤ ↑C := by
   have h_bound : ∃ C : ℝ, ∀ᶠ n in Filter.atTop, Real.log (1 / mineig) + Real.log 3 / (Max.max n 1) + (Real.log (1 / mineig) + Real.log 3 / (Max.max n 1)) / n ≤ C := by
-    have h_bound : Filter.Tendsto (fun n => Real.log (1 / mineig) + Real.log 3 / (Max.max n 1) + (Real.log (1 / mineig) + Real.log 3 / (Max.max n 1)) / n) Filter.atTop (nhds (Real.log (1 / mineig) + Real.log 3 / 0 + (Real.log (1 / mineig) + Real.log 3 / 0) / 0)) :=
-      le_trans ( Filter.Tendsto.add ( tendsto_const_nhds.add <| Filter.Tendsto.mul tendsto_const_nhds <| Filter.Tendsto.inv_tendsto_atTop <| Filter.tendsto_atTop_atTop.mpr fun x => ⟨ x + 1, fun y hy => le_max_of_le_left <| by linarith ⟩ ) <| Filter.Tendsto.mul ( tendsto_const_nhds.add <| Filter.Tendsto.mul tendsto_const_nhds <| Filter.Tendsto.inv_tendsto_atTop <| Filter.tendsto_atTop_atTop.mpr fun x => ⟨ x + 1, fun y hy => le_max_of_le_left <| by linarith ⟩ ) <| tendsto_inv_atTop_zero ) <| by norm_num;
+    have h_bound : Filter.Tendsto (fun n => Real.log (1 / mineig) + Real.log 3 / (Max.max n 1) + (Real.log (1 / mineig) + Real.log 3 / (Max.max n 1)) / n) Filter.atTop (nhds (Real.log (1 / mineig) + Real.log 3 / 0 + (Real.log (1 / mineig) + Real.log 3 / 0) / 0)) := by
+      exact le_trans ( Filter.Tendsto.add ( tendsto_const_nhds.add <| Filter.Tendsto.mul tendsto_const_nhds <| Filter.Tendsto.inv_tendsto_atTop <| Filter.tendsto_atTop_atTop.mpr fun x => ⟨ x + 1, fun y hy => le_max_of_le_left <| by linarith ⟩ ) <| Filter.Tendsto.mul ( tendsto_const_nhds.add <| Filter.Tendsto.mul tendsto_const_nhds <| Filter.Tendsto.inv_tendsto_atTop <| Filter.tendsto_atTop_atTop.mpr fun x => ⟨ x + 1, fun y hy => le_max_of_le_left <| by linarith ⟩ ) <| tendsto_inv_atTop_zero ) <| by norm_num;
     exact ⟨ _, h_bound.eventually ( ge_mem_nhds <| lt_add_one _ ) ⟩;
   intro c c' a
   simp_all only [one_div, Real.log_inv, Filter.eventually_atTop, Nat.cast_max, Nat.cast_one,
@@ -1236,7 +1236,7 @@ private theorem EquationS62
         dsimp [σ₁_mineig, iInf]
         rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
         rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
-        rw [sInf_spectrum_spacePow (σ₁ i) n, smul_smul]
+        rw [MState.mat_M, sInf_spectrum_spacePow (σ₁ i) n, MState.mat_M, smul_smul]
       _ = Real.exp (- n * (σ₁_c i n + (σ₁_c i n) / n)) • 1 := by
         rw [σ₁_c_identity i hn]
       _ ≥ Real.exp (-n * c' ε2 n) • 1 := by
@@ -1834,8 +1834,8 @@ theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (
     rw [heq]
     simp only [Set.range_comp, MState.mat_M, EquivLike.range_eq_univ, Set.image_univ, ge_iff_le]
     let S : Set ℝ := (fun x => Real.exp (f_map i n x)) '' Set.Icc ((σ₁_mineig i ^ n) / 3) 1
-    have h_card_subs : Set.ncard S ≤ n + 1 ∧ S.Finite :=
-      f_image_bound (σ₁_mineig i) n (mineig_pos i) hn (log_le_f i) (f_le_log i)
+    have h_card_subs : Set.ncard S ≤ n + 1 ∧ S.Finite := by
+      exact f_image_bound (σ₁_mineig i) n (mineig_pos i) hn (log_le_f i) (f_le_log i)
     let S₂ : Set ℝ := (fun x => (σ''_unnormalized ρ ε m σ n).trace⁻¹ * Real.exp (f_map i n x)) '' Set.Icc ((σ₁_mineig i ^ n) / 3) 1
     obtain ⟨h_card_subs₂, h_s₂_finite⟩ : Set.ncard S₂ ≤ n + 1 ∧ S₂.Finite := by
       have hS₂ : S₂ = ((σ''_unnormalized ρ ε m σ n).trace⁻¹ * ·) '' S := by
@@ -1858,7 +1858,7 @@ theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (
     rw [HermitianMat.val_eq_coe, HermitianMat.mat_smul]
     rw [spectrum.smul_eq_smul _ _ (ContinuousFunctionalCalculus.spectrum_nonempty _ ((σ₁ i) ⊗ᵣ^[n]).M.H)]
     rw [Real.sInf_smul_of_nonneg (by norm_num)]
-    simp [div_eq_inv_mul, sInf_spectrum_spacePow]
+    simp [MState.mat_M, div_eq_inv_mul, sInf_spectrum_spacePow]
 
   have hdpos n : 0 < Fintype.card (spectrum ℝ (σ'' ρ ε m σ n).m) := by
     rw [Fintype.card_pos_iff, Set.nonempty_coe_sort]

@@ -135,8 +135,8 @@ lemma div {d} : IsLocalizedFunctionTransform fun (φ : Space d → EuclideanSpac
         (fun x => (φ x) i) =ᶠ[nhds x] fun x => (φ' x) i := by
       intro i x hx
       apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      · exact Metric.isOpen_thickening.mem_nhds
-          (Metric.self_subset_thickening one_pos K hx)
+      · apply Metric.isOpen_thickening.mem_nhds
+        exact Metric.self_subset_thickening one_pos K hx
       · intro y hy
         dsimp only
         rw [hφ y (Metric.thickening_subset_cthickening 1 K hy)]
@@ -156,8 +156,8 @@ lemma div_comp_repr {d} : IsLocalizedFunctionTransform fun (φ : Space d → Spa
         (fun x => (φ x) i) =ᶠ[nhds x] fun x => (φ' x) i := by
       intro i x hx
       apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      · exact Metric.isOpen_thickening.mem_nhds
-          (Metric.self_subset_thickening one_pos K hx)
+      · apply Metric.isOpen_thickening.mem_nhds
+        exact Metric.self_subset_thickening one_pos K hx
       · intro y hy
         dsimp only
         rw [hφ y (Metric.thickening_subset_cthickening 1 K hy)]
@@ -179,8 +179,8 @@ lemma grad : IsLocalizedFunctionTransform fun (ψ : Space d → ℝ) x => Space.
     congr 2
     have h : φ =ᶠ[nhds x] φ' := by
       apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      · exact Metric.isOpen_thickening.mem_nhds
-          (Metric.self_subset_thickening one_pos K hx)
+      · apply Metric.isOpen_thickening.mem_nhds
+        exact Metric.self_subset_thickening one_pos K hx
       · intro y hy
         exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
     exact Filter.EventuallyEq.fderiv_eq h
@@ -198,8 +198,8 @@ lemma gradient : IsLocalizedFunctionTransform fun (ψ : Space d → ℝ) x => gr
     congr 2
     have h : φ =ᶠ[nhds x] φ' := by
       apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      · exact Metric.isOpen_thickening.mem_nhds
-          (Metric.self_subset_thickening one_pos K hx)
+      · apply Metric.isOpen_thickening.mem_nhds
+        exact Metric.self_subset_thickening one_pos K hx
       · intro y hy
         exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
     exact Filter.EventuallyEq.fderiv_eq h
@@ -219,8 +219,8 @@ lemma deriv [NormedAddCommGroup U] [NormedSpace ℝ U] :
     dsimp
     have h : φ =ᶠ[nhds x] φ' := by
       apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      · exact Metric.isOpen_thickening.mem_nhds
-          (Metric.self_subset_thickening one_pos K hx)
+      · apply Metric.isOpen_thickening.mem_nhds
+        exact Metric.self_subset_thickening one_pos K hx
       · intro y hy
         exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
     exact h.deriv_eq
@@ -236,8 +236,8 @@ lemma fderiv [NormedAddCommGroup U] [NormedSpace ℝ U]
     dsimp; congr 1
     have h : φ =ᶠ[nhds x] φ' := by
       apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      · exact Metric.isOpen_thickening.mem_nhds
-          (Metric.self_subset_thickening one_pos K hx)
+      · apply Metric.isOpen_thickening.mem_nhds
+        exact Metric.self_subset_thickening one_pos K hx
       · intro y hy
         exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
     rw [Filter.EventuallyEq.fderiv_eq h]
@@ -282,8 +282,8 @@ lemma adjFDeriv {dy} [NormedSpace ℝ X] [ProperSpace X]
     simp only [DFunLike.coe_fn_eq]
     have h : φ =ᶠ[nhds x] φ' := by
       apply Filter.eventuallyEq_of_mem (s := Metric.thickening 1 K)
-      · exact Metric.isOpen_thickening.mem_nhds
-          (Metric.self_subset_thickening one_pos K hx)
+      · apply Metric.isOpen_thickening.mem_nhds
+        exact Metric.self_subset_thickening one_pos K hx
       · intro y hy
         exact hφ y (Metric.thickening_subset_cthickening 1 K hy)
     exact Filter.EventuallyEq.fderiv_eq h

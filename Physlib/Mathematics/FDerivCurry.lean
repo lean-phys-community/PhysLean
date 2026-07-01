@@ -24,8 +24,8 @@ lemma fderiv_uncurry (f : X → Y → Z) (xy dxy : X × Y)
     fderiv 𝕜 ↿f xy dxy
     =
     fderiv 𝕜 (f · xy.2) xy.1 dxy.1 + fderiv 𝕜 (f xy.1 ·) xy.2 dxy.2 := by
-  have hx : (f · xy.2) = ↿f ∘ (fun x' => (x',xy.2)) := rfl
-  have hy : (f xy.1 ·) = ↿f ∘ (fun y' => (xy.1,y')) := rfl
+  have hx : (f · xy.2) = ↿f ∘ (fun x' => (x',xy.2)) := by rfl
+  have hy : (f xy.1 ·) = ↿f ∘ (fun y' => (xy.1,y')) := by rfl
   rw [hx,hy]
   repeat rw [fderiv_comp (hg := by fun_prop) (hf := by fun_prop)]
   dsimp

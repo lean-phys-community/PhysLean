@@ -138,8 +138,8 @@ lemma contrCoContraction_apply_metric :
       (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
       TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
       (contrMetric 1) ⊗ₜ[ℂ] (coMetric 1)) = coContrUnit (1 : ℝ) := by
-  rw [contrMetric_apply_one, coMetric_apply_one, contrMetricVal_expand_tmul,
-    coMetricVal_expand_tmul]
+  rw [contrMetric_apply_one, coMetric_apply_one]
+  rw [contrMetricVal_expand_tmul, coMetricVal_expand_tmul]
   simp [Fin.isValue, tmul_sub, sub_tmul, map_sub]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
   repeat erw [contrCoContraction_basis']
@@ -154,8 +154,8 @@ lemma coContrContraction_apply_metric :
       (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
       TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
       (coMetric 1) ⊗ₜ[ℂ] (contrMetric 1)) = contrCoUnit (1 : ℝ) := by
-  rw [coMetric_apply_one, contrMetric_apply_one, coMetricVal_expand_tmul,
-    contrMetricVal_expand_tmul]
+  rw [coMetric_apply_one, contrMetric_apply_one]
+  rw [coMetricVal_expand_tmul, contrMetricVal_expand_tmul]
   simp [Fin.isValue, tmul_sub, sub_tmul, map_sub]
   simp only [← Representation.IntertwiningMap.toLinearMap_apply]
   repeat erw [coContrContraction_basis']

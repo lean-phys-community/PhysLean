@@ -55,7 +55,7 @@ variable {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] [HasDim M]
     [NormedAddCommGroup G] [NormedSpace ℝ G] [HasDim G]
 
 lemma scaleUnit_measure (u1 u2 : UnitChoices) (μ : MeasureTheory.Measure M) :
-    scaleUnit u1 u2 μ = μ.map (fun m => scaleUnit u1 u2 m) := rfl
+    scaleUnit u1 u2 μ = μ.map (fun m => scaleUnit u1 u2 m) := by rfl
 
 /-- The statement that for a measure `μ` of dimension `d`, and a function
   `f : M → G` of dimension `(CarriesDimension.d G * d⁻¹)` (where `CarriesDimension.d G`

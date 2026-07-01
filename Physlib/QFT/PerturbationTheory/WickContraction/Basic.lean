@@ -129,8 +129,8 @@ lemma congrLift_surjective {n m : ℕ} {c : WickContraction n} (h : n = m) :
   simp [Function.surjective_id]
 
 lemma congrLift_bijective {n m : ℕ} {c : WickContraction n} (h : n = m) :
-    Function.Bijective (c.congrLift h) :=
-  ⟨c.congrLift_injective h, c.congrLift_surjective h⟩
+    Function.Bijective (c.congrLift h) := by
+  exact ⟨c.congrLift_injective h, c.congrLift_surjective h⟩
 
 /-- Given a contracted pair in `c : WickContraction n` the contracted pair
   in `congr h c`. -/

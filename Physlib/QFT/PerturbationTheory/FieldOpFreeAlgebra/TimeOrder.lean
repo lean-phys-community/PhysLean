@@ -307,8 +307,8 @@ lemma timeOrderF_eq_maxTimeField_mul (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldO
     𝓣ᶠ(ofFieldOpListF (φ :: φs)) =
     𝓢(𝓕 |>ₛ maxTimeField φ φs, 𝓕 |>ₛ (φ :: φs).take (maxTimeFieldPos φ φs)) •
     ofFieldOpF (maxTimeField φ φs) * 𝓣ᶠ(ofFieldOpListF (eraseMaxTimeField φ φs)) := by
-  rw [timeOrderF_ofFieldOpListF, timeOrderList_eq_maxTimeField_timeOrderList,
-    ofFieldOpListF_cons, timeOrderF_ofFieldOpListF]
+  rw [timeOrderF_ofFieldOpListF, timeOrderList_eq_maxTimeField_timeOrderList]
+  rw [ofFieldOpListF_cons, timeOrderF_ofFieldOpListF]
   simp only [Algebra.mul_smul_comm, Algebra.smul_mul_assoc, smul_smul]
   congr
   rw [timerOrderSign_of_eraseMaxTimeField, mul_assoc]

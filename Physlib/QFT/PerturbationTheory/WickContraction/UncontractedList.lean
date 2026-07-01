@@ -381,8 +381,8 @@ lemma uncontractedListEmd_surjective_mem_uncontracted {φs : List 𝓕.FieldOp}
     ∃ j, φsΛ.uncontractedListEmd j = i := by
   simp only [uncontractedListEmd, Equiv.trans_toEmbedding, Function.Embedding.trans_apply,
     Equiv.coe_toEmbedding, finCongr_apply, Function.Embedding.coe_subtype]
-  have hj : ∃ j, φsΛ.uncontractedIndexEquiv j = ⟨i, hi⟩ :=
-    φsΛ.uncontractedIndexEquiv.surjective ⟨i, hi⟩
+  have hj : ∃ j, φsΛ.uncontractedIndexEquiv j = ⟨i, hi⟩ := by
+    exact φsΛ.uncontractedIndexEquiv.surjective ⟨i, hi⟩
   generalize_proofs h1
   obtain ⟨j, hj⟩ := hj
   have hj' : ∃ j', Fin.cast h1 j' = j := (finCongr h1).surjective j
@@ -444,8 +444,8 @@ lemma uncontractedList_succAboveEmb_nodup (c : WickContraction n) (i : Fin n.suc
 lemma uncontractedList_succAbove_orderedInsert_nodup (c : WickContraction n) (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i (List.map i.succAboveEmb c.uncontractedList)).Nodup := by
   have h1 : (List.orderedInsert (· ≤ ·) i (List.map i.succAboveEmb c.uncontractedList)).Perm
-    (i :: List.map i.succAboveEmb c.uncontractedList) :=
-    List.perm_orderedInsert (fun x1 x2 => x1 ≤ x2) i _
+    (i :: List.map i.succAboveEmb c.uncontractedList) := by
+    exact List.perm_orderedInsert (fun x1 x2 => x1 ≤ x2) i _
   apply List.Perm.nodup h1.symm
   simp only [Nat.succ_eq_add_one, List.nodup_cons, List.mem_map, not_exists,
     not_and]
@@ -456,9 +456,9 @@ lemma uncontractedList_succAbove_orderedInsert_nodup (c : WickContraction n) (i 
 
 lemma uncontractedList_succAbove_orderedInsert_sorted (c : WickContraction n) (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i
-      (List.map i.succAboveEmb c.uncontractedList)).Pairwise (· ≤ ·) :=
-  List.Pairwise.orderedInsert i (List.map (⇑i.succAboveEmb) c.uncontractedList)
-    (uncontractedList_succAboveEmb_sorted c i)
+      (List.map i.succAboveEmb c.uncontractedList)).Pairwise (· ≤ ·) := by
+  refine List.Pairwise.orderedInsert i (List.map (⇑i.succAboveEmb) c.uncontractedList) ?_
+  exact uncontractedList_succAboveEmb_sorted c i
 
 lemma uncontractedList_succAbove_orderedInsert_toFinset (c : WickContraction n) (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i (List.map i.succAboveEmb c.uncontractedList)).toFinset =

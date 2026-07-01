@@ -222,8 +222,8 @@ lemma probability_le_one
     [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
     𝓒.probability T i ≤ 1 := by
   have hZpos : 0 < 𝓒.mathematicalPartitionFunction T := by
-    simpa [mathematicalPartitionFunction_of_fintype] using
-      Finset.sum_pos (fun j _ => Real.exp_pos _) Finset.univ_nonempty
+    rw [mathematicalPartitionFunction_of_fintype]
+    exact Finset.sum_pos (fun j _ => Real.exp_pos _) Finset.univ_nonempty
   rw [probability, div_le_one hZpos, mathematicalPartitionFunction_of_fintype]
   simpa [neg_mul] using Finset.single_le_sum
     (f := fun j : ι => Real.exp (- β T * 𝓒.energy j)) (fun j _ => Real.exp_nonneg _)

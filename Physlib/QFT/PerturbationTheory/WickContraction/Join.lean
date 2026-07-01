@@ -267,8 +267,8 @@ lemma join_card {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
   simp only [Finset.mem_map, RelEmbedding.coe_toEmbedding, not_exists, not_and]
   intro x hx
   by_contra hn
-  have hdis : Disjoint (Finset.map uncontractedListEmd x) a :=
-    uncontractedListEmd_finset_disjoint_left x a ha
+  have hdis : Disjoint (Finset.map uncontractedListEmd x) a := by
+    exact uncontractedListEmd_finset_disjoint_left x a ha
   rw [Finset.mapEmbedding_apply] at hn
   rw [hn] at hdis
   simp only [disjoint_self, Finset.bot_eq_empty] at hdis

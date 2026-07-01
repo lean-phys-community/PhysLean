@@ -95,8 +95,8 @@ where
             ring
           · simp only [hk', ↓reduceIte, Fin.isValue]
             rw [one_apply_ne fun a => hk (id (Eq.symm a))]
-            rw [if_neg fun a => hk (id (Eq.symm a))]
-            rw [if_neg fun a => hk' (id (Eq.symm a))]
+            rw [if_neg (by exact fun a => hk (id (Eq.symm a)))]
+            rw [if_neg (by exact fun a => hk' (id (Eq.symm a)))]
             simp
       · intro b _ hb
         simp [hb]

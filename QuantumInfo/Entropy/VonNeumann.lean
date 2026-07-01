@@ -284,8 +284,8 @@ private lemma charpoly_roots_filter_ne_zero_eq_eigenvalues_filter_ne_zero {d : T
 Mapping `RCLike.ofReal` over a multiset is injective.
 -/
 private lemma multiset_map_ofReal_injective {R : Type*} [RCLike R] {M N : Multiset ℝ} :
-    M.map (RCLike.ofReal : ℝ → R) = N.map RCLike.ofReal ↔ M = N :=
-  ⟨fun h ↦ by simpa using congr(($h).map RCLike.re), fun h ↦ by rw [h]⟩
+    M.map (RCLike.ofReal : ℝ → R) = N.map RCLike.ofReal ↔ M = N := by
+  exact ⟨fun h ↦ by simpa using congr(($h).map RCLike.re), fun h ↦ by rw [h]⟩
 
 /--
 If the non-zero roots of the characteristic polynomials of two states are equal,

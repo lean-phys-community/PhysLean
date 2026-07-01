@@ -225,9 +225,9 @@ structure RandVar (α : Type*) [Fintype α] (T : Type*) where
 instance instFunctor : Functor (RandVar α) where map f e := ⟨f ∘ e.1, e.2⟩
 
 instance instLawfulFunctor : LawfulFunctor (RandVar α) where
-  map_const {_} {_} := rfl
-  id_map _ := rfl
-  comp_map _ _ _ := rfl
+  map_const {α} {β} := by rfl
+  id_map _ := by rfl
+  comp_map _ _ _ := by rfl
 
 -- `U` is required to be a group just because mix below uses Convex.sum_mem,
 -- but it should be provable with just `AddCommMonoid U`
@@ -300,7 +300,7 @@ def congrRandVar (σ : α ≃ β) : RandVar α T ≃ RandVar β T := by
 /-- Given a `T`-valued random variable `X` over `α`, mapping over `T` commutes
   with the equivalence over `α` -/
 def map_congr_eq_congr_map {S : Type _} [Mixable U S] (f : T → S) (σ : α ≃ β) (X : RandVar α T) :
-  f <$> congrRandVar σ X = congrRandVar σ (f <$> X) := rfl
+  f <$> congrRandVar σ X = congrRandVar σ (f <$> X) := by rfl
 
 /-- The expectation value is invariant under equivalence of random variables -/
 @[simp]

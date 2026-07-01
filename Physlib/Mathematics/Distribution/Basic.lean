@@ -238,8 +238,8 @@ def fderivD [FiniteDimensional ℝ E] : (E →d[𝕜] F) →ₗ[𝕜] (E →d[�
     simp
 
 lemma fderivD_apply [FiniteDimensional ℝ E] (u : E →d[𝕜] F) (η : 𝓢(E, 𝕜)) (v : E) :
-    fderivD 𝕜 u η v =
-    - u (SchwartzMap.evalCLM (𝕜 := 𝕜) E 𝕜 v (SchwartzMap.fderivCLM 𝕜 E 𝕜 η)) := rfl
+    fderivD 𝕜 u η v = - u (SchwartzMap.evalCLM (𝕜 := 𝕜) E 𝕜 v (SchwartzMap.fderivCLM 𝕜 E 𝕜 η)) := by
+  rfl
 
 TODO "For distributions, prove that the derivative fderivD commutes with
   integrals and sums. This may require defining the integral of families of distributions
@@ -349,7 +349,7 @@ def const [hμ : Measure.HasTemperateGrowth (volume (α := E))] (c : F) : E →d
 
 lemma const_apply [hμ : Measure.HasTemperateGrowth (volume (α := E))] (c : F)
     (η : 𝓢(E, 𝕜)) :
-    const 𝕜 E c η = ∫ x, η x • c ∂MeasureTheory.volume := rfl
+    const 𝕜 E c η = ∫ x, η x • c ∂MeasureTheory.volume := by rfl
 end
 section
 

@@ -267,9 +267,9 @@ lemma nsmul_succ (n : ℕ) [SigmaFinite 𝓒.μ] : nsmul n.succ 𝓒 = (𝓒 + n
     exact Fin.sum_univ_succAbove (fun i => 𝓒.energy (x i)) 0
   · simp [Nat.succ_eq_add_one, Nat.succ_mul, dof_nsmul, add_comm]
   · simp
-  · exact Eq.symm (MeasureTheory.MeasurePreserving.map_eq
-      (MeasurePreserving.symm _
-        (MeasureTheory.measurePreserving_piFinSuccAbove (n := n) (fun _ => 𝓒.μ) 0)))
+  · refine Eq.symm (MeasureTheory.MeasurePreserving.map_eq ?_)
+    refine MeasurePreserving.symm _ ?_
+    exact MeasureTheory.measurePreserving_piFinSuccAbove (n := n) (fun _ => 𝓒.μ) 0
 
 /-!
 
@@ -930,7 +930,7 @@ lemma physicalProbability_nonneg
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
     0 ≤ 𝓒.physicalProbability T i := by
   have hp := 𝓒.probability_nonneg (T:=T) i
-  exact mul_nonneg hp (pow_nonneg (le_of_lt 𝓒.hPos) _)
+  exact mul_nonneg hp (by exact pow_nonneg (le_of_lt 𝓒.hPos) _)
 
 lemma physicalProbability_pos
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :

@@ -69,10 +69,10 @@ noncomputable def superCommuteRight (a : 𝓕.FieldOpFreeAlgebra) :
     simp
 
 lemma superCommuteRight_apply_ι (a b : 𝓕.FieldOpFreeAlgebra) :
-    superCommuteRight a (ι b) = ι [a, b]ₛF := rfl
+    superCommuteRight a (ι b) = ι [a, b]ₛF := by rfl
 
 lemma superCommuteRight_apply_quot (a b : 𝓕.FieldOpFreeAlgebra) :
-    superCommuteRight a ⟦b⟧= ι [a, b]ₛF := rfl
+    superCommuteRight a ⟦b⟧= ι [a, b]ₛF := by rfl
 
 lemma superCommuteRight_eq_of_equiv (a1 a2 : 𝓕.FieldOpFreeAlgebra) (h : a1 ≈ a2) :
     superCommuteRight a1 = superCommuteRight a2 := by
@@ -180,8 +180,8 @@ lemma superCommute_anPart_ofFieldOpF_diff_grade_zero (φ ψ : 𝓕.FieldOp)
 
 lemma superCommute_ofCrAnOp_ofCrAnOp_mem_center (φ φ' : 𝓕.CrAnFieldOp) :
     [ofCrAnOp φ, ofCrAnOp φ']ₛ ∈ Subalgebra.center ℂ (WickAlgebra 𝓕) := by
-  simpa [ofCrAnOp, superCommute_eq_ι_superCommuteF] using
-    ι_superCommuteF_ofCrAnOpF_ofCrAnOpF_mem_center φ φ'
+  rw [ofCrAnOp, ofCrAnOp, superCommute_eq_ι_superCommuteF]
+  exact ι_superCommuteF_ofCrAnOpF_ofCrAnOpF_mem_center φ φ'
 
 lemma superCommute_ofCrAnOp_ofCrAnOp_commute (φ φ' : 𝓕.CrAnFieldOp)
     (a : WickAlgebra 𝓕) :

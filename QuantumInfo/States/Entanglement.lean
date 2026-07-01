@@ -270,11 +270,11 @@ theorem Sᵥₙ_eq_trace_cfc {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
   have h_def : Sᵥₙ ρ = Finset.sum Finset.univ (fun x ↦ Real.negMulLog (ρ.M.H.eigenvalues x)) := rfl
   -- By definition of trace, the trace of `cfc ρ.M Real.negMulLog` is the sum of its eigenvalues.
   have h_trace : (ρ.M.cfc Real.negMulLog).trace =
-      ∑ x, (ρ.M.cfc Real.negMulLog).H.eigenvalues x :=
-    (HermitianMat.sum_eigenvalues_eq_trace _).symm
+      ∑ x, (ρ.M.cfc Real.negMulLog).H.eigenvalues x := by
+    exact (HermitianMat.sum_eigenvalues_eq_trace _).symm
   obtain ⟨e, he⟩ : ∃ e : d ≃ d, (ρ.M.cfc Real.negMulLog).H.eigenvalues =
-      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e :=
-    Matrix.IsHermitian.cfc_eigenvalues _ _
+      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e := by
+   exact Matrix.IsHermitian.cfc_eigenvalues _ _
   rw [h_def, h_trace, he]
   simp only [Function.comp_apply]
   conv_lhs => rw [ ← Equiv.sum_comp e ]
@@ -285,12 +285,12 @@ The von Neumann entropy of a classical state (diagonal in the basis) is equal to
 theorem Sᵥₙ_ofClassical {d : Type*} [Fintype d] [DecidableEq d] (dist : ProbDistribution d) :
     Sᵥₙ (MState.ofClassical dist) = Hₛ dist := by
   -- Let's unfold the definition of `Sᵥₙ` using `Sᵥₙ_eq_trace_cfc`.
-  have h_def : Sᵥₙ (MState.ofClassical dist) = (HermitianMat.cfc (MState.ofClassical dist).M Real.negMulLog).trace :=
-    Sᵥₙ_eq_trace_cfc (ofClassical dist);
+  have h_def : Sᵥₙ (MState.ofClassical dist) = (HermitianMat.cfc (MState.ofClassical dist).M Real.negMulLog).trace := by
+    exact Sᵥₙ_eq_trace_cfc (ofClassical dist);
   convert h_def using 1;
   -- By definition of $MState.ofClassical$, we know that $(MState.ofClassical dist).M$ is a diagonal matrix with entries $dist i$.
-  have h_diag : (MState.ofClassical dist).M = HermitianMat.diagonal ℂ (fun x => dist x) :=
-    rfl;
+  have h_diag : (MState.ofClassical dist).M = HermitianMat.diagonal ℂ (fun x => dist x) := by
+    exact rfl;
   rw [ h_diag, HermitianMat.cfc_diagonal, HermitianMat.trace_diagonal ] ; aesop
 
 /-- The entanglement of formation of the maximally entangled state with on-site dimension 𝕕 is log(𝕕). -/

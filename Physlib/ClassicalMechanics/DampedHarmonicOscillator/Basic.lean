@@ -296,8 +296,8 @@ lemma isCriticallyDamped_decayRate (hS : S.IsCriticallyDamped) : S.ω = S.decayR
       nlinarith
     exact ne_of_gt hm_sq_pos
   have hsq : S.decayRate^2 = S.ω^2 := by
-    have hsub : S.decayRate^2 - S.ω^2 = 0 :=
-      (mul_eq_zero.mp hS).resolve_left hm_sq_ne_zero
+    have hsub : S.decayRate^2 - S.ω^2 = 0 := by
+      exact (mul_eq_zero.mp hS).resolve_left hm_sq_ne_zero
     linarith
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 

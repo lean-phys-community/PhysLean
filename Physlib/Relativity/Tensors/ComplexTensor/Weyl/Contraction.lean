@@ -140,7 +140,7 @@ def leftDualContraction : (leftHandedRep.tprod dualLeftHandedRep).IntertwiningMa
 
 lemma leftDualContraction_hom_tmul (ψ : LeftHandedWeyl)
     (φ : DualLeftHandedWeyl) :
-    leftDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ :=
+    leftDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ := by
   rfl
 
 lemma leftDualContraction_basis (i j : Fin 2) :
@@ -149,8 +149,8 @@ lemma leftDualContraction_basis (i j : Fin 2) :
   simp only [leftBasis_toFin2ℂ, dualLeftBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
-    (congrFun rfl) (congrFun rfl)
+  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
+  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
 
 /-- The linear map from DualLeftHandedWeyl ⊗ leftHandedWeyl to ℂ given by
     summing over components of DualLeftHandedWeyl and leftHandedWeyl in the
@@ -166,7 +166,7 @@ def dualLeftContraction : (dualLeftHandedRep.tprod leftHandedRep).IntertwiningMa
     simp
 
 lemma dualLeftContraction_hom_tmul (φ : DualLeftHandedWeyl) (ψ : LeftHandedWeyl) :
-    dualLeftContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ :=
+    dualLeftContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ := by
   rfl
 
 lemma dualLeftContraction_basis (i j : Fin 2) :
@@ -175,8 +175,8 @@ lemma dualLeftContraction_basis (i j : Fin 2) :
   simp only [dualLeftBasis_toFin2ℂ, leftBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
-    (congrFun rfl) (congrFun rfl)
+  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
+  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
 
 /--
 The linear map from `rightHandedWeyl ⊗ DualRightHandedWeyl` to `ℂ` given by
@@ -191,7 +191,7 @@ def rightDualContraction : (rightHandedRep.tprod dualRightHandedRep).Intertwinin
   isIntertwining' M := TensorProduct.ext' fun ψ φ => by
     change (M.1.map star *ᵥ ψ.toFin2ℂ) ⬝ᵥ (M.1⁻¹.conjTranspose *ᵥ φ.toFin2ℂ) =
       ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ
-    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := rfl
+    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := by rfl
     rw [dotProduct_mulVec, h1, vecMul_transpose, mulVec_mulVec]
     have h2 : ((M.1)⁻¹.map star * (M.1).map star) = 1 := by
       refine transpose_inj.mp ?_
@@ -206,7 +206,7 @@ def rightDualContraction : (rightHandedRep.tprod dualRightHandedRep).Intertwinin
 
 lemma rightDualContraction_hom_tmul (ψ : RightHandedWeyl)
     (φ : DualRightHandedWeyl) :
-    rightDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ :=
+    rightDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ := by
   rfl
 
 lemma rightDualContraction_basis (i j : Fin 2) :
@@ -216,8 +216,8 @@ lemma rightDualContraction_basis (i j : Fin 2) :
   simp only [rightBasis_toFin2ℂ, dualRightBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
-    (congrFun rfl) (congrFun rfl)
+  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
+  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
 
 /--
   The linear map from DualRightHandedWeyl ⊗ rightHandedWeyl to ℂ given by
@@ -232,7 +232,7 @@ def dualRightContraction : (dualRightHandedRep.tprod rightHandedRep).Intertwinin
   isIntertwining' M := TensorProduct.ext' fun φ ψ => by
     change (M.1⁻¹.conjTranspose *ᵥ φ.toFin2ℂ) ⬝ᵥ (M.1.map star *ᵥ ψ.toFin2ℂ) =
       φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ
-    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := rfl
+    have h1 : (M.1)⁻¹ᴴ = ((M.1)⁻¹.map star)ᵀ := by rfl
     rw [dotProduct_mulVec, h1, mulVec_transpose, vecMul_vecMul]
     have h2 : ((M.1)⁻¹.map star * (M.1).map star) = 1 := by
       refine transpose_inj.mp ?_
@@ -247,7 +247,7 @@ def dualRightContraction : (dualRightHandedRep.tprod rightHandedRep).Intertwinin
 
 lemma dualRightContraction_hom_tmul (φ : DualRightHandedWeyl)
     (ψ : RightHandedWeyl) :
-    dualRightContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ :=
+    dualRightContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ := by
   rfl
 
 lemma dualRightContraction_basis (i j : Fin 2) :
@@ -257,8 +257,8 @@ lemma dualRightContraction_basis (i j : Fin 2) :
   simp only [dualRightBasis_toFin2ℂ, rightBasis_toFin2ℂ, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
-  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
-    (congrFun rfl) (congrFun rfl)
+  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
+  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
 
 /-!
 

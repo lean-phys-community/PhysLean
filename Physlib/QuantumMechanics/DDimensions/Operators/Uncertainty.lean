@@ -115,11 +115,11 @@ lemma raw_commutator_eq_of_symmetric
     (h_raw : ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩ - B ⟨A ψ, hBA⟩⟫_ℂ = Complex.I * c) :
     ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ - ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ = Complex.I * c := by
   have ha_pairing :
-      ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ = ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩⟫_ℂ :=
-    hA ψ ⟨B ⟨ψ, hψB⟩, hAB⟩
+      ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ = ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩⟫_ℂ := by
+    exact hA ψ ⟨B ⟨ψ, hψB⟩, hAB⟩
   have hb_pairing :
-      ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ = ⟪(ψ : H), B ⟨A ψ, hBA⟩⟫_ℂ :=
-    hB ⟨ψ, hψB⟩ ⟨A ψ, hBA⟩
+      ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ = ⟪(ψ : H), B ⟨A ψ, hBA⟩⟫_ℂ := by
+    exact hB ⟨ψ, hψB⟩ ⟨A ψ, hBA⟩
   calc
     ⟪A ψ, B ⟨ψ, hψB⟩⟫_ℂ - ⟪B ⟨ψ, hψB⟩, A ψ⟫_ℂ =
       ⟪(ψ : H), A ⟨B ⟨ψ, hψB⟩, hAB⟩⟫_ℂ -
@@ -145,7 +145,7 @@ def rawCommutatorExpectation (A B : H →ₗ.[ℂ] H)
 lemma commutator_half_sq_le_mul_norm_sq {u v : H} {c : ℝ}
     (h_comm : ⟪u, v⟫_ℂ - ⟪v, u⟫_ℂ = Complex.I * c) :
     (|c| / 2) ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 := by
-  suffices (|c| / 2) ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 from this
+  suffices (|c| / 2) ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 by exact this
   have h_sq : |c / 2| ^ 2 ≤ (‖u‖ * ‖v‖) ^ 2 := by
     have h_bound : |c / 2| ≤ ‖u‖ * ‖v‖ := by
       have h_im : |(⟪u, v⟫_ℂ).im| ≤ ‖u‖ * ‖v‖ :=
@@ -158,7 +158,7 @@ lemma commutator_half_sq_le_mul_norm_sq {u v : H} {c : ℝ}
 private lemma sqrt_mul_le_of_sq_le {x y z : ℝ}
     (hx : 0 ≤ x) (hz : 0 ≤ z) (hxy : z ^ 2 ≤ x * y) :
     z ≤ Real.sqrt x * Real.sqrt y := by
-  suffices z ≤ Real.sqrt x * Real.sqrt y from this
+  suffices z ≤ Real.sqrt x * Real.sqrt y by exact this
   have hs : Real.sqrt (z ^ 2) ≤ Real.sqrt (x * y) := Real.sqrt_le_sqrt hxy
   rw [Real.sqrt_sq hz, Real.sqrt_mul hx] at hs
   simpa [mul_comm] using hs

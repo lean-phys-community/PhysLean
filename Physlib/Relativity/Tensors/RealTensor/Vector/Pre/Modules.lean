@@ -72,7 +72,7 @@ def toFin1dℝEquiv : ContrMod d ≃ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
   through the linear equivalence `toFin1dℝEquiv`. -/
 abbrev toFin1dℝ (ψ : ContrMod d) := toFin1dℝEquiv ψ
 
-lemma toFin1dℝ_eq_val (ψ : ContrMod d) : ψ.toFin1dℝ = ψ.val := rfl
+lemma toFin1dℝ_eq_val (ψ : ContrMod d) : ψ.toFin1dℝ = ψ.val := by rfl
 /-!
 
 ## The standard basis.
@@ -108,8 +108,8 @@ lemma stdBasis_apply (μ ν : Fin 1 ⊕ Fin d) : (stdBasis μ).val ν = if μ = 
   simp only [stdBasis, Basis.coe_ofEquivFun]
   change Pi.single μ 1 ν = _
   simp only [Pi.single_apply]
-  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
-    (congrFun rfl) (congrFun rfl)
+  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
+  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
 
 /-- Decomposition of a contravariant Lorentz vector into the standard basis. -/
 lemma stdBasis_decomp (v : ContrMod d) : v = ∑ i, v.toFin1dℝ i • stdBasis i := by
@@ -284,8 +284,8 @@ instance : TopologicalSpace (ContrMod d) := TopologicalSpace.induced
 
 open Topology
 
-lemma toFin1dℝEquiv_isInducing : IsInducing (@ContrMod.toFin1dℝEquiv d) :=
-  { eq_induced := rfl }
+lemma toFin1dℝEquiv_isInducing : IsInducing (@ContrMod.toFin1dℝEquiv d) := by
+  exact { eq_induced := rfl }
 
 lemma toFin1dℝEquiv_symm_isInducing : IsInducing ((@ContrMod.toFin1dℝEquiv d).symm) := by
   let x := Equiv.toHomeomorphOfIsInducing (@ContrMod.toFin1dℝEquiv d).toEquiv
@@ -363,8 +363,8 @@ lemma stdBasis_apply (μ ν : Fin 1 ⊕ Fin d) : (stdBasis μ).val ν = if μ = 
   simp only [stdBasis, Basis.coe_ofEquivFun]
   change Pi.single μ 1 ν = _
   simp only [Pi.single_apply]
-  exact ite_congr (Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a))
-    (congrFun rfl) (congrFun rfl)
+  refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
+  exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
 
 /-- Decomposition of a covariant Lorentz vector into the standard basis. -/
 lemma stdBasis_decomp (v : CoMod d) : v = ∑ i, v.toFin1dℝ i • stdBasis i := by

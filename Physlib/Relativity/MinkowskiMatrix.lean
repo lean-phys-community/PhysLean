@@ -113,7 +113,7 @@ We prove some simple properties related to the components of the Minkowski matri
 
 /-- The `time-time` component of the Minkowski matrix is `1`. -/
 @[simp]
-lemma inl_0_inl_0 : @minkowskiMatrix d (Sum.inl 0) (Sum.inl 0) = 1 :=
+lemma inl_0_inl_0 : @minkowskiMatrix d (Sum.inl 0) (Sum.inl 0) = 1 := by
   rfl
 
 /-- The space diagonal components of the Minkowski matrix are `-1`. -/

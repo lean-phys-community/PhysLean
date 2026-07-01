@@ -24,15 +24,15 @@ theorem isUnit_smul {c : R} (hA : IsUnit c) {M : Matrix d d S} (hM : IsUnit M) :
   use d • M'
   rfl
 
-theorem isUnit_natCast {n : ℕ} (hn : n ≠ 0) [CharZero F] : IsUnit (n : Matrix d d F) :=
-  (IsUnit.mk0 (n : F) (mod_cast hn)).map (algebraMap F _)
+theorem isUnit_natCast {n : ℕ} (hn : n ≠ 0) [CharZero F] : IsUnit (n : Matrix d d F) := by
+  exact (IsUnit.mk0 (n : F) (mod_cast hn)).map (algebraMap F _)
 
 theorem isUnit_real_smul {r : ℝ} (hr : r ≠ 0) {M : Matrix d d 𝕜} (hM : IsUnit M) :
     IsUnit (r • M : Matrix d d 𝕜) :=
   isUnit_smul hr.isUnit hM
 
-theorem isUnit_real_cast {r : ℝ} (hr : r ≠ 0) : IsUnit (r • 1 : Matrix d d 𝕜) :=
-  isUnit_real_smul hr isUnit_one
+theorem isUnit_real_cast {r : ℝ} (hr : r ≠ 0) : IsUnit (r • 1 : Matrix d d 𝕜) := by
+  exact isUnit_real_smul hr isUnit_one
 
 end Matrix
 
@@ -49,8 +49,8 @@ class NonSingular (A : HermitianMat n R) : Prop where
 theorem isUnit_mat_of_nonSingular [NonSingular A] : IsUnit A.mat :=
   NonSingular.isUnit
 
-theorem nonsingular_iff_isUnit : NonSingular A ↔ IsUnit A.mat :=
-  Iff.intro (fun h ↦ h.isUnit) NonSingular.mk
+theorem nonsingular_iff_isUnit : NonSingular A ↔ IsUnit A.mat := by
+  exact Iff.intro (fun h ↦ h.isUnit) NonSingular.mk
 
 instance instHasInv_of_invertible [i : Invertible A.mat] : NonSingular A :=
   ⟨isUnit_of_invertible _⟩

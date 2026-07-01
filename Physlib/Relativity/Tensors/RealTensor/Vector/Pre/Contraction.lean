@@ -170,7 +170,7 @@ def coCoContract : ((CoMod.rep (d := d)).tprod (CoMod.rep (d := d))).Intertwinin
 local notation "⟪" ψ "," φ "⟫ₘ" => coCoContract (ψ ⊗ₜ φ)
 
 lemma coCoContract_hom_tmul (φ : Co d) (ψ : Co d) :
-    ⟪φ, ψ⟫ₘ = φ.toFin1dℝ ⬝ᵥ η *ᵥ ψ.toFin1dℝ := rfl
+    ⟪φ, ψ⟫ₘ = φ.toFin1dℝ ⬝ᵥ η *ᵥ ψ.toFin1dℝ := by rfl
 
 /-!
 

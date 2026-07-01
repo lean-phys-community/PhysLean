@@ -33,8 +33,8 @@ variable (A : HermitianMat d 𝕜) (f : ℝ → ℝ) (g : ℝ → ℝ) (q r : �
 /- Adding this to the `CStarAlgebra` aesop set allows `cfc_tac` to use it. -/
 omit [Fintype d] [DecidableEq d] in
 @[aesop safe apply (rule_sets := [CStarAlgebra])]
-theorem isSelfAdjoint : IsSelfAdjoint A.mat :=
-  A.H
+theorem isSelfAdjoint : IsSelfAdjoint A.mat := by
+  exact A.H
 
 /- Adding this to `fun_prop` allows `cfc_cont_tac` to use it. -/
 @[fun_prop]
@@ -43,8 +43,8 @@ theorem continuousOn_finite {α β : Type*} (f : α → β) (S : Set α)
   simpa [continuousOn_iff_continuous_restrict] using continuous_of_discreteTopology
 
 @[simp]
-theorem conjTranspose_cfc : (cfc f A.mat).conjTranspose = cfc f A.mat :=
-  cfc_predicate f A.mat
+theorem conjTranspose_cfc : (cfc f A.mat).conjTranspose = cfc f A.mat := by
+  exact cfc_predicate f A.mat
 
 protected def cfc : HermitianMat d 𝕜 :=
   ⟨cfc f A.mat, cfc_predicate _ _⟩
@@ -90,8 +90,8 @@ variable {A B : HermitianMat d 𝕜}
 
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.cfc_left (hAB : Commute A.mat B.mat) :
-    Commute (A.cfc f).mat B.mat :=
-  hAB.cfc_real f
+    Commute (A.cfc f).mat B.mat := by
+  exact hAB.cfc_real f
 
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem _root_.Commute.cfc_right (hAB : Commute A.mat B.mat) :
@@ -99,8 +99,8 @@ theorem _root_.Commute.cfc_right (hAB : Commute A.mat B.mat) :
   (hAB.symm.cfc_left f).symm
 
 theorem cfc_commute (f g : ℝ → ℝ) (hAB : Commute A.mat B.mat) :
-    Commute (A.cfc f).mat (B.cfc g).mat :=
-  (hAB.cfc_right g).cfc_left f
+    Commute (A.cfc f).mat (B.cfc g).mat := by
+  exact (hAB.cfc_right g).cfc_left f
 
 @[aesop safe apply (rule_sets := [Commutes])]
 theorem cfc_self_commute (A : HermitianMat d 𝕜) (f g : ℝ → ℝ) :
@@ -117,8 +117,8 @@ theorem cfc_reindex (e : d ≃ d₂) : (A.reindex e).cfc f = (A.cfc f).reindex e
   exact Matrix.cfc_reindex f e
 
 theorem spectrum_cfc_eq_image (A : HermitianMat d 𝕜) (f : ℝ → ℝ) :
-    spectrum ℝ (A.cfc f).mat = f '' (spectrum ℝ A.mat) :=
-  cfc_map_spectrum f A.mat
+    spectrum ℝ (A.cfc f).mat = f '' (spectrum ℝ A.mat) := by
+  exact cfc_map_spectrum f A.mat
 
 set_option backward.isDefEq.respectTransparency false in
 /--
@@ -186,8 +186,8 @@ theorem mat_cfc_mul : (A.cfc (f * g)).mat = A.cfc f * A.cfc g := by
   simp only [mat_cfc]
   exact cfc_mul ..
 
-theorem mat_cfc_mul_apply : (A.cfc (fun x ↦ f x * g x)).mat = A.cfc f * A.cfc g :=
-  mat_cfc_mul ..
+theorem mat_cfc_mul_apply : (A.cfc (fun x ↦ f x * g x)).mat = A.cfc f * A.cfc g := by
+  exact mat_cfc_mul ..
 
 nonrec theorem cfc_comp : A.cfc (g ∘ f) = (A.cfc f).cfc g := by
   ext1; exact cfc_comp ..
@@ -383,10 +383,10 @@ theorem Matrix.PosDef.spectrum_subset_Ioi {d 𝕜 : Type*} [Fintype d] [Decidabl
     {A : Matrix d d 𝕜} (hA : A.PosDef) : spectrum ℝ A ⊆ Set.Ioi 0 := by
   intro x hx;
   -- Since $A$ is positive definite, all its eigenvalues are positive.
-  have h_eigenvalues_pos : ∀ i : d, 0 < hA.1.eigenvalues i :=
-    hA.eigenvalues_pos
-  have h_spectrum_eq_range : spectrum ℝ A = Set.range (hA.1.eigenvalues) :=
-    Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues hA.left
+  have h_eigenvalues_pos : ∀ i : d, 0 < hA.1.eigenvalues i := by
+    exact hA.eigenvalues_pos;
+  have h_spectrum_eq_range : spectrum ℝ A = Set.range (hA.1.eigenvalues) := by
+    exact Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues hA.left;
   aesop
 
 /--
@@ -455,8 +455,8 @@ lemma norm_cfc_sub_cfc_le_sqrt_card {A : HermitianMat d ℂ} {f g : ℝ → ℝ}
   · intro x hx
     apply le_csSup;
     · -- The supremum of a finite set of real numbers is finite.
-      have h_finite : Set.Finite (spectrum ℝ A.mat) :=
-        Set.toFinite _
+      have h_finite : Set.Finite (spectrum ℝ A.mat) := by
+        exact Set.toFinite _;
       obtain ⟨ M, hM ⟩ := h_finite.exists_finset_coe;
       refine' ⟨ ∑ x ∈ M, ‖f x - g x‖, Set.forall_mem_range.2 fun x => _ ⟩;
       rw [ ← hM ];
@@ -570,9 +570,9 @@ theorem continuous_cfc_joint_compact {X d : Type*} [TopologicalSpace X] [Fintype
   (hA₂ : ContinuousOn (fun x ↦ A x) S) :
     ContinuousOn (fun x ↦ (A x).cfc (f x)) S := by
   intro x x_in_S
-  have h_eps_delta : ContinuousWithinAt (fun y => (A y).cfc (f x)) S x :=
-    ((continuousOn_cfc_of_compact hT (hf.uncurry_left x x_in_S)).comp hA₂ hA₁).continuousWithinAt
-      x_in_S
+  have h_eps_delta : ContinuousWithinAt (fun y => (A y).cfc (f x)) S x := by
+    refine ContinuousOn.continuousWithinAt ?_ x_in_S
+    exact (continuousOn_cfc_of_compact hT (hf.uncurry_left x x_in_S)).comp hA₂ hA₁
   rw [ ContinuousWithinAt ] at *;
   rw [ Metric.tendsto_nhds ] at *;
   intro ε ε_pos
@@ -737,11 +737,11 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
     (hg : ContinuousOn g T) (hA₀ : spectrum ℝ A₀.mat ⊆ T) :
     ContinuousWithinAt (fun B ↦ B.cfc g) {B | spectrum ℝ B.mat ⊆ T} A₀ := by
   have h_ext : ∃ h : ℝ → ℝ, Continuous h ∧ ∀ x ∈ spectrum ℝ A₀.mat, h x = g x := by
-    have h_finite : Set.Finite (spectrum ℝ A₀.mat) :=
-      Set.toFinite _
+    have h_finite : Set.Finite (spectrum ℝ A₀.mat) := by
+      exact Set.toFinite _
     generalize_proofs at *; (
-    have h_cont : ContinuousOn g (spectrum ℝ A₀.val) :=
-      hg.mono hA₀
+    have h_cont : ContinuousOn g (spectrum ℝ A₀.val) := by
+      exact hg.mono hA₀
     generalize_proofs at *; (
     have := @ContinuousMap.exists_restrict_eq ℝ;
     specialize this ( show IsClosed ( spectrum ℝ A₀.val ) from h_finite.isClosed ) ( ContinuousMap.mk ( fun x => g x ) <| by exact continuousOn_iff_continuous_restrict.mp h_cont ) ; rcases this with ⟨ h, hh ⟩ ; exact ⟨ h, h.continuous, fun x hx => by simpa using congr_arg ( fun f => f ⟨ x, hx ⟩ ) hh ⟩ ;));
@@ -759,8 +759,8 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
           simpa [ hh_eq y hy ] using h_diff_small.abs;
         have := Metric.tendsto_nhdsWithin_nhds.mp h_diff_small ( ε / ( Real.sqrt ( Fintype.card d ) + 1 ) ) ( div_pos ε_pos ( add_pos_of_nonneg_of_pos ( Real.sqrt_nonneg _ ) zero_lt_one ) ) ; aesop;
       choose! δ hδ_pos hδ using h_diff_small;
-      have h_finite : Set.Finite (spectrum ℝ A₀.mat) :=
-        Set.toFinite _
+      have h_finite : Set.Finite (spectrum ℝ A₀.mat) := by
+        exact Set.toFinite _;
       obtain ⟨δ_min, hδ_min_pos, hδ_min⟩ : ∃ δ_min > 0, ∀ y ∈ spectrum ℝ A₀.mat, δ_min ≤ δ y := by
         by_cases h_empty : spectrum ℝ A₀.mat = ∅;
         · exact ⟨ 1, zero_lt_one, by simp [ h_empty ] ⟩;
@@ -770,15 +770,15 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
     -- By the spectrum_subset_of_isOpen lemma, there exists a neighborhood U of A₀ such that the spectrum of B is within δ of the spectrum of A₀ for all B in U.
     obtain ⟨U, hU⟩ : ∃ U ∈ nhds A₀, ∀ B ∈ U, spectrum ℝ B.mat ⊆ {x | ∃ y ∈ spectrum ℝ A₀.mat, |x - y| < δ} := by
       have h_spectrum_subset : ∀ᶠ B in nhds A₀, spectrum ℝ B.mat ⊆ Metric.thickening δ (spectrum ℝ A₀.mat) := by
-        have h_open : IsOpen (Metric.thickening δ (spectrum ℝ A₀.mat)) :=
-          Metric.isOpen_thickening
+        have h_open : IsOpen (Metric.thickening δ (spectrum ℝ A₀.mat)) := by
+          exact Metric.isOpen_thickening
         have := spectrum_subset_of_isOpen A₀ ( Metric.thickening δ ( spectrum ℝ A₀.mat ) ) h_open ( Metric.self_subset_thickening δ_pos _ ) ; aesop;
       generalize_proofs at *; (
       exact ⟨ _, h_spectrum_subset, fun B hB => fun x hx => by simpa [ dist_eq_norm ] using Metric.mem_thickening_iff.mp ( hB hx ) ⟩)
     generalize_proofs at *; (
     refine' ⟨ U, hU.1, fun B hB => _ ⟩
-    have h_diff_small : ∀ x ∈ spectrum ℝ B.mat, |g x - h x| ≤ ε / (Real.sqrt (Fintype.card d) + 1) :=
-      fun x hx => le_of_lt ( hδ x ( hB.2 hx ) _ ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.left ) ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.right ) ) |> le_trans <| by norm_num;
+    have h_diff_small : ∀ x ∈ spectrum ℝ B.mat, |g x - h x| ≤ ε / (Real.sqrt (Fintype.card d) + 1) := by
+      exact fun x hx => le_of_lt ( hδ x ( hB.2 hx ) _ ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.left ) ( hU.2 B hB.1 hx |> Classical.choose_spec |> And.right ) ) |> le_trans <| by norm_num;
     generalize_proofs at *; (
     have h_diff_small : ‖B.cfc g - B.cfc h‖ ≤ Real.sqrt (Fintype.card d) * (ε / (Real.sqrt (Fintype.card d) + 1)) := by
       apply_rules [ norm_cfc_sub_le_of_sup_le ];
@@ -798,8 +798,8 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
   · intro x hx hx' hx''
     have hd1 := hδ hx hx'
     have hd2 := hU x ⟨(Metric.mem_nhds_iff.mp hU_nhds).choose_spec.2 hx'', hx⟩
-    have h_eq : A₀.cfc g = A₀.cfc h :=
-      cfc_congr (show Set.EqOn g h (spectrum ℝ A₀.mat) from fun x hx => hh_eq x hx ▸ rfl) ▸ rfl
+    have h_eq : A₀.cfc g = A₀.cfc h := by
+      exact cfc_congr (show Set.EqOn g h (spectrum ℝ A₀.mat) from fun x hx => hh_eq x hx ▸ rfl) ▸ rfl
     rw [dist_eq_norm, h_eq]
     calc ‖x.cfc g - A₀.cfc h‖
         = ‖(x.cfc g - x.cfc h) + (x.cfc h - A₀.cfc h)‖ := by congr 1; abel
@@ -873,8 +873,8 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
         choose U_i V_i hU_i hV_i hx₀_i hV_i_i h_cont_i using h_cont; exact ⟨ U_i, V_i, hU_i, hV_i, hx₀_i, hV_i_i, h_cont_i ⟩ ;);
       -- The open set W := ⋃ᵢ V_i contains spectrum(A x₀) (since each λᵢ ∈ V_i and spectrum = range of eigenvalues). W is open as a union of open sets.
       set W := ⋃ i, V_i i with hW_def
-      have hW_open : IsOpen W :=
-        isOpen_iUnion hV_i
+      have hW_open : IsOpen W := by
+        exact isOpen_iUnion hV_i
       have hW_spectrum : spectrum ℝ (A x₀).mat ⊆ W := by
         intro t ht
         obtain ⟨i, hi⟩ : ∃ i, t = (A x₀).H.eigenvalues i := by
@@ -891,10 +891,10 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
       obtain ⟨U'', hU''⟩ : ∃ U'' ∈ nhds x₀, ∀ i, U'' ⊆ U_i i := by
         exact ⟨ ⋂ i, U_i i, Filter.mem_of_superset ( Filter.iInter_mem.mpr fun i => IsOpen.mem_nhds ( hU_i i ) ( h_cont.1 i ) ) fun x hx => by aesop, fun i => Set.iInter_subset _ i ⟩
       set U := U' ∩ U'' with hU_def
-      have hU_mem : U ∈ nhds x₀ :=
-        Filter.inter_mem hU'.1 hU''.1
-      have hU_subset : ∀ y ∈ U ∩ S, spectrum ℝ (A y).mat ⊆ W :=
-        fun y hy => hU'.2 y ⟨hy.1.1, hy.2⟩ |> Set.Subset.trans <| by simp [hW_def]
+      have hU_mem : U ∈ nhds x₀ := by
+        exact Filter.inter_mem hU'.1 hU''.1
+      have hU_subset : ∀ y ∈ U ∩ S, spectrum ℝ (A y).mat ⊆ W := by
+        exact fun y hy => hU'.2 y ⟨ hy.1.1, hy.2 ⟩ |> Set.Subset.trans <| by simp [ hW_def ] ;
       have hU_cont : ∀ y ∈ U ∩ S, ∀ t ∈ spectrum ℝ (A y).mat, ‖f y t - f x₀ t‖ < ε := by
         intro y hy t ht
         obtain ⟨i, hi⟩ : ∃ i, t ∈ V_i i := by
@@ -1058,8 +1058,8 @@ The integral of a Hermitian matrix function commutes with `toMat`.
 -/
 lemma integral_toMat (A : ℝ → HermitianMat d 𝕜) (T₁ T₂ : ℝ) {μ : Measure ℝ}
   (hA : IntervalIntegrable A μ T₁ T₂) :
-    (∫ t in T₁..T₂, A t ∂μ).mat = ∫ t in T₁..T₂, (A t).mat ∂μ :=
-  ((matₗ (R := ℝ)).intervalIntegral_comp_comm hA).symm
+    (∫ t in T₁..T₂, A t ∂μ).mat = ∫ t in T₁..T₂, (A t).mat ∂μ := by
+  exact ((matₗ (R := ℝ)).intervalIntegral_comp_comm hA).symm
 
 set_option backward.isDefEq.respectTransparency false in
 /--
@@ -1098,8 +1098,8 @@ lemma intervalIntegrable_toMat_iff (A : ℝ → HermitianMat d 𝕜) (T₁ T₂ 
             exact IsSemisimpleModule.extension_property L h_toMat_linear LinearMap.id;
           exact ⟨ h_toMat_linear.choose, fun x ↦ by simpa using LinearMap.congr_fun h_toMat_linear.choose_spec x ⟩;
         obtain ⟨ L_inv, hL_inv ⟩ := h_toMat_linear;
-        have h_toMat_linear : IntegrableOn (fun t ↦ L_inv (L (A t))) (Set.uIoc T₁ T₂) μ :=
-          ContinuousLinearMap.integrable_comp L_inv.toContinuousLinearMap h_toMat_integrable
+        have h_toMat_linear : IntegrableOn (fun t ↦ L_inv (L (A t))) (Set.uIoc T₁ T₂) μ := by
+          exact ContinuousLinearMap.integrable_comp ( L_inv.toContinuousLinearMap ) h_toMat_integrable;
         aesop;
       aesop;
     exact h_toMat_integrable h;
@@ -1224,8 +1224,8 @@ theorem cfc_le_cfc_of_commute (hf : Monotone f) (hAB₁ : Commute A.mat B.mat) (
 open ComplexOrder in
 theorem cfc_monoOn_pos_of_monoOn_posDef {d : Type*} [Fintype d] [DecidableEq d]
   {f : ℝ → ℝ} (hf_is_operator_convex : False) :
-    MonotoneOn (HermitianMat.cfc · f) { A : HermitianMat d ℂ | A.mat.PosDef } :=
-  False.elim hf_is_operator_convex
+    MonotoneOn (HermitianMat.cfc · f) { A : HermitianMat d ℂ | A.mat.PosDef } := by
+  exact False.elim hf_is_operator_convex
 
 section uncategorized_cleanup
 
@@ -1236,18 +1236,18 @@ theorem inv_ge_one_of_le_one (hA : A.mat.PosDef) (h : A ≤ 1) : 1 ≤ A⁻¹ :=
     have h_cfc_nonneg : ∀ i, 0 ≤ (A.H.eigenvalues i)⁻¹ - 1 := by
       have h_pos : ∀ i, 0 < A.H.eigenvalues i ∧ A.H.eigenvalues i ≤ 1 := by
         -- Since $A$ is positive definite, all its eigenvalues are positive.
-        have h_pos : ∀ i, 0 < A.H.eigenvalues i :=
-          fun i => Matrix.PosDef.eigenvalues_pos hA i
+        have h_pos : ∀ i, 0 < A.H.eigenvalues i := by
+          exact fun i => Matrix.PosDef.eigenvalues_pos hA i;
         -- Since $A \leq 1$, for any eigenvalue $\lambda_i$ of $A$, we have $\lambda_i \leq 1$.
         have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
           have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
             intro i
-            have h_eigenvalue : A.mat.PosSemidef :=
-              hA.posSemidef
+            have h_eigenvalue : A.mat.PosSemidef := by
+              exact hA.posSemidef
             have h_eigenvalue_le_one : ∀ x : d → 𝕜, x ≠ 0 → (star x ⬝ᵥ A.mat.mulVec x) / (star x ⬝ᵥ x) ≤ 1 := by
               intro x hx_ne_zero
-              have h_eigenvalue_le_one : (star x ⬝ᵥ (1 - A.mat).mulVec x) ≥ 0 :=
-                Matrix.PosSemidef.dotProduct_mulVec_nonneg h x
+              have h_eigenvalue_le_one : (star x ⬝ᵥ (1 - A.mat).mulVec x) ≥ 0 := by
+                exact Matrix.PosSemidef.dotProduct_mulVec_nonneg h x
               generalize_proofs at *; (
               rw [ div_le_iff₀ ] <;> simp_all [ Matrix.sub_mulVec, dotProduct_sub ])
             generalize_proofs at *; (
@@ -1361,8 +1361,8 @@ lemma ker_cfc_le_ker_on_set
     (A.cfc f).ker ≤ A.ker := by
   intro x hx
   have h_inner : ∀ i, A.H.eigenvalues i ≠ 0 → inner ℂ (A.H.eigenvectorBasis i) x = 0 := by
-    have h_inner_zero : (A.cfc f).mat.mulVec x = 0 :=
-      (mem_ker_iff_mulVec_zero (A.cfc f) x).mp hx
+    have h_inner_zero : (A.cfc f).mat.mulVec x = 0 := by
+      exact (mem_ker_iff_mulVec_zero (A.cfc f) x).mp hx
     have h_inner_zero_expansion : ∑ i, (f (A.H.eigenvalues i) : ℂ) • inner ℂ (A.H.eigenvectorBasis i) x • A.H.eigenvectorBasis i = 0 := by
       convert h_inner_zero using 1;
       rw [ cfc_mulVec_expansion ];
@@ -1397,8 +1397,8 @@ lemma ker_le_ker_cfc_on_set (hs : spectrum ℝ A.mat ⊆ s) (h : ∀ i ∈ s, i 
   intro x hx
   have h_inner_zero : ∀ i, A.H.eigenvalues i ≠ 0 → inner ℂ (A.H.eigenvectorBasis i) x = 0 := by
     intro i hi
-    have h_inner_zero : A.mat.mulVec x = 0 :=
-      (mem_ker_iff_mulVec_zero A x).mp hx
+    have h_inner_zero : A.mat.mulVec x = 0 := by
+      exact (mem_ker_iff_mulVec_zero A x).mp hx;
     have := mulVec_eq_zero_iff_inner_eigenvector_zero A x; aesop;
   have h_mulVec_zero : (A.cfc f).mat.mulVec x = ∑ i, (f (A.H.eigenvalues i) : ℂ) • inner ℂ (A.H.eigenvectorBasis i) x • A.H.eigenvectorBasis i := by
     convert cfc_mulVec_expansion A f x using 1;

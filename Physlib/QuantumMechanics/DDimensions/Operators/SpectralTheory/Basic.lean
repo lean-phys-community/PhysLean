@@ -225,9 +225,9 @@ lemma regularityDomain_isOpen (T : H →ₗ.[ℂ] H) : IsOpen T.regularityDomain
 
 /-- `T` and `T.closure` have the same regularity domain. -/
 lemma regularityDomain_closure (T : H →ₗ.[ℂ] H) :
-    T.closure.regularityDomain = T.regularityDomain :=
-  eq_of_le_of_ge (regularityDomain_antitone T.le_closure)
-    fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
+    T.closure.regularityDomain = T.regularityDomain := by
+  refine eq_of_le_of_ge (regularityDomain_antitone T.le_closure) ?_
+  exact fun _ ⟨c, hc, h⟩ ↦ ⟨c, hc, isLowerBound_closure h⟩
 
 lemma IsClosable.closure_range_sub_eq_range_closure_sub [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosable) {z : ℂ} (hz : z ∈ T.regularityDomain) :
@@ -688,8 +688,8 @@ lemma IsClosed.resolventSet_eq [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.
   rw [mem_resolventSet_iff, mem_setOf_eq, and_congr_right_iff, and_iff_left_iff_imp]
   intro h_ker h_range
   refine continuous_of_isClosed_domain ?_ ?_
-  · exact (inverse_closed_iff h_ker).mpr
-      (hT.sub_continuous (Continuous.const_smul (by fun_prop) _) (by simp))
+  · apply (inverse_closed_iff h_ker).mpr
+    exact hT.sub_continuous (Continuous.const_smul (by fun_prop) _) (by simp)
   · simp [inverse_domain, h_range]
 
 /-- For a closed operator the resolvent set consists of those regular points for which
@@ -833,8 +833,8 @@ lemma IsClosed.spectrum_eq [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsCl
         rw [mem_continuousSpectrum_iff, ← inverse_domain]
         refine fun h ↦ h_cont ?_
         refine continuous_of_isClosed_domain ?_ h
-        exact (inverse_closed_iff h_ker).mpr
-          (hT.sub_continuous (Continuous.const_smul (by fun_prop) _) le_top)
+        apply (inverse_closed_iff h_ker).mpr
+        exact hT.sub_continuous (Continuous.const_smul (by fun_prop) _) le_top
     · left; left; exact h_ker
   · refine union_subset ?_ T.continuousSpectrum_subset_spectrum
     exact union_subset T.pointSpectrum_subset_spectrum T.residualSpectrum_subset_spectrum
