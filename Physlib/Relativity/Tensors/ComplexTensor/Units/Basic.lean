@@ -135,8 +135,7 @@ lemma rightDualRightUnit_eq_fromPairT : δR = fromPairT (Fermion.rightDualRightU
 open Lorentz in
 lemma coContrUnit_eq_complexCoBasis_complexContrBasis : δ' =
     ∑ i, fromPairT (complexCoBasis i ⊗ₜ[ℂ] complexContrBasis i) := by
-  rw [coContrUnit_eq_fromPairT, coContrUnitVal_expand_tmul]
-  rfl
+  exact (coContrUnit_eq_fromPairT.trans (congrArg fromPairT coContrUnitVal_expand_tmul)).trans rfl
 
 open Lorentz in
 lemma coContrUnit_eq_complexCoBasisFin4_complexContrBasisFin4 : δ' =

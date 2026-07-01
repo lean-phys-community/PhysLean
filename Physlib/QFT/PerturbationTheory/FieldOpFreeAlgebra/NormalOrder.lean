@@ -214,8 +214,7 @@ lemma normalOrderF_swap_create_annihilate_ofCrAnListF (φc φa : 𝓕.CrAnFieldO
   refine LinearMap.congr_fun (ofCrAnListFBasis.ext fun l ↦ ?_) a
   simp only [mulLinearMap, LinearMap.coe_mk, AddHom.coe_mk, ofListBasis_eq_ofList,
     LinearMap.coe_comp, Function.comp_apply]
-  rw [normalOrderF_swap_create_annihilate_ofCrAnListF_ofCrAnListF φc φa hφc hφa]
-  rfl
+  exact normalOrderF_swap_create_annihilate_ofCrAnListF_ofCrAnListF _ _ hφc hφa _ _
 
 lemma normalOrderF_swap_create_annihilate (φc φa : 𝓕.CrAnFieldOp)
     (hφc : 𝓕 |>ᶜ φc = CreateAnnihilate.create) (hφa : 𝓕 |>ᶜ φa = CreateAnnihilate.annihilate)

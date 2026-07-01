@@ -409,8 +409,7 @@ lemma normalOrderList_eq_createFilter_append_annihilateFilter : (φs : List 𝓕
       rw [List.filter_cons_of_neg]
       swap
       simp only [hφ, reduceCtorEq, decide_false, Bool.false_eq_true, not_false_eq_true]
-      rw [normalOrderList_eq_createFilter_append_annihilateFilter φs]
-      rfl
+      exact congrArg (List.cons φ) (normalOrderList_eq_createFilter_append_annihilateFilter φs)
     · simp only [normalOrderList, List.insertionSort_cons]
       rw [← normalOrderList]
       have hφ' : 𝓕 |>ᶜ φ = CreateAnnihilate.annihilate := by

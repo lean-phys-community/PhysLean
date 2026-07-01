@@ -151,8 +151,7 @@ lemma toMatrix_apply_contrMod (M : SL(2, ℂ)) (v : ContrMod 3) :
     *ᵥ (((Finsupp.linearEquivFunOnFinite ℝ ℝ (Fin 1 ⊕ Fin 3))
     (PauliMatrix.pauliBasis'.repr a)))) = _
   apply congrArg
-  erw [LinearMap.toMatrix_mulVec_repr]
-  rfl
+  exact LinearMap.toMatrix_mulVec_repr PauliMatrix.pauliBasis' _ _ a
 
 lemma toMatrix_mem_lorentzGroup (M : SL(2, ℂ)) : toMatrix M ∈ LorentzGroup 3 := by
   rw [LorentzGroup.mem_iff_norm]
