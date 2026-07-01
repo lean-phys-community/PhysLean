@@ -312,12 +312,9 @@ lemma powerset_of_empty :
   simp
 
 lemma powerset_mono {x y : ChargeSpectrum 𝓩} :
-    powerset x ⊆ powerset y ↔ x ⊆ y := by
-  constructor
-  · intro h
-    exact mem_powerset_iff_subset.mp (h (self_mem_powerset x))
-  · intro h z hz
-    exact mem_powerset_iff_subset.mpr (subset_trans (mem_powerset_iff_subset.mp hz) h)
+    powerset x ⊆ powerset y ↔ x ⊆ y :=
+  ⟨fun h => mem_powerset_iff_subset.mp (h (self_mem_powerset x)),
+    fun h _ hz => mem_powerset_iff_subset.mpr (subset_trans (mem_powerset_iff_subset.mp hz) h)⟩
 
 lemma min_exists_inductive (S : Finset (ChargeSpectrum 𝓩)) (hS : S ≠ ∅) :
     (n : ℕ) → (hn : S.card = n) →

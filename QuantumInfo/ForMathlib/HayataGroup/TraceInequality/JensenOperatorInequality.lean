@@ -369,8 +369,8 @@ theorem theorem_2_5_2_i_ici_all_imp_v {f : ℝ → ℝ}
   have hiv_hsum : CondIV (ℋ := HSum ℋ) f :=
     theorem_2_5_2_i_ici_all_imp_iv (ℋ := HSum ℋ) (f := f) hfIci
   have hcore := hiv_hsum (A := Atilde) (X := Xtilde) hAtilde_sa hAtilde_spec hXtilde_norm
-  have hsum_nonneg : (0 : L ℋ) ≤ star X * A * X + star Y * B * Y := by
-    exact add_nonneg
+  have hsum_nonneg : (0 : L ℋ) ≤ star X * A * X + star Y * B * Y :=
+    add_nonneg
       (by simpa [mul_assoc] using star_left_conjugate_nonneg hA0 X)
       (by simpa [mul_assoc] using star_left_conjugate_nonneg hB0 Y)
   have hsum_sa : IsSelfAdjoint (star X * A * X + star Y * B * Y) :=
