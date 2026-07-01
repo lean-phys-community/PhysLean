@@ -153,13 +153,11 @@ theorem PosDef.prod {ρ : MState (H i)} {σ : MState (H j)} (hρ : ρ.m.PosDef) 
 
 @[simp]
 theorem qRelEntropy_prodRelabel (ρ₁ ρ₂ : MState (H i)) (σ₁ σ₂ : MState (H j)):
-    𝐃(ρ₁ ⊗ᵣ σ₁‖ρ₂ ⊗ᵣ σ₂) = 𝐃(ρ₁‖ρ₂) + 𝐃(σ₁‖σ₂) := by
-  simp [prodRelabel]
+    𝐃(ρ₁ ⊗ᵣ σ₁‖ρ₂ ⊗ᵣ σ₂) = 𝐃(ρ₁‖ρ₂) + 𝐃(σ₁‖σ₂) := by simp [prodRelabel]
 
 @[simp]
 theorem sandwichedRelRentropy_prodRelabel {α : ℝ} (ρ₁ ρ₂ : MState (H i)) (σ₁ σ₂ : MState (H j)):
-    D̃_ α(ρ₁ ⊗ᵣ σ₁‖ρ₂ ⊗ᵣ σ₂) = D̃_ α(ρ₁‖ρ₂) + D̃_ α(σ₁‖σ₂) := by
-  simp [prodRelabel]
+    D̃_ α(ρ₁ ⊗ᵣ σ₁‖ρ₂ ⊗ᵣ σ₂) = D̃_ α(ρ₁‖ρ₂) + D̃_ α(σ₁‖σ₂) := by simp [prodRelabel]
 
 end ResourcePretheory
 
@@ -196,8 +194,7 @@ scoped notation i "⊗^H[" n "]" => spacePow i n
 theorem spacePow_zero (i : ι) : i ^ 0 = 1 := rfl
 
 @[simp]
-theorem spacePow_one (i : ι) : i ^ 1 = i := by
-  simp
+theorem spacePow_one (i : ι) : i ^ 1 = i := by simp
 
 theorem spacePow_succ (i : ι) (n : ℕ) : i ^ (n + 1) = (i ^ n) * i := rfl
 

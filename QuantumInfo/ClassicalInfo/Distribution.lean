@@ -254,10 +254,8 @@ theorem expect_val_eq_mixable_mix (d : ProbDistribution (Fin 2)) (x₁ x₂ : T)
   simp only [Mixable.mix, expect_val, DFunLike.coe, Mixable.to_U_of_mkT]
   calc
     ∑ i : Fin (Nat.succ 0).succ, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) =
-        ∑ i, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) := by
-      simp
-    _ = (d 0 : ℝ) • Mixable.to_U (![x₁, x₂] 0) + (d 1 : ℝ) • Mixable.to_U (![x₁, x₂] 1) := by
-      simp
+        ∑ i, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) := by simp
+    _ = (d 0 : ℝ) • Mixable.to_U (![x₁, x₂] 0) + (d 1 : ℝ) • Mixable.to_U (![x₁, x₂] 1) := by simp
     _ = (d 0 : ℝ) • Mixable.to_U x₁ + (1 - d 0).val • Mixable.to_U x₂ := by
       congr
       simpa only [Subtype.ext_iff, Prob.coe_one_minus, eq_sub_iff_add_eq, add_comm,

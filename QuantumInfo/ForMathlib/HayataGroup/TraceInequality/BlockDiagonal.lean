@@ -208,16 +208,14 @@ theorem blockDiagonal_nonneg {A B : L ℋ} (hA : 0 ≤ A) (hB : 0 ≤ B) :
           (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z) +
             inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z))) =
           ↑(RCLike.re (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z)) +
-            RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z))) := by
-            simp
+            RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z))) := by simp
       _ = inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z) +
           inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z) := by
             have hsumre :
                 (↑(RCLike.re (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z)) +
                     RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z))) : ℂ) =
                   ((RCLike.re (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z)) : ℂ) +
-                    (RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z)) : ℂ)) := by
-                  simp
+                    (RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z)) : ℂ)) := by simp
             rw [hsumre, hAz.1, hBz.1]
   · dsimp [blockDiagonal]
     erw [inner_add_left, hz0, hz1]

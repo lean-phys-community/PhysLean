@@ -117,8 +117,7 @@ theorem le_of_subset (ρ : MState d) (ε : Prob) {S1 S2 : Set (MState d)} (h : S
 theorem of_singleton {ρ σ : MState d} {ε : Prob} :
     β_ ε(ρ‖{σ}) =
       ⨅ T : { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1},
-        ⟨_, σ.exp_val_prob T.2.right⟩ := by
-  simp only [OptimalHypothesisRate, iSup_singleton]
+        ⟨_, σ.exp_val_prob T.2.right⟩ := by simp only [OptimalHypothesisRate, iSup_singleton]
 
 open scoped Prob in
 theorem negLog_le_singleton (ρ : MState d) (ε : Prob) (S : Set (MState d))
@@ -209,8 +208,7 @@ theorem exists_min (ρ : MState d) (ε : Prob) (S : Set (MState d)):
     gcongr
     · exact T.2.2.1
     · simp; positivity
-  have hρT' : ρ.exp_val (1 - T') = ε := by
-    simp [T', MState.exp_val_sub, δ, field]
+  have hρT' : ρ.exp_val (1 - T') = ε := by simp [T', MState.exp_val_sub, δ, field]
 
   have hT' : ρ.exp_val (1 - T') ≤ ε ∧ 0 ≤ T' ∧ T' ≤ 1 := by
     use hρT'.le

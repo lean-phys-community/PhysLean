@@ -164,8 +164,7 @@ theorem lowerSemicontinuousOn_iff_isClosed_preimage {f : α → γ} [IsClosed s]
       exact ⟨ o, ho, h.1, Set.eq_empty_iff_forall_notMem.2 fun z hz => h.2 ⟨ hz.1, hz.2.1 ⟩ |> not_le_of_gt <| Set.mem_Iic.1 hz.2.2 ⟩;
     · exact ⟨ sᶜ, IsClosed.isOpen_compl, hx', by aesop ⟩;
   · intro a x hx y hy
-    have hx_not_in : x ∉ s ∩ f ⁻¹' Set.Iic y := by
-      simp [hy]
+    have hx_not_in : x ∉ s ∩ f ⁻¹' Set.Iic y := by simp [hy]
     rw [ eventually_nhdsWithin_iff ]
     filter_upwards [ IsOpen.mem_nhds ( isOpen_compl_iff.2 ( a y ) ) hx_not_in ] with z hz hzs
     exact lt_of_not_ge fun h => hz ⟨hzs, h⟩
@@ -469,8 +468,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
     simp only [Set.mem_setOf_eq, I, C] at hzI
     replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
     have hz_mem : z ∈ segment ℝ y₁ y₂ :=
-      have cloL : IsClosed (segment ℝ y₁ y₂) := by
-        simp [← closure_openSegment]
+      have cloL : IsClosed (segment ℝ y₁ y₂) := by simp [← closure_openSegment]
       cloL.isSeqClosed hzI hzs
     let x := (hC_nonempty z hz_mem).some
     have hx : x ∈ C z := (hC_nonempty z hz_mem).some_mem
@@ -506,8 +504,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
     simp only [Set.mem_setOf_eq, J, C] at hzI
     replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
     have hz_mem : z ∈ segment ℝ y₁ y₂ :=
-      have cloL : IsClosed (segment ℝ y₁ y₂) := by
-        simp [← closure_openSegment]
+      have cloL : IsClosed (segment ℝ y₁ y₂) := by simp [← closure_openSegment]
       cloL.isSeqClosed hzI hzs
     let x := (hC_nonempty z hz_mem).some
     have hx : x ∈ C z := (hC_nonempty z hz_mem).some_mem

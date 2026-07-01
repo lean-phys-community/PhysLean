@@ -570,8 +570,7 @@ private lemma T₂_sq_le_one [Nonempty dB]
       · aesop
     · aesop
 
-private lemma PERM_isometry : (PERM_mat dA dB dC)ᴴ * PERM_mat dA dB dC = 1 := by
-  simp [PERM_mat]
+private lemma PERM_isometry : (PERM_mat dA dB dC)ᴴ * PERM_mat dA dB dC = 1 := by simp [PERM_mat]
 
 /-- Element-wise identity: W_mat = ∑_{b*} V_rho * V_sigma†.
     This is the key computation from Eq. (6) of Lin-Kim-Hsieh. -/

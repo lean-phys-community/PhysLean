@@ -1273,8 +1273,7 @@ The sandwiched Rényi divergence is invariant under tensoring with a fixed pure 
 `D̃_α(ρ ⊗ |ψ⟩⟨ψ| ‖ σ ⊗ |ψ⟩⟨ψ|) = D̃_α(ρ ‖ σ)`.
 -/
 theorem sandwichedRenyiEntropy_tensor_pure (hα : 0 < α) (ρ σ : MState d₁) (ψ : Ket d₂) :
-    D̃_ α(ρ ⊗ᴹ MState.pure ψ‖σ ⊗ᴹ MState.pure ψ) = D̃_ α(ρ‖σ) := by
-  simp [hα]
+    D̃_ α(ρ ⊗ᴹ MState.pure ψ‖σ ⊗ᴹ MState.pure ψ) = D̃_ α(ρ‖σ) := by simp [hα]
 
 /-- The sandwiched Rényi divergence is invariant under SWAP. -/
 @[simp]

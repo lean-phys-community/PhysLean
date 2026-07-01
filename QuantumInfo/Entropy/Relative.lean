@@ -1536,8 +1536,7 @@ theorem sandwichedRelRentropy_additive_alpha_ne_one {α : ℝ} (hα : α ≠ 1) 
     · norm_num [ add_div ];
       exact rfl;
     · exact False.elim ( ‹¬ ( σ₁ ⊗ᴹ σ₂ |> MState.M |> HermitianMat.ker ) ≤ ( ρ₁ ⊗ᴹ ρ₂ |> MState.M |> HermitianMat.ker ) › ( by simpa [ HermitianMat.ker ] using ker_prod_le_iff _ _ _ _ |>.2 h_ker ) );
-  · have h_ker_prod : ¬((σ₁ ⊗ᴹ σ₂).M.ker ≤ (ρ₁ ⊗ᴹ ρ₂).M.ker) := by
-      simp_all  [ ker_prod_le_iff ]
+  · have h_ker_prod : ¬((σ₁ ⊗ᴹ σ₂).M.ker ≤ (ρ₁ ⊗ᴹ ρ₂).M.ker) := by simp_all  [ ker_prod_le_iff ]
     rw [not_and_or] at h_ker
     rcases h_ker with h_ker | h_ker
     · simp [SandwichedRelRentropy, h_ker_prod, h_ker, hα0]
@@ -2301,12 +2300,10 @@ private lemma posDef_add_eps {A : HermitianMat d ℂ} (hA : 0 ≤ A) {ε : ℝ} 
   constructor
   · exact HermitianMat.H _
   · intro x hx_ne_zero
-    have h_inner : star x ⬝ᵥ (A.val.mulVec x) ≥ 0 := by
-      simp [hA]
+    have h_inner : star x ⬝ᵥ (A.val.mulVec x) ≥ 0 := by simp [hA]
     have h_eps : star x ⬝ᵥ (ε • 1 : Matrix d d ℂ).mulVec x = ε * star x ⬝ᵥ x := by
       simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm, Matrix.one_apply]
-    have h_pos : 0 < ε * star x ⬝ᵥ x := by
-      simp [*]
+    have h_pos : 0 < ε * star x ⬝ᵥ x := by simp [*]
     simpa [Matrix.add_mulVec, h_eps] using add_pos_of_nonneg_of_pos h_inner h_pos
 
 private lemma log_add_eps_eq_cfc (A : HermitianMat d 𝕜) (ε : ℝ) :

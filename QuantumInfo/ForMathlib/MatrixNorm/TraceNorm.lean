@@ -30,8 +30,7 @@ def traceNorm (A : Matrix m n R) : ℝ :=
   RCLike.re (CFC.sqrt (Aᴴ * A)).trace
 
 @[simp]
-theorem traceNorm_zero : traceNorm (0 : Matrix m n R) = 0 := by
-  simp [traceNorm]
+theorem traceNorm_zero : traceNorm (0 : Matrix m n R) = 0 := by simp [traceNorm]
 
 /-- The trace norm of the negative is equal to the trace norm. -/
 @[simp]
@@ -398,8 +397,7 @@ theorem abs_trace_le_traceNorm (A : Matrix n n ℂ) :
         simpa using mul_le_mul_of_nonneg_right
           (entry_norm_bound_of_unitary C.property i i)
           (Real.sqrt_nonneg _))
-    _ = A.traceNorm := by
-      simpa [hH] using (traceNorm_eq_sum_sqrt_eigenvalues A).symm
+    _ = A.traceNorm := by simpa [hH] using (traceNorm_eq_sum_sqrt_eigenvalues A).symm
 
 end complexTraceNorm
 

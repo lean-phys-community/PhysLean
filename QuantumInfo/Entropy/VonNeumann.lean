@@ -141,8 +141,7 @@ theorem Sᵥₙ_unit_zero [Unique d] (ρ : MState d) : Sᵥₙ ρ = 0 := by
 /-- Von Neumann entropy is invariant under relabeling of the basis. -/
 @[simp]
 theorem Sᵥₙ_relabel (ρ : MState d₁) (e : d₂ ≃ d₁) :
-    Sᵥₙ (ρ.relabel e) = Sᵥₙ ρ := by
-  simp [Sᵥₙ_eq_neg_trace_log]
+    Sᵥₙ (ρ.relabel e) = Sᵥₙ ρ := by simp [Sᵥₙ_eq_neg_trace_log]
 
 /-- Von Neumann entropy is unchanged under SWAP. TODO: All unitaries-/
 @[simp]
@@ -329,8 +328,7 @@ theorem qConditionalEnt_of_pure_symm (ψ : Ket (d₁ × d₂)) :
 /-- Quantum mutual information is symmetric. -/
 @[simp]
 theorem qMutualInfo_symm (ρ : MState (d₁ × d₂)) :
-    qMutualInfo ρ.SWAP = qMutualInfo ρ := by
-  simp [qMutualInfo, add_comm]
+    qMutualInfo ρ.SWAP = qMutualInfo ρ := by simp [qMutualInfo, add_comm]
 
 /-- For a pure state, the entropy of one subsystem equals the entropy of its complement,
 even after relabeling. -/
