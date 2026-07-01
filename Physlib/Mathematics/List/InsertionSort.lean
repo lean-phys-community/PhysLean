@@ -73,8 +73,7 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
     trans (insertionSortDropMinPos r a l).get i
     simp only [Fin.getElem_fin, List.get_eq_getElem]
     simp only [insertionSortDropMinPos, List.length_cons, Nat.succ_eq_add_one, finCongr_apply]
-    rw [eraseIdx_get]
-    rfl
+    exact congr_fun (eraseIdx_get (a :: l) (insertionSortMinPos r a l)) i
   erw [h1]
   simp only [List.length_cons, Nat.succ_eq_add_one, List.get_eq_getElem]
   apply insertionSortEquiv_order
@@ -307,7 +306,6 @@ lemma insertionSortEquiv_orderedInsert_append {α : Type} (r : α → α → Pro
       simp only [List.insertionSort, List.length_cons, hl]
       conv_rhs =>
         erw [insertionSortEquiv_commute _ _ _ h _ _]
-      simp
       rfl
 
 set_option backward.isDefEq.respectTransparency false in

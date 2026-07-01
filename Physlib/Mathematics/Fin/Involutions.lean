@@ -155,7 +155,6 @@ lemma involutionCons_ext {n : ℕ} {f1 f2 : (f : {f : Fin n → Fin n // Functio
   obtain ⟨val, property⟩ := fst
   obtain ⟨val_1, property_1⟩ := snd
   obtain ⟨val_2, property_2⟩ := snd_1
-  simp_all only
   rfl
 
 /-- Given an involution of `Fin n`, the optional choice of an element in `Fin n` which
@@ -201,8 +200,7 @@ lemma involutionAddEquiv_cast {n : ℕ} {f1 f2 : {f : Fin n → Fin n // Functio
     involutionAddEquiv f1 = (Equiv.subtypeEquivRight (by rw [hf]; simp)).trans
       ((involutionAddEquiv f2).trans (Equiv.optionCongr (finCongr (by rw [hf])))) := by
   subst hf
-  rw [finCongr_refl, Equiv.optionCongr_refl]
-  rfl
+  simp [Equiv.subtypeEquivRight]
 
 lemma involutionAddEquiv_cast' {m : ℕ} {f1 f2 : {f : Fin m → Fin m // Function.Involutive f}}
     {N : ℕ} (hf : f1 = f2) (n : Option (Fin N))

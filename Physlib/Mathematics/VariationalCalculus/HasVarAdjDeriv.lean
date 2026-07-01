@@ -709,14 +709,12 @@ protected lemma gradient {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
   · intro φ1 φ2 h1 h2
     rw [Space.gradient_eq_grad]
     rw [Space.grad_add, Space.grad_eq_gradient, Space.grad_eq_gradient]
-    simp
     rfl
     · exact h1.differentiable (by simp)
     · exact h2.differentiable (by simp)
   · intro c φ hφ
     rw [Space.gradient_eq_grad]
     rw [Space.grad_smul, Space.grad_eq_gradient]
-    simp
     rfl
     exact hφ.differentiable (by simp)
   · intro φ hφ x
