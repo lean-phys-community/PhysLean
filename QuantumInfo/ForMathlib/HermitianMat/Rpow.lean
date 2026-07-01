@@ -93,8 +93,7 @@ theorem continuousOn_rpow_neg (A : HermitianMat d ℂ) : ContinuousOn (fun x : �
   exact (Real.continuousAt_const_rpow' hx.ne).continuousWithinAt
 
 @[simp]
-theorem rpow_one : A ^ (1 : ℝ) = A := by
-  simp [rpow_eq_cfc]
+theorem rpow_one : A ^ (1 : ℝ) = A := by simp [rpow_eq_cfc]
 
 /--
 Functional calculus of Real.sqrt is equal to functional calculus of x^(1/2).
@@ -114,8 +113,7 @@ theorem one_rpow : (1 : HermitianMat d 𝕜) ^ r = 1 := by
     simp
 
 @[simp]
-lemma rpow_zero (A : HermitianMat d 𝕜) : A ^ (0 : ℝ) = 1 := by
-  simp [rpow_eq_cfc]
+lemma rpow_zero (A : HermitianMat d 𝕜) : A ^ (0 : ℝ) = 1 := by simp [rpow_eq_cfc]
 
 lemma rpow_diagonal (a : d → ℝ) (r : ℝ) :
   (diagonal ℂ a) ^ r = diagonal ℂ (fun i => a i ^ r) := cfc_diagonal _ _

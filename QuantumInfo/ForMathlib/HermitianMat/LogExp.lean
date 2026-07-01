@@ -115,12 +115,10 @@ theorem reindex_log (e : d ≃ d₂) : (A.reindex e).log = A.log.reindex e :=
   cfc_reindex A Real.log e
 
 @[simp]
-theorem log_zero : (0 : HermitianMat d 𝕜).log = 0 := by
-  simp [log]
+theorem log_zero : (0 : HermitianMat d 𝕜).log = 0 := by simp [log]
 
 @[simp]
-theorem log_one : (1 : HermitianMat d 𝕜).log = 0 := by
-  simp [log]
+theorem log_one : (1 : HermitianMat d 𝕜).log = 0 := by simp [log]
 
 theorem log_smul_of_pos (A : HermitianMat d 𝕜) (hx : x ≠ 0) :
     (x • A).log = Real.log x • A.supportProj + A.log := by
@@ -129,8 +127,7 @@ theorem log_smul_of_pos (A : HermitianMat d 𝕜) (hx : x ≠ 0) :
   simp [cfc, log, supportProj_eq_cfc]
 
 theorem log_smul {A : HermitianMat d 𝕜} {x : ℝ} (hx : x ≠ 0) [NonSingular A] :
-    (x • A).log = Real.log x • 1 + A.log := by
-  simp [log_smul_of_pos A hx]
+    (x • A).log = Real.log x • 1 + A.log := by simp [log_smul_of_pos A hx]
 
 /-
 The inverse function is operator antitone for positive definite matrices.
@@ -660,8 +657,7 @@ lemma log_conj_unitary (A : HermitianMat d 𝕜) (U : Matrix.unitaryGroup d 𝕜
 
 open RealInnerProductSpace in
 theorem inner_log_smul_of [NonSingular A] {x : ℝ} (hx : x ≠ 0) :
-    ⟪(x • A).log, B⟫ = Real.log x * B.trace + ⟪A.log, B⟫ := by
-  simp [log_smul hx, inner_add_left]
+    ⟪(x • A).log, B⟫ = Real.log x * B.trace + ⟪A.log, B⟫ := by simp [log_smul hx, inner_add_left]
 
 section kron
 

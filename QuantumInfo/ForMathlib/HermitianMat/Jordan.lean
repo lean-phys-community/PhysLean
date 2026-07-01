@@ -37,12 +37,10 @@ theorem symmMul_comm : A.symmMul B = B.symmMul A := by
   rw [symmMul, symmMul, Subtype.mk.injEq, add_comm]
 
 @[simp]
-theorem symmMul_zero : A.symmMul 0 = 0:= by
-  simp [symmMul]
+theorem symmMul_zero : A.symmMul 0 = 0:= by simp [symmMul]
 
 @[simp]
-theorem zero_symmMul : symmMul 0 A = 0 := by
-  simp [symmMul]
+theorem zero_symmMul : symmMul 0 A = 0 := by simp [symmMul]
 
 theorem symmMul_toMat : (A.symmMul B).mat =
     (2 : 𝕜)⁻¹ • (A.mat * B.mat + B.mat * A.mat) := rfl
@@ -57,8 +55,7 @@ theorem symmMul_of_commute (hAB : Commute A.mat B.mat) :
   rw [smul_add, ← add_smul, inv_eq_one_div, ← add_div]
   rw [add_self_div_two, one_smul]
 
-theorem symmMul_self : (symmMul A A).mat = A.mat * A.mat := by
-  simp
+theorem symmMul_self : (symmMul A A).mat = A.mat * A.mat := by simp
 
 variable [DecidableEq d]
 
