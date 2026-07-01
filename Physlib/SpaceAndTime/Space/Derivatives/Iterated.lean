@@ -124,8 +124,7 @@ lemma iteratedDeriv_contDiff (I : MultiIndex d) {f : Space d → ℝ}
 /-- The topological support of a spatial derivative is contained in that of the original
 function. -/
 lemma tsupport_deriv_subset (i : Fin d) {f : Space d → ℝ} :
-    tsupport (deriv i f) ⊆ tsupport f := by
-  simpa [deriv_eq_fderiv_fun] using
+    tsupport (deriv i f) ⊆ tsupport f := by simpa [deriv_eq_fderiv_fun] using
     (tsupport_fderiv_apply_subset (𝕜 := ℝ) (f := fun x => f x) (v := basis i))
 
 private lemma iteratedDerivList_commute_deriv (L : List (Fin d)) (i : Fin d)

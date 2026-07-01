@@ -206,8 +206,7 @@ lemma distDiv_apply_eq_sum_fderivD {d}
 
 lemma distDiv_apply_eq_sum_distDeriv {d}
     (f : (Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) (η : 𝓢(Space d, ℝ)) :
-    (∇ᵈ ⬝ f) η = ∑ i, ∂ᵈ[i] f η i := by
-  exact distDiv_apply_eq_sum_fderivD f η
+    (∇ᵈ ⬝ f) η = ∑ i, ∂ᵈ[i] f η i := distDiv_apply_eq_sum_fderivD f η
 
 /-!
 

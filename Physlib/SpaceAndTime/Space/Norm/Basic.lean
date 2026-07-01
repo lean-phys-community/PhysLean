@@ -1156,8 +1156,7 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
           (IsDistBounded.pow q (by omega))) := by
   ext η
   let p : ℕ := Int.toNat (q + (d : ℤ))
-  have hp_int : (p : ℤ) = q + (d : ℤ) := by
-    simpa [p] using Int.toNat_of_nonneg (le_of_lt hq)
+  have hp_int : (p : ℤ) = q + (d : ℤ) := by simpa [p] using Int.toNat_of_nonneg (le_of_lt hq)
   have hp_pos : 0 < p := by
     have : (0 : ℤ) < (p : ℤ) := by simpa [hp_int] using hq
     exact_mod_cast this

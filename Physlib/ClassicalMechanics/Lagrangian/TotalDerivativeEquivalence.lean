@@ -221,8 +221,7 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
     have h0 :
         δL (0 : X) =
           fderiv ℝ ↿F ((0 : Time), (0 : X))
-            ((1 : Time), (0 : X)) := by
-      simpa using (hEq (0 : Time) (0 : X)
+            ((1 : Time), (0 : X)) := by simpa using (hEq (0 : Time) (0 : X)
         (0 : X))
     have : dF ((1 : Time), (0 : X)) =
         δL (0 : X) := by simpa [dF] using h0.symm
