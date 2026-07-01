@@ -135,8 +135,7 @@ def timeOrderSign (φs : List 𝓕.FieldOp) : ℂ :=
   Wick.koszulSign 𝓕.fieldOpStatistic 𝓕.timeOrderRel φs
 
 @[simp]
-lemma timeOrderSign_nil : timeOrderSign (𝓕 := 𝓕) [] = 1 := by
-  rfl
+lemma timeOrderSign_nil : timeOrderSign (𝓕 := 𝓕) [] = 1 := rfl
 
 lemma timeOrderSign_pair_ordered {φ ψ : 𝓕.FieldOp} (h : timeOrderRel φ ψ) :
     timeOrderSign [φ, ψ] = 1 := by
@@ -234,8 +233,7 @@ def crAnTimeOrderSign (φs : List 𝓕.CrAnFieldOp) : ℂ :=
   Wick.koszulSign 𝓕.crAnStatistics 𝓕.crAnTimeOrderRel φs
 
 @[simp]
-lemma crAnTimeOrderSign_nil : crAnTimeOrderSign (𝓕 := 𝓕) [] = 1 := by
-  rfl
+lemma crAnTimeOrderSign_nil : crAnTimeOrderSign (𝓕 := 𝓕) [] = 1 := rfl
 
 lemma crAnTimeOrderSign_pair_ordered {φ ψ : 𝓕.CrAnFieldOp} (h : crAnTimeOrderRel φ ψ) :
     crAnTimeOrderSign [φ, ψ] = 1 := by
