@@ -311,14 +311,12 @@ noncomputable def toComplexVector (c : realLorentzTensor.Color) :
       simp only [map_add, Finsupp.coe_add, Pi.add_apply, Nat.reduceAdd, ← Finset.sum_add_distrib]
       congr
       funext x
-      rw [add_smul]
-      rfl
+      exact add_smul _ _ _
     | Color.down =>
       simp only [map_add, Finsupp.coe_add, Pi.add_apply, Nat.reduceAdd, ← Finset.sum_add_distrib]
       congr
       funext x
-      rw [add_smul]
-      rfl
+      exact add_smul _ _ _
   map_smul' r v := by
     match c with
     | Color.up =>
@@ -327,16 +325,14 @@ noncomputable def toComplexVector (c : realLorentzTensor.Color) :
       rw [Finset.smul_sum]
       congr
       funext x
-      rw [← smul_smul]
-      rfl
+      exact (smul_smul _ _ _).symm
     | Color.down =>
       simp only [map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, Nat.reduceAdd,
         Complex.ofRealHom_eq_coe, Complex.coe_smul]
       rw [Finset.smul_sum]
       congr
       funext x
-      rw [← smul_smul]
-      rfl
+      exact (smul_smul _ _ _).symm
 
 lemma toComplexVector_up_eq_inclCongrRealLorentz (v : Lorentz.ContrMod 3) :
     toComplexVector Color.up v = Lorentz.inclCongrRealLorentz v := by
@@ -510,8 +506,7 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
   · simp
     rw [← h]
     change Λ • (r : ℂ) • toComplex t = _
-    rw [actionT_smul]
-    rfl
+    exact actionT_smul (g := Λ) (r := (r : ℂ)) (t := toComplex t)
   · simp_all
 
 /-!
