@@ -884,8 +884,7 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
           generalize_proofs at *; (
           exact h_eigenvalues.subset ht |> Exists.imp fun i hi => hi.symm)
         aesop
-      have hW_subset : ∀ᶠ B in nhds (A x₀), spectrum ℝ B.mat ⊆ W := by
-        exact spectrum_subset_of_isOpen (A x₀) W hW_open hW_spectrum
+      have hW_subset : ∀ᶠ B in nhds (A x₀), spectrum ℝ B.mat ⊆ W := spectrum_subset_of_isOpen (A x₀) W hW_open hW_spectrum
       have hW_subset_S : ∀ᶠ y in nhdsWithin x₀ S, spectrum ℝ (A y).mat ⊆ W := by
         exact Filter.mem_of_superset ( hA₂.continuousWithinAt hx₀ |> fun h => h.eventually ( hW_subset ) ) fun y hy => hy
       obtain ⟨U', hU'⟩ : ∃ U' ∈ nhds x₀, ∀ y ∈ U' ∩ S, spectrum ℝ (A y).mat ⊆ W := by
@@ -1265,8 +1264,7 @@ theorem inv_ge_one_of_le_one (hA : A.mat.PosDef) (h : A ≤ 1) : 1 ≤ A⁻¹ :=
     exact (cfc_nonneg_iff A fun x => x⁻¹ - 1).mpr h_cfc_nonneg;
   -- Since $A.cfc (fun x => x⁻¹ - 1) \geq 0$, we have $A.cfc (fun x => x⁻¹) \geq 1$.
   have h_cfc_ge_one : A.cfc (fun x => x⁻¹) ≥ 1 := by
-    have h_cfc_sub : A.cfc (fun x => x⁻¹ - 1) = A.cfc (fun x => x⁻¹) - A.cfc (fun _ => 1) := by
-      exact cfc_sub_apply A Inv.inv fun x => 1;
+    have h_cfc_sub : A.cfc (fun x => x⁻¹ - 1) = A.cfc (fun x => x⁻¹) - A.cfc (fun _ => 1) := cfc_sub_apply A Inv.inv fun x => 1;
     aesop;
   convert h_cfc_ge_one.le using 1;
   convert cfc_inv.symm;

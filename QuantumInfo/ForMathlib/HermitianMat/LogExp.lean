@@ -629,8 +629,7 @@ lemma log_kron_diagonal {m n 𝕜 : Type*} [Fintype m] [DecidableEq m] [Fintype 
     {d₁ : m → ℝ} {d₂ : n → ℝ} (h₁ : ∀ i, 0 < d₁ i) (h₂ : ∀ j, 0 < d₂ j) :
     (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂).log =
     (diagonal 𝕜 d₁).log ⊗ₖ 1 + 1 ⊗ₖ (diagonal 𝕜 d₂).log := by
-  have h_eq : (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂) = (diagonal 𝕜 (fun (i : m × n) => d₁ i.1 * d₂ i.2)) := by
-    exact kronecker_diagonal d₁ d₂
+  have h_eq : (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂) = (diagonal 𝕜 (fun (i : m × n) => d₁ i.1 * d₂ i.2)) := kronecker_diagonal d₁ d₂
   convert congr_arg _ h_eq using 1;
   -- By definition of logarithm, we can rewrite the right-hand side.
   have h_rhs : (diagonal 𝕜 (fun (i : m × n) => d₁ i.1 * d₂ i.2)).log =
