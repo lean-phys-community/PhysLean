@@ -31,8 +31,7 @@ instance : IsOrderedAddMonoid (HermitianMat n 𝕜) :=
   inferInstanceAs (IsOrderedAddMonoid (selfAdjoint _))
 
 omit [Fintype n] in
-theorem le_iff : A ≤ B ↔ (B - A).mat.PosSemidef := by
-  rfl
+theorem le_iff : A ≤ B ↔ (B - A).mat.PosSemidef := Iff.rfl
 
 omit [Fintype n] in
 theorem zero_le_iff : 0 ≤ A ↔ A.mat.PosSemidef := by
