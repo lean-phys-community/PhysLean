@@ -1,0 +1,148 @@
+version: v0.1
+
+Title: Harmonic oscillator
+
+Overview: |
+    The key data structure is `HarmonicOscillator`, the classical mechanical system of a mass
+    `m` under a linear restoring force `-k x` (spring constant `k`), with position and velocity
+    modelled in `EuclideanSpace ℝ (Fin 1)`. The API develops its energies, Lagrangian and
+    Hamiltonian formulations, the equivalence of the resulting equations of motion
+    (Euler-Lagrange, Newton's second law, Hamilton's equations and the variational principles),
+    the explicit solution trajectories for given initial conditions, and a one-dimensional
+    `ConfigurationSpace` manifold with a map to physical `Space 1`.
+
+ParentAPIs:
+  - Euler-Lagrange equations (Physlib/ClassicalMechanics/EulerLagrange.lean)
+  - Hamilton's equations (Physlib/ClassicalMechanics/HamiltonsEquations.lean)
+  - Space (Physlib/SpaceAndTime/Space)
+
+References:
+  - Landau & Lifshitz, Mechanics, page 58, section 21.
+  - Ivo Terek, Introductory Variational Calculus on Manifolds, Section 1 (Basic definitions
+    and examples).
+
+Requirements:
+
+  - description: >
+      The key input-data structure `HarmonicOscillator`, specifying a positive mass `m` and a
+      positive spring constant `k`, is defined.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (HarmonicOscillator)
+
+  - description: >
+      The configuration space of the oscillator is defined as a structure wrapping a single
+      chosen global coordinate (issue #846 "Key data structure: Is defined"). The issue asks
+      for a single value of type `Real`; the code stores it as `EuclideanSpace ℝ (Fin 1)`.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/ConfigurationSpace.lean (ConfigurationSpace)
+
+  - description: >
+      The configuration space carries the structure of a smooth (analytic) manifold modelled on
+      `EuclideanSpace ℝ (Fin 1)` via a single global chart (issue #846: "the structure of a
+      smooth manifold on the configuration space").
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/ConfigurationSpace.lean
+      (ChartedSpace, IsManifold instances; valHomeomorphism)
+
+  - description: >
+      A map from the configuration space to the actual position of the particle in physical
+      `Space 1` (issue #846: "maps from the configuration space to the actual position of the
+      particle in Space").
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/ConfigurationSpace.lean
+      (ConfigurationSpace.toSpace)
+
+  - description: >
+      The angular frequency `ω = √(k/m)` and the kinetic, potential and total energies of the
+      oscillator, together with the conservation of energy along solutions of the equation of
+      motion.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean
+      (ω, kineticEnergy, potentialEnergy, energy, energy_conservation_of_equationOfMotion,
+      energy_conservation_of_equationOfMotion')
+
+  - description: >
+      The Lagrangian of the oscillator, its variational (Euler-Lagrange) gradient, and the
+      equation of motion defined as the vanishing of that gradient.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean
+      (lagrangian, gradLagrangian, EquationOfMotion)
+
+  - description: >
+      The Hamiltonian formulation: the canonical momentum, the Hamiltonian, and the
+      Hamilton-equation operator whose vanishing is equivalent to Hamilton's equations.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean
+      (toCanonicalMomentum, hamiltonian, hamiltonEqOp)
+
+  - description: >
+      The equation of motion is proved equivalent (TFAE) to Newton's second law, Hamilton's
+      equations, the variational principle for the action, and the Hamilton variational
+      principle.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (equationOfMotion_tfae)
+
+  - description: The structure `InitialConditions` (initial position `x₀` and initial velocity `v₀`) is defined.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Solution.lean (InitialConditions)
+
+  - description: >
+      The trajectory associated with a set of initial conditions is defined and proved to
+      satisfy the equation of motion.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/Solution.lean
+      (InitialConditions.trajectory, trajectory_equationOfMotion)
+
+  - description: >
+      Uniqueness of the trajectory: any smooth solution of the equation of motion with the same
+      initial position and velocity equals the trajectory.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Solution.lean (trajectories_unique)
+
+  - description: >
+      Alternative parametrizations of the initial conditions - at an arbitrary time, from two
+      positions, from two velocities, and in amplitude-phase form - each with correctness
+      proofs relating them to the standard initial conditions.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/Solution.lean
+      (InitialConditionsAtTime, InitialConditionsFromTwoPositions,
+      InitialConditionsFromTwoVelocities, AmplitudePhase)
+
+  - description: >
+      Periodicity and recurrence: the period `T = 2π/ω`, periodicity of the trajectory, and the
+      return time to the initial state for non-trivial initial data.
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/HarmonicOscillator/Solution.lean
+      (period, trajectory_periodic, return_time)
+
+  - description: >
+      Trajectories should be defined using the configuration space (issue #846: "Trajectories
+      should be defined using the configuration space"). Currently trajectories are valued in
+      the coordinate model `EuclideanSpace ℝ (Fin 1)`, not in `ConfigurationSpace`.
+    done: false
+    location: N/A
+
+  - description: >
+      A proper geometric model treating position as the configuration space and velocity as its
+      tangent space, showing explicitly how the coordinate model is a simplification, and tying
+      trajectories to the Space API (issue #846: "Well defined notion for trajectories, may need
+      interaction with Space API"; TODO in Basic.lean and ConfigurationSpace.lean).
+    done: false
+    location: N/A
+
+  - description: >
+      Split `Solution.lean` into smaller modules (`Solution.Basic`, `Solution.Energy`,
+      `Solution.InitialData`, `Solution.AmplitudePhase`, `Solution.SpecialTimes`,
+      `Solution.Periodicity`) with `Solution.lean` kept as an umbrella import (TODO in
+      Solution.lean).
+    done: false
+    location: N/A
