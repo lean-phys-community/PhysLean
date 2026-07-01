@@ -118,8 +118,7 @@ instance {d : ℕ} {a : ℕ∞} : CoeFun (polyBddSchwartzMap d a) (fun _ ↦ Spa
 
 @[simp]
 lemma toFun_eq_coe {d : ℕ} {a : ℕ∞} (f : polyBddSchwartzMap d a) (x : Space d) :
-    f.val.toFun x = f.val x :=
-  rfl
+    f.val.toFun x = f.val x := rfl
 
 lemma polyBddSchwartzEquiv_symm_apply_coe {d : ℕ} {a : ℕ∞}
     {ψ : schwartzSubmodule d} (hψ : ↑ψ ∈ polyBddSchwartzSubmodule d a) :

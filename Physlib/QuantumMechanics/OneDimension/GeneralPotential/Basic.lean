@@ -100,8 +100,7 @@ noncomputable def schrodingerOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   fun x ↦ 1 / (2 * Q.m) * (momentumOperator (momentumOperator ψ) x) + (Q.V x) * ψ x
 
 private lemma eval_add (f g : ℝ → ℂ) :
-    (f + g) x = f x + g x :=
-  rfl
+    (f + g) x = f x + g x := rfl
 
 lemma schrodingerOperator_linear (a1 a2 : ℂ) (ψ1 ψ2 : ℝ → ℂ)
     (hψ1_x: Differentiable ℝ ψ1) (hψ2_x: Differentiable ℝ ψ2)

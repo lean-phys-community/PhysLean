@@ -52,14 +52,12 @@ def variance (T : H →ₗ.[ℂ] H) (ψ : T.domain) : ℝ :=
 
 /-- The variance is the squared norm of the centered vector. -/
 lemma variance_eq_centered_norm_sq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    variance T ψ = ‖centered T ψ‖ ^ 2 :=
-  rfl
+    variance T ψ = ‖centered T ψ‖ ^ 2 := rfl
 
 /-- `variance` with `centered` unfolded to `Tψ - ⟨T⟩_ψ • ψ`. -/
 lemma variance_eq_norm_sub_sq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
     variance T ψ =
-      ‖T ψ - (expectedValue T ψ : ℂ) • (ψ : H)‖ ^ 2 :=
-  rfl
+      ‖T ψ - (expectedValue T ψ : ℂ) • (ψ : H)‖ ^ 2 := rfl
 
 /-- For symmetric `T` and `‖ψ‖ = 1`, variance equals `‖Tψ‖ ^ 2 - ⟨T⟩_ψ ^ 2`. -/
 lemma variance_eq_norm_sq_sub_expectedValue_sq (T : H →ₗ.[ℂ] H)
@@ -120,8 +118,7 @@ def standardDeviation (T : H →ₗ.[ℂ] H) (ψ : T.domain) : ℝ :=
 
 /-- The standard deviation, unfolded to the square root of the variance. -/
 lemma standardDeviation_eq_sqrt_variance (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    standardDeviation T ψ = Real.sqrt (variance T ψ) :=
-  rfl
+    standardDeviation T ψ = Real.sqrt (variance T ψ) := rfl
 
 /-- Standard deviation is nonnegative. -/
 lemma standardDeviation_nonneg (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
