@@ -152,7 +152,7 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
 
 open SchwartzMap SchwartzSubmodule in
 lemma mulOperator_domain_ge_of_hasTemperateGrowth
-    {f : Space d → ℂ} (hf : f.HasTemperateGrowth) : schwartzSubmodule d ≤ (𝓜 f).domain := by
+    {f : Space d → ℂ} (hf : f.HasTemperateGrowth) : SchwartzSubmodule d ≤ (𝓜 f).domain := by
   intro ψ hψ
   obtain ⟨g, hg⟩ := schwartzEquiv.surjective ⟨ψ, hψ⟩
   let w : 𝓢(Space d, ℂ) := smulLeftCLM ℂ f g

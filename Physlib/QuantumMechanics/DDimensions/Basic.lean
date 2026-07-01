@@ -128,7 +128,7 @@ lemma potentialOperator_isSelfAdjoint (h_AESM : AEStronglyMeasurable Q.potential
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
 lemma potentialOperator_domain_ge (h_HTG : Q.potential.HasTemperateGrowth) :
-    schwartzSubmodule Q.d ≤ Q.potentialOperator.domain :=
+    SchwartzSubmodule Q.d ≤ Q.potentialOperator.domain :=
   mulOperator_domain_ge_of_hasTemperateGrowth (by fun_prop)
 
 /-!

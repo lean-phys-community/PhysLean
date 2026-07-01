@@ -85,20 +85,20 @@ open SchwartzSubmodule
 
 /-- The momentum operator as a LinearPMap with domain the Schwartz submodule. -/
 def momentumOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
-  domain := schwartzSubmodule d
+  domain := SchwartzSubmodule d
   toFun := schwartzIncl.toLinearMap ∘ₗ (𝐩 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
 
 @[inherit_doc momentumOperator]
 notation "𝓟" => momentumOperator
 
-lemma momentumOperator_apply (ψ : schwartzSubmodule d) :
+lemma momentumOperator_apply (ψ : SchwartzSubmodule d) :
     𝓟 i ψ = schwartzEquiv (𝐩 i (schwartzEquiv.symm ψ)) := rfl
 
-lemma momentumOperator_apply_ae (ψ : schwartzSubmodule d) :
+lemma momentumOperator_apply_ae (ψ : SchwartzSubmodule d) :
     𝓟 i ψ =ᵐ[volume] 𝐩 i (schwartzEquiv.symm ψ) :=
   schwartzEquiv_coe_ae _
 
-lemma momentumOperator_range (ψ : schwartzSubmodule d) : 𝓟 i ψ ∈ schwartzSubmodule d := by
+lemma momentumOperator_range (ψ : SchwartzSubmodule d) : 𝓟 i ψ ∈ SchwartzSubmodule d := by
   simp [momentumOperator_apply]
 
 lemma momentumOperator_hasDenseDomain : (𝓟 i).HasDenseDomain := SchwartzSubmodule.dense d
@@ -144,12 +144,12 @@ def momentumSqOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d 
 lemma momentumSqOperator_eq :
     momentumSqOperator (d := d) = sum fun i ↦ (𝓟 i).comp (𝓟 i) (momentumOperator_range i) := rfl
 
-lemma momentumSqOperator_domain_eq : momentumSqOperator.domain = schwartzSubmodule d := by
+lemma momentumSqOperator_domain_eq : momentumSqOperator.domain = SchwartzSubmodule d := by
   rw [momentumSqOperator_eq, sum_domain]
   rcases eq_zero_or_pos d with rfl | hd
   · simp [SchwartzSubmodule.zero_eq_top]
   · letI := Fin.pos_iff_nonempty.mp hd
-    rw [← iInf_const (a := schwartzSubmodule d) (ι := Fin d)]
+    rw [← iInf_const (a := SchwartzSubmodule d) (ι := Fin d)]
     congr
 
 end
