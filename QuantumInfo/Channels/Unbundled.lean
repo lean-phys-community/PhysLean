@@ -86,7 +86,7 @@ theorem comp (h₁ : M.IsTracePreserving) (h₂ : M₂.IsTracePreserving) :
 
 /-- The identity MatrixMap IsTracePreserving. -/
 @[simp]
-theorem id : (id A R).IsTracePreserving := by simp [IsTracePreserving, MatrixMap.id]
+theorem id : (id A R).IsTracePreserving := fun _ => rfl
 
 variable {R : Type*} [CommSemiring R] in
 /-- Unit linear combinations of IsTracePreserving maps are IsTracePreserving. -/
@@ -201,7 +201,7 @@ theorem map_1 (h : M.Unital) : M 1 = 1 :=
 
 /-- The identity `MatrixMap` is `Unital`. -/
 @[simp]
-theorem id : (id A R).Unital := by simp [Unital, MatrixMap.id]
+theorem id : (id A R).Unital := rfl
 
 --TODO: Closed under composition, kronecker products, it's iff M.choi_matrix.traceLeft = 1...
 
@@ -356,15 +356,14 @@ theorem comp [DecidableEq B] {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (
 /-- The identity MatrixMap IsCompletelyPositive. -/
 @[simp]
 theorem id : (id A R).IsCompletelyPositive := by
-  intro n ρ h
-  rwa [show LinearMap.id = MatrixMap.id (Fin n) R from rfl, kron_id_id]
+  intro n _ h
+  simpa [show LinearMap.id = MatrixMap.id (Fin n) R from rfl, kron_id_id] using h
 
 /-- Sums of IsCompletelyPositive maps are IsCompletelyPositive. -/
 theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsCompletelyPositive) (h₂ : M₂.IsCompletelyPositive) :
     (M₁ + M₂).IsCompletelyPositive :=
   fun n _ h ↦ by
-  simp only [add_kron, LinearMap.add_apply]
-  exact Matrix.PosSemidef.add (h₁ n h) (h₂ n h)
+  simpa only [add_kron, LinearMap.add_apply] using Matrix.PosSemidef.add (h₁ n h) (h₂ n h)
 
 /-- Nonnegative scalings of `IsCompletelyPositive` maps are `IsCompletelyPositive`. -/
 theorem smul {M : MatrixMap A B R} (hM : M.IsCompletelyPositive) {x : R} (hx : 0 ≤ x) :
@@ -539,8 +538,8 @@ theorem congruence_CP {A B : Type*} [Fintype A] [Fintype B] [DecidableEq A] [Dec
   convert conj_isPositive ( M ⊗ₖ ( 1 : Matrix ( Fin n ) ( Fin n ) 𝕜 ) ) using 1
 
 theorem IsCompletelyPositive_sum {ι : Type*} [Fintype ι] (f : ι → MatrixMap A B ℂ) (h : ∀ i, (f i).IsCompletelyPositive) :
-    (∑ i, f i).IsCompletelyPositive := by
-      convert IsCompletelyPositive.finset_sum h using 1
+    (∑ i, f i).IsCompletelyPositive :=
+  IsCompletelyPositive.finset_sum h
 
 omit [Fintype B] [DecidableEq A] in
 theorem of_kraus_eq_sum_conj (K : κ → Matrix B A 𝕜) :
