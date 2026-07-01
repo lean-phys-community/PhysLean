@@ -73,42 +73,29 @@ lemma toBra_symm_apply (f : StrongDual ℂ (SpaceDHilbertSpace d)) : ⟪toBra.sy
 
 /-- The proposition `MemHS f` for a function `f : Space d → ℂ` is defined
   to be true if the function `f` can be lifted to the Hilbert space. -/
-def MemHS (f : Space d → ℂ) : Prop := MemLp f 2
+def MemHS (f : Space d → ℂ) : Prop := MemLp f 2 volume
 
-lemma aeStronglyMeasurable_of_memHS {f : Space d → ℂ} (h : MemHS f) : AEStronglyMeasurable f :=
-  MemLp.aestronglyMeasurable h
+lemma memHS : MemHS ψ := Lp.memLp ψ
 
-/-- A function `f` satisfies `MemHS f` if and only if it is almost everywhere
-  strongly measurable and square integrable. -/
-lemma memHS_iff {f : Space d → ℂ} : MemHS f ↔
-    AEStronglyMeasurable f ∧ Integrable (fun x ↦ ‖f x‖ ^ 2) := by
-  rw [MemHS, MemLp, and_congr_right]
-  intro h
-  rw [eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top
-    (NeZero.ne' 2).symm ENNReal.top_ne_ofNat.symm]
-  simp only [ENNReal.toReal_ofNat, ENNReal.rpow_ofNat]
-  have h' : AEStronglyMeasurable (fun x ↦ ‖f x‖ ^ 2) :=
-    AEStronglyMeasurable.pow (AEStronglyMeasurable.norm h) 2
-  simp [Integrable, h', HasFiniteIntegral]
+/-- A function `f` satisfies `MemHS f` if and only if it is a.e. strongly measurable
+  and square integrable. -/
+lemma memHS_iff : MemHS f ↔ AEStronglyMeasurable f ∧ Integrable (fun x ↦ ‖f x‖ ^ 2) :=
+  and_congr_right fun h ↦ (and_iff_right h).symm.trans (memLp_two_iff_integrable_sq_norm h)
+
+lemma mem_iff {f : Space d →ₘ[volume] ℂ} : f ∈ SpaceDHilbertSpace d ↔ MemHS f := Lp.mem_Lp_iff_memLp
 
 @[simp]
-lemma zero_memHS : MemHS (d := d) 0 := by
-  rw [memHS_iff]
-  simp only [Pi.ofNat_apply, norm_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
-    integrable_fun_zero, and_true]
-  fun_prop
+lemma MemHS.zero : MemHS (0 : Space d → ℂ) := MemLp.zero
 
-@[simp]
-lemma zero_fun_memHS : MemHS (fun _ : Space d ↦ (0 : ℂ)) := zero_memHS
+lemma MemHS.neg (hf : MemHS f) : MemHS (-f) := MemLp.neg hf
 
-lemma memHS_add {f g : Space d → ℂ} (hf : MemHS f) (hg : MemHS g) : MemHS (f + g) :=
-  MemLp.add hf hg
+lemma MemHS.add (hf : MemHS f) (hg : MemHS g) : MemHS (f + g) := MemLp.add hf hg
 
-lemma memHS_const_smul {f : Space d → ℂ} {c : ℂ} (hf : MemHS f) : MemHS (c • f) :=
-  MemLp.const_smul hf c
+lemma MemHS.sub (hf : MemHS f) (hg : MemHS g) : MemHS (f - g) := MemLp.sub hf hg
 
-lemma memHS_of_ae {g : Space d → ℂ} (f : Space d → ℂ) (hf : MemHS f) (hfg : f =ᵐ[volume] g) :
-    MemHS g := MemLp.ae_eq hfg hf
+lemma MemHS.const_smul (c : ℂ) (hf : MemHS f) : MemHS (c • f) := MemLp.const_smul hf c
+
+lemma MemHS.ae_eq (hfg : f =ᵐ[volume] g) (hf : MemHS f) : MemHS g := MemLp.ae_eq hfg hf
 
 /-!
 ## D. Construction of elements
@@ -149,24 +136,13 @@ lemma inner_mk_mk {f g : Space d → ℂ} (hf : MemHS f) (hg : MemHS g) :
 lemma eLpNorm_mk {f : Space d → ℂ} {hf : MemHS f} : eLpNorm (mk hf) 2 = eLpNorm f 2 :=
   eLpNorm_congr_ae (coe_mk_ae hf)
 
-lemma mem_iff {f : Space d → ℂ} (hf : AEStronglyMeasurable f volume) :
-    AEEqFun.mk f hf ∈ SpaceDHilbertSpace d ↔ Integrable (fun x ↦ ‖f x‖ ^ 2) := by
-  rw [Lp.mem_Lp_iff_memLp, MemLp, eLpNorm_aeeqFun]
-  have h1 := AEEqFun.aestronglyMeasurable (AEEqFun.mk f hf)
-  have h2 : AEStronglyMeasurable (fun x ↦ norm (f x) ^ 2) :=
-    AEStronglyMeasurable.pow (continuous_norm.comp_aestronglyMeasurable hf) 2
-  simp only [h1]
-  simp only [eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top (NeZero.ne' 2).symm
-    (ENNReal.top_ne_ofNat).symm, ENNReal.toReal_ofNat, ENNReal.rpow_ofNat]
-  simp [h2, Integrable, HasFiniteIntegral]
-
 @[simp]
 lemma mk_add {f g : Space d → ℂ} {hf : MemHS f} {hg : MemHS g} :
-    mk (memHS_add hf hg) = mk hf + mk hg := rfl
+    mk (hf.add hg) = mk hf + mk hg := rfl
 
 @[simp]
 lemma mk_const_smul {f : Space d → ℂ} {c : ℂ} {hf : MemHS f} :
-    mk (memHS_const_smul (c := c) hf) = c • mk hf := rfl
+    mk (hf.const_smul c) = c • mk hf := rfl
 
 lemma mk_eq_iff {f g : Space d → ℂ} {hf : MemHS f} {hg : MemHS g} :
     mk hf = mk hg ↔ f =ᵐ[volume] g := by simp [mk]

@@ -68,12 +68,12 @@ def mulOperator (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceD
     carrier := {ψ : SpaceDHilbertSpace d | MemHS (f • ψ.val.cast)}
     add_mem' := by
       intro ψ φ hψ hφ
-      refine memHS_of_ae _ (memHS_add hψ hφ) ?_
+      refine (hψ.add hφ).ae_eq ?_
       filter_upwards [coeFn_add ψ.val φ.val] with x h
       simp [mul_add, h]
-    zero_mem' := memHS_of_ae 0 zero_memHS (by filter_upwards; simp)
+    zero_mem' := MemHS.zero.ae_eq (by filter_upwards; simp)
     smul_mem' c ψ hψ := by
-      refine memHS_of_ae _ (memHS_const_smul (c := c) hψ) ?_
+      refine (hψ.const_smul c).ae_eq ?_
       filter_upwards [coeFn_smul c ψ.val] with x h
       change _ = (f • (c • ψ.val).cast) x
       simp [h, mul_left_comm]
@@ -157,7 +157,7 @@ lemma mulOperator_domain_ge_of_hasTemperateGrowth
   obtain ⟨g, hg⟩ := schwartzEquiv.surjective ⟨ψ, hψ⟩
   let w : 𝓢(Space d, ℂ) := smulLeftCLM ℂ f g
   let φ : SpaceDHilbertSpace d := schwartzEquiv w
-  refine memHS_of_ae φ (coe_hilbertSpace_memHS φ) ?_
+  refine (memHS φ).ae_eq ?_
   filter_upwards [schwartzEquiv_coe_ae w, schwartzEquiv_coe_ae g] with x h₁ h₂
   simp [w, φ, h₁, ← h₂, hg, smulLeftCLM_apply_apply hf]
 
@@ -322,7 +322,7 @@ lemma mulOperator_compRestricted_le (f g : Space d → ℂ) : 𝓜 f ∘ᵣ 𝓜
   constructor
   · intro ψ hψ
     obtain ⟨hψ, hgψ⟩ := mem_compRestricted_domain_iff.mp hψ
-    refine memHS_of_ae _ (mem_mulOperator_domain_iff.mp hgψ) ?_
+    refine (mem_mulOperator_domain_iff.mp hgψ).ae_eq ?_
     filter_upwards [mulOperator_apply_ae ⟨ψ, hψ⟩]
     simp_all [mul_assoc]
   · intro ψ φ hψφ
@@ -338,7 +338,7 @@ lemma mulOperator_compRestricted_eq (f : Space d → ℂ) {g : Space d → ℂ} 
   refine eq_of_le_of_domain_eq hle ?_
   refine eq_of_le_of_ge hle.1 fun ψ hψ ↦ ?_
   refine mem_compRestricted_domain_iff.mpr ⟨h ▸ Submodule.mem_top, ?_⟩
-  refine memHS_of_ae _ (mem_mulOperator_domain_iff.mp hψ) ?_
+  refine (mem_mulOperator_domain_iff.mp hψ).ae_eq ?_
   filter_upwards [mulOperator_apply_ae ⟨ψ, h ▸ Submodule.mem_top⟩]
   simp_all [mul_assoc]
 

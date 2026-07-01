@@ -413,10 +413,10 @@ lemma radiusPowOperator_domain_ge {d : ℕ} (s : ℝ) :
   intro ψ hψ
   let f := polyBddSchwartzEquiv.symm ⟨ψ, hψ⟩
   apply mem_mulOperator_domain_iff.mpr
-  refine memHS_of_ae (𝐫 s f.1) ?_ ?_
-  · exact radiusPowLM_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
+  refine MemHS.ae_eq (f := 𝐫 s f.1) ?_ ?_
   · filter_upwards [polyBddSchwartzEquiv_coe_ae f]
     simp_all [f]
+  · exact radiusPowLM_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
 
 end
 end QuantumMechanics
