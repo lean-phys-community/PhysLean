@@ -969,10 +969,9 @@ lemma mem_liftCharge_iff_exists (c : Finset 𝓩) {x : TenQuanta 𝓩} :
     x ∈ liftCharge c ↔
     ∃ a : TenQuanta 𝓩, a.reduce = x ∧ a.toCharges.toFinset = c ∧
     (a.toFluxesTen = {⟨1, 0⟩, ⟨1, 0⟩, ⟨1, 0⟩}
-    ∨ a.toFluxesTen = {⟨1, 1⟩, ⟨1, -1⟩, ⟨1, 0⟩}) := by
-  constructor
-  · exact exists_toCharges_toFluxesTen_of_mem_liftCharge c
-  · exact mem_liftCharge_of_exists_toCharges_toFluxesTen c
+    ∨ a.toFluxesTen = {⟨1, 1⟩, ⟨1, -1⟩, ⟨1, 0⟩}) :=
+  ⟨exists_toCharges_toFluxesTen_of_mem_liftCharge c,
+    mem_liftCharge_of_exists_toCharges_toFluxesTen c⟩
 
 /-!
 

@@ -381,10 +381,9 @@ which is not important for us.
 -/
 lemma mem_ofPotentialTerm_iff_mem_ofPotentialTerm [DecidableEq 𝓩]
     {T : PotentialTerm} {n : 𝓩} {y : ChargeSpectrum 𝓩} :
-    n ∈ y.ofPotentialTerm T ↔ n ∈ y.ofPotentialTerm' T := by
-  constructor
-  · exact fun h => ofPotentialTerm_subset_ofPotentialTerm' T h
-  · exact fun h => ofPotentialTerm'_subset_ofPotentialTerm T h
+    n ∈ y.ofPotentialTerm T ↔ n ∈ y.ofPotentialTerm' T :=
+  ⟨fun h => ofPotentialTerm_subset_ofPotentialTerm' T h,
+    fun h => ofPotentialTerm'_subset_ofPotentialTerm T h⟩
 
 /-!
 

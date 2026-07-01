@@ -272,10 +272,9 @@ lemma mem_elemsNoExotics_of_noExotics (F : FluxesFive) (hNE : F.NoExotics) (hnZ 
   which obeys `NoExotics` is an element of `elemsNoExotics`, and every
   element of `elemsNoExotics` obeys `NoExotics`. -/
 lemma noExotics_iff_mem_elemsNoExotics (F : FluxesFive) :
-    F.NoExotics ∧ F.HasNoZero ↔ F ∈ elemsNoExotics := by
-  constructor
-  · exact fun ⟨h1, h2⟩ => mem_elemsNoExotics_of_noExotics F h1 h2
-  · exact fun h => ⟨noExotics_of_mem_elemsNoExotics F h, hasNoZero_of_mem_elemsNoExotics F h⟩
+    F.NoExotics ∧ F.HasNoZero ↔ F ∈ elemsNoExotics :=
+  ⟨fun ⟨h1, h2⟩ => mem_elemsNoExotics_of_noExotics F h1 h2,
+    fun h => ⟨noExotics_of_mem_elemsNoExotics F h, hasNoZero_of_mem_elemsNoExotics F h⟩⟩
 
 end FluxesFive
 
@@ -444,10 +443,9 @@ lemma mem_elemsNoExotics_of_noExotics (F : FluxesTen) (hNE : F.NoExotics) (hnZ :
   which obeys `NoExotics` is an element of `elemsNoExotics`, and every
   element of `elemsNoExotics` obeys `NoExotics`. -/
 lemma noExotics_iff_mem_elemsNoExotics (F : FluxesTen) :
-    F.NoExotics ∧ F.HasNoZero ↔ F ∈ elemsNoExotics := by
-  constructor
-  · exact fun h => mem_elemsNoExotics_of_noExotics F h.1 h.2
-  · exact fun h => ⟨noExotics_of_mem_elemsNoExotics F h, hasNoZero_of_mem_elemsNoExotics F h⟩
+    F.NoExotics ∧ F.HasNoZero ↔ F ∈ elemsNoExotics :=
+  ⟨fun h => mem_elemsNoExotics_of_noExotics F h.1 h.2,
+    fun h => ⟨noExotics_of_mem_elemsNoExotics F h, hasNoZero_of_mem_elemsNoExotics F h⟩⟩
 
 end FluxesTen
 end SU5

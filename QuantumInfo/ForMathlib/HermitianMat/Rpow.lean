@@ -154,9 +154,8 @@ theorem rpow_pos {A : HermitianMat d 𝕜} (hA : 0 < A) {p : ℝ} : 0 < A ^ p :=
   · exact fun i hi => Real.rpow_pos_of_pos hi _
   · rcases eq_or_ne p 0 with h | h <;> simp [h]
 
-theorem rpow_nonneg (hA : 0 ≤ A) {p : ℝ} : 0 ≤ A ^ p := by
-  apply cfc_nonneg_of_nonneg hA
-  exact fun i hi => Real.rpow_nonneg hi p
+theorem rpow_nonneg (hA : 0 ≤ A) {p : ℝ} : 0 ≤ A ^ p :=
+  cfc_nonneg_of_nonneg hA fun _ hi => Real.rpow_nonneg hi p
 
 open ComplexOrder in
 theorem inv_eq_rpow_neg_one (hA : A.mat.PosDef) : A⁻¹ = A ^ (-1 : ℝ) := by
