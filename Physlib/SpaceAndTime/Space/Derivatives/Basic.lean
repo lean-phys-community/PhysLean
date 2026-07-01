@@ -170,9 +170,7 @@ lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
   rw [deriv_eq_fderiv_fun]
   ext x
-  rw [fderiv_add]
-  rfl
-  repeat fun_prop
+  exact congrArg (fun L => L (basis u)) (fderiv_add (hf1 x) (hf2 x))
 
 /-- Derivatives on space distribute coordinate-wise over addition. -/
 lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
@@ -193,9 +191,7 @@ lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
     ∂[u] (f1 - f2) = ∂[u] f1 - ∂[u] f2 := by
   rw [deriv_eq_fderiv_fun]
   ext x
-  rw [fderiv_sub]
-  rfl
-  repeat fun_prop
+  exact congrArg (fun L => L (basis u)) (fderiv_sub (hf1 x) (hf2 x))
 
 /-!
 
@@ -320,7 +316,6 @@ lemma deriv_lorentz_vector {d ν μ} {f : Space d → Lorentz.Vector d}
   change fderiv ℝ (Lorentz.Vector.coordCLM μ ∘ fun x => f x) x (basis ν) = _
   rw [fderiv_comp]
   · simp
-    rw [← deriv_eq_fderiv_basis]
     rfl
   · fun_prop
   · fun_prop

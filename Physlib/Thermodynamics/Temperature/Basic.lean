@@ -223,8 +223,7 @@ lemma chain_rule_T_beta {F : ℝ → ℝ} {F' : ℝ}
     rw [beta_fun_T_eq_on_Ioi ht]
     exact one_div_pos.mpr (mul_pos kB_pos ht)
   have h_beta_at_T : betaFromReal (T.val : ℝ) = (T.β : ℝ) := by
-    rw [beta_fun_T_eq_on_Ioi (show (T.val : ℝ) ∈ Set.Ioi 0 from hT_pos), β_toReal]
-    rfl
+    exact (beta_fun_T_eq_on_Ioi (show (T.val : ℝ) ∈ Set.Ioi 0 from hT_pos)).trans (β_toReal T).symm
   have hF_deriv' : HasDerivWithinAt F F' (Set.Ioi 0) (betaFromReal (T.val : ℝ)) := by
     simpa [h_beta_at_T] using hF_deriv
   exact hF_deriv'.comp (T.val : ℝ) (deriv_beta_wrt_T (T := T) hT_pos) h_map

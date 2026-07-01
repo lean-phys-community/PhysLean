@@ -71,9 +71,7 @@ lemma div_eq_sum_fderiv {d} (f : Space d → EuclideanSpace ℝ (Fin d))
   congr
   funext i
   rw [← Space.deriv_eq]
-  rw [deriv_euclid]
-  rfl
-  fun_prop
+  exact deriv_euclid (ν := i) hf x
 
 /-!
 
@@ -209,8 +207,7 @@ lemma distDiv_apply_eq_sum_fderivD {d}
 lemma distDiv_apply_eq_sum_distDeriv {d}
     (f : (Space d) →d[ℝ] EuclideanSpace ℝ (Fin d)) (η : 𝓢(Space d, ℝ)) :
     (∇ᵈ ⬝ f) η = ∑ i, ∂ᵈ[i] f η i := by
-  rw [distDiv_apply_eq_sum_fderivD]
-  rfl
+  exact distDiv_apply_eq_sum_fderivD f η
 
 /-!
 

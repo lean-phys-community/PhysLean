@@ -135,8 +135,7 @@ lemma timeDeriv_smul_velocity (d : ℕ) (rhoAtPosition : Time → ℝ)
   change (fderiv ℝ (rhoAtPosition • velocityAtPosition) t) 1 =
     rhoAtPosition t • (fderiv ℝ velocityAtPosition t) 1 +
       (fderiv ℝ rhoAtPosition t) 1 • velocityAtPosition t
-  rw [fderiv_smul hRho hVelocity]
-  rfl
+  exact congrArg (fun L => L 1) (fderiv_smul hRho hVelocity)
 
 /-- Product rule for the time derivative of the momentum density `rho u`. -/
 lemma timeDeriv_momentumDensity (d : ℕ) (fluid : FluidState d)

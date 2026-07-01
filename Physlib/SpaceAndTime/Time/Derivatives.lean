@@ -225,7 +225,6 @@ lemma deriv_lorentzVector {d : ℕ} {f : Time → Lorentz.Vector d}
   change fderiv ℝ (Lorentz.Vector.coordCLM i ∘ fun x => f x) t 1 = _
   rw [fderiv_comp]
   · simp
-    rw [← deriv_eq]
     rfl
   · fun_prop
   · fun_prop
