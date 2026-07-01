@@ -1799,8 +1799,7 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
       exact (Real.continuousAt_rpow_const x q (Or.inl (ne_of_gt hx0))).continuousWithinAt
     have hspec :
         spectrum ℝ Aq = (fun x : ℝ ↦ x ^ q) '' spectrum ℝ A := by
-      dsimp [Aq, cfcR]
-      simpa using
+      simpa [Aq, cfcR] using
         (cfc_map_spectrum (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x ^ q)
           (a := A) (ha := hA_sa) (hf := hcontA))
     intro y hy
@@ -1816,8 +1815,7 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
       exact (Real.continuousAt_rpow_const x q (Or.inl (ne_of_gt hx0))).continuousWithinAt
     have hspec :
         spectrum ℝ Bq = (fun x : ℝ ↦ x ^ q) '' spectrum ℝ B := by
-      dsimp [Bq, cfcR]
-      simpa using
+      simpa [Bq, cfcR] using
         (cfc_map_spectrum (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x ^ q)
           (a := B) (ha := hB_sa) (hf := hcontB))
     intro y hy
@@ -1998,8 +1996,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         exact (Real.continuousAt_rpow_const x r (Or.inl (ne_of_gt hx0))).continuousWithinAt
       have hspec :
           spectrum ℝ Cr = (fun x : ℝ ↦ x ^ r) '' spectrum ℝ C := by
-        dsimp [Cr, cfcR]
-        simpa using
+        simpa [Cr, cfcR] using
           (cfc_map_spectrum (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x ^ r)
             (a := C) (ha := hC) (hf := hcontC))
       intro y hy
@@ -2014,8 +2011,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         exact (Real.continuousAt_rpow_const x r (Or.inl (ne_of_gt hx0))).continuousWithinAt
       have hspec :
           spectrum ℝ Ar = (fun x : ℝ ↦ x ^ r) '' spectrum ℝ A := by
-        dsimp [Ar, cfcR]
-        simpa using
+        simpa [Ar, cfcR] using
           (cfc_map_spectrum (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x ^ r)
             (a := A) (ha := hA) (hf := hcontA))
       intro y hy
@@ -2030,8 +2026,7 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         exact (Real.continuousAt_rpow_const x r (Or.inl (ne_of_gt hx0))).continuousWithinAt
       have hspec :
           spectrum ℝ Br = (fun x : ℝ ↦ x ^ r) '' spectrum ℝ B := by
-        dsimp [Br, cfcR]
-        simpa using
+        simpa [Br, cfcR] using
           (cfc_map_spectrum (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (f := fun x : ℝ ↦ x ^ r)
             (a := B) (ha := hB) (hf := hcontB))
       intro y hy
