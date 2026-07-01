@@ -156,8 +156,7 @@ lemma mk_eq_iff {f g : ℝ → ℂ} {hf : MemHS f} {hg : MemHS g} :
   simp [mk]
 
 lemma ext_iff {f g : HilbertSpace} :
-    f = g ↔ (f : ℝ → ℂ) =ᶠ[ae volume] (g : ℝ → ℂ) := by
-  exact Lp.ext_iff
+    f = g ↔ (f : ℝ → ℂ) =ᶠ[ae volume] (g : ℝ → ℂ) := Lp.ext_iff
 
 end HilbertSpace
 end
