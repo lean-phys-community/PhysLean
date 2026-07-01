@@ -548,8 +548,7 @@ instance instInhabited [Nonempty d] : Inhabited (MState d) where
 lemma default_eq [Nonempty d] : (default : MState d) = uniform := rfl
 
 @[simp]
-theorem M_default [Unique d] : (default : MState d).M = 1 := by
-  rfl
+theorem M_default [Unique d] : (default : MState d).M = 1 := rfl
 
 section ptrace
 

@@ -147,8 +147,7 @@ def contrContrContractField : (Contr d).V ⊗[ℝ] (Contr d).V →ₗ[ℝ] ℝ :
 local notation "⟪" ψ "," φ "⟫ₘ" => contrContrContractField (ψ ⊗ₜ φ)
 
 lemma contrContrContract_hom_tmul (φ : Contr d) (ψ : Contr d) :
-    ⟪φ, ψ⟫ₘ = φ.toFin1dℝ ⬝ᵥ η *ᵥ ψ.toFin1dℝ:= by
-  rfl
+    ⟪φ, ψ⟫ₘ = φ.toFin1dℝ ⬝ᵥ η *ᵥ ψ.toFin1dℝ := rfl
 
 /-- The linear map from Co d ⊗ Co d to ℝ induced by the homomorphism
   `Co.toContr` and the contraction `coContrContract`. -/

@@ -85,8 +85,7 @@ lemma ofStaticScalarPotential_scalarPotential {d} (c : SpeedOfLight)
 @[simp]
 lemma ofVectorPotential_scalarPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
-    (ofVectorPotential c A).scalarPotential = 0 := by
-  rfl
+    (ofVectorPotential c A).scalarPotential = 0 := rfl
 
 @[simp]
 lemma ofStaticVectorPotential_scalarPotential {d} (c : SpeedOfLight)

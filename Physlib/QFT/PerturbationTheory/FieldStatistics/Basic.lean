@@ -266,8 +266,7 @@ lemma ofList_take_eraseIdx (n : ℕ) (φs : List 𝓕) :
   rw [take_eraseIdx_same]
 
 lemma ofList_take_zero (φs : List 𝓕) :
-    ofList q (List.take 0 φs) = 1 := by
-  rfl
+    ofList q (List.take 0 φs) = 1 := rfl
 
 lemma ofList_take_succ_cons (n : ℕ) (φ1 : 𝓕) (φs : List 𝓕) :
     ofList q ((φ1 :: φs).take (n + 1)) = q φ1 * ofList q (φs.take n) := by

@@ -78,8 +78,7 @@ noncomputable def planeWave (f₀ : ℝ → EuclideanSpace ℝ (Fin d))
     fun t x => f₀ (⟪x, s.unit⟫_ℝ - c * t)
 
 lemma planeWave_eq {d f₀ c x} {s : Direction d} :
-    planeWave f₀ c s t x = f₀ (⟪x, s.unit⟫_ℝ - c * t) :=
-  rfl
+    planeWave f₀ c s t x = f₀ (⟪x, s.unit⟫_ℝ - c * t) := rfl
 
 /-!
 
