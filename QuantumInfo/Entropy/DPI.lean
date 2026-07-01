@@ -755,7 +755,6 @@ private lemma twirling_identity [Nonempty dB] (X : HermitianMat dB ℂ) :
     · rename_i a s a_1 a_2
       obtain ⟨fst, snd⟩ := a
       simp only [not_false_eq_true, Finset.sum_insert, *]
-      rfl
   · norm_num [Matrix.one_apply]
     rw [show X.trace = ∑ k, X k k from X.trace_eq_trace]
     rcases n : Fintype.card dB with (_ | n)

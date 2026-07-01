@@ -349,8 +349,7 @@ def toComplex : LorentzGroup d →* Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) �
   map_mul' Λ Λ' := by
     ext i j
     simp only [lorentzGroupIsGroup_mul_coe, map_apply, ofRealHom_eq_coe]
-    simp only [← Matrix.map_mul]
-    rfl
+    simp [← Matrix.map_mul]
 
 /-- The image of a Lorentz transformation under `toComplex` is invertible. -/
 instance (M : LorentzGroup d) : Invertible (toComplex M) where

@@ -868,7 +868,6 @@ private lemma inner_one_kron_eq_inner_traceLeft
   refine' Finset.sum_bij ( fun x y => ( x.2, x.1 ) ) _ _ _ _ <;> simp [ Matrix.mul_apply ];
   intro a b; rw [ ← Equiv.sum_comp ( Equiv.prodComm d₁ d₂ ) ]
   simp [mul_comm]
-  rfl
 
 open HermitianMat in
 private lemma hermitianMat_log_inv_eq_neg

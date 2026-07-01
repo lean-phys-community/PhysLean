@@ -136,8 +136,7 @@ lemma complexCoBasisFin4_apply_two :
 @[simp]
 lemma complexCoBasisFin4_apply_three :
     complexCoBasisFin4 3 = complexCoBasis (Sum.inr 2) := by
-  simp only [complexCoBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexCoBasisFin4, finSumFinEquiv, Fin.addCases]
 
 /-!
 
