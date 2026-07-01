@@ -115,17 +115,11 @@ lemma normalOrderF_normalOrderF_mid (a b c : 𝓕.FieldOpFreeAlgebra) :
 
 lemma normalOrderF_normalOrderF_right (a b : 𝓕.FieldOpFreeAlgebra) :
     𝓝ᶠ(a * b) = 𝓝ᶠ(a * 𝓝ᶠ(b)) := by
-  trans 𝓝ᶠ(a * b * 1)
-  · simp
-  · rw [normalOrderF_normalOrderF_mid]
-    simp
+  simpa using normalOrderF_normalOrderF_mid a b (1 : 𝓕.FieldOpFreeAlgebra)
 
 lemma normalOrderF_normalOrderF_left (a b : 𝓕.FieldOpFreeAlgebra) :
     𝓝ᶠ(a * b) = 𝓝ᶠ(𝓝ᶠ(a) * b) := by
-  trans 𝓝ᶠ(1 * a * b)
-  · simp
-  · rw [normalOrderF_normalOrderF_mid]
-    simp
+  simpa using normalOrderF_normalOrderF_mid (1 : 𝓕.FieldOpFreeAlgebra) a b
 
 /-!
 

@@ -76,10 +76,7 @@ lemma normalOrder_normalOrder_right (a b : 𝓕.WickAlgebra) :
   simpa using normalOrder_normalOrder_mid a b (1 : 𝓕.WickAlgebra)
 
 lemma normalOrder_normalOrder (a : 𝓕.WickAlgebra) : 𝓝(𝓝(a)) = 𝓝(a) := by
-  trans 𝓝(𝓝(a) * 1)
-  · simp
-  · rw [← normalOrder_normalOrder_left]
-    simp
+  simpa using (normalOrder_normalOrder_left a (1 : 𝓕.WickAlgebra)).symm
 
 /-!
 

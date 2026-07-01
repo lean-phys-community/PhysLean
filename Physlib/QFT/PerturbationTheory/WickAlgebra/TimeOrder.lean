@@ -556,25 +556,16 @@ lemma timeOrder_timeOrder_mid (a b c : 𝓕.WickAlgebra) :
 
 lemma timeOrder_timeOrder_left (b c : 𝓕.WickAlgebra) :
     𝓣(b * c) = 𝓣(𝓣(b) * c) := by
-  trans 𝓣(1 * b * c)
-  simp only [one_mul]
-  rw [timeOrder_timeOrder_mid]
-  simp
+  simpa using timeOrder_timeOrder_mid (1 : 𝓕.WickAlgebra) b c
 
 lemma timeOrder_timeOrder_right (a b : 𝓕.WickAlgebra) :
     𝓣(a * b) = 𝓣(a * 𝓣(b)) := by
-  trans 𝓣(a * b * 1)
-  simp only [mul_one]
-  rw [timeOrder_timeOrder_mid]
-  simp
+  simpa using timeOrder_timeOrder_mid a b (1 : 𝓕.WickAlgebra)
 
 /-- Time ordering is a projection. -/
 lemma timeOrder_timeOrder (a : 𝓕.WickAlgebra) :
     𝓣(𝓣(a)) = 𝓣(a) := by
-  trans 𝓣(𝓣(a) * 1)
-  · simp
-  · rw [← timeOrder_timeOrder_left]
-    simp
+  simpa using (timeOrder_timeOrder_left a (1 : 𝓕.WickAlgebra)).symm
 
 end WickAlgebra
 end FieldSpecification

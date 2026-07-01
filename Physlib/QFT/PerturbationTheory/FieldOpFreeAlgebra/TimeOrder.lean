@@ -105,16 +105,10 @@ lemma timeOrderF_timeOrderF_mid (a b c : 𝓕.FieldOpFreeAlgebra) :
     simp_all [pc]
 
 lemma timeOrderF_timeOrderF_right (a b : 𝓕.FieldOpFreeAlgebra) : 𝓣ᶠ(a * b) = 𝓣ᶠ(a * 𝓣ᶠ(b)) := by
-  trans 𝓣ᶠ(a * b * 1)
-  · simp
-  · rw [timeOrderF_timeOrderF_mid]
-    simp
+  simpa using timeOrderF_timeOrderF_mid a b (1 : 𝓕.FieldOpFreeAlgebra)
 
 lemma timeOrderF_timeOrderF_left (a b : 𝓕.FieldOpFreeAlgebra) : 𝓣ᶠ(a * b) = 𝓣ᶠ(𝓣ᶠ(a) * b) := by
-  trans 𝓣ᶠ(1 * a * b)
-  · simp
-  · rw [timeOrderF_timeOrderF_mid]
-    simp
+  simpa using timeOrderF_timeOrderF_mid (1 : 𝓕.FieldOpFreeAlgebra) a b
 
 lemma timeOrderF_ofFieldOpListF (φs : List 𝓕.FieldOp) :
     𝓣ᶠ(ofFieldOpListF φs) = timeOrderSign φs • ofFieldOpListF (timeOrderList φs) := by
