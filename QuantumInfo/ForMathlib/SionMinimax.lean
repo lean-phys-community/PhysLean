@@ -172,8 +172,7 @@ theorem lowerSemicontinuousOn_iff_isClosed_preimage {f : α → γ} [IsClosed s]
 
 theorem segment.isConnected {E : Type u_1} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul ℝ E] (a b : E) :
     IsConnected (segment ℝ a b) := by
-  rw [← Path.range_segment a b]
-  exact isConnected_range (Path.segment a b).continuous
+  simpa [Path.range_segment a b] using isConnected_range (Path.segment a b).continuous
 
 theorem BddAbove.range_inf_of_image2 {M N α : Type*} {f : M → N → α} [ConditionallyCompleteLinearOrder α]
   {S : Set M} {T : Set N} (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T)) :

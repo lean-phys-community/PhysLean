@@ -1062,8 +1062,7 @@ This follows from `ker_conj` (which expresses `(A.conj B).ker` as a `comap`) and
 lemma ker_conj_le_of_ker_le {n : Type*} [Fintype n] [DecidableEq n]
     {A B : HermitianMat n ℂ} (hA : 0 ≤ A) (hB : 0 ≤ B) (h : A.ker ≤ B.ker)
     (C : Matrix n n ℂ) : (A.conj C).ker ≤ (B.conj C).ker := by
-  rw [ker_conj hA, ker_conj hB]
-  exact Submodule.comap_mono h
+  simpa [ker_conj hA, ker_conj hB] using Submodule.comap_mono h
 
 /-- Unitary conjugation preserves the kernel ordering between MStates.
 If `σ.M.ker ≤ ρ.M.ker`, then `(σ.conjTensorUnitary V).M.ker ≤ (ρ.conjTensorUnitary V).M.ker`. -/

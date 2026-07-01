@@ -1433,8 +1433,8 @@ theorem IsHermitian.spectrum_subset_of_mem_Icc {d 𝕜 : Type*} [Fintype d] [Dec
   {A B x : Matrix d d 𝕜} (hA : A.IsHermitian) (hB : B.IsHermitian)
   (hl : (x - A).PosSemidef) (hr : (B - x).PosSemidef) :
     spectrum ℝ x ⊆ Set.Icc (⨅ i, hA.eigenvalues i) (⨆ i, hB.eigenvalues i) := by
-  rw [← Set.Ici_inter_Iic]
-  exact Set.subset_inter (hA.spectrum_subset_Ici_of_sub hl) (hB.spectrum_subset_Iic_of_sub hr)
+  simpa [Set.Ici_inter_Iic] using
+    Set.subset_inter (hA.spectrum_subset_Ici_of_sub hl) (hB.spectrum_subset_Iic_of_sub hr)
 
 /--
 The right partial trace of a matrix is equal to the left partial trace of the matrix reindexed by swapping the tensor factors.
