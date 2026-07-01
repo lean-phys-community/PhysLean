@@ -848,8 +848,7 @@ theorem sandwichedTraceFunctional_self (hα : 0 < α) (ρ : MState d) :
       · nlinarith [mul_div_cancel₀ (1 - α) (by positivity : (2 * α) ≠ 0)]
     have h_simp : (ρ.M ^ (1 + 2 * ((1 - α) / (2 * α)))) ^ α =
         ρ.M ^ ((1 + 2 * ((1 - α) / (2 * α))) * α) := by
-      rw [← rpow_mul]
-      exact le_of_lt this
+      exact (HermitianMat.rpow_mul (le_of_lt this)).symm
     field_simp at *
     simp_all only [add_sub_cancel, one_div, rpow_one, MState.tr]
 

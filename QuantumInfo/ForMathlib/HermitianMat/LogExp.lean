@@ -67,8 +67,7 @@ instance nonSingular_exp : NonSingular A.exp :=
 
 /-- The matrix exponential of a Hermitian matrix is nonnegative. -/
 theorem exp_nonneg (A : HermitianMat d 𝕜) : 0 ≤ A.exp := by
-  rw [exp, HermitianMat.cfc_nonneg_iff]
-  exact fun i ↦ le_of_lt (Real.exp_pos _)
+  simpa [exp, HermitianMat.cfc_nonneg_iff] using fun i ↦ le_of_lt (Real.exp_pos _)
 
 /-- The matrix exponential of a Hermitian matrix is strictly positive (Loewner order).
 Requires `Nonempty` since over an empty index type every matrix equals zero and `0 < 0`

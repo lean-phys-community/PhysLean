@@ -471,8 +471,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
     replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
     have hz_mem : z ∈ segment ℝ y₁ y₂ :=
       have cloL : IsClosed (segment ℝ y₁ y₂) := by
-        rw [← closure_openSegment]
-        exact isClosed_closure
+        simp [← closure_openSegment]
       cloL.isSeqClosed hzI hzs
     let x := (hC_nonempty z hz_mem).some
     have hx : x ∈ C z := (hC_nonempty z hz_mem).some_mem
@@ -509,8 +508,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
     replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
     have hz_mem : z ∈ segment ℝ y₁ y₂ :=
       have cloL : IsClosed (segment ℝ y₁ y₂) := by
-        rw [← closure_openSegment]
-        exact isClosed_closure
+        simp [← closure_openSegment]
       cloL.isSeqClosed hzI hzs
     let x := (hC_nonempty z hz_mem).some
     have hx : x ∈ C z := (hC_nonempty z hz_mem).some_mem

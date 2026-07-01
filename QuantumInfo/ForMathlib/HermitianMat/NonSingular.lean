@@ -136,8 +136,7 @@ theorem nonSingular_iff_neg : NonSingular (-A) ↔ NonSingular A := by
 
 @[simp]
 theorem nonSingular_iff_inv : NonSingular (A⁻¹) ↔ NonSingular A := by
-  rw [nonsingular_iff_isUnit, nonsingular_iff_isUnit]
-  exact Matrix.isUnit_nonsing_inv_iff
+  simp [nonsingular_iff_isUnit]
 
 @[simp]
 theorem nonSingular_iff_kronecker [Nonempty n] [Nonempty m] :
