@@ -10,24 +10,49 @@ public import Mathlib.MeasureTheory.Function.L2Space
 public import Physlib.SpaceAndTime.Space.Module
 /-!
 
-# Hilbert space for quantum mechanics on Space d
+# Hilbert spaces for quantum mechanics on `Space d`
+
+## i. Overview
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Definition
+- B. Dual space
+- C. Membership
+- D. Construction of elements
+- E. Coersions
+- F. Misc.
+
+## iv. References
 
 -/
 
 @[expose] public section
 
+noncomputable section
+
 namespace QuantumMechanics
 
-noncomputable section
+open Function InnerProductSpace MeasureTheory Measure Set
+
+/-!
+## A. Definition
+-/
 
 /-- The Hilbert space for single-particle quantum mechanics on `Space d` is defined to be
   `L²(Space d, ℂ)`, the space of almost-everywhere equal equivalence classes of square-integrable
   functions from `Space d` to `ℂ`. -/
-abbrev SpaceDHilbertSpace (d : ℕ) := MeasureTheory.Lp (α := Space d) ℂ 2
+abbrev SpaceDHilbertSpace (d : ℕ) := Lp (α := Space d) ℂ 2 volume
 
 namespace SpaceDHilbertSpace
-open MeasureTheory
-open InnerProductSpace
+
+variable {d : ℕ} {f g : Space d → ℂ} (ψ φ : SpaceDHilbertSpace d)
+
+/-!
+## B. Dual space
+-/
 
 /-- The anti-linear map from the Hilbert space to its dual. -/
 def toBra {d : ℕ} : SpaceDHilbertSpace d →ₛₗ[starRingEnd ℂ] (StrongDual ℂ (SpaceDHilbertSpace d)) :=
@@ -46,7 +71,7 @@ lemma toBra_injective : Function.Injective (toBra (d := d)) := by
   simpa [toBra] using h
 
 /-!
-## Member of the Hilbert space as a property
+## C. Membership
 -/
 
 /-- The proposition `MemHS f` for a function `f : Space d → ℂ` is defined
@@ -89,8 +114,10 @@ lemma memHS_of_ae {g : Space d → ℂ} (f : Space d → ℂ) (hf : MemHS f) (hf
     MemHS g := MemLp.ae_eq hfg hf
 
 /-!
-## Construction of elements of the Hilbert space
+## D. Construction of elements
 -/
+
+section
 
 lemma aeEqFun_mk_mem_iff (f : Space d → ℂ) (hf : AEStronglyMeasurable f volume) :
     AEEqFun.mk f hf ∈ SpaceDHilbertSpace d ↔ MemHS f := by
@@ -150,8 +177,18 @@ lemma mk_eq_iff {f g : Space d → ℂ} {hf : MemHS f} {hg : MemHS g} :
 lemma ext_iff {f g : SpaceDHilbertSpace d} :
     f = g ↔ (f : Space d → ℂ) =ᵐ[volume] (g : Space d → ℂ) := Lp.ext_iff
 
+end
+
 /-!
-## Limits
+## E. Coersion
+-/
+
+section
+
+end
+
+/-!
+## F. Limits
 -/
 
 open Filter
@@ -168,5 +205,5 @@ lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
     simp_all
 
 end SpaceDHilbertSpace
-end
 end QuantumMechanics
+end
