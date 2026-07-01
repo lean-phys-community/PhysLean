@@ -503,7 +503,6 @@ lemma toComplex_equivariant {n} {c : Fin n → realLorentzTensor.Color}
   · rw [actionT_pure, toComplex_pure, actionT_pure, actionP_toComplexPure, toComplex_pure]
   · simp
     rw [← h]
-    change Λ • (r : ℂ) • toComplex t = _
     exact actionT_smul (g := Λ) (r := (r : ℂ)) (t := toComplex t)
   · simp_all
 

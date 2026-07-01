@@ -257,7 +257,6 @@ def inLineEqProj (T : InLineEqSol) : InLineEq × ℚ × ℚ × ℚ :=
 lemma inLineEqTo_smul (R : InLineEq) (c₁ c₂ c₃ d : ℚ) :
     inLineEqToSol (R, (d * c₁), (d * c₂), (d * c₃)) = d • inLineEqToSol (R, c₁, c₂, c₃) := by
   apply ACCSystem.Sols.ext
-  change (lineQuad _ _ _ _).val = _
   exact congrArg (fun x => x.val) (lineQuad_smul R.val c₁ c₂ c₃ d)
 
 lemma inLineEqToSol_proj (T : InLineEqSol) : inLineEqToSol (inLineEqProj T) = T.val := by
@@ -288,7 +287,6 @@ def inQuadToSol : InQuad × ℚ × ℚ × ℚ → MSSMACC.Sols := fun (R, a₁, 
 lemma inQuadToSol_smul (R : InQuad) (c₁ c₂ c₃ d : ℚ) :
     inQuadToSol (R, (d * c₁), (d * c₂), (d * c₃)) = d • inQuadToSol (R, c₁, c₂, c₃) := by
   apply ACCSystem.Sols.ext
-  change (lineCube _ _ _ _).val = _
   exact congrArg (fun x => x.val) (lineCube_smul R.val.val c₁ c₂ c₃ d)
 
 /-- On elements of `inQuadSol` a right-inverse to `inQuadToSol`. -/
@@ -327,7 +325,6 @@ def inQuadCubeToSol : InQuadCube × ℚ × ℚ × ℚ → MSSMACC.Sols := fun (R
 lemma inQuadCubeToSol_smul (R : InQuadCube) (c₁ c₂ c₃ d : ℚ) :
     inQuadCubeToSol (R, (d * c₁), (d * c₂), (d * c₃)) = d • inQuadCubeToSol (R, c₁, c₂, c₃) := by
   apply ACCSystem.Sols.ext
-  change (planeY₃B₃ _ _ _ _).val = _
   exact congrArg (fun x => x.val) (planeY₃B₃_smul R.val.val.val c₁ c₂ c₃ d)
 
 /-- On elements of `inQuadCubeSol` a right-inverse to `inQuadCubeToSol`. -/

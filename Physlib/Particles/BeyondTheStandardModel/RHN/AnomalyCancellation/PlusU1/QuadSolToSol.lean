@@ -59,7 +59,6 @@ def generic (S : (PlusU1 n).QuadSols) : (PlusU1 n).Sols :=
 
 lemma generic_on_AF (S : (PlusU1 n).Sols) : generic S.1 = (α₁ S.1) • S := by
   apply ACCSystem.Sols.ext
-  change (BL.addQuad S.1 (α₁ S.1) (α₂ S.1)).val = _
   exact congrArg (fun Q : (PlusU1 n).QuadSols => Q.val) (BL_add_α₁_α₂_AF S)
 
 lemma generic_on_AF_α₁_ne_zero (S : (PlusU1 n).Sols) (h : α₁ S.1 ≠ 0) :
