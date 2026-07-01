@@ -548,8 +548,7 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
   have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t :=
     dsub x _ (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
   have hy_deriv2 : ∂ₜ (∂ₜ y) = fun t => ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
-    rw [hy_deriv]
-    exact dsub _ _ (deriv_differentiable_of_contDiff _ hx)
+    simpa [hy_deriv] using dsub _ _ (deriv_differentiable_of_contDiff _ hx)
       (deriv_differentiable_of_contDiff _ hTraj)
   have hNewt_x := (S.equationOfMotion_iff_newtons_2nd_law x hx).1 hEOM
   have hNewt_traj := (S.equationOfMotion_iff_newtons_2nd_law (IC.trajectory S) hTraj).1

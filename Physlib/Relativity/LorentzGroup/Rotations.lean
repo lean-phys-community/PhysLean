@@ -77,12 +77,11 @@ def ofSpecialOrthogonal {d} :
     let M : Matrix (Fin d) (Fin d) ℝ := fun i j => Λ.1 (Sum.inr i) (Sum.inr j)
     have h1 : Matrix.fromBlocks 1 0 0 M = Λ.1 := by
       have h1 : LorentzGroup.toVector Λ = Lorentz.Vector.basis (Sum.inl 0) := by
-        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
-        exact h.1
+        simpa [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one] using h.1
       have h2 : LorentzGroup.toVector (LorentzGroup.transpose Λ) =
           Lorentz.Vector.basis (Sum.inl 0) := by
-        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
-        exact h.1
+        simpa [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one,
+          LorentzGroup.transpose_val] using h.1
       funext i j
       match i, j with
       | .inl 0, .inl 0 => simp [h.1]
@@ -130,12 +129,11 @@ def ofSpecialOrthogonal {d} :
     let M : Matrix (Fin d) (Fin d) ℝ := fun i j => Λ.1 (Sum.inr i) (Sum.inr j)
     have h1 : Matrix.fromBlocks 1 0 0 M = Λ.1 := by
       have h1 : LorentzGroup.toVector Λ = Lorentz.Vector.basis (Sum.inl 0) := by
-        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
-        exact h.1
+        simpa [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one] using h.1
       have h2 : LorentzGroup.toVector (LorentzGroup.transpose Λ) =
           Lorentz.Vector.basis (Sum.inl 0) := by
-        rw [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one]
-        exact h.1
+        simpa [LorentzGroup.toVector_eq_basis_iff_timeComponent_eq_one,
+          LorentzGroup.transpose_val] using h.1
       funext i j
       match i, j with
       | .inl 0, .inl 0 => simp [h.1]
