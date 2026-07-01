@@ -36,8 +36,7 @@ def chargesMapOfSpeciesMap {n m : ℕ} (f : (SMSpecies n).Charges →ₗ[ℚ] (S
     intro i
     rw [map_smul]
     rw [toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv]
-    rw [map_smul]
-    rfl
+    exact (f.comp (toSpecies i)).map_smul a S
 
 /-- The projection of the `m`-family charges onto the first `n`-family charges for species. -/
 @[simps!]

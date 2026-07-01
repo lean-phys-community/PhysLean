@@ -170,8 +170,7 @@ this proves `right_inv` of `toAffineIsometryMulEquiv`. -/
     show Matrix.toLin _ _
         (LinearMap.toMatrix _ _
           (L.toLinearEquiv : EuclideanSpace ℝ (Fin n) →ₗ[ℝ] EuclideanSpace ℝ (Fin n))) x = L x
-    rw [Matrix.toLin_toMatrix]
-    rfl
+    exact LinearMap.congr_fun (Matrix.toLin_toMatrix _ _ _) x
 
 /-- `EuclideanGroup n ≃* AffineIsometryEquiv ℝ (EuclideanSpace ℝ (Fin n)) _`: the Euclidean group
 is the full group of affine isometries of Euclidean space. This upgrades `toAffineIsometryHom` to

@@ -142,8 +142,7 @@ lemma translationVector.incl_range :
   constructor
   · rintro ⟨v, hv⟩
     show g.linear.val = 1
-    rw [← hv]
-    rfl
+    exact congrArg (fun g : EuclideanGroup n => g.linear.val) hv.symm
   · intro h
     rw [Set.mem_range]
     refine ⟨g.translation, ?_⟩

@@ -394,8 +394,7 @@ lemma toComplex_mulVec_ofReal (v : Fin 1 ⊕ Fin d → ℝ) (Λ : LorentzGroup d
     toComplex Λ *ᵥ (ofRealHom ∘ v) = ofRealHom ∘ (Λ *ᵥ v) := by
   simp only [toComplex, MonoidHom.coe_mk, OneHom.coe_mk]
   funext i
-  rw [← RingHom.map_mulVec]
-  rfl
+  exact (RingHom.map_mulVec ofRealHom Λ.val v i).symm
 
 /-- The parity transformation. -/
 def parity : LorentzGroup d := ⟨minkowskiMatrix, by

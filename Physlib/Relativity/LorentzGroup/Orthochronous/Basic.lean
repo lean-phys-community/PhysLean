@@ -163,8 +163,7 @@ lemma orthchroMap_not_IsOrthochronous {Λ : LorentzGroup d} (h : ¬ IsOrthochron
     orthchroMap Λ = Additive.toMul (1 : ZMod 2) := by
   simp only [orthchroMap, ContinuousMap.comp_apply, ContinuousMap.coe_mk,
     orthchroMapReal_on_not_IsOrthochronous h, coeForℤ₂_apply, Subtype.mk.injEq, Nat.reduceAdd]
-  rw [if_neg (by norm_num)]
-  rfl
+  exact if_neg (by norm_num)
 
 /-- The product of two orthochronous Lorentz transformations is orthochronous. -/
 lemma isOrthochronous_mul {Λ Λ' : LorentzGroup d} (h : IsOrthochronous Λ)

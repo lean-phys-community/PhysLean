@@ -61,10 +61,8 @@ def ComponentIdx.single {c : C} :
   left_inv b := by
     ext i
     cases Fin.fin_one_eq_zero i
-    simp [basisIdxCongr]
     rfl
   right_inv b := by
-    simp [basisIdxCongr]
     rfl
 
 @[simp]

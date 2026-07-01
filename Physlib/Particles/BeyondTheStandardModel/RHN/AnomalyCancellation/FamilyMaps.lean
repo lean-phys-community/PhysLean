@@ -32,8 +32,7 @@ def chargesMapOfSpeciesMap {n m : ℕ} (f : (SMνSpecies n).Charges →ₗ[ℚ] 
   map_smul' a S := by
     rw [charges_eq_toSpecies_eq]
     intro i
-    rw [map_smul, toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv, map_smul]
-    rfl
+    simp [toSMSpecies_toSpecies_inv]
 
 lemma chargesMapOfSpeciesMap_toSpecies {n m : ℕ}
     (f : (SMνSpecies n).Charges →ₗ[ℚ] (SMνSpecies m).Charges)

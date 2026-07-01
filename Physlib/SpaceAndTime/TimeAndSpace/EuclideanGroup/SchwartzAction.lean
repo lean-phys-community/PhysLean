@@ -70,8 +70,7 @@ noncomputable def schwartzEuclideanAction {d : ℕ} :
     ext η tx
     simp only [_root_.mul_inv_rev, SchwartzMap.compCLMOfAntilipschitz_apply,
       Function.comp_apply]
-    rw [mul_smul]
-    rfl
+    exact congrArg η (mul_smul _ _ _)
 
 /-- Pointwise formula for the monoid-homomorphism form of the Schwartz-map pullback action. -/
 @[simp]

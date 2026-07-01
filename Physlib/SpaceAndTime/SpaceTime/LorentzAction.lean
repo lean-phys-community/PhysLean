@@ -81,8 +81,7 @@ def schwartzAction {d} : LorentzGroup d →* 𝓢(SpaceTime d, ℝ) →L[ℝ] �
     ext η x
     simp only [_root_.mul_inv_rev, compCLM_apply, Function.comp_apply,
       Lorentz.Vector.actionCLM_apply]
-    rw [SemigroupAction.mul_smul]
-    rfl
+    exact congr_arg η (SemigroupAction.mul_smul Λ₂⁻¹ Λ₁⁻¹ x)
 
 /-!
 
