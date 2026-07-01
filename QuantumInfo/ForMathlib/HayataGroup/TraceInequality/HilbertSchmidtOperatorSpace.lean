@@ -521,21 +521,15 @@ noncomputable def rightMulHSStarAlgHom : (L ℋ)ᵐᵒᵖ →⋆ₐ[ℝ] L (HSOp
 /-- The `⋆`-algebra hom sending `A` to `op (star A)`. On selfadjoint operators this is just `op`. -/
 noncomputable def opStarHSStarAlgHom : L ℋ →⋆ₐ[ℝ] (L ℋ)ᵐᵒᵖ where
   toFun := fun A => MulOpposite.op (star A)
-  map_one' := by simp
-  map_mul' := by
-    intro A B
-    simp [star_mul]
-  map_zero' := by simp
-  map_add' := by
-    intro A B
-    simp
+  map_one' := congrArg MulOpposite.op (star_one (R := L ℋ))
+  map_mul' A B := congrArg MulOpposite.op (star_mul A B)
+  map_zero' := congrArg MulOpposite.op (star_zero (R := L ℋ))
+  map_add' A B := congrArg MulOpposite.op (star_add A B)
   commutes' := by
     intro r
     apply congrArg MulOpposite.op
     simp [Algebra.algebraMap_eq_smul_one]
-  map_star' := by
-    intro A
-    simp
+  map_star' A := rfl
 
 private noncomputable def opStarHSAlgEquiv : L ℋ ≃ₐ[ℝ] (L ℋ)ᵐᵒᵖ where
   toFun A := MulOpposite.op (star A)
