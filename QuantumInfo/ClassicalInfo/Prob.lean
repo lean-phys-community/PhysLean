@@ -278,8 +278,7 @@ instance instUniv [AddCommMonoid T] [Module ℝ T] : Mixable T T where
 
 @[simp]
 theorem mkT_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} (h : ∃ t', to_U t' = t) :
-    instUniv.mkT h = ⟨t, rfl⟩ :=
-  rfl
+    instUniv.mkT h = ⟨t, rfl⟩ := rfl
 
 @[simp]
 theorem to_U_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} : instUniv.to_U t = t := rfl
@@ -315,8 +314,7 @@ theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t
 
 @[simp]
 theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} :
-    (instPi).to_U t = fun d ↦ inst.to_U (t d) :=
-  rfl
+    (instPi).to_U t = fun d ↦ inst.to_U (t d) := rfl
 
 end pi
 
@@ -364,13 +362,11 @@ instance instMixable : Mixable ℝ Prob where
     · nlinarith
 
 @[simp]
-theorem to_U_mixable [AddCommMonoid T] [SMul ℝ T] (t : Prob) : instMixable.to_U t = t.val :=
-  rfl
+theorem to_U_mixable [AddCommMonoid T] [SMul ℝ T] (t : Prob) : instMixable.to_U t = t.val := rfl
 
 @[simp]
 theorem mkT_mixable (u : ℝ) (h : ∃ t : Prob, Mixable.to_U t = u) : Mixable.mkT h =
-    ⟨⟨u,Exists.casesOn h fun t ht ↦ ht ▸ t.2⟩, rfl⟩ :=
-  rfl
+    ⟨⟨u,Exists.casesOn h fun t ht ↦ ht ▸ t.2⟩, rfl⟩ := rfl
 
 /-- `Prob.mix` is an alias of `Mixable.mix` so it can be accessed from a probability with
 dot notation, e.g. `p.mix x y`. -/

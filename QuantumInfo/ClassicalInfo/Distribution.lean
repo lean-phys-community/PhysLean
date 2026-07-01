@@ -62,8 +62,7 @@ theorem normalized (d : ProbDistribution α) : Finset.sum Finset.univ (fun i ↦
 abbrev prob (d : ProbDistribution α) := (d : α → Prob)
 
 @[simp]
-theorem fun_eq_val (d : ProbDistribution α) : d.val = d :=
-  rfl
+theorem fun_eq_val (d : ProbDistribution α) : d.val = d := rfl
 
 @[simp]
 theorem funlike_apply (d : α → Prob) (h : _) (x : α) :
