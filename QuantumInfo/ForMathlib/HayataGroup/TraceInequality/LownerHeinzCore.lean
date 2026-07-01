@@ -1847,7 +1847,6 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
         cfcR  (fun y : ℝ ↦ y⁻¹) (cfcR  (fun x : ℝ ↦ x ^ q) A) =
           cfcR  (fun x : ℝ ↦ (x ^ q)⁻¹) A := by simpa [one_div] using hcomp
     rw [hcomp']
-    dsimp [cfcR]
     apply cfc_congr
     intro x hx
     have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using hspA hx
@@ -1882,7 +1881,6 @@ theorem power_Icc_neg_one_zero_neg_operatorMonotoneOn_Ioi : ∀ p ∈ Set.Icc (-
         cfcR  (fun y : ℝ ↦ y⁻¹) (cfcR  (fun x : ℝ ↦ x ^ q) B) =
           cfcR  (fun x : ℝ ↦ (x ^ q)⁻¹) B := by simpa [one_div] using hcomp
     rw [hcomp']
-    dsimp [cfcR]
     apply cfc_congr
     intro x hx
     have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using hspB hx
@@ -2095,7 +2093,6 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         cfcR  (fun y : ℝ ↦ y⁻¹) (cfcR  (fun x : ℝ ↦ x ^ r) A) =
           cfcR  (fun x : ℝ ↦ (x ^ r)⁻¹) A := by simpa [one_div] using hcomp
     rw [hcomp']
-    dsimp [cfcR]
     apply cfc_congr
     intro x hx
     have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using As hx
@@ -2129,7 +2126,6 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         cfcR  (fun y : ℝ ↦ y⁻¹) (cfcR  (fun x : ℝ ↦ x ^ r) B) =
           cfcR  (fun x : ℝ ↦ (x ^ r)⁻¹) B := by simpa [one_div] using hcomp
     rw [hcomp']
-    dsimp [cfcR]
     apply cfc_congr
     intro x hx
     have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using Bs hx
@@ -2163,7 +2159,6 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         cfcR  (fun y : ℝ ↦ y⁻¹) (cfcR  (fun x : ℝ ↦ x ^ r) C) =
           cfcR  (fun x : ℝ ↦ (x ^ r)⁻¹) C := by simpa [one_div] using hcomp
     rw [hcomp']
-    dsimp [cfcR]
     apply cfc_congr
     intro x hx
     have hx0 : (0 : ℝ) < x := by simpa [Set.Ioi] using Cs hx
