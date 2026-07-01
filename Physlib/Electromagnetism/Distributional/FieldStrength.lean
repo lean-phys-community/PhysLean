@@ -129,8 +129,7 @@ lemma fieldStrengthAux_tensor_basis_eq_basis {d} (A : DistElectromagneticPotenti
     (Tensor.basis _).repr (Tensorial.toTensor (A.fieldStrengthAux ε)) b =
     (Lorentz.Vector.basis.tensorProduct Lorentz.Vector.basis).repr (A.fieldStrengthAux ε)
       (b 0, b 1) := by
-  rw [Tensorial.basis_toTensor_apply]
-  rw [Tensorial.basis_map_prod]
+  rw [Tensorial.basis_toTensor_apply, Tensorial.basis_map_prod]
   simp only [Nat.reduceSucc, Nat.reduceAdd, Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
     Equiv.symm_symm, Fin.isValue]
   rw [Lorentz.Vector.tensor_basis_map_eq_basis_reindex]

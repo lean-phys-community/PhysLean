@@ -561,8 +561,7 @@ as taking the derivative and then applying the Lorentz transformation to the res
 lemma deriv_equivariant {d} {x : SpaceTime d} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) : deriv (Λ • A) x = Λ • (deriv A (Λ⁻¹ • x)) := by
-  rw [deriv_eq_tensorDeriv, deriv_eq_tensorDeriv]
-  rw [action_val, tensorDeriv_equivariant]
+  rw [deriv_eq_tensorDeriv, deriv_eq_tensorDeriv, action_val, tensorDeriv_equivariant]
   all_goals fun_prop
 
 /-!
@@ -619,8 +618,7 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
       (Fin.append ![Color.down] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (deriv A x)) b =
     ∂_ (b 0) A x (b 1) := by
-  rw [Tensorial.basis_toTensor_apply]
-  rw [Tensorial.basis_map_prod]
+  rw [Tensorial.basis_toTensor_apply, Tensorial.basis_map_prod]
   simp only [Nat.reduceSucc, Nat.reduceAdd, Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
     Equiv.symm_symm, Fin.isValue]
   rw [Lorentz.Vector.tensor_basis_map_eq_basis_reindex,
