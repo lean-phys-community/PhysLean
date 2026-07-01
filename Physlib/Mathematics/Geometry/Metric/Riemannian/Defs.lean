@@ -110,8 +110,7 @@ noncomputable def tangentInnerCore (g : RiemannianMetric I n M) (x : M) :
     InnerProductSpace.Core ℝ (TangentSpace I x) where
   inner := λ v w => g.inner x v w
   conj_inner_symm := λ v w => by
-    simp only [inner_apply, conj_trivial]
-    exact g.toPseudoRiemannianMetric.symm x w v
+    simpa only [inner_apply, conj_trivial] using g.toPseudoRiemannianMetric.symm x w v
   re_inner_nonneg := λ v => by
     simp only [inner_apply, RCLike.re_to_real]
     by_cases hv : v = 0
