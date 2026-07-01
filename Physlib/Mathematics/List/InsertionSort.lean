@@ -350,11 +350,9 @@ lemma orderedInsert_filter_of_pos {α : Type} (r : α → α → Prop) [Decidabl
     by_cases hpb : p b <;> by_cases hab : r a b
     · simp only [hab, ↓reduceIte, hpb, decide_true, List.filter_cons_of_pos,
       List.orderedInsert.eq_2]
-      rw [List.filter_cons_of_pos (by simp [h])]
-      rw [List.filter_cons_of_pos (by simp [hpb])]
+      rw [List.filter_cons_of_pos (by simp [h]), List.filter_cons_of_pos (by simp [hpb])]
     · simp only [hab, ↓reduceIte]
-      rw [List.filter_cons_of_pos (by simp [hpb])]
-      rw [List.filter_cons_of_pos (by simp [hpb])]
+      rw [List.filter_cons_of_pos (by simp [hpb]), List.filter_cons_of_pos (by simp [hpb])]
       simp only [List.orderedInsert, hab, ↓reduceIte, List.cons.injEq, true_and]
       simp only [List.pairwise_cons] at hl
       exact orderedInsert_filter_of_pos r a p h l hl.2
@@ -383,8 +381,7 @@ lemma orderedInsert_filter_of_pos {α : Type} (r : α → α → Prop) [Decidabl
       rw [hl]
       simp
     · simp only [hab, ↓reduceIte]
-      rw [List.filter_cons_of_neg (by simp [hpb])]
-      rw [List.filter_cons_of_neg (by simp [hpb])]
+      rw [List.filter_cons_of_neg (by simp [hpb]), List.filter_cons_of_neg (by simp [hpb])]
       simp only [List.pairwise_cons] at hl
       exact orderedInsert_filter_of_pos r a p h l hl.2
 
@@ -393,8 +390,7 @@ lemma orderedInsert_filter_of_neg {α : Type} (r : α → α → Prop) [Decidabl
     List.filter p (List.orderedInsert r a l) = (List.filter p l) := by
   rw [List.orderedInsert_eq_take_drop]
   simp only [decide_not, List.filter_append]
-  rw [List.filter_cons_of_neg]
-  rw [← List.filter_append]
+  rw [List.filter_cons_of_neg, ← List.filter_append]
   congr
   exact List.takeWhile_append_dropWhile
   simp [h]
@@ -412,8 +408,7 @@ lemma insertionSort_filter {α : Type} (r : α → α → Prop) [DecidableRel r]
       simp only [List.insertionSort_cons]
       rw [insertionSort_filter]
     · rw [orderedInsert_filter_of_neg r a p h]
-      rw [List.filter_cons_of_neg (by simpa using h)]
-      rw [insertionSort_filter]
+      rw [List.filter_cons_of_neg (by simpa using h), insertionSort_filter]
 
 lemma takeWhile_sorted_eq_filter {α : Type} (r : α → α → Prop) [DecidableRel r]
     [IsTrans α r] (a : α) : (l : List α) → (hl : l.Pairwise r) →
