@@ -44,7 +44,7 @@ theorem pinching_kraus_commutes (ρ : MState d) (i : spectrum ℝ ρ.m) :
 
 theorem pinching_kraus_mul_self (ρ : MState d) (i : spectrum ℝ ρ.m) :
     (pinching_kraus ρ i).mat * ρ.m = i.val • pinching_kraus ρ i := by
-  dsimp [MState.m]
+  unfold MState.m
   nth_rw 1 [← ρ.M.cfc_id]
   rw [pinching_kraus]
   rw [← ρ.M.mat_cfc_mul, ← HermitianMat.mat_smul]
@@ -123,7 +123,8 @@ theorem pinching_commutes_kraus (σ ρ : MState d) (i : spectrum ℝ σ.m) :
 
 theorem pinching_commutes (ρ σ : MState d) :
     Commute (pinching_map σ ρ).m σ.m := by
-  dsimp [MState.m, Commute, SemiconjBy]
+  rw [commute_iff_eq]
+  change (pinching_map σ ρ).M.mat * σ.M.mat = σ.M.mat * (pinching_map σ ρ).M.mat
   rw [pinchingMap_apply_M]
   simp only [MatrixMap.of_kraus, Function.comp_apply]
   simp only [HermitianMat.conjTranspose_mat, MState.mat_M, LinearMap.coe_sum,
@@ -190,7 +191,7 @@ theorem pinching_bound (ρ σ : MState d) : ρ.M ≤ (↑(Fintype.card (spectrum
   simp only [HermitianMat.mat_finset_sum]
   simp only [Matrix.mul_sum, Matrix.sum_mul, Matrix.sum_mulVec, dotProduct_sum]
   simp only [MState.pure]
-  dsimp [MState.m]
+  unfold MState.m
   --This out to be Cauchy-Schwarz.
   have hschwarz := inner_mul_inner_self_le (𝕜 := ℂ) (E := EuclideanSpace ℂ (↑(spectrum ℝ σ.m)))
     (x := .toLp 2 fun i ↦ 1) (y := .toLp 2 fun k ↦ (
