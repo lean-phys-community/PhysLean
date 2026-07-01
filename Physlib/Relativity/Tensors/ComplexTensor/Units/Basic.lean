@@ -146,8 +146,7 @@ lemma coContrUnit_eq_complexCoBasisFin4_complexContrBasisFin4 : δ' =
 open Lorentz in
 lemma contrCoUnit_eq_complexContrBasis_complexCoBasis : δ =
     ∑ i, fromPairT (complexContrBasis i ⊗ₜ[ℂ] complexCoBasis i) := by
-  rw [contrCoUnit_eq_fromPairT, contrCoUnitVal_expand_tmul]
-  rfl
+  exact (contrCoUnit_eq_fromPairT.trans (congrArg fromPairT contrCoUnitVal_expand_tmul)).trans rfl
 
 open Lorentz in
 lemma contrCoUnit_eq_complexContrBasisFin4_complexCoBasisFin4 : δ =

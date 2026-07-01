@@ -35,8 +35,7 @@ lemma contrContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply (contrBasis d) (contrBasis d) i j]
-    rfl
+    exact congrArg₂ (· • ·) rfl (Basis.tensorProduct_apply (contrBasis d) (contrBasis d) i j)
   · simp
 
 /-- Equivalence of `Co ⊗ Co` to `(1 + d) x (1 + d)` real matrices. -/
@@ -53,8 +52,7 @@ lemma coCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ F
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply (coBasis d) (coBasis d) i j]
-    rfl
+    exact congrArg₂ (· • ·) rfl (Basis.tensorProduct_apply (coBasis d) (coBasis d) i j)
   · simp
 
 /-- Equivalence of `Contr d ⊗ Co d` to `(1 + d) x (1 + d)` real matrices. -/
@@ -72,8 +70,7 @@ lemma contrCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply _ _ i j]
-    rfl
+    exact congrArg₂ (· • ·) rfl (Basis.tensorProduct_apply _ _ i j)
   · simp
 
 /-- Equivalence of `Co d ⊗ Contr d` to `(1 + d) x (1 + d)` real matrices. -/
@@ -91,8 +88,7 @@ lemma coContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply _ _ i j]
-    rfl
+    exact congrArg₂ (· • ·) rfl (Basis.tensorProduct_apply _ _ i j)
   · simp
 
 /-!
