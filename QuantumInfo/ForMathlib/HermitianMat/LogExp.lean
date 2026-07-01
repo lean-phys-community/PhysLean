@@ -62,8 +62,7 @@ theorem reindex_exp (e : d ≃ d₂) : (A.reindex e).exp = A.exp.reindex e :=
   cfc_reindex A Real.exp e
 
 variable (A) in
-instance nonSingular_exp : NonSingular A.exp := by
-  exact cfc_nonSingular A Real.exp (fun i ↦ by positivity)
+instance nonSingular_exp : NonSingular A.exp := cfc_nonSingular A Real.exp (fun i ↦ by positivity)
 
 /-- The matrix exponential of a Hermitian matrix is nonnegative. -/
 theorem exp_nonneg (A : HermitianMat d 𝕜) : 0 ≤ A.exp := by
@@ -446,8 +445,7 @@ lemma inv_convex {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.mat.Pos
       have h_block_pos : ∀ A : Matrix d d 𝕜, A.PosDef → (Matrix.fromBlocks A 1 1 A⁻¹).PosSemidef := by
         intro A hA
         have h_block_pos : (Matrix.fromBlocks A (1 : Matrix d d 𝕜) (1 : Matrix d d 𝕜) (A⁻¹)).PosSemidef := by
-          have h_inv_pos : A⁻¹.PosSemidef := by
-            exact hA.inv.posSemidef
+          have h_inv_pos : A⁻¹.PosSemidef := hA.inv.posSemidef
           have h_block_pos : (Matrix.fromBlocks A (1 : Matrix d d 𝕜) (1 : Matrix d d 𝕜) (A⁻¹)) = (Matrix.fromBlocks 1 0 A⁻¹ 1) * (Matrix.fromBlocks A 0 0 (A⁻¹ - A⁻¹ * A * A⁻¹)) * (Matrix.fromBlocks 1 A⁻¹ 0 1) := by
             simp [ Matrix.fromBlocks_multiply ];
             have := hA.det_pos;
