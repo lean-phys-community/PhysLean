@@ -749,8 +749,7 @@ theorem pure_eq_pure_iff {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d)
 
 /-- Two kets are phase-equivalent if and only if their pure states are equal. -/
 theorem PhaseEquiv_iff_pure_eq {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d) :
-    Ket.PhaseEquiv.r ψ φ ↔ MState.pure ψ = MState.pure φ := by
-  exact (pure_eq_pure_iff ψ φ).symm
+    Ket.PhaseEquiv.r ψ φ ↔ MState.pure ψ = MState.pure φ := (pure_eq_pure_iff ψ φ).symm
 
 /-- `MState.pure` descends to the quotient `KetUpToPhase`. -/
 def pureQ {d : Type*} [Fintype d] [DecidableEq d] : KetUpToPhase d → MState d :=
@@ -867,8 +866,7 @@ theorem pure_iff_rank_eq_one {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
       -- Since ρ is Hermitian and has rank 1, it must be of the form |ψ⟩⟨ψ| for some ket ψ. Use this fact.
       have h_pure : ∃ ψ : d → ℂ, ρ.m = Matrix.of (fun i j => ψ i * star (ψ j)) := by
         have h_rank : ρ.m.rank = 1 := h
-        have h_herm : ρ.m.IsHermitian := by
-          exact ρ.M.property
+        have h_herm : ρ.m.IsHermitian := ρ.M.property
         have := h_herm.spectral_theorem;
         -- Since the rank of ρ.m is 1, the diagonal matrix in the spectral theorem must have exactly one non-zero entry.
         obtain ⟨i, hi⟩ : ∃ i : d, h_herm.eigenvalues i ≠ 0 ∧ ∀ j : d, j ≠ i → h_herm.eigenvalues j = 0 := by

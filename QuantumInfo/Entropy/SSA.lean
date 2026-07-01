@@ -802,12 +802,10 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
       convert HermitianMat.inv_kronecker _ _ using 1;
       · infer_instance;
       · exact ⟨ ⟨ Classical.arbitrary dB, Classical.arbitrary dC ⟩ ⟩;
-      · have h_trace_right_pos_def : (ρAB.traceRight).mat.PosDef := by
-          exact PosDef_traceRight ρAB hρ
+      · have h_trace_right_pos_def : (ρAB.traceRight).mat.PosDef := PosDef_traceRight ρAB hρ
         exact ⟨by exact PosDef_traceRight ρAB hρ |>.isUnit⟩
       · have h_inv_symm : σBC⁻¹.NonSingular := by
-          have h_inv_symm : σBC.NonSingular := by
-            exact nonSingular_of_posDef hσ
+          have h_inv_symm : σBC.NonSingular := nonSingular_of_posDef hσ
           exact nonSingular_iff_inv.mpr h_inv_symm;
         exact h_inv_symm;
     convert congr_arg ( fun x : HermitianMat _ _ => x.reindex ( Equiv.prodAssoc dA dB dC ).symm ) h_inv_symm using 1;
@@ -830,8 +828,7 @@ theorem operator_ineq_SSA [Nonempty dA] [Nonempty dB] [Nonempty dC]
     have h_inv_symm : (σBC.traceLeft⁻¹)⁻¹ = σBC.traceLeft := by
       have h_inv_symm : (σBC.traceLeft⁻¹).mat * σBC.traceLeft.mat = 1 := by
         have h_inv_symm : (σBC.traceLeft⁻¹).mat * σBC.traceLeft.mat = 1 := by
-          have h_inv_symm : σBC.traceLeft.mat.PosDef := by
-            exact PosDef_traceLeft σBC hσ
+          have h_inv_symm : σBC.traceLeft.mat.PosDef := PosDef_traceLeft σBC hσ
           convert! Matrix.nonsing_inv_mul _ _;
           exact isUnit_iff_ne_zero.mpr h_inv_symm.det_pos.ne';
         exact h_inv_symm
