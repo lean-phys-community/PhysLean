@@ -599,8 +599,7 @@ lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n.succ)) (basis!AsCharges j) 
 
 lemma basis!_accCube (j : Fin n) :
     accCube (2 * n.succ) (basis!AsCharges j) = 0 := by
-  rw [accCube_explicit, sum_evenShift]
-  rw [basis!_on_evenShiftLast, basis!_on_evenShiftZero]
+  rw [accCube_explicit, sum_evenShift, basis!_on_evenShiftLast, basis!_on_evenShiftZero]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero, Function.comp_apply,
     zero_add]
   apply Finset.sum_eq_zero

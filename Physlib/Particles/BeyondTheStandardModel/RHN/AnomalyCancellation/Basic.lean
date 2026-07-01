@@ -257,8 +257,7 @@ def quadBiLin : BiLinearSymm (SMνCharges n).Charges := BiLinearSymm.mk₂
 lemma quadBiLin_decomp (S T : (SMνCharges n).Charges) :
     quadBiLin S T = ∑ i, Q S i * Q T i - 2 * ∑ i, U S i * U T i +
         ∑ i, D S i * D T i - ∑ i, L S i * L T i + ∑ i, E S i * E T i := by
-  rw [quadBiLin]
-  rw [BiLinearSymm.mk₂_toFun_apply]
+  rw [quadBiLin, BiLinearSymm.mk₂_toFun_apply]
   repeat rw [Finset.sum_add_distrib]
   repeat rw [← Finset.mul_sum]
   simp only [toSpecies_apply, Fin.isValue, neg_mul, one_mul, add_left_inj]
@@ -324,8 +323,7 @@ lemma cubeTriLin_decomp (S T R : (SMνCharges n).Charges) :
     cubeTriLin S T R = 6 * ∑ i, (Q S i * Q T i * Q R i) + 3 * ∑ i, (U S i * U T i * U R i) +
       3 * ∑ i, (D S i * D T i * D R i) + 2 * ∑ i, (L S i * L T i * L R i) +
       ∑ i, (E S i * E T i * E R i) + ∑ i, (N S i * N T i * N R i) := by
-  rw [cubeTriLin]
-  rw [TriLinearSymm.mk₃_toFun_apply_apply]
+  rw [cubeTriLin, TriLinearSymm.mk₃_toFun_apply_apply]
   repeat rw [Finset.sum_add_distrib]
   repeat rw [← Finset.mul_sum]
 

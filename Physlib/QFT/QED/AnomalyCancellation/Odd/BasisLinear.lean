@@ -935,8 +935,7 @@ lemma Pa'_elim_eq_iff (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
 
 lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
     Pa g f = Pa g' f' ↔ g = g' ∧ f = f' := by
-  rw [← Pa'_elim_eq_iff]
-  rw [← Sum.elim_eq_iff]
+  rw [← Pa'_elim_eq_iff, ← Sum.elim_eq_iff]
   exact Pa'_eq _ _
 
 /-!

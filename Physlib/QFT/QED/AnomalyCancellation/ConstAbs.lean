@@ -128,8 +128,7 @@ set_option backward.isDefEq.respectTransparency false in
 include hS in
 lemma boundary_accGrav'' (k : Fin n) (hk : Boundary S k) :
     accGrav n.succ S = (2 * ↑↑k + 1 - ↑n) * S (0 : Fin n.succ) := by
-  rw [boundary_accGrav' k]
-  rw [Fin.sum_univ_add]
+  rw [boundary_accGrav' k, Fin.sum_univ_add]
   have hfst (i : Fin k.succ.val) :
       S (Fin.cast (boundary_split k) (Fin.castAdd (n.succ - k.succ.val) i)) = S k.castSucc := by
     apply lt_eq hS (le_of_lt hk.left) (Fin.is_le i)
