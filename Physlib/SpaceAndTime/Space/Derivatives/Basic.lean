@@ -138,8 +138,7 @@ lemma deriv_eq_mfderiv_manifoldStructure {M d} [NormedAddCommGroup M] [NormedSpa
       (modelDiffeo.mdifferentiable WithTop.top_ne_zero).mdifferentiableAt]
     simp only [Function.comp_apply, modelDiffeo_apply, mfderiv_eq_fderiv,
       ContinuousLinearMap.coe_comp]
-    rw [basis_eq_mfderiv_modelDiffeo_single]
-    rfl
+    exact congrArg (fun v => (fderiv ℝ f x) v) (basis_eq_mfderiv_modelDiffeo_single (d := d) μ x)
   · rw [deriv_eq, fderiv_zero_of_not_differentiableAt hf,
       mfderiv_zero_of_not_mdifferentiableAt <|
       mdifferentiable_manifoldStructure_iff_differentiable.mp.mt hf]

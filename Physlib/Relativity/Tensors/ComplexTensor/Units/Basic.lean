@@ -219,11 +219,7 @@ lemma rightDualRightUnit_eq_basis : δR =
     ∑ i, Tensor.basis (S := complexLorentzTensor)
       ![Color.upR, Color.downR] (fun | 0 => i | 1 => i) := by
   rw [rightDualRightUnit_eq_rightBasis_dualRightBasis]
-  conv_lhs =>
-    enter [2, x]
-    change fromPairT ((complexLorentzTensor.basis .upR x) ⊗ₜ[ℂ]
-      (complexLorentzTensor.basis .downR _))
-    rw [fromPairT_apply_basis_repr]
+  simp [fromPairT_apply_basis_repr]
   rfl
 
 /-!

@@ -161,8 +161,7 @@ lemma sum_of_charges {n : ℕ} (f : Fin k → (PureU1 n).Charges) (j : Fin n) :
   · rfl
   · rename_i k hl
     rw [Fin.sum_univ_castSucc, Fin.sum_univ_castSucc]
-    erw [← hl (f ∘ Fin.castSucc)]
-    rfl
+    exact congrArg₂ (· + ·) (hl (f ∘ Fin.castSucc)) rfl
 
 /-- The `j`th charge of a sum of solutions to the linear ACC is equal to the sum of
   their `j`th charges. -/
@@ -172,7 +171,6 @@ lemma sum_of_anomaly_free_linear {n : ℕ} (f : Fin k → (PureU1 n).LinSols) (j
   · rfl
   · rename_i k hl
     rw [Fin.sum_univ_castSucc, Fin.sum_univ_castSucc]
-    erw [← hl (f ∘ Fin.castSucc)]
-    rfl
+    exact congrArg₂ (· + ·) (hl (f ∘ Fin.castSucc)) rfl
 
 end PureU1
