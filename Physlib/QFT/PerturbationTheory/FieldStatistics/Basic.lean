@@ -201,8 +201,7 @@ lemma ofList_append_eq_mul (s : 𝓕 → FieldStatistic) (φs φs' : List 𝓕) 
 
 lemma ofList_perm (s : 𝓕 → FieldStatistic) {l l' : List 𝓕} (h : l.Perm l') :
     ofList s l = ofList s l' := by
-  rw [ofList_eq_prod, ofList_eq_prod]
-  exact List.Perm.prod_eq (List.Perm.map s h)
+  simpa [ofList_eq_prod] using List.Perm.prod_eq (List.Perm.map s h)
 
 lemma ofList_orderedInsert (s : 𝓕 → FieldStatistic) (le1 : 𝓕 → 𝓕 → Prop) [DecidableRel le1]
     (φs : List 𝓕) (φ : 𝓕) : ofList s (List.orderedInsert le1 φ φs) = ofList s (φ :: φs) :=

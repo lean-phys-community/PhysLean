@@ -155,8 +155,7 @@ lemma ω_pos : 0 < S.ω := sqrt_pos.mpr (div_pos S.k_pos S.m_pos)
 
 /-- The square of the angular frequency of the classical harmonic oscillator is equal to `k/m`. -/
 lemma ω_sq : S.ω^2 = S.k / S.m := by
-  rw [ω, sq_sqrt]
-  exact div_nonneg (le_of_lt S.k_pos) (le_of_lt S.m_pos)
+  simpa only [ω] using sq_sqrt (div_nonneg (le_of_lt S.k_pos) (le_of_lt S.m_pos))
 
 /-- The angular frequency of the classical harmonic oscillator is not equal to zero. -/
 lemma ω_ne_zero : S.ω ≠ 0 := Ne.symm (ne_of_lt S.ω_pos)

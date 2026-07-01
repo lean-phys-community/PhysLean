@@ -372,8 +372,7 @@ lemma fstFieldOfContract_mem (c : WickContraction n) (a : c.1) :
 
 lemma fstFieldOfContract_getDual?_isSome (c : WickContraction n) (a : c.1) :
     (c.getDual? (c.fstFieldOfContract a)).isSome := by
-  rw [getDual?_isSome_iff]
-  exact ⟨a, fstFieldOfContract_mem ..⟩
+  exact (getDual?_isSome_iff (c := c) _).2 ⟨a, fstFieldOfContract_mem ..⟩
 
 @[simp]
 lemma fstFieldOfContract_getDual? (c : WickContraction n) (a : c.1) :
@@ -387,8 +386,7 @@ lemma sndFieldOfContract_mem (c : WickContraction n) (a : c.1) :
 
 lemma sndFieldOfContract_getDual?_isSome (c : WickContraction n) (a : c.1) :
     (c.getDual? (c.sndFieldOfContract a)).isSome := by
-  rw [getDual?_isSome_iff]
-  exact ⟨a, sndFieldOfContract_mem ..⟩
+  exact (getDual?_isSome_iff (c := c) _).2 ⟨a, sndFieldOfContract_mem ..⟩
 
 @[simp]
 lemma sndFieldOfContract_getDual? (c : WickContraction n) (a : c.1) :
