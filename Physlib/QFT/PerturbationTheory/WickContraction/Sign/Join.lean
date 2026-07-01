@@ -203,8 +203,8 @@ lemma join_singleton_sign_right {φs : List 𝓕.FieldOp}
     (joinSignRightExtra h φsucΛ) *
     (∏ a, 𝓢(𝓕|>ₛ [singleton h]ᵘᶜ[φsucΛ.sndFieldOfContract a], 𝓕|>ₛ ⟨φs.get,
       ((join (singleton h) φsucΛ).signFinset (uncontractedListEmd (φsucΛ.fstFieldOfContract a))
-        (uncontractedListEmd (φsucΛ.sndFieldOfContract a)))⟩)) := by
-  exact sign_right_eq_prod_mul_prod (singleton h) φsucΛ
+        (uncontractedListEmd (φsucΛ.sndFieldOfContract a)))⟩)) :=
+  sign_right_eq_prod_mul_prod (singleton h) φsucΛ
 
 lemma joinSignRightExtra_eq_i_j_finset_eq_if {φs : List 𝓕.FieldOp}
     {i j : Fin φs.length} (h : i < j) (φsucΛ : WickContraction [singleton h]ᵘᶜ.length) :

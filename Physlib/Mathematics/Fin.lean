@@ -85,8 +85,8 @@ def finExtractOne {n : ℕ} (i : Fin (n + 1)) : Fin (n + 1) ≃ Fin 1 ⊕ Fin n 
 
 @[simp]
 lemma finExtractOne_apply_eq {n : ℕ} (i : Fin n.succ) :
-    finExtractOne i i = Sum.inl 0 := by
-  exact (Equiv.apply_eq_iff_eq_symm_apply (finExtractOne i)).2 rfl
+    finExtractOne i i = Sum.inl 0 :=
+  (Equiv.apply_eq_iff_eq_symm_apply (finExtractOne i)).2 rfl
 
 lemma finExtractOne_symm_inr {n : ℕ} (i : Fin n.succ) :
     (finExtractOne i).symm ∘ Sum.inr = i.succAbove := by

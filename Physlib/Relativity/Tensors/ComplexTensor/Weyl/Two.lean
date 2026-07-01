@@ -742,8 +742,8 @@ lemma dualLeftDualRightToMatrix_ρ_symm_selfAdjoint (v : Matrix (Fin 2) (Fin 2) 
 lemma leftRightToMatrix_ρ_symm_selfAdjoint (v : Matrix (Fin 2) (Fin 2) ℂ)
     (hv : IsSelfAdjoint v) (M : SL(2,ℂ)) :
     TensorProduct.map (leftHandedRep M) (rightHandedRep M) (leftRightToMatrix.symm v) =
-    leftRightToMatrix.symm (SL2C.toSelfAdjointMap M ⟨v, hv⟩) := by
-  exact leftRightToMatrix_ρ_symm v M
+    leftRightToMatrix.symm (SL2C.toSelfAdjointMap M ⟨v, hv⟩) :=
+  leftRightToMatrix_ρ_symm v M
 
 end
 end Fermion

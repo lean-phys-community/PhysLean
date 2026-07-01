@@ -204,8 +204,8 @@ lemma sum_cons (f : CrAnSection (φ :: φs) → M) [AddCommMonoid M] :
 
 lemma sum_over_length {s : CrAnSection φs} (f : Fin s.1.length → M)
     [AddCommMonoid M] : ∑ (n : Fin s.1.length), f n =
-    ∑ (n : Fin φs.length), f (Fin.cast (length_eq s).symm n) := by
-  exact Eq.symm (Equiv.sum_comp (finCongr (length_eq s)).symm f)
+    ∑ (n : Fin φs.length), f (Fin.cast (length_eq s).symm n) :=
+  Eq.symm (Equiv.sum_comp (finCongr (length_eq s)).symm f)
 
 /-- The equivalence between `CrAnSection φs` and
   `CrAnSection φs'` induced by an equality `φs = φs'`. -/
