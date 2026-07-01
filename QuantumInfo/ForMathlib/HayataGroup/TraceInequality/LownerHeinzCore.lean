@@ -1586,8 +1586,9 @@ private lemma square_convexity_diff_hL (A B : 𝓐) (u : ℝ) :
     have : u • (B * B) - (u * u) • (B * B) = (u - u * u) • (B * B) := by
       simpa using (sub_smul u (u * u) (B * B)).symm
     simp [this, hα2]
-  have hAB : ((1 - u) * u) • (A * B) = α • (A * B) := by simp [hα3]
-  have hBA : (u * (1 - u)) • (B * A) = α • (B * A) := by rfl
+  have hAB : ((1 - u) * u) • (A * B) = α • (A * B) :=
+    congrArg (fun x => x • (A * B)) hα3
+  have hBA : (u * (1 - u)) • (B * A) = α • (B * A) := rfl
   have hL :
       (1 - u) • (A * A) + u • (B * B) -
           (((1 - u) * (1 - u)) • (A * A) + ((1 - u) * u) • (A * B)

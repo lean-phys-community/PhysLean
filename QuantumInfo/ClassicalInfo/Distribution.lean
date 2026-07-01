@@ -300,7 +300,7 @@ def congrRandVar (σ : α ≃ β) : RandVar α T ≃ RandVar β T := by
 /-- Given a `T`-valued random variable `X` over `α`, mapping over `T` commutes
   with the equivalence over `α` -/
 def map_congr_eq_congr_map {S : Type _} [Mixable U S] (f : T → S) (σ : α ≃ β) (X : RandVar α T) :
-  f <$> congrRandVar σ X = congrRandVar σ (f <$> X) := by rfl
+  f <$> congrRandVar σ X = congrRandVar σ (f <$> X) := rfl
 
 /-- The expectation value is invariant under equivalence of random variables -/
 @[simp]

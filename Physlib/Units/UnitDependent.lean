@@ -112,8 +112,8 @@ def UnitDependent.scaleUnitEquiv {M : Type} [UnitDependent M]
     (u1 u2 : UnitChoices) : M ≃ M where
   toFun m := scaleUnit u1 u2 m
   invFun m := scaleUnit u2 u1 m
-  right_inv m := by simp
-  left_inv m := by simp
+  right_inv m := UnitDependent.scaleUnit_symm_apply u2 u1 m
+  left_inv m := UnitDependent.scaleUnit_symm_apply u1 u2 m
 
 /-- For an `M` with an instance of `LinearUnitDependent M`, `scaleUnit u1 u2` as a
   linear map. -/
