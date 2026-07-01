@@ -116,8 +116,7 @@ theorem trace_function_convex_univ (g : ℝ → ℝ) (hg : ConvexOn ℝ Set.univ
   -- Let $C = aA + bB$.
   set C : HermitianMat d ℂ := a • A + b • B
   -- By the properties of the trace and the convexity of $g$, we have:
-  have h_trace : (C.cfc g).trace = ∑ i, g (C.H.eigenvalues i) := by
-    exact trace_cfc_eq C g
+  have h_trace : (C.cfc g).trace = ∑ i, g (C.H.eigenvalues i) := trace_cfc_eq C g
   have h_sum : ∑ i, g (C.H.eigenvalues i) ≤
       a * ∑ i, g ((A.conj (star C.H.eigenvectorUnitary.val)).mat i i).re +
       b * ∑ i, g ((B.conj (star C.H.eigenvectorUnitary.val)).mat i i |> Complex.re) := by
