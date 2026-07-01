@@ -233,11 +233,11 @@ lemma dense_top (d : ℕ) : Dense (PolyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
         refine mk (f := s n) ⟨?_, ?_⟩
         · exact (continuous_ofReal.comp (b n).continuous).aestronglyMeasurable.mul
             ξ.val.aestronglyMeasurable
-        · refine lt_of_le_of_lt ?_ (coe_hilbertSpace_memHS ξ).2
+        · refine lt_of_le_of_lt ?_ (memHS ξ).2
           exact eLpNorm_mono_enorm (enorm_bump_mul_le_enorm (b n) ξ)
       have hψ_ae (n : ℕ) : ψ n =ᵐ[volume] f n := (schwartzEquiv_symm_coe_ae ⟨ψ n, hψ n⟩).symm
       have hφ_ae (n : ℕ) : φ n =ᵐ[volume] g n := schwartzEquiv_coe_ae (g n)
-      have hσ_ae (n : ℕ) : σ n =ᵐ[volume] s n := coe_mk_ae _
+      have hσ_ae (n : ℕ) : σ n =ᵐ[volume] s n := coeFn_mk _
       have hφσ_ae (n : ℕ) : (φ - σ) n =ᵐ[volume] g n - s n :=
         (AEEqFun.coeFn_sub (φ n).val (σ n).val).trans <| (hφ_ae n).sub (hσ_ae n)
       have hψξ_ae (n : ℕ) : ψ n - ξ =ᵐ[volume] f n - ξ :=

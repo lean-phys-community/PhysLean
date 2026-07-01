@@ -50,6 +50,9 @@ namespace SpaceDHilbertSpace
 
 variable {d : ℕ} {f g : Space d → ℂ} (ψ φ : SpaceDHilbertSpace d)
 
+variable {ψ φ} in
+lemma ext_iff : ψ = φ ↔ ψ =ᵐ[volume] φ := Lp.ext_iff
+
 /-!
 ## B. Dual space
 -/
@@ -103,52 +106,35 @@ lemma MemHS.ae_eq (hfg : f =ᵐ[volume] g) (hf : MemHS f) : MemHS g := MemLp.ae_
 
 section
 
-lemma aeEqFun_mk_mem_iff (f : Space d → ℂ) (hf : AEStronglyMeasurable f volume) :
-    AEEqFun.mk f hf ∈ SpaceDHilbertSpace d ↔ MemHS f := by
-  rw [Lp.mem_Lp_iff_memLp]
-  exact memLp_congr_ae (AEEqFun.coeFn_mk f hf)
+variable (hf : MemHS f) (hg : MemHS g)
 
 /-- Given a function `f : Space d → ℂ` such that `MemHS f` is true via `hf`,
-  `SpaceDHilbertSpace.mk f` is the element of the Hilbert space defined by `f`. -/
-def mk {f : Space d → ℂ} (hf : MemHS f) : SpaceDHilbertSpace d :=
-  ⟨AEEqFun.mk f hf.1, (aeEqFun_mk_mem_iff f hf.1).mpr hf⟩
+  `mk hf` is the element of the Hilbert space defined by `f`. -/
+def mk : SpaceDHilbertSpace d :=
+  ⟨AEEqFun.mk f hf.1, mem_iff.mpr <| hf.ae_eq (AEEqFun.coeFn_mk f hf.1).symm⟩
 
-lemma coe_hilbertSpace_memHS (f : SpaceDHilbertSpace d) : MemHS (f : Space d → ℂ) := by
-  rw [← aeEqFun_mk_mem_iff f (Lp.aestronglyMeasurable f)]
-  have hf : f = AEEqFun.mk f (Lp.aestronglyMeasurable f) := (AEEqFun.mk_coeFn _).symm
-  exact hf ▸ f.2
+@[simp]
+lemma mk_neg : mk hf.neg = -mk hf := rfl
 
-lemma mk_surjective (f : SpaceDHilbertSpace d) :
-    ∃ (g : Space d → ℂ) (hg : MemHS g), mk hg = f := by
-  use f, coe_hilbertSpace_memHS f
-  simp [mk]
+@[simp]
+lemma mk_add : mk (hf.add hg) = mk hf + mk hg := rfl
 
-lemma coe_mk_ae {f : Space d → ℂ} (hf : MemHS f) : (mk hf) =ᵐ[volume] f :=
-  AEEqFun.coeFn_mk f hf.1
+@[simp]
+lemma mk_sub : mk (hf.sub hg) = mk hf - mk hg := rfl
 
-lemma inner_mk_mk {f g : Space d → ℂ} (hf : MemHS f) (hg : MemHS g) :
-    ⟪mk hf, mk hg⟫_ℂ = ∫ x : Space d, starRingEnd ℂ (f x) * g x := by
+@[simp]
+lemma mk_const_smul (c : ℂ) : mk (hf.const_smul c) = c • mk hf := rfl
+
+lemma coeFn_mk : mk hf =ᵐ[volume] f := AEEqFun.coeFn_mk f hf.1
+
+lemma mk_eq_iff : mk hf = mk hg ↔ f =ᵐ[volume] g := by simp [mk]
+
+lemma mk_surjective : ∃ (f : Space d → ℂ) (hf : MemHS f), mk hf = ψ := ⟨ψ, memHS ψ, by simp [mk]⟩
+
+lemma inner_mk_mk : ⟪mk hf, mk hg⟫_ℂ = ∫ x, starRingEnd ℂ (f x) * g x := by
   apply integral_congr_ae
-  filter_upwards [coe_mk_ae hf, coe_mk_ae hg] with x hf hg
-  simp [hf, hg, mul_comm]
-
-@[simp]
-lemma eLpNorm_mk {f : Space d → ℂ} {hf : MemHS f} : eLpNorm (mk hf) 2 = eLpNorm f 2 :=
-  eLpNorm_congr_ae (coe_mk_ae hf)
-
-@[simp]
-lemma mk_add {f g : Space d → ℂ} {hf : MemHS f} {hg : MemHS g} :
-    mk (hf.add hg) = mk hf + mk hg := rfl
-
-@[simp]
-lemma mk_const_smul {f : Space d → ℂ} {c : ℂ} {hf : MemHS f} :
-    mk (hf.const_smul c) = c • mk hf := rfl
-
-lemma mk_eq_iff {f g : Space d → ℂ} {hf : MemHS f} {hg : MemHS g} :
-    mk hf = mk hg ↔ f =ᵐ[volume] g := by simp [mk]
-
-lemma ext_iff {f g : SpaceDHilbertSpace d} :
-    f = g ↔ (f : Space d → ℂ) =ᵐ[volume] (g : Space d → ℂ) := Lp.ext_iff
+  filter_upwards [coeFn_mk hf, coeFn_mk hg]
+  simp_all [mul_comm]
 
 end
 
