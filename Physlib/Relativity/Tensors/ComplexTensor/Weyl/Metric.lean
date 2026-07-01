@@ -33,8 +33,7 @@ def metricRaw : Matrix (Fin 2) (Fin 2) ℂ := !![0, 1; -1, 0]
 /-- Multiplying an element of `SL(2, ℂ)` on the left with the metric `𝓔` is equivalent
   to multiplying the inverse-transpose of that element on the right with the metric. -/
 lemma comm_metricRaw (M : SL(2,ℂ)) : M.1 * metricRaw = metricRaw * (M.1⁻¹)ᵀ := by
-  rw [metricRaw]
-  rw [Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
+  rw [metricRaw, Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
   rw [SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two,
       Matrix.mul_fin_two, eta_fin_two !![M.1 1 1, -M.1 0 1; -M.1 1 0, M.1 0 0]ᵀ]
   simp only [Fin.isValue, mul_zero, mul_neg, mul_one, zero_add, add_zero, transpose_apply, of_apply,
@@ -43,8 +42,7 @@ lemma comm_metricRaw (M : SL(2,ℂ)) : M.1 * metricRaw = metricRaw * (M.1⁻¹)�
     empty_vecMul, neg_smul, neg_cons, neg_neg, neg_empty, empty_mul, Equiv.symm_apply_apply]
 
 lemma metricRaw_comm (M : SL(2,ℂ)) : metricRaw * M.1 = (M.1⁻¹)ᵀ * metricRaw := by
-  rw [metricRaw]
-  rw [Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
+  rw [metricRaw, Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
   rw [SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two,
       Matrix.mul_fin_two, eta_fin_two !![M.1 1 1, -M.1 0 1; -M.1 1 0, M.1 0 0]ᵀ]
   simp only [Fin.isValue, zero_mul, one_mul, zero_add, neg_mul, add_zero, transpose_apply, of_apply,
@@ -54,16 +52,14 @@ lemma metricRaw_comm (M : SL(2,ℂ)) : metricRaw * M.1 = (M.1⁻¹)ᵀ * metricR
     empty_vecMul, add_cons, empty_add_empty, empty_mul, Equiv.symm_apply_apply]
 
 lemma star_comm_metricRaw (M : SL(2,ℂ)) : M.1.map star * metricRaw = metricRaw * ((M.1)⁻¹)ᴴ := by
-  rw [metricRaw]
-  rw [Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
+  rw [metricRaw, Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
   rw [SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two,
       eta_fin_two !![M.1 1 1, -M.1 0 1; -M.1 1 0, M.1 0 0]ᴴ]
   rw [eta_fin_two (!![M.1 0 0, M.1 0 1; M.1 1 0, M.1 1 1].map star)]
   simp
 
 lemma metricRaw_comm_star (M : SL(2,ℂ)) : metricRaw * M.1.map star = ((M.1)⁻¹)ᴴ * metricRaw := by
-  rw [metricRaw]
-  rw [Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
+  rw [metricRaw, Lorentz.SL2C.inverse_coe, eta_fin_two M.1]
   rw [SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two,
       eta_fin_two !![M.1 1 1, -M.1 0 1; -M.1 1 0, M.1 0 0]ᴴ]
   rw [eta_fin_two (!![M.1 0 0, M.1 0 1; M.1 1 0, M.1 1 1].map star)]
@@ -280,8 +276,8 @@ lemma leftDualContraction_apply_metric :
       (TensorProduct.assoc ℂ _ _ _).symm.toLinearMap.lTensor _<|
       TensorProduct.assoc ℂ _ _ (_ ⊗[ℂ] _) <|
       (leftMetric 1) ⊗ₜ[ℂ] (dualLeftMetric 1)) = dualLeftLeftUnit (1 : ℂ) := by
-  rw [leftMetric_apply_one, dualLeftMetric_apply_one]
-  rw [leftMetricVal_expand_tmul', dualLeftMetricVal_expand_tmul]
+  rw [leftMetric_apply_one, dualLeftMetric_apply_one, leftMetricVal_expand_tmul',
+    dualLeftMetricVal_expand_tmul]
   simp only [Fin.isValue, tmul_sub, sub_tmul, map_sub, assoc_tmul, LinearMap.lTensor_tmul,
     LinearEquiv.coe_coe, assoc_symm_tmul, LinearMap.rTensor_tmul,
     Representation.IntertwiningMap.coe_toLinearMap, LinearEquiv.lTensor_tmul, lid_tmul, tmul_smul,
