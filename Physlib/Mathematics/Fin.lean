@@ -58,8 +58,7 @@ lemma predAboveI_eq_iff {i x : Fin n.succ.succ} (h : i ≠ x) (y : Fin n.succ) :
   · simp [← h]
 
 lemma predAboveI_lt {i x : Fin n.succ.succ} (h : x.val < i.val) :
-    predAboveI i x = ⟨x.val, by omega⟩ := by
-  simp [predAboveI, h]
+    predAboveI i x = ⟨x.val, by omega⟩ := by simp [predAboveI, h]
 
 lemma predAboveI_ge {i x : Fin n.succ.succ} (h : i.val < x.val) :
     predAboveI i x = ⟨x.val - 1, by omega⟩ := by
@@ -198,8 +197,7 @@ def finExtractTwo {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
 
 @[simp]
 lemma finExtractTwo_apply_fst {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
-    finExtractTwo i j i = Sum.inl (Sum.inl 0) := by
-  simp [finExtractTwo]
+    finExtractTwo i j i = Sum.inl (Sum.inl 0) := by simp [finExtractTwo]
 
 lemma finExtractTwo_symm_inr {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
     (finExtractTwo i j).symm ∘ Sum.inr = i.succAbove ∘ j.succAbove := by
@@ -208,13 +206,11 @@ lemma finExtractTwo_symm_inr {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
 
 @[simp]
 lemma finExtractTwo_symm_inr_apply {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) (x : Fin n) :
-    (finExtractTwo i j).symm (Sum.inr x) = i.succAbove (j.succAbove x) := by
-  simp [finExtractTwo]
+    (finExtractTwo i j).symm (Sum.inr x) = i.succAbove (j.succAbove x) := by simp [finExtractTwo]
 
 @[simp]
 lemma finExtractTwo_symm_inl_inr_apply {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
-    (finExtractTwo i j).symm (Sum.inl (Sum.inr 0)) = i.succAbove j := by
-  simp [finExtractTwo]
+    (finExtractTwo i j).symm (Sum.inl (Sum.inr 0)) = i.succAbove j := by simp [finExtractTwo]
 
 @[simp]
 lemma finExtractTwo_symm_inl_inl_apply {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
@@ -222,8 +218,7 @@ lemma finExtractTwo_symm_inl_inl_apply {n : ℕ} (i : Fin n.succ.succ) (j : Fin 
 
 @[simp]
 lemma finExtractTwo_apply_snd {n : ℕ} (i : Fin n.succ.succ) (j : Fin n.succ) :
-    finExtractTwo i j (i.succAbove j) = Sum.inl (Sum.inr 0) := by
-  simp [← Equiv.eq_symm_apply]
+    finExtractTwo i j (i.succAbove j) = Sum.inl (Sum.inr 0) := by simp [← Equiv.eq_symm_apply]
 
 /-- Takes two maps `Fin n → Fin n` and returns the equivalence they form. -/
 def finMapToEquiv (f1 : Fin n → Fin m) (f2 : Fin m → Fin n)
