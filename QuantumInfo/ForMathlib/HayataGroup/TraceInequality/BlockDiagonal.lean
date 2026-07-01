@@ -165,8 +165,7 @@ noncomputable def blockDiagonalHom : (L ℋ × L ℋ) →⋆ₐ[ℝ] L (HSum ℋ
 
 omit [Nontrivial ℋ] in
 @[simp] theorem blockDiagonalHom_apply (p : L ℋ × L ℋ) :
-    blockDiagonalHom (ℋ := ℋ) p = blockDiagonal (ℋ := ℋ) p.1 p.2 :=
-  rfl
+    blockDiagonalHom (ℋ := ℋ) p = blockDiagonal (ℋ := ℋ) p.1 p.2 := rfl
 
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in
 @[simp] theorem hsumProj_blockDiagonal_zero (A B : L ℋ) (z : HSum ℋ) :

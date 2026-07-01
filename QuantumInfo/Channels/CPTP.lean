@@ -83,8 +83,7 @@ theorem choi_of_CPTP_of_choi (M : Matrix (dOut × dIn) (dOut × dIn) ℂ) {h₁}
     (CPTP_of_choi_PSD_Tr (M := M) h₁ h₂).choi = M :=
   MatrixMap.map_choi_inv M
 
-theorem mat_coe_eq_apply_mat [DecidableEq dOut] (ρ : MState dIn) : (Λ ρ).m = Λ.map ρ.m :=
-  rfl
+theorem mat_coe_eq_apply_mat [DecidableEq dOut] (ρ : MState dIn) : (Λ ρ).m = Λ.map ρ.m := rfl
 
 @[ext]
 theorem funext [DecidableEq dOut] {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : ∀ ρ, Λ₁ ρ = Λ₂ ρ) : Λ₁ = Λ₂ :=
@@ -211,8 +210,7 @@ def assoc' : CPTPMap (d₁ × d₂ × d₃) ((d₁ × d₂) × d₃) :=
   ofEquiv (Equiv.prodAssoc d₁ d₂ d₃).symm
 
 @[simp]
-theorem SWAP_eq_MState_SWAP (ρ : MState (d₁ × d₂)) : SWAP (d₁ := d₁) (d₂ := d₂) ρ = ρ.SWAP :=
-  rfl
+theorem SWAP_eq_MState_SWAP (ρ : MState (d₁ × d₂)) : SWAP (d₁ := d₁) (d₂ := d₂) ρ = ρ.SWAP := rfl
 
 @[simp]
 theorem assoc_eq_MState_assoc (ρ : MState ((d₁ × d₂) × d₃)) : assoc (d₁ := d₁) (d₂ := d₂) (d₃ := d₃) ρ = ρ.assoc :=
@@ -423,8 +421,7 @@ def ofUnitary (U : 𝐔[dIn]) : CPTPMap dIn dIn where
 
 /-- The unitary channel U conjugated by U. -/
 theorem ofUnitary_eq_conj (U : 𝐔[dIn]) (ρ : MState dIn) :
-    (ofUnitary U) ρ = ρ.U_conj U :=
-  rfl
+    (ofUnitary U) ρ = ρ.U_conj U := rfl
 
 /-- A channel is unitary iff it is `ofUnitary U`. -/
 def IsUnitary (Λ : CPTPMap dIn dIn) : Prop :=

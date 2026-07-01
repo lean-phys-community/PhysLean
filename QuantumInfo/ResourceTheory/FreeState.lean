@@ -216,8 +216,7 @@ noncomputable def statePow (ρ : MState (H i)) (n : ℕ) : MState (H (i ^ n)) :=
 scoped notation ρ " ⊗ᵣ^[" n "]" => statePow ρ n
 
 @[simp]
-theorem statePow_zero (ρ : MState (H i)) : ρ ⊗ᵣ^[0] = default :=
-  rfl
+theorem statePow_zero (ρ : MState (H i)) : ρ ⊗ᵣ^[0] = default := rfl
 
 @[simp]
 theorem statePow_one (ρ : MState (H i)) : ρ ⊗ᵣ^[1] ≍ ρ := by
