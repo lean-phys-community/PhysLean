@@ -142,6 +142,52 @@ lemma evalT_basis {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
     zero_smul]
   rfl
 
+/-- Evaluation commutes with permutation of tensor indices. Evaluating the `i`-th index after
+permuting by `σ` is the same as evaluating the original `σ i`-th index, with the basis index
+transported across the preserved colour, and then permuting the remaining indices by
+`IsReindexing.succAbove`. -/
+lemma evalT_permT {n n1 : ℕ} {c : Fin (n + 1) → C} {c1 : Fin (n1 + 1) → C}
+    {σ : Fin (n1 + 1) → Fin (n + 1)} (hσ : IsReindexing c c1 σ)
+    (i : Fin (n1 + 1)) (x : basisIdx (c1 i)) (t : Tensor S c) :
+    evalT i x (permT σ hσ t) =
+    permT _ (hσ.succAbove i) (evalT (σ i) (basisIdxCongr ((hσ.2 i).symm) x) t) := by
+  let σi : Fin n1 → Fin n :=
+    if hi : σ i = 0 then
+      fun j => (σ (i.succAbove j)).pred (by simp [← hi, hσ.injective.eq_iff])
+    else (Fin.pred (σ i) hi).predAbove ∘ σ ∘ i.succAbove
+  change evalT i x (permT σ hσ t) =
+    permT σi (hσ.succAbove i) (evalT (σ i) (basisIdxCongr ((hσ.2 i).symm) x) t)
+  have hσi (j : Fin n1) : (σ i).succAbove (σi j) = σ (i.succAbove j) := by
+    dsimp [σi]
+    by_cases hi : σ i = 0
+    · simp only [hi, dif_pos, Fin.succAbove_zero]
+      exact Fin.succ_pred _ (by simp [← hi, hσ.injective.eq_iff])
+    · simp only [hi, dif_neg, Function.comp_apply]
+      have hpr : σ i = ((σ i).pred hi).succ := (Fin.succ_pred _ _).symm
+      have hne : σ (i.succAbove j) ≠ σ i := fun heq =>
+        Fin.succAbove_ne i j (hσ.injective heq)
+      conv_lhs => enter [1]; rw [hpr]
+      exact Fin.succ_succAbove_predAbove (hpr ▸ hne)
+  induction' t using Tensor.induction_on_basis with b r t ht t1 t2 h1 h2
+  · rw [permT_basis, evalT_basis, evalT_basis]
+    by_cases h : b (σ i) = basisIdxCongr ((hσ.2 i).symm) x
+    · have hx : basisIdxCongr (by simp [hσ.2]) (b (σ i)) = x := by
+        simpa [basisIdxCongr] using congrArg (basisIdxCongr (hσ.2 i)) h
+      rw [if_pos hx, if_pos h, permT_basis]
+      congr
+      funext j
+      apply basisIdxCongr_heq_arg
+      rw [hσi j]
+    · have hx : ¬ basisIdxCongr (by simp [hσ.2]) (b (σ i)) = x := by
+        intro hx
+        apply h
+        simpa [basisIdxCongr] using congrArg (basisIdxCongr ((hσ.2 i).symm)) hx
+      rw [if_neg hx, if_neg h]
+      simp
+  · simp
+  · simp [ht]
+  · simp [h1, h2]
+
 
 TODO "Add lemmas related to the interaction of evalT and permT, prodT and contrT."
 
