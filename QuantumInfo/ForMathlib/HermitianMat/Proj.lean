@@ -441,8 +441,7 @@ theorem negPart_Continuous : Continuous (·⁻ : HermitianMat n ℂ → _) := by
 
 -- variable {d : Type*} [Fintype d] [DecidableEq d] (A B : HermitianMat d ℂ)
 
-theorem one_sub_projLT : 1 - {B ≤ₚ A} = {A <ₚ B} := by
-  rw [sub_eq_iff_eq_add, proj_le_add_lt]
+theorem one_sub_projLT : 1 - {B ≤ₚ A} = {A <ₚ B} := by rw [sub_eq_iff_eq_add, proj_le_add_lt]
 
 open MatrixOrder ComplexOrder in
 theorem projLT_mul_nonneg : 0 ≤ {A <ₚ B}.mat * (B - A).mat := by

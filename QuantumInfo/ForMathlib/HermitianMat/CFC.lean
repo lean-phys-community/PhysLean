@@ -376,8 +376,7 @@ theorem Matrix.PosDef.spectrum_subset_Ioi {d 𝕜 : Type*} [Fintype d] [Decidabl
     {A : Matrix d d 𝕜} (hA : A.PosDef) : spectrum ℝ A ⊆ Set.Ioi 0 := by
   intro x hx;
   -- Since $A$ is positive definite, all its eigenvalues are positive.
-  have h_eigenvalues_pos : ∀ i : d, 0 < hA.1.eigenvalues i := by
-    exact hA.eigenvalues_pos;
+  have h_eigenvalues_pos : ∀ i : d, 0 < hA.1.eigenvalues i := hA.eigenvalues_pos
   have h_spectrum_eq_range : spectrum ℝ A = Set.range (hA.1.eigenvalues) := by
     exact Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues hA.left;
   aesop
@@ -448,8 +447,7 @@ lemma norm_cfc_sub_cfc_le_sqrt_card {A : HermitianMat d ℂ} {f g : ℝ → ℝ}
   · intro x hx
     apply le_csSup;
     · -- The supremum of a finite set of real numbers is finite.
-      have h_finite : Set.Finite (spectrum ℝ A.mat) := by
-        exact Set.toFinite _;
+      have h_finite : Set.Finite (spectrum ℝ A.mat) := Set.toFinite _
       obtain ⟨ M, hM ⟩ := h_finite.exists_finset_coe;
       refine' ⟨ ∑ x ∈ M, ‖f x - g x‖, Set.forall_mem_range.2 fun x => _ ⟩;
       rw [ ← hM ];
@@ -1223,8 +1221,7 @@ theorem inv_ge_one_of_le_one (hA : A.mat.PosDef) (h : A ≤ 1) : 1 ≤ A⁻¹ :=
     have h_cfc_nonneg : ∀ i, 0 ≤ (A.H.eigenvalues i)⁻¹ - 1 := by
       have h_pos : ∀ i, 0 < A.H.eigenvalues i ∧ A.H.eigenvalues i ≤ 1 := by
         -- Since $A$ is positive definite, all its eigenvalues are positive.
-        have h_pos : ∀ i, 0 < A.H.eigenvalues i := by
-          exact fun i => Matrix.PosDef.eigenvalues_pos hA i;
+        have h_pos : ∀ i, 0 < A.H.eigenvalues i := fun i => Matrix.PosDef.eigenvalues_pos hA i
         -- Since $A \leq 1$, for any eigenvalue $\lambda_i$ of $A$, we have $\lambda_i \leq 1$.
         have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
           have h_le_one : ∀ i, A.H.eigenvalues i ≤ 1 := by
@@ -1382,8 +1379,7 @@ lemma ker_le_ker_cfc_on_set (hs : spectrum ℝ A.mat ⊆ s) (h : ∀ i ∈ s, i 
   intro x hx
   have h_inner_zero : ∀ i, A.H.eigenvalues i ≠ 0 → inner ℂ (A.H.eigenvectorBasis i) x = 0 := by
     intro i hi
-    have h_inner_zero : A.mat.mulVec x = 0 := by
-      exact (mem_ker_iff_mulVec_zero A x).mp hx;
+    have h_inner_zero : A.mat.mulVec x = 0 := (mem_ker_iff_mulVec_zero A x).mp hx
     have := mulVec_eq_zero_iff_inner_eigenvector_zero A x; aesop;
   have h_mulVec_zero : (A.cfc f).mat.mulVec x = ∑ i, (f (A.H.eigenvalues i) : ℂ) • inner ℂ (A.H.eigenvectorBasis i) x • A.H.eigenvectorBasis i := by
     convert cfc_mulVec_expansion A f x using 1;
