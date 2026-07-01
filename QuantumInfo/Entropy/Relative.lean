@@ -311,8 +311,7 @@ lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
     A.mat * B.supportProj.mat = A.mat := by
   -- Since $B.supportProj$ is the projection onto $range B$, we have $B.supportProj * B.mat = B.mat$.
-  have h_supportProj_mul_B : B.supportProj.mat * B.mat = B.mat := by
-    exact supportProj_mul_self B
+  have h_supportProj_mul_B : B.supportProj.mat * B.mat = B.mat := supportProj_mul_self B
   have h_range_A_subset_range_B : LinearMap.range A.lin.toLinearMap ≤ LinearMap.range B.lin.toLinearMap := by
     have h_orthogonal_complement : LinearMap.range (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) = (LinearMap.ker (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
       have h_orthogonal_complement : ∀ (T : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d), T = T.adjoint → LinearMap.range T = (LinearMap.ker T)ᗮ := by
@@ -505,10 +504,8 @@ private lemma trace_conj_eq_inner_rpow {ρ σ : MState d} {t : ℝ} (ht : t ≠ 
     rw [ h_cyclic, two_mul ]
     ring_nf
     have h_exp : (σ.M ^ (t + t)).mat = (σ.M ^ t).mat * (σ.M ^ t).mat := by
-      have h_nonneg : 0 ≤ σ.M := by
-        exact σ.nonneg
-      have h_ne_zero : t + t ≠ 0 := by
-        exact fun h => ht ( by linarith )
+      have h_nonneg : 0 ≤ σ.M := σ.nonneg
+      have h_ne_zero : t + t ≠ 0 := fun h => ht ( by linarith )
       exact HermitianMat.mat_rpow_add h_nonneg h_ne_zero
     rw [ mul_two, h_exp ]
   have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ = ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re := rfl
@@ -1933,8 +1930,7 @@ private lemma eigenWeight_eq_zero_iff (ρ x : MState d) (i : d) :
             intro v w
             have h_inner : star v ⬝ᵥ (ρ.M.mat.mulVec w) = star (star w ⬝ᵥ (ρ.M.mat.mulVec v)) := by
               have h_inner : star v ⬝ᵥ (ρ.M.mat.mulVec w) = star (star w ⬝ᵥ (ρ.M.mat.mulVec v)) := by
-                have h_inner : ρ.M.mat = star ρ.M.mat := by
-                  exact ρ.M.2.symm ▸ rfl
+                have h_inner : ρ.M.mat = star ρ.M.mat := ρ.M.2.symm ▸ rfl
                 conv_rhs => rw [ h_inner ]
                 simp [ Matrix.mulVec, dotProduct ]
                 ring_nf
@@ -1952,8 +1948,7 @@ private lemma eigenWeight_eq_zero_iff (ρ x : MState d) (i : d) :
   refine ⟨h_forward, fun h ↦ ?_⟩
   -- Since ρ e_i = 0, we have e_i^* ρ e_i = 0.
   have h_zero : (Matrix.vecMul (star (x.M.H.eigenvectorBasis i : d → ℂ)) ρ.M.mat) ⬝ᵥ (x.M.H.eigenvectorBasis i : d → ℂ) = 0 := by
-    have h_zero : ρ.M.mat.mulVec (x.M.H.eigenvectorBasis i : d → ℂ) = 0 := by
-      exact congr(WithLp.ofLp $h)
+    have h_zero : ρ.M.mat.mulVec (x.M.H.eigenvectorBasis i : d → ℂ) = 0 := congr(WithLp.ofLp $h)
     convert congr_arg ( fun v => star ( x.M.H.eigenvectorBasis i : d → ℂ ) ⬝ᵥ v ) h_zero using 1
     simp [ Matrix.dotProduct_mulVec]
     ring_nf
