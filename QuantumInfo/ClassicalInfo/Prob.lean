@@ -122,8 +122,7 @@ theorem toReal_mul (x y : Prob) : (x * y : Prob) = (x : ℝ) * (y : ℝ) := rfl
   fun p ↦ ⟨p.val, zero_le_coe⟩
 
 @[simp]
-theorem toNNReal_mk : toNNReal { val := x, property := hx} = { val := x, property := hx.1 } :=
-  rfl
+theorem toNNReal_mk : toNNReal { val := x, property := hx} = { val := x, property := hx.1 } := rfl
 
 instance : Coe Prob ℝ≥0 := ⟨toNNReal⟩
 
@@ -136,12 +135,10 @@ protected theorem eq_iff_nnreal (n m : Prob) : (n : ℝ≥0) = (m : ℝ≥0) ↔
   simp only [toNNReal_mk, Subtype.mk.injEq, NNReal]
 
 @[simp, norm_cast]
-theorem toNNReal_zero : (0 : Prob) = (0 : ℝ≥0) :=
-  rfl
+theorem toNNReal_zero : (0 : Prob) = (0 : ℝ≥0) := rfl
 
 @[simp, norm_cast]
-theorem toNNReal_one : (1 : Prob) = (1 : ℝ≥0) :=
-  rfl
+theorem toNNReal_one : (1 : Prob) = (1 : ℝ≥0) := rfl
 
 theorem ofNNReal_toNNReal : ENNReal.ofNNReal (toNNReal p) = ENNReal.ofReal (p : ℝ) := by
   simp [toNNReal, ENNReal.ofReal_eq_coe_nnreal]
@@ -285,8 +282,7 @@ theorem mkT_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} (h : ∃ t', to_U 
   rfl
 
 @[simp]
-theorem to_U_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} : instUniv.to_U t = t :=
-  rfl
+theorem to_U_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} : instUniv.to_U t = t := rfl
 
 section pi
 
@@ -315,8 +311,7 @@ instance instPi : Mixable ((i:D) → U i) ((i:D) → T i) where
 
 @[simp]
 theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t, to_U t = u) :
-    (instPi.mkT h).val = fun d ↦ (inst.mkT (instPi.lem_1 h d)).val :=
-  rfl
+    (instPi.mkT h).val = fun d ↦ (inst.mkT (instPi.lem_1 h d)).val := rfl
 
 @[simp]
 theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} :
