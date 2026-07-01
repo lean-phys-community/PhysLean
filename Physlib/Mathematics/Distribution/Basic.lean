@@ -145,11 +145,10 @@ def ofLinear (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
       (f := fun kn : ℕ × ℕ ↦ (⟨SchwartzMap.seminorm 𝕜 kn.1 kn.2 η, apply_nonneg _ _⟩ : ℝ≥0))
 
 @[simp] lemma ofLinear_apply (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
-    (hu : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(E, 𝕜), ∃ (k : ℕ) (n : ℕ) (x : E), (k, n) ∈ s ∧
-      ‖u η‖ ≤ C * (‖x‖ ^ k * ‖iteratedFDeriv ℝ n η x‖))
-    (η : 𝓢(E, 𝕜)) :
-    ofLinear 𝕜 s u hu η = u η :=
-  rfl
+  (hu : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(E, 𝕜), ∃ (k : ℕ) (n : ℕ) (x : E), (k, n) ∈ s ∧
+    ‖u η‖ ≤ C * (‖x‖ ^ k * ‖iteratedFDeriv ℝ n η x‖))
+  (η : 𝓢(E, 𝕜)) :
+    ofLinear 𝕜 s u hu η = u η := rfl
 
 end NormedSpace
 
@@ -272,8 +271,7 @@ def fourierTransform : (E →d[ℂ] F) →ₗ[ℂ] (E →d[ℂ] F) where
   map_smul' c u := by simp
 
 @[simp] lemma fourierTransform_apply (u : E →d[ℂ] F) (η : 𝓢(E, ℂ)) :
-    u.fourierTransform E F η = u (fourierTransformCLM ℂ η) :=
-  rfl
+    u.fourierTransform E F η = u (fourierTransformCLM ℂ η) := rfl
 
 end Complex
 
@@ -402,8 +400,7 @@ def diracDelta (a : E) : E →d[𝕜] 𝕜 :=
     (BoundedContinuousFunction.evalCLM 𝕜 a).comp (toBoundedContinuousFunctionCLM 𝕜 E 𝕜)
 
 @[simp] lemma diracDelta_apply (a : E) (η : 𝓢(E, 𝕜)) :
-    diracDelta 𝕜 a η = η a :=
-  rfl
+    diracDelta 𝕜 a η = η a := rfl
 
 /-- Dirac delta in a given direction `v : F`. `diracDelta' 𝕜 a v` takes in a test function
 `η : 𝓢(E, 𝕜)` and outputs `η a • v`. Intuitively this is an infinitely intense vector field
@@ -412,8 +409,7 @@ def diracDelta' (a : E) (v : F) : E →d[𝕜] F :=
   ContinuousLinearMap.smulRight (diracDelta 𝕜 a) v
 
 @[simp] lemma diracDelta'_apply (a : E) (v : F) (η : 𝓢(E, 𝕜)) :
-    diracDelta' 𝕜 a v η = η a • v :=
-  rfl
+    diracDelta' 𝕜 a v η = η a • v := rfl
 
 end DiracDelta
 /-!
