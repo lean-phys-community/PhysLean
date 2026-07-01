@@ -337,10 +337,7 @@ lemma toFieldStrength_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 �
     ∑ κ, ((η μν.1 κ * ∂_ κ A x μν.2) - η μν.2 κ * ∂_ κ A x μν.1) := by
   match μν with
   | (μ, ν) =>
-  trans (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x))
-    (fun | 0 => μ | 1 => ν); swap
-  · rw [toTensor_toFieldStrength_basis_repr]
-  rfl
+  simpa using toTensor_toFieldStrength_basis_repr A x μ ν
 
 lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : ElectromagneticPotential d) (x : SpaceTime d) :

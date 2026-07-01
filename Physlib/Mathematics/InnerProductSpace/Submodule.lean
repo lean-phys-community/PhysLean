@@ -71,8 +71,7 @@ lemma submoduleToLp_closure :
 
 lemma mem_submodule_closure_iff_mem_submoduleToLp_closure :
     f ∈ M.topologicalClosure ↔ (WithLp.toLp 2 f) ∈ (submoduleToLp M).topologicalClosure := by
-  rw [← submoduleToLp_closure]
-  rfl
+  simpa [submoduleToLp_closure] using mem_submodule_iff_mem_submoduleToLp M.topologicalClosure f
 
 lemma mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal :
     g ∈ M.adjoint ↔ WithLp.toLp 2 (g.2, -g.1) ∈ (submoduleToLp M)ᗮ := by

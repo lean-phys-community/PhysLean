@@ -417,8 +417,7 @@ lemma toField_conjScalar (t : (chiralTensor (ι := ι)).Tensor ![]) :
   change componentMap (S := (chiralTensor (ι := ι)).toTensorSpecies)
       ((chiralTensor (ι := ι)).bar ∘ ![]) ((chiralTensor (ι := ι)).conjT t) (fun j => Fin.elim0 j) =
     star ((basis (S := (chiralTensor (ι := ι)).toTensorSpecies) ![]).repr t (fun j => Fin.elim0 j))
-  rw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι))]
-  rfl
+  exact ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι)) t (fun j => Fin.elim0 j)
 
 /-- Component formula for the holomorphic covector conjugate: the `![I]` basis component of
 `conjChiralCovector t` is the complex conjugate of the `![I]` component of `t`. -/
