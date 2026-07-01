@@ -268,18 +268,16 @@ lemma timeOrderF_superCommuteF_ofCrAnOpF_superCommuteF_all_not_crAnTimeOrderRel
     simp
   simp_all only [imp_false, Decidable.not_not]
   by_cases h12 : ¬ crAnTimeOrderRel φ1 φ2
-  · have h13 : ¬ crAnTimeOrderRel φ1 φ3 := by
-      intro h13
-      exact h12 (IsTrans.trans φ1 φ3 φ2 h13 h32)
+  · have h13 : ¬ crAnTimeOrderRel φ1 φ3 :=
+      fun h13 => h12 (IsTrans.trans φ1 φ3 φ2 h13 h32)
     rw [timeOrderF_superCommuteF_ofCrAnOpF_superCommuteF_not_crAnTimeOrderRel h12 h13]
   simp_all only [Decidable.not_not, forall_const]
   have h13 : crAnTimeOrderRel φ1 φ3 := IsTrans.trans φ1 φ2 φ3 h12 h23
   simp_all only [forall_const]
   by_cases h21 : ¬ crAnTimeOrderRel φ2 φ1
   · simp_all only [IsEmpty.forall_iff]
-    have h31 : ¬ crAnTimeOrderRel φ3 φ1 := by
-      intro h31
-      exact h21 (IsTrans.trans φ2 φ3 φ1 h23 h31)
+    have h31 : ¬ crAnTimeOrderRel φ3 φ1 :=
+      fun h31 => h21 (IsTrans.trans φ2 φ3 φ1 h23 h31)
     rw [timeOrderF_superCommuteF_ofCrAnOpF_superCommuteF_not_crAnTimeOrderRel' h21 h31]
   simp_all only [Decidable.not_not, forall_const]
   exact False.elim (h (IsTrans.trans φ3 φ2 φ1 h32 h21))

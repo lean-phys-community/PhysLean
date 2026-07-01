@@ -31,9 +31,7 @@ def SMNoGrav (n : ℕ) : ACCSystem where
     | 0 => @accSU2 n
     | 1 => accSU3
   numberQuadratic := 0
-  quadraticACCs := by
-    intro i
-    exact Fin.elim0 i
+  quadraticACCs := fun i => Fin.elim0 i
   cubicACC := accCube
 
 namespace SMNoGrav
