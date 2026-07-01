@@ -71,14 +71,12 @@ lemma complexContrBasisFin4_apply_one :
 @[simp]
 lemma complexContrBasisFin4_apply_two :
     complexContrBasisFin4 2 = complexContrBasis (Sum.inr 1) := by
-  simp only [complexContrBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexContrBasisFin4, finSumFinEquiv, Fin.addCases]
 
 @[simp]
 lemma complexContrBasisFin4_apply_three :
     complexContrBasisFin4 3 = complexContrBasis (Sum.inr 2) := by
-  simp only [complexContrBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexContrBasisFin4, finSumFinEquiv, Fin.addCases]
 
 @[simp]
 lemma complexContrBasisFin4_apply_succ (i : Fin 3) :
@@ -123,20 +121,17 @@ lemma complexCoBasis_reindex_apply_eq_fin4 (j : Fin 4) :
 @[simp]
 lemma complexCoBasisFin4_apply_zero :
     complexCoBasisFin4 0 = complexCoBasis (Sum.inl 0) := by
-  simp only [complexCoBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexCoBasisFin4, finSumFinEquiv, Fin.addCases]
 
 @[simp]
 lemma complexCoBasisFin4_apply_one :
     complexCoBasisFin4 1 = complexCoBasis (Sum.inr 0) := by
-  simp only [complexCoBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexCoBasisFin4, finSumFinEquiv, Fin.addCases]
 
 @[simp]
 lemma complexCoBasisFin4_apply_two :
     complexCoBasisFin4 2 = complexCoBasis (Sum.inr 1) := by
-  simp only [complexCoBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexCoBasisFin4, finSumFinEquiv, Fin.addCases]
 
 @[simp]
 lemma complexCoBasisFin4_apply_three :
