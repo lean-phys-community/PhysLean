@@ -69,8 +69,7 @@ def contrCoUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     apply congrArg
     simp
 
-lemma contrCoUnit_apply_one : contrCoUnit (1 : ℂ) = contrCoUnitVal := by
-  simp [contrCoUnit]
+lemma contrCoUnit_apply_one : contrCoUnit (1 : ℂ) = contrCoUnitVal := by simp [contrCoUnit]
 
 /-- The co-contra unit for complex lorentz vectors. Usually denoted `δᵢⁱ`. -/
 def coContrUnitVal : CoℂModule ⊗[ℂ] ContrℂModule :=
@@ -119,8 +118,7 @@ def coContrUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     refine transpose_eq_one.mp ?h.h.h.a
     simp
 
-lemma coContrUnit_apply_one : coContrUnit (1 : ℂ) = coContrUnitVal := by
-  simp [coContrUnit]
+lemma coContrUnit_apply_one : coContrUnit (1 : ℂ) = coContrUnitVal := by simp [coContrUnit]
 
 /-!
 
