@@ -109,8 +109,8 @@ variable {R : Type*} [CommSemiring R]
 def choi_equiv : MatrixMap A B R ≃ₗ[R] Matrix (B × A) (B × A) R where
   toFun := choi_matrix
   invFun := of_choi_matrix
-  left_inv _ := by simp
-  right_inv _ := by simp
+  left_inv := choi_map_inv
+  right_inv := map_choi_inv
   map_add' _ _ := by ext; simp [choi_matrix]
   map_smul' _ _ := by ext; simp [choi_matrix]
 
@@ -188,12 +188,11 @@ variable {A B : Type*} (R : Type*) [Semiring R]
 @[simps]
 def submatrix (f : B → A) : MatrixMap A B R where
   toFun x := x.submatrix f f
-  map_add' := by simp [Matrix.submatrix_add]
-  map_smul' := by simp [Matrix.submatrix_smul]
+  map_add' x y := congrFun (congrFun (Matrix.submatrix_add x y) f) f
+  map_smul' r x := congrFun (congrFun (Matrix.submatrix_smul r x) f) f
 
 @[simp]
-theorem submatrix_id : submatrix R _root_.id = id A R := by
-  ext1; simp
+theorem submatrix_id : submatrix R _root_.id = id A R := rfl
 
 @[simp]
 theorem submatrix_comp (f : C → B) (g : B → A) :
