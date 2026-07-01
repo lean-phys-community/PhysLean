@@ -601,8 +601,7 @@ lemma mul
     · apply hG.diff; assumption
   linearize := by
     intro φ hφ x
-    rw [deriv_fun_mul, deriv_fun_mul]
-    rw [hF.linearize _ hφ, hG.linearize _ hφ]
+    rw [deriv_fun_mul, deriv_fun_mul, hF.linearize _ hφ, hG.linearize _ hφ]
     · simp
     · exact hF.differentiable_linear hφ x 0
     · exact hG.differentiable_linear hφ x 0
@@ -679,8 +678,7 @@ protected lemma fderiv (u : X → U) (dx : X) (hu : ContDiff ℝ ∞ u)
     simp only [FunLike.coe_smul, Pi.smul_apply]
     exact (hφ.differentiable (by simp)).differentiableAt
   · intro φ hφ x
-    rw [← fderiv_apply_one_eq_deriv]
-    rw [fderiv_swap]
+    rw [← fderiv_apply_one_eq_deriv, fderiv_swap]
     simp only [fderiv_eq_smul_deriv, one_smul]
     · exact hφ.of_le ENat.LEInfty.out
   · exact hu
@@ -707,14 +705,12 @@ protected lemma gradient {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
     simp only [Space.deriv]
     fun_prop
   · intro φ1 φ2 h1 h2
-    rw [Space.gradient_eq_grad]
-    rw [Space.grad_add, Space.grad_eq_gradient, Space.grad_eq_gradient]
+    rw [Space.gradient_eq_grad, Space.grad_add, Space.grad_eq_gradient, Space.grad_eq_gradient]
     rfl
     · exact h1.differentiable (by simp)
     · exact h2.differentiable (by simp)
   · intro c φ hφ
-    rw [Space.gradient_eq_grad]
-    rw [Space.grad_smul, Space.grad_eq_gradient]
+    rw [Space.gradient_eq_grad, Space.grad_smul, Space.grad_eq_gradient]
     rfl
     exact hφ.differentiable (by simp)
   · intro φ hφ x
@@ -726,8 +722,7 @@ protected lemma gradient {d} (u : Space d → ℝ) (hu : ContDiff ℝ ∞ u) :
     rw [deriv_smul_const]
     congr
     simp [Space.deriv]
-    rw [← fderiv_apply_one_eq_deriv]
-    rw [fderiv_swap]
+    rw [← fderiv_apply_one_eq_deriv, fderiv_swap]
     simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
     · exact hφ.of_le ENat.LEInfty.out
     · simp [Space.deriv]
