@@ -69,8 +69,7 @@ lemma transverseHarmonicPlaneWave_eq_planeWave {c : ℝ} {k : WaveVector} {f₀x
   have normk: ‖k‖ = ω/c := by
     rw [hk]
     simp [← abs_div, hc_ge_zero, hω_ge_zero, le_of_lt]
-  rw [normk]
-  rw [mul_sub, inner_smul_right, real_inner_comm, ← mul_assoc]
+  rw [normk, mul_sub, inner_smul_right, real_inner_comm, ← mul_assoc]
   ring_nf
   simp [ne_of_gt, hc_ge_zero, hω_ge_zero, mul_comm ω, mul_assoc, basis_repr_inner_eq]
 

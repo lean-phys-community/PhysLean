@@ -179,8 +179,7 @@ lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
   rw [fderiv_comp]
   simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv,
     PiLp.smul_apply, smul_eq_mul, one_smul, Pi.smul_apply]
-  rw [fderiv_sub_const]
-  rw [fderiv_inner_apply]
+  rw [fderiv_sub_const, fderiv_inner_apply]
   simp only [fderiv_fun_const, Pi.zero_apply, _root_.zero_apply, inner_zero_right,
     fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add, mul_eq_mul_left_iff]
   left

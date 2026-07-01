@@ -299,8 +299,7 @@ lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff �
     ∂ₜ (energy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t⟫_ℝ := by
   unfold energy
   funext t
-  rw [Time.deriv_eq]
-  rw [fderiv_fun_add (by fun_prop) (by apply S.potentialEnergy_differentiable xₜ hx)]
+  rw [Time.deriv_eq, fderiv_fun_add (by fun_prop) (by apply S.potentialEnergy_differentiable xₜ hx)]
   simp only [_root_.add_apply]
   rw [← Time.deriv_eq, ← Time.deriv_eq, potentialEnergy_deriv, kineticEnergy_deriv]
   simp only

@@ -1036,8 +1036,7 @@ lemma trajectory_velocity_eq_zero_iff_norm_eq_amplitude (IC : InitialConditions)
       ext i
       fin_cases i
       simp [hA]
-  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t]
-  rw [trajectory_eq_cos]
+  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t, trajectory_eq_cos]
   set A := (AmplitudePhase.fromInitialConditions S IC).A
   set θ := S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ
   show sin θ = 0 ↔ ‖EuclideanSpace.single 0 (A * cos θ)‖ = A

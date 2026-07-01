@@ -216,8 +216,7 @@ private lemma exp_decay_smul_equationOfMotion
     (hγ : S.γ = 2 * S.m * a) (hk : S.k = S.m * (a^2 - μ)) :
     S.EquationOfMotion (fun t : Time => exp (-a * t.val) • y t) := by
   intro t
-  rw [exp_decay_smul_acceleration a μ y hy hdy hy'', exp_decay_smul_velocity a y hy]
-  rw [hγ, hk]
+  rw [exp_decay_smul_acceleration a μ y hy hdy hy'', exp_decay_smul_velocity a y hy, hγ, hk]
   simp [smul_add, smul_sub, smul_smul]
   module
 
