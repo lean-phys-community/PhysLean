@@ -143,28 +143,24 @@ lemma σ1_σ1_trace : Matrix.trace (σ1 * σ1) = 2 := by simp
 
 /-- The trace of `σ1` multiplied by `σ2` is equal to `0`. -/
 @[simp]
-lemma σ1_σ2_trace : Matrix.trace (σ1 * σ2) = 0 := by
-  simp [pauliMatrix]
+lemma σ1_σ2_trace : Matrix.trace (σ1 * σ2) = 0 := by simp [pauliMatrix]
 
 /-- The trace of `σ1` multiplied by `σ3` is equal to `0`. -/
 @[simp]
-lemma σ1_σ3_trace : Matrix.trace (σ1 * σ3) = 0 := by
-  simp [pauliMatrix]
+lemma σ1_σ3_trace : Matrix.trace (σ1 * σ3) = 0 := by simp [pauliMatrix]
 
 /-- The trace of `σ2` multiplied by `σ0` is equal to `0`. -/
 lemma σ2_σ0_trace : Matrix.trace (σ2 * σ0) = 0 := by simp [pauliMatrix]
 
 /-- The trace of `σ2` multiplied by `σ1` is equal to `0`. -/
-lemma σ2_σ1_trace : Matrix.trace (σ2 * σ1) = 0 := by
-  simp [pauliMatrix]
+lemma σ2_σ1_trace : Matrix.trace (σ2 * σ1) = 0 := by simp [pauliMatrix]
 
 /-- The trace of `σ2` multiplied by `σ2` is equal to `2`. -/
 lemma σ2_σ2_trace : Matrix.trace (σ2 * σ2) = 2 := by simp
 
 /-- The trace of `σ2` multiplied by `σ3` is equal to `0`. -/
 @[simp]
-lemma σ2_σ3_trace : Matrix.trace (σ2 * σ3) = 0 := by
-  simp [pauliMatrix]
+lemma σ2_σ3_trace : Matrix.trace (σ2 * σ3) = 0 := by simp [pauliMatrix]
 
 /-- The trace of `σ3` multiplied by `σ0` is equal to `0`. -/
 lemma σ3_σ0_trace : Matrix.trace (σ3 * σ0) = 0 := by simp [pauliMatrix]

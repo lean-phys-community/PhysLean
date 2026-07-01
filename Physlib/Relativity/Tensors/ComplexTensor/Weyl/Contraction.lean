@@ -140,8 +140,7 @@ def leftDualContraction : (leftHandedRep.tprod dualLeftHandedRep).IntertwiningMa
 
 lemma leftDualContraction_hom_tmul (ψ : LeftHandedWeyl)
     (φ : DualLeftHandedWeyl) :
-    leftDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ := by
-  rfl
+    leftDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ := by rfl
 
 lemma leftDualContraction_basis (i j : Fin 2) :
     leftDualContraction (leftBasis i ⊗ₜ dualLeftBasis j) = if i.1 = j.1 then (1 : ℂ) else 0 := by
@@ -166,8 +165,7 @@ def dualLeftContraction : (dualLeftHandedRep.tprod leftHandedRep).IntertwiningMa
     simp
 
 lemma dualLeftContraction_hom_tmul (φ : DualLeftHandedWeyl) (ψ : LeftHandedWeyl) :
-    dualLeftContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ := by
-  rfl
+    dualLeftContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ := by rfl
 
 lemma dualLeftContraction_basis (i j : Fin 2) :
     dualLeftContraction (dualLeftBasis i ⊗ₜ leftBasis j) = if i.1 = j.1 then (1 : ℂ) else 0 := by
@@ -206,8 +204,7 @@ def rightDualContraction : (rightHandedRep.tprod dualRightHandedRep).Intertwinin
 
 lemma rightDualContraction_hom_tmul (ψ : RightHandedWeyl)
     (φ : DualRightHandedWeyl) :
-    rightDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ := by
-  rfl
+    rightDualContraction (ψ ⊗ₜ φ) = ψ.toFin2ℂ ⬝ᵥ φ.toFin2ℂ := by rfl
 
 lemma rightDualContraction_basis (i j : Fin 2) :
     rightDualContraction (rightBasis i ⊗ₜ dualRightBasis j) =
@@ -247,8 +244,7 @@ def dualRightContraction : (dualRightHandedRep.tprod rightHandedRep).Intertwinin
 
 lemma dualRightContraction_hom_tmul (φ : DualRightHandedWeyl)
     (ψ : RightHandedWeyl) :
-    dualRightContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ := by
-  rfl
+    dualRightContraction (φ ⊗ₜ ψ) = φ.toFin2ℂ ⬝ᵥ ψ.toFin2ℂ := by rfl
 
 lemma dualRightContraction_basis (i j : Fin 2) :
     dualRightContraction (dualRightBasis i ⊗ₜ rightBasis j) =
