@@ -122,8 +122,8 @@ def LinearUnitDependent.scaleUnitLinear
     (u1 u2 : UnitChoices) :
     M →ₗ[ℝ] M where
   toFun m := scaleUnit u1 u2 m
-  map_add' m1 m2 := by simp [LinearUnitDependent.scaleUnit_add]
-  map_smul' r m2 := by simp [LinearUnitDependent.scaleUnit_smul]
+  map_add' m1 m2 := LinearUnitDependent.scaleUnit_add u1 u2 m1 m2
+  map_smul' r m2 := LinearUnitDependent.scaleUnit_smul u1 u2 r m2
 
 /-- For an `M` with an instance of `LinearUnitDependent M`, `scaleUnit u1 u2` as a
   linear equivalence. -/
@@ -307,15 +307,19 @@ noncomputable instance {M1 M2 : Type} [AddCommMonoid M1] [Module ℝ M1]
     LinearUnitDependent (M1 →ₗ[ℝ] M2) where
   scaleUnit u1 u2 f := {
       toFun m1 := scaleUnit u1 u2 (f m1)
-      map_add' m1 m2 := by simp [scaleUnit_add]
-      map_smul' := by simp [scaleUnit_smul]}
+      map_add' m1 m2 :=
+        Eq.trans (congrArg (scaleUnit u1 u2) (map_add f m1 m2))
+          (scaleUnit_add u1 u2 (f m1) (f m2))
+      map_smul' r m2 :=
+        Eq.trans (congrArg (scaleUnit u1 u2) (map_smul f r m2))
+          (scaleUnit_smul u1 u2 r (f m2))}
   scaleUnit_trans u1 u2 u3 f := LinearMap.ext fun m1 =>
     scaleUnit_trans u1 u2 u3 (f m1)
   scaleUnit_trans' u1 u2 u3 f := LinearMap.ext fun m1 =>
     scaleUnit_trans' u1 u2 u3 (f m1)
   scaleUnit_id u f := LinearMap.ext fun m1 => scaleUnit_id u (f m1)
-  scaleUnit_add u1 u2 f1 f2 := LinearMap.ext fun m => by
-    simp [scaleUnit_add]
+  scaleUnit_add u1 u2 f1 f2 := LinearMap.ext fun m =>
+    scaleUnit_add u1 u2 (f1 m) (f2 m)
   scaleUnit_smul u1 u2 r f := LinearMap.ext fun m => by
     simp [scaleUnit_smul]
 
