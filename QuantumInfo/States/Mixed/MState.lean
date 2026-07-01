@@ -727,8 +727,7 @@ theorem pure_eq_pure_iff {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d)
       intro i j;
       replace h := congr_arg ( fun ρ => ρ.M.mat i j ) h ; aesop;
     -- Let $k$ be such that $\varphi_k \neq 0$.
-    obtain ⟨k, hk⟩ : ∃ k, φ.vec k ≠ 0 := by
-      exact φ.exists_ne_zero;
+    obtain ⟨k, hk⟩ : ∃ k, φ.vec k ≠ 0 := φ.exists_ne_zero
     -- Let $z = \frac{\psi_k}{\varphi_k}$. Then $|z| = 1$.
     obtain ⟨z, hz⟩ : ∃ z : ℂ, ψ.vec k = z * φ.vec k ∧ ‖z‖ = 1 := by
       specialize h_eq k k
@@ -886,8 +885,8 @@ theorem pure_iff_rank_eq_one {d : Type*} [Fintype d] [DecidableEq d] (ρ : MStat
             rw [ Matrix.rank_diagonal ] at h_diag;
             simp [ Finset.sum_ite ];
             rw [ Fintype.card_subtype ] at h_diag ; exact h_diag;
-          obtain ⟨i, hi⟩ : ∃ i : d, h_herm.eigenvalues i ≠ 0 := by
-            exact not_forall.mp fun h => by simp [ h ] at h_diag;
+          obtain ⟨i, hi⟩ : ∃ i : d, h_herm.eigenvalues i ≠ 0 :=
+            not_forall.mp fun h => by simp [h] at h_diag
           rw [ Finset.sum_eq_add_sum_sdiff_singleton i _ (by simp) ] at h_diag;
           exact ⟨i, hi, fun j hj => Classical.not_not.1 fun hj' =>
             absurd h_diag ( by rw [ if_neg hi ] ; exact ne_of_gt ( lt_add_of_pos_right _ ( lt_of_lt_of_le ( by simp [ hj' ] ) ( Finset.single_le_sum ( fun x _ => by positivity ) ( Finset.mem_sdiff.2 ⟨ Finset.mem_univ j, by simp [ hj ] ⟩ ) ) ) ) ) ⟩;

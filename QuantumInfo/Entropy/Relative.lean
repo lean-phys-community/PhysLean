@@ -343,8 +343,8 @@ lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   -- Since $B.supportProj$ is the projection onto $range B$, and $range A \subseteq range B$, we have $B.supportProj * A = A$.
   have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), B.supportProj.mat.mulVec (A.mat.mulVec v) = A.mat.mulVec v := by
     intro v
-    obtain ⟨w, hw⟩ : WithLp.toLp 2 (A.mat.mulVec v) ∈ LinearMap.range B.lin.toLinearMap := by
-      exact h_range_A_subset_range_B ( Set.mem_range_self v );
+    obtain ⟨w, hw⟩ : WithLp.toLp 2 (A.mat.mulVec v) ∈ LinearMap.range B.lin.toLinearMap :=
+      h_range_A_subset_range_B (Set.mem_range_self v)
     replace h_supportProj_mul_B := congr(Matrix.mulVec $h_supportProj_mul_B w)
     replace hw := congr(WithLp.ofLp $hw)
     simp only [ContinuousLinearMap.coe_coe] at hw
@@ -1982,8 +1982,8 @@ private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
   constructor
   · exact fun h i ↦ eigenWeight_zero_of_eigenvalue_zero h
   · intro h v hv
-    obtain ⟨w, hw⟩ : ∃ w : d → ℂ, v = ∑ i, w i • x.M.H.eigenvectorBasis i := by
-      exact ⟨ _, Eq.symm ( x.M.H.eigenvectorBasis.sum_repr v ) ⟩;
+    obtain ⟨w, hw⟩ : ∃ w : d → ℂ, v = ∑ i, w i • x.M.H.eigenvectorBasis i :=
+      ⟨_, Eq.symm (x.M.H.eigenvectorBasis.sum_repr v)⟩
     -- Since $v \in \ker(x.M)$, we have $x.M(v) = 0$. Using the eigenvector basis, this implies that for each $i$, if the eigenvalue is non-zero, then $w i = 0$.
     have h_w_zero : ∀ i, x.M.H.eigenvalues i ≠ 0 → w i = 0 := by
       intro i hi

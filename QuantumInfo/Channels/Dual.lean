@@ -300,8 +300,8 @@ lemma Module.Basis.toDualEquiv_symm_comp_dualMap_toDualEquiv {ι R M : Type*} [F
     b.toDualEquiv.symm.toLinearMap ∘ₗ b.toDualEquiv.toLinearMap.dualMap = (Module.evalEquiv R M).symm.toLinearMap := by
   simp [ LinearMap.ext_iff ];
   intro x
-  obtain ⟨y, hy⟩ : ∃ y, x = (Module.evalEquiv R M).toLinearMap y := by
-    exact ⟨ _, Eq.symm <| LinearEquiv.apply_symm_apply ( Module.evalEquiv R M ) x ⟩;
+  obtain ⟨y, hy⟩ : ∃ y, x = (Module.evalEquiv R M).toLinearMap y :=
+    ⟨_, Eq.symm <| LinearEquiv.apply_symm_apply (Module.evalEquiv R M) x⟩
   rw [ hy ];
   simp [ Module.evalEquiv, LinearEquiv.symm_apply_eq ];
   ext; simp [ Module.Dual.eval ] ;
