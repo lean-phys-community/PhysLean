@@ -156,8 +156,7 @@ variable [NonnegSpectrumClass ℝ 𝓐]
 
 omit [Nontrivial (𝓐)] [NonnegSpectrumClass ℝ 𝓐] in
 lemma conjugate_isPositive {X T : 𝓐} (hX : 0 ≤ X) (hT : IsSelfAdjoint T) :
-    0 ≤ T * X * T := by
-  simpa using hT.conjugate_nonneg hX
+    0 ≤ T * X * T := by simpa using hT.conjugate_nonneg hX
 
 omit [Nontrivial 𝓐] [NonnegSpectrumClass ℝ 𝓐] in
 theorem one_div_operatorAntitoneOn_Ioi :
@@ -720,8 +719,7 @@ theorem ratio_add_t_operatorMonotoneOn_Ici : ∀ (t : ℝ), 0 < t →
         = (1 : 𝓐) - t • cfcR invfun B := by
           simpa using hrepr B hB0 hspB
     _ ≤ (1 : 𝓐) - t • cfcR invfun A := hmono_core
-    _ = cfcR (fun x : ℝ ↦ x / (x + t)) A := by
-      simpa using (hrepr A hA0 hspA).symm
+    _ = cfcR (fun x : ℝ ↦ x / (x + t)) A := by simpa using (hrepr A hA0 hspA).symm
 
 theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
   OperatorConcaveOn (𝓐 := 𝓐) (Set.Ici (0 : ℝ)) (fun x : ℝ ↦ x / (x + t)) := by
@@ -1515,8 +1513,7 @@ private lemma cfcR_mul_self (T : 𝓐) (hT : IsSelfAdjoint T) :
       simpa using
         (cfc_mul (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint)
           (f := fun x : ℝ ↦ x) (g := fun x : ℝ ↦ x) (a := T))
-    _ = T * T := by
-      simp [cfc_id' (R := ℝ) (a := T) (ha := hT)]
+    _ = T * T := by simp [cfc_id' (R := ℝ) (a := T) (ha := hT)]
 
 omit [Nontrivial (𝓐)] in
 omit [PartialOrder 𝓐] [StarOrderedRing 𝓐] [NonnegSpectrumClass ℝ 𝓐] in
@@ -1532,8 +1529,7 @@ omit [Nontrivial (𝓐)] in
 omit [PartialOrder 𝓐] [StarOrderedRing 𝓐] [NonnegSpectrumClass ℝ 𝓐] in
 private lemma smul_sub_mul_sub (α : ℝ) (A B : 𝓐) :
     α • (A * A - A * B - B * A + B * B) =
-      α • (A * A) - α • (A * B) - α • (B * A) + α • (B * B) := by
-  rw [smul_add, smul_sub, smul_sub]
+      α • (A * A) - α • (A * B) - α • (B * A) + α • (B * B) := by rw [smul_add, smul_sub, smul_sub]
 
 omit [Nontrivial (𝓐)] in
 omit [PartialOrder 𝓐] [StarOrderedRing 𝓐] [NonnegSpectrumClass ℝ 𝓐] in
@@ -1556,8 +1552,7 @@ private lemma square_convexity_diff_rhs (A B : 𝓐) (u : ℝ) :
     _ = α • (A * A) - α • (A * B) - α • (B * A) + α • (B * B) :=
       smul_sub_mul_sub  (α := α) A B
     _ = (u * (1 - u)) • (A * A) - (u * (1 - u)) • (A * B) - (u * (1 - u)) • (B * A)
-          + (u * (1 - u)) • (B * B) := by
-      simp [hα]
+          + (u * (1 - u)) • (B * B) := by simp [hα]
 
 omit [Nontrivial (𝓐)] in
 omit [PartialOrder 𝓐] [StarOrderedRing 𝓐] [NonnegSpectrumClass ℝ 𝓐] in
