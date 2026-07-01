@@ -150,8 +150,7 @@ lemma timeOrderF_ofFieldOpF_ofFieldOpF_not_ordered {φ ψ : 𝓕.FieldOp} (h : �
 lemma timeOrderF_ofFieldOpF_ofFieldOpF_not_ordered_eq_timeOrderF {φ ψ : 𝓕.FieldOp}
     (h : ¬ timeOrderRel φ ψ) :
     𝓣ᶠ(ofFieldOpF φ * ofFieldOpF ψ) = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ψ) • 𝓣ᶠ(ofFieldOpF ψ * ofFieldOpF φ) := by
-  rw [timeOrderF_ofFieldOpF_ofFieldOpF_not_ordered h]
-  rw [timeOrderF_ofFieldOpF_ofFieldOpF_ordered]
+  rw [timeOrderF_ofFieldOpF_ofFieldOpF_not_ordered h, timeOrderF_ofFieldOpF_ofFieldOpF_ordered]
   simp only [Algebra.smul_mul_assoc]
   have hx := Std.Total.total (r := timeOrderRel) ψ φ
   simp_all
@@ -310,8 +309,8 @@ lemma timeOrderF_eq_maxTimeField_mul (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldO
     𝓣ᶠ(ofFieldOpListF (φ :: φs)) =
     𝓢(𝓕 |>ₛ maxTimeField φ φs, 𝓕 |>ₛ (φ :: φs).take (maxTimeFieldPos φ φs)) •
     ofFieldOpF (maxTimeField φ φs) * 𝓣ᶠ(ofFieldOpListF (eraseMaxTimeField φ φs)) := by
-  rw [timeOrderF_ofFieldOpListF, timeOrderList_eq_maxTimeField_timeOrderList]
-  rw [ofFieldOpListF_cons, timeOrderF_ofFieldOpListF]
+  rw [timeOrderF_ofFieldOpListF, timeOrderList_eq_maxTimeField_timeOrderList,
+    ofFieldOpListF_cons, timeOrderF_ofFieldOpListF]
   simp only [Algebra.mul_smul_comm, Algebra.smul_mul_assoc, smul_smul]
   congr
   rw [timerOrderSign_of_eraseMaxTimeField, mul_assoc]

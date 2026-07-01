@@ -54,10 +54,8 @@ lemma timeContract_of_timeOrderRel (φ ψ : 𝓕.FieldOp) (h : timeOrderRel φ �
 
 lemma timeContract_of_not_timeOrderRel (φ ψ : 𝓕.FieldOp) (h : ¬ timeOrderRel φ ψ) :
     timeContract φ ψ = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ψ) • timeContract ψ φ := by
-  rw [timeContract_eq_smul]
-  rw [normalOrder_ofFieldOp_ofFieldOp_swap]
-  rw [timeOrder_ofFieldOp_ofFieldOp_not_ordered_eq_timeOrder h]
-  rw [timeContract_eq_smul]
+  rw [timeContract_eq_smul, normalOrder_ofFieldOp_ofFieldOp_swap,
+    timeOrder_ofFieldOp_ofFieldOp_not_ordered_eq_timeOrder h, timeContract_eq_smul]
   simp only [smul_add]
   rw [smul_smul, smul_smul, mul_comm]
 
@@ -67,8 +65,7 @@ lemma timeContract_of_not_timeOrderRel (φ ψ : 𝓕.FieldOp) (h : ¬ timeOrderR
   `timeContract φ ψ = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ψ) • [anPart ψ, ofFieldOp φ]ₛ`. -/
 lemma timeContract_of_not_timeOrderRel_expand (φ ψ : 𝓕.FieldOp) (h : ¬ timeOrderRel φ ψ) :
     timeContract φ ψ = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ψ) • [anPart ψ, ofFieldOp φ]ₛ := by
-  rw [timeContract_of_not_timeOrderRel _ _ h]
-  rw [timeContract_of_timeOrderRel _ _ _]
+  rw [timeContract_of_not_timeOrderRel _ _ h, timeContract_of_timeOrderRel _ _ _]
   have h1 := Std.Total.total (r := 𝓕.timeOrderRel) φ ψ
   simp_all
 

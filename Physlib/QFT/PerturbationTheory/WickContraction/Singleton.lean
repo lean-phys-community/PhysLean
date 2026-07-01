@@ -81,8 +81,7 @@ lemma singleton_sign_expand {φs : List 𝓕.FieldOp} {i j : Fin φs.length} (hi
 
 lemma singleton_getDual?_eq_none_iff_neq {i j : Fin n} (hij : i < j) (a : Fin n) :
     (singleton hij).getDual? a = none ↔ (i ≠ a ∧ j ≠ a) := by
-  rw [getDual?_eq_none_iff_mem_uncontracted]
-  rw [mem_uncontracted_iff_not_contracted]
+  rw [getDual?_eq_none_iff_mem_uncontracted, mem_uncontracted_iff_not_contracted]
   simp only [singleton, Finset.mem_singleton, forall_eq, Finset.mem_insert, not_or, ne_eq]
   omega
 
