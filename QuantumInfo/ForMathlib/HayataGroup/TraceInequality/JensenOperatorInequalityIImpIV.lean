@@ -76,8 +76,7 @@ private noncomputable def blockSwap (X : L ℋ) : L (HSum ℋ) :=
   blockOp (ℋ := ℋ) 0 (star X) X 0
 
 private lemma blockSwap_star (X : L ℋ) :
-    star (blockSwap (ℋ := ℋ) X) = blockSwap (ℋ := ℋ) X := by
-  simp [blockSwap, blockOp_star]
+    star (blockSwap (ℋ := ℋ) X) = blockSwap (ℋ := ℋ) X := by simp [blockSwap, blockOp_star]
 
 private lemma blockSwap_sq (X : L ℋ) :
     blockSwap (ℋ := ℋ) X * blockSwap (ℋ := ℋ) X =
@@ -338,8 +337,7 @@ private lemma complex_I_smul_real_I_smul_invTwo (r : ℝ) (T : L ℋ) :
             norm_num
     _ = (-1 : ℂ) • (((r * 2⁻¹ : ℝ)) • T x) := by
             rw [smul_smul]
-    _ = -((2⁻¹ : ℝ) * r) • T x := by
-            simp [neg_smul, mul_comm]
+    _ = -((2⁻¹ : ℝ) * r) • T x := by simp [neg_smul, mul_comm]
 
 omit [CompleteSpace ℋ] in
 private lemma real_smul_complex_I_real_smul_complex_I_comm (s r : ℝ) (T : L ℋ) :

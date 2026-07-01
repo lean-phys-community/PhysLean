@@ -170,13 +170,11 @@ omit [Nontrivial ℋ] in
 
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in
 @[simp] theorem hsumProj_blockDiagonal_zero (A B : L ℋ) (z : HSum ℋ) :
-    hsumProj ℋ 0 (blockDiagonal A B z) = A (hsumProj ℋ 0 z) := by
-  simp [blockDiagonal]
+    hsumProj ℋ 0 (blockDiagonal A B z) = A (hsumProj ℋ 0 z) := by simp [blockDiagonal]
 
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in
 @[simp] theorem hsumProj_blockDiagonal_one (A B : L ℋ) (z : HSum ℋ) :
-    hsumProj ℋ 1 (blockDiagonal A B z) = B (hsumProj ℋ 1 z) := by
-  simp [blockDiagonal]
+    hsumProj ℋ 1 (blockDiagonal A B z) = B (hsumProj ℋ 1 z) := by simp [blockDiagonal]
 
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in
 @[simp] theorem blockDiagonal_one :
@@ -228,14 +226,12 @@ theorem blockDiagonal_nonneg {A B : L ℋ} (hA : 0 ≤ A) (hB : 0 ≤ B) :
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in
 @[simp] theorem hsumProj_blockOp_zero (A00 A01 A10 A11 : L ℋ) (z : HSum ℋ) :
     hsumProj ℋ 0 (blockOp (ℋ := ℋ) A00 A01 A10 A11 z) =
-      A00 (hsumProj ℋ 0 z) + A01 (hsumProj ℋ 1 z) := by
-  simp [blockOp]
+      A00 (hsumProj ℋ 0 z) + A01 (hsumProj ℋ 1 z) := by simp [blockOp]
 
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in
 @[simp] theorem hsumProj_blockOp_one (A00 A01 A10 A11 : L ℋ) (z : HSum ℋ) :
     hsumProj ℋ 1 (blockOp (ℋ := ℋ) A00 A01 A10 A11 z) =
-      A10 (hsumProj ℋ 0 z) + A11 (hsumProj ℋ 1 z) := by
-  simp [blockOp]
+      A10 (hsumProj ℋ 0 z) + A11 (hsumProj ℋ 1 z) := by simp [blockOp]
 
 omit [Nontrivial ℋ] in
 @[simp] theorem blockOp_star (A00 A01 A10 A11 : L ℋ) :
