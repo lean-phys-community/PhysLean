@@ -35,10 +35,10 @@ instance ULift.instInvolutiveStar {𝕜 : Type u} [InvolutiveStar 𝕜] :
   star_involutive x := congrArg ULift.up (star_star x.down)
 
 instance ULift.instStarMul {𝕜 : Type u} [Mul 𝕜] [StarMul 𝕜] : StarMul (ULift.{v,u} 𝕜) where
-  star_mul x y := by simp; rfl
+  star_mul x y := congrArg ULift.up (star_mul x.down y.down)
 
 instance {𝕜 : Type u} [NonUnitalNonAssocSemiring 𝕜] [StarRing 𝕜] : StarRing (ULift.{v,u} 𝕜) where
-  star_add x y := by simp; rfl
+  star_add x y := congrArg ULift.up (star_add x.down y.down)
 
 @[simp]
 theorem ULift.starRingEnd_down {𝕜 : Type u} (x : ULift.{v,u} 𝕜) [CommSemiring 𝕜] [StarRing 𝕜] :
@@ -69,7 +69,7 @@ noncomputable instance {𝕜 : Type u} [RCLike 𝕜] : RCLike (ULift.{v,u} 𝕜)
       ext1
       exact h
   re_add_im_ax z := by exact congrArg ULift.up (RCLike.re_add_im_ax z.down)
-  ofReal_re_ax r := by simp
+  ofReal_re_ax r := RCLike.ofReal_re_ax r
   ofReal_im_ax := by simp
   mul_re_ax z w := by simp
   mul_im_ax := by simp

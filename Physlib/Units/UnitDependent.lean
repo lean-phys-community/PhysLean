@@ -131,8 +131,8 @@ def LinearUnitDependent.scaleUnitLinearEquiv {M : Type} [AddCommMonoid M]
     [Module ℝ M] [LinearUnitDependent M] (u1 u2 : UnitChoices) :
     M ≃ₗ[ℝ] M :=
     LinearEquiv.ofLinear (scaleUnitLinear u1 u2) (scaleUnitLinear u2 u1)
-    (by ext u; simp [scaleUnitLinear])
-    (by ext u; simp [scaleUnitLinear])
+    (LinearMap.ext fun m => UnitDependent.scaleUnit_symm_apply u2 u1 m)
+    (LinearMap.ext fun m => UnitDependent.scaleUnit_symm_apply u1 u2 m)
 
 /-- For an `M` with an instance of `ContinuousLinearUnitDependent M`, `scaleUnit u1 u2` as a
   continuous linear map. -/
