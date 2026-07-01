@@ -32,11 +32,9 @@ variable
 /-- The submodule of `WithLp 2 (E × F)` defined by `M`. -/
 def submoduleToLp : Submodule ℂ (WithLp 2 (E × F)) where
   carrier := {x | x.ofLp ∈ M}
-  add_mem' := fun {a b} ha hb => Submodule.add_mem M ha hb
+  add_mem' := fun {_ _} ha hb => Submodule.add_mem M ha hb
   zero_mem' := Submodule.zero_mem M
-  smul_mem' := by
-    intro c x hx
-    exact Submodule.smul_mem M c hx
+  smul_mem' := fun c {_} hx => Submodule.smul_mem M c hx
 
 lemma mem_submodule_iff_mem_submoduleToLp : f ∈ M ↔ (WithLp.toLp 2 f) ∈ submoduleToLp M :=
   Eq.to_iff rfl

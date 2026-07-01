@@ -52,11 +52,9 @@ lemma fin_finset_sort_map_monotone {n m : ℕ} (a : Finset (Fin n)) (f : Fin n �
     ((a.map f).sort (· ≤ ·)) := by
   have h1 : ((a.sort (· ≤ ·)).map f).Pairwise (· ≤ ·) :=
     fin_list_sorted_monotone_sorted _ (a.pairwise_sort (fun x1 x2 => x1 ≤ x2)) f hf
-  have h2 : ((a.sort (· ≤ ·)).map f).Nodup := by
-    refine (List.nodup_map_iff_inj_on ?_).mpr ?_
-    exact a.sort_nodup (fun x1 x2 => x1 ≤ x2)
-    intro a ha b hb hf
-    exact f.2 hf
+  have h2 : ((a.sort (· ≤ ·)).map f).Nodup :=
+    (List.nodup_map_iff_inj_on (a.sort_nodup (fun x1 x2 => x1 ≤ x2))).mpr
+      fun _ _ _ _ hf => f.2 hf
   have h3 : ((a.sort (· ≤ ·)).map f).toFinset = (a.map f) := by
     ext a
     simp

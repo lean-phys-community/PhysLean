@@ -305,9 +305,9 @@ lemma mulOperator_isSelfAdjoint_ofReal
 -/
 
 lemma mulOperator_isClosable {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :
-    (𝓜 f).IsClosable := by
-  refine isClosable_of_exists_dense_formalAdjoint (mulOperator_hasDenseDomain hf) ?_
-  exact ⟨𝓜 (conj ∘ f), mulOperator_hasDenseDomain (by measurability),
+    (𝓜 f).IsClosable :=
+  isClosable_of_exists_dense_formalAdjoint (mulOperator_hasDenseDomain hf)
+    ⟨𝓜 (conj ∘ f), mulOperator_hasDenseDomain (by measurability),
     mulOperator_adjoint_eq_conj hf ▸ adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)⟩
 
 lemma mulOperator_isUnbounded {f : Space d → ℂ} (hf : AEStronglyMeasurable f) :

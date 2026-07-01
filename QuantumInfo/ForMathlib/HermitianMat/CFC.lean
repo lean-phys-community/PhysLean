@@ -575,9 +575,9 @@ theorem continuous_cfc_joint_compact {X d : Type*} [TopologicalSpace X] [Fintype
   (hA₂ : ContinuousOn (fun x ↦ A x) S) :
     ContinuousOn (fun x ↦ (A x).cfc (f x)) S := by
   intro x x_in_S
-  have h_eps_delta : ContinuousWithinAt (fun y => (A y).cfc (f x)) S x := by
-    refine ContinuousOn.continuousWithinAt ?_ x_in_S
-    exact (continuousOn_cfc_of_compact hT (hf.uncurry_left x x_in_S)).comp hA₂ hA₁
+  have h_eps_delta : ContinuousWithinAt (fun y => (A y).cfc (f x)) S x :=
+    ((continuousOn_cfc_of_compact hT (hf.uncurry_left x x_in_S)).comp hA₂ hA₁).continuousWithinAt
+      x_in_S
   rw [ ContinuousWithinAt ] at *;
   rw [ Metric.tendsto_nhds ] at *;
   intro ε ε_pos

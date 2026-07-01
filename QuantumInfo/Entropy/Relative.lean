@@ -2397,9 +2397,9 @@ private lemma HermitianMat.inner_log_mono_of_psd_of_le {A B C : HermitianMat d �
     ⟪C, A.log⟫ ≤ ⟪C, B.log⟫ := by
   open scoped Topology in
   have h_eventually : ∀ᶠ ε in 𝓝[>] (0 : ℝ),
-      ⟪C, (A + ε • 1).log⟫ ≤ ⟪C, (B + ε • 1).log⟫ := by
-    refine eventually_nhdsWithin_of_forall fun ε hε ↦ ?_
-    exact inner_log_mono_of_posDef_of_le hC (posDef_add_eps hA hε) (add_le_add_left hAB _)
+      ⟪C, (A + ε • 1).log⟫ ≤ ⟪C, (B + ε • 1).log⟫ :=
+    eventually_nhdsWithin_of_forall fun ε hε =>
+      inner_log_mono_of_posDef_of_le hC (posDef_add_eps hA hε) (add_le_add_left hAB _)
   refine le_of_tendsto_of_tendsto ?_ ?_ h_eventually
   · exact inner_log_shift_tendsto hker
   · apply inner_log_shift_tendsto
