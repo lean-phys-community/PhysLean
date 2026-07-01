@@ -99,13 +99,9 @@ lemma comp {F : (Y → V) → (Z → W)} {G : (X → U) → (Y → V)} {F' G'}
 lemma congr_fun {F G : (X → U) → (Y → V)} {F' : (Y → V) → (X → U)}
     (h : HasVarAdjoint G F') (h' : ∀ φ, IsTestFunction φ → F φ = G φ) :
     HasVarAdjoint F F' where
-  test_fun_preserving φ hφ := by
-    rw[h' _ hφ]
-    exact h.test_fun_preserving φ hφ
+  test_fun_preserving φ hφ := by simpa [h' φ hφ] using h.test_fun_preserving φ hφ
   test_fun_preserving' φ hφ := h.test_fun_preserving' φ hφ
-  adjoint φ ψ hφ hψ := by
-    rw [h' φ hφ]
-    exact h.adjoint φ ψ hφ hψ
+  adjoint φ ψ hφ hψ := by simpa [h' φ hφ] using h.adjoint φ ψ hφ hψ
   ext' := h.ext'
 
 lemma of_eq {F : (X → U) → (Y → V)} {F' G' : (Y → V) → (X → U)}
@@ -113,12 +109,8 @@ lemma of_eq {F : (X → U) → (Y → V)} {F' G' : (Y → V) → (X → U)}
     (hlin : IsLocalizedFunctionTransform G') :
     HasVarAdjoint F G' where
   test_fun_preserving φ hφ := hF'.test_fun_preserving φ hφ
-  test_fun_preserving' φ hφ := by
-    rw [← h φ hφ]
-    exact hF'.test_fun_preserving' φ hφ
-  adjoint φ ψ hφ hψ := by
-    rw [← h ψ hψ]
-    exact hF'.adjoint φ ψ hφ hψ
+  test_fun_preserving' φ hφ := by simpa [← h φ hφ] using hF'.test_fun_preserving' φ hφ
+  adjoint φ ψ hφ hψ := by simpa [← h ψ hψ] using hF'.adjoint φ ψ hφ hψ
   ext' := hlin
 
 /-- Variational adjoint is unique only when applied to test functions. -/
