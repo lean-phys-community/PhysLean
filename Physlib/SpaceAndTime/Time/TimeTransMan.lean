@@ -287,8 +287,7 @@ lemma addTime_eq_val (x : TimeUnit) (r : ℝ) (t : TimeTransMan) :
   simp [diff_eq_val]
 
 lemma addTime_val (x : TimeUnit) (r : ℝ) (t : TimeTransMan) :
-    (addTime x r t).val = x.1 * r + t.val := by
-  rw [addTime_eq_val]
+    (addTime x r t).val = x.1 * r + t.val := by rw [addTime_eq_val]
 
 /-!
 

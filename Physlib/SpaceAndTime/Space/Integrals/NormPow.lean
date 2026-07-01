@@ -64,8 +64,7 @@ lemma radial_jacobian_zpow_mul_self
             rw [← zpow_add₀ hz q 1, ← zpow_add₀ hz (d - 1: ℤ) (q + 1)]
     _ = r ^ (p : ℤ) := by
             congr 1; omega
-    _ = r ^ p := by
-            rw [zpow_natCast]
+    _ = r ^ p := by rw [zpow_natCast]
 
 private lemma radial_jacobian_zpow
     {d p : ℕ} [NeZero d] {q : ℤ} (hp_int : (p : ℤ) = q + (d : ℤ))
@@ -78,8 +77,7 @@ private lemma radial_jacobian_zpow
             rw [← Nat.cast_pred (Nat.pos_of_neZero d), ← zpow_natCast, ← zpow_add₀ hz]
     _ = r ^ ((p - 1 : ℕ) : ℤ) := by
             congr 1; omega
-    _ = r ^ (p - 1) := by
-            rw [zpow_natCast]
+    _ = r ^ (p - 1) := by rw [zpow_natCast]
 
 lemma radial_norm_power_spherical_integral_eq_space_integral
     {d p : ℕ} [NeZero d] {q : ℤ} (hp_int : (p : ℤ) = q + (d : ℤ))
