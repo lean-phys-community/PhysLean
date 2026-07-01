@@ -66,8 +66,7 @@ namespace DistLorentzCurrentDensity
 noncomputable def chargeDensity {d : ℕ} (c : SpeedOfLight) :
     (DistLorentzCurrentDensity d) →ₗ[ℝ] (Time × Space d) →d[ℝ] ℝ where
   toFun J := (1 / (c : ℝ)) • (Lorentz.Vector.temporalCLM d ∘L distTimeSlice c J)
-  map_add' J1 J2 := by
-    simp
+  map_add' J1 J2 := by simp
   map_smul' r J := by
     simp only [one_div, map_smul, ContinuousLinearMap.comp_smulₛₗ, RingHom.id_apply]
     rw [smul_comm]

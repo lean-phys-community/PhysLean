@@ -93,8 +93,7 @@ def schwartzAction {d} : LorentzGroup d →* 𝓢(SpaceTime d, ℝ) →L[ℝ] �
 lemma schwartzAction_mul_apply {d} (Λ₁ Λ₂ : LorentzGroup d)
     (η : 𝓢(SpaceTime d, ℝ)) :
     schwartzAction Λ₂ (schwartzAction (Λ₁) η) =
-    schwartzAction (Λ₂ * Λ₁) η := by
-  simp
+    schwartzAction (Λ₂ * Λ₁) η := by simp
 
 lemma schwartzAction_apply {d} (Λ : LorentzGroup d)
     (η : 𝓢(SpaceTime d, ℝ)) (x : SpaceTime d) :

@@ -239,8 +239,7 @@ lemma fieldStrengthMatrix_inr_inr_eq_magneticFieldMatrix {c : SpeedOfLight}
     (A : ElectromagneticPotential d)
     (x : SpaceTime d) (i j : Fin d) :
     A.fieldStrengthMatrix x (Sum.inr i, Sum.inr j) =
-    A.magneticFieldMatrix c (x.time c) x.space (i, j) := by
-  simp [magneticFieldMatrix_eq]
+    A.magneticFieldMatrix c (x.time c) x.space (i, j) := by simp [magneticFieldMatrix_eq]
 
 /-!
 

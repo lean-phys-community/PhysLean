@@ -73,8 +73,7 @@ lemma radialAngularMeasure_eq_volume_withDensity {d : ℕ} : radialAngularMeasur
 
 @[simp]
 lemma radialAngularMeasure_zero_eq_volume :
-    radialAngularMeasure (d := 0) = volume := by
-  simp [radialAngularMeasure]
+    radialAngularMeasure (d := 0) = volume := by simp [radialAngularMeasure]
 
 /-!
 

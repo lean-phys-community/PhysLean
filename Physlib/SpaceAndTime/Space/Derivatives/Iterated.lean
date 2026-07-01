@@ -119,8 +119,7 @@ lemma iteratedDeriv_const_smul (I : MultiIndex d) (c : ℝ) {f : Space d → ℝ
 /-- Iterated spatial derivatives preserve smoothness for scalar-valued functions. -/
 lemma iteratedDeriv_contDiff (I : MultiIndex d) {f : Space d → ℝ}
     (hf : ContDiff ℝ ∞ f) :
-    ContDiff ℝ ∞ (∂^[I] f) := by
-  simpa [iteratedDeriv] using iteratedDerivList_contDiff I.toList hf
+    ContDiff ℝ ∞ (∂^[I] f) := by simpa [iteratedDeriv] using iteratedDerivList_contDiff I.toList hf
 
 /-- The topological support of a spatial derivative is contained in that of the original
 function. -/

@@ -200,8 +200,7 @@ lemma matrixDiv_momentumFlux (d : ℕ) (fluid : FluidState d)
               hVelocity x]
             simp [momentumDensity, mul_comm, mul_assoc]
     _ = (∑ j, ∂[j] (fun x' => momentumDensity d fluid t x' j) x) * fluid.velocity t x i +
-        fluid.rho t x * (∑ j, fluid.velocity t x j * ∂[j] (fluid.velocity t) x i) := by
-          ring
+        fluid.rho t x * (∑ j, fluid.velocity t x j * ∂[j] (fluid.velocity t) x i) := by ring
 
 /-- The algebraic bridge between conservative and convective momentum.
 

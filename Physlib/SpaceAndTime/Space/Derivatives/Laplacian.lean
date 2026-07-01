@@ -98,7 +98,6 @@ scoped[Space] notation "Δᵈ" => distLaplacian
 
 @[simp]
 lemma distLaplacian_const {d : ℕ} (c : ℝ) :
-    Δᵈ (Distribution.const ℝ (Space d) c) = 0 := by
-  simp [distLaplacian, distGrad_const]
+    Δᵈ (Distribution.const ℝ (Space d) c) = 0 := by simp [distLaplacian, distGrad_const]
 
 end Space

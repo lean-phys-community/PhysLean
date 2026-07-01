@@ -201,8 +201,7 @@ lemma oneDimPointParticle_electricField_timeDeriv (𝓕 : FreeSpace) (q : ℝ) (
 -/
 
 lemma oneDimPointParticle_magneticFieldMatrix (q : ℝ) (r₀ : Space 1) :
-    (oneDimPointParticle 𝓕 q r₀).magneticFieldMatrix 𝓕.c = 0 := by
-  simp
+    (oneDimPointParticle 𝓕 q r₀).magneticFieldMatrix 𝓕.c = 0 := by simp
 
 /-!
 

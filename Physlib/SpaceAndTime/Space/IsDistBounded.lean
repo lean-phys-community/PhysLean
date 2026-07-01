@@ -1285,8 +1285,7 @@ lemma mul_inner_pow_neg_two {d : ℕ} (y : Space d) (hd : 2 ≤ d := by omega) :
       by_cases hx : x = 0
       · subst hx
         simp
-      have hx' : ‖x‖ ≠ 0 := by
-        simpa using hx
+      have hx' : ‖x‖ ≠ 0 := by simpa using hx
       field_simp
   · apply AEMeasurable.aestronglyMeasurable
     fun_prop

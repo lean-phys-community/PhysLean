@@ -601,8 +601,7 @@ lemma harmonicWaveX_polarization_ellipse {d} (𝓕 : FreeSpace) (k : ℝ) (hk : 
   symm
   calc _
     _ = ∑ (i : Fin d), ∑ (j : Fin d), (cos (τ + φ i) ^ 2 + cos (τ + φ j) ^ 2
-        - 2 * cos (τ + φ i) * cos (τ + φ j) * cos (φ j - φ i)) := by
-      simp [← hij]
+        - 2 * cos (τ + φ i) * cos (τ + φ j) * cos (φ j - φ i)) := by simp [← hij]
     _ = 2 * ∑ (i : Fin d), ∑ (j : Fin d), cos (τ + φ j) ^ 2
         - 2 * ∑ (i : Fin d), ∑ (j : Fin d), cos (τ + φ i) * cos (τ + φ j) * cos (φ j - φ i) := by
       rw [two_mul]

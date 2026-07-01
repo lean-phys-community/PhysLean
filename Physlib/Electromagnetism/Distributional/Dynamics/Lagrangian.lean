@@ -78,8 +78,7 @@ noncomputable def gradFreeCurrentPotential {d} :
     DistLorentzCurrentDensity d →ₗ[ℝ] ((SpaceTime d) →d[ℝ] Lorentz.Vector d) where
   toFun J := {
     toFun ε := ∑ μ, (η μ μ • (J ε μ) • Lorentz.Vector.basis μ)
-    map_add' ε₁ ε₂ := by
-      simp [Finset.sum_add_distrib, add_smul]
+    map_add' ε₁ ε₂ := by simp [Finset.sum_add_distrib, add_smul]
     map_smul' r ε := by
       simp only [map_smul, apply_smul, smul_smul, Real.ringHom_apply, Finset.smul_sum]
       congr

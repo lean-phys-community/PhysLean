@@ -98,8 +98,7 @@ noncomputable def distTranslate {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :
   map_add' T1 T2 := by
     ext η
     simp
-  map_smul' c T := by
-    simp
+  map_smul' c T := by simp
 
 lemma distTranslate_apply {d : ℕ} (a : EuclideanSpace ℝ (Fin d))
     (T : (Space d) →d[ℝ] X) (η : 𝓢(Space d, ℝ)) :

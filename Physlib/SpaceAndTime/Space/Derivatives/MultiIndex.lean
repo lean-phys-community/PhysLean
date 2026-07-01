@@ -187,8 +187,7 @@ lemma toList_single (i : Fin d) : toList (increment 0 i : MultiIndex d) = [i] :=
         have htail :
             tail (increment (0 : MultiIndex d.succ) j.succ) = increment (0 : MultiIndex d) j := by
           rw [tail_increment_succ, tail_zero]
-        have hzero : increment (0 : MultiIndex d.succ) j.succ 0 = 0 := by
-          simp [increment]
+        have hzero : increment (0 : MultiIndex d.succ) j.succ 0 = 0 := by simp [increment]
         simp [toList, hzero, htail, ih j]
 
 end MultiIndex

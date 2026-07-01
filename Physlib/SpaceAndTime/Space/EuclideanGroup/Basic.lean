@@ -154,8 +154,7 @@ lemma translationVector.incl_range :
 
 /-- The translation by the zero vector is the identity of the Euclidean group. -/
 lemma translation_zero : translationVector.incl n
-    (Multiplicative.ofAdd (0 : EuclideanSpace ℝ (Fin n))) = 1 := by
-  simp
+    (Multiplicative.ofAdd (0 : EuclideanSpace ℝ (Fin n))) = 1 := by simp
 
 /-- The subgroup of `EuclideanGroup n` whose elements fix the origin
 (translation = 0). This is the copy of `O(n)` sitting inside `E(n)`. -/
