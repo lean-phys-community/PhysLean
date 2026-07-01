@@ -52,7 +52,6 @@ noncomputable section
 
 open LinearPMap
 open MeasureTheory
-open AEEqFun
 open Filter
 open ComplexConjugate
 
@@ -69,25 +68,23 @@ def mulOperator (f : Space d → ℂ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceD
     add_mem' := by
       intro ψ φ hψ hφ
       refine (hψ.add hφ).ae_eq ?_
-      filter_upwards [coeFn_add ψ.val φ.val] with x h
+      filter_upwards [coeFn_add ψ φ] with x h
       simp [mul_add, h]
     zero_mem' := MemHS.zero.ae_eq (by filter_upwards; simp)
     smul_mem' c ψ hψ := by
       refine (hψ.const_smul c).ae_eq ?_
-      filter_upwards [coeFn_smul c ψ.val] with x h
-      change _ = (f • (c • ψ.val).cast) x
+      filter_upwards [coeFn_smul c ψ] with x h
       simp [h, mul_left_comm]
   }
   toFun := {
     toFun ψ := mk ψ.prop
     map_add' ψ φ := by
       rw [← mk_add, mk_eq_iff]
-      filter_upwards [coeFn_add ψ.1.val φ.1.val] with x h
+      filter_upwards [coeFn_add ψ.1 φ.1] with x h
       simp [h, mul_add]
     map_smul' c ψ := by
       rw [← mk_const_smul, mk_eq_iff]
-      filter_upwards [coeFn_smul c ψ.1.val] with x h
-      change (f • (c • ψ.1.val).cast) x = _
+      filter_upwards [coeFn_smul c ψ.1] with x h
       simp [h, mul_left_comm]
   }
 
@@ -119,20 +116,20 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
   · intro n
     refine memHS_iff.mpr ⟨by measurability, by measurability, ?_⟩
     refine HasFiniteIntegral.mono (memHS_iff.mp <| memHS (n • φ n)).2.2 ?_
-    filter_upwards [hfu, coeFn_smul n (φ n).val, hφ n] with x h₁ h₂ h₃
+    filter_upwards [hfu, coeFn_smul n (φ n), hφ n] with x h₁ h₂ h₃
     by_cases hx : x ∈ s n
     · simp_rw [norm_pow, norm_norm, sq_le_sq, abs_norm]
       calc
         _ = ‖u x‖ * ‖φ n x‖ := by simp [h₁]
         _ ≤ n * ‖φ n x‖ := mul_le_mul_of_nonneg_right (by simp_all [s]) (norm_nonneg _)
-        _ = ‖(n • φ n) x‖ := by simp [h₂]
+        _ = ‖(n • φ n) x‖ := by simp [h₂, ← Nat.cast_smul_eq_nsmul ℂ]
     · simp [h₃, hx]
   · apply tendsto_sub_nhds_zero_iff.mp
     apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
     have h : ∀ n, ∫⁻ x, ‖(φ n - ψ) x‖ₑ ^ 2 = ∫⁻ x, ‖(s n)ᶜ.indicator ψ x‖ₑ ^ 2 := by
       intro n
       refine lintegral_congr_ae ?_
-      filter_upwards [coeFn_sub (φ n).val ψ.val, hφ n] with x h₁ h₂
+      filter_upwards [coeFn_sub (φ n) ψ, hφ n] with x h₁ h₂
       by_cases hx : x ∈ s n <;> simp [hx, h₁, h₂]
     simp_rw [h]
     rw [← MeasureTheory.lintegral_zero (α := Space d) (μ := volume)]

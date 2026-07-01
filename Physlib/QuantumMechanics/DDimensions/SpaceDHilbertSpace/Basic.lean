@@ -139,10 +139,20 @@ lemma inner_mk_mk : ⟪mk hf, mk hg⟫_ℂ = ∫ x, starRingEnd ℂ (f x) * g x 
 end
 
 /-!
-## E. Coersion
+## E. Coersions
 -/
 
 section
+
+variable (c : ℂ) (ψ φ : SpaceDHilbertSpace d)
+
+lemma coeFn_neg : ⇑(-ψ) =ᵐ[volume] -ψ := Lp.coeFn_neg _
+
+lemma coeFn_add : ⇑(ψ.val + φ.val) =ᵐ[volume] ψ + φ := Lp.coeFn_add _ _
+
+lemma coeFn_sub : ⇑(ψ.val - φ.val) =ᵐ[volume] ψ - φ := Lp.coeFn_sub _ _
+
+lemma coeFn_smul : ⇑(c • ψ) =ᵐ[volume] c • ψ := Lp.coeFn_smul _ _
 
 end
 

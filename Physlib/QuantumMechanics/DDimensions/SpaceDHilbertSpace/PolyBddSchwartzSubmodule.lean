@@ -239,9 +239,9 @@ lemma dense_top (d : ℕ) : Dense (PolyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
       have hφ_ae (n : ℕ) : φ n =ᵐ[volume] g n := schwartzEquiv_coe_ae (g n)
       have hσ_ae (n : ℕ) : σ n =ᵐ[volume] s n := coeFn_mk _
       have hφσ_ae (n : ℕ) : (φ - σ) n =ᵐ[volume] g n - s n :=
-        (AEEqFun.coeFn_sub (φ n).val (σ n).val).trans <| (hφ_ae n).sub (hσ_ae n)
+        (coeFn_sub (φ n) (σ n)).trans <| (hφ_ae n).sub (hσ_ae n)
       have hψξ_ae (n : ℕ) : ψ n - ξ =ᵐ[volume] f n - ξ :=
-        (AEEqFun.coeFn_sub (ψ n).val ξ.val).trans <| (hψ_ae n).sub EventuallyEq.rfl
+        (coeFn_sub (ψ n) ξ).trans <| (hψ_ae n).sub EventuallyEq.rfl
       refine tendsto_of_sub_tendsto_zero (f := σ) 0 ?_ ?_
       · -- `σ = bₙξ → 0` since the norms are bounded by the integral of `‖ξ‖²` (independent of `n`!)
         -- on a domain which tends to zero
