@@ -31,8 +31,7 @@ def koszulSign (q : 𝓕 → FieldStatistic) (le : 𝓕 → 𝓕 → Prop) [Deci
 
 @[simp]
 lemma koszulSign_singleton (q : 𝓕 → FieldStatistic) (le : 𝓕 → 𝓕 → Prop) [DecidableRel le] (φ : 𝓕) :
-    koszulSign q le [φ] = 1 := by
-  simp [koszulSign, koszulSignInsert]
+    koszulSign q le [φ] = 1 := by simp [koszulSign, koszulSignInsert]
 
 lemma koszulSign_mul_self (l : List 𝓕) : koszulSign q le l * koszulSign q le l = 1 := by
   induction l with

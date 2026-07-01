@@ -63,8 +63,7 @@ lemma mem_erase_uncontracted_iff (c : WickContraction n.succ) (i : Fin n.succ) (
       simp only [Nat.succ_eq_add_one, Finset.disjoint_insert_right, Finset.mem_insert,
         Finset.mem_singleton, true_or, not_true_eq_false, Finset.disjoint_singleton_right, not_or,
         false_and, or_false] at hc
-      have hi : i ∈ ({i.succAbove j, i.succAbove k} : Finset (Fin n.succ)) := by
-        simp [← hc]
+      have hi : i ∈ ({i.succAbove j, i.succAbove k} : Finset (Fin n.succ)) := by simp [← hc]
       simp only [Nat.succ_eq_add_one, Finset.mem_insert, Finset.mem_singleton] at hi
       rcases hi with hi | hi
       · exact False.elim (Fin.succAbove_ne _ _ hi.symm)

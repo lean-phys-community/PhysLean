@@ -234,8 +234,7 @@ lemma uncontractedList_eq_sort (c : WickContraction n) :
   · exact uncontractedList_sorted c
 
 lemma uncontractedList_length_eq_card (c : WickContraction n) :
-    c.uncontractedList.length = c.uncontracted.card := by
-  simp [uncontractedList_eq_sort]
+    c.uncontractedList.length = c.uncontracted.card := by simp [uncontractedList_eq_sort]
 
 lemma filter_uncontractedList (c : WickContraction n) (p : Fin n → Prop) [DecidablePred p] :
     (c.uncontractedList.filter p) = (c.uncontracted.filter p).sort (· ≤ ·) := by

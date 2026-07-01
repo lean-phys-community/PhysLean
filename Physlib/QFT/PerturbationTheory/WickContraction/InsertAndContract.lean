@@ -147,8 +147,7 @@ lemma insertAndContract_some_getDual?_some_eq (φ : 𝓕.FieldOp) (φs : List �
 lemma insertAndContract_none_succAbove_getDual?_eq_none_iff (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (j : Fin φs.length) :
     (φsΛ ↩Λ φ i none).getDual? (Fin.cast (insertIdx_length_fin φ φs i).symm
-      (i.succAbove j)) = none ↔ φsΛ.getDual? j = none := by
-  simp [insertAndContract, getDual?_congr]
+      (i.succAbove j)) = none ↔ φsΛ.getDual? j = none := by simp [insertAndContract, getDual?_congr]
 
 @[simp]
 lemma insertAndContract_some_succAbove_getDual?_eq_option (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)

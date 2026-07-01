@@ -51,8 +51,7 @@ def sign (φs : List 𝓕.FieldOp) (φsΛ : WickContraction φs.length) : ℂ :=
     𝓕 |>ₛ ⟨φs.get, φsΛ.signFinset (φsΛ.fstFieldOfContract a) (φsΛ.sndFieldOfContract a)⟩)
 
 lemma sign_empty (φs : List 𝓕.FieldOp) :
-    sign φs empty = 1 := by
-  simp [sign, empty]
+    sign φs empty = 1 := by simp [sign, empty]
 
 lemma sign_congr {φs φs' : List 𝓕.FieldOp} (h : φs = φs') (φsΛ : WickContraction φs.length) :
     sign φs' (congr (by simp [h]) φsΛ) = sign φs φsΛ := by

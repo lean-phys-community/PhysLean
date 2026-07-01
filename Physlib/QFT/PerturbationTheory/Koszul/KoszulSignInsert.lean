@@ -232,8 +232,7 @@ lemma koszulSignCons_eq_exchangeSign (φ0 φ1 : 𝓕) : koszulSignCons q le φ0 
 
 lemma koszulSignInsert_cons (r0 r1 : 𝓕) (r : List 𝓕) :
     koszulSignInsert q le r0 (r1 :: r) = (koszulSignCons q le r0 r1) *
-    koszulSignInsert q le r0 r := by
-  simp [koszulSignInsert, koszulSignCons]
+    koszulSignInsert q le r0 r := by simp [koszulSignInsert, koszulSignCons]
 
 lemma koszulSignInsert_of_le_mem (φ0 : 𝓕) : (φs : List 𝓕) → (h : ∀ b ∈ φs, le φ0 b) →
     koszulSignInsert q le φ0 φs = 1

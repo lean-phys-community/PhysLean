@@ -100,8 +100,7 @@ lemma uncontracted_card_eq_iff (c : WickContraction n) :
     by_contra hn
     have hc' := exists_pair_of_not_eq_empty c hn
     obtain ⟨i, j, hij⟩ := hc'
-    have hci : c.getDual? i = some j := by
-      simpa [getDual?_eq_some_iff_mem] using hij
+    have hci : c.getDual? i = some j := by simpa [getDual?_eq_some_iff_mem] using hij
     simp_all
   · intro h
     subst h

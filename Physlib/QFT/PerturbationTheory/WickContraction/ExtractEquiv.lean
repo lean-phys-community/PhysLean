@@ -47,8 +47,7 @@ def extractEquiv (i : Fin n.succ) : WickContraction n.succ ≃
     (c : WickContraction n) × Option c.uncontracted where
   toFun := fun c => ⟨erase c i, getDualErase c i⟩
   invFun := fun ⟨c, j⟩ => insertAndContractNat c i j
-  left_inv f := by
-    simp
+  left_inv f := by simp
   right_inv f := by
     refine extractEquiv_equiv ?_ ?_
     simp only [insertAndContractNat_erase]

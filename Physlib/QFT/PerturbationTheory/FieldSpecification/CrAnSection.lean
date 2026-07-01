@@ -109,8 +109,7 @@ def nilEquiv : CrAnSection (𝓕 := 𝓕) [] ≃ Unit where
     have h2 := ψs.2
     simp only [List.map_eq_nil_iff] at h2
     simp [h2]
-  right_inv _ := by
-    simp
+  right_inv _ := by simp
 
 /-- The creation and annihilation sections for a singleton list is given by
   a choice of `𝓕.fieldOpToCreateAnnihilateType φ`. If `φ` is a asymptotic state

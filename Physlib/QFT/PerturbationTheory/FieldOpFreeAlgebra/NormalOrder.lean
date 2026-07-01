@@ -290,8 +290,7 @@ Using the results from above.
 lemma normalOrderF_swap_anPartF_crPartF (φ φ' : 𝓕.FieldOp) (a b : FieldOpFreeAlgebra 𝓕) :
     𝓝ᶠ(a * (anPartF φ) * (crPartF φ') * b) =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • 𝓝ᶠ(a * (crPartF φ') *
-      (anPartF φ) * b) := by
-  simp [normalOrderF_swap_crPartF_anPartF, smul_smul]
+      (anPartF φ) * b) := by simp [normalOrderF_swap_crPartF_anPartF, smul_smul]
 
 lemma normalOrderF_superCommuteF_crPartF_anPartF (φ φ' : 𝓕.FieldOp) (a b : FieldOpFreeAlgebra 𝓕) :
     𝓝ᶠ(a * superCommuteF
