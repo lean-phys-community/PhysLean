@@ -91,8 +91,7 @@ lemma fderiv_wrt_prod_clm_comp (f : X × Y → Z) (hf : Differentiable 𝕜 f) :
 lemma fderiv_curry_clm_apply (f : X → Y →L[𝕜] Z) (y : Y) (x dx : X) (h : Differentiable 𝕜 f) :
     fderiv 𝕜 f x dx y
     =
-    fderiv 𝕜 (f · y) x dx := by
-  rw [fderiv_clm_apply] <;> first | simp | fun_prop
+    fderiv 𝕜 (f · y) x dx := by rw [fderiv_clm_apply] <;> first | simp | fun_prop
 
 /- Helper rw lemmas for proving differentiability conditions. -/
 lemma fderiv_uncurry_comp_fst (f : X → Y → Z) (y : Y) (hf : Differentiable 𝕜 (↿f)) :

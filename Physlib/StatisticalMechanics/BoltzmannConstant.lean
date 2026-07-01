@@ -39,7 +39,6 @@ lemma kB_pos : 0 < kB := kBAx.2
 lemma kB_nonneg : 0 ≤ kB := le_of_lt kBAx.2
 
 /-- The Boltzmann constant is not equal to zero. -/
-lemma kB_ne_zero : kB ≠ 0 := by
-  linarith [kB_pos]
+lemma kB_ne_zero : kB ≠ 0 := by linarith [kB_pos]
 
 end Constants

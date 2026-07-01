@@ -136,8 +136,7 @@ attribute [fun_prop] HasAdjFDerivAt.differentiableAt
 
 lemma hasAdjFDerivAt_id (x : E) : HasAdjFDerivAt 𝕜 (fun x : E => x) (fun dx => dx) x where
   differentiableAt := by fun_prop
-  hasAdjoint_fderiv := by
-    simp; apply hasAdjoint_id
+  hasAdjoint_fderiv := by simp; apply hasAdjoint_id
 
 lemma adjFDeriv_id : adjFDeriv 𝕜 (fun x : E => x) = fun _ dx => dx := by
   funext x
@@ -148,8 +147,7 @@ lemma adjFDeriv_id' : adjFDeriv 𝕜 (id : E → E) = fun _ dx => dx := adjFDeri
 lemma hasAdjFDerivAt_const (x : E) (y : F) :
     HasAdjFDerivAt 𝕜 (fun _ : E => y) (fun _ => 0) x where
   differentiableAt := by fun_prop
-  hasAdjoint_fderiv := by
-    simp; apply hasAdjoint_zero
+  hasAdjoint_fderiv := by simp; apply hasAdjoint_zero
 
 lemma adjFDeriv_const (y : F) : adjFDeriv 𝕜 (fun _ : E => y) = fun _ _ => 0 := by
   funext x
