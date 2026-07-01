@@ -103,8 +103,6 @@ open Kronecker in
 theorem measurementMap_apply_matrix (Λ : POVM X d) (m : Matrix d d ℂ) :
   Λ.measurementMap.map m =  ∑ x : X,
     ((((Λ.mats x) ^ (1/2:ℝ)).mat * m * ((Λ.mats x)^(1/2:ℝ)).mat) ⊗ₖ Matrix.single x x 1) := by
-  dsimp [measurementMap, HPMap.map]
-  rw [LinearMap.sum_apply]
   rfl
 
 open HermitianMat in

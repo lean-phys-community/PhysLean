@@ -184,8 +184,7 @@ lemma μProd_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
     (𝓒.μProd T).real {i} = 𝓒.probability T i := by
   rw [μProd]
   simp [probability]
-  rw [inv_mul_eq_div]
-  rfl
+  rw [inv_mul_eq_div, mathematicalPartitionFunction, measureReal_def]
 
 lemma meanEnergy_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.meanEnergy T = ∑ i, 𝓒.energy i * 𝓒.probability T i := by

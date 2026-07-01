@@ -167,8 +167,7 @@ lemma toMatrix_mem_lorentzGroup (M : SL(2, ℂ)) : toMatrix M ∈ LorentzGroup 3
 def toLorentzGroup : SL(2, ℂ) →* LorentzGroup 3 where
   toFun M := ⟨toMatrix M, toMatrix_mem_lorentzGroup M⟩
   map_one' := by
-    simp only [_root_.map_one]
-    rfl
+    exact Subtype.ext (by simp)
   map_mul' M N := by
     ext1
     simp only [_root_.map_mul, lorentzGroupIsGroup_mul_coe]

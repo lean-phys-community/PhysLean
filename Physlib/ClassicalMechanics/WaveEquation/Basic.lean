@@ -138,8 +138,7 @@ lemma planeWave_time_deriv {d f₀ c x} {s : Direction d}
     FunLike.coe_smul, Pi.smul_apply, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul,
     neg_mul, neg_inj, mul_eq_mul_left_iff]
   left
-  simp
-  rfl
+  simp [planeWave]
   repeat fun_prop
 
 lemma planeWave_time_deriv_time_deriv {d f₀ c x} {s : Direction d}

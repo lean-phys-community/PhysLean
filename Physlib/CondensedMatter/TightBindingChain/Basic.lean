@@ -386,8 +386,7 @@ lemma quantaWaveNumber_exp_N (n : ℕ) (k : T.QuantaWaveNumber) :
   field_simp
   ring_nf
   congr 1
-  rw [mul_comm]
-  rfl
+  exact mul_comm _ _
 
 lemma quantaWaveNumber_exp_sub_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
     Complex.exp (Complex.I * k * (n - 1).val * T.a) =

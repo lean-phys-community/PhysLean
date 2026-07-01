@@ -109,12 +109,10 @@ theorem Bra.ext {ξ ψ : Bra d} (h : ∀ x, ξ x = ψ x) : ξ = ψ :=
   DFunLike.ext ξ ψ h
 
 theorem Ket.normalized (ψ : Ket d) : ∑ x, Complex.normSq (ψ x) = 1 := by
-  convert ψ.normalized'
-  rfl
+  exact ψ.normalized'
 
 theorem Bra.normalized (ψ : Bra d) : ∑ x, Complex.normSq (ψ x) = 1 := by
-  convert ψ.normalized'
-  rfl
+  exact ψ.normalized'
 
 /-- Any Bra can be turned into a Ket by conjugating the elements. -/
 @[coe]
