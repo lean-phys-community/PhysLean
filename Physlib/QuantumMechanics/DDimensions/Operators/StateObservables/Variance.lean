@@ -67,10 +67,8 @@ lemma variance_eq_norm_sq_sub_expectedValue_sq (T : H →ₗ.[ℂ] H)
     variance T ψ = ‖T ψ‖ ^ 2 - expectedValue T ψ ^ 2 := by
   let μ := expectedValue T ψ
   let a : H := T ψ
-  have hμ_right : ⟪(ψ : H), a⟫_ℂ = (μ : ℂ) := by
-    simpa [a, μ] using expectedValue_eq_inner T hT ψ
-  have hμ_left : ⟪a, (ψ : H)⟫_ℂ = (μ : ℂ) := by
-    simpa [inner_conj_symm] using congrArg star hμ_right
+  have hμ_right : ⟪(ψ : H), a⟫_ℂ = (μ : ℂ) := by simpa [a, μ] using expectedValue_eq_inner T hT ψ
+  have hμ_left : ⟪a, (ψ : H)⟫_ℂ = (μ : ℂ) := by simpa [inner_conj_symm] using congrArg star hμ_right
   have h_re_inner_centered : (⟪a, (μ : ℂ) • (ψ : H)⟫_ℂ).re = μ ^ 2 := by
     rw [inner_smul_right, hμ_left]
     simp [μ]
@@ -92,8 +90,7 @@ lemma variance_nonneg (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
 
 /-- Zero variance is the same as a zero centered vector. -/
 lemma variance_eq_zero_iff_centered_eq_zero (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    variance T ψ = 0 ↔ centered T ψ = 0 := by
-  simp [variance_eq_centered_norm_sq]
+    variance T ψ = 0 ↔ centered T ψ = 0 := by simp [variance_eq_centered_norm_sq]
 
 /-- Zero variance is the same as `Tψ = ⟨T⟩_ψ ψ`. -/
 lemma variance_eq_zero_iff (T : H →ₗ.[ℂ] H) (ψ : T.domain) :

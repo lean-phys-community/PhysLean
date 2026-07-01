@@ -40,8 +40,7 @@ variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
 private lemma conj_inner_apply_self_eq_of_isSymmetric (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)
     (ψ : T.domain) :
-    (starRingEnd ℂ) ⟪(ψ : H), T ψ⟫_ℂ = ⟪(ψ : H), T ψ⟫_ℂ := by
-  simpa [inner_conj_symm] using hT ψ ψ
+    (starRingEnd ℂ) ⟪(ψ : H), T ψ⟫_ℂ = ⟪(ψ : H), T ψ⟫_ℂ := by simpa [inner_conj_symm] using hT ψ ψ
 
 /-- Expectation value `re ⟪ψ, Tψ⟫_ℂ` for `ψ ∈ T.domain`.
 

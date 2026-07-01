@@ -243,17 +243,14 @@ lemma inner_centered_commutator_of_raw_commutator :
   let b : H := B ⟨ψ, hψB⟩
   let μa : ℝ := expectedValue A ψ
   let μb : ℝ := expectedValue B ⟨ψ, hψB⟩
-  have hμa_right : ⟪(ψ : H), a⟫_ℂ = (μa : ℂ) := by
-    simpa [a, μa] using expectedValue_eq_inner A hA ψ
+  have hμa_right : ⟪(ψ : H), a⟫_ℂ = (μa : ℂ) := by simpa [a, μa] using expectedValue_eq_inner A hA ψ
   have hμa_left : ⟪a, (ψ : H)⟫_ℂ = (μa : ℂ) := by
-    have h_symm : ⟪a, (ψ : H)⟫_ℂ = ⟪(ψ : H), a⟫_ℂ := by
-      simpa [a] using hA ψ ψ
+    have h_symm : ⟪a, (ψ : H)⟫_ℂ = ⟪(ψ : H), a⟫_ℂ := by simpa [a] using hA ψ ψ
     simpa [h_symm] using hμa_right
   have hμb_right : ⟪(ψ : H), b⟫_ℂ = (μb : ℂ) := by
     simpa [b, μb] using expectedValue_eq_inner B hB ⟨ψ, hψB⟩
   have hμb_left : ⟪b, (ψ : H)⟫_ℂ = (μb : ℂ) := by
-    have h_symm : ⟪b, (ψ : H)⟫_ℂ = ⟪(ψ : H), b⟫_ℂ := by
-      simpa [b] using hB ⟨ψ, hψB⟩ ⟨ψ, hψB⟩
+    have h_symm : ⟪b, (ψ : H)⟫_ℂ = ⟪(ψ : H), b⟫_ℂ := by simpa [b] using hB ⟨ψ, hψB⟩ ⟨ψ, hψB⟩
     simpa [h_symm] using hμb_right
   calc
     centeredCommutatorExpectation A B ψ hψB =

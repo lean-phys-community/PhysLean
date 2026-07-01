@@ -84,8 +84,7 @@ lemma covariance_eq_re_symm_centered :
       ((⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ +
         ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ).re) / 2 := by
   let z : ℂ := ⟪centered A ψ, centered B ⟨ψ, hψB⟩⟫_ℂ
-  have hz : ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ = star z := by
-    simp [z, inner_conj_symm]
+  have hz : ⟪centered B ⟨ψ, hψB⟩, centered A ψ⟫_ℂ = star z := by simp [z, inner_conj_symm]
   rw [covariance_eq_re_inner_centered, hz]
   change z.re = ((z + star z).re) / 2
   simp only [Complex.add_re, Complex.star_def, Complex.conj_re, add_self_div_two]

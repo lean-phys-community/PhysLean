@@ -24,8 +24,7 @@ open HilbertSpace Constants
 private lemma fun_add {α : Type*} (f g : α → ℂ) :
   (fun x ↦ f x) + (fun x ↦ g x) = fun x ↦ f x + g x := rfl
 
-private lemma fun_smul (a1: ℂ) (f : ℝ → ℂ) : (a1 • fun x ↦ f x) = (fun x ↦ a1*(f x)) := by
-    rfl
+private lemma fun_smul (a1: ℂ) (f : ℝ → ℂ) : (a1 • fun x ↦ f x) = (fun x ↦ a1*(f x)) := by rfl
 
 lemma momentumOperator_linear (a1 a2 : ℂ) (ψ1 ψ2 : ℝ → ℂ)
     (hψ1_x: Differentiable ℝ ψ1) (hψ2_x: Differentiable ℝ ψ2) :

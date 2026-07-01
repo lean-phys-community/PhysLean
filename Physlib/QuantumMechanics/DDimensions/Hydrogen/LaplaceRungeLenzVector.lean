@@ -448,8 +448,7 @@ private lemma sum_Lprx (d : ℕ) (ε : ℝˣ) :
     calc
       _ = 𝐋 i j ∘L (𝐩 j ∘L 𝐱 i - 𝐩 i ∘L 𝐱 j) := by
         simp [angularMomentumOperator_antisymm j i, comp_assoc, sub_eq_add_neg]
-      _ = 𝐋 i j ∘L 𝐋 i j := by
-        simp [momentum_comp_position_eq, symm j i, angularMomentumOperator]
+      _ = 𝐋 i j ∘L 𝐋 i j := by simp [momentum_comp_position_eq, symm j i, angularMomentumOperator]
   rw [← angularMomentumSqr_comp_radiusRegPow_commute, angularMomentumOperatorSqr]
 
 private lemma sum_rxpL (d : ℕ) (ε : ℝˣ) :

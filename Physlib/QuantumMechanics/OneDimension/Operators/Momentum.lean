@@ -74,10 +74,8 @@ lemma momentumOperator_add {ψ1 ψ2 : ℝ → ℂ}
   `𝓢(ℝ, ℂ)` to itself, such that `ψ` is taken to `fun x => - I ℏ * ψ' x`. -/
 def momentumOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) where
   toFun ψ := (- Complex.I * ℏ) • SchwartzMap.derivCLM ℂ ℂ ψ
-  map_add' ψ1 ψ2 := by
-    simp only [neg_mul, map_add, smul_add, neg_smul]
-  map_smul' a ψ := by
-    simp only [map_smul, RingHom.id_apply, smul_comm (-Complex.I * ℏ) a]
+  map_add' ψ1 ψ2 := by simp only [neg_mul, map_add, smul_add, neg_smul]
+  map_smul' a ψ := by simp only [map_smul, RingHom.id_apply, smul_comm (-Complex.I * ℏ) a]
   cont := by fun_prop
 
 lemma momentumOperatorSchwartz_apply (ψ : 𝓢(ℝ, ℂ))
