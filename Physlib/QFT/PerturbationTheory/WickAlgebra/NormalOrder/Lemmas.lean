@@ -422,9 +422,8 @@ lemma normalOrder_anPart_mul_crPart (φ φ' : 𝓕.FieldOp) :
 lemma normalOrder_ofFieldOp_mul_ofFieldOp (φ φ' : 𝓕.FieldOp) : 𝓝(ofFieldOp φ * ofFieldOp φ') =
     crPart φ * crPart φ' + 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • (crPart φ' * anPart φ) +
     crPart φ * anPart φ' + anPart φ * anPart φ' := by
-  rw [ofFieldOp, ofFieldOp, ← map_mul, normalOrder_eq_ι_normalOrderF,
-    normalOrderF_ofFieldOpF_mul_ofFieldOpF]
-  rfl
+  rw [ofFieldOp, ofFieldOp, ← map_mul, normalOrder_eq_ι_normalOrderF]
+  simp [normalOrderF_ofFieldOpF_mul_ofFieldOpF, crPart, anPart]
 
 end WickAlgebra
 end FieldSpecification

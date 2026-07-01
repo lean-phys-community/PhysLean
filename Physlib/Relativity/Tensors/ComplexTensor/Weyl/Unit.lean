@@ -259,30 +259,26 @@ open CategoryTheory
 lemma dualLeftLeftUnit_symm :
     dualLeftLeftUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
     (TensorProduct.comm ℂ _ _ (leftDualLeftUnit (1 : ℂ))) := by
-  rw [dualLeftLeftUnit_apply_one, dualLeftLeftUnitVal_expand_tmul]
-  rw [leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
-  rfl
+  simp [dualLeftLeftUnit_apply_one, dualLeftLeftUnitVal_expand_tmul,
+    leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
 
 lemma leftDualLeftUnit_symm :
     leftDualLeftUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
       (TensorProduct.comm ℂ _ _ (dualLeftLeftUnit (1 : ℂ))) := by
-  rw [dualLeftLeftUnit_apply_one, dualLeftLeftUnitVal_expand_tmul]
-  rw [leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
-  rfl
+  simp [dualLeftLeftUnit_apply_one, dualLeftLeftUnitVal_expand_tmul,
+    leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
 
 lemma dualRightRightUnit_symm :
     dualRightRightUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
       (TensorProduct.comm ℂ _ _ (rightDualRightUnit (1 : ℂ))) := by
-  rw [dualRightRightUnit_apply_one, dualRightRightUnitVal_expand_tmul]
-  rw [rightDualRightUnit_apply_one, rightDualRightUnitVal_expand_tmul]
-  rfl
+  simp [dualRightRightUnit_apply_one, dualRightRightUnitVal_expand_tmul,
+    rightDualRightUnit_apply_one, rightDualRightUnitVal_expand_tmul]
 
 lemma rightDualRightUnit_symm :
     rightDualRightUnit (1 : ℂ) = LinearMap.lTensor _ (LinearEquiv.refl _ _).toLinearMap
       (TensorProduct.comm ℂ _ _ (dualRightRightUnit (1 : ℂ))) := by
-  rw [dualRightRightUnit_apply_one, dualRightRightUnitVal_expand_tmul]
-  rw [rightDualRightUnit_apply_one, rightDualRightUnitVal_expand_tmul]
-  rfl
+  simp [dualRightRightUnit_apply_one, dualRightRightUnitVal_expand_tmul,
+    rightDualRightUnit_apply_one, rightDualRightUnitVal_expand_tmul]
 
 end
 end Fermion
