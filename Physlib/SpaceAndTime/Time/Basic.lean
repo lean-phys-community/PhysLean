@@ -185,8 +185,7 @@ instance : PartialOrder Time where
 
 lemma lt_def (t1 t2 : Time) :
     t1 < t2 ↔ t1.val < t2.val := by
-  change t1.val ≤ t2.val ∧ ¬ t2.val ≤ t1.val ↔ t1.val < t2.val
-  rw [lt_iff_le_not_ge]
+  exact Iff.symm lt_iff_le_not_ge
 
 /-!
 

@@ -326,12 +326,10 @@ instance {M : Type} [CarriesDimension M] : MulAction ℝ≥0 (Dimensionful M) wh
     rw [smul_comm]⟩
   one_smul f := by
     ext u
-    change (1 : ℝ≥0) • f.1 u = f.1 u
-    simp
+    exact one_smul ℝ≥0 (f.1 u)
   mul_smul a b f := by
     ext u
-    change (a * b) • f.1 u = a • (b • f.1 u)
-    rw [smul_smul]
+    exact (smul_smul a b (f.1 u)).symm
 
 @[simp]
 lemma Dimensionful.smul_apply {M : Type} [CarriesDimension M]

@@ -97,14 +97,12 @@ lemma space_apply (tx : TimeAndSpace d) :
 /-- The time projection is nonexpanding for the product metric. -/
 lemma dist_time_le (tx ty : TimeAndSpace d) :
     dist (time tx) (time ty) ≤ dist tx ty := by
-  change dist tx.1 ty.1 ≤ dist tx ty
   rw [Prod.dist_eq]
   exact le_max_left (dist tx.1 ty.1) (dist tx.2 ty.2)
 
 /-- The spatial projection is nonexpanding for the product metric. -/
 lemma dist_space_le (tx ty : TimeAndSpace d) :
     dist (space tx) (space ty) ≤ dist tx ty := by
-  change dist tx.2 ty.2 ≤ dist tx ty
   rw [Prod.dist_eq]
   exact le_max_right (dist tx.1 ty.1) (dist tx.2 ty.2)
 
