@@ -47,8 +47,7 @@ of a matrix are always canonically sorted, this is actually an equality.
 -/
 @[simp]
 theorem U_conj_spectrum_eq (ρ : MState d) (U : 𝐔[d]) :
-    (ρ.U_conj U).spectrum = ρ.spectrum := by
-  simp [spectrum, U_conj]
+    (ρ.U_conj U).spectrum = ρ.spectrum := by simp [spectrum, U_conj]
 
 @[simp]
 theorem inner_U_conj (ρ σ : MState d) (U : 𝐔[d]) : ⟪U ◃ ρ, U ◃ σ⟫_Prob = ⟪ρ, σ⟫_Prob := by

@@ -148,8 +148,7 @@ theorem cfc_eigenvalues (A : HermitianMat d 𝕜) :
 etc. We need these because (as above) `HermitianMat.cfc` is different from `_root_.cfc`. -/
 
 @[simp]
-nonrec theorem cfc_id : A.cfc id = A := by
-  simpa [HermitianMat.ext_iff] using cfc_id ℝ A.mat
+nonrec theorem cfc_id : A.cfc id = A := by simpa [HermitianMat.ext_iff] using cfc_id ℝ A.mat
 
 @[simp]
 nonrec theorem cfc_id' : A.cfc (·) = A :=

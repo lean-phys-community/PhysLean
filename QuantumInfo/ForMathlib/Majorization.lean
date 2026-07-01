@@ -60,8 +60,7 @@ noncomputable def singularValuesSorted (A : Matrix d d ℂ) :
 lemma singularValuesSorted_nonneg (A : Matrix d d ℂ) (i : Fin (Fintype.card d)) :
     0 ≤ singularValuesSorted A i := by
   have h_nonneg : ∀ i, 0 ≤ (singularValues A i) := singularValues_nonneg A
-  have h_sorted_nonneg : ∀ {l : List ℝ}, (∀ x ∈ l, 0 ≤ x) → ∀ i < l.length, 0 ≤ l[i]! := by
-    aesop
+  have h_sorted_nonneg : ∀ {l : List ℝ}, (∀ x ∈ l, 0 ≤ x) → ∀ i < l.length, 0 ≤ l[i]! := by aesop
   contrapose! h_sorted_nonneg
   use Multiset.sort (Finset.univ.val.map (singularValues A)) (· ≥ ·)
   refine' ⟨_, i, _, _⟩

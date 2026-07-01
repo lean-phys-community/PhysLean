@@ -370,8 +370,7 @@ theorem LinearMap.IsSymmetric.directSum_isInternal_of_commute' {𝕜 E : Type*} 
     ext μ₁₂
     simp only [DirectSum.zero_apply, ZeroMemClass.coe_zero]
     rw [← inner_self_eq_zero (𝕜 := 𝕜)]
-    have h_inner_zero : inner 𝕜 (x μ₁₂ : E) (x.coeAddMonoidHom _) = 0 := by
-      simp [hx]
+    have h_inner_zero : inner 𝕜 (x μ₁₂ : E) (x.coeAddMonoidHom _) = 0 := by simp [hx]
     rw [← h_inner_zero]
     simp only [DirectSum.coeAddMonoidHom_eq_dfinsuppSum, ZeroMemClass.coe_zero, implies_true,
       DFinsupp.sum_eq_sum_fintype, DFinsupp.equivFunOnFintype_apply]

@@ -119,8 +119,7 @@ lemma trace_Φ_eq (M : Matrix d d ℂ) :
 
 /-- `traceRe(Φ(M)) = re(Tr[M])` for any matrix M. -/
 lemma traceRe_Φ_general (M : Matrix d d ℂ) :
-    traceRe (Φ M) = Complex.re M.trace := by
-  simp [traceRe, trace_Φ_eq]
+    traceRe (Φ M) = Complex.re M.trace := by simp [traceRe, trace_Φ_eq]
 
 end HermitianMatBridge
 
