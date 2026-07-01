@@ -199,8 +199,8 @@ lemma sum_nil (f : CrAnSection (𝓕 := 𝓕) [] → M) [AddCommMonoid M] :
 lemma sum_cons (f : CrAnSection (φ :: φs) → M) [AddCommMonoid M] :
     ∑ (s : CrAnSection (φ :: φs)), f s = ∑ (a : 𝓕.fieldOpToCrAnType φ),
     ∑ (s : CrAnSection φs), f (cons a s) := by
-  simpa [Fintype.sum_prod_type, consEquiv] using
-    Eq.symm (Equiv.sum_comp consEquiv.symm f)
+  rw [← consEquiv.symm.sum_comp, Fintype.sum_prod_type]
+  rfl
 
 lemma sum_over_length {s : CrAnSection φs} (f : Fin s.1.length → M)
     [AddCommMonoid M] : ∑ (n : Fin s.1.length), f n =
@@ -418,8 +418,8 @@ lemma sum_eraseIdxEquiv (n : ℕ) (φs : List 𝓕.FieldOp) (hn : n < φs.length
     (f : CrAnSection φs → M) [AddCommMonoid M] : ∑ (s : CrAnSection φs), f s =
     ∑ (a : 𝓕.fieldOpToCrAnType φs[n]), ∑ (s : CrAnSection (φs.eraseIdx n)),
     f ((eraseIdxEquiv n φs hn).symm ⟨a, s⟩) := by
-  simpa [Fintype.sum_prod_type] using
-    Eq.symm (Equiv.sum_comp (eraseIdxEquiv n φs hn).symm f)
+  rw [← (eraseIdxEquiv n φs hn).symm.sum_comp]
+  rw [Fintype.sum_prod_type]
 
 end CrAnSection
 

@@ -376,9 +376,7 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
       map_smul' _ _ := rfl
     }
     ev.comp (Distribution.fderivD ℝ f)
-  map_add' _ _ := by
-    simp
-  map_smul' _ _ := by
+  map_add' f1 f2 := by
     simp
 
 lemma distDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]

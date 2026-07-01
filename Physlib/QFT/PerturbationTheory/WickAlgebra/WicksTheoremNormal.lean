@@ -109,8 +109,8 @@ lemma normalOrder_timeOrder_ofFieldOpList_eq_eqTimeOnly_empty (φs : List 𝓕.F
     𝓣(𝓝(ofFieldOpList φs)) = 𝓣(ofFieldOpList φs) -
     ∑ (φsΛ : {φsΛ // φsΛ.EqTimeOnly (φs := φs) ∧ φsΛ ≠ empty}),
     φsΛ.1.sign • φsΛ.1.timeContract.1 * 𝓣(𝓝(ofFieldOpList [φsΛ.1]ᵘᶜ)) := by
-  simpa [eq_sub_iff_add_eq] using
-    (timeOrder_ofFieldOpList_eq_eqTimeOnly_empty (𝓕 := 𝓕) φs).symm
+  rw [timeOrder_ofFieldOpList_eq_eqTimeOnly_empty]
+  simp
 
 /--
 For a list `φs` of `𝓕.FieldOp`, then `𝓣(φs)` is equal to the sum of

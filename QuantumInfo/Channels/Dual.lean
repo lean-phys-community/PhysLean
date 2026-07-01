@@ -170,13 +170,11 @@ lemma dual_unique
     (h : ∀ A B, (M A * B).trace = (A * M' B).trace) : M.dual = M' := by
   -- By definition of dual, we know that for any A and B, the trace of (M A) * B equals the trace of
   -- A * (M.dual B).
-  have h_dual : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜,
-      (M A * B).trace = (A * M.dual B).trace :=
-    fun A B => Dual.trace_eq M A B
+  have h_dual : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜, (M A * B).trace = (A * M.dual B).trace := by
+    exact fun A B => Dual.trace_eq M A B;
   -- Since these two linear maps agree on all bases, they must be equal.
-  have h_eq : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜,
-      (A * M.dual B).trace = (A * M' B).trace :=
-    fun A B => h_dual A B ▸ h A B
+  have h_eq : ∀ A : Matrix dIn dIn 𝕜, ∀ B : Matrix dOut dOut 𝕜, (A * M.dual B).trace = (A * M' B).trace := by
+    exact fun A B => h_dual A B ▸ h A B;
   refine' LinearMap.ext fun B => _;
   exact Matrix.ext_iff_trace_mul_left.mpr fun x => h_eq x B
 

@@ -464,9 +464,9 @@ lemma schwartzMap_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n : ℕ) (η 
           (ContinuousLinearMap.id ℝ (Space d)))‖ ^ n := by
   rw [schwartzMap_slice_integral_iteratedFDeriv]
   apply le_trans (ContinuousMultilinearMap.norm_compContinuousLinearMap_le _ _)
-  simp only [Nat.succ_eq_add_one, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-  exact mul_le_mul (norm_integral_le_integral_norm fun a => iteratedFDeriv ℝ n ⇑η _)
-    (by rfl) (by positivity) (by positivity)
+  simp
+  refine mul_le_mul ?_ (by rfl) (by positivity) (by positivity)
+  exact norm_integral_le_integral_norm fun a => iteratedFDeriv ℝ n ⇑η _
 
 lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m : ℕ) (i : Fin d.succ) :
     ∃ rt, ∀ (η : 𝓢(Space d.succ, ℝ)),∀ (x : Space d),
@@ -490,10 +490,9 @@ lemma schwartzMap_mul_pow_slice_integral_iteratedFDeriv_norm_le {d : ℕ} (n m :
   calc _
       _ ≤ ‖x‖ ^ m * ((∫ (r : ℝ), ‖iteratedFDeriv ℝ n η ((slice i).symm (r, x))‖) *
           ‖(slice i).symm.toContinuousLinearMap.comp
-          ((0 : Space d →L[ℝ] ℝ).prod (ContinuousLinearMap.id ℝ (Space d)))‖ ^ n) :=
-        mul_le_mul_of_nonneg (by rfl)
-          (schwartzMap_slice_integral_iteratedFDeriv_norm_le n η i x) (by positivity)
-          (by positivity)
+          ((0 : Space d →L[ℝ] ℝ).prod (ContinuousLinearMap.id ℝ (Space d)))‖ ^ n) := by
+        refine mul_le_mul_of_nonneg (by rfl) ?_ (by positivity) (by positivity)
+        exact schwartzMap_slice_integral_iteratedFDeriv_norm_le n η i x
       _ ≤ (∫ (r : ℝ), ‖x‖ ^ m * ‖iteratedFDeriv ℝ n η ((slice i).symm (r, x))‖) *
           ‖(slice i).symm.toContinuousLinearMap.comp
           ((0 : Space d →L[ℝ] ℝ).prod (ContinuousLinearMap.id ℝ (Space d)))‖ ^ n := by

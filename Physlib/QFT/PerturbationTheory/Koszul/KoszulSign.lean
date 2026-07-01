@@ -277,8 +277,8 @@ lemma koszulSign_swap_eq_rel {ψ φ : 𝓕} (h1 : le φ ψ) (h2 : le ψ φ) : (�
     simp only [List.cons_append, koszulSign]
     rw [koszulSign_swap_eq_rel h1 h2]
     congr 1
-    exact Wick.koszulSignInsert_eq_perm q le _ _ _
-      (List.Perm.append_left φs (List.Perm.swap ψ φ φs'))
+    apply Wick.koszulSignInsert_eq_perm
+    exact List.Perm.append_left φs (List.Perm.swap ψ φ φs')
 
 lemma koszulSign_eq_rel_eq_stat_append {ψ φ : 𝓕} [IsTrans 𝓕 le]
     (h1 : le φ ψ) (h2 : le ψ φ) (hq : q ψ = q φ) : (φs : List 𝓕) →
@@ -306,8 +306,8 @@ lemma koszulSign_eq_rel_eq_stat {ψ φ : 𝓕} [IsTrans 𝓕 le]
     simp only [mul_eq_mul_right_iff]
     left
     trans koszulSignInsert q le φ'' (φ :: ψ :: (φs' ++ φs))
-    · exact koszulSignInsert_eq_perm q le _ _ _
-        (List.perm_cons_append_cons φ List.perm_middle.symm).symm
+    · apply koszulSignInsert_eq_perm
+      exact (List.perm_cons_append_cons φ List.perm_middle.symm).symm
     · rw [koszulSignInsert_eq_remove_same_stat_append q le h1 h2 hq]
 
 lemma koszulSign_of_sorted : (φs : List 𝓕)
@@ -401,8 +401,8 @@ lemma koszulSign_perm_eq_append [IsTrans 𝓕 le] (φ : 𝓕) (φs φs' φs2 : L
       forall_eq_or_imp, List.cons_append, motive]
     simp only [koszulSign, ih, mul_eq_mul_right_iff]
     left
-    exact koszulSignInsert_eq_perm q le _ _ _
-      ((List.perm_append_right_iff φs2).mpr h)
+    apply koszulSignInsert_eq_perm
+    exact (List.perm_append_right_iff φs2).mpr h
   · intro x y l h
     simp_all only [List.mem_cons, forall_eq_or_imp, List.cons_append]
     apply Wick.koszulSign_swap_eq_rel_cons

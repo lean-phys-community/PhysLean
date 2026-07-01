@@ -341,60 +341,60 @@ TODO "Add results related to the differentiability of the
 lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : Differentiable ℝ ↿φ) : Differentiable ℝ (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
-  exact (SpaceTime.differentiable_vector _).mp fun μ => by
-    rcases μ with μ | i
-    · fin_cases μ
-      fun_prop
-    · fun_prop
+  rw [← SpaceTime.differentiable_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
 
 lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : ContDiff ℝ n ↿φ) : ContDiff ℝ n (ofScalarPotential c φ) := by
   simp [ofScalarPotential]
-  exact (SpaceTime.contDiff_vector _).mp fun μ => by
-    rcases μ with μ | i
-    · fin_cases μ
-      fun_prop
-    · fun_prop
+  rw [← SpaceTime.contDiff_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
 
 lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofVectorPotential c A) := by
   simp [ofVectorPotential]
-  exact (SpaceTime.differentiable_vector _).mp fun μ => by
-    rcases μ with μ | i
-    · fin_cases μ
-      fun_prop
-    · fun_prop
+  rw [← SpaceTime.differentiable_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr _ => fun_prop
 
 lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofVectorPotential c A) := by
   simp [ofVectorPotential]
-  exact (SpaceTime.contDiff_vector _).mp fun μ => by
-    rcases μ with μ | i
-    · fin_cases μ
-      fun_prop
-    · fun_prop
+  rw [← SpaceTime.contDiff_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr _ => fun_prop
 
 lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : Differentiable ℝ ↿φ)
     (hA : Differentiable ℝ ↿A) : Differentiable ℝ (ofPotentials c φ A) := by
   simp [ofPotentials]
-  exact (SpaceTime.differentiable_vector _).mp fun μ => by
-    rcases μ with μ | i
-    · fin_cases μ
-      fun_prop
-    · fun_prop
+  rw [← SpaceTime.differentiable_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
 
 lemma contDiff_ofPotentials {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : ContDiff ℝ n ↿φ)
     (hA : ContDiff ℝ n ↿A) : ContDiff ℝ n (ofPotentials c φ A) := by
   simp [ofPotentials]
-  exact (SpaceTime.contDiff_vector _).mp fun μ => by
-    rcases μ with μ | i
-    · fin_cases μ
-      fun_prop
-    · fun_prop
+  rw [← SpaceTime.contDiff_vector]
+  intro μ
+  match μ with
+  | Sum.inl 0 => fun_prop
+  | Sum.inr i => fun_prop
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma contDiff_ofElectromagneticField {n : ℕ} (c : SpeedOfLight)

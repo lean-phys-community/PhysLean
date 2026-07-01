@@ -153,8 +153,8 @@ lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : Decidable
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (x y : V (c i)) :
-    (update p i (x + y)).toTensor =
-      (update p i x).toTensor + (update p i y).toTensor := by simp [toTensor, update]
+    (update p i (x + y)).toTensor = (update p i x).toTensor + (update p i y).toTensor := by
+  simp [toTensor, update]
 
 @[simp]
 lemma toTensor_update_smul {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)

@@ -170,8 +170,8 @@ lemma ι_normalOrderF_superCommuteF_eq_zero_mul_mul_right (a b1 b2 c d: 𝓕.Fie
 
 @[simp]
 lemma ι_normalOrderF_superCommuteF_eq_zero (c d : 𝓕.FieldOpFreeAlgebra) : ι 𝓝ᶠ([d, c]ₛF) = 0 := by
-  simpa using ι_normalOrderF_superCommuteF_eq_zero_mul
-    (1 : 𝓕.FieldOpFreeAlgebra) (1 : 𝓕.FieldOpFreeAlgebra) c d
+  rw [← ι_normalOrderF_superCommuteF_eq_zero_mul 1 1 c d]
+  simp
 
 /-!
 

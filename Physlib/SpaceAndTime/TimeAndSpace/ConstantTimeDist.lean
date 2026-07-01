@@ -769,10 +769,9 @@ lemma time_integral_iteratedFDeriv_norm_le {d : ℕ} (n : ℕ) (η : 𝓢(Time �
         (ContinuousLinearMap.id ℝ (Space d)))‖ ^ n := by
   rw [time_integral_iteratedFDeriv_eq]
   apply le_trans (ContinuousMultilinearMap.norm_compContinuousLinearMap_le _ _)
-  simp only [ContinuousLinearMap.opNorm_prod, Prod.norm_mk, norm_zero, norm_nonneg,
-    sup_of_le_right, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-  exact mul_le_mul (norm_integral_le_integral_norm fun a => iteratedFDeriv ℝ n ⇑η (a, x))
-    (by rfl) (by positivity) (by positivity)
+  simp
+  refine mul_le_mul ?_ (by rfl) (by positivity) (by positivity)
+  exact norm_integral_le_integral_norm fun a => iteratedFDeriv ℝ n ⇑η (a, x)
 
 /-!
 

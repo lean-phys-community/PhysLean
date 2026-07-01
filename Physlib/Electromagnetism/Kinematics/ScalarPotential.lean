@@ -79,8 +79,8 @@ lemma ofScalarPotential_scalarPotential {d} (c : SpeedOfLight)
 
 @[simp]
 lemma ofStaticScalarPotential_scalarPotential {d} (c : SpeedOfLight)
-    (φ : Space d → ℝ) : (ofStaticScalarPotential c φ).scalarPotential c =
-      fun _ => φ := by simp [ofStaticScalarPotential]
+    (φ : Space d → ℝ) : (ofStaticScalarPotential c φ).scalarPotential c = fun _ => φ := by
+  simp [ofStaticScalarPotential]
 
 @[simp]
 lemma ofVectorPotential_scalarPotential {d} (c : SpeedOfLight)
@@ -105,8 +105,8 @@ lemma ofPotentials_scalarPotential {d} (c : SpeedOfLight) (φ : Time → Space d
 @[simp]
 lemma ofStaticPotentials_scalarPotential {d} (c : SpeedOfLight) (φ : Space d → ℝ)
     (A : Space d → EuclideanSpace ℝ (Fin d)) :
-    (ofStaticPotentials c φ A).scalarPotential c =
-      fun _ => φ := by simp [ofStaticPotentials_eq_ofPotentials]
+    (ofStaticPotentials c φ A).scalarPotential c = fun _ => φ := by
+  simp [ofStaticPotentials_eq_ofPotentials]
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma ofElectromagneticField_scalarPotential (c : SpeedOfLight)
@@ -144,7 +144,7 @@ lemma scalarPotential_contDiff {n} {d} (c : SpeedOfLight) (A : ElectromagneticPo
   apply timeSlice_contDiff
   apply ContDiff.mul
   · fun_prop
-  exact (SpaceTime.contDiff_vector A).mpr hA (Sum.inl 0)
+  exact h1 (Sum.inl 0)
 
 @[fun_prop]
 lemma scalarPotential_contDiff_space {n} {d} (c : SpeedOfLight)
@@ -178,7 +178,7 @@ lemma scalarPotential_differentiable {d} (c : SpeedOfLight) (A : Electromagnetic
   apply timeSlice_differentiable
   apply Differentiable.mul
   · fun_prop
-  exact (SpaceTime.differentiable_vector A).mpr hA (Sum.inl 0)
+  exact h1 (Sum.inl 0)
 
 lemma scalarPotential_differentiable_space {d} (c : SpeedOfLight) (A : ElectromagneticPotential d)
     (hA : Differentiable ℝ A) (t : Time) : Differentiable ℝ (A.scalarPotential c t) :=

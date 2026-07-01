@@ -428,9 +428,8 @@ lemma norm_cfc_le_sqrt_card_mul_bound {A : HermitianMat d ℂ} {f : ℝ → ℝ}
     ‖A.cfc f‖ ≤ Real.sqrt (Fintype.card d) * C := by
   rw [ ← Real.sqrt_sq ( norm_nonneg _ ) ];
   -- Recall that the Frobenius norm of a Hermitian matrix is the square root of the sum of the squares of its eigenvalues.
-  have h_frobenius_eigenvalues :
-      ∀ (M : HermitianMat d ℂ), ‖M‖ ^ 2 = ∑ i ∈ Finset.univ, (M.H.eigenvalues i) ^ 2 :=
-    fun M => norm_eq_sum_eigenvalues_sq M
+  have h_frobenius_eigenvalues : ∀ (M : HermitianMat d ℂ), ‖M‖ ^ 2 = ∑ i ∈ Finset.univ, (M.H.eigenvalues i) ^ 2 := by
+    exact fun M => norm_eq_sum_eigenvalues_sq M;
   -- Applying the bound on the eigenvalues to the Frobenius norm.
   have h_bound : ∑ i ∈ Finset.univ, ((A.cfc f).H.eigenvalues i) ^ 2 ≤ (Fintype.card d) * C ^ 2 := by
     have h_bound : ∀ i, ((A.cfc f).H.eigenvalues i) ^ 2 ≤ C ^ 2 := by
@@ -521,9 +520,8 @@ lemma continuousOn_cfc_of_compact {K : Set ℝ} {g : ℝ → ℝ} (hK : IsCompac
   obtain ⟨p_n, hp_n⟩ : ∃ p_n : ℕ → Polynomial ℝ, (∀ n, ∀ x ∈ K, |(p_n n).eval x - g x| ≤ 1 / (n + 1)) := by
     have h_stone_weierstrass : ∀ ε > 0, ∃ p : Polynomial ℝ, ∀ x ∈ K, |p.eval x - g x| < ε := by
       have := @exists_polynomial_near_of_continuousOn;
-      obtain ⟨a, b, hab⟩ : ∃ a b : ℝ, K ⊆ Set.Icc a b :=
-        ⟨hK.bddBelow.some, hK.bddAbove.some,
-          fun x hx => ⟨hK.bddBelow.choose_spec hx, hK.bddAbove.choose_spec hx⟩⟩
+      obtain ⟨a, b, hab⟩ : ∃ a b : ℝ, K ⊆ Set.Icc a b := by
+        exact ⟨ hK.bddBelow.some, hK.bddAbove.some, fun x hx => ⟨ hK.bddBelow.choose_spec hx, hK.bddAbove.choose_spec hx ⟩ ⟩;
       -- Extend $g$ to a continuous function on $[a, b]$.
       obtain ⟨f, hf⟩ : ∃ f : ℝ → ℝ, ContinuousOn f (Set.Icc a b) ∧ ∀ x ∈ K, f x = g x := by
         have := @ContinuousMap.exists_restrict_eq;
@@ -536,10 +534,8 @@ lemma continuousOn_cfc_of_compact {K : Set ℝ} {g : ℝ → ℝ} (hK : IsCompac
     -- By the properties of the functional calculus, we have `‖A.cfc p_n - A.cfc g‖ ≤ sqrt(d) * ‖p_n - g‖_{∞, K}`.
     have h_uniform_bound : ∀ n, ∀ A : HermitianMat d ℂ, spectrum ℝ A.mat ⊆ K → ‖A.cfc (fun x => (p_n n).eval x) - A.cfc g‖ ≤ Real.sqrt (Fintype.card d) * (1 / (n + 1)) := by
       intro n A hA
-      have h_uniform_bound :
-          ‖A.cfc (fun x => (p_n n).eval x) - A.cfc g‖ ≤
-            Real.sqrt (Fintype.card d) * ⨆ x ∈ spectrum ℝ A.mat, |(p_n n).eval x - g x| :=
-        norm_cfc_sub_cfc_le_sqrt_card
+      have h_uniform_bound : ‖A.cfc (fun x => (p_n n).eval x) - A.cfc g‖ ≤ Real.sqrt (Fintype.card d) * ⨆ x ∈ spectrum ℝ A.mat, |(p_n n).eval x - g x| := by
+        exact norm_cfc_sub_cfc_le_sqrt_card;
       refine' le_trans h_uniform_bound ( mul_le_mul_of_nonneg_left _ ( Real.sqrt_nonneg _ ) );
       refine' ciSup_le fun x => _;
       field_simp;
@@ -751,18 +747,16 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
     have := @ContinuousMap.exists_restrict_eq ℝ;
     specialize this ( show IsClosed ( spectrum ℝ A₀.val ) from h_finite.isClosed ) ( ContinuousMap.mk ( fun x => g x ) <| by exact continuousOn_iff_continuous_restrict.mp h_cont ) ; rcases this with ⟨ h, hh ⟩ ; exact ⟨ h, h.continuous, fun x hx => by simpa using congr_arg ( fun f => f ⟨ x, hx ⟩ ) hh ⟩ ;));
   obtain ⟨h, hh_cont, hh_eq⟩ := h_ext;
-  have h_cfc_cont :
-      ContinuousWithinAt (fun B => B.cfc h) {B : HermitianMat d ℂ | spectrum ℝ B.mat ⊆ T} A₀ :=
-    Continuous.continuousWithinAt (HermitianMat.cfc_continuous hh_cont)
+  have h_cfc_cont : ContinuousWithinAt (fun B => B.cfc h) {B : HermitianMat d ℂ | spectrum ℝ B.mat ⊆ T} A₀ := by
+    exact Continuous.continuousWithinAt (HermitianMat.cfc_continuous hh_cont)
   have h_diff_small : ∀ ε > 0, ∃ U ∈ nhds A₀, ∀ B ∈ U ∩ {B : HermitianMat d ℂ | spectrum ℝ B.mat ⊆ T}, ‖B.cfc g - B.cfc h‖ < ε := by
     intro ε ε_pos
     obtain ⟨δ, δ_pos, hδ⟩ : ∃ δ > 0, ∀ x ∈ T, ∀ y ∈ spectrum ℝ A₀.mat, |x - y| < δ → |g x - h x| < ε / (Real.sqrt (Fintype.card d) + 1) := by
       have h_diff_small : ∀ y ∈ spectrum ℝ A₀.mat, ∃ δ > 0, ∀ x ∈ T, |x - y| < δ → |g x - h x| < ε / (Real.sqrt (Fintype.card d) + 1) := by
         intro y hy
         have h_diff_small : Filter.Tendsto (fun x => |g x - h x|) (nhdsWithin y T) (nhds 0) := by
-          have h_diff_small :
-              Filter.Tendsto (fun x => g x - h x) (nhdsWithin y T) (nhds (g y - h y)) :=
-            Filter.Tendsto.sub (hg.continuousWithinAt (hA₀ hy)) hh_cont.continuousWithinAt
+          have h_diff_small : Filter.Tendsto (fun x => g x - h x) (nhdsWithin y T) (nhds (g y - h y)) := by
+            exact Filter.Tendsto.sub ( hg.continuousWithinAt ( hA₀ hy ) ) ( hh_cont.continuousWithinAt );
           simpa [ hh_eq y hy ] using h_diff_small.abs;
         have := Metric.tendsto_nhdsWithin_nhds.mp h_diff_small ( ε / ( Real.sqrt ( Fintype.card d ) + 1 ) ) ( div_pos ε_pos ( add_pos_of_nonneg_of_pos ( Real.sqrt_nonneg _ ) zero_lt_one ) ) ; aesop;
       choose! δ hδ_pos hδ using h_diff_small;
@@ -890,19 +884,14 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
           generalize_proofs at *; (
           exact h_eigenvalues.subset ht |> Exists.imp fun i hi => hi.symm)
         aesop
-      have hW_subset : ∀ᶠ B in nhds (A x₀), spectrum ℝ B.mat ⊆ W :=
-        spectrum_subset_of_isOpen (A x₀) W hW_open hW_spectrum
-      have hW_subset_S : ∀ᶠ y in nhdsWithin x₀ S, spectrum ℝ (A y).mat ⊆ W :=
-        Filter.mem_of_superset (hA₂.continuousWithinAt hx₀ |> fun h => h.eventually hW_subset)
-          fun _ hy => hy
+      have hW_subset : ∀ᶠ B in nhds (A x₀), spectrum ℝ B.mat ⊆ W := by
+        exact spectrum_subset_of_isOpen (A x₀) W hW_open hW_spectrum
+      have hW_subset_S : ∀ᶠ y in nhdsWithin x₀ S, spectrum ℝ (A y).mat ⊆ W := by
+        exact Filter.mem_of_superset ( hA₂.continuousWithinAt hx₀ |> fun h => h.eventually ( hW_subset ) ) fun y hy => hy
       obtain ⟨U', hU'⟩ : ∃ U' ∈ nhds x₀, ∀ y ∈ U' ∩ S, spectrum ℝ (A y).mat ⊆ W := by
         obtain ⟨ U', hU' ⟩ := mem_nhdsWithin_iff_exists_mem_nhds_inter.mp hW_subset_S; use U'; aesop;
-      obtain ⟨U'', hU''⟩ : ∃ U'' ∈ nhds x₀, ∀ i, U'' ⊆ U_i i :=
-        ⟨⋂ i, U_i i,
-          Filter.mem_of_superset
-            (Filter.iInter_mem.mpr fun i => IsOpen.mem_nhds (hU_i i) (h_cont.1 i))
-            fun x hx => by aesop,
-          fun i => Set.iInter_subset _ i⟩
+      obtain ⟨U'', hU''⟩ : ∃ U'' ∈ nhds x₀, ∀ i, U'' ⊆ U_i i := by
+        exact ⟨ ⋂ i, U_i i, Filter.mem_of_superset ( Filter.iInter_mem.mpr fun i => IsOpen.mem_nhds ( hU_i i ) ( h_cont.1 i ) ) fun x hx => by aesop, fun i => Set.iInter_subset _ i ⟩
       set U := U' ∩ U'' with hU_def
       have hU_mem : U ∈ nhds x₀ :=
         Filter.inter_mem hU'.1 hU''.1
@@ -910,11 +899,10 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
         fun y hy => hU'.2 y ⟨hy.1.1, hy.2⟩ |> Set.Subset.trans <| by simp [hW_def]
       have hU_cont : ∀ y ∈ U ∩ S, ∀ t ∈ spectrum ℝ (A y).mat, ‖f y t - f x₀ t‖ < ε := by
         intro y hy t ht
-        obtain ⟨i, hi⟩ : ∃ i, t ∈ V_i i :=
-          Set.mem_iUnion.mp (hU_subset y hy ht) |> Exists.imp fun i => by tauto
-        have h_cont_i : ‖f y t - f x₀ t‖ < ε :=
-          h_cont.2.2 i y ⟨hU''.2 i (by aesop), hy.2⟩ t ⟨hi, hA₁ y hy.2 ht⟩ |>
-            fun h => by simpa using h
+        obtain ⟨i, hi⟩ : ∃ i, t ∈ V_i i := by
+          exact Set.mem_iUnion.mp ( hU_subset y hy ht ) |> Exists.imp fun i => by tauto;
+        have h_cont_i : ‖f y t - f x₀ t‖ < ε := by
+          exact h_cont.2.2 i y ⟨ hU''.2 i ( by aesop ), hy.2 ⟩ t ⟨ hi, hA₁ y hy.2 ht ⟩ |> fun h => by simpa using h;
         exact h_cont_i
       exact h_contra ⟨U, hU_mem, hU_cont⟩
 
@@ -988,12 +976,8 @@ theorem continuous_cfc_joint {X d : Type*} [TopologicalSpace X] [Fintype d] [Dec
           · exact abs_le.mpr ⟨ by linarith [ hU₂ x hx t ht ], by linarith [ hU₂ x hx t ht ] ⟩;
           · linarith [ ε_pos ]))
         generalize_proofs at *; (
-        have h_final :
-            Filter.Tendsto (fun x => ‖(A x).cfc (f x) - (A x).cfc (f x₀)‖)
-              (nhdsWithin x₀ S) (nhds 0) :=
-          squeeze_zero_norm' (by filter_upwards [h_triangle] with x hx; simpa using hx)
-              (by simpa using h_sup.const_mul _) |>
-            fun h => h.trans (by simp)
+        have h_final : Filter.Tendsto (fun x => ‖(A x).cfc (f x) - (A x).cfc (f x₀)‖) (nhdsWithin x₀ S) (nhds 0) := by
+          exact squeeze_zero_norm' ( by filter_upwards [ h_triangle ] with x hx; simpa using hx ) ( by simpa using h_sup.const_mul _ ) |> fun h => h.trans ( by simp ) ;
         generalize_proofs at *; (
         convert h_cont.add ( show ContinuousWithinAt ( fun x => ( A x |> HermitianMat.cfc ) ( f x ) - ( A x |> HermitianMat.cfc ) ( f x₀ ) ) S x₀ from ?_ ) using 1 ; aesop
         generalize_proofs at *; (
@@ -1040,16 +1024,10 @@ lemma inv_cfc_eq_cfc_inv (hf : ∀ i, f (A.H.eigenvalues i) ≠ 0) :
   suffices (A.cfc f).mat⁻¹ = (A.cfc (fun u ↦ 1 / f u)).mat by
     ext1
     simpa using this
-  have h_def : (A.cfc f).mat =
-      ∑ i, f (A.H.eigenvalues i) •
-        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
-          A.H.eigenvectorUnitary.val.conjTranspose) :=
-    cfc_toMat_eq_sum_smul_proj A f
-  have h_subst : (A.cfc (fun u ↦ 1 / f u)).mat =
-      ∑ i, (1 / f (A.H.eigenvalues i)) •
-        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
-          A.H.eigenvectorUnitary.val.conjTranspose) :=
-    cfc_toMat_eq_sum_smul_proj A fun u ↦ 1 / f u
+  have h_def : (A.cfc f).mat = ∑ i, f (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) := by
+    exact cfc_toMat_eq_sum_smul_proj A f;
+  have h_subst : (A.cfc (fun u ↦ 1 / f u)).mat = ∑ i, (1 / f (A.H.eigenvalues i)) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) := by
+    exact cfc_toMat_eq_sum_smul_proj A fun u ↦ 1 / f u;
   have h_inv : (A.cfc f).mat * (A.cfc (fun u ↦ 1 / f u)).mat = 1 := by
     -- Since the eigenvectorUnitary is unitary, we have that the product of the projections is the identity matrix.
     have h_unitary : A.H.eigenvectorUnitary.val * A.H.eigenvectorUnitary.val.conjTranspose = 1 := by
@@ -1118,10 +1096,8 @@ lemma intervalIntegrable_toMat_iff (A : ℝ → HermitianMat d 𝕜) (T₁ T₂ 
           have h_toMat_linear : Function.Injective L := by
             intro x y hxy;
             simp_all only [HermitianMat.ext_iff]
-          have h_toMat_linear :
-              ∃ (L_inv : Matrix d d 𝕜 →ₗ[ℝ] HermitianMat d 𝕜),
-                L_inv.comp L = LinearMap.id :=
-            IsSemisimpleModule.extension_property L h_toMat_linear LinearMap.id
+          have h_toMat_linear : ∃ (L_inv : Matrix d d 𝕜 →ₗ[ℝ] HermitianMat d 𝕜), L_inv.comp L = LinearMap.id := by
+            exact IsSemisimpleModule.extension_property L h_toMat_linear LinearMap.id;
           exact ⟨ h_toMat_linear.choose, fun x ↦ by simpa using LinearMap.congr_fun h_toMat_linear.choose_spec x ⟩;
         obtain ⟨ L_inv, hL_inv ⟩ := h_toMat_linear;
         have h_toMat_linear : IntegrableOn (fun t ↦ L_inv (L (A t))) (Set.uIoc T₁ T₂) μ :=
@@ -1141,11 +1117,8 @@ The CFC of an integrable function family is integrable.
 lemma integrable_cfc (T₁ T₂ : ℝ) (f : ℝ → ℝ → ℝ) {μ : Measure ℝ}
     (hf : ∀ i, IntervalIntegrable (fun t ↦ f t (A.H.eigenvalues i)) μ T₁ T₂) :
     IntervalIntegrable (fun t ↦ A.cfc (f t)) μ T₁ T₂ := by
-  have h_expand : ∀ t, (A.cfc (f t)).mat =
-      ∑ i, f t (A.H.eigenvalues i) •
-        (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
-          A.H.eigenvectorUnitary.val.conjTranspose) :=
-    fun t ↦ cfc_toMat_eq_sum_smul_proj A (f t)
+  have h_expand : ∀ t, (A.cfc (f t)).mat = ∑ i, f t (A.H.eigenvalues i) • (A.H.eigenvectorUnitary.val * (Matrix.single i i 1) * A.H.eigenvectorUnitary.val.conjTranspose) := by
+    exact fun t ↦ cfc_toMat_eq_sum_smul_proj A (f t);
   rw [ ← intervalIntegrable_toMat_iff ];
   rw [ funext h_expand ];
   apply intervalIntegrable_sum_smul_const
@@ -1292,9 +1265,8 @@ theorem inv_ge_one_of_le_one (hA : A.mat.PosDef) (h : A ≤ 1) : 1 ≤ A⁻¹ :=
     exact (cfc_nonneg_iff A fun x => x⁻¹ - 1).mpr h_cfc_nonneg;
   -- Since $A.cfc (fun x => x⁻¹ - 1) \geq 0$, we have $A.cfc (fun x => x⁻¹) \geq 1$.
   have h_cfc_ge_one : A.cfc (fun x => x⁻¹) ≥ 1 := by
-    have h_cfc_sub : A.cfc (fun x => x⁻¹ - 1) =
-        A.cfc (fun x => x⁻¹) - A.cfc (fun _ => 1) :=
-      cfc_sub_apply A Inv.inv fun x => 1
+    have h_cfc_sub : A.cfc (fun x => x⁻¹ - 1) = A.cfc (fun x => x⁻¹) - A.cfc (fun _ => 1) := by
+      exact cfc_sub_apply A Inv.inv fun x => 1;
     aesop;
   convert h_cfc_ge_one.le using 1;
   convert cfc_inv.symm;

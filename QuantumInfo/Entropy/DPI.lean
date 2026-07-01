@@ -267,9 +267,8 @@ Proof: f_α(H_hat, ρ, σ) = α · Tr[(σ^γ ρ σ^γ)^α] - (α-1) · Tr[(σ^γ
 -/
 theorem f_alpha_at_optimizer (hα : 1 < α) (ρ σ : MState d) :
     f_alpha α (H_hat α ρ σ) ρ σ = Q̃_ α(ρ‖σ) := by
-  have h_inner : ⟪ρ.M, H_hat α ρ σ⟫_ℝ =
-      ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace :=
-    inner_rho_H_hat hα ρ σ
+  have h_inner : ⟪ρ.M, H_hat α ρ σ⟫_ℝ = ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace := by
+    exact inner_rho_H_hat hα ρ σ
   have h_conj : (H_hat α ρ σ).conj (σ.M ^ ((α - 1) / (2 * α))).mat =
       (ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ (α - 1) := by
     convert H_hat_conj_sigma (hα := hα) (ρ := ρ) (σ := σ) using 1

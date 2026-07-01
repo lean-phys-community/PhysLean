@@ -64,9 +64,8 @@ theorem diagonal_pow (f : d → ℝ) :
   rfl
 
 @[fun_prop]
-theorem rpow_const_continuous {r : ℝ} (hr : 0 ≤ r) :
-    Continuous (fun A : HermitianMat d ℂ ↦ A ^ r) :=
-  HermitianMat.cfc_continuous (Real.continuous_rpow_const hr)
+theorem rpow_const_continuous {r : ℝ} (hr : 0 ≤ r) : Continuous (fun A : HermitianMat d ℂ ↦ A ^ r) := by
+  exact HermitianMat.cfc_continuous (Real.continuous_rpow_const hr)
 
 @[fun_prop]
 theorem const_rpow_continuous [NonSingular A] : Continuous (fun r : ℝ ↦ A ^ r) := by
@@ -216,13 +215,12 @@ lemma rpow_neg_mul_rpow_self (hA : A.mat.PosDef) (p : ℝ) :
   have h_pos_def : (A ^ p).mat.PosDef := by
     have h_pos_def : ∀ p : ℝ, A.mat.PosDef → (A ^ p).mat.PosDef := by
       intro p hA_pos_def
-      have h_eigenvalues_pos : ∀ i, 0 < (A.H.eigenvalues i) ^ p :=
-        fun i => Real.rpow_pos_of_pos (Matrix.PosDef.eigenvalues_pos hA i) _
-      have h_eigenvalues_pos : (A ^ p).mat.PosDef ↔ ∀ i, 0 < (A ^ p).H.eigenvalues i :=
-        Matrix.IsHermitian.posDef_iff_eigenvalues_pos (H (A ^ p))
-      have h_eigenvalues_pos :
-          ∃ e : d ≃ d, (A ^ p).H.eigenvalues = fun i => (A.H.eigenvalues (e i)) ^ p :=
-        Matrix.IsHermitian.cfc_eigenvalues (H A) fun x => x.rpow p
+      have h_eigenvalues_pos : ∀ i, 0 < (A.H.eigenvalues i) ^ p := by
+        exact fun i => Real.rpow_pos_of_pos ( by exact Matrix.PosDef.eigenvalues_pos hA i ) _;
+      have h_eigenvalues_pos : (A ^ p).mat.PosDef ↔ ∀ i, 0 < (A ^ p).H.eigenvalues i := by
+        exact Matrix.IsHermitian.posDef_iff_eigenvalues_pos (H (A ^ p));
+      have h_eigenvalues_pos : ∃ e : d ≃ d, (A ^ p).H.eigenvalues = fun i => (A.H.eigenvalues (e i)) ^ p := by
+        exact Matrix.IsHermitian.cfc_eigenvalues (H A) fun x => x.rpow p;
       aesop;
     exact h_pos_def p hA;
   convert! Matrix.nonsing_inv_mul _ _;

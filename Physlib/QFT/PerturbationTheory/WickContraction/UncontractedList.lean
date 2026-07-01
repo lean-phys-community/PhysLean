@@ -192,11 +192,11 @@ lemma uncontractedList_mem_iff (i : Fin n) :
     i ∈ c.uncontractedList ↔ i ∈ c.uncontracted := by simp [uncontractedList]
 
 @[simp]
-lemma uncontractedList_empty :
-    (empty (n := n)).uncontractedList = List.finRange n := by simp [uncontractedList]
+lemma uncontractedList_empty : (empty (n := n)).uncontractedList = List.finRange n := by
+  simp [uncontractedList]
 
-lemma nil_zero_uncontractedList :
-    (empty (n := 0)).uncontractedList = [] := by simp [empty, uncontractedList]
+lemma nil_zero_uncontractedList : (empty (n := 0)).uncontractedList = [] := by
+  simp [empty, uncontractedList]
 
 lemma congr_uncontractedList {n m : ℕ} (h : n = m) (c : WickContraction n) :
     ((congr h) c).uncontractedList = List.map (finCongr h) c.uncontractedList := by

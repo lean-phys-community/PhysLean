@@ -112,8 +112,8 @@ def UnitDependent.scaleUnitEquiv {M : Type} [UnitDependent M]
     (u1 u2 : UnitChoices) : M ≃ M where
   toFun m := scaleUnit u1 u2 m
   invFun m := scaleUnit u2 u1 m
-  right_inv m := UnitDependent.scaleUnit_symm_apply u2 u1 m
-  left_inv m := UnitDependent.scaleUnit_symm_apply u1 u2 m
+  right_inv m := by simp
+  left_inv m := by simp
 
 /-- For an `M` with an instance of `LinearUnitDependent M`, `scaleUnit u1 u2` as a
   linear map. -/
@@ -122,8 +122,8 @@ def LinearUnitDependent.scaleUnitLinear
     (u1 u2 : UnitChoices) :
     M →ₗ[ℝ] M where
   toFun m := scaleUnit u1 u2 m
-  map_add' m1 m2 := LinearUnitDependent.scaleUnit_add u1 u2 m1 m2
-  map_smul' r m2 := LinearUnitDependent.scaleUnit_smul u1 u2 r m2
+  map_add' m1 m2 := by simp [LinearUnitDependent.scaleUnit_add]
+  map_smul' r m2 := by simp [LinearUnitDependent.scaleUnit_smul]
 
 /-- For an `M` with an instance of `LinearUnitDependent M`, `scaleUnit u1 u2` as a
   linear equivalence. -/
@@ -445,7 +445,7 @@ def IsDimensionallyCorrect {M : Type} [UnitDependent M] (m : M) : Prop :=
 
 lemma isDimensionallyCorrect_iff {M : Type} [UnitDependent M] (m : M) :
     IsDimensionallyCorrect m ↔ ∀ u1 u2 : UnitChoices,
-      scaleUnit u1 u2 m = m := Iff.rfl
+      scaleUnit u1 u2 m = m := by rfl
 
 @[simp]
 lemma isDimensionallyCorrect_fun_iff {M1 M2 : Type} [UnitDependent M1] [UnitDependent M2]
@@ -527,4 +527,4 @@ lemma scaleUnit_dimSet_val {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M]
   rfl
 
 lemma DimSet.mem_iff {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) (m : M) :
-    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m := Iff.rfl
+    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m := by rfl

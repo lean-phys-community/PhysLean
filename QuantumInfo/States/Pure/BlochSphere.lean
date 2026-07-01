@@ -5,7 +5,6 @@ Authors: Anand Nambakam
 -/
 module
 
-public import QuantumInfo.States.Pure.BargmannInvariant
 public import Mathlib.LinearAlgebra.CrossProduct
 public import Mathlib.Analysis.InnerProductSpace.PiL2
 

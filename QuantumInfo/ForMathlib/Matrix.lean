@@ -125,8 +125,8 @@ variable (hA : A.IsHermitian) (hB : B.IsHermitian)
 
 include hA hB in
 omit [DecidableEq n] in
-theorem kroneckerMap_IsHermitian : (A ⊗ₖ B).IsHermitian :=
-  (kroneckerMap_conjTranspose A B).trans (congrArg₂ (· ⊗ₖ ·) hA hB)
+theorem kroneckerMap_IsHermitian : (A ⊗ₖ B).IsHermitian := by
+  exact (hA ▸ hB ▸ kroneckerMap_conjTranspose A B : _ = _)
 
 end Kronecker
 

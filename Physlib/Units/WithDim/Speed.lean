@@ -66,8 +66,7 @@ lemma oneMeterPerSecond_in_SI : oneMeterPerSecond SI = ⟨1⟩ := by
 @[simp]
 lemma oneMilePerHour_in_SI : oneMilePerHour SI = ⟨0.44704⟩ := by
   ext
-  norm_num [oneMilePerHour, dimScale, LengthUnit.miles, TimeUnit.hours,
-    toDimensionful_apply_apply, NNReal.coe_ofScientific]
+  simp [NNReal.coe_ofScientific]
   rw [toReal]
   norm_num
 
@@ -101,18 +100,18 @@ lemma oneKnot_eq_mul_oneKilometerPerHour :
     oneKnot = (1.852 : ℝ≥0) • oneKilometerPerHour := by
   apply (toDimensionful SI).symm.injective
   ext
-  norm_num [toDimensionful]
+  norm_num
 
 lemma oneKilometerPerHour_eq_mul_oneKnot:
     oneKilometerPerHour = (250/463 : ℝ≥0) • oneKnot := by
   apply (toDimensionful SI).symm.injective
   ext
-  norm_num [toDimensionful]
+  norm_num
 
 lemma oneMeterPerSecond_eq_mul_oneMilePerHour :
     oneMeterPerSecond = (3125/1397 : ℝ≥0) • oneMilePerHour := by
   apply (toDimensionful SI).symm.injective
   ext
-  norm_num [toDimensionful]
+  norm_num
 
 end DimSpeed

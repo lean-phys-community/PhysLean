@@ -43,10 +43,10 @@ instance canLift : CanLift ℝ Prob Subtype.val fun r => 0 ≤ r ∧ r ≤ 1 :=
   Subtype.canLift _
 
 instance instZero : Zero Prob :=
-  ⟨0, ⟨le_rfl, zero_le_one⟩⟩
+  ⟨0, by simp⟩
 
 instance instOne : One Prob :=
-  ⟨1, ⟨zero_le_one, le_rfl⟩⟩
+  ⟨1, by simp⟩
 
 instance instMul : Mul Prob :=
   ⟨fun x y ↦ ⟨x.1 * y.1,

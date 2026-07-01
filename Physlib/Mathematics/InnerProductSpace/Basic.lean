@@ -546,9 +546,8 @@ instance {ι : Type*} [Fintype ι] : InnerProductSpace' 𝕜 (ι → E) where
           ring
         apply Finset.sum_le_card_nsmul
         intro j _
-        exact mul_le_mul_of_nonneg (by simp)
-          ((sq_le_sq₀ (norm_nonneg (x j)) (norm_nonneg (x i))).mpr (hj j))
-          (by positivity) (by positivity)
+        refine mul_le_mul_of_nonneg (by simp) ?_ (by positivity) (by positivity)
+        exact (sq_le_sq₀ (norm_nonneg (x j)) (norm_nonneg (x i))).mpr (hj j)
     · rw [not_nonempty_iff] at hnEmpty
       refine ⟨1, 1, zero_lt_one, zero_lt_one, fun x => ?_⟩
       rw [Subsingleton.elim x 0]

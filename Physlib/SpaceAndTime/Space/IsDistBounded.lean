@@ -1116,8 +1116,8 @@ lemma norm_smul_zpow {d} (p : ℤ) (c : Space d) (hn : - (d - 1 : ℕ) ≤ p) :
       ring
     suffices h0 : IsDistBounded (fun x => ‖x‖ * (‖x‖ ^ (p + 1))⁻¹) by
       apply h0.add
-      · exact IsDistBounded.const_mul_fun
-          (IsDistBounded.pow (d := d) (n := -(p + 1)) (by grind)) ‖c‖
+      · apply IsDistBounded.const_mul_fun
+        exact IsDistBounded.pow (d := d) (n := -(p + 1)) (by grind)
     by_cases hp : p = 0
     · subst hp
       simp only [zero_add, pow_one]

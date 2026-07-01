@@ -85,8 +85,8 @@ lemma ofCrAnListF_cons (φ : 𝓕.CrAnFieldOp) (φs : List 𝓕.CrAnFieldOp) :
     ofCrAnListF (φ :: φs) = ofCrAnOpF φ * ofCrAnListF φs := rfl
 
 lemma ofCrAnListF_append (φs φs' : List 𝓕.CrAnFieldOp) :
-    ofCrAnListF (φs ++ φs') =
-      ofCrAnListF φs * ofCrAnListF φs' := by simp [ofCrAnListF, List.map_append]
+    ofCrAnListF (φs ++ φs') = ofCrAnListF φs * ofCrAnListF φs' := by
+  simp [ofCrAnListF, List.map_append]
 
 lemma ofCrAnListF_singleton (φ : 𝓕.CrAnFieldOp) :
     ofCrAnListF [φ] = ofCrAnOpF φ := by simp [ofCrAnListF]

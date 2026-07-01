@@ -474,7 +474,7 @@ lemma timeOrder_ofFieldOpList_nil : 𝓣(ofFieldOpList (𝓕 := 𝓕) []) = 1 :=
 @[simp]
 lemma timeOrder_ofFieldOpList_singleton (φ : 𝓕.FieldOp) :
     𝓣(ofFieldOpList [φ]) = ofFieldOpList [φ] := by
-  simp [ofFieldOpList, timeOrder_eq_ι_timeOrderF, timeOrderF_ofFieldOpListF_singleton]
+  rw [ofFieldOpList, timeOrder_eq_ι_timeOrderF, timeOrderF_ofFieldOpListF_singleton]
 
 /-- For a field specification `𝓕`, the time order operator acting on a
   list of `𝓕.FieldOp`, `𝓣(φ₀…φₙ)`, is equal to
@@ -487,8 +487,8 @@ lemma timeOrder_eq_maxTimeField_mul_finset (φ : 𝓕.FieldOp) (φs : List 𝓕.
       (Finset.univ.filter (fun x =>
         (maxTimeFieldPosFin φ φs).succAbove x < maxTimeFieldPosFin φ φs))⟩) •
       ofFieldOp (maxTimeField φ φs) * 𝓣(ofFieldOpList (eraseMaxTimeField φ φs)) := by
-  simpa [ofFieldOpList, ofFieldOp, timeOrder_eq_ι_timeOrderF] using
-    congrArg ι (timeOrderF_eq_maxTimeField_mul_finset φ φs)
+  rw [ofFieldOpList, timeOrder_eq_ι_timeOrderF, timeOrderF_eq_maxTimeField_mul_finset]
+  rfl
 
 lemma timeOrder_superCommute_eq_time_mid {φ ψ : 𝓕.CrAnFieldOp}
     (hφψ : crAnTimeOrderRel φ ψ) (hψφ : crAnTimeOrderRel ψ φ) (a b : 𝓕.WickAlgebra) :

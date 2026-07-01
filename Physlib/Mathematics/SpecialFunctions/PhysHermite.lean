@@ -35,8 +35,8 @@ noncomputable def physHermite : ℕ → Polynomial ℤ
   | n + 1 => 2 • X * physHermite n - derivative (physHermite n)
 
 lemma physHermite_succ (n : ℕ) :
-    physHermite (n + 1) =
-      2 • X * physHermite n - derivative (physHermite n) := by simp [physHermite]
+    physHermite (n + 1) = 2 • X * physHermite n - derivative (physHermite n) := by
+  simp [physHermite]
 
 lemma physHermite_eq_iterate (n : ℕ) :
     physHermite n = (fun p => 2 * X * p - derivative p)^[n] 1 := by
@@ -73,8 +73,8 @@ lemma physHermite_succ' (n : ℕ) :
   rw [physHermite_succ, derivative_physHermite]
 
 lemma coeff_physHhermite_succ_zero (n : ℕ) :
-    coeff (physHermite (n + 1)) 0 =
-      - coeff (physHermite n) 1 := by simp [physHermite_succ, coeff_derivative]
+    coeff (physHermite (n + 1)) 0 = - coeff (physHermite n) 1 := by
+  simp [physHermite_succ, coeff_derivative]
 
 lemma coeff_physHermite_succ_succ (n k : ℕ) : coeff (physHermite (n + 1)) (k + 1) =
     2 * coeff (physHermite n) k - (k + 2) * coeff (physHermite n) (k + 2) := by
@@ -135,8 +135,8 @@ lemma iterate_derivative_physHermite_self {n : ℕ} :
     rfl
 
 @[simp]
-lemma physHermite_leadingCoeff {n : ℕ} :
-    (physHermite n).leadingCoeff = 2 ^ n := by simp [leadingCoeff]
+lemma physHermite_leadingCoeff {n : ℕ} : (physHermite n).leadingCoeff = 2 ^ n := by
+  simp [leadingCoeff]
 
 @[simp]
 lemma physHermite_ne_zero {n : ℕ} : physHermite n ≠ 0 := by
@@ -151,8 +151,8 @@ lemma physHermite_eq_aeval (n : ℕ) (x : ℝ) :
 
 lemma physHermite_zero_apply (x : ℝ) : physHermite 0 x = 1 := by simp
 
-lemma physHermite_pow (n m : ℕ) (x : ℝ) :
-    physHermite n x ^ m = aeval x (physHermite n ^ m) := by simp
+lemma physHermite_pow (n m : ℕ) (x : ℝ) : physHermite n x ^ m = aeval x (physHermite n ^ m) := by
+  simp
 
 lemma physHermite_succ_fun (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) = 2 • (fun x => x) *

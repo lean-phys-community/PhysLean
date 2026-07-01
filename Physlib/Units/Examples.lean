@@ -34,8 +34,7 @@ noncomputable def meters400 : Dimensionful (WithDim L𝓭 ℝ) := toDimensionful
   400 meters is very almost a quarter of a mile. -/
 example : meters400 {SI with length := LengthUnit.miles} = ⟨1/4 - 73/50292⟩ := by
   ext
-  norm_num [meters400, toDimensionful_apply_apply, dimScale, LengthUnit.miles, NNReal.smul_def]
-  rw [NNReal.toReal]
+  show (1609.344 : ℝ)⁻¹ * 400 = _
   norm_num
 
 /-!
@@ -90,8 +89,8 @@ def EnergyMassWithDim (m : WithDim M𝓭 ℝ) (E : WithDim (M𝓭 * L𝓭 * L�
 
 lemma energyMassWithDim_isDimensionallyCorrect : IsDimensionallyCorrect EnergyMassWithDim := by
   simp [funext_iff, EnergyMassWithDim]
-  intro _ _ _ _ _
-  exact WithDim.scaleUnit_val_eq_scaleUnit_val_of_dim_eq
+  intros
+  rw [WithDim.scaleUnit_val_eq_scaleUnit_val_of_dim_eq]
 
 /-- An example of dimensions corresponding to `F = m a` using `WithDim` with `.val`. -/
 def NewtonsSecondWithDim (m : WithDim M𝓭 ℝ) (F : WithDim (M𝓭 * L𝓭 * T𝓭⁻¹ * T𝓭⁻¹) ℝ)
@@ -101,8 +100,8 @@ def NewtonsSecondWithDim (m : WithDim M𝓭 ℝ) (F : WithDim (M𝓭 * L𝓭 * T
 lemma newtonsSecondWithDim_isDimensionallyCorrect :
     IsDimensionallyCorrect NewtonsSecondWithDim := by
   simp [funext_iff, NewtonsSecondWithDim]
-  intro _ _ _ _ _
-  exact WithDim.scaleUnit_val_eq_scaleUnit_val_of_dim_eq
+  intros
+  rw [WithDim.scaleUnit_val_eq_scaleUnit_val_of_dim_eq]
 
 /-- An example of dimensions corresponding to `E = m c` using `WithDim` with `.val`,
   which is not dimensionally correct. -/
@@ -164,7 +163,7 @@ We now explore the consequences of `energyMass_isDimensionallyCorrect` and how w
 -/
 
 lemma example1_energyMass : EnergyMass ⟨2⟩ ⟨2 * 299792458 ^ 2⟩ SI := by
-  norm_num [EnergyMass, speedOfLight, toDimensionful_apply_apply, dimScale, SI]
+  simp [EnergyMass, speedOfLight, toDimensionful_apply_apply, dimScale, SI]
 
 /- The lemma `energyMass_isDimensionallyCorrect` allows us to scale the units
   of `example1_energyMass`, that is - we proved it in one set of units, but we get the result

@@ -81,8 +81,8 @@ lemma superCommuteRight_eq_of_equiv (a1 a2 : 𝓕.FieldOpFreeAlgebra) (h : a1 �
   obtain ⟨b, rfl⟩ := ι_surjective b
   have ha1b1 : (superCommuteRight (a1 - a2)) (ι b) = 0 := by
     rw [superCommuteRight_apply_ι]
-    exact ι_superCommuteF_eq_zero_of_ι_left_zero (a1 - a2) b
-      ((ι_eq_zero_iff_mem_ideal (a1 - a2)).mpr h)
+    apply ι_superCommuteF_eq_zero_of_ι_left_zero
+    exact (ι_eq_zero_iff_mem_ideal (a1 - a2)).mpr h
   simp_all only [superCommuteRight_apply_ι, map_sub, LinearMap.sub_apply]
   trans ι ((superCommuteF a2) b) + 0
   rw [← ha1b1]

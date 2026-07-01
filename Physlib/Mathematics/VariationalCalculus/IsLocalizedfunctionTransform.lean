@@ -205,10 +205,9 @@ lemma gradient : IsLocalizedFunctionTransform fun (ψ : Space d → ℝ) x => gr
     exact Filter.EventuallyEq.fderiv_eq h
 
 lemma clm_apply [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup U] [NormedSpace ℝ U]
-    (f : X → (U →L[ℝ] V)) : IsLocalizedFunctionTransform fun φ x => (f x) (φ x) :=
-  fun K cK => ⟨K, cK, by
-    intro _ _ hφ _ _
-    simp_all⟩
+    (f : X → (U →L[ℝ] V)) : IsLocalizedFunctionTransform fun φ x => (f x) (φ x) := by
+  intro K cK
+  exact ⟨K, cK, by intro _ _ hφ _ _; simp_all⟩
 
 lemma deriv [NormedAddCommGroup U] [NormedSpace ℝ U] :
     IsLocalizedFunctionTransform (fun φ : ℝ → U => deriv φ) := by

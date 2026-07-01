@@ -584,9 +584,9 @@ lemma sum {ι : Type} [Fintype ι]
       fun_prop
     · intro i ι' hp F F' u hu ih
       simp only [Fintype.sum_option]
-      exact HasVarAdjDerivAt.add _ _ _ _ _ (ih none)
-        (hp (fun i_1 => F (some i_1)) (fun i_1 => F' (some i_1)) u hu fun i_1 =>
-          ih (some i_1))
+      apply HasVarAdjDerivAt.add
+      exact ih none
+      exact hp (fun i_1 => F (some i_1)) (fun i_1 => F' (some i_1)) u hu fun i_1 => ih (some i_1)
   exact hp F F' u hu hF
 
 lemma mul

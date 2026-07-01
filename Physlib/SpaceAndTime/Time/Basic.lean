@@ -255,15 +255,15 @@ instance : AddGroup Time where
   zsmul := zsmulRec
 
 instance : AddCommGroup Time where
-  add_comm t1 t2 := Time.ext (by simp [add_comm])
+  add_comm := by intros; ext; simp [add_comm]
 
 instance : Module ℝ Time where
-  one_smul t := Time.ext (by simp)
-  smul_add k t1 t2 := Time.ext (by simp [mul_add])
-  smul_zero k := Time.ext (by simp)
-  add_smul k1 k2 t := Time.ext (by simp [add_mul])
-  mul_smul k1 k2 t := Time.ext (by simp [mul_assoc])
-  zero_smul t := Time.ext (by simp)
+  one_smul t := by ext; simp
+  smul_add k t1 t2 := by ext; simp [mul_add]
+  smul_zero k := by ext; simp [mul_zero]
+  add_smul k1 k2 t := by ext; simp [add_mul]
+  mul_smul k1 k2 t := by ext; simp [mul_assoc]
+  zero_smul t := by ext; simp
 
 /-!
 

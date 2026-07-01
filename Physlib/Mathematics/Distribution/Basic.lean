@@ -368,11 +368,9 @@ lemma fderivD_const [hμ : Measure.IsAddHaarMeasure (volume (α := E))]
   · simp
   rw [integral_smul_fderiv_eq_neg_fderiv_smul_of_integrable]
   simp only [evalCLM_apply_apply, fderivCLM_apply, neg_neg]
-  · exact (show
-      Integrable
-        (SchwartzMap.evalCLM (𝕜 := ℝ) E ℝ v
-          (SchwartzMap.fderivCLM ℝ E ℝ η)) volume from
-        integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))).smul_const _
+  · apply MeasureTheory.Integrable.smul_const
+    change Integrable (SchwartzMap.evalCLM (𝕜 := ℝ) E ℝ v (SchwartzMap.fderivCLM ℝ E ℝ η)) volume
+    exact integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))
   · simp
   · exact (integrable η).smul_const _
   · fun_prop

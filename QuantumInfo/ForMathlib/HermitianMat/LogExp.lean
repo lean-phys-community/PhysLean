@@ -151,12 +151,8 @@ theorem inv_antitone (hA : A.mat.PosDef) (h : A ≤ B) : B⁻¹ ≤ A⁻¹ := by
   have hB_inv : B.mat⁻¹ = A.mat⁻¹ - A.mat⁻¹ * C.conjTranspose * (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ * C * A.mat⁻¹ := by
     have hB_inv : (A.mat + C.conjTranspose * C)⁻¹ = A.mat⁻¹ - A.mat⁻¹ * C.conjTranspose * (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ * C * A.mat⁻¹ := by
       have hB_inv : (A.mat + C.conjTranspose * C) * (A.mat⁻¹ - A.mat⁻¹ * C.conjTranspose * (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ * C * A.mat⁻¹) = 1 := by
-        have h_inv :
-            (1 + C * A.mat⁻¹ * C.conjTranspose) *
-              (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ = 1 :=
-          Matrix.mul_nonsing_inv _
-            (show IsUnit _ from by
-              simpa [Matrix.isUnit_iff_isUnit_det] using h_inv_posDef.det_pos.ne')
+        have h_inv : (1 + C * A.mat⁻¹ * C.conjTranspose) * (1 + C * A.mat⁻¹ * C.conjTranspose)⁻¹ = 1 := by
+          exact Matrix.mul_nonsing_inv _ ( show IsUnit _ from by simpa [ Matrix.isUnit_iff_isUnit_det ] using h_inv_posDef.det_pos.ne' );
         simp only [mul_assoc, Matrix.mul_sub] at *
         simp only [← Matrix.mul_assoc, add_mul, one_mul] at *
         simp only [isUnit_iff_ne_zero, ne_eq, hA.det_pos.ne', not_false_eq_true,
@@ -297,10 +293,8 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
         simp [ Matrix.one_apply, Finset.mul_sum, mul_left_comm ];
         simp [ mul_left_comm, Algebra.smul_def ];
     · exact add_le_add_left hxy _;
-  have h_integral_limit :
-      ∀ t ∈ Set.Ioc 0 T,
-        (1 + t)⁻¹ • 1 - (x + t • 1)⁻¹ ≤ (1 + t)⁻¹ • 1 - (y + t • 1)⁻¹ :=
-    fun t ht => sub_le_sub_left (h_integral_limit t <| Set.Ioc_subset_Icc_self ht) _
+  have h_integral_limit : ∀ t ∈ Set.Ioc 0 T, (1 + t)⁻¹ • 1 - (x + t • 1)⁻¹ ≤ (1 + t)⁻¹ • 1 - (y + t • 1)⁻¹ := by
+    exact fun t ht => sub_le_sub_left ( h_integral_limit t <| Set.Ioc_subset_Icc_self ht ) _;
   filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_Ioc] with t ht
   exact h_integral_limit t ht
 
@@ -371,8 +365,8 @@ theorem logApprox_eq_log_add_error
     convert! logApprox_eq_cfc_scalar x hx T hT using 1;
     apply cfc_congr_of_posDef hx;
     exact fun u hu => Eq.symm ( scalarLogApprox_eq u T hu.out hT );
-  have h_cfc_add : x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) = x.cfc Real.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) :=
-    cfc_add x Real.log (fun u => Real.log ((1 + T) / (u + T)))
+  have h_cfc_add : x.cfc (fun u => Real.log u + Real.log ((1 + T) / (u + T))) = x.cfc Real.log + x.cfc (fun u => Real.log ((1 + T) / (u + T))) := by
+    apply cfc_add;
   exact h_logApprox.trans h_cfc_add
 
 open ComplexOrder Filter Topology in
@@ -384,12 +378,8 @@ The error term in the log approximation tends to 0 as T goes to infinity.
 lemma tendsto_cfc_log_div_add_atTop (x : HermitianMat d 𝕜) :
     Tendsto (fun T => x.cfc (fun u => Real.log ((1 + T) / (u + T)))) atTop (nhds 0) := by
   -- Expand `(cfc x ...).mat` using `cfc_toMat_eq_sum_smul_proj`.
-  have h_expand :
-      ∀ T : ℝ, (x.cfc (fun u => Real.log ((1 + T) / (u + T)))).mat =
-        ∑ i, Real.log ((1 + T) / (x.H.eigenvalues i + T)) •
-          (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) *
-            x.H.eigenvectorUnitary.val.conjTranspose) :=
-    fun T => cfc_toMat_eq_sum_smul_proj x fun u => Real.log ((1 + T) / (u + T))
+  have h_expand : ∀ T : ℝ, (x.cfc (fun u => Real.log ((1 + T) / (u + T)))).mat = ∑ i, Real.log ((1 + T) / (x.H.eigenvalues i + T)) • (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) * x.H.eigenvectorUnitary.val.conjTranspose) := by
+    exact fun T => cfc_toMat_eq_sum_smul_proj x fun u => Real.log ((1 + T) / (u + T));
   -- The limit of a sum is the sum of the limits.
   have h_sum : Filter.Tendsto (fun T : ℝ => ∑ i, Real.log ((1 + T) / (x.H.eigenvalues i + T)) • (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) * x.H.eigenvectorUnitary.val.conjTranspose)) Filter.atTop (nhds (∑ i, 0 • (x.H.eigenvectorUnitary.val * (Matrix.single i i 1) * x.H.eigenvectorUnitary.val.conjTranspose))) := by
     refine' tendsto_finsetSum _ fun i _ => _;
@@ -599,10 +589,8 @@ theorem logApprox_concave {n 𝕜 : Type*} [Fintype n] [DecidableEq n] [RCLike �
     rw [ intervalIntegrable_iff_integrableOn_Ioc_of_le hT ] at *
     refine MeasureTheory.Integrable.sub ?_ h_integrable
     exact ContinuousOn.integrableOn_Icc ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.smul ( ContinuousAt.inv₀ ( continuousAt_const.add continuousAt_id ) ( by linarith [ ht.1 ] ) ) continuousAt_const ) |> fun h => h.mono_set ( Set.Ioc_subset_Icc_self );
-  have h_int2 : IntervalIntegrable
-      (fun t => (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) -
-        ((a • x + b • y) + t • 1)⁻¹) MeasureTheory.volume 0 T :=
-    h_integrable (Matrix.PosDef.Convex hx hy ha hb hab)
+  have h_int2 : IntervalIntegrable (fun t => (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - ((a • x + b • y) + t • 1)⁻¹) MeasureTheory.volume 0 T := by
+    exact h_integrable (Matrix.PosDef.Convex hx hy ha hb hab)
   have h_integral_mono : ∫ t in (0)..T, a • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (x + t • 1)⁻¹) + b • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (y + t • 1)⁻¹) ≤ ∫ t in (0)..T, (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - ((a • x + b • y) + t • 1)⁻¹ := by
     have h_integral_mono : ∀ t ∈ Set.Icc 0 T, a • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (x + t • 1)⁻¹) + b • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (y + t • 1)⁻¹) ≤ (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - ((a • x + b • y) + t • 1)⁻¹ := by
       intros t ht
@@ -641,10 +629,8 @@ lemma log_kron_diagonal {m n 𝕜 : Type*} [Fintype m] [DecidableEq m] [Fintype 
     {d₁ : m → ℝ} {d₂ : n → ℝ} (h₁ : ∀ i, 0 < d₁ i) (h₂ : ∀ j, 0 < d₂ j) :
     (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂).log =
     (diagonal 𝕜 d₁).log ⊗ₖ 1 + 1 ⊗ₖ (diagonal 𝕜 d₂).log := by
-  have h_eq :
-      (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂) =
-        (diagonal 𝕜 (fun (i : m × n) => d₁ i.1 * d₂ i.2)) :=
-    kronecker_diagonal d₁ d₂
+  have h_eq : (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂) = (diagonal 𝕜 (fun (i : m × n) => d₁ i.1 * d₂ i.2)) := by
+    exact kronecker_diagonal d₁ d₂
   convert congr_arg _ h_eq using 1;
   -- By definition of logarithm, we can rewrite the right-hand side.
   have h_rhs : (diagonal 𝕜 (fun (i : m × n) => d₁ i.1 * d₂ i.2)).log =
@@ -662,9 +648,8 @@ lemma log_kron_diagonal {m n 𝕜 : Type*} [Fintype m] [DecidableEq m] [Fintype 
     · rw [← diagonal_one, kronecker_diagonal]
       simp
     · exact cfc_diagonal Real.log d₁
-  · have h_rhs : (diagonal 𝕜 d₂).log =
-        (diagonal 𝕜 (fun (i : n) => Real.log (d₂ i))) :=
-      cfc_diagonal Real.log d₂
+  · have h_rhs : (diagonal 𝕜 d₂).log = (diagonal 𝕜 (fun (i : n) => Real.log (d₂ i))) := by
+      exact cfc_diagonal Real.log d₂
     rw [ h_rhs ];
     convert kronecker_diagonal 1 ( fun i => Real.log ( d₂ i ) ) using 1;
     all_goals try infer_instance;

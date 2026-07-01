@@ -400,9 +400,8 @@ lemma IsClosable.defectNumber_eq_of_mem_ball [CompleteSpace H] {T : H →ₗ.[�
       · exact hT.closure_isClosed.exists_inner_eq_zero_of_defectNumber_lt hz₂ hle
     refine not_le (a := ‖z₁ - z₂‖ * ‖x‖).mpr ?_ le_rfl
     refine lt_of_lt_of_le (b := ‖Tcl x - z₁ • x‖) ?_ ?_
-    · exact lt_of_lt_of_le
-        ((mul_lt_mul_iff_left₀ <| norm_pos_iff.mpr hx).mpr (mem_ball_iff_norm'.mp h_ball))
-        (isLowerBound_closure h x)
+    · refine lt_of_lt_of_le ?_ (isLowerBound_closure h x)
+      exact (mul_lt_mul_iff_left₀ <| norm_pos_iff.mpr hx).mpr (mem_ball_iff_norm'.mp h_ball)
     · rcases eq_or_ne (Tcl x - z₁ • x) 0 with heq | hne
       · exact heq ▸ norm_zero (E := H) ▸ mul_nonneg (norm_nonneg _) (norm_nonneg x)
       · apply (mul_le_mul_iff_left₀ (norm_pos_iff.mpr hne)).mp
@@ -837,9 +836,8 @@ lemma IsClosed.spectrum_eq [CompleteSpace H] {T : H →ₗ.[ℂ] H} (hT : T.IsCl
         exact (inverse_closed_iff h_ker).mpr
           (hT.sub_continuous (Continuous.const_smul (by fun_prop) _) le_top)
     · left; left; exact h_ker
-  · exact union_subset
-      (union_subset T.pointSpectrum_subset_spectrum T.residualSpectrum_subset_spectrum)
-      T.continuousSpectrum_subset_spectrum
+  · refine union_subset ?_ T.continuousSpectrum_subset_spectrum
+    exact union_subset T.pointSpectrum_subset_spectrum T.residualSpectrum_subset_spectrum
 
 lemma pointSpectrum_inter_residualSpectrum (T : H →ₗ.[ℂ] H) : σᵖ T ∩ σʳ T = ∅ := by
   ext

@@ -176,11 +176,8 @@ lemma HermitianMat.trace_rpow_le_trace_of_le_one
     (p : ℝ) (hp : 1 ≤ p) :
     (A ^ p).trace ≤ A.trace := by
   -- Rewrite both sides using trace_rpow_eq_sum: Tr[A^p] = ∑ λ_i^p and Tr[A] = ∑ λ_i (using trace_rpow_eq_sum and rpow_one for the latter).
-  have h_trace_eq_sum : (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p ∧
-      A.trace = ∑ i, A.H.eigenvalues i :=
-    ⟨by rw [HermitianMat.trace_rpow_eq_sum],
-      by rw [show A.trace = ∑ i, A.H.eigenvalues i by
-        simpa using HermitianMat.trace_rpow_eq_sum A 1]⟩
+  have h_trace_eq_sum : (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p ∧ A.trace = ∑ i, (A.H.eigenvalues i) := by
+    exact ⟨ by rw [ HermitianMat.trace_rpow_eq_sum ], by rw [ show A.trace = ∑ i, ( A.H.eigenvalues i ) by simpa using HermitianMat.trace_rpow_eq_sum A 1 ] ⟩;
   rw [ h_trace_eq_sum.1, h_trace_eq_sum.2 ];
   apply_rules [ Finset.sum_le_sum ];
   intro i hi; by_cases hi0 : A.H.eigenvalues i = 0 <;> simp_all
@@ -514,9 +511,8 @@ private lemma trace_conj_eq_inner_rpow {ρ σ : MState d} {t : ℝ} (ht : t ≠ 
         fun h => ht (by linarith)
       exact HermitianMat.mat_rpow_add h_nonneg h_ne_zero
     rw [ mul_two, h_exp ]
-  have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ =
-      ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re :=
-    rfl
+  have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ = ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re := by
+    exact rfl
   simp_all
   convert congr_arg Complex.re h_cyclic using 1 ; simp [ HermitianMat.conj ] ; ring!;
   rw [ Matrix.trace_mul_comm ]
@@ -528,9 +524,8 @@ private def eigenWeight (ρ σ : MState d) (i : d) : ℝ :=
 private lemma inner_cfc_eq_sum_eigenWeight (ρ σ : MState d) (f : ℝ → ℝ) :
     ⟪ρ.M, σ.M.cfc f⟫ = ∑ i, f (σ.M.H.eigenvalues i) * eigenWeight ρ σ i := by
   -- By definition of the inner product in the context of Hermitian matrices, we can expand it using the trace.
-  have h_inner : ⟪ρ.M, σ.M.cfc f⟫ =
-      RCLike.re (Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat)) :=
-    rfl
+  have h_inner : ⟪ρ.M, σ.M.cfc f⟫ = RCLike.re (Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat)) := by
+    exact rfl;
   have h_trace : Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat) = ∑ i, f (σ.M.H.eigenvalues i) * (star (σ.M.H.eigenvectorBasis i) ⬝ᵥ ρ.M.mat.mulVec (σ.M.H.eigenvectorBasis i)) := by
     rw [ Matrix.trace ];
     have h_cfc_def : (σ.M.cfc f).mat = ∑ i, (f (Matrix.IsHermitian.eigenvalues σ.M.H i)) • Matrix.of (fun x y => (σ.M.H.eigenvectorBasis i x) * (star (σ.M.H.eigenvectorBasis i y))) := by
@@ -770,9 +765,8 @@ private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
     intro ε hε_pos
     obtain ⟨δ₁, hδ₁_pos, hδ₁⟩ : ∃ δ₁ > 0, ∀ α, abs (α - 1) < δ₁ → Real.sqrt (|b α|) * |Real.log (|b α|)| < ε := by
       simpa using Metric.tendsto_nhds_nhds.mp h_sqrt_log ε hε_pos |> fun ⟨ δ₁, hδ₁₁, hδ₁₂ ⟩ => ⟨ δ₁, hδ₁₁, fun α hα => lt_of_abs_lt <| by simpa using hδ₁₂ hα ⟩;
-    obtain ⟨δ₂, hδ₂_pos, hδ₂⟩ : ∃ δ₂ > 0, ∀ α, abs (α - 1) < δ₂ → |b α ^ α - b α| ≤ |α - 1| * Real.sqrt (|b α|) * |Real.log (|b α|)| :=
-      Metric.mem_nhds_iff.mp h_bound |> fun ⟨δ₂, hδ₂_pos, hδ₂⟩ =>
-        ⟨δ₂, hδ₂_pos, fun α hα => hδ₂ hα⟩
+    obtain ⟨δ₂, hδ₂_pos, hδ₂⟩ : ∃ δ₂ > 0, ∀ α, abs (α - 1) < δ₂ → |b α ^ α - b α| ≤ |α - 1| * Real.sqrt (|b α|) * |Real.log (|b α|)| := by
+      exact Metric.mem_nhds_iff.mp h_bound |> fun ⟨ δ₂, hδ₂_pos, hδ₂ ⟩ => ⟨ δ₂, hδ₂_pos, fun α hα => hδ₂ hα ⟩;
     exact ⟨ Min.min δ₁ δ₂, lt_min hδ₁_pos hδ₂_pos, fun α hα => le_trans ( hδ₂ α ( lt_of_lt_of_le hα ( min_le_right _ _ ) ) ) ( by nlinarith [ hδ₁ α ( lt_of_lt_of_le hα ( min_le_left _ _ ) ), abs_nonneg ( α - 1 ) ] ) ⟩;
   rw [ hasDerivAt_iff_isLittleO_nhds_zero ];
   rw [ Asymptotics.isLittleO_iff ];
@@ -1076,9 +1070,8 @@ private lemma cross_term_slope_tendsto_zero
   rw [ Filter.EventuallyEq, eventually_nhdsWithin_iff ];
   rw [ Metric.eventually_nhds_iff ] at *;
   obtain ⟨ ε, ε_pos, hε ⟩ := hK; use ε, ε_pos; intro y hy hy'; simp_all [ div_eq_inv_mul] ;
-  have h_trace_rpow : ∀ (A : HermitianMat d ℂ) (p : ℝ),
-      (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p :=
-    fun A p => HermitianMat.trace_rpow_eq_sum A p
+  have h_trace_rpow : ∀ (A : HermitianMat d ℂ) (p : ℝ), (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p := by
+    exact fun A p => HermitianMat.trace_rpow_eq_sum A p;
   have := h_trace_rpow ( M ( 1 + y ) ) 1; have := h_trace_rpow ( ρ : HermitianMat d ℂ ) 1; simp_all
   simp +zetaDelta at *;
   simp [ ← this, div_eq_inv_mul, mul_sub, hy' ];
@@ -1286,19 +1279,16 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
         · exact ⟨ 0, by simp, v, h_contra v hvU, by simp ⟩;
       have h_union : ∃ v : EuclideanSpace ℂ d₂, v ∉ U ∧ v ∈ V := by
         have h_union : ∃ v : EuclideanSpace ℂ d₂, v ∈ V ∧ v ∉ U := by
-          have h_not_subset : ¬V ≤ U :=
-            fun h => hU <| by
-              rw [eq_top_iff]
-              exact h_union ▸ sup_le (by tauto) h
+          have h_not_subset : ¬V ≤ U := by
+            exact fun h => hU <| by rw [ eq_top_iff ] ; exact h_union ▸ sup_le ( by tauto ) h;
           exact Set.not_subset.mp h_not_subset;
         exact ⟨ h_union.choose, h_union.choose_spec.2, h_union.choose_spec.1 ⟩;
       obtain ⟨ v, hv₁, hv₂ ⟩ := h_union;
       obtain ⟨ w, hw₁, hw₂ ⟩ : ∃ w : EuclideanSpace ℂ d₂, w ∉ V ∧ w ∈ U := by
         obtain ⟨ w, hw ⟩ := ( show ∃ w : EuclideanSpace ℂ d₂, w ∉ V from by simpa [ Submodule.eq_top_iff' ] using hV ) ; use w; simp_all [ Submodule.eq_top_iff' ] ;
         exact Classical.not_not.1 fun hw' => hw <| h_contra _ hw';
-      have h_union : v + w ∉ U ∧ v + w ∉ V :=
-        ⟨fun h => hv₁ <| by simpa using U.sub_mem h hw₂,
-          fun h => hw₁ <| by simpa using V.sub_mem h hv₂⟩
+      have h_union : v + w ∉ U ∧ v + w ∉ V := by
+        exact ⟨ fun h => hv₁ <| by simpa using U.sub_mem h hw₂, fun h => hw₁ <| by simpa using V.sub_mem h hv₂ ⟩;
       exact h_contra ⟨ v + w, h_union.1, h_union.2 ⟩;
     exact h_union _ _ ( by tauto ) ( by tauto );
   -- Consider $z = u \otimes v$.
@@ -1356,9 +1346,8 @@ lemma ker_le_of_ker_kron_le_right (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSt
         intro U V hU hV
         by_contra h_contra
         push Not at h_contra;
-        have h_union : ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∈ V :=
-          Exists.elim (show ∃ u : EuclideanSpace ℂ d₁, u ∉ U from by
-            simpa [Submodule.eq_top_iff'] using hU) fun u hu => ⟨u, hu, h_contra u hu⟩
+        have h_union : ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∈ V := by
+          exact Exists.elim ( show ∃ u : EuclideanSpace ℂ d₁, u ∉ U from by simpa [ Submodule.eq_top_iff' ] using hU ) fun u hu => ⟨ u, hu, h_contra u hu ⟩;
         obtain ⟨ u, hu₁, hu₂ ⟩ := h_union;
         have h_union : ∀ v : EuclideanSpace ℂ d₁, v ∈ U → v + u ∈ V := by
           intro v hv; specialize h_contra ( v + u ) ; simp_all [ Submodule.add_mem_iff_right ] ;
@@ -1470,9 +1459,8 @@ theorem sandwichedRelRentropy_additive_alpha_one_aux (ρ₁ σ₁ : MState d₁)
     ⟪ρ₁.M, ρ₁.M.log - σ₁.M.log⟫_ℝ + ⟪ρ₂.M, ρ₂.M.log - σ₂.M.log⟫ := by
   have h_log_kron : (ρ₁ ⊗ᴹ ρ₂).M.log = ρ₁.M.log ⊗ₖ ρ₂.M.supportProj + ρ₁.M.supportProj ⊗ₖ ρ₂.M.log ∧ (σ₁ ⊗ᴹ σ₂).M.log = σ₁.M.log ⊗ₖ σ₂.M.supportProj + σ₁.M.supportProj ⊗ₖ σ₂.M.log := by
     constructor <;> apply HermitianMat.log_kron_with_proj;
-  have h_inner_supportProj : ∀ (A : HermitianMat d₁ ℂ) (B : HermitianMat d₂ ℂ),
-      ⟪A ⊗ₖ B, ρ₁ ⊗ᴹ ρ₂⟫ = ⟪A, ρ₁⟫ * ⟪B, ρ₂⟫ :=
-    fun A B => HermitianMat.inner_kron A B ρ₁ ρ₂
+  have h_inner_supportProj : ∀ (A : HermitianMat d₁ ℂ) (B : HermitianMat d₂ ℂ), ⟪A ⊗ₖ B, ρ₁ ⊗ᴹ ρ₂⟫ = ⟪A, ρ₁⟫ * ⟪B, ρ₂⟫ := by
+    exact fun A B => HermitianMat.inner_kron A B ρ₁ ρ₂;
   simp only [HermitianMat.ker] at h1 h2
   simp_all only [inner_sub_right, inner_add_right, real_inner_comm,
     HermitianMat.inner_supportProj_self, MState.tr, mul_one, one_mul,
@@ -1986,10 +1974,8 @@ private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
     have h_w_zero : ∀ i, x.M.H.eigenvalues i ≠ 0 → w i = 0 := by
       intro i hi
       have h_eigenvalue : x.M.val.mulVec v = ∑ i, (x.M.H.eigenvalues i) • w i • x.M.H.eigenvectorBasis i := by
-        have h_eigenvalue : ∀ i,
-            x.M.val.mulVec (x.M.H.eigenvectorBasis i) =
-              x.M.H.eigenvalues i • x.M.H.eigenvectorBasis i :=
-          fun i => x.M.H.mulVec_eigenvectorBasis i |> fun h => by simpa [mul_comm] using h
+        have h_eigenvalue : ∀ i, x.M.val.mulVec (x.M.H.eigenvectorBasis i) = x.M.H.eigenvalues i • x.M.H.eigenvectorBasis i := by
+          exact fun i => x.M.H.mulVec_eigenvectorBasis i |> fun h => by simpa [ mul_comm ] using h;
         rw [ hw]
         simp only [WithLp.ofLp_sum, WithLp.ofLp_smul]
         rw [Matrix.mulVec_sum ];
@@ -2233,8 +2219,7 @@ theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
             (show ρ.traceRight.M.ker ≤ ρ.traceRight.M.supportProj.ker by simp))
         (by
           simpa [HermitianMat.ker, HermitianMat.lin] using
-            (show ρ.traceLeft.M.ker ≤ ρ.traceLeft.M.supportProj.ker by simp))).trans
-        (by simpa [HermitianMat.support_orthogonal_eq_range] using Submodule.orthogonal_le hP)
+            (show ρ.traceLeft.M.ker ≤ ρ.traceLeft.M.supportProj.ker by simp))).trans hkerP
   have right_mul_eq_of_fixed_support {Q ρM : HermitianMat (dA × dB) ℂ}
       (hfix : ∀ x : EuclideanSpace ℂ (dA × dB), x ∈ ρM.support → Q.lin x = x) :
       ρM.mat * Q.mat = ρM.mat := by

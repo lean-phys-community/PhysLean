@@ -103,8 +103,8 @@ lemma iteratedDeriv_increment_zero [NeZero d] [AddCommGroup M] [Module ℝ M] [T
 @[simp]
 lemma iteratedDeriv_single [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (i : Fin d) (f : Space d → M) :
-    ∂^[MultiIndex.increment 0 i] f =
-      ∂[i] f := by simp [iteratedDeriv, Physlib.MultiIndex.toList_single]
+    ∂^[MultiIndex.increment 0 i] f = ∂[i] f := by
+  simp [iteratedDeriv, Physlib.MultiIndex.toList_single]
 
 lemma iteratedDeriv_add (I : MultiIndex d) {f g : Space d → ℝ}
     (hf : ContDiff ℝ ∞ f) (hg : ContDiff ℝ ∞ g) :

@@ -401,10 +401,8 @@ private lemma W_mat_sq_eq_conj [Nonempty dA] [Nonempty dB] [Nonempty dC]
       convert! h_inv_pos.posSemidef using 1;
       exact zero_le_iff;
   have h_simp : (ρAB.sqrt : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹.sqrt : Matrix dC dC ℂ) * (ρAB.sqrt : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹.sqrt : Matrix dC dC ℂ) = (ρAB : Matrix (dA × dB) (dA × dB) ℂ) ⊗ₖ (σBC.traceLeft⁻¹ : Matrix dC dC ℂ) := by
-    have h_simp :
-        ∀ (A B C D : Matrix (dA × dB) (dA × dB) ℂ) (E F : Matrix dC dC ℂ),
-          (A ⊗ₖ E) * (B ⊗ₖ F) = (A * B) ⊗ₖ (E * F) :=
-      fun A B _ _ E F => Eq.symm (Matrix.mul_kronecker_mul A B E F)
+    have h_simp : ∀ (A B C D : Matrix (dA × dB) (dA × dB) ℂ) (E F : Matrix dC dC ℂ), (A ⊗ₖ E) * (B ⊗ₖ F) = (A * B) ⊗ₖ (E * F) := by
+      exact fun A B C D E F => Eq.symm (Matrix.mul_kronecker_mul A B E F);
     aesop;
   simp_all [ ← Matrix.mul_assoc ]
 

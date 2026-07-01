@@ -215,8 +215,8 @@ variable {ι1 : Type} [Fintype ι1] [MeasurableSpace ι1]
 open Constants
 
 lemma entropy_of_fintype (T : Temperature) :
-    𝓒.shannonEntropy T =
-      - kB * ∑ i, 𝓒.probability T i * log (𝓒.probability T i) := by simp [shannonEntropy]
+    𝓒.shannonEntropy T = - kB * ∑ i, 𝓒.probability T i * log (𝓒.probability T i) := by
+  simp [shannonEntropy]
 
 lemma probability_le_one
     [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
@@ -232,8 +232,8 @@ lemma probability_le_one
 /-- Finite specialization: strict positivity of the mathematical partition function. -/
 lemma mathematicalPartitionFunction_pos_finite
     [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
-    0 < 𝓒.mathematicalPartitionFunction T := by simpa using
-      (CanonicalEnsemble.mathematicalPartitionFunction_pos (𝓒:=𝓒) T)
+    0 < 𝓒.mathematicalPartitionFunction T := by
+  simpa using (CanonicalEnsemble.mathematicalPartitionFunction_pos (𝓒:=𝓒) T)
 
 /-- Finite specialization: strict positivity of the (physical) partition function. -/
 lemma partitionFunction_pos_finite
@@ -272,9 +272,8 @@ lemma entropy_nonneg [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι]
 
 lemma shannonEntropy_eq_differentialEntropy
     [MeasurableSingletonClass ι] [IsFinite 𝓒] (T : Temperature) :
-    𝓒.shannonEntropy T =
-      𝓒.differentialEntropy T := by simp [shannonEntropy, differentialEntropy,
-        integral_fintype, μProd_of_fintype]
+    𝓒.shannonEntropy T = 𝓒.differentialEntropy T := by
+  simp [shannonEntropy, differentialEntropy, integral_fintype, μProd_of_fintype]
 
 /-- In the finite, nonempty case the thermodynamic and Shannon entropies coincide.
 All semi-classical correction factors vanish (`dof = 0`, `phaseSpaceUnit = 1`),

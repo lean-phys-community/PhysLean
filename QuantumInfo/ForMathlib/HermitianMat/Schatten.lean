@@ -97,9 +97,8 @@ lemma schattenNorm_rpow_eq_sum_singularValues (A : Matrix d d ℂ) {p : ℝ} (hp
     ring_nf
     simp +zetaDelta at *;
     exact Matrix.eigenvalues_conjTranspose_mul_self_nonneg A i;
-  · have h_nonneg : ∀ i : d,
-        0 ≤ ((Matrix.isHermitian_mul_conjTranspose_self A.conjTranspose).eigenvalues i) ^ (p / 2) :=
-      fun i => Real.rpow_nonneg (by have := Matrix.eigenvalues_conjTranspose_mul_self_nonneg A; aesop) _
+  · have h_nonneg : ∀ i : d, 0 ≤ ((Matrix.isHermitian_mul_conjTranspose_self A.conjTranspose).eigenvalues i) ^ (p / 2) := by
+      exact fun i => Real.rpow_nonneg ( by have := Matrix.eigenvalues_conjTranspose_mul_self_nonneg A; aesop ) _;
     convert! Finset.sum_nonneg fun i _ => h_nonneg i using 1;
     convert schattenNorm_trace_as_eigenvalue_sum A p using 1
 
@@ -180,9 +179,8 @@ lemma schattenNorm_half_mul_rpow_eq_trace_conj
     {α : ℝ} (hα : 0 < α) :
     (schattenNorm ((A ^ (1/2 : ℝ)).mat * B.mat) (2 * α)) ^ (2 * α) =
     ((A.conj B.mat) ^ α).trace := by
-  have h_conj : ((A ^ (1 / 2 : ℝ)).mat * B.mat).conjTranspose *
-      ((A ^ (1 / 2 : ℝ)).mat * B.mat) = (A.conj B.mat).mat :=
-    conjTranspose_half_mul_eq_conj hA
+  have h_conj : ((A ^ (1 / 2 : ℝ)).mat * B.mat).conjTranspose * ((A ^ (1 / 2 : ℝ)).mat * B.mat) = (A.conj B.mat).mat := by
+    exact conjTranspose_half_mul_eq_conj hA;
   unfold schattenNorm;
   rw [ ← Real.rpow_mul ] <;> norm_num [ hα.ne' ];
   · ring_nf; norm_num [ hα.ne' ];
@@ -296,9 +294,8 @@ lemma HermitianMat.trace_rpow_conj_le
     (((A ^ (p / 2)).trace) ^ (1 / p) * ((B ^ q).trace) ^ (1 / q)) ^ (2 * α) := by
   -- Raise both sides of the inequality to the power of $2\alpha$.
   have h_exp : ((A.conj B.mat) ^ α).trace ≤ (schattenNorm (A ^ (1 / 2 : ℝ)).mat p * schattenNorm B.mat q) ^ (2 * α) := by
-    have h_exp : (schattenNorm ((A ^ (1 / 2 : ℝ)).mat * B.mat) (2 * α)) ^ (2 * α) =
-        ((A.conj B.mat) ^ α).trace :=
-      schattenNorm_half_mul_rpow_eq_trace_conj hA hα
+    have h_exp : (schattenNorm ((A ^ (1 / 2 : ℝ)).mat * B.mat) (2 * α)) ^ (2 * α) = ((A.conj B.mat) ^ α).trace := by
+      exact schattenNorm_half_mul_rpow_eq_trace_conj hA hα
     rw [← h_exp]
     -- Apply the Schatten-Hölder inequality to the matrices $A^{1/2} * B$.
     refine Real.rpow_le_rpow ?_ (schattenNorm_mul_le _ _ (by positivity) hp hq hpq) (by positivity)

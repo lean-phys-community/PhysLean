@@ -96,7 +96,7 @@ lemma constantEB_smooth {c : SpeedOfLight}
       apply ContDiff.inner
       · fun_prop
       · fun_prop
-    | Sum.inr i =>
+  | Sum.inr i =>
       simp [constantEB]
       apply ContDiff.mul
       · fun_prop
@@ -104,7 +104,7 @@ lemma constantEB_smooth {c : SpeedOfLight}
         intro j _
         apply ContDiff.mul
         · fun_prop
-        fun_prop)
+        fun_prop
 
 /-!
 

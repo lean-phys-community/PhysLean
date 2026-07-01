@@ -102,10 +102,8 @@ theorem csInf_mul_nonneg {s t : Set ℝ}
       intro ε hε
       obtain ⟨x, hx₁, hx₂, y, hy₁, hy₂⟩ := h_eps ε hε
       exact ⟨x, hx₁, y, hy₁, by nlinarith [hs₁ x hx₁, ht₁ y hy₁]⟩
-    have h_lim : Filter.Tendsto (fun ε => (a + ε) * (b + ε))
-        (nhdsWithin 0 (Set.Ioi 0)) (nhds (a * b)) :=
-      tendsto_nhdsWithin_of_tendsto_nhds
-        (Continuous.tendsto' (by continuity) _ _ (by norm_num))
+    have h_lim : Filter.Tendsto (fun ε => (a + ε) * (b + ε)) (nhdsWithin 0 (Set.Ioi 0)) (nhds (a * b)) := by
+      exact tendsto_nhdsWithin_of_tendsto_nhds (Continuous.tendsto' (by continuity) _ _ (by norm_num))
     apply le_of_tendsto_of_tendsto tendsto_const_nhds h_lim
     filter_upwards [self_mem_nhdsWithin] with ε hε
     specialize h_prod_eps ε hε
@@ -158,9 +156,8 @@ lemma Multiset.map_univ_eq_iff {α β : Type*} [Fintype α] (f g : α → β) :
     subst h
     simp_all only [Function.comp_apply, Finset.univ]
     -- Since $w$ is a bijection, the multiset of $w(x)$ for $x$ in the original multiset is just a permutation of the original multiset.
-    have h_perm :
-        Multiset.map (fun x => w x) (Finset.val Fintype.elems) = Finset.val Fintype.elems :=
-      Multiset.map_univ_val_equiv w
+    have h_perm : Multiset.map (fun x => w x) (Finset.val Fintype.elems) = Finset.val Fintype.elems := by
+      exact Multiset.map_univ_val_equiv w;
     conv_rhs => rw [ ← h_perm ];
     simp +zetaDelta at *
 
