@@ -124,8 +124,7 @@ def bosonicProj : 𝓕.WickAlgebra →ₗ[ℂ] statSubmodule (𝓕 := 𝓕) boso
     obtain ⟨x, hx⟩ := ι_surjective x
     obtain ⟨y, hy⟩ := ι_surjective y
     subst hx hy
-    rw [← map_add, ι_apply, ι_apply, ι_apply]
-    rw [Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
+    rw [← map_add, ι_apply, ι_apply, ι_apply, Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
     simp
   map_smul' c y := by
     obtain ⟨y, hy⟩ := ι_surjective y
@@ -170,8 +169,7 @@ def fermionicProj : 𝓕.WickAlgebra →ₗ[ℂ] statSubmodule (𝓕 := 𝓕) fe
     obtain ⟨x, hx⟩ := ι_surjective x
     obtain ⟨y, hy⟩ := ι_surjective y
     subst hx hy
-    rw [← map_add, ι_apply, ι_apply, ι_apply]
-    rw [Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
+    rw [← map_add, ι_apply, ι_apply, ι_apply, Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
     simp
   map_smul' c y := by
     obtain ⟨y, hy⟩ := ι_surjective y
@@ -207,10 +205,8 @@ lemma bosonicProj_mem_bosonic (a : 𝓕.WickAlgebra) (ha : a ∈ statSubmodule .
     simp only [p]
     apply Subtype.ext
     simp only
-    rw [ofCrAnList]
-    rw [bosonicProj_eq_bosonicProjFree]
-    rw [bosonicProjFree_eq_ι_bosonicProjF]
-    rw [bosonicProjF_of_mem_bosonic]
+    rw [ofCrAnList, bosonicProj_eq_bosonicProjFree]
+    rw [bosonicProjFree_eq_ι_bosonicProjF, bosonicProjF_of_mem_bosonic]
     exact ofCrAnListF_mem_statisticSubmodule_of _ _ h
   · simp only [map_zero, p]
     rfl
@@ -231,8 +227,7 @@ lemma fermionicProj_mem_fermionic (a : 𝓕.WickAlgebra) (ha : a ∈ statSubmodu
     simp only [p]
     apply Subtype.ext
     simp only
-    rw [ofCrAnList]
-    rw [fermionicProj_eq_fermionicProjFree]
+    rw [ofCrAnList, fermionicProj_eq_fermionicProjFree]
     rw [fermionicProjFree_eq_ι_fermionicProjF]
     rw [fermionicProjF_of_mem_fermionic]
     exact ofCrAnListF_mem_statisticSubmodule_of _ _ h
