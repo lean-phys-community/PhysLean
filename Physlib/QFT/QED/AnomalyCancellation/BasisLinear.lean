@@ -87,8 +87,7 @@ def coordinateMap : (PureU1 n.succ).LinSols ≃ₗ[ℚ] Fin n →₀ ℚ where
     rw [Finset.sum_eq_single j]
     · simp only [asCharges, ↓reduceIte, mul_one]
     · intro k _ hkj
-      erw [asCharges_ne_castSucc hkj]
-      exact Rat.mul_zero (S.val k.castSucc)
+      exact mul_eq_zero_of_right (S.val k.castSucc) (asCharges_ne_castSucc hkj)
     · simp
   right_inv f := by
     simp only
@@ -101,8 +100,7 @@ def coordinateMap : (PureU1 n.succ).LinSols ≃ₗ[ℚ] Fin n →₀ ℚ where
     rw [Finset.sum_eq_single j]
     · simp only [asCharges, ↓reduceIte, mul_one]
     · intro k _ hkj
-      erw [asCharges_ne_castSucc hkj]
-      exact Rat.mul_zero (f k)
+      exact mul_eq_zero_of_right (f k) (asCharges_ne_castSucc hkj)
     · simp
 
 /-- The basis of `LinSols`. -/

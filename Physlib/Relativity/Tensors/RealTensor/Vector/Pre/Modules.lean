@@ -87,8 +87,7 @@ lemma stdBasis_toFin1dℝEquiv_apply_same (μ : Fin 1 ⊕ Fin d) :
     toFin1dℝEquiv (stdBasis μ) μ = 1 := by
   simp only [stdBasis, Basis.ofEquivFun, Basis.coe_ofRepr, LinearEquiv.trans_symm,
     LinearEquiv.symm_symm, LinearEquiv.trans_apply, Finsupp.linearEquivFunOnFinite_single]
-  rw [@LinearEquiv.apply_symm_apply]
-  exact Pi.single_eq_same μ 1
+  simp
 
 @[simp]
 lemma stdBasis_apply_same (μ : Fin 1 ⊕ Fin d) : (stdBasis μ).val μ = 1 :=
@@ -98,8 +97,7 @@ lemma stdBasis_toFin1dℝEquiv_apply_ne {μ ν : Fin 1 ⊕ Fin d} (h : μ ≠ ν
     toFin1dℝEquiv (stdBasis μ) ν = 0 := by
   simp only [stdBasis, Basis.ofEquivFun, Basis.coe_ofRepr, LinearEquiv.trans_symm,
     LinearEquiv.symm_symm, LinearEquiv.trans_apply, Finsupp.linearEquivFunOnFinite_single]
-  rw [@LinearEquiv.apply_symm_apply]
-  exact Pi.single_eq_of_ne' h 1
+  simpa using Pi.single_eq_of_ne' h 1
 
 @[simp]
 lemma stdBasis_inl_apply_inr (i : Fin d) : (stdBasis (Sum.inl 0)).val (Sum.inr i) = 0 := by
@@ -349,8 +347,7 @@ lemma stdBasis_toFin1dℝEquiv_apply_same (μ : Fin 1 ⊕ Fin d) :
     toFin1dℝEquiv (stdBasis μ) μ = 1 := by
   simp only [stdBasis, Basis.ofEquivFun, Basis.coe_ofRepr, LinearEquiv.trans_symm,
     LinearEquiv.symm_symm, LinearEquiv.trans_apply, Finsupp.linearEquivFunOnFinite_single]
-  rw [@LinearEquiv.apply_symm_apply]
-  exact Pi.single_eq_same μ 1
+  simp
 
 @[simp]
 lemma stdBasis_apply_same (μ : Fin 1 ⊕ Fin d) : (stdBasis μ).val μ = 1 :=
@@ -360,8 +357,7 @@ lemma stdBasis_toFin1dℝEquiv_apply_ne {μ ν : Fin 1 ⊕ Fin d} (h : μ ≠ ν
     toFin1dℝEquiv (stdBasis μ) ν = 0 := by
   simp only [stdBasis, Basis.ofEquivFun, Basis.coe_ofRepr, LinearEquiv.trans_symm,
     LinearEquiv.symm_symm, LinearEquiv.trans_apply, Finsupp.linearEquivFunOnFinite_single]
-  rw [@LinearEquiv.apply_symm_apply]
-  exact Pi.single_eq_of_ne' h 1
+  simpa using Pi.single_eq_of_ne' h 1
 
 lemma stdBasis_apply (μ ν : Fin 1 ⊕ Fin d) : (stdBasis μ).val ν = if μ = ν then 1 else 0 := by
   simp only [stdBasis, Basis.coe_ofEquivFun]
