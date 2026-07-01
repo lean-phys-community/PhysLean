@@ -198,9 +198,7 @@ lemma planeWave_apply_space_deriv {d f₀ c} {s : Direction d}
   rw [fderiv_comp]
   simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
     PiLp.proj_apply, fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
-  rw [← Space.deriv_eq_fderiv_basis, planeWave_space_deriv]
-  rfl
-  · fun_prop
+  exact congrArg (fun y => y.ofLp j) (congrFun (planeWave_space_deriv h' i) x)
   · fun_prop
   · fun_prop
 

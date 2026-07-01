@@ -251,8 +251,7 @@ noncomputable def schurTriangulationAux :
   fun i j (hji : j < i) =>
     calc LinearMap.toMatrixOrthonormal b' f i j
       _ = LinearMap.toMatrixOrthonormal b f (e.symm i) (e.symm j) := by
-        rw [f.toMatrixOrthonormal_reindex]
-        rfl
+        exact congrFun (congrFun (f.toMatrixOrthonormal_reindex b e.toEquiv) i) j
       _ = 0 := hut (e.symm.lt_iff_lt.mpr hji)
 
 /-- The change of basis that induces the upper triangular form `A.schurTriangulation` of a matrix

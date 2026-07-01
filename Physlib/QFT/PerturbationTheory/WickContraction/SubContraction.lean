@@ -101,8 +101,7 @@ lemma mem_subContraction_or_quotContraction {S : Finset (Finset (Fin φs.length)
 lemma subContraction_uncontractedList_get {S : Finset (Finset (Fin φs.length))} {hs : S ⊆ φsΛ.1}
     {a : Fin [subContraction S hs]ᵘᶜ.length} :
     [subContraction S hs]ᵘᶜ[a] = φs[uncontractedListEmd a] := by
-  erw [← getElem_uncontractedListEmd]
-  rfl
+  exact (getElem_uncontractedListEmd a).symm
 
 @[simp]
 lemma subContraction_fstFieldOfContract {S : Finset (Finset (Fin φs.length))} {hs : S ⊆ φsΛ.1}
