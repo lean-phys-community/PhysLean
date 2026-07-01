@@ -113,8 +113,7 @@ We prove some simple properties related to the components of the Minkowski matri
 
 /-- The `time-time` component of the Minkowski matrix is `1`. -/
 @[simp]
-lemma inl_0_inl_0 : @minkowskiMatrix d (Sum.inl 0) (Sum.inl 0) = 1 := by
-  rfl
+lemma inl_0_inl_0 : @minkowskiMatrix d (Sum.inl 0) (Sum.inl 0) = 1 := by rfl
 
 /-- The space diagonal components of the Minkowski matrix are `-1`. -/
 @[simp]
@@ -202,14 +201,12 @@ We show properties of the action of the Minkowski matrix on vectors.
 /-- The time components of a vector acted on by the Minkowski matrix remains unchanged. -/
 @[simp]
 lemma mulVec_inl_0 (v : (Fin 1 ⊕ Fin d) → ℝ) :
-    (η *ᵥ v) (Sum.inl 0) = v (Sum.inl 0) := by
-  simp [as_diagonal, mulVec_diagonal]
+    (η *ᵥ v) (Sum.inl 0) = v (Sum.inl 0) := by simp [as_diagonal, mulVec_diagonal]
 
 /-- The space components of a vector acted on by the Minkowski matrix swaps sign. -/
 @[simp]
 lemma mulVec_inr_i (v : (Fin 1 ⊕ Fin d) → ℝ) (i : Fin d) :
-    (η *ᵥ v) (Sum.inr i) = - v (Sum.inr i) := by
-  simp [as_diagonal, mulVec_diagonal]
+    (η *ᵥ v) (Sum.inr i) = - v (Sum.inr i) := by simp [as_diagonal, mulVec_diagonal]
 
 /-!
 

@@ -258,8 +258,7 @@ lemma I_mul_toComplexNum (a : RatComplexNum) : I * toComplexNum a = toComplexNum
   ring
 
 lemma ofNat_mul_toComplexNum (n : ℕ) (a : RatComplexNum) :
-    n * toComplexNum a = toComplexNum (n * a) := by
-  simp only [map_mul, map_natCast]
+    n * toComplexNum a = toComplexNum (n * a) := by simp only [map_mul, map_natCast]
 
 lemma toComplexNum_injective : Function.Injective toComplexNum := by
   intro a b ha
