@@ -656,8 +656,7 @@ def resolventSet (T : H →ₗ.[ℂ] H) : Set ℂ :=
 scoped notation "ρ" => resolventSet
 
 lemma resolventSet_eq (T : H →ₗ.[ℂ] H) :
-    ρ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)} :=
-  rfl
+    ρ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z)} := rfl
 
 lemma mem_resolventSet_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
     z ∈ ρ T ↔ (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range = ⊤ ∧ Continuous (𝑅 T z) :=
@@ -781,8 +780,7 @@ def residualSpectrum (T : H →ₗ.[ℂ] H) : Set ℂ :=
 scoped notation "σʳ" => residualSpectrum
 
 lemma residualSpectrum_eq (T : H →ₗ.[ℂ] H) :
-    σʳ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)} :=
-  rfl
+    σʳ T = {z | (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z)} := rfl
 
 lemma mem_residualSpectrum_iff {T : H →ₗ.[ℂ] H} {z : ℂ} :
     z ∈ σʳ T ↔ (T - z • 1).toFun.ker = ⊥ ∧ (T - z • 1).toFun.range ≠ ⊤ ∧ Continuous (𝑅 T z) :=
