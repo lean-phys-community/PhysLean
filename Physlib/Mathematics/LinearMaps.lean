@@ -207,9 +207,8 @@ lemma swap₃ (f : TriLinearSymm V) (S T L : V) : f S T L = f L T S := by
   rw [f.swap₁, f.swap₂, f.swap₁]
 
 lemma map_smul₁ (f : TriLinearSymm V) (a : ℚ) (S T L : V) :
-    f (a • S) T L = a * f S T L := by
-  exact
-    (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_smul a S)).trans (by rfl)
+    f (a • S) T L = a * f S T L :=
+  (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_smul a S)).trans rfl
 
 lemma map_smul₂ (f : TriLinearSymm V) (S : V) (a : ℚ) (T L : V) :
     f S (a • T) L = a * f S T L := by
@@ -220,9 +219,8 @@ lemma map_smul₃ (f : TriLinearSymm V) (S T : V) (a : ℚ) (L : V) :
   rw [f.swap₃, f.map_smul₁, f.swap₃]
 
 lemma map_add₁ (f : TriLinearSymm V) (S1 S2 T L : V) :
-    f (S1 + S2) T L = f S1 T L + f S2 T L := by
-  exact
-    (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_add S1 S2)).trans (by rfl)
+    f (S1 + S2) T L = f S1 T L + f S2 T L :=
+  (congrArg (fun g : V →ₗ[ℚ] V →ₗ[ℚ] ℚ => g T L) (f.map_add S1 S2)).trans rfl
 
 lemma map_add₂ (f : TriLinearSymm V) (S T1 T2 L : V) :
     f S (T1 + T2) L = f S T1 L + f S T2 L := by
