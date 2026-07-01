@@ -418,8 +418,7 @@ def P' (f : Fin n.succ → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i �
 lemma P'_val (f : Fin n.succ → ℚ) : (P' f).val = P f := by
   simp only [succ_eq_add_one, P', P]
   funext i
-  rw [sum_of_anomaly_free_linear, sum_of_charges]
-  rfl
+  exact (sum_of_anomaly_free_linear _ i).trans (sum_of_charges _ i).symm
 
 /-!
 
@@ -465,8 +464,7 @@ lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).LinSols)
     have h : sort S.val (evenSnd i) = - sort S.val (evenFst i) := by
       rw [ht]
       ring
-    rw [h]
-    rfl
+    exact h.symm
 
 /-!
 
@@ -707,8 +705,7 @@ def P!' (f : Fin n → ℚ) : (PureU1 (2 * n.succ)).LinSols := ∑ i, f i • ba
 lemma P!'_val (f : Fin n → ℚ) : (P!' f).val = P! f := by
   simp only [succ_eq_add_one, P!', P!]
   funext i
-  rw [sum_of_anomaly_free_linear, sum_of_charges]
-  rfl
+  exact (sum_of_anomaly_free_linear _ i).trans (sum_of_charges _ i).symm
 
 /-!
 

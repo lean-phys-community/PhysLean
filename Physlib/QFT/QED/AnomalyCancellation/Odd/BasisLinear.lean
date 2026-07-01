@@ -460,8 +460,7 @@ def P' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • basi
 lemma P'_val (f : Fin n → ℚ) : (P' f).val = P f := by
   simp only [P', P]
   funext i
-  rw [sum_of_anomaly_free_linear, sum_of_charges]
-  rfl
+  exact (sum_of_anomaly_free_linear _ i).trans (sum_of_charges _ i).symm
 
 /-!
 
@@ -709,8 +708,7 @@ def P!' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • bas
 lemma P!'_val (f : Fin n → ℚ) : (P!' f).val = P! f := by
   simp only [P!', P!]
   funext i
-  rw [sum_of_anomaly_free_linear, sum_of_charges]
-  rfl
+  exact (sum_of_anomaly_free_linear _ i).trans (sum_of_charges _ i).symm
 
 /-!
 
