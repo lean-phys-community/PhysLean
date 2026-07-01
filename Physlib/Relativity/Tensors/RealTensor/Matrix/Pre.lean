@@ -117,8 +117,7 @@ lemma contrContrToMatrixRe_ρ {d : ℕ} (v : (Contr d ⊗ Contr d).V) (M : Loren
     have h1 := (LinearMap.toMatrix_mulVec_repr ((contrBasis d).tensorProduct (contrBasis d))
       ((contrBasis d).tensorProduct (contrBasis d))
       (TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
@@ -154,8 +153,7 @@ lemma coCoToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Co d)).V) (M : LorentzGroup 
     have h1 := (LinearMap.toMatrix_mulVec_repr ((coBasis d).tensorProduct (coBasis d))
       ((coBasis d).tensorProduct (coBasis d))
       (TensorProduct.map ((Co d).ρ M) ((Co d).ρ M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
@@ -191,8 +189,7 @@ lemma contrCoToMatrixRe_ρ {d : ℕ} (v : ((Contr d) ⊗ (Co d)).V) (M : Lorentz
     have h1 := (LinearMap.toMatrix_mulVec_repr ((contrBasis d).tensorProduct (coBasis d))
       ((contrBasis d).tensorProduct (coBasis d))
       (TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
@@ -228,8 +225,7 @@ lemma coContrToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Contr d)).V) (M : Lorentz
     have h1 := (LinearMap.toMatrix_mulVec_repr ((coBasis d).tensorProduct (contrBasis d))
       ((coBasis d).tensorProduct (contrBasis d))
       (TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)

@@ -118,8 +118,7 @@ lemma contrContrToMatrix_ρ (v : (ContrℂModule ⊗[ℂ] ContrℂModule)) (M : 
     have h1 := (LinearMap.toMatrix_mulVec_repr (complexContrBasis.tensorProduct complexContrBasis)
       (complexContrBasis.tensorProduct complexContrBasis)
       (TensorProduct.map (ContrℂModule.SL2CRep M) (ContrℂModule.SL2CRep M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
@@ -162,8 +161,7 @@ lemma coCoToMatrix_ρ (v : (CoℂModule ⊗[ℂ] CoℂModule)) (M : SL(2,ℂ)) :
     have h1 := (LinearMap.toMatrix_mulVec_repr (complexCoBasis.tensorProduct complexCoBasis)
       (complexCoBasis.tensorProduct complexCoBasis)
       (TensorProduct.map (CoℂModule.SL2CRep M) (CoℂModule.SL2CRep M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
@@ -205,8 +203,7 @@ lemma contrCoToMatrix_ρ (v : (ContrℂModule ⊗[ℂ] CoℂModule)) (M : SL(2,�
     have h1 := (LinearMap.toMatrix_mulVec_repr (complexContrBasis.tensorProduct complexCoBasis)
       (complexContrBasis.tensorProduct complexCoBasis)
       (TensorProduct.map (ContrℂModule.SL2CRep M) (CoℂModule.SL2CRep M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
@@ -248,8 +245,7 @@ lemma coContrToMatrix_ρ (v : (CoℂModule ⊗[ℂ] ContrℂModule)) (M : SL(2,�
     have h1 := (LinearMap.toMatrix_mulVec_repr (complexCoBasis.tensorProduct complexContrBasis)
       (complexCoBasis.tensorProduct complexContrBasis)
       (TensorProduct.map (CoℂModule.SL2CRep M) (ContrℂModule.SL2CRep M)) v)
-    erw [h1]
-    rfl
+    exact h1.symm
   rw [TensorProduct.toMatrix_map]
   funext i j
   change ∑ k, ((kroneckerMap (fun x1 x2 => x1 * x2)
