@@ -1991,14 +1991,11 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
     have hDr0 : 0 ≤ Dr := by
       simpa [Dr] using add_nonneg (smul_nonneg (sub_nonneg.mpr ht1) hAr0) (smul_nonneg ht0 hBr0)
     have hCr_sa : IsSelfAdjoint Cr := by
-      dsimp [Cr, cfcR]
-      exact cfc_predicate _ _
+      simp [Cr, cfcR]
     have hAr_sa : IsSelfAdjoint Ar := by
-      dsimp [Ar, cfcR]
-      exact cfc_predicate _ _
+      simp [Ar, cfcR]
     have hBr_sa : IsSelfAdjoint Br := by
-      dsimp [Br, cfcR]
-      exact cfc_predicate _ _
+      simp [Br, cfcR]
     have hspCr : spectrum ℝ Cr ⊆ Set.Ioi (0 : ℝ) := by
       have hcontC : ContinuousOn (fun x : ℝ ↦ x ^ r) (spectrum ℝ C) := by
         intro x hx
@@ -2058,11 +2055,9 @@ theorem power_Icc_neg_one_zero_neg_operatorConcaveOn_Ioi : ∀ p ∈ Set.Icc (-1
         ≤ (1 - t) • cfcR  (fun x : ℝ ↦ 1 / x) Ar
           + t • cfcR  (fun x : ℝ ↦ 1 / x) Br := by
     have hAr_sa : IsSelfAdjoint Ar := by
-      dsimp [Ar, cfcR]
-      exact cfc_predicate _ _
+      simp [Ar, cfcR]
     have hBr_sa : IsSelfAdjoint Br := by
-      dsimp [Br, cfcR]
-      exact cfc_predicate _ _
+      simp [Br, cfcR]
     have hspAr : spectrum ℝ Ar ⊆ Set.Ioi (0 : ℝ) := by
       have hcontA : ContinuousOn (fun x : ℝ ↦ x ^ r) (spectrum ℝ A) := by
         intro x hx
