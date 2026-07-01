@@ -75,8 +75,7 @@ lemma div_pos (x y : TimeUnit) : (0 : ℝ≥0) < x/ y := by
 @[simp]
 lemma div_self (x : TimeUnit) :
     x / x = (1 : ℝ≥0) := by
-  simp [div_eq_val, x.val_ne_zero]
-  rfl
+  exact NNReal.eq (_root_.div_self x.val_ne_zero)
 
 lemma div_symm (x y : TimeUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by

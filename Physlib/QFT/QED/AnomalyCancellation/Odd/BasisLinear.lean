@@ -452,8 +452,7 @@ lemma P_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P f) = 0 := by
 lemma P_zero (f : Fin n → ℚ) (h : P f = 0) : ∀ i, f i = 0 := by
   intro i
   erw [← P_oddFst f]
-  rw [h]
-  rfl
+  exact congr_fun h (oddFst i)
 
 /-- A point in the span of the first part of the basis. -/
 def P' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • basis i
@@ -696,8 +695,7 @@ lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P! f) = 0 := by
 lemma P!_zero (f : Fin n → ℚ) (h : P! f = 0) : ∀ i, f i = 0 := by
   intro i
   rw [← P!_oddShiftFst f]
-  rw [h]
-  rfl
+  exact congr_fun h (oddShiftFst i)
 
 /-!
 

@@ -356,8 +356,7 @@ lemma normalOrderSign_eraseIdx (φs : List 𝓕.CrAnFieldOp) (i : Fin φs.length
     normalOrderSign (φs.eraseIdx i) = normalOrderSign φs *
     𝓢(𝓕 |>ₛ (φs.get i), 𝓕 |>ₛ (φs.take i)) *
     𝓢(𝓕 |>ₛ (φs.get i), 𝓕 |>ₛ ((normalOrderList φs).take (normalOrderEquiv i))) := by
-  rw [normalOrderSign, Wick.koszulSign_eraseIdx, ← normalOrderSign]
-  rfl
+  exact Wick.koszulSign_eraseIdx 𝓕.crAnStatistics normalOrderRel φs i
 
 lemma orderedInsert_createFilter_append_annihilate (φ : 𝓕.CrAnFieldOp)
     (hφ : 𝓕 |>ᶜ φ = CreateAnnihilate.annihilate) : (φs φs' : List 𝓕.CrAnFieldOp) →
