@@ -187,8 +187,7 @@ lemma exp_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
 
 lemma det_exp_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
     (NormedSpace.exp ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂))).det =
-    (NormedSpace.exp A).det := by
-  rw [exp_unitary_conj, det_unitary_conj]
+    (NormedSpace.exp A).det := by rw [exp_unitary_conj, det_unitary_conj]
 
 /-- The determinant of the exponential of a matrix is the exponential of its trace.
 This is also known as **Lie's trace formula**. -/
