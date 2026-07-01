@@ -92,7 +92,6 @@ lemma harmonicWaveX_inl_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → 
 lemma harmonicWaveX_inr_zero {d} (𝓕 : FreeSpace) (k : ℝ) (E₀ : Fin d → ℝ) (φ : Fin d → ℝ)
     (x : SpaceTime d.succ) :
     harmonicWaveX 𝓕 k E₀ φ x (Sum.inr 0) = 0 := by
-  simp [harmonicWaveX]
   rfl
 
 /-!

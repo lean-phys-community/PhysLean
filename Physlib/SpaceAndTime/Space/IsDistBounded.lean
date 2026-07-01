@@ -902,8 +902,7 @@ lemma pow_shift {d : ℕ} (n : ℤ)
   · simp
     exact hn
   · intro x
-    simp
-    rfl
+    simp [sub_eq_add_neg]
 
 @[fun_prop]
 lemma inv_shift {d : ℕ} (g : Space d) (hd : 2 ≤ d := by omega) :

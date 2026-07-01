@@ -471,7 +471,6 @@ lemma curl_magneticFieldMatrix_eq_electricField_fieldStrengthMatrix {d : ℕ} {c
     field_simp
   · funext j
     rw [SpaceTime.deriv_sum_inr c]
-    simp
     rfl
     · apply fieldStrengthMatrix_differentiable hA
 

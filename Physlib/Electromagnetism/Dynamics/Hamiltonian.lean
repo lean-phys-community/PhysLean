@@ -207,7 +207,6 @@ lemma hamiltonian_eq_electricField_vectorPotential {d} {𝓕 : FreeSpace}
   rw [← Time.deriv_euclid]
   simp [vectorPotential, timeSlice]
   ring_nf
-  congr
   rfl
   · exact (hA.differentiable (by simp)).comp (by fun_prop)
   · exact vectorPotential_differentiable_time A (hA.differentiable (by simp)) x.space

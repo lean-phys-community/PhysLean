@@ -628,8 +628,7 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
       (Lorentz.Vector.basis.reindex Lorentz.Vector.indexEquiv.symm)) =
       ((Lorentz.CoVector.basis (d := d)).tensorProduct (Lorentz.Vector.basis (d := d))).reindex
       (Lorentz.CoVector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := by
-    ext ⟨i, j⟩
-    simp
+    rfl
   rfl
 
 end ElectromagneticPotential

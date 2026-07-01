@@ -293,7 +293,6 @@ lemma time_deriv_comp_vectorPotential_eq_electricField {d} {A : ElectromagneticP
     ∂ₜ (fun t => A.vectorPotential c t x i) t =
     - A.electricField c t x i - ∂[i] (A.scalarPotential c t) x := by
   rw [Time.deriv_euclid, time_deriv_vectorPotential_eq_electricField]
-  simp
   rfl
   apply vectorPotential_differentiable_time A hA x
 
