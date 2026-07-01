@@ -222,8 +222,7 @@ lemma contrT_toField {d} (c : Fin 2 → Color)
   rw [contrT_eq_sum_evalT, map_sum, Tensorial.self_toTensor_apply]
   congr
   ext μ
-  simp only [toField_permT]
-  rfl
+  exact toField_permT _ _ _
 
 open ComponentIdx in
 lemma contrT_basis_repr_apply_eq_fin {n d: ℕ} {c : Fin (n + 1 + 1) → realLorentzTensor.Color}

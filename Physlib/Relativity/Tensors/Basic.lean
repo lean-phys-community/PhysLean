@@ -498,8 +498,7 @@ noncomputable instance actionT : MulAction G (S.Tensor c) where
     simp [actionT_eq]
     change _ = (PiTensorProduct.map (fun i => rep (c i) g) ∘ₗ
       (PiTensorProduct.map (fun i => rep (c i) g'))) t
-    rw [← PiTensorProduct.map_comp]
-    rfl
+    exact LinearMap.congr_fun (PiTensorProduct.map_comp _ _) t
 
 lemma actionT_pure {g : G} {p : Pure S c} :
     g • p.toTensor = Pure.toTensor (g • p) := by

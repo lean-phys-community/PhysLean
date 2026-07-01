@@ -139,8 +139,7 @@ noncomputable instance mulAction [Tensorial S c M] : MulAction G M where
   mul_smul g h m := by
     change _ = toTensor.symm (g • toTensor (toTensor.symm (h • toTensor m)))
     simp only [LinearEquiv.apply_symm_apply]
-    rw [← mul_smul]
-    rfl
+    exact congrArg toTensor.symm (mul_smul g h (toTensor m))
 
 /-!
 

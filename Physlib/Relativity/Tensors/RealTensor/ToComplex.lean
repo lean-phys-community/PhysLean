@@ -154,8 +154,7 @@ noncomputable def toComplex {n} {c : Fin n → realLorentzTensor.Color} :
     rw [Finset.smul_sum]
     congr
     funext i
-    rw [← smul_smul]
-    rfl
+    exact (smul_smul _ _ _).symm
   map_add' c v := by
     simp only [map_add, Finsupp.coe_add, Pi.add_apply]
     rw [← Finset.sum_add_distrib]
