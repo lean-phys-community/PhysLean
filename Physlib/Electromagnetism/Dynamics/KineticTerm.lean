@@ -986,7 +986,6 @@ lemma gradKineticTerm_eq_tensorDeriv {d} {𝓕 : FreeSpace}
     rw [gradKineticTerm_eq_fieldStrength A x hA]
     simp [Lorentz.Vector.apply_sum]
   ring_nf
-  rfl
 
 end ElectromagneticPotential
 

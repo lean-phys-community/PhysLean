@@ -68,8 +68,7 @@ noncomputable def translateSchwartz {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :
           trans (1 + (‖x‖ + ‖a‖)) + ‖x‖ * ‖a‖
           · simp
             positivity
-          ring_nf
-          rfl) (by
+          nlinarith) (by
           use 1, (1 + ‖a‖)
           intro x
           simp only [pow_one]
@@ -79,8 +78,7 @@ noncomputable def translateSchwartz {d : ℕ} (a : EuclideanSpace ℝ (Fin d)) :
           trans (1 + (‖a‖ + ‖x - basis.repr.symm a‖)) + ‖a‖ * ‖x - basis.repr.symm a‖
           · simp
             positivity
-          ring_nf
-          rfl)
+          nlinarith)
 
 @[simp]
 lemma translateSchwartz_apply {d : ℕ} (a : EuclideanSpace ℝ (Fin d))

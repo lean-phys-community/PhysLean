@@ -484,7 +484,6 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
   intro u v
   simp [f, f', inner_smul_left, Lorentz.Vector.basis_inner]
   ring_nf
-  rfl
 
 /-!
 
