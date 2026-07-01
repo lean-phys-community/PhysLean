@@ -161,22 +161,17 @@ theorem nonSingular_empty [IsEmpty n] : NonSingular A := by
 
 variable [NonSingular A] [NonSingular B]
 
-theorem nonSingular_det_ne_zero : A.mat.det ≠ 0 := by
-  rwa [← nonSingular_iff_det_ne_zero]
+theorem nonSingular_det_ne_zero : A.mat.det ≠ 0 := by rwa [← nonSingular_iff_det_ne_zero]
 
 @[simp]
-theorem nonSingular_ker_bot : A.ker = ⊥ := by
-  rwa [← nonSingular_iff_ker_bot]
+theorem nonSingular_ker_bot : A.ker = ⊥ := by rwa [← nonSingular_iff_ker_bot]
 
 @[simp]
-theorem nonSingular_support_top : A.support = ⊤ := by
-  rwa [← nonSingular_iff_support_top]
+theorem nonSingular_support_top : A.support = ⊤ := by rwa [← nonSingular_iff_support_top]
 
-instance nonSingular_neg : NonSingular (-A) := by
-  rwa [nonSingular_iff_neg]
+instance nonSingular_neg : NonSingular (-A) := by rwa [nonSingular_iff_neg]
 
-instance nonSingular_inv : NonSingular (A⁻¹) := by
-  rwa [nonSingular_iff_inv]
+instance nonSingular_inv : NonSingular (A⁻¹) := by rwa [nonSingular_iff_inv]
 
 instance nonSingular_kron [Nonempty n] [Nonempty m] : NonSingular (A ⊗ₖ B) :=
   nonSingular_iff_kronecker.mpr ⟨inferInstance, inferInstance⟩
