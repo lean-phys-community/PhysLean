@@ -42,8 +42,7 @@ lemma fderiv_apply_scaleUnit (u1 u2 : UnitChoices) (x dm : M1)
   change (fderiv ℝ ((u2.dimScale u1 (dim M2)).1 • fun mx => f
       ((u1.dimScale u2 (dim M1)).1 • mx)) ((u2.dimScale u1 (dim M1)).1 • x)) dm = _
   rw [fderiv_const_smul (by fun_prop), fderiv_comp_smul]
-  simp [smul_smul]
-  rfl
+  simp [smul_smul, NNReal.smul_def]
 
 open ContinuousLinearUnitDependent in
 /-- If a function is dimensionally valid then so is it's derivative. -/
