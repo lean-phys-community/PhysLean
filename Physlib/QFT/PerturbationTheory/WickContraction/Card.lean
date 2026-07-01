@@ -53,8 +53,7 @@ lemma wickContraction_zero_some_eq_sum :
       ext
       · simp [c.2.2.2]
       · rfl}
-  rw [Fintype.card_congr e1]
-  simp
+  simpa using Fintype.card_congr e1
 
 lemma finset_succAbove_succ_disjoint (a : Finset (Fin n)) (i : Fin n.succ) :
     Disjoint ((Finset.map (Fin.succEmb (n + 1))) ((Finset.map i.succAboveEmb) a)) {0, i.succ} := by

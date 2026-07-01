@@ -246,8 +246,7 @@ lemma filter_uncontractedList (c : WickContraction n) (p : Fin n → Prop) [Deci
     ext a
     simp only [List.toFinset_filter, decide_eq_true_eq, Finset.mem_filter, List.mem_toFinset,
       and_congr_left_iff]
-    rw [uncontractedList_mem_iff]
-    simp
+    simp [uncontractedList_mem_iff]
   have hx := (List.toFinset_sort (· ≤ ·) h2).mpr h1
   rw [← hx, h3]
 
@@ -293,8 +292,7 @@ lemma take_uncontractedIndexEquiv_symm (k : c.uncontracted) :
   conv_lhs =>
     rhs
     rw [hl]
-  rw [uncontractedIndexEquiv_symm_eq_filter_length]
-  simp
+  simp [uncontractedIndexEquiv_symm_eq_filter_length]
 /-!
 
 ## Uncontracted List get
@@ -463,8 +461,7 @@ lemma uncontractedList_succAbove_orderedInsert_toFinset (c : WickContraction n) 
   ext a
   simp only [Nat.succ_eq_add_one, Fin.coe_succAboveEmb, List.mem_toFinset, List.mem_orderedInsert,
     List.mem_map, Finset.mem_insert, Finset.mem_map, Fin.succAboveEmb_apply]
-  rw [← uncontractedList_toFinset]
-  simp
+  simp [← uncontractedList_toFinset]
 
 lemma uncontractedList_succAbove_orderedInsert_eq_sort (c : WickContraction n) (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i (List.map i.succAboveEmb c.uncontractedList)) =
@@ -553,8 +550,7 @@ lemma uncontractedList_succAboveEmb_toFinset (c : WickContraction n) (i : Fin n.
   ext a
   simp only [Fin.coe_succAboveEmb, List.mem_toFinset, List.mem_map, Finset.mem_map,
     Fin.succAboveEmb_apply]
-  rw [← c.uncontractedList_toFinset]
-  simp
+  simp [← c.uncontractedList_toFinset]
 
 /-!
 
@@ -593,8 +589,7 @@ lemma take_uncontractedListOrderPos_eq_filter_sort (c : WickContraction n) (i : 
     List.Nodup.filter _ (uncontractedList_nodup c)
   have h3 : (c.uncontractedList.filter (fun x => x.1 < i.1)).toFinset =
     (c.uncontracted.filter (fun x => x.1 < i.1)) := by
-    rw [uncontractedList_eq_sort]
-    simp
+    simp [uncontractedList_eq_sort]
   simpa [← h3] using ((List.toFinset_sort (α := Fin n) (· ≤ ·) h2).mpr h1).symm
 
 lemma orderedInsert_succAboveEmb_uncontractedList_eq_insertIdx (c : WickContraction n)
