@@ -559,9 +559,8 @@ private lemma exists_unitary_extending_isometry
   refine ⟨⟨Matrix.of (fun i j ↦ b j i), ?_⟩, ?_⟩
   · simp only [Matrix.mem_unitaryGroup_iff]
     ext1 i j
-    have := b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)
-    simp_all [inner]
-    exact this
+    simpa [Matrix.mul_apply, Matrix.one_apply, Matrix.star_apply, inner] using
+      b.sum_inner_mul_inner (EuclideanSpace.single i 1) (EuclideanSpace.single j 1)
   · simp [hb, u]
 
 omit [DecidableEq dOut] [Inhabited dOut] in

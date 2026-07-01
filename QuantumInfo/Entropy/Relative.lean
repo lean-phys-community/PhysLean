@@ -2207,6 +2207,8 @@ theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
     let P : HermitianMat (dA × dB) ℂ := ρ.traceRight.M.supportProj ⊗ₖ ρ.traceLeft.M.supportProj
     have hP : ρ.M.support ≤ P.support :=
       fun x hx => ⟨x, by simpa [P] using fixed_support_kron_prod hx⟩
+    have hkerP : P.ker ≤ ρ.M.ker := by
+      simpa [HermitianMat.support_orthogonal_eq_range] using Submodule.orthogonal_le hP
     exact (show (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.ker ≤ P.ker by
       change LinearMap.ker
           ((Matrix.kroneckerMap (· * ·) ρ.traceRight.M.mat ρ.traceLeft.M.mat).toEuclideanLin)

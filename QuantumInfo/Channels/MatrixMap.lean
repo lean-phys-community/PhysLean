@@ -330,9 +330,8 @@ theorem kron_map_of_kron_state [CommRing R] (M₁ : MatrixMap A B R) (M₂ : Mat
   congr
   --TODO: Cleanup, these two branches are nearly identical (separate lemma?)
   · have h_linear : M₁ MA = ∑ i : A, ∑ i_1 : A, MA i i_1 • M₁ (Matrix.single i i_1 1) := by
-      have h_linear : M₁ MA = M₁ (∑ i : A, ∑ i_1 : A, Matrix.single i i_1 (MA i i_1)) := by
-        congr;
-        exact Matrix.matrix_eq_sum_single MA
+      have h_linear : M₁ MA = M₁ (∑ i : A, ∑ i_1 : A, Matrix.single i i_1 (MA i i_1)) :=
+        congrArg M₁ (Matrix.matrix_eq_sum_single MA)
       simp [ h_linear, Matrix.single]
       congr! 2 with i _ j _
       convert M₁.map_smul (MA i j) (Matrix.of fun i' j' ↦ if i = i' ∧ j = j' then 1 else 0) using 2

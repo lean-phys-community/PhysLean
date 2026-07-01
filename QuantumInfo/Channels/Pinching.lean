@@ -123,7 +123,7 @@ theorem pinching_commutes_kraus (σ ρ : MState d) (i : spectrum ℝ σ.m) :
 
 theorem pinching_commutes (ρ σ : MState d) :
     Commute (pinching_map σ ρ).m σ.m := by
-  dsimp [MState.m, Commute, SemiconjBy]
+  change (pinching_map σ ρ).M.mat * σ.M.mat = σ.M.mat * (pinching_map σ ρ).M.mat
   rw [pinchingMap_apply_M]
   simp only [MatrixMap.of_kraus, Function.comp_apply]
   simp only [HermitianMat.conjTranspose_mat, MState.mat_M, LinearMap.coe_sum,
@@ -296,8 +296,8 @@ theorem inner_cfc_pinching_right (ρ σ : MState d) (f : ℝ → ℝ) :
     convert pinching_sum σ using 1;
     simp [HermitianMat.ext_iff ];
     -- Since each pinching_kraus is a projection, multiplying it by itself gives the same projection. Therefore, the sum of the squares is the same as the sum of the pinching_kraus themselves.
-    have h_proj : ∀ k : spectrum ℝ σ.m, (pinching_kraus σ k).mat * (pinching_kraus σ k).mat = (pinching_kraus σ k).mat := by
-      exact fun k => by simpa [ sq, -pinching_sq_eq_self ] using congr_arg ( fun x : HermitianMat d ℂ => x.mat ) ( pinching_sq_eq_self σ k ) ;
+    have h_proj : ∀ k : spectrum ℝ σ.m, (pinching_kraus σ k).mat * (pinching_kraus σ k).mat = (pinching_kraus σ k).mat :=
+      fun k => by simpa [ sq, -pinching_sq_eq_self ] using congr_arg ( fun x : HermitianMat d ℂ => x.mat ) ( pinching_sq_eq_self σ k ) ;
     rw [ Finset.sum_congr rfl fun _ _ => h_proj _ ];
   convert congr_arg ( fun x : Matrix d d ℂ => x.trace.re ) ( congr_arg ( fun x : Matrix d d ℂ => x * ( ρ.m * cfc f σ.m ) ) h_sum_kraus ) using 1;
   · simp [Matrix.sum_mul]
@@ -324,10 +324,9 @@ theorem pinching_map_ker_le (ρ σ : MState d) : (pinching_map σ ρ).M.ker ≤ 
   simp only [WithLp.toLp_sum, WithLp.toLp_ofLp] at hv_sum
   rw [← hv_sum]
   exact Submodule.sum_mem _ fun k _ ↦ by
-    have h1 := hv k;
-    simp only [HermitianMat.ker_conj ρ.nonneg, HermitianMat.conjTranspose_mat,
-      Submodule.mem_comap] at h1 ⊢
-    exact h1
+    change Matrix.toEuclideanLin (pinching_kraus σ k).mat v ∈ ρ.M.ker
+    simpa only [HermitianMat.ker_conj ρ.nonneg, HermitianMat.conjTranspose_mat,
+      Submodule.mem_comap] using hv k
 
 
 noncomputable section AristotleLemmas
