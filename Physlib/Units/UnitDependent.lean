@@ -348,12 +348,11 @@ noncomputable instance {M1 M2 : Type} [AddCommGroup M1] [Module ℝ M1]
 noncomputable instance {M1 M2 : Type} [UnitDependent M1] :
     UnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => f (scaleUnit u2 u1 m1)
-  scaleUnit_trans u1 u2 u3 f := funext fun m1 => by
-    simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := funext fun m1 => by
-    simp [scaleUnit_trans']
-  scaleUnit_id u f := funext fun m1 => by
-    simp [scaleUnit_id]
+  scaleUnit_trans u1 u2 u3 f := funext fun m1 =>
+    congrArg f (scaleUnit_trans u3 u2 u1 m1)
+  scaleUnit_trans' u1 u2 u3 f := funext fun m1 =>
+    congrArg f (scaleUnit_trans' u3 u2 u1 m1)
+  scaleUnit_id u f := funext fun m1 => congrArg f (scaleUnit_id u m1)
 
 @[simp]
 lemma UnitDependent.scaleUnit_apply_fun_left {M1 M2 : Type} [UnitDependent M1]
@@ -364,10 +363,16 @@ noncomputable instance instUnitDependentTwoSided
     {M1 M2 : Type} [UnitDependent M1] [UnitDependent M2] :
     UnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => scaleUnit u1 u2 (f (scaleUnit u2 u1 m1))
-  scaleUnit_trans u1 u2 u3 f := funext fun m1 => by
-    simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := funext fun m1 => by
-    simp [scaleUnit_trans']
+  scaleUnit_trans u1 u2 u3 f := funext fun m1 =>
+    Eq.trans
+      (congrArg (fun x => scaleUnit u2 u3 (scaleUnit u1 u2 (f x)))
+        (scaleUnit_trans u3 u2 u1 m1))
+      (scaleUnit_trans u1 u2 u3 (f (scaleUnit u3 u1 m1)))
+  scaleUnit_trans' u1 u2 u3 f := funext fun m1 =>
+    Eq.trans
+      (congrArg (fun x => scaleUnit u1 u2 (scaleUnit u2 u3 (f x)))
+        (scaleUnit_trans' u3 u2 u1 m1))
+      (scaleUnit_trans' u1 u2 u3 (f (scaleUnit u3 u1 m1)))
   scaleUnit_id u f := funext fun m1 => by
     simp [scaleUnit_id]
 
