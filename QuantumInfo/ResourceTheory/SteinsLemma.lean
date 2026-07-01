@@ -456,8 +456,8 @@ private lemma rexp_mul_smul_proj_lt_mul_sub_le_mul_sub {n : ℕ} {x : ℝ}
   dsimp
   gcongr
   apply Matrix.PosSemidef.trace_mono
-  rw [one_div, HermitianMat.mat_smul, smul_mul_assoc, mul_smul_comm]
-  rw [inv_smul_le_iff_of_pos (mod_cast hn), HermitianMat.mat_smul]
+  rw [one_div, smul_mul_assoc, mul_smul_comm]
+  rw [inv_smul_le_iff_of_pos (mod_cast hn)]
   rw [mul_smul_comm]
   obtain ⟨C, ⟨f, hf⟩, ⟨g, hg⟩⟩ := hℰσ.exists_HermitianMat_cfc
   rw [hf, hg] at hE ⊢
@@ -855,7 +855,7 @@ private theorem hσ₁_le_σ' : (1 / 3 : ℝ) • ((σ₁ i) ⊗ᵣ^[n]).M ≤ (
     positivity
 
 private theorem σ''_unnormalized_PosDef : Matrix.PosDef (σ''_unnormalized ρ ε m σ n).mat := by
-  dsimp [σ''_unnormalized]
+  change Matrix.PosDef (((σ' ρ ε m σ n).M.cfc fun e ↦ Real.exp (f_map i n e)).mat)
   rw [HermitianMat.cfc_posDef]
   intro
   positivity
@@ -1237,7 +1237,7 @@ private theorem EquationS62
         dsimp [σ₁_mineig, iInf]
         rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
         rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
-        rw [MState.mat_M, sInf_spectrum_spacePow (σ₁ i) n, MState.mat_M, smul_smul]
+        rw [sInf_spectrum_spacePow (σ₁ i) n, smul_smul]
       _ = Real.exp (- n * (σ₁_c i n + (σ₁_c i n) / n)) • 1 := by
         rw [σ₁_c_identity i hn]
       _ ≥ Real.exp (-n * c' ε2 n) • 1 := by
@@ -1856,10 +1856,12 @@ theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1) (σ : (
     dsimp [σ₁_mineig, iInf]
     rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
     rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
-    rw [HermitianMat.val_eq_coe, HermitianMat.mat_smul]
-    rw [spectrum.smul_eq_smul _ _ (ContinuousFunctionalCalculus.spectrum_nonempty _ ((σ₁ i) ⊗ᵣ^[n]).M.H)]
+    change sInf (spectrum ℝ (σ₁ i).m) ^ n / 3 ≤
+      sInf (spectrum ℝ ((1 / 3 : ℝ) • ((σ₁ i) ⊗ᵣ^[n]).m))
+    rw [spectrum.smul_eq_smul _ _
+      (ContinuousFunctionalCalculus.spectrum_nonempty _ ((σ₁ i) ⊗ᵣ^[n]).Hermitian)]
     rw [Real.sInf_smul_of_nonneg (by norm_num)]
-    simp [MState.mat_M, div_eq_inv_mul, sInf_spectrum_spacePow]
+    simp [div_eq_inv_mul, sInf_spectrum_spacePow]
 
   have hdpos n : 0 < Fintype.card (spectrum ℝ (σ'' ρ ε m σ n).m) := by
     rw [Fintype.card_pos_iff, Set.nonempty_coe_sort]
