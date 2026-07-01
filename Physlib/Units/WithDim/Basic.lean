@@ -170,8 +170,7 @@ lemma val_pow_two_eq_mul {d1 : Dimension} (m1 : WithDim d1 ℝ) :
 lemma scaleUnit_val_eq_scaleUnit_val {d : Dimension} (M : Type) [MulAction ℝ≥0 M]
     (u1 u2 : UnitChoices) (m1 m2 : WithDim d M) :
     (scaleUnit u1 u2 m1).val = (scaleUnit u1 u2 m2).val ↔ m1.val = m2.val := by
-  rw [← WithDim.ext_iff]
-  rw [scaleUnit_injective]
+  rw [← WithDim.ext_iff, scaleUnit_injective]
   exact WithDim.ext_iff
 
 lemma scaleUnit_val_eq_scaleUnit_val_of_dim_eq {d1 d2 : Dimension} {M : Type} [MulAction ℝ≥0 M]

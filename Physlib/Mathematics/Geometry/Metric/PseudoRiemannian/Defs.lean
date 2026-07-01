@@ -486,16 +486,14 @@ lemma sharp_flat_apply
 lemma apply_sharp_sharp
     (g : PseudoRiemannianMetric E H M n I) (x : M) (ω₁ ω₂ : TangentSpace I x →L[ℝ] ℝ) :
     g.val x (g.sharpL x ω₁) (g.sharpL x ω₂) = ω₁ (g.sharpL x ω₂) := by
-  rw [← flatL_apply g x (g.sharpL x ω₁)]
-  rw [flatL_apply_sharpL g x ω₁]
+  rw [← flatL_apply g x (g.sharpL x ω₁), flatL_apply_sharpL g x ω₁]
 
 /-- The metric evaluated at `v` and `sharp ω`. -/
 lemma apply_vec_sharp
     (g : PseudoRiemannianMetric E H M n I) (x : M) (v : TangentSpace I x)
     (ω : TangentSpace I x →L[ℝ] ℝ) :
     g.val x v (g.sharpL x ω) = ω v := by
-  rw [g.symm x v (g.sharpL x ω)]
-  rw [← flatL_apply g x (g.sharpL x ω)]
+  rw [g.symm x v (g.sharpL x ω), ← flatL_apply g x (g.sharpL x ω)]
   rw [flatL_apply_sharpL g x ω]
 
 end Sharp

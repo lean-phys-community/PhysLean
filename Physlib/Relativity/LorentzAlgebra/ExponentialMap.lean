@@ -69,8 +69,7 @@ set_option backward.isDefEq.respectTransparency false in
 The exponential of an element of the Lorentz algebra is a member of the Lorentz group.
 -/
 theorem exp_mem_lorentzGroup (A : lorentzAlgebra) : NormedSpace.exp A.1 ∈ LorentzGroup 3 := by
-  rw [LorentzGroup.mem_iff_transpose_mul_minkowskiMatrix_mul_self]
-  rw [← Matrix.exp_transpose]
+  rw [LorentzGroup.mem_iff_transpose_mul_minkowskiMatrix_mul_self, ← Matrix.exp_transpose]
   rw [exp_transpose_of_mem_algebra A]
   calc
     (η * NormedSpace.exp (-A.1) * η) * η * NormedSpace.exp A.1

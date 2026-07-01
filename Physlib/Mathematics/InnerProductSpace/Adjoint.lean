@@ -49,8 +49,7 @@ def adjoint (f : E → F) :=
 
 lemma HasAdjoint.adjoint_inner_right {f : E → F} (hf : HasAdjoint 𝕜 f f') :
     ⟪x, f' y⟫ = ⟪f x, y⟫ := by
-  rw [← inner_conj_symm']
-  rw [hf.adjoint_inner_left]
+  rw [← inner_conj_symm', hf.adjoint_inner_left]
   rw [inner_conj_symm']
 
 open InnerProductSpace' in
