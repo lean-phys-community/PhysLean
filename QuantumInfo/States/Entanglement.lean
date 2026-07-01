@@ -212,7 +212,6 @@ theorem mixed_convex_roof_of_pure (ψ : Ket d) : mixed_convex_roof f (pure ψ) =
     conv_rhs =>
       enter [1, 1]
       rw [mix_mEnsemble_pure_average (toReal ∘ f) hmix, Function.comp_apply]
-    rfl
 
 /-- Entanglement of Formation of bipartite systems. It is the convex roof extension of the
 von Neumann entropy of one of the subsystems (here chosen to be the left one, but see `Entropy.Sᵥₙ_of_partial_eq`).

@@ -522,13 +522,12 @@ lemma basis!_on_oddShiftFst_other {k j : Fin n} (h : k ≠ j) :
     simp_all
     rw [Fin.ext_iff] at h
     simp_all
-  · split
-    · rename_i h1 h2
-      simp_all
-      rw [Fin.ext_iff] at h2
-      simp only [Fin.val_castAdd, Fin.val_natAdd] at h2
-      omega
-    rfl
+  · split <;> try rfl
+    rename_i h1 h2
+    simp_all
+    rw [Fin.ext_iff] at h2
+    simp only [Fin.val_castAdd, Fin.val_natAdd] at h2
+    omega
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_other {k : Fin n} {j : Fin (2 * n + 1)}

@@ -290,7 +290,6 @@ lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
         have hsup : A.support = (Matrix.toEuclideanLin (↑A : Matrix d d ℂ)).range := by
           simp [HermitianMat.support, HermitianMat.lin]
         rw [key, LinearMap.comp_apply, Submodule.subtype_apply, hsup]
-        rfl
       rw [h_supportProj_mul_A]
       exact Submodule.eq_starProjection_of_mem_of_inner_eq_zero (by simpa using hv) (by simp)
     exact congr(WithLp.ofLp $(h_supportProj_mul_A _ h_range))
