@@ -38,8 +38,7 @@ lemma Complex.ofReal_hasDerivAt : HasDerivAt Complex.ofReal 1 x := by
   let f1 : ℂ → ℂ := id
   change HasDerivAt (f1 ∘ Complex.ofReal) 1 x
   apply HasDerivAt.comp_ofReal
-  simp only [f1]
-  exact hasDerivAt_id _
+  simpa only [f1] using hasDerivAt_id _
 
 @[simp]
 lemma Complex.deriv_ofReal : deriv Complex.ofReal x = 1 := by

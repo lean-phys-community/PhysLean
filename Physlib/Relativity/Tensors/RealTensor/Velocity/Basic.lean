@@ -97,8 +97,7 @@ lemma minkowskiProduct_continuous_fst (u : Vector d) :
     (fun (x : Velocity d) => ⟪u, x.1⟫ₘ) := by
     ext x
     rw [minkowskiProduct_symm]
-  rw [h1]
-  exact minkowskiProduct_continuous_snd u
+  simpa [h1] using minkowskiProduct_continuous_snd u
 
 /-!
 

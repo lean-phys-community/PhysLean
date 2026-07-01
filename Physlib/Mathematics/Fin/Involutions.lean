@@ -341,8 +341,7 @@ def involutionNoFixedSetOne {n : ℕ} :
       simp [f.2.1 i.succ.succ]
     · intro i
       simp only [succ_eq_add_one, ne_eq, Function.comp_apply, f''', f'', f']
-      rw [Fin.pred_eq_iff_eq_succ, Fin.pred_eq_iff_eq_succ]
-      exact f.2.2.1 i.succ.succ
+      simpa [Fin.pred_eq_iff_eq_succ, Fin.pred_eq_iff_eq_succ] using f.2.2.1 i.succ.succ
   invFun f := by
     let f' := fun (i : Fin n.succ.succ)=>
       match i with

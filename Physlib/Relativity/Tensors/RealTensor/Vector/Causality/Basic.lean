@@ -56,8 +56,7 @@ lemma spaceLike_iff_norm_sq_neg {d : ℕ} (p : Vector d) :
     simp only [reduceCtorEq, h, lt_self_iff_false]
   · split
     · rename_i h
-      simp only [reduceCtorEq, false_iff, not_lt]
-      exact le_of_lt h
+      simpa only [reduceCtorEq, false_iff, not_lt] using le_of_lt h
     · rename_i h1 h2
       simp only [true_iff]
       rw [not_lt_iff_eq_or_lt] at h2

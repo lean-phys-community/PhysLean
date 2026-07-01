@@ -51,8 +51,7 @@ lemma potential_eq : H.potential = fun x ↦ -H.k * ‖x‖⁻¹ := H.coulomb_po
 
 @[fun_prop]
 lemma potential_AESM : AEStronglyMeasurable H.potential := by
-  rw [potential_eq]
-  exact AEMeasurable.aestronglyMeasurable (by fun_prop)
+  simpa [potential_eq] using AEMeasurable.aestronglyMeasurable (by fun_prop)
 
 @[fun_prop]
 lemma potential_AEM : AEMeasurable H.potential := H.potential_AESM.aemeasurable

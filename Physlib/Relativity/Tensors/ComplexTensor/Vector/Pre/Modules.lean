@@ -164,8 +164,7 @@ def lorentzGroupRep : Representation ℂ (LorentzGroup 3) CoℂModule where
       LinearEquiv.apply_symm_apply, mulVec_mulVec, EmbeddingLike.apply_eq_iff_eq]
     refine (congrFun (congrArg _ ?_) _)
     simp only [_root_.map_mul]
-    rw [Matrix.mul_inv_rev]
-    exact transpose_mul _ _
+    simp [Matrix.mul_inv_rev]
 
 /-- The representation of the SL(2, ℂ) on `ContrℂModule` induced by the representation of the
   Lorentz group. -/

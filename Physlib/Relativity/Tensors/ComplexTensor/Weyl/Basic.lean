@@ -92,8 +92,7 @@ def dualLeftHandedRep : Representation ℂ SL(2,ℂ) DualLeftHandedWeyl where
     simp only [SpecialLinearGroup.coe_mul, LinearMap.coe_mk, AddHom.coe_mk, Module.End.mul_apply,
       LinearEquiv.apply_symm_apply, mulVec_mulVec, EmbeddingLike.apply_eq_iff_eq]
     refine (congrFun (congrArg _ ?_) _)
-    rw [Matrix.mul_inv_rev]
-    exact transpose_mul _ _
+    simp [Matrix.mul_inv_rev]
 
 /-- The standard basis on dual-left-handed Weyl fermions. -/
 def dualLeftBasis : Basis (Fin 2) ℂ DualLeftHandedWeyl := Basis.ofEquivFun

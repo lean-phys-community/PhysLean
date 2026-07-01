@@ -165,8 +165,7 @@ lemma regularityDomain_smul (T : H →ₗ.[ℂ] H) {w : ℂ} (hw : w ≠ 0) :
     · refine ⟨‖w‖⁻¹ * c, by positivity, fun x ↦ ?_⟩
       rw [mul_assoc]
       apply (inv_mul_le_iff₀ <| norm_pos_iff.mpr hw).mpr
-      rw [← norm_smul, smul_sub, smul_smul, mul_inv_cancel_left₀ hw]
-      exact h_bound x
+      simpa [← norm_smul, smul_sub, smul_smul, mul_inv_cancel_left₀ hw] using h_bound x
     · simp [hw]
   · intro ⟨u, ⟨c, hc, h_bound⟩, huz⟩
     refine ⟨‖w‖ * c, by positivity, fun x ↦ ?_⟩

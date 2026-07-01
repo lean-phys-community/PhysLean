@@ -77,8 +77,7 @@ def polyBddSchwartzMap (d : ℕ) (a : ℕ∞) : Submodule ℂ 𝓢(Space d, ℂ)
     obtain ⟨C₂, hC₂_pos, hC₂⟩ := hg k hk
     refine ⟨C₁ + C₂, by positivity, fun x ↦ ?_⟩
     refine le_trans ?_ (add_le_add (hC₁ x) (hC₂ x))
-    rw [← mul_add]
-    exact mul_le_mul_of_nonneg_left (norm_add_le (f x) (g x)) (by positivity)
+    simpa [← mul_add] using mul_le_mul_of_nonneg_left (norm_add_le (f x) (g x)) (by positivity)
   zero_mem' := fun _ _ ↦ ⟨1, by simp⟩
   smul_mem' := by
     intro c f hf k hk

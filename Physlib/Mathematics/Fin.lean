@@ -144,8 +144,7 @@ lemma finExtractOne_apply_neq {n : ℕ} (i j : Fin (n + 1 + 1)) (hij : i ≠ j) 
     finExtractOne i j = Sum.inr (predAboveI i j) := by
   symm
   apply (Equiv.symm_apply_eq _).mp ?_
-  simp only [Nat.succ_eq_add_one, finExtractOne_symm_inr_apply]
-  exact succsAbove_predAboveI hij
+  simpa only [Nat.succ_eq_add_one, finExtractOne_symm_inr_apply] using succsAbove_predAboveI hij
 
 /-- Given an equivalence `Fin n.succ.succ ≃ Fin n.succ.succ`, and an `i : Fin n.succ.succ`,
   the map `Fin n.succ → Fin n.succ` obtained by dropping `i` and it's image. -/

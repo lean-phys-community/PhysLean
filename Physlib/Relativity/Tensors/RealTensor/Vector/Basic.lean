@@ -91,8 +91,7 @@ instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) where
 
 instance isNormedSpace (d : ℕ) : NormedSpace ℝ (Vector d) where
   norm_smul_le c v := by
-    simp only [norm_eq_equivEuclid, map_smul]
-    exact norm_smul_le c (equivEuclid d v)
+    simpa only [norm_eq_equivEuclid, map_smul] using norm_smul_le c (equivEuclid d v)
 open InnerProductSpace
 
 instance (d : ℕ) : Inner ℝ (Vector d) where
