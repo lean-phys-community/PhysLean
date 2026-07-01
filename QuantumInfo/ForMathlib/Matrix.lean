@@ -421,8 +421,7 @@ theorem le_smul_one_of_eigenvalues_iff (hA : A.IsHermitian) (c : ℝ) :
   (∀ i, hA.eigenvalues i ≤ c) ↔ A ≤ c • (1 : Matrix n n 𝕜) := by
   let U : Matrix n n 𝕜 := ↑hA.eigenvectorUnitary
   have hU : U.conjTranspose = star U := by simp only [star]
-  have hU' : U * star U = 1 := by
-    simp only [SetLike.coe_mem, Unitary.mul_star_self_of_mem, U]
+  have hU' : U * star U = 1 := by simp only [SetLike.coe_mem, Unitary.mul_star_self_of_mem, U]
   have hc : c • (1 : Matrix n n 𝕜) = U * (c • 1) * U.conjTranspose := by
     simp only [Algebra.mul_smul_comm, mul_one, hU, Algebra.smul_mul_assoc, hU']
   have hc' : c • (1 : Matrix n n 𝕜) = diagonal (RCLike.ofReal ∘ fun _ : n ↦ c) := by
@@ -440,8 +439,7 @@ theorem le_smul_one_of_eigenvalues_iff (hA : A.IsHermitian) (c : ℝ) :
     simp only [Function.comp_apply, algebraMap_le_algebraMap, h i]
   intro hAc i
   replace hAc := conjTranspose_mul_mul_mono U hAc
-  have hU'CT : star U * U = 1 := by
-    simp only [SetLike.coe_mem, Unitary.star_mul_self_of_mem, U]
+  have hU'CT : star U * U = 1 := by simp only [SetLike.coe_mem, Unitary.star_mul_self_of_mem, U]
   have hcCT : U.conjTranspose * (c • 1) * U = c • (1 : Matrix n n 𝕜) := by
     simp only [Algebra.mul_smul_comm, mul_one, hU, Algebra.smul_mul_assoc, hU'CT]
   have hASTCT : U.conjTranspose * A * U = diagonal (RCLike.ofReal ∘ hA.eigenvalues) := by
@@ -458,8 +456,7 @@ theorem smul_one_le_of_eigenvalues_iff (hA : A.IsHermitian) (c : ℝ) :
   -- I did the lazy thing and just copied the previous proof
   let U : Matrix n n 𝕜 := ↑hA.eigenvectorUnitary
   have hU : U.conjTranspose = star U := by simp only [star]
-  have hU' : U * star U = 1 := by
-    simp only [SetLike.coe_mem, Unitary.mul_star_self_of_mem, U]
+  have hU' : U * star U = 1 := by simp only [SetLike.coe_mem, Unitary.mul_star_self_of_mem, U]
   have hc : c • (1 : Matrix n n 𝕜) = U * (c • 1) * U.conjTranspose := by
     simp only [Algebra.mul_smul_comm, mul_one, hU, Algebra.smul_mul_assoc, hU']
   have hc' : c • (1 : Matrix n n 𝕜) = diagonal (RCLike.ofReal ∘ fun _ : n ↦ c) := by
@@ -477,8 +474,7 @@ theorem smul_one_le_of_eigenvalues_iff (hA : A.IsHermitian) (c : ℝ) :
     simp only [Function.comp_apply, algebraMap_le_algebraMap, h i]
   intro hAc i
   replace hAc := conjTranspose_mul_mul_mono U hAc
-  have hU'CT : star U * U = 1 := by
-    simp only [SetLike.coe_mem, Unitary.star_mul_self_of_mem, U]
+  have hU'CT : star U * U = 1 := by simp only [SetLike.coe_mem, Unitary.star_mul_self_of_mem, U]
   have hcCT : U.conjTranspose * (c • 1) * U = c • (1 : Matrix n n 𝕜) := by
     simp only [Algebra.mul_smul_comm, mul_one, hU, Algebra.smul_mul_assoc, hU'CT]
   have hASTCT : U.conjTranspose * A * U = diagonal (RCLike.ofReal ∘ hA.eigenvalues) := by
@@ -914,8 +910,7 @@ variable {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂]
 @[simp]
 theorem trace_submatrix
   (A : Matrix d₁ d₁ α) (e : d₂ ≃ d₁) :
-    (A.submatrix e e).trace = A.trace := by
-  simpa [Matrix.trace] using e.sum_comp (fun x ↦ A x x)
+    (A.submatrix e e).trace = A.trace := by simpa [Matrix.trace] using e.sum_comp (fun x ↦ A x x)
 
 end subm
 
@@ -1469,8 +1464,7 @@ theorem traceLeft_neg : (-A).traceLeft = -A.traceLeft := by
   ext : 2; simp [Matrix.traceLeft]
 
 @[simp]
-theorem traceLeft_sub : (A - B).traceLeft = A.traceLeft - B.traceLeft := by
-  simp [sub_eq_add_neg]
+theorem traceLeft_sub : (A - B).traceLeft = A.traceLeft - B.traceLeft := by simp [sub_eq_add_neg]
 
 variable {A B : Matrix (n × m) (n × m) α}
 
