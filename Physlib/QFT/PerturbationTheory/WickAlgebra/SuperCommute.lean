@@ -187,8 +187,8 @@ lemma superCommute_ofCrAnOp_ofCrAnOp_mem_center (φ φ' : 𝓕.CrAnFieldOp) :
 
 lemma superCommute_ofCrAnOp_ofCrAnOp_commute (φ φ' : 𝓕.CrAnFieldOp)
     (a : WickAlgebra 𝓕) :
-    a * [ofCrAnOp φ, ofCrAnOp φ']ₛ = [ofCrAnOp φ, ofCrAnOp φ']ₛ * a := by
-  exact (Subalgebra.mem_center_iff.mp (superCommute_ofCrAnOp_ofCrAnOp_mem_center φ φ')) a
+    a * [ofCrAnOp φ, ofCrAnOp φ']ₛ = [ofCrAnOp φ, ofCrAnOp φ']ₛ * a :=
+  (Subalgebra.mem_center_iff.mp (superCommute_ofCrAnOp_ofCrAnOp_mem_center φ φ')) a
 
 lemma superCommute_ofCrAnOp_ofFieldOp_mem_center (φ : 𝓕.CrAnFieldOp) (φ' : 𝓕.FieldOp) :
     [ofCrAnOp φ, ofFieldOp φ']ₛ ∈ Subalgebra.center ℂ (WickAlgebra 𝓕) := by
@@ -200,8 +200,8 @@ lemma superCommute_ofCrAnOp_ofFieldOp_mem_center (φ : 𝓕.CrAnFieldOp) (φ' : 
 
 lemma superCommute_ofCrAnOp_ofFieldOp_commute (φ : 𝓕.CrAnFieldOp) (φ' : 𝓕.FieldOp)
     (a : WickAlgebra 𝓕) : a * [ofCrAnOp φ, ofFieldOp φ']ₛ =
-    [ofCrAnOp φ, ofFieldOp φ']ₛ * a := by
-  exact (Subalgebra.mem_center_iff.mp (superCommute_ofCrAnOp_ofFieldOp_mem_center φ φ')) a
+    [ofCrAnOp φ, ofFieldOp φ']ₛ * a :=
+  (Subalgebra.mem_center_iff.mp (superCommute_ofCrAnOp_ofFieldOp_mem_center φ φ')) a
 
 lemma superCommute_anPart_ofFieldOp_mem_center (φ φ' : 𝓕.FieldOp) :
     [anPart φ, ofFieldOp φ']ₛ ∈ Subalgebra.center ℂ (WickAlgebra 𝓕) := by

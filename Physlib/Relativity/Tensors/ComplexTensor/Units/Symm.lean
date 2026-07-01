@@ -53,7 +53,7 @@ lemma dualRightRightUnit_symm : {δR' | β β' = δR | β' β}ᵀ :=
 /-- Swapping indices of `rightDualRightUnit` returns `dualRightRightUnit`:
 `{δR | β β' = δR' | β' β}ᵀ`.
 -/
-lemma rightDualRightUnit_symm : {δR | β β' = δR' | β' β}ᵀ := by
-  exact unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.downR
+lemma rightDualRightUnit_symm : {δR | β β' = δR' | β' β}ᵀ :=
+  unitTensor_eq_permT_dual (S := complexLorentzTensor) Color.downR
 
 end complexLorentzTensor
