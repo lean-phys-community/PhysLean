@@ -186,8 +186,7 @@ lemma orderedInsertPos_drop_eq_orderedInsert {I : Type} (le1 : I → I → Prop)
     List.drop (orderedInsertPos le1 r r0).succ (List.orderedInsert le1 r0 r) := by
   conv_rhs => simp [orderedInsertPos, List.orderedInsert_eq_take_drop]
   have hr : r = List.takeWhile (fun b => !decide (le1 r0 b)) r ++
-      List.dropWhile (fun b => !decide (le1 r0 b)) r := by
-    exact Eq.symm (List.takeWhile_append_dropWhile)
+      List.dropWhile (fun b => !decide (le1 r0 b)) r := Eq.symm (List.takeWhile_append_dropWhile)
   conv_lhs =>
     rhs
     rw [hr]

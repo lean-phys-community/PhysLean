@@ -144,8 +144,7 @@ lemma adjFDeriv_id : adjFDeriv 𝕜 (fun x : E => x) = fun _ dx => dx := by
   funext x
   rw[HasAdjFDerivAt.adjFDeriv (hasAdjFDerivAt_id x)]
 
-lemma adjFDeriv_id' : adjFDeriv 𝕜 (id : E → E) = fun _ dx => dx := by
-  exact adjFDeriv_id
+lemma adjFDeriv_id' : adjFDeriv 𝕜 (id : E → E) = fun _ dx => dx := adjFDeriv_id
 
 lemma hasAdjFDerivAt_const (x : E) (y : F) :
     HasAdjFDerivAt 𝕜 (fun _ : E => y) (fun _ => 0) x where

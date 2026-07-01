@@ -331,8 +331,7 @@ lemma insertionSortEquiv_insertionSort_append {α : Type} (r : α → α → Pro
       equivCons_succ]
     erw [ih]
     have hl : (List.insertionSort r (List.insertionSort r l1 ++ a :: l2)) =
-        (List.insertionSort r (l1 ++ a :: l2)) := by
-      exact insertionSort_insertionSort_append r l1 (a :: l2)
+        (List.insertionSort r (l1 ++ a :: l2)) := insertionSort_insertionSort_append r l1 (a :: l2)
     erw [orderedInsertEquiv_congr _ _ _ hl]
     simp only [List.foldr_cons, finCongr_apply]
     rfl
@@ -379,8 +378,7 @@ lemma orderedInsert_filter_of_pos {α : Type} (r : α → α → Prop) [Decidabl
         simp only [List.pairwise_cons] at hl
         apply hl.1
         have hlf : (List.filter (fun b => decide (p b)) l)[0] ∈
-            (List.filter (fun b => decide (p b)) l) := by
-          exact List.getElem_mem c
+            (List.filter (fun b => decide (p b)) l) := List.getElem_mem c
         simp only [List.mem_filter, decide_eq_true_eq] at hlf
         exact hlf.1
       rw [hl]
