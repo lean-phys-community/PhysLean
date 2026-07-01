@@ -54,21 +54,18 @@ variable {d : ℕ} {f g : Space d → ℂ} (ψ φ : SpaceDHilbertSpace d)
 ## B. Dual space
 -/
 
-/-- The anti-linear map from the Hilbert space to its dual. -/
-def toBra {d : ℕ} : SpaceDHilbertSpace d →ₛₗ[starRingEnd ℂ] (StrongDual ℂ (SpaceDHilbertSpace d)) :=
+/-- The anti-linear equivalence between `SpaceDHilbertSpace d` and its dual.
+
+  This is the map that takes a ket to its corresponding bra and _vice versa_. -/
+def toBra : SpaceDHilbertSpace d ≃ₛₗ[starRingEnd ℂ] StrongDual ℂ (SpaceDHilbertSpace d) :=
   toDual ℂ (SpaceDHilbertSpace d)
 
 @[simp]
-lemma toBra_apply (f g : SpaceDHilbertSpace d) : toBra f g = ⟪f, g⟫_ℂ := rfl
+lemma toBra_apply_apply : toBra ψ φ = ⟪ψ, φ⟫_ℂ := rfl
 
-/-- The anti-linear map `toBra` taking a ket to its corresponding bra is surjective. -/
-lemma toBra_surjective : Function.Surjective (toBra (d := d)) :=
-  (toDual ℂ (SpaceDHilbertSpace d)).surjective
-
-/-- The anti-linear map `toBra` taking a ket to its corresponding bra is injective. -/
-lemma toBra_injective : Function.Injective (toBra (d := d)) := by
-  intro f g h
-  simpa [toBra] using h
+@[simp]
+lemma toBra_symm_apply (f : StrongDual ℂ (SpaceDHilbertSpace d)) : ⟪toBra.symm f, ψ⟫_ℂ = f ψ :=
+  toDual_symm_apply
 
 /-!
 ## C. Membership
