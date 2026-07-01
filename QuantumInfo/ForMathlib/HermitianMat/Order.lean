@@ -34,8 +34,7 @@ omit [Fintype n] in
 theorem le_iff : A ≤ B ↔ (B - A).mat.PosSemidef := Iff.rfl
 
 omit [Fintype n] in
-theorem zero_le_iff : 0 ≤ A ↔ A.mat.PosSemidef := by
-  rw [le_iff, sub_zero]
+theorem zero_le_iff : 0 ≤ A ↔ A.mat.PosSemidef := by rw [le_iff, sub_zero]
 
 theorem le_iff_mulVec_le : A ≤ B ↔
     ∀ x, star x ⬝ᵥ A.mat *ᵥ x ≤ star x ⬝ᵥ B.mat *ᵥ x := by

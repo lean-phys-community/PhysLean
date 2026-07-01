@@ -29,8 +29,7 @@ theorem sqrt_sq_eq_proj (A : HermitianMat d 𝕜) :
   grind [Pi.mul_apply, Real.mul_self_sqrt, Real.sqrt_eq_zero']
 
 theorem sqrt_sq (hA : 0 ≤ A) :
-    A.sqrt.mat * A.sqrt.mat = A := by
-  rw [sqrt_sq_eq_proj, posPart_eq_self hA]
+    A.sqrt.mat * A.sqrt.mat = A := by rw [sqrt_sq_eq_proj, posPart_eq_self hA]
 
 @[aesop unsafe apply 50% (rule_sets := [Commutes])]
 theorem commute_sqrt_left (hAB : Commute A.mat B.mat) :

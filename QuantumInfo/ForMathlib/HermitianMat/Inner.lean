@@ -133,8 +133,7 @@ theorem inner_eq_trace_mul : algebraMap R α ⟪A, B⟫_R = (A.mat * B.mat).trac
   rw [Finset.sum_comm]
   congr! <;> apply congrFun₂ (H _)
 
-theorem inner_comm : ⟪A, B⟫_R = ⟪B, A⟫_R := by
-  rw [inner_def, inner_def, Matrix.trace_mul_comm]
+theorem inner_comm : ⟪A, B⟫_R = ⟪B, A⟫_R := by rw [inner_def, inner_def, Matrix.trace_mul_comm]
 
 end commring
 
