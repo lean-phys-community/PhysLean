@@ -571,13 +571,11 @@ theorem one_div_add_t_operatorConvexOn_Ici : ∀ (t : ℝ), 0 < t →
   have hC1 : C1 = C + T := by
     subst A1 B1 C1
     simp [C, add_assoc, add_left_comm, add_comm, smul_add]
-  have hshift_ne0_A : ∀ x ∈ spectrum ℝ A, shift x ≠ 0 := by
-    intro x hx
-    exact ne_of_gt (by
+  have hshift_ne0_A : ∀ x ∈ spectrum ℝ A, shift x ≠ 0 :=
+    fun _ hx => ne_of_gt (by
       simpa [shift] using add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using As hx) ht)
-  have hshift_ne0_B : ∀ x ∈ spectrum ℝ B, shift x ≠ 0 := by
-    intro x hx
-    exact ne_of_gt (by
+  have hshift_ne0_B : ∀ x ∈ spectrum ℝ B, shift x ≠ 0 :=
+    fun _ hx => ne_of_gt (by
       simpa [shift] using add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Bs hx) ht)
   have hshift_ne0_C : ∀ x ∈ spectrum ℝ C, shift x ≠ 0 :=
     fun x hx ↦ ne_of_gt (by simpa [shift] using (add_pos_of_nonneg_of_pos (spectrum_nonneg_of_nonneg C_nonneg hx) ht))
@@ -682,9 +680,8 @@ theorem ratio_add_t_operatorMonotoneOn_Ici : ∀ (t : ℝ), 0 < t →
       simp [invfun]
       field_simp [ne_of_gt (add_pos_of_nonneg_of_pos hx0 ht)]
       ring
-    have hT_ne0 : ∀ x ∈ spectrum ℝ T, x + t ≠ 0 := by
-      intro x hx
-      exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using hspT hx) ht)
+    have hT_ne0 : ∀ x ∈ spectrum ℝ T, x + t ≠ 0 :=
+      fun _ hx => ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using hspT hx) ht)
     have hT_cont : ContinuousOn invfun (spectrum ℝ T) := by
       simpa [invfun, one_div] using (continuousOn_id.add continuousOn_const).inv₀ hT_ne0
     dsimp [cfcR]
@@ -745,9 +742,8 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
           = algebraMap ℝ (𝓐) (-1 : ℝ)
             + t • cfcR (fun x : ℝ ↦ 1 / (x + t)) T := by
       let invfun : ℝ → ℝ := fun x ↦ 1 / (x + t)
-      have hne0 : ∀ x ∈ spectrum ℝ T, x + t ≠ 0 := by
-        intro x hx
-        exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Ts hx) ht)
+      have hne0 : ∀ x ∈ spectrum ℝ T, x + t ≠ 0 :=
+        fun _ hx => ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Ts hx) ht)
       have hcont : ContinuousOn invfun (spectrum ℝ T) := by
         simpa [invfun, one_div] using (continuousOn_id.add continuousOn_const).inv₀ hne0
       dsimp [cfcR]

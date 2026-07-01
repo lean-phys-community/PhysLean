@@ -314,9 +314,8 @@ theorem traceNorm_mul_le_opNorm_traceNorm [DecidableEq n] (A B : Matrix n n ℂ)
       rw [singularValuesSorted_zero_eq_sup A hcard]
       rw [Finset.sup'_le_iff]
       exact fun i _ => singularValues_le_opNorm A i
-    have hA_bound : ∀ i : Fin (Fintype.card n), singularValuesSorted A i ≤ ‖A‖ := by
-      intro i
-      exact ((singularValuesSorted_antitone A) (Fin.zero_le i)).trans htop
+    have hA_bound : ∀ i : Fin (Fintype.card n), singularValuesSorted A i ≤ ‖A‖ :=
+      fun i => ((singularValuesSorted_antitone A) (Fin.zero_le i)).trans htop
     calc
       (A * B).traceNorm = ∑ i : Fin (Fintype.card n), singularValuesSorted (A * B) i := by
         rw [traceNorm_eq_sum_singularValuesSorted]
