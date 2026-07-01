@@ -357,11 +357,9 @@ lemma P_evenFst (f : Fin n.succ → ℚ) (j : Fin n.succ) : P f (evenFst j) = f 
   rw [P, sum_of_charges]
   simp only [succ_eq_add_one, HSMul.hSMul, SMul.smul]
   rw [Finset.sum_eq_single j]
-  · rw [basis_on_evenFst_self]
-    exact Rat.mul_one (f j)
+  · simp [basis_on_evenFst_self]
   · intro k _ hkj
-    rw [basis_on_evenFst_other hkj]
-    exact Rat.mul_zero (f k)
+    exact mul_eq_zero_of_right (f k) (basis_on_evenFst_other hkj)
   · simp only [mem_univ, not_true_eq_false, _root_.mul_eq_zero, IsEmpty.forall_iff]
 
 lemma P_evenSnd (f : Fin n.succ → ℚ) (j : Fin n.succ) : P f (evenSnd j) = - f j := by
@@ -640,22 +638,18 @@ lemma P!_evenShiftFst (f : Fin n → ℚ) (j : Fin n) : P! f (evenShiftFst j) = 
   rw [P!, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Finset.sum_eq_single j]
-  · rw [basis!_on_evenShiftFst_self]
-    exact Rat.mul_one (f j)
+  · simp [basis!_on_evenShiftFst_self]
   · intro k _ hkj
-    rw [basis!_on_evenShiftFst_other hkj]
-    exact Rat.mul_zero (f k)
+    exact mul_eq_zero_of_right (f k) (basis!_on_evenShiftFst_other hkj)
   · simp only [mem_univ, not_true_eq_false, _root_.mul_eq_zero, IsEmpty.forall_iff]
 
 lemma P!_evenShiftSnd (f : Fin n → ℚ) (j : Fin n) : P! f (evenShiftSnd j) = - f j := by
   rw [P!, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Finset.sum_eq_single j]
-  · rw [basis!_on_evenShiftSnd_self]
-    exact mul_neg_one (f j)
+  · simp [basis!_on_evenShiftSnd_self]
   · intro k _ hkj
-    rw [basis!_on_evenShiftSnd_other hkj]
-    exact Rat.mul_zero (f k)
+    exact mul_eq_zero_of_right (f k) (basis!_on_evenShiftSnd_other hkj)
   · simp
 
 lemma P!_evenShiftZero (f : Fin n → ℚ) : P! f (evenShiftZero) = 0 := by

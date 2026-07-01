@@ -406,22 +406,18 @@ lemma P_oddFst (f : Fin n → ℚ) (j : Fin n) : P f (oddFst j) = f j := by
   rw [P, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Finset.sum_eq_single j]
-  · rw [basis_on_oddFst_self]
-    exact Rat.mul_one (f j)
+  · simp [basis_on_oddFst_self]
   · intro k _ hkj
-    rw [basis_on_oddFst_other hkj]
-    exact Rat.mul_zero (f k)
+    exact mul_eq_zero_of_right (f k) (basis_on_oddFst_other hkj)
   · simp only [mem_univ, not_true_eq_false, _root_.mul_eq_zero, IsEmpty.forall_iff]
 
 lemma P_oddSnd (f : Fin n → ℚ) (j : Fin n) : P f (oddSnd j) = - f j := by
   rw [P, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Finset.sum_eq_single j]
-  · rw [basis_on_oddSnd_self]
-    exact mul_neg_one (f j)
+  · simp [basis_on_oddSnd_self]
   · intro k _ hkj
-    rw [basis_on_oddSnd_other hkj]
-    exact Rat.mul_zero (f k)
+    exact mul_eq_zero_of_right (f k) (basis_on_oddSnd_other hkj)
   · simp
 
 lemma P_oddMid (f : Fin n → ℚ) : P f oddMid = 0 := by
@@ -654,22 +650,18 @@ lemma P!_oddShiftFst (f : Fin n → ℚ) (j : Fin n) : P! f (oddShiftFst j) = f 
   rw [P!, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Finset.sum_eq_single j]
-  · rw [basis!_on_oddShiftFst_self]
-    exact Rat.mul_one (f j)
+  · simp [basis!_on_oddShiftFst_self]
   · intro k _ hkj
-    rw [basis!_on_oddShiftFst_other hkj]
-    exact Rat.mul_zero (f k)
+    exact mul_eq_zero_of_right (f k) (basis!_on_oddShiftFst_other hkj)
   · simp only [mem_univ, not_true_eq_false, _root_.mul_eq_zero, IsEmpty.forall_iff]
 
 lemma P!_oddShiftSnd (f : Fin n → ℚ) (j : Fin n) : P! f (oddShiftSnd j) = - f j := by
   rw [P!, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
   rw [Finset.sum_eq_single j]
-  · rw [basis!_on_oddShiftSnd_self]
-    exact mul_neg_one (f j)
+  · simp [basis!_on_oddShiftSnd_self]
   · intro k _ hkj
-    rw [basis!_on_oddShiftSnd_other hkj]
-    exact Rat.mul_zero (f k)
+    exact mul_eq_zero_of_right (f k) (basis!_on_oddShiftSnd_other hkj)
   · simp
 
 lemma P!_oddShiftZero (f : Fin n → ℚ) : P! f oddShiftZero = 0 := by
