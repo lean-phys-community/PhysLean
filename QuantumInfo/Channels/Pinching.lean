@@ -364,9 +364,8 @@ theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ke
   --TODO Cleanup
   intro v hv;
   -- Since $v \in \ker \sigma$, we have $P_k v = 0$ for all $k$ where the eigenvalue of $k$ is non-zero.
-  have h_proj_zero : ∀ k : spectrum ℝ σ.m, k.val ≠ 0 → (pinching_kraus σ k).mat *ᵥ v = 0 := by
-    intro k hk
-    exact pinching_kraus_ker_of_ne_zero σ v congr($hv) k hk
+  have h_proj_zero : ∀ k : spectrum ℝ σ.m, k.val ≠ 0 → (pinching_kraus σ k).mat *ᵥ v = 0 :=
+    fun k hk => pinching_kraus_ker_of_ne_zero σ v congr($hv) k hk
   -- Since $v \in \ker \sigma$, we have $P_k v = v$ for all $k$ where the eigenvalue of $k$ is zero.
   have h_proj_one : ∀ k : spectrum ℝ σ.m, k.val = 0 → (pinching_kraus σ k).mat *ᵥ v = v := by
     intro k hk

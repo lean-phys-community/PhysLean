@@ -987,12 +987,10 @@ private lemma trace_cfc_tendsto_of_tendsto (f : ℝ → ℝ)
   have h_cfc_cont : ContinuousWithinAt (fun A : HermitianMat d ℂ => A.cfc f) {A : HermitianMat d ℂ | 0 ≤ A} ρ := by
     have h_cont : ContinuousOn (fun A : HermitianMat d ℂ => A.cfc f) {A : HermitianMat d ℂ | 0 ≤ A} := by
       have h_cont_trace : ContinuousOn (fun A : HermitianMat d ℂ => (A.cfc f)) {A : HermitianMat d ℂ | 0 ≤ A} := by
-        have h_cont_cfc : ContinuousOn (fun A : HermitianMat d ℂ => A.cfc f) {A : HermitianMat d ℂ | spectrum ℝ A.mat ⊆ Set.Ici 0} := by
-          intro A hA
-          exact HermitianMat.continuousWithinAt_cfc_of_continuousOn hf hA
-        have h_spectrum_subset : ∀ A : HermitianMat d ℂ, 0 ≤ A → spectrum ℝ A.mat ⊆ Set.Ici 0 := by
-          intro A hA
-          exact (HermitianMat.posSemidef_iff_spectrum_Ici A).mp hA
+        have h_cont_cfc : ContinuousOn (fun A : HermitianMat d ℂ => A.cfc f) {A : HermitianMat d ℂ | spectrum ℝ A.mat ⊆ Set.Ici 0} :=
+          fun A hA => HermitianMat.continuousWithinAt_cfc_of_continuousOn hf hA
+        have h_spectrum_subset : ∀ A : HermitianMat d ℂ, 0 ≤ A → spectrum ℝ A.mat ⊆ Set.Ici 0 :=
+          fun A hA => (HermitianMat.posSemidef_iff_spectrum_Ici A).mp hA
         exact h_cont_cfc.mono fun A hA => h_spectrum_subset A hA
       exact h_cont_trace
     exact h_cont _ ( by simp [ ρ.2 ] ) |> ContinuousWithinAt.mono <| Set.Subset.refl _;
@@ -2221,9 +2219,8 @@ theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
     simpa [HermitianMat.lin, Matrix.toEuclideanLin, A, B, ← Matrix.mul_kronecker_mul] using hmul
   have prod_marginals_ker_le : (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.ker ≤ ρ.M.ker := by
     let P : HermitianMat (dA × dB) ℂ := ρ.traceRight.M.supportProj ⊗ₖ ρ.traceLeft.M.supportProj
-    have hP : ρ.M.support ≤ P.support := by
-      intro x hx
-      exact ⟨x, by simpa [P] using fixed_support_kron_prod hx⟩
+    have hP : ρ.M.support ≤ P.support :=
+      fun x hx => ⟨x, by simpa [P] using fixed_support_kron_prod hx⟩
     exact (show (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.ker ≤ P.ker by
       change LinearMap.ker
           ((Matrix.kroneckerMap (· * ·) ρ.traceRight.M.mat ρ.traceLeft.M.mat).toEuclideanLin)

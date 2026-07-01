@@ -417,9 +417,8 @@ private lemma hmiddle_leftMul_rightMul
     exact (rightMulHS_cfcR (ℋ := ℋ) (fun x : ℝ ↦ x ^ s) (B ^ (-1 : ℝ)) hBinv_sa
       (by
         intro x hx
-        have hx0 : x ≠ 0 := by
-          intro hx0
-          exact spectrum.zero_notMem (R := ℝ) hBinv_unit (by simpa [hx0] using hx)
+        have hx0 : x ≠ 0 :=
+          fun hx0 => spectrum.zero_notMem (R := ℝ) hBinv_unit (by simpa [hx0] using hx)
         exact (Real.continuousAt_rpow_const x s (Or.inl hx0)).continuousWithinAt)).symm
   have hprod0 :
       0 ≤ leftMulHS (ℋ := ℋ) A * rightMulHS (ℋ := ℋ) (B ^ (-1 : ℝ)) := (leftMulHS_rightMulHS_commute (ℋ := ℋ) A (B ^ (-1 : ℝ))).mul_nonneg
