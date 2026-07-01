@@ -173,13 +173,11 @@ lemma smul_sub {d : ℕ} (Λ : LorentzGroup d) (p q : CoVector d) :
 
 set_option backward.isDefEq.respectTransparency false in
 lemma smul_zero {d : ℕ} (Λ : LorentzGroup d) :
-    Λ • (0 : CoVector d) = 0 := by
-  rw [smul_eq_mulVec, Matrix.mulVec_zero]
+    Λ • (0 : CoVector d) = 0 := by rw [smul_eq_mulVec, Matrix.mulVec_zero]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma smul_neg {d : ℕ} (Λ : LorentzGroup d) (p : CoVector d) :
-    Λ • (-p) = - (Λ • p) := by
-  rw [smul_eq_mulVec, smul_eq_mulVec, Matrix.mulVec_neg]
+    Λ • (-p) = - (Λ • p) := by rw [smul_eq_mulVec, smul_eq_mulVec, Matrix.mulVec_neg]
 
 /-- The Lorentz action on vectors as a continuous linear map. -/
 def actionCLM {d : ℕ} (Λ : LorentzGroup d) :

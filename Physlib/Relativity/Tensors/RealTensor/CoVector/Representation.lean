@@ -52,8 +52,7 @@ lemma rep_apply_eq_sum (d : ℕ) (Λ : LorentzGroup d) (v : CoVector d) (k : Fin
     rep Λ v k = ∑ j, (Λ⁻¹).1 j k • v j := rfl
 
 lemma rep_apply_eq_sum_coe (d : ℕ) (Λ : LorentzGroup d) (v : CoVector d) (k : Fin 1 ⊕ Fin d) :
-    rep Λ v k = ∑ j, Λ.1⁻¹ j k • v j := by
-  rw [rep_apply_eq_sum, LorentzGroup.coe_inv]
+    rep Λ v k = ∑ j, Λ.1⁻¹ j k • v j := by rw [rep_apply_eq_sum, LorentzGroup.coe_inv]
 
 lemma rep_apply_basis {d} (μ : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) :
     rep Λ (basis μ) = ∑ j, Λ.1⁻¹ μ j • basis j := by

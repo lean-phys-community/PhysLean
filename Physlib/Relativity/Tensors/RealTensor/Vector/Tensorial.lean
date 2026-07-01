@@ -168,13 +168,11 @@ lemma smul_sub {d : ℕ} (Λ : LorentzGroup d) (p q : Vector d) :
 
 set_option backward.isDefEq.respectTransparency false in
 lemma smul_zero {d : ℕ} (Λ : LorentzGroup d) :
-    Λ • (0 : Vector d) = 0 := by
-  rw [smul_eq_mulVec, Matrix.mulVec_zero]
+    Λ • (0 : Vector d) = 0 := by rw [smul_eq_mulVec, Matrix.mulVec_zero]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma smul_neg {d : ℕ} (Λ : LorentzGroup d) (p : Vector d) :
-    Λ • (-p) = - (Λ • p) := by
-  rw [smul_eq_mulVec, smul_eq_mulVec, Matrix.mulVec_neg]
+    Λ • (-p) = - (Λ • p) := by rw [smul_eq_mulVec, smul_eq_mulVec, Matrix.mulVec_neg]
 
 lemma neg_smul {d} (Λ : LorentzGroup d) (p : Vector d) :
     (-Λ) • p = - (Λ • p) := by
