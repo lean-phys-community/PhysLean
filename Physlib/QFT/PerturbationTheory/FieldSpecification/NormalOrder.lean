@@ -172,8 +172,7 @@ lemma normalOrderSign_swap_create_create (φc φc' : 𝓕.CrAnFieldOp)
     (hφc : 𝓕 |>ᶜ φc = CreateAnnihilate.create) (hφc' : 𝓕 |>ᶜ φc' = CreateAnnihilate.create) :
     (φs φs' : List 𝓕.CrAnFieldOp) →
     normalOrderSign (φs ++ φc :: φc' :: φs') = normalOrderSign (φs ++ φc' :: φc :: φs')
-  | [], φs' => by
-    exact normalOrderSign_swap_create_create_fst φc φc' hφc hφc' φs'
+  | [], φs' => normalOrderSign_swap_create_create_fst φc φc' hφc hφc' φs'
   | φ :: φs, φs' => by
     rw [normalOrderSign]
     dsimp only [List.cons_append, Wick.koszulSign]
@@ -206,8 +205,7 @@ lemma normalOrderSign_swap_annihilate_annihilate (φa φa' : 𝓕.CrAnFieldOp)
     (hφa : 𝓕 |>ᶜ φa = CreateAnnihilate.annihilate)
     (hφa' : 𝓕 |>ᶜ φa' = CreateAnnihilate.annihilate) : (φs φs' : List 𝓕.CrAnFieldOp) →
     normalOrderSign (φs ++ φa :: φa' :: φs') = normalOrderSign (φs ++ φa' :: φa :: φs')
-  | [], φs' => by
-    exact normalOrderSign_swap_annihilate_annihilate_fst φa φa' hφa hφa' φs'
+  | [], φs' => normalOrderSign_swap_annihilate_annihilate_fst φa φa' hφa hφa' φs'
   | φ :: φs, φs' => by
     rw [normalOrderSign]
     dsimp only [List.cons_append, Wick.koszulSign]

@@ -23,8 +23,7 @@ variable {n : Nat}
 lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.takeWhile P (List.eraseIdx l i) = (List.takeWhile P l).eraseIdx i
-  | [], _, h => by
-    rfl
+  | [], _, h => rfl
   | a :: [], 0, h => by
     simp only [List.takeWhile, List.eraseIdx_zero]
     split <;> rfl

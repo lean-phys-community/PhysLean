@@ -325,8 +325,7 @@ lemma integral_physHermite_mul_physHermite_eq_integral_deriv_inductive (n m : �
     ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (- x ^ 2) =
     (-1 : ℝ) ^ (m - p) * ∫ x : ℝ, (deriv^[p] (physHermite n) x *
     (deriv^[m - p] fun x => Real.exp (-x ^ 2)) x)
-  | 0, h => by
-    exact integral_physHermite_mul_physHermite_eq_integral_deriv_exp n m
+  | 0, h => integral_physHermite_mul_physHermite_eq_integral_deriv_exp n m
   | p + 1, h => by
     rw [integral_physHermite_mul_physHermite_eq_integral_deriv_inductive n m p (by omega)]
     have h1 : m - p = m - (p + 1) + 1 := by omega

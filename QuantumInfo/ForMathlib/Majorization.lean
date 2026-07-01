@@ -606,8 +606,10 @@ lemma exists_subset_prod_eq_sorted_prod (M : Matrix d d ℂ) (k : ℕ)
         obtain ⟨a, ha⟩ := σ.surjective ⟨i, by simp⟩
         exact ⟨⟨a, by simpa using a.2⟩, Fin.ext <| by simpa [Fin.ext_iff] using congr_arg Fin.val ha⟩⟩, fun i => by simpa [Fin.ext_iff] using congr_arg (fun l => l[i]!) hσ⟩)
     obtain ⟨σ, hσ⟩ := h_perm
-    use Equiv.ofBijective (fun i => (Fintype.equivFin d).symm (σ i)) ⟨fun i j hij => by simpa [Fin.ext_iff] using σ.injective (by simpa [Fin.ext_iff] using hij), fun i => by
-      exact ⟨σ.symm (Fintype.equivFin d i), by simp⟩;⟩
+    use Equiv.ofBijective (fun i => (Fintype.equivFin d).symm (σ i))
+      ⟨fun i j hij => by
+          simpa [Fin.ext_iff] using σ.injective (by simpa [Fin.ext_iff] using hij),
+        fun i => ⟨σ.symm (Fintype.equivFin d i), by simp⟩⟩
     intro i
     replace hσ := congr_arg (fun l => l[i]!) hσ
     simp_all
