@@ -520,9 +520,6 @@ def sigmaContractedEquiv : (a : c.1) × a ≃ {x : Fin n // (c.getDual? x).isSom
         not_false_eq_true]
       exact Subtype.ext (id (Eq.symm hc))
     · simp
-  right_inv := by
-    intro x
-    cases x
-    rfl
+  right_inv := fun ⟨_, _⟩ => rfl
 
 end WickContraction

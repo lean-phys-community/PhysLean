@@ -83,10 +83,7 @@ lemma isOpen_iff {s : Set TimeMan} :
 def valHomeomorphism : TimeMan ≃ₜ ℝ where
   toFun := TimeMan.val
   invFun := fun t => { val := t }
-  left_inv := by
-    intro t
-    cases t
-    rfl
+  left_inv := fun ⟨_⟩ => rfl
   right_inv := fun _ => rfl
   continuous_toFun := by fun_prop
   continuous_invFun := by
