@@ -199,8 +199,7 @@ lemma elimPureTensor_update_right (p : (i : ι1) → s1 i) (q : (i : ι2) → s2
     Function.update (elimPureTensor p q) (Sum.inr y) r := by
   funext x
   match x with
-  | Sum.inl x =>
-    rfl
+  | Sum.inl x => rfl
   | Sum.inr x =>
     change Function.update q y r x = _
     simp only [Function.update, Sum.inr.injEq, Sum.elim_inr]
@@ -224,8 +223,7 @@ lemma elimPureTensor_update_left (p : (i : ι1) → s1 i) (q : (i : ι2) → s2 
       subst h
       rfl
     · rfl
-  | Sum.inr y =>
-    rfl
+  | Sum.inr y => rfl
 
 end
 
