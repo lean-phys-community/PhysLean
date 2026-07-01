@@ -688,12 +688,9 @@ noncomputable def toCanonicalMomentum (t : Time) (x : EuclideanSpace ℝ (Fin 1)
     EuclideanSpace ℝ (Fin 1) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 1) where
   toFun v := gradient (S.lagrangian t x ·) v
   invFun p := (1 / S.m) • p
-  left_inv v := by
-    simp [gradient_lagrangian_velocity_eq]
-  right_inv p := by
-    simp [gradient_lagrangian_velocity_eq]
-  map_add' v1 v2 := by
-    simp [gradient_lagrangian_velocity_eq]
+  left_inv v := by simp [gradient_lagrangian_velocity_eq]
+  right_inv p := by simp [gradient_lagrangian_velocity_eq]
+  map_add' v1 v2 := by simp [gradient_lagrangian_velocity_eq]
   map_smul' c v := by
     simp [gradient_lagrangian_velocity_eq]
     module

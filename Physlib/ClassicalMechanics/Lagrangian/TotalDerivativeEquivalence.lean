@@ -226,8 +226,7 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
       simpa using (hEq (0 : Time) (0 : X)
         (0 : X))
     have : dF ((1 : Time), (0 : X)) =
-        δL (0 : X) := by
-      simpa [dF] using h0.symm
+        δL (0 : X) := by simpa [dF] using h0.symm
     simpa [hδL0] using this
 
   -- Induced continuous linear functional on velocity: v ↦ dF (0,v).
@@ -240,10 +239,8 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
     have hv :
         δL v =
           fderiv ℝ ↿F ((0 : Time), (0 : X))
-            ((1 : Time), v) := by
-      simpa using (hEq (0 : Time) (0 : X) v)
-    have hv' : δL v = dF ((1 : Time), v) := by
-      simpa [dF] using hv
+            ((1 : Time), v) := by simpa using (hEq (0 : Time) (0 : X) v)
+    have hv' : δL v = dF ((1 : Time), v) := by simpa [dF] using hv
     calc
       δL v = dF ((1 : Time), v) := hv'
      _ = dF (((0  : Time), v) + ((1 : Time), (0 : X))) := by simp only [Prod.mk_add_mk, zero_add,
@@ -251,10 +248,8 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
       _ = dF ((0 : Time), v) + dF ((1 : Time), (0 : X)) := by
         simpa using
           (dF.map_add ((0 : Time), v) ((1 : Time), (0 : X)))
-      _ = dF ((0 : Time), v) := by
-        simp [h_time]
-      _ = φ v := by
-        simp [φ]
+      _ = dF ((0 : Time), v) := by simp [h_time]
+      _ = φ v := by simp [φ]
 
   -- Frechet–Riesz: represent φ as inner product with some g.
   refine ⟨(InnerProductSpace.toDual ℝ (X)).symm φ, ?_⟩

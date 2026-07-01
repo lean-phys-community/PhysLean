@@ -1053,8 +1053,7 @@ lemma trajectory_velocity_eq_zero_iff_norm_eq_amplitude (IC : InitialConditions)
     · simp [hcos, abs_of_pos hA_pos]
     · simp [hcos, abs_of_pos hA_pos]
   · intro hnorm
-    have hnorm' : |A * cos θ| = A := by
-      simpa using hnorm
+    have hnorm' : |A * cos θ| = A := by simpa using hnorm
     have hcos_abs : |cos θ| = 1 := by
       calc
         |cos θ| = |A * cos θ| / A := by

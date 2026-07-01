@@ -205,8 +205,7 @@ lemma equationOfMotion_iff_newtons_2nd_law (xₜ : Time → EuclideanSpace ℝ (
   constructor
   · intro h t
     have h' :
-        S.m • ∂ₜ (∂ₜ xₜ) t + (S.γ • ∂ₜ xₜ t + S.k • xₜ t) = 0 := by
-      simpa [add_assoc] using h t
+        S.m • ∂ₜ (∂ₜ xₜ) t + (S.γ • ∂ₜ xₜ t + S.k • xₜ t) = 0 := by simpa [add_assoc] using h t
     have ha :
         S.m • ∂ₜ (∂ₜ xₜ) t = -(S.γ • ∂ₜ xₜ t + S.k • xₜ t) :=
       eq_neg_of_add_eq_zero_left h'
@@ -314,8 +313,7 @@ lemma k_eq_m_mul_ω_sq : S.k = S.m * S.ω^2 := by
 lemma k_eq_m_mul_decayRate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
     S.k = S.m * S.decayRate^2 := by
   have hωa : S.ω = S.decayRate := S.isCriticallyDamped_decayRate hS
-  have hωsq : S.decayRate ^ 2 = S.k / S.m := by
-    simpa [hωa] using S.ω_sq
+  have hωsq : S.decayRate ^ 2 = S.k / S.m := by simpa [hωa] using S.ω_sq
   field_simp [S.m_ne_zero] at hωsq
   nlinarith
 
@@ -436,8 +434,7 @@ for the corresponding undamped harmonic oscillator. -/
 lemma toUndamped_equationOfMotion (S : DampedHarmonicOscillator) (hS : S.IsUndamped)
     (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     S.EquationOfMotion xₜ ↔ (S.toUndamped hS).EquationOfMotion xₜ := by
-  have hγ : S.γ = 0 := by
-    simpa [IsUndamped] using hS
+  have hγ : S.γ = 0 := by simpa [IsUndamped] using hS
   rw [S.equationOfMotion_iff_newtons_2nd_law xₜ,
     (S.toUndamped hS).equationOfMotion_iff_newtons_2nd_law xₜ hx]
   constructor

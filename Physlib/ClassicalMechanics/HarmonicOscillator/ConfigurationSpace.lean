@@ -142,8 +142,7 @@ chart's self-transition, which is analytic, so chart compatibility is immediate.
 instance : ChartedSpace (EuclideanSpace ℝ (Fin 1)) ConfigurationSpace where
   atlas := { valHomeomorphism.toOpenPartialHomeomorph }
   chartAt _ := valHomeomorphism.toOpenPartialHomeomorph
-  mem_chart_source := by
-    simp
+  mem_chart_source := by simp
   chart_mem_atlas := by
     intro x
     simp
