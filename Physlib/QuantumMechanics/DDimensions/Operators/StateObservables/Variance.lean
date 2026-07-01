@@ -93,8 +93,7 @@ lemma variance_nonneg (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
 /-- Zero variance is the same as a zero centered vector. -/
 lemma variance_eq_zero_iff_centered_eq_zero (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
     variance T ψ = 0 ↔ centered T ψ = 0 := by
-  rw [variance_eq_centered_norm_sq]
-  exact sq_eq_zero_iff.trans norm_eq_zero
+  simp [variance_eq_centered_norm_sq]
 
 /-- Zero variance is the same as `Tψ = ⟨T⟩_ψ ψ`. -/
 lemma variance_eq_zero_iff (T : H →ₗ.[ℂ] H) (ψ : T.domain) :

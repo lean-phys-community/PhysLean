@@ -58,8 +58,7 @@ lemma fin_finset_sort_map_monotone {n m : ℕ} (a : Finset (Fin n)) (f : Fin n �
   have h3 : ((a.sort (· ≤ ·)).map f).toFinset = (a.map f) := by
     ext a
     simp
-  rw [← h3]
-  exact ((List.toFinset_sort (· ≤ ·) h2).mpr h1).symm
+  simpa [← h3] using ((List.toFinset_sort (· ≤ ·) h2).mpr h1).symm
 
 lemma fin_list_sorted_split :
     (l : List (Fin n)) → (hl : l.Pairwise (· ≤ ·)) → (i : ℕ) →
@@ -217,8 +216,7 @@ lemma uncontractedList_sorted : List.Pairwise (· ≤ ·) c.uncontractedList := 
 lemma uncontractedList_sorted_lt : List.Pairwise (· < ·) c.uncontractedList := by
   rw [uncontractedList]
   apply List.Pairwise.filter
-  rw [← List.ofFn_id]
-  exact List.pairwise_ofFn.mpr fun ⦃i j⦄ a => a
+  simp [← List.ofFn_id]
 
 lemma uncontractedList_nodup : c.uncontractedList.Nodup := by
   rw [uncontractedList]
@@ -600,8 +598,7 @@ lemma take_uncontractedListOrderPos_eq_filter_sort (c : WickContraction n) (i : 
     (c.uncontracted.filter (fun x => x.1 < i.1)) := by
     rw [uncontractedList_eq_sort]
     simp
-  rw [← h3]
-  exact ((List.toFinset_sort (α := Fin n) (· ≤ ·) h2).mpr h1).symm
+  simpa [← h3] using ((List.toFinset_sort (α := Fin n) (· ≤ ·) h2).mpr h1).symm
 
 lemma orderedInsert_succAboveEmb_uncontractedList_eq_insertIdx (c : WickContraction n)
     (i : Fin n.succ) :
