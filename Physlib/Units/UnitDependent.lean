@@ -373,8 +373,9 @@ noncomputable instance instUnitDependentTwoSided
       (congrArg (fun x => scaleUnit u1 u2 (scaleUnit u2 u3 (f x)))
         (scaleUnit_trans' u3 u2 u1 m1))
       (scaleUnit_trans' u1 u2 u3 (f (scaleUnit u3 u1 m1)))
-  scaleUnit_id u f := funext fun m1 => by
-    simp [scaleUnit_id]
+  scaleUnit_id u f := funext fun m1 =>
+    Eq.trans (congrArg (scaleUnit u u) (congrArg f (scaleUnit_id u m1)))
+      (scaleUnit_id u (f m1))
 
 @[simp]
 lemma UnitDependent.scaleUnit_apply_fun {M1 M2 : Type} [UnitDependent M1]
@@ -385,14 +386,21 @@ noncomputable instance instUnitDependentTwoSidedMul
     {M1 M2 : Type} [UnitDependent M1] [MulAction ℝ≥0 M2] [MulUnitDependent M2] :
     MulUnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => scaleUnit u1 u2 (f (scaleUnit u2 u1 m1))
-  scaleUnit_trans u1 u2 u3 f := funext fun m1 => by
-    simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := funext fun m1 => by
-    simp [scaleUnit_trans']
-  scaleUnit_id u f := funext fun m1 => by
-    simp [scaleUnit_id]
-  scaleUnit_mul u1 u2 r f := funext fun m1 => by
-    simp [MulUnitDependent.scaleUnit_mul]
+  scaleUnit_trans u1 u2 u3 f := funext fun m1 =>
+    Eq.trans
+      (congrArg (fun x => scaleUnit u2 u3 (scaleUnit u1 u2 (f x)))
+        (scaleUnit_trans u3 u2 u1 m1))
+      (scaleUnit_trans u1 u2 u3 (f (scaleUnit u3 u1 m1)))
+  scaleUnit_trans' u1 u2 u3 f := funext fun m1 =>
+    Eq.trans
+      (congrArg (fun x => scaleUnit u1 u2 (scaleUnit u2 u3 (f x)))
+        (scaleUnit_trans' u3 u2 u1 m1))
+      (scaleUnit_trans' u1 u2 u3 (f (scaleUnit u3 u1 m1)))
+  scaleUnit_id u f := funext fun m1 =>
+    Eq.trans (congrArg (scaleUnit u u) (congrArg f (scaleUnit_id u m1)))
+      (scaleUnit_id u (f m1))
+  scaleUnit_mul u1 u2 r f := funext fun m1 =>
+    MulUnitDependent.scaleUnit_mul u1 u2 r (f (scaleUnit u2 u1 m1))
 
 open LinearUnitDependent ContinuousLinearUnitDependent in
 noncomputable instance instContinuousLinearUnitDependentMap
