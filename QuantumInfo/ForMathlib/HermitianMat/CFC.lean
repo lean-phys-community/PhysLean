@@ -732,11 +732,9 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
     (hg : ContinuousOn g T) (hA₀ : spectrum ℝ A₀.mat ⊆ T) :
     ContinuousWithinAt (fun B ↦ B.cfc g) {B | spectrum ℝ B.mat ⊆ T} A₀ := by
   have h_ext : ∃ h : ℝ → ℝ, Continuous h ∧ ∀ x ∈ spectrum ℝ A₀.mat, h x = g x := by
-    have h_finite : Set.Finite (spectrum ℝ A₀.mat) := by
-      exact Set.toFinite _
+    have h_finite : Set.Finite (spectrum ℝ A₀.mat) := Set.toFinite _
     generalize_proofs at *; (
-    have h_cont : ContinuousOn g (spectrum ℝ A₀.val) := by
-      exact hg.mono hA₀
+    have h_cont : ContinuousOn g (spectrum ℝ A₀.val) := hg.mono hA₀
     generalize_proofs at *; (
     have := @ContinuousMap.exists_restrict_eq ℝ;
     specialize this ( show IsClosed ( spectrum ℝ A₀.val ) from h_finite.isClosed ) ( ContinuousMap.mk ( fun x => g x ) <| by exact continuousOn_iff_continuous_restrict.mp h_cont ) ; rcases this with ⟨ h, hh ⟩ ; exact ⟨ h, h.continuous, fun x hx => by simpa using congr_arg ( fun f => f ⟨ x, hx ⟩ ) hh ⟩ ;));
@@ -754,8 +752,7 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
           simpa [ hh_eq y hy ] using h_diff_small.abs;
         have := Metric.tendsto_nhdsWithin_nhds.mp h_diff_small ( ε / ( Real.sqrt ( Fintype.card d ) + 1 ) ) ( div_pos ε_pos ( add_pos_of_nonneg_of_pos ( Real.sqrt_nonneg _ ) zero_lt_one ) ) ; aesop;
       choose! δ hδ_pos hδ using h_diff_small;
-      have h_finite : Set.Finite (spectrum ℝ A₀.mat) := by
-        exact Set.toFinite _;
+      have h_finite : Set.Finite (spectrum ℝ A₀.mat) := Set.toFinite _;
       obtain ⟨δ_min, hδ_min_pos, hδ_min⟩ : ∃ δ_min > 0, ∀ y ∈ spectrum ℝ A₀.mat, δ_min ≤ δ y := by
         by_cases h_empty : spectrum ℝ A₀.mat = ∅;
         · exact ⟨ 1, zero_lt_one, by simp [ h_empty ] ⟩;
@@ -765,8 +762,7 @@ lemma continuousWithinAt_cfc_of_continuousOn {T : Set ℝ} {g : ℝ → ℝ}
     -- By the spectrum_subset_of_isOpen lemma, there exists a neighborhood U of A₀ such that the spectrum of B is within δ of the spectrum of A₀ for all B in U.
     obtain ⟨U, hU⟩ : ∃ U ∈ nhds A₀, ∀ B ∈ U, spectrum ℝ B.mat ⊆ {x | ∃ y ∈ spectrum ℝ A₀.mat, |x - y| < δ} := by
       have h_spectrum_subset : ∀ᶠ B in nhds A₀, spectrum ℝ B.mat ⊆ Metric.thickening δ (spectrum ℝ A₀.mat) := by
-        have h_open : IsOpen (Metric.thickening δ (spectrum ℝ A₀.mat)) := by
-          exact Metric.isOpen_thickening
+        have h_open : IsOpen (Metric.thickening δ (spectrum ℝ A₀.mat)) := Metric.isOpen_thickening
         have := spectrum_subset_of_isOpen A₀ ( Metric.thickening δ ( spectrum ℝ A₀.mat ) ) h_open ( Metric.self_subset_thickening δ_pos _ ) ; aesop;
       generalize_proofs at *; (
       exact ⟨ _, h_spectrum_subset, fun B hB => fun x hx => by simpa [ dist_eq_norm ] using Metric.mem_thickening_iff.mp ( hB hx ) ⟩)
@@ -868,8 +864,7 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
         choose U_i V_i hU_i hV_i hx₀_i hV_i_i h_cont_i using h_cont; exact ⟨ U_i, V_i, hU_i, hV_i, hx₀_i, hV_i_i, h_cont_i ⟩ ;);
       -- The open set W := ⋃ᵢ V_i contains spectrum(A x₀) (since each λᵢ ∈ V_i and spectrum = range of eigenvalues). W is open as a union of open sets.
       set W := ⋃ i, V_i i with hW_def
-      have hW_open : IsOpen W := by
-        exact isOpen_iUnion hV_i
+      have hW_open : IsOpen W := isOpen_iUnion hV_i
       have hW_spectrum : spectrum ℝ (A x₀).mat ⊆ W := by
         intro t ht
         obtain ⟨i, hi⟩ : ∃ i, t = (A x₀).H.eigenvalues i := by
