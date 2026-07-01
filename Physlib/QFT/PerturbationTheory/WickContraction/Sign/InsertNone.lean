@@ -94,8 +94,7 @@ def signInsertNone (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ : WickCo
 lemma sign_insert_none_eq_signInsertNone_mul_sign (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) :
     (φsΛ ↩Λ φ i none).sign = (φsΛ.signInsertNone φ φs i) * φsΛ.sign := by
-  rw [sign]
-  rw [signInsertNone, sign, ← Finset.prod_mul_distrib]
+  rw [sign, signInsertNone, sign, ← Finset.prod_mul_distrib]
   rw [insertAndContract_none_prod_contractions]
   congr
   funext a
@@ -192,8 +191,7 @@ lemma signInsertNone_eq_filter_map (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     φsΛ.signInsertNone φ φs i =
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ((List.filter (fun x => (φsΛ.getDual? x).isSome ∧ i.succAbove x < i)
     (List.finRange φs.length)).map φs.get)) := by
-  rw [signInsertNone_eq_prod_getDual?_Some]
-  rw [FieldStatistic.ofList_map_eq_finset_prod]
+  rw [signInsertNone_eq_prod_getDual?_Some, FieldStatistic.ofList_map_eq_finset_prod]
   rw [map_prod]
   congr
   funext a
@@ -252,8 +250,7 @@ lemma sign_insert_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) (hG : GradingCompliant φs φsΛ) :
     (φsΛ ↩Λ φ i none).sign = 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ ⟨φs.get, Finset.univ.filter
     (fun x => (φsΛ.getDual? x).isSome ∧ i.succAbove x < i)⟩) * φsΛ.sign := by
-  rw [sign_insert_none_eq_signInsertNone_mul_sign]
-  rw [signInsertNone_eq_filterset]
+  rw [sign_insert_none_eq_signInsertNone_mul_sign, signInsertNone_eq_filterset]
   exact hG
 
 /-- For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a graded compliant Wick contraction `φsΛ` of `φs`,

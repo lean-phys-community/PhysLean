@@ -83,8 +83,7 @@ lemma ofFinset_erase (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finset
 
 lemma ofFinset_eq_prod (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Finset (Fin φs.length)) :
     ofFinset q φs.get a = ∏ (i : Fin φs.length), if i ∈ a then (q φs[i]) else 1 := by
-  rw [ofFinset]
-  rw [ofList_map_eq_finset_prod]
+  rw [ofFinset, ofList_map_eq_finset_prod]
   congr
   funext i
   simp only [Finset.mem_sort, Fin.getElem_fin]
@@ -92,8 +91,7 @@ lemma ofFinset_eq_prod (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a : Fins
 
 lemma ofFinset_union (q : 𝓕 → FieldStatistic) (φs : List 𝓕) (a b : Finset (Fin φs.length)) :
     ofFinset q φs.get a * ofFinset q φs.get b = ofFinset q φs.get ((a ∪ b) \ (a ∩ b)) := by
-  rw [ofFinset_eq_prod, ofFinset_eq_prod, ofFinset_eq_prod]
-  rw [← Finset.prod_mul_distrib]
+  rw [ofFinset_eq_prod, ofFinset_eq_prod, ofFinset_eq_prod, ← Finset.prod_mul_distrib]
   congr
   funext x
   simp only [Fin.getElem_fin, mul_ite, ite_mul, mul_self, one_mul, mul_one,
