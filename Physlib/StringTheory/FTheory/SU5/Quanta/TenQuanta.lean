@@ -266,8 +266,7 @@ lemma reduce_sum_eq_sum_toCharges {M} [AddCommMonoid M] (x : TenQuanta 𝓩) (f 
           (((x.filter (fun f => f.1 = q)).map (fun y => f q y.2))).sum := by
         congr
         funext q5
-        rw [AddMonoidHom.map_multiset_sum, Multiset.map_map]
-        rfl
+        simp [AddMonoidHom.map_multiset_sum, Multiset.map_map]
       _ = (x.toCharges.dedup.bind fun q =>
           ((x.filter (fun f => f.1 = q)).map (fun y => f q y.2))).sum := by
         rw [Multiset.sum_bind]

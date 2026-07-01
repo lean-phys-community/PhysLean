@@ -261,8 +261,7 @@ noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M] [HasDim M] :
   scaleUnit_add u1 u2 m1 m2 := by
     change (toDimensionful u1 (m1 + m2)).1 u2 = _
     rw [toDimensionful_apply_apply]
-    simp
-    rfl
+    exact smul_add _ _ _
   scaleUnit_smul u1 u2 r m := by
     change (toDimensionful u1 (r • m)).1 u2 = _
     rw [toDimensionful_apply_apply]

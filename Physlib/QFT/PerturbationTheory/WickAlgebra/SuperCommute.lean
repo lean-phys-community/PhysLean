@@ -432,8 +432,7 @@ lemma superCommute_ofCrAnList_ofCrAnList_eq_sum (φs φs' : List 𝓕.CrAnFieldO
   conv_lhs =>
     rw [ofCrAnList, ofCrAnList, superCommute_eq_ι_superCommuteF,
       superCommuteF_ofCrAnListF_ofCrAnListF_eq_sum]
-  rw [map_sum]
-  rfl
+  exact map_sum _ _ _
 
 lemma superCommute_ofCrAnOp_ofCrAnList_eq_sum (φ : 𝓕.CrAnFieldOp)
     (φs' : List 𝓕.CrAnFieldOp) : [ofCrAnOp φ, ofCrAnList φs']ₛ =
@@ -458,8 +457,7 @@ lemma superCommute_ofCrAnList_ofFieldOpList_eq_sum (φs : List 𝓕.CrAnFieldOp)
   conv_lhs =>
     rw [ofCrAnList, ofFieldOpList, superCommute_eq_ι_superCommuteF,
       superCommuteF_ofCrAnListF_ofFieldOpListF_eq_sum]
-  rw [map_sum]
-  rfl
+  exact map_sum _ _ _
 
 lemma superCommute_ofCrAnOp_ofFieldOpList_eq_sum (φ : 𝓕.CrAnFieldOp) (φs' : List 𝓕.FieldOp) :
     [ofCrAnOp φ, ofFieldOpList φs']ₛ =
