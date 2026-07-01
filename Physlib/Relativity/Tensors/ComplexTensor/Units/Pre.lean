@@ -70,8 +70,7 @@ def contrCoUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     simp
 
 lemma contrCoUnit_apply_one : contrCoUnit (1 : ℂ) = contrCoUnitVal := by
-  change (1 : ℂ) • contrCoUnitVal = contrCoUnitVal
-  rw [one_smul]
+  simp [contrCoUnit]
 
 /-- The co-contra unit for complex lorentz vectors. Usually denoted `δᵢⁱ`. -/
 def coContrUnitVal : CoℂModule ⊗[ℂ] ContrℂModule :=
@@ -121,8 +120,7 @@ def coContrUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     simp
 
 lemma coContrUnit_apply_one : coContrUnit (1 : ℂ) = coContrUnitVal := by
-  change (1 : ℂ) • coContrUnitVal = coContrUnitVal
-  rw [one_smul]
+  simp [coContrUnit]
 
 /-!
 

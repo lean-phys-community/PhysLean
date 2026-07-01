@@ -172,8 +172,7 @@ def asConsTensor :
 /-- The map `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ leftHanded ⊗ rightHanded` corresponding
   to Pauli matrices, when evaluated on `1` corresponds to the tensor `PauliMatrix.asTensor`. -/
 lemma asConsTensor_apply_one : asConsTensor (1 : ℂ) = asTensor := by
-  change (1 : ℂ) • asTensor = asTensor
-  simp only [one_smul]
+  simp [asConsTensor]
 
 end
 end PauliMatrix

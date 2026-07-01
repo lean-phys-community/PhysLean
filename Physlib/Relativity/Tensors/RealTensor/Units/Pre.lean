@@ -67,8 +67,7 @@ def preContrCoUnit (d : ℕ := 3) :
     simp
 
 lemma preContrCoUnit_apply_one {d : ℕ} : (preContrCoUnit d) (1 : ℝ) = preContrCoUnitVal d := by
-  change (1 : ℝ) • preContrCoUnitVal d = preContrCoUnitVal d
-  rw [one_smul]
+  simp [preContrCoUnit]
 
 /-- The co-contra unit for complex lorentz vectors. Usually denoted `δᵢⁱ`. -/
 def preCoContrUnitVal (d : ℕ := 3) : (Co d ⊗ Contr d).V :=
@@ -118,8 +117,7 @@ def preCoContrUnit (d : ℕ) : (Representation.trivial ℝ (LorentzGroup d) ℝ)
     simp
 
 lemma preCoContrUnit_apply_one {d : ℕ} : (preCoContrUnit d) (1 : ℝ) = preCoContrUnitVal d := by
-  change (1 : ℝ) • preCoContrUnitVal d = preCoContrUnitVal d
-  rw [one_smul]
+  simp [preCoContrUnit]
 
 /-!
 
