@@ -202,7 +202,6 @@ lemma toTensor_distTensorDeriv_basis_repr_apply {d} (A : DistElectromagneticPote
     match b with
     | ⟨i, j⟩ =>
     simp
-  rw [hb]
   rfl
 
 end DistElectromagneticPotential

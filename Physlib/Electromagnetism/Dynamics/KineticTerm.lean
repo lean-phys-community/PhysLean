@@ -758,11 +758,9 @@ lemma gradKineticTerm_eq_fieldStrength {d} {𝓕 : FreeSpace} (A : Electromagnet
         apply Finset.sum_congr rfl (fun ν _ => ?_)
         apply Finset.sum_congr rfl (fun μ _ => ?_)
         congr
-        · rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_const_mul]
-          rfl
+        · rfl
           fun_prop
-        · rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, fderiv_const_mul]
-          rfl
+        · rfl
           fun_prop
     _ = ∑ (ν : (Fin 1 ⊕ Fin d)), ∑ (μ : (Fin 1 ⊕ Fin d)),
       ((1/𝓕.μ₀ * η ν ν) * (∂_ μ (fun x' => η μ μ * ∂_ μ A x' ν -
@@ -871,7 +869,6 @@ lemma gradKineticTerm_add {d} {𝓕 : FreeSpace} (A1 A2 : ElectromagneticPotenti
     rw [fieldStrengthMatrix_add _ _ _ (hA1.differentiable (by simp))
       (hA2.differentiable (by simp))]
     simp [Finsupp.coe_add, Pi.add_apply]
-  rw [fderiv_fun_add]
   rfl
   · apply fieldStrengthMatrix_differentiable <| hA1.of_le (ENat.LEInfty.out)
   · apply fieldStrengthMatrix_differentiable <| hA2.of_le (ENat.LEInfty.out)
@@ -902,7 +899,6 @@ lemma gradKineticTerm_smul {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
     rw [← SpaceTime.deriv_eq]
   congr
   funext x
-  rw [fieldStrengthMatrix_smul _ _ _]
   rfl
   · exact hA.differentiable (by simp)
   · exact hA

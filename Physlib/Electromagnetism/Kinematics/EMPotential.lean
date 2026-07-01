@@ -630,7 +630,6 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
       (Lorentz.CoVector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := by
     ext ⟨i, j⟩
     simp
-  rw [hb]
   rfl
 
 end ElectromagneticPotential
