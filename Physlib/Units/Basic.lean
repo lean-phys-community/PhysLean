@@ -125,13 +125,11 @@ lemma dimScale_apply (u1 u2 : UnitChoices) (d : Dimension) :
 
 @[simp]
 lemma dimScale_self (u : UnitChoices) (d : Dimension) :
-    dimScale u u d = 1 := by
-  simp [dimScale]
+    dimScale u u d = 1 := by simp [dimScale]
 
 @[simp]
 lemma dimScale_one (u1 u2 : UnitChoices) :
-    dimScale u1 u2 1 = 1 := by
-  simp [dimScale]
+    dimScale u1 u2 1 = 1 := by simp [dimScale]
 
 lemma dimScale_transitive (u1 u2 u3 : UnitChoices) (d : Dimension) :
     dimScale u1 u2 d * dimScale u2 u3 d = dimScale u1 u3 d := by
@@ -152,8 +150,7 @@ lemma dimScale_transitive (u1 u2 u3 : UnitChoices) (d : Dimension) :
 
 @[simp]
 lemma dimScale_mul_symm (u1 u2 : UnitChoices) (d : Dimension) :
-    dimScale u1 u2 d * dimScale u2 u1 d = 1 := by
-  rw [dimScale_transitive, dimScale_self]
+    dimScale u1 u2 d * dimScale u2 u1 d = 1 := by rw [dimScale_transitive, dimScale_self]
 
 @[simp]
 lemma dimScale_coe_mul_symm (u1 u2 : UnitChoices) (d : Dimension) :
@@ -164,8 +161,7 @@ lemma dimScale_coe_mul_symm (u1 u2 : UnitChoices) (d : Dimension) :
 
 @[simp]
 lemma dimScale_ne_zero (u1 u2 : UnitChoices) (d : Dimension) :
-    dimScale u1 u2 d ≠ 0 := by
-  simp [dimScale]
+    dimScale u1 u2 d ≠ 0 := by simp [dimScale]
 
 lemma dimScale_symm (u1 u2 : UnitChoices) (d : Dimension) :
     dimScale u1 u2 d = (dimScale u2 u1 d)⁻¹ := by
@@ -179,8 +175,7 @@ lemma dimScale_symm (u1 u2 : UnitChoices) (d : Dimension) :
 
 lemma dimScale_of_inv_eq_swap (u1 u2 : UnitChoices) (d : Dimension) :
     dimScale u1 u2 d⁻¹ = dimScale u2 u1 d := by
-  simp only [map_inv]
-  conv_rhs => rw[dimScale_symm]
+  simpa only [map_inv] using (dimScale_symm u2 u1 d).symm
 
 @[simp]
 lemma smul_dimScale_injective {M : Type} [MulAction ℝ≥0 M] (u1 u2 : UnitChoices) (d : Dimension)
