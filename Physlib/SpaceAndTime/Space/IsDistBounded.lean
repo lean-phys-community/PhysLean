@@ -235,8 +235,7 @@ lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
 @[fun_prop]
 lemma integrable_space_mul {d : ℕ} {f : Space d → ℝ} (hf : IsDistBounded f)
     (η : 𝓢(Space d, ℝ)) :
-    Integrable (fun x : Space d => η x * f x) volume := by
-  exact hf.integrable_space η
+    Integrable (fun x : Space d => η x * f x) volume := hf.integrable_space η
 
 @[fun_prop]
 lemma integrable_space_fderiv {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
@@ -634,8 +633,7 @@ lemma add {d : ℕ} {f g : Space d → F}
 
 @[fun_prop]
 lemma fun_add {d : ℕ} {f g : Space d → F}
-    (hf : IsDistBounded f) (hg : IsDistBounded g) : IsDistBounded (fun x => f x + g x) := by
-  exact hf.add hg
+    (hf : IsDistBounded f) (hg : IsDistBounded g) : IsDistBounded (fun x => f x + g x) := hf.add hg
 
 /-!
 
@@ -915,8 +913,7 @@ lemma inv_shift {d : ℕ} (g : Space d) (hd : 2 ≤ d := by omega) :
   simp
 @[fun_prop]
 lemma nat_pow {d : ℕ} (n : ℕ) :
-    IsDistBounded (d := d) (fun x => ‖x‖ ^ n) := by
-  exact IsDistBounded.pow (d := d) (n : ℤ) (by omega)
+    IsDistBounded (d := d) (fun x => ‖x‖ ^ n) := IsDistBounded.pow (d := d) (n : ℤ) (by omega)
 
 @[fun_prop]
 lemma norm_add_nat_pow {d : ℕ} (n : ℕ) (a : ℝ) :

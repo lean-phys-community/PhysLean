@@ -1022,8 +1022,7 @@ private lemma radial_power_deriv_integral_by_parts
           ∂(.comap Subtype.val volume)
         =
         ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
-          x ^ (p - 1) * η (x • n.1) := by
-    exact MeasureTheory.integral_subtype_comap (μ := volume)
+          x ^ (p - 1) * η (x • n.1) := MeasureTheory.integral_subtype_comap (μ := volume)
       (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
       (fun x : ℝ => x ^ (p - 1) * η (x • n.1))
   rw [hleft_subtype, hright_subtype]
@@ -1439,8 +1438,7 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
             ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
           (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))) =
           (d * (volume (α := Space d)).real
-            (Metric.ball 0 1)) • diracDelta ℝ 0 := by
-      exact distDiv_inv_pow_eq_dim (d := d)
+            (Metric.ball 0 1)) • diracDelta ℝ 0 := distDiv_inv_pow_eq_dim (d := d)
     rw [hdiv]
     rw [smul_smul]
     ring_nf
