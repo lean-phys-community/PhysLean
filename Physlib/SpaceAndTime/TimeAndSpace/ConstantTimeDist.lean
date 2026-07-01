@@ -750,9 +750,7 @@ lemma time_integral_iteratedFDeriv_eq {d : ℕ} (n : ℕ) (η : 𝓢(Time × Spa
       (ContinuousLinearMap.id ℝ (Space d)))) := by
   ext y
   rw [time_integral_iteratedFDeriv_apply]
-  rw [← ContinuousMultilinearMap.integral_apply]
-  rfl
-  exact iteratedFDeriv_integrable η x
+  exact (ContinuousMultilinearMap.integral_apply (iteratedFDeriv_integrable η x) _).symm
 
 /-!
 
@@ -957,8 +955,7 @@ lemma constantTime_distSpaceDiv {d : ℕ} (f : (Space d) →d[ℝ] EuclideanSpac
   rw [Space.distSpaceDiv_apply_eq_sum_distSpaceDeriv, Space.distDiv_apply_eq_sum_distDeriv]
   congr
   funext i
-  rw [constantTime_distSpaceDeriv]
-  rfl
+  exact congrArg (fun g => (g η).ofLp i) (constantTime_distSpaceDeriv i f)
 
 /-!
 

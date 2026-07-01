@@ -220,8 +220,7 @@ lemma integrable_space {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
       simp [zero_pow_eq, zero_zpow_eq, hp']
       omega
     field_simp
-    rw [zpow_add₀ hr]
-    rfl
+    exact (zpow_add₀ hr p d).symm
   convert integrable_pow_mul_iteratedFDeriv radialAngularMeasure η (p + d).toNat 0 using 1
   funext x
   simp only [Real.norm_eq_abs, norm_iteratedFDeriv_zero]

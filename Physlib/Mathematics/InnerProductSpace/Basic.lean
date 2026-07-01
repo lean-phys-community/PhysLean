@@ -574,10 +574,8 @@ lemma _root_.isBoundedBilinearMap_inner' :
       apply h1.trans
       apply le_of_eq
       congr
-      · rw [norm_withLp2_eq_norm2]
-        rfl
-      · rw [norm_withLp2_eq_norm2]
-        rfl
+      · exact norm_withLp2_eq_norm2 _
+      · exact norm_withLp2_eq_norm2 _
     · have key (z : E) : |‖z‖₂| ≤ √ d * ‖z‖ := by
         apply le_of_sq_le_sq
         · simp [@mul_pow]
