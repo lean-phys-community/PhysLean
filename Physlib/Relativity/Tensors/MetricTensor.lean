@@ -36,8 +36,7 @@ lemma metricTensor_congr {c c1 : C} (h : c = c1) :
 
 @[simp]
 lemma metricTensor_invariant {c : C} (g : G) :
-    g • S.metricTensor c = metricTensor c := by
-  rw [metricTensor, actionT_fromConstPair]
+    g • S.metricTensor c = metricTensor c := by rw [metricTensor, actionT_fromConstPair]
 
 lemma permT_fromPairTContr_metric_metric {c : C} :
     permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> rfl))

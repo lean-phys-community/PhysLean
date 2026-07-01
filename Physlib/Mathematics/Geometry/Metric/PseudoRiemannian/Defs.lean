@@ -513,8 +513,7 @@ noncomputable def cotangentMetricVal (g : PseudoRiemannianMetric E H M n I) (x :
 @[simp]
 lemma cotangentMetricVal_eq_apply_sharp (g : PseudoRiemannianMetric E H M n I) (x : M)
     (ω₁ ω₂ : TangentSpace I x →L[ℝ] ℝ) :
-  cotangentMetricVal g x ω₁ ω₂ = ω₁ (g.sharpL x ω₂) := by
-  rw [cotangentMetricVal, apply_sharp_sharp]
+  cotangentMetricVal g x ω₁ ω₂ = ω₁ (g.sharpL x ω₂) := by rw [cotangentMetricVal, apply_sharp_sharp]
 
 lemma cotangentMetricVal_symm (g : PseudoRiemannianMetric E H M n I) (x : M)
     (ω₁ ω₂ : TangentSpace I x →L[ℝ] ℝ) :

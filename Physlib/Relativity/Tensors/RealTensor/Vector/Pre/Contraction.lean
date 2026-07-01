@@ -219,8 +219,7 @@ lemma dual_mulVec_right : ⟪x, dual Λ *ᵥ y⟫ₘ = ⟪Λ *ᵥ x, y⟫ₘ := 
   simp only [dual, ← mul_assoc, minkowskiMatrix.sq, one_mul]
   rw [← mulVec_mulVec, dotProduct_mulVec, vecMul_transpose]
 
-lemma dual_mulVec_left : ⟪dual Λ *ᵥ x, y⟫ₘ = ⟪x, Λ *ᵥ y⟫ₘ := by
-  rw [symm, dual_mulVec_right, symm]
+lemma dual_mulVec_left : ⟪dual Λ *ᵥ x, y⟫ₘ = ⟪x, Λ *ᵥ y⟫ₘ := by rw [symm, dual_mulVec_right, symm]
 
 lemma right_parity : ⟪x, (Contr d).ρ LorentzGroup.parity y⟫ₘ = ∑ i, x.val i * y.val i := by
   rw [as_sum]
