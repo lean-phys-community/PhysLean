@@ -80,9 +80,8 @@ structure Time where
 
 namespace Time
 
-lemma val_injective : Function.Injective val := by
-  intro _ _ h
-  exact Time.ext h
+lemma val_injective : Function.Injective val :=
+  fun _ _ h => Time.ext h
 
 /-!
 

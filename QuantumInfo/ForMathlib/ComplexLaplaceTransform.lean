@@ -187,9 +187,8 @@ theorem continuousAt_complexLaplaceTransform_of_mem_interior_convergenceDomain
 
 theorem continuousOn_complexLaplaceTransform_interior_convergenceDomain
     {α : Type*} [MeasureTheory.MeasureSpace α] {E : α → WithTop ℝ} :
-    ContinuousOn (ComplexLaplaceTransform E) (interior (ComplexLaplaceConvergenceDomain E)) := by
-  intro z hz
-  exact (continuousAt_complexLaplaceTransform_of_mem_interior_convergenceDomain hz).continuousWithinAt
+    ContinuousOn (ComplexLaplaceTransform E) (interior (ComplexLaplaceConvergenceDomain E)) :=
+  fun _ hz => (continuousAt_complexLaplaceTransform_of_mem_interior_convergenceDomain hz).continuousWithinAt
 
 private theorem integrable_uncurry_complexLaplaceIntegrand_horizontal
     {α : Type*} [MeasureTheory.MeasureSpace α]

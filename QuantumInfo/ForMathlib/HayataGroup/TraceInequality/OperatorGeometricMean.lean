@@ -31,9 +31,9 @@ private lemma rpow_continuousOn_Ici (p : ℝ) (hp : 0 ≤ p) :
 omit [Nontrivial ℋ] in
 private lemma operatorConcaveOn_Ioi_of_Ici {f : ℝ → ℝ}
     (h : OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) f) :
-    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) f := by
-  intro A B t hA hB ht0 ht1 hAs hBs
-  exact h hA hB ht0 ht1 (Set.Subset.trans hAs Set.Ioi_subset_Ici_self)
+    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) f :=
+  fun _ _ _ hA hB ht0 ht1 hAs hBs =>
+    h hA hB ht0 ht1 (Set.Subset.trans hAs Set.Ioi_subset_Ici_self)
       (Set.Subset.trans hBs Set.Ioi_subset_Ici_self)
 
 omit [Nontrivial ℋ] in
@@ -43,9 +43,8 @@ private lemma pdSet_subset_psdSet : pdSet (ℋ := ℋ) ⊆ psdSet (ℋ := ℋ) :
   exact ⟨hA_sa, Set.Subset.trans hA_spec Set.Ioi_subset_Ici_self⟩
 
 private lemma rpow_pos_on_Ioi (p : ℝ) :
-    ∀ x ∈ Set.Ioi (0 : ℝ), 0 < x ^ p := by
-  intro x hx
-  exact Real.rpow_pos_of_pos hx p
+    ∀ x ∈ Set.Ioi (0 : ℝ), 0 < x ^ p :=
+  fun _ hx => Real.rpow_pos_of_pos hx p
 
 /--
 Theorem 1.1, concave range: the operator `(α, β)`-power mean is jointly concave on

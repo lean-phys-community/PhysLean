@@ -191,9 +191,8 @@ lemma beta_fun_T_formula (t : ℝ) (ht : 0 < t) :
 
 /-- On `Ioi 0`, `Beta_fun_T t` equals `1 / (kB * t)`. -/
 lemma beta_fun_T_eq_on_Ioi :
-    EqOn betaFromReal (fun t : ℝ => 1 / (kB * t)) (Set.Ioi 0) := by
-  intro t ht
-  exact beta_fun_T_formula t ht
+    EqOn betaFromReal (fun t : ℝ => 1 / (kB * t)) (Set.Ioi 0) :=
+  fun t ht => beta_fun_T_formula t ht
 
 lemma deriv_beta_wrt_T (T : Temperature) (hT_pos : 0 < T.val) :
     HasDerivWithinAt betaFromReal (-1 / (kB * (T.val : ℝ)^2)) (Set.Ioi 0) (T.val : ℝ) := by
