@@ -98,14 +98,12 @@ def toEquiv {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 lemma apply_inv_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (σ : Fin m → Fin n) (h : IsReindexing c c1 σ) (x : Fin m) :
     h.inv σ (σ x) = x := by
-  change h.toEquiv (h.toEquiv.symm x) = x
-  simp
+  simpa [inv, toEquiv] using h.toEquiv.apply_symm_apply x
 
 lemma inv_apply_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (σ : Fin m → Fin n) (h : IsReindexing c c1 σ) (x : Fin n) :
     σ (h.inv σ x) = x := by
-  change h.toEquiv.symm (h.toEquiv x) = x
-  simp
+  simpa [inv, toEquiv] using h.toEquiv.symm_apply_apply x
 
 lemma preserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) :

@@ -72,8 +72,7 @@ lemma contrT_metricTensor_metricTensor_eq_dual_unit {c : C} :
     contrT 2 1 2 (by simp; rfl) (prodT (metricTensor c) (metricTensor (S.τ c))) =
       permT ![0, 1] (And.intro (by decide) (fun i => by
         fin_cases i
-        · change S.τ (S.τ c) = c
-          simp
+        · exact S.τ_involution c
         · rfl))
       (unitTensor (S := S) (S.τ c)) := by
   rw [contrT_metricTensor_metricTensor, unitTensor_eq_permT_dual, permT_permT]

@@ -73,8 +73,7 @@ lemma detContinuous_eq_one (Λ : LorentzGroup d) :
   refine Iff.intro (fun h => ?_) (fun h => ?_)
   · by_contra hn
     have h' := h hn
-    change (1 : Fin 2) = (0 : Fin 2) at h'
-    simp only [Fin.isValue, one_ne_zero] at h'
+    exact (show (1 : Fin 2) ≠ 0 by decide) h'
   · intro h'
     exact False.elim (h' h)
 
@@ -85,8 +84,7 @@ lemma detContinuous_eq_zero (Λ : LorentzGroup d) :
   refine Iff.intro (fun h => ?_) (fun h => ?_)
   · by_contra hn
     rw [if_pos] at h
-    · change (0 : Fin 2) = (1 : Fin 2) at h
-      simp only [Fin.isValue, zero_ne_one] at h
+    · exact (show (0 : Fin 2) ≠ 1 by decide) h
     · cases' det_eq_one_or_neg_one Λ with h2 h2
       · simp_all only [ite_true]
       · simp_all only [not_true_eq_false]
@@ -108,14 +106,10 @@ lemma detContinuous_eq_iff_det_eq (Λ Λ' : LorentzGroup d) :
     simp only [Nat.reduceAdd]
   | .inl h1, .inr h2 =>
     rw [h1, h2, (detContinuous_eq_one Λ).mpr h1, (detContinuous_eq_zero Λ').mpr h2]
-    change (0 : Fin 2) = (1 : Fin 2) ↔ _
-    simp only [zero_ne_one, false_iff]
-    linarith
+    exact iff_of_false (by decide) (by linarith)
   | .inr h1, .inl h2 =>
     rw [h1, h2, (detContinuous_eq_zero Λ).mpr h1, (detContinuous_eq_one Λ').mpr h2]
-    change (1 : Fin 2) = (0 : Fin 2) ↔ _
-    simp only [one_ne_zero, false_iff]
-    linarith
+    exact iff_of_false (show (1 : Fin 2) ≠ 0 by decide) (by linarith)
 
 /-- The representation taking a Lorentz matrix to its determinant. -/
 @[simps!]
