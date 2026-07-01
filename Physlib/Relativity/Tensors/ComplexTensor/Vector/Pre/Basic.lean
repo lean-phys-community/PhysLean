@@ -200,8 +200,7 @@ lemma SL2CRep_ρ_basis (M : SL(2, ℂ)) (i : Fin 1 ⊕ Fin 3) :
     (ContrℂModule.SL2CRep M) (complexContrBasis i) =
     ∑ j, (SL2C.toLorentzGroup M).1 j i •
     complexContrBasis j := by
-  rw [complexContrBasis_of_real, inclCongrRealLorentz_ρ]
-  rw [Contr.ρ_stdBasis, map_sum]
+  rw [complexContrBasis_of_real, inclCongrRealLorentz_ρ, Contr.ρ_stdBasis, map_sum]
   apply congrArg
   funext j
   simp only [LinearMap.map_smulₛₗ, ofRealHom_eq_coe, coe_smul]

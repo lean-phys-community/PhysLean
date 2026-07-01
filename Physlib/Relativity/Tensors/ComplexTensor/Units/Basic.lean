@@ -153,8 +153,7 @@ lemma coContrUnit_eq_complexCoBasis_complexContrBasis : δ' =
 open Lorentz in
 lemma coContrUnit_eq_complexCoBasisFin4_complexContrBasisFin4 : δ' =
     ∑ i, fromPairT (complexCoBasisFin4 i ⊗ₜ[ℂ] complexContrBasisFin4 i) := by
-  rw [coContrUnit_eq_complexCoBasis_complexContrBasis]
-  rw [← finSumFinEquiv.symm.sum_comp]
+  rw [coContrUnit_eq_complexCoBasis_complexContrBasis, ← finSumFinEquiv.symm.sum_comp]
   simp [complexCoBasisFin4, complexContrBasisFin4]
 
 open Lorentz in
@@ -166,8 +165,7 @@ lemma contrCoUnit_eq_complexContrBasis_complexCoBasis : δ =
 open Lorentz in
 lemma contrCoUnit_eq_complexContrBasisFin4_complexCoBasisFin4 : δ =
     ∑ i, fromPairT (complexContrBasisFin4 i ⊗ₜ[ℂ] complexCoBasisFin4 i) := by
-  rw [contrCoUnit_eq_complexContrBasis_complexCoBasis]
-  rw [← finSumFinEquiv.symm.sum_comp]
+  rw [contrCoUnit_eq_complexContrBasis_complexCoBasis, ← finSumFinEquiv.symm.sum_comp]
   simp [complexContrBasisFin4, complexCoBasisFin4]
 
 open Fermion in
