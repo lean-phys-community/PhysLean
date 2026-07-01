@@ -34,8 +34,7 @@ lemma normalOrder_eq_ι_normalOrderF (a : 𝓕.FieldOpFreeAlgebra) :
 
 lemma normalOrder_ofCrAnList (φs : List 𝓕.CrAnFieldOp) :
     𝓝(ofCrAnList φs) = normalOrderSign φs • ofCrAnList (normalOrderList φs) := by
-  rw [ofCrAnList, normalOrder_eq_ι_normalOrderF, normalOrderF_ofCrAnListF]
-  rfl
+  simp only [ofCrAnList, normalOrder_eq_ι_normalOrderF, normalOrderF_ofCrAnListF, map_smul]
 
 @[simp]
 lemma normalOrder_one_eq_one : normalOrder (𝓕 := 𝓕) 1 = 1 := by
@@ -192,7 +191,6 @@ lemma anPart_mul_normalOrder_ofFieldOpList_eq_superCommute (φ : 𝓕.FieldOp)
     [anPart φ, 𝓝(ofFieldOpList φs')]ₛ := by
   rw [anPart, ofFieldOpList, normalOrder_eq_ι_normalOrderF, ← map_mul]
   rw [anPartF_mul_normalOrderF_ofFieldOpListF_eq_superCommuteF]
-  simp only [map_add, map_smul]
   rfl
 
 /-!

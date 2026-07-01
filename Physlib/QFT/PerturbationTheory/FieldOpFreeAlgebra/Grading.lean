@@ -252,9 +252,7 @@ instance fieldOpFreeAlgebraGrade :
     simp only [statisticSubmodule]
     refine Submodule.mem_span.mpr fun p a => a ?_
     simp only [Set.mem_setOf_eq]
-    use []
-    simp only [ofCrAnListF_nil, ofList_empty, true_and]
-    rfl
+    exact ⟨[], rfl, rfl⟩
   mul_mem f1 f2 a1 a2 h1 h2 := by
     let p (a2 : 𝓕.FieldOpFreeAlgebra) (hx : a2 ∈ statisticSubmodule f2) : Prop :=
       a1 * a2 ∈ statisticSubmodule (f1 + f2)

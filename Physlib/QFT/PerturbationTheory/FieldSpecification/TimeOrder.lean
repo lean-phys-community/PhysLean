@@ -155,7 +155,6 @@ lemma timerOrderSign_of_eraseMaxTimeField (φ : 𝓕.FieldOp) (φs : List 𝓕.F
     𝓢(𝓕 |>ₛ maxTimeField φ φs, 𝓕 |>ₛ (φ :: φs).take (maxTimeFieldPos φ φs)) := by
   rw [eraseMaxTimeField, insertionSortDropMinPos, timeOrderSign,
     Wick.koszulSign_eraseIdx_insertionSortMinPos]
-  rw [← timeOrderSign, ← maxTimeField]
   rfl
 
 /-- The time ordering of a list of states. A schematic example is:

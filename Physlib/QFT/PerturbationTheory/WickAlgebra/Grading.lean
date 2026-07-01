@@ -394,9 +394,7 @@ instance WickAlgebraGrade : GradedAlgebra (A := 𝓕.WickAlgebra) statSubmodule 
     simp only [statSubmodule]
     refine Submodule.mem_span.mpr fun p a => a ?_
     simp only [Set.mem_setOf_eq]
-    use []
-    simp only [ofCrAnList, ofCrAnListF_nil, map_one, ofList_empty, true_and]
-    rfl
+    exact ⟨[], rfl, rfl⟩
   mul_mem f1 f2 a1 a2 h1 h2 := by
     let p (a2 : 𝓕.WickAlgebra) (hx : a2 ∈ statSubmodule f2) : Prop :=
       a1 * a2 ∈ statSubmodule (f1 + f2)
