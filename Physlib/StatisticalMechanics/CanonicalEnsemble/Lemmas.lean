@@ -246,8 +246,7 @@ theorem helmholtzFreeEnergy_eq_meanEnergy_sub_temp_mul_thermodynamicEntropy
   have hZpos := 𝓒.mathematicalPartitionFunction_pos T
   have hhpos : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := pow_pos 𝓒.hPos _
   have hTne : (T.val : ℝ) ≠ 0 := by exact_mod_cast hT.ne'
-  have hkβT : T.val * (kB * (T.β : ℝ)) = 1 := by
-    rw [kB_mul_beta T hT, mul_one_div, div_self hTne]
+  have hkβT : T.val * (kB * (T.β : ℝ)) = 1 := by rw [kB_mul_beta T hT, mul_one_div, div_self hTne]
   rw [helmholtzFreeEnergy_def, partitionFunction_def, Real.log_div hZpos.ne' hhpos.ne',
     Real.log_pow, 𝓒.thermodynamicEntropy_eq_differentialEntropy_sub_correction (T := T) hE,
     𝓒.differentialEntropy_eq_kB_beta_meanEnergy_add_kB_log_mathZ (T := T) hE]

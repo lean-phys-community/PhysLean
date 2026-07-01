@@ -858,8 +858,7 @@ lemma helmholtzFreeEnergy_add
   calc
     (𝓒 + 𝓒1).helmholtzFreeEnergy T
         = -kB * T.val * Real.log ((𝓒 + 𝓒1).partitionFunction T) := rfl
-    _ = -kB * T.val * Real.log (𝓒.partitionFunction T * 𝓒1.partitionFunction T) := by
-          rw [hPF]
+    _ = -kB * T.val * Real.log (𝓒.partitionFunction T * 𝓒1.partitionFunction T) := by rw [hPF]
     _ = -kB * T.val *
           (Real.log (𝓒.partitionFunction T) + Real.log (𝓒1.partitionFunction T)) := by
           rw [Real.log_mul hpf₁.ne' hpf₂.ne']
@@ -881,8 +880,7 @@ lemma helmholtzFreeEnergy_nsmul
   calc
     (nsmul n 𝓒).helmholtzFreeEnergy T
         = -kB * T.val * Real.log ((nsmul n 𝓒).partitionFunction T) := rfl
-    _ = -kB * T.val * ((n : ℝ) * Real.log (𝓒.partitionFunction T)) := by
-          rw [hlog]
+    _ = -kB * T.val * ((n : ℝ) * Real.log (𝓒.partitionFunction T)) := by rw [hlog]
     _ = (n : ℝ) * (-kB * T.val * Real.log (𝓒.partitionFunction T)) := by ring
     _ = n * 𝓒.helmholtzFreeEnergy T := by
           simp [helmholtzFreeEnergy, mul_comm, mul_left_comm, mul_assoc]

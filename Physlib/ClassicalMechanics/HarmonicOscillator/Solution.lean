@@ -998,8 +998,7 @@ lemma trajectory_velocity_eq_zero_iff_exists_int (IC : InitialConditions)
       linarith
     calc
       (t : ℝ) = (S.ω * t) / S.ω := by field_simp [hω]
-      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + n * π) / S.ω := by
-        rw [ht]
+      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + n * π) / S.ω := by rw [ht]
   · intro h
     obtain ⟨n, hn⟩ := h
     rw [Real.sin_eq_zero_iff]
@@ -1115,8 +1114,7 @@ lemma trajectory_eq_zero_iff_exists_int (IC : InitialConditions)
       linarith
     calc
       (t : ℝ) = (S.ω * t) / S.ω := by field_simp [hω]
-      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + (2 * n + 1) * π / 2) / S.ω := by
-        rw [ht]
+      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + (2 * n + 1) * π / 2) / S.ω := by rw [ht]
   · intro h
     obtain ⟨n, hn⟩ := h
     rw [Real.cos_eq_zero_iff]
