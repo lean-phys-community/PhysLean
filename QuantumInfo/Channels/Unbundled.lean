@@ -306,8 +306,7 @@ theorem of_Fintype  {M : MatrixMap A B R} (h : IsCompletelyPositive M)
     simp only [EmbeddingLike.apply_eq_iff_eq, Equiv.symm_apply_apply]
   constructor
   · intro h₂
-    simp [MatrixMap.IsPositive]
-    exact h n
+    simpa [MatrixMap.IsPositive] using h n
   · intro h x hx
     specialize h (hx.submatrix (fun p : A × Fin n => (p.1, e.symm p.2)))
     rw [h_submatrix]

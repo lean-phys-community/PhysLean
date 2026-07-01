@@ -475,8 +475,7 @@ private lemma trace_conj_rpow_concave_pd [Nonempty d] {α : ℝ} (hα : 1 < α)
         rw [trace_lin]
         linarith [mul_le_mul_of_nonneg_left bridge hp_pos.le]
     _ ≤ (X_mix ^ p).trace := by
-        rw [hr_eq]
-        exact variational_lower_bound X_mix (a • Z₁ + b • Z₂) hX_mix hZ_mix hp_gt1
+        simpa [hr_eq] using variational_lower_bound X_mix (a • Z₁ + b • Z₂) hX_mix hZ_mix hp_gt1
 
 end VariationalAndBridge
 

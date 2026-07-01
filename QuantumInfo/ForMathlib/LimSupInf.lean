@@ -272,8 +272,7 @@ lemma tendsto_of_block_sequence {α : Type*} [TopologicalSpace α] {x : ℕ → 
     · rw [← not_le]
       intro h
       exact not_lt_of_ge (Finset.le_max' _ _ (h_finite.mem_toFinset.mpr h)) (Nat.lt_succ_self _)
-  rw [hg k n hk]
-  exact ha k (le_of_not_gt fun hk' ↦ by linarith [hT.monotone hk'])
+  simpa [hg k n hk] using ha k (le_of_not_gt fun hk' ↦ by linarith [hT.monotone hk'])
 
 /-
 Given a lower bound sequence M and a property P that can always be satisfied eventually, there exists a strictly increasing sequence T bounded by M such that each interval [T_k, T_{k+1}) contains a witness for P.

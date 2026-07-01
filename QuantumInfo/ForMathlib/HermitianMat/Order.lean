@@ -51,8 +51,7 @@ theorem lt_iff_posdef : A < B ↔ (B - A).mat.PosSemidef ∧ A ≠ B :=
 instance : IsStrictOrderedModule ℝ (HermitianMat n 𝕜) where
   smul_lt_smul_of_pos_left a ha b b₂ hb := by
     rw [HermitianMat.lt_iff_posdef] at hb ⊢
-    simp only [← smul_sub, ne_eq, smul_right_inj ha.ne']
-    exact ⟨hb.left.smul ha.le, hb.right⟩
+    simpa only [← smul_sub, ne_eq, smul_right_inj ha.ne'] using ⟨hb.left.smul ha.le, hb.right⟩
   smul_lt_smul_of_pos_right a ha b b2 hb := by
     rw [HermitianMat.lt_iff_posdef] at ha ⊢
     rw [sub_zero] at ha

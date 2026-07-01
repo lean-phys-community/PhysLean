@@ -37,8 +37,7 @@ theorem traceNorm_zero : traceNorm (0 : Matrix m n R) = 0 := by simp [traceNorm]
 theorem traceNorm_neg (A : Matrix m n R) : traceNorm (-A) = traceNorm A := by
   unfold traceNorm
   congr! 3
-  rw [Matrix.conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg]
-  exact neg_neg _
+  simp [Matrix.conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg]
 
 
 open MatrixOrder Isometry

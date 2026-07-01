@@ -138,8 +138,7 @@ theorem sum_eigenvalues_eq_trace [DecidableEq n] (A : HermitianMat n 𝕜) :
 --Proving that traces are 0 or 1 is common enough that we have a convenience lemma here for turning
 --statements about HermitianMat traces into Matrix traces.
 theorem trace_eq_zero_iff (A : HermitianMat n 𝕜) : A.trace = 0 ↔ A.mat.trace = 0 := by
-  rw [← trace_eq_trace_rc]
-  exact ⟨mod_cast id, mod_cast id⟩
+  simp [← trace_eq_trace_rc]
 
 theorem trace_eq_one_iff (A : HermitianMat n 𝕜) : A.trace = 1 ↔ A.mat.trace = 1 := by
   rw [← trace_eq_trace_rc]

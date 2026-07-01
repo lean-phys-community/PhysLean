@@ -659,8 +659,7 @@ theorem _root_.Matrix.range_mul_conjTranspose_of_ker_le_ker {A : Matrix d d 𝕜
             rw [← inner_self_eq_zero (𝕜 := 𝕜)]
             have : ∀ y, @inner 𝕜 _ _ y (Matrix.toEuclideanLin M x) = 0 := by
               intro y
-              rw [← LinearMap.adjoint_inner_left]
-              exact h _ ⟨y, rfl⟩
+              simpa [← LinearMap.adjoint_inner_left] using h _ ⟨y, rfl⟩
             exact this _
           · intro h y ⟨z, hz⟩
             rw [← hz, LinearMap.adjoint_inner_left, h, inner_zero_right]

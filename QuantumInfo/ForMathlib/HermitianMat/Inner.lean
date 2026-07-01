@@ -192,8 +192,7 @@ theorem inner_mono (hA : 0 ≤ A) : B ≤ C → ⟪A, B⟫ ≤ ⟪A, C⟫ := by
 
 theorem inner_mono' (hA : 0 ≤ A) : B ≤ C → ⟪B, A⟫ ≤ ⟪C, A⟫ := by
   intro hBC
-  rw [inner_comm B A, inner_comm C A]
-  exact inner_mono hA hBC
+  simpa [inner_comm B A, inner_comm C A] using inner_mono hA hBC
 
 /-- The inner product for PSD matrices is at most the product of their traces. -/
 theorem inner_le_mul_trace (hA : 0 ≤ A) (hB : 0 ≤ B) : ⟪A, B⟫ ≤ A.trace * B.trace := by

@@ -413,8 +413,7 @@ theorem one_div_operatorConvexOn_Ioi :
         Matrix.PosSemidef
           (star U * (!![C, 1; 1, D] : Matrix (Fin 2) (Fin 2) 𝓐) * U) := by
       -- rewrite the middle block matrix as `M`
-      rw [← hM]
-      exact posConj
+      simpa [← hM] using posConj
     -- rewrite the goal using the computed conjugation
     rw [← hconj]
     exact posConj'

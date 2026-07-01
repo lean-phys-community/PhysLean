@@ -121,8 +121,7 @@ theorem LowerSemicontinuousOn.bddBelow {α : Type*} [TopologicalSpace α] {S : S
     intros x hx
     specialize hg x hx (g x - 1) (sub_one_lt (g x))
     rw [eventually_nhdsWithin_iff] at hg
-    simp only [Set.mem_inter_iff, gt_iff_lt, and_imp]
-    exact ⟨_, hg, fun y hy hyS ↦ hy hyS⟩
+    simpa only [Set.mem_inter_iff, gt_iff_lt, and_imp] using ⟨_, hg, fun y hy hyS ↦ hy hyS⟩
   choose! U hU using h_neighborhood
   -- By the finite subcover property, there exists a finite subset t ⊆ S$ such that S ⊆ ⋃_{x ∈ t} U_x$.
   obtain ⟨t, ht⟩ : ∃ t, (∀ x ∈ t, x ∈ S) ∧ S ⊆ ⋃ x ∈ t, U x :=

@@ -634,8 +634,7 @@ lemma prod_singularValuesSorted_eq_compoundSV (M : Matrix d d ℂ) (k : ℕ)
     exact singularValuesSorted_antitone (compoundMatrix M k) (Fin.zero_le idx)
   · obtain ⟨j, hj⟩ := singularValuesSorted_mem_values (compoundMatrix M k) ⟨0, hcard⟩
     obtain ⟨S, hS⟩ := singularValues_compoundMatrix_rev M k j
-    rw [hj, hS]
-    exact prod_singularValues_subset_le_sorted_prod M k hk S
+    simpa [hj, hS] using prod_singularValues_subset_le_sorted_prod M k hk S
 
 /--
 The **Rayleigh quotient bound**:

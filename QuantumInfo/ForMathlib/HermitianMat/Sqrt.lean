@@ -50,8 +50,7 @@ lemma sqrt_inv_mul_self_mul_sqrt_inv_eq_one {A : HermitianMat d 𝕜} (hA : A.ma
     A⁻¹.sqrt.mat * A.mat * A⁻¹.sqrt.mat = 1 := by
   have h_inv_def : A⁻¹.sqrt.mat * A⁻¹.sqrt.mat = A⁻¹ := by
     apply HermitianMat.sqrt_sq
-    rw [zero_le_iff]
-    exact hA.inv.posSemidef
+    simpa [zero_le_iff] using hA.inv.posSemidef
   have h_inv_comm : Commute A⁻¹.sqrt.mat A.mat := by
     commutes
   rw [h_inv_comm, mul_assoc, h_inv_def]

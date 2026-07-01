@@ -165,8 +165,7 @@ theorem sandwich_self (hB : B.mat.PosDef) :
     (B.conj (B ^ (-1/2 : ℝ)).mat) = 1 := by
   have hB_inv_sqrt : (B ^ (-1 / 2 : ℝ)).mat * (B ^ (-1 / 2 : ℝ)).mat = (B ^ (-1 : ℝ)).mat := by
     rw [ ← mat_rpow_add ] <;> norm_num
-    rw [zero_le_iff]
-    exact hB.posSemidef
+    simpa [zero_le_iff] using hB.posSemidef
   have hB_inv : (B ^ (-1 : ℝ)).mat = B.mat⁻¹ := by
     rw [← inv_eq_rpow_neg_one hB, mat_inv]
   rw [ hB_inv ] at hB_inv_sqrt;
