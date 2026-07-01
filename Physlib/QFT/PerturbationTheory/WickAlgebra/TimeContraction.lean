@@ -45,8 +45,7 @@ lemma timeContract_of_timeOrderRel (φ ψ : 𝓕.FieldOp) (h : timeOrderRel φ �
     rw [ofFieldOp_eq_crPart_add_anPart]
     rw [map_add, superCommute_anPart_anPart, superCommute_anPart_crPart]
   simp only [timeContract, Algebra.smul_mul_assoc, add_zero]
-  rw [timeOrder_ofFieldOp_ofFieldOp_ordered h]
-  rw [normalOrder_ofFieldOp_mul_ofFieldOp]
+  rw [timeOrder_ofFieldOp_ofFieldOp_ordered h, normalOrder_ofFieldOp_mul_ofFieldOp]
   rw [ofFieldOp_eq_crPart_add_anPart, ofFieldOp_eq_crPart_add_anPart]
   simp only [mul_add, add_mul]
   abel_nf

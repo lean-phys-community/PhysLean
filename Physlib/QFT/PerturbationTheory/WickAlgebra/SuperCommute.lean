@@ -59,8 +59,7 @@ noncomputable def superCommuteRight (a : 𝓕.FieldOpFreeAlgebra) :
     obtain ⟨x, hx⟩ := ι_surjective x
     obtain ⟨y, hy⟩ := ι_surjective y
     subst hx hy
-    rw [← map_add, ι_apply, ι_apply, ι_apply]
-    rw [Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
+    rw [← map_add, ι_apply, ι_apply, ι_apply, Quotient.lift_mk, Quotient.lift_mk, Quotient.lift_mk]
     simp
   map_smul' c y := by
     obtain ⟨y, hy⟩ := ι_surjective y
@@ -155,13 +154,11 @@ lemma superCommute_annihilate_annihilate {φ φ' : 𝓕.CrAnFieldOp}
 
 lemma superCommute_diff_statistic {φ φ' : 𝓕.CrAnFieldOp} (h : (𝓕 |>ₛ φ) ≠ 𝓕 |>ₛ φ') :
     [ofCrAnOp φ, ofCrAnOp φ']ₛ = 0 := by
-  rw [ofCrAnOp, ofCrAnOp]
-  rw [superCommute_eq_ι_superCommuteF, ι_superCommuteF_of_diff_statistic h]
+  rw [ofCrAnOp, ofCrAnOp, superCommute_eq_ι_superCommuteF, ι_superCommuteF_of_diff_statistic h]
 
 lemma superCommute_ofCrAnOp_ofFieldOp_diff_stat_zero (φ : 𝓕.CrAnFieldOp) (ψ : 𝓕.FieldOp)
     (h : (𝓕 |>ₛ φ) ≠ (𝓕 |>ₛ ψ)) : [ofCrAnOp φ, ofFieldOp ψ]ₛ = 0 := by
-  rw [ofFieldOp_eq_sum, map_sum]
-  rw [Finset.sum_eq_zero]
+  rw [ofFieldOp_eq_sum, map_sum, Finset.sum_eq_zero]
   intro x hx
   apply superCommute_diff_statistic
   simpa [crAnStatistics] using h
@@ -444,8 +441,7 @@ lemma superCommute_ofCrAnOp_ofCrAnList_eq_sum (φ : 𝓕.CrAnFieldOp)
   funext n
   simp only [ofList_singleton, List.get_eq_getElem, Algebra.smul_mul_assoc]
   congr 1
-  rw [ofCrAnList_singleton, superCommute_ofCrAnOp_ofCrAnOp_commute]
-  rw [mul_assoc, ← ofCrAnList_append]
+  rw [ofCrAnList_singleton, superCommute_ofCrAnOp_ofCrAnOp_commute, mul_assoc, ← ofCrAnList_append]
   congr
   exact Eq.symm (List.eraseIdx_eq_take_drop_succ φs' ↑n)
 
