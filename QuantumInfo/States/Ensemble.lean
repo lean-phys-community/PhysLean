@@ -42,8 +42,7 @@ namespace Ensemble
 instance : Coe (PEnsemble d α) (MEnsemble d α) := ⟨toMEnsemble⟩
 
 @[simp]
-theorem toMEnsemble_mk : (toMEnsemble ⟨ps, distr⟩ : MEnsemble d α) = ⟨pure ∘ ps, distr⟩ :=
-  rfl
+theorem toMEnsemble_mk : (toMEnsemble ⟨ps, distr⟩ : MEnsemble d α) = ⟨pure ∘ ps, distr⟩ := rfl
 
 /-- A mixed-state ensemble comes from a pure-state ensemble if and only if all states are pure. -/
 theorem coe_PEnsemble_iff_pure_states (me : MEnsemble d α): (∃ pe : PEnsemble d α, ↑pe = me) ↔ (∃ ψ : α → Ket d, me.states = MState.pure ∘ ψ) := by

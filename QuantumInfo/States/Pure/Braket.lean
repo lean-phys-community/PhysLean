@@ -94,11 +94,9 @@ open Braket
 
 variable {d : Type*} [Fintype d]
 
-theorem Ket.apply (ψ : Ket d) (i : d) : ψ i = ψ.vec i :=
-  rfl
+theorem Ket.apply (ψ : Ket d) (i : d) : ψ i = ψ.vec i := rfl
 
-theorem Bra.apply (ψ : Bra d) (i : d) : ψ i = ψ.vec i :=
-  rfl
+theorem Bra.apply (ψ : Bra d) (i : d) : ψ i = ψ.vec i := rfl
 
 @[ext]
 theorem Ket.ext {ξ ψ : Ket d} (h : ∀ x, ξ x = ψ x) : ξ = ψ :=
@@ -129,11 +127,9 @@ instance instBraOfKet : Coe (Ket d) (Bra d) := ⟨Ket.to_bra⟩
 instance instKetOfBra : Coe (Bra d) (Ket d) := ⟨Bra.to_ket⟩
 
 @[simp]
-theorem Bra.eq_conj (ψ : Ket d) (x : d) :〈ψ∣ x = conj (∣ψ〉 x) :=
-  rfl
+theorem Bra.eq_conj (ψ : Ket d) (x : d) :〈ψ∣ x = conj (∣ψ〉 x) := rfl
 
-theorem Bra.apply' (ψ : Ket d) (i : d) : 〈ψ∣ i = conj (ψ.vec i) :=
-  rfl
+theorem Bra.apply' (ψ : Ket d) (i : d) : 〈ψ∣ i = conj (ψ.vec i) := rfl
 
 theorem Ket.exists_ne_zero (ψ : Ket d) : ∃ x, ψ x ≠ 0 := by
   have hzerolt : ∑ x : d, Complex.normSq (ψ x) > ∑ x : d, 0 := by rw [ψ.normalized, Finset.sum_const_zero]; exact zero_lt_one
