@@ -92,8 +92,7 @@ lemma pauliMatrix_mul_self (μ : Fin 1 ⊕ Fin 3) :
     (σ μ) * (σ μ) = 1 := by
   fin_cases μ
   all_goals
-    dsimp [pauliMatrix]
-    simp [one_fin_two]
+    simp [pauliMatrix, one_fin_two]
 
 instance pauliMatrixInvertiable (μ : Fin 1 ⊕ Fin 3) : Invertible (σ μ) := by
   use σ μ

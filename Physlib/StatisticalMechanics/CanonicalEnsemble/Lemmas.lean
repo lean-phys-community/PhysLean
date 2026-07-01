@@ -121,8 +121,7 @@ lemma log_probability
     Real.log (𝓒.probability T i)
       = - (β T) * 𝓒.energy i - Real.log (𝓒.mathematicalPartitionFunction T) := by
   have hZpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
-  unfold probability
-  simp [Real.log_div, hZpos.ne', Real.log_exp, sub_eq_add_neg]
+  simp [probability, Real.log_div, hZpos.ne', Real.log_exp, sub_eq_add_neg]
 
 /-- Auxiliary identity: `kB · β = 1 / T`.
 `β` is defined as `1 / (kB · T)` (see `Temperature.β`). -/

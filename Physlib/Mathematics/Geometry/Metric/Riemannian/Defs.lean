@@ -197,7 +197,6 @@ lemma norm_eq_norm_of_metricNormedAddCommGroup (g : RiemannianMetric I n M) (x :
     (@NormedAddCommGroup.toNorm _ (TangentSpace.metricNormedAddCommGroup g x)) v := by
   unfold norm
   let normed_group := TangentSpace.metricNormedAddCommGroup g x
-  unfold TangentSpace.metricNormedAddCommGroup
   simp only [inner_apply]
   rfl
 

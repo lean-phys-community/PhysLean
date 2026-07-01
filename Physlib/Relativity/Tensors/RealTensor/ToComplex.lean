@@ -836,8 +836,7 @@ lemma contrT_toComplex {n : ℕ}
             (p := Pure.basisVector (colorToComplex ∘ c) (ComponentIdx.complexify b))]
         exact toComplex_contrP_basisVector h b
       · -- zero tensor
-        dsimp [P]
-        simp
+        simp [P]
       · -- scalar multiplication
         intro r t ht
         dsimp [P] at ht ⊢

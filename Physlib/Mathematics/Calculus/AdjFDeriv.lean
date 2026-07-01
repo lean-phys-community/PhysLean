@@ -130,8 +130,7 @@ lemma gradient_eq_adjFDeriv
     {f : U → 𝕜} {x : U} (hf : DifferentiableAt 𝕜 f x) :
     gradient f x = adjFDeriv 𝕜 f x 1 := by
   apply ext_inner_right 𝕜
-  unfold gradient
-  simp [hf.hasAdjFDerivAt.hasAdjoint_fderiv.adjoint_inner_left]
+  simp [gradient, hf.hasAdjFDerivAt.hasAdjoint_fderiv.adjoint_inner_left]
 
 attribute [fun_prop] HasAdjFDerivAt.differentiableAt
 

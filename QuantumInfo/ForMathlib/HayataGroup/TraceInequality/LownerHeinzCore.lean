@@ -231,8 +231,7 @@ private lemma posSemidef_block_one_inv {A : 𝓐} (hA : IsSelfAdjoint A)
   have posV : Matrix.PosSemidef (Matrix.vecMulVec v (star v)) := by
     simpa using (Matrix.posSemidef_vecMulVec_self_star (R := 𝓐) v)
   have hsqrtA : IsSelfAdjoint sqrtA := by
-    dsimp [sqrtA, cfcR]
-    exact cfc_predicate _ _
+    simp [sqrtA, cfcR]
   have hinvSqrtA : IsSelfAdjoint invSqrtA := by
     dsimp [invSqrtA, cfcR]
     exact cfc_predicate _ _
