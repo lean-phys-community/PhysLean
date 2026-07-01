@@ -47,9 +47,7 @@ def leftDualLeftUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMa
     a' • leftDualLeftUnitVal
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • leftDualLeftUnitVal =
@@ -87,9 +85,7 @@ def dualLeftLeftUnit :
       a' • dualLeftLeftUnitVal
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • dualLeftLeftUnitVal =
@@ -130,9 +126,7 @@ def rightDualRightUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).Intertwining
     a' • rightDualRightUnitVal
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • rightDualRightUnitVal =
@@ -177,9 +171,7 @@ def dualRightRightUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).Intertwining
     a' • dualRightRightUnitVal
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • dualRightRightUnitVal =
