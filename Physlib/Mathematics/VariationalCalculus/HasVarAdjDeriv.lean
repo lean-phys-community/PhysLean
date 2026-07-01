@@ -190,9 +190,8 @@ lemma comp {F : (Y → V) → (Z → W)} {G : (X → U) → (Y → V)} {u : X �
     {F' G'} (hF : HasVarAdjDerivAt F F' (G u)) (hG : HasVarAdjDerivAt G G' u) :
     HasVarAdjDerivAt (fun u => F (G u)) (fun ψ => G' (F' ψ)) u where
   smooth_at := hG.smooth_at
-  diff := by
-    intro φ hφ
-    exact hF.diff (φ := fun t x => G (φ t) x) (hG.diff φ hφ)
+  diff := fun φ hφ =>
+    hF.diff (φ := fun t x => G (φ t) x) (hG.diff φ hφ)
   linearize := by
     intro φ hφ x
     rw[hF.linearize (fun t x => G (φ t) x) (hG.diff φ hφ)]

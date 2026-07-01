@@ -91,9 +91,8 @@ instance : Fintype FieldStatistic where
     · exact Finset.insert_eq_self.mp rfl
 
 @[simp]
-lemma fermionic_not_eq_bonsic : ¬ fermionic = bosonic := by
-  intro h
-  exact FieldStatistic.noConfusion h
+lemma fermionic_not_eq_bonsic : ¬ fermionic = bosonic :=
+  fun h => FieldStatistic.noConfusion h
 
 lemma bonsic_eq_fermionic_false : bosonic = fermionic ↔ false := by
   simp only [reduceCtorEq, Bool.false_eq_true]

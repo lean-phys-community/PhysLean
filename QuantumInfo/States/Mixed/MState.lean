@@ -129,9 +129,8 @@ theorem ext_m {ρ₁ ρ₂ : MState d} (h : ρ₁.m = ρ₂.m) : ρ₁ = ρ₂ :
 theorem m_inj : (MState.m (d := d)).Injective :=
   fun _ _ h ↦ by ext1; ext1; exact h
 
-theorem M_Injective : Function.Injective (MState.M (d := d)) := by
-  intro _ _
-  exact MState.ext
+theorem M_Injective : Function.Injective (MState.M (d := d)) :=
+  fun _ _ => MState.ext
 
 variable (d) in
 /-- The matrices corresponding to MStates are `Convex ℝ` -/

@@ -84,9 +84,8 @@ lemma val_range : Set.range val = Set.univ := by
 lemma val_inducing : Topology.IsInducing TimeTransMan.val where
   eq_induced := rfl
 
-lemma val_injective : Function.Injective TimeTransMan.val := by
-  intro _ _ h
-  exact ext_of h
+lemma val_injective : Function.Injective TimeTransMan.val :=
+  fun _ _ h => ext_of h
 
 lemma val_isOpenEmbedding : Topology.IsOpenEmbedding TimeTransMan.val where
   eq_induced := rfl
