@@ -46,9 +46,7 @@ set_option backward.isDefEq.respectTransparency false in
 lemma parameterizationCharge_cube (g f : Fin n → ℚ) (a : ℚ) :
     accCube (2 * n + 1) (parameterizationAsLinear g f a).val = 0 := by
   change accCubeTriLinSymm.toCubic _ = 0
-  rw [parameterizationAsLinear_val]
-  rw [HomogeneousCubic.map_smul]
-  rw [TriLinearSymm.toCubic_add]
+  rw [parameterizationAsLinear_val, HomogeneousCubic.map_smul, TriLinearSymm.toCubic_add]
   rw [HomogeneousCubic.map_smul, HomogeneousCubic.map_smul]
   erw [P_accCube g, P!_accCube f]
   rw [accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂,

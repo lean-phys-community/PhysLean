@@ -50,8 +50,7 @@ def asLinSols (j : Fin n) : (PureU1 n.succ).LinSols :=
     | ⟨0, _⟩=>
     simp only [PureU1_linearACCs, accGrav,
       LinearMap.coe_mk, AddHom.coe_mk]
-    rw [Fin.sum_univ_castSucc]
-    rw [Finset.sum_eq_single j]
+    rw [Fin.sum_univ_castSucc, Finset.sum_eq_single j]
     · simp only [asCharges, ↓reduceIte]
       have hn : ¬ (Fin.last n = Fin.castSucc j) := Fin.ne_of_gt j.prop
       split

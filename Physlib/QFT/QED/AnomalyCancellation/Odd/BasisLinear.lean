@@ -130,12 +130,10 @@ lemma sum_odd (S : Fin (2 * n + 1) → ℚ) :
     · intro i
       simp only [mem_univ, Fin.symm_castOrderIso, RelIso.coe_fn_toEquiv]
     · exact fun _ _ => rfl
-  rw [h1]
-  rw [Fin.sum_univ_add, Fin.sum_univ_add]
+  rw [h1, Fin.sum_univ_add, Fin.sum_univ_add]
   simp only [univ_unique, Fin.default_eq_zero, Fin.isValue, sum_singleton, Function.comp_apply]
   nth_rewrite 2 [add_comm]
-  rw [add_assoc]
-  rw [Finset.sum_add_distrib]
+  rw [add_assoc, Finset.sum_add_distrib]
   rfl
 
 /-!
