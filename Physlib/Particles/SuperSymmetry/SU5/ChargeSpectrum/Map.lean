@@ -222,8 +222,7 @@ lemma mem_map_ofPotentialTerm_iff [DecidableEq 𝓩]
 lemma mem_map_ofPotentialTerm'_iff[DecidableEq 𝓩]
     (f : 𝓩 →+ 𝓩1) (x : ChargeSpectrum 𝓩) (T : PotentialTerm) :
     i ∈ (ofPotentialTerm' (map f x) T) ↔ i ∈ (ofPotentialTerm' x T).map f := by
-  rw [← mem_ofPotentialTerm_iff_mem_ofPotentialTerm]
-  rw [mem_map_ofPotentialTerm_iff]
+  rw [← mem_ofPotentialTerm_iff_mem_ofPotentialTerm, mem_map_ofPotentialTerm_iff]
   simp only [Multiset.mem_map]
   constructor
   · intro ⟨a, h, h1⟩
