@@ -163,35 +163,29 @@ lemma function_differentiableAt_snd (f : X → Y → Z) (x : X) (y : Y) (hf : Di
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_fst (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
-    Differentiable 𝕜 (fderiv 𝕜 fun x' => (↿f) (x', y)) := by
-  fun_prop
+    Differentiable 𝕜 (fderiv 𝕜 fun x' => (↿f) (x', y)) := by fun_prop
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_snd (f : X → Y → Z) (x : X) (hf : ContDiff 𝕜 2 ↿f) :
-    Differentiable 𝕜 (fderiv 𝕜 fun y' => (↿f) (x, y')) := by
-  fun_prop
+    Differentiable 𝕜 (fderiv 𝕜 fun y' => (↿f) (x, y')) := by fun_prop
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_fst_comp_snd (f : X → Y → Z) (x : X) (hf : ContDiff 𝕜 2 ↿f) :
-    Differentiable 𝕜 (fun y' => fderiv 𝕜 (fun x' => (↿f) (x', y')) x) := by
-  fun_prop
+    Differentiable 𝕜 (fun y' => fderiv 𝕜 (fun x' => (↿f) (x', y')) x) := by fun_prop
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_fst_comp_snd_apply (f : X → Y → Z) (x δx : X)
     (hf : ContDiff 𝕜 2 ↿f) :
-    Differentiable 𝕜 (fun y' => fderiv 𝕜 (fun x' => (↿f) (x', y')) x δx) := by
-  fun_prop
+    Differentiable 𝕜 (fun y' => fderiv 𝕜 (fun x' => (↿f) (x', y')) x δx) := by fun_prop
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_snd_comp_fst (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
-    Differentiable 𝕜 (fun x' => fderiv 𝕜 (fun y' => (↿f) (x', y')) y) := by
-  fun_prop
+    Differentiable 𝕜 (fun x' => fderiv 𝕜 (fun y' => (↿f) (x', y')) y) := by fun_prop
 
 @[fun_prop]
 lemma fderiv_uncurry_differentiable_snd_comp_fst_apply (f : X → Y → Z) (y δy : Y)
     (hf : ContDiff 𝕜 2 ↿f) :
-    Differentiable 𝕜 (fun x' => fderiv 𝕜 (fun y' => (↿f) (x', y')) y δy) := by
-  fun_prop
+    Differentiable 𝕜 (fun x' => fderiv 𝕜 (fun y' => (↿f) (x', y')) y δy) := by fun_prop
 
 @[fun_prop]
 lemma fderiv_curry_differentiableAt_fst_comp_snd (f : X → Y → Z) (x dx : X) (y : Y)
