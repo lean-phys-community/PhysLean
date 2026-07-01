@@ -477,7 +477,6 @@ theorem spectralDecomposition (ρ : MState d) :
   simp only [Matrix.mul_diagonal, Matrix.IsHermitian.eigenvectorUnitary_apply,
     mul_comm, Matrix.star_apply, RCLike.star_def]
   simp only [Function.comp_apply, mat_M, mat_apply, HermitianMat.smul_apply, Complex.real_smul]
-  rw [mul_assoc]
   rfl
 
 end pure
@@ -552,7 +551,6 @@ lemma default_eq [Nonempty d] : (default : MState d) = uniform := rfl
 
 @[simp]
 theorem M_default [Unique d] : (default : MState d).M = 1 := by
-  simp [default_eq, uniform]
   rfl
 
 section ptrace

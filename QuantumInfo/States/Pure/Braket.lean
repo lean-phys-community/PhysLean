@@ -110,12 +110,10 @@ theorem Bra.ext {ξ ψ : Bra d} (h : ∀ x, ξ x = ψ x) : ξ = ψ :=
 
 theorem Ket.normalized (ψ : Ket d) : ∑ x, Complex.normSq (ψ x) = 1 := by
   convert ψ.normalized'
-  rw [Complex.normSq_eq_norm_sq]
   rfl
 
 theorem Bra.normalized (ψ : Bra d) : ∑ x, Complex.normSq (ψ x) = 1 := by
   convert ψ.normalized'
-  rw [Complex.normSq_eq_norm_sq]
   rfl
 
 /-- Any Bra can be turned into a Ket by conjugating the elements. -/

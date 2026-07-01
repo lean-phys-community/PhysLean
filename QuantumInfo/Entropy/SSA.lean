@@ -291,7 +291,6 @@ theorem Matrix.opNorm_conjTranspose_eq_opNorm {m n : Type*} [Fintype m] [Fintype
     Matrix.opNorm Aᴴ = Matrix.opNorm A := by
   unfold Matrix.opNorm
   rw [← ContinuousLinearMap.adjoint.norm_map (toEuclideanLin A).toContinuousLinearMap]
-  rw [toEuclideanLin_conjTranspose_eq_adjoint]
   rfl
 
 theorem isometry_mul_conjTranspose_le_one {m n : Type*} [Fintype m] [Fintype n]
