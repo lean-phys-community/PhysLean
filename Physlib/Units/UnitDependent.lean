@@ -413,12 +413,19 @@ noncomputable instance instContinuousLinearUnitDependentMap
   scaleUnit u1 u2 f :=
     ContinuousLinearEquiv.arrowCongr (scaleUnitContLinearEquiv u1 u2)
       (scaleUnitContLinearEquiv u1 u2) f
-  scaleUnit_trans u1 u2 u3 f := ContinuousLinearMap.ext fun m1 => by
-    simp [scaleUnit_trans]
-  scaleUnit_trans' u1 u2 u3 f := ContinuousLinearMap.ext fun m1 => by
-    simp [scaleUnit_trans']
-  scaleUnit_id u f := ContinuousLinearMap.ext fun m1 => by
-    simp [scaleUnit_id]
+  scaleUnit_trans u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
+    Eq.trans
+      (congrArg (fun x => scaleUnit u2 u3 (scaleUnit u1 u2 (f x)))
+        (scaleUnit_trans u3 u2 u1 m1))
+      (scaleUnit_trans u1 u2 u3 (f (scaleUnit u3 u1 m1)))
+  scaleUnit_trans' u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
+    Eq.trans
+      (congrArg (fun x => scaleUnit u1 u2 (scaleUnit u2 u3 (f x)))
+        (scaleUnit_trans' u3 u2 u1 m1))
+      (scaleUnit_trans' u1 u2 u3 (f (scaleUnit u3 u1 m1)))
+  scaleUnit_id u f := ContinuousLinearMap.ext fun m1 =>
+    Eq.trans (congrArg (scaleUnit u u) (congrArg f (scaleUnit_id u m1)))
+      (scaleUnit_id u (f m1))
   scaleUnit_add u1 u2 f1 f2 := ContinuousLinearMap.ext fun m =>
     scaleUnit_add u1 u2 (f1 (scaleUnit u2 u1 m)) (f2 (scaleUnit u2 u1 m))
   scaleUnit_smul u1 u2 r f := ContinuousLinearMap.ext fun m =>
@@ -525,14 +532,8 @@ instance (M : Type) [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) :
   smul a f := ⟨a • f.1, fun u1 u2 => by
     rw [smul_comm, ← f.2]
     rw [MulUnitDependent.scaleUnit_mul]⟩
-  one_smul f := by
-    ext
-    change (1 : ℝ≥0) • f.1 = f.1
-    simp
-  mul_smul a b f := by
-    ext
-    change (a * b) • f.1 = a • (b • f.1)
-    rw [smul_smul]
+  one_smul f := Subtype.ext (one_smul ℝ≥0 f.1)
+  mul_smul a b f := Subtype.ext (mul_smul a b f.1)
 
 instance (M : Type) [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) :
     CarriesDimension (DimSet M d) where
