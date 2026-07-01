@@ -115,8 +115,7 @@ lemma radiusRegPowCLM_apply_fun {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Spac
 
 @[simp]
 lemma radiusRegPowCLM_apply {d : ℕ} (ε : ℝˣ) (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐫₀ ε s ψ x = (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by
-  rw [radiusRegPowCLM_apply_fun]
+    𝐫₀ ε s ψ x = (‖x‖ ^ 2 + ε ^ 2) ^ (s / 2) • ψ x := by rw [radiusRegPowCLM_apply_fun]
 
 @[simp]
 lemma radiusRegPowCLM_comp_eq {d : ℕ} (ε : ℝˣ) (s t : ℝ) :
@@ -157,8 +156,7 @@ lemma radiusPowLM_apply_fun {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
 
 @[simp]
 lemma radiusPowLM_apply {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
-    𝐫 s ψ x = ‖x‖ ^ s • ψ x := by
-  rw [radiusPowLM_apply_fun]
+    𝐫 s ψ x = ‖x‖ ^ s • ψ x := by rw [radiusPowLM_apply_fun]
 
 /-- `x ↦ ‖x‖ˢψ(x)` is smooth away from `x = 0`. -/
 @[fun_prop]

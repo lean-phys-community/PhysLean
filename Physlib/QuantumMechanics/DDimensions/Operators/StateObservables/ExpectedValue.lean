@@ -76,8 +76,7 @@ lemma centered_eq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
 
 /-- A centered vector vanishes exactly when `Tψ = ⟨T⟩_ψ ψ`. -/
 lemma centered_eq_zero_iff (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    centered T ψ = 0 ↔ T ψ = (expectedValue T ψ : ℂ) • (ψ : H) := by
-  rw [centered_eq, sub_eq_zero]
+    centered T ψ = 0 ↔ T ψ = (expectedValue T ψ : ℂ) • (ψ : H) := by rw [centered_eq, sub_eq_zero]
 
 /-- For a unit vector and symmetric `T`, the centered vector is orthogonal to the state. -/
 lemma inner_state_centered_eq_zero (T : H →ₗ.[ℂ] H) (hT : T.IsSymmetric)

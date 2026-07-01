@@ -114,8 +114,7 @@ lemma potentialCLM_apply (h_HTG : Q.potential.HasTemperateGrowth) (ψ : 𝓢(Spa
 @[simp]
 lemma potentialCLM_apply_apply
     (h_HTG : Q.potential.HasTemperateGrowth) (ψ : 𝓢(Space Q.d, ℂ)) (x : Space Q.d) :
-    Q.potentialCLM ψ x = Q.potential x • ψ x := by
-  rw [potentialCLM_apply h_HTG]
+    Q.potentialCLM ψ x = Q.potential x • ψ x := by rw [potentialCLM_apply h_HTG]
 
 /-- The potential operator as a self-adjoint, unbounded multiplication operator
   with domain `{ψ ∈ Q.HS | Q.potential • ψ ∈ Q.HS}`. -/

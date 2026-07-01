@@ -297,8 +297,7 @@ lemma mulOperator_adjoint_eq_conj {f : Space d → ℂ} (hf : AEStronglyMeasurab
 
 lemma mulOperator_isSelfAdjoint_ofReal
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f) (hf' : conj ∘ f = f) :
-    IsSelfAdjoint (𝓜 f) := by
-  rw [isSelfAdjoint_def, mulOperator_adjoint_eq_conj hf, hf']
+    IsSelfAdjoint (𝓜 f) := by rw [isSelfAdjoint_def, mulOperator_adjoint_eq_conj hf, hf']
 
 /-!
 ## D. Closable & unbounded
