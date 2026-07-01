@@ -100,7 +100,6 @@ lemma magneticField_coord_eq_fieldStrengthMatrix {i : Fin 3} {c : SpeedOfLight}
   congr
   all_goals
   · rw [SpaceTime.deriv_sum_inr c _ hA]
-    simp only [Fin.isValue, ContinuousLinearEquiv.apply_symm_apply]
     rfl
     · fun_prop
 
@@ -150,7 +149,6 @@ lemma ofElectromagneticField_magneticField {c : SpeedOfLight}
       (u • basis.repr x) ⨯ₑ₃ B t (u • x)
   suffices h : ContDiff ℝ 1 (fun x => C x i) by
     convert! h using 1
-    simp [C]
     rfl
   fin_cases i
   all_goals

@@ -143,8 +143,6 @@ The scalar potential of the harmonic wave is zero.
 lemma harmonicWaveX_scalarPotential_eq_zero {d} (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) :
     (harmonicWaveX 𝓕 k E₀ φ).scalarPotential 𝓕.c = 0 := by
-  ext x
-  simp [harmonicWaveX, scalarPotential]
   rfl
 
 /-!
@@ -163,7 +161,6 @@ lemma harmonicWaveX_scalarPotential_eq_zero {d} (𝓕 : FreeSpace) (k : ℝ)
 lemma harmonicWaveX_vectorPotential_zero_eq_zero {d} (𝓕 : FreeSpace) (k : ℝ)
     (E₀ : Fin d → ℝ) (φ : Fin d → ℝ) (t : Time) (x : Space d.succ) :
     (harmonicWaveX 𝓕 k E₀ φ).vectorPotential 𝓕.c t x 0 = 0 := by
-  simp [harmonicWaveX, vectorPotential, SpaceTime.timeSlice]
   rfl
 
 lemma harmonicWaveX_vectorPotential_succ {d} (𝓕 : FreeSpace) (k : ℝ)
@@ -518,7 +515,6 @@ lemma harmonicWaveX_isPlaneWave {d} (𝓕 : FreeSpace) (k : ℝ) (hk : k ≠ 0)
     ext t x i
     match i with
     | 0 =>
-      simp [harmonicWaveX_electricField_zero, planeWave]
       rfl
     | ⟨Nat.succ i, h⟩ =>
       simp only [Nat.succ_eq_add_one, neg_mul]
@@ -540,7 +536,6 @@ lemma harmonicWaveX_isPlaneWave {d} (𝓕 : FreeSpace) (k : ℝ) (hk : k ≠ 0)
     ext ij
     match ij with
     | (0, 0) =>
-      simp only [Nat.succ_eq_add_one, magneticFieldMatrix_diag_eq_zero, inner_basis, neg_mul]
       rfl
     | (⟨0, h0⟩, ⟨Nat.succ j, hj⟩) =>
       simp only [Nat.succ_eq_add_one, Fin.zero_eta, inner_basis, neg_mul]

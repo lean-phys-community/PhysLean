@@ -91,7 +91,6 @@ lemma chargeDensity_eq_timeSlice {d : ℕ} {c : SpeedOfLight} {J : LorentzCurren
 @[simp]
 lemma chargeDensity_zero {d : ℕ} {c : SpeedOfLight}:
     chargeDensity c (0 : LorentzCurrentDensity d) = 0 := by
-  simp [chargeDensity_eq_timeSlice, timeSlice]
   rfl
 
 /-!
@@ -146,7 +145,6 @@ lemma currentDensity_eq_timeSlice {d : ℕ} {J : LorentzCurrentDensity d} :
 @[simp]
 lemma currentDensity_zero {d : ℕ} {c : SpeedOfLight}:
     currentDensity c (0 : LorentzCurrentDensity d) = 0 := by
-  simp [currentDensity_eq_timeSlice, timeSlice]
   rfl
 /-!
 
