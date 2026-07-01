@@ -159,8 +159,7 @@ open Space
 
 lemma deriv_normPowerSeries {d} (n : ℕ) (x : Space d) (i : Fin d) :
     ∂[i] (normPowerSeries n) x = x i * (normPowerSeries n x)⁻¹ := by
-  rw [deriv_eq_fderiv_basis]
-  rw [normPowerSeries_eq]
+  rw [deriv_eq_fderiv_basis, normPowerSeries_eq]
   rw [fderiv_sqrt]
   simp only [one_div, mul_inv_rev, fderiv_add_const, FunLike.coe_smul, Pi.smul_apply,
     smul_eq_mul]
