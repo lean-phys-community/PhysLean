@@ -53,24 +53,19 @@ instance instMul : Mul Prob :=
     ⟨mul_nonneg x.2.1 y.2.1, mul_le_one₀ x.2.2 y.2.1 y.2.2⟩⟩⟩
 
 @[simp, norm_cast]
-theorem coe_zero : (0 : Prob).val = 0 :=
-  rfl
+theorem coe_zero : (0 : Prob).val = 0 := rfl
 
 @[simp, norm_cast]
-theorem coe_one : (1 : Prob).val = 1 :=
-  rfl
+theorem coe_one : (1 : Prob).val = 1 := rfl
 
 @[simp, norm_cast]
-theorem coe_mul (x y : Prob) : (x * y).val = x.val * y.val :=
-  rfl
+theorem coe_mul (x y : Prob) : (x * y).val = x.val * y.val := rfl
 
 @[simp, norm_cast]
-theorem coe_inf (x y : Prob) : (x ⊓ y).val = x.val ⊓ y.val :=
-  rfl
+theorem coe_inf (x y : Prob) : (x ⊓ y).val = x.val ⊓ y.val := rfl
 
 @[simp, norm_cast]
-theorem coe_sup (x y : Prob) : (x ⊔ y).val = x.val ⊔ y.val :=
-  rfl
+theorem coe_sup (x y : Prob) : (x ⊔ y).val = x.val ⊔ y.val := rfl
 
 instance instCommMonoidWithZero : CommMonoidWithZero Prob where
   mul_assoc := by intros; ext; simp [mul_assoc]
