@@ -440,8 +440,7 @@ lemma toFieldStrength_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d
   ext κ
   match κ with
   | (μ', ν') =>
-  simp [Finsupp.single_apply]
-  rfl
+  simpa [Finsupp.single_apply]
 
 /-!
 

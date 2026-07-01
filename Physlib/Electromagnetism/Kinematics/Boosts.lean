@@ -190,8 +190,7 @@ lemma magneticFieldMatrix_apply_x_boost_succ_succ {d : ℕ} {c : SpeedOfLight} (
   rw [magneticFieldMatrix_eq]
   simp only
   rw [fieldStrengthMatrix_equivariant _ _ hA]
-  simp [Fintype.sum_sum_type, boost_zero_inr_succ_inr_succ, Fin.sum_univ_succ]
-  rfl
+  simpa [Fintype.sum_sum_type, boost_zero_inr_succ_inr_succ, Fin.sum_univ_succ]
 
 end ElectromagneticPotential
 end Electromagnetism
