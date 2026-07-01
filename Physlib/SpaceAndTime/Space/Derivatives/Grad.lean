@@ -193,8 +193,7 @@ lemma grad_inner_eq {d} (f : Space d → ℝ) (x : Space d) (y : EuclideanSpace 
 
 lemma inner_grad_eq {d} (f : Space d → ℝ) (x : EuclideanSpace ℝ (Fin d)) (y : Space d) :
     ⟪x, ∇ f y⟫_ℝ = ∑ i, x i * ∂[i] f y := by
-  rw [← grad_inner_eq]
-  exact real_inner_comm (∇ f y) x
+  simpa [← grad_inner_eq] using real_inner_comm (∇ f y) x
 
 lemma grad_inner_repr_eq {d} (f : Space d → ℝ) (x y : Space d) :
     ⟪∇ f x, (Space.basis).repr y⟫_ℝ = fderiv ℝ f x y := by

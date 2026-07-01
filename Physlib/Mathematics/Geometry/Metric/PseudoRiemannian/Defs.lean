@@ -120,9 +120,7 @@ lemma neg_weight_implies_neg_value {E : Type*} [AddCommGroup E] [Module ℝ E]
     intro h
     have : f v = f 0 := by rw [h]
     have : f (f.symm v_std) = f 0 := by rw [← this]
-    have : v_std = 0 := by
-      rw [← f.apply_symm_apply v_std]
-      exact Eq.trans this (map_zero f)
+    have : v_std = 0 := by simpa using this
     have : v_std i = 0 := by rw [this]; rfl
     simp only [↓reduceIte, one_ne_zero, v_std] at this
   have hq_neg : q v < 0 := by

@@ -88,9 +88,7 @@ lemma variance_eq_norm_sq_sub_expectedValue_sq (T : H →ₗ.[ℂ] H)
 
 /-- Variance is nonnegative. -/
 lemma variance_nonneg (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    0 ≤ variance T ψ := by
-  rw [variance_eq_centered_norm_sq]
-  exact sq_nonneg _
+    0 ≤ variance T ψ := by simp [variance_eq_centered_norm_sq]
 
 /-- Zero variance is the same as a zero centered vector. -/
 lemma variance_eq_zero_iff_centered_eq_zero (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
@@ -131,9 +129,8 @@ lemma standardDeviation_eq_sqrt_variance (T : H →ₗ.[ℂ] H) (ψ : T.domain) 
 
 /-- Standard deviation is nonnegative. -/
 lemma standardDeviation_nonneg (T : H →ₗ.[ℂ] H) (ψ : T.domain) :
-    0 ≤ standardDeviation T ψ := by
-  rw [standardDeviation_eq_sqrt_variance]
-  exact Real.sqrt_nonneg _
+    0 ≤ standardDeviation T ψ :=
+  Real.sqrt_nonneg _
 
 @[simp]
 lemma standardDeviation_sq (T : H →ₗ.[ℂ] H) (ψ : T.domain) :

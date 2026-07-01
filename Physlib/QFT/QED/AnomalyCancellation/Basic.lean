@@ -128,9 +128,7 @@ lemma pureU1_linear {n : ℕ} (S : (PureU1 n).LinSols) :
 
 /-- A solution to the pure U(1) accs satisfies the cubic ACCs. -/
 lemma pureU1_cube {n : ℕ} (S : (PureU1 n).Sols) :
-    ∑ i, (S.val i) ^ 3 = 0 := by
-  rw [← PureU1.accCube_explicit]
-  exact S.cubicSol
+    ∑ i, (S.val i) ^ 3 = 0 := (PureU1.accCube_explicit n S.val) ▸ S.cubicSol
 
 /-- The last charge of a solution to the linear ACCs is equal to the negation of the sum
   of the other charges. -/
