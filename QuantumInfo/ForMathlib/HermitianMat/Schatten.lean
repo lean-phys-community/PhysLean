@@ -120,8 +120,8 @@ lemma schattenNorm_eq_sum_singularValues_rpow (A : Matrix d d ℂ) {p : ℝ} (hp
 lemma schattenNorm_rpow_eq_sum_sorted (A : Matrix d d ℂ) {p : ℝ} (hp : 0 < p) :
     schattenNorm A p ^ p =
     ∑ i : Fin (Fintype.card d), singularValuesSorted A i ^ p := by
-  rw [schattenNorm_rpow_eq_sum_singularValues A hp]
-  exact sum_singularValues_rpow_eq_sum_sorted A p
+  simpa [schattenNorm_rpow_eq_sum_singularValues A hp] using
+    sum_singularValues_rpow_eq_sum_sorted A p
 
 open InnerProductSpace in
 /--

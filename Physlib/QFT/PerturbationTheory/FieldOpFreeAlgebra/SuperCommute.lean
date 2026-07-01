@@ -744,8 +744,8 @@ lemma superCommuteF_ofCrAnListF_ofCrAnListF_bosonic_or_fermionic (φs φs' : Lis
 lemma superCommuteF_ofCrAnOpF_ofCrAnOpF_bosonic_or_fermionic (φ φ' : 𝓕.CrAnFieldOp) :
     [ofCrAnOpF φ, ofCrAnOpF φ']ₛF ∈ statisticSubmodule bosonic ∨
     [ofCrAnOpF φ, ofCrAnOpF φ']ₛF ∈ statisticSubmodule fermionic := by
-  rw [← ofCrAnListF_singleton, ← ofCrAnListF_singleton]
-  exact superCommuteF_ofCrAnListF_ofCrAnListF_bosonic_or_fermionic [φ] [φ']
+  simpa [ofCrAnListF_singleton] using
+    superCommuteF_ofCrAnListF_ofCrAnListF_bosonic_or_fermionic [φ] [φ']
 
 lemma superCommuteF_superCommuteF_ofCrAnOpF_bosonic_or_fermionic (φ1 φ2 φ3 : 𝓕.CrAnFieldOp) :
     [ofCrAnOpF φ1, [ofCrAnOpF φ2, ofCrAnOpF φ3]ₛF]ₛF ∈ statisticSubmodule bosonic ∨

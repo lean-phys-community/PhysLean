@@ -40,8 +40,7 @@ theorem isSelfAdjoint : IsSelfAdjoint A.mat :=
 @[fun_prop]
 theorem continuousOn_finite {α β : Type*} (f : α → β) (S : Set α)
     [TopologicalSpace α] [TopologicalSpace β] [T1Space α] [Finite S] : ContinuousOn f S := by
-  rw [continuousOn_iff_continuous_restrict]
-  exact continuous_of_discreteTopology
+  simpa [continuousOn_iff_continuous_restrict] using continuous_of_discreteTopology
 
 @[simp]
 theorem conjTranspose_cfc : (cfc f A.mat).conjTranspose = cfc f A.mat :=

@@ -1346,8 +1346,7 @@ theorem uniform_posDef {d : Type*} [Nonempty d] [Fintype d] [DecidableEq d] :
   exact Fintype.card_pos
 
 theorem posDef_of_unique {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) [Unique d] : ρ.m.PosDef := by
-  rw [Subsingleton.allEq ρ uniform]
-  exact uniform_posDef
+  simpa [Subsingleton.allEq ρ uniform] using uniform_posDef
 
 end posdef
 

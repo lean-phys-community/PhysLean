@@ -43,8 +43,7 @@ lemma ofCrAnListF_bosonic_or_fermionic (φs : List 𝓕.CrAnFieldOp) :
 
 lemma ofCrAnOpF_bosonic_or_fermionic (φ : 𝓕.CrAnFieldOp) :
     ofCrAnOpF φ ∈ statisticSubmodule bosonic ∨ ofCrAnOpF φ ∈ statisticSubmodule fermionic := by
-  rw [← ofCrAnListF_singleton]
-  exact ofCrAnListF_bosonic_or_fermionic [φ]
+  simpa [ofCrAnListF_singleton] using ofCrAnListF_bosonic_or_fermionic [φ]
 
 /-- The projection of an element of `FieldOpFreeAlgebra` onto it's bosonic part. -/
 def bosonicProjF : 𝓕.FieldOpFreeAlgebra →ₗ[ℂ] statisticSubmodule (𝓕 := 𝓕) bosonic :=
