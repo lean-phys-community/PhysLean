@@ -421,8 +421,7 @@ instance : FiniteDimensional ℝ Time :=
   Module.finite_of_rank_eq_one rank_eq_one
 
 lemma volume_eq_basis_addHaar :
-    (volume (α := Time)) = basis.toBasis.addHaar := by
-  exact (OrthonormalBasis.addHaar_eq_volume _).symm
+    (volume (α := Time)) = basis.toBasis.addHaar := (OrthonormalBasis.addHaar_eq_volume _).symm
 
 /-!
 

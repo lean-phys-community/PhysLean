@@ -35,8 +35,7 @@ variable {d : ℕ}
 noncomputable instance : TopologicalSpace (Velocity d) := instTopologicalSpaceSubtype
 
 @[ext]
-lemma ext {v w : Velocity d} (h : v.1 = w.1) : v = w := by
-  exact SetCoe.ext h
+lemma ext {v w : Velocity d} (h : v.1 = w.1) : v = w := SetCoe.ext h
 
 lemma mem_iff {v : Vector d} : v ∈ Velocity d ↔ ⟪v, v⟫ₘ = (1 : ℝ) ∧ 0 < v.timeComponent := Iff.rfl
 
