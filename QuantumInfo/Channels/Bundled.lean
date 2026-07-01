@@ -206,8 +206,8 @@ instance instContinuousOrderHomClass : ContinuousOrderHomClass (PMap dIn dOut �
 
 /-- Positive-presering maps also preserve positivity on, specifically, Hermitian matrices. -/
 @[simp]
-theorem pos_Hermitian (M : PMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x := by
-  simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+theorem pos_Hermitian (M : PMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x :=
+  map_nonneg M h
 
 end PMap
 
@@ -259,8 +259,8 @@ instance instHContinuousOrderHomClass : ContinuousOrderHomClass (PTPMap dIn dOut
 
 /-- PTP maps also preserve positivity on Hermitian matrices. -/
 @[simp]
-theorem pos_Hermitian (M : PTPMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x := by
-  simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+theorem pos_Hermitian (M : PTPMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x :=
+  map_nonneg M h
 
 /-- `PTPMap`s are functions from `MState`s to `MState`s. -/
 noncomputable instance instMFunLike [DecidableEq dIn] [DecidableEq dOut] :
@@ -408,8 +408,8 @@ instance instOneHomClass : OneHomClass (PUMap dIn dOut ℂ)
 
 /-- CPTP maps also preserve positivity on Hermitian matrices. -/
 @[simp]
-theorem pos_Hermitian (M : PUMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x := by
-  simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+theorem pos_Hermitian (M : PUMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x :=
+  map_nonneg M h
 
 end PUMap
 
@@ -451,8 +451,8 @@ instance instOneHomClass : OneHomClass (CPUMap dIn dOut ℂ)
 
 /-- CPTP maps also preserve positivity on Hermitian matrices. -/
 @[simp]
-theorem pos_Hermitian (M : CPUMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x := by
-  simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+theorem pos_Hermitian (M : CPUMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 0 ≤ x) : 0 ≤ M x :=
+  map_nonneg M h
 
 end CPUMap
 

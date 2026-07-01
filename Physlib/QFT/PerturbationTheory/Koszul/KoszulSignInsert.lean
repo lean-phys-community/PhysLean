@@ -103,8 +103,7 @@ lemma koszulSignInsert_eq_filter (φ : 𝓕) : (φs : List 𝓕) →
 lemma koszulSignInsert_eq_cons [Std.Total le] (φ : 𝓕) (φs : List 𝓕) :
     koszulSignInsert q le φ φs = koszulSignInsert q le φ (φ :: φs) := by
   simp only [koszulSignInsert, and_self]
-  have h1 : le φ φ := by
-    simpa only [or_self] using Std.Total.total (r := le) φ φ
+  have h1 : le φ φ := (Std.Total.total (r := le) φ φ).elim id id
   simp [h1]
 
 lemma koszulSignInsert_eq_grade (φ : 𝓕) (φs : List 𝓕) :
