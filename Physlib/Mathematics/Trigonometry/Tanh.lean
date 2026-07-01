@@ -143,10 +143,8 @@ lemma tanh_hasTemperateGrowth : Function.HasTemperateGrowth Real.tanh := by
     use C
     intro x
     have h_equiv : ‖iteratedFDeriv ℝ n Real.tanh x‖ = |iteratedDeriv n Real.tanh x| := by
-      rw [← iteratedFDerivWithin_univ]
-      rw [← iteratedDerivWithin_univ]
-      rw [← norm_eq_abs]
-      rw [norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin]
+      rw [← iteratedFDerivWithin_univ, ← iteratedDerivWithin_univ]
+      rw [← norm_eq_abs, norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin]
     rw [h_equiv]
     simp only [pow_zero, mul_one]
     exact hC x

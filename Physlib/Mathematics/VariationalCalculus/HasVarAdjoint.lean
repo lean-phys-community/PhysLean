@@ -121,8 +121,7 @@ lemma unique_on_test_functions {F : (X → U) → (Y → V)} {F' G' : (Y → V) 
   obtain ⟨F_preserve_test, F'_preserve_test, F'_adjoint⟩ := hF'
   obtain ⟨F_preserve_test, G'_preserve_test, G'_adjoint⟩ := hG'
   intro φ hφ
-  rw [← zero_add (G' φ)]
-  rw [← sub_eq_iff_eq_add]
+  rw [← zero_add (G' φ), ← sub_eq_iff_eq_add]
   change (F' - G') φ = 0
   apply fundamental_theorem_of_variational_calculus (@volume X _)
   · simp
@@ -444,14 +443,12 @@ lemma fderiv_apply {dx}
     apply IsLocalizedFunctionTransform.neg
     apply IsLocalizedFunctionTransform.fderiv
   adjoint φ ψ hφ hψ := by
-    rw [← sub_eq_zero]
-    rw [← integral_sub]
+    rw [← sub_eq_zero, ← integral_sub]
     · trans ∫ (a : X), fderiv ℝ (fun a => ⟪φ a, ψ a⟫_ℝ) a dx
       · congr
         funext a
         simp only [inner_neg_right', sub_neg_eq_add]
-        rw [fderiv_inner_apply']
-        rw [add_comm]
+        rw [fderiv_inner_apply', add_comm]
         · exact hφ.differentiable a
         · exact hψ.differentiable a
       · have h1 := integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable (f := fun a => 1)
