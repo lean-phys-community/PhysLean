@@ -184,10 +184,8 @@ lemma rpow_inv_eq_neg_rpow (hA : A.mat.PosDef) (p : ℝ) : (A ^ p)⁻¹ = A ^ (-
   ext i j;
   have h_inv : (A ^ p).mat * (A ^ (-p)).mat = 1 := by
     have h_inv : (A ^ p).mat * (A ^ (-p)).mat = 1 := by
-      have h_pow : (A ^ p).mat = A.cfc (fun x => x ^ p) := by
-        exact rfl
-      have h_pow_neg : (A ^ (-p)).mat = A.cfc (fun x => x ^ (-p)) := by
-        exact rfl
+      have h_pow : (A ^ p).mat = A.cfc (fun x => x ^ p) := rfl
+      have h_pow_neg : (A ^ (-p)).mat = A.cfc (fun x => x ^ (-p)) := rfl
       have h_inv : (A ^ p).mat * (A ^ (-p)).mat = A.cfc (fun x => x ^ p * x ^ (-p)) := by
         rw [ h_pow, h_pow_neg, ← mat_cfc_mul ];
         rfl;
@@ -229,8 +227,7 @@ lemma rpow_neg_mul_rpow_self (hA : A.mat.PosDef) (p : ℝ) :
 open ComplexOrder in
 lemma isUnit_rpow_toMat (hA : A.mat.PosDef) (p : ℝ) : IsUnit (A ^ p).mat := by
   have hA_inv : IsUnit (A ^ (-p)).mat := by
-    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 := by
-      exact rpow_neg_mul_rpow_self hA p
+    have hA_inv : (A ^ (-p)).mat * (A ^ p).mat = 1 := rpow_neg_mul_rpow_self hA p
     exact IsUnit.of_mul_eq_one _ hA_inv
   -- Since $(A^{-p}) (A^p) = 1$, we have that $(A^p)$ is the inverse of $(A^{-p})$.
   have hA_inv : (A ^ p).mat = (A ^ (-p)).mat⁻¹ := by
@@ -443,8 +440,7 @@ theorem rpowApprox_eq_cfc_scalar (A : HermitianMat d ℂ) (hA : A.mat.PosDef) (q
               exact fun {f} hf => inv_cfc_eq_cfc_inv f hf
             apply h_inv_smul
             intro i
-            have h_eigenvalue_pos : 0 < A.H.eigenvalues i := by
-              exact Matrix.PosDef.eigenvalues_pos hA i
+            have h_eigenvalue_pos : 0 < A.H.eigenvalues i := Matrix.PosDef.eigenvalues_pos hA i
             exact ne_of_gt (add_pos h_eigenvalue_pos ht.left);
           rw [h_inv_def, h_inv_comp];
         exact h_inv
@@ -457,8 +453,7 @@ theorem rpowApprox_eq_cfc_scalar (A : HermitianMat d ℂ) (hA : A.mat.PosDef) (q
     have h_integrable : ∀ u : d, IntervalIntegrable (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
       intro u
       have h_integrable : IntervalIntegrable (fun t : ℝ => t ^ q * (1 / (1 + t) - 1 / (A.H.eigenvalues u + t))) volume 0 T := by
-        have h_pos : 0 < A.H.eigenvalues u := by
-          exact Matrix.PosDef.eigenvalues_pos hA u
+        have h_pos : 0 < A.H.eigenvalues u := Matrix.PosDef.eigenvalues_pos hA u
         exact ContinuousOn.intervalIntegrable ( by exact ContinuousOn.mul ( continuousOn_id.rpow_const fun x hx => Or.inr <| by linarith ) <| ContinuousOn.sub ( continuousOn_const.div ( continuousOn_const.add continuousOn_id ) fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] ) ( continuousOn_const.div ( continuousOn_const.add continuousOn_id ) fun x hx => by linarith [ Set.mem_Icc.mp <| by simpa [ hT.le ] using hx ] ) ) ..;
       exact h_integrable
     exact integral_cfc_eq_cfc_integral _ _ _ h_integrable
