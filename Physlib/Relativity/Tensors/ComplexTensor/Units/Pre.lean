@@ -57,9 +57,7 @@ def contrCoUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     a' • contrCoUnitVal
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • contrCoUnitVal =
@@ -108,9 +106,7 @@ def coContrUnit : (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
     a' • coContrUnitVal
   map_add' := fun x y => by
     simp only [add_smul]
-  map_smul' := fun m x => by
-    simp only [smul_smul]
-    rfl
+  map_smul' := fun m x => by simp only [smul_eq_mul, smul_smul, RingHom.id_apply]
   isIntertwining' M := by
     refine LinearMap.ext fun x : ℂ => ?_
     change x • coContrUnitVal =
