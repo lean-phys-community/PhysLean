@@ -234,8 +234,7 @@ lemma toLorentzGroup_fst_col (M : SL(2, ℂ)) :
   refine sub_eq_zero.mp ?_
   refine Fintype.linearIndependent_iff.mp PauliMatrix.pauliBasis'.linearIndependent
     (fun x => ((toLorentzGroup M).1 x (Sum.inl 0) - k x)) ?_ μ
-  simp only [sub_smul]
-  exact h1x
+  simpa only [sub_smul] using h1x
 
 /-- The first element of the image of `SL(2, ℂ)` in the Lorentz group. -/
 lemma toLorentzGroup_inl_inl (M : SL(2, ℂ)) :

@@ -68,8 +68,7 @@ lemma contrT_metricTensor_metricTensor {c : C} :
   rw [metricTensor, metricTensor, fromConstPair, fromConstPair]
   rw [fromPairT_contr_fromPairT_eq_fromPairTContr]
   erw [fromPairTContr_metric_metric_eq_permT_unit]
-  rw [permT_permT]
-  rfl
+  simp [permT_permT]
 
 lemma contrT_metricTensor_metricTensor_eq_dual_unit {c : C} :
     contrT 2 1 2 (by simp; rfl) (prodT (metricTensor c) (metricTensor (S.τ c))) =

@@ -30,8 +30,7 @@ def γ (β : ℝ) : ℝ := 1 / Real.sqrt (1 - β^2)
 lemma γ_sq (β : ℝ) (hβ : |β| < 1) : (γ β)^2 = 1 / (1 - β^2) := by
   simp only [γ, one_div, inv_pow, _root_.inv_inj]
   refine Real.sq_sqrt ?_
-  simp only [sub_nonneg, sq_le_one_iff_abs_le_one]
-  exact le_of_lt hβ
+  simpa only [sub_nonneg, sq_le_one_iff_abs_le_one] using le_of_lt hβ
 
 @[simp]
 lemma γ_zero : γ 0 = 1 := by simp [γ]
@@ -241,8 +240,7 @@ lemma boost_inr_other_inr {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j �
 lemma boost_inr_inr_other {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
     (boost i β hβ).1 (Sum.inr k) (Sum.inr j) = if j = k then 1 else 0:= by
   rw [← boost_transpose_eq_self]
-  simp only [transpose, transpose_apply]
-  exact boost_inr_other_inr hβ hij
+  simpa only [transpose, transpose_apply] using boost_inr_other_inr hβ hij
 /-!
 
 ## Properties of boosts in the zero-direction

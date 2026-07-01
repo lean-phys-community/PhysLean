@@ -235,8 +235,7 @@ lemma uncontractedList_eq_sort (c : WickContraction n) :
 
 lemma uncontractedList_length_eq_card (c : WickContraction n) :
     c.uncontractedList.length = c.uncontracted.card := by
-  rw [uncontractedList_eq_sort]
-  exact Finset.length_sort fun x1 x2 => x1 ≤ x2
+  simp [uncontractedList_eq_sort]
 
 lemma filter_uncontractedList (c : WickContraction n) (p : Fin n → Prop) [DecidablePred p] :
     (c.uncontractedList.filter p) = (c.uncontracted.filter p).sort (· ≤ ·) := by
@@ -286,8 +285,7 @@ lemma uncontractedIndexEquiv_symm_eq_filter_length (k : c.uncontracted) :
   rw [fin_list_sorted_indexOf_mem]
   · simp
   · exact uncontractedList_sorted c
-  · rw [uncontractedList_mem_iff]
-    exact k.2
+  · simp [uncontractedList_mem_iff, k.2]
 
 lemma take_uncontractedIndexEquiv_symm (k : c.uncontracted) :
     c.uncontractedList.take (c.uncontractedIndexEquiv.symm k).val =
