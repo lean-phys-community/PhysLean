@@ -60,8 +60,7 @@ scoped[PauliMatrix] notation "σ2" => σ (Sum.inr 1)
 /-- The Pauli matrix corresponding to the matrix `!![1, 0; 0, -1]`. -/
 scoped[PauliMatrix] notation "σ3" => σ (Sum.inr 2)
 
-lemma pauliMatrix_inl_zero_eq_one : pauliMatrix (Sum.inl 0) = 1 := by
-  dsimp [pauliMatrix]
+lemma pauliMatrix_inl_zero_eq_one : pauliMatrix (Sum.inl 0) = 1 := rfl
 
 /-!
 
@@ -73,8 +72,7 @@ lemma pauliMatrix_selfAdjoint (μ : Fin 1 ⊕ Fin 3) :
     (σ μ)ᴴ = σ μ := by
   fin_cases μ
   all_goals
-    dsimp [pauliMatrix]
-    rw [eta_fin_two _ᴴ]
+    rw [pauliMatrix.eq_def, eta_fin_two _ᴴ]
     simp
   ext i j
   fin_cases i <;> fin_cases j

@@ -82,8 +82,7 @@ def positionOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_inje
 
 lemma positionStates_generalized_eigenvector_positionOperatorUnbounded (x : ℝ) :
     positionOperatorUnbounded.IsGeneralizedEigenvector (positionState x) x := by
-  dsimp [positionOperatorUnbounded]
-  rw [UnboundedOperator.isGeneralizedEigenvector_ofSelfCLM_iff]
+  rw [positionOperatorUnbounded, UnboundedOperator.isGeneralizedEigenvector_ofSelfCLM_iff]
   intro ψ
   simp [positionState_apply]
 

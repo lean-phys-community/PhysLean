@@ -102,8 +102,7 @@ lemma integral_radialAngularMeasure {d : ℕ} (f : Space d → F) :
 
 lemma lintegral_radialMeasure {d : ℕ} (f : Space d → ENNReal) (hf : Measurable f) :
     ∫⁻ x, f x ∂radialAngularMeasure = ∫⁻ x, ENNReal.ofReal (1 / ‖x‖ ^ (d - 1)) * f x := by
-  dsimp [radialAngularMeasure]
-  rw [lintegral_withDensity_eq_lintegral_mul]
+  rw [radialAngularMeasure, lintegral_withDensity_eq_lintegral_mul]
   simp only [one_div, Pi.mul_apply]
   all_goals fun_prop
 

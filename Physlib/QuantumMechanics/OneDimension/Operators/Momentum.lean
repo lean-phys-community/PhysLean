@@ -94,8 +94,7 @@ def momentumOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_inje
 lemma planeWaveFunctional_generalized_eigenvector_momentumOperatorUnbounded (k : ℝ) :
     momentumOperatorUnbounded.IsGeneralizedEigenvector
       (planewaveFunctional k) (2 * Real.pi * ℏ * k) := by
-  dsimp [momentumOperatorUnbounded]
-  rw [UnboundedOperator.isGeneralizedEigenvector_ofSelfCLM_iff]
+  rw [momentumOperatorUnbounded, UnboundedOperator.isGeneralizedEigenvector_ofSelfCLM_iff]
   intro ψ
   trans (-((Complex.I * ↑↑ℏ) •
       (SchwartzMap.fourierTransformCLM ℂ) ((SchwartzMap.derivCLM ℂ ℂ) ψ) k))
