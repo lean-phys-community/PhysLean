@@ -92,16 +92,14 @@ lemma superCommuteF_ofFieldOpListF_ofFieldOpFsList (φ : List 𝓕.FieldOp) (φs
 lemma superCommuteF_ofFieldOpF_ofFieldOpFsList (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
     [ofFieldOpF φ, ofFieldOpListF φs]ₛF = ofFieldOpF φ * ofFieldOpListF φs -
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs) • ofFieldOpListF φs * ofFieldOpF φ := by
-  rw [← ofFieldOpListF_singleton, superCommuteF_ofFieldOpListF_ofFieldOpFsList,
-    ofFieldOpListF_singleton]
-  simp
+  simpa [ofFieldOpListF_singleton] using
+    superCommuteF_ofFieldOpListF_ofFieldOpFsList [φ] φs
 
 lemma superCommuteF_ofFieldOpListF_ofFieldOpF (φs : List 𝓕.FieldOp) (φ : 𝓕.FieldOp) :
     [ofFieldOpListF φs, ofFieldOpF φ]ₛF = ofFieldOpListF φs * ofFieldOpF φ -
     𝓢(𝓕 |>ₛ φs, 𝓕 |>ₛ φ) • ofFieldOpF φ * ofFieldOpListF φs := by
-  rw [← ofFieldOpListF_singleton, superCommuteF_ofFieldOpListF_ofFieldOpFsList,
-    ofFieldOpListF_singleton]
-  simp
+  simpa [ofFieldOpListF_singleton] using
+    superCommuteF_ofFieldOpListF_ofFieldOpFsList φs [φ]
 
 lemma superCommuteF_anPartF_crPartF (φ φ' : 𝓕.FieldOp) :
     [anPartF φ, crPartF φ']ₛF = anPartF φ * crPartF φ' -
@@ -655,14 +653,12 @@ lemma bosonic_superCommuteF {a b : 𝓕.FieldOpFreeAlgebra} (ha : a ∈ statisti
 lemma superCommuteF_bonsonic_symm {a b : 𝓕.FieldOpFreeAlgebra}
     (hb : b ∈ statisticSubmodule bosonic) :
     [a, b]ₛF = - [b, a]ₛF := by
-  rw [bosonic_superCommuteF hb, superCommuteF_bonsonic hb]
-  simp
+  simp [bosonic_superCommuteF hb, superCommuteF_bonsonic hb]
 
 lemma bonsonic_superCommuteF_symm {a b : 𝓕.FieldOpFreeAlgebra}
     (ha : a ∈ statisticSubmodule bosonic) :
     [a, b]ₛF = - [b, a]ₛF := by
-  rw [bosonic_superCommuteF ha, superCommuteF_bonsonic ha]
-  simp
+  simp [bosonic_superCommuteF ha, superCommuteF_bonsonic ha]
 
 lemma superCommuteF_fermionic_fermionic {a b : 𝓕.FieldOpFreeAlgebra}
     (ha : a ∈ statisticSubmodule fermionic) (hb : b ∈ statisticSubmodule fermionic) :
@@ -700,8 +696,7 @@ lemma superCommuteF_fermionic_fermionic {a b : 𝓕.FieldOpFreeAlgebra}
 lemma superCommuteF_fermionic_fermionic_symm {a b : 𝓕.FieldOpFreeAlgebra}
     (ha : a ∈ statisticSubmodule fermionic) (hb : b ∈ statisticSubmodule fermionic) :
     [a, b]ₛF = [b, a]ₛF := by
-  rw [superCommuteF_fermionic_fermionic ha hb]
-  rw [superCommuteF_fermionic_fermionic hb ha]
+  rw [superCommuteF_fermionic_fermionic ha hb, superCommuteF_fermionic_fermionic hb ha]
   abel
 
 lemma superCommuteF_expand_bosonicProjF_fermionicProjF (a b : 𝓕.FieldOpFreeAlgebra) :
