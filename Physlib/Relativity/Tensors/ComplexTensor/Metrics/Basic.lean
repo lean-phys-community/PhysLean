@@ -150,8 +150,7 @@ lemma coMetric_eq_complexCoBasisFin4 : η' =
     - fromPairT (complexCoBasisFin4 2 ⊗ₜ[ℂ] complexCoBasisFin4 2)
     - fromPairT (complexCoBasisFin4 3 ⊗ₜ[ℂ] complexCoBasisFin4 3) := by
   rw [coMetric_eq_complexCoBasis]
-  simp [complexCoBasisFin4]
-  rfl
+  simp [complexCoBasisFin4, finSumFinEquiv, Fin.addCases]
 
 open Lorentz in
 lemma contrMetric_eq_complexContrBasis : η =
@@ -169,8 +168,7 @@ lemma contrMetric_eq_complexContrBasisFin4 : η =
     - fromPairT (complexContrBasisFin4 2 ⊗ₜ[ℂ] complexContrBasisFin4 2)
     - fromPairT (complexContrBasisFin4 3 ⊗ₜ[ℂ] complexContrBasisFin4 3) := by
   rw [contrMetric_eq_complexContrBasis]
-  simp [complexContrBasisFin4]
-  rfl
+  simp [complexContrBasisFin4, finSumFinEquiv, Fin.addCases]
 
 open Fermion in
 lemma leftMetric_eq_leftBasis : εL =

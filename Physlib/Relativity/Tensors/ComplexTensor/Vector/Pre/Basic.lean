@@ -61,14 +61,12 @@ lemma complexContrBasis_reindex_apply_eq_fin4 (j : Fin 4) :
 @[simp]
 lemma complexContrBasisFin4_apply_zero :
     complexContrBasisFin4 0 = complexContrBasis (Sum.inl 0) := by
-  simp only [complexContrBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexContrBasisFin4, finSumFinEquiv, Fin.addCases]
 
 @[simp]
 lemma complexContrBasisFin4_apply_one :
     complexContrBasisFin4 1 = complexContrBasis (Sum.inr 0) := by
-  simp only [complexContrBasisFin4, Basis.reindex_apply]
-  rfl
+  simp [complexContrBasisFin4, finSumFinEquiv, Fin.addCases]
 
 @[simp]
 lemma complexContrBasisFin4_apply_two :

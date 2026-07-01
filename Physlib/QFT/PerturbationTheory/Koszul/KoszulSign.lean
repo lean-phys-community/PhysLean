@@ -46,8 +46,7 @@ lemma koszulSign_mul_self (l : List 𝓕) : koszulSign q le l * koszulSign q le 
 @[simp]
 lemma koszulSign_freeMonoid_of (φ : 𝓕) : koszulSign q le (FreeMonoid.of φ) = 1 := by
   change koszulSign q le [φ] = 1
-  simp only [koszulSign, mul_one]
-  rfl
+  simp [koszulSign, koszulSignInsert, mul_one]
 
 lemma koszulSignInsert_erase_boson {𝓕 : Type} (q : 𝓕 → FieldStatistic)
     (le : 𝓕 → 𝓕 → Prop) [DecidableRel le] (φ : 𝓕) :
