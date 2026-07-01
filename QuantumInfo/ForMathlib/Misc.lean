@@ -169,8 +169,7 @@ lemma exists_equiv_of_multiset_map_eq {α β γ : Type*} [Fintype α] [Fintype �
     ∃ e : α ≃ β, f = g ∘ e := by
   -- Since the multisets of values are equal, the cardinalities of the domains must be equal (as the multiset size is the cardinality of the domain). Thus there exists a bijection `σ : α ≃ β`.
   obtain ⟨σ, hσ⟩ : ∃ σ : α ≃ β, Multiset.map f Finset.univ.val = Multiset.map (g ∘ σ) Finset.univ.val := by
-    have h_card : Fintype.card α = Fintype.card β := by
-      simpa using congr_arg Multiset.card h;
+    have h_card : Fintype.card α = Fintype.card β := by simpa using congr_arg Multiset.card h
     obtain σ := Fintype.equivOfCardEq h_card
     use σ
     have h_multiset_eq : Multiset.map g Finset.univ.val = Multiset.map (g ∘ σ) Finset.univ.val := by
@@ -178,6 +177,5 @@ lemma exists_equiv_of_multiset_map_eq {α β γ : Type*} [Fintype α] [Fintype �
       rw [ Multiset.map_map ]
     exact h.trans h_multiset_eq;
   -- By `Multiset.map_univ_eq_iff`, there exists `e' : α ≃ α` such that `f = (g ∘ σ) ∘ e'`.
-  obtain ⟨e', he'⟩ : ∃ e' : α ≃ α, f = (g ∘ σ) ∘ e' := by
-    exact (Multiset.map_univ_eq_iff f (g ∘ ⇑σ)).mp hσ;
+  obtain ⟨e', he'⟩ : ∃ e' : α ≃ α, f = (g ∘ σ) ∘ e' := (Multiset.map_univ_eq_iff f (g ∘ ⇑σ)).mp hσ
   exact ⟨ e'.trans σ, by simp_all [ Function.comp ]; grind⟩

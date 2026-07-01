@@ -139,8 +139,7 @@ theorem measurable_complexLaplaceIntegrand
       have hUntop : y.untop hy = e := by
         apply WithTop.coe_inj.mp
         rw [WithTop.coe_untop, ← he]
-      have hUntopD : y.untopD 0 = e := by
-        exact he ▸ rfl
+      have hUntopD : y.untopD 0 = e := he ▸ rfl
       rw [hUntop, hUntopD]]
   exact Measurable.ite (hE (measurableSet_singleton (⊤ : WithTop ℝ))) measurable_const
     (Complex.continuous_exp.measurable.comp (by fun_prop :
