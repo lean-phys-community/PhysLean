@@ -721,9 +721,7 @@ lemma differentialEntropy_nonneg_of_prob_le_one
     intro i
     have hpos := probability_pos (𝓒:=𝓒) (T:=T) i
     have hle := hP_le_one i
-    have hle' : 𝓒.probability T i ≤ Real.exp 0 := by
-      simpa [Real.exp_zero] using hle
-    exact (log_le_iff_le_exp hpos).mpr hle'
+    exact (log_le_iff_le_exp hpos).mpr (by simpa [Real.exp_zero] using hle)
   have hInt0 : Integrable (fun _ : ι => (0 : ℝ)) (𝓒.μProd T) := integrable_const _
   have hIntLe : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T)
       ≤ (∫ _i, (0 : ℝ) ∂𝓒.μProd T) :=

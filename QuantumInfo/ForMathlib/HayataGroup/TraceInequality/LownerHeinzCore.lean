@@ -446,14 +446,10 @@ theorem one_div_add_t_operatorAntitoneOn_Ici : ∀ (t : ℝ), 0 < t →
   have hB_sa : IsSelfAdjoint B := IsSelfAdjoint.of_nonneg B_nonneg
   have hA_ne0 : ∀ x ∈ spectrum ℝ A, f x ≠ 0 := by
     intro x hx
-    have hx0 : (0 : ℝ) ≤ x := by
-      simpa [Set.Ici] using (As hx)
-    exact ne_of_gt (add_pos_of_nonneg_of_pos hx0 ht)
+    exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using As hx) ht)
   have hB_ne0 : ∀ x ∈ spectrum ℝ B, f x ≠ 0 := by
     intro x hx
-    have hx0 : (0 : ℝ) ≤ x := by
-      simpa [Set.Ici] using (Bs hx)
-    exact ne_of_gt (add_pos_of_nonneg_of_pos hx0 ht)
+    exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Bs hx) ht)
   let uA : (𝓐)ˣ :=
     cfcUnits (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) f A hA_ne0 (ha := hA_sa)
   let uB : (𝓐)ˣ :=
@@ -475,9 +471,7 @@ theorem one_div_add_t_operatorAntitoneOn_Ici : ∀ (t : ℝ), 0 < t →
     simp only [uB, cfcUnits, f]
     refine cfc_nonneg (R := ℝ) (A := 𝓐) (p := IsSelfAdjoint) (a := B) ?_
     intro x hx
-    have hx0 : (0 : ℝ) ≤ x := by
-      simpa [Set.Ici] using (Bs hx)
-    exact le_of_lt (add_pos_of_nonneg_of_pos hx0 ht)
+    exact le_of_lt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Bs hx) ht)
   have hub_le_hua : (uB : 𝓐) ≤ (uA : 𝓐) := by
     simpa [huA_val, huB_val, add_assoc, add_left_comm, add_comm] using add_le_add_right BA (algebraMap ℝ (𝓐) t)
   have hinv : (↑uA⁻¹ : 𝓐) ≤ (↑uB⁻¹ : 𝓐) := by
@@ -583,14 +577,12 @@ theorem one_div_add_t_operatorConvexOn_Ici : ∀ (t : ℝ), 0 < t →
     simp [C, add_assoc, add_left_comm, add_comm, smul_add]
   have hshift_ne0_A : ∀ x ∈ spectrum ℝ A, shift x ≠ 0 := by
     intro x hx
-    have hx0 : 0 ≤ x := by
-      simpa [Set.Ici] using (As hx)
-    exact ne_of_gt (by simpa [shift] using (add_pos_of_nonneg_of_pos hx0 ht))
+    exact ne_of_gt (by
+      simpa [shift] using add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using As hx) ht)
   have hshift_ne0_B : ∀ x ∈ spectrum ℝ B, shift x ≠ 0 := by
     intro x hx
-    have hx0 : 0 ≤ x := by
-      simpa [Set.Ici] using (Bs hx)
-    exact ne_of_gt (by simpa [shift] using (add_pos_of_nonneg_of_pos hx0 ht))
+    exact ne_of_gt (by
+      simpa [shift] using add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Bs hx) ht)
   have hshift_ne0_C : ∀ x ∈ spectrum ℝ C, shift x ≠ 0 :=
     fun x hx ↦ ne_of_gt (by simpa [shift] using (add_pos_of_nonneg_of_pos (spectrum_nonneg_of_nonneg C_nonneg hx) ht))
   have hA_inv : cfcR (fun x : ℝ ↦ (x + t)⁻¹) A = Ring.inverse A1 := by
@@ -696,9 +688,7 @@ theorem ratio_add_t_operatorMonotoneOn_Ici : ∀ (t : ℝ), 0 < t →
       ring
     have hT_ne0 : ∀ x ∈ spectrum ℝ T, x + t ≠ 0 := by
       intro x hx
-      have hx0 : (0 : ℝ) ≤ x := by
-        simpa [Set.Ici] using (hspT hx)
-      exact ne_of_gt (add_pos_of_nonneg_of_pos hx0 ht)
+      exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using hspT hx) ht)
     have hT_cont : ContinuousOn invfun (spectrum ℝ T) := by
       simpa [invfun, one_div] using (continuousOn_id.add continuousOn_const).inv₀ hT_ne0
     dsimp [cfcR]
@@ -761,9 +751,7 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
       let invfun : ℝ → ℝ := fun x ↦ 1 / (x + t)
       have hne0 : ∀ x ∈ spectrum ℝ T, x + t ≠ 0 := by
         intro x hx
-        have hx0 : (0 : ℝ) ≤ x := by
-          simpa [Set.Ici] using (Ts hx)
-        exact ne_of_gt (add_pos_of_nonneg_of_pos hx0 ht)
+        exact ne_of_gt (add_pos_of_nonneg_of_pos (by simpa [Set.Ici] using Ts hx) ht)
       have hcont : ContinuousOn invfun (spectrum ℝ T) := by
         simpa [invfun, one_div] using (continuousOn_id.add continuousOn_const).inv₀ hne0
       dsimp [cfcR]

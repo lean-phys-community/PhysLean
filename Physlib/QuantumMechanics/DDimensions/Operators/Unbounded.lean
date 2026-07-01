@@ -690,9 +690,8 @@ lemma IsSelfAdjoint.isEssentiallySelfAdjoint [CompleteSpace H] (h : IsSelfAdjoin
   isEssentiallySelfAdjoint_def.mpr (h.isClosed.closure_eq.symm ▸ h)
 
 @[aesop safe apply]
-lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† := by
-  apply isSelfAdjoint_def.mp at h
-  exact h.symm ▸ h
+lemma IsSelfAdjoint.adjoint [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint T† :=
+  isSelfAdjoint_def.mpr ((isSelfAdjoint_def.mp h).symm ▸ isSelfAdjoint_def.mp h)
 
 @[aesop safe apply]
 lemma IsSelfAdjoint.smul [CompleteSpace H]

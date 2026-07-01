@@ -228,9 +228,8 @@ theorem exists_svd_sqrt_eigenvalues (A : Matrix n n ℂ) :
     have hleft : (A * W.val) i j = A.mulVec (hH.eigenvectorBasis j).ofLp i := by
       simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, W, Matrix.IsHermitian.eigenvectorUnitary_apply]
     by_cases hj : hH.eigenvalues j = 0
-    · have hzero : A.mulVec (hH.eigenvectorBasis j).ofLp = 0 := by
-        apply (WithLp.toLp_injective (p := 2))
-        exact inner_self_eq_zero.mp (by
+    · have hzero : A.mulVec (hH.eigenvectorBasis j).ofLp = 0 :=
+        WithLp.toLp_injective (p := 2) <| inner_self_eq_zero.mp (by
           rw [inner_A_mulVec_eq]
           rw [hH.mulVec_eigenvectorBasis j, hj]
           simp)
