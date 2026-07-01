@@ -105,9 +105,7 @@ def valHomeomorphism : TimeTransMan ≃ₜ ℝ where
     intro t
     cases t
     rfl
-  right_inv := by
-    intro t
-    rfl
+  right_inv := fun _ => rfl
   continuous_toFun := by fun_prop
   continuous_invFun := by
     refine { isOpen_preimage := ?_ }

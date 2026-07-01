@@ -225,9 +225,9 @@ structure RandVar (α : Type*) [Fintype α] (T : Type*) where
 instance instFunctor : Functor (RandVar α) where map f e := ⟨f ∘ e.1, e.2⟩
 
 instance instLawfulFunctor : LawfulFunctor (RandVar α) where
-  map_const {α} {β} := by rfl
-  id_map _ := by rfl
-  comp_map _ _ _ := by rfl
+  map_const {_} {_} := rfl
+  id_map _ := rfl
+  comp_map _ _ _ := rfl
 
 -- `U` is required to be a group just because mix below uses Convex.sum_mem,
 -- but it should be provable with just `AddCommMonoid U`
