@@ -357,8 +357,7 @@ lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
 
 lemma HermitianMat.inner_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
-    ⟪A, B.supportProj⟫ = A.trace := by
-  rw [inner_def, mul_supportProj_of_ker_le h, trace]
+    ⟪A, B.supportProj⟫ = A.trace := by rw [inner_def, mul_supportProj_of_ker_le h, trace]
 
 lemma supportProj_inner_density (h : σ.M.ker ≤ ρ.M.ker) :
     ⟪σ.M.supportProj, ρ.M⟫_ℝ = 1 := by
@@ -435,8 +434,7 @@ private theorem sandwichedRelRentropy_nonneg_α_gt_1 (h : σ.M.ker ≤ ρ.M.ker)
   positivity
 
 private lemma sandwichedRelRentropy.trace_at_one (ρ σ : MState d) :
-    ((ρ.M.conj (σ.M ^ ((1 - (1:ℝ)) / (2 * (1:ℝ)))).mat) ^ (1:ℝ)).trace = 1 := by
-  simp
+    ((ρ.M.conj (σ.M ^ ((1 - (1:ℝ)) / (2 * (1:ℝ)))).mat) ^ (1:ℝ)).trace = 1 := by simp
 
 /-
 For fixed PSD B, the derivative of α ↦ Tr[B^α] at α = 1 is ⟪B, B.log⟫ = Tr[B log B].
@@ -655,14 +653,12 @@ private lemma B_of_nonneg (ρ σ : MState d) (α : ℝ) : 0 ≤ B_of ρ σ α :=
 
 -- The function g(M) = Tr[M^s] - Tr[M] satisfies g(M) = 0 when s = 1.
 private lemma trace_rpow_sub_trace_at_one (M : HermitianMat d ℂ) :
-    (M ^ (1 : ℝ)).trace - M.trace = 0 := by
-  simp [HermitianMat.rpow_one]
+    (M ^ (1 : ℝ)).trace - M.trace = 0 := by simp [HermitianMat.rpow_one]
 
 -- The cross term function value at α = 1 is zero.
 private lemma cross_term_at_one (ρ σ : MState d) :
     ((B_of ρ σ 1) ^ (1 : ℝ)).trace - (B_of ρ σ 1).trace
-    - (ρ.M ^ (1 : ℝ)).trace + 1 = 0 := by
-  simp [B_of_one, HermitianMat.rpow_one, ρ.tr]
+    - (ρ.M ^ (1 : ℝ)).trace + 1 = 0 := by simp [B_of_one, HermitianMat.rpow_one, ρ.tr]
 
 /-
 Scalar rpow cross term with just continuity: for a continuous function b with
@@ -1629,8 +1625,7 @@ lemma maps_to_Iio_of_Ioi_1 : Set.MapsTo (fun α : ℝ => (1 - α) / (2 * α)) (S
 --PR'ed: #35494
 @[simp]
 theorem frontier_singleton {X : Type*} [TopologicalSpace X] [T1Space X] [PerfectSpace X]
-    (p : X) : frontier {p} = {p} := by
-  simp [frontier]
+    (p : X) : frontier {p} = {p} := by simp [frontier]
 
 private theorem sandwichedRelRentropy.continuousOn_Ioi_1_aux (ρ σ : MState d) :
     ContinuousOn (fun (α : ℝ) ↦ ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α)) (Set.Ioi 1) := by
@@ -1785,8 +1780,7 @@ theorem qRelativeEnt_eq_neg_Sᵥₙ_add (ρ σ : MState d) :
 /-- The quantum relative entropy is unchanged by `MState.relabel` -/
 @[simp]
 theorem qRelativeEnt_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
-    𝐃(ρ.relabel e‖σ.relabel e) = 𝐃(ρ‖σ) := by
-  simp [qRelativeEnt]
+    𝐃(ρ.relabel e‖σ.relabel e) = 𝐃(ρ‖σ) := by simp [qRelativeEnt]
 
 @[simp]
 theorem sandwichedRelRentropy_of_unique [Unique d] (ρ σ : MState d) :
@@ -2107,8 +2101,7 @@ theorem qRelativeEnt_joint_convexity :
   sorry
 
 @[simp]
-theorem qRelEntropy_self (ρ : MState d) : 𝐃(ρ‖ρ) = 0 := by
-  simp [qRelativeEnt]
+theorem qRelEntropy_self (ρ : MState d) : 𝐃(ρ‖ρ) = 0 := by simp [qRelativeEnt]
 
 @[aesop (rule_sets := [finiteness]) unsafe apply]
 theorem qRelativeEnt_ne_top {ρ σ : MState d} [σ.M.NonSingular] : 𝐃(ρ‖σ) ≠ ⊤ := by
@@ -2433,5 +2426,4 @@ theorem qRelEntropy_le_add_of_le_smul (ρ : MState d) {σ₁ σ₂ : MState d} (
   · simp [hker, SandwichedRelRentropy, qRelativeEnt]
 
 theorem qRelativeEnt_op_le {ρ σ : MState d} (h : ρ.M ≤ α • σ.M) :
-    𝐃(ρ‖σ) ≤ .ofReal (Real.log α) := by
-  simpa using qRelEntropy_le_add_of_le_smul ρ h
+    𝐃(ρ‖σ) ≤ .ofReal (Real.log α) := by simpa using qRelEntropy_le_add_of_le_smul ρ h
