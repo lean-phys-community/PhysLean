@@ -46,8 +46,7 @@ def rep {d : ℕ} : Representation ℝ (LorentzGroup d) (CoVector d) where
 -/
 
 lemma rep_apply_eq_mulVec (d : ℕ) (Λ : LorentzGroup d) (v : CoVector d) :
-    rep Λ v = (LorentzGroup.transpose Λ⁻¹) *ᵥ v :=
-  rfl
+    rep Λ v = (LorentzGroup.transpose Λ⁻¹) *ᵥ v := rfl
 
 lemma rep_apply_eq_sum (d : ℕ) (Λ : LorentzGroup d) (v : CoVector d) (k : Fin 1 ⊕ Fin d) :
     rep Λ v k = ∑ j, (Λ⁻¹).1 j k • v j := rfl

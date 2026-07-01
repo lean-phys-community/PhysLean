@@ -43,8 +43,7 @@ def rep {d : ℕ} : Representation ℝ (LorentzGroup d) (Vector d) where
 -/
 
 lemma rep_apply_eq_mulVec (d : ℕ) (Λ : LorentzGroup d) (v : Vector d) :
-    rep Λ v = Λ *ᵥ v :=
-  rfl
+    rep Λ v = Λ *ᵥ v := rfl
 
 lemma rep_apply_eq_sum (d : ℕ) (Λ : LorentzGroup d) (v : Vector d) (k : Fin 1 ⊕ Fin d) :
     rep Λ v k = ∑ j, Λ.1 k j • v j := rfl

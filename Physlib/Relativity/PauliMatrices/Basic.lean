@@ -101,8 +101,7 @@ instance pauliMatrixInvertiable (μ : Fin 1 ⊕ Fin 3) : Invertible (σ μ) := b
   · simp
 
 lemma pauliMatrix_inv (μ : Fin 1 ⊕ Fin 3) :
-    ⅟ (σ μ) = σ μ :=
-  rfl
+    ⅟ (σ μ) = σ μ := by rfl
 
 /-! ### Products
 

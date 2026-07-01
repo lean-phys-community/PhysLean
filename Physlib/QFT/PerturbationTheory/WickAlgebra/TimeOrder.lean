@@ -180,8 +180,7 @@ lemma ι_timeOrderF_superCommuteF_superCommuteF {φ1 φ2 φ3 : 𝓕.CrAnFieldOp}
     simp_all [pb]
 
 example (c1 c2 : ℂ) (a : 𝓕.WickAlgebra) : c1 • c2 • a =
-  c2 • c1 • a :=
-  smul_comm c1 c2 a
+  c2 • c1 • a := smul_comm c1 c2 a
 lemma ι_timeOrderF_superCommuteF_eq_time {φ ψ : 𝓕.CrAnFieldOp}
     (hφψ : crAnTimeOrderRel φ ψ) (hψφ : crAnTimeOrderRel ψ φ) (a b : 𝓕.FieldOpFreeAlgebra) :
     ι 𝓣ᶠ(a * [ofCrAnOpF φ, ofCrAnOpF ψ]ₛF * b) =

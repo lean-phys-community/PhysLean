@@ -176,8 +176,7 @@ def toLorentzGroup : SL(2, ℂ) →* LorentzGroup 3 where
 
 lemma toLorentzGroup_eq_pauliBasis' (M : SL(2, ℂ)) :
     toLorentzGroup M = LinearMap.toMatrix
-    PauliMatrix.pauliBasis' PauliMatrix.pauliBasis' (toSelfAdjointMap M) :=
-  rfl
+    PauliMatrix.pauliBasis' PauliMatrix.pauliBasis' (toSelfAdjointMap M) := rfl
 
 lemma toSelfAdjointMap_basis (i : Fin 1 ⊕ Fin 3) :
     toSelfAdjointMap M (PauliMatrix.pauliBasis' i) =

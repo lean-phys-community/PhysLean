@@ -131,8 +131,8 @@ def LinearUnitDependent.scaleUnitLinearEquiv {M : Type} [AddCommMonoid M]
     [Module ℝ M] [LinearUnitDependent M] (u1 u2 : UnitChoices) :
     M ≃ₗ[ℝ] M :=
     LinearEquiv.ofLinear (scaleUnitLinear u1 u2) (scaleUnitLinear u2 u1)
-    (LinearMap.ext fun m => UnitDependent.scaleUnit_symm_apply u2 u1 m)
-    (LinearMap.ext fun m => UnitDependent.scaleUnit_symm_apply u1 u2 m)
+    (by ext u; simp [scaleUnitLinear])
+    (by ext u; simp [scaleUnitLinear])
 
 /-- For an `M` with an instance of `ContinuousLinearUnitDependent M`, `scaleUnit u1 u2` as a
   continuous linear map. -/
@@ -307,12 +307,8 @@ noncomputable instance {M1 M2 : Type} [AddCommMonoid M1] [Module ℝ M1]
     LinearUnitDependent (M1 →ₗ[ℝ] M2) where
   scaleUnit u1 u2 f := {
       toFun m1 := scaleUnit u1 u2 (f m1)
-      map_add' m1 m2 :=
-        Eq.trans (congrArg (scaleUnit u1 u2) (map_add f m1 m2))
-          (scaleUnit_add u1 u2 (f m1) (f m2))
-      map_smul' r m2 :=
-        Eq.trans (congrArg (scaleUnit u1 u2) (map_smul f r m2))
-          (scaleUnit_smul u1 u2 r (f m2))}
+      map_add' m1 m2 := by simp [scaleUnit_add]
+      map_smul' := by simp [scaleUnit_smul]}
   scaleUnit_trans u1 u2 u3 f := LinearMap.ext fun m1 =>
     scaleUnit_trans u1 u2 u3 (f m1)
   scaleUnit_trans' u1 u2 u3 f := LinearMap.ext fun m1 =>
@@ -338,10 +334,8 @@ noncomputable instance {M1 M2 : Type} [AddCommGroup M1] [Module ℝ M1]
   scaleUnit_trans' u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
     scaleUnit_trans' u1 u2 u3 (f m1)
   scaleUnit_id u f := ContinuousLinearMap.ext fun m1 => scaleUnit_id u (f m1)
-  scaleUnit_add u1 u2 f1 f2 := ContinuousLinearMap.ext fun m =>
-    scaleUnit_add u1 u2 (f1 m) (f2 m)
-  scaleUnit_smul u1 u2 r f := ContinuousLinearMap.ext fun m =>
-    scaleUnit_smul u1 u2 r (f m)
+  scaleUnit_add u1 u2 f1 f2 := by simp
+  scaleUnit_smul u1 u2 r f := by simp
   scaleUnit_cont u1 u2 := ContinuousLinearEquiv.continuous
       ((ContinuousLinearEquiv.refl ℝ M1).arrowCongr (scaleUnitContLinearEquiv u1 u2))
 
@@ -363,19 +357,15 @@ noncomputable instance instUnitDependentTwoSided
     {M1 M2 : Type} [UnitDependent M1] [UnitDependent M2] :
     UnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => scaleUnit u1 u2 (f (scaleUnit u2 u1 m1))
-  scaleUnit_trans u1 u2 u3 f := funext fun m1 =>
-    Eq.trans
-      (congrArg (fun x => scaleUnit u2 u3 (scaleUnit u1 u2 (f x)))
-        (scaleUnit_trans u3 u2 u1 m1))
-      (scaleUnit_trans u1 u2 u3 (f (scaleUnit u3 u1 m1)))
-  scaleUnit_trans' u1 u2 u3 f := funext fun m1 =>
-    Eq.trans
-      (congrArg (fun x => scaleUnit u1 u2 (scaleUnit u2 u3 (f x)))
-        (scaleUnit_trans' u3 u2 u1 m1))
-      (scaleUnit_trans' u1 u2 u3 (f (scaleUnit u3 u1 m1)))
-  scaleUnit_id u f := funext fun m1 =>
-    Eq.trans (congrArg (scaleUnit u u) (congrArg f (scaleUnit_id u m1)))
-      (scaleUnit_id u (f m1))
+  scaleUnit_trans u1 u2 u3 f := by
+    funext m1
+    simp [scaleUnit_trans]
+  scaleUnit_trans' u1 u2 u3 f := by
+    funext m1
+    simp [scaleUnit_trans']
+  scaleUnit_id u f := by
+    funext m1
+    simp [scaleUnit_id]
 
 @[simp]
 lemma UnitDependent.scaleUnit_apply_fun {M1 M2 : Type} [UnitDependent M1]
@@ -386,19 +376,15 @@ noncomputable instance instUnitDependentTwoSidedMul
     {M1 M2 : Type} [UnitDependent M1] [MulAction ℝ≥0 M2] [MulUnitDependent M2] :
     MulUnitDependent (M1 → M2) where
   scaleUnit u1 u2 f := fun m1 => scaleUnit u1 u2 (f (scaleUnit u2 u1 m1))
-  scaleUnit_trans u1 u2 u3 f := funext fun m1 =>
-    Eq.trans
-      (congrArg (fun x => scaleUnit u2 u3 (scaleUnit u1 u2 (f x)))
-        (scaleUnit_trans u3 u2 u1 m1))
-      (scaleUnit_trans u1 u2 u3 (f (scaleUnit u3 u1 m1)))
-  scaleUnit_trans' u1 u2 u3 f := funext fun m1 =>
-    Eq.trans
-      (congrArg (fun x => scaleUnit u1 u2 (scaleUnit u2 u3 (f x)))
-        (scaleUnit_trans' u3 u2 u1 m1))
-      (scaleUnit_trans' u1 u2 u3 (f (scaleUnit u3 u1 m1)))
-  scaleUnit_id u f := funext fun m1 =>
-    Eq.trans (congrArg (scaleUnit u u) (congrArg f (scaleUnit_id u m1)))
-      (scaleUnit_id u (f m1))
+  scaleUnit_trans u1 u2 u3 f := by
+    funext m1
+    simp [scaleUnit_trans]
+  scaleUnit_trans' u1 u2 u3 f := by
+    funext m1
+    simp [scaleUnit_trans']
+  scaleUnit_id u f := by
+    funext m1
+    simp [scaleUnit_id]
   scaleUnit_mul u1 u2 r f := funext fun m1 =>
     MulUnitDependent.scaleUnit_mul u1 u2 r (f (scaleUnit u2 u1 m1))
 
@@ -413,23 +399,17 @@ noncomputable instance instContinuousLinearUnitDependentMap
   scaleUnit u1 u2 f :=
     ContinuousLinearEquiv.arrowCongr (scaleUnitContLinearEquiv u1 u2)
       (scaleUnitContLinearEquiv u1 u2) f
-  scaleUnit_trans u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
-    Eq.trans
-      (congrArg (fun x => scaleUnit u2 u3 (scaleUnit u1 u2 (f x)))
-        (scaleUnit_trans u3 u2 u1 m1))
-      (scaleUnit_trans u1 u2 u3 (f (scaleUnit u3 u1 m1)))
-  scaleUnit_trans' u1 u2 u3 f := ContinuousLinearMap.ext fun m1 =>
-    Eq.trans
-      (congrArg (fun x => scaleUnit u1 u2 (scaleUnit u2 u3 (f x)))
-        (scaleUnit_trans' u3 u2 u1 m1))
-      (scaleUnit_trans' u1 u2 u3 (f (scaleUnit u3 u1 m1)))
-  scaleUnit_id u f := ContinuousLinearMap.ext fun m1 =>
-    Eq.trans (congrArg (scaleUnit u u) (congrArg f (scaleUnit_id u m1)))
-      (scaleUnit_id u (f m1))
-  scaleUnit_add u1 u2 f1 f2 := ContinuousLinearMap.ext fun m =>
-    scaleUnit_add u1 u2 (f1 (scaleUnit u2 u1 m)) (f2 (scaleUnit u2 u1 m))
-  scaleUnit_smul u1 u2 r f := ContinuousLinearMap.ext fun m =>
-    scaleUnit_smul u1 u2 r (f (scaleUnit u2 u1 m))
+  scaleUnit_trans u1 u2 u3 f := by
+    ext m1
+    simp [scaleUnit_trans]
+  scaleUnit_trans' u1 u2 u3 f := by
+    ext m1
+    simp [scaleUnit_trans']
+  scaleUnit_id u f := by
+    ext m1
+    simp [scaleUnit_id]
+  scaleUnit_add u1 u2 f1 f2 := by simp
+  scaleUnit_smul u1 u2 r f := by simp
   scaleUnit_cont u1 u2 := ContinuousLinearEquiv.continuous
       ((scaleUnitContLinearEquiv u1 u2).arrowCongr (scaleUnitContLinearEquiv u1 u2))
 
@@ -547,5 +527,4 @@ lemma scaleUnit_dimSet_val {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M]
   rfl
 
 lemma DimSet.mem_iff {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) (m : M) :
-    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m :=
-  Iff.rfl
+    m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m := Iff.rfl

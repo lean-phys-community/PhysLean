@@ -33,8 +33,7 @@ def timeContract (φ ψ : 𝓕.FieldOp) : 𝓕.WickAlgebra :=
     𝓣(ofFieldOp φ * ofFieldOp ψ) - 𝓝(ofFieldOp φ * ofFieldOp ψ)
 
 lemma timeContract_eq_smul (φ ψ : 𝓕.FieldOp) : timeContract φ ψ =
-    𝓣(ofFieldOp φ * ofFieldOp ψ) + (-1 : ℂ) • 𝓝(ofFieldOp φ * ofFieldOp ψ) :=
-  rfl
+    𝓣(ofFieldOp φ * ofFieldOp ψ) + (-1 : ℂ) • 𝓝(ofFieldOp φ * ofFieldOp ψ) := rfl
 
 /-- For a field specification `𝓕`, and `φ` and `ψ` elements of `𝓕.FieldOp`, if
   `φ` and `ψ` are time-ordered then

@@ -120,8 +120,7 @@ lemma apply_add {d : ℕ} (v w : CoVector d) (i : Fin 1 ⊕ Fin d) :
 
 @[simp]
 lemma apply_sub {d : ℕ} (v w : CoVector d) (i : Fin 1 ⊕ Fin d) :
-    (v - w) i = v i - w i :=
-  rfl
+    (v - w) i = v i - w i := rfl
 
 @[simp]
 lemma apply_sum {d : ℕ} {ι : Type} [Fintype ι] (f : ι → CoVector d) (i : Fin 1 ⊕ Fin d) :

@@ -124,10 +124,7 @@ lemma pauliContr_mul_pauliContrDown_add :
 lemma auliContrDown_pauliContr_mul_add :
     {((σ^__ | μ β α ⊗ σ^^^ | ν α β') + (σ^__ | ν β α ⊗ σ^^^ | μ α β')) =
     2 •ₜ η | μ ν ⊗ δR' | β β'}ᵀ := by
-  rw [show Tensorial.toTensor σ^__ = σ^__ from rfl,
-    show Tensorial.toTensor (Tensorial.toTensor σ) = Tensorial.toTensor σ from rfl,
-    show Tensorial.toTensor η = η from rfl,
-    show Tensorial.toTensor δR' = δR' from rfl]
+  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     rw [pauliContrDown_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, permT_ofRat, ← map_add]

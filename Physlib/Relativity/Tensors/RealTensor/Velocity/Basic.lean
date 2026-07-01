@@ -38,8 +38,7 @@ noncomputable instance : TopologicalSpace (Velocity d) := instTopologicalSpaceSu
 lemma ext {v w : Velocity d} (h : v.1 = w.1) : v = w :=
   SetCoe.ext h
 
-lemma mem_iff {v : Vector d} : v ∈ Velocity d ↔ ⟪v, v⟫ₘ = (1 : ℝ) ∧ 0 < v.timeComponent :=
-  Iff.rfl
+lemma mem_iff {v : Vector d} : v ∈ Velocity d ↔ ⟪v, v⟫ₘ = (1 : ℝ) ∧ 0 < v.timeComponent := Iff.rfl
 
 @[simp]
 lemma minkowskiProduct_self_eq_one (v : Velocity d) : ⟪v.1, v.1⟫ₘ = (1 : ℝ) := v.2.1

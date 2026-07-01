@@ -42,8 +42,7 @@ lemma isOrthochronous_iff_toVector_timeComponet_nonneg :
 
 /-- A Lorentz transformation is orthochronous if and only if its transpose is orthochronous. -/
 lemma isOrthochronous_iff_transpose :
-    IsOrthochronous Λ ↔ IsOrthochronous (transpose Λ) :=
-  Iff.rfl
+    IsOrthochronous Λ ↔ IsOrthochronous (transpose Λ) := Iff.rfl
 
 @[simp]
 lemma isOrthochronous_inv_iff {Λ : LorentzGroup d} :

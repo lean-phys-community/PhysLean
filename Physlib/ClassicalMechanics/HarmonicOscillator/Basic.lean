@@ -209,16 +209,13 @@ noncomputable def energy (xₜ : Time → EuclideanSpace ℝ (Fin 1)) : Time →
 -/
 
 lemma kineticEnergy_eq (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
-    kineticEnergy S xₜ = fun t => (1 / (2 : ℝ)) * S.m * ⟪∂ₜ xₜ t, ∂ₜ xₜ t⟫_ℝ :=
-  rfl
+    kineticEnergy S xₜ = fun t => (1 / (2 : ℝ)) * S.m * ⟪∂ₜ xₜ t, ∂ₜ xₜ t⟫_ℝ := rfl
 
 lemma potentialEnergy_eq (x : EuclideanSpace ℝ (Fin 1)) :
-    potentialEnergy S x = (1 / (2 : ℝ)) • S.k • ⟪x, x⟫_ℝ :=
-  rfl
+    potentialEnergy S x = (1 / (2 : ℝ)) • S.k • ⟪x, x⟫_ℝ := rfl
 
 lemma energy_eq (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
-    energy S xₜ = fun t => kineticEnergy S xₜ t + potentialEnergy S (xₜ t) :=
-  rfl
+    energy S xₜ = fun t => kineticEnergy S xₜ t + potentialEnergy S (xₜ t) := rfl
 /-!
 
 ### C.3. Differentiability of the energies
@@ -516,8 +513,7 @@ We write a simple iff statement for the definition of the equation of motions.
 -/
 
 lemma equationOfMotion_iff_gradLagrangian_zero (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
-    S.EquationOfMotion xₜ ↔ S.gradLagrangian xₜ = 0 :=
-  Iff.rfl
+    S.EquationOfMotion xₜ ↔ S.gradLagrangian xₜ = 0 := Iff.rfl
 
 /-!
 

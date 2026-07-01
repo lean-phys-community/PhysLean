@@ -209,8 +209,7 @@ noncomputable def component {n : ℕ} {c : Fin n → C} (p : Pure S c)
     ∏ i, (b (c i)).repr (p i) (φ i)
 
 lemma component_eq {n : ℕ} {c : Fin n → C} (p : Pure S c) (φ : ComponentIdx c) :
-    p.component φ = ∏ i, (b (c i)).repr (p i) (φ i) :=
-  rfl
+    p.component φ = ∏ i, (b (c i)).repr (p i) (φ i) := rfl
 
 lemma component_eq_drop {n : ℕ} {c : Fin (n + 1) → C} (p : Pure S c) (i : Fin (n + 1))
     (φ : ComponentIdx c) :

@@ -72,8 +72,7 @@ def toFin1dℝEquiv : ContrMod d ≃ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
   through the linear equivalence `toFin1dℝEquiv`. -/
 abbrev toFin1dℝ (ψ : ContrMod d) := toFin1dℝEquiv ψ
 
-lemma toFin1dℝ_eq_val (ψ : ContrMod d) : ψ.toFin1dℝ = ψ.val :=
-  rfl
+lemma toFin1dℝ_eq_val (ψ : ContrMod d) : ψ.toFin1dℝ = ψ.val := rfl
 /-!
 
 ## The standard basis.
