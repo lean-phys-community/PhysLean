@@ -148,13 +148,14 @@ lemma evalT_basis {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
 lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
     (i : Fin (n1 + 1)) (x : basisIdx (c1 i)) (t : Tensor S c) (t1 : Tensor S c1) :
     permT id (IsReindexing.append_succAbove_natAdd (n := n) (n1 := n1) i)
-      (evalT (Fin.natAdd (m := n1 + 1) n i) x (prodT t t1)) =
+      (evalT (Fin.natAdd (m := n1 + 1) n i) (basisIdxCongr (by simp) x) (prodT t t1)) =
     prodT t (evalT i x t1) := by
   induction' t using Tensor.induction_on_basis with b r t h t2 t3 h2 h3
   · induction' t1 using Tensor.induction_on_basis with b1 r t h t2 t3 h2 h3
     · by_cases hi : b1 i = x
-      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) = x := by
-          simpa [ComponentIdx.prod] using hi
+      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) =
+            basisIdxCongr (by simp) x := by
+          simp [hi]
         rw [prodT_basis', evalT_basis, if_pos hprod, permT_basis]
         rw [evalT_basis, if_pos hi, prodT_basis']
         congr
@@ -179,7 +180,8 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
             simp only [Fin.succAbove, hcond]
             split_ifs <;> ext <;> simp [Nat.add_assoc]
           simp [ComponentIdx.prod, hidx]
-      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) ≠ x := by
+      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) ≠
+            basisIdxCongr (by simp) x := by
           intro hprod
           exact hi (by simpa [ComponentIdx.prod] using hprod)
         rw [prodT_basis', evalT_basis, if_neg hprod]
