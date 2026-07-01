@@ -560,7 +560,7 @@ lagrangian, using that the gradient scales with the constant `exp (γ/m * t)`.
 
 -/
 
-lemma gradient_const_mul {f : EuclideanSpace ℝ (Fin 1) → ℝ} {x : EuclideanSpace ℝ (Fin 1)}
+private lemma gradient_const_mul {f : EuclideanSpace ℝ (Fin 1) → ℝ} {x : EuclideanSpace ℝ (Fin 1)}
     (c : ℝ) (hf : DifferentiableAt ℝ f x) :
     gradient (fun y => c * f y) x = c • gradient f x := by
   unfold gradient
@@ -595,8 +595,8 @@ lemma gradient_lagrangian_velocity_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 
 We now write down the variational gradient of the action of the damped harmonic
 oscillator, for a trajectory $x(t)$ this is equal to
 
-$$t\mapsto \left.\frac{\partial L(t, \dot x (t), q)}{\partial q}\right|_{q = x(t)} -
-  \frac{d}{dt} \left.\frac{\partial L(t, v, x(t))}{\partial v}\right|_{v = \dot x (t)}$$
+$$t\mapsto \left.\frac{\partial L(t, q, \dot x (t))}{\partial q}\right|_{q = x(t)} -
+  \frac{d}{dt} \left.\frac{\partial L(t, x(t), v)}{\partial v}\right|_{v = \dot x (t)}$$
 
 Setting this equal to zero corresponds to the Euler-Lagrange equations, and thereby the
 equation of motion.
@@ -638,8 +638,7 @@ private lemma deriv_exp_smul (a : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1))
 /-- The variational gradient of the Caldirola–Kanai action is the exponential factor
 times the difference of the force and mass times acceleration appearing in
 Newton's second law. -/
-lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1))
-    (hx : ContDiff ℝ ∞ xₜ) :
+lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     S.gradLagrangian xₜ = fun t : Time =>
       exp (S.γ / S.m * t) • (force S xₜ t - S.m • ∂ₜ (∂ₜ xₜ) t) := by
   have hdx : Differentiable ℝ (∂ₜ xₜ) := deriv_differentiable_of_contDiff xₜ hx
