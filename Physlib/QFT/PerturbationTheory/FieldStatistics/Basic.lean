@@ -239,8 +239,7 @@ lemma ofList_map_eq_finset_prod (s : 𝓕 → FieldStatistic) :
       rfl
       simp only [List.length_cons, List.nodup_cons] at hl
       exact hl.1
-    · simp only [ha, ↓reduceIte, false_or]
-      rfl
+    · simp only [ha, ↓reduceIte, false_or, Fin.getElem_fin]
     simp only [List.length_cons, List.nodup_cons] at hl
     exact hl.2
 
@@ -269,7 +268,6 @@ lemma ofList_take_eraseIdx (n : ℕ) (φs : List 𝓕) :
 
 lemma ofList_take_zero (φs : List 𝓕) :
     ofList q (List.take 0 φs) = 1 := by
-  simp only [List.take_zero, ofList_empty]
   rfl
 
 lemma ofList_take_succ_cons (n : ℕ) (φ1 : 𝓕) (φs : List 𝓕) :
@@ -307,8 +305,7 @@ instance : AddMonoid FieldStatistic where
   add_assoc a b c := by
     cases a <;> cases b <;> cases c <;> rfl
   nsmul_zero a := by
-    simp only [Finset.univ_eq_empty, Finset.prod_const, Finset.card_empty, pow_zero]
-    rfl
+    cases a <;> rfl
   nsmul_succ a n := by
     simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     rfl

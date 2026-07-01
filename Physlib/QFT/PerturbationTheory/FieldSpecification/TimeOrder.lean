@@ -136,7 +136,6 @@ def timeOrderSign (φs : List 𝓕.FieldOp) : ℂ :=
 
 @[simp]
 lemma timeOrderSign_nil : timeOrderSign (𝓕 := 𝓕) [] = 1 := by
-  simp only [timeOrderSign]
   rfl
 
 lemma timeOrderSign_pair_ordered {φ ψ : 𝓕.FieldOp} (h : timeOrderRel φ ψ) :
@@ -237,7 +236,6 @@ def crAnTimeOrderSign (φs : List 𝓕.CrAnFieldOp) : ℂ :=
 
 @[simp]
 lemma crAnTimeOrderSign_nil : crAnTimeOrderSign (𝓕 := 𝓕) [] = 1 := by
-  simp only [crAnTimeOrderSign]
   rfl
 
 lemma crAnTimeOrderSign_pair_ordered {φ ψ : 𝓕.CrAnFieldOp} (h : crAnTimeOrderRel φ ψ) :

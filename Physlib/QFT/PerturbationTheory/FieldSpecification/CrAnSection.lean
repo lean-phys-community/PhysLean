@@ -127,7 +127,6 @@ def singletonEquiv {φ : 𝓕.FieldOp} : CrAnSection [φ] ≃
     simp only [List.tail_cons, List.map_eq_nil_iff] at h2
     simp [h2]
   right_inv ψ := by
-    simp only [head]
     rfl
 
 /-- An equivalence separating the head of a creation and annihilation section

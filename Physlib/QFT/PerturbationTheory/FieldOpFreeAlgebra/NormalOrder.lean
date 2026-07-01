@@ -260,23 +260,19 @@ lemma normalOrderF_swap_crPartF_anPartF (φ φ' : 𝓕.FieldOp) (a b : FieldOpFr
   | .position φ, .position φ' =>
     simp only [crPartF_position, anPartF_position]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
-    rfl; rfl
+    all_goals rfl
   | .inAsymp φ, .outAsymp φ' =>
     simp only [crPartF_negAsymp, anPartF_posAsymp]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
-    rfl; rfl
+    all_goals rfl
   | .inAsymp φ, .position φ' =>
     simp only [crPartF_negAsymp, anPartF_position]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
-    rfl; rfl
+    all_goals rfl
   | .position φ, .outAsymp φ' =>
     simp only [crPartF_position, anPartF_posAsymp]
     rw [normalOrderF_swap_create_annihilate]
-    simp only [crAnStatistics, Function.comp_apply, crAnFieldOpToFieldOp_prod]
-    rfl; rfl
+    all_goals rfl
 
 /-!
 
