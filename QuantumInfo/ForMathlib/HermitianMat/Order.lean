@@ -130,8 +130,7 @@ theorem kronecker_self_mono (hA : 0 ≤ A) (hB : 0 ≤ B) (hAB : A ≤ B) :
       (HermitianMat.kronecker_add (A := A) (B := B) (C := -A)).symm
   have hEq : B ⊗ₖ B - A ⊗ₖ A = A ⊗ₖ (B - A) + (B - A) ⊗ₖ B := by
     calc
-      B ⊗ₖ B - A ⊗ₖ A = (A + (B - A)) ⊗ₖ B - A ⊗ₖ A := by
-        rw [show A + (B - A) = B by abel]
+      B ⊗ₖ B - A ⊗ₖ A = (A + (B - A)) ⊗ₖ B - A ⊗ₖ A := by rw [show A + (B - A) = B by abel]
       _ = (A ⊗ₖ B + (B - A) ⊗ₖ B) - A ⊗ₖ A := by rw [HermitianMat.add_kronecker]
       _ = (A ⊗ₖ B + -(A ⊗ₖ A)) + (B - A) ⊗ₖ B := by abel
       _ = A ⊗ₖ (B - A) + (B - A) ⊗ₖ B := by rw [hAC]

@@ -322,8 +322,7 @@ theorem traceNorm_mul_le_opNorm_traceNorm [DecidableEq n] (A B : Matrix n n ℂ)
         refine Finset.sum_le_sum ?_
         intro i hi
         exact mul_le_mul_of_nonneg_right (hA_bound i) (singularValuesSorted_nonneg B i)
-      _ = ‖A‖ * ∑ i : Fin (Fintype.card n), singularValuesSorted B i := by
-        rw [Finset.mul_sum]
+      _ = ‖A‖ * ∑ i : Fin (Fintype.card n), singularValuesSorted B i := by rw [Finset.mul_sum]
       _ = ‖A‖ * B.traceNorm := by rw [traceNorm_eq_sum_singularValuesSorted]
 
 omit [DecidableEq n] in

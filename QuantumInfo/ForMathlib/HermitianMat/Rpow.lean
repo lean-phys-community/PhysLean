@@ -164,8 +164,7 @@ theorem sandwich_self (hB : B.mat.PosDef) :
   have hB_inv_sqrt : (B ^ (-1 / 2 : ℝ)).mat * (B ^ (-1 / 2 : ℝ)).mat = (B ^ (-1 : ℝ)).mat := by
     rw [ ← mat_rpow_add ] <;> norm_num
     simpa [zero_le_iff] using hB.posSemidef
-  have hB_inv : (B ^ (-1 : ℝ)).mat = B.mat⁻¹ := by
-    rw [← inv_eq_rpow_neg_one hB, mat_inv]
+  have hB_inv : (B ^ (-1 : ℝ)).mat = B.mat⁻¹ := by rw [← inv_eq_rpow_neg_one hB, mat_inv]
   rw [ hB_inv ] at hB_inv_sqrt;
   ext1
   simp [mul_assoc];
@@ -863,8 +862,7 @@ private lemma compound_top_singular_le_posDef
                 apply HermitianMat.cfc_congr_of_nonneg (zero_le_iff.mpr hBk.posSemidef)
                 intro x hx
                 rw [Function.comp_apply, Real.mul_rpow (inv_nonneg.mpr hc_nonneg) hx]
-          _ = (c⁻¹) ^ r • (Bk ^ r) := by
-                rw [HermitianMat.cfc_const_mul, HermitianMat.rpow_eq_cfc]
+          _ = (c⁻¹) ^ r • (Bk ^ r) := by rw [HermitianMat.cfc_const_mul, HermitianMat.rpow_eq_cfc]
       rwa [hBk_scale, conj_smul_right] at hpow
     have hNk_le : ((Ak ^ r).conj (Bk ^ r).mat) ≤ c ^ (2 * r) • 1 := by
       have hmul := smul_le_smul_of_nonneg_left hpow' (show 0 ≤ c ^ (2 * r) by positivity)
@@ -877,8 +875,7 @@ private lemma compound_top_singular_le_posDef
             _ = (c ^ r) ^ 2 := by ring
         have hinv : (c⁻¹) ^ r = (c ^ r)⁻¹ := by rw [Real.inv_rpow hc_nonneg]
         calc
-          c ^ (2 * r) * ((c⁻¹) ^ r) ^ 2 = (c ^ r) ^ 2 * ((c ^ r)⁻¹) ^ 2 := by
-            rw [hpow, hinv]
+          c ^ (2 * r) * ((c⁻¹) ^ r) ^ 2 = (c ^ r) ^ 2 * ((c ^ r)⁻¹) ^ 2 := by rw [hpow, hinv]
           _ = 1 := by
             field_simp [pow_two, hcr_pos.ne']
       rwa [smul_smul, hs, one_smul] at hmul
