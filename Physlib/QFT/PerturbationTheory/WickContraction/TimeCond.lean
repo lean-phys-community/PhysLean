@@ -174,8 +174,7 @@ lemma timeOrder_timeContract_mul_of_eqTimeOnly_mid_induction {φs : List 𝓕.Fi
   | Nat.succ n, hn => by
     obtain ⟨i, j, hij, φsucΛ, rfl, h2, h3, h4⟩ :=
       exists_join_singleton_of_card_ge_zero φsΛ (by simp [hn]) hl
-    rw [join_timeContract]
-    rw [singleton_timeContract]
+    rw [join_timeContract, singleton_timeContract]
     simp only [Fin.getElem_fin, MulMemClass.coe_mul]
     trans timeOrder (a * WickAlgebra.timeContract φs[↑i] φs[↑j] * (φsucΛ.timeContract.1 * b))
     simp only [mul_assoc, Fin.getElem_fin]
@@ -235,11 +234,9 @@ lemma timeOrder_timeContract_of_not_eqTimeOnly {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
     (hl : ¬ φsΛ.EqTimeOnly) : 𝓣(φsΛ.timeContract.1) = 0 := by
   obtain ⟨i, j, hij, φsucΛ, rfl, hr⟩ := exists_join_singleton_of_not_eqTimeOnly φsΛ hl
-  rw [join_timeContract]
-  rw [singleton_timeContract]
+  rw [join_timeContract, singleton_timeContract]
   simp only [Fin.getElem_fin, MulMemClass.coe_mul]
-  rw [timeOrder_timeOrder_left]
-  rw [timeOrder_timeContract_ne_time]
+  rw [timeOrder_timeOrder_left, timeOrder_timeContract_ne_time]
   simp only [zero_mul, map_zero]
   simp_all only [Fin.getElem_fin, not_and]
   intro h
@@ -253,8 +250,7 @@ lemma timeOrder_staticContract_of_not_mem {φs : List 𝓕.FieldOp} (φsΛ : Wic
   obtain ⟨i, j, hij, φsucΛ, rfl, hr⟩ := exists_join_singleton_of_not_eqTimeOnly φsΛ hl
   rw [join_staticContract]
   simp only [MulMemClass.coe_mul]
-  rw [singleton_staticContract]
-  rw [timeOrder_timeOrder_left]
+  rw [singleton_staticContract, timeOrder_timeOrder_left]
   rw [timeOrder_superCommute_anPart_ofFieldOp_ne_time]
   simp only [zero_mul, map_zero]
   intro h
@@ -527,8 +523,7 @@ def hasEqTimeEquiv (φs : List 𝓕.FieldOp) :
         apply Subtype.ext
         ext a
         simp only [subContraction]
-        rw [join_eqTimeContractSet]
-        rw [eqTimeContractSet_of_not_haveEqTime h2]
+        rw [join_eqTimeContractSet, eqTimeContractSet_of_not_haveEqTime h2]
         simp only [Finset.le_eq_subset, ne_eq, Finset.map_empty, Finset.union_empty]
         rw [eqTimeContractSet_of_mem_eqTimeOnly h1.1]
       refine hasEqTimeEquiv_ext_sigma ?_ ?_
@@ -538,11 +533,9 @@ def hasEqTimeEquiv (φs : List 𝓕.FieldOp) :
         apply Subtype.ext
         ext a
         simp only [quotContraction, Finset.mem_filter, Finset.mem_univ, true_and]
-        rw [mem_congr_iff]
-        rw [mem_join_right_iff]
+        rw [mem_congr_iff, mem_join_right_iff]
         simp only [ne_eq]
-        rw [uncontractedListEmd_congr hs]
-        rw [Finset.map_map]
+        rw [uncontractedListEmd_congr hs, Finset.map_map]
 
 lemma sum_haveEqTime (φs : List 𝓕.FieldOp)
     (f : WickContraction φs.length → M) [AddCommMonoid M]:

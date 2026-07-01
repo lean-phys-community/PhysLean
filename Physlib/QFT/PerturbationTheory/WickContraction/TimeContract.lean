@@ -120,8 +120,7 @@ lemma timeContract_insert_some_of_lt
       congr
       rw [← List.map_take]
       congr
-      rw [take_uncontractedIndexEquiv_symm]
-      rw [filter_uncontractedList]
+      rw [take_uncontractedIndexEquiv_symm, filter_uncontractedList]
     rw [h1]
     simp only [exchangeSign_mul_self]
     · exact ht
