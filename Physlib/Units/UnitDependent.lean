@@ -274,8 +274,7 @@ noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M]
     conv =>
       enter [1, m]
       rw [toDimensionful_apply_apply]
-    change Continuous fun m => (u1.dimScale u2 (dim M)).1 • m
-    exact Continuous.const_smul continuous_id' _
+    exact Continuous.const_smul continuous_id' (u1.dimScale u2 (dim M)).1
 
 /-!
 

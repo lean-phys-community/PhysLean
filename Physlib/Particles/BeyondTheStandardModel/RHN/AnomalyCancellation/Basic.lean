@@ -34,7 +34,6 @@ variable {n : ℕ}
 
 lemma sum_one  [AddCommMonoid M] (f : Fin (SMνSpecies 1).numberCharges → M) :
     ∑ i, f i = f ⟨0, by simp⟩ := by
-  change  ∑ (i : Fin 1), f i = _
   exact Fin.sum_univ_one f
 
 /-- An equivalence between `(SMνCharges n).charges` and `(Fin 6 → Fin n → ℚ)`

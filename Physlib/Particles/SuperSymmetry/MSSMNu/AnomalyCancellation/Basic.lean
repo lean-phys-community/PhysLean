@@ -32,7 +32,6 @@ namespace MSSMCharges
 lemma sum_MSSMSpecies_numberCharges_eq_expand [AddCommMonoid M]
     (f : Fin MSSMSpecies.numberCharges → M) :
     ∑ i, f i = f ⟨0, by simp⟩ + f ⟨1, by simp⟩ + f ⟨2, by simp⟩ := by
-  change ∑ (i : Fin 3), f i = f ⟨0, by simp⟩ + f ⟨1, by simp⟩ + f ⟨2, by simp⟩
   exact Fin.sum_univ_three f
 
 /-- An equivalence between `MSSMCharges.charges` and the space of maps

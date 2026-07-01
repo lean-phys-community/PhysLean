@@ -120,7 +120,6 @@ instance (d : Dimension) (M : Type) [Preorder M] :
   le_refl m := le_refl m.val
   le_trans m1 m2 m3 h12 h23 := le_trans h12 h23
   lt_iff_le_not_ge m1 m2 := by
-    change m1.val < m2.val ↔ m1.val ≤ m2.val ∧ ¬ m2.val ≤ m1.val
     exact lt_iff_le_not_ge
 
 instance (d : Dimension) (M : Type) [PartialOrder M] :

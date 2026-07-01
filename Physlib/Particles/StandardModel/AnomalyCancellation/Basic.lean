@@ -34,7 +34,6 @@ variable {n : ℕ}
 lemma sum_SMSpecies_numberCharges_one {M} [AddCommMonoid M]
     (f : Fin (SMSpecies 1).numberCharges → M) :
     ∑ i, f i = f ⟨0, by simp⟩ := by
-  change ∑ (i : Fin 1), f i = _
   exact Fin.sum_univ_one f
 
 /-- An equivalence between the set `(SMCharges n).charges` and the set
