@@ -81,8 +81,7 @@ lemma mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal :
     intro u hu
     rw [mem_adjoint_iff] at h
     have h' : inner ℂ u.snd g.1 = inner ℂ u.fst g.2 := by
-      rw [← sub_eq_zero]
-      exact h u.fst u.snd hu
+      simpa [sub_eq_zero] using h u.fst u.snd hu
     simp [h']
   · rw [mem_adjoint_iff]
     intro a b hab

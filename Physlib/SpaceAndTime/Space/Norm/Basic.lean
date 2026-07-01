@@ -1164,8 +1164,7 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
     exact Int.toNat_of_nonneg (le_of_lt hq)
   have hp_pos : 0 < p := by
     have : (0 : ℤ) < (p : ℤ) := by
-      rw [hp_int]
-      exact hq
+      simpa [hp_int] using hq
     exact_mod_cast this
   have hcoef : (((q + d : ℤ) : ℝ)) = (p : ℝ) := by
     exact_mod_cast hp_int.symm

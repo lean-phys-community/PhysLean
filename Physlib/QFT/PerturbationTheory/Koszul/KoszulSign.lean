@@ -171,11 +171,9 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
       simp only [Function.comp_apply, Equiv.symm_apply_apply, List.get_eq_getElem, ni]
       simp_all only [List.length_cons, add_le_add_iff_right, List.getElem_insertIdx_self]
     have hc1 (hninro : ni.castSucc < nro) : ¬ le φ1 φ := by
-      rw [← hns]
-      exact lt_orderedInsertPos_rel le φ1 rs ni hninro
+      simpa [← hns] using lt_orderedInsertPos_rel le φ1 rs ni hninro
     have hc2 (hninro : ¬ ni.castSucc < nro) : le φ1 φ := by
-      rw [← hns]
-      exact gt_orderedInsertPos_rel le φ1 rs
+      simpa [← hns] using gt_orderedInsertPos_rel le φ1 rs
         (List.pairwise_insertionSort le (List.insertIdx φs n φ)) ni hninro
     by_cases hn : ni.castSucc < nro
     · simp only [hn, ↓reduceIte, Fin.val_castSucc]

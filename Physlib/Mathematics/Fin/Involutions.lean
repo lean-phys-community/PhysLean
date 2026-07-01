@@ -332,8 +332,8 @@ def involutionNoFixedSetOne {n : ℕ} :
     have hf' (i : Fin n) : f' i ≠ 0 := (f_succ_succ_ne_zero_one i).1
     let f'' := fun i => (f' i).pred (hf' i)
     have hf'' (i : Fin n) : f'' i ≠ 0 := by
-      rw [ne_eq, Fin.pred_eq_iff_eq_succ, Fin.succ_zero_eq_one]
-      exact (f_succ_succ_ne_zero_one i).2
+      simpa [f'', f', ne_eq, Fin.pred_eq_iff_eq_succ, Fin.succ_zero_eq_one] using
+        (f_succ_succ_ne_zero_one i).2
     let f''' := fun i => (f'' i).pred (hf'' i)
     refine ⟨f''', ?_, ?_⟩
     · intro i
