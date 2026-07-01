@@ -63,8 +63,7 @@ lemma normalOrder_normalOrder_mid (a b c : 𝓕.WickAlgebra) :
   rw [normalOrder_eq_ι_normalOrderF]
   simp only [← map_mul]
   rw [normalOrder_eq_ι_normalOrderF]
-  rw [normalOrderF_normalOrderF_mid]
-  rfl
+  exact congrArg ι (normalOrderF_normalOrderF_mid a b c)
 
 lemma normalOrder_normalOrder_left (a b : 𝓕.WickAlgebra) :
     𝓝(a * b) = 𝓝(𝓝(a) * b) := by simpa using normalOrder_normalOrder_mid (1 : 𝓕.WickAlgebra) a b
@@ -83,8 +82,7 @@ lemma normalOrder_normalOrder (a : 𝓕.WickAlgebra) : 𝓝(𝓝(a)) = 𝓝(a) :
 lemma normalOrder_mul_anPart (φ : 𝓕.FieldOp) (a : 𝓕.WickAlgebra) :
     𝓝(a * anPart φ) = 𝓝(a) * anPart φ := by
   obtain ⟨a, rfl⟩ := ι_surjective a
-  rw [anPart, ← map_mul, normalOrder_eq_ι_normalOrderF, normalOrderF_mul_anPartF]
-  rfl
+  exact congrArg ι (normalOrderF_mul_anPartF _ _)
 
 lemma crPart_mul_normalOrder (φ : 𝓕.FieldOp) (a : 𝓕.WickAlgebra) :
     𝓝(crPart φ * a) = crPart φ * 𝓝(a) := by

@@ -457,8 +457,7 @@ lemma vectorLikeEven_in_span (S : (PureU1 (2 * n.succ)).LinSols)
   erw [P'_val]
   apply ext_even
   · intro i
-    rw [P_evenFst]
-    rfl
+    exact P_evenFst f i
   · intro i
     rw [P_evenSnd]
     have ht := hS i
