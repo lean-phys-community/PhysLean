@@ -503,8 +503,7 @@ noncomputable instance actionT : MulAction G (S.Tensor c) where
 
 lemma actionT_pure {g : G} {p : Pure S c} :
     g • p.toTensor = Pure.toTensor (g • p) := by
-  rw [actionT_eq, Pure.toTensor, PiTensorProduct.map_tprod]
-  rfl
+  exact PiTensorProduct.map_tprod (R := k) (fun i => rep (c i) g) p
 
 lemma actionT_add {g : G} {t1 t2 : S.Tensor c} :
     g • (t1 + t2) = g • t1 + g • t2 := by

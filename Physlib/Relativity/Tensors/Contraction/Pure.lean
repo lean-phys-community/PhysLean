@@ -52,7 +52,6 @@ lemma dropPair_equivariant {n : ℕ} {c : Fin (n + 1 + 1) → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j) (p : Pure S c) (g : G) :
     dropPair i j hij (g • p) = g • dropPair i j hij p := by
   ext m
-  simp only [dropPair, actionP_eq]
   rfl
 
 lemma dropPair_symm (i j : Fin (n + 1 + 1)) (hij : i ≠ j)

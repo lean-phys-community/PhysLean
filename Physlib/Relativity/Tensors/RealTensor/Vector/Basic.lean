@@ -152,7 +152,6 @@ lemma apply_sum {d : ℕ} {ι : Type} [Fintype ι] (f : ι → Vector d) (i : Fi
     simp at h'
     rw [← @e.sum_comp, ← @e.sum_comp, h']
   · intro f i
-    simp only [Finset.univ_eq_empty, Finset.sum_empty]
     rfl
   · intro ι _ h f i
     rw [Fintype.sum_option, apply_add, h, Fintype.sum_option]

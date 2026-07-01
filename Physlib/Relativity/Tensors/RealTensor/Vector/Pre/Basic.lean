@@ -49,7 +49,6 @@ lemma contrBasis_toFin1dℝ {d : ℕ} (i : Fin 1 ⊕ Fin d) :
 
 lemma contrBasis_repr_apply {d : ℕ} (p : Contr d) (i : Fin 1 ⊕ Fin d) :
     (contrBasis d).repr p i = p.val i := by
-  simp only [contrBasis, Basis.ofEquivFun_repr_apply]
   rfl
 
 /-- The standard basis of contravariant Lorentz vectors indexed by `Fin (1 + d)`. -/
@@ -99,7 +98,6 @@ lemma coBasis_ρ_apply {d : ℕ} (M : LorentzGroup d) (i j : Fin 1 ⊕ Fin d) :
 
 lemma coBasis_repr_apply {d : ℕ} (p : Co d) (i : Fin 1 ⊕ Fin d) :
     (coBasis d).repr p i = p.val i := by
-  simp only [coBasis, Basis.ofEquivFun_repr_apply]
   rfl
 
 @[simp]
