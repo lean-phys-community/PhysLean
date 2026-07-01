@@ -479,18 +479,15 @@ That is, every field operator splits into its creation part plus its annihilatio
 -/
 lemma ofFieldOp_eq_crPart_add_anPart (φ : 𝓕.FieldOp) :
     ofFieldOp φ = crPart φ + anPart φ := by
-  rw [ofFieldOp, crPart, anPart, ofFieldOpF_eq_crPartF_add_anPartF]
-  simp [map_add]
+  simp [ofFieldOp, crPart, anPart, ofFieldOpF_eq_crPartF_add_anPartF, map_add]
 
 lemma anPart_outAsymp_eq_ofFieldOp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
     anPart (FieldOp.outAsymp φ) = ofFieldOp (FieldOp.outAsymp φ) := by
-  rw [ofFieldOp_eq_crPart_add_anPart]
-  simp
+  simp [ofFieldOp_eq_crPart_add_anPart]
 
 lemma crPart_inAsymp_eq_ofFieldOp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
     crPart (FieldOp.inAsymp φ) = ofFieldOp (FieldOp.inAsymp φ) := by
-  rw [ofFieldOp_eq_crPart_add_anPart]
-  simp
+  simp [ofFieldOp_eq_crPart_add_anPart]
 
 end WickAlgebra
 end FieldSpecification

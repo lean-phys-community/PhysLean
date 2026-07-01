@@ -308,9 +308,7 @@ Within a proto-operator algebra we have that
 lemma anPart_mul_normalOrder_ofFieldOpList_eq_superCommute_reorder (φ : 𝓕.FieldOp)
     (φs : List 𝓕.FieldOp) : anPart φ * 𝓝(ofFieldOpList φs) =
     𝓝(anPart φ * ofFieldOpList φs) + [anPart φ, 𝓝(ofFieldOpList φs)]ₛ := by
-  rw [anPart_mul_normalOrder_ofFieldOpList_eq_superCommute]
-  simp only [add_left_inj]
-  rw [normalOrder_anPart_ofFieldOpList_swap]
+  rw [anPart_mul_normalOrder_ofFieldOpList_eq_superCommute, normalOrder_anPart_ofFieldOpList_swap]
 
 /--
 Within a proto-operator algebra we have that

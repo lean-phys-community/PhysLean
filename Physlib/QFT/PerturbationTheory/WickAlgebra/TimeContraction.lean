@@ -196,8 +196,7 @@ lemma timeOrder_timeContract_ne_time {φ ψ : 𝓕.FieldOp}
   connected to incoming vertices. -/
 lemma timeContract_inAsymp_inAsymp (φ ψ : ((f : Field 𝓕) × AsymptoticLabel 𝓕 f) × Momentum) :
     timeContract (.inAsymp φ) (.inAsymp ψ) = 0 := by
-  rw [timeContract_eq_superCommute]
-  simp
+  simp [timeContract_eq_superCommute]
 
 /-- The time contraction of an outgoing asymptotic field with
   another outgoing asymptotic field is zero.
@@ -206,8 +205,7 @@ lemma timeContract_inAsymp_inAsymp (φ ψ : ((f : Field 𝓕) × AsymptoticLabel
   connected to outgoing vertices. -/
 lemma timeContract_outAsymp_outAsymp (φ ψ : ((f : Field 𝓕) × AsymptoticLabel 𝓕 f) × Momentum) :
     timeContract (.outAsymp φ) (.outAsymp ψ) = 0 := by
-  rw [timeContract_eq_superCommute, ← anPart_outAsymp_eq_ofFieldOp, ← anPart_outAsymp_eq_ofFieldOp]
-  simp [- anPart_outAsymp]
+  simp [timeContract_eq_superCommute, ← anPart_outAsymp_eq_ofFieldOp, - anPart_outAsymp]
 
 end WickAlgebra
 
