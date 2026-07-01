@@ -339,10 +339,8 @@ theorem kron_map_of_kron_state [CommRing R] (M₁ : MatrixMap A B R) (M₂ : Mat
       simp
     simp [h_linear, mul_comm, Matrix.sum_apply]
   · have h_expand : M₂ MC = ∑ i : C, ∑ j : C, MC i j • M₂ (Matrix.single i j 1) := by
-      have h_expand : MC = ∑ i : C, ∑ j : C, MC i j • Matrix.single i j 1 := by
-        ext i j
-        simp [Matrix.sum_apply, Matrix.single]
-        rw [ Finset.sum_eq_single i ] <;> aesop
+      have h_expand : MC = ∑ i : C, ∑ j : C, Matrix.single i j (MC i j) :=
+        Matrix.matrix_eq_sum_single MC
       conv_lhs => rw [ h_expand ];
       simp [map_sum]
       congr! 2 with i _ j _

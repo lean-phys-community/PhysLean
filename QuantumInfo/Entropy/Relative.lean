@@ -511,8 +511,7 @@ private lemma trace_conj_eq_inner_rpow {ρ σ : MState d} {t : ℝ} (ht : t ≠ 
         fun h => ht (by linarith)
       exact HermitianMat.mat_rpow_add h_nonneg h_ne_zero
     rw [ mul_two, h_exp ]
-  have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ = ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re := by
-    exact rfl
+  have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ = ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re := rfl
   simp_all
   convert congr_arg Complex.re h_cyclic using 1 ; simp [ HermitianMat.conj ] ; ring!;
   rw [ Matrix.trace_mul_comm ]
@@ -524,8 +523,7 @@ private def eigenWeight (ρ σ : MState d) (i : d) : ℝ :=
 private lemma inner_cfc_eq_sum_eigenWeight (ρ σ : MState d) (f : ℝ → ℝ) :
     ⟪ρ.M, σ.M.cfc f⟫ = ∑ i, f (σ.M.H.eigenvalues i) * eigenWeight ρ σ i := by
   -- By definition of the inner product in the context of Hermitian matrices, we can expand it using the trace.
-  have h_inner : ⟪ρ.M, σ.M.cfc f⟫ = RCLike.re (Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat)) := by
-    exact rfl;
+  have h_inner : ⟪ρ.M, σ.M.cfc f⟫ = RCLike.re (Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat)) := rfl;
   have h_trace : Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat) = ∑ i, f (σ.M.H.eigenvalues i) * (star (σ.M.H.eigenvectorBasis i) ⬝ᵥ ρ.M.mat.mulVec (σ.M.H.eigenvectorBasis i)) := by
     rw [ Matrix.trace ];
     have h_cfc_def : (σ.M.cfc f).mat = ∑ i, (f (Matrix.IsHermitian.eigenvalues σ.M.H i)) • Matrix.of (fun x y => (σ.M.H.eigenvectorBasis i x) * (star (σ.M.H.eigenvectorBasis i y))) := by
