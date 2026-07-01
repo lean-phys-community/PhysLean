@@ -89,8 +89,7 @@ def contrCoContraction : (ContrℂModule.SL2CRep.tprod CoℂModule.SL2CRep).Inte
     simp
 
 lemma contrCoContraction_hom_tmul (ψ : ContrℂModule) (φ : CoℂModule) :
-    contrCoContraction (ψ ⊗ₜ φ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ := by
-  rfl
+    contrCoContraction (ψ ⊗ₜ φ) = ψ.toFin13ℂ ⬝ᵥ φ.toFin13ℂ := by rfl
 
 lemma contrCoContraction_basis (i j : Fin 4) :
     contrCoContraction (complexContrBasisFin4 i ⊗ₜ complexCoBasisFin4 j) =
@@ -126,8 +125,7 @@ def coContrContraction : (CoℂModule.SL2CRep.tprod ContrℂModule.SL2CRep).Inte
     simp
 
 lemma coContrContraction_hom_tmul (φ : CoℂModule) (ψ : ContrℂModule) :
-    coContrContraction (φ ⊗ₜ ψ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ := by
-  rfl
+    coContrContraction (φ ⊗ₜ ψ) = φ.toFin13ℂ ⬝ᵥ ψ.toFin13ℂ := by rfl
 
 lemma coContrContraction_basis (i j : Fin 4) :
     coContrContraction (complexCoBasisFin4 i ⊗ₜ complexContrBasisFin4 j) =

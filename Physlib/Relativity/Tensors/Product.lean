@@ -121,15 +121,13 @@ def Pure.prodP {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
 lemma Pure.prodP_apply_castAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n1) :
     Pure.prodP p1 p2 (Fin.castAdd n2 i) =
-    LinearEquiv.cast (R := k) (by simp) (p1 i) := by
-  simp [Pure.prodP]
+    LinearEquiv.cast (R := k) (by simp) (p1 i) := by simp [Pure.prodP]
 
 @[simp]
 lemma Pure.prodP_apply_natAdd {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n2) :
     Pure.prodP p1 p2 (Fin.natAdd n1 i) =
-    LinearEquiv.cast (R := k) (by simp) (p2 i) := by
-  simp [Pure.prodP]
+    LinearEquiv.cast (R := k) (by simp) (p2 i) := by simp [Pure.prodP]
 
 lemma Pure.prodP_apply_finSumFinEquiv {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (p1 : Pure S c) (p2 : Pure S c1) (i : Fin n1 ⊕ Fin n2) :
@@ -445,8 +443,7 @@ noncomputable def prodT {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
 
 lemma prodT_pure {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (t : Pure S c) (t1 : Pure S c1) :
-    (t.toTensor).prodT (t1.toTensor) = (Pure.prodP t t1).toTensor := by
-  simp [prodT, Pure.toTensor]
+    (t.toTensor).prodT (t1.toTensor) = (Pure.prodP t t1).toTensor := by simp [prodT, Pure.toTensor]
 
 /-!
 

@@ -43,16 +43,14 @@ noncomputable def evalPCoeff (i : Fin (n + 1)) (φ : basisIdx (c i)) (p : Pure S
 lemma evalPCoeff_update_self (i : Fin (n + 1)) [inst : DecidableEq (Fin (n + 1))]
     (φ : basisIdx (c i)) (p : Pure S c)
     (x : V (c i)) :
-    evalPCoeff i φ (p.update i x) = (b (c i)).repr x φ := by
-  simp [evalPCoeff]
+    evalPCoeff i φ (p.update i x) = (b (c i)).repr x φ := by simp [evalPCoeff]
 
 @[simp]
 lemma evalPCoeff_update_succAbove (i : Fin (n + 1)) [inst : DecidableEq (Fin (n + 1))]
     (j : Fin n)
     (φ : basisIdx (c i)) (p : Pure S c)
     (x : V (c (i.succAbove j))) :
-    evalPCoeff i φ (p.update (i.succAbove j) x) = evalPCoeff i φ p := by
-  simp [evalPCoeff]
+    evalPCoeff i φ (p.update (i.succAbove j) x) = evalPCoeff i φ p := by simp [evalPCoeff]
 
 lemma evalPCoeff_basisVector (i : Fin (n + 1)) (φ : basisIdx (c i)) (b' : ComponentIdx (S := S) c) :
     evalPCoeff i φ (Pure.basisVector c b') = if b' i = φ then (1 : k) else 0 := by
