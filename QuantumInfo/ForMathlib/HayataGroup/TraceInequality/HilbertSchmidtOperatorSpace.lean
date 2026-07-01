@@ -515,8 +515,7 @@ noncomputable def rightMulHSStarAlgHom : (L ℋ)ᵐᵒᵖ →⋆ₐ[ℝ] L (HSOp
     simp [rightMulHS_star (ℋ := ℋ) (MulOpposite.unop A)]
 
 @[simp] theorem rightMulHSStarAlgHom_apply (A : (L ℋ)ᵐᵒᵖ) :
-    rightMulHSStarAlgHom (ℋ := ℋ) A = rightMulHS (ℋ := ℋ) (MulOpposite.unop A) :=
-  rfl
+    rightMulHSStarAlgHom (ℋ := ℋ) A = rightMulHS (ℋ := ℋ) (MulOpposite.unop A) := rfl
 
 /-- The `⋆`-algebra hom sending `A` to `op (star A)`. On selfadjoint operators this is just `op`. -/
 noncomputable def opStarHSStarAlgHom : L ℋ →⋆ₐ[ℝ] (L ℋ)ᵐᵒᵖ where

@@ -1179,8 +1179,7 @@ lemma trajectory_periodic (IC : InitialConditions) :
   have h : S.ω * (t.val + 2 * π / S.ω) = S.ω * t.val + 2 * π := by
     have := S.ω_ne_zero
     ring_nf; field_simp
-  rw [InitialConditions.trajectory, add_val, period_eq, h, cos_add_two_pi, sin_add_two_pi]
-  rfl
+  simp [InitialConditions.trajectory, add_val, period_eq, h, cos_add_two_pi, sin_add_two_pi]
 
 /-!
 
