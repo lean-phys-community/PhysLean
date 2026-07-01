@@ -77,8 +77,7 @@ lemma div_pos (x y : ChargeUnit) : (0 : ℝ≥0) < x/ y := by
 
 @[simp]
 lemma div_self (x : ChargeUnit) :
-    x / x = (1 : ℝ≥0) := by
-  exact NNReal.eq (_root_.div_self x.val_ne_zero)
+    x / x = (1 : ℝ≥0) := NNReal.eq (_root_.div_self x.val_ne_zero)
 
 lemma div_symm (x y : ChargeUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
