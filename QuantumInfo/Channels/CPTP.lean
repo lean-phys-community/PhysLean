@@ -285,8 +285,8 @@ end trace
 def replacement [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) : CPTPMap dIn dOut :=
   traceLeft ∘ₘ {
       toFun := fun M => Matrix.kroneckerMap (fun x1 x2 => x1 * x2) M ρ.m
-      map_add' := by simp [Matrix.add_kronecker]
-      map_smul' := by simp [Matrix.smul_kronecker]
+      map_add' M N := Matrix.add_kronecker M N ρ.m
+      map_smul' r M := Matrix.smul_kronecker r M ρ.m
       cp := MatrixMap.kron_kronecker_const ρ.psd
       TP := by intro; simp [Matrix.trace_kronecker]
       }

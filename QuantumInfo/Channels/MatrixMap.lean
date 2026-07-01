@@ -196,8 +196,7 @@ theorem submatrix_id : submatrix R _root_.id = id A R := rfl
 
 @[simp]
 theorem submatrix_comp (f : C → B) (g : B → A) :
-    submatrix R f ∘ₗ submatrix R g = submatrix R (g ∘ f) := by
-  ext1; simp
+    submatrix R f ∘ₗ submatrix R g = submatrix R (g ∘ f) := rfl
 
 end submatrix
 
@@ -385,10 +384,10 @@ theorem submatrix_kron_submatrix [CommSemiring R] (f : B → A) (g : D → C) :
   simp [Prod.map, Matrix.single, ite_and]
 
 theorem submatrix_kron_id [CommSemiring R] (f : B → A) :
-    submatrix R f ⊗ₖₘ id C R = submatrix R (Prod.map f _root_.id) := by simp [← submatrix_kron_submatrix]
+    submatrix R f ⊗ₖₘ id C R = submatrix R (Prod.map f _root_.id) := submatrix_kron_submatrix f _root_.id
 
 theorem id_kron_submatrix [CommSemiring R] (f : B → A) :
-    id C R ⊗ₖₘ submatrix R f = submatrix R (Prod.map _root_.id f) := by simp [← submatrix_kron_submatrix]
+    id C R ⊗ₖₘ submatrix R f = submatrix R (Prod.map _root_.id f) := submatrix_kron_submatrix _root_.id f
 
 end kron
 
