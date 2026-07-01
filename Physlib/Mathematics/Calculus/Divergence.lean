@@ -39,8 +39,7 @@ lemma divergence_zero : divergence 𝕜 (fun _ : E => 0) = fun _ => 0 := by
 lemma divergence_eq_sum_fderiv {s : Finset E} (b : Basis s 𝕜 E) {f : E → E} :
     divergence 𝕜 f = fun x => ∑ i : s, b.repr (fderiv 𝕜 f x (b i)) i := by
   funext x
-  unfold divergence
-  rw[LinearMap.trace_eq_matrix_trace_of_finset (s:=s) _ b]
+  rw [divergence, LinearMap.trace_eq_matrix_trace_of_finset (s := s) _ b]
   simp only [Matrix.trace, Matrix.diag, LinearMap.toMatrix_apply]
   rfl
 
@@ -108,29 +107,25 @@ lemma divergence_add {f g : E → E} {x : E}
     divergence 𝕜 (fun x => f x + g x) x
     =
     divergence 𝕜 f x + divergence 𝕜 g x := by
-  unfold divergence
-  simp [fderiv_fun_add hf hg]
+  simp [divergence, fderiv_fun_add hf hg]
 
 lemma divergence_neg {f : E → E} {x : E} :
     divergence 𝕜 (fun x => -f x) x = -divergence 𝕜 f x := by
-  unfold divergence
-  simp
+  simp [divergence]
 
 lemma divergence_sub {f g : E → E} {x : E}
     (hf : DifferentiableAt 𝕜 f x) (hg : DifferentiableAt 𝕜 g x) :
     divergence 𝕜 (fun x => f x - g x) x
     =
     divergence 𝕜 f x - divergence 𝕜 g x := by
-  unfold divergence
-  simp [fderiv_fun_sub hf hg]
+  simp [divergence, fderiv_fun_sub hf hg]
 
 lemma divergence_const_smul {f : E → E} {x : E} {c : 𝕜}
     (hf : DifferentiableAt 𝕜 f x) :
     divergence 𝕜 (fun x => c • f x) x
     =
     c * divergence 𝕜 f x := by
-  unfold divergence
-  simp [fderiv_fun_const_smul hf]
+  simp [divergence, fderiv_fun_const_smul hf]
 
 open InnerProductSpace' in
 lemma divergence_smul [InnerProductSpace' 𝕜 E] {f : E → 𝕜} {g : E → E} {x : E}
