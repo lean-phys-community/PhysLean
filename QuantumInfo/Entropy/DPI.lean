@@ -571,8 +571,8 @@ theorem sandwichedTraceFunctional_jointly_convex (hα : 1 < α) {ι : Type*} [Fi
     (hker : ∀ i, (σs i).M.ker ≤ (ρs i).M.ker) :
     Q̃_ α(ρ_mix‖σ_mix) ≤ ∑ i, w i * Q̃_ α(ρs i‖σs i) := by
   have hker' : σ_mix.M.ker ≤ ρ_mix.M.ker := by
-    rw [hρ_mix, hσ_mix]
-    exact ker_weighted_sum_le w hw_nonneg _ _ (fun i => (ρs i).nonneg) (fun i => (σs i).nonneg) hker
+    simpa [hρ_mix, hσ_mix] using
+      ker_weighted_sum_le w hw_nonneg _ _ (fun i => (ρs i).nonneg) (fun i => (σs i).nonneg) hker
   rw [traceFunctional_eq_iSup_f_alpha hα ρ_mix σ_mix hker']
   calc ⨆ H : {H : HermitianMat d ℂ // 0 ≤ H}, f_alpha α H.1 ρ_mix σ_mix
       ≤ ∑ i, w i * (⨆ H : {H : HermitianMat d ℂ // 0 ≤ H}, f_alpha α H.1 (ρs i) (σs i)) :=
@@ -1096,8 +1096,7 @@ theorem sandwichedTraceFunctional_mono_traceRight [Nonempty dB]
     field_simp
   -- Step 3: By joint convexity (α > 1)
   have hw_sum : ∑ i : κ, (Fintype.card κ : ℝ)⁻¹ = 1 := by
-    rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-    exact mul_inv_cancel₀ hcard_ne
+    simp [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, hcard_ne]
   set ρ_mix := ρ.traceRight ⊗ᴹ MState.uniform (d := dB)
   set σ_mix := σ.traceRight ⊗ᴹ MState.uniform (d := dB)
   have hρ_mix : ρ_mix.M = ∑ i : κ, (Fintype.card κ : ℝ)⁻¹ • (ρ.conjTensorUnitary (V i)).M :=

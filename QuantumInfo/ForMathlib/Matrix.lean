@@ -430,8 +430,7 @@ theorem le_smul_one_of_eigenvalues_iff (hA : A.IsHermitian) (c : ℝ) :
     simp only [smul_apply, one_apply, smul_ite, RCLike.real_smul_eq_coe_mul, mul_one, smul_zero,
       diagonal, Function.comp_apply, of_apply]
   have hAST : A = U * diagonal (RCLike.ofReal ∘ hA.eigenvalues) * U.conjTranspose := by
-    rw [hU]
-    exact IsHermitian.spectral_theorem hA
+    simpa [hU] using IsHermitian.spectral_theorem hA
   constructor
   · intro h
     rw [hc, hc', hAST]
@@ -468,8 +467,7 @@ theorem smul_one_le_of_eigenvalues_iff (hA : A.IsHermitian) (c : ℝ) :
     simp only [smul_apply, one_apply, smul_ite, RCLike.real_smul_eq_coe_mul, mul_one, smul_zero,
       diagonal, Function.comp_apply, of_apply]
   have hAST : A = U * diagonal (RCLike.ofReal ∘ hA.eigenvalues) * U.conjTranspose := by
-    rw [hU]
-    exact IsHermitian.spectral_theorem hA
+    simpa [hU] using IsHermitian.spectral_theorem hA
   constructor
   · intro h
     rw [hc, hc', hAST]

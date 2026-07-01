@@ -226,8 +226,7 @@ lemma chain_rule_T_beta {F : ℝ → ℝ} {F' : ℝ}
     rw [beta_fun_T_eq_on_Ioi (show (T.val : ℝ) ∈ Set.Ioi 0 from hT_pos), β_toReal]
     rfl
   have hF_deriv' : HasDerivWithinAt F F' (Set.Ioi 0) (betaFromReal (T.val : ℝ)) := by
-    rw [h_beta_at_T]
-    exact hF_deriv
+    simpa [h_beta_at_T] using hF_deriv
   exact hF_deriv'.comp (T.val : ℝ) (deriv_beta_wrt_T (T := T) hT_pos) h_map
 
 end Temperature
