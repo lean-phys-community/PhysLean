@@ -1065,9 +1065,7 @@ private lemma radial_power_deriv_integral_by_parts
         ring_nf
         simp [hη'_apply, mul_assoc])
         measurableSet_Ioi
-    · have hcont :
-          ContinuousAt (fun x : ℝ => x ^ p * η (x • n.1)) (0 : ℝ) := by
-        fun_prop
+    · have hcont : ContinuousAt (fun x : ℝ => x ^ p * η (x • n.1)) (0 : ℝ) := by fun_prop
       have hlim := tendsto_nhdsWithin_of_tendsto_nhds
         (s := Set.Ioi (0 : ℝ)) hcont.tendsto
       simp only [ne_eq, hp.ne', not_false_eq_true, zero_pow, zero_smul, zero_mul] at hlim

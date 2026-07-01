@@ -87,8 +87,7 @@ lemma one_add_minkowskiProduct_ne_zero (u v : Velocity d) :
   linarith [zero_le_minkowskiProduct u v]
 
 lemma minkowskiProduct_continuous_snd (u : Vector d) :
-    Continuous fun (x : Velocity d) => ⟪u, x.1⟫ₘ := by
-  fun_prop
+    Continuous fun (x : Velocity d) => ⟪u, x.1⟫ₘ := by fun_prop
 
 @[fun_prop]
 lemma minkowskiProduct_continuous_fst (u : Vector d) :
@@ -150,8 +149,7 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
         · apply mul_nonneg
           · exact sq_nonneg _
           · exact sq_nonneg _⟩
-  continuous_toFun := by
-    fun_prop
+  continuous_toFun := by fun_prop
   source' := by simp
   target' := by
     ext1

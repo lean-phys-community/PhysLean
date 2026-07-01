@@ -115,8 +115,7 @@ def coordCLM (μ : Fin 1 ⊕ Fin d) : SpaceTime d →L[ℝ] ℝ where
   toFun x := x μ
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
-  cont := by
-    fun_prop
+  cont := by fun_prop
 
 /-!
 
@@ -199,8 +198,7 @@ def space {d : ℕ} : SpaceTime d →L[ℝ] Space d where
   map_smul' c x := by
     ext i
     simp
-  cont := by
-    fun_prop
+  cont := by fun_prop
 
 /-!
 

@@ -96,8 +96,7 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
   -- Preliminary construction: properties of the function t => (t, q t)
   let tq := fun (q : Time → X) t => (t, q t)
-  have h_tq_contDiff : ∀ (q : Time → X), ContDiff ℝ ∞ q -> ContDiff ℝ ∞ (tq q) := by
-    fun_prop
+  have h_tq_contDiff : ∀ (q : Time → X), ContDiff ℝ ∞ q -> ContDiff ℝ ∞ (tq q) := by fun_prop
   have h_tq_der :  ∀ (q : Time → X) t, ContDiff ℝ ∞ q -> ∂ₜ (tq q) t = (1, ∂ₜ q t) := by
     intro q t h_ContDiff_q
     ext

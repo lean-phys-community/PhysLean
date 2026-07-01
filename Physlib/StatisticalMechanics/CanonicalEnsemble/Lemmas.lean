@@ -376,8 +376,7 @@ lemma integral_bolt_eq_integral_mul_exp
       = ∫ x, φ x * Real.exp (-T.β * 𝓒.energy x) ∂ 𝓒.μ := by
   unfold μBolt
   set f : ι → ℝ≥0∞ := fun x => ENNReal.ofReal (Real.exp (-T.β * 𝓒.energy x))
-  have hf_meas : Measurable f := by
-    fun_prop
+  have hf_meas : Measurable f := by fun_prop
   have hf_lt_top : ∀ᵐ x ∂ 𝓒.μ, f x < ∞ := by simp [f]
   have h :=
     integral_withDensity_eq_integral_toReal_smul

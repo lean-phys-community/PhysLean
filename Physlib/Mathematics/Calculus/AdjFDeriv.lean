@@ -158,8 +158,7 @@ lemma adjFDeriv_const (y : F) : adjFDeriv 𝕜 (fun _ : E => y) = fun _ _ => 0 :
 lemma HasAdjFDerivAt.comp {f : F → G} {g : E → F} {f' g'} {x : E}
     (hf : HasAdjFDerivAt 𝕜 f f' (g x)) (hg : HasAdjFDerivAt 𝕜 g g' x) :
     HasAdjFDerivAt 𝕜 (fun x => f (g x)) (fun dz => g' (f' dz)) x where
-  differentiableAt := by
-    fun_prop
+  differentiableAt := by fun_prop
   hasAdjoint_fderiv := by
     simp (disch:=fun_prop) [fderiv_fun_comp]
     exact hf.hasAdjoint_fderiv.comp hg.hasAdjoint_fderiv

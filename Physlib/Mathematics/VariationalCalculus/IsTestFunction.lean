@@ -207,8 +207,7 @@ lemma IsTestFunction.linearMap_comp {f : X → V} (hf : IsTestFunction f)
 lemma IsTestFunction.family_linearMap_comp {f : X → V} (hf : IsTestFunction f)
     {g : X → V →L[ℝ] U} (hg : ContDiff ℝ ∞ g) :
     IsTestFunction (fun x => g x (f x)) where
-  smooth := by
-    fun_prop
+  smooth := by fun_prop
   supp := by
     have hf' := hf.supp
     rw [← exists_compact_iff_hasCompactSupport] at hf' ⊢

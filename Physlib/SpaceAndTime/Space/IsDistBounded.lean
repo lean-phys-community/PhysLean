@@ -115,14 +115,12 @@ lemma aestronglyMeasurable {d : ℕ} {f : Space d → F} (hf : IsDistBounded f) 
 @[fun_prop]
 lemma aeStronglyMeasurable_schwartzMap_smul {d : ℕ} {f : Space d → F}
     (hf : IsDistBounded f) (η : 𝓢(Space d, ℝ)) :
-    AEStronglyMeasurable (fun x => η x • f x) := by
-  fun_prop
+    AEStronglyMeasurable (fun x => η x • f x) := by fun_prop
 
 @[fun_prop]
 lemma aeStronglyMeasurable_fderiv_schwartzMap_smul {d : ℕ} {f : Space d → F}
     (hf : IsDistBounded f) (η : 𝓢(Space d, ℝ)) (y : Space d) :
-    AEStronglyMeasurable (fun x => fderiv ℝ η x y • f x) := by
-  fun_prop
+    AEStronglyMeasurable (fun x => fderiv ℝ η x y • f x) := by fun_prop
 
 @[fun_prop]
 lemma aeStronglyMeasurable_inv_pow {d r : ℕ} {f : Space d → F}
@@ -1182,8 +1180,7 @@ lemma component_smul_isDistBounded {d : ℕ} [NormedSpace ℝ F] {f : Space d �
   apply IsDistBounded.mono (f := fun x => ‖x‖ • f x)
   · fun_prop
   · apply AEStronglyMeasurable.smul
-    · have h1 : AEStronglyMeasurable (fun x => Space.coordCLM i x) := by
-        fun_prop
+    · have h1 : AEStronglyMeasurable (fun x => Space.coordCLM i x) := by fun_prop
       convert h1 using 1
       funext i
       simp [coordCLM_apply, coord_apply]
