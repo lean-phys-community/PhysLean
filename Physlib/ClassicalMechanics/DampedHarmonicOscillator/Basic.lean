@@ -276,13 +276,11 @@ lemma isUnderdamped_of_gamma_eq_zero (hγ : S.γ = 0) : S.IsUnderdamped := by
 
 /-- An underdamped system has decay rate less than the natural frequency. -/
 lemma isUnderdamped_decayRate (hS : S.IsUnderdamped) : S.decayRate < S.ω := by
-  rw [IsUnderdamped] at hS
-  rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
+  rw [IsUnderdamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
   have hm_sq_pos : 0 < 4 * S.m^2 := by
     have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
     nlinarith
-  have hsq : S.decayRate^2 < S.ω^2 := by
-    nlinarith
+  have hsq : S.decayRate^2 < S.ω^2 := by nlinarith
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 
 /-- A critically damped system has decay rate equal to the natural frequency. -/
@@ -324,8 +322,7 @@ lemma isOverdamped_decayRate (hS : S.IsOverdamped) : S.ω < S.decayRate := by
   have hm_sq_pos : 0 < 4 * S.m^2 := by
     have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
     nlinarith
-  have hsq : S.ω^2 < S.decayRate^2 := by
-    nlinarith
+  have hsq : S.ω^2 < S.decayRate^2 := by nlinarith
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 
 /-- In the underdamped regime, the selected frequency uses the oscillation frequency. -/

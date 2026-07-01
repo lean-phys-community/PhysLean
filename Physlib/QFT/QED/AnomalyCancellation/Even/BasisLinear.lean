@@ -152,8 +152,7 @@ lemma sum_even (S : Fin (2 * n.succ) → ℚ) :
 
 -/
 
-lemma n_cond₂ (n : ℕ) : 1 + ((n + n) + 1) = 2 * n.succ := by
-  linarith
+lemma n_cond₂ (n : ℕ) : 1 + ((n + n) + 1) = 2 * n.succ := by linarith
 
 /-- The inclusion of `Fin n` into `Fin (1 + (n + n + 1))` via the first `n`,
   casted into `Fin (2 * n.succ)`. -/

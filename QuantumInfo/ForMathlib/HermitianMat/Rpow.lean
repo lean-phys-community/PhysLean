@@ -876,8 +876,7 @@ private lemma compound_top_singular_le_posDef
         have hinv : (c⁻¹) ^ r = (c ^ r)⁻¹ := by rw [Real.inv_rpow hc_nonneg]
         calc
           c ^ (2 * r) * ((c⁻¹) ^ r) ^ 2 = (c ^ r) ^ 2 * ((c ^ r)⁻¹) ^ 2 := by rw [hpow, hinv]
-          _ = 1 := by
-            field_simp [pow_two, hcr_pos.ne']
+          _ = 1 := by field_simp [pow_two, hcr_pos.ne']
       rwa [smul_smul, hs, one_smul] at hmul
     have htop : singularValuesSorted Nk (compoundZero k hk) ≤ Real.sqrt (c ^ (2 * r)) :=
       top_singular_le_of_self_mul_le_smul_one Nk
