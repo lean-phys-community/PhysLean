@@ -246,8 +246,7 @@ noncomputable instance {M1 : Type} [CarriesDimension M1] : MulUnitDependent M1 w
     rw [smul_smul, mul_comm, UnitChoices.dimScale_transitive]
   scaleUnit_trans' u1 u2 u3 m := by
     simp [toDimensionful, smul_smul, UnitChoices.dimScale_transitive]
-  scaleUnit_id u m := by
-    simp [toDimensionful, UnitChoices.dimScale_self]
+  scaleUnit_id u m := by simp [toDimensionful, UnitChoices.dimScale_self]
   scaleUnit_mul u1 u2 r m := by
     simp [toDimensionful]
     exact smul_comm (u1.dimScale u2 (dim M1)) r m

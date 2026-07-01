@@ -44,10 +44,8 @@ noncomputable instance (M : Type)
     simp [HasDim.scaleUnit_apply]
     · exact measurable_const_smul (α := M) ↑(u1.dimScale u2 (dim M)).1
     · exact measurable_const_smul (α := M) ↑(u2.dimScale u3 (dim M)).1
-  scaleUnit_id u μ := by
-    simp [scaleUnit_id]
-  scaleUnit_mul u1 u2 r μ := by
-    simp
+  scaleUnit_id u μ := by simp [scaleUnit_id]
+  scaleUnit_mul u1 u2 r μ := by simp
 
 variable {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] [HasDim M]
     [MeasurableSpace M] [MeasurableConstSMul ℝ M]
@@ -83,8 +81,7 @@ lemma integral_isDimensionallyCorrect (d : Dimension) :
     then do the integral, and then we take the result back to `u2`.
     If the integral is dimensionally correct, this should be the same as just doing the
     original integral in `u2` units i.e. `∫ x, f x ∂μ`. -/
-    _ = scaleUnit u1 u2 (∫ x, (scaleUnit u2 u1 f) x ∂(scaleUnit u2 u1 μ)) := by
-      simp
+    _ = scaleUnit u1 u2 (∫ x, (scaleUnit u2 u1 f) x ∂(scaleUnit u2 u1 μ)) := by simp
     /- Since we have assumed `μ` has dimension `d`, `(scaleUnit u2 μ u1)`
       is equal to `(u2.dimScale u1 d) • μ` -/
     _ = scaleUnit u1 u2 (u2.dimScale u1 d • ∫ (x : M), scaleUnit u2 u1 f x ∂ μ) := by

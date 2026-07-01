@@ -105,8 +105,7 @@ noncomputable def dimScale (u1 u2 : UnitChoices) :Dimension →* ℝ≥0 where
     (u1.mass / u2.mass) ^ (d.mass : ℝ) *
     (u1.charge / u2.charge) ^ (d.charge : ℝ) *
     (u1.temperature / u2.temperature) ^ (d.temperature : ℝ)
-  map_one' := by
-    simp
+  map_one' := by simp
   map_mul' d1 d2 := by
     simp only [Dimension.length_mul, Rat.cast_add, Dimension.time_mul, Dimension.mass_mul,
       Dimension.charge_mul, Dimension.temperature_mul]
@@ -350,8 +349,7 @@ noncomputable def CarriesDimension.toDimensionful {M : Type} [CarriesDimension M
       simp [smul_smul]
       rw [mul_comm, UnitChoices.dimScale_transitive]}
   invFun f := f.1 u
-  left_inv m := by
-    simp
+  left_inv m := by simp
   right_inv f := by
     simp only
     ext u1

@@ -163,8 +163,7 @@ lemma val_mul_eq_mul {d1 d2 : Dimension} (m1 : WithDim d1 ℝ) (m2 : WithDim d2 
 
 @[simp]
 lemma val_pow_two_eq_mul {d1 : Dimension} (m1 : WithDim d1 ℝ) :
-    m1.val ^ 2 = (m1 * m1).val := by
-  simp [sq]
+    m1.val ^ 2 = (m1 * m1).val := by simp [sq]
 
 @[simp]
 lemma scaleUnit_val_eq_scaleUnit_val {d : Dimension} (M : Type) [MulAction ℝ≥0 M]
