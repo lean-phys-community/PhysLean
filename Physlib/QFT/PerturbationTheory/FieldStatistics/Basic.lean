@@ -235,10 +235,9 @@ lemma ofList_map_eq_finset_prod (s : 𝓕 → FieldStatistic) :
     simp only [List.length_cons, mul_ite, ite_mul, one_mul, mul_one]
     by_cases ha : a = i
     · simp only [ha, ↓reduceIte, mul_self, true_or]
-      rw [if_neg]
-      rfl
-      simp only [List.length_cons, List.nodup_cons] at hl
-      exact hl.1
+      exact if_neg (by
+        simp only [List.length_cons, List.nodup_cons] at hl
+        exact hl.1)
     · simp only [ha, ↓reduceIte, false_or, Fin.getElem_fin]
     simp only [List.length_cons, List.nodup_cons] at hl
     exact hl.2

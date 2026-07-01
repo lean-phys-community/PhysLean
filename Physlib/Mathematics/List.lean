@@ -175,10 +175,9 @@ lemma orderedInsertPos_take_eq_orderedInsert {I : Type} (le1 : I → I → Prop)
     exact Nat.le_of_lt_succ (orderedInsertPos_lt_length le1 r r0)
   · intro n h1 h2
     simp only [List.get_eq_getElem, List.getElem_take]
-    rw [orderedInsert_get_lt le1 r r0 n]
-    rfl
-    simp only [List.length_take, lt_inf_iff] at h1
-    exact h1.1
+    exact (orderedInsert_get_lt le1 r r0 n (by
+      simp only [List.length_take, lt_inf_iff] at h1
+      exact h1.1)).symm
 
 lemma orderedInsertPos_drop_eq_orderedInsert {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
     (r : List I) (r0 : I) :

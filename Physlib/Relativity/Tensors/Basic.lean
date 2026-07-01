@@ -476,7 +476,6 @@ lemma actionP_cast {g : G} {p : Pure S c} (h : c = c1) :
 lemma drop_actionP {n : ℕ} {c : Fin (n + 1) → C} {i : Fin (n + 1)} {p : Pure S c} (g : G) :
     (g • p).drop i = g • (p.drop i) := by
   ext j
-  rw [drop, actionP_eq, actionP_eq]
   rfl
 
 end Pure

@@ -133,8 +133,7 @@ lemma prodT_contrT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     apply induction_on_pure
     · intro p1
       simp only [Nat.add_eq, finSumFinEquiv_apply_right, contrT_pure, P2, P]
-      rw [Pure.prodP_contrP_snd, prodT_pure, contrT_pure]
-      rfl
+      simp [Pure.prodP_contrP_snd, prodT_pure, contrT_pure]
     · intro r t h1
       simp_all only [map_smul, LinearMap.smul_apply, P2, P]
     · intro t1 t2 h1 h2

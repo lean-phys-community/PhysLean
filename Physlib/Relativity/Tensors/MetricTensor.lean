@@ -45,8 +45,7 @@ lemma permT_fromPairTContr_metric_metric {c : C} :
     ((S.metric ((S.τ c))) (1 : k))) = (unitTensor c) := by
   rw [fromPairTContr, ← fromPairT_comm]
   change _ = fromPairT ((S.unit c) (1 : k))
-  rw [← S.contr_metric]
-  rfl
+  exact congr_arg fromPairT (S.contr_metric c)
 
 lemma fromPairTContr_metric_metric_eq_permT_unit {c : C} :
     fromPairTContr ((S.metric c) (1 : k))

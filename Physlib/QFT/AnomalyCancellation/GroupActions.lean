@@ -61,8 +61,7 @@ def linSolRep {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
   map_mul' g1 g2 := by
     refine LinearMap.ext fun S ↦ ACCSystemLinear.LinSols.ext ?_
     change (G.rep (g1 * g2)) S.val = _
-    rw [G.rep.map_mul]
-    rfl
+    exact LinearMap.congr_fun (G.rep.map_mul g1 g2) S.val
   map_one' := by
     refine LinearMap.ext fun S ↦ ACCSystemLinear.LinSols.ext ?_
     change (G.rep.toFun 1) S.val = _
@@ -82,8 +81,7 @@ instance quadSolAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) :
   mul_smul f1 f2 S := by
     apply ACCSystemQuad.QuadSols.ext
     change (G.rep.toFun (f1 * f2)) S.val = _
-    rw [G.rep.map_mul']
-    rfl
+    exact LinearMap.congr_fun (G.rep.map_mul' f1 f2) S.val
   one_smul S := by
     apply ACCSystemQuad.QuadSols.ext
     change (G.rep.toFun 1) S.val = _
@@ -106,8 +104,7 @@ instance solAction {χ : ACCSystem} (G : ACCSystemGroupAction χ) : MulAction G.
   mul_smul f1 f2 S := by
     apply ACCSystem.Sols.ext
     change (G.rep.toFun (f1 * f2)) S.val = _
-    rw [G.rep.map_mul']
-    rfl
+    exact LinearMap.congr_fun (G.rep.map_mul' f1 f2) S.val
   one_smul S := by
     apply ACCSystem.Sols.ext
     change (G.rep.toFun 1) S.val = _

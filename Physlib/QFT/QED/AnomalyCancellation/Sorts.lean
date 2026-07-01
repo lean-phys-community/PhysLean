@@ -54,8 +54,7 @@ lemma sort_zero {n : ℕ} (S : (PureU1 n).Charges) (hS : sort S = 0) : S = 0 := 
   have hi := hj ((Tuple.sort S).invFun i)
   rw [sort_apply] at hi
   simp only [Equiv.invFun_as_coe, Equiv.apply_symm_apply] at hi
-  rw [hi]
-  rfl
+  exact hi
 
 lemma sort_projection {n : ℕ} (S : (PureU1 n).Charges) : sort (sort S) = sort S :=
   sort_perm S (Tuple.sort S).symm
@@ -70,8 +69,7 @@ lemma sortAFL_zero {n : ℕ} (S : (PureU1 n).LinSols) (hS : sortAFL S = 0) : S =
   apply ACCSystemLinear.LinSols.ext
   have h1 : sort S.val = 0 := by
     rw [← sortAFL_val]
-    rw [hS]
-    rfl
+    exact congrArg ACCSystemLinear.LinSols.val hS
   exact sort_zero S.val h1
 
 end PureU1

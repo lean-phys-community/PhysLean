@@ -342,8 +342,7 @@ lemma succSuccAbove_comm_apply (i1 j1 : Fin (n + 1 + 1 + 1 + 1)) (i2 j2 : Fin (n
     succSuccAbove i1 j1 (succSuccAbove i2 j2 m) := by
   intro i2' j2' hi2j2' i1' j1'
   change _ = (succSuccAbove i1 j1 ∘ succSuccAbove i2 j2) m
-  rw [succSuccAbove_comm i1 j1 i2 j2 hij1 hij2]
-  rfl
+  exact (congr_fun (succSuccAbove_comm i1 j1 i2 j2 hij1 hij2) m).symm
 
 /-!
 
