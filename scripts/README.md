@@ -53,3 +53,13 @@ This linter may need running a number of times.
   as proofs (proof-irrelevant). Anonymous instances and `example`s are not tracked.
   It also breaks the golfs down by trivial shape: proofs where only a newline was
   removed, and proofs where tactics were joined onto one line with a `;`.
+
+  With `--measure` it also reports the **compile cost** of the golf: for each
+  changed file it compiles the base and head versions and diffs their heartbeats
+  (via Mathlib's `#count_heartbeats`) and wall-clock time. This needs a built
+  project, so the workflow runs `lake build` on the head revision first:
+
+  ```
+  lake exe cache get && lake build
+  scripts/check_golf.py --base <merge-base> --head <head-sha> --measure
+  ```

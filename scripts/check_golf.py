@@ -25,6 +25,11 @@ separates its statement from its body. That top-level split is what lets it
 ignore ``:=`` inside default-valued binders and ``by`` tactic blocks that live
 *inside* a type (e.g. ``⟨x, by omega⟩``).
 
+With ``--measure`` it additionally reports the compile cost of the golf: for
+every changed file it compiles the base and head versions and diffs their
+heartbeats (via Mathlib's ``#count_heartbeats``) and wall-clock time. This
+requires a built project, so it is only used from CI after a ``lake build``.
+
 Usage (analysis / dry-run, prints Markdown to stdout):
 
     scripts/check_golf.py --base <ref> --head <ref>
@@ -45,6 +50,8 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
+import time
 import urllib.request
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
@@ -548,13 +555,263 @@ def file_at(ref: str, path: str) -> Optional[str]:
 
 
 # --------------------------------------------------------------------------- #
+# Compile-cost measurement (heartbeats + time)
+# --------------------------------------------------------------------------- #
+IMPORT_RE = re.compile(r"^\s*(?:public\s+|private\s+|meta\s+)*import\s")
+HEARTBEAT_RE = re.compile(r"[Uu]sed (?:approximately )?(\d+) heartbeats")
+
+
+@dataclass
+class Measurement:
+    path: str
+    base_hb: Optional[int] = None
+    head_hb: Optional[int] = None
+    base_ms: Optional[float] = None
+    head_ms: Optional[float] = None
+    note: str = ""
+
+    @property
+    def ok(self) -> bool:
+        return self.base_hb is not None and self.head_hb is not None
+
+    @property
+    def dhb(self) -> int:
+        return (self.head_hb or 0) - (self.base_hb or 0)
+
+
+def _comment_mask(src: str) -> bytearray:
+    """``mask[i] == 1`` if character ``i`` is inside a comment."""
+    n = len(src)
+    mask = bytearray(n)
+    i, state, depth = 0, 0, 0  # state: 0 normal, 1 line, 2 block, 3 string
+    while i < n:
+        c = src[i]
+        two = src[i:i + 2]
+        if state == 0:
+            if two == "--":
+                mask[i] = 1
+                if i + 1 < n:
+                    mask[i + 1] = 1
+                i += 2
+                state = 1
+            elif two == "/-":
+                mask[i] = 1
+                if i + 1 < n:
+                    mask[i + 1] = 1
+                i += 2
+                state, depth = 2, 1
+            elif c == '"':
+                i += 1
+                state = 3
+            else:
+                i += 1
+        elif state == 1:
+            if c == "\n":
+                state = 0
+            else:
+                mask[i] = 1
+            i += 1
+        elif state == 2:
+            if two == "/-":
+                mask[i] = 1
+                mask[i + 1] = 1
+                i += 2
+                depth += 1
+            elif two == "-/":
+                mask[i] = 1
+                mask[i + 1] = 1
+                i += 2
+                depth -= 1
+                if depth == 0:
+                    state = 0
+            else:
+                mask[i] = 1
+                i += 1
+        else:  # string
+            if c == "\\":
+                i += 2
+            elif c == '"':
+                state = 0
+                i += 1
+            else:
+                i += 1
+    return mask
+
+
+def _attach_point(src: str, mask: bytearray, start: int) -> int:
+    """Move an insertion point above a doc comment attached to a declaration."""
+    j = start
+    while j > 0 and src[j - 1].isspace():
+        j -= 1
+    if j > 0 and mask[j - 1]:
+        while j > 0 and mask[j - 1]:
+            j -= 1
+        return src.rfind("\n", 0, j) + 1
+    return start
+
+
+def _instrument(src: str) -> Optional[str]:
+    """Wrap every top-level declaration with a heartbeat counter; None if no imports.
+
+    Mathlib's ``#count_heartbeats in <cmd>`` reports the heartbeats a command
+    uses, but only under ``Elab.async false`` -- otherwise the proof elaborates
+    in a background task the counter cannot see. So we import the counter, force
+    synchronous elaboration once, and prefix ``#count_heartbeats in`` before
+    each declaration (above any attached doc comment, so it stays attached).
+    """
+    code = code_view(src)
+    starts = _block_starts(code)
+    lines = src.split("\n")
+    imports = [i for i, line in enumerate(lines) if IMPORT_RE.match(line)]
+    if not imports:
+        return None
+
+    # Character offset of the start of each source line.
+    line_off = [0]
+    for line in lines:
+        line_off.append(line_off[-1] + len(line) + 1)
+    import_at = line_off[max(imports) + 1]
+
+    mask = _comment_mask(src)
+    inserts = [(import_at, "import Mathlib.Util.CountHeartbeats\n"
+                           "set_option Elab.async false\n\n")]
+    # Attributes/modifiers can sit on their own column-0 line, forming a block
+    # of their own; such a prefix block belongs to the declaration that follows,
+    # so the counter must go before the prefix, not between it and the keyword.
+    prefix_start = None
+    for idx, start in enumerate(starts):
+        end = starts[idx + 1] if idx + 1 < len(starts) else len(code)
+        kw_pos = _strip_prefixes(code, start, end)
+        keyword = _read_token(code, kw_pos, end)
+        logical_start = prefix_start if prefix_start is not None else start
+        if keyword == "":
+            # Attribute-/modifier-only line: hold it for the next declaration.
+            prefix_start = logical_start
+            continue
+        if keyword in DECL_KEYWORDS:
+            inserts.append((_attach_point(src, mask, logical_start),
+                            "#count_heartbeats in\n"))
+        prefix_start = None
+
+    out = src
+    for offset, text in sorted(inserts, reverse=True):
+        out = out[:offset] + text + out[offset:]
+    return out
+
+
+def _run_lean(source: str) -> Tuple[bool, int, float]:
+    """Compile ``source`` with ``lake env lean``; return (ok, heartbeats, ms).
+
+    Heartbeats are deterministic; wall-clock time includes constant import
+    loading, so only the base-vs-head *delta* is meaningful.
+    """
+    with tempfile.NamedTemporaryFile("w", suffix=".lean", delete=False) as f:
+        f.write(source)
+        tmp = f.name
+    try:
+        t0 = time.monotonic()
+        p = subprocess.run(["lake", "env", "lean", tmp],
+                           capture_output=True, text=True)
+        ms = (time.monotonic() - t0) * 1000.0
+    finally:
+        os.unlink(tmp)
+    out = p.stdout + p.stderr
+    total = sum(int(m.group(1)) for m in HEARTBEAT_RE.finditer(out))
+    return p.returncode == 0, total, ms
+
+
+def measure_revision(ref: str, path: str) -> Tuple[Optional[int], Optional[float], str]:
+    """Measure heartbeats/time for ``path`` at ``ref`` against the built env."""
+    src = file_at(ref, path)
+    if src is None:
+        return None, None, "file absent at {}".format(ref[:9])
+    injected = _instrument(src)
+    if injected is None:
+        return None, None, "no import block"
+    ok, hb, ms = _run_lean(injected)
+    if not ok:
+        return None, None, "did not compile in isolation"
+    return hb, ms, ""
+
+
+def measure_files(base: str, head: str, reports: List[FileReport],
+                  limit: Optional[int] = None) -> List[Measurement]:
+    """Measure each file that had a proof/body change, base and head.
+
+    The base source is compiled against the (head) built environment; this is
+    sound exactly when statements are preserved -- which is what the check
+    itself verifies -- because only proof/body text then differs.
+    """
+    paths = [r.path for r in reports
+             if r.proof_golfed or r.embedded_proof_changed or r.def_body_changed]
+    if limit is not None:
+        paths = paths[:limit]
+    out: List[Measurement] = []
+    for i, path in enumerate(paths):
+        bhb, bms, bnote = measure_revision(base, path)
+        hhb, hms, hnote = measure_revision(head, path)
+        m = Measurement(path, bhb, hhb, bms, hms, bnote or hnote)
+        out.append(m)
+        print("[{}/{}] measured {} ({})".format(
+            i + 1, len(paths), path, m.note or "ok"), file=sys.stderr)
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # Report rendering
 # --------------------------------------------------------------------------- #
 def _bullets(names: List[str], path: str) -> str:
     return "\n".join("- `{}` — `{}`".format(n, path) for n in sorted(names))
 
 
-def render_report(base: str, head: str, reports: List[FileReport]) -> str:
+def _fmt_signed(n: int) -> str:
+    return "+{:,}".format(n) if n > 0 else "{:,}".format(n)
+
+
+def _render_measurements(lines: List[str],
+                         measurements: List[Measurement]) -> None:
+    ok = [m for m in measurements if m.ok]
+    failed = [m for m in measurements if not m.ok]
+    lines.append("### ⏱️ Compile cost (base → head)")
+    lines.append("")
+    if not ok:
+        lines.append("_No changed files could be measured in isolation "
+                     "({} attempted)._".format(len(measurements)))
+        lines.append("")
+        return
+    tb = sum(m.base_hb for m in ok)
+    th = sum(m.head_hb for m in ok)
+    tbm = sum(m.base_ms or 0.0 for m in ok)
+    thm = sum(m.head_ms or 0.0 for m in ok)
+    pct = (100.0 * (th - tb) / tb) if tb else 0.0
+    extra = (" ({} could not be measured in isolation)".format(len(failed))
+             if failed else "")
+    lines.append("Measured **{}** file(s) with body changes{}.".format(
+        len(ok), extra))
+    lines.append("")
+    lines.append("- **Heartbeats:** {:,} → {:,} (**{}**, {:+.1f}%)".format(
+        tb, th, _fmt_signed(th - tb), pct))
+    lines.append("- **Elapsed** (wall-clock, includes constant import loading): "
+                 "{:.1f}s → {:.1f}s".format(tbm / 1000.0, thm / 1000.0))
+    lines.append("")
+    movers = [m for m in ok if m.dhb != 0]
+    top = sorted(movers, key=lambda m: abs(m.dhb), reverse=True)[:20]
+    top.sort(key=lambda m: m.dhb)
+    if top:
+        lines.append("<details open><summary>Largest heartbeat changes "
+                     "({} of {} files differ)</summary>\n".format(
+                         len(movers), len(ok)))
+        lines.append("| File | Δ heartbeats | base → head |")
+        lines.append("|---|---:|---|")
+        for m in top:
+            lines.append("| `{}` | {} | {:,} → {:,} |".format(
+                m.path, _fmt_signed(m.dhb), m.base_hb, m.head_hb))
+        lines.append("\n</details>")
+        lines.append("")
+
+
+def render_report(base: str, head: str, reports: List[FileReport],
+                  measurements: "Optional[List[Measurement]]" = None) -> str:
     stmt = [(r.path, n) for r in reports for n in r.statement_changed]
     golfed = [(r.path, n) for r in reports for n in r.proof_golfed]
     embedded = [(r.path, n) for r in reports for n in r.embedded_proof_changed]
@@ -638,6 +895,9 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
         lines.append("\n</details>")
         lines.append("")
 
+    if measurements is not None:
+        _render_measurements(lines, measurements)
+
     lines.append(
         "<sub>Generated by <code>scripts/check_golf.py</code> · triggered by "
         "<code>/check-golf</code>. Statements are compared textually: comments "
@@ -650,7 +910,9 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
         "outside them changed — or the whole body is one <code>by</code> block "
         "— it is a “definition body changed” (the data may have changed; "
         "textually we cannot always tell). <code>;</code> "
-        "counts exclude the <code>&lt;;&gt;</code> combinator.</sub>")
+        "counts exclude the <code>&lt;;&gt;</code> combinator. Heartbeats are "
+        "measured with Mathlib's <code>#count_heartbeats</code> and are "
+        "deterministic; elapsed time is wall-clock.</sub>")
     return "\n".join(lines)
 
 
@@ -726,10 +988,19 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="upsert the report as a PR comment")
     ap.add_argument("--token-env", default="GITHUB_TOKEN",
                     help="env var holding the GitHub token (default GITHUB_TOKEN)")
+    ap.add_argument("--measure", action="store_true",
+                    help="also measure compile time and heartbeats "
+                         "(requires a built project)")
+    ap.add_argument("--measure-limit", type=int, default=None,
+                    help="measure at most this many files (for a quick sample)")
     args = ap.parse_args(argv)
 
     reports = build_reports(args.base, args.head)
-    body = render_report(args.base, args.head, reports)
+    measurements = None
+    if args.measure:
+        measurements = measure_files(args.base, args.head, reports,
+                                     args.measure_limit)
+    body = render_report(args.base, args.head, reports, measurements)
 
     if args.post:
         if not (args.repo and args.pr):
