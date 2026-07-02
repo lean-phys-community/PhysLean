@@ -146,7 +146,13 @@ theorem pinching_self (ρ : MState d) : pinching_map ρ ρ = ρ := by
   simp only [HermitianMat.conjTranspose_mat, MState.mat_M, LinearMap.coe_sum,
     LinearMap.coe_mk, AddHom.coe_mk, Finset.sum_apply]
   simp_rw [(pinching_kraus_commutes ρ _).eq, mul_assoc, ← sq]
-  simp_rw [pinching_sq_eq_self]
+  conv_lhs =>
+    enter [1, 2, x, 2]
+    change (pinching_kraus ρ x ^ 2).mat
+    rw [pinching_sq_eq_self]
+  simp_rw [← Finset.mul_sum, ← HermitianMat.mat_finset_sum]
+  simp only [pinching_sum, HermitianMat.mat_one, mul_one]
+  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Lemma 3.10 of Hayashi's book "Quantum Information Theory - Mathematical Foundations".
@@ -184,7 +190,7 @@ theorem pinching_bound (ρ σ : MState d) : ρ.M ≤ (↑(Fintype.card (spectrum
   simp only [HermitianMat.mat_finset_sum]
   simp only [Matrix.mul_sum, Matrix.sum_mul, Matrix.sum_mulVec, dotProduct_sum]
   simp only [MState.pure]
-  dsimp [MState.m]
+  dsimp only [MState.m]
   --This out to be Cauchy-Schwarz.
   have hschwarz := inner_mul_inner_self_le (𝕜 := ℂ) (E := EuclideanSpace ℂ (↑(spectrum ℝ σ.m)))
     (x := .toLp 2 fun i ↦ 1) (y := .toLp 2 fun k ↦ (
@@ -217,7 +223,8 @@ theorem pinching_bound (ρ σ : MState d) : ρ.M ≤ (↑(Fintype.card (spectrum
     rw [Complex.mul_conj, Complex.norm_real, Real.norm_of_nonneg (Complex.normSq_nonneg _)]
     simp_rw [← Complex.mul_conj, map_sum, Finset.mul_sum, Finset.sum_mul]
     congr! with x _ y _
-    simpa [← Matrix.mul_assoc] using h_mul x y
+    rw [← Matrix.mul_assoc]
+    exact h_mul x y
   · simp
   · have hc (c d : ℂ) : d = starRingEnd ℂ d  → c = d → c = d.re := by
       rintro h rfl; simp [Complex.ext_iff] at h ⊢; linarith
@@ -349,8 +356,9 @@ theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ke
   --TODO Cleanup
   intro v hv;
   -- Since $v \in \ker \sigma$, we have $P_k v = 0$ for all $k$ where the eigenvalue of $k$ is non-zero.
-  have h_proj_zero : ∀ k : spectrum ℝ σ.m, k.val ≠ 0 → (pinching_kraus σ k).mat *ᵥ v = 0 :=
-    fun k hk => pinching_kraus_ker_of_ne_zero σ v congr($hv) k hk
+  have h_proj_zero : ∀ k : spectrum ℝ σ.m, k.val ≠ 0 → (pinching_kraus σ k).mat *ᵥ v = 0 := by
+    intro k hk
+    exact pinching_kraus_ker_of_ne_zero σ v congr($hv) k hk
   -- Since $v \in \ker \sigma$, we have $P_k v = v$ for all $k$ where the eigenvalue of $k$ is zero.
   have h_proj_one : ∀ k : spectrum ℝ σ.m, k.val = 0 → (pinching_kraus σ k).mat *ᵥ v = v := by
     intro k hk
@@ -383,7 +391,8 @@ theorem ker_le_ker_pinching_map_ker (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ke
       rw! [← hk_zero] at h_proj_one
       simp only [Subtype.coe_eta] at h_proj_one
       simp only [← Matrix.mul_assoc, ← Matrix.mulVec_mulVec, ContinuousLinearMap.coe_coe]
-      exact h_proj_one
+      rw [h_proj_one]
+      rfl
     · simp
   · simp [← Matrix.mulVec_mulVec, h_proj_zero _ hk_zero]
 

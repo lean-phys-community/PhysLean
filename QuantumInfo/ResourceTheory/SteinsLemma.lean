@@ -2026,6 +2026,7 @@ theorem GeneralizedQSteinsLemma {i : ι} (ρ : MState (H i)) {ε : Prob} (hε : 
       rw [← add_assoc, σₖ_succ, pow_succ]
       grw [Lemma7_gap ρ hε hε' (σₖ (m + k)), ih m]
       ring_nf
+      rfl
 
     replace hσₖ_gap : Filter.atTop.liminf (fun k ↦ R2 ρ (σₖ k)) ≤ R1 ρ ε := by
       rw [ENNReal.tendsto_sub_const_nhds_zero_iff] at hσₖ_gap

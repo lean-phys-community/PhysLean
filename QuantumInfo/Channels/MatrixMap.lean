@@ -233,6 +233,7 @@ theorem kron_def [CommSemiring R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D
       rw [Finset.sum_eq_single a₁, Finset.sum_eq_single a₂, Finset.sum_eq_single c₁, Finset.sum_eq_single c₂]
       <;> simp +contextual
     nth_rw 1 [h_expand]
+    simp only [map_sum, LinearMap.map_smulₛₗ]
     rfl
   rw [h_expand]
   clear h_expand

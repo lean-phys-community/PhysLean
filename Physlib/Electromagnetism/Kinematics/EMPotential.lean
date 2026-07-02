@@ -280,7 +280,7 @@ noncomputable instance {d} :
     simp
   smul_add Λ A B := by
     ext x μ
-    simp [Lorentz.Vector.smul_add]
+    simp
 
 /-!
 
@@ -484,6 +484,7 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
   intro u v
   simp [f, f', inner_smul_left, Lorentz.Vector.basis_inner]
   ring_nf
+  rfl
 
 /-!
 
@@ -626,7 +627,11 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
       Lorentz.CoVector.indexEquiv.symm).tensorProduct
       (Lorentz.Vector.basis.reindex Lorentz.Vector.indexEquiv.symm)) =
       ((Lorentz.CoVector.basis (d := d)).tensorProduct (Lorentz.Vector.basis (d := d))).reindex
-      (Lorentz.CoVector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := rfl
+      (Lorentz.CoVector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := by
+    ext ⟨i, j⟩
+    simp
+  rw [hb]
+  rw [Module.Basis.repr_reindex_apply, deriv_basis_repr_apply]
   rfl
 
 end ElectromagneticPotential

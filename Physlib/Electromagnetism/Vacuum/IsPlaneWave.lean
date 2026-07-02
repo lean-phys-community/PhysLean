@@ -152,7 +152,8 @@ lemma electricFunction_unique {d : ℕ} {𝓕 : FreeSpace}
   funext x
   obtain ⟨t, rfl⟩ : ∃ t, x = ⟪0, s.unit⟫_ℝ - 𝓕.c * t := by use (- x/𝓕.c); field_simp; simp
   trans A.electricField 𝓕.c t (0 : Space d)
-  · exact congrFun hE₁ _
+  · rw [hE₁]
+    rfl
   · rw [P.electricField_eq_electricFunction]
 
 /-!

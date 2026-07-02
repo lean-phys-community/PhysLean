@@ -85,10 +85,11 @@ The potential is smooth.
 lemma constantEB_smooth {c : SpeedOfLight}
     {E₀ : EuclideanSpace ℝ (Fin d)} {B₀ : Fin d × Fin d → ℝ}
     {B₀_antisymm : ∀ i j, B₀ (i, j) = - B₀ (j, i)} :
-    ContDiff ℝ ∞ (constantEB c E₀ B₀ B₀_antisymm) :=
-  (Lorentz.Vector.contDiff_apply _).mp (fun μ => by
-    match μ with
-    | Sum.inl _ =>
+    ContDiff ℝ ∞ (constantEB c E₀ B₀ B₀_antisymm) := by
+  rw [← Lorentz.Vector.contDiff_apply]
+  intro μ
+  match μ with
+  | Sum.inl _ =>
       simp [constantEB]
       apply ContDiff.neg
       apply ContDiff.mul

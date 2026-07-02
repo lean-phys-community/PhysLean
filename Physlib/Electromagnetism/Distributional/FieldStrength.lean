@@ -80,7 +80,8 @@ lemma fieldStrengthAux_eq_add {d} (A : DistElectromagneticPotential d) (ε : �
   rw [sub_eq_add_neg]
   apply congrArg₂
   · rfl
-  · rfl
+  · rw [permT_permT]
+    rfl
 
 lemma toTensor_fieldStrengthAux {d} (A : DistElectromagneticPotential d)
     (ε : 𝓢(SpaceTime d, ℝ)) :

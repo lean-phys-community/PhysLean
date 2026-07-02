@@ -291,6 +291,8 @@ theorem Matrix.opNorm_conjTranspose_eq_opNorm {m n : Type*} [Fintype m] [Fintype
     Matrix.opNorm Aᴴ = Matrix.opNorm A := by
   unfold Matrix.opNorm
   rw [← ContinuousLinearMap.adjoint.norm_map (toEuclideanLin A).toContinuousLinearMap]
+  rw [toEuclideanLin_conjTranspose_eq_adjoint]
+  rfl
 
 theorem isometry_mul_conjTranspose_le_one {m n : Type*} [Fintype m] [Fintype n]
     [DecidableEq m] [DecidableEq n]
@@ -867,6 +869,7 @@ private lemma inner_one_kron_eq_inner_traceLeft
   refine' Finset.sum_bij ( fun x y => ( x.2, x.1 ) ) _ _ _ _ <;> simp [ Matrix.mul_apply ];
   intro a b; rw [ ← Equiv.sum_comp ( Equiv.prodComm d₁ d₂ ) ]
   simp [mul_comm]
+  rfl
 
 open HermitianMat in
 private lemma hermitianMat_log_inv_eq_neg

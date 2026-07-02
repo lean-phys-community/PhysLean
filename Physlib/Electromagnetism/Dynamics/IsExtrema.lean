@@ -417,6 +417,7 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
       congr
       rw [Time.deriv_eq]
       rw [fderiv_fun_sum fun i _ => (hBt i).differentiableAt]
+      simp only [FunLike.coe_sum, Finset.sum_apply]
       rfl
     _ = 1 / (𝓕.μ₀ * 𝓕.ε₀) * (∑ j, ∂[j] (fun x => ∂ₜ (A.magneticFieldMatrix 𝓕.c · x (j, i)) t)) x -
         1 / 𝓕.ε₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by

@@ -862,6 +862,8 @@ private lemma pdSet_rpow_of_mem_Icc_zero_one
       (algebraMap ℝ (L ℋ) r) ^ p = algebraMap ℝ (L ℋ) (r ^ p) := by
     rw [CFC.rpow_eq_cfc_real (A := L ℋ) (a := algebraMap ℝ (L ℋ) r) (y := p) (ha := hr0)]
     simp
+  have hbound : algebraMap ℝ (L ℋ) (r ^ p) ≤ A ^ p := by
+    simpa [hscalar, hApow] using hmono
   exact (CFC.exists_pos_algebraMap_le_iff (A := L ℋ) (a := A ^ p) (ha := hApow_sa)).1
     ⟨r ^ p, Real.rpow_pos_of_pos hr p, hbound⟩
 

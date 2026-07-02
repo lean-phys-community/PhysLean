@@ -83,7 +83,8 @@ attribute [simp] MState.tr
 def m (ρ : MState d) : Matrix d d ℂ := ρ.M.mat
 
 @[simp]
-theorem mat_M : ρ.M.mat = ρ.m := rfl
+theorem mat_M : ρ.M.mat = ρ.m := by
+  rfl
 
 theorem pos (ρ : MState d) : 0 < ρ.M := by
   apply ρ.nonneg.lt_of_ne'
@@ -407,6 +408,7 @@ theorem pure_of_constant_spectrum (h : ∃ i, ρ.spectrum = ProbDistribution.con
     rw [if_neg hxnoti, Complex.ofReal_zero]
     ring
   simp_rw [←Finset.sum_subset (Finset.subset_univ {i}) hsum, Finset.sum_singleton, reduceIte, Complex.ofReal_one, mul_one]
+  rfl
 
 /-- A state ρ is pure iff its spectrum is (1,0,0,...) i.e. a constant distribution. -/
 theorem pure_iff_constant_spectrum : (∃ ψ, ρ = pure ψ) ↔
@@ -475,6 +477,8 @@ theorem spectralDecomposition (ρ : MState d) :
   congr!
   simp only [Matrix.mul_diagonal, Matrix.IsHermitian.eigenvectorUnitary_apply,
     mul_comm, Matrix.star_apply, RCLike.star_def]
+  simp only [Function.comp_apply, mat_M, mat_apply, HermitianMat.smul_apply, Complex.real_smul]
+  rw [mul_assoc]
   rfl
 
 end pure
@@ -548,7 +552,9 @@ instance instInhabited [Nonempty d] : Inhabited (MState d) where
 lemma default_eq [Nonempty d] : (default : MState d) = uniform := rfl
 
 @[simp]
-theorem M_default [Unique d] : (default : MState d).M = 1 := rfl
+theorem M_default [Unique d] : (default : MState d).M = 1 := by
+  simp [default_eq, uniform]
+  rfl
 
 section ptrace
 
@@ -786,7 +792,8 @@ theorem pure_separable_imp_IsProd {d₁ d₂ : Type*} [Fintype d₁] [Fintype d�
       · intro a
         exact MState.ext_iff.mpr a.symm
       · intro a
-        exact MState.ext_iff.mpr a
+        rw [← a]
+        rfl
   -- Since `pure ψ` is pure (`purity = 1`), by `MState.pure_iff_purity_one`, `ρL_k = pure ξ` and `ρR_k = pure φ` for some `ξ, φ`.
   obtain ⟨ξ, hξ⟩ : ∃ ξ : MState d₁, k.val.1 = ξ ∧ ξ.purity = 1 := by
     have h_purity : (pure ψ).purity = (k.val.1).purity * (k.val.2).purity := by
@@ -1136,7 +1143,8 @@ def spectrum_SWAP (ρ : MState (d₁ × d₂)) : ∃ e, ρ.SWAP.spectrum.relabel
     (ρ.multiset_spectrum_relabel_eq (Equiv.prodComm _ _).symm ▸ rfl)
   use w
   ext x
-  exact h x
+  simp_rw [h]
+  rfl
 
 @[simp]
 theorem SWAP_SWAP (ρ : MState (d₁ × d₂)) : ρ.SWAP.SWAP = ρ := rfl

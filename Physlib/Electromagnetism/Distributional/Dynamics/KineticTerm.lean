@@ -209,7 +209,8 @@ lemma gradKineticTerm_eq_distTensorDeriv {d} {𝓕 : FreeSpace}
         (Lorentz.Vector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := by
       ext ⟨i, j⟩
       simp
-    simpa [hb] using Module.Basis.repr_reindex_apply _ _ _
+    rw [hb, Module.Basis.repr_reindex_apply]
+    rfl
   apply congr
   · simp
     rfl

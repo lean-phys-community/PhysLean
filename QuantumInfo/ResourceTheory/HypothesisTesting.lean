@@ -100,6 +100,7 @@ theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val 
 @[simp]
 theorem of_empty {ρ : MState d} (ε : Prob) : β_ ε(ρ‖∅) = 0 := by
   simp [OptimalHypothesisRate]
+  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 theorem le_sup_exp_val {ρ : MState d} (ε : Prob) {S : Set (MState d)}
@@ -304,6 +305,7 @@ theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompa
     have hi := iSup_range' (ι := S) (fun x ↦ (f x) ↑y) (·)
     rw [← Set.image_eq_range] at hi
     rw [← iSup_subtype'', Set.Icc.coe_iSup zero_le_one, hi]
+    rfl
 
 --Maybe should be phrased in terms of `0 < ...` instead? Maybe belongs in another file? It's kiinnnd of specialized..
 theorem ker_diagonal_prob_eq_bot {q : Prob} (hq₁ : 0 < q) (hq₂ : q < 1) :

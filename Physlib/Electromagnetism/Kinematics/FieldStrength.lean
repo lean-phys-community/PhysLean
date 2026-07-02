@@ -118,14 +118,17 @@ lemma toFieldStrength_eq_add {d} (A : ElectromagneticPotential d) (x : SpaceTime
   rw [sub_eq_add_neg]
   apply congrArg₂
   · rfl
-  · rfl
+  · rw [permT_permT]
+    rfl
 
 lemma toFieldStrength_eq_sub_tensorDeriv {d} {A : ElectromagneticPotential d}
     (hA : Differentiable ℝ A) (x : SpaceTime d) :
     toFieldStrength A x =
     Tensorial.toTensor.symm (permT id IsReindexing.auto {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ)
     - Tensorial.toTensor.symm (permT ![1, 0] IsReindexing.auto
-    {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := rfl
+    {η d | μ μ' ⊗ tensorDeriv A x | μ' ν}ᵀ) := by
+  simp only [toFieldStrength_eq_tensorDeriv hA, map_add, map_neg, sub_eq_add_neg, permT_permT]
+  rfl
 
 lemma toTensor_toFieldStrength {d} (A : ElectromagneticPotential d) (x : SpaceTime d) :
     Tensorial.toTensor (toFieldStrength A x) =
@@ -335,7 +338,11 @@ lemma toFieldStrength_basis_repr_apply {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 �
     ∑ κ, ((η μν.1 κ * ∂_ κ A x μν.2) - η μν.2 κ * ∂_ κ A x μν.1) := by
   match μν with
   | (μ, ν) =>
-  simpa using toTensor_toFieldStrength_basis_repr A x μ ν
+  trans (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x))
+    (fun | 0 => μ | 1 => ν); swap
+  · rw [toTensor_toFieldStrength_basis_repr]
+  rw [toFieldStrength_tensor_basis_eq_basis]
+  rfl
 
 lemma toFieldStrength_basis_repr_apply_eq_single {d} {μν : (Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)}
     (A : ElectromagneticPotential d) (x : SpaceTime d) :
@@ -426,7 +433,9 @@ lemma fieldStrengthMatrix_eq_tensor_basis_repr {d} (A : ElectromagneticPotential
     (x : SpaceTime d) (μ ν : (Fin 1 ⊕ Fin d)) :
     A.fieldStrengthMatrix x (μ, ν) =
     (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x))
-    (fun | 0 => μ | 1 => ν) := rfl
+    (fun | 0 => μ | 1 => ν) := by
+  rw [toFieldStrength_tensor_basis_eq_basis]
+  rfl
 
 lemma toFieldStrength_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d) :
     toFieldStrength A = fun x => ∑ μ, ∑ ν,
@@ -437,7 +446,8 @@ lemma toFieldStrength_eq_fieldStrengthMatrix {d} (A : ElectromagneticPotential d
   ext κ
   match κ with
   | (μ', ν') =>
-  simpa [Finsupp.single_apply]
+  simp [Finsupp.single_apply]
+  rfl
 
 /-!
 
@@ -525,6 +535,7 @@ lemma toFieldStrength_antisymmetric {d} (A : ElectromagneticPotential d) (x : Sp
   rw [toTensor_toFieldStrength_basis_repr]
   rw [← Finset.sum_neg_distrib]
   apply Finset.sum_congr rfl (fun κ _ => ?_)
+  simp only [Fin.isValue, neg_sub]
   rfl
 
 lemma fieldStrengthMatrix_antisymm {d} (A : ElectromagneticPotential d) (x : SpaceTime d)

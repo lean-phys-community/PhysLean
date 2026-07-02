@@ -36,7 +36,8 @@ theorem eq_IsHermitian : HermitianMat n α  = { m : Matrix n n α // m.IsHermiti
 instance : Coe (HermitianMat n α) (Matrix n n α) := ⟨mat⟩
 
 @[simp]
-theorem val_eq_coe (A : HermitianMat n α) : A.val = A := rfl
+theorem val_eq_coe (A : HermitianMat n α) : A.val = A := by
+  rfl
 
 @[simp]
 theorem mat_mk (x : Matrix n n α) (h) : mat ⟨x, h⟩ = x := rfl
@@ -100,7 +101,8 @@ instance : SMul R (HermitianMat n α) :=
 
 @[simp, norm_cast]
 theorem mat_smul (c : R) (A : HermitianMat n α) :
-    (c • A).mat = c • A.mat := rfl
+    (c • A).mat = c • A.mat := by
+  rfl
 
 @[simp]
 theorem smul_apply (c : R) (A : HermitianMat n α) (i j : n) :

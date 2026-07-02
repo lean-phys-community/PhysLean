@@ -100,6 +100,8 @@ lemma magneticField_coord_eq_fieldStrengthMatrix {i : Fin 3} {c : SpeedOfLight}
   congr
   all_goals
   · rw [SpaceTime.deriv_sum_inr c _ hA]
+    simp only [Fin.isValue, ContinuousLinearEquiv.apply_symm_apply]
+    rw [Space.deriv_eq, Space.deriv_eq, Lorentz.Vector.fderiv_apply]
     rfl
     · fun_prop
 
@@ -149,6 +151,7 @@ lemma ofElectromagneticField_magneticField {c : SpeedOfLight}
       (u • basis.repr x) ⨯ₑ₃ B t (u • x)
   suffices h : ContDiff ℝ 1 (fun x => C x i) by
     convert! h using 1
+    simp [C]
     rfl
   fin_cases i
   all_goals
@@ -303,7 +306,8 @@ lemma magneticFieldMatrix_eq_vectorPotential {c : SpeedOfLight} (A : Electromagn
   rw [add_comm]
   congr
   all_goals
-  · rfl
+  · rw [← Space.deriv_lorentz_vector]
+    rfl
     fun_prop
 
 /-!
@@ -392,6 +396,7 @@ lemma time_deriv_magneticFieldMatrix {d : ℕ} {c : SpeedOfLight} (A : Electroma
       conv_lhs =>
         enter [1, t]
         rw [magneticFieldMatrix_eq_vectorPotential _ (hA.differentiable (by simp))]
+      rw [Time.deriv, fderiv_fun_sub]
       rfl
       all_goals
       · apply Differentiable.differentiableAt
@@ -469,6 +474,7 @@ lemma curl_magneticFieldMatrix_eq_electricField_fieldStrengthMatrix {d : ℕ} {c
     field_simp
   · funext j
     rw [SpaceTime.deriv_sum_inr c]
+    simp
     rfl
     · apply fieldStrengthMatrix_differentiable hA
 

@@ -179,6 +179,7 @@ theorem convex_roof_of_pure (ψ : Ket d) : convex_roof g (pure ψ) = g (KetUpToP
       conv_lhs =>
         enter [1, 1]
         rw [trivial_pEnsemble_average ψ _ 0]
+      rfl
   · apply le_convex_roof
     intro n hnpos e hmix
     apply le_of_eq
@@ -190,6 +191,7 @@ theorem convex_roof_of_pure (ψ : Ket d) : convex_roof g (pure ψ) = g (KetUpToP
       congr 1
       exact congrArg g (Quotient.sound hab)
     simp [mix_pEnsemble_pure_average (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) hphase_inv hmix]
+    rfl
 
 omit [Nonempty d] in
 /-- The mixed convex roof extension of `f : MState d → ℝ≥0` applied to a pure state `ψ` is `f (pure ψ)`. -/
@@ -204,6 +206,7 @@ theorem mixed_convex_roof_of_pure (ψ : Ket d) : mixed_convex_roof f (pure ψ) =
       conv_lhs =>
         enter [1, 1]
         rw [trivial_mEnsemble_average _ (pure ψ) 0]
+      rfl
   · apply le_mixed_convex_roof
     intro n hnpos e hmix
     replace hpure := mix_mEnsemble_pure_iff_pure.mp hmix
@@ -212,6 +215,7 @@ theorem mixed_convex_roof_of_pure (ψ : Ket d) : mixed_convex_roof f (pure ψ) =
     conv_rhs =>
       enter [1, 1]
       rw [mix_mEnsemble_pure_average (toReal ∘ f) hmix, Function.comp_apply]
+    rfl
 
 /-- Entanglement of Formation of bipartite systems. It is the convex roof extension of the
 von Neumann entropy of one of the subsystems (here chosen to be the left one, but see `Entropy.Sᵥₙ_of_partial_eq`).
@@ -250,6 +254,7 @@ theorem traceRight_pure_MES (d : Type*) [Fintype d] [DecidableEq d] [Nonempty d]
     coe_ofClassical, ProbDistribution.uniform_def, Finset.card_univ]
   unfold HermitianMat.diagonal
   simp_all only [map_inv₀, map_natCast]
+  rfl
 
 /-
 The von Neumann entropy of a state is equal to the trace of `ρ log ρ` (technically `cfc ρ negMulLog`).

@@ -378,6 +378,7 @@ noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     ev.comp (Distribution.fderivD ℝ f)
   map_add' f1 f2 := by
     simp
+  map_smul' a f := by simp
 
 lemma distDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin 1 ⊕ Fin d) (f : (SpaceTime d) →d[ℝ] M) (ε : 𝓢(SpaceTime d, ℝ)) :

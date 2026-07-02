@@ -50,7 +50,8 @@ protected def cfc : HermitianMat d 𝕜 :=
 theorem cfc_eq : A.cfc f = ⟨cfc f A.mat, cfc_predicate f A.mat⟩ := rfl
 
 @[simp]
-theorem mat_cfc : (A.cfc f).mat = _root_.cfc f A.mat := rfl
+theorem mat_cfc : (A.cfc f).mat = _root_.cfc f A.mat := by
+  rfl
 
 section congr
 

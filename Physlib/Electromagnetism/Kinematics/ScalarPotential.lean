@@ -85,7 +85,9 @@ lemma ofStaticScalarPotential_scalarPotential {d} (c : SpeedOfLight)
 @[simp]
 lemma ofVectorPotential_scalarPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) :
-    (ofVectorPotential c A).scalarPotential = 0 := rfl
+    (ofVectorPotential c A).scalarPotential = 0 := by
+  simp only [scalarPotential, SpeedOfLight.val_one, ofVectorPotential, Fin.isValue, mul_zero]
+  rfl
 
 @[simp]
 lemma ofStaticVectorPotential_scalarPotential {d} (c : SpeedOfLight)
@@ -140,6 +142,9 @@ lemma scalarPotential_contDiff {n} {d} (c : SpeedOfLight) (A : ElectromagneticPo
     (hA : ContDiff ℝ n A) : ContDiff ℝ n ↿(A.scalarPotential c) := by
   simp [scalarPotential]
   apply timeSlice_contDiff
+  have h1 : ∀ i, ContDiff ℝ n (fun x => A x i) := by
+    rw [SpaceTime.contDiff_vector]
+    exact hA
   apply ContDiff.mul
   · fun_prop
   exact h1 (Sum.inl 0)
@@ -174,6 +179,9 @@ lemma scalarPotential_differentiable {d} (c : SpeedOfLight) (A : Electromagnetic
     (hA : Differentiable ℝ A) : Differentiable ℝ ↿(A.scalarPotential c) := by
   simp [scalarPotential]
   apply timeSlice_differentiable
+  have h1 : ∀ i, Differentiable ℝ (fun x => A x i) := by
+    rw [SpaceTime.differentiable_vector]
+    exact hA
   apply Differentiable.mul
   · fun_prop
   exact h1 (Sum.inl 0)

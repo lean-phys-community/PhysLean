@@ -279,7 +279,7 @@ lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
     have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), v ∈ LinearMap.range A.val.toEuclideanLin → (A.supportProj.val.toEuclideanLin v) = v := by
       intro v hv
       have h_supportProj_mul_A : (A.supportProj.val.toEuclideanLin v) = (Submodule.orthogonalProjectionOnto (LinearMap.range A.val.toEuclideanLin) v) := by
-        simp only [val_eq_coe, Submodule.coe_orthogonalProjectionOnto_apply]
+        simp only [val_eq_coe]
         simp [supportProj, projector]
         have key : ∀ (f : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d),
             Matrix.toEuclideanLin
@@ -290,6 +290,7 @@ lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
         have hsup : A.support = (Matrix.toEuclideanLin (↑A : Matrix d d ℂ)).range := by
           simp [HermitianMat.support, HermitianMat.lin]
         rw [key, LinearMap.comp_apply, Submodule.subtype_apply, hsup]
+        rfl
       rw [h_supportProj_mul_A]
       exact Submodule.eq_starProjection_of_mem_of_inner_eq_zero (by simpa using hv) (by simp)
     exact congr(WithLp.ofLp $(h_supportProj_mul_A _ h_range))
@@ -461,7 +462,8 @@ private lemma hasDerivAt_trace_rpow_at_one (B : HermitianMat d ℂ) (hB : 0 ≤ 
             simp [pow_one, HermitianMat.log]
           rw [h_log]
           exact (B.mat_cfc_mul_apply id Real.log).symm
-        exact h_trace.trans HermitianMat.trace_eq_trace_rc.symm
+        rw [h_trace, ← HermitianMat.trace_eq_trace_rc]
+        rfl
       simp_all [ HermitianMat.trace_cfc_eq ];
     exact_mod_cast h_inner_def.trans h_trace;
   have h_deriv : ∀ i, HasDerivAt (fun α : ℝ => (B.H.eigenvalues i) ^ α) (B.H.eigenvalues i * Real.log (B.H.eigenvalues i)) 1 := by
@@ -1254,6 +1256,7 @@ lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MSta
           convert! congr(WithLp.ofLp $(h_top (WithLp.toLp 2 ( Pi.single j 1 )) ) i) using 1
           simp
           simp [ HermitianMat.lin ];
+          rfl
         exact ρ₂.pos.ne' h_contra;
     have h_union : ∀ (U V : Submodule ℂ (EuclideanSpace ℂ d₂)), U ≠ ⊤ → V ≠ ⊤ → ∃ v : EuclideanSpace ℂ d₂, v ∉ U ∧ v ∉ V := by
       intros U V hU hV;
@@ -1490,6 +1493,7 @@ private theorem sandwichedRelRentropy_additive_alpha_one (ρ₁ σ₁ : MState d
   <;> by_cases h2 : σ₂.M.ker ≤ ρ₂.M.ker
   · simp only [SandwichedRelRentropy, ↓reduceIte, ↓reduceDIte, h1, h2]
     split_ifs <;> simp_all [ ker_prod_le_iff ];
+    simp only [sandwichedRelRentropy_additive_alpha_one_aux ρ₁ σ₁ ρ₂ σ₂ h1 h2]
     rfl
   · simp only [SandwichedRelRentropy, zero_lt_one, ↓reduceDIte, ↓reduceIte, h1, h2,
       add_top, dite_eq_right_iff, ENNReal.coe_ne_top, imp_false]
@@ -1662,7 +1666,8 @@ private theorem sandwichedRelRentropy.continuousOn_Ioi_1 (ρ σ : MState d) :
       have hα₀ : 0 < α := by linarith
       have hα₁ : α ≠ 1 := by linarith
       simp only [dif_pos hα₀, if_neg hα₁, ENNReal.ofReal]
-      exact Real.toNNReal_of_nonneg _
+      rw [Real.toNNReal_of_nonneg]
+      rfl
   · rw [continuousOn_congr (f := fun α ↦ ⊤)]
     · fun_prop
     · clear ρ σ hρ;
@@ -1707,7 +1712,8 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
       have hα₁ : α ≠ 1 := ne_of_lt hα.2
       split_ifs
       · norm_cast
-      · exact Real.toNNReal_of_nonneg _
+      · rw [ENNReal.ofReal, Real.toNNReal_of_nonneg]
+        rfl
   · rw [continuousOn_congr (f := fun α ↦ ⊤)]
     · fun_prop
     · intro x hx
@@ -1964,7 +1970,8 @@ private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
         replace h_eigenvalue := congr(WithLp.toLp 2 $h_eigenvalue)
         simp only [HermitianMat.val_eq_coe, MState.mat_M, WithLp.ofLp_sum, WithLp.ofLp_smul,
           WithLp.toLp_sum, WithLp.toLp_smul, WithLp.toLp_ofLp] at h_eigenvalue
-        exact h_eigenvalue.symm.trans hv.symm
+        rw [← h_eigenvalue, ← hv]
+        rfl
       have h_eigenvalue_zero : ∀ i, (x.M.H.eigenvalues i) • w i = 0 := by
         intro i
         have h_eigenvalue_zero : (x.M.H.eigenvalues i) • w i = inner ℂ (x.M.H.eigenvectorBasis i) (∑ j, (x.M.H.eigenvalues j) • w j • x.M.H.eigenvectorBasis j) := by
