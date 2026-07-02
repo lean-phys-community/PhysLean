@@ -6,6 +6,8 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.Relativity.Tensors.Product
+public import Physlib.Relativity.Tensors.Contraction.Basis
+public import Physlib.Meta.Sorry
 /-!
 
 # Evaluation of tensor indices
@@ -116,9 +118,10 @@ noncomputable def evalPMultilinear {n : ℕ} {c : Fin (n + 1)→ C}
 
 end Pure
 
-/-- Given a `i : Fin (n + 1)`, a `φ : Fin (S.repDim (c i))` and a tensor
-  `t : Tensor S c`, `evalT i φ t` is the tensor formed by evaluating the `i`th index
-  of `t` at `φ`. -/
+TODO "Choose a more descriptive name for `evalT` and `evalP`, taking into consideration
+  the namespaces they live in."
+
+/-- Evaluation of a tensor at a given index and basis element. -/
 noncomputable def evalT {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
       (φ : basisIdx (c i)) :
     Tensor S c →ₗ[k] Tensor S (c ∘ i.succAbove) :=
@@ -140,11 +143,126 @@ lemma evalT_basis {n : ℕ} {c : Fin (n + 1) → C} (i : Fin (n + 1))
     zero_smul]
   rfl
 
+attribute [-simp] Matrix.cons_val_zero Matrix.cons_val Fin.succAbove_zero
 
 TODO "Add lemmas related to the interaction of evalT and permT, prodT and contrT."
 
+/-!
 
-attribute [-simp] Matrix.cons_val_zero Matrix.cons_val Fin.succAbove_zero
+## The commutation of evaluation with permutations.
+
+-/
+
+/-- Commuting evaluation with permutations.-/
+lemma evalT_permT {n m : ℕ} {c : Fin (n + 1) → C} {c' : Fin (m + 1) → C}
+    {σ : Fin (n + 1) → Fin (m + 1)}
+    (h : IsReindexing c' c  σ) (i : Fin (n + 1)) (x : basisIdx (c i)) (t : Tensor S c') :
+    evalT i x (permT _ h t) = permT _ (h.succAbove i)
+      (evalT (σ i) (basisIdxCongr (by simp [h.2]) x) t) := by
+  induction' t using Tensor.induction_on_basis with b a t h t1 t2 h1 h2
+  · simp only [evalT_basis, permT_basis]
+    by_cases h1 : (basisIdxCongr (by simp [h.2])) (b (σ i)) = x
+    · have h1' : basisIdxCongr (by simp [h.2]) x = b (σ i) := by subst h1; simp
+      simp only [h1, ↓reduceIte, h1', permT_basis]
+      congr
+      funext j
+      refine (Equiv.eq_symm_apply (basisIdxCongr _)).mp ?_
+      simp only [basisIdxCongr_symm]
+      erw [basisIdxCongr_apply_apply]
+      apply ComponentIdx.congr_right
+      split_ifs with h2
+      · simp [h2]
+      · have hne : σ (i.succAbove j) ≠ ((σ i).pred h2).succ := by
+          rw [Fin.succ_pred]; exact fun heq => Fin.succAbove_ne i j (h.1.injective heq)
+        rw [show (σ i).succAbove = (((σ i).pred h2).succ).succAbove from by rw [Fin.succ_pred]]
+        exact (Fin.succ_succAbove_predAbove hne).symm
+    · have h1' : b (σ i) ≠ basisIdxCongr (by simp [h.2]) x := by by_contra h2; simp [h2] at h1
+      simp [h1, h1']
+  · simp
+  · simp only [map_smul, h]
+  · simp only [map_add, h1, h2]
+
+/-!
+
+## The commutation of evaluation with evaluation.
+
+-/
+
+TODO "Add the lemma corresponding the the commutation of two evaluations of tensor
+  indices."
+
+/-!
+
+## The commutation of evaluation with contraction.
+
+-/
+
+/-- Commuting evaluation with contraction. Evaluating index `k` and then contracting the
+  pair `i j` equals contracting the corresponding pair `k.succAbove i`, `k.succAbove j` and
+  then evaluating the residual index, up to the identity reindexing
+  `IsReindexing.succAbove_succSuccAbove_comm`. -/
+lemma contrT_evalT {n : ℕ} {c : Fin (n + 1 + 1 + 1) → C}
+    (k : Fin (n + 1 + 1 + 1)) (i j : Fin (n + 1 + 1)) (φ : basisIdx (c k))
+    (hij : i ≠ j ∧ S.τ ((c ∘ k.succAbove) i) = (c ∘ k.succAbove) j) (t : Tensor S c) :
+    contrT n i j hij (evalT k φ t) =
+    permT id (.succAbove_succSuccAbove_comm k i j hij.1)
+      (evalT (Fin.predPredAbove (k.succAbove i) (k.succAbove j) (by simp [hij.1]) k (by simp))
+        (basisIdxCongr (by simp) φ)
+        (contrT (n + 1) (k.succAbove i) (k.succAbove j) ⟨by simp [hij.1], hij.2⟩ t)) := by
+  induction' t using Tensor.induction_on_basis with b a t hb t1 t2 hb1 hb2
+  · have hs : Pure.contrPCoeff i j hij
+          (Pure.basisVector (c ∘ k.succAbove) (fun m => b (k.succAbove m))) =
+        Pure.contrPCoeff (k.succAbove i) (k.succAbove j) ⟨by simp [hij.1], hij.2⟩
+          (Pure.basisVector c b) := rfl
+    conv_lhs => rw [evalT_basis]
+    conv_rhs => rw [contrT_basis, map_smul, evalT_basis]
+    rw [apply_ite (contrT n i j hij), map_zero, contrT_basis, hs, map_smul,
+      apply_ite (permT id (IsReindexing.succAbove_succSuccAbove_comm k i j hij.1)), map_zero,
+      permT_basis, smul_ite, smul_zero]
+    have hidx : ∀ m, (k.succAbove i).succSuccAbove (k.succAbove j)
+        (((k.succAbove i).predPredAbove (k.succAbove j) (by simp [hij.1]) k (by simp)).succAbove m)
+        = k.succAbove (i.succSuccAbove j m) := by
+      intro m
+      apply Fin.val_injective
+      simp only [Fin.succSuccAbove, Fin.succAbove, Fin.predPredAbove, Fin.lt_def,
+        Fin.val_castSucc, Fin.val_succ, apply_ite Fin.val, apply_dite Fin.val]
+      grind (splits := 60)
+    have hk : (k.succAbove i).succSuccAbove (k.succAbove j)
+        ((k.succAbove i).predPredAbove (k.succAbove j) (by simp [hij.1]) k (by simp)) = k := by simp
+    have hcond : (ComponentIdx.dropPair (k.succAbove i) (k.succAbove j) b
+          ((k.succAbove i).predPredAbove (k.succAbove j) (by simp [hij.1]) k (by simp)) =
+          basisIdxCongr (by simp) φ) = (b k = φ) := by
+      simp only [ComponentIdx.dropPair]
+      rw [ComponentIdx.congr_right b _ k hk, eq_iff_iff]
+      exact (basisIdxCongr _).apply_eq_iff_eq
+    simp only [hcond]
+    split_ifs with hbk
+    · congr 1
+      congr 1
+      funext m
+      simp only [ComponentIdx.dropPair, id_eq]
+      exact ComponentIdx.congr_right b _ _ (hidx m).symm
+    · rfl
+  · simp
+  · simp only [map_smul, hb]
+  · simp only [map_add, hb1, hb2]
+
+TODO "Add a lemma similar to `contrT_evalT` except with the contraction and
+  evaluation the other way around."
+
+/-!
+
+## The commutation of evaluation with products.
+
+-/
+
+TODO "Add a lemmas related to the commutation of evaluation with contraction."
+
+/-!
+
+## Other properties of evaluation
+
+-/
 /-- Evaluating the single-index basis tensor `basis ![c] (single.symm b)` at the index `x`
   yields the field element `1` if `b = x` (transported across `![c] 0 = c`) and `0` otherwise:
   evaluation of a one-index basis tensor is the Kronecker delta. -/
@@ -225,12 +343,11 @@ lemma eq_sum_evalT_zero {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
       funext i
       simp only [Pure.basisVector, Pure.permP_basisVector]
       congr
-      refine Fin.cases ?_ ?_ i
+      refine Fin.cases ?_ (fun j => ?_) i
       · simp only [ComponentIdx.prod, Equiv.coe_fn_symm_mk, Fin.cast_zero, Fin.addCases,
           ComponentIdx.single_symm_apply, basisIdxCongr_apply_apply]
         exact ComponentIdx.congr_right b 0 0 rfl
-      · intro j
-        simp only [ComponentIdx.prod, Equiv.coe_fn_symm_mk, Fin.addCases]
+      · simp only [ComponentIdx.prod, Equiv.coe_fn_symm_mk, Fin.addCases]
         rw [dif_neg (by simp)]
         simp only [eqRec_eq_cast, basisIdxCongr, Equiv.cast_apply, cast_cast]
         symm
@@ -245,6 +362,31 @@ lemma eq_sum_evalT_zero {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
     simp [Finset.smul_sum]
   · simp [Finset.sum_add_distrib]
     grind
+
+lemma ext_of_evalT {n : ℕ} {c : Fin (n + 1) → C} (t1 t2 : Tensor S c)
+    (h : ∀ i φ, evalT i φ t1 = evalT i φ t2) :
+    t1 = t2 := by
+  rw [eq_sum_evalT t1, eq_sum_evalT t2]
+  congr
+  funext i
+  rw [h]
+
+lemma ext_of_evalT_index {n : ℕ} {c : Fin (n + 1) → C} {t1 t2 : Tensor S c}
+    (i : Fin (n + 1)) (h : ∀ φ, evalT i φ t1 = evalT i φ t2) :
+    t1 = t2 := by
+  have evalT_eq : ∀ (j : Fin (n + 1)), j = i →
+      ∀ (ψ : basisIdx (c j)), evalT j ψ t1 = evalT j ψ t2 := by
+    rintro j rfl ψ; exact h ψ
+  let e : Fin (n + 1) ≃ Fin (n + 1) := Equiv.swap i (Fin.last n)
+  have h0 : IsReindexing c (c ∘ e) e := ⟨e.bijective, fun _ => rfl⟩
+  have hlast : e (Fin.last n) = i := Equiv.swap_apply_right i (Fin.last n)
+  have hperm : permT e h0 t1 = permT e h0 t2 := by
+    rw [eq_sum_evalT (permT e h0 t1), eq_sum_evalT (permT e h0 t2)]
+    congr 1
+    funext φ
+    rw [evalT_permT h0 (Fin.last n) φ t1, evalT_permT h0 (Fin.last n) φ t2,
+      evalT_eq (e (Fin.last n)) hlast]
+  rw [← sub_eq_zero, ← permT_eq_zero_iff h0, map_sub, hperm, sub_self]
 
 end Tensor
 end TensorSpecies

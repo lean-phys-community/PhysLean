@@ -17,7 +17,7 @@ In this module we define the Schwartz submodule of `SpaceDHilbertSpace`.
 
 ## ii. Key results
 
-- `schwartzSubmodule d`: Submodule of `SpaceDHilbertSpace d` consisting of the L² equivalence
+- `SchwartzSubmodule d`: Submodule of `SpaceDHilbertSpace d` consisting of the L² equivalence
   classes of Schwartz maps `𝓢(Space d, ℂ)`.
 
 ## iii. Table of contents
@@ -51,22 +51,22 @@ variable {d : ℕ}
 def schwartzIncl : 𝓢(Space d, ℂ) →L[ℂ] SpaceDHilbertSpace d := toLpCLM ℂ (E := Space d) ℂ 2
 
 /-- The submodule of `SpaceDHilbertSpace d` corresponding to Schwartz maps. -/
-abbrev schwartzSubmodule (d : ℕ) := (schwartzIncl (d := d)).range
+abbrev SchwartzSubmodule (d : ℕ) := (schwartzIncl (d := d)).range
 
 /-- The linear equivalence between the Schwartz maps `𝓢(Space d, ℂ)` and the Schwartz submodule
   of `SpaceDHilbertSpace d`. -/
-def schwartzEquiv : 𝓢(Space d, ℂ) ≃ₗ[ℂ] schwartzSubmodule d :=
+def schwartzEquiv : 𝓢(Space d, ℂ) ≃ₗ[ℂ] SchwartzSubmodule d :=
   LinearEquiv.ofInjective schwartzIncl.toLinearMap (injective_toLp (E := Space d) 2)
 
 namespace SchwartzSubmodule
 
-variable (f g : 𝓢(Space d, ℂ)) (ψ : schwartzSubmodule d)
+variable (f g : 𝓢(Space d, ℂ)) (ψ : SchwartzSubmodule d)
 
 /-!
 ## B. Coercions
 -/
 
-instance : CoeFun (schwartzSubmodule d) fun _ ↦ Space d → ℂ := ⟨fun ψ ↦ ψ.val⟩
+instance : CoeFun (SchwartzSubmodule d) fun _ ↦ Space d → ℂ := ⟨fun ψ ↦ ψ.val⟩
 
 lemma schwartzEquiv_apply_coe : ↑(schwartzEquiv f) = schwartzIncl f := by simp [schwartzEquiv]
 
@@ -84,7 +84,7 @@ lemma schwartzEquiv_ae_eq (h : schwartzEquiv f =ᵐ[volume] schwartzEquiv g) : f
 -/
 
 @[simp]
-lemma zero_eq_top : schwartzSubmodule 0 = ⊤ := by
+lemma zero_eq_top : SchwartzSubmodule 0 = ⊤ := by
   ext ψ
   simp only [LinearMap.mem_range, ContinuousLinearMap.coe_coe, Submodule.mem_top, iff_true]
   let g : 𝓢(Space 0, ℂ) := {
@@ -104,7 +104,7 @@ lemma zero_eq_top : schwartzSubmodule 0 = ⊤ := by
   rw [← schwartzEquiv_apply_coe, hg, Space.point_dim_zero_eq x]
   rfl
 
-lemma dense (d : ℕ) : Dense (schwartzSubmodule d : Set (SpaceDHilbertSpace d)) :=
+lemma dense (d : ℕ) : Dense (SchwartzSubmodule d : Set (SpaceDHilbertSpace d)) :=
   denseRange_toLpCLM ENNReal.top_ne_ofNat.symm
 
 lemma schwartzEquiv_inner :

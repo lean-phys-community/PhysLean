@@ -177,7 +177,7 @@ lemma complexContrBasis_of_real (i : Fin 1 ⊕ Fin 3) :
 
 lemma inclCongrRealLorentz_ρ (M : SL(2, ℂ)) (v : ContrMod 3) :
     (ContrℂModule.SL2CRep M) (inclCongrRealLorentz v) =
-    inclCongrRealLorentz ((Contr 3).ρ (SL2C.toLorentzGroup M) v) := by
+    inclCongrRealLorentz (ContrMod.rep (SL2C.toLorentzGroup M) v) := by
   apply Lorentz.ContrℂModule.ext
   rw [complexContrBasis_ρ_val, inclCongrRealLorentz_val, inclCongrRealLorentz_val]
   exact LorentzGroup.toComplex_mulVec_ofReal _ _
@@ -227,7 +227,7 @@ lemma complexCoBasis_of_real (i : Fin 1 ⊕ Fin 3) :
 
 lemma inclCoRealLorentz_ρ (M : SL(2, ℂ)) (v : CoMod 3) :
     (CoℂModule.SL2CRep M) (inclCoRealLorentz v) =
-    inclCoRealLorentz ((Co 3).ρ (SL2C.toLorentzGroup M) v) := by
+    inclCoRealLorentz (CoMod.rep (SL2C.toLorentzGroup M) v) := by
   ext i
   rw [CoℂModule.SL2CRep_val, inclCoRealLorentz_val, inclCoRealLorentz_val]
   change ((LorentzGroup.toComplex (SL2C.toLorentzGroup M))⁻¹ᵀ *ᵥ

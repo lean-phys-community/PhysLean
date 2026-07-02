@@ -6,6 +6,7 @@ Authors: Nicola Bernini, Nathaneal Sajan
 module
 
 public import Physlib.SpaceAndTime.Space.Basic
+public import Mathlib.Geometry.Manifold.Diffeomorph
 /-!
 # Configuration space of the harmonic oscillator
 
@@ -26,6 +27,8 @@ chart.
   `EuclideanSpace ℝ (Fin 1)` model.
 - `ConfigurationSpace.valHomeomorphism` : the global coordinate homeomorphism underlying the
   manifold chart.
+- `ConfigurationSpace.valDiffeomorph` : the global coordinate chart as an analytic
+  diffeomorphism, upgrading `valHomeomorphism` to a smooth identification of `Q` with its model.
 - the `ChartedSpace` and `IsManifold` instances, exhibiting `Q` as a one-dimensional analytic
   manifold modeled on `EuclideanSpace ℝ (Fin 1)`.
 - `ConfigurationSpace.toSpace` : the point of physical `Space 1` determined by a
@@ -36,7 +39,8 @@ chart.
 - A. The configuration space type
 - B. Topology and coordinate homeomorphism
 - C. Smooth manifold structure
-- D. Map to physical space
+- D. The coordinate diffeomorphism
+- E. Map to physical space
 
 ## iv. References
 
@@ -160,7 +164,36 @@ instance : IsManifold 𝓘(ℝ, EuclideanSpace ℝ (Fin 1)) ω ConfigurationSpac
     exact symm_trans_mem_contDiffGroupoid valHomeomorphism.toOpenPartialHomeomorph
 
 /-!
-## D. Map to physical space
+## D. The coordinate diffeomorphism
+
+The single global chart is an analytic diffeomorphism, not merely a homeomorphism, so `Q` is
+identified with its `EuclideanSpace ℝ (Fin 1)` model as a smooth manifold. With one chart this
+is immediate: the only transition is the analytic self-transition already recorded in the
+manifold structure. This smooth identification is what lets smoothness of maps to or from `Q`
+be tested in the chosen global coordinate, the device used for trajectories and their velocities.
+-/
+
+/-- The global coordinate chart as an analytic diffeomorphism between `ConfigurationSpace` and
+its `EuclideanSpace ℝ (Fin 1)` model, upgrading `valHomeomorphism` to a smooth identification. -/
+def valDiffeomorph :
+    ConfigurationSpace ≃ₘ^ω⟮𝓘(ℝ, EuclideanSpace ℝ (Fin 1)), 𝓘(ℝ, EuclideanSpace ℝ (Fin 1))⟯
+      EuclideanSpace ℝ (Fin 1) where
+  toEquiv := valEquiv
+  contMDiff_toFun := by
+    have h := contMDiffOn_chart (I := 𝓘(ℝ, EuclideanSpace ℝ (Fin 1))) (n := ω)
+      (x := (⟨0⟩ : ConfigurationSpace))
+    rw [show (chartAt (EuclideanSpace ℝ (Fin 1)) (⟨0⟩ : ConfigurationSpace)).source = Set.univ
+        from rfl, contMDiffOn_univ] at h
+    exact h
+  contMDiff_invFun := by
+    have h := contMDiffOn_chart_symm (I := 𝓘(ℝ, EuclideanSpace ℝ (Fin 1))) (n := ω)
+      (x := (⟨0⟩ : ConfigurationSpace))
+    rw [show (chartAt (EuclideanSpace ℝ (Fin 1)) (⟨0⟩ : ConfigurationSpace)).target = Set.univ
+        from rfl, contMDiffOn_univ] at h
+    exact h
+
+/-!
+## E. Map to physical space
 
 The point of one-dimensional physical `Space 1` determined by a configuration, obtained by
 reading off the underlying coordinate. This links the abstract configuration manifold to the

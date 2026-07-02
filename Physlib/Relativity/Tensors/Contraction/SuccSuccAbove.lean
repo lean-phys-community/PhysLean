@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Data.Finset.Sort
 public import Mathlib.Data.Nat.SuccPred
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # Defining succSuccAbove
@@ -42,9 +41,12 @@ variable {n : ℕ} {c : Fin (n + 1 + 1) → C}
 
 -/
 
-TODO "Determine a way to simplify the definition of `succSuccAbove` using
-  predefined functions from Mathlib, but ensuring tactics such as `decide` still
-  work."
+/-!
+The definition below is deliberately explicit. Later lemmas identify it with
+`Finset.orderEmbOfFin` and `Finset.orderIsoOfFin`, giving a bridge to the Mathlib
+API while keeping this form convenient for computation and goals solved by
+`decide`.
+-/
 
 /-- The embedding of `Fin n` into `Fin (n + 1 + 1)` which leaves a hole
   at `i` and `j`. -/

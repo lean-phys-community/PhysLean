@@ -8,7 +8,8 @@ public import Physlib.ClassicalMechanics.EulerLagrange
 public import Physlib.ClassicalMechanics.FreeParticle.Basic
 public import Physlib.ClassicalMechanics.HamiltonsEquations
 public import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
-public import Physlib.ClassicalMechanics.HarmonicOscillator.ConfigurationSpace
+public import Physlib.ClassicalMechanics.HarmonicOscillator.Geometric.Basic
+public import Physlib.ClassicalMechanics.HarmonicOscillator.Geometric.Trajectory
 public import Physlib.ClassicalMechanics.HarmonicOscillator.Solution
 public import Physlib.ClassicalMechanics.Lagrangian.TotalDerivativeEquivalence
 public import Physlib.ClassicalMechanics.Mass.MassUnit
@@ -17,6 +18,7 @@ public import Physlib.ClassicalMechanics.Pendulum.CoplanarDoublePendulum
 public import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
 public import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
 public import Physlib.ClassicalMechanics.RigidBody.Basic
+public import Physlib.ClassicalMechanics.RigidBody.Motion
 public import Physlib.ClassicalMechanics.RigidBody.SolidSphere
 public import Physlib.ClassicalMechanics.Scattering.RigidSphere
 public import Physlib.ClassicalMechanics.Vibrations.LinearTriatomic

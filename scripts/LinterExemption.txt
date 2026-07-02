@@ -61,7 +61,6 @@ QuantumInfo/ForMathlib/Tactic/Commutes.lean
 QuantumInfo/ForMathlib/Tactic/Commutes/Attribute.lean
 QuantumInfo/ForMathlib/Unitary.lean
 QuantumInfo/Measurements/POVM.lean
-QuantumInfo/Operators/Unitary.lean
 QuantumInfo/Regularized.lean
 QuantumInfo/ResourceTheory/FreeState.lean
 QuantumInfo/ResourceTheory/HypothesisTesting.lean

@@ -460,7 +460,7 @@ lemma actionP_toComplexPure {n : ℕ} (c : Fin n → Color) (p : Pure realLorent
           = (Lorentz.ContrℂModule.SL2CRep Λ) (Lorentz.inclCongrRealLorentz p) := by
             exact congrArg (Lorentz.ContrℂModule.SL2CRep Λ)
               (toComplexVector_up_eq_inclCongrRealLorentz p)
-      _ = Lorentz.inclCongrRealLorentz ((Lorentz.Contr 3).ρ (toLorentzGroup Λ) p) := by
+      _ = Lorentz.inclCongrRealLorentz (Lorentz.ContrMod.rep (toLorentzGroup Λ) p) := by
         rw [Lorentz.inclCongrRealLorentz_ρ]
       _ = (toComplexVector Color.up) ((Lorentz.ContrMod.rep (toLorentzGroup Λ)) p) := by
         exact (toComplexVector_up_eq_inclCongrRealLorentz
@@ -471,7 +471,7 @@ lemma actionP_toComplexPure {n : ℕ} (c : Fin n → Color) (p : Pure realLorent
           = (Lorentz.CoℂModule.SL2CRep Λ) (Lorentz.inclCoRealLorentz p) := by
             exact congrArg (Lorentz.CoℂModule.SL2CRep Λ)
               (toComplexVector_down_eq_inclCoRealLorentz p)
-      _ = Lorentz.inclCoRealLorentz ((Lorentz.Co 3).ρ (toLorentzGroup Λ) p) := by
+      _ = Lorentz.inclCoRealLorentz (Lorentz.CoMod.rep (toLorentzGroup Λ) p) := by
         rw [Lorentz.inclCoRealLorentz_ρ]
       _ = (toComplexVector Color.down) ((Lorentz.CoMod.rep (toLorentzGroup Λ)) p) := by
         exact (toComplexVector_down_eq_inclCoRealLorentz

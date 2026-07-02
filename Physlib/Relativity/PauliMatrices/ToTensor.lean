@@ -245,7 +245,6 @@ lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
   rw [pauliCo]
   rw [permT_basis_repr_symm_apply]
   rw [contrT_basis_repr_apply]
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     enter [2, x]
     rw [contr_basis_ratComplexNum]
@@ -275,7 +274,6 @@ lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
   rw [pauliCoDown]
   rw [permT_basis_repr_symm_apply]
   rw [contrT_basis_repr_apply]
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     enter [2, x]
     rw [contr_basis_ratComplexNum]
@@ -317,7 +315,6 @@ lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
   rw [pauliContrDown]
   rw [permT_basis_repr_symm_apply]
   rw [contrT_basis_repr_apply]
-  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     enter [2, x]
     rw [contr_basis_ratComplexNum]
@@ -353,9 +350,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `pauliCo` is invariant under the action of `SL(2,ℂ)`. -/
 lemma smul_pauliCo (g : SL(2,ℂ)) : g • pauliCo = pauliCo := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant]
-  simp only [Tensorial.self_toTensor_apply]
   rw [toTensor_smul_eq_self, actionT_coMetric]
-  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 set_option maxRecDepth 2000 in
@@ -363,17 +358,13 @@ set_option maxRecDepth 2000 in
 lemma smul_pauliCoDown (g : SL(2,ℂ)) : g • pauliCoDown = pauliCoDown := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant,
     ← contrT_equivariant, ← prodT_equivariant]
-  simp only [Tensorial.self_toTensor_apply]
   rw [smul_pauliCo, actionT_dualLeftMetric, actionT_dualRightMetric]
-  rfl
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The tensor `pauliContrDown` is invariant under the action of `SL(2,ℂ)`. -/
 lemma smul_pauliContrDown (g : SL(2,ℂ)) : g • pauliContrDown = pauliContrDown := by
   rw [← permT_equivariant, ← contrT_equivariant, ← prodT_equivariant,
     ← contrT_equivariant, ← prodT_equivariant]
-  simp only [Tensorial.self_toTensor_apply]
   rw [toTensor_smul_eq_self, actionT_dualLeftMetric, actionT_dualRightMetric]
-  rfl
 
 end PauliMatrix

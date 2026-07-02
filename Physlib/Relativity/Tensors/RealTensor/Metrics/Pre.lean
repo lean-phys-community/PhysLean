@@ -20,7 +20,7 @@ open Module Matrix MatrixGroups Complex TensorProduct CategoryTheory.MonoidalCat
 namespace Lorentz
 open scoped TensorProduct
 
-/-- The metric `ηᵃᵃ` as an element of `(Contr d ⊗ Contr d).V`. -/
+/-- The metric `ηᵃᵃ` as an element of `(ContrMod d ⊗[ℝ] ContrMod d)`. -/
 def preContrMetricVal (d : ℕ := 3) : ContrMod d ⊗[ℝ] ContrMod d :=
   contrContrToMatrixRe.symm ((@minkowskiMatrix d))
 
@@ -39,7 +39,7 @@ lemma preContrMetricVal_expand_tmul {d : ℕ} : preContrMetricVal d =
     sub_eq_add_neg]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The metric `ηᵃᵃ` as a morphism `𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ Contr d ⊗ Contr d`,
+/-- The metric `ηᵃᵃ` as a morphism `𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ ContrMod.rep ⊗ ContrMod.rep`,
   making its invariance under the action of `LorentzGroup d`. -/
 def preContrMetric (d : ℕ := 3) :
     (Representation.trivial ℝ (LorentzGroup d) ℝ).IntertwiningMap
@@ -51,7 +51,7 @@ def preContrMetric (d : ℕ := 3) :
     refine LinearMap.ext fun x : ℝ => ?_
     simp only [LinearMap.coe_comp, Function.comp_apply]
     change x • (preContrMetricVal d) =
-      (TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M)) (x • (preContrMetricVal d))
+      (TensorProduct.map (ContrMod.rep M) (ContrMod.rep M)) (x • (preContrMetricVal d))
     simp only [map_smul]
     apply congrArg
     simp only [preContrMetricVal]
@@ -63,8 +63,8 @@ def preContrMetric (d : ℕ := 3) :
 lemma preContrMetric_apply_one {d : ℕ} : (preContrMetric d) (1 : ℝ) = preContrMetricVal d :=
   one_smul ℝ _
 
-/-- The metric `ηᵢᵢ` as an element of `(Co d ⊗ Co d).V`. -/
-def preCoMetricVal (d : ℕ := 3) : (Co d ⊗ Co d).V :=
+/-- The metric `ηᵢᵢ` as an element of `(CoMod d ⊗[ℝ] CoMod d)`. -/
+def preCoMetricVal (d : ℕ := 3) : CoMod d ⊗[ℝ] CoMod d :=
   coCoToMatrixRe.symm ((@minkowskiMatrix d))
 
 lemma preCoMetricVal_expand_tmul_minkowskiMatrix {d : ℕ} : preCoMetricVal d =
@@ -82,7 +82,7 @@ lemma preCoMetricVal_expand_tmul {d : ℕ} : preCoMetricVal d =
     sub_eq_add_neg]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The metric `ηᵢᵢ` as a morphism `𝟙_ (Rep ℂ (LorentzGroup d))) ⟶ Co d ⊗ Co d`,
+/-- The metric `ηᵢᵢ` as a morphism `𝟙_ (Rep ℂ (LorentzGroup d))) ⟶ CoMod.rep ⊗ CoMod.rep`,
   making its invariance under the action of `LorentzGroup d`. -/
 def preCoMetric (d : ℕ := 3) : (Representation.trivial ℝ (LorentzGroup d) ℝ).IntertwiningMap
     ((CoMod.rep).tprod (CoMod.rep)) where
@@ -93,7 +93,7 @@ def preCoMetric (d : ℕ := 3) : (Representation.trivial ℝ (LorentzGroup d) �
     refine LinearMap.ext fun x : ℝ => ?_
     simp only [LinearMap.coe_comp, Function.comp_apply]
     change x • preCoMetricVal d =
-      (TensorProduct.map ((Co d).ρ M) ((Co d).ρ M)) (x • preCoMetricVal d)
+      (TensorProduct.map (CoMod.rep M) (CoMod.rep M)) (x • preCoMetricVal d)
     simp only [_root_.map_smul]
     apply congrArg
     simp only [preCoMetricVal]

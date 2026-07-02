@@ -445,6 +445,9 @@ lemma potential_eq_gramVector (P : PotentialParameters) (H : TwoHiggsDoublet) :
     ∑ a, ∑ b, H.gramVector a * H.gramVector b * P.η a b := by
   rw [potential, massTerm_eq_gramVector, quarticTerm_eq_gramVector]
 
+TODO "Define a general effective potential for the two Higgs doublet model, mirroring
+  `StandardModel.HiggsField.EffectivePotential`"
+
 /-!
 
 ## E. Stability of the potential

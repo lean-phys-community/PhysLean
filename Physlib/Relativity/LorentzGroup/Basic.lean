@@ -10,6 +10,7 @@ public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.Topology.Instances.Matrix
 public import Mathlib.Topology.Maps.Basic
+public import Mathlib.Topology.Algebra.Group.ClosedSubgroup
 /-!
 # The Lorentz Group
 
@@ -329,6 +330,78 @@ lemma toGL_embedding : IsEmbedding (@toGL d).toFun where
   of a topological group. -/
 instance : IsTopologicalGroup (LorentzGroup d) :=
   IsInducing.topologicalGroup toGL toGL_embedding.toIsInducing
+
+/-!
+
+## Lorentz group as a closed subgroup of the general linear group
+
+Following the plan sketched by PrParadoxy and Joseph Tooby-Smith in physlib issue #833, we realise
+`LorentzGroup d` as a *closed* subgroup of `GL (Fin 1 ⊕ Fin d) ℝ`. This promotes the closed
+embedding into the ambient matrix space (`isClosedEmbedding_val`) to the level of the general
+linear group, and is the structural prerequisite for a Lie group structure on the Lorentz group.
+
+The remaining step of that plan, endowing `LorentzGroup d` with a Lie group structure as a closed
+subgroup of the Lie group `GL (Fin 1 ⊕ Fin d) ℝ` and thereby deriving its Lie algebra, needs the
+closed subgroup theorem (Cartan's theorem: a closed subgroup of a Lie group is an embedded Lie
+subgroup). That theorem is not yet available in Mathlib: there is no `LieSubgroup`, and no
+`ChartedSpace`/`IsManifold` instance is produced from a closed embedding (only
+`IsOpenEmbedding.singletonChartedSpace`, for open embeddings). The Lie group instance and the
+Lorentz algebra therefore remain open; see the `TODO` at the top of this file.
+
+-/
+
+/-- The range of `toGL`, as a set in `GL (Fin 1 ⊕ Fin d) ℝ`, is exactly the preimage of the
+Lorentz group under the coercion `GL (Fin 1 ⊕ Fin d) ℝ → Matrix _ _ ℝ`: an element of the general
+linear group lies in the image precisely when its underlying matrix is a Lorentz transformation. -/
+lemma range_toGL :
+    Set.range (@toGL d).toFun =
+      Units.val ⁻¹' (LorentzGroup d : Set (Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)) := by
+  ext x
+  constructor
+  · rintro ⟨A, rfl⟩
+    exact A.2
+  · intro hx
+    exact ⟨⟨x.val, hx⟩, Units.ext rfl⟩
+
+/-- The homomorphism `toGL` is a closed embedding of the Lorentz group into
+`GL (Fin 1 ⊕ Fin d) ℝ`. This strengthens `toGL_embedding`: the image is closed because it is the
+preimage, under the continuous coercion `GL (Fin 1 ⊕ Fin d) ℝ → Matrix _ _ ℝ`, of the closed set
+`LorentzGroup d` (`LorentzGroup.isClosed`). -/
+lemma toGL_isClosedEmbedding : Topology.IsClosedEmbedding (@toGL d).toFun where
+  toIsEmbedding := toGL_embedding
+  isClosed_range := by
+    rw [range_toGL]
+    exact (isClosed d).preimage Units.continuous_val
+
+/-- The Lorentz group realised as a subgroup of `GL (Fin 1 ⊕ Fin d) ℝ`, namely the range of the
+embedding `toGL`. -/
+def toGLSubgroup (d : ℕ) : Subgroup (GL (Fin 1 ⊕ Fin d) ℝ) := (@toGL d).range
+
+@[simp]
+lemma mem_toGLSubgroup {x : GL (Fin 1 ⊕ Fin d) ℝ} :
+    x ∈ toGLSubgroup d ↔
+      (x : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) ∈ LorentzGroup d := by
+  constructor
+  · rintro ⟨A, rfl⟩
+    exact A.2
+  · intro hx
+    exact ⟨⟨x.val, hx⟩, Units.ext rfl⟩
+
+lemma coe_toGLSubgroup :
+    (toGLSubgroup d : Set (GL (Fin 1 ⊕ Fin d) ℝ)) =
+      Units.val ⁻¹' (LorentzGroup d : Set (Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)) :=
+  range_toGL
+
+/-- The Lorentz group realised as a *closed* subgroup of `GL (Fin 1 ⊕ Fin d) ℝ`. The closedness is
+exactly the content of `toGL_isClosedEmbedding`, and is the hypothesis that the (not-yet-formalised)
+closed subgroup theorem would consume to produce a Lie group structure. -/
+def toClosedSubgroup (d : ℕ) : ClosedSubgroup (GL (Fin 1 ⊕ Fin d) ℝ) where
+  toSubgroup := toGLSubgroup d
+  isClosed' := by
+    rw [show (toGLSubgroup d).carrier =
+        Units.val ⁻¹' (LorentzGroup d : Set (Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)) from
+      coe_toGLSubgroup]
+    exact (isClosed d).preimage Units.continuous_val
 
 /-!
 

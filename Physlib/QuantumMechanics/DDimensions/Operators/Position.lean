@@ -177,7 +177,7 @@ lemma radiusPowLM_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space 
 
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)
-    (hψ : ψ ∈ polyBddSchwartzMap d a) (h : 0 < d + 2 * (a + s)) :
+    (hψ : ψ ∈ PolyBddSchwartzMap d a) (h : 0 < d + 2 * (a + s)) :
     MemHS (𝐫 s ψ) := by
   rcases Nat.eq_zero_or_pos d with (rfl | hd)
   · simp only [MemHS, MemLp.of_discrete]
@@ -400,20 +400,20 @@ private lemma add_floor_toNat_pos_aux (d : ℕ) (s : ℝ) :
   linarith
 
 lemma radiusPowLM_apply_polyBddSchwartz_memHS {d : ℕ} {s : ℝ}
-    (ψ : polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
+    (ψ : PolyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
     MemHS (𝐫[d] s (polyBddSchwartzEquiv.symm ψ)) :=
   let f := polyBddSchwartzEquiv.symm ψ
   radiusPowLM_apply_memHS s f.1 ⌊1 - d / 2 - s⌋.toNat f.2 (add_floor_toNat_pos_aux d s)
 
 lemma radiusPowOperator_domain_ge {d : ℕ} (s : ℝ) :
-    polyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat ≤ (radiusPowOperator s).domain := by
+    PolyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat ≤ (radiusPowOperator s).domain := by
   intro ψ hψ
   let f := polyBddSchwartzEquiv.symm ⟨ψ, hψ⟩
   apply mem_mulOperator_domain_iff.mpr
-  refine memHS_of_ae (𝐫 s f.1) ?_ ?_
-  · exact radiusPowLM_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
+  refine MemHS.ae_eq (f := 𝐫 s f.1) ?_ ?_
   · filter_upwards [polyBddSchwartzEquiv_coe_ae f]
     simp_all [f]
+  · exact radiusPowLM_apply_memHS s f.1 _ f.2 (add_floor_toNat_pos_aux d s)
 
 end
 end QuantumMechanics

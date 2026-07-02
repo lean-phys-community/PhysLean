@@ -24,7 +24,11 @@ Requirements:
     done: true
     location: Physlib/Relativity/LorentzGroup/Basic.lean (lorentzGroupIsGroup)
 
-  - description: Instance as a Lie group
+  - description: Realization as a closed subgroup of GL (closed embedding toGL, toGLSubgroup, toClosedSubgroup)
+    done: true
+    location: Physlib/Relativity/LorentzGroup/Basic.lean (toGL_isClosedEmbedding, toGLSubgroup, toClosedSubgroup)
+
+  - description: Instance as a Lie group (blocked: needs Cartan's closed subgroup theorem, not yet in Mathlib)
     done: false
     location: N/A
 

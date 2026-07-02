@@ -238,17 +238,6 @@ def stringToTerm (str : String) : TermElabM Term := do
     match stx with
     | `(term| $e) => return e
 
-/-- Given two lists of indices returns the permutation between them based on `finMapToEquiv`. -/
-def getPermutationTerm (l1 l2 : List (TSyntax `indexExpr)) : TermElabM Term := do
-  let lPerm ← getPermutation l1 l2
-  -- let l2Perm ← getPermutation l2 l1
-  let permString := "![" ++ String.intercalate ", " (lPerm.map toString) ++ "]"
-  -- let perm2String := "![" ++ String.intercalate ", " (l2Perm.map toString) ++ "]"
-  let P1 ← stringToTerm permString
-  -- let P2 ← stringToTerm perm2String
-  -- let stx := Syntax.mkApp (mkIdent ``finMapToEquiv) #[P1, P2]
-  return P1
-
 /-!
 
 ## Syntax for tensor expressions.
@@ -453,15 +442,47 @@ def smulTermMap (c T : Term) : Term :=
 def actionTermMap (c T : Term) : Term :=
   Syntax.mkApp (mkIdent ``HSMul.hSMul) #[c, T]
 
-/-- The syntax for a equality of tensor trees. -/
-def addTermMap (P : Term) (T1 T2 : Term) : TermElabM Term := do
-  let RHS := Syntax.mkApp (mkIdent ``Tensor.permT) #[P, (mkIdent ``IsReindexing.auto), T2]
-  return Syntax.mkApp (mkIdent ``HAdd.hAdd) #[T1, RHS]
+/-- Whether `T1` and `T2` elaborate to tensors of definitionally equal colour (equal type).
+  Used to decide whether an identity reindexing between them may be dropped: the bare,
+  un-`permT`'d term is well typed exactly when the two colours agree by `rfl`. The check
+  elaborates speculatively and restores the elaborator state afterwards. -/
+def colorsDefEq (T1 T2 : Term) : TermElabM Bool := do
+  let s ← saveState
+  try
+    let ty1 ← inferType (← elabTerm T1 none)
+    let ty2 ← inferType (← elabTerm T2 none)
+    let result ← Meta.isDefEq ty1 ty2
+    s.restore
+    return result
+  catch _ =>
+    s.restore
+    return false
 
-/-- The syntax for a equality of tensor trees. -/
-def equalTermMap (P : Term) (T1 T2 : Term) : TermElabM Term := do
-  let X2' := Syntax.mkApp (mkIdent ``Tensor.permT) #[P, (mkIdent ``IsReindexing.auto), T2]
-  return Syntax.mkApp (mkIdent ``Eq) #[T1, X2']
+/-- Wraps `T` in the reindexing `permT ![lPerm] IsReindexing.auto`. -/
+def permWrap (lPerm : List ℕ) (T : Term) : TermElabM Term := do
+  let permString := "![" ++ String.intercalate ", " (lPerm.map toString) ++ "]"
+  let P ← stringToTerm permString
+  return Syntax.mkApp (mkIdent ``Tensor.permT) #[P, mkIdent ``IsReindexing.auto, T]
+
+/-- The syntax for the addition of two tensor trees. The right-hand side is reindexed by the
+  permutation `lPerm` relating the two index lists; the reindexing is dropped only when that
+  permutation is the identity *and* the two colours already agree definitionally (so the bare
+  sum is well typed, i.e. the identity reindexing is provably trivial by `rfl`). -/
+def addTermMap (lPerm : List ℕ) (T1 T2 : Term) : TermElabM Term := do
+  if lPerm = List.range lPerm.length then
+    if ← colorsDefEq T1 T2 then
+      return Syntax.mkApp (mkIdent ``HAdd.hAdd) #[T1, T2]
+  return Syntax.mkApp (mkIdent ``HAdd.hAdd) #[T1, ← permWrap lPerm T2]
+
+/-- The syntax for an equality of two tensor trees. The right-hand side is reindexed by the
+  permutation `lPerm` relating the two index lists; the reindexing is dropped only when that
+  permutation is the identity *and* the two colours already agree definitionally (so the bare
+  equality is well typed, i.e. the identity reindexing is provably trivial by `rfl`). -/
+def equalTermMap (lPerm : List ℕ) (T1 T2 : Term) : TermElabM Term := do
+  if lPerm = List.range lPerm.length then
+    if ← colorsDefEq T1 T2 then
+      return Syntax.mkApp (mkIdent ``Eq) #[T1, T2]
+  return Syntax.mkApp (mkIdent ``Eq) #[T1, ← permWrap lPerm T2]
 
 /-!
 
@@ -499,14 +520,14 @@ partial def syntaxFull (stx : Syntax) : TermElabM Term := do
   | `(tensorExpr| $a + $b) => do
       let indicesLeft ← getIndicesLeft stx
       let indicesRight ← getIndicesRight stx
-      let permSyntax ← getPermutationTerm indicesLeft indicesRight
-      let addSyntax ← addTermMap permSyntax (← syntaxFull a) (← syntaxFull b)
+      let lPerm ← getPermutation indicesLeft indicesRight
+      let addSyntax ← addTermMap lPerm (← syntaxFull a) (← syntaxFull b)
       return addSyntax
   | `(tensorExpr| $a:tensorExpr = $b:tensorExpr) => do
       let indicesLeft ← getIndicesLeftEq stx
       let indicesRight ← getIndicesRightEq stx
-      let permSyntax ← getPermutationTerm indicesLeft indicesRight
-      let equalSyntax ← equalTermMap permSyntax (← syntaxFull a) (← syntaxFull b)
+      let lPerm ← getPermutation indicesLeft indicesRight
+      let equalSyntax ← equalTermMap lPerm (← syntaxFull a) (← syntaxFull b)
       return equalSyntax
   | _ =>
     throwError "Unsupported tensor expression syntax in elaborateTensorNode: {stx}"
@@ -517,12 +538,26 @@ partial def syntaxFull (stx : Syntax) : TermElabM Term := do
 
 -/
 
+/-- Removes redundant `Tensorial.toTensor` coercions from an elaborated tensor expression:
+  every subterm `Tensorial.toTensor t` whose `Tensorial` instance is the canonical instance
+  on `S.Tensor c` (`Tensorial.self`) is replaced by `t` itself, since there the coercion is
+  the identity. Coercions coming from genuine tensorial instances (e.g. on Lorentz vectors)
+  carry real information and are left untouched. -/
+def stripToTensorSelf (e : Expr) : Expr :=
+  e.replace fun s => do
+    guard (s.isAppOf ``DFunLike.coe)
+    guard (s.getAppNumArgs ≥ 2)
+    let f := s.appFn!.appArg!
+    guard (f.isAppOf ``Tensorial.toTensor)
+    guard (f.appArg!.isAppOf ``Tensorial.self)
+    return s.appArg!
+
 /-- Takes a syntax corresponding to a tensor expression and turns it into an
-  expression corresponding to a tensor tree. -/
+  expression corresponding to a tensor tree. The redundant `Tensorial.toTensor` coercions
+  inserted for bare `S.Tensor` terms are removed via `stripToTensorSelf`. -/
 def elaborateTensorNode (stx : Syntax) : TermElabM Expr := do
   let tensorExpr ← elabTerm (← syntaxFull stx) none
-  -- println! (← syntaxFull stx)
-  return tensorExpr
+  return stripToTensorSelf (← instantiateMVars tensorExpr)
 
 /-- The tensor tree corresponding to a tensor expression. -/
 syntax (name := tensorExprSyntax) "{" tensorExpr "}ᵀ" : term
@@ -531,30 +566,91 @@ elab_rules (kind:=tensorExprSyntax) : term
   | `(term| {$e:tensorExpr}ᵀ) => do
     let tensorTree ← elaborateTensorNode e
     return tensorTree
+
 /-!
 
 ## Test cases
 
--/
-/-
-open Tensor
-
-variable {k : Type} [CommRing k] {C G : Type} [Group G] {S : TensorSpecies k C G}
-  {c : Fin (Nat.succ (Nat.succ 0)) → C} {t : S.Tensor c}
-  {c1 c2 : C}
-  {t2 : S.Tensor ![c1, c2]}
-  {t3 : S.Tensor ![S.τ c1, S.τ c2]}
-  {t4 : S.Tensor ![c1, c2]}
-  {t5 : S.Tensor ![S.τ c1, S.τ c2]}
-
-#synth Tensorial S ![c1, c2] (S.Tensor ![c1, c2])
-def x := Tensorial.toTensor t
-
-#check {t | α β }ᵀ
-
-#check {t4 | α β ⊗ t5 | α β}ᵀ
+We pin the elaboration of the `{ … }ᵀ` notation for each construct it supports: bare tensor
+nodes, a genuine `Tensorial` instance, negation, evaluation, scalar multiplication, the group
+action, products, contractions, addition and equality. Together these check that the elaborator
+inserts neither a redundant `Tensorial.toTensor` wrapper on a bare `S.Tensor` term nor an
+identity `permT` when the two sides already align, while keeping the `toTensor` coercion of a
+genuine `Tensorial` instance and a genuine `permT` for a real reindexing.
 
 -/
+section Tests
+variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
+    {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
+    {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
+    {rep : (c : C) → Representation k G (V c)} {b : (c : C) → Module.Basis (basisIdx c) k (V c)}
+    {S : TensorSpecies k C G V basisIdx rep b}
+    {c : Fin 2 → C} {t t' : S.Tensor c} (a : k) (g : G) (y : basisIdx (c 0))
+    {c1 c2 c3 : C} {u : S.Tensor ![c1, c2]} {u' : S.Tensor ![c2, c1]}
+    {w : S.Tensor ![c3]} {td : S.Tensor ![S.τ c1, S.τ c2]}
+    {M : Type} [AddCommMonoid M] [Module k M] [Tensorial S c M] (m : M)
+
+-- A bare `S.Tensor` carries no redundant `Tensorial.toTensor` wrapper.
+/-- info: t : S.Tensor c -/
+#guard_msgs in
+#check {t | α β}ᵀ
+
+-- A genuine `Tensorial` instance (here the abstract `m : M`) keeps its `toTensor` coercion.
+/-- info: Tensorial.toTensor m : S.Tensor c -/
+#guard_msgs in
+#check {m | α β}ᵀ
+
+-- Negation of a tensor expression.
+/-- info: -t : S.Tensor c -/
+#guard_msgs in
+#check {-(t | α β)}ᵀ
+
+-- Evaluation of an index at a basis value `[y]`.
+/-- info: (evalT 0 y) t : S.Tensor (c ∘ Fin.succAbove 0) -/
+#guard_msgs in
+#check {t | [y] β}ᵀ
+
+-- Scalar multiplication `•ₜ`.
+/-- info: a • t : S.Tensor c -/
+#guard_msgs in
+#check {a •ₜ t | α β}ᵀ
+
+-- Group action `•ₐ`.
+/-- info: g • t : S.Tensor c -/
+#guard_msgs in
+#check {g •ₐ t | α β}ᵀ
+
+-- Tensor product of two tensors with no shared indices.
+/-- info: (prodT u) w : S.Tensor (Fin.append ![c1, c2] ![c3]) -/
+#guard_msgs in
+#check {u | α β ⊗ w | γ}ᵀ
+
+-- Contraction of both index pairs of a product.
+/--
+info: (contrT 0 0 1 ⋯) ((contrT 2 1 3 ⋯) ((prodT u) td)) :
+  S.Tensor ((Fin.append ![c1, c2] ![S.τ c1, S.τ c2] ∘ Fin.succSuccAbove 1 3) ∘
+  Fin.succSuccAbove 0 1)
+-/
+#guard_msgs (whitespace := lax) in
+#check {u | α β ⊗ td | α β}ᵀ
+
+-- Addition with aligned indices: no redundant identity `permT` (nor `toTensor`).
+/-- info: t + t' : S.Tensor c -/
+#guard_msgs in
+#check ({t | α β + t' | α β}ᵀ)
+
+-- Equality with aligned indices: no redundant identity `permT`.
+/-- info: t = t' : Prop -/
+#guard_msgs in
+#check ({t | α β = t' | α β}ᵀ : Prop)
+
+-- Equality with reordered indices: a genuine `permT` reindexing is inserted.
+/-- info: u = (permT ![1, 0] ⋯) u' : Prop -/
+#guard_msgs in
+#check ({u | α β = u' | β α}ᵀ : Prop)
+
+end Tests
+
 end Tensor
 
 end TensorSpecies
