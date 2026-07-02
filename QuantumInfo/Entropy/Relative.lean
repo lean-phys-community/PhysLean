@@ -2106,21 +2106,6 @@ theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous f
     · simp at junk
     · exact hy
 
-/-- Joint convexity of Quantum relative entropy. We can't state this with `ConvexOn` because that requires
-an `AddCommMonoid`, which `MState`s are not. Instead we state it with `Mixable`.
-
-TODO:
- * Add the `Mixable` instance that infers from the `Coe` so that the right hand side can be written as
-`p [𝐃(ρ₁‖σ₁) ↔ 𝐃(ρ₂‖σ₂)]`
- * Define (joint) convexity as its own thing - a `ConvexOn` for `Mixable` types.
- * Maybe, more broadly, find a way to make `ConvexOn` work with the subset of `Matrix` that corresponds to `MState`.
--/
-@[sorryful]
-theorem qRelativeEnt_joint_convexity :
-  ∀ (ρ₁ ρ₂ σ₁ σ₂ : MState d), ∀ (p : Prob),
-    𝐃(p [ρ₁ ↔ ρ₂]‖p [σ₁ ↔ σ₂]) ≤ p * 𝐃(ρ₁‖σ₁) + (1 - p) * 𝐃(ρ₂‖σ₂) := by
-  sorry
-
 @[simp]
 theorem qRelEntropy_self (ρ : MState d) : 𝐃(ρ‖ρ) = 0 := by
   simp [qRelativeEnt]
