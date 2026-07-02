@@ -18,6 +18,7 @@ public import Physlib.ClassicalMechanics.Pendulum.CoplanarDoublePendulum
 public import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
 public import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
 public import Physlib.ClassicalMechanics.RigidBody.Basic
+public import Physlib.ClassicalMechanics.RigidBody.Motion
 public import Physlib.ClassicalMechanics.RigidBody.SolidSphere
 public import Physlib.ClassicalMechanics.Scattering.RigidSphere
 public import Physlib.ClassicalMechanics.Vibrations.LinearTriatomic

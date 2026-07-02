@@ -106,7 +106,7 @@ lemma kineticTerm_equivariant {d} {𝓕 : FreeSpace} (A : ElectromagneticPotenti
   conv_lhs =>
     enter [2]
     rw [toFieldStrength_equivariant A Λ hf, Tensorial.toTensor_smul]
-    rw [← actionT_coMetric Λ, Tensorial.toTensor_smul]
+    rw [← actionT_coMetric Λ]
     simp only [prodT_equivariant, contrT_equivariant, toField_equivariant]
 
 /-!

@@ -170,11 +170,11 @@ lemma toFieldStrength_eq_sum_basis {d} {A : ElectromagneticPotential d}
     Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Finset.sum_const_zero]
   simp only [prod_basis_of_map_reindex Vector.basis_eq_map_tensor_basis
         Vector.basis_eq_map_tensor_basis,
-    toFieldStrength_eq_sub_tensorDeriv hA, self_toTensor_apply, ← deriv_eq_tensorDeriv _ hA,
-    map_sub, Basis.repr_reindex, Basis.map_repr, LinearEquiv.symm_symm, LinearEquiv.trans_apply,
-    LinearEquiv.apply_symm_apply, Finsupp.coe_sub, Pi.sub_apply, Finsupp.mapDomain_equiv_apply,
-    permT_basis_repr_symm_apply, Function.comp_apply, contrT_basis_repr_apply_eq_fin,
-    prodT_basis_repr_apply, contrMetric_repr_apply_eq_minkowskiMatrix,
+    toFieldStrength_eq_sub_tensorDeriv hA, ← deriv_eq_tensorDeriv _ hA, map_sub, Basis.repr_reindex,
+    Basis.map_repr, LinearEquiv.symm_symm, LinearEquiv.trans_apply, LinearEquiv.apply_symm_apply,
+    Finsupp.coe_sub, Pi.sub_apply, Finsupp.mapDomain_equiv_apply, permT_basis_repr_symm_apply,
+    Function.comp_apply, contrT_basis_repr_apply_eq_fin, prodT_basis_repr_apply,
+    contrMetric_repr_apply_eq_minkowskiMatrix,
     prod_tensor_basis_eq_map_reindex CoVector.basis_eq_map_tensor_basis
         Vector.basis_eq_map_tensor_basis,
     LinearEquiv.symm_apply_apply, Equiv.symm_symm, deriv_basis_repr_apply, Finset.sum_sub_distrib]
@@ -289,8 +289,7 @@ lemma toTensor_toFieldStrength_basis_repr {d} (A : ElectromagneticPotential d) (
     (Tensor.basis _).repr (Tensorial.toTensor (toFieldStrength A x)) b =
     ∑ κ, (η (b 0) κ * ∂_ κ A x (b 1) - η (b 1) κ * ∂_ κ A x (b 0)) := by
   rw [toTensor_toFieldStrength]
-  simp only [Tensorial.self_toTensor_apply, map_sub,
-    Finsupp.coe_sub, Pi.sub_apply]
+  simp only [map_sub, Finsupp.coe_sub, Pi.sub_apply]
   rw [Tensor.permT_basis_repr_symm_apply, contrT_basis_repr_apply_eq_fin]
   conv_lhs =>
     enter [1, 2, n]

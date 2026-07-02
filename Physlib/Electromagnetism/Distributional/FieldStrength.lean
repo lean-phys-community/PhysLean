@@ -99,8 +99,7 @@ lemma toTensor_fieldStrengthAux_basis_repr {d} (A : DistElectromagneticPotential
     ∑ κ, (η (b 0) κ * SpaceTime.distDeriv κ A ε (b 1) -
       η (b 1) κ * SpaceTime.distDeriv κ A ε (b 0)) := by
   rw [toTensor_fieldStrengthAux]
-  simp only [Tensorial.self_toTensor_apply, map_sub,
-    Finsupp.coe_sub, Pi.sub_apply]
+  simp only [map_sub, Finsupp.coe_sub, Pi.sub_apply]
   rw [Tensor.permT_basis_repr_symm_apply, contrT_basis_repr_apply_eq_fin]
   conv_lhs =>
     enter [1, 2, n]

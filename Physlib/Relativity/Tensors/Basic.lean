@@ -587,8 +587,8 @@ lemma Pure.permP_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   subst h2
   simp
 
-/-- Given a permutation `σ : Fin m → Fin n` of indices satisfying `IsReindexing` through `h`,
-  and a tensor `t`, `permT σ h t` is the tensor tensor permuted according to `σ`. -/
+/-- The reindexing of a tensor based on a map `σ : Fin m → Fin n` of indices
+  satisfying `IsReindexing`. -/
 noncomputable def permT {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (σ : Fin m → Fin n) (h : IsReindexing c c1 σ) : S.Tensor c →ₗ[k] S.Tensor c1 :=
   PiTensorProduct.map (fun i => LinearEquiv.cast (R := k) (M := V)

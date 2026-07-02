@@ -82,7 +82,6 @@ lemma leviCivita_basis_repr_eq_zero_of_eq
 lemma leviCivita_antisymm : {ε4 | μ ν ρ σ = - (ε4 | ν μ ρ σ)}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply, leviCivita_eq_ofInt, TensorInt.basis_repr_apply,
     map_neg, Finsupp.neg_apply, TensorInt.basis_repr_apply, ← Int.cast_neg]
   congr 1
@@ -96,7 +95,6 @@ lemma leviCivita_antisymm : {ε4 | μ ν ρ σ = - (ε4 | ν μ ρ σ)}ᵀ := by
 lemma leviCivita_antisymm_mid : {ε4 | μ ν ρ σ = - (ε4 | μ ρ ν σ)}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply, leviCivita_eq_ofInt, TensorInt.basis_repr_apply,
     map_neg, Finsupp.neg_apply, TensorInt.basis_repr_apply, ← Int.cast_neg]
   congr 1
@@ -110,7 +108,6 @@ lemma leviCivita_antisymm_mid : {ε4 | μ ν ρ σ = - (ε4 | μ ρ ν σ)}ᵀ :
 lemma leviCivita_antisymm_last : {ε4 | μ ν ρ σ = - (ε4 | μ ν σ ρ)}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [Tensorial.self_toTensor_apply]
   rw [permT_basis_repr_symm_apply, leviCivita_eq_ofInt, TensorInt.basis_repr_apply,
     map_neg, Finsupp.neg_apply, TensorInt.basis_repr_apply, ← Int.cast_neg]
   congr 1

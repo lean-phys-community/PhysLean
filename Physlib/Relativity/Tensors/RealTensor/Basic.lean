@@ -221,7 +221,7 @@ lemma contrT_eq_sum_evalT {n} {d} (c : Fin (n + 1 + 1) → Color) (i j : Fin (n 
 lemma contrT_toField {d} (c : Fin 2 → Color)
     (h : 0 ≠ 1 ∧ (realLorentzTensor d).τ (c 0) = c 1) (t : ℝT(d, c)) :
     (contrT 0 0 1 h t).toField = ∑ (μ : Fin 1 ⊕ Fin d), {t | [μ] [μ]}ᵀ.toField := by
-  rw [contrT_eq_sum_evalT, map_sum, Tensorial.self_toTensor_apply]
+  rw [contrT_eq_sum_evalT, map_sum]
   congr
   ext μ
   simp only [toField_permT]

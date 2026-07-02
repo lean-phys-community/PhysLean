@@ -25,27 +25,16 @@ namespace complexLorentzTensor
 open TensorSpecies
 open Tensor
 
-set_option backward.isDefEq.respectTransparency false in
-set_option maxHeartbeats 450000 in
 lemma antiSymm_contr_symm {A : ℂT[.up, .up]} {S : ℂT[.down, .down]}
     (hA : {A | μ ν = - (A | ν μ)}ᵀ) (hs : {S | μ ν = S | ν μ}ᵀ) :
     {A | μ ν ⊗ S | μ ν = - A | μ ν ⊗ S | μ ν}ᵀ := by
   conv_lhs =>
-    rw [hA, hs, prodT_permT_left, prodT_permT_right, permT_permT, contrT_comm, contrT_congr 0 1,
-      contrT_congr 0 3, contrT_permT,contrT_permT]
-    enter [2, 2, 2, 2]
-    rw [contrT_congr 0 1]
-    enter [2, 2]
-    rw [contrT_congr 1 3]
-  conv_lhs =>
-    enter [2, 2, 2, 2]
-    rw [contrT_permT, permT_permT]
-    enter [2, 2]
-  rw [permT_permT, permT_permT, permT_permT, permT_permT]
-  apply permT_congr
-  · decide
-  · simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, id_eq, LinearMap.map_neg,
-    LinearMap.neg_apply]
+    rw [hA, hs, prodT_permT_left, prodT_permT_right, contrT_comm, permT_permT,
+      contrT_permT, contrT_permT, permT_permT]
+  simp only[LinearMap.neg_apply, map_neg]
+  congr 1
+  apply permT_congr_eq_id
+  decide
 
 end complexLorentzTensor
 
