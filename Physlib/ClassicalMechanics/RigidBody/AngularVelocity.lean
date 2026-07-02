@@ -36,17 +36,9 @@ namespace RigidBodyMotion
 
 variable {d : ℕ}
 
-/-- The orientation of the body as a matrix-valued function of time: the underlying matrix of
-`orientation`. -/
-noncomputable def orientationMatrix (M : RigidBodyMotion d) : Time → Matrix (Fin d) (Fin d) ℝ :=
-  fun s => (M.orientation s).val
-
-lemma orientationMatrix_apply (M : RigidBodyMotion d) (t : Time) :
-    M.orientationMatrix t = (M.orientation t).val := rfl
-
 /-- The orientation matrix is special orthogonal, so `R Rᵀ = 1`. -/
-lemma orientationMatrix_mul_transpose (M : RigidBodyMotion d) (t : Time) :
-    M.orientationMatrix t * (M.orientationMatrix t)ᵀ = 1 :=
+lemma orientation_mul_transpose (M : RigidBodyMotion d) (t : Time) :
+    (M.orientation t).1 * ((M.orientation t).1)ᵀ = 1 :=
   (mem_orthogonalGroup_iff (Fin d) ℝ).mp
     (mem_specialOrthogonalGroup_iff.mp (M.orientation t).2).1
 
@@ -55,29 +47,28 @@ lemma orientationMatrix_mul_transpose (M : RigidBodyMotion d) (t : Time) :
 `v = V + Ω × r` of the velocity of a point of the body. -/
 noncomputable def angularVelocityTensor (M : RigidBodyMotion d) (t : Time) :
     Matrix (Fin d) (Fin d) ℝ :=
-  ∂ₜ M.orientationMatrix t * (M.orientationMatrix t)ᵀ
+  ∂ₜ (fun s => (M.orientation s).1) t * ((M.orientation t).1)ᵀ
 
 lemma angularVelocityTensor_eq (M : RigidBodyMotion d) (t : Time) :
-    M.angularVelocityTensor t = ∂ₜ M.orientationMatrix t * (M.orientationMatrix t)ᵀ := rfl
+    M.angularVelocityTensor t = ∂ₜ (fun s => (M.orientation s).1) t * ((M.orientation t).1)ᵀ :=
+  rfl
 
 /-- The angular velocity tensor is skew-symmetric, `Ωᵀ = -Ω`: it lies in the Lie algebra `𝔰𝔬(d)`.
 This is the litmus check that `Ω = Ṙ Rᵀ` is a genuine angular-velocity tensor, and follows by
 differentiating the orthogonality identity `R Rᵀ = 1`. -/
 lemma angularVelocityTensor_transpose (M : RigidBodyMotion d) (t : Time)
-    (hR : DifferentiableAt ℝ M.orientationMatrix t) :
+    (hR : DifferentiableAt ℝ (fun s => (M.orientation s).1) t) :
     (M.angularVelocityTensor t)ᵀ = - M.angularVelocityTensor t := by
-  have hconst : (fun s => M.orientationMatrix s * (M.orientationMatrix s)ᵀ)
+  have hconst : (fun s => (M.orientation s).1 * ((M.orientation s).1)ᵀ)
       = fun _ => (1 : Matrix (Fin d) (Fin d) ℝ) := by
     funext s
-    exact M.orientationMatrix_mul_transpose s
-  have hderiv0 : ∂ₜ (fun s => M.orientationMatrix s * (M.orientationMatrix s)ᵀ) t = 0 := by
+    exact M.orientation_mul_transpose s
+  have hderiv0 : ∂ₜ (fun s => (M.orientation s).1 * ((M.orientation s).1)ᵀ) t = 0 := by
     rw [hconst]
     exact Time.deriv_const 1
-  have hRt : DifferentiableAt ℝ (fun s => (M.orientationMatrix s)ᵀ) t :=
-    Matrix.transposeCLM.differentiableAt.comp t hR
-  have hprod :=
-    Time.deriv_matrix_mul M.orientationMatrix (fun s => (M.orientationMatrix s)ᵀ) t hR hRt
-  rw [Time.deriv_matrix_transpose M.orientationMatrix t hR, hderiv0] at hprod
+  have hprod := Time.deriv_matrix_mul (fun s => (M.orientation s).1)
+    (fun s => ((M.orientation s).1)ᵀ) t hR hR.matrix_transpose
+  rw [Time.deriv_matrix_transpose (fun s => (M.orientation s).1) t hR, hderiv0] at hprod
   rw [angularVelocityTensor, transpose_mul, transpose_transpose]
   exact eq_neg_of_add_eq_zero_left hprod.symm
 
@@ -86,9 +77,9 @@ lemma angularVelocityTensor_of_orientation_const (M : RigidBodyMotion d)
     (R : Matrix.specialOrthogonalGroup (Fin d) ℝ) (h : M.orientation = fun _ => R) :
     M.angularVelocityTensor = 0 := by
   funext t
-  have hconst : M.orientationMatrix = fun _ => R.val := by
+  have hconst : (fun s => (M.orientation s).1) = fun _ => R.1 := by
     funext s
-    rw [orientationMatrix_apply, h]
+    rw [h]
   rw [angularVelocityTensor_eq, hconst, Time.deriv_eq]
   simp
 
