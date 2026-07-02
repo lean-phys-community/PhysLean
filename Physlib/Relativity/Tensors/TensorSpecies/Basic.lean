@@ -88,6 +88,11 @@ def basisIdxCongr {c c1 : C} (h : c = c1) :
 lemma basisIdxCongr_rfl (c : C) (i : basisIdx c) :
     basisIdxCongr (Eq.refl c) i = i := rfl
 
+lemma basisIdxCongr_symm {c c1 : C} (h : c = c1) (i : basisIdx c1) :
+    (basisIdxCongr h).symm i = basisIdxCongr h.symm i := by
+  subst h
+  rfl
+
 @[simp]
 lemma basisIdxCongr_apply_apply {c c1 c2 : C} (h1 : c = c1) (h2 : c1 = c2) (i : basisIdx c) :
     basisIdxCongr h2 (basisIdxCongr h1 i) = basisIdxCongr (by simp [h1, h2]) i := by

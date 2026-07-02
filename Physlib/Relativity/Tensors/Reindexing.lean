@@ -421,6 +421,25 @@ lemma succAbove_succSuccAbove_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1) → C}
     val_succ, apply_ite Fin.val, apply_dite Fin.val]
   grind (splits := 60)
 
+lemma succSuccAbove_succAbove_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1) → C}
+    (k : Fin (n + 1)) (i j : Fin (n + 1 + 1 + 1)) :
+    -- The corresponding position of k in the full list.
+    let k' := Fin.succSuccAbove i j k
+    let k'' := Fin.predAbove 0 k'
+    -- The position of i after removing k'
+    let i' := k''.predAbove i
+    -- The position of j after removing k'
+    let j' := k''.predAbove j
+    IsReindexing ((c ∘ k'.succAbove) ∘ i'.succSuccAbove j')
+      ((c ∘ i.succSuccAbove j) ∘ k.succAbove) id := by
+  refine ⟨Function.bijective_id, fun m => ?_⟩
+  simp only [id_eq, Function.comp_apply]
+  congr 1
+  apply Fin.val_injective
+  simp only [Fin.succSuccAbove, Fin.succAbove, lt_def, val_castSucc,
+    val_succ, apply_ite Fin.val, apply_dite Fin.val, Fin.predAbove, Fin.castPred]
+  grind (splits := 60)
+
 /-- Removing two single entries from `c` in either order gives the same colour list:
   removing the `k1`-th entry and then the (shifted) `k2`-th entry matches removing the
   `k2`-th entry first and then the (shifted) `k1`-th entry, via the identity permutation.

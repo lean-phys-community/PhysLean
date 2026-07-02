@@ -9,6 +9,7 @@ public import Physlib.Mathematics.InnerProductSpace.Basic
 public import Mathlib.Analysis.InnerProductSpace.Dual
 public import Physlib.SpaceAndTime.Time.Derivatives
 public import Mathlib.Analysis.Calculus.ContDiff.CPolynomial
+public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
 /-!
 
 # Equivalent Lagrangians under Total Derivatives
@@ -188,10 +189,121 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
     · exact hFdif
     · exact hq_ContDiff
 
+/--
+Elementary fact: if δL is a time derivative, then so is -δL.
+-/
+lemma isTotalTimeDerivative_neg {δL : Time → X → X → ℝ} (h :  IsTotalTimeDerivative δL) :
+    IsTotalTimeDerivative (- δL) := by
+    rcases h with ⟨F, h_ContDiff, hF⟩
+    set F_neg := (fun t q => - F t q)
+    use F_neg
+    have h_neg_F_ContDiff : ContDiff ℝ ∞ ↿F_neg := by
+      fun_prop
+    use  h_neg_F_ContDiff
+    intro t q hq
+    simp only [Pi.neg_apply]
+    rw [hF t q hq]
+    unfold F_neg
+    unfold Time.deriv
+    simp only [fderiv_fun_neg, _root_.neg_apply]
+
+/-!
+## B. Total time derivative do not affect the physical content
+  The total time derivative does not affect the Euler-Lagrange equations, because its variational
+  derivative is zero:
+  ∫d/dt F(t, q)= F(t₁,q₁) - F(t₀,q₀)
+  is fixed by the boundary conditions.
+-/
+
+
+ /--
+Total time derivative has a variational derivative, which is zero
+ -/
+lemma totalTimeDerivative_hasZeroVarGradient [CompleteSpace X] {δL : Time → X → X → ℝ}
+    (h : IsTotalTimeDerivative δL) (q : Time → X) (hq : ContDiff ℝ ∞ q):
+     HasVarGradientAt (fun q' t => δL t (q' t) (∂ₜ q' t)) (fun _ => 0) q := by
+  rcases h with ⟨F,hF_contDiff, hF⟩
+  let traj_deriv := fun (G : Time → ℝ) t => fderiv ℝ G t 1
+  let F_traj := fun (q : Time → X) t => F t (q t)
+  apply HasVarGradientAt.intro _
+  · apply HasVarAdjDerivAt.congr (F := fun q' => traj_deriv (F_traj q'))
+    · apply HasVarAdjDerivAt.comp (F := traj_deriv) (G := F_traj)
+      · apply HasVarAdjDerivAt.fderiv
+        fun_prop
+      · apply HasVarAdjDerivAt.fmap (f := fun t => F t)
+        · exact hq
+        · fun_prop
+        · intro t x
+          apply DifferentiableAt.hasAdjFDerivAt
+          apply Differentiable.differentiableAt
+          apply ContDiff.differentiable
+          fun_prop
+          decide
+    · intro q' hq'
+      funext t'
+      rw [hF t' q' hq']
+      rfl
+  funext t
+  unfold adjFDeriv
+  simp [adjoint_eq_clm_adjoint]
+
+/--
+If two lagrangians, L and L', differ by a total time derivative, and L has a variational derivative
+grad, then so does L'.
+ -/
+lemma totalTimeDerivative_hasVarGradientAt_equivalence [CompleteSpace X] (L δL : Time → X → X → ℝ)
+    (hδL : IsTotalTimeDerivative δL)
+    (q : Time → X)    (hq : ContDiff ℝ ∞ q) (grad : Time → X)
+    (hgrad :  HasVarGradientAt (fun q' t => L t (q' t) (fderiv ℝ  q' t 1)) grad q) :
+    HasVarGradientAt (fun q' t => (L + δL) t (q' t) (fderiv ℝ q' t 1)) grad q := by
+  have h_add_zero : grad = grad + (fun _ => 0) := by
+    funext t
+    simp
+  rw [h_add_zero]
+  apply HasVarGradientAt.add
+  · exact hgrad
+  · exact totalTimeDerivative_hasZeroVarGradient hδL q hq
+
+
+/-
+Reformulation of the previous result:
+If two lagrangians, L and L', differ by a total time derivative, their variational time derivatives
+coincide (or neither of them has a variational derivative).
+-/
+lemma totalTimeDerivative_varGradient_equivalenvce [CompleteSpace X] (L L' : Time → X → X → ℝ)
+    (htot : IsTotalTimeDerivative (L' - L))
+    (q : Time → X) (hq : ContDiff ℝ ∞ q):
+    (δ (q':=q), ∫ t, L' t (q' t) (fderiv ℝ q' t 1)) =
+       (δ (q':=q), ∫ t, L t (q' t) (fderiv ℝ q' t 1)) := by
+  let δL := (fun t q v => L' t q v - L t q v)
+  by_cases hL : ∃ grad, HasVarGradientAt (fun q' t => L t (q' t) (fderiv ℝ q' t 1)) grad q
+  · apply HasVarGradientAt.varGradient
+    have h_triv : L' = L + (L' - L) := by module
+    rw [h_triv]
+    apply totalTimeDerivative_hasVarGradientAt_equivalence
+    · exact htot
+    · exact hq
+    · rcases hL with ⟨grad, hgrad⟩
+      rw [ HasVarGradientAt.varGradient (fun q' t => L t (q' t) (fderiv ℝ  q' t 1)) grad q hgrad]
+      exact hgrad
+  · by_cases hL' : ∃ grad, HasVarGradientAt (fun q' t => L' t (q' t) (fderiv ℝ q' t 1)) grad q
+    · apply Eq.symm
+      apply HasVarGradientAt.varGradient
+      have h_triv : L = L' +(-(L' - L)) := by module
+      rw [h_triv]
+      apply totalTimeDerivative_hasVarGradientAt_equivalence
+      · apply isTotalTimeDerivative_neg
+        exact htot
+      · exact hq
+      · rcases hL' with ⟨grad, hgrad⟩
+        rw [HasVarGradientAt.varGradient (fun q' t => L' t (q' t) (fderiv ℝ  q' t 1)) grad q hgrad]
+        exact hgrad
+    · unfold varGradient
+      simp only [hL, hL', ↓reduceDIte]
 
 /-!
 
-## B. Velocity-Only Total Time Derivative
+## C. Velocity-Only Total Time Derivative
 
 When δL depends only on velocity (the free particle case), the condition simplifies.
 
