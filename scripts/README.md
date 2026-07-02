@@ -34,3 +34,20 @@ This linter may need running a number of times.
 - `lake exe module_doc_lint` : Checks that module documentation is laid out according to a set standard. This does not check any file in the list `./scripts/MetaPrograms/module_doc_no_lint.txt`. Slowly we will empty this list of files.
 - `lake exe spelling` : Checks the spelling of words in Physlib against a given list
   of correctly spelled words which can be found in `./scripts/MetaPrograms/spellingWords.txt`
+
+## Checking golf pull requests
+
+- `scripts/check_golf.py` : Verifies that a pull request only *golfs* proofs, i.e.
+  that no declaration statement (its signature/type) changed and only proofs and
+  definition bodies changed. Comment `/check-golf` on a PR to run it via the
+  [`check-golf`](../.github/workflows/check-golf.yml) workflow; the bot posts its
+  findings as a single PR comment and edits that same comment on subsequent runs.
+  To run it locally against two revisions:
+
+  ```
+  scripts/check_golf.py --base <merge-base> --head <head-sha>
+  ```
+
+  It parses the changed Lean files textually (no build required): comments and
+  whitespace are ignored, and `by` proof terms embedded inside a type are treated
+  as proofs (proof-irrelevant). Anonymous instances and `example`s are not tracked.

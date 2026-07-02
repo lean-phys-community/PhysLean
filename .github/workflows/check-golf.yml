@@ -1,0 +1,72 @@
+# Reacts to a `/check-golf` comment on a pull request. It verifies that the PR
+# only golfs proofs -- i.e. that no declaration *statement* (signature/type)
+# changed, only proofs and bodies -- and posts the findings as a single PR
+# comment, editing that comment in place on subsequent runs.
+#
+# The check runs on `issue_comment`, so it uses the workflow file from the
+# default branch and only parses the PR's Lean sources textually (it does not
+# build them).
+
+name: Check golf
+
+on:
+  issue_comment:
+    types: [created]
+
+# Only the permissions needed to read the repo and upsert a PR comment.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-golf:
+    name: Verify only proofs changed
+    # Run only for `/check-golf` comments posted on a pull request.
+    if: >-
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/check-golf')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acknowledge the command
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        run: |
+          gh api --method POST \
+            "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}/reactions" \
+            -f content=eyes || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve base and head revisions
+        id: refs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.issue.number }}
+        run: |
+          base_branch=$(gh pr view "$PR" --json baseRefName -q .baseRefName)
+          head_sha=$(gh pr view "$PR" --json headRefOid -q .headRefOid)
+          git fetch --no-tags origin "$base_branch"
+          git fetch --no-tags origin "pull/$PR/head:check-golf-head"
+          merge_base=$(git merge-base "origin/$base_branch" "$head_sha")
+          echo "base=$merge_base" >> "$GITHUB_OUTPUT"
+          echo "head=$head_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run check-golf and upsert the report comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/check_golf.py \
+            --base "${{ steps.refs.outputs.base }}" \
+            --head "${{ steps.refs.outputs.head }}" \
+            --repo "${{ github.repository }}" \
+            --pr "${{ github.event.issue.number }}" \
+            --post
