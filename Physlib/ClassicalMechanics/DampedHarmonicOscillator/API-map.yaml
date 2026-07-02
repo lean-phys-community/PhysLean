@@ -87,15 +87,11 @@ Requirements:
 
   - description: The API shall contain the definition of the kinetic energy.
     done: true
-    location: >
-      Inherited from Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (kineticEnergy),
-      since DampedHarmonicOscillator extends HarmonicOscillator.
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (kineticEnergy)
 
   - description: The API shall contain the definition of the potential energy.
     done: true
-    location: >
-      Inherited from Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (potentialEnergy),
-      since DampedHarmonicOscillator extends HarmonicOscillator.
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (potentialEnergy)
 
   - description: The API shall contain the definition of the Lagrangian.
     done: true
