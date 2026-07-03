@@ -289,11 +289,12 @@ lemma append_succSuccAbove_natAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   This is used for the commutation of taking a *product* of tensors
   with *contraction* of indices. -/
 lemma append_succSuccAbove_castAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
-    {c1 : Fin n1 → C} (i j : Fin (n + 1 + 1)) :
+    {c1 : Fin n1 → C} (i j : Fin (n + 1 + 1)) (hij : i ≠ j) :
     IsReindexing (Fin.append c c1 ∘ (Fin.castAdd n1 i).succSuccAbove (Fin.castAdd n1 j))
       (Fin.append (c ∘ i.succSuccAbove j) c1) (Fin.cast (by grind)) := by
   apply And.intro (finCongr (by grind)).bijective
-  simp [forall_fin_add, succSuccAbove_comm_castAdd i j, succSuccAbove_castAdd_apply_natAdd i j]
+  simp [forall_fin_add, succSuccAbove_comm_castAdd i j hij,
+    succSuccAbove_castAdd_apply_natAdd i j hij]
 
 /-- Given a reindexing of `c` by `c1` via `σ` for which the index `i` is sent to `0`,
   removing the `i`-th entry of `c1` and the first entry of `c` yields a reindexing of

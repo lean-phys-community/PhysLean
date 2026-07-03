@@ -97,7 +97,7 @@ lemma Pure.dropPair_prodP {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C}
     (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
     (p : Pure S c) (p1 : Pure S c1) :
-    (dropPair i j hij.1 p).prodP p1 = permP _ (IsReindexing.append_succSuccAbove_castAdd i j)
+    (dropPair i j hij.1 p).prodP p1 = permP _ (IsReindexing.append_succSuccAbove_castAdd i j hij.1)
     (dropPair (Fin.castAdd n1 i) (Fin.castAdd n1 j)
     (by simp_all [Fin.ext_iff]) (p.prodP p1)) := by
   ext x
@@ -109,12 +109,12 @@ lemma Pure.dropPair_prodP {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   | Sum.inl m =>
     simp only [finSumFinEquiv_apply_left]
     rw [← congr_right (p.prodP p1) _ (Fin.cast (by grind) (Fin.castAdd n1 (i.succSuccAbove j m)))
-      (by rw [Fin.succSuccAbove_comm_castAdd i j])]
+      (by rw [Fin.succSuccAbove_comm_castAdd i j hij.1])]
     simp [LinearEquiv.cast_apply]
   | Sum.inr m =>
     simp only [finSumFinEquiv_apply_right]
     rw [← congr_right (p.prodP p1) _ (Fin.cast (by grind) (Fin.natAdd (n + 1 + 1) m))
-      (by rw [Fin.succSuccAbove_castAdd_apply_natAdd i j])]
+      (by rw [Fin.succSuccAbove_castAdd_apply_natAdd i j hij.1])]
     simp [LinearEquiv.cast_apply]
 
 set_option backward.isDefEq.respectTransparency false in
