@@ -263,14 +263,13 @@ TODO "Add a lemma similar to `contrT_evalT` except with the contraction and
   index from the appended color list. -/
 lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
     (i : Fin (n1 + 1)) (x : basisIdx (c1 i)) (t : Tensor S c) (t1 : Tensor S c1) :
+    prodT t (evalT i x t1) =
     permT id (IsReindexing.append_succAbove_natAdd (n := n) (n1 := n1) i)
-      (evalT (Fin.natAdd (m := n1 + 1) n i) (basisIdxCongr (by simp) x) (prodT t t1)) =
-    prodT t (evalT i x t1) := by
-  apply Tensor.induction_on_basis (t := t)
-  · intro b
-    apply Tensor.induction_on_basis (t := t1)
-    · intro b1
-      by_cases hi : b1 i = x
+      (evalT (Fin.natAdd (m := n1 + 1) n i) (basisIdxCongr (by simp) x) (prodT t t1)) := by
+  symm
+  induction' t using Tensor.induction_on_basis with b a t ht t2 t3 ht2 ht3
+  · induction' t1 using Tensor.induction_on_basis with b1 a t ht t2 t3 ht2 ht3
+    · by_cases hi : b1 i = x
       · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) =
             basisIdxCongr (by simp) x := by
           simp [hi]
@@ -310,15 +309,11 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
         rw [evalT_basis, if_neg hi]
         simp
     · simp
-    · intro r t1 ht1
-      simp [ht1]
-    · intro t2 t3 ht2 ht3
-      simp [map_add, ht2, ht3]
+    · simp [ht]
+    · simp [map_add, ht2, ht3]
   · simp
-  · intro r t ht
-    simp [ht]
-  · intro t2 t3 ht2 ht3
-    simp [map_add, ht2, ht3]
+  · simp [ht]
+  · simp [map_add, ht2, ht3]
 
 TODO "Add a lemmas related to the commutation of evaluation with contraction."
 
