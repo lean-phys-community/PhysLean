@@ -501,12 +501,16 @@ def compare_file(path: str, base_src: Optional[str],
             # A real token-level change to the proof / defining term.
             if d.is_proof:
                 rep.proof_golfed.append(name)
-            elif mask_by_indent(b.body_raw) == mask_by_indent(d.body_raw):
-                # A definition whose data is unchanged once `by` proof blocks
-                # are masked: only its proof obligations were golfed.
-                rep.def_proof_golfed.append(name)
             else:
-                rep.def_value_changed.append(name)
+                mb, mh = mask_by_indent(b.body_raw), mask_by_indent(d.body_raw)
+                # "Data unchanged" only if the term outside `by` proof blocks is
+                # identical AND the whole body is not itself one `by` block: a
+                # `def foo := by ...` builds its *value* with tactics, so any
+                # change there may change the definition, not just a proof.
+                if mb == mh and mh != "<by>":
+                    rep.def_proof_golfed.append(name)
+                else:
+                    rep.def_value_changed.append(name)
             crammed = semi_count(d.body_raw) - semi_count(b.body_raw)
             if crammed > 0:
                 rep.semicolon_crammed.append((name, crammed))
