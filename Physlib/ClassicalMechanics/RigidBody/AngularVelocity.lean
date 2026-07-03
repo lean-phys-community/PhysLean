@@ -36,12 +36,6 @@ namespace RigidBodyMotion
 
 variable {d : ℕ}
 
-/-- The orientation matrix is special orthogonal, so `R Rᵀ = 1`. -/
-lemma orientation_mul_transpose (M : RigidBodyMotion d) (t : Time) :
-    (M.orientation t).1 * ((M.orientation t).1)ᵀ = 1 :=
-  (mem_orthogonalGroup_iff (Fin d) ℝ).mp
-    (mem_specialOrthogonalGroup_iff.mp (M.orientation t).2).1
-
 /-- The angular velocity tensor `Ω(t) = Ṙ(t) R(t)ᵀ` of a rigid body in motion, where
 `R(t) = orientation t`. It is the antisymmetric tensor `Ω` in the Landau–Lifshitz decomposition
 `v = V + Ω × r` of the velocity of a point of the body. -/

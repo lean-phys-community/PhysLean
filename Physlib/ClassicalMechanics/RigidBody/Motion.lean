@@ -26,7 +26,7 @@ a rigid motion into a translation of the centre of mass plus a rotation about it
 
 @[expose] public section
 
-open Time Manifold
+open Time Manifold Matrix
 
 /-- A motion of a rigid body in `d`-dimensional space: the body together with the inertial-frame
 trajectory of its centre of mass and its time-dependent orientation (a rotation about the centre
@@ -38,6 +38,12 @@ structure RigidBodyMotion (d : ℕ) extends RigidBody d where
   orientation : Time → Matrix.specialOrthogonalGroup (Fin d) ℝ
 
 namespace RigidBodyMotion
+
+/-- The orientation matrix is special orthogonal, so `R Rᵀ = 1`. -/
+lemma orientation_mul_transpose {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
+    (M.orientation t).1 * ((M.orientation t).1)ᵀ = 1 :=
+  (mem_orthogonalGroup_iff (Fin d) ℝ).mp
+    (mem_specialOrthogonalGroup_iff.mp (M.orientation t).2).1
 
 /-- The velocity of the centre of mass of a rigid body in motion, defined as the time-derivative
 of its centre-of-mass trajectory. This is the velocity `V` in the Landau–Lifshitz decomposition
