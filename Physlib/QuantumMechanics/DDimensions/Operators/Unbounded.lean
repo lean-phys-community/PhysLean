@@ -7,6 +7,7 @@ module
 
 public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.LinearPMap
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Unbounded operators
@@ -79,6 +80,12 @@ Results
 
 -/
 
+TODO "Prove that `IsStarNormal (T : H →ₗ.[ℂ] H)` is equivalent
+  to `T.domain = T†.domain` and `‖T x‖ = ‖T† x‖` for all `x ∈ T.domain`."
+
+TODO "Prove basic properties of `IsStarNormal (T : H →ₗ.[ℂ] H)`,
+  paralleling those for `IsSelfAdjoint (T : H →ₗ.[ℂ] H)`."
+
 @[expose] public section
 
 namespace LinearPMap
@@ -124,6 +131,8 @@ def IsEssentiallySelfAdjoint [CompleteSpace H] (T : H →ₗ.[ℂ] H) : Prop := 
 
 lemma isEssentiallySelfAdjoint_def [CompleteSpace H] :
     T.IsEssentiallySelfAdjoint ↔ IsSelfAdjoint T.closure := Iff.rfl
+
+lemma isStarNormal_def [CompleteSpace H] : IsStarNormal T ↔ T† * T = T * T† := isStarNormal_iff _
 
 /-!
 ## B. Basic properties
