@@ -298,6 +298,7 @@ public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Basic
 public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Completeness
 public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
 public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.Examples
+public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.SuddenFrequencyChange
 public import Physlib.QuantumMechanics.OneDimension.HarmonicOscillator.TISE
 public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
 public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Gaussians
