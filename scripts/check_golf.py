@@ -7,7 +7,8 @@ the binders and the type). This script compares two git revisions of the
 repository and, for every declaration in the changed Lean files, decides
 whether its statement was preserved and only the proof/body changed. For a
 definition it further distinguishes changes confined to its ``by`` proof
-blocks (data unchanged) from changes to the defining term itself. It also
+blocks (data unchanged) from changes to the defining term itself (where the
+data *may* have changed -- textually we cannot always tell). It also
 counts the trivial reshapes among the golfs: proofs where only a newline was
 removed (same tokens, fewer lines), and proofs where tactics were joined onto
 one line with a ``;`` (excluding the ``<;>`` combinator).
@@ -587,7 +588,7 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
     lines.append("| Proofs golfed (statement unchanged) | {} |".format(len(golfed)))
     lines.append("| Embedded proofs golfed (type unchanged) | {} |".format(len(embedded)))
     lines.append("| Definition proofs golfed (data unchanged) | {} |".format(len(defproof)))
-    lines.append("| **Definition values changed** (data changed, type unchanged) | {} |".format(len(defval)))
+    lines.append("| **Definition bodies changed** (data *may* have changed, type unchanged) | {} |".format(len(defval)))
     lines.append("| **Statements changed** | {} |".format(len(stmt)))
     lines.append("| Declarations added | {} |".format(len(added)))
     lines.append("| Declarations removed | {} |".format(len(removed)))
@@ -602,19 +603,25 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
     lines.append("| — total `;` tactic-joins introduced | {} |".format(cram_total))
     lines.append("")
 
-    def section(title: str, items: List[Tuple[str, str]], open_: bool) -> None:
+    def section(title: str, items: List[Tuple[str, str]], open_: bool,
+                note: str = "") -> None:
         if not items:
             return
         lines.append("<details{}><summary>{} ({})</summary>\n".format(
             " open" if open_ else "", title, len(items)))
+        if note:
+            lines.append(note + "\n")
         for path, name in sorted(items):
             lines.append("- `{}` — `{}`".format(name, path))
         lines.append("\n</details>")
         lines.append("")
 
     section("❌ Statements changed", stmt, open_=True)
-    section("🔧 Definition values changed (data changed, type unchanged)",
-            defval, open_=bool(defval and not stmt))
+    section("🔧 Definition bodies changed (data may have changed, type unchanged)",
+            defval, open_=bool(defval and not stmt),
+            note=("_The defining term outside `by` proof blocks changed, or the "
+                  "whole body is one `by` block. The data may or may not have "
+                  "actually changed — flagged for a human glance._"))
     section("✅ Proofs golfed", golfed, open_=False)
     section("✅ Embedded proofs golfed (type unchanged)", embedded, open_=False)
     section("✅ Definition proofs golfed (data unchanged)", defproof, open_=False)
@@ -640,7 +647,9 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
         "For a <code>def</code>/<code>instance</code>/<code>abbrev</code> we mask "
         "its <code>by</code> proof blocks: if only those changed it is a "
         "“definition proofs golfed” (the data is unchanged); if something "
-        "outside them changed it is a “definition value changed”. <code>;</code> "
+        "outside them changed — or the whole body is one <code>by</code> block "
+        "— it is a “definition body changed” (the data may have changed; "
+        "textually we cannot always tell). <code>;</code> "
         "counts exclude the <code>&lt;;&gt;</code> combinator.</sub>")
     return "\n".join(lines)
 
