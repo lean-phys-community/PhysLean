@@ -290,9 +290,10 @@ lemma append_succSuccAbove_natAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   with *contraction* of indices. -/
 lemma append_succSuccAbove_castAdd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
     {c1 : Fin n1 → C} (i j : Fin (n + 1 + 1)) (hij : i ≠ j) :
-    IsReindexing (Fin.append c c1 ∘ (Fin.castAdd n1 i).succSuccAbove (Fin.castAdd n1 j))
-      (Fin.append (c ∘ i.succSuccAbove j) c1) (Fin.cast (by grind)) := by
-  apply And.intro (finCongr (by grind)).bijective
+    IsReindexing (n := n + n1) (m := n + n1)
+      (Fin.append c c1 ∘ (Fin.castAdd n1 i).succSuccAbove (Fin.castAdd n1 j))
+      (Fin.append (c ∘ i.succSuccAbove j) c1) id := by
+  apply And.intro Function.bijective_id
   simp [forall_fin_add, succSuccAbove_comm_castAdd i j hij,
     succSuccAbove_castAdd_apply_natAdd i j hij]
 

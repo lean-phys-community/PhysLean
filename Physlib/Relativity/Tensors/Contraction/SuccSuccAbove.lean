@@ -251,7 +251,7 @@ lemma succSuccAbove_comm_natAdd {n n1 : ℕ}
   grind
 
 lemma succSuccAbove_comm_castAdd {n n1 : ℕ}
-    (i j : Fin (n + 1 + 1)) (hij : i ≠ j) (m : Fin n) :
+    (i j : Fin (n + 1 + 1)) (_hij : i ≠ j) (m : Fin n) :
     succSuccAbove (n := n + n1) (Fin.cast (by grind) (Fin.castAdd n1 i))
       (Fin.cast (by grind) (Fin.castAdd n1 j)) (Fin.castAdd n1 m) =
     Fin.cast (by grind) (Fin.castAdd n1 (succSuccAbove i j m)) := by
