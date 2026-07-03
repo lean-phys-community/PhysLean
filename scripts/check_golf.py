@@ -5,7 +5,9 @@ A "golf" changes the *proofs* of lemmas/theorems (and the *bodies* of
 definitions) without touching their *statements* (the signature: the name,
 the binders and the type). This script compares two git revisions of the
 repository and, for every declaration in the changed Lean files, decides
-whether its statement was preserved and only the proof/body changed. It also
+whether its statement was preserved and only the proof/body changed. For a
+definition it further distinguishes changes confined to its ``by`` proof
+blocks (data unchanged) from changes to the defining term itself. It also
 counts the trivial reshapes among the golfs: proofs where only a newline was
 removed (same tokens, fewer lines), and proofs where tactics were joined onto
 one line with a ``;`` (excluding the ``<;>`` combinator).
@@ -184,6 +186,42 @@ def code_lines(fragment: str) -> List[str]:
 def semi_count(fragment: str) -> int:
     """Number of standalone `;` tactic separators (ignoring `<;>`)."""
     return len(_SEMI_RE.findall(fragment))
+
+
+_BY_RE = re.compile(r"(?<![\w'.])by(?![\w'])")
+
+
+def mask_by_indent(body: str) -> str:
+    """Collapse indentation-delimited ``by`` tactic blocks to a placeholder.
+
+    In a definition, proof *obligations* are usually discharged by ``by``
+    blocks (delimited by indentation), while the data lives outside them.
+    Masking every ``by`` block therefore leaves the data: if two versions of a
+    definition agree once their ``by`` blocks are masked, only proofs changed
+    and the definition's data is unchanged. This is a heuristic -- a proof
+    written as a term rather than ``by`` is not recognised as a proof.
+    """
+    lines = body.split("\n")
+    out: List[str] = []
+    i, n = 0, len(lines)
+    while i < n:
+        line = lines[i]
+        indent = len(line) - len(line.lstrip())
+        m = _BY_RE.search(line)
+        if m:
+            out.append(line[:m.start()] + "<by>")
+            i += 1
+            while i < n:
+                nxt = lines[i]
+                stripped = nxt.lstrip()
+                if stripped == "" or len(nxt) - len(stripped) > indent:
+                    i += 1
+                else:
+                    break
+        else:
+            out.append(line)
+            i += 1
+    return normalize("\n".join(out))
 
 
 def _ident_char(c: str) -> bool:
@@ -425,7 +463,8 @@ class FileReport:
     statement_changed: List[str] = field(default_factory=list)
     proof_golfed: List[str] = field(default_factory=list)
     embedded_proof_changed: List[str] = field(default_factory=list)
-    def_body_changed: List[str] = field(default_factory=list)
+    def_proof_golfed: List[str] = field(default_factory=list)
+    def_value_changed: List[str] = field(default_factory=list)
     added: List[str] = field(default_factory=list)
     removed: List[str] = field(default_factory=list)
     # Trivial golf shapes (subsets / refinements of the above).
@@ -435,8 +474,9 @@ class FileReport:
     @property
     def touched(self) -> bool:
         return bool(self.statement_changed or self.proof_golfed
-                    or self.embedded_proof_changed or self.def_body_changed
-                    or self.added or self.removed or self.newline_removed)
+                    or self.embedded_proof_changed or self.def_proof_golfed
+                    or self.def_value_changed or self.added or self.removed
+                    or self.newline_removed)
 
 
 def compare_file(path: str, base_src: Optional[str],
@@ -459,8 +499,14 @@ def compare_file(path: str, base_src: Optional[str],
         # Statement preserved; classify how the proof/body changed.
         if b.body != d.body:
             # A real token-level change to the proof / defining term.
-            (rep.proof_golfed if d.is_proof
-             else rep.def_body_changed).append(name)
+            if d.is_proof:
+                rep.proof_golfed.append(name)
+            elif mask_by_indent(b.body_raw) == mask_by_indent(d.body_raw):
+                # A definition whose data is unchanged once `by` proof blocks
+                # are masked: only its proof obligations were golfed.
+                rep.def_proof_golfed.append(name)
+            else:
+                rep.def_value_changed.append(name)
             crammed = semi_count(d.body_raw) - semi_count(b.body_raw)
             if crammed > 0:
                 rep.semicolon_crammed.append((name, crammed))
@@ -507,7 +553,8 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
     stmt = [(r.path, n) for r in reports for n in r.statement_changed]
     golfed = [(r.path, n) for r in reports for n in r.proof_golfed]
     embedded = [(r.path, n) for r in reports for n in r.embedded_proof_changed]
-    defbody = [(r.path, n) for r in reports for n in r.def_body_changed]
+    defproof = [(r.path, n) for r in reports for n in r.def_proof_golfed]
+    defval = [(r.path, n) for r in reports for n in r.def_value_changed]
     added = [(r.path, n) for r in reports for n in r.added]
     removed = [(r.path, n) for r in reports for n in r.removed]
     newline = [(r.path, n) for r in reports for n in r.newline_removed]
@@ -523,7 +570,7 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
         lines.append("**Result: ❌ Statements changed.** {} declaration(s) "
                      "changed their statement — this is more than a golf. See "
                      "below.".format(len(stmt)))
-    elif golfed or embedded or defbody or newline:
+    elif golfed or embedded or defproof or defval or newline:
         lines.append("**Result: ✅ Statements preserved.** Every changed "
                      "declaration kept its statement; only proofs / bodies "
                      "changed.")
@@ -534,9 +581,10 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
     lines.append("| Category | Count |")
     lines.append("|---|---:|")
     lines.append("| Proofs golfed (statement unchanged) | {} |".format(len(golfed)))
-    lines.append("| Statements changed | {} |".format(len(stmt)))
     lines.append("| Embedded proofs golfed (type unchanged) | {} |".format(len(embedded)))
-    lines.append("| Definition values changed (type unchanged) | {} |".format(len(defbody)))
+    lines.append("| Definition proofs golfed (data unchanged) | {} |".format(len(defproof)))
+    lines.append("| **Definition values changed** (data changed, type unchanged) | {} |".format(len(defval)))
+    lines.append("| **Statements changed** | {} |".format(len(stmt)))
     lines.append("| Declarations added | {} |".format(len(added)))
     lines.append("| Declarations removed | {} |".format(len(removed)))
     lines.append("")
@@ -561,9 +609,11 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
         lines.append("")
 
     section("❌ Statements changed", stmt, open_=True)
+    section("🔧 Definition values changed (data changed, type unchanged)",
+            defval, open_=bool(defval and not stmt))
     section("✅ Proofs golfed", golfed, open_=False)
     section("✅ Embedded proofs golfed (type unchanged)", embedded, open_=False)
-    section("🔧 Definition values changed (type unchanged)", defbody, open_=False)
+    section("✅ Definition proofs golfed (data unchanged)", defproof, open_=False)
     section("↩️ Only a newline removed (tokens unchanged)", newline, open_=False)
     section("➕ Declarations added", added, open_=False)
     section("➖ Declarations removed", removed, open_=False)
@@ -583,10 +633,11 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
         "and whitespace are ignored, and <code>by</code> proof terms embedded "
         "in a type are treated as proofs (proof-irrelevant). Anonymous "
         "instances and <code>example</code>s are not tracked (no stable name). "
-        "A “definition value changed” is a <code>def</code>/<code>instance</code>"
-        "/<code>abbrev</code> whose type is unchanged but whose defining term "
-        "changed. <code>;</code> counts exclude the <code>&lt;;&gt;</code> "
-        "combinator.</sub>")
+        "For a <code>def</code>/<code>instance</code>/<code>abbrev</code> we mask "
+        "its <code>by</code> proof blocks: if only those changed it is a "
+        "“definition proofs golfed” (the data is unchanged); if something "
+        "outside them changed it is a “definition value changed”. <code>;</code> "
+        "counts exclude the <code>&lt;;&gt;</code> combinator.</sub>")
     return "\n".join(lines)
 
 
