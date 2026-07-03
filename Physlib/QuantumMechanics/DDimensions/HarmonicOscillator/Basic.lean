@@ -31,5 +31,5 @@ TODO "Determine the spectrum of the quantum harmonic oscillator in terms of the 
 TODO "Determine the energy eigenstates of the quantum harmonic oscillator
   in the 'Cartesian basis' in terms of Hermite polynomials."
 
-TODO "Determine the energy eigenstates of the quantum harmonic oscillator
+TODO "Determine the energy eigenstates of the isotropic quantum harmonic oscillator
   in the 'spherical basis' in terms of spherical harmonics."

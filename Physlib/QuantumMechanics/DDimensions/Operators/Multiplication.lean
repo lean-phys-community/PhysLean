@@ -343,10 +343,10 @@ lemma mulOperator_compRestricted_eq (f : Space d → ℂ) {g : Space d → ℂ} 
 ## F. Spectrum
 -/
 
-TODO "Prove that the spectrum of the multiplication operators `𝓜 f`
+TODO "Prove that the spectrum of the multiplication operator `𝓜 f`
   is the 'essential range' of `f`."
 
-TODO "Prove that the spectrum of the multiplication operators `𝓜 f`
+TODO "Prove that the spectrum of the multiplication operator `𝓜 f`
   is the closure of `f.range` for continuous `f`."
 
 end
