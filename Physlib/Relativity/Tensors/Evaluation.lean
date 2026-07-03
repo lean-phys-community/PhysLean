@@ -287,7 +287,8 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
               omega
           simp only [id_eq]
           erw [ComponentIdx.congr_right (ComponentIdx.prod.symm (b, b1)) _ _ hidx]
-          simp [ComponentIdx.prod, basisIdxCongr]
+          simp only [ComponentIdx.prod_symm_castAdd]
+          erw [basisIdxCongr_apply_apply]
         · have hidx : (Fin.natAdd (m := n1 + 1) n i).succAbove
               (Fin.natAdd (m := n1) n a) =
               Fin.natAdd (m := n1 + 1) n (i.succAbove a) := by
@@ -300,7 +301,8 @@ lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
             split_ifs <;> ext <;> simp [Nat.add_assoc]
           simp only [id_eq]
           erw [ComponentIdx.congr_right (ComponentIdx.prod.symm (b, b1)) _ _ hidx]
-          simp [ComponentIdx.prod, basisIdxCongr]
+          simp only [ComponentIdx.prod_symm_natAdd]
+          erw [basisIdxCongr_apply_apply]
       · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) ≠
             basisIdxCongr (by simp) x := by
           intro hprod
