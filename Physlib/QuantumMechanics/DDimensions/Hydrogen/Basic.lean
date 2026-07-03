@@ -24,6 +24,24 @@ e.g. see https://doi.org/10.1103/PhysRevA.80.032507 and https://doi.org/10.1063/
 
 -/
 
+TODO "Prove that the Hydrogen Hamiltonian is _not_ essentially self-adjoint for `d < 3`."
+
+TODO "Prove that the Hydrogen Hamiltonian is essentially self-adjoint for `d ≥ 3`."
+
+TODO "Prove that (the closure of) the Hydrogen Hamiltonian has eigenvalues (point spectrum)
+  {-½mk²ℏ⁻² / (n + ½(d - 1))² | n ∈ ℕ}. These correspond to the bound states."
+
+TODO "Prove that (the closure of) the Hydrogen Hamiltonian has continuous spectrum [0,∞).
+  These correspond to scattering states."
+
+TODO "Define the Rydberg formula and Lyman, Balmer, Paschen, etc. series."
+
+TODO "Determine the wavelengths / frequencies of the Lyman, Balmer, Paschen, etc. series."
+
+TODO "Analyze the Zeeman effect using first-order degenerate perturbation theory."
+
+TODO "Analyze the Stark effect using first-order degenerate perturbation theory."
+
 @[expose] public section
 
 namespace QuantumMechanics
