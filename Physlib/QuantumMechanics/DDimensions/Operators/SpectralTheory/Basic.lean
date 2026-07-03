@@ -85,6 +85,8 @@ Main results
 
 -/
 
+TODO "Move spectral theory definitions and lemmas over to Mathlib equivalents if/when available."
+
 @[expose] public section
 
 namespace LinearPMap
