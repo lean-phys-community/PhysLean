@@ -5,7 +5,10 @@ A "golf" changes the *proofs* of lemmas/theorems (and the *bodies* of
 definitions) without touching their *statements* (the signature: the name,
 the binders and the type). This script compares two git revisions of the
 repository and, for every declaration in the changed Lean files, decides
-whether its statement was preserved and only the proof/body changed.
+whether its statement was preserved and only the proof/body changed. It also
+counts the trivial reshapes among the golfs: proofs where only a newline was
+removed (same tokens, fewer lines), and proofs where tactics were joined onto
+one line with a ``;`` (excluding the ``<;>`` combinator).
 
 It is meant to be driven from a GitHub workflow that reacts to a
 ``/check-golf`` comment on a pull request: it produces a Markdown report and,
@@ -169,6 +172,20 @@ def normalize(fragment: str) -> str:
     return " ".join(fragment.split())
 
 
+# A standalone `;` tactic separator, i.e. not part of the `<;>` combinator.
+_SEMI_RE = re.compile(r"(?<!<);(?!>)")
+
+
+def code_lines(fragment: str) -> List[str]:
+    """Non-blank lines of a (comment-stripped) fragment, each stripped."""
+    return [line.strip() for line in fragment.split("\n") if line.strip()]
+
+
+def semi_count(fragment: str) -> int:
+    """Number of standalone `;` tactic separators (ignoring `<;>`)."""
+    return len(_SEMI_RE.findall(fragment))
+
+
 def _ident_char(c: str) -> bool:
     return c.isalnum() or c in "_.'" or ord(c) > 127
 
@@ -223,6 +240,7 @@ class Decl:
     signature: str         # normalized statement (keyword .. up to `:=`/`where`)
     signature_masked: str  # same, with embedded `by` proof blocks blanked
     body: str              # normalized defining term / proof
+    body_raw: str          # defining term / proof, comments stripped, layout kept
 
     @property
     def is_proof(self) -> bool:
@@ -382,7 +400,8 @@ def parse_decls(text: str) -> "Dict[str, Decl]":
         signature = normalize(sig_code)
         signature_masked = mask_by_blocks(sig_code)
         body_start = boundary + (2 if code[boundary:boundary + 2] == ":=" else 0)
-        body = normalize(code[body_start:end])
+        body_raw = code[body_start:end]
+        body = normalize(body_raw)
 
         prefix = ".".join(nm for kind, nm in ns_stack
                           if kind == "namespace" and nm)
@@ -393,7 +412,7 @@ def parse_decls(text: str) -> "Dict[str, Decl]":
         else:
             seen[qualified] = 0
         result[qualified] = Decl(qualified, keyword, signature,
-                                 signature_masked, body)
+                                 signature_masked, body, body_raw)
     return result
 
 
@@ -409,12 +428,15 @@ class FileReport:
     def_body_changed: List[str] = field(default_factory=list)
     added: List[str] = field(default_factory=list)
     removed: List[str] = field(default_factory=list)
+    # Trivial golf shapes (subsets / refinements of the above).
+    newline_removed: List[str] = field(default_factory=list)
+    semicolon_crammed: List[Tuple[str, int]] = field(default_factory=list)
 
     @property
     def touched(self) -> bool:
         return bool(self.statement_changed or self.proof_golfed
                     or self.embedded_proof_changed or self.def_body_changed
-                    or self.added or self.removed)
+                    or self.added or self.removed or self.newline_removed)
 
 
 def compare_file(path: str, base_src: Optional[str],
@@ -427,15 +449,25 @@ def compare_file(path: str, base_src: Optional[str],
             rep.added.append(name)
             continue
         b = base[name]
-        if b.signature == d.signature:
-            if b.body != d.body:
-                (rep.proof_golfed if d.is_proof
-                 else rep.def_body_changed).append(name)
-        elif b.signature_masked == d.signature_masked:
-            # Only embedded proof terms differ: the type is unchanged.
-            rep.embedded_proof_changed.append(name)
-        else:
-            rep.statement_changed.append(name)
+        if b.signature != d.signature:
+            if b.signature_masked == d.signature_masked:
+                # Only embedded proof terms differ: the type is unchanged.
+                rep.embedded_proof_changed.append(name)
+            else:
+                rep.statement_changed.append(name)
+            continue
+        # Statement preserved; classify how the proof/body changed.
+        if b.body != d.body:
+            # A real token-level change to the proof / defining term.
+            (rep.proof_golfed if d.is_proof
+             else rep.def_body_changed).append(name)
+            crammed = semi_count(d.body_raw) - semi_count(b.body_raw)
+            if crammed > 0:
+                rep.semicolon_crammed.append((name, crammed))
+        elif len(code_lines(b.body_raw)) > len(code_lines(d.body_raw)):
+            # Same tokens, fewer lines: the proof was only reflowed (a newline
+            # was deleted) without joining tactics with `;`.
+            rep.newline_removed.append(name)
     for name in base:
         if name not in head:
             rep.removed.append(name)
@@ -478,6 +510,9 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
     defbody = [(r.path, n) for r in reports for n in r.def_body_changed]
     added = [(r.path, n) for r in reports for n in r.added]
     removed = [(r.path, n) for r in reports for n in r.removed]
+    newline = [(r.path, n) for r in reports for n in r.newline_removed]
+    crammed = [(r.path, n, c) for r in reports for n, c in r.semicolon_crammed]
+    cram_total = sum(c for _, _, c in crammed)
     n_files = sum(1 for r in reports if r.touched)
 
     lines: List[str] = [COMMENT_MARKER, "## 🏌️ check-golf report", ""]
@@ -488,7 +523,7 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
         lines.append("**Result: ❌ Statements changed.** {} declaration(s) "
                      "changed their statement — this is more than a golf. See "
                      "below.".format(len(stmt)))
-    elif golfed or embedded or defbody:
+    elif golfed or embedded or defbody or newline:
         lines.append("**Result: ✅ Statements preserved.** Every changed "
                      "declaration kept its statement; only proofs / bodies "
                      "changed.")
@@ -501,9 +536,18 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
     lines.append("| Proofs golfed (statement unchanged) | {} |".format(len(golfed)))
     lines.append("| Statements changed | {} |".format(len(stmt)))
     lines.append("| Embedded proofs golfed (type unchanged) | {} |".format(len(embedded)))
-    lines.append("| Definition bodies changed (type unchanged) | {} |".format(len(defbody)))
+    lines.append("| Definition values changed (type unchanged) | {} |".format(len(defbody)))
     lines.append("| Declarations added | {} |".format(len(added)))
     lines.append("| Declarations removed | {} |".format(len(removed)))
+    lines.append("")
+    lines.append("Of the golfed proofs/bodies above, the trivial reshapes were:")
+    lines.append("")
+    lines.append("| Golf shape | Count |")
+    lines.append("|---|---:|")
+    lines.append("| Only a newline removed (proof reflowed, tokens unchanged) | {} |"
+                 .format(len(newline)))
+    lines.append("| Declarations with tactics joined by `;` | {} |".format(len(crammed)))
+    lines.append("| — total `;` tactic-joins introduced | {} |".format(cram_total))
     lines.append("")
 
     def section(title: str, items: List[Tuple[str, str]], open_: bool) -> None:
@@ -519,17 +563,30 @@ def render_report(base: str, head: str, reports: List[FileReport]) -> str:
     section("❌ Statements changed", stmt, open_=True)
     section("✅ Proofs golfed", golfed, open_=False)
     section("✅ Embedded proofs golfed (type unchanged)", embedded, open_=False)
-    section("🔧 Definition bodies changed (type unchanged)", defbody, open_=False)
+    section("🔧 Definition values changed (type unchanged)", defbody, open_=False)
+    section("↩️ Only a newline removed (tokens unchanged)", newline, open_=False)
     section("➕ Declarations added", added, open_=False)
     section("➖ Declarations removed", removed, open_=False)
+
+    if crammed:
+        lines.append("<details><summary>➡️ Tactics joined by `;` ({})</summary>\n"
+                     .format(len(crammed)))
+        for path, name, count in sorted(crammed):
+            suffix = "" if count == 1 else " (×{})".format(count)
+            lines.append("- `{}` — `{}`{}".format(name, path, suffix))
+        lines.append("\n</details>")
+        lines.append("")
 
     lines.append(
         "<sub>Generated by <code>scripts/check_golf.py</code> · triggered by "
         "<code>/check-golf</code>. Statements are compared textually: comments "
         "and whitespace are ignored, and <code>by</code> proof terms embedded "
         "in a type are treated as proofs (proof-irrelevant). Anonymous "
-        "instances and <code>example</code>s are not tracked (no stable "
-        "name).</sub>")
+        "instances and <code>example</code>s are not tracked (no stable name). "
+        "A “definition value changed” is a <code>def</code>/<code>instance</code>"
+        "/<code>abbrev</code> whose type is unchanged but whose defining term "
+        "changed. <code>;</code> counts exclude the <code>&lt;;&gt;</code> "
+        "combinator.</sub>")
     return "\n".join(lines)
 
 

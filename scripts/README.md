@@ -51,3 +51,5 @@ This linter may need running a number of times.
   It parses the changed Lean files textually (no build required): comments and
   whitespace are ignored, and `by` proof terms embedded inside a type are treated
   as proofs (proof-irrelevant). Anonymous instances and `example`s are not tracked.
+  It also breaks the golfs down by trivial shape: proofs where only a newline was
+  removed, and proofs where tactics were joined onto one line with a `;`.
