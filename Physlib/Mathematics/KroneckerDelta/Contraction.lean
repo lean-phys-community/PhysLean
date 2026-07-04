@@ -5,24 +5,24 @@ Authors: Robert Sneiderman
 -/
 module
 
-public import Physlib.Mathematics.KroneckerDelta
+public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Mathlib.LinearAlgebra.Matrix.SchurComplement
 /-!
 
 # Contraction identities for the generalized Kronecker delta
 
 This file proves the combinatorial contraction facts for the `generalizedKroneckerDelta`
-(defined in `Physlib.Mathematics.KroneckerDelta`).  Everything here is purely about the
+(defined in `Physlib.Mathematics.KroneckerDelta.Basic`).  Everything here is purely about the
 abstract generalized Kronecker delta on a finite type; no tensor or physics content appears.
 These facts are the reusable backbone of the Levi-Civita epsilon-epsilon contraction
 identities proved in `Physlib.Relativity.Tensors.LeviCivita.Contractions`.
 
 The central fact is that summing a `generalizedKroneckerDelta` over one shared index lowers
 its rank by one and multiplies it by `card α - n`
-(`KroneckerDelta.generalizedKroneckerDelta_sum_snoc`).  Iterating that fact, together with the
+(`generalizedKroneckerDelta_sum_snoc`).  Iterating that fact, together with the
 product identity
 `generalizedKroneckerDelta μ ν = generalizedKroneckerDelta μ id * generalizedKroneckerDelta ν id`
-(`KroneckerDelta.generalizedKroneckerDelta_mul`), gives the fully-, singly-, and doubly-free
+(`generalizedKroneckerDelta_mul`), gives the fully-, singly-, and doubly-free
 contractions `sum_generalizedKroneckerDelta_self`, `sum_generalizedKroneckerDelta_cons`, and
 `sum_generalizedKroneckerDelta_cons₂` over `Fin 4`.
 
@@ -95,7 +95,7 @@ private lemma det_add_rankOne {ι : Type*} [DecidableEq ι] [Fintype ι] {R : Ty
 
 end Matrix
 
-namespace KroneckerDelta
+open KroneckerDelta
 
 open Matrix
 
@@ -351,5 +351,3 @@ lemma sum_generalizedKroneckerDelta_mul_cons₂ (ρ σ τ ω : Fin 4) :
   norm_num [Finset.prod_range_succ]
 
 end Generalized
-
-end KroneckerDelta

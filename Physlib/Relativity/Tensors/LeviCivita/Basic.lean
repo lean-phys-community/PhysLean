@@ -7,7 +7,7 @@ module
 
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.OfInt
-public import Physlib.Mathematics.KroneckerDelta
+public import Physlib.Mathematics.KroneckerDelta.Basic
 /-!
 
 # The Levi-Civita tensor as a real Lorentz tensor

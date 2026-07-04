@@ -92,8 +92,8 @@ public import Physlib.Mathematics.InnerProductSpace.Adjoint
 public import Physlib.Mathematics.InnerProductSpace.Basic
 public import Physlib.Mathematics.InnerProductSpace.Calculus
 public import Physlib.Mathematics.InnerProductSpace.Submodule
-public import Physlib.Mathematics.KroneckerDelta
-public import Physlib.Mathematics.KroneckerDeltaContraction
+public import Physlib.Mathematics.KroneckerDelta.Basic
+public import Physlib.Mathematics.KroneckerDelta.Contraction
 public import Physlib.Mathematics.LinearMaps
 public import Physlib.Mathematics.LinearPMap
 public import Physlib.Mathematics.List

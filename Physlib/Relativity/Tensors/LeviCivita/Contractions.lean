@@ -6,7 +6,7 @@ Authors: Robert Sneiderman
 module
 
 public import Physlib.Relativity.Tensors.LeviCivita.Basic
-public import Physlib.Mathematics.KroneckerDeltaContraction
+public import Physlib.Mathematics.KroneckerDelta.Contraction
 /-!
 
 # Contraction identities for the Levi-Civita tensor
@@ -16,7 +16,7 @@ tensor `leviCivita` (notation `ε4`) in `d = 3`, stated in terms of the standard
 components of `ε4` itself (`realLorentzTensor.leviCivita_basis_repr_apply`).
 
 The purely combinatorial backbone — facts about the `generalizedKroneckerDelta` alone, with no
-tensor content — lives in `Physlib.Mathematics.KroneckerDeltaContraction`, next to the
+tensor content — lives in `Physlib.Mathematics.KroneckerDelta.Contraction`, next to the
 definition of `generalizedKroneckerDelta`.  Here we specialise those facts to the components of
 `ε4`:
 
@@ -54,10 +54,10 @@ namespace realLorentzTensor
 The integer Levi-Civita symbol is `generalizedKroneckerDelta f id` for `f : Fin 4 → Fin 4`, and
 `realLorentzTensor.leviCivita_basis_repr_apply` identifies it with the standard-basis component of
 `ε4` after transporting the component index along `finSumFinEquiv`.  The symbol-level value of each
-contraction now lives in `Physlib.Mathematics.KroneckerDeltaContraction`
+contraction now lives in `Physlib.Mathematics.KroneckerDelta.Contraction`
 (`sum_generalizedKroneckerDelta_mul_self`, `sum_generalizedKroneckerDelta_mul_cons`,
 `sum_generalizedKroneckerDelta_mul_cons₂`), and the `finSumFinEquiv`-invariance of the Kronecker
-delta in `Physlib.Mathematics.KroneckerDelta` (`kroneckerDelta_finSumFinEquiv`).  The one remaining
+delta in `Physlib.Mathematics.KroneckerDelta.Basic` (`kroneckerDelta_finSumFinEquiv`).  The one remaining
 private lemma here is the bookkeeping needed to switch between the component indices
 `Fin 1 ⊕ Fin 3` and the `Fin 4` labels.
 
