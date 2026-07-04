@@ -76,8 +76,7 @@ lemma toSpecies_sum_invariant (m : ℕ) (f : PermGroup n) (S : (SMCharges n).Cha
     ∑ i, ((fun a => a ^ m) ∘ toSpecies j (repCharges f S)) i =
     ∑ i, ((fun a => a ^ m) ∘ toSpecies j S) i := by
   rw [repCharges_toSpecies]
-  exact Fintype.sum_equiv (f⁻¹ j) (fun x => ((fun a => a ^ m) ∘ (toSpecies j) S ∘ ⇑(f⁻¹ j)) x)
-    (fun x => ((fun a => a ^ m) ∘ (toSpecies j) S) x) (congrFun rfl)
+  exact Equiv.sum_comp (f⁻¹ j) ((fun a => a ^ m) ∘ toSpecies j S)
 
 /-- The gravitational anomaly equations is invariant under family permutations. -/
 lemma accGrav_invariant (f : PermGroup n) (S : (SMCharges n).Charges) :
@@ -110,6 +109,6 @@ lemma accQuad_invariant (f : PermGroup n) (S : (SMCharges n).Charges) :
 /-- The cubic anomaly equation is invariant under family permutations. -/
 lemma accCube_invariant (f : PermGroup n) (S : (SMCharges n).Charges) :
     accCube (repCharges f S) = accCube S :=
-  accCube_ext (fun j => toSpecies_sum_invariant 3 f S j)
+  accCube_ext (toSpecies_sum_invariant 3 f S)
 
 end SM
