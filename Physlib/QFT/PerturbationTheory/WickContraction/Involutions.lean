@@ -82,40 +82,34 @@ lemma fromInvolution_getDual?_isSome (f : {f : Fin n → Fin n // Function.Invol
     obtain ⟨j, h⟩ := ha2.2
     rw [← h] at ha
     have hj : f.1 j ≠ j := by
-      by_contra hn
+      intro hn
       rw [hn] at h
-      rw [← h] at ha2
-      simp at ha2
+      simp [← h] at ha2
     simp only [Finset.mem_insert, Finset.mem_singleton] at ha
-    rcases ha with ha | ha
-    · subst ha
-      exact hj
-    · subst ha
-      rw [f.2]
-      exact id (Ne.symm hj)
+    rcases ha with rfl | rfl
+    · exact hj
+    · rw [f.2]
+      exact hj.symm
   · intro hi
     use ⟨{i, f.1 i}, by
       simp only [fromInvolution, Finset.mem_filter, Finset.mem_univ, exists_apply_eq_apply,
         and_true, true_and]
-      rw [Finset.card_pair (id (Ne.symm hi))]⟩
+      exact Finset.card_pair hi.symm⟩
     simp
 
 lemma fromInvolution_getDual?_eq_some (f : {f : Fin n → Fin n // Function.Involutive f}) (i : Fin n)
     (h : ((fromInvolution f).getDual? i).isSome) :
     ((fromInvolution f).getDual? i) = some (f.1 i) := by
-  rw [@getDual?_eq_some_iff_mem]
+  rw [getDual?_eq_some_iff_mem]
   simp only [fromInvolution, Finset.mem_filter, Finset.mem_univ, exists_apply_eq_apply, and_true,
     true_and]
-  apply Finset.card_pair
-  simp only [fromInvolution_getDual?_isSome, ne_eq] at h
-  exact fun a => h (id (Eq.symm a))
+  exact Finset.card_pair (Ne.symm ((fromInvolution_getDual?_isSome f i).mp h))
 
 @[simp]
 lemma fromInvolution_getDual?_get (f : {f : Fin n → Fin n // Function.Involutive f}) (i : Fin n)
     (h : ((fromInvolution f).getDual? i).isSome) :
-    ((fromInvolution f).getDual? i).get h = (f.1 i) := by
-  have h1 := fromInvolution_getDual?_eq_some f i h
-  exact Option.get_of_mem h h1
+    ((fromInvolution f).getDual? i).get h = (f.1 i) :=
+  Option.get_of_mem h (fromInvolution_getDual?_eq_some f i h)
 
 lemma toInvolution_fromInvolution : fromInvolution c.toInvolution = c := by
   apply Subtype.ext
@@ -128,15 +122,12 @@ lemma toInvolution_fromInvolution : fromInvolution c.toInvolution = c := by
     split at hi
     · subst hi
       simp
-    · simp only [Finset.mem_singleton, Finset.insert_eq_of_mem] at hi
-      subst hi
-      simp at h
+    · subst hi
+      simp [Finset.insert_eq_of_mem] at h
   · intro ha
-    apply And.intro (c.2.1 a ha)
-    use c.fstFieldOfContract ⟨a, ha⟩
+    refine ⟨c.2.1 a ha, c.fstFieldOfContract ⟨a, ha⟩, ?_⟩
     simp only [fstFieldOfContract_getDual?, Option.isSome_some, ↓reduceDIte, Option.get_some]
-    change _ = (⟨a, ha⟩ : c.1).1
-    conv_rhs => rw [finset_eq_fstFieldOfContract_sndFieldOfContract]
+    exact (finset_eq_fstFieldOfContract_sndFieldOfContract c ⟨a, ha⟩).symm
 
 lemma fromInvolution_toInvolution (f : {f : Fin n → Fin n // Function.Involutive f}) :
     (fromInvolution f).toInvolution = f := by
@@ -144,11 +135,10 @@ lemma fromInvolution_toInvolution (f : {f : Fin n → Fin n // Function.Involuti
   funext i
   simp only [toInvolution]
   split
-  · rename_i h
-    simp
+  · simp
   · rename_i h
     simp only [fromInvolution_getDual?_isSome, ne_eq, Decidable.not_not] at h
-    exact id (Eq.symm h)
+    exact h.symm
 
 /-- The equivalence between Wick contractions for `n` and involutions of `Fin n`.
   The involution of `Fin n` associated with a Wick contraction `c : WickContraction n` as follows.
