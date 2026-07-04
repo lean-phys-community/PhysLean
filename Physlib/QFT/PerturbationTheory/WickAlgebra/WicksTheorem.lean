@@ -41,9 +41,7 @@ open FieldStatistic
 
 lemma wicks_theorem_congr {φs φs' : List 𝓕.FieldOp} (h : φs = φs') :
     ∑ (φsΛ : WickContraction φs.length), φsΛ.wickTerm
-    = ∑ (φs'Λ : WickContraction φs'.length), φs'Λ.wickTerm := by
-  subst h
-  rfl
+    = ∑ (φs'Λ : WickContraction φs'.length), φs'Λ.wickTerm := h ▸ rfl
 
 /--
 For a list `φs` of `𝓕.FieldOp`, Wick's theorem states that
@@ -81,10 +79,8 @@ lemmas used.
 theorem wicks_theorem : (φs : List 𝓕.FieldOp) → 𝓣(ofFieldOpList φs) =
     ∑ (φsΛ : WickContraction φs.length), φsΛ.wickTerm
   | [] => by
-    rw [timeOrder_ofFieldOpList_nil]
-    simp only [List.length_nil]
-    rw [sum_WickContraction_nil]
-    simp only [wickTerm_empty_nil]
+    simp only [timeOrder_ofFieldOpList_nil, List.length_nil, sum_WickContraction_nil,
+      wickTerm_empty_nil]
   | φ :: φs => by
     have ih := wicks_theorem (eraseMaxTimeField φ φs)
     conv_lhs => rw [timeOrder_eq_maxTimeField_mul_finset, ih, Finset.mul_sum]
@@ -93,17 +89,10 @@ theorem wicks_theorem : (φs : List 𝓕.FieldOp) → 𝓣(ofFieldOpList φs) =
       simp only [eraseMaxTimeField, insertionSortDropMinPos, List.length_cons, Nat.succ_eq_add_one,
         maxTimeField, insertionSortMin, List.get_eq_getElem]
       erw [insertIdx_eraseIdx_fin]
-    conv_rhs => rw [wicks_theorem_congr h1]
-    conv_rhs => rw [insertLift_sum]
-    apply Finset.sum_congr rfl
-    intro c _
+    conv_rhs => rw [wicks_theorem_congr h1, insertLift_sum]
+    refine Finset.sum_congr rfl fun c _ => ?_
     rw [Algebra.smul_mul_assoc, mul_wickTerm_eq_sum
-      (maxTimeField φ φs) (eraseMaxTimeField φ φs) (maxTimeFieldPosFin φ φs) c]
-    trans (1 : ℂ) • ∑ k : Option { x // x ∈ c.uncontracted },
-      (c ↩Λ (maxTimeField φ φs) (maxTimeFieldPosFin φ φs) k).wickTerm
-    swap
-    · simp
-    rw [smul_smul]
+      (maxTimeField φ φs) (eraseMaxTimeField φ φs) (maxTimeFieldPosFin φ φs) c, smul_smul]
     simp only [exchangeSign_mul_self, Nat.succ_eq_add_one, Fintype.sum_option,
       Finset.univ_eq_attach, smul_add, one_smul]
     · exact fun k => timeOrder_maxTimeField _ _ k
