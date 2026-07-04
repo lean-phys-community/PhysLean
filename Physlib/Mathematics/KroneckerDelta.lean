@@ -44,6 +44,11 @@ lemma eq_of_coe {p : α → Prop} (i j : Subtype p) : δ[(i : α),j] = δ[i,j] :
 lemma eq_zero_of_not {p : α → Prop} {i j : α} (hi : ¬p i) (hj : p j) : δ[i,j] = 0 :=
   eq_zero_of_ne (fun h ↦ hi (h ▸ hj))
 
+/-- The Kronecker delta is invariant under the component-index equivalence `finSumFinEquiv`. -/
+lemma kroneckerDelta_finSumFinEquiv (a b : Fin 1 ⊕ Fin 3) :
+    kroneckerDelta (finSumFinEquiv a) (finSumFinEquiv b) = kroneckerDelta a b := by
+  simp only [kroneckerDelta, Equiv.apply_eq_iff_eq]
+
 /-!
 ### Conditions for smul to vanish
 -/

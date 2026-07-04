@@ -312,6 +312,44 @@ lemma sum_generalizedKroneckerDelta_cons₂ (ρ σ τ ω : Fin 4) (k : ℕ) :
       Finset.prod_range_succ]
     ring
 
+/-- Symbol-level full contraction over `Fin 4 → Fin 4`. -/
+lemma sum_generalizedKroneckerDelta_mul_self :
+    ∑ g : Fin 4 → Fin 4,
+      generalizedKroneckerDelta g id * generalizedKroneckerDelta g id = (24 : ℤ) := by
+  rw [Finset.sum_congr rfl fun g _ => generalizedKroneckerDelta_mul g g,
+    sum_generalizedKroneckerDelta_self 4]
+  norm_num [Finset.prod_range_succ]
+
+/-- Symbol-level triple contraction, one free pair `σ, τ`. -/
+lemma sum_generalizedKroneckerDelta_mul_cons (σ τ : Fin 4) :
+    ∑ h : Fin 3 → Fin 4,
+        generalizedKroneckerDelta (Fin.cons σ h) id
+          * generalizedKroneckerDelta (Fin.cons τ h) id
+      = 6 * ((kroneckerDelta σ τ : ℕ) : ℤ) := by
+  rw [Finset.sum_congr rfl fun h _ =>
+      generalizedKroneckerDelta_mul (Fin.cons σ h) (Fin.cons τ h),
+    sum_generalizedKroneckerDelta_cons σ τ 3]
+  norm_num [Finset.prod_range_succ]
+
+/-- Symbol-level double contraction, two free pairs. -/
+lemma sum_generalizedKroneckerDelta_mul_cons₂ (ρ σ τ ω : Fin 4) :
+    ∑ h : Fin 2 → Fin 4,
+        generalizedKroneckerDelta (Fin.cons ρ (Fin.cons σ h)) id
+          * generalizedKroneckerDelta (Fin.cons τ (Fin.cons ω h)) id
+      = 2 * (((kroneckerDelta ρ τ : ℕ) : ℤ) * ((kroneckerDelta σ ω : ℕ) : ℤ)
+          - ((kroneckerDelta ρ ω : ℕ) : ℤ) * ((kroneckerDelta σ τ : ℕ) : ℤ)) := by
+  have hdet : generalizedKroneckerDelta ![ρ, σ] ![τ, ω]
+      = ((kroneckerDelta ρ τ : ℕ) : ℤ) * ((kroneckerDelta σ ω : ℕ) : ℤ)
+        - ((kroneckerDelta ρ ω : ℕ) : ℤ) * ((kroneckerDelta σ τ : ℕ) : ℤ) := by
+    rw [show generalizedKroneckerDelta ![ρ, σ] ![τ, ω]
+          = (Matrix.of fun i j => ((kroneckerDelta (![ρ, σ] i) (![τ, ω] j) : ℕ) : ℤ)).det from rfl,
+      Matrix.det_fin_two]
+    simp
+  rw [Finset.sum_congr rfl fun h _ =>
+      generalizedKroneckerDelta_mul (Fin.cons ρ (Fin.cons σ h)) (Fin.cons τ (Fin.cons ω h)),
+    sum_generalizedKroneckerDelta_cons₂ ρ σ τ ω 2, hdet]
+  norm_num [Finset.prod_range_succ]
+
 end Generalized
 
 end KroneckerDelta
