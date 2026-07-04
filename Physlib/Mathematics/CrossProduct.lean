@@ -30,4 +30,11 @@ lemma cross_cross_self_apply (v w : Fin 3 → ℝ) (i : Fin 3) :
   simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, dotProduct, Fin.sum_univ_three]
   ring
 
+/-- Contracting `w` with the triple cross product `v ⨯₃ (w ⨯₃ v)` gives `(w ⨯₃ v) ⬝ᵥ (w ⨯₃ v)`
+(over `ℝ`, the squared length `|w × v|²`), by two cyclic permutations of the scalar triple
+product. -/
+lemma dotProduct_cross_cross_self {R : Type*} [CommRing R] (v w : Fin 3 → R) :
+    w ⬝ᵥ (v ⨯₃ (w ⨯₃ v)) = (w ⨯₃ v) ⬝ᵥ (w ⨯₃ v) := by
+  rw [triple_product_permutation, triple_product_permutation]
+
 end Matrix
