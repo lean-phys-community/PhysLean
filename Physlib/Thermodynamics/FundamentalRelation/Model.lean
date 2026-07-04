@@ -20,7 +20,7 @@ abstract state space, an entropy representation, and two linking
 hypotheses — `entropy_agrees` (the coordinate entropy equals the abstract entropy on charted
 states) and `comparison` (the Lieb-Yngvason Comparison Hypothesis on `Γ`).
 
-From these we *derive* the **Entropy Principle** for the model (`entropyPrinciple`): on charted
+From these we *derive* the **Entropy Principle** for the model via `entropyPrinciple`: on charted
 states, Callen's entropy order coincides with adiabatic accessibility,
 `Φ.S e₁ ≤ Φ.S e₂ ↔ coords e₁ ≺ coords e₂` .
 

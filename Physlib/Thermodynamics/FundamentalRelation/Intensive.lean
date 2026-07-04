@@ -5,7 +5,6 @@ Authors: Nathaneal Sajan
 -/
 module
 
-public import Mathlib.Analysis.Calculus.Deriv.Comp
 public import Mathlib.Analysis.Calculus.Deriv.Prod
 public import Mathlib.Analysis.Calculus.MeanValue
 public import Physlib.Thermodynamics.FundamentalRelation.Basic

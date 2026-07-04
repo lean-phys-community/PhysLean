@@ -100,7 +100,7 @@ structure FundamentalRelation where
   S : ℝ → ℝ → ℝ → ℝ
   /-- Regularity: `S` is C^∞ on the positive orthant. -/
   smooth : ContDiffOn ℝ ∞ (fun p : ℝ × ℝ × ℝ => S p.1 p.2.1 p.2.2) posOrthant
-  /-- Postulate III (`T > 0`): for positive states, `∂S/∂U > 0`, i.e.
+  /-- Postulate III, `T > 0`: for positive states, `∂S/∂U > 0`, i.e.
   `1 / T > 0` pointwise. This yields positive temperature without invoking concavity. -/
   dS_dU_pos : ∀ U V N, 0 < U → 0 < V → 0 < N → 0 < deriv (fun u => S u V N) U
   /-- Extensivity: `S` is homogeneous of degree one on the positive orthant,

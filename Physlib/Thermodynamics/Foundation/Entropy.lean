@@ -71,34 +71,34 @@ def AllStates (System : Type u) [T : ThermoSystemCore System] :=
 
 An `EntropyRepresentation` is the Entropy Principle turned into a structure: a real-valued `S`
 on `AllStates` that represents `≺` on comparable states (monotonicity), is additive under
-composition, and is extensive under positive scaling.-/
+composition, and is extensive under positive scaling. -/
 
 /-- An abstract entropy representation of a thermodynamic core: the Lieb-Yngvason Entropy
 Principle as a structure. A real-valued `S` on `AllStates` that represents adiabatic
 accessibility on comparable states, is additive under composition, and is extensive under
-positive scaling.-/
+positive scaling. -/
 structure EntropyRepresentation (System : Type u) [T : ThermoSystemCore System] where
   /-- The entropy of an arbitrary state, packaged with its system. -/
   S : AllStates System → ℝ
-  /-- Monotonicity (Lieb-Yngvason eq. 2.3): for comparable states, accessibility is
+  /-- Monotonicity, Lieb-Yngvason eq. 2.3: for comparable states, accessibility is
   equivalent to entropy increase, `X ≺ Y ↔ S(X) ≤ S(Y)`. Conditioned on `Comparable`
   because the equivalence is claimed only for comparable states. -/
   Monotonicity {Γ₁ Γ₂ : System} (X : T.State Γ₁) (Y : T.State Γ₂) :
     Comparable (T := T) X Y → (T.le X Y ↔ S ⟨Γ₁, X⟩ ≤ S ⟨Γ₂, Y⟩)
-  /-- Additivity (Lieb-Yngvason eq. 2.4): `S(X, Y) = S(X) + S(Y)` across a composition. -/
+  /-- Additivity, Lieb-Yngvason eq. 2.4: `S(X, Y) = S(X) + S(Y)` across a composition. -/
   Additivity {Γ₁ Γ₂ : System} (X : T.State Γ₁) (Y : T.State Γ₂) :
     S ⟨T.comp Γ₁ Γ₂, T.state_of_comp_equiv.symm (X, Y)⟩ =
       S ⟨Γ₁, X⟩ + S ⟨Γ₂, Y⟩
-  /-- Extensivity (Lieb-Yngvason eq. 2.5): `S(t • X) = t · S(X)` for `t > 0`. -/
+  /-- Extensivity, Lieb-Yngvason eq. 2.5: `S(t • X) = t · S(X)` for `t > 0`. -/
   Extensivity {Γ : System} (X : T.State Γ) {t : ℝ} (ht : 0 < t) :
     S ⟨T.scale t Γ, (T.state_of_scale_equiv (ne_of_gt ht)).symm X⟩ =
       t * S ⟨Γ, X⟩
 
 /-! ## C. Consequences of the entropy principle
 
-Immediate rephrasings of monotonicity : on comparable states, adiabatic equivalence is equality
- of entropy and strict accessibility is strict entropy increase. These are the "entropy increases
- in an irreversible process" readings of `S`. -/
+Immediate rephrasings of monotonicity: on comparable states, adiabatic equivalence is equality
+of entropy and strict accessibility is strict entropy increase. These are the "entropy increases
+in an irreversible process" readings of `S`. -/
 
 section Consequences
 
@@ -117,8 +117,8 @@ lemma entropy_equiv_iff_eq {E : EntropyRepresentation System} {Γ₁ Γ₂ : Sys
   rw [E.Monotonicity Y X h_comp_symm]
   exact le_antisymm_iff.symm
 
-/-- For comparable states, strict accessibility is strict entropy increase `X ≺≺ Y ↔ S(X) < S(Y)`-
- entropy strictly increases in an irreversible process. -/
+/-- For comparable states, strict accessibility is strict entropy increase:
+`X ≺≺ Y ↔ S(X) < S(Y)`. -/
 lemma entropy_strict_iff_lt {E : EntropyRepresentation System} {Γ₁ Γ₂ : System}
     (X : T.State Γ₁) (Y : T.State Γ₂) (h_comp : Comparable (T := T) X Y) :
     X ≺≺ Y ↔ E.S ⟨Γ₁, X⟩ < E.S ⟨Γ₂, Y⟩ := by
@@ -136,7 +136,7 @@ Lieb-Yngvason's entropy is unique only up to a positive affine change of scale
 `S ↦ aS + b`. We record that statement as a `Prop`. -/
 
 /-- Essential affine uniqueness of entropy representations: any two
-representations agree up to a positive affine recalibration `S ↦ a * S + b` (`a > 0`).-/
+representations agree up to a positive affine recalibration `S ↦ a * S + b` (`a > 0`). -/
 def AffineUniqueness (System : Type u) [T : ThermoSystemCore System] : Prop :=
   ∀ E E' : EntropyRepresentation System,
     ∃ a b : ℝ, 0 < a ∧ ∀ x, E'.S x = a * E.S x + b

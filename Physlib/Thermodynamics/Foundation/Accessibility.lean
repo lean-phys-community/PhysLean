@@ -5,7 +5,6 @@ Authors: Nathaneal Sajan
 -/
 module
 
-public import Mathlib.Order.Filter.AtTopBot.Defs
 public import Mathlib.Topology.Instances.Real.Lemmas
 
 /-!
@@ -85,7 +84,7 @@ later layers depend only on the vocabulary they actually use. -/
 /-- The operational core of a thermodynamic accessibility structure.
 
 A `ThermoSystemCore` records the state space indexed by each system, system composition,
-system scaling, the zero system, and the primitive adiabatic-accessibility relation.-/
+system scaling, the zero system, and the primitive adiabatic-accessibility relation. -/
 class ThermoSystemCore (System : Type u) where
   /-- The state space associated to a thermodynamic system. -/
   State : System → Type v
@@ -122,7 +121,7 @@ The fields are assumptions of the abstract world. -/
 
 /--
 This extends `ThermoSystemCore` with the structural equalities, accessibility axioms A1-A6,
-and coherence axioms needed to reason about casts induced by equalities of systems.-/
+and coherence axioms needed to reason about casts induced by equalities of systems. -/
 class ThermoWorld (System : Type u) extends ThermoSystemCore System where
   /-- Scaling by zero gives the zero system. -/
   scale_zero_is_ZSystem (Γ : System) : scale 0 Γ = ZSystem
