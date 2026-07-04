@@ -11,16 +11,17 @@ public import Mathlib.LinearAlgebra.Matrix.SchurComplement
 
 # Contraction identities for the generalized Kronecker delta
 
+## i. Overview
+
 This file proves the combinatorial contraction facts for the `generalizedKroneckerDelta`
-(defined in `Physlib.Mathematics.KroneckerDelta.Basic`).  Everything here is purely about the
+(defined in `Physlib.Mathematics.KroneckerDelta.Basic`). Everything here is purely about the
 abstract generalized Kronecker delta on a finite type; no tensor or physics content appears.
 These facts are the reusable backbone of the Levi-Civita epsilon-epsilon contraction
 identities proved in `Physlib.Relativity.Tensors.LeviCivita.Contractions`.
 
 The central fact is that summing a `generalizedKroneckerDelta` over one shared index lowers
-its rank by one and multiplies it by `card α - n`
-(`generalizedKroneckerDelta_sum_snoc`).  Iterating that fact, together with the
-product identity
+its rank by one and multiplies it by `card α - n` (`generalizedKroneckerDelta_sum_snoc`).
+Iterating that fact, together with the product identity
 `generalizedKroneckerDelta μ ν = generalizedKroneckerDelta μ id * generalizedKroneckerDelta ν id`
 (`generalizedKroneckerDelta_mul`), gives the fully-, singly-, and doubly-free
 contractions `sum_generalizedKroneckerDelta_self`, `sum_generalizedKroneckerDelta_cons`, and
@@ -31,11 +32,31 @@ index (a Schur-complement reduction) and then applies the ring-general rank-one 
 update lemma `Matrix.det_add_rankOne`, which is proved here because Mathlib only provides the
 matrix determinant lemma when `det A` is a unit and Kronecker-delta matrices are singular.
 
+## ii. Key results
+
+- `generalizedKroneckerDelta_sum_snoc` : summing over one shared index lowers the rank by one.
+- `sum_generalizedKroneckerDelta_mul_self`, `sum_generalizedKroneckerDelta_mul_cons`,
+  `sum_generalizedKroneckerDelta_mul_cons₂` : the fully-, singly-, and doubly-free symbol-level
+  contractions over `Fin 4`.
+
+## iii. Table of contents
+
+- A. The rank-one determinant update
+- B. Contraction identities
+
+## iv. References
+
 -/
 
 @[expose] public section
 
 open Matrix
+
+/-!
+
+## A. The rank-one determinant update
+
+-/
 
 namespace Matrix
 
@@ -82,7 +103,7 @@ private lemma det_add_rankOne_aux {ι : Type*} [DecidableEq ι] [Fintype ι] {R 
     ring
 
 /-- **Rank-one determinant update** (the ring-general matrix determinant lemma for an outer
-product, valid even when `A` is singular).  Adding the rank-one matrix `w ⊗ b` to `A` changes the
+product, valid even when `A` is singular). Adding the rank-one matrix `w ⊗ b` to `A` changes the
 determinant by `∑ i, w i * det (A.updateRow i b)`.
 
 Mathlib only provides this when `det A` is a unit (`Matrix.det_add_replicateCol_mul_replicateRow`);
@@ -99,13 +120,19 @@ open KroneckerDelta
 
 open Matrix
 
+/-!
+
+## B. Contraction identities
+
+-/
+
 section Generalized
 
 variable {α : Type} [DecidableEq α] [Fintype α]
 
 /-- The product of two Levi-Civita-type symbols is a generalized Kronecker delta:
 `δ^{μ}_{·} · δ^{ν}_{·} = δ^{μ}_{ν}`, where each single factor is a Kronecker matrix against the
-identity.  This is the Lean form of `ε^{μ₁…μₙ} ε_{ν₁…νₙ} = δ^{μ₁…μₙ}_{ν₁…νₙ}`. -/
+identity. This is the Lean form of `ε^{μ₁…μₙ} ε_{ν₁…νₙ} = δ^{μ₁…μₙ}_{ν₁…νₙ}`. -/
 lemma generalizedKroneckerDelta_mul (μ ν : α → α) :
     generalizedKroneckerDelta μ id * generalizedKroneckerDelta ν id
       = generalizedKroneckerDelta μ ν := by
@@ -126,7 +153,7 @@ lemma generalizedKroneckerDelta_mul (μ ν : α → α) :
   rw [Finset.sum_congr rfl fun k _ => by rw [KroneckerDelta.symm (ν j) k]]
   exact KroneckerDelta.sum_mul (μ i) (ν j)
 
-/-- **Generalized Kronecker delta contraction.**  Summing a `generalizedKroneckerDelta` over one
+/-- **Generalized Kronecker delta contraction.** Summing a `generalizedKroneckerDelta` over one
 shared index appended at the end lowers the rank by one and pulls out a factor of `card α - n`.
 This is the reusable combinatorial fact behind all epsilon-epsilon identities. -/
 lemma generalizedKroneckerDelta_sum_snoc {n : ℕ} (μ ν : Fin n → α) :
@@ -137,7 +164,7 @@ lemma generalizedKroneckerDelta_sum_snoc {n : ℕ} (μ ν : Fin n → α) :
     Matrix.of fun i j => ((kroneckerDelta (μ i) (ν j) : ℕ) : ℤ) with hA
   -- The `n × n` δ-matrix is exactly `generalizedKroneckerDelta μ ν`.
   have hAdet : A.det = generalizedKroneckerDelta μ ν := rfl
-  -- Step 1: Schur complement.  Border the matrix with the appended index and reduce dimension.
+  -- Step 1: Schur complement. Border the matrix with the appended index and reduce dimension.
   have step1 : ∀ a : α, generalizedKroneckerDelta (Fin.snoc μ a) (Fin.snoc ν a)
       = (A - Matrix.of fun i j =>
           ((kroneckerDelta (μ i) a : ℕ) : ℤ) * ((kroneckerDelta a (ν j) : ℕ) : ℤ)).det := by
@@ -231,8 +258,8 @@ private lemma sum_over_snoc {X : Type*} [Fintype X] {M : Type*} [AddCommMonoid M
   rw [← Equiv.sum_comp (Fin.snocEquiv (fun _ => X)) F, Fintype.sum_prod_type, Finset.sum_comm]
   rfl
 
-/-- **Full contraction.**  Iterating the snoc contraction over all four indices:
-`∑_f δ^{f}_{f} = 4!`.  Here `f` ranges over all maps `Fin 4 → Fin 4`. -/
+/-- **Full contraction.** Iterating the snoc contraction over all four indices:
+`∑_f δ^{f}_{f} = 4!`. Here `f` ranges over all maps `Fin 4 → Fin 4`. -/
 lemma sum_generalizedKroneckerDelta_self (k : ℕ) :
     ∑ h : Fin k → Fin 4, generalizedKroneckerDelta h h
       = ∏ j ∈ Finset.range k, ((4 : ℤ) - j) := by
@@ -253,7 +280,7 @@ lemma sum_generalizedKroneckerDelta_self (k : ℕ) :
       Finset.prod_range_succ]
     ring
 
-/-- **Single contraction.**  Contracting the last `k` of `k+1` index pairs leaves one free pair
+/-- **Single contraction.** Contracting the last `k` of `k+1` index pairs leaves one free pair
 `σ, τ`, with the factorial factor `(4-1)(4-2)…`. -/
 lemma sum_generalizedKroneckerDelta_cons (σ τ : Fin 4) (k : ℕ) :
     ∑ h : Fin k → Fin 4,
@@ -278,7 +305,7 @@ lemma sum_generalizedKroneckerDelta_cons (σ τ : Fin 4) (k : ℕ) :
       Finset.prod_range_succ]
     ring
 
-/-- **Double contraction.**  Contracting the last `k` of `k+2` index pairs leaves two free pairs,
+/-- **Double contraction.** Contracting the last `k` of `k+2` index pairs leaves two free pairs,
 with value a `2×2` generalized Kronecker delta times the factorial factor. -/
 lemma sum_generalizedKroneckerDelta_cons₂ (ρ σ τ ω : Fin 4) (k : ℕ) :
     ∑ h : Fin k → Fin 4,
