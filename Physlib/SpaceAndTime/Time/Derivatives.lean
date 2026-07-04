@@ -239,4 +239,9 @@ lemma deriv_lorentzVector {d : ℕ} {f : Time → Lorentz.Vector d}
   · fun_prop
   · fun_prop
 
+lemma deriv_space {d : ℕ} {f : Time → Space d}
+    (hf : Differentiable ℝ f) (t : Time) (i : Fin d) :
+    deriv (fun s => f s i) t = deriv f t i :=
+  (Space.fderiv_space_components i f hf t 1).symm
+
 end Time

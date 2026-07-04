@@ -173,4 +173,51 @@ lemma massDistribution_centerOfMass {d : ℕ} (M : RigidBodyMotion d) (t : Time)
     massDistribution_mass, key, smul_eq_mul, mul_comm, mul_one_div, mul_div_assoc, div_self h,
     mul_one]
 
+/-- The velocity of the material point `y` of a rigid body in motion: the inertial-frame time
+derivative of the trajectory `s ↦ displacement s y` of that point. -/
+noncomputable def velocity {d : ℕ} (M : RigidBodyMotion d) (y : Space d) : Time → Space d :=
+  fun t => ∂ₜ (fun s => M.displacement s y) t
+
+lemma velocity_eq {d : ℕ} (M : RigidBodyMotion d) (y : Space d) (t : Time) :
+    M.velocity y t = ∂ₜ (fun s => M.displacement s y) t := rfl
+
+/-- The `i`-th component of the velocity of a body point is the time derivative of the `i`-th
+coordinate of its inertial-frame trajectory. -/
+lemma velocity_apply {d : ℕ} (M : RigidBodyMotion d) (y : Space d) (t : Time) (i : Fin d)
+    (hd : Differentiable ℝ (fun s => M.displacement s y)) :
+    M.velocity y t i = ∂ₜ (fun s => M.displacement s y i) t := by
+  rw [velocity_eq]
+  exact (Time.deriv_space hd t i).symm
+
+/-- The material point at the centre of mass moves with the centre-of-mass velocity, for any
+motion: `v(centreOfMass) = V`. This is the velocity counterpart of `massDistribution_centerOfMass`.
+-/
+lemma velocity_centerOfMass {d : ℕ} (M : RigidBodyMotion d) :
+    M.velocity M.centerOfMass = M.centerOfMassVelocity := by
+  funext t
+  rw [velocity_eq, centerOfMassVelocity_eq]
+  congr 1
+  funext s
+  ext k
+  rw [displacement_apply]
+  simp
+
+/-- A rigid body in pure translation (constant orientation) has every point moving with the
+centre-of-mass velocity: `v = V`. -/
+lemma velocity_of_orientation_const {d : ℕ} (M : RigidBodyMotion d) (y : Space d)
+    (R : Matrix.specialOrthogonalGroup (Fin d) ℝ) (h : M.orientation = fun _ => R) :
+    M.velocity y = M.centerOfMassVelocity := by
+  funext t
+  rw [velocity_eq, centerOfMassVelocity_eq]
+  have hdisp : (fun s => M.displacement s y)
+      = fun s => (⟨fun k => ∑ j, R.1 k j * (y j - M.centerOfMass j)⟩ : Space d)
+          + M.comTrajectory s := by
+    funext s
+    ext k
+    rw [displacement_apply, h]
+    simp
+  rw [hdisp]
+  simp only [Time.deriv_eq]
+  rw [fderiv_const_add]
+
 end RigidBodyMotion
