@@ -31,30 +31,28 @@ def diagPhase (θ : Fin 3 → ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
 lemma diagPhase_zero:
     diagPhase (fun _ : Fin 3 => 0) = 1 := by
     ext i j
-    fin_cases i <;> fin_cases j <;> simp []
+    simp [Matrix.one_apply]
 
 /-- lemma stating that diagPhase with θ = 0 is equal to diagPhase with all zero phases -/
 @[simp]
 lemma diagPhase_zero_eq : diagPhase 0 = diagPhase (fun _ : Fin 3 => 0) := by
     ext i j
-    simp [diagPhase]
+    simp
 
 /-- lemma stating that the Hermitian conjugate of diagPhase diag(+iθ_i)
 is just diagPhase with entries diag(-iθ_i) -/
 @[simp]
 lemma diagPhase_star (θ : Fin 3 → ℝ) :
     (diagPhase θ)ᴴ = diagPhase (- θ) := by
-    ext i j
-    fin_cases i <;> fin_cases j <;>
-    simp [diagPhase, Matrix.conjTranspose_apply, ← exp_conj]
+    show (Matrix.diagonal _)ᴴ = Matrix.diagonal _
+    simp [Matrix.diagonal_conjTranspose, ← exp_conj]
 
 /-- lemma stating that multiplying two phase matrices is equivalent to adding the phases -/
 @[simp]
 lemma diagPhase_mul (θ φ : Fin 3 → ℝ) :
     diagPhase θ * diagPhase φ = diagPhase (θ + φ) := by
-    ext i j
-    fin_cases i <;> fin_cases j <;>
-    simp [diagPhase, Matrix.mul_apply, ← exp_add, mul_add]
+    show Matrix.diagonal _ * Matrix.diagonal _ = Matrix.diagonal _
+    simp [Matrix.diagonal_mul_diagonal, ← exp_add, mul_add]
 
 /-- diagonal phase matrix diag(iθ_i) is part of the unitary group -/
 def diagPhase_unitary (θ : Fin 3 → ℝ) : unitaryGroup (Fin 3) ℂ :=
@@ -99,31 +97,20 @@ def PMNS_dirac_equivalence (U V : unitaryGroup (Fin 3) ℂ) : Prop :=
 lemma PMNS_dirac_equivalence_refl :
     ∀ U : unitaryGroup (Fin 3) ℂ, PMNS_dirac_equivalence U U := by
     intro U
-    use (fun _ : Fin 3 => 0), (fun _ : Fin 3 => 0)
-    simp [diagPhase_zero]
+    exact ⟨0, 0, by simp⟩
 
 /-- The relation `PMNS_dirac_equivalence` is symmetric. -/
 lemma PMNS_dirac_equivalence_symm :
     ∀ U V : unitaryGroup (Fin 3) ℂ, PMNS_dirac_equivalence U V → PMNS_dirac_equivalence V U := by
-    intros U V h
-    rcases h with ⟨θ, φ, h'⟩
-    use -θ, -φ
-    rw [h']
-    rw [← mul_assoc, mul_assoc]
-    simp [diagPhase_mul]
-    rw [← mul_assoc]
-    simp [diagPhase_mul]
+    rintro U V ⟨θ, φ, h'⟩
+    refine ⟨-θ, -φ, ?_⟩
+    simp only [h', ← mul_assoc, diagPhase_mul]
+    simp [mul_assoc, diagPhase_mul, add_neg_cancel, neg_add_cancel]
 
 /-- The relation `PMNS_dirac_equivalence` is transitive. -/
 lemma PMNS_dirac_equivalence_trans {U V W : unitaryGroup (Fin 3) ℂ} :
     PMNS_dirac_equivalence U V → PMNS_dirac_equivalence V W → PMNS_dirac_equivalence U W := by
-    intros h1 h2
-    rcases h1 with ⟨θ1, φ1, hUV⟩
-    rcases h2 with ⟨θ2, φ2, hVW⟩
-    use (θ1 + θ2), (φ1 + φ2)
-    rw [hUV, hVW]
-    rw [← mul_assoc, mul_assoc]
-    simp [diagPhase_mul]
-    rw [← mul_assoc]
-    simp [diagPhase_mul]
-    simp [add_comm]
+    rintro ⟨θ1, φ1, hUV⟩ ⟨θ2, φ2, hVW⟩
+    refine ⟨θ1 + θ2, φ1 + φ2, ?_⟩
+    simp only [hUV, hVW, ← mul_assoc, diagPhase_mul]
+    simp [mul_assoc, diagPhase_mul, add_comm]
