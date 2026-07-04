@@ -83,9 +83,8 @@ lemma jointLiftLeft_injective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} :
     Function.Injective (@joinLiftLeft _ _ φsΛ φsucΛ) := by
   intro a b h
-  simp only [joinLiftLeft] at h
-  rw [Subtype.mk_eq_mk] at h
-  refine Subtype.ext h
+  simp only [joinLiftLeft, Subtype.mk_eq_mk] at h
+  exact Subtype.ext h
 
 /-- Given a contracting pair within `φsucΛ` the corresponding contracting pair within
   `(join φsΛ φsucΛ)`. -/
@@ -103,29 +102,22 @@ lemma joinLiftRight_injective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} :
     Function.Injective (@joinLiftRight _ _ φsΛ φsucΛ) := by
   intro a b h
-  simp only [joinLiftRight] at h
-  rw [Subtype.mk_eq_mk] at h
-  simp only [Finset.map_inj] at h
-  refine Subtype.ext h
+  simp only [joinLiftRight, Subtype.mk_eq_mk, Finset.map_inj] at h
+  exact Subtype.ext h
 
 lemma jointLiftLeft_disjoint_joinLiftRight {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} (a : φsΛ.1) (b : φsucΛ.1) :
-    Disjoint (@joinLiftLeft _ _ _ φsucΛ a).1 (joinLiftRight b).1 := by
-  simp only [joinLiftLeft, joinLiftRight]
-  symm
-  apply uncontractedListEmd_finset_disjoint_left
-  exact a.2
+    Disjoint (@joinLiftLeft _ _ _ φsucΛ a).1 (joinLiftRight b).1 :=
+  (uncontractedListEmd_finset_disjoint_left b.1 a.1 a.2).symm
 
 lemma jointLiftLeft_ne_joinLiftRight {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} (a : φsΛ.1) (b : φsucΛ.1) :
     joinLiftLeft a ≠ joinLiftRight b := by
   by_contra hn
   have h1 := jointLiftLeft_disjoint_joinLiftRight a b
-  rw [hn] at h1
-  simp only [disjoint_self, Finset.bot_eq_empty] at h1
+  rw [hn, disjoint_self, Finset.bot_eq_empty] at h1
   have hj := (join φsΛ φsucΛ).2.1 (joinLiftRight b).1 (joinLiftRight b).2
-  rw [h1] at hj
-  simp at hj
+  simp [h1] at hj
 
 /-- The map from contracted pairs of `φsΛ` and `φsucΛ` to contracted pairs in
   `(join φsΛ φsucΛ)`. -/
@@ -140,19 +132,13 @@ lemma joinLift_injective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.
   intro a b h
   match a, b with
   | Sum.inl a, Sum.inl b =>
-    simp only [Sum.inl.injEq]
-    exact jointLiftLeft_injective h
+    exact congrArg Sum.inl (jointLiftLeft_injective h)
   | Sum.inr a, Sum.inr b =>
-    simp only [Sum.inr.injEq]
-    exact joinLiftRight_injective h
+    exact congrArg Sum.inr (joinLiftRight_injective h)
   | Sum.inl a, Sum.inr b =>
-    simp only [joinLift] at h
-    have h1 := jointLiftLeft_ne_joinLiftRight a b
-    simp_all
+    exact absurd h (jointLiftLeft_ne_joinLiftRight a b)
   | Sum.inr a, Sum.inl b =>
-    simp only [joinLift] at h
-    have h1 := jointLiftLeft_ne_joinLiftRight b a
-    simp_all
+    exact absurd h.symm (jointLiftLeft_ne_joinLiftRight b a)
 
 lemma joinLift_surjective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} : Function.Surjective (@joinLift _ _ φsΛ φsucΛ) := by
@@ -170,17 +156,14 @@ lemma joinLift_surjective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs
     exact ha3.2
 
 lemma joinLift_bijective {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
-    {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} : Function.Bijective (@joinLift _ _ φsΛ φsucΛ) := by
-  apply And.intro
-  · exact joinLift_injective
-  · exact joinLift_surjective
+    {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} : Function.Bijective (@joinLift _ _ φsΛ φsucΛ) :=
+  ⟨joinLift_injective, joinLift_surjective⟩
 
 lemma prod_join {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) (f : (join φsΛ φsucΛ).1 → M) [CommMonoid M]:
       ∏ (a : (join φsΛ φsucΛ).1), f a = (∏ (a : φsΛ.1), f (joinLiftLeft a)) *
       ∏ (a : φsucΛ.1), f (joinLiftRight a) := by
-  let e1 := Equiv.ofBijective (@joinLift _ _ φsΛ φsucΛ) joinLift_bijective
-  rw [← e1.prod_comp]
+  rw [← (Equiv.ofBijective (@joinLift _ _ φsΛ φsucΛ) joinLift_bijective).prod_comp]
   simp only [Fintype.prod_sum_type, Finset.univ_eq_attach]
   rfl
 
@@ -193,12 +176,8 @@ lemma joinLiftLeft_or_joinLiftRight_of_mem_join {φs : List 𝓕.FieldOp}
   simp only [join, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
     RelEmbedding.coe_toEmbedding] at ha
   rcases ha with ha | ⟨a, ha, rfl⟩
-  · left
-    use ⟨a, ha⟩
-    rfl
-  · right
-    use ⟨a, ha⟩
-    rfl
+  · exact Or.inl ⟨⟨a, ha⟩, rfl⟩
+  · exact Or.inr ⟨⟨a, ha⟩, rfl⟩
 
 @[simp]
 lemma join_fstFieldOfContract_joinLiftRight {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
@@ -252,15 +231,10 @@ lemma mem_join_right_iff {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.
   simp only [h1', false_or]
   apply Iff.intro
   · intro h
-    use a
-    simp only [h, true_and]
-    rw [Finset.mapEmbedding_apply]
-  · intro h
-    obtain ⟨a, ha, h2⟩ := h
-    rw [Finset.mapEmbedding_apply] at h2
-    simp only [Finset.map_inj] at h2
-    subst h2
-    exact ha
+    exact ⟨a, h, Finset.mapEmbedding_apply⟩
+  · rintro ⟨a, ha, h2⟩
+    rw [Finset.mapEmbedding_apply, Finset.map_inj] at h2
+    exact h2 ▸ ha
 
 lemma join_card {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
     {φsucΛ : WickContraction [φsΛ]ᵘᶜ.length} :
@@ -273,11 +247,10 @@ lemma join_card {φs : List 𝓕.FieldOp} {φsΛ : WickContraction φs.length}
   simp only [Finset.mem_map, RelEmbedding.coe_toEmbedding, not_exists, not_and]
   intro x hx
   by_contra hn
-  have hdis : Disjoint (Finset.map uncontractedListEmd x) a := by
-    exact uncontractedListEmd_finset_disjoint_left x a ha
+  have hdis : Disjoint (Finset.map uncontractedListEmd x) a :=
+    uncontractedListEmd_finset_disjoint_left x a ha
   rw [Finset.mapEmbedding_apply] at hn
   rw [hn] at hdis
-  simp only [disjoint_self, Finset.bot_eq_empty] at hdis
   have hcard := φsΛ.2.1 a ha
   simp_all
 
@@ -299,16 +272,12 @@ lemma empty_join {φs : List 𝓕.FieldOp} (φsΛ : WickContraction [empty (n :=
     rw [Finset.mapEmbedding_apply]
     rw [Finset.map_map]
     apply Set.mem_of_eq_of_mem _ ha
-    trans Finset.map (Equiv.refl _).toEmbedding a
-    rfl
-    simp
+    exact Finset.map_refl
   · intro h
     use Finset.map (finCongr (by simp)).toEmbedding a
     simp only [h, true_and]
-    trans Finset.map (Equiv.refl _).toEmbedding a
     rw [Finset.mapEmbedding_apply, Finset.map_map]
-    rfl
-    simp
+    exact Finset.map_refl
 
 @[simp]
 lemma join_empty {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length) :
@@ -323,9 +292,7 @@ lemma join_timeContract {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.l
   simp only [timeContract, List.get_eq_getElem]
   rw [prod_join]
   congr 1
-  congr
-  funext a
-  simp
+  exact Finset.prod_congr rfl fun a _ => by simp
 
 lemma join_staticContract {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) :
@@ -333,9 +300,7 @@ lemma join_staticContract {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs
   simp only [staticContract, List.get_eq_getElem]
   rw [prod_join]
   congr 1
-  congr
-  funext a
-  simp
+  exact Finset.prod_congr rfl fun a _ => by simp
 
 lemma mem_join_uncontracted_of_mem_right_uncontracted {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length)
@@ -376,10 +341,8 @@ lemma exists_mem_right_uncontracted_of_mem_join_uncontracted {φs : List 𝓕.Fi
     ∃ a, uncontractedListEmd a = i ∧ a ∈ φsucΛ.uncontracted := by
   have hi' := exists_mem_left_uncontracted_of_mem_join_uncontracted _ _ i hi
   obtain ⟨j, rfl⟩ := uncontractedListEmd_surjective_mem_uncontracted i hi'
-  use j
-  simp only [true_and]
-  rw [mem_uncontracted_iff_not_contracted] at hi
-  rw [mem_uncontracted_iff_not_contracted]
+  refine ⟨j, rfl, ?_⟩
+  rw [mem_uncontracted_iff_not_contracted] at hi ⊢
   intro p hp
   have hip := hi (p.map uncontractedListEmd) (by
     simp only [join, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
@@ -439,8 +402,7 @@ lemma join_uncontractedListEmb {φs : List 𝓕.FieldOp} (φsΛ : WickContractio
       φsucΛ.uncontractedListEmd).trans φsΛ.uncontractedListEmd := by
   refine Function.Embedding.ext_iff.mpr (congrFun ?_)
   change uncontractedListEmd.toFun = _
-  rw [uncontractedListEmd_toFun_eq_get]
-  rw [join_uncontractedList_get]
+  rw [uncontractedListEmd_toFun_eq_get, join_uncontractedList_get]
   rfl
 
 set_option backward.isDefEq.respectTransparency false in
@@ -506,8 +468,7 @@ lemma join_getDual?_apply_uncontractedListEmb_eq_none_iff {φs : List 𝓕.Field
     obtain ⟨a, ha', ha⟩ := exists_mem_right_uncontracted_of_mem_join_uncontracted _ _
       (uncontractedListEmd i) h
     simp only [EmbeddingLike.apply_eq_iff_eq] at ha'
-    subst ha'
-    exact ha
+    exact ha' ▸ ha
   · intro h
     exact mem_join_uncontracted_of_mem_right_uncontracted φsΛ φsucΛ i h
 
@@ -543,15 +504,11 @@ lemma join_getDual?_apply_uncontractedListEmb {φs : List 𝓕.FieldOp}
     Option.map uncontractedListEmd (φsucΛ.getDual? i) := by
   by_cases h : (φsucΛ.getDual? i).isSome
   · rw [join_getDual?_apply_uncontractedListEmb_some]
-    have h1 : (φsucΛ.getDual? i) = (φsucΛ.getDual? i).get (by simpa using h) :=
-      Eq.symm (Option.some_get h)
-    conv_rhs => rw [h1]
+    conv_rhs => rw [← Option.some_get h]
     simp only [Option.map_some]
     exact (join_getDual?_apply_uncontractedListEmb_isSome_iff φsΛ φsucΛ i).mpr h
   · simp only [Bool.not_eq_true, Option.isSome_eq_false_iff, Option.isNone_iff_eq_none] at h
-    rw [h]
-    simp only [Option.map_none, join_getDual?_apply_uncontractedListEmb_eq_none_iff]
-    exact h
+    simp [h, join_getDual?_apply_uncontractedListEmb_eq_none_iff]
 
 /-!
 
@@ -581,9 +538,7 @@ lemma join_sub_quot (S : Finset (Finset (Fin φs.length))) (ha : S ⊆ φsΛ.1) 
     · simp [h1]
     · right
       obtain ⟨a, rfl, ha⟩ := h1
-      use a
-      simp only [ha, true_and]
-      rw [Finset.mapEmbedding_apply]
+      exact ⟨a, ha, Finset.mapEmbedding_apply⟩
 
 lemma subContraction_card_plus_quotContraction_card_eq (S : Finset (Finset (Fin φs.length)))
     (ha : S ⊆ φsΛ.1) :
@@ -615,9 +570,8 @@ lemma join_singleton_getDual?_right {φs : List 𝓕.FieldOp}
 
 lemma exists_contraction_pair_of_card_ge_zero {φs : List 𝓕.FieldOp}
     (φsΛ : WickContraction φs.length) (h : 0 < φsΛ.1.card) :
-    ∃ a, a ∈ φsΛ.1 := by
-  simp_all only [Finset.card_pos]
-  exact h
+    ∃ a, a ∈ φsΛ.1 :=
+  Finset.card_pos.mp h
 
 set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 400000 in
