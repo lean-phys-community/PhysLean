@@ -60,9 +60,9 @@ open scoped ContDiff
 
 A `FundamentalRelation` is regular only on physically admissible states — those with strictly
 positive `U`, `V`, `N`. We carry that positivity in two ways: `ExtensiveState` for the physical
-states the later bridge charts, and `posOrthant` for the open set on which smoothness and the
-energy derivative are asserted. Keeping positivity here, rather than in the type of `S`, lets the
-calculus treat `S` as an ordinary total function. -/
+states the later bridge maps to abstract states, and `posOrthant` for the open set on which
+smoothness and the energy derivative are asserted. Keeping positivity here, rather than in the
+type of `S`, lets the calculus treat `S` as an ordinary total function. -/
 
 /-- A positive **extensive state** `(U, V, N)` of a simple system: internal energy,
 volume and particle number, all strictly positive. This is the physical domain over
