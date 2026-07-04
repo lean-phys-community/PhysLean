@@ -56,8 +56,8 @@ private theorem partitionZ_eq_re_partitionZComplex {β : ℝ}
       by_cases h : H.H config = ⊤
       · simp [h]
       · simp only [h, dite_false]
-        set e : ℝ := (H.H config).untop h
-        simpa [Complex.ofReal_mul] using (Complex.exp_ofReal_re (-(β * e))).symm
+        simpa [Complex.ofReal_mul] using
+          (Complex.exp_ofReal_re (-(β * (H.H config).untop h))).symm
     _ = RCLike.re (∫ x, ComplexLaplaceIntegrand
         (fun config : H.dim d → ℝ => H.H config) (β : ℂ) x) := integral_re hInt
 
@@ -69,8 +69,8 @@ theorem contDiffAt_partitionZ_of_mem_interior_convergenceDomain {β : ℝ}
     (E := fun config : H.dim d → ℝ => H.H config) (H.measurable_H d) hβ).contDiffAt
     |>.real_of_complex |>.congr_of_eventuallyEq ?_
   filter_upwards [(Complex.continuous_ofReal.tendsto β).eventually
-    (IsOpen.mem_nhds isOpen_interior hβ)] with x hx
-  exact H.partitionZ_eq_re_partitionZComplex d (_root_.interior_subset hx)
+    (IsOpen.mem_nhds isOpen_interior hβ)] with x hx using
+    H.partitionZ_eq_re_partitionZComplex d (_root_.interior_subset hx)
 
 /-- The partition function as a function of temperature T instead of β. -/
 def partitionZT (T : ℝ) : ℝ :=
@@ -172,26 +172,20 @@ theorem β_eq_deriv_S_U {β : ℝ}
     β = (deriv (H.entropySβ d) β) / deriv (H.internalU d) β := by
   have hZ : ContDiffAt ℝ ⊤ (H.partitionZ d) β :=
     H.contDiffAt_partitionZ_of_mem_interior_convergenceDomain d hZint
-  unfold entropySβ
-  unfold internalU
+  unfold entropySβ internalU
 
   --Show the differentiability side-goals
-  have hlogDiff : DifferentiableAt ℝ (fun β => Real.log (H.partitionZ d β)) β := by
-    have := hZne
-    have := hZ.differentiableAt (by simp)
-    fun_prop (disch := assumption)
+  have hlogDiff : DifferentiableAt ℝ (fun β => Real.log (H.partitionZ d β)) β :=
+    (hZ.differentiableAt (by simp)).log hZne
   have hlogDerivDiff : DifferentiableAt ℝ (deriv fun β => Real.log (H.partitionZ d β)) β := by
-    have this := hZ.log hZne
-    replace this :=
-      (this.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (by simp)
+    have := ((hZ.log hZne).fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (by simp)
     unfold deriv
     fun_prop
   have hderiv : deriv (deriv fun β => Real.log (H.partitionZ d β)) β ≠ 0 := by
     intro hzero
     apply hU'
     change deriv (-fun β => deriv (fun β' => Real.log (H.partitionZ d β')) β) β = 0
-    rw [deriv.neg]
-    simp [hzero]
+    simp [deriv.neg, hzero]
 
   --Main goal
   simp only [mul_neg]
