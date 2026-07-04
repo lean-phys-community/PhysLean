@@ -37,15 +37,9 @@ lemma jarlskogℂCKM_equiv (V U : CKMMatrix) (h : V ≈ U) :
   obtain ⟨a, b, c, e, f, g, h⟩ := h
   change V = phaseShiftApply U a b c e f g at h
   rw [h]
-  simp only [jarlskogℂCKM, Fin.isValue, phaseShiftApply.ub,
-  phaseShiftApply.us, phaseShiftApply.cb, phaseShiftApply.cs]
-  simp only [exp_add, Fin.isValue, _root_.map_mul, ← exp_conj, conj_ofReal, conj_I, mul_neg,
-    exp_neg]
-  have ha : cexp (↑a * I) ≠ 0 := exp_ne_zero _
-  have hb : cexp (↑b * I) ≠ 0 := exp_ne_zero _
-  have hf : cexp (↑f * I) ≠ 0 := exp_ne_zero _
-  have hg : cexp (↑g * I) ≠ 0 := exp_ne_zero _
-  field_simp
+  simp only [jarlskogℂCKM, phaseShiftApply.ub, phaseShiftApply.us, phaseShiftApply.cb,
+    phaseShiftApply.cs, exp_add, _root_.map_mul, ← exp_conj, conj_ofReal, conj_I, mul_neg, exp_neg]
+  field_simp [Complex.exp_ne_zero]
 
 /-- The complex jarlskog invariant for an equivalence class of CKM matrices. -/
 @[simp]

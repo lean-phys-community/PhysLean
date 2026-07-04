@@ -88,19 +88,14 @@ variable {𝓩 𝓩1 : Type} [DecidableEq 𝓩1] [DecidableEq 𝓩][CommRing �
 
 lemma isAnomalyFree_map (f : 𝓩 →+* 𝓩1) {c : ChargeSpectrum 𝓩}
     (h : IsAnomalyFree c) : IsAnomalyFree (c.map (f.toAddMonoidHom)) := by
-  obtain ⟨Q, h1, h2⟩ := h
-  match Q with
-  | ⟨qHd, qHu, F5, F10⟩ =>
+  obtain ⟨⟨qHd, qHu, F5, F10⟩, h1, h2⟩ := h
   let QM : Quanta 𝓩1 := ⟨Option.map f qHd, Option.map f qHu, F5.map fun y => (f y.1, y.2),
     F10.map fun y => (f y.1, y.2)⟩
-  use QM.reduce
-  constructor
-  · rw [Quanta.mem_liftCharge_iff] at ⊢ h1
-    simp [Quanta.reduce, QM] at ⊢ h1
+  refine ⟨QM.reduce, ?_, ?_⟩
+  · simp [Quanta.mem_liftCharge_iff, Quanta.reduce, QM] at ⊢ h1
     refine ⟨?_, ?_, FiveQuanta.map_liftCharge _ _ _ h1.2.2.1,
-      TenQuanta.map_liftCharge _ _ _ h1.2.2.2⟩
-    · simp [ChargeSpectrum.map, h1.1]
-    · simp [ChargeSpectrum.map, h1.2]
+      TenQuanta.map_liftCharge _ _ _ h1.2.2.2⟩ <;>
+      simp [ChargeSpectrum.map, h1]
   · rw [Quanta.LinearAnomalyCancellation] at h2
     simp [QM, ← map_add, h2, Quanta.reduce, Quanta.LinearAnomalyCancellation,
       FiveQuanta.anomalyCoefficient_of_reduce, TenQuanta.anomalyCoefficient_of_reduce]
