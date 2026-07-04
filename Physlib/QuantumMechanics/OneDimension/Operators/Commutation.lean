@@ -37,29 +37,23 @@ lemma positionOperatorSchwartz_commutation_momentumOperatorSchwartz
   ext x
   simp [momentumOperatorSchwartz_apply, positionOperatorSchwartz_apply,
     positionOperatorSchwartz_apply_fun]
-  rw [deriv_fun_mul]
-  have h1 : deriv Complex.ofReal x = 1 := by
-    change deriv Complex.ofRealCLM x = _
-    simp
-  rw [h1]
+  have h1 : deriv Complex.ofReal x = 1 := Complex.ofRealCLM.deriv.trans (by simp)
+  rw [deriv_fun_mul, h1]
   ring
-  · change DifferentiableAt ℝ Complex.ofRealCLM x
-    fun_prop
-  · exact SchwartzMap.differentiableAt ψ
+  · exact Complex.ofRealCLM.differentiableAt
+  · exact ψ.differentiableAt
 
 lemma positionOperatorSchwartz_momentumOperatorSchwartz_eq (ψ : 𝓢(ℝ, ℂ)) :
     positionOperatorSchwartz (momentumOperatorSchwartz ψ)
     = momentumOperatorSchwartz (positionOperatorSchwartz ψ)
-    + (Complex.I * ℏ) • ψ := by
-  rw [← positionOperatorSchwartz_commutation_momentumOperatorSchwartz]
-  simp
+    + (Complex.I * ℏ) • ψ :=
+  sub_eq_iff_eq_add'.mp (positionOperatorSchwartz_commutation_momentumOperatorSchwartz ψ)
 
 lemma momentumOperatorSchwartz_positionOperatorSchwartz_eq (ψ : 𝓢(ℝ, ℂ)) :
     momentumOperatorSchwartz (positionOperatorSchwartz ψ)
     = positionOperatorSchwartz (momentumOperatorSchwartz ψ)
     - (Complex.I * ℏ) • ψ := by
-  rw [← positionOperatorSchwartz_commutation_momentumOperatorSchwartz]
-  simp
+  simp [← positionOperatorSchwartz_commutation_momentumOperatorSchwartz ψ]
 
 end
 end OneDimension

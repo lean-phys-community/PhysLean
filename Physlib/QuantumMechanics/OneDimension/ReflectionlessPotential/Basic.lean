@@ -77,34 +77,19 @@ noncomputable def mulByTemperateGrowth {g : ℝ → ℂ} (hg : g.HasTemperateGro
 
 -- First, you need a theorem that the scaled tanh has temperate growth
 lemma scaled_tanh_hasTemperateGrowth (κ : ℝ) :
-    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x))) := by
-  exact tanh_const_mul_hasTemperateGrowth κ
+    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x))) :=
+  tanh_const_mul_hasTemperateGrowth κ
 
 /-- This is a helper lemma to show that the embedding of a real function with temperate growth in ℂ
   also has temperate growth -/
 private lemma complex_embedding_of_temperate_growth (f : ℝ → ℝ)
-    (h : Function.HasTemperateGrowth f) : Function.HasTemperateGrowth (fun x => (f x : ℂ)) := by
-  obtain ⟨h1, h2⟩ := h
-  constructor
-  · apply ContDiff.fun_comp
-    apply ContinuousLinearMap.contDiff Complex.ofRealCLM
-    apply h1
-  · intro n
-    obtain ⟨k, C, j⟩ := h2 n
-    use k, C
-    intro x
-    change ‖iteratedFDeriv ℝ n (RCLike.ofRealLI ∘ f) x‖ ≤ C * (1 + ‖x‖) ^ k
-    rw [LinearIsometry.norm_iteratedFDeriv_comp_left (g := RCLike.ofRealLI (K := ℂ))
-        (hf := h1.contDiffAt)]
-    exact j x
-    · apply ENat.natCast_le_of_coe_top_le_withTop
-      simp only [le_refl]
+    (h : Function.HasTemperateGrowth f) : Function.HasTemperateGrowth (fun x => (f x : ℂ)) :=
+  Function.Complex.hasTemperateGrowth_ofReal.comp h
 
 -- Scaled tanh embedded into the complex numbers has temperate growth
 lemma scaled_tanh_complex_hasTemperateGrowth (κ : ℝ) :
-    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x) : ℂ)) := by
-  apply complex_embedding_of_temperate_growth
-  apply scaled_tanh_hasTemperateGrowth
+    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x) : ℂ)) :=
+  complex_embedding_of_temperate_growth _ (scaled_tanh_hasTemperateGrowth κ)
 
 /-- Define tanh(κ X) multiplication pointwise as a Schwartz map -/
 noncomputable def tanhOperatorSchwartz (Q : ReflectionlessPotential) :

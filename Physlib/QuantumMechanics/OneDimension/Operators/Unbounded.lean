@@ -58,18 +58,7 @@ lemma isGeneralizedEigenvector_ofSelfCLM_iff {Op : S →L[ℂ] S}
     (F : S →L[ℂ] ℂ) (c : ℂ) :
     IsGeneralizedEigenvector (ofSelfCLM (hι := hι) Op) F c ↔
     ∀ ψ : S, F (Op ψ) = c • F ψ := by
-  constructor
-  · intro h ψ
-    obtain ⟨ψ', hψ', hF⟩ := h ψ
-    simp at hψ'
-    rw [hι.eq_iff] at hψ'
-    subst hψ'
-    exact hF
-  · intro h ψ
-    use Op ψ
-    constructor
-    · simp
-    · rw [h ψ]
+  simp only [IsGeneralizedEigenvector, ofSelfCLM_apply, hι.eq_iff, exists_eq_left]
 
 open InnerProductSpace
 
