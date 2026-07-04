@@ -101,14 +101,12 @@ notation "𝐋²[" d' "]" => angularMomentumOperatorSqr (d := d')
 
 lemma angularMomentumOperatorSqr_apply_fun {d : ℕ} (ψ : 𝓢(Space d, ℂ)) :
     𝐋² ψ = (2 : ℂ)⁻¹ • ∑ i, ∑ j, 𝐋 i j (𝐋 i j ψ) := by
-  dsimp only [angularMomentumOperatorSqr]
-  simp only [FunLike.coe_sum, FunLike.coe_smul,
+  simp only [angularMomentumOperatorSqr, FunLike.coe_sum, FunLike.coe_smul,
     ContinuousLinearMap.coe_comp, Finset.sum_apply, Pi.smul_apply, Function.comp_apply]
 
 lemma angularMomentumOperatorSqr_apply {d : ℕ} (ψ : 𝓢(Space d, ℂ)) (x : Space d) :
     𝐋² ψ x = (2 : ℂ)⁻¹ * ∑ i, ∑ j, 𝐋 i j (𝐋 i j ψ) x := by
-  rw [angularMomentumOperatorSqr_apply_fun]
-  simp only [smul_apply, sum_apply, smul_eq_mul]
+  simp only [angularMomentumOperatorSqr_apply_fun, smul_apply, sum_apply, smul_eq_mul]
 
 /-!
 
@@ -128,8 +126,7 @@ lemma angularMomentumOperatorSqr_apply {d : ℕ} (ψ : 𝓢(Space d, ℂ)) (x : 
 /-- In one dimension the angular momentum operator is trivial. -/
 lemma angularMomentumOperator1D_trivial : 𝐋[1] = 0 := by
   ext i j
-  fin_cases i, j
-  simp [angularMomentumOperator_eq_zero]
+  simp [Subsingleton.elim i j, angularMomentumOperator_eq_zero]
 
 /-- The angular momentum (pseudo)scalar operator in two dimensions, `𝐋 ≔ 𝐋₀₁`. -/
 def angularMomentumOperator2D : 𝓢(Space 2, ℂ) →L[ℂ] 𝓢(Space 2, ℂ) := 𝐋 0 1

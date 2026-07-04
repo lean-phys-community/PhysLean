@@ -54,13 +54,7 @@ noncomputable def inertiaTensor {d : ℕ} (R : RigidBody d) :
 
 lemma inertiaTensor_symmetric {d : ℕ} (R : RigidBody d) (i j : Fin d) :
     R.inertiaTensor i j = R.inertiaTensor j i := by
-  simp only [inertiaTensor]
-  congr
-  funext x
-  congr 1
-  · congr 2
-    exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
-  · ring
+  simp only [inertiaTensor, eq_comm, mul_comm]
 
 /-- The kinetic energy of a rigid body. -/
 informal_definition kineticEnergy where

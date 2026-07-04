@@ -42,10 +42,8 @@ lemma planewaveFunctional_apply (k : ℝ) (ψ : 𝓢(ℝ, ℂ)) :
   all applications of `planewaveFunctional`. -/
 lemma eq_of_eq_planewaveFunctional {ψ1 ψ2 : 𝓢(ℝ, ℂ)}
     (h : ∀ k, planewaveFunctional k ψ1 = planewaveFunctional k ψ2) :
-    ψ1 = ψ2 := by
-  apply (FourierTransform.fourierCLE ℂ 𝓢(ℝ, ℂ)).injective
-  ext k
-  exact h k
+    ψ1 = ψ2 :=
+  (FourierTransform.fourierCLE ℂ 𝓢(ℝ, ℂ)).injective (SchwartzMap.ext h)
 
 end HilbertSpace
 end

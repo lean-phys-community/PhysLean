@@ -64,15 +64,9 @@ theorem navierStokes_iff_convectiveNavierStokes
     (hMomentumDensity : ∀ t,
       Differentiable ℝ (FluidDynamics.NavierStokes.momentumDensity d data.toFluidState t))
     (hVelocitySpace : ∀ t, Differentiable ℝ (data.velocity t)) :
-    NavierStokes d data ↔ ConvectiveNavierStokes d data := by
-  constructor
-  · intro hConservative
-    refine ⟨hConservative.1, ?_⟩
-    exact (FluidDynamics.NavierStokes.momentumEquation_iff_convectiveMomentumEquation d data
-      hConservative.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mp hConservative.2
-  · intro hConvective
-    refine ⟨hConvective.1, ?_⟩
-    exact (FluidDynamics.NavierStokes.momentumEquation_iff_convectiveMomentumEquation d data
-      hConvective.1 hRhoTime hVelocityTime hMomentumDensity hVelocitySpace).mpr hConvective.2
+    NavierStokes d data ↔ ConvectiveNavierStokes d data :=
+  and_congr_right fun h =>
+    FluidDynamics.NavierStokes.momentumEquation_iff_convectiveMomentumEquation d data h
+      hRhoTime hVelocityTime hMomentumDensity hVelocitySpace
 
 end FluidDynamics

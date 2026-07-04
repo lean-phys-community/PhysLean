@@ -66,10 +66,7 @@ noncomputable def scalarPotential {d} (c : SpeedOfLight) :
     simp [distTimeSlice]
   map_smul' r A := by
     ext ε
-    simp only [distTimeSlice, map_smul, ContinuousLinearEquiv.coe_mk, LinearEquiv.coe_mk,
-      LinearMap.coe_mk, AddHom.coe_mk, ContinuousLinearMap.coe_comp, FunLike.coe_smul,
-      Function.comp_apply, Pi.smul_apply, smul_eq_mul, Real.ringHom_apply]
-    ring
+    simp [distTimeSlice, mul_left_comm]
 
 end DistElectromagneticPotential
 end Electromagnetism
