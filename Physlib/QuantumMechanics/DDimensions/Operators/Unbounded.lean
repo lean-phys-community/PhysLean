@@ -154,12 +154,11 @@ lemma closure_domain_le_domain_closure (U : H →ₗ.[ℂ] H') : U.closure.domai
   · intro ψ hψ
     obtain ⟨φ, hψφ⟩ := h_cl.graph_closure_eq_closure_graph ▸ mem_domain_iff.mp hψ
     obtain ⟨b, hb, hb'⟩ := mem_closure_iff_seq_limit.mp hψφ
-    apply mem_closure_iff_seq_limit.mpr
-    refine ⟨fun n ↦ (b n).1, fun n ↦ ?_, (nhds_prod_eq (x := ψ) (y := φ) ▸ hb').fst⟩
-    specialize hb n
+    refine mem_closure_iff_seq_limit.mpr
+      ⟨fun n ↦ (b n).1, fun n ↦ ?_, (nhds_prod_eq (x := ψ) (y := φ) ▸ hb').fst⟩
     simp only [coe_toAddSubmonoid, SetLike.mem_coe, mem_graph_iff, Subtype.exists,
       exists_and_left, exists_eq_left] at hb
-    exact hb.choose
+    exact (hb n).choose
   · simp [closure_def' h_cl, closure_le.mp]
 
 lemma hasDenseDomain_iff_closure_hasDenseDomain : U.HasDenseDomain ↔ U.closure.HasDenseDomain :=
@@ -230,10 +229,7 @@ lemma isClosable_of_exists_dense_formalAdjoint [CompleteSpace H] [CompleteSpace 
     U.IsClosable := by
   have h_adj : U†.HasDenseDomain := by
     obtain ⟨U', hU', hU''⟩ := h_fadj
-    refine Dense.mono ?_ hU'
-    rcases eq_or_lt_of_le (hU''.symm.le_adjoint h) with (rfl | h_lt)
-    · rfl
-    · exact (domain_mono h_lt).le
+    exact hU'.mono (hU''.symm.le_adjoint h).1
   use U††
   ext
   rw [adjoint_graph_eq_graph_adjoint h_adj, adjoint_graph_eq_graph_adjoint h,
@@ -312,8 +308,7 @@ lemma adjoint_of_zero [CompleteSpace H] (h_zero : ⇑U = 0) : U† = 0 := by
   refine dExt ?_ fun x y hxy ↦ ?_
   · ext
     simp only [zero_domain, mem_top, iff_true]
-    apply (mem_adjoint_domain_iff _ _).mpr
-    exact continuous_of_const (by simp [h_zero])
+    exact (mem_adjoint_domain_iff _ _).mpr (continuous_of_const (by simp [h_zero]))
   · by_cases h : U.HasDenseDomain
     · exact adjoint_apply_eq h x (by simp [h_zero])
     · exact adjoint_apply_of_not_dense h x
@@ -361,9 +356,7 @@ lemma adjoint_add_le_add_adjoint [CompleteSpace H]
   have h₂ : U₂.HasDenseDomain := h₁₂.mono Set.inter_subset_right
   constructor
   · intro u hu
-    apply mem_adjoint_domain_of_exists
-    use U₁† ⟨u, hu.1⟩ + U₂† ⟨u, hu.2⟩
-    intro x
+    refine mem_adjoint_domain_of_exists _ ⟨U₁† ⟨u, hu.1⟩ + U₂† ⟨u, hu.2⟩, fun x ↦ ?_⟩
     simp only [add_apply, inner_add_left, inner_add_right,
       adjoint_isFormalAdjoint h₁ ⟨u, hu.1⟩ ⟨x, x.2.1⟩,
       adjoint_isFormalAdjoint h₂ ⟨u, hu.2⟩ ⟨x, x.2.2⟩]
@@ -388,9 +381,8 @@ lemma adjoint_compRestricted_le_compRestricted_adjoint [CompleteSpace H] [Comple
     trans ⟪V† ⟨x, x.2.2⟩, U ⟨y, y.2.2⟩⟫_ℂ
     · exact adjoint_isFormalAdjoint hU ⟨V† ⟨x, x.2.2⟩, hx⟩ ⟨y, y.2.2⟩
     exact adjoint_isFormalAdjoint hV ⟨x, x.2.2⟩ ⟨U ⟨y, y.2.2⟩, hy⟩
-  constructor
-  · exact fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨(U† ∘ᵣ V†) ⟨x, hx⟩, h ⟨x, hx⟩⟩
-  · exact fun x y hxy ↦ (adjoint_apply_eq hVU y <| hxy ▸ h x).symm
+  exact ⟨fun x hx ↦ mem_adjoint_domain_of_exists _ ⟨(U† ∘ᵣ V†) ⟨x, hx⟩, h ⟨x, hx⟩⟩,
+    fun x y hxy ↦ (adjoint_apply_eq hVU y <| hxy ▸ h x).symm⟩
 
 lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDenseDomain) :
     T† ^ n ≤ (T ^ n)† := by
@@ -422,8 +414,7 @@ lemma isClosable_of_continuous (h : Continuous U) : U.IsClosable := by
   refine (toLinearPMap_graph_eq _ fun x hx hx₁ ↦ ?_).symm
   obtain ⟨b, hb, hbx⟩ := mem_closure_iff_seq_limit.mp hx
   rw [nhds_prod_eq] at hbx
-  apply norm_eq_zero.mp
-  apply tendsto_nhds_unique hbx.snd.norm
+  refine norm_eq_zero.mp (tendsto_nhds_unique hbx.snd.norm ?_)
   obtain ⟨M, hM, h_bound⟩ := LinearMap.continuous_iff_bounded.mp h
   refine squeeze_zero (g := fun n ↦ M * ‖(b n).1‖) (fun _ ↦ norm_nonneg _) (fun n ↦ ?_) ?_
   · obtain ⟨y, hy₁, hy₂⟩ := (mem_graph_iff _).mp (hb n)
@@ -453,8 +444,7 @@ lemma closure_domain_eq_domain_closure_of_continuous [CompleteSpace H'] (h : Con
   apply mem_domain_iff.mpr
   rw [← (isClosable_of_continuous h).graph_closure_eq_closure_graph]
   use y
-  apply mem_closure_iff_seq_limit.mpr
-  refine ⟨fun n ↦ (b n, Ub n), fun n ↦ ?_, ?_⟩
+  refine mem_closure_iff_seq_limit.mpr ⟨fun n ↦ (b n, Ub n), fun n ↦ ?_, ?_⟩
   · simp [hb n, Ub]
   · rw [nhds_prod_eq]
     exact Filter.Tendsto.prodMk hb' hy
@@ -478,8 +468,8 @@ lemma IsClosed.isClosed_toFun_graph (hU : U.IsClosed) :
   obtain ⟨b, hb, hbx⟩ := mem_closure_iff_seq_limit.mp hx
   apply mem_closure_iff_seq_limit.mpr
   rw [nhds_prod_eq] at *
-  refine ⟨fun n ↦ (↑(b n).1, (b n).2), by simp_all, ?_⟩
-  exact Filter.Tendsto.prodMk (tendsto_subtype_rng.mp hbx.fst) hbx.snd
+  refine ⟨fun n ↦ (↑(b n).1, (b n).2), by simp_all,
+    Filter.Tendsto.prodMk (tendsto_subtype_rng.mp hbx.fst) hbx.snd⟩
 
 /-- The **closed graph theorem** for partial linear maps:
   a closed operator with closed domain is continuous.
@@ -489,9 +479,8 @@ lemma IsClosed.isClosed_toFun_graph (hU : U.IsClosed) :
 lemma IsClosed.continuous_of_isClosed_domain [CompleteSpace H] [CompleteSpace H']
     (hU : U.IsClosed) (h : _root_.IsClosed (U.domain : Set H)) :
     Continuous U := by
-  have hCS : CompleteSpace U.domain := instCompleteSpaceSubtypeMemSubmoduleOfIsClosedCoe U.domain
-  refine @LinearMap.continuous_of_isClosed_graph _ _ _ _ _ hCS _ _ _ _ U.toFun ?_
-  exact hU.isClosed_toFun_graph
+  haveI : CompleteSpace U.domain := instCompleteSpaceSubtypeMemSubmoduleOfIsClosedCoe U.domain
+  exact LinearMap.continuous_of_isClosed_graph U.toFun hU.isClosed_toFun_graph
 
 /-- Closability is preserved upon adding a continuous operator. -/
 lemma IsClosable.add_continuous
@@ -521,8 +510,7 @@ lemma IsClosable.sub_continuous
 lemma IsClosed.add_continuous [CompleteSpace H']
     (h₁ : U₁.IsClosed) (h₂ : Continuous U₂) (h : U₁.domain ≤ U₂.domain) : (U₁ + U₂).IsClosed := by
   have hcl : (U₁ + U₂).IsClosable := h₁.isClosable.add_continuous h₂ h
-  apply hcl.isClosed_iff.mpr
-  refine eq_of_le_of_ge (le_of_le_graph ?_) (U₁ + U₂).le_closure
+  refine hcl.isClosed_iff.mpr (eq_of_le_of_ge (le_of_le_graph ?_) (U₁ + U₂).le_closure)
   rw [← hcl.graph_closure_eq_closure_graph]
   intro ⟨x₁, x₂⟩ hx
   obtain ⟨b, hb, hbx⟩ := mem_closure_iff_seq_limit.mp hx
@@ -590,8 +578,7 @@ theorem inner_map_polarization' (x y : T.domain) :
 lemma isSymmetric_iff_inner_map_self_real :
     T.IsSymmetric ↔ ∀ x : T.domain, conj ⟪T x, x⟫_ℂ = ⟪T x, x⟫_ℂ := by
   refine ⟨fun h_symm x ↦ by simp [h_symm x x], fun h_re x y ↦ ?_⟩
-  nth_rw 2 [← inner_conj_symm]
-  nth_rw 2 [inner_map_polarization]
+  nth_rw 2 [← inner_conj_symm, inner_map_polarization]
   simp only [map_div₀, _root_.map_sub, _root_.map_add, map_mul, neg_mul, conj_ofNat, conj_I, h_re]
   rw [inner_map_polarization']
   simp [sub_eq_add_neg]
@@ -620,10 +607,8 @@ lemma add_adjoint_isSymmetric [CompleteSpace H] (h : T.HasDenseDomain) :
     (T + T.adjoint).IsSymmetric := by
   intro x y
   have h₁ := adjoint_isFormalAdjoint h ⟨x, x.2.2⟩ ⟨y, y.2.1⟩
-  have h₂ := adjoint_isFormalAdjoint h ⟨y, y.2.2⟩ ⟨x, x.2.1⟩
-  apply starRingEquiv.apply_eq_iff_eq.mpr at h₂
-  simp only [RingEquiv.toEquiv_eq_coe, EquivLike.coe_coe, starRingEquiv_apply, RCLike.star_def,
-    inner_conj_symm, MulOpposite.op_inj] at h₂
+  have h₂ := congrArg conj (adjoint_isFormalAdjoint h ⟨y, y.2.2⟩ ⟨x, x.2.1⟩)
+  simp only [inner_conj_symm] at h₂
   simp only [add_apply, inner_add_left, inner_add_right, h₁, h₂]
   exact add_comm _ _
 
@@ -649,9 +634,8 @@ lemma IsSymmetric.neg (h : T.IsSymmetric) : (-T).IsSymmetric := fun x y ↦ by s
 @[aesop safe apply]
 lemma IsSymmetric.add (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ + T₂).IsSymmetric := by
   intro x y
-  specialize h₁ ⟨x, x.2.1⟩ ⟨y, y.2.1⟩
-  specialize h₂ ⟨x, x.2.2⟩ ⟨y, y.2.2⟩
-  simp [h₁, h₂, add_apply, inner_add_left, inner_add_right]
+  simp [h₁ ⟨x, x.2.1⟩ ⟨y, y.2.1⟩, h₂ ⟨x, x.2.2⟩ ⟨y, y.2.2⟩, add_apply, inner_add_left,
+    inner_add_right]
 
 @[aesop safe apply]
 lemma IsSymmetric.sub (h₁ : T₁.IsSymmetric) (h₂ : T₂.IsSymmetric) : (T₁ - T₂).IsSymmetric :=
@@ -742,10 +726,9 @@ lemma IsEssentiallySelfAdjoint.isUnbounded [CompleteSpace H] (h : T.IsEssentiall
 lemma IsEssentiallySelfAdjoint.unique_self_adjoint_extension [CompleteSpace H]
     (h : T.IsEssentiallySelfAdjoint) {T₂ : H →ₗ.[ℂ] H} (h_le : T ≤ T₂) (h₂ : IsSelfAdjoint T₂) :
     T₂ = T.closure := by
-  have h_dense : T.HasDenseDomain := h.hasDenseDomain
   have h_cl : T₂.IsClosed := IsSelfAdjoint.isClosed h₂
   have h_le' : T.closure ≤ T₂ := h_cl.closure_eq ▸ h_cl.isClosable.closure_mono h_le
-  exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl <| h_dense.closure) h_le') h_le'
+  exact eq_of_le_of_ge (h ▸ h₂ ▸ adjoint_antitone (Or.inl h.hasDenseDomain.closure) h_le') h_le'
 
 @[aesop safe apply]
 lemma IsEssentiallySelfAdjoint.smul [CompleteSpace H]
@@ -781,8 +764,7 @@ lemma IsUnbounded.adjoint [CompleteSpace H] [CompleteSpace H'] (h : U.IsUnbounde
     rw [← orthogonal_eq_top_iff, orthogonal_orthogonal_eq_closure]
     exact fun a ↦ ne_of_mem_of_not_mem' mem_top hy a.symm
   obtain ⟨x, hx, hx'⟩ := exists_mem_ne_zero_of_ne_bot h_ne_bot
-  apply hx'
-  refine graph_fst_eq_zero_snd U.closure ?_ rfl
+  refine hx' (graph_fst_eq_zero_snd U.closure ?_ rfl)
   rw [← IsClosable.graph_closure_eq_closure_graph h.2,
     mem_submodule_closure_iff_mem_submoduleToLp_closure, ← orthogonal_orthogonal_eq_closure,
     ← mem_submodule_adjoint_adjoint_iff_mem_submoduleToLp_orthogonal_orthogonal,
