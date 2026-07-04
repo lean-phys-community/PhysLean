@@ -182,8 +182,7 @@ noncomputable def congr (e : ι1 ≃ᵐ ι) : CanonicalEnsemble ι1 where
 @[simp]
 lemma congr_energy_comp_symmm (e : ι1 ≃ᵐ ι) :
     (𝓒.congr e).energy ∘ e.symm = 𝓒.energy := by
-  funext i
-  simp [congr]
+  simp [congr, Function.comp_def]
 
 /-- Scalar multiplication of `CanonicalEnsemble`, defined such that
 `nsmul n 𝓒` represents `n` non-interacting, distinguishable copies of the ensemble `𝓒`. -/
@@ -231,11 +230,8 @@ lemma μ_add : (𝓒 + 𝓒1).μ = 𝓒.μ.prod 𝓒1.μ := rfl
 
 lemma μ_nsmul (n : ℕ) : (nsmul n 𝓒).μ = MeasureTheory.Measure.pi fun _ => 𝓒.μ := rfl
 
-lemma μ_nsmul_zero_eq : (nsmul 0 𝓒).μ = Measure.pi (fun _ => 0) := by
-  simp [nsmul]
-  congr
-  funext x
-  exact Fin.elim0 x
+lemma μ_nsmul_zero_eq : (nsmul 0 𝓒).μ = Measure.pi (fun _ => 0) :=
+  congrArg Measure.pi (Subsingleton.elim _ _)
 
 /-!
 
@@ -262,14 +258,10 @@ open MeasureTheory
 lemma nsmul_succ (n : ℕ) [SigmaFinite 𝓒.μ] : nsmul n.succ 𝓒 = (𝓒 + nsmul n 𝓒).congr
     (MeasurableEquiv.piFinSuccAbove (fun _ => ι) 0) := by
   ext1
-  · ext x
-    simp only [Nat.succ_eq_add_one, energy_nsmul_apply]
-    exact Fin.sum_univ_succAbove (fun i => 𝓒.energy (x i)) 0
-  · simp [Nat.succ_eq_add_one, Nat.succ_mul, dof_nsmul, add_comm]
+  · exact funext fun x => Fin.sum_univ_succAbove (fun i => 𝓒.energy (x i)) 0
+  · simp [Nat.succ_mul, add_comm]
   · simp
-  · refine Eq.symm (MeasureTheory.MeasurePreserving.map_eq ?_)
-    refine MeasurePreserving.symm _ ?_
-    exact MeasureTheory.measurePreserving_piFinSuccAbove (n := n) (fun _ => 𝓒.μ) 0
+  · exact (((measurePreserving_piFinSuccAbove (fun _ => 𝓒.μ) 0).symm _).map_eq).symm
 
 /-!
 
@@ -278,36 +270,18 @@ lemma nsmul_succ (n : ℕ) [SigmaFinite 𝓒.μ] : nsmul n.succ 𝓒 = (𝓒 + n
 -/
 
 instance [NeZero 𝓒.μ] [NeZero 𝓒1.μ] : NeZero (𝓒 + 𝓒1).μ := by
-  simp [μ_add]
-  refine { out := ?_ }
-  rw [← @Measure.measure_univ_pos]
-  have h1 : (𝓒.μ.prod (𝓒1.μ)) Set.univ =
-      (𝓒.μ Set.univ) * (𝓒1.μ Set.univ) := by
-    rw [← @Measure.prod_prod]
-    simp
-  rw [h1]
-  exact NeZero.pos (𝓒.μ Set.univ * 𝓒1.μ Set.univ)
+  refine ⟨Measure.measure_univ_ne_zero.mp ?_⟩
+  rw [μ_add, ← Set.univ_prod_univ, Measure.prod_prod]
+  exact NeZero.ne _
 
 instance μ_neZero_congr [NeZero 𝓒.μ] (e : ι1 ≃ᵐ ι) :
-    NeZero (𝓒.congr e).μ := by
-  refine { out := ?_ }
-  rw [← @Measure.measure_univ_pos]
-  simp only [Measure.measure_univ_pos, ne_eq]
-  refine (Measure.map_ne_zero_iff ?_).mpr ?_
-  · fun_prop
-  · exact Ne.symm (NeZero.ne' _)
+    NeZero (𝓒.congr e).μ :=
+  ⟨(Measure.map_ne_zero_iff e.symm.measurable.aemeasurable).mpr (NeZero.ne _)⟩
 
 instance [NeZero 𝓒.μ] (n : ℕ) : NeZero (nsmul n 𝓒).μ := by
-  induction n with
-  | zero =>
-    rw [μ_nsmul_zero_eq]
-    rw [@neZero_iff]
-    simp only [ne_eq]
-    refine Measure.measure_univ_ne_zero.mp ?_
-    simp
-  | succ n ih =>
-    rw [nsmul_succ]
-    infer_instance
+  refine ⟨Measure.measure_univ_ne_zero.mp ?_⟩
+  rw [μ_nsmul, Measure.pi_univ]
+  exact Finset.prod_ne_zero_iff.mpr fun i _ => Measure.measure_univ_ne_zero.mpr (NeZero.ne _)
 
 /-!
 
@@ -328,12 +302,9 @@ lemma μBolt_add (T : Temperature) :
     (𝓒 + 𝓒1).μBolt T = (𝓒.μBolt T).prod (𝓒1.μBolt T) := by
   simp_rw [μBolt, μ_add]
   rw [MeasureTheory.prod_withDensity]
-  congr
-  funext i
-  rw [← ENNReal.ofReal_mul, ← Real.exp_add]
-  simp only [energy_add_apply, neg_mul]
-  ring_nf
-  · exact exp_nonneg _
+  · congr with i
+    rw [← ENNReal.ofReal_mul (exp_nonneg _), ← Real.exp_add]
+    simp only [energy_add_apply, mul_add]
   · fun_prop
   · fun_prop
 
@@ -341,43 +312,27 @@ lemma μBolt_congr (e : ι1 ≃ᵐ ι) (T : Temperature) : (𝓒.congr e).μBolt
     (𝓒.μBolt T).map e.symm := by
   simp [congr, μBolt]
   refine Measure.ext_of_lintegral _ fun φ hφ ↦ ?_
-  rw [lintegral_withDensity_eq_lintegral_mul₀]
-  rw [lintegral_map, lintegral_map, lintegral_withDensity_eq_lintegral_mul₀]
-  congr
-  funext i
-  simp only [Pi.mul_apply, MeasurableEquiv.apply_symm_apply]
-  repeat fun_prop
+  rw [lintegral_withDensity_eq_lintegral_mul₀, lintegral_map, lintegral_map,
+    lintegral_withDensity_eq_lintegral_mul₀]
+  · congr with i
+    simp
+  all_goals fun_prop
 
 lemma μBolt_nsmul [SigmaFinite 𝓒.μ] (n : ℕ) (T : Temperature) :
     (nsmul n 𝓒).μBolt T = MeasureTheory.Measure.pi fun _ => (𝓒.μBolt T) := by
   induction n with
   | zero =>
     simp [nsmul, μBolt]
-    congr
-    funext x
-    exact Fin.elim0 x
+    exact congrArg Measure.pi (Subsingleton.elim _ _)
   | succ n ih =>
-    rw [nsmul_succ, μBolt_congr]
-    rw [μBolt_add]
-    refine MeasurePreserving.map_eq ?_
-    refine MeasurePreserving.symm _ ?_
-    rw [ih]
-    exact MeasureTheory.measurePreserving_piFinSuccAbove (fun _ => 𝓒.μBolt T) 0
+    rw [nsmul_succ, μBolt_congr, μBolt_add, ih]
+    exact ((measurePreserving_piFinSuccAbove (fun _ => 𝓒.μBolt T) 0).symm _).map_eq
 
 lemma μBolt_ne_zero_of_μ_ne_zero (T : Temperature) (h : 𝓒.μ ≠ 0) :
     𝓒.μBolt T ≠ 0 := by
-  simp [μBolt] at ⊢ h
-  rw [Measure.ext_iff'] at ⊢ h
-  simp only [Measure.coe_zero, Pi.zero_apply]
-  have hs : {x | ENNReal.ofReal (rexp (-(↑T.β * 𝓒.energy x))) ≠ 0} = Set.univ := by
-    ext i
-    simp only [ne_eq, ENNReal.ofReal_eq_zero, not_le, Set.mem_setOf_eq, Set.mem_univ, iff_true]
-    exact exp_pos _
-  conv =>
-    enter [1, s]
-    rw [MeasureTheory.withDensity_apply_eq_zero' (by fun_prop), hs]
-    simp
-  simpa using h
+  have hm : AEMeasurable (fun i => ENNReal.ofReal (exp (- T.β * 𝓒.energy i))) 𝓒.μ := by fun_prop
+  rw [μBolt, ne_eq, withDensity_eq_zero_iff hm, Filter.EventuallyEq, ae_iff]
+  simpa [ENNReal.ofReal_eq_zero, exp_pos] using h
 
 instance (T : Temperature) [NeZero 𝓒.μ] : NeZero (𝓒.μBolt T) := by
   refine { out := ?_ }
@@ -405,16 +360,11 @@ noncomputable def mathematicalPartitionFunction (T : Temperature) : ℝ := (𝓒
 
 lemma mathematicalPartitionFunction_eq_integral (T : Temperature) :
     mathematicalPartitionFunction 𝓒 T = ∫ i, exp (- T.β * 𝓒.energy i) ∂𝓒.μ := by
-  trans ∫ i, 1 ∂𝓒.μBolt T
-  · simp only [integral_const, smul_eq_mul, mul_one]
-    rfl
-  rw [μBolt]
-  erw [integral_withDensity_eq_integral_smul]
-  congr
-  funext x
-  simp [HSMul.hSMul, SMul.smul]
-  · exact exp_nonneg _
+  rw [mathematicalPartitionFunction, measureReal_def, μBolt, withDensity_apply _ .univ,
+    setLIntegral_univ, ← integral_toReal]
+  · simp [ENNReal.toReal_ofReal, exp_nonneg]
   · fun_prop
+  · exact .of_forall fun i => ENNReal.ofReal_lt_top
 
 lemma mathematicalPartitionFunction_add {T : Temperature} :
     (𝓒 + 𝓒1).mathematicalPartitionFunction T =
@@ -425,39 +375,23 @@ lemma mathematicalPartitionFunction_add {T : Temperature} :
 @[simp]
 lemma mathematicalPartitionFunction_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
     (𝓒.congr e).mathematicalPartitionFunction T = 𝓒.mathematicalPartitionFunction T := by
-  rw [mathematicalPartitionFunction_eq_integral, mathematicalPartitionFunction_eq_integral]
-  simp only [congr]
-  rw [integral_map_equiv]
-  simp
+  simp [mathematicalPartitionFunction, μBolt_congr, measureReal_def, MeasurableEquiv.map_apply]
 
 /-- The `mathematicalPartitionFunction_nsmul` function of `n` copies of a canonical ensemble. -/
 lemma mathematicalPartitionFunction_nsmul (n : ℕ) (T : Temperature) :
     (nsmul n 𝓒).mathematicalPartitionFunction T = (𝓒.mathematicalPartitionFunction T) ^ n := by
-  simp_rw [mathematicalPartitionFunction, μBolt_nsmul, measureReal_def, Measure.pi_univ]
-  simp
+  simp [mathematicalPartitionFunction, μBolt_nsmul, measureReal_def, Measure.pi_univ]
 
 lemma mathematicalPartitionFunction_nonneg (T : Temperature) :
-    0 ≤ 𝓒.mathematicalPartitionFunction T := by
-  rw [mathematicalPartitionFunction]; exact measureReal_nonneg
+    0 ≤ 𝓒.mathematicalPartitionFunction T := measureReal_nonneg
 
 lemma mathematicalPartitionFunction_eq_zero_iff (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] :
     mathematicalPartitionFunction 𝓒 T = 0 ↔ 𝓒.μ = 0 := by
-  simp [mathematicalPartitionFunction]
-  rw [measureReal_def]
-  rw [ENNReal.toReal_eq_zero_iff]
+  rw [mathematicalPartitionFunction, measureReal_def, ENNReal.toReal_eq_zero_iff]
   simp only [measure_ne_top, or_false]
-  rw [μBolt]
-  rw [MeasureTheory.withDensity_apply_eq_zero']
-  simp only [neg_mul, ne_eq, ENNReal.ofReal_eq_zero, not_le, Set.inter_univ]
-  let s : Set ι := {x | 0 < rexp (-(T.β * 𝓒.energy x))}
-  have h : s = Set.univ := by
-    ext i
-    simp [s]
-    exact exp_pos (-(T.β * 𝓒.energy i))
-  change 𝓒.μ s = 0 ↔ 𝓒.μ = 0
-  rw [h]
-  simp only [Measure.measure_univ_eq_zero]
-  fun_prop
+  rw [μBolt, MeasureTheory.withDensity_apply_eq_zero']
+  · simp [ENNReal.ofReal_eq_zero, exp_pos]
+  · fun_prop
 
 open NNReal
 
@@ -489,8 +423,7 @@ noncomputable def probability (T : Temperature) (i : ι) : ℝ :=
 
 lemma probability_add {T : Temperature} (i : ι × ι1) :
     (𝓒 + 𝓒1).probability T i = 𝓒.probability T i.1 * 𝓒1.probability T i.2 := by
-  simp [probability, mathematicalPartitionFunction_add, mul_add, Real.exp_add]
-  ring
+  simp [probability, mathematicalPartitionFunction_add, mul_add, Real.exp_add, div_mul_div_comm]
 
 @[simp]
 lemma probability_congr (e : ι1 ≃ᵐ ι) (T : Temperature) (i : ι1) :
@@ -500,16 +433,12 @@ lemma probability_congr (e : ι1 ≃ᵐ ι) (T : Temperature) (i : ι1) :
 lemma probability_nsmul (n : ℕ) (T : Temperature) (f : Fin n → ι) :
     (nsmul n 𝓒).probability T f = ∏ i, 𝓒.probability T (f i) := by
   induction n with
-  | zero =>
-    simp [probability, mathematicalPartitionFunction_nsmul]
+  | zero => simp [probability, mathematicalPartitionFunction_nsmul]
   | succ n ih =>
-    rw [nsmul_succ]
-    rw [probability_congr]
-    rw [probability_add]
+    rw [nsmul_succ, probability_congr, probability_add]
     simp only [MeasurableEquiv.piFinSuccAbove_apply, Fin.insertNthEquiv_zero,
-      Fin.consEquiv_symm_apply]
-    rw [ih]
-    exact Eq.symm (Fin.prod_univ_succAbove (fun i => 𝓒.probability T (f i)) 0)
+      Fin.consEquiv_symm_apply, ih]
+    exact (Fin.prod_univ_succAbove (fun i => 𝓒.probability T (f i)) 0).symm
 
 /-- The probability measure associated with the Boltzmann distribution of a
   canonical ensemble. -/
@@ -523,51 +452,29 @@ instance (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)]
   [NeZero 𝓒.μ] : IsProbabilityMeasure (𝓒.μProd T) := inferInstanceAs <|
   IsProbabilityMeasure ((𝓒.μBolt T Set.univ)⁻¹ • 𝓒.μBolt T)
 
-instance {T} : IsFiniteMeasure (𝓒.μProd T) := by
-  rw [μProd]
-  infer_instance
+instance {T} : IsFiniteMeasure (𝓒.μProd T) :=
+  inferInstanceAs (IsFiniteMeasure ((𝓒.μBolt T Set.univ)⁻¹ • 𝓒.μBolt T))
 
 lemma μProd_add {T : Temperature} [IsFiniteMeasure (𝓒.μBolt T)]
     [IsFiniteMeasure (𝓒1.μBolt T)] : (𝓒 + 𝓒1).μProd T = (𝓒.μProd T).prod (𝓒1.μProd T) := by
-  rw [μProd, μProd, μProd, μBolt_add]
-  rw [MeasureTheory.Measure.prod_smul_left, MeasureTheory.Measure.prod_smul_right]
-  rw [smul_smul]
-  congr
-  trans ((𝓒.μBolt T) Set.univ * (𝓒1.μBolt T) Set.univ)⁻¹
-  swap
-  · by_cases h : (𝓒.μBolt T) Set.univ = 0
-    · simp [h]
-    by_cases h1 : (𝓒1.μBolt T) Set.univ = 0
-    · simp [h1]
-    rw [ENNReal.mul_inv]
-    · simp
-    · simp
-  · rw [← @Measure.prod_prod]
-    simp
+  rw [μProd, μProd, μProd, μBolt_add, Measure.prod_smul_left, Measure.prod_smul_right, smul_smul]
+  congr 1
+  rw [← ENNReal.mul_inv (.inr (measure_ne_top _ _)) (.inl (measure_ne_top _ _)),
+    ← Measure.prod_prod, Set.univ_prod_univ]
 
 lemma μProd_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
     (𝓒.congr e).μProd T = (𝓒.μProd T).map e.symm := by
-  simp [μProd, μBolt_congr]
-  congr 2
-  rw [MeasurableEquiv.map_apply]
-  simp
+  rw [μProd, μProd, μBolt_congr, Measure.map_smul, MeasurableEquiv.map_apply, Set.preimage_univ]
 
 lemma μProd_nsmul (n : ℕ) (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] :
     (nsmul n 𝓒).μProd T = MeasureTheory.Measure.pi fun _ => 𝓒.μProd T := by
   induction n with
   | zero =>
     simp [nsmul, μProd, μBolt]
-    congr
-    funext x
-    exact Fin.elim0 x
+    exact congrArg Measure.pi (Subsingleton.elim _ _)
   | succ n ih =>
-    rw [nsmul_succ]
-    rw [μProd_congr]
-    rw [μProd_add]
-    refine MeasurePreserving.map_eq ?_
-    refine MeasurePreserving.symm _ ?_
-    rw [ih]
-    exact MeasureTheory.measurePreserving_piFinSuccAbove (fun _ => 𝓒.μProd T) 0
+    rw [nsmul_succ, μProd_congr, μProd_add, ih]
+    exact ((measurePreserving_piFinSuccAbove (fun _ => 𝓒.μProd T) 0).symm _).map_eq
 
 /-!
 
@@ -581,30 +488,14 @@ lemma integrable_energy_add (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)]
     (h : Integrable 𝓒.energy (𝓒.μProd T)) (h1 : Integrable 𝓒1.energy (𝓒1.μProd T)) :
     Integrable (𝓒 + 𝓒1).energy ((𝓒 + 𝓒1).μProd T) := by
   rw [μProd_add]
-  refine MeasureTheory.Integrable.fun_add ?_ ?_
-  · have h1 : (fun (i : ι × ι1) => 𝓒.energy i.1)
-      = fun (i : ι × ι1) => 𝓒.energy i.1 * (fun (i : ι1) => 1) i.2 := by
-      funext i
-      simp
-    rw [h1]
-    apply Integrable.mul_prod (f := 𝓒.energy) (g := (fun (i : ι1) => 1))
-    · fun_prop
-    · fun_prop
-  · have h1 : (fun (i : ι × ι1) => 𝓒1.energy i.2)
-      = fun (i : ι × ι1) => (fun (i : ι) => 1) i.1 * 𝓒1.energy i.2 := by
-      funext i
-      simp
-    rw [h1]
-    apply Integrable.mul_prod (f := (fun (i : ι) => 1)) (g := 𝓒1.energy) <;> fun_prop
+  exact (h.comp_fst _).fun_add (h1.comp_snd _)
 
 @[fun_prop]
 lemma integrable_energy_congr (T : Temperature) (e : ι1 ≃ᵐ ι)
     (h : Integrable 𝓒.energy (𝓒.μProd T)) :
     Integrable (𝓒.congr e).energy ((𝓒.congr e).μProd T) := by
-  simp [μProd_congr]
-  refine (integrable_map_equiv e.symm (𝓒.congr e).energy).mpr ?_
-  simp only [congr_energy_comp_symmm]
-  exact h
+  rw [μProd_congr]
+  exact (integrable_map_equiv e.symm _).mpr (by simpa only [congr_energy_comp_symmm] using h)
 
 @[fun_prop]
 lemma integrable_energy_nsmul (n : ℕ) (T : Temperature)
@@ -612,14 +503,10 @@ lemma integrable_energy_nsmul (n : ℕ) (T : Temperature)
     (h : Integrable 𝓒.energy (𝓒.μProd T)) :
     Integrable (nsmul n 𝓒).energy ((nsmul n 𝓒).μProd T) := by
   induction n with
-  | zero =>
-    simp [nsmul]
+  | zero => simp [nsmul]
   | succ n ih =>
     rw [nsmul_succ]
-    apply integrable_energy_congr
-    apply integrable_energy_add
-    · exact h
-    · exact ih
+    exact integrable_energy_congr _ _ _ (integrable_energy_add _ _ _ h ih)
 
 /-!
 
@@ -644,45 +531,27 @@ lemma meanEnergy_add {T : Temperature}
     (h1 : Integrable 𝓒.energy (𝓒.μProd T))
     (h2 : Integrable 𝓒1.energy (𝓒1.μProd T)) :
     (𝓒 + 𝓒1).meanEnergy T = 𝓒.meanEnergy T + 𝓒1.meanEnergy T := by
-  rw [meanEnergy]
-  simp only [energy_add_apply]
-  rw [μProd_add]
-  rw [MeasureTheory.integral_prod]
-  simp only
-  conv_lhs =>
-    enter [2, x]
-    rw [integral_add (integrable_const _) h2]
-    rw [integral_const]
-    simp
-  rw [integral_add h1 (integrable_const _)]
-  rw [integral_const]
-  simp
-  rfl
-  · have h1 := integrable_energy_add 𝓒 𝓒1 T h1 h2
-    simp_all only [μProd_add]
-    exact h1
+  have hI := integrable_energy_add 𝓒 𝓒1 T h1 h2
+  rw [μProd_add] at hI
+  rw [meanEnergy, μProd_add, integral_prod _ hI]
+  simp [integral_add (integrable_const _) h2, integral_add h1 (integrable_const _), meanEnergy]
 
 lemma meanEnergy_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
     (𝓒.congr e).meanEnergy T = 𝓒.meanEnergy T := by
-  simp [meanEnergy, μProd_congr]
-  refine MeasurePreserving.integral_comp' ?_ 𝓒.energy
-  refine { measurable := ?_, map_eq := ?_ }
-  · exact MeasurableEquiv.measurable e
-  · exact MeasurableEquiv.map_map_symm e
+  simp only [meanEnergy, μProd_congr]
+  exact MeasurePreserving.integral_comp' ⟨e.measurable, e.map_map_symm⟩ 𝓒.energy
 
 lemma meanEnergy_nsmul (n : ℕ) (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
     (h1 : Integrable 𝓒.energy (𝓒.μProd T)) :
     (nsmul n 𝓒).meanEnergy T = n * 𝓒.meanEnergy T := by
   induction n with
-  | zero =>
-    simp [nsmul, meanEnergy]
+  | zero => simp [nsmul, meanEnergy]
   | succ n ih =>
-    rw [nsmul_succ, meanEnergy_congr, meanEnergy_add, ih]
-    simp only [Nat.cast_add, Nat.cast_one]
+    rw [nsmul_succ, meanEnergy_congr,
+      meanEnergy_add _ _ h1 (integrable_energy_nsmul 𝓒 n T h1), ih]
+    push_cast
     ring
-    · exact h1
-    · exact integrable_energy_nsmul 𝓒 n T h1
 
 /-!
 
@@ -699,16 +568,14 @@ noncomputable def differentialEntropy (T : Temperature) : ℝ :=
 /-- Probabilities are non-negative, assuming a positive partition function. -/
 lemma probability_nonneg
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
-    0 ≤ 𝓒.probability T i := by
-  have hpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
-  simp [CanonicalEnsemble.probability, div_nonneg, Real.exp_nonneg, hpos.le]
+    0 ≤ 𝓒.probability T i :=
+  div_nonneg (exp_nonneg _) (𝓒.mathematicalPartitionFunction_nonneg T)
 
 /-- Probabilities are strictly positive. -/
 lemma probability_pos
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
-    0 < 𝓒.probability T i := by
-  have hZpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
-  simp [probability, Real.exp_pos, hZpos]
+    0 < 𝓒.probability T i :=
+  div_pos (exp_pos _) (𝓒.mathematicalPartitionFunction_pos T)
 
 /-- General entropy non-negativity under a pointwise upper bound `probability ≤ 1`.
 This assumption holds automatically in the finite/counting case (since sums bound each term),
@@ -719,29 +586,10 @@ lemma differentialEntropy_nonneg_of_prob_le_one
     (hInt : Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T))
     (hP_le_one : ∀ i, 𝓒.probability T i ≤ 1) :
     0 ≤ 𝓒.differentialEntropy T := by
-  have hPoint :
-      (fun i => Real.log (𝓒.probability T i)) ≤ᵐ[𝓒.μProd T] fun _ => 0 := by
-    refine Filter.Eventually.of_forall ?_
-    intro i
-    have hpos := probability_pos (𝓒:=𝓒) (T:=T) i
-    have hle := hP_le_one i
-    have hle' : 𝓒.probability T i ≤ Real.exp 0 := by
-      simpa [Real.exp_zero] using hle
-    exact (log_le_iff_le_exp hpos).mpr hle'
-  have hInt0 : Integrable (fun _ : ι => (0 : ℝ)) (𝓒.μProd T) := integrable_const _
-  have hIntLe : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T)
-      ≤ (∫ _i, (0 : ℝ) ∂𝓒.μProd T) :=
-    integral_mono_ae hInt hInt0 hPoint
-  have hent :
-      𝓒.differentialEntropy T
-        = - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) := rfl
-  have hkB : 0 ≤ kB := kB_nonneg
-  have hIle0 : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) ≤ 0 := by
-    simpa [integral_const] using hIntLe
-  have hProd :
-      0 ≤ - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) :=
-    mul_nonneg_of_nonpos_of_nonpos (neg_nonpos.mpr hkB) hIle0
-  simpa [hent] using hProd
+  rw [differentialEntropy]
+  refine mul_nonneg_of_nonpos_of_nonpos (neg_nonpos.mpr kB_nonneg) ?_
+  simpa using integral_mono_ae hInt (integrable_const 0) (Filter.Eventually.of_forall fun i =>
+    Real.log_nonpos (𝓒.probability_nonneg T i) (hP_le_one i))
 
 /-!
 
@@ -765,10 +613,8 @@ lemma partitionFunction_def (𝓒 : CanonicalEnsemble ι) (T : Temperature) :
 lemma partitionFunction_pos
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
-    0 < 𝓒.partitionFunction T := by
-  have hZ := 𝓒.mathematicalPartitionFunction_pos T
-  have hden : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := pow_pos 𝓒.hPos _
-  simp [partitionFunction, hZ, hden]
+    0 < 𝓒.partitionFunction T :=
+  div_pos (𝓒.mathematicalPartitionFunction_pos T) (pow_pos 𝓒.hPos _)
 
 lemma partitionFunction_congr
     (𝓒 : CanonicalEnsemble ι) (e : ι1 ≃ᵐ ι) (T : Temperature) :
@@ -781,16 +627,13 @@ lemma partitionFunction_add
     (h : 𝓒.phaseSpaceunit = 𝓒1.phaseSpaceunit) :
     (𝓒 + 𝓒1).partitionFunction T
       = 𝓒.partitionFunction T * 𝓒1.partitionFunction T := by
-  simp [partitionFunction, mathematicalPartitionFunction_add, h]
-  ring_nf
+  simp [partitionFunction, mathematicalPartitionFunction_add, h, pow_add, div_mul_div_comm]
 
 lemma partitionFunction_nsmul
     (𝓒 : CanonicalEnsemble ι) (n : ℕ) (T : Temperature) :
     (nsmul n 𝓒).partitionFunction T
       = (𝓒.partitionFunction T) ^ n := by
-  simp [partitionFunction, mathematicalPartitionFunction_nsmul,
-        dof_nsmul, phase_space_unit_nsmul, pow_mul]
-  ring_nf
+  simp [partitionFunction, mathematicalPartitionFunction_nsmul, pow_mul', div_pow]
 
 lemma partitionFunction_dof_zero
     (𝓒 : CanonicalEnsemble ι) (T : Temperature) (h : 𝓒.dof = 0) :
@@ -808,14 +651,8 @@ lemma log_partitionFunction
     Real.log (𝓒.partitionFunction T)
       = Real.log (𝓒.mathematicalPartitionFunction T)
         - (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-  have hZ := 𝓒.mathematicalPartitionFunction_pos T
-  have hden : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := pow_pos 𝓒.hPos _
-  have hlogpow :
-      Real.log (𝓒.phaseSpaceunit ^ 𝓒.dof)
-        = (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-    simp
-  simp [partitionFunction, Real.log_div hZ.ne' hden.ne', hlogpow,
-        sub_eq_add_neg]
+  rw [partitionFunction, Real.log_div (𝓒.mathematicalPartitionFunction_pos T).ne'
+    (pow_pos 𝓒.hPos _).ne', Real.log_pow]
 
 /-- A rewriting form convenient under a coercion to a temperature obtained from an inverse
 temperature. -/
@@ -868,42 +705,17 @@ lemma helmholtzFreeEnergy_add
     (h : 𝓒.phaseSpaceunit = 𝓒1.phaseSpaceunit) :
     (𝓒 + 𝓒1).helmholtzFreeEnergy T
       = 𝓒.helmholtzFreeEnergy T + 𝓒1.helmholtzFreeEnergy T := by
-  have hPF := partitionFunction_add (𝓒:=𝓒) (𝓒1:=𝓒1) (T:=T) h
-  have hpf₁ : 0 < 𝓒.partitionFunction T := partitionFunction_pos (𝓒:=𝓒) (T:=T)
-  have hpf₂ : 0 < 𝓒1.partitionFunction T := partitionFunction_pos (𝓒:=𝓒1) (T:=T)
-  calc
-    (𝓒 + 𝓒1).helmholtzFreeEnergy T
-        = -kB * T.val * Real.log ((𝓒 + 𝓒1).partitionFunction T) := rfl
-    _ = -kB * T.val * Real.log (𝓒.partitionFunction T * 𝓒1.partitionFunction T) := by
-          rw [hPF]
-    _ = -kB * T.val *
-          (Real.log (𝓒.partitionFunction T) + Real.log (𝓒1.partitionFunction T)) := by
-          rw [Real.log_mul hpf₁.ne' hpf₂.ne']
-    _ = (-kB * T.val) * Real.log (𝓒.partitionFunction T)
-        + (-kB * T.val) * Real.log (𝓒1.partitionFunction T) := by
-          ring
-    _ = 𝓒.helmholtzFreeEnergy T + 𝓒1.helmholtzFreeEnergy T := by
-          simp [helmholtzFreeEnergy, mul_comm, mul_assoc]
+  simp only [helmholtzFreeEnergy]
+  rw [partitionFunction_add _ _ _ h,
+    Real.log_mul (partitionFunction_pos 𝓒 T).ne' (partitionFunction_pos 𝓒1 T).ne']
+  ring
 
 lemma helmholtzFreeEnergy_nsmul
     (𝓒 : CanonicalEnsemble ι) (n : ℕ) (T : Temperature) :
     (nsmul n 𝓒).helmholtzFreeEnergy T
       = n * 𝓒.helmholtzFreeEnergy T := by
-  have hPF := partitionFunction_nsmul (𝓒:=𝓒) (n:=n) (T:=T)
-  have hlog :
-      Real.log ((nsmul n 𝓒).partitionFunction T)
-        = (n : ℝ) * Real.log (𝓒.partitionFunction T) := by
-    rw [hPF]
-    simp
-  calc
-    (nsmul n 𝓒).helmholtzFreeEnergy T
-        = -kB * T.val * Real.log ((nsmul n 𝓒).partitionFunction T) := rfl
-    _ = -kB * T.val * ((n : ℝ) * Real.log (𝓒.partitionFunction T)) := by
-          rw [hlog]
-    _ = (n : ℝ) * (-kB * T.val * Real.log (𝓒.partitionFunction T)) := by
-          ring
-    _ = n * 𝓒.helmholtzFreeEnergy T := by
-          simp [helmholtzFreeEnergy, mul_comm, mul_left_comm, mul_assoc]
+  simp only [helmholtzFreeEnergy, partitionFunction_nsmul, Real.log_pow]
+  ring
 
 /-- The dimensionless physical probability density. This is is the probability density w.r.t. the
 measure, obtained by dividing the phase space measure by the fundamental unit `h^dof`, making the
@@ -918,66 +730,33 @@ lemma physicalProbability_def (T : Temperature) (i : ι) :
 
 lemma physicalProbability_measurable (T : Temperature) :
     Measurable (𝓒.physicalProbability T) := by
-  let c : ℝ := (𝓒.phaseSpaceunit ^ 𝓒.dof) / 𝓒.mathematicalPartitionFunction T
-  have h_energy_meas : Measurable fun i => 𝓒.energy i := 𝓒.energy_measurable
-  have h_mul_meas : Measurable fun i => (-(T.β : ℝ)) * 𝓒.energy i := by
-    simpa [mul_comm] using h_energy_meas.const_mul (-(T.β : ℝ))
-  have h_exp_meas : Measurable fun i => Real.exp (-(T.β : ℝ) * 𝓒.energy i) :=
-    (continuous_exp.measurable.comp h_mul_meas)
-  have h_fun_meas : Measurable fun i => c * Real.exp (-(T.β : ℝ) * 𝓒.energy i) := by
-    simpa [mul_comm] using (h_exp_meas.const_mul c)
-  have h_eq :
-      (fun i => 𝓒.physicalProbability T i)
-        = fun i => c * Real.exp (-(T.β : ℝ) * 𝓒.energy i) := by
-    funext i
-    simp [physicalProbability, probability, c, div_eq_mul_inv,
-          mul_comm, mul_assoc]
-  simpa [h_eq] using h_fun_meas
+  unfold physicalProbability probability
+  fun_prop
 
 lemma physicalProbability_nonneg
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
-    0 ≤ 𝓒.physicalProbability T i := by
-  have hp := 𝓒.probability_nonneg (T:=T) i
-  exact mul_nonneg hp (by exact pow_nonneg (le_of_lt 𝓒.hPos) _)
+    0 ≤ 𝓒.physicalProbability T i :=
+  mul_nonneg (𝓒.probability_nonneg T i) (pow_nonneg 𝓒.hPos.le _)
 
 lemma physicalProbability_pos
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
-    0 < 𝓒.physicalProbability T i := by
-  have hp := 𝓒.probability_pos (T:=T) i
-  exact mul_pos hp (pow_pos 𝓒.hPos _)
+    0 < 𝓒.physicalProbability T i :=
+  mul_pos (𝓒.probability_pos T i) (pow_pos 𝓒.hPos _)
 
 lemma log_physicalProbability
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
     Real.log (𝓒.physicalProbability T i)
       = Real.log (𝓒.probability T i) + (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := by
-  have hppos := 𝓒.probability_pos (T:=T) i
-  have hpowpos : 0 < 𝓒.phaseSpaceunit ^ 𝓒.dof := pow_pos 𝓒.hPos _
-  simp [physicalProbability, Real.log_mul hppos.ne' hpowpos.ne', Real.log_pow]
+  rw [physicalProbability, Real.log_mul (𝓒.probability_pos T i).ne' (pow_pos 𝓒.hPos _).ne',
+    Real.log_pow]
 
 lemma integral_probability
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
     (∫ i, 𝓒.probability T i ∂ 𝓒.μ) = 1 := by
-  classical
-  have hZ :
-      𝓒.mathematicalPartitionFunction T
-        = ∫ i, Real.exp (- T.β * 𝓒.energy i) ∂ 𝓒.μ :=
-    mathematicalPartitionFunction_eq_integral (𝓒:=𝓒) (T:=T)
-  have hZpos : 0 < 𝓒.mathematicalPartitionFunction T :=
-    𝓒.mathematicalPartitionFunction_pos T
-  have h_int :
-      (∫ i, 𝓒.probability T i ∂ 𝓒.μ)
-        = (𝓒.mathematicalPartitionFunction T)⁻¹ *
-          (∫ i, Real.exp (- T.β * 𝓒.energy i) ∂ 𝓒.μ) := by
-    simp [probability, div_eq_mul_inv, integral_const_mul,
-          mul_comm]
-  calc
-    (∫ i, 𝓒.probability T i ∂ 𝓒.μ)
-        = (𝓒.mathematicalPartitionFunction T)⁻¹ *
-          (∫ i, Real.exp (- T.β * 𝓒.energy i) ∂ 𝓒.μ) := h_int
-    _ = (𝓒.mathematicalPartitionFunction T)⁻¹ *
-          𝓒.mathematicalPartitionFunction T := by simp [hZ]
-    _ = 1 := by simp [hZpos.ne']
+  simp only [probability, div_eq_mul_inv, integral_mul_const,
+    ← mathematicalPartitionFunction_eq_integral]
+  exact mul_inv_cancel₀ (𝓒.mathematicalPartitionFunction_pos T).ne'
 
 /-- Normalization of the dimensionless physical probability density over the base measure. -/
 lemma integral_physicalProbability_base
@@ -985,16 +764,7 @@ lemma integral_physicalProbability_base
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
     (∫ i, 𝓒.physicalProbability T i ∂ 𝓒.μ)
       = 𝓒.phaseSpaceunit ^ 𝓒.dof := by
-  classical
-  have hnorm := integral_probability (𝓒:=𝓒) (T:=T)
-  calc
-    (∫ i, 𝓒.physicalProbability T i ∂ 𝓒.μ)
-        = (∫ i, 𝓒.probability T i * (𝓒.phaseSpaceunit ^ 𝓒.dof) ∂ 𝓒.μ) := by
-              simp [physicalProbability]
-    _ = (∫ i, 𝓒.probability T i ∂ 𝓒.μ) * (𝓒.phaseSpaceunit ^ 𝓒.dof) := by
-              simp [integral_mul_const, mul_comm]
-    _ = 1 * (𝓒.phaseSpaceunit ^ 𝓒.dof) := by simp [hnorm]
-    _ = 𝓒.phaseSpaceunit ^ 𝓒.dof := by ring
+  simp [physicalProbability, integral_mul_const, integral_probability]
 
 lemma physicalProbability_dof_zero
     (T : Temperature) (h : 𝓒.dof = 0) (i : ι) :
@@ -1017,8 +787,8 @@ lemma physicalProbability_add
     (h : 𝓒.phaseSpaceunit = 𝓒1.phaseSpaceunit) :
     (𝓒 + 𝓒1).physicalProbability T i
       = 𝓒.physicalProbability T i.1 * 𝓒1.physicalProbability T i.2 := by
-  simp [physicalProbability, probability_add, phase_space_unit_add, dof_add, h, pow_add]
-  ring
+  simp [physicalProbability, probability_add, phase_space_unit_add, dof_add, h, pow_add,
+    mul_mul_mul_comm]
 
 /-- The absolute thermodynamic entropy, defined from its statistical mechanical foundation as
 the Gibbs-Shannon entropy of the dimensionless physical probability distribution.
