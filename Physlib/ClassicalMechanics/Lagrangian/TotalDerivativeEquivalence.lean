@@ -10,6 +10,8 @@ public import Mathlib.Analysis.InnerProductSpace.Dual
 public import Physlib.SpaceAndTime.Time.Derivatives
 public import Mathlib.Analysis.Calculus.ContDiff.CPolynomial
 public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
+public import Physlib.ClassicalMechanics.EulerLagrange
+
 /-!
 
 # Equivalent Lagrangians under Total Derivatives
@@ -208,7 +210,7 @@ lemma isTotalTimeDerivative_neg {δL : Time → X → X → ℝ} (h :  IsTotalTi
     simp only [fderiv_fun_neg, _root_.neg_apply]
 
 /--
-If δL is a total time derivative (of a smooth function), then it is smooth 
+If δL is a total time derivative (of a smooth function), then it is smooth
 -/
 lemma totalTimeDerivative_contDiff {δL : Time → X → X → ℝ} (h : IsTotalTimeDerivative δL):
     ContDiff ℝ ∞ ↿δL := by
@@ -216,7 +218,7 @@ lemma totalTimeDerivative_contDiff {δL : Time → X → X → ℝ} (h : IsTotal
  let Fder_v := Prod.map (fderiv ℝ ↿(fun t q => F t q)) (fun (v : X) => v )
  let regroup := ↿(fun (t : Time) (q : X) (v : X) => ((t, q), v))
  let appv := fun (FV : ((Time × X →L[ℝ] ℝ) × X )) => FV.fst (1, FV.snd)
- have hδL : ↿δL = appv ∘ Fder_v ∘ regroup := by 
+ have hδL : ↿δL = appv ∘ Fder_v ∘ regroup := by
    funext tqv
    rcases tqv with ⟨t, q, v⟩
    simp
@@ -324,7 +326,7 @@ lemma totalTimeDerivative_varGradient_equivalenvce [CompleteSpace X] (L L' : Tim
       simp only [hL, hL', ↓reduceDIte]
 
 /--
-Corollary: If L and L' differ by a total time derivative, then the corresponding Euler-Lagrange 
+Corollary: If L and L' differ by a total time derivative, then the corresponding Euler-Lagrange
 operators coincide
 -/
 lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : Time → X → X → ℝ) 
@@ -336,7 +338,7 @@ lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : T
       | inl hL => 
         constructor 
         · exact hL
-        · have h_triv : ↿L' =  ↿L + ↿(L' - L) := by 
+        · have h_triv : ↿L' =  ↿L + ↿(L' - L) := by
             funext tqv
             rcases tqv with ⟨t, q', v⟩
             rw [Pi.add_apply]
@@ -346,10 +348,10 @@ lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : T
           rw [h_triv]
           apply ContDiff.add
           · exact hL
-          · exact h_δL_contDiff 
-      | inr hL' => 
+          · exact h_δL_contDiff
+      | inr hL' =>
         constructor
-        · have h_triv : ↿L =  ↿L' + ↿(-(L' - L)) := by 
+        · have h_triv : ↿L =  ↿L' + ↿(-(L' - L)) := by
             funext tqv
             rcases tqv with ⟨t, q', v⟩
             rw [Pi.add_apply]
@@ -361,8 +363,8 @@ lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : T
           · exact hL'
           · exact h_δL_contDiff
         · exact hL'
-  rw [←euler_lagrange_varGradient L q hq hContDiff_both.left]
-  rw [←euler_lagrange_varGradient L' q hq hContDiff_both.right]
+  rw [← euler_lagrange_varGradient L q hq hContDiff_both.left]
+  rw [← euler_lagrange_varGradient L' q hq hContDiff_both.right]
   apply Eq.symm
   apply totalTimeDerivative_varGradient_equivalenvce
   · exact htot
