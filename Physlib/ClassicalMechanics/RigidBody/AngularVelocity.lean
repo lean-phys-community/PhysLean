@@ -109,4 +109,68 @@ lemma angularVelocity_of_orientation_const (M : RigidBodyMotion 3)
   rw [angularVelocity_eq, congrFun (M.angularVelocityTensor_of_orientation_const R h) t]
   fin_cases i <;> simp [crossProductVee]
 
+/-- The time derivative of the orientation is `Ṙ = Ω R`, recovering the orientation path from its
+angular velocity tensor `Ω = Ṙ Rᵀ` via the orthogonality `Rᵀ R = 1`. -/
+lemma angularVelocityTensor_mul_orientation (M : RigidBodyMotion d) (t : Time) :
+    M.angularVelocityTensor t * (M.orientation t).1 = ∂ₜ (fun s => (M.orientation s).1) t := by
+  rw [angularVelocityTensor_eq, mul_assoc,
+    mul_eq_one_comm.mp (M.orientation_mul_transpose t), mul_one]
+
+/-- The velocity of a body point decomposes as `v = Ṙ (y − c) + V`: the rate of change of the
+orientation acting on the body-frame position, plus the centre-of-mass velocity. -/
+lemma velocity_eq_deriv_orientation (M : RigidBodyMotion d) (y : Space d) (t : Time) (i : Fin d)
+    (hR : Differentiable ℝ (fun s => (M.orientation s).1))
+    (hX : Differentiable ℝ M.comTrajectory) :
+    M.velocity y t i
+      = (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j) i
+        + M.centerOfMassVelocity t i := by
+  have hentry : ∀ a b : Fin d, Differentiable ℝ (fun s => (M.orientation s).1 a b) := fun a b =>
+    ((Matrix.entryLinearMap ℝ ℝ a b).toContinuousLinearMap).differentiable.comp hR
+  have hXcoord : ∀ k : Fin d, Differentiable ℝ (fun s => M.comTrajectory s k) := fun k =>
+    (Space.eval_differentiable k).comp hX
+  have hd : Differentiable ℝ (fun s => M.displacement s y) := by
+    have hcoord : ∀ k : Fin d, Differentiable ℝ (fun s => M.displacement s y k) := by
+      intro k
+      simp only [displacement_apply]
+      exact (Differentiable.fun_sum
+        (fun j _ => (hentry k j).mul_const (y j - M.centerOfMass j))).add (hXcoord k)
+    exact Space.mk_differentiable.comp (differentiable_pi.mpr hcoord)
+  have hmv : (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j) i
+      = ∑ j, (∂ₜ (fun s => (M.orientation s).1) t) i j * (y j - M.centerOfMass j) := rfl
+  rw [M.velocity_apply y t i hd]
+  simp only [displacement_apply]
+  rw [Time.deriv_add (fun s => ∑ j, (M.orientation s).1 i j * (y j - M.centerOfMass j))
+      (fun s => M.comTrajectory s i)
+      ((Differentiable.fun_sum
+        fun j _ => (hentry i j).mul_const (y j - M.centerOfMass j)) t) ((hXcoord i) t),
+    Time.deriv_fun_sum Finset.univ
+      (fun j s => (M.orientation s).1 i j * (y j - M.centerOfMass j))
+      (fun j _ => ((hentry i j).mul_const (y j - M.centerOfMass j)) t),
+    Finset.sum_congr rfl (fun j (_ : j ∈ Finset.univ) =>
+      Time.deriv_mul_const (fun s => (M.orientation s).1 i j)
+        (y j - M.centerOfMass j) ((hentry i j) t))]
+  simp only [Time.deriv_matrix_apply (fun s => (M.orientation s).1) t (hR t)]
+  rw [hmv, Time.deriv_space hX t i, ← centerOfMassVelocity_eq]
+
+/-- The Landau–Lifshitz velocity decomposition `v = V + ω × r` for a rigid body in three
+dimensions: the velocity of a body point is the centre-of-mass velocity plus the cross product of
+the angular velocity with the point's position relative to the centre of mass. -/
+theorem velocity_eq_angularVelocity (M : RigidBodyMotion 3) (y : Space 3) (t : Time) (i : Fin 3)
+    (hR : Differentiable ℝ (fun s => (M.orientation s).1))
+    (hX : Differentiable ℝ M.comTrajectory) :
+    M.velocity y t i
+      = M.centerOfMassVelocity t i
+        + (M.angularVelocity t ⨯₃ fun j => M.displacement t y j - M.comTrajectory t j) i := by
+  have hRw : (M.orientation t).1 *ᵥ (fun j => y j - M.centerOfMass j)
+      = fun j => M.displacement t y j - M.comTrajectory t j := by
+    funext k
+    show ((M.orientation t).1 *ᵥ fun j => y j - M.centerOfMass j) k
+      = M.displacement t y k - M.comTrajectory t k
+    rw [eq_sub_iff_add_eq, displacement_apply]
+    rfl
+  rw [M.velocity_eq_deriv_orientation y t i hR hX, add_comm]
+  congr 1
+  rw [← M.angularVelocityTensor_mul_orientation t, ← Matrix.mulVec_mulVec, hRw,
+    ← M.crossProductMatrix_angularVelocity t (hR t), Matrix.crossProductMatrix_mulVec]
+
 end RigidBodyMotion

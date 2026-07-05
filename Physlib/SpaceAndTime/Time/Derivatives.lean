@@ -129,6 +129,23 @@ lemma deriv_neg [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) :
   rw [deriv, fderiv_neg]
   rfl
 
+lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M] (f g : Time → M)
+    (hf : DifferentiableAt ℝ f t) (hg : DifferentiableAt ℝ g t) :
+    ∂ₜ (fun s => f s + g s) t = ∂ₜ f t + ∂ₜ g t := by
+  simp only [Time.deriv_eq]
+  rw [fderiv_fun_add hf hg, _root_.add_apply]
+
+lemma deriv_fun_sum {ι : Type*} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (s : Finset ι) (a : ι → Time → M) (ha : ∀ i ∈ s, DifferentiableAt ℝ (a i) t) :
+    ∂ₜ (fun x => ∑ i ∈ s, a i x) t = ∑ i ∈ s, ∂ₜ (a i) t := by
+  simp only [Time.deriv_eq]
+  rw [fderiv_fun_sum ha, _root_.sum_apply]
+
+lemma deriv_mul_const (f : Time → ℝ) (c : ℝ) (hf : DifferentiableAt ℝ f t) :
+    ∂ₜ (fun s => f s * c) t = ∂ₜ f t * c := by
+  simp only [Time.deriv_eq]
+  rw [fderiv_mul_const hf c, _root_.smul_apply, smul_eq_mul, mul_comm]
+
 /-- Quotient rule for `Time.deriv` on real-valued functions: if `c` and `g` are
   differentiable at `t` and `g t ≠ 0`, then
   `∂ₜ (c / g) t = (∂ₜ c t * g t - c t * ∂ₜ g t) / (g t)^2`. -/
