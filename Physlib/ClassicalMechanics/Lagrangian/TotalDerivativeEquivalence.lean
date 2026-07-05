@@ -221,7 +221,7 @@ lemma totalTimeDerivative_contDiff {δL : Time → X → X → ℝ} (h : IsTotal
  have hδL : ↿δL = appv ∘ Fder_v ∘ regroup := by
    funext tqv
    rcases tqv with ⟨t, q, v⟩
-   simp
+   simp only [Function.comp_apply]
    change δL t q v = appv (Fder_v (regroup (t, q, v)))
    rw [heq t q v]
    rfl
@@ -329,14 +329,14 @@ lemma totalTimeDerivative_varGradient_equivalenvce [CompleteSpace X] (L L' : Tim
 Corollary: If L and L' differ by a total time derivative, then the corresponding Euler-Lagrange
 operators coincide
 -/
-lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : Time → X → X → ℝ) 
-    (htot : IsTotalTimeDerivative (L' - L)) (hContDiff : (ContDiff ℝ ∞ ↿L) ∨ (ContDiff ℝ ∞ ↿L') )
+lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : Time → X → X → ℝ)
+    (htot : IsTotalTimeDerivative (L' - L)) (hContDiff : (ContDiff ℝ ∞ ↿L) ∨ (ContDiff ℝ ∞ ↿L'))
     (q : Time → X)    (hq : ContDiff ℝ ∞ q) : eulerLagrangeOp L q = eulerLagrangeOp L' q := by
   rcases (isTotalTimeDerivative_explicit.mp htot) with ⟨F, hFContDiff, hEq⟩
   have hContDiff_both :  (ContDiff ℝ ∞ ↿L) ∧ (ContDiff ℝ ∞ ↿L') := by
     cases hContDiff with
-      | inl hL => 
-        constructor 
+      | inl hL =>
+        constructor
         · exact hL
         · have h_triv : ↿L' =  ↿L + ↿(L' - L) := by
             funext tqv
