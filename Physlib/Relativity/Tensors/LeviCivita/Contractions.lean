@@ -90,11 +90,10 @@ private lemma cons_finSum {n : ℕ} (a : Fin 1 ⊕ Fin 3) (h : Fin n → (Fin 1 
 
 -/
 
-TODO "A Lorentz-indexed Levi-Civita tensor on the split index type `Fin 1 ⊕ Fin 3`, whose
-  contractions raise and lower indices with the Lorentz metric `η` (rather than the naive
-  Euclidean Kronecker pairing used for the `Fin 4` indices here), is future work. A natural home
-  is ./Relativity/Tensors/RealEuclidean/Basic.lean, defining it for now directly via
-  generalizedKroneckerDelta. This is a large change and is intentionally out of scope here."
+TODO "The contractions done here use the relativistic Levi-Civita tensor `ε4`
+  but treat it as a Euclidean tensor. We should define
+  a euclidean form of the Levi-Civita tensor and prove replace the
+  results here with theorems about that tensor."
 
 /-- **Full Euclidean Levi-Civita contraction** `∑_b (ε4)_b · (ε4)_b = 24` at the symbol level:
 summing the square of every standard-basis component of `ε4` over all four `Fin 4` index slots,
