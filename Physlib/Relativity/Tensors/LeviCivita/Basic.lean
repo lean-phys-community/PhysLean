@@ -76,6 +76,10 @@ lemma leviCivita_eq_ofInt : ε4 =
     generalizedKroneckerDelta (fun i => finSumFinEquiv (f i)) (id : Fin 4 → Fin 4) :=
   rfl
 
+/-- The Euclidean Levi-Civita symbol `ε_{ijkl}` in dimension 4. -/
+def _root_.euclidLeviCivita (g : Fin 4 → Fin 4) : ℝ :=
+  generalizedKroneckerDelta g (id : Fin 4 → Fin 4)
+
 /-!
 
 ## B. Components in the standard basis
