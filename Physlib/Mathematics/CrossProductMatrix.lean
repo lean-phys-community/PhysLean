@@ -17,9 +17,6 @@ The hat map sends a vector `ω : Fin 3 → ℝ` to the skew-symmetric matrix `[�
 `[ω]ₓ *ᵥ v = ω ⨯₃ v`. It realises the correspondence between `ℝ³` and the skew-symmetric `3 × 3`
 matrices (the Lie algebra `𝖘𝖔(3)`), and underlies the angular velocity of a rigid body.
 
-The file also records the component form of the triple (`bac−cab`) cross product `v ⨯₃ (w ⨯₃ v)`,
-used to express the angular momentum of a rigid body.
-
 -/
 
 @[expose] public section
@@ -69,14 +66,5 @@ lemma crossProductMatrix_crossProductVee {A : Matrix (Fin 3) (Fin 3) ℝ} (hA : 
     first
       | exact (h _ _).symm
       | exact (hdiag _).symm
-
-/-- The component form of the triple cross product `v ⨯₃ (w ⨯₃ v)`: by the `bac−cab` identity its
-`i`-th entry is `|v|² wᵢ − (v · w) vᵢ`, written with the explicit component sums `∑ k, (v k)²` and
-`∑ j, v j * w j`. -/
-lemma cross_cross_self_apply (v w : Fin 3 → ℝ) (i : Fin 3) :
-    (v ⨯₃ (w ⨯₃ v)) i = (∑ k, (v k) ^ 2) * w i - (∑ j, v j * w j) * v i := by
-  rw [cross_cross_eq_smul_sub_smul']
-  simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, dotProduct, Fin.sum_univ_three]
-  ring
 
 end Matrix
