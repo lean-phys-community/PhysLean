@@ -82,7 +82,3 @@ Requirements:
   - description: "The API shall show that translationally-invariant metrics on `TimeTransMan` are in one-to-one correspondence with the positive reals (choices of `TimeUnit`)."
     done: false
     location: N/A
-
-  - description: "The API shall define `HasTimeDimension`, the property of a function from `TimeUnit` to a type `M` that scales with the time unit with respect to a rational power `d`."
-    done: false
-    location: N/A
