@@ -227,17 +227,18 @@ private lemma exp_decay_smul_equationOfMotion
 
 /-!
 
-private lemma fderiv_comp_val_eq_deriv (g : ℝ → ℝ) (hg : DifferentiableAt ℝ g t.val) :
-    (fderiv ℝ (fun s : Time => g s.val) t) 1 = _root_.deriv g t.val := by
-  rw [fderiv_fun_comp t hg (by fun_prop), ContinuousLinearMap.comp_apply, Time.fderiv_val]
-  simp
-
 ### B.4. Derivatives of the base trajectories
 
 The remaining private lemmas compute the velocity and acceleration of the trigonometric,
 polynomial, and hyperbolic base trajectories before the exponential decay factor is applied.
 
 -/
+
+private lemma fderiv_comp_val_eq_deriv {t : Time} (g : ℝ → ℝ)
+    (hg : DifferentiableAt ℝ g t.val) :
+    (fderiv ℝ (fun s : Time => g s.val) t) 1 = _root_.deriv g t.val := by
+  rw [fderiv_fun_comp t hg (by fun_prop), ContinuousLinearMap.comp_apply, Time.fderiv_val]
+  simp
 
 private lemma criticallyDampedBase_velocity (IC : InitialConditions) :
     ∂ₜ (S.criticallyDampedBase IC) =

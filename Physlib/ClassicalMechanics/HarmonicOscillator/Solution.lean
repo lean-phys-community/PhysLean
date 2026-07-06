@@ -572,9 +572,9 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
         HarmonicOscillator.potentialEnergy, hy0, hyv0]
   funext t
   have hk : 0 ≤ S.kineticEnergy y t := by
-    simp [HarmonicOscillator.kineticEnergy, mul_nonneg, S.m_pos.le, real_inner_self_nonneg]
+    simp [HarmonicOscillator.kineticEnergy, mul_nonneg, S.m_pos.le]
   have hp : 0 ≤ S.potentialEnergy (y t) := by
-    simp [HarmonicOscillator.potentialEnergy, mul_nonneg, S.k_pos.le, real_inner_self_nonneg]
+    simp [HarmonicOscillator.potentialEnergy, mul_nonneg, S.k_pos.le]
   have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp (hE t)).2
   have hpe' : S.k * inner ℝ (y t) (y t) = 0 := by
     simpa [HarmonicOscillator.potentialEnergy, smul_eq_mul] using hpe
