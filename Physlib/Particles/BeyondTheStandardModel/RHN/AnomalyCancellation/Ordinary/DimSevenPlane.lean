@@ -245,9 +245,9 @@ theorem basis_linear_independent : LinearIndependent ℚ B := by
   simp only [Fin.sum_univ_seven, B, B₀, B₁, B₂, B₃, B₄, B₅, B₆, HSMul.hSMul,
     ACCSystemCharges.chargesAddCommMonoid_add, ACCSystemCharges.chargesModule_smul, Fin.isValue,
     Equiv.invFun_as_coe, toSpeciesEquiv_symm_apply, Fin.divNat, Nat.reduceMul, Fin.coe_ofNat_eq_mod,
-    Nat.zero_mod, Nat.zero_div, Fin.zero_eta, Fin.modNat, mul_one, mul_zero, add_zero, Nat.reduceMod,
-    Nat.ofNat_pos, Nat.div_self, Fin.mk_one, Nat.mod_self, zero_add, Nat.reduceDiv,
-    Fin.reduceFinMk] at h0 h1 h2 h3 h4 h5 h6
+    Nat.zero_mod, Nat.zero_div, Fin.zero_eta, Fin.modNat, mul_one, mul_zero, add_zero,
+    Nat.reduceMod, Nat.ofNat_pos, Nat.div_self, Fin.mk_one, Nat.mod_self, zero_add,
+    Nat.reduceDiv, Fin.reduceFinMk] at h0 h1 h2 h3 h4 h5 h6
   intro i
   fin_cases i <;> assumption
 

@@ -337,7 +337,10 @@ lemma fderiv_star_eq {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 lemma dWirtingerDir_star_comp (hf : DifferentiableAt ℝ f u) (v : V) :
     dWirtingerDir (fun p => star (f p)) v u = star (dWirtingerAntiDir f v u) := by
   rw [dWirtingerDir_apply, dWirtingerAntiDir_apply, fderiv_star_eq hf]
-  simp
+  simp only [one_div, ContinuousLinearMap.comp_apply, ContinuousLinearEquiv.coe_coe,
+    ContinuousAlgEquiv.coeCLE_apply, Complex.conjCAE_apply, star_mul', star_inv₀,
+    star_ofNat, star_add, RCLike.star_def, Complex.conj_I, neg_mul,
+    mul_eq_mul_left_iff, inv_eq_zero, OfNat.ofNat_ne_zero, or_false]
   ring
 
 /-- Conjugating the function swaps the operators up to an outer conjugation:

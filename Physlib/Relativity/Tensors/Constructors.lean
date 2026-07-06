@@ -143,7 +143,7 @@ lemma actionT_fromPairT {c1 c2 : C}
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul x y =>
-    simp
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, map_tmul]
     rw [fromPairT_tmul, ← permT_equivariant, ← prodT_equivariant,
       actionT_fromSingleT, actionT_fromSingleT]
     rfl
@@ -174,7 +174,7 @@ lemma fromPairT_comm {c1 c2 : C}
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul x y =>
-    simp
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, comm_tmul, Fin.isValue]
     rw [fromPairT_tmul, fromPairT_tmul, prodT_swap]
     simp only [Nat.succ_eq_add_one, Nat.reduceAdd, permT_permT, CompTriple.comp_eq, Fin.isValue]
     congr
@@ -429,7 +429,7 @@ lemma actionT_fromTripleT {c1 c2 c3 : C}
     induction yz using TensorProduct.induction_on with
     | zero => simp
     | tmul y z =>
-      simp
+      simp only [Nat.succ_eq_add_one, Nat.reduceAdd, map_tmul]
       rw [fromTripleT_tmul, fromTripleT_tmul]
       rw [← permT_equivariant, ← prodT_equivariant, ← prodT_equivariant]
       simp [← actionT_fromSingleT]
@@ -448,7 +448,8 @@ lemma fromTripleT_basis_repr {c c1 c2 : C}
     induction yz using TensorProduct.induction_on with
     | zero => simp
     | tmul y z =>
-      simp
+      simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue,
+        Basis.tensorProduct_repr_tmul_apply, smul_eq_mul]
       rw [fromTripleT_tmul]
       rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, fromSingleT_eq_pureT]
       rw [prodT_pure, prodT_pure, permT_pure]

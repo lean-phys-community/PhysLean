@@ -594,7 +594,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     exact abs_of_nonneg (by positivity)
   · intro n
     filter_upwards [Measure.ae_ne volume 0] with x hx
-    simp
+    simp only [norm_mul, Real.norm_eq_abs]
     exact mul_le_mul_of_nonneg_left (normPowerSeries_log_le n x hx) (abs_nonneg _)
   · filter_upwards [Measure.ae_ne volume 0] with x hx
     exact tendsto_const_nhds.mul

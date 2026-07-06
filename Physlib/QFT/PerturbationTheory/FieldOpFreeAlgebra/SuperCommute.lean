@@ -105,9 +105,10 @@ lemma superCommuteF_anPartF_crPartF (φ φ' : 𝓕.FieldOp) :
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • crPartF φ' * anPartF φ := by
   match φ, φ' with
   | FieldOp.inAsymp φ, _ =>
-    simp
+    simp only [anPartF_negAsymp, map_zero, LinearMap.zero_apply, zero_mul, mul_zero,
+      sub_self]
   | _, FieldOp.outAsymp φ =>
-    simp
+    simp only [crPartF_posAsymp, map_zero, mul_zero, smul_zero, zero_mul, sub_self]
   | FieldOp.position φ, FieldOp.position φ' =>
     simp [anPartF_position, crPartF_position, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
@@ -124,21 +125,22 @@ lemma superCommuteF_anPartF_crPartF (φ φ' : 𝓕.FieldOp) :
 lemma superCommuteF_crPartF_anPartF (φ φ' : 𝓕.FieldOp) :
     [crPartF φ, anPartF φ']ₛF = crPartF φ * anPartF φ' -
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPartF φ' * crPartF φ := by
-    match φ, φ' with
-    | FieldOp.outAsymp φ, _ =>
-    simp
-    | _, FieldOp.inAsymp φ =>
-    simp
-    | FieldOp.position φ, FieldOp.position φ' =>
+  match φ, φ' with
+  | FieldOp.outAsymp φ, _ =>
+    simp only [crPartF_posAsymp, map_zero, LinearMap.zero_apply, zero_mul, mul_zero,
+      sub_self]
+  | _, FieldOp.inAsymp φ =>
+    simp only [anPartF_negAsymp, map_zero, mul_zero, smul_zero, zero_mul, sub_self]
+  | FieldOp.position φ, FieldOp.position φ' =>
     simp [crPartF_position, anPartF_position, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
-    | FieldOp.position φ, FieldOp.outAsymp φ' =>
+  | FieldOp.position φ, FieldOp.outAsymp φ' =>
     simp [crPartF_position, anPartF_posAsymp, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
-    | FieldOp.inAsymp φ, FieldOp.position φ' =>
+  | FieldOp.inAsymp φ, FieldOp.position φ' =>
     simp [crPartF_negAsymp, anPartF_position, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
-    | FieldOp.inAsymp φ, FieldOp.outAsymp φ' =>
+  | FieldOp.inAsymp φ, FieldOp.outAsymp φ' =>
     simp [crPartF_negAsymp, anPartF_posAsymp, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
 
@@ -147,21 +149,22 @@ lemma superCommuteF_crPartF_crPartF (φ φ' : 𝓕.FieldOp) :
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • crPartF φ' * crPartF φ := by
   match φ, φ' with
   | FieldOp.outAsymp φ, _ =>
-  simp
+    simp only [crPartF_posAsymp, map_zero, LinearMap.zero_apply, zero_mul, mul_zero,
+      sub_self]
   | _, FieldOp.outAsymp φ =>
-  simp
+    simp only [crPartF_posAsymp, map_zero, mul_zero, smul_zero, zero_mul, sub_self]
   | FieldOp.position φ, FieldOp.position φ' =>
-  simp [crPartF_position, ← ofCrAnListF_singleton,
-    superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
+    simp [crPartF_position, ← ofCrAnListF_singleton,
+      superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
   | FieldOp.position φ, FieldOp.inAsymp φ' =>
-  simp [crPartF_position, crPartF_negAsymp, ← ofCrAnListF_singleton,
-    superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
+    simp [crPartF_position, crPartF_negAsymp, ← ofCrAnListF_singleton,
+      superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
   | FieldOp.inAsymp φ, FieldOp.position φ' =>
-  simp [crPartF_negAsymp, crPartF_position, ← ofCrAnListF_singleton,
-    superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
+    simp [crPartF_negAsymp, crPartF_position, ← ofCrAnListF_singleton,
+      superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
   | FieldOp.inAsymp φ, FieldOp.inAsymp φ' =>
-  simp [crPartF_negAsymp, ← ofCrAnListF_singleton,
-    superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
+    simp [crPartF_negAsymp, ← ofCrAnListF_singleton,
+      superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
 
 lemma superCommuteF_anPartF_anPartF (φ φ' : 𝓕.FieldOp) :
     [anPartF φ, anPartF φ']ₛF =
