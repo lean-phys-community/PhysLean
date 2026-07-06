@@ -30,7 +30,7 @@ In this module we define and prove basic lemmas about derivatives of functions o
   - A.2. Derivatives of functions into manifolds
 - B. Linearlity properties of the derivative
 - C. Derivative of constant functions
-- D. Smoothness properties of the derivative
+- D. Smoothness properties
 - E. Derivatives of components
 
 ## iv. References
@@ -157,11 +157,16 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) :
 
 /-!
 
-## D. Smoothness properties of the derivative
+## D. Smoothness properties
 
 -/
 
 open MeasureTheory ContDiff InnerProductSpace Time
+
+@[fun_prop]
+lemma val_contDiff {n : WithTop ℕ∞} : ContDiff ℝ n Time.val := by
+  change ContDiff ℝ n toRealCLM
+  fun_prop
 
 @[fun_prop]
 lemma deriv_differentiable_of_contDiff {M : Type}

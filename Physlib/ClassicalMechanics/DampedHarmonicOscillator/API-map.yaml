@@ -15,8 +15,10 @@ Overview: |
     equivalence with Newton's second law, the rate of mechanical-energy dissipation
     along solutions, the three damping regimes (underdamped, critically damped,
     overdamped) selected by the sign of the discriminant `γ² - 4 m k` together with
-    the decay rate and regime-selected angular frequency, and the reduction to the
-    undamped harmonic oscillator when `γ = 0`. The `Solution` module defines the
+    the decay rate and regime-selected angular frequency, the reduction to the
+    undamped harmonic oscillator when `γ = 0`, and the Caldirola–Kanai lagrangian
+    `exp (γ/m * t) * (T - V)`, whose variational gradient vanishes if and only if
+    the equation of motion holds. The `Solution` module defines the
     initial conditions, the explicit closed-form `trajectory` selected from the
     damping regime (trigonometric, polynomial, or hyperbolic, each times an
     exponential decay factor), and proves that the selected trajectory satisfies the
@@ -29,6 +31,8 @@ ParentAPIs:
 References:
   - Landau & Lifshitz, Mechanics, page 76, section 25.
   - Goldstein, Classical Mechanics, Chapter 2.
+  - Caldirola, Nuovo Cimento 18 (1941) 393.
+  - Kanai, Progress of Theoretical Physics 3 (1948) 440.
 
 Requirements:
 
@@ -82,22 +86,24 @@ Requirements:
     location: Physlib/ClassicalMechanics/DampedHarmonicOscillator/Solution.lean (trajectory_equationOfMotion)
 
   - description: The API shall contain the definition of the kinetic energy.
-    done: false
-    location: N/A
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (kineticEnergy)
 
   - description: The API shall contain the definition of the potential energy.
-    done: false
-    location: N/A
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Basic.lean (potentialEnergy)
 
   - description: The API shall contain the definition of the Lagrangian.
-    done: false
-    location: N/A
+    done: true
+    location: Physlib/ClassicalMechanics/DampedHarmonicOscillator/Basic.lean (lagrangian)
 
   - description: >
       The API shall contain a simplification of the variational gradient of the
       Lagrangian to the Euler-Lagrange equations.
-    done: false
-    location: N/A
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/DampedHarmonicOscillator/Basic.lean
+      (gradLagrangian, gradLagrangian_eq_force, equationOfMotion_iff_gradLagrangian_zero)
 
   - description: >
       The API shall prove that the selected trajectory is the unique solution of the

@@ -7,10 +7,12 @@ module
 
 public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.OfInt
-public import Physlib.Mathematics.KroneckerDelta
+public import Physlib.Mathematics.KroneckerDelta.Basic
 /-!
 
 # The Levi-Civita tensor as a real Lorentz tensor
+
+## i. Overview
 
 This file defines the rank-four Levi-Civita tensor `εᵘᵛᵖᵟ` as a real Lorentz tensor in
 `d = 3` spatial dimensions, with `ε⁰¹²³ = 1`, and proves its antisymmetry under each
@@ -19,6 +21,21 @@ adjacent transposition of indices.
 The component on a multi-index `f` is the generalized Kronecker delta of `f` against the
 identity, i.e. the sign of `f` when `f` is a permutation and `0` otherwise. The integer
 components are carried by `TensorSpecies.Tensor.TensorInt.toTensor`.
+
+## ii. Key results
+
+- `leviCivita` : the rank-four Levi-Civita tensor `ε4`, with `ε⁰¹²³ = 1`.
+- `leviCivita_basis_repr_apply` : its standard-basis components as a generalized Kronecker delta.
+- `leviCivita_antisymm`, `leviCivita_antisymm_mid`, `leviCivita_antisymm_last` : antisymmetry
+  under each adjacent transposition of the indices.
+
+## iii. Table of contents
+
+- A. Definition
+- B. Components in the standard basis
+- C. Antisymmetry
+
+## iv. References
 
 -/
 
@@ -33,6 +50,12 @@ namespace realLorentzTensor
 open TensorSpecies
 open Tensor
 open KroneckerDelta
+
+/-!
+
+## A. Definition
+
+-/
 
 /-- The Levi-Civita tensor `εᵘᵛᵖᵟ` as a real Lorentz tensor in `d = 3`, with `ε⁰¹²³ = 1`.
 
@@ -52,6 +75,16 @@ lemma leviCivita_eq_ofInt : ε4 =
     (c := ![Color.up, Color.up, Color.up, Color.up]) fun f =>
     generalizedKroneckerDelta (fun i => finSumFinEquiv (f i)) (id : Fin 4 → Fin 4) :=
   rfl
+
+/-- The Euclidean Levi-Civita symbol `ε_{ijkl}` in dimension 4. -/
+def _root_.euclidLeviCivita (g : Fin 4 → Fin 4) : ℝ :=
+  generalizedKroneckerDelta g (id : Fin 4 → Fin 4)
+
+/-!
+
+## B. Components in the standard basis
+
+-/
 
 /-- The components of the Levi-Civita tensor in the standard basis are the generalized
 Kronecker delta of the multi-index against the identity. -/
@@ -76,6 +109,12 @@ lemma leviCivita_basis_repr_eq_zero_of_eq
     refine Matrix.det_zero_of_row_eq hij (funext fun c => ?_)
     rw [congrArg (⇑finSumFinEquiv) h]
   rw [hdet, Int.cast_zero]
+
+/-!
+
+## C. Antisymmetry
+
+-/
 
 /-- The Levi-Civita tensor is antisymmetric in its first two indices
 `{ε4 | μ ν ρ σ = - ε4 | ν μ ρ σ}ᵀ`. -/

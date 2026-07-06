@@ -258,6 +258,69 @@ TODO "Add a lemma similar to `contrT_evalT` except with the contraction and
 
 -/
 
+/-- Evaluating an index in the right factor of a tensor product commutes with forming the
+  product, up to the identity reindexing which identifies the two ways of removing that
+  index from the appended color list. -/
+lemma evalT_prodT_right {n n1 : ℕ} {c : Fin n → C} {c1 : Fin (n1 + 1) → C}
+    (i : Fin (n1 + 1)) (x : basisIdx (c1 i)) (t : Tensor S c) (t1 : Tensor S c1) :
+    prodT t (evalT i x t1) =
+    permT id (IsReindexing.append_succAbove_natAdd (n := n) (n1 := n1) i)
+      (evalT (Fin.natAdd (m := n1 + 1) n i) (basisIdxCongr (by simp) x) (prodT t t1)) := by
+  symm
+  induction' t using Tensor.induction_on_basis with b a t ht t2 t3 ht2 ht3
+  · induction' t1 using Tensor.induction_on_basis with b1 a t ht t2 t3 ht2 ht3
+    · by_cases hi : b1 i = x
+      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) =
+            basisIdxCongr (by simp) x := by
+          simp [hi]
+        rw [prodT_basis', evalT_basis, if_pos hprod, permT_basis]
+        rw [evalT_basis, if_pos hi, prodT_basis']
+        congr
+        ext j
+        refine Fin.addCases (fun a => ?_) (fun a => ?_) j
+        · have hidx : (Fin.natAdd (m := n1 + 1) n i).succAbove (Fin.castAdd n1 a) =
+              Fin.castAdd (n1 + 1) a := by
+            rw [Fin.succAbove_of_castSucc_lt]
+            · ext
+              simp
+            · simp only [Fin.lt_def, Fin.val_castSucc, Fin.val_castAdd, Fin.val_natAdd]
+              omega
+          simp only [id_eq]
+          erw [ComponentIdx.congr_right (ComponentIdx.prod.symm (b, b1)) _ _ hidx]
+          simp only [ComponentIdx.prod_symm_castAdd]
+          exact basisIdxCongr_heq_arg _ _ (by
+            simp only [basisIdxCongr, Equiv.cast_apply]
+            exact (cast_heq _ _).trans (cast_heq _ _))
+        · have hidx : (Fin.natAdd (m := n1 + 1) n i).succAbove
+              (Fin.natAdd (m := n1) n a) =
+              Fin.natAdd (m := n1 + 1) n (i.succAbove a) := by
+            have hcond : ((Fin.natAdd (m := n1) n a).castSucc <
+                Fin.natAdd (m := n1 + 1) n i) ↔
+                (a.castSucc < i) := by
+              simp only [Fin.lt_def, Fin.val_castSucc, Fin.val_natAdd]
+              omega
+            simp only [Fin.succAbove, hcond]
+            split_ifs <;> ext <;> simp [Nat.add_assoc]
+          simp only [id_eq]
+          erw [ComponentIdx.congr_right (ComponentIdx.prod.symm (b, b1)) _ _ hidx]
+          simp only [ComponentIdx.prod_symm_natAdd]
+          exact basisIdxCongr_heq_arg _ _ (by
+            simp only [basisIdxCongr, Equiv.cast_apply]
+            exact (cast_heq _ _).trans (cast_heq _ _))
+      · have hprod : ComponentIdx.prod.symm (b, b1) (Fin.natAdd (m := n1 + 1) n i) ≠
+            basisIdxCongr (by simp) x := by
+          intro hprod
+          exact hi (by simpa [ComponentIdx.prod] using hprod)
+        rw [prodT_basis', evalT_basis, if_neg hprod]
+        rw [evalT_basis, if_neg hi]
+        simp
+    · simp
+    · simp [ht]
+    · simp [map_add, ht2, ht3]
+  · simp
+  · simp [ht]
+  · simp [map_add, ht2, ht3]
+
 TODO "Add a lemmas related to the commutation of evaluation with contraction."
 
 /-!

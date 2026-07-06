@@ -17,6 +17,7 @@ public import Physlib.ClassicalMechanics.OrbitalMechanics.VisViva
 public import Physlib.ClassicalMechanics.Pendulum.CoplanarDoublePendulum
 public import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
 public import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
+public import Physlib.ClassicalMechanics.RigidBody.AngularVelocity
 public import Physlib.ClassicalMechanics.RigidBody.Basic
 public import Physlib.ClassicalMechanics.RigidBody.Motion
 public import Physlib.ClassicalMechanics.RigidBody.SolidSphere
@@ -94,7 +95,8 @@ public import Physlib.Mathematics.InnerProductSpace.Adjoint
 public import Physlib.Mathematics.InnerProductSpace.Basic
 public import Physlib.Mathematics.InnerProductSpace.Calculus
 public import Physlib.Mathematics.InnerProductSpace.Submodule
-public import Physlib.Mathematics.KroneckerDelta
+public import Physlib.Mathematics.KroneckerDelta.Basic
+public import Physlib.Mathematics.KroneckerDelta.Contraction
 public import Physlib.Mathematics.LinearMaps
 public import Physlib.Mathematics.LinearPMap
 public import Physlib.Mathematics.List
@@ -269,11 +271,13 @@ public import Physlib.QFT.QED.AnomalyCancellation.Permutations
 public import Physlib.QFT.QED.AnomalyCancellation.Sorts
 public import Physlib.QFT.QED.AnomalyCancellation.VectorLike
 public import Physlib.QuantumMechanics.DDimensions.Basic
+public import Physlib.QuantumMechanics.DDimensions.HarmonicOscillator.Basic
 public import Physlib.QuantumMechanics.DDimensions.Hydrogen.Basic
 public import Physlib.QuantumMechanics.DDimensions.Hydrogen.LaplaceRungeLenzVector
 public import Physlib.QuantumMechanics.DDimensions.Operators.AngularMomentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
 public import Physlib.QuantumMechanics.DDimensions.Operators.Covariance
+public import Physlib.QuantumMechanics.DDimensions.Operators.Examples
 public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
 public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
 public import Physlib.QuantumMechanics.DDimensions.Operators.Position
@@ -371,6 +375,7 @@ public import Physlib.Relativity.Tensors.Dual
 public import Physlib.Relativity.Tensors.Elab
 public import Physlib.Relativity.Tensors.Evaluation
 public import Physlib.Relativity.Tensors.LeviCivita.Basic
+public import Physlib.Relativity.Tensors.LeviCivita.Contractions
 public import Physlib.Relativity.Tensors.MetricTensor
 public import Physlib.Relativity.Tensors.OfInt
 public import Physlib.Relativity.Tensors.Product
@@ -435,6 +440,7 @@ public import Physlib.SpaceAndTime.SpaceTime.LorentzAction
 public import Physlib.SpaceAndTime.SpaceTime.TimeSlice
 public import Physlib.SpaceAndTime.Time.Basic
 public import Physlib.SpaceAndTime.Time.Derivatives
+public import Physlib.SpaceAndTime.Time.MatrixDerivatives
 public import Physlib.SpaceAndTime.Time.TimeMan
 public import Physlib.SpaceAndTime.Time.TimeTransMan
 public import Physlib.SpaceAndTime.Time.TimeUnit

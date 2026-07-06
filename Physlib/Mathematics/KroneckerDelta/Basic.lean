@@ -14,7 +14,27 @@ public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 # Kronecker delta
 
-This module defines the Kronecker delta.
+## i. Overview
+
+This module defines the Kronecker delta `kroneckerDelta i j` (notation `δ[i,j]`), equal to
+`1` when `i = j` and `0` otherwise, together with its behaviour under scalar multiplication,
+symmetrization, and finite sums. It also defines the `generalizedKroneckerDelta`, the
+determinant of a matrix of Kronecker deltas.
+
+## ii. Key results
+
+- `kroneckerDelta` : the Kronecker delta on a type with decidable equality.
+- `generalizedKroneckerDelta` : the determinant form `det (δ[μᵢ, νⱼ])`.
+
+## iii. Table of contents
+
+- A. The Kronecker delta
+- B. Conditions for smul to vanish
+- C. Symmetrization
+- D. Sums
+- E. The generalized Kronecker delta
+
+## iv. References
 
 -/
 
@@ -23,6 +43,12 @@ This module defines the Kronecker delta.
 namespace KroneckerDelta
 
 variable {α M : Type*} [DecidableEq α]
+
+/-!
+
+## A. The Kronecker delta
+
+-/
 
 /-- The Kronecker delta function, `ite (i = j) 1 0`. -/
 def kroneckerDelta (i j : α) : ℕ := if i = j then 1 else 0
@@ -44,8 +70,15 @@ lemma eq_of_coe {p : α → Prop} (i j : Subtype p) : δ[(i : α),j] = δ[i,j] :
 lemma eq_zero_of_not {p : α → Prop} {i j : α} (hi : ¬p i) (hj : p j) : δ[i,j] = 0 :=
   eq_zero_of_ne (fun h ↦ hi (h ▸ hj))
 
+/-- The Kronecker delta is invariant under the component-index equivalence `finSumFinEquiv`. -/
+lemma kroneckerDelta_finSumFinEquiv (a b : Fin 1 ⊕ Fin 3) :
+    kroneckerDelta (finSumFinEquiv a) (finSumFinEquiv b) = kroneckerDelta a b := by
+  simp only [kroneckerDelta, Equiv.apply_eq_iff_eq]
+
 /-!
-### Conditions for smul to vanish
+
+## B. Conditions for smul to vanish
+
 -/
 
 lemma smul_of_eq_zero [AddMonoid M] (i j : α) {f : α → α → M} (hf : f i i = 0) :
@@ -70,7 +103,9 @@ lemma smul_eq_zero_iff'' [AddMonoid M] (f : α → α → M) :
   forall_congr' fun j ↦ smul_eq_zero_iff' j f
 
 /-!
-### Symmetrization
+
+## C. Symmetrization
+
 -/
 
 lemma symm (i j : α) : δ[i,j] = δ[j,i] := ite_cond_congr <| Eq.propIntro Eq.symm Eq.symm
@@ -100,7 +135,9 @@ lemma smul_sub_eq_zero [AddGroup M] (i j : α) (f : α → α → M) : δ[i,j] �
   · exact smul_eq_zero_of_left (eq_zero_of_ne hne) _
 
 /-!
-### Sums
+
+## D. Sums
+
 -/
 
 section Sums
@@ -134,7 +171,7 @@ end Sums
 
 /-!
 
-# Generalized Kronecker delta
+## E. The generalized Kronecker delta
 
 -/
 

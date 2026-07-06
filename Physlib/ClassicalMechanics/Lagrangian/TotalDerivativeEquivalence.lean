@@ -10,6 +10,8 @@ public import Mathlib.Analysis.InnerProductSpace.Dual
 public import Physlib.SpaceAndTime.Time.Derivatives
 public import Mathlib.Analysis.Calculus.ContDiff.CPolynomial
 public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
+public import Physlib.ClassicalMechanics.EulerLagrange
+
 /-!
 
 # Equivalent Lagrangians under Total Derivatives
@@ -207,6 +209,28 @@ lemma isTotalTimeDerivative_neg {δL : Time → X → X → ℝ} (h :  IsTotalTi
     unfold Time.deriv
     simp only [fderiv_fun_neg, _root_.neg_apply]
 
+/--
+If δL is a total time derivative (of a smooth function), then it is smooth
+-/
+lemma totalTimeDerivative_contDiff {δL : Time → X → X → ℝ} (h : IsTotalTimeDerivative δL):
+    ContDiff ℝ ∞ ↿δL := by
+ rcases isTotalTimeDerivative_explicit.mp h with ⟨F, hContDiff, heq⟩
+ let Fder_v := Prod.map (fderiv ℝ ↿(fun t q => F t q)) (fun (v : X) => v )
+ let regroup := ↿(fun (t : Time) (q : X) (v : X) => ((t, q), v))
+ let appv := fun (FV : ((Time × X →L[ℝ] ℝ) × X )) => FV.fst (1, FV.snd)
+ have hδL : ↿δL = appv ∘ Fder_v ∘ regroup := by
+   funext tqv
+   rcases tqv with ⟨t, q, v⟩
+   simp only [Function.comp_apply]
+   change δL t q v = appv (Fder_v (regroup (t, q, v)))
+   rw [heq t q v]
+   rfl
+ rw [hδL]
+ unfold appv
+ unfold Fder_v
+ unfold regroup
+ fun_prop
+
 /-!
 ## B. Total time derivative do not affect the physical content
   The total time derivative does not affect the Euler-Lagrange equations, because its variational
@@ -300,6 +324,47 @@ lemma totalTimeDerivative_varGradient_equivalenvce [CompleteSpace X] (L L' : Tim
         exact hgrad
     · unfold varGradient
       simp only [hL, hL', ↓reduceDIte]
+
+/--
+Corollary: If L and L' differ by a total time derivative, then the corresponding Euler-Lagrange
+operators coincide
+-/
+lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : Time → X → X → ℝ)
+    (htot : IsTotalTimeDerivative (L' - L)) (hContDiff : (ContDiff ℝ ∞ ↿L) ∨ (ContDiff ℝ ∞ ↿L'))
+    (q : Time → X) (hq : ContDiff ℝ ∞ q) : eulerLagrangeOp L q = eulerLagrangeOp L' q := by
+  rcases (isTotalTimeDerivative_explicit.mp htot) with ⟨F, hFContDiff, hEq⟩
+  have hContDiff_both :  (ContDiff ℝ ∞ ↿L) ∧ (ContDiff ℝ ∞ ↿L') := by
+    cases hContDiff with
+      | inl hL =>
+        constructor
+        · exact hL
+        · have h_triv : ↿L' =  ↿L + ↿(L' - L) := by
+            funext tqv
+            rcases tqv with ⟨t, q', v⟩
+            rw [Pi.add_apply]
+            change L' t q' v = L t q' v + (L' - L) t q' v
+            simp
+          have h_δL_contDiff := totalTimeDerivative_contDiff htot
+          rw [h_triv]
+          exact hL.add h_δL_contDiff
+      | inr hL' =>
+        constructor
+        · have h_triv : ↿L =  ↿L' + ↿(-(L' - L)) := by
+            funext tqv
+            rcases tqv with ⟨t, q', v⟩
+            rw [Pi.add_apply]
+            change L t q' v = L' t q' v + (- (L' - L)) t q' v
+            simp
+          have h_δL_contDiff := totalTimeDerivative_contDiff (isTotalTimeDerivative_neg htot)
+          rw [h_triv]
+          exact hL'.add h_δL_contDiff
+        · exact hL'
+  rw [← euler_lagrange_varGradient L q hq hContDiff_both.left]
+  rw [← euler_lagrange_varGradient L' q hq hContDiff_both.right]
+  apply Eq.symm
+  apply totalTimeDerivative_varGradient_equivalenvce
+  · exact htot
+  · exact hq
 
 /-!
 

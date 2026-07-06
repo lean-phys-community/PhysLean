@@ -7,6 +7,7 @@ module
 
 public import Physlib.Meta.TODO.Basic
 public import Mathlib.Analysis.Distribution.TemperedDistribution
+public import Mathlib.MeasureTheory.Measure.CharacteristicFunction.Basic
 /-!
 
 # Distributions
@@ -28,6 +29,8 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 - `Distribution.toTemperedDistribution` converts a Physlib distribution to a Mathlib
   tempered distribution.
 - `Distribution.ofFiniteMeasure` is the scalar distribution associated to a finite measure.
+- `Distribution.ofFiniteMeasure_eq_iff` says that finite measures are determined by their
+  associated complex scalar distributions.
 
 ## iii. Table of Content
 
@@ -47,7 +50,7 @@ functions from `E` to `F`. We give a more precise definition of distributions be
 @[expose] public section
 
 open SchwartzMap NNReal
-open scoped SchwartzMap FourierTransform
+open scoped ENNReal SchwartzMap FourierTransform
 noncomputable section
 
 /-!
@@ -453,7 +456,120 @@ lemma toTemperedDistribution_ofFiniteMeasure (μ : Measure E) [IsFiniteMeasure �
     (ofFiniteMeasure ℂ μ).toTemperedDistribution = μ.toTemperedDistribution :=
   rfl
 
+omit [NormedAddCommGroup E] [NormedSpace ℝ E] [BorelSpace E]
+  [SecondCountableTopology E] in
+private lemma lipschitzWith_integral_of_le {μ ρ : Measure E} (hμρ : μ ≤ ρ) :
+    LipschitzWith 1 (fun f : Lp ℂ 1 ρ => ∫ x, f x ∂μ) := by
+  refine LipschitzWith.of_dist_le_mul ?_
+  intro f g
+  rw [dist_eq_norm, dist_eq_norm, NNReal.coe_one, one_mul]
+  have hfμ : Integrable (fun x => f x) μ :=
+    memLp_one_iff_integrable.mp ((Lp.memLp f).mono_measure hμρ)
+  have hgμ : Integrable (fun x => g x) μ :=
+    memLp_one_iff_integrable.mp ((Lp.memLp g).mono_measure hμρ)
+  have hfg_ae : (fun x => (f - g : Lp ℂ 1 ρ) x) =ᵐ[ρ] fun x => f x - g x :=
+    Lp.coeFn_sub f g
+  have hfg_top : eLpNorm (fun x => f x - g x) 1 ρ ≠ ∞ := by
+    rw [← eLpNorm_congr_ae hfg_ae]
+    exact (Lp.memLp (f - g)).eLpNorm_ne_top
+  calc
+    ‖∫ x, f x ∂μ - ∫ x, g x ∂μ‖
+        = ‖∫ x, (f x - g x) ∂μ‖ := by rw [integral_sub hfμ hgμ]
+    _ ≤ (∫⁻ x, ‖f x - g x‖ₑ ∂μ).toReal := by
+      simpa only [ofReal_norm, eLpNorm_one_eq_lintegral_enorm] using
+        MeasureTheory.norm_integral_le_lintegral_norm (μ := μ) (fun x => f x - g x)
+    _ ≤ (eLpNorm (fun x => f x - g x) 1 ρ).toReal := by
+      refine ENNReal.toReal_mono hfg_top ?_
+      simpa [eLpNorm_one_eq_lintegral_enorm] using
+        eLpNorm_mono_measure (p := (1 : ℝ≥0∞)) (fun x => f x - g x) hμρ
+    _ = ‖f - g‖ := by
+      rw [Lp.norm_def]
+      rw [eLpNorm_congr_ae hfg_ae]
+
+private lemma integral_boundedContinuous_eq_of_forall_schwartz_integral_eq
+    [FiniteDimensional ℝ E] {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν]
+    (h : ∀ η : 𝓢(E, ℂ), ∫ x, η x ∂μ = ∫ x, η x ∂ν)
+    (f : BoundedContinuousFunction E ℂ) :
+    ∫ x, f x ∂μ = ∫ x, f x ∂ν := by
+  let ρ : Measure E := μ + ν
+  haveI : IsFiniteMeasure ρ := by infer_instance
+  haveI : ρ.HasTemperateGrowth := by infer_instance
+  let L : 𝓢(E, ℂ) →L[ℝ] Lp ℂ 1 ρ :=
+    SchwartzMap.toLpCLM ℝ ℂ 1 ρ
+  let toL1 : BoundedContinuousFunction E ℂ →L[ℝ] Lp ℂ 1 ρ :=
+    BoundedContinuousFunction.toLp 1 ρ ℝ
+  let S : Set (Lp ℂ 1 ρ) := {u | ∫ x, u x ∂μ = ∫ x, u x ∂ν}
+  have hS_closed : IsClosed S := by
+    exact isClosed_eq
+      (lipschitzWith_integral_of_le (μ := μ) (ρ := ρ)
+        (Measure.le_add_right le_rfl)).continuous
+      (lipschitzWith_integral_of_le (μ := ν) (ρ := ρ)
+        (Measure.le_add_left le_rfl)).continuous
+  have h_range_subset : Set.range L ⊆ S := by
+    rintro u ⟨η, rfl⟩
+    dsimp [S, L]
+    have hηρ : (L η : E → ℂ) =ᵐ[ρ] η := by
+      simpa [L] using SchwartzMap.coeFn_toLp η (1 : ℝ≥0∞) ρ
+    have hημ : (L η : E → ℂ) =ᵐ[μ] η :=
+      (Measure.absolutelyContinuous_of_le (Measure.le_add_right le_rfl)) hηρ
+    have hην : (L η : E → ℂ) =ᵐ[ν] η :=
+      (Measure.absolutelyContinuous_of_le (Measure.le_add_left le_rfl)) hηρ
+    calc
+      ∫ x, (L η : E → ℂ) x ∂μ = ∫ x, η x ∂μ := integral_congr_ae hημ
+      _ = ∫ x, η x ∂ν := h η
+      _ = ∫ x, (L η : E → ℂ) x ∂ν := (integral_congr_ae hην).symm
+  have hS_univ : Set.univ ⊆ S := by
+    rw [← (SchwartzMap.denseRange_toLpCLM (E := E) (F := ℂ) (p := (1 : ℝ≥0∞))
+      (μ := ρ) ENNReal.one_ne_top).closure_range]
+    exact hS_closed.closure_subset_iff.mpr h_range_subset
+  have hfS : toL1 f ∈ S := hS_univ trivial
+  dsimp [S, toL1] at hfS
+  have hfρ : (toL1 f : E → ℂ) =ᵐ[ρ] f := by
+    simpa [toL1] using BoundedContinuousFunction.coeFn_toLp (1 : ℝ≥0∞) ρ ℝ f
+  have hfμ : (toL1 f : E → ℂ) =ᵐ[μ] f :=
+    (Measure.absolutelyContinuous_of_le (Measure.le_add_right le_rfl)) hfρ
+  have hfν : (toL1 f : E → ℂ) =ᵐ[ν] f :=
+    (Measure.absolutelyContinuous_of_le (Measure.le_add_left le_rfl)) hfρ
+  calc
+    ∫ x, f x ∂μ = ∫ x, (toL1 f : E → ℂ) x ∂μ := (integral_congr_ae hfμ).symm
+    _ = ∫ x, (toL1 f : E → ℂ) x ∂ν := hfS
+    _ = ∫ x, f x ∂ν := integral_congr_ae hfν
+
 end finiteMeasure
+
+section finiteMeasureExt
+
+open MeasureTheory
+
+private lemma measure_eq_of_forall_schwartz_integral_eq
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [MeasurableSpace E]
+    [BorelSpace E] [SecondCountableTopology E] [FiniteDimensional ℝ E]
+    {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν]
+    (h : ∀ η : 𝓢(E, ℂ), ∫ x, η x ∂μ = ∫ x, η x ∂ν) :
+    μ = ν := by
+  apply Measure.ext_of_charFunDual
+  ext L
+  rw [charFunDual_apply, charFunDual_apply]
+  exact integral_boundedContinuous_eq_of_forall_schwartz_integral_eq h
+    (BoundedContinuousFunction.probCharDual L)
+
+/-- The complex scalar distribution associated to a finite measure determines the measure. -/
+lemma ofFiniteMeasure_eq_iff
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [MeasurableSpace E]
+    [BorelSpace E] [SecondCountableTopology E] [FiniteDimensional ℝ E]
+    {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν] :
+    ofFiniteMeasure ℂ μ = ofFiniteMeasure ℂ ν ↔ μ = ν := by
+  constructor
+  · intro hdist
+    apply measure_eq_of_forall_schwartz_integral_eq
+    intro η
+    rw [← ofFiniteMeasure_apply (𝕜 := ℂ) μ η,
+      ← ofFiniteMeasure_apply (𝕜 := ℂ) ν η, hdist]
+  · intro hμν
+    subst hμν
+    rfl
+
+end finiteMeasureExt
 
 /-!
 

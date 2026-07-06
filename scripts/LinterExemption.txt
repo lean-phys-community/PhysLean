@@ -1,4 +1,3 @@
-QuantumInfo/Capacity/Capacity.lean
 QuantumInfo/Capacity/Capacity_doc.lean
 QuantumInfo/Channels/Bundled.lean
 QuantumInfo/Channels/CPTP.lean

@@ -38,6 +38,10 @@ Notation:
 
 -/
 
+TODO "Extend the domain of the momentum operator to the Sobolev space `H¹`."
+
+TODO "Prove that the momentum operator is self-adjoint (relies on 15310236534648318597)."
+
 @[expose] public section
 
 namespace QuantumMechanics

@@ -53,4 +53,18 @@ lemma crossProductVee_crossProductMatrix (ω : Fin 3 → ℝ) :
   funext i
   fin_cases i <;> simp [crossProductVee, crossProductMatrix]
 
+/-- On skew-symmetric matrices the hat map is also a right inverse of the vee map: if `Aᵀ = -A`
+then `[Aᵛ]ₓ = A`. Together with `crossProductVee_crossProductMatrix` this identifies `ℝ³` with the
+skew-symmetric `3 × 3` matrices `𝖘𝖔(3)`. -/
+lemma crossProductMatrix_crossProductVee {A : Matrix (Fin 3) (Fin 3) ℝ} (hA : Aᵀ = -A) :
+    crossProductMatrix (crossProductVee A) = A := by
+  have h : ∀ i j, A i j = - A j i := fun i j => by
+    simpa using congrFun (congrFun hA j) i
+  have hdiag : ∀ i, A i i = 0 := fun i => CharZero.eq_neg_self_iff.mp (h i i)
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [crossProductVee, crossProductMatrix] <;>
+    first
+      | exact (h _ _).symm
+      | exact (hdiag _).symm
+
 end Matrix

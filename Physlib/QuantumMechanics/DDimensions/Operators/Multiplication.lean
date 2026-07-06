@@ -339,6 +339,16 @@ lemma mulOperator_compRestricted_eq (f : Space d → ℂ) {g : Space d → ℂ} 
   filter_upwards [mulOperator_apply_ae ⟨ψ, h ▸ Submodule.mem_top⟩]
   simp_all [mul_assoc]
 
+/-!
+## F. Spectrum
+-/
+
+TODO "Prove that the spectrum of the multiplication operator `𝓜 f`
+  is the 'essential range' of `f`."
+
+TODO "Prove that the spectrum of the multiplication operator `𝓜 f`
+  is the closure of `f.range` for continuous `f`."
+
 end
 end SpaceDHilbertSpace
 end QuantumMechanics

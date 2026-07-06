@@ -48,6 +48,10 @@ In the `Basic` module:
 - `angularFrequency` selects the real frequency parameter from the damping regime.
 - `toUndamped_equationOfMotion` relates the damped and undamped equations of motion when
   the damping coefficient is zero.
+- `lagrangian` defines the Caldirola–Kanai lagrangian `exp (γ/m * t) * (T - V)`.
+- `gradLagrangian` defines the variational gradient of the corresponding action, and
+  `equationOfMotion_iff_gradLagrangian_zero` shows that its vanishing is equivalent to
+  the equation of motion.
 
 In the `Solution` module:
 - `InitialConditions` contains the initial position and velocity.
@@ -64,12 +68,24 @@ In the `Solution` module:
   - C.2. Equation of motion if and only if Newton's second law
 - D. Damping regimes
 - E. To undamped oscillator
+- F. The Caldirola–Kanai lagrangian and the equation of motion
+  - F.1. The lagrangian
+    - F.1.1. Equalities for the lagrangian
+    - F.1.2. Smoothness of the lagrangian
+    - F.1.3. Gradients of the lagrangian
+  - F.2. The variational gradient of the action
+    - F.2.1. The variational gradient and Newton's second law
+  - F.3. Equation of motion iff the variational gradient vanishes
 
 ## iv. References
 
 References for the damped harmonic oscillator include:
 - Landau & Lifshitz, Mechanics, page 76, section 25.
 - Goldstein, Classical Mechanics, Chapter 2.
+
+References for the Caldirola–Kanai lagrangian include:
+- Caldirola, Nuovo Cimento 18 (1941) 393.
+- Kanai, Progress of Theoretical Physics 3 (1948) 440.
 
 -/
 
@@ -456,6 +472,206 @@ lemma toUndamped_equationOfMotion (S : DampedHarmonicOscillator) (hS : S.IsUndam
       _ = HarmonicOscillator.force (S.toUndamped hS) (xₜ t) := h t
       _ = force S xₜ t := by
         simp [force, HarmonicOscillator.force_eq_linear, toUndamped, hγ]
+
+/-!
+
+## F. The Caldirola–Kanai lagrangian and the equation of motion
+
+The damped harmonic oscillator is not conservative, so the undamped lagrangian
+`T - V` does not reproduce the damped equation of motion. Instead we use the
+Caldirola–Kanai lagrangian, which multiplies the undamped lagrangian by the
+time-dependent factor `exp (γ/m * t)`:
+
+$$L(t, x, v) = e^{(\gamma/m) t}\left(\frac{1}{2} m \|v\|^2 - \frac{1}{2} k \|x\|^2\right)$$
+
+Setting the variational gradient of the corresponding action equal to zero
+recovers exactly the damped equation of motion `m ẍ + γ ẋ + k x = 0`.
+
+-/
+
+/-!
+
+### F.1. The lagrangian
+
+We define the Caldirola–Kanai lagrangian as the lagrangian of the underlying
+undamped harmonic oscillator multiplied by the exponential factor `exp (γ/m * t)`.
+
+-/
+
+/-- The Caldirola–Kanai lagrangian of the damped harmonic oscillator. It is the
+lagrangian of the underlying undamped harmonic oscillator multiplied by the
+time-dependent factor `exp (γ/m * t)`. -/
+noncomputable def lagrangian (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) : ℝ :=
+  exp (S.γ / S.m * t) * S.toHarmonicOscillator.lagrangian t x v
+
+/-!
+
+#### F.1.1. Equalities for the lagrangian
+
+We prove some simple equalities for the lagrangian, in particular that when applied to a
+trajectory it is the exponential factor times the kinetic energy minus the potential energy,
+and that it reduces to the undamped lagrangian when the damping coefficient is zero.
+
+-/
+
+lemma lagrangian_eq : S.lagrangian = fun (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) =>
+    exp (S.γ / S.m * t) * (1 / (2 : ℝ) * S.m * ⟪v, v⟫_ℝ - 1 / (2 : ℝ) * S.k * ⟪x, x⟫_ℝ) := by
+  funext t x v
+  rw [lagrangian, S.toHarmonicOscillator.lagrangian_eq]
+
+lemma lagrangian_eq_exp_mul_kineticEnergy_sub_potentialEnergy (t : Time)
+    (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
+    S.lagrangian t (xₜ t) (∂ₜ xₜ t) =
+      exp (S.γ / S.m * t) * (S.kineticEnergy xₜ t - S.potentialEnergy (xₜ t)) := by
+  rw [lagrangian, S.toHarmonicOscillator.lagrangian_eq_kineticEnergy_sub_potentialEnergy]
+
+/-- When the damping coefficient is zero, the Caldirola–Kanai lagrangian is the
+lagrangian of the underlying undamped harmonic oscillator. -/
+lemma lagrangian_of_isUndamped (hS : S.IsUndamped) :
+    S.lagrangian = S.toHarmonicOscillator.lagrangian := by
+  have hγ : S.γ = 0 := by simpa [IsUndamped] using hS
+  funext t x v
+  rw [lagrangian, hγ]
+  simp
+
+/-!
+
+#### F.1.2. Smoothness of the lagrangian
+
+The lagrangian is smooth in all its arguments.
+
+-/
+
+@[fun_prop]
+lemma contDiff_lagrangian (n : WithTop ℕ∞) : ContDiff ℝ n ↿S.lagrangian := by
+  have h : ↿S.lagrangian =
+      fun p : Time × EuclideanSpace ℝ (Fin 1) × EuclideanSpace ℝ (Fin 1) =>
+        exp (S.γ / S.m * p.1) * ↿S.toHarmonicOscillator.lagrangian p := rfl
+  rw [h]
+  fun_prop
+
+/-!
+
+#### F.1.3. Gradients of the lagrangian
+
+We now show results related to the gradients of the lagrangian with respect to the
+position and velocity. They follow from the corresponding gradients of the undamped
+lagrangian, using that the gradient scales with the constant `exp (γ/m * t)`.
+
+-/
+
+private lemma gradient_const_mul {f : EuclideanSpace ℝ (Fin 1) → ℝ} {x : EuclideanSpace ℝ (Fin 1)}
+    (c : ℝ) (hf : DifferentiableAt ℝ f x) :
+    gradient (fun y => c * f y) x = c • gradient f x := by
+  unfold gradient
+  rw [fderiv_const_mul hf]
+  simp [map_smul]
+
+lemma gradient_lagrangian_position_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
+    gradient (fun x => S.lagrangian t x v) x = -(exp (S.γ / S.m * t) * S.k) • x := by
+  have hf : DifferentiableAt ℝ (fun y => S.toHarmonicOscillator.lagrangian t y v) x := by
+    simp only [HarmonicOscillator.lagrangian_eq]
+    fun_prop
+  have h_eq : (fun y => S.lagrangian t y v) =
+      fun y => exp (S.γ / S.m * t) * S.toHarmonicOscillator.lagrangian t y v := rfl
+  rw [h_eq, gradient_const_mul _ hf,
+    S.toHarmonicOscillator.gradient_lagrangian_position_eq]
+  module
+
+lemma gradient_lagrangian_velocity_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
+    gradient (S.lagrangian t x) v = (exp (S.γ / S.m * t) * S.m) • v := by
+  have hf : DifferentiableAt ℝ (fun w => S.toHarmonicOscillator.lagrangian t x w) v := by
+    simp only [HarmonicOscillator.lagrangian_eq]
+    fun_prop
+  have h_eq : S.lagrangian t x =
+      fun w => exp (S.γ / S.m * t) * S.toHarmonicOscillator.lagrangian t x w := rfl
+  rw [h_eq, gradient_const_mul _ hf,
+    S.toHarmonicOscillator.gradient_lagrangian_velocity_eq, smul_smul]
+
+/-!
+
+### F.2. The variational gradient of the action
+
+We now write down the variational gradient of the action of the damped harmonic
+oscillator, for a trajectory $x(t)$ this is equal to
+
+$$t\mapsto \left.\frac{\partial L(t, q, \dot x (t))}{\partial q}\right|_{q = x(t)} -
+  \frac{d}{dt} \left.\frac{\partial L(t, x(t), v)}{\partial v}\right|_{v = \dot x (t)}$$
+
+Setting this equal to zero corresponds to the Euler-Lagrange equations, and thereby the
+equation of motion.
+
+-/
+
+/-- The variational gradient of the action of the damped harmonic oscillator. -/
+noncomputable def gradLagrangian (xₜ : Time → EuclideanSpace ℝ (Fin 1)) :
+    Time → EuclideanSpace ℝ (Fin 1) :=
+  (δ (q':=xₜ), ∫ t, S.lagrangian t (q' t) (fderiv ℝ q' t 1))
+
+lemma gradLagrangian_eq_eulerLagrangeOp (xₜ : Time → EuclideanSpace ℝ (Fin 1))
+    (hq : ContDiff ℝ ∞ xₜ) :
+    S.gradLagrangian xₜ = eulerLagrangeOp S.lagrangian xₜ := by
+  rw [gradLagrangian,
+    ClassicalMechanics.euler_lagrange_varGradient _ _ hq (S.contDiff_lagrangian _)]
+
+/-!
+
+#### F.2.1. The variational gradient and Newton's second law
+
+We simplify the variational gradient of the action to the exponential factor times
+the difference between the force and mass times acceleration.
+
+-/
+
+private lemma deriv_exp_smul (a : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1))
+    (hy : Differentiable ℝ y) (t : Time) :
+    ∂ₜ (fun t' : Time => exp (a * t'.val) • y t') t =
+      exp (a * t.val) • (∂ₜ y t + a • y t) := by
+  rw [Time.deriv]
+  rw [fderiv_fun_smul (by fun_prop) (hy t)]
+  rw [fderiv_exp (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
+  simp only [_root_.add_apply, _root_.smul_apply,
+    ContinuousLinearMap.smulRight_apply, Time.fderiv_val, smul_eq_mul, mul_one]
+  rw [← Time.deriv_eq]
+  simp [smul_add, smul_smul]
+
+/-- The variational gradient of the Caldirola–Kanai action is the exponential factor
+times the difference of the force and mass times acceleration appearing in
+Newton's second law. -/
+lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
+    S.gradLagrangian xₜ = fun t : Time =>
+      exp (S.γ / S.m * t) • (force S xₜ t - S.m • ∂ₜ (∂ₜ xₜ) t) := by
+  have hdx : Differentiable ℝ (∂ₜ xₜ) := deriv_differentiable_of_contDiff xₜ hx
+  funext t
+  rw [gradLagrangian_eq_eulerLagrangeOp S xₜ hx, eulerLagrangeOp]
+  have h2 : ∂ₜ (fun t' => gradient (S.lagrangian t' (xₜ t') ·) (∂ₜ xₜ t')) t =
+      exp (S.γ / S.m * t) • (S.m • ∂ₜ (∂ₜ xₜ) t + S.γ • ∂ₜ xₜ t) := by
+    conv_lhs =>
+      arg 1
+      ext t'
+      rw [gradient_lagrangian_velocity_eq, ← smul_smul]
+    rw [deriv_exp_smul (S.γ / S.m) (fun t' => S.m • ∂ₜ xₜ t') (hdx.const_smul S.m) t]
+    rw [Time.deriv_smul _ _ hdx, smul_smul, div_mul_cancel₀ _ S.m_ne_zero]
+  rw [gradient_lagrangian_position_eq, h2, force]
+  module
+
+/-!
+
+### F.3. Equation of motion iff the variational gradient vanishes
+
+The equation of motion of the damped harmonic oscillator holds if and only if the
+variational gradient of the Caldirola–Kanai action vanishes, since the exponential
+factor is never zero.
+
+-/
+
+lemma equationOfMotion_iff_gradLagrangian_zero (xₜ : Time → EuclideanSpace ℝ (Fin 1))
+    (hx : ContDiff ℝ ∞ xₜ) :
+    S.EquationOfMotion xₜ ↔ S.gradLagrangian xₜ = 0 := by
+  rw [S.equationOfMotion_iff_newtons_2nd_law xₜ, gradLagrangian_eq_force S xₜ hx, funext_iff]
+  refine forall_congr' fun t => ?_
+  simp only [Pi.zero_apply, smul_eq_zero, Real.exp_ne_zero, false_or, sub_eq_zero]
+  exact eq_comm
 
 end DampedHarmonicOscillator
 

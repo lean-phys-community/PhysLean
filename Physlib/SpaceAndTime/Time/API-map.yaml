@@ -1,0 +1,84 @@
+version: v0.1
+
+Title: Time
+
+Overview: |
+    The key data structure is `Time`, a structure with a single field `val : ℝ`
+    representing time with a given (but arbitrary) choice of units, origin and
+    orientation — the version of time most often used in non-relativistic physics,
+    forming a 1d real inner-product space. The API also contains the time
+    derivative `∂ₜ` of functions on `Time`, and the related types `TimeMan`,
+    `TimeTransMan` and `TimeUnit`, versions of time with fewer choices made,
+    related to `Time` via a choice of units or origin.
+
+ParentAPIs:
+  - "Space (Physlib/SpaceAndTime/Space)"
+  - "Lorentz vectors (Physlib/Relativity/Tensors/RealTensor/Vector)"
+
+References: []
+
+Requirements:
+
+  - description: "The key data structure `Time` (a structure with a single field `val : ℝ`, representing time with an arbitrary but fixed choice of units and origin) is defined."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/Basic.lean (Time)"
+
+  - description: "The API contains an instance of a vector space (module) on `Time`, with an orthonormal basis and continuous linear/isometric equivalences to `ℝ`."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/Basic.lean (AddCommGroup Time, Module ℝ Time, basis : OrthonormalBasis (Fin 1) ℝ Time, toRealCLM, toRealCLE, toRealLIE)"
+
+  - description: "The API contains an ordering on `Time`."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/Basic.lean (LE Time, PartialOrder Time)"
+
+  - description: "The API contains a norm on `Time`, and an inner product making it a 1d real inner-product space."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/Basic.lean (Norm Time, NormedAddCommGroup Time, NormedSpace ℝ Time, InnerProductSpace ℝ Time)"
+
+  - description: "The API contains a measure-theoretic structure on `Time` (a Borel measurable space, with the volume measure equal to the Haar measure associated with the basis)."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/Basic.lean (MeasurableSpace Time, BorelSpace Time, volume_eq_basis_addHaar, val_measurePreserving)"
+
+  - description: "The API contains the derivatives of functions from `Time` to normed spaces, with linearity, constant-function, quotient and smoothness lemmas, and compatibility with Euclidean and Lorentz-vector components."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/Derivatives.lean (Time.deriv, notation ∂ₜ, deriv_smul, deriv_div, deriv_const, deriv_contDiff_of_contDiff, deriv_euclid, deriv_lorentzVector)"
+
+  - description: "The API contains the derivatives of functions from `Time` to manifolds."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/Derivatives.lean (Time.manifoldDeriv, deriv_eq_manifoldDeriv)"
+
+  - description: "The API contains the product rule and commutation with transpose for the time derivative of square-matrix-valued functions of time."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/MatrixDerivatives.lean (Time.deriv_matrix_mul, Time.deriv_matrix_transpose)"
+
+  - description: "The API contains the time manifold `TimeMan` (time with no structure except an orientation), with topology, charted-space and manifold instances and the diffeomorphism to `ℝ`."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/TimeMan.lean (TimeMan, ChartedSpace ℝ TimeMan, IsManifold 𝓘(ℝ, ℝ) ω TimeMan, valDiffeomorphism)"
+
+  - description: "The API contains the type `TimeUnit` of choices of time unit (equivalent to the positive reals), with ratios of units, scaling, and concrete units (seconds through weeks) and their relations."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/TimeUnit.lean (TimeUnit, HDiv TimeUnit TimeUnit ℝ≥0, scale, seconds, hours_div_seconds)"
+
+  - description: "The API contains the time manifold `TimeTransMan` with a transitive action of `ℝ`, an orientation, unit-dependent differences and translations (`diff`, `addTime`, `neg`), and the homeomorphism `toTime` to `Time` given a choice of origin and unit."
+    done: true
+    location: "Physlib/SpaceAndTime/Time/TimeTransMan.lean (TimeTransMan, AddAction ℝ TimeTransMan, diff, addTime, neg, toTime)"
+
+  - description: "The API shall contain an action of the translation group on `Time`."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain derivatives of distributions from `Time` to normed spaces."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain derivatives of distributions from `Time` to manifolds."
+    done: false
+    location: N/A
+
+  - description: "The API shall show that the homeomorphism `toTime` from `TimeTransMan` to `Time` is a diffeomorphism."
+    done: false
+    location: N/A
+
+  - description: "The API shall show that translationally-invariant metrics on `TimeTransMan` are in one-to-one correspondence with the positive reals (choices of `TimeUnit`)."
+    done: false
+    location: N/A
