@@ -357,9 +357,7 @@ lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : T
             simp
           have h_δL_contDiff := totalTimeDerivative_contDiff (isTotalTimeDerivative_neg htot)
           rw [h_triv]
-          apply ContDiff.add
-          · exact hL'
-          · exact h_δL_contDiff
+          exact hL'.add h_δL_contDiff
         · exact hL'
   rw [← euler_lagrange_varGradient L q hq hContDiff_both.left]
   rw [← euler_lagrange_varGradient L' q hq hContDiff_both.right]
