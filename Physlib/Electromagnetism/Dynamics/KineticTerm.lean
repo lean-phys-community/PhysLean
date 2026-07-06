@@ -381,28 +381,12 @@ lemma kineticTerm_eq_electricMatrix_magneticFieldMatrix {𝓕 : FreeSpace}
 
 lemma kineticTerm_const {d} {𝓕 : FreeSpace} (A₀ : Lorentz.Vector d) :
     kineticTerm 𝓕 ⟨fun _ : SpaceTime d => A₀⟩ = 0 := by
-  funext x
-  rw [kineticTerm_eq_sum_potential]
-  conv_lhs =>
-    enter [2, 2, μ, 2, ν]
-    repeat rw [SpaceTime.deriv_eq]
-    simp
-  simp
+  ext x; simp [kineticTerm_eq_sum_potential, SpaceTime.deriv_eq]
 
 lemma kineticTerm_add_const {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (A₀ : Lorentz.Vector d) :
     kineticTerm 𝓕 ⟨fun x => A x + A₀⟩ = kineticTerm 𝓕 A := by
-  funext x
-  rw [kineticTerm_eq_sum_potential, kineticTerm_eq_sum_potential]
-  congr
-  funext μ
-  congr
-  funext ν
-  congr
-  all_goals
-  · rw [SpaceTime.deriv_eq]
-    simp
-    rfl
+  ext x; simp [kineticTerm_eq_sum_potential, SpaceTime.deriv_eq]
 
 /-!
 

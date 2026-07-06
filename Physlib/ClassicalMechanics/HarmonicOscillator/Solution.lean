@@ -430,11 +430,9 @@ lemma trajectory_velocity (IC : InitialConditions) : ∂ₜ (IC.trajectory S) =
   rw [fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop)]
   have h1 : (fderiv ℝ (fun t => sin (S.ω * t.val) / S.ω) t) =
     (1/ S.ω) • (fderiv ℝ (fun t => sin (S.ω * t.val)) t) := by
-    rw [← fderiv_mul_const]
-    congr
-    funext t
-    field_simp
-    fun_prop
+    rw [div_eq_mul_inv, ← fderiv_mul_const (hc := ?_)]
+    · congr; funext t; ring
+    · fun_prop
   simp [h1]
   rw [fderiv_cos (by fun_prop), fderiv_sin (by fun_prop),
     fderiv_fun_mul (by fun_prop) (by fun_prop)]
@@ -507,8 +505,7 @@ lemma trajectory_equationOfMotion (IC : InitialConditions) :
   ext
   have hω : S.ω ≠ 0 := ω_ne_zero S
   have hωm : S.ω ^ 2 * S.m = S.k := by
-    rw [ω_sq]
-    field_simp [m_ne_zero S]
+    rw [ω_sq]; field_simp [m_ne_zero S]
   simp [trajectory_eq, smul_add, smul_smul, mul_comm]
   rw [← hωm]
   field_simp [hω]
@@ -529,6 +526,11 @@ for the given initial conditions.
   position and velocity, the difference `y = x - IC.trajectory S` also solves the
   equation of motion with zero initial conditions; energy conservation then forces
   its energy, and hence `y`, to vanish identically, so `x = IC.trajectory S`. -/
+private lemma timeDeriv_sub {f g : Time → EuclideanSpace ℝ (Fin 1)}
+    (hf : Differentiable ℝ f) (hg : Differentiable ℝ g) :
+    ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
+  funext s; simp [Time.deriv_eq, fderiv_fun_sub (hf s) (hg s)]
+
 lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace ℝ (Fin 1))
     (hx : ContDiff ℝ ∞ x) :
     S.EquationOfMotion x ∧ x 0 = IC.x₀ ∧ ∂ₜ x 0 = IC.v₀ →
@@ -543,15 +545,10 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
   have hEOM_y : S.EquationOfMotion y :=
     (S.equationOfMotion_iff_newtons_2nd_law y hyContDiff).2 fun t => by
       have hy_deriv2 : ∂ₜ (∂ₜ y) t = ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
-        have dsub : ∀ f g : Time → EuclideanSpace ℝ (Fin 1),
-            Differentiable ℝ f → Differentiable ℝ g →
-            ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
-          intro f g hf hg; funext s
-          simp [Time.deriv_eq, fderiv_fun_sub (hf s) (hg s)]
         have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t :=
-          dsub x _ (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
+          timeDeriv_sub (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
         rw [hy_deriv]
-        exact congrFun (dsub (∂ₜ x) (∂ₜ (IC.trajectory S))
+        exact congrFun (timeDeriv_sub
           (deriv_differentiable_of_contDiff _ hx) (deriv_differentiable_of_contDiff _ hTraj)) t
       rw [hy_deriv2]
       simp [smul_sub, hNewt_x, hNewt_traj, hydef, force_eq_linear]
@@ -559,13 +556,8 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
     (S.energy_conservation_of_equationOfMotion' y hyContDiff hEOM_y t).trans <| by
       have hy0 : y 0 = 0 := by simp [hydef, hx0]
       have hyv0 : ∂ₜ y 0 = 0 := by
-        have dsub : ∀ f g : Time → EuclideanSpace ℝ (Fin 1),
-            Differentiable ℝ f → Differentiable ℝ g →
-            ∂ₜ (fun t => f t - g t) = fun t => ∂ₜ f t - ∂ₜ g t := by
-          intro f g hf hg; funext s
-          simp [Time.deriv_eq, fderiv_fun_sub (hf s) (hg s)]
         have hy_deriv : ∂ₜ y = fun t => ∂ₜ x t - ∂ₜ (IC.trajectory S) t :=
-          dsub x _ (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
+          timeDeriv_sub (hx.differentiable (by simp)) (hTraj.differentiable (by simp))
         rw [congrFun hy_deriv 0, hv0, trajectory_velocity_at_zero S IC]
         simp
       simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,
@@ -575,13 +567,12 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
     simp [HarmonicOscillator.kineticEnergy, mul_nonneg, S.m_pos.le]
   have hp : 0 ≤ S.potentialEnergy (y t) := by
     simp [HarmonicOscillator.potentialEnergy, mul_nonneg, S.k_pos.le]
-  have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp (hE t)).2
   have hpe' : S.k * inner ℝ (y t) (y t) = 0 := by
+    have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp (hE t)).2
     simpa [HarmonicOscillator.potentialEnergy, smul_eq_mul] using hpe
   rcases eq_zero_or_eq_zero_of_mul_eq_zero hpe' with h | h
   · exact (S.k_pos.ne' h).elim
-  · have hyt : x t - IC.trajectory S t = 0 :=
-      inner_self_eq_zero.mp h
+  · have hyt : x t - IC.trajectory S t = 0 := inner_self_eq_zero.mp h
     exact sub_eq_zero.mp hyt
 
 /-!
