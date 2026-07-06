@@ -192,13 +192,13 @@ scoped notation "|" n "⟩⟨" m "|" => localizedComp n m
 lemma localizedComp_apply_localizedState (m n p : Fin T.N) :
     |m⟩⟨n| |p⟩ = if n = p then |m⟩ else 0 := by
   rw [localizedComp, LinearMap.coe_mk, AddHom.coe_mk,
-    orthonormal_iff_ite.mp T.localizedState_orthonormal n p, ite_smul, one_smul, zero_smul]
+    T.localizedState_orthonormal_eq_ite n p, ite_smul, one_smul, zero_smul]
 
 /-- The adjoint of localizedComp |m⟩⟨n| is |n⟩⟨m|. -/
 lemma localizedComp_adjoint (m n : Fin T.N) (ψ φ : T.HilbertSpace) :
     ⟪|m⟩⟨n| ψ, φ⟫_ℂ = ⟪ψ, |n⟩⟨m| φ⟫_ℂ := by
-  simp only [localizedComp, LinearMap.coe_mk, AddHom.coe_mk]
-  rw [inner_smul_left, inner_smul_right, inner_conj_symm]
+  simp only [localizedComp, LinearMap.coe_mk, AddHom.coe_mk, inner_smul_left, inner_smul_right,
+    inner_conj_symm]
   ring
 
 /-!
@@ -224,25 +224,15 @@ noncomputable def hamiltonian : T.HilbertSpace →ₗ[ℂ] T.HilbertSpace :=
 lemma hamiltonian_hermitian (ψ φ : T.HilbertSpace) :
     ⟪T.hamiltonian ψ, φ⟫_ℂ = ⟪ψ, T.hamiltonian φ⟫_ℂ := by
   simp only [hamiltonian, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.coe_sum,
-    Finset.sum_apply, LinearMap.add_apply]
-  rw [inner_sub_left, inner_sub_right]
+    Finset.sum_apply, LinearMap.add_apply, inner_sub_left, inner_sub_right]
   congr 1
   · -- E0 term
-    simp only [Finset.smul_sum]
-    rw [sum_inner, inner_sum]
-    apply Finset.sum_congr rfl
-    intro n _
-    simp only [inner_smul_left_eq_smul, inner_smul_right_eq_smul]
-    rw [localizedComp_adjoint]
+    simp only [Finset.smul_sum, sum_inner, inner_sum, inner_smul_left_eq_smul,
+      inner_smul_right_eq_smul, localizedComp_adjoint]
   · -- t term
-    simp only [Finset.smul_sum, smul_add]
-    rw [sum_inner, inner_sum]
-    apply Finset.sum_congr rfl
-    intro n _
-    rw [inner_add_left, inner_add_right]
-    simp only [inner_smul_left_eq_smul, inner_smul_right_eq_smul]
-    rw [localizedComp_adjoint, localizedComp_adjoint]
-    ring
+    simp only [Finset.smul_sum, smul_add, sum_inner, inner_sum, inner_add_left, inner_add_right,
+      inner_smul_left_eq_smul, inner_smul_right_eq_smul, localizedComp_adjoint]
+    exact Finset.sum_congr rfl fun n _ => by ring
 
 /-!
 
@@ -255,24 +245,10 @@ lemma hamiltonian_hermitian (ψ φ : T.HilbertSpace) :
 lemma hamiltonian_apply_localizedState (n : Fin T.N) :
     T.hamiltonian |n⟩ = (T.E0 : ℂ) • |n⟩ - (T.t : ℂ) • (|n + 1⟩ + |n - 1⟩) := by
   simp only [hamiltonian, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.coe_sum,
-    Finset.sum_apply, LinearMap.add_apply, smul_add]
-  congr
-  · /- The `|n⟩` term -/
-    conv_lhs => enter [2, c]; rw [localizedComp_apply_localizedState]
-    simp
-  · rw [← smul_add]
-    congr
-    rw [Finset.sum_add_distrib, add_comm]
-    congr
-    · /- The `|n + 1⟩` term-/
-      conv_lhs => enter [2, c]; rw [localizedComp_apply_localizedState]
-      simp
-    · /- The `|n - 1⟩` term -/
-      conv_lhs => enter [2, c]; rw [localizedComp_apply_localizedState]
-      rw [Finset.sum_eq_single (n - 1)]
-      · simp
-      · aesop
-      · simp
+    Finset.sum_apply, LinearMap.add_apply, smul_add, Finset.sum_add_distrib,
+    localizedComp_apply_localizedState, ← eq_sub_iff_add_eq, Finset.sum_ite_eq', Finset.mem_univ,
+    if_true]
+  module
 
 /-!
 
@@ -285,21 +261,10 @@ lemma hamiltonian_apply_localizedState (n : Fin T.N) :
   result is not true. -/
 lemma energy_localizedState (n : Fin T.N) (htn : 1 < T.N) : ⟪|n⟩, T.hamiltonian |n⟩⟫_ℂ = T.E0 := by
   rw [hamiltonian_apply_localizedState]
-  simp only [smul_add, inner_sub_right, inner_add_right]
-  erw [inner_smul_right, inner_smul_right, inner_smul_right]
-  simp only [localizedState_orthonormal_eq_ite, ↓reduceIte, mul_one, left_eq_add,
-    Fin.one_eq_zero_iff, mul_ite, mul_zero, sub_eq_self]
-  split_ifs with h1 h2
-  · omega
-  · omega
-  · rename_i h2
-    have hn : (-1 : Fin T.N) = 0 := by
-      trans n - n
-      · nth_rewrite 1 [h2]
-        exact Eq.symm (sub_sub_cancel_left n 1)
-      · exact Fin.sub_self
-    aesop
-  · simp
+  simp only [smul_add, inner_sub_right, inner_add_right, inner_smul_right,
+    localizedState_orthonormal_eq_ite, ↓reduceIte, mul_one, left_eq_add, eq_sub_iff_add_eq,
+    add_eq_left, Fin.one_eq_zero_iff, mul_ite, mul_zero, sub_eq_self]
+  simp [show T.N ≠ 1 from by omega]
 
 /-!
 
@@ -350,20 +315,10 @@ lemma quantaWaveNumber_subset_brillouinZone : T.QuantaWaveNumber ⊆ T.Brillouin
   have hx2' : (x : ℝ) ≤ 2 * ((x / 2 : ℕ) : ℝ) + 1 := by
     exact_mod_cast (by omega : x ≤ 2 * (x / 2) + 1)
   refine ⟨?_, ?_⟩
-  · apply le_of_eq_of_le (by ring : _ = Real.pi / a * (-1 : ℝ))
-    apply le_of_le_of_eq (b := Real.pi / a * (2 * ((n : ℝ) - (x / 2 : ℕ)) / x))
-    · apply mul_le_mul_of_nonneg_left
-      · rw [le_div_iff₀ hx]; linarith [hx2, hn0]
-      · positivity
-    · ring
-  · apply lt_of_lt_of_eq (b := Real.pi / a * (1 : ℝ))
-    swap
-    · ring
-    apply lt_of_eq_of_lt (b := Real.pi / a * (2 * ((n : ℝ) - (x / 2 : ℕ)) / x))
-    · ring
-    apply mul_lt_mul_of_pos_left
-    · rw [div_lt_one hx]; linarith [hn, hx2']
-    · positivity
+  · rw [div_mul_eq_mul_div, div_le_div_iff₀ hT (mul_pos hT hx)]
+    nlinarith [hx2, hn0, mul_pos Real.pi_pos hT]
+  · rw [div_mul_eq_mul_div, div_lt_div_iff₀ (mul_pos hT hx) hT]
+    nlinarith [hn, hx2', mul_pos Real.pi_pos hT]
 
 /-!
 
@@ -374,20 +329,13 @@ lemma quantaWaveNumber_subset_brillouinZone : T.QuantaWaveNumber ⊆ T.Brillouin
 lemma quantaWaveNumber_exp_N (n : ℕ) (k : T.QuantaWaveNumber) :
     Complex.exp (Complex.I * k * n * T.N * T.a) = 1 := by
   refine Complex.exp_eq_one_iff.mpr ?_
-  match k with
-  | ⟨k, hk⟩ =>
-  obtain ⟨k, rfl⟩ := hk
-  use ((k : Int) - (T.N / 2 : ℕ)) * (n : ℤ)
+  obtain ⟨_, m, rfl⟩ := k
+  use ((m : Int) - (T.N / 2 : ℕ)) * (n : ℤ)
   have hpp : (T.N : ℂ) ≠ 0 := by simp [Ne.symm (NeZero.ne' T.N)]
   have hT' : (T.a : ℂ) ≠ 0 := Complex.ne_zero_of_re_pos T.a_pos
   simp only [Complex.ofReal_mul, Complex.ofReal_div, Complex.ofReal_ofNat, Complex.ofReal_natCast,
-    Complex.ofReal_sub, Int.natCast_ediv, Nat.cast_ofNat, Int.cast_mul, Int.cast_sub,
-    Int.cast_natCast]
+    Complex.ofReal_sub, Int.cast_mul, Int.cast_sub, Int.cast_natCast]
   field_simp
-  ring_nf
-  congr 1
-  rw [mul_comm]
-  rfl
 
 lemma quantaWaveNumber_exp_sub_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
     Complex.exp (Complex.I * k * (n - 1).val * T.a) =
@@ -431,9 +379,9 @@ lemma quantaWaveNumber_exp_sub_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
 lemma quantaWaveNumber_exp_add_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
     Complex.exp (Complex.I * k * (n + 1).val * T.a) =
     Complex.exp (Complex.I * k * n * T.a) * Complex.exp (Complex.I * k * T.a) := by
-  have hn : n = (n + 1) - 1 := by exact Eq.symm (add_sub_cancel_right n 1)
   conv_rhs =>
-    rw [hn, quantaWaveNumber_exp_sub_one, mul_assoc, ← Complex.exp_add]
+    rw [show n = (n + 1) - 1 from (add_sub_cancel_right n 1).symm,
+      quantaWaveNumber_exp_sub_one, mul_assoc, ← Complex.exp_add]
     simp
 
 /-!
@@ -471,8 +419,7 @@ lemma energyEigenstate_orthogonal :
     Pairwise fun k1 k2 => ⟪T.energyEigenstate k1, T.energyEigenstate k2⟫_ℂ = 0 := by
   intro k1 k2 hne
   simp only [energyEigenstate, sum_inner]
-  simp_rw [inner_sum, inner_smul_left, inner_smul_right,
-    orthonormal_iff_ite.mp T.localizedState_orthonormal]
+  simp_rw [inner_sum, inner_smul_left, inner_smul_right, localizedState_orthonormal_eq_ite]
   simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
   set ω := Complex.exp (Complex.I * (k2 - k1) * T.a) with hω_def
   have hsum_eq : ∑ n : Fin T.N, (starRingEnd ℂ) (Complex.exp (Complex.I * k1 * n * T.a)) *
@@ -554,16 +501,12 @@ lemma hamiltonian_energyEigenstate (k : T.QuantaWaveNumber) :
   rw [energyEigenstate]
   have hp1 : (∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • |n + 1⟩)
     = ∑ n : Fin T.N, Complex.exp (Complex.I * k * (n - 1).val * T.a) • |n⟩ := by
-    let e : Fin T.N ≃ Fin T.N := ⟨fun n => n + 1, fun n => n - 1, fun n => add_sub_cancel_right n 1,
-      fun n => sub_add_cancel n 1⟩
-    conv_rhs => rw [← e.sum_comp]
-    simp [Equiv.coe_fn_mk, add_sub_cancel_right, e]
+    conv_rhs => rw [← Equiv.sum_comp (Equiv.addRight (1 : Fin T.N))]
+    simp [Equiv.coe_addRight, add_sub_cancel_right]
   have hm1 : (∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • |n - 1⟩)
     = ∑ n : Fin T.N, Complex.exp (Complex.I * k * (n + 1).val * T.a) • |n⟩ := by
-    let e : Fin T.N ≃ Fin T.N := ⟨fun n => n - 1, fun n => n + 1, fun n => sub_add_cancel n 1,
-      fun n => add_sub_cancel_right n 1⟩
-    conv_rhs => rw [← e.sum_comp]
-    simp [Equiv.coe_fn_mk, sub_add_cancel, e]
+    conv_rhs => rw [← Equiv.sum_comp (Equiv.subRight (1 : Fin T.N))]
+    simp [Equiv.subRight_apply, sub_add_cancel]
   calc
       _ = ∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • T.hamiltonian |n⟩ := by simp
       _ = ∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • (T.E0 • |n⟩
@@ -573,14 +516,8 @@ lemma hamiltonian_energyEigenstate (k : T.QuantaWaveNumber) :
         - T.t • ((∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • |n + 1⟩) +
           (∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • |n - 1⟩)) := by
         simp only [smul_add, Finset.smul_sum, ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib]
-        congr
-        funext n
-        simp only [smul_sub, smul_add]
-        congr 1
-        · rw [smul_comm]
-        · rw [smul_comm]
-          congr 1
-          rw [smul_comm]
+        refine Finset.sum_congr rfl fun n _ => ?_
+        module
       _ = T.E0 • (∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • |n⟩)
         - T.t • ((∑ n : Fin T.N, Complex.exp (Complex.I * k * (n - 1).val * T.a) • |n⟩) +
           (∑ n : Fin T.N, Complex.exp (Complex.I * k * (n + 1).val * T.a) • |n⟩)) := by
@@ -591,9 +528,8 @@ lemma hamiltonian_energyEigenstate (k : T.QuantaWaveNumber) :
         simp [Finset.smul_sum, ← Finset.sum_add_distrib,
           ← add_smul, sub_smul, ← smul_smul, Finset.sum_sub_distrib]
   rw [Finset.smul_sum]
-  congr
-  funext n
-  conv_rhs => rw [smul_smul]
+  refine Finset.sum_congr rfl fun n _ => ?_
+  rw [smul_smul]
   simp only [quantaWaveNumber_exp_sub_one, quantaWaveNumber_exp_add_one, energyEigenvalue,
     Complex.ofReal_sub, Complex.ofReal_mul, Complex.ofReal_ofNat, Complex.ofReal_cos,
       Complex.cos.eq_1]

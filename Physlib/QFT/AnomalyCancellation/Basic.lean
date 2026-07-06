@@ -346,10 +346,8 @@ def quadSolsInclLinSols (χ : ACCSystemQuad) : χ.QuadSols →[ℚ] χ.LinSols w
   map_smul' _ _ := rfl
 
 lemma quadSolsInclLinSols_injective (χ : ACCSystemQuad) :
-    Function.Injective χ.quadSolsInclLinSols := by
-  intro S T h
-  ext
-  exact congrArg (fun X => X.val) h
+    Function.Injective χ.quadSolsInclLinSols :=
+  fun _ _ h => QuadSols.ext (congrArg (fun X => X.val) h)
 
 /-!
 
@@ -381,12 +379,9 @@ def quadSolsIncl (χ : ACCSystemQuad) : χ.QuadSols →[ℚ] χ.Charges :=
   MulActionHom.comp χ.linSolsIncl.toMulActionHom χ.quadSolsInclLinSols
 
 lemma quadSolsIncl_injective (χ : ACCSystemQuad) :
-    Function.Injective χ.quadSolsIncl := by
-  intro S T h
-  have h' : χ.quadSolsInclLinSols S = χ.quadSolsInclLinSols T := by
-    apply ACCSystemLinear.linSolsIncl_injective (χ := χ.toACCSystemLinear)
-    exact h
-  exact quadSolsInclLinSols_injective χ h'
+    Function.Injective χ.quadSolsIncl :=
+  fun _ _ h => quadSolsInclLinSols_injective χ
+    (ACCSystemLinear.linSolsIncl_injective χ.toACCSystemLinear h)
 
 end ACCSystemQuad
 
@@ -485,12 +480,8 @@ def solsInclQuadSols (χ : ACCSystem) : χ.Sols →[ℚ] χ.QuadSols where
   map_smul' _ _ := rfl
 
 lemma solsInclQuadSols_injective (χ : ACCSystem) :
-    Function.Injective χ.solsInclQuadSols := by
-  intro S T h
-  apply Sols.ext
-  have hv : (χ.solsInclQuadSols S).val = (χ.solsInclQuadSols T).val :=
-    congrArg (fun X => X.val) h
-  exact hv
+    Function.Injective χ.solsInclQuadSols :=
+  fun _ _ h => Sols.ext (congrArg (fun X => X.val) h)
 
 /-!
 
@@ -502,12 +493,9 @@ def solsInclLinSols (χ : ACCSystem) : χ.Sols →[ℚ] χ.LinSols :=
   MulActionHom.comp χ.quadSolsInclLinSols χ.solsInclQuadSols
 
 lemma solsInclLinSols_injective (χ : ACCSystem) :
-    Function.Injective χ.solsInclLinSols := by
-  intro S T h
-  have h' : χ.solsInclQuadSols S = χ.solsInclQuadSols T := by
-    apply ACCSystemQuad.quadSolsInclLinSols_injective (χ := χ.toACCSystemQuad)
-    simpa [ACCSystem.solsInclLinSols, MulActionHom.comp_apply] using h
-  exact solsInclQuadSols_injective χ h'
+    Function.Injective χ.solsInclLinSols :=
+  fun _ _ h => solsInclQuadSols_injective χ
+    (ACCSystemQuad.quadSolsInclLinSols_injective χ.toACCSystemQuad h)
 
 /-!
 
@@ -520,12 +508,9 @@ def solsIncl (χ : ACCSystem) : χ.Sols →[ℚ] χ.Charges :=
   MulActionHom.comp χ.quadSolsIncl χ.solsInclQuadSols
 
 lemma solsIncl_injective (χ : ACCSystem) :
-    Function.Injective χ.solsIncl := by
-  intro S T h
-  have h' : χ.solsInclQuadSols S = χ.solsInclQuadSols T := by
-    apply ACCSystemQuad.quadSolsIncl_injective (χ := χ.toACCSystemQuad)
-    simpa [ACCSystem.solsIncl, MulActionHom.comp_apply] using h
-  exact (solsInclQuadSols_injective χ) h'
+    Function.Injective χ.solsIncl :=
+  fun _ _ h => solsInclQuadSols_injective χ
+    (ACCSystemQuad.quadSolsIncl_injective χ.toACCSystemQuad h)
 
 /-!
 

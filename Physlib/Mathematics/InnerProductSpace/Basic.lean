@@ -145,11 +145,8 @@ scoped instance toNormedAddCommGroupWitL2 : NormedAddCommGroup (WithLp 2 E) :=
 
 lemma norm_withLp2_eq_norm2 (x : WithLp 2 E) :
     ‖x‖ = |norm₂ (WithLp.equiv 2 E x)| := by
-  trans √ (RCLike.re ⟪WithLp.equiv 2 E x, WithLp.equiv 2 E x⟫)
-  · rfl
-  have h1 := norm₂_sq_eq_re_inner (𝕜 := 𝕜) ((WithLp.equiv 2 E) x)
-  rw [← h1]
-  exact Real.sqrt_sq_eq_abs ‖(WithLp.equiv 2 E) x‖₂
+  rw [show ‖x‖ = √ (RCLike.re ⟪WithLp.equiv 2 E x, WithLp.equiv 2 E x⟫) from rfl,
+    ← norm₂_sq_eq_re_inner (𝕜 := 𝕜) (WithLp.equiv 2 E x), Real.sqrt_sq_eq_abs]
 
 /-- Attach normed space structure to `WithLp 2 E` with L₂ norm. -/
 noncomputable
@@ -220,13 +217,13 @@ def fromL2 : WithLp 2 E →L[𝕜] E where
 
 lemma fromL2_inner_left (x : WithLp 2 E) (y : E) : ⟪fromL2 𝕜 x, y⟫ = ⟪x, toL2 𝕜 y⟫ := rfl
 
-lemma ofLp_inner_left (x : E) (y : WithLp 2 E) : ⟪WithLp.ofLp y, x⟫ = ⟪y, WithLp.toLp 2 x⟫ := by
-  exact fromL2_inner_left y x
+lemma ofLp_inner_left (x : E) (y : WithLp 2 E) : ⟪WithLp.ofLp y, x⟫ = ⟪y, WithLp.toLp 2 x⟫ :=
+  fromL2_inner_left y x
 
 lemma toL2_inner_left (x : E) (y : WithLp 2 E) : ⟪toL2 𝕜 x, y⟫ = ⟪x, fromL2 𝕜 y⟫ := rfl
 
-lemma toLp_inner_left (x : WithLp 2 E) (y : E) : ⟪WithLp.toLp 2 y, x⟫ = ⟪y, WithLp.ofLp x⟫ := by
-  exact toL2_inner_left y x
+lemma toLp_inner_left (x : WithLp 2 E) (y : E) : ⟪WithLp.toLp 2 y, x⟫ = ⟪y, WithLp.ofLp x⟫ :=
+  toL2_inner_left y x
 
 @[simp]
 lemma toL2_fromL2 (x : WithLp 2 E) : toL2 𝕜 (fromL2 𝕜 x) = x := rfl
@@ -270,8 +267,8 @@ lemma ext_inner_left' {x y : E} (h : ∀ v, ⟪v, x⟫ = ⟪v, y⟫) : x = y :=
 
 variable (𝕜) in
 lemma ext_inner_right' {x y : E} (h : ∀ v, ⟪x, v⟫ = ⟪y, v⟫) : x = y :=
-  (WithLp.equiv 2 E).symm.injective <| ext_inner_right (E := WithLp 2 E) 𝕜 <| by
-  exact fun v => h (WithLp.ofLp v)
+  (WithLp.equiv 2 E).symm.injective <| ext_inner_right (E := WithLp 2 E) 𝕜 <|
+    fun v => h (WithLp.ofLp v)
 
 @[simp]
 lemma inner_conj_symm' (x y : E) : ⟪y, x⟫† = ⟪x, y⟫ :=
@@ -318,24 +315,14 @@ lemma inner_self_eq_zero' {x : E} : ⟪x, x⟫ = 0 ↔ x = 0 := by
 
 @[simp]
 lemma inner_sum'{ι : Type*} [Fintype ι] (x : E) (g : ι → E) :
-    ⟪x, ∑ i, g i⟫ = ∑ i, ⟪x, g i⟫ := by
-  have h1 := inner_sum (𝕜 := 𝕜) (E:=WithLp 2 E) (x := WithLp.toLp 2 x)
-    (f := fun i => WithLp.toLp 2 (g i))
-  convert h1 (Finset.univ)
-  · rw [← ofLp_inner_left]
-    simp only
-    congr
-    change _ = (WithLp.linearEquiv 2 𝕜 E) _
-    simp only [map_sum, WithLp.linearEquiv_apply, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
-      EquivLike.coe_coe, WithLp.addEquiv_apply]
-  · rfl
+    ⟪x, ∑ i, g i⟫ = ∑ i, ⟪x, g i⟫ :=
+  map_sum (AddMonoidHom.mk' (fun y => ⟪x, y⟫) (inner_add_right' x)) g Finset.univ
 
 @[fun_prop]
 lemma Continuous.inner' {α} [TopologicalSpace α] (f g : α → E)
     (hf : Continuous f) (hg : Continuous g) : Continuous (fun a => ⟪f a, g a⟫) :=
-  have hf : Continuous (fun x => toL2 𝕜 (f x)) := by fun_prop
-  have hg : Continuous (fun x => toL2 𝕜 (g x)) := by fun_prop
-  Continuous.inner (𝕜:=𝕜) (E:=WithLp 2 E) hf hg
+  Continuous.inner (𝕜 := 𝕜) (E := WithLp 2 E) (f := fun x => toL2 𝕜 (f x))
+    (g := fun x => toL2 𝕜 (g x)) (by fun_prop) (by fun_prop)
 
 section Real
 
@@ -355,17 +342,15 @@ lemma real_inner_comm' (x y : F) : ⟪y, x⟫ = ⟪x, y⟫ :=
 lemma ContDiffAt.inner' {f g : E → F} {x : E}
     (hf : ContDiffAt ℝ n f x) (hg : ContDiffAt ℝ n g x) :
     ContDiffAt ℝ n (fun x => ⟪f x, g x⟫) x :=
-  have hf : ContDiffAt ℝ n (fun x => toL2 ℝ (f x)) x := by fun_prop
-  have hg : ContDiffAt ℝ n (fun x => toL2 ℝ (g x)) x := by fun_prop
-  hf.inner ℝ hg
+  ContDiffAt.inner ℝ (f := fun x => toL2 ℝ (f x)) (g := fun x => toL2 ℝ (g x))
+    (by fun_prop) (by fun_prop)
 
 @[fun_prop]
 lemma ContDiff.inner' {f g : E → F}
     (hf : ContDiff ℝ n f) (hg : ContDiff ℝ n g) :
     ContDiff ℝ n (fun x => ⟪f x, g x⟫) :=
-  have hf : ContDiff ℝ n (fun x => toL2 ℝ (f x)) := by fun_prop
-  have hg : ContDiff ℝ n (fun x => toL2 ℝ (g x)) := by fun_prop
-  hf.inner ℝ hg
+  ContDiff.inner ℝ (f := fun x => toL2 ℝ (f x)) (g := fun x => toL2 ℝ (g x))
+    (by fun_prop) (by fun_prop)
 
 end Real
 
@@ -570,37 +555,23 @@ lemma _root_.isBoundedBilinearMap_inner' :
     simp_all
     intro x y
     trans |‖x‖₂| * |‖y‖₂|
-    · change |@inner ℝ (WithLp 2 E) _ _ _| ≤ _
-      have h1 := norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x) (WithLp.toLp 2 y)
-      simp at h1
-      apply h1.trans
-      apply le_of_eq
-      congr
-      · rw [norm_withLp2_eq_norm2]
-        rfl
-      · rw [norm_withLp2_eq_norm2]
-        rfl
+    · refine (norm_inner_le_norm (𝕜 := ℝ) (E := WithLp 2 E) (WithLp.toLp 2 x)
+        (WithLp.toLp 2 y)).trans ?_
+      simp [norm_withLp2_eq_norm2]
     · have key (z : E) : |‖z‖₂| ≤ √ d * ‖z‖ := by
         apply le_of_sq_le_sq
         · simp [@mul_pow]
           rw [norm₂_sq_eq_re_inner (𝕜 := ℝ)]
           simp only [re_to_real]
-          apply (h z).2.trans
-          apply le_of_eq
-          simp only [mul_eq_mul_right_iff, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-            pow_eq_zero_iff, norm_eq_zero]
-          left
-          refine Eq.symm (Real.sq_sqrt ?_)
-          linarith
+          rw [Real.sq_sqrt (by linarith : (0:ℝ) ≤ d)]
+          exact (h z).2
         · positivity
       have h1 := key x
       have h2 := key y
       trans (√ d * ‖x‖) * (√ d * ‖y‖)
       · exact mul_le_mul_of_nonneg h1 h2 (by positivity) (by positivity)
       · apply le_of_eq
-        ring_nf
-        rw [Real.sq_sqrt]
-        · ring
-        · linarith
+        rw [mul_mul_mul_comm, Real.mul_self_sqrt (by linarith : (0:ℝ) ≤ d)]
+        ring
 
 end Constructions
