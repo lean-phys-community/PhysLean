@@ -181,40 +181,25 @@ Elementary fact: if δL is a time derivative, then so is -δL.
 -/
 lemma isTotalTimeDerivative_neg {δL : Time → X → X → ℝ} (h :  IsTotalTimeDerivative δL) :
     IsTotalTimeDerivative (- δL) := by
-    rcases h with ⟨F, h_ContDiff, hF⟩
-    set F_neg := (fun t q => - F t q)
-    use F_neg
-    have h_neg_F_ContDiff : ContDiff ℝ ∞ ↿F_neg := by
-      fun_prop
-    use  h_neg_F_ContDiff
-    intro t q hq
-    simp only [Pi.neg_apply]
-    rw [hF t q hq]
-    unfold F_neg
-    unfold Time.deriv
-    simp only [fderiv_fun_neg, _root_.neg_apply]
+    rcases h with ⟨F, hF_contDiff, hF⟩
+    refine ⟨fun t q => -F t q, hF_contDiff.neg, fun t q hq => ?_⟩
+    calc
+      (-δL) t (q t) (∂ₜ q t) = -(δL t (q t) (∂ₜ q t)) := rfl
+      _ = -(∂ₜ (fun t' => F t' (q t')) t) := by rw [hF t q hq]
+      _ = ∂ₜ (-(fun t' => F t' (q t'))) t := by rw [← Time.deriv_neg]
+      _ = ∂ₜ (fun t' => -F t' (q t')) t := rfl
 
 /--
 If δL is a total time derivative (of a smooth function), then it is smooth
 -/
 lemma totalTimeDerivative_contDiff {δL : Time → X → X → ℝ} (h : IsTotalTimeDerivative δL):
     ContDiff ℝ ∞ ↿δL := by
- rcases isTotalTimeDerivative_explicit.mp h with ⟨F, hContDiff, heq⟩
- let Fder_v := Prod.map (fderiv ℝ ↿(fun t q => F t q)) (fun (v : X) => v )
- let regroup := ↿(fun (t : Time) (q : X) (v : X) => ((t, q), v))
- let appv := fun (FV : ((Time × X →L[ℝ] ℝ) × X )) => FV.fst (1, FV.snd)
- have hδL : ↿δL = appv ∘ Fder_v ∘ regroup := by
-   funext tqv
-   rcases tqv with ⟨t, q, v⟩
-   simp only [Function.comp_apply]
-   change δL t q v = appv (Fder_v (regroup (t, q, v)))
-   rw [heq t q v]
-   rfl
- rw [hδL]
- unfold appv
- unfold Fder_v
- unfold regroup
- fun_prop
+  rcases (isTotalTimeDerivative_explicit.mp h) with ⟨F, hF, heq⟩
+  have hδL :
+      δL = fun (t : Time) (q : X) (v : X) => fderiv ℝ ↿F (t, q) (1, v) := by
+    funext t q v; exact heq t q v
+  rw [hδL]
+  fun_prop
 
 /-!
 ## B. Total time derivative do not affect the physical content
@@ -265,13 +250,14 @@ lemma totalTimeDerivative_hasVarGradientAt_equivalence [CompleteSpace X] (L δL 
     (q : Time → X)    (hq : ContDiff ℝ ∞ q) (grad : Time → X)
     (hgrad :  HasVarGradientAt (fun q' t => L t (q' t) (fderiv ℝ  q' t 1)) grad q) :
     HasVarGradientAt (fun q' t => (L + δL) t (q' t) (fderiv ℝ q' t 1)) grad q := by
-  have h_add_zero : grad = grad + (fun _ => 0) := by
-    funext t
+  have h_add := HasVarGradientAt.add
+    (F := fun q' t => L t (q' t) (fderiv ℝ q' t 1))
+    (F' := fun q' t => δL t (q' t) (∂ₜ q' t))
+    hgrad (totalTimeDerivative_hasZeroVarGradient hδL q hq)
+  convert h_add using 1
+  · rfl
+  · ext
     simp
-  rw [h_add_zero]
-  apply HasVarGradientAt.add
-  · exact hgrad
-  · exact totalTimeDerivative_hasZeroVarGradient hδL q hq
 
 
 /-
