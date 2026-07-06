@@ -346,9 +346,7 @@ lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : T
             simp
           have h_δL_contDiff := totalTimeDerivative_contDiff htot
           rw [h_triv]
-          apply ContDiff.add
-          · exact hL
-          · exact h_δL_contDiff
+          exact hL.add h_δL_contDiff
       | inr hL' =>
         constructor
         · have h_triv : ↿L =  ↿L' + ↿(-(L' - L)) := by
