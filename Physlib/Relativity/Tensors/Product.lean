@@ -243,9 +243,7 @@ lemma Pure.prodP_zero_right {n} {c : Fin n → C}
     {c1 : Fin 0 → C} (p : Pure S c) (p0 : Pure S c1) :
     prodP p p0 = permP id IsReindexing.append_zero_right p := by
   ext i
-  obtain ⟨j, hi⟩ := finSumFinEquiv.surjective (Fin.cast (by rfl) i : Fin (n + 0))
-  simp only [Nat.add_zero, Fin.cast_eq_self] at hi
-  subst hi
+  obtain ⟨j, rfl⟩ := finSumFinEquiv.surjective i
   rw (transparency := .instances) [prodP_apply_finSumFinEquiv]
   match j with
   | Sum.inl j => rfl
@@ -460,9 +458,7 @@ lemma prodT_basis {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (b : ComponentIdx c) (b1 : ComponentIdx (S := S) c1) :
     (basis c b).prodT (basis c1 b1) =
     (Pure.basisVector _ (ComponentIdx.prod.symm (b, b1))).toTensor := by
-  rw [basis_apply, basis_apply, prodT_pure]
-  congr
-  rw [Pure.prodP_basisVector]
+  rw [basis_apply, basis_apply, prodT_pure, Pure.prodP_basisVector]
 
 lemma prodT_basis' {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (b : ComponentIdx c) (b1 : ComponentIdx (S := S) c1) :
@@ -548,10 +544,7 @@ lemma basis_prod_eq {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C} :
   congr
   funext i
   obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective i
-  rw [ComponentIdx.prod]
-  match i with
-  | Sum.inl i => simp
-  | Sum.inr i => simp
+  rcases i with i | i <;> simp [ComponentIdx.prod]
 
 lemma prodT_basis_repr_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     (t : Tensor S c) (t1 : Tensor S c1)
@@ -562,9 +555,7 @@ lemma prodT_basis_repr_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   apply induction_on_pure (t := t)
   · apply induction_on_pure (t := t1)
     · intro p p1
-      rw [prodT_pure]
-      rw [basis_repr_pure, basis_repr_pure, basis_repr_pure]
-      rw [Pure.prodP_component]
+      simp only [prodT_pure, basis_repr_pure, Pure.prodP_component]
     · intro r t hp p
       simp only [basis_repr_pure, map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul] at hp ⊢
       rw [hp]
@@ -589,25 +580,13 @@ lemma prodT_basis_repr_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
 lemma prodT_equivariant {n1 n2} {c : Fin n1 → C} {c1 : Fin n2 → C}
     (g : G) (t : S.Tensor c) (t1 : S.Tensor c1) :
     prodT (g • t) (g • t1) = g • prodT t t1 := by
-  let P (t : S.Tensor c) := prodT (g • t) (g • t1) = g • prodT t t1
-  change P t
-  apply induction_on_pure
-  · intro p
-    let P (t1 : S.Tensor c1) := prodT (g • p.toTensor) (g • t1) = g • prodT p.toTensor t1
-    change P t1
-    apply induction_on_pure
-    · intro q
-      simp only [P]
-      rw [prodT_pure, actionT_pure, actionT_pure, prodT_pure, actionT_pure]
-      simp
-    · intro r t h1
-      simp_all only [actionT_smul, map_smul, P]
-    · intro t1 t2 h1 h2
-      simp_all only [actionT_add, map_add, P]
-  · intro r t h1
-    simp_all only [actionT_smul, map_smul, LinearMap.smul_apply, P]
-  · intro t1 t2 h1 h2
-    simp_all only [actionT_add, map_add, LinearMap.add_apply, P]
+  induction' t using induction_on_pure with p r t ht t1 t2 ht1 ht2
+  · induction' t1 using induction_on_pure with q r t ht t1 t2 ht1 ht2
+    · simp [prodT_pure, actionT_pure]
+    · simp [actionT_smul, map_smul, ht]
+    · simp [map_add, ht1, ht2]
+  · simp [actionT_smul, map_smul, ht]
+  · simp [map_add, ht1, ht2]
 
 /-!
 
@@ -619,19 +598,12 @@ lemma prodT_default_right {n} {c : Fin n → C}
     {c1 : Fin 0 → C} (t : S.Tensor c) :
     prodT t (Pure.toTensor default : S.Tensor c1) =
     permT id (IsReindexing.append_zero_right) t := by
-  let P (t : S.Tensor c) := prodT t (Pure.toTensor default : S.Tensor c1)
-    = permT id (IsReindexing.append_zero_right) t
-  change P t
-  apply induction_on_pure
-  · intro p
-    simp only [Nat.add_zero, P]
+  induction' t using induction_on_pure with p r t ht t1 t2 ht1 ht2
+  · simp only [Nat.add_zero]
     rw (transparency := .instances) [prodT_pure]
-    rw [Pure.prodP_zero_right]
-    rw [permT_pure]
-  · intro r t h1
-    simp_all only [map_smul, LinearMap.smul_apply, P]
-  · intro t1 t2 h1 h2
-    simp_all only [map_add, LinearMap.add_apply, P]
+    rw [Pure.prodP_zero_right, permT_pure]
+  · simp [map_smul, ht]
+  · simp [map_add, ht1, ht2]
 
 lemma prodT_zero_right {n} {c : Fin n → C}
     {c1 : Fin 0 → C} (t : S.Tensor c) (t1 : S.Tensor c1) :
@@ -654,7 +626,7 @@ lemma prodT_swap {n n1} {c : Fin n → C} {c1 : Fin n1 → C} (t : S.Tensor c) (
     prodT t t1 = permT _ IsReindexing.append_swap (prodT t1 t) := by
   induction' t using induction_on_pure with p r t ht t1 t2 ht1 ht2
   · induction' t1 using induction_on_pure with q r t ht t1 t2 ht1 ht2
-    · simp [prodT_pure, permT_pure, permT_pure, prodT_pure, Pure.prodP_swap p q]
+    · simp [prodT_pure, permT_pure, Pure.prodP_swap p q]
     · simp [map_smul, ht]
     · simp [map_add, ht1, ht2]
   · simp [ht]
@@ -672,9 +644,7 @@ lemma prodT_permT_left {n n'} {c : Fin n → C} {c' : Fin n' → C}
     prodT (permT σ h t) t2 = permT _ (h.append_congr_left c2) (prodT t t2) := by
   induction' t using induction_on_pure with p r t ht t1 t2 ht1 ht2
   · induction' t2 using induction_on_pure with q r t ht t1 t2 ht1 ht2
-    · simp only [prodT_pure, permT_pure, permT_pure, prodT_pure]
-      congr
-      simp
+    · simp [prodT_pure, permT_pure]
     · simp only [map_smul, ht]
     · simp only [map_add, ht1, ht2]
   · simp [ht]
@@ -692,9 +662,7 @@ lemma prodT_permT_right {n n'} {c : Fin n → C} {c' : Fin n' → C}
     prodT t2 (permT σ h t) = permT _ (h.append_congr_right c2) (prodT t2 t) := by
   induction' t using induction_on_pure with p r t ht t1 t2 ht1 ht2
   · induction' t2 using induction_on_pure with q r t ht t1 t2 ht1 ht2
-    · simp only [prodT_pure, permT_pure, permT_pure, prodT_pure]
-      congr
-      simp
+    · simp [prodT_pure, permT_pure]
     · simp [map_smul, ht]
     · simp [map_add, ht1, ht2]
   · simp [ht]
@@ -712,7 +680,7 @@ lemma prodT_assoc {n n1 n2} {c : Fin n → C}
   induction' t using induction_on_pure with p r t ht t1 t2 ht1 ht2
   · induction' t1 using induction_on_pure with q r t ht t1 t2 ht1 ht2
     · induction' t2 using induction_on_pure with q r t ht t1 t2 ht1 ht2
-      · simp [prodT_pure, permT_pure, permT_pure, prodT_pure, Pure.prodP_assoc]
+      · simp [prodT_pure, permT_pure, Pure.prodP_assoc]
       · simp [ht]
       · simp [ht1, ht2]
     · simp [ht]
@@ -732,7 +700,7 @@ lemma prodT_assoc' {n n1 n2} {c : Fin n → C}
   induction' t using induction_on_pure with p r t ht t1 t2 ht1 ht2
   · induction' t1 using induction_on_pure with q r t ht t1 t2 ht1 ht2
     · induction' t2 using induction_on_pure with q r t ht t1 t2 ht1 ht2
-      · simp [prodT_pure, permT_pure, permT_pure, prodT_pure, Pure.prodP_assoc']
+      · simp [prodT_pure, permT_pure, Pure.prodP_assoc']
       · simp [ht]
       · simp [ht1, ht2]
     · simp [ht]
