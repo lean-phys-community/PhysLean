@@ -101,55 +101,40 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
   let tq := fun (q : Time → X) t => (t, q t)
   have h_tq_contDiff : ∀ (q : Time → X), ContDiff ℝ ∞ q -> ContDiff ℝ ∞ (tq q) := by
     fun_prop
-  have h_tq_der :  ∀ (q : Time → X) t, ContDiff ℝ ∞ q -> ∂ₜ (tq q) t = (1, ∂ₜ q t) := by
-    intro q t h_ContDiff_q
-    ext
-    change (∂ₜ (tq q) t).1.val = (1 : Time).val
-    congr
-    apply Eq.symm
+  have h_tq_der_val : ∀ (q : Time → X) t, ContDiff ℝ ∞ q ->
+      fderiv ℝ (tq q) t 1 = (1, ∂ₜ q t) := by
+    intro q t hq
+    have h_diff_id : DifferentiableAt ℝ (fun (t' : Time) => t') t := by fun_prop
+    have h_diff_q : DifferentiableAt ℝ q t :=
+      hq.contDiffAt.differentiableAt (by simp)
+    have h_fderiv_eq : fderiv ℝ (fun (t' : Time) => (t', q t')) t =
+        (fderiv ℝ (fun (t' : Time) => t') t).prod (fderiv ℝ q t) :=
+      h_diff_id.fderiv_prodMk h_diff_q
     calc
-      (1 : Time) = fderiv ℝ (fun (t' : Time) => t') t 1 := by simp only [fderiv_fun_id,
-        ContinuousLinearMap.coe_id', id_eq]
-      _ = fderiv ℝ (fun (t' : Time) => (tq q t').1) t 1 := by rfl
-      _ = (∂ₜ (tq q) t).1 := by
-        rw [fderiv.fst]
-        · simp
-          rfl
-        · apply ContDiffAt.differentiableAt
-          · apply ContDiff.contDiffAt
-            exact h_tq_contDiff q h_ContDiff_q
-          · by_contra
-            rcases this
-    apply Eq.symm
-    calc
-       (1, ∂ₜ q t).2 = fderiv ℝ (fun t' => (tq q t').2) t 1 := by rfl
-       _ = (∂ₜ (tq q) t).2 := by
-        rw [fderiv.snd]
-        · simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.coe_snd']
-          rfl
-        · apply ContDiffAt.differentiableAt
-          · apply ContDiff.contDiffAt
-            exact h_tq_contDiff q h_ContDiff_q
-          · by_contra
-            rcases this
-  have h_F_tq_der : ∀ (q : Time → X) (F : Time → X → ℝ) t, (ContDiff ℝ ∞ ↿F) → (ContDiff ℝ ∞ q)  →
+      fderiv ℝ (tq q) t 1 = (fderiv ℝ (fun (t' : Time) => (t', q t')) t) 1 := rfl
+      _ = ((fderiv ℝ (fun (t' : Time) => t') t).prod (fderiv ℝ q t)) 1 := by rw [h_fderiv_eq]
+      _ = (fderiv ℝ (fun (t' : Time) => t') t 1, (fderiv ℝ q t) 1) := rfl
+      _ = (1, ∂ₜ q t) := by simp [Time.deriv_eq]
+  have h_tq_der : ∀ (q : Time → X) t, ContDiff ℝ ∞ q -> ∂ₜ (tq q) t = (1, ∂ₜ q t) := by
+    intro q t hq
+    rw [Time.deriv_eq, h_tq_der_val q t hq]
+  have h_F_tq_der : ∀ (q : Time → X) (F : Time → X → ℝ) t, (ContDiff ℝ ∞ ↿F) → (ContDiff ℝ ∞ q) →
       ∂ₜ (fun t' => ↿F (t', q t')) t = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t) := by
     intro q F t hF hq
-    change  fderiv ℝ ((↿F) ∘ (tq q)) t 1 = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t)
-    rw [fderiv_comp]
-    · simp only [ContinuousLinearMap.comp_apply]
-      rw [← Time.deriv_eq,h_tq_der]
-      exact hq
-    · apply ContDiffAt.differentiableAt
-      · apply ContDiff.contDiffAt
-        exact hF
-      · by_contra
-        rcases this
-    · apply ContDiffAt.differentiableAt
-      · apply ContDiff.contDiffAt
-        exact h_tq_contDiff q hq
-      · by_contra
-        rcases this
+    have h_diff_F : DifferentiableAt ℝ ↿F (t, q t) :=
+      hF.contDiffAt.differentiableAt (by simp)
+    have h_diff_tq : DifferentiableAt ℝ (tq q) t :=
+      (h_tq_contDiff q hq).contDiffAt.differentiableAt (by simp)
+    calc
+      ∂ₜ (fun t' => ↿F (t', q t')) t = fderiv ℝ (fun t' => ↿F (t', q t')) t 1 := by
+        rw [Time.deriv_eq]
+      _ = fderiv ℝ ((↿F) ∘ (tq q)) t 1 := rfl
+      _ = (fderiv ℝ ↿F ((tq q) t) ∘SL fderiv ℝ (tq q) t) 1 := by
+        rw [fderiv_comp t h_diff_F h_diff_tq]
+      _ = fderiv ℝ ↿F ((tq q) t) (fderiv ℝ (tq q) t 1) := rfl
+      _ = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t) := by
+        rw [h_tq_der_val q t hq]
+
   -- beginning of the proof
   constructor
   -- From total the total derivative to the explicit form
