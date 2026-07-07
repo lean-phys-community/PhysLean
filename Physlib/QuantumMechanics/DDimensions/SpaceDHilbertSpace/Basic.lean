@@ -23,7 +23,8 @@ public import Physlib.SpaceAndTime.Space.Module
 - C. Membership
 - D. Construction of elements
 - E. Coersions
-- F. Misc.
+- F. Sub-Hilbert spaces
+- G. Misc.
 
 ## iv. References
 
@@ -179,7 +180,77 @@ lemma coeFn_smul : ⇑(c • ψ) =ᵐ[μ] c • ψ := Lp.coeFn_smul _ _
 end
 
 /-!
-## F. Misc.
+## F. Sub-Hilbert spaces
+-/
+
+/-- The linear map projecting `SpaceDHilbertSpace d μ` onto the sub-Hilbert space
+  of functions which vanish `μ`-a.e. outside of `Ω`. -/
+def subspaceProjection (Ω : Set (Space d)) :
+    SpaceDHilbertSpace d μ →ₗ[ℂ] SpaceDHilbertSpace d (μ.restrict Ω) where
+  toFun ψ := mk ((memHS_coe ψ).restrict Ω)
+  map_add' ψ φ := by
+    rw [← mk_add, mk_eq_iff]
+    exact (coeFn_add ψ φ).filter_mono ae_restrict_le
+  map_smul' c ψ := by
+    rw [← mk_const_smul, mk_eq_iff]
+    exact (coeFn_smul c ψ).filter_mono ae_restrict_le
+
+lemma subspaceProjection_apply (Ω : Set (Space d)) (ψ : SpaceDHilbertSpace d μ) :
+    subspaceProjection Ω ψ =ᵐ[μ.restrict Ω] ψ :=
+  coeFn_mk ((memHS_coe ψ).restrict Ω)
+
+lemma subspaceProjection_norm_le (Ω : Set (Space d)) (ψ : SpaceDHilbertSpace d μ) :
+    ‖subspaceProjection Ω ψ‖ ≤ ‖ψ‖ := by
+  refine ENNReal.toReal_mono (Lp.eLpNorm_ne_top ψ) ?_
+  refine (eLpNorm_congr_ae (subspaceProjection_apply Ω ψ)).trans_le ?_
+  exact eLpNorm_mono_measure ψ restrict_le_self
+
+/-- The linear map including `SpaceDHilbertSpace d (μ.restrict Ω)` as a sub-Hilbert space of
+  `SpaceDHilbertSpace d μ` defined by mapping `ψ` to `Ω.indicator ψ`. -/
+def restrictIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
+    SpaceDHilbertSpace d (μ.restrict Ω) →ₗ[ℂ] SpaceDHilbertSpace d μ where
+  toFun ψ := mk ((memHS_coe ψ).indicator_of_restrict hΩ)
+  map_add' ψ φ := by
+    rw [← mk_add, mk_eq_iff, ← indicator_add']
+    exact (ae_eq_restrict_iff_indicator_ae_eq hΩ).mp (coeFn_add ψ φ)
+  map_smul' c ψ := by
+    rw [← mk_const_smul, mk_eq_iff, Pi.smul_def, ← indicator_const_smul]
+    exact (ae_eq_restrict_iff_indicator_ae_eq hΩ).mp (coeFn_smul c ψ)
+
+lemma restrictIncl_apply
+    {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
+    restrictIncl hΩ ψ =ᵐ[μ] Ω.indicator ψ :=
+  coeFn_mk ((memHS_coe ψ).indicator_of_restrict hΩ)
+
+@[simp]
+lemma restrictIncl_norm
+    {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
+    ‖restrictIncl hΩ ψ‖ = ‖ψ‖ := by
+  trans (eLpNorm (Ω.indicator ψ) 2 μ).toReal
+  · simp only [norm, eLpNorm_congr_ae (restrictIncl_apply hΩ ψ)]
+  exact congrArg _ (eLpNorm_indicator_eq_eLpNorm_restrict hΩ)
+
+lemma leftInverse_subspaceProjection {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
+    LeftInverse (subspaceProjection (μ := μ) Ω) (restrictIncl hΩ) := by
+  intro ψ
+  apply ext_iff.mpr
+  have h := subspaceProjection_apply Ω (restrictIncl hΩ ψ)
+  rw [ae_eq_restrict_iff_indicator_ae_eq hΩ] at *
+  filter_upwards [restrictIncl_apply hΩ ψ, h] with x
+  by_cases x ∈ Ω <;> simp_all
+
+@[simp]
+lemma subspaceProjection_restrictIncl_apply
+    {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
+    subspaceProjection Ω (restrictIncl hΩ ψ) = ψ :=
+  leftInverse_subspaceProjection hΩ ψ
+
+lemma subspaceProjection_surjective {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
+    Surjective (subspaceProjection (μ := μ) Ω) :=
+  (leftInverse_subspaceProjection hΩ).surjective
+
+/-!
+## G. Misc.
 -/
 
 open Filter
