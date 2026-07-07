@@ -101,11 +101,7 @@ lemma planeWave_differentiable_space {d f₀ c t} {s : Direction d}
   simp only [planeWave_eq]
   apply Differentiable.comp
   · fun_prop
-  · apply Differentiable.sub
-    · refine Differentiable.inner ℝ ?_ ?_
-      · fun_prop
-      · fun_prop
-    · fun_prop
+  apply Differentiable.sub <;> fun_prop
 
 @[fun_prop]
 lemma planeWave_differentiable {s : Direction d}
