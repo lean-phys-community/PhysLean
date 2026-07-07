@@ -132,15 +132,13 @@ lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
 @[to_fun]
 lemma curl_neg (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f) :
     ∇ ⨯ (-f) = -∇ ⨯ f := by
-  rw [← neg_one_smul ℝ, curl_smul, neg_one_smul]
-  · exact hf
+  simpa using curl_smul f (-1) hf
 
 @[to_fun]
 lemma curl_sub (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∇ ⨯ (f1 - f2) = ∇ ⨯ f1 - ∇ ⨯ f2 := by
-  rw [sub_eq_add_neg, curl_add, curl_neg, sub_eq_add_neg]
-  repeat fun_prop
+  rw [sub_eq_add_neg, curl_add f1 (-f2) hf1 hf2.neg, curl_neg f2 hf2, sub_eq_add_neg]
 
 /-!
 

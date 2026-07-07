@@ -122,13 +122,9 @@ lemma freeCurrentPotential_hasVarGradientAt (A : ElectromagneticPotential d)
   have h2' : ContDiff ℝ ∞ fun x => η μ μ * J x μ :=
     ContDiff.mul (by fun_prop) ((Lorentz.Vector.contDiff_apply _).mpr hJ μ)
   have h2 := HasVarAdjDerivAt.fun_mul h2' _ _ A h1
-  have h3' : (fun (φ : SpaceTime d → Lorentz.Vector d) x => η μ μ * J x μ * φ x μ) =
-    (fun (φ : SpaceTime d → Lorentz.Vector d) x => η μ μ * φ x μ * J x μ) := by
-    funext φ x
-    ring
-  rw [h3'] at h2
-  apply HasVarGradientAt.intro _ h2
-  simp
+  apply HasVarGradientAt.intro _ (by
+    simpa [mul_comm, mul_left_comm, mul_assoc] using h2)
+  ext x; simp [mul_comm]
 
 /-!
 
