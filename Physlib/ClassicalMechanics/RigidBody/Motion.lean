@@ -7,6 +7,7 @@ module
 
 public import Physlib.ClassicalMechanics.RigidBody.Basic
 public import Physlib.SpaceAndTime.Time.Derivatives
+public import Physlib.SpaceAndTime.Time.MatrixDerivatives
 public import Mathlib.LinearAlgebra.UnitaryGroup
 /-!
 
@@ -27,6 +28,9 @@ a rigid motion into a translation of the centre of mass plus a rotation about it
 @[expose] public section
 
 open Time Manifold Matrix
+
+attribute [local instance] Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace
+  Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
 /-- A motion of a rigid body in `d`-dimensional space: the body together with the inertial-frame
 trajectory of its centre of mass and its time-dependent orientation (a rotation about the centre
@@ -219,5 +223,41 @@ lemma velocity_of_orientation_const {d : ℕ} (M : RigidBodyMotion d) (y : Space
   rw [hdisp]
   simp only [Time.deriv_eq]
   rw [fderiv_const_add]
+
+/-- The velocity of a body point decomposes as `v = Ṙ (y − c) + V`: the rate of change of the
+orientation acting on the body-frame position, plus the centre-of-mass velocity. -/
+lemma velocity_eq_deriv_orientation {d : ℕ} (M : RigidBodyMotion d) (y : Space d) (t : Time)
+    (i : Fin d) (hR : Differentiable ℝ (fun s => (M.orientation s).1))
+    (hX : Differentiable ℝ M.comTrajectory) :
+    M.velocity y t i
+      = (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j) i
+        + M.centerOfMassVelocity t i := by
+  have hentry : ∀ a b : Fin d, Differentiable ℝ (fun s => (M.orientation s).1 a b) := fun a b =>
+    ((Matrix.entryLinearMap ℝ ℝ a b).toContinuousLinearMap).differentiable.comp hR
+  have hXcoord : ∀ k : Fin d, Differentiable ℝ (fun s => M.comTrajectory s k) := fun k =>
+    (Space.eval_differentiable k).comp hX
+  have hd : Differentiable ℝ (fun s => M.displacement s y) := by
+    have hcoord : ∀ k : Fin d, Differentiable ℝ (fun s => M.displacement s y k) := by
+      intro k
+      simp only [displacement_apply]
+      exact (Differentiable.fun_sum
+        (fun j _ => (hentry k j).mul_const (y j - M.centerOfMass j))).add (hXcoord k)
+    exact Space.mk_differentiable.comp (differentiable_pi.mpr hcoord)
+  have hmv : (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j) i
+      = ∑ j, (∂ₜ (fun s => (M.orientation s).1) t) i j * (y j - M.centerOfMass j) := rfl
+  rw [M.velocity_apply y t i hd]
+  simp only [displacement_apply]
+  rw [Time.deriv_add (fun s => ∑ j, (M.orientation s).1 i j * (y j - M.centerOfMass j))
+      (fun s => M.comTrajectory s i)
+      ((Differentiable.fun_sum
+        fun j _ => (hentry i j).mul_const (y j - M.centerOfMass j)) t) ((hXcoord i) t),
+    Time.deriv_fun_sum Finset.univ
+      (fun j s => (M.orientation s).1 i j * (y j - M.centerOfMass j))
+      (fun j _ => ((hentry i j).mul_const (y j - M.centerOfMass j)) t),
+    Finset.sum_congr rfl (fun j (_ : j ∈ Finset.univ) =>
+      Time.deriv_mul_const (fun s => (M.orientation s).1 i j)
+        (y j - M.centerOfMass j) ((hentry i j) t))]
+  simp only [Time.deriv_matrix_apply (fun s => (M.orientation s).1) t (hR t)]
+  rw [hmv, Time.deriv_space hX t i, ← centerOfMassVelocity_eq]
 
 end RigidBodyMotion
