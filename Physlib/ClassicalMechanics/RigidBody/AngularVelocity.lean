@@ -119,8 +119,7 @@ lemma angularVelocityTensor_mul_orientation (M : RigidBodyMotion d) (t : Time) :
 /-- The velocity of a body point decomposes as `v = Ṙ (y − c) + V`: the rate of change of the
 orientation acting on the body-frame position, plus the centre-of-mass velocity. -/
 lemma velocity_eq_deriv_orientation (M : RigidBodyMotion d) (y : Space d) (t : Time) (i : Fin d)
-    (hR : Differentiable ℝ (fun s => (M.orientation s).1))
-    (hX : Differentiable ℝ M.comTrajectory) :
+    (hR : Differentiable ℝ (fun s => (M.orientation s).1)) (hX : Differentiable ℝ M.comTrajectory) :
     M.velocity y t i
       = (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j) i
         + M.centerOfMassVelocity t i := by
@@ -156,10 +155,8 @@ lemma velocity_eq_deriv_orientation (M : RigidBodyMotion d) (y : Space d) (t : T
 dimensions: the velocity of a body point is the centre-of-mass velocity plus the cross product of
 the angular velocity with the point's position relative to the centre of mass. -/
 theorem velocity_eq_angularVelocity (M : RigidBodyMotion 3) (y : Space 3) (t : Time) (i : Fin 3)
-    (hR : Differentiable ℝ (fun s => (M.orientation s).1))
-    (hX : Differentiable ℝ M.comTrajectory) :
-    M.velocity y t i
-      = M.centerOfMassVelocity t i
+    (hR : Differentiable ℝ (fun s => (M.orientation s).1)) (hX : Differentiable ℝ M.comTrajectory) :
+    M.velocity y t i = M.centerOfMassVelocity t i
         + (M.angularVelocity t ⨯₃ fun j => M.displacement t y j - M.comTrajectory t j) i := by
   have hRw : (M.orientation t).1 *ᵥ (fun j => y j - M.centerOfMass j)
       = fun j => M.displacement t y j - M.comTrajectory t j := by
