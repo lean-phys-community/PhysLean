@@ -14,7 +14,36 @@ public import Physlib.SpaceAndTime.Space.Module
 
 ## i. Overview
 
+The Hilbert spaces appropriate for doing quantum mechanics on `Space d` are the $$L^2$$-spaces
+`SpaceDHilbertSpace d μ := Lp ℂ 2 μ`, where `μ` is some measure on `Space d`.
+Elements of `SpaceDHilbertSpace d μ` are _equivalence classes_ of functions `Space d → ℂ` which are
+square-integrable with respect to `μ`, i.e. `∫ x, ‖f x‖ ^ 2 ∂μ` is finite, and where `f` and `g` are
+in the same equivalence class if they are `μ`-a.e. equal.
+
+Given `SpaceDHilbertSpace d μ` and `Ω : Set (Space d)`, the Hilbert space
+`SpaceDHilbertSpace d (μ.restrict Ω)` may be interpreted as the sub-Hilbert space
+consisting of those vectors with domain contained in `Ω`.
+The reason is that for each `f` in `SpaceDHilbertSpace d (μ.restrict Ω)` we have
+`f =ᵐ[μ.restrict Ω] Ω.indicator f`, namely the equivalence class of `f` always
+contains a representative which vanishes on the complement of `Ω`.
+The linear map `restrictIncl Ω` defined below describes this sub-Hilbert space relationship by
+mapping each `f` to this special representative in its equivalence class.
+
+Similarly, we may project `SpaceDHilbertSpace d μ` onto the sub-Hilbert space
+`SpaceDHilbertSpace d (μ.restrict Ω)` by enlarging the equivalence classes, essentially dropping
+information about the functions on the complement of `Ω`.
+
 ## ii. Key results
+
+- `SpaceDHilbertSpace d μ` : The $$L^2$$-space on `Space d` with respect to the measure `μ`.
+- `toBra` : The linear equivalence between the Hilbert space and its dual. This is the map which
+    sends each ket to its corresponding bra and _vice versa_.
+- `MemHS f μ` : The proposition capturing exactly when the function `f : Space d → ℂ` can be lifted
+    to an element of the Hilbert space.
+- `subspaceProjection` : The projection of `SpaceDHilbertSpace d μ` onto a sub-Hilbert space
+    `SpaceDHilbertSpace d (μ.restrict Ω)`.
+- `restrictIncl Ω` : The linear map including `SpaceDHilbertSpace d (μ.restrict Ω)`
+    as a sub-Hilbert space of `SpaceDHilbertspace d μ`.
 
 ## iii. Table of contents
 
@@ -42,9 +71,9 @@ open Function InnerProductSpace MeasureTheory Measure Set
 ## A. Definition
 -/
 
-/-- The Hilbert space for single-particle quantum mechanics on `Space d` is defined to be
-  `L²(Space d, ℂ)`, the space of almost-everywhere equal equivalence classes of square-integrable
-  functions from `Space d` to `ℂ`. -/
+/-- The Hilbert space for single-particle quantum mechanics on `Space d` with measure `μ`
+  is defined to be `L²(Space d, ℂ; μ)`, the space of `μ`-a.e. equal equivalence classes
+  of functions `f : Space d → ℂ` for which `∫ x, ‖f x‖² ∂μ` is finite. -/
 abbrev SpaceDHilbertSpace (d : ℕ) (μ : Measure (Space d) := volume) := Lp ℂ 2 μ
 
 namespace SpaceDHilbertSpace
@@ -52,6 +81,8 @@ namespace SpaceDHilbertSpace
 variable {d : ℕ} {μ μ' : Measure (Space d)} {f g : Space d → ℂ} (ψ φ : SpaceDHilbertSpace d μ)
 
 variable {ψ φ} in
+/-- Elements of `SpaceDHilbertSpace d μ` are equivalence classes
+  of `μ`-a.e. equal functions `Space d → ℂ`. -/
 lemma ext_iff : ψ = φ ↔ ψ =ᵐ[μ] φ := Lp.ext_iff
 
 /-!
@@ -75,14 +106,15 @@ lemma toBra_symm_apply (f : StrongDual ℂ (SpaceDHilbertSpace d μ)) : ⟪toBra
 ## C. Membership
 -/
 
-/-- The proposition `MemHS f` for a function `f : Space d → ℂ` is defined
-  to be true if the function `f` can be lifted to the Hilbert space. -/
+/-- For a function `f : Space d → ℂ`, the proposition `MemHS f μ` means that the function `f`
+  can be lifted to an element of the Hilbert space. -/
 def MemHS (f : Space d → ℂ) (μ : Measure (Space d) := volume) : Prop := MemLp f 2 μ
 
+/-- Elements of the Hilbert space satisfy the property `MemHS`. -/
 lemma memHS_coe : MemHS ψ μ := Lp.memLp ψ
 
-/-- A function `f` satisfies `MemHS f μ` if and only if it is `μ`-a.e. strongly measurable
-  and square integrable. -/
+/-- A function `f : Space d → ℂ` satisfies `MemHS f μ` if and only if
+  it is `μ`-a.e. strongly measurable and `∫ x, ‖f x‖ ^ 2 ∂μ` is finite. -/
 lemma memHS_iff : MemHS f μ ↔ AEStronglyMeasurable f μ ∧ Integrable (fun x ↦ ‖f x‖ ^ 2) μ :=
   and_congr_right fun h ↦ (and_iff_right h).symm.trans (memLp_two_iff_integrable_sq_norm h)
 
@@ -114,6 +146,9 @@ lemma MemHS.indicator {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (hf : MemHS 
     MemHS (Ω.indicator f) μ :=
   MemLp.indicator hΩ hf
 
+/-- If `f` is a member of the sub-Hilbert space `SpaceDHilbertSpace d (μ.restrict Ω)`
+  of `SpaceDHilbertSpace d μ` then the representative `Ω.indicator f` which vanishes outside `Ω`
+  is a member of the full Hilbert space. -/
 lemma MemHS.indicator_of_restrict
     {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (hf : MemHS f (μ.restrict Ω)) :
     MemHS (Ω.indicator f) μ := by
