@@ -109,7 +109,7 @@ lemma mulOperator_hasDenseDomain {f : Space d → ℂ} (hf : AEStronglyMeasurabl
   obtain ⟨u, hu, hfu⟩ := AEStronglyMeasurable.aemeasurable hf
   let s : ℕ → Set (Space d) := fun n ↦ u ⁻¹' (Metric.closedBall 0 n)
   let φ : ℕ → SpaceDHilbertSpace d := fun n ↦
-    mk ((memHS_coe ψ).indicator (s := s n) (by measurability))
+    mk ((memHS_coe ψ).indicator (Ω := s n) (by measurability))
   have hφ : ∀ n, φ n =ᵐ[volume] (s n).indicator ψ := fun n ↦ coeFn_mk _
   use φ
   constructor

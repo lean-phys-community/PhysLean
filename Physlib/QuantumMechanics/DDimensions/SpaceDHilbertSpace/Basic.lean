@@ -48,7 +48,7 @@ abbrev SpaceDHilbertSpace (d : ℕ) (μ : Measure (Space d) := volume) := Lp ℂ
 
 namespace SpaceDHilbertSpace
 
-variable {d : ℕ} {μ : Measure (Space d)} {f g : Space d → ℂ} (ψ φ : SpaceDHilbertSpace d μ)
+variable {d : ℕ} {μ μ' : Measure (Space d)} {f g : Space d → ℂ} (ψ φ : SpaceDHilbertSpace d μ)
 
 variable {ψ φ} in
 lemma ext_iff : ψ = φ ↔ ψ =ᵐ[μ] φ := Lp.ext_iff
@@ -99,6 +99,27 @@ lemma MemHS.sub (hf : MemHS f μ) (hg : MemHS g μ) : MemHS (f - g) μ := MemLp.
 lemma MemHS.const_smul (c : ℂ) (hf : MemHS f μ) : MemHS (c • f) μ := MemLp.const_smul hf c
 
 lemma MemHS.ae_eq (hfg : f =ᵐ[μ] g) (hf : MemHS f μ) : MemHS g μ := MemLp.ae_eq hfg hf
+
+lemma MemHS.mono_measure (h : μ' ≤ μ) (hf : MemHS f μ) : MemHS f μ' := MemLp.mono_measure h hf
+
+lemma MemHS.restrict (Ω : Set (Space d)) (hf : MemHS f μ) : MemHS f (μ.restrict Ω) :=
+  hf.mono_measure restrict_le_self
+
+lemma MemHS.mono_restrict {Ω Ω' : Set (Space d)} (h : Ω' ≤ Ω) (hf : MemHS f (μ.restrict Ω)) :
+    MemHS f (μ.restrict Ω') :=
+  hf.mono_measure (μ.restrict_mono_set h)
+
+lemma MemHS.indicator {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (hf : MemHS f μ) :
+    MemHS (Ω.indicator f) μ :=
+  MemLp.indicator hΩ hf
+
+lemma MemHS.indicator_of_restrict
+    {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (hf : MemHS f (μ.restrict Ω)) :
+    MemHS (Ω.indicator f) μ := by
+  refine memHS_iff.mpr ⟨(aestronglyMeasurable_indicator_iff hΩ).mpr hf.1, ?_⟩
+  refine (IntegrableOn.integrable_indicator (memHS_iff.mp hf).2 hΩ).congr ?_
+  filter_upwards with x
+  by_cases x ∈ Ω <;> simp_all
 
 /-!
 ## D. Construction of elements
