@@ -10,8 +10,8 @@ public import Physlib.ClassicalMechanics.RigidBody.AngularMomentum
 
 # Rotational kinetic energy of a rigid body
 
-A rigid body rotating with angular velocity `ω` about its reference point carries the point at
-position `r` with velocity `ω × r`, so its kinetic energy is `T = ½ ∫ |ω × r|² dm`. Since
+For a rigid body rotating with angular velocity `ω` about its reference point the point at
+position `r` has velocity `ω × r`, so its kinetic energy is `T = ½ ∫ |ω × r|² dm`. Since
 `|ω × r|² = ω · (r × (ω × r))` and the angular momentum is `L = ∫ r × (ω × r) dm = I ω`, the
 kinetic energy is the quadratic form `T = ½ ω · L = ½ ω · I ω` in the inertia tensor.
 
@@ -36,20 +36,23 @@ lemma rotationalKineticEnergy_eq_angularMomentum (R : RigidBody 3) (ω : Fin 3 �
     R.rotationalKineticEnergy ω = (1 / 2) * (ω ⬝ᵥ R.angularMomentum ω) := by
   rw [rotationalKineticEnergy, angularMomentum_eq_inertiaTensor_mulVec]
 
+/-- The local rotational speed squared `|ω × r|² = (ω × r) · (ω × r)` is a smooth function of the
+position `r`. -/
+lemma contDiff_rotationalSpeedSq (ω : Fin 3 → ℝ) :
+    ContDiff ℝ ⊤ fun x : Space 3 => (ω ⨯₃ (x : Fin 3 → ℝ)) ⬝ᵥ (ω ⨯₃ (x : Fin 3 → ℝ)) := by
+  simp only [dotProduct, Fin.sum_univ_three, cross_apply, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  fun_prop
+
 /-- The rotational kinetic energy equals the mass integral of the local rotational speed squared:
 `T = ½ ∫ |ω × r|² dm`. -/
 theorem rotationalKineticEnergy_eq_integral (R : RigidBody 3) (ω : Fin 3 → ℝ) :
     R.rotationalKineticEnergy ω
       = (1 / 2) * R.ρ ⟨fun x => (ω ⨯₃ (x : Fin 3 → ℝ)) ⬝ᵥ (ω ⨯₃ (x : Fin 3 → ℝ)),
-        ContDiff.contMDiff <| by
-          simp only [dotProduct, Fin.sum_univ_three, cross_apply, Matrix.cons_val_zero,
-            Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
-          fun_prop⟩ := by
+        (contDiff_rotationalSpeedSq ω).contMDiff⟩ := by
   rw [rotationalKineticEnergy_eq_angularMomentum]
   congr 1
-  simp only [dotProduct, angularMomentum]
-  rw [Finset.sum_congr rfl (fun i (_ : i ∈ Finset.univ) =>
-      (smul_eq_mul (ω i) _).symm.trans (map_smul R.ρ (ω i) _).symm), ← map_sum]
+  simp_rw [dotProduct, angularMomentum, ← smul_eq_mul, ← map_smul, ← map_sum]
   congr 1
   ext x
   rw [← ContMDiffMap.coeFnAddMonoidHom_apply, map_sum, Finset.sum_apply]
