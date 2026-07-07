@@ -97,34 +97,22 @@ def IsTotalTimeDerivative
 lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
-  -- Preliminary construction: properties of the function t => (t, q t)
   let tq := fun (q : Time → X) t => (t, q t)
-  have h_tq_contDiff : ∀ (q : Time → X), ContDiff ℝ ∞ q -> ContDiff ℝ ∞ (tq q) := by
-    fun_prop
   have h_tq_der_val : ∀ (q : Time → X) t, ContDiff ℝ ∞ q ->
       fderiv ℝ (tq q) t 1 = (1, ∂ₜ q t) := by
     intro q t hq
-    have h_diff_id : DifferentiableAt ℝ (fun (t' : Time) => t') t := by fun_prop
-    have h_diff_q : DifferentiableAt ℝ q t :=
-      hq.contDiffAt.differentiableAt (by simp)
-    have h_fderiv_eq : fderiv ℝ (fun (t' : Time) => (t', q t')) t =
-        (fderiv ℝ (fun (t' : Time) => t') t).prod (fderiv ℝ q t) :=
-      h_diff_id.fderiv_prodMk h_diff_q
-    calc
-      fderiv ℝ (tq q) t 1 = (fderiv ℝ (fun (t' : Time) => (t', q t')) t) 1 := rfl
-      _ = ((fderiv ℝ (fun (t' : Time) => t') t).prod (fderiv ℝ q t)) 1 := by rw [h_fderiv_eq]
-      _ = (fderiv ℝ (fun (t' : Time) => t') t 1, (fderiv ℝ q t) 1) := rfl
-      _ = (1, ∂ₜ q t) := by simp [Time.deriv_eq]
-  have h_tq_der : ∀ (q : Time → X) t, ContDiff ℝ ∞ q -> ∂ₜ (tq q) t = (1, ∂ₜ q t) := by
-    intro q t hq
-    rw [Time.deriv_eq, h_tq_der_val q t hq]
+    have h := (differentiableAt_id (𝕜 := ℝ) (x := t)).fderiv_prodMk
+      ((hq.contDiffAt (x := t)).differentiableAt (by simp))
+    dsimp [tq]
+    simpa [Time.deriv_eq] using congrArg (fun f => f 1) h
   have h_F_tq_der : ∀ (q : Time → X) (F : Time → X → ℝ) t, (ContDiff ℝ ∞ ↿F) → (ContDiff ℝ ∞ q) →
       ∂ₜ (fun t' => ↿F (t', q t')) t = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t) := by
     intro q F t hF hq
     have h_diff_F : DifferentiableAt ℝ ↿F (t, q t) :=
       hF.contDiffAt.differentiableAt (by simp)
-    have h_diff_tq : DifferentiableAt ℝ (tq q) t :=
-      (h_tq_contDiff q hq).contDiffAt.differentiableAt (by simp)
+    have h_diff_tq : DifferentiableAt ℝ (tq q) t := by
+      have h_contDiff : ContDiff ℝ ∞ (tq q) := by fun_prop
+      exact h_contDiff.contDiffAt.differentiableAt (by simp)
     calc
       ∂ₜ (fun t' => ↿F (t', q t')) t = fderiv ℝ (fun t' => ↿F (t', q t')) t 1 := by
         rw [Time.deriv_eq]
@@ -134,47 +122,36 @@ lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
       _ = fderiv ℝ ↿F ((tq q) t) (fderiv ℝ (tq q) t 1) := rfl
       _ = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t) := by
         rw [h_tq_der_val q t hq]
-
-  -- beginning of the proof
   constructor
-  -- From total the total derivative to the explicit form
   · intro h
     rcases h with ⟨F, hF⟩
     rcases hF with ⟨hFdif, hFder⟩
-    use F
-    use hFdif
+    use F, hFdif
     intro t q₀ v
     let qv := fun (t' : Time) => (q₀ - t.val • v) + t'.val • v
-    have h_qv_contDiff : ContDiff ℝ ∞ qv := by
-      change ContDiff ℝ ∞ (((fun (tR : ℝ) => (q₀ - t.val • v) + tR • v)) ∘ Time.toRealCLE)
-      fun_prop
+    have h_qv_contDiff : ContDiff ℝ ∞ qv := by fun_prop
     have h_qv_t : qv t = q₀ := by
-      calc
-        qv t = (q₀ - t.val • v) + t.val • v := by rfl
-        _ = q₀ := by module
+      dsimp [qv]; simp [sub_add_cancel]
     have h_qv_der : ∂ₜ qv t = v := by
-      calc
-        ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v) t 1 := by rfl
-        _ = v := by
-          rw [fderiv_const_add,fderiv_smul_const]
-          · simp only [ContinuousLinearMap.smulRight_apply, fderiv_val, one_smul]
-          · fun_prop
+      rw [Time.deriv_eq]
+      dsimp [qv]
+      rw [fderiv_const_add (q₀ - t.val • v) (f := fun (t' : Time) => t'.val • v)]
+      have h := fderiv_smul_const (by fun_prop : DifferentiableAt ℝ (fun (t' : Time) => t'.val) t) v
+      simpa [fderiv_val] using congrArg (fun f => f 1) h
     rw [← h_qv_t, ← h_qv_der, hFder, ← h_F_tq_der]
     · rfl
     · exact hFdif
     · exact h_qv_contDiff
     · exact h_qv_contDiff
-  -- From the explicit form to the total derivative
   · intro h
     rcases h with ⟨F, hF⟩
     rcases hF with ⟨hFdif, hFder⟩
-    use F
-    use hFdif
-    intro t q hq_ContDiff
+    use F, hFdif
+    intro t q hq
     rw [hFder, ← h_F_tq_der]
     · rfl
     · exact hFdif
-    · exact hq_ContDiff
+    · exact hq
 
 /--
 Elementary fact: if δL is a time derivative, then so is -δL.

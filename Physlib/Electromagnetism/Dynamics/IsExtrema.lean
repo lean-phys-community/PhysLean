@@ -250,14 +250,14 @@ lemma isExtrema_iff_gauss_ampere_magneticFieldMatrix {d} {𝓕 : FreeSpace}
       field_simp
       simp only [FreeSpace.c_sq, one_div, mul_inv_rev, mul_zero]
       field_simp
-      ring
+      ring_nf
     · intro h x
       specialize h (x.time 𝓕.c) x.space
       linear_combination (norm := simp) (𝓕.μ₀⁻¹ * 𝓕.c⁻¹) * h
       field_simp
       simp only [FreeSpace.c_sq, one_div, mul_inv_rev, mul_zero]
       field_simp
-      ring
+      ring_nf
   · apply Iff.intro
     · intro h t x i
       specialize h ((toTimeAndSpace 𝓕.c).symm (t, x)) i
