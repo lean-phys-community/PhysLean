@@ -1784,6 +1784,17 @@ theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
   simp [qRelativeEnt, SandwichedRelRentropy, h, EReal.coe_nnreal_eq_coe_real]
   norm_cast
 
+/-- The quantum relative entropy is finite exactly when the support condition
+`σ.M.ker ≤ ρ.M.ker` holds. -/
+theorem qRelativeEnt_ne_top_iff {ρ σ : MState d} : 𝐃(ρ‖σ) ≠ ⊤ ↔ σ.M.ker ≤ ρ.M.ker := by
+  rw [qRelativeEnt, SandwichedRelRentropy]
+  simp only [zero_lt_one, ↓reduceDIte]
+  split_ifs with h <;> simp [h]
+
+/-- The quantum relative entropy is `⊤` exactly when the support condition fails. -/
+theorem qRelativeEnt_eq_top_iff {ρ σ : MState d} : 𝐃(ρ‖σ) = ⊤ ↔ ¬ σ.M.ker ≤ ρ.M.ker := by
+  simpa using (not_congr (qRelativeEnt_ne_top_iff (ρ := ρ) (σ := σ)))
+
 open Classical in
 theorem qRelativeEnt_eq_neg_Sᵥₙ_add (ρ σ : MState d) :
     (qRelativeEnt ρ σ).toEReal = -(Sᵥₙ ρ : EReal) +

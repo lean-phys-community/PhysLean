@@ -280,6 +280,11 @@ theorem mix_zero [inst : Mixable U T] (x₁ x₂ : T) : (0 : Prob) [ x₁ ↔ x�
   apply inst.to_U_inj
   simp [mix, mix_ab]
 
+@[simp]
+theorem mix_one [inst : Mixable U T] (x₁ x₂ : T) : (1 : Prob) [ x₁ ↔ x₂ : inst] = x₁ := by
+  apply inst.to_U_inj
+  simp [mix, mix_ab]
+
 /--When T is the whole space, and T is a suitable vector space over ℝ, we get a Mixable instance.-/
 instance instUniv [AddCommMonoid T] [Module ℝ T] : Mixable T T where
   to_U := id
