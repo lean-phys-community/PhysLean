@@ -26,8 +26,8 @@ consisting of those vectors with domain contained in `Ω`.
 The reason is that for each `f` in `SpaceDHilbertSpace d (μ.restrict Ω)` we have
 `f =ᵐ[μ.restrict Ω] Ω.indicator f`, namely the equivalence class of `f` always
 contains a representative which vanishes on the complement of `Ω`.
-The linear map `restrictIncl Ω` defined below describes this sub-Hilbert space relationship by
-mapping each `f` to this special representative in its equivalence class.
+The linear isometry `restrictIncl Ω` defined below describes this sub-Hilbert space relationship
+by mapping each `f` to this special representative in its equivalence class.
 
 Similarly, we may project `SpaceDHilbertSpace d μ` onto the sub-Hilbert space
 `SpaceDHilbertSpace d (μ.restrict Ω)` by enlarging the equivalence classes, essentially dropping
@@ -42,7 +42,7 @@ information about the functions on the complement of `Ω`.
     to an element of the Hilbert space.
 - `subspaceProjection` : The projection of `SpaceDHilbertSpace d μ` onto a sub-Hilbert space
     `SpaceDHilbertSpace d (μ.restrict Ω)`.
-- `restrictIncl Ω` : The linear map including `SpaceDHilbertSpace d (μ.restrict Ω)`
+- `restrictIncl Ω` : The linear isometry including `SpaceDHilbertSpace d (μ.restrict Ω)`
     as a sub-Hilbert space of `SpaceDHilbertspace d μ`.
 
 ## iii. Table of contents
@@ -240,10 +240,10 @@ lemma subspaceProjection_norm_le (Ω : Set (Space d)) (ψ : SpaceDHilbertSpace d
   refine (eLpNorm_congr_ae (subspaceProjection_apply Ω ψ)).trans_le ?_
   exact eLpNorm_mono_measure ψ restrict_le_self
 
-/-- The linear map including `SpaceDHilbertSpace d (μ.restrict Ω)` as a sub-Hilbert space of
+/-- The linear isometry including `SpaceDHilbertSpace d (μ.restrict Ω)` as a sub-Hilbert space of
   `SpaceDHilbertSpace d μ` defined by mapping `ψ` to `Ω.indicator ψ`. -/
 def restrictIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
-    SpaceDHilbertSpace d (μ.restrict Ω) →ₗ[ℂ] SpaceDHilbertSpace d μ where
+    SpaceDHilbertSpace d (μ.restrict Ω) →ₗᵢ[ℂ] SpaceDHilbertSpace d μ where
   toFun ψ := mk ((memHS_coe ψ).indicator_of_restrict hΩ)
   map_add' ψ φ := by
     rw [← mk_add, mk_eq_iff, ← indicator_add']
@@ -251,19 +251,16 @@ def restrictIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
   map_smul' c ψ := by
     rw [← mk_const_smul, mk_eq_iff, Pi.smul_def, ← indicator_const_smul]
     exact (ae_eq_restrict_iff_indicator_ae_eq hΩ).mp (coeFn_smul c ψ)
+  norm_map' ψ := by
+    calc
+      _ = (eLpNorm (mk ((memHS_coe ψ).indicator_of_restrict hΩ)) 2 μ).toReal := rfl
+      _ = (eLpNorm (Ω.indicator ψ) 2 μ).toReal := congrArg _ (eLpNorm_congr_ae (coeFn_mk _))
+      _ = ‖ψ‖ := congrArg _ (eLpNorm_indicator_eq_eLpNorm_restrict hΩ)
 
 lemma restrictIncl_apply
     {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
     restrictIncl hΩ ψ =ᵐ[μ] Ω.indicator ψ :=
   coeFn_mk ((memHS_coe ψ).indicator_of_restrict hΩ)
-
-@[simp]
-lemma restrictIncl_norm
-    {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
-    ‖restrictIncl hΩ ψ‖ = ‖ψ‖ := by
-  trans (eLpNorm (Ω.indicator ψ) 2 μ).toReal
-  · simp only [norm, eLpNorm_congr_ae (restrictIncl_apply hΩ ψ)]
-  exact congrArg _ (eLpNorm_indicator_eq_eLpNorm_restrict hΩ)
 
 lemma leftInverse_subspaceProjection {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
     LeftInverse (subspaceProjection (μ := μ) Ω) (restrictIncl hΩ) := by
