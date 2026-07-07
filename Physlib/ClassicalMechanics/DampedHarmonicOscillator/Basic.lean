@@ -256,6 +256,11 @@ def IsCriticallyDamped : Prop := S.discriminant = 0
 /-- The system is overdamped when 4mk < γ². -/
 def IsOverdamped : Prop := 0 < S.discriminant
 
+/-- Every damped oscillator is underdamped, critically damped, or overdamped. -/
+lemma isUnderdamped_or_isCriticallyDamped_or_isOverdamped :
+    S.IsUnderdamped ∨ S.IsCriticallyDamped ∨ S.IsOverdamped :=
+  lt_trichotomy S.discriminant 0
+
 /-- The system is undamped when γ = 0. -/
 def IsUndamped : Prop := S.γ = 0
 

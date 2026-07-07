@@ -108,5 +108,7 @@ Requirements:
   - description: >
       The API shall prove that the selected trajectory is the unique solution of the
       equation of motion with the given initial conditions.
-    done: false
-    location: N/A
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/DampedHarmonicOscillator/Solution.lean
+      (equationOfMotion_unique, trajectories_unique)
