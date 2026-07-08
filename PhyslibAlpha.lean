@@ -31,3 +31,11 @@ public import PhyslibAlpha.QuantumMechanics.QuantumHarmonicOscillator
 public import PhyslibAlpha.QuantumMechanics.StinespringDilation
 public import PhyslibAlpha.Mathematics.PartialDerivativeTest
 public import PhyslibAlpha.ClassicalMechanics.CoupledSpringPotential
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.ChargeBalance
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.EffectivePotential
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.GaugeSlice
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.GaugeTorus
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.Invariants
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.Module
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.OrbitRepresentative
+public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.SwapDoublet

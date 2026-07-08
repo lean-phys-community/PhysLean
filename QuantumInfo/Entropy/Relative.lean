@@ -1784,6 +1784,17 @@ theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
   simp [qRelativeEnt, SandwichedRelRentropy, h, EReal.coe_nnreal_eq_coe_real]
   norm_cast
 
+/-- The quantum relative entropy is finite exactly when the support condition
+`σ.M.ker ≤ ρ.M.ker` holds. -/
+theorem qRelativeEnt_ne_top_iff {ρ σ : MState d} : 𝐃(ρ‖σ) ≠ ⊤ ↔ σ.M.ker ≤ ρ.M.ker := by
+  rw [qRelativeEnt, SandwichedRelRentropy]
+  simp only [zero_lt_one, ↓reduceDIte]
+  split_ifs with h <;> simp [h]
+
+/-- The quantum relative entropy is `⊤` exactly when the support condition fails. -/
+theorem qRelativeEnt_eq_top_iff {ρ σ : MState d} : 𝐃(ρ‖σ) = ⊤ ↔ ¬ σ.M.ker ≤ ρ.M.ker := by
+  simpa using (not_congr (qRelativeEnt_ne_top_iff (ρ := ρ) (σ := σ)))
+
 open Classical in
 theorem qRelativeEnt_eq_neg_Sᵥₙ_add (ρ σ : MState d) :
     (qRelativeEnt ρ σ).toEReal = -(Sᵥₙ ρ : EReal) +
@@ -2105,21 +2116,6 @@ theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous f
       exact hx'
     · simp at junk
     · exact hy
-
-/-- Joint convexity of Quantum relative entropy. We can't state this with `ConvexOn` because that requires
-an `AddCommMonoid`, which `MState`s are not. Instead we state it with `Mixable`.
-
-TODO:
- * Add the `Mixable` instance that infers from the `Coe` so that the right hand side can be written as
-`p [𝐃(ρ₁‖σ₁) ↔ 𝐃(ρ₂‖σ₂)]`
- * Define (joint) convexity as its own thing - a `ConvexOn` for `Mixable` types.
- * Maybe, more broadly, find a way to make `ConvexOn` work with the subset of `Matrix` that corresponds to `MState`.
--/
-@[sorryful]
-theorem qRelativeEnt_joint_convexity :
-  ∀ (ρ₁ ρ₂ σ₁ σ₂ : MState d), ∀ (p : Prob),
-    𝐃(p [ρ₁ ↔ ρ₂]‖p [σ₁ ↔ σ₂]) ≤ p * 𝐃(ρ₁‖σ₁) + (1 - p) * 𝐃(ρ₂‖σ₂) := by
-  sorry
 
 @[simp]
 theorem qRelEntropy_self (ρ : MState d) : 𝐃(ρ‖ρ) = 0 := by

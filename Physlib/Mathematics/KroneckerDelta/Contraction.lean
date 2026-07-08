@@ -159,97 +159,48 @@ This is the reusable combinatorial fact behind all epsilon-epsilon identities. -
 lemma generalizedKroneckerDelta_sum_snoc {n : ℕ} (μ ν : Fin n → α) :
     ∑ a : α, generalizedKroneckerDelta (Fin.snoc μ a) (Fin.snoc ν a)
       = ((Fintype.card α : ℤ) - n) * generalizedKroneckerDelta μ ν := by
-  classical
   set A : Matrix (Fin n) (Fin n) ℤ :=
     Matrix.of fun i j => ((kroneckerDelta (μ i) (ν j) : ℕ) : ℤ) with hA
-  -- The `n × n` δ-matrix is exactly `generalizedKroneckerDelta μ ν`.
-  have hAdet : A.det = generalizedKroneckerDelta μ ν := rfl
-  -- Step 1: Schur complement. Border the matrix with the appended index and reduce dimension.
-  have step1 : ∀ a : α, generalizedKroneckerDelta (Fin.snoc μ a) (Fin.snoc ν a)
-      = (A - Matrix.of fun i j =>
-          ((kroneckerDelta (μ i) a : ℕ) : ℤ) * ((kroneckerDelta a (ν j) : ℕ) : ℤ)).det := by
-    intro a
+  set b : α → Fin n → ℤ := fun a j => ((kroneckerDelta a (ν j) : ℕ) : ℤ) with hb
+  -- Bordering the δ-matrix with the appended index (`Matrix.det_fromBlocks_one₂₂`) and the
+  -- rank-one update `Matrix.det_add_rankOne` express each summand through row updates of `A`.
+  have key (a : α) : generalizedKroneckerDelta (Fin.snoc μ a) (Fin.snoc ν a)
+      = A.det - ∑ i, ((kroneckerDelta (μ i) a : ℕ) : ℤ) * (A.updateRow i (b a)).det := by
+    set B : Matrix (Fin n) (Fin 1) ℤ :=
+      Matrix.of fun i _ => ((kroneckerDelta (μ i) a : ℕ) : ℤ) with hB
+    set C : Matrix (Fin 1) (Fin n) ℤ := Matrix.of fun _ j => b a j with hC
     have hblk : (Matrix.of fun (i j : Fin (n + 1)) =>
           ((kroneckerDelta ((Fin.snoc μ a : Fin (n + 1) → α) i)
             ((Fin.snoc ν a : Fin (n + 1) → α) j) : ℕ) : ℤ)).submatrix
-            finSumFinEquiv finSumFinEquiv
-        = Matrix.fromBlocks A
-            (Matrix.of fun i (_ : Fin 1) => ((kroneckerDelta (μ i) a : ℕ) : ℤ))
-            (Matrix.of fun (_ : Fin 1) j => ((kroneckerDelta a (ν j) : ℕ) : ℤ))
-            (1 : Matrix (Fin 1) (Fin 1) ℤ) := by
-      have hcast : ∀ i : Fin n, (Fin.castAdd 1 i : Fin (n + 1)) = Fin.castSucc i := fun _ => rfl
-      have hlast : Fin.natAdd n (0 : Fin 1) = Fin.last n := by
-        apply Fin.ext; simp
-      ext x y
-      cases x with
-      | inl i =>
-        cases y with
-        | inl j =>
-          simp only [Matrix.submatrix_apply, finSumFinEquiv_apply_left, Matrix.of_apply,
-            Matrix.fromBlocks_apply₁₁, hA]
-          rw [hcast i, hcast j, Fin.snoc_castSucc, Fin.snoc_castSucc]
-        | inr j =>
-          simp only [Matrix.submatrix_apply, finSumFinEquiv_apply_left, finSumFinEquiv_apply_right,
-            Matrix.of_apply, Matrix.fromBlocks_apply₁₂]
-          rw [hcast i, Fin.snoc_castSucc, Subsingleton.elim j 0, hlast, Fin.snoc_last]
-      | inr i =>
-        cases y with
-        | inl j =>
-          simp only [Matrix.submatrix_apply, finSumFinEquiv_apply_left, finSumFinEquiv_apply_right,
-            Matrix.of_apply, Matrix.fromBlocks_apply₂₁]
-          rw [hcast j, Fin.snoc_castSucc, Subsingleton.elim i 0, hlast, Fin.snoc_last]
-        | inr j =>
-          simp only [Matrix.submatrix_apply, finSumFinEquiv_apply_right, Matrix.of_apply,
-            Matrix.fromBlocks_apply₂₂]
-          rw [Subsingleton.elim i 0, Subsingleton.elim j 0, hlast]
-          simp [Fin.snoc_last]
+          finSumFinEquiv finSumFinEquiv = Matrix.fromBlocks A B C 1 := by
+      simp only [← Fin.append_right_eq_snoc μ (fun _ => a), ← Fin.append_right_eq_snoc ν
+        (fun _ => a)]
+      ext (i | i) (j | j)
+      · simp [hA]
+      · simp [hB]
+      · simp [hC, hb]
+      · simp [Subsingleton.elim i j]
+    have hBC : A - B * C
+        = A + Matrix.of fun i j => -((kroneckerDelta (μ i) a : ℕ) : ℤ) * b a j := by
+      ext i j
+      simp [hB, hC, Matrix.mul_apply, sub_eq_add_neg]
     rw [show generalizedKroneckerDelta (Fin.snoc μ a) (Fin.snoc ν a)
-          = (Matrix.of fun (i j : Fin (n + 1)) =>
-              ((kroneckerDelta ((Fin.snoc μ a : Fin (n + 1) → α) i)
-                ((Fin.snoc ν a : Fin (n + 1) → α) j) : ℕ) : ℤ)).det from rfl,
-      ← Matrix.det_submatrix_equiv_self finSumFinEquiv, hblk, Matrix.det_fromBlocks_one₂₂]
-    congr 1
-  -- Step 2: the rank-one determinant lemma applied per `a`.
-  have step2 : ∀ a : α, (A - Matrix.of fun i j =>
-        ((kroneckerDelta (μ i) a : ℕ) : ℤ) * ((kroneckerDelta a (ν j) : ℕ) : ℤ)).det
-      = A.det - ∑ i, ((kroneckerDelta (μ i) a : ℕ) : ℤ)
-          * (A.updateRow i (fun j => ((kroneckerDelta a (ν j) : ℕ) : ℤ))).det := by
-    intro a
-    have h := Matrix.det_add_rankOne A (fun i => -((kroneckerDelta (μ i) a : ℕ) : ℤ))
-      (fun j => ((kroneckerDelta a (ν j) : ℕ) : ℤ))
-    have hmat : (A - Matrix.of fun i j =>
-          ((kroneckerDelta (μ i) a : ℕ) : ℤ) * ((kroneckerDelta a (ν j) : ℕ) : ℤ))
-        = (A + Matrix.of fun i j => (-((kroneckerDelta (μ i) a : ℕ) : ℤ))
-            * ((kroneckerDelta a (ν j) : ℕ) : ℤ)) := by
-      ext i j; simp [Matrix.sub_apply, Matrix.add_apply, neg_mul, sub_eq_add_neg]
-    rw [hmat, h]
-    simp only [neg_mul, Finset.sum_neg_distrib, sub_eq_add_neg]
-  -- Step 3: collect the sums.
-  rw [← hAdet]
-  have hkey : ∀ i : Fin n, ∑ a : α, ((kroneckerDelta (μ i) a : ℕ) : ℤ)
-        * (A.updateRow i (fun j => ((kroneckerDelta a (ν j) : ℕ) : ℤ))).det = A.det := by
-    intro i
-    rw [Finset.sum_eq_single (μ i)]
-    · have : (fun j => ((kroneckerDelta (μ i) (ν j) : ℕ) : ℤ)) = A i := by
-        funext j; simp [hA]
-      rw [KroneckerDelta.eq_one_of_same, Nat.cast_one, one_mul, this, Matrix.updateRow_eq_self]
-    · intro a _ hane
-      rw [KroneckerDelta.eq_zero_of_ne (Ne.symm hane), Nat.cast_zero, zero_mul]
-    · intro h; exact absurd (Finset.mem_univ (μ i)) h
-  calc ∑ a : α, generalizedKroneckerDelta (Fin.snoc μ a) (Fin.snoc ν a)
-      = ∑ a : α, (A.det - ∑ i, ((kroneckerDelta (μ i) a : ℕ) : ℤ)
-          * (A.updateRow i (fun j => ((kroneckerDelta a (ν j) : ℕ) : ℤ))).det) := by
-        exact Finset.sum_congr rfl fun a _ => by rw [step1 a, step2 a]
-    _ = (Fintype.card α : ℤ) * A.det
-          - ∑ i, ∑ a : α, ((kroneckerDelta (μ i) a : ℕ) : ℤ)
-            * (A.updateRow i (fun j => ((kroneckerDelta a (ν j) : ℕ) : ℤ))).det := by
-        rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
-          Finset.sum_comm]
-    _ = (Fintype.card α : ℤ) * A.det - ∑ _i : Fin n, A.det := by
-        rw [Finset.sum_congr rfl fun i _ => hkey i]
-    _ = ((Fintype.card α : ℤ) - n) * A.det := by
-        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-        ring
+          = ((Matrix.of fun (i j : Fin (n + 1)) =>
+            ((kroneckerDelta ((Fin.snoc μ a : Fin (n + 1) → α) i)
+              ((Fin.snoc ν a : Fin (n + 1) → α) j) : ℕ) : ℤ)).submatrix
+            finSumFinEquiv finSumFinEquiv).det from (Matrix.det_submatrix_equiv_self _ _).symm,
+      hblk, Matrix.det_fromBlocks_one₂₂, hBC, Matrix.det_add_rankOne]
+    simp only [neg_mul, Finset.sum_neg_distrib, ← sub_eq_add_neg]
+  -- Summing the row updates over the shared index restores `A` itself, once per row.
+  have hrow (i : Fin n) :
+      ∑ a : α, ((kroneckerDelta (μ i) a : ℕ) : ℤ) * (A.updateRow i (b a)).det = A.det := by
+    simp_rw [← nsmul_eq_mul, KroneckerDelta.sum_smul]
+    exact congrArg Matrix.det (A.updateRow_eq_self i)
+  rw [Finset.sum_congr rfl fun a _ => key a, Finset.sum_sub_distrib, Finset.sum_comm,
+    Finset.sum_congr rfl fun i _ => hrow i, Finset.sum_const, Finset.sum_const,
+    Finset.card_univ, Finset.card_univ, Fintype.card_fin,
+    show generalizedKroneckerDelta μ ν = A.det from rfl]
+  simp only [nsmul_eq_mul, ← sub_mul]
 
 /-- Split a sum over `(k+1)`-tuples into the last entry and the initial `k`-tuple. -/
 private lemma sum_over_snoc {X : Type*} [Fintype X] {M : Type*} [AddCommMonoid M] {k : ℕ}

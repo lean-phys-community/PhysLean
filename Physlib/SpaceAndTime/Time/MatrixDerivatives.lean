@@ -11,9 +11,9 @@ public import Mathlib.Analysis.Matrix.Normed
 
 # Time derivatives of matrix-valued functions
 
-General lemmas on the time derivative `∂ₜ` of square-matrix-valued functions of time: a product rule
-and the commutation of the derivative with transpose. These are the tools needed to differentiate a
-path of matrices.
+General lemmas on the time derivative `∂ₜ` of square-matrix-valued functions of time: a product
+rule, the commutation of the derivative with transpose, and the commutation of the derivative with
+taking a matrix entry. These are the tools needed to differentiate a path of matrices.
 
 They rely on the (opt-in) operator-norm structure on matrices — activated here as local instances —
 only to invoke the product rule and to view transpose (through `Matrix.transposeLinearEquiv`) as a
@@ -59,6 +59,17 @@ lemma deriv_matrix_transpose (A : Time → Matrix (Fin d) (Fin d) ℝ) (t : Time
     (transposeLinearEquiv (Fin d) (Fin d) ℝ ℝ).toLinearMap.toContinuousLinearMap
   have h : HasFDerivAt (fun s => (A s)ᵀ) (T.comp (fderiv ℝ A t)) t :=
     T.hasFDerivAt.comp t hA.hasFDerivAt
+  rw [Time.deriv_eq, h.fderiv, Time.deriv_eq]
+  rfl
+
+/-- The time derivative commutes with taking a matrix entry. -/
+lemma deriv_matrix_apply (A : Time → Matrix (Fin d) (Fin d) ℝ) (t : Time)
+    (hA : DifferentiableAt ℝ A t) (i j : Fin d) :
+    ∂ₜ (fun s => A s i j) t = (∂ₜ A t) i j := by
+  let E : Matrix (Fin d) (Fin d) ℝ →L[ℝ] ℝ :=
+    (Matrix.entryLinearMap ℝ ℝ i j).toContinuousLinearMap
+  have h : HasFDerivAt (fun s => A s i j) (E.comp (fderiv ℝ A t)) t :=
+    E.hasFDerivAt.comp t hA.hasFDerivAt
   rw [Time.deriv_eq, h.fderiv, Time.deriv_eq]
   rfl
 

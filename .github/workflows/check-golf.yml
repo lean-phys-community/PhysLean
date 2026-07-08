@@ -1,11 +1,12 @@
 # Reacts to a `/check-golf` comment on a pull request. It verifies that the PR
 # only golfs proofs -- i.e. that no declaration *statement* (signature/type)
-# changed, only proofs and bodies -- and posts the findings as a single PR
-# comment, editing that comment in place on subsequent runs.
+# changed, only proofs and bodies -- and reports the compile-cost of the golf
+# (heartbeats and time, base vs head). The findings are posted as a single PR
+# comment, edited in place on subsequent runs.
 #
 # The check runs on `issue_comment`, so it uses the workflow file from the
-# default branch and only parses the PR's Lean sources textually (it does not
-# build them).
+# default branch. Measuring compile cost needs oleans, so this workflow builds
+# the head revision before measuring.
 
 name: Check golf
 
@@ -55,12 +56,26 @@ jobs:
           echo "base=$merge_base" >> "$GITHUB_OUTPUT"
           echo "head=$head_sha" >> "$GITHUB_OUTPUT"
 
+      - name: Check out the head revision (to build it)
+        run: git checkout --detach "${{ steps.refs.outputs.head }}"
+
+      - name: Install elan
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build the head revision
+        run: |
+          lake exe cache get
+          lake build
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Run check-golf and upsert the report comment
+      - name: Run check-golf (with compile-cost measurement) and upsert comment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -69,4 +84,5 @@ jobs:
             --head "${{ steps.refs.outputs.head }}" \
             --repo "${{ github.repository }}" \
             --pr "${{ github.event.issue.number }}" \
+            --measure \
             --post

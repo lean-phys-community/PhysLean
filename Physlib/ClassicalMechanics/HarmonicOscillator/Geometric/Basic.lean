@@ -7,6 +7,8 @@ module
 
 public import Physlib.SpaceAndTime.Space.Basic
 public import Mathlib.Geometry.Manifold.Diffeomorph
+public import Mathlib.Geometry.Manifold.VectorBundle.Tangent
+
 /-!
 # Configuration space of the harmonic oscillator
 
@@ -18,6 +20,10 @@ possible positions of the oscillator, formalised here as a one-dimensional smoot
 `Q` carries a single chosen global coordinate, modeled by `EuclideanSpace ℝ (Fin 1)`. This
 coordinate supplies the topology and the smooth-manifold structure through a single global
 chart.
+
+The global coordinate also identifies each tangent space with the same Euclidean model. The
+map `tangentCoord q` records the coordinate representative of a tangent vector at `q`; this
+tangent-coordinate infrastructure is used by later geometric constructions on the oscillator.
 
 ## ii. Key results
 
@@ -31,6 +37,12 @@ chart.
   diffeomorphism, upgrading `valHomeomorphism` to a smooth identification of `Q` with its model.
 - the `ChartedSpace` and `IsManifold` instances, exhibiting `Q` as a one-dimensional analytic
   manifold modeled on `EuclideanSpace ℝ (Fin 1)`.
+- `tangentCoord` : the chart-induced continuous linear equivalence from the tangent space at a
+  configuration to `EuclideanSpace ℝ (Fin 1)`.
+- `instNormedAddCommGroupTangent` and `instNormedSpaceTangent` : the normed real vector-space
+  structure on tangent spaces, supplied through the global coordinate model.
+- `instFiniteDimensionalTangent` : finite-dimensionality of each tangent space, transported
+  through `tangentCoord`.
 - `ConfigurationSpace.toSpace` : the point of physical `Space 1` determined by a
   configuration.
 
@@ -40,7 +52,8 @@ chart.
 - B. Topology and coordinate homeomorphism
 - C. Smooth manifold structure
 - D. The coordinate diffeomorphism
-- E. Map to physical space
+- E. Tangent-coordinate infrastructure
+- F. Map to physical space
 
 ## iv. References
 
@@ -53,6 +66,8 @@ chart.
 namespace ClassicalMechanics
 
 namespace HarmonicOscillator
+
+open scoped Manifold
 
 TODO "The API around the configuration space
     should be improved to allow further development of a proper
@@ -76,6 +91,7 @@ structure ConfigurationSpace where
 
 namespace ConfigurationSpace
 
+/-- Two configurations are equal when their chosen global coordinates are equal. -/
 @[ext]
 lemma ext {x y : ConfigurationSpace} (h : x.val = y.val) : x = y := by
   cases x
@@ -88,6 +104,8 @@ underlying coordinate. This mirrors the function-like use of `EuclideanSpace ℝ
 instance : CoeFun ConfigurationSpace (fun _ => Fin 1 → ℝ) where
   coe x := fun i => x.val i
 
+/-- Applying a configuration as a function reads the corresponding component of its global
+coordinate. -/
 lemma coe_apply (x : ConfigurationSpace) (i : Fin 1) : x i = x.val i := rfl
 
 /-!
@@ -195,8 +213,52 @@ def valDiffeomorph :
         from rfl, contMDiffOn_univ] at h
     exact h
 
+end ConfigurationSpace
+
 /-!
-## E. Map to physical space
+## E. Tangent-coordinate infrastructure
+
+The global coordinate on `ConfigurationSpace` also gives a coordinate representative for tangent
+vectors. The tangent spaces inherit their normed real vector-space structure from the Euclidean
+coordinate model, and `tangentCoord q` records the resulting continuous linear equivalence.
+-/
+
+noncomputable section
+
+-- Let Lean use the definitional tangent/model identification used by `tangentCoord`.
+set_option backward.isDefEq.respectTransparency false
+
+/-- The model-space normed additive group structure on tangent spaces. -/
+instance instNormedAddCommGroupTangent (q : ConfigurationSpace) :
+    NormedAddCommGroup (TangentSpace 𝓘(ℝ, EuclideanSpace ℝ (Fin 1)) q) :=
+  inferInstanceAs (NormedAddCommGroup (EuclideanSpace ℝ (Fin 1)))
+
+/-- The model-space real normed vector space structure on tangent spaces. -/
+instance instNormedSpaceTangent (q : ConfigurationSpace) :
+    NormedSpace ℝ (TangentSpace 𝓘(ℝ, EuclideanSpace ℝ (Fin 1)) q) :=
+  inferInstanceAs (NormedSpace ℝ (EuclideanSpace ℝ (Fin 1)))
+
+/-- The chart-induced continuous linear equivalence from the tangent space at `q` to the
+Euclidean coordinate model `EuclideanSpace ℝ (Fin 1)`. -/
+def tangentCoord (q : ConfigurationSpace) :
+    TangentSpace 𝓘(ℝ, EuclideanSpace ℝ (Fin 1)) q ≃L[ℝ] EuclideanSpace ℝ (Fin 1) where
+  toFun v := v
+  invFun v := v
+  map_add' := by simp
+  map_smul' := by simp
+
+/-- Each tangent space is finite-dimensional because it is linearly equivalent to
+`EuclideanSpace ℝ (Fin 1)` through `tangentCoord`. -/
+instance instFiniteDimensionalTangent (q : ConfigurationSpace) :
+    FiniteDimensional ℝ (TangentSpace 𝓘(ℝ, EuclideanSpace ℝ (Fin 1)) q) :=
+  LinearEquiv.finiteDimensional (tangentCoord q).symm.toLinearEquiv
+
+end
+
+namespace ConfigurationSpace
+
+/-!
+## F. Map to physical space
 
 The point of one-dimensional physical `Space 1` determined by a configuration, obtained by
 reading off the underlying coordinate. This links the abstract configuration manifold to the
@@ -206,6 +268,8 @@ concrete coordinate model.
 /-- The position in one-dimensional space associated to the configuration. -/
 def toSpace (q : ConfigurationSpace) : Space 1 := ⟨fun i => q.val i⟩
 
+/-- The physical-space coordinate associated to a configuration is its chosen global
+coordinate. -/
 lemma toSpace_apply (q : ConfigurationSpace) (i : Fin 1) : q.toSpace i = q.val i := rfl
 
 end ConfigurationSpace

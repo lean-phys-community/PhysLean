@@ -109,4 +109,30 @@ lemma angularVelocity_of_orientation_const (M : RigidBodyMotion 3)
   rw [angularVelocity_eq, congrFun (M.angularVelocityTensor_of_orientation_const R h) t]
   fin_cases i <;> simp [crossProductVee]
 
+/-- The time derivative of the orientation is `Ṙ = Ω R`, recovering the orientation path from its
+angular velocity tensor `Ω = Ṙ Rᵀ` via the orthogonality `Rᵀ R = 1`. -/
+lemma angularVelocityTensor_mul_orientation (M : RigidBodyMotion d) (t : Time) :
+    M.angularVelocityTensor t * (M.orientation t).1 = ∂ₜ (fun s => (M.orientation s).1) t := by
+  rw [angularVelocityTensor_eq, mul_assoc,
+    mul_eq_one_comm.mp (M.orientation_mul_transpose t), mul_one]
+
+/-- The Landau–Lifshitz velocity decomposition `v = V + ω × r` for a rigid body in three
+dimensions: the velocity of a body point is the centre-of-mass velocity plus the cross product of
+the angular velocity with the point's position relative to the centre of mass. -/
+theorem velocity_eq_angularVelocity (M : RigidBodyMotion 3) (y : Space 3) (t : Time) (i : Fin 3)
+    (hR : Differentiable ℝ (fun s => (M.orientation s).1)) (hX : Differentiable ℝ M.comTrajectory) :
+    M.velocity y t i = M.centerOfMassVelocity t i
+        + (M.angularVelocity t ⨯₃ fun j => M.displacement t y j - M.comTrajectory t j) i := by
+  have hRw : (M.orientation t).1 *ᵥ (fun j => y j - M.centerOfMass j)
+      = fun j => M.displacement t y j - M.comTrajectory t j := by
+    funext k
+    show ((M.orientation t).1 *ᵥ fun j => y j - M.centerOfMass j) k
+      = M.displacement t y k - M.comTrajectory t k
+    rw [eq_sub_iff_add_eq, displacement_apply]
+    rfl
+  rw [M.velocity_eq_deriv_orientation y t i hR hX, add_comm]
+  congr 1
+  rw [← M.angularVelocityTensor_mul_orientation t, ← Matrix.mulVec_mulVec, hRw,
+    ← M.crossProductMatrix_angularVelocity t (hR t), Matrix.crossProductMatrix_mulVec]
+
 end RigidBodyMotion
