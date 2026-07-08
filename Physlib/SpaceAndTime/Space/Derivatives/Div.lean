@@ -158,7 +158,7 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
   · intro w w'
     rw [hf'.map_add]
     rw [div_add]
-    repeat fun_prop
+    all_goals fun_prop
   · intros k w
     rw [hf'.map_smul]
     rw [div_smul]

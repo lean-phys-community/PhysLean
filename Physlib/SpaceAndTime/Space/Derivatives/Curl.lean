@@ -127,7 +127,7 @@ lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
   ext x i
   simp only [Fin.isValue, Pi.smul_apply, PiLp.smul_apply, smul_eq_mul]
   rw [deriv_coord_smul, deriv_coord_smul, mul_sub]
-  repeat fun_prop
+  all_goals fun_prop
 
 @[to_fun]
 lemma curl_neg (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f) :
@@ -156,7 +156,7 @@ lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
   · intro w w'
     rw [hf'.map_add]
     rw [curl_add]
-    repeat fun_prop
+    all_goals fun_prop
   · intros k w
     rw [hf'.map_smul]
     rw [curl_smul]
@@ -178,7 +178,7 @@ lemma deriv_coord_2nd_add (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
   rw [fderiv_fun_add, fderiv_fun_add]
   simp only [_root_.add_apply, Pi.add_apply]
   ring
-  repeat fun_prop
+  all_goals fun_prop
 
 /-- Second derivatives distribute coordinate-wise over subtraction (two components for curl). -/
 lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
@@ -189,7 +189,7 @@ lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
   simp only [Pi.sub_apply]
   rw [fderiv_fun_sub]
   simp only [FunLike.coe_sub, Pi.sub_apply]
-  repeat fun_prop
+  all_goals fun_prop
 
 /-!
 

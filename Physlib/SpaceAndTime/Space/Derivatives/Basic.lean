@@ -173,7 +173,7 @@ lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
   ext x
   rw [fderiv_add]
   rfl
-  repeat fun_prop
+  all_goals fun_prop
 
 /-- Derivatives on space distribute coordinate-wise over addition. -/
 lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
@@ -185,7 +185,7 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
   ext x
   rw [fderiv_fun_add]
   simp only [_root_.add_apply, Pi.add_apply]
-  repeat fun_prop
+  all_goals fun_prop
 
 /-- Derivatives on space distribute over subtraction. -/
 @[to_fun]
@@ -196,7 +196,7 @@ lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
   ext x
   rw [fderiv_sub]
   rfl
-  repeat fun_prop
+  all_goals fun_prop
 
 /-!
 
@@ -247,7 +247,7 @@ lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
   apply ContDiffAt.isSymmSndFDerivAt
   exact ContDiff.contDiffAt hf
   simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
-  repeat fun_prop
+  all_goals fun_prop
 
 /-!
 
