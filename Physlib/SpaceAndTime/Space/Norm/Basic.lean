@@ -1409,13 +1409,11 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
             (fun x : Space d =>
               ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
             (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega)) := by
-      convert distOfFunction_smul_fun
+      simpa [smul_smul] using distOfFunction_smul_fun
         (fun x : Space d =>
           ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
         (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))
-        (2 - (d : ℝ)) using 1
-      ext x
-      simp [smul_smul]
+        (2 - (d : ℝ))
     rw [hdist]
     rw [map_smul]
     have hdiv :
