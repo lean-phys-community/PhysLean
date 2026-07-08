@@ -743,7 +743,7 @@ def measure_files(base: str, head: str, reports: List[FileReport],
     itself verifies -- because only proof/body text then differs.
     """
     paths = [r.path for r in reports
-             if r.proof_golfed or r.embedded_proof_changed or r.def_body_changed]
+             if r.proof_golfed or r.embedded_proof_changed or r.def_value_changed]
     if limit is not None:
         paths = paths[:limit]
     out: List[Measurement] = []
