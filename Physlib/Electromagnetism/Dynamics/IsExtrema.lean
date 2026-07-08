@@ -134,24 +134,20 @@ lemma isExtrema_iff_tensors {𝓕 : FreeSpace}
   · intro h
     simp only [IsExtrema] at h
     intro x
-    have h1 : ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-        (permT id (IsReindexing.auto) {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
-        - (J x | ν')}ᵀ)) = 0 := by
-      funext ν
-      have h2 : gradLagrangian 𝓕 A J x ν = 0 := by simp [h]
-      rw [gradLagrangian_eq_tensor A hA J hJ] at h2
-      simp only [one_div, map_smul, map_neg, map_add,
-        permT_permT, CompTriple.comp_eq, apply_add, apply_smul, Lorentz.Vector.neg_apply,
-        mul_eq_zero] at h2
+    let V := {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
+      - (J x | ν')}ᵀ
+    have h_tensor_eq : (Tensorial.toTensor (M := Lorentz.Vector d)).symm
+        (permT id (IsReindexing.auto) V) = 0 := by
+      ext ν
+      have hgrad := congr_fun (congr_fun h x) ν
+      rw [gradLagrangian_eq_tensor A hA J hJ x ν] at hgrad
       have hn : η ν ν ≠ 0 := η_diag_ne_zero
-      simp_all only [false_or, ne_eq, one_div, map_smul,
-        map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul,
-        Lorentz.Vector.neg_apply, Lorentz.Vector.zero_apply]
-    generalize {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
-        - (J x | ν')}ᵀ = V at *
-    simp only [EmbeddingLike.map_eq_zero_iff] at h1
-    rw [permT_eq_zero_iff] at h1
-    exact h1
+      apply mul_eq_zero.mp at hgrad
+      rcases hgrad with hη | hX
+      · exact (hn hη).elim
+      · exact hX
+    rw [EmbeddingLike.map_eq_zero_iff] at h_tensor_eq
+    rwa [permT_eq_zero_iff] at h_tensor_eq
   · intro h
     simp only [IsExtrema]
     funext x
