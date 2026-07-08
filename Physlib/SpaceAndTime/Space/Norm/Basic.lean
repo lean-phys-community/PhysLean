@@ -529,11 +529,11 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
       congr
       funext x
       rw [fderiv_normPowerSeries_zpow]
-  congr
-  funext x
+  refine MeasureTheory.integral_congr_ae ?_
+  filter_upwards with x
   simp [inner_smul_left_eq_smul]
   left
-  rw [real_inner_comm, basis_repr_inner_eq]
+  rw [real_inner_comm x (basis.repr.symm y), ← basis_repr_inner_eq x y]
   ring
 
 /-!
@@ -584,7 +584,7 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} [NeZero
     simp at hx
     simp
     apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    rw [abs_of_nonneg (by simp)]
+    rw [abs_of_nonneg (normPowerSeries_nonneg n x)]
     exact normPowerSeries_zpow_le_norm_sq_add_one n m x hx
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
@@ -593,14 +593,7 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} [NeZero
     intro x hx
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
-    have h1 : Filter.Tendsto (fun x_1 => normPowerSeries x_1 x ^ (m : ℝ))
-      Filter.atTop (𝓝 (‖x‖ ^ (m : ℝ))) := by
-      refine Filter.Tendsto.rpow ?_ ?_ ?_
-      · apply normPowerSeries_tendsto x hx
-      · simp
-      · left
-        simpa using hx
-    simpa using h1
+    exact (normPowerSeries_tendsto x hx).zpow₀ m (Or.inl (norm_ne_zero_iff.mpr hx))
 
 lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} [NeZero d] (m : ℤ)
     (hm : - (d - 1 : ℕ) + 1 ≤ m)
@@ -690,35 +683,29 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} [NeZero d] (m : ℤ)
     intro x hx
     simp at hx
     simp [mul_assoc]
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    rw [abs_of_nonneg (by simp)]
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+    have h_abs : |normPowerSeries n x| = normPowerSeries n x :=
+      abs_of_nonneg (normPowerSeries_nonneg n x)
+    rw [h_abs]
     exact normPowerSeries_zpow_le_norm_sq_add_one n (m - 2) x hx
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
     constructor
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    simp [inner_smul_left, mul_assoc]
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    ring_nf
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    have h1 : Filter.Tendsto (fun x_1 => normPowerSeries x_1 x ^ ((m - 2 : ℤ) : ℝ))
-      Filter.atTop (𝓝 (‖x‖ ^ ((m - 2 : ℤ) : ℝ))) := by
-      refine Filter.Tendsto.rpow ?_ ?_ ?_
-      · apply normPowerSeries_tendsto x hx
-      · simp
-      · left
-        simpa using hx
-    simp [-Int.cast_sub, Real.rpow_intCast] at h1
-    convert h1 using 3
-    · ring
-    · ring
+    simp at hx
+    have h1 : Filter.Tendsto (fun n => normPowerSeries n x ^ (m - 2))
+      Filter.atTop (𝓝 (‖x‖ ^ (m - 2))) :=
+      (normPowerSeries_tendsto x hx).zpow₀ (m - 2) (Or.inl (norm_ne_zero_iff.mpr hx))
+    have h_mul : Filter.Tendsto (fun n => (η x * (m : ℝ) * ⟪basis.repr x, y⟫_ℝ) *
+        (normPowerSeries n x ^ (m - 2))) Filter.atTop
+        (𝓝 ((η x * (m : ℝ) * ⟪basis.repr x, y⟫_ℝ) * (‖x‖ ^ (m - 2)))) :=
+      tendsto_const_nhds.mul h1
+    convert h_mul using 1
+    · ring_nf
+    · simp [inner_smul_left, mul_assoc, mul_comm, mul_left_comm]
 
 /-!
 
@@ -754,12 +741,11 @@ lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
       congr
       funext x
       rw [fderiv_log_normPowerSeries]
-  congr
-  funext x
+  refine MeasureTheory.integral_congr_ae ?_
+  filter_upwards with x
   simp [inner_smul_left_eq_smul]
   left
-  rw [real_inner_comm]
-  rw [basis_repr_inner_eq]
+  rw [real_inner_comm x (basis.repr.symm y), ← basis_repr_inner_eq x y]
   ring
 
 /-!
@@ -808,7 +794,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     intro x hx
     simp at hx
     simp
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
+    refine mul_le_mul_of_nonneg_left ?_ (abs_nonneg _)
     exact normPowerSeries_log_le n x hx
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
@@ -817,9 +803,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     intro x hx
     apply Filter.Tendsto.mul
     · exact tendsto_const_nhds
-    apply Filter.Tendsto.log
-    · exact normPowerSeries_tendsto x hx
-    · simpa using hx
+    exact (normPowerSeries_tendsto x hx).log (norm_ne_zero_iff.mpr hx)
 
 lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     (η : 𝓢(Space d, ℝ)) (y : EuclideanSpace ℝ (Fin d)) :
@@ -882,27 +866,26 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     simp [mul_assoc]
     apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
     apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    rw [abs_of_nonneg (by simp)]
-    exact normPowerSeries_zpow_le_norm_sq_add_one n (- 2 : ℤ) x hx
+    have h_abs : |normPowerSeries n x| = normPowerSeries n x :=
+      abs_of_nonneg (normPowerSeries_nonneg n x)
+    rw [h_abs]
+    exact normPowerSeries_zpow_le_norm_sq_add_one n (-2 : ℤ) x hx
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
     constructor
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    simp [inner_smul_left, inner_smul_left]
-    rw [mul_comm]
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    have h1 : Filter.Tendsto (fun x_1 => normPowerSeries x_1 x ^ ((- 2 : ℤ) : ℝ))
-      Filter.atTop (𝓝 (‖x‖ ^ ((- 2 : ℤ) : ℝ))) := by
-      refine Filter.Tendsto.rpow ?_ ?_ ?_
-      · apply normPowerSeries_tendsto x hx
-      · simp
-      · left
-        simpa using hx
-    simpa using h1
+    simp at hx
+    have h1 : Filter.Tendsto (fun n => normPowerSeries n x ^ (-2 : ℤ))
+      Filter.atTop (𝓝 (‖x‖ ^ (-2 : ℤ))) :=
+      (normPowerSeries_tendsto x hx).zpow₀ (-2) (Or.inl (norm_ne_zero_iff.mpr hx))
+    have h_mul : Filter.Tendsto (fun n => (η x * ⟪basis.repr x, y⟫_ℝ) *
+        (normPowerSeries n x ^ (-2 : ℤ))) Filter.atTop
+        (𝓝 ((η x * ⟪basis.repr x, y⟫_ℝ) * (‖x‖ ^ (-2 : ℤ)))) :=
+      tendsto_const_nhds.mul h1
+    convert h_mul using 1
+    · ring_nf
+    · simp [inner_smul_left, mul_comm, mul_left_comm]
 
 /-!
 
