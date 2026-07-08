@@ -275,22 +275,20 @@ lemma norm_le_normPowerSeries {d} (n : ℕ) (x : Space d) :
 lemma normPowerSeries_zpow_le_norm_sq_add_one {d} (n : ℕ) (m : ℤ) (x : Space d)
     (hx : x ≠ 0) :
     (normPowerSeries n x) ^ m ≤ (‖x‖ + 1) ^ m + ‖x‖ ^ m := by
-  match m with
-  | .ofNat m =>
-    trans (‖x‖ + 1) ^ m
-    · simp
-      refine pow_le_pow_left₀ (by simp) ?_ m
-      exact normPowerSeries_le_norm_sq_add_one n x
-    · simp
-  | .negSucc m =>
-    trans (‖x‖ ^ (m + 1))⁻¹; swap
-    · simp
-      positivity
-    simp only [zpow_negSucc]
-    refine inv_anti₀ ?_ ?_
-    · positivity
-    refine pow_le_pow_left₀ (by simp) ?_ (m + 1)
-    exact norm_le_normPowerSeries n x
+  cases m with
+  | ofNat m =>
+    calc
+      (normPowerSeries n x) ^ m ≤ (‖x‖ + 1) ^ m :=
+        pow_le_pow_left₀ (normPowerSeries_nonneg n x) (normPowerSeries_le_norm_sq_add_one n x) m
+      _ ≤ (‖x‖ + 1) ^ m + ‖x‖ ^ m := le_add_of_nonneg_right (by positivity)
+  | negSucc m =>
+    have hpos' : 0 < ‖x‖ ^ (m + 1) := by positivity
+    calc
+      (normPowerSeries n x) ^ (Int.negSucc m) = ((normPowerSeries n x) ^ (m + 1))⁻¹ := by simp
+      _ ≤ (‖x‖ ^ (m + 1))⁻¹ := inv_anti₀ hpos'
+        (pow_le_pow_left₀ (by simp) (norm_le_normPowerSeries n x) (m + 1))
+      _ ≤ ((‖x‖ + 1) ^ (m + 1))⁻¹ + (‖x‖ ^ (m + 1))⁻¹ := le_add_of_nonneg_left (by positivity)
+      _ = (‖x‖ + 1) ^ (Int.negSucc m) + ‖x‖ ^ (Int.negSucc m) := by simp [zpow_negSucc]
 
 lemma normPowerSeries_inv_le {d} (n : ℕ) (x : Space d) (hx : x ≠ 0) :
     (normPowerSeries n x)⁻¹ ≤ ‖x‖⁻¹ := by
