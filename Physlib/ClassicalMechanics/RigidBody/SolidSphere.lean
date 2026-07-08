@@ -44,9 +44,9 @@ noncomputable def solidSphere (d : ℕ) (m R : ℝ≥0) : RigidBody d where
       ring⟩
 
 lemma solidSphere_mass {d : ℕ} (m R : ℝ≥0) (hr : R ≠ 0) : (solidSphere d m R).mass = m := by
-  simp only [mass, solidSphere]
-  simp only [LinearMap.coe_mk, AddHom.coe_mk, ContMDiffMap.coeFn_mk, integral_const,
-    MeasurableSet.univ, measureReal_restrict_apply, Set.univ_inter, smul_eq_mul, mul_one]
+  simp only [mass, solidSphere, LinearMap.coe_mk, AddHom.coe_mk, ContMDiffMap.coeFn_mk,
+    integral_const, MeasurableSet.univ, measureReal_restrict_apply, Set.univ_inter, smul_eq_mul,
+    mul_one]
   have h1 : (@volume (Space d) measureSpaceOfInnerProductSpace).real
       (Metric.closedBall 0 R) ≠ 0 := by
     refine (measureReal_ne_zero_iff ?_).mpr ?_
