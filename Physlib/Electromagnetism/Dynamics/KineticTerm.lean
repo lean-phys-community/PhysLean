@@ -189,16 +189,14 @@ lemma kineticTerm_eq_sum_fieldStrengthMatrix_sq {d} {𝓕 : FreeSpace}
     · simp
       ring
     · intro b _ hb
-      nth_rewrite 2 [minkowskiMatrix.off_diag_zero]
-      simp only [mul_zero, zero_mul]
-      exact id (Ne.symm hb)
+      rw [minkowskiMatrix.off_diag_zero (Ne.symm hb)]
+      simp
     · simp
   · intro b _ hb
     rw [Finset.sum_eq_zero]
     intro ν' _
-    rw [minkowskiMatrix.off_diag_zero]
-    simp only [zero_mul]
-    exact id (Ne.symm hb)
+    rw [minkowskiMatrix.off_diag_zero (Ne.symm hb)]
+    simp
   · simp
 
 lemma kineticTerm_eq_sum_potential {d} {𝓕 : FreeSpace}

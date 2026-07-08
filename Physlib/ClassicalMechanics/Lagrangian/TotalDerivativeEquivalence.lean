@@ -341,61 +341,21 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
     ∃ g : X, ∀ v, δL v = ⟪g, v⟫_ℝ := by
   classical
   rcases (isTotalTimeDerivative_explicit.mp h) with ⟨F, hFdiff, hEq⟩
-
-  -- Derivative of F at (0,0)
-  let dF : (Time  × X) →L[ℝ] ℝ :=
-    fderiv ℝ ↿F ((0 : Time), (0 : X))
-
-  -- The "time-direction" derivative must vanish because δL 0 = 0.
+  let dF : (Time × X) →L[ℝ] ℝ := fderiv ℝ ↿F ((0 : Time), (0 : X))
   have h_time : dF ((1 : Time), (0 : X)) = 0 := by
-    have h0 :
-        δL (0 : X) =
-          fderiv ℝ ↿F ((0 : Time), (0 : X))
-            ((1 : Time), (0 : X)) := by
-      simpa using (hEq (0 : Time) (0 : X)
-        (0 : X))
-    have : dF ((1 : Time), (0 : X)) =
-        δL (0 : X) := by
-      simpa [dF] using h0.symm
-    simpa [hδL0] using this
-
-  -- Induced continuous linear functional on velocity: v ↦ dF (0,v).
-  let φ : X →L[ℝ] ℝ :=
-    dF.comp (ContinuousLinearMap.inr ℝ Time X)
-
-  -- Show δL v = φ v for all v.
+    simpa [dF, hδL0] using (hEq (0 : Time) (0 : X) (0 : X)).symm
+  let φ : X →L[ℝ] ℝ := dF.comp (ContinuousLinearMap.inr ℝ Time X)
   have hφ : ∀ v : X, δL v = φ v := by
     intro v
-    have hv :
-        δL v =
-          fderiv ℝ ↿F ((0 : Time), (0 : X))
-            ((1 : Time), v) := by
-      simpa using (hEq (0 : Time) (0 : X) v)
-    have hv' : δL v = dF ((1 : Time), v) := by
-      simpa [dF] using hv
     calc
-      δL v = dF ((1 : Time), v) := hv'
-     _ = dF (((0  : Time), v) + ((1 : Time), (0 : X))) := by simp only [Prod.mk_add_mk, zero_add,
-        add_zero]
-      _ = dF ((0 : Time), v) + dF ((1 : Time), (0 : X)) := by
-        simpa using
-          (dF.map_add ((0 : Time), v) ((1 : Time), (0 : X)))
-      _ = dF ((0 : Time), v) := by
-        simp [h_time]
-      _ = φ v := by
-        simp [φ]
-
-  -- Frechet–Riesz: represent φ as inner product with some g.
-  refine ⟨(InnerProductSpace.toDual ℝ (X)).symm φ, ?_⟩
-  intro v
-  have hinner :
-      ⟪(InnerProductSpace.toDual ℝ (X)).symm φ, v⟫_ℝ = φ v := by
-    rw [InnerProductSpace.toDual_symm_apply (𝕜 := ℝ)
-        (E := X) (x := v) (y := φ)]
-  calc
-    δL v = φ v := hφ v
-    _ = ⟪(InnerProductSpace.toDual ℝ (X)).symm φ, v⟫_ℝ := by
-      rw [hinner.symm]
+      δL v = dF ((1 : Time), v) := by simpa [dF] using hEq (0 : Time) (0 : X) v
+      _ = dF (((0 : Time), v) + ((1 : Time), (0 : X))) := by simp
+      _ = dF ((0 : Time), v) + dF ((1 : Time), (0 : X)) := by rw [dF.map_add]
+      _ = dF ((0 : Time), v) := by simp [h_time]
+      _ = φ v := by simp [φ]
+  refine ⟨(InnerProductSpace.toDual ℝ (X)).symm φ, fun v => ?_⟩
+  simpa [hφ v] using
+    (InnerProductSpace.toDual_symm_apply (𝕜 := ℝ) (E := X) (x := v) (y := φ)).symm
 
 end Lagrangian
 

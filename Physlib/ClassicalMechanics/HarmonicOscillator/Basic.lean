@@ -564,19 +564,8 @@ lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx :
   rw [gradLagrangian_eq_eulerLagrangeOp S xₜ hx, eulerLagrangeOp]
   congr
   · simp [gradient_lagrangian_position_eq, force_eq_linear]
-  · conv_lhs =>
-      arg 1
-      ext t'
-      rw [gradient_lagrangian_velocity_eq]
-    show ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t = S.m • ∂ₜ (∂ₜ xₜ) t
-    have hd : DifferentiableAt ℝ (∂ₜ xₜ) t :=
-      (deriv_differentiable_of_contDiff xₜ hx).differentiableAt
-    calc
-      ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
-          = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
-      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          exact congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
-      _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
+  · simp [gradient_lagrangian_velocity_eq, Time.deriv_smul (∂ₜ xₜ) S.m
+      (deriv_differentiable_of_contDiff xₜ hx)]
 
 /-!
 

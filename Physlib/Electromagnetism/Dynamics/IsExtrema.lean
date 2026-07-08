@@ -189,32 +189,24 @@ lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
     simp only [one_div, map_smul, actionT_smul,
       contrT_equivariant, map_neg, permT_equivariant]
     rw [smul_comm, ← Tensor.actionT_neg, ← Tensor.actionT_add]
-  apply Iff.intro
-  · intro h
-    rw [isExtrema_iff_tensors A hA J hJ]
-    intro x
+  rw [isExtrema_iff_tensors A hA J hJ]
+  constructor
+  · intro h x
     apply MulAction.injective Λ
     simp only [one_div, map_smul, map_neg,
       _root_.smul_add, actionT_smul, _root_.smul_neg, _root_.smul_zero]
     simpa using h (Λ • x)
   · intro h x
-    rw [isExtrema_iff_tensors A hA J hJ] at h
     specialize h (Λ⁻¹ • x)
     simp at h
     rw [h]
     simp
   · change ContDiff ℝ ∞ (actionCLM Λ ∘ A ∘ actionCLM Λ⁻¹)
-    apply ContDiff.comp
-    · exact ContinuousLinearMap.contDiff (actionCLM Λ)
-    · apply ContDiff.comp
-      · exact hA
-      · exact ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)
+    exact (ContinuousLinearMap.contDiff (actionCLM Λ)).comp
+      (hA.comp (ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)))
   · change ContDiff ℝ ∞ (actionCLM Λ ∘ J ∘ actionCLM Λ⁻¹)
-    apply ContDiff.comp
-    · exact ContinuousLinearMap.contDiff (actionCLM Λ)
-    · apply ContDiff.comp
-      · exact hJ
-      · exact ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)
+    exact (ContinuousLinearMap.contDiff (actionCLM Λ)).comp
+      (hJ.comp (ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)))
 
 /-!
 
