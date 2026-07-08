@@ -734,9 +734,8 @@ lemma decompose_reduce (x : TenQuanta 𝓩) [DecidableEq 𝓩]
   apply Multiset.map_congr
   · rw [decompose_toCharges_dedup x hx]
   · intro q hx'
-    simp only [Prod.mk.injEq, true_and]
-    change x.decompose.toChargeMap q = x.toChargeMap q
-    rw [decompose_toChargeMap x hx]
+    have h := decompose_toChargeMap x hx
+    simpa [toChargeMap] using congrFun h q
 
 /-!
 
