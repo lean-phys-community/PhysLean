@@ -13,7 +13,9 @@ Overview: |
     centre-of-mass velocity and linear momentum, the rigid displacement and the moved mass
     distribution, and the angular velocity — as the skew-symmetric tensor `Ω = Ṙ Rᵀ` in any
     dimension and, in three dimensions, as the dual vector `ω` obtained from `Ω` via the hat
-    map.
+    map. The total kinetic energy of the motion is defined and shown to split into a
+    translational part `½ M V · V` and a rotational part about the centre of mass — in three
+    dimensions `½ ∫ |ω × r|² dm` — the König decomposition.
 
 ParentAPIs:
   - Space (Physlib/SpaceAndTime/Space)
@@ -72,8 +74,10 @@ Requirements:
     location: Physlib/ClassicalMechanics/RigidBody/Motion.lean (RigidBodyMotion.centerOfMassVelocity)
 
   - description: The API contains the definition of the kinetic energy of the rigid body.
-    done: false
-    location: N/A
+    done: true
+    location: >
+      Physlib/ClassicalMechanics/RigidBody/KineticEnergy.lean
+      (RigidBody.rotationalKineticEnergy, RigidBodyMotion.kineticEnergy)
 
   - description: The API contains the definition of Euler angles for a rigid body.
     done: false

@@ -42,6 +42,11 @@ namespace RigidBody
 /-- The total mass of the rigid body. -/
 noncomputable def mass {d : ℕ} (R : RigidBody d) : ℝ := R.ρ ⟨fun _ => 1, contMDiff_const⟩
 
+/-- The mass distribution applied to the constant function `1` is the total mass. -/
+@[simp]
+lemma rho_one {d : ℕ} (R : RigidBody d) :
+    R.ρ (1 : C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯) = R.mass := rfl
+
 /-- The center of mass of the rigid body. -/
 noncomputable def centerOfMass {d : ℕ} (R : RigidBody d) : Space d := ⟨fun i =>
   (1 / R.mass) • R.ρ ⟨fun x => x i, ContDiff.contMDiff <| by fun_prop⟩⟩
@@ -62,10 +67,31 @@ lemma inertiaTensor_symmetric {d : ℕ} (R : RigidBody d) (i j : Fin d) :
     exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
   · ring
 
-/-- The kinetic energy of a rigid body. -/
-informal_definition kineticEnergy where
-  tag := "MEYBM"
-  deps := [``RigidBody]
+/-- Bundle a smooth real-valued function on `Space d` as an element of the space of test
+functions. Keeping this as a named constructor ensures the resulting type head stays
+`ContMDiffMap`, so the module/ring operations and `comp` resolve correctly. -/
+def cmap {d : ℕ} (f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f) :
+    C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯ := ⟨f, hf.contMDiff⟩
+
+@[simp]
+lemma cmap_apply {d : ℕ} (f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f) (y : Space d) :
+    cmap f hf y = f y := rfl
+
+/-- The first moment of the mass distribution about its own centre of mass vanishes:
+for nonzero mass, `ρ` of the centred `j`-th coordinate function is zero. -/
+lemma rho_coord_sub_centerOfMass {d : ℕ} (R : RigidBody d) (h : R.mass ≠ 0) (j : Fin d) :
+    R.ρ (cmap (fun y => y j - R.centerOfMass j) (by fun_prop)) = 0 := by
+  have hsplit : cmap (fun y => y j - R.centerOfMass j) (by fun_prop)
+        = cmap (fun y => y j) (by fun_prop)
+          - R.centerOfMass j • (1 : C^⊤⟮𝓘(ℝ, Space d), Space d; 𝓘(ℝ, ℝ), ℝ⟯) := by
+    ext y
+    simp only [cmap_apply, ContMDiffMap.coe_sub, ContMDiffMap.coe_smul,
+      ContMDiffMap.coe_one, Pi.sub_apply, Pi.smul_apply, Pi.one_apply, smul_eq_mul, mul_one]
+  have hcoord : R.ρ (cmap (fun y => y j) (by fun_prop)) = R.mass * R.centerOfMass j := by
+    have hc : R.centerOfMass j = (1 / R.mass) • R.ρ (cmap (fun y => y j) (by fun_prop)) := rfl
+    rw [hc, smul_eq_mul, one_div, ← mul_assoc, mul_inv_cancel₀ h, one_mul]
+  rw [hsplit, map_sub, map_smul, R.rho_one, hcoord, smul_eq_mul]
+  ring
 
 /-- One can describe the motion of rigid body with a fixed (inertial) coordinate system (X,Y,Z)
     and a moving system (x₁,x₂,x₃) rigidly attached to the body. -/
