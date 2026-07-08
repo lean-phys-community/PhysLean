@@ -126,8 +126,7 @@ open Filter Topology
 /-- Eventually, `ofβ β` is positive as β → ∞`. -/
 lemma eventually_pos_ofβ : ∀ᶠ b : ℝ≥0 in atTop, ((Temperature.ofβ b : Temperature) : ℝ) > 0 := by
   filter_upwards [eventually_gt_atTop 0] with b hb
-  have : 0 < (1 : ℝ) / (kB * (b : ℝ)) := one_div_pos.mpr (mul_pos kB_pos (by exact_mod_cast hb))
-  simpa [ofβ_toReal] using this
+  simpa [ofβ_toReal] using one_div_pos.mpr (mul_pos kB_pos (by exact_mod_cast hb))
 
 /-- General helper: for any `a > 0`, we have `1 / (a * b) → 0` as `b → ∞` in `ℝ≥0`. -/
 private lemma tendsto_const_inv_mul_atTop (a : ℝ) (ha : 0 < a) :
