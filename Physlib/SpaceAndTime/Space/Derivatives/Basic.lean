@@ -171,9 +171,8 @@ lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
   rw [deriv_eq_fderiv_fun]
   ext x
-  rw [fderiv_add]
+  rw [fderiv_add (hf1 x) (hf2 x)]
   rfl
-  all_goals fun_prop
 
 /-- Derivatives on space distribute coordinate-wise over addition. -/
 lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
@@ -181,10 +180,9 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
     (∂[u] (fun x => f1 x i + f2 x i)) =
       (∂[u] (fun x => f1 x i)) + (∂[u] (fun x => f2 x i)) := by
   rw [deriv_eq_fderiv_fun, deriv_eq_fderiv_fun, deriv_eq_fderiv_fun]
-  simp only
   ext x
-  rw [fderiv_fun_add]
-  simp only [_root_.add_apply, Pi.add_apply]
+  rw [fderiv_fun_add, _root_.add_apply]
+  simp
   all_goals fun_prop
 
 /-- Derivatives on space distribute over subtraction. -/
@@ -194,9 +192,8 @@ lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
     ∂[u] (f1 - f2) = ∂[u] f1 - ∂[u] f2 := by
   rw [deriv_eq_fderiv_fun]
   ext x
-  rw [fderiv_sub]
+  rw [fderiv_sub (hf1 x) (hf2 x)]
   rfl
-  all_goals fun_prop
 
 /-!
 
