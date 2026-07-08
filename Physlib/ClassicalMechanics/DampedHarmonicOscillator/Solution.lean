@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Florian Wiesner. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Florian Wiesner, Giuseppe Sorge
+Authors: Giuseppe Sorge, Florian Wiesner
 -/
 module
 
@@ -162,6 +162,30 @@ lemma trajectory_eq_of_overdamped (IC : InitialConditions) (hS : S.IsOverdamped)
     rw [IsCriticallyDamped]
     linarith
   simp [trajectory, hnotUnder, hnotCritical]
+
+/-- The selected trajectory is smooth. -/
+lemma trajectory_contDiff (IC : InitialConditions) :
+    ContDiff ℝ ∞ (S.trajectory IC) := by
+  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
+  · rw [S.trajectory_eq_of_underdamped IC hS]
+    unfold underdampedBase
+    fun_prop
+  · rw [S.trajectory_eq_of_criticallyDamped IC hS]
+    unfold criticallyDampedBase
+    fun_prop
+  · rw [S.trajectory_eq_of_overdamped IC hS]
+    unfold overdampedBase
+    fun_prop
+
+/-- The selected trajectory has initial position `IC.x₀`. -/
+lemma trajectory_apply_zero (IC : InitialConditions) : S.trajectory IC 0 = IC.x₀ := by
+  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
+  · rw [S.trajectory_eq_of_underdamped IC hS]
+    simp [underdampedBase]
+  · rw [S.trajectory_eq_of_criticallyDamped IC hS]
+    simp [criticallyDampedBase]
+  · rw [S.trajectory_eq_of_overdamped IC hS]
+    simp [overdampedBase]
 
 /-!
 
@@ -351,6 +375,26 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
   simp [mul_comm, smul_smul, smul_add]
   field_simp [hΩ]
 
+/-- The selected trajectory has initial velocity `IC.v₀`. -/
+lemma trajectory_velocity_at_zero (IC : InitialConditions) :
+    ∂ₜ (S.trajectory IC) 0 = IC.v₀ := by
+  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
+  · rw [S.trajectory_eq_of_underdamped IC hS,
+      exp_decay_smul_velocity S.decayRate (S.underdampedBase IC)
+        (by unfold underdampedBase; fun_prop),
+      show ∂ₜ (S.underdampedBase IC) = _ from S.underdampedBase_velocity IC hS]
+    simp [underdampedBase]
+  · rw [S.trajectory_eq_of_criticallyDamped IC hS,
+      exp_decay_smul_velocity S.decayRate (S.criticallyDampedBase IC)
+        (by unfold criticallyDampedBase; fun_prop),
+      S.criticallyDampedBase_velocity IC]
+    simp [criticallyDampedBase]
+  · rw [S.trajectory_eq_of_overdamped IC hS,
+      exp_decay_smul_velocity S.decayRate (S.overdampedBase IC)
+        (by unfold overdampedBase; fun_prop),
+      show ∂ₜ (S.overdampedBase IC) = _ from S.overdampedBase_velocity IC hS]
+    simp [overdampedBase]
+
 /-!
 ## C. Trajectories and equation of motion
 
@@ -437,21 +481,6 @@ linear map, hence Lipschitz).
 
 -/
 
-/-- Solving the equation of motion for the acceleration: along a solution the second derivative
-is `-(k/m) x - (γ/m) ẋ`. -/
-private lemma acceleration_eq_of_equationOfMotion (z : Time → EuclideanSpace ℝ (Fin 1))
-    (hEOM : S.EquationOfMotion z) (t : Time) :
-    ∂ₜ (∂ₜ z) t = (-(S.m⁻¹ * S.k)) • z t + (-(S.m⁻¹ * S.γ)) • ∂ₜ z t := by
-  have hm : S.m ≠ 0 := S.m_ne_zero
-  have hsum : S.m • ∂ₜ (∂ₜ z) t + (S.γ • ∂ₜ z t + S.k • z t) = 0 := by
-    rw [← add_assoc]; exact hEOM t
-  have hma : S.m • ∂ₜ (∂ₜ z) t = -(S.k • z t) - S.γ • ∂ₜ z t := by
-    rw [eq_neg_of_add_eq_zero_left hsum]; module
-  have hkey : ∂ₜ (∂ₜ z) t = S.m⁻¹ • (S.m • ∂ₜ (∂ₜ z) t) := by
-    rw [smul_smul, inv_mul_cancel₀ hm, one_smul]
-  rw [hkey, hma]
-  module
-
 /-- The phase-space vector field of the damped oscillator, sending `(x, ẋ)` to
 `(ẋ, -(k/m) x - (γ/m) ẋ)`, as a continuous linear map on `E × E`. -/
 private noncomputable def phaseVectorField :
@@ -478,12 +507,9 @@ private lemma hasDerivAt_comp_toRealCLE_symm (w : Time → EuclideanSpace ℝ (F
     (hw : DifferentiableAt ℝ w (Time.toRealCLE.symm τ)) :
     HasDerivAt (fun τ : ℝ => w (Time.toRealCLE.symm τ))
       (∂ₜ w (Time.toRealCLE.symm τ)) τ := by
-  have hval : ((fderiv ℝ w (Time.toRealCLE.symm τ)).comp
-      (Time.toRealCLE.symm : ℝ →L[ℝ] Time)) 1 = ∂ₜ w (Time.toRealCLE.symm τ) := by
-    rw [ContinuousLinearMap.comp_apply, Time.deriv_eq, ContinuousLinearEquiv.coe_coe,
-      toRealCLE_symm_one]
-  rw [← hval]
-  exact (hw.hasFDerivAt.comp τ Time.toRealCLE.symm.hasFDerivAt).hasDerivAt
+  simpa [Function.comp_def, Time.deriv_eq, toRealCLE_symm_one] using
+    hw.hasFDerivAt.comp_hasDerivAt_of_eq τ
+      ((Time.toRealCLE.symm : ℝ →L[ℝ] Time).hasDerivAt) rfl
 
 /-- The phase curve `τ ↦ (z t, ẋ t)` (with `t = toRealCLE.symm τ`) of a smooth solution `z`
 solves the first-order phase-space ODE with vector field `phaseVectorField`. -/
@@ -519,50 +545,6 @@ lemma equationOfMotion_unique (x y : Time → EuclideanSpace ℝ (Fin 1))
   have h1 := congrFun hEq (Time.toRealCLE t)
   simp only [ContinuousLinearEquiv.symm_apply_apply] at h1
   exact (Prod.ext_iff.mp h1).1
-
-/-- The selected trajectory is smooth. -/
-private lemma trajectory_contDiff (IC : InitialConditions) :
-    ContDiff ℝ ∞ (S.trajectory IC) := by
-  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
-  · rw [S.trajectory_eq_of_underdamped IC hS]
-    unfold underdampedBase
-    fun_prop
-  · rw [S.trajectory_eq_of_criticallyDamped IC hS]
-    unfold criticallyDampedBase
-    fun_prop
-  · rw [S.trajectory_eq_of_overdamped IC hS]
-    unfold overdampedBase
-    fun_prop
-
-/-- The selected trajectory has initial position `IC.x₀`. -/
-private lemma trajectory_apply_zero (IC : InitialConditions) : S.trajectory IC 0 = IC.x₀ := by
-  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
-  · rw [S.trajectory_eq_of_underdamped IC hS]
-    simp [underdampedBase]
-  · rw [S.trajectory_eq_of_criticallyDamped IC hS]
-    simp [criticallyDampedBase]
-  · rw [S.trajectory_eq_of_overdamped IC hS]
-    simp [overdampedBase]
-
-/-- The selected trajectory has initial velocity `IC.v₀`. -/
-private lemma trajectory_velocity_at_zero (IC : InitialConditions) :
-    ∂ₜ (S.trajectory IC) 0 = IC.v₀ := by
-  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
-  · rw [S.trajectory_eq_of_underdamped IC hS,
-      exp_decay_smul_velocity S.decayRate (S.underdampedBase IC)
-        (by unfold underdampedBase; fun_prop),
-      show ∂ₜ (S.underdampedBase IC) = _ from S.underdampedBase_velocity IC hS]
-    simp [underdampedBase]
-  · rw [S.trajectory_eq_of_criticallyDamped IC hS,
-      exp_decay_smul_velocity S.decayRate (S.criticallyDampedBase IC)
-        (by unfold criticallyDampedBase; fun_prop),
-      S.criticallyDampedBase_velocity IC]
-    simp [criticallyDampedBase]
-  · rw [S.trajectory_eq_of_overdamped IC hS,
-      exp_decay_smul_velocity S.decayRate (S.overdampedBase IC)
-        (by unfold overdampedBase; fun_prop),
-      show ∂ₜ (S.overdampedBase IC) = _ from S.overdampedBase_velocity IC hS]
-    simp [overdampedBase]
 
 /-- The selected trajectory is the unique smooth solution of the damped equation of motion with the
 given initial conditions. -/
