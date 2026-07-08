@@ -122,6 +122,10 @@ lemma planeWave_differentiable {s : Direction d}
 
 -/
 
+lemma iteratedDeriv_two_eq_deriv_deriv (f : ℝ → EuclideanSpace ℝ (Fin d)) :
+    iteratedDeriv 2 f = deriv (deriv f) := by
+  ext x; rw [iteratedDeriv_succ', iteratedDeriv_one]
+
 lemma planeWave_time_deriv {d f₀ c x} {s : Direction d}
     (h' : Differentiable ℝ f₀) :
     ∂ₜ (planeWave f₀ c s · x) = -c • fun t => planeWave (fderiv ℝ f₀ · 1) c s t x := by
@@ -152,9 +156,7 @@ lemma planeWave_time_deriv_time_deriv {d f₀ c x} {s : Direction d}
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, PiLp.smul_apply, smul_eq_mul, neg_mul,
     mul_neg, neg_neg]
   ring_nf
-  have h_iter : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) = fun x => iteratedDeriv 2 f₀ x := by
-    ext x; rw [iteratedDeriv_succ', iteratedDeriv_one]
-  rw [h_iter]
+  rw [iteratedDeriv_two_eq_deriv_deriv f₀]
 
 /-!
 
@@ -235,9 +237,7 @@ lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
   rw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv]
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
   ring_nf
-  have h_iter : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) = fun x => iteratedDeriv 2 f₀ x := by
-    ext x; rw [iteratedDeriv_succ', iteratedDeriv_one]
-  rw [h_iter]
+  rw [iteratedDeriv_two_eq_deriv_deriv f₀]
   repeat fun_prop
 
 /-!

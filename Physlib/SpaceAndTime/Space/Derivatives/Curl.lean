@@ -517,59 +517,28 @@ lemma eq_neg_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
     rw [← hi]
     congr
     funext t
-    have hdiv : div f (t • x) = 0 := by simp [hdiv]
-    rw [div_eq_sum_fderiv _ (by fun_prop)] at hdiv
-    simp [Fin.sum_univ_three] at hdiv
+    have hdiv' : div f (t • x) = 0 := by simp [hdiv]
+    rw [div_eq_sum_fderiv _ (by fun_prop)] at hdiv'
+    simp [Fin.sum_univ_three] at hdiv'
     have hx : x = ∑ i, basis.repr x i • basis i :=
       Eq.symm (OrthonormalBasis.sum_repr basis x)
     conv_rhs =>
       enter [2, 2,1, 1, 2]
       rw [hx]
-  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 0 * hdiv
-  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 1 * hdiv
-  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 2 * hdiv
+  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 0 * hdiv'
+  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 1 * hdiv'
+  · linear_combination (norm := {simp [Fin.sum_univ_three]; ring}) - t ^ 2 * x 2 * hdiv'
 
 lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 1 f)
     (hdiv : ∇ ⬝ f = 0) :
     ∃ g : Space → EuclideanSpace ℝ (Fin 3), f = curl g ∧ Differentiable ℝ g := by
-  suffices hneg : ∃ g: Space → EuclideanSpace ℝ (Fin 3), f = - curl g ∧ Differentiable ℝ g by
-    obtain ⟨g, hcurl, hdifferentiable⟩ := hneg
-    use -g
-    subst f
-    simp_all
-    rw [curl_neg]
-    fun_prop
-  have f_differentiable : Differentiable ℝ f := hf.differentiable (by simp)
-  have fderiv_f_t (x : Space) (t : ℝ)
-      (i : Fin 3) : (fderiv ℝ (fun t => (f (t • x)).ofLp i) t) 1 = fderiv ℝ f (t • x) x i := by
-    change (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun (t : ℝ) => t • x) t) 1 = _
-    rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_comp _ (by fun_prop) (by fun_prop),
-      fderiv_fun_smul (by fun_prop) (by fun_prop)]
-    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_const, Pi.zero_apply,
-      fderiv_fun_id, ContinuousLinearMap.coe_comp, _root_.add_apply,
-      FunLike.coe_smul, Pi.smul_apply, _root_.zero_apply, smul_zero,
-      ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.coe_id', id_eq, one_smul, zero_add,
-      PiLp.proj_apply]
-  have hi (x : Space) (i : Fin 3) : ∫ (t : ℝ) in 0..1, (t * f (t • x) i * 2) -
-        t * (- fderiv ℝ f (t • x) (t • x)) i ∂(volume) = f x i := by
-    trans ∫ (t : ℝ) in 0..1, fderiv ℝ (fun t => t ^ 2 * f (t • x) i) t 1 ∂(volume)
-    · congr
-      funext t
-      rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
-      simp [fderiv_f_t]
-      ring
-    simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
-    rw [intervalIntegral.integral_deriv_eq_sub (by fun_prop)]
-    simp only [one_pow, one_smul, one_mul, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
-      zero_smul, zero_mul, sub_zero]
-    · apply Continuous.intervalIntegrable
-      fun_prop
-  use fun x => ∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t ∂(volume)
-  apply And.intro
-  swap
-  · intro x
-    exact (hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) _).differentiableAt
-  · exact eq_neg_curl_of_div_zero f hf hdiv
+  have h := eq_neg_curl_of_div_zero f hf hdiv
+  let g := fun x => ∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t ∂(volume)
+  have hg_diff : Differentiable ℝ g := by
+    intro x
+    exact (hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand hf _).differentiableAt
+  have h_eq : f = curl (-g) := h.trans (curl_neg g hg_diff).symm
+  exact ⟨-g, h_eq, hg_diff.neg⟩
 
 TODO "Generalize the statement that a div-free field is a curl
   to time-dependent fields."
