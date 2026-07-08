@@ -36,20 +36,13 @@ lemma rotationalKineticEnergy_eq_angularMomentum (R : RigidBody 3) (ω : Fin 3 �
     R.rotationalKineticEnergy ω = (1 / 2) * (ω ⬝ᵥ R.angularMomentum ω) := by
   rw [rotationalKineticEnergy, angularMomentum_eq_inertiaTensor_mulVec]
 
-/-- The local rotational speed squared `|ω × r|² = (ω × r) · (ω × r)` is a smooth function of the
-position `r`. -/
-lemma contDiff_rotationalSpeedSq (ω : Fin 3 → ℝ) :
-    ContDiff ℝ ⊤ fun x : Space 3 => (ω ⨯₃ (x : Fin 3 → ℝ)) ⬝ᵥ (ω ⨯₃ (x : Fin 3 → ℝ)) := by
-  simp only [dotProduct, Fin.sum_univ_three, cross_apply, Matrix.cons_val_zero,
-    Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
-  fun_prop
-
 /-- The rotational kinetic energy equals the mass integral of the local rotational speed squared:
 `T = ½ ∫ |ω × r|² dm`. -/
 theorem rotationalKineticEnergy_eq_integral (R : RigidBody 3) (ω : Fin 3 → ℝ) :
     R.rotationalKineticEnergy ω
       = (1 / 2) * R.ρ ⟨fun x => (ω ⨯₃ (x : Fin 3 → ℝ)) ⬝ᵥ (ω ⨯₃ (x : Fin 3 → ℝ)),
-        (contDiff_rotationalSpeedSq ω).contMDiff⟩ := by
+        ContDiff.contMDiff <| (contDiff_cross_dotProduct_cross ω).comp
+          (contDiff_pi.mpr fun i => Space.eval_contDiff i)⟩ := by
   rw [rotationalKineticEnergy_eq_angularMomentum]
   congr 1
   simp_rw [dotProduct, angularMomentum, ← smul_eq_mul, ← map_smul, ← map_sum]
