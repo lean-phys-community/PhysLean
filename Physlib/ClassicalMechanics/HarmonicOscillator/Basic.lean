@@ -293,9 +293,7 @@ lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : C
     congr 1
     module
   rw [real_inner_comm, ← inner_smul_right]
-  repeat fun_prop
-  · rw [contDiff_infty_iff_fderiv] at hx
-    apply hx.1
+  all_goals (first | fun_prop | exact (hx.contDiffAt (x := t)).differentiableAt (by simp))
 
 lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (energy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t⟫_ℝ := by
