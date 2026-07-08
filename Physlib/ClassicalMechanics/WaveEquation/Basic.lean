@@ -421,6 +421,6 @@ lemma wave_fderiv_inner_eq_inner_fderiv_proj {f₀ : ℝ → EuclideanSpace ℝ 
   rw [← mul_one (s.unit i), ← smul_eq_mul (s.unit i)]
   rw [← mul_one (inner ℝ y s.unit), ← smul_eq_mul (inner ℝ y s.unit)]
   simp only [smul_eq_mul, mul_comm, one_mul, ← mul_assoc]
-  repeat fun_prop
+  all_goals fun_prop
 
 end ClassicalMechanics
