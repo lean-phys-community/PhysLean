@@ -544,17 +544,9 @@ We now show that the force is equal to `- k x`.
 /-- The force on the classical harmonic oscillator is `- k x`. -/
 lemma force_eq_linear (x : EuclideanSpace ℝ (Fin 1)) : force S x = - S.k • x := by
   unfold force potentialEnergy
-  have hpot : (fun y : EuclideanSpace ℝ (Fin 1) => (1 / (2 : ℝ)) • S.k • ⟪y, y⟫_ℝ) =
-      fun y => ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ := by
-    funext y
-    simp [smul_eq_mul, mul_assoc]
-  rw [hpot]
-  have hgrad : gradient (fun y : EuclideanSpace ℝ (Fin 1) => ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ) x
-      = S.k • x := by
-    simpa [smul_eq_mul, mul_assoc] using
-      (gradient_const_mul_inner_self (c := (1 / (2 : ℝ)) * S.k) x)
-  rw [hgrad]
-  simp [neg_smul]
+  simp only [smul_eq_mul]
+  simpa [mul_assoc] using congrArg Neg.neg
+    (gradient_const_mul_inner_self (c := (1/2) * S.k) x)
 
 /-!
 
