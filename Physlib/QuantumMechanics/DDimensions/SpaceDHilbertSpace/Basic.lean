@@ -219,7 +219,7 @@ end
 -/
 
 /-- The linear map projecting `SpaceDHilbertSpace d μ` onto the sub-Hilbert space
-  of functions which vanish `μ`-a.e. outside of `Ω`. -/
+  `SpaceDHilbertSpace d (μ.restrict Ω)`. -/
 def subspaceProjection (Ω : Set (Space d)) :
     SpaceDHilbertSpace d μ →ₗ[ℂ] SpaceDHilbertSpace d (μ.restrict Ω) where
   toFun ψ := mk ((memHS_coe ψ).restrict Ω)
@@ -242,7 +242,7 @@ lemma subspaceProjection_norm_le (Ω : Set (Space d)) (ψ : SpaceDHilbertSpace d
 
 /-- The linear isometry including `SpaceDHilbertSpace d (μ.restrict Ω)` as a sub-Hilbert space of
   `SpaceDHilbertSpace d μ` defined by mapping `ψ` to `Ω.indicator ψ`. -/
-def restrictIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
+def subspaceIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
     SpaceDHilbertSpace d (μ.restrict Ω) →ₗᵢ[ℂ] SpaceDHilbertSpace d μ where
   toFun ψ := mk ((memHS_coe ψ).indicator_of_restrict hΩ)
   map_add' ψ φ := by
@@ -257,24 +257,24 @@ def restrictIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
       _ = (eLpNorm (Ω.indicator ψ) 2 μ).toReal := congrArg _ (eLpNorm_congr_ae (coeFn_mk _))
       _ = ‖ψ‖ := congrArg _ (eLpNorm_indicator_eq_eLpNorm_restrict hΩ)
 
-lemma restrictIncl_apply
+lemma subspaceIncl_apply
     {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
-    restrictIncl hΩ ψ =ᵐ[μ] Ω.indicator ψ :=
+    subspaceIncl hΩ ψ =ᵐ[μ] Ω.indicator ψ :=
   coeFn_mk ((memHS_coe ψ).indicator_of_restrict hΩ)
 
 lemma leftInverse_subspaceProjection {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
-    LeftInverse (subspaceProjection (μ := μ) Ω) (restrictIncl hΩ) := by
+    LeftInverse (subspaceProjection (μ := μ) Ω) (subspaceIncl hΩ) := by
   intro ψ
   apply ext_iff.mpr
-  have h := subspaceProjection_apply Ω (restrictIncl hΩ ψ)
+  have h := subspaceProjection_apply Ω (subspaceIncl hΩ ψ)
   rw [ae_eq_restrict_iff_indicator_ae_eq hΩ] at *
-  filter_upwards [restrictIncl_apply hΩ ψ, h] with x
+  filter_upwards [subspaceIncl_apply hΩ ψ, h] with x
   by_cases x ∈ Ω <;> simp_all
 
 @[simp]
-lemma subspaceProjection_restrictIncl_apply
+lemma subspaceProjection_subspaceIncl_apply
     {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
-    subspaceProjection Ω (restrictIncl hΩ ψ) = ψ :=
+    subspaceProjection Ω (subspaceIncl hΩ ψ) = ψ :=
   leftInverse_subspaceProjection hΩ ψ
 
 lemma subspaceProjection_surjective {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
