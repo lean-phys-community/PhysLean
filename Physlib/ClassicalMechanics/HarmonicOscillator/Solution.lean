@@ -546,12 +546,10 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
     (trajectory_equationOfMotion S IC)
   have hEOM_y : S.EquationOfMotion y :=
     (S.equationOfMotion_iff_newtons_2nd_law y hyContDiff).2 fun t => by
-      have hy_deriv2 : ∂ₜ (∂ₜ y) t = ∂ₜ (∂ₜ x) t - ∂ₜ (∂ₜ (IC.trajectory S)) t := by
-        rw [hy_deriv]
-        simp [timeDeriv_sub (Time.deriv_differentiable_of_contDiff _ hx)
-          (Time.deriv_differentiable_of_contDiff _ hTraj)]
-      rw [hy_deriv2]
-      simp [smul_sub, hNewt_x, hNewt_traj, hydef, force_eq_linear]
+      rw [hy_deriv]
+      simp [timeDeriv_sub (deriv_differentiable_of_contDiff x hx)
+        (deriv_differentiable_of_contDiff (IC.trajectory S) hTraj),
+        smul_sub, hNewt_x, hNewt_traj, hydef, force_eq_linear]
   have hy0 : y 0 = 0 := by simp [hydef, hx0]
   have hyv0 : ∂ₜ y 0 = 0 := by
     simpa [hy_deriv, hv0, trajectory_velocity_at_zero S IC]
@@ -561,15 +559,21 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
         HarmonicOscillator.potentialEnergy, hy0, hyv0]
   funext t
   have hk : 0 ≤ S.kineticEnergy y t := by
-    simp [HarmonicOscillator.kineticEnergy, mul_nonneg, S.m_pos.le]
+    unfold HarmonicOscillator.kineticEnergy
+    refine mul_nonneg (mul_nonneg (by norm_num) S.m_pos.le) real_inner_self_nonneg
   have hp : 0 ≤ S.potentialEnergy (y t) := by
-    simp [HarmonicOscillator.potentialEnergy, mul_nonneg, S.k_pos.le]
-  have hpe' : S.k * inner ℝ (y t) (y t) = 0 := by
-    have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp (hE t)).2
-    simpa [HarmonicOscillator.potentialEnergy, smul_eq_mul] using hpe
-  rcases eq_zero_or_eq_zero_of_mul_eq_zero hpe' with h | h
-  · exact (S.k_pos.ne' h).elim
-  · exact sub_eq_zero.mp (inner_self_eq_zero.mp h)
+    unfold HarmonicOscillator.potentialEnergy
+    simp only [smul_eq_mul]
+    refine mul_nonneg (by norm_num) (mul_nonneg S.k_pos.le real_inner_self_nonneg)
+  have hsum : S.kineticEnergy y t + S.potentialEnergy (y t) = 0 := by
+    simpa [HarmonicOscillator.energy] using hE t
+  have hpe : S.potentialEnergy (y t) = 0 := ((add_eq_zero_iff_of_nonneg hk hp).mp hsum).2
+  have h_inner : inner ℝ (y t) (y t) = 0 := by
+    unfold HarmonicOscillator.potentialEnergy at hpe
+    simpa [smul_eq_mul] using hpe
+  have hy_eq : y t = 0 := inner_self_eq_zero.mp h_inner
+  apply sub_eq_zero.mp
+  simpa [hydef] using hy_eq
 
 /-!
 
