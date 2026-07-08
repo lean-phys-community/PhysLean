@@ -466,7 +466,7 @@ lemma trajectory_acceleration (IC : InitialConditions) : ∂ₜ (∂ₜ (IC.traj
     FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
     smul_eq_mul, mul_one, neg_smul]
   ring_nf
-  ext; simp; ring
+  module
 
 /-!
 

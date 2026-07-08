@@ -264,10 +264,7 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
        rw [Time.deriv_euclid]
        have h1 := hf.differentiable (by simp)
        fun_prop)
-    repeat' fun_prop
-    all_goals
-      apply Differentiable.differentiableAt
-      fun_prop
+    all_goals (first | fun_prop | (apply Differentiable.differentiableAt; fun_prop))
   · fun_prop
 
 /-!

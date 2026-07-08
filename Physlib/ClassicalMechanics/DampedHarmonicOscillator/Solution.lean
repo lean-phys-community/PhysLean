@@ -184,8 +184,7 @@ private lemma exp_decay_smul_velocity
     fderiv_fun_neg, fderiv_fun_const, Pi.zero_apply, Time.fderiv_val,
     _root_.neg_apply, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   rw [← Time.deriv_eq]
-  simp [smul_sub, smul_smul]
-  module
+  simp [smul_smul, sub_eq_add_neg]
 
 private lemma exp_decay_smul_acceleration
     (a μ : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1))
