@@ -327,7 +327,7 @@ lemma deriv_sum_inr {d : ℕ} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ
   · rw [← toTimeAndSpace_basis_inr (c := c)]
     simp
   · rfl
-  repeat' fun_prop
+  all_goals fun_prop
 
 lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
     [NormedSpace ℝ M] (c : SpeedOfLight) (f : SpaceTime d → M)
@@ -357,7 +357,7 @@ lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
   rw [← map_smul]
   rw [← toTimeAndSpace_basis_inl' (c := c)]
   simp only [Fin.isValue, ContinuousLinearEquiv.symm_apply_apply]
-  repeat' fun_prop
+  all_goals fun_prop
 
 /-!
 
