@@ -1185,10 +1185,7 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
     _ = (((q + (d : ℤ) : ℤ) : ℝ) •
         distOfFunction (fun x : Space d => ‖x‖ ^ q)
           (IsDistBounded.pow q (by omega))) η := by
-          simp [distOfFunction_apply, mul_comm]
-          left
-          rw [← hcoef]
-          norm_num
+          simp [distOfFunction_apply, mul_comm, hcoef]
 
 /-!
 
@@ -1217,11 +1214,9 @@ lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} [NeZero d] (m : ℤ)
         (m : ℝ) • distOfFunction
           (fun x : Space d => ‖x‖ ^ (m - 2) • basis.repr x)
           (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) := by
-    convert distOfFunction_smul_fun
+    simpa [smul_smul] using distOfFunction_smul_fun
       (fun x : Space d => ‖x‖ ^ (m - 2) • basis.repr x)
-      (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) (m : ℝ) using 1
-    ext x
-    simp [smul_smul]
+      (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) (m : ℝ)
   rw [hdist]
   rw [map_smul]
   rw [distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv]
