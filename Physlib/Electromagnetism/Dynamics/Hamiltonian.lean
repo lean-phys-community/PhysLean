@@ -224,9 +224,7 @@ lemma hamiltonian_eq_electricField_scalarPotential {d} {𝓕 : FreeSpace}
         - lagrangian 𝓕 A J x := by
   rw [hamiltonian_eq_electricField_vectorPotential A hA J x]
   congr 1
-  conv_lhs =>
-    enter [2, 2, i]
-    rw [time_deriv_vectorPotential_eq_electricField]
+  conv_lhs => rw [time_deriv_vectorPotential_eq_electricField A (x.time 𝓕.c) x.space]
   simp [mul_sub, Finset.sum_sub_distrib]
   rw [EuclideanSpace.norm_sq_eq]
   ring_nf
