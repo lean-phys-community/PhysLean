@@ -214,16 +214,11 @@ lemma reduce_filter (x : TenQuanta 𝓩) (q : 𝓩) (h : q ∈ x.toCharges) :
   rw [Multiset.filter_map]
   simp only [Function.comp_apply]
   have hx : (Multiset.filter (fun x => x = q) x.toCharges.dedup) = {q} := by
-    refine (Multiset.Nodup.ext ?_ ?_).mpr ?_
-    · refine Multiset.Nodup.filter (fun x => x = q) ?_
-      exact Multiset.nodup_dedup x.toCharges
-    · exact Multiset.nodup_singleton q
-    intro a
-    simp only [Multiset.mem_filter, Multiset.mem_dedup, Multiset.mem_singleton,
-      and_iff_right_iff_imp]
-    intro h'
-    subst h'
-    exact h
+    refine Multiset.ext.mpr (fun a => ?_)
+    simp only [Multiset.count_filter, Multiset.count_dedup, Multiset.count_singleton]
+    by_cases ha : a = q
+    · subst ha; simp [h]
+    · simp [ha]
   rw [hx]
   simp
 
@@ -246,9 +241,8 @@ lemma reduce_reduce (x : TenQuanta 𝓩) :
   intro hp
   have h1 (a b c : Fluxes) (h : b = c) : a = b ↔ a = c := by subst h; rfl
   apply h1
-  rw [reduce_filter]
-  simp only [Multiset.map_singleton, Multiset.sum_singleton]
-  exact hp
+  rw [reduce_filter x p.1 hp]
+  simp
 
 /-!
 
@@ -386,8 +380,7 @@ lemma mem_powerset_sum_of_mem_reduce_toFluxesTen {F : TenQuanta 𝓩}
   use (Multiset.map (fun x => x.2) (Multiset.filter (fun x => x.1 = q) F))
   simp only [and_true]
   rw [toFluxesTen]
-  refine Multiset.map_le_map ?_
-  exact Multiset.filter_le (fun x => x.1 = q) F
+  exact Multiset.map_le_map (Multiset.filter_le (fun x => x.1 = q) F)
 
 lemma mem_powerset_sum_of_mem_reduce_toFluxesTen_filter {F : TenQuanta 𝓩}
     {f : Fluxes} (hf : f ∈ F.reduce.toFluxesTen) :
@@ -403,8 +396,7 @@ lemma mem_powerset_sum_of_mem_reduce_toFluxesTen_filter {F : TenQuanta 𝓩}
     Multiset.filter_eq_nil, Prod.forall, not_forall, Decidable.not_not, and_true]
   apply And.intro
   rw [toFluxesTen]
-  refine Multiset.map_le_map ?_
-  exact Multiset.filter_le (fun x => x.1 = q) F
+  exact Multiset.map_le_map (Multiset.filter_le (fun x => x.1 = q) F)
   simpa [toCharges] using hq
 
 /-!

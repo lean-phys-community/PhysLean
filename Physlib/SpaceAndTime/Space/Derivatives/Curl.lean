@@ -205,13 +205,11 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
     Fin.reduceAdd, Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons,
     List.sum_nil, add_zero, Pi.ofNat_apply]
   rw [deriv_coord_2nd_sub, deriv_coord_2nd_sub, deriv_coord_2nd_sub]
-  simp only [Fin.isValue, Pi.sub_apply]
+  simp only [Pi.sub_apply]
   rw [deriv_commute fun x => f x 0, deriv_commute fun x => f x 1,
     deriv_commute fun x => f x 2]
-  simp only [Fin.isValue, sub_add_sub_cancel', sub_self]
-  repeat
-    try apply contDiff_euclidean.mp
-    exact hf
+  simp only [sub_add_sub_cancel', sub_self]
+  all_goals fun_prop
 
 /-!
 
@@ -242,14 +240,13 @@ lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ
   ext x i
   fin_cases i <;>
   · simp only [Fin.reduceFinMk, Fin.isValue, Fin.reduceAdd, zero_add, Pi.sub_apply, PiLp.sub_apply]
-    rw [deriv_coord_2nd_sub, deriv_coord_2nd_sub]
+    rw [deriv_coord_2nd_sub, deriv_coord_2nd_sub, deriv_coord_2nd_add]
     simp only [Fin.isValue, Pi.sub_apply]
-    rw [deriv_coord_2nd_add]
     rw [deriv_commute fun x => f x 0, deriv_commute fun x => f x 1,
       deriv_commute fun x => f x 2]
     simp only [Fin.isValue, Pi.add_apply]
     ring
-    repeat fun_prop
+    all_goals fun_prop
 
 /-!
 
