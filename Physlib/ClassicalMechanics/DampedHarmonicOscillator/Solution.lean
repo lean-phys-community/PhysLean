@@ -207,7 +207,7 @@ private lemma exp_decay_smul_acceleration
     FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   rw [hy''_t, ← Time.deriv_eq]
   simp [smul_add, smul_sub, smul_smul]
-  module
+  ext i; simp; ring
 
 private lemma exp_decay_smul_equationOfMotion
     (a μ : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1))
@@ -219,7 +219,7 @@ private lemma exp_decay_smul_equationOfMotion
   rw [exp_decay_smul_acceleration a μ y hy hdy hy'', exp_decay_smul_velocity a y hy,
     hγ, hk]
   simp [smul_add, smul_sub, smul_smul]
-  module
+  ext i; simp; ring
 
 /-!
 

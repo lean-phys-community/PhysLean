@@ -152,11 +152,9 @@ lemma planeWave_time_deriv_time_deriv {d f₀ c x} {s : Direction d}
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, PiLp.smul_apply, smul_eq_mul, neg_mul,
     mul_neg, neg_neg]
   ring_nf
-  suffices h : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) =
-      fun x => iteratedDeriv 2 f₀ x by rw [h]
-  funext x
-  erw [iteratedDeriv_succ]
-  simp only [iteratedDeriv_one]
+  have h_iter : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) = fun x => iteratedDeriv 2 f₀ x := by
+    ext x; rw [iteratedDeriv_succ', iteratedDeriv_one]
+  rw [h_iter]
 
 /-!
 
@@ -237,11 +235,9 @@ lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
   rw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv]
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
   ring_nf
-  suffices h : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) =
-      fun x => iteratedDeriv 2 f₀ x by rw [h]
-  ext x i
-  erw [iteratedDeriv_succ']
-  simp only [iteratedDeriv_one]
+  have h_iter : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) = fun x => iteratedDeriv 2 f₀ x := by
+    ext x; rw [iteratedDeriv_succ', iteratedDeriv_one]
+  rw [h_iter]
   repeat fun_prop
 
 /-!

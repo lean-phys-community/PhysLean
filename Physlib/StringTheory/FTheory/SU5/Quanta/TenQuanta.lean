@@ -662,12 +662,10 @@ lemma decompose_filter_charge [DecidableEq 𝓩] (x : TenQuanta 𝓩) (q : 𝓩)
     simp only [Multiset.cons_bind, Multiset.filter_add]
     rw [Multiset.filter_cons, decompose_add, ih]
     congr
-    match a with
-    | (q', f) =>
+    rcases a with ⟨q', f⟩
     simp [decomposeFluxes]
     by_cases h : q' = q
-    · subst h
-      simp [decompose, decomposeFluxes]
+    · subst h; simp [decompose, decomposeFluxes]
     · simp [h, decompose]
 
 /-!
@@ -681,9 +679,8 @@ lemma decompose_toChargeMap [DecidableEq 𝓩] (x : TenQuanta 𝓩)
     x.decompose.toChargeMap = x.toChargeMap := by
   ext q
   rw [toChargeMap, decompose_filter_charge]
-  simp [decompose]
-  rw [Multiset.map_bind]
-  simp only [Multiset.map_map, Function.comp_apply, Multiset.map_id', Multiset.sum_bind]
+  simp [decompose, Multiset.map_bind, Multiset.map_map, Function.comp_apply,
+    Multiset.map_id', Multiset.sum_bind]
   rw [toChargeMap]
   congr 1
   apply Multiset.map_congr
