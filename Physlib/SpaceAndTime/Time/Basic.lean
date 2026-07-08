@@ -80,10 +80,7 @@ structure Time where
 
 namespace Time
 
-lemma val_injective : Function.Injective val := by
-  intro t1 t2 h
-  ext
-  exact h
+lemma val_injective : Function.Injective val := fun _ _ h => Time.ext h
 
 /-!
 
@@ -117,28 +114,20 @@ lemma natCast_one : ((1 : ℕ) : Time) = 1 := rfl
 @[simp]
 lemma ofNat_val {n : ℕ} : val (OfNat.ofNat n : Time) = n := rfl
 
-lemma one_ne_zero : (1 : Time) ≠ (0 : Time) := by
-  by_contra h
-  rw [Time.ext_iff, ofNat_val, ofNat_val] at h
-  norm_cast at h
+lemma one_ne_zero : (1 : Time) ≠ (0 : Time) :=
+  mt (congrArg val) (Nat.cast_injective.ne Nat.one_ne_zero)
 
 @[simp]
-lemma zero_val : val 0 = 0 := by
-  rw [ofNat_val]
-  norm_cast
+lemma zero_val : val 0 = 0 := by exact_mod_cast ofNat_val (n := 0)
 
 @[simp]
-lemma eq_zero_iff (t : Time) : t = 0 ↔ t.val = 0 := by
-  aesop
+lemma eq_zero_iff (t : Time) : t = 0 ↔ t.val = 0 := by simp [Time.ext_iff]
 
 @[simp]
-lemma one_val : val 1 = 1 := by
-  rw [ofNat_val]
-  norm_cast
+lemma one_val : val 1 = 1 := by exact_mod_cast ofNat_val (n := 1)
 
 @[simp]
-lemma eq_one_iff (t : Time) : t = 1 ↔ t.val = 1 := by
-  aesop
+lemma eq_one_iff (t : Time) : t = 1 ↔ t.val = 1 := by simp [Time.ext_iff]
 
 /-!
 
@@ -188,14 +177,7 @@ instance : PartialOrder Time where
   le_antisymm t1 t2 h1 h2 := by simp_all [le_def]; ext; exact le_antisymm h1 h2
 
 lemma lt_def (t1 t2 : Time) :
-    t1 < t2 ↔ t1.val < t2.val := by
-  constructor
-  · intro h
-    exact lt_iff_le_not_ge.mpr h
-  · intro h
-    apply lt_iff_le_not_ge.mpr
-    simp_all [le_def]
-    apply le_of_lt h
+    t1 < t2 ↔ t1.val < t2.val := by simp only [lt_iff_le_not_ge, le_def]
 
 /-!
 
@@ -407,34 +389,17 @@ lemma basis_apply_eq_one (i : Fin 1) :
   rfl
 
 @[simp]
-lemma rank_eq_one : Module.rank ℝ Time = 1 := by
-  rw [@rank_eq_one_iff]
-  use 1
-  constructor
-  · simp
-  · intro v
-    use v.val
-    ext
-    simp [one_val]
+lemma rank_eq_one : Module.rank ℝ Time = 1 :=
+  rank_eq_one_iff.mpr ⟨1, one_ne_zero, fun v => ⟨v.val, Time.ext (by simp)⟩⟩
 
 @[simp]
-lemma finRank_eq_one : Module.finrank ℝ Time = 1 := by
-  rw [@finrank_eq_one_iff']
-  use 1
-  constructor
-  · simp
-  · intro v
-    use v.val
-    ext
-    simp [one_val]
+lemma finRank_eq_one : Module.finrank ℝ Time = 1 :=
+  Module.rank_eq_one_iff_finrank_eq_one.mp rank_eq_one
 
-instance : FiniteDimensional ℝ Time := by
-  refine Module.finite_of_rank_eq_one ?_
-  simp
+instance : FiniteDimensional ℝ Time := Module.finite_of_rank_eq_one rank_eq_one
 
 lemma volume_eq_basis_addHaar :
-    (volume (α := Time)) = basis.toBasis.addHaar := by
-  exact (OrthonormalBasis.addHaar_eq_volume _).symm
+    (volume (α := Time)) = basis.toBasis.addHaar := basis.addHaar_eq_volume.symm
 
 /-!
 
@@ -473,36 +438,23 @@ noncomputable def toRealLIE : Time ≃ₗᵢ[ℝ] ℝ where
     rfl
 
 lemma eq_one_smul (t : Time) :
-    t = t.val • 1 := by
-  ext
-  simp [one_val]
+    t = t.val • 1 := Time.ext (by simp)
 
 @[fun_prop]
-lemma val_measurable : Measurable Time.val := by
-  change Measurable toRealCLE
-  fun_prop
+lemma val_measurable : Measurable Time.val := toRealCLE.continuous.measurable
 
-lemma val_measurableEmbedding : MeasurableEmbedding Time.val where
-  injective := val_injective
-  measurable := by fun_prop
-  measurableSet_image' := by
-    intro s hs
-    change MeasurableSet (⇑toRealCLE '' s)
-    rw [ContinuousLinearEquiv.image_eq_preimage_symm]
-    exact toRealCLE.symm.continuous.measurable hs
+lemma val_measurableEmbedding : MeasurableEmbedding Time.val :=
+  toRealCLE.toHomeomorph.measurableEmbedding
 
 lemma val_measurePreserving : MeasurePreserving Time.val volume volume :=
   LinearIsometryEquiv.measurePreserving toRealLIE
 
 @[fun_prop]
-lemma val_differentiable : Differentiable ℝ Time.val := by
-  change Differentiable ℝ toRealCLM
-  fun_prop
+lemma val_differentiable : Differentiable ℝ Time.val := toRealCLM.differentiable
 
 @[simp]
 lemma fderiv_val (t : Time) : fderiv ℝ Time.val t 1 = 1 := by
-  change (fderiv ℝ toRealCLM t 1) = 1
-  rw [ContinuousLinearMap.fderiv, toRealCLM]
-  simp
+  rw [show Time.val = ⇑toRealCLM from rfl, ContinuousLinearMap.fderiv]
+  simp [toRealCLM]
 
 end Time
