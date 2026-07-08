@@ -361,14 +361,12 @@ lemma IsDistBounded.normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_single {d : ℕ} {n : ℕ} :
     IsDistBounded (d := d) (fun x => (normPowerSeries n x)) := by
-  convert IsDistBounded.normPowerSeries_zpow (n := n) (m := 1) using 1
-  simp
+  simpa using IsDistBounded.normPowerSeries_zpow (n := n) (m := 1)
 
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_inv {d : ℕ} {n : ℕ} :
     IsDistBounded (d := d) (fun x => (normPowerSeries n x)⁻¹) := by
-  convert normPowerSeries_zpow (n := n) (-1) using 1
-  simp
+  simpa using normPowerSeries_zpow (n := n) (-1)
 
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_deriv {d : ℕ} (n : ℕ) (i : Fin d) :
@@ -419,9 +417,7 @@ lemma differentiable_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
 @[fun_prop]
 lemma differentiable_normPowerSeries_inv {d : ℕ} {n : ℕ} :
     Differentiable ℝ (fun x : Space d => (normPowerSeries n x)⁻¹) := by
-  convert differentiable_normPowerSeries_zpow (n := n) (m := -1) using 1
-  funext x
-  simp
+  simpa using differentiable_normPowerSeries_zpow (n := n) (m := -1)
 
 @[fun_prop]
 lemma differentiable_log_normPowerSeries {d : ℕ} {n : ℕ} :
@@ -582,10 +578,8 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} [NeZero
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
     simp at hx
-    simp
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    rw [abs_of_nonneg (normPowerSeries_nonneg n x)]
-    exact normPowerSeries_zpow_le_norm_sq_add_one n m x hx
+    simpa [abs_of_nonneg (normPowerSeries_nonneg n x)] using
+      mul_le_mul_of_nonneg_left (normPowerSeries_zpow_le_norm_sq_add_one n m x hx) (abs_nonneg _)
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
     constructor
@@ -682,30 +676,22 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} [NeZero d] (m : ℤ)
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
     simp at hx
-    simp [mul_assoc]
-    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-    have h_abs : |normPowerSeries n x| = normPowerSeries n x :=
-      abs_of_nonneg (normPowerSeries_nonneg n x)
-    rw [h_abs]
-    exact normPowerSeries_zpow_le_norm_sq_add_one n (m - 2) x hx
+    have h := normPowerSeries_zpow_le_norm_sq_add_one n (m - 2) x hx
+    have h_nonneg : 0 ≤ |η x| * |m| * |⟪basis.repr x, y⟫_ℝ| := by positivity
+    simpa [abs_of_nonneg (normPowerSeries_nonneg n x), mul_assoc] using
+      mul_le_mul_of_nonneg_left h h_nonneg
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
     constructor
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
-    simp at hx
-    have h1 : Filter.Tendsto (fun n => normPowerSeries n x ^ (m - 2))
-      Filter.atTop (𝓝 (‖x‖ ^ (m - 2))) :=
-      (normPowerSeries_tendsto x hx).zpow₀ (m - 2) (Or.inl (norm_ne_zero_iff.mpr hx))
-    have h_mul : Filter.Tendsto (fun n => (η x * (m : ℝ) * ⟪basis.repr x, y⟫_ℝ) *
-        (normPowerSeries n x ^ (m - 2))) Filter.atTop
-        (𝓝 ((η x * (m : ℝ) * ⟪basis.repr x, y⟫_ℝ) * (‖x‖ ^ (m - 2)))) :=
-      tendsto_const_nhds.mul h1
-    convert h_mul using 1
-    · ring_nf
-    · simp [inner_smul_left, mul_assoc, mul_comm, mul_left_comm]
+    have hx' : x ≠ 0 := by simpa using hx
+    have h : Filter.Tendsto (fun n => (η x * (m : ℝ) * ⟪basis.repr x, y⟫_ℝ) *
+      (normPowerSeries n x ^ (m - 2))) Filter.atTop
+      (𝓝 ((η x * (m : ℝ) * ⟪basis.repr x, y⟫_ℝ) * (‖x‖ ^ (m - 2)))) :=
+      (tendsto_const_nhds.mul ((normPowerSeries_tendsto x hx').zpow₀ (m - 2)
+        (Or.inl (norm_ne_zero_iff.mpr hx'))))
+    simpa [inner_smul_left, mul_assoc, mul_comm, mul_left_comm] using h
 
 /-!
 
@@ -801,9 +787,8 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     constructor
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    exact (normPowerSeries_tendsto x hx).log (norm_ne_zero_iff.mpr hx)
+    have hx' : x ≠ 0 := by simpa using hx
+    exact (tendsto_const_nhds.mul ((normPowerSeries_tendsto x hx').log (norm_ne_zero_iff.mpr hx')))
 
 lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     (η : 𝓢(Space d, ℝ)) (y : EuclideanSpace ℝ (Fin d)) :
@@ -815,20 +800,12 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     refine (IsDistBounded.zpow_smul_repr_self _ ?_)
     omega) η, y⟫_ℝ)) := by
   haveI : NeZero d := ⟨by omega⟩
-  conv =>
-    enter [1, n];
-    rw [gradient_dist_normPowerSeries_log]
-  simp only [distOfFunction_inner]
+  simp only [gradient_dist_normPowerSeries_log, distOfFunction_inner]
   have h1 (n : ℕ) (x : Space d) :
     η x * ⟪(normPowerSeries n x ^ (- 2 : ℤ)) • basis.repr x, y⟫_ℝ =
     η x * ((⟪basis.repr x, y⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ))) := by
-    simp [inner_smul_left]
-    ring_nf
-    left
-    trivial
-  conv =>
-    enter [1, n, 2, x]
-    rw [h1 n x]
+    simp [inner_smul_left, mul_comm, mul_left_comm]
+  conv => enter [1, n, 2, x]; rw [h1 n x]
   apply MeasureTheory.tendsto_integral_of_dominated_convergence
     (bound := fun x => |η x| * |⟪basis.repr x, y⟫_ℝ| * ((‖x‖ + 1) ^ (- 2 : ℤ) + ‖x‖ ^ (- 2 : ℤ)))
   · intro n
@@ -863,29 +840,22 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
     simp at hx
-    simp [mul_assoc]
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    have h_abs : |normPowerSeries n x| = normPowerSeries n x :=
-      abs_of_nonneg (normPowerSeries_nonneg n x)
-    rw [h_abs]
-    exact normPowerSeries_zpow_le_norm_sq_add_one n (-2 : ℤ) x hx
+    have h := normPowerSeries_zpow_le_norm_sq_add_one n (-2 : ℤ) x hx
+    have h_nonneg : 0 ≤ |η x| * |⟪basis.repr x, y⟫_ℝ| := by positivity
+    simpa [abs_of_nonneg (normPowerSeries_nonneg n x), mul_assoc] using
+      mul_le_mul_of_nonneg_left h h_nonneg
   · rw [Filter.eventually_iff_exists_mem]
     use {0}ᶜ
     constructor
     · rw [compl_mem_ae_iff, measure_singleton]
     intro x hx
-    simp at hx
-    have h1 : Filter.Tendsto (fun n => normPowerSeries n x ^ (-2 : ℤ))
-      Filter.atTop (𝓝 (‖x‖ ^ (-2 : ℤ))) :=
-      (normPowerSeries_tendsto x hx).zpow₀ (-2) (Or.inl (norm_ne_zero_iff.mpr hx))
-    have h_mul : Filter.Tendsto (fun n => (η x * ⟪basis.repr x, y⟫_ℝ) *
-        (normPowerSeries n x ^ (-2 : ℤ))) Filter.atTop
-        (𝓝 ((η x * ⟪basis.repr x, y⟫_ℝ) * (‖x‖ ^ (-2 : ℤ)))) :=
-      tendsto_const_nhds.mul h1
-    convert h_mul using 1
-    · ring_nf
-    · simp [inner_smul_left, mul_comm, mul_left_comm]
+    have hx' : x ≠ 0 := by simpa using hx
+    have hlim : Filter.Tendsto (fun n => (η x * ⟪basis.repr x, y⟫_ℝ) *
+      (normPowerSeries n x ^ (-2 : ℤ))) Filter.atTop
+      (𝓝 ((η x * ⟪basis.repr x, y⟫_ℝ) * (‖x‖ ^ (-2 : ℤ)))) :=
+      tendsto_const_nhds.mul ((normPowerSeries_tendsto x hx').zpow₀ (-2)
+        (Or.inl (norm_ne_zero_iff.mpr hx')))
+    simpa [inner_smul_left, mul_comm, mul_left_comm] using hlim
 
 /-!
 
@@ -1200,10 +1170,7 @@ lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} [NeZero d] (m : ℤ)
       (((m : ℝ) * (((m - 2 + d : ℤ) : ℝ))) •
         distOfFunction (fun x : Space d => ‖x‖ ^ (m - 2))
           (IsDistBounded.pow (m - 2) (by omega))) := by
-  rw [distLaplacian]
-  change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space d => ‖x‖ ^ m)
-    (IsDistBounded.pow m (by omega)))) = _
-  rw [distGrad_distOfFunction_norm_zpow m (by omega)]
+  rw [distLaplacian, LinearMap.comp_apply, distGrad_distOfFunction_norm_zpow m (by omega)]
   have hdist :
       distOfFunction (fun x : Space d => (m * ‖x‖ ^ (m - 2)) • basis.repr x)
           (by
@@ -1217,11 +1184,7 @@ lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} [NeZero d] (m : ℤ)
     simpa [smul_smul] using distOfFunction_smul_fun
       (fun x : Space d => ‖x‖ ^ (m - 2) • basis.repr x)
       (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) (m : ℝ)
-  rw [hdist]
-  rw [map_smul]
-  rw [distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv]
-  rw [smul_smul]
-
+  rw [hdist, map_smul, distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv, smul_smul]
 /-!
 
 ### B.5. Divergence equal dirac delta
@@ -1354,7 +1317,7 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} [NeZero d] :
       _ = η 0 * (d * (volume (α := Space d)).real (Metric.ball 0 1)) := by
           simp only [integral_const, Measure.toSphere_real_apply_univ, finrank_eq_dim, smul_eq_mul,
             mul_neg, neg_neg]
-          ring
+          ring_nf
   simp only [_root_.smul_apply, diracDelta_apply, smul_eq_mul]
   ring
 
@@ -1389,43 +1352,24 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
       linarith
     simp [hzero]
   · haveI : NeZero d := ⟨by omega⟩
-    rw [distLaplacian]
-    change ∇ᵈ ⬝ (∇ᵈ (distOfFunction
-      (fun x : Space d => ‖x‖ ^ (- ((d : ℤ) - 2)))
-      (IsDistBounded.pow (- ((d : ℤ) - 2)) (by omega)))) = _
-    rw [distGrad_distOfFunction_norm_zpow (- ((d : ℤ) - 2)) (by omega)]
+    rw [distLaplacian, LinearMap.comp_apply, distGrad_distOfFunction_norm_zpow (- ((d : ℤ) - 2)) (by omega)]
     simp only [neg_sub, Int.cast_sub, Int.cast_ofNat, Int.cast_natCast, sub_sub_cancel_left]
-    have hdist :
-        distOfFunction
-          (fun x : Space d =>
-            ((2 - (d : ℝ)) * ‖x‖ ^ (- (d : ℤ))) • basis.repr x)
-          (by
-            simpa [smul_smul] using
-              (IsDistBounded.const_fun_smul
-                (F := EuclideanSpace ℝ (Fin d))
-                (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))
-                (2 - (d : ℝ)))) =
-          (2 - (d : ℝ)) • distOfFunction
-            (fun x : Space d =>
-              ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
-            (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega)) := by
+    have hdist : distOfFunction
+        (fun x : Space d => ((2 - (d : ℝ)) * ‖x‖ ^ (- (d : ℤ))) • basis.repr x)
+        (by
+          simpa [smul_smul] using
+            (IsDistBounded.const_fun_smul
+              (F := EuclideanSpace ℝ (Fin d))
+              (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))
+              (2 - (d : ℝ)))) =
+      (2 - (d : ℝ)) • distOfFunction
+        (fun x : Space d => ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
+        (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega)) := by
       simpa [smul_smul] using distOfFunction_smul_fun
-        (fun x : Space d =>
-          ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
+        (fun x : Space d => ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
         (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))
         (2 - (d : ℝ))
-    rw [hdist]
-    rw [map_smul]
-    have hdiv :
-        ∇ᵈ ⬝ (distOfFunction
-          (fun x : Space d =>
-            ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
-          (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))) =
-          (d * (volume (α := Space d)).real
-            (Metric.ball 0 1)) • diracDelta ℝ 0 := by
-      exact distDiv_inv_pow_eq_dim (d := d)
-    rw [hdiv]
-    rw [smul_smul]
+    rw [hdist, map_smul, distDiv_inv_pow_eq_dim (d := d), smul_smul]
     ring_nf
 
 /-- In dimension two the fundamental solution of the Laplacian is the logarithm: the
@@ -1434,10 +1378,7 @@ delta at the origin. -/
 lemma distLaplacian_fundamentalSolution_log_norm :
     Δᵈ (distOfFunction (fun x : Space 2 => Real.log ‖x‖) IsDistBounded.log_norm) =
       (2 * (volume (α := Space 2)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
-  rw [distLaplacian]
-  change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space 2 => Real.log ‖x‖)
-    IsDistBounded.log_norm)) = _
-  rw [distGrad_distOfFunction_log_norm (by norm_num)]
-  simpa only [Nat.cast_ofNat] using distDiv_inv_pow_eq_dim (d := 2)
+  rw [distLaplacian, LinearMap.comp_apply, distGrad_distOfFunction_log_norm (by norm_num)]
+  simpa using distDiv_inv_pow_eq_dim (d := 2)
 
 end Space
