@@ -27,7 +27,7 @@ a rigid motion into a translation of the centre of mass plus a rotation about it
 
 @[expose] public section
 
-open Time Manifold Matrix RigidBody
+open Time Manifold Matrix RigidBody InnerProductSpace
 
 attribute [local instance] Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace
   Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
@@ -244,5 +244,45 @@ lemma velocity_eq_deriv_orientation {d : ℕ} (M : RigidBodyMotion d) (y : Space
         (y j - M.centerOfMass j) ((hentry i j) t))]
   simp only [Time.deriv_matrix_apply (fun s => (M.orientation s).1) t (hR t)]
   rw [hmv, Time.deriv_space hX t i, ← centerOfMassVelocity_eq]
+
+/-- The closed form `Ṙ(t) (y − c) + V(t)` of the velocity of the body point `y` at time `t`:
+the rate of change of the orientation acting on the body-frame position, plus the centre-of-mass
+velocity. It is polynomial in `y` for any motion, and for differentiable motions it agrees with
+the honest point velocity `∂ₜ (displacement · y)`; see `velocityClosedForm_eq_velocity`. -/
+noncomputable def velocityClosedForm {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d) :
+    Space d :=
+  ⟨∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j⟩
+    + M.centerOfMassVelocity t
+
+/-- The `i`-th coordinate of the closed-form velocity. -/
+lemma velocityClosedForm_apply {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d)
+    (i : Fin d) :
+    M.velocityClosedForm t y i
+      = (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j) i
+        + M.centerOfMassVelocity t i := by
+  simp only [velocityClosedForm, Space.add_apply]
+
+/-- The closed-form velocity as a plain vector-valued function of the coordinates of `y`. -/
+lemma velocityClosedForm_val {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d) :
+    (M.velocityClosedForm t y : Fin d → ℝ)
+      = (∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j)
+        + (M.centerOfMassVelocity t : Fin d → ℝ) := by
+  funext i
+  rw [Pi.add_apply]
+  exact M.velocityClosedForm_apply t y i
+
+/-- For a differentiable motion the closed-form velocity is the honest point velocity. -/
+lemma velocityClosedForm_eq_velocity {d : ℕ} (M : RigidBodyMotion d) (t : Time)
+    (hR : Differentiable ℝ (fun s => (M.orientation s).1))
+    (hX : Differentiable ℝ M.comTrajectory) (y : Space d) :
+    M.velocityClosedForm t y = M.velocity y t := by
+  ext i
+  rw [velocityClosedForm_apply, ← M.velocity_eq_deriv_orientation y t i hR hX]
+
+/-- The squared speed of a body point, in closed form, is a smooth function of the point. -/
+lemma contDiff_velocityClosedForm_inner {d : ℕ} (M : RigidBodyMotion d) (t : Time) :
+    ContDiff ℝ ⊤ fun y : Space d => (⟪M.velocityClosedForm t y, M.velocityClosedForm t y⟫_ℝ) := by
+  simp only [Space.inner_eq_sum, velocityClosedForm_apply, Matrix.mulVec, dotProduct]
+  fun_prop
 
 end RigidBodyMotion
