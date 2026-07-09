@@ -1250,26 +1250,37 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
      _ = inner ℝ (-( S.ω • s • IC.x₀) + c • IC.v₀) IC.v₀ := by rw [neg_smul]
      _ = vv := by rw [htv]
   have hcos : 1 = cos (S.ω * t) := by
-    calc
-    1 =  det / det := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self]
-    _ = (vv + xx * S.ω^2 ) / det := by rfl
-    _ = c * ((vv + xx * S.ω^2) / det) + s * xv *S.ω* (S.ω/S.ω-1 ) / det := by
-      nth_rewrite 1 [← hvv, ← hxx]
-      ring_nf
-    _ = c * ((vv + xx * S.ω^2) / det ) := by
-      simp only [ne_eq, S.ω_ne_zero, not_false_eq_true,
-        div_self, sub_self, mul_zero, zero_div, add_zero]
-    _ = c * (det / det) := by rfl
-    _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
-    _ = _ := by rfl
+    have h_eq : (c - 1) * det = 0 := by
+      dsimp [det]
+      have hω : S.ω ≠ 0 := ω_ne_zero S
+      field_simp [hω] at hxx
+      have hxx' : (c - 1) * xx * S.ω + s * xv = 0 := by linarith
+      have hvv' : (c - 1) * vv - S.ω * s * xv = 0 := by linarith
+      have h_comb : (c - 1) * vv + (c - 1) * xx * S.ω ^ 2 = 0 := by
+        have hvv_eq : (c - 1) * vv = S.ω * s * xv := sub_eq_zero.mp hvv'
+        have htemp : s * xv = -(c - 1) * xx * S.ω := by linarith
+        calc
+          (c - 1) * vv + (c - 1) * xx * S.ω ^ 2
+              = S.ω * s * xv + (c - 1) * xx * S.ω ^ 2 := by rw [hvv_eq]
+          _ = S.ω * (s * xv) + (c - 1) * xx * S.ω ^ 2 := by ring
+          _ = S.ω * (-(c - 1) * xx * S.ω) + (c - 1) * xx * S.ω ^ 2 := by rw [htemp]
+          _ = (-(c - 1) * xx * S.ω ^ 2) + (c - 1) * xx * S.ω ^ 2 := by ring
+          _ = 0 := by ring
+      calc
+        (c - 1) * (vv + xx * S.ω ^ 2) = (c - 1) * vv + (c - 1) * xx * S.ω ^ 2 := by ring
+        _ = 0 := by rw [h_comb]
+    have hc1 : c = 1 := by
+      rcases mul_eq_zero.mp h_eq with h | h
+      · exact sub_eq_zero.mp h
+      · exact (det_ne_zero h).elim
+    exact hc1.symm
   let ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp (Eq.symm hcos)
   use n
+  rw [period_eq]
   calc
-    (n : ℝ) * (T S) = (n : ℝ) * (2 * π / S.ω) := by rfl
-    _ = ((n : ℝ) * (2 * π)) / S.ω := by ring_nf
-    _ = (S.ω * t) / S.ω := by rw [hn]
-    _ = t * (S.ω / S.ω) := by ring_nf
-    _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
+    (n : ℝ) * (2 * π / S.ω) = ((n : ℝ) * (2 * π)) / S.ω := by ring
+    _ = (S.ω * (t : ℝ)) / S.ω := by rw [hn]
+    _ = t := by field_simp [S.ω_ne_zero]
 end HarmonicOscillator
 
 end ClassicalMechanics

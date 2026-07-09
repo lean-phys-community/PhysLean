@@ -795,9 +795,6 @@ lemma gradKineticTerm_eq_electric_magnetic {𝓕 : FreeSpace} (A : Electromagnet
     ∑ i, (𝓕.μ₀⁻¹ * (1 / 𝓕.c ^ 2 * ∂ₜ (fun t => A.electricField 𝓕.c t x.space) (x.time 𝓕.c) i-
       ∑ j, Space.deriv j (A.magneticFieldMatrix 𝓕.c (x.time 𝓕.c) · (j, i)) x.space)) •
       Lorentz.Vector.basis (Sum.inr i) := by
-  have hdiff (μ ν) : Differentiable ℝ fun x => (A.fieldStrengthMatrix x) (μ, ν) := by
-    conv => enter [2, x]; rw [toFieldStrength_basis_repr_apply_eq_single]
-    fun_prop
   rw [gradKineticTerm_eq_fieldStrength A x ha]
   rw [Fintype.sum_sum_type, Fin.sum_univ_one]
   congr 1
@@ -852,13 +849,13 @@ lemma gradKineticTerm_add {d} {𝓕 : FreeSpace} (A1 A2 : ElectromagneticPotenti
   rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, SpaceTime.deriv_eq]
   conv_lhs =>
     enter [1, 2, x]
-    rw [fieldStrengthMatrix_add _ _ _ (hA1.differentiable (by simp))
+    rw [fieldStrengthMatrix_add A1 A2 x (hA1.differentiable (by simp))
       (hA2.differentiable (by simp))]
-    simp [Finsupp.coe_add, Pi.add_apply]
+    simp
   rw [fderiv_fun_add]
   rfl
-  · apply fieldStrengthMatrix_differentiable <| hA1.of_le (ENat.LEInfty.out)
-  · apply fieldStrengthMatrix_differentiable <| hA2.of_le (ENat.LEInfty.out)
+  · exact (fieldStrengthMatrix_differentiable (hA1.of_le (ENat.LEInfty.out))) x
+  · exact (fieldStrengthMatrix_differentiable (hA2.of_le (ENat.LEInfty.out))) x
   · exact hA2
   · exact hA1
   · exact hA1.add hA2
@@ -878,15 +875,15 @@ lemma gradKineticTerm_smul {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
   congr
   rw [Finset.mul_sum]
   apply Finset.sum_congr rfl (fun μ _ => ?_)
-  conv_rhs =>
-    rw [SpaceTime.deriv_eq]
-    change (c • fderiv ℝ (fun x => (A.fieldStrengthMatrix x) (μ, ν)) x) (Lorentz.Vector.basis μ)
-    rw [← fderiv_const_smul
-      (fieldStrengthMatrix_differentiable <| hA.of_le (ENat.LEInfty.out)).differentiableAt]
-    rw [← SpaceTime.deriv_eq]
-  congr
-  funext x
-  rw [fieldStrengthMatrix_smul _ _ _]
+  have h_smul : ((c • A).fieldStrengthMatrix x) (μ, ν) = c * (A.fieldStrengthMatrix x) (μ, ν) := by
+    rw [fieldStrengthMatrix_smul c A x (hA.differentiable (by simp))]
+    simp
+  have hdiff : DifferentiableAt ℝ (fun x => (A.fieldStrengthMatrix x) (μ, ν)) x :=
+    (fieldStrengthMatrix_differentiable (μν := (μ, ν)) (hA.of_le (ENat.LEInfty.out))).differentiableAt x
+  have h_smul_fun : (fun x => ((c • A).fieldStrengthMatrix x) (μ, ν)) =
+      (fun x => c * (A.fieldStrengthMatrix x) (μ, ν)) := by
+    funext x; exact h_smul x
+  rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, h_smul_fun, fderiv_const_smul hdiff]
   rfl
   · exact hA.differentiable (by simp)
   · exact hA
