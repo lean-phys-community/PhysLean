@@ -464,10 +464,13 @@ public import Physlib.StringTheory.FTheory.SU5.Quanta.FiveQuanta
 public import Physlib.StringTheory.FTheory.SU5.Quanta.IsViable
 public import Physlib.StringTheory.FTheory.SU5.Quanta.TenQuanta
 public import Physlib.Thermodynamics.Basic
-public import Physlib.Thermodynamics.Foundation.Accessibility
+public import Physlib.Thermodynamics.Foundation.Comparability
+public import Physlib.Thermodynamics.Foundation.Core
 public import Physlib.Thermodynamics.Foundation.Entropy
+public import Physlib.Thermodynamics.Foundation.World
 public import Physlib.Thermodynamics.FundamentalRelation.Basic
 public import Physlib.Thermodynamics.FundamentalRelation.Euler
+public import Physlib.Thermodynamics.FundamentalRelation.ExtensiveState
 public import Physlib.Thermodynamics.FundamentalRelation.Intensive
 public import Physlib.Thermodynamics.FundamentalRelation.Model
 public import Physlib.Thermodynamics.IdealGas.Basic

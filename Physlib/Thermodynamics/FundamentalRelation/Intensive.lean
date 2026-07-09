@@ -16,25 +16,9 @@ public import Physlib.Thermodynamics.FundamentalRelation.Basic
 
 In the entropy representation, a simple system is described by a fundamental relation
 `S = S(U, V, N)`, where `U` is internal energy, `V` is volume, and `N` is particle number.
-The intensive parameters are obtained from the entropy differential
-
-`dS = (1 / T) dU + (P / T) dV - (μ / T) dN`.
-
-For a `FundamentalRelation Φ`, this file names the three coordinate derivatives
-`∂S/∂U`, `∂S/∂V`, and `∂S/∂N`, defines the corresponding temperature, pressure, and chemical
-potential, and proves `T > 0` from the assumed positivity of `∂S/∂U`.
-
-The differentiability lemmas connect the joint smoothness hypothesis on `S(U, V, N)` to the
-one-coordinate derivative statements used by these definitions. The total derivative lemma
-then identifies the Fréchet derivative of `S` with the expected linear expression in the
-three entropy partials.
-
-The final theorem is a determination result for fundamental relations. If two fundamental
-relations have the same `U` and `V` entropy partials and agree at one positive reference
-state, then their residual vanishes everywhere on the positive orthant. Thus the two entropy
-functions agree exactly on positive extensive states. The theorem is useful when a later
-model identifies the equations of state first and then needs equality of the whole
-fundamental relation.
+For a `FundamentalRelation Φ`, this file names the three coordinate entropy partials, defines
+the intensive parameters temperature, pressure, and chemical potential, identifies the total
+derivative of `S`, and proves a determination result for fundamental relations.
 
 ## ii. Key results
 
@@ -59,8 +43,7 @@ fundamental relation.
 ## iv. References
 
 - H.B. Callen, *Thermodynamics and an Introduction to Thermostatistics*, 2nd ed., Wiley
-  (1985).
--/
+  (1985). -/
 
 @[expose] public section
 
@@ -72,9 +55,10 @@ noncomputable section
 
 /-! ## A. Entropy partial derivatives
 
-The coordinate partials of the fundamental relation are defined by fixing two extensive
-coordinates and differentiating with respect to the third. These are ordinary one-variable
-`deriv`s evaluated at a positive `ExtensiveState`. -/
+For a `FundamentalRelation Φ`, this section names the three coordinate derivatives `∂S/∂U`,
+`∂S/∂V`, and `∂S/∂N`. The coordinate partials of the fundamental relation are defined by
+fixing two extensive coordinates and differentiating with respect to the third. These are
+ordinary one-variable `deriv`s evaluated at a positive `ExtensiveState`. -/
 
 /-- The energy partial derivative `∂S/∂U` at a positive extensive state.
 
@@ -96,12 +80,18 @@ def FundamentalRelation.dS_dN (Φ : FundamentalRelation) (e : ExtensiveState) : 
 
 /-! ## B. Intensive parameters
 
-The intensive parameters are recovered from the entropy partials by solving
+The intensive parameters are obtained from the entropy differential
+
+`dS = (1 / T) dU + (P / T) dV - (μ / T) dN`.
+
+They are recovered from the entropy partials by solving
 
 `∂S/∂U = 1 / T`, `∂S/∂V = P / T`, and `∂S/∂N = -μ / T`.
 
-The definitions here are real-valued coordinate functions on positive extensive states; no
-particular equation of state is assumed. -/
+This section defines the corresponding temperature, pressure, and chemical potential, and
+proves `T > 0` from the assumed positivity of `∂S/∂U`. The definitions here are real-valued
+coordinate functions on positive extensive states; no particular equation of state is
+assumed. -/
 
 /-- Temperature as the reciprocal of the energy derivative of entropy:
 `T = (∂S/∂U)⁻¹`. -/
@@ -154,7 +144,7 @@ lemma FundamentalRelation.differentiableAt_slice_U (Φ : FundamentalRelation)
     DifferentiableAt ℝ (fun u => Φ.S u e.V e.N) e.U := by
   change DifferentiableAt ℝ ((fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2) ∘
     fun u : ℝ => (u, (e.V, e.N))) e.U
-  have hmem : (e.U, e.V, e.N) ∈ posOrthant := ⟨e.hU, e.hV, e.hN⟩
+  have hmem : (e.U, e.V, e.N) ∈ posOrthant := e.mem_posOrthant
   have hjoint : DifferentiableAt ℝ (fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2)
       (e.U, e.V, e.N) :=
     (Φ.smooth.contDiffAt (isOpen_posOrthant.mem_nhds hmem)).differentiableAt (by norm_num)
@@ -169,7 +159,7 @@ lemma FundamentalRelation.differentiableAt_slice_V (Φ : FundamentalRelation)
     DifferentiableAt ℝ (fun v => Φ.S e.U v e.N) e.V := by
   change DifferentiableAt ℝ ((fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2) ∘
     fun v : ℝ => (e.U, (v, e.N))) e.V
-  have hmem : (e.U, e.V, e.N) ∈ posOrthant := ⟨e.hU, e.hV, e.hN⟩
+  have hmem : (e.U, e.V, e.N) ∈ posOrthant := e.mem_posOrthant
   have hjoint : DifferentiableAt ℝ (fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2)
       (e.U, e.V, e.N) :=
     (Φ.smooth.contDiffAt (isOpen_posOrthant.mem_nhds hmem)).differentiableAt (by norm_num)
@@ -184,7 +174,7 @@ lemma FundamentalRelation.differentiableAt_slice_N (Φ : FundamentalRelation)
     DifferentiableAt ℝ (fun n => Φ.S e.U e.V n) e.N := by
   change DifferentiableAt ℝ ((fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2) ∘
     fun n : ℝ => (e.U, (e.V, n))) e.N
-  have hmem : (e.U, e.V, e.N) ∈ posOrthant := ⟨e.hU, e.hV, e.hN⟩
+  have hmem : (e.U, e.V, e.N) ∈ posOrthant := e.mem_posOrthant
   have hjoint : DifferentiableAt ℝ (fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2)
       (e.U, e.V, e.N) :=
     (Φ.smooth.contDiffAt (isOpen_posOrthant.mem_nhds hmem)).differentiableAt (by norm_num)
@@ -215,7 +205,7 @@ lemma FundamentalRelation.hasFDerivAt_joint (Φ : FundamentalRelation) (e : Exte
     HasFDerivAt (fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2)
       (fderiv ℝ (fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2) (e.U, e.V, e.N))
       (e.U, e.V, e.N) := by
-  have hmem : (e.U, e.V, e.N) ∈ posOrthant := ⟨e.hU, e.hV, e.hN⟩
+  have hmem : (e.U, e.V, e.N) ∈ posOrthant := e.mem_posOrthant
   have hdiff : DifferentiableAt ℝ
       (fun p : ℝ × ℝ × ℝ => Φ.S p.1 p.2.1 p.2.2) (e.U, e.V, e.N) :=
     (Φ.smooth.contDiffAt (isOpen_posOrthant.mem_nhds hmem)).differentiableAt (by norm_num)
@@ -312,7 +302,7 @@ lemma FundamentalRelation.eq_of_dS_dU_dS_dV_eq_of_eq_at
       ∀ {U V N : ℝ}, 0 < U → 0 < V → 0 < N →
         HasDerivAt (fun u => sResidual u V N) 0 U := by
     intro U V N hUpos hVpos hNpos
-    let e : ExtensiveState := ⟨U, V, N, hUpos, hVpos, hNpos⟩
+    let e : ExtensiveState := ExtensiveState.mk U V N hUpos hVpos hNpos
     have hΦ := Φ.hasDerivAt_dS_dU e
     have hΨ := Ψ.hasDerivAt_dS_dU e
     have hres : HasDerivAt ((fun u => Φ.S u V N) - fun u => Ψ.S u V N)
@@ -330,7 +320,7 @@ lemma FundamentalRelation.eq_of_dS_dU_dS_dV_eq_of_eq_at
       ∀ {U V N : ℝ}, 0 < U → 0 < V → 0 < N →
         HasDerivAt (fun v => sResidual U v N) 0 V := by
     intro U V N hUpos hVpos hNpos
-    let e : ExtensiveState := ⟨U, V, N, hUpos, hVpos, hNpos⟩
+    let e : ExtensiveState := ExtensiveState.mk U V N hUpos hVpos hNpos
     have hΦ := Φ.hasDerivAt_dS_dV e
     have hΨ := Ψ.hasDerivAt_dS_dV e
     have hres : HasDerivAt ((fun v => Φ.S U v N) - fun v => Ψ.S U v N)

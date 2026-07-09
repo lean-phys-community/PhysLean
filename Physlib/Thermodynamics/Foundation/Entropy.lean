@@ -5,7 +5,7 @@ Authors: Nathaneal Sajan
 -/
 module
 
-public import Physlib.Thermodynamics.Foundation.Accessibility
+public import Physlib.Thermodynamics.Foundation.Comparability
 
 /-!
 # Entropy representations
@@ -20,17 +20,18 @@ Lieb-Yngvason build such an `S` explicitly as `S(X) = sup {t | R_t ≺ X}`, wher
 `R_t = ((1-t)•X₀, t•X₁)` mixes two fixed reference states `X₀ ≺≺ X₁`; the accessibility axioms
 A1-A6 are what make that supremum well-defined, monotone, additive and extensive.
 
-The `Monotonicity` field is conditional on `Comparable`. This is faithful to
-Lieb-Yngvason's eq. (2.3), which asserts the accessibility/entropy equivalence only for
-comparable states, and to the design choice (see `Accessibility.lean`) that comparison
-hypotheses are carried explicitly rather than baked into accessibility.
+The `Monotonicity` field is conditioned on `Comparable` and the equivalence
+`X ≺ Y ↔ S(X) ≤ S(Y)` is asserted only when `X` and `Y` are comparable. This follows
+Lieb-Yngvason, who state the equivalence only in that case, and it keeps to the design
+choice that comparison hypotheses are carried as explicit assumptions rather than built
+into the accessibility relation `≺`
 
 ## ii. Key results
 
 - `AllStates` — the sigma-typed domain: every state packaged with its system.
 - `EntropyRepresentation` — entropy `S` bundled with monotonicity, additivity, extensivity.
 - `entropy_equiv_iff_eq` / `entropy_strict_iff_lt` — the equivalence and strict forms of
-  monotonicity (Lieb-Yngvason eq. 2.6).
+  monotonicity.
 - `AffineUniqueness` — the statement (not a field, not proved here) that any two
   representations agree up to a positive affine recalibration `S ↦ aS + b`.
 
@@ -44,9 +45,9 @@ hypotheses are carried explicitly rather than baked into accessibility.
 ## iv. References
 
 - E.H. Lieb and J. Yngvason, *The Physics and Mathematics of the Second Law of
-  Thermodynamics*, Physics Reports **310** (1999) 1-96. The entropy principle and its
-  properties (monotonicity, additivity, extensivity), §II.B, eqns (2.3)-(2.6); essential
-  uniqueness up to affine scale, §II.C; the canonical construction of `S`, §II.E.
+  Thermodynamics*, Physics Reports **310** (1999)
+- E.H. Lieb and J. Yngvason, *The Mathematical Structure of the Second Law of
+  Thermodynamics*, Current Developments in Mathematics **2001** (2002)
 -/
 
 @[expose] public section
@@ -57,48 +58,54 @@ universe u
 
 /-! ## A. The domain of entropy
 
-An entropy function must range over *all* states of *all* systems at once — compound
-systems included — so that additivity `S(X, Y) = S(X) + S(Y)` can even be stated across
+An entropy function must range over *all* states of *all* systems at once, compound
+systems included, so that additivity `S(X, Y) = S(X) + S(Y)` can even be stated across
 systems. We package a state together with the system it belongs to as a sigma type. -/
 
 /-- The type of all states of all systems in a thermodynamic core: a state packaged with
-the system it belongs to. This sigma type is the domain of an entropy representation,
-letting `S` compare states across different systems. -/
+the system it belongs to. This sigma type is the domain of an entropy representation. -/
 def AllStates (System : Type u) [T : ThermoSystemCore System] :=
   Σ Γ : System, T.State Γ
 
 /-! ## B. Entropy as an order representation
 
-An `EntropyRepresentation` is the Entropy Principle turned into a structure: a real-valued `S`
-on `AllStates` that represents `≺` on comparable states (monotonicity), is additive under
-composition, and is extensive under positive scaling. -/
+This section turns the Entropy Principle into the structure `EntropyRepresentation`: an `S`
+on `AllStates` bundling monotonicity, additivity, and extensivity.
 
-/-- An abstract entropy representation of a thermodynamic core: the Lieb-Yngvason Entropy
-Principle as a structure. A real-valued `S` on `AllStates` that represents adiabatic
-accessibility on comparable states, is additive under composition, and is extensive under
-positive scaling. -/
+Extensivity can almost be derived from additivity, which makes the small gap between them
+one of the more interesting features of the entropy principle. For rational scaling factors
+there is no gap at all: given the recombination axiom A5, which lets equal samples of a
+state be combined into a scaled copy, additivity already forces `S(t • X) = t · S(X)`
+whenever `t` is rational. Extensivity earns its independence at the irrational factors. By
+the axiom of choice, through a Hamel-basis construction, any `S` satisfying monotonicity and
+additivity can be altered so that extensivity fails at some irrational `t`. So extensivity
+is never quite redundant, even when A5 holds, and here, where the structure is only a bare
+`ThermoSystemCore` without A5, it must be assumed outright for every factor. -/
+
+/-- An entropy representation of a thermodynamic core: a real-valued `S` on `AllStates` with
+monotonicity, additivity, and extensivity as its fields. -/
 structure EntropyRepresentation (System : Type u) [T : ThermoSystemCore System] where
   /-- The entropy of an arbitrary state, packaged with its system. -/
   S : AllStates System → ℝ
-  /-- Monotonicity, Lieb-Yngvason eq. 2.3: for comparable states, accessibility is
-  equivalent to entropy increase, `X ≺ Y ↔ S(X) ≤ S(Y)`. Conditioned on `Comparable`
-  because the equivalence is claimed only for comparable states. -/
+  /-- Monotonicity: for comparable states, accessibility is equivalent to entropy
+  increase, `X ≺ Y ↔ S(X) ≤ S(Y)`. Conditioned on `Comparable` because the equivalence is
+  claimed only for comparable states. -/
   Monotonicity {Γ₁ Γ₂ : System} (X : T.State Γ₁) (Y : T.State Γ₂) :
     Comparable (T := T) X Y → (T.le X Y ↔ S ⟨Γ₁, X⟩ ≤ S ⟨Γ₂, Y⟩)
-  /-- Additivity, Lieb-Yngvason eq. 2.4: `S(X, Y) = S(X) + S(Y)` across a composition. -/
+  /-- Additivity: `S(X, Y) = S(X) + S(Y)` across a composition. -/
   Additivity {Γ₁ Γ₂ : System} (X : T.State Γ₁) (Y : T.State Γ₂) :
     S ⟨T.comp Γ₁ Γ₂, T.state_of_comp_equiv.symm (X, Y)⟩ =
       S ⟨Γ₁, X⟩ + S ⟨Γ₂, Y⟩
-  /-- Extensivity, Lieb-Yngvason eq. 2.5: `S(t • X) = t · S(X)` for `t > 0`. -/
+  /-- Extensivity: `S(t • X) = t · S(X)` for `t > 0`. -/
   Extensivity {Γ : System} (X : T.State Γ) {t : ℝ} (ht : 0 < t) :
     S ⟨T.scale t Γ, (T.state_of_scale_equiv (ne_of_gt ht)).symm X⟩ =
       t * S ⟨Γ, X⟩
 
 /-! ## C. Consequences of the entropy principle
 
-Immediate rephrasings of monotonicity: on comparable states, adiabatic equivalence is equality
-of entropy and strict accessibility is strict entropy increase. These are the "entropy increases
-in an irreversible process" readings of `S`. -/
+Monotonicity has two immediate corollaries. On comparable states, adiabatic equivalence is
+equality of entropy and strict accessibility is strict entropy increase. These are the
+"entropy increases in an irreversible process" readings of `S`. -/
 
 section Consequences
 
