@@ -313,8 +313,8 @@ lemma inner_neg_right' (x y : E) : ⟪x, -y⟫ = -⟪x, y⟫ :=
 
 @[simp]
 lemma inner_self_eq_zero' {x : E} : ⟪x, x⟫ = 0 ↔ x = 0 := by
-  erw [inner_self_eq_zero (E:=WithLp 2 E)]
-  simp
+  rw [show (⟪x, x⟫ : 𝕜) = inner 𝕜 (toL2 𝕜 x) (toL2 𝕜 x) from rfl, inner_self_eq_zero,
+      map_eq_zero_iff _ (Function.LeftInverse.injective fromL2_toL2)]
 
 @[simp]
 lemma inner_sum'{ι : Type*} [Fintype ι] (x : E) (g : ι → E) :
