@@ -67,6 +67,10 @@ lemma inertiaTensor_symmetric {d : ℕ} (R : RigidBody d) (i j : Fin d) :
     exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
   · ring
 
+TODO "Move `cmap` and `cmap_apply` to a more general location, such as a file in
+  `SpaceAndTime/Space/` or `Mathematics/`. Alternatively, define a version of `ρ` taking an
+  unbundled `(f : Space d → ℝ) (hf : ContDiff ℝ ⊤ f)` in place of a `ContMDiffMap`."
+
 /-- Bundle a smooth real-valued function on `Space d` as an element of the space of test
 functions. Keeping this as a named constructor ensures the resulting type head stays
 `ContMDiffMap`, so the module/ring operations and `comp` resolve correctly. -/

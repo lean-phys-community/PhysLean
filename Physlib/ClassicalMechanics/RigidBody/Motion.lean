@@ -246,8 +246,10 @@ lemma velocity_eq_deriv_orientation {d : ℕ} (M : RigidBodyMotion d) (y : Space
   rw [hmv, Time.deriv_space hX t i, ← centerOfMassVelocity_eq]
 
 /-- The closed form `Ṙ(t) (y − c) + V(t)` of the velocity of the body point `y` at time `t`.
-It is polynomial in `y` for any motion; for differentiable motions it agrees with the point
-velocity `∂ₜ (displacement · y)`, see `velocityClosedForm_eq_velocity`. -/
+Unlike `velocity` — whose junk values on non-differentiable motions need not vary continuously
+with `y` — it is polynomial in `y` for any motion, so its squared speed can be bundled as the
+smooth integrand of the total kinetic energy; for differentiable motions the two agree, see
+`velocityClosedForm_eq_velocity`. -/
 noncomputable def velocityClosedForm {d : ℕ} (M : RigidBodyMotion d) (t : Time) (y : Space d) :
     Space d :=
   ⟨∂ₜ (fun s => (M.orientation s).1) t *ᵥ fun j => y j - M.centerOfMass j⟩
