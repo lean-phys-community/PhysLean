@@ -258,24 +258,14 @@ less than or equal to the degree of the potential term `T`.
 
 lemma allowsTermForm_card_le_degree {a b c : 𝓩} {T : PotentialTerm} :
     (allowsTermForm a b c T).card ≤ T.degree := by
-  cases T
+  cases T <;> simp [allowsTermForm, PotentialTerm.toFieldLabel, card, PotentialTerm.degree]
   all_goals
-    simp [allowsTermForm, PotentialTerm.toFieldLabel, card, PotentialTerm.degree]
-  case' Λ =>
-    have h1 : Finset.card {a, b} ≤ 2 := Finset.card_le_two
-    omega
-  case' W3 =>
-    have h1 : Finset.card {b, -b - 2 • a} ≤ 2 := Finset.card_le_two
-    omega
-  case' K1 =>
-    have h1 : Finset.card {b, -a - b} ≤ 2 := Finset.card_le_two
-    omega
-  case' topYukawa =>
-    have h1 : Finset.card {b, -a - b} ≤ 2 := Finset.card_le_two
-    omega
-  all_goals
-    have h1 : Finset.card {a, b, c} ≤ 3 := Finset.card_le_three
-    omega
+    first
+    | exact Finset.card_le_two
+    | exact Finset.card_le_three
+    | have h := Finset.card_le_two (a := b) (b := -b - 2 • a); omega
+    | have h := Finset.card_le_two (a := b) (b := -a - b); omega
+    | have h := Finset.card_le_three (a := a) (b := b) (c := c); omega
 
 /-!
 
