@@ -472,12 +472,7 @@ lemma kineticTerm_add_time_mul_const {d} {𝓕 : FreeSpace} (A : Electromagnetic
       funext μ
       congr
       funext ν
-      congr
-      all_goals
-      · simp
-        split_ifs
-        simp
-        rfl
+      split_ifs <;> simp
     _ = -1 / (2 * 𝓕.μ₀) *
       ∑ μ, ∑ ν, ((η μ μ * η ν ν * (∂_ μ A x ν) ^ 2 - ∂_ μ A x ν * ∂_ ν A x μ) +
           (if μ = Sum.inl 0 then c ν else 0) * (2 * η μ μ * η ν ν * ∂_ μ A x ν +
