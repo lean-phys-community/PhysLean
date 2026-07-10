@@ -552,7 +552,7 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace 
         smul_sub, hNewt_x, hNewt_traj, hydef, force_eq_linear]
   have hy0 : y 0 = 0 := by simp [hydef, hx0]
   have hyv0 : ∂ₜ y 0 = 0 := by
-    simpa [hy_deriv, hv0, trajectory_velocity_at_zero S IC]
+    simp [hy_deriv, hv0, trajectory_velocity_at_zero S IC]
   have hE : ∀ t, S.energy y t = 0 := fun t =>
     (S.energy_conservation_of_equationOfMotion' y hyContDiff hEOM_y t).trans <| by
       simp [HarmonicOscillator.energy, HarmonicOscillator.kineticEnergy,

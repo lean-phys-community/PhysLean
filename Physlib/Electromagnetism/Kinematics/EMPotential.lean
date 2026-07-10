@@ -281,7 +281,7 @@ noncomputable instance {d} :
     simp
   smul_add Λ A B := by
     ext x μ
-    simp [Lorentz.Vector.smul_add]
+    simp
 
 /-!
 

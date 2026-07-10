@@ -354,8 +354,7 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
       _ = dF ((0 : Time), v) := by simp [h_time]
       _ = φ v := by simp [φ]
   refine ⟨(InnerProductSpace.toDual ℝ (X)).symm φ, fun v => ?_⟩
-  simpa [hφ v] using
-    (InnerProductSpace.toDual_symm_apply (𝕜 := ℝ) (E := X) (x := v) (y := φ)).symm
+  simp [hφ v, InnerProductSpace.toDual_symm_apply]
 
 end Lagrangian
 

@@ -393,7 +393,7 @@ lemma realLinear_apply_eq_wirtinger (L : ℂ →L[ℝ] ℂ) (w : ℂ) :
       ((1 / 2 : ℂ) * (L 1 - Complex.I * L Complex.I)) * w
         + ((1 / 2 : ℂ) * (L 1 + Complex.I * L Complex.I)) * star w := by
   have h : (w.re : ℝ) • (1 : ℂ) + (w.im : ℝ) • Complex.I = w := by
-    simpa using (Complex.re_add_im w).symm
+    simp [Complex.re_add_im w]
   rw [← h, map_add, map_smul, map_smul]
   apply Complex.ext <;>
     simp [Complex.add_re, Complex.add_im, Complex.sub_re, Complex.sub_im,
