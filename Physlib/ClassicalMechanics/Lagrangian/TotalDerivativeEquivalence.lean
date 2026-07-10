@@ -287,14 +287,15 @@ lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : T
     cases hContDiff with
     | inl hL =>
       have hL' : ContDiff ℝ ∞ ↿L' := by
-        have : ↿L' = ↿L + ↿(L' - L) := by ext tqv; rcases tqv with ⟨t, q', v⟩; simp
+        have : ↿L' = ↿L + ↿(L' - L) := by
+          ext tqv; rcases tqv with ⟨t, q', v⟩; show L' t q' v = L t q' v + (L' - L) t q' v; simp
         rw [this]
         exact hL.add h_δL_contDiff
       exact ⟨hL, hL'⟩
     | inr hL' =>
       have hL : ContDiff ℝ ∞ ↿L := by
         have : ↿L = ↿L' + ↿(-(L' - L)) := by
-          ext ⟨t, q', v⟩; simp [Pi.add_apply, Pi.neg_apply, sub_eq_add_neg]
+          ext ⟨t, q', v⟩; show L t q' v = L' t q' v + (-(L' - L)) t q' v; simp
         rw [this]
         exact hL'.add h_δL_contDiff_neg
       exact ⟨hL, hL'⟩

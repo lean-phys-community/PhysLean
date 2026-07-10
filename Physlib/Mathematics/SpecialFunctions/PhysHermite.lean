@@ -97,9 +97,8 @@ lemma coeff_physHermite_self_succ (n : ℕ) : coeff (physHermite n) n = 2 ^ n :=
   induction n with
   | zero => exact coeff_C
   | succ n ih =>
-    rw [coeff_physHermite_succ_succ, ih, coeff_physHermite_of_lt, mul_zero, sub_zero]
-    · rw [← Int.pow_succ']
-    · simp
+    rw [coeff_physHermite_succ_succ, ih, coeff_physHermite_of_lt (by omega), mul_zero, sub_zero,
+      ← Int.pow_succ']
 
 @[simp]
 lemma degree_physHermite (n : ℕ) : degree (physHermite n) = n := by
@@ -115,8 +114,7 @@ lemma natDegree_physHermite {n : ℕ} : (physHermite n).natDegree = n :=
 
 lemma iterate_derivative_physHermite_of_gt {n m : ℕ} (h : n < m) :
     derivative^[m] (physHermite n) = 0 := by
-  refine iterate_derivative_eq_zero ?_
-  simpa using h
+  exact iterate_derivative_eq_zero (by simpa using h)
 
 open Nat
 
@@ -140,8 +138,7 @@ lemma physHermite_leadingCoeff {n : ℕ} : (physHermite n).leadingCoeff = 2 ^ n 
 
 @[simp]
 lemma physHermite_ne_zero {n : ℕ} : physHermite n ≠ 0 := by
-  refine leadingCoeff_ne_zero.mp ?_
-  simp
+  exact leadingCoeff_ne_zero.mp (by simp)
 
 noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ)where
   coe p := fun x => p.aeval x
@@ -283,9 +280,8 @@ lemma guassian_integrable_polynomial_cons {b c : ℝ} (hb : 0 < b) (P : Polynomi
     simp only [neg_mul, mul_assoc, Real.rpow_natCast, Pi.smul_apply, smul_eq_mul]
     ring
   refine h2 ▸ MeasureTheory.Integrable.smul (c ^ i * P.coeff i : ℝ) ?_
-  apply integrable_rpow_mul_exp_neg_mul_sq (s := i)
-  · exact hb
-  · exact lt_of_le_of_lt' (Nat.cast_nonneg' i) neg_one_lt_zero
+  exact integrable_rpow_mul_exp_neg_mul_sq hb
+    (lt_of_le_of_lt' (Nat.cast_nonneg' i) neg_one_lt_zero)
 
 @[fun_prop]
 lemma guassian_integrable_polynomial {b : ℝ} (hb : 0 < b) (P : Polynomial ℤ) :
@@ -369,13 +365,12 @@ lemma physHermite_orthogonal_lt {n m : ℕ} (hnm : n < m) :
 
 theorem physHermite_orthogonal {n m : ℕ} (hnm : n ≠ m) :
     ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (- x ^ 2) = 0 := by
-  by_cases hnm' : n < m
-  · exact physHermite_orthogonal_lt hnm'
-  · have hmn : m < n := by omega
-    conv_lhs =>
+  rcases hnm.lt_or_lt with h | h
+  · exact physHermite_orthogonal_lt h
+  · conv_lhs =>
       enter [2, x, 1]
       rw [mul_comm]
-    rw [physHermite_orthogonal_lt hmn]
+    rw [physHermite_orthogonal_lt h]
 
 lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
     ∫ x : ℝ, (physHermite n (c * x) * physHermite m (c * x)) *
@@ -383,13 +378,10 @@ lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
   trans ∫ x : ℝ, (fun x => (physHermite n x * physHermite m x) * Real.exp (- x^2)) (c * x)
   · congr
     funext x
-    simp only [neg_mul, mul_eq_mul_left_iff, Real.exp_eq_exp, neg_inj, _root_.mul_eq_zero]
-    left
-    exact Eq.symm (mul_pow c x 2)
+    rw [neg_mul, mul_pow]
   rw [MeasureTheory.Measure.integral_comp_mul_left
     (fun x => physHermite n x * physHermite m x * Real.exp (-x ^ 2)) c]
-  rw [physHermite_orthogonal hnm]
-  simp
+  simp [physHermite_orthogonal hnm]
 
 theorem physHermite_norm (n : ℕ) :
     ∫ x : ℝ, (physHermite n x * physHermite n x) * Real.exp (- x ^ 2) =
@@ -411,9 +403,7 @@ lemma physHermite_norm_cons (n : ℕ) (c : ℝ) :
   trans ∫ x : ℝ, (fun x => (physHermite n x * physHermite n x) * Real.exp (- x^2)) (c * x)
   · congr
     funext x
-    simp only [neg_mul, mul_eq_mul_left_iff, Real.exp_eq_exp, neg_inj, _root_.mul_eq_zero, or_self]
-    left
-    exact Eq.symm (mul_pow c x 2)
+    rw [neg_mul, mul_pow]
   rw [MeasureTheory.Measure.integral_comp_mul_left
     (fun x => physHermite n x * physHermite n x * Real.exp (-x ^ 2)) c]
   rw [physHermite_norm]

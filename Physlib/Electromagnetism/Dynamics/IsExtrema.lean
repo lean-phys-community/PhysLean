@@ -371,7 +371,7 @@ lemma time_deriv_time_deriv_electricField_of_isExtrema {A : ElectromagneticPoten
       𝓕.c ^ 2 / 𝓕.ε₀ * ∂[i] (J.chargeDensity 𝓕.c t ·) x -
       𝓕.c ^ 2 * 𝓕.μ₀ * ∂ₜ (J.currentDensity 𝓕.c · x i) t := by
   have hEs : ∀ j, ContDiff ℝ 2 (fun y => A.electricField 𝓕.c t y j) :=
-    fun j => electricField_apply_contDiff_space (i := j) (hA.of_le (ENat.LEInfty.out)) t
+    fun j => electricField_apply_contDiff_space (i := j) (hA.of_le (by decide)) t
   have hEd : ∀ j k, Differentiable ℝ (∂[k] (fun y => A.electricField 𝓕.c t y j)) :=
     fun j k => Space.deriv_differentiable (hEs j) k
   have hBt : ∀ j, Differentiable ℝ

@@ -93,11 +93,8 @@ lemma UnitDependent.scaleUnit_injective {M : Type} [UnitDependent M]
     scaleUnit u1 u2 m1 = scaleUnit u1 u2 m2 ↔ m1 = m2 := by
   constructor
   · intro h1
-    have h2 : scaleUnit u2 u1 (scaleUnit u1 u2 m1) =
-        scaleUnit u2 u1 (scaleUnit u1 u2 m2) := by rw [h1]
-    simpa using h2
-  · intro h
-    subst h
+    simpa using congrArg (scaleUnit u2 u1) h1
+  · rintro rfl
     rfl
 
 /-!
@@ -199,13 +196,10 @@ noncomputable instance : UnitDependent UnitChoices where
 @[simp]
 lemma UnitChoices.scaleUnit_apply_fst (u1 u2 : UnitChoices) :
     (scaleUnit u1 u2 u1) = u2 := by
-  simp [scaleUnit]
-  apply UnitChoices.ext
-  · simp [LengthUnit.scale, LengthUnit.div_eq_val, toReal]
-  · simp [TimeUnit.scale, TimeUnit.div_eq_val, toReal]
-  · simp [MassUnit.scale, MassUnit.div_eq_val, toReal]
-  · simp [ChargeUnit.scale, ChargeUnit.div_eq_val, toReal]
-  · simp [TemperatureUnit.scale, TemperatureUnit.div_eq_val, toReal]
+  apply UnitChoices.ext <;>
+    simp [scaleUnit, LengthUnit.scale, TimeUnit.scale, MassUnit.scale, ChargeUnit.scale,
+      TemperatureUnit.scale, LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val,
+      ChargeUnit.div_eq_val, TemperatureUnit.div_eq_val, toReal]
 
 @[simp]
 lemma UnitChoices.dimScale_scaleUnit {u1 u2 u : UnitChoices} (d : Dimension) :
@@ -215,42 +209,27 @@ lemma UnitChoices.dimScale_scaleUnit {u1 u2 u : UnitChoices} (d : Dimension) :
   congr 1
   congr 1
   congr 1
-  · congr 1
-    simp [scaleUnit]
-    simp [LengthUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [TimeUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [MassUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [ChargeUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [TemperatureUnit.div_eq_val, toReal]
+  all_goals
+    congr 1
+    simp [scaleUnit, LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val,
+      ChargeUnit.div_eq_val, TemperatureUnit.div_eq_val, toReal]
 
 lemma Dimensionful.of_scaleUnit {M : Type} [CarriesDimension M] {u1 u2 u : UnitChoices}
     (c : Dimensionful M) :
     c.1 (scaleUnit u1 u2 u) =
     u1.dimScale u2 (dim M) • c.1 (u) := by
-  rw [c.2 u (scaleUnit u1 u2 u)]
-  congr 1
-  simp
+  rw [c.2 u (scaleUnit u1 u2 u), UnitChoices.dimScale_scaleUnit]
 
 noncomputable instance {M1 : Type} [CarriesDimension M1] : MulUnitDependent M1 where
   scaleUnit u1 u2 m := (toDimensionful u1 m).1 u2
   scaleUnit_trans u1 u2 u3 m := by
-    simp [toDimensionful]
-    rw [smul_smul, mul_comm, UnitChoices.dimScale_transitive]
+    simp [toDimensionful, smul_smul, mul_comm, UnitChoices.dimScale_transitive]
   scaleUnit_trans' u1 u2 u3 m := by
     simp [toDimensionful, smul_smul, UnitChoices.dimScale_transitive]
   scaleUnit_id u m := by
     simp [toDimensionful, UnitChoices.dimScale_self]
   scaleUnit_mul u1 u2 r m := by
-    simp [toDimensionful]
-    exact smul_comm (u1.dimScale u2 (dim M1)) r m
+    simpa [toDimensionful] using smul_comm (u1.dimScale u2 (dim M1)) r m
 
 lemma HasDim.scaleUnit_apply {M : Type} [CarriesDimension M]
     (u1 u2 : UnitChoices) (m : M) :
@@ -260,15 +239,10 @@ lemma HasDim.scaleUnit_apply {M : Type} [CarriesDimension M]
 noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M] [HasDim M] :
     LinearUnitDependent M where
   scaleUnit_add u1 u2 m1 m2 := by
-    change (toDimensionful u1 (m1 + m2)).1 u2 = _
-    rw [toDimensionful_apply_apply]
-    simp
-    rfl
+    simp only [HasDim.scaleUnit_apply, smul_add]
   scaleUnit_smul u1 u2 r m := by
-    change (toDimensionful u1 (r • m)).1 u2 = _
-    rw [toDimensionful_apply_apply]
+    simp only [HasDim.scaleUnit_apply]
     rw [smul_comm]
-    rfl
 
 noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M]
     [HasDim M] [TopologicalSpace M]
@@ -279,8 +253,7 @@ noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M]
       enter [1, m]
       rw [toDimensionful_apply_apply]
     change Continuous fun m => (u1.dimScale u2 (dim M)).1 • m
-    apply Continuous.const_smul
-    exact continuous_id'
+    exact continuous_id'.const_smul _
 
 /-!
 
@@ -472,24 +445,21 @@ lemma isDimensionallyCorrect_fun_iff {M1 M2 : Type} [UnitDependent M1] [UnitDepe
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f (scaleUnit u2 u1 m)) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp only [IsDimensionallyCorrect, funext_iff, scaleUnit_apply_fun]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_left {M1 M2 : Type} [UnitDependent M1]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, (f (scaleUnit u2 u1 m)) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp only [IsDimensionallyCorrect, funext_iff, scaleUnit_apply_fun_left]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_right {M1 M2 : Type} [UnitDependent M2]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f m) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp only [IsDimensionallyCorrect, funext_iff, scaleUnit_apply_fun_right]
 /-!
 
 ## Some type classes to help track dimensions
