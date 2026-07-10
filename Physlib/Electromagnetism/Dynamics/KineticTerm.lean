@@ -875,15 +875,15 @@ lemma gradKineticTerm_smul {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential 
   congr
   rw [Finset.mul_sum]
   apply Finset.sum_congr rfl (fun μ _ => ?_)
-  have h_smul : ((c • A).fieldStrengthMatrix x) (μ, ν) = c * (A.fieldStrengthMatrix x) (μ, ν) := by
-    rw [fieldStrengthMatrix_smul c A x (hA.differentiable (by simp))]
-    simp
-  have hdiff : DifferentiableAt ℝ (fun x => (A.fieldStrengthMatrix x) (μ, ν)) x :=
-    (fieldStrengthMatrix_differentiable (μν := (μ, ν)) (hA.of_le (ENat.LEInfty.out))).differentiableAt x
-  have h_smul_fun : (fun x => ((c • A).fieldStrengthMatrix x) (μ, ν)) =
-      (fun x => c * (A.fieldStrengthMatrix x) (μ, ν)) := by
-    funext x; exact h_smul x
-  rw [SpaceTime.deriv_eq, SpaceTime.deriv_eq, h_smul_fun, fderiv_const_smul hdiff]
+  conv_rhs =>
+    rw [SpaceTime.deriv_eq]
+    change (c • fderiv ℝ (fun x => (A.fieldStrengthMatrix x) (μ, ν)) x) (Lorentz.Vector.basis μ)
+    rw [← fderiv_const_smul
+      (fieldStrengthMatrix_differentiable <| hA.of_le (ENat.LEInfty.out)).differentiableAt]
+    rw [← SpaceTime.deriv_eq]
+  congr
+  funext x
+  rw [fieldStrengthMatrix_smul _ _ _]
   rfl
   · exact hA.differentiable (by simp)
   · exact hA

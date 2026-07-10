@@ -1024,41 +1024,30 @@ lemma trajectory_velocity_eq_zero_iff_norm_eq_amplitude (IC : InitialConditions)
       ‖IC.trajectory S t‖ = (AmplitudePhase.fromInitialConditions S IC).A := by
   by_cases hA : (AmplitudePhase.fromInitialConditions S IC).A = 0
   · constructor
-    · intro _
-      rw [trajectory_eq_cos]
-      simp [hA]
-    · intro _
-      rw [trajectory_velocity_eq_sin]
-      ext i
-      fin_cases i
-      simp [hA]
-  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t]
-  rw [trajectory_eq_cos]
+    · intro _; rw [trajectory_eq_cos]; simp [hA]
+    · intro _; rw [trajectory_velocity_eq_sin]; ext i; fin_cases i; simp [hA]
+  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t, trajectory_eq_cos]
   set A := (AmplitudePhase.fromInitialConditions S IC).A
   set θ := S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ
-  show sin θ = 0 ↔ ‖EuclideanSpace.single 0 (A * cos θ)‖ = A
   have hA' : A ≠ 0 := by simpa [A] using hA
-  have hA_nonneg : 0 ≤ A := by
-    show 0 ≤ ‖(⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)‖
-    exact norm_nonneg _
-  have hA_pos : 0 < A := lt_of_le_of_ne hA_nonneg (Ne.symm hA')
+  have hA_pos : 0 < A := by
+    have hA_nonneg : 0 ≤ A := norm_nonneg _
+    exact lt_of_le_of_ne hA_nonneg (Ne.symm hA')
+  show sin θ = 0 ↔ ‖EuclideanSpace.single 0 (A * cos θ)‖ = A
   constructor
   · intro hsin
-    rcases Real.sin_eq_zero_iff_cos_eq.mp hsin with hcos | hcos
+    rcases Real.sin_eq_zero_iff_cos_eq.mp hsin with (hcos | hcos)
     · simp [hcos, abs_of_pos hA_pos]
     · simp [hcos, abs_of_pos hA_pos]
   · intro hnorm
-    have hnorm' : |A * cos θ| = A := by
-      simpa using hnorm
+    have hnorm' : |A * cos θ| = A := by simpa using hnorm
     have hcos_abs : |cos θ| = 1 := by
       calc
         |cos θ| = |A * cos θ| / A := by
-          rw [abs_mul, abs_of_pos hA_pos]
-          field_simp [hA']
+          rw [abs_mul, abs_of_pos hA_pos]; field_simp [hA']
         _ = A / A := by rw [hnorm']
         _ = 1 := by field_simp [hA']
-    obtain ⟨n, hn⟩ := Real.abs_cos_eq_one_iff.mp hcos_abs
-    exact Real.sin_eq_zero_iff.mpr ⟨n, hn⟩
+    exact Real.sin_eq_zero_iff.mpr (Real.abs_cos_eq_one_iff.mp hcos_abs)
 
 /-!
 

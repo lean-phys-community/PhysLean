@@ -529,22 +529,21 @@ lemma schwartMap_fderiv_comm {d}
     ((SchwartzMap.evalCLM ℝ (Space d) ℝ (basis ν))
       ((fderivCLM ℝ (Space d) ℝ) ((SchwartzMap.evalCLM ℝ (Space d) ℝ (basis μ))
       ((fderivCLM ℝ (Space d) ℝ) η)))) x := by
-  have h1 := η.smooth
-  have h2 := h1 2
+  have h_symm : IsSymmSndFDerivAt ℝ η x :=
+    ((η.smooth 2).contDiffAt (x := x)).isSymmSndFDerivAt (by norm_num)
+  have h_contDiff : ContDiff ℝ (2 : ℕ∞) η := η.smooth 2
+  have hd : DifferentiableAt ℝ (fderiv ℝ η) x := by
+    have hct := h_contDiff.contDiffAt (x := x)
+    have hderiv : ContDiffAt ℝ 1 (fderiv ℝ η) x := hct.fderiv_right (by norm_num)
+    exact hderiv.differentiableAt one_ne_zero
+  have hconst_μ : DifferentiableAt ℝ (fun (_ : Space d) => basis μ) x := by fun_prop
+  have hconst_ν : DifferentiableAt ℝ (fun (_ : Space d) => basis ν) x := by fun_prop
   change fderiv ℝ (fun x => fderiv ℝ η x (basis ν)) x (basis μ) =
     fderiv ℝ (fun x => fderiv ℝ η x (basis μ)) x (basis ν)
-  rw [fderiv_clm_apply, fderiv_clm_apply]
+  rw [fderiv_clm_apply hd hconst_ν, fderiv_clm_apply hd hconst_μ]
   simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
     ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  apply ContDiffAt.isSymmSndFDerivAt (n := 2)
-  · refine ContDiff.contDiffAt ?_
-    exact h2
-  · simp
-  · fun_prop
-  · exact differentiableAt_const (basis μ)
-  · fun_prop
-  · exact differentiableAt_const (basis ν)
+  rw [IsSymmSndFDerivAt.eq h_symm]
 
 lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ ν : Fin d) (f : (Space d) →d[ℝ] M) :

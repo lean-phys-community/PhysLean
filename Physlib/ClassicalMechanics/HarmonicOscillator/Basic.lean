@@ -370,19 +370,7 @@ The lagrangian is smooth in all its arguments.
 @[fun_prop]
 lemma contDiff_lagrangian (n : WithTop ℕ∞) : ContDiff ℝ n ↿S.lagrangian := by
   rw [lagrangian_eq]
-  apply ContDiff.sub
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_snd.comp contDiff_snd)
-        (contDiff_snd.comp contDiff_snd)
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_fst.comp contDiff_snd)
-        (contDiff_fst.comp contDiff_snd)
+  fun_prop
 
 lemma toDual_symm_innerSL (x : EuclideanSpace ℝ (Fin 1)) :
     (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin 1))).symm (innerSL ℝ x) = x := by
