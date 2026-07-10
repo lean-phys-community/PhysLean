@@ -599,9 +599,7 @@ lemma energy_conservation_of_equationOfMotion (xₜ : Time → EuclideanSpace �
   rw [energy_deriv _ _ hx]
   rw [equationOfMotion_iff_newtons_2nd_law _ _ hx] at h
   funext x
-  simp only [Pi.zero_apply]
-  rw [h]
-  simp [force_eq_linear]
+  simp [h x, force_eq_linear]
 
 /-!
 

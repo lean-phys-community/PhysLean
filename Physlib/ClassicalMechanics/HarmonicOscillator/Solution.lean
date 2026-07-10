@@ -645,9 +645,7 @@ lemma toInitialConditions_energy_at_t₀ (S : HarmonicOscillator)
     S.energy ((IC.toInitialConditions S).trajectory S) IC.t₀ =
     1/2 * (S.m * ‖IC.v_t₀‖^2 + S.k * ‖IC.x_t₀‖^2) := by
   unfold energy kineticEnergy potentialEnergy
-  simp only [toInitialConditions_trajectory_at_t₀, toInitialConditions_velocity_at_t₀]
-  rw [real_inner_self_eq_norm_sq, real_inner_self_eq_norm_sq]
-  simp only [smul_eq_mul]
+  simp [toInitialConditions_trajectory_at_t₀, toInitialConditions_velocity_at_t₀, smul_eq_mul]
   ring
 
 end InitialConditionsAtTime
