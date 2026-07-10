@@ -46,7 +46,8 @@ lemma staticContract_insert_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) :
     (φsΛ ↩Λ φ i none).staticContract = φsΛ.staticContract := by
   rw [staticContract, insertAndContract_none_prod_contractions]
-  simp [staticContract]
+  congr with a
+  simp
 
 /--
   For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of
@@ -70,7 +71,8 @@ lemma staticContract_insert_some
   · simp only [Nat.succ_eq_add_one, insertAndContract_fstFieldOfContract_some_incl, finCongr_apply,
     List.get_eq_getElem, insertAndContract_sndFieldOfContract_some_incl, Fin.getElem_fin]
     split <;> simp
-  · simp [staticContract]
+  · congr with a
+    simp
 
 open FieldStatistic
 

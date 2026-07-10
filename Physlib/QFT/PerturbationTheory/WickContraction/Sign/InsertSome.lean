@@ -69,35 +69,125 @@ lemma signFinset_insertAndContract_some (φ : 𝓕.FieldOp) (φs : List 𝓕.Fie
   ext k
   rcases insert_fin_eq_self φ i k with hk | hk
   · subst hk
+    have h1 : Fin.cast (insertIdx_length_fin φ φs i).symm i ∈
+      (if i.succAbove i1 < i ∧ i < i.succAbove i2 ∧ (i1 < j) then
+      Insert.insert (finCongr (insertIdx_length_fin φ φs i).symm i)
+      (insertAndContractLiftFinset φ i (φsΛ.signFinset i1 i2))
+      else
+        if i1 < j ∧ j < i2 ∧ ¬ i.succAbove i1 < i then
+          (insertAndContractLiftFinset φ i (φsΛ.signFinset i1 i2)).erase
+          (finCongr (insertIdx_length_fin φ φs i).symm (i.succAbove j))
+        else
+          (insertAndContractLiftFinset φ i (φsΛ.signFinset i1 i2))) ↔
+          i.succAbove i1 < i ∧ i < i.succAbove i2 ∧ (i1 < j) := by
+        split
+        simp_all only [Nat.succ_eq_add_one, finCongr_apply, Finset.mem_insert,
+          self_not_mem_insertAndContractLiftFinset, or_false, and_self]
+        rename_i h
+        simp only [Nat.succ_eq_add_one, not_lt, finCongr_apply, h, iff_false]
+        split
+        simp only [Finset.mem_erase, ne_eq, self_not_mem_insertAndContractLiftFinset, and_false,
+          not_false_eq_true]
+        simp
+    rw [h1]
     simp only [Nat.succ_eq_add_one, signFinset, finCongr_apply, Finset.mem_filter, Finset.mem_univ,
       insertAndContract_some_getDual?_self_eq, reduceCtorEq, Option.isSome_some, Option.get_some,
-      forall_const, false_or, true_and, Fin.cast_lt_cast, Fin.succAbove_lt_succAbove_iff]
-    split
-    · simp_all
-    · rename_i h
-      simp only [h, false_iff]
-      split <;> simp
+      forall_const, false_or, true_and]
+    rw [Fin.lt_def, Fin.lt_def, Fin.lt_def, Fin.lt_def]
+    simp only [Fin.val_cast, Fin.val_fin_lt, and_congr_right_iff]
+    intro h1 h2
+    exact Fin.succAbove_lt_succAbove_iff
   · obtain ⟨k, hk⟩ := hk
     subst hk
     by_cases hkj : k = j.1
     · subst hkj
-      have hj : φsΛ.getDual? ↑j = none := (φsΛ.getDual?_eq_none_iff_mem_uncontracted ↑j).mpr j.2
-      simp only [Nat.succ_eq_add_one, signFinset, finCongr_apply, Finset.mem_filter,
+      conv_lhs=> simp only [Nat.succ_eq_add_one, signFinset, finCongr_apply, Finset.mem_filter,
         Finset.mem_univ, insertAndContract_some_getDual?_some_eq, reduceCtorEq, Option.isSome_some,
-        Option.get_some, forall_const, false_or, true_and, Fin.cast_lt_cast,
-        Fin.succAbove_lt_succAbove_iff]
+        Option.get_some, forall_const, false_or, true_and, not_lt]
+      rw [Fin.lt_def, Fin.lt_def]
+      simp only [Fin.val_cast, Fin.val_fin_lt, Nat.succ_eq_add_one, finCongr_apply, not_lt]
+      conv_lhs =>
+        enter [2, 2]
+        rw [Fin.lt_def]
+      simp only [Fin.val_cast, Fin.val_fin_lt]
       split
-      · simp_all [succAbove_mem_insertAndContractLiftFinset, Fin.cast_inj, Fin.succAbove_ne]
-      · split <;> simp_all [succAbove_mem_insertAndContractLiftFinset]
-    · simp only [Nat.succ_eq_add_one, signFinset, finCongr_apply, Finset.mem_filter,
-        Finset.mem_univ, true_and, ne_eq, hkj, not_false_eq_true,
-        insertAndContract_some_succAbove_getDual?_eq_option, Option.map_eq_none_iff,
-        Option.isSome_map, Option.get_map, Function.comp_apply, Fin.cast_lt_cast,
-        Fin.succAbove_lt_succAbove_iff]
-      split
-      · simp [Fin.cast_inj, Fin.succAbove_ne, succAbove_mem_insertAndContractLiftFinset]
-      · split <;> simp [Fin.cast_inj, Fin.succAbove_right_injective.eq_iff, hkj,
-          succAbove_mem_insertAndContractLiftFinset]
+      · rename_i h
+        simp_all only [and_true, Finset.mem_insert]
+        rw [succAbove_mem_insertAndContractLiftFinset]
+        simp only [Fin.ext_iff, Fin.val_cast]
+        have h1 : ¬ (i.succAbove ↑j) = i := Fin.succAbove_ne i ↑j
+        simp only [Fin.val_eq_val, h1, signFinset, Finset.mem_filter, Finset.mem_univ, true_and,
+          false_or]
+        rw [Fin.succAbove_lt_succAbove_iff, Fin.succAbove_lt_succAbove_iff]
+        simp only [and_congr_right_iff, iff_self_and]
+        intro h1 h2
+        apply Or.inl
+        have hj:= j.2
+        simpa [uncontracted, -SetLike.coe_mem] using hj
+      · rename_i h
+        simp only [not_and, not_lt] at h
+        rw [Fin.succAbove_lt_succAbove_iff, Fin.succAbove_lt_succAbove_iff]
+        split
+        · rename_i h1
+          simp only [Finset.mem_erase, ne_eq, not_true_eq_false, false_and, iff_false, not_and,
+            not_lt]
+          intro h1 h2
+          omega
+        · rename_i h1
+          rw [succAbove_mem_insertAndContractLiftFinset]
+          simp only [signFinset, Finset.mem_filter, Finset.mem_univ, true_and, and_congr_right_iff]
+          intro h1 h2
+          have hj:= j.2
+          simp only [uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hj
+          simp only [hj, Option.isSome_none, Bool.false_eq_true, IsEmpty.forall_iff, or_self,
+            iff_true, gt_iff_lt]
+          omega
+    · have h1 : Fin.cast (insertIdx_length_fin φ φs i).symm (i.succAbove k) ∈
+        (if i.succAbove i1 < i ∧ i < i.succAbove i2 ∧ (i1 < j) then
+        Insert.insert (finCongr (insertIdx_length_fin φ φs i).symm i)
+        (insertAndContractLiftFinset φ i (φsΛ.signFinset i1 i2))
+        else
+        if i1 < j ∧ j < i2 ∧ ¬ i.succAbove i1 < i then
+          (insertAndContractLiftFinset φ i (φsΛ.signFinset i1 i2)).erase
+          (finCongr (insertIdx_length_fin φ φs i).symm (i.succAbove j))
+        else
+          (insertAndContractLiftFinset φ i (φsΛ.signFinset i1 i2))) ↔
+          Fin.cast (insertIdx_length_fin φ φs i).symm (i.succAbove k) ∈
+          (insertAndContractLiftFinset φ i (φsΛ.signFinset i1 i2)) := by
+        split
+        · simp only [Nat.succ_eq_add_one, finCongr_apply, Finset.mem_insert, or_iff_right_iff_imp]
+          intro h
+          simp only [Fin.ext_iff, Fin.val_cast] at h
+          simp only [Fin.val_eq_val] at h
+          have hn : ¬ i.succAbove k = i := Fin.succAbove_ne i k
+          exact False.elim (hn h)
+        · split
+          simp only [Nat.succ_eq_add_one, finCongr_apply, Finset.mem_erase, ne_eq,
+            and_iff_right_iff_imp]
+          intro h
+          simp only [Fin.ext_iff, Fin.val_cast]
+          simp only [Fin.val_eq_val]
+          rw [Function.Injective.eq_iff]
+          exact hkj
+          exact Fin.succAbove_right_injective
+          · simp
+      rw [h1]
+      rw [succAbove_mem_insertAndContractLiftFinset]
+      simp only [Nat.succ_eq_add_one, signFinset, finCongr_apply, Finset.mem_filter,
+        Finset.mem_univ, true_and]
+      rw [Fin.lt_def, Fin.lt_def, Fin.lt_def, Fin.lt_def]
+      simp only [Fin.val_cast, Fin.val_fin_lt]
+      rw [Fin.succAbove_lt_succAbove_iff, Fin.succAbove_lt_succAbove_iff]
+      simp only [and_congr_right_iff]
+      intro h1 h2
+      simp only [ne_eq, hkj, not_false_eq_true, insertAndContract_some_succAbove_getDual?_eq_option,
+        Nat.succ_eq_add_one, Option.map_eq_none_iff, Option.isSome_map]
+      conv_lhs =>
+        rhs
+        enter [h]
+        rw [Fin.lt_def]
+        simp only [Fin.val_cast, Option.get_map, Function.comp_apply, Fin.val_fin_lt]
+        rw [Fin.succAbove_lt_succAbove_iff]
 
 /--
 Given a Wick contraction `φsΛ` the sign defined in the following way,
@@ -264,7 +354,8 @@ lemma signInsertSomeCoef_if (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) (φsΛ
       signFinset (φsΛ ↩Λ φ i (some j))
       (finCongr (insertIdx_length_fin φ φs i).symm (i.succAbove j))
       (finCongr (insertIdx_length_fin φ φs i).symm i)⟩) := by
-  simp only [signInsertSomeCoef, insertAndContract_sndFieldOfContract_some_incl,
+  simp only [signInsertSomeCoef, Nat.succ_eq_add_one,
+    insertAndContract_sndFieldOfContract_some_incl, finCongr_apply, Fin.getElem_fin,
     insertAndContract_fstFieldOfContract_some_incl]
   split <;> simp [hφj]
 
@@ -389,32 +480,91 @@ lemma signInsertSome_mul_filter_contracted_of_lt (φ : 𝓕.FieldOp) (φs : List
     rw [Finset.disjoint_filter]
     intro j _ h
     simp only [Nat.succ_eq_add_one, not_lt, not_and, not_forall, not_or, not_le]
-    exact fun h1 => ⟨h1, by omega⟩
+    intro h1
+    use h1
+    omega
   rw [ofFinset_union, ← mul_eq_one_iff, ofFinset_union]
   simp only [Nat.succ_eq_add_one, not_lt]
   apply stat_ofFinset_eq_one_of_gradingCompliant _ _ _ hg.1
   · /- The `c.getDual? i = none` case for `stat_ofFinset_eq_one_of_gradingCompliant`. -/
     intro j hn
-    have h1 := Fin.succAbove_le_succAbove_iff (p := i) (i := j) (j := k.1)
-    have h2 := Fin.ne_succAbove i j
     simp only [uncontracted, Finset.mem_sdiff, Finset.mem_union, Finset.mem_filter, Finset.mem_univ,
       hn, Option.isSome_none, Bool.false_eq_true, IsEmpty.forall_iff, or_self, and_true, or_false,
       true_and, and_self, Finset.mem_inter, not_and, not_lt, Classical.not_imp, not_le, and_imp]
-    omega
+    intro h
+    rcases h with h | h
+    · simp only [h, or_true, isEmpty_Prop, not_le, IsEmpty.forall_iff, and_self]
+    · simp only [h, true_and]
+      refine And.intro ?_ (And.intro ?_ h.2)
+      · by_contra hkj
+        simp only [not_lt] at hkj
+        have h2 := h.2 hkj
+        apply Fin.ne_succAbove i j
+        have hij : i.succAbove j ≤ i.succAbove k.1 := Fin.succAbove_le_succAbove_iff.mpr hkj
+        omega
+      · have h1' := h.1
+        rcases h1' with h1' | h1'
+        · have hl := h.2 h1'
+          have hij : i.succAbove j ≤ i.succAbove k.1 := Fin.succAbove_le_succAbove_iff.mpr h1'
+          by_contra hn
+          apply Fin.ne_succAbove i j
+          omega
+        · exact h1'
   · /- The `(c.getDual? i).isSome` case for `stat_ofFinset_eq_one_of_gradingCompliant`. -/
     intro j hj
     have hn : ¬ φsΛ.getDual? j = none := Option.isSome_iff_ne_none.mp hj
-    have hkd := (φsΛ.getDual?_eq_none_iff_mem_uncontracted _).mpr k.2
-    have hkneqj : ↑k ≠ j := fun h => by simp [h ▸ hkd] at hj
-    have hkneqdual : k.1 ≠ (φsΛ.getDual? j).get hj := fun h => by simp [h] at hkd
-    have h2' := Fin.ne_succAbove i ((φsΛ.getDual? j).get hj)
-    have m1 := Fin.succAbove_lt_succAbove_iff (p := i) (i := j) (j := k.1)
-    have m2 := Fin.succAbove_lt_succAbove_iff (p := i) (i := (φsΛ.getDual? j).get hj) (j := k.1)
     simp only [uncontracted, Finset.mem_sdiff, Finset.mem_union, Finset.mem_filter, Finset.mem_univ,
       hn, hj, forall_true_left, false_or, true_and, and_false, false_and, Finset.mem_inter,
       not_false_eq_true, and_true, not_and, not_lt, getDual?_getDual?_get_get, reduceCtorEq,
       Option.isSome_some, Option.get_some, forall_const, and_imp]
-    omega
+    intro h1 h2
+    have hijsucc' : i.succAbove ((φsΛ.getDual? j).get hj) ≠ i := Fin.succAbove_ne i _
+    have hkneqj : ↑k ≠ j := by
+      by_contra hkj
+      have hk := k.prop
+      simp only [uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hk
+      simp_all
+    have hkneqgetdual : k.1 ≠ (φsΛ.getDual? j).get hj := by
+      by_contra hkj
+      have hk := k.prop
+      simp only [uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hk
+      simp_all
+    by_cases hik : ↑k < j
+    · have hn : ¬ j < ↑k := by omega
+      simp only [hik, true_and, hn, false_and, or_false, and_imp, and_true] at h1 h2 ⊢
+      have hir : i.succAbove j < i := by
+        rcases h1 with h1 | h1
+        · simp [h1]
+        · simp [h1]
+      simp only [hir, true_and, or_true, forall_const] at h1 h2
+      have hnkdual : ¬ ↑k < (φsΛ.getDual? j).get hj := by
+        by_contra hn
+        have h2 := h2 hn
+        apply Fin.ne_succAbove i j
+        omega
+      simp only [hnkdual, IsEmpty.forall_iff, false_and, false_or, and_imp] at h2 ⊢
+      have hnkdual : (φsΛ.getDual? j).get hj < ↑k := by omega
+      have hi : i.succAbove ((φsΛ.getDual? j).get hj) < i.succAbove k := by
+        rw [@Fin.succAbove_lt_succAbove_iff]
+        omega
+      omega
+    · have ht : j < ↑k := by omega
+      have ht' : i.succAbove j < i.succAbove k := by
+        rw [@Fin.succAbove_lt_succAbove_iff]
+        omega
+      simp only [hik, false_and, ht, true_and, false_or, and_false, or_false, and_imp] at h1 h2 ⊢
+      by_cases hik : i.succAbove j < i
+      · simp_all only [Fin.getElem_fin, ne_eq, not_lt, true_and, or_true]
+        have hn : ¬ i ≤ i.succAbove j := by omega
+        simp_all only [and_false, or_false, imp_false, not_lt, Nat.succ_eq_add_one, not_le]
+        apply And.intro
+        · apply Or.inr
+          omega
+        · intro h1 h2 h3
+          omega
+      · simp_all only [Fin.getElem_fin, ne_eq, not_lt, false_and, false_or, or_false, and_self,
+        or_true, imp_self]
+        omega
 
 /--
 The following two signs are equal for `i < i.succAbove k`.
@@ -462,27 +612,84 @@ lemma signInsertSome_mul_filter_contracted_of_not_lt (φ : 𝓕.FieldOp) (φs : 
   · /- The `c.getDual? i = none` case for `stat_ofFinset_eq_one_of_gradingCompliant`. -/
     intro j hj
     have hijsucc : i.succAbove j ≠ i := Fin.succAbove_ne i j
-    have h1 := Fin.succAbove_lt_succAbove_iff (p := i) (i := j) (j := k.1)
     simp only [uncontracted, Finset.mem_sdiff, Finset.mem_union, Finset.mem_filter, Finset.mem_univ,
       hj, Option.isSome_none, Bool.false_eq_true, IsEmpty.forall_iff, or_self, and_true, true_and,
       and_false, or_false, Finset.mem_inter, not_false_eq_true, and_self, not_and, not_lt,
       Classical.not_imp, not_le, and_imp]
+    intro h
+    have hij : i < i.succAbove j := by
+      rcases h with h | h
+      · exact h.1
+      · rcases h.1 with h1 | h1
+        · omega
+        · have hik : i.succAbove k.1 ≤ i.succAbove j := by
+            rw [Fin.succAbove_le_succAbove_iff]
+            omega
+          omega
+    simp only [hij, true_and] at h ⊢
     omega
   · /- The `(c.getDual? i).isSome` case for `stat_ofFinset_eq_one_of_gradingCompliant`. -/
     intro j hj
     have hn : ¬ φsΛ.getDual? j = none := Option.isSome_iff_ne_none.mp hj
-    have hkd := (φsΛ.getDual?_eq_none_iff_mem_uncontracted _).mpr k.2
-    have hkneqj : ↑k ≠ j := fun h => by simp [h ▸ hkd] at hj
     have hijSuc : i.succAbove j ≠ i := Fin.succAbove_ne i j
-    have hkneqdual : k.1 ≠ (φsΛ.getDual? j).get hj := fun h => by simp [h] at hkd
-    have h2' := Fin.ne_succAbove i ((φsΛ.getDual? j).get hj)
-    have m1 := Fin.succAbove_lt_succAbove_iff (p := i) (i := j) (j := k.1)
-    have m2 := Fin.succAbove_lt_succAbove_iff (p := i) (i := (φsΛ.getDual? j).get hj) (j := k.1)
+    have hkneqj : ↑k ≠ j := by
+      by_contra hkj
+      have hk := k.prop
+      simp only [uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hk
+      simp_all
+    have hkneqgetdual : k.1 ≠ (φsΛ.getDual? j).get hj := by
+      by_contra hkj
+      have hk := k.prop
+      simp only [uncontracted, Finset.mem_filter, Finset.mem_univ, true_and] at hk
+      simp_all
     simp only [uncontracted, Finset.mem_sdiff, Finset.mem_union, Finset.mem_filter, Finset.mem_univ,
       hn, hj, forall_true_left, false_or, true_and, Finset.mem_inter, not_and, not_or, not_lt,
       not_le, and_imp, and_false, false_and, not_false_eq_true, and_true, getDual?_getDual?_get_get,
       reduceCtorEq, Option.isSome_some, Option.get_some, forall_const]
-    omega
+    by_cases hik : ↑k < j
+    · have hikn : ¬ j < k.1 := by omega
+      have hksucc : i.succAbove k.1 < i.succAbove j := by
+        rw [Fin.succAbove_lt_succAbove_iff]
+        omega
+      have hkn : i < i.succAbove j := by omega
+      have hl : ¬ i.succAbove j < i := by omega
+      simp only [hkn, hikn, false_and, and_false, hl, false_or, or_self, IsEmpty.forall_iff,
+        imp_false, not_lt, true_and, implies_true, and_true, forall_const, hik,
+        imp_forall_iff_forall]
+    · have hikn : j < k.1 := by omega
+      have hksucc : i.succAbove j < i.succAbove k.1 := Fin.succAbove_lt_succAbove_iff.mpr hikn
+      simp only [hikn, true_and, forall_const, hik, false_and, or_false, IsEmpty.forall_iff,
+        and_true]
+      by_cases hij: i < i.succAbove j
+      · simp only [hij, true_and, forall_const, and_true, imp_forall_iff_forall]
+        have hijn : ¬ i.succAbove j < i := by omega
+        simp only [hijn, false_and, false_or, IsEmpty.forall_iff, imp_false, not_lt, true_and,
+          or_false, and_imp]
+        have hijle : i ≤ i.succAbove j := by omega
+        simp only [hijle, and_true, implies_true, forall_const]
+        intro h1 h2
+        apply And.intro
+        · rcases h1 with h1 | h1
+          · apply Or.inl
+            omega
+          · apply Or.inl
+            have hi : i.succAbove k.1 < i.succAbove ((φsΛ.getDual? j).get hj) :=
+              Fin.succAbove_lt_succAbove_iff.mpr h1
+            apply And.intro
+            · apply Or.inr
+              apply And.intro
+              · omega
+              · omega
+            · omega
+        · intro h3 h4
+          omega
+      · simp only [hij, false_and, false_or, IsEmpty.forall_iff, and_true, forall_const, and_false,
+        or_self, implies_true]
+        have hijn : i.succAbove j < i := by omega
+        have hijn' : ¬ i ≤ i.succAbove j := by omega
+        simp only [hijn, true_and, hijn', and_false, or_false, or_true, imp_false, not_lt,
+          forall_const]
+        exact fun h => lt_of_le_of_ne h (Fin.succAbove_ne i ((φsΛ.getDual? j).get hj))
 
 /--
 For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of

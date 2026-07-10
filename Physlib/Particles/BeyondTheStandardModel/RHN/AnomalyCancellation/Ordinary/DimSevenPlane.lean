@@ -143,49 +143,49 @@ lemma B₀_Bi_cubic {i : Fin 7} (hi : 0 ≠ i) (S : (SM 3).Charges) :
   change cubeTriLin B₀ (B i) S = 0
   rw [B₀_cubic]
   fin_cases i <;>
-    simp_all [B₁, B₂, B₃, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
+    first | exact absurd rfl hi | simp [B₁, B₂, B₃, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
 
 lemma B₁_Bi_cubic {i : Fin 7} (hi : 1 ≠ i) (S : (SM 3).Charges) :
     cubeTriLin (B 1) (B i) S = 0 := by
   change cubeTriLin B₁ (B i) S = 0
   rw [B₁_cubic]
   fin_cases i <;>
-    simp_all [B₀, B₂, B₃, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
+    first | exact absurd rfl hi | simp [B₀, B₂, B₃, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
 
 lemma B₂_Bi_cubic {i : Fin 7} (hi : 2 ≠ i) (S : (SM 3).Charges) :
     cubeTriLin (B 2) (B i) S = 0 := by
   change cubeTriLin B₂ (B i) S = 0
   rw [B₂_cubic]
   fin_cases i <;>
-    simp_all [B₀, B₁, B₃, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
+    first | exact absurd rfl hi | simp [B₀, B₁, B₃, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
 
 lemma B₃_Bi_cubic {i : Fin 7} (hi : 3 ≠ i) (S : (SM 3).Charges) :
     cubeTriLin (B 3) (B i) S = 0 := by
   change cubeTriLin (B₃) (B i) S = 0
   rw [B₃_cubic]
   fin_cases i <;>
-    simp_all [B₀, B₁, B₂, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
+    first | exact absurd rfl hi | simp [B₀, B₁, B₂, B₄, B₅, B₆, Fin.divNat, Fin.modNat]
 
 lemma B₄_Bi_cubic {i : Fin 7} (hi : 4 ≠ i) (S : (SM 3).Charges) :
     cubeTriLin (B 4) (B i) S = 0 := by
   change cubeTriLin (B₄) (B i) S = 0
   rw [B₄_cubic]
   fin_cases i <;>
-    simp_all [B₀, B₁, B₂, B₃, B₅, B₆, Fin.divNat, Fin.modNat]
+    first | exact absurd rfl hi | simp [B₀, B₁, B₂, B₃, B₅, B₆, Fin.divNat, Fin.modNat]
 
 lemma B₅_Bi_cubic {i : Fin 7} (hi : 5 ≠ i) (S : (SM 3).Charges) :
     cubeTriLin (B 5) (B i) S = 0 := by
   change cubeTriLin (B₅) (B i) S = 0
   rw [B₅_cubic]
   fin_cases i <;>
-    simp_all [B₀, B₁, B₂, B₃, B₄, B₆, Fin.divNat, Fin.modNat]
+    first | exact absurd rfl hi | simp [B₀, B₁, B₂, B₃, B₄, B₆, Fin.divNat, Fin.modNat]
 
 lemma B₆_Bi_cubic {i : Fin 7} (hi : 6 ≠ i) (S : (SM 3).Charges) :
     cubeTriLin (B 6) (B i) S = 0 := by
   change cubeTriLin (B₆) (B i) S = 0
   rw [B₆_cubic]
   fin_cases i <;>
-    simp_all [B₀, B₁, B₂, B₃, B₄, B₅, Fin.divNat, Fin.modNat]
+    first | exact absurd rfl hi | simp [B₀, B₁, B₂, B₃, B₄, B₅, Fin.divNat, Fin.modNat]
 
 lemma Bi_Bj_ne_cubic {i j : Fin 7} (h : i ≠ j) (S : (SM 3).Charges) :
     cubeTriLin (B i) (B j) S = 0 := by
@@ -200,7 +200,10 @@ lemma Bi_Bj_ne_cubic {i j : Fin 7} (h : i ≠ j) (S : (SM 3).Charges) :
 
 lemma Bi_Bi_Bj_cubic (i j : Fin 7) :
     cubeTriLin (B i) (B i) (B j) = 0 := by
-  with_unfolding_all decide +revert
+  rcases eq_or_ne i j with rfl | hij
+  · with_unfolding_all decide +revert
+  · rw [cubeTriLin.swap₂]
+    exact Bi_Bj_ne_cubic hij (B i)
 
 lemma Bi_Bj_Bk_cubic (i j k : Fin 7) :
     cubeTriLin (B i) (B j) (B k) = 0 := by

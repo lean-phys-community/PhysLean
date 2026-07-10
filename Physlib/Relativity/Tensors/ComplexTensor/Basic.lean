@@ -283,17 +283,20 @@ lemma contrPCoeff_basis {n : ℕ} {c : Fin n → complexLorentzTensor.Color} (i 
   generalize c i = ci at *
   generalize c j = cj at *
   subst h2
-  fin_cases ci
-  all_goals
-    simp [complexLorentzTensor]
-    erw [LinearEquiv.cast_apply]
-    simp only [cast_eq]
-    first
-      | erw [Fermion.leftDualContraction_basis]
-      | erw [Fermion.dualLeftContraction_basis]
-      | erw [Fermion.dualRightContraction_basis]
-      | erw [Lorentz.coContrContraction_basis]
-    grind
+  cases ci
+  all_goals simp only [complexLorentzTensor, Fin.cast_refl, id_eq]
+  · erw [Fermion.leftDualContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Fermion.dualLeftContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Fermion.rightDualContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Fermion.dualRightContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Lorentz.contrCoContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Lorentz.coContrContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
 
 end complexLorentzTensor
 end
