@@ -29,6 +29,8 @@ public import PhyslibAlpha.SpaceAndTime.Space.Surfaces.SolidSphere
 public import PhyslibAlpha.SpaceAndTime.Space.Surfaces.SphericalShell
 public import PhyslibAlpha.QuantumMechanics.QuantumHarmonicOscillator
 public import PhyslibAlpha.QuantumMechanics.StinespringDilation
+public import PhyslibAlpha.QuantumThermodynamics.Landauer
+public import PhyslibAlpha.QuantumThermodynamics.ThermalState
 public import PhyslibAlpha.Mathematics.PartialDerivativeTest
 public import PhyslibAlpha.ClassicalMechanics.CoupledSpringPotential
 public import PhyslibAlpha.Particles.BeyondTheStandardModel.TwoHDM.ChargeBalance
