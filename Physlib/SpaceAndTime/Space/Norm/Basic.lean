@@ -110,14 +110,8 @@ lemma normPowerSeries_eq_rpow {d} (n : ℕ) :
 lemma normPowerSeries_differentiable {d} (n : ℕ) :
     Differentiable ℝ (fun (x : Space d) => normPowerSeries n x) := by
   rw [normPowerSeries_eq_rpow]
-  refine Differentiable.rpow_const ?_ ?_
-  · refine (Differentiable.fun_add_iff_right ?_).mpr ?_
-    · apply Differentiable.norm_sq ℝ
-      fun_prop
-    · fun_prop
-  · intro x
-    have h1 : 0 < ‖x‖ ^ 2 + 1 / (↑n + 1) := by positivity
-    grind
+  refine Differentiable.rpow_const ?_ (fun x => Or.inl (by positivity))
+  fun_prop
 
 /-!
 
