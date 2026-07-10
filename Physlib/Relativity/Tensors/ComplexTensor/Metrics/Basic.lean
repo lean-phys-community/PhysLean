@@ -229,16 +229,24 @@ lemma coMetric_eq_basis : η' =
   rw [coMetric_eq_complexCoBasisFin4]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .down _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .down _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Lorentz in
@@ -254,16 +262,24 @@ lemma contrMetric_eq_basis : η =
   rw [contrMetric_eq_complexContrBasisFin4]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .up _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .up _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
@@ -275,10 +291,14 @@ lemma leftMetric_eq_basis : εL =
   rw [leftMetric_eq_leftHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upL _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upL _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
@@ -290,10 +310,14 @@ lemma dualLeftMetric_eq_basis : εL' =
   rw [dualLeftMetric_eq_dualLeftHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downL _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downL _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downL _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
@@ -305,10 +329,14 @@ lemma rightMetric_eq_basis : εR =
   rw [rightMetric_eq_rightHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upR _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1, 1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .upR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .upR _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 open Fermion in
@@ -320,10 +348,14 @@ lemma dualRightMetric_eq_basis : εR' =
   rw [dualRightMetric_eq_dualRightHandedWeyl_basis]
   conv_lhs =>
     enter [2]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downR _))
+    rw [fromPairT_apply_basis_repr]
   conv_lhs =>
     enter [1]
-    erw [fromPairT_apply_basis_repr]
+    change fromPairT ((complexLorentzTensor.basis .downR _) ⊗ₜ[ℂ]
+      (complexLorentzTensor.basis .downR _))
+    rw [fromPairT_apply_basis_repr]
   rfl
 
 /-!
