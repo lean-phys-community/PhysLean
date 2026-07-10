@@ -281,32 +281,23 @@ lemma totalTimeDerivative_eulerLagrange_equivalenvce [CompleteSpace X] (L L' : T
     (htot : IsTotalTimeDerivative (L' - L)) (hContDiff : (ContDiff ℝ ∞ ↿L) ∨ (ContDiff ℝ ∞ ↿L'))
     (q : Time → X) (hq : ContDiff ℝ ∞ q) : eulerLagrangeOp L q = eulerLagrangeOp L' q := by
   rcases (isTotalTimeDerivative_explicit.mp htot) with ⟨F, hFContDiff, hEq⟩
-  have hContDiff_both :  (ContDiff ℝ ∞ ↿L) ∧ (ContDiff ℝ ∞ ↿L') := by
+  have h_δL_contDiff := totalTimeDerivative_contDiff htot
+  have h_δL_contDiff_neg := totalTimeDerivative_contDiff (isTotalTimeDerivative_neg htot)
+  have hContDiff_both : (ContDiff ℝ ∞ ↿L) ∧ (ContDiff ℝ ∞ ↿L') := by
     cases hContDiff with
-      | inl hL =>
-        constructor
-        · exact hL
-        · have h_triv : ↿L' =  ↿L + ↿(L' - L) := by
-            funext tqv
-            rcases tqv with ⟨t, q', v⟩
-            rw [Pi.add_apply]
-            change L' t q' v = L t q' v + (L' - L) t q' v
-            simp
-          have h_δL_contDiff := totalTimeDerivative_contDiff htot
-          rw [h_triv]
-          exact hL.add h_δL_contDiff
-      | inr hL' =>
-        constructor
-        · have h_triv : ↿L =  ↿L' + ↿(-(L' - L)) := by
-            funext tqv
-            rcases tqv with ⟨t, q', v⟩
-            rw [Pi.add_apply]
-            change L t q' v = L' t q' v + (- (L' - L)) t q' v
-            simp
-          have h_δL_contDiff := totalTimeDerivative_contDiff (isTotalTimeDerivative_neg htot)
-          rw [h_triv]
-          exact hL'.add h_δL_contDiff
-        · exact hL'
+    | inl hL =>
+      have hL' : ContDiff ℝ ∞ ↿L' := by
+        have : ↿L' = ↿L + ↿(L' - L) := by ext tqv; rcases tqv with ⟨t, q', v⟩; simp
+        rw [this]
+        exact hL.add h_δL_contDiff
+      exact ⟨hL, hL'⟩
+    | inr hL' =>
+      have hL : ContDiff ℝ ∞ ↿L := by
+        have : ↿L = ↿L' + ↿(-(L' - L)) := by
+          ext ⟨t, q', v⟩; simp [Pi.add_apply, Pi.neg_apply, sub_eq_add_neg]
+        rw [this]
+        exact hL'.add h_δL_contDiff_neg
+      exact ⟨hL, hL'⟩
   rw [← euler_lagrange_varGradient L q hq hContDiff_both.left]
   rw [← euler_lagrange_varGradient L' q hq hContDiff_both.right]
   apply Eq.symm
@@ -347,12 +338,16 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
   let φ : X →L[ℝ] ℝ := dF.comp (ContinuousLinearMap.inr ℝ Time X)
   have hφ : ∀ v : X, δL v = φ v := by
     intro v
-    calc
-      δL v = dF ((1 : Time), v) := by simpa [dF] using hEq (0 : Time) (0 : X) v
-      _ = dF (((0 : Time), v) + ((1 : Time), (0 : X))) := by simp
-      _ = dF ((0 : Time), v) + dF ((1 : Time), (0 : X)) := by rw [dF.map_add]
-      _ = dF ((0 : Time), v) := by simp [h_time]
-      _ = φ v := by simp [φ]
+    have h := hEq (0 : Time) (0 : X) v
+    have h1 : δL v = dF ((1 : Time), v) := by simpa [dF] using h
+    have h2 : dF ((1 : Time), v) = dF ((0 : Time), v) := by
+      calc
+        dF ((1 : Time), v) = dF (((0 : Time), v) + ((1 : Time), (0 : X))) := by simp
+        _ = dF ((0 : Time), v) + dF ((1 : Time), (0 : X)) := by rw [map_add]
+        _ = dF ((0 : Time), v) + 0 := by rw [h_time]
+        _ = dF ((0 : Time), v) := by simp
+    have h3 : dF ((0 : Time), v) = φ v := by simp [φ, dF]
+    rw [h1, h2, h3]
   refine ⟨(InnerProductSpace.toDual ℝ (X)).symm φ, fun v => ?_⟩
   simp [hφ v, InnerProductSpace.toDual_symm_apply]
 
