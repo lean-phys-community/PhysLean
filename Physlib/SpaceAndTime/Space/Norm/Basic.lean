@@ -382,15 +382,12 @@ lemma IsDistBounded.normPowerSeries_log {d : ℕ} (n : ℕ) :
     IsDistBounded (d := d) (fun x => Real.log (normPowerSeries n x)) := by
   apply IsDistBounded.mono (f := fun x => (normPowerSeries n x)⁻¹ + (normPowerSeries n x))
   · fun_prop
-  · apply AEMeasurable.aestronglyMeasurable
-    fun_prop
+  · apply AEMeasurable.aestronglyMeasurable; fun_prop
   · intro x
-    simp only [Real.norm_eq_abs]
-    conv_rhs => rw [abs_of_nonneg (by
-      apply add_nonneg
-      · simp
-      · simp)]
-    exact normPowerSeries_log_le_normPowerSeries n x
+    have h := normPowerSeries_log_le_normPowerSeries n x
+    have h_nonneg : 0 ≤ (normPowerSeries n x)⁻¹ + (normPowerSeries n x) :=
+      add_nonneg (inv_nonneg.mpr (normPowerSeries_nonneg n x)) (normPowerSeries_nonneg n x)
+    simpa [Real.norm_eq_abs, abs_of_nonneg h_nonneg] using h
 
 /-!
 

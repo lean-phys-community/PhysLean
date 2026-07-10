@@ -588,8 +588,7 @@ lemma trajectory_energy (IC : InitialConditions) : S.energy (IC.trajectory S) =
     fun _ => 1/2 * (S.m * ‖IC.v₀‖ ^2 + S.k * ‖IC.x₀‖ ^ 2) := by
   funext t
   rw [energy_conservation_of_equationOfMotion' _ _ (by fun_prop) (trajectory_equationOfMotion S IC)]
-  simp [energy, kineticEnergy, potentialEnergy]
-  ring
+  simp [energy, kineticEnergy, potentialEnergy]; ring
 
 end InitialConditions
 

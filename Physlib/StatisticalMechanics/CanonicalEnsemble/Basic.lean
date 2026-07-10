@@ -425,10 +425,7 @@ lemma mathematicalPartitionFunction_add {T : Temperature} :
 @[simp]
 lemma mathematicalPartitionFunction_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
     (𝓒.congr e).mathematicalPartitionFunction T = 𝓒.mathematicalPartitionFunction T := by
-  rw [mathematicalPartitionFunction_eq_integral, mathematicalPartitionFunction_eq_integral]
-  simp only [congr]
-  rw [integral_map_equiv]
-  simp
+  simp [mathematicalPartitionFunction_eq_integral, congr, integral_map_equiv]
 
 /-- The `mathematicalPartitionFunction_nsmul` function of `n` copies of a canonical ensemble. -/
 lemma mathematicalPartitionFunction_nsmul (n : ℕ) (T : Temperature) :
@@ -719,29 +716,17 @@ lemma differentialEntropy_nonneg_of_prob_le_one
     (hInt : Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T))
     (hP_le_one : ∀ i, 𝓒.probability T i ≤ 1) :
     0 ≤ 𝓒.differentialEntropy T := by
-  have hPoint :
-      (fun i => Real.log (𝓒.probability T i)) ≤ᵐ[𝓒.μProd T] fun _ => 0 := by
-    refine Filter.Eventually.of_forall ?_
-    intro i
-    have hpos := probability_pos (𝓒:=𝓒) (T:=T) i
-    have hle := hP_le_one i
-    have hle' : 𝓒.probability T i ≤ Real.exp 0 := by
-      simpa [Real.exp_zero] using hle
-    exact (log_le_iff_le_exp hpos).mpr hle'
-  have hInt0 : Integrable (fun _ : ι => (0 : ℝ)) (𝓒.μProd T) := integrable_const _
-  have hIntLe : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T)
-      ≤ (∫ _i, (0 : ℝ) ∂𝓒.μProd T) :=
-    integral_mono_ae hInt hInt0 hPoint
-  have hent :
-      𝓒.differentialEntropy T
-        = - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) := rfl
+  have hPoint : (fun i => Real.log (𝓒.probability T i)) ≤ᵐ[𝓒.μProd T] fun _ => 0 :=
+    Filter.Eventually.of_forall fun i => by
+      have hpos := probability_pos (𝓒:=𝓒) (T:=T) i
+      have hle' : 𝓒.probability T i ≤ Real.exp 0 := by
+        simpa [Real.exp_zero] using hP_le_one i
+      exact (log_le_iff_le_exp hpos).mpr hle'
   have hkB : 0 ≤ kB := kB_nonneg
   have hIle0 : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) ≤ 0 := by
-    simpa [integral_const] using hIntLe
-  have hProd :
-      0 ≤ - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) :=
+    simpa [integral_const] using integral_mono_ae hInt (integrable_const _) hPoint
+  simpa [differentialEntropy] using
     mul_nonneg_of_nonpos_of_nonpos (neg_nonpos.mpr hkB) hIle0
-  simpa [hent] using hProd
 
 /-!
 

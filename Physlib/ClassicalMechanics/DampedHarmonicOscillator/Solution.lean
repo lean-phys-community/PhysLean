@@ -407,8 +407,9 @@ lemma trajectory_equationOfMotion (IC : InitialConditions) :
   · by_cases hCritical : S.IsCriticallyDamped
     · exact S.trajectory_equationOfMotion_of_criticallyDamped IC hCritical
     · have hOver : S.IsOverdamped := by
-        rw [IsOverdamped, IsUnderdamped] at *
-        exact lt_of_le_of_ne (not_lt.mp hUnder) (Ne.symm hCritical)
+        dsimp [IsOverdamped, IsUnderdamped, IsCriticallyDamped] at hUnder hCritical ⊢
+        have hle : 0 ≤ S.discriminant := not_lt.mp hUnder
+        exact lt_of_le_of_ne hle (Ne.symm hCritical)
       exact S.trajectory_equationOfMotion_of_overdamped IC hOver
 
 /-!
