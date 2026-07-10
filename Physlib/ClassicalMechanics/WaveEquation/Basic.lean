@@ -101,11 +101,7 @@ lemma planeWave_differentiable_space {d f₀ c t} {s : Direction d}
   simp only [planeWave_eq]
   apply Differentiable.comp
   · fun_prop
-  · apply Differentiable.sub
-    · refine Differentiable.inner ℝ ?_ ?_
-      · fun_prop
-      · fun_prop
-    · fun_prop
+  apply Differentiable.sub <;> fun_prop
 
 @[fun_prop]
 lemma planeWave_differentiable {s : Direction d}
@@ -116,8 +112,7 @@ lemma planeWave_differentiable {s : Direction d}
   apply Differentiable.comp
   · fun_prop
   · apply Differentiable.sub
-    · apply Differentiable.inner
-      repeat fun_prop
+    · apply Differentiable.inner <;> fun_prop
     · fun_prop
 
 /-!
@@ -125,6 +120,10 @@ lemma planeWave_differentiable {s : Direction d}
 ### B.3. Time derivatives of plane waves
 
 -/
+
+lemma iteratedDeriv_two_eq_deriv_deriv (f : ℝ → EuclideanSpace ℝ (Fin d)) :
+    iteratedDeriv 2 f = deriv (deriv f) := by
+  ext x; rw [iteratedDeriv_succ', iteratedDeriv_one]
 
 lemma planeWave_time_deriv {d f₀ c x} {s : Direction d}
     (h' : Differentiable ℝ f₀) :
@@ -140,7 +139,7 @@ lemma planeWave_time_deriv {d f₀ c x} {s : Direction d}
   left
   simp
   rfl
-  repeat fun_prop
+  all_goals fun_prop
 
 lemma planeWave_time_deriv_time_deriv {d f₀ c x} {s : Direction d}
     (h' : ContDiff ℝ 2 f₀) :
@@ -156,11 +155,7 @@ lemma planeWave_time_deriv_time_deriv {d f₀ c x} {s : Direction d}
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, PiLp.smul_apply, smul_eq_mul, neg_mul,
     mul_neg, neg_neg]
   ring_nf
-  suffices h : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) =
-      fun x => iteratedDeriv 2 f₀ x by rw [h]
-  funext x
-  erw [iteratedDeriv_succ]
-  simp only [iteratedDeriv_one]
+  rw [iteratedDeriv_two_eq_deriv_deriv f₀]
 
 /-!
 
@@ -187,7 +182,7 @@ lemma planeWave_space_deriv {d f₀ c} {s : Direction d}
     fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add, mul_eq_mul_left_iff]
   left
   simp [planeWave_eq]
-  repeat fun_prop
+  all_goals fun_prop
 
 lemma planeWave_apply_space_deriv {d f₀ c} {s : Direction d}
     (h' : Differentiable ℝ f₀) (i j : Fin d) :
@@ -241,12 +236,8 @@ lemma planeWave_apply_space_deriv_space_deriv {d f₀ c} {s : Direction d}
   rw [← Space.deriv_eq_fderiv_basis, planeWave_apply_space_deriv]
   simp only [fderiv_eq_smul_deriv, one_smul, Pi.smul_apply, smul_eq_mul]
   ring_nf
-  suffices h : (fun x => _root_.deriv (fun x => _root_.deriv f₀ x) x) =
-      fun x => iteratedDeriv 2 f₀ x by rw [h]
-  ext x i
-  erw [iteratedDeriv_succ']
-  simp only [iteratedDeriv_one]
-  repeat fun_prop
+  rw [iteratedDeriv_two_eq_deriv_deriv f₀]
+  all_goals fun_prop
 
 /-!
 
@@ -293,7 +284,7 @@ lemma wave_differentiable {s : Direction d} {c : ℝ} {x : Space d} :
     DifferentiableAt ℝ (fun x => inner ℝ x s.unit - c * t) x := by
   apply DifferentiableAt.sub
   apply DifferentiableAt.inner
-  repeat fun_prop
+  all_goals fun_prop
 
 lemma wave_dx2 {u v : Fin d} {s : Direction d}
     {f₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin d)} {f₀'' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin d)}
@@ -429,6 +420,6 @@ lemma wave_fderiv_inner_eq_inner_fderiv_proj {f₀ : ℝ → EuclideanSpace ℝ 
   rw [← mul_one (s.unit i), ← smul_eq_mul (s.unit i)]
   rw [← mul_one (inner ℝ y s.unit), ← smul_eq_mul (inner ℝ y s.unit)]
   simp only [smul_eq_mul, mul_comm, one_mul, ← mul_assoc]
-  repeat fun_prop
+  all_goals fun_prop
 
 end ClassicalMechanics

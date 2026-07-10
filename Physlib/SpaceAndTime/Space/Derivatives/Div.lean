@@ -156,13 +156,9 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     IsLinearMap ℝ (fun w => ∇ ⬝ (f w)) := by
   constructor
   · intro w w'
-    rw [hf'.map_add]
-    rw [div_add]
-    repeat fun_prop
+    rw [hf'.map_add, div_add (f1 := f w) (f2 := f w') (hf1 := hf w) (hf2 := hf w')]
   · intros k w
-    rw [hf'.map_smul]
-    rw [div_smul]
-    fun_prop
+    rw [hf'.map_smul, div_smul (f := f w) (hf := hf w)]
 
 /-!
 

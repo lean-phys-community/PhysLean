@@ -273,7 +273,7 @@ lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : Con
   congr 1
   simp only [smul_add]
   module
-  repeat fun_prop
+  all_goals fun_prop
 
 lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (fun t => potentialEnergy S (xₜ t)) = fun t => ⟪∂ₜ xₜ t, S.k • xₜ t⟫_ℝ := by
@@ -293,10 +293,7 @@ lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : C
     congr 1
     module
   rw [real_inner_comm, ← inner_smul_right]
-  repeat fun_prop
-  apply Differentiable.differentiableAt
-  rw [contDiff_infty_iff_fderiv] at hx
-  exact hx.1
+  all_goals (first | fun_prop | exact (hx.contDiffAt (x := t)).differentiableAt (by simp))
 
 lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (energy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t⟫_ℝ := by
@@ -309,8 +306,7 @@ lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff �
   rw [potentialEnergy_deriv, kineticEnergy_deriv]
   simp only
   rw [← inner_add_right]
-  fun_prop
-  fun_prop
+  all_goals fun_prop
 
 /-!
 
@@ -374,19 +370,7 @@ The lagrangian is smooth in all its arguments.
 @[fun_prop]
 lemma contDiff_lagrangian (n : WithTop ℕ∞) : ContDiff ℝ n ↿S.lagrangian := by
   rw [lagrangian_eq]
-  apply ContDiff.sub
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_snd.comp contDiff_snd)
-        (contDiff_snd.comp contDiff_snd)
-  · apply ContDiff.mul
-    · apply ContDiff.mul
-      · exact contDiff_const
-      · exact contDiff_const
-    · exact ContDiff.inner (𝕜 := ℝ) (contDiff_fst.comp contDiff_snd)
-        (contDiff_fst.comp contDiff_snd)
+  fun_prop
 
 lemma toDual_symm_innerSL (x : EuclideanSpace ℝ (Fin 1)) :
     (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin 1))).symm (innerSL ℝ x) = x := by
@@ -400,8 +384,6 @@ lemma gradient_inner_self (x : EuclideanSpace ℝ (Fin 1)) :
   unfold gradient
   rw [InnerProductSpace.toDual_symm_apply]
   have hid : DifferentiableAt ℝ (fun y : EuclideanSpace ℝ (Fin 1) => y) x := differentiableAt_id
-  rw [show (fun y : EuclideanSpace ℝ (Fin 1) => ⟪y, y⟫_ℝ) =
-      fun y => ⟪(fun y => y) y, (fun y => y) y⟫_ℝ from rfl]
   rw [fderiv_inner_apply (𝕜 := ℝ) hid hid]
   simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, real_inner_comm, inner_smul_left',
     ringHom_apply]
@@ -550,17 +532,9 @@ We now show that the force is equal to `- k x`.
 /-- The force on the classical harmonic oscillator is `- k x`. -/
 lemma force_eq_linear (x : EuclideanSpace ℝ (Fin 1)) : force S x = - S.k • x := by
   unfold force potentialEnergy
-  have hpot : (fun y : EuclideanSpace ℝ (Fin 1) => (1 / (2 : ℝ)) • S.k • ⟪y, y⟫_ℝ) =
-      fun y => ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ := by
-    funext y
-    simp [smul_eq_mul, mul_assoc]
-  rw [hpot]
-  have hgrad : gradient (fun y : EuclideanSpace ℝ (Fin 1) => ((1 / (2 : ℝ)) * S.k) * ⟪y, y⟫_ℝ) x
-      = S.k • x := by
-    simpa [smul_eq_mul, mul_assoc] using
-      (gradient_const_mul_inner_self (c := (1 / (2 : ℝ)) * S.k) x)
-  rw [hgrad]
-  simp [neg_smul]
+  simp only [smul_eq_mul]
+  simpa [mul_assoc] using congrArg Neg.neg
+    (gradient_const_mul_inner_self (c := (1/2) * S.k) x)
 
 /-!
 
@@ -578,19 +552,8 @@ lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx :
   rw [gradLagrangian_eq_eulerLagrangeOp S xₜ hx, eulerLagrangeOp]
   congr
   · simp [gradient_lagrangian_position_eq, force_eq_linear]
-  · conv_lhs =>
-      arg 1
-      ext t'
-      rw [gradient_lagrangian_velocity_eq]
-    show ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t = S.m • ∂ₜ (∂ₜ xₜ) t
-    have hd : DifferentiableAt ℝ (∂ₜ xₜ) t :=
-      (deriv_differentiable_of_contDiff xₜ hx).differentiableAt
-    calc
-      ∂ₜ (fun t' => S.m • ∂ₜ xₜ t') t
-          = fderiv ℝ (fun t' => S.m • ∂ₜ xₜ t') t 1 := rfl
-      _ = S.m • (fderiv ℝ (∂ₜ xₜ) t 1) := by
-          exact congrArg (fun L => L 1) (fderiv_const_smul (c := S.m) (f := ∂ₜ xₜ) hd)
-      _ = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
+  · simp [gradient_lagrangian_velocity_eq, Time.deriv_smul (∂ₜ xₜ) S.m
+      (deriv_differentiable_of_contDiff xₜ hx)]
 
 /-!
 
@@ -636,9 +599,7 @@ lemma energy_conservation_of_equationOfMotion (xₜ : Time → EuclideanSpace �
   rw [energy_deriv _ _ hx]
   rw [equationOfMotion_iff_newtons_2nd_law _ _ hx] at h
   funext x
-  simp only [Pi.zero_apply]
-  rw [h]
-  simp [force_eq_linear]
+  simp [h x, force_eq_linear]
 
 /-!
 

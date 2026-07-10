@@ -116,8 +116,8 @@ lemma ofβ_differentiableOn :
     · intro x hx
       exact mul_ne_zero kB_ne_zero (ne_of_gt hx)
   · intro x hx
-    rw [show ((ofβ (Real.toNNReal x)).val : ℝ) = (ofβ (Real.toNNReal x)).toReal from rfl,
-        ofβ_toReal, Real.coe_toNNReal x hx.le]
+    rw [show ((ofβ x.toNNReal).val : ℝ) = (ofβ x.toNNReal).toReal from rfl,
+      ofβ_toReal x.toNNReal, Real.coe_toNNReal x hx.le]
 
 /-! ### Convergence -/
 
@@ -126,8 +126,7 @@ open Filter Topology
 /-- Eventually, `ofβ β` is positive as β → ∞`. -/
 lemma eventually_pos_ofβ : ∀ᶠ b : ℝ≥0 in atTop, ((Temperature.ofβ b : Temperature) : ℝ) > 0 := by
   filter_upwards [eventually_gt_atTop 0] with b hb
-  have : 0 < (1 : ℝ) / (kB * (b : ℝ)) := one_div_pos.mpr (mul_pos kB_pos (by exact_mod_cast hb))
-  simpa [ofβ_toReal] using this
+  simpa [ofβ_toReal] using one_div_pos.mpr (mul_pos kB_pos (by exact_mod_cast hb))
 
 /-- General helper: for any `a > 0`, we have `1 / (a * b) → 0` as `b → ∞` in `ℝ≥0`. -/
 private lemma tendsto_const_inv_mul_atTop (a : ℝ) (ha : 0 < a) :
@@ -198,19 +197,15 @@ lemma beta_fun_T_eq_on_Ioi :
 
 lemma deriv_beta_wrt_T (T : Temperature) (hT_pos : 0 < T.val) :
     HasDerivWithinAt betaFromReal (-1 / (kB * (T.val : ℝ)^2)) (Set.Ioi 0) (T.val : ℝ) := by
-  have hTne : (T.val : ℝ) ≠ 0 := ne_of_gt hT_pos
-  have hg : HasDerivAt (fun t : ℝ => kB * t) kB (T.val : ℝ) := by
-    simpa using (hasDerivAt_id (T.val : ℝ)).const_mul kB
   have h_deriv : HasDerivAt (fun t : ℝ => 1 / (kB * t))
       (-1 / (kB * (T.val : ℝ) ^ 2)) (T.val : ℝ) := by
-    have h := (hasDerivAt_const (T.val : ℝ) (1 : ℝ)).div hg (mul_ne_zero kB_ne_zero hTne)
+    have hg : HasDerivAt (fun t : ℝ => kB * t) kB (T.val : ℝ) := by
+      simpa using (hasDerivAt_id (T.val : ℝ)).const_mul kB
+    have h := (hasDerivAt_const (T.val : ℝ) (1 : ℝ)).div hg (mul_ne_zero kB_ne_zero (ne_of_gt hT_pos))
     have hval : (-1 : ℝ) / (kB * (T.val : ℝ) ^ 2)
         = (0 * (kB * (T.val : ℝ)) - 1 * kB) / (kB * (T.val : ℝ)) ^ 2 := by
-      rw [mul_pow]
-      field_simp
-      ring
-    rw [hval]
-    exact h
+      field_simp; ring
+    rw [hval]; exact h
   exact (h_deriv.hasDerivWithinAt).congr beta_fun_T_eq_on_Ioi (beta_fun_T_eq_on_Ioi hT_pos)
 
 /-- Chain rule for β(T) : d/dT F(β(T)) = F'(β(T)) * (-1 / (kB * T^2)), within `Ioi 0`. -/
@@ -219,17 +214,12 @@ lemma chain_rule_T_beta {F : ℝ → ℝ} {F' : ℝ}
     (hF_deriv : HasDerivWithinAt F F' (Set.Ioi 0) (T.β : ℝ)) :
     HasDerivWithinAt (fun t : ℝ => F (betaFromReal t))
       (F' * (-1 / (kB * (T.val : ℝ)^2))) (Set.Ioi 0) (T.val : ℝ) := by
-  have h_map : Set.MapsTo betaFromReal (Set.Ioi 0) (Set.Ioi 0) := by
-    intro t ht
-    show 0 < betaFromReal t
-    rw [beta_fun_T_eq_on_Ioi ht]
-    exact one_div_pos.mpr (mul_pos kB_pos ht)
+  have h_map : Set.MapsTo betaFromReal (Set.Ioi 0) (Set.Ioi 0) :=
+    fun t ht => by
+      rw [beta_fun_T_eq_on_Ioi ht]
+      exact one_div_pos.mpr (mul_pos kB_pos ht)
   have h_beta_at_T : betaFromReal (T.val : ℝ) = (T.β : ℝ) := by
-    rw [beta_fun_T_eq_on_Ioi (show (T.val : ℝ) ∈ Set.Ioi 0 from hT_pos), β_toReal]
-    rfl
-  have hF_deriv' : HasDerivWithinAt F F' (Set.Ioi 0) (betaFromReal (T.val : ℝ)) := by
-    rw [h_beta_at_T]
-    exact hF_deriv
-  exact hF_deriv'.comp (T.val : ℝ) (deriv_beta_wrt_T (T := T) hT_pos) h_map
+    simpa [β_toReal, Temperature.toReal] using beta_fun_T_eq_on_Ioi hT_pos
+  exact (h_beta_at_T ▸ hF_deriv).comp (T.val : ℝ) (deriv_beta_wrt_T (T := T) hT_pos) h_map
 
 end Temperature

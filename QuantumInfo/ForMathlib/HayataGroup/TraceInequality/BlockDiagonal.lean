@@ -194,35 +194,17 @@ theorem blockDiagonal_nonneg {A B : L ℋ} (hA : 0 ≤ A) (hB : 0 ≤ B) :
   intro z
   have hAz := (ContinuousLinearMap.isPositive_iff_complex A).mp hApos (hsumProj ℋ 0 z)
   have hBz := (ContinuousLinearMap.isPositive_iff_complex B).mp hBpos (hsumProj ℋ 1 z)
-  have hz0 :
-      inner ℂ ((hsumIncl ℋ 0) (A (hsumProj ℋ 0 z))) z =
-        inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z) := by
+  have hsum0 : inner ℂ ((hsumIncl ℋ 0) (A (hsumProj ℋ 0 z))) z =
+      inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z) := by
     simp [hsumProj, hsumIncl, hsumEquiv, PiLp.inner_apply]
-  have hz1 :
-      inner ℂ ((hsumIncl ℋ 1) (B (hsumProj ℋ 1 z))) z =
-        inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z) := by
+  have hsum1 : inner ℂ ((hsumIncl ℋ 1) (B (hsumProj ℋ 1 z))) z =
+      inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z) := by
     simp [hsumProj, hsumIncl, hsumEquiv, PiLp.inner_apply]
+  dsimp [blockDiagonal]
+  erw [inner_add_left, hsum0, hsum1]
   constructor
+  · simpa [map_add] using congrArg₂ (· + ·) hAz.1 hBz.1
   · dsimp [blockDiagonal]
-    erw [inner_add_left, hz0, hz1]
-    calc
-      ↑(RCLike.re
-          (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z) +
-            inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z))) =
-          ↑(RCLike.re (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z)) +
-            RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z))) := by
-            simp
-      _ = inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z) +
-          inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z) := by
-            have hsumre :
-                (↑(RCLike.re (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z)) +
-                    RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z))) : ℂ) =
-                  ((RCLike.re (inner ℂ (A (hsumProj ℋ 0 z)) (hsumProj ℋ 0 z)) : ℂ) +
-                    (RCLike.re (inner ℂ (B (hsumProj ℋ 1 z)) (hsumProj ℋ 1 z)) : ℂ)) := by
-                  simp
-            rw [hsumre, hAz.1, hBz.1]
-  · dsimp [blockDiagonal]
-    erw [inner_add_left, hz0, hz1]
     exact add_nonneg hAz.2 hBz.2
 
 omit [CompleteSpace ℋ] [Nontrivial ℋ] in

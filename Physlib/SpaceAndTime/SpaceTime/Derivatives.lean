@@ -238,19 +238,20 @@ lemma deriv_commute {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : �
     (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (hf : ContDiff ℝ 2 f) :
     ∂_ μ (∂_ ν f) = ∂_ ν (∂_ μ f) := by
   ext x
-  show fderiv ℝ (fun y => fderiv ℝ f y (Lorentz.Vector.basis ν)) x (Lorentz.Vector.basis μ) =
+  have h_symm : IsSymmSndFDerivAt ℝ f x :=
+    (hf.contDiffAt (x := x)).isSymmSndFDerivAt (by norm_num)
+  change fderiv ℝ (fun y => fderiv ℝ f y (Lorentz.Vector.basis ν)) x (Lorentz.Vector.basis μ) =
     fderiv ℝ (fun y => fderiv ℝ f y (Lorentz.Vector.basis μ)) x (Lorentz.Vector.basis ν)
-  rw [fderiv_clm_apply, fderiv_clm_apply]
+  have hc : DifferentiableAt ℝ (fderiv ℝ f) x := by
+    have hct := hf.contDiffAt (x := x)
+    have hderiv : ContDiffAt ℝ 1 (fderiv ℝ f) x := hct.fderiv_right (by norm_num)
+    exact hderiv.differentiableAt one_ne_zero
+  have hu_μ : DifferentiableAt ℝ (fun (_ : SpaceTime d) => Lorentz.Vector.basis μ) x := by fun_prop
+  have hu_ν : DifferentiableAt ℝ (fun (_ : SpaceTime d) => Lorentz.Vector.basis ν) x := by fun_prop
+  rw [fderiv_clm_apply hc hu_ν, fderiv_clm_apply hc hu_μ]
   simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
     ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt
-    exact hf.contDiffAt
-    simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
-  · have h1 := hf.differentiable (by norm_cast); fun_prop
-  · fun_prop
-  · have h1 := hf.differentiable (by norm_cast); fun_prop
-  · fun_prop
+  rw [IsSymmSndFDerivAt.eq h_symm]
 
 /-!
 
@@ -327,7 +328,7 @@ lemma deriv_sum_inr {d : ℕ} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ
   · rw [← toTimeAndSpace_basis_inr (c := c)]
     simp
   · rfl
-  repeat' fun_prop
+  all_goals fun_prop
 
 lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
     [NormedSpace ℝ M] (c : SpeedOfLight) (f : SpaceTime d → M)
@@ -357,7 +358,7 @@ lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
   rw [← map_smul]
   rw [← toTimeAndSpace_basis_inl' (c := c)]
   simp only [Fin.isValue, ContinuousLinearEquiv.symm_apply_apply]
-  repeat' fun_prop
+  all_goals fun_prop
 
 /-!
 

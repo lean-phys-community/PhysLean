@@ -128,7 +128,7 @@ lemma fderiv_space_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M
   rw [DifferentiableAt.fderiv_prodMk]
   simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.prod_apply,
     _root_.zero_apply, ContinuousLinearMap.coe_id', id_eq]
-  repeat' fun_prop
+  all_goals fun_prop
 
 lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Time → Space d → M) (t dt : Time) (x : Space d)
@@ -140,7 +140,7 @@ lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
   rw [DifferentiableAt.fderiv_prodMk]
   simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
     ContinuousLinearMap.coe_id', id_eq, _root_.zero_apply]
-  repeat' fun_prop
+  all_goals fun_prop
 
 /-!
 
@@ -264,10 +264,7 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
        rw [Time.deriv_euclid]
        have h1 := hf.differentiable (by simp)
        fun_prop)
-    repeat' fun_prop
-    all_goals
-      apply Differentiable.differentiableAt
-      fun_prop
+    all_goals (first | fun_prop | (apply Differentiable.differentiableAt; fun_prop))
   · fun_prop
 
 /-!

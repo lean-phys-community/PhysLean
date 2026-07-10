@@ -171,9 +171,8 @@ lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
   rw [deriv_eq_fderiv_fun]
   ext x
-  rw [fderiv_add]
+  rw [fderiv_add (hf1 x) (hf2 x)]
   rfl
-  repeat fun_prop
 
 /-- Derivatives on space distribute coordinate-wise over addition. -/
 lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
@@ -181,11 +180,10 @@ lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
     (∂[u] (fun x => f1 x i + f2 x i)) =
       (∂[u] (fun x => f1 x i)) + (∂[u] (fun x => f2 x i)) := by
   rw [deriv_eq_fderiv_fun, deriv_eq_fderiv_fun, deriv_eq_fderiv_fun]
-  simp only
   ext x
-  rw [fderiv_fun_add]
-  simp only [_root_.add_apply, Pi.add_apply]
-  repeat fun_prop
+  rw [fderiv_fun_add, _root_.add_apply]
+  simp
+  all_goals fun_prop
 
 /-- Derivatives on space distribute over subtraction. -/
 @[to_fun]
@@ -194,9 +192,8 @@ lemma deriv_sub [NormedAddCommGroup M] [NormedSpace ℝ M]
     ∂[u] (f1 - f2) = ∂[u] f1 - ∂[u] f2 := by
   rw [deriv_eq_fderiv_fun]
   ext x
-  rw [fderiv_sub]
+  rw [fderiv_sub (hf1 x) (hf2 x)]
   rfl
-  repeat fun_prop
 
 /-!
 
@@ -247,7 +244,7 @@ lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
   apply ContDiffAt.isSymmSndFDerivAt
   exact ContDiff.contDiffAt hf
   simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
-  repeat fun_prop
+  all_goals fun_prop
 
 /-!
 
@@ -532,22 +529,21 @@ lemma schwartMap_fderiv_comm {d}
     ((SchwartzMap.evalCLM ℝ (Space d) ℝ (basis ν))
       ((fderivCLM ℝ (Space d) ℝ) ((SchwartzMap.evalCLM ℝ (Space d) ℝ (basis μ))
       ((fderivCLM ℝ (Space d) ℝ) η)))) x := by
-  have h1 := η.smooth
-  have h2 := h1 2
+  have h_symm : IsSymmSndFDerivAt ℝ η x :=
+    ((η.smooth 2).contDiffAt (x := x)).isSymmSndFDerivAt (by norm_num)
+  have h_contDiff : ContDiff ℝ (2 : ℕ∞) η := η.smooth 2
+  have hd : DifferentiableAt ℝ (fderiv ℝ η) x := by
+    have hct := h_contDiff.contDiffAt (x := x)
+    have hderiv : ContDiffAt ℝ 1 (fderiv ℝ η) x := hct.fderiv_right (by norm_num)
+    exact hderiv.differentiableAt one_ne_zero
+  have hconst_μ : DifferentiableAt ℝ (fun (_ : Space d) => basis μ) x := by fun_prop
+  have hconst_ν : DifferentiableAt ℝ (fun (_ : Space d) => basis ν) x := by fun_prop
   change fderiv ℝ (fun x => fderiv ℝ η x (basis ν)) x (basis μ) =
     fderiv ℝ (fun x => fderiv ℝ η x (basis μ)) x (basis ν)
-  rw [fderiv_clm_apply, fderiv_clm_apply]
+  rw [fderiv_clm_apply hd hconst_ν, fderiv_clm_apply hd hconst_μ]
   simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
     ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  apply ContDiffAt.isSymmSndFDerivAt (n := 2)
-  · refine ContDiff.contDiffAt ?_
-    exact h2
-  · simp
-  · fun_prop
-  · exact differentiableAt_const (basis μ)
-  · fun_prop
-  · exact differentiableAt_const (basis ν)
+  rw [IsSymmSndFDerivAt.eq h_symm]
 
 lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ ν : Fin d) (f : (Space d) →d[ℝ] M) :

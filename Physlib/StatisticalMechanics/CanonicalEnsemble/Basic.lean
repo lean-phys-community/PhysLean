@@ -346,7 +346,7 @@ lemma μBolt_congr (e : ι1 ≃ᵐ ι) (T : Temperature) : (𝓒.congr e).μBolt
   congr
   funext i
   simp only [Pi.mul_apply, MeasurableEquiv.apply_symm_apply]
-  repeat fun_prop
+  all_goals fun_prop
 
 lemma μBolt_nsmul [SigmaFinite 𝓒.μ] (n : ℕ) (T : Temperature) :
     (nsmul n 𝓒).μBolt T = MeasureTheory.Measure.pi fun _ => (𝓒.μBolt T) := by

@@ -134,24 +134,20 @@ lemma isExtrema_iff_tensors {𝓕 : FreeSpace}
   · intro h
     simp only [IsExtrema] at h
     intro x
-    have h1 : ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
-        (permT id (IsReindexing.auto) {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
-        - (J x | ν')}ᵀ)) = 0 := by
-      funext ν
-      have h2 : gradLagrangian 𝓕 A J x ν = 0 := by simp [h]
-      rw [gradLagrangian_eq_tensor A hA J hJ] at h2
-      simp only [one_div, map_smul, map_neg, map_add,
-        permT_permT, CompTriple.comp_eq, apply_add, apply_smul, Lorentz.Vector.neg_apply,
-        mul_eq_zero] at h2
+    let V := {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
+      - (J x | ν')}ᵀ
+    have h_tensor_eq : (Tensorial.toTensor (M := Lorentz.Vector d)).symm
+        (permT id (IsReindexing.auto) V) = 0 := by
+      ext ν
+      have hgrad := congr_fun (congr_fun h x) ν
+      rw [gradLagrangian_eq_tensor A hA J hJ x ν] at hgrad
       have hn : η ν ν ≠ 0 := η_diag_ne_zero
-      simp_all only [false_or, ne_eq, one_div, map_smul,
-        map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add, apply_smul,
-        Lorentz.Vector.neg_apply, Lorentz.Vector.zero_apply]
-    generalize {((1/ 𝓕.μ₀ : ℝ) • tensorDeriv A.toFieldStrength x | κ κ ν') +
-        - (J x | ν')}ᵀ = V at *
-    simp only [EmbeddingLike.map_eq_zero_iff] at h1
-    rw [permT_eq_zero_iff] at h1
-    exact h1
+      apply mul_eq_zero.mp at hgrad
+      rcases hgrad with hη | hX
+      · exact (hn hη).elim
+      · exact hX
+    rw [EmbeddingLike.map_eq_zero_iff] at h_tensor_eq
+    rwa [permT_eq_zero_iff] at h_tensor_eq
   · intro h
     simp only [IsExtrema]
     funext x
@@ -193,32 +189,24 @@ lemma isExtrema_lorentzGroup_apply_iff {𝓕 : FreeSpace}
     simp only [one_div, map_smul, actionT_smul,
       contrT_equivariant, map_neg, permT_equivariant]
     rw [smul_comm, ← Tensor.actionT_neg, ← Tensor.actionT_add]
-  apply Iff.intro
-  · intro h
-    rw [isExtrema_iff_tensors A hA J hJ]
-    intro x
+  rw [isExtrema_iff_tensors A hA J hJ]
+  constructor
+  · intro h x
     apply MulAction.injective Λ
     simp only [one_div, map_smul, map_neg,
       _root_.smul_add, actionT_smul, _root_.smul_neg, _root_.smul_zero]
     simpa using h (Λ • x)
   · intro h x
-    rw [isExtrema_iff_tensors A hA J hJ] at h
     specialize h (Λ⁻¹ • x)
     simp at h
     rw [h]
     simp
   · change ContDiff ℝ ∞ (actionCLM Λ ∘ A ∘ actionCLM Λ⁻¹)
-    apply ContDiff.comp
-    · exact ContinuousLinearMap.contDiff (actionCLM Λ)
-    · apply ContDiff.comp
-      · exact hA
-      · exact ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)
+    exact (ContinuousLinearMap.contDiff (actionCLM Λ)).comp
+      (hA.comp (ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)))
   · change ContDiff ℝ ∞ (actionCLM Λ ∘ J ∘ actionCLM Λ⁻¹)
-    apply ContDiff.comp
-    · exact ContinuousLinearMap.contDiff (actionCLM Λ)
-    · apply ContDiff.comp
-      · exact hJ
-      · exact ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)
+    exact (ContinuousLinearMap.contDiff (actionCLM Λ)).comp
+      (hJ.comp (ContinuousLinearMap.contDiff (actionCLM Λ⁻¹)))
 
 /-!
 
@@ -250,14 +238,14 @@ lemma isExtrema_iff_gauss_ampere_magneticFieldMatrix {d} {𝓕 : FreeSpace}
       field_simp
       simp only [FreeSpace.c_sq, one_div, mul_inv_rev, mul_zero]
       field_simp
-      ring
+      ring_nf
     · intro h x
       specialize h (x.time 𝓕.c) x.space
       linear_combination (norm := simp) (𝓕.μ₀⁻¹ * 𝓕.c⁻¹) * h
       field_simp
       simp only [FreeSpace.c_sq, one_div, mul_inv_rev, mul_zero]
       field_simp
-      ring
+      ring_nf
   · apply Iff.intro
     · intro h t x i
       specialize h ((toTimeAndSpace 𝓕.c).symm (t, x)) i

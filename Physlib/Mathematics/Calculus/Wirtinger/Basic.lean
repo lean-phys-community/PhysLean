@@ -392,18 +392,14 @@ lemma realLinear_apply_eq_wirtinger (L : ℂ →L[ℝ] ℂ) (w : ℂ) :
     L w =
       ((1 / 2 : ℂ) * (L 1 - Complex.I * L Complex.I)) * w
         + ((1 / 2 : ℂ) * (L 1 + Complex.I * L Complex.I)) * star w := by
-  calc
-    L w = L ((w.re : ℝ) • (1 : ℂ) + (w.im : ℝ) • Complex.I) := by
-              congr 1; apply Complex.ext <;> simp
-    _ = (w.re : ℝ) • L 1 + (w.im : ℝ) • L Complex.I := by
-          rw [map_add, map_smul, map_smul]
-    _ = ((1 / 2 : ℂ) * (L 1 - Complex.I * L Complex.I)) * w
-          + ((1 / 2 : ℂ) * (L 1 + Complex.I * L Complex.I)) * star w := by
-      apply Complex.ext <;>
-        simp [Complex.add_re, Complex.add_im, Complex.sub_re, Complex.sub_im,
-          Complex.mul_re, Complex.mul_im, Complex.conj_re, Complex.conj_im,
-          Complex.I_re, Complex.I_im] <;>
-        ring
+  have h : (w.re : ℝ) • (1 : ℂ) + (w.im : ℝ) • Complex.I = w := by
+    simpa using (Complex.re_add_im w).symm
+  rw [← h, map_add, map_smul, map_smul]
+  apply Complex.ext <;>
+    simp [Complex.add_re, Complex.add_im, Complex.sub_re, Complex.sub_im,
+      Complex.mul_re, Complex.mul_im, Complex.conj_re, Complex.conj_im,
+      Complex.I_re, Complex.I_im] <;>
+    ring
 
 /-- The two-term Wirtinger chain rule for `dWirtingerDir`, outer `g : ℂ → ℂ` and inner
 `f : V → ℂ`:

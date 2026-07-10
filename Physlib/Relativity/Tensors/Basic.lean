@@ -719,10 +719,8 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
       simpa [h'] using (ComponentIdx.congr_right _ _ _
         (IsReindexing.apply_inv_apply σ h x).symm).symm
   · simp
-  · intro r t h
-    simp [h]
-  · intro t1 t2 h1 h2
-    simp [h1, h2]
+  · intro r t' ht; simp [ht, map_smul]
+  · intro t1 t2 ht1 ht2; simp [ht1, ht2, map_add]
 
 lemma permT_basis {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)

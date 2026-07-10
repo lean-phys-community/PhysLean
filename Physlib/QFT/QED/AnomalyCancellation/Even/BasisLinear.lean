@@ -434,13 +434,17 @@ lemma P'_val (f : Fin n.succ → ℚ) : (P' f).val = P f := by
 theorem basis_linear_independent : LinearIndependent ℚ (@basis n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
-  change P' f = 0 at h
-  have h1 : (P' f).val = 0 :=
-    (AddSemiconjBy.eq_zero_iff (ACCSystemLinear.LinSols.val 0)
-    (congrFun (congrArg HAdd.hAdd (congrArg ACCSystemLinear.LinSols.val (id (Eq.symm h))))
-    (ACCSystemLinear.LinSols.val 0))).mp rfl
-  rw [P'_val] at h1
-  exact P_zero f h1
+  apply P_zero f
+  have hval : (P' f).val = 0 := by
+    have h1 := congrArg (fun (x : (PureU1 (2 * n.succ)).LinSols) => x.val) h
+    -- h1 : (∑ i, f i • basis i).val = ACCSystemLinear.LinSols.val 0
+    -- ACCSystemLinear.LinSols.val 0 is definitionally 0
+    have h2 : (P' f).val = (∑ i, f i • basis i).val := rfl
+    -- h2 : (P' f).val = (∑ i, f i • basis i).val
+    -- Combine: h2.trans h1 gives (P' f).val = 0
+    exact h2.trans h1
+  rw [P'_val] at hval
+  exact hval
 
 /-!
 
@@ -731,13 +735,13 @@ lemma P!'_val (f : Fin n → ℚ) : (P!' f).val = P! f := by
 theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
-  change P!' f = 0 at h
-  have h1 : (P!' f).val = 0 :=
-    (AddSemiconjBy.eq_zero_iff (ACCSystemLinear.LinSols.val 0)
-    (congrFun (congrArg HAdd.hAdd (congrArg ACCSystemLinear.LinSols.val (id (Eq.symm h))))
-    (ACCSystemLinear.LinSols.val 0))).mp rfl
-  rw [P!'_val] at h1
-  exact P!_zero f h1
+  apply P!_zero f
+  have hval : (P!' f).val = 0 := by
+    have h1 := congrArg (fun (x : (PureU1 (2 * n.succ)).LinSols) => x.val) h
+    have h2 : (P!' f).val = (∑ i, f i • basis! i).val := rfl
+    exact h2.trans h1
+  rw [P!'_val] at hval
+  exact hval
 
 /-!
 
@@ -929,22 +933,15 @@ lemma Pa'_P'_P!' (f : (Fin n.succ) ⊕ (Fin n) → ℚ) :
 theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
-  change Pa' f = 0 at h
-  have h1 : (Pa' f).val = 0 :=
-    (AddSemiconjBy.eq_zero_iff (ACCSystemLinear.LinSols.val 0)
-    (congrFun (congrArg HAdd.hAdd (congrArg ACCSystemLinear.LinSols.val (id (Eq.symm h))))
-    (ACCSystemLinear.LinSols.val 0))).mp rfl
-  rw [Pa'_P'_P!'] at h1
-  change (P' (f ∘ Sum.inl)).val + (P!' (f ∘ Sum.inr)).val = 0 at h1
-  rw [P!'_val, P'_val] at h1
-  change Pa (f ∘ Sum.inl) (f ∘ Sum.inr) = 0 at h1
-  have hf := Pa_zero (f ∘ Sum.inl) (f ∘ Sum.inr) h1
-  have hg := Pa_zero! (f ∘ Sum.inl) (f ∘ Sum.inr) h1
+  have hval : (Pa' f).val = 0 := congrArg (fun (x : (PureU1 (2 * n.succ)).LinSols) => x.val) h
+  have hval' : Pa (f ∘ Sum.inl) (f ∘ Sum.inr) = 0 := by
+    simpa [Pa, Pa'_P'_P!', P!'_val, P'_val, map_add] using hval
+  have hf := Pa_zero (f ∘ Sum.inl) (f ∘ Sum.inr) hval'
+  have hg := Pa_zero! (f ∘ Sum.inl) (f ∘ Sum.inr) hval'
   intro i
-  simp_all
   cases i
-  · simp_all
-  · simp_all
+  · exact hf _
+  · exact hg _
 /-!
 
 ### E.7. Injectivity of the inclusion into linear solutions

@@ -97,139 +97,86 @@ def IsTotalTimeDerivative
 lemma isTotalTimeDerivative_explicit {δL : Time → X → X → ℝ} :
     IsTotalTimeDerivative δL ↔  (∃ (F : Time → X → ℝ) (_ : ContDiff ℝ ∞ ↿F),
     ∀ t q v, δL t q v = fderiv ℝ ↿F (t, q) ((1 : Time), v)) := by
-  -- Preliminary construction: properties of the function t => (t, q t)
   let tq := fun (q : Time → X) t => (t, q t)
-  have h_tq_contDiff : ∀ (q : Time → X), ContDiff ℝ ∞ q -> ContDiff ℝ ∞ (tq q) := by
-    fun_prop
-  have h_tq_der :  ∀ (q : Time → X) t, ContDiff ℝ ∞ q -> ∂ₜ (tq q) t = (1, ∂ₜ q t) := by
-    intro q t h_ContDiff_q
-    ext
-    change (∂ₜ (tq q) t).1.val = (1 : Time).val
-    congr
-    apply Eq.symm
-    calc
-      (1 : Time) = fderiv ℝ (fun (t' : Time) => t') t 1 := by simp only [fderiv_fun_id,
-        ContinuousLinearMap.coe_id', id_eq]
-      _ = fderiv ℝ (fun (t' : Time) => (tq q t').1) t 1 := by rfl
-      _ = (∂ₜ (tq q) t).1 := by
-        rw [fderiv.fst]
-        · simp
-          rfl
-        · apply ContDiffAt.differentiableAt
-          · apply ContDiff.contDiffAt
-            exact h_tq_contDiff q h_ContDiff_q
-          · by_contra
-            rcases this
-    apply Eq.symm
-    calc
-       (1, ∂ₜ q t).2 = fderiv ℝ (fun t' => (tq q t').2) t 1 := by rfl
-       _ = (∂ₜ (tq q) t).2 := by
-        rw [fderiv.snd]
-        · simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.coe_snd']
-          rfl
-        · apply ContDiffAt.differentiableAt
-          · apply ContDiff.contDiffAt
-            exact h_tq_contDiff q h_ContDiff_q
-          · by_contra
-            rcases this
-  have h_F_tq_der : ∀ (q : Time → X) (F : Time → X → ℝ) t, (ContDiff ℝ ∞ ↿F) → (ContDiff ℝ ∞ q)  →
+  have h_tq_der_val : ∀ (q : Time → X) t, ContDiff ℝ ∞ q ->
+      fderiv ℝ (tq q) t 1 = (1, ∂ₜ q t) := by
+    intro q t hq
+    have h := (differentiableAt_id (𝕜 := ℝ) (x := t)).fderiv_prodMk
+      ((hq.contDiffAt (x := t)).differentiableAt (by simp))
+    dsimp [tq]
+    simpa [Time.deriv_eq] using congrArg (fun f => f 1) h
+  have h_F_tq_der : ∀ (q : Time → X) (F : Time → X → ℝ) t, (ContDiff ℝ ∞ ↿F) → (ContDiff ℝ ∞ q) →
       ∂ₜ (fun t' => ↿F (t', q t')) t = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t) := by
     intro q F t hF hq
-    change  fderiv ℝ ((↿F) ∘ (tq q)) t 1 = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t)
-    rw [fderiv_comp]
-    · simp only [ContinuousLinearMap.comp_apply]
-      rw [← Time.deriv_eq,h_tq_der]
-      exact hq
-    · apply ContDiffAt.differentiableAt
-      · apply ContDiff.contDiffAt
-        exact hF
-      · by_contra
-        rcases this
-    · apply ContDiffAt.differentiableAt
-      · apply ContDiff.contDiffAt
-        exact h_tq_contDiff q hq
-      · by_contra
-        rcases this
-  -- beginning of the proof
+    have h_diff_F : DifferentiableAt ℝ ↿F (t, q t) :=
+      hF.contDiffAt.differentiableAt (by simp)
+    have h_diff_tq : DifferentiableAt ℝ (tq q) t := by
+      have h_contDiff : ContDiff ℝ ∞ (tq q) := by fun_prop
+      exact h_contDiff.contDiffAt.differentiableAt (by simp)
+    calc
+      ∂ₜ (fun t' => ↿F (t', q t')) t = fderiv ℝ (fun t' => ↿F (t', q t')) t 1 := by
+        rw [Time.deriv_eq]
+      _ = fderiv ℝ ((↿F) ∘ (tq q)) t 1 := rfl
+      _ = (fderiv ℝ ↿F ((tq q) t) ∘SL fderiv ℝ (tq q) t) 1 := by
+        rw [fderiv_comp t h_diff_F h_diff_tq]
+      _ = fderiv ℝ ↿F ((tq q) t) (fderiv ℝ (tq q) t 1) := rfl
+      _ = fderiv ℝ ↿F (t, q t) ((1 : Time), ∂ₜ q t) := by
+        rw [h_tq_der_val q t hq]
   constructor
-  -- From total the total derivative to the explicit form
   · intro h
     rcases h with ⟨F, hF⟩
     rcases hF with ⟨hFdif, hFder⟩
-    use F
-    use hFdif
+    use F, hFdif
     intro t q₀ v
     let qv := fun (t' : Time) => (q₀ - t.val • v) + t'.val • v
-    have h_qv_contDiff : ContDiff ℝ ∞ qv := by
-      change ContDiff ℝ ∞ (((fun (tR : ℝ) => (q₀ - t.val • v) + tR • v)) ∘ Time.toRealCLE)
-      fun_prop
+    have h_qv_contDiff : ContDiff ℝ ∞ qv := by fun_prop
     have h_qv_t : qv t = q₀ := by
-      calc
-        qv t = (q₀ - t.val • v) + t.val • v := by rfl
-        _ = q₀ := by module
+      dsimp [qv]; simp [sub_add_cancel]
     have h_qv_der : ∂ₜ qv t = v := by
-      calc
-        ∂ₜ qv t = fderiv ℝ (fun t' => (q₀ - t.val • v) + t'.val • v) t 1 := by rfl
-        _ = v := by
-          rw [fderiv_const_add,fderiv_smul_const]
-          · simp only [ContinuousLinearMap.smulRight_apply, fderiv_val, one_smul]
-          · fun_prop
+      rw [Time.deriv_eq]
+      dsimp [qv]
+      rw [fderiv_const_add (q₀ - t.val • v) (f := fun (t' : Time) => t'.val • v)]
+      have h := fderiv_smul_const (by fun_prop : DifferentiableAt ℝ (fun (t' : Time) => t'.val) t) v
+      simpa [fderiv_val] using congrArg (fun f => f 1) h
     rw [← h_qv_t, ← h_qv_der, hFder, ← h_F_tq_der]
     · rfl
     · exact hFdif
     · exact h_qv_contDiff
     · exact h_qv_contDiff
-  -- From the explicit form to the total derivative
   · intro h
     rcases h with ⟨F, hF⟩
     rcases hF with ⟨hFdif, hFder⟩
-    use F
-    use hFdif
-    intro t q hq_ContDiff
+    use F, hFdif
+    intro t q hq
     rw [hFder, ← h_F_tq_der]
     · rfl
     · exact hFdif
-    · exact hq_ContDiff
+    · exact hq
 
 /--
 Elementary fact: if δL is a time derivative, then so is -δL.
 -/
 lemma isTotalTimeDerivative_neg {δL : Time → X → X → ℝ} (h :  IsTotalTimeDerivative δL) :
     IsTotalTimeDerivative (- δL) := by
-    rcases h with ⟨F, h_ContDiff, hF⟩
-    set F_neg := (fun t q => - F t q)
-    use F_neg
-    have h_neg_F_ContDiff : ContDiff ℝ ∞ ↿F_neg := by
-      fun_prop
-    use  h_neg_F_ContDiff
-    intro t q hq
-    simp only [Pi.neg_apply]
-    rw [hF t q hq]
-    unfold F_neg
-    unfold Time.deriv
-    simp only [fderiv_fun_neg, _root_.neg_apply]
+    rcases h with ⟨F, hF_contDiff, hF⟩
+    refine ⟨fun t q => -F t q, hF_contDiff.neg, fun t q hq => ?_⟩
+    calc
+      (-δL) t (q t) (∂ₜ q t) = -(δL t (q t) (∂ₜ q t)) := rfl
+      _ = -(∂ₜ (fun t' => F t' (q t')) t) := by rw [hF t q hq]
+      _ = ∂ₜ (-(fun t' => F t' (q t'))) t := by rw [← Time.deriv_neg]
+      _ = ∂ₜ (fun t' => -F t' (q t')) t := rfl
 
 /--
 If δL is a total time derivative (of a smooth function), then it is smooth
 -/
 lemma totalTimeDerivative_contDiff {δL : Time → X → X → ℝ} (h : IsTotalTimeDerivative δL):
     ContDiff ℝ ∞ ↿δL := by
- rcases isTotalTimeDerivative_explicit.mp h with ⟨F, hContDiff, heq⟩
- let Fder_v := Prod.map (fderiv ℝ ↿(fun t q => F t q)) (fun (v : X) => v )
- let regroup := ↿(fun (t : Time) (q : X) (v : X) => ((t, q), v))
- let appv := fun (FV : ((Time × X →L[ℝ] ℝ) × X )) => FV.fst (1, FV.snd)
- have hδL : ↿δL = appv ∘ Fder_v ∘ regroup := by
-   funext tqv
-   rcases tqv with ⟨t, q, v⟩
-   simp only [Function.comp_apply]
-   change δL t q v = appv (Fder_v (regroup (t, q, v)))
-   rw [heq t q v]
-   rfl
- rw [hδL]
- unfold appv
- unfold Fder_v
- unfold regroup
- fun_prop
+  rcases (isTotalTimeDerivative_explicit.mp h) with ⟨F, hF, heq⟩
+  have hδL :
+      δL = fun (t : Time) (q : X) (v : X) => fderiv ℝ ↿F (t, q) (1, v) := by
+    funext t q v; exact heq t q v
+  rw [hδL]
+  fun_prop
 
 /-!
 ## B. Total time derivative do not affect the physical content
@@ -280,13 +227,14 @@ lemma totalTimeDerivative_hasVarGradientAt_equivalence [CompleteSpace X] (L δL 
     (q : Time → X)    (hq : ContDiff ℝ ∞ q) (grad : Time → X)
     (hgrad :  HasVarGradientAt (fun q' t => L t (q' t) (fderiv ℝ  q' t 1)) grad q) :
     HasVarGradientAt (fun q' t => (L + δL) t (q' t) (fderiv ℝ q' t 1)) grad q := by
-  have h_add_zero : grad = grad + (fun _ => 0) := by
-    funext t
+  have h_add := HasVarGradientAt.add
+    (F := fun q' t => L t (q' t) (fderiv ℝ q' t 1))
+    (F' := fun q' t => δL t (q' t) (∂ₜ q' t))
+    hgrad (totalTimeDerivative_hasZeroVarGradient hδL q hq)
+  convert h_add using 1
+  · rfl
+  · ext
     simp
-  rw [h_add_zero]
-  apply HasVarGradientAt.add
-  · exact hgrad
-  · exact totalTimeDerivative_hasZeroVarGradient hδL q hq
 
 
 /-
@@ -393,61 +341,21 @@ lemma isTotalTimeDerivativeVelocity  [CompleteSpace X]
     ∃ g : X, ∀ v, δL v = ⟪g, v⟫_ℝ := by
   classical
   rcases (isTotalTimeDerivative_explicit.mp h) with ⟨F, hFdiff, hEq⟩
-
-  -- Derivative of F at (0,0)
-  let dF : (Time  × X) →L[ℝ] ℝ :=
-    fderiv ℝ ↿F ((0 : Time), (0 : X))
-
-  -- The "time-direction" derivative must vanish because δL 0 = 0.
+  let dF : (Time × X) →L[ℝ] ℝ := fderiv ℝ ↿F ((0 : Time), (0 : X))
   have h_time : dF ((1 : Time), (0 : X)) = 0 := by
-    have h0 :
-        δL (0 : X) =
-          fderiv ℝ ↿F ((0 : Time), (0 : X))
-            ((1 : Time), (0 : X)) := by
-      simpa using (hEq (0 : Time) (0 : X)
-        (0 : X))
-    have : dF ((1 : Time), (0 : X)) =
-        δL (0 : X) := by
-      simpa [dF] using h0.symm
-    simpa [hδL0] using this
-
-  -- Induced continuous linear functional on velocity: v ↦ dF (0,v).
-  let φ : X →L[ℝ] ℝ :=
-    dF.comp (ContinuousLinearMap.inr ℝ Time X)
-
-  -- Show δL v = φ v for all v.
+    simpa [dF, hδL0] using (hEq (0 : Time) (0 : X) (0 : X)).symm
+  let φ : X →L[ℝ] ℝ := dF.comp (ContinuousLinearMap.inr ℝ Time X)
   have hφ : ∀ v : X, δL v = φ v := by
     intro v
-    have hv :
-        δL v =
-          fderiv ℝ ↿F ((0 : Time), (0 : X))
-            ((1 : Time), v) := by
-      simpa using (hEq (0 : Time) (0 : X) v)
-    have hv' : δL v = dF ((1 : Time), v) := by
-      simpa [dF] using hv
     calc
-      δL v = dF ((1 : Time), v) := hv'
-     _ = dF (((0  : Time), v) + ((1 : Time), (0 : X))) := by simp only [Prod.mk_add_mk, zero_add,
-        add_zero]
-      _ = dF ((0 : Time), v) + dF ((1 : Time), (0 : X)) := by
-        simpa using
-          (dF.map_add ((0 : Time), v) ((1 : Time), (0 : X)))
-      _ = dF ((0 : Time), v) := by
-        simp [h_time]
-      _ = φ v := by
-        simp [φ]
-
-  -- Frechet–Riesz: represent φ as inner product with some g.
-  refine ⟨(InnerProductSpace.toDual ℝ (X)).symm φ, ?_⟩
-  intro v
-  have hinner :
-      ⟪(InnerProductSpace.toDual ℝ (X)).symm φ, v⟫_ℝ = φ v := by
-    rw [InnerProductSpace.toDual_symm_apply (𝕜 := ℝ)
-        (E := X) (x := v) (y := φ)]
-  calc
-    δL v = φ v := hφ v
-    _ = ⟪(InnerProductSpace.toDual ℝ (X)).symm φ, v⟫_ℝ := by
-      rw [hinner.symm]
+      δL v = dF ((1 : Time), v) := by simpa [dF] using hEq (0 : Time) (0 : X) v
+      _ = dF (((0 : Time), v) + ((1 : Time), (0 : X))) := by simp
+      _ = dF ((0 : Time), v) + dF ((1 : Time), (0 : X)) := by rw [dF.map_add]
+      _ = dF ((0 : Time), v) := by simp [h_time]
+      _ = φ v := by simp [φ]
+  refine ⟨(InnerProductSpace.toDual ℝ (X)).symm φ, fun v => ?_⟩
+  simpa [hφ v] using
+    (InnerProductSpace.toDual_symm_apply (𝕜 := ℝ) (E := X) (x := v) (y := φ)).symm
 
 end Lagrangian
 

@@ -182,7 +182,7 @@ lemma fderiv_slice_symm_left_apply {d : ℕ} (i : Fin d.succ) (x : Space d) (r1 
     ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe, Function.comp_apply,
     ContinuousLinearMap.prod_apply, ContinuousLinearMap.coe_id', id_eq,
     _root_.zero_apply]
-  repeat' fun_prop
+  all_goals fun_prop
 
 @[simp]
 lemma fderiv_slice_symm_right_apply {d : ℕ} (i : Fin d.succ) (r : ℝ)
@@ -193,7 +193,7 @@ lemma fderiv_slice_symm_right_apply {d : ℕ} (i : Fin d.succ) (r : ℝ)
     ContinuousLinearMap.coe_comp, ContinuousLinearEquiv.coe_coe, Function.comp_apply,
     ContinuousLinearMap.prod_apply, _root_.zero_apply, ContinuousLinearMap.coe_id',
     id_eq]
-  repeat' fun_prop
+  all_goals fun_prop
 
 lemma fderiv_fun_slice_symm_right_apply {d : ℕ} (i : Fin d.succ) (r : ℝ)
     (x1 x2 : Space d) (f : Space d.succ → F) (hf : DifferentiableAt ℝ f ((slice i).symm (r, x1))) :

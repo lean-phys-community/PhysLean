@@ -242,7 +242,7 @@ lemma equationOfMotion_iff_newtons_2nd_law (xₜ : Time → EuclideanSpace ℝ (
     have ha :
         S.m • ∂ₜ (∂ₜ xₜ) t = -(S.γ • ∂ₜ xₜ t + S.k • xₜ t) :=
       eq_neg_of_add_eq_zero_left h'
-    simpa [sub_eq_add_neg, neg_add, add_comm] using ha
+    simpa [force, sub_eq_add_neg, neg_add, add_comm] using ha
   · intro h t
     rw [h t]
     module

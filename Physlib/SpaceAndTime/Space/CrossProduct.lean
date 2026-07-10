@@ -71,7 +71,7 @@ lemma fderiv_cross_commute {t : Time} {s : EuclideanSpace ℝ (Fin 3)}
         Pi.smul_apply, smul_eq_mul]
       rw [Time.fderiv_euclid, Time.fderiv_euclid]
       · intro i
-        repeat fun_prop
+        all_goals fun_prop
       · fun_prop
     · fun_prop
     · fun_prop
@@ -101,9 +101,7 @@ lemma fderiv_cross_commute {t : Time} {s : EuclideanSpace ℝ (Fin 3)}
 lemma time_deriv_cross_commute {s : EuclideanSpace ℝ (Fin 3)} {f : Time → EuclideanSpace ℝ (Fin 3)}
     (hf : Differentiable ℝ f) :
     s ⨯ₑ₃ (∂ₜ (fun t => f t) t) = ∂ₜ (fun t => s ⨯ₑ₃ (f t)) t := by
-  repeat rw [Time.deriv]
-  rw [fderiv_cross_commute]
-  fun_prop
+  simpa [Time.deriv] using fderiv_cross_commute hf
 
 /-!
 
