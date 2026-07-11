@@ -516,7 +516,7 @@ lemma distGrad_eq_sum_basis {d} (f : (Space d) →d[ℝ] ℝ) (η : 𝓢(Space d
     rw [hy]
     simp [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, map_sum, map_smul, smul_eq_mul,
       Pi.single_apply, fderivD_apply]
-  rw [distGrad_inner_eq, h1]
+  exact (distGrad_inner_eq f η y).trans h1.symm
 
 /-!
 
