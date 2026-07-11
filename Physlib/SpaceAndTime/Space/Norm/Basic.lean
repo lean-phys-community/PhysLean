@@ -739,14 +739,11 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     (IsDistBounded.log_norm)) η, y⟫_ℝ)) := by
   haveI : NeZero d := ⟨by omega⟩
   simp only [distGrad_inner_eq, Distribution.fderivD_apply, distOfFunction_apply]
-  change Filter.Tendsto (fun n => -
-    ∫ (x : Space d), fderiv ℝ η x (basis.repr.symm y) * Real.log (normPowerSeries n x))
-    Filter.atTop (𝓝 (- ∫ (x : Space d), fderiv ℝ η x (basis.repr.symm y) * Real.log ‖x‖))
   apply Filter.Tendsto.neg
-  apply MeasureTheory.tendsto_integral_of_dominated_convergence
-    (bound := fun x => |fderiv ℝ η x (basis.repr.symm y)| * (‖x‖⁻¹ + (‖x‖ + 1)))
+  refine MeasureTheory.tendsto_integral_of_dominated_convergence
+    (bound := fun x => |fderiv ℝ η x (basis.repr.symm y)| * (‖x‖⁻¹ + (‖x‖ + 1))) ?_ ?_ ?_ ?_
   · intro n
-    apply IsDistBounded.aeStronglyMeasurable_fderiv_schwartzMap_smul (F := ℝ) ?_
+    refine IsDistBounded.aeStronglyMeasurable_fderiv_schwartzMap_smul (F := ℝ) ?_ _ _
     fun_prop
   · have h1 : Integrable (fun x => (fderiv ℝ (⇑η) x) (basis.repr.symm y) *
         (‖x‖⁻¹ + (‖x‖ + 1))) volume := by

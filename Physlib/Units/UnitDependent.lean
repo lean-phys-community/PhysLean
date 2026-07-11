@@ -204,15 +204,11 @@ lemma UnitChoices.scaleUnit_apply_fst (u1 u2 : UnitChoices) :
 @[simp]
 lemma UnitChoices.dimScale_scaleUnit {u1 u2 u : UnitChoices} (d : Dimension) :
     u.dimScale (scaleUnit u1 u2 u) d = u1.dimScale u2 d := by
-  simp [dimScale]
-  congr 1
-  congr 1
-  congr 1
-  congr 1
-  all_goals
-    congr 1
-    simp [scaleUnit, LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val,
-      ChargeUnit.div_eq_val, TemperatureUnit.div_eq_val, toReal]
+  dsimp [dimScale, scaleUnit, LengthUnit.scale, TimeUnit.scale, MassUnit.scale,
+    ChargeUnit.scale, TemperatureUnit.scale]
+  simp only [LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val,
+    ChargeUnit.div_eq_val, TemperatureUnit.div_eq_val, toReal]
+  congr 1 <;> field_simp
 
 lemma Dimensionful.of_scaleUnit {M : Type} [CarriesDimension M] {u1 u2 u : UnitChoices}
     (c : Dimensionful M) :

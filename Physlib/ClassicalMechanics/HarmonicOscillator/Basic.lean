@@ -260,24 +260,53 @@ the time derivatives of the energies.
 lemma kineticEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (kineticEnergy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t⟫_ℝ := by
   funext t
-  simp [kineticEnergy_eq, Time.deriv, fderiv_comp, fderiv_const_mul, fderiv_inner_apply,
-    real_inner_comm, inner_add_left, inner_smul_right, smul_add, mul_comm, add_comm]
-  fun_prop
+  unfold kineticEnergy
+  conv_lhs => simp only [Time.deriv, one_div, ringHom_apply]
+  change (fderiv ℝ ((fun x => 2⁻¹ * S.m * ⟪x, x⟫_ℝ) ∘ (fun t => ∂ₜ xₜ t)) t) 1 = _
+  rw [fderiv_comp]
+  rw [fderiv_const_mul (by fun_prop)]
+  simp only [ContinuousLinearMap.smul_comp, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, Pi.smul_apply, Function.comp_apply, smul_eq_mul]
+  rw [fderiv_inner_apply]
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
+  rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right]
+  congr 1
+  simp only [smul_add]
+  module
+  all_goals fun_prop
 
 lemma potentialEnergy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (fun t => potentialEnergy S (xₜ t)) = fun t => ⟪∂ₜ xₜ t, S.k • xₜ t⟫_ℝ := by
   funext t
-  simp [potentialEnergy_eq, Time.deriv, fderiv_comp, fderiv_const_mul, fderiv_inner_apply,
-    real_inner_comm, inner_add_left, inner_smul_right, smul_add, mul_comm, add_comm]
-  fun_prop
+  unfold potentialEnergy
+  conv_lhs => simp only [Time.deriv, one_div, smul_eq_mul]
+  change (fderiv ℝ ((fun x => 2⁻¹ * (S.k * ⟪x, x⟫_ℝ)) ∘ (fun t => xₜ t)) t) 1 = _
+  rw [fderiv_comp]
+  rw [fderiv_const_mul (by fun_prop), fderiv_const_mul (by fun_prop)]
+  simp only [ContinuousLinearMap.smul_comp, FunLike.coe_smul,
+    ContinuousLinearMap.coe_comp, Pi.smul_apply, Function.comp_apply, smul_eq_mul]
+  rw [fderiv_inner_apply]
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq]
+  trans S.k * ⟪xₜ t, ∂ₜ xₜ t⟫_ℝ
+  · rw [real_inner_comm, ← inner_add_left, ← Time.deriv, real_inner_comm, ← inner_smul_right,
+      ← inner_smul_right, ← inner_smul_right]
+    congr 1
+    module
+  rw [real_inner_comm, ← inner_smul_right]
+  all_goals (first | fun_prop | exact ((contDiff_infty_iff_fderiv.mp hx).1 t))
 
 lemma energy_deriv (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (energy S xₜ) = fun t => ⟪∂ₜ xₜ t, S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t⟫_ℝ := by
   unfold energy
   funext t
-  simp [Time.deriv_eq, fderiv_fun_add, potentialEnergy_deriv, kineticEnergy_deriv,
-    inner_add_right, energy_differentiable, energy]
-  fun_prop
+  rw [Time.deriv_eq]
+  rw [fderiv_fun_add (by fun_prop) (by apply S.potentialEnergy_differentiable xₜ hx)]
+  simp only [_root_.add_apply]
+  rw [← Time.deriv_eq, ← Time.deriv_eq]
+  rw [potentialEnergy_deriv, kineticEnergy_deriv]
+  simp only
+  rw [← inner_add_right]
+  all_goals fun_prop
 
 /-!
 
@@ -354,8 +383,11 @@ lemma gradient_inner_self (x : EuclideanSpace ℝ (Fin 1)) :
   refine ext_inner_right (𝕜 := ℝ) fun y => ?_
   unfold gradient
   rw [InnerProductSpace.toDual_symm_apply]
-  simp [fderiv_inner_apply, real_inner_comm, inner_smul_left', mul_comm]
-  fun_prop
+  have hid : DifferentiableAt ℝ (fun y : EuclideanSpace ℝ (Fin 1) => y) x := differentiableAt_id
+  rw [fderiv_inner_apply (𝕜 := ℝ) hid hid]
+  simp only [fderiv_fun_id, ContinuousLinearMap.coe_id', id_eq, real_inner_comm, inner_smul_left',
+    ringHom_apply]
+  ring
 
 lemma gradient_const_mul_inner_self (c : ℝ) (x : EuclideanSpace ℝ (Fin 1)) :
     gradient (fun y : EuclideanSpace ℝ (Fin 1) => c * ⟪y, y⟫_ℝ) x = (2 * c) • x := by

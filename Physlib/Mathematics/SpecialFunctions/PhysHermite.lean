@@ -365,7 +365,7 @@ lemma physHermite_orthogonal_lt {n m : ℕ} (hnm : n < m) :
 
 theorem physHermite_orthogonal {n m : ℕ} (hnm : n ≠ m) :
     ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (- x ^ 2) = 0 := by
-  rcases hnm.lt_or_lt with h | h
+  rcases Nat.ne_iff_lt_or_gt.mp hnm with h | h
   · exact physHermite_orthogonal_lt h
   · conv_lhs =>
       enter [2, x, 1]
@@ -378,7 +378,7 @@ lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
   trans ∫ x : ℝ, (fun x => (physHermite n x * physHermite m x) * Real.exp (- x^2)) (c * x)
   · congr
     funext x
-    rw [neg_mul, mul_pow]
+    simp [mul_pow, neg_mul]
   rw [MeasureTheory.Measure.integral_comp_mul_left
     (fun x => physHermite n x * physHermite m x * Real.exp (-x ^ 2)) c]
   simp [physHermite_orthogonal hnm]
@@ -403,7 +403,7 @@ lemma physHermite_norm_cons (n : ℕ) (c : ℝ) :
   trans ∫ x : ℝ, (fun x => (physHermite n x * physHermite n x) * Real.exp (- x^2)) (c * x)
   · congr
     funext x
-    rw [neg_mul, mul_pow]
+    simp [mul_pow, neg_mul]
   rw [MeasureTheory.Measure.integral_comp_mul_left
     (fun x => physHermite n x * physHermite n x * Real.exp (-x ^ 2)) c]
   rw [physHermite_norm]

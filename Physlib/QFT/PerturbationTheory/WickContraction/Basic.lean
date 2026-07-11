@@ -284,19 +284,25 @@ lemma sndFieldOfContract_congr {n m : ℕ} (h : n = m) (c : WickContraction n) (
 lemma finset_eq_fstFieldOfContract_sndFieldOfContract (c : WickContraction n) (a : c.1) :
     a.1 = {c.fstFieldOfContract a, c.sndFieldOfContract a} := by
   obtain ⟨x, y, hxy, ha⟩ := Finset.card_eq_two.mp (c.2.1 a.1 a.2)
-  rw [ha]
-  rcases le_or_lt x y with hle | hlt
-  · have hs : a.1.sort (· ≤ ·) = [x, y] := by
-      rw [ha, Finset.sort_insert, Finset.sort_singleton]
-      · simpa using hle
-      · simpa using hxy
-    simp [fstFieldOfContract, hs, sndFieldOfContract]
-  · have hs : a.1.sort (· ≤ ·) = [y, x] := by
-      rw [ha, Finset.pair_comm, Finset.sort_insert, Finset.sort_singleton]
-      · simpa using hlt.le
-      · simpa using hlt.ne
-    simp only [fstFieldOfContract, hs, List.head_cons, sndFieldOfContract, List.tail_cons]
-    rw [Finset.pair_comm]
+  rcases Nat.lt_or_ge x y with hlt | hle
+  · -- hlt : x < y, so sorted is [x, y]
+    have hs : a.1.sort (· ≤ ·) = [x, y] := by
+      rw [ha]
+      rw [Finset.sort_insert (a := x) (s := {y}) (r := (· ≤ ·))
+        (h₁ := by intro b hb; simpa [Finset.mem_singleton.mp hb] using hlt.le)
+        (h₂ := by simpa using hxy)]
+      simp only [Finset.sort_singleton]
+    dsimp [fstFieldOfContract, sndFieldOfContract]
+    simpa [hs] using ha
+  · -- hle : y ≤ x, so sorted is [y, x]
+    have hs : a.1.sort (· ≤ ·) = [y, x] := by
+      rw [ha, Finset.pair_comm]
+      rw [Finset.sort_insert (a := y) (s := {x}) (r := (· ≤ ·))
+        (h₁ := by intro b hb; simpa [Finset.mem_singleton.mp hb] using hle)
+        (h₂ := by simpa using hxy.symm)]
+      simp only [Finset.sort_singleton]
+    dsimp [fstFieldOfContract, sndFieldOfContract]
+    simpa [hs, Finset.pair_comm] using ha
 
 lemma fstFieldOfContract_ne_sndFieldOfContract (c : WickContraction n) (a : c.1) :
     c.fstFieldOfContract a ≠ c.sndFieldOfContract a := by
