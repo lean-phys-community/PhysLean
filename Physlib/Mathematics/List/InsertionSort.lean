@@ -76,7 +76,8 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
     rw [eraseIdx_get]
     simp only [List.length_cons, Function.comp_apply, List.get_eq_getElem, Fin.val_cast]
     rfl
-  erw [h1]
+  rw [show (insertionSortDropMinPos r a l)[(i : ℕ)] = (insertionSortDropMinPos r a l)[i] from rfl,
+    h1]
   simp only [List.length_cons, Nat.succ_eq_add_one, List.get_eq_getElem]
   apply insertionSortEquiv_order
   exact h
@@ -509,12 +510,12 @@ lemma filter_rel_eq_insertionSort {α : Type} (r : α → α → Prop) [Decidabl
     List.filter (fun c => r a c ∧ r c a) l
   | [] => by simp
   | b :: l => by
-    simp only [List.insertionSort]
+    simp only [List.insertionSort_cons]
     by_cases h : r a b ∧ r b a
     · have hl := orderedInsert_filter_of_pos r b (fun c => r a c ∧ r c a) h
         (List.insertionSort r l) (by exact List.pairwise_insertionSort r l)
       simp only [Bool.decide_and] at hl ⊢
-      erw [hl]
+      rw [hl]
       rw [List.orderedInsert_eq_take_drop]
       have ht : List.takeWhile (fun b_1 => decide ¬r b b_1)
         (List.filter (fun b => decide (r a b) && decide (r b a))
@@ -551,7 +552,7 @@ lemma filter_rel_eq_insertionSort {α : Type} (r : α → α → Prop) [Decidabl
       simp_all
     · have hl := orderedInsert_filter_of_neg r b (fun c => r a c ∧ r c a) h (List.insertionSort r l)
       simp only [Bool.decide_and] at hl ⊢
-      erw [hl]
+      rw [hl]
       rw [List.filter_cons_of_neg]
       have ih := filter_rel_eq_insertionSort r a l
       simp_all only [not_and, Bool.decide_and]
