@@ -76,19 +76,23 @@ lemma contr_basis_ratComplexNum {c : complexLorentzTensor.Color}
       = toComplexNum (if i.val = j.val then 1 else 0) := by
   match c with
   | Color.upL =>
-    change Fermion.leftDualContraction (Fermion.leftBasis i ⊗ₜ Fermion.dualLeftBasis j) = _
+    change Fermion.leftDualContraction
+      (Fermion.LeftHandedWeyl.basis i ⊗ₜ Fermion.DualLeftHandedWeyl.basis j) = _
     rw [Fermion.leftDualContraction_basis]
     simp
   | Color.downL =>
-    change Fermion.dualLeftContraction (Fermion.dualLeftBasis i ⊗ₜ Fermion.leftBasis j) = _
+    change Fermion.dualLeftContraction
+      (Fermion.DualLeftHandedWeyl.basis i ⊗ₜ Fermion.LeftHandedWeyl.basis j) = _
     rw [Fermion.dualLeftContraction_basis]
     simp
   | Color.upR =>
-    change Fermion.rightDualContraction (Fermion.rightBasis i ⊗ₜ Fermion.dualRightBasis j) = _
+    change Fermion.rightDualContraction
+      (Fermion.RightHandedWeyl.basis i ⊗ₜ Fermion.DualRightHandedWeyl.basis j) = _
     rw [Fermion.rightDualContraction_basis]
     simp
   | Color.downR =>
-    change Fermion.rightDualContraction (Fermion.rightBasis i ⊗ₜ Fermion.dualRightBasis j) = _
+    change Fermion.rightDualContraction
+      (Fermion.RightHandedWeyl.basis i ⊗ₜ Fermion.DualRightHandedWeyl.basis j) = _
     rw [Fermion.rightDualContraction_basis]
     simp
   | Color.up =>

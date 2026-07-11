@@ -130,7 +130,7 @@ def dualRightBi : DualRightHandedWeyl →ₗ[ℂ] RightHandedWeyl →ₗ[ℂ] �
     standard basis (i.e. the dot product).
     Physically, the contraction of a left-handed Weyl fermion with a dual-left-handed Weyl fermion.
     In index notation this is ψ^a φ_a. -/
-def leftDualContraction : (leftHandedRep.tprod dualLeftHandedRep).IntertwiningMap
+def leftDualContraction : (LeftHandedWeyl.rep.tprod DualLeftHandedWeyl.rep).IntertwiningMap
     (Representation.trivial ℂ SL(2,ℂ) ℂ) where
   toLinearMap := TensorProduct.lift leftDualBi
   isIntertwining' M := TensorProduct.ext' fun ψ φ => by
@@ -144,9 +144,11 @@ lemma leftDualContraction_hom_tmul (ψ : LeftHandedWeyl)
   rfl
 
 lemma leftDualContraction_basis (i j : Fin 2) :
-    leftDualContraction (leftBasis i ⊗ₜ dualLeftBasis j) = if i.1 = j.1 then (1 : ℂ) else 0 := by
+    leftDualContraction (LeftHandedWeyl.basis i ⊗ₜ DualLeftHandedWeyl.basis j) =
+      if i.1 = j.1 then (1 : ℂ) else 0 := by
   rw [leftDualContraction_hom_tmul]
-  simp only [leftBasis_toFin2ℂ, dualLeftBasis_toFin2ℂ, dotProduct_single, mul_one]
+  simp only [LeftHandedWeyl.toFin2ℂ_eq_val, LeftHandedWeyl.basis_val,
+    DualLeftHandedWeyl.toFin2ℂ_eq_val, DualLeftHandedWeyl.basis_val, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
   refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
@@ -157,7 +159,7 @@ lemma leftDualContraction_basis (i j : Fin 2) :
     standard basis (i.e. the dot product).
     Physically, the contraction of a dual-left-handed Weyl fermion with a left-handed Weyl fermion.
     In index notation this is φ_a ψ^a. -/
-def dualLeftContraction : (dualLeftHandedRep.tprod leftHandedRep).IntertwiningMap
+def dualLeftContraction : (DualLeftHandedWeyl.rep.tprod LeftHandedWeyl.rep).IntertwiningMap
     (Representation.trivial ℂ SL(2,ℂ) ℂ) where
   toLinearMap := TensorProduct.lift dualLeftBi
   isIntertwining' M := TensorProduct.ext' fun φ ψ => by
@@ -170,9 +172,11 @@ lemma dualLeftContraction_hom_tmul (φ : DualLeftHandedWeyl) (ψ : LeftHandedWey
   rfl
 
 lemma dualLeftContraction_basis (i j : Fin 2) :
-    dualLeftContraction (dualLeftBasis i ⊗ₜ leftBasis j) = if i.1 = j.1 then (1 : ℂ) else 0 := by
+    dualLeftContraction (DualLeftHandedWeyl.basis i ⊗ₜ LeftHandedWeyl.basis j) =
+      if i.1 = j.1 then (1 : ℂ) else 0 := by
   rw [dualLeftContraction_hom_tmul]
-  simp only [dualLeftBasis_toFin2ℂ, leftBasis_toFin2ℂ, dotProduct_single, mul_one]
+  simp only [DualLeftHandedWeyl.toFin2ℂ_eq_val, DualLeftHandedWeyl.basis_val,
+    LeftHandedWeyl.toFin2ℂ_eq_val, LeftHandedWeyl.basis_val, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
   refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
@@ -185,7 +189,7 @@ The linear map from `rightHandedWeyl ⊗ DualRightHandedWeyl` to `ℂ` given by
   The contraction of a right-handed Weyl fermion with a left-handed Weyl fermion.
   In index notation this is `ψ^{dot a} φ_{dot a}`.
 -/
-def rightDualContraction : (rightHandedRep.tprod dualRightHandedRep).IntertwiningMap
+def rightDualContraction : (RightHandedWeyl.rep.tprod DualRightHandedWeyl.rep).IntertwiningMap
     (Representation.trivial ℂ SL(2,ℂ) ℂ) where
   toLinearMap := TensorProduct.lift rightDualBi
   isIntertwining' M := TensorProduct.ext' fun ψ φ => by
@@ -210,10 +214,11 @@ lemma rightDualContraction_hom_tmul (ψ : RightHandedWeyl)
   rfl
 
 lemma rightDualContraction_basis (i j : Fin 2) :
-    rightDualContraction (rightBasis i ⊗ₜ dualRightBasis j) =
+    rightDualContraction (RightHandedWeyl.basis i ⊗ₜ DualRightHandedWeyl.basis j) =
     if i.1 = j.1 then (1 : ℂ) else 0 := by
   rw [rightDualContraction_hom_tmul]
-  simp only [rightBasis_toFin2ℂ, dualRightBasis_toFin2ℂ, dotProduct_single, mul_one]
+  simp only [RightHandedWeyl.toFin2ℂ_eq_val, RightHandedWeyl.basis_val,
+    DualRightHandedWeyl.toFin2ℂ_eq_val, DualRightHandedWeyl.basis_val, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
   refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)
@@ -226,7 +231,7 @@ lemma rightDualContraction_basis (i j : Fin 2) :
   The contraction of a right-handed Weyl fermion with a left-handed Weyl fermion.
     In index notation this is φ_{dot a} ψ^{dot a}.
 -/
-def dualRightContraction : (dualRightHandedRep.tprod rightHandedRep).IntertwiningMap
+def dualRightContraction : (DualRightHandedWeyl.rep.tprod RightHandedWeyl.rep).IntertwiningMap
     (Representation.trivial ℂ SL(2,ℂ) ℂ) where
   toLinearMap := TensorProduct.lift dualRightBi
   isIntertwining' M := TensorProduct.ext' fun φ ψ => by
@@ -251,10 +256,11 @@ lemma dualRightContraction_hom_tmul (φ : DualRightHandedWeyl)
   rfl
 
 lemma dualRightContraction_basis (i j : Fin 2) :
-    dualRightContraction (dualRightBasis i ⊗ₜ rightBasis j) =
+    dualRightContraction (DualRightHandedWeyl.basis i ⊗ₜ RightHandedWeyl.basis j) =
     if i.1 = j.1 then (1 : ℂ) else 0 := by
   rw [dualRightContraction_hom_tmul]
-  simp only [dualRightBasis_toFin2ℂ, rightBasis_toFin2ℂ, dotProduct_single, mul_one]
+  simp only [DualRightHandedWeyl.toFin2ℂ_eq_val, DualRightHandedWeyl.basis_val,
+    RightHandedWeyl.toFin2ℂ_eq_val, RightHandedWeyl.basis_val, dotProduct_single, mul_one]
   rw [Pi.single_apply]
   simp only [Fin.ext_iff]
   refine ite_congr ?h₁ (congrFun rfl) (congrFun rfl)

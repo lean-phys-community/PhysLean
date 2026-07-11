@@ -28,15 +28,37 @@ open MatrixGroups
 open Complex
 open TensorProduct
 
-TODO "Rename the Weyl fermion representations `leftHandedRep`, `dualLeftHandedRep`,
-  `rightHandedRep` and `dualRightHandedRep` to `LeftHandedWeyl.rep`,
-  `DualLeftHandedWeyl.rep`, `RightHandedWeyl.rep` and `DualRightHandedWeyl.rep`
-  respectively, so that each representation lives in the namespace of the module it
-  acts on, and update all references accordingly."
+/-!
+
+## Left-handed Weyl fermions
+
+-/
+
+namespace LeftHandedWeyl
+
+/-- The standard basis on left-handed Weyl fermions. -/
+def basis : Basis (Fin 2) ℂ LeftHandedWeyl := Basis.ofEquivFun
+  (Equiv.linearEquiv ℂ LeftHandedWeyl.toFin2ℂFun)
+
+lemma basis_apply (i j : Fin 2) : (basis i).1 j = if j = i then 1 else 0 := by
+  simp only [basis, Equiv.linearEquiv, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
+    EquivLike.coe_coe, Equiv.invFun_as_coe, AddEquiv.coe_toEquiv_symm, Basis.coe_ofEquivFun,
+    LinearEquiv.symm_mk, LinearMap.coe_mk, AddHom.coe_mk, LinearEquiv.coe_mk,
+    Equiv.addEquiv_symm_apply]
+  change Pi.single i 1 j = _
+  simp [Pi.single_apply]
+
+lemma eq_sum_basis (ψ : LeftHandedWeyl) : ψ = ∑ i, ψ.1 i • basis i := by
+  conv_lhs => rw [← basis.sum_repr ψ]
+  rfl
+
+lemma basis_val (i : Fin 2) : (basis i).val = Pi.single i 1 := by
+  ext j
+  simp [basis_apply, Pi.single_apply]
 
 /-- The vector space ℂ^2 carrying the fundamental representation of SL(2,C).
   In index notation corresponds to a Weyl fermion with indices ψ^a. -/
-def leftHandedRep : Representation ℂ SL(2,ℂ) LeftHandedWeyl where
+def rep : Representation ℂ SL(2,ℂ) LeftHandedWeyl where
   toFun := fun M => {
     toFun := fun (ψ : LeftHandedWeyl) =>
       LeftHandedWeyl.toFin2ℂEquiv.symm (M.1 *ᵥ ψ.toFin2ℂ),
@@ -55,26 +77,65 @@ def leftHandedRep : Representation ℂ SL(2,ℂ) LeftHandedWeyl where
     simp only [LinearMap.coe_mk, AddHom.coe_mk, Module.End.mul_apply, LinearEquiv.apply_symm_apply,
       mulVec_mulVec]
 
-/-- The standard basis on left-handed Weyl fermions. -/
-def leftBasis : Basis (Fin 2) ℂ LeftHandedWeyl := Basis.ofEquivFun
-  (Equiv.linearEquiv ℂ LeftHandedWeyl.toFin2ℂFun)
+lemma rep_apply (M : SL(2,ℂ)) (ψ : LeftHandedWeyl) : rep M ψ = ⟨M.1 *ᵥ ψ.1⟩ := rfl
 
-@[simp]
-lemma leftBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 2) :
-    (LinearMap.toMatrix leftBasis leftBasis) (leftHandedRep M) i j = M.1 i j := by
+lemma rep_apply_eq_sum_basis (M : SL(2,ℂ)) (ψ : LeftHandedWeyl) :
+    rep M ψ = ∑ i, (∑ j, M.1 i j * ψ.1 j) • basis i := by
+  rw [eq_sum_basis (rep M ψ)]
+  rfl
+
+lemma rep_apply_basis (M : SL(2,ℂ)) (i : Fin 2) :
+    rep M (basis i) = ∑ j, M.1 j i • basis j := by
+  rw [rep_apply_eq_sum_basis]
+  congr
+  funext j
+  simp [basis_apply]
+
+lemma rep_toMatrix (M : SL(2,ℂ)) : (LinearMap.toMatrix basis basis) (rep M) = M.1 := by
+  ext i j
   rw [LinearMap.toMatrix_apply]
-  simp only [leftBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
+  simp only [basis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
   change (M.1 *ᵥ (Pi.single j 1)) i = _
   simp
 
-@[simp]
-lemma leftBasis_toFin2ℂ (i : Fin 2) : (leftBasis i).toFin2ℂ = Pi.single i 1 := by
-  simp only [leftBasis, Basis.coe_ofEquivFun]
+lemma rep_apply_basis_repr (M : SL(2,ℂ)) (i j : Fin 2) :
+    basis.repr (rep M (basis i)) j = M.1 j i := by
+  fin_cases j <;> simp [rep_apply_basis]
+
+end LeftHandedWeyl
+
+
+/-!
+
+## Dual Left-handed Weyl fermions
+
+-/
+
+namespace DualLeftHandedWeyl
+
+/-- The standard basis on dual-left-handed Weyl fermions. -/
+def basis : Basis (Fin 2) ℂ DualLeftHandedWeyl := Basis.ofEquivFun
+  (Equiv.linearEquiv ℂ DualLeftHandedWeyl.toFin2ℂFun)
+
+lemma basis_apply (i j : Fin 2) : (basis i).1 j = if j = i then 1 else 0 := by
+  simp only [basis, Equiv.linearEquiv, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
+    EquivLike.coe_coe, Equiv.invFun_as_coe, AddEquiv.coe_toEquiv_symm, Basis.coe_ofEquivFun,
+    LinearEquiv.symm_mk, LinearMap.coe_mk, AddHom.coe_mk, LinearEquiv.coe_mk,
+    Equiv.addEquiv_symm_apply]
+  change Pi.single i 1 j = _
+  simp [Pi.single_apply]
+
+lemma eq_sum_basis (ψ : DualLeftHandedWeyl) : ψ = ∑ i, ψ.1 i • basis i := by
+  conv_lhs => rw [← basis.sum_repr ψ]
   rfl
 
+lemma basis_val (i : Fin 2) : (basis i).val = Pi.single i 1 := by
+  ext j
+  simp [basis_apply, Pi.single_apply]
+
 /-- The vector space ℂ^2 carrying the representation of SL(2,C) given by
-    M → (M⁻¹)ᵀ. In index notation corresponds to a Weyl fermion with indices ψ_a. -/
-def dualLeftHandedRep : Representation ℂ SL(2,ℂ) DualLeftHandedWeyl where
+    M → (M⁻¹)ᵀ. In index notation corresponds to a left-handed Weyl fermion with indices ψ_a. -/
+def rep : Representation ℂ SL(2,ℂ) DualLeftHandedWeyl where
   toFun := fun M => {
     toFun := fun (ψ : DualLeftHandedWeyl) =>
       DualLeftHandedWeyl.toFin2ℂEquiv.symm ((M.1⁻¹)ᵀ *ᵥ ψ.toFin2ℂ),
@@ -95,26 +156,62 @@ def dualLeftHandedRep : Representation ℂ SL(2,ℂ) DualLeftHandedWeyl where
     rw [Matrix.mul_inv_rev]
     exact transpose_mul _ _
 
-/-- The standard basis on dual-left-handed Weyl fermions. -/
-def dualLeftBasis : Basis (Fin 2) ℂ DualLeftHandedWeyl := Basis.ofEquivFun
-  (Equiv.linearEquiv ℂ DualLeftHandedWeyl.toFin2ℂFun)
-
-@[simp]
-lemma dualLeftBasis_toFin2ℂ (i : Fin 2) : (dualLeftBasis i).toFin2ℂ = Pi.single i 1 := by
-  simp only [dualLeftBasis, Basis.coe_ofEquivFun]
+lemma rep_apply_eq_sum_basis (M : SL(2,ℂ)) (ψ : DualLeftHandedWeyl) :
+    rep M ψ = ∑ i, (∑ j, M.1⁻¹ j i * ψ.1 j) • basis i := by
+  rw [eq_sum_basis (rep M ψ)]
   rfl
 
-@[simp]
-lemma dualLeftBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 2) :
-    (LinearMap.toMatrix dualLeftBasis dualLeftBasis) (dualLeftHandedRep M) i j = (M.1⁻¹)ᵀ i j := by
+lemma rep_apply_basis (M : SL(2,ℂ)) (i : Fin 2) :
+    rep M (basis i) = ∑ j, M.1⁻¹ i j • basis j := by
+  rw [rep_apply_eq_sum_basis]
+  congr
+  funext j
+  simp [basis_apply]
+
+lemma rep_toMatrix (M : SL(2,ℂ)) : (LinearMap.toMatrix basis basis) (rep M) = (M.1⁻¹)ᵀ := by
+  ext i j
   rw [LinearMap.toMatrix_apply]
-  simp only [dualLeftBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply, transpose_apply]
+  simp only [basis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
   change ((M.1⁻¹)ᵀ *ᵥ (Pi.single j 1)) i = _
   simp
 
+lemma rep_apply_basis_repr (M : SL(2,ℂ)) (i j : Fin 2) :
+    basis.repr (rep M (basis i)) j = M.1⁻¹ i j := by
+  fin_cases j <;> simp [rep_apply_basis]
+
+end DualLeftHandedWeyl
+
+/-!
+
+## Right-handed Weyl fermions
+
+-/
+
+namespace RightHandedWeyl
+
+/-- The standard basis on right-handed Weyl fermions. -/
+def basis : Basis (Fin 2) ℂ RightHandedWeyl := Basis.ofEquivFun
+  (Equiv.linearEquiv ℂ RightHandedWeyl.toFin2ℂFun)
+
+lemma basis_apply (i j : Fin 2) : (basis i).1 j = if j = i then 1 else 0 := by
+  simp only [basis, Equiv.linearEquiv, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
+    EquivLike.coe_coe, Equiv.invFun_as_coe, AddEquiv.coe_toEquiv_symm, Basis.coe_ofEquivFun,
+    LinearEquiv.symm_mk, LinearMap.coe_mk, AddHom.coe_mk, LinearEquiv.coe_mk,
+    Equiv.addEquiv_symm_apply]
+  change Pi.single i 1 j = _
+  simp [Pi.single_apply]
+
+lemma eq_sum_basis (ψ : RightHandedWeyl) : ψ = ∑ i, ψ.1 i • basis i := by
+  conv_lhs => rw [← basis.sum_repr ψ]
+  rfl
+
+lemma basis_val (i : Fin 2) : (basis i).val = Pi.single i 1 := by
+  ext j
+  simp [basis_apply, Pi.single_apply]
+
 /-- The vector space ℂ^2 carrying the conjugate representation of SL(2,C).
   In index notation corresponds to a Weyl fermion with indices ψ^{dot a}. -/
-def rightHandedRep : Representation ℂ SL(2,ℂ) RightHandedWeyl where
+def rep : Representation ℂ SL(2,ℂ) RightHandedWeyl where
   toFun := fun M => {
     toFun := fun (ψ : RightHandedWeyl) =>
       RightHandedWeyl.toFin2ℂEquiv.symm (M.1.map star *ᵥ ψ.toFin2ℂ),
@@ -132,27 +229,65 @@ def rightHandedRep : Representation ℂ SL(2,ℂ) RightHandedWeyl where
     simp only [SpecialLinearGroup.coe_mul, RCLike.star_def, Matrix.map_mul, LinearMap.coe_mk,
       AddHom.coe_mk, Module.End.mul_apply, LinearEquiv.apply_symm_apply, mulVec_mulVec]
 
-/-- The standard basis on right-handed Weyl fermions. -/
-def rightBasis : Basis (Fin 2) ℂ RightHandedWeyl := Basis.ofEquivFun
-  (Equiv.linearEquiv ℂ RightHandedWeyl.toFin2ℂFun)
+lemma rep_apply (M : SL(2,ℂ)) (ψ : RightHandedWeyl) : rep M ψ = ⟨M.1.map star *ᵥ ψ.1⟩ := rfl
 
-@[simp]
-lemma rightBasis_toFin2ℂ (i : Fin 2) : (rightBasis i).toFin2ℂ = Pi.single i 1 := by
-  simp only [rightBasis, Basis.coe_ofEquivFun]
+lemma rep_apply_eq_sum_basis (M : SL(2,ℂ)) (ψ : RightHandedWeyl) :
+    rep M ψ = ∑ i, (∑ j, M.1.map star i j * ψ.1 j) • basis i := by
+  rw [eq_sum_basis (rep M ψ)]
   rfl
 
-@[simp]
-lemma rightBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 2) :
-    (LinearMap.toMatrix rightBasis rightBasis) (rightHandedRep M) i j = (M.1.map star) i j := by
-  rw [LinearMap.toMatrix_apply]
-  simp only [rightBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
-  change (M.1.map star *ᵥ (Pi.single j 1)) i = _
-  simp [mulVec_single]
+lemma rep_apply_basis (M : SL(2,ℂ)) (i : Fin 2) :
+    rep M (basis i) = ∑ j, M.1.map star j i • basis j := by
+  rw [rep_apply_eq_sum_basis]
+  congr
+  funext j
+  simp [basis_apply]
 
+lemma rep_toMatrix (M : SL(2,ℂ)) : (LinearMap.toMatrix basis basis) (rep M) = M.1.map star := by
+  ext i j
+  rw [LinearMap.toMatrix_apply]
+  simp only [basis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
+  change (M.1.map star *ᵥ (Pi.single j 1)) i = _
+  simp
+
+lemma rep_apply_basis_repr (M : SL(2,ℂ)) (i j : Fin 2) :
+    basis.repr (rep M (basis i)) j = star (M.1 j i) := by
+  fin_cases j <;> simp [rep_apply_basis]
+
+end RightHandedWeyl
+
+/-!
+
+## Dual Right-handed Weyl fermions
+
+-/
+
+namespace DualRightHandedWeyl
+
+/-- The standard basis on dual-right-handed Weyl fermions. -/
+def basis : Basis (Fin 2) ℂ DualRightHandedWeyl := Basis.ofEquivFun
+  (Equiv.linearEquiv ℂ DualRightHandedWeyl.toFin2ℂFun)
+
+
+lemma basis_apply (i j : Fin 2) : (basis i).1 j = if j = i then 1 else 0 := by
+  simp only [basis, Equiv.linearEquiv, AddEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe,
+    EquivLike.coe_coe, Equiv.invFun_as_coe, AddEquiv.coe_toEquiv_symm, Basis.coe_ofEquivFun,
+    LinearEquiv.symm_mk, LinearMap.coe_mk, AddHom.coe_mk, LinearEquiv.coe_mk,
+    Equiv.addEquiv_symm_apply]
+  change Pi.single i 1 j = _
+  simp [Pi.single_apply]
+
+lemma eq_sum_basis (ψ : DualRightHandedWeyl) : ψ = ∑ i, ψ.1 i • basis i := by
+  conv_lhs => rw [← basis.sum_repr ψ]
+  rfl
+
+lemma basis_val (i : Fin 2) : (basis i).val = Pi.single i 1 := by
+  ext j
+  simp [basis_apply, Pi.single_apply]
 /-- The vector space ℂ^2 carrying the representation of SL(2,C) given by
     M → (M⁻¹)^†.
     In index notation this corresponds to a Weyl fermion with index `ψ_{dot a}`. -/
-def dualRightHandedRep : Representation ℂ SL(2,ℂ) DualRightHandedWeyl where
+def rep : Representation ℂ SL(2,ℂ) DualRightHandedWeyl where
   toFun := fun M => {
     toFun := fun (ψ : DualRightHandedWeyl) =>
       DualRightHandedWeyl.toFin2ℂEquiv.symm ((M.1⁻¹).conjTranspose *ᵥ ψ.toFin2ℂ),
@@ -173,34 +308,48 @@ def dualRightHandedRep : Representation ℂ SL(2,ℂ) DualRightHandedWeyl where
     rw [Matrix.mul_inv_rev]
     exact conjTranspose_mul _ _
 
-/-- The standard basis on dual-right-handed Weyl fermions. -/
-def dualRightBasis : Basis (Fin 2) ℂ DualRightHandedWeyl := Basis.ofEquivFun
-  (Equiv.linearEquiv ℂ DualRightHandedWeyl.toFin2ℂFun)
+lemma rep_apply (M : SL(2,ℂ)) (ψ : DualRightHandedWeyl) :
+    rep M ψ = ⟨(M.1⁻¹).conjTranspose *ᵥ ψ.1⟩ := rfl
 
-@[simp]
-lemma dualRightBasis_toFin2ℂ (i : Fin 2) : (dualRightBasis i).toFin2ℂ = Pi.single i 1 := by
-  simp only [dualRightBasis, Basis.coe_ofEquivFun]
+lemma rep_apply_eq_sum_basis (M : SL(2,ℂ)) (ψ : DualRightHandedWeyl) :
+    rep M ψ = ∑ i, (∑ j, (M.1⁻¹).conjTranspose i j * ψ.1 j) • basis i := by
+  rw [eq_sum_basis (rep M ψ)]
   rfl
 
-@[simp]
-lemma dualRightBasis_ρ_apply (M : SL(2,ℂ)) (i j : Fin 2) :
-    (LinearMap.toMatrix dualRightBasis dualRightBasis) (dualRightHandedRep M) i j =
-    ((M.1⁻¹).conjTranspose) i j := by
+lemma rep_apply_basis (M : SL(2,ℂ)) (i : Fin 2) :
+    rep M (basis i) = ∑ j, (M.1⁻¹).conjTranspose j i • basis j := by
+  rw [rep_apply_eq_sum_basis]
+  congr
+  funext j
+  simp [basis_apply]
+
+lemma rep_toMatrix (M : SL(2,ℂ)) :
+    (LinearMap.toMatrix basis basis) (rep M) = (M.1⁻¹).conjTranspose := by
+  ext i j
   rw [LinearMap.toMatrix_apply]
-  simp only [dualRightBasis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
+  simp only [basis, Basis.coe_ofEquivFun, Basis.ofEquivFun_repr_apply]
   change ((M.1⁻¹).conjTranspose *ᵥ (Pi.single j 1)) i = _
-  simp [mulVec_single]
+  simp
+
+lemma rep_apply_basis_repr (M : SL(2,ℂ)) (i j : Fin 2) :
+    basis.repr (rep M (basis i)) j = star (M.1⁻¹ i j) := by
+  fin_cases j <;> simp [rep_apply_basis]
+
+end DualRightHandedWeyl
 
 /-!
 
-## Equivalences between Weyl fermion vector spaces.
+## Duals of Weyl fermions
+
+The dual of `LeftHandedWeyl` is `DualLeftHandedWeyl`, and the dual of `RightHandedWeyl` is
+`DualRightHandedWeyl`.
 
 -/
 
 /-- The morphism between the representation `leftHanded` and the representation
   `dualLeftHanded` defined by multiplying an element of
   `leftHanded` by the matrix `εᵃ⁰ᵃ¹ = !![0, 1; -1, 0]]`. -/
-def leftHandedToDual : leftHandedRep.IntertwiningMap dualLeftHandedRep where
+def LeftHandedWeyl.dual : LeftHandedWeyl.rep.IntertwiningMap DualLeftHandedWeyl.rep where
   toFun := fun ψ => DualLeftHandedWeyl.toFin2ℂEquiv.symm (!![0, 1; -1, 0] *ᵥ ψ.toFin2ℂ)
   map_add' := by
     intro ψ ψ'
@@ -221,14 +370,14 @@ def leftHandedToDual : leftHandedRep.IntertwiningMap dualLeftHandedRep where
       Matrix.mul_fin_two, eta_fin_two !![M.1 1 1, -M.1 0 1; -M.1 1 0, M.1 0 0]ᵀ]
     simp
 
-lemma leftHandedToDual_hom_apply (ψ : LeftHandedWeyl) :
-    leftHandedToDual ψ =
+lemma LeftHandedWeyl.dual_hom_apply (ψ : LeftHandedWeyl) :
+    LeftHandedWeyl.dual ψ =
     DualLeftHandedWeyl.toFin2ℂEquiv.symm (!![0, 1; -1, 0] *ᵥ ψ.toFin2ℂ) := rfl
 
 /-- The morphism from `dualLeftHanded` to
   `leftHanded` defined by multiplying an element of
   DualLeftHandedWeyl by the matrix `εₐ₁ₐ₂ = !![0, -1; 1, 0]`. -/
-def leftHandedDualTo : dualLeftHandedRep.IntertwiningMap leftHandedRep where
+def DualLeftHandedWeyl.dual : DualLeftHandedWeyl.rep.IntertwiningMap LeftHandedWeyl.rep where
   toFun := fun ψ =>
       LeftHandedWeyl.toFin2ℂEquiv.symm (!![0, -1; 1, 0] *ᵥ ψ.toFin2ℂ)
   map_add' := by
@@ -252,19 +401,19 @@ def leftHandedDualTo : dualLeftHandedRep.IntertwiningMap leftHandedRep where
       Matrix.mul_fin_two, eta_fin_two !![M.1 1 1, -M.1 0 1; -M.1 1 0, M.1 0 0]ᵀ]
     simp
 
-lemma leftHandedDualTo_hom_apply (ψ : DualLeftHandedWeyl) :
-    leftHandedDualTo ψ =
+lemma DualLeftHandedWeyl.dual_hom_apply (ψ : DualLeftHandedWeyl) :
+    DualLeftHandedWeyl.dual ψ =
     LeftHandedWeyl.toFin2ℂEquiv.symm (!![0, -1; 1, 0] *ᵥ ψ.toFin2ℂ) := rfl
 
 /-- The equivalence between the representation `leftHanded` and the representation
   `dualLeftHanded` defined by multiplying an element of
   `leftHanded` by the matrix `εᵃ⁰ᵃ¹ = !![0, 1; -1, 0]]`. -/
-def leftHandedDualEquiv : leftHandedRep.Equiv dualLeftHandedRep := by
-  refine Representation.Equiv.mk' leftHandedToDual leftHandedDualTo ?_ ?_
+def LeftHandedWeyl.dualEquiv : LeftHandedWeyl.rep.Equiv DualLeftHandedWeyl.rep := by
+  refine Representation.Equiv.mk'  LeftHandedWeyl.dual DualLeftHandedWeyl.dual ?_ ?_
   · intro x
     simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
       Representation.IntertwiningMap.coe_toLinearMap]
-    rw [leftHandedDualTo_hom_apply, leftHandedToDual_hom_apply]
+    rw [DualLeftHandedWeyl.dual_hom_apply, LeftHandedWeyl.dual_hom_apply]
     rw [DualLeftHandedWeyl.toFin2ℂ, LinearEquiv.apply_symm_apply, mulVec_mulVec]
     rw [show (!![0, -1; (1 : ℂ), 0] * !![0, 1; -1, 0]) = 1 by simpa using Eq.symm one_fin_two]
     rw [one_mulVec]
@@ -272,7 +421,7 @@ def leftHandedDualEquiv : leftHandedRep.Equiv dualLeftHandedRep := by
   · intro ψ
     simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
       Representation.IntertwiningMap.coe_toLinearMap]
-    rw [leftHandedDualTo_hom_apply, leftHandedToDual_hom_apply, LeftHandedWeyl.toFin2ℂ,
+    rw [DualLeftHandedWeyl.dual_hom_apply, LeftHandedWeyl.dual_hom_apply, LeftHandedWeyl.toFin2ℂ,
       LinearEquiv.apply_symm_apply, mulVec_mulVec]
     rw [show (!![0, (1 : ℂ); -1, 0] * !![0, -1; 1, 0]) = 1 by simpa using Eq.symm one_fin_two]
     rw [one_mulVec]
@@ -280,28 +429,28 @@ def leftHandedDualEquiv : leftHandedRep.Equiv dualLeftHandedRep := by
 
 /-- `leftHandedDualEquiv` acting on an element `ψ : leftHanded` corresponds
   to multiplying `ψ` by the matrix `!![0, 1; -1, 0]`. -/
-lemma leftHandedDualEquiv_hom_hom_apply (ψ : LeftHandedWeyl) :
-    leftHandedDualEquiv ψ =
+lemma LeftHandedWeyl.dualEquiv_hom_hom_apply (ψ : LeftHandedWeyl) :
+    LeftHandedWeyl.dualEquiv ψ =
     DualLeftHandedWeyl.toFin2ℂEquiv.symm (!![0, 1; -1, 0] *ᵥ ψ.toFin2ℂ) := rfl
 
 /-- The inverse of `leftHandedDualEquiv` acting on an element`ψ : dualLeftHanded` corresponds
   to multiplying `ψ` by the matrix `!![0, -1; 1, 0]`. -/
-lemma leftHandedDualEquiv_inv_hom_apply (ψ : DualLeftHandedWeyl) :
-    leftHandedDualEquiv.symm ψ =
+lemma LeftHandedWeyl.dualEquiv_inv_hom_apply (ψ : DualLeftHandedWeyl) :
+    LeftHandedWeyl.dualEquiv.symm ψ =
     LeftHandedWeyl.toFin2ℂEquiv.symm (!![0, -1; 1, 0] *ᵥ ψ.toFin2ℂ) := rfl
 
 /-- The linear equivalence between `rightHandedWeyl` and `DualRightHandedWeyl` given by multiplying
 an element of `rightHandedWeyl` by the matrix `εᵃ⁰ᵃ¹ = !![0, 1; -1, 0]]`.
 -/
-informal_definition rightHandedWeylDualEquiv where
-  deps := [``rightHandedRep, ``dualRightHandedRep]
+informal_definition RightHandedWeyl.dualEquiv where
+  deps := [``RightHandedWeyl, ``DualRightHandedWeyl]
   tag := "6VZR4"
 
 /-- The linear equivalence `rightHandedWeylDualEquiv` is equivariant with respect to the action of
 `SL(2,C)` on `rightHandedWeyl` and `DualRightHandedWeyl`.
 -/
-informal_lemma rightHandedWeylDualEquiv_equivariant where
-  deps := [``rightHandedWeylDualEquiv]
+informal_lemma RightHandedWeyl.dualEquiv_equivariant where
+  deps := [``RightHandedWeyl.dualEquiv]
   tag := "6VZSG"
 
 end

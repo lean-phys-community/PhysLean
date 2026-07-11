@@ -6,6 +6,8 @@ Authors: Robert Sneiderman
 module
 
 public import Physlib.Relativity.Tensors.RealTensor.Basic
+public import Physlib.Relativity.Tensors.UnitTensor
+public import Physlib.Meta.Sorry
 public import Physlib.Relativity.Tensors.OfInt
 public import Physlib.Mathematics.KroneckerDelta.Basic
 /-!
@@ -154,5 +156,17 @@ lemma leviCivita_antisymm_last : {ε4 | μ ν ρ σ = - (ε4 | μ ν σ ρ)}ᵀ 
   congr 1
   funext i
   fin_cases i <;> rfl
+
+open TensorSpecies Tensor
+
+@[sorryful]
+lemma leviCivita_contract_three : {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(ρ) τ(τ) =
+    (-6) • unitTensor (S := realLorentzTensor) Color.down | σ τ }ᵀ := by
+  sorry
+
+@[sorryful]
+lemma leviCivita_contract_self :
+    {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ.toField = - 24 := by
+  sorry
 
 end realLorentzTensor

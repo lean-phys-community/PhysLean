@@ -72,6 +72,8 @@ def toFin2ℂEquiv : LeftHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
   through the linear equivalence `toFin2ℂEquiv`. -/
 abbrev toFin2ℂ (ψ : LeftHandedWeyl) := toFin2ℂEquiv ψ
 
+lemma toFin2ℂ_eq_val (ψ : LeftHandedWeyl) : ψ.toFin2ℂ = ψ.val := rfl
+
 end LeftHandedWeyl
 
 end LeftHanded
@@ -115,6 +117,8 @@ def toFin2ℂEquiv : DualLeftHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
 /-- The underlying element of `Fin 2 → ℂ` of a element in `DualLeftHandedWeyl` defined
   through the linear equivalence `toFin2ℂEquiv`. -/
 abbrev toFin2ℂ (ψ : DualLeftHandedWeyl) := toFin2ℂEquiv ψ
+
+lemma toFin2ℂ_eq_val (ψ : DualLeftHandedWeyl) : ψ.toFin2ℂ = ψ.val := rfl
 
 end DualLeftHandedWeyl
 
@@ -161,6 +165,8 @@ def toFin2ℂEquiv : RightHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
   through the linear equivalence `toFin2ℂEquiv`. -/
 abbrev toFin2ℂ (ψ : RightHandedWeyl) := toFin2ℂEquiv ψ
 
+lemma toFin2ℂ_eq_val (ψ : RightHandedWeyl) : ψ.toFin2ℂ = ψ.val := rfl
+
 end RightHandedWeyl
 
 end RightHanded
@@ -206,6 +212,8 @@ def toFin2ℂEquiv : DualRightHandedWeyl ≃ₗ[ℂ] (Fin 2 → ℂ) where
 /-- The underlying element of `Fin 2 → ℂ` of a element in `DualRightHandedWeyl` defined
   through the linear equivalence `toFin2ℂEquiv`. -/
 abbrev toFin2ℂ (ψ : DualRightHandedWeyl) := toFin2ℂEquiv ψ
+
+lemma toFin2ℂ_eq_val (ψ : DualRightHandedWeyl) : ψ.toFin2ℂ = ψ.val := rfl
 
 end DualRightHandedWeyl
 

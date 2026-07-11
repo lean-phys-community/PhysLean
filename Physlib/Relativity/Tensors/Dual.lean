@@ -146,6 +146,17 @@ lemma toDual_equivariant {c : C} (g : G) (t : S.Tensor ![c]) :
   conv_lhs => rw [← metricTensor_invariant g]
   rw [prodT_equivariant, contrT_equivariant, permT_equivariant]
 
+/-- The linear map between `S.Tensor c` and `S.Tensor (Function.update c i (S.τ (c i)))`
+  formed by contracting with metric tensors at a specific index. -/
+noncomputable def toDualAtIndex {c : Fin n → C} (i : Fin n) :
+    S.Tensor c →ₗ[k] S.Tensor (Function.update c i (S.τ (c i))) where
+  toFun t := permT _ (IsReindexing.contr_two_rotate S i) <|
+    contrT (n) (Fin.natAdd n (0 : Fin 2)) (Fin.castAdd 2 i)
+      (by simp [Fin.ext_iff]; grind) <|
+    prodT t (metricTensor (S := S) (S.τ (c i)))
+  map_add' := by intros; simp
+  map_smul' := by intros; simp
+
 end Tensor
 
 open Tensor

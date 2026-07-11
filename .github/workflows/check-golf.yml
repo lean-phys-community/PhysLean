@@ -65,24 +65,51 @@ jobs:
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Build the head revision
+      # Reuse this repo's compiled oleans across check-golf runs. The key is
+      # per-head so every run saves a fresh entry; restore-keys fall back to
+      # the most recent build with the same toolchain/deps, making rebuilds
+      # incremental (typically seconds-to-minutes instead of a full build).
+      - name: Restore Lake build cache
+        uses: actions/cache@v4
+        with:
+          path: .lake/build
+          key: check-golf-lake-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-${{ steps.refs.outputs.head }}
+          restore-keys: |
+            check-golf-lake-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-
+
+      # Measurement only needs the *measured files'* imports built, not the
+      # whole library: build just the changed modules (their dependency cones
+      # come from the mathlib cache plus the restored build cache above).
+      - name: Build the changed modules
         run: |
           lake exe cache get
-          lake build
+          mods=$(git diff --name-only --diff-filter=d \
+              "${{ steps.refs.outputs.base }}" "${{ steps.refs.outputs.head }}" -- '*.lean' \
+            | grep -vE '^(scripts|docs)/' \
+            | sed -e 's/\.lean$//' -e 's#/#.#g')
+          if [ -n "$mods" ]; then
+            # shellcheck disable=SC2086
+            lake build $mods
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
+      # Run the checker from the default branch, not the PR head: the head may
+      # predate flags this workflow passes (workflow file and script must not
+      # skew apart).
       - name: Run check-golf (with compile-cost measurement) and upsert comment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python scripts/check_golf.py \
+          git show "origin/${{ github.event.repository.default_branch }}:scripts/check_golf.py" > /tmp/check_golf.py
+          python /tmp/check_golf.py \
             --base "${{ steps.refs.outputs.base }}" \
             --head "${{ steps.refs.outputs.head }}" \
             --repo "${{ github.repository }}" \
             --pr "${{ github.event.issue.number }}" \
             --measure \
+            --measure-jobs "$(nproc)" \
             --post

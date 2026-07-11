@@ -47,39 +47,43 @@ lemma asTensor_expand_complexContrBasis : asTensor =
 
 /-- The expansion of the pauli matrix `σ₀` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inl_0_expand : leftRightToMatrix.symm (pauliBasis (Sum.inl 0)) =
-    leftBasis 0 ⊗ₜ rightBasis 0 + leftBasis 1 ⊗ₜ rightBasis 1 := by
+    LeftHandedWeyl.basis 0 ⊗ₜ RightHandedWeyl.basis 0 +
+      LeftHandedWeyl.basis 1 ⊗ₜ RightHandedWeyl.basis 1 := by
   rw [leftRightToMatrix_symm_expand_tmul]
   simp [pauliBasis, pauliSelfAdjoint, pauliMatrix]
 
 /-- The expansion of the pauli matrix `σ₁` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inr_0_expand : leftRightToMatrix.symm (pauliBasis (Sum.inr 0)) =
-    leftBasis 0 ⊗ₜ rightBasis 1 + leftBasis 1 ⊗ₜ rightBasis 0:= by
+    LeftHandedWeyl.basis 0 ⊗ₜ RightHandedWeyl.basis 1 +
+      LeftHandedWeyl.basis 1 ⊗ₜ RightHandedWeyl.basis 0:= by
   rw [leftRightToMatrix_symm_expand_tmul]
   simp [pauliBasis, pauliSelfAdjoint, pauliMatrix]
 
 /-- The expansion of the pauli matrix `σ₂` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inr_1_expand : leftRightToMatrix.symm (pauliBasis (Sum.inr 1)) =
-    -(I • leftBasis 0 ⊗ₜ[ℂ] rightBasis 1) + I • leftBasis 1 ⊗ₜ[ℂ] rightBasis 0 := by
+    -(I • LeftHandedWeyl.basis 0 ⊗ₜ[ℂ] RightHandedWeyl.basis 1) +
+      I • LeftHandedWeyl.basis 1 ⊗ₜ[ℂ] RightHandedWeyl.basis 0 := by
   simp [leftRightToMatrix_symm_expand_tmul, pauliBasis, pauliSelfAdjoint, pauliMatrix]
   module
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The expansion of the pauli matrix `σ₃` in terms of a basis of tensor product vectors. -/
 lemma leftRightToMatrix_σSA_inr_2_expand : leftRightToMatrix.symm (pauliBasis (Sum.inr 2)) =
-    leftBasis 0 ⊗ₜ rightBasis 0 - leftBasis 1 ⊗ₜ rightBasis 1 := by
+    LeftHandedWeyl.basis 0 ⊗ₜ RightHandedWeyl.basis 0 -
+      LeftHandedWeyl.basis 1 ⊗ₜ RightHandedWeyl.basis 1 := by
   simp [leftRightToMatrix_symm_expand_tmul, pauliBasis, pauliSelfAdjoint, pauliMatrix]
   module
 
 /-- The expansion of `asTensor` into complexContrBasis basis of tensor product vectors. -/
 lemma asTensor_expand : asTensor =
-    complexContrBasis (Sum.inl 0) ⊗ₜ (leftBasis 0 ⊗ₜ rightBasis 0)
-    + complexContrBasis (Sum.inl 0) ⊗ₜ (leftBasis 1 ⊗ₜ rightBasis 1)
-    + complexContrBasis (Sum.inr 0) ⊗ₜ (leftBasis 0 ⊗ₜ rightBasis 1)
-    + complexContrBasis (Sum.inr 0) ⊗ₜ (leftBasis 1 ⊗ₜ rightBasis 0)
-    - I • complexContrBasis (Sum.inr 1) ⊗ₜ (leftBasis 0 ⊗ₜ rightBasis 1)
-    + I • complexContrBasis (Sum.inr 1) ⊗ₜ (leftBasis 1 ⊗ₜ rightBasis 0)
-    + complexContrBasis (Sum.inr 2) ⊗ₜ (leftBasis 0 ⊗ₜ rightBasis 0)
-    - complexContrBasis (Sum.inr 2) ⊗ₜ (leftBasis 1 ⊗ₜ rightBasis 1) := by
+    complexContrBasis (Sum.inl 0) ⊗ₜ (LeftHandedWeyl.basis 0 ⊗ₜ RightHandedWeyl.basis 0)
+    + complexContrBasis (Sum.inl 0) ⊗ₜ (LeftHandedWeyl.basis 1 ⊗ₜ RightHandedWeyl.basis 1)
+    + complexContrBasis (Sum.inr 0) ⊗ₜ (LeftHandedWeyl.basis 0 ⊗ₜ RightHandedWeyl.basis 1)
+    + complexContrBasis (Sum.inr 0) ⊗ₜ (LeftHandedWeyl.basis 1 ⊗ₜ RightHandedWeyl.basis 0)
+    - I • complexContrBasis (Sum.inr 1) ⊗ₜ (LeftHandedWeyl.basis 0 ⊗ₜ RightHandedWeyl.basis 1)
+    + I • complexContrBasis (Sum.inr 1) ⊗ₜ (LeftHandedWeyl.basis 1 ⊗ₜ RightHandedWeyl.basis 0)
+    + complexContrBasis (Sum.inr 2) ⊗ₜ (LeftHandedWeyl.basis 0 ⊗ₜ RightHandedWeyl.basis 0)
+    - complexContrBasis (Sum.inr 2) ⊗ₜ (LeftHandedWeyl.basis 1 ⊗ₜ RightHandedWeyl.basis 1) := by
   rw [asTensor_expand_complexContrBasis]
   rw [leftRightToMatrix_σSA_inl_0_expand, leftRightToMatrix_σSA_inr_0_expand,
     leftRightToMatrix_σSA_inr_1_expand, leftRightToMatrix_σSA_inr_2_expand]
@@ -92,7 +96,7 @@ set_option backward.isDefEq.respectTransparency false in
   the invariance under the `SL(2,ℂ)` action. -/
 def asConsTensor :
     (Representation.trivial ℂ SL(2,ℂ) ℂ).IntertwiningMap
-    (ContrℂModule.SL2CRep.tprod (leftHandedRep.tprod rightHandedRep)) where
+    (ContrℂModule.SL2CRep.tprod (LeftHandedWeyl.rep.tprod RightHandedWeyl.rep)) where
 
     toFun := fun a =>
       let a' : ℂ := a
@@ -106,7 +110,7 @@ def asConsTensor :
       refine LinearMap.ext fun x : ℂ => ?_
       change x • asTensor =
         (TensorProduct.map (ContrℂModule.SL2CRep M)
-          (TensorProduct.map (leftHandedRep M) (rightHandedRep M))) (x • asTensor)
+          (TensorProduct.map (LeftHandedWeyl.rep M) (RightHandedWeyl.rep M))) (x • asTensor)
       simp only [map_smul]
       apply congrArg
       nth_rewrite 2 [asTensor]

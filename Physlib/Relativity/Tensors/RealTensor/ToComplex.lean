@@ -312,10 +312,10 @@ lemma toComplexPure_component {c : Fin n → Color} (p : Pure realLorentzTensor 
   let b (c : Color) : Basis (Fin (complexLorentzTensor.repDim (colorToComplex c))) ℂ
       (complexLorentzTensor.modules (colorToComplex c)) :=
     match colorToComplex c with
-    | Color.upL => Fermion.leftBasis
-    | Color.downL => Fermion.dualLeftBasis
-    | Color.upR => Fermion.rightBasis
-    | Color.downR => Fermion.dualRightBasis
+    | Color.upL => Fermion.LeftHandedWeyl.basis
+    | Color.downL => Fermion.DualLeftHandedWeyl.basis
+    | Color.upR => Fermion.RightHandedWeyl.basis
+    | Color.downR => Fermion.DualRightHandedWeyl.basis
     | complexLorentzTensor.Color.up => Lorentz.complexContrBasisFin4
     | complexLorentzTensor.Color.down => Lorentz.complexCoBasisFin4
   let b' (c : Color) : Basis (Fin 1 ⊕ Fin 3) ℝ (realLorentzTensor.modules 3 c) :=
@@ -369,10 +369,10 @@ lemma actionP_toComplexPure {n : ℕ} (c : Fin n → Color) (p : Pure realLorent
   simp [Pure.actionP_eq, toComplexPure]
   let b (c : Color) : Representation ℂ _ (complexLorentzTensor.modules (colorToComplex c)) :=
     match colorToComplex c with
-    | Color.upL => Fermion.leftHandedRep
-    | Color.downL => Fermion.dualLeftHandedRep
-    | Color.upR => Fermion.rightHandedRep
-    | Color.downR => Fermion.dualRightHandedRep
+    | Color.upL => Fermion.LeftHandedWeyl.rep
+    | Color.downL => Fermion.DualLeftHandedWeyl.rep
+    | Color.upR => Fermion.RightHandedWeyl.rep
+    | Color.downR => Fermion.DualRightHandedWeyl.rep
     | complexLorentzTensor.Color.up => Lorentz.ContrℂModule.SL2CRep
     | complexLorentzTensor.Color.down => Lorentz.CoℂModule.SL2CRep
   let b' (c : Color) : Representation ℝ _ (realLorentzTensor.modules 3 c) :=

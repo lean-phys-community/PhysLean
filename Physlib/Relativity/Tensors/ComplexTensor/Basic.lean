@@ -130,17 +130,17 @@ def complexLorentzTensor : TensorSpecies ℂ complexLorentzTensor.Color SL(2, �
       | Color.down => Lorentz.CoℂModule)
     (fun c => Fin (repDim c))
     (fun c => match c with
-      | Color.upL => Fermion.leftHandedRep
-      | Color.downL => Fermion.dualLeftHandedRep
-      | Color.upR => Fermion.rightHandedRep
-      | Color.downR => Fermion.dualRightHandedRep
+      | Color.upL => Fermion.LeftHandedWeyl.rep
+      | Color.downL => Fermion.DualLeftHandedWeyl.rep
+      | Color.upR => Fermion.RightHandedWeyl.rep
+      | Color.downR => Fermion.DualRightHandedWeyl.rep
       | Color.up => Lorentz.ContrℂModule.SL2CRep
       | Color.down => Lorentz.CoℂModule.SL2CRep)
     (fun c => match c with
-    | Color.upL => Fermion.leftBasis
-    | Color.downL => Fermion.dualLeftBasis
-    | Color.upR => Fermion.rightBasis
-    | Color.downR => Fermion.dualRightBasis
+    | Color.upL => Fermion.LeftHandedWeyl.basis
+    | Color.downL => Fermion.DualLeftHandedWeyl.basis
+    | Color.upR => Fermion.RightHandedWeyl.basis
+    | Color.downR => Fermion.DualRightHandedWeyl.basis
     | Color.up => Lorentz.complexContrBasisFin4
     | Color.down => Lorentz.complexCoBasisFin4) where
 
@@ -231,20 +231,20 @@ syntax (name := complexLorentzTensorSyntax) "ℂT[" term,* "]" : term
 /-- The basis associated with each of the different types of complex Lorentz vector space. -/
 abbrev basis (c : Color) : Module.Basis (Fin (repDim c)) ℂ (modules c) :=
   match c with
-  | Color.upL => Fermion.leftBasis
-  | Color.downL => Fermion.dualLeftBasis
-  | Color.upR => Fermion.rightBasis
-  | Color.downR => Fermion.dualRightBasis
+  | Color.upL => Fermion.LeftHandedWeyl.basis
+  | Color.downL => Fermion.DualLeftHandedWeyl.basis
+  | Color.upR => Fermion.RightHandedWeyl.basis
+  | Color.downR => Fermion.DualRightHandedWeyl.basis
   | Color.up => Lorentz.complexContrBasisFin4
   | Color.down => Lorentz.complexCoBasisFin4
 
 /-- The reps associated with each of the different types of complex Lorentz vector space. -/
 abbrev rep (c : Color) : Representation ℂ SL(2, ℂ) (modules c) :=
   match c with
-  | Color.upL => Fermion.leftHandedRep
-  | Color.downL => Fermion.dualLeftHandedRep
-  | Color.upR => Fermion.rightHandedRep
-  | Color.downR => Fermion.dualRightHandedRep
+  | Color.upL => Fermion.LeftHandedWeyl.rep
+  | Color.downL => Fermion.DualLeftHandedWeyl.rep
+  | Color.upR => Fermion.RightHandedWeyl.rep
+  | Color.downR => Fermion.DualRightHandedWeyl.rep
   | Color.up => Lorentz.ContrℂModule.SL2CRep
   | Color.down => Lorentz.CoℂModule.SL2CRep
 

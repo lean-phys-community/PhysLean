@@ -1,12 +1,13 @@
 /-
 Copyright (c) 2026 Florian Wiesner. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Florian Wiesner
+Authors: Giuseppe Sorge, Florian Wiesner
 -/
 module
 
 public import Physlib.ClassicalMechanics.DampedHarmonicOscillator.Basic
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.Analysis.ODE.ExistUnique
 /-!
 
 # Solutions to the damped harmonic oscillator
@@ -29,6 +30,9 @@ case, polynomial for the critically damped case, and hyperbolic for the overdamp
   equation of motion in each damping regime.
 - `trajectory_equationOfMotion` proves that the selected trajectory satisfies the equation
   of motion.
+- `equationOfMotion_unique` proves that two smooth solutions with the same initial data agree, and
+  `trajectories_unique` proves that the selected trajectory is the unique solution with the given
+  initial conditions.
 
 ## iii. Table of contents
 
@@ -48,11 +52,7 @@ References for the damped harmonic oscillator include:
 - Landau & Lifshitz, Mechanics, page 76, section 25.
 - Goldstein, Classical Mechanics, Chapter 2.
 
-## v. TODOs
-
 -/
-TODO "Prove that the selected trajectory is the unique solution of the equation of motion with
-the given initial conditions."
 
 @[expose] public section
 
@@ -162,6 +162,30 @@ lemma trajectory_eq_of_overdamped (IC : InitialConditions) (hS : S.IsOverdamped)
     rw [IsCriticallyDamped]
     linarith
   simp [trajectory, hnotUnder, hnotCritical]
+
+/-- The selected trajectory is smooth. -/
+lemma trajectory_contDiff (IC : InitialConditions) :
+    ContDiff ℝ ∞ (S.trajectory IC) := by
+  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
+  · rw [S.trajectory_eq_of_underdamped IC hS]
+    unfold underdampedBase
+    fun_prop
+  · rw [S.trajectory_eq_of_criticallyDamped IC hS]
+    unfold criticallyDampedBase
+    fun_prop
+  · rw [S.trajectory_eq_of_overdamped IC hS]
+    unfold overdampedBase
+    fun_prop
+
+/-- The selected trajectory has initial position `IC.x₀`. -/
+lemma trajectory_apply_zero (IC : InitialConditions) : S.trajectory IC 0 = IC.x₀ := by
+  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
+  · rw [S.trajectory_eq_of_underdamped IC hS]
+    simp [underdampedBase]
+  · rw [S.trajectory_eq_of_criticallyDamped IC hS]
+    simp [criticallyDampedBase]
+  · rw [S.trajectory_eq_of_overdamped IC hS]
+    simp [overdampedBase]
 
 /-!
 
@@ -351,6 +375,26 @@ private lemma overdampedBase_acceleration (IC : InitialConditions) (hS : S.IsOve
   simp [mul_comm, smul_smul, smul_add]
   field_simp [hΩ]
 
+/-- The selected trajectory has initial velocity `IC.v₀`. -/
+lemma trajectory_velocity_at_zero (IC : InitialConditions) :
+    ∂ₜ (S.trajectory IC) 0 = IC.v₀ := by
+  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
+  · rw [S.trajectory_eq_of_underdamped IC hS,
+      exp_decay_smul_velocity S.decayRate (S.underdampedBase IC)
+        (by unfold underdampedBase; fun_prop),
+      show ∂ₜ (S.underdampedBase IC) = _ from S.underdampedBase_velocity IC hS]
+    simp [underdampedBase]
+  · rw [S.trajectory_eq_of_criticallyDamped IC hS,
+      exp_decay_smul_velocity S.decayRate (S.criticallyDampedBase IC)
+        (by unfold criticallyDampedBase; fun_prop),
+      S.criticallyDampedBase_velocity IC]
+    simp [criticallyDampedBase]
+  · rw [S.trajectory_eq_of_overdamped IC hS,
+      exp_decay_smul_velocity S.decayRate (S.overdampedBase IC)
+        (by unfold overdampedBase; fun_prop),
+      show ∂ₜ (S.overdampedBase IC) = _ from S.overdampedBase_velocity IC hS]
+    simp [overdampedBase]
+
 /-!
 ## C. Trajectories and equation of motion
 
@@ -419,23 +463,99 @@ lemma trajectory_equationOfMotion_of_overdamped (IC : InitialConditions)
 /-- The selected trajectory satisfies the damped equation of motion. -/
 lemma trajectory_equationOfMotion (IC : InitialConditions) :
     S.EquationOfMotion (S.trajectory IC) := by
-  by_cases hUnder : S.IsUnderdamped
-  · exact S.trajectory_equationOfMotion_of_underdamped IC hUnder
-  · by_cases hCritical : S.IsCriticallyDamped
-    · exact S.trajectory_equationOfMotion_of_criticallyDamped IC hCritical
-    · have hOver : S.IsOverdamped := by
-        rw [IsOverdamped, IsUnderdamped] at *
-        exact lt_of_le_of_ne (not_lt.mp hUnder) (Ne.symm hCritical)
-      exact S.trajectory_equationOfMotion_of_overdamped IC hOver
+  rcases S.isUnderdamped_or_isCriticallyDamped_or_isOverdamped with hS | hS | hS
+  · exact S.trajectory_equationOfMotion_of_underdamped IC hS
+  · exact S.trajectory_equationOfMotion_of_criticallyDamped IC hS
+  · exact S.trajectory_equationOfMotion_of_overdamped IC hS
 
 /-!
 
 ### C.2. Uniqueness of the solutions
 
-Future work: prove that, in each damping regime, the selected explicit branch is the unique
-solution of the damped equation of motion with the given initial conditions.
+Unlike the undamped oscillator, the mechanical energy is not conserved along a damped solution, so
+uniqueness cannot be read off from a conserved positive-definite energy. Instead we reduce the
+second-order equation of motion `m ẍ + γ ẋ + k x = 0` to the first-order linear system
+`(x, ẋ)' = (ẋ, (1/m)(-k x - γ ẋ))` on the phase space and invoke the global
+ODE-uniqueness theorem `ODE_solution_unique_univ` (the right-hand side is a continuous
+linear map, hence Lipschitz).
 
 -/
+
+/-- The phase-space vector field of the damped oscillator, sending `(x, ẋ)` to
+`(ẋ, -(k/m) x - (γ/m) ẋ)`, as a continuous linear map on `E × E`. -/
+private noncomputable def phaseVectorField :
+    EuclideanSpace ℝ (Fin 1) × EuclideanSpace ℝ (Fin 1) →L[ℝ]
+      EuclideanSpace ℝ (Fin 1) × EuclideanSpace ℝ (Fin 1) :=
+  (ContinuousLinearMap.snd ℝ (EuclideanSpace ℝ (Fin 1)) (EuclideanSpace ℝ (Fin 1))).prod
+    ((-(S.m⁻¹ * S.k)) •
+        ContinuousLinearMap.fst ℝ (EuclideanSpace ℝ (Fin 1)) (EuclideanSpace ℝ (Fin 1)) +
+      (-(S.m⁻¹ * S.γ)) •
+        ContinuousLinearMap.snd ℝ (EuclideanSpace ℝ (Fin 1)) (EuclideanSpace ℝ (Fin 1)))
+
+private lemma phaseVectorField_apply (a b : EuclideanSpace ℝ (Fin 1)) :
+    S.phaseVectorField (a, b) = (b, (-(S.m⁻¹ * S.k)) • a + (-(S.m⁻¹ * S.γ)) • b) := by
+  simp [phaseVectorField]
+
+private lemma toRealCLE_symm_one : Time.toRealCLE.symm (1 : ℝ) = (1 : Time) := by
+  rw [ContinuousLinearEquiv.symm_apply_eq]
+  change (1 : ℝ) = (1 : Time).val
+  rw [Time.one_val]
+
+/-- Bridge from the time derivative to `HasDerivAt` for a curve reparametrised through the
+canonical `ℝ ≃L[ℝ] Time` equivalence. -/
+private lemma hasDerivAt_comp_toRealCLE_symm (w : Time → EuclideanSpace ℝ (Fin 1)) (τ : ℝ)
+    (hw : DifferentiableAt ℝ w (Time.toRealCLE.symm τ)) :
+    HasDerivAt (fun τ : ℝ => w (Time.toRealCLE.symm τ))
+      (∂ₜ w (Time.toRealCLE.symm τ)) τ := by
+  simpa [Function.comp_def, Time.deriv_eq, toRealCLE_symm_one] using
+    hw.hasFDerivAt.comp_hasDerivAt_of_eq τ
+      ((Time.toRealCLE.symm : ℝ →L[ℝ] Time).hasDerivAt) rfl
+
+/-- The phase curve `τ ↦ (z t, ẋ t)` (with `t = toRealCLE.symm τ`) of a smooth solution `z`
+solves the first-order phase-space ODE with vector field `phaseVectorField`. -/
+private lemma phaseCurve_hasDerivAt (z : Time → EuclideanSpace ℝ (Fin 1))
+    (hz : ContDiff ℝ ∞ z) (hEOM : S.EquationOfMotion z) (τ : ℝ) :
+    HasDerivAt (fun τ : ℝ => (z (Time.toRealCLE.symm τ), ∂ₜ z (Time.toRealCLE.symm τ)))
+      (S.phaseVectorField (z (Time.toRealCLE.symm τ), ∂ₜ z (Time.toRealCLE.symm τ))) τ := by
+  rw [S.phaseVectorField_apply,
+    ← S.acceleration_eq_of_equationOfMotion z hEOM (Time.toRealCLE.symm τ)]
+  exact (hasDerivAt_comp_toRealCLE_symm z τ (hz.differentiable (by simp) _)).prodMk
+    (hasDerivAt_comp_toRealCLE_symm (∂ₜ z) τ (deriv_differentiable_of_contDiff z hz _))
+
+/-- Any two smooth solutions of the damped equation of motion with the same initial position and
+velocity are equal. -/
+lemma equationOfMotion_unique (x y : Time → EuclideanSpace ℝ (Fin 1))
+    (hx : ContDiff ℝ ∞ x) (hy : ContDiff ℝ ∞ y)
+    (hEOMx : S.EquationOfMotion x) (hEOMy : S.EquationOfMotion y)
+    (h0 : x 0 = y 0) (hv0 : ∂ₜ x 0 = ∂ₜ y 0) :
+    x = y := by
+  have hIC : (fun τ : ℝ => (x (Time.toRealCLE.symm τ), ∂ₜ x (Time.toRealCLE.symm τ))) 0 =
+      (fun τ : ℝ => (y (Time.toRealCLE.symm τ), ∂ₜ y (Time.toRealCLE.symm τ))) 0 := by
+    have h00 : Time.toRealCLE.symm (0 : ℝ) = (0 : Time) := map_zero Time.toRealCLE.symm
+    simp only [h00, h0, hv0]
+  have hEq := ODE_solution_unique_univ
+    (v := fun _ p => S.phaseVectorField p) (s := fun _ => Set.univ) (t₀ := (0 : ℝ))
+    (f := fun τ : ℝ => (x (Time.toRealCLE.symm τ), ∂ₜ x (Time.toRealCLE.symm τ)))
+    (g := fun τ : ℝ => (y (Time.toRealCLE.symm τ), ∂ₜ y (Time.toRealCLE.symm τ)))
+    (fun _ => S.phaseVectorField.lipschitz.lipschitzOnWith)
+    (fun τ => ⟨S.phaseCurve_hasDerivAt x hx hEOMx τ, Set.mem_univ _⟩)
+    (fun τ => ⟨S.phaseCurve_hasDerivAt y hy hEOMy τ, Set.mem_univ _⟩)
+    hIC
+  funext t
+  have h1 := congrFun hEq (Time.toRealCLE t)
+  simp only [ContinuousLinearEquiv.symm_apply_apply] at h1
+  exact (Prod.ext_iff.mp h1).1
+
+/-- The selected trajectory is the unique smooth solution of the damped equation of motion with the
+given initial conditions. -/
+lemma trajectories_unique (IC : InitialConditions) (x : Time → EuclideanSpace ℝ (Fin 1))
+    (hx : ContDiff ℝ ∞ x) (hEOM : S.EquationOfMotion x)
+    (hx0 : x 0 = IC.x₀) (hv0 : ∂ₜ x 0 = IC.v₀) :
+    x = S.trajectory IC := by
+  refine S.equationOfMotion_unique x (S.trajectory IC) hx (S.trajectory_contDiff IC)
+    hEOM (S.trajectory_equationOfMotion IC) ?_ ?_
+  · rw [hx0, S.trajectory_apply_zero IC]
+  · rw [hv0, S.trajectory_velocity_at_zero IC]
 
 end DampedHarmonicOscillator
 

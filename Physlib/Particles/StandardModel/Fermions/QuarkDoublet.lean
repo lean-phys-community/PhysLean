@@ -89,7 +89,7 @@ open Representation in
 noncomputable def repLorentzGroup : Representation ℂ (SL(2,ℂ)) QuarkDoublet where
   toFun Λ :=  valLinEquiv.symm ∘ₗ
       TensorProduct.map
-      (TensorProduct.map (Fermion.leftHandedRep Λ)
+      (TensorProduct.map (Fermion.LeftHandedWeyl.rep Λ)
         (trivial ℂ (SL(2,ℂ)) (EuclideanSpace ℂ (Fin 3)) Λ))
         (trivial ℂ (SL(2,ℂ)) (EuclideanSpace ℂ (Fin 2)) Λ)
       ∘ₗ valLinEquiv

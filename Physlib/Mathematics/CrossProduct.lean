@@ -5,6 +5,7 @@ Authors: Giuseppe Sorge
 -/
 module
 
+public import Mathlib.Analysis.Calculus.ContDiff.Operations
 public import Mathlib.Data.Matrix.Mul
 public import Mathlib.Data.Real.Basic
 public import Mathlib.LinearAlgebra.CrossProduct
@@ -29,5 +30,20 @@ lemma cross_cross_self_apply (v w : Fin 3 → ℝ) (i : Fin 3) :
   rw [cross_cross_eq_smul_sub_smul']
   simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, dotProduct, Fin.sum_univ_three]
   ring
+
+/-- Contracting `w` with the triple cross product `v ⨯₃ (w ⨯₃ v)` gives `(w ⨯₃ v) ⬝ᵥ (w ⨯₃ v)`
+(over `ℝ`, the squared length `|w × v|²`), by two cyclic permutations of the scalar triple
+product. -/
+lemma dotProduct_cross_cross_self {R : Type*} [CommRing R] (v w : Fin 3 → R) :
+    w ⬝ᵥ (v ⨯₃ (w ⨯₃ v)) = (w ⨯₃ v) ⬝ᵥ (w ⨯₃ v) := by
+  rw [triple_product_permutation, triple_product_permutation]
+
+/-- The squared length `(ω ⨯₃ v) ⬝ᵥ (ω ⨯₃ v)` of the cross product with a fixed vector `ω` is a
+smooth function of `v`. -/
+lemma contDiff_cross_dotProduct_cross (ω : Fin 3 → ℝ) :
+    ContDiff ℝ ⊤ fun v : Fin 3 → ℝ => (ω ⨯₃ v) ⬝ᵥ (ω ⨯₃ v) := by
+  simp only [dotProduct, Fin.sum_univ_three, cross_apply, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  fun_prop
 
 end Matrix

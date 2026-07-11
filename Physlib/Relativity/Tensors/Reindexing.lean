@@ -10,6 +10,7 @@ public import Physlib.Relativity.Tensors.Contraction.SuccSuccAbove
 public import Mathlib.Topology.Algebra.Module.ModuleTopology
 public import Mathlib.Analysis.RCLike.Basic
 public import Mathlib.Tactic.Cases
+public import Mathlib.GroupTheory.Perm.Fin
 /-!
 
 # Reindexing of tensor components
@@ -142,6 +143,10 @@ lemma toEquiv_symm_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
 
 -/
 open Fin
+
+lemma swap {n : ℕ} {c : Fin n → C} (i j : Fin n) :
+    IsReindexing c (c ∘ Equiv.swap i j) (Equiv.swap i j) := by
+  simp [IsReindexing]
 
 /-- The inverse of a map satisfying `IsReindexing c c1 σ` is a reindexing of `c1` by `c`. -/
 lemma symm {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
@@ -486,6 +491,52 @@ lemma fin_cast_isReindexing (n n1 : ℕ) {c : Fin n → C} (h : n1 = n) :
   · exact Equiv.bijective (finCongr h)
   · intro i
     rfl
+
+/-- Contracting the `i`-th index of a tensor with the first index of an appended metric tensor
+  is, up to a cycle permutation, a reindexing to the color list where the `i`-th index is
+  replaced by its dual. -/
+lemma contr_two_rotate  {c : Fin n → C}  (i : Fin n) : IsReindexing
+    ((Fin.append c ![S.τ (c i), S.τ (c i)] ∘
+      (Fin.natAdd n (0 : Fin 2)).succSuccAbove (Fin.castAdd 2 i)))
+    (Function.update c i (S.τ (c i)))
+    (Fin.cycleIcc i ⟨n - 1, by have := i.prop; omega⟩).symm := by
+  haveI : NeZero n := ⟨by have := i.prop; omega⟩
+  set j : Fin n := ⟨n - 1, by have := i.prop; omega⟩ with hj
+  have key : ∀ y : Fin n, Fin.append c ![S.τ (c i), S.τ (c i)]
+      ((Fin.natAdd n (0 : Fin 2)).succSuccAbove (Fin.castAdd 2 i) y)
+      = Function.update c i (S.τ (c i)) (Fin.cycleIcc i j y) := by
+    intro y
+    have hval := Fin.succSuccAbove_val (Fin.natAdd n (0 : Fin 2)) (Fin.castAdd 2 i) y
+    simp only [Fin.val_natAdd, Fin.val_castAdd, Fin.val_zero, Nat.add_zero] at hval
+    rcases lt_or_ge y.val i.val with hy | hy
+    · -- y < i
+      rw [Fin.cycleIcc_of_lt (Fin.lt_def.mpr hy),
+        Function.update_of_ne (Fin.ne_of_val_ne (by omega)),
+        Fin.succSuccAbove_apply_lt_lt _ _ _ (by simp) (by simpa using hy),
+        show y.castSucc.castSucc = Fin.castAdd 2 y from by ext; simp, Fin.append_left]
+    · rcases eq_or_lt_of_le (show y.val ≤ n - 1 from by have := y.isLt; omega) with hyj | hyj
+      · -- y = j (the last index)
+        have hyj' : y = j := Fin.ext (by rw [hj]; exact hyj)
+        subst hyj'
+        have hval' : ((Fin.natAdd n (0 : Fin 2)).succSuccAbove (Fin.castAdd 2 i) j).val
+            = n + 1 := by rw [hval]; split_ifs <;> omega
+        rw [Fin.cycleIcc_of_last (Fin.le_def.mpr (by rw [hj]; omega)), Function.update_self,
+          show (Fin.natAdd n (0 : Fin 2)).succSuccAbove (Fin.castAdd 2 i) j =
+            Fin.natAdd n (1 : Fin 2)
+            from Fin.ext (by rw [hval']; simp [Fin.val_natAdd]), Fin.append_right]
+        simp
+      · -- i ≤ y < j
+        have hy1 : (y + 1).val = y.val + 1 := by
+          rw [Fin.val_add, Fin.val_one', Nat.mod_eq_of_lt (show 1 < n by omega),
+            Nat.mod_eq_of_lt (show y.val + 1 < n by omega)]
+        have hval' : ((Fin.natAdd n (0 : Fin 2)).succSuccAbove (Fin.castAdd 2 i) y).val
+            = y.val + 1 := by rw [hval]; split_ifs <;> omega
+        rw [Fin.cycleIcc_of_ge_of_lt (Fin.le_def.mpr hy) (Fin.lt_def.mpr hyj),
+          Function.update_of_ne (Fin.ne_of_val_ne (by omega)),
+          show (Fin.natAdd n (0 : Fin 2)).succSuccAbove (Fin.castAdd 2 i) y = Fin.castAdd 2 (y + 1)
+            from Fin.ext (by rw [hval', Fin.val_castAdd, hy1]), Fin.append_left]
+  refine ⟨(Equiv.symm _).bijective, fun x => ?_⟩
+  rw [Function.comp_apply, key, Equiv.apply_symm_apply]
 
 end IsReindexing
 

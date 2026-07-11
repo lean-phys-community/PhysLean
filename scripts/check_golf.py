@@ -735,25 +735,42 @@ def measure_revision(ref: str, path: str) -> Tuple[Optional[int], Optional[float
 
 
 def measure_files(base: str, head: str, reports: List[FileReport],
-                  limit: Optional[int] = None) -> List[Measurement]:
+                  limit: Optional[int] = None,
+                  jobs: int = 1) -> List[Measurement]:
     """Measure each file that had a proof/body change, base and head.
 
     The base source is compiled against the (head) built environment; this is
     sound exactly when statements are preserved -- which is what the check
     itself verifies -- because only proof/body text then differs.
+
+    With ``jobs > 1`` measurements run concurrently. Heartbeats are
+    deterministic and unaffected; wall-clock times are measured under load,
+    so only large time deltas remain meaningful.
     """
     paths = [r.path for r in reports
              if r.proof_golfed or r.embedded_proof_changed or r.def_value_changed]
     if limit is not None:
         paths = paths[:limit]
-    out: List[Measurement] = []
-    for i, path in enumerate(paths):
+
+    def one(path: str) -> Measurement:
         bhb, bms, bnote = measure_revision(base, path)
         hhb, hms, hnote = measure_revision(head, path)
-        m = Measurement(path, bhb, hhb, bms, hms, bnote or hnote)
-        out.append(m)
-        print("[{}/{}] measured {} ({})".format(
-            i + 1, len(paths), path, m.note or "ok"), file=sys.stderr)
+        return Measurement(path, bhb, hhb, bms, hms, bnote or hnote)
+
+    out: List[Measurement] = []
+    if jobs <= 1:
+        for i, path in enumerate(paths):
+            m = one(path)
+            out.append(m)
+            print("[{}/{}] measured {} ({})".format(
+                i + 1, len(paths), path, m.note or "ok"), file=sys.stderr)
+        return out
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=jobs) as ex:
+        for i, m in enumerate(ex.map(one, paths)):
+            out.append(m)
+            print("[{}/{}] measured {} ({})".format(
+                i + 1, len(paths), m.path, m.note or "ok"), file=sys.stderr)
     return out
 
 
@@ -991,6 +1008,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--measure", action="store_true",
                     help="also measure compile time and heartbeats "
                          "(requires a built project)")
+    ap.add_argument("--measure-jobs", type=int,
+                    default=max(1, os.cpu_count() or 1),
+                    help="concurrent measurement compiles (default: nproc)")
     ap.add_argument("--measure-limit", type=int, default=None,
                     help="measure at most this many files (for a quick sample)")
     args = ap.parse_args(argv)
@@ -999,7 +1019,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     measurements = None
     if args.measure:
         measurements = measure_files(args.base, args.head, reports,
-                                     args.measure_limit)
+                                     args.measure_limit,
+                                     args.measure_jobs)
     body = render_report(args.base, args.head, reports, measurements)
 
     if args.post:
