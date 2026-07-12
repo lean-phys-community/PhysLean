@@ -5,8 +5,8 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Basic
-public import Physlib.QuantumMechanics.DDimensions.Operators.Position
+public import Physlib.QuantumMechanics.SpaceDQuantumSystem
+public import Physlib.QuantumMechanics.Operators.Position
 /-!
 
 # Hydrogen atom

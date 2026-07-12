@@ -5,8 +5,8 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
-public import Physlib.QuantumMechanics.DDimensions.Operators.Multiplication
+public import Physlib.QuantumMechanics.Operators.Momentum
+public import Physlib.QuantumMechanics.Operators.Multiplication
 /-!
 
 # Single-particle quantum system on `Space d`

@@ -5,7 +5,7 @@ Authors: Matteo Cipollina
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Covariance
+public import Physlib.QuantumMechanics.Operators.Covariance
 /-!
 
 # Uncertainty bounds for partial linear maps

@@ -5,8 +5,8 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
-public import Physlib.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.Operators.Unbounded
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceDHilbertSpace.SchwartzSubmodule
 /-!
 
 # Multiplication operators on `SpaceDHilbertSpace`

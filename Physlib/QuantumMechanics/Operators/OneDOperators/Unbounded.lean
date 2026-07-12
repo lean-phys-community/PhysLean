@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.Basic
+public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.Basic
 /-!
 
 # Unbounded operators

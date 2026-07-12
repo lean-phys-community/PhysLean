@@ -5,7 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Basic
+public import Physlib.QuantumMechanics.Operators.SpectralTheory.Basic
 /-!
 
 # Spectral theory for symmetric operators

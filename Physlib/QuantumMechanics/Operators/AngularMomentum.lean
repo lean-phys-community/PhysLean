@@ -5,8 +5,8 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Position
-public import Physlib.QuantumMechanics.DDimensions.Operators.Momentum
+public import Physlib.QuantumMechanics.Operators.Position
+public import Physlib.QuantumMechanics.Operators.Momentum
 /-!
 
 # Angular momentum operator

@@ -5,10 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.PositionStates
-public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
+public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.PositionStates
+public import Physlib.QuantumMechanics.Operators.OneDOperators.Unbounded
 public import Physlib.Mathematics.Distribution.PowMul
-public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.SchwartzSubmodule
 /-!
 
 # Position operator

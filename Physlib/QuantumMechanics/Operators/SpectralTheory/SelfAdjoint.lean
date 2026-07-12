@@ -5,7 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.SpectralTheory.Symmetric
+public import Physlib.QuantumMechanics.Operators.SpectralTheory.Symmetric
 /-!
 
 # Spectral theory for self-adjoint operators

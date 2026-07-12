@@ -5,7 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.Unbounded
+public import Physlib.QuantumMechanics.Operators.Unbounded
 /-!
 
 # Spectral theory for closed operators

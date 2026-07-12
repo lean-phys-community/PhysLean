@@ -7,7 +7,7 @@ module
 
 public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Tensorial
-public import Physlib.QuantumMechanics.DDimensions.Operators.AngularMomentum
+public import Physlib.QuantumMechanics.Operators.AngularMomentum
 /-!
 
 # Commutation relations

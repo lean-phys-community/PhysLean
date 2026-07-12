@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.FiniteTarget.HilbertSpace
+public import Physlib.QuantumMechanics.HilbertSpaces.FiniteTargetHilbertSpace.Basic
 /-!
 
 # The tight binding chain

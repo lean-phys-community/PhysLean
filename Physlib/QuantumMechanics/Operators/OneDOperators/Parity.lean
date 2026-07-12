@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDimension.HilbertSpace.SchwartzSubmodule
-public import Physlib.QuantumMechanics.OneDimension.Operators.Unbounded
+public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.Operators.OneDOperators.Unbounded
 public import Mathlib.MeasureTheory.Measure.Haar.Unique
 public import Mathlib.Analysis.Calculus.ContDiff.Operations
 /-!

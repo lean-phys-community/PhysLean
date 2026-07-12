@@ -5,7 +5,7 @@ Authors: Afiq Hatta
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDimension.Operators.Momentum
+public import Physlib.QuantumMechanics.Operators.OneDOperators.Momentum
 public import Physlib.Mathematics.Trigonometry.Tanh
 /-!
 

@@ -5,7 +5,7 @@ Authors: Matteo Cipollina
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Operators.StateObservables.Variance
+public import Physlib.QuantumMechanics.Operators.StateObservables.Variance
 /-!
 
 # Covariance

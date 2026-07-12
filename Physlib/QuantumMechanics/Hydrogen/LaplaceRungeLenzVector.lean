@@ -5,8 +5,8 @@ Authors: Gregory J. Loges
 -/
 module
 
-public import Physlib.QuantumMechanics.DDimensions.Hydrogen.Basic
-public import Physlib.QuantumMechanics.DDimensions.Operators.Commutation
+public import Physlib.QuantumMechanics.Hydrogen.Basic
+public import Physlib.QuantumMechanics.Operators.Commutation
 public import Physlib.Meta.Linters.Sorry
 /-!
 
