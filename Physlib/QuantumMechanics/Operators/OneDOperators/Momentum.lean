@@ -7,9 +7,9 @@ module
 
 public import Mathlib.Analysis.Calculus.FDeriv.Star
 public import Physlib.QuantumMechanics.Operators.OneDOperators.Unbounded
-public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.SchwartzSubmodule
 public import Physlib.QuantumMechanics.PlanckConstant
-public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.PlaneWaves
+public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.PlaneWaves
 /-!
 
 # Momentum operator

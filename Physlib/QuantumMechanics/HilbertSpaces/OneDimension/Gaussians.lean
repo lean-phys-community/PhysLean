@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.Basic
+public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Basic
 public import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 public import Physlib.Meta.TODO.Basic
 /-!

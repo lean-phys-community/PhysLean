@@ -6,7 +6,7 @@ Authors: Gregory J. Loges
 module
 
 public import Physlib.QuantumMechanics.Operators.Unbounded
-public import Physlib.QuantumMechanics.HilbertSpaces.SpaceDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 /-!
 
 # Multiplication operators on `SpaceDHilbertSpace`

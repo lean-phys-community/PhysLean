@@ -6,7 +6,7 @@ Authors: Gregory J. Loges
 module
 
 public import Physlib.QuantumMechanics.Operators.Multiplication
-public import Physlib.QuantumMechanics.HilbertSpaces.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PolyBddSchwartzSubmodule
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 /-!
 

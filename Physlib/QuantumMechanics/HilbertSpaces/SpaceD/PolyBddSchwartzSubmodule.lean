@@ -7,7 +7,7 @@ module
 
 public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
-public import Physlib.QuantumMechanics.HilbertSpaces.SpaceDHilbertSpace.SchwartzSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 /-!
 
 # Polynomially-bounded Schwartz submodules
