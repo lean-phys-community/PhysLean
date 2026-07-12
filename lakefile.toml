@@ -28,6 +28,10 @@ name = "check_file_imports"
 srcDir = "scripts"
 
 [[lean_exe]]
+name = "autolabel"
+srcDir = "scripts"
+
+[[lean_exe]]
 name = "style_lint"
 srcDir = "scripts/MetaPrograms"
 
