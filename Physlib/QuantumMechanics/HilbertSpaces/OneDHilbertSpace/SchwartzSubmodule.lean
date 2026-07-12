@@ -7,6 +7,7 @@ module
 
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.Basic
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Schwartz submodule of the Hilbert space
@@ -15,6 +16,8 @@ This can be used to define e.g.
 the rigged Hilbert space.
 
 -/
+
+TODO "Remove once dependencies are all generalized to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 

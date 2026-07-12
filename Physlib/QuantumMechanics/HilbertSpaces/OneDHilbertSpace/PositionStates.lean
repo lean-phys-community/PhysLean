@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Distribution.TemperedDistribution
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Position states
@@ -14,6 +15,8 @@ We define plane waves as a member of the dual of the
 Schwartz submodule of the Hilbert space.
 
 -/
+
+TODO "Generalize to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 namespace QuantumMechanics

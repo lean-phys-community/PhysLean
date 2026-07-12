@@ -7,11 +7,14 @@ module
 
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.Basic
 public import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Gaussians and the hilbert space
 
 -/
+
+TODO "Generalize to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 

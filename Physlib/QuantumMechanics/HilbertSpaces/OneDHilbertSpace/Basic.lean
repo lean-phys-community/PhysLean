@@ -8,11 +8,14 @@ module
 public import Mathlib.Analysis.InnerProductSpace.Dual
 public import Mathlib.MeasureTheory.Function.L2Space
 public import Mathlib.MeasureTheory.Measure.Haar.OfBasis
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Hilbert space for one dimension quantum mechanics
 
 -/
+
+TODO "Remove once dependencies are all generalized to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 

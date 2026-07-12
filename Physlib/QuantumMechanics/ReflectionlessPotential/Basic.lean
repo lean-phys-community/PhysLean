@@ -7,6 +7,7 @@ module
 
 public import Physlib.QuantumMechanics.Operators.OneDOperators.Momentum
 public import Physlib.Mathematics.Trigonometry.Tanh
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # 1d Reflectionless Potential
@@ -22,6 +23,10 @@ This file contains
 annihilation operators
 - Show reflectionless properties
 -/
+
+TODO "Refactor to use `SpaceDHilbertSpace 1`."
+
+TODO "Refactor to use `QuantumMechanics.PlanckConstant`."
 
 @[expose] public section
 

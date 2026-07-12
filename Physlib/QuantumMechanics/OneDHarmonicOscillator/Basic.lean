@@ -8,7 +8,7 @@ module
 public import Physlib.QuantumMechanics.Operators.OneDOperators.Parity
 public import Physlib.QuantumMechanics.Operators.OneDOperators.Momentum
 public import Physlib.QuantumMechanics.Operators.OneDOperators.Position
-
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # 1d Harmonic Oscillator
@@ -20,9 +20,9 @@ This file contains
   of Hermite polynomials
 - proof that eigenfunctions and eigenvalues are indeed eigenfunctions and eigenvalues.
 
-## TODO
-
 -/
+
+TODO "Generalize to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 
