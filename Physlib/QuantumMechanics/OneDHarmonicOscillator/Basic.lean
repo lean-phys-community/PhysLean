@@ -22,7 +22,7 @@ This file contains
 
 -/
 
-TODO "Generalize to d dimensions and SpaceDHilbertSpace."
+TODO "Generalize 1d harmonic oscillator to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 

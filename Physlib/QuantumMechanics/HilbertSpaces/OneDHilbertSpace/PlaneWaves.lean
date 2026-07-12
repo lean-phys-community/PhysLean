@@ -16,7 +16,7 @@ Schwartz submodule of the Hilbert space.
 
 -/
 
-TODO "Generalize to d dimensions and SpaceDHilbertSpace."
+TODO "Generalize plane waves to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 

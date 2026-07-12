@@ -15,7 +15,7 @@ public import Physlib.Meta.TODO.Basic
 
 -/
 
-TODO "Remove once dependencies are all generalized to d dimensions and SpaceDHilbertSpace."
+TODO "Remove 1d Hilbert space once dependencies are moved over to SpaceDHilbertSpace."
 
 @[expose] public section
 

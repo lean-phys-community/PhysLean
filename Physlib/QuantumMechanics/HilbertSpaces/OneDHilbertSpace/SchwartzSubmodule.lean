@@ -17,7 +17,7 @@ the rigged Hilbert space.
 
 -/
 
-TODO "Remove once dependencies are all generalized to d dimensions and SpaceDHilbertSpace."
+TODO "Remove 1d Schwartz submodule once dependencies are all generalized to SpaceDHilbertSpace."
 
 @[expose] public section
 

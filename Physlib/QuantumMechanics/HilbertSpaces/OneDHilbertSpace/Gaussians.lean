@@ -14,7 +14,7 @@ public import Physlib.Meta.TODO.Basic
 
 -/
 
-TODO "Generalize to d dimensions and SpaceDHilbertSpace."
+TODO "Generalize Gaussian states to d dimensions and SpaceDHilbertSpace."
 
 @[expose] public section
 
