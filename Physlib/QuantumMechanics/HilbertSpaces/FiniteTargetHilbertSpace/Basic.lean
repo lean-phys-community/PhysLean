@@ -47,7 +47,6 @@ TODO "To match this with the results currently in the `QuantumInfo` part of the 
   definition of bras and kets, and the definition of mixed states. Maybe also
   parts of `./ResourceTheory/FreeState`."
 
-
 /-- The Hilbert space of a finite target quantum mechanical system whose target is
   a finite type `d` with decidable equality.
 
@@ -66,7 +65,6 @@ structure FiniteHilbertSpace (d : Type*) [Fintype d] [DecidableEq d] where
 
 @[inherit_doc FiniteHilbertSpace]
 scoped notation "𝓗[" d "]" => FiniteHilbertSpace d
-
 
 namespace FiniteHilbertSpace
 

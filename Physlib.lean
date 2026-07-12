@@ -275,6 +275,8 @@ public import Physlib.QFT.QED.AnomalyCancellation.Odd.Parameterization
 public import Physlib.QFT.QED.AnomalyCancellation.Permutations
 public import Physlib.QFT.QED.AnomalyCancellation.Sorts
 public import Physlib.QFT.QED.AnomalyCancellation.VectorLike
+public import Physlib.QuantumMechanics.FiniteTarget
+public import Physlib.QuantumMechanics.HarmonicOscillator.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.FiniteTargetHilbertSpace.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.Gaussians
@@ -284,7 +286,6 @@ public import Physlib.QuantumMechanics.HilbertSpaces.OneDHilbertSpace.SchwartzSu
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceDHilbertSpace.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceDHilbertSpace.PolyBddSchwartzSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceDHilbertSpace.SchwartzSubmodule
-public import Physlib.QuantumMechanics.HarmonicOscillator.Basic
 public import Physlib.QuantumMechanics.Hydrogen.Basic
 public import Physlib.QuantumMechanics.Hydrogen.LaplaceRungeLenzVector
 public import Physlib.QuantumMechanics.OneDHarmonicOscillator.Basic
@@ -313,9 +314,8 @@ public import Physlib.QuantumMechanics.Operators.StateObservables.IsEigenvector
 public import Physlib.QuantumMechanics.Operators.StateObservables.Variance
 public import Physlib.QuantumMechanics.Operators.Unbounded
 public import Physlib.QuantumMechanics.Operators.Uncertainty
-public import Physlib.QuantumMechanics.ReflectionlessPotential.Basic
-public import Physlib.QuantumMechanics.FiniteTarget
 public import Physlib.QuantumMechanics.PlanckConstant
+public import Physlib.QuantumMechanics.ReflectionlessPotential.Basic
 public import Physlib.QuantumMechanics.SpaceDQuantumSystem
 public import Physlib.Relativity.Bispinors.Basic
 public import Physlib.Relativity.CliffordAlgebra

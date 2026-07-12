@@ -139,7 +139,7 @@ attribute [local instance 100] LieRing.ofAssociativeRing
 
 @[simp]
 lemma momentumSqr_commutation_momentum : ⁅𝐩[d] ⬝ᵥ 𝐩, 𝐩 i⁆ = 0 := by
-  simp  [dotProduct, mul_def, sum_lie, leibniz_lie]
+  simp [dotProduct, mul_def, sum_lie, leibniz_lie]
 
 lemma momentumSqr_comp_momentum_commute : (𝐩 ⬝ᵥ 𝐩) ∘L 𝐩 i = 𝐩 i ∘L (𝐩 ⬝ᵥ 𝐩) := by
   rw [comp_eq_comp_add_commute, momentumSqr_commutation_momentum, add_zero]
