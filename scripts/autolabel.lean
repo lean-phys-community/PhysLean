@@ -54,7 +54,6 @@ Additionally, the script does a few consistency checks:
   There is `AutoLabel.physlibUnlabelled` to add exceptions for this test.
 
 -/
-
 open Lean System
 
 namespace AutoLabel
@@ -178,9 +177,7 @@ A `LabelData` consists of the
   ones that start with the ones in `dirs`.
   Any modifications to a file in an excluded path is ignored for the purposes of labelling.
 * The `dependencies` field is the array of all labels, which are lower in the import hierarchy
-  and which should be excluded if the label is present.
--/
-
+  and which should be excluded if the label is present.-/
 structure LabelData (label : Label) where
   /-- Array of paths which fall under this label. e.g. `"Physlib" / "Cosmology"`.
 
@@ -203,9 +200,7 @@ structure LabelData (label : Label) where
 
 
 /-- This function maps each label to the corresponding paths
-For now, no exclusions or dependencies are specified
---/
-
+For now, no exclusions or dependencies are specified --/
 def physlibLabelData: (l: Label) → LabelData l
   | .«t-classical-field-theory-pl» => { dirs := #["Physlib" / "ClassicalFieldTheory"] }
   | .«t-classical-mechanics-pl» => { dirs := #["Physlib" / "ClassicalMechanics"] }
@@ -235,16 +230,15 @@ def physlibLabelData: (l: Label) → LabelData l
   | .«t-states-qi» => { dirs := #["QuantumInfo" / "States"] }
   | .«CI» => { dirs := #["scripts"] }
 
-/-- Exceptions inside `Physlib/` or `QuantumInfo/` which are not covered by any label.
-(For the First versions, no exceptions)
--/
+/-- Exceptions inside `Physlib/` which are not covered by any label.
+(For the First versions, no exceptions) -/
 def physlibUnlabelled : Array FilePath := #[ ]
+/-- Exceptions inside `QuantumInfo/` which are not covered by any label.
+(For the First versions, no exceptions) -/
 def quantuminfoUnlabelled : Array FilePath := #[ ]
 
 /-- Checks if the folder `path` lies inside the folder `dir`.
-Copied verbatim from mathlib `scripts/autolabel.lean`
--/
-
+Copied verbatim from mathlib `scripts/autolabel.lean` -/
 def _root_.System.FilePath.isPrefixOf (dir path : FilePath) : Bool :=
   -- use `dir / ""` to prevent partial matching of folder names
   (dir / "").normalize.toString.isPrefixOf (path / "").normalize.toString
@@ -252,10 +246,7 @@ def _root_.System.FilePath.isPrefixOf (dir path : FilePath) : Bool :=
 /--
 Return all labels in `physlibLabels` which match
 at least one of the `files`.
-
-* `files`: array of relative paths starting from the physlib root directory.
--/
-
+* `files`: array of relative paths starting from the physlib root directory. -/
 def getMatchingLabels (files : Array FilePath) : Array Label :=
   let applicable := physlibLabels.filter fun label ↦
     -- first exclude all files the label excludes,
@@ -267,7 +258,7 @@ def getMatchingLabels (files : Array FilePath) : Array Label :=
   -- return sorted list of labels
   applicable |>.qsort (·.toString < ·.toString)
 
-  /-- Helper function: union of all labels and all their dependent labels -/
+/-- Helper function: union of all labels and all their dependent labels -/
 partial def collectLabelsAndDependentLabels (labels: Array Label) : Array Label :=
   labels.flatMap fun label ↦
     (collectLabelsAndDependentLabels (physlibLabelData label).dependencies).push label
@@ -340,7 +331,6 @@ Note: `file` is duplicated below so that it is also visible in the plain text ou
 * `title`: title of the annotation
 * `message`: annotation message
 -/
-
 def githubAnnotation (type file title message : String) : String :=
   s!"::{type} file={file},title={title}::{file}: {message}"
 
@@ -360,7 +350,6 @@ to add the label to the PR.
 - `2`: invalid labels defined
 - `3`: ~labels do not cover all of `Physlib/`~ (unused; only emitting warning)
 -/
-
 unsafe def main (args : List String): IO UInt32 := do
   if args.length > 1 then
     println s!"::error:: autolabel: invalid number of arguments ({args.length}), \
