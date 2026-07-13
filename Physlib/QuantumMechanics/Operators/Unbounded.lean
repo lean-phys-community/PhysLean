@@ -702,40 +702,31 @@ lemma IsSelfAdjoint.real_smul [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} 
 lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint (-T) :=
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
-
 /-- Self-adjointness from surjectivity of `T ± i`. A symmetric (`T.IsSymmetric`),densely-defined
 operator `T` for which `T + i` and `T - i` are both surjective onto `H`, is self-adjoint. -/
 lemma IsSelfAdjoint.of_surjective_add_sub [CompleteSpace H] (hsym : T.IsSymmetric)
     (hdense : Dense (T.domain : Set H))
     (hplus : ∀ φ : H, ∃ ψ : T.domain, T ψ + I • (ψ : H) = φ)
-    (hminus : ∀ φ : H, ∃ ψ : T.domain, T ψ - I • (ψ : H) = φ) :
-    IsSelfAdjoint T := by
+    (hminus : ∀ φ : H, ∃ ψ : T.domain, T ψ - I • (ψ : H) = φ) : IsSelfAdjoint T := by
   rw [isSelfAdjoint_def]
   have hle : T ≤ T.adjoint := (isSymmetric_def.mp hsym).le_adjoint hdense
-  refine le_antisymm ?_ hle
-  -- `ker (T† - i) = 0`, using surjectivity of `T + i`.
-  have hker : ∀ w : T.adjoint.domain, T.adjoint w = I • (w : H) → (w : H) = 0 := by
-    intro w hw
-    obtain ⟨v, hv⟩ := hplus (w : H)
-    have hadj : ⟪T.adjoint w, (v : H)⟫_ℂ = ⟪(w : H), T v⟫_ℂ :=
-      adjoint_isFormalAdjoint hdense w v
-    rw [hw, inner_smul_left, Complex.conj_I] at hadj
-    have key : ⟪(w : H), T v⟫_ℂ + I * ⟪(w : H), (v : H)⟫_ℂ = ⟪(w : H), (w : H)⟫_ℂ := by
-      rw [← inner_smul_right, ← inner_add_right, hv]
-    exact inner_self_eq_zero.mp (by rw [← key, ← hadj]; ring)
-  -- `T† ≤ T`: every `w ∈ D(T†)` is matched by an `x ∈ D(T)` via surjectivity of `T - i`.
+  apply le_antisymm _ hle
   apply le_of_eqLocus_ge
   intro w hw
   let W : T.adjoint.domain := ⟨w, hw⟩
   obtain ⟨x, hx⟩ := hminus (T.adjoint W - I • (W : H))
-  have hxin : (x : H) ∈ T.adjoint.domain := hle.1 x.2
-  let X : T.adjoint.domain := ⟨x, hxin⟩
+  set X : T.adjoint.domain := ⟨x, hle.1 x.2⟩ with hX
   have hxeq : T.adjoint X = T x := (hle.2 (x := x) (y := X) rfl).symm
-  have hdiff : T.adjoint (W - X) = I • ((W - X : T.adjoint.domain) : H) := by
-    rw [LinearPMap.map_sub, hxeq]
-    change T.adjoint W - T x = I • ((W : H) - (x : H))
-    rw [smul_sub, sub_eq_sub_iff_sub_eq_sub]
-    exact hx.symm
+  have hdiff : T.adjoint (W - X) = I • ((W - X) : H) := by
+    rw [LinearPMap.map_sub, hxeq, hX, Subtype.coe_mk, smul_sub, sub_eq_sub_iff_sub_eq_sub, hx]
+  have hker : ∀ w : T.adjoint.domain, T.adjoint w = I • (w : H) → (w : H) = 0 := by
+    intro w hw
+    obtain ⟨v, hv⟩ := hplus (w : H)
+    suffices ⟪↑w, T v + I • v⟫_ℂ = 0 by
+      exact inner_self_eq_zero.mp (hv ▸ this)
+    rw [inner_add_right, inner_smul_right, ← adjoint_isFormalAdjoint hdense w v, hw,
+      inner_smul_left, conj_I]
+    ring
   obtain rfl : w = (x : H) := sub_eq_zero.mp (hker (W - X) hdiff)
   exact ⟨hw, x.2, hxeq⟩
 
