@@ -68,9 +68,7 @@ lemma toSpecies_sum_invariant (m : ℕ) (f : PermGroup n) (S : (SMνCharges n).C
     ∑ i, ((fun a => a ^ m) ∘ toSpecies j (repCharges f S)) i =
     ∑ i, ((fun a => a ^ m) ∘ toSpecies j S) i := by
   rw [repCharges_toSpecies]
-  change ∑ i : Fin n, ((fun a => a ^ m) ∘ _) (⇑(f⁻¹ _) i) = ∑ i : Fin n, ((fun a => a ^ m) ∘ _) i
-  refine Equiv.Perm.sum_comp _ _ _ ?_
-  simp only [PermGroup, Pi.inv_apply, ne_eq, coe_univ, Set.subset_univ]
+  exact Equiv.sum_comp (f⁻¹ j) ((fun a => a ^ m) ∘ toSpecies j S)
 
 lemma accGrav_invariant (f : PermGroup n) (S : (SMνCharges n).Charges) :
     accGrav (repCharges f S) = accGrav S :=

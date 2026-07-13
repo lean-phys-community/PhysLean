@@ -48,8 +48,7 @@ lemma normalOrder_uncontracted_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp
   rw [ofFieldOpList_normalOrder_insert φ [φsΛ]ᵘᶜ
     ⟨(φsΛ.uncontractedListOrderPos i), by simp [uncontractedListGet]⟩,
     smul_smul]
-  trans (1 : ℂ) • (𝓝(ofFieldOpList [φsΛ ↩Λ φ i none]ᵘᶜ))
-  · simp
+  refine (one_smul ℂ _).symm.trans ?_
   congr 1
   simp only [uncontractedListGet]
   rw [← List.map_take, take_uncontractedListOrderPos_eq_filter]
@@ -59,11 +58,11 @@ lemma normalOrder_uncontracted_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp
       congr
       rw [uncontractedList_eq_sort]
       have hdup : (List.filter (fun x => decide (x.1 < i.1))
-          (φsΛ.uncontracted.sort (fun x1 x2 => x1 ≤ x2))).Nodup := by
-        exact List.Nodup.filter _ (φsΛ.uncontracted.sort_nodup (fun x1 x2 => x1 ≤ x2))
+          (φsΛ.uncontracted.sort (fun x1 x2 => x1 ≤ x2))).Nodup :=
+        List.Nodup.filter _ (φsΛ.uncontracted.sort_nodup (fun x1 x2 => x1 ≤ x2))
       have hsort : (List.filter (fun x => decide (x.1 < i.1))
-          (φsΛ.uncontracted.sort (fun x1 x2 => x1 ≤ x2))).Pairwise (· ≤ ·) := by
-        exact List.Pairwise.filter _ (φsΛ.uncontracted.pairwise_sort (fun x1 x2 => x1 ≤ x2))
+          (φsΛ.uncontracted.sort (fun x1 x2 => x1 ≤ x2))).Pairwise (· ≤ ·) :=
+        List.Pairwise.filter _ (φsΛ.uncontracted.pairwise_sort (fun x1 x2 => x1 ≤ x2))
       rw [← (List.toFinset_sort (· ≤ ·) hdup).mpr hsort]
       congr
       ext a
@@ -72,36 +71,11 @@ lemma normalOrder_uncontracted_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp
   simp only [Nat.succ_eq_add_one]
   have h2 : (Finset.filter (fun x => x.1 < i.1) φsΛ.uncontracted) =
     (Finset.filter (fun x => i.succAbove x < i) φsΛ.uncontracted) := by
-    ext a
-    simp only [Nat.succ_eq_add_one, Finset.mem_filter, and_congr_right_iff]
-    intro ha
-    simp only [Fin.succAbove]
-    split
-    · apply Iff.intro
-      · intro h
-        omega
-      · intro h
-        rename_i h
-        rw [Fin.lt_def] at h
-        simp only [Fin.val_castSucc] at h
-        omega
-    · apply Iff.intro
-      · intro h
-        rename_i h'
-        rw [Fin.lt_def]
-        simp only [Fin.val_succ]
-        rw [Fin.lt_def] at h'
-        simp only [Fin.val_castSucc, not_lt] at h'
-        omega
-      · intro h
-        rename_i h
-        rw [Fin.lt_def] at h
-        simp only [Fin.val_succ] at h
-        omega
+    refine Finset.filter_congr fun a _ => ?_
+    rw [Fin.succAbove_lt_iff_castSucc_lt, Fin.lt_def, Fin.val_castSucc]
   rw [h2]
   simp only [exchangeSign_mul_self]
   congr
-  simp only [Nat.succ_eq_add_one]
   rw [insertAndContract_uncontractedList_none_map]
 
 /--

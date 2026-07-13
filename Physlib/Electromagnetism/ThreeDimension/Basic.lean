@@ -47,15 +47,13 @@ the standard vector-calculus expressions.
 
 /-- The electric field written in terms of the scalar and vector potentials as `- ∇ φ - ∂ₜ A`. -/
 theorem electricField_eq_3D :
-    E = fun t x => - ∇ (φ t) x - ∂ₜ (fun t => A t x) t := by
-  rw [electricField_eq]
+    E = fun t x => - ∇ (φ t) x - ∂ₜ (fun t => A t x) t := electricField_eq V
 
 local notation "B" => V.magneticField c
 
 /-- The magnetic field written as the curl of the vector potential as `∇ ⨯ A`. -/
 theorem magneticField_eq_3D :
-    B = fun t x => (∇ ⨯ (A t)) x := by
-  rw [magneticField_eq]
+    B = fun t x => (∇ ⨯ (A t)) x := magneticField_eq V
 
 end ThreeDimension
 end Electromagnetism

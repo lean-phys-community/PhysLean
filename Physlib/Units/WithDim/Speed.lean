@@ -68,8 +68,7 @@ lemma oneMilePerHour_in_SI : oneMilePerHour SI = ⟨0.44704⟩ := by
   simp [oneMilePerHour, dimScale, LengthUnit.miles, TimeUnit.hours, toDimensionful_apply_apply]
   ext
   simp [NNReal.coe_ofScientific]
-  rw [toReal]
-  norm_num
+  norm_num [toReal]
 
 @[simp]
 lemma oneKilometerPerHour_in_SI :
@@ -79,8 +78,7 @@ lemma oneKilometerPerHour_in_SI :
   ext
   simp only [WithDim.smul_val, smul_eq_mul, mul_one, NNReal.coe_mul, coe_rpow, NNReal.coe_div,
     NNReal.coe_ofNat]
-  rw [toReal]
-  norm_num
+  norm_num [toReal]
 
 @[simp]
 lemma oneKnot_in_SI : oneKnot SI = ⟨463/900⟩ := by
@@ -88,8 +86,7 @@ lemma oneKnot_in_SI : oneKnot SI = ⟨463/900⟩ := by
   ext
   simp only [WithDim.smul_val, smul_eq_mul, mul_one, NNReal.coe_mul, coe_rpow, NNReal.coe_div,
     NNReal.coe_ofNat]
-  rw [toReal]
-  norm_num
+  norm_num [toReal]
 
 @[simp]
 lemma speedOfLight_in_SI : speedOfLight SI = ⟨299792458⟩ := by
@@ -104,22 +101,19 @@ lemma speedOfLight_in_SI : speedOfLight SI = ⟨299792458⟩ := by
 lemma oneKnot_eq_mul_oneKilometerPerHour :
     oneKnot = (1.852 : ℝ≥0) • oneKilometerPerHour := by
   apply (toDimensionful SI).symm.injective
-  simp [toDimensionful]
   ext
-  norm_num
+  norm_num [toDimensionful]
 
 lemma oneKilometerPerHour_eq_mul_oneKnot:
     oneKilometerPerHour = (250/463 : ℝ≥0) • oneKnot := by
   apply (toDimensionful SI).symm.injective
-  simp [toDimensionful]
   ext
-  norm_num
+  norm_num [toDimensionful]
 
 lemma oneMeterPerSecond_eq_mul_oneMilePerHour :
     oneMeterPerSecond = (3125/1397 : ℝ≥0) • oneMilePerHour := by
   apply (toDimensionful SI).symm.injective
-  simp [toDimensionful]
   ext
-  norm_num
+  norm_num [toDimensionful]
 
 end DimSpeed

@@ -123,11 +123,8 @@ lemma isViable_iff_def (x : Quanta) : IsViable x ↔
     x.T.toFluxesTen.NoExotics ∧
     x.T.toFluxesTen.HasNoZero ∧
     x.LinearAnomalyCancellation := by
-  apply Iff.intro
-  · rintro ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12⟩
-    exact ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12⟩
-  · rintro ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12⟩
-    exact ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12⟩
+  refine ⟨fun ⟨a, b, c, d, e, f, g, h, i, j, k, l⟩ => ⟨a, b, c, d, e, f, g, h, i, j, k, l⟩, ?_⟩
+  exact fun ⟨a, b, c, d, e, f, g, h, i, j, k, l⟩ => ⟨a, b, c, d, e, f, g, h, i, j, k, l⟩
 
 /-!
 
@@ -148,10 +145,7 @@ lemma isViable_iff_charges_mem_viableCharges (x : Quanta) :
         x.T.toFluxesTen.HasNoZero ∧
         /- 3. Conditions on the fluxes and the charges. -/
         x.LinearAnomalyCancellation := by
-  rw [isViable_iff_def]
-  conv_rhs =>
-    enter [1, 1, I]
-    rw [mem_viableCharges_iff']
+  simp only [isViable_iff_def, mem_viableCharges_iff']
   aesop
 
 /-!
@@ -164,10 +158,9 @@ lemma isViable_iff_charges_mem_viableCharges_mem_liftCharges (x : Quanta) :
     IsViable x ↔ (∃ I, x.toCharges ∈ viableCharges I) ∧
       x ∈ Quanta.liftCharge x.toCharges ∧
       x.LinearAnomalyCancellation := by
-  rw [Quanta.mem_liftCharge_iff]
-  simp [toCharges_qHd, toCharges_qHu]
-  rw [FiveQuanta.mem_liftCharge_iff, TenQuanta.mem_liftCharge_iff]
-  rw [isViable_iff_charges_mem_viableCharges, ← FluxesFive.noExotics_iff_mem_elemsNoExotics,
+  simp [Quanta.mem_liftCharge_iff, toCharges_qHd, toCharges_qHu]
+  rw [FiveQuanta.mem_liftCharge_iff, TenQuanta.mem_liftCharge_iff,
+    isViable_iff_charges_mem_viableCharges, ← FluxesFive.noExotics_iff_mem_elemsNoExotics,
     ← FluxesTen.noExotics_iff_mem_elemsNoExotics]
   aesop
 
@@ -181,8 +174,7 @@ lemma isViable_iff_filter (x : Quanta) :
     IsViable x ↔ (∃ I, x.toCharges ∈ (viableCharges I).filter IsAnomalyFree) ∧
       x ∈ Quanta.liftCharge x.toCharges
       ∧ x.LinearAnomalyCancellation := by
-  rw [isViable_iff_charges_mem_viableCharges_mem_liftCharges]
-  simp [IsAnomalyFree]
+  simp [isViable_iff_charges_mem_viableCharges_mem_liftCharges, IsAnomalyFree]
   aesop
 
 /-!

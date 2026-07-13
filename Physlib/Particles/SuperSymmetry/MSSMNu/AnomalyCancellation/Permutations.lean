@@ -132,7 +132,7 @@ lemma accQuad_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
 lemma accCube_invariant (f : PermGroup) (S : MSSMCharges.Charges) :
     accCube (repCharges f S) = accCube S :=
   accCube_ext
-    (fun j => toSpecies_sum_invariant 3 f S j)
+    (toSpecies_sum_invariant 3 f S)
     (Hd_invariant f S)
     (Hu_invariant f S)
 

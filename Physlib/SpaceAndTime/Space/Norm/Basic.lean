@@ -95,10 +95,8 @@ lemma normPowerSeries_eq (n : ℕ) :
     normPowerSeries (d := d) n = fun x => √(‖x‖ ^ 2 + 1/(n + 1)) := rfl
 
 lemma normPowerSeries_eq_rpow {d} (n : ℕ) :
-    normPowerSeries (d := d) n = fun x => ((‖x‖ ^ 2 + 1/(n + 1))) ^ (1/2 : ℝ) := by
-  rw [normPowerSeries_eq]
-  funext x
-  rw [← Real.sqrt_eq_rpow]
+    normPowerSeries (d := d) n = fun x => ((‖x‖ ^ 2 + 1/(n + 1))) ^ (1/2 : ℝ) :=
+  funext fun _ => Real.sqrt_eq_rpow _
 
 /-!
 
@@ -109,15 +107,9 @@ lemma normPowerSeries_eq_rpow {d} (n : ℕ) :
 @[fun_prop]
 lemma normPowerSeries_differentiable {d} (n : ℕ) :
     Differentiable ℝ (fun (x : Space d) => normPowerSeries n x) := by
-  rw [normPowerSeries_eq_rpow]
-  refine Differentiable.rpow_const ?_ ?_
-  · refine (Differentiable.fun_add_iff_right ?_).mpr ?_
-    · apply Differentiable.norm_sq ℝ
-      fun_prop
-    · fun_prop
-  · intro x
-    have h1 : 0 < ‖x‖ ^ 2 + 1 / (↑n + 1) := by positivity
-    grind
+  rw [normPowerSeries_eq]
+  intro x
+  exact ((differentiable_id.norm_sq ℝ).add_const _).differentiableAt.sqrt (by positivity)
 
 /-!
 
@@ -130,25 +122,14 @@ open scoped Topology BigOperators FourierTransform
 
 lemma normPowerSeries_tendsto {d} (x : Space d) (hx : x ≠ 0) :
     Filter.Tendsto (fun n => normPowerSeries n x) Filter.atTop (𝓝 (‖x‖)) := by
-  conv => enter [1, n]; rw [normPowerSeries_eq_rpow]
-  simp only [one_div]
-  have hx_norm : ‖x‖ = (‖x‖ ^ 2 + 0) ^ (1 / 2 : ℝ) := by
-    rw [← Real.sqrt_eq_rpow]
-    simp
-  conv_rhs => rw [hx_norm]
-  refine Filter.Tendsto.rpow ?_ ?_ ?_
-  · apply Filter.Tendsto.add
-    · exact tendsto_const_nhds
-    · simpa using tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ)
-  · simp
-  · left
-    simpa using hx
+  have h := (Real.continuous_sqrt.tendsto _).comp
+    ((tendsto_const_nhds (x := ‖x‖ ^ 2)).add (tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ)))
+  simpa only [normPowerSeries_eq, Function.comp_def, add_zero,
+    Real.sqrt_sq (norm_pos_iff.mpr hx).le] using h
 
 lemma normPowerSeries_inv_tendsto {d} (x : Space d) (hx : x ≠ 0) :
-    Filter.Tendsto (fun n => (normPowerSeries n x)⁻¹) Filter.atTop (𝓝 (‖x‖⁻¹)) := by
-  apply Filter.Tendsto.inv₀
-  · exact normPowerSeries_tendsto x hx
-  · simpa using hx
+    Filter.Tendsto (fun n => (normPowerSeries n x)⁻¹) Filter.atTop (𝓝 (‖x‖⁻¹)) :=
+  (normPowerSeries_tendsto x hx).inv₀ (norm_ne_zero_iff.mpr hx)
 
 /-!
 
@@ -159,27 +140,19 @@ open Space
 
 lemma deriv_normPowerSeries {d} (n : ℕ) (x : Space d) (i : Fin d) :
     ∂[i] (normPowerSeries n) x = x i * (normPowerSeries n x)⁻¹ := by
-  rw [deriv_eq_fderiv_basis]
-  rw [normPowerSeries_eq]
-  rw [fderiv_sqrt]
+  rw [deriv_eq_fderiv_basis, normPowerSeries_eq, fderiv_sqrt]
   simp only [one_div, mul_inv_rev, fderiv_add_const, FunLike.coe_smul, Pi.smul_apply,
     smul_eq_mul]
-  rw [← deriv_eq_fderiv_basis]
-  rw [deriv_norm_sq]
+  rw [← deriv_eq_fderiv_basis, deriv_norm_sq]
   ring
-  · simp
-    apply DifferentiableAt.norm_sq ℝ
-    fun_prop
+  · exact ((differentiable_id.norm_sq ℝ).add_const _).differentiableAt
   · positivity
 
 lemma fderiv_normPowerSeries {d} (n : ℕ) (x y : Space d) :
     fderiv ℝ (fun (x : Space d) => normPowerSeries n x) x y =
       ⟪y, x⟫_ℝ * (normPowerSeries n x)⁻¹ := by
   rw [fderiv_eq_sum_deriv, inner_eq_sum, Finset.sum_mul]
-  congr
-  funext i
-  simp [deriv_normPowerSeries]
-  ring
+  exact Finset.sum_congr rfl fun i _ => by simp [deriv_normPowerSeries, mul_assoc]
 
 /-!
 
@@ -189,18 +162,14 @@ lemma fderiv_normPowerSeries {d} (n : ℕ) (x y : Space d) :
 
 lemma deriv_normPowerSeries_tendsto {d} (x : Space d) (hx : x ≠ 0) (i : Fin d) :
     Filter.Tendsto (fun n => ∂[i] (normPowerSeries n) x) Filter.atTop (𝓝 (x i * (‖x‖)⁻¹)) := by
-  conv => enter [1, n]; rw [deriv_normPowerSeries]
-  refine Filter.Tendsto.mul ?_ ?_
-  · exact tendsto_const_nhds
-  · exact normPowerSeries_inv_tendsto x hx
+  simp only [deriv_normPowerSeries]
+  exact tendsto_const_nhds.mul (normPowerSeries_inv_tendsto x hx)
 
 lemma fderiv_normPowerSeries_tendsto {d} (x y : Space d) (hx : x ≠ 0) :
     Filter.Tendsto (fun n => fderiv ℝ (fun (x : Space d) => normPowerSeries n x) x y)
       Filter.atTop (𝓝 (⟪y, x⟫_ℝ * (‖x‖)⁻¹)) := by
-  conv => enter [1, n]; rw [fderiv_normPowerSeries]
-  refine Filter.Tendsto.mul ?_ ?_
-  · exact tendsto_const_nhds
-  · exact normPowerSeries_inv_tendsto x hx
+  simp only [fderiv_normPowerSeries]
+  exact tendsto_const_nhds.mul (normPowerSeries_inv_tendsto x hx)
 
 /-!
 
@@ -210,11 +179,8 @@ lemma fderiv_normPowerSeries_tendsto {d} (x y : Space d) (hx : x ≠ 0) :
 
 @[fun_prop]
 lemma normPowerSeries_aestronglyMeasurable {d} (n : ℕ) :
-    AEStronglyMeasurable (normPowerSeries n : Space d → ℝ) volume := by
-  rw [normPowerSeries_eq_rpow]
-  refine StronglyMeasurable.aestronglyMeasurable ?_
-  refine stronglyMeasurable_iff_measurable.mpr ?_
-  fun_prop
+    AEStronglyMeasurable (normPowerSeries n : Space d → ℝ) volume :=
+  (normPowerSeries_differentiable n).continuous.aestronglyMeasurable
 
 /-!
 
@@ -224,100 +190,61 @@ lemma normPowerSeries_aestronglyMeasurable {d} (n : ℕ) :
 
 @[simp]
 lemma normPowerSeries_nonneg {d} (n : ℕ) (x : Space d) :
-    0 ≤ normPowerSeries n x := by
-  rw [normPowerSeries_eq]
-  simp
+    0 ≤ normPowerSeries n x :=
+  Real.sqrt_nonneg _
 
 @[simp]
 lemma normPowerSeries_pos {d} (n : ℕ) (x : Space d) :
-    0 < normPowerSeries n x := by
-  rw [normPowerSeries_eq]
-  simp only [one_div, Real.sqrt_pos]
-  positivity
+    0 < normPowerSeries n x :=
+  Real.sqrt_pos_of_pos (by positivity)
 
 @[simp]
 lemma normPowerSeries_ne_zero {d} (n : ℕ) (x : Space d) :
-    normPowerSeries n x ≠ 0 := by
-  rw [normPowerSeries_eq]
-  simp only [one_div, ne_eq]
-  positivity
+    normPowerSeries n x ≠ 0 :=
+  (normPowerSeries_pos n x).ne'
 
 lemma normPowerSeries_le_norm_sq_add_one {d} (n : ℕ) (x : Space d) :
     normPowerSeries n x ≤ ‖x‖ + 1 := by
-  trans √(‖x‖ ^ 2 + 1)
-  · rw [normPowerSeries_eq]
-    apply Real.sqrt_le_sqrt
-    simp only [one_div, add_le_add_iff_left]
-    refine inv_le_one_iff₀.mpr ?_
-    right
-    simp
-  · refine (Real.sqrt_le_left (by positivity)).mpr ?_
-    trans (‖x‖ ^ 2 + 1) + (2 * ‖x‖)
-    · simp
-    · ring_nf
-      rfl
+  rw [normPowerSeries_eq]
+  refine (Real.sqrt_le_left (by positivity)).mpr ?_
+  have h : 1 / ((n : ℝ) + 1) ≤ 1 := div_le_one_of_le₀ (by simp) (by positivity)
+  nlinarith [norm_nonneg x]
 
 @[simp]
 lemma norm_lt_normPowerSeries {d} (n : ℕ) (x : Space d) :
-    ‖x‖ < normPowerSeries n x := by
-  rw [normPowerSeries_eq]
-  apply Real.lt_sqrt_of_sq_lt
-  simp only [one_div, lt_add_iff_pos_right, inv_pos]
-  positivity
+    ‖x‖ < normPowerSeries n x :=
+  Real.lt_sqrt_of_sq_lt (lt_add_of_pos_right _ (by positivity))
 
 lemma norm_le_normPowerSeries {d} (n : ℕ) (x : Space d) :
-    ‖x‖ ≤ normPowerSeries n x := by
-  rw [normPowerSeries_eq]
-  apply Real.le_sqrt_of_sq_le
-  simp only [one_div, le_add_iff_nonneg_right, inv_nonneg]
-  positivity
+    ‖x‖ ≤ normPowerSeries n x :=
+  (norm_lt_normPowerSeries n x).le
 
 lemma normPowerSeries_zpow_le_norm_sq_add_one {d} (n : ℕ) (m : ℤ) (x : Space d)
     (hx : x ≠ 0) :
     (normPowerSeries n x) ^ m ≤ (‖x‖ + 1) ^ m + ‖x‖ ^ m := by
   match m with
   | .ofNat m =>
-    trans (‖x‖ + 1) ^ m
-    · simp
-      refine pow_le_pow_left₀ (by simp) ?_ m
-      exact normPowerSeries_le_norm_sq_add_one n x
-    · simp
+    simpa using le_add_of_le_of_nonneg
+      (pow_le_pow_left₀ (by simp) (normPowerSeries_le_norm_sq_add_one n x) m) (by positivity)
   | .negSucc m =>
-    trans (‖x‖ ^ (m + 1))⁻¹; swap
-    · simp
-      positivity
     simp only [zpow_negSucc]
-    refine inv_anti₀ ?_ ?_
-    · positivity
-    refine pow_le_pow_left₀ (by simp) ?_ (m + 1)
-    exact norm_le_normPowerSeries n x
+    exact le_add_of_nonneg_of_le (by positivity) (inv_anti₀ (by positivity)
+      (pow_le_pow_left₀ (by simp) (norm_le_normPowerSeries n x) (m + 1)))
 
 lemma normPowerSeries_inv_le {d} (n : ℕ) (x : Space d) (hx : x ≠ 0) :
-    (normPowerSeries n x)⁻¹ ≤ ‖x‖⁻¹ := by
-  refine inv_anti₀ ?_ ?_
-  · positivity
-  apply Real.le_sqrt_of_sq_le
-  simp only [one_div, le_add_iff_nonneg_right, inv_nonneg]
-  positivity
+    (normPowerSeries n x)⁻¹ ≤ ‖x‖⁻¹ :=
+  inv_anti₀ (norm_pos_iff.mpr hx) (norm_le_normPowerSeries n x)
 
 lemma normPowerSeries_log_le_normPowerSeries {d} (n : ℕ) (x : Space d) :
     |Real.log (normPowerSeries n x)| ≤ (normPowerSeries n x)⁻¹ + (normPowerSeries n x) := by
-  have h1 := Real.neg_inv_le_log (x := (normPowerSeries n x)) (by simp)
-  have h2 := Real.log_le_rpow_div (x := (normPowerSeries n x)) (by simp) (ε := 1) (by positivity)
   rw [abs_le']
-  generalize Real.log ‖x‖ = r at *
-  apply And.intro
-  · apply h2.trans
-    simp
-  · rw [neg_le]
-    apply le_trans _ h1
-    simp
+  exact ⟨(Real.log_le_rpow_div (x := normPowerSeries n x) (by simp) one_pos).trans (by simp),
+    (neg_le.mp (Real.neg_inv_le_log (normPowerSeries_nonneg n x))).trans
+      (le_add_of_nonneg_right (normPowerSeries_nonneg n x))⟩
 lemma normPowerSeries_log_le {d} (n : ℕ) (x : Space d) (hx : x ≠ 0) :
-    |Real.log (normPowerSeries n x)| ≤ ‖x‖⁻¹ + (‖x‖ + 1) := by
-  apply le_trans (normPowerSeries_log_le_normPowerSeries n x) ?_
-  apply add_le_add
-  · exact normPowerSeries_inv_le n x hx
-  · exact normPowerSeries_le_norm_sq_add_one n x
+    |Real.log (normPowerSeries n x)| ≤ ‖x‖⁻¹ + (‖x‖ + 1) :=
+  (normPowerSeries_log_le_normPowerSeries n x).trans
+    (add_le_add (normPowerSeries_inv_le n x hx) (normPowerSeries_le_norm_sq_add_one n x))
 
 /-!
 
@@ -343,64 +270,44 @@ lemma IsDistBounded.normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
     simp only [zpow_negSucc]
     apply IsDistBounded.mono (f := fun (x : Space d) => ((√(1/(n + 1)) : ℝ) ^ (m + 1))⁻¹)
     · fun_prop
-    · rw [normPowerSeries_eq_rpow]
-      refine StronglyMeasurable.aestronglyMeasurable ?_
-      refine stronglyMeasurable_iff_measurable.mpr ?_
-      fun_prop
+    · exact (((normPowerSeries_differentiable n).continuous.pow _).inv₀
+        fun x => pow_ne_zero _ (normPowerSeries_ne_zero n x)).aestronglyMeasurable
     · intro x
       simp only [norm_inv, norm_pow, Real.norm_eq_abs, one_div]
-      refine inv_anti₀ (by positivity) ?_
-      refine (pow_le_pow_iff_left₀ (by positivity) (by positivity) (by simp)).mpr ?_
-      rw [abs_of_nonneg (by positivity), abs_of_nonneg (by simp)]
-      rw [normPowerSeries_eq]
-      simp only [Real.sqrt_inv, one_div]
-      rw [← Real.sqrt_inv]
-      apply Real.sqrt_le_sqrt
-      simp
+      refine inv_anti₀ (by positivity) (pow_le_pow_left₀ (abs_nonneg _) ?_ _)
+      rw [abs_of_nonneg (by positivity), abs_of_nonneg (by simp), normPowerSeries_eq]
+      exact Real.sqrt_le_sqrt (by simp)
 
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_single {d : ℕ} {n : ℕ} :
     IsDistBounded (d := d) (fun x => (normPowerSeries n x)) := by
-  convert IsDistBounded.normPowerSeries_zpow (n := n) (m := 1) using 1
-  simp
+  simpa using IsDistBounded.normPowerSeries_zpow (n := n) (m := 1)
 
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_inv {d : ℕ} {n : ℕ} :
     IsDistBounded (d := d) (fun x => (normPowerSeries n x)⁻¹) := by
-  convert normPowerSeries_zpow (n := n) (-1) using 1
-  simp
+  simpa using normPowerSeries_zpow (n := n) (-1)
 
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_deriv {d : ℕ} (n : ℕ) (i : Fin d) :
     IsDistBounded (d := d) (fun x => ∂[i] (normPowerSeries n) x) := by
-  conv =>
-    enter [1, x];
-    rw [deriv_normPowerSeries]
+  simp only [deriv_normPowerSeries]
   fun_prop
 
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_fderiv {d : ℕ} (n : ℕ) (y : Space d) :
     IsDistBounded (d := d) (fun x => fderiv ℝ (fun (x : Space d) => normPowerSeries n x) x y) := by
-  conv =>
-    enter [1, x];
-    rw [fderiv_eq_sum_deriv]
-  apply IsDistBounded.sum_fun
-  fun_prop
+  simp only [fderiv_eq_sum_deriv]
+  exact IsDistBounded.sum_fun (by fun_prop)
 
 @[fun_prop]
 lemma IsDistBounded.normPowerSeries_log {d : ℕ} (n : ℕ) :
     IsDistBounded (d := d) (fun x => Real.log (normPowerSeries n x)) := by
   apply IsDistBounded.mono (f := fun x => (normPowerSeries n x)⁻¹ + (normPowerSeries n x))
   · fun_prop
-  · apply AEMeasurable.aestronglyMeasurable
-    fun_prop
-  · intro x
-    simp only [Real.norm_eq_abs]
-    conv_rhs => rw [abs_of_nonneg (by
-      apply add_nonneg
-      · simp
-      · simp)]
-    exact normPowerSeries_log_le_normPowerSeries n x
+  · exact ((normPowerSeries_differentiable n).continuous.log
+      (normPowerSeries_ne_zero n)).aestronglyMeasurable
+  · exact fun x => (normPowerSeries_log_le_normPowerSeries n x).trans (le_abs_self _)
 
 /-!
 
@@ -410,26 +317,18 @@ lemma IsDistBounded.normPowerSeries_log {d : ℕ} (n : ℕ) :
 
 @[fun_prop]
 lemma differentiable_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
-    Differentiable ℝ (fun x : Space d => (normPowerSeries n x) ^ m) := by
-  refine Differentiable.zpow ?_ ?_
-  · fun_prop
-  · left
-    exact normPowerSeries_ne_zero n
+    Differentiable ℝ (fun x : Space d => (normPowerSeries n x) ^ m) :=
+  Differentiable.zpow (by fun_prop) (.inl (normPowerSeries_ne_zero n))
 
 @[fun_prop]
 lemma differentiable_normPowerSeries_inv {d : ℕ} {n : ℕ} :
-    Differentiable ℝ (fun x : Space d => (normPowerSeries n x)⁻¹) := by
-  convert differentiable_normPowerSeries_zpow (n := n) (m := -1) using 1
-  funext x
-  simp
+    Differentiable ℝ (fun x : Space d => (normPowerSeries n x)⁻¹) :=
+  Differentiable.inv (by fun_prop) (normPowerSeries_ne_zero n)
 
 @[fun_prop]
 lemma differentiable_log_normPowerSeries {d : ℕ} {n : ℕ} :
-    Differentiable ℝ (fun x : Space d => Real.log (normPowerSeries n x)) := by
-  refine Differentiable.log ?_ ?_
-  · fun_prop
-  · intro x
-    exact normPowerSeries_ne_zero n x
+    Differentiable ℝ (fun x : Space d => Real.log (normPowerSeries n x)) :=
+  Differentiable.log (by fun_prop) (normPowerSeries_ne_zero n)
 /-!
 
 ### A.9. Derivatives of functions
@@ -441,58 +340,39 @@ lemma deriv_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) (x : Space d) (i 
       m * x i * (normPowerSeries n x) ^ (m - 2) := by
   rw [deriv_eq_fderiv_basis]
   change (fderiv ℝ ((fun x => x ^ m) ∘ normPowerSeries n) x) (basis i) = _
-  rw [fderiv_comp]
+  rw [show m - 2 = m - 1 - 1 by ring, zpow_sub_one₀ (normPowerSeries_ne_zero n x), fderiv_comp]
   simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv, deriv_zpow',
     smul_eq_mul]
-  rw [fderiv_normPowerSeries]
-  simp only [basis_inner]
-  field_simp
-  ring_nf
-  have h1 : normPowerSeries n x ^ (-1 + m) = normPowerSeries n x ^ ((-2 + m) + 1) := by
-    ring_nf
-  rw [h1, zpow_add₀]
-  simp only [Int.reduceNeg, zpow_one]
+  rw [fderiv_normPowerSeries, basis_inner]
   ring
-  · simp
-  · refine DifferentiableAt.zpow ?_ ?_
-    · fun_prop
-    · left
-      exact normPowerSeries_ne_zero n x
+  · exact differentiableAt_zpow.mpr (.inl (normPowerSeries_ne_zero n x))
   · fun_prop
 
 lemma fderiv_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) (x y : Space d) :
     fderiv ℝ (fun x : Space d => (normPowerSeries n x) ^ m) x y =
       m * ⟪y, x⟫_ℝ * (normPowerSeries n x) ^ (m - 2) := by
   rw [fderiv_eq_sum_deriv, inner_eq_sum, Finset.mul_sum, Finset.sum_mul]
-  congr
-  funext i
-  simp [deriv_normPowerSeries_zpow]
-  ring
+  exact Finset.sum_congr rfl fun i _ => by
+    simp [deriv_normPowerSeries_zpow, mul_assoc, mul_comm, mul_left_comm]
 
 lemma deriv_log_normPowerSeries {d : ℕ} {n : ℕ} (x : Space d) (i : Fin d) :
     ∂[i] (fun x : Space d => Real.log (normPowerSeries n x)) x =
       x i * (normPowerSeries n x) ^ (-2 : ℤ) := by
   rw [deriv_eq_fderiv_basis]
   change (fderiv ℝ (Real.log ∘ normPowerSeries n) x) (basis i) = _
-  rw [fderiv_comp,]
+  rw [fderiv_comp]
   simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_eq_smul_deriv,
     Real.deriv_log', smul_eq_mul, Int.reduceNeg, zpow_neg]
-  rw [fderiv_normPowerSeries]
-  simp [zpow_ofNat, sq]
+  simp [fderiv_normPowerSeries, zpow_ofNat, sq]
   ring
-  · apply DifferentiableAt.log ?_ ?_
-    · fun_prop
-    exact normPowerSeries_ne_zero n x
+  · exact Real.differentiableAt_log (normPowerSeries_ne_zero n x)
   · fun_prop
 
 lemma fderiv_log_normPowerSeries {d : ℕ} {n : ℕ} (x y : Space d) :
     fderiv ℝ (fun x : Space d => Real.log (normPowerSeries n x)) x y =
       ⟪y, x⟫_ℝ * (normPowerSeries n x) ^ (-2 : ℤ) := by
   rw [fderiv_eq_sum_deriv, inner_eq_sum, Finset.sum_mul]
-  congr
-  funext i
-  simp [deriv_log_normPowerSeries]
-  ring
+  exact Finset.sum_congr rfl fun i _ => by simp [deriv_log_normPowerSeries, mul_assoc]
 
 /-!
 
@@ -505,8 +385,7 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
     distOfFunction (fun x : Space d => (m * (normPowerSeries n x) ^ (m - 2)) • basis.repr x)
     (by fun_prop) := by
   ext1 η
-  apply ext_inner_right ℝ
-  intro y
+  refine ext_inner_right ℝ fun y => ?_
   simp [distGrad_inner_eq]
   rw [Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_inner]
   calc _
@@ -516,19 +395,14 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
       rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]
       · fun_prop
       · refine IsDistBounded.integrable_space_mul ?_ η
-        conv => enter [1, x]; rw [fderiv_normPowerSeries_zpow]
-        simp [mul_assoc]
+        simp only [fderiv_normPowerSeries_zpow, mul_assoc]
         fun_prop
       · fun_prop
       · fun_prop
-      · intro _ _
-        apply Differentiable.differentiableAt
-        fun_prop
+      · exact fun _ _ => (differentiable_normPowerSeries_zpow m).differentiableAt
     _ = ∫ (x : Space d), η x *
         (m * ⟪(basis.repr.symm y), x⟫_ℝ * (normPowerSeries n x) ^ (m - 2)) := by
-      congr
-      funext x
-      rw [fderiv_normPowerSeries_zpow]
+      simp only [fderiv_normPowerSeries_zpow]
   congr
   funext x
   simp [inner_smul_left_eq_smul]
@@ -559,48 +433,23 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} [NeZero
   apply MeasureTheory.tendsto_integral_of_dominated_convergence
     (bound := fun x => |fderiv ℝ η x (basis.repr.symm y)| * ((‖x‖ + 1) ^ m + ‖x‖ ^ m))
   · intro n
-    apply IsDistBounded.aeStronglyMeasurable_fderiv_schwartzMap_smul (F := ℝ) ?_
-    fun_prop
+    exact IsDistBounded.aeStronglyMeasurable_fderiv_schwartzMap_smul (F := ℝ) (by fun_prop) η _
   · have h1 : Integrable (fun x =>
         (fderiv ℝ (⇑η) x) (basis.repr.symm y) * ((‖x‖ + 1) ^ m + ‖x‖ ^ m)) volume := by
-      apply IsDistBounded.integrable_space_fderiv ?_
-      apply IsDistBounded.add
-      · refine IsDistBounded.norm_add_pos_nat_zpow m 1 ?_
-        simp
-      · exact IsDistBounded.pow m hm
-    rw [← integrable_norm_iff] at h1
-    convert h1 using 1
-    funext x
-    simp only [norm_mul, Real.norm_eq_abs, mul_eq_mul_left_iff, abs_eq_zero]
-    left
-    rw [abs_of_nonneg (by positivity)]
-    fun_prop
+      apply IsDistBounded.integrable_space_fderiv
+        ((IsDistBounded.norm_add_pos_nat_zpow m 1 one_pos).add (IsDistBounded.pow m hm))
+    refine h1.abs.congr (ae_of_all _ fun x => ?_)
+    simp only [abs_mul]
+    congr 1
+    exact abs_of_nonneg (by positivity)
   · intro n
-    rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    simp at hx
-    simp
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    rw [abs_of_nonneg (by simp)]
-    exact normPowerSeries_zpow_le_norm_sq_add_one n m x hx
-  · rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    have h1 : Filter.Tendsto (fun x_1 => normPowerSeries x_1 x ^ (m : ℝ))
-      Filter.atTop (𝓝 (‖x‖ ^ (m : ℝ))) := by
-      refine Filter.Tendsto.rpow ?_ ?_ ?_
-      · apply normPowerSeries_tendsto x hx
-      · simp
-      · left
-        simpa using hx
-    simpa using h1
+    filter_upwards [Measure.ae_ne volume 0] with x hx
+    simp [abs_of_nonneg (normPowerSeries_nonneg n x)]
+    exact mul_le_mul_of_nonneg_left
+      (normPowerSeries_zpow_le_norm_sq_add_one n m x hx) (abs_nonneg _)
+  · filter_upwards [Measure.ae_ne volume 0] with x hx
+    exact tendsto_const_nhds.mul
+      ((normPowerSeries_tendsto x hx).zpow₀ m (.inl (norm_ne_zero_iff.mpr hx)))
 
 lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} [NeZero d] (m : ℤ)
     (hm : - (d - 1 : ℕ) + 1 ≤ m)
@@ -614,28 +463,21 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} [NeZero d] (m : ℤ)
     refine IsDistBounded.const_fun_smul ?_ ↑m
     apply IsDistBounded.zpow_smul_repr_self
     omega) η, y⟫_ℝ)) := by
-  conv =>
-    enter [1, n];
-    rw [gradient_dist_normPowerSeries_zpow]
+  simp only [gradient_dist_normPowerSeries_zpow]
   simp [distOfFunction_inner]
   have h1 (n : ℕ) (x : Space d) :
     η x * ⟪(↑m * normPowerSeries n x ^ (m - 2)) • basis.repr x, (y)⟫_ℝ =
     η x * (m * (⟪basis.repr x, y⟫_ℝ * (normPowerSeries n x) ^ (m - 2))) := by
-    simp [inner_smul_left]
-    ring_nf
-    left
-    trivial
-  conv =>
-    enter [1, n, 2, x];
-    rw [h1 n x]
+    rw [real_inner_smul_left]
+    ring
+  simp only [h1]
   apply MeasureTheory.tendsto_integral_of_dominated_convergence
     (bound := fun x => |η x| * |m| * |⟪basis.repr x, y⟫_ℝ| * ((‖x‖ + 1) ^ (m - 2) + ‖x‖ ^ (m - 2)))
   · intro n
     apply IsDistBounded.aeStronglyMeasurable_schwartzMap_smul (F := ℝ) ?_ η
     apply IsDistBounded.const_mul_fun
     simp [basis_repr_inner_eq]
-    apply IsDistBounded.isDistBounded_mul_inner'
-    fun_prop
+    exact IsDistBounded.isDistBounded_mul_inner' (by fun_prop) _
   · have h1 : Integrable (fun x =>
         η x * (m * (⟪basis.repr x, y⟫_ℝ * ((‖x‖ + 1) ^ (m - 2) + ‖x‖ ^ (m - 2))))) volume := by
       apply IsDistBounded.integrable_space_mul ?_ η
@@ -643,21 +485,16 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} [NeZero d] (m : ℤ)
       simp [mul_add]
       apply IsDistBounded.add
       · simp [basis_repr_inner_eq]
-        apply IsDistBounded.isDistBounded_mul_inner'
-        refine IsDistBounded.norm_add_pos_nat_zpow (m - 2) 1 ?_
-        simp
+        exact IsDistBounded.isDistBounded_mul_inner'
+          (IsDistBounded.norm_add_pos_nat_zpow (m - 2) 1 one_pos) _
       · simp [basis_repr_inner_eq]
         conv =>
           enter [1, x]
           rw [real_inner_comm]
         apply IsDistBounded.isDistBounded_mul_inner_of_smul_norm
         · apply IsDistBounded.mono (f := fun x => ‖x‖ ^ (m - 1) + 1)
-          · apply IsDistBounded.add
-            · apply IsDistBounded.pow (m - 1)
-              omega
-            · fun_prop
-          · apply AEMeasurable.aestronglyMeasurable
-            fun_prop
+          · exact (IsDistBounded.pow (m - 1) (by omega)).add (by fun_prop)
+          · exact AEMeasurable.aestronglyMeasurable (by fun_prop)
           · intro x
             simp only [norm_mul, Real.norm_eq_abs, abs_norm, norm_zpow]
             rw [abs_of_nonneg (by positivity)]
@@ -665,60 +502,27 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} [NeZero d] (m : ℤ)
             · subst hx
               simp [zero_zpow_eq]
               split_ifs <;> grind
-            · trans ‖x‖ ^ (m - 1); swap
-              · simp
-              apply le_of_eq
-              trans ‖x‖ ^ (m - 2 + 1)
-              rw [zpow_add₀, zpow_one]
-              ring
-              simpa using hx
-              ring_nf
-        · apply AEMeasurable.aestronglyMeasurable
-          fun_prop
-    rw [← integrable_norm_iff] at h1
-    convert h1 using 1
-    funext x
-    simp [mul_assoc]
-    rw [abs_of_nonneg (by positivity)]
-    simp only [true_or]
-    fun_prop
+            · rw [mul_comm, ← zpow_add_one₀ (norm_ne_zero_iff.mpr hx),
+                show m - 2 + 1 = m - 1 by ring]
+              simp
+        · exact AEMeasurable.aestronglyMeasurable (by fun_prop)
+    refine h1.abs.congr (ae_of_all _ fun x => ?_)
+    simp only [abs_mul, mul_assoc, Int.cast_abs,
+      abs_of_nonneg (show (0:ℝ) ≤ (‖x‖ + 1) ^ (m - 2) + ‖x‖ ^ (m - 2) by positivity)]
   · intro n
-    rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    simp at hx
+    filter_upwards [Measure.ae_ne volume 0] with x hx
     simp [mul_assoc]
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
+    gcongr
     rw [abs_of_nonneg (by simp)]
     exact normPowerSeries_zpow_le_norm_sq_add_one n (m - 2) x hx
-  · rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    simp [inner_smul_left, mul_assoc]
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    ring_nf
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    have h1 : Filter.Tendsto (fun x_1 => normPowerSeries x_1 x ^ ((m - 2 : ℤ) : ℝ))
-      Filter.atTop (𝓝 (‖x‖ ^ ((m - 2 : ℤ) : ℝ))) := by
-      refine Filter.Tendsto.rpow ?_ ?_ ?_
-      · apply normPowerSeries_tendsto x hx
-      · simp
-      · left
-        simpa using hx
-    simp [-Int.cast_sub, Real.rpow_intCast] at h1
-    convert h1 using 3
-    · ring
-    · ring
+  · filter_upwards [Measure.ae_ne volume 0] with x hx
+    have h2 : ⟪((m : ℝ) * ‖x‖ ^ (m - 2)) • basis.repr x, y⟫_ℝ =
+        (m : ℝ) * (⟪basis.repr x, y⟫_ℝ * ‖x‖ ^ (m - 2)) := by
+      rw [real_inner_smul_left]
+      ring
+    rw [h2]
+    exact tendsto_const_nhds.mul (tendsto_const_nhds.mul (tendsto_const_nhds.mul
+      ((normPowerSeries_tendsto x hx).zpow₀ _ (.inl (norm_ne_zero_iff.mpr hx)))))
 
 /-!
 
@@ -731,8 +535,7 @@ lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
     distOfFunction (fun x : Space d => ((normPowerSeries n x) ^ (- 2 : ℤ)) • basis.repr x)
     (by fun_prop) := by
   ext1 η
-  apply ext_inner_right ℝ
-  intro y
+  refine ext_inner_right ℝ fun y => ?_
   simp [distGrad_inner_eq]
   rw [Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_inner]
   calc _
@@ -743,23 +546,18 @@ lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
       rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]
       · fun_prop
       · refine IsDistBounded.integrable_space_mul ?_ η
-        conv => enter [1, x]; rw [fderiv_log_normPowerSeries]
+        simp only [fderiv_log_normPowerSeries]
         fun_prop
       · fun_prop
       · fun_prop
-      · intro _ _
-        apply Differentiable.differentiableAt
-        fun_prop
+      · exact fun _ _ => Differentiable.differentiableAt (by fun_prop)
     _ = ∫ (x : Space d), η x * (⟪basis.repr.symm y, x⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ)) := by
-      congr
-      funext x
-      rw [fderiv_log_normPowerSeries]
+      simp only [fderiv_log_normPowerSeries]
   congr
   funext x
   simp [inner_smul_left_eq_smul]
   left
-  rw [real_inner_comm]
-  rw [basis_repr_inner_eq]
+  rw [real_inner_comm, basis_repr_inner_eq]
   ring
 
 /-!
@@ -785,41 +583,22 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
   apply MeasureTheory.tendsto_integral_of_dominated_convergence
     (bound := fun x => |fderiv ℝ η x (basis.repr.symm y)| * (‖x‖⁻¹ + (‖x‖ + 1)))
   · intro n
-    apply IsDistBounded.aeStronglyMeasurable_fderiv_schwartzMap_smul (F := ℝ) ?_
-    fun_prop
+    exact IsDistBounded.aeStronglyMeasurable_fderiv_schwartzMap_smul (F := ℝ) (by fun_prop) η _
   · have h1 : Integrable (fun x => (fderiv ℝ (⇑η) x) (basis.repr.symm y) *
         (‖x‖⁻¹ + (‖x‖ + 1))) volume := by
-      apply IsDistBounded.integrable_space_fderiv ?_
-      apply IsDistBounded.add
-      · exact IsDistBounded.inv
-      · fun_prop
-    rw [← integrable_norm_iff] at h1
-    convert h1 using 1
-    funext x
-    simp only [norm_mul, Real.norm_eq_abs, mul_eq_mul_left_iff, abs_eq_zero]
-    left
-    rw [abs_of_nonneg (by positivity)]
-    fun_prop
+      apply IsDistBounded.integrable_space_fderiv
+        (IsDistBounded.add IsDistBounded.inv (by fun_prop))
+    refine h1.abs.congr (ae_of_all _ fun x => ?_)
+    simp only [abs_mul]
+    congr 1
+    exact abs_of_nonneg (by positivity)
   · intro n
-    rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    simp at hx
-    simp
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    exact normPowerSeries_log_le n x hx
-  · rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    apply Filter.Tendsto.log
-    · exact normPowerSeries_tendsto x hx
-    · simpa using hx
+    filter_upwards [Measure.ae_ne volume 0] with x hx
+    simp only [norm_mul, Real.norm_eq_abs]
+    exact mul_le_mul_of_nonneg_left (normPowerSeries_log_le n x hx) (abs_nonneg _)
+  · filter_upwards [Measure.ae_ne volume 0] with x hx
+    exact tendsto_const_nhds.mul
+      ((normPowerSeries_tendsto x hx).log (norm_ne_zero_iff.mpr hx))
 
 lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     (η : 𝓢(Space d, ℝ)) (y : EuclideanSpace ℝ (Fin d)) :
@@ -831,78 +610,48 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     refine (IsDistBounded.zpow_smul_repr_self _ ?_)
     omega) η, y⟫_ℝ)) := by
   haveI : NeZero d := ⟨by omega⟩
-  conv =>
-    enter [1, n];
-    rw [gradient_dist_normPowerSeries_log]
-  simp only [distOfFunction_inner]
+  simp only [gradient_dist_normPowerSeries_log, distOfFunction_inner]
   have h1 (n : ℕ) (x : Space d) :
     η x * ⟪(normPowerSeries n x ^ (- 2 : ℤ)) • basis.repr x, y⟫_ℝ =
     η x * ((⟪basis.repr x, y⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ))) := by
-    simp [inner_smul_left]
-    ring_nf
-    left
-    trivial
-  conv =>
-    enter [1, n, 2, x]
-    rw [h1 n x]
+    rw [real_inner_smul_left]
+    ring
+  simp only [h1]
   apply MeasureTheory.tendsto_integral_of_dominated_convergence
     (bound := fun x => |η x| * |⟪basis.repr x, y⟫_ℝ| * ((‖x‖ + 1) ^ (- 2 : ℤ) + ‖x‖ ^ (- 2 : ℤ)))
   · intro n
-    apply IsDistBounded.aeStronglyMeasurable_schwartzMap_smul (F := ℝ) ?_ η
+    refine IsDistBounded.aeStronglyMeasurable_schwartzMap_smul (F := ℝ) ?_ η
     simp only [basis_repr_inner_eq]
-    apply IsDistBounded.isDistBounded_mul_inner'
-    fun_prop
+    exact IsDistBounded.isDistBounded_mul_inner' (by fun_prop) _
   · have h1 : Integrable (fun x =>
         η x * ((⟪basis.repr x, y⟫_ℝ * ((‖x‖ + 1) ^ (- 2 : ℤ) + ‖x‖ ^ (- 2 : ℤ))))) volume := by
       apply IsDistBounded.integrable_space_mul ?_ η
       simp [mul_add]
       apply IsDistBounded.add
       · simp only [basis_repr_inner_eq]
-        apply IsDistBounded.isDistBounded_mul_inner'
-        refine IsDistBounded.norm_add_pos_nat_zpow (- 2) 1 ?_
-        simp
+        exact IsDistBounded.isDistBounded_mul_inner'
+          (IsDistBounded.norm_add_pos_nat_zpow (- 2) 1 one_pos) _
       · simp only [basis_repr_inner_eq]
         convert IsDistBounded.mul_inner_pow_neg_two (basis.repr.symm y) using 1
         funext x
         simp [real_inner_comm]
-    rw [← integrable_norm_iff] at h1
-    convert h1 using 1
-    funext x
-    simp [mul_assoc]
-    rw [abs_of_nonneg (by positivity)]
-    simp only [true_or]
-    fun_prop
+    refine h1.abs.congr (ae_of_all _ fun x => ?_)
+    simp only [abs_mul, mul_assoc,
+      abs_of_nonneg (show (0:ℝ) ≤ (‖x‖ + 1) ^ (- 2 : ℤ) + ‖x‖ ^ (- 2 : ℤ) by positivity)]
   · intro n
-    rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    simp at hx
+    filter_upwards [Measure.ae_ne volume 0] with x hx
     simp [mul_assoc]
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
-    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
+    gcongr
     rw [abs_of_nonneg (by simp)]
     exact normPowerSeries_zpow_le_norm_sq_add_one n (- 2 : ℤ) x hx
-  · rw [Filter.eventually_iff_exists_mem]
-    use {0}ᶜ
-    constructor
-    · rw [compl_mem_ae_iff, measure_singleton]
-    intro x hx
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    simp [inner_smul_left, inner_smul_left]
-    rw [mul_comm]
-    apply Filter.Tendsto.mul
-    · exact tendsto_const_nhds
-    have h1 : Filter.Tendsto (fun x_1 => normPowerSeries x_1 x ^ ((- 2 : ℤ) : ℝ))
-      Filter.atTop (𝓝 (‖x‖ ^ ((- 2 : ℤ) : ℝ))) := by
-      refine Filter.Tendsto.rpow ?_ ?_ ?_
-      · apply normPowerSeries_tendsto x hx
-      · simp
-      · left
-        simpa using hx
-    simpa using h1
+  · filter_upwards [Measure.ae_ne volume 0] with x hx
+    have h2 : ⟪(‖x‖ ^ (- 2 : ℤ)) • basis.repr x, y⟫_ℝ =
+        ⟪basis.repr x, y⟫_ℝ * ‖x‖ ^ (- 2 : ℤ) := by
+      rw [real_inner_smul_left]
+      ring
+    rw [h2]
+    exact tendsto_const_nhds.mul (tendsto_const_nhds.mul
+      ((normPowerSeries_tendsto x hx).zpow₀ _ (.inl (norm_ne_zero_iff.mpr hx))))
 
 /-!
 
@@ -957,9 +706,8 @@ open Distribution
 private lemma integrable_real_pow_mul_schwartz
     (ψ : 𝓢(ℝ, ℝ)) (k : ℕ) :
     Integrable (fun x : ℝ => x ^ k * ψ x) volume := by
-  refine (ψ.integrable_pow_mul volume k).mono' (by fun_prop) ?_
-  filter_upwards with x
-  simp [norm_mul, norm_pow]
+  refine (ψ.integrable_pow_mul volume k).mono' (by fun_prop)
+    (ae_of_all _ fun x => by simp [norm_mul, norm_pow])
 
 private lemma radial_power_deriv_integral_by_parts
     {d : ℕ} (η : 𝓢(Space d, ℝ))
@@ -983,9 +731,7 @@ private lemma radial_power_deriv_integral_by_parts
       | 1 =>
         use 0, 1
         intro x
-        simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right]
-        rw [(continuousMultilinearCurryRightEquiv' ℝ 0 ℝ (Space d)).symm.norm_map]
-        simp [ContinuousLinearMap.norm_smulRight_apply]
+        simp [fderiv_smul_const]
       | n' + 1 + 1 =>
         use 0, 0
         intro x
@@ -1002,36 +748,29 @@ private lemma radial_power_deriv_integral_by_parts
       ∀ k x, ((Physlib.Distribution.powOneMul ℝ)^[k] η') x = x ^ k * η' x := by
     intro k
     induction k with
-    | zero =>
-        intro x
-        simp
+    | zero => simp
     | succ k ih =>
-        intro x
-        rw [Function.iterate_succ_apply']
-        rw [Physlib.Distribution.powOneMul_apply, ih]
-        rw [pow_succ]
-        change x * (x ^ k * η' x) = x ^ k * x * η' x
-        ring
+      intro x
+      rw [Function.iterate_succ_apply', Physlib.Distribution.powOneMul_apply, ih, pow_succ]
+      change x * (x ^ k * η' x) = x ^ k * x * η' x
+      ring
   have hleft_subtype :
       ∫ (r : Set.Ioi (0 : ℝ)),
           r.1 ^ p * _root_.deriv (fun a => η (a • n.1)) r.1
           ∂(.comap Subtype.val volume)
         =
         ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
-          x ^ p * _root_.deriv (fun a => η (a • n.1)) x := by
-    exact MeasureTheory.integral_subtype_comap (μ := volume)
-      (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
-      (fun x : ℝ => x ^ p * _root_.deriv (fun a => η (a • n.1)) x)
+          x ^ p * _root_.deriv (fun a => η (a • n.1)) x :=
+    MeasureTheory.integral_subtype_comap measurableSet_Ioi
+      fun x : ℝ => x ^ p * _root_.deriv (fun a => η (a • n.1)) x
   have hright_subtype :
       ∫ (r : Set.Ioi (0 : ℝ)),
           r.1 ^ (p - 1) * η (r.1 • n.1)
           ∂(.comap Subtype.val volume)
         =
         ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
-          x ^ (p - 1) * η (x • n.1) := by
-    exact MeasureTheory.integral_subtype_comap (μ := volume)
-      (s := Set.Ioi (0 : ℝ)) measurableSet_Ioi
-      (fun x : ℝ => x ^ (p - 1) * η (x • n.1))
+          x ^ (p - 1) * η (x • n.1) :=
+    MeasureTheory.integral_subtype_comap measurableSet_Ioi fun x : ℝ => x ^ (p - 1) * η (x • n.1)
   rw [hleft_subtype, hright_subtype]
   have hIBP :
       ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
@@ -1047,51 +786,26 @@ private lemma radial_power_deriv_integral_by_parts
       (v := fun x : ℝ => η (x • n.1))
       (v' := fun x : ℝ => _root_.deriv (fun a => η (a • n.1)) x)
       (a' := (0 : ℝ)) (b' := (0 : ℝ)) ?_ ?_ ?_ ?_ ?_ ?_
-    · intro x hx
-      simpa using (hasDerivAt_pow p x)
-    · intro x hx
-      exact DifferentiableAt.hasDerivAt (by fun_prop :
-        DifferentiableAt ℝ (fun x : ℝ => η (x • n.1)) x)
-    · have hderiv_int :
-          Integrable (fun x : ℝ =>
-            x ^ p * ((SchwartzMap.derivCLM ℝ ℝ) η') x) volume :=
-        integrable_real_pow_mul_schwartz ((SchwartzMap.derivCLM ℝ ℝ) η') p
-      exact hderiv_int.integrableOn.congr_fun (by
-        intro x hx
-        have hderiv_eq :
-            _root_.deriv η' x = _root_.deriv (fun a => η (a • n.1)) x := by
-          congr 1
-        simp [SchwartzMap.derivCLM_apply, hderiv_eq])
-        measurableSet_Ioi
-    · have hbase :
-          Integrable (fun x : ℝ => x ^ (p - 1) * η' x) volume :=
-        integrable_real_pow_mul_schwartz η' (p - 1)
-      have hconst :
-          Integrable (fun x : ℝ => (p : ℝ) * (x ^ (p - 1) * η' x)) volume :=
-        hbase.const_mul (p : ℝ)
-      exact hconst.integrableOn.congr_fun (by
-        intro x hx
-        ring_nf
-        simp [hη'_apply, mul_assoc])
-        measurableSet_Ioi
-    · have hcont :
-          ContinuousAt (fun x : ℝ => x ^ p * η (x • n.1)) (0 : ℝ) := by
-        fun_prop
-      have hlim := tendsto_nhdsWithin_of_tendsto_nhds
-        (s := Set.Ioi (0 : ℝ)) hcont.tendsto
+    · exact fun x _ => by simpa using hasDerivAt_pow p x
+    · exact fun x _ => DifferentiableAt.hasDerivAt (by fun_prop)
+    · refine (integrable_real_pow_mul_schwartz ((SchwartzMap.derivCLM ℝ ℝ) η')
+        p).integrableOn.congr_fun (fun x _ => ?_) measurableSet_Ioi
+      have hderiv_eq : _root_.deriv η' x = _root_.deriv (fun a => η (a • n.1)) x := by congr 1
+      simp [SchwartzMap.derivCLM_apply, hderiv_eq]
+    · refine ((integrable_real_pow_mul_schwartz η' (p - 1)).const_mul
+        (p : ℝ)).integrableOn.congr_fun (fun x _ => ?_) measurableSet_Ioi
+      ring_nf
+      simp [hη'_apply, mul_assoc]
+    · have hcont : ContinuousAt (fun x : ℝ => x ^ p * η (x • n.1)) (0 : ℝ) := by fun_prop
+      have hlim := tendsto_nhdsWithin_of_tendsto_nhds (s := Set.Ioi (0 : ℝ)) hcont.tendsto
       simp only [ne_eq, hp.ne', not_false_eq_true, zero_pow, zero_smul, zero_mul] at hlim
       exact hlim
-    · have hzero :
-          Filter.Tendsto (fun x : ℝ => x ^ p * η' x) Filter.atTop (𝓝 (0 : ℝ)) := by
-        have hsch :
-            Filter.Tendsto (fun x : ℝ => ((Physlib.Distribution.powOneMul ℝ)^[p] η') x)
-              Filter.atTop (𝓝 (0 : ℝ)) :=
-          Filter.Tendsto.mono_left
-            (((Physlib.Distribution.powOneMul ℝ)^[p] η').toZeroAtInfty.zero_at_infty')
-            atTop_le_cocompact
-        exact hsch.congr' (Filter.Eventually.of_forall (fun x => by
-          rw [hmul_iter_apply p x]))
-      exact hzero
+    · have hsch : Filter.Tendsto (fun x : ℝ => ((Physlib.Distribution.powOneMul ℝ)^[p] η') x)
+          Filter.atTop (𝓝 (0 : ℝ)) :=
+        Filter.Tendsto.mono_left
+          (((Physlib.Distribution.powOneMul ℝ)^[p] η').toZeroAtInfty.zero_at_infty')
+          atTop_le_cocompact
+      exact hsch.congr' (Filter.Eventually.of_forall (hmul_iter_apply p))
   calc
     -∫ (x : ℝ) in Set.Ioi (0 : ℝ),
         x ^ p * _root_.deriv (fun a => η (a • n.1)) x
@@ -1101,10 +815,7 @@ private lemma radial_power_deriv_integral_by_parts
           ring
     _ = (p : ℝ) * ∫ (x : ℝ) in Set.Ioi (0 : ℝ),
           x ^ (p - 1) * η (x • n.1) := by
-          rw [← integral_const_mul]
-          congr
-          funext x
-          ring
+          simp only [mul_assoc, integral_const_mul]
 
 private lemma distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv
     {d p : ℕ} [NeZero d] (q : ℤ) (hq : 0 < q + (d : ℤ))
@@ -1148,10 +859,8 @@ private lemma distDiv_norm_zpow_smul_repr_self_apply_eq_radial_deriv
             rw [NNReal.smul_def]
             rw [Real.coe_toNNReal _ (pow_nonneg (le_of_lt hr) (d - 1))]
             · simp only [smul_eq_mul]
-              rw [hnorm]
-              rw [← grad_smul_inner_space (n : Space d) (⇑η)
-                (SchwartzMap.differentiable η) (r : ℝ) hr]
-              rw [real_inner_comm]
+              rw [hnorm, ← grad_smul_inner_space (n : Space d) (⇑η)
+                (SchwartzMap.differentiable η) (r : ℝ) hr, real_inner_comm]
               simp only [inner_smul_right]
               rw [← radial_jacobian_zpow_mul_self hp_int hr]
               ring
@@ -1165,14 +874,8 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
           (IsDistBounded.pow q (by omega))) := by
   ext η
   let p : ℕ := Int.toNat (q + (d : ℤ))
-  have hp_int : (p : ℤ) = q + (d : ℤ) := by
-    dsimp [p]
-    exact Int.toNat_of_nonneg (le_of_lt hq)
-  have hp_pos : 0 < p := by
-    have : (0 : ℤ) < (p : ℤ) := by
-      rw [hp_int]
-      exact hq
-    exact_mod_cast this
+  have hp_int : (p : ℤ) = q + (d : ℤ) := by simpa [p] using Int.toNat_of_nonneg (le_of_lt hq)
+  have hp_pos : 0 < p := by omega
   have hcoef : (((q + d : ℤ) : ℝ)) = (p : ℝ) := by
     exact_mod_cast hp_int.symm
   calc
@@ -1202,10 +905,7 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
     _ = (((q + (d : ℤ) : ℤ) : ℝ) •
         distOfFunction (fun x : Space d => ‖x‖ ^ q)
           (IsDistBounded.pow q (by omega))) η := by
-          simp [distOfFunction_apply, mul_comm]
-          left
-          rw [← hcoef]
-          norm_num
+          simp [distOfFunction_apply, hcoef]
 
 /-!
 
@@ -1220,10 +920,7 @@ lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} [NeZero d] (m : ℤ)
       (((m : ℝ) * (((m - 2 + d : ℤ) : ℝ))) •
         distOfFunction (fun x : Space d => ‖x‖ ^ (m - 2))
           (IsDistBounded.pow (m - 2) (by omega))) := by
-  rw [distLaplacian]
-  change ∇ᵈ ⬝ (∇ᵈ (distOfFunction (fun x : Space d => ‖x‖ ^ m)
-    (IsDistBounded.pow m (by omega)))) = _
-  rw [distGrad_distOfFunction_norm_zpow m (by omega)]
+  rw [distLaplacian, LinearMap.comp_apply, distGrad_distOfFunction_norm_zpow m (by omega)]
   have hdist :
       distOfFunction (fun x : Space d => (m * ‖x‖ ^ (m - 2)) • basis.repr x)
           (by
@@ -1239,10 +936,7 @@ lemma distLaplacian_distOfFunction_norm_zpow {d : ℕ} [NeZero d] (m : ℤ)
       (IsDistBounded.zpow_smul_repr_self (m - 2) (by omega)) (m : ℝ) using 1
     ext x
     simp [smul_smul]
-  rw [hdist]
-  rw [map_smul]
-  rw [distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv]
-  rw [smul_smul]
+  rw [hdist, map_smul, distDiv_norm_zpow_smul_repr_self_eq_smul (m - 2) hdiv, smul_smul]
 
 /-!
 
@@ -1303,8 +997,7 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} [NeZero d] :
           simp only [Real.norm_eq_abs, inv_pow, Function.comp_apply,
             homeomorphUnitSphereProd_symm_apply_coe, map_smul]
           let x : Space d := r.2.1 • r.1.1
-          have hr := r.2.2
-          simp [-Subtype.coe_prop] at hr
+          have hr : (0 : ℝ) < r.2.1 := r.2.2
           rw [abs_of_nonneg (le_of_lt hr)]
           trans (r.2.1 ^ (d - 1))⁻¹ * _root_.deriv (fun a => η (a • ‖↑x‖⁻¹ • ↑x)) ‖x‖
           · simp [x, norm_smul]
@@ -1332,8 +1025,7 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} [NeZero d] :
           erw [integral_withDensity_eq_integral_smul]
           congr
           funext r
-          have hr := r.2
-          simp [-Subtype.coe_prop] at hr
+          have hr : (0 : ℝ) < r.1 := r.2
           rw [abs_of_nonneg hr.le, NNReal.smul_def, Real.coe_toNNReal _ (by positivity),
             smul_eq_mul, ← mul_assoc, mul_inv_cancel₀ (pow_ne_zero (d - 1) hr.ne'), one_mul]
           fun_prop
@@ -1365,12 +1057,8 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} [NeZero d] :
           rw [MeasureTheory.integral_subtype_comap (by simp),
             MeasureTheory.integral_Ioi_of_hasDerivAt_of_tendsto (f := fun a => η (a • n)) (m := 0)]
           · simp
-          · refine ContinuousAt.continuousWithinAt ?_
-            fun_prop
-          · intro x hx
-            refine DifferentiableAt.hasDerivAt ?_
-            have := η.differentiable
-            fun_prop
+          · exact ContinuousAt.continuousWithinAt (by fun_prop)
+          · exact fun x _ => DifferentiableAt.hasDerivAt (by fun_prop)
           · exact (integrable ((derivCLM ℝ ℝ) (η' n))).integrableOn
           · exact Filter.Tendsto.mono_left (η' n).toZeroAtInfty.zero_at_infty' atTop_le_cocompact
       _ = η 0 * (d * (volume (α := Space d)).real (Metric.ball 0 1)) := by
@@ -1406,9 +1094,7 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
       rw [distOfFunction_apply]
       refine integral_eq_zero_of_ae (ae_of_all _ fun x => ?_)
       rw [Subsingleton.elim x 0]
-      simp only [norm_zero, smul_eq_mul, Pi.zero_apply, mul_eq_zero]
-      right
-      linarith
+      simp [zero_zpow_eq]
     simp [hzero]
   · haveI : NeZero d := ⟨by omega⟩
     rw [distLaplacian]
@@ -1438,18 +1124,7 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
         (2 - (d : ℝ)) using 1
       ext x
       simp [smul_smul]
-    rw [hdist]
-    rw [map_smul]
-    have hdiv :
-        ∇ᵈ ⬝ (distOfFunction
-          (fun x : Space d =>
-            ‖x‖ ^ (- (d : ℤ)) • basis.repr x)
-          (IsDistBounded.zpow_smul_repr_self (- (d : ℤ)) (by omega))) =
-          (d * (volume (α := Space d)).real
-            (Metric.ball 0 1)) • diracDelta ℝ 0 := by
-      exact distDiv_inv_pow_eq_dim (d := d)
-    rw [hdiv]
-    rw [smul_smul]
+    rw [hdist, map_smul, distDiv_inv_pow_eq_dim, smul_smul]
     ring_nf
 
 /-- In dimension two the fundamental solution of the Laplacian is the logarithm: the

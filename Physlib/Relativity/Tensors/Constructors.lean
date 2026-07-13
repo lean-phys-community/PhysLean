@@ -63,9 +63,8 @@ lemma fromSingleT_symm_pure {c : C} (p : Pure S ![c]) :
 lemma fromSingleT_eq_pureT {c : C} (x : V c) :
     fromSingleT (S := S) x = Pure.toTensor (fun 0 => x : Pure S ![c]) := by
   change _ = Pure.toTensor (Pure.fromSingleP x)
-  obtain ⟨p, rfl⟩ := Pure.fromSingleP (S := S).symm.surjective x
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, LinearEquiv.apply_symm_apply]
-  rw [← fromSingleT_symm_pure]
+  apply fromSingleT.symm.injective
+  rw [fromSingleT_symm_pure]
   simp
 
 lemma actionT_fromSingleT {c : C} (x : V c) (g : G) :
@@ -134,28 +133,21 @@ lemma fromPairT_eq_pure {c1 c2 : C} (x : V c1) (y : V c2) :
   rw [fromPairT_tmul, fromSingleT_eq_pureT, fromSingleT_eq_pureT, prodT_pure, permT_pure]
   congr
   funext i
-  fin_cases i
-  · rfl
-  · rfl
+  fin_cases i <;> rfl
 
 lemma actionT_fromPairT {c1 c2 : C}
     (x : V c1 ⊗[k]V c2)
     (g : G) :
     g • fromPairT (S := S) x = fromPairT (TensorProduct.map (rep c1 g)
       (rep c2 g) x) := by
-  let P (x : V c1 ⊗[k] V c2) : Prop :=
-    g • fromPairT (S := S) x = fromPairT (TensorProduct.map (rep c1 g)
-      (rep c2 g) x)
-  change P x
-  apply TensorProduct.induction_on
-  · simp [P]
-  · intro x y
-    simp [P]
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul x y =>
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, map_tmul]
     rw [fromPairT_tmul, ← permT_equivariant, ← prodT_equivariant,
       actionT_fromSingleT, actionT_fromSingleT]
     rfl
-  · intro x y hx hy
-    simp [P, hx, hy]
+  | add x y hx hy => simp [hx, hy]
 
 lemma fromPairT_map_right {c1 c2 c2' : C} (h :c2 = c2')
     (x : V c1 ⊗[k] V c2) :
@@ -179,25 +171,16 @@ lemma fromPairT_comm {c1 c2 : C}
     fromPairT (TensorProduct.comm k _ _ x) =
     permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> simp))
     (fromPairT (S := S) x) := by
-  let P (x : V c1 ⊗[k] V c2) : Prop :=
-    fromPairT (TensorProduct.comm k _ _ x) =
-    permT ![1, 0] (And.intro (by decide) (fun i => by fin_cases i <;> simp))
-    (fromPairT (S := S) x)
-  change P x
-  apply TensorProduct.induction_on
-  · simp [P]
-  · intro x y
-    simp [P]
-    rw [fromPairT_tmul, fromPairT_tmul]
-    rw [prodT_swap]
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul x y =>
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, comm_tmul, Fin.isValue]
+    rw [fromPairT_tmul, fromPairT_tmul, prodT_swap]
     simp only [Nat.succ_eq_add_one, Nat.reduceAdd, permT_permT, CompTriple.comp_eq, Fin.isValue]
     congr
     ext i
-    fin_cases i
-    · rfl
-    · rfl
-  · intro x y hx hy
-    simp [P, hx, hy]
+    fin_cases i <;> rfl
+  | add x y hx hy => simp [hx, hy]
 
 /-!
 
@@ -218,17 +201,7 @@ lemma fromSingleTContrFromPairT_tmul {c c2 : C}
     (x : V c) (y1 : V (S.τ c)) (y2 : V c2) :
     fromSingleTContrFromPairT x (y1 ⊗ₜ[k] y2) =
     S.contr c (x ⊗ₜ[k] y1) • fromSingleT y2 := by
-  rw [fromSingleTContrFromPairT]
-  conv_lhs =>
-    enter [2, 2, 2]
-    change (x ⊗ₜ[k] y1) ⊗ₜ[k] y2
-  conv_lhs =>
-    enter [2, 2]
-    change (S.contr c) (x ⊗ₜ[k] y1) ⊗ₜ[k] y2
-  conv_lhs =>
-    enter [2]
-    change (S.contr c) (x ⊗ₜ[k] y1) • y2
-  simp
+  simp [fromSingleTContrFromPairT]
 
 lemma fromSingleT_contr_fromPairT_tmul {c c2 : C}
     (x : V c) (y1 : V (S.τ c)) (y2 : V c2) :
@@ -265,10 +238,9 @@ lemma fromSingleT_contr_fromPairT_tmul {c c2 : C}
       rw [permT_permT]
     conv_rhs =>
       rw [contrT_permT]
-    apply permT_congr
-    · ext i
-      simp
-    · rfl
+    refine permT_congr ?_ rfl
+    ext i
+    simp
   · rw [contrT_fromSingleT_fromSingleT]
     simp only [map_smul, LinearMap.smul_apply]
     rw [fromSingleTContrFromPairT_tmul]
@@ -276,10 +248,9 @@ lemma fromSingleT_contr_fromPairT_tmul {c c2 : C}
     congr 1
     rw [prodT_swap, permT_permT]
     simp only [Fin.isValue, Nat.add_zero, CompTriple.comp_eq, prodT_default_right, permT_permT]
-    apply permT_congr
-    · ext i
-      simp
-    · rfl
+    refine permT_congr ?_ rfl
+    ext i
+    simp
 
 lemma contrT_fromSingleT_fromPairT {c c2 : C}
     (x : V c)
@@ -287,20 +258,13 @@ lemma contrT_fromSingleT_fromPairT {c c2 : C}
     contrT 1 0 1 (by simp; rfl)
       (prodT (fromSingleT x) (fromPairT y)) =
     permT id (by simp; rfl) (fromSingleTContrFromPairT x y) := by
-  /- The proof -/
-  let P (y : V (S.τ c) ⊗[k] V c2) : Prop :=
-    contrT 1 0 1 (by simp; rfl)
-      (prodT (fromSingleT x) (fromPairT y)) =
-    permT id (by simp; rfl) (fromSingleTContrFromPairT x y)
-  change P y
-  apply TensorProduct.induction_on
-  · simp only [fromSingleTContrFromPairT, map_zero, tmul_zero, P]
-  · intro y1 y2
-    exact fromSingleT_contr_fromPairT_tmul x y1 y2
-  · intro x y hx hy
-    simp only [P, fromSingleTContrFromPairT] at hx hy ⊢
+  induction y using TensorProduct.induction_on with
+  | zero => simp only [fromSingleTContrFromPairT, map_zero, tmul_zero]
+  | tmul y1 y2 => exact fromSingleT_contr_fromPairT_tmul x y1 y2
+  | add a b ha hb =>
+    simp only [fromSingleTContrFromPairT] at ha hb ⊢
     simp only [tmul_add, map_add]
-    rw [hx, hy]
+    rw [ha, hb]
 
 /-!
 
@@ -325,21 +289,7 @@ noncomputable def fromPairTContr {c c1 c2 : C}(x : V c1 ⊗[k] V c) (y : V (S.τ
 lemma fromPairTContr_tmul_tmul {c c1 c2 : C} (x1 : V c1) (x2 : V c) (y1 : V (S.τ c))
     (y2 : V c2) : fromPairTContr (x1 ⊗ₜ[k] x2) (y1 ⊗ₜ[k] y2) =
     (S.contr c) (x2 ⊗ₜ[k] y1) • fromPairT (x1 ⊗ₜ[k] y2) := by
-  rw [fromPairTContr]
-  conv_lhs =>
-    enter [2, 2, 2, 2]
-    change x1 ⊗ₜ[k] (x2 ⊗ₜ[k] (y1 ⊗ₜ[k] y2))
-  conv_lhs =>
-    enter [2, 2, 2]
-    change x1 ⊗ₜ[k] ((x2 ⊗ₜ[k] y1) ⊗ₜ[k] y2)
-  conv_lhs =>
-    enter [2, 2]
-    change x1 ⊗ₜ[k] ((S.contr c) (x2 ⊗ₜ[k] y1) ⊗ₜ[k] y2)
-  conv_lhs =>
-    enter [2]
-    change x1 ⊗ₜ[k] (((S.contr c) (x2 ⊗ₜ[k] y1) :k) • y2)
-    rw [tmul_smul (R := k) (R' := k)]
-  simp
+  simp [fromPairTContr, tmul_smul]
 
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : C)
     (x1 : V c1) (x2 : V c) (y1 : V (S.τ c))
@@ -351,9 +301,7 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : C)
     Pure.contrP, contrT_pure, prodT_pure]
   congr
   funext i
-  fin_cases i
-  · rfl
-  · rfl
+  fin_cases i <;> rfl
 
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : C)
     (x : V c1 ⊗[k] V c)
@@ -361,33 +309,22 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : C)
     contrT 2 1 2 (by simp; rfl)
       (prodT (fromPairT x) (fromPairT y)) =
     permT id (by simp; exact ⟨rfl, rfl⟩) (fromPairTContr x y) := by
-  /- The proof-/
-  let P (x : V c1 ⊗[k] V c)
-      (y : V (S.τ c) ⊗[k] V c2) : Prop :=
-    contrT 2 1 2 (by simp; rfl)
-      (prodT (fromPairT x) (fromPairT y)) =
-    permT id (by simp; exact ⟨rfl, rfl⟩) (fromPairTContr x y)
-  let P1 (x : V c1 ⊗[k] V c) := P x y
-  change P1 x
-  apply TensorProduct.induction_on
-  · simp only [fromPairTContr, map_zero, LinearMap.zero_apply, zero_tmul, P1, P]
-  · intro x1 x2
-    let P2 (y : V (S.τ c) ⊗[k] V c2) : Prop :=
-      P (x1 ⊗ₜ x2) y
-    change P2 y
-    apply TensorProduct.induction_on
-    · simp only [fromPairTContr, map_zero, tmul_zero, P2, P]
-    · intro y1 y2
-      simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, P2, P]
+  induction x using TensorProduct.induction_on with
+  | zero => simp only [fromPairTContr, map_zero, LinearMap.zero_apply, zero_tmul]
+  | tmul x1 x2 =>
+    induction y using TensorProduct.induction_on with
+    | zero => simp only [fromPairTContr, map_zero, tmul_zero]
+    | tmul y1 y2 =>
+      simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue]
       exact fromPairT_contr_fromPairT_eq_fromPairTContr_tmul c c1 c2 x1 x2 y1 y2
-    · intro x y hx hy
-      simp only [P2, P, fromPairTContr] at hx hy ⊢
+    | add a b ha hb =>
+      simp only [fromPairTContr] at ha hb ⊢
       simp only [tmul_add, map_add]
-      rw [← hx, ← hy]
-  · intro x y hx hy
-    simp only [P1, P, fromPairTContr] at hx hy ⊢
+      rw [← ha, ← hb]
+  | add a b ha hb =>
+    simp only [fromPairTContr] at ha hb ⊢
     simp only [add_tmul, map_add]
-    rw [← hx, ← hy]
+    rw [← ha, ← hb]
     simp
 
 lemma fromPairT_basis_repr {c c1 : C}
@@ -395,16 +332,11 @@ lemma fromPairT_basis_repr {c c1 : C}
     (φ : ComponentIdx ![c, c1]) :
     (basis ![c, c1]).repr (fromPairT (S := S) x) φ =
     (Basis.tensorProduct (b c) (b c1)).repr x (φ 0, φ 1) := by
-  let P (x : (V c ⊗[k] V c1)) :=
-    (basis ![c, c1]).repr
-    (fromPairT (S := S) x) φ =
-    (Basis.tensorProduct (b c) (b c1)).repr x (φ 0, φ 1)
-  change P x
-  apply TensorProduct.induction_on
-  · simp [P]
-  · intro x y
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul x y =>
     simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Basis.tensorProduct_repr_tmul_apply,
-      smul_eq_mul, P]
+      smul_eq_mul]
     conv_lhs =>
       left
       right
@@ -415,8 +347,7 @@ lemma fromPairT_basis_repr {c c1 : C}
     simp [Pure.component]
     rw [mul_comm]
     rfl
-  · intro x y hx hy
-    simp_all [P]
+  | add x y hx hy => simp_all
 
 lemma fromPairT_apply_basis_repr {c c1 : C}
     (b0 : basisIdx c) (b1 : basisIdx c1) :
@@ -492,27 +423,18 @@ lemma actionT_fromTripleT {c1 c2 c3 : C}
     (x : V c1 ⊗[k] (V c2 ⊗[k] V c3)) (g : G) :
     g • fromTripleT (S := S) x = fromTripleT (TensorProduct.map (rep c1 g)
       (TensorProduct.map (rep c2 g) (rep c3 g)) x) := by
-  let P (x : V c1 ⊗[k] (V c2 ⊗[k] V c3)) : Prop :=
-      g • fromTripleT (S := S) x = fromTripleT (TensorProduct.map (rep c1 g)
-      (TensorProduct.map (rep c2 g) (rep c3 g)) x)
-  change P x
-  apply TensorProduct.induction_on
-  · simp [P]
-  · intro x y
-    let P1 (y : V c2 ⊗[k] V c3) : Prop :=
-      P (x ⊗ₜ[k] y)
-    change P1 y
-    apply TensorProduct.induction_on
-    · simp [P1, P]
-    · intro y z
-      simp [P1, P]
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul x yz =>
+    induction yz using TensorProduct.induction_on with
+    | zero => simp
+    | tmul y z =>
+      simp only [Nat.succ_eq_add_one, Nat.reduceAdd, map_tmul]
       rw [fromTripleT_tmul, fromTripleT_tmul]
       rw [← permT_equivariant, ← prodT_equivariant, ← prodT_equivariant]
       simp [← actionT_fromSingleT]
-    · intro x y hx hy
-      simp [P1, P, hx, hy, tmul_add]
-  · intro x y hx hy
-    simp [P, hx, hy]
+    | add a b ha hb => simp [ha, hb, tmul_add]
+  | add a b ha hb => simp [ha, hb]
 
 lemma fromTripleT_basis_repr {c c1 c2 : C}
     (x : V c ⊗[k] (V c1 ⊗[k] V c2))
@@ -520,20 +442,14 @@ lemma fromTripleT_basis_repr {c c1 c2 : C}
     (basis ![c, c1, c2]).repr (fromTripleT (S := S) x) φ =
     (Basis.tensorProduct (b c) (Basis.tensorProduct (b c1) (b c2))).repr x
     (φ 0, φ 1, φ 2) := by
-  let P (x : V c ⊗[k] (V c1 ⊗[k] V c2)) := (basis ![c, c1, c2]).repr (fromTripleT x) φ =
-    (Basis.tensorProduct (b c) (Basis.tensorProduct (b c1) (b c2))).repr x
-    (φ 0, φ 1, φ 2)
-  change P x
-  apply TensorProduct.induction_on
-  · simp [P]
-  · intro x y
-    let P1 (y : V c1 ⊗[k] V c2) : Prop :=
-      P (x ⊗ₜ[k] y)
-    change P1 y
-    apply TensorProduct.induction_on
-    · simp [P1, P]
-    · intro y z
-      simp [P1, P]
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul x yz =>
+    induction yz using TensorProduct.induction_on with
+    | zero => simp
+    | tmul y z =>
+      simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue,
+        Basis.tensorProduct_repr_tmul_apply, smul_eq_mul]
       rw [fromTripleT_tmul]
       rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, fromSingleT_eq_pureT]
       rw [prodT_pure, prodT_pure, permT_pure]
@@ -544,15 +460,14 @@ lemma fromTripleT_basis_repr {c c1 c2 : C}
         enter [1]
         rw [mul_comm]
       rfl
-    · intro y1 y2 hx hy
+    | add y1 y2 hx hy =>
       simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue,
-        Basis.tensorProduct_repr_tmul_apply, smul_eq_mul, P1, P] at hx hy
+        Basis.tensorProduct_repr_tmul_apply, smul_eq_mul] at hx hy
       simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue,
         Basis.tensorProduct_repr_tmul_apply, smul_eq_mul, tmul_add, map_add, Finsupp.coe_add,
-        Pi.add_apply, add_mul, P1, P]
+        Pi.add_apply]
       rw [hx, hy]
-  · intro x y hx hy
-    simp_all [P]
+  | add a b ha hb => simp_all
 
 lemma fromTripleT_apply_basis {c c1 c2 : C}
     (b0 : basisIdx c) (b1 : basisIdx c1)

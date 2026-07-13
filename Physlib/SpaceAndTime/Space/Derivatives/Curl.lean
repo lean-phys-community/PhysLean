@@ -132,8 +132,7 @@ lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
 @[to_fun]
 lemma curl_neg (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : Differentiable ℝ f) :
     ∇ ⨯ (-f) = -∇ ⨯ f := by
-  rw [← neg_one_smul ℝ, curl_smul, neg_one_smul]
-  · exact hf
+  rw [← neg_one_smul ℝ, curl_smul _ _ hf, neg_one_smul]
 
 @[to_fun]
 lemma curl_sub (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
@@ -156,12 +155,10 @@ lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     IsLinearMap ℝ (fun w => ∇ ⨯ (f w)) := by
   constructor
   · intro w w'
-    rw [hf'.map_add]
-    rw [curl_add]
+    rw [hf'.map_add, curl_add]
     repeat fun_prop
   · intros k w
-    rw [hf'.map_smul]
-    rw [curl_smul]
+    rw [hf'.map_smul, curl_smul]
     fun_prop
 
 /-!
@@ -226,9 +223,8 @@ lemma curl_of_grad_eq_zero (f : Space → ℝ) (hf : ContDiff ℝ 2 f) :
   unfold curl grad
   ext x i
   simp only [Fin.isValue, Pi.zero_apply, PiLp.zero_apply]
-  rw [deriv_commute]
+  rw [deriv_commute _ hf]
   simp only [Fin.isValue, sub_self]
-  · exact hf
 
 /-!
 
@@ -318,9 +314,8 @@ private lemma homotopyOperatorIntegrand_continuous_param {f : Space → Euclidea
 
 private lemma intervalIntegrable_homotopyOperatorIntegrand {f : Space → EuclideanSpace ℝ (Fin 3)}
     (hf : Differentiable ℝ f) (x : Space) :
-    IntervalIntegrable (homotopyOperatorIntegrand f x ·) volume (0 : ℝ) 1 := by
-  apply Continuous.intervalIntegrable
-  fun_prop
+    IntervalIntegrable (homotopyOperatorIntegrand f x ·) volume (0 : ℝ) 1 :=
+  Continuous.intervalIntegrable (by fun_prop) 0 1
 
 private lemma fderiv_homotopyOperatorIntegrand_eq_fderiv_crossProduct
     {f : Space → EuclideanSpace ℝ (Fin 3)}
@@ -416,7 +411,6 @@ private lemma hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand
         fun_prop)
   change HasFDerivAt (fun (x : Space) => ∫ (t : ℝ) in 0..1, F x t ∂(volume))
       (∫ (t : ℝ) in 0..1, F' x₀ t ∂(volume)) x₀
-  have hx :=hf.differentiable (by simp)
   apply intervalIntegral.hasFDerivAt_integral_of_dominated_of_fderiv_le (s := s x₀)
     (bound := fun t => ‖F' a.1 a.2‖)
   · exact Metric.closedBall_mem_nhds x₀ (by simp)
@@ -541,37 +535,9 @@ lemma exists_curl_of_div_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : C
     simp_all
     rw [curl_neg]
     fun_prop
-  have f_differentiable : Differentiable ℝ f := hf.differentiable (by simp)
-  have fderiv_f_t (x : Space) (t : ℝ)
-      (i : Fin 3) : (fderiv ℝ (fun t => (f (t • x)).ofLp i) t) 1 = fderiv ℝ f (t • x) x i := by
-    change (fderiv ℝ (EuclideanSpace.proj i ∘ f ∘ fun (t : ℝ) => t • x) t) 1 = _
-    rw [fderiv_comp _ (by fun_prop) (by fun_prop), fderiv_comp _ (by fun_prop) (by fun_prop),
-      fderiv_fun_smul (by fun_prop) (by fun_prop)]
-    simp only [Function.comp_apply, ContinuousLinearMap.fderiv, fderiv_fun_const, Pi.zero_apply,
-      fderiv_fun_id, ContinuousLinearMap.coe_comp, _root_.add_apply,
-      FunLike.coe_smul, Pi.smul_apply, _root_.zero_apply, smul_zero,
-      ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.coe_id', id_eq, one_smul, zero_add,
-      PiLp.proj_apply]
-  have hi (x : Space) (i : Fin 3) : ∫ (t : ℝ) in 0..1, (t * f (t • x) i * 2) -
-        t * (- fderiv ℝ f (t • x) (t • x)) i ∂(volume) = f x i := by
-    trans ∫ (t : ℝ) in 0..1, fderiv ℝ (fun t => t ^ 2 * f (t • x) i) t 1 ∂(volume)
-    · congr
-      funext t
-      rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
-      simp [fderiv_f_t]
-      ring
-    simp only [fderiv_eq_smul_deriv, smul_eq_mul, one_mul]
-    rw [intervalIntegral.integral_deriv_eq_sub (by fun_prop)]
-    simp only [one_pow, one_smul, one_mul, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
-      zero_smul, zero_mul, sub_zero]
-    · apply Continuous.intervalIntegrable
-      fun_prop
   use fun x => ∫ (t : ℝ) in 0..1, homotopyOperatorIntegrand f x t ∂(volume)
-  apply And.intro
-  swap
-  · intro x
-    exact (hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand (hf) _).differentiableAt
-  · exact eq_neg_curl_of_div_zero f hf hdiv
+  exact ⟨eq_neg_curl_of_div_zero f hf hdiv,
+    fun x => (hasFDerivAt_intervalIntegral_homotopyOperatorIntegrand hf x).differentiableAt⟩
 
 TODO "Generalize the statement that a div-free field is a curl
   to time-dependent fields."
@@ -680,10 +646,7 @@ lemma eq_grad_integral_of_curl_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (
     nth_rewrite 1 [eq_integral_grad h1]
     simp
   rw [contDiff_one_iff_hasFDerivAt]
-  use fun x => ((toDual ℝ Space) (basis.repr.symm (∇ g x)))
-  apply And.intro
-  · fun_prop
-  intro x
+  refine ⟨fun x => ((toDual ℝ Space) (basis.repr.symm (∇ g x))), by fun_prop, fun x => ?_⟩
   exact hasGradientAt_iff_hasFDerivAt.mpr (DifferentiableAt.hasGradientAt_grad x (hg x))
 
 TODO "Generalize the statement that a curl-free field is a gradient

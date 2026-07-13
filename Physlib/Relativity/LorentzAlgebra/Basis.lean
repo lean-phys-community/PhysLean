@@ -104,80 +104,42 @@ def rotationGenerator (i : Fin 3) : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) �
 lemma boostGenerator_mem (i : Fin 3) : boostGenerator i ∈ lorentzAlgebra := by
   rw [lorentzAlgebra.mem_iff]
   ext μ ν
-  simp only [boostGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, transpose_apply]
-  rcases μ with μ | μ <;> rcases ν with ν | ν
-  · -- (time, time) case
-    simp only [Sum.elim_inl]
-    have : μ = 0 := Subsingleton.elim _ _
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [boostGenerator, *]
-  · -- (time, space) case
-    simp only [Sum.elim_inr]
-    have : μ = 0 := Subsingleton.elim _ _
-    simp [boostGenerator, *]
-    split_ifs <;> norm_num
-  · -- (space, time) case
-    simp only [Sum.elim_inl]
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [boostGenerator, *]
-  · -- (space, space) case
-    simp [Sum.elim_inr, boostGenerator]
+  fin_cases μ <;> fin_cases ν <;>
+    simp [boostGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, diagonal_mul, neg_ite]
 
 /-- The rotation generator J_i is in the Lorentz algebra. -/
 lemma rotationGenerator_mem (i : Fin 3) : rotationGenerator i ∈ lorentzAlgebra := by
   rw [lorentzAlgebra.mem_iff]
   ext μ ν
-  simp only [rotationGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, transpose_apply]
-  rcases μ with μ | μ <;> rcases ν with ν | ν
-  · -- (time, time) case
-    have : μ = 0 := Subsingleton.elim _ _
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [rotationGenerator, *]
-    fin_cases i <;> norm_num
-  · -- (time, space) case
-    have : μ = 0 := Subsingleton.elim _ _
-    simp [rotationGenerator, *]
-  · -- (space, time) case
-    have : ν = 0 := Subsingleton.elim _ _
-    simp [rotationGenerator, *]
-  · -- (space, space) case: need explicit computation
-    simp only [Sum.elim_inr]
-    fin_cases i <;> fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
+  fin_cases i <;> fin_cases μ <;> fin_cases ν <;>
+    simp [rotationGenerator, minkowskiMatrix.as_diagonal, mul_diagonal, diagonal_mul]
 
 /-- The boost generators are symmetric. -/
 @[simp]
 lemma boostGenerator_transpose (i : Fin 3) :
     (boostGenerator i)ᵀ = boostGenerator i := by
   ext μ ν
-  rcases μ with μ | μ <;> rcases ν with ν | ν <;>
-    fin_cases μ <;> fin_cases ν <;> simp [boostGenerator]
+  simp only [transpose_apply, boostGenerator, and_comm, or_comm]
 
 /-- The boost generators are traceless. -/
 @[simp]
 lemma boostGenerator_trace (i : Fin 3) :
     Matrix.trace (boostGenerator i) = 0 := by
-  rw [Matrix.trace]
-  apply Finset.sum_eq_zero
-  intro μ _
-  rcases μ with μ | μ <;> simp [boostGenerator]
+  simp [Matrix.trace, Matrix.diag, boostGenerator]
 
 /-- The rotation generators are antisymmetric. -/
 @[simp]
 lemma rotationGenerator_transpose (i : Fin 3) :
     (rotationGenerator i)ᵀ = -rotationGenerator i := by
   ext μ ν
-  fin_cases i <;> rcases μ with μ | μ <;> rcases ν with ν | ν <;>
-    fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
+  fin_cases i <;> fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
 
 /-- The rotation generators are traceless. -/
 @[simp]
 lemma rotationGenerator_trace (i : Fin 3) :
     Matrix.trace (rotationGenerator i) = 0 := by
-  rw [Matrix.trace]
-  apply Finset.sum_eq_zero
-  intro μ _
-  rcases μ with μ | μ
-  · fin_cases i <;> simp [rotationGenerator]
-  · fin_cases i <;> fin_cases μ <;> simp [rotationGenerator]
+  have h := Matrix.trace_transpose (rotationGenerator i)
+  rw [rotationGenerator_transpose, Matrix.trace_neg] at h
+  exact eq_zero_of_neg_eq h
 
 end lorentzAlgebra

@@ -37,9 +37,8 @@ lemma cube_for_linSol' (S : (PureU1 3).LinSols) :
 lemma cube_for_linSol (S : (PureU1 3).LinSols) :
     (S.val (0 : Fin 3) = 0 ∨ S.val (1 : Fin 3) = 0 ∨ S.val (2 : Fin 3) = 0) ↔
     (PureU1 3).cubicACC S.val = 0 := by
-  rw [← cube_for_linSol']
-  simp only [Fin.isValue, _root_.mul_eq_zero, OfNat.ofNat_ne_zero, false_or]
-  exact Iff.symm or_assoc
+  simp only [← cube_for_linSol', Fin.isValue, _root_.mul_eq_zero, OfNat.ofNat_ne_zero,
+    false_or, or_assoc]
 
 lemma three_sol_zero (S : (PureU1 3).Sols) : S.val (0 : Fin 3) = 0 ∨ S.val (1 : Fin 3) = 0
     ∨ S.val (2 : Fin 3) = 0 := (cube_for_linSol S.1.1).mpr S.cubicSol
@@ -53,10 +52,8 @@ def solOfLinear (S : (PureU1 3).LinSols)
 
 theorem solOfLinear_surjects (S : (PureU1 3).Sols) :
     ∃ (T : (PureU1 3).LinSols) (hT : T.val (0 : Fin 3) = 0 ∨ T.val (1 : Fin 3) = 0
-    ∨ T.val (2 : Fin 3) = 0), solOfLinear T hT = S := by
-  use S.1.1
-  use (three_sol_zero S)
-  rfl
+    ∨ T.val (2 : Fin 3) = 0), solOfLinear T hT = S :=
+  ⟨S.1.1, three_sol_zero S, rfl⟩
 
 end Three
 

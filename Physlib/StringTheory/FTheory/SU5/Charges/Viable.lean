@@ -447,8 +447,7 @@ lemma viableCharges_mem_ofFinset (I : CodimensionOneConfig) :
 -/
 lemma isComplete_of_mem_viableCharges (I : CodimensionOneConfig) :
     ∀ x ∈ (viableCharges I), IsComplete x := by
-  revert I
-  decide
+  decide +revert
 
 /-!
 
@@ -458,8 +457,7 @@ lemma isComplete_of_mem_viableCharges (I : CodimensionOneConfig) :
 
 lemma allowsTerm_topYukawa_of_mem_viableCharges (I : CodimensionOneConfig) :
     ∀ x ∈ (viableCharges I), x.AllowsTerm topYukawa := by
-  revert I
-  decide
+  decide +revert
 
 /-!
 
@@ -469,12 +467,10 @@ lemma allowsTerm_topYukawa_of_mem_viableCharges (I : CodimensionOneConfig) :
 
 lemma not_isPhenoConstrained_of_mem_viableCharges (I : CodimensionOneConfig) :
     ∀ x ∈ (viableCharges I), ¬ IsPhenoConstrained x := by
-  rw [viableCharges]
-  intro x hs
-  simp at hs
-  rcases hs with hs | hs
-  · exact viableCompletions_isPhenoConstrained I x hs
-  · exact not_isPhenoConstrained_of_mem_viableChargesAdditional I x hs
+  intro x hx
+  rw [viableCharges, Multiset.mem_add] at hx
+  exact hx.elim (viableCompletions_isPhenoConstrained I x)
+    (not_isPhenoConstrained_of_mem_viableChargesAdditional I x)
 
 /-!
 
@@ -485,12 +481,10 @@ lemma not_isPhenoConstrained_of_mem_viableCharges (I : CodimensionOneConfig) :
 lemma not_yukawaGeneratesDangerousAtLevel_one_of_mem_viableCharges
     (I : CodimensionOneConfig) :
     ∀ x ∈ (viableCharges I), ¬ YukawaGeneratesDangerousAtLevel x 1 := by
-  rw [viableCharges]
-  intro x hs
-  simp at hs
-  rcases hs with hs | hs
-  · exact viableCompletions_yukawaGeneratesDangerousAtLevel_one I x hs
-  · exact yukawaGeneratesDangerousAtLevel_one_of_mem_viableChargesAdditional I x hs
+  intro x hx
+  rw [viableCharges, Multiset.mem_add] at hx
+  exact hx.elim (viableCompletions_yukawaGeneratesDangerousAtLevel_one I x)
+    (yukawaGeneratesDangerousAtLevel_one_of_mem_viableChargesAdditional I x)
 
 /-!
 
@@ -500,8 +494,7 @@ lemma not_yukawaGeneratesDangerousAtLevel_one_of_mem_viableCharges
 
 lemma card_five_bar_le_of_mem_viableCharges (I : CodimensionOneConfig) :
     ∀ x ∈ (viableCharges I), x.Q5.card ≤ 2 := by
-  revert I
-  decide
+  decide +revert
 
 /-!
 
@@ -511,8 +504,7 @@ lemma card_five_bar_le_of_mem_viableCharges (I : CodimensionOneConfig) :
 
 lemma card_ten_le_of_mem_viableCharges (I : CodimensionOneConfig) :
     ∀ x ∈ (viableCharges I), x.Q10.card ≤ 2 := by
-  revert I
-  decide
+  decide +revert
 
 /-!
 
@@ -530,8 +522,7 @@ couplings, or is already in `viableCharges I`.
   with the Yukawas. -/
 lemma isPhenoClosedQ5_viableCharges : (I : CodimensionOneConfig) →
     IsPhenoClosedQ5 I.allowedBarFiveCharges (viableCharges I) := by
-  intro I
-  apply isPhenClosedQ5_of_isPhenoConstrainedQ5
+  refine fun I => isPhenClosedQ5_of_isPhenoConstrainedQ5 ?_
   revert I
   decide +kernel
 
@@ -547,8 +538,7 @@ lemma isPhenoClosedQ5_viableCharges : (I : CodimensionOneConfig) →
   with the Yukawas. -/
 lemma isPhenoClosedQ10_viableCharges : (I : CodimensionOneConfig) →
     IsPhenoClosedQ10 I.allowedTenCharges (viableCharges I) := by
-  intro I
-  apply isPhenClosedQ10_of_isPhenoConstrainedQ10
+  refine fun I => isPhenClosedQ10_of_isPhenoConstrainedQ10 ?_
   revert I
   decide +kernel
 
@@ -560,11 +550,9 @@ lemma isPhenoClosedQ10_viableCharges : (I : CodimensionOneConfig) →
 
 lemma viableCompletions_subset_viableCharges (I : CodimensionOneConfig) :
     ∀ x ∈ (viableCompletions I), x ∈ viableCharges I := by
-  rw [viableCharges]
   intro x hx
-  simp only [Multiset.mem_add]
-  left
-  exact hx
+  rw [viableCharges, Multiset.mem_add]
+  exact Or.inl hx
 
 /-!
 
@@ -595,13 +583,10 @@ lemma mem_viableCharges_iff' {I} {x : ChargeSpectrum} :
     ¬ IsPhenoConstrained x ∧ ¬ YukawaGeneratesDangerousAtLevel x 1 ∧ IsComplete x := by
   constructor
   · intro h
-    have h1 : x ∈ ofFinset I.allowedBarFiveCharges I.allowedTenCharges := by
-      exact viableCharges_mem_ofFinset I x h
-    rw [mem_viableCharges_iff h1] at h
-    exact ⟨h1, h⟩
+    have h1 := viableCharges_mem_ofFinset I x h
+    exact ⟨h1, (mem_viableCharges_iff h1).mp h⟩
   · rintro ⟨h1, h⟩
-    rw [mem_viableCharges_iff h1]
-    exact h
+    exact (mem_viableCharges_iff h1).mpr h
 
 end ChargeSpectrum
 

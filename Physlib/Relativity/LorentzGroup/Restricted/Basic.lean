@@ -53,20 +53,11 @@ lemma isOrthochronous_of_restricted {d : ℕ} (Λ : restricted d) :
 /-- The restricted Lorentz group is a normal subgroup of the Lorentz group. -/
 lemma restricted_normal_subgroup {d : ℕ} : (restricted d).Normal := by
   have h_proper {Λ P : LorentzGroup d} (hP : IsProper P) : IsProper (Λ * P * Λ⁻¹) := by
-    simp only [IsProper, lorentzGroupIsGroup_mul_coe, det_mul]
-    rw [hP, mul_one, ← det_mul, coe_inv, mul_inv_of_invertible, det_one]
+    rw [isProper_iff] at hP ⊢
+    simp only [map_mul, map_inv, hP, mul_one, mul_inv_cancel]
   have h_ortho {Λ O : LorentzGroup d} (hO : IsOrthochronous O) : IsOrthochronous (Λ * O * Λ⁻¹) := by
-    by_cases hΛ : IsOrthochronous Λ
-    · exact isOrthochronous_mul
-        (isOrthochronous_mul hΛ hO)
-        (isOrthochronous_inv_iff.mpr hΛ)
-    · rw [isOrthochronous_mul_iff, isOrthochronous_inv_iff]
-      simp_all
-      rw [isOrthochronous_mul_iff]
-      simp_all
-  constructor
-  rintro R ⟨R_proper, R_ortho⟩ Λ
-  exact ⟨h_proper R_proper, h_ortho R_ortho⟩
+    simp [isOrthochronous_mul_iff, isOrthochronous_inv_iff, hO]
+  exact ⟨fun R hR Λ => ⟨h_proper hR.1, h_ortho hR.2⟩⟩
 
 open TopologicalSpace
 
@@ -80,13 +71,8 @@ semiformal_result "FXNL5" restricted_isConnected {d : ℕ} :
 lemma restricted_eq_identity_component_of_isConnected {d : ℕ}
     (h1 : IsConnected (restricted d : Set (LorentzGroup d))) :
     (restricted d) = connectedComponent (1 : LorentzGroup d) := by
-  ext x
-  constructor
-  · intro hx
-    have h_id : 1 ∈ restricted d := by simp [restricted, IsOrthochronous]
-    exact IsConnected.subset_connectedComponent h1 h_id hx
-  · intro h
-    exact ⟨(isProper_on_connected_component h).mp isProper_id,
-          (isOrthochronous_on_connected_component h).mp id_isOrthochronous⟩
+  exact Set.Subset.antisymm (IsConnected.subset_connectedComponent h1 (restricted d).one_mem)
+    fun x h => ⟨(isProper_on_connected_component h).mp isProper_id,
+      (isOrthochronous_on_connected_component h).mp id_isOrthochronous⟩
 
 end LorentzGroup

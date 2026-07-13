@@ -96,13 +96,10 @@ lemma QuadraticMap.weightedSumSquares_basis_vector {E : Type*} [AddCommGroup E]
     {i : Fin (finrank ℝ E)} (v : Fin (finrank ℝ E) → ℝ)
     (hv : ∀ j, v j = if j = i then 1 else 0) :
     QuadraticMap.weightedSumSquares ℝ weights v = weights i := by
-  simp only [QuadraticMap.weightedSumSquares_apply]
-  rw [Finset.sum_eq_single i]
-  · simp only [hv i, ↓reduceIte, mul_one, smul_eq_mul]
+  rw [QuadraticMap.weightedSumSquares_apply, Finset.sum_eq_single_of_mem i (mem_univ i)]
+  · simp [hv i]
   · intro j _ hj
-    simp only [hv j, if_neg hj, mul_zero, smul_eq_mul]
-  · simp only [Finset.mem_univ, not_true_eq_false, smul_eq_mul, mul_eq_zero, or_self,
-    IsEmpty.forall_iff]
+    simp [hv j, hj]
 
 /-- When a quadratic form is equivalent to a weighted sum of squares,
     negative weights correspond to vectors where the form takes negative values.
@@ -115,28 +112,17 @@ lemma neg_weight_implies_neg_value {E : Type*} [AddCommGroup E] [Module ℝ E]
     ∃ v : E, v ≠ 0 ∧ q v < 0 := by
   let f := Classical.choice h_equiv
   let v_std : Fin (finrank ℝ E) → ℝ := fun j => if j = i then 1 else 0
-  let v := f.symm v_std
-  have hv_ne_zero : v ≠ 0 := by
-    intro h
-    have : f v = f 0 := by rw [h]
-    have : f (f.symm v_std) = f 0 := by rw [← this]
-    have : v_std = 0 := by
-      rw [← f.apply_symm_apply v_std]
-      exact Eq.trans this (map_zero f)
-    have : v_std i = 0 := by rw [this]; rfl
-    simp only [↓reduceIte, one_ne_zero, v_std] at this
-  have hq_neg : q v < 0 := by
-    have heq : q v = QuadraticMap.weightedSumSquares ℝ (fun j => (w j : ℝ)) v_std :=
-      QuadraticMap.IsometryEquiv.map_app f.symm v_std
-    have hw : QuadraticMap.weightedSumSquares ℝ (fun j => (w j : ℝ)) v_std = (w i : ℝ) := by
-      apply QuadraticMap.weightedSumSquares_basis_vector v_std
-      intro j; simp only [v_std]
-    rw [heq, hw]
-    have : (w i : ℝ) = -1 := by simp only [hi, SignType.neg_eq_neg_one, SignType.coe_neg,
-      SignType.coe_one]
-    rw [this]
-    exact neg_one_lt_zero
-  exact ⟨v, hv_ne_zero, hq_neg⟩
+  refine ⟨f.symm v_std, ?_, ?_⟩
+  · intro h
+    have hz : v_std = 0 := by
+      have hf := congrArg f h
+      rwa [f.apply_symm_apply, map_zero] at hf
+    simpa [v_std] using congrFun hz i
+  · have hw : QuadraticMap.weightedSumSquares ℝ (fun j => (w j : ℝ)) v_std = (w i : ℝ) :=
+      QuadraticMap.weightedSumSquares_basis_vector v_std fun _ => rfl
+    rw [QuadraticMap.IsometryEquiv.map_app f.symm v_std, hw, hi, SignType.neg_eq_neg_one,
+      SignType.coe_neg, SignType.coe_one]
+    norm_num
 
 /-- A positive definite quadratic form cannot have any negative weights
     in its diagonal representation. A quadratic form `q` derived from a bilinear form `b`
@@ -148,9 +134,8 @@ lemma posDef_no_neg_weights {E : Type*} [AddCommGroup E] [Module ℝ E]
     (h_equiv : QuadraticMap.Equivalent q (QuadraticMap.weightedSumSquares ℝ fun i => (w i : ℝ))) :
     ∀ i, w i ≠ SignType.neg := by
   intro i hi
-  obtain ⟨v, hv_ne_zero, hq_neg⟩ := QuadraticForm.neg_weight_implies_neg_value h_equiv hi
-  have hq_pos : 0 < q v := hq v hv_ne_zero
-  exact lt_asymm hq_neg hq_pos
+  obtain ⟨v, hv, hq_neg⟩ := QuadraticForm.neg_weight_implies_neg_value h_equiv hi
+  exact lt_asymm hq_neg (hq v hv)
 
 /-- For a positive definite quadratic form, the negative dimension (index) is zero.
     O'Neill states (p. 47) that "ν = 0 if and only if b is positive semidefinite."
@@ -163,13 +148,9 @@ theorem rankNeg_eq_zero {E : Type*} [AddCommGroup E]
   unfold QuadraticForm.negDim
   have h_exists := equivalent_signType_weighted_sum_squared q
   let w := Classical.choose h_exists
-  have h_equiv : QuadraticMap.Equivalent q
-      (QuadraticMap.weightedSumSquares ℝ fun i => (w i : ℝ)) :=
-    Classical.choose_spec h_exists
   have h_no_neg : ∀ i, w i ≠ SignType.neg :=
-    QuadraticForm.posDef_no_neg_weights hq h_equiv
-  simp [Finset.card_eq_zero, Finset.filter_eq_empty_iff]
-  exact fun ⦃x⦄ => h_no_neg x
+    QuadraticForm.posDef_no_neg_weights hq (Classical.choose_spec h_exists)
+  simpa [Finset.card_eq_zero, Finset.filter_eq_empty_iff] using h_no_neg
 
 end QuadraticForm
 
@@ -304,21 +285,13 @@ lemma toQuadraticForm_apply (g : PseudoRiemannianMetric E H M n I) (x : M)
 
 @[simp]
 lemma toBilinForm_isSymm (g : PseudoRiemannianMetric E H M n I) (x : M) :
-    (toBilinForm g x).IsSymm := by
-  refine { eq := ?_ }
-  intro v w; simp only [toBilinForm_apply]; exact g.symm x v w
+    (toBilinForm g x).IsSymm := ⟨g.symm x⟩
 
 @[simp]
 lemma toBilinForm_nondegenerate (g : PseudoRiemannianMetric E H M n I) (x : M) :
     (toBilinForm g x).Nondegenerate := by
-  unfold LinearMap.BilinForm.Nondegenerate LinearMap.Nondegenerate
-    LinearMap.SeparatingLeft LinearMap.SeparatingRight
-  constructor
-  · intro v hv; simp_rw [toBilinForm_apply] at hv; exact g.nondegenerate x v hv
-  · intro v hv; simp_rw [toBilinForm_apply] at hv;
-    have hw : ∀ (w : TangentSpace I x), ((g.val x) v) w = 0 := by
-      intro w; rw [symm]; simp [hv]
-    exact g.nondegenerate x v hw
+  refine ⟨fun v hv => g.nondegenerate x v hv, fun v hv => ?_⟩
+  exact g.nondegenerate x v fun w => (g.symm x v w).trans (hv w)
 
 /-- The inner product (or scalar product) on the tangent space at point `x`
   induced by the pseudo-Riemannian metric `g`. This is `gₓ(v, w)`. -/
@@ -362,8 +335,8 @@ lemma flatL_apply (g : PseudoRiemannianMetric E H M n I) (x : M) (v w : TangentS
 @[simp]
 lemma flat_inj (g : PseudoRiemannianMetric E H M n I) (x : M) :
     Function.Injective (flat g x) := by
-  rw [← LinearMap.ker_eq_bot]; apply LinearMap.ker_eq_bot'.mpr
-  intro v hv; apply g.nondegenerate x v; intro w; exact DFunLike.congr_fun hv w
+  rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+  exact fun v hv => g.nondegenerate x v fun w => DFunLike.congr_fun hv w
 
 @[simp]
 lemma flatL_inj (g : PseudoRiemannianMetric E H M n I) (x : M) :
@@ -375,28 +348,10 @@ lemma flatL_surj
     (g : PseudoRiemannianMetric E H M n I) (x : M) :
     Function.Surjective (g.flatL x) := by
   haveI : FiniteDimensional ℝ (TangentSpace I x) := inst_tangent_findim x
-  have h_finrank_eq : finrank ℝ (TangentSpace I x) = finrank ℝ (TangentSpace I x →L[ℝ] ℝ) := by
-    have h_dual_eq : finrank ℝ (TangentSpace I x →L[ℝ] ℝ) = finrank ℝ (Module.Dual ℝ
-    (TangentSpace I x)) := by
-      let to_dual : (TangentSpace I x →L[ℝ] ℝ) → Module.Dual ℝ (TangentSpace I x) :=
-        fun f => f.toLinearMap
-      let from_dual : Module.Dual ℝ (TangentSpace I x) → (TangentSpace I x →L[ℝ] ℝ) := fun f =>
-        ContinuousLinearMap.mk f (by
-          have : T2Space (TangentSpace I x) := inferInstanceAs (T2Space E)
-          apply LinearMap.continuous_of_finiteDimensional)
-      let equiv : (TangentSpace I x →L[ℝ] ℝ) ≃ₗ[ℝ] Module.Dual ℝ (TangentSpace I x) :=
-      { toFun := to_dual,
-        invFun := from_dual,
-        map_add' := fun f g => by
-          ext v; unfold to_dual; simp only [LinearMap.add_apply]; rfl,
-        map_smul' := fun c f => by
-          ext v; unfold to_dual; simp only [LinearMap.smul_apply]; rfl,
-        left_inv := fun f => by
-          ext v; unfold to_dual from_dual; simp,
-        right_inv := fun f => by
-          ext v; unfold to_dual from_dual; simp }
-      exact LinearEquiv.finrank_eq equiv
-    rw [h_dual_eq, ← Subspace.dual_finrank_eq]
+  haveI : T2Space (TangentSpace I x) := inferInstanceAs (T2Space E)
+  have h_finrank_eq : finrank ℝ (TangentSpace I x) = finrank ℝ (TangentSpace I x →L[ℝ] ℝ) :=
+    Subspace.dual_finrank_eq.symm.trans (LinearMap.toContinuousLinearMap
+      (𝕜 := ℝ) (E := TangentSpace I x) (F' := ℝ)).finrank_eq
   exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank h_finrank_eq).mp (flatL_inj g x)
 
 /-- The "musical" isomorphism (index lowering) from `TₓM` to its dual,
@@ -468,35 +423,28 @@ lemma flatL_apply_sharpL
 @[simp]
 lemma flat_sharp_apply
     (g : PseudoRiemannianMetric E H M n I) (x : M) (ω : TangentSpace I x →L[ℝ] ℝ) :
-    g.flat x (g.sharp x ω) = ω := by
-  have := flatL_apply_sharpL g x ω
-  simp only [flat, sharp]; simp only [LinearEquiv.coe_coe] at this ⊢
-  exact this
+    g.flat x (g.sharp x ω) = ω :=
+  flatL_apply_sharpL g x ω
 
 @[simp]
 lemma sharp_flat_apply
     (g : PseudoRiemannianMetric E H M n I) (x : M) (v : TangentSpace I x) :
-    g.sharp x (g.flat x v) = v := by
-  have := sharpL_apply_flatL g x v
-  simp only [sharp, flat]; simp only [LinearEquiv.coe_coe] at this ⊢
-  exact this
+    g.sharp x (g.flat x v) = v :=
+  sharpL_apply_flatL g x v
 
 /-- The metric evaluated at `sharp ω₁` and `sharp ω₂`. -/
 @[simp]
 lemma apply_sharp_sharp
     (g : PseudoRiemannianMetric E H M n I) (x : M) (ω₁ ω₂ : TangentSpace I x →L[ℝ] ℝ) :
     g.val x (g.sharpL x ω₁) (g.sharpL x ω₂) = ω₁ (g.sharpL x ω₂) := by
-  rw [← flatL_apply g x (g.sharpL x ω₁)]
-  rw [flatL_apply_sharpL g x ω₁]
+  rw [← flatL_apply g x (g.sharpL x ω₁), flatL_apply_sharpL g x ω₁]
 
 /-- The metric evaluated at `v` and `sharp ω`. -/
 lemma apply_vec_sharp
     (g : PseudoRiemannianMetric E H M n I) (x : M) (v : TangentSpace I x)
     (ω : TangentSpace I x →L[ℝ] ℝ) :
     g.val x v (g.sharpL x ω) = ω v := by
-  rw [g.symm x v (g.sharpL x ω)]
-  rw [← flatL_apply g x (g.sharpL x ω)]
-  rw [flatL_apply_sharpL g x ω]
+  rw [g.symm x v (g.sharpL x ω), ← flatL_apply g x (g.sharpL x ω), flatL_apply_sharpL g x ω]
 
 end Sharp
 
@@ -518,14 +466,13 @@ noncomputable def cotangentMetricVal (g : PseudoRiemannianMetric E H M n I) (x :
 @[simp]
 lemma cotangentMetricVal_eq_apply_sharp (g : PseudoRiemannianMetric E H M n I) (x : M)
     (ω₁ ω₂ : TangentSpace I x →L[ℝ] ℝ) :
-  cotangentMetricVal g x ω₁ ω₂ = ω₁ (g.sharpL x ω₂) := by
-  rw [cotangentMetricVal, apply_sharp_sharp]
+  cotangentMetricVal g x ω₁ ω₂ = ω₁ (g.sharpL x ω₂) :=
+  apply_sharp_sharp g x ω₁ ω₂
 
 lemma cotangentMetricVal_symm (g : PseudoRiemannianMetric E H M n I) (x : M)
     (ω₁ ω₂ : TangentSpace I x →L[ℝ] ℝ) :
   cotangentMetricVal g x ω₁ ω₂ = cotangentMetricVal g x ω₂ ω₁ := by
-  unfold cotangentMetricVal
-  rw [g.symm x (g.sharpL x ω₁) (g.sharpL x ω₂)]
+  simpa only [cotangentMetricVal] using g.symm x (g.sharpL x ω₁) (g.sharpL x ω₂)
 
 /-- The induced metric on the cotangent space at point `x` as a bilinear form.
 For covectors `ω₁` and `ω₂`, this gives `g(ω₁^#, ω₂^#)`, where `ω^#` is
@@ -591,9 +538,7 @@ lemma cotangentToQuadraticForm_apply (g : PseudoRiemannianMetric E H M n I) (x :
 
 @[simp]
 lemma cotangentToBilinForm_isSymm (g : PseudoRiemannianMetric E H M n I) (x : M) :
-    (cotangentToBilinForm g x).IsSymm := by
-  refine { eq := ?_ }
-  intro ω₁ ω₂; simp only [cotangentToBilinForm_apply]; exact cotangentMetricVal_symm g x ω₁ ω₂
+    (cotangentToBilinForm g x).IsSymm := ⟨cotangentMetricVal_symm g x⟩
 
 /-- The cotangent metric is non-degenerate: if `cotangentMetricVal g x ω v = 0` for all `v`,
     then `ω = 0`. -/
@@ -602,34 +547,17 @@ lemma cotangentMetricVal_nondegenerate (g : PseudoRiemannianMetric E H M n I) (x
       cotangentMetricVal g x ω v = 0) :
     ω = 0 := by
   apply ContinuousLinearMap.ext
-  intro v
-  have h_forall : ∀ w : TangentSpace I x, ω w = 0 := by
-    intro w
-    let ω' : TangentSpace I x →L[ℝ] ℝ := g.flatL x w
-    have this : g.sharpL x ω' = w := by
-      simp only [ω', sharpL_apply_flatL]
-    have h_apply : cotangentMetricVal g x ω ω' = 0 := h ω'
-    simp only [cotangentMetricVal_eq_apply_sharp] at h_apply
-    rw [this] at h_apply
-    exact h_apply
-  exact h_forall v
+  intro w
+  have hw := h (g.flatL x w)
+  rw [cotangentMetricVal_eq_apply_sharp, sharpL_apply_flatL] at hw
+  simpa using hw
 
 @[simp]
 lemma cotangentToBilinForm_nondegenerate (g : PseudoRiemannianMetric E H M n I) (x : M) :
     (cotangentToBilinForm g x).Nondegenerate := by
-  unfold LinearMap.BilinForm.Nondegenerate LinearMap.Nondegenerate
-    LinearMap.SeparatingLeft LinearMap.SeparatingRight
-  constructor
-  · intro ω hω
-    apply cotangentMetricVal_nondegenerate g x ω
-    intro v
-    exact hω v
-  · intro ω hω
-    apply cotangentMetricVal_nondegenerate g x ω
-    intro v
-    have hv : ∀ (y : TangentSpace I x →L[ℝ] ℝ), ((g.cotangentToBilinForm x) ω) y = 0 := by
-      intro y; rw [LinearMap.BilinForm.isSymm_def.mp (cotangentToBilinForm_isSymm g x)]; simp [hω]
-    exact hv v
+  refine ⟨fun ω hω => cotangentMetricVal_nondegenerate g x ω hω, fun ω hω => ?_⟩
+  refine cotangentMetricVal_nondegenerate g x ω fun v => ?_
+  exact (cotangentMetricVal_symm g x ω v).trans (hω v)
 
 end Cotangent
 

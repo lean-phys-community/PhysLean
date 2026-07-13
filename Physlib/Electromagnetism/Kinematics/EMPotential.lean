@@ -79,10 +79,8 @@ attribute [-simp] Fintype.sum_sum_type
 attribute [-simp] Nat.succ_eq_add_one
 
 @[ext]
-lemma eq_of_val_eq (A B : ElectromagneticPotential d) (h : A.val = B.val) : A = B := by
-  cases A; cases B
-  simp at h
-  rw [h]
+lemma eq_of_val_eq (A B : ElectromagneticPotential d) (h : A.val = B.val) : A = B :=
+  congrArg ElectromagneticPotential.mk h
 
 /-!
 
@@ -217,12 +215,7 @@ lemma ofPotentials_eq_add {d} (c : SpeedOfLight) (ϕ : Time → Space d → ℝ)
   ext1 x
   refine Lorentz.Vector.ext_of_apply (fun i => ?_)
   match i with
-  | Sum.inl 0 =>
-    simp only [ofPotentials, Fin.isValue, add_val, Pi.add_apply, Lorentz.Vector.apply_add]
-    simp only [ofScalarPotential, Fin.isValue, ofVectorPotential, add_zero]
-  | Sum.inr i =>
-    simp only [ofPotentials, add_val, Pi.add_apply, Lorentz.Vector.apply_add]
-    simp [ofScalarPotential, ofVectorPotential]
+  | Sum.inl 0 | Sum.inr _ => simp [ofPotentials, ofScalarPotential, ofVectorPotential]
 
 /-- The creation of of an electromagnetic potential from static potentials. -/
 noncomputable def ofStaticPotentials {d} (c : SpeedOfLight) (ϕ : Space d → ℝ)
@@ -232,8 +225,7 @@ noncomputable def ofStaticPotentials {d} (c : SpeedOfLight) (ϕ : Space d → �
 lemma ofStaticPotentials_eq_ofPotentials {d} (c : SpeedOfLight) (ϕ : Space d → ℝ)
     (A : Space d → EuclideanSpace ℝ (Fin d)) :
     ofStaticPotentials c ϕ A = ofPotentials c (fun _ => ϕ) (fun _ => A) := by
-  rw [ofPotentials_eq_add]
-  rfl
+  simp [ofStaticPotentials, ofStaticScalarPotential, ofStaticVectorPotential, ofPotentials_eq_add]
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 /-- The electromagnetic potential from an electric and a magnetic field.
@@ -296,37 +288,28 @@ open ContDiff
 lemma differentiable_component {d : ℕ}
     (A : ElectromagneticPotential d) (hA : Differentiable ℝ A) (μ : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => A x μ) := by
-  revert μ
-  rw [SpaceTime.differentiable_vector]
-  exact hA
+  exact (SpaceTime.differentiable_vector _).mpr hA μ
 
 @[fun_prop]
 lemma differentiable_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
     (hA : Differentiable ℝ A) : Differentiable ℝ (fun x => Λ • A (Λ⁻¹ • x)) := by
-  apply Differentiable.comp
-  · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ)
-  · apply Differentiable.comp
-    · exact hA
-    · exact ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)
+  exact (ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ)).comp
+    (hA.comp (ContinuousLinearMap.differentiable (Lorentz.Vector.actionCLM Λ⁻¹)))
 
 @[fun_prop]
 lemma contDiff_action {d} (Λ : LorentzGroup d) (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ n A) : ContDiff ℝ n (fun x => Λ • A (Λ⁻¹ • x)) := by
-  apply ContDiff.comp
-  · exact ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ)
-  · apply ContDiff.comp
-    · exact hA
-    · exact ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ⁻¹)
+  exact (ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ)).comp
+    (hA.comp (ContinuousLinearMap.contDiff (Lorentz.Vector.actionCLM Λ⁻¹)))
 
 @[fun_prop]
 lemma differentiable_deriv {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ 2 A) (μ ν : Fin 1 ⊕ Fin d) :
     Differentiable ℝ (fun x => ∂_ μ A x ν) := by
-  have diff_partial (μ) :
-      ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
+  have h : ∀ ν, Differentiable ℝ fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
     rw [SpaceTime.differentiable_vector]
     fun_prop
-  exact diff_partial μ ν
+  exact h ν
 
 @[fun_prop]
 lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
@@ -338,11 +321,10 @@ lemma differentiable_deriv_of_smooth {d} {A : ElectromagneticPotential d}
 lemma contDiff_deriv {n} {d} {A : ElectromagneticPotential d}
     (hA : ContDiff ℝ (n + 1) A) (μ ν : Fin 1 ⊕ Fin d) :
     ContDiff ℝ n (fun x => ∂_ μ A x ν) := by
-  have diff_partial (μ) :
-      ∀ ν, ContDiff ℝ n fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
+  have h : ∀ ν, ContDiff ℝ n fun x => (fderiv ℝ A x) (Lorentz.Vector.basis μ) ν := by
     rw [SpaceTime.contDiff_vector]
     fun_prop
-  exact diff_partial μ ν
+  exact h ν
 
 TODO "Add results related to the differentiability of the
   derivative of the Electromagnetic potential."
@@ -359,8 +341,7 @@ lemma differentiable_ofScalarPotential {d} (c : SpeedOfLight) (φ : Time → Spa
   rw [← SpaceTime.differentiable_vector]
   intro μ
   match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr _ => fun_prop
+  | Sum.inl 0 | Sum.inr _ => fun_prop
 
 lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (hϕ : ContDiff ℝ n ↿φ) : ContDiff ℝ n (ofScalarPotential c φ) := by
@@ -368,8 +349,7 @@ lemma contDiff_ofScalarPotential {n} {d} (c : SpeedOfLight) (φ : Time → Space
   rw [← SpaceTime.contDiff_vector]
   intro μ
   match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr _ => fun_prop
+  | Sum.inl 0 | Sum.inr _ => fun_prop
 
 lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
@@ -378,8 +358,7 @@ lemma differentiable_ofVectorPotential {d} (c : SpeedOfLight)
   rw [← SpaceTime.differentiable_vector]
   intro μ
   match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  | Sum.inl 0 | Sum.inr _ => fun_prop
 
 lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d))
@@ -388,8 +367,7 @@ lemma contDiff_ofVectorPotential {n} {d} (c : SpeedOfLight)
   rw [← SpaceTime.contDiff_vector]
   intro μ
   match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  | Sum.inl 0 | Sum.inr _ => fun_prop
 
 lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : Differentiable ℝ ↿φ)
@@ -398,8 +376,7 @@ lemma differentiable_ofPotentials {d} (c : SpeedOfLight) (φ : Time → Space d 
   rw [← SpaceTime.differentiable_vector]
   intro μ
   match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  | Sum.inl 0 | Sum.inr _ => fun_prop
 
 lemma contDiff_ofPotentials {n} {d} (c : SpeedOfLight) (φ : Time → Space d → ℝ)
     (A : Time → Space d → EuclideanSpace ℝ (Fin d)) (hϕ : ContDiff ℝ n ↿φ)
@@ -408,8 +385,7 @@ lemma contDiff_ofPotentials {n} {d} (c : SpeedOfLight) (φ : Time → Space d �
   rw [← SpaceTime.contDiff_vector]
   intro μ
   match μ with
-  | Sum.inl 0 => fun_prop
-  | Sum.inr i => fun_prop
+  | Sum.inl 0 | Sum.inr _ => fun_prop
 
 open MeasureTheory Matrix Space InnerProductSpace Time in
 lemma contDiff_ofElectromagneticField {n : ℕ} (c : SpeedOfLight)
@@ -497,9 +473,8 @@ lemma hasVarAdjDerivAt_component {d : ℕ} (μ : Fin 1 ⊕ Fin d) (A : SpaceTime
   · fun_prop
   refine { adjoint_inner_left := ?_ }
   intro u v
-  simp [f, f', inner_smul_left, Lorentz.Vector.basis_inner]
-  ring_nf
-  rfl
+  simp [f, f', inner_smul_left, Lorentz.Vector.basis_inner, Lorentz.Vector.coordCLM_apply]
+  ring
 
 /-!
 
@@ -576,8 +551,7 @@ as taking the derivative and then applying the Lorentz transformation to the res
 lemma deriv_equivariant {d} {x : SpaceTime d} (A : ElectromagneticPotential d)
     (Λ : LorentzGroup d)
     (hf : Differentiable ℝ A) : deriv (Λ • A) x = Λ • (deriv A (Λ⁻¹ • x)) := by
-  rw [deriv_eq_tensorDeriv, deriv_eq_tensorDeriv]
-  rw [action_val, tensorDeriv_equivariant]
+  rw [deriv_eq_tensorDeriv, deriv_eq_tensorDeriv, action_val, tensorDeriv_equivariant]
   all_goals fun_prop
 
 /-!
@@ -634,8 +608,7 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
       (Fin.append ![Color.down] ![Color.up])) :
     (Tensor.basis _).repr (Tensorial.toTensor (deriv A x)) b =
     ∂_ (b 0) A x (b 1) := by
-  rw [Tensorial.basis_toTensor_apply]
-  rw [Tensorial.basis_map_prod]
+  rw [Tensorial.basis_toTensor_apply, Tensorial.basis_map_prod]
   simp only [Nat.reduceSucc, Nat.reduceAdd, Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
     Equiv.symm_symm, Fin.isValue]
   rw [Lorentz.Vector.tensor_basis_map_eq_basis_reindex,
@@ -647,8 +620,7 @@ lemma toTensor_deriv_basis_repr_apply {d} (A : ElectromagneticPotential d)
       (Lorentz.CoVector.indexEquiv.symm.prodCongr Lorentz.Vector.indexEquiv.symm) := by
     ext ⟨i, j⟩
     simp
-  rw [hb]
-  rw [Module.Basis.repr_reindex_apply, deriv_basis_repr_apply]
+  rw [hb, Module.Basis.repr_reindex_apply, deriv_basis_repr_apply]
   rfl
 
 end ElectromagneticPotential

@@ -259,10 +259,7 @@ Kronecker coordinate-value lemmas `dWirtingerCoord_coordProj` / `dWirtingerAntiC
 which feed it the slot-I real and imaginary directions. -/
 private lemma fderiv_coordProj (J : ι) (u d : (ι → ℂ)) :
     fderiv ℝ (fun v : (ι → ℂ) => v J) u d = d J := by
-  have h : HasFDerivAt (fun v : (ι → ℂ) => v J)
-      (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : ι => ℂ) J) u :=
-    (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : ι => ℂ) J).hasFDerivAt
-  rw [h.fderiv, ContinuousLinearMap.proj_apply]
+  rw [(hasFDerivAt_apply (𝕜 := ℝ) J u).fderiv, ContinuousLinearMap.proj_apply]
 
 /-- `∂_I z^J = δ_IJ`. The holomorphic coordinate-independence value; also feeds the
 coordinate-difference rule `dWirtingerCoord_coordDiff` and the conjugate-coordinate value
@@ -274,8 +271,7 @@ coordinate-difference rule `dWirtingerCoord_coordDiff` and the conjugate-coordin
   rw [dWirtingerCoord_apply I, fderiv_coordProj, fderiv_coordProj]
   by_cases h : I = J
   · subst h; rw [Pi.single_eq_same, Pi.single_eq_same, if_pos rfl, Complex.I_mul_I]; ring
-  · rw [Pi.single_eq_of_ne (Ne.symm h), Pi.single_eq_of_ne (Ne.symm h), if_neg h,
-      mul_zero, sub_zero, mul_zero]
+  · simp [h]
 
 /-- Pointwise additivity of the holomorphic coordinate derivative at `u`:
 `∂_I (f + g) = ∂_I f + ∂_I g`. Used to assemble the coordinate-difference rule
@@ -348,14 +344,9 @@ holomorphic `f`. -/
 lemma dWirtingerCoord_eq_zero_of_antiHolomorphic_apply {u : (ι → ℂ)}
     (hg : DifferentiableAt ℂ g (star u)) (I : ι) :
     dWirtingerCoord (fun v : (ι → ℂ) => g (star v)) I u = 0 := by
-  have hgr : DifferentiableAt ℝ g (conjCLM u) := by
-    rw [conjCLM_apply]; exact hg.restrictScalars ℝ
-  show dWirtingerDir (fun v : (ι → ℂ) => g (star v))
-      (Pi.single I 1) u = 0
-  rw [show (fun v : (ι → ℂ) => g (star v))
-      = fun v => g (conjCLM v) from by funext v; rw [conjCLM_apply],
-    dWirtingerDir_comp_conjLinear conjCLM_smul_I hgr]
-  simp only [conjCLM_apply]
+  have hgr : DifferentiableAt ℝ g (conjCLM u) := hg.restrictScalars ℝ
+  change dWirtingerDir (fun v : (ι → ℂ) => g (conjCLM v)) (Pi.single I 1) u = 0
+  rw [dWirtingerDir_comp_conjLinear conjCLM_smul_I hgr]
   exact dWirtingerAntiDir_eq_zero_of_clinear (clinear_of_holomorphic hg _)
 
 end
@@ -405,12 +396,8 @@ value `dWirtingerCoord_conjCoord` (§C). -/
 @[simp] lemma dWirtingerAntiCoord_coordProj (I J : ι) :
     dWirtingerAntiCoord (fun u : (ι → ℂ) => u J) I = 0 := by
   funext u
-  simp only [Pi.zero_apply]
-  rw [dWirtingerAntiCoord_apply I, fderiv_coordProj, fderiv_coordProj]
-  by_cases h : I = J
-  · subst h; rw [Pi.single_eq_same, Pi.single_eq_same, Complex.I_mul_I]; ring
-  · rw [Pi.single_eq_of_ne (Ne.symm h), Pi.single_eq_of_ne (Ne.symm h),
-      mul_zero, add_zero, mul_zero]
+  exact dWirtingerAntiDir_eq_zero_of_clinear (clinear_of_holomorphic
+    (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : ι => ℂ) J).differentiableAt _)
 
 /-- `∂_I z̄^J = 0`. The conjugate of `dWirtingerAntiCoord_coordProj` (`z̄^J = star z^J`),
 read off through `dWirtingerDir_star_comp` rather than recomputed. Used to assemble the
@@ -418,13 +405,8 @@ coordinate-difference rule `dWirtingerCoord_coordDiff` (§C). -/
 lemma dWirtingerCoord_conjCoord (I J : ι) :
     dWirtingerCoord (fun u : (ι → ℂ) => star (u J)) I = 0 := by
   funext u
-  have hd : DifferentiableAt ℝ (fun w : (ι → ℂ) => w J) u :=
-    (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : ι => ℂ) J).differentiableAt
-  change dWirtingerDir (fun v => star ((fun w : (ι → ℂ) => w J) v))
-      (Pi.single I 1) u = 0
-  rw [dWirtingerDir_star_comp hd (Pi.single I 1)]
-  show star (dWirtingerAntiCoord (fun w : (ι → ℂ) => w J) I u) = 0
-  rw [dWirtingerAntiCoord_coordProj, Pi.zero_apply, star_zero]
+  exact dWirtingerCoord_eq_zero_of_antiHolomorphic_apply (g := fun w => w J)
+    (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : ι => ℂ) J).differentiableAt I
 
 /-- `∂̄_I z̄^J = δ_IJ`. The conjugate of `dWirtingerCoord_coordProj`, read off through
 `dWirtingerAntiDir_star_comp` rather than recomputed. Used to assemble the
@@ -435,11 +417,9 @@ lemma dWirtingerAntiCoord_conjCoord (I J : ι) :
   funext u
   have hd : DifferentiableAt ℝ (fun w : (ι → ℂ) => w J) u :=
     (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : ι => ℂ) J).differentiableAt
-  change dWirtingerAntiDir (fun v => star ((fun w : (ι → ℂ) => w J) v))
-      (Pi.single I 1) u = if I = J then 1 else 0
-  rw [dWirtingerAntiDir_star_comp hd (Pi.single I 1)]
-  show star (dWirtingerCoord (fun w : (ι → ℂ) => w J) I u) = if I = J then 1 else 0
-  rw [dWirtingerCoord_coordProj]
+  rw [show dWirtingerAntiCoord (fun u : (ι → ℂ) => star (u J)) I u
+      = star (dWirtingerCoord (fun w : (ι → ℂ) => w J) I u)
+      from dWirtingerAntiDir_star_comp hd (Pi.single I 1), dWirtingerCoord_coordProj]
   simp only [apply_ite (star : ℂ → ℂ), star_one, star_zero]
 
 /-- Pointwise additivity of the anti-holomorphic coordinate derivative at `u`:
@@ -482,13 +462,10 @@ lemma dWirtingerAntiCoord_eq_complex_fderiv_apply {u : (ι → ℂ)}
     (hg : DifferentiableAt ℂ g (star u)) (I : ι) :
     dWirtingerAntiCoord (fun v : (ι → ℂ) => g (star v)) I u =
       fderiv ℂ g (star u) (Pi.single I 1) := by
-  have hgr : DifferentiableAt ℝ g (conjCLM u) := by
-    rw [conjCLM_apply]; exact hg.restrictScalars ℝ
-  show dWirtingerAntiDir (fun v : (ι → ℂ) => g (star v))
-      (Pi.single I 1) u = fderiv ℂ g (star u) (Pi.single I 1)
-  rw [show (fun v : (ι → ℂ) => g (star v))
-      = fun v => g (conjCLM v) from by funext v; rw [conjCLM_apply],
-    dWirtingerAntiDir_comp_conjLinear conjCLM_smul_I hgr]
+  have hgr : DifferentiableAt ℝ g (conjCLM u) := hg.restrictScalars ℝ
+  change dWirtingerAntiDir (fun v : (ι → ℂ) => g (conjCLM v)) (Pi.single I 1) u
+      = fderiv ℂ g (star u) (Pi.single I 1)
+  rw [dWirtingerAntiDir_comp_conjLinear conjCLM_smul_I hgr]
   simp only [conjCLM_apply, Pi.star_single, star_one]
   rw [dWirtingerDir_eq_of_clinear (clinear_of_holomorphic hg _),
     DifferentiableAt.fderiv_restrictScalars ℝ hg, ContinuousLinearMap.coe_restrictScalars']
@@ -496,9 +473,8 @@ lemma dWirtingerAntiCoord_eq_complex_fderiv_apply {u : (ι → ℂ)}
 /-- Holomorphic functions have zero anti-holomorphic coordinate derivative: `∂̄_I f = 0`. -/
 lemma dWirtingerAntiCoord_eq_zero_of_holomorphic_apply {u : (ι → ℂ)}
     (hf : DifferentiableAt ℂ f u) (I : ι) :
-    dWirtingerAntiCoord f I u = 0 := by
-  show dWirtingerAntiDir f (Pi.single I 1) u = 0
-  exact dWirtingerAntiDir_eq_zero_of_clinear (clinear_of_holomorphic hf _)
+    dWirtingerAntiCoord f I u = 0 :=
+  dWirtingerAntiDir_eq_zero_of_clinear (clinear_of_holomorphic hf _)
 
 /-!
 
@@ -516,8 +492,8 @@ and the negated conjugate coordinate — the form on which the `dWirtingerCoord`
 `dWirtingerAntiCoord` additivity rules apply. -/
 private lemma coordDiff_eq_add_neg (J : ι) :
     (fun v : (ι → ℂ) => v J - star (v J))
-      = (fun v => v J) + (fun v => -(star (v J))) := by
-  funext v; simp [sub_eq_add_neg]
+      = (fun v => v J) + (fun v => -(star (v J))) :=
+  funext fun v => sub_eq_add_neg (v J) (star (v J))
 
 /-- `∂_I (z^J − z̄^J) = δ_IJ`, from `∂_I z^J = δ_IJ` and
 `∂_I z̄^J = 0`. -/
@@ -594,7 +570,7 @@ lemma dWirtingerCoord_comp_holomorphic_apply {u : (ι → ℂ)}
     (hg : DifferentiableAt ℂ g (f u)) (hf : DifferentiableAt ℝ f u) (I : ι) :
     dWirtingerCoord (fun v => g (f v)) I u =
       deriv g (f u) * dWirtingerCoord f I u := by
-  rw [dWirtingerCoord_comp_apply (hg.hasFDerivAt.restrictScalars ℝ).differentiableAt hf I,
+  rw [dWirtingerCoord_comp_apply (hg.restrictScalars ℝ) hf I,
     dWirtingerDir_eq_of_clinear (clinear_of_holomorphic hg 1),
     DifferentiableAt.fderiv_restrictScalars ℝ hg, ContinuousLinearMap.coe_restrictScalars',
     fderiv_apply_one_eq_deriv,
@@ -630,7 +606,7 @@ lemma dWirtingerAntiCoord_comp_holomorphic_apply {u : (ι → ℂ)}
     (hg : DifferentiableAt ℂ g (f u)) (hf : DifferentiableAt ℝ f u) (I : ι) :
     dWirtingerAntiCoord (fun v => g (f v)) I u =
       deriv g (f u) * dWirtingerAntiCoord f I u := by
-  rw [dWirtingerAntiCoord_comp_apply (hg.hasFDerivAt.restrictScalars ℝ).differentiableAt hf I,
+  rw [dWirtingerAntiCoord_comp_apply (hg.restrictScalars ℝ) hf I,
     dWirtingerDir_eq_of_clinear (clinear_of_holomorphic hg 1),
     DifferentiableAt.fderiv_restrictScalars ℝ hg, ContinuousLinearMap.coe_restrictScalars',
     fderiv_apply_one_eq_deriv,

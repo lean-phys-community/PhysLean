@@ -126,13 +126,9 @@ def oddMid : Fin (2 * n + 1) :=
 
 lemma sum_odd (S : Fin (2 * n + 1) → ℚ) :
     ∑ i, S i = S oddMid + ∑ i : Fin n, ((S ∘ oddFst) i + (S ∘ oddSnd) i) := by
-  have h1 : ∑ i, S i = ∑ i : Fin (n + 1 + n), S (Fin.cast (split_odd n) i) := by
-    rw [Finset.sum_equiv (Fin.castOrderIso (split_odd n)).symm.toEquiv]
-    · intro i
-      simp only [mem_univ, Fin.symm_castOrderIso, RelIso.coe_fn_toEquiv]
-    · exact fun _ _ => rfl
-  rw [h1]
-  rw [Fin.sum_univ_add, Fin.sum_univ_add]
+  have h1 : ∑ i, S i = ∑ i : Fin (n + 1 + n), S (Fin.cast (split_odd n) i) :=
+    (Equiv.sum_comp (finCongr (split_odd n)) S).symm
+  rw [h1, Fin.sum_univ_add, Fin.sum_univ_add]
   simp only [univ_unique, Fin.default_eq_zero, Fin.isValue, sum_singleton, Function.comp_apply]
   nth_rewrite 2 [add_comm]
   rw [add_assoc]
@@ -162,11 +158,8 @@ def oddShiftZero : Fin (2 * n + 1) :=
 
 lemma sum_oddShift (S : Fin (2 * n + 1) → ℚ) :
     ∑ i, S i = S oddShiftZero + ∑ i : Fin n, ((S ∘ oddShiftFst) i + (S ∘ oddShiftSnd) i) := by
-  have h1 : ∑ i, S i = ∑ i : Fin ((1+n)+n), S (Fin.cast (odd_shift_eq n) i) := by
-    rw [Finset.sum_equiv (Fin.castOrderIso (odd_shift_eq n)).symm.toEquiv]
-    · intro i
-      simp only [mem_univ, Fin.castOrderIso, RelIso.coe_fn_toEquiv]
-    · exact fun _ _ => rfl
+  have h1 : ∑ i, S i = ∑ i : Fin ((1+n)+n), S (Fin.cast (odd_shift_eq n) i) :=
+    (Equiv.sum_comp (finCongr (odd_shift_eq n)) S).symm
   rw [h1, Fin.sum_univ_add, Fin.sum_univ_add]
   simp only [univ_unique, Fin.default_eq_zero, Fin.isValue, sum_singleton, Function.comp_apply]
   rw [add_assoc, Finset.sum_add_distrib]
@@ -213,57 +206,52 @@ lemma oddShiftShiftZero_eq_oddShiftZero : @oddShiftShiftZero n = oddShiftZero :=
 
 lemma oddShiftShiftFst_eq_oddFst_succ (j : Fin n) :
     oddShiftShiftFst j = oddFst j.succ := by
-  rw [Fin.ext_iff]
-  simp only [succ_eq_add_one, oddShiftShiftFst, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd,
-    oddFst, Fin.val_succ]
-  exact Nat.add_comm 1 ↑j
+  simp only [Fin.ext_iff, succ_eq_add_one, oddShiftShiftFst, Fin.val_cast, Fin.val_castAdd,
+    Fin.val_natAdd, oddFst, Fin.val_succ]
+  omega
 
 lemma oddShiftShiftFst_eq_oddShiftFst_castSucc (j : Fin n) :
     oddShiftShiftFst j = oddShiftFst j.castSucc := by
   rfl
 
 lemma oddShiftShiftMid_eq_oddMid : @oddShiftShiftMid n = oddMid := by
-  rw [Fin.ext_iff]
-  simp only [succ_eq_add_one, oddShiftShiftMid, Fin.isValue, Fin.val_cast, Fin.val_castAdd,
-    Fin.val_natAdd, Fin.val_eq_zero, add_zero, oddMid]
-  exact Nat.add_comm 1 n
+  simp only [Fin.ext_iff, succ_eq_add_one, oddShiftShiftMid, Fin.isValue, Fin.val_cast,
+    Fin.val_castAdd, Fin.val_natAdd, Fin.val_eq_zero, add_zero, oddMid]
+  omega
 
 lemma oddShiftShiftMid_eq_oddShiftFst_last : oddShiftShiftMid = oddShiftFst (Fin.last n) := by
   rfl
 
 lemma oddShiftShiftSnd_eq_oddSnd (j : Fin n.succ) : oddShiftShiftSnd j = oddSnd j := by
-  rw [Fin.ext_iff]
-  simp only [succ_eq_add_one, oddShiftShiftSnd, Fin.val_cast, Fin.val_natAdd, oddSnd, add_left_inj]
-  exact Nat.add_comm 1 n
+  simp only [Fin.ext_iff, succ_eq_add_one, oddShiftShiftSnd, Fin.val_cast, Fin.val_natAdd, oddSnd,
+    add_left_inj]
+  omega
 
 lemma oddShiftShiftSnd_eq_oddShiftSnd (j : Fin n.succ) : oddShiftShiftSnd j = oddShiftSnd j := by
   rw [Fin.ext_iff]
   rfl
 
 lemma oddSnd_eq_oddShiftSnd (j : Fin n) : oddSnd j = oddShiftSnd j := by
-  rw [Fin.ext_iff]
-  simp only [oddSnd, Fin.val_cast, Fin.val_natAdd, oddShiftSnd, add_left_inj]
-  exact Nat.add_comm n 1
+  simp only [Fin.ext_iff, oddSnd, Fin.val_cast, Fin.val_natAdd, oddShiftSnd, add_left_inj]
+  omega
 
 lemma oddShiftZero_eq_oddFst : oddShiftZero = oddFst (0 : Fin n.succ) := by
-  ext
-  simp [oddShiftZero, oddFst]
+  simp [Fin.ext_iff, oddShiftZero, oddFst]
 
 lemma oddShiftFst_castSucc_eq_oddFst_succ (j : Fin n) :
     oddShiftFst j.castSucc = oddFst j.succ := by
-  rw [Fin.ext_iff]
-  simp only [oddShiftFst, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, oddFst, Fin.val_succ]
-  exact Nat.add_comm 1 ↑j
+  simp only [Fin.ext_iff, oddShiftFst, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, oddFst,
+    Fin.val_succ, Fin.val_castSucc]
+  omega
 
 lemma oddShiftFst_last_eq_oddMid : oddShiftFst (Fin.last n) = oddMid := by
-  rw [Fin.ext_iff]
-  simp only [oddShiftFst, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, oddMid, Fin.val_last]
-  exact Nat.add_comm 1 n
+  simp only [Fin.ext_iff, oddShiftFst, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, oddMid,
+    Fin.val_last]
+  omega
 
 lemma oddShiftSnd_eq_oddSnd (j : Fin n) : oddShiftSnd j = oddSnd j := by
-  rw [Fin.ext_iff]
-  simp only [oddShiftSnd, Fin.val_cast, Fin.val_natAdd, oddSnd, add_left_inj]
-  ring
+  simp only [Fin.ext_iff, oddShiftSnd, Fin.val_cast, Fin.val_natAdd, oddSnd, add_left_inj]
+  omega
 
 end theDeltas
 
@@ -302,48 +290,26 @@ lemma basis_on_oddFst_self (j : Fin n) : basisAsCharges j (oddFst j) = 1 := by
 set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_oddFst_other {k j : Fin n} (h : k ≠ j) :
     basisAsCharges k (oddFst j) = 0 := by
-  simp only [basisAsCharges]
-  simp only [oddFst, oddSnd]
+  have hk : (k : ℕ) ≠ (j : ℕ) := fun he => h (Fin.ext he)
+  simp only [basisAsCharges, oddFst, oddSnd, Fin.ext_iff, Fin.val_cast, Fin.val_castAdd,
+    Fin.val_natAdd]
   split
-  · rename_i h1
-    rw [Fin.ext_iff] at h1
-    simp_all
-    rw [Fin.ext_iff] at h
-    simp_all
+  · omega
   · split
-    · rename_i h1 h2
-      simp_all
-      rw [Fin.ext_iff] at h2
-      simp only [Fin.val_castAdd, Fin.val_natAdd] at h2
-      omega
+    · omega
     · rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_other {k : Fin n} {j : Fin (2 * n + 1)} (h1 : j ≠ oddFst k) (h2 : j ≠ oddSnd k) :
     basisAsCharges k j = 0 := by
-  simp only [basisAsCharges]
-  simp_all only [ne_eq, ↓reduceIte]
+  simp only [basisAsCharges, h1, h2, ↓reduceIte]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis_oddSnd_eq_minus_oddFst (j i : Fin n) :
     basisAsCharges j (oddSnd i) = - basisAsCharges j (oddFst i) := by
-  simp only [basisAsCharges, oddSnd, oddFst]
-  split <;> split
-  any_goals split
-  any_goals split
-  any_goals rfl
-  all_goals
-    rename_i h1 h2
-    rw [Fin.ext_iff] at h1 h2
-    simp_all only [Fin.cast_inj, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, neg_neg,
-      add_eq_right, AddLeftCancelMonoid.add_eq_zero, one_ne_zero, and_false, not_false_eq_true]
-  all_goals
-    rename_i h3
-    rw [Fin.ext_iff] at h3
-    simp_all only [Fin.val_natAdd, Fin.val_castAdd, add_eq_right,
-      AddLeftCancelMonoid.add_eq_zero, one_ne_zero, and_false, not_false_eq_true]
-  all_goals
-    omega
+  simp only [basisAsCharges, oddSnd, oddFst, Fin.ext_iff, Fin.val_cast, Fin.val_castAdd,
+    Fin.val_natAdd]
+  split_ifs <;> first | omega | simp
 
 lemma basis_on_oddSnd_self (j : Fin n) : basisAsCharges j (oddSnd j) = - 1 := by
   rw [basis_oddSnd_eq_minus_oddFst, basis_on_oddFst_self]
@@ -354,17 +320,12 @@ lemma basis_on_oddSnd_other {k j : Fin n} (h : k ≠ j) : basisAsCharges k (oddS
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_oddMid (j : Fin n) : basisAsCharges j oddMid = 0 := by
-  simp only [basisAsCharges]
-  split <;> rename_i h
-  · rw [Fin.ext_iff] at h
-    simp only [oddMid, Fin.isValue, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, Fin.val_eq_zero,
-      add_zero, oddFst] at h
-    omega
-  · split <;> rename_i h2
-    · rw [Fin.ext_iff] at h2
-      simp only [oddMid, Fin.isValue, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd,
-        Fin.val_eq_zero, add_zero, oddSnd] at h2
-      omega
+  simp only [basisAsCharges, oddMid, oddFst, oddSnd, Fin.isValue, Fin.val_cast, Fin.val_castAdd,
+    Fin.val_natAdd, Fin.val_eq_zero, add_zero, Fin.ext_iff]
+  split
+  · omega
+  · split
+    · omega
     · rfl
 
 /-!
@@ -375,9 +336,7 @@ lemma basis_on_oddMid (j : Fin n) : basisAsCharges j oddMid = 0 := by
 
 lemma basis_linearACC (j : Fin n) : (accGrav (2 * n + 1)) (basisAsCharges j) = 0 := by
   rw [accGrav]
-  simp only [LinearMap.coe_mk, AddHom.coe_mk]
-  erw [sum_odd]
-  simp [basis_oddSnd_eq_minus_oddFst, basis_on_oddMid]
+  simp [sum_odd, basis_oddSnd_eq_minus_oddFst, basis_on_oddMid]
 
 /-!
 
@@ -411,24 +370,18 @@ def P (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).Charges := ∑ i, f i • basis
 lemma P_oddFst (f : Fin n → ℚ) (j : Fin n) : P f (oddFst j) = f j := by
   rw [P, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
-  rw [Finset.sum_eq_single j]
-  · rw [basis_on_oddFst_self]
-    exact Rat.mul_one (f j)
-  · intro k _ hkj
-    rw [basis_on_oddFst_other hkj]
-    exact Rat.mul_zero (f k)
-  · simp only [mem_univ, not_true_eq_false, _root_.mul_eq_zero, IsEmpty.forall_iff]
+  rw [Fintype.sum_eq_single j]
+  · simp [basis_on_oddFst_self]
+  · intro k hkj
+    exact mul_eq_zero_of_right (f k) (basis_on_oddFst_other hkj)
 
 lemma P_oddSnd (f : Fin n → ℚ) (j : Fin n) : P f (oddSnd j) = - f j := by
   rw [P, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
-  rw [Finset.sum_eq_single j]
-  · rw [basis_on_oddSnd_self]
-    exact mul_neg_one (f j)
-  · intro k _ hkj
-    rw [basis_on_oddSnd_other hkj]
-    exact Rat.mul_zero (f k)
-  · simp
+  rw [Fintype.sum_eq_single j]
+  · simp [basis_on_oddSnd_self]
+  · intro k hkj
+    exact mul_eq_zero_of_right (f k) (basis_on_oddSnd_other hkj)
 
 lemma P_oddMid (f : Fin n → ℚ) : P f oddMid = 0 := by
   rw [P, sum_of_charges]
@@ -442,15 +395,12 @@ lemma P_oddMid (f : Fin n → ℚ) : P f oddMid = 0 := by
 
 lemma P_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P f) = 0 := by
   rw [accGrav]
-  simp only [LinearMap.coe_mk, AddHom.coe_mk]
-  rw [sum_odd]
-  simp [P_oddSnd, P_oddFst, P_oddMid]
+  simp [sum_odd, P_oddSnd, P_oddFst, P_oddMid]
 
 lemma P_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P f) = 0 := by
   rw [accCube_explicit, sum_odd, P_oddMid]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, Function.comp_apply, zero_add]
-  apply Finset.sum_eq_zero
-  intro i _
+  refine Finset.sum_eq_zero fun i _ => ?_
   simp only [P_oddFst, P_oddSnd]
   ring
 
@@ -460,11 +410,8 @@ lemma P_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P f) = 0 := by
 
 -/
 
-lemma P_zero (f : Fin n → ℚ) (h : P f = 0) : ∀ i, f i = 0 := by
-  intro i
-  erw [← P_oddFst f]
-  rw [h]
-  rfl
+lemma P_zero (f : Fin n → ℚ) (h : P f = 0) : ∀ i, f i = 0 :=
+  fun i => (P_oddFst f i).symm.trans (congr_fun h (oddFst i))
 
 /-- A point in the span of the first part of the basis. -/
 def P' (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • basis i
@@ -485,12 +432,7 @@ theorem basis_linear_independent : LinearIndependent ℚ (@basis n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
   change P' f = 0 at h
-  have h1 : (P' f).val = 0 :=
-    (AddSemiconjBy.eq_zero_iff (ACCSystemLinear.LinSols.val 0)
-    (congrFun (congrArg HAdd.hAdd (congrArg ACCSystemLinear.LinSols.val (id (Eq.symm h))))
-    (ACCSystemLinear.LinSols.val 0))).mp rfl
-  rw [P'_val] at h1
-  exact P_zero f h1
+  exact P_zero f (P'_val f ▸ congrArg ACCSystemLinear.LinSols.val h)
 
 /-!
 
@@ -527,46 +469,27 @@ lemma basis!_on_oddShiftFst_self (j : Fin n) : basis!AsCharges j (oddShiftFst j)
 set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_oddShiftFst_other {k j : Fin n} (h : k ≠ j) :
     basis!AsCharges k (oddShiftFst j) = 0 := by
-  simp only [basis!AsCharges]
-  simp only [oddShiftFst, oddShiftSnd]
+  have hk : (k : ℕ) ≠ (j : ℕ) := fun he => h (Fin.ext he)
+  simp only [basis!AsCharges, oddShiftFst, oddShiftSnd, Fin.ext_iff, Fin.val_cast, Fin.val_castAdd,
+    Fin.val_natAdd]
   split
-  · rename_i h1
-    rw [Fin.ext_iff] at h1
-    simp_all
-    rw [Fin.ext_iff] at h
-    simp_all
+  · omega
   · split
-    · rename_i h1 h2
-      simp_all
-      rw [Fin.ext_iff] at h2
-      simp only [Fin.val_castAdd, Fin.val_natAdd] at h2
-      omega
-    rfl
+    · omega
+    · rfl
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_other {k : Fin n} {j : Fin (2 * n + 1)}
     (h1 : j ≠ oddShiftFst k) (h2 : j ≠ oddShiftSnd k) :
     basis!AsCharges k j = 0 := by
-  simp only [basis!AsCharges]
-  simp_all only [ne_eq, ↓reduceIte]
+  simp only [basis!AsCharges, h1, h2, ↓reduceIte]
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis!_oddShiftSnd_eq_minus_oddShiftFst (j i : Fin n) :
     basis!AsCharges j (oddShiftSnd i) = - basis!AsCharges j (oddShiftFst i) := by
-  simp only [basis!AsCharges, oddShiftSnd, oddShiftFst]
-  split <;> split
-  any_goals split
-  any_goals split
-  any_goals rfl
-  all_goals rename_i h1 h2
-  all_goals rw [Fin.ext_iff] at h1 h2
-  all_goals simp_all
-  · subst h1
-    exact Fin.elim0 i
-  all_goals rename_i h3
-  all_goals rw [Fin.ext_iff] at h3
-  all_goals simp_all
-  all_goals omega
+  simp only [basis!AsCharges, oddShiftSnd, oddShiftFst, Fin.ext_iff, Fin.val_cast, Fin.val_castAdd,
+    Fin.val_natAdd]
+  split_ifs <;> first | omega | simp
 
 lemma basis!_on_oddShiftSnd_self (j : Fin n) : basis!AsCharges j (oddShiftSnd j) = - 1 := by
   rw [basis!_oddShiftSnd_eq_minus_oddShiftFst, basis!_on_oddShiftFst_self]
@@ -578,17 +501,12 @@ lemma basis!_on_oddShiftSnd_other {k j : Fin n} (h : k ≠ j) :
 
 set_option backward.isDefEq.respectTransparency false in
 lemma basis!_on_oddShiftZero (j : Fin n) : basis!AsCharges j oddShiftZero = 0 := by
-  simp only [basis!AsCharges]
-  split <;> rename_i h
-  · rw [Fin.ext_iff] at h
-    simp only [oddShiftZero, Fin.isValue, Fin.val_cast, Fin.val_castAdd, Fin.val_eq_zero,
-      oddShiftFst, Fin.val_natAdd] at h
-    omega
-  · split <;> rename_i h2
-    · rw [Fin.ext_iff] at h2
-      simp only [oddShiftZero, Fin.isValue, Fin.val_cast, Fin.val_castAdd, Fin.val_eq_zero,
-        oddShiftSnd, Fin.val_natAdd] at h2
-      omega
+  simp only [basis!AsCharges, oddShiftZero, oddShiftFst, oddShiftSnd, Fin.isValue, Fin.val_cast,
+    Fin.val_castAdd, Fin.val_eq_zero, Fin.val_natAdd, Fin.ext_iff]
+  split
+  · omega
+  · split
+    · omega
     · rfl
 
 /-!
@@ -599,9 +517,7 @@ lemma basis!_on_oddShiftZero (j : Fin n) : basis!AsCharges j oddShiftZero = 0 :=
 
 lemma basis!_linearACC (j : Fin n) : (accGrav (2 * n + 1)) (basis!AsCharges j) = 0 := by
   rw [accGrav]
-  simp only [LinearMap.coe_mk, AddHom.coe_mk]
-  rw [sum_oddShift, basis!_on_oddShiftZero]
-  simp [basis!_oddShiftSnd_eq_minus_oddShiftFst]
+  simp [sum_oddShift, basis!_on_oddShiftZero, basis!_oddShiftSnd_eq_minus_oddShiftFst]
 
 /-!
 
@@ -660,24 +576,18 @@ def P! (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).Charges := ∑ i, f i • basi
 lemma P!_oddShiftFst (f : Fin n → ℚ) (j : Fin n) : P! f (oddShiftFst j) = f j := by
   rw [P!, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
-  rw [Finset.sum_eq_single j]
-  · rw [basis!_on_oddShiftFst_self]
-    exact Rat.mul_one (f j)
-  · intro k _ hkj
-    rw [basis!_on_oddShiftFst_other hkj]
-    exact Rat.mul_zero (f k)
-  · simp only [mem_univ, not_true_eq_false, _root_.mul_eq_zero, IsEmpty.forall_iff]
+  rw [Fintype.sum_eq_single j]
+  · simp [basis!_on_oddShiftFst_self]
+  · intro k hkj
+    exact mul_eq_zero_of_right (f k) (basis!_on_oddShiftFst_other hkj)
 
 lemma P!_oddShiftSnd (f : Fin n → ℚ) (j : Fin n) : P! f (oddShiftSnd j) = - f j := by
   rw [P!, sum_of_charges]
   simp only [HSMul.hSMul, SMul.smul]
-  rw [Finset.sum_eq_single j]
-  · rw [basis!_on_oddShiftSnd_self]
-    exact mul_neg_one (f j)
-  · intro k _ hkj
-    rw [basis!_on_oddShiftSnd_other hkj]
-    exact Rat.mul_zero (f k)
-  · simp
+  rw [Fintype.sum_eq_single j]
+  · simp [basis!_on_oddShiftSnd_self]
+  · intro k hkj
+    exact mul_eq_zero_of_right (f k) (basis!_on_oddShiftSnd_other hkj)
 
 lemma P!_oddShiftZero (f : Fin n → ℚ) : P! f oddShiftZero = 0 := by
   rw [P!, sum_of_charges]
@@ -691,15 +601,12 @@ lemma P!_oddShiftZero (f : Fin n → ℚ) : P! f oddShiftZero = 0 := by
 
 lemma P!_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (P! f) = 0 := by
   rw [accGrav]
-  simp only [LinearMap.coe_mk, AddHom.coe_mk]
-  rw [sum_oddShift]
-  simp [P!_oddShiftSnd, P!_oddShiftFst, P!_oddShiftZero]
+  simp [sum_oddShift, P!_oddShiftSnd, P!_oddShiftFst, P!_oddShiftZero]
 
 lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P! f) = 0 := by
   rw [accCube_explicit, sum_oddShift, P!_oddShiftZero]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, Function.comp_apply, zero_add]
-  apply Finset.sum_eq_zero
-  intro i _
+  refine Finset.sum_eq_zero fun i _ => ?_
   simp only [P!_oddShiftFst, P!_oddShiftSnd]
   ring
 
@@ -709,11 +616,8 @@ lemma P!_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (P! f) = 0 := by
 
 -/
 
-lemma P!_zero (f : Fin n → ℚ) (h : P! f = 0) : ∀ i, f i = 0 := by
-  intro i
-  rw [← P!_oddShiftFst f]
-  rw [h]
-  rfl
+lemma P!_zero (f : Fin n → ℚ) (h : P! f = 0) : ∀ i, f i = 0 :=
+  fun i => (P!_oddShiftFst f i).symm.trans (congr_fun h (oddShiftFst i))
 
 /-!
 
@@ -740,12 +644,7 @@ theorem basis!_linear_independent : LinearIndependent ℚ (@basis! n) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
   change P!' f = 0 at h
-  have h1 : (P!' f).val = 0 :=
-    (AddSemiconjBy.eq_zero_iff (ACCSystemLinear.LinSols.val 0)
-    (congrFun (congrArg HAdd.hAdd (congrArg ACCSystemLinear.LinSols.val (id (Eq.symm h))))
-    (ACCSystemLinear.LinSols.val 0))).mp rfl
-  rw [P!'_val] at h1
-  exact P!_zero f h1
+  exact P!_zero f (P!'_val f ▸ congrArg ACCSystemLinear.LinSols.val h)
 
 /-!
 
@@ -759,13 +658,12 @@ lemma P_P_P!_accCube (g : Fin n → ℚ) (j : Fin n) :
   simp only [accCubeTriLinSymm, TriLinearSymm.mk₃_toFun_apply_apply]
   erw [sum_oddShift, basis!_on_oddShiftZero]
   simp only [mul_zero, Function.comp_apply, zero_add]
-  rw [Finset.sum_eq_single j, basis!_on_oddShiftFst_self, basis!_on_oddShiftSnd_self]
+  rw [Fintype.sum_eq_single j, basis!_on_oddShiftFst_self, basis!_on_oddShiftSnd_self]
   · rw [← oddSnd_eq_oddShiftSnd, P_oddSnd]
     ring
-  · intro k _ hkj
+  · intro k hkj
     erw [basis!_on_oddShiftFst_other hkj.symm, basis!_on_oddShiftSnd_other hkj.symm]
     simp only [mul_zero, add_zero]
-  · simp
 
 /-!
 
@@ -805,8 +703,7 @@ lemma Pa_oddShiftShiftZero (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftZero
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
   nth_rewrite 1 [oddShiftShiftZero_eq_oddFst_zero]
   rw [oddShiftShiftZero_eq_oddShiftZero]
-  rw [P!_oddShiftZero, oddShiftZero_eq_oddFst, P_oddFst]
-  exact Rat.add_zero (f 0)
+  rw [P!_oddShiftZero, oddShiftZero_eq_oddFst, P_oddFst, add_zero]
 
 lemma Pa_oddShiftShiftFst (f g : Fin n.succ → ℚ) (j : Fin n) :
     Pa f g (oddShiftShiftFst j) = f j.succ + g j.castSucc := by
@@ -821,8 +718,7 @@ lemma Pa_oddShiftShiftMid (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftMid =
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
   nth_rewrite 1 [oddShiftShiftMid_eq_oddMid]
   rw [oddShiftShiftMid_eq_oddShiftFst_last]
-  rw [P!_oddShiftFst, oddShiftFst_last_eq_oddMid, P_oddMid]
-  exact Rat.zero_add (g (Fin.last n))
+  rw [P!_oddShiftFst, oddShiftFst_last_eq_oddMid, P_oddMid, zero_add]
 
 lemma Pa_oddShiftShiftSnd (f g : Fin n.succ → ℚ) (j : Fin n.succ) :
     Pa f g (oddShiftShiftSnd j) = - f j - g j := by
@@ -891,10 +787,7 @@ theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n.succ) := by
   apply Fintype.linearIndependent_iff.mpr
   intro f h
   change Pa' f = 0 at h
-  have h1 : (Pa' f).val = 0 :=
-    (AddSemiconjBy.eq_zero_iff (ACCSystemLinear.LinSols.val 0)
-    (congrFun (congrArg HAdd.hAdd (congrArg ACCSystemLinear.LinSols.val (id (Eq.symm h))))
-    (ACCSystemLinear.LinSols.val 0))).mp rfl
+  have h1 : (Pa' f).val = 0 := congrArg ACCSystemLinear.LinSols.val h
   rw [Pa'_P'_P!'] at h1
   change (P' (f ∘ Sum.inl)).val + (P!' (f ∘ Sum.inr)).val = 0 at h1
   rw [P!'_val, P'_val] at h1
@@ -903,9 +796,7 @@ theorem basisa_linear_independent : LinearIndependent ℚ (@basisa n.succ) := by
   have hg := Pa_zero! (f ∘ Sum.inl) (f ∘ Sum.inr) h1
   intro i
   simp_all only [succ_eq_add_one, Function.comp_apply]
-  cases i
-  · simp_all
-  · simp_all
+  cases i <;> simp_all
 
 /-!
 
@@ -919,15 +810,11 @@ lemma Pa'_eq (f f' : (Fin n.succ) ⊕ (Fin n.succ) → ℚ) : Pa' f = Pa' f' ↔
     rw [Pa', Pa'] at h
     have h1 : ∑ i : Fin n.succ ⊕ Fin n.succ, (f i + (- f' i)) • basisa i = 0 := by
       simp only [add_smul, neg_smul]
-      rw [Finset.sum_add_distrib]
-      rw [h]
-      rw [← Finset.sum_add_distrib]
+      rw [Finset.sum_add_distrib, h, ← Finset.sum_add_distrib]
       simp
-    have h2 : ∀ i, (f i + (- f' i)) = 0 := by
-      exact Fintype.linearIndependent_iff.mp (@basisa_linear_independent n)
-        (fun i => f i + -f' i) h1
-    have h2i := h2 i
-    linarith
+    have h2 : ∀ i, (f i + (- f' i)) = 0 :=
+      Fintype.linearIndependent_iff.mp (@basisa_linear_independent n) (fun i => f i + -f' i) h1
+    linarith [h2 i]
   · rw [h]
 
 lemma Pa'_elim_eq_iff (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
@@ -955,8 +842,7 @@ lemma Pa_eq (g g' : Fin n.succ → ℚ) (f f' : Fin n.succ → ℚ) :
 lemma basisa_card : Fintype.card ((Fin n.succ) ⊕ (Fin n.succ)) =
     Module.finrank ℚ (PureU1 (2 * n.succ + 1)).LinSols := by
   erw [BasisLinear.finrank_AnomalyFreeLinear]
-  simp only [Fintype.card_sum, Fintype.card_fin]
-  exact Eq.symm (Nat.two_mul n.succ)
+  simp [Fintype.card_sum, Fintype.card_fin, two_mul]
 
 /-!
 
@@ -977,13 +863,12 @@ noncomputable def basisaAsBasis :
 
 lemma span_basis (S : (PureU1 (2 * n.succ + 1)).LinSols) :
     ∃ (g f : Fin n.succ → ℚ), S.val = P g + P! f := by
-  have h := (Submodule.mem_span_range_iff_exists_fun ℚ).mp (Basis.mem_span basisaAsBasis S)
-  obtain ⟨f, hf⟩ := h
+  obtain ⟨f, hf⟩ :=
+    (Submodule.mem_span_range_iff_exists_fun ℚ).mp (Basis.mem_span basisaAsBasis S)
   simp only [succ_eq_add_one, basisaAsBasis, coe_basisOfLinearIndependentOfCardEqFinrank,
     Fintype.sum_sum_type] at hf
   change P' _ + P!' _ = S at hf
-  use f ∘ Sum.inl
-  use f ∘ Sum.inr
+  refine ⟨f ∘ Sum.inl, f ∘ Sum.inr, ?_⟩
   rw [← hf]
   simp only [succ_eq_add_one, ACCSystemLinear.linSolsAddCommMonoid_add_val, P'_val, P!'_val]
   rfl
@@ -1001,24 +886,15 @@ lemma span_basis_swap! {S : (PureU1 (2 * n.succ + 1)).LinSols} (j : Fin n.succ)
     S'.val = P g' + P! f' ∧ P! f' = P! f +
     (S.val (oddShiftSnd j) - S.val (oddShiftFst j)) • basis!AsCharges j ∧ g' = g := by
   let X := P! f + (S.val (oddShiftSnd j) - S.val (oddShiftFst j)) • basis!AsCharges j
-  have hf : P! f ∈ Submodule.span ℚ (Set.range basis!AsCharges) := by
-    rw [(Submodule.mem_span_range_iff_exists_fun ℚ)]
-    use f
-    rfl
+  have hf : P! f ∈ Submodule.span ℚ (Set.range basis!AsCharges) :=
+    (Submodule.mem_span_range_iff_exists_fun ℚ).mpr ⟨f, rfl⟩
   have hP : (S.val (oddShiftSnd j) - S.val (oddShiftFst j)) • basis!AsCharges j ∈
-      Submodule.span ℚ (Set.range basis!AsCharges) := by
-    apply Submodule.smul_mem
-    apply SetLike.mem_of_subset
-    apply Submodule.subset_span
-    simp_all only [Set.mem_range, exists_apply_eq_apply]
-  have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) := by
-    apply Submodule.add_mem
-    exact hf
-    exact hP
-  have hXsum := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hX
-  obtain ⟨f', hf'⟩ := hXsum
-  use g
-  use f'
+      Submodule.span ℚ (Set.range basis!AsCharges) :=
+    Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
+  have hX : X ∈ Submodule.span ℚ (Set.range (basis!AsCharges)) :=
+    Submodule.add_mem _ hf hP
+  obtain ⟨f', hf'⟩ := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hX
+  use g, f'
   change P! f' = _ at hf'
   erw [hf']
   simp only [and_self, and_true, X]

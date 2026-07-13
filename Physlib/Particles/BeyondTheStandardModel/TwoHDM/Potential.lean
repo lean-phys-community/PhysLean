@@ -279,8 +279,7 @@ lemma massTerm_eq_gramVector (P : PotentialParameters) (H : TwoHiggsDoublet) :
 lemma gaugeGroupI_smul_massTerm (g : StandardModel.GaugeGroupI) (P : PotentialParameters)
     (H : TwoHiggsDoublet) :
     massTerm P (g • H) = massTerm P H := by
-  rw [massTerm_eq_gramVector, massTerm_eq_gramVector]
-  simp
+  simp [massTerm_eq_gramVector]
 
 @[simp]
 lemma massTerm_zero : massTerm 0 = 0 := by
@@ -291,8 +290,7 @@ lemma massTerm_stabilityCounterExample (H : TwoHiggsDoublet) :
     massTerm PotentialParameters.stabilityCounterExample H =
     2 * (⟪H.Φ1, H.Φ2⟫_ℂ).im := by
   simp [massTerm, PotentialParameters.stabilityCounterExample]
-  rw [show ⟪H.Φ2, H.Φ1⟫_ℂ = conj ⟪H.Φ1, H.Φ2⟫_ℂ from Eq.symm (conj_inner_symm H.Φ2 H.Φ1)]
-  rw [Complex.conj_im]
+  rw [← inner_conj_symm H.Φ2 H.Φ1, Complex.conj_im]
   ring_nf
 
 /-!
@@ -323,12 +321,8 @@ lemma quarticTerm_𝓵₄_expand (P : PotentialParameters) (H : TwoHiggsDoublet)
     + (P.𝓵₇ * ‖H.Φ2‖ ^ 2 * ⟪H.Φ1, H.Φ2⟫_ℂ + conj P.𝓵₇ * ‖H.Φ2‖ ^ 2 * ⟪H.Φ2, H.Φ1⟫_ℂ).re := by
   simp [quarticTerm]
   left
-  rw [Complex.sq_norm]
-  rw [← Complex.mul_re]
-  rw [← inner_conj_symm, ← Complex.normSq_eq_conj_mul_self]
-  simp only [inner_conj_symm, Complex.ofReal_re]
-  rw [← inner_conj_symm]
-  exact Complex.normSq_conj ⟪H.Φ2, H.Φ1⟫_ℂ
+  rw [Complex.sq_norm, ← inner_conj_symm H.Φ2 H.Φ1, ← Complex.mul_re, Complex.mul_conj,
+    Complex.ofReal_re]
 
 lemma quarticTerm_eq_gramVector (P : PotentialParameters) (H : TwoHiggsDoublet) :
     quarticTerm P H = ∑ a, ∑ b, H.gramVector a * H.gramVector b * P.η a b := by
@@ -343,8 +337,7 @@ lemma quarticTerm_eq_gramVector (P : PotentialParameters) (H : TwoHiggsDoublet) 
 lemma gaugeGroupI_smul_quarticTerm (g : StandardModel.GaugeGroupI) (P : PotentialParameters)
     (H : TwoHiggsDoublet) :
     quarticTerm P (g • H) = quarticTerm P H := by
-  rw [quarticTerm_eq_gramVector, quarticTerm_eq_gramVector]
-  simp
+  simp [quarticTerm_eq_gramVector]
 
 @[simp]
 lemma quarticTerm_zero : quarticTerm 0 = 0 := by
@@ -354,7 +347,6 @@ lemma quarticTerm_zero : quarticTerm 0 = 0 := by
 lemma quarticTerm_stabilityCounterExample (H : TwoHiggsDoublet) :
     quarticTerm .stabilityCounterExample H =
     (‖H.Φ1‖ ^ 2 + ‖H.Φ2‖ ^ 2 - 2 * (⟪H.Φ1, H.Φ2⟫_ℂ).re) ^ 2:= by
-  /- Proof by calculation. -/
   calc _ = (‖H.Φ1‖ ^ 2 + ‖H.Φ2‖ ^ 2) ^ 2
     + 2 * ‖⟪H.Φ1, H.Φ2⟫_ℂ‖ ^ 2
     + (⟪H.Φ1, H.Φ2⟫_ℂ ^ 2 + ⟪H.Φ2, H.Φ1⟫_ℂ ^ 2).re
@@ -362,39 +354,17 @@ lemma quarticTerm_stabilityCounterExample (H : TwoHiggsDoublet) :
         simp [quarticTerm, PotentialParameters.stabilityCounterExample, Complex.add_re,
           ← Complex.ofReal_pow]
         ring
-      _ = (‖H.Φ1‖ ^ 2 + ‖H.Φ2‖ ^ 2) ^ 2
-      + 4 * (⟪H.Φ1, H.Φ2⟫_ℂ).re ^ 2
-      - 2 * (‖H.Φ1‖ ^ 2 + ‖H.Φ2‖ ^ 2) * ((⟪H.Φ1, H.Φ2⟫_ℂ).re + (⟪H.Φ2, H.Φ1⟫_ℂ).re) := by
-        have h1 : 2 * ‖⟪H.Φ1, H.Φ2⟫_ℂ‖ ^ 2
-            + (⟪H.Φ1, H.Φ2⟫_ℂ ^ 2 + ⟪H.Φ2, H.Φ1⟫_ℂ ^ 2).re = 4 * (⟪H.Φ1, H.Φ2⟫_ℂ).re ^ 2 := by
-          rw [show ⟪H.Φ2, H.Φ1⟫_ℂ = conj ⟪H.Φ1, H.Φ2⟫_ℂ from Eq.symm (conj_inner_symm H.Φ2 H.Φ1),
-            ← Complex.normSq_eq_norm_sq, Complex.normSq_apply, sq, sq, sq]
-          simp only [Complex.add_re, Complex.mul_re, Complex.conj_re, Complex.conj_im]
-          ring
-        rw [← h1]
-        ring
       _ = (‖H.Φ1‖ ^ 2 + ‖H.Φ2‖ ^ 2 - 2 * (⟪H.Φ1, H.Φ2⟫_ℂ).re) ^ 2 := by
-        rw [show ⟪H.Φ2, H.Φ1⟫_ℂ = conj ⟪H.Φ1, H.Φ2⟫_ℂ from Eq.symm (conj_inner_symm H.Φ2 H.Φ1)]
-        rw [Complex.conj_re]
+        rw [← inner_conj_symm H.Φ2 H.Φ1, ← Complex.normSq_eq_norm_sq, Complex.normSq_apply]
+        simp only [Complex.add_re, Complex.mul_re, Complex.conj_re, Complex.conj_im, pow_two]
         ring
 
 lemma quarticTerm_stabilityCounterExample_eq_norm_pow_four (H : TwoHiggsDoublet) :
     quarticTerm .stabilityCounterExample H = ‖H.Φ1 - H.Φ2‖ ^ 4 := by
-  /- Proof by calculation. -/
-  calc _
-      _ = (‖H.Φ1‖ ^ 2 + ‖H.Φ2‖ ^ 2 - 2 * (⟪H.Φ1, H.Φ2⟫_ℂ).re) ^ 2 := by
-        rw [quarticTerm_stabilityCounterExample]
-      _ = (‖H.Φ1 - H.Φ2‖ ^ 2) ^ 2 := by
-        congr
-        have h1 (v : HiggsVec) : ‖v‖ ^ 2 = (⟪v, v⟫_ℂ).re := by
-          rw [inner_self_eq_norm_sq_to_K]
-          simp [← Complex.ofReal_pow]
-        rw [h1, h1, h1]
-        simp only [inner_sub_right, inner_sub_left, Complex.sub_re]
-        rw [show ⟪H.Φ2, H.Φ1⟫_ℂ = conj ⟪H.Φ1, H.Φ2⟫_ℂ from Eq.symm (conj_inner_symm H.Φ2 H.Φ1)]
-        rw [Complex.conj_re]
-        ring
-      _ = ‖H.Φ1 - H.Φ2‖ ^ 4 := by ring
+  rw [quarticTerm_stabilityCounterExample]
+  rw [show ‖H.Φ1 - H.Φ2‖ ^ 4 = (‖H.Φ1 - H.Φ2‖ ^ 2) ^ 2 from by ring, norm_sub_sq (𝕜 := ℂ),
+    RCLike.re_to_complex]
+  ring
 
 lemma quarticTerm_stabilityCounterExample_nonneg (H : TwoHiggsDoublet) :
     0 ≤ quarticTerm .stabilityCounterExample H := by
@@ -406,8 +376,7 @@ lemma massTerm_zero_of_quarticTerm_zero_stabilityCounterExample (H : TwoHiggsDou
     massTerm .stabilityCounterExample H = 0 := by
   rw [quarticTerm_stabilityCounterExample_eq_norm_pow_four] at h
   rw [massTerm_stabilityCounterExample]
-  simp at h
-  have h1 : H.Φ1 = H.Φ2 := by rw [← sub_eq_zero, h]
+  have h1 : H.Φ1 = H.Φ2 := by simpa [sub_eq_zero] using h
   simp [← Complex.ofReal_pow, h1]
 
 /-!
@@ -427,8 +396,7 @@ noncomputable def potential (P : PotentialParameters) (H : TwoHiggsDoublet) : �
 lemma gaugeGroupI_smul_potential (g : StandardModel.GaugeGroupI)
     (P : PotentialParameters) (H : TwoHiggsDoublet) :
     potential P (g • H) = potential P H := by
-  rw [potential, potential]
-  simp
+  simp [potential]
 
 @[simp]
 lemma potential_zero : potential 0 = 0 := by
@@ -585,10 +553,7 @@ lemma massTermReduced_lower_bound (P : PotentialParameters) (k : EuclideanSpace 
   · simp
     simp at hk
     have ha (a b : ℝ) (h : a ≤ 1) (ha : 0 ≤ a) (hb : 0 ≤ b) : a * b ≤ b := by nlinarith
-    apply ha
-    · exact hk
-    · exact norm_nonneg k
-    · exact norm_nonneg ξEuclid
+    exact ha _ _ hk (norm_nonneg k) (norm_nonneg ξEuclid)
   trans - ‖⟪k, ξEuclid⟫_ℝ‖
   · simp
     exact abs_real_inner_le_norm k ξEuclid
@@ -657,21 +622,15 @@ lemma potentialIsStable_iff_forall_gramVector (P : PotentialParameters) :
       ∑ μ : Fin 3, K (Sum.inr μ) ^ 2 ≤ K (Sum.inl 0) ^ 2 →
       c ≤ ∑ μ, P.ξ μ * K μ + ∑ a, ∑ b, K a * K b * P.η a b := by
   apply Iff.intro
-  · intro h
-    obtain ⟨c, hc⟩ := h
-    use c
-    intro v hv₀ hv_sum
+  · rintro ⟨c, hc⟩
+    refine ⟨c, fun v hv₀ hv_sum => ?_⟩
     obtain ⟨H, hH⟩ := gramVector_surjective v hv₀ hv_sum
-    apply (hc H).trans
-    apply le_of_eq
+    refine (hc H).trans (le_of_eq ?_)
     rw [potential, massTerm_eq_gramVector, quarticTerm_eq_gramVector]
     simp [hH]
-  · intro h
-    obtain ⟨c, hc⟩ := h
-    use c
-    intro H
-    apply (hc H.gramVector (gramVector_inl_nonneg H) (gramVector_inr_sum_sq_le_inl H)).trans
-    apply le_of_eq
+  · rintro ⟨c, hc⟩
+    refine ⟨c, fun H => (hc H.gramVector (gramVector_inl_nonneg H)
+      (gramVector_inr_sum_sq_le_inl H)).trans (le_of_eq ?_)⟩
     rw [potential, massTerm_eq_gramVector, quarticTerm_eq_gramVector]
 
 lemma potentialIsStable_iff_forall_euclid (P : PotentialParameters) :
@@ -687,19 +646,14 @@ lemma potentialIsStable_iff_forall_euclid (P : PotentialParameters) :
     Finset.sum_singleton, Prod.forall, Equiv.sumArrowEquivProdArrow_symm_apply_inl,
     Equiv.sumArrowEquivProdArrow_symm_apply_inr]
   rw [Equiv.forall_congr_left <| Equiv.funUnique (Fin 1) ℝ]
-  apply forall_congr'
-  intro K0
+  refine forall_congr' fun K0 => ?_
   rw [Equiv.forall_congr_left <| (WithLp.equiv 2 ((i : Fin 3) → (fun x => ℝ) i)).symm]
-  apply forall_congr'
-  intro K
+  refine forall_congr' fun K => ?_
   simp only [Fin.isValue, Equiv.funUnique_symm_apply, uniqueElim_const, Equiv.symm_symm,
     WithLp.equiv_apply]
-  refine imp_congr_right ?_
-  intro hle
-  simp only [PiLp.norm_sq_eq_of_L2]
-  simp only [Fin.isValue, Real.norm_eq_abs, sq_abs]
-  refine imp_congr_right ?_
-  intro hle'
+  refine imp_congr_right fun _ => ?_
+  simp only [PiLp.norm_sq_eq_of_L2, Fin.isValue, Real.norm_eq_abs, sq_abs]
+  refine imp_congr_right fun _ => ?_
   apply le_iff_le_of_cmp_eq_cmp
   congr 1
   simp [add_assoc, sq, Finset.sum_add_distrib]
@@ -718,17 +672,11 @@ lemma potentialIsStable_iff_forall_euclid_lt (P : PotentialParameters) :
       ∑ a, ∑ b, K a * K b * P.η (Sum.inr a) (Sum.inr b) := by
   rw [potentialIsStable_iff_forall_euclid]
   apply Iff.intro
-  · intro h
-    obtain ⟨c, hc⟩ := h
-    use c
-    apply And.intro
-    · simpa using hc 0 0 (by simp) (by simp)
-    · intro K0 K hk0 hle
-      exact hc K0 K hk0.le hle
-  · intro h
-    obtain ⟨c, hc₀, hc⟩ := h
-    use c
-    intro K0 K hK0 hle
+  · rintro ⟨c, hc⟩
+    refine ⟨c, ?_, fun K0 K hk0 hle => hc K0 K hk0.le hle⟩
+    simpa using hc 0 0 (by simp) (by simp)
+  · rintro ⟨c, hc₀, hc⟩
+    refine ⟨c, fun K0 K hK0 hle => ?_⟩
     by_cases hK0' : K0 = 0
     · subst hK0'
       simp_all
@@ -883,7 +831,6 @@ lemma massTermReduced_pos_of_quarticTermReduced_zero_potentialIsStable (P : Pote
   specialize hc k hk
   rw [hq] at hc
   simp only [le_refl, mul_zero, zero_mul, sq_nonpos_iff, true_and] at hc
-  generalize massTermReduced P k = j2 at *
   grind
 
 /-!
@@ -903,17 +850,14 @@ lemma potentialIsStable_of_strong (P : PotentialParameters)
     PotentialIsStable P := by
   rw [potentialIsStable_iff_massTermReduced_sq_le_quarticTermReduced]
   let S := Metric.closedBall (0 : EuclideanSpace ℝ (Fin 3)) 1
-  have S_isCompact : IsCompact S := isCompact_closedBall 0 1
   have S_nonEmpty : S.Nonempty := ⟨0, by simp [S]⟩
   obtain ⟨kmax, kmax_S, kmax_isMax⟩ := IsCompact.exists_isMaxOn
     (isCompact_closedBall 0 1) S_nonEmpty
     (f := fun k => (massTermReduced P k ^ 2) / (4 * quarticTermReduced P k)) <| by
     apply ContinuousOn.div₀
-    · apply Continuous.continuousOn
-      simp only [massTermReduced, Fin.isValue]
+    · simp only [massTermReduced, Fin.isValue]
       fun_prop
-    · apply Continuous.continuousOn
-      simp only [quarticTermReduced, Fin.isValue]
+    · simp only [quarticTermReduced, Fin.isValue]
       fun_prop
     · intro x hx
       specialize h x (by simpa using hx)
@@ -954,17 +898,12 @@ lemma forall_reduced_exists_not_potentialIsStable :
     - The mass term is of the form `-(k - z) · w` for some `w` orthogonal to `z`, so as `k - z`
       approaches orthogonal to `z`, the mass term becomes small only on the account that the abs of
       `k - z` becomes small. -/
-  use .stabilityCounterExample
-  apply And.intro
-  /- The condition that P is not stable. -/
-  · exact stabilityCounterExample_not_potentialIsStable
-  /- The condition on the reduced terms. -/
-  · refine fun k hk => And.intro (quarticTermReduced_stabilityCounterExample_nonneg k)
-      (fun hq => ?_)
-    simp [quarticTermReduced_stabilityCounterExample] at hq
-    simp only [PiLp.norm_sq_eq_of_L2, Real.norm_eq_abs, sq_abs, Fin.sum_univ_three,
-      Fin.isValue] at hk
-    have hk1 : k 1 = 0 := by nlinarith
-    rw [massTermReduced_stabilityCounterExample, hk1]
+  refine ⟨.stabilityCounterExample, stabilityCounterExample_not_potentialIsStable,
+    fun k hk => ⟨quarticTermReduced_stabilityCounterExample_nonneg k, fun hq => ?_⟩⟩
+  simp [quarticTermReduced_stabilityCounterExample] at hq
+  simp only [PiLp.norm_sq_eq_of_L2, Real.norm_eq_abs, sq_abs, Fin.sum_univ_three,
+    Fin.isValue] at hk
+  have hk1 : k 1 = 0 := by nlinarith
+  rw [massTermReduced_stabilityCounterExample, hk1]
 
 end TwoHiggsDoublet
