@@ -53,13 +53,11 @@ instance : (φ φ' : CreateAnnihilate) → Decidable (normalOrder φ φ')
 
 /-- Normal ordering is total. -/
 instance : Std.Total normalOrder where
-  total a b := by
-    cases a <;> cases b <;> simp [normalOrder]
+  total := by decide
 
 /-- Normal ordering is transitive. -/
 instance : IsTrans CreateAnnihilate normalOrder where
-  trans a b c := by
-    cases a <;> cases b <;> cases c <;> simp [normalOrder]
+  trans := by decide
 
 @[simp]
 lemma not_normalOrder_annihilate_iff_false (a : CreateAnnihilate) :

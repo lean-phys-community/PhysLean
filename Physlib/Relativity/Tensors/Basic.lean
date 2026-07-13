@@ -99,11 +99,8 @@ lemma congr_mid {n : ℕ} {c : Fin n → C} (c' : C) (p : Pure S c)
     (i j : Fin n) (h : i = j) (hi : c i = c') (hj : c j = c') :
     LinearEquiv.cast (R := k) (by rw [hi] : c i = c') (p i) =
     LinearEquiv.cast (R := k) (by rw [hj] : c j = c') (p j) := by
-  subst hi
-  simp only [LinearEquiv.cast_apply, cast_eq]
-  symm
-  apply congr_right
-  exact h
+  subst h hi
+  simp
 
 lemma map_mid_move_left {n n1 : ℕ} {c : Fin n → C} {c1 : Fin n1 → C} (p : Pure S c)
     (p' : Pure S c1) {c' : C}
@@ -141,16 +138,13 @@ lemma update_same {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : 
 
 lemma update_diff {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c) (i j : Fin n)
     (x : V (c i)) (hij : i ≠ j) : (update p i x) j = p j := by
-  simp_all [update, Function.update]
-  grind
+  rw [update_eq_function_update, Function.update_of_ne hij.symm]
 
 @[simp]
 lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fin (n + 1))]
     (p : Pure S c) (i : Fin (n + 1)) (j : Fin n) (x : V (c (i.succAbove j))) :
     update p (i.succAbove j) x i = p i := by
-  simp only [update]
-  rw [Function.update_of_ne]
-  exact Fin.ne_succAbove i j
+  rw [update_eq_function_update, Function.update_of_ne (Fin.ne_succAbove i j)]
 
 @[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → C} [inst : DecidableEq (Fin n)] (p : Pure S c)
@@ -175,26 +169,15 @@ def drop {n : ℕ} {c : Fin (n + 1) → C} (p : Pure S c) (i : Fin (n + 1)) :
 @[simp]
 lemma update_succAbove_drop {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fin (n + 1))]
     (p : Pure S c) (i : Fin (n + 1)) (k : Fin n) (x : V (c (i.succAbove k))) :
-    (update p (i.succAbove k) x).drop i = (p.drop i).update k x := by
-  ext j
-  simp only [Function.comp_apply, drop, update]
-  by_cases h : j = k
-  · subst h
-    simp
-  · rw [Function.update_of_ne h, Function.update_of_ne]
-    · rfl
-    · simp only [ne_eq]
-      rw [Function.Injective.eq_iff (Fin.succAbove_right_injective (p := i))]
-      exact h
+    (update p (i.succAbove k) x).drop i = (p.drop i).update k x :=
+  Function.update_comp_eq_of_injective' p Fin.succAbove_right_injective k x
 
 @[simp]
 lemma update_drop_self {n : ℕ} {c : Fin (n + 1) → C} [inst : DecidableEq (Fin (n + 1))]
     (p : Pure S c) (i : Fin (n + 1)) (x : V (c i)) :
     (update p i x).drop i = p.drop i := by
-  ext k
-  simp only [Function.comp_apply, drop, update]
-  rw [Function.update_of_ne]
-  exact Fin.succAbove_ne i k
+  ext j
+  simp [drop, update_eq_function_update]
 
 /-!
 
@@ -217,10 +200,8 @@ lemma component_eq {n : ℕ} {c : Fin n → C} (p : Pure S c) (φ : ComponentIdx
 lemma component_eq_drop {n : ℕ} {c : Fin (n + 1) → C} (p : Pure S c) (i : Fin (n + 1))
     (φ : ComponentIdx c) :
     p.component φ = ((b (c i)).repr (p i) (φ i)) *
-    ((drop p i).component (fun j => φ (i.succAbove j))) := by
-  simp only [component, Function.comp_apply]
-  rw [Fin.prod_univ_succAbove _ i]
-  rfl
+    ((drop p i).component (fun j => φ (i.succAbove j))) :=
+  Fin.prod_univ_succAbove (fun j => (b (c j)).repr (p j) (φ j)) i
 
 @[simp]
 lemma component_update_add {n : ℕ} [inst : DecidableEq (Fin n)]
@@ -230,9 +211,7 @@ lemma component_update_add {n : ℕ} [inst : DecidableEq (Fin n)]
     (update p i y).component b := by
   cases n
   · exact Fin.elim0 i
-  rename_i n
-  rw [component_eq_drop _ i, component_eq_drop _ i, component_eq_drop _ i]
-  simp [add_mul]
+  · simp [component_eq_drop _ i, add_mul]
 
 @[simp]
 lemma component_update_smul {n : ℕ} [inst : DecidableEq (Fin n)]
@@ -241,10 +220,7 @@ lemma component_update_smul {n : ℕ} [inst : DecidableEq (Fin n)]
     (update p i (x • y)).component b = x * (update p i y).component b := by
   cases n
   · exact Fin.elim0 i
-  rename_i n
-  rw [component_eq_drop _ i, component_eq_drop _ i]
-  simp only [update_same, map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, update_drop_self]
-  ring
+  · simp [component_eq_drop _ i, mul_assoc]
 
 /-- The multilinear map taking pure tensors `p` to a map `ComponentIdx c → k` which when
   evaluated returns the components of `p`. -/
@@ -274,22 +250,7 @@ noncomputable def basisVector {n : ℕ} (c : Fin n → C) (φ : ComponentIdx (S 
 @[simp]
 lemma component_basisVector {n : ℕ} (c : Fin n → C) (b1 b2 : ComponentIdx (S := S) c) :
     (basisVector c b1).component b2 = if b1 = b2 then 1 else 0 := by
-  simp only [basisVector, component_eq, funext_iff]
-  simp only [Basis.repr_self]
-  by_cases h : b1 = b2
-  · subst h
-    simp
-  · rw [funext_iff] at h
-    simp only [not_forall] at h
-    obtain ⟨i, hi⟩ := h
-    split
-    next h => simp_all only [not_true_eq_false]
-    next h =>
-      simp_all only [not_forall]
-      obtain ⟨w, h⟩ := h
-      refine Finset.prod_eq_zero (Finset.mem_univ i) ?_
-      rw [Finsupp.single_eq_of_ne]
-      exact fun a => hi (id (Eq.symm a))
+  simp [component_eq, basisVector, Finsupp.single_apply, Fintype.prod_boole, funext_iff]
 
 end Pure
 
@@ -297,12 +258,9 @@ lemma induction_on_pure {n : ℕ} {c : Fin n → C} {P : S.Tensor c → Prop}
     (h : ∀ (p : Pure S c), P p.toTensor)
     (hsmul : ∀ (r : k) t, P t → P (r • t))
     (hadd : ∀ t1 t2, P t1 → P t2 → P (t1 + t2)) (t : S.Tensor c) : P t := by
-  refine PiTensorProduct.induction_on' t ?_ ?_
-  · intro r p
-    simp only [PiTensorProduct.tprodCoeff_eq_smul_tprod]
-    exact hsmul r _ (h p)
-  · intro t1 t2
-    exact fun a a_1 => hadd t1 t2 a a_1
+  refine PiTensorProduct.induction_on' t (fun r p => ?_) hadd
+  simp only [PiTensorProduct.tprodCoeff_eq_smul_tprod]
+  exact hsmul r _ (h p)
 
 /-!
 
@@ -318,10 +276,8 @@ def componentMap {n : ℕ} (c : Fin n → C) : S.Tensor c →ₗ[k] (ComponentId
 
 @[simp]
 lemma componentMap_pure {n : ℕ} (c : Fin n → C)
-    (p : Pure S c) : componentMap c (p.toTensor) = Pure.componentMap c p := by
-  simp only [componentMap, Pure.toTensor]
-  change (PiTensorProduct.lift (Pure.componentMap c)) ((PiTensorProduct.tprod k) p) = _
-  simp
+    (p : Pure S c) : componentMap c (p.toTensor) = Pure.componentMap c p :=
+  PiTensorProduct.lift.tprod p
 
 /-- The tensor created from it's components. -/
 def ofComponents {n : ℕ} (c : Fin n → C) :
@@ -342,30 +298,17 @@ lemma componentMap_ofComponents {n : ℕ} (c : Fin n → C) (f : ComponentIdx c 
 lemma ofComponents_componentMap {n : ℕ} (c : Fin n → C) (t : S.Tensor c) :
     ofComponents c (componentMap c t) = t := by
   simp only [ofComponents, LinearMap.coe_mk, AddHom.coe_mk]
-  apply induction_on_pure ?_ ?_ ?_ t
-  · intro p
+  induction t using induction_on_pure with
+  | h p =>
     simp only [componentMap_pure, Pure.componentMap_apply]
-    have h1 (x : ComponentIdx c) : p.component x • (Pure.basisVector c x).toTensor =
-        Pure.toTensor (fun i => ((b (c i)).repr (p i)) (x i) • (b (c i)) (x i)) := by
-      rw [Pure.component_eq, Pure.toTensor]
-      exact Eq.symm (MultilinearMap.map_smul_univ (PiTensorProduct.tprod k)
-          (fun i => ((b (c i)).repr (p i)) (x i)) fun i => (b (c i)) (x i))
-    conv_lhs =>
-      enter [2, x]
-      rw [h1]
+    simp_rw [Pure.component_eq, Pure.toTensor, ← MultilinearMap.map_smul_univ, Pure.basisVector]
     trans (PiTensorProduct.tprod k) fun i =>
       ∑ x, ((b (c i)).repr (p i)) x • (b (c i)) x
-    · exact (MultilinearMap.map_sum (PiTensorProduct.tprod k) fun i j =>
-        ((b (c i)).repr (p i)) j • (b (c i)) j).symm
-    congr
-    funext i
-    exact Basis.sum_equivFun (b (c i)) (p i)
-  · intro r t ht
-    simp only [map_smul, Pi.smul_apply, smul_eq_mul, ← smul_smul]
-    conv_rhs => rw [← ht]
-    exact Eq.symm Finset.smul_sum
-  · intro t1 t2 h1 h2
-    simp [add_smul, Finset.sum_add_distrib, h1, h2]
+    · exact (MultilinearMap.map_sum _ fun i j => ((b (c i)).repr (p i)) j • (b (c i)) j).symm
+    exact congrArg _ (funext fun i => Basis.sum_equivFun (b (c i)) (p i))
+  | hsmul r t ht =>
+    simp only [map_smul, Pi.smul_apply, smul_eq_mul, ← smul_smul, ← Finset.smul_sum, ht]
+  | hadd t1 t2 h1 h2 => simp [add_smul, Finset.sum_add_distrib, h1, h2]
 
 /-- The basis of tensors. -/
 def basis {n : ℕ} (c : Fin n → C) : Basis (ComponentIdx (S := S) c) k (S.Tensor c) where
@@ -376,14 +319,7 @@ def basis {n : ℕ} (c : Fin n → C) : Basis (ComponentIdx (S := S) c) k (S.Ten
 lemma basis_apply {n : ℕ} (c : Fin n → C) (φ : ComponentIdx (S := S) c) :
     basis c φ = (Pure.basisVector c φ).toTensor := by
   change ofComponents c _ = _
-  simp only [ofComponents, LinearEquiv.coe_toEquiv_symm, LinearEquiv.symm_symm, EquivLike.coe_coe,
-    Finsupp.linearEquivFunOnFinite_single, LinearMap.coe_mk, AddHom.coe_mk]
-  rw [Finset.sum_eq_single φ]
-  · simp
-  · intro b' _ hb
-    rw [Pi.single_apply]
-    simp [hb]
-  · simp
+  simp [ofComponents, Finsupp.linearEquivFunOnFinite_single, Pi.single_apply, ite_smul]
 
 @[simp]
 lemma basis_repr_pure {n : ℕ} (c : Fin n → C)
@@ -397,18 +333,10 @@ lemma induction_on_basis {n : ℕ} {c : Fin n → C} {P : S.Tensor c → Prop}
     (h : ∀ b, P (basis c b)) (hzero : P 0)
     (hsmul : ∀ (r : k) t, P t → P (r • t))
     (hadd : ∀ t1 t2, P t1 → P t2 → P (t1 + t2)) (t : S.Tensor c) : P t := by
-  let Pt (t : S.Tensor c)
-      (ht : t ∈ Submodule.span k (Set.range (basis c))) := P t
-  change Pt t (Basis.mem_span _ t)
-  apply Submodule.span_induction
-  · intro x hx
-    obtain ⟨b, rfl⟩ := Set.mem_range.mp hx
-    exact h b
-  · simp [Pt, hzero]
-  · intro t1 t2 h1 h2
-    exact fun a a_1 => hadd t1 t2 a a_1
-  · intro r t ht
-    exact fun a => hsmul r t a
+  refine Submodule.span_induction ?_ hzero (fun t1 t2 _ _ => hadd t1 t2)
+    (fun r t _ => hsmul r t) (Basis.mem_span (basis c) t)
+  rintro x ⟨b, rfl⟩
+  exact h b
 
 /-- `componentMap` is the basis representation `(basis c).repr` definitionally; this bridges the two
 notations wherever a component computation meets a `repr` rewrite. -/
@@ -418,8 +346,7 @@ lemma componentMap_eq_repr {n : ℕ} (c : Fin n → C) (t : S.Tensor c)
 /-- Two tensors with the same colour sequence are equal when all their components agree. -/
 lemma componentMap_ext {n : ℕ} {c : Fin n → C} {t₁ t₂ : S.Tensor c}
     (h : ∀ b, componentMap c t₁ b = componentMap c t₂ b) : t₁ = t₂ := by
-  rw [← ofComponents_componentMap c t₁, ← ofComponents_componentMap c t₂]
-  congr 1; funext b; exact h b
+  rw [← ofComponents_componentMap c t₁, ← ofComponents_componentMap c t₂, funext h]
 
 end Basis
 
@@ -516,20 +443,17 @@ noncomputable instance actionT : MulAction G (S.Tensor c) where
     rfl
 
 lemma actionT_pure {g : G} {p : Pure S c} :
-    g • p.toTensor = Pure.toTensor (g • p) := by
-  rw [actionT_eq, Pure.toTensor, PiTensorProduct.map_tprod]
-  rfl
+    g • p.toTensor = Pure.toTensor (g • p) :=
+  PiTensorProduct.map_tprod (R := k) (fun i => rep (c i) g) p
 
 lemma actionT_add {g : G} {t1 t2 : S.Tensor c} :
     g • (t1 + t2) = g • t1 + g • t2 := by
-  rw [actionT_eq, actionT_eq, actionT_eq]
-  simp
+  simp [actionT_eq]
 
 @[simp]
 lemma actionT_smul {g : G} {r : k} {t : S.Tensor c} :
     g • (r • t) = r • (g • t) := by
-  rw [actionT_eq, actionT_eq (S := S)]
-  simp
+  simp [actionT_eq]
 
 lemma actionT_zero {g : G} : g • (0 : S.Tensor c) = 0 := by
   simp [actionT_eq]
@@ -567,25 +491,14 @@ lemma Pure.permP_basisVector {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     Pure.basisVector c1 (fun i => basisIdxCongr (by simp [h.preserve_color]) (φ (σ i))) := by
   ext i
   simp only [permP, basisVector]
-  have h1 {c1 c2 : C} (h : c1 = c2) (x : basisIdx c1) :
-      LinearEquiv.cast (R := k) (by simp [h]) ((b (c1)) x) =
-      (b c2) (basisIdxCongr (by simp [h]) x) := by
-    subst h
-    simp
-  apply h1
-  simp [h.preserve_color]
+  apply map_basis_eq
 
 lemma Pure.permP_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (g : G) (p : Pure S c) :
     Pure.permP σ h (g • p) = g • Pure.permP σ h p := by
   ext i
   simp only [permP, actionP_eq]
-  generalize p (σ i) = p
-  generalize_proofs h1 h2
-  generalize c1 i = c' at *
-  generalize c (σ i) = c at *
-  subst h2
-  simp
+  exact rep_cast _ _
 
 /-- The reindexing of a tensor based on a map `σ : Fin m → Fin n` of indices
   satisfying `IsReindexing`. -/
@@ -599,7 +512,7 @@ lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (p : Pure S c) :
     permT σ h p.toTensor = (p.permP σ h).toTensor := by
   simp only [permT, Pure.toTensor, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
-    PiTensorProduct.reindex_tprod, PiTensorProduct.map_tprod, LinearEquiv.cast_apply]
+    PiTensorProduct.reindex_tprod, PiTensorProduct.map_tprod]
   rfl
 
 set_option backward.isDefEq.respectTransparency false in
@@ -612,17 +525,10 @@ lemma Pure.permP_id_self {n : ℕ} {c : Fin n → C} (p : Pure S c) :
 @[simp]
 lemma permT_id_self {n : ℕ} {c : Fin n → C} (t : S.Tensor c) :
     permT (id : Fin n → Fin n) (by simp : IsReindexing c c id) t = t := by
-  let P (t : S.Tensor c) := permT (id : Fin n → Fin n) (by simp : IsReindexing c c id) t = t
-  change P t
-  apply induction_on_pure
-  · intro p
-    simp [P]
-    rw [permT_pure]
-    simp
-  · intro r t ht
-    simp [P, ht]
-  · intro t1 t2 h1 h2
-    simp [P, h1, h2]
+  induction t using induction_on_pure with
+  | h p => simp [permT_pure]
+  | hsmul r t ht => simp [ht]
+  | hadd t1 t2 h1 h2 => simp [h1, h2]
 
 lemma permT_congr_eq_id {n : ℕ} {c : Fin n → C} (t : S.Tensor c)
     (σ : Fin n → Fin n) (hσ : IsReindexing c c σ) (h : σ = id) :
@@ -640,16 +546,10 @@ lemma permT_congr_eq_id' {n : ℕ} {c : Fin n → C} (t t1 : S.Tensor c)
 lemma permT_equivariant {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (g : G) (t : S.Tensor c) :
     permT σ h (g • t) = g • permT σ h t := by
-  apply induction_on_pure (t := t)
-  · intro p
-    simp [actionT_pure, permT_pure]
-    congr
-    simp [Pure.permP_equivariant]
-  · intro r t ht
-    rw [actionT_smul, map_smul]
-    simp [ht]
-  · intro t1 t2 h1 h2
-    simp [h1, h2]
+  induction t using induction_on_pure with
+  | h p => simp [actionT_pure, permT_pure, Pure.permP_equivariant]
+  | hsmul r t ht => simp [ht]
+  | hadd t1 t2 h1 h2 => simp [h1, h2]
 
 @[congr]
 lemma Pure.permP_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
@@ -674,26 +574,18 @@ lemma Pure.permP_permP {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2
     (h2 : IsReindexing c1 c2 σ2) (p : Pure S c) :
     Pure.permP σ2 h2 (Pure.permP σ h p) = Pure.permP (σ ∘ σ2) (h.comp h2) p := by
   ext i
-  simp [permP, Pure.permP, Function.comp_apply]
+  simp [permP]
 
 @[simp]
 lemma permT_permT {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fin m2 → C}
     {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : IsReindexing c c1 σ)
     (h2 : IsReindexing c1 c2 σ2) (t : S.Tensor c) :
     permT σ2 h2 (permT σ h t) = permT (σ ∘ σ2) (h.comp h2) t := by
-  let P (t : S.Tensor c) := permT σ2 h2 (permT σ h t) = permT (σ ∘ σ2) (h.comp h2) t
-  change P t
-  apply induction_on_basis
-  · intro b
-    simp only [P]
-    rw [basis_apply, permT_pure, permT_pure, permT_pure]
-    simp only [Pure.permP_basisVector, basisIdxCongr_apply_apply, Function.comp_apply]
-    rfl
-  · simp [P]
-  · intro r t h1
-    simp_all [P]
-  · intro t1 t2 h1 h2
-    simp_all [P]
+  induction t using induction_on_basis with
+  | h b => rw [basis_apply, permT_pure, permT_pure, permT_pure, Pure.permP_permP]
+  | hzero => simp
+  | hsmul r t h1 => simp [h1]
+  | hadd t1 t2 h1 h2 => simp [h1, h2]
 
 lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (t : S.Tensor c)
@@ -701,15 +593,13 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
     (basis c1).repr (permT σ h t) φ =
     (basis c).repr t (fun i =>
       basisIdxCongr (by simp [IsReindexing.inv_perserve_color]) (φ (h.inv σ i))) := by
-  apply induction_on_basis (t := t)
-  · intro b'
-    rw [basis_apply]
-    rw [permT_pure, Pure.permP_basisVector, ← basis_apply, ← basis_apply]
-    simp only [Basis.repr_self]
-    rw [Finsupp.single_apply, Finsupp.single_apply]
+  induction t using induction_on_basis with
+  | h b' =>
+    rw [basis_apply, permT_pure, Pure.permP_basisVector, ← basis_apply, ← basis_apply]
+    simp only [Basis.repr_self, Finsupp.single_apply]
     congr 1
     simp only [eq_iff_iff]
-    apply Iff.intro
+    constructor
     · intro h'
       funext x
       simpa [← h'] using ComponentIdx.congr_right _ _ _
@@ -718,52 +608,25 @@ lemma permT_basis_repr_symm_apply {n m : ℕ} {c : Fin n → C} {c1 : Fin m → 
       funext x
       simpa [h'] using (ComponentIdx.congr_right _ _ _
         (IsReindexing.apply_inv_apply σ h x).symm).symm
-  · simp
-  · intro r t h
-    simp [h]
-  · intro t1 t2 h1 h2
-    simp [h1, h2]
+  | hzero => simp
+  | hsmul r t h => simp [h]
+  | hadd t1 t2 h1 h2 => simp [h1, h2]
 
 lemma permT_basis {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ)
     (b : ComponentIdx c) :
     (permT σ h) (basis (S := S) c b) = basis c1 (fun i =>
       basisIdxCongr (by simp [h.2]) (b (σ i))) := by
-  apply (basis c1).repr.injective
-  ext b'
-  rw [permT_basis_repr_symm_apply]
-  simp only [Basis.repr_self, Finsupp.single_apply]
-  congr 1
-  simp only [eq_iff_iff]
-  constructor
-  · intro h
-    rw [h]
-    ext i
-    simp only [basisIdxCongr_apply_apply]
-    refine Eq.symm (ComponentIdx.congr_right b' i (IsReindexing.inv σ _ (σ i)) ?_)
-    simp [IsReindexing.apply_inv_apply]
-  · rintro rfl
-    ext i
-    simp only [basisIdxCongr_apply_apply]
-    apply ComponentIdx.congr_right
-    simp [IsReindexing.inv_apply_apply]
+  rw [basis_apply, permT_pure, Pure.permP_basisVector, ← basis_apply]
 
 lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (t : S.Tensor c) :
     permT σ h t = 0 ↔ t = 0 := by
-  apply Iff.intro
-  · intro h'
-    trans permT (h.inv σ) (IsReindexing.symm h) ((permT σ h) t)
-    · rw [permT_permT]
-      rw [permT_congr_eq_id']
-      · funext x
-        simp [IsReindexing.inv_apply_apply]
-      · rfl
-    · rw [h']
-      simp
-  · intro hzero
-    rw [hzero]
-    simp
+  refine ⟨fun h' => ?_, fun h' => by simp [h']⟩
+  have h2 := congrArg (permT (h.inv σ) h.symm) h'
+  rwa [permT_permT, map_zero, permT_congr_eq_id] at h2
+  funext x
+  simp [IsReindexing.inv_apply_apply]
 
 /-!
 ## field
@@ -785,10 +648,7 @@ lemma toField_injective {c : Fin 0 → C} :
 @[simp]
 lemma toField_pure {c : Fin 0 → C} (p : Pure S c) :
     toField (p.toTensor : S.Tensor c) = 1 := by
-  rw [← toField_default (S := S)]
-  congr
-  ext i
-  exact Fin.elim0 i
+  rw [Subsingleton.elim p default, toField_default]
 
 lemma toField_permT {c c1 : Fin 0 → C} (σ : Fin 0 → Fin 0)
     (h : IsReindexing c c1 σ) (t : S.Tensor c) :
@@ -812,25 +672,16 @@ lemma toField_eq_repr {c : Fin 0 → C} (t : Tensor S c) :
     t.toField = (basis c).repr t (fun j => Fin.elim0 j) := by
   obtain ⟨t, rfl⟩ := (basis c).repr.symm.surjective t
   simp only [Basis.repr_symm_apply, Basis.repr_linearCombination]
-  rw [@Finsupp.linearCombination_unique]
-  rw [map_smul]
-  conv_lhs =>
-    enter [2]
-    rw [toField_basis_default (c := c)]
-  simp only [smul_eq_mul, mul_one]
+  rw [Finsupp.linearCombination_unique, map_smul, toField_basis_default, smul_eq_mul, mul_one]
   rfl
 
 @[simp]
 lemma toField_equivariant {c : Fin 0 → C} (g : G) (t : Tensor S c) :
     toField (g • t) = toField t := by
-  apply induction_on_pure (t := t)
-  · intro p
-    rw [actionT_pure]
-    simp
-  · intro r t hp
-    simp [hp]
-  · intro t1 t2 hp1 hp2
-    simp [hp1, hp2]
+  induction t using induction_on_pure with
+  | h p => simp [actionT_pure]
+  | hsmul r t hp => simp [hp]
+  | hadd t1 t2 hp1 hp2 => simp [hp1, hp2]
 
 lemma eq_smul_toField {c : Fin 0 → C} (t : Tensor S c) :
     t = toField t • (basis c (@default (ComponentIdx (S := S) c) Unique.instInhabited)) := by

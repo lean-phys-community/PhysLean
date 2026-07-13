@@ -65,7 +65,7 @@ lemma add_val {d: ℕ} (x y : Space d) :
 @[simp]
 lemma add_apply {d : ℕ} (x y : Space d) (i : Fin d) :
     (x + y) i = x i + y i := by
-  simp [add_val]
+  simp
 
 instance {d} : AddCommMonoid (Space d) where
   add_assoc a b c:= by
@@ -96,9 +96,8 @@ lemma nsmul_apply {d : ℕ} (n : ℕ) (a : Space d) (i : Fin d) :
 
 lemma eq_vadd_zero {d} (s : Space d) :
     ∃ v : EuclideanSpace ℝ (Fin d), s = v +ᵥ (0 : Space d) := by
-  obtain ⟨v, h⟩ := vadd_transitive 0 s
-  use v
-  rw [h]
+  obtain ⟨v, rfl⟩ := vadd_transitive 0 s
+  exact ⟨v, rfl⟩
 
 @[simp]
 lemma add_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
@@ -135,19 +134,16 @@ instance {d} : Module ℝ (Space d) where
     simp
   mul_smul a b x := by
     ext i
-    simp only [smul_apply]
-    ring
+    simp [mul_assoc]
   smul_add a x y := by
     ext i
-    simp only [smul_apply, add_apply]
-    ring
+    simp [mul_add]
   smul_zero a := by
     ext i
     simp
   add_smul a b x := by
     ext i
-    simp only [smul_apply, add_apply]
-    ring
+    simp [add_mul]
   zero_smul x := by
     ext i
     simp
@@ -167,21 +163,17 @@ lemma norm_eq {d} (p : Space d) : ‖p‖ = √ (∑ i, (p i) ^ 2) := by
 @[simp]
 lemma abs_eval_le_norm {d} (p : Space d) (i : Fin d) :
     |p i| ≤ ‖p‖ := by
-  simp [norm_eq]
-  refine Real.abs_le_sqrt ?_
-  trans ∑ j ∈ {i}, (p j) ^ 2
-  · simp
-  refine Finset.sum_le_univ_sum_of_nonneg (fun i => by positivity)
+  rw [norm_eq]
+  exact Real.abs_le_sqrt
+    (Finset.single_le_sum (f := fun j => (p j) ^ 2) (fun j _ => by positivity) (Finset.mem_univ i))
 
 lemma norm_sq_eq {d} (p : Space d) :
     ‖p‖ ^ 2 = ∑ i, (p i) ^ 2 := by
   rw [norm_eq]
-  refine Real.sq_sqrt ?_
-  positivity
+  exact Real.sq_sqrt (by positivity)
 
-lemma point_dim_zero_eq (p : Space 0) : p = 0 := by
-  ext i
-  fin_cases i
+lemma point_dim_zero_eq (p : Space 0) : p = 0 :=
+  Subsingleton.elim p 0
 
 @[simp]
 lemma norm_vadd_zero {d} (v : EuclideanSpace ℝ (Fin d)) :
@@ -221,7 +213,7 @@ noncomputable instance {d} : AddCommGroup (Space d) where
 @[simp]
 lemma sub_apply {d} (p q : Space d) (i : Fin d) :
     (p - q) i = p i - q i := by
-  simp [sub_eq_add_neg, neg_apply, add_apply]
+  simp [sub_eq_add_neg]
 
 @[simp]
 lemma sub_val {d} (p q : Space d) :
@@ -231,7 +223,7 @@ lemma sub_val {d} (p q : Space d) :
 lemma vadd_zero_sub_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
     (v1 +ᵥ (0 : Space d)) - (v2 +ᵥ (0 : Space d)) = (v1 - v2) +ᵥ (0 : Space d) := by
   ext i
-  simp [sub_apply, vadd_apply]
+  simp
 
 @[simp]
 lemma dist_eq_norm {d} (p q : Space d) :
@@ -239,17 +231,13 @@ lemma dist_eq_norm {d} (p q : Space d) :
 
 noncomputable instance {d} : SeminormedAddCommGroup (Space d) where
   dist_eq x y := by
-    simp [dist_eq_norm, norm_eq]
-    congr
-    funext i
-    ring
+    simp [dist_eq_norm, norm_eq, sub_apply]
+    exact congrArg _ (Finset.sum_congr rfl fun i _ => by ring)
 
 noncomputable instance : NormedAddCommGroup (Space d) where
   dist_eq x y := by
-    simp [dist_eq_norm, norm_eq]
-    congr
-    funext i
-    ring
+    simp [dist_eq_norm, norm_eq, sub_apply]
+    exact congrArg _ (Finset.sum_congr rfl fun i _ => by ring)
 
 instance {d} : Inner ℝ (Space d) where
   inner p q := ∑ i, p i * q i
@@ -257,10 +245,7 @@ instance {d} : Inner ℝ (Space d) where
 @[simp]
 lemma inner_vadd_zero {d} (v1 v2 : EuclideanSpace ℝ (Fin d)) :
     inner ℝ (v1 +ᵥ (0 : Space d)) (v2 +ᵥ (0 : Space d)) = Inner.inner ℝ v1 v2 := by
-  simp [inner, vadd_apply]
-  apply Finset.sum_congr rfl
-  intro i hi
-  ring
+  simp [inner, vadd_apply, mul_comm]
 
 lemma inner_apply {d} (p q : Space d) :
     inner ℝ p q = ∑ i, p i * q i := by rfl
@@ -268,27 +253,22 @@ lemma inner_apply {d} (p q : Space d) :
 instance {d} : InnerProductSpace ℝ (Space d) where
   norm_smul_le a x := by
     obtain ⟨v, rfl⟩ := eq_vadd_zero x
-    simp only [smul_vadd_zero, norm_vadd_zero, Real.norm_eq_abs]
-    exact norm_smul_le a v
+    simpa only [smul_vadd_zero, norm_vadd_zero, Real.norm_eq_abs] using norm_smul_le a v
   norm_sq_eq_re_inner x := by
     obtain ⟨v, rfl⟩ := eq_vadd_zero x
     simp
   conj_inner_symm x y := by
-    simp [inner_apply]
-    congr
-    funext i
-    ring
+    simp [inner_apply, mul_comm]
   add_left x y z := by
     obtain ⟨v1, rfl⟩ := eq_vadd_zero x
     obtain ⟨v2, rfl⟩ := eq_vadd_zero y
     obtain ⟨v3, rfl⟩ := eq_vadd_zero z
-    simp only [add_vadd_zero, inner_vadd_zero]
-    exact InnerProductSpace.add_left v1 v2 v3
+    simpa only [add_vadd_zero, inner_vadd_zero] using InnerProductSpace.add_left v1 v2 v3
   smul_left x y a := by
     obtain ⟨v1, rfl⟩ := eq_vadd_zero x
     obtain ⟨v2, rfl⟩ := eq_vadd_zero y
-    simp only [smul_vadd_zero, inner_vadd_zero, conj_trivial]
-    exact InnerProductSpace.smul_left v1 v2 a
+    simpa only [smul_vadd_zero, inner_vadd_zero, conj_trivial]
+      using InnerProductSpace.smul_left v1 v2 a
 
 lemma norm_smul_sphere {d : ℕ} (n : ↑(Metric.sphere (0 : Space d) 1))
     {r : ℝ} (hr : 0 ≤ r) :
@@ -393,9 +373,7 @@ lemma basis_repr_symm_apply {d} (v : EuclideanSpace ℝ (Fin d)) (i : Fin d) :
 
 lemma basis_apply {d} (i j : Fin d) :
     basis i j = if i = j then 1 else 0 := by
-  simp [apply_eq_basis_repr_apply]
-  congr 1
-  exact Lean.Grind.eq_congr' rfl rfl
+  simp [apply_eq_basis_repr_apply, eq_comm]
 
 @[simp]
 lemma basis_self {d} (i : Fin d) : basis i i = 1 := by
@@ -414,8 +392,8 @@ lemma basis_inner {d} (i : Fin d) (p : Space d) :
 open InnerProductSpace
 
 lemma basis_repr_inner_eq {d} (p : Space d) (v : EuclideanSpace ℝ (Fin d)) :
-    ⟪basis.repr p, v⟫_ℝ = ⟪p, basis.repr.symm v⟫_ℝ := by
-  exact LinearIsometryEquiv.inner_map_eq_flip basis.repr p v
+    ⟪basis.repr p, v⟫_ℝ = ⟪p, basis.repr.symm v⟫_ℝ :=
+  LinearIsometryEquiv.inner_map_eq_flip basis.repr p v
 
 instance {d : ℕ} : FiniteDimensional ℝ (Space d) :=
   Module.Basis.finiteDimensional_of_finite (h := basis.toBasis)
@@ -445,23 +423,7 @@ lemma basis_induction_on {d} {P : Space d → Prop}
     (hadd : ∀ p1 p2, P p1 → P p2 → P (p1 + p2))
     (hsmul : ∀ (c : ℝ) p, P p → P (c • p)) (p : Space d) : P p := by
   rw [← OrthonormalBasis.sum_repr basis p]
-  have hp_sum (s : Finset (Fin d)) (f : (Fin d) → Space d)
-    (hi : ∀ i ∈ s, P (f i)) : P (∑ x ∈ s, f x) := by
-    induction' s using Finset.induction with i s hi ih
-    · simpa using hzero
-    · rw [Finset.sum_insert]
-      apply hadd
-      · apply hi
-        simp
-      · apply ih
-        intro i h'
-        apply hi
-        simp_all
-      simp_all
-  apply hp_sum
-  intro i _
-  apply hsmul
-  apply hb
+  exact Finset.sum_induction _ P hadd hzero fun i _ => hsmul _ _ (hb i)
 /-!
 
 ## Coordinates
@@ -492,9 +454,8 @@ noncomputable def coordCLM {d} (μ : Fin d) : Space d →L[ℝ] ℝ where
 open ContDiff
 
 @[fun_prop]
-lemma coord_contDiff {i} : ContDiff ℝ ∞ (fun x : Space d => x.coord i) := by
-  change ContDiff ℝ ∞ (coordCLM i)
-  fun_prop
+lemma coord_contDiff {i} : ContDiff ℝ ∞ (fun x : Space d => x.coord i) :=
+  (coordCLM i).contDiff
 
 lemma coordCLM_apply (μ : Fin d) (p : Space d) :
     coordCLM μ p = coord μ p := by
@@ -564,20 +525,15 @@ lemma fderiv_val {d : ℕ} (p : Space d) :
 @[simp]
 lemma fderiv_eval_apply {d : ℕ} (p y : Space d) (i : Fin d) :
     fderiv ℝ (fun p => p.val i) p y = y i := by
-  trans fderiv ℝ (Space.coordCLM i) p y
-  · congr
-    funext i
-    simp [Space.coordCLM, Space.coord_apply]
-  simp only [ContinuousLinearMap.fderiv]
-  simp [Space.coordCLM, Space.coord_apply]
+  have h : (fun p : Space d => p.val i) = ⇑(coordCLM i) :=
+    funext fun q => by simp [coordCLM, coord_apply]
+  rw [h, ContinuousLinearMap.fderiv]
+  simp [coordCLM, coord_apply]
 
 @[fun_prop]
 lemma contDiffOn_vadd (s : Space d) :
-    ContDiffOn ℝ ω (fun (v : EuclideanSpace ℝ (Fin d)) => v +ᵥ s) Set.univ := by
-  rw [contDiffOn_univ]
-  refine fun_comp ?_ ?_
-  · exact mk_contDiff (n := ω)
-  · fun_prop
+    ContDiffOn ℝ ω (fun (v : EuclideanSpace ℝ (Fin d)) => v +ᵥ s) Set.univ :=
+  contDiffOn_univ.mpr <| fun_comp (mk_contDiff (n := ω)) (by fun_prop)
 
 @[fun_prop]
 lemma vadd_differentiable {d} (s : Space d) :
@@ -625,10 +581,8 @@ noncomputable def toDirection {d : ℕ} (x : Space d) (h : x ≠ 0) : Direction 
 @[simp]
 lemma direction_unit_sq_sum {d} (s : Direction d) :
     ∑ i : Fin d, (s.unit i) ^ 2 = 1 := by
-  trans (‖s.unit‖) ^ 2
-  · rw [norm_sq_eq]
-  · rw [s.norm]
-    simp
+  rw [← norm_sq_eq, s.norm]
+  simp
 
 /-!
 
@@ -661,7 +615,6 @@ lemma oneEquiv_symm_coe :
 
 lemma oneEquiv_symm_apply (x : ℝ) (i : Fin 1) :
     oneEquiv.symm x i = x := by
-  fin_cases i
   rfl
 
 lemma oneEquiv_continuous :
@@ -708,8 +661,8 @@ lemma oneEquiv_symm_measurableEmbedding : MeasurableEmbedding oneEquiv.symm wher
 lemma oneEquiv_measurePreserving : MeasurePreserving oneEquiv volume volume :=
   LinearIsometryEquiv.measurePreserving oneEquiv
 
-lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume volume := by
-  exact LinearIsometryEquiv.measurePreserving oneEquiv.symm
+lemma oneEquiv_symm_measurePreserving : MeasurePreserving oneEquiv.symm volume volume :=
+  LinearIsometryEquiv.measurePreserving oneEquiv.symm
 
 /-!
 
@@ -794,27 +747,18 @@ lemma fderiv_vadd {d} (v : EuclideanSpace ℝ (Fin d)) :
     fderiv ℝ (fun s => v +ᵥ s) = fun (_ : Space d) => ContinuousLinearMap.id ℝ _ := by
   ext s ds i
   rw [fderiv_space_components]
-  simp only [vadd_apply, fderiv_const_add, ContinuousLinearMap.coe_id', id_eq]
-  trans fderiv ℝ (coordCLM i) s ds
-  · congr
-    ext j
-    simp [coordCLM, coord_apply]
-  · rw [ContinuousLinearMap.fderiv]
-    simp [coordCLM, coord_apply]
+  · simp [fderiv_const_add]
   · fun_prop
 
 @[fun_prop]
 lemma vadd_hasTemperateGrowth {d} (v : EuclideanSpace ℝ (Fin d)) :
     Function.HasTemperateGrowth (fun s : Space d => v +ᵥ s) := by
   apply Function.HasTemperateGrowth.of_fderiv (k := 1) (C := 1 + ‖v‖)
-  · rw [fderiv_vadd]
-    simp
+  · simp [fderiv_vadd]
   · fun_prop
   · intro x
     simp only [pow_one]
     apply (norm_vadd_le_add _ _).trans
-    have : 0 ≤ ‖v‖ := by positivity
-    have : 0 ≤ ‖x‖ := by positivity
-    nlinarith
+    nlinarith [norm_nonneg v, norm_nonneg x]
 
 end Space

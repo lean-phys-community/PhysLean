@@ -59,7 +59,7 @@ open ContDiff
 
 open SchwartzMap
 
-/-- The parity operator on the Schwartz maps is defined as the linear map from
+/-- The position operator on the Schwartz maps is defined as the linear map from
   `𝓢(ℝ, ℂ)` to itself, such that `ψ` is taken to `fun x => x * ψ x`. -/
 def positionOperatorSchwartz : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := Distribution.powOneMul ℂ
 

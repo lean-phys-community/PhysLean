@@ -59,13 +59,7 @@ noncomputable def inertiaTensor {d : ℕ} (R : RigidBody d) :
 
 lemma inertiaTensor_symmetric {d : ℕ} (R : RigidBody d) (i j : Fin d) :
     R.inertiaTensor i j = R.inertiaTensor j i := by
-  simp only [inertiaTensor]
-  congr
-  funext x
-  congr 1
-  · congr 2
-    exact Eq.propIntro (fun a => id (Eq.symm a)) fun a => id (Eq.symm a)
-  · ring
+  simp only [inertiaTensor, eq_comm, mul_comm]
 
 TODO "Move `cmap` and `cmap_apply` to a more general location, such as a file in
   `SpaceAndTime/Space/` or `Mathematics/`. Alternatively, define a version of `ρ` taking an

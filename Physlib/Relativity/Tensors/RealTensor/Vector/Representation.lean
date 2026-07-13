@@ -54,37 +54,26 @@ lemma rep_apply_basis {d} (μ : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) :
   simp [rep_apply_eq_sum, apply_sum]
 
 lemma rep_toMatrix (d : ℕ) (Λ : LorentzGroup d) :
-    LinearMap.toMatrix basis basis (rep Λ) = Λ.1 := by
-  simp only [rep, MonoidHom.coe_mk, OneHom.coe_mk]
-  exact (LinearEquiv.eq_symm_apply (LinearMap.toMatrix basis basis)).mp rfl
+    LinearMap.toMatrix basis basis (rep Λ) = Λ.1 :=
+  (LinearEquiv.eq_symm_apply (LinearMap.toMatrix basis basis)).mp rfl
 
-lemma rep_injective (d : ℕ) (Λ : LorentzGroup d) : Function.Injective (rep Λ) := by
-  intro v1 v2 h
-  rw [rep_apply_eq_mulVec, rep_apply_eq_mulVec] at h
-  exact Matrix.mulVec_injective_of_isUnit (isUnit_of_invertible Λ.1) h
+lemma rep_injective (d : ℕ) (Λ : LorentzGroup d) : Function.Injective (rep Λ) :=
+  fun _ _ h => Matrix.mulVec_injective_of_isUnit (isUnit_of_invertible Λ.1) h
 
-lemma rep_surjective (d : ℕ) (Λ : LorentzGroup d) : Function.Surjective (rep Λ) := by
-  intro v
-  use Λ⁻¹ *ᵥ v
-  rw [rep_apply_eq_mulVec]
-  simp
+lemma rep_surjective (d : ℕ) (Λ : LorentzGroup d) : Function.Surjective (rep Λ) :=
+  fun v => ⟨Λ⁻¹ *ᵥ v, by simp [rep_apply_eq_mulVec]⟩
 
 lemma rep_bijective (d : ℕ) (Λ : LorentzGroup d) : Function.Bijective (rep Λ) :=
   ⟨rep_injective d Λ, rep_surjective d Λ⟩
 
 @[fun_prop]
 lemma rep_contDiff (d : ℕ) {n} (Λ : LorentzGroup d) : ContDiff ℝ n (rep Λ) := by
-  refine (contDiff_apply ⇑(rep Λ)).mp ?_
-  intro μ
+  refine (contDiff_apply _).mp fun μ => ?_
   simp only [rep_apply_eq_sum, smul_eq_mul]
   fun_prop
 
-lemma rep_left_injective (d : ℕ) : Function.Injective (rep (d := d)) := by
-  intro Λ Λ' h
-  apply LorentzGroup.eq_of_mulVec_eq
-  intro v
-  rw [← rep_apply_eq_mulVec, ← rep_apply_eq_mulVec]
-  exact LinearMap.congr_fun h v
+lemma rep_left_injective (d : ℕ) : Function.Injective (rep (d := d)) :=
+  fun _ _ h => LorentzGroup.eq_of_mulVec_eq (LinearMap.congr_fun h)
 
 end Vector
 

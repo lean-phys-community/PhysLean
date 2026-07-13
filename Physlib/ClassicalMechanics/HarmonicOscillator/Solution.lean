@@ -401,19 +401,8 @@ The trajectories for any initial conditions are smooth functions of time.
 lemma trajectory_contDiff (S : HarmonicOscillator) (IC : InitialConditions) {n : WithTop ℕ∞} :
     ContDiff ℝ n (IC.trajectory S) := by
   rw [trajectory_eq]
-  apply ContDiff.add
-  · apply fun_smul
-    · change ContDiff ℝ _ (((fun x => cos x) ∘ (fun y => S.ω * y))∘ Time.toRealCLM)
-      refine ContDiff.comp_continuousLinearMap (ContDiff.comp contDiff_cos ?_)
-      fun_prop
-    · fun_prop
-  · have hx := contDiff_sin (n := n)
-    apply fun_smul
-    · change ContDiff ℝ _ (((fun x => sin x / S.ω) ∘ (fun y => S.ω * y))∘ Time.toRealCLM)
-      refine ContDiff.comp_continuousLinearMap (ContDiff.comp ?_ ?_)
-      · fun_prop
-      · fun_prop
-    · fun_prop
+  have h : ContDiff ℝ n (Time.val : Time → ℝ) := Time.toRealCLM.contDiff
+  fun_prop
 
 /-!
 
@@ -441,10 +430,8 @@ lemma trajectory_velocity (IC : InitialConditions) : ∂ₜ (IC.trajectory S) =
   simp only [fderiv_fun_const, Pi.zero_apply, smul_zero, add_zero, neg_smul,
     _root_.neg_apply, FunLike.coe_smul, Pi.smul_apply, fderiv_val,
     smul_eq_mul, mul_one]
-  field_simp
-  ring_nf
-  rw [← mul_smul, mul_rotate, NonUnitalRing.mul_assoc]
-  field_simp [mul_div_assoc, div_self, mul_one, S.ω_ne_zero]
+  field_simp [S.ω_ne_zero]
+  module
 
 /-!
 
@@ -467,7 +454,6 @@ lemma trajectory_acceleration (IC : InitialConditions) : ∂ₜ (∂ₜ (IC.traj
   simp only [fderiv_fun_const, Pi.ofNat_apply, smul_zero, add_zero, _root_.neg_apply,
     FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.smulRight_apply, fderiv_val,
     smul_eq_mul, mul_one, neg_smul]
-  ring_nf
   module
 
 /-!
@@ -499,19 +485,18 @@ The trajectories satisfy the equation of motion for the harmonic oscillator.
 
 lemma trajectory_equationOfMotion (IC : InitialConditions) :
     EquationOfMotion S (IC.trajectory S) := by
-  have hcont : ContDiff ℝ ∞ (IC.trajectory S) := trajectory_contDiff S IC
-  rw [EquationOfMotion, gradLagrangian_eq_force (S := S) (xₜ := IC.trajectory S) hcont]
+  rw [EquationOfMotion, gradLagrangian_eq_force (S := S) (xₜ := IC.trajectory S)
+    (trajectory_contDiff S IC)]
   funext t
   simp only [Pi.zero_apply]
   rw [trajectory_acceleration, force_eq_linear]
   ext
-  have hω : S.ω ≠ 0 := ω_ne_zero S
   have hωm : S.ω ^ 2 * S.m = S.k := by
     rw [ω_sq]
     field_simp [m_ne_zero S]
   simp [trajectory_eq, smul_add, smul_smul, mul_comm]
   rw [← hωm]
-  field_simp [hω]
+  field_simp [ω_ne_zero S]
   ring
 
 /-!
@@ -621,12 +606,8 @@ lemma toInitialConditions_trajectory_at_t₀ (S : HarmonicOscillator)
   rw [InitialConditions.trajectory_eq, toInitialConditions]
   ext i
   simp only [smul_add, PiLp.add_apply, PiLp.smul_apply, PiLp.sub_apply, smul_eq_mul]
-  have h1 : cos (S.ω * IC.t₀.val) ^ 2 + sin (S.ω * IC.t₀.val) ^ 2 = 1 :=
-    cos_sq_add_sin_sq (S.ω * IC.t₀.val)
   field_simp [S.ω_ne_zero]
-  nth_rw 2 [← mul_one (S.ω * IC.x_t₀.ofLp i)]
-  rw [← h1]
-  ring
+  linear_combination (S.ω * IC.x_t₀.ofLp i) * cos_sq_add_sin_sq (S.ω * IC.t₀.val)
 
 /-- The trajectory resulting from `toInitialConditions` has the specified
   velocity `v_t₀` at time `t₀`. -/
@@ -638,12 +619,8 @@ lemma toInitialConditions_velocity_at_t₀ (S : HarmonicOscillator)
   ext i
   simp only [neg_smul, smul_add, PiLp.add_apply, PiLp.neg_apply, PiLp.smul_apply, PiLp.sub_apply,
     smul_eq_mul]
-  have h1 : cos (S.ω * IC.t₀.val) ^ 2 + sin (S.ω * IC.t₀.val) ^ 2 = 1 :=
-    cos_sq_add_sin_sq (S.ω * IC.t₀.val)
   field_simp [S.ω_ne_zero]
-  nth_rw 3 [← mul_one (IC.v_t₀.ofLp i)]
-  rw [← h1]
-  ring
+  linear_combination (IC.v_t₀.ofLp i) * cos_sq_add_sin_sq (S.ω * IC.t₀.val)
 
 /-- The energy of the trajectory at time `t₀` equals the energy computed from the
   initial conditions at `t₀`. -/
@@ -653,8 +630,7 @@ lemma toInitialConditions_energy_at_t₀ (S : HarmonicOscillator)
     1/2 * (S.m * ‖IC.v_t₀‖^2 + S.k * ‖IC.x_t₀‖^2) := by
   unfold energy kineticEnergy potentialEnergy
   simp only [toInitialConditions_trajectory_at_t₀, toInitialConditions_velocity_at_t₀]
-  rw [real_inner_self_eq_norm_sq, real_inner_self_eq_norm_sq]
-  simp only [smul_eq_mul]
+  simp only [real_inner_self_eq_norm_sq, smul_eq_mul]
   ring
 
 end InitialConditionsAtTime
@@ -872,14 +848,8 @@ lemma toInitialConditions_fromInitialConditions (S : HarmonicOscillator)
   have hω : S.ω ≠ 0 := S.ω_ne_zero
   set z : ℂ := (⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)
   -- polar identities
-  have hcos : ‖z‖ * cos (Complex.arg z) = z.re := by
-    rcases eq_or_ne z 0 with h | h
-    · simp [h]
-    · rw [Complex.cos_arg h]; field_simp
-  have hsin : ‖z‖ * sin (Complex.arg z) = z.im := by
-    rcases eq_or_ne z 0 with h | h
-    · simp [h]
-    · rw [Complex.sin_arg]; field_simp
+  have hcos : ‖z‖ * cos (Complex.arg z) = z.re := Complex.norm_mul_cos_arg z
+  have hsin : ‖z‖ * sin (Complex.arg z) = z.im := Complex.norm_mul_sin_arg z
   -- By construction the parts of `z` are exactly the original data.
   have hre : z.re = IC.x₀ 0 := rfl
   have him : z.im = IC.v₀ 0 / S.ω := rfl
@@ -962,25 +932,7 @@ lemma trajectory_velocity_eq_zero_iff_sin_eq_zero (IC : InitialConditions)
     ∂ₜ (IC.trajectory S) t = 0 ↔
       sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
   rw [trajectory_velocity_eq_sin]
-  constructor
-  · intro h
-    have hscalar :
-        -((AmplitudePhase.fromInitialConditions S IC).A * S.ω *
-          sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ)) = 0 := by
-      simpa using congrArg (fun x : EuclideanSpace ℝ (Fin 1) => x 0) h
-    have hprod :
-        (AmplitudePhase.fromInitialConditions S IC).A * S.ω *
-          sin (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
-      simpa only [neg_eq_zero] using hscalar
-    rcases mul_eq_zero.mp hprod with hAω | hsin
-    · rcases mul_eq_zero.mp hAω with hA0 | hω
-      · exact (hA hA0).elim
-      · exact (S.ω_ne_zero hω).elim
-    · exact hsin
-  · intro h
-    ext i
-    fin_cases i
-    simp [h]
+  simp [hA, S.ω_ne_zero]
 
 /-- For nonzero amplitude, the velocity is zero exactly at phase times `φ + nπ`. -/
 lemma trajectory_velocity_eq_zero_iff_exists_int (IC : InitialConditions)
@@ -993,22 +945,13 @@ lemma trajectory_velocity_eq_zero_iff_exists_int (IC : InitialConditions)
   constructor
   · intro h
     obtain ⟨n, hn⟩ := Real.sin_eq_zero_iff.mp h
-    use n
-    have hω : S.ω ≠ 0 := S.ω_ne_zero
-    have ht :
-        S.ω * t.val = (AmplitudePhase.fromInitialConditions S IC).φ + n * π := by
-      linarith
-    calc
-      (t : ℝ) = (S.ω * t) / S.ω := by field_simp [hω]
-      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + n * π) / S.ω := by
-        rw [ht]
-  · intro h
-    obtain ⟨n, hn⟩ := h
-    rw [Real.sin_eq_zero_iff]
-    use n
-    have hω : S.ω ≠ 0 := S.ω_ne_zero
-    rw [hn]
-    field_simp [hω]
+    refine ⟨n, ?_⟩
+    rw [eq_div_iff S.ω_ne_zero, mul_comm]
+    linarith
+  · rintro ⟨n, hn⟩
+    rw [Real.sin_eq_zero_iff, hn]
+    refine ⟨n, ?_⟩
+    field_simp [S.ω_ne_zero]
     ring
 
 /-!
@@ -1030,40 +973,25 @@ lemma trajectory_velocity_eq_zero_iff_norm_eq_amplitude (IC : InitialConditions)
     ∂ₜ (IC.trajectory S) t = 0 ↔
       ‖IC.trajectory S t‖ = (AmplitudePhase.fromInitialConditions S IC).A := by
   by_cases hA : (AmplitudePhase.fromInitialConditions S IC).A = 0
-  · constructor
-    · intro _
-      rw [trajectory_eq_cos]
-      simp [hA]
-    · intro _
-      rw [trajectory_velocity_eq_sin]
-      ext i
-      fin_cases i
-      simp [hA]
-  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t]
-  rw [trajectory_eq_cos]
+  · rw [trajectory_velocity_eq_sin, trajectory_eq_cos]
+    simp [hA]
+  rw [trajectory_velocity_eq_zero_iff_sin_eq_zero S IC hA t, trajectory_eq_cos]
   set A := (AmplitudePhase.fromInitialConditions S IC).A
   set θ := S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ
   show sin θ = 0 ↔ ‖EuclideanSpace.single 0 (A * cos θ)‖ = A
   have hA' : A ≠ 0 := by simpa [A] using hA
-  have hA_nonneg : 0 ≤ A := by
-    show 0 ≤ ‖(⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)‖
-    exact norm_nonneg _
+  have hA_nonneg : 0 ≤ A := norm_nonneg (⟨IC.x₀ 0, IC.v₀ 0 / S.ω⟩ : ℂ)
   have hA_pos : 0 < A := lt_of_le_of_ne hA_nonneg (Ne.symm hA')
   constructor
   · intro hsin
-    rcases Real.sin_eq_zero_iff_cos_eq.mp hsin with hcos | hcos
-    · simp [hcos, abs_of_pos hA_pos]
-    · simp [hcos, abs_of_pos hA_pos]
+    rcases Real.sin_eq_zero_iff_cos_eq.mp hsin with hcos | hcos <;>
+      simp [hcos, abs_of_pos hA_pos]
   · intro hnorm
     have hnorm' : |A * cos θ| = A := by
       simpa using hnorm
     have hcos_abs : |cos θ| = 1 := by
-      calc
-        |cos θ| = |A * cos θ| / A := by
-          rw [abs_mul, abs_of_pos hA_pos]
-          field_simp [hA']
-        _ = A / A := by rw [hnorm']
-        _ = 1 := by field_simp [hA']
+      rw [abs_mul, abs_of_pos hA_pos] at hnorm'
+      exact mul_left_cancel₀ hA' (hnorm'.trans (mul_one A).symm)
     obtain ⟨n, hn⟩ := Real.abs_cos_eq_one_iff.mp hcos_abs
     exact Real.sin_eq_zero_iff.mpr ⟨n, hn⟩
 
@@ -1084,19 +1012,7 @@ lemma trajectory_eq_zero_iff_cos_eq_zero (IC : InitialConditions)
     IC.trajectory S t = 0 ↔
       cos (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
   rw [trajectory_eq_cos]
-  constructor
-  · intro h
-    have hscalar :
-        (AmplitudePhase.fromInitialConditions S IC).A *
-          cos (S.ω * t.val - (AmplitudePhase.fromInitialConditions S IC).φ) = 0 := by
-      simpa using congrArg (fun x : EuclideanSpace ℝ (Fin 1) => x 0) h
-    rcases mul_eq_zero.mp hscalar with hA0 | hcos
-    · exact (hA hA0).elim
-    · exact hcos
-  · intro h
-    ext i
-    fin_cases i
-    simp [h]
+  simp [hA]
 
 /-- For nonzero amplitude, the trajectory passes through zero exactly at phase times
   `φ + (2n + 1)π / 2`. -/
@@ -1110,23 +1026,13 @@ lemma trajectory_eq_zero_iff_exists_int (IC : InitialConditions)
   constructor
   · intro h
     obtain ⟨n, hn⟩ := Real.cos_eq_zero_iff.mp h
-    use n
-    have hω : S.ω ≠ 0 := S.ω_ne_zero
-    have ht :
-        S.ω * t.val =
-          (AmplitudePhase.fromInitialConditions S IC).φ + (2 * n + 1) * π / 2 := by
-      linarith
-    calc
-      (t : ℝ) = (S.ω * t) / S.ω := by field_simp [hω]
-      _ = ((AmplitudePhase.fromInitialConditions S IC).φ + (2 * n + 1) * π / 2) / S.ω := by
-        rw [ht]
-  · intro h
-    obtain ⟨n, hn⟩ := h
-    rw [Real.cos_eq_zero_iff]
-    use n
-    have hω : S.ω ≠ 0 := S.ω_ne_zero
-    rw [hn]
-    field_simp [hω]
+    refine ⟨n, ?_⟩
+    rw [eq_div_iff S.ω_ne_zero, mul_comm]
+    linarith
+  · rintro ⟨n, hn⟩
+    rw [Real.cos_eq_zero_iff, hn]
+    refine ⟨n, ?_⟩
+    field_simp [S.ω_ne_zero]
     ring
 
 end InitialConditions
@@ -1160,10 +1066,7 @@ scoped notation "T" => HarmonicOscillator.period
 
 lemma period_eq : T S = 2 * π / S.ω := rfl
 
-lemma period_pos : 0 < T S := by
-  have := S.ω_pos
-  rw [period_eq]
-  positivity
+lemma period_pos : 0 < T S := div_pos (by positivity) S.ω_pos
 
 /-!
 
@@ -1214,48 +1117,21 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
   set vv := inner ℝ IC.v₀ IC.v₀
   set xv := inner ℝ IC.x₀ IC.v₀
   set det := vv + xx *  S.ω^2
-  have zero_lt_det :  0 < det := by
-   cases non_trivial with
-   | inl hx =>
-    have  xx_gt_zero : 0 < xx  := by
-        apply real_inner_self_pos.mpr
-        exact hx
-    calc
-      0 < xx * S.ω^2 := by bound
-      _ ≤  ‖IC.v₀‖^2 +   xx * S.ω^2  := by bound
-      _ = vv +   xx * S.ω^2 := by rw [← real_inner_self_eq_norm_sq IC.v₀]
-      _ = det := by rfl
-   | inr hv =>
-     have vv_gt_zero : 0 < vv := by
-        apply real_inner_self_pos.mpr
-        exact hv
-     calc
-        0 <  vv := vv_gt_zero
-        _ ≤ vv +   ‖IC.x₀‖^2 * S.ω^2 := by bound
-        _ = vv +   xx * S.ω^2  := by rw [← real_inner_self_eq_norm_sq IC.x₀]
-        _ = det := by rfl
-  have det_ne_zero : det ≠ 0 := by bound
+  have hxx0 : 0 ≤ xx := real_inner_self_nonneg
+  have hvv0 : 0 ≤ vv := real_inner_self_nonneg
+  have hω2 : 0 < S.ω ^ 2 := pow_pos S.ω_pos 2
+  have zero_lt_det : 0 < det := by
+    show 0 < vv + xx * S.ω ^ 2
+    rcases non_trivial with hx | hv
+    · nlinarith [real_inner_self_pos.mpr hx]
+    · nlinarith [real_inner_self_pos.mpr hv]
+  have det_ne_zero : det ≠ 0 := zero_lt_det.ne'
   have hxx : c * xx + (s / S.ω) * xv = xx := by
-    calc
-     c * xx + (s / S.ω) * xv =  (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * xv := by
-       rw[real_inner_smul_left]
-     (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * xv =
-       (inner ℝ (c • IC.x₀) IC.x₀) + (s / S.ω) * inner ℝ  IC.v₀ IC.x₀ := by
-         rw [real_inner_comm IC.x₀ IC.v₀]
-     _  = (inner ℝ (c • IC.x₀) IC.x₀) +  inner ℝ  ((s / S.ω)  • IC.v₀) IC.x₀ := by
-       rw [real_inner_smul_left IC.v₀]
-     _ = (inner ℝ (c • IC.x₀ + (s / S.ω)  • IC.v₀) IC.x₀) := by rw [inner_add_left]
-     _ = xx := by rw [htx]
+    have h := congrArg (inner ℝ IC.x₀) htx
+    simpa only [inner_add_right, real_inner_smul_right] using h
   have hvv : - S.ω * s * xv + c * vv = vv := by
-    calc
-     - S.ω * s * xv + c * vv = - S.ω * (s * xv) + c * vv := by ring_nf
-     _ = - S.ω * inner ℝ (s • IC.x₀) IC.v₀ + c * vv := by rw[real_inner_smul_left]
-     _ = inner ℝ  (- S.ω • s • IC.x₀ ) IC.v₀ + c * vv := by rw [← real_inner_smul_left]
-     _ = inner ℝ  (- S.ω • s • IC.x₀ ) IC.v₀ + inner ℝ (c • IC.v₀) IC.v₀ := by
-       rw [← real_inner_smul_left]
-     _ = inner ℝ (- S.ω • s • IC.x₀ + c • IC.v₀) IC.v₀ := by rw [inner_add_left]
-     _ = inner ℝ (-( S.ω • s • IC.x₀) + c • IC.v₀) IC.v₀ := by rw [neg_smul]
-     _ = vv := by rw [htv]
+    have h := congrArg (fun w => inner ℝ w IC.v₀) htv
+    simpa only [inner_add_left, inner_neg_left, real_inner_smul_left, neg_mul, mul_assoc] using h
   have hcos : 1 = cos (S.ω * t) := by
     calc
     1 =  det / det := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self]
@@ -1269,14 +1145,11 @@ lemma return_time (IC : InitialConditions) (non_trivial : IC.x₀ ≠ 0 ∨ IC.v
     _ = c * (det / det) := by rfl
     _ = c := by simp only [ne_eq, det_ne_zero, not_false_eq_true, div_self, mul_one]
     _ = _ := by rfl
-  let ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp (Eq.symm hcos)
-  use n
-  calc
-    (n : ℝ) * (T S) = (n : ℝ) * (2 * π / S.ω) := by rfl
-    _ = ((n : ℝ) * (2 * π)) / S.ω := by ring_nf
-    _ = (S.ω * t) / S.ω := by rw [hn]
-    _ = t * (S.ω / S.ω) := by ring_nf
-    _ = t := by simp only [ne_eq, S.ω_ne_zero, not_false_eq_true, div_self, mul_one]
+  obtain ⟨n, hn⟩ := (Real.cos_eq_one_iff (S.ω * t)).mp hcos.symm
+  refine ⟨n, ?_⟩
+  rw [period_eq]
+  field_simp [S.ω_ne_zero]
+  linear_combination hn
 end HarmonicOscillator
 
 end ClassicalMechanics

@@ -182,8 +182,8 @@ The degree of all terms present is less than or equal to four.
 def degree (T : PotentialTerm) : ℕ := T.toFieldLabel.length
 
 lemma degree_le_four (T : PotentialTerm) : T.degree ≤ 4 := by
-  cases T
-  all_goals simp [toFieldLabel, degree]
+  revert T
+  decide
 
 /-!
 

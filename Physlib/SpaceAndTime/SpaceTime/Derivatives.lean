@@ -139,44 +139,31 @@ variable {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
 
 lemma differentiable_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d) :
     (∀ ν, Differentiable ℝ (fun x => f x ν)) ↔ Differentiable ℝ f := by
-  apply Iff.intro
-  · intro h
-    rw [← (Lorentz.Vector.equivPi d).comp_differentiable_iff]
+  refine ⟨fun h => ?_, fun h ν => ?_⟩
+  · rw [← (Lorentz.Vector.equivPi d).comp_differentiable_iff]
     exact differentiable_pi'' h
-  · intro h ν
-    change Differentiable ℝ (Lorentz.Vector.coordCLM ν ∘ f)
-    apply Differentiable.comp
-    · fun_prop
-    · exact h
+  · exact (Lorentz.Vector.coordCLM ν).differentiable.comp h
 
 lemma contDiff_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d) :
     (∀ ν, ContDiff ℝ n (fun x => f x ν)) ↔ ContDiff ℝ n f := by
-  apply Iff.intro
-  · intro h
-    rw [← (Lorentz.Vector.equivPi d).comp_contDiff_iff]
-    apply contDiff_pi'
-    intro ν
-    exact h ν
-  · intro h ν
-    change ContDiff ℝ n (Lorentz.Vector.coordCLM ν ∘ f)
-    apply ContDiff.comp
-    · fun_prop
-    · exact h
+  refine ⟨fun h => ?_, fun h ν => ?_⟩
+  · rw [← (Lorentz.Vector.equivPi d).comp_contDiff_iff]
+    exact contDiff_pi' h
+  · exact (Lorentz.Vector.coordCLM ν).contDiff.comp h
 
 lemma fderiv_vector {d : ℕ} (f : SpaceTime d → Lorentz.Vector d)
     (hf : Differentiable ℝ f) (y dt : SpaceTime d) (ν : Fin 1 ⊕ Fin d) :
     fderiv ℝ f y dt ν = fderiv ℝ (fun x => f x ν) y dt := by
   change _ = (fderiv ℝ (Lorentz.Vector.coordCLM ν ∘ f) y) dt
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
-  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
-  rfl
+  simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
+    Lorentz.Vector.coordCLM_apply]
 
 lemma deriv_apply_eq {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → Lorentz.Vector d)
     (hf : Differentiable ℝ f)
     (y : SpaceTime d) :
-    ∂_ μ f y ν = fderiv ℝ (fun x => f x ν) y (Lorentz.Vector.basis μ) := by
-  rw [deriv_eq]
-  exact fderiv_vector f hf y _ ν
+    ∂_ μ f y ν = fderiv ℝ (fun x => f x ν) y (Lorentz.Vector.basis μ) :=
+  fderiv_vector f hf y _ ν
 
 @[simp]
 lemma deriv_coord {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) :
@@ -186,9 +173,7 @@ lemma deriv_coord {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) :
   rw [deriv_eq]
   simp only [ContinuousLinearMap.fderiv]
   simp [coordCLM]
-  split_ifs
-  rfl
-  rfl
+  split_ifs <;> rfl
 
 /-!
 
@@ -199,8 +184,7 @@ lemma deriv_coord {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) :
 @[simp]
 lemma deriv_zero {d : ℕ} (μ : Fin 1 ⊕ Fin d) : SpaceTime.deriv μ (fun _ => (0 : ℝ)) = 0 := by
   ext y
-  rw [SpaceTime.deriv_eq]
-  simp
+  simp [SpaceTime.deriv_eq]
 
 attribute [-simp] Fintype.sum_sum_type
 
@@ -217,7 +201,6 @@ lemma contDiff_deriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : 
     ContDiff ℝ n (∂_ μ f) := by
   -- `∂_ μ f = fun x => fderiv ℝ f x (Lorentz.Vector.basis μ)`; use
   -- `ContDiff.clm_apply` with `ContDiff.fderiv_right`.
-  show ContDiff ℝ n (fun x => fderiv ℝ f x (Lorentz.Vector.basis μ))
   exact (ContDiff.fderiv_right (m := n) hf (by rfl)).clm_apply contDiff_const
 
 /-- If `f` is `C^2` then `∂_ μ f` is differentiable. -/
@@ -244,13 +227,8 @@ lemma deriv_commute {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : �
   simp only [fderiv_fun_const, Pi.ofNat_apply, ContinuousLinearMap.comp_zero, zero_add,
     ContinuousLinearMap.flip_apply]
   rw [IsSymmSndFDerivAt.eq]
-  · apply ContDiffAt.isSymmSndFDerivAt
-    exact hf.contDiffAt
-    simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
-  · have h1 := hf.differentiable (by norm_cast); fun_prop
-  · fun_prop
-  · have h1 := hf.differentiable (by norm_cast); fun_prop
-  · fun_prop
+  · exact hf.contDiffAt.isSymmSndFDerivAt (by simp [minSmoothness_of_isRCLikeNormedField])
+  all_goals fun_prop
 
 /-!
 
@@ -269,8 +247,7 @@ lemma deriv_comp_lorentz_action {M : Type} [NormedAddCommGroup M] [NormedSpace �
     ContinuousLinearMap.coe_comp, Function.comp_apply]
     -- Fintype.sum_sum_type
   rw [Lorentz.Vector.smul_basis]
-  simp
-  rfl
+  simp [deriv_eq]
   · fun_prop
   · fun_prop
 
@@ -285,17 +262,13 @@ lemma deriv_equivariant (f : SpaceTime d → M) (Λ : LorentzGroup d) (x : Space
       ∂_ μ (fun x => Λ • f (Λ⁻¹ • x)) x =
       Λ • ∂_ μ (fun x => f (Λ⁻¹ • x)) x := by
     change ∂_ μ (TensorSpecies.Tensorial.actionCLM _ Λ ∘ fun x => f (Λ⁻¹ • x)) x = _
-    rw [deriv_eq]
-    rw [fderiv_comp]
+    rw [deriv_eq, fderiv_comp]
     simp [Tensorial.actionCLM_apply, ← deriv_eq]
     · fun_prop
-    · apply Differentiable.differentiableAt
-      have hx : Differentiable ℝ (f ∘ (Lorentz.Vector.actionCLM Λ⁻¹)) := by fun_prop
-      exact hx
+    · exact (hf.comp (Lorentz.Vector.actionCLM Λ⁻¹).differentiable).differentiableAt
   rw [h1 μ x, deriv_comp_lorentz_action]
   change (TensorSpecies.Tensorial.actionCLM _ Λ) (∑ ν, (Λ⁻¹).1 ν μ • ∂_ ν f (Λ⁻¹ • x)) = _
-  simp only [map_sum, map_smul]
-  simp [TensorSpecies.Tensorial.actionCLM_apply]
+  simp [TensorSpecies.Tensorial.actionCLM_apply, map_sum, map_smul]
   · fun_prop
 
 /-!
@@ -401,8 +374,7 @@ lemma apply_fderiv_eq_distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     f ((SchwartzMap.evalCLM ℝ (SpaceTime d) ℝ (Lorentz.Vector.basis μ))
     ((fderivCLM ℝ (SpaceTime d) ℝ) ε)) =
     - distDeriv μ f ε := by
-  rw [distDeriv_apply']
-  simp
+  simp [distDeriv_apply']
 
 /-!
 
@@ -415,9 +387,7 @@ lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ ν : Fin 1 ⊕ Fin d) (f : (SpaceTime d) →d[ℝ] M) :
     distDeriv μ (distDeriv ν f) = distDeriv ν (distDeriv μ f) := by
   ext κ
-  rw [distDeriv_apply, distDeriv_apply, fderivD_apply, fderivD_apply]
-  rw [distDeriv_apply, distDeriv_apply, fderivD_apply, fderivD_apply]
-  simp only [neg_neg]
+  simp only [distDeriv_apply, fderivD_apply, neg_neg]
   congr 1
   ext x
   exact congrFun (deriv_commute ν μ ⇑κ (smooth κ 2)) x
@@ -502,8 +472,7 @@ lemma tensorDeriv_equivariant (f : SpaceTime d → M) (Λ : LorentzGroup d) (x :
     enter [2, ν]
     rw [← sum_tmul, ← Lorentz.CoVector.smul_basis, ← Tensorial.smul_prod]
   change _ = (TensorSpecies.Tensorial.smulLinearMap Λ) _
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, map_sum]
-  simp [TensorSpecies.Tensorial.smulLinearMap_apply]
+  simp [TensorSpecies.Tensorial.smulLinearMap_apply, map_sum]
 
 open TensorSpecies.Tensorial Lorentz Tensor
 
@@ -532,8 +501,7 @@ lemma tensorDeriv_toTensor_basis_repr
       enter [2, x]
       rw [h1 x]
     conv_rhs =>
-      rw [deriv_eq]
-      rw [fderiv_fun_comp _ (by fun_prop) (by fun_prop)]
+      rw [deriv_eq, fderiv_fun_comp _ (by fun_prop) (by fun_prop)]
     rw [ContinuousLinearMap.fderiv]
     simp [deriv_eq]
   · intro b' _ hb
@@ -618,8 +586,7 @@ lemma distTensorDeriv_equivariant {M : Type} [NormedAddCommGroup M]
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, ContinuousLinearMap.coe_comp,
     ContinuousLinearMap.coe_coe, Function.comp_apply]
   rw [distTensorDeriv_apply]
-  simp only [map_sum]
-  simp [TensorSpecies.Tensorial.smulLinearMap_apply]
+  simp [TensorSpecies.Tensorial.smulLinearMap_apply, map_sum]
 
 lemma distTensorDeriv_toTensor_basis_repr {M : Type} [NormedAddCommGroup M]
     [InnerProductSpace ℝ M] [FiniteDimensional ℝ M] [(realLorentzTensor d).Tensorial c M]

@@ -118,7 +118,7 @@ def toFin2ℂ : HiggsVec →L[ℝ] (Fin 2 → ℂ) where
 
 /-- The map `toFin2ℂ` is smooth. -/
 lemma smooth_toFin2ℂ : ContMDiff 𝓘(ℝ, HiggsVec) 𝓘(ℝ, Fin 2 → ℂ) ⊤ toFin2ℂ :=
-  ContinuousLinearMap.contMDiff toFin2ℂ
+  toFin2ℂ.contMDiff
 
 /-!
 
@@ -148,7 +148,7 @@ def ofReal (a : ℝ) : HiggsVec :=
 
 @[simp]
 lemma ofReal_normSq {a : ℝ} (ha : 0 ≤ a) : ‖ofReal a‖ ^ 2 = a := by
-  simp [ofReal, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_two, Real.sq_sqrt ha]
+  simp [ofReal, PiLp.norm_sq_eq_of_L2, Real.sq_sqrt ha]
 
 /-!
 
@@ -182,29 +182,17 @@ lemma gaugeGroupI_smul_eq_U1_smul_SU2 (g : StandardModel.GaugeGroupI) (φ : Higg
 instance : MulAction StandardModel.GaugeGroupI HiggsVec where
   one_smul φ := by simp [gaugeGroupI_smul_eq]
   mul_smul g₁ g₂ φ := by
-    rw [gaugeGroupI_smul_eq, gaugeGroupI_smul_eq, gaugeGroupI_smul_eq_U1_mul_SU2]
-    rw [mulVec_smul, mulVec_smul, smul_smul, mulVec_mulVec]
-    congr
-    simp [mul_pow]
+    simp [gaugeGroupI_smul_eq, mulVec_smul, smul_smul, mulVec_mulVec, mul_pow]
 
 instance : DistribMulAction StandardModel.GaugeGroupI HiggsVec where
-  smul_zero g := by
-    rw [gaugeGroupI_smul_eq_U1_smul_SU2]
-    simp
-  smul_add g φ ψ := by
-    rw [gaugeGroupI_smul_eq_U1_smul_SU2]
-    simp [mulVec_add]
-    simp [← gaugeGroupI_smul_eq_U1_smul_SU2]
+  smul_zero g := by simp [gaugeGroupI_smul_eq_U1_smul_SU2]
+  smul_add g φ ψ := by simp [gaugeGroupI_smul_eq_U1_smul_SU2, mulVec_add]
 
 instance : SMulCommClass ℂ GaugeGroupI HiggsVec where
-  smul_comm r g φ := by
-    simp [gaugeGroupI_smul_eq, mulVec_smul]
-    rw [smul_comm]
+  smul_comm r g φ := by simp [gaugeGroupI_smul_eq, mulVec_smul, smul_comm r]
 
 instance : SMulCommClass ℝ GaugeGroupI HiggsVec where
-  smul_comm r g φ := by
-    simp [gaugeGroupI_smul_eq, mulVec_smul]
-    rw [smul_comm]
+  smul_comm r g φ := by simp [gaugeGroupI_smul_eq, mulVec_smul, smul_comm r]
 
 /-!
 
@@ -218,30 +206,11 @@ open InnerProductSpace
 @[simp]
 lemma gaugeGroupI_smul_inner (g : StandardModel.GaugeGroupI) (φ ψ : HiggsVec) :
     ⟪g • φ, g • ψ⟫_ℂ = ⟪φ, ψ⟫_ℂ := by
-  calc ⟪g • φ, g • ψ⟫_ℂ
-    _ = WithLp.ofLp (g • ψ) ⬝ᵥ star (WithLp.ofLp (g • φ)) := by
-      rw [EuclideanSpace.inner_eq_star_dotProduct]
-    _ = (g.toSU2.1 *ᵥ (g.toU1 ^ 3 • ψ)) ⬝ᵥ star (g.toSU2.1 *ᵥ (g.toU1 ^ 3 • φ)) := by
-      rw [gaugeGroupI_smul_eq_U1_mul_SU2, gaugeGroupI_smul_eq_U1_mul_SU2]
-    _ = (g.toSU2.1 *ᵥ (g.toU1 ^ 3 • ψ)) ⬝ᵥ (star ((g.toU1 ^ 3 • φ)) ᵥ* star (g.toSU2.1)) := by
-      rw [star_mulVec]
-      rfl
-    _ = ((star (g.toSU2.1) * g.toSU2.1) *ᵥ (g.toU1 ^ 3 • ψ)) ⬝ᵥ star ((g.toU1 ^ 3 • φ)) := by
-      rw [dotProduct_comm, ← Matrix.dotProduct_mulVec, dotProduct_comm, mulVec_mulVec]
-      rfl
-    _ = ((g.toU1 ^ 3 • ψ)) ⬝ᵥ star ((g.toU1 ^ 3 • φ)) := by
-      rw [mem_unitaryGroup_iff'.mp (GaugeGroupI.toSU2 g).2.1]
-      simp
-    _ = ((g.toU1 ^ 3 • ψ)) ⬝ᵥ star (g.toU1 ^ 3) • star (φ.toFin2ℂ) := by
-      congr
-      ext i
-      simp only [Pi.star_apply, RCLike.star_def, star_pow, Pi.smul_apply]
-      change (starRingEnd ℂ) (GaugeGroupI.toU1 g ^ 3 * φ i) = _
-      simp
-      rfl
-    _ = (ψ ⬝ᵥ star (φ.toFin2ℂ)) := by
-      rw [dotProduct_smul, WithLp.ofLp_smul, smul_dotProduct, smul_smul, Unitary.star_mul_self,
-        one_smul]
+  rw [gaugeGroupI_smul_eq, gaugeGroupI_smul_eq, EuclideanSpace.inner_toLp_toLp,
+    EuclideanSpace.inner_eq_star_dotProduct, Submonoid.smul_def, Submonoid.smul_def, star_smul,
+    smul_dotProduct, dotProduct_smul, smul_smul, Unitary.mul_star_self_of_mem (g.toU1 ^ 3).2,
+    one_smul, star_mulVec, dotProduct_comm, dotProduct_mulVec, vecMul_vecMul,
+    ← star_eq_conjTranspose, mem_unitaryGroup_iff'.mp g.toSU2.2.1, vecMul_one, dotProduct_comm]
 
 @[simp]
 lemma gaugeGroupI_smul_norm (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
@@ -301,28 +270,24 @@ def toRealGroupElem (φ : HiggsVec) : GaugeGroupI :=
 lemma toRealGroupElem_smul_self (φ : HiggsVec) :
     (toRealGroupElem φ) • φ = ofReal (‖φ‖ ^ 2) := by
   by_cases hφ : φ = 0
-  · simp [hφ, toRealGroupElem]
-    ext i
-    fin_cases i <;> simp [ofReal]
+  · ext i
+    fin_cases i <;> simp [hφ, toRealGroupElem, ofReal]
   rw [gaugeGroupI_smul_eq]
   have h0' : (‖φ‖ ^ 2 : ℂ) = φ 0 * (starRingEnd ℂ) (φ 0) + φ 1 * (starRingEnd ℂ) (φ 1) := by
     rw [← ofReal_pow, ← @real_inner_self_eq_norm_sq]
     simp only [Fin.isValue, mul_conj, PiLp.inner_apply, Complex.inner, ofReal_re,
       Fin.sum_univ_two, ofReal_add]
-  simp [toRealGroupElem, hφ]
-  · simp [GaugeGroupI.toU1, GaugeGroupI.toSU2]
-    ext i
-    have hφ : Complex.ofReal ‖φ‖ ≠ 0 := ofReal_inj.mp.mt (norm_ne_zero_iff.mpr hφ)
-    fin_cases i
-    · simp [ofReal]
-      field_simp
-      rw [h0']
-      ring_nf
-      rfl
-    · simp [ofReal]
-      field_simp
-      change -(φ 1 * φ 0) + φ 0 * φ 1= _
-      ring
+  have hn : Complex.ofReal ‖φ‖ ≠ 0 := ofReal_inj.mp.mt (norm_ne_zero_iff.mpr hφ)
+  simp [toRealGroupElem, hφ, GaugeGroupI.toU1, GaugeGroupI.toSU2]
+  ext i
+  fin_cases i
+  · simp [ofReal, vecHead, vecTail]
+    field_simp
+    rw [h0']
+    ring
+  · simp [ofReal, vecHead, vecTail]
+    field_simp
+    ring
 
 /-!
 
@@ -341,8 +306,8 @@ lemma mem_orbit_gaugeGroupI_iff (φ : HiggsVec) (ψ : HiggsVec) :
   · intro h
     use (toRealGroupElem ψ)⁻¹ * toRealGroupElem (φ)
     simp only
-    rw [← smul_smul, toRealGroupElem_smul_self φ, ← h, ← toRealGroupElem_smul_self ψ, smul_smul]
-    simp
+    rw [← smul_smul, toRealGroupElem_smul_self φ, ← h, ← toRealGroupElem_smul_self ψ]
+    exact inv_smul_smul _ ψ
 
 /-!
 
@@ -386,19 +351,12 @@ lemma ofU1Subgroup_smul_eq_smul (g : unitary ℂ) (φ : HiggsVec) :
     star_pow, RCLike.star_def, smul_of, smul_cons, smul_zero, smul_empty, cons_mulVec,
     cons_dotProduct, zero_mul, dotProduct_of_isEmpty, add_zero, zero_add, empty_mulVec, one_mul,
     WithLp.toLp.injEq, vecCons_inj, mul_eq_mul_right_iff, and_true]
-  apply And.intro
+  refine ⟨?_, Or.inl ?_⟩
   · have h0 : g ^ 3 • (starRingEnd ℂ) ↑g ^ 3 = 1 := by
-      trans (normSq (g ^ 3).1 : ℂ)
-      · rw [← mul_conj]
-        simp
-        rfl
-      · rw [normSq_eq_norm_sq]
-        simp
+      simp only [starRingEnd_apply, Submonoid.smul_def, smul_eq_mul, SubmonoidClass.coe_pow,
+        ← mul_pow, Unitary.mul_star_self_of_mem g.2, one_pow]
     simp [h0]
-  · left
-    trans (g ^ 3 : ℂ) • (g ^ 3 : ℂ)
-    · rfl
-    simp only [smul_eq_mul]
+  · show (g : ℂ) ^ 3 * (g : ℂ) ^ 3 = (g : ℂ) ^ 6
     ring
 
 lemma gaugeGroupI_smul_phase_snd (φ : HiggsVec) :
@@ -407,11 +365,10 @@ lemma gaugeGroupI_smul_phase_snd (φ : HiggsVec) :
       (∀ φ1 : HiggsVec, (g • φ1).ofLp 0 = φ1.ofLp 0) ∧
       (∀ a : ℝ, g • (!₂[a, 0] : HiggsVec) = (!₂[a, 0] : HiggsVec)) := by
   let θ := arg (φ 1)
-  use StandardModel.GaugeGroupI.ofU1Subgroup ⟨Complex.exp (-I * θ / 6), by
+  refine ⟨StandardModel.GaugeGroupI.ofU1Subgroup ⟨Complex.exp (-I * θ / 6), by
     simp [Unitary.mem_iff, ← Complex.exp_conj, ← Complex.exp_add, Complex.conj_ofNat]
     ring_nf
-    simp⟩
-  apply And.intro
+    simp⟩, ?_, ?_, ?_⟩
   · rw [ofU1Subgroup_smul_eq_smul]
     simp only [Fin.isValue, neg_mul, cons_mulVec, cons_dotProduct, one_mul, zero_mul,
       dotProduct_of_isEmpty, add_zero, zero_add, empty_mulVec, cons_val_one, cons_val_fin_one]
@@ -421,7 +378,6 @@ lemma gaugeGroupI_smul_phase_snd (φ : HiggsVec) :
     simp [θ]
     ring_nf
     simp
-  apply And.intro
   · intro φ
     simp [ofU1Subgroup_smul_eq_smul, vecHead]
   · intro a
@@ -450,20 +406,16 @@ def toRealScalars : HiggsVec →ₗ[ℝ] (Fin 4 → ℝ) where
     fin_cases i <;> simp
 
 lemma toRealScalars_smul_real (a : ℝ) (φ : HiggsVec) :
-    toRealScalars (a • φ) = a • toRealScalars φ := by
-  simp [toRealScalars]
+    toRealScalars (a • φ) = a • toRealScalars φ := map_smul toRealScalars a φ
 
 lemma ofReal_toRealScalars (a : ℝ) :
     toRealScalars (ofReal a) = !₄[Real.sqrt a, 0, 0, 0] := by
-  simp [ofReal, toRealScalars]
   funext i
-  fin_cases i <;> simp
+  fin_cases i <;> simp [ofReal, toRealScalars]
 
 lemma ofReal_toRealScalars_norm (φ : HiggsVec) :
     toRealScalars (ofReal (‖φ‖ ^ 2)) = !₄[‖φ‖, 0, 0, 0] := by
-  simp [ofReal, toRealScalars]
-  funext i
-  fin_cases i <;> simp
+  rw [ofReal_toRealScalars, Real.sqrt_sq (norm_nonneg φ)]
 
 end HiggsVec
 
@@ -566,11 +518,8 @@ lemma const_apply (φ : HiggsVec) (x : SpaceTime) : const φ x = φ := rfl
 def toHiggsVec (φ : HiggsField) : SpaceTime → HiggsVec := φ
 
 lemma toHiggsVec_smooth (φ : HiggsField) :
-    ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, HiggsVec) ⊤ φ.toHiggsVec := by
-  intro x0
-  have h1 := φ.contMDiff x0
-  rw [Bundle.contMDiffAt_section] at h1
-  exact h1
+    ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, HiggsVec) ⊤ φ.toHiggsVec :=
+  fun x0 => (Bundle.contMDiffAt_section x0).mp (φ.contMDiff x0)
 
 lemma const_toHiggsVec_apply (φ : HiggsField) (x : SpaceTime) :
     const (φ.toHiggsVec x) x = φ x := rfl
@@ -588,31 +537,24 @@ We prove some smoothness properties of the components of a Higgs field.
 
 @[fun_prop]
 lemma contDiff (φ : HiggsField) :
-    ContDiff ℝ ⊤ φ := by
-  have h1 := φ.toHiggsVec_smooth
-  simp_all only [contMDiff_iff_contDiff]
-  exact h1
+    ContDiff ℝ ⊤ φ :=
+  contMDiff_iff_contDiff.mp φ.toHiggsVec_smooth
 
 lemma toVec_smooth (φ : HiggsField) :
     ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, EuclideanSpace ℂ (Fin 2)) ⊤ φ :=
   φ.toHiggsVec_smooth
 
 lemma apply_smooth (φ : HiggsField) :
-    ∀ i, ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℂ) ⊤ (fun (x : SpaceTime) => (φ x i)) := by
-  have h1 := φ.contDiff
-  intro i
-  refine ContDiff.contMDiff ?_
-  simp only
-  rw [contDiff_piLp] at h1
-  exact h1 i
+    ∀ i, ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℂ) ⊤ (fun (x : SpaceTime) => (φ x i)) :=
+  fun i => ((contDiff_piLp 2).mp φ.contDiff i).contMDiff
 
 lemma apply_re_smooth (φ : HiggsField) (i : Fin 2) :
     ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℝ) ⊤ (reCLM ∘ (fun (x : SpaceTime) => (φ x i))) :=
-  (ContinuousLinearMap.contMDiff reCLM).comp (φ.apply_smooth i)
+  reCLM.contMDiff.comp (φ.apply_smooth i)
 
 lemma apply_im_smooth (φ : HiggsField) (i : Fin 2) :
     ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℝ) ⊤ (imCLM ∘ (fun (x : SpaceTime) => (φ x i))) :=
-  (ContinuousLinearMap.contMDiff imCLM).comp (φ.apply_smooth i)
+  imCLM.contMDiff.comp (φ.apply_smooth i)
 
 /-!
 
@@ -642,22 +584,13 @@ lemma inner_eq_expand (φ1 φ2 : HiggsField) :
     ((φ1 x 0).re * (φ2 x 0).im + (φ1 x 1).re * (φ2 x 1).im
     - (φ1 x 0).im * (φ2 x 0).re - (φ1 x 1).im * (φ2 x 1).re)) := by
   funext x
-  simp only [inner_apply, PiLp.inner_apply, RCLike.inner_apply, Fin.sum_univ_two,
-    equivRealProdCLM_symm_apply, ofReal_add, ofReal_mul, ofReal_sub]
-  rw [RCLike.conj_eq_re_sub_im, RCLike.conj_eq_re_sub_im]
-  nth_rewrite 1 [← RCLike.re_add_im (φ2 x 0)]
-  nth_rewrite 1 [← RCLike.re_add_im (φ2 x 1)]
-  ring_nf
-  simp only [Fin.isValue, RCLike.re_to_complex, coe_algebraMap, RCLike.I_to_complex,
-    RCLike.im_to_complex, I_sq, mul_neg, mul_one, neg_mul, sub_neg_eq_add, one_mul]
-  ring
+  apply Complex.ext <;> simp [inner_apply, PiLp.inner_apply, equivRealProdCLM_symm_apply] <;> ring
 
 /-- Expands the inner product on Higgs fields in terms of complex components of the
   Higgs fields. -/
 lemma inner_expand_conj (φ1 φ2 : HiggsField) (x : SpaceTime) :
     ⟪φ1, φ2⟫_(SpaceTime → ℂ) x = conj (φ1 x 0) * φ2 x 0 + conj (φ1 x 1) * φ2 x 1 := by
-  simp [inner_apply, PiLp.inner_apply]
-  ring
+  simp [inner_apply, PiLp.inner_apply, mul_comm]
 
 /-!
 
@@ -666,9 +599,8 @@ lemma inner_expand_conj (φ1 φ2 : HiggsField) (x : SpaceTime) :
 -/
 
 lemma inner_symm (φ1 φ2 : HiggsField) :
-    conj ⟪φ2, φ1⟫_(SpaceTime → ℂ) = ⟪φ1, φ2⟫_(SpaceTime → ℂ) := by
-  funext x
-  simp only [inner_apply, Pi.conj_apply, inner_conj_symm]
+    conj ⟪φ2, φ1⟫_(SpaceTime → ℂ) = ⟪φ1, φ2⟫_(SpaceTime → ℂ) :=
+  funext fun x => inner_conj_symm (φ1 x) (φ2 x)
 
 /-!
 
@@ -677,36 +609,30 @@ lemma inner_symm (φ1 φ2 : HiggsField) :
 -/
 
 lemma inner_add_left (φ1 φ2 φ3 : HiggsField) :
-    ⟪φ1 + φ2, φ3⟫_(SpaceTime → ℂ) = ⟪φ1, φ3⟫_(SpaceTime → ℂ) + ⟪φ2, φ3⟫_(SpaceTime → ℂ) := by
-  funext x
-  simp [inner_apply, _root_.inner_add_left]
+    ⟪φ1 + φ2, φ3⟫_(SpaceTime → ℂ) = ⟪φ1, φ3⟫_(SpaceTime → ℂ) + ⟪φ2, φ3⟫_(SpaceTime → ℂ) :=
+  funext fun x => _root_.inner_add_left (φ1 x) (φ2 x) (φ3 x)
 
 lemma inner_add_right (φ1 φ2 φ3 : HiggsField) :
-    ⟪φ1, φ2 + φ3⟫_(SpaceTime → ℂ) = ⟪φ1, φ2⟫_(SpaceTime → ℂ) + ⟪φ1, φ3⟫_(SpaceTime → ℂ) := by
-  funext x
-  simp [inner_apply, _root_.inner_add_right]
+    ⟪φ1, φ2 + φ3⟫_(SpaceTime → ℂ) = ⟪φ1, φ2⟫_(SpaceTime → ℂ) + ⟪φ1, φ3⟫_(SpaceTime → ℂ) :=
+  funext fun x => _root_.inner_add_right (φ1 x) (φ2 x) (φ3 x)
 
 @[simp]
 lemma inner_zero_left (φ : HiggsField) :
-    ⟪0, φ⟫_(SpaceTime → ℂ) = 0 := by
-  funext x
-  simp [inner_apply]
+    ⟪0, φ⟫_(SpaceTime → ℂ) = 0 :=
+  funext fun x => _root_.inner_zero_left (φ x)
 
 @[simp]
 lemma inner_zero_right (φ : HiggsField) :
-    ⟪φ, 0⟫_(SpaceTime → ℂ) = 0 := by
-  funext x
-  simp [inner_apply]
+    ⟪φ, 0⟫_(SpaceTime → ℂ) = 0 :=
+  funext fun x => _root_.inner_zero_right (φ x)
 
 lemma inner_neg_left (φ1 φ2 : HiggsField) :
-    ⟪-φ1, φ2⟫_(SpaceTime → ℂ) = -⟪φ1, φ2⟫_(SpaceTime → ℂ) := by
-  funext x
-  simp [inner_apply]
+    ⟪-φ1, φ2⟫_(SpaceTime → ℂ) = -⟪φ1, φ2⟫_(SpaceTime → ℂ) :=
+  funext fun x => _root_.inner_neg_left (φ1 x) (φ2 x)
 
 lemma inner_neg_right (φ1 φ2 : HiggsField) :
-    ⟪φ1, -φ2⟫_(SpaceTime → ℂ) = -⟪φ1, φ2⟫_(SpaceTime → ℂ) := by
-  funext x
-  simp [inner_apply]
+    ⟪φ1, -φ2⟫_(SpaceTime → ℂ) = -⟪φ1, φ2⟫_(SpaceTime → ℂ) :=
+  funext fun x => _root_.inner_neg_right (φ1 x) (φ2 x)
 
 /-!
 
@@ -715,17 +641,9 @@ lemma inner_neg_right (φ1 φ2 : HiggsField) :
 -/
 
 lemma inner_smooth (φ1 φ2 : HiggsField) : ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℂ) ⊤
-    ⟪φ1, φ2⟫_(SpaceTime → ℂ) := by
-  rw [inner_eq_expand]
-  exact (ContinuousLinearMap.contMDiff (equivRealProdCLM.symm : ℝ × ℝ →L[ℝ] ℂ)).comp $
-    (((((φ1.apply_re_smooth 0).smul (φ2.apply_re_smooth 0)).add
-    ((φ1.apply_re_smooth 1).smul (φ2.apply_re_smooth 1))).add
-    ((φ1.apply_im_smooth 0).smul (φ2.apply_im_smooth 0))).add
-    ((φ1.apply_im_smooth 1).smul (φ2.apply_im_smooth 1))).prodMk_space $
-    ((((φ1.apply_re_smooth 0).smul (φ2.apply_im_smooth 0)).add
-    ((φ1.apply_re_smooth 1).smul (φ2.apply_im_smooth 1))).sub
-    ((φ1.apply_im_smooth 0).smul (φ2.apply_re_smooth 0))).sub
-    ((φ1.apply_im_smooth 1).smul (φ2.apply_re_smooth 1))
+    ⟪φ1, φ2⟫_(SpaceTime → ℂ) :=
+  ContDiff.contMDiff <|
+    (isBoundedBilinearMap_inner (𝕜 := ℂ)).contDiff.comp (φ1.contDiff.prodMk φ2.contDiff)
 
 /-!
 
@@ -754,17 +672,11 @@ scoped[StandardModel.HiggsField] notation "‖" φ1 "‖_H^2" => normSq φ1
 
 lemma inner_self_eq_normSq (φ : HiggsField) (x : SpaceTime) :
     ⟪φ, φ⟫_(SpaceTime → ℂ) x = ‖φ‖_H^2 x := by
-  simp only [inner_apply, PiLp.inner_apply, RCLike.inner_apply, Fin.sum_univ_two, Fin.isValue,
-    normSq, ofReal_pow]
-  rw [← Complex.ofReal_pow, PiLp.norm_sq_eq_of_L2]
-  rw [Fin.sum_univ_two, ofReal_add, ofReal_pow]
-  rw [mul_comm, conj_mul', mul_comm, conj_mul', ofReal_pow]
+  simp [inner_apply, inner_self_eq_norm_sq_to_K]
 
 lemma normSq_eq_inner_self_re (φ : HiggsField) (x : SpaceTime) :
     φ.normSq x = (⟪φ, φ⟫_(SpaceTime → ℂ) x).re := by
-  rw [inner_self_eq_normSq]
-  simp only [normSq, ofReal_pow]
-  rw [← Complex.ofReal_pow, Complex.ofReal_re]
+  rw [inner_self_eq_normSq, Complex.ofReal_re]
 
 /-- The expansion of the norm squared of into components. -/
 lemma normSq_expand (φ : HiggsField) :
@@ -778,8 +690,7 @@ lemma normSq_expand (φ : HiggsField) :
 
 -/
 
-lemma normSq_nonneg (φ : HiggsField) (x : SpaceTime) : 0 ≤ ‖φ‖_H^2 x := by
-  simp [normSq]
+lemma normSq_nonneg (φ : HiggsField) (x : SpaceTime) : 0 ≤ ‖φ‖_H^2 x := sq_nonneg _
 
 /-!
 
@@ -800,14 +711,8 @@ lemma normSq_zero : ‖0‖_H^2 = 0 := by
 
 /-- The norm squared of the Higgs field is a smooth function on space-time. -/
 lemma normSq_smooth (φ : HiggsField) : ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ, ℝ) ⊤ φ.normSq := by
-  rw [normSq_expand]
-  refine ContMDiff.add ?_ ?_
-  · simp only [mul_re, conj_re, conj_im, neg_mul, sub_neg_eq_add]
-    exact ((φ.apply_re_smooth 0).smul (φ.apply_re_smooth 0)).add $
-      (φ.apply_im_smooth 0).smul (φ.apply_im_smooth 0)
-  · simp only [mul_re, conj_re, conj_im, neg_mul, sub_neg_eq_add]
-    exact ((φ.apply_re_smooth 1).smul (φ.apply_re_smooth 1)).add $
-      (φ.apply_im_smooth 1).smul (φ.apply_im_smooth 1)
+  rw [show φ.normSq = reCLM ∘ ⟪φ, φ⟫_(SpaceTime → ℂ) from funext (normSq_eq_inner_self_re φ)]
+  exact reCLM.contMDiff.comp (φ.inner_smooth φ)
 
 /-!
 
@@ -817,8 +722,7 @@ lemma normSq_smooth (φ : HiggsField) : ContMDiff 𝓘(ℝ, SpaceTime) 𝓘(ℝ,
 
 @[simp]
 lemma const_normSq (φ : HiggsVec) (x : SpaceTime) :
-    ‖const φ‖_H^2 x = ‖φ‖ ^ 2 := by
-  simp [normSq, const_apply]
+    ‖const φ‖_H^2 x = ‖φ‖ ^ 2 := by simp
 
 /-!
 

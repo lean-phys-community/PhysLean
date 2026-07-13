@@ -47,9 +47,8 @@ open Set
 instance (H : Type*) [SeminormedAddCommGroup H] [InnerProductSpace ℂ H] :
     IsAddTorsionFree (H →L[ℂ] H) where
   nsmul_right_injective n hn := by
-    refine Function.HasLeftInverse.injective ?_
-    use fun f ↦ (n : ℂ)⁻¹ • f
-    intro; ext; simp [← Nat.cast_smul_eq_nsmul ℂ, smul_smul, Nat.cast_ne_zero (R := ℂ), hn]
+    refine Function.HasLeftInverse.injective ⟨fun f ↦ (n : ℂ)⁻¹ • f, fun x ↦ ?_⟩
+    simp [← Nat.cast_smul_eq_nsmul ℂ, smul_smul, Nat.cast_ne_zero (R := ℂ), hn]
 
 /-!
 ## A. Definition
@@ -95,27 +94,23 @@ lemma comp_of_disjoint
     {A B : Set α} (h : Disjoint A B) (hA : MeasurableSet A) (hB : MeasurableSet B) :
     μS A ∘L μS B = 0 := by
   suffices μS A ∘L μS (A ∪ B) = μS A by simp_all [μS.of_union]
-  refine (IsStarProjection.sub_iff_mul_eq_left ?_ ?_).mp ?_
-  · exact μS.isStarProjection A
-  · exact μS.isStarProjection (A ∪ B)
-  · rw [μS.of_union h hA hB, add_sub_cancel_left]
-    exact μS.isStarProjection B
+  refine (IsStarProjection.sub_iff_mul_eq_left (μS.isStarProjection A)
+    (μS.isStarProjection (A ∪ B))).mp ?_
+  simpa [μS.of_union h hA hB] using μS.isStarProjection B
 
 lemma comp_eq_of_inter {A B : Set α} (hA : MeasurableSet A) (hB : MeasurableSet B) :
     μS A ∘L μS B = μS (A ∩ B) := by
   nth_rw 1 [← inter_union_sdiff B A, ← inter_union_sdiff A B]
   simp only [μS.of_union, hA.inter hB, hB.inter hA, hA.diff hB, hB.diff hA,
     disjoint_sdiff_inter.symm, add_comp, comp_add]
-  rw [inter_comm B A, μS.comp_of_disjoint disjoint_sdiff_inter (hA.diff hB) (hA.inter hB)]
-  rw [inter_comm A B, μS.comp_of_disjoint disjoint_sdiff_inter.symm (hB.inter hA) (hB.diff hA)]
+  rw [inter_comm B A, μS.comp_of_disjoint disjoint_sdiff_inter (hA.diff hB) (hA.inter hB),
+    inter_comm A B, μS.comp_of_disjoint disjoint_sdiff_inter.symm (hB.inter hA) (hB.diff hA)]
   simp [μS.comp_of_disjoint disjoint_sdiff_sdiff (hA.diff hB) (hB.diff hA)]
 
 lemma commute (A B : Set α) : Commute (μS A) (μS B) := by
   by_cases hAB : MeasurableSet A ∧ MeasurableSet B
   · simp [commute_iff_eq, mul_def, comp_eq_of_inter, hAB, inter_comm]
-  · rcases not_and_or.mp hAB with hA | hB
-    · simp [hA]
-    · simp [hB]
+  · rcases not_and_or.mp hAB with hA | hB <;> simp [*]
 
 end SpectralMeasure
 

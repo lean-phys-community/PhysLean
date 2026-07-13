@@ -47,19 +47,10 @@ lemma lineInCubic_expand {S : (PureU1 (2 * n.succ)).LinSols} (h : LineInCubic S)
   intro g f hS a b
   have h1 := h g f hS a b
   change accCubeTriLinSymm.toCubic (a • P g + b • P! f) = 0 at h1
-  simp only [TriLinearSymm.toCubic_add] at h1
-  simp only [HomogeneousCubic.map_smul,
+  simp only [TriLinearSymm.toCubic_add, HomogeneousCubic.map_smul,
     accCubeTriLinSymm.map_smul₁, accCubeTriLinSymm.map_smul₂, accCubeTriLinSymm.map_smul₃] at h1
-  conv_lhs at h1 =>
-    enter [1, 1, 1, 2]
-    change accCube _ _
-    rw [P_accCube]
-  conv_lhs at h1 =>
-    enter [1, 1, 2, 2]
-    change accCube _ _
-    rw [P!_accCube]
-  rw [← h1]
-  ring
+  erw [P_accCube, P!_accCube] at h1
+  linear_combination h1
 
 /--
 This lemma states that for a given `S` of type `(PureU1 (2 * n.succ)).AnomalyFreeLinear` and
@@ -87,13 +78,10 @@ lemma lineInCubicPerm_self {S : (PureU1 (2 * n.succ)).LinSols}
 lemma lineInCubicPerm_permute {S : (PureU1 (2 * n.succ)).LinSols}
     (hS : LineInCubicPerm S) (M' : (FamilyPermutations (2 * n.succ)).group) :
     LineInCubicPerm ((FamilyPermutations (2 * n.succ)).linSolRep M' S) := by
-  rw [LineInCubicPerm]
   intro M
-  change LineInCubic
-    (((FamilyPermutations (2 * n.succ)).linSolRep M *
-    (FamilyPermutations (2 * n.succ)).linSolRep M') S)
-  erw [← (FamilyPermutations (2 * n.succ)).linSolRep.map_mul M M']
-  exact hS (M * M')
+  have h := hS (M * M')
+  erw [(FamilyPermutations (2 * n.succ)).linSolRep.map_mul M M'] at h
+  exact h
 
 set_option backward.isDefEq.respectTransparency false in
 lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ)).LinSols}
@@ -102,17 +90,12 @@ lemma lineInCubicPerm_swap {S : (PureU1 (2 * n.succ)).LinSols}
       (S.val (evenShiftSnd j) - S.val (evenShiftFst j))
       * accCubeTriLinSymm (P g) (P g) (basis!AsCharges j) = 0 := by
   intro j g f h
-  let S' := (FamilyPermutations (2 * n.succ)).linSolRep
-    (Equiv.swap (evenShiftFst j) (evenShiftSnd j)) S
-  have hSS' : ((FamilyPermutations (2 * n.succ)).linSolRep
-    (Equiv.swap (evenShiftFst j) (evenShiftSnd j))) S = S' := rfl
-  obtain ⟨g', f', hall⟩ := span_basis_swap! j hSS' g f h
+  obtain ⟨g', f', hall⟩ := span_basis_swap! j rfl g f h
   have h1 := line_in_cubic_P_P_P! (lineInCubicPerm_self LIC) g f h
   have h2 := line_in_cubic_P_P_P!
     (lineInCubicPerm_self (lineInCubicPerm_permute LIC
     (Equiv.swap (evenShiftFst j) (evenShiftSnd j)))) g' f' hall.1
-  rw [hall.2.1, hall.2.2] at h2
-  rw [accCubeTriLinSymm.map_add₃, h1, accCubeTriLinSymm.map_smul₃] at h2
+  rw [hall.2.1, hall.2.2, accCubeTriLinSymm.map_add₃, h1, accCubeTriLinSymm.map_smul₃] at h2
   simpa using h2
 
 lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ)).LinSols}
@@ -121,22 +104,8 @@ lemma P_P_P!_accCube' {S : (PureU1 (2 * n.succ.succ)).LinSols}
     - (S.val (evenShiftSnd (Fin.last n)) + S.val (evenShiftFst (Fin.last n))) *
     (2 * S.val evenShiftLast +
     S.val (evenShiftSnd (Fin.last n)) + S.val (evenShiftFst (Fin.last n))) := by
-  rw [P_P_P!_accCube f (Fin.last n)]
-  have h1 := Pa_evenShiftLast f g
-  have h2 := Pa_evenShiftFst f g (Fin.last n)
-  have h3 := Pa_evenShiftSnd f g (Fin.last n)
-  simp only [Fin.succ_last, Nat.succ_eq_add_one] at h1 h2 h3
-  have hl : f (Fin.succ (Fin.last n)) = - Pa f g evenShiftLast := by
-    simp_all only [Fin.succ_last, neg_neg]
-  erw [hl] at h2
-  have hg : g (Fin.last n) = Pa f g (evenShiftFst (Fin.last n)) + Pa f g evenShiftLast := by
-    linear_combination -(1 * h2)
-  have hll : f (Fin.castSucc (Fin.last n)) =
-      - (Pa f g (evenShiftSnd (Fin.last n)) + Pa f g (evenShiftFst (Fin.last n))
-      + Pa f g evenShiftLast) := by
-    linear_combination h3 - 1 * hg
-  rw [← hS] at hl hll
-  rw [hl, hll]
+  rw [P_P_P!_accCube f (Fin.last n), hS, Pa_evenShiftSnd, Pa_evenShiftFst, Pa_evenShiftLast,
+    Fin.succ_last]
   ring
 
 lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ)).LinSols}
@@ -148,13 +117,10 @@ lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ)).LinSols}
   have h1 := lineInCubicPerm_swap LIC (Fin.last n) g f hfg
   rw [P_P_P!_accCube' g f hfg] at h1
   simp only [Nat.succ_eq_add_one, neg_add_rev, mul_eq_zero] at h1
-  cases h1 <;> rename_i h1
-  · left
-    linear_combination h1
-  · cases h1 <;> rename_i h1
-    · refine Or.inr (Or.inl ?_)
-      linear_combination -(1 * h1)
-    · exact Or.inr (Or.inr h1)
+  rcases h1 with h1 | h1 | h1
+  · exact Or.inl (by linear_combination h1)
+  · exact Or.inr (Or.inl (by linear_combination -(1 * h1)))
+  · exact Or.inr (Or.inr h1)
 
 lemma lineInCubicPerm_last_perm {S : (PureU1 (2 * n.succ.succ)).LinSols}
     (LIC : LineInCubicPerm S) : LineInPlaneCond S := by
@@ -163,9 +129,7 @@ lemma lineInCubicPerm_last_perm {S : (PureU1 (2 * n.succ.succ)).LinSols}
     evenShiftLast ?_ ?_ ?_ ?_
   · simp [Fin.ext_iff, evenShiftSnd, evenShiftFst]
   · simp [Fin.ext_iff, evenShiftSnd, evenShiftLast]
-  · simp only [Nat.succ_eq_add_one, evenShiftFst, evenShiftLast, Fin.isValue, ne_eq, Fin.ext_iff,
-    Fin.val_cast, Fin.val_natAdd, Fin.val_castAdd, Fin.val_last, Fin.val_eq_zero, add_zero,
-    add_right_inj]
+  · simp [Fin.ext_iff, evenShiftFst, evenShiftLast]
     omega
   · exact fun M => lineInCubicPerm_last_cond (lineInCubicPerm_permute LIC M)
 

@@ -58,10 +58,8 @@ lemma staticWickTerm_insert_zero_none (φ : 𝓕.FieldOp) (φs : List 𝓕.Field
     (φsΛ : WickContraction φs.length) :
     (φsΛ ↩Λ φ 0 none).staticWickTerm =
     φsΛ.sign • φsΛ.staticContract * 𝓝(ofFieldOpList (φ :: [φsΛ]ᵘᶜ)) := by
-  symm
-  erw [staticWickTerm, sign_insert_none_zero]
-  simp only [staticContract_insert_none, insertAndContract_uncontractedList_none_zero,
-    Algebra.smul_mul_assoc]
+  simp only [staticWickTerm, sign_insert_none_zero, staticContract_insert_none,
+    insertAndContract_uncontractedList_none_zero, Algebra.smul_mul_assoc]
 
 /-- For a list `φs = φ₀…φₙ` of `𝓕.FieldOp`, a Wick contraction `φsΛ` of `φs`, an element `φ` of
   `𝓕.FieldOp`, and a `k` in `φsΛ.uncontracted`, `(φsΛ ↩Λ φ 0 (some k)).wickTerm` is equal
@@ -89,21 +87,16 @@ lemma staticWickTerm_insert_zero_some (φ : 𝓕.FieldOp) (φs : List 𝓕.Field
   simp only [← mul_assoc]
   rw [← smul_mul_assoc]
   congr 1
-  rw [staticContract_insert_some_of_lt]
-  swap
-  · simp
-  rw [smul_smul]
+  rw [staticContract_insert_some_of_lt (hik := by simp), smul_smul]
   by_cases hn : GradingCompliant φs φsΛ ∧ (𝓕|>ₛφ) = (𝓕|>ₛ φs[k.1])
   · congr 1
-    swap
-    · rw [Subalgebra.mem_center_iff.mp φsΛ.staticContract.2]
     · rw [sign_insert_some_zero _ _ _ _ hn, mul_comm, ← mul_assoc]
       simp
+    · rw [Subalgebra.mem_center_iff.mp φsΛ.staticContract.2]
   · simp only [Fin.getElem_fin, not_and] at hn
     by_cases h0 : ¬ GradingCompliant φs φsΛ
-    · rw [staticContract_of_not_gradingCompliant]
+    · rw [staticContract_of_not_gradingCompliant _ _ h0]
       simp only [ZeroMemClass.coe_zero, zero_mul, smul_zero, mul_zero]
-      exact h0
     · simp_all only [not_not, forall_const]
       have h1 : contractStateAtIndex φ [φsΛ]ᵘᶜ (uncontractedFieldOpEquiv φs φsΛ k) = 0 := by
         simp only [contractStateAtIndex, uncontractedFieldOpEquiv, Equiv.optionCongr_apply,
@@ -112,10 +105,8 @@ lemma staticWickTerm_insert_zero_some (φ : 𝓕.FieldOp) (φs : List 𝓕.Field
         right
         simp only [uncontractedListGet, List.getElem_map,
           uncontractedList_getElem_uncontractedIndexEquiv_symm, List.get_eq_getElem]
-        rw [superCommute_anPart_ofFieldOpF_diff_grade_zero]
-        exact hn
-      rw [h1]
-      simp
+        rw [superCommute_anPart_ofFieldOpF_diff_grade_zero (h := hn)]
+      simp [h1]
 
 set_option backward.isDefEq.respectTransparency false in
 /--
@@ -141,9 +132,8 @@ lemma mul_staticWickTerm_eq_sum (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
       (φsΛ.staticContract).2 φsΛ.sign)
     conv_rhs => rw [← mul_assoc, ← ht]
     simp [mul_assoc, staticWickTerm]
-  rw [ofFieldOp_mul_normalOrder_ofFieldOpList_eq_sum]
-  rw [Finset.mul_sum]
-  rw [uncontractedFieldOpEquiv_list_sum]
+  rw [ofFieldOp_mul_normalOrder_ofFieldOpList_eq_sum, Finset.mul_sum,
+    uncontractedFieldOpEquiv_list_sum]
   refine Finset.sum_congr rfl (fun n _ => ?_)
   match n with
   | none =>

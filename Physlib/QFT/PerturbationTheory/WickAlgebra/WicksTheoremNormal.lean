@@ -57,15 +57,13 @@ lemma timeOrder_ofFieldOpList_eqTimeOnly (φs : List 𝓕.FieldOp) :
   simp only [staticWickTerm, Algebra.smul_mul_assoc, map_smul]
   conv_lhs =>
     enter [2, 2, x]
-    rw [timeOrder_timeOrder_left]
-    rw [timeOrder_staticContract_of_not_mem _ x.2]
+    rw [timeOrder_timeOrder_left, timeOrder_staticContract_of_not_mem _ x.2]
   simp only [zero_mul, map_zero, smul_zero, Finset.sum_const_zero, add_zero]
   congr
   funext x
-  rw [staticContract_eq_timeContract_of_eqTimeOnly]
-  rw [timeOrder_timeContract_mul_of_eqTimeOnly_left]
-  exact x.2
-  exact x.2
+  rw [staticContract_eq_timeContract_of_eqTimeOnly,
+    timeOrder_timeContract_mul_of_eqTimeOnly_left] <;>
+    exact x.2
 
 lemma timeOrder_ofFieldOpList_eq_eqTimeOnly_empty (φs : List 𝓕.FieldOp) :
     𝓣(ofFieldOpList φs) = 𝓣(𝓝(ofFieldOpList φs)) +
@@ -87,11 +85,8 @@ lemma timeOrder_ofFieldOpList_eq_eqTimeOnly_empty (φs : List 𝓕.FieldOp) :
         simp [a.2], right_inv a := by simp}
     rw [← e2.symm.sum_comp]
     simp [e2, sign_empty]
-  · let e2 : { φsΛ : {φsΛ : WickContraction φs.length // φsΛ.EqTimeOnly} // ¬ φsΛ.1 = empty } ≃
-      {φsΛ // φsΛ.EqTimeOnly ∧ φsΛ ≠ empty} := {
-        toFun := fun x => ⟨x, ⟨x.1.2, x.2⟩⟩, invFun := fun x => ⟨⟨x.1, x.2.1⟩, x.2.2⟩,
-        left_inv a := by rfl, right_inv a := by rfl }
-    rw [← e2.symm.sum_comp]
+  · rw [← (Equiv.subtypeSubtypeEquivSubtypeInter
+      (fun φsΛ : WickContraction φs.length => φsΛ.EqTimeOnly) (· ≠ empty)).symm.sum_comp]
     rfl
 
 /--
@@ -109,8 +104,7 @@ lemma normalOrder_timeOrder_ofFieldOpList_eq_eqTimeOnly_empty (φs : List 𝓕.F
     𝓣(𝓝(ofFieldOpList φs)) = 𝓣(ofFieldOpList φs) -
     ∑ (φsΛ : {φsΛ // φsΛ.EqTimeOnly (φs := φs) ∧ φsΛ ≠ empty}),
     φsΛ.1.sign • φsΛ.1.timeContract.1 * 𝓣(𝓝(ofFieldOpList [φsΛ.1]ᵘᶜ)) := by
-  rw [timeOrder_ofFieldOpList_eq_eqTimeOnly_empty]
-  simp
+  simp [timeOrder_ofFieldOpList_eq_eqTimeOnly_empty]
 
 /--
 For a list `φs` of `𝓕.FieldOp`, then `𝓣(φs)` is equal to the sum of
@@ -140,8 +134,8 @@ lemma timeOrder_haveEqTime_split (φs : List 𝓕.FieldOp) :
       φssucΛ.1.wickTerm) := by
   rw [wicks_theorem]
   simp only [wickTerm]
-  let e1 : WickContraction φs.length ≃ {φsΛ // HaveEqTime φsΛ} ⊕ {φsΛ // ¬ HaveEqTime φsΛ} := by
-    exact (Equiv.sumCompl HaveEqTime).symm
+  let e1 : WickContraction φs.length ≃ {φsΛ // HaveEqTime φsΛ} ⊕ {φsΛ // ¬ HaveEqTime φsΛ} :=
+    (Equiv.sumCompl HaveEqTime).symm
   rw [← e1.symm.sum_comp]
   simp only [Equiv.symm_symm, Algebra.smul_mul_assoc, Fintype.sum_sum_type,
     Equiv.sumCompl_apply_inl, Equiv.sumCompl_apply_inr, ne_eq, e1]
@@ -156,11 +150,7 @@ lemma timeOrder_haveEqTime_split (φs : List 𝓕.FieldOp) :
   simp only [f]
   conv_lhs =>
     enter [2, φsucΛ]
-    rw [← Algebra.smul_mul_assoc]
-    rw [join_sign_timeContract φsΛ.1 φsucΛ.1]
-  conv_lhs =>
-    enter [2, φsucΛ]
-    rw [mul_assoc]
+    rw [← Algebra.smul_mul_assoc, join_sign_timeContract φsΛ.1 φsucΛ.1, mul_assoc]
   rw [← Finset.mul_sum, ← Algebra.smul_mul_assoc]
   congr
   funext φsΛ'
@@ -176,14 +166,9 @@ lemma normalOrder_timeOrder_ofFieldOpList_eq_not_haveEqTime_sub_inductive (φs :
         (∑ φssucΛ : { φssucΛ : WickContraction [φsΛ.1]ᵘᶜ.length // ¬ φssucΛ.HaveEqTime },
         φssucΛ.1.wickTerm - 𝓣(𝓝(ofFieldOpList [φsΛ.1]ᵘᶜ))) := by
   rw [normalOrder_timeOrder_ofFieldOpList_eq_eqTimeOnly_empty,
-    timeOrder_haveEqTime_split]
-  rw [add_sub_assoc]
+    timeOrder_haveEqTime_split, add_sub_assoc]
   congr 1
-  simp only [ne_eq, Algebra.smul_mul_assoc]
-  rw [← Finset.sum_sub_distrib]
-  congr 1
-  funext x
-  rw [← smul_sub, ← mul_sub]
+  simp only [ne_eq, Algebra.smul_mul_assoc, ← Finset.sum_sub_distrib, ← smul_sub, ← mul_sub]
 
 lemma wicks_theorem_normal_order_empty : 𝓣(𝓝(ofFieldOpList [])) =
     ∑ (φsΛ : {φsΛ : WickContraction ([] : List 𝓕.FieldOp).length // ¬ HaveEqTime φsΛ}),
@@ -196,27 +181,19 @@ lemma wicks_theorem_normal_order_empty : 𝓣(𝓝(ofFieldOpList [])) =
       left_inv := by
         intro a
         simp only [List.length_nil]
-        apply Subtype.ext
-        apply Subtype.ext
-        simp only [empty]
+        refine Subtype.ext (Subtype.ext ?_)
         ext i
-        simp only [Finset.notMem_empty, false_iff]
-        by_contra hn
-        have h2 := a.1.2.1 i hn
-        rw [@Finset.card_eq_two] at h2
-        obtain ⟨a, b, ha, hb, hab⟩ := h2
-        exact Fin.elim0 a,
+        simp only [empty, Finset.notMem_empty, false_iff]
+        exact fun hn => absurd (a.1.2.1 i hn) (by simp [Finset.eq_empty_of_isEmpty i]),
       right_inv := by intro a; simp}
   rw [← e2.symm.sum_comp]
   simp only [Finset.univ_unique, PUnit.default_eq_unit, List.length_nil, Equiv.coe_fn_symm_mk,
     sign_empty, timeContract_empty, OneMemClass.coe_one, one_smul, uncontractedListGet_empty,
     one_mul, Finset.sum_const, Finset.card_singleton, e2]
   have h1' : ofFieldOpList (𝓕 := 𝓕) [] = ofCrAnList [] := by rfl
-  rw [h1']
-  rw [normalOrder_ofCrAnList]
+  rw [h1', normalOrder_ofCrAnList]
   simp only [normalOrderSign_nil, normalOrderList_nil, one_smul]
-  rw [ofCrAnList, timeOrder_eq_ι_timeOrderF]
-  rw [timeOrderF_ofCrAnListF]
+  rw [ofCrAnList, timeOrder_eq_ι_timeOrderF, timeOrderF_ofCrAnListF]
   simp
 
 /--For a list `φs` of `𝓕.FieldOp`, the normal-ordered version of Wick's theorem states that
@@ -242,10 +219,7 @@ theorem wicks_theorem_normal_order : (φs : List 𝓕.FieldOp) →
     simp only [Algebra.smul_mul_assoc, ne_eq, add_eq_left]
     apply Finset.sum_eq_zero
     intro φsΛ hφsΛ
-    simp only [smul_eq_zero]
-    right
-    have ih := wicks_theorem_normal_order [φsΛ.1]ᵘᶜ
-    rw [ih]
+    rw [wicks_theorem_normal_order [φsΛ.1]ᵘᶜ]
     simp [wickTerm]
 termination_by φs => φs.length
 decreasing_by

@@ -413,12 +413,9 @@ lemma fderivD_const [hμ : Measure.IsAddHaarMeasure (volume (α := E))]
   · simp
   rw [integral_smul_fderiv_eq_neg_fderiv_smul_of_integrable]
   simp only [evalCLM_apply_apply, fderivCLM_apply, neg_neg]
-  · apply MeasureTheory.Integrable.smul_const
-    change Integrable (SchwartzMap.evalCLM (𝕜 := ℝ) E ℝ v (SchwartzMap.fderivCLM ℝ E ℝ η)) volume
-    exact integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))
+  · exact (integrable ((SchwartzMap.evalCLM ℝ E ℝ v) ((fderivCLM ℝ) E ℝ η))).smul_const c
   · simp
-  · apply MeasureTheory.Integrable.smul_const
-    exact integrable η
+  · exact (integrable η).smul_const c
   · fun_prop
   · simp
 
@@ -460,8 +457,7 @@ omit [NormedAddCommGroup E] [NormedSpace ℝ E] [BorelSpace E]
   [SecondCountableTopology E] in
 private lemma lipschitzWith_integral_of_le {μ ρ : Measure E} (hμρ : μ ≤ ρ) :
     LipschitzWith 1 (fun f : Lp ℂ 1 ρ => ∫ x, f x ∂μ) := by
-  refine LipschitzWith.of_dist_le_mul ?_
-  intro f g
+  refine LipschitzWith.of_dist_le_mul fun f g => ?_
   rw [dist_eq_norm, dist_eq_norm, NNReal.coe_one, one_mul]
   have hfμ : Integrable (fun x => f x) μ :=
     memLp_one_iff_integrable.mp ((Lp.memLp f).mono_measure hμρ)
@@ -482,9 +478,7 @@ private lemma lipschitzWith_integral_of_le {μ ρ : Measure E} (hμρ : μ ≤ �
       refine ENNReal.toReal_mono hfg_top ?_
       simpa [eLpNorm_one_eq_lintegral_enorm] using
         eLpNorm_mono_measure (p := (1 : ℝ≥0∞)) (fun x => f x - g x) hμρ
-    _ = ‖f - g‖ := by
-      rw [Lp.norm_def]
-      rw [eLpNorm_congr_ae hfg_ae]
+    _ = ‖f - g‖ := by rw [Lp.norm_def, eLpNorm_congr_ae hfg_ae]
 
 private lemma integral_boundedContinuous_eq_of_forall_schwartz_integral_eq
     [FiniteDimensional ℝ E] {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν]
@@ -492,15 +486,15 @@ private lemma integral_boundedContinuous_eq_of_forall_schwartz_integral_eq
     (f : BoundedContinuousFunction E ℂ) :
     ∫ x, f x ∂μ = ∫ x, f x ∂ν := by
   let ρ : Measure E := μ + ν
-  haveI : IsFiniteMeasure ρ := by infer_instance
-  haveI : ρ.HasTemperateGrowth := by infer_instance
+  haveI : IsFiniteMeasure ρ := inferInstance
+  haveI : ρ.HasTemperateGrowth := inferInstance
   let L : 𝓢(E, ℂ) →L[ℝ] Lp ℂ 1 ρ :=
     SchwartzMap.toLpCLM ℝ ℂ 1 ρ
   let toL1 : BoundedContinuousFunction E ℂ →L[ℝ] Lp ℂ 1 ρ :=
     BoundedContinuousFunction.toLp 1 ρ ℝ
   let S : Set (Lp ℂ 1 ρ) := {u | ∫ x, u x ∂μ = ∫ x, u x ∂ν}
-  have hS_closed : IsClosed S := by
-    exact isClosed_eq
+  have hS_closed : IsClosed S :=
+    isClosed_eq
       (lipschitzWith_integral_of_le (μ := μ) (ρ := ρ)
         (Measure.le_add_right le_rfl)).continuous
       (lipschitzWith_integral_of_le (μ := ν) (ρ := ρ)
@@ -547,8 +541,7 @@ private lemma measure_eq_of_forall_schwartz_integral_eq
     {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν]
     (h : ∀ η : 𝓢(E, ℂ), ∫ x, η x ∂μ = ∫ x, η x ∂ν) :
     μ = ν := by
-  apply Measure.ext_of_charFunDual
-  ext L
+  refine Measure.ext_of_charFunDual (funext fun L => ?_)
   rw [charFunDual_apply, charFunDual_apply]
   exact integral_boundedContinuous_eq_of_forall_schwartz_integral_eq h
     (BoundedContinuousFunction.probCharDual L)
@@ -559,14 +552,9 @@ lemma ofFiniteMeasure_eq_iff
     [BorelSpace E] [SecondCountableTopology E] [FiniteDimensional ℝ E]
     {μ ν : Measure E} [IsFiniteMeasure μ] [IsFiniteMeasure ν] :
     ofFiniteMeasure ℂ μ = ofFiniteMeasure ℂ ν ↔ μ = ν := by
-  constructor
-  · intro hdist
-    apply measure_eq_of_forall_schwartz_integral_eq
-    intro η
-    rw [← ofFiniteMeasure_apply (𝕜 := ℂ) μ η,
-      ← ofFiniteMeasure_apply (𝕜 := ℂ) ν η, hdist]
-  · intro hμν
-    subst hμν
+  refine ⟨fun hdist => measure_eq_of_forall_schwartz_integral_eq fun η => ?_, ?_⟩
+  · rw [← ofFiniteMeasure_apply (𝕜 := ℂ) μ η, ← ofFiniteMeasure_apply (𝕜 := ℂ) ν η, hdist]
+  · rintro rfl
     rfl
 
 end finiteMeasureExt

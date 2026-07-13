@@ -57,11 +57,8 @@ def toU1 : GaugeGroupI →* unitary ℂ where
 
 @[ext]
 lemma ext {g g' : GaugeGroupI} (hSU3 : toSU3 g = toSU3 g')
-    (hSU2 : toSU2 g = toSU2 g') (hU1 : toU1 g = toU1 g') : g = g' := by
-  rcases g with ⟨g1, g2, g3⟩
-  cases g'
-  simp only [toSU3, toSU2, toU1] at hSU3 hSU2 hU1
-  simp_all
+    (hSU2 : toSU2 g = toSU2 g') (hU1 : toU1 g = toU1 g') : g = g' :=
+  Prod.ext hSU3 (Prod.ext hSU2 hU1)
 
 instance : Star GaugeGroupI where
   star g := (star g.1, star g.2.1, star g.2.2)
@@ -209,18 +206,8 @@ lemma gaugeGroupℤ₆OfRoot_mem_center (α : rootsOfUnity 6 ℂ) :
     gaugeGroupℤ₆OfRoot α ∈ Subgroup.center GaugeGroupI := by
   rw [Subgroup.mem_center_iff]
   intro g
-  apply GaugeGroupI.ext
-  · change GaugeGroupI.toSU3 g * gaugeGroupℤ₆SU3OfRoot α =
-      gaugeGroupℤ₆SU3OfRoot α * GaugeGroupI.toSU3 g
-    ext i j
-    simp [gaugeGroupℤ₆SU3OfRoot, Matrix.scalar_apply, mul_comm]
-  · change GaugeGroupI.toSU2 g * gaugeGroupℤ₆SU2OfRoot α =
-      gaugeGroupℤ₆SU2OfRoot α * GaugeGroupI.toSU2 g
-    ext i j
-    simp [gaugeGroupℤ₆SU2OfRoot, Matrix.scalar_apply, mul_comm]
-  · change GaugeGroupI.toU1 g * gaugeGroupℤ₆UnitaryOfRoot α =
-      gaugeGroupℤ₆UnitaryOfRoot α * GaugeGroupI.toU1 g
-    exact mul_comm _ _
+  refine GaugeGroupI.ext ?_ ?_ (mul_comm _ _) <;> ext i j <;>
+    simp [map_mul, gaugeGroupℤ₆SU3OfRoot, gaugeGroupℤ₆SU2OfRoot, Matrix.scalar_apply, mul_comm]
 
 /-- The homomorphism from sixth roots of unity to `GaugeGroupI`. -/
 noncomputable def gaugeGroupℤ₆Hom : rootsOfUnity 6 ℂ →* GaugeGroupI where
@@ -289,20 +276,13 @@ lemma mem_gaugeGroupℤ₆SubGroup_iff (g : GaugeGroupI) :
 
 lemma gaugeGroupℤ₆SubGroup_le_center :
     gaugeGroupℤ₆SubGroup ≤ Subgroup.center GaugeGroupI := by
-  intro g hg
-  rw [mem_gaugeGroupℤ₆SubGroup_iff] at hg
-  rcases hg with ⟨α, rfl⟩
+  rintro g ⟨α, rfl⟩
   exact gaugeGroupℤ₆OfRoot_mem_center α
 
 instance gaugeGroupℤ₆SubGroup_normal : gaugeGroupℤ₆SubGroup.Normal where
   conj_mem n hn g := by
-    have hn_center : n ∈ Subgroup.center GaugeGroupI := gaugeGroupℤ₆SubGroup_le_center hn
-    have hcomm : g * n = n * g := (Subgroup.mem_center_iff.mp hn_center) g
-    have hconj : g * n * g⁻¹ = n := by
-      calc
-        g * n * g⁻¹ = n * g * g⁻¹ := by rw [hcomm]
-        _ = n := by simp [mul_assoc]
-    simpa [hconj] using hn
+    rwa [Subgroup.mem_center_iff.mp (gaugeGroupℤ₆SubGroup_le_center hn) g,
+      mul_inv_cancel_right]
 
 /-- The smallest possible gauge group of the Standard Model, i.e., the quotient of `GaugeGroupI` by
 the ℤ₆-subgroup `gaugeGroupℤ₆SubGroup`.
@@ -323,10 +303,8 @@ noncomputable def mk : GaugeGroupI →* GaugeGroupℤ₆ :=
 
 @[simp]
 lemma mk_gaugeGroupℤ₆OfRoot (α : rootsOfUnity 6 ℂ) :
-    mk (gaugeGroupℤ₆OfRoot α) = 1 := by
-  change ((gaugeGroupℤ₆OfRoot α : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) = 1
-  rw [QuotientGroup.eq_one_iff]
-  exact gaugeGroupℤ₆OfRoot_mem α
+    mk (gaugeGroupℤ₆OfRoot α) = 1 :=
+  (QuotientGroup.eq_one_iff _).mpr (gaugeGroupℤ₆OfRoot_mem α)
 
 end GaugeGroupℤ₆
 
@@ -405,27 +383,17 @@ lemma mem_gaugeGroupℤ₂SubGroup_iff (g : GaugeGroupI) :
 
 lemma gaugeGroupℤ₂SubGroup_le_gaugeGroupℤ₆SubGroup :
     gaugeGroupℤ₂SubGroup ≤ gaugeGroupℤ₆SubGroup := by
-  intro g hg
-  rw [mem_gaugeGroupℤ₂SubGroup_iff] at hg
-  rcases hg with ⟨α, rfl⟩
+  rintro g ⟨α, rfl⟩
   exact gaugeGroupℤ₆OfRoot_mem (gaugeGroupℤ₂RootToℤ₆Root α)
 
 lemma gaugeGroupℤ₂SubGroup_le_center :
-    gaugeGroupℤ₂SubGroup ≤ Subgroup.center GaugeGroupI := by
-  intro g hg
-  rw [mem_gaugeGroupℤ₂SubGroup_iff] at hg
-  rcases hg with ⟨α, rfl⟩
-  exact gaugeGroupℤ₂OfRoot_mem_center α
+    gaugeGroupℤ₂SubGroup ≤ Subgroup.center GaugeGroupI :=
+  gaugeGroupℤ₂SubGroup_le_gaugeGroupℤ₆SubGroup.trans gaugeGroupℤ₆SubGroup_le_center
 
 instance gaugeGroupℤ₂SubGroup_normal : gaugeGroupℤ₂SubGroup.Normal where
   conj_mem n hn g := by
-    have hn_center : n ∈ Subgroup.center GaugeGroupI := gaugeGroupℤ₂SubGroup_le_center hn
-    have hcomm : g * n = n * g := (Subgroup.mem_center_iff.mp hn_center) g
-    have hconj : g * n * g⁻¹ = n := by
-      calc
-        g * n * g⁻¹ = n * g * g⁻¹ := by rw [hcomm]
-        _ = n := by simp [mul_assoc]
-    simpa [hconj] using hn
+    rwa [Subgroup.mem_center_iff.mp (gaugeGroupℤ₂SubGroup_le_center hn) g,
+      mul_inv_cancel_right]
 
 /-- The gauge group of the Standard Model with a ℤ₂ quotient, i.e., the quotient of `GaugeGroupI` by
 the ℤ₂-subgroup `gaugeGroupℤ₂SubGroup`.
@@ -446,10 +414,8 @@ noncomputable def mk : GaugeGroupI →* GaugeGroupℤ₂ :=
 
 @[simp]
 lemma mk_gaugeGroupℤ₂OfRoot (α : rootsOfUnity 2 ℂ) :
-    mk (gaugeGroupℤ₂OfRoot α) = 1 := by
-  change ((gaugeGroupℤ₂OfRoot α : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) = 1
-  rw [QuotientGroup.eq_one_iff]
-  exact gaugeGroupℤ₂OfRoot_mem α
+    mk (gaugeGroupℤ₂OfRoot α) = 1 :=
+  (QuotientGroup.eq_one_iff _).mpr (gaugeGroupℤ₂OfRoot_mem α)
 
 end GaugeGroupℤ₂
 
@@ -528,27 +494,17 @@ lemma mem_gaugeGroupℤ₃SubGroup_iff (g : GaugeGroupI) :
 
 lemma gaugeGroupℤ₃SubGroup_le_gaugeGroupℤ₆SubGroup :
     gaugeGroupℤ₃SubGroup ≤ gaugeGroupℤ₆SubGroup := by
-  intro g hg
-  rw [mem_gaugeGroupℤ₃SubGroup_iff] at hg
-  rcases hg with ⟨α, rfl⟩
+  rintro g ⟨α, rfl⟩
   exact gaugeGroupℤ₆OfRoot_mem (gaugeGroupℤ₃RootToℤ₆Root α)
 
 lemma gaugeGroupℤ₃SubGroup_le_center :
-    gaugeGroupℤ₃SubGroup ≤ Subgroup.center GaugeGroupI := by
-  intro g hg
-  rw [mem_gaugeGroupℤ₃SubGroup_iff] at hg
-  rcases hg with ⟨α, rfl⟩
-  exact gaugeGroupℤ₃OfRoot_mem_center α
+    gaugeGroupℤ₃SubGroup ≤ Subgroup.center GaugeGroupI :=
+  gaugeGroupℤ₃SubGroup_le_gaugeGroupℤ₆SubGroup.trans gaugeGroupℤ₆SubGroup_le_center
 
 instance gaugeGroupℤ₃SubGroup_normal : gaugeGroupℤ₃SubGroup.Normal where
   conj_mem n hn g := by
-    have hn_center : n ∈ Subgroup.center GaugeGroupI := gaugeGroupℤ₃SubGroup_le_center hn
-    have hcomm : g * n = n * g := (Subgroup.mem_center_iff.mp hn_center) g
-    have hconj : g * n * g⁻¹ = n := by
-      calc
-        g * n * g⁻¹ = n * g * g⁻¹ := by rw [hcomm]
-        _ = n := by simp [mul_assoc]
-    simpa [hconj] using hn
+    rwa [Subgroup.mem_center_iff.mp (gaugeGroupℤ₃SubGroup_le_center hn) g,
+      mul_inv_cancel_right]
 
 /-- The gauge group of the Standard Model with a ℤ₃-quotient, i.e., the quotient of `GaugeGroupI` by
 the ℤ₃-subgroup `gaugeGroupℤ₃SubGroup`.
@@ -569,10 +525,8 @@ noncomputable def mk : GaugeGroupI →* GaugeGroupℤ₃ :=
 
 @[simp]
 lemma mk_gaugeGroupℤ₃OfRoot (α : rootsOfUnity 3 ℂ) :
-    mk (gaugeGroupℤ₃OfRoot α) = 1 := by
-  change ((gaugeGroupℤ₃OfRoot α : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup) = 1
-  rw [QuotientGroup.eq_one_iff]
-  exact gaugeGroupℤ₃OfRoot_mem α
+    mk (gaugeGroupℤ₃OfRoot α) = 1 :=
+  (QuotientGroup.eq_one_iff _).mpr (gaugeGroupℤ₃OfRoot_mem α)
 
 end GaugeGroupℤ₃
 
@@ -628,10 +582,7 @@ lemma subgroup_le_center (q : GaugeGroupQuot) :
   · exact gaugeGroupℤ₆SubGroup_le_center
   · exact gaugeGroupℤ₂SubGroup_le_center
   · exact gaugeGroupℤ₃SubGroup_le_center
-  · intro g hg
-    change g ∈ (⊥ : Subgroup GaugeGroupI) at hg
-    rw [Subgroup.mem_bot] at hg
-    simp [hg]
+  · exact bot_le
 
 /-- The subgroup attached to a gauge-group quotient choice is normal in `GaugeGroupI`. -/
 instance subgroup_normal (q : GaugeGroupQuot) : (subgroup q).Normal := by
@@ -639,8 +590,7 @@ instance subgroup_normal (q : GaugeGroupQuot) : (subgroup q).Normal := by
   · exact gaugeGroupℤ₆SubGroup_normal
   · exact gaugeGroupℤ₂SubGroup_normal
   · exact gaugeGroupℤ₃SubGroup_normal
-  · change (⊥ : Subgroup GaugeGroupI).Normal
-    infer_instance
+  · exact Subgroup.normal_bot
 
 /-- The quotient map from `GaugeGroupI` to the gauge group selected by a quotient choice. -/
 noncomputable def quotientMap (q : GaugeGroupQuot) : GaugeGroupI →* GaugeGroup q :=
@@ -673,34 +623,16 @@ lemma quotientMap_ℤ₃_gaugeGroupℤ₃OfRoot (α : rootsOfUnity 3 ℂ) :
 lemma mem_subgroup_iff_quotientMap_eq_one (q : GaugeGroupQuot) (g : GaugeGroupI) :
     g ∈ subgroup q ↔ quotientMap q g = 1 := by
   cases q
-  · change g ∈ gaugeGroupℤ₆SubGroup ↔
-      ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) = 1
-    exact (QuotientGroup.eq_one_iff g).symm
-  · change g ∈ gaugeGroupℤ₂SubGroup ↔
-      ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) = 1
-    exact (QuotientGroup.eq_one_iff g).symm
-  · change g ∈ gaugeGroupℤ₃SubGroup ↔
-      ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup) = 1
-    exact (QuotientGroup.eq_one_iff g).symm
-  · change g ∈ (⊥ : Subgroup GaugeGroupI) ↔ (MonoidHom.id GaugeGroupI) g = 1
-    simp
+  case I => exact Subgroup.mem_bot
+  all_goals exact (QuotientGroup.eq_one_iff g).symm
 
 /-- Two representatives have the same image under the selected quotient map exactly when their
 quotient lies in the subgroup selected by the quotient choice. -/
 lemma quotientMap_eq_iff (q : GaugeGroupQuot) (g h : GaugeGroupI) :
     quotientMap q g = quotientMap q h ↔ g / h ∈ subgroup q := by
   cases q
-  · change ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) =
-      ((h : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₆SubGroup) ↔ g / h ∈ gaugeGroupℤ₆SubGroup
-    exact QuotientGroup.eq_iff_div_mem
-  · change ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) =
-      ((h : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₂SubGroup) ↔ g / h ∈ gaugeGroupℤ₂SubGroup
-    exact QuotientGroup.eq_iff_div_mem
-  · change ((g : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup) =
-      ((h : GaugeGroupI) : GaugeGroupI ⧸ gaugeGroupℤ₃SubGroup) ↔ g / h ∈ gaugeGroupℤ₃SubGroup
-    exact QuotientGroup.eq_iff_div_mem
-  · change g = h ↔ g / h ∈ (⊥ : Subgroup GaugeGroupI)
-    rw [Subgroup.mem_bot, div_eq_one]
+  case I => exact (Subgroup.mem_bot.trans div_eq_one).symm
+  all_goals exact QuotientGroup.eq_iff_div_mem
 
 end GaugeGroupQuot
 

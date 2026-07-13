@@ -183,22 +183,16 @@ lemma energy_dissipation_rate (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : 
     (hx : ContDiff ℝ ∞ xₜ) :
     ∂ₜ (S.energy xₜ) t = - S.γ * ⟪∂ₜ xₜ t, ∂ₜ xₜ t⟫_ℝ := by
   rw [S.energy_deriv xₜ hx]
-  simp only
-  have heom := h1 t
   have hforce : S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t = - S.γ • ∂ₜ xₜ t := by
-    have hsum : (S.m • ∂ₜ (∂ₜ xₜ) t + S.k • xₜ t) + S.γ • ∂ₜ xₜ t = 0 := by
-      simpa [add_assoc, add_left_comm, add_comm] using heom
-    simpa [neg_smul] using eq_neg_of_add_eq_zero_left hsum
-  rw [hforce]
-  simp [inner_smul_right]
+    linear_combination (norm := module) h1 t
+  simp [hforce, inner_smul_right]
 
 /-- If `0 < γ` and the velocity is nonzero at a time, the mechanical energy is strictly
 decreasing at that time. -/
 lemma energy_not_conserved (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time)
     (h1 : S.EquationOfMotion xₜ) (hx : ContDiff ℝ ∞ xₜ) (hdx : ∂ₜ xₜ t ≠ 0) (hγ : 0 < S.γ) :
     ∂ₜ (S.energy xₜ) t < 0 := by
-  rw [energy_dissipation_rate S xₜ t h1 hx]
-  rw [neg_mul]
+  rw [energy_dissipation_rate S xₜ t h1 hx, neg_mul]
   exact neg_neg_of_pos (mul_pos hγ (real_inner_self_pos.mpr hdx))
 
 /-!
@@ -236,16 +230,9 @@ lemma equationOfMotion_iff_newtons_2nd_law (xₜ : Time → EuclideanSpace ℝ (
   simp only [EquationOfMotion, force]
   constructor
   · intro h t
-    have h' :
-        S.m • ∂ₜ (∂ₜ xₜ) t + (S.γ • ∂ₜ xₜ t + S.k • xₜ t) = 0 := by
-      simpa [add_assoc] using h t
-    have ha :
-        S.m • ∂ₜ (∂ₜ xₜ) t = -(S.γ • ∂ₜ xₜ t + S.k • xₜ t) :=
-      eq_neg_of_add_eq_zero_left h'
-    simpa [sub_eq_add_neg, neg_add, add_comm] using ha
+    linear_combination (norm := module) h t
   · intro h t
-    rw [h t]
-    module
+    linear_combination (norm := module) h t
 
 /-!
 ## D. Damping regimes
@@ -303,40 +290,23 @@ lemma discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq :
 
 /-- The decay rate is nonnegative. -/
 lemma decayRate_nonneg : 0 ≤ S.decayRate := by
-  rw [decayRate]
   exact div_nonneg S.γ_nonneg (by nlinarith [S.m_pos])
 
 /-- An undamped oscillator lies in the underdamped regime. -/
 lemma isUnderdamped_of_gamma_eq_zero (hγ : S.γ = 0) : S.IsUnderdamped := by
-  rw [IsUnderdamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq S, decayRate]
-  rw [hγ]
-  ring_nf
-  nlinarith [sq_pos_of_pos S.m_pos, sq_pos_of_pos S.ω_pos]
+  rw [IsUnderdamped, discriminant, hγ]
+  nlinarith [mul_pos S.m_pos S.k_pos]
 
 /-- An underdamped system has decay rate less than the natural frequency. -/
 lemma isUnderdamped_decayRate (hS : S.IsUnderdamped) : S.decayRate < S.ω := by
-  rw [IsUnderdamped] at hS
-  rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
-  have hm_sq_pos : 0 < 4 * S.m^2 := by
-    have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
-    nlinarith
-  have hsq : S.decayRate^2 < S.ω^2 := by
-    nlinarith
+  rw [IsUnderdamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
+  have hsq : S.decayRate ^ 2 < S.ω ^ 2 := by nlinarith [sq_pos_of_pos S.m_pos]
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 
 /-- A critically damped system has decay rate equal to the natural frequency. -/
 lemma isCriticallyDamped_decayRate (hS : S.IsCriticallyDamped) : S.ω = S.decayRate := by
-  rw [IsCriticallyDamped] at hS
-  rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
-  have hm_sq_ne_zero : 4 * S.m^2 ≠ 0 := by
-    have hm_sq_pos : 0 < 4 * S.m^2 := by
-      have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
-      nlinarith
-    exact ne_of_gt hm_sq_pos
-  have hsq : S.decayRate^2 = S.ω^2 := by
-    have hsub : S.decayRate^2 - S.ω^2 = 0 := by
-      exact (mul_eq_zero.mp hS).resolve_left hm_sq_ne_zero
-    linarith
+  rw [IsCriticallyDamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
+  have hsq : S.decayRate ^ 2 = S.ω ^ 2 := by nlinarith [sq_pos_of_pos S.m_pos]
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 
 /-- The damping coefficient is twice mass times the decay rate. -/
@@ -352,55 +322,30 @@ lemma k_eq_m_mul_ω_sq : S.k = S.m * S.ω^2 := by
 /-- In the critically damped regime, `k = m * decayRate^2`. -/
 lemma k_eq_m_mul_decayRate_sq_of_criticallyDamped (hS : S.IsCriticallyDamped) :
     S.k = S.m * S.decayRate^2 := by
-  have hωa : S.ω = S.decayRate := S.isCriticallyDamped_decayRate hS
-  have hωsq : S.decayRate ^ 2 = S.k / S.m := by
-    simpa [hωa] using S.ω_sq
-  field_simp [S.m_ne_zero] at hωsq
-  nlinarith
+  rw [S.k_eq_m_mul_ω_sq, S.isCriticallyDamped_decayRate hS]
 
 /-- An overdamped system has decay rate greater than the natural frequency. -/
 lemma isOverdamped_decayRate (hS : S.IsOverdamped) : S.ω < S.decayRate := by
-  rw [IsOverdamped] at hS
-  rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
-  have hm_sq_pos : 0 < 4 * S.m^2 := by
-    have hsq : 0 < S.m^2 := sq_pos_of_pos S.m_pos
-    nlinarith
-  have hsq : S.ω^2 < S.decayRate^2 := by
-    nlinarith
+  rw [IsOverdamped, discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq] at hS
+  have hsq : S.ω ^ 2 < S.decayRate ^ 2 := by nlinarith [sq_pos_of_pos S.m_pos]
   nlinarith [S.decayRate_nonneg, S.ω_pos]
 
 /-- In the underdamped regime, the selected frequency uses the oscillation frequency. -/
 lemma angularFrequency_eq_underdamped (hS : S.IsUnderdamped) :
     S.angularFrequency = sqrt (- S.discriminant) / (2 * S.m) := by
-  classical
   simp [angularFrequency, hS]
 
 /-- In the critically damped regime, the selected frequency is zero. -/
 lemma angularFrequency_eq_criticallyDamped (hS : S.IsCriticallyDamped) :
     S.angularFrequency = 0 := by
-  classical
-  have hnotUnder : ¬ S.IsUnderdamped := by
-    intro hUnder
-    rw [IsUnderdamped] at hUnder
-    rw [IsCriticallyDamped] at hS
-    linarith
-  simp [angularFrequency, hnotUnder, hS]
+  rw [IsCriticallyDamped] at hS
+  simp [angularFrequency, IsUnderdamped, IsCriticallyDamped, hS]
 
 /-- In the overdamped regime, the selected frequency uses the real split rate. -/
 lemma angularFrequency_eq_overdamped (hS : S.IsOverdamped) :
     S.angularFrequency = sqrt S.discriminant / (2 * S.m) := by
-  classical
-  have hnotUnder : ¬ S.IsUnderdamped := by
-    intro hUnder
-    rw [IsUnderdamped] at hUnder
-    rw [IsOverdamped] at hS
-    linarith
-  have hnotCritical : ¬ S.IsCriticallyDamped := by
-    intro hCritical
-    rw [IsCriticallyDamped] at hCritical
-    rw [IsOverdamped] at hS
-    linarith
-  simp [angularFrequency, hnotUnder, hnotCritical]
+  rw [IsOverdamped] at hS
+  simp [angularFrequency, IsUnderdamped, IsCriticallyDamped, not_lt.mpr hS.le, hS.ne']
 
 /-- In the underdamped regime, the selected angular frequency squares to
 `ω^2 - decayRate^2`. -/
@@ -410,22 +355,18 @@ lemma angularFrequency_sq_of_underdamped (hS : S.IsUnderdamped) :
   · rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq]
     field_simp [S.m_ne_zero]
     ring
-  · rw [IsUnderdamped] at hS
-    exact le_of_lt (neg_pos.mpr hS)
+  · exact (neg_pos.mpr hS).le
 
 /-- The selected angular frequency is positive in the underdamped regime. -/
 lemma angularFrequency_pos_of_underdamped (hS : S.IsUnderdamped) :
     0 < S.angularFrequency := by
   rw [S.angularFrequency_eq_underdamped hS]
-  apply div_pos
-  · rw [IsUnderdamped] at hS
-    exact sqrt_pos.mpr (neg_pos.mpr hS)
-  · nlinarith [S.m_pos]
+  exact div_pos (sqrt_pos.mpr (neg_pos.mpr hS)) (by linarith [S.m_pos])
 
 /-- The selected angular frequency is nonzero in the underdamped regime. -/
 lemma angularFrequency_ne_zero_of_underdamped (hS : S.IsUnderdamped) :
     S.angularFrequency ≠ 0 :=
-  Ne.symm (ne_of_lt (S.angularFrequency_pos_of_underdamped hS))
+  (S.angularFrequency_pos_of_underdamped hS).ne'
 
 /-- In the overdamped regime, the selected angular frequency squares to
 `decayRate^2 - ω^2`. -/
@@ -435,22 +376,18 @@ lemma angularFrequency_sq_of_overdamped (hS : S.IsOverdamped) :
   · rw [discriminant_eq_four_mul_m_sq_mul_decayRate_sq_sub_ω_sq]
     field_simp [S.m_ne_zero]
     ring
-  · rw [IsOverdamped] at hS
-    exact le_of_lt hS
+  · exact le_of_lt hS
 
 /-- The selected angular frequency is positive in the overdamped regime. -/
 lemma angularFrequency_pos_of_overdamped (hS : S.IsOverdamped) :
     0 < S.angularFrequency := by
   rw [S.angularFrequency_eq_overdamped hS]
-  apply div_pos
-  · rw [IsOverdamped] at hS
-    exact sqrt_pos.mpr hS
-  · nlinarith [S.m_pos]
+  exact div_pos (sqrt_pos.mpr hS) (by linarith [S.m_pos])
 
 /-- The selected angular frequency is nonzero in the overdamped regime. -/
 lemma angularFrequency_ne_zero_of_overdamped (hS : S.IsOverdamped) :
     S.angularFrequency ≠ 0 :=
-  Ne.symm (ne_of_lt (S.angularFrequency_pos_of_overdamped hS))
+  (S.angularFrequency_pos_of_overdamped hS).ne'
 
 /-!
 ## E. To undamped oscillator
@@ -475,23 +412,13 @@ for the corresponding undamped harmonic oscillator. -/
 lemma toUndamped_equationOfMotion (S : DampedHarmonicOscillator) (hS : S.IsUndamped)
     (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx : ContDiff ℝ ∞ xₜ) :
     S.EquationOfMotion xₜ ↔ (S.toUndamped hS).EquationOfMotion xₜ := by
-  have hγ : S.γ = 0 := by
-    simpa [IsUndamped] using hS
+  have hγ : S.γ = 0 := by simpa [IsUndamped] using hS
   rw [S.equationOfMotion_iff_newtons_2nd_law xₜ,
     (S.toUndamped hS).equationOfMotion_iff_newtons_2nd_law xₜ hx]
-  constructor
-  · intro h t
-    calc
-      (S.toUndamped hS).m • ∂ₜ (∂ₜ xₜ) t = S.m • ∂ₜ (∂ₜ xₜ) t := rfl
-      _ = force S xₜ t := h t
-      _ = HarmonicOscillator.force (S.toUndamped hS) (xₜ t) := by
-        simp [force, HarmonicOscillator.force_eq_linear, toUndamped, hγ]
-  · intro h t
-    calc
-      S.m • ∂ₜ (∂ₜ xₜ) t = (S.toUndamped hS).m • ∂ₜ (∂ₜ xₜ) t := rfl
-      _ = HarmonicOscillator.force (S.toUndamped hS) (xₜ t) := h t
-      _ = force S xₜ t := by
-        simp [force, HarmonicOscillator.force_eq_linear, toUndamped, hγ]
+  refine forall_congr' fun t => ?_
+  rw [show (S.toUndamped hS).m = S.m from rfl,
+    show HarmonicOscillator.force (S.toUndamped hS) (xₜ t) = force S xₜ t from by
+      simp [force, HarmonicOscillator.force_eq_linear, toUndamped, hγ]]
 
 /-!
 
@@ -551,8 +478,7 @@ lemma lagrangian_of_isUndamped (hS : S.IsUndamped) :
     S.lagrangian = S.toHarmonicOscillator.lagrangian := by
   have hγ : S.γ = 0 := by simpa [IsUndamped] using hS
   funext t x v
-  rw [lagrangian, hγ]
-  simp
+  simp [lagrangian, hγ]
 
 /-!
 
@@ -564,10 +490,8 @@ The lagrangian is smooth in all its arguments.
 
 @[fun_prop]
 lemma contDiff_lagrangian (n : WithTop ℕ∞) : ContDiff ℝ n ↿S.lagrangian := by
-  have h : ↿S.lagrangian =
-      fun p : Time × EuclideanSpace ℝ (Fin 1) × EuclideanSpace ℝ (Fin 1) =>
-        exp (S.γ / S.m * p.1) * ↿S.toHarmonicOscillator.lagrangian p := rfl
-  rw [h]
+  show ContDiff ℝ n fun p : Time × EuclideanSpace ℝ (Fin 1) × EuclideanSpace ℝ (Fin 1) =>
+    exp (S.γ / S.m * p.1) * ↿S.toHarmonicOscillator.lagrangian p
   fun_prop
 
 /-!
@@ -583,19 +507,16 @@ lagrangian, using that the gradient scales with the constant `exp (γ/m * t)`.
 private lemma gradient_const_mul {f : EuclideanSpace ℝ (Fin 1) → ℝ} {x : EuclideanSpace ℝ (Fin 1)}
     (c : ℝ) (hf : DifferentiableAt ℝ f x) :
     gradient (fun y => c * f y) x = c • gradient f x := by
-  unfold gradient
-  rw [fderiv_const_mul hf]
-  simp [map_smul]
+  simp [gradient, fderiv_const_mul hf, map_smul]
 
 lemma gradient_lagrangian_position_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
     gradient (fun x => S.lagrangian t x v) x = -(exp (S.γ / S.m * t) * S.k) • x := by
   have hf : DifferentiableAt ℝ (fun y => S.toHarmonicOscillator.lagrangian t y v) x := by
     simp only [HarmonicOscillator.lagrangian_eq]
     fun_prop
-  have h_eq : (fun y => S.lagrangian t y v) =
-      fun y => exp (S.γ / S.m * t) * S.toHarmonicOscillator.lagrangian t y v := rfl
-  rw [h_eq, gradient_const_mul _ hf,
-    S.toHarmonicOscillator.gradient_lagrangian_position_eq]
+  rw [show (fun y => S.lagrangian t y v) =
+      fun y => exp (S.γ / S.m * t) * S.toHarmonicOscillator.lagrangian t y v from rfl,
+    gradient_const_mul _ hf, S.toHarmonicOscillator.gradient_lagrangian_position_eq]
   module
 
 lemma gradient_lagrangian_velocity_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
@@ -603,10 +524,9 @@ lemma gradient_lagrangian_velocity_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 
   have hf : DifferentiableAt ℝ (fun w => S.toHarmonicOscillator.lagrangian t x w) v := by
     simp only [HarmonicOscillator.lagrangian_eq]
     fun_prop
-  have h_eq : S.lagrangian t x =
-      fun w => exp (S.γ / S.m * t) * S.toHarmonicOscillator.lagrangian t x w := rfl
-  rw [h_eq, gradient_const_mul _ hf,
-    S.toHarmonicOscillator.gradient_lagrangian_velocity_eq, smul_smul]
+  rw [show S.lagrangian t x =
+      fun w => exp (S.γ / S.m * t) * S.toHarmonicOscillator.lagrangian t x w from rfl,
+    gradient_const_mul _ hf, S.toHarmonicOscillator.gradient_lagrangian_velocity_eq, smul_smul]
 
 /-!
 
@@ -647,9 +567,8 @@ private lemma deriv_exp_smul (a : ℝ) (y : Time → EuclideanSpace ℝ (Fin 1))
     (hy : Differentiable ℝ y) (t : Time) :
     ∂ₜ (fun t' : Time => exp (a * t'.val) • y t') t =
       exp (a * t.val) • (∂ₜ y t + a • y t) := by
-  rw [Time.deriv]
-  rw [fderiv_fun_smul (by fun_prop) (hy t)]
-  rw [fderiv_exp (by fun_prop), fderiv_fun_mul (by fun_prop) (by fun_prop)]
+  rw [Time.deriv, fderiv_fun_smul (by fun_prop) (hy t), fderiv_exp (by fun_prop),
+    fderiv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [_root_.add_apply, _root_.smul_apply,
     ContinuousLinearMap.smulRight_apply, Time.fderiv_val, smul_eq_mul, mul_one]
   rw [← Time.deriv_eq]
@@ -670,8 +589,8 @@ lemma gradLagrangian_eq_force (xₜ : Time → EuclideanSpace ℝ (Fin 1)) (hx :
       arg 1
       ext t'
       rw [gradient_lagrangian_velocity_eq, ← smul_smul]
-    rw [deriv_exp_smul (S.γ / S.m) (fun t' => S.m • ∂ₜ xₜ t') (hdx.const_smul S.m) t]
-    rw [Time.deriv_smul _ _ hdx, smul_smul, div_mul_cancel₀ _ S.m_ne_zero]
+    rw [deriv_exp_smul (S.γ / S.m) (fun t' => S.m • ∂ₜ xₜ t') (hdx.const_smul S.m) t,
+      Time.deriv_smul _ _ hdx, smul_smul, div_mul_cancel₀ _ S.m_ne_zero]
   rw [gradient_lagrangian_position_eq, h2, force]
   module
 

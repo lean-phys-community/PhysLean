@@ -34,7 +34,7 @@ lemma E_zero_iff_Q_zero {S : (SMNoGrav 1).Sols} : Q S.val (0 : Fin 1) = 0 ↔
   have hS' := congrArg (fun S => S.val) (linearParameters.bijection.right_inv S.1.1)
   change S'.asCharges = S.val at hS'
   rw [← hS'] at hC
-  exact Iff.intro (fun hQ => S'.cubic_zero_Q'_zero hC hQ) (fun hE => S'.cubic_zero_E'_zero hC hE)
+  exact ⟨S'.cubic_zero_Q'_zero hC, S'.cubic_zero_E'_zero hC⟩
 
 /-- For a set of 1-family SM charges satisfying all ACCs except the gravitational,
   if the `Q` charge is zero then the charges satisfy the gravitational ACCs. -/
@@ -44,34 +44,31 @@ lemma accGrav_Q_zero {S : (SMNoGrav 1).Sols} (hQ : Q S.val (0 : Fin 1) = 0) :
   have hE := E_zero_iff_Q_zero.mp hQ
   simp_all only [toSpecies_apply_eq, Fin.isValue, sum_SMSpecies_numberCharges_one, LinearMap.coe_mk,
     AddHom.coe_mk]
-  erw [hQ, hE]
   have h1 := SU2Sol S.1.1
   have h2 := SU3Sol S.1.1
   simp only [accSU2, toSpecies_apply_eq, Fin.isValue, sum_SMSpecies_numberCharges_one,
     LinearMap.coe_mk, AddHom.coe_mk, accSU3] at h1 h2
-  erw [hQ] at h1 h2
-  simp_all
-  linear_combination 3 * h2
+  erw [hQ] at h1 h2 ⊢
+  erw [hE]
+  linear_combination 2 * h1 + 3 * h2
 
 /-- For a set of 1-family SM charges satisfying all ACCs except the gravitational,
   if the `Q` charge is not zero then the charges satisfy the gravitational ACCs. -/
 lemma accGrav_Q_ne_zero {S : (SMNoGrav 1).Sols} (hQ : Q S.val (0 : Fin 1) ≠ 0) :
     accGrav S.val = 0 := by
   have hE := E_zero_iff_Q_zero.mpr.mt hQ
-  let S' := linearParametersQENeqZero.bijection.symm ⟨S.1.1, And.intro hQ hE⟩
+  let S' := linearParametersQENeqZero.bijection.symm ⟨S.1.1, hQ, hE⟩
   have hC := cubeSol S
   have hS' := congrArg (fun S => S.val.val)
-    (linearParametersQENeqZero.bijection.right_inv ⟨S.1.1, And.intro hQ hE⟩)
+    (linearParametersQENeqZero.bijection.right_inv ⟨S.1.1, hQ, hE⟩)
   change _ = S.val at hS'
   rw [← hS'] at hC ⊢
   exact S'.grav_of_cubic hC
 
 /-- Any solution to the 1-family ACCs without gravity satisfies the gravitational ACC. -/
 theorem accGravSatisfied {S : (SMNoGrav 1).Sols} :
-    accGrav S.val = 0 := by
-  by_cases hQ : Q S.val (0 : Fin 1)= 0
-  · exact accGrav_Q_zero hQ
-  · exact accGrav_Q_ne_zero hQ
+    accGrav S.val = 0 :=
+  (em _).elim accGrav_Q_zero accGrav_Q_ne_zero
 
 end One
 end SMNoGrav

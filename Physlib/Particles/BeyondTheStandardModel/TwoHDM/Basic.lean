@@ -50,7 +50,6 @@ open InnerProductSpace
 lemma ext_of_fst_snd {H1 H2 : TwoHiggsDoublet}
     (h1 : H1.Φ1 = H2.Φ1) (h2 : H1.Φ2 = H2.Φ2) : H1 = H2 := by
   cases H1
-  cases H2
   congr
 /-!
 

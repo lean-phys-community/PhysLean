@@ -90,15 +90,8 @@ lemma UnitDependent.scaleUnit_symm_apply {M : Type} [UnitDependent M]
 @[simp]
 lemma UnitDependent.scaleUnit_injective {M : Type} [UnitDependent M]
     (u1 u2 : UnitChoices) (m1 m2 : M) :
-    scaleUnit u1 u2 m1 = scaleUnit u1 u2 m2 ↔ m1 = m2 := by
-  constructor
-  · intro h1
-    have h2 : scaleUnit u2 u1 (scaleUnit u1 u2 m1) =
-        scaleUnit u2 u1 (scaleUnit u1 u2 m2) := by rw [h1]
-    simpa using h2
-  · intro h
-    subst h
-    rfl
+    scaleUnit u1 u2 m1 = scaleUnit u1 u2 m2 ↔ m1 = m2 :=
+  ⟨fun h => by simpa using congrArg (scaleUnit u2 u1) h, congrArg (scaleUnit u1 u2)⟩
 
 /-!
 
@@ -199,45 +192,22 @@ noncomputable instance : UnitDependent UnitChoices where
 @[simp]
 lemma UnitChoices.scaleUnit_apply_fst (u1 u2 : UnitChoices) :
     (scaleUnit u1 u2 u1) = u2 := by
-  simp [scaleUnit]
-  apply UnitChoices.ext
-  · simp [LengthUnit.scale, LengthUnit.div_eq_val, toReal]
-  · simp [TimeUnit.scale, TimeUnit.div_eq_val, toReal]
-  · simp [MassUnit.scale, MassUnit.div_eq_val, toReal]
-  · simp [ChargeUnit.scale, ChargeUnit.div_eq_val, toReal]
-  · simp [TemperatureUnit.scale, TemperatureUnit.div_eq_val, toReal]
+  ext <;> simp [scaleUnit, LengthUnit.scale, TimeUnit.scale, MassUnit.scale, ChargeUnit.scale,
+    TemperatureUnit.scale, LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val,
+    ChargeUnit.div_eq_val, TemperatureUnit.div_eq_val, toReal]
 
 @[simp]
 lemma UnitChoices.dimScale_scaleUnit {u1 u2 u : UnitChoices} (d : Dimension) :
     u.dimScale (scaleUnit u1 u2 u) d = u1.dimScale u2 d := by
-  simp [dimScale]
-  congr 1
-  congr 1
-  congr 1
-  congr 1
-  · congr 1
-    simp [scaleUnit]
-    simp [LengthUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [TimeUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [MassUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [ChargeUnit.div_eq_val, toReal]
-  · congr 1
-    simp [scaleUnit]
-    simp [TemperatureUnit.div_eq_val, toReal]
+  simp [dimScale, scaleUnit]
+  simp [LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val, ChargeUnit.div_eq_val,
+    TemperatureUnit.div_eq_val, toReal]
 
 lemma Dimensionful.of_scaleUnit {M : Type} [CarriesDimension M] {u1 u2 u : UnitChoices}
     (c : Dimensionful M) :
     c.1 (scaleUnit u1 u2 u) =
     u1.dimScale u2 (dim M) • c.1 (u) := by
-  rw [c.2 u (scaleUnit u1 u2 u)]
-  congr 1
-  simp
+  rw [c.2 u (scaleUnit u1 u2 u), UnitChoices.dimScale_scaleUnit]
 
 noncomputable instance {M1 : Type} [CarriesDimension M1] : MulUnitDependent M1 where
   scaleUnit u1 u2 m := (toDimensionful u1 m).1 u2
@@ -254,33 +224,18 @@ noncomputable instance {M1 : Type} [CarriesDimension M1] : MulUnitDependent M1 w
 
 lemma HasDim.scaleUnit_apply {M : Type} [CarriesDimension M]
     (u1 u2 : UnitChoices) (m : M) :
-    scaleUnit u1 u2 m = (u1.dimScale u2 (dim M)) • m := by
-  simp [scaleUnit, toDimensionful_apply_apply]
+    scaleUnit u1 u2 m = (u1.dimScale u2 (dim M)) • m :=
+  toDimensionful_apply_apply u1 u2 m
 
 noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M] [HasDim M] :
     LinearUnitDependent M where
-  scaleUnit_add u1 u2 m1 m2 := by
-    change (toDimensionful u1 (m1 + m2)).1 u2 = _
-    rw [toDimensionful_apply_apply]
-    simp
-    rfl
-  scaleUnit_smul u1 u2 r m := by
-    change (toDimensionful u1 (r • m)).1 u2 = _
-    rw [toDimensionful_apply_apply]
-    rw [smul_comm]
-    rfl
+  scaleUnit_add u1 u2 m1 m2 := smul_add (u1.dimScale u2 (dim M)) m1 m2
+  scaleUnit_smul u1 u2 r m := smul_comm (u1.dimScale u2 (dim M)) r m
 
 noncomputable instance {M : Type} [AddCommMonoid M] [Module ℝ M]
     [HasDim M] [TopologicalSpace M]
     [ContinuousConstSMul ℝ M] : ContinuousLinearUnitDependent M where
-  scaleUnit_cont u1 u2 := by
-    change Continuous fun m => (toDimensionful u1 m).1 u2
-    conv =>
-      enter [1, m]
-      rw [toDimensionful_apply_apply]
-    change Continuous fun m => (u1.dimScale u2 (dim M)).1 • m
-    apply Continuous.const_smul
-    exact continuous_id'
+  scaleUnit_cont u1 u2 := continuous_const_smul (u1.dimScale u2 (dim M)).1
 
 /-!
 
@@ -472,24 +427,21 @@ lemma isDimensionallyCorrect_fun_iff {M1 M2 : Type} [UnitDependent M1] [UnitDepe
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f (scaleUnit u2 u1 m)) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp [IsDimensionallyCorrect, funext_iff]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_left {M1 M2 : Type} [UnitDependent M1]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, (f (scaleUnit u2 u1 m)) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp [IsDimensionallyCorrect, funext_iff]
 
 @[simp]
 lemma isDimensionallyCorrect_fun_right {M1 M2 : Type} [UnitDependent M2]
     {f : M1 → M2} :
     IsDimensionallyCorrect f ↔
     ∀ u1 u2 : UnitChoices, ∀ m, scaleUnit u1 u2 (f m) = f m := by
-  simp only [IsDimensionallyCorrect, funext_iff]
-  rfl
+  simp [IsDimensionallyCorrect, funext_iff]
 /-!
 
 ## Some type classes to help track dimensions
@@ -509,12 +461,8 @@ lemma DMul.hMul_scaleUnit {M1 M2 M3 : Type} [CarriesDimension M1] [CarriesDimens
     [DMul M1 M2 M3] (m1 : M1) (m2 : M2) (u1 u2 : UnitChoices) :
     (scaleUnit u1 u2 m1) * (scaleUnit u1 u2 m2) =
     scaleUnit u1 u2 (m1 * m2) := by
-  simp [scaleUnit, toDimensionful]
-  have h1 := DMul.mul_dim (M3 := M3) (toDimensionful u1 m1) (toDimensionful u1 m2) u2 u1
-  simp [toDimensionful_apply_apply] at h1
-  conv_rhs =>
-    rw [h1, smul_smul]
-    simp
+  simpa [scaleUnit, toDimensionful] using
+    DMul.mul_dim (M3 := M3) (toDimensionful u1 m1) (toDimensionful u1 m2) u1 u2
 
 /-!
 
@@ -548,9 +496,7 @@ instance (M : Type) [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) :
 @[simp]
 lemma scaleUnit_dimSet_val {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension)
     (m : DimSet M d) (u1 u2 : UnitChoices) :
-    (scaleUnit u1 u2 m).1 = scaleUnit u1 u2 m.1 := by
-  rw [HasDim.scaleUnit_apply, m.2]
-  rfl
+    (scaleUnit u1 u2 m).1 = scaleUnit u1 u2 m.1 := (m.2 u1 u2).symm
 
 lemma DimSet.mem_iff {M : Type} [MulAction ℝ≥0 M] [MulUnitDependent M] (d : Dimension) (m : M) :
     m ∈ DimSet M d ↔ ∀ u1 u2, scaleUnit u1 u2 m = (UnitChoices.dimScale u1 u2 d) • m := by rfl

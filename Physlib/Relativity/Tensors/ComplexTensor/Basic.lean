@@ -268,7 +268,7 @@ lemma basisIdxCongr_eq_cast {c1 c2 : complexLorentzTensor.Color}
 
 lemma repDim_tau {c : complexLorentzTensor.Color} :
     repDim (complexLorentzTensor.τ c) = repDim c := by
-  cases c <;> simp [repDim] <;> rfl
+  cases c <;> rfl
 
 lemma contrPCoeff_basis {n : ℕ} {c : Fin n → complexLorentzTensor.Color} (i j : Fin n)
     (hij : i ≠ j ∧ (complexLorentzTensor.τ (c i) = c j))
@@ -283,37 +283,20 @@ lemma contrPCoeff_basis {n : ℕ} {c : Fin n → complexLorentzTensor.Color} (i 
   generalize c i = ci at *
   generalize c j = cj at *
   subst h2
-  fin_cases ci
-  · simp [complexLorentzTensor]
-    erw [LinearEquiv.cast_apply]
-    simp only [cast_eq]
-    erw [Fermion.leftDualContraction_basis]
-    grind
-  · simp [complexLorentzTensor]
-    erw [LinearEquiv.cast_apply]
-    simp only [cast_eq]
-    erw [Fermion.dualLeftContraction_basis]
-    grind
-  · simp [complexLorentzTensor]
-    erw [LinearEquiv.cast_apply]
-    simp only [cast_eq]
-    erw [Fermion.dualRightContraction_basis]
-    grind
-  · simp [complexLorentzTensor]
-    erw [LinearEquiv.cast_apply]
-    simp only [cast_eq]
-    erw [Fermion.dualLeftContraction_basis]
-    grind
-  · simp [complexLorentzTensor]
-    erw [LinearEquiv.cast_apply]
-    simp only [cast_eq]
-    erw [Lorentz.coContrContraction_basis]
-    grind
-  · simp [complexLorentzTensor]
-    erw [LinearEquiv.cast_apply]
-    simp only [cast_eq]
-    erw [Lorentz.contrCoContraction_basis]
-    grind
+  cases ci
+  all_goals simp only [complexLorentzTensor, Fin.cast_refl, id_eq]
+  · erw [Fermion.leftDualContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Fermion.dualLeftContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Fermion.rightDualContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Fermion.dualRightContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Lorentz.contrCoContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
+  · erw [Lorentz.coContrContraction_basis]
+    exact if_congr Fin.ext_iff.symm rfl rfl
 
 end complexLorentzTensor
 end

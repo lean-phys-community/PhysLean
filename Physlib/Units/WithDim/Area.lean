@@ -68,19 +68,17 @@ lemma squareMeter_in_SI : squareMeter.1 SI = ⟨1⟩ := by
 
 @[simp]
 lemma squareFoot_in_SI : squareFoot.1 SI = ⟨0.09290304⟩ := by
-  simp [squareFoot, dimScale, LengthUnit.feet, toDimensionful_apply_apply,]
+  simp [squareFoot, dimScale, LengthUnit.feet, toDimensionful_apply_apply]
   ext
   simp [NNReal.coe_ofScientific]
-  rw [toReal]
-  norm_num
+  norm_num [toReal]
 
 @[simp]
 lemma squareMile_in_SI : squareMile.1 SI = ⟨2589988.110336⟩ := by
   simp [squareMile, dimScale, LengthUnit.miles, toDimensionful_apply_apply]
   ext
   simp [NNReal.coe_ofScientific]
-  rw [toReal]
-  norm_num
+  norm_num [toReal]
 
 @[simp]
 lemma are_in_SI : are.1 SI = ⟨100⟩ := by
@@ -95,8 +93,7 @@ lemma acre_in_SI : acre.1 SI = ⟨4046.8564224⟩ := by
   simp [acre, dimScale, LengthUnit.miles, toDimensionful_apply_apply]
   ext
   simp [NNReal.coe_ofScientific]
-  rw [toReal]
-  norm_num
+  norm_num [toReal]
 
 /-!
 
@@ -107,8 +104,7 @@ lemma acre_in_SI : acre.1 SI = ⟨4046.8564224⟩ := by
 /-- One acre is exactly `43560` square feet. -/
 lemma acre_eq_mul_squareFeet : acre = (43560 : ℝ≥0) • squareFoot := by
   apply (toDimensionful SI).symm.injective
-  simp [toDimensionful]
   ext
-  norm_num
+  norm_num [toDimensionful]
 
 end DimArea

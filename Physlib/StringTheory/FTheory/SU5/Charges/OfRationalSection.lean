@@ -95,9 +95,7 @@ namespace CodimensionOneConfig
 
 instance : Fintype CodimensionOneConfig where
   elems := {same, nearestNeighbor, nextToNearestNeighbor}
-  complete := by
-    intro I
-    cases I <;> decide
+  complete := by rintro (_ | _ | _) <;> decide
 
 /-!
 

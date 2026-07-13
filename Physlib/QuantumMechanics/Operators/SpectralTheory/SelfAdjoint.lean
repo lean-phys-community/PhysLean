@@ -53,10 +53,8 @@ lemma resolventSet_eq_regularityDomain : ρ T = T.regularityDomain := by
   have h_ker' : (T - conj z • 1).toFun.ker = ⊥ := by
     by_cases hz' : conj z = z
     · exact hz'.symm ▸ h_ker
-    · suffices conj z ∉ σᵖ T by simp_all [pointSpectrum_eq]
-      refine fun h ↦ hz' ?_
-      obtain ⟨r, hr⟩ := (isSymmetric hT).pointSpectrum_real h
-      simp [show z = conj (↑r) from by simp [hr]]
+    · exact (mem_regularityDomain_iff.mp <| (isSymmetric hT).mem_regularityDomain_of_im_ne_zero
+        (by simp_all [Complex.conj_eq_iff_im])).1
   have h_orthog := (isUnbounded hT).orthogonal_adjoint_sub_ker hz
   rw [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, h_ker'] at h_orthog
   simp [← h_orthog]
@@ -68,11 +66,9 @@ lemma mem_resolventSet_of_range_eq_top {z : ℂ} (h : (T - z • 1).toFun.range 
   · rw [(isClosed hT).resolventSet_eq]
     refine ⟨?_, h⟩
     have h_orthog := (isUnbounded hT).orthogonal_closure_sub_range z
-    rw [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, conj_eq_iff_im.mpr hz_im, h,
-      Submodule.top_orthogonal_eq_bot, Eq.comm, Submodule.ext_iff] at h_orthog
-    ext x
-    specialize h_orthog x
-    simp_all
+    rwa [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, conj_eq_iff_im.mpr hz_im, h,
+      Submodule.top_orthogonal_eq_bot, Eq.comm, ← LinearMap.le_ker_iff_map, Submodule.ker_subtype,
+      le_bot_iff] at h_orthog
   · rw [resolventSet_eq_regularityDomain hT]
     exact (isSymmetric hT).mem_regularityDomain_of_im_ne_zero hz_im
 
@@ -86,11 +82,9 @@ lemma spectrum_real : σ T ⊆ range ofReal := by
   exact compl_subset_comm.mp (isSymmetric hT).compl_ofReal_subset_regularityDomain
 
 /-- The residual spectrum of a self-adjoint operator is empty. -/
-lemma residualSpectrum_eq_empty : σʳ T = ∅ := by
-  apply eq_empty_of_subset_empty
-  refine inter_compl_self (ρ T) ▸ subset_inter ?_ ?_
-  · exact resolventSet_eq_regularityDomain hT ▸ T.residualSpectrum_subset_regularityDomain
-  · exact T.spectrum_eq ▸ T.residualSpectrum_subset_spectrum
+lemma residualSpectrum_eq_empty : σʳ T = ∅ :=
+  eq_empty_iff_forall_notMem.mpr fun _ hz ↦ T.residualSpectrum_subset_spectrum hz
+    (resolventSet_eq_regularityDomain hT ▸ T.residualSpectrum_subset_regularityDomain hz)
 
 end IsSelfAdjoint
 end LinearPMap

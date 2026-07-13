@@ -46,8 +46,7 @@ lemma staticContract_insert_none (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (i : Fin φs.length.succ) :
     (φsΛ ↩Λ φ i none).staticContract = φsΛ.staticContract := by
   rw [staticContract, insertAndContract_none_prod_contractions]
-  congr
-  ext a
+  congr with a
   simp
 
 /--
@@ -71,11 +70,8 @@ lemma staticContract_insert_some
   congr 1
   · simp only [Nat.succ_eq_add_one, insertAndContract_fstFieldOfContract_some_incl, finCongr_apply,
     List.get_eq_getElem, insertAndContract_sndFieldOfContract_some_incl, Fin.getElem_fin]
-    split
-    · simp
-    · simp
-  · congr
-    ext a
+    split <;> simp
+  · congr with a
     simp
 
 open FieldStatistic
@@ -96,10 +92,6 @@ lemma staticContract_insert_some_of_lt
     List.getElem_map, uncontractedList_getElem_uncontractedIndexEquiv_symm, List.get_eq_getElem,
     Algebra.smul_mul_assoc, uncontractedListGet]
   · simp only [hik, ↓reduceIte, MulMemClass.coe_mul]
-    trans (1 : ℂ) • ((superCommute (anPart φ)) (ofFieldOp φs[k.1]) * ↑φsΛ.staticContract)
-    · simp
-    simp only [smul_smul]
-    congr 1
     have h1 : ofList 𝓕.fieldOpStatistic (List.take (↑(φsΛ.uncontractedIndexEquiv.symm k))
         (List.map φs.get φsΛ.uncontractedList))
         = (𝓕 |>ₛ ⟨φs.get, (Finset.filter (fun x => x < k) φsΛ.uncontracted)⟩) := by
@@ -107,23 +99,16 @@ lemma staticContract_insert_some_of_lt
       congr
       rw [← List.map_take]
       congr
-      rw [take_uncontractedIndexEquiv_symm]
-      rw [filter_uncontractedList]
-    rw [h1]
-    simp only [exchangeSign_mul_self]
+      rw [take_uncontractedIndexEquiv_symm, filter_uncontractedList]
+    rw [h1, smul_smul, exchangeSign_mul_self, one_smul]
 
 lemma staticContract_of_not_gradingCompliant (φs : List 𝓕.FieldOp)
     (φsΛ : WickContraction φs.length) (h : ¬ GradingCompliant φs φsΛ) :
     φsΛ.staticContract = 0 := by
   rw [staticContract]
   simp only [GradingCompliant, Subtype.forall, not_forall] at h
-  obtain ⟨a, ha⟩ := h
-  obtain ⟨ha, ha2⟩ := ha
-  apply Finset.prod_eq_zero (i := ⟨a, ha⟩)
-  simp only [Finset.univ_eq_attach, Finset.mem_attach]
-  apply Subtype.ext
-  simp only [List.get_eq_getElem, ZeroMemClass.coe_zero]
-  rw [superCommute_anPart_ofFieldOpF_diff_grade_zero]
-  simp [ha2]
+  obtain ⟨a, ha, ha2⟩ := h
+  refine Finset.prod_eq_zero (Finset.mem_univ ⟨a, ha⟩) (Subtype.ext ?_)
+  exact superCommute_anPart_ofFieldOpF_diff_grade_zero _ _ ha2
 
 end WickContraction

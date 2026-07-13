@@ -99,8 +99,7 @@ lemma magneticFieldMatrix_basis_repr_eq_vector_potential {c : SpeedOfLight}
         (A.magneticFieldMatrix c ε) (i, j) =
       Space.distSpaceDeriv j (A.vectorPotential c) ε i -
       Space.distSpaceDeriv i (A.vectorPotential c) ε j := by
-  rw [magneticFieldMatrix_eq_vectorPotential]
-  simp
+  simp [magneticFieldMatrix_eq_vectorPotential]
 
 lemma magneticFieldMatrix_distSpaceDeriv_basis_repr_eq_vector_potential {c : SpeedOfLight}
     (A : DistElectromagneticPotential d)
@@ -147,8 +146,7 @@ lemma magneticFieldMatrix_one_dim_eq_zero {c : SpeedOfLight}
     (A : DistElectromagneticPotential 1) :
     A.magneticFieldMatrix c = 0 := by
   ext ε
-  rw [magneticFieldMatrix_eq_vectorPotential]
-  simp
+  simp [magneticFieldMatrix_eq_vectorPotential]
 
 end DistElectromagneticPotential
 end Electromagnetism

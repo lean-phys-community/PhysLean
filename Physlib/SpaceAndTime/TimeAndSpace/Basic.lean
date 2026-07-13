@@ -97,16 +97,14 @@ lemma space_apply (tx : TimeAndSpace d) :
 /-- The time projection is nonexpanding for the product metric. -/
 lemma dist_time_le (tx ty : TimeAndSpace d) :
     dist (time tx) (time ty) ≤ dist tx ty := by
-  change dist tx.1 ty.1 ≤ dist tx ty
   rw [Prod.dist_eq]
-  exact le_max_left (dist tx.1 ty.1) (dist tx.2 ty.2)
+  exact le_max_left _ _
 
 /-- The spatial projection is nonexpanding for the product metric. -/
 lemma dist_space_le (tx ty : TimeAndSpace d) :
     dist (space tx) (space ty) ≤ dist tx ty := by
-  change dist tx.2 ty.2 ≤ dist tx ty
   rw [Prod.dist_eq]
-  exact le_max_right (dist tx.1 ty.1) (dist tx.2 ty.2)
+  exact le_max_right _ _
 
 end TimeAndSpace
 
@@ -123,11 +121,10 @@ lemma fderiv_space_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M
     (hf : Differentiable ℝ ↿f) :
     fderiv ℝ (fun x' => f t x') x dx = fderiv ℝ ↿f (t, x) (0, dx) := by
   change fderiv ℝ (↿f ∘ fun x' => (t, x')) x dx = _
-  rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
-  rw [DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_fun_id, ContinuousLinearMap.prod_apply,
-    _root_.zero_apply, ContinuousLinearMap.coe_id', id_eq]
+  rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_fun_const, Pi.zero_apply,
+    fderiv_fun_id, ContinuousLinearMap.prod_apply, _root_.zero_apply,
+    ContinuousLinearMap.coe_id', id_eq]
   repeat' fun_prop
 
 lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
@@ -135,11 +132,10 @@ lemma fderiv_time_eq_fderiv_curry {M} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (hf : Differentiable ℝ ↿f) :
     fderiv ℝ (fun t' => f t' x) t dt = fderiv ℝ ↿f (t, x) (dt, 0) := by
   change fderiv ℝ (↿f ∘ fun t' => (t', x)) t dt = _
-  rw [fderiv_comp]
-  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply]
-  rw [DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_fun_id, fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.prod_apply,
-    ContinuousLinearMap.coe_id', id_eq, _root_.zero_apply]
+  rw [fderiv_comp, DifferentiableAt.fderiv_prodMk]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, fderiv_fun_id, fderiv_fun_const,
+    Pi.zero_apply, ContinuousLinearMap.prod_apply, ContinuousLinearMap.coe_id', id_eq,
+    _root_.zero_apply]
   repeat' fun_prop
 
 /-!
@@ -235,10 +231,7 @@ lemma curl_differentiable_time
     Differentiable ℝ (fun t => (∇ ⨯ fₜ t) x) := by
   rw [differentiable_euclidean]
   intro i
-  fin_cases i
-  all_goals
-    simp only [Fin.zero_eta, Fin.isValue, curl]
-    fun_prop
+  fin_cases i <;> simp only [Fin.zero_eta, Fin.isValue, curl] <;> fun_prop
 
 /-!
 
@@ -282,8 +275,6 @@ lemma space_fun_of_time_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [NormedSpac
     ∃ (g : Space d → M), ∀ t x, f t x = g x := by
   use fun x => f 0 x
   intro t x
-  simp only
-  change (fun t' => f t' x) t = (fun t' => f t' x) 0
   apply is_const_of_fderiv_eq_zero (f := fun t' => f t' x) (𝕜 := ℝ)
   · fun_prop
   intro t
@@ -302,8 +293,6 @@ lemma time_fun_of_space_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [NormedSpac
     ∃ (g : Time → M), ∀ t x, f t x = g t := by
   use fun t => f t 0
   intro t x
-  simp only
-  change (fun x' => f t x') x = (fun x' => f t x') 0
   apply is_const_of_fderiv_eq_zero (f := fun x' => f t x') (𝕜 := ℝ)
   · fun_prop
   intro x
@@ -323,8 +312,7 @@ lemma const_of_time_deriv_space_deriv_eq_zero {d} {M} [NormedAddCommGroup M] [No
   obtain ⟨k, hk⟩ := time_fun_of_space_deriv_eq_zero hf h₂
   use g 0
   intro t x
-  have h1 : ∀ t x, g x = k t := fun t x => by rw [← hg t x, hk t x]
-  rw [hk, ← h1 t 0]
+  rw [hk t x, ← hk t 0, hg t 0]
 
 /-!
 
@@ -464,9 +452,7 @@ lemma distSpaceDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (i j : Fin d) (f : (Time × Space d) →d[ℝ] M) :
     distSpaceDeriv i (distSpaceDeriv j f) = distSpaceDeriv j (distSpaceDeriv i f) := by
   ext κ
-  rw [distSpaceDeriv_apply, distSpaceDeriv_apply, fderivD_apply, fderivD_apply]
-  rw [distSpaceDeriv_apply, distSpaceDeriv_apply, fderivD_apply, fderivD_apply]
-  simp only [neg_neg]
+  simp only [distSpaceDeriv_apply, fderivD_apply, neg_neg]
   congr 1
   ext x
   change fderiv ℝ (fun x => fderiv ℝ κ x (0, basis i)) x (0, basis j) =
@@ -501,9 +487,7 @@ lemma distTimeDeriv_commute_distSpaceDeriv {M d} [NormedAddCommGroup M] [NormedS
     (i : Fin d) (f : (Time × Space d) →d[ℝ] M) :
     distTimeDeriv (distSpaceDeriv i f) = distSpaceDeriv i (distTimeDeriv f) := by
   ext κ
-  rw [distTimeDeriv_apply, distSpaceDeriv_apply, fderivD_apply, fderivD_apply]
-  rw [distTimeDeriv_apply, distSpaceDeriv_apply, fderivD_apply, fderivD_apply]
-  simp only [neg_neg]
+  simp only [distTimeDeriv_apply, distSpaceDeriv_apply, fderivD_apply, neg_neg]
   congr 1
   ext x
   change fderiv ℝ (fun x => fderiv ℝ κ x (1, 0)) x (0, basis i) =
