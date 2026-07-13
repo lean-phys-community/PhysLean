@@ -277,6 +277,11 @@ public import Physlib.QFT.QED.AnomalyCancellation.Sorts
 public import Physlib.QFT.QED.AnomalyCancellation.VectorLike
 public import Physlib.QuantumMechanics.FiniteTarget
 public import Physlib.QuantumMechanics.HarmonicOscillator.Basic
+public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Basic
+public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Completeness
+public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Eigenfunction
+public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Examples
+public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.TISE
 public import Physlib.QuantumMechanics.HilbertSpaces.FiniteTarget.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Gaussians
@@ -288,11 +293,6 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PolyBddSchwartzSubmo
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 public import Physlib.QuantumMechanics.Hydrogen.Basic
 public import Physlib.QuantumMechanics.Hydrogen.LaplaceRungeLenzVector
-public import Physlib.QuantumMechanics.OneDHarmonicOscillator.Basic
-public import Physlib.QuantumMechanics.OneDHarmonicOscillator.Completeness
-public import Physlib.QuantumMechanics.OneDHarmonicOscillator.Eigenfunction
-public import Physlib.QuantumMechanics.OneDHarmonicOscillator.Examples
-public import Physlib.QuantumMechanics.OneDHarmonicOscillator.TISE
 public import Physlib.QuantumMechanics.Operators.AngularMomentum
 public import Physlib.QuantumMechanics.Operators.Commutation
 public import Physlib.QuantumMechanics.Operators.Covariance

@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDHarmonicOscillator.Basic
+public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Basic
 public import Physlib.Mathematics.SpecialFunctions.PhysHermite
 /-!
 

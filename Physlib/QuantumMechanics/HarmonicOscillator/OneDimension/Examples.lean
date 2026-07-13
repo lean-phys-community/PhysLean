@@ -5,7 +5,7 @@ Authors: Nicola Bernini
 -/
 module
 
-public import Physlib.QuantumMechanics.OneDHarmonicOscillator.TISE
+public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.TISE
 /-!
 # Examples: 1d Quantum Harmonic Oscillator
 
