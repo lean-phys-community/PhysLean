@@ -232,4 +232,15 @@ lemma bodyAngularVelocity_of_orientation_const (M : RigidBodyMotion 3)
   rw [bodyAngularVelocity_eq, congrFun (M.bodyAngularVelocityTensor_of_orientation_const R h) t]
   fin_cases i <;> simp [crossProductVee]
 
+/-- The rotational velocity written through the body-frame angular velocity,
+`Ṙ(t) v = R(t) (ω_body(t) × v)`: the derivative of the orientation acts as the body-frame angular
+velocity `ω_body` crossed with `v`, rotated back into the inertial frame by `R`. -/
+lemma deriv_orientation_mulVec_eq_orientation_bodyAngularVelocity_cross (M : RigidBodyMotion 3)
+    (v : Fin 3 → ℝ) (t : Time)
+    (hR : DifferentiableAt ℝ (fun s => (M.orientation s).1) t) :
+    ∂ₜ (fun s => (M.orientation s).1) t *ᵥ v
+      = (M.orientation t).1 *ᵥ (M.bodyAngularVelocity t ⨯₃ v) := by
+  rw [← M.orientation_mul_bodyAngularVelocityTensor t, ← Matrix.mulVec_mulVec,
+    ← M.crossProductMatrix_bodyAngularVelocity t hR, Matrix.crossProductMatrix_mulVec]
+
 end RigidBodyMotion
