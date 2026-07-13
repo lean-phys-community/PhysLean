@@ -299,11 +299,11 @@ public import Physlib.QuantumMechanics.Operators.Covariance
 public import Physlib.QuantumMechanics.Operators.Examples
 public import Physlib.QuantumMechanics.Operators.Momentum
 public import Physlib.QuantumMechanics.Operators.Multiplication
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Commutation
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Momentum
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Parity
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Position
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Unbounded
+public import Physlib.QuantumMechanics.Operators.OneDimension.Commutation
+public import Physlib.QuantumMechanics.Operators.OneDimension.Momentum
+public import Physlib.QuantumMechanics.Operators.OneDimension.Parity
+public import Physlib.QuantumMechanics.Operators.OneDimension.Position
+public import Physlib.QuantumMechanics.Operators.OneDimension.Unbounded
 public import Physlib.QuantumMechanics.Operators.Position
 public import Physlib.QuantumMechanics.Operators.SpectralTheory.Basic
 public import Physlib.QuantumMechanics.Operators.SpectralTheory.SelfAdjoint

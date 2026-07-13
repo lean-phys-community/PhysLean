@@ -5,8 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Position
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Momentum
+public import Physlib.QuantumMechanics.Operators.OneDimension.Position
+public import Physlib.QuantumMechanics.Operators.OneDimension.Momentum
 /-!
 
 # Commutation relations

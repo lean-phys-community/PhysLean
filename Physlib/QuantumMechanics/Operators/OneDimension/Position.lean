@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.PositionStates
-public import Physlib.QuantumMechanics.Operators.OneDOperators.Unbounded
+public import Physlib.QuantumMechanics.Operators.OneDimension.Unbounded
 public import Physlib.Mathematics.Distribution.PowMul
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.SchwartzSubmodule
 /-!
