@@ -61,16 +61,16 @@ lemma insertionSortMin_lt_mem_insertionSortDropMinPos_of_lt {α : Type} (r : α 
     (h : (insertionSortMinPosFin r a l).succAbove i < insertionSortMinPosFin r a l) :
     ¬ r ((insertionSortDropMinPos r a l)[i]) (insertionSortMin r a l) := by
   simp only [Fin.getElem_fin, insertionSortMin, List.get_eq_getElem, List.length_cons]
-  have h1 : (insertionSortDropMinPos r a l)[i] =
+  have h1 : (insertionSortDropMinPos r a l)[(i : ℕ)] =
     (a :: l).get (finCongr (eraseIdx_length_succ (a :: l) (insertionSortMinPos r a l))
     ((insertionSortMinPosFin r a l).succAbove i)) := by
     trans (insertionSortDropMinPos r a l).get i
-    simp only [Fin.getElem_fin, List.get_eq_getElem]
+    simp only [List.get_eq_getElem]
     simp only [insertionSortDropMinPos, List.length_cons, Nat.succ_eq_add_one, finCongr_apply]
     rw [eraseIdx_get]
     simp only [List.length_cons, Function.comp_apply, List.get_eq_getElem, Fin.val_cast]
     rfl
-  erw [h1]
+  rw [h1]
   simp only [List.length_cons, Nat.succ_eq_add_one, List.get_eq_getElem]
   apply insertionSortEquiv_order
   exact h
@@ -482,12 +482,12 @@ lemma filter_rel_eq_insertionSort {α : Type} (r : α → α → Prop) [Decidabl
     List.filter (fun c => r a c ∧ r c a) l
   | [] => by simp
   | b :: l => by
-    simp only [List.insertionSort]
+    simp only [List.insertionSort_cons]
     by_cases h : r a b ∧ r b a
     · have hl := orderedInsert_filter_of_pos r b (fun c => r a c ∧ r c a) h
         (List.insertionSort r l) (List.pairwise_insertionSort r l)
       simp only [Bool.decide_and] at hl ⊢
-      erw [hl]
+      rw [hl]
       rw [List.orderedInsert_eq_take_drop]
       have ht : List.takeWhile (fun b_1 => decide ¬r b b_1)
         (List.filter (fun b => decide (r a b) && decide (r b a))
@@ -524,7 +524,7 @@ lemma filter_rel_eq_insertionSort {α : Type} (r : α → α → Prop) [Decidabl
       simp_all
     · have hl := orderedInsert_filter_of_neg r b (fun c => r a c ∧ r c a) h (List.insertionSort r l)
       simp only [Bool.decide_and] at hl ⊢
-      erw [hl]
+      rw [hl]
       rw [List.filter_cons_of_neg]
       have ih := filter_rel_eq_insertionSort r a l
       simp_all only [not_and, Bool.decide_and]
