@@ -54,8 +54,11 @@ open LinearPMap
 structure QuantumSystem where
   /-- The complex Hilbert space. -/
   HS : Type*
+  /-- The Hilbert space is a normed, commutative group. -/
   [instNormed : NormedAddCommGroup HS]
+  /-- The Hilbert space is a complex inner product space. -/
   [instInner : InnerProductSpace ℂ HS]
+  /-- The Hilbert space is complete. -/
   [instComplete : CompleteSpace HS]
   /-- The self-adjoint Hamiltonian operator. -/
   ℋ : HS →ₗ.[ℂ] HS
