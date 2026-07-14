@@ -16,37 +16,51 @@ References:
 Requirements:
 
   - description:
-      The key data structure `QuantumSystem` (containing fields for a Hilbert space
-      and self-adjoint Hamiltonian operator) is defined.
+      Defines the key data structure `QuantumSystem` containing fields for a Hilbert space
+      and self-adjoint Hamiltonian operator.
     done: true
     location: Physlib/QuantumMechanics/QuantumSystem/Basic.lean (QuantumSystem)
 
   - description:
-      The API contains a zero instance representing the unique quantum system
+      Contains a zero instance representing the unique quantum system
       on the trivial (zero-dimensional) Hilbert space.
     done: true
     location: Physlib/QuantumMechanics/QuantumSystem/Basic.lean (Zero QuantumSystem)
 
   - description:
-      The API defines the notion of unitary equivalence as an equivalence relation on quantum
-      systems. Two quantum systems are unitary equivalent if there exists a unitary map between
+      Defines the notion of unitary equivalence as an equivalence relation on quantum systems.
+      Two quantum systems are unitary equivalent if there exists a unitary map between
       their Hilbert spaces which sends one Hamiltonian to the other under conjugation.
     done: true
     location:
       Physlib/QuantumMechanics/QuantumSystem/Basic.lean (UnitaryRelation, unitaryRelation_equiv)
 
   - description:
-      The API contains an instance of addition, where the 'sum' of two quantum systems
-      `Q₁` and `Q₂` is the quantum system on the product of their Hilbert spaces
-      and with Hamiltonian `Q₁.ℋ + Q₂.ℋ` (schematically).
+      Contains an instance of addition, where the 'sum' of two quantum systems `Q₁` and `Q₂`
+      is the quantum system on the product of their Hilbert spaces and with Hamiltonian
+      `Q₁.ℋ + Q₂.ℋ` (schematically).
     done: false
     location: N/A
 
   - description:
-      The API defines the Schrödinger equation for wavefunctions of type `Time → Q.ℋ.domain`.
+      Defines the Schrödinger equation for wavefunctions of type `Time → Q.ℋ.domain`.
     done: false
     location: N/A
 
-  - description: The API defines the time evolution operator of type `Time → Q.HS →L[ℂ] Q.HS`.
+  - description: Defines the time evolution operator of type `Time → Q.HS →L[ℂ] Q.HS`.
+    done: false
+    location: N/A
+
+  - description: Defines the energy eigenspaces, eigenvectors and eigenvalues.
+    done: false
+    location: N/A
+
+  - description: Defines energy eigenbases.
+    done: false
+    location: N/A
+
+  - description:
+      Allows one to transform an operator in/out of the Heisenberg picture
+      by conjugating by the time evolution operator.
     done: false
     location: N/A
