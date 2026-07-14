@@ -94,23 +94,24 @@ def MAX_LABELS := 1
 /-- Physlib's Github topic labels -/
 inductive Label where
   -- Physlib
-  | «t-classical-field-theory-pl»
-  | «t-classical-mechanics-pl»
-  | «t-condensed-matter-pl»
-  | «t-cosmology-pl»
-  | «t-electromagnetism-pl»
-  | «t-mathematics-pl»
-  | «t-meta-pl»
-  | «t-optics-pl»
-  | «t-particles-pl»
-  | «t-qft-pl»
-  | «t-quantum-mechanics-pl»
-  | «t-relativity-pl»
-  | «t-space-and-time-pl»
-  | «t-statistical-mechanics-pl»
-  | «t-string-theory-pl»
-  | «t-thermodynamics-pl»
-  | «t-units-pl»
+  | «t-classical-field-theory»
+  | «t-classical-mechanics»
+  | «t-condensed-matter»
+  | «t-cosmology»
+  | «t-electromagnetism»
+  | «t-fluid-dynamics»
+  | «t-mathematics»
+  | «t-meta»
+  | «t-optics»
+  | «t-particles»
+  | «t-qft»
+  | «t-quantum-mechanics»
+  | «t-relativity»
+  | «t-space-and-time»
+  | «t-statistical-mechanics»
+  | «t-string-theory»
+  | «t-thermodynamics»
+  | «t-units»
 
   -- QuantumInfo
   | «t-capacity-qi»
@@ -127,34 +128,35 @@ inductive Label where
   deriving BEq, Hashable, Repr
 
 def physlibLabels : Array Label := #[
-  .«t-classical-field-theory-pl», .«t-classical-mechanics-pl», .«t-condensed-matter-pl», .«t-cosmology-pl»,
-  .«t-electromagnetism-pl», .«t-mathematics-pl», .«t-meta-pl», .«t-optics-pl»,
-  .«t-particles-pl», .«t-qft-pl», .«t-quantum-mechanics-pl», .«t-relativity-pl»,
-  .«t-space-and-time-pl», .«t-statistical-mechanics-pl», .«t-string-theory-pl», .«t-thermodynamics-pl»,
-  .«t-units-pl», .«t-capacity-qi», .«t-channels-qi», .«t-classical-info-qi», .«t-entropy-qi»,
+  .«t-classical-field-theory», .«t-classical-mechanics», .«t-condensed-matter», .«t-cosmology»,
+  .«t-electromagnetism», .«t-fluid-dynamics», .«t-mathematics», .«t-meta», .«t-optics»,
+  .«t-particles», .«t-qft», .«t-quantum-mechanics», .«t-relativity»,
+  .«t-space-and-time», .«t-statistical-mechanics», .«t-string-theory», .«t-thermodynamics»,
+  .«t-units», .«t-capacity-qi», .«t-channels-qi», .«t-classical-info-qi», .«t-entropy-qi»,
   .«t-for-mathlib-qi», .«t-measurements-qi», .«t-operators-qi», .«t-resource-theory-qi», .«t-states-qi»,
   .«CI»
 ]
 
 
 def Label.toString : Label → String
-  | .«t-classical-field-theory-pl»                    => "t-classical-field-theory-pl"
-  | .«t-classical-mechanics-pl»         => "t-classical-mechanics-pl"
-  | .«t-condensed-matter-pl»         => "t-condensed-matter-pl"
-  | .«t-cosmology-pl»                   => "t-cosmology-pl"
-  | .«t-electromagnetism-pl»            => "t-electromagnetism-pl"
-  | .«t-mathematics-pl»              => "t-mathematics-pl"
-  | .«t-meta-pl»                       => "t-meta-pl"
-  | .«t-optics-pl»                     => "t-optics-pl"
-  | .«t-particles-pl»                  => "t-particles-pl"
-  | .«t-qft-pl»                        => "t-qft-pl"
-  | .«t-quantum-mechanics-pl»          => "t-quantum-mechanics-pl"
-  | .«t-relativity-pl»                => "t-relativity-pl"
-  | .«t-space-and-time-pl»             => "t-space-and-time-pl"
-  | .«t-statistical-mechanics-pl»      => "t-statistical-mechanics-pl"
-  | .«t-string-theory-pl»              => "t-string-theory-pl"
-  | .«t-thermodynamics-pl»             => "t-thermodynamics-pl"
-  | .«t-units-pl»                      => "t-units-pl"
+  | .«t-classical-field-theory»                    => "t-classical-field-theory"
+  | .«t-classical-mechanics»         => "t-classical-mechanics"
+  | .«t-condensed-matter»         => "t-condensed-matter"
+  | .«t-cosmology»                   => "t-cosmology"
+  | .«t-electromagnetism»            => "t-electromagnetism"
+  | .«t-fluid-dynamics»            => "t-fluid-dynamics"
+  | .«t-mathematics»              => "t-mathematics"
+  | .«t-meta»                       => "t-meta"
+  | .«t-optics»                     => "t-optics"
+  | .«t-particles»                  => "t-particles"
+  | .«t-qft»                        => "t-qft"
+  | .«t-quantum-mechanics»          => "t-quantum-mechanics"
+  | .«t-relativity»                => "t-relativity"
+  | .«t-space-and-time»             => "t-space-and-time"
+  | .«t-statistical-mechanics»      => "t-statistical-mechanics"
+  | .«t-string-theory»              => "t-string-theory"
+  | .«t-thermodynamics»             => "t-thermodynamics"
+  | .«t-units»                      => "t-units"
   | .«t-capacity-qi»                   => "t-capacity-qi"
   | .«t-channels-qi»                   => "t-channels-qi"
   | .«t-classical-info-qi»             => "t-classical-info-qi"
@@ -181,13 +183,13 @@ A `LabelData` consists of the
 structure LabelData (label : Label) where
   /-- Array of paths which fall under this label. e.g. `"Physlib" / "Cosmology"`.
 
-  For a label of the form `t-cosmology-pl` this defaults to `#["Physlib" / "Cosmology"]`.
+  For a label of the form `t-cosmology` this defaults to `#["Physlib" / "Cosmology"]`.
   For a label of the form `t-states-qi` this defaults to `#["QuantumInfo" / "States"]`. -/
 
-  dirs : Array FilePath := if label.toString.startsWith "t-" && label.toString.endsWith "-pl" then
-      #["Physlib" / ("".intercalate (label.toString.splitOn "-" |>.drop 1 |>.dropLast |>.map .capitalize))]
-  else if label.toString.startsWith "t-" && label.toString.endsWith "-qi" then
-    #["QuantumInfo" / ("".intercalate (label.toString.splitOn "-" |>.drop 1 |>.dropLast |>.map .capitalize))]
+  dirs : Array FilePath := if label.toString.startsWith "t-" && label.toString.endsWith "-qi" then
+      #["QuantumInfo" / ("".intercalate (label.toString.splitOn "-" |>.drop 1 |>.dropLast |>.map .capitalize))]
+  else if label.toString.startsWith "t-" then
+    #["Physlib" / ("".intercalate (label.toString.splitOn "-" |>.drop 1 |>.map .capitalize))]
     else #[]
   /-- Array of paths which should be excluded.
   Any modifications to a file in an excluded path are ignored for the purposes of labelling. -/
@@ -202,32 +204,33 @@ structure LabelData (label : Label) where
 /-- This function maps each label to the corresponding paths
 For now, no exclusions or dependencies are specified --/
 def physlibLabelData: (l: Label) → LabelData l
-  | .«t-classical-field-theory-pl» => { dirs := #["Physlib" / "ClassicalFieldTheory"] }
-  | .«t-classical-mechanics-pl» => { dirs := #["Physlib" / "ClassicalMechanics"] }
-  | .«t-condensed-matter-pl» => { dirs := #["Physlib" / "CondensedMatter"] }
-  | .«t-cosmology-pl» => { dirs := #["Physlib" / "Cosmology"] }
-  | .«t-electromagnetism-pl» => { dirs := #["Physlib" / "Electromagnetism"] }
-  | .«t-mathematics-pl» => { dirs := #["Physlib" / "Mathematics"] }
-  | .«t-meta-pl» => { dirs := #["Physlib" / "Meta"] }
-  | .«t-optics-pl» => { dirs := #["Physlib" / "Optics"] }
-  | .«t-particles-pl» => { dirs := #["Physlib" / "Particles"] }
-  | .«t-qft-pl» => { dirs := #["Physlib" / "QFT"] }
-  | .«t-quantum-mechanics-pl» => { dirs := #["Physlib" / "QuantumMechanics"] }
-  | .«t-relativity-pl» => { dirs := #["Physlib" / "Relativity"] }
-  | .«t-space-and-time-pl» => { dirs := #["Physlib" / "SpaceAndTime"] }
-  | .«t-statistical-mechanics-pl» => { dirs := #["Physlib" / "StatisticalMechanics"] }
-  | .«t-string-theory-pl» => { dirs := #["Physlib" / "StringTheory"] }
-  | .«t-thermodynamics-pl» => { dirs := #["Physlib" / "Thermodynamics"] }
-  | .«t-units-pl» => { dirs := #["Physlib" / "Units"] }
-  | .«t-capacity-qi» => { dirs := #["QuantumInfo" / "Capacity"] }
-  | .«t-channels-qi» => { dirs := #["QuantumInfo" / "Channels"] }
-  | .«t-classical-info-qi» => { dirs := #["QuantumInfo" / "ClassicalInfo"] }
-  | .«t-entropy-qi» => { dirs := #["QuantumInfo" / "Entropy"] }
-  | .«t-for-mathlib-qi» => { dirs := #["QuantumInfo" / "ForMathlib"] }
-  | .«t-measurements-qi» => { dirs := #["QuantumInfo" / "Measurements"] }
-  | .«t-operators-qi» => { dirs := #["QuantumInfo" / "Operators"] }
-  | .«t-resource-theory-qi» => { dirs := #["QuantumInfo" / "ResourceTheory"] }
-  | .«t-states-qi» => { dirs := #["QuantumInfo" / "States"] }
+  | .«t-classical-field-theory» => {}
+  | .«t-classical-mechanics» => {}
+  | .«t-condensed-matter» => {}
+  | .«t-cosmology» => {}
+  | .«t-electromagnetism» => {}
+  | .«t-fluid-dynamics» => {}
+  | .«t-mathematics» => {}
+  | .«t-meta» => {}
+  | .«t-optics» => {}
+  | .«t-particles» => {}
+  | .«t-qft» => { dirs := #["Physlib" / "QFT"] }
+  | .«t-quantum-mechanics» => {}
+  | .«t-relativity» => {}
+  | .«t-space-and-time» => {}
+  | .«t-statistical-mechanics» => {}
+  | .«t-string-theory» => {}
+  | .«t-thermodynamics» => {}
+  | .«t-units» => {}
+  | .«t-capacity-qi» => {}
+  | .«t-channels-qi» => {}
+  | .«t-classical-info-qi» => {}
+  | .«t-entropy-qi» => {}
+  | .«t-for-mathlib-qi» => {}
+  | .«t-measurements-qi» => {}
+  | .«t-operators-qi» => {}
+  | .«t-resource-theory-qi» => {}
+  | .«t-states-qi» => {}
   | .«CI» => { dirs := #["scripts"] }
 
 /-- Exceptions inside `Physlib/` which are not covered by any label.
@@ -284,7 +287,7 @@ section Tests
 #guard getMatchingLabels #[] == #[]
 
 -- Test default value for `label.dirs` works
-#guard getMatchingLabels #["Physlib" / "CondensedMatter" / "TightBindingChain" / "Basic.lean"] == #[.«t-condensed-matter-pl»]
+#guard getMatchingLabels #["Physlib" / "CondensedMatter" / "TightBindingChain" / "Basic.lean"] == #[.«t-condensed-matter»]
 
 -- Test QuantumInfo labels resolve to their topic folders
 #guard getMatchingLabels #["QuantumInfo" / "Entropy" / "Basic.lean"] == #[.«t-entropy-qi»]
