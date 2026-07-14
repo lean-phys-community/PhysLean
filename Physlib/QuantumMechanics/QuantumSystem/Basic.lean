@@ -8,13 +8,31 @@ module
 public import Physlib.QuantumMechanics.Operators.Unbounded
 /-!
 
-# Quantum systems
+# Quantum system
 
 ## i. Overview
 
+In non-relativistic quantum mechanics a quantum system is characterized by a Hilbert space
+(complete inner product space) and self-adjoint Hamiltonian operator; these data are collected in
+the `QuantumSystem` structure.
+
+Two quantum systems are said to be "unitary equivalent" if there is a unitary bijection between
+their respective Hilbert spaces which sends one Hamiltonian to the other under conjugation.
+Unitary equivalent quantum systems are physically indestinguishable, as all operators, states,
+matrix elements, probabilities, eigenvalues, etc. are in 1-1 correspondence.
+
 ## ii. Key results
 
+Definitions
+- `QuantumSystem` : Structure bundling together a choice of Hilbert space
+    and self-adjoint Hamiltonian operator.
+- `UnitaryRelation` : The unitary equivalence relation.
+
 ## iii. Table of contents
+
+- A. Definition
+- B. Zero
+- C. Unitary equivalence
 
 ## iv. References
 
@@ -27,6 +45,10 @@ noncomputable section
 namespace QuantumMechanics
 
 open LinearPMap
+
+/-!
+## A. Definition
+-/
 
 /-- A quantum system is identified by its Hilbert space and self-adjoint Hamiltonian operator. -/
 structure QuantumSystem where
@@ -48,13 +70,13 @@ instance (Q : QuantumSystem) : InnerProductSpace ℂ Q.HS := Q.instInner
 instance (Q : QuantumSystem) : CompleteSpace Q.HS := Q.instComplete
 
 /-!
-## Zero
+## B. Zero
 -/
 
 instance instZero : Zero QuantumSystem := ⟨EuclideanSpace ℂ (Fin 0), 0, adjoint_zero⟩
 
 /-!
-## Unitary equivalence
+## C. Unitary equivalence
 -/
 
 /-- The relation on quantum systems where `Q₁` is related to `Q₂` if there exists a linear isometry
