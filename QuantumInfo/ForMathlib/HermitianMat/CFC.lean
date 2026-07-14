@@ -8,14 +8,10 @@ module
 public import QuantumInfo.ForMathlib.HermitianMat.Inner
 public import QuantumInfo.ForMathlib.HermitianMat.NonSingular
 public import QuantumInfo.ForMathlib.Isometry
-public import QuantumInfo.ForMathlib.Unitary
 
 public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Continuity
-public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Basic
-public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Instances
 public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Commute
 public import Mathlib.Analysis.CStarAlgebra.CStarMatrix
-public import Mathlib.Algebra.Order.Group.Pointwise.CompleteLattice
 public import Mathlib.Topology.TietzeExtension
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 
