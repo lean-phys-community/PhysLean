@@ -30,7 +30,6 @@ QuantumInfo/ForMathlib/HayataGroup/TraceInequality/LiebAndoTrace.lean
 QuantumInfo/ForMathlib/HayataGroup/TraceInequality/LownerHeinzCore.lean
 QuantumInfo/ForMathlib/HayataGroup/TraceInequality/LownerHeinzTheorem.lean
 QuantumInfo/ForMathlib/HayataGroup/TraceInequality/OperatorGeometricMean.lean
-QuantumInfo/ForMathlib/HermitianMat.lean
 QuantumInfo/ForMathlib/HermitianMat/Basic.lean
 QuantumInfo/ForMathlib/HermitianMat/CFC.lean
 QuantumInfo/ForMathlib/HermitianMat/Inner.lean
@@ -56,8 +55,6 @@ QuantumInfo/ForMathlib/Minimax.lean
 QuantumInfo/ForMathlib/Misc.lean
 QuantumInfo/ForMathlib/SionMinimax.lean
 QuantumInfo/ForMathlib/Superadditive.lean
-QuantumInfo/ForMathlib/Tactic/Commutes.lean
-QuantumInfo/ForMathlib/Tactic/Commutes/Attribute.lean
 QuantumInfo/ForMathlib/Unitary.lean
 QuantumInfo/Measurements/POVM.lean
 QuantumInfo/Regularized.lean
@@ -70,7 +67,6 @@ QuantumInfo/States/Entanglement.lean
 QuantumInfo/States/Mixed/Fidelity.lean
 QuantumInfo/States/Mixed/MState.lean
 QuantumInfo/States/Mixed/TraceDistance.lean
-QuantumInfo/States/Pure/BargmannInvariant.lean
 QuantumInfo/States/Pure/BlochSphere.lean
 QuantumInfo/States/Pure/Braket.lean
 QuantumInfo/States/Pure/Qubit.lean

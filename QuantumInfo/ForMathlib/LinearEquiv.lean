@@ -26,7 +26,8 @@ together with lemmas relating them to `Matrix.reindex`.
 
 ## iii. Table of contents
 
-This can be filled in later.
+- A. Relabelling linear equivalences
+- B. Reindexing matrices and their linear maps
 
 ## iv. References
 
@@ -35,6 +36,12 @@ This can be filled in later.
 @[expose] public section
 
 variable {d d₁ d₂ d₃ R 𝕜 : Type*} [RCLike 𝕜]
+
+/-!
+
+## A. Relabelling linear equivalences
+
+-/
 
 namespace LinearEquiv
 
@@ -70,6 +77,12 @@ theorem euclidean_of_relabel_refl : euclidean_of_relabel 𝕜 (.refl d) =
   rfl
 
 end LinearEquiv
+
+/-!
+
+## B. Reindexing matrices and their linear maps
+
+-/
 
 namespace Matrix
 
