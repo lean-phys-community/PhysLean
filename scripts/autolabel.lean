@@ -85,7 +85,7 @@ namespace AutoLabel
     2. IO AutoLabel command is opened to define the main function which takes in a list of
     arguments and returns an IO UInt32. This is the function run during github action.
 
-     -/
+-/
 
 
 /-- Maximal number of labels which can be added. If more are applicable, nothing will be added. -/
