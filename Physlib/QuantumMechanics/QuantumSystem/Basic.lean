@@ -39,5 +39,20 @@ structure QuantumSystem where
   ℋ : HS →ₗ.[ℂ] HS
   ℋ_self_adjoint : IsSelfAdjoint ℋ
 
+namespace QuantumSystem
+
+instance (Q : QuantumSystem) : NormedAddCommGroup Q.HS := Q.instNormed
+
+instance (Q : QuantumSystem) : InnerProductSpace ℂ Q.HS := Q.instInner
+
+instance (Q : QuantumSystem) : CompleteSpace Q.HS := Q.instComplete
+
+/-!
+## Zero
+-/
+
+instance instZero : Zero QuantumSystem := ⟨EuclideanSpace ℂ (Fin 0), 0, adjoint_zero⟩
+
+end QuantumSystem
 end QuantumMechanics
 end
