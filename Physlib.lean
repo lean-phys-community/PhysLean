@@ -90,6 +90,7 @@ public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
 public import Physlib.Mathematics.Distribution.Basic
 public import Physlib.Mathematics.Distribution.PowMul
+public import Physlib.Mathematics.Distribution.ResolventReciprocal
 public import Physlib.Mathematics.FDerivCurry
 public import Physlib.Mathematics.Fin
 public import Physlib.Mathematics.Fin.Involutions
