@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Gregory J. Loges. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Gregory J. Loges
+Authors: Adam Bornemann, Gregory J. Loges
 -/
 module
 
@@ -18,12 +18,16 @@ In this module we develop the spectral theory for self-adjoint operators.
 
 - `resolventSet_eq_regularityDomain` : The resolvent set and regularity domain coincide. That is,
     if `T - z • 1` has a continuous (equivalently, bounded) inverse then its range is all of `H`.
+- `sub_smul_surjective` : A self-adjoint `T` has `T - z • 1` surjective for every non-real `z`
+    (in particular `T ± i • 1` are onto).
 - `spectrum_real` : The spectrum of a self-adjoint unbounded operator is real.
+- `unitaryConj_isSelfAdjoint` : Unitary conjugation preserves self-adjointness.
 
 ## iii. Table of contents
 
 - A. Resolvent set
 - B. Spectrum
+- C. Unitary conjugation
 
 ## iv. References
 
@@ -59,6 +63,18 @@ lemma resolventSet_eq_regularityDomain : ρ T = T.regularityDomain := by
   rw [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, h_ker'] at h_orthog
   simp [← h_orthog]
 
+/-- A self-adjoint operator has `T - z • 1` surjective for every non-real `z`: off the real
+axis a self-adjoint operator has `z` in its resolvent set, so `T - z • 1` has full range. -/
+lemma sub_smul_surjective {z : ℂ} (hz : z.im ≠ 0) (φ : H) :
+    ∃ ψ : T.domain, T ψ - z • (ψ : H) = φ := by
+  have hz_res : z ∈ ρ T := by
+    rw [resolventSet_eq_regularityDomain hT]
+    exact (isSymmetric hT).mem_regularityDomain_of_im_ne_zero hz
+  obtain ⟨ξ, hξ⟩ := LinearMap.range_eq_top.mp (mem_resolventSet_iff.mp hz_res).2.1 φ
+  refine ⟨⟨(ξ : H), (Submodule.mem_inf.mp ξ.2).1⟩, ?_⟩
+  have happ : (T - z • 1) ξ = φ := hξ
+  rwa [LinearPMap.sub_apply, LinearPMap.smul_apply] at happ
+
 /-- `(T - z • 1).range = ⊤` is a sufficient condition for `z ∈ ρ T`
   (and it is a necessary condition by definition of `ρ`). -/
 lemma mem_resolventSet_of_range_eq_top {z : ℂ} (h : (T - z • 1).toFun.range = ⊤) : z ∈ ρ T := by
@@ -87,4 +103,35 @@ lemma residualSpectrum_eq_empty : σʳ T = ∅ :=
     (resolventSet_eq_regularityDomain hT ▸ T.residualSpectrum_subset_regularityDomain hz)
 
 end IsSelfAdjoint
+
+/-!
+## C. Unitary conjugation
+-/
+
+open Complex
+
+variable {H H' : Type*}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H']
+
+/-- Unitary conjugation preserves self-adjointness: if `A` is a self-adjoint operator on `H` and
+`u : H ≃ₗᵢ[ℂ] H'` is unitary, then `u A u⁻¹` is self-adjoint on `H'`. Symmetry, dense domain, and
+the two deficiency surjectivities of `A` all transfer through `u`. -/
+lemma unitaryConj_isSelfAdjoint (u : H ≃ₗᵢ[ℂ] H') {A : H →ₗ.[ℂ] H} (hA : IsSelfAdjoint A) :
+    IsSelfAdjoint (A.unitaryConj u) := by
+  have hsurj {z : ℂ} (hz : z.im ≠ 0) (φ : H') :
+      ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ - z • (ψ : H') = φ := by
+    have hAz : Function.Surjective (A - z • 1).toFun := fun φ' ↦ by
+      obtain ⟨ψ, hψ⟩ := IsSelfAdjoint.sub_smul_surjective hA hz φ'
+      exact ⟨⟨(ψ : H), Submodule.mem_inf.mpr ⟨ψ.2, Submodule.mem_top⟩⟩, hψ⟩
+    obtain ⟨ξ, hξ⟩ := unitaryConj_sub_smul_surjective hAz φ
+    exact ⟨⟨(ξ : H'), (Submodule.mem_inf.mp ξ.2).1⟩, hξ⟩
+  have hplus (φ : H') : ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ + I • (ψ : H') = φ := by
+    simpa only [neg_smul, sub_neg_eq_add] using hsurj (z := -I) (by norm_num) φ
+  have hminus (φ : H') : ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ - I • (ψ : H') = φ :=
+    hsurj (by norm_num) φ
+  exact IsSelfAdjoint.of_surjective_add_sub
+    (IsFormalAdjoint.unitaryConj (IsSelfAdjoint.isSymmetric hA))
+    (HasDenseDomain.unitaryConj_dense_domain (IsSelfAdjoint.dense_domain hA)) hplus hminus
+
 end LinearPMap
