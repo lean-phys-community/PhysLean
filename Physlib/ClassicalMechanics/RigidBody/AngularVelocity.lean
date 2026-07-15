@@ -37,8 +37,10 @@ with the body, and its origin follows the (generally accelerating) centre of mas
 natural setting for the inertia tensor and Euler's equations, since the mass distribution, and
 with it the inertia tensor, is time-independent in body-fixed axes.
 
-The *body-frame angular velocity tensor* `Ω_body(t) = R(t)ᵀ Ṙ(t)` is the spatial tensor
-conjugated into the body frame, `Ω_body = Rᵀ Ω R`, and is again skew-symmetric; in three
+The *body-frame angular velocity tensor* `Ω_body(t) = R(t)ᵀ Ṙ(t)` is defined directly from the
+orientation, mirroring the spatial `Ω = Ṙ Rᵀ` rather than being derived from it — the two tensors
+are the derivative `Ṙ` translated back to the identity from the two sides — and they are related
+by conjugation, `Ω_body = Rᵀ Ω R`. The body-frame tensor is again skew-symmetric; in three
 dimensions its dual is the *body-frame angular velocity vector* `ω_body = Ω_bodyᵛ`, the angular
 velocity `ω` resolved along the body-fixed axes, `ω_body = Rᵀ ω`.
 
@@ -155,7 +157,8 @@ theorem velocity_eq_angularVelocity (M : RigidBodyMotion 3) (y : Space 3) (t : T
 
 /-- The body-frame (co-rotating) angular velocity tensor `Ω_body(t) = R(t)ᵀ Ṙ(t)` of a rigid body
 in motion, where `R(t) = orientation t`. It is the angular velocity tensor expressed in the frame
-rotating with the body, the conjugate `Ω_body = Rᵀ Ω R` of the spatial tensor `Ω = Ṙ Rᵀ`. -/
+rotating with the body, related to the spatial tensor `Ω = Ṙ Rᵀ` by the conjugation
+`Ω = R Ω_body Rᵀ` (`angularVelocityTensor_eq_orientation_conj`). -/
 noncomputable def bodyAngularVelocityTensor (M : RigidBodyMotion d) (t : Time) :
     Matrix (Fin d) (Fin d) ℝ :=
   ((M.orientation t).1)ᵀ * ∂ₜ (fun s => (M.orientation s).1) t
@@ -196,6 +199,14 @@ lemma angularVelocityTensor_eq_orientation_conj (M : RigidBodyMotion d) (t : Tim
     M.angularVelocityTensor t
       = (M.orientation t).1 * M.bodyAngularVelocityTensor t * ((M.orientation t).1)ᵀ := by
   rw [angularVelocityTensor_eq, ← M.orientation_mul_bodyAngularVelocityTensor t]
+
+/-- The body-frame angular velocity tensor is the spatial tensor conjugated into the body frame,
+`Ω_body = Rᵀ Ω R`: the converse of `angularVelocityTensor_eq_orientation_conj`. -/
+lemma bodyAngularVelocityTensor_eq_orientation_conj (M : RigidBodyMotion d) (t : Time) :
+    M.bodyAngularVelocityTensor t
+      = ((M.orientation t).1)ᵀ * M.angularVelocityTensor t * (M.orientation t).1 := by
+  rw [bodyAngularVelocityTensor_eq, angularVelocityTensor_eq, ← mul_assoc, mul_assoc,
+    mul_eq_one_comm.mp (M.orientation_mul_transpose t), mul_one]
 
 /-- The body-frame angular velocity *vector* `ω_body(t)` of a rigid body moving in three-dimensional
 space: the vector dual to the body-frame angular velocity tensor `Ω_body(t)` under the hat map,
