@@ -119,9 +119,9 @@ lemma potentialCLM_apply_apply
 
 /-- The potential operator as a self-adjoint, unbounded multiplication operator
   with domain `{ψ ∈ Q.HS | Q.potential • ψ ∈ Q.HS}`. -/
-def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 (ofReal ∘ Q.potential)
+def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 volume (ofReal ∘ Q.potential)
 
-lemma potentialOperator_eq : Q.potentialOperator = 𝓜 (ofReal ∘ Q.potential) := rfl
+lemma potentialOperator_eq : Q.potentialOperator = 𝓜 volume (ofReal ∘ Q.potential) := rfl
 
 lemma potentialOperator_isSelfAdjoint (h_AESM : AEStronglyMeasurable Q.potential) :
     IsSelfAdjoint Q.potentialOperator :=
@@ -129,7 +129,7 @@ lemma potentialOperator_isSelfAdjoint (h_AESM : AEStronglyMeasurable Q.potential
 
 lemma potentialOperator_domain_ge (h_HTG : Q.potential.HasTemperateGrowth) :
     SchwartzSubmodule Q.d ≤ Q.potentialOperator.domain :=
-  mulOperator_domain_ge_of_hasTemperateGrowth (by fun_prop)
+  mulOperator_domain_ge_of_hasTemperateGrowth (by fun_prop) volume
 
 /-!
 ### B.3. Hamiltonian
