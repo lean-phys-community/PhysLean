@@ -90,29 +90,29 @@ open SchwartzSubmodule
 /-- The momentum operator as a LinearPMap with domain the Schwartz submodule. -/
 def momentumOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d where
   domain := SchwartzSubmodule d
-  toFun := schwartzIncl.toLinearMap ∘ₗ (𝐩 i).toLinearMap ∘ₗ schwartzEquiv.symm.toLinearMap
+  toFun := (schwartzIncl volume).1 ∘ₗ (𝐩 i).1 ∘ₗ (schwartzEquiv volume).symm.1
 
 @[inherit_doc momentumOperator]
 notation "𝓟" => momentumOperator
 
 lemma momentumOperator_apply (ψ : SchwartzSubmodule d) :
-    𝓟 i ψ = schwartzEquiv (𝐩 i (schwartzEquiv.symm ψ)) := rfl
+    𝓟 i ψ = schwartzEquiv volume (𝐩 i ((schwartzEquiv volume).symm ψ)) := rfl
 
 lemma momentumOperator_apply_ae (ψ : SchwartzSubmodule d) :
-    𝓟 i ψ =ᵐ[volume] 𝐩 i (schwartzEquiv.symm ψ) :=
+    𝓟 i ψ =ᵐ[volume] 𝐩 i ((schwartzEquiv volume).symm ψ) :=
   schwartzEquiv_coe_ae _
 
 lemma momentumOperator_range (ψ : SchwartzSubmodule d) : 𝓟 i ψ ∈ SchwartzSubmodule d := by
   simp [momentumOperator_apply]
 
-lemma momentumOperator_hasDenseDomain : (𝓟 i).HasDenseDomain := SchwartzSubmodule.dense d
+lemma momentumOperator_hasDenseDomain : (𝓟 i).HasDenseDomain := SchwartzSubmodule.dense d _
 
 lemma momentumOperator_isSymmetric : (𝓟 i).IsSymmetric := by
   intro ψ φ
-  obtain ⟨f, rfl⟩ := schwartzEquiv.surjective ψ
-  obtain ⟨g, rfl⟩ := schwartzEquiv.surjective φ
+  obtain ⟨f, rfl⟩ := (schwartzEquiv volume).surjective ψ
+  obtain ⟨g, rfl⟩ := (schwartzEquiv volume).surjective φ
   simp only [momentumOperator_apply, ← Submodule.coe_inner, schwartzEquiv_inner,
-    schwartzEquiv.symm_apply_apply, momentumCLM_apply]
+    (schwartzEquiv volume).symm_apply_apply, momentumCLM_apply]
   have heq : ∀ x, fderiv ℝ (star ∘ f) x = (starL' ℝ).toContinuousLinearMap ∘L (fderiv ℝ f x) :=
     fun _ ↦ fderiv_star
   have hI₁ : Integrable fun x ↦ star (f x) := (starL' ℝ).integrable_comp_iff.mpr f.integrable
