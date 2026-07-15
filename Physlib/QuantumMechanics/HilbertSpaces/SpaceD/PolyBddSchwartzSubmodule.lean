@@ -14,14 +14,14 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 
 ## i. Overview
 
-In this module we define polynomially-bounded Schwartz submodules of `SpaceDHilbertSpace`.
+In this module we define polynomially-bounded Schwartz submodules of `SpaceDHilbertSpace d μ`.
 
-For each `a : ℕ∞`, `PolyBddSchwartzSubmodule d a` is the submodule corresponding to Schwartz
+For each `a : ℕ∞`, `PolyBddSchwartzSubmodule d a μ` is the submodule corresponding to Schwartz
 maps `f` satisfying the polynomial growth bounds `‖x‖ ^ (-k) * ‖f x‖ ≤ Cₖ` for all `(k : ℕ) ≤ a`.
 In particular, for `a = ⊤` such a bound holds for all natural numbers.
 
 These serve as a natural domain for singular unbounded operators. For example, the `1/r` Coulomb
-potential operator maps `PolyBddSchwartzSubmodule d ⊤` to itself. In the same way that multiplying
+potential operator maps `PolyBddSchwartzSubmodule d ⊤ μ` to itself. In the same way that multiplying
 a Schwartz map by any polynomial in the coordinates results in a square-integrable function,
 polynomially-bounded Schwartz maps may be multiplied by Laurent polynomials and remain
 square-integrable (the precise condition depends on `d`, `a` and the negative degree of
@@ -36,9 +36,9 @@ their being dense in `SpaceDHilbertSpace 0 ≅ ℂ`).
 
 ## ii. Key results
 
-- `PolyBddSchwartzSubmodule d (a : ℕ∞)`: Restriction of `SchwartzSubmodule d` to those Schwartz maps
-  which are bounded by powers of `‖x‖`.
-- `PolyBddSchwartzSubmodule.dense d a`: These submodules are dense in `SpaceDHilbertSpace`.
+- `PolyBddSchwartzSubmodule d (a : ℕ∞) μ`: Restriction of `SchwartzSubmodule d μ` to those
+  Schwartz maps which are bounded by powers of `‖x‖`.
+- `PolyBddSchwartzSubmodule.dense`: These submodules are dense in `SpaceDHilbertSpace d μ`.
 
 ## iii. Table of contents
 
@@ -88,52 +88,58 @@ def PolyBddSchwartzMap (d : ℕ) (a : ℕ∞) : Submodule ℂ 𝓢(Space d, ℂ)
     exact le_trans (mul_le_mul_of_nonneg_left (hC x) (norm_nonneg c)) (by linarith)
 
 /-- The continuous linear map `schwartzIncl` with domain restricted to `PolyBddSchwartzMap d a`. -/
-def polyBddSchwartzIncl {d : ℕ} {a : ℕ∞} : PolyBddSchwartzMap d a →L[ℂ] SpaceDHilbertSpace d :=
-  ⟨schwartzIncl.domRestrict (PolyBddSchwartzMap d a),
-    schwartzIncl.continuous_domRestrict schwartzIncl.continuous _⟩
+def polyBddSchwartzIncl {d : ℕ} {a : ℕ∞} (μ : Measure (Space d)) [μ.HasTemperateGrowth] :
+    PolyBddSchwartzMap d a →L[ℂ] SpaceDHilbertSpace d μ :=
+  ⟨(schwartzIncl μ).domRestrict (PolyBddSchwartzMap d a),
+    (schwartzIncl μ).continuous_domRestrict (schwartzIncl μ).continuous _⟩
 
 /-- The submodule of `SpaceDHilbertSpace d` corresponding to bounded Schwartz maps. -/
-abbrev PolyBddSchwartzSubmodule (d : ℕ) (a : ℕ∞) : Submodule ℂ (SpaceDHilbertSpace d) :=
-  (polyBddSchwartzIncl (a := a)).range
+abbrev PolyBddSchwartzSubmodule
+    (d : ℕ) (a : ℕ∞) (μ : Measure (Space d) := volume) [μ.HasTemperateGrowth] :
+    Submodule ℂ (SpaceDHilbertSpace d μ) :=
+  (polyBddSchwartzIncl (a := a) μ).range
 
-lemma polyBddSchwartzIncl_injective (d : ℕ) (a : ℕ∞) :
-    Function.Injective (polyBddSchwartzIncl (d := d) (a := a)) :=
-  LinearMap.injective_domRestrict_iff.mpr <| schwartzIncl_ker.symm ▸ inf_bot_eq _
+lemma polyBddSchwartzIncl_injective
+    {d : ℕ} (a : ℕ∞) (μ : Measure (Space d)) [μ.HasTemperateGrowth] [μ.IsOpenPosMeasure] :
+    Function.Injective (polyBddSchwartzIncl (a := a) μ) :=
+  LinearMap.injective_domRestrict_iff.mpr <| (schwartzIncl_ker μ).symm ▸ inf_bot_eq _
 
 /-- The linear equivalence between polynomially-bounded Schwartz maps and the corresponding
   submodule of the Hilbert space. -/
-def polyBddSchwartzEquiv {d : ℕ} {a : ℕ∞} :
-    PolyBddSchwartzMap d a ≃ₗ[ℂ] PolyBddSchwartzSubmodule d a :=
-  LinearEquiv.ofInjective polyBddSchwartzIncl.toLinearMap (polyBddSchwartzIncl_injective d a)
+def polyBddSchwartzEquiv
+    {d : ℕ} {a : ℕ∞} (μ : Measure (Space d)) [μ.HasTemperateGrowth] [μ.IsOpenPosMeasure] :
+    PolyBddSchwartzMap d a ≃ₗ[ℂ] PolyBddSchwartzSubmodule d a μ :=
+  LinearEquiv.ofInjective (polyBddSchwartzIncl μ).toLinearMap (polyBddSchwartzIncl_injective a μ)
 
 namespace PolyBddSchwartzSubmodule
+
+variable {d : ℕ} {a : ℕ∞}
+variable (μ : Measure (Space d)) [μ.HasTemperateGrowth]
 
 /-!
 ## B. Coercions
 -/
 
-instance {d : ℕ} {a : ℕ∞} : CoeOut (PolyBddSchwartzMap d a) 𝓢(Space d, ℂ) := ⟨fun f ↦ f.val⟩
+instance : CoeOut (PolyBddSchwartzMap d a) 𝓢(Space d, ℂ) := ⟨fun f ↦ f.val⟩
 
-instance {d : ℕ} {a : ℕ∞} : CoeFun (PolyBddSchwartzMap d a) (fun _ ↦ Space d → ℂ) :=
-  ⟨fun f ↦ ⇑f.val⟩
+instance : CoeFun (PolyBddSchwartzMap d a) (fun _ ↦ Space d → ℂ) := ⟨fun f ↦ ⇑f.val⟩
 
 @[simp]
-lemma toFun_eq_coe {d : ℕ} {a : ℕ∞} (f : PolyBddSchwartzMap d a) (x : Space d) :
-    f.val.toFun x = f.val x :=
-  rfl
+lemma toFun_eq_coe (f : PolyBddSchwartzMap d a) (x : Space d) : f.val.toFun x = f.val x := rfl
 
-lemma polyBddSchwartzEquiv_symm_apply_coe {d : ℕ} {a : ℕ∞}
-    {ψ : SchwartzSubmodule d} (hψ : ↑ψ ∈ PolyBddSchwartzSubmodule d a) :
-    (polyBddSchwartzEquiv.symm ⟨ψ, hψ⟩).val = schwartzEquiv.symm ψ := by
-  apply schwartzEquiv.injective
+lemma polyBddSchwartzEquiv_symm_apply_coe [μ.IsOpenPosMeasure]
+    {ψ : SchwartzSubmodule d μ} (hψ : ↑ψ ∈ PolyBddSchwartzSubmodule d a μ) :
+    ((polyBddSchwartzEquiv μ).symm ⟨ψ, hψ⟩).val = (schwartzEquiv μ).symm ψ := by
+  apply (schwartzEquiv μ).injective
   apply SetLike.coe_eq_coe.mp
-  obtain ⟨g, hg⟩ := polyBddSchwartzEquiv.surjective ⟨ψ.val, hψ⟩
-  have hg' : polyBddSchwartzIncl g = ψ := SetLike.coe_eq_coe.mpr hg
+  obtain ⟨g, hg⟩ := (polyBddSchwartzEquiv μ).surjective ⟨ψ.val, hψ⟩
+  have hg' : polyBddSchwartzIncl μ g = ψ := SetLike.coe_eq_coe.mpr hg
   rw [← hg, LinearEquiv.symm_apply_apply, LinearEquiv.apply_symm_apply, ← hg']
   rfl
 
-lemma polyBddSchwartzEquiv_coe_ae {d : ℕ} {a : ℕ∞} (f : PolyBddSchwartzMap d a) :
-    polyBddSchwartzEquiv f =ᵐ[volume] f.val := schwartzEquiv_coe_ae f.val
+lemma polyBddSchwartzEquiv_coe_ae [μ.IsOpenPosMeasure] (f : PolyBddSchwartzMap d a) :
+    polyBddSchwartzEquiv μ f =ᵐ[μ] f.val :=
+  schwartzEquiv_coe_ae f.val
 
 /-!
 ### C. (In)equalities
@@ -147,14 +153,14 @@ lemma PolyBddSchwartzMap_zero_eq_top (d : ℕ) : PolyBddSchwartzMap d 0 = ⊤ :=
 lemma PolyBddSchwartzMap_antitone (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
     PolyBddSchwartzMap d b ≤ PolyBddSchwartzMap d a := fun _ hx k hk ↦ hx k (hk.trans h)
 
-lemma of_zero_eq (d : ℕ) : PolyBddSchwartzSubmodule d 0 = SchwartzSubmodule d := by
+lemma of_zero_eq : PolyBddSchwartzSubmodule d 0 μ = SchwartzSubmodule d μ := by
   simp [PolyBddSchwartzSubmodule, polyBddSchwartzIncl, PolyBddSchwartzMap_zero_eq_top]
 
 lemma le_SchwartzSubmodule (d : ℕ) (a : ℕ∞) : PolyBddSchwartzSubmodule d a ≤ SchwartzSubmodule d :=
   LinearMap.range_domRestrict_le_range _ _
 
-lemma antitone (d : ℕ) {a b : ℕ∞} (h : a ≤ b) :
-    PolyBddSchwartzSubmodule d b ≤ PolyBddSchwartzSubmodule d a := by
+lemma antitone {a b : ℕ∞} (h : a ≤ b) :
+    PolyBddSchwartzSubmodule d b μ ≤ PolyBddSchwartzSubmodule d a μ := by
   simp only [PolyBddSchwartzSubmodule, polyBddSchwartzIncl,
     ContinuousLinearMap.toLinearMap_domRestrict, LinearMap.range_domRestrict]
   exact Submodule.map_mono (PolyBddSchwartzMap_antitone d h)
@@ -175,8 +181,8 @@ private lemma enorm_bump_mul_le_enorm {𝕜 E : Type*} [RCLike 𝕜] [NormedAddC
   rw [norm_algebraMap', Real.norm_eq_abs, norm_one, ← abs_one]
   exact abs_le_abs_of_nonneg f.nonneg f.le_one
 
-private lemma dense_zero_top :
-    Dense (PolyBddSchwartzSubmodule 0 ⊤ : Set (SpaceDHilbertSpace 0)) := by
+private lemma dense_zero_top (μ : Measure (Space 0)) [μ.HasTemperateGrowth] [μ.IsOpenPosMeasure] :
+    Dense (PolyBddSchwartzSubmodule 0 ⊤ μ : Set (SpaceDHilbertSpace 0 μ)) := by
   suffices PolyBddSchwartzMap 0 ⊤ = ⊤ by
     simp [PolyBddSchwartzSubmodule, polyBddSchwartzIncl, this]
   refine Submodule.eq_top_iff'.mpr (fun f k hk ↦ ?_)
@@ -184,22 +190,25 @@ private lemma dense_zero_top :
   simp only [Space.point_dim_zero_eq, norm_zero, zpow_neg, zpow_natCast]
   rcases k with _ | k <;> simp [add_nonneg]
 
-lemma dense_top (d : ℕ) : Dense (PolyBddSchwartzSubmodule d ⊤ : Set (SpaceDHilbertSpace d)) := by
+TODO "Generalize density of PolyBddSchwartzSubmodule to more general measures than just μ ≤ volume."
+
+lemma dense_top (hμ : μ ≤ volume) [μ.IsOpenPosMeasure] [IsFiniteMeasureOnCompacts μ] :
+    Dense (PolyBddSchwartzSubmodule d ⊤ μ : Set (SpaceDHilbertSpace d μ)) := by
   rcases eq_zero_or_pos d with (rfl | hd)
-  · -- `d = 0`: Every function `Space 0 ≅ {0} → ℂ` is in `PolyBddSchwartzSubmodule 0 ⊤`.
-    exact dense_zero_top
-  · -- `d > 0`: Construct a sequence in `PolyBddSchwartzSubmodule d ⊤` which tends to `ξ`
+  · -- `d = 0`: Every function `Space 0 ≅ {0} → ℂ` is in `PolyBddSchwartzSubmodule 0 ⊤ μ`.
+    exact dense_zero_top _
+  · -- `d > 0`: Construct a sequence in `PolyBddSchwartzSubmodule d ⊤ μ` which tends to `ξ`
     intro ξ
     apply mem_closure_iff_seq_limit.mpr
     -- `ψₙ = [fₙ]` is a sequence in `SchwartzSubmodule` which tends to `ξ`
-    obtain ⟨ψ, hψ, hψξ⟩ := mem_closure_iff_seq_limit.mp (SchwartzSubmodule.dense d ξ)
-    let f (n : ℕ) : 𝓢(Space d, ℂ) := schwartzEquiv.symm ⟨ψ n, hψ n⟩
+    obtain ⟨ψ, hψ, hψξ⟩ := mem_closure_iff_seq_limit.mp (SchwartzSubmodule.dense d μ ξ)
+    let f (n : ℕ) : 𝓢(Space d, ℂ) := (schwartzEquiv μ).symm ⟨ψ n, hψ n⟩
     -- `bₙ` is a sequence of bump functions with shrinking domain
     let b (n : ℕ) : ContDiffBump (0 : Space d) :=
       ⟨(n + 1)⁻¹, 2 * (n + 1 : ℝ)⁻¹, by positivity, lt_two_mul_self Nat.inv_pos_of_nat⟩
     -- `φₙ = [bₙfₙ]` is a sequence in `SchwartzSubmodule` which tends to `0`
     let g (n : ℕ) : 𝓢(Space d, ℂ) := smulLeftCLM ℂ (b n) (f n)
-    let φ (n : ℕ) : SpaceDHilbertSpace d := schwartzIncl (g n)
+    let φ (n : ℕ) : SpaceDHilbertSpace d μ := schwartzIncl μ (g n)
     have hg (n : ℕ) (x : Space d) : g n x = b n x * f n x := by
       have := (b n).hasCompactSupport.hasTemperateGrowth (b n).contDiff
       rw [smulLeftCLM_apply_apply this, ← Complex.coe_smul, smul_eq_mul]
@@ -229,46 +238,47 @@ lemma dense_top (d : ℕ) : Dense (PolyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
       rw [sub_sub_cancel_left, Pi.neg_def, ← neg_zero, tendsto_neg_iff]
       -- Split `φₙ = σₙ + (φₙ - σₐ)` with `σₙ ≔ [bₙξ]` a sequence in `SpaceDHilbertSpace`
       let s (n : ℕ) : Space d → ℂ := fun x ↦ b n x * ξ x
-      let σ (n : ℕ) : SpaceDHilbertSpace d := by
+      let σ (n : ℕ) : SpaceDHilbertSpace d μ := by
         refine mk (f := s n) ⟨?_, ?_⟩
         · exact (continuous_ofReal.comp (b n).continuous).aestronglyMeasurable.mul
             ξ.val.aestronglyMeasurable
         · refine lt_of_le_of_lt ?_ (memHS_coe ξ).2
           exact eLpNorm_mono_enorm (enorm_bump_mul_le_enorm (b n) ξ)
-      have hψ_ae (n : ℕ) : ψ n =ᵐ[volume] f n := (schwartzEquiv_symm_coe_ae ⟨ψ n, hψ n⟩).symm
-      have hφ_ae (n : ℕ) : φ n =ᵐ[volume] g n := schwartzEquiv_coe_ae (g n)
-      have hσ_ae (n : ℕ) : σ n =ᵐ[volume] s n := coeFn_mk _
-      have hφσ_ae (n : ℕ) : (φ - σ) n =ᵐ[volume] g n - s n :=
+      have hψ_ae (n : ℕ) : ψ n =ᵐ[μ] f n := (schwartzEquiv_symm_coe_ae ⟨ψ n, hψ n⟩).symm
+      have hφ_ae (n : ℕ) : φ n =ᵐ[μ] g n := schwartzEquiv_coe_ae (g n)
+      have hσ_ae (n : ℕ) : σ n =ᵐ[μ] s n := coeFn_mk _
+      have hφσ_ae (n : ℕ) : (φ - σ) n =ᵐ[μ] g n - s n :=
         (coeFn_sub (φ n) (σ n)).trans <| (hφ_ae n).sub (hσ_ae n)
-      have hψξ_ae (n : ℕ) : ψ n - ξ =ᵐ[volume] f n - ξ :=
+      have hψξ_ae (n : ℕ) : ψ n - ξ =ᵐ[μ] f n - ξ :=
         (coeFn_sub (ψ n) ξ).trans <| (hψ_ae n).sub EventuallyEq.rfl
       refine tendsto_of_sub_tendsto_zero (f := σ) 0 ?_ ?_
       · -- `σ = bₙξ → 0` since the norms are bounded by the integral of `‖ξ‖²` (independent of `n`!)
         -- on a domain which tends to zero
         apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
         let B (n : ℕ) : Set (Space d) := Metric.ball 0 (b n).rOut
-        have hξB : Tendsto (fun n ↦ ∫⁻ x in B n, ‖ξ x‖ₑ ^ 2) atTop (nhds 0) := by
+        have hξB : Tendsto (fun n ↦ ∫⁻ x in B n, ‖ξ x‖ₑ ^ 2 ∂μ) atTop (nhds 0) := by
           refine tendsto_setLIntegral_zero ?_ ?_
           · refine lt_top_iff_ne_top.mp ?_
             simpa [eLpNorm_one_eq_lintegral_enorm, Real.rpow_ofNat, enorm_pow, enorm_norm]
               using L2.eLpNorm_rpow_two_norm_lt_top ξ
           · have : NeZero d := ⟨hd.ne'⟩
+            refine tendsto_const_nhds.squeeze ?_ zero_le (fun n ↦ hμ (B n))
             let C : ℝ := (ENNReal.ofReal (√Real.pi ^ d / Real.Gamma (d / 2 + 1))).toReal
-            have hvolB : ⇑volume ∘ B = fun n ↦ ENNReal.ofReal (C * (b n).rOut ^ d) := by
-              ext n
+            have hvolB : ∀ n, volume (B n) = ENNReal.ofReal (C * (b n).rOut ^ d) := by
+              intro n
               simp [B, InnerProductSpace.volume_ball, C, mul_comm,
                 ENNReal.ofReal_pow (b n).rOut_pos.le]
             simp_rw [hvolB, ← ENNReal.ofReal_zero, b, ← one_div, mul_pow, ← mul_assoc]
             rw [← mul_zero (C * 2 ^ d), ← zero_pow (M₀ := ℝ) hd.ne']
             refine ENNReal.tendsto_ofReal <| Tendsto.const_mul (C * 2 ^ d) ?_
             exact tendsto_one_div_add_atTop_nhds_zero_nat.pow d
-        refine Tendsto.squeeze tendsto_const_nhds hξB (zero_le) (fun n ↦ ?_)
-        suffices ∫⁻ x, ‖σ n x‖ₑ ^ 2 = ∫⁻ x in B n, ‖σ n x‖ₑ ^ 2 by
+        refine tendsto_const_nhds.squeeze hξB (zero_le) (fun n ↦ ?_)
+        suffices ∫⁻ x, ‖σ n x‖ₑ ^ 2 ∂μ = ∫⁻ x in B n, ‖σ n x‖ₑ ^ 2 ∂μ by
           rw [this]
           refine setLIntegral_mono_ae' measurableSet_ball ?_
           filter_upwards [hσ_ae n] with x h _
           exact ENNReal.pow_le_pow_left <| h ▸ enorm_bump_mul_le_enorm (b n) ξ x
-        have h (A : Set (Space d)) : ∫⁻ x in A, ‖σ n x‖ₑ ^ 2 = ∫⁻ x in A, ‖s n x‖ₑ ^ 2 :=
+        have h (A : Set (Space d)) : ∫⁻ x in A, ‖σ n x‖ₑ ^ 2 ∂μ = ∫⁻ x in A, ‖s n x‖ₑ ^ 2 ∂μ :=
           lintegral_congr_ae ((hσ_ae n).fun_comp (fun z ↦ ‖z‖ₑ ^ 2)).restrict
         rw [← setLIntegral_univ, h, h, setLIntegral_univ]
         refine (setLIntegral_eq_of_support_subset ?_).symm
@@ -276,7 +286,7 @@ lemma dense_top (d : ℕ) : Dense (PolyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
         simp [s, (b n).zero_of_le_dist (not_lt.mp hx)]
       · -- `φₙ - σₙ = bₙ(ψₙ - ξ) → 0` since `ψₙ → ξ` (by definition) and the `bₙ` are bounded
         apply tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mpr
-        have hψξ : Tendsto (fun n ↦ ∫⁻ x, ‖(ψ n - ξ) x‖ₑ ^ 2) atTop (nhds 0) :=
+        have hψξ : Tendsto (fun n ↦ ∫⁻ x, ‖(ψ n - ξ) x‖ₑ ^ 2 ∂μ) atTop (nhds 0) :=
           tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq.mp (sub_self ξ ▸ hψξ.sub_const ξ)
         refine Tendsto.squeeze tendsto_const_nhds hψξ (zero_le) (fun n ↦ ?_)
         refine lintegral_mono_ae ?_
@@ -284,8 +294,9 @@ lemma dense_top (d : ℕ) : Dense (PolyBddSchwartzSubmodule d ⊤ : Set (SpaceDH
         simp_rw [h, h', Pi.sub_apply, hg, s, ← mul_sub]
         exact ENNReal.pow_le_pow_left <| enorm_bump_mul_le_enorm (b n) (fun x ↦ f n x - ξ x) x
 
-lemma dense (d : ℕ) (a : ℕ∞) : Dense (PolyBddSchwartzSubmodule d a : Set (SpaceDHilbertSpace d)) :=
-  (dense_top d).mono (antitone d le_top)
+lemma dense (hμ : μ ≤ volume) [μ.IsOpenPosMeasure] [IsFiniteMeasureOnCompacts μ] :
+    Dense (PolyBddSchwartzSubmodule d a μ : Set (SpaceDHilbertSpace d μ)) :=
+  (dense_top μ hμ).mono (antitone μ le_top)
 
 end PolyBddSchwartzSubmodule
 end

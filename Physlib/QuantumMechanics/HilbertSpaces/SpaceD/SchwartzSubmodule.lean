@@ -90,7 +90,8 @@ lemma schwartzEquiv_ae_eq (h : schwartzEquiv μ f =ᵐ[μ] schwartzEquiv μ g) :
 -/
 
 @[simp]
-lemma zero_eq_top : SchwartzSubmodule 0 = ⊤ := by
+lemma zero_eq_top (μ : Measure (Space 0)) [μ.HasTemperateGrowth] [μ.IsOpenPosMeasure] :
+    SchwartzSubmodule 0 μ = ⊤ := by
   ext ψ
   simp only [LinearMap.mem_range, ContinuousLinearMap.coe_coe, Submodule.mem_top, iff_true]
   let g : 𝓢(Space 0, ℂ) := {
@@ -110,6 +111,7 @@ lemma zero_eq_top : SchwartzSubmodule 0 = ⊤ := by
   rw [← schwartzEquiv_apply_coe, hg, Space.point_dim_zero_eq x]
   rfl
 
+variable (d μ) in
 omit [μ.IsOpenPosMeasure] in
 lemma dense [IsFiniteMeasureOnCompacts μ] :
     Dense (SchwartzSubmodule d μ : Set (SpaceDHilbertSpace d μ)) :=
@@ -121,6 +123,7 @@ lemma schwartzEquiv_inner :
   filter_upwards [schwartzEquiv_coe_ae f, schwartzEquiv_coe_ae g] with _ hf hg
   simp [hf, hg, mul_comm]
 
+variable (μ) in
 lemma schwartzIncl_ker : (schwartzIncl μ).ker = (⊥ : Submodule ℂ 𝓢(Space d, ℂ)) := by
   ext; simp [← schwartzEquiv_apply_coe]
 
