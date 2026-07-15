@@ -137,6 +137,7 @@ lemma polyBddSchwartzEquiv_symm_apply_coe [μ.IsOpenPosMeasure]
   rw [← hg, LinearEquiv.symm_apply_apply, LinearEquiv.apply_symm_apply, ← hg']
   rfl
 
+variable {μ} in
 lemma polyBddSchwartzEquiv_coe_ae [μ.IsOpenPosMeasure] (f : PolyBddSchwartzMap d a) :
     polyBddSchwartzEquiv μ f =ᵐ[μ] f.val :=
   schwartzEquiv_coe_ae f.val

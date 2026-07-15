@@ -58,7 +58,7 @@ open SchwartzMap
 open SpaceDHilbertSpace
 open SchwartzSubmodule PolyBddSchwartzSubmodule
 
-variable {d : ℕ} (i : Fin d)
+variable {d : ℕ} (μ : Measure (Space d)) (i : Fin d)
 
 /-!
 ## A. Schwartz operators
@@ -331,20 +331,20 @@ open Space
 -/
 
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by `fun x ↦ xᵢ`. -/
-def positionOperator : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  𝓜 (Complex.ofRealCLM ∘L Space.coordCLM i)
+def positionOperator : SpaceDHilbertSpace d μ →ₗ.[ℂ] SpaceDHilbertSpace d μ :=
+  𝓜 μ (Complex.ofRealCLM ∘L Space.coordCLM i)
 
 @[inherit_doc positionOperator]
 notation "𝓧" => positionOperator
 
-lemma positionOperator_hasDenseDomain : (𝓧 i).HasDenseDomain :=
+lemma positionOperator_hasDenseDomain : (𝓧 μ i).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
-lemma positionOperator_isSelfAdjoint : IsSelfAdjoint (𝓧 i) :=
+lemma positionOperator_isSelfAdjoint [IsFiniteMeasureOnCompacts μ] : IsSelfAdjoint (𝓧 μ i) :=
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
-lemma positionOperator_isUnbounded : (𝓧 i).IsUnbounded :=
-  LinearPMap.IsSelfAdjoint.isUnbounded (positionOperator_isSelfAdjoint i)
+lemma positionOperator_isUnbounded [IsFiniteMeasureOnCompacts μ] : (𝓧 μ i).IsUnbounded :=
+  LinearPMap.IsSelfAdjoint.isUnbounded (positionOperator_isSelfAdjoint μ i)
 
 /-!
 ### B.2. Radius powers (regularized)
@@ -352,46 +352,44 @@ lemma positionOperator_isUnbounded : (𝓧 i).IsUnbounded :=
 
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by
   `fun x ↦ (‖x‖² + ε²)^(s/2)`. -/
-def radiusRegPowOperator (ε : ℝˣ) (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  𝓜 (Complex.ofReal ∘ normRegularizedPow d ε s)
+def radiusRegPowOperator (ε : ℝˣ) (s : ℝ) :
+    SpaceDHilbertSpace d μ →ₗ.[ℂ] SpaceDHilbertSpace d μ :=
+  𝓜 μ (Complex.ofReal ∘ normRegularizedPow d ε s)
 
 @[inherit_doc radiusRegPowOperator]
 notation "𝓡₀" => radiusRegPowOperator
 
-@[inherit_doc radiusRegPowOperator]
-notation "𝓡₀[" d' "]" => radiusRegPowOperator (d := d')
-
-lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).HasDenseDomain :=
+lemma radiusRegPowOperator_hasDenseDomain (ε : ℝˣ) (s : ℝ) : (𝓡₀ μ ε s).HasDenseDomain :=
   mulOperator_hasDenseDomain (by fun_prop)
 
-lemma radiusRegPowOperator_isSelfAdjoint (ε : ℝˣ) (s : ℝ) : IsSelfAdjoint (𝓡₀[d] ε s) :=
+lemma radiusRegPowOperator_isSelfAdjoint [IsFiniteMeasureOnCompacts μ] (ε : ℝˣ) (s : ℝ) :
+    IsSelfAdjoint (𝓡₀ μ ε s) :=
   mulOperator_isSelfAdjoint_ofReal (by fun_prop) (by ext; simp)
 
-lemma radiusRegPowOperator_isUnbounded (ε : ℝˣ) (s : ℝ) : (𝓡₀[d] ε s).IsUnbounded :=
-  LinearPMap.IsSelfAdjoint.isUnbounded (radiusRegPowOperator_isSelfAdjoint ε s)
+lemma radiusRegPowOperator_isUnbounded [IsFiniteMeasureOnCompacts μ] (ε : ℝˣ) (s : ℝ) :
+    (𝓡₀ μ ε s).IsUnbounded :=
+  LinearPMap.IsSelfAdjoint.isUnbounded (radiusRegPowOperator_isSelfAdjoint μ ε s)
 
 /-!
 ### B.3. Radius powers
 -/
 
 /-- The operator on `SpaceDHilbertSpace d` acting by multiplication by `fun x ↦ ‖x‖ˢ`. -/
-def radiusPowOperator (s : ℝ) : SpaceDHilbertSpace d →ₗ.[ℂ] SpaceDHilbertSpace d :=
-  𝓜 (Complex.ofReal ∘ fun x ↦ ‖x‖ ^ s)
+def radiusPowOperator (s : ℝ) : SpaceDHilbertSpace d μ →ₗ.[ℂ] SpaceDHilbertSpace d μ :=
+  𝓜 μ (Complex.ofReal ∘ fun x ↦ ‖x‖ ^ s)
 
 @[inherit_doc radiusPowOperator]
 notation "𝓡" => radiusPowOperator
 
-@[inherit_doc radiusPowOperator]
-notation "𝓡[" d' "]" => radiusPowOperator (d := d')
-
-lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝓡[d] s).HasDenseDomain :=
+lemma radiusPowOperator_hasDenseDomain (s : ℝ) : (𝓡 μ s).HasDenseDomain :=
   mulOperator_hasDenseDomain (Measurable.aestronglyMeasurable (by fun_prop))
 
-lemma radiusPowOperator_isSelfAdjoint (s : ℝ) : IsSelfAdjoint (𝓡[d] s) :=
+lemma radiusPowOperator_isSelfAdjoint [IsFiniteMeasureOnCompacts μ] (s : ℝ) :
+    IsSelfAdjoint (𝓡 μ s) :=
   mulOperator_isSelfAdjoint_ofReal (Measurable.aestronglyMeasurable (by fun_prop)) (by ext; simp)
 
-lemma radiusPowOperator_isUnbounded (s : ℝ) : (𝓡[d] s).IsUnbounded :=
-  LinearPMap.IsSelfAdjoint.isUnbounded (radiusPowOperator_isSelfAdjoint s)
+lemma radiusPowOperator_isUnbounded [IsFiniteMeasureOnCompacts μ] (s : ℝ) : (𝓡 μ s).IsUnbounded :=
+  LinearPMap.IsSelfAdjoint.isUnbounded (radiusPowOperator_isSelfAdjoint μ s)
 
 open Complex
 
@@ -402,16 +400,16 @@ private lemma add_floor_toNat_pos_aux (d : ℕ) (s : ℝ) :
   have hn₂ : (n : ℝ) ≤ n.toNat := Int.cast_le.mpr (Int.self_le_toNat _)
   linarith
 
-lemma radiusPowLM_apply_polyBddSchwartz_memHS {d : ℕ} {s : ℝ}
-    (ψ : PolyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
-    MemHS (𝐫[d] s (polyBddSchwartzEquiv.symm ψ)) :=
-  let f := polyBddSchwartzEquiv.symm ψ
+lemma radiusPowLM_apply_polyBddSchwartz_memHS
+    {d : ℕ} {s : ℝ} (ψ : PolyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat) :
+    MemHS (𝐫[d] s ((polyBddSchwartzEquiv volume).symm ψ)) :=
+  let f := (polyBddSchwartzEquiv volume).symm ψ
   radiusPowLM_apply_memHS s f.1 ⌊1 - d / 2 - s⌋.toNat f.2 (add_floor_toNat_pos_aux d s)
 
 lemma radiusPowOperator_domain_ge {d : ℕ} (s : ℝ) :
-    PolyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat ≤ (radiusPowOperator s).domain := by
+    PolyBddSchwartzSubmodule d ⌊1 - d / 2 - s⌋.toNat ≤ (radiusPowOperator volume s).domain := by
   intro ψ hψ
-  let f := polyBddSchwartzEquiv.symm ⟨ψ, hψ⟩
+  let f := (polyBddSchwartzEquiv volume).symm ⟨ψ, hψ⟩
   apply mem_mulOperator_domain_iff.mpr
   refine MemHS.ae_eq (f := 𝐫 s f.1) ?_ ?_
   · filter_upwards [polyBddSchwartzEquiv_coe_ae f]
