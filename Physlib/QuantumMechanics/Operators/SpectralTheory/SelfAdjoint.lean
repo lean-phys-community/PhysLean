@@ -65,15 +65,11 @@ lemma resolventSet_eq_regularityDomain : ρ T = T.regularityDomain := by
 
 /-- A self-adjoint operator has `T - z • 1` surjective for every non-real `z`: off the real
 axis a self-adjoint operator has `z` in its resolvent set, so `T - z • 1` has full range. -/
-lemma sub_smul_surjective {z : ℂ} (hz : z.im ≠ 0) (φ : H) :
-    ∃ ψ : T.domain, T ψ - z • (ψ : H) = φ := by
+lemma sub_smul_surjective {z : ℂ} (hz : z.im ≠ 0) : Function.Surjective (T - z • 1).toFun := by
   have hz_res : z ∈ ρ T := by
     rw [resolventSet_eq_regularityDomain hT]
     exact (isSymmetric hT).mem_regularityDomain_of_im_ne_zero hz
-  obtain ⟨ξ, hξ⟩ := LinearMap.range_eq_top.mp (mem_resolventSet_iff.mp hz_res).2.1 φ
-  refine ⟨⟨(ξ : H), (Submodule.mem_inf.mp ξ.2).1⟩, ?_⟩
-  have happ : (T - z • 1) ξ = φ := hξ
-  rwa [LinearPMap.sub_apply, LinearPMap.smul_apply] at happ
+  exact LinearMap.range_eq_top.mp (mem_resolventSet_iff.mp hz_res).2.1
 
 /-- `(T - z • 1).range = ⊤` is a sufficient condition for `z ∈ ρ T`
   (and it is a necessary condition by definition of `ρ`). -/
@@ -121,10 +117,7 @@ lemma unitaryConj_isSelfAdjoint (u : H ≃ₗᵢ[ℂ] H') {A : H →ₗ.[ℂ] H}
     IsSelfAdjoint (A.unitaryConj u) := by
   have hsurj {z : ℂ} (hz : z.im ≠ 0) (φ : H') :
       ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ - z • (ψ : H') = φ := by
-    have hAz : Function.Surjective (A - z • 1).toFun := fun φ' ↦ by
-      obtain ⟨ψ, hψ⟩ := IsSelfAdjoint.sub_smul_surjective hA hz φ'
-      exact ⟨⟨(ψ : H), Submodule.mem_inf.mpr ⟨ψ.2, Submodule.mem_top⟩⟩, hψ⟩
-    obtain ⟨ξ, hξ⟩ := unitaryConj_sub_smul_surjective hAz φ
+    obtain ⟨ξ, hξ⟩ := unitaryConj_sub_smul_surjective (IsSelfAdjoint.sub_smul_surjective hA hz) φ
     exact ⟨⟨(ξ : H'), (Submodule.mem_inf.mp ξ.2).1⟩, hξ⟩
   have hplus (φ : H') : ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ + I • (ψ : H') = φ := by
     simpa only [neg_smul, sub_neg_eq_add] using hsurj (z := -I) (by norm_num) φ
