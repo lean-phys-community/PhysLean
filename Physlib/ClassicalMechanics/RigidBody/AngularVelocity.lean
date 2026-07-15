@@ -26,11 +26,21 @@ In three dimensions the skew-symmetric tensor `Ω` is dual to the *angular veloc
 `ω(t) = Ωᵛ` via the hat map (`Physlib.Mathematics.CrossProductMatrix`), with `[ω]ₓ = Ω`; `ω` is the
 angular velocity proper, appearing in the decomposition `v = V + ω × r` as an honest cross product.
 
-The angular velocity can equally be expressed in the frame co-rotating with the body. The
-*body-frame angular velocity tensor* `Ω_body(t) = R(t)ᵀ Ṙ(t)` is the conjugate `Ω_body = Rᵀ Ω R` of
-the spatial tensor, and is again skew-symmetric; in three dimensions its dual is the *body-frame
-angular velocity vector* `ω_body = Ω_bodyᵛ`. The body frame is the natural setting for the inertia
-tensor and Euler's equations, since the inertia tensor is time-independent in body-fixed axes.
+The angular velocity can equally be expressed in the *body frame*: the moving coordinate system
+rigidly attached to the body, with origin at the centre of mass and axes rotating with the body,
+in which every material point has time-independent coordinates. The orientation `R(t)` is
+precisely the rotational part of the change of frame: a point fixed at position `a` in the body
+frame sits at `r = R(t) a` relative to the centre of mass in the lab frame (the inertial frame in
+which the trajectories of `RigidBodyMotion` are written), and a vector with lab-frame components
+`u` has body-frame components `R(t)ᵀ u`. The body frame is in general *not* inertial — it rotates
+with the body, and its origin follows the (generally accelerating) centre of mass — but it is the
+natural setting for the inertia tensor and Euler's equations, since the mass distribution, and
+with it the inertia tensor, is time-independent in body-fixed axes.
+
+The *body-frame angular velocity tensor* `Ω_body(t) = R(t)ᵀ Ṙ(t)` is the spatial tensor
+conjugated into the body frame, `Ω_body = Rᵀ Ω R`, and is again skew-symmetric; in three
+dimensions its dual is the *body-frame angular velocity vector* `ω_body = Ω_bodyᵛ`, the angular
+velocity `ω` resolved along the body-fixed axes, `ω_body = Rᵀ ω`.
 
 ## References
 - Landau and Lifshitz, Mechanics, Sections 31 and 32.
@@ -189,7 +199,7 @@ lemma angularVelocityTensor_eq_orientation_conj (M : RigidBodyMotion d) (t : Tim
 
 /-- The body-frame angular velocity *vector* `ω_body(t)` of a rigid body moving in three-dimensional
 space: the vector dual to the body-frame angular velocity tensor `Ω_body(t)` under the hat map,
-`ω_body = Ω_bodyᵛ`. It is the angular velocity as measured in the co-rotating body frame. -/
+`ω_body = Ω_bodyᵛ`. It is the angular velocity `ω` resolved along the body-fixed axes. -/
 noncomputable def bodyAngularVelocity (M : RigidBodyMotion 3) (t : Time) : Fin 3 → ℝ :=
   crossProductVee (M.bodyAngularVelocityTensor t)
 
