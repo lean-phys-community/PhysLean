@@ -70,7 +70,10 @@ def mulOperator (μ : Measure (Space d)) (f : Space d → ℂ) :
       refine (hψ.add hφ).ae_eq ?_
       filter_upwards [coeFn_add ψ φ] with x h
       simp [mul_add, h]
-    zero_mem' := by sorry
+    zero_mem' := by
+      refine MemHS.zero.ae_eq ?_
+      filter_upwards [AEEqFun.coeFn_zero (μ := μ) (β := ℂ)]
+      simp_all
     smul_mem' c ψ hψ := by
       refine (hψ.const_smul c).ae_eq ?_
       filter_upwards [coeFn_smul c ψ] with x h
