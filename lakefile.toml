@@ -92,6 +92,11 @@ srcDir = "scripts"
 supportInterpreter = true
 
 [[lean_exe]]
+name = "api_map_index"
+root = "APIMapIndex"
+srcDir = "scripts"
+
+[[lean_exe]]
 name = "local_stats"
 srcDir = "scripts/MetaPrograms"
 supportInterpreter = true
