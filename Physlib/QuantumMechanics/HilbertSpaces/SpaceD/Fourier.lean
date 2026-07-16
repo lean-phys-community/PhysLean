@@ -79,18 +79,18 @@ lemma fourierUnitary_symm_apply (ψ : SpaceDHilbertSpace d) : (fourierUnitary d)
 /-- Applying `fourierUnitary d` to the L² class of a Schwartz map `f` gives the L² class of the
 Schwartz Fourier transform `𝓕 f`. -/
 lemma schwartzIncl_fourier_eq (f : 𝓢(Space d, ℂ)) :
-    𝓕 (schwartzIncl f) = schwartzIncl (𝓕 f) := SchwartzMap.toLp_fourier_eq f
+    𝓕 (schwartzIncl volume f) = schwartzIncl volume (𝓕 f) := SchwartzMap.toLp_fourier_eq f
 
 /-- Applying `(fourierUnitary d).symm` to the L² class of a Schwartz map `f` gives the L² class
 of the inverse Schwartz Fourier transform `𝓕⁻ f`. -/
 lemma fourierUnitary_symm_schwartzIncl (f : 𝓢(Space d, ℂ)) :
-    (fourierUnitary d).symm (schwartzIncl f) = schwartzIncl (𝓕⁻ f) :=
+    (fourierUnitary d).symm (schwartzIncl volume f) = schwartzIncl volume (𝓕⁻ f) :=
   SchwartzMap.toLp_fourierInv_eq f
 
 /-- Pulling the L² class of `𝓕 f` back through the Fourier unitary recovers the L² class of `f`. -/
 @[simp]
 lemma fourierInv_schwartzIncl_fourier (f : 𝓢(Space d, ℂ)) :
-    𝓕⁻ (schwartzIncl (𝓕 f)) = schwartzIncl f := by
+    𝓕⁻ (schwartzIncl volume (𝓕 f)) = schwartzIncl volume f := by
   rw [← schwartzIncl_fourier_eq, FourierPair.fourierInv_fourier_eq]
 
 /-- The Fourier unitary maps the Schwartz submodule onto itself. -/
@@ -100,7 +100,7 @@ lemma fourierUnitary_map_schwartzSubmodule :
   · rintro x ⟨y, ⟨f, rfl⟩, rfl⟩
     exact ⟨𝓕 f, (schwartzIncl_fourier_eq f).symm⟩
   · rintro x ⟨g, rfl⟩
-    exact ⟨𝓕⁻ (schwartzIncl g), ⟨𝓕⁻ g, (fourierUnitary_symm_schwartzIncl g).symm⟩, by simp⟩
+    exact ⟨𝓕⁻ (schwartzIncl volume g), ⟨𝓕⁻ g, (fourierUnitary_symm_schwartzIncl g).symm⟩, by simp⟩
 
 end SpaceDHilbertSpace
 end QuantumMechanics
