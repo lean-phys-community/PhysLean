@@ -5,6 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
+public import Physlib.Meta.Informal.Basic
 public import Physlib.QuantumMechanics.Operators.Momentum
 public import Physlib.QuantumMechanics.QuantumSystem.Basic
 /-!
@@ -19,6 +20,8 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
 
 - A. Basic properties
 - B. Hilbert space
+- C. Hamiltonian
+- D. As a quantum system
 
 ## iv. References
 
@@ -59,6 +62,28 @@ lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
 -/
 
 abbrev HS := SpaceDHilbertSpace Q.d
+
+/-!
+## C. Hamiltonian
+-/
+
+/-- The Hamiltonian, `p²/(2m)`. -/
+def hamiltonian : Q.HS →ₗ.[ℂ] Q.HS := (2 * Q.m)⁻¹ • momentumSqOperator
+
+/-- The Hamiltonian for the free particle is essentially self-adjoint.
+  This follows immediately from the ess. self-adjointness of the momentum-square operator. -/
+informal_lemma hamiltonian_essentially_self_adjoint where
+  deps := [``FreeParticle]
+  tag := "QM-FP-hamESA"
+
+/-!
+## D. As a quantum system
+-/
+
+/-- The free particle as a quantum system (self-adjoint Hamiltonian acting on a Hilbert space). -/
+informal_definition toQuantumSystem where
+  deps := [``FreeParticle]
+  tag := "QM-FP-sys"
 
 end FreeParticle
 end QuantumMechanics
