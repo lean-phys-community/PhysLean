@@ -72,7 +72,7 @@ Here `stress` is intentionally not yet specialized to a constitutive law.
 -/
 def ConvectiveCauchyMomentumEquation (d : ℕ) (flow : CauchyFlow d) : Prop :=
   ∀ t x,
-    flow.rho t x • FluidFlow.materialAcceleration d flow.toFluidFlow t x =
+    FluidFlow.convectiveMomentumLHS d flow.toFluidFlow t x =
       matrixDiv d (flow.stress t) x + flow.rho t x • flow.specificBodyForce t x
 
 /-!
