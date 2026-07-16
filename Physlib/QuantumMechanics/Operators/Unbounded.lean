@@ -553,6 +553,40 @@ lemma IsClosed.sub_continuous [CompleteSpace H']
     (h₁ : U₁.IsClosed) (h₂ : Continuous U₂) (h : U₁.domain ≤ U₂.domain) : (U₁ - U₂).IsClosed :=
   sub_eq_add_neg U₁ U₂ ▸ h₁.add_continuous h₂.neg h
 
+lemma adjoint_domain_of_continuous [CompleteSpace H] (h : Continuous U) : U†.domain = ⊤ := by
+  ext
+  simp only [mem_top, iff_true, mem_adjoint_domain_iff, LinearMap.coe_comp, coe_innerₛₗ_apply]
+  exact Continuous.comp (by fun_prop) h
+
+lemma HasDenseDomain.adjoint_add_continuous [CompleteSpace H]
+    (h₁ : T₁.HasDenseDomain) (h₂ : Continuous T₂) (h : T₁.domain ≤ T₂.domain) :
+    (T₁ + T₂)† = T₁† + T₂† := by
+  have h₂' : T₂†.domain = ⊤ := adjoint_domain_of_continuous h₂
+  have h₁₂ : (T₁ + T₂).HasDenseDomain := h₁.mono <| by simp [add_domain, h]
+  refine (eq_of_le_of_domain_eq ?_ ?_).symm
+  · exact adjoint_add_le_add_adjoint T₁ T₂ h₁₂
+  · ext x
+    simp only [add_domain, h₂', inf_top_eq]
+    constructor <;> intro h'
+    · apply mem_adjoint_domain_of_exists
+      use T₁† ⟨x, h'⟩ + T₂† ⟨x, h₂' ▸ mem_top⟩
+      intro y
+      simp [add_apply, inner_add_left, inner_add_right,
+        adjoint_isFormalAdjoint h₁ ⟨x, h'⟩ ⟨y, y.2.1⟩,
+        adjoint_isFormalAdjoint (h₁.mono h) ⟨x, h₂' ▸ mem_top⟩ ⟨y, y.2.2⟩]
+    · apply mem_adjoint_domain_of_exists
+      use (T₁ + T₂)† ⟨x, h'⟩ - T₂† ⟨x, h₂' ▸ mem_top⟩
+      intro y
+      simp [add_apply, inner_add_right, inner_sub_left,
+        adjoint_isFormalAdjoint h₁₂ ⟨x, h'⟩ ⟨y, ⟨y.2, h y.2⟩⟩,
+        adjoint_isFormalAdjoint (h₁.mono h) ⟨x, h₂' ▸ mem_top⟩ ⟨y, h y.2⟩]
+
+lemma HasDenseDomain.adjoint_sub_continuous [CompleteSpace H]
+    (h₁ : T₁.HasDenseDomain) (h₂ : Continuous T₂) (h : T₁.domain ≤ T₂.domain) :
+    (T₁ - T₂)† = T₁† - T₂† := by
+  simp only [sub_eq_add_neg, ← adjoint_neg]
+  exact h₁.adjoint_add_continuous (continuous_neg_iff.mpr h₂) h
+
 /-!
 ### B.5. Unitary conjugation
 -/
