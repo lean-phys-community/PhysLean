@@ -772,6 +772,20 @@ lemma isSymmetric_iff_le_adjoint [CompleteSpace H] (h : T.HasDenseDomain) :
   have h_eq : T x = T† ⟨x, h_le.1 x.2⟩ := @h_le.2 x ⟨x, h_le.1 x.2⟩ rfl
   exact h_eq ▸ adjoint_isFormalAdjoint h _ _
 
+lemma IsSymmetric.closure_le_adjoint [CompleteSpace H] (h : T.IsSymmetric) (h' : T.HasDenseDomain) :
+    T.closure ≤ T† := by
+  have h_adj : T†.IsClosed := adjoint_isClosed h'
+  exact h_adj.closure_eq ▸ h_adj.isClosable.closure_mono (h.le_adjoint h')
+
+lemma IsSymmetric.isEssentiallySelfAdjoint_iff [CompleteSpace H]
+    (h : T.IsSymmetric) (h' : T.HasDenseDomain) :
+    T.IsEssentiallySelfAdjoint ↔ T†.domain = T.closure.domain := by
+  rw [isEssentiallySelfAdjoint_def, isSelfAdjoint_def,
+    (h.isUnbounded_iff_hasDenseDomain.mpr h').adjoint_closure_eq_adjoint]
+  constructor <;> intro h''
+  · congr
+  · exact (eq_of_le_of_domain_eq (h.closure_le_adjoint h') h''.symm).symm
+
 lemma IsSymmetric.isSelfAdjoint_iff [CompleteSpace H] (h : T.IsSymmetric) (h' : T.HasDenseDomain) :
     IsSelfAdjoint T ↔ T†.domain = T.domain := by
   constructor <;> intro h''
