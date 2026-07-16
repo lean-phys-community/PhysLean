@@ -76,7 +76,7 @@ instance (Q : QuantumSystem) : CompleteSpace Q.HS := Q.instComplete
 /-!
 ## B. Creation from an essentially self-adjoint operator
 
-An operator is essentially self-adjoint has a unique self-adjoint extension
+An essentially self-adjoint operator has a unique self-adjoint extension
 (c.f. `IsEssentiallySelfAdjoint.unique_self_adjoint_extension`).
 For this reason, a quantum system can be uniquely associated to an e.s.a. Hamiltonian operator.
 -/
