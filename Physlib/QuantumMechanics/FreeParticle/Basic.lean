@@ -64,6 +64,7 @@ lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
 -/
 
 /-- The Hilbert space for the free particle. -/
+@[nolint unusedArguments]
 abbrev HS (_ : FreeParticle d) : Type _ := SpaceDHilbertSpace d
 
 /-!
