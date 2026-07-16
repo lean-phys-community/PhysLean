@@ -14,6 +14,10 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
 
 ## i. Overview
 
+The free quantum particle is one of the simplest quantum systems.
+States for a particle of mass `m` are elements of `SpaceDHilbertSpace d` and evolve according
+to the Hamiltonian `p²/2m` with no potential.
+
 ## ii. Key results
 
 ## iii. Table of contents

@@ -14,6 +14,10 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
 
 ## i. Overview
 
+The particle in an infinite square well is one of the simplest quantum systems.
+The domain is an axis-aligned cuboid (box) and energy eigenstates are (products of) trigonometric
+functions satisfying appropriate boundary conditions.
+
 ## ii. Key results
 
 ## iii. Table of contents
@@ -34,7 +38,10 @@ namespace QuantumMechanics
 
 open Set MeasureTheory
 
-/-- A spinless quantum particle with mass `m > 0` confined to a cuboid in `Space d`. -/
+/-- A spinless quantum particle with mass `m > 0` confined to a cuboid in `Space d`.
+
+  The bounds of the cuboid are specified by two functions `lower upper : Fin d → ℝ`
+  satisfying `∀ i, lower i < upper i`. -/
 structure InfiniteSquareWell where
   /-- The number of spatial dimensions. -/
   d : ℕ
@@ -46,7 +53,7 @@ structure InfiniteSquareWell where
   /-- The upper bounds of the box. -/
   upper : Fin d → ℝ
   /-- The box is non-empty. -/
-  hbounds : ∀ i, lower i < upper i
+  h_bounds : ∀ i, lower i < upper i
 
 variable {Q : InfiniteSquareWell}
 
