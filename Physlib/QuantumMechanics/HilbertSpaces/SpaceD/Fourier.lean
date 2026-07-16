@@ -24,7 +24,7 @@ equivalence of `Lp ℂ 2 volume`, hence of `SpaceDHilbertSpace d`, onto itself; 
   `SpaceDHilbertSpace d ≃ₗᵢ[ℂ] SpaceDHilbertSpace d`, acting as `𝓕`/`𝓕⁻`
   (`fourierUnitary_apply`, `fourierUnitary_symm_apply`).
 - `schwartzIncl_fourier_eq` : `𝓕 (schwartzIncl f) = schwartzIncl (𝓕 f)`.
-- `fourierUnitary_symm_schwartzIncl` : the inverse acts by the inverse Schwartz Fourier transform.
+- `schwartzIncl_fourierInv_eq` : the inverse acts by the inverse Schwartz Fourier transform.
 - `fourierUnitary_map_schwartzSubmodule` : `fourierUnitary d` maps the Schwartz submodule onto
   itself.
 
@@ -54,17 +54,6 @@ variable {d : ℕ}
 noncomputable def fourierUnitary (d : ℕ) :
     SpaceDHilbertSpace d ≃ₗᵢ[ℂ] SpaceDHilbertSpace d := Lp.fourierTransformₗᵢ (Space d) ℂ
 
-noncomputable instance : FourierTransform (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) where
-  fourier := fourierUnitary d
-
-noncomputable instance : FourierTransformInv (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) where
-  fourierInv := (fourierUnitary d).symm
-
-instance : FourierPair (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) where
-  fourierInv_fourier_eq := (fourierUnitary d).symm_apply_apply
-
-instance : FourierInvPair (SpaceDHilbertSpace d) (SpaceDHilbertSpace d) where
-  fourier_fourierInv_eq := (fourierUnitary d).apply_symm_apply
 
 /-- `fourierUnitary d` acts as the L² Fourier transform `𝓕`. -/
 @[simp]
@@ -81,10 +70,10 @@ Schwartz Fourier transform `𝓕 f`. -/
 lemma schwartzIncl_fourier_eq (f : 𝓢(Space d, ℂ)) :
     𝓕 (schwartzIncl volume f) = schwartzIncl volume (𝓕 f) := SchwartzMap.toLp_fourier_eq f
 
-/-- Applying `(fourierUnitary d).symm` to the L² class of a Schwartz map `f` gives the L² class
-of the inverse Schwartz Fourier transform `𝓕⁻ f`. -/
-lemma fourierUnitary_symm_schwartzIncl (f : 𝓢(Space d, ℂ)) :
-    (fourierUnitary d).symm (schwartzIncl volume f) = schwartzIncl volume (𝓕⁻ f) :=
+/-- Applying `𝓕⁻` to the L² class of a Schwartz map `f` gives the L² class of the inverse
+Schwartz Fourier transform `𝓕⁻ f`. -/
+lemma schwartzIncl_fourierInv_eq (f : 𝓢(Space d, ℂ)) :
+    𝓕⁻ (schwartzIncl volume f) = schwartzIncl volume (𝓕⁻ f) :=
   SchwartzMap.toLp_fourierInv_eq f
 
 /-- Pulling the L² class of `𝓕 f` back through the Fourier unitary recovers the L² class of `f`. -/
@@ -100,7 +89,7 @@ lemma fourierUnitary_map_schwartzSubmodule :
   · rintro x ⟨y, ⟨f, rfl⟩, rfl⟩
     exact ⟨𝓕 f, (schwartzIncl_fourier_eq f).symm⟩
   · rintro x ⟨g, rfl⟩
-    exact ⟨𝓕⁻ (schwartzIncl volume g), ⟨𝓕⁻ g, (fourierUnitary_symm_schwartzIncl g).symm⟩, by simp⟩
+    exact ⟨𝓕⁻ (schwartzIncl volume g), ⟨𝓕⁻ g, (schwartzIncl_fourierInv_eq g).symm⟩, by simp⟩
 
 end SpaceDHilbertSpace
 end QuantumMechanics
