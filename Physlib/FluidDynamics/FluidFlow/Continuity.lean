@@ -23,8 +23,8 @@ equation, so they can be reused by Navier-Stokes, Euler, and other fluid models.
 - `FluidFlow.ClassicalContinuityEquation` : Classical conservation of mass in conservative form.
 - `FluidFlow.continuityResidual` : The scalar residual `partial_t rho + div (rho u)`.
 - `FluidFlow.SmoothContinuityEquation` : Continuity for globally differentiable fields.
-- `FluidFlow.SmoothContinuityEquation.toClassical` : Smooth continuity implies classical
-  continuity.
+- `FluidFlow.classicalContinuityEquation_of_smoothContinuityEquation` : A smooth continuity
+  equation implies the classical continuity equation.
 
 ## iii. Table of contents
 
@@ -76,7 +76,8 @@ def SmoothContinuityEquation (d : ℕ) (fluid : FluidFlow d) : Prop :=
       ∀ t x, continuityResidual d fluid t x = 0
 
 /-- A smooth continuity equation satisfies the guarded classical continuity equation. -/
-lemma SmoothContinuityEquation.toClassical (d : ℕ) (fluid : FluidFlow d) :
+lemma classicalContinuityEquation_of_smoothContinuityEquation
+    (d : ℕ) (fluid : FluidFlow d) :
     SmoothContinuityEquation d fluid → ClassicalContinuityEquation d fluid := by
   intro hSmooth t x _ _
   simpa [continuityResidual] using hSmooth.2.2 t x
