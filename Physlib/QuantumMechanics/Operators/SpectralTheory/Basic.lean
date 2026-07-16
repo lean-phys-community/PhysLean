@@ -274,42 +274,21 @@ lemma IsClosable.closure_range_sub_eq_range_closure_sub [CompleteSpace H]
 lemma IsClosed.sub_range_isClosed [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsClosed) {z : ℂ} (hz : z ∈ T.regularityDomain) :
     _root_.IsClosed ((T - z • 1).toFun.range : Set H) :=
-  (hT.isClosable.isClosed_iff.mp hT ▸
-    hT.isClosable.closure_range_sub_eq_range_closure_sub hz) ▸ isClosed_closure
+  (hT.closure_eq ▸ hT.isClosable.closure_range_sub_eq_range_closure_sub hz) ▸ isClosed_closure
 
 /-- `(T.closure - z • 1).rangeᗮ = (T† - conj z • 1).ker` -/
 lemma IsUnbounded.orthogonal_closure_sub_range [CompleteSpace H]
     {T : H →ₗ.[ℂ] H} (hT : T.IsUnbounded) (z : ℂ) :
     (T.closure - z • 1).toFun.rangeᗮ
       = (T† - conj z • 1).toFun.ker.map (T† - conj z • 1).domain.subtype := by
-  let S := T.closure - z • 1
-  have hS_domain : S.domain = T.closure.domain := by simp [S, sub_domain]
-  have hS_dense : S.HasDenseDomain := hT.hasDenseDomain.mono (by simp [hS_domain, T.le_closure.1])
-  have hS_adjoint : S† = T† - conj z • 1 := by
-    rw [← hT.adjoint_closure_eq_adjoint]
-    refine (eq_of_le_of_domain_eq ?_ ?_).symm
-    · refine le_of_eq_of_le ?_ (adjoint_sub_le_sub_adjoint T.closure (z • 1) hS_dense)
-      rcases eq_zero_or_neZero z with rfl | hz₀
-      · simp
-      · simp [adjoint_smul _ hz₀.ne]
-    · ext x
-      simp only [sub_domain, smul_domain, one_domain, le_top, inf_of_le_left]
-      constructor <;> intro h
-      · apply mem_adjoint_domain_of_exists
-        use T.closure† ⟨x, h⟩ - conj z • x
-        intro y
-        have h_inner : ⟪T.closure† ⟨x, h⟩, y⟫_ℂ = ⟪x, T.closure ⟨y, hS_domain ▸ y.2⟩⟫_ℂ :=
-          adjoint_isFormalAdjoint hT.hasDenseDomain.closure ⟨x, h⟩ ⟨y, hS_domain ▸ y.2⟩
-        simp [inner_sub_left, h_inner, S, sub_apply, inner_sub_right, inner_smul_left,
-          inner_smul_right]
-      · apply mem_adjoint_domain_of_exists
-        use S† ⟨x, h⟩ + conj z • x
-        intro y
-        have h_inner : ⟪S† ⟨x, h⟩, y⟫_ℂ = ⟪x, S ⟨y, by simp [hS_domain]⟩⟫_ℂ :=
-          adjoint_isFormalAdjoint hS_dense ⟨x, h⟩ ⟨y, by simp [hS_domain]⟩
-        simp [inner_add_left, h_inner, S, sub_apply, inner_sub_right, inner_smul_left,
-          inner_smul_right]
-  exact hS_adjoint ▸ hS_dense.orthogonal_range
+  have h_adj : (T.closure - z • 1)† = T† - conj z • 1 := by
+    have hC : Continuous (z • 1 : H →ₗ.[ℂ] H) := Continuous.const_smul (by fun_prop) _
+    rw [hT.hasDenseDomain.closure.adjoint_sub_continuous hC le_top, hT.adjoint_closure_eq_adjoint]
+    rcases eq_zero_or_neZero z with rfl | hz
+    · simp
+    · simp [hz.ne]
+  refine h_adj ▸ HasDenseDomain.orthogonal_range ?_
+  exact hT.hasDenseDomain.mono (by simp [sub_domain, T.le_closure.1])
 
 /-- `(T† - conj z • 1).kerᗮ = (T.closure - z • 1).range` -/
 lemma IsUnbounded.orthogonal_adjoint_sub_ker [CompleteSpace H]
@@ -317,7 +296,7 @@ lemma IsUnbounded.orthogonal_adjoint_sub_ker [CompleteSpace H]
     ((T† - conj z • 1).toFun.ker.map (T† - conj z • 1).domain.subtype)ᗮ
       = (T.closure - z • 1).toFun.range := by
   have hT' : IsClosable T.closure := hT.isClosable.closureIsClosable
-  have hTcl : T.closure.closure = T.closure := hT'.isClosed_iff.mp hT.isClosable.closure_isClosed
+  have hTcl : T.closure.closure = T.closure := hT.isClosable.closure_isClosed.closure_eq
   rw [← hTcl, ← hT.orthogonal_closure_sub_range, orthogonal_orthogonal_eq_closure]
   exact hT'.closure_range_sub_eq_range_closure_sub (T.regularityDomain_closure ▸ hz)
 
