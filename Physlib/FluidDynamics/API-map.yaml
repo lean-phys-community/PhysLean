@@ -1,0 +1,84 @@
+version: v0.1
+
+Title: "Fluid"
+
+Overview: |
+  A fluid is described by the spatial distribution of its velocity, density, and
+  pressure fields. This is a core data structure of fluid dynamics from which the
+  continuity equation, the equations of motion, and thermodynamic balance laws are
+  built (Landau and Lifshitz, Fluid Mechanics, Chapter 1).
+
+  This map records the current state of Physlib/FluidDynamics.
+  Partial infrastructure exists. `FluidState` (density and velocity fields) is
+  defined in `FluidDynamics/FluidState.lean`, together with the field-type
+  abbreviations and the `FluidInMomentumBalance` extension. The mass flux density
+  `rho u` is available as `momentumDensity`, and the equation of continuity is fully
+  formalized in the conservative, residual, and smooth forms with an implication
+  between them.
+
+  Several requirements are not implemented. `FluidState` carries no pressure
+  field, so the fluid data structure is only part of the required one. There is no Euler equation (the momentum equations in
+  `FluidDynamics/NavierStokes/Momentum.lean` keep the stress tensor general and are
+  explicitly not specialized to an ideal, pressure-only fluid), no definition of an
+  ideal fluid, no entropy flux density, no Bernoulli equation, no energy flux, and no
+  notion of flow out of a volume. Those requirements are recorded below with
+  location N/A so future work can be tracked against them.
+
+ParentAPIs:
+  - Space (Physlib/SpaceAndTime/Space)
+  - Time (Physlib/SpaceAndTime/Time)
+
+References:
+  - "Landau, L. D. and Lifshitz, E. M., Fluid Mechanics (Course of Theoretical Physics, vol. 6), 2nd ed., Chapter 1 (continuity, Euler equation, Bernoulli equation, energy and momentum flux)"
+
+Requirements:
+
+  - description: >
+      The key data structure for a fluid, given by the spatial distribution of its
+      velocity, density, and pressure, is defined. (FluidState currently provides
+      the density and velocity fields; pressure is not yet part of the structure.)
+    done: false
+    location: "Physlib/FluidDynamics/FluidState.lean (FluidState, FluidInMomentumBalance, ScalarField, VectorField, MassDensity, VelocityField, StressTensor)"
+
+  - description: >
+      Flow out of a volume: the flux of fluid through the boundary of a spatial
+      region.
+    done: false
+    location: "N/A"
+
+  - description: >
+      Mass flux density rho u, the vector whose divergence enters the continuity
+      equation. (Defined as momentumDensity, which equals rho u.)
+    done: true
+    location: "Physlib/FluidDynamics/NavierStokes/Momentum.lean (momentumDensity)"
+
+  - description: >
+      Equation of continuity, expressing local conservation of mass as
+      partial_t rho + div (rho u) = 0.
+    done: true
+    location: "Physlib/FluidDynamics/NavierStokes/Continuity.lean (ClassicalContinuityEquation, continuityResidual, SmoothContinuityEquation, SmoothContinuityEquation.toClassical)"
+
+  - description: >
+      Euler's equation, the equation of motion of an ideal (inviscid) fluid.
+    done: false
+    location: "N/A"
+
+  - description: >
+      Definition of an ideal fluid.
+    done: false
+    location: "N/A"
+
+  - description: >
+      Definition of the entropy flux density.
+    done: false
+    location: "N/A"
+
+  - description: >
+      Bernoulli's equation.
+    done: false
+    location: "N/A"
+
+  - description: >
+      Energy flux of a fluid.
+    done: false
+    location: "N/A"
