@@ -156,9 +156,7 @@ theorem velocity_eq_angularVelocity (M : RigidBodyMotion 3) (y : Space 3) (t : T
     M.deriv_orientation_mulVec_eq_angularVelocity_cross y t (hR t)]
 
 /-- The body-frame (co-rotating) angular velocity tensor `Ω_body(t) = R(t)ᵀ Ṙ(t)` of a rigid body
-in motion, where `R(t) = orientation t`. It is the angular velocity tensor expressed in the frame
-rotating with the body, related to the spatial tensor `Ω = Ṙ Rᵀ` by the conjugation
-`Ω = R Ω_body Rᵀ` (`angularVelocityTensor_eq_orientation_conj`). -/
+in motion, where `R(t) = orientation t`. -/
 noncomputable def bodyAngularVelocityTensor (M : RigidBodyMotion d) (t : Time) :
     Matrix (Fin d) (Fin d) ℝ :=
   ((M.orientation t).1)ᵀ * ∂ₜ (fun s => (M.orientation s).1) t
@@ -167,50 +165,38 @@ lemma bodyAngularVelocityTensor_eq (M : RigidBodyMotion d) (t : Time) :
     M.bodyAngularVelocityTensor t = ((M.orientation t).1)ᵀ * ∂ₜ (fun s => (M.orientation s).1) t :=
   rfl
 
-/-- The body-frame angular velocity tensor is skew-symmetric, `Ω_bodyᵀ = -Ω_body`: it lies in the
-Lie algebra `𝔰𝔬(d)`. Like its spatial counterpart this follows by differentiating the orthogonality
-identity `Rᵀ R = 1`. -/
-lemma bodyAngularVelocityTensor_transpose (M : RigidBodyMotion d) (t : Time)
-    (hR : DifferentiableAt ℝ (fun s => (M.orientation s).1) t) :
-    (M.bodyAngularVelocityTensor t)ᵀ = - M.bodyAngularVelocityTensor t := by
-  have hconst : (fun s => ((M.orientation s).1)ᵀ * (M.orientation s).1)
-      = fun _ => (1 : Matrix (Fin d) (Fin d) ℝ) := by
-    funext s
-    exact mul_eq_one_comm.mp (M.orientation_mul_transpose s)
-  have hderiv0 : ∂ₜ (fun s => ((M.orientation s).1)ᵀ * (M.orientation s).1) t = 0 := by
-    rw [hconst]
-    exact Time.deriv_const 1
-  have hprod := Time.deriv_matrix_mul (fun s => ((M.orientation s).1)ᵀ)
-    (fun s => (M.orientation s).1) t hR.matrix_transpose hR
-  rw [Time.deriv_matrix_transpose (fun s => (M.orientation s).1) t hR, hderiv0] at hprod
-  rw [bodyAngularVelocityTensor, transpose_mul, transpose_transpose]
-  exact eq_neg_of_add_eq_zero_right hprod.symm
-
 /-- The time derivative of the orientation is `Ṙ = R Ω_body`, recovering the orientation path from
-its body-frame angular velocity tensor `Ω_body = Rᵀ Ṙ` via the orthogonality `R Rᵀ = 1`. -/
+its body-frame angular velocity tensor via the orthogonality `R Rᵀ = 1`. -/
 lemma orientation_mul_bodyAngularVelocityTensor (M : RigidBodyMotion d) (t : Time) :
     (M.orientation t).1 * M.bodyAngularVelocityTensor t = ∂ₜ (fun s => (M.orientation s).1) t := by
   rw [bodyAngularVelocityTensor, ← mul_assoc, M.orientation_mul_transpose t, one_mul]
 
-/-- The spatial and body-frame angular velocity tensors are conjugate under the orientation,
-`Ω = R Ω_body Rᵀ`: the spatial tensor `Ω = Ṙ Rᵀ` is the body-frame tensor `Ω_body = Rᵀ Ṙ` rotated
-into the inertial frame. -/
+/-- The spatial tensor is the body-frame tensor rotated into the inertial frame,
+`Ω = R Ω_body Rᵀ`. -/
 lemma angularVelocityTensor_eq_orientation_conj (M : RigidBodyMotion d) (t : Time) :
     M.angularVelocityTensor t
       = (M.orientation t).1 * M.bodyAngularVelocityTensor t * ((M.orientation t).1)ᵀ := by
   rw [angularVelocityTensor_eq, ← M.orientation_mul_bodyAngularVelocityTensor t]
 
-/-- The body-frame angular velocity tensor is the spatial tensor conjugated into the body frame,
-`Ω_body = Rᵀ Ω R`: the converse of `angularVelocityTensor_eq_orientation_conj`. -/
+/-- The body-frame tensor is the spatial tensor conjugated into the body frame,
+`Ω_body = Rᵀ Ω R`. -/
 lemma bodyAngularVelocityTensor_eq_orientation_conj (M : RigidBodyMotion d) (t : Time) :
     M.bodyAngularVelocityTensor t
       = ((M.orientation t).1)ᵀ * M.angularVelocityTensor t * (M.orientation t).1 := by
   rw [bodyAngularVelocityTensor_eq, angularVelocityTensor_eq, ← mul_assoc, mul_assoc,
     mul_eq_one_comm.mp (M.orientation_mul_transpose t), mul_one]
 
+/-- The body-frame angular velocity tensor is skew-symmetric, `Ω_bodyᵀ = -Ω_body`: it lies in the
+Lie algebra `𝔰𝔬(d)`, inherited from the spatial tensor by conjugation. -/
+lemma bodyAngularVelocityTensor_transpose (M : RigidBodyMotion d) (t : Time)
+    (hR : DifferentiableAt ℝ (fun s => (M.orientation s).1) t) :
+    (M.bodyAngularVelocityTensor t)ᵀ = - M.bodyAngularVelocityTensor t := by
+  rw [M.bodyAngularVelocityTensor_eq_orientation_conj t, transpose_mul, transpose_mul,
+    transpose_transpose, M.angularVelocityTensor_transpose t hR, neg_mul, mul_neg, ← mul_assoc]
+
 /-- The body-frame angular velocity *vector* `ω_body(t)` of a rigid body moving in three-dimensional
 space: the vector dual to the body-frame angular velocity tensor `Ω_body(t)` under the hat map,
-`ω_body = Ω_bodyᵛ`. It is the angular velocity `ω` resolved along the body-fixed axes. -/
+`ω_body = Ω_bodyᵛ`. -/
 noncomputable def bodyAngularVelocity (M : RigidBodyMotion 3) (t : Time) : Fin 3 → ℝ :=
   crossProductVee (M.bodyAngularVelocityTensor t)
 
