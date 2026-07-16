@@ -43,9 +43,7 @@ open Set MeasureTheory
 
   The bounds of the well are specified by two functions `lower upper : Fin d → ℝ`
   satisfying `∀ i, lower i < upper i`. -/
-structure InfiniteSquareWell where
-  /-- The number of spatial dimensions. -/
-  d : ℕ
+structure InfiniteSquareWell (d : ℕ) where
   /-- The mass (positive). -/
   m : ℝ
   hm : 0 < m
@@ -56,7 +54,7 @@ structure InfiniteSquareWell where
   /-- The well is a non-empty set. -/
   h_bounds : ∀ i, lower i < upper i
 
-variable {Q : InfiniteSquareWell}
+variable {d : ℕ} (Q : InfiniteSquareWell d)
 
 namespace InfiniteSquareWell
 
@@ -78,17 +76,17 @@ lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
 -/
 
 /-- The domain of the infinite square well as a Cartesian product of closed intervals. -/
-def well : Set (Space Q.d) := Space.val ⁻¹' Icc Q.lower Q.upper
+def well : Set (Space d) := Space.val ⁻¹' Icc Q.lower Q.upper
 
 /-!
 ## C. Hilbert space
 -/
 
 /-- The measure associated with the domain of the infinite square well. -/
-def measure : Measure (Space Q.d) := volume.restrict Q.well
+def measure : Measure (Space d) := volume.restrict Q.well
 
 /-- The Hilbert space for the infinite square well. -/
-abbrev HS := SpaceDHilbertSpace Q.d Q.measure
+abbrev HS : Type _ := SpaceDHilbertSpace d Q.measure
 
 /-!
 ## D. Hamiltonian

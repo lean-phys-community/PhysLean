@@ -37,14 +37,12 @@ noncomputable section
 namespace QuantumMechanics
 
 /-- A free, spinless quantum particle with mass `m > 0` in `Space d`. -/
-structure FreeParticle where
-  /-- The number of spatial dimensions. -/
-  d : ℕ
+structure FreeParticle (d : ℕ) where
   /-- The mass (positive). -/
   m : ℝ
   hm : 0 < m
 
-variable {Q : FreeParticle}
+variable {d : ℕ} (Q : FreeParticle d)
 
 namespace FreeParticle
 
@@ -66,7 +64,7 @@ lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
 -/
 
 /-- The Hilbert space for the free particle. -/
-abbrev HS := SpaceDHilbertSpace Q.d
+abbrev HS (_ : FreeParticle d) : Type _ := SpaceDHilbertSpace d
 
 /-!
 ## C. Hamiltonian
