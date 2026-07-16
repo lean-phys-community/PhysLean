@@ -5,6 +5,7 @@ Authors: Gregory J. Loges
 -/
 module
 
+public import Physlib.Meta.Informal.Basic
 public import Physlib.QuantumMechanics.Operators.Momentum
 public import Physlib.QuantumMechanics.QuantumSystem.Basic
 /-!
@@ -20,6 +21,7 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
 - A. Basic properties
 - B. Hilbert space
 - C. Hamiltonian
+- D. As a quantum system
 
 ## iv. References
 
@@ -79,6 +81,32 @@ def measure : Measure (Space Q.d) := volume.restrict Q.box
 
 /-- The Hilbert space for the infinite square well. -/
 abbrev HS := SpaceDHilbertSpace Q.d Q.measure
+
+/-!
+## D. Hamiltonian
+-/
+
+/-- The Hamiltonian for the infinite square well is `(2m)⁻¹momentumSqOperator` with respect
+  to `InfiniteSquareWell.measure`. This requires first generalizing `momentumSqOperator`
+  to `Space d` measures other than `volume`. -/
+informal_definition hamiltonian where
+  deps := [``InfiniteSquareWell]
+  tag := "QM-ISW-ham"
+
+/-- The Hamiltonian for the infinite square well is essentially self-adjoint. -/
+informal_lemma hamiltonian_essentially_self_adjoint where
+  deps := [``InfiniteSquareWell]
+  tag := "QM-ISW-hamESA"
+
+/-!
+## E. As a quantum system
+-/
+
+/-- The particle in an infinite square well as a quantum system
+  (self-adjoint Hamiltonian acting on a Hilbert space). -/
+informal_definition toQuantumSystem where
+  deps := [``InfiniteSquareWell]
+  tag := "QM-ISW-sys"
 
 end InfiniteSquareWell
 end QuantumMechanics
