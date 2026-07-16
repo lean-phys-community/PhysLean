@@ -1,0 +1,91 @@
+version: v0.1
+
+Title: Configuration space of the harmonic oscillator
+
+Overview: |
+    The geometric API for the one-dimensional harmonic oscillator formalises its
+    configuration space `Q` as a one-dimensional smooth (analytic) manifold. The key
+    data structure `ConfigurationSpace` wraps a single chosen global coordinate valued
+    in `EuclideanSpace ℝ (Fin 1)`; the required structure carrying a single real
+    value is realised by this one-dimensional Euclidean coordinate. This coordinate
+    supplies the induced topology, a global coordinate homeomorphism and diffeomorphism,
+    the charted-space and manifold instances, the tangent-coordinate infrastructure, and
+    a map to physical `Space 1`. Trajectories are curves from `Time` into `Q`, with a
+    coordinate projection, a smoothness characterisation reducing manifold smoothness to
+    ordinary smoothness of the coordinate curve, and a geometric velocity in the tangent
+    bundle. A companion mass Riemannian metric gives the geometric kinetic energy.
+
+ParentAPIs:
+  - Harmonic oscillator (Physlib/ClassicalMechanics/HarmonicOscillator)
+  - Space (Physlib/SpaceAndTime/Space)
+  - Time (Physlib/SpaceAndTime/Time)
+
+References:
+  - Ivo Terek, Introductory Variational Calculus on Manifolds, Section 1 (pages 1-2), Basic definitions and examples.
+
+Requirements:
+
+  - description: >
+      The key data structure of the API, the configuration space of the classical
+      harmonic oscillator, is defined as a structure carrying a single global
+      coordinate (a one-dimensional Euclidean value), with extensionality in that
+      coordinate and function-like coordinate access.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean (ConfigurationSpace, val, ext, coe_apply)
+
+  - description: >
+      The API equips the configuration space with the topology induced by its global
+      coordinate and the coordinate equivalence and homeomorphism to the Euclidean
+      model, transporting Hausdorffness and second countability across it.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean (valEquiv, valHomeomorphism)
+
+  - description: >
+      The API provides the smooth-manifold structure on the configuration space: the
+      charted-space and analytic manifold instances via a single global chart, together
+      with the global coordinate chart as an analytic diffeomorphism to the Euclidean
+      model.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean (valDiffeomorph, ChartedSpace instance, IsManifold instance)
+
+  - description: >
+      The API provides the tangent-coordinate infrastructure: the normed real
+      vector-space and finite-dimensionality structures on each tangent space and the
+      chart-induced continuous linear equivalence from the tangent space to the
+      Euclidean coordinate model.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean (tangentCoord, instNormedAddCommGroupTangent, instNormedSpaceTangent, instFiniteDimensionalTangent)
+
+  - description: >
+      The API provides a map from the configuration space to the actual position of the
+      particle in physical `Space 1`, obtained by reading off the underlying coordinate.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean (toSpace, toSpace_apply)
+
+  - description: >
+      Trajectories of the oscillator are defined using the configuration space, as
+      time-parametrised curves into `Q`, with a global-coordinate projection curve and a
+      physical-space position curve.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Trajectory.lean (Trajectory, coord, toSpace, coord_apply)
+
+  - description: >
+      The API gives a well-defined notion of smooth trajectory, characterising manifold
+      smoothness and differentiability of a trajectory in terms of ordinary smoothness
+      and differentiability of its coordinate curve, and defines the geometric velocity
+      as a tangent vector, shown to be the time derivative of the coordinate curve.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Trajectory.lean (contMDiff_iff_contDiff_coord, mdifferentiableAt_iff_differentiableAt_coord, velocity, velocity_eq_deriv_coord)
+
+  - description: >
+      The API defines the oscillator mass Riemannian metric on the configuration space
+      as the mass-scaled Euclidean inner product in global tangent coordinates, with its
+      positive-definiteness and coordinate evaluation.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/KineticEnergy.lean (massMetricVal, massMetricVal_apply, massMetricVal_pos, massRiemannianMetric, massRiemannianMetric_pos, massRiemannianMetric_inner_apply)
+
+  - description: >
+      The API defines the geometric kinetic energy from the mass Riemannian metric and
+      proves it recovers the standard mass-scaled coordinate expression.
+    done: true
+    location: Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/KineticEnergy.lean (geometricKineticEnergy, geometricKineticEnergy_eq, geometricKineticEnergy_massMetric_eq)
