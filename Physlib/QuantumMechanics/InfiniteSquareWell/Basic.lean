@@ -15,17 +15,18 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
 ## i. Overview
 
 The particle in an infinite square well is one of the simplest quantum systems.
-The domain is an axis-aligned cuboid (box) and energy eigenstates are (products of) trigonometric
-functions satisfying appropriate boundary conditions.
+The domain is an axis-aligned cuboid (the well) and energy eigenstates are (products of)
+trigonometric functions satisfying appropriate boundary conditions.
 
 ## ii. Key results
 
 ## iii. Table of contents
 
 - A. Basic properties
-- B. Hilbert space
-- C. Hamiltonian
-- D. As a quantum system
+- B. Domain
+- C. Hilbert space
+- D. Hamiltonian
+- E. As a quantum system
 
 ## iv. References
 
@@ -40,7 +41,7 @@ open Set MeasureTheory
 
 /-- A spinless quantum particle with mass `m > 0` confined to a cuboid in `Space d`.
 
-  The bounds of the cuboid are specified by two functions `lower upper : Fin d → ℝ`
+  The bounds of the well are specified by two functions `lower upper : Fin d → ℝ`
   satisfying `∀ i, lower i < upper i`. -/
 structure InfiniteSquareWell where
   /-- The number of spatial dimensions. -/
@@ -48,11 +49,11 @@ structure InfiniteSquareWell where
   /-- The mass (positive). -/
   m : ℝ
   hm : 0 < m
-  /-- The lower bounds of the box. -/
+  /-- The lower bounds of the well. -/
   lower : Fin d → ℝ
-  /-- The upper bounds of the box. -/
+  /-- The upper bounds of the well. -/
   upper : Fin d → ℝ
-  /-- The box is non-empty. -/
+  /-- The well is a non-empty set. -/
   h_bounds : ∀ i, lower i < upper i
 
 variable {Q : InfiniteSquareWell}
@@ -73,18 +74,18 @@ lemma m_nonneg : 0 ≤ Q.m := Q.hm.le
 lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
 
 /-!
-## B. The domain
+## B. Domain
 -/
 
 /-- The domain of the infinite square well as a Cartesian product of closed intervals. -/
-def box : Set (Space Q.d) := Space.val ⁻¹' Icc Q.lower Q.upper
+def well : Set (Space Q.d) := Space.val ⁻¹' Icc Q.lower Q.upper
 
 /-!
 ## C. Hilbert space
 -/
 
 /-- The measure associated with the domain of the infinite square well. -/
-def measure : Measure (Space Q.d) := volume.restrict Q.box
+def measure : Measure (Space Q.d) := volume.restrict Q.well
 
 /-- The Hilbert space for the infinite square well. -/
 abbrev HS := SpaceDHilbertSpace Q.d Q.measure
