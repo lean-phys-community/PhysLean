@@ -31,8 +31,9 @@ Definitions
 ## iii. Table of contents
 
 - A. Definition
-- B. Zero
-- C. Unitary equivalence
+- B. Creation from an essentially self-adjoint operator
+- C. Zero
+- D. Unitary equivalence
 
 ## iv. References
 
@@ -73,13 +74,26 @@ instance (Q : QuantumSystem) : InnerProductSpace ℂ Q.HS := Q.instInner
 instance (Q : QuantumSystem) : CompleteSpace Q.HS := Q.instComplete
 
 /-!
-## B. Zero
+## B. Creation from an essentially self-adjoint operator
+
+An operator is essentially self-adjoint has a unique self-adjoint extension
+(c.f. `IsEssentiallySelfAdjoint.unique_self_adjoint_extension`).
+For this reason, a quantum system can be uniquely associated to an e.s.a. Hamiltonian operator.
+-/
+
+/-- Create a quantum system from a Hamiltonian operator which is merely
+  essentially self-adjoint by taking its closure. -/
+def mk_esa {HS : Type*} [NormedAddCommGroup HS] [InnerProductSpace ℂ HS] [CompleteSpace HS]
+    {ℋ : HS →ₗ.[ℂ] HS} (hℋ : IsEssentiallySelfAdjoint ℋ) : QuantumSystem := ⟨HS, ℋ.closure, hℋ⟩
+
+/-!
+## C. Zero
 -/
 
 instance instZero : Zero QuantumSystem := ⟨EuclideanSpace ℂ (Fin 0), 0, adjoint_zero⟩
 
 /-!
-## C. Unitary equivalence
+## D. Unitary equivalence
 -/
 
 /-- The relation on quantum systems where `Q₁` is related to `Q₂` if there exists a linear isometry
