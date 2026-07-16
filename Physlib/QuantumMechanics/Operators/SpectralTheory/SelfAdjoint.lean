@@ -18,6 +18,8 @@ In this module we develop the spectral theory for self-adjoint operators.
 
 - `resolventSet_eq_regularityDomain` : The resolvent set and regularity domain coincide. That is,
     if `T - z • 1` has a continuous (equivalently, bounded) inverse then its range is all of `H`.
+- `mem_resolventSet_of_im_ne_zero` : every non-real `z` lies in the resolvent set of a
+    self-adjoint operator.
 - `sub_smul_surjective` : A self-adjoint `T` has `T - z • 1` surjective for every non-real `z`
     (in particular `T ± i • 1` are onto).
 - `spectrum_real` : The spectrum of a self-adjoint unbounded operator is real.
@@ -63,13 +65,15 @@ lemma resolventSet_eq_regularityDomain : ρ T = T.regularityDomain := by
   rw [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, h_ker'] at h_orthog
   simp [← h_orthog]
 
+/-- Every non-real `z` lies in the resolvent set of a self-adjoint operator. -/
+lemma mem_resolventSet_of_im_ne_zero {z : ℂ} (hz : z.im ≠ 0) : z ∈ ρ T := by
+  rw [resolventSet_eq_regularityDomain hT]
+  exact (isSymmetric hT).mem_regularityDomain_of_im_ne_zero hz
+
 /-- A self-adjoint operator has `T - z • 1` surjective for every non-real `z`: off the real
 axis a self-adjoint operator has `z` in its resolvent set, so `T - z • 1` has full range. -/
-lemma sub_smul_surjective {z : ℂ} (hz : z.im ≠ 0) : Function.Surjective (T - z • 1).toFun := by
-  have hz_res : z ∈ ρ T := by
-    rw [resolventSet_eq_regularityDomain hT]
-    exact (isSymmetric hT).mem_regularityDomain_of_im_ne_zero hz
-  exact LinearMap.range_eq_top.mp (mem_resolventSet_iff.mp hz_res).2.1
+lemma sub_smul_surjective {z : ℂ} (hz : z.im ≠ 0) : Function.Surjective (T - z • 1).toFun :=
+  LinearMap.range_eq_top.mp (mem_resolventSet_iff.mp (mem_resolventSet_of_im_ne_zero hT hz)).2.1
 
 /-- `(T - z • 1).range = ⊤` is a sufficient condition for `z ∈ ρ T`
   (and it is a necessary condition by definition of `ρ`). -/
@@ -81,8 +85,7 @@ lemma mem_resolventSet_of_range_eq_top {z : ℂ} (h : (T - z • 1).toFun.range 
     rwa [isSelfAdjoint_def.mp hT, (isClosed hT).closure_eq, conj_eq_iff_im.mpr hz_im, h,
       Submodule.top_orthogonal_eq_bot, Eq.comm, ← LinearMap.le_ker_iff_map, Submodule.ker_subtype,
       le_bot_iff] at h_orthog
-  · rw [resolventSet_eq_regularityDomain hT]
-    exact (isSymmetric hT).mem_regularityDomain_of_im_ne_zero hz_im
+  · exact mem_resolventSet_of_im_ne_zero hT hz_im
 
 /-!
 ## B. Spectrum
