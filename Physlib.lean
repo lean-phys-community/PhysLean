@@ -79,6 +79,7 @@ public import Physlib.FluidDynamics.CauchyFlow.Basic
 public import Physlib.FluidDynamics.CauchyFlow.BodyForce
 public import Physlib.FluidDynamics.CauchyFlow.Inviscid
 public import Physlib.FluidDynamics.CauchyFlow.Momentum
+public import Physlib.FluidDynamics.CauchyFlow.NavierStokes
 public import Physlib.FluidDynamics.CauchyFlow.Newtonian
 public import Physlib.FluidDynamics.Euler.Basic
 public import Physlib.FluidDynamics.FluidFlow.Basic
@@ -86,7 +87,7 @@ public import Physlib.FluidDynamics.FluidFlow.Continuity
 public import Physlib.FluidDynamics.FluidFlow.Incompressible
 public import Physlib.FluidDynamics.FluidFlow.Kinematics
 public import Physlib.FluidDynamics.FluidFlow.Momentum
-public import Physlib.FluidDynamics.NavierStokes.Basic
+public import Physlib.FluidDynamics.FluidFlow.Newtonian
 public import Physlib.FluidDynamics.ThermodynamicCauchyFlow.Basic
 public import Physlib.FluidDynamics.ThermodynamicCauchyFlow.Bernoulli
 public import Physlib.FluidDynamics.ThermodynamicCauchyFlow.Isentropic

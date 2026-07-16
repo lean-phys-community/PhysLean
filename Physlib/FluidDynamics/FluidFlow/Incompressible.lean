@@ -22,8 +22,8 @@ Navier-Stokes, incompressible Euler, and Bernoulli-style developments.
 - `FluidFlow.incompressibilityResidual` : The divergence of the velocity field.
 - `FluidFlow.ClassicalIncompressible` : Incompressibility guarded by velocity differentiability.
 - `FluidFlow.SmoothIncompressible` : Incompressibility with globally differentiable velocity.
-- `FluidFlow.SmoothIncompressible.toClassical` : Smooth incompressibility implies classical
-  incompressibility.
+- `FluidFlow.classicalIncompressible_of_smoothIncompressible` : Smooth incompressibility implies
+  classical incompressibility.
 
 ## iii. Table of contents
 
@@ -65,7 +65,8 @@ def SmoothIncompressible (d : ℕ) (fluid : FluidFlow d) : Prop :=
     ∀ t x, incompressibilityResidual d fluid t x = 0
 
 /-- A smooth incompressible flow is classically incompressible. -/
-lemma SmoothIncompressible.toClassical (d : ℕ) (fluid : FluidFlow d) :
+lemma classicalIncompressible_of_smoothIncompressible
+    (d : ℕ) (fluid : FluidFlow d) :
     SmoothIncompressible d fluid → ClassicalIncompressible d fluid := by
   intro hSmooth t x _
   simpa [incompressibilityResidual] using hSmooth.2 t x

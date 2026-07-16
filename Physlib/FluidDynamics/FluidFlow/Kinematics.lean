@@ -14,19 +14,16 @@ public import Physlib.SpaceAndTime.Time.Derivatives
 
 ## i. Overview
 
-This module defines basic kinematic predicates and scalar quantities associated to `FluidFlow`.
+This module defines basic kinematic scalar quantities associated to `FluidFlow`.
 
 ## ii. Key results
 
-- `FluidFlow.DensityTimeIndependent` : A fluid flow whose density has zero time derivative.
-- `FluidFlow.VelocityTimeIndependent` : A fluid flow whose velocity has zero time derivative.
 - `FluidFlow.materialDerivative` : The material derivative along a fluid velocity field.
 - `FluidFlow.specificKineticEnergy` : The specific kinetic energy `|u|^2 / 2`.
 
 ## iii. Table of contents
 
-- A. Time-independence predicates
-- B. Flow-derived scalar quantities
+- A. Flow-derived scalar quantities
 
 ## iv. References
 
@@ -44,23 +41,7 @@ namespace FluidFlow
 
 /-!
 
-## A. Time-independence predicates
-
--/
-
-/-- A fluid flow has time-independent density when the density has zero time derivative at
-each spatial point. -/
-def DensityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
-  ∀ t x, ∂ₜ (fluid.rho · x) t = 0
-
-/-- A fluid flow has time-independent velocity when the velocity has zero time derivative at
-each spatial point. -/
-def VelocityTimeIndependent (d : ℕ) (fluid : FluidFlow d) : Prop :=
-  ∀ t x, ∂ₜ (fluid.velocity · x) t = 0
-
-/-!
-
-## B. Flow-derived scalar quantities
+## A. Flow-derived scalar quantities
 
 -/
 
