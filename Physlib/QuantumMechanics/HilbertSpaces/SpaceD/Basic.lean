@@ -23,15 +23,14 @@ in the same equivalence class if they are `μ`-a.e. equal.
 Given `SpaceDHilbertSpace d μ` and `Ω : Set (Space d)`, the Hilbert space
 `SpaceDHilbertSpaceOn Ω μ ≔ SpaceDHilbertSpace d (μ.restrict Ω)` may be interpreted as the
 sub-Hilbert space consisting of those vectors with domain contained in `Ω`.
-The reason is that for each `f` in `SpaceDHilbertSpaceOn Ω μ` we have
-`f =ᵐ[μ.restrict Ω] Ω.indicator f`, namely the equivalence class of `f` always
+The reason is that for each `ψ` in `SpaceDHilbertSpaceOn Ω μ` we have
+`ψ =ᵐ[μ.restrict Ω] Ω.indicator ψ`, namely the equivalence class of `ψ` always
 contains a representative which vanishes on the complement of `Ω`.
-The linear isometry `restrictIncl Ω` defined below describes this sub-Hilbert space relationship
-by mapping each `f` to this special representative in its equivalence class.
+The linear isometry `restrictIncl Ω μ` describes this sub-Hilbert space relationship
+by mapping each `ψ` to this special representative in its equivalence class.
 
-Similarly, we may project `SpaceDHilbertSpace d μ` onto the sub-Hilbert space
-`SpaceDHilbertSpaceOn Ω μ` by enlarging the equivalence classes, essentially dropping
-information about the functions on the complement of `Ω`.
+Similarly, we may project `SpaceDHilbertSpace d μ` onto `SpaceDHilbertSpaceOn Ω μ` by enlarging the
+equivalence classes, essentially dropping information about the functions on the complement of `Ω`.
 
 ## ii. Key results
 
@@ -41,7 +40,7 @@ information about the functions on the complement of `Ω`.
 - `MemHS f μ` : The proposition capturing exactly when the function `f : Space d → ℂ` can be lifted
     to an element of the Hilbert space.
 - `subspaceProjection` : The projection of `SpaceDHilbertSpace d μ` onto `SpaceDHilbertSpaceOn Ω μ`.
-- `subsetIncl` : The linear isometry including `SpaceDHilbertSpaceOn Ω μ`
+- `subspaceIncl` : The linear isometry including `SpaceDHilbertSpaceOn Ω μ`
     as a sub-Hilbert space of `SpaceDHilbertspace d μ`.
 
 ## iii. Table of contents

@@ -12,12 +12,22 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 
 ## i. Overview
 
+In this module we define the Dirichlet submodule of `SpaceDHilbertSpaceOn Ω μ` consisting of
+equivalence classes of Schwartz maps which vanish on `frontier Ω`.
+
+These serve as a convenient dense domain for operators acting on wavefunctions satisfying
+homogeneous Dirichlet boundary conditions on `Ω`.
+
 ## ii. Key results
+
+- `DirichletSubmoduleOn Ω μ`: The subspace of `SchwartzSubmodule d μ` consisting of Schwartz maps
+  which vanish on the frontier of `Ω`.
 
 ## iii. Table of contents
 
 - A. Definitions
 - B. Contained in SchwartzSubmoduleOn
+- C. Density
 
 ## iv. References
 
@@ -46,7 +56,7 @@ def DirichletSchwartz : Submodule ℂ 𝓢(Space d, ℂ) where
 
 /-- The submodule of the Hilbert space on `Ω` consisting of the equivalence classes
   of Schwartz maps which vanish on `frontier Ω`. -/
-def DirichletSubmoduleOn : Submodule ℂ (SpaceDHilbertSpaceOn Ω μ) :=
+abbrev DirichletSubmoduleOn : Submodule ℂ (SpaceDHilbertSpaceOn Ω μ) :=
   (DirichletSchwartz Ω).map (subspaceProjection Ω μ ∘ₗ schwartzIncl μ)
 
 namespace DirichletSubmoduleOn
@@ -55,7 +65,7 @@ variable {Ω μ} in
 lemma mem_iff {ψ : SpaceDHilbertSpaceOn Ω μ} :
     ψ ∈ DirichletSubmoduleOn Ω μ ↔
       ∃ f : DirichletSchwartz Ω, subspaceProjection Ω μ (schwartzIncl μ f) = ψ := by
-  simp [DirichletSubmoduleOn]
+  simp
 
 /-!
 ## B. Contained in SchwartzSubmoduleOn
@@ -65,6 +75,13 @@ lemma le_schwartzSubmodule : DirichletSubmoduleOn Ω μ ≤ SchwartzSubmoduleOn 
   intro ψ hψ
   obtain ⟨f, hf⟩ := mem_iff.mp hψ
   apply SchwartzSubmoduleOn.mem_iff.mpr ⟨⟨schwartzIncl μ f, by simp⟩, hf⟩
+
+/-!
+## C. Density
+-/
+
+TODO "Prove that DirichletSubmoduleOn is dense in SpaceDHilbertSpaceOn
+  (perhaps with some assumptions on the measure μ)."
 
 end DirichletSubmoduleOn
 end SpaceDHilbertSpaceOn

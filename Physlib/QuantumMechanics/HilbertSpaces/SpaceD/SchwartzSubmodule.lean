@@ -14,11 +14,18 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Basic
 ## i. Overview
 
 In this module we define the Schwartz submodule of `SpaceDHilbertSpace d μ`.
+`SchwartzSubmodule d μ` consists of the `μ`-a.e. equal equivalence classes of Schwartz maps
+on `Space d`.
+
+This is an import subspace of the Hilbert space. For one, the Fourier transform maps the Schwartz
+submodule into itself. It also is a convenient dense domain on which to define derivative operators.
 
 ## ii. Key results
 
 - `SchwartzSubmodule d μ`: Submodule of `SpaceDHilbertSpace d μ` consisting of the L² equivalence
   classes of Schwartz maps `𝓢(Space d, ℂ)`.
+- `SchwartzSubmoduleOn Ω μ`: The projection of `SchwartzSubmodule d μ`
+  onto `SpaceDHilbertSpaceOn Ω μ`.
 
 ## iii. Table of contents
 
