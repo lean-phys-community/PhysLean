@@ -233,6 +233,9 @@ end SpaceDHilbertSpace
 ## B. SpaceDHilbertSpaceOn
 -/
 
+TODO "Upgrade subspaceProjection to a ContinuousLinearMap when Lp.LpToLpOfMeasureLeSMul
+  becomes available."
+
 abbrev SpaceDHilbertSpaceOn {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d) := volume) :=
   SpaceDHilbertSpace d (μ.restrict Ω)
 

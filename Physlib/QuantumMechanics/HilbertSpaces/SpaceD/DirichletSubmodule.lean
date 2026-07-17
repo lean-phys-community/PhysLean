@@ -48,7 +48,7 @@ variable {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d)) [μ.HasTemperat
 -/
 
 /-- The Schwartz maps which vanish on `frontier Ω`. -/
-def DirichletSchwartz : Submodule ℂ 𝓢(Space d, ℂ) where
+def DirichletSchwartzMap : Submodule ℂ 𝓢(Space d, ℂ) where
   carrier := {f : 𝓢(Space d, ℂ) | ∀ x : frontier Ω, f x = 0}
   add_mem' := by simp_all
   zero_mem' := by simp
@@ -57,21 +57,21 @@ def DirichletSchwartz : Submodule ℂ 𝓢(Space d, ℂ) where
 /-- The submodule of the Hilbert space on `Ω` consisting of the equivalence classes
   of Schwartz maps which vanish on `frontier Ω`. -/
 abbrev DirichletSubmoduleOn : Submodule ℂ (SpaceDHilbertSpaceOn Ω μ) :=
-  (DirichletSchwartz Ω).map (subspaceProjection Ω μ ∘ₗ schwartzIncl μ)
+  (DirichletSchwartzMap Ω).map (subspaceProjection Ω μ ∘ₗ schwartzIncl μ)
 
 namespace DirichletSubmoduleOn
 
 variable {Ω μ} in
 lemma mem_iff {ψ : SpaceDHilbertSpaceOn Ω μ} :
     ψ ∈ DirichletSubmoduleOn Ω μ ↔
-      ∃ f : DirichletSchwartz Ω, subspaceProjection Ω μ (schwartzIncl μ f) = ψ := by
+      ∃ f : DirichletSchwartzMap Ω, subspaceProjection Ω μ (schwartzIncl μ f) = ψ := by
   simp
 
 /-!
 ## B. Contained in SchwartzSubmoduleOn
 -/
 
-lemma le_schwartzSubmodule : DirichletSubmoduleOn Ω μ ≤ SchwartzSubmoduleOn Ω μ := by
+lemma le_schwartzSubmoduleOn : DirichletSubmoduleOn Ω μ ≤ SchwartzSubmoduleOn Ω μ := by
   intro ψ hψ
   obtain ⟨f, hf⟩ := mem_iff.mp hψ
   apply SchwartzSubmoduleOn.mem_iff.mpr ⟨⟨schwartzIncl μ f, by simp⟩, hf⟩
@@ -80,8 +80,8 @@ lemma le_schwartzSubmodule : DirichletSubmoduleOn Ω μ ≤ SchwartzSubmoduleOn 
 ## C. Density
 -/
 
-TODO "Prove that DirichletSubmoduleOn is dense in SpaceDHilbertSpaceOn
-  (perhaps with some assumptions on the measure μ)."
+TODO "Prove that `DirichletSubmoduleOn Ω μ` is dense in `SpaceDHilbertSpaceOn Ω μ`
+  (perhaps with some assumptions on Ω and μ)."
 
 end DirichletSubmoduleOn
 end SpaceDHilbertSpaceOn
