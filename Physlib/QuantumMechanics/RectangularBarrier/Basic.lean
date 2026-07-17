@@ -75,6 +75,21 @@ lemma m_nonneg : 0 ≤ Q.m := Q.hm.le
 @[simp]
 lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
 
+/-!
+## B. Potential function
+-/
+
+def potentialFunction : Space 1 → ℝ := fun x ↦ (Icc Q.lower Q.upper).indicator (fun _ ↦ Q.V₀) (x 0)
+
+lemma potentialFunction_eq :
+    Q.potentialFunction = fun x ↦ (Icc Q.lower Q.upper).indicator (fun _ ↦ Q.V₀) (x 0) := rfl
+
+/-- The piecewise-constant potential of the rectangular barrier is a.e. strongly measurable. -/
+informal_lemma potentialFunction_aestronglyMeasurable where
+  deps := [``RectangularBarrier]
+  tag := "QM-RB-aesm"
+  -- This relies on `Space.val` being measure-preserving.
+
 end RectangularBarrier
 end QuantumMechanics
 end
