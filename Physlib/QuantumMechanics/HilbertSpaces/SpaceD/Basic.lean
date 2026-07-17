@@ -228,14 +228,18 @@ lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
   · apply Tendsto.ennrpow_const 2⁻¹ at h
     simp_all
 
+end SpaceDHilbertSpace
+
 /-!
 ## B. SpaceDHilbertSpaceOn
 -/
 
-section
-
 abbrev SpaceDHilbertSpaceOn {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d) := volume) :=
   SpaceDHilbertSpace d (μ.restrict Ω)
+
+namespace SpaceDHilbertSpaceOn
+
+open SpaceDHilbertSpace
 
 variable {d : ℕ} (Ω : Set (Space d)) (hΩ : MeasurableSet Ω) (μ : Measure (Space d))
 variable (ψ : SpaceDHilbertSpace d μ) (φ : SpaceDHilbertSpaceOn Ω μ)
@@ -298,8 +302,7 @@ include hΩ in
 lemma subspaceProjection_surjective : Surjective (subspaceProjection Ω μ) :=
   (leftInverse_subspaceProjection hΩ μ).surjective
 
-end
+end SpaceDHilbertSpaceOn
 
-end SpaceDHilbertSpace
 end QuantumMechanics
 end
