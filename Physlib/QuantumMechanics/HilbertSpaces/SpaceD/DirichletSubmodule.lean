@@ -17,6 +17,7 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 ## iii. Table of contents
 
 - A. Definitions
+- B. Contained in SchwartzSubmoduleOn
 
 ## iv. References
 
@@ -26,9 +27,9 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 
 noncomputable section
 namespace QuantumMechanics
-namespace SpaceDHilbertSpace
+namespace SpaceDHilbertSpaceOn
 
-open MeasureTheory SchwartzMap
+open MeasureTheory SchwartzMap SpaceDHilbertSpace
 
 variable {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d)) [μ.HasTemperateGrowth]
 
@@ -48,6 +49,24 @@ def DirichletSchwartz : Submodule ℂ 𝓢(Space d, ℂ) where
 def DirichletSubmoduleOn : Submodule ℂ (SpaceDHilbertSpaceOn Ω μ) :=
   (DirichletSchwartz Ω).map (subspaceProjection Ω μ ∘ₗ schwartzIncl μ)
 
-end SpaceDHilbertSpace
+namespace DirichletSubmoduleOn
+
+variable {Ω μ} in
+lemma mem_iff {ψ : SpaceDHilbertSpaceOn Ω μ} :
+    ψ ∈ DirichletSubmoduleOn Ω μ ↔
+      ∃ f : DirichletSchwartz Ω, subspaceProjection Ω μ (schwartzIncl μ f) = ψ := by
+  simp [DirichletSubmoduleOn]
+
+/-!
+## B. Contained in SchwartzSubmoduleOn
+-/
+
+lemma le_schwartzSubmodule : DirichletSubmoduleOn Ω μ ≤ SchwartzSubmoduleOn Ω μ := by
+  intro ψ hψ
+  obtain ⟨f, hf⟩ := mem_iff.mp hψ
+  apply SchwartzSubmoduleOn.mem_iff.mpr ⟨⟨schwartzIncl μ f, by simp⟩, hf⟩
+
+end DirichletSubmoduleOn
+end SpaceDHilbertSpaceOn
 end QuantumMechanics
 end
