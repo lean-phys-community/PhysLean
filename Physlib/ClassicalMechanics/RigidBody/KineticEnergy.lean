@@ -171,9 +171,12 @@ theorem kineticEnergy_eq_translational_add_angularVelocity (M : RigidBodyMotion 
   ext y
   simp only [cmap_apply, M.deriv_orientation_mulVec_eq_angularVelocity_cross y t hR]
 
-/-- **König's theorem** in the body frame: at the centre of mass (`centerOfMass = 0`) the kinetic
-energy splits as `T = ½ M ⟪V, V⟫ + rotationalKineticEnergy ω_body`, the rotational term now carried
-by the body-frame angular velocity. -/
+/-- **König's theorem** in the body frame. The total kinetic energy `M.kineticEnergy t`, formed from
+the lab-frame point velocities, splits at the centre of mass (`centerOfMass = 0`) as
+`T = ½ M ⟪V, V⟫ + rotationalKineticEnergy ω_body`. The rotational energy is a frame-independent
+scalar, so it is evaluated here from the *body-frame* angular velocity `ω_body`: the spatial form
+`|Ṙ (y − c)|²` and the body form `|ω_body × (y − c)|²` agree because
+`Ṙ (y − c) = R (ω_body × (y − c))` and `R`, being orthogonal, preserves the norm. -/
 theorem kineticEnergy_eq_translational_add_bodyAngularVelocity (M : RigidBodyMotion 3) (t : Time)
     (h : M.mass ≠ 0) (hR : DifferentiableAt ℝ (fun s => (M.orientation s).1) t)
     (hc : M.centerOfMass = 0) :
