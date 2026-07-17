@@ -236,6 +236,9 @@ end SpaceDHilbertSpace
 TODO "Upgrade subspaceProjection to a ContinuousLinearMap when Lp.LpToLpOfMeasureLeSMul
   becomes available."
 
+/-- The Hilbert space for single-particle quantum mechanics on a set `Ω ⊆ Space d` with measure `μ`
+  is defined to be `SpaceDHilbertSpace d (μ.restrict Ω)`, the space of `μ`-a.e. equal on `Ω`
+  equivalence classes of functions `f : Space d → ℂ` for which `∫ x on Ω, ‖f x‖² ∂μ` is finite. -/
 abbrev SpaceDHilbertSpaceOn {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d) := volume) :=
   SpaceDHilbertSpace d (μ.restrict Ω)
 
