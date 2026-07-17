@@ -90,7 +90,6 @@ public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
 public import Physlib.Mathematics.Distribution.Basic
 public import Physlib.Mathematics.Distribution.PowMul
-public import Physlib.Mathematics.Distribution.ResolventReciprocal
 public import Physlib.Mathematics.FDerivCurry
 public import Physlib.Mathematics.Fin
 public import Physlib.Mathematics.Fin.Involutions
@@ -110,6 +109,7 @@ public import Physlib.Mathematics.List.InsertionSort
 public import Physlib.Mathematics.OrthogonalMatrix
 public import Physlib.Mathematics.PiTensorProduct
 public import Physlib.Mathematics.RatComplexNum
+public import Physlib.Mathematics.Resolvent
 public import Physlib.Mathematics.SO3.Basic
 public import Physlib.Mathematics.SchurTriangulation
 public import Physlib.Mathematics.SpecialFunctions.PhysHermite
