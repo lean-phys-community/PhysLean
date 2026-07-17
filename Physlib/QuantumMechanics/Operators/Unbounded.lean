@@ -929,4 +929,13 @@ lemma isUnbounded_of_dense_of_isSymmetric' [CompleteSpace H]
     (mk E (E.subtype ∘ₗ f)).IsUnbounded :=
   ⟨hE, IsSymmetric.isClosable h hE⟩
 
+/-- The closure of a symmetric densely-defined operator is symmetric. -/
+lemma IsSymmetric.closure [CompleteSpace H] (hsym : T.IsSymmetric) (hdense : T.HasDenseDomain) :
+    T.closure.IsSymmetric := by
+  have hub : T.IsUnbounded := ⟨hdense, hsym.isClosable hdense⟩
+  have hadj_closed : T.adjoint.IsClosed := adjoint_isClosed hdense
+  rw [isSymmetric_iff_le_adjoint hdense.closure, hub.adjoint_closure_eq_adjoint]
+  rw [← hadj_closed.closure_eq]
+  exact hadj_closed.isClosable.closure_mono (hsym.le_adjoint hdense)
+
 end LinearPMap
