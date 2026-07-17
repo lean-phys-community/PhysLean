@@ -79,6 +79,8 @@ lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
 ## B. Potential function
 -/
 
+/-- The piece-wise constant potential, equal to `Q.V₀` for `x.val 0 ∈ Icc Q.lower Q.upper`
+  and zero otherwise. -/
 def potentialFunction : Space 1 → ℝ := fun x ↦ (Icc Q.lower Q.upper).indicator (fun _ ↦ Q.V₀) (x 0)
 
 lemma potentialFunction_eq :
@@ -106,12 +108,14 @@ abbrev HS (_ : RectangularBarrier) : Type _ := SpaceDHilbertSpace 1
 ### D.1. Kinetic
 -/
 
+/-- The kinetic energy operator, `p²/2m`. -/
 def kineticOperator : Q.HS →ₗ.[ℂ] Q.HS := (2 * Q.m)⁻¹ • momentumSqOperator
 
 /-!
 ### D.2. Potential
 -/
 
+/-- The potential energy operator, defined by multiplication by `Q.potentialFunction`. -/
 def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 volume (Complex.ofReal ∘ Q.potentialFunction)
 
 /-- The potential operator for the rectangular barrier is self-adjoint. -/
