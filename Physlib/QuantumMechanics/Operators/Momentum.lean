@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Gregory J. Loges. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Gregory J. Loges
+Authors: Adam Bornemann, Gregory J. Loges
 -/
 module
 
@@ -33,6 +33,7 @@ Notation:
 
 - A. Momentum vector operator
 - B. Unbounded momentum vector operator
+- C. Fourier conjugate of the momentum operator
 
 ## iv. References
 
@@ -49,6 +50,8 @@ noncomputable section
 open Constants Complex
 open Space
 open ContDiff SchwartzMap
+open LineDeriv
+open scoped FourierTransform
 
 variable {d : ℕ} (i : Fin d)
 
@@ -155,6 +158,39 @@ lemma momentumSqOperator_domain_eq : momentumSqOperator.domain = SchwartzSubmodu
   · letI := Fin.pos_iff_nonempty.mp hd
     rw [← iInf_const (a := SchwartzSubmodule d) (ι := Fin d)]
     congr
+
+/-!
+## C. Fourier conjugate of the momentum operator
+-/
+
+/-- The momentum operator is the scalar `-iℏ` times the line derivative in the direction of the
+`i`-th basis vector. -/
+lemma momentumCLM_eq_smul_lineDerivOp (i : Fin d) (ψ : 𝓢(Space d, ℂ)) :
+    𝐩 i ψ = (- Complex.I * ℏ) • (∂_{Space.basis i} ψ : 𝓢(Space d, ℂ)) := by
+  ext x
+  simp [momentumCLM_apply, Space.deriv_eq, lineDerivOp_apply_eq_fderiv]
+
+/-- The Fourier multiplier of the momentum operator `𝐩 i = -iℏ∂ᵢ` is real-valued (viewed in `ℂ`). -/
+def momentumSymbol (i : Fin d) : Space d → ℂ :=
+  fun ξ => ((2 * Real.pi * (ℏ : ℝ) : ℝ) : ℂ) * (Space.coordCLM i ξ : ℝ)
+
+/-- The momentum symbol has temperate growth (it is a real-linear coordinate function). -/
+@[fun_prop] lemma momentumSymbol_hasTemperateGrowth (i : Fin d) :
+    (momentumSymbol i).HasTemperateGrowth := by
+  unfold momentumSymbol; fun_prop
+
+/-- The Fourier transform conjugates the momentum operator `𝐩 i = -iℏ∂ᵢ` into multiplication by the
+real symbol `2πℏ·ξᵢ`: `𝓕 (𝐩 i ψ) = momentumSymbol i · 𝓕 ψ`. -/
+lemma fourier_momentumCLM_eq (i : Fin d) (ψ : 𝓢(Space d, ℂ)) :
+    𝓕 (𝐩 i ψ) = SchwartzMap.smulLeftCLM ℂ (momentumSymbol i) (𝓕 ψ) := by
+  rw [momentumCLM_eq_smul_lineDerivOp, FourierSMul.fourier_smul,
+    fourier_lineDerivOp_eq, smul_smul,
+    show (- Complex.I * ℏ) * (2 * Real.pi * Complex.I)
+      = ((2 * Real.pi * (ℏ : ℝ) : ℝ) : ℂ) by push_cast; ring_nf; simp [Complex.I_sq]]
+  ext x
+  rw [_root_.smul_apply, SchwartzMap.smulLeftCLM_apply_apply (by fun_prop),
+    SchwartzMap.smulLeftCLM_apply_apply (momentumSymbol_hasTemperateGrowth i)]
+  simp [momentumSymbol, Space.coordCLM_apply, Space.coord, mul_comm, mul_assoc, Complex.real_smul]
 
 end
 end QuantumMechanics
