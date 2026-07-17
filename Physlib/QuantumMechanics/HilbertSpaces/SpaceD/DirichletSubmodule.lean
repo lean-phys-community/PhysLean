@@ -13,7 +13,8 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 ## i. Overview
 
 In this module we define the Dirichlet submodule of `SpaceDHilbertSpaceOn Ω μ` consisting of
-equivalence classes of Schwartz maps which vanish on `frontier Ω`.
+equivalence classes of Schwartz maps which vanish on `frontier Ω`. The frontier (or boundary)
+of a set `Ω` contains all points whose neighborhoods always intersect with both `Ω` and `Ωᶜ`.
 
 These serve as a convenient dense domain for operators acting on wavefunctions satisfying
 homogeneous Dirichlet boundary conditions on `Ω`.
