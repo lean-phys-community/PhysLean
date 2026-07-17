@@ -90,6 +90,59 @@ informal_lemma potentialFunction_aestronglyMeasurable where
   tag := "QM-RB-aesm"
   -- This relies on `Space.val` being measure-preserving.
 
+/-!
+## C. Hilbert space
+-/
+
+/-- The Hilbert space for the 1d rectangular barrier. -/
+@[nolint unusedArguments]
+abbrev HS (_ : RectangularBarrier) : Type _ := SpaceDHilbertSpace 1
+
+/-!
+## D. Operators
+-/
+
+/-!
+### D.1. Kinetic
+-/
+
+def kineticOperator : Q.HS →ₗ.[ℂ] Q.HS := (2 * Q.m)⁻¹ • momentumSqOperator
+
+/-!
+### D.2. Potential
+-/
+
+def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 volume (Complex.ofReal ∘ Q.potentialFunction)
+
+/-- The potential operator for the rectangular barrier is self-adjoint. -/
+informal_lemma potentialOperator_isSelfAdjoint where
+  deps := [``RectangularBarrier]
+  tag := "QM-RB-sa"
+
+/-!
+### D.3. Hamiltonian
+-/
+
+/-- The Hamiltonian for the rectangular barrier. -/
+informal_definition hamiltonian where
+  deps := [``RectangularBarrier]
+  tag := "QM-RB-ham"
+
+/-- The Hamiltonian for the rectangular barrier is essentially self-adjoint. -/
+informal_lemma hamiltonian_essentially_self_adjoint where
+  deps := [``RectangularBarrier.hamiltonian]
+  tag := "QM-RB-hamESA"
+
+/-!
+## E. As a quantum system
+-/
+
+/-- The rectangular barrier as a quantum system
+  (self-adjoint Hamiltonian acting on a Hilbert space). -/
+informal_definition toQuantumSystem where
+  deps := [``RectangularBarrier.hamiltonian_essentially_self_adjoint]
+  tag := "QM-RB-sys"
+
 end RectangularBarrier
 end QuantumMechanics
 end
