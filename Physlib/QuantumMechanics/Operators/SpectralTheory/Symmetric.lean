@@ -27,10 +27,8 @@ simply reinterprets the numerical range as a subset of ℝ.
     all complex numbers with non-zero imaginary part.
 - `regularityDomain_isConnected_iff` : The regularity domain of a symmetric operator is connected
     if and only if it contains a real number.
-- `IsSymmetric.closure_sub_smul_surjective` : For symmetric, densely-defined `A` and non-real `z`,
-    a dense range of `A - z • 1` gives a surjective `A.closure - z • 1`.
-- `IsEssentiallySelfAdjoint.of_dense_range_add_sub` : The basic criterion for essential
-    self-adjointness: symmetric + densely defined + `A ± i` dense range.
+- `IsSymmetric.isEssentiallySelfAdjoint_of_defectNumber_eq_zero` : The basic criterion for
+    essential self-adjointness: symmetric + densely defined + vanishing defect numbers at `± i`.
 
 ## iii. Table of contents
 
@@ -220,40 +218,32 @@ lemma pointSpectrum_real : σᵖ T ⊆ range ofReal := by
     _ = ⟪x, z • x⟫_ℂ := by simp [← toFun_eq_coe, LinearMap.mem_ker.mp hx]
     _ = ↑(‖x‖ ^ 2) * z := by simp [inner_smul_right, mul_comm]
 
-end IsSymmetric
-
 /-!
 ## D. Essential self-adjointness
 -/
 
-open Complex
+variable [CompleteSpace H]
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-
-/-- For symmetric, densely-defined `A` and non-real `z`, density of the range of `A - z • 1`
-upgrades to surjectivity of `A.closure - z • 1`. -/
-lemma IsSymmetric.closure_sub_smul_surjective {A : H →ₗ.[ℂ] H} (hsym : A.IsSymmetric)
-    (hdense : A.HasDenseDomain) {z : ℂ} (hz : z.im ≠ 0)
-    (hd : Dense ((A - z • 1).toFun.range : Set H)) :
-    Function.Surjective (A.closure - z • 1).toFun := by
-  have hrange : (A.closure - z • 1).toFun.range = ⊤ := by
-    rw [← (hsym.isClosable hdense).closure_range_sub_eq_range_closure_sub
-      (hsym.mem_regularityDomain_of_im_ne_zero hz)]
-    exact Submodule.dense_iff_topologicalClosure_eq_top.mp hd
-  exact LinearMap.range_eq_top.mp hrange
-
-/-- A symmetric, densely-defined `A` with `A ± i • 1` of dense range is essentially self-adjoint. -/
-lemma IsEssentiallySelfAdjoint.of_dense_range_add_sub {A : H →ₗ.[ℂ] H}
-    (hsym : A.IsSymmetric) (hdense : A.HasDenseDomain)
-    (hplus : Dense ((A - (-I) • 1).toFun.range : Set H))
-    (hminus : Dense ((A - I • 1).toFun.range : Set H)) : A.IsEssentiallySelfAdjoint := by
-  have hsurj {z : ℂ} (hz : z.im ≠ 0) (hd : Dense ((A - z • 1).toFun.range : Set H)) (φ : H) :
-      ∃ ψ : A.closure.domain, A.closure ψ - z • (ψ : H) = φ := by
-    obtain ⟨ξ, hξ⟩ := hsym.closure_sub_smul_surjective hdense hz hd φ
-    exact ⟨⟨(ξ : H), (Submodule.mem_inf.mp ξ.2).1⟩, hξ⟩
+/-- The basic criterion for essential self-adjointness: a symmetric, densely-defined operator
+whose defect numbers at `I` and `-I` both vanish is essentially self-adjoint. -/
+lemma isEssentiallySelfAdjoint_of_defectNumber_eq_zero
+    (hdense : T.HasDenseDomain) (hpos : T.defectNumber I = 0) (hneg : T.defectNumber (-I) = 0) :
+    T.IsEssentiallySelfAdjoint := by
+  have hrange {z : ℂ} (hz : z.im ≠ 0) (hd : T.defectNumber z = 0) :
+      (T.closure - z • 1).toFun.range = ⊤ := by
+    have hz' : z ∈ T.regularityDomain := hT.mem_regularityDomain_of_im_ne_zero hz
+    have hcl : T.closure.IsClosed := (hT.isClosable hdense).closure_isClosed
+    rw [← hcl.defectNumber_eq_zero_iff (T.regularityDomain_closure ▸ hz'),
+      defectNumber_closure hz']
+    exact hd
   rw [isEssentiallySelfAdjoint_def]
-  apply IsSelfAdjoint.of_surjective_add_sub (hsym.closure hdense) hdense.closure _ _
-  · simpa only [neg_smul, sub_neg_eq_add] using hsurj (by norm_num) hplus
-  · exact hsurj (by norm_num) hminus
+  apply (hT.closure hdense).isSelfAdjoint_of_range_eq_top hdense.closure
+  · have hI : T.closure + I • 1 = T.closure - (-I) • 1 :=
+      LinearPMap.ext rfl fun x hf hg => by simp [sub_apply, add_apply, smul_apply, sub_neg_eq_add]
+    rw [hI]
+    exact hrange (by norm_num) hneg
+  · exact hrange (by norm_num) hpos
+
+end IsSymmetric
 
 end LinearPMap

@@ -401,6 +401,16 @@ lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDen
     refine le_trans ?_ (adjoint_compRestricted_le_compRestricted_adjoint hTn h)
     exact pow_succ' T† n ▸ compRestricted_mono_right T† (ih hTn)
 
+/-- A densely-defined closable operator and its closure have the same adjoint. -/
+lemma adjoint_closure_eq_adjoint [CompleteSpace H] (hdense : U.HasDenseDomain)
+    (hcl : U.IsClosable) : U.closure† = U† := by
+  refine eq_of_eq_graph ?_
+  ext
+  rw [adjoint_graph_eq_graph_adjoint hdense, adjoint_graph_eq_graph_adjoint hdense.closure,
+    ← IsClosable.graph_closure_eq_closure_graph hcl,
+    mem_submodule_closure_adjoint_iff_mem_submoduleToLp_closure_orthogonal, orthogonal_closure,
+    mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
+
 /-!
 ### B.4. Continuity / boundedness
 -/
@@ -733,6 +743,14 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
   have hy : T₂ y = T₁ ⟨y, h_le.1 y.2⟩ := @h_le.2 y ⟨y, h_le.1 y.2⟩ rfl
   exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
 
+/-- The closure of a symmetric densely-defined operator is symmetric. -/
+lemma IsSymmetric.closure [CompleteSpace H] (hsym : T.IsSymmetric) (hdense : T.HasDenseDomain) :
+    T.closure.IsSymmetric := by
+  have hadj_closed : T.adjoint.IsClosed := adjoint_isClosed hdense
+  rw [isSymmetric_iff_le_adjoint hdense.closure,
+    adjoint_closure_eq_adjoint hdense (hsym.isClosable hdense), ← hadj_closed.closure_eq]
+  exact hadj_closed.isClosable.closure_mono (hsym.le_adjoint hdense)
+
 /-!
 ### C.2. Self-adjoint operators
 -/
@@ -775,12 +793,18 @@ lemma IsSelfAdjoint.real_smul [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} 
 lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint (-T) :=
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
-/-- Self-adjointness from surjectivity of `T ± i`. A symmetric (`T.IsSymmetric`),densely-defined
-operator `T` for which `T + i` and `T - i` are both surjective onto `H`, is self-adjoint. -/
-lemma IsSelfAdjoint.of_surjective_add_sub [CompleteSpace H] (hsym : T.IsSymmetric)
-    (hdense : Dense (T.domain : Set H))
-    (hplus : ∀ φ : H, ∃ ψ : T.domain, T ψ + I • (ψ : H) = φ)
-    (hminus : ∀ φ : H, ∃ ψ : T.domain, T ψ - I • (ψ : H) = φ) : IsSelfAdjoint T := by
+/-- Self-adjointness from surjectivity of `T ± i`: a symmetric, densely-defined operator `T` for
+which `T + I • 1` and `T - I • 1` both have full range is self-adjoint. -/
+lemma IsSymmetric.isSelfAdjoint_of_range_eq_top [CompleteSpace H] (hsym : T.IsSymmetric)
+    (hdense : T.HasDenseDomain)
+    (hadd : (T + I • 1).toFun.range = ⊤) (hsub : (T - I • 1).toFun.range = ⊤) :
+    IsSelfAdjoint T := by
+  have hplus : ∀ φ : H, ∃ ψ : T.domain, T ψ + I • (ψ : H) = φ := fun φ => by
+    obtain ⟨ψ, hψ⟩ := LinearMap.range_eq_top.mp hadd φ
+    exact ⟨⟨(ψ : H), (Submodule.mem_inf.mp ψ.2).1⟩, hψ⟩
+  have hminus : ∀ φ : H, ∃ ψ : T.domain, T ψ - I • (ψ : H) = φ := fun φ => by
+    obtain ⟨ψ, hψ⟩ := LinearMap.range_eq_top.mp hsub φ
+    exact ⟨⟨(ψ : H), (Submodule.mem_inf.mp ψ.2).1⟩, hψ⟩
   rw [isSelfAdjoint_def]
   have hle : T ≤ T.adjoint := (isSymmetric_def.mp hsym).le_adjoint hdense
   apply le_antisymm _ hle
@@ -879,13 +903,8 @@ lemma IsUnbounded.closure (h : U.IsUnbounded) : U.closure.IsUnbounded :=
 
 @[simp]
 lemma IsUnbounded.adjoint_closure_eq_adjoint [CompleteSpace H] (h : U.IsUnbounded) :
-    U.closure† = U† := by
-  refine eq_of_eq_graph ?_
-  ext
-  rw [adjoint_graph_eq_graph_adjoint h.1, adjoint_graph_eq_graph_adjoint h.1.closure,
-    ← IsClosable.graph_closure_eq_closure_graph h.2,
-    mem_submodule_closure_adjoint_iff_mem_submoduleToLp_closure_orthogonal, orthogonal_closure,
-    mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
+    U.closure† = U† :=
+  LinearPMap.adjoint_closure_eq_adjoint h.1 h.2
 
 @[simp]
 lemma IsUnbounded.adjoint_adjoint_eq_closure [CompleteSpace H] [CompleteSpace H']
@@ -929,13 +948,5 @@ lemma isUnbounded_of_dense_of_isSymmetric' [CompleteSpace H]
     (mk E (E.subtype ∘ₗ f)).IsUnbounded :=
   ⟨hE, IsSymmetric.isClosable h hE⟩
 
-/-- The closure of a symmetric densely-defined operator is symmetric. -/
-lemma IsSymmetric.closure [CompleteSpace H] (hsym : T.IsSymmetric) (hdense : T.HasDenseDomain) :
-    T.closure.IsSymmetric := by
-  have hub : T.IsUnbounded := ⟨hdense, hsym.isClosable hdense⟩
-  have hadj_closed : T.adjoint.IsClosed := adjoint_isClosed hdense
-  rw [isSymmetric_iff_le_adjoint hdense.closure, hub.adjoint_closure_eq_adjoint]
-  rw [← hadj_closed.closure_eq]
-  exact hadj_closed.isClosable.closure_mono (hsym.le_adjoint hdense)
 
 end LinearPMap
