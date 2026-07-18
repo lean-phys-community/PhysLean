@@ -111,7 +111,7 @@ def lint_map(path, repository, verbose):
         counts["checked"] += 1
         for relative_file, claims in parse_location(location):
             if relative_file is None:
-                problems.append(f"req[{index}] UNPARSEABLE location: {location!r}")
+                problems.append(f"req[{index}] UNPARSABLE location: {location!r}")
                 continue
             source_path = repository / relative_file
             if not source_path.is_file():
@@ -156,7 +156,7 @@ def main():
             total[key] += value
         invalid = (
             counts["missing_file"] or counts["missing_name"] or
-            any("SCHEMA" in problem or "PARSE" in problem or "UNPARSEABLE" in problem
+            any("SCHEMA" in problem or "PARSE" in problem or "UNPARSABLE" in problem
                 for problem in problems)
         )
         failed = failed or invalid
