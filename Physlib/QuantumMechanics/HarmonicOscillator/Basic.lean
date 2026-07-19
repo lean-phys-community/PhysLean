@@ -109,6 +109,56 @@ lemma ξ_inv : (Q.ξ i)⁻¹ = √Q.m * √(Q.ω i) / √ℏ := by simp [ξ_eq]
 
 lemma ξ_inv' : (Q.ξ i)⁻¹ = Q.m * Q.ω i * Q.ξ i / ℏ := by field_simp; simp [ξ_sq, mul_assoc]
 
+/-!
+## C. The quadratic potential function
+-/
+
+section
+
+open Matrix
+
+/-!
+### C.1. Positive-definite matrix
+-/
+
+/-- The positive-definite matrix defining the quadratic potential function. -/
+def potentialMatrix : Matrix (Fin d) (Fin d) ℝ := diagonal ((2⁻¹ * Q.m) • Q.ω ^ 2)
+
+lemma potentialMatrix_eq : Q.potentialMatrix = diagonal ((2⁻¹ * Q.m) • Q.ω ^ 2) := rfl
+
+-- lemma potentialMatrix_isSymm : Q.potentialMatrix.IsSymm := by simp [potentialMatrix_eq]
+
+lemma potentialMatrix_isHermitian : Q.potentialMatrix.IsHermitian := by simp [potentialMatrix_eq]
+
+@[simp]
+lemma potentialMatrix_mulVec (v : Fin d → ℝ) :
+    Q.potentialMatrix *ᵥ v = (2⁻¹ * Q.m) • (Q.ω ^ 2 * v) := by
+  ext
+  simp [potentialMatrix_eq, smul_mulVec, mulVec_diagonal]
+
+/-!
+### C.2. Quadratic form
+-/
+
+/-- The positive-definite quadratic form associated to the potential matrix. -/
+def potentialQuadraticForm : QuadraticForm ℝ (Fin d → ℝ) := Q.potentialMatrix.toQuadraticForm'
+
+/-!
+### C.3. Potential function
+-/
+
+/-- The quadratic potential function, `½m · ∑ i, ωᵢ²·xᵢ²`. -/
+def potentialFunction : Space d → ℝ := Q.potentialQuadraticForm ∘ Space.val
+
+lemma potentialFunction_eq : Q.potentialFunction = Q.potentialQuadraticForm ∘ Space.val := rfl
+
+/-- The potential function for the harmonic oscillator is a.e. strongly measurable. -/
+informal_lemma potentialFunction_aestronglyMeasurable where
+  deps := [``HarmonicOscillator]
+  tag := "QM-HO-potAESM"
+
+end
+
 end HarmonicOscillator
 end QuantumMechanics
 end
