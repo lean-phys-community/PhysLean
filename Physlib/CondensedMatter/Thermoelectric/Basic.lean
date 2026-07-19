@@ -14,38 +14,54 @@ public import Mathlib.Tactic.Positivity
 
 ## i. Overview
 
-A thermoelectric material converts a temperature difference into electrical power.
-Its performance at absolute temperature `T` is captured by the dimensionless
-figure of merit
+A thermoelectric material converts a temperature difference into electrical
+power. In the linear-response (Onsager) regime, the coupled transport of
+charge and heat in an isotropic material is governed by the constitutive
+relations
 
-  zT = σ S² T / (κₗ + κₑ),
+  J = σ (E − S ∇T),        q = T S J − κ ∇T,
 
-where `S` is the Seebeck coefficient, `σ` the electrical conductivity, and
-`κₗ`, `κₑ` the lattice (phonon) and electronic contributions to the thermal
-conductivity. The numerator groups into the power factor `PF = σ S²`.
+so a thermoelectric material is characterized by exactly four transport
+coefficients: the Seebeck coefficient `S`, the electrical conductivity `σ`,
+and the thermal conductivity `κ = κl + κe`, split into its lattice (phonon)
+and electronic contributions because the two channels respond independently
+to material design. These four coefficients are collected in the structure
+`ThermoelectricMaterial`, and everything in this file is stated on it.
+
+The performance of the material at absolute temperature `T` is captured by
+the dimensionless figure of merit
+
+  zT = σ S² T / (κl + κe),
+
+whose numerator groups into the power factor `PF = σ S²`. Temperature is a
+state variable, not a material property, so `T` enters as an argument rather
+than a field.
 
 In this file all quantities are real numbers in a fixed consistent system of
 units, following the convention of `Physlib.Thermodynamics.IdealGas.Basic`.
 
 ## ii. Key results
 
+- `ThermoelectricMaterial`: the four linear-response transport coefficients
+  of a thermoelectric material, with their physical sign constraints.
 - `powerFactor`: the thermoelectric power factor `σ S²`.
-- `totalThermalConductivity`: the total thermal conductivity `κₗ + κₑ`.
+- `totalThermalConductivity`: the total thermal conductivity `κl + κe`.
 - `figureOfMerit`: the dimensionless figure of merit `zT`.
-- `figureOfMerit_eq`: the flat form `zT = σ S² T / (κₗ + κₑ)`.
-- `figureOfMerit_pos`: positivity of `zT` for a conducting material with a
-  nonzero Seebeck coefficient at positive temperature.
+- `figureOfMerit_eq`: the flat form `zT = σ S² T / (κl + κe)`.
+- `figureOfMerit_pos`: positivity of `zT` for a material with a nonzero
+  Seebeck coefficient at positive temperature.
 - `figureOfMerit_le_of_le`: lowering the lattice thermal conductivity raises
   `zT`, the phonon-glass electron-crystal design principle.
 
 ## iii. Table of contents
 
-- A. The power factor
-- B. The total thermal conductivity
-- C. The figure of merit
-  - C.1. Equalities for the figure of merit
-  - C.2. Positivity of the figure of merit
-  - C.3. Monotonicity in the lattice thermal conductivity
+- A. The thermoelectric material
+- B. The power factor
+- C. The total thermal conductivity
+- D. The figure of merit
+  - D.1. Equalities for the figure of merit
+  - D.2. Positivity of the figure of merit
+  - D.3. Monotonicity in the lattice thermal conductivity
 
 ## iv. References
 
@@ -62,104 +78,131 @@ noncomputable section
 
 namespace CondensedMatter
 
-namespace Thermoelectric
-
 /-!
 
-## A. The power factor
+## A. The thermoelectric material
+
+The four fields are the complete set of linear-response coefficients for
+coupled charge and heat transport in an isotropic material: no further
+material parameter enters the steady-state thermoelectric equations, and
+`zT` is a function of exactly these four together with the temperature.
+The sign constraints are physical: a thermoelectric material conducts
+charge (`0 < σ`) and its lattice conducts heat (`0 < κl`), while the
+electronic heat channel can be negligible but never negative (`0 ≤ κe`).
+The Seebeck coefficient is unconstrained: its sign records the carrier
+type (negative for electrons, positive for holes), and it vanishes at
+compensation points.
 
 -/
 
-/-- The thermoelectric power factor `PF = σ S²` of a material with Seebeck
-coefficient `S` and electrical conductivity `σ`. -/
-def powerFactor (S σ : ℝ) : ℝ := σ * S ^ 2
+/-- A thermoelectric material in the linear-response regime, characterized by
+its four transport coefficients. -/
+structure ThermoelectricMaterial where
+  /-- The Seebeck coefficient `S`: the voltage developed per unit temperature
+  difference. Its sign records the dominant carrier type. -/
+  S : ℝ
+  /-- The electrical conductivity `σ`. -/
+  σ : ℝ
+  /-- The lattice (phonon) contribution `κl` to the thermal conductivity. -/
+  κl : ℝ
+  /-- The electronic contribution `κe` to the thermal conductivity. -/
+  κe : ℝ
+  σ_pos : 0 < σ
+  κl_pos : 0 < κl
+  κe_nonneg : 0 ≤ κe
 
-/-- The power factor is positive for a conducting material (`0 < σ`) with a
-nonzero Seebeck coefficient. -/
-lemma powerFactor_pos {S σ : ℝ} (hσ : 0 < σ) (hS : S ≠ 0) :
-    0 < powerFactor S σ := by
+namespace ThermoelectricMaterial
+
+/-!
+
+## B. The power factor
+
+-/
+
+/-- The thermoelectric power factor `PF = σ S²` of a material. -/
+def powerFactor (M : ThermoelectricMaterial) : ℝ := M.σ * M.S ^ 2
+
+/-- The power factor is positive when the Seebeck coefficient is nonzero. -/
+lemma powerFactor_pos {M : ThermoelectricMaterial} (hS : M.S ≠ 0) :
+    0 < M.powerFactor := by
   unfold powerFactor
+  have hσ := M.σ_pos
   positivity
 
 /-!
 
-## B. The total thermal conductivity
+## C. The total thermal conductivity
 
 -/
 
-/-- The total thermal conductivity `κₗ + κₑ`, the sum of the lattice (phonon)
-contribution `κₗ` and the electronic contribution `κₑ`. -/
-def totalThermalConductivity (κl κe : ℝ) : ℝ := κl + κe
+/-- The total thermal conductivity `κl + κe` of a material, the sum of the
+lattice (phonon) and electronic contributions. -/
+def totalThermalConductivity (M : ThermoelectricMaterial) : ℝ := M.κl + M.κe
 
-/-- The total thermal conductivity is positive when the lattice contribution is
-positive and the electronic contribution is nonnegative. -/
-lemma totalThermalConductivity_pos {κl κe : ℝ} (hl : 0 < κl) (he : 0 ≤ κe) :
-    0 < totalThermalConductivity κl κe := by
-  unfold totalThermalConductivity
-  positivity
+/-- The total thermal conductivity is positive. -/
+lemma totalThermalConductivity_pos (M : ThermoelectricMaterial) :
+    0 < M.totalThermalConductivity :=
+  add_pos_of_pos_of_nonneg M.κl_pos M.κe_nonneg
 
 /-!
 
-## C. The figure of merit
+## D. The figure of merit
 
 -/
 
 /-- The dimensionless thermoelectric figure of merit
-`zT = PF · T / (κₗ + κₑ)` of a material with Seebeck coefficient `S`,
-electrical conductivity `σ`, lattice thermal conductivity `κl`, electronic
-thermal conductivity `κe`, at absolute temperature `T`. -/
-def figureOfMerit (S σ κl κe T : ℝ) : ℝ :=
-  powerFactor S σ * T / totalThermalConductivity κl κe
+`zT = PF · T / (κl + κe)` of a material at absolute temperature `T`. -/
+def figureOfMerit (M : ThermoelectricMaterial) (T : ℝ) : ℝ :=
+  M.powerFactor * T / M.totalThermalConductivity
 
 /-!
 
-### C.1. Equalities for the figure of merit
+### D.1. Equalities for the figure of merit
 
 -/
 
-/-- The figure of merit in its standard flat form `zT = σ S² T / (κₗ + κₑ)`. -/
-lemma figureOfMerit_eq (S σ κl κe T : ℝ) :
-    figureOfMerit S σ κl κe T = σ * S ^ 2 * T / (κl + κe) := by
+/-- The figure of merit in its standard flat form
+`zT = σ S² T / (κl + κe)`. -/
+lemma figureOfMerit_eq (M : ThermoelectricMaterial) (T : ℝ) :
+    M.figureOfMerit T = M.σ * M.S ^ 2 * T / (M.κl + M.κe) := by
   unfold figureOfMerit powerFactor totalThermalConductivity
   ring
 
 /-!
 
-### C.2. Positivity of the figure of merit
+### D.2. Positivity of the figure of merit
 
 -/
 
-/-- The figure of merit is positive for a conducting material (`0 < σ`) with a
-nonzero Seebeck coefficient at positive temperature, when the lattice thermal
-conductivity is positive and the electronic one nonnegative. -/
-lemma figureOfMerit_pos {S σ κl κe T : ℝ}
-    (hσ : 0 < σ) (hS : S ≠ 0)
-    (hl : 0 < κl) (he : 0 ≤ κe) (hT : 0 < T) :
-    0 < figureOfMerit S σ κl κe T :=
-  div_pos (mul_pos (powerFactor_pos hσ hS) hT)
-    (totalThermalConductivity_pos hl he)
+/-- The figure of merit is positive at positive temperature when the Seebeck
+coefficient is nonzero. -/
+lemma figureOfMerit_pos {M : ThermoelectricMaterial} {T : ℝ}
+    (hS : M.S ≠ 0) (hT : 0 < T) :
+    0 < M.figureOfMerit T :=
+  div_pos (mul_pos (powerFactor_pos hS) hT) M.totalThermalConductivity_pos
 
 /-!
 
-### C.3. Monotonicity in the lattice thermal conductivity
+### D.3. Monotonicity in the lattice thermal conductivity
 
 -/
 
 /-- Lowering the lattice thermal conductivity raises the figure of merit: if
-`κl ≤ κl'` then `zT(κl') ≤ zT(κl)`, all other properties held fixed. This is
-the phonon-glass electron-crystal design principle: scatter phonons without
-degrading electronic transport. -/
-lemma figureOfMerit_le_of_le {S σ κl κl' κe T : ℝ}
-    (hσ : 0 < σ) (hS : S ≠ 0)
-    (hl : 0 < κl) (he : 0 ≤ κe) (hT : 0 < T)
-    (h : κl ≤ κl') :
-    figureOfMerit S σ κl' κe T ≤ figureOfMerit S σ κl κe T := by
-  unfold figureOfMerit totalThermalConductivity
-  have hnum : 0 ≤ powerFactor S σ * T :=
-    le_of_lt (mul_pos (powerFactor_pos hσ hS) hT)
-  have hden : 0 < κl + κe := add_pos_of_pos_of_nonneg hl he
+`M.κl ≤ κl'` then the material with lattice conductivity `κl'` (all other
+coefficients equal) has the smaller `zT`. This is the phonon-glass
+electron-crystal design principle: scatter phonons without degrading
+electronic transport. -/
+lemma figureOfMerit_le_of_le (M : ThermoelectricMaterial) {κl' T : ℝ}
+    (hpos : 0 < κl') (h : M.κl ≤ κl') (hS : M.S ≠ 0) (hT : 0 < T) :
+    figureOfMerit { M with κl := κl', κl_pos := hpos } T ≤ M.figureOfMerit T := by
+  unfold figureOfMerit powerFactor totalThermalConductivity
+  have hnum : (0 : ℝ) ≤ M.σ * M.S ^ 2 * T := by
+    have hσ := M.σ_pos
+    have hs2 : 0 < M.S ^ 2 := by positivity
+    positivity
+  have hden : 0 < M.κl + M.κe := add_pos_of_pos_of_nonneg M.κl_pos M.κe_nonneg
   gcongr
 
-end Thermoelectric
+end ThermoelectricMaterial
 
 end CondensedMatter
