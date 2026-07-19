@@ -13,6 +13,29 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
 
 # The quantum harmonic oscillator
 
+## i. Overview
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Basic properties
+  - A.1. Positive mass
+  - A.2. Positive natural frequencies
+- B. Characteristic lengths
+- C. The quadratic potential function
+  - C.1. Positive-definite matrix
+  - C.2. Quadratic form
+  - C.3. Potential function
+- D. Hilbert space
+- E. Operators
+  - E.1. Kinetic energy
+  - E.2. Potential energy
+  - E.3. Hamiltonian
+- F. As a quantum system
+
+## iv. References
+
 -/
 
 @[expose] public section
