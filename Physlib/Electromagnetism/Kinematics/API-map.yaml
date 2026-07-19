@@ -26,8 +26,7 @@ ParentAPIs:
   - LorentzGroup (Physlib/Relativity/LorentzGroup)
 
 References:
-  - HEPLean/PhysLean issue "API - Electromagnetic potential"
-  - J. D. Jackson, Classical Electrodynamics, Chapter 6 (potentials and gauge transformations)
+  - J. D. Jackson, Classical Electrodynamics, 3rd ed., Sections 6.2-6.3 (vector and scalar potentials; gauge transformations)
 
 Requirements:
 
