@@ -13,9 +13,9 @@ public import Physlib.SpaceAndTime.Space.Derivatives.MatrixDiv
 
 ## i. Overview
 
-This module defines the generic momentum fields and conservative/convective momentum left-hand
-sides for fluid flow. The definitions do not choose a particular force law or stress model, so
-they can be reused by Navier-Stokes, Euler, and related systems.
+This module defines generic momentum fields for fluid flow and relates conservative momentum
+transport to mass density times material acceleration. The definitions do not choose a particular
+force law or stress model, so they can be reused by Navier-Stokes, Euler, and related systems.
 
 ## ii. Key results
 
@@ -23,16 +23,13 @@ they can be reused by Navier-Stokes, Euler, and related systems.
 - `FluidFlow.momentumFlux` : The convective momentum flux `rho u ⊗ u`.
 - `FluidFlow.convectiveTerm` : The nonlinear transport term `(u · ∇)u`.
 - `FluidFlow.materialAcceleration` : The material acceleration `∂ₜ u + (u · ∇)u`.
-- `FluidFlow.conservativeMomentumLHS` : The conservative momentum-balance left-hand side.
-- `FluidFlow.convectiveMomentumLHS` : The convective momentum-balance left-hand side.
-- `FluidFlow.conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul` :
-  The bridge between conservative and convective momentum forms.
+- `FluidFlow.momentumTransport_eq_materialAcceleration_add_continuityResidual` :
+  The momentum-transport identity relating conservative and convective quantities.
 
 ## iii. Table of contents
 
 - A. Momentum fields
-- B. Conservative and convective left-hand sides
-- C. Equivalence of conservative and convective momentum left-hand sides
+- B. Momentum transport identity
 
 ## iv. References
 
@@ -73,21 +70,7 @@ noncomputable def materialAcceleration (d : ℕ) (fluid : FluidFlow d) : VectorF
 
 /-!
 
-## B. Conservative and convective left-hand sides
-
--/
-
-/-- The left-hand side of the conservative momentum equation. -/
-noncomputable def conservativeMomentumLHS (d : ℕ) (fluid : FluidFlow d) : VectorField d :=
-  fun t x => ∂ₜ (momentumDensity d fluid · x) t + matrixDiv d (momentumFlux d fluid t) x
-
-/-- The left-hand side of the convective momentum equation. -/
-noncomputable def convectiveMomentumLHS (d : ℕ) (fluid : FluidFlow d) : VectorField d :=
-  fun t x => fluid.rho t x • materialAcceleration d fluid t x
-
-/-!
-
-## C. Equivalence of conservative and convective momentum left-hand sides
+## B. Momentum transport identity
 
 -/
 
@@ -171,21 +154,20 @@ lemma matrixDiv_momentumFlux (d : ℕ) (fluid : FluidFlow d)
         fluid.rho t x * (∑ j, fluid.velocity t x j * ∂[j] (fluid.velocity t) x i) := by
           ring
 
-/-- The algebraic bridge between conservative and convective momentum.
-
-The conservative momentum left-hand side equals the convective momentum left-hand side plus
-the continuity residual times the velocity field.
+/-- The conservative momentum transport terms equal mass density times material acceleration plus
+the continuity residual times velocity.
 -/
-lemma conservativeMomentumLHS_eq_convectiveMomentumLHS_add_continuityResidual_smul
+lemma momentumTransport_eq_materialAcceleration_add_continuityResidual
     (d : ℕ) (fluid : FluidFlow d)
     (t : Time) (x : Space d)
     (hRhoTime : DifferentiableAt ℝ (fluid.rho · x) t)
     (hVelocityTime : DifferentiableAt ℝ (fluid.velocity · x) t)
     (hMomentumDensity : Differentiable ℝ (momentumDensity d fluid t))
     (hVelocitySpace : Differentiable ℝ (fluid.velocity t)) :
-    conservativeMomentumLHS d fluid t x =
-      convectiveMomentumLHS d fluid t x + continuityResidual d fluid t x • fluid.velocity t x := by
-  rw [conservativeMomentumLHS, convectiveMomentumLHS, continuityResidual]
+    ∂ₜ (momentumDensity d fluid · x) t + matrixDiv d (momentumFlux d fluid t) x =
+      fluid.rho t x • materialAcceleration d fluid t x +
+        continuityResidual d fluid t x • fluid.velocity t x := by
+  rw [continuityResidual]
   rw [timeDeriv_momentumDensity d fluid t x hRhoTime hVelocityTime]
   rw [matrixDiv_momentumFlux d fluid t x hMomentumDensity hVelocitySpace]
   ext i
