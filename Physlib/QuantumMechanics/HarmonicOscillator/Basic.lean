@@ -15,6 +15,15 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
 
 ## i. Overview
 
+The harmonic oscillator is one of the most important examples in non-relativistic quantum mechanics.
+It describes a particle of mass `m` subject to a positive-definite quadratic potential
+in `d` dimensions.
+
+- `Basic.lean` : Properties of the potential, definition of isotropic oscillators,
+    kinetic, potential and Hamiltonian operators.
+- `LadderOperators.lean` : Definitions of the raising/lowering/number operators
+    and their algebraic properties.
+
 ## ii. Key results
 
 ## iii. Table of contents
@@ -27,12 +36,13 @@ public import Physlib.QuantumMechanics.QuantumSystem.Basic
   - C.1. Positive-definite matrix
   - C.2. Quadratic form
   - C.3. Potential function
-- D. Hilbert space
-- E. Operators
+- D. Isotropic oscillators
+- E. Hilbert space
+- F. Operators
   - E.1. Kinetic energy
   - E.2. Potential energy
   - E.3. Hamiltonian
-- F. As a quantum system
+- G. As a quantum system
 
 ## iv. References
 
@@ -138,8 +148,6 @@ def potentialMatrix : Matrix (Fin d) (Fin d) ℝ := diagonal ((2⁻¹ * Q.m) •
 
 lemma potentialMatrix_eq : Q.potentialMatrix = diagonal ((2⁻¹ * Q.m) • Q.ω ^ 2) := rfl
 
--- lemma potentialMatrix_isSymm : Q.potentialMatrix.IsSymm := by simp [potentialMatrix_eq]
-
 lemma potentialMatrix_isHermitian : Q.potentialMatrix.IsHermitian := by simp [potentialMatrix_eq]
 
 @[simp]
@@ -172,7 +180,7 @@ informal_lemma potentialFunction_aestronglyMeasurable where
 end
 
 /-!
-## C. Isotropic oscillators
+## D. Isotropic oscillators
 -/
 
 /-- A Harmonic oscillator is isotropic if all natural frequencies are equal. -/
@@ -183,26 +191,26 @@ lemma isIsotropic_def : Q.IsIsotropic ↔ ∀ i j, Q.ω i = Q.ω j := Iff.rfl
 lemma isIsotropic_of_one (Q : HarmonicOscillator 1) : Q.IsIsotropic := by simp [isIsotropic_def]
 
 /-!
-## D. Hilbert space
+## E. Hilbert space
 -/
 
-/-- The Hilbert space for the free particle. -/
+/-- The Hilbert space for the quantum harmonic oscillator. -/
 @[nolint unusedArguments]
 abbrev HS (_ : HarmonicOscillator d) : Type _ := SpaceDHilbertSpace d
 
 /-!
-## E. Operators
+## F. Operators
 -/
 
 /-!
-### E.1. Kinetic energy
+### F.1. Kinetic energy
 -/
 
 /-- The kinetic energy operator, `p²/2m`. -/
 def kineticOperator : Q.HS →ₗ.[ℂ] Q.HS := (2 * Q.m)⁻¹ • momentumSqOperator
 
 /-!
-### E.2. Potential energy
+### F.2. Potential energy
 -/
 
 section
@@ -220,7 +228,7 @@ informal_lemma potentialOperator_isSelfAdjoint where
 end
 
 /-!
-### E.3. Hamiltonian
+### F.3. Hamiltonian
 -/
 
 /-- The Hamiltonian for the harmonic oscillator. -/
@@ -234,7 +242,7 @@ informal_lemma hamiltonian_essentially_self_adjoint where
   tag := "QM-HO-hamESA"
 
 /-!
-## F. As a quantum system
+## G. As a quantum system
 -/
 
 /-- The `d`-dimensional harmonic oscillator as a quantum system
