@@ -183,14 +183,16 @@ def momentumSymbol (i : Fin d) : Space d → ℂ :=
 real symbol `2πℏ·ξᵢ`: `𝓕 (𝐩 i ψ) = momentumSymbol i · 𝓕 ψ`. -/
 lemma fourier_momentumCLM_eq (i : Fin d) (ψ : 𝓢(Space d, ℂ)) :
     𝓕 (𝐩 i ψ) = SchwartzMap.smulLeftCLM ℂ (momentumSymbol i) (𝓕 ψ) := by
-  rw [momentumCLM_eq_smul_lineDerivOp, FourierSMul.fourier_smul,
-    fourier_lineDerivOp_eq, smul_smul,
-    show (- Complex.I * ℏ) * (2 * Real.pi * Complex.I)
-      = ((2 * Real.pi * (ℏ : ℝ) : ℝ) : ℂ) by push_cast; ring_nf; simp [Complex.I_sq]]
+  have hscalar : (- Complex.I * ℏ) * (2 * Real.pi * Complex.I)
+      = ((2 * Real.pi * (ℏ : ℝ) : ℝ) : ℂ) := by
+    push_cast
+    linear_combination -(2 * Real.pi * ℏ : ℂ) * Complex.I_sq
+  rw [momentumCLM_eq_smul_lineDerivOp, FourierSMul.fourier_smul, fourier_lineDerivOp_eq, smul_smul,
+    hscalar]
   ext x
   rw [_root_.smul_apply, SchwartzMap.smulLeftCLM_apply_apply (by fun_prop),
     SchwartzMap.smulLeftCLM_apply_apply (momentumSymbol_hasTemperateGrowth i)]
-  simp [momentumSymbol, Space.coordCLM_apply, Space.coord, mul_comm, mul_assoc, Complex.real_smul]
+  simp [momentumSymbol, Space.coordCLM_apply, Space.coord, mul_comm, mul_assoc]
 
 end
 end QuantumMechanics
