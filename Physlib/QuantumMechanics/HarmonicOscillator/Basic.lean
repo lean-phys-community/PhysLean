@@ -85,6 +85,30 @@ lemma ω_nonneg : 0 ≤ Q.ω i := (Q.hω i).le
 @[simp]
 lemma ω_ne_zero : Q.ω i ≠ 0 := (Q.hω i).ne'
 
+/-!
+## B. Characteristic lengths
+-/
+
+/-- The characteristic length `ξ i ≔ √ℏ / (√Q.m * √(Q.ω i))`. -/
+def ξ : ℝ := √ℏ / (√Q.m * √(Q.ω i))
+
+lemma ξ_eq : Q.ξ i = √ℏ / (√Q.m * √(Q.ω i)) := rfl
+
+@[simp]
+lemma ξ_pos : 0 < Q.ξ i := by simp [ξ_eq]
+
+@[simp]
+lemma ξ_nonneg : 0 ≤ Q.ξ i := (Q.ξ_pos i).le
+
+@[simp]
+lemma ξ_ne_zero : Q.ξ i ≠ 0 := (Q.ξ_pos i).ne'
+
+lemma ξ_sq : (Q.ξ i) ^ 2 = ℏ / (Q.m * Q.ω i) := by rw [Q.ξ_eq]; field_simp; simp [← mul_rotate]
+
+lemma ξ_inv : (Q.ξ i)⁻¹ = √Q.m * √(Q.ω i) / √ℏ := by simp [ξ_eq]
+
+lemma ξ_inv' : (Q.ξ i)⁻¹ = Q.m * Q.ω i * Q.ξ i / ℏ := by field_simp; simp [ξ_sq, mul_assoc]
+
 end HarmonicOscillator
 end QuantumMechanics
 end
