@@ -245,5 +245,4 @@ lemma isEssentiallySelfAdjoint_of_defectNumber_eq_zero
   · exact hrange (by norm_num) hpos
 
 end IsSymmetric
-
 end LinearPMap

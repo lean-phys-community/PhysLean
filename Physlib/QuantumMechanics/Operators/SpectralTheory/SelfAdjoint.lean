@@ -118,24 +118,16 @@ variable {H H' : Type*}
 the two deficiency surjectivities of `A` all transfer through `u`. -/
 lemma unitaryConj_isSelfAdjoint (u : H ≃ₗᵢ[ℂ] H') {A : H →ₗ.[ℂ] H} (hA : IsSelfAdjoint A) :
     IsSelfAdjoint (A.unitaryConj u) := by
-  have hsurj {z : ℂ} (hz : z.im ≠ 0) (φ : H') :
-      ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ - z • (ψ : H') = φ := by
-    obtain ⟨ξ, hξ⟩ := unitaryConj_sub_smul_surjective (IsSelfAdjoint.sub_smul_surjective hA hz) φ
-    exact ⟨⟨(ξ : H'), (Submodule.mem_inf.mp ξ.2).1⟩, hξ⟩
-  have hplus (φ : H') : ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ + I • (ψ : H') = φ := by
-    simpa only [neg_smul, sub_neg_eq_add] using hsurj (z := -I) (by norm_num) φ
-  have hminus (φ : H') : ∃ ψ : (A.unitaryConj u).domain, A.unitaryConj u ψ - I • (ψ : H') = φ :=
-    hsurj (by norm_num) φ
+  have hrange {z : ℂ} (hz : z.im ≠ 0) : (A.unitaryConj u - z • 1).toFun.range = ⊤ :=
+    LinearMap.range_eq_top.mpr
+      (unitaryConj_sub_smul_surjective (IsSelfAdjoint.sub_smul_surjective hA hz))
   refine IsSymmetric.isSelfAdjoint_of_range_eq_top
     (IsFormalAdjoint.unitaryConj (IsSelfAdjoint.isSymmetric hA))
     (HasDenseDomain.unitaryConj_dense_domain (IsSelfAdjoint.dense_domain hA)) ?_ ?_
-  · rw [LinearMap.range_eq_top]
-    intro φ
-    obtain ⟨ψ, hψ⟩ := hplus φ
-    exact ⟨⟨(ψ : H'), Submodule.mem_inf.mpr ⟨ψ.2, Submodule.mem_top⟩⟩, hψ⟩
-  · rw [LinearMap.range_eq_top]
-    intro φ
-    obtain ⟨ψ, hψ⟩ := hminus φ
-    exact ⟨⟨(ψ : H'), Submodule.mem_inf.mpr ⟨ψ.2, Submodule.mem_top⟩⟩, hψ⟩
+  · have hI : A.unitaryConj u + I • 1 = A.unitaryConj u - (-I) • 1 :=
+      LinearPMap.ext rfl fun x hf hg => by simp [sub_apply, add_apply, smul_apply, sub_neg_eq_add]
+    rw [hI]
+    exact hrange (by norm_num)
+  · exact hrange (by norm_num)
 
 end LinearPMap

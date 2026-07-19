@@ -401,16 +401,6 @@ lemma adjoint_pow_le_pow_adjoint [CompleteSpace H] {n : ℕ} (h : (T ^ n).HasDen
     refine le_trans ?_ (adjoint_compRestricted_le_compRestricted_adjoint hTn h)
     exact pow_succ' T† n ▸ compRestricted_mono_right T† (ih hTn)
 
-/-- A densely-defined closable operator and its closure have the same adjoint. -/
-lemma adjoint_closure_eq_adjoint [CompleteSpace H] (hdense : U.HasDenseDomain)
-    (hcl : U.IsClosable) : U.closure† = U† := by
-  refine eq_of_eq_graph ?_
-  ext
-  rw [adjoint_graph_eq_graph_adjoint hdense, adjoint_graph_eq_graph_adjoint hdense.closure,
-    ← IsClosable.graph_closure_eq_closure_graph hcl,
-    mem_submodule_closure_adjoint_iff_mem_submoduleToLp_closure_orthogonal, orthogonal_closure,
-    mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
-
 /-!
 ### B.4. Continuity / boundedness
 -/
@@ -743,13 +733,18 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
   have hy : T₂ y = T₁ ⟨y, h_le.1 y.2⟩ := @h_le.2 y ⟨y, h_le.1 y.2⟩ rfl
   exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
 
-/-- The closure of a symmetric densely-defined operator is symmetric. -/
+/-- The closure of a symmetric densely-defined operator is symmetric: `T††` is a symmetric
+closed extension of `T`, so it extends `T.closure`, whose symmetry then descends. -/
 lemma IsSymmetric.closure [CompleteSpace H] (hsym : T.IsSymmetric) (hdense : T.HasDenseDomain) :
     T.closure.IsSymmetric := by
-  have hadj_closed : T.adjoint.IsClosed := adjoint_isClosed hdense
-  rw [isSymmetric_iff_le_adjoint hdense.closure,
-    adjoint_closure_eq_adjoint hdense (hsym.isClosable hdense), ← hadj_closed.closure_eq]
-  exact hadj_closed.isClosable.closure_mono (hsym.le_adjoint hdense)
+  have hle : T ≤ T† := (isSymmetric_def.mp hsym).le_adjoint hdense
+  have hadj_dense : T†.HasDenseDomain := hdense.mono hle.1
+  have hT_le : T ≤ T†† := (adjoint_isFormalAdjoint hdense).le_adjoint hadj_dense
+  have hc : (T††).IsClosed := adjoint_isClosed hadj_dense
+  have h1 : (T††).IsSymmetric :=
+    (isSymmetric_iff_le_adjoint (hdense.mono hT_le.1)).mpr
+      (adjoint_antitone (Or.inl (hdense.mono hT_le.1)) (adjoint_antitone (Or.inl hdense) hle))
+  exact h1.of_le (hc.closure_eq ▸ hc.isClosable.closure_mono hT_le)
 
 /-!
 ### C.2. Self-adjoint operators
@@ -903,8 +898,13 @@ lemma IsUnbounded.closure (h : U.IsUnbounded) : U.closure.IsUnbounded :=
 
 @[simp]
 lemma IsUnbounded.adjoint_closure_eq_adjoint [CompleteSpace H] (h : U.IsUnbounded) :
-    U.closure† = U† :=
-  LinearPMap.adjoint_closure_eq_adjoint h.1 h.2
+    U.closure† = U† := by
+  refine eq_of_eq_graph ?_
+  ext
+  rw [adjoint_graph_eq_graph_adjoint h.1, adjoint_graph_eq_graph_adjoint h.1.closure,
+    ← IsClosable.graph_closure_eq_closure_graph h.2,
+    mem_submodule_closure_adjoint_iff_mem_submoduleToLp_closure_orthogonal, orthogonal_closure,
+    mem_submodule_adjoint_iff_mem_submoduleToLp_orthogonal]
 
 @[simp]
 lemma IsUnbounded.adjoint_adjoint_eq_closure [CompleteSpace H] [CompleteSpace H']
