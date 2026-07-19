@@ -159,6 +159,17 @@ informal_lemma potentialFunction_aestronglyMeasurable where
 
 end
 
+/-!
+## C. Isotropic oscillators
+-/
+
+/-- A Harmonic oscillator is isotropic if all natural frequencies are equal. -/
+def IsIsotropic : Prop := ∀ i j, Q.ω i = Q.ω j
+
+lemma isIsotropic_def : Q.IsIsotropic ↔ ∀ i j, Q.ω i = Q.ω j := Iff.rfl
+
+lemma isIsotropic_of_one (Q : HarmonicOscillator 1) : Q.IsIsotropic := by simp [isIsotropic_def]
+
 end HarmonicOscillator
 end QuantumMechanics
 end
