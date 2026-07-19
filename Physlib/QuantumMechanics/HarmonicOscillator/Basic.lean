@@ -170,6 +170,67 @@ lemma isIsotropic_def : Q.IsIsotropic ↔ ∀ i j, Q.ω i = Q.ω j := Iff.rfl
 
 lemma isIsotropic_of_one (Q : HarmonicOscillator 1) : Q.IsIsotropic := by simp [isIsotropic_def]
 
+/-!
+## D. Hilbert space
+-/
+
+/-- The Hilbert space for the free particle. -/
+@[nolint unusedArguments]
+abbrev HS (_ : HarmonicOscillator d) : Type _ := SpaceDHilbertSpace d
+
+/-!
+## E. Operators
+-/
+
+/-!
+### E.1. Kinetic energy
+-/
+
+/-- The kinetic energy operator, `p²/2m`. -/
+def kineticOperator : Q.HS →ₗ.[ℂ] Q.HS := (2 * Q.m)⁻¹ • momentumSqOperator
+
+/-!
+### E.2. Potential energy
+-/
+
+section
+
+open MeasureTheory Complex
+
+/-- The potential operator which maps `ψ` to `Q.potentialFunction • ψ`. -/
+def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 volume (ofReal ∘ Q.potentialFunction)
+
+/-- The potential operators for the harmonic oscillator is self-adjoint. -/
+informal_lemma potentialOperator_isSelfAdjoint where
+  deps := [``HarmonicOscillator.potentialFunction_aestronglyMeasurable]
+  tag := "QM-HO-potSA"
+
+end
+
+/-!
+### E.3. Hamiltonian
+-/
+
+/-- The Hamiltonian for the harmonic oscillator. -/
+def hamiltonian : Q.HS →ₗ.[ℂ] Q.HS := Q.kineticOperator + Q.potentialOperator
+
+lemma hamiltonain_eq : Q.hamiltonian = Q.kineticOperator + Q.potentialOperator := rfl
+
+/-- The Hamiltonian for the harmonic oscillator is essentially self-adjoint. -/
+informal_lemma hamiltonian_essentially_self_adjoint where
+  deps := [``HarmonicOscillator.hamiltonian]
+  tag := "QM-HO-hamESA"
+
+/-!
+## F. As a quantum system
+-/
+
+/-- The `d`-dimensional harmonic oscillator as a quantum system
+  (self-adjoint Hamiltonian acting on a Hilbert space). -/
+informal_definition toQuantumSystem where
+  deps := [``HarmonicOscillator.hamiltonian_essentially_self_adjoint]
+  tag := "QM-HO-sys"
+
 end HarmonicOscillator
 end QuantumMechanics
 end
