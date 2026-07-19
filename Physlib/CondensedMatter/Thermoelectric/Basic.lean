@@ -35,7 +35,10 @@ the dimensionless figure of merit
 
 whose numerator groups into the power factor `PF = σ S²`. Temperature is a
 state variable, not a material property, so `T` enters as an argument rather
-than a field.
+than a field. The four coefficients of a real material are themselves
+temperature-dependent, so a `ThermoelectricMaterial` should be read as a
+material at an operating point, its coefficients evaluated at the same
+temperature at which `zT` is evaluated.
 
 In this file all quantities are real numbers in a fixed consistent system of
 units, following the convention of `Physlib.Thermodynamics.IdealGas.Basic`.
@@ -126,6 +129,7 @@ def powerFactor (M : ThermoelectricMaterial) : ℝ := M.σ * M.S ^ 2
 lemma powerFactor_pos {M : ThermoelectricMaterial} (hS : M.S ≠ 0) :
     0 < M.powerFactor := by
   unfold powerFactor
+  -- `positivity` does not look through the projection, so name the field.
   have hσ := M.σ_pos
   positivity
 
@@ -191,14 +195,15 @@ lemma figureOfMerit_pos {M : ThermoelectricMaterial} {T : ℝ}
 `M.κl ≤ κl'` then the material with lattice conductivity `κl'` (all other
 coefficients equal) has the smaller `zT`. This is the phonon-glass
 electron-crystal design principle: scatter phonons without degrading
-electronic transport. -/
+electronic transport. Note the hypotheses: no condition on the Seebeck
+coefficient is needed, since monotonicity only requires the numerator
+`σ S² T` to be nonnegative. -/
 lemma figureOfMerit_le_of_le (M : ThermoelectricMaterial) {κl' T : ℝ}
-    (hpos : 0 < κl') (h : M.κl ≤ κl') (hS : M.S ≠ 0) (hT : 0 < T) :
+    (hpos : 0 < κl') (h : M.κl ≤ κl') (hT : 0 ≤ T) :
     figureOfMerit { M with κl := κl', κl_pos := hpos } T ≤ M.figureOfMerit T := by
   unfold figureOfMerit powerFactor totalThermalConductivity
   have hnum : (0 : ℝ) ≤ M.σ * M.S ^ 2 * T := by
     have hσ := M.σ_pos
-    have hs2 : 0 < M.S ^ 2 := by positivity
     positivity
   have hden : 0 < M.κl + M.κe := add_pos_of_pos_of_nonneg M.κl_pos M.κe_nonneg
   gcongr
