@@ -106,8 +106,10 @@ public import Physlib.Mathematics.LinearPMap
 public import Physlib.Mathematics.List
 public import Physlib.Mathematics.List.InsertIdx
 public import Physlib.Mathematics.List.InsertionSort
+public import Physlib.Mathematics.OrthogonalMatrix
 public import Physlib.Mathematics.PiTensorProduct
 public import Physlib.Mathematics.RatComplexNum
+public import Physlib.Mathematics.Resolvent
 public import Physlib.Mathematics.SO3.Basic
 public import Physlib.Mathematics.SchurTriangulation
 public import Physlib.Mathematics.SpecialFunctions.PhysHermite
@@ -278,6 +280,7 @@ public import Physlib.QFT.QED.AnomalyCancellation.VectorLike
 public import Physlib.QuantumMechanics.FiniteTarget
 public import Physlib.QuantumMechanics.FreeParticle.Basic
 public import Physlib.QuantumMechanics.HarmonicOscillator.Basic
+public import Physlib.QuantumMechanics.HarmonicOscillator.LadderOperators
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Basic
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Completeness
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Eigenfunction
@@ -290,6 +293,8 @@ public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.PlaneWaves
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.PositionStates
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.SchwartzSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Basic
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.DirichletSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Fourier
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PolyBddSchwartzSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 public import Physlib.QuantumMechanics.Hydrogen.Basic
@@ -318,6 +323,7 @@ public import Physlib.QuantumMechanics.Operators.Unbounded
 public import Physlib.QuantumMechanics.Operators.Uncertainty
 public import Physlib.QuantumMechanics.PlanckConstant
 public import Physlib.QuantumMechanics.QuantumSystem.Basic
+public import Physlib.QuantumMechanics.RectangularBarrier.Basic
 public import Physlib.QuantumMechanics.ReflectionlessPotential.Basic
 public import Physlib.QuantumMechanics.SpaceDQuantumSystem
 public import Physlib.Relativity.Bispinors.Basic

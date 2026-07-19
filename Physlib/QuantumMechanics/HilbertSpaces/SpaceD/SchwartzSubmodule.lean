@@ -14,17 +14,25 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Basic
 ## i. Overview
 
 In this module we define the Schwartz submodule of `SpaceDHilbertSpace d μ`.
+`SchwartzSubmodule d μ` consists of the `μ`-a.e. equal equivalence classes of Schwartz maps
+on `Space d`.
+
+This is an import subspace of the Hilbert space. For one, the Fourier transform maps the Schwartz
+submodule into itself. It also is a convenient dense domain on which to define derivative operators.
 
 ## ii. Key results
 
 - `SchwartzSubmodule d μ`: Submodule of `SpaceDHilbertSpace d μ` consisting of the L² equivalence
   classes of Schwartz maps `𝓢(Space d, ℂ)`.
+- `SchwartzSubmoduleOn Ω μ`: The projection of `SchwartzSubmodule d μ`
+  onto `SpaceDHilbertSpaceOn Ω μ`.
 
 ## iii. Table of contents
 
-- A. Definitions
-- B. Coercions
-- D. Misc.
+- A. SchwartzSubmodule
+  - A.1. Coercions
+  - A.2. Misc.
+- B. SchwartzSubmoduleOn
 
 ## iv. References
 
@@ -32,17 +40,17 @@ In this module we define the Schwartz submodule of `SpaceDHilbertSpace d μ`.
 
 @[expose] public section
 
-namespace QuantumMechanics
-namespace SpaceDHilbertSpace
-
 noncomputable section
+namespace QuantumMechanics
 
 open MeasureTheory
 open InnerProductSpace
 open SchwartzMap
 
+namespace SpaceDHilbertSpace
+
 /-!
-## A. Definitions
+## A. SchwartzSubmodule
 -/
 
 /-- The continuous linear map including Schwartz maps into `SpaceDHilbertSpace d μ`. -/
@@ -69,7 +77,7 @@ variable {μ : Measure (Space d)} [μ.HasTemperateGrowth] [μ.IsOpenPosMeasure]
 variable (f g : 𝓢(Space d, ℂ)) (ψ : SchwartzSubmodule d μ)
 
 /-!
-## B. Coercions
+### A.1. Coercions
 -/
 
 instance : CoeFun (SchwartzSubmodule d μ) fun _ ↦ Space d → ℂ := ⟨fun ψ ↦ ψ.val⟩
@@ -86,7 +94,7 @@ lemma schwartzEquiv_ae_eq (h : schwartzEquiv μ f =ᵐ[μ] schwartzEquiv μ g) :
   (EmbeddingLike.apply_eq_iff_eq _).mp (SetLike.coe_eq_coe.mp (ext_iff.mpr h))
 
 /-!
-## C. Misc.
+### A.2. Misc.
 -/
 
 @[simp]
@@ -128,6 +136,33 @@ lemma schwartzIncl_ker : (schwartzIncl μ).ker = (⊥ : Submodule ℂ 𝓢(Space
   ext; simp [← schwartzEquiv_apply_coe]
 
 end SchwartzSubmodule
-end
 end SpaceDHilbertSpace
+
+/-!
+## B. SchwartzSubmoduleOn
+-/
+
+namespace SpaceDHilbertSpaceOn
+
+open SpaceDHilbertSpace
+
+/-- The projection of `SchwartzSubmodule d μ` onto `SpaceDHilbertSpaceOn Ω μ`. -/
+abbrev SchwartzSubmoduleOn
+    {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d) := volume) [μ.HasTemperateGrowth] :
+    Submodule ℂ (SpaceDHilbertSpaceOn Ω μ) :=
+  (SchwartzSubmodule d μ).map (subspaceProjection Ω μ)
+
+namespace SchwartzSubmoduleOn
+
+variable {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d)) [μ.HasTemperateGrowth]
+
+variable {Ω μ} in
+lemma mem_iff {ψ : SpaceDHilbertSpaceOn Ω μ} :
+    ψ ∈ SchwartzSubmoduleOn Ω μ ↔ ∃ φ : SchwartzSubmodule d μ, subspaceProjection Ω μ φ = ψ := by
+  simp
+
+end SchwartzSubmoduleOn
+end SpaceDHilbertSpaceOn
+
 end QuantumMechanics
+end

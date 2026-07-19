@@ -849,6 +849,19 @@ lemma IsSymmetric.of_le (h₁ : T₁.IsSymmetric) (h_le : T₂ ≤ T₁) : T₂.
   have hy : T₂ y = T₁ ⟨y, h_le.1 y.2⟩ := @h_le.2 y ⟨y, h_le.1 y.2⟩ rfl
   exact hx ▸ hy ▸ h₁ ⟨x, h_le.1 x.2⟩ ⟨y, h_le.1 y.2⟩
 
+/-- The closure of a symmetric densely-defined operator is symmetric: `T††` is a symmetric
+closed extension of `T`, so it extends `T.closure`, whose symmetry then descends. -/
+lemma IsSymmetric.closure [CompleteSpace H] (hsym : T.IsSymmetric) (hdense : T.HasDenseDomain) :
+    T.closure.IsSymmetric := by
+  have hle : T ≤ T† := (isSymmetric_def.mp hsym).le_adjoint hdense
+  have hadj_dense : T†.HasDenseDomain := hdense.mono hle.1
+  have hT_le : T ≤ T†† := (adjoint_isFormalAdjoint hdense).le_adjoint hadj_dense
+  have hc : (T††).IsClosed := adjoint_isClosed hadj_dense
+  have h1 : (T††).IsSymmetric :=
+    (isSymmetric_iff_le_adjoint (hdense.mono hT_le.1)).mpr
+      (adjoint_antitone (Or.inl (hdense.mono hT_le.1)) (adjoint_antitone (Or.inl hdense) hle))
+  exact h1.of_le (hc.closure_eq ▸ hc.isClosable.closure_mono hT_le)
+
 /-- A LinearPMap constructed from a symmetric LinearMap with dense domain
   is an unbounded operator. -/
 lemma isUnbounded_of_dense_of_isSymmetric [CompleteSpace H] {E : Submodule ℂ H}
@@ -904,12 +917,18 @@ lemma IsSelfAdjoint.real_smul [CompleteSpace H] (h : IsSelfAdjoint T) {r : ℝ} 
 lemma IsSelfAdjoint.neg [CompleteSpace H] (h : IsSelfAdjoint T) : IsSelfAdjoint (-T) :=
   neg_eq_neg_one_smul T ▸ smul h (by norm_num) (by norm_num)
 
-/-- Self-adjointness from surjectivity of `T ± i`. A symmetric (`T.IsSymmetric`),densely-defined
-operator `T` for which `T + i` and `T - i` are both surjective onto `H`, is self-adjoint. -/
-lemma IsSelfAdjoint.of_surjective_add_sub [CompleteSpace H] (hsym : T.IsSymmetric)
-    (hdense : Dense (T.domain : Set H))
-    (hplus : ∀ φ : H, ∃ ψ : T.domain, T ψ + I • (ψ : H) = φ)
-    (hminus : ∀ φ : H, ∃ ψ : T.domain, T ψ - I • (ψ : H) = φ) : IsSelfAdjoint T := by
+/-- Self-adjointness from surjectivity of `T ± i`: a symmetric, densely-defined operator `T` for
+which `T + I • 1` and `T - I • 1` both have full range is self-adjoint. -/
+lemma IsSymmetric.isSelfAdjoint_of_range_eq_top [CompleteSpace H] (hsym : T.IsSymmetric)
+    (hdense : T.HasDenseDomain)
+    (hadd : (T + I • 1).toFun.range = ⊤) (hsub : (T - I • 1).toFun.range = ⊤) :
+    IsSelfAdjoint T := by
+  have hplus : ∀ φ : H, ∃ ψ : T.domain, T ψ + I • (ψ : H) = φ := fun φ => by
+    obtain ⟨ψ, hψ⟩ := LinearMap.range_eq_top.mp hadd φ
+    exact ⟨⟨(ψ : H), (Submodule.mem_inf.mp ψ.2).1⟩, hψ⟩
+  have hminus : ∀ φ : H, ∃ ψ : T.domain, T ψ - I • (ψ : H) = φ := fun φ => by
+    obtain ⟨ψ, hψ⟩ := LinearMap.range_eq_top.mp hsub φ
+    exact ⟨⟨(ψ : H), (Submodule.mem_inf.mp ψ.2).1⟩, hψ⟩
   rw [isSelfAdjoint_def]
   have hle : T ≤ T.adjoint := (isSymmetric_def.mp hsym).le_adjoint hdense
   apply le_antisymm _ hle

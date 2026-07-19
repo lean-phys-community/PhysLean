@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Gregory J. Loges. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Gregory J. Loges
+Authors: Adam Bornemann, Gregory J. Loges
 -/
 module
 
@@ -27,11 +27,15 @@ simply reinterprets the numerical range as a subset of ℝ.
     all complex numbers with non-zero imaginary part.
 - `regularityDomain_isConnected_iff` : The regularity domain of a symmetric operator is connected
     if and only if it contains a real number.
+- `IsSymmetric.isEssentiallySelfAdjoint_of_defectNumber_eq_zero` : The basic criterion for
+    essential self-adjointness: symmetric + densely defined + vanishing defect numbers at `± i`.
 
 ## iii. Table of contents
 
 - A. Numerical range
 - B. Regularity domain
+- C. Point spectrum
+- D. Essential self-adjointness
 
 ## iv. References
 
@@ -213,6 +217,32 @@ lemma pointSpectrum_real : σᵖ T ⊆ range ofReal := by
     _ = ⟪↑x, (T - z • 1) x + z • x⟫_ℂ := by simp [sub_apply]
     _ = ⟪x, z • x⟫_ℂ := by simp [← toFun_eq_coe, LinearMap.mem_ker.mp hx]
     _ = ↑(‖x‖ ^ 2) * z := by simp [inner_smul_right, mul_comm]
+
+/-!
+## D. Essential self-adjointness
+-/
+
+variable [CompleteSpace H]
+
+/-- The basic criterion for essential self-adjointness: a symmetric, densely-defined operator
+whose defect numbers at `I` and `-I` both vanish is essentially self-adjoint. -/
+lemma isEssentiallySelfAdjoint_of_defectNumber_eq_zero
+    (hdense : T.HasDenseDomain) (hpos : T.defectNumber I = 0) (hneg : T.defectNumber (-I) = 0) :
+    T.IsEssentiallySelfAdjoint := by
+  have hrange {z : ℂ} (hz : z.im ≠ 0) (hd : T.defectNumber z = 0) :
+      (T.closure - z • 1).toFun.range = ⊤ := by
+    have hz' : z ∈ T.regularityDomain := hT.mem_regularityDomain_of_im_ne_zero hz
+    have hcl : T.closure.IsClosed := (hT.isClosable hdense).closure_isClosed
+    rw [← hcl.defectNumber_eq_zero_iff (T.regularityDomain_closure ▸ hz'),
+      defectNumber_closure hz']
+    exact hd
+  rw [isEssentiallySelfAdjoint_def]
+  apply (hT.closure hdense).isSelfAdjoint_of_range_eq_top hdense.closure
+  · have hI : T.closure + I • 1 = T.closure - (-I) • 1 :=
+      LinearPMap.ext rfl fun x hf hg => by simp [sub_apply, add_apply, smul_apply, sub_neg_eq_add]
+    rw [hI]
+    exact hrange (by norm_num) hneg
+  · exact hrange (by norm_num) hpos
 
 end IsSymmetric
 end LinearPMap

@@ -101,29 +101,18 @@ subset of `y` and `x` is complete, then `y` is also complete.
 
 lemma isComplete_mono {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) (hx : IsComplete x) :
     IsComplete y := by
-  simp [IsComplete] at *
   rw [subset_def] at h
+  obtain ⟨hd, hu, h5, h10⟩ := h
+  obtain ⟨hxd, hxu, hx5, hx10⟩ := hx
   refine ⟨?_, ?_, ?_, ?_⟩
-  · by_contra hn
-    simp only [Bool.not_eq_true, Option.isSome_eq_false_iff, Option.isNone_iff_eq_none] at hn
-    have h1 := h.1
-    have hx1 := hx.1
-    rw [Option.isSome_iff_exists] at hx1
-    obtain ⟨a, ha⟩ := hx1
-    rw [hn, ha] at h1
-    simp at h1
-  · by_contra hn
-    simp only [Bool.not_eq_true, Option.isSome_eq_false_iff, Option.isNone_iff_eq_none] at hn
-    have h1 := h.2.1
-    have hx1 := hx.2.1
-    rw [Option.isSome_iff_exists] at hx1
-    obtain ⟨a, ha⟩ := hx1
-    rw [hn, ha] at h1
-    simp at h1
-  · by_contra hn
-    simp_all
-  · by_contra hn
-    simp_all
+  · obtain ⟨a, ha⟩ := Option.isSome_iff_exists.mp hxd
+    rw [ha, Option.toFinset_some, Finset.singleton_subset_iff, Option.mem_toFinset] at hd
+    exact Option.isSome_of_mem hd
+  · obtain ⟨a, ha⟩ := Option.isSome_iff_exists.mp hxu
+    rw [ha, Option.toFinset_some, Finset.singleton_subset_iff, Option.mem_toFinset] at hu
+    exact Option.isSome_of_mem hu
+  · exact fun hy => hx5 (Finset.subset_empty.mp (hy ▸ h5))
+  · exact fun hy => hx10 (Finset.subset_empty.mp (hy ▸ h10))
 
 /-!
 

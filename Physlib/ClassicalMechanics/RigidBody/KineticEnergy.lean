@@ -7,6 +7,7 @@ module
 
 public import Physlib.ClassicalMechanics.RigidBody.AngularMomentum
 public import Physlib.ClassicalMechanics.RigidBody.AngularVelocity
+public import Physlib.Mathematics.OrthogonalMatrix
 /-!
 
 # Kinetic energy of a rigid body
@@ -169,5 +170,28 @@ theorem kineticEnergy_eq_translational_add_angularVelocity (M : RigidBodyMotion 
   congr 2
   ext y
   simp only [cmap_apply, M.deriv_orientation_mulVec_eq_angularVelocity_cross y t hR]
+
+/-- **König's theorem** in the body frame. The total kinetic energy `M.kineticEnergy t`, formed from
+the lab-frame point velocities, splits at the centre of mass (`centerOfMass = 0`) as
+`T = ½ M ⟪V, V⟫ + rotationalKineticEnergy ω_body`. The rotational energy is a frame-independent
+scalar, so it is evaluated here from the *body-frame* angular velocity `ω_body`: the spatial form
+`|Ṙ (y − c)|²` and the body form `|ω_body × (y − c)|²` agree because
+`Ṙ (y − c) = R (ω_body × (y − c))` and `R`, being orthogonal, preserves the norm. -/
+theorem kineticEnergy_eq_translational_add_bodyAngularVelocity (M : RigidBodyMotion 3) (t : Time)
+    (h : M.mass ≠ 0) (hR : DifferentiableAt ℝ (fun s => (M.orientation s).1) t)
+    (hc : M.centerOfMass = 0) :
+    M.kineticEnergy t
+      = (1 / (2 : ℝ)) * M.mass * (⟪M.centerOfMassVelocity t, M.centerOfMassVelocity t⟫_ℝ)
+        + M.toRigidBody.rotationalKineticEnergy (M.bodyAngularVelocity t) := by
+  rw [M.kineticEnergy_eq_translational_add_rotational t h,
+    RigidBody.rotationalKineticEnergy_eq_integral]
+  congr 1
+  congr 2
+  ext y
+  have hy : (fun j => (y : Fin 3 → ℝ) j - M.centerOfMass j) = (y : Fin 3 → ℝ) := by
+    simp [hc]
+  simp only [cmap_apply, ContMDiffMap.coeFn_mk]
+  rw [hy, M.deriv_orientation_mulVec_eq_orientation_bodyAngularVelocity_cross (y : Fin 3 → ℝ) t hR,
+    Matrix.dotProduct_mulVec_orthogonal (mul_eq_one_comm.mp (M.orientation_mul_transpose t))]
 
 end RigidBodyMotion

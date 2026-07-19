@@ -8,7 +8,6 @@ module
 public import Physlib.QuantumMechanics.Operators.OneDimension.Parity
 public import Physlib.QuantumMechanics.Operators.OneDimension.Momentum
 public import Physlib.QuantumMechanics.Operators.OneDimension.Position
-public import Physlib.Meta.TODO.Basic
 /-!
 
 # 1d Harmonic Oscillator
@@ -77,20 +76,22 @@ open MeasureTheory
 variable (Q : HarmonicOscillator)
 
 @[simp]
-lemma m_mul_ω_div_two_ℏ_pos : 0 < Q.m * Q.ω / (2 * ℏ) := by
-  apply div_pos
-  · exact mul_pos Q.hm Q.hω
-  · exact mul_pos (by norm_num) ℏ_pos
+lemma m_pos : 0 < Q.m := Q.hm
 
 @[simp]
-lemma m_mul_ω_div_ℏ_pos : 0 < Q.m * Q.ω / ℏ := by
-  apply div_pos
-  · exact mul_pos Q.hm Q.hω
-  · exact ℏ_pos
+lemma m_nonneg : 0 ≤ Q.m := Q.hm.le
 
-lemma m_ne_zero : Q.m ≠ 0 := by
-  have h1 := Q.hm
-  linarith
+@[simp]
+lemma m_ne_zero : Q.m ≠ 0 := Q.hm.ne'
+
+@[simp]
+lemma ω_pos : 0 < Q.ω := Q.hω
+
+@[simp]
+lemma ω_nonneg : 0 ≤ Q.ω := Q.hω.le
+
+@[simp]
+lemma ω_ne_zero : Q.ω ≠ 0 := Q.hω.ne'
 
 /-!
 
@@ -137,7 +138,7 @@ lemma ξ_inverse : Q.ξ⁻¹ = √(Q.m * Q.ω / ℏ) := by
 
 lemma one_over_ξ_sq : (1/Q.ξ)^2 = Q.m * Q.ω / ℏ := by
   rw [one_over_ξ]
-  refine Real.sq_sqrt (le_of_lt Q.m_mul_ω_div_ℏ_pos)
+  exact Real.sq_sqrt (by simp [div_nonneg])
 
 @[inherit_doc momentumOperator]
 scoped[QuantumMechanics.OneDimension.HarmonicOscillator] notation "Pᵒᵖ" => momentumOperator

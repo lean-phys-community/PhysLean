@@ -21,17 +21,16 @@ square-integrable with respect to `μ`, i.e. `∫ x, ‖f x‖ ^ 2 ∂μ` is fin
 in the same equivalence class if they are `μ`-a.e. equal.
 
 Given `SpaceDHilbertSpace d μ` and `Ω : Set (Space d)`, the Hilbert space
-`SpaceDHilbertSpace d (μ.restrict Ω)` may be interpreted as the sub-Hilbert space
-consisting of those vectors with domain contained in `Ω`.
-The reason is that for each `f` in `SpaceDHilbertSpace d (μ.restrict Ω)` we have
-`f =ᵐ[μ.restrict Ω] Ω.indicator f`, namely the equivalence class of `f` always
+`SpaceDHilbertSpaceOn Ω μ ≔ SpaceDHilbertSpace d (μ.restrict Ω)` may be interpreted as the
+sub-Hilbert space consisting of those vectors with domain contained in `Ω`.
+The reason is that for each `ψ` in `SpaceDHilbertSpaceOn Ω μ` we have
+`ψ =ᵐ[μ.restrict Ω] Ω.indicator ψ`, namely the equivalence class of `ψ` always
 contains a representative which vanishes on the complement of `Ω`.
-The linear isometry `restrictIncl Ω` defined below describes this sub-Hilbert space relationship
-by mapping each `f` to this special representative in its equivalence class.
+The linear isometry `restrictIncl Ω μ` describes this sub-Hilbert space relationship
+by mapping each `ψ` to this special representative in its equivalence class.
 
-Similarly, we may project `SpaceDHilbertSpace d μ` onto the sub-Hilbert space
-`SpaceDHilbertSpace d (μ.restrict Ω)` by enlarging the equivalence classes, essentially dropping
-information about the functions on the complement of `Ω`.
+Similarly, we may project `SpaceDHilbertSpace d μ` onto `SpaceDHilbertSpaceOn Ω μ` by enlarging the
+equivalence classes, essentially dropping information about the functions on the complement of `Ω`.
 
 ## ii. Key results
 
@@ -40,20 +39,19 @@ information about the functions on the complement of `Ω`.
     sends each ket to its corresponding bra and _vice versa_.
 - `MemHS f μ` : The proposition capturing exactly when the function `f : Space d → ℂ` can be lifted
     to an element of the Hilbert space.
-- `subspaceProjection` : The projection of `SpaceDHilbertSpace d μ` onto a sub-Hilbert space
-    `SpaceDHilbertSpace d (μ.restrict Ω)`.
-- `restrictIncl Ω` : The linear isometry including `SpaceDHilbertSpace d (μ.restrict Ω)`
+- `subspaceProjection` : The projection of `SpaceDHilbertSpace d μ` onto `SpaceDHilbertSpaceOn Ω μ`.
+- `subspaceIncl` : The linear isometry including `SpaceDHilbertSpaceOn Ω μ`
     as a sub-Hilbert space of `SpaceDHilbertspace d μ`.
 
 ## iii. Table of contents
 
-- A. Definition
-- B. Dual space
-- C. Membership
-- D. Construction of elements
-- E. Coersions
-- F. Sub-Hilbert spaces
-- G. Misc.
+- A. SpaceDHilbertSpace
+  - A.1. Dual space
+  - A.2. Membership
+  - A.3. Construction of elements
+  - A.4. Coersions
+  - A.5. Misc.
+- B. SpaceDHilbertSpaceOn
 
 ## iv. References
 
@@ -68,7 +66,7 @@ namespace QuantumMechanics
 open Function InnerProductSpace MeasureTheory Measure Set
 
 /-!
-## A. Definition
+## A. SpaceDHilbertSpace
 -/
 
 /-- The Hilbert space for single-particle quantum mechanics on `Space d` with measure `μ`
@@ -86,7 +84,7 @@ variable {ψ φ} in
 lemma ext_iff : ψ = φ ↔ ψ =ᵐ[μ] φ := Lp.ext_iff
 
 /-!
-## B. Dual space
+### A.1. Dual space
 -/
 
 /-- The anti-linear equivalence between `SpaceDHilbertSpace d μ` and its dual.
@@ -103,7 +101,7 @@ lemma toBra_symm_apply (f : StrongDual ℂ (SpaceDHilbertSpace d μ)) : ⟪toBra
   toDual_symm_apply
 
 /-!
-## C. Membership
+### A.2. Membership
 -/
 
 /-- For a function `f : Space d → ℂ`, the proposition `MemHS f μ` means that the function `f`
@@ -146,9 +144,8 @@ lemma MemHS.indicator {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (hf : MemHS 
     MemHS (Ω.indicator f) μ :=
   MemLp.indicator hΩ hf
 
-/-- If `f` is a member of the sub-Hilbert space `SpaceDHilbertSpace d (μ.restrict Ω)`
-  of `SpaceDHilbertSpace d μ` then the representative `Ω.indicator f` which vanishes outside `Ω`
-  is a member of the full Hilbert space. -/
+/-- If `f` is a member of the Hilbert space `SpaceDHilbertSpaceOn Ω μ` then the representative
+  `Ω.indicator f` which vanishes outside `Ω` is a member of `SpaceDHilbertSpace d μ`. -/
 lemma MemHS.indicator_of_restrict
     {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (hf : MemHS f (μ.restrict Ω)) :
     MemHS (Ω.indicator f) μ := by
@@ -158,7 +155,7 @@ lemma MemHS.indicator_of_restrict
   by_cases x ∈ Ω <;> simp_all
 
 /-!
-## D. Construction of elements
+### A.3. Construction of elements
 -/
 
 section
@@ -197,7 +194,7 @@ lemma inner_mk_mk : ⟪mk hf, mk hg⟫_ℂ = ∫ x, starRingEnd ℂ (f x) * g x 
 end
 
 /-!
-## E. Coersions
+### A.4. Coersions
 -/
 
 section
@@ -215,13 +212,45 @@ lemma coeFn_smul : ⇑(c • ψ) =ᵐ[μ] c • ψ := Lp.coeFn_smul _ _
 end
 
 /-!
-## F. Sub-Hilbert spaces
+### A.5. Misc.
 -/
 
-/-- The linear map projecting `SpaceDHilbertSpace d μ` onto the sub-Hilbert space
-  `SpaceDHilbertSpace d (μ.restrict Ω)`. -/
-def subspaceProjection (Ω : Set (Space d)) :
-    SpaceDHilbertSpace d μ →ₗ[ℂ] SpaceDHilbertSpace d (μ.restrict Ω) where
+open Filter in
+lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
+    {α : Type*} {l : Filter α} {ψ : α → SpaceDHilbertSpace d μ} :
+    Tendsto ψ l (nhds 0) ↔ Tendsto (fun a ↦ ∫⁻ x, ‖ψ a x‖ₑ ^ 2 ∂μ) l (nhds 0) := by
+  trans Tendsto (fun a ↦ (∫⁻ x, ‖ψ a x‖ₑ ^ 2 ∂μ) ^ (2⁻¹ : ℝ)) l (nhds 0)
+  · simp [tendsto_iff_edist_tendsto_0, edist_zero_right, Lp.enorm_def, eLpNorm, eLpNorm']
+  constructor <;> intro h
+  · apply Tendsto.ennrpow_const 2 at h
+    simp_all [← ENNReal.rpow_mul_natCast]
+  · apply Tendsto.ennrpow_const 2⁻¹ at h
+    simp_all
+
+end SpaceDHilbertSpace
+
+/-!
+## B. SpaceDHilbertSpaceOn
+-/
+
+TODO "Upgrade subspaceProjection to a ContinuousLinearMap when Lp.LpToLpOfMeasureLeSMul
+  becomes available."
+
+/-- The Hilbert space for single-particle quantum mechanics on a set `Ω ⊆ Space d` with measure `μ`
+  is defined to be `SpaceDHilbertSpace d (μ.restrict Ω)`, the space of `μ`-a.e. equal on `Ω`
+  equivalence classes of functions `f : Space d → ℂ` for which `∫ x on Ω, ‖f x‖² ∂μ` is finite. -/
+abbrev SpaceDHilbertSpaceOn {d : ℕ} (Ω : Set (Space d)) (μ : Measure (Space d) := volume) :=
+  SpaceDHilbertSpace d (μ.restrict Ω)
+
+namespace SpaceDHilbertSpaceOn
+
+open SpaceDHilbertSpace
+
+variable {d : ℕ} (Ω : Set (Space d)) (hΩ : MeasurableSet Ω) (μ : Measure (Space d))
+variable (ψ : SpaceDHilbertSpace d μ) (φ : SpaceDHilbertSpaceOn Ω μ)
+
+/-- The linear map projecting `SpaceDHilbertSpace d μ` onto `SpaceDHilbertSpaceOn Ω μ`. -/
+def subspaceProjection : SpaceDHilbertSpace d μ →ₗ[ℂ] SpaceDHilbertSpaceOn Ω μ where
   toFun ψ := mk ((memHS_coe ψ).restrict Ω)
   map_add' ψ φ := by
     rw [← mk_add, mk_eq_iff]
@@ -230,20 +259,20 @@ def subspaceProjection (Ω : Set (Space d)) :
     rw [← mk_const_smul, mk_eq_iff]
     exact (coeFn_smul c ψ).filter_mono ae_restrict_le
 
-lemma subspaceProjection_apply (Ω : Set (Space d)) (ψ : SpaceDHilbertSpace d μ) :
-    subspaceProjection Ω ψ =ᵐ[μ.restrict Ω] ψ :=
+variable {μ} in
+lemma subspaceProjection_apply : subspaceProjection Ω μ ψ =ᵐ[μ.restrict Ω] ψ :=
   coeFn_mk ((memHS_coe ψ).restrict Ω)
 
-lemma subspaceProjection_norm_le (Ω : Set (Space d)) (ψ : SpaceDHilbertSpace d μ) :
-    ‖subspaceProjection Ω ψ‖ ≤ ‖ψ‖ := by
+lemma subspaceProjection_norm_le : ‖subspaceProjection Ω μ ψ‖ ≤ ‖ψ‖ := by
   refine ENNReal.toReal_mono (Lp.eLpNorm_ne_top ψ) ?_
   refine (eLpNorm_congr_ae (subspaceProjection_apply Ω ψ)).trans_le ?_
   exact eLpNorm_mono_measure ψ restrict_le_self
 
-/-- The linear isometry including `SpaceDHilbertSpace d (μ.restrict Ω)` as a sub-Hilbert space of
-  `SpaceDHilbertSpace d μ` defined by mapping `ψ` to `Ω.indicator ψ`. -/
-def subspaceIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
-    SpaceDHilbertSpace d (μ.restrict Ω) →ₗᵢ[ℂ] SpaceDHilbertSpace d μ where
+variable {Ω}
+
+/-- The linear isometry including `SpaceDHilbertSpaceOn Ω μ` as a sub-Hilbert space of
+  `SpaceDHilbertSpace d μ`, defined by mapping `ψ` to `Ω.indicator ψ`. -/
+def subspaceIncl : SpaceDHilbertSpaceOn Ω μ →ₗᵢ[ℂ] SpaceDHilbertSpace d μ where
   toFun ψ := mk ((memHS_coe ψ).indicator_of_restrict hΩ)
   map_add' ψ φ := by
     rw [← mk_add, mk_eq_iff, ← indicator_add']
@@ -257,47 +286,28 @@ def subspaceIncl {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
       _ = (eLpNorm (Ω.indicator ψ) 2 μ).toReal := congrArg _ (eLpNorm_congr_ae (coeFn_mk _))
       _ = ‖ψ‖ := congrArg _ (eLpNorm_indicator_eq_eLpNorm_restrict hΩ)
 
-lemma subspaceIncl_apply
-    {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
-    subspaceIncl hΩ ψ =ᵐ[μ] Ω.indicator ψ :=
-  coeFn_mk ((memHS_coe ψ).indicator_of_restrict hΩ)
+variable {μ} in
+lemma subspaceIncl_apply : subspaceIncl hΩ μ φ =ᵐ[μ] Ω.indicator φ :=
+  coeFn_mk ((memHS_coe φ).indicator_of_restrict hΩ)
 
-lemma leftInverse_subspaceProjection {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
-    LeftInverse (subspaceProjection (μ := μ) Ω) (subspaceIncl hΩ) := by
+lemma leftInverse_subspaceProjection :
+    LeftInverse (subspaceProjection Ω μ) (subspaceIncl hΩ μ) := by
   intro ψ
   apply ext_iff.mpr
-  have h := subspaceProjection_apply Ω (subspaceIncl hΩ ψ)
+  have h := subspaceProjection_apply Ω (subspaceIncl hΩ μ ψ)
   rw [ae_eq_restrict_iff_indicator_ae_eq hΩ] at *
   filter_upwards [subspaceIncl_apply hΩ ψ, h] with x
   by_cases x ∈ Ω <;> simp_all
 
 @[simp]
-lemma subspaceProjection_subspaceIncl_apply
-    {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) (ψ : SpaceDHilbertSpace d (μ.restrict Ω)) :
-    subspaceProjection Ω (subspaceIncl hΩ ψ) = ψ :=
-  leftInverse_subspaceProjection hΩ ψ
+lemma subspaceProjection_subspaceIncl_apply : subspaceProjection Ω μ (subspaceIncl hΩ μ φ) = φ :=
+  leftInverse_subspaceProjection hΩ μ φ
 
-lemma subspaceProjection_surjective {Ω : Set (Space d)} (hΩ : MeasurableSet Ω) :
-    Surjective (subspaceProjection (μ := μ) Ω) :=
-  (leftInverse_subspaceProjection hΩ).surjective
+include hΩ in
+lemma subspaceProjection_surjective : Surjective (subspaceProjection Ω μ) :=
+  (leftInverse_subspaceProjection hΩ μ).surjective
 
-/-!
-## G. Misc.
--/
+end SpaceDHilbertSpaceOn
 
-open Filter
-
-lemma tendsto_zero_iff_tendsto_zero_lintegral_enorm_sq
-    {α : Type*} {l : Filter α} {ψ : α → SpaceDHilbertSpace d μ} :
-    Tendsto ψ l (nhds 0) ↔ Tendsto (fun a ↦ ∫⁻ x, ‖ψ a x‖ₑ ^ 2 ∂μ) l (nhds 0) := by
-  trans Tendsto (fun a ↦ (∫⁻ x, ‖ψ a x‖ₑ ^ 2 ∂μ) ^ (2⁻¹ : ℝ)) l (nhds 0)
-  · simp [tendsto_iff_edist_tendsto_0, edist_zero_right, Lp.enorm_def, eLpNorm, eLpNorm']
-  constructor <;> intro h
-  · apply Tendsto.ennrpow_const 2 at h
-    simp_all [← ENNReal.rpow_mul_natCast]
-  · apply Tendsto.ennrpow_const 2⁻¹ at h
-    simp_all
-
-end SpaceDHilbertSpace
 end QuantumMechanics
 end
