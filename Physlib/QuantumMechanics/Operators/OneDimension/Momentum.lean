@@ -117,11 +117,11 @@ lemma planeWaveFunctional_generalized_eigenvector_momentumOperatorUnbounded (k :
 
 /-!
 
-## The momentum operator is self adjoint
+## The momentum operator is symmetric
 
 -/
 
-lemma momentumOperatorUnbounded_isSelfAdjoint : momentumOperatorUnbounded.IsSelfAdjoint := by
+lemma momentumOperatorUnbounded_isSymmetric : momentumOperatorUnbounded.IsSymmetric := by
   intro ψ1 ψ2
   have hint : ∀ f g : 𝓢(ℝ, ℂ),
       MeasureTheory.Integrable (fun x => star (f x) * g x) MeasureTheory.volume :=

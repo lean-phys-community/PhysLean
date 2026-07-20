@@ -62,8 +62,12 @@ lemma isGeneralizedEigenvector_ofSelfCLM_iff {Op : S →L[ℂ] S}
 
 open InnerProductSpace
 
-/-- The condition on an unbounded operator to be self-adjoint. -/
-def IsSelfAdjoint : Prop :=
+/-- The condition for an unbounded operator to be *symmetric* (equivalently, formally
+self-adjoint): `⟪U ψ1, ι ψ2⟫ = ⟪ι ψ1, U ψ2⟫` for all `ψ1 ψ2`. This is the Hermitian
+pairing on the underlying space `S`; on its own it does **not** imply genuine
+self-adjointness (`A† = A`, including equality of domains), which for an unbounded
+operator on a proper dense core is strictly stronger. -/
+def IsSymmetric : Prop :=
   ∀ ψ1 ψ2 : S, ⟪U ψ1, ι ψ2⟫_ℂ = ⟪ι ψ1, U ψ2⟫_ℂ
 
 end UnboundedOperator

@@ -93,12 +93,12 @@ lemma positionStates_generalized_eigenvector_positionOperatorUnbounded (x : ℝ)
 
 /-!
 
-## Position operator is self adjoint
+## Position operator is symmetric
 
 -/
 
-lemma positionOperatorUnbounded_isSelfAdjoint :
-    positionOperatorUnbounded.IsSelfAdjoint := by
+lemma positionOperatorUnbounded_isSymmetric :
+    positionOperatorUnbounded.IsSymmetric := by
   intro ψ1 ψ2
   dsimp [positionOperatorUnbounded]
   rw [schwartzIncl_inner, schwartzIncl_inner]

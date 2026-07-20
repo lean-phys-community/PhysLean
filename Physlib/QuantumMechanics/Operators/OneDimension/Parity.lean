@@ -93,14 +93,14 @@ lemma parityOperatorSchwartz_parityOperatorSchwartz (ψ : 𝓢(ℝ, ℂ)) :
 
 /-!
 
-## Parity operator is self adjoint
+## Parity operator is symmetric
 
 -/
 
 open InnerProductSpace
 
-lemma parityOperatorUnbounded_isSelfAdjoint :
-    parityOperatorUnbounded.IsSelfAdjoint := by
+lemma parityOperatorUnbounded_isSymmetric :
+    parityOperatorUnbounded.IsSymmetric := by
   intro ψ1 ψ2
   dsimp [parityOperatorUnbounded]
   rw [schwartzIncl_inner, schwartzIncl_inner]
