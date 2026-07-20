@@ -104,7 +104,7 @@ lemma mem_mulOperator_domain_iff
   Iff.rfl
 
 lemma mulOperator_apply_ae {μ : Measure (Space d)} {f : Space d → ℂ} (ψ : (𝓜 μ f).domain) :
-    (𝓜 μ f) ψ =ᵐ[μ] f • ψ :=
+    𝓜 μ f ψ =ᵐ[μ] f • ψ :=
   coeFn_mk ψ.prop
 
 /-!
@@ -365,6 +365,25 @@ lemma mulOperator_neg (μ : Measure (Space d)) (f : Space d → ℂ) : 𝓜 μ (
 /-!
 ### E.2. Add & sub
 -/
+
+lemma mulOperator_add_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
+    𝓜 μ f + 𝓜 μ g ≤ 𝓜 μ (f + g) := by
+  refine le_of_le_graph fun u h ↦ ?_
+  rw [mem_graph_iff] at *
+  obtain ⟨⟨v, hv⟩, hvu, hvu'⟩ := h
+  have hv' : v ∈ (𝓜 μ (f + g)).domain := by
+    rw [add_domain, Submodule.mem_inf] at hv
+    simpa [add_mul, mem_mulOperator_domain_iff] using hv.1.add hv.2
+  refine ⟨⟨v, hv'⟩, hvu, ?_⟩
+  rw [← hvu', ext_iff]
+  change _ =ᵐ[μ] 𝓜 μ f ⟨v, hv.1⟩ + 𝓜 μ g ⟨v, hv.2⟩
+  filter_upwards [mulOperator_apply_ae ⟨v, hv.1⟩, mulOperator_apply_ae ⟨v, hv.2⟩,
+    mulOperator_apply_ae ⟨v, hv'⟩, coeFn_add (𝓜 μ f ⟨v, hv.1⟩) (𝓜 μ g ⟨v, hv.2⟩)]
+  simp_all [add_mul]
+
+lemma mulOperator_sub_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
+    𝓜 μ f - 𝓜 μ g ≤ 𝓜 μ (f - g) :=
+  le_of_eq_of_le (by simp [sub_eq_add_neg]) (mulOperator_add_ge μ f (-g))
 
 /-!
 ### E.3. Composition
