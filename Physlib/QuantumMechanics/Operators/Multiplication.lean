@@ -34,7 +34,11 @@ In this module we introduce unbounded operators defined by multiplication by a f
 - C. Adjoint
   - C.1. Self-adjoint
 - D. Closable & unbounded
-- E. Composition
+- E. Structural properties
+  - E.1. Smul
+  - E.2. Add & sub
+  - E.3. Composition
+- F. Spectrum
 
 ## iv. References
 
@@ -326,7 +330,19 @@ lemma mulOperator_isUnbounded {μ : Measure (Space d)} [IsFiniteMeasureOnCompact
   ⟨mulOperator_hasDenseDomain hf, mulOperator_isClosable hf⟩
 
 /-!
-## E. Composition
+## E. Structural properties
+-/
+
+/-!
+### E.1. Smul & neg
+-/
+
+/-!
+### E.2. Add & sub
+-/
+
+/-!
+### E.3. Composition
 -/
 
 lemma mulOperator_compRestricted_le (μ : Measure (Space d)) (f g : Space d → ℂ) :
