@@ -96,18 +96,10 @@ def matrixToFun :
     Matrix (HSIndex ℋ) (HSIndex ℋ) ℂ ≃ₗ[ℂ] HSCoordFun ℋ where
   toFun M p := M p.1 p.2
   invFun f i j := f (i, j)
-  map_add' M N := by
-    ext ⟨i, j⟩
-    rfl
-  map_smul' c M := by
-    ext ⟨i, j⟩
-    rfl
-  left_inv M := by
-    ext i j
-    rfl
-  right_inv f := by
-    ext ⟨i, j⟩
-    rfl
+  map_add' M N := by rfl
+  map_smul' c M := by rfl
+  left_inv M := by rfl
+  right_inv f := by rfl
 
 noncomputable def matrixToCoords :
     Matrix (HSIndex ℋ) (HSIndex ℋ) ℂ ≃ₗ[ℂ] HSCoords ℋ :=
@@ -132,19 +124,7 @@ omit [CompleteSpace ℋ] in
     toHSCoordsLinearEquiv (ℋ := ℋ) T (i, j) =
       LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
         (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-        ((hsLinearMapEquiv (ℋ := ℋ)) T) i j := by
-  change hsCoordsLinearEquiv (toHSCoordsLinearEquiv (ℋ := ℋ) T) (i, j) =
-    LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-      (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-      ((hsLinearMapEquiv (ℋ := ℋ)) T) i j
-  let f : HSCoordFun ℋ := fun p =>
-    LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-      (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-      ((hsLinearMapEquiv (ℋ := ℋ)) T) p.1 p.2
-  have h : hsCoordsLinearEquiv (toHSCoordsLinearEquiv (ℋ := ℋ) T) = f := by
-    simp [toHSCoordsLinearEquiv, matrixToCoords, matrixToFun, f]
-  have hEval := congrArg (fun g : HSCoordFun ℋ => g (i, j)) h
-  simpa [f] using hEval
+        ((hsLinearMapEquiv (ℋ := ℋ)) T) i j := rfl
 
 instance : NormedAddCommGroup (HSOp ℋ) :=
   NormedAddCommGroup.induced (HSOp ℋ) (HSCoords ℋ)
@@ -157,50 +137,26 @@ instance : Inner ℂ (HSOp ℋ) where
   inner T S := inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) T) (toHSCoordsLinearEquiv (ℋ := ℋ) S)
 
 instance : InnerProductSpace ℂ (HSOp ℋ) where
-  norm_sq_eq_re_inner T := by
-    change ‖toHSCoordsLinearEquiv (ℋ := ℋ) T‖ ^ 2 =
-      Complex.re (inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) T)
-        (toHSCoordsLinearEquiv (ℋ := ℋ) T))
-    simpa using
-      (inner_self_eq_norm_sq (𝕜 := ℂ) (toHSCoordsLinearEquiv (ℋ := ℋ) T)).symm
-  conj_inner_symm T S := by
-    change star (inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) S)
-      (toHSCoordsLinearEquiv (ℋ := ℋ) T)) =
-      inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) T) (toHSCoordsLinearEquiv (ℋ := ℋ) S)
-    simp [inner_conj_symm (toHSCoordsLinearEquiv (ℋ := ℋ) T)
-      (toHSCoordsLinearEquiv (ℋ := ℋ) S)]
+  norm_sq_eq_re_inner T :=
+    (inner_self_eq_norm_sq (𝕜 := ℂ) (toHSCoordsLinearEquiv (ℋ := ℋ) T)).symm
+  conj_inner_symm T S :=
+    inner_conj_symm (toHSCoordsLinearEquiv (ℋ := ℋ) T) (toHSCoordsLinearEquiv (ℋ := ℋ) S)
   add_left T S R := by
-    change inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) (T + S))
-      (toHSCoordsLinearEquiv (ℋ := ℋ) R) =
-      inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) T)
-        (toHSCoordsLinearEquiv (ℋ := ℋ) R) +
-      inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) S)
-        (toHSCoordsLinearEquiv (ℋ := ℋ) R)
-    simp [inner_add_left, map_add]
+    show inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) (T + S)) (toHSCoordsLinearEquiv (ℋ := ℋ) R) = _
+    rw [map_add, inner_add_left]
+    rfl
   smul_left T S z := by
-    change inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) (z • T))
-      (toHSCoordsLinearEquiv (ℋ := ℋ) S) =
-      star z * inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) T)
-        (toHSCoordsLinearEquiv (ℋ := ℋ) S)
-    simp [inner_smul_left, map_smul]
+    show inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) (z • T)) (toHSCoordsLinearEquiv (ℋ := ℋ) S) = _
+    rw [map_smul, inner_smul_left]
+    rfl
 
 /-- Hilbert-Schmidt coordinates as a linear isometry. -/
 noncomputable def toHSCoordsLinearIsometryEquiv :
     HSOp ℋ ≃ₗᵢ[ℂ] HSCoords ℋ :=
-  LinearEquiv.isometryOfInner (toHSCoordsLinearEquiv (ℋ := ℋ)) <| by
-    intro T S
-    change inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) T)
-      (toHSCoordsLinearEquiv (ℋ := ℋ) S) =
-      inner ℂ T S
-    rfl
+  LinearEquiv.isometryOfInner (toHSCoordsLinearEquiv (ℋ := ℋ)) fun _ _ => rfl
 
 instance : CompleteSpace (HSOp ℋ) :=
-  let e : HSOp ℋ ≃ HSCoords ℋ :=
-    (toHSCoordsLinearIsometryEquiv.toContinuousLinearEquiv.toLinearEquiv.toEquiv)
-  (completeSpace_congr (e := e) <| by
-    exact
-      (toHSCoordsLinearIsometryEquiv.toContinuousLinearEquiv.isUniformEmbedding)).2
-    inferInstance
+  (toHSCoordsLinearIsometryEquiv (ℋ := ℋ)).toIsometryEquiv.completeSpace
 
 instance : ContinuousSMul ℂ (HSOp ℋ) :=
   (toHSCoordsLinearIsometryEquiv (ℋ := ℋ)).isometry.isUniformInducing.isInducing.continuousSMul
@@ -273,28 +229,10 @@ private lemma hsInner_eq_pairSum (X Y : L ℋ) :
         star
           (LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
             (hsOrthonormalBasis (ℋ := ℋ)).toBasis X.toLinearMap p.1 p.2) := by
-  have hXfun :
-      ((toHSCoordsLinearEquiv (ℋ := ℋ) (ofOp X) : HSCoords ℋ).ofLp : HSCoordFun ℋ) =
-        fun p =>
-          LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-            (hsOrthonormalBasis (ℋ := ℋ)).toBasis X.toLinearMap p.1 p.2 := by
-    funext p
-    change (toHSCoordsLinearEquiv (ℋ := ℋ) (ofOp X) :
-      EuclideanSpace ℂ (HSIndex ℋ × HSIndex ℋ)) p = _
-    exact toHSCoordsLinearEquiv_apply_apply (ℋ := ℋ) (T := ofOp X) p.1 p.2
-  have hYfun :
-      ((toHSCoordsLinearEquiv (ℋ := ℋ) (ofOp Y) : HSCoords ℋ).ofLp : HSCoordFun ℋ) =
-        fun p =>
-          LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-            (hsOrthonormalBasis (ℋ := ℋ)).toBasis Y.toLinearMap p.1 p.2 := by
-    funext p
-    change (toHSCoordsLinearEquiv (ℋ := ℋ) (ofOp Y) :
-      EuclideanSpace ℂ (HSIndex ℋ × HSIndex ℋ)) p = _
-    exact toHSCoordsLinearEquiv_apply_apply (ℋ := ℋ) (T := ofOp Y) p.1 p.2
   change inner ℂ (toHSCoordsLinearEquiv (ℋ := ℋ) (ofOp X))
       (toHSCoordsLinearEquiv (ℋ := ℋ) (ofOp Y)) = _
-  rw [EuclideanSpace.inner_eq_star_dotProduct, hXfun, hYfun]
-  simp [dotProduct]
+  simp only [PiLp.inner_apply, RCLike.inner_apply]
+  rfl
 
 private lemma trace_star_mul_eq_pairSum (X Y : L ℋ) :
     LinearMap.trace ℂ ℋ ((star X * Y).toLinearMap) =
@@ -305,69 +243,34 @@ private lemma trace_star_mul_eq_pairSum (X Y : L ℋ) :
           (LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
             (hsOrthonormalBasis (ℋ := ℋ)).toBasis X.toLinearMap p.1 p.2) := by
   let b := hsOrthonormalBasis (ℋ := ℋ)
+  rw [LinearMap.trace_eq_sum_inner ((star X * Y).toLinearMap) b, Fintype.sum_prod_type,
+    Finset.sum_comm]
+  refine Finset.sum_congr rfl fun i _ => ?_
   calc
-    LinearMap.trace ℂ ℋ ((star X * Y).toLinearMap)
-        = ∑ i : HSIndex ℋ, ∑ j : HSIndex ℋ,
-            LinearMap.toMatrix b.toBasis b.toBasis Y.toLinearMap j i *
-              star (LinearMap.toMatrix b.toBasis b.toBasis X.toLinearMap j i) := by
-            rw [LinearMap.trace_eq_sum_inner ((star X * Y).toLinearMap) b]
-            apply Finset.sum_congr rfl
-            intro i hi
-            calc
-              inner ℂ (b i) (((star X * Y).toLinearMap) (b i)) = inner ℂ (X (b i)) (Y (b i)) := by
-                simpa [ContinuousLinearMap.star_eq_adjoint] using
-                  (ContinuousLinearMap.adjoint_inner_right (A := X) (x := b i) (y := Y (b i)))
-              _ = ∑ j : HSIndex ℋ, inner ℂ (X (b i)) (b j) * inner ℂ (b j) (Y (b i)) := by
-                symm
-                exact OrthonormalBasis.sum_inner_mul_inner b (X (b i)) (Y (b i))
-              _ = ∑ j : HSIndex ℋ,
-                    LinearMap.toMatrix b.toBasis b.toBasis Y.toLinearMap j i *
-                      star (LinearMap.toMatrix b.toBasis b.toBasis X.toLinearMap j i) := by
-                  apply Finset.sum_congr rfl
-                  intro j hj
-                  simp [LinearMap.toMatrix_apply, OrthonormalBasis.repr_apply_apply, mul_comm]
-    _ = ∑ p : HSIndex ℋ × HSIndex ℋ,
-          LinearMap.toMatrix b.toBasis b.toBasis Y.toLinearMap p.1 p.2 *
-            star (LinearMap.toMatrix b.toBasis b.toBasis X.toLinearMap p.1 p.2) := by
-          rw [Finset.sum_comm]
-          symm
-          simpa [Finset.univ_product_univ] using
-            (Finset.sum_product' (s := (Finset.univ : Finset (HSIndex ℋ)))
-              (t := (Finset.univ : Finset (HSIndex ℋ)))
-              (f := fun j i =>
-                LinearMap.toMatrix b.toBasis b.toBasis Y.toLinearMap j i *
-                  star (LinearMap.toMatrix b.toBasis b.toBasis X.toLinearMap j i)))
+    inner ℂ (b i) (((star X * Y).toLinearMap) (b i)) = inner ℂ (X (b i)) (Y (b i)) := by
+      simpa [ContinuousLinearMap.star_eq_adjoint] using
+        ContinuousLinearMap.adjoint_inner_right (A := X) (x := b i) (y := Y (b i))
+    _ = ∑ j : HSIndex ℋ, inner ℂ (X (b i)) (b j) * inner ℂ (b j) (Y (b i)) :=
+      (OrthonormalBasis.sum_inner_mul_inner b (X (b i)) (Y (b i))).symm
+    _ = _ := Finset.sum_congr rfl fun j _ => by
+      simp [b, LinearMap.toMatrix_apply, OrthonormalBasis.repr_apply_apply, mul_comm]
 
 lemma hsInner_eq_trace (X Y : L ℋ) :
-    inner ℂ (ofOp X) (ofOp Y) = LinearMap.trace ℂ ℋ ((star X * Y).toLinearMap) := by
-  calc
-    inner ℂ (ofOp X) (ofOp Y)
-        = ∑ p : HSIndex ℋ × HSIndex ℋ,
-            LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-              (hsOrthonormalBasis (ℋ := ℋ)).toBasis Y.toLinearMap p.1 p.2 *
-            star
-              (LinearMap.toMatrix (hsOrthonormalBasis (ℋ := ℋ)).toBasis
-                (hsOrthonormalBasis (ℋ := ℋ)).toBasis X.toLinearMap p.1 p.2) :=
-          hsInner_eq_pairSum (X := X) (Y := Y)
-    _ = LinearMap.trace ℂ ℋ ((star X * Y).toLinearMap) := by
-          symm
-          exact trace_star_mul_eq_pairSum (X := X) (Y := Y)
+    inner ℂ (ofOp X) (ofOp Y) = LinearMap.trace ℂ ℋ ((star X * Y).toLinearMap) :=
+  (hsInner_eq_pairSum X Y).trans (trace_star_mul_eq_pairSum X Y).symm
 
 lemma re_hsInner_eq_traceRe (X Y : L ℋ) :
     Complex.re (inner ℂ (ofOp X) (ofOp Y)) =
-      Complex.re (LinearMap.trace ℂ ℋ ((star X * Y).toLinearMap)) := by
-  simpa using congrArg Complex.re (hsInner_eq_trace (X := X) (Y := Y))
+      Complex.re (LinearMap.trace ℂ ℋ ((star X * Y).toLinearMap)) :=
+  congrArg Complex.re (hsInner_eq_trace X Y)
 
 @[simp] lemma leftMulHS_star (A : L ℋ) :
     star (leftMulHS (ℋ := ℋ) A) = leftMulHS (ℋ := ℋ) (star A) := by
   rw [eq_comm, ContinuousLinearMap.star_eq_adjoint]
-  refine (ContinuousLinearMap.eq_adjoint_iff
-    (A := leftMulHS (ℋ := ℋ) (star A)) (B := leftMulHS (ℋ := ℋ) A)).2 ?_
-  intro X Y
+  refine (ContinuousLinearMap.eq_adjoint_iff _ _).2 fun X Y => ?_
   change inner ℂ (ofOp ((star A) * toOp X)) (ofOp (toOp Y)) =
     inner ℂ (ofOp (toOp X)) (ofOp (A * toOp Y))
-  rw [hsInner_eq_trace]
-  rw [hsInner_eq_trace]
+  rw [hsInner_eq_trace, hsInner_eq_trace]
   simp [mul_assoc]
 
 omit [CompleteSpace ℋ] in
@@ -386,91 +289,46 @@ omit [CompleteSpace ℋ] in
 
 lemma leftMulHS_nonneg {A : L ℋ} (hA0 : 0 ≤ A) :
     0 ≤ leftMulHS (ℋ := ℋ) A := by
-  have hApos : A.IsPositive := (ContinuousLinearMap.nonneg_iff_isPositive A).1 hA0
-  have hA_sa : IsSelfAdjoint A := hApos.isSelfAdjoint
-  have hleft_sa : IsSelfAdjoint (leftMulHS (ℋ := ℋ) A) := by
-    change star (leftMulHS (ℋ := ℋ) A) = leftMulHS (ℋ := ℋ) A
-    simp [hA_sa.star_eq, leftMulHS_star (ℋ := ℋ) A]
-  refine (ContinuousLinearMap.nonneg_iff_isPositive _).2 ?_
-  rw [ContinuousLinearMap.isPositive_iff_complex]
-  intro X
-  constructor
-  · have hsymm :
-        ((leftMulHS (ℋ := ℋ) A : HSOp ℋ →L[ℂ] HSOp ℋ) : HSOp ℋ →ₗ[ℂ] HSOp ℋ).IsSymmetric :=
-        (ContinuousLinearMap.isSelfAdjoint_iff_isSymmetric).mp hleft_sa
-    simpa using LinearMap.IsSymmetric.coe_re_inner_apply_self hsymm X
-  · let b := hsOrthonormalBasis (ℋ := ℋ)
-    have htrace :
-        Complex.re (inner ℂ (leftMulHS (ℋ := ℋ) A X) X) =
-          ∑ i : HSIndex ℋ, Complex.re (inner ℂ (A (toOp X (b i))) (toOp X (b i))) := by
-      calc
-        Complex.re (inner ℂ (leftMulHS (ℋ := ℋ) A X) X)
-            = Complex.re (LinearMap.trace ℂ ℋ
-                ((star (A * toOp X) * toOp X).toLinearMap)) := by
-                  simpa [leftMulHS_apply] using
-                    re_hsInner_eq_traceRe (ℋ := ℋ) (X := A * toOp X) (Y := toOp X)
-        _ = ∑ i : HSIndex ℋ,
-              Complex.re (inner ℂ (b i)
-                (((star (A * toOp X) * toOp X).toLinearMap) (b i))) := by
-              rw [LinearMap.trace_eq_sum_inner ((star (A * toOp X) * toOp X).toLinearMap) b]
-              simp
-        _ = ∑ i : HSIndex ℋ,
-              Complex.re (inner ℂ (A (toOp X (b i))) (toOp X (b i))) := by
-              apply Finset.sum_congr rfl
-              intro i hi
-              exact congrArg Complex.re <| by
-                simpa [ContinuousLinearMap.star_eq_adjoint, mul_assoc] using
-                  (ContinuousLinearMap.adjoint_inner_right
-                  (A := A * toOp X) (x := b i) (y := toOp X (b i)))
-    have htrace' :
-        RCLike.re (inner ℂ (leftMulHS (ℋ := ℋ) A X) X) =
-          ∑ i : HSIndex ℋ, Complex.re (inner ℂ (A (toOp X (b i))) (toOp X (b i))) := by
-      simpa using htrace
-    rw [htrace']
-    exact Finset.sum_nonneg fun i _ => hApos.re_inner_nonneg_left (toOp X (b i))
+  rw [StarOrderedRing.nonneg_iff] at hA0
+  induction hA0 using AddSubmonoid.closure_induction with
+  | mem a ha =>
+    obtain ⟨s, rfl⟩ := ha
+    simpa using star_mul_self_nonneg (leftMulHS (ℋ := ℋ) s)
+  | zero =>
+    exact le_of_eq (ContinuousLinearMap.ext fun T => congrArg ofOp (zero_mul (toOp T)).symm)
+  | add a b _ _ ha hb =>
+    have hadd : leftMulHS (ℋ := ℋ) (a + b) = leftMulHS (ℋ := ℋ) a + leftMulHS (ℋ := ℋ) b :=
+      ContinuousLinearMap.ext fun T => congrArg ofOp (add_mul a b (toOp T))
+    exact hadd ▸ add_nonneg ha hb
 
 lemma leftMulHS_le_leftMulHS {A B : L ℋ} (hAB : A ≤ B) :
     leftMulHS (ℋ := ℋ) A ≤ leftMulHS (ℋ := ℋ) B := by
-  have hnonneg : 0 ≤ leftMulHS (ℋ := ℋ) (B - A) :=
-    leftMulHS_nonneg (ℋ := ℋ) (sub_nonneg.mpr hAB)
-  have hsub :
-      leftMulHS (ℋ := ℋ) B - leftMulHS (ℋ := ℋ) A =
-        leftMulHS (ℋ := ℋ) (B - A) := by
-    ext T; exact congrArg ofOp (sub_mul B A (toOp T)).symm
-  exact sub_nonneg.mp (by simpa [hsub] using hnonneg)
+  have hsub : leftMulHS (ℋ := ℋ) B - leftMulHS (ℋ := ℋ) A = leftMulHS (ℋ := ℋ) (B - A) :=
+    ContinuousLinearMap.ext fun T => congrArg ofOp (sub_mul B A (toOp T)).symm
+  exact sub_nonneg.mp (hsub ▸ leftMulHS_nonneg (ℋ := ℋ) (sub_nonneg.mpr hAB))
 
 lemma leftMulHS_pdSet [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint] [Nontrivial (L ℋ)]
     {A : L ℋ} (hA : A ∈ GeneralizedPerspectiveFunction.pdSet (ℋ := ℋ)) :
     leftMulHS (ℋ := ℋ) A ∈ GeneralizedPerspectiveFunction.pdSet (ℋ := HSOp ℋ) := by
   rcases hA with ⟨hA_sa, hA_spec⟩
   have hleft_sa : IsSelfAdjoint (leftMulHS (ℋ := ℋ) A) := by
-    change star (leftMulHS (ℋ := ℋ) A) = leftMulHS (ℋ := ℋ) A
-    simp [hA_sa.star_eq, leftMulHS_star (ℋ := ℋ) A]
-  letI : Nontrivial (HSOp ℋ) := by
-    delta HSOp
-    infer_instance
-  letI : Nontrivial (L (HSOp ℋ)) := inferInstance
-  refine ⟨?_, ?_⟩
-  · exact hleft_sa
-  · rcases (CFC.exists_pos_algebraMap_le_iff (A := L ℋ) (a := A) (ha := hA_sa)).2 hA_spec
-      with ⟨r, hr, hrA⟩
-    refine (CFC.exists_pos_algebraMap_le_iff
-      (A := L (HSOp ℋ)) (a := leftMulHS (ℋ := ℋ) A) (ha := hleft_sa)).1 ?_
-    refine ⟨r, hr, ?_⟩
-    simpa [Algebra.algebraMap_eq_smul_one, leftMulHS_real_smul_one (r := r)] using
-      leftMulHS_le_leftMulHS (ℋ := ℋ) hrA
+    simp [IsSelfAdjoint, hA_sa.star_eq]
+  letI : Nontrivial (HSOp ℋ) := inferInstanceAs (Nontrivial (L ℋ))
+  refine ⟨hleft_sa, ?_⟩
+  rcases (CFC.exists_pos_algebraMap_le_iff (A := L ℋ) (a := A) (ha := hA_sa)).2 hA_spec
+    with ⟨r, hr, hrA⟩
+  refine (CFC.exists_pos_algebraMap_le_iff
+    (A := L (HSOp ℋ)) (a := leftMulHS (ℋ := ℋ) A) (ha := hleft_sa)).1 ⟨r, hr, ?_⟩
+  simpa [Algebra.algebraMap_eq_smul_one, leftMulHS_real_smul_one (r := r)] using
+    leftMulHS_le_leftMulHS (ℋ := ℋ) hrA
 
 @[simp] lemma rightMulHS_star (A : L ℋ) :
     star (rightMulHS (ℋ := ℋ) A) = rightMulHS (ℋ := ℋ) (star A) := by
   rw [eq_comm, ContinuousLinearMap.star_eq_adjoint]
-  refine (ContinuousLinearMap.eq_adjoint_iff
-    (A := rightMulHS (ℋ := ℋ) (star A)) (B := rightMulHS (ℋ := ℋ) A)).2 ?_
-  intro X Y
+  refine (ContinuousLinearMap.eq_adjoint_iff _ _).2 fun X Y => ?_
   change inner ℂ (ofOp (toOp X * star A)) (ofOp (toOp Y)) =
     inner ℂ (ofOp (toOp X)) (ofOp (toOp Y * A))
-  rw [hsInner_eq_trace]
-  rw [hsInner_eq_trace]
-  rw [star_mul, star_star, mul_assoc]
+  rw [hsInner_eq_trace, hsInner_eq_trace, star_mul, star_star, mul_assoc]
   symm
   simpa [mul_assoc] using
     (LinearMap.trace_mul_cycle (R := ℂ) (M := ℋ)
@@ -481,38 +339,21 @@ noncomputable def leftMulHSStarAlgHom : L ℋ →⋆ₐ[ℝ] L (HSOp ℋ) where
   toFun := leftMulHS (ℋ := ℋ)
   map_one' := leftMulHS_one (ℋ := ℋ)
   map_mul' := leftMulHS_mul (ℋ := ℋ)
-  map_zero' := by ext T; exact congrArg ofOp (zero_mul (toOp T))
-  map_add' := fun A B => by ext T; exact congrArg ofOp (add_mul A B (toOp T))
-  commutes' := by
-    intro r
-    simp only [Algebra.algebraMap_eq_smul_one]
-    exact leftMulHS_real_smul_one (ℋ := ℋ) r
-  map_star' := by
-    intro A
-    simp [leftMulHS_star (ℋ := ℋ) A]
+  map_zero' := ContinuousLinearMap.ext fun T => congrArg ofOp (zero_mul (toOp T))
+  map_add' A B := ContinuousLinearMap.ext fun T => congrArg ofOp (add_mul A B (toOp T))
+  commutes' r := by simp [Algebra.algebraMap_eq_smul_one]
+  map_star' A := by simp
 
 /-- Right multiplication as a real `⋆`-algebra homomorphism out of the opposite algebra. -/
 noncomputable def rightMulHSStarAlgHom : (L ℋ)ᵐᵒᵖ →⋆ₐ[ℝ] L (HSOp ℋ) where
   toFun := fun A => rightMulHS (ℋ := ℋ) (MulOpposite.unop A)
-  map_one' := by simp [rightMulHS_one (ℋ := ℋ)]
-  map_mul' := by intro A B; ext T; simp [rightMulHS_apply, mul_assoc]
-  map_zero' := by
-    ext T
-    change ofOp (toOp T * MulOpposite.unop (0 : (L ℋ)ᵐᵒᵖ)) = ofOp (0 : L ℋ)
-    congr 1; simp
-  map_add' := fun A B => by
-    ext T
-    change ofOp (toOp T * MulOpposite.unop (A + B)) =
-      ofOp (toOp T * MulOpposite.unop A + toOp T * MulOpposite.unop B)
-    congr 1; simp [MulOpposite.unop_add, mul_add]
-  commutes' := by
-    intro r
-    show rightMulHS (ℋ := ℋ) (MulOpposite.unop (MulOpposite.op (r • (1 : L ℋ)))) =
-      r • (1 : L (HSOp ℋ))
-    simp [rightMulHS_real_smul_one (ℋ := ℋ) r]
-  map_star' := by
-    intro A
-    simp [rightMulHS_star (ℋ := ℋ) (MulOpposite.unop A)]
+  map_one' := by simp
+  map_mul' A B := rightMulHS_mul (ℋ := ℋ) (MulOpposite.unop B) (MulOpposite.unop A)
+  map_zero' := ContinuousLinearMap.ext fun T => congrArg ofOp (mul_zero (toOp T))
+  map_add' A B := ContinuousLinearMap.ext fun T =>
+    congrArg ofOp (mul_add (toOp T) (MulOpposite.unop A) (MulOpposite.unop B))
+  commutes' r := by simp [Algebra.algebraMap_eq_smul_one]
+  map_star' A := by simp
 
 @[simp] theorem rightMulHSStarAlgHom_apply (A : (L ℋ)ᵐᵒᵖ) :
     rightMulHSStarAlgHom (ℋ := ℋ) A = rightMulHS (ℋ := ℋ) (MulOpposite.unop A) :=
@@ -522,20 +363,11 @@ noncomputable def rightMulHSStarAlgHom : (L ℋ)ᵐᵒᵖ →⋆ₐ[ℝ] L (HSOp
 noncomputable def opStarHSStarAlgHom : L ℋ →⋆ₐ[ℝ] (L ℋ)ᵐᵒᵖ where
   toFun := fun A => MulOpposite.op (star A)
   map_one' := by simp
-  map_mul' := by
-    intro A B
-    simp [star_mul]
+  map_mul' A B := by simp [star_mul]
   map_zero' := by simp
-  map_add' := by
-    intro A B
-    simp
-  commutes' := by
-    intro r
-    apply congrArg MulOpposite.op
-    simp [Algebra.algebraMap_eq_smul_one]
-  map_star' := by
-    intro A
-    simp
+  map_add' A B := by simp
+  commutes' r := by simp [Algebra.algebraMap_eq_smul_one]
+  map_star' A := by simp
 
 private noncomputable def opStarHSAlgEquiv : L ℋ ≃ₐ[ℝ] (L ℋ)ᵐᵒᵖ where
   toFun A := MulOpposite.op (star A)
@@ -544,58 +376,34 @@ private noncomputable def opStarHSAlgEquiv : L ℋ ≃ₐ[ℝ] (L ℋ)ᵐᵒᵖ 
   right_inv A := by simp
   map_mul' A B := by simp [star_mul]
   map_add' A B := by simp
-  commutes' r := by
-    apply congrArg MulOpposite.op
-    simp [Algebra.algebraMap_eq_smul_one]
+  commutes' r := by simp [Algebra.algebraMap_eq_smul_one]
 
 omit [FiniteDimensional ℂ ℋ] in
 lemma op_isSelfAdjoint (A : L ℋ) (hA : IsSelfAdjoint A) :
-    IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := by
-  exact congrArg MulOpposite.op hA.star_eq
+    IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) :=
+  congrArg MulOpposite.op hA.star_eq
 
 private noncomputable def opStarHSLinearMap : L ℋ →ₗ[ℝ] (L ℋ)ᵐᵒᵖ where
   toFun := fun A => MulOpposite.op (star A)
   map_add' A B := by simp
-  map_smul' r A := by
-    apply MulOpposite.unop_injective
-    rw [MulOpposite.unop_op, MulOpposite.unop_smul, MulOpposite.unop_op]
-    rw [Algebra.smul_def, star_mul]
-    show star A * star ((algebraMap ℝ (L ℋ)) r) = (algebraMap ℝ (L ℋ)) r * star A
-    have hstar : star ((algebraMap ℝ (L ℋ)) r) = (algebraMap ℝ (L ℋ)) r := by
-      rw [Algebra.algebraMap_eq_smul_one, star_smul, star_one]
-      simp
-    rw [hstar]
-    simpa using (Algebra.commutes (R := ℝ) (A := L ℋ) r (star A)).symm
+  map_smul' r A := map_smul (opStarHSStarAlgHom (ℋ := ℋ)) r A
 
 private noncomputable def leftMulHSLinearMap : L ℋ →ₗ[ℝ] L (HSOp ℋ) where
   toFun := leftMulHS (ℋ := ℋ)
-  map_add' A B := by ext T; exact congrArg ofOp (add_mul A B (toOp T))
-  map_smul' r A := by
-    ext T
-    show ((r • A) * toOp T : L ℋ) = r • (A * toOp T)
-    rw [smul_mul_assoc]
+  map_add' A B := map_add (leftMulHSStarAlgHom (ℋ := ℋ)) A B
+  map_smul' r A := map_smul (leftMulHSStarAlgHom (ℋ := ℋ)) r A
 
 private noncomputable def rightMulHSLinearMap : (L ℋ)ᵐᵒᵖ →ₗ[ℝ] L (HSOp ℋ) where
   toFun := fun A => rightMulHS (ℋ := ℋ) (MulOpposite.unop A)
-  map_add' A B := by
-    ext T
-    change ofOp (toOp T * MulOpposite.unop (A + B)) =
-      ofOp (toOp T * MulOpposite.unop A + toOp T * MulOpposite.unop B)
-    congr 1; simp [MulOpposite.unop_add, mul_add]
-  map_smul' r A := by
-    ext T
-    change ofOp (toOp T * MulOpposite.unop (r • A)) =
-      ofOp (r • (toOp T * MulOpposite.unop A))
-    congr 1
-    rw [MulOpposite.unop_smul, mul_smul_comm]
+  map_add' A B := map_add (rightMulHSStarAlgHom (ℋ := ℋ)) A B
+  map_smul' r A := map_smul (rightMulHSStarAlgHom (ℋ := ℋ)) r A
 
 omit [FiniteDimensional ℂ ℋ] in
 lemma spectrum_op_eq [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint] [Nontrivial (L ℋ)]
     (A : L ℋ) (hA : IsSelfAdjoint A) :
     spectrum ℝ (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) = spectrum ℝ A := by
-  have hopA : IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := op_isSelfAdjoint (A := A) hA
-  simpa [opStarHSAlgEquiv, hA.star_eq, hopA.star_eq] using
-    (AlgEquiv.spectrum_eq (opStarHSAlgEquiv (ℋ := ℋ)) A)
+  simpa [opStarHSAlgEquiv, hA.star_eq, (op_isSelfAdjoint A hA).star_eq] using
+    AlgEquiv.spectrum_eq (opStarHSAlgEquiv (ℋ := ℋ)) A
 
 lemma cfc_op_eq_op_cfc [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint]
     [ContinuousFunctionalCalculus ℝ ((L ℋ)ᵐᵒᵖ) IsSelfAdjoint] [Nontrivial (L ℋ)]
@@ -603,37 +411,22 @@ lemma cfc_op_eq_op_cfc [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint]
     (hf : ContinuousOn f (spectrum ℝ A)) :
     cfc (R := ℝ) (A := (L ℋ)ᵐᵒᵖ) (p := IsSelfAdjoint) f (MulOpposite.op A) =
       MulOpposite.op (cfcR f A) := by
-  let φ : L ℋ →⋆ₐ[ℝ] (L ℋ)ᵐᵒᵖ := opStarHSStarAlgHom (ℋ := ℋ)
-  have hφ : Continuous φ := by
-    exact
-      (LinearMap.continuous_of_finiteDimensional (opStarHSLinearMap (ℋ := ℋ)))
-  have hopA : IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := op_isSelfAdjoint (A := A) hA
-  have hφA : IsSelfAdjoint (φ A) := hA.map φ
-  have hcfcA :
-      IsSelfAdjoint (cfc (R := ℝ) (A := L ℋ) (p := IsSelfAdjoint) f A) := by
-    simp [IsSelfAdjoint.cfc (f := f) (a := A)]
-  have hopcfcA :
-      IsSelfAdjoint
-        (MulOpposite.op (cfc (R := ℝ) (A := L ℋ) (p := IsSelfAdjoint) f A) : (L ℋ)ᵐᵒᵖ) :=
-    op_isSelfAdjoint (A := cfc (R := ℝ) (A := L ℋ) (p := IsSelfAdjoint) f A) hcfcA
-  have hmap := StarAlgHom.map_cfc (φ := φ) (f := f) (a := A)
-    (hf := hf) (hφ := hφ) (ha := hA) (hφa := hφA)
-  simpa [φ, opStarHSStarAlgHom, cfcR, hA.star_eq, hopA.star_eq, hcfcA.star_eq,
-    hopcfcA.star_eq] using hmap.symm
+  have hmap := StarAlgHom.map_cfc (φ := opStarHSStarAlgHom (ℋ := ℋ)) (f := f) (a := A)
+    (hf := hf)
+    (hφ := LinearMap.continuous_of_finiteDimensional (opStarHSLinearMap (ℋ := ℋ)))
+    (ha := hA) (hφa := hA.map (opStarHSStarAlgHom (ℋ := ℋ)))
+  simpa [opStarHSStarAlgHom, cfcR, hA.star_eq, (op_isSelfAdjoint A hA).star_eq,
+    (IsSelfAdjoint.cfc (f := f) (a := A)).star_eq,
+    (op_isSelfAdjoint _ (IsSelfAdjoint.cfc (f := f) (a := A))).star_eq] using hmap.symm
 
 lemma leftMulHS_cfcR [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint] [Nontrivial (L ℋ)]
     (f : ℝ → ℝ) (A : L ℋ) (hA : IsSelfAdjoint A)
     (hf : ContinuousOn f (spectrum ℝ A)) :
     leftMulHS (ℋ := ℋ) (cfcR f A) =
       cfcR (ℋ := HSOp ℋ) f (leftMulHS (ℋ := ℋ) A) := by
-  let φ : L ℋ →⋆ₐ[ℝ] L (HSOp ℋ) := leftMulHSStarAlgHom (ℋ := ℋ)
-  have hφ : Continuous φ := by
-    exact
-      (LinearMap.continuous_of_finiteDimensional (leftMulHSLinearMap (ℋ := ℋ)))
-  have hφA : IsSelfAdjoint (φ A) := hA.map φ
-  have hmap := StarAlgHom.map_cfc (φ := φ) (f := f) (a := A)
-    (hf := hf) (hφ := hφ) (ha := hA) (hφa := hφA)
-  exact hmap
+  exact StarAlgHom.map_cfc (φ := leftMulHSStarAlgHom (ℋ := ℋ)) (f := f) (a := A) (hf := hf)
+    (hφ := LinearMap.continuous_of_finiteDimensional (leftMulHSLinearMap (ℋ := ℋ)))
+    (ha := hA) (hφa := hA.map (leftMulHSStarAlgHom (ℋ := ℋ)))
 
 lemma rightMulHS_cfcR [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint]
     [ContinuousFunctionalCalculus ℝ ((L ℋ)ᵐᵒᵖ) IsSelfAdjoint] [Nontrivial (L ℋ)]
@@ -641,20 +434,12 @@ lemma rightMulHS_cfcR [ContinuousFunctionalCalculus ℝ (L ℋ) IsSelfAdjoint]
     (hf : ContinuousOn f (spectrum ℝ A)) :
     rightMulHS (ℋ := ℋ) (cfcR f A) =
       cfcR (ℋ := HSOp ℋ) f (rightMulHS (ℋ := ℋ) A) := by
-  let φ : (L ℋ)ᵐᵒᵖ →⋆ₐ[ℝ] L (HSOp ℋ) := rightMulHSStarAlgHom (ℋ := ℋ)
-  have hφ : Continuous φ := by
-    exact
-      (LinearMap.continuous_of_finiteDimensional (rightMulHSLinearMap (ℋ := ℋ)))
   have hopA : IsSelfAdjoint (MulOpposite.op A : (L ℋ)ᵐᵒᵖ) := op_isSelfAdjoint (A := A) hA
-  have hφA : IsSelfAdjoint (φ (MulOpposite.op A)) := hopA.map φ
-  have hmap := StarAlgHom.map_cfc (φ := φ) (f := f) (a := MulOpposite.op A)
-    (hf := by simpa [spectrum_op_eq (A := A) hA] using hf)
-    (hφ := hφ) (ha := hopA) (hφa := hφA)
-  have hopcfc :
-      cfc (R := ℝ) (A := (L ℋ)ᵐᵒᵖ) (p := IsSelfAdjoint) f (MulOpposite.op A) =
-        MulOpposite.op (cfcR f A) :=
-    cfc_op_eq_op_cfc (ℋ := ℋ) f A hA hf
-  simpa [φ, cfcR, rightMulHSStarAlgHom, hopcfc] using hmap
+  have hmap := StarAlgHom.map_cfc (φ := rightMulHSStarAlgHom (ℋ := ℋ)) (f := f)
+    (a := MulOpposite.op A) (hf := by simpa [spectrum_op_eq (A := A) hA] using hf)
+    (hφ := LinearMap.continuous_of_finiteDimensional (rightMulHSLinearMap (ℋ := ℋ)))
+    (ha := hopA) (hφa := hopA.map (rightMulHSStarAlgHom (ℋ := ℋ)))
+  simpa [cfcR, rightMulHSStarAlgHom, cfc_op_eq_op_cfc (ℋ := ℋ) f A hA hf] using hmap
 
 end
 

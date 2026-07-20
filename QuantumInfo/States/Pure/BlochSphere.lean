@@ -51,23 +51,15 @@ private def blochVecRaw (α θ : ℝ) : Fin 3 → ℝ :=
 private lemma blochVecRaw_norm (α θ : ℝ) :
     Real.sqrt ((blochVecRaw α θ 0) ^ 2 + (blochVecRaw α θ 1) ^ 2 +
       (blochVecRaw α θ 2) ^ 2) = 1 := by
-  have : (blochVecRaw α θ 0) ^ 2 + (blochVecRaw α θ 1) ^ 2 +
-    (blochVecRaw α θ 2) ^ 2 = 1 := by
-    simp [blochVecRaw, Fin.sum_univ_three]
-    have h1 := Real.sin_sq_add_cos_sq α
-    have h2 := Real.sin_sq_add_cos_sq θ
-    nlinarith [sq_nonneg (Real.sin α * Real.cos θ),
-      sq_nonneg (Real.sin α * Real.sin θ), sq_nonneg (Real.cos α),
-      sq_abs (Real.sin α), sq_abs (Real.cos θ)]
-  rw [this, Real.sqrt_one]
+  rw [Real.sqrt_eq_one]
+  show (Real.sin α * Real.cos θ) ^ 2 + (Real.sin α * Real.sin θ) ^ 2 + Real.cos α ^ 2 = 1
+  linear_combination Real.sin α ^ 2 * Real.sin_sq_add_cos_sq θ + Real.sin_sq_add_cos_sq α
 
 /-- A point on the Bloch sphere parameterized by polar angle `α` and
     azimuthal angle `θ`. -/
 def blochPoint (α θ : ℝ) : BlochSphere :=
   ⟨(WithLp.equiv 2 _).symm (blochVecRaw α θ), by
-    rw [Metric.mem_sphere, dist_comm, EuclideanSpace.dist_eq]
-    simp [EuclideanSpace.norm_eq, Fin.sum_univ_three, sub_zero, blochVecRaw_norm α θ,
-      Real.sqrt_one]⟩
+    simpa [EuclideanSpace.norm_eq, Fin.sum_univ_three, sq_abs] using blochVecRaw_norm α θ⟩
 
 /-- The underlying vector of a `blochPoint`. -/
 lemma blochPoint_val (α θ : ℝ) :
@@ -97,9 +89,7 @@ lemma dot_blochPoint (α₁ θ₁ α₂ θ₂ : ℝ) :
     (blochPoint α₂ θ₂ : EuclideanSpace ℝ (Fin 3)) =
     Real.sin α₁ * Real.sin α₂ * Real.cos (θ₂ - θ₁) +
     Real.cos α₁ * Real.cos α₂ := by
-  simp [blochPoint_val, dotProduct, blochVecRaw, Fin.sum_univ_three, WithLp.equiv]
-  rw [show Real.cos (θ₂ - θ₁) = Real.cos θ₁ * Real.cos θ₂ +
-    Real.sin θ₁ * Real.sin θ₂ from by rw [Real.cos_sub]; ring]
+  simp [blochPoint_val, dotProduct, blochVecRaw, Fin.sum_univ_three, Real.cos_sub]
   ring
 
 end BlochSphere

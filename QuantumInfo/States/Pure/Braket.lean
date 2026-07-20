@@ -85,7 +85,7 @@ def dot (ξ : Bra d) (ψ : Ket d) : ℂ := ∑ x, (ξ x) * (ψ x)
 
 scoped notation "〈" ξ:90 "‖" ψ:90 "〉" => dot (ξ : Bra _) (ψ : Ket _)
 
-theorem dot_eq_dotProduct (ψ : Bra d) (φ : Ket d) :〈ψ‖φ〉= dotProduct (m := d) ψ φ := by
+theorem dot_eq_dotProduct (ψ : Bra d) (φ : Ket d) :〈ψ‖φ〉= dotProduct (m := d) ψ φ :=
   rfl
 
 end Braket
@@ -109,25 +109,21 @@ theorem Ket.ext {ξ ψ : Ket d} (h : ∀ x, ξ x = ψ x) : ξ = ψ :=
 theorem Bra.ext {ξ ψ : Bra d} (h : ∀ x, ξ x = ψ x) : ξ = ψ :=
   DFunLike.ext ξ ψ h
 
-theorem Ket.normalized (ψ : Ket d) : ∑ x, Complex.normSq (ψ x) = 1 := by
-  convert ψ.normalized'
-  rw [Complex.normSq_eq_norm_sq]
-  rfl
+theorem Ket.normalized (ψ : Ket d) : ∑ x, Complex.normSq (ψ x) = 1 :=
+  ψ.normalized' ▸ Finset.sum_congr rfl fun x _ => Complex.normSq_eq_norm_sq (ψ x)
 
-theorem Bra.normalized (ψ : Bra d) : ∑ x, Complex.normSq (ψ x) = 1 := by
-  convert ψ.normalized'
-  rw [Complex.normSq_eq_norm_sq]
-  rfl
+theorem Bra.normalized (ψ : Bra d) : ∑ x, Complex.normSq (ψ x) = 1 :=
+  ψ.normalized' ▸ Finset.sum_congr rfl fun x _ => Complex.normSq_eq_norm_sq (ψ x)
 
 /-- Any Bra can be turned into a Ket by conjugating the elements. -/
 @[coe]
 def Ket.to_bra (ψ : Ket d) : Bra d :=
-  ⟨conj ψ, by simp_all; exact ψ.2⟩
+  ⟨conj ψ, by simpa [Ket.apply] using ψ.2⟩
 
 /-- Any Ket can be turned into a Bra by conjugating the elements. -/
 @[coe]
 def Bra.to_ket (ψ : Bra d) : Ket d :=
-  ⟨conj ψ, by simp_all; exact ψ.2⟩
+  ⟨conj ψ, by simpa [Bra.apply] using ψ.2⟩
 
 instance instBraOfKet : Coe (Ket d) (Bra d) := ⟨Ket.to_bra⟩
 
@@ -141,62 +137,44 @@ theorem Bra.apply' (ψ : Ket d) (i : d) : 〈ψ∣ i = conj (ψ.vec i) :=
   rfl
 
 theorem Ket.exists_ne_zero (ψ : Ket d) : ∃ x, ψ x ≠ 0 := by
-  have hzerolt : ∑ x : d, Complex.normSq (ψ x) > ∑ x : d, 0 := by rw [ψ.normalized, Finset.sum_const_zero]; exact zero_lt_one
-  have hpos : ∃ x ∈ Finset.univ, 0 < Complex.normSq (ψ x) := Finset.exists_lt_of_sum_lt hzerolt
-  obtain ⟨x, _, hpos⟩ := hpos
-  rw [Complex.normSq_pos] at hpos
-  use x
+  by_contra h
+  push Not at h
+  simpa [h] using ψ.normalized
 
 theorem Bra.exists_ne_zero (ψ : Bra d) : ∃ x, ψ x ≠ 0 := by
-  have hzerolt : ∑ x : d, Complex.normSq (ψ x) > ∑ x : d, 0 := by rw [ψ.normalized, Finset.sum_const_zero]; exact zero_lt_one
-  have hpos : ∃ x ∈ Finset.univ, 0 < Complex.normSq (ψ x) := Finset.exists_lt_of_sum_lt hzerolt
-  obtain ⟨x, _, hpos⟩ := hpos
-  rw [Complex.normSq_pos] at hpos
-  use x
+  by_contra h
+  push Not at h
+  simpa [h] using ψ.normalized
 
 /-- Create a ket out of a vector given it has a nonzero component -/
 def Ket.normalize (v : d → ℂ) (h : ∃ x, v x ≠ 0) : Ket d :=
   { vec := fun x ↦ v x / √(∑ x : d, ‖v x‖ ^ 2),
     normalized' := by
-      simp only [← Complex.normSq_eq_norm_sq, Complex.normSq_div,
-        Complex.normSq_ofReal, ←sq]
-      have hnonneg : ∑ x : d, Complex.normSq (v x) ≥ 0 := Fintype.sum_nonneg (fun x => Complex.normSq_nonneg (v x))
-      simp only [Real.sq_sqrt hnonneg, div_eq_inv_mul, ←Finset.mul_sum]
-      apply inv_mul_cancel₀
-      by_contra hzero
-      rw [Fintype.sum_eq_zero_iff_of_nonneg (fun x => Complex.normSq_nonneg (v x))] at hzero
       obtain ⟨a, ha⟩ := h
-      have h₁ : (fun x => Complex.normSq (v x)) a ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact ha
-      exact h₁ (congrFun hzero a)
+      have hS : 0 < ∑ x, ‖v x‖ ^ 2 :=
+        Finset.sum_pos' (fun _ _ => sq_nonneg _) ⟨a, Finset.mem_univ a, by positivity⟩
+      simp [div_pow, ← Finset.sum_div, Real.sq_sqrt hS.le, hS.ne']
   }
 
 /-- A ket is already normalized -/
 theorem Ket.normalize_ket_eq_self (ψ : Ket d) : Ket.normalize (ψ.vec) (Ket.exists_ne_zero ψ) = ψ := by
   ext x
-  unfold normalize
-  simp only [apply, ψ.normalized', Real.sqrt_one, Complex.ofReal_one, div_one]
+  simp [normalize, apply, ψ.normalized']
 
 /-- Create a bra out of a vector given it has a nonzero component -/
 def Bra.normalize (v : d → ℂ) (h : ∃ x, v x ≠ 0) : Bra d :=
   { vec := fun x ↦ v x / √(∑ x : d, ‖v x‖ ^ 2),
     normalized' := by
-      simp only [← Complex.normSq_eq_norm_sq, Complex.normSq_div,
-      Complex.normSq_ofReal, ←sq]
-      have hnonneg : ∑ x : d, Complex.normSq (v x) ≥ 0 := Fintype.sum_nonneg (fun x => Complex.normSq_nonneg (v x))
-      simp only [Real.sq_sqrt hnonneg, div_eq_inv_mul, ←Finset.mul_sum]
-      apply inv_mul_cancel₀
-      by_contra hzero
-      rw [Fintype.sum_eq_zero_iff_of_nonneg (fun x => Complex.normSq_nonneg (v x))] at hzero
       obtain ⟨a, ha⟩ := h
-      have h₁ : (fun x => Complex.normSq (v x)) a ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact ha
-      exact h₁ (congrFun hzero a)
+      have hS : 0 < ∑ x, ‖v x‖ ^ 2 :=
+        Finset.sum_pos' (fun _ _ => sq_nonneg _) ⟨a, Finset.mem_univ a, by positivity⟩
+      simp [div_pow, ← Finset.sum_div, Real.sq_sqrt hS.le, hS.ne']
   }
 
 /-- A bra is already normalized -/
 def Bra.normalize_ket_eq_self (ψ : Bra d) : Bra.normalize (ψ.vec) (Bra.exists_ne_zero ψ) = ψ := by
   ext x
-  unfold normalize
-  simp only [apply, ψ.normalized', Real.sqrt_one, Complex.ofReal_one, div_one]
+  simp [normalize, apply, ψ.normalized']
 
 /-- Ket form by the superposition of all elements in `d`.
 Commonly denoted by |+⟩, especially for qubits -/
@@ -231,16 +209,13 @@ instance instFunLikeBraket : FunLike (Bra d) (Ket d) ℂ where
 /-- The inner product of any state with itself is 1. -/
 @[simp]
 theorem Braket.dot_self_eq_one (ψ : Ket d) :〈ψ‖ψ〉= 1 := by
-  have h₁ x : conj (ψ x) * ψ x = Complex.normSq (ψ x) := by
-    rw [Complex.normSq_eq_conj_mul_self]
-  simpa [dot, Bra.eq_conj, h₁] using congr(Complex.ofReal $ψ.normalized)
+  simpa [dot, ← Complex.normSq_eq_conj_mul_self] using congr(Complex.ofReal $ψ.normalized)
 
 /-- Swapping the arguments conjugates the bra-ket product:
     `⟨ψ₂|ψ₁⟩ = conj(⟨ψ₁|ψ₂⟩)`. -/
 lemma Braket.dot_swap_conj (ψ₁ ψ₂ : Ket d) :
     〈ψ₂‖ψ₁〉 = starRingEnd ℂ 〈ψ₁‖ψ₂〉 := by
-  simp +decide [Braket.dot]
-  ac_rfl
+  simp [Braket.dot, mul_comm]
 
 section prod
 variable {d d₁ d₂ : Type*} [Fintype d] [Fintype d₁] [Fintype d₂]
@@ -278,63 +253,35 @@ theorem Ket.IsProd_iff_mul_eq_mul (ψ : Ket (d₁ × d₂)) : ψ.IsProd ↔
     simp only [prod, apply]
     ring_nf
   · intro hcrossm
-    obtain ⟨⟨a, b⟩, hψnonZero⟩ := Ket.exists_ne_zero ψ
-    -- May be able to simplify proof below by using Ket.normalize
-    let v₁ : d₁ → ℂ := fun x => ‖ψ (a, b)‖ / (ψ (a, b)) * ((ψ (x, b)) / √(∑ i : d₁, ‖ψ (i, b)‖^2))
-    let v₂ : d₂ → ℂ := fun y => ψ (a, y) / √(∑ j : d₂, ‖ψ (a, j)‖^2)
-    have hv1Norm : ∑ x, ‖v₁ x‖^2 = 1 := by
-      simp only [← Complex.normSq_eq_norm_sq, v₁, Complex.normSq_mul, Complex.normSq_div,
-      Complex.normSq_ofReal, ← sq]
-      rw [div_self _]
-      have hnonneg : ∑ i : d₁, Complex.normSq (ψ (i, b)) ≥ 0 := Fintype.sum_nonneg (fun i => Complex.normSq_nonneg (ψ (i, b)))
-      · simp_rw [Real.sq_sqrt hnonneg, one_mul, div_eq_inv_mul, ←Finset.mul_sum]
-        apply inv_mul_cancel₀
-        by_contra hzero
-        rw [Fintype.sum_eq_zero_iff_of_nonneg (fun i => Complex.normSq_nonneg (ψ (i, b)))] at hzero
-        have h₁ : (fun i => Complex.normSq (ψ (i,b))) a ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact hψnonZero
-        rw [hzero, Pi.zero_apply, ne_eq, eq_self, not_true_eq_false] at h₁
-        exact h₁
-      · simp_all only [ne_eq, map_eq_zero, not_false_eq_true]
-    have hv2Norm : ∑ x, ‖v₂ x‖^2 = 1 := by
-      simp only [← Complex.normSq_eq_norm_sq, v₂, Complex.normSq_div,
-      Complex.normSq_ofReal, ← sq]
-      have hnonneg : ∑ j : d₂, Complex.normSq (ψ (a, j)) ≥ 0 := Fintype.sum_nonneg (fun j => Complex.normSq_nonneg (ψ (a, j)))
-      simp_rw [Real.sq_sqrt hnonneg, div_eq_inv_mul, ←Finset.mul_sum]
-      apply inv_mul_cancel₀
-      by_contra hzero
-      rw [Fintype.sum_eq_zero_iff_of_nonneg (fun j => Complex.normSq_nonneg (ψ (a, j)))] at hzero
-      have h₁ : (fun j => Complex.normSq (ψ (a, j))) b ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact hψnonZero
-      rw [hzero, Pi.zero_apply, ne_eq, eq_self, not_true_eq_false] at h₁
-      exact h₁
-    let ψ₁ : Ket d₁ := ⟨v₁, hv1Norm⟩
-    let ψ₂ : Ket d₂ := ⟨v₂, hv2Norm⟩
-    use ψ₁, ψ₂
-    ext ⟨x, y⟩
-    have hψfun : ψ (x, y) = (ψ (x, b) * ψ (a, y)) / ψ (a, b) := eq_div_of_mul_eq hψnonZero (hcrossm x a y b)
-    have hψnorm : (∑ z : d₁ × d₂, Complex.normSq (ψ.vec (z.1, b) * ψ.vec (a, z.2))) = Complex.normSq (ψ (a, b)) :=
-    calc
-      ∑ z : d₁ × d₂, Complex.normSq (ψ.vec (z.1, b) * ψ.vec (a, z.2)) =
-        ∑ z : d₁ × d₂, Complex.normSq (ψ.vec (a, b) * ψ.vec (z.1, z.2)) := by simp only [← apply, hcrossm, mul_comm]
-      _ = ∑ z : d₁ × d₂, Complex.normSq (ψ.vec (a, b)) * Complex.normSq (ψ.vec (z.1, z.2)) := by simp only [Complex.normSq_mul]
-      _ = Complex.normSq (ψ.vec (a, b)) * ∑ z : d₁ × d₂, Complex.normSq (ψ.vec z) := by rw [←Finset.mul_sum]
-      _ = Complex.normSq (ψ.vec (a, b)) := by simp only [← apply, ψ.normalized, mul_one]
-    simp [prod, apply, ψ₁, ψ₂, v₁, v₂]
-    rw [mul_assoc, ←mul_div_mul_comm, ←Complex.ofReal_mul, ←Real.sqrt_mul (Finset.sum_nonneg _)]
-    ·
-      simp_rw [Fintype.sum_mul_sum, ←Fintype.sum_prod_type']
-      simp only [← Complex.normSq_eq_norm_sq]
-      simp_rw [Fintype.sum_congr _ _ (fun z : d₁ × d₂ => (Complex.normSq_mul (ψ.vec (z.1, b)) (ψ.vec (a, z.2))).symm)]
-      simp_rw [hψnorm, Complex.normSq_eq_norm_sq, Real.sqrt_sq_eq_abs, abs_norm, apply]
-      ring_nf
-      rw [mul_comm, ←mul_assoc, ←mul_assoc, ←mul_assoc]
-      nth_rw 2 [←inv_inv (Complex.ofReal (‖ψ.vec (a, b)‖))]
-      rw [Complex.mul_inv_cancel _]
-      · rw [one_mul]
-        ring_nf at hψfun
-        simp_rw [Ket.apply, mul_comm, mul_comm (ψ.vec (a, y)) _, ←mul_assoc] at hψfun
-        exact hψfun
-      · simp_all [Ket.apply]
-    · simp
+    obtain ⟨⟨a, b⟩, hab⟩ := Ket.exists_ne_zero ψ
+    have hn : ‖ψ (a, b)‖ ≠ 0 := by simpa using hab
+    have hS₁ : 0 < ∑ i, ‖ψ (i, b)‖ ^ 2 :=
+      Finset.sum_pos' (fun _ _ => sq_nonneg _) ⟨a, Finset.mem_univ a, by positivity⟩
+    have hS₂ : 0 < ∑ j, ‖ψ (a, j)‖ ^ 2 :=
+      Finset.sum_pos' (fun _ _ => sq_nonneg _) ⟨b, Finset.mem_univ b, by positivity⟩
+    have hmul : √(∑ i, ‖ψ (i, b)‖ ^ 2) * √(∑ j, ‖ψ (a, j)‖ ^ 2) = ‖ψ (a, b)‖ := by
+      rw [← Real.sqrt_mul hS₁.le, ← Real.sqrt_sq (norm_nonneg (ψ (a, b)))]
+      congr 1
+      simp_rw [Finset.sum_mul_sum, ← Fintype.sum_prod_type', ← mul_pow, ← norm_mul]
+      calc ∑ p : d₁ × d₂, ‖ψ (p.1, b) * ψ (a, p.2)‖ ^ 2
+          = ∑ p : d₁ × d₂, ‖ψ (a, b) * ψ (p.1, p.2)‖ ^ 2 :=
+            Finset.sum_congr rfl fun p _ => by rw [hcrossm p.1 a b p.2, mul_comm]
+        _ = ‖ψ (a, b)‖ ^ 2 := by simp [mul_pow, ← Finset.mul_sum, apply, ψ.normalized']
+    refine ⟨⟨fun x => ‖ψ (a, b)‖ / ψ (a, b) * (ψ (x, b) / √(∑ i, ‖ψ (i, b)‖ ^ 2)), ?_⟩,
+        ⟨fun y => ψ (a, y) / √(∑ j, ‖ψ (a, j)‖ ^ 2), ?_⟩, ?_⟩
+    · simp [div_pow, Real.sq_sqrt hS₁.le, ← Finset.sum_div, div_self, hn, hS₁.ne']
+    · simp [div_pow, Real.sq_sqrt hS₂.le, ← Finset.sum_div, hS₂.ne']
+    · ext ⟨x, y⟩
+      have key := hcrossm x a y b
+      have hsqrt : (√(∑ i, ‖ψ (i, b)‖ ^ 2) * √(∑ j, ‖ψ (a, j)‖ ^ 2) : ℂ) = ‖ψ (a, b)‖ := by
+        exact_mod_cast congrArg Complex.ofReal hmul
+      have h₁ : (√(∑ i, ‖ψ (i, b)‖ ^ 2) : ℂ) ≠ 0 := by
+        exact_mod_cast (Real.sqrt_pos.mpr hS₁).ne'
+      have h₂ : (√(∑ j, ‖ψ (a, j)‖ ^ 2) : ℂ) ≠ 0 := by
+        exact_mod_cast (Real.sqrt_pos.mpr hS₂).ne'
+      simp only [prod, apply] at key hsqrt h₁ h₂ hab ⊢
+      field_simp
+      linear_combination (ψ.vec (x, y) * ψ.vec (a, b)) * hsqrt + (‖ψ.vec (a, b)‖ : ℂ) * key
 end prod
 
 section mes
@@ -348,27 +295,16 @@ def Ket.MES (d) [Fintype d] [Nonempty d] : Ket (d × d) where
 
 /-- On any space of dimension at least two, the maximally entangled state `MES` is entangled. -/
 theorem Ket.MES_isEntangled [Nontrivial d] : (Ket.MES d).IsEntangled := by
-  obtain ⟨x, y, h⟩ := @Nontrivial.exists_pair_ne d _
-  rw [IsEntangled, MES, IsProd_iff_mul_eq_mul]
-  push Not
-  use x, y, x, y
-  simp [apply, h]
+  obtain ⟨x, y, h⟩ := exists_pair_ne d
+  simp only [IsEntangled, IsProd_iff_mul_eq_mul, not_forall]
+  exact ⟨x, y, x, y, by simp [MES, apply, h]⟩
 
 /-- The transpose trick -/
 theorem transposeTrick {d} [Fintype d] [Nonempty d] [DecidableEq d] {M : Matrix d d ℂ} :
     (M ⊗ₖ 1) *ᵥ (Ket.MES d).vec = (1 ⊗ₖ M.transpose) *ᵥ (Ket.MES d).vec := by
-  ext i
-  simp only [Ket.MES, Matrix.mulVec, dotProduct, Matrix.kroneckerMap, Matrix.one_apply]
-  simp
-  conv =>
-    enter [1, 2, a]
-    equals if (i.2, i.2) = a then (M i.1 i.2) / √(Fintype.card d) else 0 =>
-      grind
-  conv =>
-    enter [2, 2, a]
-    equals if (i.1, i.1) = a then (M i.1 i.2) / √(Fintype.card d) else 0 =>
-      grind
-  simp
+  ext ⟨i₁, i₂⟩
+  simp [Ket.MES, Matrix.mulVec, dotProduct, Matrix.kroneckerMap, Matrix.one_apply,
+    Fintype.sum_prod_type, mul_ite, ite_mul, Finset.sum_ite_eq]
 
 end mes
 
@@ -413,7 +349,7 @@ theorem KetUpToPhase.ind {p : KetUpToPhase d → Prop}
   @Quotient.ind _ Ket.PhaseEquiv p h
 
 theorem KetUpToPhase.surjective_mk : Function.Surjective (KetUpToPhase.mk (d := d)) :=
-  fun q => @Quotient.ind _ Ket.PhaseEquiv (fun q => ∃ a, KetUpToPhase.mk a = q) (fun a => ⟨a, rfl⟩) q
+  Quotient.mk_surjective
 
 end equiv
 
@@ -428,24 +364,17 @@ private def ketToEuclidean (ψ : Ket d) : EuclideanSpace ℂ d :=
   (WithLp.equiv 2 _).symm ψ.vec
 
 private lemma ketToEuclidean_norm (ψ : Ket d) : ‖ketToEuclidean ψ‖ = 1 := by
-  rw [EuclideanSpace.norm_eq]; convert! Real.sqrt_one
-  simp only [ketToEuclidean]; convert! ψ.normalized'
+  simp [EuclideanSpace.norm_eq, ketToEuclidean, ψ.normalized']
 
 private lemma dot_eq_euclidean_inner (ψ₁ ψ₂ : Ket d) :
     〈ψ₁‖ψ₂〉 = @inner ℂ (EuclideanSpace ℂ d) _
       (ketToEuclidean ψ₁) (ketToEuclidean ψ₂) := by
-  unfold dot ketToEuclidean
-  simp only [Bra.eq_conj, PiLp.inner_apply]
-  congr 1; ext x
-  rw [RCLike.inner_apply']
-  simp [WithLp.equiv, Ket.apply]
+  simp [dot, ketToEuclidean, PiLp.inner_apply, RCLike.inner_apply, Ket.apply, mul_comm]
 
 /-- The bra-ket product of normalized states has norm at most 1 (Cauchy-Schwarz). -/
 lemma Braket.norm_dot_le_one (ψ₁ ψ₂ : Ket d) : ‖〈ψ₁‖ψ₂〉‖ ≤ 1 := by
   rw [dot_eq_euclidean_inner]
-  calc ‖@inner ℂ (EuclideanSpace ℂ d) _ (ketToEuclidean ψ₁) (ketToEuclidean ψ₂)‖
-      ≤ ‖ketToEuclidean ψ₁‖ * ‖ketToEuclidean ψ₂‖ := norm_inner_le_norm _ _
-    _ = 1 := by rw [ketToEuclidean_norm, ketToEuclidean_norm, mul_one]
+  simpa [ketToEuclidean_norm] using norm_inner_le_norm (ketToEuclidean ψ₁) (ketToEuclidean ψ₂)
 
 end norm_bounds
 

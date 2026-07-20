@@ -50,15 +50,14 @@ def DegradablePreorder (dIn : Type*) [Fintype dIn] [DecidableEq dIn] : Preorder
     let _ := Λ.fst.snd.2;
     ⟨CPTPMap.id, CPTPMap.compose_id Λ.snd⟩
   le_trans Λ₁ Λ₂ Λ₃ h₁₂ h₂₃ := by
-    let _ := Λ₁.fst.snd.1;
-    let _ := Λ₁.fst.snd.2;
-    let _ := Λ₂.fst.snd.1;
-    let _ := Λ₂.fst.snd.2;
-    let _ := Λ₃.fst.snd.1;
-    let _ := Λ₃.fst.snd.2;
-    obtain ⟨D₁₂, hD₁₂⟩ := h₁₂;
-    obtain ⟨D₂₃, hD₂₃⟩ := h₂₃;
-    use D₁₂.compose D₂₃
-    rwa [CPTPMap.compose_assoc, hD₂₃]
+    let _ := Λ₁.fst.snd.1
+    let _ := Λ₁.fst.snd.2
+    let _ := Λ₂.fst.snd.1
+    let _ := Λ₂.fst.snd.2
+    let _ := Λ₃.fst.snd.1
+    let _ := Λ₃.fst.snd.2
+    obtain ⟨D₁₂, hD₁₂⟩ := h₁₂
+    obtain ⟨D₂₃, hD₂₃⟩ := h₂₃
+    exact ⟨D₁₂.compose D₂₃, by rwa [CPTPMap.compose_assoc, hD₂₃]⟩
 
 end

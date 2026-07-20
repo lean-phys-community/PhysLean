@@ -162,9 +162,9 @@ theorem emulates_self (Λ : CPTPMap d₁ d₂) : Λ.Emulates Λ :=
 @[trans]
 theorem emulates_trans (Λ₁ : CPTPMap d₁ d₂) (Λ₂ : CPTPMap d₃ d₄) (Λ₃ : CPTPMap d₅ d₆)
     (h₁₂ : Λ₁.Emulates Λ₂) (h₂₃ : Λ₂.Emulates Λ₃) : Λ₁.Emulates Λ₃ := by
-  obtain ⟨E₁, D₁, hED₁⟩ := h₁₂
-  obtain ⟨E₂, D₂, hED₂⟩ := h₂₃
-  exact ⟨E₁.compose E₂, D₂.compose D₁, by classical simp [← hED₁, ← hED₂, compose_assoc]⟩
+  obtain ⟨E₁, D₁, rfl⟩ := h₁₂
+  obtain ⟨E₂, D₂, rfl⟩ := h₂₃
+  exact ⟨E₁.compose E₂, D₂.compose D₁, by classical simp [compose_assoc]⟩
 
 end emulates
 
@@ -198,24 +198,19 @@ section AchievesRate
 /-- Every quantum channel out of a nonempty space achieves at least a rate of zero. -/
 theorem achievesRate_0 (Λ : CPTPMap d₁ d₂) [Nonempty d₁] : Λ.AchievesRate 0 := fun ε hε => by
   have : Nonempty d₂ := Λ.toPTPMap.nonemptyOut
-  refine ⟨1, one_pos, 1, default, ⟨default, default, Subsingleton.elim _ _⟩, by norm_num, ?_⟩
-  simpa [show (default : CPTPMap (Fin 1) (Fin 1)) = id from Subsingleton.elim _ _] using
-    εApproximates_monotone (εApproximates_self (id (dIn := Fin 1))) hε.le
+  exact ⟨1, one_pos, 1, id, ⟨default, default, Subsingleton.elim _ _⟩, by norm_num,
+    εApproximates_monotone (εApproximates_self id) hε.le⟩
 
 /-- The identity channel on D dimensional space achieves a rate of log2(D). -/
 theorem id_achievesRate_log_dim :
     (id (dIn := d₁)).AchievesRate (Real.logb 2 (Fintype.card d₁)) := by
   intro ε hε
-  use 1, zero_lt_one, Fintype.card d₁, id
-  constructor
-  · --piProd of id's is id, then use emulates_self up to equivalence
-    rw [show (fun (_ : Fin 1) ↦ id (dIn := d₁)) = (fun _ ↦ id) from rfl, piProd_id]
-    exact let σ := Fintype.equivFinOfCardEq (by simp +decide :
-            Fintype.card (Fin 1 → d₁) = Fintype.card d₁)
-      ⟨ofEquiv σ.symm, ofEquiv σ, by ext1; simp⟩
-  constructor
-  · norm_num
-  · exact εApproximates_monotone (εApproximates_self id) hε.le
+  refine ⟨1, one_pos, Fintype.card d₁, id, ?_, by norm_num,
+    εApproximates_monotone (εApproximates_self id) hε.le⟩
+  --piProd of id's is id, then use emulates_self up to equivalence
+  rw [piProd_id]
+  exact let σ := (Equiv.funUnique (Fin 1) d₁).trans (Fintype.equivFin d₁)
+    ⟨ofEquiv σ.symm, ofEquiv σ, by ext1; simp⟩
 
 /-- A channel cannot achieve a rate greater than log2(D), where D is the input dimension. -/
 @[sorryful]
@@ -231,34 +226,19 @@ end AristotleLemmas
 @[sorryful]
 theorem not_achievesRate_gt_log_dim_out (Λ : CPTPMap d₁ d₂) {R : ℝ}
     (hR : Real.logb 2 (Fintype.card d₂) < R) : ¬Λ.AchievesRate R := by
-  intro h;
-  -- We show that the identity channel on the output space `d₂` emulates `Λ`. Since capacity
-  -- is monotonic under emulation, `Q(Λ) ≤ Q(id_{d₂})`.
-  have h_emulate : (CPTPMap.id (dIn := d₂)).Emulates Λ := by
-    exact ⟨Λ, CPTPMap.id, by simp⟩
-  -- If `Λ` achieves rate `R`, then `id_{d₂}` achieves rate `R`. This follows because if
-  -- `Λ^{\otimes n}` emulates `B`, and `id^{\otimes n}` emulates `Λ^{\otimes n}` (by
-  -- functoriality of tensor product), then `id^{\otimes n}` emulates `B`.
-  have h_id_achieves : (CPTPMap.id (dIn := d₂)).AchievesRate R := by
-    intro ε hε_pos
-    obtain ⟨n, hn, dimB, B, hB_emulate, hB_rate, hB_approx⟩ := h ε hε_pos
-    have h_id_emulate :
-        (CPTPMap.piProd (fun (_ : Fin n) => CPTPMap.id (dIn := d₂))).Emulates B := by
-      rw [piProd_id]
-      obtain ⟨E, D, hD⟩ := h_emulate
-      exact emulates_trans _ _ _ ⟨piProd fun _ => E, piProd fun _ => D,
-        by simp [← hD, ← CPTPMap.piProd_comp]⟩ hB_emulate
-    exact ⟨ n, hn, dimB, B, h_id_emulate, hB_rate, hB_approx ⟩;
-  refine not_le_of_gt hR <| not_lt.mp fun h => ?_
-  exact not_lt_of_ge ( le_of_not_gt fun h' => not_achievesRate_gt_log_dim_in _ h' h_id_achieves ) h
+  -- If `Λ` achieves rate `R`, then so does `id_{d₂}`, since `id^{\otimes n}` emulates
+  -- `Λ^{\otimes n}`; this contradicts `not_achievesRate_gt_log_dim_in`.
+  intro h
+  refine not_achievesRate_gt_log_dim_in CPTPMap.id hR fun ε hε_pos => ?_
+  obtain ⟨n, hn, dimB, B, hB_emulate, hB_rate, hB_approx⟩ := h ε hε_pos
+  refine ⟨n, hn, dimB, B, ?_, hB_rate, hB_approx⟩
+  exact emulates_trans _ _ _ ⟨piProd fun _ => Λ, id, by simp [piProd_id]⟩ hB_emulate
 
 /-- The achievable rates are a bounded set. -/
 @[sorryful]
-theorem bddAbove_achievesRate (Λ : CPTPMap d₁ d₂) : BddAbove {R | Λ.AchievesRate R} := by
-  use Real.logb 2 (Fintype.card d₁)
-  intro R h
-  contrapose h
-  exact not_achievesRate_gt_log_dim_in Λ (lt_of_not_ge h)
+theorem bddAbove_achievesRate (Λ : CPTPMap d₁ d₂) : BddAbove {R | Λ.AchievesRate R} :=
+  ⟨Real.logb 2 (Fintype.card d₁), fun _ h =>
+    not_lt.1 fun hR => not_achievesRate_gt_log_dim_in Λ hR h⟩
 
 end AchievesRate
 
@@ -280,14 +260,10 @@ theorem zero_le_quantumCapacity (Λ : CPTPMap d₁ d₂) [Nonempty d₁] :
 @[sorryful]
 theorem quantumCapacity_ge_log_dim_in (Λ : CPTPMap d₁ d₂) :
     Λ.quantumCapacity ≤ Real.logb 2 (Fintype.card d₁) :=
-  Real.sSup_le (by
-    intro R h
-    contrapose h
-    exact not_achievesRate_gt_log_dim_in Λ (lt_of_not_ge h))
-  (by
-    by_cases h : Nonempty d₁
-    · apply Real.logb_nonneg one_lt_two (Nat.one_le_cast.mpr Fintype.card_pos)
-    · simp [not_nonempty_iff.mp h])
+  Real.sSup_le (fun _ h => not_lt.1 fun hR => not_achievesRate_gt_log_dim_in Λ hR h) <| by
+    rcases isEmpty_or_nonempty d₁
+    · simp
+    · exact Real.logb_nonneg one_lt_two (Nat.one_le_cast.2 Fintype.card_pos)
 
 /-- The LSD (Lloyd-Shor-Devetak) theorem: the quantum capacity is at least as large the
 single-copy coherent information. The "coherent information" is used in literature to refer to

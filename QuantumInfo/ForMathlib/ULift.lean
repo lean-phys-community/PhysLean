@@ -63,14 +63,7 @@ noncomputable instance {𝕜 : Type u} [RCLike 𝕜] : RCLike (ULift.{v,u} 𝕜)
   im := RCLike.im.comp AddEquiv.ulift.toAddMonoidHom (N := 𝕜)
   I := .up RCLike.I
   I_re_ax := by simp
-  I_mul_I_ax := by
-    rcases RCLike.I_mul_I_ax (K := 𝕜) with h |h
-    · left
-      ext1
-      exact h
-    · right
-      ext1
-      exact h
+  I_mul_I_ax := (RCLike.I_mul_I_ax (K := 𝕜)).imp (congrArg ULift.up) (congrArg ULift.up)
   re_add_im_ax z := by exact congrArg ULift.up (RCLike.re_add_im_ax z.down)
   ofReal_re_ax r := by simp
   ofReal_im_ax := by simp

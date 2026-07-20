@@ -63,23 +63,13 @@ theorem no_cloning {U : 𝐔[d × d]}
     (hφ : U ◃ pure (φ ⊗ᵠ f) = pure (φ ⊗ᵠ φ))
     (H : ⟪pure ψ, pure φ⟫_Prob < (1 : ℝ)) :
     ⟪pure ψ, pure φ⟫_Prob = (0 : ℝ) := by
-  set ρψ := pure ψ
-  set ρφ := pure φ
-  have h1 : ⟪ρψ, ρφ⟫_Prob * ⟪ρψ, ρφ⟫_Prob = ⟪pure (ψ ⊗ᵠ ψ), pure (φ ⊗ᵠ φ)⟫_Prob := by
-    grind only [pure_prod_pure, prod_inner_prod]
-  have h2 : (⟪pure (ψ ⊗ᵠ ψ), pure (φ ⊗ᵠ φ)⟫_Prob : ℝ) =
-      ⟪U ◃ pure (ψ ⊗ᵠ f), U ◃ pure (φ ⊗ᵠ f)⟫_Prob := by
-    grind only [pure_prod_pure]
-  replace h2 : ((pure (ψ ⊗ᵠ ψ)).m * (pure (φ ⊗ᵠ φ)).m).trace.re = (ρψ.m * ρφ.m).trace.re := by
-    convert! ← h2
-    simp +zetaDelta only [inner_U_conj, pure_prod_pure, prod]
-    simp [inner, ← Matrix.mul_kronecker_mul, pure_mul_self,
-      Matrix.trace_kronecker]
-  have h3 : (ρψ.m * ρφ.m).trace.re * ((ρψ.m * ρφ.m).trace.re - 1) = 0 := by
-    rw [mul_sub, sub_eq_zero, mul_one]
-    exact congr(Subtype.val $h1).trans h2
-  rw [mul_eq_zero] at h3
-  apply h3.resolve_right
-  exact sub_ne_zero_of_ne H.ne
+  have hf : ⟪pure f, pure f⟫_Prob = 1 :=
+    Prob.ext (by simp [pure_inner, Braket.dot_self_eq_one])
+  have h1 : ⟪pure ψ, pure φ⟫_Prob * ⟪pure ψ, pure φ⟫_Prob = ⟪pure ψ, pure φ⟫_Prob * 1 := by
+    rw [← hf, ← prod_inner_prod, ← prod_inner_prod, ← pure_prod_pure, ← pure_prod_pure,
+      ← pure_prod_pure, ← pure_prod_pure, ← hψ, ← hφ, inner_U_conj]
+  have h2 := Prob.ext_iff.mp h1
+  push_cast at h2
+  nlinarith [Prob.zero_le_coe (p := ⟪pure ψ, pure φ⟫_Prob)]
 
 end MState

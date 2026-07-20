@@ -40,67 +40,30 @@ lemma Φ_continuous : Continuous (⇑Φ : Matrix d d ℂ → _) :=
 
 /-- `Φ` maps Hermitian matrices to self-adjoint operators. -/
 lemma Φ_isSelfAdjoint (A : HermitianMat d ℂ) :
-    IsSelfAdjoint (Φ A.mat) := by
-  rw [isSelfAdjoint_iff, ← map_star (Φ (d := d))]
-  congr 1; exact A.conjTranspose_mat
+    IsSelfAdjoint (Φ A.mat) :=
+  A.H.isSelfAdjoint.map Φ
 
 /-
 `Φ` preserves nonneg: PSD HermitianMat maps to nonneg operators.
 -/
 lemma Φ_nonneg (A : HermitianMat d ℂ) (hA : 0 ≤ A) :
     (0 : EuclideanSpace ℂ d →L[ℂ] EuclideanSpace ℂ d) ≤ Φ A.mat := by
-  refine' { .. }
-  · convert Φ_isSelfAdjoint A using 1
-    simp [IsSelfAdjoint, LinearMap.IsSymmetric]
-    simp [ContinuousLinearMap.ext_iff, ContinuousLinearMap.star_eq_adjoint]
-    constructor
-    · intro h x
-      apply ext_inner_left ℂ
-      intro y
-      rw [ContinuousLinearMap.adjoint_inner_right, h]
-    · intro h x y
-      rw [← ContinuousLinearMap.adjoint_inner_left, h]
-  · intro x
-    have h_inner : ∀ x : EuclideanSpace ℂ d, 0 ≤ Complex.re (inner ℂ x (Φ A.mat x)) := by
-      intro x
-      have h_inner : 0 ≤ Complex.re (∑ i, ∑ j, star (x i) * A.mat i j * x j) := by
-        have := hA.2
-        specialize this (Finsupp.equivFunOnFinite.symm x.ofLp); simp_all [Finsupp.sum_fintype]
-        simp_all [Complex.le_def]
-      convert h_inner using 1
-      simp [inner, mul_comm]
-      simp [Matrix.mulVec, dotProduct, mul_comm, Finset.sum_add_distrib]
-      simp [mul_add, mul_sub, Finset.mul_sum _ _ _, Finset.sum_add_distrib, Finset.sum_sub_distrib]
-      simp [mul_left_comm]
-      ring
-    convert h_inner x using 1
-    simp [ContinuousLinearMap.reApplyInnerSelf]
-    rw [← inner_conj_symm, Complex.conj_re]
+  have h := star_mul_self_nonneg (Φ (A ^ (1/2 : ℝ)).mat)
+  rwa [← map_star, ← map_mul, Matrix.star_eq_conjTranspose,
+    (A ^ (1/2 : ℝ)).conjTranspose_mat, HermitianMat.pow_half_mul hA] at h
 
 open ComplexOrder in
 /-- `Φ` maps PosDef HermitianMat to pdSet. -/
 lemma Φ_mem_pdSet [Nonempty d] (A : HermitianMat d ℂ) (hA : A.mat.PosDef) :
     Φ A.mat ∈ pdSet (ℋ := EuclideanSpace ℂ d) := by
-  have h_spectrum : spectrum ℝ (Φ A.mat) = spectrum ℝ A.mat := by
-    ext x
-    simp [spectrum.mem_iff]
-    rw [show (algebraMap ℝ _) x = Φ (algebraMap ℝ _ x) from ?_,
-      show (algebraMap ℝ (Matrix d d ℂ)) x = x • 1 from ?_]
-    · simp [← map_sub, -map_smul]
-    · simp [Algebra.smul_def]
-    · ext
-      simp [Φ]
-      simp [Algebra.algebraMap_eq_smul_one, Matrix.mulVec, dotProduct]
-      simp [Matrix.one_apply, Finset.sum_ite_eq]
-  refine' ⟨ Φ_isSelfAdjoint A, h_spectrum.symm ▸ _ ⟩
-  exact HermitianMat.Matrix.PosDef.spectrum_subset_Ioi hA
+  exact ⟨Φ_isSelfAdjoint A, (AlgEquiv.spectrum_eq (Φ.toAlgEquiv.restrictScalars ℝ) A.mat).symm ▸
+    HermitianMat.Matrix.PosDef.spectrum_subset_Ioi hA⟩
 
 set_option synthInstance.maxHeartbeats 80000 in
 /-- `Φ` commutes with CFC for Hermitian matrices. -/
 lemma Φ_cfc (A : HermitianMat d ℂ) (f : ℝ → ℝ) :
-    Φ (cfc f A.mat) = cfc f (Φ A.mat) := by
-  exact StarAlgHomClass.map_cfc Φ f A.mat (hφ := Φ_continuous)
-    (ha := A.H.isSelfAdjoint)
+    Φ (cfc f A.mat) = cfc f (Φ A.mat) :=
+  StarAlgHomClass.map_cfc Φ f A.mat (hφ := Φ_continuous) (ha := A.H.isSelfAdjoint)
 
 set_option synthInstance.maxHeartbeats 80000 in
 /-- `Φ` commutes with rpow for PSD matrices. -/
@@ -113,10 +76,8 @@ lemma Φ_rpow (A : HermitianMat d ℂ) (hA : 0 ≤ A) (r : ℝ) :
 for any matrix M (not just Hermitian). -/
 lemma trace_Φ_eq (M : Matrix d d ℂ) :
     (LinearMap.trace ℂ (EuclideanSpace ℂ d)) (Φ M).toLinearMap = M.trace := by
-  rw [LinearMap.trace_eq_matrix_trace ℂ (EuclideanSpace.basisFun d ℂ).toBasis]
-  congr 1
-  ext i j
-  simp [Φ, Matrix.toEuclideanCLM, EuclideanSpace.basisFun]
+  simp [LinearMap.trace_eq_matrix_trace ℂ (EuclideanSpace.basisFun d ℂ).toBasis, Φ,
+    Matrix.toEuclideanCLM, EuclideanSpace.basisFun, Matrix.trace]
 
 /-- `traceRe(Φ(M)) = re(Tr[M])` for any matrix M. -/
 lemma traceRe_Φ_general (M : Matrix d d ℂ) :
@@ -131,61 +92,35 @@ open LiebAndoTrace GeneralizedPerspectiveFunction ComplexOrder
 
 omit [Fintype d] in
 /-- The PSD cone is convex. -/
-private lemma psd_convex : Convex ℝ {σ : HermitianMat d ℂ | 0 ≤ σ} := by
-  intro σ₁ hσ₁ σ₂ hσ₂ a b ha hb _
-  simp only [Set.mem_setOf_eq] at *
-  exact add_nonneg (smul_nonneg ha hσ₁) (smul_nonneg hb hσ₂)
+private lemma psd_convex : Convex ℝ {σ : HermitianMat d ℂ | 0 ≤ σ} :=
+  convex_Ici 0
 
 /-- The trace of rpow applied to a congruence is continuous in the base matrix. -/
 private lemma trace_conj_rpow_continuous {s p : ℝ} (hs : 0 ≤ s) (hp : 0 ≤ p)
     (H : HermitianMat d ℂ) :
     Continuous (fun σ : HermitianMat d ℂ ↦
       ((H.conj (σ ^ s).mat) ^ p).trace) := by
-  have h_rpow_cont : Continuous (fun σ : HermitianMat d ℂ => σ ^ s) :=
-    rpow_const_continuous hs
-  have h_conj_cont : Continuous (fun σ : HermitianMat d ℂ => (σ ^ s).mat) :=
-    Continuous.subtype_val h_rpow_cont
-  have h_trace_cont : Continuous (fun σ : HermitianMat d ℂ => σ.trace) := by
-    simp [HermitianMat.trace]; fun_prop
-  have h_comp_cont : Continuous (fun σ : Matrix d d ℂ => ((conj σ H) ^ p).trace) := by
-    have h_conj_cont : Continuous (fun σ : Matrix d d ℂ => conj σ H) :=
-      continuous_conj H
-    exact h_trace_cont.comp (rpow_const_continuous hp |>.comp h_conj_cont)
-  exact h_comp_cont.comp h_conj_cont
+  have h_trace : Continuous (fun σ : HermitianMat d ℂ => σ.trace) := by
+    simp [HermitianMat.trace]
+    fun_prop
+  fun_prop
 
 /-! ### Density and continuity lemmas for PD/PSD extension -/
 
 private lemma psd_add_eps_posdef [Nonempty d] (σ : HermitianMat d ℂ) (hσ : 0 ≤ σ)
     (ε : ℝ) (hε : 0 < ε) : (σ + ε • (1 : HermitianMat d ℂ)).mat.PosDef := by
-  refine' ⟨ _, _ ⟩
-  · exact H (σ + ε • 1)
-  · intro x hx_ne_zero
-    have h_pos : 0 < ∑ i, ∑ j, star (x i) * (σ.mat i j + ε * (if i = j then 1 else 0)) * x j := by
-      have h_pos : 0 ≤ ∑ i, ∑ j, star (x i) * σ i j * x j := by
-        have := hσ.2
-        simpa [Finsupp.sum_fintype, Finset.sum_mul _ _ _] using this x
-      simp_all [mul_add, add_mul, Finset.sum_add_distrib]
-      refine' add_pos_of_nonneg_of_pos h_pos _
-      simp_all [mul_comm, mul_left_comm, Complex.mul_conj, Complex.normSq_eq_norm_sq]
-      contrapose! hx_ne_zero
-      ext i
-      simp only [Finsupp.coe_zero, Pi.zero_apply]
-      exact not_not.mp fun hi => hx_ne_zero <| lt_of_lt_of_le (by positivity) <|
-        Finset.single_le_sum (fun i _ => by positivity) <| Finset.mem_univ i
-    simp [Finsupp.sum]
-    convert h_pos using 1
-    rw [Finset.sum_subset (Finset.subset_univ x.support)]
-    · refine Finset.sum_congr rfl fun i hi => ?_
-      exact Finset.sum_subset (Finset.subset_univ _) fun j hj₁ hj₂ => by aesop
-    · aesop
+  refine Matrix.PosDef.of_dotProduct_mulVec_pos (σ + ε • 1).H fun x hx => ?_
+  simp only [mat_add, mat_smul, mat_one, Matrix.add_mulVec, Matrix.smul_mulVec,
+    Matrix.one_mulVec, dotProduct_add, dotProduct_smul]
+  exact add_pos_of_nonneg_of_pos ((zero_le_iff.mp hσ).dotProduct_mulVec_nonneg x)
+    (smul_pos hε (Matrix.dotProduct_star_self_pos_iff.mpr hx))
 
 omit [Fintype d] in
 /-- σ + εI → σ as ε → 0+. -/
 private lemma tendsto_add_eps (σ : HermitianMat d ℂ) :
     Filter.Tendsto (fun ε : ℝ ↦ σ + ε • (1 : HermitianMat d ℂ))
       (nhdsWithin 0 (Set.Ioi 0)) (nhds σ) := by
-  exact tendsto_nhdsWithin_of_tendsto_nhds
-    (Continuous.tendsto' (by continuity) _ _ (by simp))
+  exact tendsto_nhdsWithin_of_tendsto_nhds (Continuous.tendsto' (by fun_prop) _ _ (by simp))
 
 /-! ### Helper lemmas for the core concavity proof -/
 
@@ -198,23 +133,10 @@ private lemma trace_rpow_conjTranspose_mul_comm [Nonempty d]
     (M₁ ^ p).trace = (M₂ ^ p).trace := by
   intro M₁ M₂
   rw [trace_rpow_eq_sum M₁ p, trace_rpow_eq_sum M₂ p]
-  have hcharpoly : M₁.mat.charpoly = M₂.mat.charpoly :=
-    Matrix.charpoly_mul_comm C.conjTranspose C
-  rw [M₁.H.charpoly_eq, M₂.H.charpoly_eq] at hcharpoly
-  have hmultiset : Finset.univ.val.map (fun i => (M₁.H.eigenvalues i : ℂ)) =
-                   Finset.univ.val.map (fun i => (M₂.H.eigenvalues i : ℂ)) := by
-    have h1 := Polynomial.roots_multiset_prod_X_sub_C
-      (Finset.univ.val.map (fun i => (M₁.H.eigenvalues i : ℂ)))
-    have h2 := Polynomial.roots_multiset_prod_X_sub_C
-      (Finset.univ.val.map (fun i => (M₂.H.eigenvalues i : ℂ)))
-    simp only [Multiset.map_map] at h1 h2
-    rw [← h1, ← h2]; congr 1
-  have hmap : Finset.univ.val.map (fun i => M₁.H.eigenvalues i ^ p) =
-              Finset.univ.val.map (fun i => M₂.H.eigenvalues i ^ p) := by
-    have := congr_arg (Multiset.map (fun x : ℂ => x.re ^ p)) hmultiset
-    simp [Multiset.map_map, Function.comp, Complex.ofReal_re] at this
-    exact this
-  simpa using congr_arg Multiset.sum hmap
+  have h : M₁.mat.charpoly.roots = M₂.mat.charpoly.roots :=
+    congr_arg Polynomial.roots (Matrix.charpoly_mul_comm C.conjTranspose C)
+  rw [M₁.H.roots_charpoly_eq_eigenvalues, M₂.H.roots_charpoly_eq_eigenvalues] at h
+  simpa using congr_arg (fun m => (m.map fun x : ℂ => x.re ^ p).sum) h
 
 /-! ### Core concavity on positive definite matrices -/
 
@@ -231,18 +153,10 @@ private lemma variational_lower_bound
     (X Z : HermitianMat d ℂ) (hX : 0 ≤ X) (hZ : 0 ≤ Z)
     {p : ℝ} (hp : 1 < p) :
     p * ⟪X, Z ^ ((p-1)/p)⟫_ℝ - (p - 1) * Z.trace ≤ (X ^ p).trace := by
-  have := @HermitianMat.trace_young d _ _ X (Z ^ ((p - 1) / p)) hX (?_) p (p / (p - 1)) hp ?_
-  · -- Using the fact that $Z$ is positive semi-definite, we can simplify the expression.
-    have hZ_pow : ((Z ^ ((p - 1) / p)) ^ (p / (p - 1))) = Z := by
-      rw [← HermitianMat.rpow_mul]
-      · field_simp
-        rw [div_self (by linarith), HermitianMat.rpow_one]
-      · exact hZ
-    simp_all
-    field_simp at this
-    exact this
-  · exact rpow_nonneg hZ
-  · grind
+  have h := trace_young X (Z ^ ((p - 1) / p)) hX (rpow_nonneg hZ) p (p / (p - 1)) hp (by grind)
+  rw [← rpow_mul hZ, show (p - 1) / p * (p / (p - 1)) = 1 from by grind, rpow_one] at h
+  field_simp at h
+  linarith
 
 /-
 At the optimizer Z = X^p, the variational bound is tight.
@@ -255,16 +169,11 @@ private lemma variational_eq_optimizer
   have h_exp : (X ^ p) ^ ((p - 1) / p) = X ^ (p - 1) := by
     rw [← rpow_mul hX, mul_div_cancel₀ _ (by positivity)]
   have h_inner : ⟪X, X ^ (p - 1)⟫_ℝ = (X ^ p).trace := by
-    have h_inner : ⟪X, X ^ (p - 1)⟫_ℝ = (X * (X ^ (p - 1)).mat).trace.re := by
-      exact Real.ext_cauchy rfl
-    convert h_inner using 1
-    have h_exp : (X ^ p).mat = X.mat * (X ^ (p - 1)).mat := by
-      convert mat_rpow_add hX _
-      rotate_left
-      rotate_left
-      exacts [1, by linarith, by ring, by simp]
-    exact h_exp ▸ rfl
-  rw [h_exp, h_inner]; ring
+    rw [inner_eq_re_trace, trace_eq_re_trace, Matrix.trace_mul_comm,
+      show (X ^ (p - 1)).mat * X.mat = (X ^ p).mat by
+        simpa using (mat_rpow_add hX (p := p - 1) (q := 1) (by linarith)).symm]
+  rw [h_exp, h_inner]
+  ring
 
 /-
 Joint concavity of the Lieb extension trace map on HermitianMat.
@@ -292,39 +201,17 @@ private lemma liebExtension_bridge [Nonempty d]
       simp [Matrix.mul_assoc, Matrix.trace_mul_comm K.mat]
     convert h_inner using 1
     rw [← traceRe_Φ_general]
-    simp [liebExtensionTraceMap, Φ_rpow, hσ, hZ]
-    rw [show star (Φ K.mat) = Φ K.mat from ?_]
-    have h_rewrite : IsSelfAdjoint (Φ K.mat) := by
-      exact Φ_isSelfAdjoint K
-    exact h_rewrite
+    simp [liebExtensionTraceMap, Φ_rpow, hσ, hZ, (Φ_isSelfAdjoint K).star_eq]
   convert! h_joint_concave (Φ_mem_pdSet σ₁ hσ₁) (Φ_mem_pdSet σ₂ hσ₂)
     (Φ_mem_pdSet Z₁ hZ₁) (Φ_mem_pdSet Z₂ hZ₂) hθ₀ hθ₁ using 1
-  · rw [h_rewrite σ₁ Z₁ (by
-      constructor
-      · simp [Matrix.IsHermitian]
-      · intro x; have := hσ₁.2
-        simp_all
-        exact if hx : x = 0 then by simp [hx] else le_of_lt (this hx))
-        (by finiteness), h_rewrite σ₂ Z₂ (by finiteness) (by finiteness)]
+  · rw [h_rewrite σ₁ Z₁ (zero_le_iff.mpr hσ₁.posSemidef) (zero_le_iff.mpr hZ₁.posSemidef),
+      h_rewrite σ₂ Z₂ (zero_le_iff.mpr hσ₂.posSemidef) (zero_le_iff.mpr hZ₂.posSemidef)]
     norm_num [Algebra.smul_def]
   · convert h_rewrite ((1 - θ) • σ₁ + θ • σ₂) ((1 - θ) • Z₁ + θ • Z₂) _ _ using 1
-    · congr! 2
-      · ext; simp [Φ]
-        simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc]
-      · ext; simp [Φ]
-        simp [Matrix.mulVec, dotProduct, Finset.mul_sum]
-        simp only [mul_assoc]
-    · nontriviality
-      have h_pos_def : ∀ (A : HermitianMat d ℂ), A.mat.PosDef → 0 ≤ A := by
-        intro A hA
-        have := hA.2
-        constructor
-        · simp [Matrix.IsHermitian]
-        · intro x; by_cases hx : x = 0 <;> simp_all [Matrix.PosDef]
-          exact le_of_lt (hA.2 hx)
-      positivity [sub_nonneg.2 hθ₁]
-    · have : 0 ≤ 1 - θ := by linarith
-      positivity
+    · congr! 2 <;>
+        simp only [mat_add, mat_smul, map_add, RCLike.real_smul_eq_coe_smul (K := ℂ), map_smul]
+    all_goals have : 0 ≤ 1 - θ := by linarith
+    all_goals positivity
 
 /-
 **AB/BA rewrite**: `Tr[(H.conj (σ^s))^p] = Tr[((σ^{2s}).conj (H^{1/2}))^p]` for PSD σ, H.
@@ -333,21 +220,15 @@ private lemma trace_conj_rpow_eq_conj_sqrt [Nonempty d]
     (σ H : HermitianMat d ℂ) (hσ : 0 ≤ σ) (hH : 0 ≤ H) (s p : ℝ) (hs : 0 < s) :
     ((H.conj (σ ^ s).mat) ^ p).trace =
     (((σ ^ (2 * s)).conj (H ^ (1/2 : ℝ)).mat) ^ p).trace := by
-  norm_num [conj_apply_mat, Matrix.mul_assoc]
   have h_exp : (σ ^ (2 * s)).mat = (σ ^ s).mat * (σ ^ s).mat := by
-    convert mat_rpow_add hσ _ using 1 <;> ring_nf
-    positivity
-  have h_exp' : (H ^ (1 / 2 : ℝ)).mat * (H ^ (1 / 2 : ℝ)).mat = H.mat := by
-    apply HermitianMat.pow_half_mul hH
-  -- Apply the lemma that states the equality of the traces of the conjugates.
-  have := trace_rpow_conjTranspose_mul_comm ((σ ^ s).mat * (H ^ (1 / 2 : ℝ)).mat) p
-  convert this.symm using 3 <;> simp [mul_assoc]
-  · ext; simp [← mul_assoc]
-    simp [conj_apply]
-    simp_all [mul_assoc]
-  · ext; simp [← mul_assoc]
-    simp [conj, h_exp]
-    simp [mul_assoc]
+    rw [two_mul]
+    exact mat_rpow_add hσ (by positivity)
+  have h := trace_rpow_conjTranspose_mul_comm ((σ ^ s).mat * (H ^ (1 / 2 : ℝ)).mat) p
+  convert h.symm using 3
+  · ext1
+    simp [conj_apply_mat, Matrix.conjTranspose_mul, ← pow_half_mul hH, Matrix.mul_assoc]
+  · ext1
+    simp [conj_apply_mat, Matrix.conjTranspose_mul, h_exp, Matrix.mul_assoc]
 
 /-
 Extension of liebExtension_bridge from PD to PSD Z inputs via continuity.
@@ -367,35 +248,17 @@ private lemma liebExtension_bridge_psd [Nonempty d]
     intro ε hε_pos
     exact liebExtension_bridge hq hr hqr K σ₁ σ₂ (Z₁ + ε • 1) (Z₂ + ε • 1) hσ₁ hσ₂
       (psd_add_eps_posdef Z₁ hZ₁ ε hε_pos) (psd_add_eps_posdef Z₂ hZ₂ ε hε_pos) θ hθ₀ hθ₁
-  -- Apply the continuity results to take the limit as ε approaches 0.
-  have h_lim :
-    Filter.Tendsto (fun ε : ℝ ↦ ⟪(σ₁ ^ q).conj K, (Z₁ + ε • 1) ^ r⟫_ℝ) (𝓝[>] 0)
-      (𝓝 ⟪(σ₁ ^ q).conj K, Z₁ ^ r⟫_ℝ) ∧
-    Filter.Tendsto (fun ε : ℝ ↦ ⟪(σ₂ ^ q).conj K, (Z₂ + ε • 1) ^ r⟫_ℝ) (𝓝[>] 0)
-      (𝓝 ⟪(σ₂ ^ q).conj K, Z₂ ^ r⟫_ℝ) := by
-    constructor <;> refine' Filter.Tendsto.mono_left _ nhdsWithin_le_nhds
-    · have h_cont : Continuous (fun ε : ℝ => (Z₁ + ε • 1) ^ r) := by
-        have h_cont : Continuous (fun ε : ℝ => (Z₁ + ε • 1)) := by
-          fun_prop
-        exact (HermitianMat.rpow_const_continuous (show 0 ≤ r by positivity)).comp h_cont
-      convert Filter.Tendsto.inner tendsto_const_nhds (h_cont.tendsto 0) using 2
-      norm_num
-    · have h_inner_cont : Continuous (fun ε : ℝ => (Z₂ + ε • 1) ^ r) := by
-        have h_cont : Continuous (fun ε : HermitianMat d ℂ => ε ^ r) := by
-          apply_rules [HermitianMat.rpow_const_continuous]
-          positivity
-        fun_prop (disch := solve_by_elim)
-      convert Filter.Tendsto.inner tendsto_const_nhds (h_inner_cont.tendsto 0) using 2; simp
-  refine le_of_tendsto_of_tendsto
-    ((tendsto_const_nhds.mul h_lim.1).add (tendsto_const_nhds.mul h_lim.2)) ?_
+  have key : ∀ X Z : HermitianMat d ℂ, Filter.Tendsto (fun ε : ℝ ↦ ⟪X, (Z + ε • 1) ^ r⟫_ℝ)
+      (𝓝[>] 0) (𝓝 ⟪X, Z ^ r⟫_ℝ) := fun X Z => by
+    have hc : Continuous fun ε : ℝ => (Z + ε • 1) ^ r :=
+      (rpow_const_continuous hr.le).comp (by fun_prop)
+    exact (tendsto_const_nhds.inner (hc.tendsto' 0 _ (by simp))).mono_left nhdsWithin_le_nhds
+  have hmix : ∀ ε : ℝ, (1 - θ) • (Z₁ + ε • 1) + θ • (Z₂ + ε • 1) =
+      (1 - θ) • Z₁ + θ • Z₂ + ε • 1 := fun ε => by module
+  exact le_of_tendsto_of_tendsto
+    ((tendsto_const_nhds.mul (key _ Z₁)).add (tendsto_const_nhds.mul (key _ Z₂)))
+    (by simpa only [hmix] using key _ ((1 - θ) • Z₁ + θ • Z₂))
     (Filter.eventually_of_mem self_mem_nhdsWithin h_cont)
-  refine Filter.Tendsto.inner tendsto_const_nhds ?_
-  refine (rpow_const_continuous (by positivity) |> Continuous.continuousAt |> fun h =>
-    h.tendsto.comp (show Filter.Tendsto (fun ε : ℝ => (1 - θ) • (Z₁ + ε • 1) + θ • (Z₂ + ε • 1))
-    (nhdsWithin 0 (Set.Ioi 0)) (nhds ((1 - θ) • Z₁ + θ • Z₂)) from ?_))
-  refine' tendsto_nhdsWithin_of_tendsto_nhds _
-  refine' Continuous.tendsto' _ _ _ _ <;> norm_num
-  fun_prop
 
 set_option maxHeartbeats 1600000 in
 /-- Core concavity inequality on positive definite matrices. -/
@@ -412,25 +275,22 @@ private lemma trace_conj_rpow_concave_pd [Nonempty d] {α : ℝ} (hα : 1 < α)
   have hα_pos : 0 < α := by linarith
   have hαm1_pos : 0 < α - 1 := by linarith
   have hα_ne : α ≠ 0 := ne_of_gt hα_pos
-  have hαm1_ne : α - 1 ≠ 0 := ne_of_gt hαm1_pos
   have hs_pos : 0 < s := by show 0 < (α - 1) / (2 * α); positivity
-  have hp_gt1 : 1 < p := by
-    show 1 < α / (α - 1); rw [lt_div_iff₀ hαm1_pos]; linarith
+  have hp_gt1 : 1 < p := (one_lt_div hαm1_pos).mpr (by linarith)
   have hp_pos : 0 < p := by linarith
   -- The exponents for the bridge
   set q := (α - 1) / α with q_def
   set r := 1 / α with r_def
-  have hq_pos : 0 < q := by simp only [q_def]; positivity
-  have hr_pos : 0 < r := by simp only [r_def]; positivity
+  have hq_pos : 0 < q := div_pos hαm1_pos hα_pos
+  have hr_pos : 0 < r := div_pos one_pos hα_pos
   have hqr : q + r ≤ 1 := by
-    simp only [q_def, r_def]; rw [← add_div, sub_add_cancel, div_self hα_ne]
+    rw [q_def, r_def, ← add_div, sub_add_cancel, div_self hα_ne]
   have h2s_eq_q : 2 * s = q := by
     show 2 * ((α - 1) / (2 * α)) = (α - 1) / α; field_simp
   have hr_eq : r = (p - 1) / p := by
     show 1 / α = (α / (α - 1) - 1) / (α / (α - 1)); field_simp; ring
   -- K = H^{1/2}
   set K := H ^ (1/2 : ℝ) with K_def
-  have hK : 0 ≤ K := rpow_nonneg hH
   -- PSD facts for σ_i
   have hσ₁_psd : 0 ≤ σ₁ := HermitianMat.zero_le_iff.mpr hσ₁.posSemidef
   have hσ₂_psd : 0 ≤ σ₂ := HermitianMat.zero_le_iff.mpr hσ₂.posSemidef
@@ -476,9 +336,7 @@ private lemma trace_conj_rpow_concave_pd [Nonempty d] {α : ℝ} (hα : 1 < α)
         have bridge := liebExtension_bridge_psd hq_pos hr_pos hqr K
           σ₁ σ₂ Z₁ Z₂ hσ₁ hσ₂ hZ₁ hZ₂ b hb (by linarith)
         rw [show (1 : ℝ) - b = a from by linarith] at bridge
-        have trace_lin : (a • Z₁ + b • Z₂).trace = a * Z₁.trace + b * Z₂.trace := by
-          rw [trace_add, trace_smul, trace_smul]
-        rw [trace_lin]
+        rw [trace_add, trace_smul, trace_smul]
         linarith [mul_le_mul_of_nonneg_left bridge hp_pos.le]
     _ ≤ (X_mix ^ p).trace := by
         rw [hr_eq]
@@ -498,6 +356,10 @@ theorem trace_conj_rpow_concave {α : ℝ} (hα : 1 < α)
   refine' ⟨psd_convex, fun σ₁ hσ₁ σ₂ hσ₂ a b ha hb hab => _⟩
   by_cases hd : Nonempty d
   · simp only [Set.mem_setOf_eq, smul_eq_mul] at *
+    have hcont : Continuous (fun σ : HermitianMat d ℂ ↦ ((H.conj (σ ^ ((α - 1) / (2 * α))).mat) ^
+        (α / (α - 1))).trace) :=
+      trace_conj_rpow_continuous (div_nonneg (sub_nonneg.2 hα.le) (by positivity))
+        (div_nonneg (by positivity) (by linarith)) H
     open scoped Topology in
     refine' le_of_tendsto_of_tendsto (b := 𝓝[>] (0 : ℝ))
       (f := fun ε ↦ a * ((H.conj ((σ₁ + ε • 1) ^ ((α - 1) / (2 * α))).mat) ^ (α / (α - 1))).trace +
@@ -505,26 +367,13 @@ theorem trace_conj_rpow_concave {α : ℝ} (hα : 1 < α)
       (g := fun ε ↦ ((H.conj ((a • (σ₁ + ε • 1) + b • (σ₂ + ε • 1)) ^ ((α - 1) / (2 * α))).mat) ^
         (α / (α - 1))).trace)
       ?_ ?_ _
-    · have hcont : Continuous (fun σ : HermitianMat d ℂ ↦ ((H.conj (σ ^ ((α - 1) / (2 * α))).mat) ^
-          (α / (α - 1))).trace) :=
-        trace_conj_rpow_continuous
-          (div_nonneg (sub_nonneg.2 hα.le) (by positivity))
-          (div_nonneg (by positivity) (by linarith)) H
-      exact Filter.Tendsto.add (tendsto_const_nhds.mul (hcont.continuousAt.tendsto.comp
-        (tendsto_add_eps _))) (tendsto_const_nhds.mul (hcont.continuousAt.tendsto.comp
-        (tendsto_add_eps _))) |> fun h => h.trans (by simp)
-    · have hcont : Continuous (fun σ : HermitianMat d ℂ ↦ ((H.conj (σ ^ ((α - 1) / (2 * α))).mat) ^
-          (α / (α - 1))).trace) :=
-        trace_conj_rpow_continuous (div_nonneg (sub_nonneg.2 hα.le) (by positivity))
-          (div_nonneg (by positivity) (by linarith)) H
-      refine hcont.continuousAt.tendsto.comp (show Filter.Tendsto
-        (fun ε ↦ a • (σ₁ + ε • 1) + b • (σ₂ + ε • 1)) (𝓝[>] 0) (𝓝 (a • σ₁ + b • σ₂)) from ?_)
-      apply tendsto_nhdsWithin_of_tendsto_nhds
-      exact Continuous.tendsto' (by fun_prop) _ _ (by simp)
+    · exact (tendsto_const_nhds.mul (hcont.continuousAt.tendsto.comp (tendsto_add_eps _))).add
+        (tendsto_const_nhds.mul (hcont.continuousAt.tendsto.comp (tendsto_add_eps _)))
+    · exact hcont.continuousAt.tendsto.comp (tendsto_nhdsWithin_of_tendsto_nhds
+        (Continuous.tendsto' (by fun_prop) _ (a • σ₁ + b • σ₂) (by simp)))
     · filter_upwards [self_mem_nhdsWithin] with ε hε
-      refine trace_conj_rpow_concave_pd hα H hH (σ₁ + ε • 1) (σ₂ + ε • 1) ?_ ?_ a b ha hb hab
-      · exact psd_add_eps_posdef σ₁ hσ₁ ε hε
-      · exact psd_add_eps_posdef σ₂ hσ₂ ε hε
+      exact trace_conj_rpow_concave_pd hα H hH _ _ (psd_add_eps_posdef σ₁ hσ₁ ε hε)
+        (psd_add_eps_posdef σ₂ hσ₂ ε hε) a b ha hb hab
   · simp_all [HermitianMat.trace]
 
 end HermitianMat

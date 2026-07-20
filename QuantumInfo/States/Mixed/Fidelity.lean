@@ -29,9 +29,8 @@ namespace MState
 def fidelity (ρ σ : MState d) : ℝ :=
   (σ.M.conj ρ.M.sqrt.mat).sqrt.trace
 
-theorem fidelity_ge_zero : 0 ≤ fidelity ρ σ := by
-  apply HermitianMat.trace_nonneg
-  apply HermitianMat.sqrt_nonneg
+theorem fidelity_ge_zero : 0 ≤ fidelity ρ σ :=
+  HermitianMat.trace_nonneg (HermitianMat.sqrt_nonneg _)
 
 theorem fidelity_le_one : fidelity ρ σ ≤ 1 := by
   unfold fidelity
@@ -42,14 +41,10 @@ theorem fidelity_le_one : fidelity ρ σ ≤ 1 := by
         HermitianMat.trace_rpow_conj_le σ.nonneg (HermitianMat.sqrt_nonneg ρ.M)
           (by norm_num) (by norm_num) (by norm_num) (by norm_num)
     _ = 1 := by
-        have h1 : (σ.M ^ (2/2 : ℝ)).trace = 1 := by
-          rw [show (2:ℝ)/2 = 1 from by norm_num, HermitianMat.rpow_one]; exact σ.tr
-        have h2 : (ρ.M.sqrt ^ (2 : ℝ)).trace = 1 := by
-          rw [show ρ.M.sqrt = ρ.M ^ (1/2 : ℝ) from by
-            rw [HermitianMat.sqrt_eq_cfc_rpow_half, ← HermitianMat.rpow_eq_cfc],
-            ← HermitianMat.rpow_mul ρ.nonneg,
-            show (1:ℝ)/2 * 2 = 1 from by norm_num, HermitianMat.rpow_one]; exact ρ.tr
-        simp [h2]
+        rw [show ρ.M.sqrt = ρ.M ^ (1/2 : ℝ) from by
+          rw [HermitianMat.sqrt_eq_cfc_rpow_half, ← HermitianMat.rpow_eq_cfc],
+          ← HermitianMat.rpow_mul ρ.nonneg]
+        norm_num [HermitianMat.rpow_one, σ.tr, ρ.tr]
 
 /-- The fidelity, as a `Prob` probability with value between 0 and 1. -/
 def fidelity_prob : Prob :=
@@ -57,18 +52,12 @@ def fidelity_prob : Prob :=
 
 /-- A state has perfect fidelity with itself. -/
 theorem fidelity_self_eq_one : fidelity ρ ρ = 1 := by
-  simp only [fidelity, HermitianMat.sqrt_eq_cfc_rpow_half]
-  conv =>
-    enter [1, 1, 1, 2]
-    rw [← HermitianMat.cfc_id ρ.M]
+  simp only [fidelity, HermitianMat.sqrt]
+  nth_rw 2 [← HermitianMat.cfc_id ρ.M]
   rw [HermitianMat.cfc_conj, ← HermitianMat.cfc_comp_apply]
-  convert ρ.tr using 2
-  convert ρ.M.cfc_id using 1
-  apply HermitianMat.cfc_congr_of_nonneg ρ.nonneg
-  intro x hx
-  simp only [one_div, Pi.mul_apply, id_eq, Pi.pow_apply]
-  rw [← Real.rpow_two, Real.rpow_inv_rpow hx (by norm_num), ← sq, ← Real.rpow_two]
-  exact Real.rpow_rpow_inv hx (by norm_num)
+  rw [ρ.M.cfc_congr_of_nonneg ρ.nonneg (g := id) fun x hx ↦ by
+    simp [Real.sq_sqrt hx, Real.sqrt_mul_self hx], ρ.M.cfc_id]
+  exact ρ.tr
 
 /-- Fidelity can be rewritten as the trace norm of the product of square roots. -/
 theorem fidelity_eq_traceNorm_sqrt_mul_sqrt (ρ σ : MState d) :
@@ -102,9 +91,8 @@ theorem fidelity_eq_one_iff_self : fidelity ρ σ = 1 ↔ ρ = σ := by
     show _ = (U.1 * (B * A)).trace
     rw [hAh, ← Matrix.mul_assoc, Matrix.trace_mul_cycle, Matrix.trace_mul_comm]
   have hz2 : ((U.1 * B)ᴴ * A).trace = conj z := by
-    rw [show ((U.1 * B)ᴴ * A) = (Aᴴ * (U.1 * B))ᴴ from by
-      simp [Matrix.conjTranspose_mul, hAh, hBh]]
-    simpa [hz1] using Matrix.trace_conjTranspose (Aᴴ * (U.1 * B))
+    rw [← hz1, starRingEnd_apply, ← Matrix.trace_conjTranspose]
+    simp [Matrix.conjTranspose_mul, hAh]
   have hAU : A = U.1 * B := by
     refine sub_eq_zero.mp <| Matrix.trace_conjTranspose_mul_self_eq_zero_iff.mp ?_
     have h_expand : ((A - U.1 * B)ᴴ * (A - U.1 * B)).trace =

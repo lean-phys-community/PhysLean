@@ -83,15 +83,10 @@ theorem prodRelabel_assoc (ρ₁ : MState (H i)) (ρ₂ : MState (H j)) (ρ₃ :
   simp [prodRelabel, MState.relabel_kron]
   have h_equiv := hAssoc i j k
   rw [← Equiv.trans_assoc, Equiv.trans_cancel_right] at h_equiv
-  have h_cong := congrArg (MState.relabel ((ρ₁ ⊗ᴹ ρ₂) ⊗ᴹ ρ₃)) h_equiv
-  rw [← eq_cast_iff_heq]; swap
-  · rw [mul_assoc]
-  convert h_cong; clear h_equiv h_cong
-  rw [← MState.relabel_cast]; swap
-  · rw [mul_assoc]
-  rw [MState.kron_relabel, MState.prod_assoc]
-  rw [MState.relabel_comp, MState.relabel_comp, MState.relabel_comp]
-  rfl
+  rw [← eq_cast_iff_heq (e := by rw [mul_assoc])]
+  convert congrArg (MState.relabel ((ρ₁ ⊗ᴹ ρ₂) ⊗ᴹ ρ₃)) h_equiv
+  rw [← MState.relabel_cast _ (by rw [mul_assoc])]
+  simp [MState.kron_relabel, MState.prod_assoc, Equiv.trans_assoc]
 
 /-- A `MState.relabel` can be distributed across a `prodRelabel`, if you have proofs that the factors
 correspond correctly. -/
@@ -100,8 +95,7 @@ theorem prodRelabel_relabel_cast_prod
     (h : H (k * l) = H (i * j)) (hik : k = i) (hlj : l = j) :
     (ρ₁ ⊗ᵣ ρ₂).relabel (Equiv.cast h) =
     (ρ₁.relabel (Equiv.cast (congrArg H hik))) ⊗ᵣ (ρ₂.relabel (Equiv.cast (congrArg H hlj))) := by
-  subst hik
-  subst hlj
+  subst hik hlj
   rfl
 
 /-- The `prod` operation of `ResourcePretheory` gives the natural product operation on `CPTPMap`s. Accessible
@@ -115,10 +109,8 @@ scoped notation M₁ " ⊗ᶜᵖᵣ " M₂ => prodCPTPMap M₁ M₂
 
 open ComplexOrder in
 theorem PosDef.prod {ρ : MState (H i)} {σ : MState (H j)} (hρ : ρ.m.PosDef) (hσ : σ.m.PosDef)
-    : (ρ ⊗ᵣ σ).m.PosDef := by
-  have : (ρ ⊗ᴹ σ).m.PosDef := MState.PosDef.kron hρ hσ
-  rw [prodRelabel]
-  exact MState.PosDef.relabel this (prodEquiv i j)
+    : (ρ ⊗ᵣ σ).m.PosDef :=
+  MState.PosDef.relabel (MState.PosDef.kron hρ hσ) (prodEquiv i j)
 
 --BAD old attempt at PNat powers
 -- /-- Powers of spaces. Defined for `PNat` so that we don't have zeroth powers. -/
@@ -193,22 +185,19 @@ noncomputable def spacePow (i : ι) (n : ℕ) : ι :=
 scoped notation i "⊗^H[" n "]" => spacePow i n
 
 @[simp]
-theorem spacePow_zero (i : ι) : i ^ 0 = 1 := by
+theorem spacePow_zero (i : ι) : i ^ 0 = 1 :=
   rfl
 
 @[simp]
-theorem spacePow_one (i : ι) : i ^ 1 = i := by
-  simp
+theorem spacePow_one (i : ι) : i ^ 1 = i :=
+  pow_one i
 
-theorem spacePow_succ (i : ι) (n : ℕ) : i ^ (n + 1) = (i ^ n) * i := by
+theorem spacePow_succ (i : ι) (n : ℕ) : i ^ (n + 1) = (i ^ n) * i :=
   rfl
 
 theorem spacePow_add (m n : ℕ) :
-    i ^ (m + n) = (i ^ m) * (i ^ n) := by
-  induction n
-  · simp
-  · rename_i n ih
-    rw [spacePow_succ, ← mul_assoc, ← add_assoc, ← ih, spacePow_succ]
+    i ^ (m + n) = (i ^ m) * (i ^ n) :=
+  pow_add i m n
 
 theorem spacePow_mul (m n : ℕ) :
     i ^ (m * n) = (i ^ m) ^ n :=
@@ -227,67 +216,38 @@ theorem statePow_zero (ρ : MState (H i)) : ρ ⊗ᵣ^[0] = default :=
   rfl
 
 @[simp]
-theorem statePow_one (ρ : MState (H i)) : ρ ⊗ᵣ^[1] ≍ ρ := by
-  rw [← eq_cast_iff_heq]; swap
-  · rw [spacePow_one]
-  · rw [eq_cast_iff_heq, statePow]
-    exact default_prod ρ
+theorem statePow_one (ρ : MState (H i)) : ρ ⊗ᵣ^[1] ≍ ρ :=
+  default_prod ρ
 
-theorem statePow_succ (ρ : MState (H i)) (n : ℕ) : ρ ⊗ᵣ^[n + 1] = ρ ⊗ᵣ^[n] ⊗ᵣ ρ := by
+theorem statePow_succ (ρ : MState (H i)) (n : ℕ) : ρ ⊗ᵣ^[n + 1] = ρ ⊗ᵣ^[n] ⊗ᵣ ρ :=
   rfl
 
 theorem statePow_add (ρ : MState (H i)) (m n : ℕ) : ρ ⊗ᵣ^[m + n] ≍ ρ ⊗ᵣ^[m] ⊗ᵣ ρ ⊗ᵣ^[n] := by
-  rw [← eq_cast_iff_heq]; swap
-  · rw [spacePow_add]
-  rw [eq_cast_iff_heq]
-  induction n
-  · rw [add_zero, statePow_zero]
-    exact (prod_default _).symm
-  · rename_i n ih
-    rw [statePow_succ, ← add_assoc, statePow_succ]
+  induction n with
+  | zero => exact (prod_default _).symm
+  | succ n ih =>
+    rw [← add_assoc, statePow_succ, statePow_succ]
     refine HEq.trans ?_ (prodRelabel_assoc _ _ _)
-    congr
-    apply spacePow_add
+    congr 1
+    exact pow_add i m n
 
 theorem statePow_add_relabel (ρ : MState (H i)) (m n : ℕ) :
-    ρ ⊗ᵣ^[m + n] = (ρ ⊗ᵣ^[m] ⊗ᵣ ρ ⊗ᵣ^[n]).relabel (Equiv.cast (by congr; exact pow_add i m n)) := by
-  have h := statePow_add ρ m n
-  rw [heq_iff_exists_eq_cast] at h
-  obtain ⟨h, h₂⟩ := h
-  rw [h₂, MState.relabel_cast]
+    ρ ⊗ᵣ^[m + n] = (ρ ⊗ᵣ^[m] ⊗ᵣ ρ ⊗ᵣ^[n]).relabel (Equiv.cast (by congr; exact pow_add i m n)) :=
+  (eq_cast_iff_heq.mpr (statePow_add ρ m n)).trans (MState.relabel_cast _ _).symm
 
 set_option backward.isDefEq.respectTransparency false in
 theorem statePow_mul (ρ : MState (H i)) (m n : ℕ) : ρ ⊗ᵣ^[m * n] ≍ (ρ ⊗ᵣ^[m]) ⊗ᵣ^[n] := by
-  rw [← eq_cast_iff_heq]; swap
-  · rw [spacePow_mul]
-  rw [eq_cast_iff_heq]
-  induction n
-  · simp
-  · rename_i n ih
-    rw [statePow_succ, mul_add]
-    --This is TERRIBLE. There has to be a better way. TODO Cleanup
-    trans ρ ⊗ᵣ^[m * n] ⊗ᵣ ρ ⊗ᵣ^[m * 1]
-    · apply statePow_add
-    · rw [← eq_cast_iff_heq] at ih; swap
-      · congr 2 <;> simp [pow_mul]
-      rw [← eq_cast_iff_heq]; swap
-      · congr 2 <;> simp [pow_mul]
-      rw [← MState.relabel_cast _ (by simp [pow_mul])]
-      rw [prodRelabel_relabel_cast_prod]
-      · congr
-        · rw [ih, MState.relabel_cast]
-        · rw [MState.relabel_cast]
-          rw [eq_cast_iff_heq]
-          · rw [mul_one]
-      · rw [pow_mul]
-      · rw [mul_one]
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [mul_add, mul_one, statePow_succ]
+    refine (statePow_add ρ (m * n) m).trans ?_
+    congr 1
+    exact pow_mul i m n
 
 theorem statePow_mul_relabel {i : ι} (ρ : MState (H i)) (m n : ℕ) :
-   ρ ⊗ᵣ^[m * n] = (ρ ⊗ᵣ^[m]) ⊗ᵣ^[n].relabel (Equiv.cast (congrArg H (pow_mul i m n))) := by
-  have h := statePow_mul ρ m n
-  rw [heq_iff_exists_eq_cast] at h
-  obtain ⟨h, h₂⟩ := h
-  rw [h₂, MState.relabel_cast]
+   ρ ⊗ᵣ^[m * n] = (ρ ⊗ᵣ^[m]) ⊗ᵣ^[n].relabel (Equiv.cast (congrArg H (pow_mul i m n))) :=
+  (eq_cast_iff_heq.mpr (statePow_mul ρ m n)).trans (MState.relabel_cast _ _).symm
 
 open ComplexOrder in
 theorem PosDef.npow {ρ : MState (H i)} (hρ : ρ.m.PosDef) (n : ℕ)
@@ -320,13 +280,8 @@ set_option backward.isDefEq.respectTransparency false in
 lemma sInf_spectrum_spacePow (σ : MState (H i)) (n : ℕ) :
     sInf (spectrum ℝ (σ ⊗ᵣ^[n]).m) = sInf (spectrum ℝ σ.m) ^ n := by
   induction n
-  · simp only [statePow_zero, pow_zero]
-    conv =>
-      enter [1, 1, 2]
-      equals 1 =>
-        ext1
-        simp [default, MState.uniform, MState.ofClassical, MState.m, HermitianMat.diagonal]
-    rw [spectrum.one_eq, csInf_singleton]
+  · rw [statePow_zero, spacePow_zero, pow_zero]
+    simp [MState.m, spectrum.one_eq]
   · rename_i n ih
     rw [statePow_succ, sInf_spectrum_rprod, ih, pow_succ]
 
@@ -370,10 +325,8 @@ variable {ι : Type*} [FreeStateTheory ι] {i : ι}
 noncomputable instance Inhabited_IsFree : Inhabited (IsFree (i := i)) :=
   ⟨⟨(free_fullRank i).choose, (free_fullRank i).choose_spec.right⟩⟩
 
-theorem IsFree.of_unique [Unique (H i)] (ρ : MState (H i)) : ρ ∈ IsFree := by
-  obtain ⟨σ, h₁, h₂⟩ := free_fullRank i
-  convert! h₂
-  apply Subsingleton.allEq
+theorem IsFree.of_unique [Unique (H i)] (ρ : MState (H i)) : ρ ∈ IsFree :=
+  Subsingleton.elim _ ρ ▸ (free_fullRank i).choose_spec.2
 
 /--The set of free states is compact because it's a closed subset of a compact space. -/
 theorem IsCompact_IsFree : IsCompact (IsFree (i := i)) :=
@@ -385,8 +338,7 @@ theorem IsCompact_IsFree : IsCompact (IsFree (i := i)) :=
 theorem IsFree.mix {ι : Type*} [FreeStateTheory ι] {i : ι} {σ₁ σ₂ : MState (H i)}
     (hσ₁ : IsFree σ₁) (hσ₂ : IsFree σ₂) (p : Prob) : IsFree (p [σ₁ ↔ σ₂]) := by
   obtain ⟨m, hm₁, hm₂⟩ := free_convex (i := i) ⟨σ₁, hσ₁, rfl⟩ ⟨σ₂, hσ₂, rfl⟩ p.zero_le (1 - p).zero_le (by simp)
-  simp [Mixable.mix, Mixable.mix_ab, MState.instMixable]
-  simp at hm₂
+  simp_all [Mixable.mix, Mixable.mix_ab, MState.instMixable]
   convert! ← hm₁
 
 end FreeStateTheory
@@ -408,8 +360,7 @@ theorem _root_.FreeStateTheory.IsFree.npow {i : ι} {ρ : MState (H i)}
   induction n
   · rw [statePow_zero, spacePow_zero]
     apply IsFree.of_unique
-  · rw [statePow_succ]
-    exact FreeStateTheory.free_prod ‹_› hρ
+  · exact FreeStateTheory.free_prod ‹_› hρ
 
 @[simp]
 theorem relabel_cast_isFree {i j : ι} (ρ : MState (H i)) (h : j = i) {h' : H j = H i}:
@@ -423,17 +374,9 @@ open NNReal
 of any state `ρ` to a free state is finite. -/
 @[aesop (rule_sets := [finiteness]) safe]
 lemma relativeEntResource_ne_top (ρ : MState (H i)) : ⨅ σ ∈ IsFree, 𝐃(ρ‖σ) ≠ ⊤ := by
-  let ⟨w,h⟩ := free_fullRank i
-  apply ne_top_of_le_ne_top _ (iInf_le _ w)
-  simp only [ne_eq, iInf_eq_top, Classical.not_imp]
-  constructor
-  · exact h.2
-  · refine ne_of_apply_ne ENNReal.toEReal (qRelativeEnt_ker (ρ := ρ) (?_) ▸ EReal.coe_ne_top _)
-    convert @bot_le _ _ (Submodule.instOrderBot) _
-    have := h.1.toLin_ker_eq_bot
-    simp [LinearMap.ker_eq_bot', HermitianMat.ker] at this ⊢
-    intro m hm
-    simpa only [WithLp.ofLp_eq_zero] using this m congr($hm)
+  obtain ⟨w, h₁, h₂⟩ := free_fullRank i
+  have := HermitianMat.nonSingular_of_posDef h₁
+  exact ne_top_of_le_ne_top qRelativeEnt_ne_top (iInf₂_le w h₂)
 
 noncomputable def RelativeEntResource : MState (H i) → ℝ≥0 :=
     fun ρ ↦ (⨅ σ ∈ IsFree, 𝐃(ρ‖σ)).untop (relativeEntResource_ne_top ρ)
@@ -457,13 +400,9 @@ theorem RelativeEntResource.Subadditive (ρ : MState (H i)) : Subadditive fun n 
   rw [← ENNReal.coe_le_coe]
   simp [RelativeEntResource, ENNReal.ofNNReal] at hσ₂d hσ₃d ⊢
   rw [← hσ₂d, ← hσ₃d]
-  clear hσ₂d hσ₃d
-  have ht₁ : i ^ (m + n) = i ^ m * i ^ n :=
-    spacePow_add m n
-  have ht := congrArg H ht₁
+  have ht := congrArg H (spacePow_add (i := i) m n)
   refine le_trans (biInf_le (i := (σ₂ ⊗ᵣ σ₃).relabel (Equiv.cast ht)) _ ?_) ?_
-  · simp only [ht₁, relabel_cast_isFree]
-    exact free_prod hσ₂f hσ₃f
+  · exact (relabel_cast_isFree _ (spacePow_add m n)).mpr (free_prod hσ₂f hσ₃f)
   · apply le_of_eq
     rw [← qRelEntropy_prodRelabel]
     exact qRelEntropy_heq_congr ht (statePow_add ρ m n) (by rw [MState.relabel_cast]; exact cast_heq _ _)
@@ -471,9 +410,7 @@ theorem RelativeEntResource.Subadditive (ρ : MState (H i)) : Subadditive fun n 
 noncomputable def RegularizedRelativeEntResource (ρ : MState (H i)) : ℝ≥0 :=
   ⟨(RelativeEntResource.Subadditive ρ).lim, by
     rw [Subadditive.lim]
-    apply Real.sInf_nonneg
-    rintro x ⟨x, hx, rfl⟩
-    positivity⟩
+    exact Real.sInf_nonneg fun x ⟨y, hy, h⟩ ↦ h ▸ by positivity⟩
 
 scoped notation "𝑅ᵣ∞" => RegularizedRelativeEntResource
 
@@ -481,21 +418,16 @@ scoped notation "𝑅ᵣ∞" => RegularizedRelativeEntResource
 theorem RelativeEntResource.tendsto (ρ : MState (H i)) :
     Filter.atTop.Tendsto (fun n ↦ 𝑅ᵣ (ρ ⊗ᵣ^[n]) / n) (𝓝 (𝑅ᵣ∞ ρ)) := by
   rw [← NNReal.tendsto_coe]
-  apply (RelativeEntResource.Subadditive ρ).tendsto_lim
-  use 0
-  rintro _ ⟨y, rfl⟩
-  positivity
+  exact (RelativeEntResource.Subadditive ρ).tendsto_lim ⟨0, fun _ ⟨y, h⟩ ↦ h ▸ by positivity⟩
 
 /-- Alternate version of Lemma 5 which states the convergence with the `ENNReal`
 expression for `RelativeEntResource`, as opposed its `untop`-ped `NNReal` value. -/
 theorem RelativeEntResource.tendsto_ennreal (ρ : MState (H i)) :
     Filter.atTop.Tendsto (fun n ↦ (⨅ σ ∈ IsFree, 𝐃(ρ ⊗ᵣ^[n]‖σ)) / ↑n) (𝓝 (𝑅ᵣ∞ ρ)) := by
   refine Filter.Tendsto.congr' ?_ (ENNReal.tendsto_coe.mpr <| RelativeEntResource.tendsto ρ)
-  rw [Filter.EventuallyEq, Filter.eventually_atTop]
-  use 1; intros
+  filter_upwards [Filter.eventually_ge_atTop 1] with n hn
   rw [RelativeEntResource, ENNReal.coe_div (by positivity), ENNReal.coe_natCast]
-  congr
-  apply WithTop.coe_untop
+  exact congrArg₂ _ (WithTop.coe_untop _ _) rfl
 
 noncomputable def GlobalRobustness {i : ι} : MState (H i) → ℝ≥0 :=
   fun ρ ↦ sInf {s | ∃ σ, (⟨1 / (1+s), by bound⟩ [ρ ↔ σ]) ∈ IsFree}

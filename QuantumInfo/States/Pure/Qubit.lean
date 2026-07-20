@@ -154,10 +154,8 @@ def controllize (g : 𝐔[k]) : 𝐔[Qubit × k] :=
     else 0
     , by
       rw [Matrix.mem_unitaryGroup_iff]
-      matrix_expand [-Complex.ext_iff] with ti tj;
-      · congr 1
-        exact propext eq_comm
-      · exact congrFun₂ g.2.2 ti tj
+      matrix_expand [-Complex.ext_iff, eq_comm] with ti tj;
+      exact (congrFun₂ g.2.2 ti tj).symm
     ⟩
 
 scoped notation "C[" g "]" => controllize g
@@ -174,26 +172,21 @@ lemma CNOT_matrix :
         ![0, 0, 0, 1],
         ![0, 0, 1, 0]] := by
         ext i j
-        simp only [CNOT, Qubit.X, Matrix.reindex_apply]
         fin_cases i <;> fin_cases j <;> rfl
 
 variable (g : 𝐔[k]) (j₁ j₂ : k)
 
 @[simp]
-theorem controllize_apply_zero_zero : C[g] (0, j₁) (0, j₂) = (1 : 𝐔[k]) j₁ j₂ := by
-  rfl
+theorem controllize_apply_zero_zero : C[g] (0, j₁) (0, j₂) = (1 : 𝐔[k]) j₁ j₂ := rfl
 
 @[simp]
-theorem controllize_apply_zero_one : C[g] (0, j₁) (1, j₂) = 0 := by
-  rfl
+theorem controllize_apply_zero_one : C[g] (0, j₁) (1, j₂) = 0 := rfl
 
 @[simp]
-theorem controllize_apply_one_zero : C[g] (1, j₁) (0, j₂) = 0 := by
-  rfl
+theorem controllize_apply_one_zero : C[g] (1, j₁) (0, j₂) = 0 := rfl
 
 @[simp]
-theorem controllize_apply_one_one : C[g] (1, j₁) (1, j₂) = g j₁ j₂ := by
-  rfl
+theorem controllize_apply_one_one : C[g] (1, j₁) (1, j₂) = g j₁ j₂ := rfl
 
 @[simp]
 theorem controllize_mul (g₁ g₂ : 𝐔[k]) : C[g₁] * C[g₂] = C[g₁ * g₂] := by
@@ -211,8 +204,6 @@ open scoped Matrix in
 @[simp]
 theorem X_controllize_X : (X ⊗ᵤ 1) * C[g] * (X ⊗ᵤ 1) = (1 ⊗ᵤ g) * C[g⁻¹] := by
   matrix_expand [X, -Complex.ext_iff] with ki kj;
-  suffices (1 : Matrix k k ℂ) ki kj = (g * g⁻¹) ki kj by
-    convert! this
-  simp
+  exact (congrFun₂ g.2.2 ki kj).symm
 
 end Qubit

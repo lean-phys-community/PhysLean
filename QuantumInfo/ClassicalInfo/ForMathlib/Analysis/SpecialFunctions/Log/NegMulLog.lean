@@ -15,29 +15,21 @@ open NNReal
 namespace Real
 
 theorem negMulLog_strictMonoOn : StrictMonoOn Real.negMulLog (Set.Icc 0 (exp (-1))) := by
-  apply strictMonoOn_of_deriv_pos
-  · exact convex_Icc 0 (exp (-1))
-  · exact continuous_negMulLog.continuousOn
-  · intro x hx
-    rw [interior_Icc, Set.mem_Ioo] at hx
-    linarith only [log_exp (-1), log_lt_log hx.left hx.right, deriv_negMulLog hx.left.ne']
+  refine strictMonoOn_of_deriv_pos (convex_Icc _ _) continuous_negMulLog.continuousOn
+    fun x hx ↦ ?_
+  rw [interior_Icc, Set.mem_Ioo] at hx
+  linarith only [log_exp (-1), log_lt_log hx.left hx.right, deriv_negMulLog hx.left.ne']
 
 theorem negMulLog_strictAntiOn : StrictAntiOn Real.negMulLog (Set.Ici (exp (-1))) := by
-  apply strictAntiOn_of_deriv_neg
-  · exact convex_Ici (exp (-1))
-  · exact continuous_negMulLog.continuousOn
-  · intro x hx
-    rw [interior_Ici' Set.nonempty_Iio, Set.mem_Ioi] at hx
-    have hx' : x ≠ 0 := by grind [exp_nonneg]
-    linarith [log_exp (-1), log_lt_log (exp_pos (-1)) hx, deriv_negMulLog hx']
+  refine strictAntiOn_of_deriv_neg (convex_Ici _) continuous_negMulLog.continuousOn
+    fun x hx ↦ ?_
+  rw [interior_Ici' Set.nonempty_Iio, Set.mem_Ioi] at hx
+  linarith [log_exp (-1), log_lt_log (exp_pos (-1)) hx,
+    deriv_negMulLog ((exp_pos (-1)).trans hx).ne']
 
 theorem negMulLog_le_rexp_neg_one {x : ℝ} (hx : 0 ≤ x) : negMulLog x ≤ exp (-1) := by
-  by_cases hp : x < exp (-1)
-  · grw [negMulLog_strictMonoOn.monotoneOn (by grind) (by grind) hp.le]
-    simp [negMulLog]
-  by_cases hp' : Real.exp (-1) < x
-  · grw [negMulLog_strictAntiOn.antitoneOn (by grind) (by grind) hp'.le]
-    simp [negMulLog]
-  · simp [show x = exp (-1) by order, negMulLog]
+  rcases le_total x (exp (-1)) with h | h
+  · simpa [negMulLog] using negMulLog_strictMonoOn.monotoneOn (by grind) (by grind) h
+  · simpa [negMulLog] using negMulLog_strictAntiOn.antitoneOn (by grind) (by grind) h
 
 end Real

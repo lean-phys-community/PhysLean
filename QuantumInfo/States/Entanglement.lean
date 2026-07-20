@@ -81,23 +81,16 @@ variable (g : KetUpToPhase d → ℝ≥0)
 set_option backward.isDefEq.respectTransparency false in
 /-- The convex roof extension `convex_roof_ENNReal` is never ∞. -/
 theorem convex_roof_ne_top : ∀ ρ, convex_roof_ENNReal g ρ ≠ ∞ := fun ρ => by
-  simp only [convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall]
-  use ⟨Fintype.card d, Fintype.card_pos⟩
-  have ed : d ≃ Fin ↑(⟨Fintype.card d, Fintype.card_pos⟩ : ℕ+) := by
-    simp only
-    exact Fintype.equivFin d
-  use (congrPEnsemble ed) <| spectral_ensemble ρ
-  rw [mix_congrPEnsemble_eq_mix ed]
-  push Not
-  convert spectral_ensemble_mix
+  simp only [convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall, not_not]
+  exact ⟨⟨_, Fintype.card_pos⟩, congrPEnsemble (Fintype.equivFin d) (spectral_ensemble ρ),
+    (mix_congrPEnsemble_eq_mix _ _).trans spectral_ensemble_mix⟩
 
 omit [Nonempty d] in
 /-- The convex roof extension `mixed_convex_roof_ENNReal` is never ∞. -/
 theorem mixed_convex_roof_ne_top : ∀ ρ, mixed_convex_roof_ENNReal f ρ ≠ ∞ := fun ρ => by
-  simp only [mixed_convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall]
-  use 1, trivial_mEnsemble ρ 0
-  push Not
-  exact trivial_mEnsemble_mix ρ 0
+  simp only [mixed_convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall,
+    not_not]
+  exact ⟨1, trivial_mEnsemble ρ 0, trivial_mEnsemble_mix ρ 0⟩
 
 /-- Convex roof extension of a function `g : KetUpToPhase d → ℝ≥0`, defined as the infimum of all pure-state
 ensembles of a given `ρ` of the average of `g` in that ensemble.
@@ -123,104 +116,53 @@ set_option backward.isDefEq.respectTransparency false in
 omit [Nonempty d] in
 theorem le_mixed_convex_roof (ρ : MState d) :
   (∀ n > 0, ∀ e : MEnsemble d (Fin n), mix e = ρ → c ≤ average_NNReal f e) → (c ≤ mixed_convex_roof f ρ) := fun h => by
-  unfold mixed_convex_roof
-  rw [WithTop.le_untop_iff]
-  apply le_iInf; intro ⟨n, hnpos⟩; apply le_iInf; intro e; apply le_iInf; intro hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h n hnpos e hmix
+  simp only [mixed_convex_roof, mixed_convex_roof_ENNReal, WithTop.le_untop_iff, le_iInf_iff]
+  exact fun n e hmix => ENNReal.coe_le_coe.mpr (h n n.2 e hmix)
 
 set_option backward.isDefEq.respectTransparency false in
 theorem le_convex_roof (ρ : MState d) :
   (∀ n > 0, ∀ e : PEnsemble d (Fin n), mix (toMEnsemble e) = ρ → c ≤ pure_average_NNReal (g ∘ KetUpToPhase.mk) e) → (c ≤ convex_roof g ρ) := fun h => by
-  unfold convex_roof
-  rw [WithTop.le_untop_iff]
-  apply le_iInf; intro ⟨n, hnpos⟩; apply le_iInf; intro e; apply le_iInf; intro hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h n hnpos e hmix
+  simp only [convex_roof, convex_roof_ENNReal, WithTop.le_untop_iff, le_iInf_iff]
+  exact fun n e hmix => ENNReal.coe_le_coe.mpr (h n n.2 e hmix)
 
 set_option backward.isDefEq.respectTransparency false in
 theorem convex_roof_le (ρ : MState d):
 (∃ n > 0, ∃ e : PEnsemble d (Fin n), mix (toMEnsemble e) = ρ ∧ pure_average_NNReal (g ∘ KetUpToPhase.mk) e ≤ c) → (convex_roof g ρ ≤ c) := fun h => by
   obtain ⟨n, hnpos, e, hmix, h⟩ := h
-  unfold convex_roof
-  rw [WithTop.untop_le_iff]
-  apply iInf_le_of_le ⟨n, hnpos⟩; apply iInf_le_of_le e; apply iInf_le_of_le hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h
+  simp only [convex_roof, WithTop.untop_le_iff, some_eq_coe']
+  exact iInf₂_le_of_le ⟨n, hnpos⟩ e <| iInf_le_of_le hmix <| ENNReal.coe_le_coe.mpr h
 
 set_option backward.isDefEq.respectTransparency false in
 omit [Nonempty d] in
 theorem mixed_convex_roof_le (ρ : MState d):
 (∃ n > 0, ∃ e : MEnsemble d (Fin n), mix e = ρ ∧ average_NNReal f e ≤ c) → (mixed_convex_roof f ρ ≤ c) := fun h => by
   obtain ⟨n, hnpos, e, hmix, h⟩ := h
-  unfold mixed_convex_roof
-  rw [WithTop.untop_le_iff]
-  apply iInf_le_of_le ⟨n, hnpos⟩; apply iInf_le_of_le e; apply iInf_le_of_le hmix
-  rw [some_eq_coe', ENNReal.coe_le_coe]
-  exact h
+  simp only [mixed_convex_roof, WithTop.untop_le_iff, some_eq_coe']
+  exact iInf₂_le_of_le ⟨n, hnpos⟩ e <| iInf_le_of_le hmix <| ENNReal.coe_le_coe.mpr h
 
 /-- The mixed convex roof extension of `f` is smaller than or equal to its convex roof extension, since
 the former minimizes over a larger set of ensembles. -/
 theorem mixed_convex_roof_le_convex_roof : mixed_convex_roof f ≤ convex_roof_of_MState_fun f := by
-  intro ρ
-  apply le_convex_roof (f ∘ pureQ) ρ
-  intro n hnpos e hmix
-  apply mixed_convex_roof_le
-  use n
-  apply And.intro hnpos
-  use ↑e
-  apply And.intro hmix
-  exact le_of_eq <| NNReal.coe_inj.mp <| average_of_pure_ensemble (toReal ∘ f) e
+  refine fun ρ => le_convex_roof (f ∘ pureQ) ρ fun n hnpos e hmix => mixed_convex_roof_le f ρ
+    ⟨n, hnpos, ↑e, hmix, le_of_eq <| NNReal.coe_inj.mp <| average_of_pure_ensemble (toReal ∘ f) e⟩
 
 /-- The convex roof extension of `g : KetUpToPhase d → ℝ≥0` applied to a pure state `ψ` is `g (KetUpToPhase.mk ψ)`. -/
 theorem convex_roof_of_pure (ψ : Ket d) : convex_roof g (pure ψ) = g (KetUpToPhase.mk ψ) := by
-  rw [le_antisymm_iff]
-  constructor
-  · apply convex_roof_le
-    use 1; simp only [gt_iff_lt, zero_lt_one, true_and]; use trivial_pEnsemble ψ 0
-    constructor
-    · exact trivial_pEnsemble_mix ψ 0
-    · simp only [pure_average_NNReal, Fin.isValue, ← NNReal.coe_le_coe]
-      conv_lhs =>
-        enter [1, 1]
-        rw [trivial_pEnsemble_average ψ _ 0]
-      rfl
-  · apply le_convex_roof
-    intro n hnpos e hmix
-    apply le_of_eq
-    simp only [pure_average_NNReal, ← NNReal.coe_inj]
-    have hphase_inv : ∀ a b, Ket.PhaseEquiv.r a b →
-        (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) a = (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) b := by
-      intro a b hab
-      simp only [Function.comp_apply]
-      congr 1
-      exact congrArg g (Quotient.sound hab)
-    simp [mix_pEnsemble_pure_average (NNReal.toReal ∘ g ∘ KetUpToPhase.mk) hphase_inv hmix]
-    rfl
+  refine le_antisymm (convex_roof_le g _ ⟨1, one_pos, trivial_pEnsemble ψ 0,
+    trivial_pEnsemble_mix ψ 0, ?_⟩) (le_convex_roof g _ fun n hnpos e hmix => ?_)
+  · exact le_of_eq <| NNReal.coe_inj.mp <|
+      trivial_pEnsemble_average ψ (toReal ∘ g ∘ KetUpToPhase.mk) (0 : Fin 1)
+  · exact ge_of_eq <| NNReal.coe_inj.mp <| mix_pEnsemble_pure_average _
+      (fun a b hab => congrArg (toReal ∘ g) (Quotient.sound hab)) hmix
 
 omit [Nonempty d] in
 /-- The mixed convex roof extension of `f : MState d → ℝ≥0` applied to a pure state `ψ` is `f (pure ψ)`. -/
 theorem mixed_convex_roof_of_pure (ψ : Ket d) : mixed_convex_roof f (pure ψ) = f (pure ψ) := by
-  rw [le_antisymm_iff]
-  constructor
-  · apply mixed_convex_roof_le
-    use 1; simp only [gt_iff_lt, zero_lt_one, true_and]; use trivial_mEnsemble (pure ψ) 0
-    constructor
-    · exact trivial_mEnsemble_mix (pure ψ) 0
-    · simp only [average_NNReal, Fin.isValue, ← NNReal.coe_le_coe]
-      conv_lhs =>
-        enter [1, 1]
-        rw [trivial_mEnsemble_average _ (pure ψ) 0]
-      rfl
-  · apply le_mixed_convex_roof
-    intro n hnpos e hmix
-    replace hpure := mix_mEnsemble_pure_iff_pure.mp hmix
-    apply le_of_eq
-    simp only [average_NNReal, ← NNReal.coe_inj]
-    conv_rhs =>
-      enter [1, 1]
-      rw [mix_mEnsemble_pure_average (toReal ∘ f) hmix, Function.comp_apply]
-    rfl
+  refine le_antisymm (mixed_convex_roof_le f _ ⟨1, one_pos, trivial_mEnsemble (pure ψ) 0,
+    trivial_mEnsemble_mix (pure ψ) 0, ?_⟩) (le_mixed_convex_roof f _ fun n hnpos e hmix => ?_)
+  · exact le_of_eq <| NNReal.coe_inj.mp <|
+      trivial_mEnsemble_average (toReal ∘ f) (pure ψ) (0 : Fin 1)
+  · exact ge_of_eq <| NNReal.coe_inj.mp <| mix_mEnsemble_pure_average (toReal ∘ f) hmix
 
 /-- Entanglement of Formation of bipartite systems. It is the convex roof extension of the
 von Neumann entropy of one of the subsystems (here chosen to be the left one, but see `Entropy.Sᵥₙ_of_partial_eq`).
@@ -230,76 +172,42 @@ same mixed state, so it descends to `KetUpToPhase` via `pureQ`. -/
 def EoF : MState (d₁ × d₂) → ℝ≥0 :=
   convex_roof (KetUpToPhase.lift
     (fun ψ ↦ ⟨Sᵥₙ (pure ψ).traceRight, Sᵥₙ_nonneg (pure ψ).traceRight⟩)
-    (fun ψ φ h ↦ by
-      congr 1
-      congr 1
-      exact congrArg MState.traceRight ((MState.PhaseEquiv_iff_pure_eq ψ φ).mp h)))
+    (fun ψ φ h ↦ by rw [(MState.PhaseEquiv_iff_pure_eq ψ φ).mp h]))
 
 /-
 The partial trace of the maximally entangled state is the maximally mixed state.
 -/
 theorem traceRight_pure_MES (d : Type*) [Fintype d] [DecidableEq d] [Nonempty d] :
     (MState.pure (Ket.MES d)).traceRight = MState.uniform := by
-  -- By definition of partial trace, we sum over the second system.
-  have h_partial_trace : ∀ (i j : d), ∑ k : d, (Ket.MES d).vec (i, k) * (star (Ket.MES d).vec (j, k)) = (1 / Fintype.card d : ℝ) * (if i = j then 1 else 0) := by
-    unfold Ket.MES
-    intro i j
-    simp only [one_div, Pi.star_apply, RCLike.star_def, ite_mul, zero_mul, Finset.sum_ite_eq,
-      Finset.mem_univ, ↓reduceIte, Complex.ofReal_inv]
-    split
-    · subst i
-      simp only [map_inv₀, Complex.conj_ofReal]
-      ring_nf; norm_cast; norm_num;
-    · grind
-  unfold MState.pure MState.traceRight MState.uniform
   ext i j
-  convert! h_partial_trace i j
-  simp_all only [Pi.star_apply, RCLike.star_def, one_div, Complex.ofReal_inv,
-    Complex.ofReal_natCast, mul_ite, mul_one, mul_zero, HermitianMat.mat_apply,
-    coe_ofClassical, ProbDistribution.uniform_def, Finset.card_univ]
-  unfold HermitianMat.diagonal
-  simp_all only [map_inv₀, map_natCast]
-  rfl
+  simp [MState.pure, MState.traceRight, MState.uniform, MState.ofClassical, Ket.MES,
+    HermitianMat.diagonal, HermitianMat.traceRight, Matrix.traceRight, -HermitianMat.mat_apply,
+    Matrix.vecMulVec_apply, Matrix.diagonal_apply, apply_ite, Ket.apply, map_inv₀,
+    Complex.conj_ofReal, ← mul_inv, ← Complex.ofReal_mul, Real.mul_self_sqrt]
+  exact fun h h' => absurd h h'
 
 /-
 The von Neumann entropy of a state is equal to the trace of `ρ log ρ` (technically `cfc ρ negMulLog`).
 -/
 theorem Sᵥₙ_eq_trace_cfc {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) :
     Sᵥₙ ρ = (HermitianMat.cfc ρ.M Real.negMulLog).trace := by
-  -- By definition of von Neumann entropy, we have Sᵥₙ ρ = Finset.sum Finset.univ (fun x ↦ Real.negMulLog (ρ.M.H.eigenvalues x)).
-  have h_def : Sᵥₙ ρ = Finset.sum Finset.univ (fun x ↦ Real.negMulLog (ρ.M.H.eigenvalues x)) := by
-    rfl
-  -- By definition of trace, the trace of `cfc ρ.M Real.negMulLog` is the sum of its eigenvalues.
-  have h_trace : (ρ.M.cfc Real.negMulLog).trace =
-      ∑ x, (ρ.M.cfc Real.negMulLog).H.eigenvalues x := by
-    exact (HermitianMat.sum_eigenvalues_eq_trace _).symm
   obtain ⟨e, he⟩ : ∃ e : d ≃ d, (ρ.M.cfc Real.negMulLog).H.eigenvalues =
-      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e := by
-   exact Matrix.IsHermitian.cfc_eigenvalues _ _
-  rw [h_def, h_trace, he]
-  simp only [Function.comp_apply]
-  conv_lhs => rw [ ← Equiv.sum_comp e ]
+      Real.negMulLog ∘ ρ.M.H.eigenvalues ∘ e := Matrix.IsHermitian.cfc_eigenvalues _ _
+  rw [← HermitianMat.sum_eigenvalues_eq_trace, he]
+  exact (Equiv.sum_comp e (Real.negMulLog ∘ ρ.M.H.eigenvalues)).symm
 
 /-
 The von Neumann entropy of a classical state (diagonal in the basis) is equal to the Shannon entropy of the corresponding distribution.
 -/
 theorem Sᵥₙ_ofClassical {d : Type*} [Fintype d] [DecidableEq d] (dist : ProbDistribution d) :
     Sᵥₙ (MState.ofClassical dist) = Hₛ dist := by
-  -- Let's unfold the definition of `Sᵥₙ` using `Sᵥₙ_eq_trace_cfc`.
-  have h_def : Sᵥₙ (MState.ofClassical dist) = (HermitianMat.cfc (MState.ofClassical dist).M Real.negMulLog).trace := by
-    exact Sᵥₙ_eq_trace_cfc (ofClassical dist);
-  convert h_def using 1;
-  -- By definition of $MState.ofClassical$, we know that $(MState.ofClassical dist).M$ is a diagonal matrix with entries $dist i$.
-  have h_diag : (MState.ofClassical dist).M = HermitianMat.diagonal ℂ (fun x => dist x) := by
-    exact rfl;
-  rw [ h_diag, HermitianMat.cfc_diagonal, HermitianMat.trace_diagonal ] ; aesop
+  rw [Sᵥₙ_eq_trace_cfc,
+    show (MState.ofClassical dist).M = HermitianMat.diagonal ℂ (fun x => dist x) from rfl,
+    HermitianMat.cfc_diagonal, HermitianMat.trace_diagonal]
+  aesop
 
 /-- The entanglement of formation of the maximally entangled state with on-site dimension 𝕕 is log(𝕕). -/
 theorem EoF_of_MES : EoF (pure <| Ket.MES d) = Real.log (Finset.card Finset.univ (α := d)) := by
-  simp only [EoF, convex_roof_of_pure, Finset.card_univ]
-  simp only [KetUpToPhase.lift_mk]
-  -- The von Neumann entropy of the maximally mixed state is log(d).
-  have h_von_neumann : Sᵥₙ (MState.uniform : MState d) = Real.log (Fintype.card d) := by
-    rw [MState.uniform, Sᵥₙ_ofClassical ProbDistribution.uniform, Hₛ_uniform, Finset.card_univ]
-  simp [traceRight_pure_MES]
-  exact h_von_neumann
+  simp [EoF, convex_roof_of_pure, KetUpToPhase.lift_mk, traceRight_pure_MES, MState.uniform,
+    Sᵥₙ_ofClassical, Hₛ_uniform]
+  rfl

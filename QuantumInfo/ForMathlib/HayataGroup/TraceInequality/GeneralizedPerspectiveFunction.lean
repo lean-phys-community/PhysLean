@@ -96,42 +96,20 @@ private lemma spectrum_convexCombo_Ioi {A B : L ℋ} {t : ℝ}
     (hA : IsSelfAdjoint A) (hB : IsSelfAdjoint B) (ht0 : 0 ≤ t) (ht1 : t ≤ 1)
     (As : spectrum ℝ A ⊆ Set.Ioi (0 : ℝ)) (Bs : spectrum ℝ B ⊆ Set.Ioi (0 : ℝ)) :
     spectrum ℝ ((1 - t) • A + t • B) ⊆ Set.Ioi (0 : ℝ) := by
-  set C : L ℋ := (1 - t) • A + t • B
-  have hC : IsSelfAdjoint C := by
-    simpa [C] using (IsSelfAdjoint.all (1 - t)).smul hA |>.add ((IsSelfAdjoint.all t).smul hB)
-  have hApos : ∃ r > 0, algebraMap ℝ (L ℋ) r ≤ A := by
-    refine (CFC.exists_pos_algebraMap_le_iff (A := L ℋ) (a := A) (ha := hA)).2 ?_
-    intro x hx
-    exact As hx
-  have hBpos : ∃ r > 0, algebraMap ℝ (L ℋ) r ≤ B := by
-    refine (CFC.exists_pos_algebraMap_le_iff (A := L ℋ) (a := B) (ha := hB)).2 ?_
-    intro x hx
-    exact Bs hx
-  rcases hApos with ⟨rA, hrA, hrA_le⟩
-  rcases hBpos with ⟨rB, hrB, hrB_le⟩
-  set rC : ℝ := (1 - t) * rA + t * rB
-  have hrC : 0 < rC := by
-    by_cases h1t : (1 - t) = 0
-    · have ht' : t = 1 := by linarith
-      subst ht'
-      simpa [rC] using hrB
-    · have h1t_pos : 0 < 1 - t := lt_of_le_of_ne (sub_nonneg.mpr ht1) (Ne.symm h1t)
-      simpa [rC] using
-        add_pos_of_pos_of_nonneg (mul_pos h1t_pos hrA) (mul_nonneg ht0 (le_of_lt hrB))
-  have hrC_le : algebraMap ℝ (L ℋ) rC ≤ C := by
-    have hsum :
-        (1 - t) • algebraMap ℝ (L ℋ) rA + t • algebraMap ℝ (L ℋ) rB ≤ C := by
-      simpa [C] using
-        add_le_add (smul_le_smul_of_nonneg_left hrA_le (sub_nonneg.mpr ht1))
+  have hC : IsSelfAdjoint ((1 - t) • A + t • B) :=
+    ((IsSelfAdjoint.all (1 - t)).smul hA).add ((IsSelfAdjoint.all t).smul hB)
+  obtain ⟨rA, hrA, hrA_le⟩ := (CFC.exists_pos_algebraMap_le_iff hA).2 fun x hx => As hx
+  obtain ⟨rB, hrB, hrB_le⟩ := (CFC.exists_pos_algebraMap_le_iff hB).2 fun x hx => Bs hx
+  refine fun x hx => (CFC.exists_pos_algebraMap_le_iff hC).1 ⟨(1 - t) * rA + t * rB, ?_, ?_⟩ x hx
+  · rcases ht1.eq_or_lt with rfl | h1t
+    · simpa using hrB
+    · nlinarith
+  · calc algebraMap ℝ (L ℋ) ((1 - t) * rA + t * rB)
+        = (1 - t) • algebraMap ℝ (L ℋ) rA + t • algebraMap ℝ (L ℋ) rB := by
+          simp [Algebra.smul_def]
+      _ ≤ (1 - t) • A + t • B :=
+        add_le_add (smul_le_smul_of_nonneg_left hrA_le (by linarith))
           (smul_le_smul_of_nonneg_left hrB_le ht0)
-    have hLHS :
-        (1 - t) • algebraMap ℝ (L ℋ) rA + t • algebraMap ℝ (L ℋ) rB =
-          algebraMap ℝ (L ℋ) rC := by
-      simp [rC, Algebra.smul_def]
-    simpa [hLHS] using hsum
-  intro x hx
-  simpa [C] using
-    (CFC.exists_pos_algebraMap_le_iff (A := L ℋ) (a := C) (ha := hC)).1 ⟨rC, hrC, hrC_le⟩ x hx
 
 omit [Nontrivial ℋ] in
 private lemma cfcR_sq_eq {g k : ℝ → ℝ} {A : L ℋ}
@@ -140,11 +118,8 @@ private lemma cfcR_sq_eq {g k : ℝ → ℝ} {A : L ℋ}
     (hk : ContinuousOn k (spectrum ℝ A))
     (hmul : ∀ x ∈ spectrum ℝ A, g x * k x = 1) :
     cfcR (ℋ := ℋ) g A * cfcR (ℋ := ℋ) k A = (1 : L ℋ) := by
-  rw [← cfc_mul (R := ℝ) (A := L ℋ) (p := IsSelfAdjoint)
-      (f := g) (g := k) (a := A) hg hk, ← cfc_const_one ℝ A]
-  apply cfc_congr
-  intro x hx
-  simpa using hmul x hx
+  rw [← cfc_mul g k A hg hk, ← cfc_const_one ℝ A]
+  exact cfc_congr hmul
 
 omit [Nontrivial ℋ] in
 private lemma cfcR_mul_eq {g k m : ℝ → ℝ} {A : L ℋ}
@@ -152,34 +127,24 @@ private lemma cfcR_mul_eq {g k m : ℝ → ℝ} {A : L ℋ}
     (hk : ContinuousOn k (spectrum ℝ A))
     (hmul : ∀ x ∈ spectrum ℝ A, g x * k x = m x) :
     cfcR (ℋ := ℋ) g A * cfcR (ℋ := ℋ) k A = cfcR (ℋ := ℋ) m A := by
-  rw [← cfc_mul (R := ℝ) (A := L ℋ) (p := IsSelfAdjoint)
-      (f := g) (g := k) (a := A) hg hk]
-  apply cfc_congr
-  intro x hx
-  simpa using hmul x hx
+  rw [← cfc_mul g k A hg hk]
+  exact cfc_congr hmul
 
 private lemma hpow_continuousOn
     (h : ℝ → ℝ) (p : ℝ)
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     ContinuousOn (fun x : ℝ ↦ (h x) ^ p) (Set.Ioi (0 : ℝ)) := by
-  intro x hx
-  have hg : ContinuousWithinAt (fun y : ℝ ↦ y ^ p) (Set.Ioi (0 : ℝ)) (h x) :=
-    (Real.continuousAt_rpow_const (h x) p (Or.inl (ne_of_gt (hpos x hx)))).continuousWithinAt
-  exact hg.comp (hcont x hx) (by
-    intro y hy
-    exact hpos y hy)
+  exact hcont.rpow_const fun x hx => .inl (hpos x hx).ne'
 
 omit [Nontrivial ℋ] in
 private lemma hSqrt_selfAdjoint (h : ℝ → ℝ) (B : L ℋ) :
     IsSelfAdjoint (hSqrt (ℋ := ℋ) h B) := by
-  dsimp [hSqrt, cfcR]
   exact cfc_predicate _ _
 
 omit [Nontrivial ℋ] in
 private lemma hInvSqrt_selfAdjoint (h : ℝ → ℝ) (B : L ℋ) :
     IsSelfAdjoint (hInvSqrt (ℋ := ℋ) h B) := by
-  dsimp [hInvSqrt, cfcR]
   exact cfc_predicate _ _
 
 omit [Nontrivial ℋ] in
@@ -189,20 +154,10 @@ private lemma hSqrt_mul_hInvSqrt_eq_one
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     hSqrt (ℋ := ℋ) h B * hInvSqrt (ℋ := ℋ) h B = (1 : L ℋ) := by
-  have hsqrt :
-      ContinuousOn (fun x : ℝ ↦ (h x) ^ ((1 : ℝ) / 2)) (spectrum ℝ B) :=
-    (hpow_continuousOn h ((1 : ℝ) / 2) hcont hpos).mono (by intro x hx; exact Bs hx)
-  have hinv :
-      ContinuousOn (fun x : ℝ ↦ (h x) ^ ((-1 : ℝ) / 2)) (spectrum ℝ B) :=
-    (hpow_continuousOn h ((-1 : ℝ) / 2) hcont hpos).mono (by intro x hx; exact Bs hx)
-  have hmul :
-      ∀ x ∈ spectrum ℝ B,
-        (h x) ^ ((1 : ℝ) / 2) * (h x) ^ ((-1 : ℝ) / 2) = 1 := by
-    intro x hx
-    have hxpos : 0 < h x := hpos x (Bs hx)
-    rw [← Real.rpow_add hxpos]
-    norm_num
-  simpa [hSqrt, hInvSqrt] using cfcR_sq_eq (ℋ := ℋ) (A := B) hB hsqrt hinv hmul
+  refine cfcR_sq_eq hB ((hpow_continuousOn h _ hcont hpos).mono Bs)
+    ((hpow_continuousOn h _ hcont hpos).mono Bs) fun x hx => ?_
+  rw [← Real.rpow_add (hpos x (Bs hx))]
+  norm_num
 
 omit [Nontrivial ℋ] in
 private lemma hInvSqrt_mul_hSqrt_eq_one
@@ -211,20 +166,10 @@ private lemma hInvSqrt_mul_hSqrt_eq_one
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     hInvSqrt (ℋ := ℋ) h B * hSqrt (ℋ := ℋ) h B = (1 : L ℋ) := by
-  have hsqrt :
-      ContinuousOn (fun x : ℝ ↦ (h x) ^ ((1 : ℝ) / 2)) (spectrum ℝ B) :=
-    (hpow_continuousOn h ((1 : ℝ) / 2) hcont hpos).mono (by intro x hx; exact Bs hx)
-  have hinv :
-      ContinuousOn (fun x : ℝ ↦ (h x) ^ ((-1 : ℝ) / 2)) (spectrum ℝ B) :=
-    (hpow_continuousOn h ((-1 : ℝ) / 2) hcont hpos).mono (by intro x hx; exact Bs hx)
-  have hmul :
-      ∀ x ∈ spectrum ℝ B,
-        (h x) ^ ((-1 : ℝ) / 2) * (h x) ^ ((1 : ℝ) / 2) = 1 := by
-    intro x hx
-    have hxpos : 0 < h x := hpos x (Bs hx)
-    rw [← Real.rpow_add hxpos]
-    norm_num
-  simpa [hSqrt, hInvSqrt] using cfcR_sq_eq (ℋ := ℋ) (A := B) hB hinv hsqrt hmul
+  refine cfcR_sq_eq hB ((hpow_continuousOn h _ hcont hpos).mono Bs)
+    ((hpow_continuousOn h _ hcont hpos).mono Bs) fun x hx => ?_
+  rw [← Real.rpow_add (hpos x (Bs hx))]
+  norm_num
 
 omit [Nontrivial ℋ] in
 private lemma hSqrt_mul_hSqrt_eq
@@ -233,27 +178,15 @@ private lemma hSqrt_mul_hSqrt_eq
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     hSqrt (ℋ := ℋ) h B * hSqrt (ℋ := ℋ) h B = cfcR (ℋ := ℋ) h B := by
-  have hsqrt :
-      ContinuousOn (fun x : ℝ ↦ (h x) ^ ((1 : ℝ) / 2)) (spectrum ℝ B) :=
-    (hpow_continuousOn h ((1 : ℝ) / 2) hcont hpos).mono (by intro x hx; exact Bs hx)
-  have hmul :
-      ∀ x ∈ spectrum ℝ B,
-        (h x) ^ ((1 : ℝ) / 2) * (h x) ^ ((1 : ℝ) / 2) = h x := by
-    intro x hx
-    have hxpos : 0 < h x := hpos x (Bs hx)
-    rw [← Real.rpow_add hxpos]
-    norm_num
-  simpa [hSqrt] using cfcR_mul_eq (ℋ := ℋ) (A := B) hsqrt hsqrt hmul
+  refine cfcR_mul_eq ((hpow_continuousOn h _ hcont hpos).mono Bs)
+    ((hpow_continuousOn h _ hcont hpos).mono Bs) fun x hx => ?_
+  rw [← Real.rpow_add (hpos x (Bs hx))]
+  norm_num
 
 omit [Nontrivial ℋ] in
 private lemma conj_le_conj {X Y T : L ℋ} (hXY : X ≤ Y) (hT : IsSelfAdjoint T) :
-    T * X * T ≤ T * Y * T := by
-  have hnonneg : 0 ≤ Y - X := sub_nonneg.mpr hXY
-  have hconj : 0 ≤ T * (Y - X) * T := by
-    simpa using hT.conjugate_nonneg hnonneg
-  have hsub : T * (Y - X) * T = T * Y * T - T * X * T := by
-    simp [sub_eq_add_neg, mul_add, add_mul, mul_assoc]
-  exact sub_nonneg.mp (by simpa [hsub] using hconj)
+    T * X * T ≤ T * Y * T :=
+  hT.conjugate_le_conjugate hXY
 
 set_option maxHeartbeats 800000 in
 -- The generalized-perspective normalization expands several nested CFC products.
@@ -264,38 +197,22 @@ private theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     JointlyConvexOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ)) (fun A B ↦ (f Δ h) A B) := by
-  intro A₁ A₂ B₁ B₂ θ hA₁ hA₂ hB₁ hB₂ hθ0 hθ1
-  rcases hA₁ with ⟨hA₁_sa, hA₁_spec⟩
-  rcases hA₂ with ⟨hA₂_sa, hA₂_spec⟩
-  rcases hB₁ with ⟨hB₁_sa, hB₁_spec⟩
-  rcases hB₂ with ⟨hB₂_sa, hB₂_spec⟩
+  rintro A₁ A₂ B₁ B₂ θ ⟨hA₁_sa, hA₁_spec⟩ ⟨hA₂_sa, hA₂_spec⟩ ⟨hB₁_sa, hB₁_spec⟩
+    ⟨hB₂_sa, hB₂_spec⟩ hθ0 hθ1
   let A : L ℋ := (1 - θ) • A₁ + θ • A₂
   let B : L ℋ := (1 - θ) • B₁ + θ • B₂
-  have hA₁_nonneg : (0 : L ℋ) ≤ A₁ := by
-    refine (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A₁ (ha := hA₁_sa)).2 ?_
-    intro x hx
-    simpa [Set.Ici] using hA₁_spec hx
-  have hA₂_nonneg : (0 : L ℋ) ≤ A₂ := by
-    refine (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A₂ (ha := hA₂_sa)).2 ?_
-    intro x hx
-    simpa [Set.Ici] using hA₂_spec hx
-  have hB_sa : IsSelfAdjoint B := by
-    dsimp [B]
-    simpa using (IsSelfAdjoint.all (1 - θ)).smul hB₁_sa |>.add ((IsSelfAdjoint.all θ).smul hB₂_sa)
+  have hA₁_nonneg : (0 : L ℋ) ≤ A₁ :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A₁ hA₁_sa).2 fun x hx => hA₁_spec hx
+  have hA₂_nonneg : (0 : L ℋ) ≤ A₂ :=
+    (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) A₂ hA₂_sa).2 fun x hx => hA₂_spec hx
+  have hB_sa : IsSelfAdjoint B :=
+    ((IsSelfAdjoint.all (1 - θ)).smul hB₁_sa).add ((IsSelfAdjoint.all θ).smul hB₂_sa)
   have hB_spec : spectrum ℝ B ⊆ Set.Ioi (0 : ℝ) :=
     spectrum_convexCombo_Ioi (ℋ := ℋ) hB₁_sa hB₂_sa hθ0 hθ1 hB₁_spec hB₂_spec
   have hB_conc :
       (1 - θ) • cfcR (ℋ := ℋ) h B₁ + θ • cfcR (ℋ := ℋ) h B₂ ≤ cfcR (ℋ := ℋ) h B := by
-    have hconc' := hconc
-    dsimp [OperatorConcaveOn, OperatorConvexOn] at hconc'
-    have hneg :
-        cfcR (ℋ := ℋ) (fun x : ℝ ↦ -h x) B ≤
-          (1 - θ) • cfcR (ℋ := ℋ) (fun x : ℝ ↦ -h x) B₁ +
-            θ • cfcR (ℋ := ℋ) (fun x : ℝ ↦ -h x) B₂ := by
-      simpa [B] using
-        hconc' (A := B₁) (B := B₂) (t := θ) hB₁_sa hB₂_sa hθ0 hθ1 hB₁_spec hB₂_spec
-    simpa [cfcR, cfc_neg, smul_neg, neg_add, add_comm, add_left_comm, add_assoc] using
-      neg_le_neg hneg
+    simpa [B, cfcR, cfc_neg, smul_neg, neg_add, add_comm, add_left_comm, add_assoc] using
+      neg_le_neg (hconc hB₁_sa hB₂_sa hθ0 hθ1 hB₁_spec hB₂_spec)
   let S : L ℋ := hSqrt (ℋ := ℋ) h B
   let IR : L ℋ := hInvSqrt (ℋ := ℋ) h B
   let S₁ : L ℋ := hSqrt (ℋ := ℋ) h B₁
@@ -312,141 +229,72 @@ private theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
   have hS₂_sa : IsSelfAdjoint S₂ := hSqrt_selfAdjoint (ℋ := ℋ) h B₂
   have hIR₁_sa : IsSelfAdjoint IR₁ := hInvSqrt_selfAdjoint (ℋ := ℋ) h B₁
   have hIR₂_sa : IsSelfAdjoint IR₂ := hInvSqrt_selfAdjoint (ℋ := ℋ) h B₂
-  have hSIR : S * IR = (1 : L ℋ) :=
-    hSqrt_mul_hInvSqrt_eq_one (ℋ := ℋ) hB_sa hB_spec hcont hpos
-  have hIRS : IR * S = (1 : L ℋ) :=
-    hInvSqrt_mul_hSqrt_eq_one (ℋ := ℋ) hB_sa hB_spec hcont hpos
-  have hS₁IR₁ : S₁ * IR₁ = (1 : L ℋ) :=
-    hSqrt_mul_hInvSqrt_eq_one (ℋ := ℋ) hB₁_sa hB₁_spec hcont hpos
-  have hIR₁S₁ : IR₁ * S₁ = (1 : L ℋ) :=
-    hInvSqrt_mul_hSqrt_eq_one (ℋ := ℋ) hB₁_sa hB₁_spec hcont hpos
-  have hS₂IR₂ : S₂ * IR₂ = (1 : L ℋ) :=
-    hSqrt_mul_hInvSqrt_eq_one (ℋ := ℋ) hB₂_sa hB₂_spec hcont hpos
-  have hIR₂S₂ : IR₂ * S₂ = (1 : L ℋ) :=
-    hInvSqrt_mul_hSqrt_eq_one (ℋ := ℋ) hB₂_sa hB₂_spec hcont hpos
+  have hSIR : S * IR = (1 : L ℋ) := hSqrt_mul_hInvSqrt_eq_one hB_sa hB_spec hcont hpos
+  have hIRS : IR * S = (1 : L ℋ) := hInvSqrt_mul_hSqrt_eq_one hB_sa hB_spec hcont hpos
+  have hS₁IR₁ : S₁ * IR₁ = (1 : L ℋ) := hSqrt_mul_hInvSqrt_eq_one hB₁_sa hB₁_spec hcont hpos
+  have hIR₁S₁ : IR₁ * S₁ = (1 : L ℋ) := hInvSqrt_mul_hSqrt_eq_one hB₁_sa hB₁_spec hcont hpos
+  have hS₂IR₂ : S₂ * IR₂ = (1 : L ℋ) := hSqrt_mul_hInvSqrt_eq_one hB₂_sa hB₂_spec hcont hpos
+  have hIR₂S₂ : IR₂ * S₂ = (1 : L ℋ) := hInvSqrt_mul_hSqrt_eq_one hB₂_sa hB₂_spec hcont hpos
   have hM₁_nonneg : (0 : L ℋ) ≤ M₁ := by
-    dsimp [M₁]
-    simpa [mul_assoc] using hIR₁_sa.conjugate_nonneg hA₁_nonneg
+    simpa [M₁, mul_assoc] using hIR₁_sa.conjugate_nonneg hA₁_nonneg
   have hM₂_nonneg : (0 : L ℋ) ≤ M₂ := by
-    dsimp [M₂]
-    simpa [mul_assoc] using hIR₂_sa.conjugate_nonneg hA₂_nonneg
+    simpa [M₂, mul_assoc] using hIR₂_sa.conjugate_nonneg hA₂_nonneg
   have hM₁_sa : IsSelfAdjoint M₁ := IsSelfAdjoint.of_nonneg hM₁_nonneg
   have hM₂_sa : IsSelfAdjoint M₂ := IsSelfAdjoint.of_nonneg hM₂_nonneg
-  have hM₁_spec : spectrum ℝ M₁ ⊆ Set.Ici (0 : ℝ) := by
-    intro x hx
-    simpa [Set.Ici] using spectrum_nonneg_of_nonneg hM₁_nonneg hx
-  have hM₂_spec : spectrum ℝ M₂ ⊆ Set.Ici (0 : ℝ) := by
-    intro x hx
-    simpa [Set.Ici] using spectrum_nonneg_of_nonneg hM₂_nonneg hx
-  have hT₁ :
-      star T₁ * T₁ = (1 - θ) • (IR * cfcR (ℋ := ℋ) h B₁ * IR) := by
-    calc
-      star T₁ * T₁
-          = (Real.sqrt (1 - θ) * Real.sqrt (1 - θ)) • (IR * (S₁ * S₁) * IR) := by
-              simp [T₁, hS₁_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
-      _ = (1 - θ) • (IR * (S₁ * S₁) * IR) := by
-              rw [Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
-      _ = (1 - θ) • (IR * cfcR (ℋ := ℋ) h B₁ * IR) := by
-              rw [hSqrt_mul_hSqrt_eq (ℋ := ℋ) (B := B₁) hB₁_spec hcont hpos]
-  have hT₂ :
-      star T₂ * T₂ = θ • (IR * cfcR (ℋ := ℋ) h B₂ * IR) := by
-    calc
-      star T₂ * T₂
-          = (Real.sqrt θ * Real.sqrt θ) • (IR * (S₂ * S₂) * IR) := by
-              simp [T₂, hS₂_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
-      _ = θ • (IR * (S₂ * S₂) * IR) := by
-              rw [Real.mul_self_sqrt hθ0]
-      _ = θ • (IR * cfcR (ℋ := ℋ) h B₂ * IR) := by
-              rw [hSqrt_mul_hSqrt_eq (ℋ := ℋ) (B := B₂) hB₂_spec hcont hpos]
+  have hM₁_spec : spectrum ℝ M₁ ⊆ Set.Ici (0 : ℝ) := fun x hx =>
+    spectrum_nonneg_of_nonneg hM₁_nonneg hx
+  have hM₂_spec : spectrum ℝ M₂ ⊆ Set.Ici (0 : ℝ) := fun x hx =>
+    spectrum_nonneg_of_nonneg hM₂_nonneg hx
+  have hSS : S * S = cfcR (ℋ := ℋ) h B := hSqrt_mul_hSqrt_eq hB_spec hcont hpos
+  have hSS₁ : S₁ * S₁ = cfcR (ℋ := ℋ) h B₁ := hSqrt_mul_hSqrt_eq hB₁_spec hcont hpos
+  have hSS₂ : S₂ * S₂ = cfcR (ℋ := ℋ) h B₂ := hSqrt_mul_hSqrt_eq hB₂_spec hcont hpos
+  have hT₁ : star T₁ * T₁ = (1 - θ) • (IR * cfcR (ℋ := ℋ) h B₁ * IR) := by
+    rw [← hSS₁, ← Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
+    simp [T₁, hS₁_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
+  have hT₂ : star T₂ * T₂ = θ • (IR * cfcR (ℋ := ℋ) h B₂ * IR) := by
+    rw [← hSS₂, ← Real.mul_self_sqrt hθ0]
+    simp [T₂, hS₂_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
   have hTsum : star T₁ * T₁ + star T₂ * T₂ ≤ (1 : L ℋ) := by
-    rw [hT₁, hT₂]
-    have hmid :
-        (1 - θ) • (IR * cfcR (ℋ := ℋ) h B₁ * IR) + θ • (IR * cfcR (ℋ := ℋ) h B₂ * IR)
-          ≤ IR * cfcR (ℋ := ℋ) h B * IR := by
-      calc
-        (1 - θ) • (IR * cfcR (ℋ := ℋ) h B₁ * IR) + θ • (IR * cfcR (ℋ := ℋ) h B₂ * IR)
-            = IR * ((1 - θ) • cfcR (ℋ := ℋ) h B₁ + θ • cfcR (ℋ := ℋ) h B₂) * IR := by
-                simp [mul_add, add_mul, mul_assoc]
-        _ ≤ IR * cfcR (ℋ := ℋ) h B * IR := conj_le_conj (ℋ := ℋ) hB_conc hIR_sa
-    have hunit : IR * cfcR (ℋ := ℋ) h B * IR = (1 : L ℋ) := by
-      calc
-        IR * cfcR (ℋ := ℋ) h B * IR = IR * (S * S) * IR := by
-          rw [hSqrt_mul_hSqrt_eq (ℋ := ℋ) (B := B) hB_spec hcont hpos]
-        _ = (IR * S) * (S * IR) := by simp [mul_assoc]
-        _ = 1 := by simp [hIRS, hSIR]
-    exact hmid.trans_eq hunit
-  have hterm₁ :
-      star T₁ * M₁ * T₁ = (1 - θ) • (IR * A₁ * IR) := by
-    calc
-      star T₁ * M₁ * T₁
-          = (Real.sqrt (1 - θ) * Real.sqrt (1 - θ)) •
-              (IR * (S₁ * (IR₁ * A₁ * IR₁) * S₁) * IR) := by
-                simp [T₁, M₁, hS₁_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
-      _ = (1 - θ) • (IR * (S₁ * (IR₁ * A₁ * IR₁) * S₁) * IR) := by
-            rw [Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
-      _ = (1 - θ) • (IR * A₁ * IR) := by
-            rw [show IR * (S₁ * (IR₁ * A₁ * IR₁) * S₁) * IR =
-                IR * (((S₁ * IR₁) * A₁) * (IR₁ * S₁)) * IR by simp [mul_assoc]]
-            rw [hS₁IR₁, hIR₁S₁]
-            simp [mul_assoc]
-  have hterm₂ :
-      star T₂ * M₂ * T₂ = θ • (IR * A₂ * IR) := by
-    calc
-      star T₂ * M₂ * T₂
-          = (Real.sqrt θ * Real.sqrt θ) •
-              (IR * (S₂ * (IR₂ * A₂ * IR₂) * S₂) * IR) := by
-                simp [T₂, M₂, hS₂_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
-      _ = θ • (IR * (S₂ * (IR₂ * A₂ * IR₂) * S₂) * IR) := by
-            rw [Real.mul_self_sqrt hθ0]
-      _ = θ • (IR * A₂ * IR) := by
-            rw [show IR * (S₂ * (IR₂ * A₂ * IR₂) * S₂) * IR =
-                IR * (((S₂ * IR₂) * A₂) * (IR₂ * S₂)) * IR by simp [mul_assoc]]
-            rw [hS₂IR₂, hIR₂S₂]
-            simp [mul_assoc]
-  have hleft_inner :
-      star T₁ * M₁ * T₁ + star T₂ * M₂ * T₂ = IR * A * IR := by
+    calc star T₁ * T₁ + star T₂ * T₂
+        = IR * ((1 - θ) • cfcR (ℋ := ℋ) h B₁ + θ • cfcR (ℋ := ℋ) h B₂) * IR := by
+          rw [hT₁, hT₂]
+          simp [mul_add, add_mul, mul_assoc]
+      _ ≤ IR * cfcR (ℋ := ℋ) h B * IR := conj_le_conj (ℋ := ℋ) hB_conc hIR_sa
+      _ = 1 := by simp [← hSS, ← mul_assoc, hIRS, hSIR]
+  have hterm₁ : star T₁ * M₁ * T₁ = (1 - θ) • (IR * A₁ * IR) := by
+    have h₁ : S₁ * M₁ * S₁ = A₁ := by
+      simp only [M₁, ← mul_assoc, hS₁IR₁, one_mul]
+      simp [mul_assoc, hIR₁S₁]
+    rw [← h₁, ← Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
+    simp [T₁, hS₁_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
+  have hterm₂ : star T₂ * M₂ * T₂ = θ • (IR * A₂ * IR) := by
+    have h₂ : S₂ * M₂ * S₂ = A₂ := by
+      simp only [M₂, ← mul_assoc, hS₂IR₂, one_mul]
+      simp [mul_assoc, hIR₂S₂]
+    rw [← h₂, ← Real.mul_self_sqrt hθ0]
+    simp [T₂, hS₂_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
+  have hleft_inner : star T₁ * M₁ * T₁ + star T₂ * M₂ * T₂ = IR * A * IR := by
     rw [hterm₁, hterm₂]
     simp [A, mul_add, add_mul, mul_assoc]
-  have hcore :=
-    hcoreV (A := M₁) (B := M₂) (X := T₁) (Y := T₂) hM₁_sa hM₂_sa hM₁_spec hM₂_spec hTsum
-  have houter := conj_le_conj (ℋ := ℋ) hcore hS_sa
+  have houter := conj_le_conj (hcoreV hM₁_sa hM₂_sa hM₁_spec hM₂_spec hTsum) hS_sa
   rw [hleft_inner] at houter
   have hright₁ :
-      S * (star T₁ * cfcR (ℋ := ℋ) f M₁ * T₁) * S =
-        (1 - θ) • ((f Δ h) A₁ B₁) := by
-    calc
-      S * (star T₁ * cfcR (ℋ := ℋ) f M₁ * T₁) * S
-          = (Real.sqrt (1 - θ) * Real.sqrt (1 - θ)) •
-              (S * IR * (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) * IR * S) := by
-                simp [T₁, hS₁_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
-      _ = (1 - θ) • (S * IR * (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) * IR * S) := by
-            rw [Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
-      _ = (1 - θ) • (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) := by
-            simp [mul_assoc, hSIR, hIRS]
-      _ = (1 - θ) • ((f Δ h) A₁ B₁) := by
-            rfl
+      S * (star T₁ * cfcR (ℋ := ℋ) f M₁ * T₁) * S = (1 - θ) • ((f Δ h) A₁ B₁) := by
+    calc S * (star T₁ * cfcR (ℋ := ℋ) f M₁ * T₁) * S
+        = (1 - θ) • (S * IR * (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) * IR * S) := by
+          rw [← Real.mul_self_sqrt (sub_nonneg.mpr hθ1)]
+          simp [T₁, hS₁_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
+      _ = (1 - θ) • (S₁ * cfcR (ℋ := ℋ) f M₁ * S₁) := by simp [mul_assoc, hSIR, hIRS]
+      _ = (1 - θ) • ((f Δ h) A₁ B₁) := rfl
   have hright₂ :
-      S * (star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S =
-        θ • ((f Δ h) A₂ B₂) := by
-    calc
-      S * (star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S
-          = (Real.sqrt θ * Real.sqrt θ) •
-              (S * IR * (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) * IR * S) := by
-                simp [T₂, hS₂_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
-      _ = θ • (S * IR * (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) * IR * S) := by
-            rw [Real.mul_self_sqrt hθ0]
-      _ = θ • (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) := by
-            simp [mul_assoc, hSIR, hIRS]
-      _ = θ • ((f Δ h) A₂ B₂) := by
-            rfl
-  have hright :
-      S * (star T₁ * cfcR (ℋ := ℋ) f M₁ * T₁ + star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S =
-        (1 - θ) • ((f Δ h) A₁ B₁) + θ • ((f Δ h) A₂ B₂) := by
-    rw [mul_add, add_mul, hright₁, hright₂]
-  have hleft :
-      S * cfcR (ℋ := ℋ) f (IR * A * IR) * S = (f Δ h) A B := by
-    rfl
-  simpa [hleft, hright] using houter
+      S * (star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S = θ • ((f Δ h) A₂ B₂) := by
+    calc S * (star T₂ * cfcR (ℋ := ℋ) f M₂ * T₂) * S
+        = θ • (S * IR * (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) * IR * S) := by
+          rw [← Real.mul_self_sqrt hθ0]
+          simp [T₂, hS₂_sa.star_eq, hIR_sa.star_eq, mul_assoc, smul_smul]
+      _ = θ • (S₂ * cfcR (ℋ := ℋ) f M₂ * S₂) := by simp [mul_assoc, hSIR, hIRS]
+      _ = θ • ((f Δ h) A₂ B₂) := rfl
+  exact houter.trans_eq (by rw [mul_add, add_mul, hright₁, hright₂])
 
 -- Restricted forward form of Theorem 2.5 on the positive cone.
 theorem theorem_2_5_forward_jointlyConvexOn_psd_pd
@@ -456,10 +304,8 @@ theorem theorem_2_5_forward_jointlyConvexOn_psd_pd
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     JointlyConvexOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ)) (fun A B ↦ (f Δ h) A B) := by
-  have hcoreV : CondV (ℋ := ℋ) f :=
-    theorem_2_5_2_i_all_imp_v (ℋ := ℋ) (f := f) hf
   exact theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
-    (ℋ := ℋ) (f := f) (h := h) hcoreV hconc hcont hpos
+    (theorem_2_5_2_i_all_imp_v (ℋ := ℋ) hf) hconc hcont hpos
 
 -- Restricted localized forward form of Theorem 2.5 on the positive cone.
 theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_Ici
@@ -469,10 +315,8 @@ theorem theorem_2_5_forward_jointlyConvexOn_psd_pd_Ici
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     JointlyConvexOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ)) (fun A B ↦ (f Δ h) A B) := by
-  have hcoreV : CondV (ℋ := ℋ) f :=
-    theorem_2_5_2_i_ici_all_imp_v (ℋ := ℋ) (f := f) hf
   exact theorem_2_5_forward_jointlyConvexOn_psd_pd_of_condV
-    (ℋ := ℋ) (f := f) (h := h) hcoreV hconc hcont hpos
+    (theorem_2_5_2_i_ici_all_imp_v (ℋ := ℋ) hf) hconc hcont hpos
 
 omit [Nontrivial ℋ] in
 private lemma generalizedPerspective_neg
@@ -486,12 +330,7 @@ private lemma jointlyConvexOn_neg
     (hΦ : JointlyConvexOn s t (fun A B ↦ -Φ A B)) :
     JointlyConcaveOn s t Φ := by
   intro A₁ A₂ B₁ B₂ θ hA₁ hA₂ hB₁ hB₂ hθ0 hθ1
-  have hneg := hΦ hA₁ hA₂ hB₁ hB₂ hθ0 hθ1
-  have hneg' :
-      -Φ ((1 - θ) • A₁ + θ • A₂) ((1 - θ) • B₁ + θ • B₂) ≤
-        -((1 - θ) • Φ A₁ B₁ + θ • Φ A₂ B₂) := by
-    simpa [smul_neg, neg_add, add_comm, add_left_comm, add_assoc] using hneg
-  exact (neg_le_neg_iff.mp hneg')
+  simpa [add_comm] using neg_le_neg (hΦ hA₁ hA₂ hB₁ hB₂ hθ0 hθ1)
 
 /-- Restricted forward form of Corollary 2.6 on the positive cone. -/
 theorem theorem_2_6_forward_jointlyConcaveOn_psd_pd
@@ -502,18 +341,11 @@ theorem theorem_2_6_forward_jointlyConcaveOn_psd_pd
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     JointlyConcaveOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ)) (fun A B ↦ (f Δ h) A B) := by
-  have hfneg : CondIAll.{u} (fun x : ℝ ↦ -f x) := by
-    refine ⟨?_, ?_⟩
-    · intro K _ _ _ _
-      exact (hfconc (K := K))
-    · simpa using (neg_nonpos.mpr hf0)
-  have hconv_neg :
-      JointlyConvexOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ))
-        (fun A B ↦ -((f Δ h) A B)) := by
-    simpa [generalizedPerspective_neg] using
-      (theorem_2_5_forward_jointlyConvexOn_psd_pd
-        (ℋ := ℋ) (f := fun x : ℝ ↦ -f x) (h := h) hfneg hconc hcont hpos)
-  exact jointlyConvexOn_neg (ℋ := ℋ) hconv_neg
+  have hfneg : CondIAll.{u} (fun x : ℝ ↦ -f x) :=
+    ⟨fun {K} _ _ _ _ => hfconc (K := K), neg_nonpos.mpr hf0⟩
+  refine jointlyConvexOn_neg (ℋ := ℋ) ?_
+  simpa [generalizedPerspective_neg] using
+    theorem_2_5_forward_jointlyConvexOn_psd_pd (ℋ := ℋ) hfneg hconc hcont hpos
 
 /-- Restricted localized forward form of Corollary 2.6 on the positive cone. -/
 theorem theorem_2_6_forward_jointlyConcaveOn_psd_pd_Ici
@@ -525,19 +357,11 @@ theorem theorem_2_6_forward_jointlyConcaveOn_psd_pd_Ici
     (hcont : ContinuousOn h (Set.Ioi (0 : ℝ)))
     (hpos : ∀ x ∈ Set.Ioi (0 : ℝ), 0 < h x) :
     JointlyConcaveOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ)) (fun A B ↦ (f Δ h) A B) := by
-  have hfneg : CondIciAll.{u} (fun x : ℝ ↦ -f x) := by
-    refine ⟨?_, ?_, ?_⟩
-    · intro K _ _ _ _
-      exact (hfconc (K := K))
-    · simpa using hfcont.neg
-    · simpa using (neg_nonpos.mpr hf0)
-  have hconv_neg :
-      JointlyConvexOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ))
-        (fun A B ↦ -((f Δ h) A B)) := by
-    simpa [generalizedPerspective_neg] using
-      (theorem_2_5_forward_jointlyConvexOn_psd_pd_Ici
-        (ℋ := ℋ) (f := fun x : ℝ ↦ -f x) (h := h) hfneg hconc hcont hpos)
-  exact jointlyConvexOn_neg (ℋ := ℋ) hconv_neg
+  have hfneg : CondIciAll.{u} (fun x : ℝ ↦ -f x) :=
+    ⟨fun {K} _ _ _ _ => hfconc (K := K), hfcont.neg, neg_nonpos.mpr hf0⟩
+  refine jointlyConvexOn_neg (ℋ := ℋ) ?_
+  simpa [generalizedPerspective_neg] using
+    theorem_2_5_forward_jointlyConvexOn_psd_pd_Ici (ℋ := ℋ) hfneg hconc hcont hpos
 
 end Theorem25Forward
 

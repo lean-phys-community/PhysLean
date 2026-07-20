@@ -82,24 +82,15 @@ theorem map_choi_inv (M : Matrix (B × A) (B × A) R) : choi_matrix (of_choi_mat
 /-- Proves that `MatrixMap.choi_matrix` and `MatrixMap.of_choi_matrix` inverses. -/
 @[simp]
 theorem choi_map_inv (M : MatrixMap A B R) : of_choi_matrix (choi_matrix M) = M := by
-  -- By definition of `MatrixMap.of_choi_matrix`, we know that applying it to the Choi matrix of `M`
-  -- reconstructs `M`.
-  ext X b₁ b₂; simp [MatrixMap.of_choi_matrix, MatrixMap.choi_matrix];
-  -- By linearity of $M$, we can distribute $M$ over the sum.
-  have h_linear : M X = ∑ x : A, ∑ x_1 : A, X x x_1 • M (Matrix.single x x_1 1) := by
-    have h_linear : M X = M (∑ x : A, ∑ x_1 : A, X x x_1 • Matrix.single x x_1 1) := by
-      congr with i j ; simp ( config := { decide := Bool.true } ) [ Matrix.sum_apply ];
-      simp ( config := { decide := Bool.true } ) [ Matrix.single ];
-      rw [ Finset.sum_eq_single i ] <;> aesop;
-    simp +decide only [h_linear, map_sum, LinearMap.map_smulₛₗ];
-    simp +zetaDelta at *;
-  -- By linearity of $M$, we can distribute $M$ over the sum and then apply it to each term.
-  simp [h_linear, Matrix.sum_apply]
+  refine Matrix.ext_linearMap (R := R) fun i j => LinearMap.ext fun x => ?_
+  ext b₁ b₂
+  rw [LinearMap.comp_apply, LinearMap.comp_apply, Matrix.singleLinearMap_apply,
+    show Matrix.single i j x = x • Matrix.single i j 1 by simp, map_smul, map_smul]
+  simp [of_choi_matrix, choi_matrix, Matrix.single, ite_and]
 
 /-- The correspondence induced by `MatrixMap.of_choi_matrix` is injective. -/
-theorem choi_matrix_inj : Function.Injective (@choi_matrix A B R _ _) := by
-  intro _ _ h
-  simpa only [choi_map_inv] using congrArg of_choi_matrix h
+theorem choi_matrix_inj : Function.Injective (@choi_matrix A B R _ _) :=
+  Function.LeftInverse.injective choi_map_inv
 
 
 variable {R : Type*} [CommSemiring R]
@@ -153,30 +144,13 @@ theorem exists_kraus (Φ : MatrixMap A B R) :
     Matrix.single b a₁ (Φ (Matrix.single a₁ a₂ (1 : R)) b b₂)
   let N₀ : K → Matrix B A R := fun (((_, _), a₂), b₂) => Matrix.single b₂ a₂ (1 : R)
   let e : Fin (Fintype.card K) ≃ K := (Fintype.equivFin _).symm
-  refine ⟨Fintype.card K, M₀ ∘ e, N₀ ∘ e, ?_⟩
-  apply choi_matrix_inj
+  refine ⟨Fintype.card K, M₀ ∘ e, N₀ ∘ e, choi_matrix_inj ?_⟩
   ext ⟨j₁, i₁⟩ ⟨j₂, i₂⟩
   simp only [choi_matrix, of_kraus, LinearMap.coe_sum, LinearMap.coe_mk, AddHom.coe_mk,
-    Finset.sum_apply]
-  have hsum_reindex :
-      (∑ x : Fin (Fintype.card K),
-          (M₀ ∘ e) x * Matrix.single i₁ i₂ (1 : R) * ((N₀ ∘ e) x).conjTranspose) j₁ j₂
-        =
-      ∑ y : K, (M₀ y * Matrix.single i₁ i₂ (1 : R) * (N₀ y).conjTranspose) j₁ j₂ := by
-    rw [Matrix.sum_apply]
-    exact e.sum_comp
-      (fun y : K => (M₀ y * Matrix.single i₁ i₂ (1 : R) * (N₀ y).conjTranspose) j₁ j₂)
-  rw [hsum_reindex, Fintype.sum_prod_type, Fintype.sum_prod_type, Fintype.sum_prod_type]
-  simp [M₀, N₀, Matrix.mul_apply, Matrix.single, ite_and]
-  rw [Finset.sum_eq_single i₂]
-  · rw [Finset.sum_eq_single j₂]
-    · simp
-    · intro b hb hbj
-      simp [hbj, star_zero]
-    · simp
-  · intro a ha ha_ne
-    simp [ha_ne, star_zero]
-  · simp
+    Finset.sum_apply, Function.comp_apply]
+  rw [← Equiv.sum_comp e.symm, Fintype.sum_prod_type, Fintype.sum_prod_type,
+    Fintype.sum_prod_type]
+  simp [M₀, N₀, Matrix.sum_apply, Matrix.mul_apply, Matrix.single, ite_and, apply_ite]
 
 end kraus_exists
 
@@ -228,59 +202,26 @@ set_option synthInstance.maxHeartbeats 60000 in
 theorem kron_def [CommSemiring R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) (M : Matrix (A × C) (A × C) R) :
     (M₁ ⊗ₖₘ M₂) M (b₁, d₁) (b₂, d₂) = ∑ a₁, ∑ a₂, ∑ c₁, ∑ c₂,
       (M₁ (Matrix.single a₁ a₂ 1) b₁ b₂) * (M₂ (Matrix.single c₁ c₂ 1) d₁ d₂) * (M (a₁, c₁) (a₂, c₂)) := by
-  rw [kron]
-  have h_expand : (Matrix.toLin (Matrix.stdBasis R (A × C) (A × C)) (Matrix.stdBasis R (B × D) (B × D))) ((Matrix.reindex (Equiv.prodProdProdComm B B D D) (Equiv.prodProdProdComm A A C C)) ((LinearMap.toMatrix ((Matrix.stdBasis R A A).tensorProduct (Matrix.stdBasis R C C)) ((Matrix.stdBasis R B B).tensorProduct (Matrix.stdBasis R D D))) (TensorProduct.map M₁ M₂))) M = ∑ a₁ : A, ∑ a₂ : A, ∑ c₁ : C, ∑ c₂ : C, M (a₁, c₁) (a₂, c₂) • (Matrix.toLin (Matrix.stdBasis R (A × C) (A × C)) (Matrix.stdBasis R (B × D) (B × D))) ((Matrix.reindex (Equiv.prodProdProdComm B B D D) (Equiv.prodProdProdComm A A C C)) ((LinearMap.toMatrix ((Matrix.stdBasis R A A).tensorProduct (Matrix.stdBasis R C C)) ((Matrix.stdBasis R B B).tensorProduct (Matrix.stdBasis R D D))) (TensorProduct.map M₁ M₂))) (Matrix.single (a₁, c₁) (a₂, c₂) 1) := by
-    have h_expand : M = ∑ a₁ : A, ∑ a₂ : A, ∑ c₁ : C, ∑ c₂ : C, M (a₁, c₁) (a₂, c₂) • Matrix.single (a₁, c₁) (a₂, c₂) 1 := by
-      ext ⟨a₁, c₁⟩ ⟨a₂, c₂⟩
-      simp only [Matrix.single, Matrix.sum_apply]
-      rw [Finset.sum_eq_single a₁, Finset.sum_eq_single a₂, Finset.sum_eq_single c₁, Finset.sum_eq_single c₂]
-      <;> simp +contextual
-    nth_rw 1 [h_expand]
-    simp only [map_sum, LinearMap.map_smulₛₗ]
-    rfl
-  rw [h_expand]
-  clear h_expand
-  simp only [Matrix.sum_apply]
-  congr! 8 with a₁ _ a₂ _ c₁ _ c₂ _
-  rw [Matrix.smul_apply, smul_eq_mul, mul_comm]
-  congr
   classical
-  simp only [Matrix.stdBasis,
-    Matrix.reindex_apply, Equiv.prodProdProdComm_symm, Matrix.toLin_apply,
-    Matrix.mulVec, dotProduct, Matrix.submatrix_apply, Equiv.prodProdProdComm_apply, LinearMap.toMatrix_apply,
-    Module.Basis.tensorProduct_apply, Module.Basis.map_apply, Module.Basis.coe_reindex, Function.comp_apply,
-    Equiv.sigmaEquivProd_symm_apply, Pi.basis_apply, Pi.basisFun_apply, Matrix.coe_ofLinearEquiv, TensorProduct.map_tmul,
-    Module.Basis.tensorProduct_repr_tmul_apply, Module.Basis.map_repr, LinearEquiv.trans_apply, Matrix.coe_ofLinearEquiv_symm,
-    Module.Basis.repr_reindex, Finsupp.mapDomain_equiv_apply, Pi.basis_repr, Pi.basisFun_repr, Matrix.of_symm_apply, smul_eq_mul,
-    Matrix.of_symm_single, Pi.single_apply, Matrix.smul_of, Matrix.sum_apply, Matrix.of_apply, Pi.smul_apply]
-  rw [ Finset.sum_eq_single ( ( b₁, d₁ ), ( b₂, d₂ ) ) ]
-  · rw [ Finset.sum_eq_single ( ( a₁, c₁ ), ( a₂, c₂ ) ) ]
-    · simp only [↓reduceIte, Pi.single_eq_same, mul_one]
-      rw [ mul_comm ]
-      congr! 2
-      · ext i j
-        by_cases hi : i = a₁
-        <;> by_cases hj : j = a₂
-        <;> simp only [hi, hj, Matrix.of_apply, ne_eq, not_false_eq_true, Pi.single_eq_of_ne,
-              Pi.single_eq_same, Pi.zero_apply, Matrix.single]
-        <;> grind only
-      · ext i j
-        by_cases hi : i = c₁
-        <;> by_cases hj : j = c₂
-        <;> simp only [hi, hj, Matrix.of_apply, ne_eq, not_false_eq_true, Pi.single_eq_of_ne,
-              Pi.single_eq_same, Pi.zero_apply, Matrix.single]
-        <;> grind only
-    · intros
-      split
-      · grind [Prod.mk.injEq, Pi.single_eq_of_ne, mul_zero]
-      · simp
-    · simp
-  · simp only [Finset.mem_univ, ne_eq, forall_const, Prod.forall, Prod.mk.injEq, not_and, and_imp]
-    intro a b c d h
-    split_ifs
-    · simp_all
-    · simp
-  · simp
+  obtain ⟨hB, hD⟩ : (∀ (X : Matrix B B R) (p : B × B), (Matrix.stdBasis R B B).repr X p = X p.1 p.2)
+      ∧ ∀ (X : Matrix D D R) (p : D × D), (Matrix.stdBasis R D D).repr X p = X p.1 p.2 := by
+    constructor <;> intro X p <;>
+      simp [Matrix.stdBasis, Module.Basis.map_repr, Module.Basis.repr_reindex, Pi.basis_repr]
+  induction M using Matrix.induction_on' with
+  | h_zero => simp
+  | h_add p q hp hq => simp [hp, hq, mul_add, Finset.sum_add_distrib]
+  | h_std_basis i j x =>
+    obtain ⟨a₁, c₁⟩ := i
+    obtain ⟨a₂, c₂⟩ := j
+    simp only [kron]
+    rw [show Matrix.single (a₁, c₁) (a₂, c₂) x = x • Matrix.single (a₁, c₁) (a₂, c₂) 1 by simp,
+      ← Matrix.stdBasis_eq_single (R := R), map_smul, Matrix.toLin_self]
+    simp only [Matrix.smul_apply, Matrix.sum_apply, Matrix.reindex_apply, Matrix.submatrix_apply,
+      Equiv.prodProdProdComm_symm, Equiv.prodProdProdComm_apply, LinearMap.toMatrix_apply,
+      Module.Basis.tensorProduct_apply, TensorProduct.map_tmul,
+      Module.Basis.tensorProduct_repr_tmul_apply, hB, hD, Matrix.stdBasis_eq_single]
+    simp [Matrix.single, ite_and, Fintype.sum_prod_type, Matrix.stdBasis_eq_single]
+    ring
 
 section kron_lemmas
 variable [CommSemiring R]
@@ -329,69 +270,34 @@ end kron_lemmas
 /-- The operational definition of the Kronecker product `MatrixMap.kron`, that it maps a Kronecker
   product of inputs to the Kronecker product of outputs. It is the unique bilinear map doing so. -/
 theorem kron_map_of_kron_state [CommRing R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) (MA : Matrix A A R) (MC : Matrix C C R) : (M₁ ⊗ₖₘ M₂) (MA ⊗ₖ MC) = (M₁ MA) ⊗ₖ (M₂ MC) := by
-  ext bd₁ bd₂
-  let (b₁, d₁) := bd₁
-  let (b₂, d₂) := bd₂
-  rw [kron_def]
-  simp only [Matrix.kroneckerMap_apply]
-  simp_rw [mul_assoc, ← Finset.mul_sum]
-  simp_rw [mul_comm (M₂ _ _ _), mul_assoc, ← Finset.mul_sum, ← mul_assoc]
-  simp_rw [← Finset.sum_mul]
-  congr
-  --TODO: Cleanup, these two branches are nearly identical (separate lemma?)
-  · have h_linear : M₁ MA = ∑ i : A, ∑ i_1 : A, MA i i_1 • M₁ (Matrix.single i i_1 1) := by
-      have h_linear : M₁ MA = M₁ (∑ i : A, ∑ i_1 : A, Matrix.single i i_1 (MA i i_1)) := by
-        congr;
-        exact Matrix.matrix_eq_sum_single MA
-      simp [ h_linear, Matrix.single]
-      congr! 2 with i _ j _
-      convert M₁.map_smul (MA i j) (Matrix.of fun i' j' ↦ if i = i' ∧ j = j' then 1 else 0) using 2
-      ext
-      simp
-    simp [h_linear, mul_comm, Matrix.sum_apply]
-  · have h_expand : M₂ MC = ∑ i : C, ∑ j : C, MC i j • M₂ (Matrix.single i j 1) := by
-      have h_expand : MC = ∑ i : C, ∑ j : C, MC i j • Matrix.single i j 1 := by
-        ext i j
-        simp [Matrix.sum_apply, Matrix.single]
-        rw [ Finset.sum_eq_single i ] <;> aesop
-      conv_lhs => rw [ h_expand ];
-      simp [map_sum]
-      congr! 2 with i _ j _
-      rw [← M₂.map_smul (MC i j) (Matrix.single i j 1)]
-      exact congr_arg _ (by ext; simp [Matrix.single])
-    simp [h_expand, Matrix.sum_apply]
+  induction MA using Matrix.induction_on' with
+  | h_zero => simp
+  | h_add p q hp hq => simp [Matrix.add_kronecker, map_add, hp, hq]
+  | h_std_basis a₁ a₂ x =>
+    induction MC using Matrix.induction_on' with
+    | h_zero => simp
+    | h_add p q hp hq => simp [Matrix.kronecker_add, map_add, hp, hq]
+    | h_std_basis c₁ c₂ y =>
+      ext ⟨b₁, d₁⟩ ⟨b₂, d₂⟩
+      rw [Matrix.single_kronecker_single, kron_def,
+        show Matrix.single a₁ a₂ x = x • Matrix.single a₁ a₂ 1 by simp,
+        show Matrix.single c₁ c₂ y = y • Matrix.single c₁ c₂ 1 by simp, map_smul, map_smul]
+      simp [Matrix.single, ite_and]
+      ring
 
 theorem choi_matrix_state_rep {B : Type*} [Fintype B] [Nonempty A] (M : MatrixMap A B ℂ) :
     M.choi_matrix = (↑(Fintype.card (α := A)) : ℂ) • (M ⊗ₖₘ (LinearMap.id : MatrixMap A A ℂ)) (MState.pure (Ket.MES A)).m := by
-  ext i j
-  simp [choi_matrix, kron_def M, Ket.MES, Ket.apply, Finset.mul_sum]
-  conv =>
-    rhs
-    conv =>
-      enter [2, x, 2, a_1]
-      conv =>
-        enter [2, a_2]
-        simp [apply_ite]
-      simp only [Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
-      rw [← mul_inv, ← Complex.ofReal_mul, ← Real.sqrt_mul (Fintype.card A).cast_nonneg',
-        Real.sqrt_mul_self (Fintype.card A).cast_nonneg', mul_comm, mul_assoc]
-      simp
-      conv =>
-        right
-        rw [Matrix.single, Matrix.of_apply]
-        enter [1]
-        rw [and_comm]
-      simp [apply_ite, ite_and]
-    conv =>
-      enter [2, x]
-      simp [Finset.sum_ite]
-    simp [Finset.sum_ite]
+  ext ⟨b, a⟩ ⟨b', a'⟩
+  simp [Matrix.smul_apply, kron_def, choi_matrix, Ket.MES, Ket.apply, Matrix.single, ite_and,
+    apply_ite]
+  rw [← mul_inv, ← Complex.ofReal_mul, Real.mul_self_sqrt (Fintype.card A).cast_nonneg']
+  field_simp
+  norm_cast
 
 theorem submatrix_kron_submatrix [CommSemiring R] (f : B → A) (g : D → C) :
     submatrix R f ⊗ₖₘ submatrix R g = submatrix R (Prod.map f g) := by
-  ext m i j
-  rw [kron_def]
-  simp [Prod.map, Matrix.single, ite_and]
+  ext m ⟨i₁, i₂⟩ ⟨j₁, j₂⟩
+  simp [kron_def, Prod.map, Matrix.single, ite_and]
 
 theorem submatrix_kron_id [CommSemiring R] (f : B → A) :
     submatrix R f ⊗ₖₘ id C R = submatrix R (Prod.map f _root_.id) := by
@@ -431,15 +337,11 @@ theorem choi_matrix_piProd (Λi : ∀ i, MatrixMap (dI i) (dO i) R) :
   ext x y
   simp [MatrixMap.choi_matrix, Matrix.piProd]
   rw [MatrixMap.piProd, ← Matrix.stdBasis_eq_single (R := R) x.2 y.2,
-    Matrix.toLin_self, Matrix.sum_apply, Finset.sum_eq_single (x.1, y.1)]
-  · simp [Matrix.reindex_apply, LinearMap.toMatrix_apply, Matrix.stdBasis,
-      ← Matrix.single_eq_of_single_single]
-  · intro z _ hz
-    rw [Matrix.stdBasis_eq_single]
-    simp [Matrix.single]
-    intro hz1 hz2
-    exact False.elim (hz (Prod.ext hz1 hz2))
-  · simp
+    Matrix.toLin_self, Matrix.sum_apply, Fintype.sum_prod_type]
+  simp only [Matrix.smul_apply, Matrix.stdBasis_eq_single, Matrix.single, Matrix.of_apply,
+    ite_and, smul_eq_mul, mul_ite, mul_one, mul_zero]
+  simp [Matrix.reindex_apply, LinearMap.toMatrix_apply, Matrix.stdBasis, Matrix.single, ite_and,
+    ← Matrix.single_eq_of_single_single]
 
 -- notation3:100 "⨂ₜₘ "(...)", "r:(scoped f => tprod R f) => r
 -- syntax (name := bigsum) "∑ " bigOpBinders ("with " term)? ", " term:67 : term
@@ -459,8 +361,6 @@ theorem piProd_comp
 @[simp]
 theorem piProd_id :
     piProd (fun i ↦ (LinearMap.id : MatrixMap (dI i) (dI i) R)) = LinearMap.id := by
-  simp [piProd, PiTensorProduct.map_id, LinearMap.toMatrix_id_eq_basis_toMatrix,
-    Module.Basis.toMatrix_self, Matrix.reindex_apply, Matrix.submatrix_one_equiv,
-    Matrix.toLin_one]
+  simp [piProd, PiTensorProduct.map_id, Matrix.submatrix_one_equiv]
 
 end pi

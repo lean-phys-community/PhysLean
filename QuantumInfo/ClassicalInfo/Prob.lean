@@ -136,10 +136,8 @@ instance : Coe Prob ℝ≥0 := ⟨toNNReal⟩
 instance canLiftNN : CanLift ℝ≥0 Prob toNNReal fun r => r ≤ 1 :=
   ⟨fun x hx ↦ ⟨⟨x, ⟨x.2, hx⟩⟩, rfl⟩⟩
 
-protected theorem eq_iff_nnreal (n m : Prob) : (n : ℝ≥0) = (m : ℝ≥0) ↔ n = m := by
-  obtain ⟨n,hn⟩ := n
-  obtain ⟨m,hn⟩ := m
-  simp only [toNNReal_mk, Subtype.mk.injEq, NNReal]
+protected theorem eq_iff_nnreal (n m : Prob) : (n : ℝ≥0) = (m : ℝ≥0) ↔ n = m :=
+  ⟨fun h => Prob.ext (congrArg NNReal.toReal h), congrArg toNNReal⟩
 
 @[simp, norm_cast]
 theorem toNNReal_zero : (0 : Prob) = (0 : ℝ≥0) :=
@@ -149,9 +147,8 @@ theorem toNNReal_zero : (0 : Prob) = (0 : ℝ≥0) :=
 theorem toNNReal_one : (1 : Prob) = (1 : ℝ≥0) :=
   rfl
 
-theorem ofNNReal_toNNReal : ENNReal.ofNNReal (toNNReal p) = ENNReal.ofReal (p : ℝ) := by
-  simp [toNNReal, ENNReal.ofReal_eq_coe_nnreal]
-  norm_cast
+theorem ofNNReal_toNNReal : ENNReal.ofNNReal (toNNReal p) = ENNReal.ofReal (p : ℝ) :=
+  (ENNReal.ofReal_eq_coe_nnreal zero_le_coe).symm
 
 def NNReal.asProb (p : ℝ≥0) (hp : p ≤ 1) : Prob :=
   ⟨p, ⟨p.2, hp⟩⟩
@@ -181,9 +178,8 @@ theorem add_one_minus (p : Prob) : p.val + (1 - p).val = 1 := by
   simp
 
 @[simp]
-theorem one_minus_inv (p : Prob) : 1 - (1 - p) = p := by
-  ext
-  simp
+theorem one_minus_inv (p : Prob) : 1 - (1 - p) = p :=
+  Prob.ext (by simp)
 
 instance : OrderTopology Prob :=
   orderTopology_of_ordConnected (ht := Set.ordConnected_Icc)
@@ -204,21 +200,18 @@ theorem top_eq_one : (⊤ : Prob) = 1 := by
   rfl
 
 @[simp]
-theorem sub_zero (p : Prob) : p - 0 = p := by
-  ext1; simp [coe_sub]
+theorem sub_zero (p : Prob) : p - 0 = p :=
+  Prob.ext (by simp [coe_sub])
 
 @[fun_prop]
-theorem toNNReal_Continuous : Continuous Prob.toNNReal := by
-  unfold Prob.toNNReal
-  fun_prop
+theorem toNNReal_Continuous : Continuous Prob.toNNReal :=
+  continuous_subtype_val.subtype_mk _
 
 @[simp]
 theorem mul_eq_one_iff (p q : Prob) : p * q = 1 ↔ p = 1 ∧ q = 1 := by
-  cases p
-  cases q
   refine ⟨fun h ↦ ?_, fun h ↦ by simp [h]⟩
-  simp [Prob.ext_iff] at h ⊢
-  constructor <;> nlinarith
+  simp only [Prob.ext_iff, coe_mul, coe_one] at h ⊢
+  constructor <;> nlinarith [p.2.1, p.2.2, q.2.1, q.2.2]
 
 end Prob
 
@@ -289,9 +282,7 @@ theorem mix_one [inst : Mixable U T] (x₁ x₂ : T) : (1 : Prob) [ x₁ ↔ x�
 instance instUniv [AddCommMonoid T] [Module ℝ T] : Mixable T T where
   to_U := id
   to_U_inj := id
-  convex := by
-    convert convex_univ
-    simp only [Set.range_id]
+  convex := Set.range_id ▸ convex_univ
   mkT := fun _ ↦ ⟨_, rfl⟩
 
 @[simp]
@@ -308,10 +299,8 @@ section pi
 theorem instPi.lem_1 {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)]
     [inst : ∀i, Mixable (U i) (T i)]
     {u : (i : D) → U i} (h : ∃ (t : (i : D) → T i), (fun d => to_U (t d)) = u) (d : D) :
-    ∃ (t : T d), to_U t = u d := by
-  obtain ⟨t, h⟩ := h
-  use t d
-  exact congrFun h d
+    ∃ (t : T d), to_U t = u d :=
+  h.elim fun t ht => ⟨t d, congrFun ht d⟩
 
 variable {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)]
   [inst : ∀i, Mixable (U i) (T i)] in
@@ -322,11 +311,8 @@ instance instPi : Mixable ((i:D) → U i) ((i:D) → T i) where
   mkT := fun {u} h ↦ ⟨fun d ↦ (inst d).mkT (u := u d) (instPi.lem_1 h d),
     by funext d; simp⟩
   convex := by
-    simp [Convex, StarConvex]
-    intro f₁ f₂ a b ha hb hab
-    use fun d ↦ (inst d).mix_ab ha hb hab (f₁ d) (f₂ d)
-    funext d
-    simp only [to_U_of_mkT, Pi.add_apply, Pi.smul_apply]
+    rintro - ⟨f₁, rfl⟩ - ⟨f₂, rfl⟩ a b ha hb hab
+    exact ⟨fun d ↦ (inst d).mix_ab ha hb hab (f₁ d) (f₂ d), funext fun d ↦ to_U_of_mkT _⟩
 
 @[simp]
 theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t, to_U t = u) :
@@ -357,15 +343,8 @@ def instSubtype {T : Type*} {P : T → Prop} (inst : Mixable U T)
     exact (inst.to_U_inj $ hu.trans ht₁.symm) ▸ t₁.prop,
     by simp only [to_U_of_mkT]⟩
   convex := by
-    have hi := inst.convex
-    simp [Convex, StarConvex] at hi ⊢
-    intro x hx y hy a b ha hb hab
-    let ⟨z, hz⟩ := hi x y ha hb hab
-    refine ⟨z, ⟨?_, hz⟩⟩
-    convert h ha hb hab hx hy
-    apply inst.to_U_inj
-    convert hz
-    simp only [to_U_of_mkT]
+    rintro - ⟨x, rfl⟩ - ⟨y, rfl⟩ a b ha hb hab
+    exact ⟨⟨inst.mix_ab ha hb hab x.1 y.1, h ha hb hab x.2 y.2⟩, to_U_of_mkT _⟩
 
 end Mixable
 
@@ -376,12 +355,7 @@ instance instMixable : Mixable ℝ Prob where
   to_U := Subtype.val
   to_U_inj := Prob.ext
   mkT := fun h ↦ ⟨⟨_, Exists.casesOn h fun t ht => ht ▸ t.prop⟩, rfl⟩
-  convex := by
-    simp [Convex, StarConvex]
-    intro x hx0 hx1 y hy0 hy1 a b ha hb hab
-    constructor
-    · positivity
-    · nlinarith
+  convex := Subtype.range_val ▸ convex_Icc 0 1
 
 @[simp]
 theorem to_U_mixable [AddCommMonoid T] [SMul ℝ T] (t : Prob) : instMixable.to_U t = t.val :=
@@ -416,16 +390,10 @@ theorem negLog_Antitone : Antitone negLog := by
   dsimp [negLog]
   split_ifs with h₁ h₂ h₂
   · rfl
-  · subst y
-    exfalso
-    change x.1 ≤ 0 at h
-    have : ¬(x.1 = 0) := unitInterval.coe_ne_zero.mpr (by assumption)
-    have : 0 ≤ x.1 := zero_le
-    linarith +splitNe
-  · exact OrderTop.le_top _
+  · exact absurd (le_antisymm (h₁ ▸ h) zero_le) h₂
+  · exact le_top
   · rw [ENNReal.coe_le_coe, toReal_le, toReal, neg_le_neg_iff]
-    apply (Real.log_le_log_iff _ _).mpr h
-    <;> exact lt_of_le_of_ne zero_le (unitInterval.coe_ne_zero.mpr (by assumption)).symm
+    exact Real.log_le_log (zero_lt_coe h₂) h
 
 @[simp]
 theorem negLog_zero : —log (0 : Prob) = ⊤ := by
@@ -448,36 +416,21 @@ theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by
   rw [negLog]
   split_ifs with hp
   · simp [hp]
-  · simp; rfl
+  · rfl
 
 theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENNReal.ofReal x ≤ —log p := by
-  by_cases hx : 0 ≤ x
-  · rw [negLog]
-    split_ifs with hp
-    · exact le_top
-    · replace hp : 0 < p := lt_of_le_of_ne' p.zero_le hp
-      rw [le_iff_lt_or_eq] at h
-      rcases h with h|h
-      · apply le_of_lt
-        replace h := Real.strictMonoOn_log hp (Real.exp_pos _) h
-        rw [Real.log_exp] at h
-        rw [← ENNReal.toReal_lt_toReal ofReal_ne_top coe_ne_top, toReal_ofReal hx]
-        exact lt_neg_of_lt_neg h
-      · apply le_of_eq
-        conv_rhs =>
-          enter [1, 1]
-          rw [h, Real.log_exp, neg_neg]
-        rw [← ENNReal.toReal_eq_toReal_iff' ofReal_ne_top coe_ne_top,
-          coe_toReal, toReal, toReal_ofReal hx]
-  · trans 0
-    · simp only [nonpos_iff_eq_zero, ofReal_eq_zero, le_of_not_ge hx]
-    · exact _root_.zero_le
+  rcases eq_or_ne p 0 with rfl | hp
+  · simp
+  · have hx : x ≤ -Real.log p := by
+      have := Real.log_le_log (zero_lt_coe hp) h
+      rw [Real.log_exp] at this
+      linarith
+    rw [negLog, if_neg hp]
+    exact (ENNReal.ofReal_le_ofReal hx).trans_eq (ENNReal.ofReal_eq_coe_nnreal _)
 
 @[aesop (rule_sets := [finiteness]) safe apply]
 theorem negLog_ne_top {p : Prob} (hp : 0 < p.val) : —log p ≠ ∞ := by
-  have h1 := ne_of_gt hp
-  simp_all only [unitInterval.coe_pos, ne_eq, Set.Icc.coe_eq_zero, negLog_eq_top_iff]
-  exact h1
+  simpa [Prob.ext_iff] using hp.ne'
 
 theorem negLog_eq_neg_ENNReal_log (p : Prob) : —log p = -ENNReal.log p := by
   rw [negLog]
@@ -486,68 +439,39 @@ theorem negLog_eq_neg_ENNReal_log (p : Prob) : —log p = -ENNReal.log p := by
   · rw [log, if_neg, if_neg]
     · norm_cast
     · finiteness
-    · rw [Subtype.ext_iff] at hp
-      rw [toNNReal, ENNReal.coe_eq_zero]
-      exact NNReal.coe_ne_zero.mp hp
+    · exact ENNReal.coe_ne_zero.mpr fun h => hp (Prob.ext (congrArg NNReal.toReal h))
 
 theorem negLog_eq_ofReal_neg_log {p : Prob} (hp : 0 < p) :
     ENNReal.ofReal (-Real.log p) = —log p := by
-  rcases p with ⟨p, p0, p1⟩
-  rw [negLog]
-  split_ifs with h
-  · simp_all
-  · exact ENNReal.ofReal_eq_coe_nnreal (neg_nonneg_of_nonpos (Real.log_nonpos p0 p1))
+  rw [negLog, if_neg hp.ne']
+  exact ENNReal.ofReal_eq_coe_nnreal _
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem zero_lt_negLog {p : Prob} : 0 < —log p ↔ p ≠ 1 := by
-  --This is messy enough it's probably a sign we're missing other simp lemmas
   rw [negLog]
   split_ifs with h
   · simp [h]
-  constructor <;> intro h₂ <;> contrapose! h₂
-  · simp [h₂]; rfl
-  simp only [nonpos_iff_eq_zero, ENNReal.coe_eq_zero] at h₂
-  rw [Subtype.ext_iff] at h₂
-  simp only [NNReal.val_eq_coe, NNReal.coe_zero, neg_eq_zero, Real.log_eq_zero,
-    Set.Icc.coe_eq_zero, Set.Icc.coe_eq_one] at h₂
-  rcases h₂ with h₂|h₂|h₂
-  · contradiction
-  · assumption
-  · linarith [p.zero_le_coe]
+  rw [ENNReal.coe_pos, ← NNReal.coe_pos]
+  show 0 < -Real.log p ↔ p ≠ 1
+  rw [neg_pos]
+  constructor
+  · rintro h₂ rfl
+    simp at h₂
+  · exact fun h₂ => Real.log_neg (zero_lt_coe h) (lt_of_le_of_ne coe_le_one (ne_iff.mpr h₂))
 
 set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 theorem Continuous_negLog : Continuous negLog := by
-  --Thanks Aristotle
-  have h_cont_at_zero : ContinuousAt —log 0 := by
-    unfold Prob.negLog
-    rw [ContinuousAt, if_pos rfl, ENNReal.tendsto_nhds_top_iff_nnreal]
-    intro x
-    rw [Metric.eventually_nhds_iff]
-    use Real.exp (-x), by positivity
-    rintro ⟨a, ha0, ha1⟩ ha'
-    rw [Subtype.dist_eq, Set.Icc.coe_zero, dist_zero_right, Real.norm_eq_abs] at ha'
-    split_ifs with h; · simp
-    rw [Subtype.mk_eq_mk, Set.Icc.coe_zero] at h
-    simp only [ENNReal.coe_lt_coe, ← NNReal.coe_lt_coe]
-    replace ha' := Real.log_lt_log (by positivity) ((le_abs_self _).trans_lt ha')
-    simp only [Real.log_exp] at ha'
-    show x < -Real.log a
-    linarith
-  have h_cont_on_pos : ContinuousOn —log (Set.Ioi 0) := by
-    intro p hp
-    apply Filter.Tendsto.congr'
-    · filter_upwards [self_mem_nhdsWithin] with x hx using negLog_eq_ofReal_neg_log hx
-    · rw [← negLog_eq_ofReal_neg_log hp]
-      apply ENNReal.continuous_ofReal.continuousAt.tendsto.comp
-      exact (continuous_subtype_val.continuousWithinAt.tendsto.log hp.ne').neg
-  rw [continuous_iff_continuousAt]
-  rintro ⟨p, ⟨_, _⟩⟩
-  rcases lt_trichotomy p 0 with h | rfl | h
-  · order
-  · exact h_cont_at_zero
-  · exact h_cont_on_pos.continuousAt (Ioi_mem_nhds h)
+  have hsurj : Function.Surjective negLog := by
+    intro y
+    rcases eq_or_ne y ⊤ with rfl | hy
+    · exact ⟨0, negLog_zero⟩
+    · refine ⟨⟨Real.exp (-y.toReal), Real.exp_nonneg _, Real.exp_le_one_iff.mpr (by simp)⟩, ?_⟩
+      rw [← negLog_eq_ofReal_neg_log (by exact_mod_cast Real.exp_pos _)]
+      simp [ENNReal.ofReal_toReal hy]
+  exact negLog_Antitone.dual_right.continuous_of_surjective
+    (OrderDual.toDual.surjective.comp hsurj)
 
 end negLog
 

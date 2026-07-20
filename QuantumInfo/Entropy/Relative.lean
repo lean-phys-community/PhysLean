@@ -65,36 +65,31 @@ lemma doubly_stochastic_holder (a b : d → ℝ) (w : d → d → ℝ)
     (hrow : ∀ i, ∑ j, w i j = 1) (hcol : ∀ j, ∑ i, w i j = 1)
     (p q : ℝ) (hp : 1 < p) (hpq : 1/p + 1/q = 1) :
     ∑ i, ∑ j, a i * b j * w i j ≤ (∑ i, a i ^ p) ^ (1/p) * (∑ j, b j ^ q) ^ (1/q) := by
-  by_contra h_contra
-  contrapose! h_contra with h_contra
-  simp_all [ ← Finset.mul_sum, mul_assoc ]
-  have h0q : 0 < q :=
-    lt_of_le_of_ne ( le_of_not_gt fun hq => by { rw [ inv_eq_one_div, div_eq_mul_inv ] at hpq; nlinarith [ inv_mul_cancel₀ ( by linarith : ( p : ℝ ) ≠ 0 ), inv_lt_zero.2 hq ] } ) (by grind)
-  -- Apply Hölder's inequality with the sequences $a_i$ and $g_i = \sum_j w_{ij} b_j$.
-  have h_holder : (∑ i, a i * (∑ j, w i j * b j)) ≤ (∑ i, a i ^ p) ^ (1 / p) * (∑ i, (∑ j, w i j * b j) ^ q) ^ (1 / q) := by
-    have := @Real.inner_le_Lp_mul_Lq
-    simp_all
-    convert this Finset.univ a ( fun i => ∑ j, w i j * b j ) ( show p.HolderConjugate q from ?_ ) using 1
-    · simp only [ha, abs_of_nonneg, mul_eq_mul_left_iff]
-      left
-      congr!
-      symm
-      exact abs_of_nonneg (Finset.sum_nonneg fun _ _ ↦ mul_nonneg (hw _ _) (hb _))
-    · constructor <;> linarith
-  -- By Fubini's theorem, we can interchange the order of summation.
-  have h_fubini : ∑ i, (∑ j, w i j * b j) ^ q ≤ ∑ j, b j ^ q := by
-    -- Apply Jensen's inequality to the convex function $x^q$ with weights $w_{ij}$.
-    have h_jensen : ∀ i, (∑ j, w i j * b j) ^ q ≤ ∑ j, w i j * b j ^ q := by
-      intro i
-      have h_jensen : ConvexOn ℝ (Set.Ici 0) (fun x : ℝ => x ^ q) := by
-        apply convexOn_rpow
-        nlinarith [ inv_pos.2 ( zero_lt_one.trans hp ), inv_pos.2 h0q, mul_inv_cancel₀ h0q.ne']
-      convert h_jensen.map_sum_le _ _ _ <;> aesop
-    refine' le_trans ( Finset.sum_le_sum fun i _ => h_jensen i ) _;
-    rw [ Finset.sum_comm ]
-    simp [ ← Finset.sum_mul, hcol]
-  simp_all only [mul_comm];
-  simpa using h_holder.trans ( mul_le_mul_of_nonneg_left ( Real.rpow_le_rpow ( Finset.sum_nonneg fun _ _ => Real.rpow_nonneg ( Finset.sum_nonneg fun _ _ => mul_nonneg ( hb _ ) ( hw _ _ ) ) _ ) h_fubini (one_div_nonneg.mpr h0q.le)) ( Real.rpow_nonneg ( Finset.sum_nonneg fun _ _ => Real.rpow_nonneg ( ha _ ) _ ) _ ) ) |> le_trans <| by simp;
+  have hp0 : 0 < p := by linarith
+  have hq0 : 0 < q := one_div_pos.mp (by linarith [(div_lt_one hp0).mpr hp])
+  have hq1 : 1 ≤ q := (div_le_one hq0).mp (by linarith [one_div_pos.mpr hp0])
+  have hs : ∀ i, 0 ≤ ∑ j, w i j * b j :=
+    fun i => Finset.sum_nonneg fun j _ => mul_nonneg (hw i j) (hb j)
+  calc ∑ i, ∑ j, a i * b j * w i j
+      = ∑ i, a i * ∑ j, w i j * b j := by
+        simp_rw [Finset.mul_sum]
+        exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
+    _ ≤ (∑ i, |a i| ^ p) ^ (1/p) * (∑ i, |∑ j, w i j * b j| ^ q) ^ (1/q) :=
+        Real.inner_le_Lp_mul_Lq Finset.univ a _ ⟨by simpa [one_div] using hpq, hp0, hq0⟩
+    _ ≤ (∑ i, a i ^ p) ^ (1/p) * (∑ j, b j ^ q) ^ (1/q) := by
+        have h3 : ∑ i, (∑ j, w i j * b j) ^ q ≤ ∑ j, b j ^ q := by
+          calc ∑ i, (∑ j, w i j * b j) ^ q
+              ≤ ∑ i, ∑ j, w i j * b j ^ q :=
+                Finset.sum_le_sum fun i _ => weighted_jensen_rpow b (w i) q hb (hw i) (hrow i) hq1
+            _ = ∑ j, b j ^ q := by
+                rw [Finset.sum_comm]
+                simp_rw [← Finset.sum_mul]
+                simp [hcol]
+        simp_rw [fun i => abs_of_nonneg (ha i), fun i => abs_of_nonneg (hs i)]
+        exact mul_le_mul_of_nonneg_left
+          (Real.rpow_le_rpow (Finset.sum_nonneg fun i _ => Real.rpow_nonneg (hs i) q) h3
+            (by positivity))
+          (Real.rpow_nonneg (Finset.sum_nonneg fun i _ => Real.rpow_nonneg (ha i) p) _)
 
 --PULLOUT
 /--
@@ -127,46 +122,17 @@ lemma HermitianMat.inner_le_trace_rpow_mul
 
 --PULLOUT
 lemma MState.rpow_le_one' {r : ℝ} (hσ : 0 < r) : σ.M ^ r ≤ 1 := by
-  rw [HermitianMat.le_iff]
-  have h1 : 1 - σ.M ^ r = σ.M.cfc (fun x => 1 - x ^ r) := by
-    rw [HermitianMat.rpow_eq_cfc]
-    have : σ.M.cfc (fun _ => (1:ℝ)) = 1 := by ext1; simp
-    rw [← this, ← HermitianMat.cfc_sub_apply]
-  rw [h1, ← HermitianMat.zero_le_iff, HermitianMat.cfc_nonneg_iff]
-  intro i
-  have hge : 0 ≤ σ.M.H.eigenvalues i :=
-    (HermitianMat.zero_le_iff.mp σ.nonneg).eigenvalues_nonneg i
-  have hle : σ.M.H.eigenvalues i ≤ 1 := σ.eigenvalue_le_one i
-  linarith [Real.rpow_le_one hge hle hσ.le]
+  obtain ⟨e, he⟩ := σ.M.cfc_eigenvalues (f := (· ^ r))
+  refine ((σ.M ^ r).eigenvalues_le_imp_le_smul_one 1 fun i => ?_).trans_eq (one_smul _ _)
+  rw [HermitianMat.rpow_eq_cfc, he]
+  exact Real.rpow_le_one (σ.eigenvalue_nonneg _) (σ.eigenvalue_le_one _) hσ.le
 
 --PULLOUT
 /-- If A ≥ 0 and A ≤ 1, then each eigenvalue of A is in [0, 1]. -/
 lemma HermitianMat.eigenvalues_le_one_of_le_one
     (A : HermitianMat d ℂ) (hA1 : A ≤ 1) (i : d) :
-    A.H.eigenvalues i ≤ 1 := by
-  by_contra! h
-  obtain ⟨v, hv₁, hv₂⟩ : ∃ v : EuclideanSpace ℂ d, ‖v‖ = 1 ∧ A.mat.mulVec v = (A.H.eigenvalues i) • v := by
-    use A.H.eigenvectorBasis i
-    exact ⟨A.H.eigenvectorBasis.orthonormal.1 i, A.H.mulVec_eigenvectorBasis i⟩
-  have h_eigenvalue : star v ⬝ᵥ A.mat.mulVec v = (A.H.eigenvalues i) * star v ⬝ᵥ v := by
-    rw [hv₂, dotProduct_smul, Complex.real_smul]
-  have h_unit : star v ⬝ᵥ v = 1 := by
-    simp only [EuclideanSpace.norm_eq, Real.sqrt_eq_one, dotProduct, Pi.star_apply,
-      RCLike.star_def]  at hv₁ ⊢
-    simp only [sq, Complex.ext_iff, Complex.re_sum, Complex.mul_re, Complex.conj_re,
-      Complex.conj_im, Complex.mul_im, neg_mul, sub_neg_eq_add, Complex.im_sum,
-      Complex.one_re, Complex.one_im] at hv₁ ⊢
-    simp only [Complex.norm_def, Complex.normSq, MonoidWithZeroHom.coe_mk, ZeroHom.coe_mk,
-      mul_comm, add_neg_cancel, Finset.sum_const_zero, and_true] at hv₁ ⊢
-    rw [← hv₁]
-    refine Finset.sum_congr rfl fun _ _ => ?_
-    rw [Real.mul_self_sqrt (add_nonneg (mul_self_nonneg _) (mul_self_nonneg _))]
-  open ComplexOrder in
-  have := (Matrix.posSemidef_iff_dotProduct_mulVec.mp hA1).2 v
-  simp only [val_eq_coe, mul_one, mat_one, Matrix.sub_mulVec,
-    Matrix.one_mulVec, dotProduct_sub, h_eigenvalue, h_unit] at this
-  norm_cast at this
-  linarith
+    A.H.eigenvalues i ≤ 1 :=
+  A.le_smul_one_imp_eigenvalues_le 1 (by simpa using hA1) i
 
 --PULLOUT
 /-- For positive A ≤ 1 and p ≥ 1, `Tr[A^p] ≤ Tr[A]`.
@@ -175,48 +141,20 @@ lemma HermitianMat.trace_rpow_le_trace_of_le_one
     (A : HermitianMat d ℂ) (hA : 0 ≤ A) (hA1 : A ≤ 1)
     (p : ℝ) (hp : 1 ≤ p) :
     (A ^ p).trace ≤ A.trace := by
-  -- Rewrite both sides using trace_rpow_eq_sum: Tr[A^p] = ∑ λ_i^p and Tr[A] = ∑ λ_i (using trace_rpow_eq_sum and rpow_one for the latter).
-  have h_trace_eq_sum : (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p ∧ A.trace = ∑ i, (A.H.eigenvalues i) := by
-    exact ⟨ by rw [ HermitianMat.trace_rpow_eq_sum ], by rw [ show A.trace = ∑ i, ( A.H.eigenvalues i ) by simpa using HermitianMat.trace_rpow_eq_sum A 1 ] ⟩;
-  rw [ h_trace_eq_sum.1, h_trace_eq_sum.2 ];
-  apply_rules [ Finset.sum_le_sum ];
-  intro i hi; by_cases hi0 : A.H.eigenvalues i = 0 <;> simp_all
-  · rw [ Real.zero_rpow ( by positivity ) ];
-  · conv_rhs => rw [← (A.H.eigenvalues i).rpow_one]
-    apply Real.rpow_le_rpow_of_exponent_ge
-    · exact lt_of_le_of_ne' (le_of_not_gt fun hi => hi0 <| by linarith [ show 0 ≤ A.H.eigenvalues i by simpa using hA.eigenvalues_nonneg i ] ) hi0
-    · exact A.eigenvalues_le_one_of_le_one hA1 i
-    · exact hp
+  rw [HermitianMat.trace_rpow_eq_sum, ← A.sum_eigenvalues_eq_trace]
+  exact Finset.sum_le_sum fun i _ => Real.rpow_le_self_of_le_one
+    ((HermitianMat.zero_le_iff.mp hA).eigenvalues_nonneg i)
+    (A.eigenvalues_le_one_of_le_one hA1 i) hp
 
 private lemma trace_conj_rpow_eq_inner (hα₀ : 0 < α) (hα : α < 1) :
     ((ρ.M ^ α).conj (σ.M ^ ((1 - α) / (2 * α) * α)).mat).trace = ⟪ρ.M ^ α, σ.M ^ (1 - α)⟫_ℝ := by
-  convert congr_arg _ ( HermitianMat.inner_eq_trace_rc _ _ ) using 2;
-  rotate_left;
-  rotate_left;
-  rotate_left;
-  exact d;
-  exact ℂ;
-  all_goals try infer_instance;
-  exact ρ ^ α;
-  exact σ ^ ( 1 - α );
-  rotate_right;
-  exact fun x => x.re;
-  · unfold HermitianMat.conj;
-    simp [ Matrix.trace, Matrix.mul_apply, inner]
-    rw [ show ( 1 - α ) / ( 2 * α ) * α = ( 1 - α ) / 2 by rw [ div_mul_eq_mul_div, div_eq_iff ] <;> linarith ];
-    -- By the properties of the trace, we can rearrange the terms inside the trace.
-    have h_trace : Matrix.trace ((σ.M ^ ((1 - α) / 2)).mat * (ρ.M ^ α).mat * (σ.M ^ ((1 - α) / 2)).mat) = Matrix.trace ((ρ.M ^ α).mat * (σ.M ^ (1 - α)).mat) := by
-      have h_trace : (σ.M ^ ((1 - α) / 2)).mat * (σ.M ^ ((1 - α) / 2)).mat = (σ.M ^ (1 - α)).mat := by
-        have := σ.nonneg;
-        rw [ ← HermitianMat.mat_rpow_add this ]
-        ring_nf
-        linarith;
-      rw [ ← h_trace, Matrix.mul_assoc ];
-      rw [ ← Matrix.trace_mul_comm ]
-      simp [ Matrix.mul_assoc ]
-    convert! congr_arg Complex.re h_trace using 1;
-    simp [ Matrix.trace, Matrix.mul_apply ];
-  · exact HermitianMat.inner_eq_re_trace _ _
+  have h2 : (1 - α) / (2 * α) * α = (1 - α) / 2 := by field_simp
+  have hs : (σ.M ^ ((1 - α) / 2)).mat * (σ.M ^ ((1 - α) / 2)).mat = (σ.M ^ (1 - α)).mat := by
+    rw [← HermitianMat.mat_rpow_add σ.nonneg (by linarith)]
+    norm_num
+  rw [h2, HermitianMat.inner_eq_re_trace, HermitianMat.trace_eq_re_trace,
+    HermitianMat.conj_apply_mat, HermitianMat.conjTranspose_mat, Matrix.trace_mul_comm,
+    ← Matrix.mul_assoc, hs, Matrix.trace_mul_comm]
 
 private lemma inner_rpow_le_one (hα₀ : 0 < α) (hα : α < 1) :
     ⟪ρ.M ^ α, σ.M ^ (1 - α)⟫_ℝ ≤ 1 := by
@@ -259,105 +197,42 @@ private theorem sandwiched_trace_of_lt_1 (hα₀ : 0 < α) (hα : α < 1) :
 lemma HermitianMat.rpow_neg_mul_rpow_eq_supportProj
     {A : HermitianMat d ℂ} (hA : 0 ≤ A) {p : ℝ} (hp : p ≠ 0) :
     (A ^ (-p)).mat * (A ^ p).mat = A.supportProj.mat := by
-  unfold HermitianMat.supportProj;
-  have h_cfc : (A ^ (-p)).mat * (A ^ p).mat = (A.cfc (fun x => x ^ (-p))) * (A.cfc (fun x => x ^ p)) := by
-    congr! 1;
-  rw [ h_cfc, ← mat_cfc_mul ];
-  have h_cfc : ∀ x : ℝ, 0 ≤ x → x ^ (-p) * x ^ p = if x = 0 then 0 else 1 := by
-    intro x hx; by_cases hx' : x = 0 <;> simp [ hx', Real.rpow_neg, hx, hp ] ;
-  have h_cfc_eq : (A.cfc (fun x => x ^ (-p) * x ^ p)) = (A.cfc (fun x => if x = 0 then 0 else 1)) := by
-    apply cfc_congr_of_nonneg hA;
-    exact fun x hx => h_cfc x hx;
-  convert! congr_arg ( fun x : HermitianMat d ℂ => x.val ) h_cfc_eq using 1;
-  exact congr_arg ( fun x : HermitianMat d ℂ => x.val ) ( supportProj_eq_cfc A )
+  rw [HermitianMat.supportProj_eq_cfc, HermitianMat.rpow_eq_cfc, HermitianMat.rpow_eq_cfc,
+    ← HermitianMat.mat_cfc_mul_apply]
+  exact congrArg _ (A.cfc_congr_of_nonneg hA fun x hx => by
+    rcases eq_or_lt_of_le (Set.mem_Ici.mp hx) with rfl | h
+    · simp [hp]
+    · simp [← Real.rpow_add h, h.ne'])
 
 lemma HermitianMat.supportProj_mul_self (A : HermitianMat d ℂ) :
     A.supportProj.mat * A.mat = A.mat := by
-  have h_supportProj_mul_A : ∀ (v : d → ℂ), (A.supportProj.val.mulVec (A.val.mulVec v)) = (A.val.mulVec v) := by
-    intro v
-    have h_range : WithLp.toLp 2 (A.val.mulVec v) ∈ LinearMap.range A.val.toEuclideanLin := by
-      exact ⟨ _, rfl ⟩
-    have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), v ∈ LinearMap.range A.val.toEuclideanLin → (A.supportProj.val.toEuclideanLin v) = v := by
-      intro v hv
-      have h_supportProj_mul_A : (A.supportProj.val.toEuclideanLin v) = (Submodule.orthogonalProjectionOnto (LinearMap.range A.val.toEuclideanLin) v) := by
-        simp only [val_eq_coe, Submodule.coe_orthogonalProjectionOnto_apply]
-        simp [supportProj, projector]
-        simp only [Submodule.starProjection]
-        simp
-        have key : ∀ (f : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d),
-            Matrix.toEuclideanLin
-              ((LinearMap.toMatrix (EuclideanSpace.basisFun d ℂ).toBasis (EuclideanSpace.basisFun d ℂ).toBasis) f) = f := by
-          intro f
-          rw [Matrix.toEuclideanLin, Matrix.toLpLin_eq_toLin]
-          exact Matrix.toLin_toMatrix _ _ f
-        have hsup : A.support = (Matrix.toEuclideanLin (↑A : Matrix d d ℂ)).range := by
-          simp [HermitianMat.support, HermitianMat.lin]
-        rw [key, LinearMap.comp_apply, Submodule.subtype_apply, hsup]
-        rfl
-      rw [h_supportProj_mul_A]
-      exact Submodule.eq_starProjection_of_mem_of_inner_eq_zero (by simpa using hv) (by simp)
-    exact congr(WithLp.ofLp $(h_supportProj_mul_A _ h_range))
-  exact Matrix.toLin'.injective ( LinearMap.ext fun v => by simpa using h_supportProj_mul_A v )
+  have h : (A.cfc fun x => (if x = 0 then (0:ℝ) else 1) * x).mat = A.mat :=
+    congrArg _ ((A.cfc_congr fun x _ => by by_cases hx : x = 0 <;> simp [hx]).trans A.cfc_id')
+  rw [HermitianMat.mat_cfc_mul_apply, HermitianMat.cfc_id'] at h
+  rwa [HermitianMat.supportProj_eq_cfc]
 
 lemma HermitianMat.inner_supportProj_self (A : HermitianMat d ℂ) :
     ⟪A, A.supportProj⟫ = A.trace := by
-  simp only [trace, IsMaximalSelfAdjoint.RCLike_selfadjMap, Matrix.trace, Matrix.diag_apply,
-    mat_apply, map_sum, RCLike.re_to_complex]
-  simp only [inner, IsMaximalSelfAdjoint.RCLike_selfadjMap, RCLike.re_to_complex];
-  convert congr_arg Complex.re ( congr_arg Matrix.trace ( HermitianMat.supportProj_mul_self A ) ) using 1;
-  · simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, mat_apply, Complex.re_sum,
-      Complex.mul_re, Finset.sum_sub_distrib, mul_comm];
-    exact congrArg₂ _ ( Finset.sum_comm ) ( Finset.sum_comm );
-  · simp only [Matrix.trace, Matrix.diag_apply, mat_apply, Complex.re_sum]
+  rw [HermitianMat.inner_eq_re_trace, Matrix.trace_mul_comm, HermitianMat.supportProj_mul_self,
+    HermitianMat.trace_eq_re_trace]
 
 lemma HermitianMat.mul_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
     A.mat * B.supportProj.mat = A.mat := by
-  -- Since $B.supportProj$ is the projection onto $range B$, we have $B.supportProj * B.mat = B.mat$.
-  have h_supportProj_mul_B : B.supportProj.mat * B.mat = B.mat := by
-    exact supportProj_mul_self B
-  have h_range_A_subset_range_B : LinearMap.range A.lin.toLinearMap ≤ LinearMap.range B.lin.toLinearMap := by
-    have h_orthogonal_complement : LinearMap.range (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) = (LinearMap.ker (B.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
-      have h_orthogonal_complement : ∀ (T : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d), T = T.adjoint → LinearMap.range T = (LinearMap.ker T)ᗮ := by
-        intro T hT;
-        refine' Submodule.eq_of_le_of_finrank_eq _ _;
-        · rintro x ⟨y, rfl⟩
-          rw [Submodule.mem_orthogonal' (LinearMap.ker T) (T y)]
-          intro z hz
-          rw [LinearMap.mem_ker] at hz
-          simp [← LinearMap.adjoint_inner_right, ← hT, hz]
-        · have := LinearMap.finrank_range_add_finrank_ker T;
-          have := Submodule.finrank_add_finrank_orthogonal (LinearMap.ker T)
-          linarith;
-      apply h_orthogonal_complement
-      simp
-    have h_orthogonal_complement_A : LinearMap.range (A.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d) ≤ (LinearMap.ker (A.lin : EuclideanSpace ℂ d →ₗ[ℂ] EuclideanSpace ℂ d))ᗮ := by
-      intro x hx y hy
-      simp_all only [LinearMap.mem_range, ContinuousLinearMap.coe_coe, LinearMap.mem_ker]
-      obtain ⟨ z, rfl ⟩ := hx;
-      have h_orthogonal_complement_A : ∀ (y z : EuclideanSpace ℂ d), ⟪y, A.lin z⟫_ℂ = ⟪A.lin y, z⟫_ℂ := by
-        simp
-      rw [ h_orthogonal_complement_A, hy, inner_zero_left ];
-    exact h_orthogonal_complement.symm ▸ le_trans h_orthogonal_complement_A ( Submodule.orthogonal_le h );
-  -- Since $B.supportProj$ is the projection onto $range B$, and $range A \subseteq range B$, we have $B.supportProj * A = A$.
-  have h_supportProj_mul_A : ∀ (v : EuclideanSpace ℂ d), B.supportProj.mat.mulVec (A.mat.mulVec v) = A.mat.mulVec v := by
+  have hsupp : A.support ≤ B.support := by
+    rw [← ker_orthogonal_eq_support, ← ker_orthogonal_eq_support]
+    exact Submodule.orthogonal_le h
+  have h0 : B.kerProj.mat * A.mat = 0 := by
+    rw [Matrix.ext_iff_mulVec]
     intro v
-    obtain ⟨w, hw⟩ : WithLp.toLp 2 (A.mat.mulVec v) ∈ LinearMap.range B.lin.toLinearMap := by
-      exact h_range_A_subset_range_B ( Set.mem_range_self v );
-    replace h_supportProj_mul_B := congr(Matrix.mulVec $h_supportProj_mul_B w)
-    replace hw := congr(WithLp.ofLp $hw)
-    simp only [ContinuousLinearMap.coe_coe] at hw
-    simp_all only [← hw, ← Matrix.mulVec_mulVec]
-    exact h_supportProj_mul_B
-  -- By definition of matrix multiplication, if B.supportProj * A * v = A * v for all vectors v, then B.supportProj * A = A.
-  have h_matrix_eq : ∀ (M N : Matrix d d ℂ), (∀ v : EuclideanSpace ℂ d, M.mulVec (N.mulVec v) = N.mulVec v) → M * N = N := by
-    intro M N hMN
-    ext i j
-    specialize hMN (WithLp.toLp 2 ( Pi.single j 1 ))
-    replace hMN := congr_fun hMN i
-    aesop;
-  rw [← Matrix.conjTranspose_inj]
-  simp_all only [Matrix.mulVec_mulVec, Matrix.conjTranspose_mul, conjTranspose_mat, implies_true]
+    have hm : WithLp.toLp 2 (A.mat.mulVec v) ∈ B.kerProj.ker := by
+      rw [kerProj_ker]
+      exact hsupp ⟨WithLp.toLp 2 v, rfl⟩
+    simpa [← Matrix.mulVec_mulVec] using (B.kerProj.mem_ker_iff_mulVec_zero _).mp hm
+  have h0' : A.mat * B.kerProj.mat = 0 := by
+    simpa [Matrix.conjTranspose_mul] using congrArg Matrix.conjTranspose h0
+  rw [eq_sub_of_add_eq' B.kerProj_add_supportProj]
+  simp [Matrix.mul_sub, h0']
 
 lemma HermitianMat.inner_supportProj_of_ker_le {A B : HermitianMat d ℂ}
   (h : LinearMap.ker B.lin.toLinearMap ≤ LinearMap.ker A.lin.toLinearMap) :
@@ -377,12 +252,11 @@ private lemma sandwiched_inner_eq_one (h : σ.M.ker ≤ ρ.M.ker) (t : ℝ) :
   rcases eq_or_ne t 0 with rfl | ht
   · simp
   · have h_combine : (σ.M ^ (-2 * t)).mat * (σ.M ^ t).mat = (σ.M ^ (-t)).mat := by
-      rw [show (-t : ℝ) = -2 * t + t by ring, HermitianMat.mat_rpow_add σ.nonneg]
-      contrapose! ht
-      linarith
+      rw [show (-t : ℝ) = -2 * t + t by ring,
+        HermitianMat.mat_rpow_add σ.nonneg fun hh => ht (by linarith)]
     have h_support : (σ.M ^ t).mat * (σ.M ^ (-t)).mat = σ.M.supportProj.mat := by
-      rw [← neg_ne_zero] at ht
-      simpa only [neg_neg] using σ.M.rpow_neg_mul_rpow_eq_supportProj σ.nonneg ht
+      simpa only [neg_neg] using
+        σ.M.rpow_neg_mul_rpow_eq_supportProj σ.nonneg (neg_ne_zero.mpr ht)
     rw [HermitianMat.inner_def, HermitianMat.conj_apply_mat, HermitianMat.conjTranspose_mat]
     rw [Matrix.trace_mul_comm, ← mul_assoc, ← mul_assoc, h_combine]
     rw [Matrix.trace_mul_cycle, h_support, ← HermitianMat.inner_def]
@@ -395,34 +269,24 @@ private theorem sandwiched_trace_of_gt_1 (h : σ.M.ker ≤ ρ.M.ker) (hα : α >
   set A := ρ.M.conj (σ.M ^ t).mat
   set B := σ.M ^ (-2 * t)
   have h_trace : ⟪A, B⟫ = 1 := sandwiched_inner_eq_one h t
-  have h_inner : ⟪A, B⟫ ≤ (A ^ α).trace ^ (1 / α) * (B ^ (α / (α - 1))).trace ^ (1 / (α / (α - 1))) := by
-    apply HermitianMat.inner_le_trace_rpow_mul
-    · positivity
-    · exact HermitianMat.rpow_nonneg σ.nonneg --TODO positivity
-    · exact hα
-    · rw [div_div_eq_mul_div, div_add_div, div_eq_iff]
-      · ring
-      · positivity
-      · positivity
-      · positivity
+  have h_inner : ⟪A, B⟫ ≤
+      (A ^ α).trace ^ (1 / α) * (B ^ (α / (α - 1))).trace ^ (1 / (α / (α - 1))) :=
+    HermitianMat.inner_le_trace_rpow_mul (by positivity) (HermitianMat.rpow_nonneg σ.nonneg)
+      _ _ hα (by
+        rw [div_div_eq_mul_div, div_add_div _ _ (by positivity) (by positivity),
+          div_eq_iff (by positivity)]
+        ring)
   have h_trace_B : (B ^ (α / (α - 1))).trace = 1 := by
-    have hB : B ^ (α / (α - 1)) = σ.M ^ (-2 * t * (α / (α - 1))) := by
-      rw [HermitianMat.rpow_mul σ.nonneg]
-    have h : -2 * t * ( α / ( α - 1 ) ) = 1 := by
-      rw [mul_div, div_eq_iff]
-      · linarith [mul_div_cancel₀ (1 - α) (by linarith : (2 * α) ≠ 0)]
-      · linarith only [hα]
-    rw [hB, h]
+    rw [← HermitianMat.rpow_mul σ.nonneg, show -2 * t * (α / (α - 1)) = 1 by
+      rw [mul_div, div_eq_iff (by linarith only [hα])]
+      linarith [mul_div_cancel₀ (1 - α) (by linarith : (2 * α) ≠ 0)]]
     simp
   have h_final : 1 ≤ (A ^ α).trace ^ (1 / α) := by
     simpa only [h_trace, one_div, h_trace_B, Real.one_rpow, mul_one] using h_inner
-  have : 0 ≤ (A ^ α).trace := by
-    --TODO: Make this all discharge via just `positivity`.
-    apply HermitianMat.trace_nonneg
-    apply HermitianMat.rpow_nonneg
-    positivity
-  refine le_of_not_gt fun h => h_final.not_gt ?_
-  simpa using Real.rpow_lt_one this h (by positivity)
+  have h0 : 0 ≤ (A ^ α).trace :=
+    HermitianMat.trace_nonneg (HermitianMat.rpow_nonneg (by positivity))
+  refine le_of_not_gt fun hlt => h_final.not_gt ?_
+  simpa using Real.rpow_lt_one h0 hlt (by positivity)
 
 private theorem sandwichedRelRentropy_nonneg_α_lt_1 (h : σ.M.ker ≤ ρ.M.ker) (hα0 : 0 < α) (hα : α < 1) :
     0 ≤ ((ρ.M.conj (σ.M ^ ((1 - α)/(2 * α)) ).mat) ^ α).trace.log / (α - 1) := by
@@ -448,41 +312,19 @@ For fixed PSD B, the derivative of α ↦ Tr[B^α] at α = 1 is ⟪B, B.log⟫ =
 private lemma hasDerivAt_trace_rpow_at_one (B : HermitianMat d ℂ) (hB : 0 ≤ B) :
     HasDerivAt (fun α : ℝ => (B ^ α).trace) ⟪B, B.log⟫ 1 := by
   have h_inner : ⟪B, B.log⟫ = ∑ i, (B.H.eigenvalues i) * Real.log (B.H.eigenvalues i) := by
-    -- By definition of the inner product, we have ⟪B, B.log⟫ = tr(B * B.log).
-    have h_inner_def : ⟪B, B.log⟫ = Matrix.trace (B.mat * B.log.mat) := by
-      simp [ Matrix.trace, Inner.inner ];
-      refine' Finset.sum_congr rfl fun i _ => _;
-      have h_herm : (B * B.log : Matrix d d ℂ).IsHermitian := by
-        have h_comm : Commute (B : Matrix d d ℂ) (B.log : Matrix d d ℂ) := by
-          commutes
-        simp_all [Matrix.IsHermitian]
-        rw [h_comm]
-      have := h_herm.apply i i
-      simp_all [Complex.ext_iff]
-      linarith
-    -- By definition of the trace, we have tr(B * B.log) = ∑ i, B.eigenvalues i * log(B.eigenvalues i).
-    have h_trace : (B.mat * B.log.mat).trace = ∑ i, B.H.eigenvalues i * Real.log (B.H.eigenvalues i) := by
-      have h_trace : (B ^ 1 * B.log.mat).trace = (B.cfc (fun x ↦ x * Real.log x)).trace := by
-        have h_trace : B ^ 1 * B.log.mat = B.cfc (fun x ↦ x * Real.log x) := by
-          have h_log : B ^ 1 * B.log.mat = B.cfc id * B.cfc Real.log := by
-            simp [pow_one, HermitianMat.log]
-          rw [h_log]
-          exact (B.mat_cfc_mul_apply id Real.log).symm
-        rw [h_trace, ← HermitianMat.trace_eq_trace_rc]
-        rfl
-      simp_all [ HermitianMat.trace_cfc_eq ];
-    exact_mod_cast h_inner_def.trans h_trace;
-  have h_deriv : ∀ i, HasDerivAt (fun α : ℝ => (B.H.eigenvalues i) ^ α) (B.H.eigenvalues i * Real.log (B.H.eigenvalues i)) 1 := by
-    intro i
-    by_cases h_pos : 0 < B.H.eigenvalues i;
-    · convert! HasDerivAt.rpow ( hasDerivAt_const _ _ ) ( hasDerivAt_id 1 ) h_pos using 1
-      simp only [id_eq, mul_one, sub_self, Real.rpow_zero, Real.rpow_one, one_mul, zero_add]
-    · have h_zero : B.H.eigenvalues i = 0 := by
-        exact le_antisymm ( le_of_not_gt h_pos ) ( by simpa using hB.eigenvalues_nonneg i )
-      simp [h_zero]
-      exact (hasDerivAt_const _ _).congr_of_eventuallyEq (Filter.eventuallyEq_of_mem ( Ioi_mem_nhds zero_lt_one ) fun x hx => Real.zero_rpow hx.out.ne' )
+    rw [HermitianMat.inner_eq_re_trace, show B.log = B.cfc Real.log from rfl, B.trace_mul_cfc]
+    simp
+  have h_deriv : ∀ i, HasDerivAt (fun α : ℝ => (B.H.eigenvalues i) ^ α)
+      (B.H.eigenvalues i * Real.log (B.H.eigenvalues i)) 1 := fun i => by
+    rcases eq_or_lt_of_le (show 0 ≤ B.H.eigenvalues i by simpa using hB.eigenvalues_nonneg i)
+      with h0 | h0
+    · simp only [← h0, Real.log_zero, mul_zero]
+      exact (hasDerivAt_const _ _).congr_of_eventuallyEq (Filter.eventuallyEq_of_mem
+        (Ioi_mem_nhds zero_lt_one) fun x hx => Real.zero_rpow hx.out.ne')
+    · simpa using (Real.hasStrictDerivAt_const_rpow h0 1).hasDerivAt
+  rw [h_inner]
   simp only [HermitianMat.trace_rpow_eq_sum, ← Finset.sum_apply]
-  convert! HasDerivAt.sum fun i _ => h_deriv i using 1
+  exact HasDerivAt.sum fun i _ => h_deriv i
 
 /-
 PROBLEM
@@ -500,25 +342,11 @@ Note: show t + t = 2 * t by ring, and 2 * t ≠ 0 from ht using two_mul_ne_zero 
 -/
 private lemma trace_conj_eq_inner_rpow {ρ σ : MState d} {t : ℝ} (ht : t ≠ 0) :
     (ρ.M.conj (σ.M ^ t).mat).trace = ⟪ρ.M, σ.M ^ (2 * t)⟫ := by
-  have h_cyclic : ((σ.M ^ t).mat * ρ.M.mat * (σ.M ^ t).mat).trace = ((σ.M ^ (2 * t)).mat * ρ.M.mat).trace := by
-    -- Since σ.M ^ t is Hermitian, we can use the property that the trace of a product is invariant under cyclic permutations.
-    have h_cyclic : Matrix.trace ((σ.M ^ t).mat * ρ.M.mat * (σ.M ^ t).mat) = Matrix.trace ((σ.M ^ t).mat * (σ.M ^ t).mat * ρ.M.mat) := by
-      rw [ ← Matrix.trace_mul_comm ]
-      simp [ Matrix.mul_assoc ]
-    rw [ h_cyclic, two_mul ]
-    ring_nf
-    have h_exp : (σ.M ^ (t + t)).mat = (σ.M ^ t).mat * (σ.M ^ t).mat := by
-      have h_nonneg : 0 ≤ σ.M := by
-        exact σ.nonneg
-      have h_ne_zero : t + t ≠ 0 := by
-        exact fun h => ht ( by linarith )
-      exact HermitianMat.mat_rpow_add h_nonneg h_ne_zero
-    rw [ mul_two, h_exp ]
-  have h_inner : ⟪ρ.M, σ.M ^ (2 * t)⟫ = ((ρ.M.mat * (σ.M ^ (2 * t)).mat).trace).re := by
-    exact rfl
-  simp_all
-  convert congr_arg Complex.re h_cyclic using 1 ; simp [ HermitianMat.conj ] ; ring!;
-  rw [ Matrix.trace_mul_comm ]
+  have hs : (σ.M ^ t).mat * (σ.M ^ t).mat = (σ.M ^ (2 * t)).mat := by
+    rw [two_mul, HermitianMat.mat_rpow_add σ.nonneg fun h => ht (by linarith)]
+  rw [HermitianMat.inner_eq_re_trace, HermitianMat.trace_eq_re_trace,
+    HermitianMat.conj_apply_mat, HermitianMat.conjTranspose_mat, Matrix.trace_mul_comm,
+    ← Matrix.mul_assoc, hs, Matrix.trace_mul_comm]
 
 -- The weight of eigenvalue i in the inner product decomposition
 private def eigenWeight (ρ σ : MState d) (i : d) : ℝ :=
@@ -526,53 +354,27 @@ private def eigenWeight (ρ σ : MState d) (i : d) : ℝ :=
 
 private lemma inner_cfc_eq_sum_eigenWeight (ρ σ : MState d) (f : ℝ → ℝ) :
     ⟪ρ.M, σ.M.cfc f⟫ = ∑ i, f (σ.M.H.eigenvalues i) * eigenWeight ρ σ i := by
-  -- By definition of the inner product in the context of Hermitian matrices, we can expand it using the trace.
-  have h_inner : ⟪ρ.M, σ.M.cfc f⟫ = RCLike.re (Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat)) := by
-    exact rfl;
-  have h_trace : Matrix.trace (ρ.M.mat * (σ.M.cfc f).mat) = ∑ i, f (σ.M.H.eigenvalues i) * (star (σ.M.H.eigenvectorBasis i) ⬝ᵥ ρ.M.mat.mulVec (σ.M.H.eigenvectorBasis i)) := by
-    rw [ Matrix.trace ];
-    have h_cfc_def : (σ.M.cfc f).mat = ∑ i, (f (Matrix.IsHermitian.eigenvalues σ.M.H i)) • Matrix.of (fun x y => (σ.M.H.eigenvectorBasis i x) * (star (σ.M.H.eigenvectorBasis i y))) := by
-      convert σ.M.cfc_toMat_eq_sum_smul_proj f using 1;
-      ext i j; simp [ Matrix.single ] ; ring_nf
-      simp [ Matrix.sum_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply ];
-      refine' Finset.sum_congr rfl fun x _ => _ ; simp [ Finset.sum_ite, Finset.filter_eq, Finset.filter_and ] ; ring_nf
-      rw [ Finset.sum_eq_single x ] <;> aesop;
-    simp [ h_cfc_def, Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm ];
-    simp [ Matrix.sum_apply, Matrix.mul_apply ];
-    rw [ Finset.sum_comm ] ; congr ; ext ; congr ; ext ; congr ; ext ; ring!;
-  simp_all [ eigenWeight ];
-  simp [ Matrix.dotProduct_mulVec ]
+  rw [HermitianMat.inner_eq_re_trace, σ.M.cfc_toMat_eq_sum_smul_proj f, Matrix.mul_sum]
+  simp only [Matrix.mul_smul, Matrix.trace_sum, Matrix.trace_smul, map_sum, RCLike.smul_re]
+  refine Finset.sum_congr rfl fun i _ => congrArg _ (congrArg _ ?_)
+  rw [← Matrix.mul_assoc, Matrix.trace_mul_cycle, ← Matrix.mul_assoc, Matrix.trace_mul_single]
+  simp [Matrix.mul_apply, Matrix.vecMul, dotProduct, Matrix.conjTranspose_apply]
+  rfl
 
 private lemma eigenWeight_nonneg (ρ σ : MState d) (i : d) : 0 ≤ eigenWeight ρ σ i := by
-  -- By definition of `eigenWeight`, we have:
-  set v := σ.M.H.eigenvectorBasis i
-  set w := ρ.M.mat.mulVec v
-  have h_eigenWeight : eigenWeight ρ σ i = RCLike.re (star v ⬝ᵥ w) := by
-    unfold eigenWeight;
-    simp +zetaDelta at *;
-    simp [ Matrix.dotProduct_mulVec ]
-  rw [h_eigenWeight];
-  -- Since ρ is positive semi-definite, we have that the inner product of any vector with ρ is non-negative. Hence, we can write:
-  have := ρ.pos
-  obtain ⟨ h₁, h₂ ⟩ := this;
-  open ComplexOrder in
-  have := (Matrix.posSemidef_iff_dotProduct_mulVec.mp h₁).2 v;
-  exact this.1.trans (by simp [w])
+  have h := (Matrix.posSemidef_iff_dotProduct_mulVec.mp (HermitianMat.zero_le_iff.mp ρ.nonneg)).2
+    (σ.M.H.eigenvectorBasis i)
+  simpa [eigenWeight, Matrix.dotProduct_mulVec] using h.1
 
 set_option backward.isDefEq.respectTransparency false in
 private lemma eigenWeight_zero_of_eigenvalue_zero {i : d} (hσ : σ.M.ker ≤ ρ.M.ker)
   (hei : σ.M.H.eigenvalues i = 0) :
     eigenWeight ρ σ i = 0 := by
-  unfold eigenWeight
-  have h_mulVec_zero : σ.M.mat.mulVec (σ.M.H.eigenvectorBasis i) = 0 := by
-    convert Matrix.IsHermitian.mulVec_eigenvectorBasis σ.M.H i using 1
-    simp [hei]
-  have h_mulVec_zero' : ρ.M.mat.mulVec (σ.M.H.eigenvectorBasis i) = 0 := by
-    specialize hσ congr(WithLp.toLp 2 $h_mulVec_zero)
-    exact congr(WithLp.ofLp $hσ)
-  convert congr_arg ( fun x : d → ℂ => RCLike.re ( star ( σ.M.H.eigenvectorBasis i ) ⬝ᵥ x ) ) h_mulVec_zero' using 1;
-  · simp [Matrix.dotProduct_mulVec]
-  · simp [dotProduct]
+  have h1 : σ.M.mat.mulVec (σ.M.H.eigenvectorBasis i) = 0 := by
+    simpa [hei] using σ.M.H.mulVec_eigenvectorBasis i
+  have h0 : ρ.m.mulVec (σ.M.H.eigenvectorBasis i) = 0 :=
+    congr(WithLp.ofLp $(hσ congr(WithLp.toLp 2 $h1)))
+  simp [eigenWeight, ← Matrix.dotProduct_mulVec, h0]
 
 /-
 The derivative of u ↦ ⟪ρ, σ^u⟫ at u = 0 is ⟪ρ, σ.log⟫.
@@ -582,26 +384,16 @@ The derivative of u ↦ ⟪ρ, σ^u⟫ at u = 0 is ⟪ρ, σ.log⟫.
 set_option backward.isDefEq.respectTransparency false in
 private lemma hasDerivAt_inner_rpow_at_zero (h : σ.M.ker ≤ ρ.M.ker) :
     HasDerivAt (fun u : ℝ => ⟪ρ.M, σ.M ^ u⟫) ⟪ρ.M, σ.M.log⟫ 0 := by
-  convert HasDerivAt.congr_of_eventuallyEq ?_ ?_;
-  exact fun u => ∑ i, ( σ.M.H.eigenvalues i ) ^ u * eigenWeight ρ σ i;
-  · have h_deriv : ∀ i, HasDerivAt (fun u : ℝ => (σ.M.H.eigenvalues i) ^ u * eigenWeight ρ σ i) (Real.log (σ.M.H.eigenvalues i) * eigenWeight ρ σ i) 0 := by
-      intro i
-      rcases (σ.eigenvalue_nonneg i).lt_or_eq' with h_pos | h_zero
-      · simp only [h_pos, Real.rpow_def_of_pos, mul_comm]
-        convert! ((hasDerivAt_id 0).mul (hasDerivAt_const _ _)).exp.const_mul (eigenWeight ρ σ i ) using 1
-        simp
-      · simp [Real.rpow_def_of_nonpos, mul_comm, h_zero]
-        convert! hasDerivAt_const (0 : ℝ) (0 : ℝ) using 1
-        ext1 u
-        split_ifs with hu
-        · simp [eigenWeight_zero_of_eigenvalue_zero h h_zero]
-        · rfl
-    convert HasDerivAt.sum (u := Finset.univ) fun i _ => h_deriv i using 1
-    · ext x : 1
-      simp only [Finset.sum_apply]
-    · exact inner_cfc_eq_sum_eigenWeight ρ σ Real.log
-  · filter_upwards [Metric.ball_mem_nhds 0 zero_lt_one] with u hu
-    exact inner_cfc_eq_sum_eigenWeight ρ σ (· ^ u)
+  have h_deriv : ∀ i, HasDerivAt (fun u : ℝ => σ.M.H.eigenvalues i ^ u * eigenWeight ρ σ i)
+      (Real.log (σ.M.H.eigenvalues i) * eigenWeight ρ σ i) 0 := fun i => by
+    rcases (σ.eigenvalue_nonneg i).lt_or_eq' with h_pos | h_zero
+    · simpa using (Real.hasStrictDerivAt_const_rpow h_pos 0).hasDerivAt.mul_const _
+    · simpa [eigenWeight_zero_of_eigenvalue_zero h h_zero] using hasDerivAt_const (0:ℝ) (0:ℝ)
+  refine HasDerivAt.congr_of_eventuallyEq ?_ (Filter.Eventually.of_forall fun u =>
+    inner_cfc_eq_sum_eigenWeight ρ σ (· ^ u))
+  rw [show σ.M.log = σ.M.cfc Real.log from rfl, inner_cfc_eq_sum_eigenWeight]
+  convert HasDerivAt.sum (u := Finset.univ) fun i _ => h_deriv i using 1
+  exact (Finset.sum_fn _ _).symm
 
 /-  The derivative of α ↦ Tr[ρ σ^((1-α)/α)] at α = 1 is -⟪ρ, log σ⟫.
     Uses trace cyclic: Tr[σ^t ρ σ^t] = Tr[ρ σ^(2t)].
@@ -615,10 +407,8 @@ private lemma hasDerivAt_trace_conj_at_one {ρ σ : MState d}
   have h_chain : HasDerivAt (fun α : ℝ => ⟪ρ.M, σ.M ^ ((1 - α) / α)⟫) (⟪ρ.M, σ.M.log⟫ * (-1)) 1 := by
     apply HasDerivAt.comp (h₂ := fun u => ⟪ρ.M, σ.M ^ u⟫) (h := fun α => (1 - α) / α)
     · simpa using hasDerivAt_inner_rpow_at_zero h
-    · have h1 := HasDerivAt.div ( hasDerivAt_id ( 1 : ℝ ) |> HasDerivAt.const_sub 1 )
-        ( hasDerivAt_id ( 1 : ℝ ) ) ( by norm_num )
-      simp_all only [id_eq, mul_one, sub_self, sub_zero, one_pow, div_one]
-      exact h1
+    · simpa only [Pi.div_def, id_eq, mul_one, sub_self, sub_zero, one_pow, div_one] using
+        ((hasDerivAt_id (1:ℝ)).const_sub 1).div (hasDerivAt_id 1) one_ne_zero
   ring_nf at h_chain
   apply h_chain.congr_of_eventuallyEq _
   filter_upwards [ lt_mem_nhds zero_lt_one ] with α hα
@@ -779,12 +569,11 @@ private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
     This is because ρM is supported entirely on the support (= range) of A. -/
 private lemma conj_supportProj_eq_of_ker_le (A ρM : HermitianMat d ℂ) (hker : A.ker ≤ ρM.ker) :
     ρM.conj (A.supportProj).mat = ρM := by
-  have h_conj_support : ρM.mat * A.supportProj.mat = ρM.mat := by
-    apply HermitianMat.mul_supportProj_of_ker_le; assumption;
-  -- Using the conjugate transpose property and the fact that A.supportProj is Hermitian, we can simplify the expression.
-  have h_conj_support : (A.supportProj.mat).conjTranspose * ρM.mat * A.supportProj.mat = ρM.mat := by
-    rw [ ← Matrix.conjTranspose_inj ] at * ; aesop;
-  simp_all [ HermitianMat.conj, Matrix.mul_assoc ]
+  have h1 : ρM.mat * A.supportProj.mat = ρM.mat := HermitianMat.mul_supportProj_of_ker_le hker
+  have h2 : A.supportProj.mat * ρM.mat = ρM.mat := by
+    simpa [Matrix.conjTranspose_mul] using congrArg Matrix.conjTranspose h1
+  ext1
+  simp only [HermitianMat.conj_apply_mat, HermitianMat.conjTranspose_mat, h2, h1]
 
 /-- For a PSD matrix A, the function r ↦ A ^ r converges to A.supportProj
     as r → 0 through nonzero values. On positive eigenvalues λ, λ^r → 1.
@@ -793,20 +582,21 @@ private lemma conj_supportProj_eq_of_ker_le (A ρM : HermitianMat d ℂ) (hker :
 private lemma rpow_tendsto_supportProj
     (A : HermitianMat d ℂ)  :
     Filter.Tendsto (fun r : ℝ => A ^ r) (nhdsWithin 0 {(0 : ℝ)}ᶜ) (nhds A.supportProj) := by
-  -- By definition of $g$, we know that $A.cfc (g r)$ converges to $A.supportProj$ as $r$ approaches $0$.
-  have h_cfc_g_conv : Filter.Tendsto (fun r : ℝ => A.cfc (fun x : ℝ => if r = 0 then (if x = 0 then 0 else 1) else x ^ r)) (nhds 0) (nhds A.supportProj) := by
-    have h_cfc_g_conv : Continuous (fun r : ℝ => A.cfc (fun x : ℝ => if r = 0 then (if x = 0 then 0 else 1) else x ^ r)) := by
-      -- Apply the continuity of the cfc function.
-      have h_cfc_cont : Continuous (fun r : ℝ => A.cfc (fun x : ℝ => if r = 0 then (if x = 0 then 0 else 1) else x ^ r)) := by
-        have h_g_cont : ∀ x : ℝ, Continuous (fun r : ℝ => if r = 0 then (if x = 0 then 0 else 1) else x ^ r) := by
-          intro x
-          by_cases hx : x = 0 <;> simp [hx];
-          · rw [ Metric.continuous_iff ] ; aesop;
-          · rw [ show ( fun r : ℝ => if r = 0 then 1 else x ^ r ) = fun r : ℝ => x ^ r by ext r; by_cases hr : r = 0 <;> simp [ hr ] ] ; exact Continuous.rpow continuous_const continuous_id' <| by continuity;
-        apply_rules [ HermitianMat.continuous_cfc_fun ];
-      convert h_cfc_cont using 1;
-    convert h_cfc_g_conv.tendsto 0 using 2 ; simp [ HermitianMat.supportProj_eq_cfc ];
-  exact Filter.Tendsto.congr' ( Filter.eventuallyEq_of_mem self_mem_nhdsWithin fun x hx => by aesop ) ( h_cfc_g_conv.mono_left inf_le_left )
+  have hg : ∀ x : ℝ, Continuous
+      (fun r : ℝ => if r = 0 then (if x = 0 then (0:ℝ) else 1) else x ^ r) := by
+    intro x
+    by_cases hx : x = 0 <;> simp [hx]
+    · rw [Metric.continuous_iff]
+      aesop
+    · rw [show (fun r : ℝ => if r = 0 then 1 else x ^ r) = fun r : ℝ => x ^ r from
+        funext fun r => by by_cases hr : r = 0 <;> simp [hr]]
+      fun_prop (disch := exact Or.inl hx)
+  have h2 : Filter.Tendsto (fun r : ℝ => A.cfc fun i => if r = 0 then (if i = 0 then (0:ℝ) else 1)
+      else i ^ r) (nhdsWithin 0 {0}ᶜ) (nhds A.supportProj) := by
+    simpa [HermitianMat.supportProj_eq_cfc] using
+      ((HermitianMat.continuous_cfc_fun A hg).tendsto 0).mono_left nhdsWithin_le_nhds
+  exact h2.congr' (Filter.eventuallyEq_of_mem self_mem_nhdsWithin fun x hx => by
+    simp [HermitianMat.rpow_eq_cfc, show x ≠ 0 from hx])
 
 set_option backward.isDefEq.respectTransparency false in
 /-- For PSD matrices A, ρ with A.ker ≤ ρ.ker, the function r ↦ ρ.conj (A ^ r).mat
@@ -817,15 +607,14 @@ private lemma conj_rpow_continuousAt_zero
     (A ρM : HermitianMat d ℂ)
     (hker : A.ker ≤ ρM.ker) :
     ContinuousAt (fun r : ℝ => ρM.conj (A ^ r).mat) 0 := by
-  have h_conj : Filter.Tendsto (fun r : ℝ => A ^ r) (nhdsWithin 0 {0}ᶜ) (nhds A.supportProj) := by
-    convert rpow_tendsto_supportProj A using 1;
-  have h_conj : Filter.Tendsto (fun r : ℝ => (HermitianMat.conj (A ^ r).mat) ρM) (nhdsWithin 0 {0}ᶜ) (nhds ρM) := by
-    convert! Filter.Tendsto.comp ( show Filter.Tendsto ( fun M : { M : Matrix d d ℂ // M.IsHermitian } ↦ ( HermitianMat.conj M.val ) ρM ) ( nhds ( A.supportProj ) ) ( nhds ρM ) from ?_ ) h_conj using 2;
-    convert Continuous.tendsto _ _;
-    · convert! conj_supportProj_eq_of_ker_le A ρM hker |> Eq.symm;
-    · fun_prop;
-  rw [ Metric.tendsto_nhdsWithin_nhds ] at *;
-  exact Metric.tendsto_nhds_nhds.mpr fun ε hε => by rcases h_conj ε hε with ⟨ δ, hδ, H ⟩ ; exact ⟨ δ, hδ, by intro x hx; by_cases hx' : x = 0 <;> aesop ⟩ ;
+  have h1 : Filter.Tendsto (fun r : ℝ => ρM.conj (A ^ r).mat) (nhdsWithin 0 {0}ᶜ) (nhds ρM) := by
+    have hc : Continuous fun B : HermitianMat d ℂ => ρM.conj B.mat := by fun_prop
+    have h2 := (hc.tendsto A.supportProj).comp (rpow_tendsto_supportProj A)
+    rwa [conj_supportProj_eq_of_ker_le A ρM hker] at h2
+  have h0 : ρM.conj (A ^ (0:ℝ)).mat = ρM := by simp
+  rw [ContinuousAt, h0, ← nhdsNE_sup_pure 0, Filter.tendsto_sup]
+  refine ⟨h1, ?_⟩
+  simpa [h0] using tendsto_pure_nhds (fun r : ℝ => ρM.conj (A ^ r).mat) 0
 
 /-
 ContinuousAt for B_of: the function α ↦ B(α) is continuous at α = 1.
@@ -835,15 +624,9 @@ ContinuousAt for B_of: the function α ↦ B(α) is continuous at α = 1.
 -/
 private lemma B_of_continuousAt (ρ σ : MState d) (h : σ.M.ker ≤ ρ.M.ker) :
     ContinuousAt (B_of ρ σ) 1 := by
-  -- Use the fact that the composition of continuous functions is continuous.
-  have h_cont : ContinuousAt (fun α : ℝ => ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) 1 := by
-    have h_inner : ContinuousAt (fun r : ℝ => ρ.M.conj (σ.M ^ r).mat) 0 := by
-      -- Apply the hypothesis `h_cont` directly to conclude the proof.
-      exact conj_rpow_continuousAt_zero σ.M ρ.M h
-    have h_exp : ContinuousAt (fun α : ℝ => (1 - α) / (2 * α)) 1 := by
-      exact ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by norm_num )
-    exact ContinuousAt.comp ( by simpa using h_inner ) h_exp |> ContinuousAt.congr <| Filter.eventuallyEq_of_mem ( Ioi_mem_nhds zero_lt_one ) fun x hx ↦ by aesop;
-  exact h_cont
+  have h_exp : ContinuousAt (fun α : ℝ => (1 - α) / (2 * α)) 1 :=
+    ContinuousAt.div (by fun_prop) (by fun_prop) (by norm_num)
+  exact ContinuousAt.comp (by simpa using conj_rpow_continuousAt_zero σ.M ρ.M h) h_exp
 
 private lemma trace_cfc_sub_le (A : HermitianMat d ℂ) (f g : ℝ → ℝ) :
     |(A.cfc f).trace - (A.cfc g).trace| ≤
@@ -858,15 +641,11 @@ private lemma eigenvalues_bounded_near {M : ℝ → HermitianMat d ℂ}
     (hM_nonneg : ∀ᶠ α in nhds 1, 0 ≤ M α)
     (hM_cont : ContinuousAt M 1) :
     ∃ K > 0, ∀ᶠ α in nhds 1, ∀ i, 0 ≤ (M α).H.eigenvalues i ∧ (M α).H.eigenvalues i ≤ K := by
-  have h_op_norm_bound : ∃ K > 0, ∀ᶠ α in nhds 1, ‖M α‖ ≤ K := by
-    exact ⟨ ‖M 1‖ + 1, by positivity, hM_cont.norm.eventually ( ge_mem_nhds ( lt_add_one _ ) ) ⟩
-  have h_eigenvalue_bound : ∀ᶠ α in nhds 1, ∀ i, 0 ≤ (M α).H.eigenvalues i ∧ (M α).H.eigenvalues i ≤ ‖M α‖ := by
-    have h_eigenvalue_bound : ∀ᶠ α in nhds 1, ∀ i, |(M α).H.eigenvalues i| ≤ ‖M α‖ := by
-      filter_upwards [ hM_nonneg, h_op_norm_bound.choose_spec.2 ] with α hα₁ hα₂ i
-      exact HermitianMat.eigenvalue_norm_le (M α) i
-    filter_upwards [ h_eigenvalue_bound, hM_nonneg ] with α hα hα' i
-    exact ⟨ hα' |> fun h => by simpa using h.eigenvalues_nonneg i, le_of_abs_le ( hα i ) ⟩
-  exact ⟨ h_op_norm_bound.choose, h_op_norm_bound.choose_spec.1, h_eigenvalue_bound.and ( h_op_norm_bound.choose_spec.2 ) |> fun h => h.mono fun α hα i => ⟨ hα.1 i |>.1, hα.1 i |>.2.trans ( hα.2 ) ⟩ ⟩
+  refine ⟨‖M 1‖ + 1, by positivity, ?_⟩
+  filter_upwards [hM_nonneg, hM_cont.norm.eventually (ge_mem_nhds (lt_add_one ‖M 1‖))]
+    with α h1 h2 i
+  exact ⟨by simpa using h1.eigenvalues_nonneg i,
+    (le_of_abs_le (HermitianMat.eigenvalue_norm_le (M α) i)).trans h2⟩
 
 /-
 Uniform convergence of (x^{1+h} - x)/h to x * log x on [0, K] as h → 0.
@@ -982,24 +761,13 @@ private lemma trace_cfc_tendsto_of_tendsto (f : ℝ → ℝ)
     (hM_cont : ContinuousAt M 1) (hM_nonneg : ∀ᶠ α in nhds 1, 0 ≤ M α)
     (hM_one : M 1 = ρ.M) :
     Filter.Tendsto (fun α => ((M α).cfc f).trace) (nhds 1) (nhds ((ρ.M.cfc f).trace)) := by
-  have h_cfc_cont : ContinuousWithinAt (fun A : HermitianMat d ℂ => A.cfc f) {A : HermitianMat d ℂ | 0 ≤ A} ρ := by
-    have h_cont : ContinuousOn (fun A : HermitianMat d ℂ => A.cfc f) {A : HermitianMat d ℂ | 0 ≤ A} := by
-      have h_cont_trace : ContinuousOn (fun A : HermitianMat d ℂ => (A.cfc f)) {A : HermitianMat d ℂ | 0 ≤ A} := by
-        have h_cont_cfc : ContinuousOn (fun A : HermitianMat d ℂ => A.cfc f) {A : HermitianMat d ℂ | spectrum ℝ A.mat ⊆ Set.Ici 0} := by
-          intro A hA
-          exact HermitianMat.continuousWithinAt_cfc_of_continuousOn hf hA
-        have h_spectrum_subset : ∀ A : HermitianMat d ℂ, 0 ≤ A → spectrum ℝ A.mat ⊆ Set.Ici 0 := by
-          intro A hA
-          exact (HermitianMat.posSemidef_iff_spectrum_Ici A).mp hA
-        exact h_cont_cfc.mono fun A hA => h_spectrum_subset A hA
-      exact h_cont_trace
-    exact h_cont _ ( by simp [ ρ.2 ] ) |> ContinuousWithinAt.mono <| Set.Subset.refl _;
-  have h_trace_cont : Continuous (fun A : HermitianMat d ℂ => A.trace) := by
-    exact HermitianMat.trace_Continuous;
-  have h_comp_cont : Filter.Tendsto (fun α => (M α).cfc f) (nhds 1) (nhds ((ρ : HermitianMat d ℂ).cfc f)) := by
-    convert! h_cfc_cont.tendsto.comp _ using 2;
-    exact tendsto_nhdsWithin_iff.mpr ⟨ hM_cont.tendsto.trans ( by simp [ hM_one ] ), hM_nonneg ⟩;
-  exact h_trace_cont.continuousAt.tendsto.comp h_comp_cont
+  have h_cfc_cont : ContinuousWithinAt (fun A : HermitianMat d ℂ => A.cfc f)
+      {A : HermitianMat d ℂ | 0 ≤ A} ρ.M :=
+    (HermitianMat.continuousWithinAt_cfc_of_continuousOn hf
+        ((HermitianMat.posSemidef_iff_spectrum_Ici _).mp ρ.nonneg)).mono
+      fun A hA => (HermitianMat.posSemidef_iff_spectrum_Ici A).mp hA
+  exact HermitianMat.trace_Continuous.continuousAt.tendsto.comp (h_cfc_cont.tendsto.comp
+    (tendsto_nhdsWithin_iff.mpr ⟨hM_one ▸ hM_cont.tendsto, hM_nonneg⟩))
 
 /-
 The remainder term r(1+h)/h → 0 where
@@ -1016,73 +784,62 @@ private lemma cross_term_slope_tendsto_zero
                     - (ρ.M ^ (1 + h)).trace + ρ.M.trace) / h)
       (nhdsWithin 0 {0}ᶜ)
       (nhds 0) := by
-  obtain ⟨ K, hK_pos, hK ⟩ := eigenvalues_bounded_near hM_nonneg hM_cont;
-  clear hK_pos
-  -- Let $G_h(x) = \frac{x^{1+h} - x}{h}$ for $h \neq 0$ and $G_0(x) = x \log x$.
-  set Gh : ℝ → ℝ → ℝ := fun h x => if h = 0 then x * Real.log x else (x ^ (1 + h) - x) / h;
-  -- Using the triangle inequality decomposition with $G_0(x) = x \log x$, we get:
-  have h_triangle : Filter.Tendsto (fun h => (∑ i, Gh h ((M (1 + h)).H.eigenvalues i)) - (∑ i, Gh h (ρ.M.H.eigenvalues i))) (nhdsWithin 0 {0}ᶜ) (nhds 0) := by
-    -- By the properties of the trace and the continuity of $G_h$, we can bound the difference.
-    have h_bound : ∀ ε > 0, ∃ δ > 0, ∀ h : ℝ, 0 < |h| → |h| < δ → ∀ x ∈ Set.Icc 0 K, |Gh h x - x * Real.log x| < ε := by
-      intro ε ε_pos
-      obtain ⟨δ, δ_pos, hδ⟩ : ∃ δ > 0, ∀ h : ℝ, 0 < |h| → |h| < δ → ∀ x ∈ Set.Icc 0 K, |(x ^ (1 + h) - x) / h - x * Real.log x| < ε := by
-        have := rpow_slope_tendsto_uniformly K ε ε_pos; aesop;
-      use δ, δ_pos
-      intro h hh_pos hh_lt
-      aesop;
-    -- Using the bound, we can show that the difference tends to zero.
-    have h_diff_zero : Filter.Tendsto (fun h => ∑ i, (Gh h ((M (1 + h)).H.eigenvalues i) - (M (1 + h)).H.eigenvalues i * Real.log ((M (1 + h)).H.eigenvalues i))) (nhdsWithin 0 {0}ᶜ) (nhds 0) ∧ Filter.Tendsto (fun h => ∑ i, (Gh h (ρ.M.H.eigenvalues i) - ρ.M.H.eigenvalues i * Real.log (ρ.M.H.eigenvalues i))) (nhdsWithin 0 {0}ᶜ) (nhds 0) := by
-      constructor;
-      · have h_diff_zero : ∀ ε > 0, ∃ δ > 0, ∀ h : ℝ, 0 < |h| → |h| < δ → ∀ i, |Gh h ((M (1 + h)).H.eigenvalues i) - (M (1 + h)).H.eigenvalues i * Real.log ((M (1 + h)).H.eigenvalues i)| < ε := by
-          intro ε hε_pos
-          obtain ⟨δ, hδ_pos, hδ⟩ := h_bound ε hε_pos
-          obtain ⟨δ', hδ'_pos, hδ'⟩ : ∃ δ' > 0, ∀ h : ℝ, |h| < δ' → ∀ i, 0 ≤ (M (1 + h)).H.eigenvalues i ∧ (M (1 + h)).H.eigenvalues i ≤ K := by
-            rcases Metric.mem_nhds_iff.mp hK with ⟨ δ', hδ'_pos, hδ' ⟩;
-            exact ⟨ δ', hδ'_pos, fun h hh i => hδ' ( mem_ball_iff_norm.mpr <| by simpa using hh ) i ⟩;
-          exact ⟨ Min.min δ δ', lt_min hδ_pos hδ'_pos, fun h hh₁ hh₂ i => hδ h hh₁ ( lt_of_lt_of_le hh₂ ( min_le_left _ _ ) ) _ ( hδ' h ( lt_of_lt_of_le hh₂ ( min_le_right _ _ ) ) i ) ⟩;
-        rw [ Metric.tendsto_nhdsWithin_nhds ];
-        intro ε hε_pos
-        obtain ⟨δ, hδ_pos, hδ⟩ := h_diff_zero (ε / (Fintype.card d + 1)) (by
-        positivity);
-        refine' ⟨ δ, hδ_pos, fun x hx hx' => _ ⟩;
-        simp +zetaDelta at *;
-        rw [ if_neg hx ];
-        rw [ ← Finset.sum_sub_distrib ];
-        exact lt_of_le_of_lt ( Finset.abs_sum_le_sum_abs _ _ ) ( lt_of_le_of_lt ( Finset.sum_le_sum fun i _ => le_of_lt ( by simpa [ hx ] using hδ x hx hx' i ) ) ( by norm_num; nlinarith [ mul_div_cancel₀ ε ( by positivity : ( Fintype.card d + 1 : ℝ ) ≠ 0 ) ] ) );
-      · rw [ Metric.tendsto_nhdsWithin_nhds ];
-        intro ε ε_pos; rcases h_bound ( ε / ( Fintype.card d + 1 ) ) ( div_pos ε_pos ( Nat.cast_add_one_pos _ ) ) with ⟨ δ, δ_pos, H ⟩ ; use δ, δ_pos; intro x hx hx'; simp_all [ dist_eq_norm ] ;
-        rw [ ← Finset.sum_sub_distrib ];
-        refine' lt_of_le_of_lt ( Finset.abs_sum_le_sum_abs _ _ ) _;
-        refine' lt_of_le_of_lt ( Finset.sum_le_sum fun i _ => le_of_lt ( H x hx hx' _ _ _ ) ) _;
-        · have := hK i; have := this.1.self_of_nhds; aesop;
-        · exact hK i |>.2.self_of_nhds |> fun h => by simpa [ hM_one ] using h;
-        · simp [ div_eq_mul_inv ];
-          nlinarith [ mul_inv_cancel_left₀ ( by positivity : ( Fintype.card d : ℝ ) + 1 ≠ 0 ) ε ];
-    have h_diff_zero : Filter.Tendsto (fun h => ∑ i, ((M (1 + h)).H.eigenvalues i * Real.log ((M (1 + h)).H.eigenvalues i)) - ∑ i, (ρ.M.H.eigenvalues i * Real.log (ρ.M.H.eigenvalues i))) (nhdsWithin 0 {0}ᶜ) (nhds 0) := by
-      have h_diff_zero : Filter.Tendsto (fun h => ((M (1 + h)).cfc (fun x => x * Real.log x)).trace - (ρ.M.cfc (fun x => x * Real.log x)).trace) (nhdsWithin 0 {0}ᶜ) (nhds 0) := by
-        have h_diff_zero : Filter.Tendsto (fun h => ((M (1 + h)).cfc (fun x => x * Real.log x)).trace) (nhdsWithin 0 {0}ᶜ) (nhds ((ρ.M.cfc (fun x => x * Real.log x)).trace)) := by
-          have h_diff_zero : Filter.Tendsto (fun α => ((M α).cfc (fun x => x * Real.log x)).trace) (nhds 1) (nhds ((ρ.M.cfc (fun x => x * Real.log x)).trace)) := by
-            convert trace_cfc_tendsto_of_tendsto _ _ _ _ _ using 1;
-            · exact Continuous.continuousOn ( Real.continuous_mul_log );
-            · exact hM_cont;
-            · exact hM_nonneg;
-            · exact hM_one;
-          exact h_diff_zero.comp ( tendsto_nhdsWithin_of_tendsto_nhds ( by norm_num [ Filter.Tendsto ] ) );
-        simpa using h_diff_zero.sub_const ( ( ρ.M.cfc fun x => x * Real.log x ).trace );
-      convert h_diff_zero using 2;
-      rw [ HermitianMat.trace_cfc_eq, HermitianMat.trace_cfc_eq ];
-    convert h_diff_zero.add ( ‹Filter.Tendsto ( fun h => ∑ i, ( Gh h ( ( M ( 1 + h ) ).H.eigenvalues i ) - ( M ( 1 + h ) ).H.eigenvalues i * Real.log ( ( M ( 1 + h ) ).H.eigenvalues i ) ) ) ( nhdsWithin 0 { 0 } ᶜ ) ( nhds 0 ) ∧ Filter.Tendsto ( fun h => ∑ i, ( Gh h ( ρ.M.H.eigenvalues i ) - ρ.M.H.eigenvalues i * Real.log ( ρ.M.H.eigenvalues i ) ) ) ( nhdsWithin 0 { 0 } ᶜ ) ( nhds 0 ) ›.1.sub ‹Filter.Tendsto ( fun h => ∑ i, ( Gh h ( ( M ( 1 + h ) ).H.eigenvalues i ) - ( M ( 1 + h ) ).H.eigenvalues i * Real.log ( ( M ( 1 + h ) ).H.eigenvalues i ) ) ) ( nhdsWithin 0 { 0 } ᶜ ) ( nhds 0 ) ∧ Filter.Tendsto ( fun h => ∑ i, ( Gh h ( ρ.M.H.eigenvalues i ) - ρ.M.H.eigenvalues i * Real.log ( ρ.M.H.eigenvalues i ) ) ) ( nhdsWithin 0 { 0 } ᶜ ) ( nhds 0 ) ›.2 ) using 2 <;> simp [ Finset.sum_sub_distrib ] ; ring;
-  refine' h_triangle.congr' _;
-  rw [ Filter.EventuallyEq, eventually_nhdsWithin_iff ];
-  rw [ Metric.eventually_nhds_iff ] at *;
-  obtain ⟨ ε, ε_pos, hε ⟩ := hK; use ε, ε_pos; intro y hy hy'; simp_all [ div_eq_inv_mul] ;
-  have h_trace_rpow : ∀ (A : HermitianMat d ℂ) (p : ℝ), (A ^ p).trace = ∑ i, (A.H.eigenvalues i) ^ p := by
-    exact fun A p => HermitianMat.trace_rpow_eq_sum A p;
-  have := h_trace_rpow ( M ( 1 + y ) ) 1; have := h_trace_rpow ( ρ : HermitianMat d ℂ ) 1; simp_all
-  simp +zetaDelta at *;
-  simp [ ← this, div_eq_inv_mul, mul_sub, hy' ];
-  simp [ ← Finset.mul_sum _ _ _, this.symm ]
-  ring
+  obtain ⟨K, hK_pos, hK⟩ := eigenvalues_bounded_near hM_nonneg hM_cont
+  have h1add : Filter.Tendsto (fun h : ℝ => 1 + h) (nhdsWithin 0 {0}ᶜ) (nhds 1) :=
+    ((continuous_const.add continuous_id).tendsto' 0 1 (by norm_num)).mono_left
+      nhdsWithin_le_nhds
+  have key : ∀ lam : ℝ → d → ℝ,
+      (∀ᶠ h in nhdsWithin (0:ℝ) {0}ᶜ, ∀ i, 0 ≤ lam h i ∧ lam h i ≤ K) →
+      Filter.Tendsto (fun h => ∑ i, ((lam h i ^ (1 + h) - lam h i) / h
+        - lam h i * Real.log (lam h i))) (nhdsWithin 0 {0}ᶜ) (nhds 0) := by
+    intro lam hlam
+    rw [Metric.tendsto_nhdsWithin_nhds]
+    intro ε hε
+    obtain ⟨δ₁, hδ₁, H⟩ := rpow_slope_tendsto_uniformly K (ε / (Fintype.card d + 1))
+      (by positivity)
+    rw [eventually_nhdsWithin_iff, Metric.eventually_nhds_iff] at hlam
+    obtain ⟨δ₂, hδ₂, H₂⟩ := hlam
+    refine ⟨min δ₁ δ₂, lt_min hδ₁ hδ₂, fun {h} hh hdist => ?_⟩
+    rw [Real.dist_eq, sub_zero] at hdist ⊢
+    have hmem := H₂ (show dist h 0 < δ₂ by
+      rw [Real.dist_eq, sub_zero]
+      exact hdist.trans_le (min_le_right _ _)) hh
+    calc |∑ i, ((lam h i ^ (1 + h) - lam h i) / h - lam h i * Real.log (lam h i))|
+        ≤ ∑ i, |(lam h i ^ (1 + h) - lam h i) / h - lam h i * Real.log (lam h i)| :=
+          Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ _i : d, ε / (Fintype.card d + 1) :=
+          Finset.sum_le_sum fun i _ => le_of_lt <|
+            H h (abs_pos.mpr hh) (hdist.trans_le (min_le_left _ _)) _
+              (Set.mem_Icc.mpr (hmem i))
+      _ < ε := by
+          rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+          calc (Fintype.card d : ℝ) * (ε / (Fintype.card d + 1))
+              < (Fintype.card d + 1) * (ε / (Fintype.card d + 1)) :=
+                mul_lt_mul_of_pos_right (by linarith) (by positivity)
+            _ = ε := by field_simp
+  have hμ : ∀ i, 0 ≤ ρ.M.H.eigenvalues i ∧ ρ.M.H.eigenvalues i ≤ K := by
+    have h0 := hK.self_of_nhds
+    rwa [hM_one] at h0
+  have hA := key (fun h i => (M (1 + h)).H.eigenvalues i) (h1add.eventually hK)
+  have hB := key (fun _ i => ρ.M.H.eigenvalues i) (Filter.Eventually.of_forall fun _ => hμ)
+  have hT3 : Filter.Tendsto (fun h : ℝ =>
+      ∑ i, (M (1 + h)).H.eigenvalues i * Real.log ((M (1 + h)).H.eigenvalues i)
+        - ∑ i, ρ.M.H.eigenvalues i * Real.log (ρ.M.H.eigenvalues i))
+      (nhdsWithin 0 {0}ᶜ) (nhds 0) := by
+    have h2 := (trace_cfc_tendsto_of_tendsto (fun x => x * Real.log x)
+      Real.continuous_mul_log.continuousOn hM_cont hM_nonneg hM_one).comp h1add
+    simpa [HermitianMat.trace_cfc_eq, Function.comp_def] using h2.sub_const
+      ((ρ.M.cfc fun x => x * Real.log x).trace)
+  have hfinal := (hA.sub hB).add hT3
+  norm_num at hfinal
+  refine hfinal.congr' ?_
+  filter_upwards [self_mem_nhdsWithin] with h hh
+  have hh0 : h ≠ 0 := by simpa using hh
+  rw [HermitianMat.trace_rpow_eq_sum, HermitianMat.trace_rpow_eq_sum,
+    ← HermitianMat.sum_eigenvalues_eq_trace, ← HermitianMat.sum_eigenvalues_eq_trace]
+  simp only [div_eq_mul_inv, sub_mul, Finset.sum_sub_distrib, ← Finset.sum_mul]
+  ring_nf
+  rfl
 
 /-- For a differentiable family of PSD matrices M(α) with M(1) having eigenvalues p_i,
     the function α ↦ Tr[M(α)^α] - Tr[M(α)] has derivative ⟪M(1), M(1).log⟫ at α = 1.
@@ -1249,79 +1006,36 @@ If the kernel of a product state is contained in another, the left component ker
 lemma ker_le_of_ker_kron_le_left (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂)
   (h : (σ₁ ⊗ᴹ σ₂).M.ker ≤ (ρ₁ ⊗ᴹ ρ₂).M.ker) :
     σ₁.M.ker ≤ ρ₁.M.ker := by
-  intro u hu
-  obtain ⟨v, hv⟩ : ∃ v : EuclideanSpace ℂ d₂, v ∉ (σ₂ :HermitianMat d₂ ℂ).ker ∧ v ∉ (ρ₂ :HermitianMat d₂ ℂ).ker := by
-    have h_union : (σ₂ : HermitianMat d₂ ℂ).ker ≠ ⊤ ∧ (ρ₂ : HermitianMat d₂ ℂ).ker ≠ ⊤ := by
-      constructor <;> intro h_top;
-      · have h_contra : σ₂.M = 0 := by
-          ext1
-          simp_all [ Submodule.eq_top_iff'];
-          ext i j
-          specialize h_top ( EuclideanSpace.single j 1 )
-          simp_all
-          replace h_top := congr(WithLp.ofLp $h_top i)
-          simp_all
-          convert h_top using 1;
-          erw [ Matrix.toLpLin_apply ]
-          simp_all only [MState.mat_M, PiLp.ofLp_single, Matrix.mulVec_single,
-            MulOpposite.op_one, Pi.smul_apply, Matrix.col_apply, one_smul]
-        exact σ₂.pos.ne' h_contra;
-      · have h_contra : ρ₂.M = 0 := by
-          ext i j; simp_all [ Submodule.eq_top_iff' ] ;
-          convert! congr(WithLp.ofLp $(h_top (WithLp.toLp 2 ( Pi.single j 1 )) ) i) using 1
-          simp
-          simp [ HermitianMat.lin ];
-          rfl
-        exact ρ₂.pos.ne' h_contra;
-    have h_union : ∀ (U V : Submodule ℂ (EuclideanSpace ℂ d₂)), U ≠ ⊤ → V ≠ ⊤ → ∃ v : EuclideanSpace ℂ d₂, v ∉ U ∧ v ∉ V := by
-      intros U V hU hV;
-      by_contra h_contra;
-      have h_union : U ⊔ V = ⊤ := by
-        ext v
-        simp only [Submodule.mem_top, iff_true]
-        by_cases hvU : v ∈ U <;> by_cases hvV : v ∈ V <;> simp_all [ Submodule.mem_sup ];
-        · exact ⟨ v, hvU, 0, by simp, by simp ⟩;
-        · exact ⟨ v, hvU, 0, by simp, by simp ⟩;
-        · exact ⟨ 0, by simp, v, h_contra v hvU, by simp ⟩;
-      have h_union : ∃ v : EuclideanSpace ℂ d₂, v ∉ U ∧ v ∈ V := by
-        have h_union : ∃ v : EuclideanSpace ℂ d₂, v ∈ V ∧ v ∉ U := by
-          have h_not_subset : ¬V ≤ U := by
-            exact fun h => hU <| by rw [ eq_top_iff ] ; exact h_union ▸ sup_le ( by tauto ) h;
-          exact Set.not_subset.mp h_not_subset;
-        exact ⟨ h_union.choose, h_union.choose_spec.2, h_union.choose_spec.1 ⟩;
-      obtain ⟨ v, hv₁, hv₂ ⟩ := h_union;
-      obtain ⟨ w, hw₁, hw₂ ⟩ : ∃ w : EuclideanSpace ℂ d₂, w ∉ V ∧ w ∈ U := by
-        obtain ⟨ w, hw ⟩ := ( show ∃ w : EuclideanSpace ℂ d₂, w ∉ V from by simpa [ Submodule.eq_top_iff' ] using hV ) ; use w; simp_all [ Submodule.eq_top_iff' ] ;
-        exact Classical.not_not.1 fun hw' => hw <| h_contra _ hw';
-      have h_union : v + w ∉ U ∧ v + w ∉ V := by
-        exact ⟨ fun h => hv₁ <| by simpa using U.sub_mem h hw₂, fun h => hw₁ <| by simpa using V.sub_mem h hv₂ ⟩;
-      exact h_contra ⟨ v + w, h_union.1, h_union.2 ⟩;
-    exact h_union _ _ ( by tauto ) ( by tauto );
-  -- Consider $z = u \otimes v$.
-  set z : EuclideanSpace ℂ (d₁ × d₂) := WithLp.toLp 2 ( fun p => u p.1 * v p.2 );
-  have hz : z ∈ (σ₁ ⊗ᴹ σ₂ : HermitianMat (d₁ × d₂) ℂ).ker := by
+  have hkron : ∀ (A : Matrix d₁ d₁ ℂ) (B : Matrix d₂ d₂ ℂ) (a : d₁ → ℂ) (b : d₂ → ℂ),
+      (A.kronecker B).mulVec (fun p => a p.1 * b p.2) =
+        fun p => A.mulVec a p.1 * B.mulVec b p.2 := by
+    intro A B a b
     ext ⟨i, j⟩
-    simp [z]
-    have h_kronecker : ∀ (A : Matrix d₁ d₁ ℂ) (B : Matrix d₂ d₂ ℂ) (u : d₁ → ℂ) (v : d₂ → ℂ), (A.kronecker B).mulVec (fun p => u p.1 * v p.2) = fun p => (A.mulVec u) p.1 * (B.mulVec v) p.2 := by
-      intro A B u v; ext ⟨ i, j ⟩ ; simp [ Matrix.mulVec, dotProduct, Finset.mul_sum, mul_comm, mul_left_comm ] ;
-      exact Fintype.sum_prod_type_right fun x => A i x.1 * (B j x.2 * (u x.1 * v x.2));
-    convert! congr_fun ( h_kronecker σ₁.1.mat σ₂.1.mat u v ) ( i, j ) using 1 ; simp
-    exact Or.inl ( by exact congr(WithLp.ofLp $hu i) );
-  have hz' : z ∈ (ρ₁ ⊗ᴹ ρ₂ : HermitianMat (d₁ × d₂) ℂ).ker := by
-    exact h hz;
-  have hz'' : ∀ a b, (ρ₁.M.val.mulVec u) a * (ρ₂.M.val.mulVec v) b = 0 := by
-    intro a b
-    have hz'' : (ρ₁.M.val.mulVec u) a * (ρ₂.M.val.mulVec v) b = ((ρ₁ ⊗ᴹ ρ₂ : HermitianMat (d₁ × d₂) ℂ).val.mulVec z) (a, b) := by
-      simp [ Matrix.mulVec, dotProduct];
-      simp [  Finset.sum_mul, mul_assoc, mul_comm];
-      simp [ z, Finset.mul_sum, mul_assoc, mul_left_comm ];
-      erw [ Finset.sum_product ] ; simp
-      exact rfl;
-    exact hz''.trans ( by exact congr(WithLp.ofLp $hz' ( a, b )) );
-  ext a; specialize hz'' a; simp_all [ Matrix.mulVec, dotProduct ] ;
-  contrapose! hv;
-  intro hv'; ext b; specialize hz'' b; simp_all
-  exact hz''.resolve_left ( by exact hv )
+    simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_comm, mul_left_comm]
+    exact Fintype.sum_prod_type_right fun x => A i x.1 * (B j x.2 * (a x.1 * b x.2))
+  have hker_ne : ∀ (τ : MState d₂), τ.M.ker ≠ ⊤ := fun τ hτ => τ.pos.ne' <| by
+    ext1
+    rw [Matrix.ext_iff_mulVec]
+    intro w
+    simpa using (τ.M.mem_ker_iff_mulVec_zero (WithLp.toLp 2 w)).mp (hτ ▸ Submodule.mem_top)
+  obtain ⟨v, hv⟩ := Submodule.exists_forall_notMem_of_forall_ne_top
+    ![ρ₂.M.ker, σ₂.M.ker] (fun i => by fin_cases i <;> exact hker_ne _)
+  intro u hu
+  have hu0 : σ₁.m.mulVec u = 0 := (σ₁.M.mem_ker_iff_mulVec_zero u).mp hu
+  have hz : (WithLp.toLp 2 fun p : d₁ × d₂ => u p.1 * v p.2) ∈ (σ₁ ⊗ᴹ σ₂).M.ker := by
+    refine ((σ₁ ⊗ᴹ σ₂).M.mem_ker_iff_mulVec_zero _).mpr ?_
+    refine (hkron σ₁.M.mat σ₂.M.mat u v).trans ?_
+    ext p
+    simp [hu0]
+  have hz' := ((ρ₁ ⊗ᴹ ρ₂).M.mem_ker_iff_mulVec_zero _).mp (h hz)
+  rw [show ((ρ₁ ⊗ᴹ ρ₂).M.mat).mulVec _ = _ from hkron ρ₁.M.mat ρ₂.M.mat u v] at hz'
+  have hvne : ρ₂.m.mulVec v ≠ 0 := fun h0 => by
+    simpa using hv 0 ((ρ₂.M.mem_ker_iff_mulVec_zero v).mpr h0)
+  obtain ⟨b, hb⟩ := Function.ne_iff.mp hvne
+  refine (ρ₁.M.mem_ker_iff_mulVec_zero u).mpr (funext fun a => ?_)
+  have h2 := congr_fun hz' (a, b)
+  simp only [Pi.zero_apply, mul_eq_zero] at h2
+  exact h2.resolve_right hb
 
 
 --TODO: Generalize to arbitrary PSD matrices.
@@ -1333,74 +1047,36 @@ If the kernel of a product state is contained in another, the right component ke
 lemma ker_le_of_ker_kron_le_right (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂)
   (h : (σ₁ ⊗ᴹ σ₂).M.ker ≤ (ρ₁ ⊗ᴹ ρ₂).M.ker) :
     σ₂.M.ker ≤ ρ₂.M.ker := by
-  intro v hv;
-  have h_z : ∃ u : EuclideanSpace ℂ d₁, u ≠ 0 ∧ u ∉ σ₁.M.ker ∧ u ∉ ρ₁.M.ker := by
-    have h_z : σ₁.M.ker ≠ ⊤ ∧ ρ₁.M.ker ≠ ⊤ := by
-      have h_ker_ne_top : ∀ (ρ : MState d₁), ρ.M.ker ≠ ⊤ := by
-        intro ρ hρ_top
-        have h_contra : ρ.M = 0 := by
-          ext i j
-          simp_all [ Submodule.eq_top_iff' ] ;
-          convert! congr(WithLp.ofLp $(hρ_top ( EuclideanSpace.single j 1 ) ) i) using 1
-          simp
-          erw [ Matrix.toLpLin_apply ]
-          aesop
-        exact ρ.pos.ne' h_contra;
-      exact ⟨ h_ker_ne_top σ₁, h_ker_ne_top ρ₁ ⟩;
-    have h_z : ∃ u : EuclideanSpace ℂ d₁, u ∉ σ₁.M.ker ∧ u ∉ ρ₁.M.ker := by
-      have h_z : ∀ (U V : Submodule ℂ (EuclideanSpace ℂ d₁)), U ≠ ⊤ → V ≠ ⊤ → ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∉ V := by
-        intro U V hU hV
-        by_contra h_contra
-        push Not at h_contra;
-        have h_union : ∃ u : EuclideanSpace ℂ d₁, u ∉ U ∧ u ∈ V := by
-          exact Exists.elim ( show ∃ u : EuclideanSpace ℂ d₁, u ∉ U from by simpa [ Submodule.eq_top_iff' ] using hU ) fun u hu => ⟨ u, hu, h_contra u hu ⟩;
-        obtain ⟨ u, hu₁, hu₂ ⟩ := h_union;
-        have h_union : ∀ v : EuclideanSpace ℂ d₁, v ∈ U → v + u ∈ V := by
-          intro v hv; specialize h_contra ( v + u ) ; simp_all [ Submodule.add_mem_iff_right ] ;
-        have h_union : ∀ v : EuclideanSpace ℂ d₁, v ∈ U → v ∈ V := by
-          exact fun v hv => by simpa using V.sub_mem ( h_union v hv ) hu₂;
-        exact hV ( eq_top_iff.mpr fun x hx => by by_cases hxU : x ∈ U <;> aesop );
-      exact h_z _ _ ( by tauto ) ( by tauto );
-    exact ⟨ h_z.choose, by intro h; simpa [ h ] using h_z.choose_spec.1, h_z.choose_spec.1, h_z.choose_spec.2 ⟩;
-  obtain ⟨ u, hu₁, hu₂, hu₃ ⟩ := h_z;
-  -- Consider the vector $z = u \otimes v$.
-  set z : EuclideanSpace ℂ (d₁ × d₂) := .toLp 2 ( fun p => u p.1 * v p.2 );
-  have hz : z ∈ (σ₁ ⊗ᴹ σ₂).M.ker := by
-    -- By definition of $z$, we have $(σ₁ ⊗ σ₂).mat.mulVec z = σ₁.mat.mulVec u ⊗ σ₂.mat.mulVec v$.
-    have hz_mul : (σ₁ ⊗ᴹ σ₂).M.mat.mulVec z = fun p => (σ₁.M.mat.mulVec u) p.1 * (σ₂.M.mat.mulVec v) p.2 := by
-      ext p; simp [z, Matrix.mulVec]
-      simp [ dotProduct, Finset.mul_sum, Finset.sum_mul, mul_assoc, mul_comm, mul_left_comm ];
-      rw [ ← Finset.sum_product' ];
-      refine' Finset.sum_bij ( fun x _ => ( x.2, x.1 ) ) _ _ _ _ <;> simp;
-      exact fun a b => Or.inl <| Or.inl <| rfl;
-    simp_all [ funext_iff, Matrix.mulVec ];
-    ext ⟨ a, b ⟩
-    specialize hz_mul a b
-    simp_all [ dotProduct]
-    convert! hz_mul using 1;
-    simp_all only [zero_eq_mul]
-    exact Or.inr ( by exact congr(WithLp.ofLp $hv b) );
-  have hz' : z ∈ (ρ₁ ⊗ᴹ ρ₂).M.ker := by
-    exact h hz;
-  have hz'' : ∀ i j, (ρ₁.M.val.mulVec u) i * (ρ₂.M.val.mulVec v) j = 0 := by
-    intro i j;
-    have hz'' : (ρ₁.M.val.kronecker ρ₂.M.val).mulVec (fun p => u p.1 * v p.2) (i, j) = (ρ₁.M.val.mulVec u) i * (ρ₂.M.val.mulVec v) j := by
-      simp [ Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc, mul_comm, mul_left_comm ];
-      simp [ mul_assoc, Finset.mul_sum, Finset.sum_mul ];
-      rw [ ← Finset.sum_product' ];
-      refine' Finset.sum_bij ( fun x _ => ( x.2, x.1 ) ) _ _ _ _
-      · simp
-      · simp
-      · simp
-      · intro _ _
-        simp only [MState.m, HermitianMat.mat_apply]
-        ring_nf
-    exact hz''.symm.trans ( by exact congr(WithLp.ofLp $hz' ( i, j )) );
-  contrapose! hz'';
-  obtain ⟨ i, hi ⟩ := Function.ne_iff.mp ( show ρ₁.M.val.mulVec u ≠ 0 from fun h => hu₃ <| congr(WithLp.toLp 2 $h))
-  obtain ⟨ j, hj ⟩ := Function.ne_iff.mp ( show ρ₂.M.val.mulVec v ≠ 0 from fun h => hz'' <| congr(WithLp.toLp 2 $h))
-  use i, j
-  aesop;
+  have hkron : ∀ (A : Matrix d₁ d₁ ℂ) (B : Matrix d₂ d₂ ℂ) (a : d₁ → ℂ) (b : d₂ → ℂ),
+      (A.kronecker B).mulVec (fun p => a p.1 * b p.2) =
+        fun p => A.mulVec a p.1 * B.mulVec b p.2 := by
+    intro A B a b
+    ext ⟨i, j⟩
+    simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_comm, mul_left_comm]
+    exact Fintype.sum_prod_type_right fun x => A i x.1 * (B j x.2 * (a x.1 * b x.2))
+  have hker_ne : ∀ (τ : MState d₁), τ.M.ker ≠ ⊤ := fun τ hτ => τ.pos.ne' <| by
+    ext1
+    rw [Matrix.ext_iff_mulVec]
+    intro w
+    simpa using (τ.M.mem_ker_iff_mulVec_zero (WithLp.toLp 2 w)).mp (hτ ▸ Submodule.mem_top)
+  obtain ⟨u, hu⟩ := Submodule.exists_forall_notMem_of_forall_ne_top
+    ![ρ₁.M.ker, σ₁.M.ker] (fun i => by fin_cases i <;> exact hker_ne _)
+  intro v hv
+  have hv0 : σ₂.m.mulVec v = 0 := (σ₂.M.mem_ker_iff_mulVec_zero v).mp hv
+  have hz : (WithLp.toLp 2 fun p : d₁ × d₂ => u p.1 * v p.2) ∈ (σ₁ ⊗ᴹ σ₂).M.ker := by
+    refine ((σ₁ ⊗ᴹ σ₂).M.mem_ker_iff_mulVec_zero _).mpr ?_
+    refine (hkron σ₁.M.mat σ₂.M.mat u v).trans ?_
+    ext p
+    simp [hv0]
+  have hz' := ((ρ₁ ⊗ᴹ ρ₂).M.mem_ker_iff_mulVec_zero _).mp (h hz)
+  rw [show ((ρ₁ ⊗ᴹ ρ₂).M.mat).mulVec _ = _ from hkron ρ₁.M.mat ρ₂.M.mat u v] at hz'
+  have hune : ρ₁.m.mulVec u ≠ 0 := fun h0 => by
+    simpa using hu 0 ((ρ₁.M.mem_ker_iff_mulVec_zero u).mpr h0)
+  obtain ⟨a, ha⟩ := Function.ne_iff.mp hune
+  refine (ρ₂.M.mem_ker_iff_mulVec_zero v).mpr (funext fun b => ?_)
+  have h2 := congr_fun hz' (a, b)
+  simp only [Pi.zero_apply, mul_eq_zero] at h2
+  exact h2.resolve_left ha
 
 /--
 The kernel of a product state is contained in another product state's kernel iff the individual
@@ -1417,22 +1093,9 @@ omit [DecidableEq d₁] [DecidableEq d₂] in
 lemma HermitianMat.inner_kron
     (A : HermitianMat d₁ ℂ) (B : HermitianMat d₂ ℂ) (C : HermitianMat d₁ ℂ) (D : HermitianMat d₂ ℂ) :
     ⟪A ⊗ₖ B, C ⊗ₖ D⟫ = ⟪A, C⟫ * ⟪B, D⟫ := by
-  -- Apply the property of the trace of Kronecker products.
-  have h_trace_kron : ∀ (A₁ B₁ : Matrix d₁ d₁ ℂ) (A₂ B₂ : Matrix d₂ d₂ ℂ), Matrix.trace (Matrix.kroneckerMap (· * ·) A₁ A₂ * Matrix.kroneckerMap (· * ·) B₁ B₂) = Matrix.trace (A₁ * B₁) * Matrix.trace (A₂ * B₂) := by
-    intro A₁ B₁ A₂ B₂
-    rw [← Matrix.mul_kronecker_mul, Matrix.trace_kronecker]
-  simp_all only [inner, IsMaximalSelfAdjoint.RCLike_selfadjMap, kronecker_mat, RCLike.mul_re,
-    RCLike.re_to_complex, RCLike.im_to_complex, sub_eq_self, mul_eq_zero];
-  simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, mat_apply, Complex.im_sum,
-    Complex.mul_im];
-  left;
-  have h_symm : ∀ x x_1, (A x x_1).re * (C x_1 x).im + (A x x_1).im * (C x_1 x).re = -((A x_1 x).re * (C x x_1).im + (A x_1 x).im * (C x x_1).re) := by
-    intro x y; have := congr_fun ( congr_fun A.2 y ) x; have := congr_fun ( congr_fun C.2 y ) x; simp_all [ Complex.ext_iff ] ;
-    grind;
-  have h_sum_zero : ∑ x, ∑ x_1, ((A x x_1).re * (C x_1 x).im + (A x x_1).im * (C x_1 x).re) = ∑ x, ∑ x_1, -((A x x_1).re * (C x_1 x).im + (A x x_1).im * (C x_1 x).re) := by
-    rw [ Finset.sum_comm ];
-    exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => h_symm _ _ ▸ rfl;
-  norm_num [ Finset.sum_add_distrib ] at * ; linarith
+  rw [← RCLike.ofReal_inj (K := ℂ), RCLike.ofReal_mul, HermitianMat.inner_eq_trace_rc,
+    HermitianMat.inner_eq_trace_rc, HermitianMat.inner_eq_trace_rc, HermitianMat.kronecker_mat,
+    HermitianMat.kronecker_mat, ← Matrix.mul_kronecker_mul, Matrix.trace_kronecker]
 
 attribute [fun_prop] ContinuousAt.rpow
 
@@ -1590,24 +1253,16 @@ theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
   simp only [SandwichedRelRentropy, hα, ↓reduceDIte, Std.le_refl, sub_self, inner_zero_right,
       ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_zero]
   simp [NNReal.toReal]
-  intro hα
+  intro hα1
   left; right; left
-  rw [HermitianMat.rpow_eq_cfc, HermitianMat.rpow_eq_cfc]
-  nth_rw 2 [← HermitianMat.cfc_id ρ.M]
-  rw [HermitianMat.cfc_conj, ← HermitianMat.cfc_comp]
-  conv =>
-    enter [1, 1]
-    equals ρ.M.cfc id =>
-      apply HermitianMat.cfc_congr_of_nonneg ρ.nonneg
-      intro i (hi : 0 ≤ i)
-      simp
-      rw [← Real.rpow_mul_natCast hi, ← Real.rpow_one_add' hi]
-      · rw [← Real.rpow_mul hi]
-        field_simp
-        ring_nf
-        exact Real.rpow_one i
-      · field_simp; ring_nf; positivity
-  simp
+  have ht : (1 - α) / (2 * α) ≠ 0 := div_ne_zero (sub_ne_zero.mpr (Ne.symm hα1)) (by positivity)
+  have h2 : (1:ℝ) + 2 * ((1 - α) / (2 * α)) = 1 / α := by
+    field_simp
+    ring
+  nth_rw 2 [← HermitianMat.rpow_one (A := ρ.M)]
+  rw [HermitianMat.conj_rpow ρ.nonneg ht (h2.symm ▸ one_div_ne_zero hα.ne'),
+    ← HermitianMat.rpow_mul ρ.nonneg, h2, one_div_mul_cancel hα.ne', HermitianMat.rpow_one]
+  exact ρ.tr
 
 @[aesop (rule_sets := [finiteness]) unsafe apply]
 theorem sandwichedRelEntropy_ne_top {ρ σ : MState d} [σ.M.NonSingular] : D̃_ α(ρ‖σ) ≠ ⊤ := by
@@ -1645,21 +1300,12 @@ theorem frontier_singleton {X : Type*} [TopologicalSpace X] [T1Space X] [Perfect
 
 private theorem sandwichedRelRentropy.continuousOn_Ioi_1_aux (ρ σ : MState d) :
     ContinuousOn (fun (α : ℝ) ↦ ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α)) (Set.Ioi 1) := by
-  have h_cont : ContinuousOn (fun α : ℝ => (HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M) (Set.Ioi 1) := by
-    have h_cont : ContinuousOn (fun α : ℝ => (σ.M ^ ((1 - α) / (2 * α))).mat) (Set.Ioi 1) := by
-      have h_cont : ContinuousOn (fun α : ℝ => σ.M ^ ((1 - α) / (2 * α))) (Set.Ioi 1) := by
-        have h_cont : ContinuousOn (fun α : ℝ => (1 - α) / (2 * α)) (Set.Ioi 1) := by
-          exact continuousOn_of_forall_continuousAt fun x hx => ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by linarith [ hx.out ] )
-        have h_cont : ContinuousOn (fun α : ℝ => (σ.M ^ α)) (Set.Iio 0) := by
-          apply_rules [ HermitianMat.continuousOn_rpow_neg ];
-        exact h_cont.comp ‹_› fun x hx => by rw [ Set.mem_Iio ] ; rw [ div_lt_iff₀ ] <;> linarith [ hx.out ] ;
-      exact Continuous.comp_continuousOn ( by continuity ) h_cont;
-    fun_prop;
-  -- Apply the lemma HermitianMat.continuousOn_rpow_joint_nonneg_pos with the given conditions.
-  apply HermitianMat.continuousOn_rpow_joint_nonneg_pos;
-  · exact h_cont;
-  · exact continuousOn_id;
-  · exact fun x hx => zero_lt_one.trans hx;
+  have h1 : ContinuousOn (fun α : ℝ => (σ.M ^ ((1 - α) / (2 * α))).mat) (Set.Ioi 1) :=
+    HermitianMat.continuous_mat.comp_continuousOn <| (σ.M.continuousOn_rpow_neg).comp
+      (continuousOn_exponent.mono fun x hx => Set.mem_Ioi.mpr (zero_lt_one.trans hx))
+      maps_to_Iio_of_Ioi_1
+  exact HermitianMat.continuousOn_rpow_joint_nonneg_pos (by fun_prop) continuousOn_id
+    fun x hx => zero_lt_one.trans (Set.mem_Ioi.mp hx)
 
 private theorem sandwichedRelRentropy.continuousOn_Ioi_1 (ρ σ : MState d) :
     ContinuousOn (fun α => D̃_ α(ρ‖σ)) (Set.Ioi 1) := by
@@ -1692,20 +1338,12 @@ private theorem sandwichedRelRentropy.continuousOn_Ioi_1 (ρ σ : MState d) :
 
 private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1_aux (ρ σ : MState d) :
     ContinuousOn (fun (α : ℝ) ↦ ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α)) (Set.Ioo 0 1) := by
-  have h_cont : ContinuousOn (fun α : ℝ => (HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M) (Set.Ioo 0 1) := by
-    have h_cont : ContinuousOn (fun α : ℝ => (σ.M ^ ((1 - α) / (2 * α))).mat) (Set.Ioo 0 1) := by
-      have h_cont : ContinuousOn (fun α : ℝ => σ.M ^ ((1 - α) / (2 * α))) (Set.Ioo 0 1) := by
-        have h_exp_cont : ContinuousOn (fun α : ℝ => (1 - α) / (2 * α)) (Set.Ioo 0 1) := by
-          exact continuousOn_of_forall_continuousAt fun x hx => ContinuousAt.div ( continuousAt_const.sub continuousAt_id ) ( continuousAt_const.mul continuousAt_id ) ( by linarith [ hx.1 ] )
-        have h_rpow_cont : ContinuousOn (fun α : ℝ => (σ.M ^ α)) (Set.Ioi 0) := by
-          apply_rules [ HermitianMat.continuousOn_rpow_pos ]
-        exact h_rpow_cont.comp h_exp_cont fun x hx => by rw [ Set.mem_Ioi ] ; apply div_pos <;> linarith [ hx.1, hx.2 ]
-      exact Continuous.comp_continuousOn ( by continuity ) h_cont
-    fun_prop
-  apply HermitianMat.continuousOn_rpow_joint_nonneg_pos
-  · exact h_cont
-  · exact continuousOn_id
-  · exact fun x hx => hx.1
+  have h1 : ContinuousOn (fun α : ℝ => (σ.M ^ ((1 - α) / (2 * α))).mat) (Set.Ioo 0 1) :=
+    HermitianMat.continuous_mat.comp_continuousOn <| (σ.M.continuousOn_rpow_pos).comp
+      (continuousOn_exponent.mono fun x hx => Set.mem_Ioi.mpr hx.1)
+      fun x hx => Set.mem_Ioi.mpr (div_pos (by linarith [hx.2]) (by linarith [hx.1]))
+  exact HermitianMat.continuousOn_rpow_joint_nonneg_pos (by fun_prop) continuousOn_id
+    fun x hx => hx.1
 
 /-- Continuity on (0,1): the sandwich relative Rényi entropy is continuous in α on (0,1). -/
 private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
@@ -1942,44 +1580,17 @@ open scoped InnerProductSpace RealInnerProductSpace HermitianMat
 
 private lemma eigenWeight_eq_zero_iff (ρ x : MState d) (i : d) :
     eigenWeight ρ x i = 0 ↔ (x.M.H.eigenvectorBasis i : EuclideanSpace ℂ d) ∈ ρ.M.ker := by
-  have h_forward : eigenWeight ρ x i = 0 → (x.M.H.eigenvectorBasis i) ∈ ρ.M.ker := by
-    unfold eigenWeight
-    intro h_zero
-    have h_inner : star (x.M.H.eigenvectorBasis i : d → ℂ) ⬝ᵥ (ρ.M.mat.mulVec (x.M.H.eigenvectorBasis i : d → ℂ)) = 0 := by
-      convert h_zero using 1
-      have h_real : ∀ (v : d → ℂ), star v ⬝ᵥ (ρ.M.mat.mulVec v) = star (star v ⬝ᵥ (ρ.M.mat.mulVec v)) := by
-        intro v
-        have h_real : star v ⬝ᵥ (ρ.M.mat.mulVec v) = star (star v ⬝ᵥ (ρ.M.mat.mulVec v)) := by
-          have h_inner : ∀ (v w : d → ℂ), star v ⬝ᵥ (ρ.M.mat.mulVec w) = star (star w ⬝ᵥ (ρ.M.mat.mulVec v)) := by
-            intro v w
-            have h_inner : star v ⬝ᵥ (ρ.M.mat.mulVec w) = star (star w ⬝ᵥ (ρ.M.mat.mulVec v)) := by
-              have h_inner : star v ⬝ᵥ (ρ.M.mat.mulVec w) = star (star w ⬝ᵥ (ρ.M.mat.mulVec v)) := by
-                have h_inner : ρ.M.mat = star ρ.M.mat := by
-                  exact ρ.M.2.symm ▸ rfl
-                conv_rhs => rw [ h_inner ]
-                simp [ Matrix.mulVec, dotProduct ]
-                ring_nf
-                simp [Finset.mul_sum, mul_comm, mul_left_comm ];
-                rw [ Finset.sum_comm ] ; congr ; ext ; congr ; ext ; ring!;
-              exact h_inner
-            exact h_inner
-          exact h_inner v v ▸ by simp [ Matrix.mulVec, dotProduct ] ;
-        exact h_real.trans ( by simp [] )
-      have h_real : ∀ (v : d → ℂ), star v ⬝ᵥ (ρ.M.mat.mulVec v) = RCLike.re (star v ⬝ᵥ (ρ.M.mat.mulVec v)) := by
-        intro v; specialize h_real v; rw [ eq_comm ] at h_real; simp_all [ Complex.ext_iff ] ;
-        linarith! [ h_real ] ;
-      rw [ h_real ] ; norm_cast; simp [Matrix.dotProduct_mulVec ]
-    exact HermitianMat.mem_ker_of_inner_mulVec_zero ρ.2 _ h_inner
-  refine ⟨h_forward, fun h ↦ ?_⟩
-  -- Since ρ e_i = 0, we have e_i^* ρ e_i = 0.
-  have h_zero : (Matrix.vecMul (star (x.M.H.eigenvectorBasis i : d → ℂ)) ρ.M.mat) ⬝ᵥ (x.M.H.eigenvectorBasis i : d → ℂ) = 0 := by
-    have h_zero : ρ.M.mat.mulVec (x.M.H.eigenvectorBasis i : d → ℂ) = 0 := by
-      exact congr(WithLp.ofLp $h)
-    convert congr_arg ( fun v => star ( x.M.H.eigenvectorBasis i : d → ℂ ) ⬝ᵥ v ) h_zero using 1
-    simp [ Matrix.dotProduct_mulVec]
-    ring_nf
-    simp [ dotProduct ]
-  exact congr_arg Complex.re h_zero
+  have hpsd := (Matrix.posSemidef_iff_dotProduct_mulVec.mp (HermitianMat.zero_le_iff.mp
+    ρ.nonneg)).2 (x.M.H.eigenvectorBasis i)
+  constructor
+  · intro h0
+    refine HermitianMat.mem_ker_of_inner_mulVec_zero ρ.nonneg _ (Complex.ext ?_ ?_)
+    · simpa [eigenWeight, Matrix.dotProduct_mulVec] using h0
+    · simpa [Complex.le_def, eq_comm] using hpsd.2
+  · intro h
+    have h0 := (ρ.M.mem_ker_iff_mulVec_zero _).mp h
+    simp only [MState.mat_M] at h0
+    simp [eigenWeight, ← Matrix.dotProduct_mulVec, h0]
 
 set_option backward.isDefEq.respectTransparency false in
 private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
@@ -1987,32 +1598,14 @@ private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
   constructor
   · exact fun h i ↦ eigenWeight_zero_of_eigenvalue_zero h
   · intro h v hv
-    obtain ⟨w, hw⟩ : ∃ w : d → ℂ, v = ∑ i, w i • x.M.H.eigenvectorBasis i := by
-      exact ⟨ _, Eq.symm ( x.M.H.eigenvectorBasis.sum_repr v ) ⟩;
-    -- Since $v \in \ker(x.M)$, we have $x.M(v) = 0$. Using the eigenvector basis, this implies that for each $i$, if the eigenvalue is non-zero, then $w i = 0$.
-    have h_w_zero : ∀ i, x.M.H.eigenvalues i ≠ 0 → w i = 0 := by
-      intro i hi
-      have h_eigenvalue : x.M.val.mulVec v = ∑ i, (x.M.H.eigenvalues i) • w i • x.M.H.eigenvectorBasis i := by
-        have h_eigenvalue : ∀ i, x.M.val.mulVec (x.M.H.eigenvectorBasis i) = x.M.H.eigenvalues i • x.M.H.eigenvectorBasis i := by
-          exact fun i => x.M.H.mulVec_eigenvectorBasis i |> fun h => by simpa [ mul_comm ] using h;
-        rw [ hw]
-        simp only [WithLp.ofLp_sum, WithLp.ofLp_smul]
-        rw [Matrix.mulVec_sum ];
-        exact Finset.sum_congr rfl fun i _ => by rw [ Matrix.mulVec_smul, h_eigenvalue i, SMulCommClass.smul_comm ]
-      have h_eigenvalue_zero : ∑ i, (x.M.H.eigenvalues i) • w i • x.M.H.eigenvectorBasis i = 0 := by
-        replace h_eigenvalue := congr(WithLp.toLp 2 $h_eigenvalue)
-        simp only [HermitianMat.val_eq_coe, MState.mat_M, WithLp.ofLp_sum, WithLp.ofLp_smul,
-          WithLp.toLp_sum, WithLp.toLp_smul, WithLp.toLp_ofLp] at h_eigenvalue
-        rw [← h_eigenvalue, ← hv]
-        rfl
-      have h_eigenvalue_zero : ∀ i, (x.M.H.eigenvalues i) • w i = 0 := by
-        intro i
-        have h_eigenvalue_zero : (x.M.H.eigenvalues i) • w i = inner ℂ (x.M.H.eigenvectorBasis i) (∑ j, (x.M.H.eigenvalues j) • w j • x.M.H.eigenvectorBasis j) := by
-          simp [ orthonormal_iff_ite.mp ( show Orthonormal ℂ ( fun i => x.M.H.eigenvectorBasis i ) from ?_ ) ]
-        aesop
-      simpa [ hi ] using h_eigenvalue_zero i |> fun h => by simpa [ hi ] using h;
-    simp_all [ eigenWeight_eq_zero_iff ];
-    exact Submodule.sum_mem _ fun i _ => if hi : x.M.H.eigenvalues i = 0 then by simpa [ hi, h_w_zero i ] using Submodule.smul_mem _ ( w i ) ( h i hi ) else by simp [ h_w_zero i hi ] ;
+    have hv0 := (x.M.mulVec_eq_zero_iff_inner_eigenvector_zero v).mp
+      ((x.M.mem_ker_iff_mulVec_zero v).mp hv)
+    rw [← x.M.H.eigenvectorBasis.sum_repr v]
+    refine Submodule.sum_mem _ fun i _ => ?_
+    rcases eq_or_ne (x.M.H.eigenvalues i) 0 with hi | hi
+    · exact Submodule.smul_mem _ _ ((eigenWeight_eq_zero_iff ρ x i).mp (h i hi))
+    · rw [OrthonormalBasis.repr_apply_apply, hv0 i hi]
+      simp
 
 private lemma neg_ker_exists_eigenWeight_pos (ρ x : MState d) (hx : ¬(x.M.ker ≤ ρ.M.ker)) :
     ∃ i, x.M.H.eigenvalues i = 0 ∧ 0 < eigenWeight ρ x i := by
@@ -2348,27 +1941,17 @@ private lemma inner_cfc_eq_sum (A C : HermitianMat d 𝕜) (f : ℝ → ℝ) :
 private lemma eigenproj_coeff_zero_of_ker_le {A C : HermitianMat d 𝕜}
     (hker : A.ker ≤ C.ker) {i : d} (hi : A.H.eigenvalues i = 0) :
     RCLike.re ((C.mat * (A.H.eigenvectorUnitary.val * Matrix.single i i 1 * A.H.eigenvectorUnitary.val.conjTranspose)).trace) = 0 := by
-  have h_eigenvector_in_ker_C : C.mat.mulVec (A.H.eigenvectorBasis i) = 0 := by
-    have h_eigenvector_in_ker : (A.H.eigenvectorBasis i) ∈ LinearMap.ker A.lin.toLinearMap := by
-      have := congr(WithLp.toLp 2 $(A.H.mulVec_eigenvectorBasis i))
-      simp [hi] at this
-      exact congr(WithLp.toLp 2 $this)
-    specialize hker h_eigenvector_in_ker
-    exact congr(WithLp.ofLp $hker)
-  have h_trace_zero : (C.mat * (A.H.eigenvectorUnitary.val * Matrix.single i i 1 * A.H.eigenvectorUnitary.val.conjTranspose)).trace = (star (A.H.eigenvectorBasis i)) ⬝ᵥ (C.mat.mulVec (A.H.eigenvectorBasis i)) := by
-    simp [Matrix.trace, Matrix.mulVec, dotProduct]
-    simp [Matrix.mul_apply, Matrix.single, Matrix.conjTranspose_apply]
-    simp [Finset.sum_ite, Finset.filter_eq, Finset.filter_and, mul_comm, mul_left_comm, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun j hj => Finset.sum_congr rfl fun k hk => ?_
-    rw [Finset.sum_eq_single i]
-    · simp_all only [Finset.mem_univ, ↓reduceIte, Finset.inter_univ, Finset.sum_singleton]
-      rw [mul_assoc]
-    · intro b a a_1
-      simp_all only [Finset.mem_univ, ne_eq]
-      split <;> simp_all only [not_true_eq_false, Finset.inter_empty, Finset.sum_empty]
-    · intro a
-      simp_all only [Finset.mem_univ, not_true_eq_false]
-  simp [h_eigenvector_in_ker_C, h_trace_zero]
+  have h1 : A.mat.mulVec (A.H.eigenvectorBasis i) = 0 := by
+    simpa [hi] using A.H.mulVec_eigenvectorBasis i
+  have h0 : C.mat.mulVec (A.H.eigenvectorBasis i) = 0 :=
+    congr(WithLp.ofLp $(hker ((A.mem_ker_iff_mulVec_zero _).mpr h1)))
+  have h2 := congr_arg (fun v => star ((A.H.eigenvectorBasis i : d → 𝕜)) ⬝ᵥ v) h0
+  rw [← Matrix.mul_assoc, Matrix.trace_mul_cycle, ← Matrix.mul_assoc, Matrix.trace_mul_single]
+  simp only [dotProduct_zero] at h2
+  simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Matrix.conjTranspose_apply, Finset.mul_sum,
+    mul_comm, mul_left_comm] at h2 ⊢
+  rw [Finset.sum_comm] at h2
+  simpa using congr_arg RCLike.re h2
 
 open scoped Topology in
 private lemma inner_log_shift_tendsto {A C : HermitianMat d 𝕜} (hker : A.ker ≤ C.ker) :

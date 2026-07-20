@@ -25,28 +25,22 @@ noncomputable def operatorPowerMean (α β : ℝ) (A B : L ℋ) : L ℋ :=
   GeneralizedPerspective (fun x : ℝ ↦ x ^ α) (fun x : ℝ ↦ x ^ β) A B
 
 private lemma rpow_continuousOn_Ici (p : ℝ) (hp : 0 ≤ p) :
-    ContinuousOn (fun x : ℝ ↦ x ^ p) (Set.Ici (0 : ℝ)) := by
-  intro x hx
-  exact (Real.continuousAt_rpow_const x p (Or.inr hp)).continuousWithinAt
+    ContinuousOn (fun x : ℝ ↦ x ^ p) (Set.Ici (0 : ℝ)) := fun x _ =>
+  (Real.continuousAt_rpow_const x p (Or.inr hp)).continuousWithinAt
 
 omit [Nontrivial ℋ] in
 private lemma operatorConcaveOn_Ioi_of_Ici {f : ℝ → ℝ}
     (h : OperatorConcaveOn (ℋ := ℋ) (Set.Ici (0 : ℝ)) f) :
-    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) f := by
-  intro A B t hA hB ht0 ht1 hAs hBs
-  exact h hA hB ht0 ht1 (Set.Subset.trans hAs Set.Ioi_subset_Ici_self)
-      (Set.Subset.trans hBs Set.Ioi_subset_Ici_self)
+    OperatorConcaveOn (ℋ := ℋ) (Set.Ioi (0 : ℝ)) f := fun _ _ _ hA hB ht0 ht1 hAs hBs =>
+  h hA hB ht0 ht1 (hAs.trans Set.Ioi_subset_Ici_self) (hBs.trans Set.Ioi_subset_Ici_self)
 
 omit [Nontrivial ℋ] in
-private lemma pdSet_subset_psdSet : pdSet (ℋ := ℋ) ⊆ psdSet (ℋ := ℋ) := by
-  intro A hA
-  rcases hA with ⟨hA_sa, hA_spec⟩
-  exact ⟨hA_sa, Set.Subset.trans hA_spec Set.Ioi_subset_Ici_self⟩
+private lemma pdSet_subset_psdSet : pdSet (ℋ := ℋ) ⊆ psdSet (ℋ := ℋ) :=
+  fun _ ⟨hsa, hspec⟩ => ⟨hsa, hspec.trans Set.Ioi_subset_Ici_self⟩
 
 private lemma rpow_pos_on_Ioi (p : ℝ) :
-    ∀ x ∈ Set.Ioi (0 : ℝ), 0 < x ^ p := by
-  intro x hx
-  exact Real.rpow_pos_of_pos hx p
+    ∀ x ∈ Set.Ioi (0 : ℝ), 0 < x ^ p :=
+  fun _ hx => Real.rpow_pos_of_pos hx p
 
 /--
 Theorem 1.1, concave range: the operator `(α, β)`-power mean is jointly concave on
@@ -64,23 +58,16 @@ theorem operatorPowerMean_jointlyConcaveOn_pdSet
       (ℋ := ℋ)
       (f := fun x : ℝ ↦ x ^ α)
       (h := fun x : ℝ ↦ x ^ β)
-      (hfconc := by
-        intro K _ _ _ _
-        exact power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := K) α hα)
+      (hfconc := fun {K} _ _ _ _ => power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := K) α hα)
       (hfcont := rpow_continuousOn_Ici α hα.1)
-      (hf0 := by
-        exact Real.rpow_nonneg (show (0 : ℝ) ≤ 0 by simp) α)
-      (hconc := by
-        exact operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
-          (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
-      (hcont := by
-        intro x hx
-        exact (Real.continuousAt_rpow_const x β (Or.inl (ne_of_gt hx))).continuousWithinAt)
+      (hf0 := Real.rpow_nonneg le_rfl α)
+      (hconc := operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
+        (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
+      (hcont := fun x hx =>
+        (Real.continuousAt_rpow_const x β (Or.inl (ne_of_gt hx))).continuousWithinAt)
       (hpos := rpow_pos_on_Ioi β)
   simpa [operatorPowerMean] using
-    hconc (A₁ := A₁) (A₂ := A₂) (B₁ := B₁) (B₂ := B₂) (θ := θ)
-      (pdSet_subset_psdSet (ℋ := ℋ) hA₁) (pdSet_subset_psdSet (ℋ := ℋ) hA₂)
-      hB₁ hB₂ hθ0 hθ1
+    hconc (pdSet_subset_psdSet (ℋ := ℋ) hA₁) (pdSet_subset_psdSet (ℋ := ℋ) hA₂) hB₁ hB₂ hθ0 hθ1
 
 /--
 Theorem 1.1, convex range: the operator `(α, β)`-power mean is jointly convex on
@@ -100,22 +87,16 @@ theorem operatorPowerMean_jointlyConvexOn_pdSet
       (h := fun x : ℝ ↦ x ^ β)
       (hf := by
         refine ⟨?_, ?_, ?_⟩
-        · intro K _ _ _ _
-          exact power_Icc_one_two_operatorConvexOn_Ici (ℋ := K) α hα
-        · exact rpow_continuousOn_Ici α (by linarith [hα.1])
-        · have hα0 : α ≠ 0 := by linarith [hα.1]
-          simp [Real.zero_rpow hα0]
+        · exact fun {K} _ _ _ _ => power_Icc_one_two_operatorConvexOn_Ici (ℋ := K) α hα
+        · exact rpow_continuousOn_Ici α (zero_le_one.trans hα.1)
+        · simp [Real.zero_rpow (one_pos.trans_le hα.1).ne']
       )
-      (hconc := by
-        exact operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
-          (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
-      (hcont := by
-        intro x hx
-        exact (Real.continuousAt_rpow_const x β (Or.inl (ne_of_gt hx))).continuousWithinAt)
+      (hconc := operatorConcaveOn_Ioi_of_Ici (ℋ := ℋ)
+        (power_Icc_zero_one_operatorConcaveOn_Ici (ℋ := ℋ) β hβ))
+      (hcont := fun x hx =>
+        (Real.continuousAt_rpow_const x β (Or.inl (ne_of_gt hx))).continuousWithinAt)
       (hpos := rpow_pos_on_Ioi β)
   simpa [operatorPowerMean] using
-    hconv (A₁ := A₁) (A₂ := A₂) (B₁ := B₁) (B₂ := B₂) (θ := θ)
-      (pdSet_subset_psdSet (ℋ := ℋ) hA₁) (pdSet_subset_psdSet (ℋ := ℋ) hA₂)
-      hB₁ hB₂ hθ0 hθ1
+    hconv (pdSet_subset_psdSet (ℋ := ℋ) hA₁) (pdSet_subset_psdSet (ℋ := ℋ) hA₂) hB₁ hB₂ hθ0 hθ1
 
 end OperatorGeometricMean

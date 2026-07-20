@@ -995,12 +995,9 @@ lemma holder_step_for_singularValues (A B : Matrix d d ℂ)
       (singularValuesSorted A i ^ r * singularValuesSorted B i ^ r)) ≤
     (∑ i : Fin (Fintype.card d), singularValuesSorted A i ^ p) ^ (r / p) *
     (∑ i : Fin (Fintype.card d), singularValuesSorted B i ^ q) ^ (r / q) := by
-  have h_holder : (∑ i : Fin (Fintype.card d), (singularValuesSorted A i ^ r) * (singularValuesSorted B i ^ r)) ≤ (∑ i : Fin (Fintype.card d), (singularValuesSorted A i ^ r) ^ (p / r)) ^ (r / p) * (∑ i : Fin (Fintype.card d), (singularValuesSorted B i ^ r) ^ (q / r)) ^ (r / q) := by
-    have := @Real.inner_le_Lp_mul_Lq
-    convert @this (Fin (Fintype.card d)) Finset.univ (fun i => singularValuesSorted A i ^ r) (fun i => singularValuesSorted B i ^ r) (p / r) (q / r) _ using 1 <;> norm_num [hr.ne', hp.ne', hq.ne', div_eq_mul_inv]
-    · simp only [abs_of_nonneg (Real.rpow_nonneg (singularValuesSorted_nonneg A _) _),
-              abs_of_nonneg (Real.rpow_nonneg (singularValuesSorted_nonneg B _) _)]
-    · constructor <;> norm_num [hr.ne', hp.ne', hq.ne'] at hpqr ⊢ <;> ring_nf at hpqr ⊢ <;> nlinarith [inv_pos.2 hr, inv_pos.2 hp, inv_pos.2 hq, mul_inv_cancel₀ hr.ne', mul_inv_cancel₀ hp.ne', mul_inv_cancel₀ hq.ne']
-  convert h_holder using 3 <;> push_cast [← Real.rpow_mul (singularValuesSorted_nonneg _ _), mul_div_cancel₀ _ hr.ne'] <;> ring_nf
+  have h := Real.Lr_rpow_le_Lp_mul_Lq Finset.univ (singularValuesSorted A)
+    (singularValuesSorted B) ⟨by simpa [inv_eq_one_div] using hpqr.symm, hp, hq⟩
+  simpa only [abs_of_nonneg (singularValuesSorted_nonneg _ _),
+    Real.mul_rpow (singularValuesSorted_nonneg _ _) (singularValuesSorted_nonneg _ _)] using h
 
 end

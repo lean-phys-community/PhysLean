@@ -62,10 +62,8 @@ def on_fin (C : DMChannel I O) {n : ℕ} (is : Fin n → I) : ProbDistribution (
   ProbDistribution.mk' (fun os ↦ ∏ k, (C.symb_dist (is k) (os k) : ℝ))
     (fun _ ↦ Finset.prod_nonneg fun k _ ↦ Prob.zero_le_coe)
     (by
-      have h := Finset.sum_prod_piFinset (Finset.univ : Finset O)
-        (fun (k : Fin n) (j : O) ↦ ((C.symb_dist (is k)) j : ℝ))
-      simp only [Fintype.piFinset_univ] at h
-      simp only [h]
+      rw [← Fintype.piFinset_univ,
+        Finset.sum_prod_piFinset Finset.univ fun k j ↦ ((C.symb_dist (is k)) j : ℝ)]
       exact Finset.prod_eq_one fun k _ ↦ ProbDistribution.normalized (C.symb_dist (is k)))
 
 /-- Apply a discrete memoryless channel to a list. -/

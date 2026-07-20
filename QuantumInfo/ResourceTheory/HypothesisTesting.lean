@@ -69,14 +69,10 @@ instance (ρ : MState d) (ε : Prob) : Inhabited {m | ρ.exp_val (1 - m) ≤ ε 
 
 /-- The space of strategies `T` in `OptimalHypothesisRate` is compact. -/
 theorem iInf_IsCompact (ρ : MState d) (ε : Prob) : IsCompact { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
-  have hC₁ : IsCompact {m : HermitianMat d ℂ | 0 ≤ m ∧ m ≤ 1} :=
-    HermitianMat.unitInterval_IsCompact
-  have hC₂ : IsClosed {m | ρ.exp_val (1 - m) ≤ ε} := by
-    --This is a linear constraint and so has a closed image
-    change IsClosed ((fun m ↦ ρ.M.innerₗ (1 - m)) ⁻¹' (Set.Iic ε))
-    refine IsClosed.preimage ?_ isClosed_Iic
-    fun_prop
-  exact hC₁.inter_left hC₂
+  refine HermitianMat.unitInterval_IsCompact.inter_left ?_
+  --This is a linear constraint and so has a closed image
+  change IsClosed ((fun m ↦ ρ.M.innerₗ (1 - m)) ⁻¹' (Set.Iic ε))
+  exact IsClosed.preimage (by fun_prop) isClosed_Iic
 
 /-- The space of strategies `T` in `OptimalHypothesisRate` is convex. -/
 theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
@@ -86,15 +82,14 @@ theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val 
   rintro x ⟨hx₁, hx₂, hx₃⟩ y ⟨hy₁, hy₂, hy₃⟩ a b ha hb hab
   rw [← eq_sub_iff_add_eq'] at hab
   subst b
-  refine And.intro ?_ (And.intro ?_ ?_)
+  refine ⟨?_, ?_, ?_⟩
   · simp only [MState.exp_val, inner_sub_right, HermitianMat.inner_one, MState.tr,
       tsub_le_iff_right, inner_add_right, inner_smul_right] at hx₁ hy₁ ⊢
     linear_combination a * hx₁ + (1 - a) * hy₁
   · apply HermitianMat.convex_cone <;> assumption
   · rw [← sub_nonneg] at hx₃ hy₃ ⊢
     convert HermitianMat.convex_cone hx₃ hy₃ ha hb using 1
-    simp only [sub_smul, one_smul, smul_sub]
-    abel
+    module
 
 /-- When `S` is empty, the optimal hypothesis testing rate is zero. -/
 @[simp]
@@ -107,8 +102,7 @@ theorem le_sup_exp_val {ρ : MState d} (ε : Prob) {S : Set (MState d)}
     (m : HermitianMat d ℂ) (hExp : ρ.exp_val (1 - m) ≤ ε) (hm : 0 ≤ m ∧ m ≤ 1) :
     β_ ε(ρ‖S) ≤ ⨆ σ ∈ S, ⟨_, σ.exp_val_prob hm⟩ := by
   unfold OptimalHypothesisRate
-  apply iInf_le_of_le ⟨m, ⟨hExp, hm⟩⟩ _
-  simp only [le_refl]
+  exact iInf_le_of_le ⟨m, ⟨hExp, hm⟩⟩ le_rfl
 
 theorem le_of_subset (ρ : MState d) (ε : Prob) {S1 S2 : Set (MState d)} (h : S1 ⊆ S2) :
     β_ ε(ρ‖S1) ≤ β_ ε(ρ‖S2) :=
@@ -122,18 +116,15 @@ theorem of_singleton {ρ σ : MState d} {ε : Prob} :
 
 open scoped Prob in
 theorem negLog_le_singleton (ρ : MState d) (ε : Prob) (S : Set (MState d))
-    (σ : MState d) (h : σ ∈ S) : —log β_ ε(ρ‖S) ≤ —log β_ ε(ρ‖{σ}) := by
-  apply Prob.negLog_Antitone
-  apply le_of_subset
-  exact Set.singleton_subset_iff.mpr h
+    (σ : MState d) (h : σ ∈ S) : —log β_ ε(ρ‖S) ≤ —log β_ ε(ρ‖{σ}) :=
+  Prob.negLog_Antitone (le_of_subset _ _ (Set.singleton_subset_iff.mpr h))
 
 set_option backward.isDefEq.respectTransparency false in
 theorem singleton_le_exp_val {ρ σ : MState d} {ε : Prob} (m : HermitianMat d ℂ)
     (hExp : ρ.exp_val (1 - m) ≤ ε) (hm : 0 ≤ m ∧ m ≤ 1) :
   β_ ε(ρ‖{σ}) ≤ ⟨_, σ.exp_val_prob hm⟩ := by
   rw [of_singleton]
-  apply iInf_le_of_le ⟨m, ⟨hExp, hm⟩⟩ _
-  simp only [le_refl]
+  exact iInf_le_of_le ⟨m, ⟨hExp, hm⟩⟩ le_rfl
 
 set_option backward.isDefEq.respectTransparency false in
 /-- There exists an optimal T for the hypothesis testing, that is, it's a minimum
@@ -147,7 +138,7 @@ theorem exists_min' (ρ : MState d) (ε : Prob) (S : Set (MState d)):
   rcases S.eq_empty_or_nonempty with rfl | hS
   · simpa [-Subtype.exists] using ⟨rfl, ⟨1, by simp⟩, by simp⟩
   rw [← Set.nonempty_coe_sort] at hS
-  obtain ⟨T, hT₁, hT₂⟩ := IsCompact.exists_isMinOn (α := Prob)
+  obtain ⟨T, -, hT₂⟩ := IsCompact.exists_isMinOn (α := Prob)
     (isCompact_iff_isCompact_univ.mp (iInf_IsCompact ρ ε)) Set.univ_nonempty
     (f := fun T ↦ ⨆ σ ∈ S, ⟨_, σ.exp_val_prob T.prop.right⟩)
     (by
@@ -162,16 +153,11 @@ theorem exists_min' (ρ : MState d) (ε : Prob) (S : Set (MState d)):
       rw [← sSup_image' (s := (MState.M '' S)) (f := fun i ↦ i.innerₗ T)]
       simp [Set.image, MState.exp_val, HermitianMat.innerₗ]
     )
-  clear hT₁
-
-  use T
-  constructor
+  refine ⟨T, ?_, ?_⟩
   · simp only [isMinOn_univ_iff] at hT₂
     rw [OptimalHypothesisRate]
     --Why is the following three bundled together not a theorem? Is it, and I can't find it? TODO
-    apply le_antisymm
-    · exact le_iInf hT₂
-    · exact iInf_le_iff.mpr fun _ a ↦ a T
+    exact le_antisymm (le_iInf hT₂) (iInf_le_iff.mpr fun _ a ↦ a T)
   · simpa [MState.exp_val_sub, add_comm (ε : ℝ) _] using T.2.1
 
 --TODO: Maybe we should define these two instances.
@@ -212,23 +198,13 @@ theorem exists_min (ρ : MState d) (ε : Prob) (S : Set (MState d)):
   have hρT' : ρ.exp_val (1 - T') = ε := by
     simp [T', MState.exp_val_sub, δ, field]
 
-  have hT' : ρ.exp_val (1 - T') ≤ ε ∧ 0 ≤ T' ∧ T' ≤ 1 := by
-    use hρT'.le
-    constructor
-    · simp [T']
-      refine smul_nonneg ?_ T.2.2.1
-      bound
-    · exact hT'_le.trans T.2.2.2
-  use ⟨T', hT'⟩
-
-  constructor
+  have hT' : ρ.exp_val (1 - T') ≤ ε ∧ 0 ≤ T' ∧ T' ≤ 1 :=
+    ⟨hρT'.le, hT'_def ▸ smul_nonneg (by bound) T.2.2.1, hT'_le.trans T.2.2.2⟩
+  refine ⟨⟨T', hT'⟩, ?_, ?_⟩
   · rw [OptimalHypothesisRate] at hT₁ ⊢
     apply le_antisymm
-    · apply le_iInf
-      intro i
-      refine le_trans ?_ (le_of_eq_of_le hT₁ ?_)
-      · gcongr
-      · exact iInf_le_iff.mpr fun _ a ↦ a i
+    · refine le_iInf fun i ↦ le_trans ?_ (hT₁.trans_le (iInf_le_iff.mpr fun _ a ↦ a i))
+      gcongr
     · exact iInf_le_iff.mpr fun _ a ↦ a ⟨T', hT'⟩
   · simp [MState.exp_val_sub, ← hρT']
 
@@ -249,8 +225,7 @@ theorem pos_of_lt_one {ρ : MState d} (S : Set (MState d))
   --`ρ.exp_val (1 - T) = ρ.exp_val 1 - ρ.exp_val T = ρ.trace - 0 = 1`, a contradiction.
   by_contra h
   obtain ⟨⟨T, hT₁, hT₂, hT₃⟩, hT₄, hT₅⟩ := exists_min ρ ε S
-  push Not at h
-  simp at h
+  replace h : β_ ε(ρ‖S) = 0 := by simpa using h
   rw [h] at hT₄
   have h_sup_zero := hT₄ ▸ le_iSup₂ σ hσ₁
   have h_eq := le_antisymm h_sup_zero (by simp)
@@ -283,18 +258,10 @@ theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompa
   let S' : Set (HermitianMat d ℂ) := MState.M '' S
   let T' : Set (HermitianMat d ℂ) := { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 }
 
-  have hS'₁ : IsCompact S' := hS₁.image MState.Continuous_HermitianMat
-
-  have hT'₁ : IsCompact T' := iInf_IsCompact ρ ε
-
-  have hT'₂ : Convex ℝ T' := iInf_IsConvex ρ ε
-
-  have hS'₃ : S'.Nonempty := by simpa only [Set.image_nonempty, S']
-
-  have hT'₃ : T'.Nonempty := Set.Nonempty.of_subtype
-
   ext1 --turn it from Prob equality into ℝ equality
-  convert LinearMap.BilinForm.minimax' (M := HermitianMat d ℂ) f S' T' hS'₁ hT'₁ hS₂ hT'₂ hS'₃ hT'₃
+  convert LinearMap.BilinForm.minimax' (M := HermitianMat d ℂ) f S' T'
+    (hS₁.image MState.Continuous_HermitianMat) (iInf_IsCompact ρ ε) hS₂ (iInf_IsConvex ρ ε)
+    (hnS.image _) Set.Nonempty.of_subtype
   --The remaining twiddling is about moving the casts inside the iInf's and iSup's.
   --In a better world, this would be mostly handled by some clever simps or push_cast's.
   · have hi := iSup_range' (ι := S) (fun x ↦ ⨅ (y : T'), (f x) ↑y) (·)
@@ -312,23 +279,11 @@ theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompa
 --Maybe should be phrased in terms of `0 < ...` instead? Maybe belongs in another file? It's kiinnnd of specialized..
 theorem ker_diagonal_prob_eq_bot {q : Prob} (hq₁ : 0 < q) (hq₂ : q < 1) :
     HermitianMat.ker (.diagonal ℂ (ProbDistribution.coin q ·)) = ⊥ := by
-  have hA : (Matrix.toLin' (HermitianMat.diagonal ℂ (ProbDistribution.coin q ·)).mat).ker = ⊥ := by
-    apply Matrix.PosDef.toLin_ker_eq_bot
-    apply Matrix.PosDef.diagonal
-    intro i; fin_cases i
-    · simpa
-    · simpa [← Complex.ofReal_one, Complex.real_lt_real]
-  simp [LinearMap.ker_eq_bot', HermitianMat.ker] at hA ⊢
-  intro m hm
-  have h := hA m
-  simp at h
-  apply h
-  · have := congrArg (·.ofLp 0) hm
-    simp [ProbDistribution.coin, HermitianMat.diagonal, HermitianMat.lin] at this
-    exact this
-  · have := congrArg (·.ofLp 1) hm
-    simp [ProbDistribution.coin, HermitianMat.diagonal, HermitianMat.lin] at this
-    exact this
+  rw [← HermitianMat.nonSingular_iff_ker_bot]
+  refine HermitianMat.nonSingular_of_posDef (Matrix.PosDef.diagonal fun i ↦ ?_)
+  fin_cases i
+  · simpa
+  · simpa [← Complex.ofReal_one, Complex.real_lt_real]
 
 variable {d₂ : Type*} [Fintype d₂] [DecidableEq d₂] in
 /-- Lemma S1 -/
@@ -350,9 +305,7 @@ theorem optimalHypothesisRate_antitone (ρ σ : MState d) (ℰ : CPTPMap d d₂)
       rfl
   convert! le_iInf_comp _ ℰdualSubtype
   rename_i T'
-  specialize h T'
-  rw [h]
-  exact ℰ.exp_val_hermDual σ T'
+  exact (h T') ▸ ℰ.exp_val_hermDual σ T'
 
 open scoped HermitianMat in
 open scoped Prob in
@@ -394,9 +347,7 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
   -- the (p, 1-p) and (q,1-q) refer to states which are qubits ("coins") of probability p and
   -- q, respectively. The states ρ and σ can be "processed" into these coins by measuring the optimal T.
 
-  have h₂ : 0 < 1 - ε.val := by
-    change ε.val < 1 at hε
-    linarith
+  have h₂ : 0 < 1 - ε.val := sub_pos.mpr hε
 
   let p : Prob := 1 - ε
   set q : Prob := β_ ε(ρ‖{σ})
@@ -457,11 +408,9 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
 
   --The Renyi entropy is finite
   rw [SandwichedRelRentropy, dif_pos (zero_lt_one.trans hα), dif_pos ?_]; swap
-  · suffices q2.M.ker = ⊥ by
-      simp only [this, bot_le]
-    --q2 has eigenvalues β_ ε(ρ‖{σ}) and 1-β_ ε(ρ‖{σ}), so as long as β_ ε(ρ‖{σ}) isn't 0 or 1,
+  · --q2 has eigenvalues β_ ε(ρ‖{σ}) and 1-β_ ε(ρ‖{σ}), so as long as β_ ε(ρ‖{σ}) isn't 0 or 1,
     --this is true.
-    exact ker_diagonal_prob_eq_bot hq hq₂
+    exact ker_diagonal_prob_eq_bot hq hq₂ ▸ bot_le
 
   conv => enter [2, 1, 1, 1]; rw [if_neg hα.ne']
 
@@ -470,15 +419,11 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
   rw [if_neg (show 1 - ε ≠ 0 by simpa [Subtype.ext_iff, Prob.coe_sub] using h₂.ne')]
 
   --Turn the ENNReal problem into a Real problem
-  have hα₂ : Subtype.mk _ pf2 ≠ 0 := by
-    change ¬(_ = Subtype.mk 0 _)
-    simp
-    linarith
+  have hα₂ : Subtype.mk _ pf2 ≠ 0 := by simp [Subtype.ext_iff, sub_eq_zero, hα.ne']
   rw [← ENNReal.coe_mul, ← ENNReal.coe_div hα₂, ← ENNReal.coe_add, ENNReal.coe_le_coe]
-  clear hα₂
   simp only [← coe_le_coe, NNReal.coe_add, NNReal.coe_div, NNReal.coe_mul]
   simp [toReal]
-  clear pf1 pf2
+  clear hα₂ pf1 pf2
   rw [← add_div, ← sub_eq_add_neg]
   conv =>
     enter [2,1,1,1]
@@ -500,9 +445,8 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
       congr <;> simp [field]
 
   by_cases h : ε = 0
-  · simp [h, p, @Real.zero_rpow α (by positivity)]
+  · simp [h, p, @Real.zero_rpow α (by positivity), Real.log_rpow hq]
     apply Eq.le
-    rw [Real.log_rpow hq]
     have : α - 1 ≠ 0 := by linarith
     field_simp
     ring_nf
@@ -568,13 +512,10 @@ theorem optimalHypothesisRate_unique {d : Type*} [Fintype d] [DecidableEq d]
   apply le_antisymm
   · refine iInf_le_of_le ⟨((1 - ε : Prob) : ℝ) • 1, ⟨?_, ?_, ?_⟩⟩ ?_
     · simp [MState.exp_val_sub]
-    · apply smul_nonneg ?_ zero_le_one
-      simp
-    · apply smul_le_of_le_one_left zero_le_one
-      simp
+    · exact smul_nonneg (by simp) zero_le_one
+    · exact smul_le_of_le_one_left zero_le_one (by simp)
     · simp [-Prob.coe_one_minus]
   · simp
     intro a he1 ha0 ha1
     rw [MState.exp_val_sub, MState.exp_val_one, tsub_le_iff_right] at he1
-    rw [← tsub_le_iff_left, ← Prob.coe_one_minus] at he1
-    exact he1
+    rwa [← tsub_le_iff_left, ← Prob.coe_one_minus] at he1

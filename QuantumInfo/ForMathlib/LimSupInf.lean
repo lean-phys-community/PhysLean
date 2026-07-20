@@ -53,29 +53,17 @@ There exists a strictly increasing sequence M such that for all k, and all n ≥
 -/
 lemma exists_seq_bound (y : ℝ≥0) (f : ℝ≥0 → ℕ → ℝ≥0∞) (hf : ∀ x > 0, Filter.atTop.limsup (f x) ≤ y) :
     ∃ M : ℕ → ℕ, StrictMono M ∧ ∀ k, ∀ n ≥ M k, f ((k + 1 : ℝ≥0)⁻¹) n ≤ y + (k + 1 : ℝ≥0∞)⁻¹ := by
-  have h_M (k : ℕ) : ∃ M_k, ∀ n ≥ M_k, f (k + 1)⁻¹ n ≤ y + (k + 1 : ℝ≥0∞)⁻¹ := by
-    specialize hf (k + 1)⁻¹ (by positivity)
-    contrapose! hf
-    refine lt_of_lt_of_le (b := ?_) ?_ (le_csInf ⟨⊤, by simp⟩ ?_)
-    · exact y + (k + 1 : ℝ≥0∞)⁻¹
-    · exact ENNReal.lt_add_right (by norm_num) (by norm_num)
-    · intro b hb
-      simp only [Filter.eventually_map, Filter.eventually_atTop, Set.mem_setOf_eq] at hb
-      obtain ⟨w, h⟩ := hb
-      obtain ⟨_, hw_left, hw_right⟩ := hf w
-      grw [hw_right]
-      exact h _ hw_left
+  have h_M (k : ℕ) : ∃ M_k, ∀ n ≥ M_k, f (k + 1)⁻¹ n ≤ y + (k + 1 : ℝ≥0∞)⁻¹ :=
+    Filter.eventually_atTop.mp <| (Filter.eventually_lt_of_limsup_lt <|
+      (hf (k + 1)⁻¹ (by positivity)).trans_lt <|
+      ENNReal.lt_add_right (by norm_num) (by norm_num)).mono fun n hn ↦ hn.le
   choose M hM using h_M
-  use Nat.rec (M 0) fun k ih ↦ M (k + 1) ⊔ (ih + 1)
-  constructor
-  · apply strictMono_nat_of_lt_succ
-    exact fun _ ↦ lt_sup_of_lt_right (lt_add_one _)
-  · intro k n hn
-    apply hM
-    grw [hn]
-    cases k
-    · rfl
-    · apply le_max_left
+  refine ⟨Nat.rec (M 0) fun k ih ↦ M (k + 1) ⊔ (ih + 1),
+    strictMono_nat_of_lt_succ fun _ ↦ lt_sup_of_lt_right (lt_add_one _),
+    fun k n hn ↦ hM k n (le_trans ?_ hn)⟩
+  cases k
+  · exact le_rfl
+  · exact le_max_left _ _
 
 /- (∀ x, x > 0 → liminf (n ↦ f x n) ≤ y) →
   ∃ g : ℕ → ℝ, (∀ x, g x > 0) ∧ (liminf g = 0) ∧ (liminf (n ↦ f (g n) n) ≤ y) -/
@@ -83,94 +71,33 @@ lemma exists_liminf_zero_of_forall_liminf_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
   (hf : ∀ x > 0, Filter.atTop.liminf (f x) ≤ y) :
     ∃ g : ℕ → ℝ≥0, (∀ x, g x > 0) ∧ Filter.atTop.Tendsto g (𝓝 0) ∧
       Filter.atTop.liminf (fun n ↦ f (g n) n) ≤ y := by
-  conv at hf =>
-    enter [x, h]
-    exact propext (Filter.liminf_le_iff (by isBoundedDefault) (by isBoundedDefault))
-  replace hf x hx z hz := Filter.exists_seq_forall_of_frequently (hf x hx z hz)
-  choose! c hc hc₂ using hf
   classical
-  by_contra h_contra;
-  -- By definition of negation, if $\neg P$ holds, then $P$ does not hold.
-  push Not at h_contra;
-  -- Apply `exists_strictMono_seq_le` to obtain a strictly increasing sequence `n_k` such that `f (1/(k+1)) (n_k) ≤ y + 1/(k+1)`.
-  obtain ⟨n, hn_mono, hn_le⟩ : ∃ n : ℕ → ℕ, StrictMono n ∧ ∀ k : ℕ, f ((k : ℝ≥0) + 1)⁻¹ (n k) ≤ (y : ℝ≥0∞) + ((k : ℝ≥0) + 1)⁻¹ := by
-    -- Apply `exists_strictMono_seq_le` to obtain a strictly increasing sequence `n_k` such that `f (1/(k+1)) (n_k) ≤ y + 1/(k+1)` for all `k`.
-    apply exists_strictMono_seq_le y f; intro x hx_pos; (
-    refine' le_of_forall_gt_imp_ge_of_dense fun z hz => _;
-    refine' csSup_le _ _ <;> norm_num;
-    · exact ⟨ 0, ⟨ 0, fun _ _ => zero_le ⟩ ⟩;
-    · intro b n hn; specialize hc x hx_pos z hz; have := hc.eventually_gt_atTop n
-      simp_all only [gt_iff_lt, Filter.eventually_atTop, ge_iff_le]
-      obtain ⟨w, h⟩ := this
-      exact le_trans ( hn _ ( le_of_lt ( h _ le_rfl ) ) ) ( le_of_lt ( hc₂ _ hx_pos _ hz _ ) ));
+  obtain ⟨n, hn_mono, hn_le⟩ := exists_strictMono_seq_le y f hf
   -- Define $g(m) = 1/(k(m)+1)$ where $k(m)$ is the index such that $n_{k(m)} \leq m < n_{k(m)+1}$.
-  set g : ℕ → ℝ≥0 := fun m => (Nat.findGreatest (fun k => m ≥ n k) m + 1 : ℝ≥0)⁻¹;
-  have hg_pos : ∀ m, g m > 0 := by
-    exact fun m => by positivity;;
-  have hg_tendsto_zero : Filter.Tendsto g Filter.atTop (𝓝 0) := by
-    -- Since $n$ is strictly monotone, $Nat.findGreatest (fun k => m ≥ n k) m$ tends to infinity as $m$ tends to infinity.
-    have h_find_greatest_inf : Filter.Tendsto (fun m => Nat.findGreatest (fun k => m ≥ n k) m) Filter.atTop Filter.atTop := by
-      refine' Filter.tendsto_atTop_atTop.mpr fun x => _;
-      use n x; intro a ha
-      refine' Nat.le_findGreatest _ ha
-      simp_all only [gt_iff_lt, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true,
-        ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one, ge_iff_le, inv_pos, add_pos_iff,
-        Nat.cast_pos, Nat.findGreatest_pos, zero_lt_one, or_true, implies_true, g]
-      exact le_trans ( hn_mono.id_le _ ) ha;
-    rw [ tendsto_order ] at *
-    simp_all only [gt_iff_lt, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true,
-      ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one, ge_iff_le, inv_pos, add_pos_iff,
-      Nat.cast_pos, Nat.findGreatest_pos, zero_lt_one, or_true, implies_true, not_lt_zero, Filter.eventually_atTop,
-      not_isEmpty_of_nonempty, IsEmpty.forall_iff, IsEmpty.exists_iff, true_and, g]
-    intro a' a
-    exact Filter.eventually_atTop.mp ( h_find_greatest_inf.eventually_gt_atTop ⌈ ( a' : ℝ≥0 ) ⁻¹⌉₊ ) |> fun ⟨ M, hM ⟩ ↦ ⟨ M, fun m hm ↦ by simpa using inv_lt_of_inv_lt₀ a <| by exact lt_of_lt_of_le ( Nat.lt_of_ceil_lt <| hM m hm ) <| mod_cast Nat.le_succ _ ⟩;
-  have hg_le : ∀ k, f (g (n k)) (n k) ≤ (y : ℝ≥0∞) + ((k : ℝ≥0) + 1)⁻¹ := by
-    intro k
-    specialize hn_le k
-    simp_all only [gt_iff_lt, ge_iff_le, inv_pos, add_pos_iff, Nat.cast_pos, Nat.findGreatest_pos, zero_lt_one,
-      or_true, implies_true, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true,
-      ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one, g]
-    rw [ show Nat.findGreatest ( fun k_1 => n k_1 ≤ n k ) ( n k ) = k from _ ]
-    simp_all only
-    rw [ Nat.findGreatest_eq_iff ]
-    simp_all only [ne_eq, le_refl, implies_true, not_le, true_and]
-    apply And.intro
-    · exact hn_mono.id_le _;
-    · intro n_1 a a_1
-      exact hn_mono a;
-  have hg_liminf : Filter.liminf (fun n => f (g n) n) Filter.atTop ≤ y := by
-    refine' csSup_le _ _ <;> norm_num;
-    · exact ⟨ 0, ⟨ 0, fun _ _ => zero_le ⟩ ⟩;
-    · intro b x hx; contrapose! hx
-      simp_all only [gt_iff_lt, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true,
-        ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one, ge_iff_le, inv_pos, add_pos_iff,
-        Nat.cast_pos, Nat.findGreatest_pos, zero_lt_one, or_true, implies_true, g]
-      -- Choose $k$ such that $y + 1/(k+1) < b$.
-      obtain ⟨k, hk⟩ : ∃ k : ℕ, y + ((k : ℝ≥0) + 1)⁻¹ < b := by
-        rcases ENNReal.lt_iff_exists_nnreal_btwn.mp hx with ⟨z, hz⟩
-        simp_all only [ENNReal.coe_lt_coe, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-          not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one]
-        obtain ⟨left, right⟩ := hz
-        obtain ⟨k, hk⟩ := exists_nat_one_div_lt ( show 0 < ( z : ℝ ) - y from sub_pos.mpr <| mod_cast left )
-        use k
-        norm_num at *;
-        refine' lt_of_le_of_lt _ right;
-        convert! add_le_add_left ( ENNReal.ofReal_le_ofReal hk.le ) ( y : ℝ≥0∞ ) using 1 ; norm_num [ ENNReal.ofReal ];
-        · norm_num [ Real.toNNReal_inv ];
-          rw [add_comm]
-        · rw [ENNReal.ofReal_sub _ (by positivity)]
-          simp [tsub_add_cancel_of_le, left.le]
-      refine' ⟨ n ( Max.max x k ), _, _ ⟩
-      · simp_all only [ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true, ENNReal.coe_inv,
-          ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one]
-        exact le_trans ( le_max_left _ _ ) ( hn_mono.id_le _ );
-      · simp_all only [ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true, ENNReal.coe_inv,
-          ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one]
-        refine' lt_of_le_of_lt ( hg_le _ ) _;
-        refine' lt_of_le_of_lt _ hk
-        gcongr
-        exact le_sup_right
-  exact h_contra g hg_pos hg_tendsto_zero |> not_lt_of_ge hg_liminf;
+  set g : ℕ → ℝ≥0 := fun m => (Nat.findGreatest (fun k => m ≥ n k) m + 1 : ℝ≥0)⁻¹ with hg_def
+  have hg_le (k : ℕ) : f (g (n k)) (n k) ≤ (y : ℝ≥0∞) + ((k : ℝ≥0) + 1)⁻¹ := by
+    have hfind : Nat.findGreatest (fun j => n k ≥ n j) (n k) = k :=
+      Nat.findGreatest_eq_iff.mpr
+        ⟨hn_mono.id_le k, fun _ => le_rfl, fun j hj _ => (hn_mono hj).not_ge⟩
+    simpa only [hg_def, hfind] using hn_le k
+  refine ⟨g, fun m => by positivity, ?_, ?_⟩
+  · have h1 : Filter.Tendsto (fun m => Nat.findGreatest (fun k => m ≥ n k) m)
+        Filter.atTop Filter.atTop :=
+      Filter.tendsto_atTop_atTop.mpr fun x =>
+        ⟨n x, fun a ha => Nat.le_findGreatest ((hn_mono.id_le x).trans ha) ha⟩
+    have h2 : Filter.Tendsto (fun k : ℕ => ((k : ℝ≥0) + 1)⁻¹) Filter.atTop (𝓝 0) := by
+      rw [← ENNReal.tendsto_coe]
+      simpa [Function.comp_def] using
+        ENNReal.tendsto_inv_nat_nhds_zero.comp (Filter.tendsto_add_atTop_nat 1)
+    exact h2.comp h1
+  · refine le_of_forall_pos_le_add fun ε hε => ?_
+    obtain ⟨k₀, hk₀⟩ := ENNReal.exists_inv_nat_lt hε.ne'
+    refine Filter.liminf_le_of_frequently_le' (Filter.frequently_atTop.mpr fun a => ?_)
+    refine ⟨n (a ⊔ k₀), le_sup_left.trans (hn_mono.id_le _), (hg_le _).trans ?_⟩
+    gcongr
+    refine le_trans ?_ hk₀.le
+    rw [ENNReal.coe_inv (by positivity)]
+    exact ENNReal.inv_le_inv.mpr (by exact_mod_cast Nat.le_succ_of_le le_sup_right)
 
 /- Version of `exists_liminf_zero_of_forall_liminf_le` that lets you also require `g`
 to have an upper bound. -/
@@ -181,13 +108,10 @@ lemma exists_liminf_zero_of_forall_liminf_le_with_UB (y : ℝ≥0) (f : ℝ≥0 
       (Filter.atTop.liminf (fun n ↦ f (g n) n) ≤ y) := by
   obtain ⟨g, hg₀, hg₁, hg₂⟩ := exists_liminf_zero_of_forall_liminf_le y (fun x n => f x n) hf;
   refine ⟨fun n => min (g n) (z / 2), by bound, by bound, ?_, ?_⟩
-  · convert hg₁.min tendsto_const_nhds using 2
-    simp
+  · simpa using hg₁.min tendsto_const_nhds
   · beta_reduce
-    rwa [Filter.liminf_congr]
-    have h := hg₁.eventually (gt_mem_nhds <| half_pos hz)
-    peel h with h
-    rw [min_eq_left h.le]
+    rwa [Filter.liminf_congr ((hg₁.eventually (gt_mem_nhds <| half_pos hz)).mono
+      fun n h => by rw [min_eq_left h.le])]
 
 /- (∀ x, x > 0 → liminf (n ↦ f x n) ≤ y) →
   ∃ g : ℕ → ℝ, (∀ x, g x > 0) ∧ (liminf g = 0) ∧ (liminf (n ↦ f (g n) n) ≤ y) -/
@@ -195,59 +119,30 @@ lemma exists_limsup_zero_of_forall_limsup_le (y : ℝ≥0) (f : ℝ≥0 → ℕ 
   (hf : ∀ x, x > 0 → Filter.atTop.limsup (f x) ≤ y) :
     ∃ g : ℕ → ℝ≥0, (∀ x, g x > 0) ∧ (Filter.atTop.Tendsto g (𝓝 0)) ∧
       (Filter.atTop.limsup (fun n ↦ f (g n) n) ≤ y) := by
-    -- Let's choose a sequence M such that for all k, and all n ≥ M k, f (1/(k+1)) n is close to y.
-  obtain ⟨M, hM⟩ : ∃ M : ℕ → ℕ, StrictMono M ∧ ∀ k, ∀ n ≥ M k, f ((k + 1 : ℝ≥0)⁻¹) n ≤ y + (k + 1 : ℝ≥0∞)⁻¹ := by
-    -- Apply the hypothesis `exists_seq_bound` to obtain the sequence $M$.
-    apply exists_seq_bound y f hf;
-  use fun n => 1 / ( Nat.findGreatest ( fun k => M k ≤ n ) n + 1 );
-  refine ⟨?_, ?_, ?_⟩
-  · aesop;
-  · -- We'll use that Nat.findGreatest (fun k => M k ≤ n) n tends to infinity as n tends to infinity.
-    have h_find_greatest : Filter.Tendsto (fun n => Nat.findGreatest (fun k => M k ≤ n) n) Filter.atTop Filter.atTop := by
-      refine' Filter.tendsto_atTop_atTop.mpr fun k => _;
-      use M k; intro a ha; refine' Nat.le_findGreatest _ ha
-      simp_all only [gt_iff_lt, ge_iff_le]
-      obtain ⟨left, right⟩ := hM
-      exact le_trans ( left.id_le _ ) ha;
-    rw [ tendsto_order ]
-    simp_all only [gt_iff_lt, ge_iff_le, not_lt_zero, one_div, Filter.eventually_atTop, not_isEmpty_of_nonempty,
-      IsEmpty.forall_iff, IsEmpty.exists_iff, implies_true, true_and]
-    intro a' a
-    obtain ⟨left, right⟩ := hM
-    have := h_find_greatest.eventually_gt_atTop ⌈a'⁻¹⌉₊
-    simp_all only [Filter.eventually_atTop]
-    obtain ⟨w, h⟩ := this
-    exact ⟨ w, fun n hn => inv_lt_of_inv_lt₀ a <| by exact lt_of_lt_of_le ( Nat.lt_of_ceil_lt <| h n hn ) <| mod_cast Nat.le_succ _ ⟩;
-  · -- For any ε > 0, choose K such that 1/(K+1) < ε. For n ≥ M K, we have g n = 1/(k+1) with k ≥ K. Also n ≥ M k (since k is the smallest such that n < M (k+1)). Thus f (g n) n ≤ y + 1/(k+1) < y + ε.
-    have h_eps : ∀ ε > 0, ∃ N, ∀ n ≥ N, f (1 / (Nat.findGreatest (fun k => M k ≤ n) n + 1)) n ≤ y + ε := by
-      intro ε hε_pos
-      obtain ⟨K, hK⟩ : ∃ K : ℕ, (K + 1 : ℝ≥0∞)⁻¹ < ε := by
-        rcases ENNReal.exists_inv_nat_lt hε_pos.ne' with ⟨ K, hK ⟩
-        use K
-        simp_all only [gt_iff_lt, ge_iff_le]
-        obtain ⟨left, right⟩ := hM
-        exact lt_of_le_of_lt ( by gcongr ; norm_num ) hK;
-      use M K;
-      intros n hn
-      have h_k_ge_K : Nat.findGreatest (fun k => M k ≤ n) n ≥ K := by
-        refine' Nat.le_findGreatest _ hn
-        simp_all only [gt_iff_lt, ge_iff_le]
-        obtain ⟨left, right⟩ := hM
-        exact le_trans ( left.id_le _ ) hn;
-      have := hM.2 ( Nat.findGreatest ( fun k => M k ≤ n ) n ) n ?_
-      · simp_all only [gt_iff_lt, ge_iff_le, one_div]
-        obtain ⟨left, right⟩ := hM
-        refine le_trans this ( add_le_add_right ( le_trans ( by gcongr ) hK.le ) _ );
-      · simp_all only [gt_iff_lt, ge_iff_le]
-        obtain ⟨left, right⟩ := hM
-        have := Nat.findGreatest_eq_iff.mp ( by aesop : Nat.findGreatest ( fun k => M k ≤ n ) n = Nat.findGreatest ( fun k => M k ≤ n ) n )
-        by_cases h : Nat.findGreatest ( fun k => M k ≤ n ) n = 0
-        · simp_all
-        · simp_all
-    refine' le_of_forall_pos_le_add fun ε hε => _;
-    refine' csInf_le _ _
-    · aesop
-    · aesop
+  obtain ⟨M, hM₁, hM₂⟩ := exists_seq_bound y f hf
+  refine ⟨fun n => 1 / (Nat.findGreatest (fun k => M k ≤ n) n + 1),
+    fun n => by positivity, ?_, ?_⟩
+  · have h1 : Filter.Tendsto (fun n => Nat.findGreatest (fun k => M k ≤ n) n)
+        Filter.atTop Filter.atTop :=
+      Filter.tendsto_atTop_atTop.mpr fun k =>
+        ⟨M k, fun a ha => Nat.le_findGreatest ((hM₁.id_le k).trans ha) ha⟩
+    have h2 : Filter.Tendsto (fun k : ℕ => ((k : ℝ≥0) + 1)⁻¹) Filter.atTop (𝓝 0) := by
+      rw [← ENNReal.tendsto_coe]
+      simpa [Function.comp_def] using
+        ENNReal.tendsto_inv_nat_nhds_zero.comp (Filter.tendsto_add_atTop_nat 1)
+    simpa [one_div, Function.comp_def] using h2.comp h1
+  · refine le_of_forall_pos_le_add fun ε hε => ?_
+    obtain ⟨K, hK⟩ := ENNReal.exists_inv_nat_lt hε.ne'
+    refine Filter.limsup_le_of_le (by isBoundedDefault) ?_
+    filter_upwards [Filter.eventually_ge_atTop (M K)] with n hn
+    have hKf : K ≤ Nat.findGreatest (fun k => M k ≤ n) n :=
+      Nat.le_findGreatest ((hM₁.id_le K).trans hn) hn
+    rw [one_div]
+    refine (hM₂ _ n (Nat.findGreatest_spec (P := fun k => M k ≤ n)
+      ((hM₁.id_le K).trans hn) hn)).trans ?_
+    gcongr
+    refine le_trans ?_ hK.le
+    exact ENNReal.inv_le_inv.mpr (by exact_mod_cast Nat.le_succ_of_le hKf)
 
 /-
 If x_k tends to L and g(n) = x_k for n in [T_k, T_{k+1}) where T is strictly increasing, then g(n) tends to L.
@@ -257,50 +152,29 @@ lemma tendsto_of_block_sequence {α : Type*} [TopologicalSpace α] {x : ℕ → 
       Filter.atTop.Tendsto g (𝓝 L) := by
   rw [Filter.tendsto_atTop'] at hx ⊢
   intro s hs
-  -- Let `a` be the witness from the definition of `Tendsto`.
   rcases hx s hs with ⟨a, ha⟩
-  use T a
-  intros n hn
-  -- Let `k` be such that `T k ≤ n < T (k + 1)`.
-  obtain ⟨k, hk⟩ : ∃ k, T k ≤ n ∧ n < T (k + 1) := by
-    -- Since $T$ is strictly increasing, the set $\{k \mid T k \leq n\}$ is finite and non-empty.
-    have h_finite : Set.Finite {k | T k ≤ n} := by
-      rw [Set.finite_iff_bddAbove]
-      exact ⟨_, (hT.id_le · |>.trans)⟩
-    use h_finite.toFinset.max' ⟨a, h_finite.mem_toFinset.mpr hn⟩
-    constructor
-    · exact h_finite.mem_toFinset.mp (Finset.max'_mem _ _)
-    · rw [← not_le]
-      intro h
-      exact not_lt_of_ge (Finset.le_max' _ _ (h_finite.mem_toFinset.mpr h)) (Nat.lt_succ_self _)
-  rw [hg k n hk]
-  exact ha k (le_of_not_gt fun hk' ↦ by linarith [hT.monotone hk'])
+  refine ⟨T a, fun n hn => ?_⟩
+  have h1 : T (Nat.findGreatest (T · ≤ n) n) ≤ n :=
+    Nat.findGreatest_spec (P := (T · ≤ n)) ((hT.id_le a).trans hn) hn
+  have h2 : n < T (Nat.findGreatest (T · ≤ n) n + 1) :=
+    lt_of_not_ge fun hc =>
+      Nat.findGreatest_is_greatest (Nat.lt_succ_self _) ((hT.id_le _).trans hc) hc
+  rw [hg _ n ⟨h1, h2⟩]
+  exact ha _ (Nat.le_findGreatest ((hT.id_le a).trans hn) hn)
 
 /-
 Given a lower bound sequence M and a property P that can always be satisfied eventually, there exists a strictly increasing sequence T bounded by M such that each interval [T_k, T_{k+1}) contains a witness for P.
 -/
 lemma exists_increasing_sequence_with_property (M : ℕ → ℕ) (P : ℕ → ℕ → Prop) (hP : ∀ k L, ∃ n ≥ L, P k n) :
     ∃ T : ℕ → ℕ, StrictMono T ∧ (∀ k, T k ≥ M k) ∧ (∀ k, ∃ n ∈ Set.Ico (T k) (T (k + 1)), P k n) := by
-  -- We construct $T_k$ by induction.
-  have hT_ind : ∀ k : ℕ, ∃ T : ℕ → ℕ, StrictMono T ∧ (∀ k, T k ≥ M k) ∧ (∀ k, ∃ n ∈ Set.Ico (T k) (T (k + 1)), P k n) ∧ T (k + 1) > T k := by
-    intro k
-    induction k
-    · choose! n hn using hP;
-      use fun k => Nat.recOn k ( M 0 ) fun k ih => Max.max ( ih + 1 ) ( Max.max ( M ( k + 1 ) ) ( n k ih + 1 ) )
-      simp_all only [ge_iff_le, le_sup_iff, add_le_add_iff_right, or_true, sup_of_le_right, Set.mem_Ico, lt_sup_iff,
-        Nat.rec_zero, zero_add]
-      refine ⟨?_, ?_, ?_, ?_⟩
-      · exact strictMono_nat_of_lt_succ fun k => by cases max_cases ( M ( k + 1 ) ) ( n k ( Nat.rec ( M 0 ) ( fun k ih => Max.max ( M ( k + 1 ) ) ( n k ih + 1 ) ) k ) + 1 ) <;> linarith [ hn k ( Nat.rec ( M 0 ) ( fun k ih => Max.max ( M ( k + 1 ) ) ( n k ih + 1 ) ) k ) ] ;
-      · intro k
-        induction k <;> aesop;
-      · intro k
-        exact ⟨ n k ( Nat.rec ( M 0 ) ( fun k ih => Max.max ( M ( k + 1 ) ) ( n k ih + 1 ) ) k ), ⟨ hn _ _ |>.1, Or.inr ( Nat.lt_succ_self _ ) ⟩, hn _ _ |>.2 ⟩;
-      · exact Or.inr ( by linarith [ hn 0 ( M 0 ) ] );
-    · rename_i ih
-      obtain ⟨ T, hT₁, hT₂, hT₃, hT₄ ⟩ := ih
-      use T
-      aesop
-  exact Exists.elim ( hT_ind 0 ) fun T hT => ⟨ T, hT.1, hT.2.1, hT.2.2.1 ⟩
+  choose! w hw₁ hw₂ using hP
+  refine ⟨fun k => Nat.rec (M 0) (fun k ih => max (M (k + 1)) (w k ih + 1)) k,
+    strictMono_nat_of_lt_succ fun k => ?_, fun k => ?_, fun k => ?_⟩
+  · exact lt_of_le_of_lt (hw₁ k _) (lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_right _ _))
+  · cases k
+    · exact le_rfl
+    · exact le_max_left _ _
+  · exact ⟨w k _, ⟨hw₁ k _, lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_right _ _)⟩, hw₂ k _⟩
 
 /-
 If g is a block sequence constructed from x and T, and each block contains a witness where f is bounded by y + 1/(k+1), then liminf f(g) <= y.
@@ -310,27 +184,17 @@ lemma liminf_le_of_block_sequence_witnesses {α : Type*} (y : ℝ≥0) (f : α �
     (hg : ∀ k, ∀ n ∈ Set.Ico (T k) (T (k + 1)), g n = x k)
     (hwit : ∀ k, ∃ n ∈ Set.Ico (T k) (T (k + 1)), f (x k) n ≤ (y : ℝ≥0∞) + (k + 1 : ℝ≥0)⁻¹) :
     Filter.atTop.liminf (fun n ↦ f (g n) n) ≤ y := by
-  rw [ Filter.liminf_eq ];
-  simp_all only [Set.mem_Ico, and_imp, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-    not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one,
-    Filter.eventually_atTop, sSup_le_iff, Set.mem_setOf_eq, forall_exists_index]
-  intro b x_1 h
-  -- Fix an arbitrary $k \geq x_1$.
-  suffices h_suff : ∀ k ≥ x_1, ∃ n ≥ k, f (g n) n ≤ y + 1 / (k + 1) by
-    -- By taking the limit as $k$ approaches infinity, we get $b \leq y$.
-    have h_lim : Filter.Tendsto (fun k : ℕ => y + 1 / (k + 1 : ℝ≥0∞)) Filter.atTop (𝓝 y) := by
-      have h_lim : Filter.Tendsto (fun k : ℕ => (k + 1 : ℝ≥0∞)⁻¹) Filter.atTop (𝓝 0) := by
-        rw [ ENNReal.tendsto_nhds_zero ]
-        intro ε a
-        simp_all only [one_div, gt_iff_lt, Filter.eventually_atTop]
-        rcases ENNReal.exists_inv_nat_lt a.ne' with ⟨ N, hN ⟩;
-        exact ⟨ N, fun n hn => le_trans ( by gcongr ; norm_cast ; linarith ) hN.le ⟩;
-      simpa using tendsto_const_nhds.add h_lim;
-    refine' le_of_tendsto_of_tendsto tendsto_const_nhds h_lim _;
-    filter_upwards [ Filter.eventually_ge_atTop x_1 ] with k hk using by obtain ⟨ n, hn₁, hn₂ ⟩ := h_suff k hk; exact le_trans ( h n ( by linarith ) ) hn₂;
-  intro k hk
-  obtain ⟨n, hn₁, hn₂⟩ := hwit k;
-  exact ⟨ n, le_trans ( show k ≤ T k from hT.id_le _ ) hn₁.1, by rw [ hg k n hn₁.1 hn₁.2 ] ; simpa using hn₂ ⟩
+  refine le_of_forall_pos_le_add fun ε hε => ?_
+  obtain ⟨k₀, hk₀⟩ := ENNReal.exists_inv_nat_lt hε.ne'
+  refine Filter.liminf_le_of_frequently_le' (Filter.frequently_atTop.mpr fun a => ?_)
+  obtain ⟨m, hm, hle⟩ := hwit (a ⊔ k₀)
+  refine ⟨m, le_trans (le_sup_left.trans (hT.id_le _)) hm.1, ?_⟩
+  rw [hg _ m hm]
+  refine hle.trans ?_
+  gcongr
+  refine le_trans ?_ hk₀.le
+  rw [ENNReal.coe_inv (by positivity)]
+  exact ENNReal.inv_le_inv.mpr (by exact_mod_cast Nat.le_succ_of_le le_sup_right)
 
 /-
 If g is a block sequence constructed from x and T, and f is bounded by y + 1/(k+1) on each block, then limsup f(g) <= y.
@@ -340,37 +204,23 @@ lemma limsup_le_of_block_sequence_bound {α : Type*} (y : ℝ≥0) (f : α → �
   (hg : ∀ k, ∀ n ∈ Set.Ico (T k) (T (k + 1)), g n = x k)
   (hbound : ∀ k, ∀ n ∈ Set.Ico (T k) (T (k + 1)), f (x k) n ≤ (y : ℝ≥0∞) + (k + 1 : ℝ≥0)⁻¹) :
   Filter.atTop.limsup (fun n ↦ f (g n) n) ≤ y := by
-    refine' le_of_forall_pos_le_add fun ε hε => _;
-    refine' csInf_le _ _
-    · aesop
-    simp_all only [Set.mem_Ico, and_imp, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-      not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one,
-      Filter.eventually_map, Filter.eventually_atTop, Set.mem_setOf_eq]
-    -- Choose $K$ such that for all $k \ge K$, we have $1/(k+1) \le \epsilon$.
-    obtain ⟨K, hK⟩ : ∃ K : ℕ, ∀ k ≥ K, (k + 1 : ℝ≥0)⁻¹ ≤ ε := by
-      rcases ENNReal.lt_iff_exists_nnreal_btwn.mp hε with ⟨ δ, hδ, hδε ⟩
-      simp_all only [ENNReal.coe_pos, ge_iff_le, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-        not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one]
-      refine' ⟨ ⌈δ⁻¹⌉₊, fun k hk => le_trans _ hδε.le ⟩
-      norm_cast
-      rw [ ENNReal.inv_le_iff_le_mul ] <;> norm_cast
-      · rw [ ← div_le_iff₀ ] at * <;> norm_cast at *
-        simp_all only [Nat.ceil_le, Nat.cast_add, Nat.cast_one, one_div]
-        exact le_add_of_le_of_nonneg hk zero_le_one;
-      · aesop
-      · aesop
-    use T K
-    intro b a
-    simp_all only [ge_iff_le, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false, not_false_eq_true,
-      ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one]
-    -- Let $k$ be such that $b \in [T_k, T_{k+1})$.
-    obtain ⟨k, hk⟩ : ∃ k, T k ≤ b ∧ b < T (k + 1) := by
-      -- Since $T$ is strictly increasing and unbounded, the set $\{n \mid T n \leq b\}$ is finite and non-empty.
-      have h_finite : Set.Finite {n | T n ≤ b} := by
-        exact Set.finite_iff_bddAbove.2 ⟨ b, fun n hn => le_trans ( hT.id_le _ ) hn ⟩;
-      exact ⟨ Finset.max' ( h_finite.toFinset ) ⟨ K, h_finite.mem_toFinset.mpr a ⟩, h_finite.mem_toFinset.mp ( Finset.max'_mem _ _ ), not_le.mp fun h => not_lt_of_ge ( Finset.le_max' _ _ ( h_finite.mem_toFinset.mpr h ) ) ( Nat.lt_succ_self _ ) ⟩;
-    rw [ hg k b hk.1 hk.2 ];
-    exact le_trans ( hbound k b hk.1 hk.2 ) ( add_le_add_right ( hK k ( le_of_not_gt fun hk' => by linarith [ hT.monotone hk'.nat_succ_le ] ) ) _ )
+    refine le_of_forall_pos_le_add fun ε hε => ?_
+    obtain ⟨K, hK⟩ := ENNReal.exists_inv_nat_lt hε.ne'
+    refine Filter.limsup_le_of_le (by isBoundedDefault) ?_
+    filter_upwards [Filter.eventually_ge_atTop (T K)] with b hb
+    have hKf : K ≤ Nat.findGreatest (T · ≤ b) b :=
+      Nat.le_findGreatest ((hT.id_le K).trans hb) hb
+    have h1 : T (Nat.findGreatest (T · ≤ b) b) ≤ b :=
+      Nat.findGreatest_spec (P := (T · ≤ b)) ((hT.id_le K).trans hb) hb
+    have h2 : b < T (Nat.findGreatest (T · ≤ b) b + 1) :=
+      lt_of_not_ge fun hc =>
+        Nat.findGreatest_is_greatest (Nat.lt_succ_self _) ((hT.id_le _).trans hc) hc
+    rw [hg _ b ⟨h1, h2⟩]
+    refine (hbound _ b ⟨h1, h2⟩).trans ?_
+    gcongr
+    refine le_trans ?_ hK.le
+    rw [ENNReal.coe_inv (by positivity)]
+    exact ENNReal.inv_le_inv.mpr (by exact_mod_cast Nat.le_succ_of_le hKf)
 
 /- Version of `exists_liminf_zero_of_forall_liminf_le_with_UB` that lets you stipulate it for
 two different functions simultaneously, one with liminf and one with limsup. -/
@@ -383,100 +233,49 @@ lemma exists_liminf_zero_of_forall_liminf_limsup_le_with_UB (y₁ y₂ : ℝ≥0
         Filter.atTop.liminf (fun n ↦ f₁ (g n) n) ≤ y₁ ∧
       Filter.atTop.limsup (fun n ↦ f₂ (g n) n) ≤ y₂ := by
   -- Fix some sequences of positive real numbers $x_k$ and $N_0(k)$.
-  obtain ⟨x, hx⟩ : ∃ x : ℕ → ℝ≥0, (∀ k, 0 < x k) ∧ (∀ k, x k ≤ z / 2) ∧ (∀ k, x k ≤ 1 / (k + 1)) ∧ Filter.Tendsto x Filter.atTop (𝓝 0) := by
-    use fun k => Min.min ( z / 2 ) ( 1 / ( k + 1 ) )
-    simp_all only [gt_iff_lt, one_div, lt_inf_iff, div_pos_iff_of_pos_left, Nat.ofNat_pos, inv_pos, add_pos_iff,
-      Nat.cast_pos, zero_lt_one, or_true, and_self, implies_true, inf_le_left, inf_le_right, true_and]
-    rw [ Filter.tendsto_congr' ];
-    any_goals filter_upwards [ Filter.eventually_gt_atTop ⌈ ( z / 2 ) ⁻¹⌉₊ ] with k hk; rw [ min_eq_right ];
-    · refine' tendsto_order.2 ⟨ fun x => _, fun x hx => _ ⟩
-      · aesop
-      · simp_all only [gt_iff_lt, Filter.eventually_atTop]
-        exact ⟨ ⌈x⁻¹⌉₊, fun n hn => inv_lt_of_inv_lt₀ hx <| lt_of_le_of_lt ( Nat.le_ceil _ ) <| mod_cast Nat.lt_succ_of_le hn ⟩;
-    · rw [ inv_le_comm₀ ] <;> norm_cast
-      · simp_all only [inv_div, Nat.cast_add, Nat.cast_one]
-        exact le_trans ( Nat.le_ceil _ ) ( mod_cast by linarith )
-      · aesop
-      · aesop
+  obtain ⟨x, hx₀, hx₁, hx₂⟩ : ∃ x : ℕ → ℝ≥0, (∀ k, 0 < x k) ∧ (∀ k, x k ≤ z / 2) ∧
+      Filter.Tendsto x Filter.atTop (𝓝 0) := by
+    refine ⟨fun k => min (z / 2) ((k : ℝ≥0) + 1)⁻¹,
+      fun k => lt_min (by positivity) (by positivity), fun k => min_le_left _ _, ?_⟩
+    have h2 : Filter.Tendsto (fun k : ℕ => ((k : ℝ≥0) + 1)⁻¹) Filter.atTop (𝓝 0) := by
+      rw [← ENNReal.tendsto_coe]
+      simpa [Function.comp_def] using
+        ENNReal.tendsto_inv_nat_nhds_zero.comp (Filter.tendsto_add_atTop_nat 1)
+    exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds h2
+      (fun k => by positivity) (fun k => min_le_right _ _)
   obtain ⟨N0, hN0⟩ : ∃ N0 : ℕ → ℕ, ∀ k, ∀ n ≥ N0 k, f₂ (x k) n ≤ y₂ + (k + 1 : ℝ≥0)⁻¹ := by
-    have h_limsup : ∀ k, Filter.limsup (f₂ (x k)) Filter.atTop ≤ y₂ := by
-      exact fun k => hf₂ _ ( hx.1 k );
-    have h_limsup_le : ∀ k, ∀ ε > 0, ∃ N, ∀ n ≥ N, f₂ (x k) n ≤ y₂ + ε := by
-      intro k ε hε_pos
-      have h_limsup_le : Filter.limsup (f₂ (x k)) Filter.atTop ≤ y₂ := h_limsup k;
-      rw [ Filter.limsup_eq ] at h_limsup_le;
-      have := exists_lt_of_csInf_lt ( show { a : ℝ≥0∞ | ∀ᶠ n in Filter.atTop, f₂ ( x k ) n ≤ a }.Nonempty from ⟨ _, Filter.Eventually.of_forall fun n => le_top ⟩ ) ( show InfSet.sInf { a : ℝ≥0∞ | ∀ᶠ n in Filter.atTop, f₂ ( x k ) n ≤ a } < ( y₂ : ℝ≥0∞ ) + ε from lt_of_le_of_lt h_limsup_le <| ENNReal.lt_add_right ( by aesop ) <| by aesop )
-      simp_all only [gt_iff_lt, one_div, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-        not_false_eq_true, NNReal.le_inv_iff_mul_le, implies_true, Filter.eventually_atTop, ge_iff_le, Set.mem_setOf_eq]
-      obtain ⟨left, right⟩ := hx
-      obtain ⟨w, h⟩ := this
-      obtain ⟨left_1, right⟩ := right
-      obtain ⟨left_2, right_1⟩ := h
-      obtain ⟨left_3, right⟩ := right
-      obtain ⟨w_1, h⟩ := left_2
-      exact ⟨ w_1, fun n hn => le_trans ( h n hn ) right_1.le ⟩;
-    exact ⟨ fun k => Classical.choose ( h_limsup_le k _ <| by positivity ), fun k n hn => Classical.choose_spec ( h_limsup_le k _ <| by positivity ) n hn ⟩;
-  -- Define the sequence $T_k$ such that $T_k \geq N_0(k)$ and each interval $[T_k, T_{k+1})$ contains some $n_k$ with $P(k, n_k)$.
-  obtain ⟨T, hT_mono, hT_bound, hT_wit⟩ : ∃ T : ℕ → ℕ, StrictMono T ∧ (∀ k, T k ≥ N0 k) ∧ (∀ k, ∃ n ∈ Set.Ico (T k) (T (k + 1)), f₁ (x k) n ≤ y₁ + (k + 1 : ℝ≥0)⁻¹) := by
-    have hP : ∀ k L, ∃ n ≥ L, f₁ (x k) n ≤ y₁ + (k + 1 : ℝ≥0)⁻¹ := by
-      intro k L; specialize hf₁ ( x k ) ( hx.1 k ) ; rw [ Filter.liminf_eq ] at hf₁; simp_all +decide [ Filter.limsup_eq ] ;
-      contrapose! hf₁;
-      exact ⟨ y₁ + ( k + 1 : ℝ≥0∞ ) ⁻¹, L, fun n hn => le_of_lt ( hf₁ n hn ), ENNReal.lt_add_right ( by aesop ) ( by aesop ) ⟩;
-    have := exists_increasing_sequence_with_property ( fun k => N0 k ) ( fun k n => f₁ ( x k ) n ≤ y₁ + ( k + 1 : ℝ≥0 ) ⁻¹ ) hP; aesop;
-  refine' ⟨ fun n => x ( Nat.find ( show ∃ k, n < T ( k + 1 ) from _ ) ), _, _, _, _, _ ⟩;
-  exact ⟨ n, hT_mono.id_le _ ⟩;
-  · exact fun n => hx.1 _;
-  · intro n
-    specialize hx
-    simp_all only [gt_iff_lt, ge_iff_le, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-      not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one, Set.mem_Ico, one_div,
-      NNReal.le_inv_iff_mul_le]
-    obtain ⟨left, right⟩ := hx
-    obtain ⟨left_1, right⟩ := right
-    obtain ⟨left_2, right⟩ := right
-    exact lt_of_le_of_lt ( left_1 _ ) ( half_lt_self hz );
-  · refine' hx.2.2.2.comp _;
-    refine' Filter.tendsto_atTop_atTop.mpr _;
-    intro b; use T b; intro a ha; contrapose! ha
-    simp_all only [gt_iff_lt, one_div, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-      not_false_eq_true, NNReal.le_inv_iff_mul_le, ge_iff_le, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast,
-      ENNReal.coe_one, Set.mem_Ico, Nat.find_lt_iff]
-    obtain ⟨left, right⟩ := hx
-    obtain ⟨w, h⟩ := ha
-    obtain ⟨left_1, right⟩ := right
-    obtain ⟨left_2, right_1⟩ := h
-    obtain ⟨left_3, right⟩ := right
-    exact right_1.trans_le ( hT_mono.monotone ( by linarith ) );
+    have h (k : ℕ) : ∃ N, ∀ n ≥ N, f₂ (x k) n ≤ y₂ + (k + 1 : ℝ≥0)⁻¹ :=
+      Filter.eventually_atTop.mp <| (Filter.eventually_lt_of_limsup_lt <|
+        (hf₂ _ (hx₀ k)).trans_lt <|
+        ENNReal.lt_add_right (by simp) (by simp)).mono fun n hn => hn.le
+    exact ⟨fun k => (h k).choose, fun k => (h k).choose_spec⟩
+  -- Define the sequence $T_k$ such that $T_k \geq N_0(k)$ and each interval $[T_k, T_{k+1})$
+  -- contains some $n_k$ with $P(k, n_k)$.
+  obtain ⟨T, hT_mono, hT_bound, hT_wit⟩ :=
+    exists_increasing_sequence_with_property N0
+      (fun k n => f₁ (x k) n ≤ y₁ + (k + 1 : ℝ≥0)⁻¹) fun k L => by
+        have h : ∃ᶠ n in Filter.atTop, f₁ (x k) n < y₁ + (k + 1 : ℝ≥0)⁻¹ :=
+          Filter.frequently_lt_of_liminf_lt (by isBoundedDefault)
+            ((hf₁ _ (hx₀ k)).trans_lt (ENNReal.lt_add_right (by simp) (by simp)))
+        obtain ⟨m, h₁, h₂⟩ := (h.and_eventually (Filter.eventually_ge_atTop L)).exists
+        exact ⟨m, h₂, h₁.le⟩
+  refine ⟨fun n => x (Nat.find (show ∃ k, n < T (k + 1) from ⟨n, hT_mono.id_le _⟩)),
+    fun n => hx₀ _, fun n => (hx₁ _).trans_lt (half_lt_self hz), ?_, ?_, ?_⟩
+  · refine hx₂.comp (Filter.tendsto_atTop_atTop.mpr fun b => ⟨T b, fun a ha => ?_⟩)
+    rw [← not_lt, Nat.find_lt_iff]
+    push Not
+    exact fun m hm => le_trans (hT_mono.monotone hm) ha
   · refine liminf_le_of_block_sequence_witnesses y₁ f₁ T hT_mono x _ ?_ hT_wit
-    intro k n hn
+    intro k m hm
     congr
-    simp_all only [gt_iff_lt, one_div, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-      not_false_eq_true, NNReal.le_inv_iff_mul_le, ge_iff_le, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast,
-      ENNReal.coe_one, Set.mem_Ico]
-    obtain ⟨left, right⟩ := hx
-    obtain ⟨left_1, right_1⟩ := hn
-    obtain ⟨left_2, right⟩ := right
-    obtain ⟨left_3, right⟩ := right
-    rw [ Nat.find_eq_iff ]
-    simp_all only [not_lt, true_and]
-    intro n_1 a
-    exact le_trans ( hT_mono.monotone ( by linarith ) ) left_1
-  · -- By definition of $g$, we know that for each $k$, $g(n) = x_k$ for $n \in [T_k, T_{k+1})$.
-    apply limsup_le_of_block_sequence_bound
-    · exact hT_mono
-    · intro k n hn
-      congr! 1;
-      rw [ Nat.find_eq_iff ]
-      simp_all only [gt_iff_lt, one_div, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-        not_false_eq_true, NNReal.le_inv_iff_mul_le, ge_iff_le, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast,
-        ENNReal.coe_one, Set.mem_Ico, not_lt, true_and]
-      intro n_1 a
-      obtain ⟨left, right⟩ := hx
-      obtain ⟨left_1, right_1⟩ := hn
-      obtain ⟨left_2, right⟩ := right
-      obtain ⟨left_3, right⟩ := right
-      exact le_trans ( hT_mono.monotone ( by linarith ) ) left_1
-    · grind
+    rw [Nat.find_eq_iff]
+    exact ⟨hm.2, fun j hj => not_lt.mpr ((hT_mono.monotone hj).trans hm.1)⟩
+  · refine limsup_le_of_block_sequence_bound y₂ f₂ T hT_mono x _ ?_
+      fun k m hm => hN0 k m ((hT_bound k).trans hm.1)
+    intro k m hm
+    congr
+    rw [Nat.find_eq_iff]
+    exact ⟨hm.2, fun j hj => not_lt.mpr ((hT_mono.monotone hj).trans hm.1)⟩
 
 
 --PULLOUT.
@@ -495,30 +294,11 @@ theorem extracted_limsup_inequality (z : ℝ≥0∞) (hz : z ≠ ⊤) (y x : ℕ
     grw [← h_bn m hm, ← ENNReal.add_div, h_lem5 m]
   -- Since z is finite, we have lim z / n = 0.
   have h_z_div_n_zero : Filter.atTop.Tendsto (fun n : ℕ ↦ z / (n : ℝ≥0∞)) (𝓝 0) := by
-    rw [ENNReal.tendsto_nhds_zero]
-    intro ε hε
-    rw [gt_iff_lt, ENNReal.lt_iff_exists_real_btwn] at hε
-    rcases hε with ⟨ε', hε₁, hε₂⟩
-    rw [ENNReal.ofReal_pos] at hε₂
-    -- Since z is finite, we can choose k such that for all b ≥ k, z ≤ b * ε'.
-    obtain ⟨k, hk⟩ : ∃ k : ℕ, ∀ b ≥ k, z ≤ b * ENNReal.ofReal ε' := by
-      rcases ENNReal.lt_iff_exists_real_btwn.mp (show z < ⊤ by finiteness) with ⟨a, _, ha, _⟩
-      use ⌈a / ε'⌉₊
-      intro n hn
-      grw [ha.le, ← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (by positivity)]
-      gcongr
-      nlinarith [Nat.ceil_le.mp hn, mul_div_cancel₀ a hε₂.1.ne']
-    -- Since z ≤ b * ε' for all b ≥ k, dividing both sides by b (which is positive) gives z / b ≤ ε'.
-    rw [Filter.eventually_atTop]
-    use k + 1
-    intros b _
-    grw [ENNReal.div_le_iff_le_mul (by aesop) (by simp), hk b (by omega), mul_comm, hε₂.right.le]
+    simpa using ENNReal.Tendsto.const_div ENNReal.tendsto_nat_nhds_top (Or.inr hz)
   refine le_of_forall_pos_le_add fun ε hε ↦ ?_
   rcases Filter.eventually_atTop.mp (h_z_div_n_zero.eventually <| gt_mem_nhds hε) with ⟨m, hm⟩
-  apply sInf_le
-  use n + m
-  intro n hn
-  grw [h_le n (by omega), (hm n (by omega)).le]
+  refine sInf_le ⟨n + m, fun k hk => ?_⟩
+  grw [h_le k (by omega), (hm k (by omega)).le]
 
 --PULLOUT and PR
 open Filter in
@@ -539,9 +319,6 @@ theorem _root_.ENNReal.tendsto_sub_const_nhds_zero_iff {α : Type*} {l : Filter 
   · simp [tendsto_const_nhds]
   rw [ENNReal.tendsto_nhds_zero, limsup_le_iff']
   simp only [tsub_le_iff_left]
-  constructor
-  · intro h y hy
-    specialize h (y - a) (tsub_pos_of_lt hy)
-    rwa [add_comm, tsub_add_cancel_of_le hy.le] at h
-  · intro h ε hε
-    exact h (a + ε) (lt_add_right ha hε.ne')
+  refine ⟨fun h y hy => ?_, fun h ε hε => h (a + ε) (lt_add_right ha hε.ne')⟩
+  have h' := h (y - a) (tsub_pos_of_lt hy)
+  rwa [add_comm, tsub_add_cancel_of_le hy.le] at h'

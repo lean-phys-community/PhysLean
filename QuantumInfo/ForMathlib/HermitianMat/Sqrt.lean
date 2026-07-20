@@ -48,28 +48,19 @@ For a positive definite matrix A, A^{-1/2} * A * A^{-1/2} = I.
 -/
 lemma sqrt_inv_mul_self_mul_sqrt_inv_eq_one {A : HermitianMat d 𝕜} (hA : A.mat.PosDef) :
     A⁻¹.sqrt.mat * A.mat * A⁻¹.sqrt.mat = 1 := by
-  have h_inv_def : A⁻¹.sqrt.mat * A⁻¹.sqrt.mat = A⁻¹ := by
-    apply HermitianMat.sqrt_sq
-    rw [zero_le_iff]
-    exact hA.inv.posSemidef
-  have h_inv_comm : Commute A⁻¹.sqrt.mat A.mat := by
-    commutes
-  rw [h_inv_comm, mul_assoc, h_inv_def]
-  apply Matrix.mul_nonsing_inv
-  exact isUnit_iff_ne_zero.mpr hA.det_pos.ne'
+  have h_comm : Commute A⁻¹.sqrt.mat A.mat := by commutes
+  rw [h_comm, mul_assoc, sqrt_sq (zero_le_iff.mpr hA.inv.posSemidef)]
+  exact Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hA.det_pos.ne')
 
-theorem sqrt_nonneg (A : HermitianMat d 𝕜) : 0 ≤ A.sqrt := by
-  rw [sqrt, cfc_nonneg_iff]
-  intro; positivity
+theorem sqrt_nonneg (A : HermitianMat d 𝕜) : 0 ≤ A.sqrt :=
+  (HermitianMat.cfc_nonneg_iff _ _).mpr fun _ ↦ Real.sqrt_nonneg _
 
-theorem sqrt_pos (h : 0 < A) : 0 < A.sqrt := by
-  rw [sqrt]
-  apply cfc_pos_of_pos h (by intros; positivity) (by simp)
+theorem sqrt_pos (h : 0 < A) : 0 < A.sqrt :=
+  cfc_pos_of_pos h (fun _ hi ↦ Real.sqrt_pos.mpr hi) (by simp)
 
 theorem sqrt_posDef {A : HermitianMat d 𝕜} (hA : A.mat.PosDef) :
-    A.sqrt.mat.PosDef := by
-  rw [sqrt, cfc_posDef]
-  simp [hA.eigenvalues_pos]
+    A.sqrt.mat.PosDef :=
+  (cfc_posDef _ _).mpr fun i ↦ Real.sqrt_pos.mpr (hA.eigenvalues_pos i)
 
 open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `HermitianMat.sqrt` -/

@@ -58,14 +58,13 @@ omit [DecidableEq d] in
 @[simp]
 lemma bargmannInvariantThree_degenerate (ψ : Ket d) :
     bargmannInvariantThree ψ ψ ψ = 1 := by
-  unfold bargmannInvariantThree
-  simp [Braket.dot_self_eq_one]
+  simp [bargmannInvariantThree, Braket.dot_self_eq_one]
 
 omit [DecidableEq d] in
 /-- The geometric phase of three identical states is 0. -/
 lemma bargmannPhaseThree_degenerate (ψ : Ket d) :
     bargmannPhaseThree ψ ψ ψ = 0 := by
-  unfold bargmannPhaseThree; simp [Complex.arg_one]
+  simp [bargmannPhaseThree]
 
 /-! ## Conjugacy -/
 
@@ -73,11 +72,8 @@ omit [DecidableEq d] in
 /-- Reversing the cyclic order conjugates the invariant. -/
 lemma bargmannInvariantThree_reverse (ψ₁ ψ₂ ψ₃ : Ket d) :
     bargmannInvariantThree ψ₃ ψ₂ ψ₁ = starRingEnd ℂ (bargmannInvariantThree ψ₁ ψ₂ ψ₃) := by
-  unfold bargmannInvariantThree
-  conv_lhs =>
-    rw [Braket.dot_swap_conj ψ₂ ψ₃, Braket.dot_swap_conj ψ₁ ψ₂, Braket.dot_swap_conj ψ₃ ψ₁,
-        ← map_mul, ← map_mul]
-  congr 1; ring
+  simp only [bargmannInvariantThree, map_mul, ← Braket.dot_swap_conj]
+  ring
 
 omit [DecidableEq d] in
 /-- Reversing the cyclic order negates the geometric phase (mod 2π). -/
@@ -92,14 +88,13 @@ lemma bargmannPhaseThree_reverse (ψ₁ ψ₂ ψ₃ : Ket d) :
 omit [DecidableEq d] in
 /-- Cyclic permutation of the three states preserves the Bargmann invariant. -/
 lemma bargmannInvariantThree_cyclic (ψ₁ ψ₂ ψ₃ : Ket d) :
-    bargmannInvariantThree ψ₂ ψ₃ ψ₁ = bargmannInvariantThree ψ₁ ψ₂ ψ₃ := by
-  unfold bargmannInvariantThree; ring
+    bargmannInvariantThree ψ₂ ψ₃ ψ₁ = bargmannInvariantThree ψ₁ ψ₂ ψ₃ := (mul_rotate _ _ _).symm
 
 omit [DecidableEq d] in
 /-- Cyclic permutation preserves the geometric phase. -/
 lemma bargmannPhaseThree_cyclic (ψ₁ ψ₂ ψ₃ : Ket d) :
-    bargmannPhaseThree ψ₂ ψ₃ ψ₁ = bargmannPhaseThree ψ₁ ψ₂ ψ₃ := by
-  unfold bargmannPhaseThree; rw [bargmannInvariantThree_cyclic]
+    bargmannPhaseThree ψ₂ ψ₃ ψ₁ = bargmannPhaseThree ψ₁ ψ₂ ψ₃ :=
+  congrArg Complex.arg (bargmannInvariantThree_cyclic ψ₁ ψ₂ ψ₃)
 
 /-! ## Norm bounds -/
 
@@ -108,10 +103,7 @@ omit [DecidableEq d] in
     is bounded by Cauchy-Schwarz on unit vectors. -/
 lemma norm_bargmannInvariantThree_le_one (ψ₁ ψ₂ ψ₃ : Ket d) :
     ‖bargmannInvariantThree ψ₁ ψ₂ ψ₃‖ ≤ 1 := by
-  unfold bargmannInvariantThree
-  calc ‖〈ψ₁‖ψ₂〉 * 〈ψ₂‖ψ₃〉 * 〈ψ₃‖ψ₁〉‖
-      = ‖〈ψ₁‖ψ₂〉‖ * ‖〈ψ₂‖ψ₃〉‖ * ‖〈ψ₃‖ψ₁〉‖ := by rw [norm_mul, norm_mul]
-    _ ≤ 1 * 1 * 1 := by
-        gcongr <;> exact Braket.norm_dot_le_one _ _
-    _ = 1 := by ring
+  simp only [bargmannInvariantThree, norm_mul]
+  exact mul_le_one₀ (mul_le_one₀ (Braket.norm_dot_le_one _ _) (norm_nonneg _)
+    (Braket.norm_dot_le_one _ _)) (norm_nonneg _) (Braket.norm_dot_le_one _ _)
 

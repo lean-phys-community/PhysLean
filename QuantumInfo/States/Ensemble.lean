@@ -47,17 +47,8 @@ theorem toMEnsemble_mk : (toMEnsemble ⟨ps, distr⟩ : MEnsemble d α) = ⟨pur
 
 /-- A mixed-state ensemble comes from a pure-state ensemble if and only if all states are pure. -/
 theorem coe_PEnsemble_iff_pure_states (me : MEnsemble d α): (∃ pe : PEnsemble d α, ↑pe = me) ↔ (∃ ψ : α → Ket d, me.states = MState.pure ∘ ψ) := by
-  constructor
-  · intro ⟨pe, hpe⟩
-    use pe.states
-    ext1 i
-    subst hpe
-    rfl
-  · intro ⟨ψ, hψ⟩
-    use ⟨ψ, me.distr⟩
-    simp only [toMEnsemble_mk]
-    congr
-    exact hψ.symm
+  refine ⟨fun ⟨pe, hpe⟩ => ⟨pe.states, hpe ▸ rfl⟩,
+    fun ⟨ψ, hψ⟩ => ⟨⟨ψ, me.distr⟩, by rw [toMEnsemble_mk, ← hψ]⟩⟩
 
 /-- The resulting mixed state after mixing the states in an ensemble with their
 respective probability weights. Note that, generically, a single mixed state has infinitely many
@@ -82,9 +73,9 @@ theorem mix_congrMEnsemble_eq_mix (σ : α ≃ β) (e : MEnsemble d α) : mix (c
 /-- Equivalence of pure-state ensembles leaves the resulting mixed state invariant -/
 @[simp]
 theorem mix_congrPEnsemble_eq_mix (σ : α ≃ β) (e : PEnsemble d α) : mix (toMEnsemble (congrPEnsemble σ e)) = mix (↑e : MEnsemble d α) := by
-  unfold toMEnsemble congrPEnsemble mix
-  rw [ProbDistribution.map_congr_eq_congr_map MState.pure σ e]
-  exact ProbDistribution.expect_val_congr_eq_expect_val σ (MState.pure <$> e)
+  exact (congrArg ProbDistribution.expect_val
+    (ProbDistribution.map_congr_eq_congr_map MState.pure σ e)).trans
+    (ProbDistribution.expect_val_congr_eq_expect_val σ (MState.pure <$> e))
 
 /-- The average of a function `f : MState d → T`, where `T` is of `Mixable U T` instance, on a mixed-state ensemble `e`
 is the expectation value of `f` acting on the states of `e`, with the corresponding probability weights from `e.distr`. -/
@@ -152,74 +143,52 @@ theorem mix_pEnsemble_pure_average {e : PEnsemble d α} {T : Type _} {U : Type*}
     (hmix : mix (toMEnsemble e) = MState.pure ψ) :
   pure_average f e = f ψ := by
   have hpure := mix_pEnsemble_pure_iff_pure.mp hmix
-  -- Each state with nonzero probability is phase-equivalent to ψ
-  have hfeq : ∀ i, e.distr i ≠ 0 → f (e.var i) = f ψ := fun i hdi =>
-    hf _ _ ((MState.PhaseEquiv_iff_pure_eq _ _).mpr (hpure i hdi))
   simp only [pure_average, Functor.map, ProbDistribution.expect_val]
   apply Mixable.to_U_inj
   simp only [Mixable.to_U_of_mkT, Function.comp_apply]
-  have h1 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) ≠ 0 → e.var i = e.var i := fun _ _ _ => rfl
-  -- For nonzero summands, distr i ≠ 0 so f (e.var i) = f ψ
-  have h2 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • Mixable.to_U (f (e.var i)) = (e.distr i : ℝ) • Mixable.to_U (f ψ) := by
-    intro i _
-    by_cases hdi : e.distr i = 0
+  have h2 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • Mixable.to_U (f (e.var i))
+      = (e.distr i : ℝ) • Mixable.to_U (f ψ) := fun i _ => by
+    rcases eq_or_ne (e.distr i) 0 with hdi | hdi
     · simp [hdi]
-    · rw [hfeq i hdi]
+    · rw [hf _ _ ((MState.PhaseEquiv_iff_pure_eq _ _).mpr (hpure i hdi))]
   rw [Finset.sum_congr rfl h2, ← Finset.sum_smul, ProbDistribution.normalized, one_smul]
 
 theorem sum_prob_mul_eq_one_iff {ι : Type*} [Fintype ι] (p : ι → ℝ) (x : ι → ℝ)
     (hp : ∀ i, 0 ≤ p i) (hsum : ∑ i, p i = 1) (hx : ∀ i, x i ≤ 1) :
     (∑ i, p i * x i = 1) ↔ ∀ i, p i ≠ 0 → x i = 1 := by
-  constructor
-  · intro a i a_1
-    contrapose! a
-    have h : ∃ i, p i * x i < p i := by
-      use i
-      apply mul_lt_of_lt_one_right
-      · exact lt_of_le_of_ne' (hp i) a_1
-      · exact lt_of_le_of_ne (hx i) a
-    replace h : ∑ i, p i * x i < ∑ i, p i :=
-      Finset.sum_lt_sum (fun i _ ↦ by nlinarith [hp i, hx i]) (by simpa using h)
-    exact (h.trans_le (by simp [hsum])).ne
-  · intro a
-    rw [← hsum]
-    congr! with i
-    by_cases hi : p i = 0
-    · simp [hi]
-    · simp [a i hi]
+  nth_rewrite 1 [← hsum]
+  rw [Finset.sum_eq_sum_iff_of_le fun i _ => mul_le_of_le_one_right (hp i) (hx i)]
+  simp [mul_right_eq_self₀, or_iff_not_imp_right]
 
 theorem MState.exp_val_pure_eq_one_iff {d : Type*} [Fintype d] [DecidableEq d]
     (ρ : MState d) (ψ : Ket d) :
     ρ.exp_val (pure ψ) = 1 ↔ ρ = pure ψ := by
-  have hpure_inner_prob : ⟪MState.pure ψ, MState.pure ψ⟫_Prob = 1 :=
-    Subtype.ext (by rw [MState.pure_inner]; simp [Braket.dot_self_eq_one])
   have hpure_inner : ⟪(MState.pure ψ).M, (MState.pure ψ).M⟫ = 1 := by
-    simpa [MState.inner_def] using congrArg (fun p : Prob => (p : ℝ)) hpure_inner_prob
+    simpa [MState.inner_def] using congrArg (fun p : Prob => (p : ℝ))
+      (Subtype.ext (α := ℝ) (by simp [MState.pure_inner, Braket.dot_self_eq_one]) :
+        ⟪MState.pure ψ, MState.pure ψ⟫_Prob = 1)
   constructor
   · intro h
     have hρ_le : ⟪ρ.M, ρ.M⟫ ≤ 1 := by
-      have := HermitianMat.inner_le_mul_trace ρ.nonneg ρ.nonneg; simpa [ρ.tr]
+      simpa [ρ.tr] using HermitianMat.inner_le_mul_trace ρ.nonneg ρ.nonneg
     have hinner : ⟪ρ.M, (MState.pure ψ).M⟫ = 1 := by simpa [MState.exp_val] using h
-    have hsq : ⟪ρ.M - (MState.pure ψ).M, ρ.M - (MState.pure ψ).M⟫ =
-        ⟪ρ.M, ρ.M⟫ - 2 * ⟪ρ.M, (MState.pure ψ).M⟫ + ⟪(MState.pure ψ).M, (MState.pure ψ).M⟫ := by
-      simp only [HermitianMat.inner_def, IsMaximalSelfAdjoint.RCLike_selfadjMap, HermitianMat.mat_sub,
-        MState.mat_M, RCLike.re_to_complex]
-      simp [Matrix.mul_sub, Matrix.sub_mul, Matrix.trace_sub, Matrix.trace_mul_comm (ρ.m)]; ring
+    have hsq := real_inner_sub_sub_self ρ.M (MState.pure ψ).M
     exact MState.ext (eq_of_sub_eq_zero (inner_self_eq_zero.mp (le_antisymm
-      (by rw [hsq]; linarith) (ρ.M - (MState.pure ψ).M).inner_self_nonneg)))
-  · rintro rfl; simpa [MState.exp_val] using hpure_inner
+      (hsq.trans_le (by linarith)) (ρ.M - (MState.pure ψ).M).inner_self_nonneg)))
+  · rintro rfl
+    simpa [MState.exp_val] using hpure_inner
 
 set_option backward.isDefEq.respectTransparency false in
 theorem mix_mEnsemble_pure_iff_pure {e : MEnsemble d α} :
     mix e = pure ψ ↔ ∀ i : α, e.distr i ≠ 0 → e.states i = MState.pure ψ := by
-  have h : (mix e).exp_val ↑(MState.pure ψ) = ∑ i, ↑(e.distr i) * (e.states i).exp_val ↑(MState.pure ψ) := by
+  have h : (mix e).exp_val ↑(MState.pure ψ)
+      = ∑ i, ↑(e.distr i) * (e.states i).exp_val ↑(MState.pure ψ) := by
     simp [MState.exp_val, HermitianMat.inner_def, Finset.sum_mul]
   rw [← MState.exp_val_pure_eq_one_iff, h, sum_prob_mul_eq_one_iff]
   · simp only [MState.exp_val_pure_eq_one_iff, ne_eq, Set.Icc.coe_eq_zero]
-  · exact fun i => ( e.distr i ).2.1;
+  · exact fun i => (e.distr i).2.1
   · simp
-  · intro i
-    apply (e.states i).exp_val_le_one (MState.le_one _)
+  · exact fun i => (e.states i).exp_val_le_one (MState.le_one _)
 
 /-- The average of `f : MState d → T` on an ensemble that mixes to a pure state `ψ` is `f (pure ψ)` -/
 theorem mix_mEnsemble_pure_average {e : MEnsemble d α} {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (hmix : mix e = pure ψ) :
@@ -227,28 +196,13 @@ theorem mix_mEnsemble_pure_average {e : MEnsemble d α} {T : Type _} {U : Type*}
   have hpure := mix_mEnsemble_pure_iff_pure.mp hmix
   simp only [average, Functor.map, ProbDistribution.expect_val]
   apply Mixable.to_U_inj
-  rw [MEnsemble.states] at hpure
   simp only [Mixable.to_U_of_mkT, Function.comp_apply]
-  have h1 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) ≠ 0 → e.var i = pure ψ := fun i hi ↦ by
-    have h2 : e.distr i = 0 → (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) = 0 := fun h0 ↦ by
-      simp only [h0, Prob.coe_zero, zero_smul]
-    exact (hpure i) ∘ h2.mt
-  classical rw [←Finset.sum_filter_of_ne h1, Finset.sum_filter]
-  classical conv =>
-    enter [1, 2, a]
-    rw [←dite_eq_ite]
-    enter [2, hvar]
-    rw [hvar]
-  classical conv =>
-    enter [1, 2, a]
-    rw [dite_eq_ite]
-    rw [←ite_zero_smul]
-  have hpure' : ∀ i ∈ Finset.univ, (↑(e.distr i) : ℝ) ≠ 0 → e.var i = pure ψ := fun i hi hne0 ↦ by
-    apply hpure i
-    simp_all only [ne_eq, Finset.mem_univ, smul_eq_zero, Set.Icc.coe_eq_zero, not_or, and_imp,
-      forall_const]
-    exact hne0
-  classical rw [← Finset.sum_smul, ← Finset.sum_filter, Finset.sum_filter_of_ne hpure', ProbDistribution.normalized, one_smul]
+  have h2 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • Mixable.to_U (f (e.var i))
+      = (e.distr i : ℝ) • Mixable.to_U (f (pure ψ)) := fun i _ => by
+    rcases eq_or_ne (e.distr i) 0 with hdi | hdi
+    · simp [hdi]
+    · rw [show e.var i = MState.pure ψ from hpure i hdi]
+  rw [Finset.sum_congr rfl h2, ← Finset.sum_smul, ProbDistribution.normalized, one_smul]
 
 /-- The trivial mixed-state ensemble of `ρ` consists of copies of `rho`, with the `i`-th one having
 probability 1. -/
@@ -257,16 +211,14 @@ def trivial_mEnsemble (ρ : MState d) (i : α) : MEnsemble d α := ⟨fun _ ↦ 
 /-- The trivial mixed-state ensemble of `ρ` mixes to `ρ` -/
 theorem trivial_mEnsemble_mix (ρ : MState d) : ∀ i : α, mix (trivial_mEnsemble ρ i) = ρ := fun i ↦by
   apply MState.ext_m
-  classical simp only [trivial_mEnsemble, ProbDistribution.constant, mix_of, DFunLike.coe, apply_ite,
-    Prob.coe_one, Prob.coe_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq,
-    Finset.mem_univ, ↓reduceIte]
+  classical simp [trivial_mEnsemble, ProbDistribution.constant, DFunLike.coe, apply_ite]
 
 /-- The average of `f : MState d → T` on a trivial ensemble of `ρ` is `f ρ`-/
 theorem trivial_mEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (ρ : MState d):
   ∀ i : α, average f (trivial_mEnsemble ρ i) = f ρ := fun i ↦ by
-    simp only [average, Functor.map, ProbDistribution.expect_val, trivial_mEnsemble]
     apply Mixable.to_U_inj
-    classical simp [apply_ite]
+    classical simp [average, Functor.map, ProbDistribution.expect_val, trivial_mEnsemble,
+      apply_ite]
 
 instance MEnsemble.instInhabited [Nonempty d] [Inhabited α] : Inhabited (MEnsemble d α) where
   default := trivial_mEnsemble default default
@@ -280,17 +232,16 @@ variable (ψ : Ket d)
 /-- The trivial pure-state ensemble of `ψ` mixes to `ψ` -/
 theorem trivial_pEnsemble_mix : ∀ i : α, mix (toMEnsemble (trivial_pEnsemble ψ i)) = MState.pure ψ := fun i ↦ by
   apply MState.ext_m
-  classical simp only [trivial_pEnsemble, ProbDistribution.constant, toMEnsemble_mk, mix_of, DFunLike.coe,
-    apply_ite, Prob.coe_one, Prob.coe_zero, MEnsemble.states, Function.comp_apply, ite_smul,
-    one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+  classical simp [trivial_pEnsemble, ProbDistribution.constant, DFunLike.coe, apply_ite,
+    MEnsemble.states]
 
 omit [DecidableEq d] in
 /-- The average of `f : Ket d → T` on a trivial ensemble of `ψ` is `f ψ`-/
 theorem trivial_pEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) :
   ∀ i : α, pure_average f (trivial_pEnsemble ψ i) = f ψ := fun i ↦ by
-    simp only [pure_average, Functor.map, ProbDistribution.expect_val, trivial_pEnsemble]
     apply Mixable.to_U_inj
-    classical simp [apply_ite]
+    classical simp [pure_average, Functor.map, ProbDistribution.expect_val, trivial_pEnsemble,
+      apply_ite]
 
 instance PEnsemble.instInhabited [Nonempty d] [Inhabited α] : Inhabited (PEnsemble d α) where
   default := trivial_pEnsemble default default
@@ -300,11 +251,7 @@ def spectral_ensemble (ρ : MState d) : PEnsemble d d where
   var i :=
     { vec := ρ.Hermitian.eigenvectorBasis i
       normalized' := by
-        rw [←one_pow 2, ←ρ.Hermitian.eigenvectorBasis.orthonormal.1 i]
-        have hnonneg : 0 ≤ ∑ x : d, Complex.normSq (ρ.Hermitian.eigenvectorBasis i x) := by
-          simp_rw [Complex.normSq_eq_norm_sq]
-          positivity
-        simp only [← Complex.normSq_eq_norm_sq, EuclideanSpace.norm_eq, Real.sq_sqrt hnonneg]
+        rw [← EuclideanSpace.norm_sq_eq, ρ.Hermitian.eigenvectorBasis.orthonormal.1 i, one_pow]
     }
   distr := ρ.spectrum
 
@@ -314,21 +261,14 @@ theorem spectral_decomposition_sum {d 𝕜 : Type*} [Fintype d] [DecidableEq d] 
     A = ∑ i, (hA.eigenvalues i) • (Matrix.vecMulVec (hA.eigenvectorBasis i) (star (hA.eigenvectorBasis i))) := by
   nth_rw 1 [hA.spectral_theorem]
   ext
-  simp only [Matrix.sum_apply]
-  simp only [Unitary.conjStarAlgAut_apply, mul_assoc]
-  simp only [Matrix.mul_apply, Matrix.IsHermitian.eigenvectorUnitary_apply, Matrix.diagonal_apply,
-    Function.comp_apply, Matrix.star_apply, RCLike.star_def, mul_comm, mul_ite, zero_mul,
-    Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Matrix.vecMulVec, Pi.star_apply,
-    Matrix.smul_apply, Matrix.of_apply, Algebra.smul_def]
-  simp_rw [mul_assoc]
+  simp only [Matrix.sum_apply, Unitary.conjStarAlgAut_apply, mul_assoc]
+  simp [Matrix.mul_apply, Matrix.IsHermitian.eigenvectorUnitary_apply, Matrix.diagonal_apply,
+    Matrix.vecMulVec, Algebra.smul_def, mul_comm, mul_assoc, mul_ite]
 
 /-- The spectral pure-state ensemble of `ρ` mixes to `ρ` -/
 theorem spectral_ensemble_mix {ρ : MState d} : mix (↑(spectral_ensemble ρ) : MEnsemble d d) = ρ := by
-  ext i j
-  convert rfl;
-  convert rfl;
-  apply MState.ext_m;
-  convert Ensemble.mix_of _
-  convert! (spectral_decomposition_sum ρ.Hermitian) using 1
+  apply MState.ext_m
+  rw [mix_of]
+  exact (spectral_decomposition_sum ρ.Hermitian).symm
 
 end Ensemble

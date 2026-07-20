@@ -125,15 +125,9 @@ theorem sandwichedTraceFunctional_conj_unitary_hermitian
     let γ := (1 - α) / (2 * α)
     ((A.conj U.val).conj ((B.conj U.val) ^ γ).mat ^ α).trace =
       ((A.conj (B ^ γ).mat) ^ α).trace := by
-  have h_conj_conj : ∀ (A B : HermitianMat d ℂ) (U : Matrix.unitaryGroup d ℂ),
-      (conj U.val A).conj ((conj U.val B).mat) = conj U.val (A.conj B.mat) := by
-    intros A B U
-    simp [conj]
-    have h_unitary : ∀ (U : Matrix.unitaryGroup d ℂ), U.val * U.val.conjTranspose = 1 := by
-      exact fun U => U.2.2
-    simp [← mul_assoc]
-    have := h_unitary U; simp_all [Matrix.mul_assoc, mul_eq_one_comm.mp this]
-  simp_all [conj_apply_mat, rpow_conj_unitary]
+  intro γ
+  rw [rpow_conj_unitary, conj_apply_mat, conj_conj, mul_assoc, mul_assoc]
+  simp [← Matrix.star_eq_conjTranspose, ← conj_conj, rpow_conj_unitary, trace_conj_unitary]
 
 /-- The trace functional is invariant under joint unitary conjugation of MStates. -/
 theorem sandwichedTraceFunctional_conj_unitary_MState
@@ -195,14 +189,10 @@ support projection leaves B unchanged.
 -/
 private lemma conj_supportProj_eq_of_ker_le (A B : HermitianMat d ℂ) (hker : A.ker ≤ B.ker) :
     B.conj (A.supportProj).mat = B := by
-  ext i j
-  simp [*, conj]
-  suffices h_conj : A.supportProj.mat * B.mat * A.supportProj.mat = B.mat by
-    exact congr($h_conj i j)
-  have h_unitary := mul_supportProj_of_ker_le hker
-  apply_fun Matrix.conjTranspose at h_unitary ⊢
-  · simp_all only [Matrix.conjTranspose_mul, conjTranspose_mat]
-  · exact Matrix.conjTranspose_injective
+  ext1
+  have h' := congrArg Matrix.conjTranspose (mul_supportProj_of_ker_le hker)
+  simp only [Matrix.conjTranspose_mul, conjTranspose_mat] at h'
+  simp [h', mul_supportProj_of_ker_le hker]
 
 /--
 The kernel of σ is contained in the kernel of (ρ.conj (σ^γ))^{α-1} when γ ≠ 0 and α > 1.
@@ -221,13 +211,11 @@ theorem H_hat_conj_sigma (hα : 1 < α) (ρ σ : MState d) :
     let γ := (1 - α) / (2 * α)
     (H_hat α ρ σ).conj (σ.M ^ (-γ)).mat = (ρ.M.conj (σ.M ^ γ).mat) ^ (α - 1) := by
   intro γ
-  have hγ : γ ≠ 0 := by
-    simp only [γ]; rw [div_ne_zero_iff]; exact ⟨by linarith, by linarith⟩
+  have hγ : γ ≠ 0 := div_ne_zero (sub_ne_zero_of_ne hα.ne) (ne_of_gt (by linarith))
   have hα1 : α - 1 ≠ 0 := by linarith
   show (((ρ.M.conj (σ.M ^ γ).mat) ^ (α - 1)).conj (σ.M ^ γ).mat).conj (σ.M ^ (-γ)).mat =
     (ρ.M.conj (σ.M ^ γ).mat) ^ (α - 1)
-  rw [conj_conj]
-  rw [rpow_neg_mul_rpow_eq_supportProj σ.nonneg hγ]
+  rw [conj_conj, rpow_neg_mul_rpow_eq_supportProj σ.nonneg hγ]
   exact conj_supportProj_eq_of_ker_le σ.M _ (ker_sigma_le_ker_conj_rpow ρ σ hγ hα1)
 
 
@@ -238,27 +226,16 @@ By cyclicity of trace: Tr[ρ · σ^γ · (σ^γ ρ σ^γ)^{α−1} · σ^γ] = T
 theorem inner_rho_H_hat (hα : 1 < α) (ρ σ : MState d) :
     let γ := (1 - α) / (2 * α)
     ⟪ρ.M, H_hat α ρ σ⟫_ℝ = ((ρ.M.conj (σ.M ^ γ).mat) ^ α).trace := by
-  unfold H_hat; simp [inner_def]
-  have h_cyclic : (ρ.m * (σ.M ^ ((1 - α) / (2 * α))).mat *
-      ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ (α - 1)).mat *
-      (σ.M ^ ((1 - α) / (2 * α))).mat).trace =
-      ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace := by
-    have h_cyclic : (ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat).mat *
-        ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ (α - 1)).mat =
-        ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).mat := by
-      have := @mat_rpow_add
-      specialize this (show 0 ≤ conj (σ.M ^ ((1 - α) / (2 * α))).mat ρ.M from ?_)
-        (show (1 : ℝ) + (α - 1) ≠ 0 from by linarith)
-      · positivity
-      · aesop
-    convert congr_arg Matrix.trace h_cyclic using 1
-    · rw [← Matrix.trace_mul_comm]; simp [Matrix.mul_assoc]
-    · simp [trace]
-      norm_num [Matrix.trace]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      convert Complex.ofReal_re (((conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α) i i).re
-      simp [Complex.ext_iff]
-  simp_all [← Matrix.mul_assoc]
+  intro γ
+  simp only [show γ = (1 - α) / (2 * α) from rfl]
+  have hmul := mat_rpow_add (A := ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) (by positivity)
+    (p := 1) (q := α - 1) (by linarith)
+  simp only [rpow_one, show (1 : ℝ) + (α - 1) = α by ring] at hmul
+  rw [inner_eq_re_trace, trace_eq_re_trace, H_hat, hmul]
+  congr 1
+  simp only [conj_apply_mat, conjTranspose_mat, ← Matrix.mul_assoc]
+  rw [Matrix.trace_mul_cycle]
+  simp [Matrix.mul_assoc]
 
 /-
 **Step 1b**: Evaluating `f_α` at the optimizer `H_hat` gives `Q̃_α(ρ‖σ)`.
@@ -267,8 +244,8 @@ Proof: f_α(H_hat, ρ, σ) = α · Tr[(σ^γ ρ σ^γ)^α] - (α-1) · Tr[(σ^γ
 -/
 theorem f_alpha_at_optimizer (hα : 1 < α) (ρ σ : MState d) :
     f_alpha α (H_hat α ρ σ) ρ σ = Q̃_ α(ρ‖σ) := by
-  have h_inner : ⟪ρ.M, H_hat α ρ σ⟫_ℝ = ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace := by
-    exact inner_rho_H_hat hα ρ σ
+  have h_inner : ⟪ρ.M, H_hat α ρ σ⟫_ℝ =
+      ((ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace := inner_rho_H_hat hα ρ σ
   have h_conj : (H_hat α ρ σ).conj (σ.M ^ ((α - 1) / (2 * α))).mat =
       (ρ.M.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ^ (α - 1) := by
     convert H_hat_conj_sigma (hα := hα) (ρ := ρ) (σ := σ) using 1
@@ -277,8 +254,7 @@ theorem f_alpha_at_optimizer (hα : 1 < α) (ρ σ : MState d) :
   simp_all [sub_div]
   rw [← rpow_mul]; norm_num [show α ≠ 0 by positivity, show α - 1 ≠ 0 by linarith]
   · rw [mul_div_cancel₀ _ (by linarith)]; ring
-  · apply_rules [conj_nonneg]
-    exact ρ.nonneg
+  · exact conj_nonneg _ ρ.nonneg
 
 /--
 For PSD `A` and `γ ≠ 0`, the product `A^γ * A^{-γ}` equals the support projection
@@ -287,15 +263,7 @@ of `A`. This is because `x^γ * x^{-γ} = if x = 0 then 0 else 1` for `x ≥ 0`.
 lemma rpow_mul_neg_rpow_eq_supportProj {A : HermitianMat d ℂ}
     (hA : 0 ≤ A) (γ : ℝ) (hγ : γ ≠ 0) :
     (A ^ γ).mat * (A ^ (-γ)).mat = A.supportProj.mat := by
-  rw [supportProj_eq_cfc]
-  rw [rpow_eq_cfc, rpow_eq_cfc]
-  rw [← mat_cfc_mul_apply]
-  refine congr_arg _ (cfc_congr_of_nonneg hA ?_)
-  intro x (hx : 0 ≤ x)
-  rcases eq_or_ne x 0 with hx' | hx'
-  · simp [hx', hγ]
-  · simp [hx', Real.rpow_neg hx]
-    exact mul_inv_cancel₀ (by positivity)
+  simpa using rpow_neg_mul_rpow_eq_supportProj hA (neg_ne_zero.mpr hγ)
 
 /--
 The support projection of `A` acts as identity on `B` when `A.ker ≤ B.ker`.
@@ -305,52 +273,8 @@ the projection preserves `B`.
 lemma supportProj_mul_of_ker_le {A B : HermitianMat d ℂ}
     (hker : A.ker ≤ B.ker) :
     A.supportProj.mat * B.mat = B.mat := by
-  contrapose! hker
-  simp_all [SetLike.le_def]
-  -- Since $B$ is not in the kernel of $A$, there exists some $x \in \ker(A)$ such that $Bx \neq 0$.
-  obtain ⟨x, hx⟩ : ∃ x : EuclideanSpace ℂ d, A.mat *ᵥ x = 0 ∧ B.mat *ᵥ x ≠ 0 := by
-    contrapose! hker
-    have h_support : ∀ x : EuclideanSpace ℂ d, B.mat *ᵥ x = B.mat *ᵥ (A.supportProj.mat *ᵥ x) := by
-      intro x
-      have h_support : x.ofLp = A.supportProj.mat *ᵥ x.ofLp + A.kerProj.mat *ᵥ x.ofLp := by
-        have h_support : A.supportProj.mat + A.kerProj.mat = 1 := by
-          simp [add_comm]
-          simp [← Matrix.ext_iff]
-          intro i j; exact (by
-          have h_support : A.kerProj + A.supportProj = 1 := by
-            exact kerProj_add_supportProj A
-          convert! congr_arg (fun f => f i j) h_support using 1)
-        rw [← Matrix.add_mulVec, h_support, Matrix.one_mulVec]
-      have hsup : B.mat *ᵥ (A.kerProj.mat *ᵥ x.ofLp) = 0 := by
-        convert hker _ _
-        have h_support : A.mat * A.kerProj.mat = 0 := by
-          have h_support : A.mat * A.kerProj.mat = A.mat * (1 - A.supportProj.mat) := by
-            congr
-            have h_support : A.kerProj + A.supportProj = 1 := by
-              exact kerProj_add_supportProj A
-            exact eq_sub_of_add_eq <| congr_arg Subtype.val h_support
-          rw [h_support, mul_sub, mul_one, sub_eq_zero]
-          exact Eq.symm (mul_supportProj_of_ker_le fun ⦃x⦄ a => a)
-        convert congr_arg (fun m => m *ᵥ x.ofLp) h_support using 1
-        · simp
-        · simp
-      convert congr_arg (fun y => B.mat *ᵥ y) h_support using 1
-      simp [Matrix.mulVec_add, hsup]
-    have h_support : B.mat = B.mat * A.supportProj.mat := by
-      ext i j
-      convert congr_fun (h_support (EuclideanSpace.single j 1)) i using 1
-      · simp [Matrix.mulVec, dotProduct]
-      · simp [Matrix.mulVec, dotProduct]
-        rfl
-    have h_support : B.mat = B.mat.conjTranspose := by
-      exact B.2.symm
-    have h_support : (B.mat * A.supportProj.mat).conjTranspose = A.supportProj.mat * B.mat := by
-      simp [Matrix.conjTranspose_mul]
-    lia
-  refine ⟨x, ?_, ?_⟩
-  · simpa [ker, lin, funext_iff, Matrix.toLpLin] using hx.1
-  · rw [mem_ker_iff_mulVec_zero]
-    exact hx.right
+  simpa [Matrix.conjTranspose_mul] using
+    congrArg Matrix.conjTranspose (mul_supportProj_of_ker_le hker)
 
 /--
 Under the support condition `σ.M.ker ≤ ρ.M.ker` (i.e., supp(ρ) ⊆ supp(σ)),
@@ -361,26 +285,17 @@ ensures `ρ` is supported on `supp(σ)`, where `σ^γ σ^{-γ}` acts as the iden
 lemma inner_eq_inner_conj_of_ker_le (ρ σ : MState d)
     (H : HermitianMat d ℂ) (hker : σ.M.ker ≤ ρ.M.ker) (γ : ℝ) (hγ : γ ≠ 0) :
     ⟪ρ.M, H⟫_ℝ = ⟪ρ.M.conj (σ.M ^ γ).mat, H.conj (σ.M ^ (-γ)).mat⟫_ℝ := by
-  -- Since σ^γ σ^-γ acts as the identity on the support of ρ, we can simplify
-  have h_support :
-      (σ.M ^ γ).mat * (σ.M ^ (-γ)).mat = σ.M.supportProj.mat ∧
-      (σ.M ^ (-γ)).mat * (σ.M ^ γ).mat = σ.M.supportProj.mat :=
-    ⟨rpow_mul_neg_rpow_eq_supportProj σ.nonneg γ hγ,
-     by simpa using rpow_mul_neg_rpow_eq_supportProj σ.nonneg (-γ) (neg_ne_zero.mpr hγ)⟩
-  simp only [inner_def, conj_apply_mat]
-  have h_support :
-      σ.M.supportProj.mat * ρ.M.mat = ρ.M.mat ∧
-      ρ.M.mat * σ.M.supportProj.mat = ρ.M.mat := by
-    exact ⟨supportProj_mul_of_ker_le hker, mul_supportProj_of_ker_le hker⟩
-  have h_trace_cyclic :
-      Matrix.trace ((σ.M ^ γ).mat * ρ.M.mat * (σ.M ^ γ).mat *
-        (σ.M ^ (-γ)).mat * H.mat * (σ.M ^ (-γ)).mat) =
-      Matrix.trace ((σ.M ^ (-γ)).mat * (σ.M ^ γ).mat * ρ.M.mat *
-        (σ.M ^ γ).mat * (σ.M ^ (-γ)).mat * H.mat) := by
-    rw [← Matrix.trace_mul_comm]
-    simp [Matrix.mul_assoc]
-  simp_all [mul_assoc, Matrix.trace_mul_comm ((σ.M ^ γ).mat)]
-  simp_all [← mul_assoc]
+  have h2 : (σ.M ^ (-γ)).mat * (σ.M ^ γ).mat = σ.M.supportProj.mat := by
+    simpa using rpow_mul_neg_rpow_eq_supportProj σ.nonneg (-γ) (neg_ne_zero.mpr hγ)
+  simp only [inner_eq_re_trace, conj_apply_mat, conjTranspose_mat]
+  congr 1
+  rw [Matrix.trace_mul_cycle]
+  simp only [← Matrix.mul_assoc]
+  rw [Matrix.mul_assoc _ (σ.M ^ (-γ)).mat (σ.M ^ γ).mat, h2,
+    Matrix.mul_assoc _ _ ρ.M.mat, supportProj_mul_of_ker_le hker,
+    Matrix.trace_mul_cycle, ← Matrix.mul_assoc,
+    rpow_mul_neg_rpow_eq_supportProj σ.nonneg γ hγ,
+    Matrix.trace_mul_cycle, mul_supportProj_of_ker_le hker]
 
 /-- **Step 1c**: `H_hat` is a maximizer: for all `H ≥ 0`, `f_α(H) ≤ f_α(H_hat)`.
 This uses the trace Young inequality: for PSD `A, B` and conjugate exponents `p, q > 1`,
@@ -396,11 +311,8 @@ theorem f_alpha_le_at_optimizer (hα : 1 < α) (ρ σ : MState d)
     f_alpha α H ρ σ ≤ f_alpha α (H_hat α ρ σ) ρ σ := by
   rw [f_alpha_at_optimizer hα]
   -- Goal: f_alpha α H ρ σ ≤ Q̃_α(ρ‖σ)
-  set γ : ℝ := (1 - α) / (2 * α) with hγ_def
-  have hγ : γ ≠ 0 := by
-    intro h; have h1 : (1 - α) / (2 * α) = 0 := hγ_def ▸ h
-    have h2 : (2 : ℝ) * α ≠ 0 := by positivity
-    rw [div_eq_zero_iff] at h1; rcases h1 with h1 | h1 <;> linarith
+  set γ : ℝ := (1 - α) / (2 * α)
+  have hγ : γ ≠ 0 := div_ne_zero (sub_ne_zero_of_ne hα.ne) (ne_of_gt (by linarith))
   set A := ρ.M.conj (σ.M ^ γ).mat
   set B := H.conj (σ.M ^ (-γ)).mat
   have hA_nn : 0 ≤ A := conj_nonneg _ ρ.nonneg
@@ -411,19 +323,11 @@ theorem f_alpha_le_at_optimizer (hα : 1 < α) (ρ σ : MState d)
   have h_young := trace_young A B hA_nn hB_nn α (α / (α - 1)) hα hpq
   have hα_pos : (0 : ℝ) < α := by linarith
   have hαm1_pos : (0 : ℝ) < α - 1 := by linarith
-  -- Multiply h_young by α and simplify
-  have h_scaled : α * ⟪A, B⟫_ℝ ≤
-      (A ^ α).trace + (α - 1) * (B ^ (α / (α - 1))).trace := by
-    have := mul_le_mul_of_nonneg_left h_young hα_pos.le
-    have h_simp : α * ((A ^ α).trace / α + (B ^ (α / (α - 1))).trace / (α / (α - 1))) =
-        (A ^ α).trace + (α - 1) * (B ^ (α / (α - 1))).trace := by
-      field_simp
-    linarith
-  -- Goal is definitionally: α * ⟪ρ.M, H⟫ - (α-1) * (B ^ (α/(α-1))).trace ≤ (A ^ α).trace
-  -- which follows from h_scaled and h_inner
   change α * ⟪ρ.M, H⟫_ℝ - (α - 1) * (B ^ (α / (α - 1))).trace ≤ (A ^ α).trace
-  have h_inner_scaled : α * ⟪ρ.M, H⟫_ℝ = α * ⟪A, B⟫_ℝ := by rw [h_inner]
-  linarith [h_scaled, h_inner_scaled]
+  rw [h_inner]
+  have h_simp : α * ((A ^ α).trace / α + (B ^ (α / (α - 1))).trace / (α / (α - 1))) =
+      (A ^ α).trace + (α - 1) * (B ^ (α / (α - 1))).trace := by field_simp
+  nlinarith [mul_le_mul_of_nonneg_left h_young hα_pos.le]
 
 /--
 **Step 1 (Variational formula)**: For `α > 1`, the trace functional equals the
@@ -470,18 +374,12 @@ theorem f_alpha_convex_in_sigma (hα : 1 < α) (H : HermitianMat d ℂ) (hH : 0 
   simp_rw [hf_eq]
   -- Reduce to concavity: ∑ w_i * F(σ_i.M) ≤ F(σ_mix.M)
   suffices h : ∑ i, w i * F (σs i).M ≤ F σ_mix.M by
-    have h1 : ∑ i, w i * ((α - 1) * F (σs i).M) = (α - 1) * ∑ i, w i * F (σs i).M := by
-      rw [Finset.mul_sum]; congr 1; ext i; ring
-    simp only [mul_sub, Finset.sum_sub_distrib, ← Finset.sum_mul, hw_sum, one_mul, h1]
-    linarith [mul_le_mul_of_nonneg_left h (le_of_lt hα_pos)]
-  -- Apply ConcaveOn.le_map_sum from trace_conj_rpow_concave
-  have hF_concave : ConcaveOn ℝ {σ : HermitianMat d ℂ | 0 ≤ σ} F :=
-    trace_conj_rpow_concave hα H hH
-  have h_jensen := hF_concave.le_map_sum
+    simp only [mul_sub, Finset.sum_sub_distrib, ← Finset.sum_mul, hw_sum, one_mul,
+      mul_left_comm _ (α - 1), ← Finset.mul_sum]
+    linarith [mul_le_mul_of_nonneg_left h hα_pos.le]
+  have h_jensen := (trace_conj_rpow_concave hα H hH).le_map_sum
     (t := Finset.univ) (w := w) (p := fun i => (σs i).M)
-    (fun i _ => hw_nonneg i)
-    (by simp [hw_sum])
-    (fun i _ => (σs i).nonneg)
+    (fun i _ => hw_nonneg i) (by simp [hw_sum]) (fun i _ => (σs i).nonneg)
   rw [← hσ_mix] at h_jensen
   convert! h_jensen using 1
 
@@ -498,16 +396,11 @@ theorem f_alpha_jointly_convex (hα : 1 < α) (H : HermitianMat d ℂ) (hH : 0 �
     (hρ_mix : ρ_mix.M = ∑ i, w i • (ρs i).M)
     (hσ_mix : σ_mix.M = ∑ i, w i • (σs i).M) :
     f_alpha α H ρ_mix σ_mix ≤ ∑ i, w i * f_alpha α H (ρs i) (σs i) := by
-  convert f_alpha_convex_in_sigma hα H hH ρ_mix _ _ _ _ using 1
-  any_goals assumption
-  constructor <;> intro h
-  · exact fun σ_mix hσ_mix =>
-    f_alpha_convex_in_sigma hα H hH ρ_mix w hw_nonneg hw_sum σs σ_mix hσ_mix
-  · apply (h σ_mix hσ_mix).trans
-    unfold f_alpha
-    simp [hρ_mix]
-    simp [sum_inner, inner_smul_left, mul_sub, sub_mul, mul_comm, mul_left_comm, Finset.mul_sum]
-    simp [← Finset.mul_sum, ← Finset.sum_mul, hw_sum]
+  refine (f_alpha_convex_in_sigma hα H hH ρ_mix w hw_nonneg hw_sum σs σ_mix hσ_mix).trans ?_
+  unfold f_alpha
+  simp [hρ_mix]
+  simp [sum_inner, inner_smul_left, mul_sub, sub_mul, mul_comm, mul_left_comm, Finset.mul_sum]
+  simp [← Finset.mul_sum, ← Finset.sum_mul, hw_sum]
 
 /-
 The range of `H ↦ f_alpha α H ρ σ` over PSD `H` is bounded above.
@@ -533,12 +426,9 @@ theorem iSup_f_alpha_jointly_convex (hα : 1 < α)
     (hker : ∀ i, (σs i).M.ker ≤ (ρs i).M.ker) :
     (⨆ (H : {H : HermitianMat d ℂ // 0 ≤ H}), f_alpha α H.1 ρ_mix σ_mix) ≤
       ∑ i, w i * (⨆ (H : {H : HermitianMat d ℂ // 0 ≤ H}), f_alpha α H.1 (ρs i) (σs i)) := by
-  apply ciSup_le
-  intro H
-  have h_sum : f_alpha α H.1 ρ_mix σ_mix ≤ ∑ i, w i * (f_alpha α H.1 (ρs i) (σs i)) := by
-    apply f_alpha_jointly_convex hα H.1 H.2 w hw_nonneg hw_sum ρs σs ρ_mix σ_mix hρ_mix hσ_mix
-  exact h_sum.trans (Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_left
-    (le_ciSup (f_alpha_bddAbove hα (ρs i) (σs i) (hker i)) H) (hw_nonneg i))
+  refine ciSup_le fun H => (f_alpha_jointly_convex hα H.1 H.2 w hw_nonneg hw_sum ρs σs ρ_mix
+    σ_mix hρ_mix hσ_mix).trans (Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_left
+      (le_ciSup (f_alpha_bddAbove hα (ρs i) (σs i) (hker i)) H) (hw_nonneg i))
 
 /-- If for all i, ker(σs i) ≤ ker(ρs i), then ker(∑ w i • σs i) ≤ ker(∑ w i • ρs i),
 provided all weights are nonneg and all matrices are PSD. -/
@@ -597,15 +487,10 @@ A diagonal matrix with ±1 entries (determined by a Bool function) is unitary.
 -/
 private lemma signDiag_mem_unitaryGroup (f : dB → Bool) :
     Matrix.diagonal (fun i : dB => (if f i then (-1 : ℂ) else 1)) ∈ Matrix.unitaryGroup dB ℂ := by
-  constructor
-  · ext i j; by_cases hi : i = j <;> simp [hi]
-    · split_ifs <;> simp [*, Matrix.one_apply]
-    · rw [Matrix.diagonal_apply_ne _ (.symm hi)]
-      simp
-  · ext i j; by_cases hi : i = j <;> simp [hi]
-    · split_ifs <;> simp [*, Matrix.one_apply]
-    · rw [Matrix.diagonal_apply_ne _ (.symm hi)]
-      simp
+  rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
+    Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+  congr with i
+  split_ifs <;> simp_all
 
 /-- The product of a ±1 diagonal matrix and a permutation matrix is unitary. -/
 private lemma twirlingU_mem_unitaryGroup (σ : Equiv.Perm dB) (f : dB → Bool) :
@@ -626,23 +511,12 @@ private lemma twirlingU_conj_entry (X : HermitianMat dB ℂ) (σ : Equiv.Perm dB
     (p q : dB) :
     (X.conj (twirlingU σ f : Matrix dB dB ℂ)) p q =
       (if f p then (-1 : ℂ) else 1) * (if f q then (-1 : ℂ) else 1) * X (σ p) (σ q) := by
-  have h_conj_apply : ∀ u : Matrix.unitaryGroup dB ℂ, (conj u.val X).mat =
-      u.val * X.mat * u.val.conjTranspose := by
-    intro u
-    simp_all only [conj_apply_mat]
-  convert! congr_fun (congr_fun (h_conj_apply (twirlingU σ f)) p) q using 1
   unfold twirlingU
+  rw [← mat_apply, conj_apply_mat]
   simp [Matrix.mul_apply, Matrix.diagonal]
   simp [Finset.sum_ite]
   rw [Finset.sum_eq_single (σ q)]
-  · simp_all only [conj_apply_mat, implies_true, Equiv.symm_apply_apply, ↓reduceIte]
-    split
-    next h =>
-      simp_all only [map_neg, map_one, mul_neg, mul_one, neg_neg]
-      split
-      next h_1 => simp_all only [neg_neg]
-      next h_1 => simp_all only [Bool.not_eq_true]
-    next h => simp_all only [Bool.not_eq_true, map_one, mul_one]
+  · split_ifs <;> simp_all
   · aesop
   · simp
 
@@ -656,24 +530,13 @@ private lemma sum_sign_prod (p q : dB) :
       if p = q then (2 ^ Fintype.card dB : ℕ) else 0 := by
   split_ifs with h
   · simp +contextual [h]
-  simp +contextual
-  -- By pairing each function with its p-flip, we can see that the sum of each pair is zero.
-  have h_pair :
-      ∑ f : dB → Bool, (if f q then -if f p then -1 else 1 else if f p then -1 else 1 : ℂ) =
-      ∑ f : dB → Bool, - (if f q then -if f p then -1 else 1 else if f p then -1 else 1 : ℂ) := by
-    apply Finset.sum_bij (fun f _ => Function.update f p (¬f p)) (by simp)
-    · intro a₁ _ a₂ _ h; ext x; by_cases hx : x = p
-      · replace h := congr_fun h x
-        subst hx
-        simp_all only [Finset.mem_univ, Bool.not_eq_true, Bool.decide_eq_false,
-          Function.update_self, Bool.not_eq_eq_eq_not, Bool.not_not]
-      · replace h := congr_fun h x
-        simp_all only [Finset.mem_univ, Bool.not_eq_true, Bool.decide_eq_false, ne_eq,
-          not_false_eq_true, Function.update_of_ne]
-    · exact fun b _ => ⟨Function.update b p (decide ¬b p = true), Finset.mem_univ _, by simp⟩
-    · grind
-  rw [Finset.sum_neg_distrib] at h_pair
-  linear_combination h_pair / 2
+  · rw [Nat.cast_zero]
+    refine Finset.sum_involution (fun f _ => Function.update f p (!f p)) ?_ ?_
+      (fun _ _ => Finset.mem_univ _) (by simp)
+    · intro g _
+      rcases hp : g p <;> rcases hq : g q <;> simp_all [Ne.symm h]
+    · intro g _ _
+      simp
 
 /-
 Summing X_{σ(p), σ(p)} over all permutations σ.
@@ -682,38 +545,23 @@ Summing X_{σ(p), σ(p)} over all permutations σ.
 private lemma sum_perm_diag_entry (X : HermitianMat dB ℂ) (p : dB) :
     ∑ σ : Equiv.Perm dB, X (σ p) (σ p) =
       ((Fintype.card dB - 1).factorial : ℂ) * ∑ k : dB, X k k := by
-  -- For each fixed k, the number of permutations σ with σ p = k is (card dB - 1)!
+  have hn : 0 < Fintype.card dB := Fintype.card_pos_iff.mpr ⟨p⟩
+  have h_eq : ∀ k : dB, (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = k)).card =
+      (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = p)).card := fun k =>
+    Finset.card_bij (fun σ _ => Equiv.swap p k * σ) (by simp +contextual)
+      (by simp) (fun b hb => ⟨Equiv.swap p k * b, by simp_all, by simp⟩)
   have h_card (k : dB) : (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = k)).card =
-      (Nat.factorial (Fintype.card dB - 1) : ℕ) := by
-    have h_fixed : Finset.card (Finset.filter (fun σ : Equiv.Perm dB => σ p = k) Finset.univ) =
-        Finset.card (Finset.univ : Finset (Equiv.Perm dB)) / Fintype.card dB := by
-      have h_card : ∀ k : dB, (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = k)).card =
-          (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = p)).card := by
-        intro k
-        apply Finset.card_bij (fun σ _ => Equiv.swap p k * σ)
-        · intro a ha
-          simp_all only [Finset.mem_filter, Finset.mem_univ, true_and, Equiv.Perm.coe_mul,
-            Function.comp_apply, Equiv.swap_apply_right, and_self]
-        · simp
-        · simp
-          exact fun b hb => ⟨Equiv.swap p k * b, by simp [hb], by simp⟩
-      have hc2 : (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = p)).card * Fintype.card dB =
-          Finset.card (Finset.univ : Finset (Equiv.Perm dB)) := by
-        have hc : ∑ k : dB, (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = k)).card =
-            Finset.card (Finset.univ : Finset (Equiv.Perm dB)) := by
-          simp only [Finset.card_eq_sum_ones, Finset.sum_fiberwise]
-        simp_all [mul_comm]
-      rw [← hc2, h_card k, Nat.mul_div_cancel _ (Fintype.card_pos_iff.mpr ⟨p⟩)]
-    rcases n : Fintype.card dB with (_ | _ | n) <;> simp_all [Nat.factorial_succ, Fintype.card_perm]
-    exact absurd n (Nat.ne_of_gt (Fintype.card_pos_iff.mpr ⟨p⟩))
-  -- By Fubini's theorem, we can interchange the order of summation.
-  have h_fubini : ∑ σ : Equiv.Perm dB, X (σ p) (σ p) = ∑ k : dB, ∑ σ ∈ Finset.univ.filter
-      (fun σ : Equiv.Perm dB => σ p = k), X k k := by
-    simp only [Finset.sum_filter]
-    rw [Finset.sum_comm, Finset.sum_congr rfl]
-    intro x a
-    simp_all only [Finset.mem_univ, Finset.sum_ite_eq, ↓reduceIte]
-  simp_all [Finset.mul_sum]
+      (Fintype.card dB - 1).factorial := by
+    have hc : ∑ j : dB, (Finset.univ.filter (fun σ : Equiv.Perm dB => σ p = j)).card =
+        Finset.card (Finset.univ : Finset (Equiv.Perm dB)) := by
+      simp only [Finset.card_eq_sum_ones, Finset.sum_fiberwise]
+    simp only [h_eq, Finset.sum_const, Finset.card_univ, smul_eq_mul, Fintype.card_perm,
+      ← Nat.mul_factorial_pred hn.ne'] at hc
+    rw [h_eq k]
+    exact Nat.eq_of_mul_eq_mul_left hn hc
+  rw [Finset.sum_comp (fun k => X k k) (fun σ : Equiv.Perm dB => σ p),
+    Finset.image_univ_of_surjective fun k => ⟨Equiv.swap p k, Equiv.swap_apply_left p k⟩]
+  simp [h_card, Finset.mul_sum]
 
 /-
 The sum formula for twirling: summing the conjugation entries over all (σ, f) pairs.
@@ -727,20 +575,14 @@ private lemma twirling_sum_eq [Nonempty dB] (X : HermitianMat dB ℂ) (p q : dB)
       ((conj (twirlingU i.1 i.2 : Matrix dB dB ℂ)) X) p q =
     ∑ σ : Equiv.Perm dB, ∑ f : dB → Bool, ((if f p then (-1 : ℂ) else 1) *
         (if f q then (-1 : ℂ) else 1) * X (σ p) (σ q)) := by
-      rw [← Finset.sum_product']
-      refine Finset.sum_bij (fun i _ => (i.1, i.2)) ?_ ?_ ?_ ?_
-      · simp
-      · simp
-      · simp
-      · simp [twirlingU_conj_entry]
+      simp_rw [Fintype.sum_prod_type, twirlingU_conj_entry]
   split_ifs with h
   · simp_all [← Finset.mul_sum]
     have := sum_perm_diag_entry X q; simp_all [mul_assoc, mul_comm]
   · rw [h_double_sum, Finset.sum_eq_zero]
     intro σ _
     rw [← Finset.sum_mul, sum_sign_prod p q]
-    simp_all only [mul_ite, mul_neg, mul_one, ite_mul, neg_mul, one_mul, Finset.mem_univ, reduceIte,
-      CharP.cast_eq_zero, zero_mul]
+    simp [h]
 
 /-
 The identity for the twirling set, stated for κ = Perm dB × (dB → Bool).
@@ -750,24 +592,22 @@ private lemma twirling_identity [Nonempty dB] (X : HermitianMat dB ℂ) :
       ∑ i : Equiv.Perm dB × (dB → Bool), X.conj (twirlingU i.1 i.2 : Matrix dB dB ℂ) =
         (X.trace / Fintype.card dB) • (1 : HermitianMat dB ℂ) := by
   ext p q
-  simp [Fintype.card_prod, Fintype.card_perm, Fintype.card_pi]
-  ring_nf
-  convert congr_arg ((2⁻¹ ^ Fintype.card dB * (Fintype.card dB |> Nat.factorial : ℂ)⁻¹) * ·)
-      (twirling_sum_eq X p q) using 1
-  · norm_num [Matrix.one_apply]
-    convert! Or.inl rfl
-    induction (Finset.univ : Finset (Equiv.Perm dB × (dB → Bool))) using Finset.induction
-    · simp_all only [Finset.sum_empty, HermitianMat.zero_apply]
-    · rename_i a s a_1 a_2
-      obtain ⟨fst, snd⟩ := a
-      simp only [not_false_eq_true, Finset.sum_insert, *]
-      rfl
-  · norm_num [Matrix.one_apply]
-    rw [show X.trace = ∑ k, X k k from X.trace_eq_trace]
-    rcases n : Fintype.card dB with (_ | n)
-    · simp_all
-    · simp_all [Nat.factorial_succ, mul_assoc, mul_comm, mul_left_comm]
-      simp [Nat.factorial_ne_zero]
+  have mat_sum := map_sum
+    (⟨⟨(mat : HermitianMat dB ℂ → Matrix dB dB ℂ), rfl⟩, mat_add⟩ :
+      HermitianMat dB ℂ →+ Matrix dB dB ℂ)
+    (fun i : Equiv.Perm dB × (dB → Bool) => X.conj (twirlingU i.1 i.2 : Matrix dB dB ℂ))
+    Finset.univ
+  simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] at mat_sum
+  rw [mat_smul, mat_smul, mat_sum, mat_one]
+  simp only [Matrix.sum_apply, Matrix.smul_apply, mat_apply, twirling_sum_eq X p q,
+    Matrix.one_apply, Fintype.card_prod, Fintype.card_perm, Fintype.card_pi, smul_ite, smul_zero]
+  split_ifs with h
+  · rw [Complex.real_smul, Complex.real_smul, mul_one]
+    push_cast [Fintype.card_bool, Finset.prod_const, Finset.card_univ,
+      show ((X.trace : ℝ) : ℂ) = ∑ k, X k k from X.trace_eq_trace,
+      ← Nat.mul_factorial_pred Fintype.card_ne_zero]
+    field_simp [Nat.factorial_ne_zero]
+  · rfl
 
 /-! ## Twirling Set
 
@@ -794,12 +634,7 @@ private lemma exists_twirling_unitaries [Nonempty dB] :
   intro X
   rw [Fintype.card_shrink]
   convert twirling_identity X using 2
-  refine Finset.sum_bij (fun i _ => (equivShrink _).symm i) ?_ ?_ ?_ ?_
-  · simp
-  · simp
-  · simp
-    exact fun a b => ⟨_, Equiv.apply_symm_apply _ _⟩
-  · simp
+  exact Fintype.sum_equiv (equivShrink _).symm _ _ fun i => rfl
 
 
 -- /-- Twirling on a bipartite system: applying `1_A ⊗ V_i` and averaging produces the
@@ -840,20 +675,14 @@ theorem sandwichedTraceFunctional_self (hα : 0 < α) (ρ : MState d) :
   by_cases h : α = 1
   · subst h; simp [sandwichedTraceFunctional]
   · unfold sandwichedTraceFunctional
-    have := ρ.pos
-    have h_simp : (ρ.M.conj (ρ.M ^ ((1 - α) / (2 * α))).mat) =
-        ρ.M ^ (1 + 2 * ((1 - α) / (2 * α))) := by
-      rw [← conj_rpow]
-      · rw [rpow_one]
-      · exact le_of_lt this
-      · exact div_ne_zero (sub_ne_zero_of_ne (Ne.symm h)) (mul_ne_zero two_ne_zero hα.ne')
-      · nlinarith [mul_div_cancel₀ (1 - α) (by positivity : (2 * α) ≠ 0)]
-    have h_simp : (ρ.M ^ (1 + 2 * ((1 - α) / (2 * α)))) ^ α =
-        ρ.M ^ ((1 + 2 * ((1 - α) / (2 * α))) * α) := by
-      rw [← rpow_mul]
-      exact le_of_lt this
-    field_simp at *
-    simp_all only [add_sub_cancel, one_div, rpow_one, MState.tr]
+    show ((ρ.M.conj (ρ.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace = 1
+    have hγ : (1 - α) / (2 * α) ≠ 0 :=
+      div_ne_zero (sub_ne_zero_of_ne (Ne.symm h)) (by positivity)
+    have h1 : 1 + 2 * ((1 - α) / (2 * α)) = 1 / α := by field_simp; ring
+    have h2 : ρ.M.conj (ρ.M ^ ((1 - α) / (2 * α))).mat = ρ.M ^ (1 / α) := by
+      rw [← h1, ← conj_rpow ρ.pos.le hγ (by rw [h1]; exact one_div_ne_zero hα.ne'), rpow_one]
+    rw [h2, ← rpow_mul ρ.pos.le, one_div_mul_cancel hα.ne', rpow_one]
+    exact ρ.tr
 
 /-- The trace functional is invariant under tensoring with a fixed state.
 This follows from multiplicativity (`sandwichedTraceFunctional_mul`) and
@@ -901,20 +730,8 @@ lemma conj_kron_one_entry (M : Matrix (dA × dB) (dA × dB) ℂ)
     (Matrix.kroneckerMap (· * ·) (1 : Matrix dA dA ℂ) V * M *
      (Matrix.kroneckerMap (· * ·) (1 : Matrix dA dA ℂ) V).conjTranspose) (a₁, b₁) (a₂, b₂) =
     (V * (Matrix.of fun b₁' b₂' => M (a₁, b₁') (a₂, b₂')) * V.conjTranspose) b₁ b₂ := by
-  norm_num [Matrix.mul_apply, Matrix.adjugate_apply, Matrix.det_apply', Matrix.trace]
-  simp [Matrix.one_apply, Finset.sum_ite]
-  apply Finset.sum_bij (fun x _ => x.2)
-  · simp
-  · simp
-  · simp
-  simp
-  intro a b rfl
-  left
-  apply Finset.sum_bij (fun x _ => x.2)
-  · simp
-  · simp
-  · simp
-  simp +contextual
+  simp [Matrix.mul_apply, Fintype.sum_prod_type, Matrix.one_apply, apply_ite,
+    Finset.sum_ite_eq]
 
 /-
 For a Hermitian matrix, the twirling identity at the entry level.
@@ -994,14 +811,9 @@ lemma prod_traceRight_uniform_entry [Nonempty dB] (ρ : MState (dA × dB))
     (a₁ a₂ : dA) (b₁ b₂ : dB) :
     (ρ.traceRight ⊗ᴹ MState.uniform).M.val (a₁, b₁) (a₂, b₂) =
     ρ.M.val.traceRight a₁ a₂ * ((Fintype.card dB : ℂ)⁻¹ * if b₁ = b₂ then 1 else 0) := by
-  unfold MState.traceRight MState.uniform
-  unfold MState.ofClassical
-  unfold diagonal
-  unfold MState.prod
-  unfold kronecker
-  simp [Matrix.kroneckerMap_apply]
-  rw [Matrix.diagonal_apply]
-  simp only [mul_ite, mul_zero]
+  simp [MState.traceRight, MState.uniform, MState.ofClassical, diagonal, MState.prod, kronecker]
+  rw [← mat_apply, mat_mk]
+  simp [Matrix.diagonal_apply, mul_ite, mul_zero]
 
 theorem twirling_average_eq [Nonempty dB]
     (κ : Type) [Fintype κ] (V : κ → Matrix.unitaryGroup dB ℂ)
@@ -1011,38 +823,30 @@ theorem twirling_average_eq [Nonempty dB]
     (ρ : MState (dA × dB)) :
     ∑ i : κ, ((Fintype.card κ : ℝ)⁻¹ • (ρ.conjTensorUnitary' (V i)).M) =
       (ρ.traceRight ⊗ᴹ MState.uniform).M := by
-  -- Apply the twirling hypothesis to each term in the sum.
-  have h_sum : ∀ a₁ a₂ : dA, ∀ b₁ b₂ : dB, (∑ i, (1 / (Fintype.card κ : ℂ)) •
-      (ρ.conjTensorUnitary' (V i)).M.val (a₁, b₁) (a₂, b₂)) =
-      (ρ.M.val.traceRight a₁ a₂) * (1 / (Fintype.card dB : ℂ)) * (if b₁ = b₂ then 1 else 0) := by
-    intro a₁ a₂ b₁ b₂
-    have h_sum : ∑ i : κ, ((V i : Matrix dB dB ℂ) * (Matrix.of fun b₁' b₂' =>
-        ρ.M.val (a₁, b₁') (a₂, b₂')) * (V i : Matrix dB dB ℂ).conjTranspose) b₁ b₂ =
-        (ρ.M.val.traceRight a₁ a₂) * (Fintype.card κ : ℂ) * (1 / (Fintype.card dB : ℂ)) *
-        (if b₁ = b₂ then 1 else 0) := by
-      convert twirling_general_matrix κ V hV
-        (Matrix.of fun b₁' b₂' => ρ.M.val (a₁, b₁') (a₂, b₂')) b₁ b₂ using 1
-      simp [Matrix.trace]
-      ring_nf!
-    convert congr_arg (fun x : ℂ => (1 / (Fintype.card κ : ℂ)) * x) h_sum using 1
-    · norm_num [conjTensorUnitary'_entry]
-      ring_nf
-      rw [Finset.mul_sum]
-    · norm_num [conjTensorUnitary'_entry]
-      by_cases h : Fintype.card κ = 0 <;> simp_all [mul_assoc, mul_comm, mul_left_comm]
-      specialize hV 1; norm_num at hV
-  convert h_sum using 1
-  constructor <;> intro h
-  · exact h_sum
-  · ext ⟨a₁, b₁⟩ ⟨a₂, b₂⟩
-    convert h a₁ a₂ b₁ b₂ using 1
-    · classical induction (Finset.univ : Finset κ) using Finset.induction
-      · simp_all
-      · simp_all
-        convert! congr_arg₂ (· + ·) rfl ‹_› using 1
-        simp [Algebra.smul_def]
-    · convert! prod_traceRight_uniform_entry ρ a₁ a₂ b₁ b₂ using 1
-      ring
+  have hκ : (Fintype.card κ : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero]
+    intro h0
+    haveI := Fintype.card_eq_zero_iff.mp h0
+    have h1 := congrArg HermitianMat.trace (hV 1)
+    simp [Fintype.card_ne_zero] at h1
+    exact absurd h1.symm (Nat.cast_ne_zero.mpr Fintype.card_ne_zero)
+  have hn : (Fintype.card dB : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+  have mat_sum := map_sum (⟨⟨(mat : HermitianMat (dA × dB) ℂ → Matrix (dA × dB) (dA × dB) ℂ),
+      rfl⟩, mat_add⟩ : HermitianMat (dA × dB) ℂ →+ Matrix (dA × dB) (dA × dB) ℂ)
+    (fun i : κ => (Fintype.card κ : ℝ)⁻¹ • (ρ.conjTensorUnitary' (V i)).M) Finset.univ
+  simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] at mat_sum
+  ext ⟨a₁, b₁⟩ ⟨a₂, b₂⟩
+  have h := twirling_general_matrix κ V hV
+    (Matrix.of fun b₁' b₂' => ρ.M.val (a₁, b₁') (a₂, b₂')) b₁ b₂
+  have htr : (Matrix.of fun b₁' b₂' => ρ.M.val (a₁, b₁') (a₂, b₂')).trace =
+      ρ.M.val.traceRight a₁ a₂ := rfl
+  have hprod := prod_traceRight_uniform_entry ρ a₁ a₂ b₁ b₂
+  have hconj := fun i => conjTensorUnitary'_entry ρ (V i) a₁ a₂ b₁ b₂
+  simp only [val_eq_coe, mat_apply] at h htr hprod hconj
+  rw [mat_sum]
+  simp only [Matrix.sum_apply, mat_smul, Matrix.smul_apply, mat_apply, hconj, hprod,
+    Complex.real_smul, Complex.ofReal_inv, Complex.ofReal_natCast, ← Finset.mul_sum, h, htr]
+  field_simp
 
 end twirling
 
@@ -1091,16 +895,13 @@ theorem sandwichedTraceFunctional_mono_traceRight [Nonempty dB]
   have h_inv (i) : Q̃_ α(ρ.conjTensorUnitary (V i)‖σ.conjTensorUnitary (V i)) = Q̃_ α(ρ‖σ) :=
     sandwichedTraceFunctional_conj_tensorUnitary ρ σ (V i)
   -- Step 2: Q̃_α(ρ‖σ) = Σ_i (1/|κ|) * Q̃_α(V_i ρ V_i†‖V_i σ V_i†)
-  have hcard_ne : (Fintype.card κ : ℝ) ≠ 0 :=
-    Nat.cast_ne_zero.mpr Fintype.card_ne_zero
   have h_avg : Q̃_ α(ρ‖σ) = ∑ i : κ, (Fintype.card κ : ℝ)⁻¹ *
       Q̃_ α(ρ.conjTensorUnitary (V i)‖σ.conjTensorUnitary (V i)) := by
     simp only [h_inv, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
     field_simp
   -- Step 3: By joint convexity (α > 1)
   have hw_sum : ∑ i : κ, (Fintype.card κ : ℝ)⁻¹ = 1 := by
-    rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-    exact mul_inv_cancel₀ hcard_ne
+    simp [Finset.card_univ]
   set ρ_mix := ρ.traceRight ⊗ᴹ MState.uniform (d := dB)
   set σ_mix := σ.traceRight ⊗ᴹ MState.uniform (d := dB)
   have hρ_mix : ρ_mix.M = ∑ i : κ, (Fintype.card κ : ℝ)⁻¹ • (ρ.conjTensorUnitary (V i)).M :=
@@ -1135,18 +936,9 @@ private lemma inner_traceRight_eq_sum_inner_vecTensorBasis
     (A : Matrix (dA × dB) (dA × dB) ℂ) (v : dA → ℂ) :
     star v ⬝ᵥ A.traceRight *ᵥ v =
     ∑ b : dB, star (vecTensorBasis v b) ⬝ᵥ A *ᵥ (vecTensorBasis v b) := by
-  simp [Matrix.traceRight, Matrix.mulVec, dotProduct]
-  simp [vecTensorBasis, Fintype.sum_prod_type]
-  rw [Finset.sum_comm, Finset.sum_congr rfl]
-  simp [Finset.mul_sum _ _ _, mul_assoc, mul_comm]
-  intro x
-  rw [Finset.sum_comm]
-  congr
-  ext y
-  rw [Finset.sum_comm, Finset.sum_comm, Finset.sum_eq_single y]
-  · simp
-  · simp +contextual
-  · simp
+  simp [Matrix.traceRight, Matrix.mulVec, dotProduct, vecTensorBasis, Fintype.sum_prod_type,
+    Finset.mul_sum, Finset.sum_mul, apply_ite, mul_comm, mul_assoc, mul_left_comm]
+  exact (Finset.sum_congr rfl fun a _ => Finset.sum_comm).trans Finset.sum_comm
 
 omit [DecidableEq dA] in
 /-- If A.mulVec(v⊗e_b) = 0 for all b, then (Tr_B A) *ᵥ v = 0 -/
@@ -1155,20 +947,12 @@ private lemma traceRight_mulVec_zero_of_vecTensorBasis_zero
     (h : ∀ b : dB, A *ᵥ (vecTensorBasis v b) = 0) :
     A.traceRight *ᵥ v = 0 := by
   ext i
-  simp_all [funext_iff, Matrix.mulVec, dotProduct]
-  convert Finset.sum_congr rfl fun j _ => h j i j using 1
-  any_goals exact Finset.univ
-  · unfold Matrix.traceRight vecTensorBasis; simp [Finset.sum_ite]
-    simp [Finset.sum_mul, Finset.sum_sigma']
-    apply Finset.sum_bij (fun x _ => ⟨x.2, x.1, x.2⟩)
-    · simp
-    · rintro ⟨fst, snd⟩ ha₁ ⟨fst_1, snd_1⟩  ha₂ ⟨rfl, ⟨rfl, right⟩⟩
-      rfl
-    · intro ⟨fst, ⟨fst_1, snd⟩⟩ a
-      simp_all only [Finset.mem_sigma, Finset.mem_univ, Finset.mem_filter, true_and, Sigma.mk.injEq,
-        heq_eq_eq, Prod.mk.injEq, exists_const, Sigma.exists, exists_eq_left, and_true, exists_eq]
-    · simp
-  · norm_num
+  simp only [Matrix.traceRight, Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply,
+    Finset.sum_mul]
+  rw [Finset.sum_comm]
+  refine Finset.sum_eq_zero fun b _ => ?_
+  have hb := congrFun (h b) (i, b)
+  simpa [Matrix.mulVec, dotProduct, vecTensorBasis, Fintype.sum_prod_type] using hb
 
 /-- The kernel condition `σ.M.ker ≤ ρ.M.ker` is preserved under partial trace.
 This follows because `supp(ρ) ⊆ supp(σ)` implies `supp(Tr_B ρ) ⊆ supp(Tr_B σ)`:
@@ -1179,29 +963,20 @@ theorem ker_le_traceRight {ρ σ : MState (dA × dB)}
     σ.traceRight.M.ker ≤ ρ.traceRight.M.ker := by
   simp only [MState.traceRight_M]
   intro v hv
-  rw [mem_ker_iff_mulVec_zero] at hv ⊢
-  have hv' : σ.M.mat.traceRight *ᵥ v.ofLp = 0 := by
-    rwa [traceRight_mat] at hv
-  have hin : star v.ofLp ⬝ᵥ σ.M.mat.traceRight *ᵥ v.ofLp = 0 := by
-    rw [hv']; simp [dotProduct]
-  rw [inner_traceRight_eq_sum_inner_vecTensorBasis] at hin
+  rw [mem_ker_iff_mulVec_zero, traceRight_mat] at hv
+  rw [mem_ker_iff_mulVec_zero, traceRight_mat]
   have hσ_psd := zero_le_iff.mp σ.nonneg
-  have h_each_zero : ∀ b : dB,
-      star (vecTensorBasis v.ofLp b) ⬝ᵥ σ.M.mat *ᵥ (vecTensorBasis v.ofLp b) = 0 := by
-    have h_nonneg : ∀ b, (0 : ℂ) ≤
-        star (vecTensorBasis v.ofLp b) ⬝ᵥ σ.M.mat *ᵥ (vecTensorBasis v.ofLp b) :=
-      fun b => hσ_psd.dotProduct_mulVec_nonneg _
-    intro b
-    exact Finset.sum_eq_zero_iff_of_nonneg (fun b _ => h_nonneg b) |>.mp hin b (Finset.mem_univ _)
-  have h_σ_zero : ∀ b : dB, σ.M.mat *ᵥ (vecTensorBasis v.ofLp b) = 0 :=
-    fun b => (hσ_psd.dotProduct_mulVec_zero_iff _).mp (h_each_zero b)
-  have h_ρ_zero : ∀ b : dB, ρ.M.mat *ᵥ (vecTensorBasis v.ofLp b) = 0 := by
-    intro b
-    have hmem_σ : (WithLp.toLp 2 (vecTensorBasis v.ofLp b) : EuclideanSpace ℂ _) ∈ σ.M.ker := by
-      rw [mem_ker_iff_mulVec_zero]; exact h_σ_zero b
-    have hmem_ρ := hker hmem_σ
-    rwa [mem_ker_iff_mulVec_zero] at hmem_ρ
-  exact traceRight_mulVec_zero_of_vecTensorBasis_zero ρ.M.mat v.ofLp h_ρ_zero
+  have hin : star v.ofLp ⬝ᵥ σ.M.mat.traceRight *ᵥ v.ofLp = 0 := by
+    rw [hv]
+    simp [dotProduct]
+  rw [inner_traceRight_eq_sum_inner_vecTensorBasis] at hin
+  refine traceRight_mulVec_zero_of_vecTensorBasis_zero ρ.M.mat v.ofLp fun b => ?_
+  have h_zero : σ.M.mat *ᵥ vecTensorBasis v.ofLp b = 0 :=
+    (hσ_psd.dotProduct_mulVec_zero_iff _).mp <|
+      (Finset.sum_eq_zero_iff_of_nonneg fun b _ => hσ_psd.dotProduct_mulVec_nonneg _).mp
+        hin b (Finset.mem_univ _)
+  exact (mem_ker_iff_mulVec_zero _ (WithLp.toLp 2 (vecTensorBasis v.ofLp b))).mp
+    (hker ((mem_ker_iff_mulVec_zero _ (WithLp.toLp 2 (vecTensorBasis v.ofLp b))).mpr h_zero))
 
 /-- The sandwiched Rényi divergence is monotone under partial trace for `α > 1`.
 This follows from monotonicity of the trace functional together with the fact that
@@ -1230,46 +1005,14 @@ set_option maxHeartbeats 400000 in
 theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
     (U : Matrix.unitaryGroup d ℂ) :
     D̃_ α(ρ.U_conj U‖σ.U_conj U) = D̃_ α(ρ‖σ) := by
-  -- Since unitary conjugation preserves the kernel, the condition σ.M.ker ≤ ρ.M.ker is
-  -- equivalent to (σ.U_conj U).M.ker ≤ (ρ.U_conj U).M.ker.
+  have hsurj : Function.Surjective ⇑(Matrix.toEuclideanLin U.val.conjTranspose) := fun y =>
+    ⟨Matrix.toEuclideanLin U.val y, by
+      rw [← LinearMap.comp_apply, ← Matrix.toLpLin_mul_same, ← Matrix.star_eq_conjTranspose,
+        U.2.1, Matrix.toLpLin_one, LinearMap.id_apply]⟩
   have h_kernel : σ.M.ker ≤ ρ.M.ker ↔ (σ.U_conj U).M.ker ≤ (ρ.U_conj U).M.ker := by
-    have hk (A : HermitianMat d ℂ) : (A.conj U.val).ker = A.ker.map (U.val.toEuclideanLin) := by
-      ext x
-      simp [conj]
-      constructor <;> intro hx
-      all_goals generalize_proofs at *
-      · use (U.val.conjTranspose.toEuclideanLin x)
-        simp_all [ker, Matrix.toEuclideanLin]
-        simp_all [lin, Matrix.toLpLin]
-        have h_unitary : (U.val * U.val.conjTranspose) = 1 := by
-          exact U.2.2
-        generalize_proofs at *; (
-        apply_fun (U.val.conjTranspose *ᵥ ·) at hx
-        simp_all [Matrix.mul_assoc, Matrix.mulVec_mulVec]
-        simp_all [← Matrix.mul_assoc, mul_eq_one_comm.mp h_unitary])
-      · obtain ⟨y, hy, rfl⟩ := hx; simp_all [Matrix.toEuclideanLin, Matrix.mul_assoc]
-        simp_all [ker, Matrix.toLpLin]
-        simp_all [lin]
-        simp_all [Matrix.toLpLin, Matrix.mulVec, funext_iff]
-        simp_all [Matrix.mul_apply, dotProduct]
-        -- Since U is unitary, we have ∑_{x_3} ⟨U_{x_3 x}, U_{x_3 x_1⟩ = δ_{x x_1}.
-        have h_unitary : ∀ x x_1, ∑ x_3, (starRingEnd ℂ) (U.val x_3 x) * U.val x_3 x_1 =
-            if x = x_1 then 1 else 0 := by
-          intro x x_1
-          have this := congr_fun (congr_fun U.2.1 x) x_1
-          simp_all [Matrix.mul_apply, Matrix.one_apply]
-        simp_all [mul_assoc, Finset.sum_mul]
-        intro x; rw [Finset.sum_comm]; simp_all [← Finset.mul_sum]
-    simp [hk, MState.U_conj]
-    constructor <;> intro h <;> simp_all [SetLike.le_def]
-    · exact fun x hx => ⟨x, h hx, rfl⟩
-    · intro x hx
-      obtain ⟨y, hy, hy'⟩ := h x hx
-      obtain ⟨⟩ : y = x := by
-        apply_fun (U.val⁻¹).mulVec at hy'
-        simp_all [Matrix.mulVec_mulVec]
-        exact PiLp.ext (congrFun hy')
-      exact hy
+    show _ ↔ (σ.M.conj U.val).ker ≤ (ρ.M.conj U.val).ker
+    rw [ker_conj σ.nonneg, ker_conj ρ.nonneg,
+      Submodule.comap_le_comap_iff_of_surjective hsurj]
   by_cases h : σ.M.ker ≤ ρ.M.ker <;> simp_all [SandwichedRelRentropy]
   split_ifs <;> simp_all [MState.U_conj]
   · congr 1
@@ -1304,9 +1047,7 @@ theorem sandwichedRenyiEntropy_mono_traceRight' [Nonempty dB]
   by_cases hker : σ.M.ker ≤ ρ.M.ker
   · exact sandwichedRenyiEntropy_mono_traceRight hα ρ σ hker
   · simp only [SandwichedRelRentropy, MState.traceRight_M]
-    split
-    next h => simp_all only [le_top]
-    next h => simp_all only [not_lt, le_refl]
+    split <;> simp_all
 
 /-- Monotonicity of the sandwiched Rényi divergence under `traceLeft` for `α > 1`.
 Follows from `sandwichedRenyiEntropy_mono_traceRight'` + SWAP invariance. -/
@@ -1383,17 +1124,10 @@ This follows from the α > 1 case by taking a limit, using the continuity of
 -/
 theorem sandwichedRenyiEntropy_DPI_eq_one (ρ σ : MState d₁) (Φ : CPTPMap d₁ d₂) :
     D̃_ 1(Φ ρ‖Φ σ) ≤ D̃_ 1(ρ‖σ) := by
-  -- Since α → D_α(ρ‖σ) is continuous on (0, ∞), we can take the limit as α → 1.
-  have h_cont :
-      Filter.Tendsto (fun α : ℝ => D̃_ α(Φ ρ‖Φ σ)) (𝓝[>] 1) (𝓝 (D̃_ 1(Φ ρ‖Φ σ))) ∧
-      Filter.Tendsto (fun α : ℝ => D̃_ α(ρ‖σ)) (𝓝[>] 1) (𝓝 (D̃_ 1(ρ‖σ))) := by
-    constructor
-    · exact tendsto_nhdsWithin_of_tendsto_nhds (sandwichedRelRentropy.continuousOn (Φ ρ) (Φ σ) |>
-        ContinuousOn.continuousAt <| Ioi_mem_nhds zero_lt_one)
-    · exact tendsto_nhdsWithin_of_tendsto_nhds (sandwichedRelRentropy.continuousOn ρ σ |>
-        ContinuousOn.continuousAt <| Ioi_mem_nhds zero_lt_one)
-  exact le_of_tendsto_of_tendsto h_cont.1 h_cont.2 <| Filter.eventually_of_mem
-    self_mem_nhdsWithin fun x hx => sandwichedRenyiEntropy_DPI_gt_one hx ρ σ Φ
+  refine le_of_tendsto_of_tendsto (b := 𝓝[>] (1 : ℝ)) ?_ ?_ (Filter.eventually_of_mem
+      self_mem_nhdsWithin fun x hx => sandwichedRenyiEntropy_DPI_gt_one hx ρ σ Φ) <;>
+    exact tendsto_nhdsWithin_of_tendsto_nhds
+      ((sandwichedRelRentropy.continuousOn _ _).continuousAt (Ioi_mem_nhds zero_lt_one))
 
 /-- The Data Processing Inequality for the Sandwiched Renyi relative entropy.
 Proved following the approach of Frank–Lieb and Leditzky–Rouzé–Datta. -/

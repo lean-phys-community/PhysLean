@@ -22,19 +22,13 @@ variable [TopologicalSpace β]
 theorem sSup_image_eq_sSup_image_closure {f : β → α}
   (hS : IsCompact (closure S)) (hf : Continuous f) :
     sSup (f '' S) = sSup (f '' closure S) := by
-  rcases S.eq_empty_or_nonempty with rfl | h; · simp
-  refine csSup_eq_of_forall_le_of_forall_lt_exists_gt (by simpa) ?_ ?_
-  · rintro a ⟨w, hw, rfl⟩
-    exact le_csSup (hS.image hf).bddAbove (Set.mem_image_of_mem f <| subset_closure hw)
-  · intro w hw
-    simp only [Set.mem_image, exists_exists_and_eq_and]
-    contrapose! hw
-    have h_image_closure : f '' closure S ⊆ closure (f '' S) :=
-      image_closure_subset_closure_image hf
-    have h_closure_image : closure (f '' S) ⊆ Set.Iic w :=
-      closure_minimal (Set.image_subset_iff.mpr hw) isClosed_Iic
-    exact csSup_le ((h.mono subset_closure).image f) fun y hy ↦
-      (h_image_closure.trans h_closure_image) hy
+  rcases S.eq_empty_or_nonempty with rfl | h
+  · simp
+  refine le_antisymm
+    (csSup_le_csSup (hS.image hf).bddAbove (h.image f) (Set.image_mono subset_closure))
+    (csSup_le (h.closure.image f) fun y hy => closure_minimal
+      (fun _ hz => le_csSup ((hS.image hf).bddAbove.mono (Set.image_mono subset_closure)) hz)
+      isClosed_Iic (image_closure_subset_closure_image hf hy))
 
 theorem sInf_image_eq_sInf_image_closure {f : β → α} (hS : IsCompact (closure S)) (hf : Continuous f) :
     sInf (f '' S) = sInf (f '' closure S) :=
@@ -80,9 +74,8 @@ theorem continuous_sInf (hS : Bornology.IsBounded S) (hf : Continuous ↿f) :
   hS.isCompact_closure.closure_continuous_sInf hf
 
 theorem continuous_iSup (hS : Bornology.IsBounded S) (hf : Continuous ↿f) :
-    Continuous fun x ↦ ⨆ y : S, f x y := by
-  simp_rw [iSup, ← Set.image_eq_range]
-  exact hS.isCompact_closure.closure_continuous_sSup <| by fun_prop
+    Continuous fun x ↦ ⨆ y : S, f x y :=
+  hS.isCompact_closure.continuous_iSup hf
 
 theorem continuous_iInf (hS : Bornology.IsBounded S) (hf : Continuous ↿f) :
     Continuous fun x ↦ ⨅ y : S, f x y :=
@@ -182,8 +175,8 @@ end ContinuousLinearMap
 theorem LinearMap.BilinForm.continuous_iSup_fst
   {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   (f : LinearMap.BilinForm ℝ E) {S : Set E} (hS : Bornology.IsBounded S) :
-    Continuous fun x ↦ ⨆ y : S, f y x := by
-  exact LinearMap.BilinForm.continuous_iSup f.flip hS
+    Continuous fun x ↦ ⨆ y : S, f y x :=
+  LinearMap.BilinForm.continuous_iSup f.flip hS
   --Old "direct" proof:
   -- -- Since $f$ is continuous, there exists $C > 0$ such that for all $y \in S$ and $x \in E$, $|f y x| \leq C \|y\| \|x\|$.
   -- obtain ⟨C, hC1, hC2⟩ : ∃ C > 0, ∀ y ∈ S, ∀ x : E, |f y x| ≤ C * ‖y‖ * ‖x‖ := by

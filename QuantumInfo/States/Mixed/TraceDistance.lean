@@ -40,15 +40,13 @@ namespace TrDistance
 
 variable {d d₂ : Type*} [Fintype d] [Fintype d₂] (ρ σ : MState d)
 
-theorem ge_zero : 0 ≤ TrDistance ρ σ := by
-  rw [TrDistance]
-  simp [Matrix.traceNorm_nonneg]
+theorem ge_zero : 0 ≤ TrDistance ρ σ :=
+  mul_nonneg (by norm_num) (ρ.m - σ.m).traceNorm_nonneg
 
 theorem le_one : TrDistance ρ σ ≤ 1 := by
-  have htri := Matrix.traceNorm_add_le ρ.m (-σ.m)
-  simp [TrDistance, sub_eq_add_neg, Matrix.traceNorm_neg,
-    ρ.traceNorm_eq_one, σ.traceNorm_eq_one] at htri ⊢
-  linarith
+  simp only [TrDistance, sub_eq_add_neg]
+  linarith [Matrix.traceNorm_add_le ρ.m (-σ.m), Matrix.traceNorm_neg σ.m,
+    ρ.traceNorm_eq_one, σ.traceNorm_eq_one]
 
 /-- The trace distance, as a `Prob` probability with value between 0 and 1. -/
 def prob : Prob :=
@@ -56,8 +54,7 @@ def prob : Prob :=
 
 /-- The trace distance is a symmetric quantity. -/
 theorem symm : TrDistance ρ σ = TrDistance σ ρ := by
-  dsimp [TrDistance]
-  rw [← Matrix.traceNorm_neg, neg_sub]
+  rw [TrDistance, TrDistance, ← Matrix.traceNorm_neg, neg_sub]
 
 /-- The trace distance is equal to half the 1-norm of the eigenvalues of their difference . -/
 theorem eq_abs_eigenvalues : TrDistance ρ σ = (1/2:ℝ) *

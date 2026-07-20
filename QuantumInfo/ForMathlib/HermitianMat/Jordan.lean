@@ -45,7 +45,7 @@ theorem zero_symmMul : symmMul 0 A = 0 := by
   simp [symmMul]
 
 theorem symmMul_toMat : (A.symmMul B).mat =
-    (2 : 𝕜)⁻¹ • (A.mat * B.mat + B.mat * A.mat) := by
+    (2 : 𝕜)⁻¹ • (A.mat * B.mat + B.mat * A.mat) :=
   rfl
 
 variable [Invertible (2 : 𝕜)]
@@ -54,12 +54,10 @@ variable {A B} in
 @[simp]
 theorem symmMul_of_commute (hAB : Commute A.mat B.mat) :
     (A.symmMul B).mat = A.mat * B.mat := by
-  rw [symmMul_toMat, hAB]
-  rw [smul_add, ← add_smul, inv_eq_one_div, ← add_div]
-  rw [add_self_div_two, one_smul]
+  rw [symmMul_toMat, hAB, ← two_smul 𝕜, inv_smul_smul₀ (Invertible.ne_zero 2)]
 
-theorem symmMul_self : (symmMul A A).mat = A.mat * A.mat := by
-  simp
+theorem symmMul_self : (symmMul A A).mat = A.mat * A.mat :=
+  symmMul_of_commute rfl
 
 variable [DecidableEq d]
 
@@ -97,7 +95,7 @@ scoped instance : CommMagma (HermitianMat d 𝕜) where
 -- scoped instance : Mul (HermitianMat d 𝕜) :=
   -- CommMagma.toMul
 
-theorem mul_eq_symmMul : A * B = A.symmMul B := by
+theorem mul_eq_symmMul : A * B = A.symmMul B :=
   rfl
 
 scoped instance : IsCommJordan (HermitianMat d 𝕜) where
