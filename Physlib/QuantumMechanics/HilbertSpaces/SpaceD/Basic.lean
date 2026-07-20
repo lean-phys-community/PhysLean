@@ -129,6 +129,9 @@ lemma MemHS.sub (hf : MemHS f μ) (hg : MemHS g μ) : MemHS (f - g) μ := MemLp.
 
 lemma MemHS.const_smul (c : ℂ) (hf : MemHS f μ) : MemHS (c • f) μ := MemLp.const_smul hf c
 
+lemma MemHS.const_smul_iff {c : ℂ} (hc : c ≠ 0) : MemHS (c • f) μ ↔ MemHS f μ :=
+  ⟨fun h ↦ inv_smul_smul₀ hc f ▸ h.const_smul c⁻¹, const_smul c⟩
+
 lemma MemHS.ae_eq (hfg : f =ᵐ[μ] g) (hf : MemHS f μ) : MemHS g μ := MemLp.ae_eq hfg hf
 
 lemma MemHS.mono_measure (h : μ' ≤ μ) (hf : MemHS f μ) : MemHS f μ' := MemLp.mono_measure h hf
