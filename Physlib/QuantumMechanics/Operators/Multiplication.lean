@@ -337,6 +337,31 @@ lemma mulOperator_isUnbounded {μ : Measure (Space d)} [IsFiniteMeasureOnCompact
 ### E.1. Smul & neg
 -/
 
+lemma mulOperator_smul_ge (μ : Measure (Space d)) (c : ℂ) (f : Space d → ℂ) :
+    c • 𝓜 μ f ≤ 𝓜 μ (c • f) := by
+  refine le_of_le_graph fun u h ↦ ?_
+  rw [mem_graph_iff] at *
+  obtain ⟨⟨v, hv⟩, hvu, hvu'⟩ := h
+  have hv' : v ∈ (𝓜 μ (c • f)).domain := by
+    rw [smul_domain, mem_mulOperator_domain_iff] at *
+    simpa using hv.const_smul c
+  refine ⟨⟨v, hv'⟩, hvu, ?_⟩
+  rw [← hvu', ext_iff]
+  filter_upwards [mulOperator_apply_ae ⟨v, hv⟩, mulOperator_apply_ae ⟨v, hv'⟩,
+    coeFn_smul c (𝓜 μ f ⟨v, hv⟩)]
+  simp_all [mul_assoc]
+
+@[simp]
+lemma mulOperator_smul_eq (μ : Measure (Space d)) {c : ℂ} (hc : c ≠ 0) (f : Space d → ℂ) :
+    𝓜 μ (c • f) = c • 𝓜 μ f := by
+  refine (eq_of_le_of_domain_eq (mulOperator_smul_ge μ c f) ?_).symm
+  ext
+  simp [mem_mulOperator_domain_iff, MemHS.const_smul_iff hc]
+
+@[simp]
+lemma mulOperator_neg (μ : Measure (Space d)) (f : Space d → ℂ) : 𝓜 μ (-f) = -𝓜 μ f := by
+  rw [← neg_one_smul ℂ f, mulOperator_smul_eq _ (by norm_num), neg_eq_neg_one_smul]
+
 /-!
 ### E.2. Add & sub
 -/
