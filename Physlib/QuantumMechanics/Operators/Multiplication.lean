@@ -35,7 +35,7 @@ In this module we introduce unbounded operators defined by multiplication by a f
   - C.1. Self-adjoint
 - D. Closable & unbounded
 - E. Structural properties
-  - E.1. Smul
+  - E.1. Smul & neg
   - E.2. Add & sub
   - E.3. Composition
 - F. Spectrum
@@ -381,6 +381,7 @@ lemma mulOperator_add_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
     mulOperator_apply_ae ⟨v, hv'⟩, coeFn_add (𝓜 μ f ⟨v, hv.1⟩) (𝓜 μ g ⟨v, hv.2⟩)]
   simp_all [add_mul]
 
+@[simp]
 lemma mulOperator_add_eq
     {μ : Measure (Space d)} (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 μ g).domain = ⊤) :
     𝓜 μ (f + g) = 𝓜 μ f + 𝓜 μ g := by
@@ -395,6 +396,7 @@ lemma mulOperator_sub_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
     𝓜 μ f - 𝓜 μ g ≤ 𝓜 μ (f - g) :=
   le_of_eq_of_le (by simp [sub_eq_add_neg]) (mulOperator_add_ge μ f (-g))
 
+@[simp]
 lemma mulOperator_sub_eq
     {μ : Measure (Space d)} (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 μ g).domain = ⊤) :
     𝓜 μ (f - g) = 𝓜 μ f - 𝓜 μ g := by
