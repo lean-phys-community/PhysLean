@@ -381,9 +381,28 @@ lemma mulOperator_add_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
     mulOperator_apply_ae ⟨v, hv'⟩, coeFn_add (𝓜 μ f ⟨v, hv.1⟩) (𝓜 μ g ⟨v, hv.2⟩)]
   simp_all [add_mul]
 
+lemma mulOperator_add_eq
+    {μ : Measure (Space d)} (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 μ g).domain = ⊤) :
+    𝓜 μ (f + g) = 𝓜 μ f + 𝓜 μ g := by
+  have hle := mulOperator_add_ge μ f g
+  refine (eq_of_le_of_domain_eq hle ?_).symm
+  refine eq_of_le_of_ge hle.1 fun ψ hψ ↦ ?_
+  have hg : ψ ∈ (𝓜 μ g).domain := by simp [h]
+  simp only [add_domain, Submodule.mem_inf, mem_mulOperator_domain_iff] at *
+  exact ⟨by simpa [add_mul] using hψ.sub hg, hg⟩
+
 lemma mulOperator_sub_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
     𝓜 μ f - 𝓜 μ g ≤ 𝓜 μ (f - g) :=
   le_of_eq_of_le (by simp [sub_eq_add_neg]) (mulOperator_add_ge μ f (-g))
+
+lemma mulOperator_sub_eq
+    {μ : Measure (Space d)} (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 μ g).domain = ⊤) :
+    𝓜 μ (f - g) = 𝓜 μ f - 𝓜 μ g := by
+  simp [sub_eq_add_neg, mulOperator_add_eq, h]
+
+TODO "`mulOperator_add_eq` has the strong assumption `(𝓜 μ g).domain = ⊤`. Weaken this assumption
+  and/or find other sufficient conditions to ensure the equality `𝓜 μ (f + g) = 𝓜 μ f + 𝓜 μ g`.
+  For example, `f • g ≥ᵐ[μ] 0` or `|f| ≤ᵐ[μ] c • |g|` (with no assumptions on the domains)?"
 
 /-!
 ### E.3. Composition
