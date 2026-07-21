@@ -74,7 +74,8 @@ theorem sqrt_posDef {A : HermitianMat d 𝕜} (hA : A.mat.PosDef) :
 open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `HermitianMat.sqrt` -/
 @[positivity HermitianMat.sqrt _]
-meta def evalHermitianMatSqrt : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatSqrt : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app _sqrt (A : Expr) ← whnfR e | throwError "not sqrt application"
   try
     let (isStrictA, pfA) ← bestResult A

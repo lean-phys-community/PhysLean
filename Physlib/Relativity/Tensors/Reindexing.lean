@@ -118,7 +118,7 @@ lemma preserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   rw [h.2]
 
 set_option warning.simp.varHead false in
-@[simp, nolint simpVarHead]
+@[simp]
 lemma inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (x : Fin n) :
     c1 (h.inv σ x) = c x := by
@@ -129,7 +129,7 @@ lemma inv_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   rfl
 
 set_option warning.simp.varHead false in
-@[simp, nolint simpVarHead]
+@[simp]
 lemma toEquiv_symm_perserve_color {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) (x : Fin m) :
     c (h.toEquiv.symm x) = c1 x := by

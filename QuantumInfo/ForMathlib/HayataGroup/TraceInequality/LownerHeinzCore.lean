@@ -700,7 +700,10 @@ theorem ratio_add_t_operatorMonotoneOn_Ici : ∀ (t : ℝ), 0 < t →
         simpa [Set.Ici] using (hspT hx)
       exact ne_of_gt (add_pos_of_nonneg_of_pos hx0 ht)
     have hT_cont : ContinuousOn invfun (spectrum ℝ T) := by
-      simpa [invfun, one_div] using (continuousOn_id.add continuousOn_const).inv₀ hT_ne0
+      have h1 : ContinuousOn (fun x : ℝ ↦ x + t) (spectrum ℝ T) :=
+        continuousOn_id.add continuousOn_const
+      have h2 : ContinuousOn (fun x : ℝ ↦ (x + t)⁻¹) (spectrum ℝ T) := h1.inv₀ hT_ne0
+      simpa [invfun, one_div] using h2
     dsimp [cfcR]
     have hcongr :
         cfcR (fun x : ℝ ↦ x / (x + t)) T =
@@ -765,7 +768,10 @@ theorem ratio_add_t_operatorConcaveOn_Ici : ∀ (t : ℝ), 0 < t →
           simpa [Set.Ici] using (Ts hx)
         exact ne_of_gt (add_pos_of_nonneg_of_pos hx0 ht)
       have hcont : ContinuousOn invfun (spectrum ℝ T) := by
-        simpa [invfun, one_div] using (continuousOn_id.add continuousOn_const).inv₀ hne0
+        have h1 : ContinuousOn (fun x : ℝ ↦ x + t) (spectrum ℝ T) :=
+          continuousOn_id.add continuousOn_const
+        have h2 : ContinuousOn (fun x : ℝ ↦ (x + t)⁻¹) (spectrum ℝ T) := h1.inv₀ hne0
+        simpa [invfun, one_div] using h2
       dsimp [cfcR]
       have hcongr :
           cfcR (fun x : ℝ ↦ - (x / (x + t))) T

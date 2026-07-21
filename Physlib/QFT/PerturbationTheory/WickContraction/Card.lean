@@ -72,7 +72,7 @@ def consAddContract (i : Fin n.succ) (c : WickContraction n) :
   ⟨(c.1.map (Finset.mapEmbedding i.succAboveEmb).toEmbedding).map
     (Finset.mapEmbedding (Fin.succEmb n.succ)).toEmbedding ∪ {{0, i.succ}}, by
     intro a
-    simp only [succ_eq_add_one, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
+    simp only [succ_eq_add_one, Finset.mem_union, Finset.mem_map,
       RelEmbedding.coe_toEmbedding, exists_exists_and_eq_and, Finset.mem_singleton]
     intro h
     rcases h with h | h
@@ -86,7 +86,7 @@ def consAddContract (i : Fin n.succ) (c : WickContraction n) :
       simp only [succ_eq_add_one, ne_eq, and_true]
       exact ne_of_beq_false rfl, by
     intro a ha b hb
-    simp only [succ_eq_add_one, Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
+    simp only [succ_eq_add_one, Finset.mem_union, Finset.mem_map,
       RelEmbedding.coe_toEmbedding, exists_exists_and_eq_and, Finset.mem_singleton] at ha hb
     rcases ha with ha | ha <;> rcases hb with hb | hb
     · obtain ⟨a, ha, rfl⟩ := ha
@@ -122,7 +122,7 @@ lemma consAddContract_getDual?_self_succ (i : Fin n.succ) (c : WickContraction n
 
 lemma mem_consAddContract_of_mem_iff (i : Fin n.succ) (c : WickContraction n) (a : Finset (Fin n)) :
     a ∈ c.1 ↔ (a.map i.succAboveEmb).map (Fin.succEmb n.succ) ∈ (consAddContract i c).1 := by
-  simp only [succ_eq_add_one, consAddContract, Finset.le_eq_subset, Finset.mem_union,
+  simp only [succ_eq_add_one, consAddContract, Finset.mem_union,
     Finset.mem_map, RelEmbedding.coe_toEmbedding, exists_exists_and_eq_and, Finset.mem_singleton]
   apply Iff.intro
   · intro h
@@ -186,7 +186,6 @@ lemma consAddContract_surjective_on_zero_contract (i : Fin n.succ)
       rw [← h2]
       simp
     · obtain ⟨b, hb, rfl⟩ := h
-      rw [Finset.mapEmbedding_apply, Finset.mapEmbedding_apply]
       simp only [succ_eq_add_one, Finset.mem_filter, Finset.mem_univ, true_and, c'] at hb
       exact hb
   · intro h
@@ -207,7 +206,6 @@ lemma consAddContract_surjective_on_zero_contract (i : Fin n.succ)
       obtain ⟨y, rfl⟩ := (Fin.exists_succAbove_eq (x := y) (y := i)) (by omega)
       use {x, y}
       simp only [c']
-      rw [Finset.mapEmbedding_apply, Finset.mapEmbedding_apply]
       simpa using h
 
 lemma consAddContract_bijection (i : Fin n.succ) :

@@ -145,9 +145,7 @@ theorem exp_isOrthochronous (A : lorentzAlgebra) :
   let γ : Path (0 : lorentzAlgebra) A :=
   { toFun := fun t => t.val • A,
     continuous_toFun := by
-      apply Continuous.smul
-      · exact continuous_subtype_val
-      · exact continuous_const,
+      exact Continuous.smul continuous_subtype_val continuous_const,
     source' := by simp [zero_smul],
     target' := by simp [one_smul] }
   let exp_γ : Path (1 : LorentzGroup 3) ⟨NormedSpace.exp A.1, exp_mem_lorentzGroup A⟩ :=

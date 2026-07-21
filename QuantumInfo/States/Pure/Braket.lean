@@ -193,7 +193,7 @@ def Bra.normalize (v : d → ℂ) (h : ∃ x, v x ≠ 0) : Bra d :=
   }
 
 /-- A bra is already normalized -/
-def Bra.normalize_ket_eq_self (ψ : Bra d) : Bra.normalize (ψ.vec) (Bra.exists_ne_zero ψ) = ψ := by
+lemma Bra.normalize_ket_eq_self (ψ : Bra d) : Bra.normalize (ψ.vec) (Bra.exists_ne_zero ψ) = ψ := by
   ext x
   unfold normalize
   simp only [apply, ψ.normalized', Real.sqrt_one, Complex.ofReal_one, div_one]

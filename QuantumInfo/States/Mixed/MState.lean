@@ -97,7 +97,8 @@ open Lean Meta Mathlib.Meta.Positivity in
 Note: we must not call `whnfR` on `e` because `MState.M` is a structure
 projection (reducible), so `whnfR` would reduce it and destroy the pattern. -/
 @[positivity MState.M _]
-meta def evalMStateM : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalMStateM : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let ρ := e.appArg!
   pure (.positive (← mkAppM ``MState.pos #[ρ]))
 
@@ -152,9 +153,9 @@ instance instMixable : Mixable (HermitianMat d ℂ) (MState d) where
       h.casesOn fun t ht ↦ ht ▸ t.tr⟩, rfl⟩
   convex := convex d
 
+include ρ in
 /-- An MState is a witness that d is nonempty. -/
-@[implicit_reducible]
-def nonempty : Nonempty d := by
+lemma nonempty : Nonempty d := by
   by_contra h
   simpa [HermitianMat.trace_eq_re_trace, not_nonempty_iff.mp h] using ρ.tr
 
@@ -1157,7 +1158,7 @@ lemma multiset_spectrum_relabel_eq {d₁ d₂ : Type*} [Fintype d₁] [Decidable
     congr! 2;
     exact beq_eq_beq.mp rfl
 
-def spectrum_SWAP (ρ : MState (d₁ × d₂)) : ∃ e, ρ.SWAP.spectrum.relabel e = ρ.spectrum := by
+lemma spectrum_SWAP (ρ : MState (d₁ × d₂)) : ∃ e, ρ.SWAP.spectrum.relabel e = ρ.spectrum := by
   -- Apply the lemma exists_equiv_of_multiset_map_eq with the appropriate parameters.
   obtain ⟨w, h⟩ := exists_equiv_of_multiset_map_eq (fun p => ρ.spectrum p) (fun p => ρ.SWAP.spectrum p)
     (ρ.multiset_spectrum_relabel_eq (Equiv.prodComm _ _).symm ▸ rfl)

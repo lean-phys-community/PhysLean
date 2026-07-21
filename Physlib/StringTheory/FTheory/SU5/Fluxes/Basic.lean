@@ -205,10 +205,9 @@ instance : AddCommMonoid Fluxes where
   zero_add f := Fluxes.ext_iff.mpr <| by simp
   add_zero f := Fluxes.ext_iff.mpr <| by simp
   add_comm f1 f2 := Fluxes.ext_iff.mpr <| by simp only [add_M, add_N]; ring_nf; simp
-  nsmul n f := ⟨n * f.M, n * f.N⟩
-  nsmul_zero f := Fluxes.ext_iff.mpr <| by simp
-  nsmul_succ n f := Fluxes.ext_iff.mpr <| by
-    simp only [Nat.cast_add, Nat.cast_one, add_M, add_N]; ring_nf; simp
+  nsmul n f := ⟨n • f.M, n • f.N⟩
+  nsmul_zero f := Fluxes.ext_iff.mpr ⟨zero_nsmul f.M, zero_nsmul f.N⟩
+  nsmul_succ n f := Fluxes.ext_iff.mpr ⟨succ_nsmul f.M n, succ_nsmul f.N n⟩
 
 end Fluxes
 

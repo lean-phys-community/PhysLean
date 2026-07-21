@@ -192,23 +192,10 @@ lemma neg_apply {d : ℕ} (p : Space d) (i : Fin d) :
     (-p) i = - (p i) := by rfl
 
 noncomputable instance {d} : AddCommGroup (Space d) where
-  zsmul z p := ⟨fun i => z * p.val i⟩
+  zsmul z p := ⟨fun i => z • p.val i⟩
   neg_add_cancel p := by
     ext i
     simp
-  zsmul_zero' p := by
-    ext i
-    simp
-  zsmul_succ' n p := by
-    ext i
-    simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, Int.cast_add, Int.cast_natCast,
-      Int.cast_one, add_apply]
-    ring
-  zsmul_neg' n p := by
-    ext i
-    simp only [Int.cast_negSucc, Nat.cast_add, Nat.cast_one, neg_add_rev, Nat.succ_eq_add_one,
-      Int.cast_add, Int.cast_natCast, Int.cast_one, neg_apply]
-    ring
 
 @[simp]
 lemma sub_apply {d} (p q : Space d) (i : Fin d) :

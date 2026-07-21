@@ -227,7 +227,7 @@ instance linSolsAddCommMonoid (χ : ACCSystemLinear) :
   zero_add S := LinSols.ext (χ.chargesAddCommMonoid.zero_add _)
   add_zero S := LinSols.ext (χ.chargesAddCommMonoid.add_zero _)
   nsmul n S := ⟨n • S.val, fun _ ↦ by simp [S.linearSol _]⟩
-  nsmul_zero n := by ext; simp only [zero_nsmul]; rfl
+  nsmul_zero n := LinSols.ext (χ.chargesAddCommMonoid.nsmul_zero _)
   nsmul_succ n S := LinSols.ext (χ.chargesAddCommMonoid.nsmul_succ _ _)
 
 /-- An instance providing the operations and properties for `LinSols` to form a

@@ -176,7 +176,8 @@ lemma radiusPowLM_apply_contDiffAt {d : ℕ} (s : ℝ) (n : ℕ∞) (ψ : 𝓢(S
 lemma radiusPowLM_apply_stronglyMeasurable {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) :
     StronglyMeasurable (𝐫 s ψ) := by
   rw [radiusPowLM_apply_fun]
-  exact StronglyMeasurable.smul (by measurability) ψ.continuous.stronglyMeasurable
+  exact StronglyMeasurable.smul (f := fun x : Space d => ‖x‖ ^ s) (by measurability)
+    ψ.continuous.stronglyMeasurable
 
 /-- `x ↦ ‖x‖ˢψ(x)` is square-integrable provided `s` is not too negative. -/
 lemma radiusPowLM_apply_memHS {d : ℕ} (s : ℝ) (ψ : 𝓢(Space d, ℂ)) (a : ℕ)

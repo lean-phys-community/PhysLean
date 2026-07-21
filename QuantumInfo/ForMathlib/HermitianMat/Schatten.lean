@@ -40,7 +40,7 @@ theorem schattenNorm_hermitian_pow {A : HermitianMat d ℂ} (hA : 0 ≤ A) {p : 
   simp only [HermitianMat.conjTranspose_mat, HermitianMat.mat_pow]
   convert rfl using 2
   rw [sq]
-  exact Matrix.IsHermitian.cfc_eq _ _
+  exact congrFun (congrFun (Matrix.IsHermitian.cfc_eq _ _) _) _
 
 lemma schattenNorm_nonneg (A : Matrix d d ℂ) (p : ℝ) :
     0 ≤ schattenNorm A p := by

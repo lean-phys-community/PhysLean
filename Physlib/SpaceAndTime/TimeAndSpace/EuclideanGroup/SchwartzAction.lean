@@ -59,19 +59,21 @@ plain mathlib `Representation` (`G →* V →ₗ[ℝ] V`) is recovered via
 `ContRepresentation.toRepresentation`. -/
 noncomputable def schwartzEuclideanAction {d : ℕ} :
     ContRepresentation ℝ (EuclideanGroup d) 𝓢(TimeAndSpace d, F) where
-  toFun g := SchwartzMap.compCLMOfAntilipschitz (𝕜 := ℝ)
-    (g := fun tx : TimeAndSpace d => g⁻¹ • tx)
-    (TimeAndSpace.smul_hasTemperateGrowth g⁻¹)
-    (TimeAndSpace.antilipschitz_smul g⁻¹)
-  map_one' := by
-    ext η tx
-    simp
-  map_mul' g h := by
-    ext η tx
-    simp only [_root_.mul_inv_rev, SchwartzMap.compCLMOfAntilipschitz_apply,
-      Function.comp_apply]
-    rw [mul_smul]
-    rfl
+  toMonoidHom :=
+  { toFun := fun g => SchwartzMap.compCLMOfAntilipschitz (𝕜 := ℝ)
+      (g := fun tx : TimeAndSpace d => g⁻¹ • tx)
+      (TimeAndSpace.smul_hasTemperateGrowth g⁻¹)
+      (TimeAndSpace.antilipschitz_smul g⁻¹)
+    map_one' := by
+      ext η tx
+      simp
+    map_mul' := by
+      intro g h
+      ext η tx
+      simp only [_root_.mul_inv_rev, SchwartzMap.compCLMOfAntilipschitz_apply,
+        Function.comp_apply]
+      rw [mul_smul]
+      rfl }
 
 /-- Pointwise formula for the monoid-homomorphism form of the Schwartz-map pullback action. -/
 @[simp]

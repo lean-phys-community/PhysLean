@@ -901,14 +901,15 @@ lemma component_mul_isDistBounded {d : ℕ} {f : Space d → ℝ}
 lemma isDistBounded_smul_self {d : ℕ} {f : Space d → ℝ}
     (hf : IsDistBounded f) : IsDistBounded (fun x => f x • x) := by
   refine IsDistBounded.congr (f := fun x => ‖x‖ * f x) (by fun_prop)
-    (AEStronglyMeasurable.smul (by fun_prop) (by fun_prop)) fun x => ?_
+    (AEStronglyMeasurable.smul (f := f) (g := fun x => x) (by fun_prop) (by fun_prop)) fun x => ?_
   simp [norm_smul, mul_comm]
 
 @[fun_prop]
 lemma isDistBounded_smul_self_repr {d : ℕ} {f : Space d → ℝ}
     (hf : IsDistBounded f) : IsDistBounded (fun x => f x • basis.repr x) := by
   refine IsDistBounded.congr (f := fun x => ‖x‖ * f x) (by fun_prop)
-    (AEStronglyMeasurable.smul (by fun_prop) (by fun_prop)) fun x => ?_
+    (AEStronglyMeasurable.smul (f := f) (g := fun x => basis.repr x) (by fun_prop) (by fun_prop))
+      fun x => ?_
   simp [norm_smul, mul_comm]
 
 @[fun_prop]

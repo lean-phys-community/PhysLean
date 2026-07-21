@@ -76,7 +76,7 @@ instance instCoeVectorMeasure : Coe (SpectralMeasure α H) (VectorMeasure α (H 
   ⟨toVectorMeasure⟩
 
 instance instCoeFun : CoeFun (SpectralMeasure α H) fun _ ↦ Set α → H →L[ℂ] H :=
-  ⟨fun μS ↦ μS.toVectorMeasure.measureOf'⟩
+  ⟨fun μS ↦ ⇑μS.toVectorMeasure⟩
 
 lemma isStarProjection (A : Set α) : IsStarProjection (μS A) := μS.isStarProjection' A
 

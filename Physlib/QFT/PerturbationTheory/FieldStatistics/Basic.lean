@@ -310,11 +310,11 @@ instance : AddMonoid FieldStatistic where
   add_assoc a b c := by
     cases a <;> cases b <;> cases c <;> rfl
   nsmul_zero a := by
-    simp only [Finset.univ_eq_empty, Finset.prod_const, Finset.card_empty, pow_zero]
-    rfl
+    show (∏ _i : Fin 0, a) = (1 : FieldStatistic)
+    rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, pow_zero]
   nsmul_succ a n := by
-    simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-    rfl
+    show (∏ _i : Fin (a + 1), n) = (∏ _i : Fin a, n) * n
+    simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin, pow_succ]
 
 @[simp]
 lemma add_eq_mul (a b : FieldStatistic) : a + b = a * b := rfl

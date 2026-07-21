@@ -566,11 +566,12 @@ lemma eval_Qslice_eigenPoint (P : MvPolynomial (Fin 6) ℝ) (X : Fin 4 → ℝ) 
 open MvPolynomial in
 /-- The real part of a complex polynomial, taken coefficient-wise. -/
 noncomputable def realPart (H : MvPolynomial (Fin 5) ℂ) : MvPolynomial (Fin 5) ℝ :=
-  Finsupp.mapRange Complex.re Complex.zero_re H
+  .ofCoeff (Finsupp.mapRange Complex.re Complex.zero_re (AddMonoidAlgebra.coeff H))
 
 open MvPolynomial in
 @[simp] lemma realPart_coeff (H : MvPolynomial (Fin 5) ℂ) (m : Fin 5 →₀ ℕ) :
-    coeff m (realPart H) = (coeff m H).re := Finsupp.mapRange_apply
+    coeff m (realPart H) = (coeff m H).re := by
+  simp only [realPart, coeff, AddMonoidAlgebra.coeff_ofCoeff, Finsupp.mapRange_apply]
 
 open MvPolynomial in
 lemma realPart_C (a : ℂ) : realPart (C a) = C a.re := by

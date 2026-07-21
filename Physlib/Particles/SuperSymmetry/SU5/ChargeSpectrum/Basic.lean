@@ -187,7 +187,9 @@ lemma _root_.Option.toFinset_inj {x y : Option 𝓩} :
   cases x <;> cases y <;> simp [Option.toFinset]
 
 lemma subset_trans {x y z : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyz : y ⊆ z) : x ⊆ z := by
-  simp_all [Subset]
+  rw [subset_def] at hxy hyz ⊢
+  exact ⟨Finset.Subset.trans hxy.1 hyz.1, Finset.Subset.trans hxy.2.1 hyz.2.1,
+    Finset.Subset.trans hxy.2.2.1 hyz.2.2.1, Finset.Subset.trans hxy.2.2.2 hyz.2.2.2⟩
 
 lemma subset_antisymm {x y : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyx : y ⊆ x) : x = y :=
   eq_of_parts
@@ -328,6 +330,9 @@ lemma powerset_mono {x y : ChargeSpectrum 𝓩} :
   · intro h z hz
     exact mem_powerset_iff_subset.mpr (subset_trans (mem_powerset_iff_subset.mp hz) h)
 
+-- `unusedArguments` (newly flagged under v4.32.0): `hn` names the induction
+-- target but the proof discharges it directly via `exists_min_image`.
+@[nolint unusedArguments]
 lemma min_exists_inductive (S : Finset (ChargeSpectrum 𝓩)) (hS : S ≠ ∅) :
     (n : ℕ) → (hn : S.card = n) →
     ∃ y ∈ S, powerset y ∩ S = {y} := by

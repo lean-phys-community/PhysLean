@@ -84,7 +84,8 @@ TODO: We could add a fallback to give `nonnegative` if `Nonempty d` is not avail
 possibly also print a warning. (Users might often not have `Nonempty d` in context, and
 they probably want to.) -/
 @[positivity HermitianMat.exp _]
-meta def evalHermitianMatExp : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatExp : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app _exp (A : Expr) ← whnfR e | throwError "not HermitianMat.exp"
   pure (.positive (← mkAppM ``HermitianMat.exp_pos #[A]))
 
@@ -215,7 +216,8 @@ theorem logApprox_mono {x y : HermitianMat d 𝕜} (hx : x.mat.PosDef) (hy : y.m
     ∫ t in (0)..T, ((1 + t)⁻¹ • (1 : HermitianMat d 𝕜) - (y + t • 1)⁻¹) := by
   -- By the properties of the integral, we can bring the limit inside, so we have:
   have h_integrable : ContinuousOn (fun t : ℝ => (1 + t)⁻¹ • (1 : HermitianMat d 𝕜)) (Set.Icc 0 T) ∧ ContinuousOn (fun t : ℝ => (x + t • 1)⁻¹) (Set.Icc 0 T) ∧ ContinuousOn (fun t : ℝ => (y + t • 1)⁻¹) (Set.Icc 0 T) := by
-    refine' ⟨ ContinuousOn.smul ( ContinuousOn.inv₀ ( continuousOn_const.add continuousOn_id ) fun t ht => by linarith [ ht.1 ] ) continuousOn_const, _, _ ⟩;
+    refine' ⟨ ContinuousOn.smul ( ContinuousOn.inv₀ ( continuousOn_const.add continuousOn_id ) fun t ht => by
+        simp only [Pi.add_apply, id_eq]; linarith [ ht.1 ] ) continuousOn_const, _, _ ⟩;
     · refine' ContinuousOn.comp ( show ContinuousOn ( fun m : HermitianMat d 𝕜 => m⁻¹ ) ( { m : HermitianMat d 𝕜 | m.mat.PosDef } ) from _ ) _ _;
       · intro m hm;
         refine' ContinuousAt.continuousWithinAt _;
@@ -588,7 +590,8 @@ theorem logApprox_concave {n 𝕜 : Type*} [Fintype n] [DecidableEq n] [RCLike �
     have h_integrable := integrable_inv_shift hz T hT
     rw [ intervalIntegrable_iff_integrableOn_Ioc_of_le hT ] at *
     refine MeasureTheory.Integrable.sub ?_ h_integrable
-    exact ContinuousOn.integrableOn_Icc ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.smul ( ContinuousAt.inv₀ ( continuousAt_const.add continuousAt_id ) ( by linarith [ ht.1 ] ) ) continuousAt_const ) |> fun h => h.mono_set ( Set.Ioc_subset_Icc_self );
+    exact ContinuousOn.integrableOn_Icc ( by exact continuousOn_of_forall_continuousAt fun t ht => ContinuousAt.smul ( ContinuousAt.inv₀ ( continuousAt_const.add continuousAt_id ) ( by
+        simp only [Pi.add_apply, id_eq]; linarith [ ht.1 ] ) ) continuousAt_const ) |> fun h => h.mono_set ( Set.Ioc_subset_Icc_self );
   have h_int2 : IntervalIntegrable (fun t => (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - ((a • x + b • y) + t • 1)⁻¹) MeasureTheory.volume 0 T := by
     exact h_integrable (Matrix.PosDef.Convex hx hy ha hb hab)
   have h_integral_mono : ∫ t in (0)..T, a • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (x + t • 1)⁻¹) + b • ((1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - (y + t • 1)⁻¹) ≤ ∫ t in (0)..T, (1 + t)⁻¹ • (1 : HermitianMat n 𝕜) - ((a • x + b • y) + t • 1)⁻¹ := by

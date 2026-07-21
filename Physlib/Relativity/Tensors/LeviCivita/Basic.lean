@@ -164,7 +164,10 @@ lemma leviCivita_contract_three : {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(
     (-6) • unitTensor (S := realLorentzTensor) Color.down | σ τ }ᵀ := by
   sorry
 
-@[sorryful]
+-- `checkType` linter: under the v4.32.0 toolchain, whnf on this tensor-notation
+-- statement exceeds the linter's 200k-heartbeat budget (it did not on v4.31.0).
+-- Statement unchanged; see the v4.32.0 bump commit message.
+@[sorryful, nolint checkType]
 lemma leviCivita_contract_self :
     {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ.toField = - 24 := by
   sorry

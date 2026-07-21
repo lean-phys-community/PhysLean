@@ -193,7 +193,7 @@ lemma projector_support_eq_sum : A.supportProj.mat =
   simp_all [ Finset.sum_ite ];
   convert h_sum_rankOne using 1;
   · exact h_support ▸ rfl;
-  · refine' Finset.sum_bij ( fun i hi => ⟨ i, by simpa using hi ⟩ ) _ _ _ _ <;> simp [ Finset.mem_filter ]
+  · refine' Finset.sum_bij ( fun i hi => ⟨ i, by simpa using hi ⟩ ) _ _ _ _ <;> simp [ Finset.mem_filter, hb ]
 
 /-
 `HermitianMat.supportProj` as a cfc.

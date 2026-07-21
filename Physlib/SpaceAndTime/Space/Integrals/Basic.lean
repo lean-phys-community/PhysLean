@@ -120,6 +120,9 @@ lemma integral_volume_eq_spherical (d : ℕ) [NeZero d] (f : Space d → F)
   field_simp
   simp
 
+-- `unusedArguments` (newly flagged under v4.32.0): `NormedSpace ℝ F` is required
+-- to state the goal but is not referenced in the proof term.
+@[nolint unusedArguments]
 lemma integrable_spherical_of_integrable {d : ℕ} {F : Type*}
     [NormedAddCommGroup F] [NormedSpace ℝ F] {f : Space d → F}
     (hf : Integrable f volume) :

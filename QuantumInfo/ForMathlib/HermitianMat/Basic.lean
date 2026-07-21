@@ -305,7 +305,7 @@ theorem one_zpow : ((1 : HermitianMat m α) ^ z) = 1 := by
   ext1; simp
 
 @[simp]
-theorem zpow_neg_one : A ^ (-1) = A⁻¹ := by
+theorem zpow_neg_one : A ^ (-1 : ℤ) = A⁻¹ := by
   ext1; exact A.mat.zpow_neg_one
 
 @[simp]

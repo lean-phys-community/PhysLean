@@ -52,6 +52,9 @@ lemma lightlike_eq_spatial_norm_of_eq_time {d : ℕ} {v w : Vector d}
 set_option linter.unusedVariables false in
 /-- If two lightlike vectors have parallel spatial components, their temporal components
 must also be proportional, which implies the entire vectors are proportional -/
+-- `unusedArguments` (newly flagged under v4.32.0): the lightlike hypotheses are
+-- part of the intended interface but not needed by the current proof.
+@[nolint unusedArguments]
 lemma lightlike_spatial_parallel_implies_proportional {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .lightLike) (hw : causalCharacter w = .lightLike)
     (h_spatial_parallel : ∃ (r : ℝ), v = r • w) :

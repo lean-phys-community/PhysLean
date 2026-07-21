@@ -31,12 +31,12 @@ def H₁ : Prob → ℝ :=
 
 /-- H₁ of 0 is zero.-/
 @[simp]
-def H₁_zero_eq_zero : H₁ 0 = 0 := by
+lemma H₁_zero_eq_zero : H₁ 0 = 0 := by
   simp [H₁]
 
 /-- H₁ of 1 is zero.-/
 @[simp]
-def H₁_one_eq_zero : H₁ 1 = 0 := by
+lemma H₁_one_eq_zero : H₁ 1 = 0 := by
   simp [H₁]
 
 /-- Entropy is nonnegative. -/

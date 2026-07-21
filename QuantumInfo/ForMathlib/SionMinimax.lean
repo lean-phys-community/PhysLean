@@ -263,23 +263,30 @@ theorem LeftOrdContinuous.comp_lowerSemicontinuousOn_strong_assumptions {α γ �
     LowerSemicontinuousOn (g ∘ f) s := by
   intros x hx y hy
   have hU : ∃ U ∈ nhds x, ∀ z ∈ U ∩ s, g (f z) > y := by
-    simp_all only [Set.mem_inter_iff, gt_iff_lt, and_imp]
-    obtain ⟨z, hz1, hz2⟩ : ∃ z, y < g z ∧ z < f x := by
-      obtain ⟨z, hz⟩ : ∃ z, z < f x ∧ y < g z := by
-        by_contra h_contra
-        simp only [not_exists, not_and, not_lt] at h_contra
-        have h_exists_z : ∃ z, z < f x ∧ g z > y := by
-          have h_lub : IsLUB (Set.Iio (f x)) (f x) := by
-            exact isLUB_Iio
-          have := hg h_lub;
-          have := this.exists_between hy
-          simp_all only [Set.mem_image, Set.mem_Iio, exists_exists_and_eq_and, gt_iff_lt]
-          grind
-        exact h_exists_z.choose_spec.2.not_ge ( h_contra _ h_exists_z.choose_spec.1 );
-      aesop
-    specialize hf x hx z hz2
-    rw [ eventually_nhdsWithin_iff ] at hf
-    exact ⟨_, hf, fun _ hx hx' ↦ hz1.trans_le (hg2 (hx hx').le)⟩
+    by_cases hne : (Set.Iio (f x)).Nonempty
+    · simp_all only [Set.mem_inter_iff, gt_iff_lt, and_imp]
+      obtain ⟨z, hz1, hz2⟩ : ∃ z, y < g z ∧ z < f x := by
+        obtain ⟨z, hz⟩ : ∃ z, z < f x ∧ y < g z := by
+          by_contra h_contra
+          simp only [not_exists, not_and, not_lt] at h_contra
+          have h_exists_z : ∃ z, z < f x ∧ g z > y := by
+            have h_lub : IsLUB (Set.Iio (f x)) (f x) := by
+              exact isLUB_Iio
+            have := hg hne h_lub
+            have := this.exists_between hy
+            simp_all only [Set.mem_image, Set.mem_Iio, exists_exists_and_eq_and, gt_iff_lt]
+            grind
+          exact h_exists_z.choose_spec.2.not_ge ( h_contra _ h_exists_z.choose_spec.1 )
+        aesop
+      specialize hf x hx z hz2
+      rw [ eventually_nhdsWithin_iff ] at hf
+      exact ⟨_, hf, fun _ hx hx' ↦ hz1.trans_le (hg2 (hx hx').le)⟩
+    · refine ⟨Set.univ, Filter.univ_mem, fun z _ ↦ ?_⟩
+      rw [Set.not_nonempty_iff_eq_empty] at hne
+      have hmin : f x ≤ f z := by
+        by_contra h
+        exact Set.eq_empty_iff_forall_notMem.mp hne (f z) (not_le.mp h)
+      exact lt_of_lt_of_le hy (hg2 hmin)
   simp only [Set.mem_inter_iff, and_imp] at hU
   obtain ⟨w, ⟨left, right⟩⟩ := hU
   exact Filter.eventually_inf_principal.2 (Filter.mem_of_superset left right)
@@ -665,7 +672,6 @@ private lemma sion_exists_min_fin
         ext
         simp [S']
       rw [hS'_compl] at hS_diff_ne ⊢
-      rw [Set.coe_setOf] at hS_diff_ne
       refine hab.trans_le ?_
       simp
       apply le_ciInf

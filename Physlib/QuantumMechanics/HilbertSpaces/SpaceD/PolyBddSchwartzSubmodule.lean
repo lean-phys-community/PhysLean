@@ -102,7 +102,7 @@ abbrev PolyBddSchwartzSubmodule
 lemma polyBddSchwartzIncl_injective
     {d : ℕ} (a : ℕ∞) (μ : Measure (Space d)) [μ.HasTemperateGrowth] [μ.IsOpenPosMeasure] :
     Function.Injective (polyBddSchwartzIncl (a := a) μ) :=
-  LinearMap.injective_domRestrict_iff.mpr <| (schwartzIncl_ker μ).symm ▸ inf_bot_eq _
+  LinearMap.injective_domRestrict_iff.mpr <| (schwartzIncl_ker μ).symm ▸ disjoint_bot_right
 
 /-- The linear equivalence between polynomially-bounded Schwartz maps and the corresponding
   submodule of the Hilbert space. -/

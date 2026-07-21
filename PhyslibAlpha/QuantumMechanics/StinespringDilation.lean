@@ -501,7 +501,7 @@ open Kronecker TensorProduct
 /-- Taking the partial trace of a tensor product with a matrix of trace 1 is the
 identity map. -/
 lemma tr₂_e₀Xe₀ {R : Type*} [RCLike R]
-    {m w : Type*} [Fintype w] [Zero w]
+    {m w : Type*} [Fintype w]
     (e : Matrix w w R) (htr : e.trace = 1)
     (ρ : Matrix m m R) :
     tr₂ (ρ ⊗ₖ e) = ρ := by
@@ -536,7 +536,7 @@ def stinespringUnitaryForm_e {R : Type*} [RCLike R] {m r : ℕ}
 
 /-- Trace-free version of the Stinespring Dilation Theorem. -/
 theorem tracefree_version {R : Type*} [RCLike R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Zero r] [Fintype m] [DecidableEq m]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     {K : r → Matrix m m R}
     (ρ : Matrix m m R) :
     let K' := fun i x y => star <| K i y x; let U := (stinespringOp K');
@@ -556,7 +556,7 @@ theorem tracefree_version {R : Type*} [RCLike R]
 
 /-- A Heisberg picture / Schrödinger picture view of the Stinespring dilation. -/
 theorem heisenberg_schrõdinger {R : Type*} [RCLike R]
-    {m r : Type*} [Fintype r] [DecidableEq r] [Zero r] [Fintype m] [DecidableEq m]
+    {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     {K : r → Matrix m m R}
     (ρ : Matrix m m R) :
   let K' := fun i x y => star <| K i y x
@@ -722,7 +722,7 @@ def krausCompletion {R : Type*} [RCLike R] {m r : ℕ}
 
 /-- Entrywise formula for the Stinespring isometry: its `((x₁, x₂), y)` entry is `K x₂ x₁ y`. -/
 theorem stinespringOp_apply {R : Type*} [Ring R] {m r : Type*} [Fintype r] [DecidableEq r]
-    [Fintype m] [DecidableEq m] (K : r → Matrix m m R) (x : m × r) (y : m) :
+    (K : r → Matrix m m R) (x : m × r) (y : m) :
     stinespringOp K x y = K x.2 x.1 y := by
   unfold stinespringOp
   simp [Matrix.sum_apply, Matrix.kroneckerMap_apply, Matrix.single_apply]

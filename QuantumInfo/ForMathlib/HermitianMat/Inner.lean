@@ -378,8 +378,7 @@ noncomputable instance : NormedAddCommGroup (HermitianMat d ℂ) :=
 
 --PR'ed in #35056
 open ComplexOrder in
-@[reducible]
-def _root_.RCLike.instOrderClosed : OrderClosedTopology 𝕜 where
+lemma _root_.RCLike.instOrderClosed : OrderClosedTopology 𝕜 where
   isClosed_le' := by
     conv => enter [1, 1, p]; rw [RCLike.le_iff_re_im]
     simp_rw [Set.setOf_and]

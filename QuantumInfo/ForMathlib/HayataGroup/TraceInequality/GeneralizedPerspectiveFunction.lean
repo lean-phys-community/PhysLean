@@ -529,7 +529,7 @@ theorem theorem_2_6_forward_jointlyConcaveOn_psd_pd_Ici
     refine ⟨?_, ?_, ?_⟩
     · intro K _ _ _ _
       exact (hfconc (K := K))
-    · simpa using hfcont.neg
+    · exact hfcont.neg
     · simpa using (neg_nonpos.mpr hf0)
   have hconv_neg :
       JointlyConvexOn (psdSet (ℋ := ℋ)) (pdSet (ℋ := ℋ))

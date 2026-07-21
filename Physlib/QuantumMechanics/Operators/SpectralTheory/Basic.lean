@@ -397,7 +397,7 @@ lemma IsClosable.defectNumber_const [CompleteSpace H]
     T.defectNumber z₁ = T.defectNumber z₂ := by
   by_cases hz₁ : z₁ ∈ T.regularityDomain
   · have h_joined : JoinedIn T.regularityDomain z₁ z₂ := by
-      haveI := T.regularityDomain_isOpen.locPathConnectedSpace
+      haveI := T.regularityDomain_isOpen.locallyPathConnectedSpace
       have hz₂ : z₂ ∈ T.regularityDomain := connectedComponentIn_subset _ _ hz
       apply (joinedIn_iff_joined hz₁ hz₂).mpr
       rw [← mem_pathComponent_iff, pathComponent_eq_connectedComponent]

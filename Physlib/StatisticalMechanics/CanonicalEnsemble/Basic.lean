@@ -566,6 +566,9 @@ noncomputable def differentialEntropy (T : Temperature) : ℝ :=
   - kB * ∫ i, log (probability 𝓒 T i) ∂𝓒.μProd T
 
 /-- Probabilities are non-negative, assuming a positive partition function. -/
+-- `unusedArguments` (newly flagged under v4.32.0): the finiteness / non-zero
+-- instances are part of the intended interface but not needed by this proof.
+@[nolint unusedArguments]
 lemma probability_nonneg
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
     0 ≤ 𝓒.probability T i :=

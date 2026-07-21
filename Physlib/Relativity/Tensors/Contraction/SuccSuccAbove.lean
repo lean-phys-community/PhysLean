@@ -167,7 +167,7 @@ lemma succSuccAbove_symm (i j : Fin (n + 1 + 1)) :
   grind (splits := 5)
 
 set_option warning.simp.varHead false in
-@[simp, nolint simpVarHead]
+@[simp]
 lemma apply_succSuccAbove_symm {c : Fin (n + 1 + 1) → C} (i j : Fin (n + 1 + 1))
     (k : Fin n) : c (succSuccAbove i j k) = c (succSuccAbove j i k) := by
   rw [succSuccAbove_symm]

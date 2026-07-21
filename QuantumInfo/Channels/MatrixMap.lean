@@ -6,7 +6,7 @@ Authors: Alex Meiburg
 module
 
 public import Mathlib.LinearAlgebra.TensorProduct.Matrix
-public import Mathlib.LinearAlgebra.PiTensorProduct
+public import Mathlib.LinearAlgebra.PiTensorProduct.Basic
 public import Mathlib.LinearAlgebra.PiTensorProduct.Basis
 public import Mathlib.Data.Set.Card
 public import Mathlib.Algebra.Module.LinearMap.Basic

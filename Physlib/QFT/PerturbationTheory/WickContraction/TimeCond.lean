@@ -312,7 +312,7 @@ lemma join_eqTimeContractSet {φs : List 𝓕.FieldOp} (φsΛ : WickContraction 
   · intro h
     have hmem := mem_of_mem_eqTimeContractSet h
     have ht := joinLiftLeft_or_joinLiftRight_of_mem_join (φsucΛ := φsucΛ) _ hmem
-    simp only [Finset.le_eq_subset, Finset.mem_union, Finset.mem_map, RelEmbedding.coe_toEmbedding]
+    simp only [Finset.mem_union, Finset.mem_map, RelEmbedding.coe_toEmbedding]
     rcases ht with ht | ht
     · obtain ⟨b, rfl⟩ := ht
       left
@@ -330,7 +330,7 @@ lemma join_eqTimeContractSet {φs : List 𝓕.FieldOp} (φsΛ : WickContraction 
       simp only [joinLiftRight, and_true]
       simpa [eqTimeContractSet] using h
   · intro h
-    simp only [Finset.le_eq_subset, Finset.mem_union, Finset.mem_map,
+    simp only [Finset.mem_union, Finset.mem_map,
       RelEmbedding.coe_toEmbedding] at h
     rcases h with h | h
     · simp only [eqTimeContractSet, Fin.getElem_fin, Finset.mem_filter, Finset.mem_univ,
@@ -433,7 +433,7 @@ lemma join_haveEqTime_of_eqTimeOnly_nonEmpty {φs : List 𝓕.FieldOp} (φsΛ : 
     (h1 : φsΛ.EqTimeOnly) (h2 : φsΛ ≠ empty)
     (φsucΛ : WickContraction [φsΛ]ᵘᶜ.length) :
     HaveEqTime (join φsΛ φsucΛ) := by
-  simp only [HaveEqTime, Fin.getElem_fin, join, Finset.le_eq_subset, Finset.mem_union,
+  simp only [HaveEqTime, Fin.getElem_fin, join, Finset.mem_union,
     Finset.mem_map, RelEmbedding.coe_toEmbedding, exists_and_left, exists_prop]
   simp only [EqTimeOnly, Fin.getElem_fin] at h1
   obtain ⟨i, j, h⟩ := exists_pair_of_not_eq_empty _ h2
@@ -481,7 +481,7 @@ def hasEqTimeEquiv (φs : List 𝓕.FieldOp) :
         simp only [subContraction]
         rw [join_eqTimeContractSet]
         rw [eqTimeContractSet_of_not_haveEqTime h2]
-        simp only [Finset.le_eq_subset, ne_eq, Finset.map_empty, Finset.union_empty]
+        simp only [ne_eq, Finset.map_empty, Finset.union_empty]
         rw [eqTimeContractSet_of_mem_eqTimeOnly h1.1]
       refine hasEqTimeEquiv_ext_sigma ?_ ?_
       · simp only [ne_eq]

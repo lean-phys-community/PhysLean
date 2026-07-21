@@ -225,7 +225,7 @@ lemma ι_eq_zero_iff_mem_ideal (x : FieldOpFreeAlgebra 𝓕) :
     ι x = 0 ↔ x ∈ TwoSidedIdeal.span 𝓕.fieldOpIdealSet := by
   rw [ι_apply]
   change ⟦x⟧ = ⟦0⟧ ↔ _
-  simp_all only [Quotient.eq, Con.rel_eq_coe, RingCon.toCon_coe_eq_coe, TwoSidedIdeal.mem_mk]
+  simp_all only [Quotient.eq, Con.rel_eq_coe, RingCon.toCon_coe_eq_coe, TwoSidedIdeal.mem_ofRingCon]
 
 lemma bosonicProjF_mem_fieldOpIdealSet_or_zero (x : FieldOpFreeAlgebra 𝓕)
     (hx : x ∈ 𝓕.fieldOpIdealSet) :
@@ -322,7 +322,7 @@ lemma bosonicProjF_mem_ideal (x : FieldOpFreeAlgebra 𝓕)
       · exact TwoSidedIdeal.mem_span_iff.mpr fun I hI => hI h
       · simp [h]
     exact add_mem (add_mem (key hBy) (key hFy)) (add_mem (key hFy) (key hBy))
-  · simp only [TwoSidedIdeal.mem_mk, map_zero, ZeroMemClass.coe_zero, p]
+  · simp only [TwoSidedIdeal.mem_ofRingCon, map_zero, ZeroMemClass.coe_zero, p]
     exact (RingCon.eq (ringConGen fun a b => a - b ∈ 𝓕.fieldOpIdealSet)).mp rfl
   · intro x y hx hy hpx hpy
     simp_all only [map_add, Submodule.coe_add, p]

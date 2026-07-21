@@ -83,8 +83,8 @@ instance : AddCommGroup RatComplexNum where
         simp
       · change a2 + 0 = a2
         simp
-  nsmul := fun n x => ⟨n • x.fst, n • x.snd⟩
   neg := fun x => ⟨-x.fst, -x.snd⟩
+  nsmul := fun n x => ⟨n • x.fst, n • x.snd⟩
   zsmul := fun n x => ⟨n • x.1, n • x.2⟩
   neg_add_cancel := by
     intro a
@@ -102,42 +102,17 @@ instance : AddCommGroup RatComplexNum where
       ring
     · simp only [add_snd]
       ring
-  nsmul_zero := by
-    intro x
-    simp only [zero_nsmul]
-    rfl
-  nsmul_succ := by
-    intro x y
-    ext
-    · simp only [add_fst]
-      ring
-    · simp only [add_snd]
-      ring
-  zsmul_zero' := by
-    intro a
-    ext
-    · simp only [zero_smul]
-      rfl
-    · simp only [zero_smul]
-      rfl
+  nsmul_zero := by intro x; ext <;> exact zero_nsmul _
+  nsmul_succ := by intro n x; ext <;> exact succ_nsmul _ _
+  zsmul_zero' := by intro a; ext <;> exact zero_zsmul _
   zsmul_succ' := by
-    intro a n
+    intro n a
     ext
-    · simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, zsmul_eq_mul, Int.cast_add,
-      Int.cast_natCast, Int.cast_one, add_fst]
-      ring
-    · simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, zsmul_eq_mul, Int.cast_add,
-      Int.cast_natCast, Int.cast_one, add_snd]
-      ring
-  zsmul_neg' := by
-    intro a n
-    ext
-    · simp only [zsmul_eq_mul, Int.cast_negSucc, Nat.cast_add, Nat.cast_one, neg_add_rev,
-      Nat.succ_eq_add_one, Int.cast_add, Int.cast_natCast, Int.cast_one]
-      ring
-    · simp only [zsmul_eq_mul, Int.cast_negSucc, Nat.cast_add, Nat.cast_one, neg_add_rev,
-      Nat.succ_eq_add_one, Int.cast_add, Int.cast_natCast, Int.cast_one]
-      ring
+    · show ((n : ℤ) + 1) • a.fst = (n : ℤ) • a.fst + a.fst
+      exact add_one_zsmul _ _
+    · show ((n : ℤ) + 1) • a.snd = (n : ℤ) • a.snd + a.snd
+      exact add_one_zsmul _ _
+  zsmul_neg' := by intro n a; ext <;> exact negSucc_zsmul _ _
 
 instance : Mul RatComplexNum where
   mul := fun x y => ⟨x.fst * y.fst - x.snd * y.snd, x.fst * y.snd + x.snd * y.fst⟩

@@ -848,17 +848,18 @@ lemma dist_lt_of_continuous_spectrum {X : Type*} [TopologicalSpace X]
           intro i
           generalize_proofs at *; (
           have h_cont : ContinuousWithinAt (fun p : X × ℝ => f p.1 p.2 - f x₀ p.2) (S ×ˢ T) (x₀, (A x₀).H.eigenvalues i) := by
-            have := hf (x₀, (A x₀).H.eigenvalues i) ⟨hx₀, ?_⟩
-            generalize_proofs at *;
-            · convert this.sub ( ContinuousWithinAt.comp ( show ContinuousWithinAt ( fun p : ℝ => f x₀ p ) T ( ( A x₀ ).H.eigenvalues i ) from ?_ ) ( continuousWithinAt_snd ) ?_ ) using 1 <;> norm_num +zetaDelta at *;
-              · have := hf ( x₀, ( A x₀ ).H.eigenvalues i ) ⟨ hx₀, hA₁ x₀ hx₀ ((A x₀).H.eigenvalues_mem_spectrum_real i) ⟩
-                generalize_proofs at *; (
-                convert! this.comp ( show ContinuousWithinAt ( fun p => ( x₀, p ) ) T ( ( A x₀ ).H.eigenvalues i ) from ?_ ) ?_ using 1 ;
-                generalize_proofs at *; (
-                exact ContinuousWithinAt.prodMk ( continuousWithinAt_const ) (continuousWithinAt_id));
-                exact fun x hx => ⟨ hx₀, hx ⟩);
-              · exact fun x hx => hx.2;
-            · exact hA₁ x₀ hx₀ ((A x₀).H.eigenvalues_mem_spectrum_real i) )
+            have hmemT : (A x₀).H.eigenvalues i ∈ T :=
+              hA₁ x₀ hx₀ ((A x₀).H.eigenvalues_mem_spectrum_real i)
+            have h1 : ContinuousWithinAt (fun p : X × ℝ => f p.1 p.2) (S ×ˢ T)
+                (x₀, (A x₀).H.eigenvalues i) := hf (x₀, (A x₀).H.eigenvalues i) ⟨hx₀, hmemT⟩
+            have hg : ContinuousWithinAt (fun q : ℝ => f x₀ q) T ((A x₀).H.eigenvalues i) :=
+              (hf (x₀, (A x₀).H.eigenvalues i) ⟨hx₀, hmemT⟩).comp
+                (continuousWithinAt_const.prodMk continuousWithinAt_id) (fun q hq => ⟨hx₀, hq⟩)
+            have h2 : ContinuousWithinAt (fun p : X × ℝ => f x₀ p.2) (S ×ˢ T)
+                (x₀, (A x₀).H.eigenvalues i) :=
+              hg.comp (f := Prod.snd) (x := (x₀, (A x₀).H.eigenvalues i))
+                continuousWithinAt_snd (fun p hp => hp.2)
+            exact h1.sub h2 )
           generalize_proofs at *; (
           have := h_cont.eventually ( Metric.ball_mem_nhds _ hε )
           simp_all [ dist_eq_norm ]
