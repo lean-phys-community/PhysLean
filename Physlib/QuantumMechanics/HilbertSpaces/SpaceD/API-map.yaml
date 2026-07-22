@@ -40,15 +40,15 @@ Requirements:
     location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Fourier.lean (fourierUnitary)
 
   - description: Defines the Sobolev subspaces.
-    done: true
-    location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/SobolevSubmodule.lean (SobolevSubmodule)
+    done: false
+    location: N/A
 
   - description: >
       Defines sub-Hilbert spaces consisting of functions with support contained
       in a subset of Space.
     done: true
     location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Basic.lean
-      (SpaceDHilbertSpaceOn, subsetIncl, subsetProjection)
+      (SpaceDHilbertSpaceOn, subspaceIncl, subspaceProjection)
 
   - description: >
       Defines subspaces corresponding to elements of the Hilbert space satisfying
