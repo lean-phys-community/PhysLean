@@ -68,3 +68,34 @@ Requirements:
       homogeneous mixed boundary conditions on a subset of Space.
     done: false
     location: N/A
+
+  - description: >
+      Defines the multiplication operator for a general complex function of position
+      with maximal domain.
+    done: true
+    location: Physlib/QuantumMechanics/Operators/Multiplication.lean (mulOperator)
+
+  - description:
+      Defines position operators as instances of multiplication operators with maximal domain.
+    done: true
+    location: Physlib/QuantumMechanics/Operators/Position.lean (positionOperator)
+
+  - description: >
+      Defines the derivative operator for a general complex function of the wavenumber
+      with maximal domain.
+    done: false
+    location: N/A
+
+  - description: >
+      Defines momentum and momentum-squared operators as instances of derivative operators
+      with maximal domain.
+    done: false
+    location: N/A
+
+  - description: Defines angular momentum and angular momentum-squared operators.
+    done: false
+    location: N/A
+
+  - description: Defines the reflection operator through a general hyperplane.
+    done: false
+    location: N/A
