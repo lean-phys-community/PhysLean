@@ -69,9 +69,8 @@ Requirements:
     done: false
     location: N/A
 
-  - description: >
-      Defines the multiplication operator for a general complex function of position
-      with maximal domain.
+  - description:
+      Defines multiplication operators with maximal domain for any complex function of position.
     done: true
     location: Physlib/QuantumMechanics/Operators/Multiplication.lean (mulOperator)
 
@@ -80,9 +79,8 @@ Requirements:
     done: true
     location: Physlib/QuantumMechanics/Operators/Position.lean (positionOperator)
 
-  - description: >
-      Defines the derivative operator for a general complex function of the wavenumber
-      with maximal domain.
+  - description:
+      Defines derivative operators with maximal domain for any complex function of the wavenumber.
     done: false
     location: N/A
 
