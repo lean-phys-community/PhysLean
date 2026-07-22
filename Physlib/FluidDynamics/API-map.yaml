@@ -6,23 +6,14 @@ Overview: |
   A fluid is described by the spatial distribution of its velocity, density, and
   pressure fields. This is a core data structure of fluid dynamics from which the
   continuity equation, the equations of motion, and thermodynamic balance laws are
-  built (Landau and Lifshitz, Fluid Mechanics, Chapter 1).
+  built (Landau and Lifshitz, Fluid Mechanics, vol. 6, 2nd ed., Chapter 1).
 
-  This map records the current state of Physlib/FluidDynamics.
-  Partial infrastructure exists. `FluidState` (density and velocity fields) is
-  defined in `FluidDynamics/FluidState.lean`, together with the field-type
-  abbreviations and the `FluidInMomentumBalance` extension. The mass flux density
-  `rho u` is available as `momentumDensity`, and the equation of continuity is fully
-  formalized in the conservative, residual, and smooth forms with an implication
-  between them.
-
-  Several requirements are not implemented. `FluidState` carries no pressure
-  field, so the fluid data structure is only part of the required one. There is no Euler equation (the momentum equations in
-  `FluidDynamics/NavierStokes/Momentum.lean` keep the stress tensor general and are
-  explicitly not specialized to an ideal, pressure-only fluid), no definition of an
-  ideal fluid, no entropy flux density, no Bernoulli equation, no energy flux, and no
-  notion of flow out of a volume. Those requirements are recorded below with
-  location N/A so future work can be tracked against them.
+  At present the fluid state carries density and velocity but not pressure, so the
+  data structure covers only part of the requirement. The mass flux density and
+  the equation of continuity are fully formalized, the latter in conservative,
+  residual, and smooth forms with the implication between them. The Euler
+  equation, the ideal fluid, entropy flux, the Bernoulli equation, energy flux,
+  and flow out of a volume are open; they are recorded below with location N/A.
 
 ParentAPIs:
   - Space (Physlib/SpaceAndTime/Space)
