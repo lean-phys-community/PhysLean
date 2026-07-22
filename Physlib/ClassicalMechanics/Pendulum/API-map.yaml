@@ -3,24 +3,25 @@ version: v0.1
 Title: Configuration space for pendulum
 
 Overview: |
-    The pendulum is a simple example of a classical-mechanical system whose key data
-    structure is its configuration space. This API covers the pendulum problems from
-    Landau & Lifshitz, Mechanics, Chapter 1, Section 5.
+    A pendulum is a mass swinging under gravity on a string or rod; its
+    configuration is set by angles and, for a moving support, the support position,
+    so its configuration space is naturally a product of circles and lines. This API
+    covers the pendulum problems of Landau and Lifshitz, Mechanics, 3rd ed.,
+    Chapter 1, Section 5.
 
-    Current state (partial): the sliding pendulum (`SlidingPendulum.lean`) has a genuine
-    configuration space `structure ConfigurationSpace` with generalized coordinates
-    `supportPosition : ℝ` (the horizontal position of the support mass) and
-    `angle : Real.Angle` (the angle the string makes with the vertical). The coplanar
-    double pendulum (`CoplanarDoublePendulum.lean`) declares `ConfigurationSpace` but it
-    is still `sorry` (`@[sorryful] def ConfigurationSpace : Type := sorry`), so it is not
-    treated as defined here. The miscellaneous pivot-motion file
-    (`MiscellaneousPendulumPivotMotions.lean`) contains only documentation and no
-    declarations.
+    Current state (partial): the sliding pendulum (`SlidingPendulum.lean`) has a
+    genuine configuration space `structure ConfigurationSpace` with generalized
+    coordinates `supportPosition : ℝ` (the horizontal position of the support mass)
+    and `angle : Real.Angle` (the angle the string makes with the vertical). The
+    coplanar double pendulum (`CoplanarDoublePendulum.lean`) declares
+    `ConfigurationSpace` but it is still a placeholder stub, so it is not treated as
+    defined here. The miscellaneous pivot-motion file contains only documentation
+    and no declarations.
 
-    The remaining requirements (a manifold structure on the configuration
-    space, a map to `Space` giving the position in real space, a trajectory based on the
+    The remaining requirements (a manifold structure on the configuration space, a
+    map to `Space` giving the position in real space, a trajectory based on the
     configuration space, and the lagrangian) are not yet implemented in the Pendulum
-    directory and are marked undone below.
+    directory; they are recorded below with location N/A.
 
 ParentAPIs:
   - Classical mechanics Lagrangian (Physlib/ClassicalMechanics/Lagrangian)

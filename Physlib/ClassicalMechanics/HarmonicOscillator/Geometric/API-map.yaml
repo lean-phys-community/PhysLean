@@ -3,17 +3,20 @@ version: v0.1
 Title: Configuration space of the harmonic oscillator
 
 Overview: |
-    The geometric API for the one-dimensional harmonic oscillator formalises its
-    configuration space `Q` as a one-dimensional smooth (analytic) manifold. The key
-    data structure `ConfigurationSpace` wraps a single chosen global coordinate valued
-    in `EuclideanSpace ℝ (Fin 1)`; the required structure carrying a single real
-    value is realised by this one-dimensional Euclidean coordinate. This coordinate
-    supplies the induced topology, a global coordinate homeomorphism and diffeomorphism,
-    the charted-space and manifold instances, the tangent-coordinate infrastructure, and
-    a map to physical `Space 1`. Trajectories are curves from `Time` into `Q`, with a
-    coordinate projection, a smoothness characterisation reducing manifold smoothness to
-    ordinary smoothness of the coordinate curve, and a geometric velocity in the tangent
-    bundle. A companion mass Riemannian metric gives the geometric kinetic energy.
+    The one-dimensional harmonic oscillator is a mass on a spring: a single particle
+    moving on a line under a restoring force proportional to its displacement. Its
+    configuration is one real coordinate, so its configuration space `Q` is a
+    one-dimensional smooth manifold; trajectories are curves from `Time` into `Q`,
+    and the kinetic energy comes from the mass metric, the mass-scaled Euclidean
+    inner product on tangent vectors.
+
+    The API formalises this geometrically. `ConfigurationSpace` wraps a global
+    coordinate valued in `EuclideanSpace ℝ (Fin 1)` and carries the induced
+    topology, a coordinate homeomorphism and analytic diffeomorphism, charted-space
+    and manifold instances, tangent-coordinate infrastructure, and a map to physical
+    `Space 1`. Smoothness of a trajectory reduces to smoothness of its coordinate
+    curve, the velocity is a tangent vector recovered as the coordinate derivative,
+    and the geometric kinetic energy recovers the standard mass-scaled expression.
 
 ParentAPIs:
   - Harmonic oscillator (Physlib/ClassicalMechanics/HarmonicOscillator)

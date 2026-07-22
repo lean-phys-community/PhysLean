@@ -3,20 +3,16 @@ version: v0.1
 Title: Configuration Space
 
 Overview: |
-    The configuration space `Q` of a mechanical system is the manifold of its possible
-    instantaneous configurations, coordinatised by generalized coordinates. It is the base
-    space of the Lagrangian formulation: a Lagrangian is a function on the tangent bundle
-    `TQ` (positions and velocities), and the Euler-Lagrange equations describe curves in `Q`.
+    The configuration space `Q` of a mechanical system is the manifold of its
+    possible instantaneous configurations, coordinatised by generalized coordinates.
+    It is the base space of the Lagrangian formulation of mechanics: a Lagrangian is
+    a function on the tangent bundle `TQ` of positions and velocities, and the
+    Euler-Lagrange equations describe physical motions as curves in `Q`.
 
-    There is at present no single general `ConfigurationSpace` construction shared across the
-    Lagrangian API; the notion exists only as concrete, per-system types. The most developed
-    instance is the geometric harmonic oscillator, whose `ConfigurationSpace` is built up as a
-    genuine one-dimensional analytic manifold: a wrapper around a single global coordinate in
-    `EuclideanSpace ℝ (Fin 1)`, carrying an induced topology, a coordinate homeomorphism and
-    analytic diffeomorphism, charted-space and manifold instances, tangent-coordinate
-    infrastructure, and a map to physical `Space 1`. Lighter per-system configuration-space
-    types exist for the sliding pendulum (support position and string angle) and, as a
-    `sorry` stub only, for the coplanar double pendulum.
+    The library does not yet have a general, system-agnostic configuration-space
+    abstraction, nor a Lagrangian built over one; those are the requirements below.
+    Concrete per-system configuration spaces exist and are tracked in their own API
+    maps (the geometric harmonic oscillator and the pendulum).
 
 ParentAPIs:
   - Space (Physlib/SpaceAndTime/Space)
@@ -30,64 +26,6 @@ Requirements:
   - description: >
       A general, system-agnostic `ConfigurationSpace` construction (a configuration manifold
       abstracting over the choice of mechanical system) usable across the Lagrangian API.
-    done: false
-    location: N/A
-
-  - description: >
-      A concrete configuration-space type for the geometric harmonic oscillator is defined,
-      wrapping a single chosen global coordinate valued in `EuclideanSpace ℝ (Fin 1)`, with
-      extensionality and a function-like coordinate accessor.
-    done: true
-    location: >
-      Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean
-      (ConfigurationSpace, ConfigurationSpace.ext, ConfigurationSpace.coe_apply)
-
-  - description: >
-      The configuration space of the geometric harmonic oscillator carries a topology induced
-      by its chosen coordinate, and a coordinate equivalence and homeomorphism to its
-      `EuclideanSpace ℝ (Fin 1)` model.
-    done: true
-    location: >
-      Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean
-      (ConfigurationSpace.valEquiv, ConfigurationSpace.valHomeomorphism)
-
-  - description: >
-      The configuration space of the geometric harmonic oscillator is equipped with a
-      charted-space and analytic-manifold structure, and the global chart is upgraded to an
-      analytic diffeomorphism onto `EuclideanSpace ℝ (Fin 1)`.
-    done: true
-    location: >
-      Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean
-      (ConfigurationSpace.valDiffeomorph)
-
-  - description: >
-      Tangent-coordinate infrastructure on the geometric harmonic oscillator configuration
-      space: normed-vector-space structure on tangent spaces and the chart-induced continuous
-      linear equivalence `tangentCoord` from each tangent space to the coordinate model.
-    done: true
-    location: >
-      Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean (tangentCoord)
-
-  - description: >
-      A map from the geometric harmonic oscillator configuration space to physical
-      one-dimensional space `Space 1`, reading off the underlying coordinate.
-    done: true
-    location: >
-      Physlib/ClassicalMechanics/HarmonicOscillator/Geometric/Basic.lean
-      (ConfigurationSpace.toSpace, ConfigurationSpace.toSpace_apply)
-
-  - description: >
-      A configuration-space type for the sliding pendulum, whose generalized coordinates are
-      the horizontal support position and the angle of the string from the vertical.
-    done: true
-    location: >
-      Physlib/ClassicalMechanics/Pendulum/SlidingPendulum.lean
-      (ConfigurationSpace, ConfigurationSpace.supportPosition, ConfigurationSpace.angle)
-
-  - description: >
-      A configuration-space type for the coplanar double pendulum. Present only as a
-      `sorry`-backed stub (`def ConfigurationSpace : Type := sorry`), so not counted as
-      implemented.
     done: false
     location: N/A
 
