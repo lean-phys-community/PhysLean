@@ -64,7 +64,8 @@ variable {d : ℕ}
 ## A. Definition
 -/
 
-/-- The LinearPMap which maps `ψ` to `f • ψ` with domain `{ψ | f • ψ ∈ SpaceDHilbertSpace d μ}`. -/
+/-- The multiplication operator which maps `ψ` to the equivalence class of `f • ψ`
+  with maximal domain `{ψ : SpaceDHilbertspace d μ | MemHS (f • ψ) μ}`. -/
 def mulOperator (μ : Measure (Space d)) (f : Space d → ℂ) :
     SpaceDHilbertSpace d μ →ₗ.[ℂ] SpaceDHilbertSpace d μ where
   domain := {
@@ -98,11 +99,14 @@ def mulOperator (μ : Measure (Space d)) (f : Space d → ℂ) :
 @[inherit_doc mulOperator]
 notation "𝓜" => mulOperator
 
+/-- The multiplication operator `𝓜 μ f` has maximal domain: `ψ` is in the domain exactly
+  when multiplying by `f` gives an element of the Hilbert space. -/
 lemma mem_mulOperator_domain_iff
     {μ : Measure (Space d)} {f : Space d → ℂ} {ψ : SpaceDHilbertSpace d μ} :
     ψ ∈ (𝓜 μ f).domain ↔ MemHS (f • ψ.val.cast) μ :=
   Iff.rfl
 
+/-- The defining property of a multiplication operator: `ψ` is mapped to `f • ψ`. -/
 lemma mulOperator_apply_ae {μ : Measure (Space d)} {f : Space d → ℂ} (ψ : (𝓜 μ f).domain) :
     𝓜 μ f ψ =ᵐ[μ] f • ψ :=
   coeFn_mk ψ.prop
@@ -111,6 +115,8 @@ lemma mulOperator_apply_ae {μ : Measure (Space d)} {f : Space d → ℂ} (ψ : 
 ## B. Domain
 -/
 
+/-- The multiplication operator corresponding to a `μ`-a.e. strongly measurable function
+  is densely defined. -/
 lemma mulOperator_hasDenseDomain
     {μ : Measure (Space d)} {f : Space d → ℂ} (hf : AEStronglyMeasurable f μ) :
     (𝓜 μ f).HasDenseDomain := by
@@ -158,6 +164,8 @@ lemma mulOperator_hasDenseDomain
       exact (Nat.le_ceil _).trans (by exact_mod_cast hn)
 
 open SchwartzMap SchwartzSubmodule in
+/-- The multiplication operator corresponding to a function of temperate growth
+  contains all Schwartz maps in its domain. -/
 lemma mulOperator_domain_ge_of_hasTemperateGrowth {f : Space d → ℂ} (hf : f.HasTemperateGrowth)
     (μ : Measure (Space d)) [μ.HasTemperateGrowth] [μ.IsOpenPosMeasure] :
     SchwartzSubmodule d μ ≤ (𝓜 μ f).domain := by
@@ -169,17 +177,18 @@ lemma mulOperator_domain_ge_of_hasTemperateGrowth {f : Space d → ℂ} (hf : f.
   filter_upwards [schwartzEquiv_coe_ae w, schwartzEquiv_coe_ae g] with x h₁ h₂
   simp [w, φ, h₁, ← h₂, hg, smulLeftCLM_apply_apply hf]
 
-/-!
-## C. Adjoint
--/
-
--- Can the AEStronglyMeasurable hypothesis be removed?
+/-- The multiplication operators corresponding to a function
+  and its conjugate have the same domain. -/
 lemma mulOperator_conj_domain
     {μ : Measure (Space d)} {f : Space d → ℂ} (hf : AEStronglyMeasurable f μ) :
     (𝓜 μ (conj ∘ f)).domain = (𝓜 μ f).domain := by
   ext
   simp only [mulOperator, smul_eq_mul, memHS_iff]
   exact and_congr (iff_of_true (by fun_prop) (by fun_prop)) (by simp)
+
+/-!
+## C. Adjoint
+-/
 
 private lemma exists_monotone_sets_hasFiniteIntegral
     {μ : Measure (Space d)} [IsFiniteMeasureOnCompacts μ]
@@ -214,7 +223,7 @@ private lemma exists_monotone_sets_hasFiniteIntegral
       exact measure_inter_lt_top_of_left_ne_top measure_closedBall_lt_top.ne
 
 open Complex InnerProductSpace in
-lemma mulOperator_adjoint_domain_le
+private lemma mulOperator_adjoint_domain_le
     {μ : Measure (Space d)} [IsFiniteMeasureOnCompacts μ]
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f μ) :
     (𝓜 μ f)†.domain ≤ (𝓜 μ (conj ∘ f)).domain := by
@@ -291,6 +300,7 @@ lemma mulOperator_adjoint_domain_le
       rw [(adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf) ⟨ψ, hψ⟩ ⟨φ n, hφ n⟩).symm]
     _ ≤ ‖ξ‖ * ‖φ n‖ := norm_inner_le_norm ξ (φ n)
 
+/-- The adjoint of a multiplication operator is again a multiplication operator. -/
 lemma mulOperator_adjoint_eq_conj {μ : Measure (Space d)} [IsFiniteMeasureOnCompacts μ]
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f μ) :
     (𝓜 μ f)† = 𝓜 μ (conj ∘ f) := by
@@ -308,6 +318,7 @@ lemma mulOperator_adjoint_eq_conj {μ : Measure (Space d)} [IsFiniteMeasureOnCom
 ### C.1. Self-adjoint
 -/
 
+/-- The multiplication operator corresponding to a real function is self-adjoint. -/
 lemma mulOperator_isSelfAdjoint_ofReal {μ : Measure (Space d)} [IsFiniteMeasureOnCompacts μ]
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f μ) (hf' : conj ∘ f = f) :
     IsSelfAdjoint (𝓜 μ f) := by
@@ -317,6 +328,7 @@ lemma mulOperator_isSelfAdjoint_ofReal {μ : Measure (Space d)} [IsFiniteMeasure
 ## D. Closable & unbounded
 -/
 
+/-- Multiplication operators of `μ`-a.e. strongly measurable functions are closable. -/
 lemma mulOperator_isClosable {μ : Measure (Space d)} [IsFiniteMeasureOnCompacts μ]
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f μ) :
     (𝓜 μ f).IsClosable := by
@@ -324,6 +336,7 @@ lemma mulOperator_isClosable {μ : Measure (Space d)} [IsFiniteMeasureOnCompacts
   exact ⟨𝓜 μ (conj ∘ f), mulOperator_hasDenseDomain (by measurability),
     mulOperator_adjoint_eq_conj hf ▸ adjoint_isFormalAdjoint (mulOperator_hasDenseDomain hf)⟩
 
+/-- Multiplication operators of `μ`-a.e. strongly measurable functions are unbounded. -/
 lemma mulOperator_isUnbounded {μ : Measure (Space d)} [IsFiniteMeasureOnCompacts μ]
     {f : Space d → ℂ} (hf : AEStronglyMeasurable f μ) :
     (𝓜 μ f).IsUnbounded :=
@@ -337,6 +350,10 @@ lemma mulOperator_isUnbounded {μ : Measure (Space d)} [IsFiniteMeasureOnCompact
 ### E.1. Smul & neg
 -/
 
+/-- Scalar multiplication and `mulOperator` commute except possibly for `c = 0`
+  where the domains of `0 • 𝓜 μ f` and `𝓜 μ 0 = 0` may not agree.
+
+  See `mulOperator_smul_eq` for equality when `c ≠ 0`. -/
 lemma mulOperator_smul_ge (μ : Measure (Space d)) (c : ℂ) (f : Space d → ℂ) :
     c • 𝓜 μ f ≤ 𝓜 μ (c • f) := by
   refine le_of_le_graph fun u h ↦ ?_
@@ -351,6 +368,7 @@ lemma mulOperator_smul_ge (μ : Measure (Space d)) (c : ℂ) (f : Space d → �
     coeFn_smul c (𝓜 μ f ⟨v, hv⟩)]
   simp_all [mul_assoc]
 
+/-- Scalar multiplication and `mulOperator` commute for `c ≠ 0`. -/
 @[simp]
 lemma mulOperator_smul_eq (μ : Measure (Space d)) {c : ℂ} (hc : c ≠ 0) (f : Space d → ℂ) :
     𝓜 μ (c • f) = c • 𝓜 μ f := by
@@ -358,6 +376,7 @@ lemma mulOperator_smul_eq (μ : Measure (Space d)) {c : ℂ} (hc : c ≠ 0) (f :
   ext
   simp [mem_mulOperator_domain_iff, MemHS.const_smul_iff hc]
 
+/-- Negation and `mulOperator` commute. -/
 @[simp]
 lemma mulOperator_neg (μ : Measure (Space d)) (f : Space d → ℂ) : 𝓜 μ (-f) = -𝓜 μ f := by
   rw [← neg_one_smul ℂ f, mulOperator_smul_eq _ (by norm_num), neg_eq_neg_one_smul]
@@ -366,6 +385,13 @@ lemma mulOperator_neg (μ : Measure (Space d)) (f : Space d → ℂ) : 𝓜 μ (
 ### E.2. Add & sub
 -/
 
+/-- `𝓜 μ (f + g)` extends `𝓜 μ f + 𝓜 μ g`.
+
+  In general the domains do not match: `ψ ∈ (𝓜 μ f + 𝓜 μ g).domain` amounts to `MemHS (f • ψ) μ`
+  _and_ `MemHS (g • ψ) μ` whereas `ψ ∈ (𝓜 μ (f + g)).domain` is equivalent to the weaker condition
+  `MemHS ((f + g) • ψ) μ`.
+
+  See `mulOperator_add_eq` for a sufficient condition to ensure equality. -/
 lemma mulOperator_add_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
     𝓜 μ f + 𝓜 μ g ≤ 𝓜 μ (f + g) := by
   refine le_of_le_graph fun u h ↦ ?_
@@ -381,6 +407,7 @@ lemma mulOperator_add_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
     mulOperator_apply_ae ⟨v, hv'⟩, coeFn_add (𝓜 μ f ⟨v, hv.1⟩) (𝓜 μ g ⟨v, hv.2⟩)]
   simp_all [add_mul]
 
+/-- `(𝓜 μ g).domain = ⊤` is a sufficient condition to ensure equality in `mulOperator_add_ge`. -/
 @[simp]
 lemma mulOperator_add_eq
     {μ : Measure (Space d)} (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 μ g).domain = ⊤) :
@@ -392,10 +419,18 @@ lemma mulOperator_add_eq
   simp only [add_domain, Submodule.mem_inf, mem_mulOperator_domain_iff] at *
   exact ⟨by simpa [add_mul] using hψ.sub hg, hg⟩
 
+/-- `𝓜 μ (f - g)` extends `𝓜 μ f - 𝓜 μ g`.
+
+  In general the domains do not match: `ψ ∈ (𝓜 μ f - 𝓜 μ g).domain` amounts to `MemHS (f • ψ) μ`
+  _and_ `MemHS (g • ψ) μ` whereas `ψ ∈ (𝓜 μ (f - g)).domain` is equivalent to the weaker condition
+  `MemHS ((f - g) • ψ) μ`.
+
+  See `mulOperator_sub_eq` for a sufficient condition to ensure equality. -/
 lemma mulOperator_sub_ge (μ : Measure (Space d)) (f g : Space d → ℂ) :
     𝓜 μ f - 𝓜 μ g ≤ 𝓜 μ (f - g) :=
   le_of_eq_of_le (by simp [sub_eq_add_neg]) (mulOperator_add_ge μ f (-g))
 
+/-- `(𝓜 μ g).domain = ⊤` is a sufficient condition to ensure equality in `mulOperator_sub_ge`. -/
 @[simp]
 lemma mulOperator_sub_eq
     {μ : Measure (Space d)} (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 μ g).domain = ⊤) :
@@ -410,6 +445,13 @@ TODO "`mulOperator_add_eq` has the strong assumption `(𝓜 μ g).domain = ⊤`.
 ### E.3. Composition
 -/
 
+/-- `𝓜 μ (f • g)` extends `𝓜 μ f * 𝓜 μ g`.
+
+  In general the domains do not match: `ψ ∈ (𝓜 μ f * 𝓜 μ g).domain`
+  amounts to `MemHS (g • ψ) μ` _and_ `MemHS (f • g • ψ) μ` whereas
+  `ψ ∈ (𝓜 μ (f • g)).domain` only requires `MemHS (f • g • ψ) μ`.
+
+  See `mulOperator_compRestricted_eq` for a sufficient condition to ensure equality. -/
 lemma mulOperator_compRestricted_le (μ : Measure (Space d)) (f g : Space d → ℂ) :
     𝓜 μ f ∘ᵣ 𝓜 μ g ≤ 𝓜 μ (f • g) := by
   constructor
@@ -425,6 +467,8 @@ lemma mulOperator_compRestricted_le (μ : Measure (Space d)) (f g : Space d → 
       mulOperator_apply_ae ⟨𝓜 μ g ⟨ψ, hψ⟩, hgψ⟩]
     simp_all [mul_assoc]
 
+/-- `(𝓜 μ g).domain = ⊤` is a sufficient condition
+  to ensure equality in `mulOperator_compRestricted_ge`. -/
 lemma mulOperator_compRestricted_eq
     {μ : Measure (Space d)} (f : Space d → ℂ) {g : Space d → ℂ} (h : (𝓜 μ g).domain = ⊤) :
     𝓜 μ f ∘ᵣ 𝓜 μ g = 𝓜 μ (f • g) := by
@@ -435,6 +479,10 @@ lemma mulOperator_compRestricted_eq
   refine (mem_mulOperator_domain_iff.mp hψ).ae_eq ?_
   filter_upwards [mulOperator_apply_ae ⟨ψ, h ▸ Submodule.mem_top⟩]
   simp_all [mul_assoc]
+
+TODO "`mulOperator_compRestricted_eq` has the strong assumption `(𝓜 μ g).domain = ⊤`.
+  Weaken this assumption and/or find other sufficient conditions to ensure the equality
+  `𝓜 μ (f • g) = 𝓜 μ f * 𝓜 μ g`."
 
 /-!
 ## F. Spectrum
