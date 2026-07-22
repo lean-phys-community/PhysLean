@@ -20,6 +20,11 @@ Elements of `SpaceDHilbertSpace d μ` are _equivalence classes_ of functions `Sp
 square-integrable with respect to `μ`, i.e. `∫ x, ‖f x‖ ^ 2 ∂μ` is finite, and where `f` and `g` are
 in the same equivalence class if they are `μ`-a.e. equal.
 
+The ability of a function to be interpreted as an element of `SpaceDHilbertSpace d μ` is captured
+by the property `MemHS`. If one has `hf : MemHS f μ` for a function `f : Space d → ℂ` this means
+that `f` is `μ`-a.e. strongly measurable and square-integrable; `mk hf` constructs the corresponding
+equivalence class of `f` in `SpaceDHilbertSpace d μ`.
+
 Given `SpaceDHilbertSpace d μ` and `Ω : Set (Space d)`, the Hilbert space
 `SpaceDHilbertSpaceOn Ω μ ≔ SpaceDHilbertSpace d (μ.restrict Ω)` may be interpreted as the
 sub-Hilbert space consisting of those vectors with domain contained in `Ω`.
@@ -37,7 +42,7 @@ equivalence classes, essentially dropping information about the functions on the
 - `SpaceDHilbertSpace d μ` : The $L^2$-space on `Space d` with respect to the measure `μ`.
 - `toBra` : The linear equivalence between the Hilbert space and its dual. This is the map which
     sends each ket to its corresponding bra and _vice versa_.
-- `MemHS f μ` : The proposition capturing exactly when the function `f : Space d → ℂ` can be lifted
+- `MemHS f μ` : The proposition capturing exactly when a function `f : Space d → ℂ` can be lifted
     to an element of the Hilbert space.
 - `subspaceProjection` : The projection of `SpaceDHilbertSpace d μ` onto `SpaceDHilbertSpaceOn Ω μ`.
 - `subspaceIncl` : The linear isometry including `SpaceDHilbertSpaceOn Ω μ`
