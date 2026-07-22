@@ -1,0 +1,64 @@
+version: v0.1
+
+Title: Hilbert spaces on Space
+
+Overview: |
+  The Hilbert space on Space with measure μ is the $L^2$ space consisting of μ-a.e. equal
+  equivalence classes of complex functions which are square-integrable with respect to μ.
+  These Hilbert spaces are used extensively in the study of non-relativistic quantum mechanics.
+
+ParentAPIs:
+  - Space (Physlib/SpaceAndTime/Space)
+
+References:
+
+Requirements:
+
+  - description: >
+      Defines Hilbert spaces on Space as instances of MeasureTheory.Lp
+      with MeasurableSpace.volume as the default measure.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Basic.lean (SpaceDHilbertSpace)
+
+  - description: >
+      Includes a proposition describing when a function may be interpreted as an element
+      of a Hilbert space on Space.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Basic.lean (MemHS)
+
+  - description:
+      Defines the subspace corresponding to complex Schwartz maps and provides functions
+      for moving back and forth between the complex Schwartz maps on Space
+      and their equivalence classes in the Hilbert space.
+    done: true
+    location: >
+      Physlib/QuantumMechanics/HilbertSpaces/SpaceD/SchwartzSubmodule.lean
+      (SchwartzSubmodule, schwartzIncl, schwartzEquiv)
+
+  - description: Defines the Fourier transform as a unitary map from the Hilbert space to itself.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Fourier.lean (fourierUnitary)
+
+  - description: Defines the Sobolev subspaces.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/SobolevSubmodule.lean (SobolevSubmodule)
+
+  - description: >
+      Defines sub-Hilbert spaces consisting of functions with support contained
+      in a subset of Space.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Basic.lean
+      (SpaceDHilbertSpaceOn, subsetIncl, subsetProjection)
+
+  - description: >
+      Defines subspaces corresponding to elements of the Hilbert space satisfying
+      Dirichlet boundary conditions on a subset of Space.
+    done: true
+    location:
+      Physlib/QuantumMechanics/HilbertSpaces/SpaceD/DirichletSubmodule.lean (DirichletSubmoduleOn)
+
+  - description: >
+      Defines subspaces corresponding to elements of the Hilbert space satisfying
+      Neumann boundary conditions on a subset of Space.
+    done: false
+    location: N/A
