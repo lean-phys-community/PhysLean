@@ -9,19 +9,13 @@ Overview: |
     covers the pendulum problems of Landau and Lifshitz, Mechanics, 3rd ed.,
     Chapter 1, Section 5.
 
-    Current state (partial): the sliding pendulum (`SlidingPendulum.lean`) has a
-    genuine configuration space `structure ConfigurationSpace` with generalized
-    coordinates `supportPosition : ℝ` (the horizontal position of the support mass)
-    and `angle : Real.Angle` (the angle the string makes with the vertical). The
-    coplanar double pendulum (`CoplanarDoublePendulum.lean`) declares
-    `ConfigurationSpace` but it is still a placeholder stub, so it is not treated as
-    defined here. The miscellaneous pivot-motion file contains only documentation
-    and no declarations.
-
-    The remaining requirements (a manifold structure on the configuration space, a
-    map to `Space` giving the position in real space, a trajectory based on the
-    configuration space, and the lagrangian) are not yet implemented in the Pendulum
-    directory; they are recorded below with location N/A.
+    At present only the sliding pendulum has a defined configuration space, with
+    the horizontal support position and the string angle as its generalized
+    coordinates. The coplanar double pendulum's configuration space is declared but
+    not yet defined, and the miscellaneous pivot-motion problems have documentation
+    only. The remaining requirements, a manifold structure on the configuration
+    space, a map into real space, trajectories, and the lagrangian, are open and
+    recorded below with location N/A.
 
 ParentAPIs:
   - Classical mechanics Lagrangian (Physlib/ClassicalMechanics/Lagrangian)
