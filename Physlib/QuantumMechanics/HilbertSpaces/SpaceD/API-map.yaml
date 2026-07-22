@@ -5,7 +5,7 @@ Title: Hilbert spaces on Space
 Overview: |
   The Hilbert space on Space with measure μ is the $L^2$ space consisting of μ-a.e. equal
   equivalence classes of complex functions which are square-integrable with respect to μ.
-  These Hilbert spaces are used extensively in the study of non-relativistic quantum mechanics.
+  These Hilbert spaces are used extensively in non-relativistic quantum mechanics.
 
 ParentAPIs:
   - Space (Physlib/SpaceAndTime/Space)
@@ -21,14 +21,14 @@ Requirements:
     location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Basic.lean (SpaceDHilbertSpace)
 
   - description: >
-      Includes a proposition describing when a function may be interpreted as an element
-      of a Hilbert space on Space.
+      Includes a proposition describing when a function can be interpreted
+      as an element of a Hilbert space on Space.
     done: true
     location: Physlib/QuantumMechanics/HilbertSpaces/SpaceD/Basic.lean (MemHS)
 
   - description:
-      Defines the subspace corresponding to complex Schwartz maps and provides functions
-      for moving back and forth between the complex Schwartz maps on Space
+      Defines the subspace corresponding to complex Schwartz maps on Space
+      and provides functions for moving back and forth between the Schwartz maps
       and their equivalence classes in the Hilbert space.
     done: true
     location: >
@@ -52,13 +52,19 @@ Requirements:
 
   - description: >
       Defines subspaces corresponding to elements of the Hilbert space satisfying
-      Dirichlet boundary conditions on a subset of Space.
+      homogeneous Dirichlet boundary conditions on a subset of Space.
     done: true
     location:
       Physlib/QuantumMechanics/HilbertSpaces/SpaceD/DirichletSubmodule.lean (DirichletSubmoduleOn)
 
   - description: >
       Defines subspaces corresponding to elements of the Hilbert space satisfying
-      Neumann boundary conditions on a subset of Space.
+      homogeneous Neumann boundary conditions on a subset of Space.
+    done: false
+    location: N/A
+
+  - description: >
+      Defines subspaces corresponding to elements of the Hilbert space satisfying
+      homogeneous mixed boundary conditions on a subset of Space.
     done: false
     location: N/A
