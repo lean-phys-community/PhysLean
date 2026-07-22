@@ -14,7 +14,7 @@ public import Physlib.SpaceAndTime.Space.Module
 
 ## i. Overview
 
-The Hilbert spaces appropriate for doing quantum mechanics on `Space d` are the $$L^2$$-spaces
+The Hilbert spaces appropriate for doing quantum mechanics on `Space d` are the $L^2$-spaces
 `SpaceDHilbertSpace d μ := Lp ℂ 2 μ`, where `μ` is some measure on `Space d`.
 Elements of `SpaceDHilbertSpace d μ` are _equivalence classes_ of functions `Space d → ℂ` which are
 square-integrable with respect to `μ`, i.e. `∫ x, ‖f x‖ ^ 2 ∂μ` is finite, and where `f` and `g` are
@@ -34,7 +34,7 @@ equivalence classes, essentially dropping information about the functions on the
 
 ## ii. Key results
 
-- `SpaceDHilbertSpace d μ` : The $$L^2$$-space on `Space d` with respect to the measure `μ`.
+- `SpaceDHilbertSpace d μ` : The $L^2$-space on `Space d` with respect to the measure `μ`.
 - `toBra` : The linear equivalence between the Hilbert space and its dual. This is the map which
     sends each ket to its corresponding bra and _vice versa_.
 - `MemHS f μ` : The proposition capturing exactly when the function `f : Space d → ℂ` can be lifted
