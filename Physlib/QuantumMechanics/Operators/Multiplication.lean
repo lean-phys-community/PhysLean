@@ -25,6 +25,9 @@ allow one to nail down some of its properties. For example, when `f` is `μ`-a.e
 then the corresponding multiplication operator is densely defined, if `f` is `μ`-a.e. bounded then
 the domain is `⊤` and if `f` has temperate growth then the domain contains the Schwartz submodule.
 
+Multiplication operators also form the backbone for derivative operators, which are defined
+through multiplication in the Fourier domain: see `Operators/Derivative.lean`.
+
 ## ii. Key results
 
 - `mulOperator μ f` (notation `𝓜 μ f`) : The operator defined by `ψ ↦ f • ψ`
