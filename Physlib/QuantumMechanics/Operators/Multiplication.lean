@@ -13,10 +13,10 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 
 ## i. Overview
 
-In this module we define and develop the properties of multiplication operators on
-`SpaceDHilberrtSpace d μ`. Given a measure `μ` on `Space d` and any function `f : Space d → ℂ`,
-the multiplication operator `𝓜 μ f` is defined on the domain
-`{ψ : SpaceDHilbertSpace d μ | MemHS (f • ψ) μ}` and maps `ψ` to `f • ψ`.
+In this module we define and develop the properties of multiplication operators.
+Given a measure `μ` on `Space d` and any function `f : Space d → ℂ`, the multiplication operator
+`𝓜 μ f` is the partial linear map on `SpaceDHilbertSpace d μ` with domain
+`{ψ : SpaceDHilbertSpace d μ | MemHS (f • ψ) μ}` and mapping `ψ` to `f • ψ`.
 Prime examples of multiplication operators are the position operators which multiply by `xᵢ` and
 the potential operators which multiply by the potential function `V(x)` of a quantum system.
 
