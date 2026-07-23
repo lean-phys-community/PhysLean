@@ -13,19 +13,30 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 
 ## i. Overview
 
-In this module we introduce unbounded operators defined by multiplication by a function
-`f : Space d → ℂ`. The domain is defined to be as large as possible, namely a vector
-`ψ ∈ SpaceDHilbertSpace d μ` is in the domain iff `f • ψ ∈ SpaceDHilbertSpace d μ`.
+In this module we define and develop the properties of multiplication operators on
+`SpaceDHilberrtSpace d μ`. Given a measure `μ` on `Space d` and any function `f : Space d → ℂ`,
+the multiplication operator `𝓜 μ f` is defined on the domain
+`{ψ : SpaceDHilbertSpace d μ | MemHS (f • ψ) μ}` and maps `ψ` to `f • ψ`.
+Prime examples of multiplication operators are the position operators which multiply by `xᵢ` and
+the potential operators which multiply by the potential function `V(x)` of a quantum system.
+
+Although the domain of `𝓜 μ f` is defined implicitly through `MemHS`, simple assumptions on `f`
+allow one to nail down some of its properties. For example, when `f` is `μ`-a.e. strongly measurable
+then the corresponding multiplication operator is densely defined, if `f` is `μ`-a.e. bounded then
+the domain is `⊤` and if `f` has temperate growth then the domain contains the Schwartz submodule.
 
 ## ii. Key results
 
-- `mulOperator f` : Given a function `f : Space d → ℂ`, the operator defined by `ψ ↦ f • ψ`
-  (with maximal domain) with notation `𝓜 f`.
-- `mulOperator_adjoint_eq_conj` : For a.e. strongly measurable `f`, `(𝓜 f)† = 𝓜 (conj ∘ f)`
-- `mulOperator_isUnbounded` : For a.e. strongly measurable `f`, `𝓜 f` is an unbounded operator.
-- `mulOperator_compRestricted_le` : The composition `𝓜 f ∘ᵣ 𝓜 g` is contained in `𝓜 (f • g)`.
-- `mulOperator_compRestricted_eq` : The composition `𝓜 f ∘ᵣ 𝓜 g` is equal to `𝓜 (f • g)` when
-    `(𝓜 g).domain = ⊤`.
+- `mulOperator μ f` (notation `𝓜 μ f`) : The operator defined by `ψ ↦ f • ψ`
+    with maximal domain `{ψ : SpaceDHilbertSpace d μ | MemHS (f • ψ) μ}`.
+- `mulOperator_adjoint_eq_conj` : The adjoint of `𝓜 μ f` is the multiplication operator
+    defined by the conjugate of `f`.
+- `mulOperator_isSelfAdjoint` : The multiplication operator of a real function is self-adjoint.
+- `mulOperator_isUnbounded` : Multiplication operators with maximal domain are unbounded
+    (i.e. densely defined and closable).
+- `mulOperator_smul_eq` : `𝓜 μ (c • f) = c • 𝓜 μ f` for non-zero `c`.
+- `mulOperator_add_ge` : `𝓜 μ (f + g)` is an extension of `𝓜 μ f + 𝓜 μ g`.
+- `mulOperator_compRestricted_le` : `𝓜 μ (f • g)` is an extension of `𝓜 μ f * 𝓜 μ g`.
 
 ## iii. Table of contents
 
@@ -69,31 +80,30 @@ variable {d : ℕ}
 def mulOperator (μ : Measure (Space d)) (f : Space d → ℂ) :
     SpaceDHilbertSpace d μ →ₗ.[ℂ] SpaceDHilbertSpace d μ where
   domain := {
-    carrier := {ψ : SpaceDHilbertSpace d μ | MemHS (f • ψ.val.cast) μ}
-    add_mem' := by
-      intro ψ φ hψ hφ
+    carrier := {ψ : SpaceDHilbertSpace d μ | MemHS (f • ⇑ψ) μ}
+    add_mem' {ψ φ} hψ hφ := by
       refine (hψ.add hφ).ae_eq ?_
-      filter_upwards [coeFn_add ψ φ] with x h
-      simp [mul_add, h]
+      filter_upwards [coeFn_add ψ φ]
+      simp_all [mul_add]
     zero_mem' := by
       refine MemHS.zero.ae_eq ?_
       filter_upwards [AEEqFun.coeFn_zero (μ := μ) (β := ℂ)]
       simp_all
     smul_mem' c ψ hψ := by
       refine (hψ.const_smul c).ae_eq ?_
-      filter_upwards [coeFn_smul c ψ] with x h
-      simp [h, mul_left_comm]
+      filter_upwards [coeFn_smul c ψ]
+      simp_all [mul_left_comm]
   }
   toFun := {
     toFun ψ := mk ψ.prop
     map_add' ψ φ := by
       rw [← mk_add, mk_eq_iff]
-      filter_upwards [coeFn_add ψ.1 φ.1] with x h
-      simp [h, mul_add]
+      filter_upwards [coeFn_add ψ φ]
+      simp_all [mul_add]
     map_smul' c ψ := by
       rw [← mk_const_smul, mk_eq_iff]
-      filter_upwards [coeFn_smul c ψ.1] with x h
-      simp [h, mul_left_comm]
+      filter_upwards [coeFn_smul c ψ]
+      simp_all [mul_left_comm]
   }
 
 @[inherit_doc mulOperator]
@@ -103,7 +113,7 @@ notation "𝓜" => mulOperator
   when multiplying by `f` gives an element of the Hilbert space. -/
 lemma mem_mulOperator_domain_iff
     {μ : Measure (Space d)} {f : Space d → ℂ} {ψ : SpaceDHilbertSpace d μ} :
-    ψ ∈ (𝓜 μ f).domain ↔ MemHS (f • ψ.val.cast) μ :=
+    ψ ∈ (𝓜 μ f).domain ↔ MemHS (f • ⇑ψ) μ :=
   Iff.rfl
 
 /-- The defining property of a multiplication operator: `ψ` is mapped to `f • ψ`. -/
