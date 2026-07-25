@@ -123,6 +123,85 @@ lemma toEFTLagrangianExclDeriv_barφ (α : Fin 2) :
 
 end FieldSpecification
 
+namespace EFTLagrangianExclDeriv
+
+open FieldSpecification
+
+/-!
+
+## B. Higgs monomials
+
+-/
+
+/-! ### B.1. Monomials from a list -/
+
+/-- The term in the Higgs effective Lagrangian given by the product of the field labels in `l`. -/
+def termOfList (l : List FieldSpecification) : EFTLagrangianExclDeriv :=
+  (l.map toEFTLagrangianExclDeriv).prod
+
+@[simp]
+lemma termOfList_nil : termOfList [] = 1 := by
+  simp [termOfList]
+
+lemma termOfList_cons (f : FieldSpecification) (l : List FieldSpecification) :
+    termOfList (f :: l) = [f]ₛ * termOfList l := by
+  simp [termOfList]
+
+lemma termOfList_singleton (f : FieldSpecification) : termOfList [f] = [f]ₛ := by
+  simp [termOfList_cons]
+
+lemma termOfList_append (l₁ l₂ : List FieldSpecification) :
+    termOfList (l₁ ++ l₂) = termOfList l₁ * termOfList l₂ := by
+  simp [termOfList]
+
+/-! ### B.2. Permutation invariance -/
+
+/-- Permuting bosonic field labels leaves their monomial unchanged. -/
+lemma termOfList_eq_of_perm {l₁ l₂ : List FieldSpecification} (h : l₁.Perm l₂) :
+    termOfList l₁ = termOfList l₂ :=
+  (h.map toEFTLagrangianExclDeriv).prod_eq
+
+lemma termOfList_eq_ιMulti (l : List FieldSpecification) :
+    termOfList l = SymmetricAlgebra.ιMulti ℂ
+      (Module.Dual ℂ HiggsVec × Module.Dual ℂ (ConjModule HiggsVec)) l.length
+      (fun i => moduleBasis (l.get i)) := by
+  induction l with
+  | nil => simp
+  | cons f l h =>
+      simp [termOfList_cons, h]
+      rfl
+
+lemma termOfList_ofFn {n : ℕ} (g : Fin n → FieldSpecification) :
+    termOfList (List.ofFn g) = SymmetricAlgebra.ιMulti ℂ
+      (Module.Dual ℂ HiggsVec × Module.Dual ℂ (ConjModule HiggsVec)) n
+      (fun i => moduleBasis (g i)) := by
+  rw [SymmetricAlgebra.ιMulti_apply, termOfList, List.map_ofFn, List.prod_ofFn]
+  rfl
+
+/-! ### B.3. Monomials from a tuple -/
+
+/-- The term in the Higgs effective Lagrangian given by the product of the field labels in the
+finite tuple `g`. -/
+def termOfTuple {n : ℕ} (g : Fin n → FieldSpecification) : EFTLagrangianExclDeriv :=
+  termOfList (List.ofFn g)
+
+lemma termOfTuple_eq_ιMulti {n : ℕ} (g : Fin n → FieldSpecification) :
+    termOfTuple g = SymmetricAlgebra.ιMulti ℂ
+      (Module.Dual ℂ HiggsVec × Module.Dual ℂ (ConjModule HiggsVec)) n
+      (fun i => moduleBasis (g i)) := by
+  rw [termOfTuple, termOfList_ofFn]
+
+/-- Permuting a bosonic field tuple leaves its monomial unchanged. -/
+lemma termOfTuple_comp_perm {n : ℕ} (g : Fin n → FieldSpecification) (e : Equiv.Perm (Fin n)) :
+    termOfTuple (g ∘ e) = termOfTuple g := by
+  rw [termOfTuple_eq_ιMulti, termOfTuple_eq_ιMulti]
+  simpa [Function.comp_apply] using
+    (SymmetricAlgebra.ιMulti ℂ
+      (Module.Dual ℂ HiggsVec × Module.Dual ℂ (ConjModule HiggsVec)) n).map_perm e
+      (fun i => moduleBasis (g i))
+
+end EFTLagrangianExclDeriv
+
 end
 
 end StandardModel.HiggsField
