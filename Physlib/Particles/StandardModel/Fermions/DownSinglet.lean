@@ -216,6 +216,41 @@ lemma repGaugeGroupI_eq_iff_mul_eq {g₁ g₂ : GaugeGroupI} :
         (starRingEnd ℂ) g₂.toU1.1 ^ 2 * g₂.toSU3.1 i' i := h i i'
     rw [hi']
 
+/-!
+
+## E. Kernel of the gauge action
+
+An element acts trivially when its colour action is scalar and that scalar cancels its `U(1)`
+phase. Its weak component is unrestricted because the down-type singlet is an `SU(2)` singlet.
+-/
+
+/-- Characterizes the full-group elements acting trivially on the down-type singlet. -/
+lemma mem_repGaugeGroupI_ker_iff_eq {g : GaugeGroupI} :
+    g ∈ repGaugeGroupI.ker ↔ ∃ a : ℂ,
+      g.toSU3.1 = a • 1 ∧ a * star g.toU1.1 ^ 2 = 1 := by
+  rw [MonoidHom.mem_ker, ← MonoidHom.map_one repGaugeGroupI, repGaugeGroupI_eq_iff_mul_eq]
+  constructor
+  · intro h
+    have hc : star g.toU1.1 ^ 2 ≠ 0 := by
+      apply pow_ne_zero
+      rw [star_ne_zero]
+      intro hzero
+      have hu := Unitary.star_mul_self_of_mem g.toU1.2
+      simp [hzero] at hu
+    use g.toSU3.1 0 0
+    simp only [map_one, OneMemClass.coe_one, Fin.forall_fin_succ, Fin.isValue,
+      Fin.succ_zero_eq_one, IsEmpty.forall_iff, and_true, one_apply_eq, ne_eq,
+      one_ne_zero, not_false_eq_true, one_apply_ne, mul_eq_zero, zero_ne_one,
+      Fin.succ_one_eq_two, Fin.reduceEq, star_one, one_pow, one_mul] at h
+    refine ⟨?_, ?_⟩
+    · ext i j
+      fin_cases i <;> fin_cases j <;> simp <;> grind
+    · grind
+  · rintro ⟨a, h₁, h₂⟩ i i'
+    simp only [Matrix.smul_apply, smul_eq_mul, h₁, map_one, OneMemClass.coe_one,
+      star_one, one_pow, one_mul]
+    linear_combination h₂ * (1 : Matrix _ _ ℂ) i' i
+
 end DownSinglet
 
 end StandardModel
