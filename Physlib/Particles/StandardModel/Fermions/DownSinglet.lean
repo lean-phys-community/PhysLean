@@ -163,6 +163,59 @@ lemma repGaugeGroupI_tmul (g : GaugeGroupI) (ψ : Fermion.RightHandedWeyl)
     repGaugeGroupI g ⟨ψ ⊗ₜ v⟩ =
       ⟨(star g.toU1.1 ^ 2) • ψ ⊗ₜ g.toSU3.1.toEuclideanLin v⟩ := rfl
 
+open Fermion in
+/-- Expands the gauge action in the spinor–colour basis. -/
+lemma repGaugeGroupI_tmul_basis_eq_sum (g : GaugeGroupI) (k : Fin 2) (i : Fin 3) :
+    repGaugeGroupI g
+      ⟨RightHandedWeyl.basis k ⊗ₜ[ℂ] EuclideanSpace.basisFun (Fin 3) ℂ i⟩ =
+      ∑ i' : Fin 3, (star g.toU1.1 ^ 2 * g.toSU3.1 i' i) •
+        (⟨RightHandedWeyl.basis k ⊗ₜ[ℂ]
+          EuclideanSpace.basisFun (Fin 3) ℂ i'⟩ : DownSinglet) := by
+  apply valLinEquiv.injective
+  apply (((RightHandedWeyl.basis).tensorProduct
+    (EuclideanSpace.basisFun (Fin 3) ℂ).toBasis)).repr.injective
+  ext ⟨⟨k, l⟩, m⟩
+  simp only [EuclideanSpace.basisFun_apply, repGaugeGroupI_tmul, valLinEquiv_apply, map_smul,
+    Finsupp.coe_smul, Pi.smul_apply, Module.Basis.tensorProduct_repr_tmul_apply,
+    OrthonormalBasis.coe_toBasis_repr_apply, EuclideanSpace.basisFun_repr, ofLp_toLpLin,
+    PiLp.ofLp_single, toLin'_apply, mulVec_single, MulOpposite.op_one, col_apply, one_smul,
+    Module.Basis.repr_self, smul_eq_mul, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply,
+    PiLp.single_apply, ite_mul, one_mul, zero_mul, mul_ite, mul_zero, Finset.sum_ite_eq,
+    Finset.mem_univ, ↓reduceIte]
+  ring
+
+open Fermion in
+/-- Two gauge elements induce the same action exactly when their hypercharge–colour coefficients
+agree. -/
+lemma repGaugeGroupI_eq_iff_mul_eq {g₁ g₂ : GaugeGroupI} :
+    repGaugeGroupI g₁ = repGaugeGroupI g₂ ↔ ∀ i i',
+      star g₁.toU1.1 ^ 2 * g₁.toSU3.1 i' i =
+        star g₂.toU1.1 ^ 2 * g₂.toSU3.1 i' i := by
+  let b := RightHandedWeyl.basis.tensorProduct
+    (EuclideanSpace.basisFun (Fin 3) ℂ).toBasis
+  constructor
+  · intro h i i'
+    have h' := congrFun (congrArg (fun f => f.1) h)
+      ⟨RightHandedWeyl.basis 0 ⊗ₜ[ℂ] EuclideanSpace.basisFun (Fin 3) ℂ i⟩
+    simp only [Fin.isValue, LinearMap.coe_toAddHom, repGaugeGroupI_tmul_basis_eq_sum] at h'
+    replace h' := congrArg b.repr (congrArg valLinEquiv h')
+    simpa [Module.Basis.tensorProduct_repr_tmul_apply, -Fin.sum_univ_two, b] using
+      congrArg (fun f => f (0, i')) h'
+  · intro h
+    apply (valLinEquiv.symm.eq_comp_toLinearMap_iff
+      (repGaugeGroupI g₁) (repGaugeGroupI g₂)).mp
+    apply b.ext
+    rintro ⟨k, i⟩
+    have h₁ := repGaugeGroupI_tmul_basis_eq_sum g₁ k i
+    have h₂ := repGaugeGroupI_tmul_basis_eq_sum g₂ k i
+    simp only [EuclideanSpace.basisFun_apply] at h₁ h₂
+    simp [valLinEquiv_symm_apply, h₁, h₂, b]
+    apply Finset.sum_congr rfl
+    intro i' _
+    have hi' : (starRingEnd ℂ) g₁.toU1.1 ^ 2 * g₁.toSU3.1 i' i =
+        (starRingEnd ℂ) g₂.toU1.1 ^ 2 * g₂.toSU3.1 i' i := h i i'
+    rw [hi']
+
 end DownSinglet
 
 end StandardModel
