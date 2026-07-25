@@ -200,6 +200,124 @@ lemma termOfTuple_comp_perm {n : ℕ} (g : Fin n → FieldSpecification) (e : Eq
       (Module.Dual ℂ HiggsVec × Module.Dual ℂ (ConjModule HiggsVec)) n).map_perm e
       (fun i => moduleBasis (g i))
 
+/-!
+
+## C. The field-content projection
+
+We cannot define a basis on `EFTLagrangianExclDeriv` without choosing an ordering on the field
+specification. Instead, given a multiset of field specifications, we define a linear map
+projecting onto the span of the monomials with that field content. That span is one-dimensional,
+which is the sense in which this projection plays the role of a coefficient.
+
+-/
+
+/-! ### C.1. The symmetric coordinate rule -/
+
+/-- The symmetric multilinear rule underlying `coeff s`: a tuple of vectors is sent to
+`termOfTuple g` weighted by the product of the `g`-coordinates of the vectors, summed over the
+tuples `g` of fields with field content `s`. -/
+def coeffOfVectorTuple (s : Multiset FieldSpecification) (n : ℕ) :
+    SymmetricMap ℂ (Module.Dual ℂ HiggsVec × Module.Dual ℂ (ConjModule HiggsVec))
+      EFTLagrangianExclDeriv (Fin n) where
+  toMultilinearMap :=
+    ∑ g : Fin n → FieldSpecification,
+      if Multiset.ofList (List.ofFn g) = s then
+        (LinearMap.toSpanSingleton ℂ EFTLagrangianExclDeriv (termOfTuple g)).compMultilinearMap
+          ((MultilinearMap.mkPiAlgebra ℂ (Fin n) ℂ).compLinearMap
+            fun i => moduleBasis.coord (g i))
+      else 0
+  map_perm' := by
+    intro v e
+    simp only [MultilinearMap.toFun_eq_coe, sum_apply]
+    -- Name the summand family, and the reindexing `g ↦ g ∘ e.symm` of the index set.
+    let F : (Fin n → FieldSpecification) →
+        MultilinearMap ℂ
+          (fun _ : Fin n => Module.Dual ℂ HiggsVec × Module.Dual ℂ (ConjModule HiggsVec))
+          EFTLagrangianExclDeriv :=
+      fun g =>
+        if Multiset.ofList (List.ofFn g) = s then
+          (LinearMap.toSpanSingleton ℂ EFTLagrangianExclDeriv (termOfTuple g)).compMultilinearMap
+            ((MultilinearMap.mkPiAlgebra ℂ (Fin n) ℂ).compLinearMap
+              fun i => moduleBasis.coord (g i))
+        else 0
+    let p : (Fin n → FieldSpecification) → (Fin n → FieldSpecification) :=
+      fun g => g ∘ e.symm
+    have hp : Function.Bijective p := by
+      constructor
+      · intro g h hgh
+        funext i
+        simpa [p, Function.comp_apply] using congrFun hgh (e i)
+      · intro g
+        refine ⟨g ∘ e, ?_⟩
+        funext i
+        simp [p, Function.comp_apply]
+    change (∑ g, F g (fun i => v (e i))) = ∑ g, F g v
+    calc
+      _ = ∑ g, F (p g) v := by
+        apply Finset.sum_congr rfl
+        intro g _
+        simp only [F, p]
+        -- Reindexing the tuple by a permutation preserves its field content.
+        have hms : Multiset.ofList (List.ofFn (g ∘ e.symm)) =
+            Multiset.ofList (List.ofFn g) :=
+          Multiset.coe_eq_coe.mpr (Equiv.Perm.ofFn_comp_perm e.symm g)
+        rw [hms]
+        split_ifs with h
+        · simp only [LinearMap.compMultilinearMap_apply, MultilinearMap.compLinearMap_apply,
+            MultilinearMap.mkPiAlgebra_apply, LinearMap.toSpanSingleton_apply,
+            Function.comp_apply]
+          -- The coordinate product is a finite product, so it is permutation invariant.
+          have hprod : ∏ i, moduleBasis.coord (g i) (v (e i)) =
+              ∏ i, moduleBasis.coord (g (e.symm i)) (v i) := by
+            simpa using
+              Equiv.prod_comp e (fun i => moduleBasis.coord (g (e.symm i)) (v i))
+          rw [hprod, termOfTuple_comp_perm g e.symm]
+        · simp
+      _ = _ := hp.sum_comp (fun g => F g v)
+
+/-! ### C.2. The projection and its value on monomials -/
+
+/-- The projection of a non-derivative Higgs term onto the span of the monomials with field
+content `s`. -/
+def coeff (s : Multiset FieldSpecification) :
+    EFTLagrangianExclDeriv →ₗ[ℂ] EFTLagrangianExclDeriv :=
+  SymmetricAlgebra.liftSymmetric (coeffOfVectorTuple s)
+
+/-- A monomial is preserved by the projection onto its own field content and killed by every
+other. In particular the surviving monomial appears with coefficient one, with no factorial or
+divided-power normalization, and this holds also when field labels repeat. -/
+lemma coeff_apply_termOfList (s : Multiset FieldSpecification) (l : List FieldSpecification) :
+    coeff s (termOfList l) = if Multiset.ofList l = s then termOfList l else 0 := by
+  have hterm : termOfTuple l.get = termOfList l := by
+    rw [termOfTuple, List.ofFn_get]
+  rw [coeff, termOfList_eq_ιMulti, SymmetricAlgebra.liftSymmetric_apply_ιMulti]
+  change (coeffOfVectorTuple s l.length).toMultilinearMap
+    (fun i => moduleBasis (l.get i)) = _
+  simp only [coeffOfVectorTuple, sum_apply]
+  refine (Finset.sum_eq_single l.get ?_ ?_).trans ?_
+  · intro g _ hg
+    obtain ⟨i, hi⟩ := Function.ne_iff.mp hg
+    split_ifs with h
+    · simp only [LinearMap.compMultilinearMap_apply, MultilinearMap.compLinearMap_apply,
+        MultilinearMap.mkPiAlgebra_apply, LinearMap.toSpanSingleton_apply]
+      -- Coordinate orthogonality kills every tuple other than the matching one.
+      have hzero : ∏ k, moduleBasis.coord (g k) (moduleBasis (l.get k)) = 0 :=
+        Finset.prod_eq_zero (Finset.mem_univ i) (by
+          rw [Basis.coord_apply, Basis.repr_self, Finsupp.single_eq_of_ne hi])
+      rw [hzero, zero_smul]
+    · simp
+  · intro h
+    exact absurd (Finset.mem_univ _) h
+  · rw [List.ofFn_get]
+    split_ifs with h
+    · simp only [LinearMap.compMultilinearMap_apply, MultilinearMap.compLinearMap_apply,
+        MultilinearMap.mkPiAlgebra_apply, LinearMap.toSpanSingleton_apply, hterm]
+      have hprod : ∏ i, moduleBasis.coord (l.get i) (moduleBasis (l.get i)) = 1 := by
+        simp
+      rw [hprod, one_smul]
+      exact termOfList_eq_ιMulti l
+    · simp
+
 end EFTLagrangianExclDeriv
 
 end
