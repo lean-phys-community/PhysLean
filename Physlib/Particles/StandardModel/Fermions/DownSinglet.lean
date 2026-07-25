@@ -129,6 +129,40 @@ noncomputable def repLorentzGroup : Representation ℂ (SL(2,ℂ)) DownSinglet w
     ext1 d
     simp [TensorProduct.map_map, Module.End.mul_eq_comp]
 
+/-!
+
+## D. Gauge action
+
+The `SU(3)` component acts on the colour index, while the `SU(2)` component acts trivially. The
+`U(1)` action is `star z ^ 2`; since `z` is unitary, `star z = z⁻¹`, so this represents charge
+`-2`.
+
+The tensor and basis formulas below expose the coefficients used to compare actions and compute the
+kernel.
+-/
+
+/-- The `(3, 1)_{-2}` action of the unquotiented Standard Model gauge group. -/
+noncomputable def repGaugeGroupI : Representation ℂ GaugeGroupI DownSinglet where
+  toFun g := valLinEquiv.symm ∘ₗ
+      TensorProduct.map
+        (LinearMap.id (M := Fermion.RightHandedWeyl))
+        g.toSU3.1.toEuclideanLin ∘ₗ
+      LinearMap.lsmul ℂ _ (star g.toU1.1 ^ 2 : ℂ) ∘ₗ
+      valLinEquiv
+  map_one' := by
+    ext d
+    simp [valLinEquiv_symm_apply]
+  map_mul' g₁ g₂ := by
+    ext d
+    simp [smul_smul, mul_comm, TensorProduct.map_map, valLinEquiv_symm_apply]
+    ring_nf
+
+/-- The gauge action on a pure spinor–colour tensor. -/
+lemma repGaugeGroupI_tmul (g : GaugeGroupI) (ψ : Fermion.RightHandedWeyl)
+    (v : EuclideanSpace ℂ (Fin 3)) :
+    repGaugeGroupI g ⟨ψ ⊗ₜ v⟩ =
+      ⟨(star g.toU1.1 ^ 2) • ψ ⊗ₜ g.toSU3.1.toEuclideanLin v⟩ := rfl
+
 end DownSinglet
 
 end StandardModel
