@@ -400,6 +400,31 @@ lemma coeff_eq_termOfList {s : Multiset FieldSpecification} (V : EFTLagrangianEx
       obtain ⟨c, hc⟩ := hW
       exact ⟨a * c, by rw [map_smul, hc, smul_smul]⟩
 
+/-!
+
+## E. The Higgs norm-squared term
+
+-/
+
+/-- The formal Higgs norm-squared term, the component sum of a conjugate-Higgs generator times
+the corresponding Higgs generator. It has the component shape of `H†H`. -/
+def normSqTerm : EFTLagrangianExclDeriv :=
+  ∑ α : Fin 2, [barφ α]ₛ * [φ α]ₛ
+
+/-- Projecting the formal Higgs norm square onto one of its two component contents returns
+exactly that component bilinear, with coefficient one. -/
+lemma coeff_normSqTerm (α : Fin 2) :
+    coeff {barφ α, φ α} normSqTerm = [barφ α]ₛ * [φ α]ₛ := by
+  have hterm (β : Fin 2) : [barφ β]ₛ * [φ β]ₛ = termOfList [barφ β, φ β] := by
+    rw [termOfList_cons, termOfList_singleton]
+  rw [normSqTerm, Fin.sum_univ_two, hterm 0, hterm 1, hterm α, map_add,
+    coeff_apply_termOfList, coeff_apply_termOfList]
+  fin_cases α
+  · rw [if_pos (by decide), if_neg (by decide), add_zero]
+    rfl
+  · rw [if_neg (by decide), if_pos (by decide), zero_add]
+    rfl
+
 end EFTLagrangianExclDeriv
 
 end
