@@ -106,6 +106,29 @@ lemma val_add (d₁ d₂ : DownSinglet) : (d₁ + d₂).val = d₁.val + d₂.va
 @[simp]
 lemma val_smul (r : ℂ) (d : DownSinglet) : (r • d).val = r • d.val := rfl
 
+/-!
+
+## C. Lorentz action
+
+The Lorentz group acts on the right-handed Weyl factor and leaves the colour index fixed.
+-/
+
+open Matrix MatrixGroups
+
+open Representation in
+/-- The right-handed Lorentz representation on down-type singlet quarks. -/
+noncomputable def repLorentzGroup : Representation ℂ (SL(2,ℂ)) DownSinglet where
+  toFun Λ := valLinEquiv.symm ∘ₗ
+      TensorProduct.map (Fermion.RightHandedWeyl.rep Λ)
+        (trivial ℂ (SL(2,ℂ)) (EuclideanSpace ℂ (Fin 3)) Λ) ∘ₗ
+      valLinEquiv
+  map_one' := by
+    ext d
+    simp [Module.End.one_eq_id]
+  map_mul' Λ₁ Λ₂ := by
+    ext1 d
+    simp [TensorProduct.map_map, Module.End.mul_eq_comp]
+
 end DownSinglet
 
 end StandardModel
