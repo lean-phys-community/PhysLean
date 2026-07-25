@@ -318,6 +318,88 @@ lemma coeff_apply_termOfList (s : Multiset FieldSpecification) (l : List FieldSp
       exact termOfList_eq_ιMulti l
     · simp
 
+/-!
+
+## D. Properties of the projection
+
+-/
+
+/-! ### D.1. Monomials span the space -/
+
+/-- Every element of `EFTLagrangianExclDeriv` is a linear combination of Higgs monomials. -/
+lemma mem_termOfList_span (V : EFTLagrangianExclDeriv) :
+    V ∈ Submodule.span ℂ (Set.range termOfList) := by
+  induction V using SymmetricAlgebra.induction with
+  | algebraMap r =>
+      rw [Algebra.algebraMap_eq_smul_one]
+      exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨[], termOfList_nil⟩)
+  | ι v =>
+      rw [← Basis.sum_repr moduleBasis v, map_sum]
+      refine Submodule.sum_mem _ fun f _ => ?_
+      rw [map_smul]
+      exact Submodule.smul_mem _ _
+        (Submodule.subset_span ⟨[f], by rw [termOfList_singleton]; rfl⟩)
+  | mul a b ha hb =>
+      induction ha using Submodule.span_induction with
+      | mem x hx =>
+          obtain ⟨l₁, rfl⟩ := hx
+          induction hb using Submodule.span_induction with
+          | mem y hy =>
+              obtain ⟨l₂, rfl⟩ := hy
+              exact Submodule.subset_span ⟨l₁ ++ l₂, termOfList_append l₁ l₂⟩
+          | zero => simp
+          | add y z _ _ hy hz => rw [mul_add]; exact add_mem hy hz
+          | smul c y _ hy => rw [mul_smul_comm]; exact Submodule.smul_mem _ _ hy
+      | zero => simp
+      | add x y _ _ hx hy => rw [add_mul]; exact add_mem hx hy
+      | smul c x _ hx => rw [smul_mul_assoc]; exact Submodule.smul_mem _ _ hx
+  | add a b ha hb => exact add_mem ha hb
+
+/-! ### D.2. Idempotence -/
+
+/-- `coeff s` is idempotent, and is therefore genuinely a projection on the whole algebra. -/
+@[simp]
+lemma coeff_coeff_self {s : Multiset FieldSpecification} (V : EFTLagrangianExclDeriv) :
+    coeff s (coeff s V) = coeff s V := by
+  have hV := mem_termOfList_span V
+  induction hV using Submodule.span_induction with
+  | mem W hW =>
+      obtain ⟨l, rfl⟩ := hW
+      rw [coeff_apply_termOfList]
+      split_ifs with h
+      · rw [coeff_apply_termOfList, if_pos h]
+      · rw [map_zero]
+  | zero => rw [map_zero, map_zero]
+  | add W X _ _ hW hX => rw [map_add, map_add, hW, hX]
+  | smul c W _ hW => rw [map_smul, map_smul, hW]
+
+/-! ### D.3. One-dimensionality of the image -/
+
+/-- The image of `coeff s` is the line spanned by the monomial with field content `s`: every
+projected term is a scalar multiple of a single monomial. Since permutations act without a sign,
+the choice of ordering `l` of the content is immaterial. -/
+lemma coeff_eq_termOfList {s : Multiset FieldSpecification} (V : EFTLagrangianExclDeriv)
+    {l : List FieldSpecification} (hl : Multiset.ofList l = s) :
+    ∃ c : ℂ, coeff s V = c • termOfList l := by
+  have hV := mem_termOfList_span V
+  induction hV using Submodule.span_induction with
+  | mem W hW =>
+      obtain ⟨l', rfl⟩ := hW
+      rw [coeff_apply_termOfList]
+      split_ifs with h
+      · refine ⟨1, ?_⟩
+        rw [one_smul]
+        exact termOfList_eq_of_perm (Multiset.coe_eq_coe.mp (h.trans hl.symm))
+      · exact ⟨0, by rw [zero_smul]⟩
+  | zero => exact ⟨0, by rw [map_zero, zero_smul]⟩
+  | add W X _ _ hW hX =>
+      obtain ⟨c₁, hc₁⟩ := hW
+      obtain ⟨c₂, hc₂⟩ := hX
+      exact ⟨c₁ + c₂, by rw [map_add, hc₁, hc₂, add_smul]⟩
+  | smul a W _ hW =>
+      obtain ⟨c, hc⟩ := hW
+      exact ⟨a * c, by rw [map_smul, hc, smul_smul]⟩
+
 end EFTLagrangianExclDeriv
 
 end
