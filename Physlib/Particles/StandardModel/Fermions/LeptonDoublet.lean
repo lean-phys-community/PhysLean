@@ -6,7 +6,7 @@ Authors: Nathaneal Sajan
 module
 
 public import Physlib.Particles.StandardModel.Basic
-public import Physlib.Relativity.Tensors.ComplexTensor.Weyl.Basic
+public import Physlib.Relativity.Tensors.ComplexTensor.Basic
 /-!
 # Lepton doublets
 
