@@ -251,6 +251,42 @@ lemma mem_repGaugeGroupI_ker_iff_eq {g : GaugeGroupI} :
       star_one, one_pow, one_mul]
     linear_combination h₂ * (1 : Matrix _ _ ℂ) i' i
 
+/-!
+
+## F. Descent to quotient gauge groups
+
+A representation descends through a quotient when the quotient subgroup lies in its kernel. For
+the central `ℤ₆`, the colour phase is `x²` while the charge `-2` phase is `(star x)² = x⁻²`, so
+their product is one.
+-/
+
+/-- The central `ℤ₆` subgroup acts trivially on `(3, 1)_{-2}`. -/
+lemma gaugeGroup_subgroup_ℤ₆_le_ker_repGaugeGroupI :
+    GaugeGroupQuot.subgroup .ℤ₆ ≤ repGaugeGroupI.ker := by
+  simp only [GaugeGroupQuot.subgroup, gaugeGroupℤ₆SubGroup, SetLike.le_def,
+    MonoidHom.mem_range, gaugeGroupℤ₆Hom_apply, Subtype.exists,
+    mem_repGaugeGroupI_ker_iff_eq, forall_exists_index]
+  rintro g x hx ⟨rfl⟩
+  use x ^ 2
+  simp only [gaugeGroupℤ₆OfRoot_toSU3, gaugeGroupℤ₆SU3OfRoot_eq_mul_id,
+    gaugeGroupℤ₆OfRoot_toU1, gaugeGroupℤ₆UnitaryOfRoot_coe, true_and, RCLike.star_def,
+    Complex.conj_rootsOfUnity hx, Units.val_inv_eq_inv_val, inv_pow]
+  field_simp
+
+/-- Every supported quotient subgroup acts trivially on the down-type singlet. -/
+lemma gaugeGroup_subgroup_le_ker_repGaugeGroupI (Q : GaugeGroupQuot) :
+    Q.subgroup ≤ repGaugeGroupI.ker := Q.subgroup_le_subgroup_ℤ₆.trans
+  gaugeGroup_subgroup_ℤ₆_le_ker_repGaugeGroupI
+
+/-- The `(3, 1)_{-2}` representation for every supported global form of the
+Standard Model gauge group. -/
+noncomputable def repGaugeGroup : (Q : GaugeGroupQuot) →
+    Representation ℂ (GaugeGroup Q) DownSinglet
+  | .I => repGaugeGroupI
+  | .ℤ₆ => QuotientGroup.lift _ repGaugeGroupI (gaugeGroup_subgroup_le_ker_repGaugeGroupI .ℤ₆)
+  | .ℤ₂ => QuotientGroup.lift _ repGaugeGroupI (gaugeGroup_subgroup_le_ker_repGaugeGroupI .ℤ₂)
+  | .ℤ₃ => QuotientGroup.lift _ repGaugeGroupI (gaugeGroup_subgroup_le_ker_repGaugeGroupI .ℤ₃)
+
 end DownSinglet
 
 end StandardModel
