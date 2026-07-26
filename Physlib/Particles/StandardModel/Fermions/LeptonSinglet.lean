@@ -173,6 +173,20 @@ lemma repGaugeGroupI_eq_iff {g₁ g₂ : GaugeGroupI} :
     ext l
     simp [repGaugeGroupI, h']
 
+/-!
+
+## E. Kernel of the gauge action
+
+An element acts trivially exactly when its hypercharge scalar is one. Its colour and weak
+components are unrestricted, since neither appears in the action.
+-/
+
+/-- Characterizes the full-group elements acting trivially on the charged-lepton singlet. -/
+lemma mem_repGaugeGroupI_ker_iff_eq {g : GaugeGroupI} :
+    g ∈ repGaugeGroupI.ker ↔ star g.toU1.1 ^ 6 = 1 := by
+  rw [MonoidHom.mem_ker, ← MonoidHom.map_one repGaugeGroupI, repGaugeGroupI_eq_iff]
+  simp
+
 end LeptonSinglet
 
 end StandardModel
