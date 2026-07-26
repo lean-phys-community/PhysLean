@@ -102,6 +102,26 @@ lemma val_add (l₁ l₂ : LeptonSinglet) : (l₁ + l₂).val = l₁.val + l₂.
 @[simp]
 lemma val_smul (r : ℂ) (l : LeptonSinglet) : (r • l).val = r • l.val := rfl
 
+/-!
+
+## C. Lorentz action
+
+The Lorentz group acts through the right-handed Weyl representation, transported along the
+identification of a charged-lepton singlet with its spinor.
+-/
+
+open Matrix MatrixGroups
+
+/-- The right-handed Lorentz representation on charged-lepton singlets. -/
+noncomputable def repLorentzGroup : Representation ℂ (SL(2,ℂ)) LeptonSinglet where
+  toFun Λ := valLinEquiv.symm ∘ₗ Fermion.RightHandedWeyl.rep Λ ∘ₗ valLinEquiv
+  map_one' := by
+    ext l
+    simp [Module.End.one_eq_id]
+  map_mul' Λ₁ Λ₂ := by
+    ext1 l
+    simp [Module.End.mul_eq_comp]
+
 end LeptonSinglet
 
 end StandardModel
