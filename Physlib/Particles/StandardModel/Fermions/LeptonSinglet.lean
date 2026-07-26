@@ -150,6 +150,29 @@ noncomputable def repGaugeGroupI : Representation ℂ GaugeGroupI LeptonSinglet 
 lemma repGaugeGroupI_apply (g : GaugeGroupI) (ψ : Fermion.RightHandedWeyl) :
     repGaugeGroupI g ⟨ψ⟩ = ⟨(star g.toU1.1 ^ 6) • ψ⟩ := rfl
 
+open Fermion in
+/-- The gauge action is diagonal in the standard Weyl basis. -/
+lemma repGaugeGroupI_basis (g : GaugeGroupI) (k : Fin 2) :
+    repGaugeGroupI g ⟨RightHandedWeyl.basis k⟩ =
+      (star g.toU1.1 ^ 6) • (⟨RightHandedWeyl.basis k⟩ : LeptonSinglet) := rfl
+
+open Fermion in
+/-- Two gauge elements induce the same action exactly when their hypercharge scalars agree. -/
+lemma repGaugeGroupI_eq_iff {g₁ g₂ : GaugeGroupI} :
+    repGaugeGroupI g₁ = repGaugeGroupI g₂ ↔
+      star g₁.toU1.1 ^ 6 = star g₂.toU1.1 ^ 6 := by
+  constructor
+  · intro h
+    have h' := congrFun (congrArg (fun f => f.1) h)
+      (⟨RightHandedWeyl.basis 0⟩ : LeptonSinglet)
+    simp only [LinearMap.coe_toAddHom, repGaugeGroupI_apply] at h'
+    have h'' := congrArg (fun v => RightHandedWeyl.basis.repr (LeptonSinglet.val v) 0) h'
+    simpa using h''
+  · intro h
+    have h' : (starRingEnd ℂ) g₁.toU1.1 ^ 6 = (starRingEnd ℂ) g₂.toU1.1 ^ 6 := h
+    ext l
+    simp [repGaugeGroupI, h']
+
 end LeptonSinglet
 
 end StandardModel
