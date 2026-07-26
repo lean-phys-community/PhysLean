@@ -122,6 +122,34 @@ noncomputable def repLorentzGroup : Representation ℂ (SL(2,ℂ)) LeptonSinglet
     ext1 l
     simp [Module.End.mul_eq_comp]
 
+/-!
+
+## D. Gauge action
+
+The colour and weak factors act trivially, so the gauge group acts only through hypercharge.
+The `U(1)` action is `star z ^ 6`; since `z` is unitary, `star z = z⁻¹`, so this represents
+charge `-6`.
+
+The formulas below expose the scalar used to compare actions and compute the kernel.
+-/
+
+/-- The `(1, 1)_{-6}` action of the unquotiented Standard Model gauge group. -/
+noncomputable def repGaugeGroupI : Representation ℂ GaugeGroupI LeptonSinglet where
+  toFun g := valLinEquiv.symm ∘ₗ
+      LinearMap.lsmul ℂ Fermion.RightHandedWeyl (star g.toU1.1 ^ 6 : ℂ)
+      ∘ₗ valLinEquiv
+  map_one' := by
+    ext l
+    simp [valLinEquiv_symm_apply]
+  map_mul' g₁ g₂ := by
+    ext l
+    simp [smul_smul, mul_comm, valLinEquiv_symm_apply]
+    ring_nf
+
+/-- The gauge group acts on a charged-lepton singlet by the hypercharge scalar alone. -/
+lemma repGaugeGroupI_apply (g : GaugeGroupI) (ψ : Fermion.RightHandedWeyl) :
+    repGaugeGroupI g ⟨ψ⟩ = ⟨(star g.toU1.1 ^ 6) • ψ⟩ := rfl
+
 end LeptonSinglet
 
 end StandardModel
