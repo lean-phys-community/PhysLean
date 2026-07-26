@@ -187,6 +187,40 @@ lemma mem_repGaugeGroupI_ker_iff_eq {g : GaugeGroupI} :
   rw [MonoidHom.mem_ker, ← MonoidHom.map_one repGaugeGroupI, repGaugeGroupI_eq_iff]
   simp
 
+/-!
+
+## F. Descent to quotient gauge groups
+
+A representation descends through a quotient when the quotient subgroup lies in its kernel.
+The `U(1)` component of a central element is a sixth root of unity, so conjugating and raising
+to the sixth power gives one, and charge `-6` therefore acts trivially.
+-/
+
+/-- The central `ℤ₆` subgroup acts trivially on `(1, 1)_{-6}`. -/
+lemma gaugeGroup_subgroup_ℤ₆_le_ker_repGaugeGroupI :
+    GaugeGroupQuot.subgroup .ℤ₆ ≤ repGaugeGroupI.ker := by
+  simp only [GaugeGroupQuot.subgroup, gaugeGroupℤ₆SubGroup, SetLike.le_def,
+    MonoidHom.mem_range, gaugeGroupℤ₆Hom_apply, Subtype.exists,
+    mem_repGaugeGroupI_ker_iff_eq, forall_exists_index]
+  rintro g x hx ⟨rfl⟩
+  simp only [gaugeGroupℤ₆OfRoot_toU1, gaugeGroupℤ₆UnitaryOfRoot_coe]
+  have hx6 : (((x : ℂˣ) : ℂ)) ^ 6 = 1 := (mem_rootsOfUnity' 6 x).mp hx
+  simpa [map_pow] using congrArg (starRingEnd ℂ) hx6
+
+/-- Every supported quotient subgroup acts trivially on the charged-lepton singlet. -/
+lemma gaugeGroup_subgroup_le_ker_repGaugeGroupI (Q : GaugeGroupQuot) :
+    Q.subgroup ≤ repGaugeGroupI.ker := Q.subgroup_le_subgroup_ℤ₆.trans
+  gaugeGroup_subgroup_ℤ₆_le_ker_repGaugeGroupI
+
+/-- The `(1, 1)_{-6}` representation for every supported global form of the
+  Standard Model gauge group. -/
+noncomputable def repGaugeGroup : (Q : GaugeGroupQuot) →
+    Representation ℂ (GaugeGroup Q) LeptonSinglet
+  | .I => repGaugeGroupI
+  | .ℤ₆ => QuotientGroup.lift _ repGaugeGroupI (gaugeGroup_subgroup_le_ker_repGaugeGroupI .ℤ₆)
+  | .ℤ₂ => QuotientGroup.lift _ repGaugeGroupI (gaugeGroup_subgroup_le_ker_repGaugeGroupI .ℤ₂)
+  | .ℤ₃ => QuotientGroup.lift _ repGaugeGroupI (gaugeGroup_subgroup_le_ker_repGaugeGroupI .ℤ₃)
+
 end LeptonSinglet
 
 end StandardModel
