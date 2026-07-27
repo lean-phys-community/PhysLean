@@ -13,6 +13,37 @@ public import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 
 # Gaussians in inner product spaces
 
+## i. Overview
+
+In this module we define Gaussians as Schwartz maps in general inner product spaces.
+
+The most general Gaussian constructed is `exp (-2⁻¹ * ‖B⁻¹ (x - x₀)‖ ^ 2)` (mean `x₀`
+and covariance `BᵀB`) as a Schwartz map `𝓢(E, 𝕜)`, where `B : D ≃L[ℝ] E` is a linear equivalence
+of inner product spaces. This is accomplished by first constructing the Gaussian
+`exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, ℝ)` using explicit bounds on the derivatives
+of `‖x‖ ^ 2 = innerSL ℝ x x` and limiting properties of the real exponential,
+then composing with an invertible affine transformation.
+
+The Gaussians are left unnormalized since the appropriate condition will depend on context and
+whether `E` is finite- or infinite-dimensional. For example, the normalization conditions when
+interpreted as a probability density function vs. as a quantum state require different pre-factors.
+
+## ii. Key results
+
+- `realStdGaussian E` : The standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, ℝ)`.
+- `stdGaussian E 𝕜` : The standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, 𝕜)`.
+- `gaussian₀ 𝕜 B` : Given a linear equivalence `B : D ≃L[ℝ] C` of inner product spaces,
+    the Gaussian `exp (-2⁻¹ * ‖B⁻¹ x‖ ^ 2)` centered on the origin as a Schwartz map `𝓢(E, 𝕜)`.
+- `gaussian 𝕜 B x₀` : Given a linear equivalence `B : D ≃L[ℝ] C` and mean `x₀ : E`,
+    the Gaussian `exp (-2⁻¹ * ‖B⁻¹ (x - x₀)‖ ^ 2)` centered on `x₀` as a Schwartz map `𝓢(E, 𝕜)`.
+
+## iii. Table of contents
+
+- A. Standard, real-valued
+- B. General, RCLike-valued
+
+## iv. References
+
 -/
 
 @[expose] public section
