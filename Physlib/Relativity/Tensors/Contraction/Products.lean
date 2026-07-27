@@ -153,6 +153,23 @@ lemma contrT_prodT_snd {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
   rw [prodT_contrT_snd]
   simp
 
+/-- A contraction internal to the left factor commutes past the outer product with a right
+  spectator. The mirror of `prodT_contrT_snd`, obtained from it by `prodT_swap`, so the right-hand
+  side contracts the swapped product `prodT t1 t` and carries a block swap. -/
+lemma prodT_contrT_fst {n n1 : ℕ} {c : Fin (n + 1 + 1) → C}
+    {c1 : Fin n1 → C}
+    (i j : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
+    (t : Tensor S c) (t1 : Tensor S c1) :
+    prodT (contrT n i j hij t) t1 =
+    permT _ IsReindexing.append_swap
+      (permT id (IsReindexing.append_succSuccAbove_natAdd i j) <|
+      contrT _
+        (Fin.natAdd n1 i)
+        (Fin.natAdd n1 j)
+        (by simpa using hij) <|
+      prodT t1 t) := by
+  rw [prodT_swap, prodT_contrT_snd]
+
 end Tensor
 
 end TensorSpecies
