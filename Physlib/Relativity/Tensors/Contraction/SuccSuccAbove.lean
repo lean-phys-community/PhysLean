@@ -231,6 +231,37 @@ lemma succSuccAbove_natAdd_apply_castAdd {n n1 : ℕ}
   simp only [Fin.ext_iff, succSuccAbove_val, natAdd, castAdd]
   grind (splits := 20)
 
+/-- Reinserting a left-block survivor `a` after removing the `i`-th slot of the left block and the
+  `j`-th slot of the right block of `Fin ((nA + 1) + (nB + 1))`, the removal read at the contracted
+  length `(nA + nB) + 1 + 1`. Unlike `succSuccAbove_natAdd_apply_castAdd` the two holes straddle the
+  two blocks, so the statement carries the reshaping `Fin.cast`s. -/
+lemma reinsert_castAdd {nA nB : ℕ} (i : Fin (nA + 1)) (j : Fin (nB + 1))
+    (a : Fin nA) :
+    Fin.cast (show (nA + nB) + 1 + 1 = (nA + 1) + (nB + 1) by omega)
+        ((Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.castAdd (nB + 1) i)).succSuccAbove
+          (Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.natAdd (nA + 1) j)) (Fin.castAdd nB a))
+      = Fin.castAdd (nB + 1) (i.succAbove a) := by
+  apply Fin.ext
+  simp only [Fin.succSuccAbove_val, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd,
+    Fin.succAbove, Fin.lt_def, Fin.val_castSucc, Fin.val_succ, apply_ite Fin.val]
+  split_ifs <;> omega
+
+/-- Reinserting a right-block survivor, the mirror of `Fin.reinsert_castAdd`. -/
+lemma reinsert_natAdd {nA nB : ℕ} (i : Fin (nA + 1)) (j : Fin (nB + 1))
+    (a : Fin nB) :
+    Fin.cast (show (nA + nB) + 1 + 1 = (nA + 1) + (nB + 1) by omega)
+        ((Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.castAdd (nB + 1) i)).succSuccAbove
+          (Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega)
+            (Fin.natAdd (nA + 1) j)) (Fin.natAdd nA a))
+      = Fin.natAdd (nA + 1) (j.succAbove a) := by
+  apply Fin.ext
+  simp only [Fin.succSuccAbove_val, Fin.val_cast, Fin.val_castAdd, Fin.val_natAdd, Fin.succAbove,
+    Fin.lt_def, Fin.val_castSucc, Fin.val_succ, apply_ite Fin.val]
+  split_ifs <;> omega
+
 lemma succSuccAbove_natAdd_image_range_castAdd {n n1 : ℕ}
     (i j : Fin (n + 1 + 1)) :
     (succSuccAbove (n := n1 + n) (Fin.natAdd n1 i) (Fin.natAdd n1 j)) ''

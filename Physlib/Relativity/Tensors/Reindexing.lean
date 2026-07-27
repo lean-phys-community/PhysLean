@@ -32,6 +32,96 @@ We are interested in the interaction of reindexing with the following operations
 
 open Module
 
+namespace Fin
+
+/-!
+
+## Index maps
+
+The finite index maps out of which the reindexings below are built: `Fin.append` for products and
+`Fin.succAbove` for a deleted slot. The lemmas on `Fin.succSuccAbove`, for a deleted pair, are in
+`Physlib.Relativity.Tensors.Contraction.SuccSuccAbove`.
+
+-/
+
+/-- The `.val` of the block-swap map, as a piecewise-linear function. -/
+lemma append_swap_val (n n2 : ℕ) (x : Fin (n2 + n)) :
+    (Fin.append (Fin.natAdd n) (Fin.castAdd n2) x).val =
+      if x.val < n2 then n + x.val else x.val - n2 := by
+  refine Fin.addCases (fun i => ?_) (fun i => ?_) x
+  · simp [Fin.append_left]
+  · simp [Fin.append_right]
+
+/-- Splitting `Fin (m + n)` into its two blocks and reassembling them is the identity. -/
+lemma append_castAdd_natAdd_eq_id {m n : ℕ} :
+    Fin.append (Fin.castAdd n) (Fin.natAdd m) = (id : Fin (m + n) → Fin (m + n)) := by
+  simpa using Fin.append_castAdd_natAdd (f := (id : Fin (m + n) → Fin (m + n)))
+
+/-- Reassembling the blocks of `Fin (na + n2)` after casting the left one along `na = nb` is the
+  cast of the total length. -/
+lemma append_castAdd_cast (na nb n2 : ℕ) (heq : na = nb) :
+    Fin.append (Fin.castAdd n2 ∘ Fin.cast heq) (Fin.natAdd nb) =
+      Fin.cast (show na + n2 = nb + n2 by omega) := by
+  subst heq
+  simpa using append_castAdd_natAdd_eq_id
+
+/-- Reassembling the blocks of `Fin (n2 + na)` after casting the right one along `na = nb` is the
+  cast of the total length. The right-block mirror of `Fin.append_castAdd_cast`. -/
+lemma append_natAdd_cast (na nb n2 : ℕ) (heq : na = nb) :
+    Fin.append (Fin.castAdd nb) (Fin.natAdd n2 ∘ Fin.cast heq) =
+      Fin.cast (show n2 + na = n2 + nb by omega) := by
+  subst heq
+  simpa using append_castAdd_natAdd_eq_id
+
+/-- Moving slot `i` to the end is the cycle `[i, last]`: the block map that lists the
+  `i.succAbove` survivors in order and then `i` is `Fin.cycleIcc i (Fin.last n)`. -/
+lemma append_succAbove_const_eq_cycleIcc {n : ℕ} (i : Fin (n + 1)) :
+    Fin.append i.succAbove (fun _ : Fin 1 => i) = ⇑(Fin.cycleIcc i (Fin.last n)) := by
+  funext y
+  refine Fin.addCases (fun a => ?_) (fun a => ?_) y
+  · rw [Fin.append_left]
+    have h := congrFun (Fin.cycleIcc_comp_succAbove i (Fin.last n) (Fin.le_last i)) a
+    rw [Fin.succAbove_last] at h
+    exact h.symm
+  · rw [Fin.append_right]
+    have : (Fin.natAdd n a : Fin (n + 1)) = Fin.last n := by
+      apply Fin.ext; simp [Fin.val_natAdd]
+    rw [this, Fin.cycleIcc_of_le_of_le (Fin.le_last _) (Fin.le_last _), if_pos rfl]
+
+/-- The inverse of the cycle `[i, last]` carries the reinserted survivor `i.succAbove a` back to
+  its position `a` in the survivor block. -/
+lemma cycleIcc_last_symm_apply_succAbove {n : ℕ} (i : Fin (n + 1)) (a : Fin n) :
+    (Fin.cycleIcc i (Fin.last n)).symm (i.succAbove a) = Fin.castAdd 1 a :=
+  (Equiv.symm_apply_eq _).2 (by rw [← append_succAbove_const_eq_cycleIcc i, Fin.append_left])
+
+/-- An injection `σ` of `Fin (n + 1)` restricts to the survivors of a slot `i`: there is a map
+  `σ'` filling the square `(σ i).succAbove ∘ σ' = σ ∘ i.succAbove`, carrying the complement of `i`
+  to the complement of `σ i`. -/
+lemma exists_succAbove_comm {n : ℕ} {σ : Fin (n + 1) → Fin (n + 1)} (hσ : Function.Injective σ)
+    (i : Fin (n + 1)) : ∃ σ' : Fin n → Fin n, (σ i).succAbove ∘ σ' = σ ∘ i.succAbove :=
+  ⟨fun a => (Fin.exists_succAbove_eq (hσ.ne (Fin.succAbove_ne i a))).choose,
+    funext fun a => (Fin.exists_succAbove_eq (hσ.ne (Fin.succAbove_ne i a))).choose_spec⟩
+
+/-- A `Fin.cast` of a left-block injection is the literal slot `⟨v, _⟩` at the same value `v`.
+
+  Stated at `Fin` level rather than `.val` level so that a rewrite replaces the composite before
+  `Fin.succSuccAbove_val` builds its `ite` conditions on it, keeping the generated `Decidable`
+  instances in sync with the reduced conditions. -/
+lemma cast_castAdd_eq_mk {n m N : ℕ} (h : n + m = N) {i : Fin n} {v : ℕ} (hv : i.val = v) :
+    Fin.cast h (Fin.castAdd m i) =
+      ⟨v, by subst h hv; exact Nat.lt_of_lt_of_le i.isLt (Nat.le_add_right n m)⟩ :=
+  Fin.ext (by simp [hv])
+
+/-- A `Fin.cast` of a right-block injection is the literal slot `⟨v, _⟩` at the offset value `v`.
+  See `Fin.cast_castAdd_eq_mk` for why the `Fin`-level statement matters. -/
+lemma cast_natAdd_eq_mk {n m N : ℕ} (h : n + m = N) {i : Fin m} {v : ℕ}
+    (hv : n + i.val = v) :
+    Fin.cast h (Fin.natAdd n i) =
+      ⟨v, by subst h hv; exact Nat.add_lt_add_left i.isLt n⟩ :=
+  Fin.ext (by simp [hv])
+
+end Fin
+
 namespace TensorSpecies
 
 variable {k : Type} [CommRing k] {C : Type} {G : Type} [Group G]
@@ -364,6 +454,23 @@ lemma succAbove {n n1 : ℕ} {c : Fin (n + 1) → C} {c1 : Fin (n1 + 1) → C}
   · simpa [hi] using IsReindexing.succAbove_of_eq_zero i h hi
   · simpa [hi] using IsReindexing.succAbove_of_neq_zero i h hi
 
+/-- The conclusion of `succAbove` from an explicit survivor relabelling: if `σ'` fills the square
+  `(σ i).succAbove ∘ σ' = σ ∘ i.succAbove`, carrying the complement of `i` to the complement of
+  `σ i`, then it is a reindexing of the two shortened colour lists. The square forces `σ'` to be
+  injective, hence bijective, so no bijectivity hypothesis is needed; this is why the statement is
+  restricted to equal lengths.
+
+  Where `succAbove` builds the relabelling from `σ` as a `dite` composite, the map here is the
+  caller's, which is what lets it stand in the statement of a lemma the caller instantiates. -/
+lemma succAbove_of_succAbove_eq {n : ℕ} {c c1 : Fin (n + 1) → C}
+    {σ : Fin (n + 1) → Fin (n + 1)} {σ' : Fin n → Fin n} (i : Fin (n + 1))
+    (h : IsReindexing c c1 σ) (hσ' : (σ i).succAbove ∘ σ' = σ ∘ i.succAbove) :
+    IsReindexing (c ∘ (σ i).succAbove) (c1 ∘ i.succAbove) σ' := by
+  have key : ∀ a, (σ i).succAbove (σ' a) = σ (i.succAbove a) := congrFun hσ'
+  refine ⟨Finite.injective_iff_bijective.mp (fun a b hab => ?_), fun a => ?_⟩
+  · exact Fin.succAbove_right_injective (h.injective (by rw [← key a, ← key b, hab]))
+  · simpa only [Function.comp_apply, key a] using h.2 (i.succAbove a)
+
 /-- Given a reindexing of `c` by `c1` via `σ` and two distinct indices `i ≠ j`, removing the
   `i`-th and `j`-th entries of `c1` and the `(σ i)`-th and `(σ j)`-th entries of `c` yields a
   reindexing of `c ∘ (σ i).succSuccAbove (σ j)` by `c1 ∘ i.succSuccAbove j`.
@@ -471,6 +578,24 @@ lemma append_succ_last {n : ℕ} (c : Fin (n + 1) → C) :
   refine Fin.addCases (fun i => ?_) (fun i => ?_)
   · simp only [Fin.append_left, Function.comp_apply]; rfl
   · fin_cases i; simp only [Fin.append_right, Matrix.cons_val_fin_one]; rfl
+
+/-- Splitting a list of colours `c : Fin (n + 1) → C` at an arbitrary slot `i`, rather than at the
+  last one as in `append_succ_last`: the block map that lists the `i.succAbove` survivors and then
+  `i` itself matches `c` with the survivors of `i` followed by the surviving entry `c1 1` of a
+  rank-two list `c1` whose second entry is slot `i`'s colour. -/
+lemma moveLast {n : ℕ} {c : Fin (n + 1) → C} {c1 : Fin 2 → C} (i : Fin (n + 1))
+    (hc : c i = c1 1) :
+    IsReindexing c
+      (Fin.append (c ∘ i.succAbove) (c1 ∘ (0 : Fin 2).succAbove))
+      (Fin.append i.succAbove (fun _ : Fin 1 => i)) :=
+  ⟨by
+      rw [Fin.append_succAbove_const_eq_cycleIcc i]
+      exact (Fin.cycleIcc i (Fin.last n)).bijective,
+    fun x => by
+      refine Fin.addCases (fun a => ?_) (fun a => ?_) x
+      · simp [Fin.append_left]
+      · fin_cases a
+        simp [Fin.append_right, hc]⟩
 
 /-- Splitting a list of colours `c : Fin (n + 1) → C` into its first entry and its remaining
   `n` entries recovers `c`: the canonical reindexing `Fin (1 + n) ≃ Fin (n + 1)` matches

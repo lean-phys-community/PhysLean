@@ -628,6 +628,12 @@ lemma permT_eq_zero_iff {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   funext x
   simp [IsReindexing.inv_apply_apply]
 
+/-- `permT` is injective. -/
+lemma permT_injective {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
+    {σ : Fin m → Fin n} (h : IsReindexing c c1 σ) :
+    Function.Injective (permT (S := S) σ h) :=
+  (injective_iff_map_eq_zero' _).mpr (permT_eq_zero_iff h)
+
 /-!
 ## field
 -/
