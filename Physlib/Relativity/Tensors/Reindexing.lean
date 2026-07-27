@@ -597,6 +597,12 @@ lemma moveLast {n : ℕ} {c : Fin (n + 1) → C} {c1 : Fin 2 → C} (i : Fin (n 
       · fin_cases a
         simp [Fin.append_right, hc]⟩
 
+/-- Updating slot `i` of `c` to `d` and then back to `e = c i` returns `c`, no other slot moving:
+  the colour cast a round trip of two contractions at slot `i` generates. -/
+lemma update_update_of_eq {n : ℕ} {c : Fin n → C} {d e : C} (i : Fin n) (he : c i = e) :
+    IsReindexing c (Function.update (Function.update c i d) i e) (id : Fin n → Fin n) :=
+  on_id.mpr (fun j => by by_cases h : j = i <;> simp [h, Function.update_of_ne, he])
+
 /-- Splitting a list of colours `c : Fin (n + 1) → C` into its first entry and its remaining
   `n` entries recovers `c`: the canonical reindexing `Fin (1 + n) ≃ Fin (n + 1)` matches
   `Fin.append ![c 0] (c ∘ Fin.succAbove 0)` with `c`. -/

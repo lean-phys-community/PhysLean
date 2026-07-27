@@ -27,6 +27,8 @@ operation live with the unit-tensor collapse theory in
 - `TensorSpecies.Tensor.crossToSlot` : contract slot `i` against slot `j` of a rank-2 tensor and
     rotate the survivor back into position `i`; raising and lowering a named index.
 - `TensorSpecies.Tensor.crossToSlot_eq_crossToEnd` : the bridge to the result-to-end convention.
+- `TensorSpecies.Tensor.crossToSlotInv` : the returning half of a round trip, the contraction
+    against the second factor with the round trip's color cast absorbed.
 - `TensorSpecies.Tensor.crossToSlot_permT_right_id` : an identity reindexing of the rank-2 tensor
     passes through the contraction.
 - `TensorSpecies.Tensor.crossToSlot_equivariant` : the contraction commutes with the `G`-action.
@@ -97,6 +99,18 @@ lemma crossToSlot_eq_crossToEnd {nA : ℕ} {c : Fin (nA + 1) → C} {cM : Fin 2 
     crossToSlot i j hc M t =
       permT ⇑(Fin.cycleIcc i (Fin.last nA)).symm (IsReindexing.crossToSlot_cycle i j)
         (crossToEnd i j hc t M) := rfl
+
+/-- Contract slot `i` of a tensor whose color there is `d` against `M'`, then absorb the color cast
+  the two `Function.update`s generate, landing back on `c`. This is the returning half of a
+  raise-then-lower round trip; absorbing the cast here is what keeps the round trip cast-free at
+  both ends. -/
+noncomputable def crossToSlotInv {nA : ℕ} {c : Fin (nA + 1) → C} {b d e : C} (i : Fin (nA + 1))
+    (he : c i = e) (hb : S.τ d = b) (M' : S.Tensor ![b, e]) :
+    S.Tensor (Function.update c i d) →ₗ[k] S.Tensor c :=
+  permT (id : Fin (nA + 1) → Fin (nA + 1))
+      (IsReindexing.on_id_symm (IsReindexing.update_update_of_eq (d := d) i he)) ∘ₗ
+    crossToSlot i (0 : Fin 2)
+      (by rw [Function.update_self]; exact hb : S.τ (Function.update c i d i) = b) M'
 
 /-- An identity reindexing of the rank-2 tensor becomes the corresponding identity reindexing of
   the contracted output: the `crossToSlot`-level case of `crossToEnd_permT_right` where the rank-2
