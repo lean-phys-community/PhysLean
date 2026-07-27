@@ -28,13 +28,16 @@ The Gaussians are left unnormalized since the appropriate condition will depend 
 whether `E` is finite- or infinite-dimensional. For example, the normalization conditions when
 interpreted as a probability density function vs. as a quantum state require different pre-factors.
 
+For some relevant Gaussian integrals see
+`Mathlib/Analysis/SpecialFunctions/Gaussian/FourierTransform`.
+
 ## ii. Key results
 
 - `realStdGaussian E` : The standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, ℝ)`.
 - `stdGaussian E 𝕜` : The standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, 𝕜)`.
-- `gaussian₀ 𝕜 B` : Given a linear equivalence `B : D ≃L[ℝ] C` of inner product spaces,
+- `gaussian₀ 𝕜 B` : Given a linear equivalence `B : D ≃L[ℝ] E` of inner product spaces,
     the Gaussian `exp (-2⁻¹ * ‖B⁻¹ x‖ ^ 2)` centered on the origin as a Schwartz map `𝓢(E, 𝕜)`.
-- `gaussian 𝕜 B x₀` : Given a linear equivalence `B : D ≃L[ℝ] C` and mean `x₀ : E`,
+- `gaussian 𝕜 B x₀` : Given a linear equivalence `B : D ≃L[ℝ] E` and mean `x₀ : E`,
     the Gaussian `exp (-2⁻¹ * ‖B⁻¹ (x - x₀)‖ ^ 2)` centered on `x₀` as a Schwartz map `𝓢(E, 𝕜)`.
 
 ## iii. Table of contents
