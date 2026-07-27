@@ -25,7 +25,7 @@ Requirements:
 
   - description: "The API contains projections from `TimeAndSpace d` to `Time` and to `Space d`."
     done: true
-    location: "Physlib/SpaceAndTime/TimeAndSpace/Basic.lean (time, space, as continuous linear maps →L[ℝ], with time_apply, space_apply, dist_time_le, dist_space_le)"
+    location: "Physlib/SpaceAndTime/TimeAndSpace/Basic.lean (time, space, time_apply, space_apply, dist_time_le, dist_space_le)"
 
   - description: "The API contains an action of the Euclidean group on `TimeAndSpace d`."
     done: true

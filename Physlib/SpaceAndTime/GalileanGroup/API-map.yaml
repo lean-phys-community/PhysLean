@@ -22,11 +22,11 @@ Requirements:
 
   - description: "The key data structure corresponding to the Galilean group is defined."
     done: true
-    location: "Physlib/SpaceAndTime/GalileanGroup/Basic.lean (GalileanGroup, with fields rotation, velocity, spaceTranslation, timeTranslation)"
+    location: "Physlib/SpaceAndTime/GalileanGroup/Basic.lean (GalileanGroup, rotation, velocity, spaceTranslation, timeTranslation)"
 
   - description: "The API contains an instance of a group on the type corresponding to the Galilean group."
     done: true
-    location: "Physlib/SpaceAndTime/GalileanGroup/Basic.lean (One, Mul, Inv, Group (GalileanGroup d), with simp lemmas for each field under one, mul and inv)"
+    location: "Physlib/SpaceAndTime/GalileanGroup/Basic.lean (One (GalileanGroup d), Mul (GalileanGroup d), Inv (GalileanGroup d), Group (GalileanGroup d), one_rotation, one_velocity, one_spaceTranslation, one_timeTranslation, mul_rotation, mul_velocity, mul_spaceTranslation, mul_timeTranslation, inv_rotation, inv_velocity, inv_spaceTranslation, inv_timeTranslation)"
 
   - description: "The API contains an instance of a Lie group on the type corresponding to the Galilean group."
     done: false
@@ -46,7 +46,7 @@ Requirements:
 
   - description: "The API is general for any dimension."
     done: true
-    location: "Physlib/SpaceAndTime/GalileanGroup/Basic.lean (GalileanGroup (d : ℕ := 3), with every definition and instance parameterised by d)"
+    location: "Physlib/SpaceAndTime/GalileanGroup/Basic.lean (GalileanGroup)"
 
   - description: "The API contains the action of the Galilean group on time and space."
     done: true
