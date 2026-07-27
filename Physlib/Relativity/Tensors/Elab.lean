@@ -5,10 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.Contraction.Basic
-public import Physlib.Relativity.Tensors.Evaluation
-public import Physlib.Relativity.Tensors.Tensorial
 public import Physlib.Relativity.Tensors.Dual
+public import Physlib.Relativity.Tensors.Tensorial
 /-!
 
 # Elaboration of tensor expressions
@@ -401,7 +399,7 @@ def TensorExpressionOperator.create (stx : Syntax) :
   indices with `τ`-syntax. -/
 def TensorExpressionOperator.jiggle : TensorExpressionOperator := fun (ind, T) => do
   let pos ← getJigglePos ind
-  let T' := pos.foldl (fun T' x => Syntax.mkApp (mkIdent ``Tensor.toDualAtIndex)
+  let T' := pos.foldl (fun T' x => Syntax.mkApp (mkIdent ``Tensor.toDualMapAtIndex)
     #[Syntax.mkNumLit (toString x), T']) T
   let ind' := ind.map indexRemoveTau
   return (ind', T')
@@ -667,13 +665,13 @@ variable {k : Type} [RCLike k] {C : Type} [DecidableEq C]  {G : Type} [Group G]
     {w : S.Tensor ![c3]} {td : S.Tensor ![S.τ c1, S.τ c2]}
     {M : Type} [AddCommMonoid M] [Module k M] [Tensorial S c M] (m : M)
 
-/-- info: (toDualAtIndex 0) u :
+/-- info: (toDualMapAtIndex 0) u :
   S.Tensor (Function.update ![c1, c2] 0 (S.τ (![c1, c2] 0))) -/
 #guard_msgs (whitespace := lax) in
 #check {u | τ(α) β}ᵀ
 
 /-- info: (contrT 2 1 3 ⋯)
-  ((prodT u) ((toDualAtIndex 1) u)) :
+  ((prodT u) ((toDualMapAtIndex 1) u)) :
     S.Tensor (Fin.append ![c1, c2]
       (Function.update ![c1, c2] 1 (S.τ (![c1, c2] 1))) ∘ Fin.succSuccAbove 1 3) -/
 #guard_msgs (whitespace := lax) in
