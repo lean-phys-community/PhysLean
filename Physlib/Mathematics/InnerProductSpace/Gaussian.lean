@@ -17,10 +17,20 @@ public import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 
 @[expose] public section
 
-open ContinuousLinearMap Real
+namespace InnerProductSpace
 
+noncomputable section
+
+open ContinuousLinearMap Filter RCLike Real SchwartzMap
+
+variable {D : Type*} [NormedAddCommGroup D] [InnerProductSpace ℝ D]
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-variable (x : E)
+variable (𝕜 : Type*) [RCLike 𝕜]
+variable (B : D ≃L[ℝ] E) (x₀ x : E)
+
+/-!
+## A. Standard, real-valued
+-/
 
 /-- Crude bounds on the norms of iterated Fréchet derivatives of `innerSL ℝ`
   in the form required by `norm_iteratedFDeriv_comp_le`. -/
@@ -112,3 +122,32 @@ def realStdGaussian : 𝓢(E, ℝ) where
       _ ≤ n.factorial * C :=
         mul_le_mul_of_nonneg_left (hbC _ <| pow_two_nonneg ‖x‖) (Nat.cast_nonneg' _)
 
+@[simp]
+lemma realStdGaussian_apply : realStdGaussian E x = rexp (-2⁻¹ * ‖x‖ ^ 2) := rfl
+
+/-!
+## B. General, RCLike-valued
+-/
+
+variable (E) in
+/-- The (unnormalized) `𝕜`-valued standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map. -/
+def stdGaussian : 𝓢(E, 𝕜) := (realStdGaussian E).postcompCLM ofRealCLM
+
+@[simp]
+lemma stdGaussian_apply : stdGaussian E 𝕜 x = ofReal (rexp (-2⁻¹ * ‖x‖ ^ 2)) := rfl
+
+/-- The (unnormalized) `𝕜`-valued Gaussian `exp (-2⁻¹ * ‖B⁻¹ x‖ ^ 2)` as a Schwartz map. -/
+def gaussian₀ : 𝓢(E, 𝕜) := (stdGaussian D 𝕜).compCLMOfContinuousLinearEquiv 𝕜 B.symm
+
+@[simp]
+lemma gaussian₀_apply : gaussian₀ 𝕜 B x = ofReal (rexp (-2⁻¹ * ‖B.symm x‖ ^ 2)) := rfl
+
+/-- The (unnormalized) `𝕜`-valued Gaussian `exp (-2⁻¹ * ‖B⁻¹ (x - x₀)‖ ^ 2)` as a Schwartz map. -/
+def gaussian : 𝓢(E, 𝕜) := compSubConstCLM 𝕜 x₀ (gaussian₀ 𝕜 B)
+
+@[simp]
+lemma gaussian_apply : gaussian 𝕜 B x₀ x = ofReal (rexp (-2⁻¹ * ‖B.symm (x - x₀)‖ ^ 2)) := rfl
+
+end
+
+end InnerProductSpace
