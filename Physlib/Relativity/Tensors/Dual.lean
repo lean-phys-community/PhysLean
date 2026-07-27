@@ -107,19 +107,13 @@ lemma crossToEnd_metricTensor_metricTensor_eq_dual_unit {c : C} :
 
 -/
 
-/-- Dualising the color of the index `i` twice gives back `c`, as a reindexing along the
-  identity. -/
-lemma IsReindexing.update_dual_dual {n : ℕ} (c : Fin n → C) (i : Fin n) :
-    IsReindexing c (Function.update (Function.update c i (S.τ (c i))) i
-      (S.τ (Function.update c i (S.τ (c i)) i))) (id : Fin n → Fin n) :=
-  IsReindexing.update_update_of_eq i (by simp [τ_τ_apply])
-
 /-- Dualising the index `i` twice returns the original tensor, up to the reindexing of the
   colors. -/
 lemma toDualMapAtIndex_toDualMapAtIndex {n : ℕ} {c : Fin n → C}
     (i : Fin n) (t : S.Tensor c) :
     toDualMapAtIndex (S := S) i (toDualMapAtIndex (S := S) i t) =
-      permT (id : Fin n → Fin n) (IsReindexing.update_dual_dual c i) t := by
+      permT (id : Fin n → Fin n)
+        (IsReindexing.update_update_of_eq i (by simp [τ_τ_apply])) t := by
   cases n with
   | zero => exact i.elim0
   | succ nA =>

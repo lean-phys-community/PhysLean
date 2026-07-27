@@ -109,9 +109,8 @@ private lemma crossToEnd_prodT_unitTensor {nV : ℕ} {cE : Fin nV → C} {cB : C
         (prodT E (contrT 1 0 1 hij (prodT B (unitTensor cB)))) :=
     contrT_prodT_snd (0 : Fin 3) 1 hij (prodT B (unitTensor cB)) E
   rw [contrT_single_unitTensor] at key
-  -- The `contrT_congr` pinning above leaves a goal whose slot proofs are not syntactically equal
-  -- to `key`'s, so `rw` at reducible transparency cannot key on them; `instances` transparency
-  -- matches. The final `permT_permT` needs the full `erw`.
+  -- The `contrT_congr` pinning leaves slot proofs that match `key`'s only at `instances`
+  -- transparency; the trailing `permT_permT` needs the full `erw`.
   rw (transparency := .instances) [key, permT_permT]
   rw [prodT_permT_right, permT_permT]
   erw [permT_permT]
@@ -238,9 +237,8 @@ lemma crossToEnd_round_trip_of_unit_slot {nA : ℕ} {c : Fin (nA + 1) → C} {d 
   rw [crossToEnd_permT_right i (0 : Fin 2)
     (id : Fin 2 → Fin 2) (fun x : Fin 1 => x)
     (IsReindexing.on_id.mpr (fun i => by fin_cases i <;> rfl)) rfl]
-  -- The `id`-spelled map from `crossToEnd_permT_right` leaves the composite slot proof only
-  -- type-correct at default transparency, so `rw`/`simp` cannot key on `crossToEnd_unitTensor`
-  -- or `permT_permT`; `erw` matches up to defeq.
+  -- The `id`-spelled map leaves the composite slot proof type-correct only at default
+  -- transparency, so `rw`/`simp` cannot key on it; `erw` matches up to defeq.
   erw [crossToEnd_unitTensor (nA := nA) (cA := c) (c := c i) i rfl]
   erw [permT_permT, permT_permT]
   apply permT_congr
@@ -268,11 +266,8 @@ private lemma crossToSlot_round_trip_of_unit {nA : ℕ} {c : Fin (nA + 1) → C}
   have hcycle : (⇑(Fin.cycleIcc i (Fin.last nA)).symm) i = Fin.last nA :=
     (Equiv.symm_apply_eq _).2 (Fin.cycleIcc_of_last (Fin.le_last i)).symm
   rw [crossToSlot_eq_crossToEnd, crossToSlot_eq_crossToEnd]
-  -- `crossToSlot`'s output color `Function.update c i (cM ((0).succAbove 0))` reduces to the clean
-  -- color only after the `Fin.cons` reduction (default transparency), so the unfolded goal is not
-  -- type-correct at `instances` transparency and `rw` cannot key on the composite. Precompute the
-  -- left commutator (its `rfl`-heavy `hσ'` witness elaborated at normal transparency) and `erw` it,
-  -- which matches up to defeq.
+  -- `crossToSlot`'s output color reduces to the clean one only at default transparency, so `rw`
+  -- cannot key on the composite. Precompute the left commutator and `erw` it instead.
   have hpl := crossToEnd_permT_left i (0 : Fin 2)
     ⇑(Fin.cycleIcc i (Fin.last nA)).symm id (IsReindexing.crossToSlot_cycle i (0 : Fin 2))
     (by
@@ -325,8 +320,8 @@ lemma crossToSlot_raise_lower_round_trip {nA : ℕ} {c : Fin (nA + 1) → C} {a 
 
 ## C. Raising and lowering as an equivalence
 
-A pair collapsing to the unit tensor in both orders makes the two contractions mutually inverse, so
-the color lists `c` and `Function.update c i d` carry the same tensors.
+Both collapse orders are hypotheses here and each is used once: `M · M' = δ` gives one round trip
+by section B, `M' · M = δ` the other through injectivity of the lowering half.
 
 -/
 
@@ -348,9 +343,8 @@ include hMM' in
 lemma crossToSlotInv_crossToSlot (t : Tensor S c) :
     crossToSlotInv i he hb M' (crossToSlot i (0 : Fin 2) ha M t) = t := by
   simp only [crossToSlotInv, LinearMap.coe_comp, Function.comp_apply]
-  -- Unfolding `crossToSlotInv` leaves the inner slot proof at the clean color `b` where the
-  -- `crossToSlot` application wants the composite `![b, e] 0`, so `rw` cannot key on the round
-  -- trip; `erw` matches up to defeq.
+  -- Unfolding `crossToSlotInv` leaves the inner slot proof at the clean color `b` where the goal
+  -- wants the composite `![b, e] 0`, so `rw` cannot key on the round trip; `erw` matches.
   erw [crossToSlot_raise_lower_round_trip i he ha hb M M' hMM' t, permT_permT]
   exact permT_congr_eq_id _ _ _ rfl
 
@@ -383,14 +377,6 @@ noncomputable def crossToSlotEquiv : Tensor S c ≃ₗ[k] Tensor S (Function.upd
   LinearEquiv.mk (crossToSlot i (0 : Fin 2) ha M) (crossToSlotInv i he hb M').toFun
     (crossToSlotInv_crossToSlot i he ha hb M M' hMM')
     (crossToSlot_crossToSlotInv i he ha hb M M' hMM' hM'M)
-
-@[simp]
-lemma crossToSlotEquiv_apply (t : Tensor S c) :
-    crossToSlotEquiv i he ha hb M M' hMM' hM'M t = crossToSlot i (0 : Fin 2) ha M t := rfl
-
-@[simp]
-lemma crossToSlotEquiv_symm_apply (t : Tensor S (Function.update c i d)) :
-    (crossToSlotEquiv i he ha hb M M' hMM' hM'M).symm t = crossToSlotInv i he hb M' t := rfl
 
 end RoundTripEquiv
 
