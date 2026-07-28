@@ -9,6 +9,7 @@ public import Mathlib.Analysis.Calculus.ContDiff.Bounds
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Basic
 public import Mathlib.Analysis.InnerProductSpace.Calculus
 public import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Gaussians in inner product spaces
@@ -49,6 +50,10 @@ For some relevant Gaussian integrals see
 -/
 
 @[expose] public section
+
+TODO "Provide functionality for multiplying by exponential functions like `exp ⟪v, x⟫`
+  (which does not have temperate growth) to obtain another Schwartz map (smulLeftExp?)
+  and prove that this is equal to a shifted/rescaled Gaussian with the same covariance."
 
 namespace InnerProductSpace
 
