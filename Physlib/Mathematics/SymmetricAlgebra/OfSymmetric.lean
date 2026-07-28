@@ -293,7 +293,6 @@ private noncomputable def Lhat : TensorAlgebra R M →ₗ[R] N :=
     (TensorAlgebra.equivDirectSum (R := R) (M := M)).toLinearMap
 
 /-- `Lhat` sends a tensor-algebra monomial to the value prescribed by the rule of its degree. -/
-@[simp]
 private lemma Lhat_tprod (n : ℕ) (v : Fin n → M) :
     Lhat f (TensorAlgebra.tprod R M n v) = f n v := by
   rw [Lhat, LinearMap.comp_apply, AlgEquiv.toLinearMap_apply,
