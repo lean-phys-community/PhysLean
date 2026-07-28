@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Nathaneal Sajan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Nathaneal Sajan
+Authors: George McNinch, Nathaneal Sajan
 -/
 module
 
@@ -12,8 +12,8 @@ public import Mathlib.LinearAlgebra.Multilinear.Basic
 
 This module provides a temporary compatibility layer for symmetric multilinear maps.
 
-The declarations follow the root-level names selected in Mathlib PR #41426. This module should be
-removed in favor of the Mathlib implementation once that API is available upstream.
+The declarations follow the root-level names selected by George McNinch in Mathlib PR #41426. This
+module should be removed in favor of the Mathlib implementation once that API is available upstream.
 
 ## Main definitions
 
