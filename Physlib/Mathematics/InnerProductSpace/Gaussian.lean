@@ -33,12 +33,11 @@ For some relevant Gaussian integrals see
 
 ## ii. Key results
 
-- `realStdGaussian E` : The standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, ℝ)`.
-- `stdGaussian E 𝕜` : The standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, 𝕜)`.
-- `gaussian₀ 𝕜 B` : Given a linear equivalence `B : D ≃L[ℝ] E` of inner product spaces,
-    the Gaussian `exp (-2⁻¹ * ‖B⁻¹ x‖ ^ 2)` centered on the origin as a Schwartz map `𝓢(E, 𝕜)`.
 - `gaussian 𝕜 B x₀` : Given a linear equivalence `B : D ≃L[ℝ] E` and mean `x₀ : E`,
     the Gaussian `exp (-2⁻¹ * ‖B⁻¹ (x - x₀)‖ ^ 2)` centered on `x₀` as a Schwartz map `𝓢(E, 𝕜)`.
+- `gaussian₀ 𝕜 B` : Given a linear equivalence `B : D ≃L[ℝ] E` of inner product spaces,
+    the Gaussian `exp (-2⁻¹ * ‖B⁻¹ x‖ ^ 2)` centered on the origin as a Schwartz map `𝓢(E, 𝕜)`.
+- `stdGaussian E 𝕜` : The standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map `𝓢(E, 𝕜)`.
 
 ## iii. Table of contents
 
@@ -128,7 +127,10 @@ private lemma pow_mul_exp_bddAbove {s : ℝ} (hs : 0 ≤ s) (n : ℕ) :
   · exact le_max_of_le_right (hgM x <| (le_abs_self _).trans (Std.le_of_not_ge hxM)).le
 
 variable (E) in
-/-- The (unnormalized) real-valued standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map. -/
+/-- The (unnormalized) real-valued standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map.
+
+  This definition is used to construct the general RCLike-valued Gaussian and the preferred version
+  to use is `gaussian ℝ B x₀` (or `stdGaussian E ℝ` for mean zero, variance one). -/
 def realStdGaussian : 𝓢(E, ℝ) where
   toFun x := rexp (-2⁻¹ * ‖x‖ ^ 2)
   smooth' := contDiff_exp.fun_comp <| contDiff_const.mul <| contDiff_norm_sq ℝ
@@ -156,31 +158,24 @@ def realStdGaussian : 𝓢(E, ℝ) where
       _ ≤ n.factorial * C :=
         mul_le_mul_of_nonneg_left (hbC _ <| pow_two_nonneg ‖x‖) (Nat.cast_nonneg' _)
 
-@[simp]
-lemma realStdGaussian_apply : realStdGaussian E x = rexp (-2⁻¹ * ‖x‖ ^ 2) := rfl
-
 /-!
 ## B. General, RCLike-valued
 -/
 
-variable (E) in
-/-- The (unnormalized) `𝕜`-valued standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map. -/
-def stdGaussian : 𝓢(E, 𝕜) := (realStdGaussian E).postcompCLM ofRealCLM
-
-@[simp]
-lemma stdGaussian_apply : stdGaussian E 𝕜 x = ofReal (rexp (-2⁻¹ * ‖x‖ ^ 2)) := rfl
-
-/-- The (unnormalized) `𝕜`-valued Gaussian `exp (-2⁻¹ * ‖B⁻¹ x‖ ^ 2)` as a Schwartz map. -/
-def gaussian₀ : 𝓢(E, 𝕜) := (stdGaussian D 𝕜).compCLMOfContinuousLinearEquiv 𝕜 B.symm
-
-@[simp]
-lemma gaussian₀_apply : gaussian₀ 𝕜 B x = ofReal (rexp (-2⁻¹ * ‖B.symm x‖ ^ 2)) := rfl
-
 /-- The (unnormalized) `𝕜`-valued Gaussian `exp (-2⁻¹ * ‖B⁻¹ (x - x₀)‖ ^ 2)` as a Schwartz map. -/
-def gaussian : 𝓢(E, 𝕜) := compSubConstCLM 𝕜 x₀ (gaussian₀ 𝕜 B)
+def gaussian : 𝓢(E, 𝕜) :=
+  compSubConstCLM 𝕜 x₀
+    (((realStdGaussian D).postcompCLM ofRealCLM).compCLMOfContinuousLinearEquiv 𝕜 B.symm)
 
 @[simp]
 lemma gaussian_apply : gaussian 𝕜 B x₀ x = ofReal (rexp (-2⁻¹ * ‖B.symm (x - x₀)‖ ^ 2)) := rfl
+
+/-- The (unnormalized) `𝕜`-valued Gaussian `exp (-2⁻¹ * ‖B⁻¹ x‖ ^ 2)` as a Schwartz map. -/
+abbrev gaussian₀ : 𝓢(E, 𝕜) := gaussian 𝕜 B 0
+
+variable (E) in
+/-- The (unnormalized) `𝕜`-valued standard Gaussian `exp (-2⁻¹ * ‖x‖ ^ 2)` as a Schwartz map. -/
+abbrev stdGaussian : 𝓢(E, 𝕜) := gaussian₀ 𝕜 (ContinuousLinearEquiv.refl ℝ E)
 
 end
 
