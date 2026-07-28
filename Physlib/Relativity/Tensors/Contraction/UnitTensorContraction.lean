@@ -67,7 +67,7 @@ namespace Tensor
 ## A. The unit tensor as a slot-contraction identity
 
 Contracting a named slot against `unitTensor` returns the tensor unchanged, the slot carried to the
-survivor tail by `moveLast`.
+survivor tail by `move_last`.
 
 -/
 
@@ -130,7 +130,7 @@ private lemma crossToEnd_prodT_unitTensor {nV : ℕ} {cE : Fin nV → C} {cB : C
 private lemma crossToEnd_unitTensor_slot {nA : ℕ} {cA : Fin (nA + 1) → C} {c : C}
     {i : Fin (nA + 1)} (hilast : i = Fin.last nA) (hc : cA i = c) (t1 : Tensor S cA) :
     crossToEnd i (0 : Fin 2) (by simp [hc] : S.τ (cA i) = ![S.τ c, c] 0) t1 (unitTensor c) =
-      permT (Fin.append i.succAbove (fun _ : Fin 1 => i)) (IsReindexing.moveLast i hc) t1 := by
+      permT (Fin.append i.succAbove (fun _ : Fin 1 => i)) (IsReindexing.move_last i hc) t1 := by
   subst hilast
   subst hc
   rw [eq_sum_evalT t1, map_sum, LinearMap.sum_apply, map_sum]
@@ -152,17 +152,21 @@ private lemma crossToEnd_unitTensor_slot {nA : ℕ} {cA : Fin (nA + 1) → C} {c
     exact Fin.ext (by simp)
 
 /-- Contracting slot `i` of `t1` against the unit tensor for that slot's color returns `t1`, the
-  contracted slot relabelled by `moveLast i`. The unit tensor acts as an identity for `crossToEnd`
+  contracted slot relabelled by `move_last i`. The unit tensor acts as an identity for `crossToEnd`
   at any named slot. -/
 lemma crossToEnd_unitTensor {nA : ℕ} {cA : Fin (nA + 1) → C} {c : C}
     (i : Fin (nA + 1)) (hc : cA i = c) (t1 : Tensor S cA) :
     crossToEnd i (0 : Fin 2) (by simp [hc] : S.τ (cA i) = ![S.τ c, c] 0) t1 (unitTensor c) =
-      permT (Fin.append i.succAbove (fun _ : Fin 1 => i)) (IsReindexing.moveLast i hc) t1 := by
+      permT (Fin.append i.succAbove (fun _ : Fin 1 => i)) (IsReindexing.move_last i hc) t1 := by
   set τ : Fin (nA + 1) → Fin (nA + 1) := ⇑(Equiv.swap i (Fin.last nA)) with hτdef
   have hτbij : Function.Bijective τ := (Equiv.swap i (Fin.last nA)).bijective
   have hτi : τ i = Fin.last nA := Equiv.swap_apply_left i (Fin.last nA)
   have hself : ∀ x, τ (τ x) = x := fun x => Equiv.swap_apply_self i (Fin.last nA) x
-  obtain ⟨τ', hτ'⟩ := Fin.exists_succAbove_comm hτbij.1 i
+  -- `τ` is injective, so it restricts to the survivors of `i`: some `τ'` fills the square
+  -- `(τ i).succAbove ∘ τ' = τ ∘ i.succAbove`.
+  obtain ⟨τ', hτ'⟩ : ∃ τ' : Fin nA → Fin nA, (τ i).succAbove ∘ τ' = τ ∘ i.succAbove :=
+    ⟨fun a => (Fin.exists_succAbove_eq (hτbij.1.ne (Fin.succAbove_ne i a))).choose,
+      funext fun a => (Fin.exists_succAbove_eq (hτbij.1.ne (Fin.succAbove_ne i a))).choose_spec⟩
   have hre2 : IsReindexing cA (cA ∘ τ) τ := Tensor.IsReindexing.swap i (Fin.last nA)
   have hre : IsReindexing (cA ∘ τ) cA τ :=
     ⟨hτbij, fun x => by simp only [Function.comp_apply, hself]⟩
@@ -265,6 +269,12 @@ private lemma crossToSlot_round_trip_of_unit {nA : ℕ} {c : Fin (nA + 1) → C}
       permT (id : Fin (nA + 1) → Fin (nA + 1)) (IsReindexing.update_update_of_eq i rfl) t := by
   have hcycle : (⇑(Fin.cycleIcc i (Fin.last nA)).symm) i = Fin.last nA :=
     (Equiv.symm_apply_eq _).2 (Fin.cycleIcc_of_last (Fin.le_last i)).symm
+  -- The inverse cycle carries a reinserted survivor `i.succAbove a` back to its position `a` in
+  -- the survivor block.
+  have hcycle_succAbove : ∀ a : Fin nA,
+      (Fin.cycleIcc i (Fin.last nA)).symm (i.succAbove a) = Fin.castAdd 1 a := fun a =>
+    (Equiv.symm_apply_eq _).2
+      (by rw [← Fin.append_succAbove_const_eq_cycleIcc i, Fin.append_left])
   rw [crossToSlot_eq_crossToEnd, crossToSlot_eq_crossToEnd]
   -- `crossToSlot`'s output color reduces to the clean one only at default transparency, so `rw`
   -- cannot key on the composite. Precompute the left commutator and `erw` it instead.
@@ -273,7 +283,7 @@ private lemma crossToSlot_round_trip_of_unit {nA : ℕ} {c : Fin (nA + 1) → C}
     (by
       funext a
       simp only [Function.comp_apply, id_eq]
-      rw [hcycle, Fin.cycleIcc_last_symm_apply_succAbove, Fin.succAbove_last]
+      rw [hcycle, hcycle_succAbove, Fin.succAbove_last]
       rfl)
     (show S.τ (Function.update c i d i) = ![S.τ d, c i] 0 by
       rw [Function.update_self, Matrix.cons_val_zero])

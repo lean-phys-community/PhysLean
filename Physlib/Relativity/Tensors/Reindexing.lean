@@ -44,34 +44,10 @@ The finite index maps out of which the reindexings below are built: `Fin.append`
 
 -/
 
-/-- The `.val` of the block-swap map, as a piecewise-linear function. -/
-lemma append_swap_val (n n2 : ℕ) (x : Fin (n2 + n)) :
-    (Fin.append (Fin.natAdd n) (Fin.castAdd n2) x).val =
-      if x.val < n2 then n + x.val else x.val - n2 := by
-  refine Fin.addCases (fun i => ?_) (fun i => ?_) x
-  · simp [Fin.append_left]
-  · simp [Fin.append_right]
-
 /-- Splitting `Fin (m + n)` into its two blocks and reassembling them is the identity. -/
 lemma append_castAdd_natAdd_eq_id {m n : ℕ} :
     Fin.append (Fin.castAdd n) (Fin.natAdd m) = (id : Fin (m + n) → Fin (m + n)) := by
   simpa using Fin.append_castAdd_natAdd (f := (id : Fin (m + n) → Fin (m + n)))
-
-/-- Reassembling the blocks of `Fin (na + n2)` after casting the left one along `na = nb` is the
-  cast of the total length. -/
-lemma append_castAdd_cast (na nb n2 : ℕ) (heq : na = nb) :
-    Fin.append (Fin.castAdd n2 ∘ Fin.cast heq) (Fin.natAdd nb) =
-      Fin.cast (show na + n2 = nb + n2 by omega) := by
-  subst heq
-  simpa using append_castAdd_natAdd_eq_id
-
-/-- Reassembling the blocks of `Fin (n2 + na)` after casting the right one along `na = nb` is the
-  cast of the total length. The right-block mirror of `Fin.append_castAdd_cast`. -/
-lemma append_natAdd_cast (na nb n2 : ℕ) (heq : na = nb) :
-    Fin.append (Fin.castAdd nb) (Fin.natAdd n2 ∘ Fin.cast heq) =
-      Fin.cast (show n2 + na = n2 + nb by omega) := by
-  subst heq
-  simpa using append_castAdd_natAdd_eq_id
 
 /-- Moving slot `i` to the end is the cycle `[i, last]`: the block map that lists the
   `i.succAbove` survivors in order and then `i` is `Fin.cycleIcc i (Fin.last n)`. -/
@@ -87,38 +63,6 @@ lemma append_succAbove_const_eq_cycleIcc {n : ℕ} (i : Fin (n + 1)) :
     have : (Fin.natAdd n a : Fin (n + 1)) = Fin.last n := by
       apply Fin.ext; simp [Fin.val_natAdd]
     rw [this, Fin.cycleIcc_of_le_of_le (Fin.le_last _) (Fin.le_last _), if_pos rfl]
-
-/-- The inverse of the cycle `[i, last]` carries the reinserted survivor `i.succAbove a` back to
-  its position `a` in the survivor block. -/
-lemma cycleIcc_last_symm_apply_succAbove {n : ℕ} (i : Fin (n + 1)) (a : Fin n) :
-    (Fin.cycleIcc i (Fin.last n)).symm (i.succAbove a) = Fin.castAdd 1 a :=
-  (Equiv.symm_apply_eq _).2 (by rw [← append_succAbove_const_eq_cycleIcc i, Fin.append_left])
-
-/-- An injection `σ` of `Fin (n + 1)` restricts to the survivors of a slot `i`: there is a map
-  `σ'` filling the square `(σ i).succAbove ∘ σ' = σ ∘ i.succAbove`, carrying the complement of `i`
-  to the complement of `σ i`. -/
-lemma exists_succAbove_comm {n : ℕ} {σ : Fin (n + 1) → Fin (n + 1)} (hσ : Function.Injective σ)
-    (i : Fin (n + 1)) : ∃ σ' : Fin n → Fin n, (σ i).succAbove ∘ σ' = σ ∘ i.succAbove :=
-  ⟨fun a => (Fin.exists_succAbove_eq (hσ.ne (Fin.succAbove_ne i a))).choose,
-    funext fun a => (Fin.exists_succAbove_eq (hσ.ne (Fin.succAbove_ne i a))).choose_spec⟩
-
-/-- A `Fin.cast` of a left-block injection is the literal slot `⟨v, _⟩` at the same value `v`.
-
-  Stated at `Fin` level rather than `.val` level so that a rewrite replaces the composite before
-  `Fin.succSuccAbove_val` builds its `ite` conditions on it, keeping the generated `Decidable`
-  instances in sync with the reduced conditions. -/
-lemma cast_castAdd_eq_mk {n m N : ℕ} (h : n + m = N) {i : Fin n} {v : ℕ} (hv : i.val = v) :
-    Fin.cast h (Fin.castAdd m i) =
-      ⟨v, by subst h hv; exact Nat.lt_of_lt_of_le i.isLt (Nat.le_add_right n m)⟩ :=
-  Fin.ext (by simp [hv])
-
-/-- A `Fin.cast` of a right-block injection is the literal slot `⟨v, _⟩` at the offset value `v`.
-  See `Fin.cast_castAdd_eq_mk` for why the `Fin`-level statement matters. -/
-lemma cast_natAdd_eq_mk {n m N : ℕ} (h : n + m = N) {i : Fin m} {v : ℕ}
-    (hv : n + i.val = v) :
-    Fin.cast h (Fin.natAdd n i) =
-      ⟨v, by subst h hv; exact Nat.add_lt_add_left i.isLt n⟩ :=
-  Fin.ext (by simp [hv])
 
 end Fin
 
@@ -583,7 +527,7 @@ lemma append_succ_last {n : ℕ} (c : Fin (n + 1) → C) :
   last one as in `append_succ_last`: the block map that lists the `i.succAbove` survivors and then
   `i` itself matches `c` with the survivors of `i` followed by the surviving entry `c1 1` of a
   rank-two list `c1` whose second entry is slot `i`'s colour. -/
-lemma moveLast {n : ℕ} {c : Fin (n + 1) → C} {c1 : Fin 2 → C} (i : Fin (n + 1))
+lemma move_last {n : ℕ} {c : Fin (n + 1) → C} {c1 : Fin 2 → C} (i : Fin (n + 1))
     (hc : c i = c1 1) :
     IsReindexing c
       (Fin.append (c ∘ i.succAbove) (c1 ∘ (0 : Fin 2).succAbove))

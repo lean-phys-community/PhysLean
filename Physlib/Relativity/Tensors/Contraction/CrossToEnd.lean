@@ -16,12 +16,17 @@ public import Physlib.Relativity.Tensors.Contraction.Products
 another (`T^{μν} u_ν`, `g_{μν} v^ν`) is `prodT` then `contrT`, which leaves every call site to
 locate the two post-product slots and discharge the distinctness and `τ`-duality goals.
 
-`crossToEnd i j hc` packages that move at named slots `i` and `j`, with `hc : S.τ (cA i) = cB j`
-recording their `τ`-duality and output color `Fin.append (cA ∘ i.succAbove) (cB ∘ j.succAbove)`,
-left survivors then right. Any slot is reachable: `crossToEnd 2 0 _ R u` reads as `R_{μνρσ} u^ρ`.
-Survivors at the end make the output an append, so both bracketings of a chain produce the same
-survivor list. The complementary convention, keeping the replacement index in place
-(`T^{μ}{}_{νρ} ↦ T_{μνρ}`), is `crossToSlot`, built on this substrate in
+`crossToEnd i j hc` performs that contraction at named slots `i` and `j`, with
+`hc : S.τ (cA i) = cB j` recording their `τ`-duality. The output color is
+`Fin.append (cA ∘ i.succAbove) (cB ∘ j.succAbove)`: every slot of `cA` except `i`, in order, then
+every slot of `cB` except `j`. These are the survivors. Any slot is reachable:
+`crossToEnd 2 0 _ R u` reads as `R_{μνρσ} u^ρ`. The survivors are appended rather than interleaved,
+and appending is associative, so both bracketings of a chain produce the same survivor list in the
+same order.
+
+The complementary convention keeps the replacement index in place. Contracting slot `1` of
+`![c₀, c₁, c₂, c₃]` against a rank-two `![S.τ c₁, d]` gives `![c₀, c₂, c₃, d]` here and
+`![c₀, d, c₂, c₃]` there; that operation is `crossToSlot`, built on this substrate in
 `Physlib.Relativity.Tensors.Contraction.CrossToSlot`.
 
 ## ii. Key results
@@ -79,9 +84,9 @@ noncomputable def crossToEnd {nA nB : ℕ} {cA : Fin (nA + 1) → C} {cB : Fin (
         refine ⟨Function.bijective_id, fun m => ?_⟩
         simp only [id_eq, Function.comp_apply]
         refine Fin.addCases (fun a => ?_) (fun a => ?_) m
-        · rw [Fin.reinsert_castAdd i j a]
+        · rw [Fin.succSuccAbove_castAdd_natAdd_apply_castAdd i j a]
           simp only [Fin.append_left, Function.comp_apply]
-        · rw [Fin.reinsert_natAdd i j a]
+        · rw [Fin.succSuccAbove_castAdd_natAdd_apply_natAdd i j a]
           simp only [Fin.append_right, Function.comp_apply]) ∘ₗ
     contrT (nA + nB)
       (Fin.cast (show (nA + 1) + (nB + 1) = (nA + nB) + 1 + 1 by omega) (Fin.castAdd (nB + 1) i))
@@ -203,6 +208,27 @@ lemma crossToEnd_assoc_rankTwo {nA : ℕ}
   · intro p
     simp only [contrT_pure, permT_pure, Pure.contrP, map_smul]
     rw [smul_smul, smul_smul]
+    -- Index-map facts used only by this proof, kept local rather than exported. They are `clear`ed
+    -- before the closing `grind`, which would otherwise ingest them as candidate facts.
+    have happend_swap_val : ∀ (n n2 : ℕ) (x : Fin (n2 + n)),
+        (Fin.append (Fin.natAdd n) (Fin.castAdd n2) x).val =
+          if x.val < n2 then n + x.val else x.val - n2 := by
+      intro n n2 x
+      refine Fin.addCases (fun i => ?_) (fun i => ?_) x
+      · simp [Fin.append_left]
+      · simp [Fin.append_right]
+    have happend_castAdd_cast : ∀ (na nb n2 : ℕ) (heq : na = nb),
+        Fin.append (Fin.castAdd n2 ∘ Fin.cast heq) (Fin.natAdd nb) =
+          Fin.cast (show na + n2 = nb + n2 by omega) := by
+      intro na nb n2 heq
+      subst heq
+      simpa using Fin.append_castAdd_natAdd_eq_id
+    have happend_natAdd_cast : ∀ (na nb n2 : ℕ) (heq : na = nb),
+        Fin.append (Fin.castAdd nb) (Fin.natAdd n2 ∘ Fin.cast heq) =
+          Fin.cast (show n2 + na = n2 + nb by omega) := by
+      intro na nb n2 heq
+      subst heq
+      simpa using Fin.append_castAdd_natAdd_eq_id
     apply congrArg₂ (fun r t => r • t)
     · -- Coefficients.
       simp only [Pure.contrPCoeff_dropPair]
@@ -214,9 +240,9 @@ lemma crossToEnd_assoc_rankTwo {nA : ℕ}
         simp only [Nat.add_eq, Function.id_comp, Function.comp_id, Function.comp_apply,
           Fin.cast_castAdd_left, Fin.cast_natAdd_left,
           Fin.funPredPredAbove, Fin.succSuccAbove_predPredAbove,
-          Fin.append_right, Fin.append_swap_val,
-          Fin.append_castAdd_natAdd_eq_id, id_eq, Fin.append_castAdd_cast,
-          Fin.append_natAdd_cast, Fin.succSuccAbove_val, Fin.val_castAdd,
+          Fin.append_right, happend_swap_val,
+          Fin.append_castAdd_natAdd_eq_id, id_eq, happend_castAdd_cast,
+          happend_natAdd_cast, Fin.succSuccAbove_val, Fin.val_castAdd,
           Fin.val_natAdd, Fin.val_last, Fin.val_cast, Fin.val_zero]
         split_ifs <;> omega
     · -- Slot maps.
@@ -230,23 +256,37 @@ lemma crossToEnd_assoc_rankTwo {nA : ℕ}
         try simp only [Fin.funPredPredAbove]
         try simp only [Fin.succSuccAbove_predPredAbove]
       apply Fin.ext
+      -- Pinning a block injection to a literal slot `⟨v, _⟩` is stated at `Fin` level, not at
+      -- `.val` level, so that a rewrite replaces the composite before `Fin.succSuccAbove_val`
+      -- builds its `ite` conditions on it, keeping the generated `Decidable` instances in sync.
+      have hcast_castAdd : ∀ {n m N : ℕ} (h : n + m = N) {i : Fin n} {v : ℕ} (hv : i.val = v),
+          Fin.cast h (Fin.castAdd m i) = ⟨v, by have := i.isLt; omega⟩ := by
+        intro n m N h i v hv
+        exact Fin.ext (by simp [hv])
+      have hcast_natAdd : ∀ {n m N : ℕ} (h : n + m = N) {i : Fin m} {v : ℕ} (hv : n + i.val = v),
+          Fin.cast h (Fin.natAdd n i) = ⟨v, by have := i.isLt; omega⟩ := by
+        intro n m N h i v hv
+        exact Fin.ext (by simp [hv])
       -- Pin each slot to a literal `⟨v, _⟩`, innermost first, so that `succSuccAbove_val` fires.
-      rw [Fin.cast_castAdd_eq_mk (i := Fin.last nA) (v := nA) _ rfl,
-        Fin.cast_natAdd_eq_mk (n := nA + 1) (i := (0 : Fin (1 + 1))) (v := nA + 1) _
+      rw [hcast_castAdd (i := Fin.last nA) (v := nA) _ rfl,
+        hcast_natAdd (n := nA + 1) (i := (0 : Fin (1 + 1))) (v := nA + 1) _
           (by simp only [Fin.val_zero, Nat.add_zero]),
-        Fin.cast_castAdd_eq_mk (i := iA) (v := (iA : ℕ)) _ rfl,
+        hcast_castAdd (i := iA) (v := (iA : ℕ)) _ rfl,
         Fin.natAdd_mk (1 + 1) (iA : ℕ),
         Fin.natAdd_mk (1 + 1) (nA + 1),
-        Fin.cast_castAdd_eq_mk (i := Fin.last 1) (v := 1) _ rfl,
-        Fin.cast_natAdd_eq_mk (n := 1 + 1) (i := (0 : Fin (1 + 1))) (v := 1 + 1) _
+        hcast_castAdd (i := Fin.last 1) (v := 1) _ rfl,
+        hcast_natAdd (n := 1 + 1) (i := (0 : Fin (1 + 1))) (v := 1 + 1) _
           (by simp only [Fin.val_zero, Nat.add_zero]),
         Fin.natAdd_mk (nA + 1) 1,
         Fin.natAdd_mk (nA + 1) (1 + 1)]
       simp only [Function.comp_id]
       rw [Fin.append_castAdd_natAdd_eq_id]
-      simp only [Nat.add_eq, id_eq, Fin.append_swap_val, Fin.append_castAdd_cast,
-        Fin.append_natAdd_cast, Fin.succSuccAbove_val, Fin.val_cast]
-      -- Four nested reinsertion conditionals; the split budget is `SuccSuccAbove`'s.
+      simp only [Nat.add_eq, id_eq, happend_swap_val, happend_castAdd_cast,
+        happend_natAdd_cast, Fin.succSuccAbove_val, Fin.val_cast]
+      -- Four nested reinsertion conditionals; the split budget is `SuccSuccAbove`'s. The spent
+      -- index-map hypotheses are dropped first: `grind` ingests the local context, and leaving
+      -- them in costs it more than twice the elaboration time.
+      clear happend_swap_val happend_castAdd_cast happend_natAdd_cast hcast_castAdd hcast_natAdd
       grind (splits := 20)
   · intro r t ht; simp only [map_smul, ht]
   · intro t1 t2 h1 h2; simp only [map_add, h1, h2]
@@ -294,11 +334,12 @@ lemma crossToEnd_permT_left {nA nB : ℕ} {cA cA' : Fin (nA + 1) → C}
       intro m
       simp only [Function.comp_apply, id_eq]
       refine Fin.addCases (fun a => ?_) (fun b => ?_) m
-      · rw [Fin.reinsert_castAdd i j a, Fin.append_left, Function.comp_apply,
-          Fin.append_left, Function.comp_apply, Fin.reinsert_castAdd (σ i) j _,
+      · rw [Fin.succSuccAbove_castAdd_natAdd_apply_castAdd i j a, Fin.append_left,
+          Function.comp_apply, Fin.append_left, Function.comp_apply,
+          Fin.succSuccAbove_castAdd_natAdd_apply_castAdd (σ i) j _,
           show (σ i).succAbove (σ' a) = σ (i.succAbove a) from congrFun hσ' a]
-      · rw [Fin.reinsert_natAdd i j b, Fin.append_right, Fin.append_right,
-          Fin.reinsert_natAdd (σ i) j b]
+      · rw [Fin.succSuccAbove_castAdd_natAdd_apply_natAdd i j b, Fin.append_right,
+          Fin.append_right, Fin.succSuccAbove_castAdd_natAdd_apply_natAdd (σ i) j b]
   · intro r t ht; simp only [map_smul, ht]
   · intro t1 t2 h1 h2; simp only [map_add, h1, h2]
 
@@ -332,10 +373,11 @@ lemma crossToEnd_permT_right {nA nB : ℕ} {cA : Fin (nA + 1) → C}
       intro m
       simp only [Function.comp_apply, id_eq]
       refine Fin.addCases (fun a => ?_) (fun b => ?_) m
-      · rw [Fin.reinsert_castAdd i j a, Fin.append_left, Fin.append_left,
-          Fin.reinsert_castAdd i (σ j) a]
-      · rw [Fin.reinsert_natAdd i j b, Fin.append_right, Function.comp_apply,
-          Fin.append_right, Function.comp_apply, Fin.reinsert_natAdd i (σ j) _,
+      · rw [Fin.succSuccAbove_castAdd_natAdd_apply_castAdd i j a, Fin.append_left,
+          Fin.append_left, Fin.succSuccAbove_castAdd_natAdd_apply_castAdd i (σ j) a]
+      · rw [Fin.succSuccAbove_castAdd_natAdd_apply_natAdd i j b, Fin.append_right,
+          Function.comp_apply, Fin.append_right, Function.comp_apply,
+          Fin.succSuccAbove_castAdd_natAdd_apply_natAdd i (σ j) _,
           show (σ j).succAbove (σ' b) = σ (j.succAbove b) from congrFun hσ' b]
   · intro r t ht; simp only [map_smul, ht]
   · intro t1 t2 h1 h2; simp only [map_add, h1, h2]
