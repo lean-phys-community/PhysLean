@@ -6,9 +6,11 @@ Authors: Tomas Skrivan, Joseph Tooby-Smith
 module
 
 public import Mathlib.Analysis.Calculus.Deriv.Polynomial
+public import Mathlib.Analysis.Calculus.ContDiff.Polynomial
 public import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Series
 public import Mathlib.Tactic.Cases
+public import Mathlib.Topology.Algebra.Polynomial
 /-!
 
 # Physicists Hermite Polynomial
@@ -234,13 +236,19 @@ lemma physHermite_odd {n : ℕ} (hn : Odd n) : Function.Odd (physHermite n) := b
 -/
 
 @[fun_prop]
-lemma physHermite_differentiableAt (n : ℕ) (x : ℝ) :
-    DifferentiableAt ℝ (physHermite n) x := Polynomial.differentiableAt_aeval (physHermite n)
+lemma physHermite_differentiable (n : ℕ) : Differentiable ℝ (physHermite n) :=
+  Polynomial.differentiable_aeval _
 
 @[fun_prop]
-lemma deriv_physHermite_differentiableAt (n m : ℕ) (x : ℝ) :
-    DifferentiableAt ℝ (deriv^[m] (physHermite n)) x :=
-  iterate_deriv_physHermite_eq_iterate_derivative n m ▸ Polynomial.differentiableAt_aeval _
+lemma deriv_physHermite_differentiable (n m : ℕ) : Differentiable ℝ (deriv^[m] (physHermite n)) :=
+  iterate_deriv_physHermite_eq_iterate_derivative n m ▸ Polynomial.differentiable_aeval _
+
+@[fun_prop]
+lemma physHermite_continuous (n : ℕ) : Continuous (physHermite n) := Polynomial.continuous_aeval _
+
+@[fun_prop]
+lemma physHermite_contDiff (n : ℕ) (m : WithTop ℕ∞) : ContDiff ℝ m (physHermite n) :=
+  Polynomial.contDiff_aeval _ _
 
 /-!
 ### D.4. Temperate growth
