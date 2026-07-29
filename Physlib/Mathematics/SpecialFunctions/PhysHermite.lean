@@ -364,7 +364,7 @@ lemma integral_physHermite_mul_physHermite_eq_integral_deriv_inductive (n m : �
         - ∫ (x : ℝ), deriv (deriv^[p] (physHermite n)) x *
         deriv^[m - (p + 1)] (fun x => Real.exp (-x ^ 2)) x := by
       apply MeasureTheory.integral_mul_deriv_eq_deriv_mul_of_integrable
-      · exact fun _ _ ↦ DifferentiableAt.hasDerivAt (deriv_physHermite_differentiableAt n p _)
+      · exact fun _ _ ↦ DifferentiableAt.hasDerivAt (deriv_physHermite_differentiable n p _)
       · intro x
         rw [hasDerivAt_deriv_iff]
         have h1 : (deriv^[m - (p + 1)] fun x => Real.exp (-x ^ 2)) =
