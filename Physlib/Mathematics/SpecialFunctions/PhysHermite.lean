@@ -69,6 +69,7 @@ lemma physHermite_eq_iterate (n : ℕ) :
 @[simp]
 lemma physHermite_zero : physHermite 0 = C 1 := rfl
 
+@[simp]
 lemma physHermite_one : physHermite 1 = 2 * X := by simp [physHermite_succ]
 
 lemma derivative_physHermite_succ : (n : ℕ) →
@@ -175,58 +176,53 @@ noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ) := ⟨r
 ### D.1. Recursion
 -/
 
-lemma physHermite_eq_aeval (n : ℕ) (x : ℝ) :
-    physHermite n x = (physHermite n).aeval x := rfl
+lemma physHermite_zero_coe (x : ℝ) : physHermite 0 x = 1 := by simp
 
-lemma physHermite_zero_apply (x : ℝ) : physHermite 0 x = 1 := by simp
+lemma physHermite_succ_coe (n : ℕ) :
+    (physHermite (n + 1) : ℝ → ℝ) =
+      2 • (fun x => x) * (physHermite n : ℝ → ℝ) - deriv (physHermite n) := by
+  ext
+  simp [physHermite_succ, map_ofNat]
 
-lemma physHermite_pow (n m : ℕ) (x : ℝ) : physHermite n x ^ m = aeval x (physHermite n ^ m) := by
-  simp
+lemma physHermite_succ_apply (n : ℕ) (x : ℝ) :
+    physHermite (n + 1) x = 2 * x * physHermite n x - deriv (physHermite n) x := by
+  simp [physHermite_succ_coe]
 
-lemma physHermite_succ_fun (n : ℕ) :
-    (physHermite (n + 1) : ℝ → ℝ) = 2 • (fun x => x) *
-    (physHermite n : ℝ → ℝ)- (2 * n : ℝ) • (physHermite (n - 1) : ℝ → ℝ) := by
-  ext x
+lemma physHermite_succ_coe' (n : ℕ) :
+    (physHermite (n + 1) : ℝ → ℝ) =
+      2 • (fun x => x) * (physHermite n : ℝ → ℝ) - (2 * n) • (physHermite (n - 1) : ℝ → ℝ) := by
+  ext
   simp [physHermite_succ', mul_assoc, map_ofNat]
 
-lemma physHermite_succ_fun' (n : ℕ) :
-    (physHermite (n + 1) : ℝ → ℝ) = fun x => 2 • x *
-    physHermite n x -
-    (2 * n : ℝ) • physHermite (n - 1) x := by
-  rw [physHermite_succ_fun]
-  rfl
+lemma physHermite_succ_apply' (n : ℕ) (x : ℝ) :
+    physHermite (n + 1) x = 2 * x * physHermite n x - 2 * n * physHermite (n - 1) x := by
+  simp [physHermite_succ_coe']
 
-lemma iterated_deriv_physHermite_eq_aeval (n : ℕ) : (m : ℕ) →
-    deriv^[m] (physHermite n) = fun x => (derivative^[m] (physHermite n)).aeval x
-  | 0 => by simp
-  | m + 1 => by
-    simp only [Function.iterate_succ_apply', iterated_deriv_physHermite_eq_aeval n m]
-    funext x
-    rw [Polynomial.deriv_aeval]
+lemma deriv_physHermite (n : ℕ) : deriv (physHermite n) = 2 * n * (physHermite (n - 1)) := by
+  ext
+  simp [derivative_physHermite, map_ofNat, mul_assoc]
+
+lemma iterate_deriv_physHermite_eq_iterate_derivative (n m : ℕ) :
+    deriv^[m] (physHermite n) = derivative^[m] (physHermite n) := by
+  match m with
+  | 0 => simp
+  | m + 1 =>
+    ext
+    simp [Function.iterate_succ_apply', iterate_deriv_physHermite_eq_iterate_derivative n m]
 
 lemma fderiv_physHermite (n : ℕ) (x : ℝ) :
     fderiv ℝ (physHermite n) x = (1 : ℝ →L[ℝ] ℝ).smulRight (deriv (physHermite n) x) := by
   simp
 
-lemma deriv_physHermite (n : ℕ) :
-    deriv (physHermite n) = 2 * n * (physHermite (n - 1)) := by
-  ext x
-  rw [Polynomial.deriv_aeval (physHermite n), derivative_physHermite]
-  simp [mul_assoc, map_ofNat]
-
 /-!
 ### D.2. Parity
 -/
 
-lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
-    physHermite n (-x) = (-1)^n * physHermite n x
-  | 0, x => by simp
-  | 1, x => by simp [physHermite_one, map_ofNat]
-  | n + 2, x => by
-    rw [physHermite_succ_fun']
-    simp only [smul_neg, nsmul_eq_mul, cast_ofNat, physHermite_parity (n + 1) x, neg_mul, cast_add,
-      cast_one, add_tsub_cancel_right, physHermite_parity n x, smul_eq_mul]
-    ring
+lemma physHermite_neg (n : ℕ) (x : ℝ) : physHermite n (-x) = (-1) ^ n * physHermite n x := by
+  match n with
+  | 0 => simp
+  | 1 => simp [map_ofNat]
+  | n + 2 => grind [physHermite_succ_apply', physHermite_neg (n + 1), physHermite_neg n]
 
 /-!
 ### D.3. Differentiability
@@ -239,7 +235,7 @@ lemma physHermite_differentiableAt (n : ℕ) (x : ℝ) :
 @[fun_prop]
 lemma deriv_physHermite_differentiableAt (n m : ℕ) (x : ℝ) :
     DifferentiableAt ℝ (deriv^[m] (physHermite n)) x :=
-  iterated_deriv_physHermite_eq_aeval n m ▸ Polynomial.differentiableAt_aeval _
+  iterate_deriv_physHermite_eq_iterate_derivative n m ▸ Polynomial.differentiableAt_aeval _
 
 /-!
 ### D.4. Temperate growth
@@ -310,7 +306,7 @@ lemma physHermite_gaussian_integrable (n p m : ℕ) :
       (-1 : ℝ) ^ n • fun x => (derivative^[m] (physHermite p) * physHermite n).aeval x *
       Real.exp (-1 * x ^ 2) := by
     funext x
-    rw [iterated_deriv_physHermite_eq_aeval]
+    rw [iterate_deriv_physHermite_eq_iterate_derivative]
     simp only [Pi.mul_apply, deriv_gaussian_eq_physHermite_mul_gaussian, map_mul, Pi.smul_apply,
       smul_eq_mul, neg_one_mul]
     ring
@@ -368,7 +364,7 @@ lemma integral_physHermite_mul_physHermite_eq_integral_deriv (n m : ℕ) :
 lemma physHermite_orthogonal_lt {n m : ℕ} (hnm : n < m) :
     ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (- x ^ 2) = 0 := by
   rw [integral_physHermite_mul_physHermite_eq_integral_deriv]
-  simp [iterated_deriv_physHermite_eq_aeval, iterate_derivative_physHermite_of_gt hnm]
+  simp [iterate_deriv_physHermite_eq_iterate_derivative, iterate_derivative_physHermite_of_gt hnm]
 
 theorem physHermite_orthogonal {n m : ℕ} (hnm : n ≠ m) :
     ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (- x ^ 2) = 0 := by
@@ -387,7 +383,8 @@ lemma physHermite_orthogonal_cons {n m : ℕ} (hnm : n ≠ m) (c : ℝ) :
 theorem physHermite_norm (n : ℕ) :
     ∫ x : ℝ, (physHermite n x * physHermite n x) * Real.exp (- x ^ 2) =
     ↑n ! * 2 ^ n * √Real.pi := by
-  rw [integral_physHermite_mul_physHermite_eq_integral_deriv, iterated_deriv_physHermite_eq_aeval]
+  rw [integral_physHermite_mul_physHermite_eq_integral_deriv,
+    iterate_deriv_physHermite_eq_iterate_derivative]
   simp [MeasureTheory.integral_const_mul, map_ofNat,
     show (∫ x : ℝ, Real.exp (-x ^ 2)) = √Real.pi by simpa using integral_gaussian 1]
 
