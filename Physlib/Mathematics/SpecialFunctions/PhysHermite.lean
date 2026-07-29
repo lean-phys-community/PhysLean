@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Tomas Skrivan, Joseph Tooby-Smith
+Authors: Gregory J. Loges, Tomas Skrivan, Joseph Tooby-Smith
 -/
 module
 
@@ -14,11 +14,16 @@ public import Mathlib.Tactic.Cases
 public import Mathlib.Topology.Algebra.Polynomial
 /-!
 
-# Physicists Hermite Polynomial
+# Physicist's Hermite Polynomials
 
 This file may eventually be upstreamed to Mathlib.
 
 ## i. Overview
+
+The physicist's Hermite polynomials are a family of orthogonal polynomials defined by the recursion
+$H_0(x) = 1$ and $H_{n+1}(x) = 2x\,H_n(x) - H_n'(x)$.
+These are a rescaling of the so-called probabalist's Hermite polynomials (`Polynomial.hermite`)
+and, up to numerical factors, satisfy all of the same properties.
 
 ## ii. Key results
 
@@ -48,7 +53,7 @@ open Function Nat
 ## A. Recursive definition
 -/
 
-/-- The Physicists Hermite polynomial are defined as polynomials over `ℤ` in `X` recursively
+/-- The physicist's Hermite polynomials are defined as polynomials over `ℤ` in `X` recursively
   with `physHermite 0 = 1` and
 
   `physHermite (n + 1) = 2 • X * physHermite n - derivative (physHermite n)`.
@@ -59,10 +64,12 @@ noncomputable def physHermite : ℕ → Polynomial ℤ
   | 0 => 1
   | n + 1 => 2 • X * physHermite n - derivative (physHermite n)
 
+/-- The defining recursion `physHermite (n + 1) = (2x - d/dx) (physHermite n)`. -/
 lemma physHermite_succ (n : ℕ) :
     physHermite (n + 1) = 2 • X * physHermite n - derivative (physHermite n) := by
   simp [physHermite]
 
+/-- The Rodrigues formula `physHermite n = (2x - d/dx)ⁿ 1`. -/
 lemma physHermite_eq_iterate (n : ℕ) :
     physHermite n = (fun p => 2 * X * p - derivative p)^[n] 1 := by
   induction n with
@@ -99,7 +106,7 @@ lemma physHermite_succ' (n : ℕ) :
 ## B. Coefficients & degree
 -/
 
-lemma coeff_physHhermite_succ_zero (n : ℕ) :
+lemma coeff_physHermite_succ_zero (n : ℕ) :
     coeff (physHermite (n + 1)) 0 = - coeff (physHermite n) 1 := by
   simp [physHermite_succ, coeff_derivative]
 
@@ -120,7 +127,7 @@ lemma coeff_physHermite_of_lt {n k : ℕ} (hnk : n < k) : coeff (physHermite n) 
     simp
 
 @[simp]
-lemma coeff_physHermite_self_succ (n : ℕ) : coeff (physHermite n) n = 2 ^ n := by
+lemma coeff_physHermite_self (n : ℕ) : coeff (physHermite n) n = 2 ^ n := by
   induction n with
   | zero => exact coeff_C
   | succ n ih =>
@@ -134,15 +141,15 @@ lemma degree_physHermite (n : ℕ) : degree (physHermite n) = n := by
   exact fun _ => coeff_physHermite_of_lt
 
 @[simp]
-lemma natDegree_physHermite {n : ℕ} : (physHermite n).natDegree = n :=
+lemma natDegree_physHermite (n : ℕ) : (physHermite n).natDegree = n :=
   natDegree_eq_of_degree_eq_some (degree_physHermite n)
 
 @[simp]
-lemma physHermite_leadingCoeff {n : ℕ} : (physHermite n).leadingCoeff = 2 ^ n := by
+lemma physHermite_leadingCoeff (n : ℕ) : (physHermite n).leadingCoeff = 2 ^ n := by
   simp [leadingCoeff]
 
 @[simp]
-lemma physHermite_ne_zero {n : ℕ} : physHermite n ≠ 0 :=
+lemma physHermite_ne_zero (n : ℕ) : physHermite n ≠ 0 :=
   leadingCoeff_ne_zero.mp (by simp)
 
 /-!
@@ -154,8 +161,8 @@ lemma iterate_derivative_physHermite_of_gt {n m : ℕ} (h : n < m) :
   iterate_derivative_eq_zero (by simpa using h)
 
 @[simp]
-lemma iterate_derivative_physHermite_self {n : ℕ} :
-    derivative^[n] (physHermite n) = C ((n ! : ℤ) * 2 ^ n) := by
+lemma iterate_derivative_physHermite_self (n : ℕ) :
+    derivative^[n] (physHermite n) = C (n ! * 2 ^ n : ℤ) := by
   ext m
   rw [Polynomial.coeff_iterate_derivative]
   match m with
@@ -170,6 +177,7 @@ lemma iterate_derivative_physHermite_self {n : ℕ} :
 ## D. As functions `ℝ → ℝ`
 -/
 
+/-- Cast an integer polynomial to a function `ℝ → ℝ` by evaluation. -/
 @[coe]
 noncomputable abbrev realEval (p : Polynomial ℤ) : ℝ → ℝ := fun x ↦ p.aeval x
 
@@ -181,6 +189,7 @@ noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ) := ⟨r
 
 lemma physHermite_zero_coe : (physHermite 0 : ℝ → ℝ) = fun _ ↦ 1 := by ext; simp
 
+/-- The defining recursion for `physHermite` as functions `ℝ → ℝ` (c.f. `physHermite_succ`). -/
 lemma physHermite_succ_coe (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) =
       2 • (fun x => x) * (physHermite n : ℝ → ℝ) - deriv (physHermite n) := by
@@ -201,7 +210,7 @@ lemma physHermite_succ_apply' (n : ℕ) (x : ℝ) :
     physHermite (n + 1) x = 2 * x * physHermite n x - 2 * n * physHermite (n - 1) x := by
   simp [physHermite_succ_coe']
 
-lemma deriv_physHermite (n : ℕ) : deriv (physHermite n) = 2 * n * (physHermite (n - 1)) := by
+lemma deriv_physHermite (n : ℕ) : deriv (physHermite n) = 2 * n * physHermite (n - 1) := by
   ext
   simp [derivative_physHermite, map_ofNat, mul_assoc]
 
@@ -221,6 +230,7 @@ lemma fderiv_physHermite (n : ℕ) (x : ℝ) :
 ### D.2. Parity
 -/
 
+/-- The `physHermite` polynomials are alternately even and odd. -/
 @[simp]
 lemma physHermite_neg (n : ℕ) (x : ℝ) : physHermite n (-x) = (-1) ^ n * physHermite n x := by
   match n with
@@ -446,7 +456,7 @@ lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ)
         = (2 ^ (n + 1) : ℝ) • (fun (x : ℝ) => (aeval x) P) - ↑(P.coeff (n + 1) : ℝ) •
         (fun (x : ℝ)=> (aeval x) (physHermite (n + 1))) := by
       funext x
-      simp [coeff_physHermite_self_succ, map_ofNat]
+      simp [coeff_physHermite_self, map_ofNat]
     rw [hl, Submodule.sub_mem_iff_left] at hP'mem
     · rwa [Submodule.smul_mem_iff] at hP'mem
       simp
@@ -455,12 +465,12 @@ decreasing_by
   rw [Polynomial.natDegree_lt_iff_degree_lt]
   · apply (Polynomial.degree_lt_iff_coeff_zero _ _).mpr
     intro m hm'
-    simp only [coeff_physHermite_self_succ, coeff_sub]
+    simp only [coeff_physHermite_self, coeff_sub]
     change n + 1 ≤ m at hm'
     rw [coeff_smul, coeff_smul]
     by_cases hm : m = n + 1
     · subst hm
-      simp only [smul_eq_mul, coeff_physHermite_self_succ]
+      simp only [smul_eq_mul, coeff_physHermite_self]
       ring
     · rw [coeff_eq_zero_of_natDegree_lt (by omega), coeff_physHermite_of_lt (by omega)]
       simp
