@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Analysis.Calculus.Deriv.Polynomial
 public import Mathlib.Analysis.Calculus.ContDiff.Polynomial
+public import Mathlib.Analysis.Distribution.TemperateGrowth
 public import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Series
 public import Mathlib.Tactic.Cases
@@ -41,7 +42,7 @@ This file may eventually be upstreamed to Mathlib.
 
 namespace Polynomial
 
-open Nat
+open Function Nat
 
 /-!
 ## A. Recursive definition
@@ -178,7 +179,7 @@ noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ) := ⟨r
 ### D.1. Recursion
 -/
 
-lemma physHermite_zero_coe (x : ℝ) : physHermite 0 x = 1 := by simp
+lemma physHermite_zero_coe : (physHermite 0 : ℝ → ℝ) = fun _ ↦ 1 := by ext; simp
 
 lemma physHermite_succ_coe (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) =
@@ -254,7 +255,18 @@ lemma physHermite_contDiff (n : ℕ) (m : WithTop ℕ∞) : ContDiff ℝ m (phys
 ### D.4. Temperate growth
 -/
 
-
+open HasTemperateGrowth in
+@[fun_prop]
+lemma physHermite_hasTemperateGrowth (n : ℕ) : HasTemperateGrowth (physHermite n) := by
+  match n with
+  | 0 =>
+    rw [physHermite_zero_coe]
+    fun_prop
+  | n + 1 =>
+    rw [physHermite_succ_coe', two_smul, nsmul_eq_mul]
+    refine sub ?_ ?_
+    · exact mul (by fun_prop) (physHermite_hasTemperateGrowth n)
+    · exact mul (const _) (physHermite_hasTemperateGrowth (n - 1))
 
 /-!
 
