@@ -218,11 +218,16 @@ lemma fderiv_physHermite (n : ℕ) (x : ℝ) :
 ### D.2. Parity
 -/
 
+@[simp]
 lemma physHermite_neg (n : ℕ) (x : ℝ) : physHermite n (-x) = (-1) ^ n * physHermite n x := by
   match n with
   | 0 => simp
   | 1 => simp [map_ofNat]
   | n + 2 => grind [physHermite_succ_apply', physHermite_neg (n + 1), physHermite_neg n]
+
+lemma physHermite_even {n : ℕ} (hn : Even n) : Function.Even (physHermite n) := by intro; simp [hn]
+
+lemma physHermite_odd {n : ℕ} (hn : Odd n) : Function.Odd (physHermite n) := by intro; simp [hn]
 
 /-!
 ### D.3. Differentiability
