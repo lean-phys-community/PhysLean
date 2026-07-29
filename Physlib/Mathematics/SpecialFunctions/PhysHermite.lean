@@ -25,6 +25,10 @@ This file may eventually be upstreamed to Mathlib.
 - B. Coefficients & degree
 - C. Iterated derivatives
 - D. As functions `ℝ → ℝ`
+  - D.1. Recursion
+  - D.2. Parity
+  - D.3. Differentiability
+  - D.5. Temperate growth
 - E. Relationship to Gaussians
 
 ## iv. References
@@ -162,8 +166,14 @@ lemma iterate_derivative_physHermite_self {n : ℕ} :
 ## D. As functions `ℝ → ℝ`
 -/
 
-noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ)where
-  coe p := fun x => p.aeval x
+@[coe]
+noncomputable abbrev realEval (p : Polynomial ℤ) : ℝ → ℝ := fun x ↦ p.aeval x
+
+noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ) := ⟨realEval⟩
+
+/-!
+### D.1. Recursion
+-/
 
 lemma physHermite_eq_aeval (n : ℕ) (x : ℝ) :
     physHermite n x = (physHermite n).aeval x := rfl
@@ -194,14 +204,9 @@ lemma iterated_deriv_physHermite_eq_aeval (n : ℕ) : (m : ℕ) →
     funext x
     rw [Polynomial.deriv_aeval]
 
-@[fun_prop]
-lemma physHermite_differentiableAt (n : ℕ) (x : ℝ) :
-    DifferentiableAt ℝ (physHermite n) x := Polynomial.differentiableAt_aeval (physHermite n)
-
-@[fun_prop]
-lemma deriv_physHermite_differentiableAt (n m : ℕ) (x : ℝ) :
-    DifferentiableAt ℝ (deriv^[m] (physHermite n)) x :=
-  iterated_deriv_physHermite_eq_aeval n m ▸ Polynomial.differentiableAt_aeval _
+lemma fderiv_physHermite (n : ℕ) (x : ℝ) :
+    fderiv ℝ (physHermite n) x = (1 : ℝ →L[ℝ] ℝ).smulRight (deriv (physHermite n) x) := by
+  simp
 
 lemma deriv_physHermite (n : ℕ) :
     deriv (physHermite n) = 2 * n * (physHermite (n - 1)) := by
@@ -209,27 +214,9 @@ lemma deriv_physHermite (n : ℕ) :
   rw [Polynomial.deriv_aeval (physHermite n), derivative_physHermite]
   simp [mul_assoc, map_ofNat]
 
-lemma fderiv_physHermite
-    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (x : E)
-    (f : E → ℝ) (hf : DifferentiableAt ℝ f x) (n : ℕ) :
-    fderiv ℝ (fun x => physHermite n (f x)) x
-    = (2 * n * physHermite (n - 1) (f x)) • fderiv ℝ f x := by
-  rw [show (fun x => physHermite n (f x)) = physHermite n ∘ f from rfl,
-    fderiv_comp x (by fun_prop) hf]
-  ext dx
-  simp only [Polynomial.fderiv_aeval, derivative_physHermite, nsmul_eq_mul, map_mul, map_natCast,
-    ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.smulRight_apply,
-    one_apply_eq_self, smul_eq_mul, FunLike.coe_smul, Pi.smul_apply, map_ofNat]
-  ring
-
-@[simp]
-lemma deriv_physHermite' (x : ℝ)
-    (f : ℝ → ℝ) (hf : DifferentiableAt ℝ f x) (n : ℕ) :
-    deriv (fun x => physHermite n (f x)) x
-    = (2 * n * physHermite (n - 1) (f x)) * deriv f x := by
-  unfold deriv
-  rw [fderiv_physHermite (hf := hf)]
-  rfl
+/-!
+### D.2. Parity
+-/
 
 lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
     physHermite n (-x) = (-1)^n * physHermite n x
@@ -240,6 +227,25 @@ lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
     simp only [smul_neg, nsmul_eq_mul, cast_ofNat, physHermite_parity (n + 1) x, neg_mul, cast_add,
       cast_one, add_tsub_cancel_right, physHermite_parity n x, smul_eq_mul]
     ring
+
+/-!
+### D.3. Differentiability
+-/
+
+@[fun_prop]
+lemma physHermite_differentiableAt (n : ℕ) (x : ℝ) :
+    DifferentiableAt ℝ (physHermite n) x := Polynomial.differentiableAt_aeval (physHermite n)
+
+@[fun_prop]
+lemma deriv_physHermite_differentiableAt (n m : ℕ) (x : ℝ) :
+    DifferentiableAt ℝ (deriv^[m] (physHermite n)) x :=
+  iterated_deriv_physHermite_eq_aeval n m ▸ Polynomial.differentiableAt_aeval _
+
+/-!
+### D.4. Temperate growth
+-/
+
+
 
 /-!
 
@@ -404,7 +410,7 @@ lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ)
     simp
   | n + 1, h => by
     by_cases hP0 : P = 0
-    · simp [hP0, ← Pi.zero_def]
+    · grind
     let P' := ((coeff (physHermite (n + 1)) (n + 1)) • P -
         (coeff P (n + 1)) • physHermite (n + 1))
     have hP'mem : (fun x => P'.aeval x) ∈ Submodule.span ℝ
