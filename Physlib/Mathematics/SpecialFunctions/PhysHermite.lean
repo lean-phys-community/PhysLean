@@ -15,13 +15,31 @@ public import Mathlib.Tactic.Cases
 
 This file may eventually be upstreamed to Mathlib.
 
+## i. Overview
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Recursive definition
+- B. Coefficients & degree
+- C. Iterated derivatives
+- D. As functions `ℝ → ℝ`
+- E. Relationship to Gaussians
+
+## iv. References
+
 -/
 
 @[expose] public section
 
-open Polynomial
+namespace Polynomial
 
-namespace Physlib
+open Nat
+
+/-!
+## A. Recursive definition
+-/
 
 /-- The Physicists Hermite polynomial are defined as polynomials over `ℤ` in `X` recursively
   with `physHermite 0 = 1` and
@@ -69,6 +87,10 @@ lemma physHermite_succ' (n : ℕ) :
     physHermite (n + 1) = 2 • X * physHermite n - 2 * n • physHermite (n - 1) := by
   rw [physHermite_succ, derivative_physHermite]
 
+/-!
+## B. Coefficients & degree
+-/
+
 lemma coeff_physHhermite_succ_zero (n : ℕ) :
     coeff (physHermite (n + 1)) 0 = - coeff (physHermite n) 1 := by
   simp [physHermite_succ, coeff_derivative]
@@ -107,11 +129,21 @@ lemma degree_physHermite (n : ℕ) : degree (physHermite n) = n := by
 lemma natDegree_physHermite {n : ℕ} : (physHermite n).natDegree = n :=
   natDegree_eq_of_degree_eq_some (degree_physHermite n)
 
+@[simp]
+lemma physHermite_leadingCoeff {n : ℕ} : (physHermite n).leadingCoeff = 2 ^ n := by
+  simp [leadingCoeff]
+
+@[simp]
+lemma physHermite_ne_zero {n : ℕ} : physHermite n ≠ 0 :=
+  leadingCoeff_ne_zero.mp (by simp)
+
+/-!
+## C. Iterated derivatives
+-/
+
 lemma iterate_derivative_physHermite_of_gt {n m : ℕ} (h : n < m) :
     derivative^[m] (physHermite n) = 0 :=
   iterate_derivative_eq_zero (by simpa using h)
-
-open Nat
 
 @[simp]
 lemma iterate_derivative_physHermite_self {n : ℕ} :
@@ -126,13 +158,9 @@ lemma iterate_derivative_physHermite_self {n : ℕ} :
     rw [coeff_physHermite_of_lt (by omega), Polynomial.coeff_C_of_ne_zero (by omega)]
     rfl
 
-@[simp]
-lemma physHermite_leadingCoeff {n : ℕ} : (physHermite n).leadingCoeff = 2 ^ n := by
-  simp [leadingCoeff]
-
-@[simp]
-lemma physHermite_ne_zero {n : ℕ} : physHermite n ≠ 0 :=
-  leadingCoeff_ne_zero.mp (by simp)
+/-!
+## D. As functions `ℝ → ℝ`
+-/
 
 noncomputable instance : CoeFun (Polynomial ℤ) (fun _ ↦ ℝ → ℝ)where
   coe p := fun x => p.aeval x
@@ -215,7 +243,7 @@ lemma physHermite_parity: (n : ℕ) → (x : ℝ) →
 
 /-!
 
-## Relationship to Gaussians
+## E. Relationship to Gaussians
 
 -/
 
@@ -314,8 +342,9 @@ lemma integral_physHermite_mul_physHermite_eq_integral_deriv_inductive (n m : �
         rw [hasDerivAt_deriv_iff]
         have h1 : (deriv^[m - (p + 1)] fun x => Real.exp (-x ^ 2)) =
             fun x => (-1 : ℝ) ^ (m - (p + 1)) * physHermite (m - (p + 1)) x *
-            Real.exp (- x ^ 2) := funext fun x =>
-          deriv_gaussian_eq_physHermite_mul_gaussian (m - (p + 1)) x
+            Real.exp (- x ^ 2) := by
+          ext x
+          exact deriv_gaussian_eq_physHermite_mul_gaussian (m - (p + 1)) x
         rw [h1]
         fun_prop
       · rw [← Function.iterate_succ_apply' deriv]
@@ -429,9 +458,10 @@ lemma cos_mem_physHermite_span_topologicalClosure (c : ℝ) :
       exact Finset.sum_congr rfl fun i _ => by ring
     rw [h0]
     refine Submodule.sum_mem _ fun l _ => Submodule.smul_mem _ _ ?_
-    have hy : (fun (y : ℝ) => y ^ (2 * l)) = fun y => ((X ^ (2 * l) : Polynomial ℤ)).aeval y :=
-      funext fun y => by simp
+    have hy : (fun (y : ℝ) => y ^ (2 * l)) = fun y => ((X ^ (2 * l) : Polynomial ℤ)).aeval y := by
+      ext
+      simp
     exact hy ▸ polynomial_mem_physHermite_span _
   exact mem_closure_of_tendsto h1 (Filter.Eventually.of_forall h2)
 
-end Physlib
+end Polynomial
