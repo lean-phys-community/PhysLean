@@ -36,7 +36,7 @@ and, up to numerical factors, satisfy all of the same properties.
   - D.1. Recursion
   - D.2. Parity
   - D.3. Differentiability
-  - D.5. Temperate growth
+  - D.4. Temperate growth
 - E. Relationship to Gaussians
 
 ## iv. References
@@ -170,14 +170,13 @@ lemma iterate_derivative_physHermite_self (n : ℕ) :
     rw [Polynomial.coeff_C_zero]
     simp [Nat.descFactorial_self]
   | m + 1 =>
-    rw [coeff_physHermite_of_lt (by omega), Polynomial.coeff_C_of_ne_zero (by omega)]
-    rfl
+    rw [coeff_physHermite_of_lt (by omega), Polynomial.coeff_C_of_ne_zero (by omega), smul_zero]
 
 /-!
 ## D. As functions `ℝ → ℝ`
 -/
 
-/-- Cast an integer polynomial to a function `ℝ → ℝ` by evaluation. -/
+/-- Cast an integer polynomial to a function `ℝ → ℝ` by evaluation of the indeterminant. -/
 @[coe]
 noncomputable abbrev realEval (p : Polynomial ℤ) : ℝ → ℝ := fun x ↦ p.aeval x
 
@@ -200,6 +199,7 @@ lemma physHermite_succ_apply (n : ℕ) (x : ℝ) :
     physHermite (n + 1) x = 2 * x * physHermite n x - deriv (physHermite n) x := by
   simp [physHermite_succ_coe]
 
+/-- The two-term recursion for `physHermite` as functions `ℝ → ℝ` (c.f. `physHermite_succ'`). -/
 lemma physHermite_succ_coe' (n : ℕ) :
     (physHermite (n + 1) : ℝ → ℝ) =
       2 • (fun x => x) * (physHermite n : ℝ → ℝ) - (2 * n) • (physHermite (n - 1) : ℝ → ℝ) := by
