@@ -127,4 +127,14 @@ lemma twoState_helmholtzFreeEnergy_eq (E₀ E₁ : ℝ) (T : Temperature) :
   simp only [Real.log_exp,Temperature.β_toReal,div_eq_mul_inv, one_mul, inv_inv]
   ring
 
+/-- An instance of `twoState_helmholtzFreeEnergy_eq` assuming T ≠ 0 -/
+lemma twoState_helmholtzFreeEnergy_eq_Tneq0 (E₀ E₁ : ℝ) (T : Temperature) (Th : T ≠ 0) :
+    (twoState E₀ E₁).helmholtzFreeEnergy T =
+      (E₀ + E₁) / 2 - Real.log (2 * Real.cosh (β T * (E₁ - E₀) / 2)) / β T  := by
+  have hTval : T.val ≠ 0 := fun h => Th (Temperature.ext h)
+  have hβne : (β T : ℝ) ≠ 0 := (Temperature.beta_pos T (pos_iff_ne_zero.mpr hTval)).ne'
+  rw [twoState_helmholtzFreeEnergy_eq]
+  field_simp
+
+
 end CanonicalEnsemble
