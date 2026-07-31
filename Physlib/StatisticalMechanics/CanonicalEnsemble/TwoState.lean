@@ -104,8 +104,7 @@ informal_lemma twoState_entropy_eq where
   deps := [``twoState, ``thermodynamicEntropy]
 
 /-- A simplification of the `helmholtzFreeEnergy` of the two-state canonical ensemble. -/
-lemma twoState_helmholtzFreeEnergy_eq
-    (E₀ E₁ : ℝ) (T : Temperature) :
+lemma twoState_helmholtzFreeEnergy_eq (E₀ E₁ : ℝ) (T : Temperature) :
     (twoState E₀ E₁).helmholtzFreeEnergy T =
       (β T  * (E₀ + E₁) / 2 - Real.log
           (2 * Real.cosh (β T * (E₁ - E₀) / 2))) / β T  := by
@@ -117,20 +116,15 @@ lemma twoState_helmholtzFreeEnergy_eq
   have hE1 : -β T * E₁ = -x + (- C) := by
     simp [x, C]
     ring
-  rw [helmholtzFreeEnergy, twoState_partitionFunction_apply]
-  rw [show (T.val : ℝ) = T.toReal by rfl]
-  rw [hE0, hE1]
+  rw [helmholtzFreeEnergy, twoState_partitionFunction_apply,show (T.val : ℝ) = T.toReal by rfl,hE0, hE1]
   have hfactor :
-      Real.exp (x + (- C)) + Real.exp (-x + (- C)) =
-        Real.exp (-C) * (2 * Real.cosh x) := by
+      Real.exp (x + (- C)) + Real.exp (-x + (- C)) = Real.exp (-C) * (2 * Real.cosh x) := by
     rw [Real.exp_add, Real.exp_add, Real.cosh_eq]
     ring
-  rw [hfactor]
-  rw [Real.log_mul
+  rw [hfactor, Real.log_mul
         (Real.exp_pos _).ne'
         (by positivity : 2 * Real.cosh x ≠ 0)]
-  rw [Real.log_exp,Temperature.β_toReal]
-  simp only [div_eq_mul_inv, one_mul, inv_inv]
+  simp only [Real.log_exp,Temperature.β_toReal,div_eq_mul_inv, one_mul, inv_inv]
   ring
 
 end CanonicalEnsemble
