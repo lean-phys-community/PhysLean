@@ -116,7 +116,8 @@ lemma twoState_helmholtzFreeEnergy_eq (E₀ E₁ : ℝ) (T : Temperature) :
   have hE1 : -β T * E₁ = -x + (- C) := by
     simp [x, C]
     ring
-  rw [helmholtzFreeEnergy, twoState_partitionFunction_apply,show (T.val : ℝ) = T.toReal by rfl,hE0, hE1]
+  rw [helmholtzFreeEnergy, twoState_partitionFunction_apply,
+    show (T.val : ℝ) = T.toReal by rfl,hE0, hE1]
   have hfactor :
       Real.exp (x + (- C)) + Real.exp (-x + (- C)) = Real.exp (-C) * (2 * Real.cosh x) := by
     rw [Real.exp_add, Real.exp_add, Real.cosh_eq]
