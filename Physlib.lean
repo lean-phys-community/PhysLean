@@ -140,6 +140,7 @@ public import Physlib.Meta.Basic
 public import Physlib.Meta.Informal.Basic
 public import Physlib.Meta.Informal.Post
 public import Physlib.Meta.Informal.SemiFormal
+public import Physlib.Meta.Linters.DefsWithUnderscore
 public import Physlib.Meta.Linters.Sorry
 public import Physlib.Meta.Notes.Basic
 public import Physlib.Meta.Notes.HTMLNote

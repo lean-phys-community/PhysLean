@@ -174,7 +174,7 @@ Exercise 4.1.10-4.1.13: Specific to qubits and the Bloch sphere.
 ❓
 
 Unitary Evolution of a Mixed State
-✅ `MState.U_conj` in `QuantumInfo.Finite.Unitary`
+✅ `MState.uConj` in `QuantumInfo.Finite.Unitary`
 
 Evolution of an ensemble of mixed states
 ❓ Could define ensemble as distribution over a finite set of MStates.

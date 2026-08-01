@@ -820,7 +820,7 @@ This is the **purification theorem**: every mixed state has a purification.
 
 ### Unitary Conjugation
 
-**`U_conj (ρ : MState d) (U : Matrix.unitaryGroup d ℂ) : MState d`**:
+**`uConj (ρ : MState d) (U : Matrix.unitaryGroup d ℂ) : MState d`**:
 
 Applies unitary transformation: `ρ ↦ U ρ U†`.
 

@@ -83,7 +83,7 @@ For this reason, a quantum system can be uniquely associated to an e.s.a. Hamilt
 
 /-- Create a quantum system from a Hamiltonian operator which is merely
   essentially self-adjoint by taking its closure. -/
-def mk_esa {HS : Type*} [NormedAddCommGroup HS] [InnerProductSpace ℂ HS] [CompleteSpace HS]
+def mkESA {HS : Type*} [NormedAddCommGroup HS] [InnerProductSpace ℂ HS] [CompleteSpace HS]
     {ℋ : HS →ₗ.[ℂ] HS} (hℋ : IsEssentiallySelfAdjoint ℋ) : QuantumSystem := ⟨HS, ℋ.closure, hℋ⟩
 
 /-!

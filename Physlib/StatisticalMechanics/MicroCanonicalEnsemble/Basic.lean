@@ -31,15 +31,15 @@ structure MicroHamiltonian (D : Type) where
     the shape of the box), how many continuous degrees of freedom are there? -/
   dim : D → Type
   /-- The number of degrees of freedom is finite. -/
-  [dim_fin : ∀ d, Fintype (dim d)]
+  [dimFin : ∀ d, Fintype (dim d)]
   /-- Given the configuration, what is its energy? -/
   H : {d : D} → (dim d → ℝ) → WithTop ℝ
   --The energy function must be measurable (else the partition function integral is meaningless).
   measurable_H : ∀ d, Measurable (@H d)
 
-/-- The dim_fin to the instance cache is added so that things like the measure can be synthesized -/
+/-- The dimFin to the instance cache is added so that things like the measure can be synthesized -/
 instance microHamiltonianFintype {D} (H : MicroHamiltonian D) (d : D) : Fintype (H.dim d) :=
-  H.dim_fin d
+  H.dimFin d
 
 /-- The standard microcanonical ensemble Hamiltonian, where the data is the particle number N and
   the volume V. -/

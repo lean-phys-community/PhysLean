@@ -54,7 +54,7 @@ def densityMatrix {R : Type*} [Ring R] [PartialOrder R] [StarRing R] (d : Type*)
   {ρ : Matrix d d R // ρ.PosSemidef ∧ ρ.trace = 1}
 
 /-- Density matrices are closed under real convex combinations. -/
-def densityMatrix.convex_comb {R : Type*} [RCLike R]
+def densityMatrix.convexComb {R : Type*} [RCLike R]
     {d : ℕ} (ρ₀ ρ₁ : densityMatrix (Fin d) (R := R)) {t : R}
     (hp₀ : 0 ≤ t) (hp₁ : 0 ≤ 1 - t) : densityMatrix (Fin d) (R := R) :=
   ⟨t • ρ₀.1 + (1 - t) • ρ₁.1, by
@@ -241,17 +241,17 @@ theorem complCard {R : Type*} [RCLike R] {m r : ℕ}
 /--
 See discussion at https://leanprover.zulipchat.com/#narrow/channel/217875-Is-there-code-for-X.3F/topic/succAbove.20and.20predAbove.20lemmas/with/584270574
 -/
-def Fin.predAbove_of_ne {n : ℕ} {k i : Fin n}
+def Fin.predAboveOfNe {n : ℕ} {k i : Fin n}
     (h : i ≠ k) : Fin (n - 1) := by
   by_cases H : i.1 > k.1
   · exact ⟨i.1 - 1, by omega⟩
   · exact ⟨i.1, by omega⟩
 
 /-- A "missing lemma" for `Fin` types. -/
-lemma Fin.predAbove_of_ne_injective (n : ℕ) (k x y : Fin n)
+lemma Fin.predAboveOfNe_injective (n : ℕ) (k x y : Fin n)
     (hx : x ≠ k) (hy : y ≠ k)
-    (heq : Fin.predAbove_of_ne hx = Fin.predAbove_of_ne hy) : x = y := by
-  unfold predAbove_of_ne at heq
+    (heq : Fin.predAboveOfNe hx = Fin.predAboveOfNe hy) : x = y := by
+  unfold predAboveOfNe at heq
   split_ifs at heq
   all_goals
   · simp only [mk.injEq] at heq
@@ -272,7 +272,7 @@ def onbPart {R : Type*} [RCLike R]
         ((exists_orthonormalBasis R theRangeᗮ).choose_spec.choose
         (Finset.equivOfCardEq (complCard hK z) ⟨w, Finset.mem_univ _⟩)).1.1
     apply this
-    exact (x.1, Fin.predAbove_of_ne hx)
+    exact (x.1, Fin.predAboveOfNe hx)
 
 /- The custom in quantum information theory is to use
 |e₁>< e₁| as ancillary; we allow an arbitrary (standard) basis vector.
@@ -310,7 +310,7 @@ lemma onbPart_inner {R : Type*} [RCLike R] {m r : ℕ} {K : Fin r → Matrix (Fi
                 have : x.2.1 ≠ z := Fin.val_ne_of_ne hx
                 have : y.2.1 = x.2.1 := by
                     suffices y.2 = x.2 by rw [this]
-                    apply Fin.predAbove_of_ne_injective
+                    apply Fin.predAboveOfNe_injective
                     omega
                 have : y.2 = x.2 := by omega
                 exact Prod.ext hyz this)
@@ -341,7 +341,7 @@ def Ud {R : Type*} [RCLike R] {m r : ℕ}
 
 /-- This generalization of Stinespring dilation has the right
 "shape" but otherwise nothing specific to it. -/
-def general_dilation {R : Type*}
+def generalDilation {R : Type*}
     {m r : Type*} [DecidableEq r]
     (z : r)
     (S : Matrix (m × r) m R)
@@ -354,7 +354,7 @@ def general_dilation {R : Type*}
 def dilation {R : Type*} [Ring R]
     {m r : Type*} [Fintype r] [DecidableEq r]
     (K : r → Matrix m m R) (z : r) (M : Matrix (m × r) (m × r) R) :
-    Matrix (m × r) (m × r) R := general_dilation z (stinespringOp K) (M)
+    Matrix (m × r) (m × r) R := generalDilation z (stinespringOp K) (M)
 
 
 
@@ -526,7 +526,7 @@ def stinespringUnitaryForm {R : Type*} [RCLike R] {m r : ℕ}
     tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
 /-- The Stinespring unitary form, general version. -/
-def stinespringUnitaryForm_e {R : Type*} [RCLike R] {m r : ℕ}
+def stinespringUnitaryFormE {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) (e : Matrix (Fin r) (Fin r) R)
     (ρ : Matrix (Fin m) (Fin m) R) :
@@ -575,7 +575,7 @@ def generalForm {R : Type*} [RCLike R]
     (z : r)
     (S : Matrix (m × r) m R)
     (M : Matrix (m × r) (m × r) R) :=
-    let U := general_dilation z S M
+    let U := generalDilation z S M
     fun ρ => tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
 /-- General form of the Stinespring dilation. -/
@@ -587,7 +587,7 @@ def stinespringGeneralForm {R : Type*} [RCLike R]
     fun ρ => tr₂ (U * (ρ ⊗ₖ (single z z 1)) * Uᴴ)
 
 /-- Even more general form of the Stinespring dilation. -/
-def stinespringGeneralForm_e {R : Type*} [RCLike R]
+def stinespringGeneralFormE {R : Type*} [RCLike R]
     {m r : Type*} [Fintype r] [DecidableEq r] [Fintype m]
     (K : r → Matrix m m R) (z : r) (e : Matrix r r R)
     (M : Matrix (m × r) (m × r) R) :=
@@ -607,7 +607,7 @@ theorem unitaryForm_of_general {R : Type*} [RCLike R] {m r : ℕ}
     stinespringUnitaryForm hK z := by
   unfold
     stinespringUnitaryForm tr₂ Ud
-    stinespringGeneralForm dilation general_dilation tr₂
+    stinespringGeneralForm dilation generalDilation tr₂
   ext a b
   congr
   ext c
@@ -636,11 +636,11 @@ theorem unitaryForm_of_general {R : Type*} [RCLike R] {m r : ℕ}
 theorem unitaryForm_of_general_e {R : Type*} [RCLike R] {m r : ℕ}
     {K : Fin r → Matrix (Fin m) (Fin m) R}
     (hK : ∑ i, (K i)ᴴ * K i = 1) (z : Fin r) (e : Matrix (Fin r) (Fin r) R) :
-    stinespringGeneralForm_e K z e (Ud hK z) =
-    stinespringUnitaryForm_e hK z e := by
+    stinespringGeneralFormE K z e (Ud hK z) =
+    stinespringUnitaryFormE hK z e := by
   unfold
-    stinespringUnitaryForm_e tr₂ Ud
-    stinespringGeneralForm_e dilation general_dilation tr₂
+    stinespringUnitaryFormE tr₂ Ud
+    stinespringGeneralFormE dilation generalDilation tr₂
   ext a b
   congr
   ext c
@@ -678,7 +678,7 @@ lemma stinespringGeneralForm_works {R : Type*} [RCLike R] {m r : ℕ}
     (M : Matrix (Fin m × Fin r) (Fin m × Fin r) R) :
     stinespringGeneralForm K z M = krausApply K := by
       -- my 4.27 proof failed in 4.31 so this is Aristotle:
-      unfold stinespringGeneralForm krausApply dilation general_dilation stinespringOp tr₂;
+      unfold stinespringGeneralForm krausApply dilation generalDilation stinespringOp tr₂;
       ext ρ i j;
       simp only [Fin.isValue, Matrix.sum_apply, kroneckerMap_apply, Matrix.mul_apply, ite_mul,
         conjTranspose_apply, star_def];

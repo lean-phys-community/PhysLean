@@ -30,29 +30,29 @@ variable [DecidableEq d]
 variable {ψ φ f : Ket d}
 
 /-- Conjugate a state by a unitary matrix (applying the unitary as an evolution). -/
-def U_conj (ρ : MState d) (U : 𝐔[d]) : MState d where
+def uConj (ρ : MState d) (U : 𝐔[d]) : MState d where
   M := ρ.M.conj U.val
   nonneg := HermitianMat.conj_nonneg U.val ρ.nonneg
   tr := by simp
 
-/-- `MState.U_conj`, the action of a unitary on a mixed state by conjugation.
+/-- `MState.uConj`, the action of a unitary on a mixed state by conjugation.
 The ◃ notation comes from the theory of racks and quandles, where this is a
 conjugation-like operation. -/
-scoped[MState] notation:80 U:80 " ◃ " ρ:81 => MState.U_conj ρ U
+scoped[MState] notation:80 U:80 " ◃ " ρ:81 => MState.uConj ρ U
 
 set_option backward.isDefEq.respectTransparency false in
 /-- You might think this should only be true up to permutation, so that it would read like
-`∃ σ : Equiv.Perm d, (ρ.U_conj U).spectrum = ρ.spectrum.relabel σ`. But since eigenvalues
+`∃ σ : Equiv.Perm d, (ρ.uConj U).spectrum = ρ.spectrum.relabel σ`. But since eigenvalues
 of a matrix are always canonically sorted, this is actually an equality.
 -/
 @[simp]
-theorem U_conj_spectrum_eq (ρ : MState d) (U : 𝐔[d]) :
-    (ρ.U_conj U).spectrum = ρ.spectrum := by
-  simp [spectrum, U_conj]
+theorem uConj_spectrum_eq (ρ : MState d) (U : 𝐔[d]) :
+    (ρ.uConj U).spectrum = ρ.spectrum := by
+  simp [spectrum, uConj]
 
 @[simp]
-theorem inner_U_conj (ρ σ : MState d) (U : 𝐔[d]) : ⟪U ◃ ρ, U ◃ σ⟫_Prob = ⟪ρ, σ⟫_Prob := by
-  simp [U_conj, inner_def]
+theorem inner_uConj (ρ σ : MState d) (U : 𝐔[d]) : ⟪U ◃ ρ, U ◃ σ⟫_Prob = ⟪ρ, σ⟫_Prob := by
+  simp [uConj, inner_def]
 
 /-- The **No-cloning theorem**, saying that if states `ψ` and `φ` can both be perfectly cloned
 using a unitary `U` and a fiducial state `f`, and they aren't identical (their inner product is
@@ -72,7 +72,7 @@ theorem no_cloning {U : 𝐔[d × d]}
     grind only [pure_prod_pure]
   replace h2 : ((pure (ψ ⊗ᵠ ψ)).m * (pure (φ ⊗ᵠ φ)).m).trace.re = (ρψ.m * ρφ.m).trace.re := by
     convert! ← h2
-    simp +zetaDelta only [inner_U_conj, pure_prod_pure, prod]
+    simp +zetaDelta only [inner_uConj, pure_prod_pure, prod]
     simp [inner, ← Matrix.mul_kronecker_mul, pure_mul_self,
       Matrix.trace_kronecker]
   have h3 : (ρψ.m * ρφ.m).trace.re * ((ρψ.m * ρφ.m).trace.re - 1) = 0 := by

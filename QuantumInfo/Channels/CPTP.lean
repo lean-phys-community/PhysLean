@@ -436,7 +436,7 @@ def ofUnitary (U : 𝐔[dIn]) : CPTPMap dIn dIn where
 
 /-- The unitary channel U conjugated by U. -/
 theorem ofUnitary_eq_conj (U : 𝐔[dIn]) (ρ : MState dIn) :
-    (ofUnitary U) ρ = ρ.U_conj U :=
+    (ofUnitary U) ρ = ρ.uConj U :=
   rfl
 
 /-- A channel is unitary iff it is `ofUnitary U`. -/
@@ -444,7 +444,7 @@ def IsUnitary (Λ : CPTPMap dIn dIn) : Prop :=
   ∃ U, Λ = ofUnitary U
 
 /-- A channel is unitary iff it can be written as conjugation by a unitary. -/
-theorem IsUnitary_iff_U_conj (Λ : CPTPMap dIn dIn) : IsUnitary Λ ↔ ∃ U, ∀ ρ, Λ ρ = ρ.U_conj U := by
+theorem IsUnitary_iff_uConj (Λ : CPTPMap dIn dIn) : IsUnitary Λ ↔ ∃ U, ∀ ρ, Λ ρ = ρ.uConj U := by
   simp_rw [IsUnitary, ← ofUnitary_eq_conj, CPTPMap.funext_iff]
 
 theorem IsUnitary_equiv (σ : dIn ≃ dIn) : IsUnitary (ofEquiv σ) := by

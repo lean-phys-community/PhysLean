@@ -55,7 +55,7 @@ lemma diagPhase_mul (θ φ : Fin 3 → ℝ) :
     simp [Matrix.diagonal_mul_diagonal, ← exp_add, mul_add]
 
 /-- diagonal phase matrix diag(iθ_i) is part of the unitary group -/
-def diagPhase_unitary (θ : Fin 3 → ℝ) : unitaryGroup (Fin 3) ℂ :=
+def diagPhaseUnitary (θ : Fin 3 → ℝ) : unitaryGroup (Fin 3) ℂ :=
     ⟨diagPhase θ,
     by
     rw[Matrix.mem_unitaryGroup_iff]
@@ -68,7 +68,7 @@ def diagPhase_unitary (θ : Fin 3 → ℝ) : unitaryGroup (Fin 3) ℂ :=
 /-- The underlying matrix of the phase-shift element of the unitary group is the
   phase-shift matrix. -/
 @[simp]
-lemma diagPhaseShift_coe_matrix (θ : Fin 3 → ℝ) : ↑(diagPhase_unitary θ) = diagPhase θ := rfl
+lemma diagPhaseShift_coe_matrix (θ : Fin 3 → ℝ) : ↑(diagPhaseUnitary θ) = diagPhase θ := rfl
 
 /-- The Lepton phase shift matrix as a `3×3` complex matrix, given three reals `a b c`.
 This dictates the phase shift freedom of the charged lepton sector.
@@ -89,27 +89,27 @@ def majoranaPhaseMatrix (α1 α2 : ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
   diagPhase (fun i => if i = 0 then 0 else if i = 1 then α1/2 else α2/2)
 
 /-- The Dirac PMNS matrix equivalence relations -/
-def PMNS_dirac_equivalence (U V : unitaryGroup (Fin 3) ℂ) : Prop :=
+def PMNSDiracEquivalence (U V : unitaryGroup (Fin 3) ℂ) : Prop :=
   ∃ (θ φ : Fin 3 → ℝ),
   U = diagPhase θ * V * diagPhase φ
 
-/-- The relation `PMNS_dirac_equivalence` is reflexive. -/
-lemma PMNS_dirac_equivalence_refl :
-    ∀ U : unitaryGroup (Fin 3) ℂ, PMNS_dirac_equivalence U U := by
+/-- The relation `PMNSDiracEquivalence` is reflexive. -/
+lemma PMNSDiracEquivalence_refl :
+    ∀ U : unitaryGroup (Fin 3) ℂ, PMNSDiracEquivalence U U := by
     intro U
     exact ⟨0, 0, by simp⟩
 
-/-- The relation `PMNS_dirac_equivalence` is symmetric. -/
-lemma PMNS_dirac_equivalence_symm :
-    ∀ U V : unitaryGroup (Fin 3) ℂ, PMNS_dirac_equivalence U V → PMNS_dirac_equivalence V U := by
+/-- The relation `PMNSDiracEquivalence` is symmetric. -/
+lemma PMNSDiracEquivalence_symm :
+    ∀ U V : unitaryGroup (Fin 3) ℂ, PMNSDiracEquivalence U V → PMNSDiracEquivalence V U := by
     rintro U V ⟨θ, φ, h'⟩
     refine ⟨-θ, -φ, ?_⟩
     simp only [h', ← mul_assoc, diagPhase_mul]
     simp [mul_assoc, diagPhase_mul, add_neg_cancel, neg_add_cancel]
 
-/-- The relation `PMNS_dirac_equivalence` is transitive. -/
-lemma PMNS_dirac_equivalence_trans {U V W : unitaryGroup (Fin 3) ℂ} :
-    PMNS_dirac_equivalence U V → PMNS_dirac_equivalence V W → PMNS_dirac_equivalence U W := by
+/-- The relation `PMNSDiracEquivalence` is transitive. -/
+lemma PMNSDiracEquivalence_trans {U V W : unitaryGroup (Fin 3) ℂ} :
+    PMNSDiracEquivalence U V → PMNSDiracEquivalence V W → PMNSDiracEquivalence U W := by
     rintro ⟨θ1, φ1, hUV⟩ ⟨θ2, φ2, hVW⟩
     refine ⟨θ1 + θ2, φ1 + φ2, ?_⟩
     simp only [hUV, hVW, ← mul_assoc, diagPhase_mul]
