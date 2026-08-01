@@ -116,6 +116,7 @@ public import Physlib.Mathematics.InnerProductSpace.Gaussian
 public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Physlib.Mathematics.KroneckerDelta.Contraction
+public import Physlib.Mathematics.LeviCivita.Basic
 public import Physlib.Mathematics.LinearMaps
 public import Physlib.Mathematics.LinearPMap
 public import Physlib.Mathematics.List

@@ -9,7 +9,7 @@ public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.UnitTensor
 public import Physlib.Meta.Sorry
 public import Physlib.Relativity.Tensors.OfInt
-public import Physlib.Mathematics.KroneckerDelta.Basic
+public import Physlib.Mathematics.LeviCivita.Basic
 /-!
 
 # The Levi-Civita tensor as a real Lorentz tensor
@@ -28,6 +28,8 @@ components are carried by `TensorSpecies.Tensor.TensorInt.toTensor`.
 
 - `leviCivita` : the rank-four Levi-Civita tensor `ε4`, with `ε⁰¹²³ = 1`.
 - `leviCivita_basis_repr_apply` : its standard-basis components as a generalized Kronecker delta.
+- `leviCivita_basis_repr_eq_leviCivitaSymbol` : its standard-basis components as the
+  general-dimension Levi-Civita symbol `leviCivitaSymbol` at `ι = Fin 4`.
 - `leviCivita_antisymm`, `leviCivita_antisymm_mid`, `leviCivita_antisymm_last` : antisymmetry
   under each adjacent transposition of the indices.
 
@@ -82,6 +84,12 @@ lemma leviCivita_eq_ofInt : ε4 =
 def _root_.euclidLeviCivita (g : Fin 4 → Fin 4) : ℝ :=
   generalizedKroneckerDelta g (id : Fin 4 → Fin 4)
 
+/-- The Euclidean Levi-Civita symbol in dimension 4 is the general-dimension
+Levi-Civita symbol `leviCivitaSymbol` at `ι = Fin 4`, carried to the reals. -/
+lemma _root_.euclidLeviCivita_eq_leviCivitaSymbol (g : Fin 4 → Fin 4) :
+    euclidLeviCivita g = (leviCivitaSymbol g : ℝ) :=
+  rfl
+
 /-!
 
 ## B. Components in the standard basis
@@ -95,6 +103,15 @@ lemma leviCivita_basis_repr_apply
     (Tensor.basis _).repr ε4 b
       = (generalizedKroneckerDelta (fun i => finSumFinEquiv (b i)) (id : Fin 4 → Fin 4) : ℝ) := by
   rw [leviCivita_eq_ofInt, TensorInt.basis_repr_apply]
+
+/-- The components of the Levi-Civita tensor in the standard basis are the
+general-dimension Levi-Civita symbol `leviCivitaSymbol` of the multi-index at
+`ι = Fin 4`. -/
+lemma leviCivita_basis_repr_eq_leviCivitaSymbol
+    (b : ComponentIdx (S := realLorentzTensor 3) ![Color.up, Color.up, Color.up, Color.up]) :
+    (Tensor.basis _).repr ε4 b
+      = (leviCivitaSymbol (fun i => finSumFinEquiv (b i)) : ℝ) :=
+  leviCivita_basis_repr_apply b
 
 /-- The Levi-Civita tensor vanishes on any multi-index with a repeated value: if two distinct
 index positions `i ≠ j` carry the same basis index, the component is zero. -/
