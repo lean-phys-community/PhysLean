@@ -31,7 +31,7 @@ namespace HarmonicOscillator
 variable (Q : HarmonicOscillator)
 
 open Module Nat
-open Physlib
+open Polynomial
 open MeasureTheory HilbertSpace InnerProductSpace
 
 /-
