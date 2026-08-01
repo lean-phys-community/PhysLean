@@ -32,8 +32,9 @@ In this module we define the Higgs field and prove some basic properties.
   - A.3. Orthonormal basis
   - A.4. Generating Higgs vectors from real numbers
   - A.5. Action of the gauge group on `HiggsVec`
-    - A.5.1. Definition of the action
+    - A.5.1. Definition of the representation
     - A.5.2. Unitary nature of the action
+    - A.5.3. Group properties of the representation applied to vectors
   - A.6. The Gauge orbit of a Higgs vector
     - A.6.1. The rotation matrix to ofReal
     - A.6.2. Members of orbits
@@ -160,42 +161,36 @@ The gauge group of the Standard Model acts on `HiggsVec` by matrix multiplicatio
 
 /-!
 
-#### A.5.1. Definition of the action
+#### A.5.1. Definition of the representation
 
 -/
 
-instance : SMul StandardModel.GaugeGroupI HiggsVec where
-  smul g φ := WithLp.toLp 2 <| g.toU1 ^ 3 • (g.toSU2.1 *ᵥ φ.ofLp)
+/-- The representation of the gauge group `GaugeGroupI` on `HiggsVec`: the `SU(2)`
+  factor acts by matrix multiplication, and the `U(1)` factor by scalar
+  multiplication with its third power. -/
+def repGaugeGroupI : Representation ℂ GaugeGroupI HiggsVec where
+  toFun g :=
+    { toFun φ := WithLp.toLp 2 <| g.toU1 ^ 3 • (g.toSU2.1 *ᵥ φ.ofLp)
+      map_add' φ ψ := by simp [mulVec_add, smul_add]
+      map_smul' c φ := by simp [mulVec_smul, smul_comm c] }
+  map_one' := by
+    ext φ
+    simp
+  map_mul' g₁ g₂ := by
+    ext φ
+    simp [Module.End.mul_apply, smul_smul, mulVec_mulVec, mul_pow, mul_comm]
 
-lemma gaugeGroupI_smul_eq (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
-    g • φ = (WithLp.toLp 2 <| g.toU1 ^ 3 • (g.toSU2.1 *ᵥ φ.ofLp)) := rfl
+lemma repGaugeGroupI_apply (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
+    repGaugeGroupI g φ = (WithLp.toLp 2 <| g.toU1 ^ 3 • (g.toSU2.1 *ᵥ φ.ofLp)) := rfl
 
-lemma gaugeGroupI_smul_eq_U1_mul_SU2 (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
-    g • φ = (WithLp.toLp 2 <| g.toSU2.1 *ᵥ (g.toU1 ^ 3 • φ.ofLp)) := by
-  rw [gaugeGroupI_smul_eq, ← mulVec_smul]
+lemma repGaugeGroupI_apply_eq_U1_mul_SU2 (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
+    repGaugeGroupI g φ = (WithLp.toLp 2 <| g.toSU2.1 *ᵥ (g.toU1 ^ 3 • φ.ofLp)) := by
+  rw [repGaugeGroupI_apply, ← mulVec_smul]
 
-lemma gaugeGroupI_smul_eq_U1_smul_SU2 (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
-    g • φ = (WithLp.toLp 2 <| (g.toU1 ^ 3 • g.toSU2.1) *ᵥ φ.ofLp) := by
-  rw [gaugeGroupI_smul_eq]
+lemma repGaugeGroupI_apply_eq_U1_smul_SU2 (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
+    repGaugeGroupI g φ = (WithLp.toLp 2 <| (g.toU1 ^ 3 • g.toSU2.1) *ᵥ φ.ofLp) := by
+  rw [repGaugeGroupI_apply]
   rw [Matrix.smul_mulVec]
-
-instance : MulAction StandardModel.GaugeGroupI HiggsVec where
-  one_smul φ := by simp [gaugeGroupI_smul_eq]
-  mul_smul g₁ g₂ φ := by
-    simp [gaugeGroupI_smul_eq, mulVec_smul, smul_smul, mulVec_mulVec, mul_pow]
-
-instance : DistribMulAction StandardModel.GaugeGroupI HiggsVec where
-  smul_zero g := by simp [gaugeGroupI_smul_eq_U1_smul_SU2]
-  smul_add g φ ψ := by simp [gaugeGroupI_smul_eq_U1_smul_SU2, mulVec_add]
-
-TODO "Change the action of `GaugeGroupI` on `HiggsVec` to be a representation
-  rather than a `MulAction`."
-
-instance : SMulCommClass ℂ GaugeGroupI HiggsVec where
-  smul_comm r g φ := by simp [gaugeGroupI_smul_eq, mulVec_smul, smul_comm r]
-
-instance : SMulCommClass ℝ GaugeGroupI HiggsVec where
-  smul_comm r g φ := by simp [gaugeGroupI_smul_eq, mulVec_smul, smul_comm r]
 
 /-!
 
@@ -207,18 +202,46 @@ The action of `StandardModel.GaugeGroupI` on `HiggsVec` is unitary.
 open InnerProductSpace
 
 @[simp]
-lemma gaugeGroupI_smul_inner (g : StandardModel.GaugeGroupI) (φ ψ : HiggsVec) :
-    ⟪g • φ, g • ψ⟫_ℂ = ⟪φ, ψ⟫_ℂ := by
-  rw [gaugeGroupI_smul_eq, gaugeGroupI_smul_eq, EuclideanSpace.inner_toLp_toLp,
+lemma repGaugeGroupI_inner (g : StandardModel.GaugeGroupI) (φ ψ : HiggsVec) :
+    ⟪repGaugeGroupI g φ, repGaugeGroupI g ψ⟫_ℂ = ⟪φ, ψ⟫_ℂ := by
+  rw [repGaugeGroupI_apply, repGaugeGroupI_apply, EuclideanSpace.inner_toLp_toLp,
     EuclideanSpace.inner_eq_star_dotProduct, Submonoid.smul_def, Submonoid.smul_def, star_smul,
     smul_dotProduct, dotProduct_smul, smul_smul, Unitary.mul_star_self_of_mem (g.toU1 ^ 3).2,
     one_smul, star_mulVec, dotProduct_comm, dotProduct_mulVec, vecMul_vecMul,
     ← star_eq_conjTranspose, mem_unitaryGroup_iff'.mp g.toSU2.2.1, vecMul_one, dotProduct_comm]
 
 @[simp]
-lemma gaugeGroupI_smul_norm (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
-    ‖g • φ‖ = ‖φ‖ := by
-  rw [norm_eq_sqrt_re_inner (𝕜 := ℂ), norm_eq_sqrt_re_inner (𝕜 := ℂ), gaugeGroupI_smul_inner]
+lemma repGaugeGroupI_norm (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
+    ‖repGaugeGroupI g φ‖ = ‖φ‖ := by
+  rw [norm_eq_sqrt_re_inner (𝕜 := ℂ), norm_eq_sqrt_re_inner (𝕜 := ℂ), repGaugeGroupI_inner]
+
+/-!
+
+#### A.5.3. Group properties of the representation applied to vectors
+
+-/
+
+lemma repGaugeGroupI_mul_apply (g₁ g₂ : StandardModel.GaugeGroupI) (φ : HiggsVec) :
+    repGaugeGroupI (g₁ * g₂) φ = repGaugeGroupI g₁ (repGaugeGroupI g₂ φ) := by
+  rw [map_mul, Module.End.mul_apply]
+
+@[simp]
+lemma repGaugeGroupI_inv_apply_apply (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
+    repGaugeGroupI g⁻¹ (repGaugeGroupI g φ) = φ := by
+  rw [← repGaugeGroupI_mul_apply, inv_mul_cancel, map_one, Module.End.one_apply]
+
+@[simp]
+lemma repGaugeGroupI_apply_inv_apply (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
+    repGaugeGroupI g (repGaugeGroupI g⁻¹ φ) = φ := by
+  rw [← repGaugeGroupI_mul_apply, mul_inv_cancel, map_one, Module.End.one_apply]
+
+lemma repGaugeGroupI_inv_apply_eq_iff (g : StandardModel.GaugeGroupI) (φ ψ : HiggsVec) :
+    repGaugeGroupI g⁻¹ φ = ψ ↔ φ = repGaugeGroupI g ψ := by
+  constructor
+  · rintro rfl
+    rw [repGaugeGroupI_apply_inv_apply]
+  · rintro rfl
+    rw [repGaugeGroupI_inv_apply_apply]
 
 /-!
 
@@ -270,12 +293,12 @@ def toRealGroupElem (φ : HiggsVec) : GaugeGroupI :=
     rw [← mul_conj, ← mul_conj]
     ring
 
-lemma toRealGroupElem_smul_self (φ : HiggsVec) :
-    (toRealGroupElem φ) • φ = ofReal (‖φ‖ ^ 2) := by
+lemma toRealGroupElem_apply_self (φ : HiggsVec) :
+    repGaugeGroupI (toRealGroupElem φ) φ = ofReal (‖φ‖ ^ 2) := by
   by_cases hφ : φ = 0
   · ext i
     fin_cases i <;> simp [hφ, toRealGroupElem, ofReal]
-  rw [gaugeGroupI_smul_eq]
+  rw [repGaugeGroupI_apply]
   have h0' : (‖φ‖ ^ 2 : ℂ) = φ 0 * (starRingEnd ℂ) (φ 0) + φ 1 * (starRingEnd ℂ) (φ 1) := by
     rw [← ofReal_pow, ← @real_inner_self_eq_norm_sq]
     simp only [Fin.isValue, mul_conj, PiLp.inner_apply, Complex.inner, ofReal_re,
@@ -301,16 +324,18 @@ Higgs vectors with the same norm.
 
 -/
 
-lemma mem_orbit_gaugeGroupI_iff (φ : HiggsVec) (ψ : HiggsVec) :
-    ψ ∈ MulAction.orbit GaugeGroupI φ ↔ ‖ψ‖ = ‖φ‖ := by
+/-- Two Higgs vectors are in the same gauge orbit (i.e. related by `repGaugeGroupI`)
+  if and only if they have the same norm. -/
+lemma exists_repGaugeGroupI_eq_iff_norm_eq (φ : HiggsVec) (ψ : HiggsVec) :
+    (∃ g : GaugeGroupI, repGaugeGroupI g φ = ψ) ↔ ‖ψ‖ = ‖φ‖ := by
   constructor
   · rintro ⟨g, rfl⟩
     simp
   · intro h
     use (toRealGroupElem ψ)⁻¹ * toRealGroupElem (φ)
-    simp only
-    rw [← smul_smul, toRealGroupElem_smul_self φ, ← h, ← toRealGroupElem_smul_self ψ]
-    exact inv_smul_smul _ ψ
+    rw [map_mul, Module.End.mul_apply, toRealGroupElem_apply_self φ, ← h,
+      ← toRealGroupElem_apply_self ψ, ← Module.End.mul_apply, ← map_mul,
+      inv_mul_cancel, map_one, Module.End.one_apply]
 
 /-!
 
@@ -324,7 +349,7 @@ The items in this section are marked as `informal_lemma` as they are not yet for
 -/
 
 /-- The Higgs boson breaks electroweak symmetry down to the electromagnetic force, i.e., the
-stability group of the action of `rep` on `![0, Complex.ofReal ‖φ‖]`, for non-zero `‖φ‖`, is the
+stability group of `repGaugeGroupI` on `![0, Complex.ofReal ‖φ‖]`, for non-zero `‖φ‖`, is the
 `SU(3) × U(1)` subgroup of `gaugeGroup := SU(3) × SU(2) × U(1)` with the embedding given by
 `(g, e^{i θ}) ↦ (g, diag (e ^ {3 * i θ}, e ^ {- 3 * i θ}), e^{i θ})`.
 -/
@@ -333,8 +358,8 @@ informal_lemma stability_group_single where
   tag := "6V2MD"
 
 /-- The subgroup of `gaugeGroup := SU(3) × SU(2) × U(1)` which preserves every `HiggsVec` by the
-action of `StandardModel.HiggsVec.rep` is given by `SU(3) × ℤ₆` where `ℤ₆` is the subgroup of
-`SU(2) × U(1)` with elements `(α^(-3) * I₂, α)` where `α` is a sixth root of unity.
+action of `StandardModel.HiggsVec.repGaugeGroupI` is given by `SU(3) × ℤ₆` where `ℤ₆` is the
+subgroup of `SU(2) × U(1)` with elements `(α^(-3) * I₂, α)` where `α` is a sixth root of unity.
 -/
 informal_lemma stability_group where
   deps := [``HiggsVec]
@@ -346,10 +371,10 @@ informal_lemma stability_group where
 
 -/
 
-lemma ofU1Subgroup_smul_eq_smul (g : unitary ℂ) (φ : HiggsVec) :
-    (StandardModel.GaugeGroupI.ofU1Subgroup g) • φ =
+lemma ofU1Subgroup_repGaugeGroupI_apply (g : unitary ℂ) (φ : HiggsVec) :
+    repGaugeGroupI (StandardModel.GaugeGroupI.ofU1Subgroup g) φ =
     (WithLp.toLp 2 <| !![1, 0; 0, g.1 ^ 6] *ᵥ φ.ofLp) := by
-  rw [gaugeGroupI_smul_eq_U1_smul_SU2]
+  rw [repGaugeGroupI_apply_eq_U1_smul_SU2]
   simp only [GaugeGroupI.ofU1Subgroup_toU1, GaugeGroupI.ofU1Subgroup_toSU2, SubmonoidClass.coe_pow,
     star_pow, RCLike.star_def, smul_of, smul_cons, smul_zero, smul_empty, cons_mulVec,
     cons_dotProduct, zero_mul, dotProduct_of_isEmpty, add_zero, zero_add, empty_mulVec, one_mul,
@@ -362,17 +387,17 @@ lemma ofU1Subgroup_smul_eq_smul (g : unitary ℂ) (φ : HiggsVec) :
   · show (g : ℂ) ^ 3 * (g : ℂ) ^ 3 = (g : ℂ) ^ 6
     ring
 
-lemma gaugeGroupI_smul_phase_snd (φ : HiggsVec) :
+lemma repGaugeGroupI_phase_snd (φ : HiggsVec) :
     ∃ g : StandardModel.GaugeGroupI,
-      (g • φ).ofLp 1 = ‖(φ.ofLp 1)‖ ∧
-      (∀ φ1 : HiggsVec, (g • φ1).ofLp 0 = φ1.ofLp 0) ∧
-      (∀ a : ℝ, g • (!₂[a, 0] : HiggsVec) = (!₂[a, 0] : HiggsVec)) := by
+      (repGaugeGroupI g φ).ofLp 1 = ‖(φ.ofLp 1)‖ ∧
+      (∀ φ1 : HiggsVec, (repGaugeGroupI g φ1).ofLp 0 = φ1.ofLp 0) ∧
+      (∀ a : ℝ, repGaugeGroupI g (!₂[a, 0] : HiggsVec) = (!₂[a, 0] : HiggsVec)) := by
   let θ := arg (φ 1)
   refine ⟨StandardModel.GaugeGroupI.ofU1Subgroup ⟨Complex.exp (-I * θ / 6), by
     simp [Unitary.mem_iff, ← Complex.exp_conj, ← Complex.exp_add, Complex.conj_ofNat]
     ring_nf
     simp⟩, ?_, ?_, ?_⟩
-  · rw [ofU1Subgroup_smul_eq_smul]
+  · rw [ofU1Subgroup_repGaugeGroupI_apply]
     simp only [Fin.isValue, neg_mul, cons_mulVec, cons_dotProduct, one_mul, zero_mul,
       dotProduct_of_isEmpty, add_zero, zero_add, empty_mulVec, cons_val_one, cons_val_fin_one]
     rw [show vecHead (vecTail φ.ofLp) = φ.ofLp 1 from rfl]
@@ -382,10 +407,10 @@ lemma gaugeGroupI_smul_phase_snd (φ : HiggsVec) :
     ring_nf
     simp
   · intro φ
-    simp [ofU1Subgroup_smul_eq_smul, vecHead]
+    simp [ofU1Subgroup_repGaugeGroupI_apply, vecHead]
   · intro a
     ext i
-    fin_cases i <;> simp [ofU1Subgroup_smul_eq_smul]
+    fin_cases i <;> simp [ofU1Subgroup_repGaugeGroupI_apply]
 
 
 /-!
@@ -738,7 +763,8 @@ TODO "Define the global gauge action on HiggsField."
 TODO "Prove `⟪φ1, φ2⟫_H` invariant under the global gauge action. (norm_map_of_mem_unitary)"
 TODO "Prove invariance of potential under global gauge action."
 
-/-- The action of `gaugeTransformI` on `HiggsField` acting pointwise through `HiggsVec.rep`. -/
+/-- The action of `gaugeTransformI` on `HiggsField` acting pointwise through
+  `HiggsVec.repGaugeGroupI`. -/
 informal_definition gaugeAction where
   deps := [``gaugeTransformI]
   tag := "6V2NP"
