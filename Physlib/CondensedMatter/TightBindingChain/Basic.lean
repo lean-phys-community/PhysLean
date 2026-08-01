@@ -427,7 +427,8 @@ lemma energyEigenstate_orthogonal :
     ring_nf
   have hω_pow : ω ^ T.N = 1 := by
     rw [hω_def, ← Complex.exp_nat_mul, show (T.N : ℂ) * (Complex.I * (k2 - k1) * T.a) =
-      Complex.I * k2 * (1 : ℕ) * T.N * T.a - Complex.I * k1 * (1 : ℕ) * T.N * T.a by push_cast; ring,
+      Complex.I * k2 * (1 : ℕ) * T.N * T.a - Complex.I * k1 * (1 : ℕ) * T.N * T.a by
+        push_cast; ring,
       Complex.exp_sub, T.quantaWaveNumber_exp_N 1 k2, T.quantaWaveNumber_exp_N 1 k1, div_one]
   -- Distinct quantized wavenumbers differ by a non-multiple of `2π / a`, so `ω ≠ 1`.
   have hω_ne_one : ω ≠ 1 := fun hω_eq_one => hne <| by
