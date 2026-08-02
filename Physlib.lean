@@ -311,6 +311,7 @@ public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Gaussians
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.PlaneWaves
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.PositionStates
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.SchwartzSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.CompleteTensorProduct
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.DirichletSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Fourier
