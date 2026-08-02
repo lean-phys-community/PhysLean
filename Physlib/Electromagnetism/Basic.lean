@@ -40,17 +40,15 @@ interfaces should be consolidated without breaking the physical meaning of exist
 
 namespace Electromagnetism
 
-/-- The electric field is a map from `d`+1 dimensional spacetime to the vector space
-  `ℝ^d`. -/
+/-- The electric field is a map from `(d + 1)`-dimensional spacetime to `ℝ^d`. -/
 abbrev ElectricField (d : ℕ := 3) := Time → Space d → EuclideanSpace ℝ (Fin d)
 
-/-- The magnetic field is a map from `d+1` dimensional spacetime to the vector space
-  `ℝ^d`. -/
+/-- The magnetic field is a map from `(d + 1)`-dimensional spacetime to `ℝ^d`. -/
 abbrev MagneticField (d : ℕ := 3) := Time → Space d → EuclideanSpace ℝ (Fin d)
 
 open realLorentzTensor
 
-/-- The vector potential of an electromagnetic field-/
+/-- The vector potential of an electromagnetic field. -/
 abbrev VectorPotential (d : ℕ := 3) := SpaceTime d → ℝT[d, .up]
 
 /-- The electric permittivity and the magnetic permeability of free space. -/
@@ -62,14 +60,14 @@ structure EMSystem where
 
 TODO "Charge density and current density should be generalized to signed measures,
   in such a way
-  that they are still easy to work with and can be integrated with with tensor notation.
+  that they are still easy to work with and can be integrated with tensor notation.
   See here:
   https://leanprover.zulipchat.com/#narrow/channel/479953-Physlib/topic/Maxwell's.20Equations"
 
 /-- The charge density. -/
 abbrev ChargeDensity := Time → Space → ℝ
 
-/-- Current density. -/
+/-- The current density. -/
 abbrev CurrentDensity := Time → Space → EuclideanSpace ℝ (Fin 3)
 
 namespace EMSystem
