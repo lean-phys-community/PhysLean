@@ -127,5 +127,27 @@ lemma norm_tInclL [Nontrivial E] [Nontrivial F] : ‖(tInclL : E ⊗ F →L[𝕜
   (tInclₗᵢ : E ⊗ F →ₗᵢ[𝕜] E ⊗ₕ F).norm_toContinuousLinearMap
 
 end Coercion
+
+/-!
+## D. Induction principle
+-/
+
+section Induction
+
+variable {𝕜 : Type*} [RCLike 𝕜]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+
+/-- Induction principle for `CompleteTensorProduct` combining those of `Completion`
+  and `TensorProduct`. -/
+@[elab_as_elim]
+lemma induction_on {motive : E ⊗ₕ[𝕜] F → Prop} (z : E ⊗ₕ[𝕜] F)
+    (zero : motive 0) (tmul : ∀ (x : E) (y : F), motive (x ⊗ₜ[𝕜] y))
+    (add : ∀ x y : E ⊗[𝕜] F, motive x → motive y → motive ↑(x + y))
+    (closed : IsClosed {x | motive x}) : motive z :=
+  Completion.induction_on z closed fun x ↦ x.induction_on zero tmul add
+
+end Induction
+
 end CompleteTensorProduct
 end
