@@ -44,8 +44,9 @@ and prove that `⊗ₕ` is commutative and associative (up to linear isometric e
 - A. Definition
 - B. Nontrivial
 - C. Coercions
-- D. Commutative
-- E. Associative
+- D. Induction principle
+- E. Commutative
+- F. Associative
 
 ## iv. References
 
@@ -184,7 +185,7 @@ lemma induction_on {motive : E ⊗ₕ[𝕜] F → Prop} (z : E ⊗ₕ[𝕜] F)
 end Induction
 
 /-!
-## D. Commutative
+## E. Commutative
 -/
 
 section Commutative
@@ -206,7 +207,7 @@ lemma comm_coe (x : E ⊗[𝕜] F) : comm 𝕜 E F x = TensorProduct.comm 𝕜 E
 end Commutative
 
 /-!
-## E. Associative
+## F. Associative
 -/
 
 section Associative
