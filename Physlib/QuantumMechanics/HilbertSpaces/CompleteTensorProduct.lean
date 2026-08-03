@@ -8,6 +8,7 @@ module
 public import Mathlib.Analysis.InnerProductSpace.Completion
 public import Mathlib.Analysis.InnerProductSpace.TensorProduct
 public import Mathlib.Analysis.Normed.Operator.Extend
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Complete tensor product
@@ -260,8 +261,23 @@ def assoc : E ⊗ₕ[𝕜] F ⊗ₕ[𝕜] G ≃ₗᵢ[𝕜] E ⊗ₕ[𝕜] (F �
       exact TensorProduct.denseRange_map denseRange_id denseRange_coe)
     fun _ ↦ by simp only [LinearIsometry.norm_map', TensorProduct.norm_assoc]
 
+TODO "Prove CompleteTensorProduct.assoc acting on elements of the tensor product
+  reduces to TensorProduct.assoc. It may be worthwhile to extract and name the linear isometries
+  (tInclₗᵢ.comp (tInclₗᵢ.rTensor G) : E ⊗[𝕜] F ⊗[𝕜] G →ₗᵢ[𝕜] E ⊗ₕ[𝕜] F ⊗ₕ[𝕜] G) and
+  (tInclₗᵢ.comp (tInclₗᵢ.lTensor E) : E ⊗[𝕜] (F ⊗[𝕜] G) →ₗᵢ[𝕜] E ⊗ₕ[𝕜] (F ⊗ₕ[𝕜] G))
+  which embed 3-fold tensor products into their completion."
+
 end Associative
 
+TODO "Define LinearPMap.lTensor/rTensor, TensorProduct.mapP (P = 'partial'?) for the tensor product.
+  See LinearMap/LinearEquiv/ContinuousLinearMap/LinearIsometry/LinearIsometryEquiv.lTensor/rTensor
+  and TensorProduct.map/congr/mapL/mapIsometry/congrIsometry for the desired pattern. The tensor
+  product of two LinearPMaps f and g is the canonical LinearPMap with domain f.domain ⊗ g.domain."
+
+TODO "Define CompleteTensorProduct.mapLₕ/mapPₕ/etc. (or a different naming scheme) which take pairs
+  of continuous/partial/etc. maps or congruences and construct the corresponding map/congruence
+  on complete tensor products (using, for example, ContinuousLinearMap.extend with tInclL).
+  c.f. TensorProduct.map/congr/mapL/mapIsometry/congrIsometry."
 
 end CompleteTensorProduct
 end
