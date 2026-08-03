@@ -149,5 +149,32 @@ lemma induction_on {motive : E ⊗ₕ[𝕜] F → Prop} (z : E ⊗ₕ[𝕜] F)
 
 end Induction
 
+/-!
+## D. Commutative
+-/
+
+section Commutative
+
+variable (𝕜 : Type*) [RCLike 𝕜]
+variable (E : Type*) [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+
+/-- The complete tensor product of inner product spaces is commutative,
+  up to linear isometry equivalence. -/
+def comm : E ⊗ₕ[𝕜] F ≃ₗᵢ[𝕜] F ⊗ₕ[𝕜] E :=
+  (TensorProduct.comm 𝕜 E F).extendOfIsometry tInclₗᵢ.toLinearMap tInclₗᵢ.toLinearMap
+    denseRange_coe denseRange_coe (by simp)
+
+@[simp]
+lemma comm_symm : (comm 𝕜 E F).symm = comm 𝕜 F E := rfl
+
+variable {𝕜 E F} in
+@[simp]
+lemma comm_coe (x : E ⊗[𝕜] F) : comm 𝕜 E F x = TensorProduct.comm 𝕜 E F x :=
+  LinearEquiv.extendOfIsometry_eq _ _ _ _ _ _ _
+
+end Commutative
+
+
 end CompleteTensorProduct
 end
