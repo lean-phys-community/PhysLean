@@ -113,7 +113,7 @@ section Coercion
 
 variable {𝕜 E F} (c : 𝕜) (x y : E ⊗[𝕜] F)
 
-/-- The canoncial embedding of the tensor product into its completion. -/
+/-- The canonical embedding of the tensor product into its completion. -/
 @[coe]
 def coe' : E ⊗[𝕜] F → E ⊗ₕ[𝕜] F := Completion.coe'
 
