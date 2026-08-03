@@ -113,7 +113,7 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
 variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
 variable (c : 𝕜) (x y : E ⊗[𝕜] F)
 
-/-- The map from the tensor product to its completion. -/
+/-- The canoncial embedding of the tensor product into its completion. -/
 @[coe]
 def coe' : E ⊗[𝕜] F → E ⊗ₕ[𝕜] F := Completion.coe'
 
@@ -175,7 +175,7 @@ variable {𝕜 : Type*} [RCLike 𝕜]
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
 variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
 
-/-- Induction principle for `CompleteTensorProduct` combining those of `Completion`
+/-- An induction principle for `CompleteTensorProduct` combining those of `Completion`
   and `TensorProduct`. -/
 @[elab_as_elim]
 lemma induction_on {motive : E ⊗ₕ[𝕜] F → Prop} (z : E ⊗ₕ[𝕜] F)
@@ -197,7 +197,7 @@ variable (E : Type*) [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
 variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
 
 /-- The complete tensor product of inner product spaces is commutative,
-  up to linear isometry equivalence. -/
+  up to linear isometric equivalence. -/
 def comm : E ⊗ₕ[𝕜] F ≃ₗᵢ[𝕜] F ⊗ₕ[𝕜] E :=
   (TensorProduct.comm 𝕜 E F).extendOfIsometry tInclₗᵢ.toLinearMap tInclₗᵢ.toLinearMap
     denseRange_coe denseRange_coe (by simp)
@@ -218,12 +218,13 @@ end Commutative
 
 section Associative
 
+/-- The tensor product of a pair of linear maps with dense range also has dense range. -/
 lemma _root_.TensorProduct.denseRange_map
-    {R 𝕜 : Type*} [CommSemiring R] [RCLike 𝕜] {σ₁₂ : R →+* 𝕜} [RingHomSurjective σ₁₂]
-    {E : Type*} [AddCommMonoid E] [Module R E] {F : Type*} [AddCommMonoid F] [Module R F]
-    {G : Type*} [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]
-    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace 𝕜 H]
-    {f : E →ₛₗ[σ₁₂] G} (hf : DenseRange f) {g : F →ₛₗ[σ₁₂] H} (hg : DenseRange g) :
+    {R 𝕜 : Type*} [CommSemiring R] [RCLike 𝕜] {σ : R →+* 𝕜} [RingHomSurjective σ]
+    {M : Type*} [AddCommMonoid M] [Module R M] {N : Type*} [AddCommMonoid N] [Module R N]
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+    {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+    {f : M →ₛₗ[σ] E} (hf : DenseRange f) {g : N →ₛₗ[σ] F} (hg : DenseRange g) :
     DenseRange (TensorProduct.map f g) := by
   intro x
   change x ∈ (TensorProduct.map f g).range.topologicalClosure
@@ -247,7 +248,7 @@ variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
 variable (G : Type*) [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]
 
 /-- The compete tensor product of inner product spaces is associative,
-  up to linear isometry equivalence. -/
+  up to linear isometric equivalence. -/
 def assoc : E ⊗ₕ[𝕜] F ⊗ₕ[𝕜] G ≃ₗᵢ[𝕜] E ⊗ₕ[𝕜] (F ⊗ₕ[𝕜] G) :=
   (TensorProduct.assoc 𝕜 E F G).extendOfIsometry
     (tInclₗᵢ.comp (tInclₗᵢ.rTensor G)).toLinearMap (tInclₗᵢ.comp (tInclₗᵢ.lTensor E)).toLinearMap
