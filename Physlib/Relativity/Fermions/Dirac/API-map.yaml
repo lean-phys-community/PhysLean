@@ -1,0 +1,91 @@
+version: v0.1
+
+Title: "Dirac Fermions"
+
+Overview: |
+  A Dirac fermion is the four-component spinor built from a left-handed Weyl
+  fermion together with a dual right-handed one. The key data structure is the
+  structure `Dirac`, which carries a module structure over ℂ, the chiral basis
+  indexed by `Fin 4`, and the representation of SL(2, ℂ) induced from the two
+  Weyl factors. Alongside it sit the gamma matrices in the Dirac
+  representation, which generate the Dirac algebra and realize it as a
+  quotient of the Clifford algebra of the Minkowski quadratic form. Note that
+  the gamma matrices are written in the Dirac representation while `Dirac`
+  itself is presented in the chiral basis; the change of basis between the two
+  is not yet in the library, which is why the gamma action on `Dirac` is
+  recorded below as still to be built. Completing this API is what allows the
+  Dirac equation, the Dirac bilinears, and the fermionic terms of the Standard
+  Model Lagrangian to be stated.
+
+ParentAPIs:
+  - "Weyl Fermions (Physlib/Relativity/Fermions/Weyl)"
+  - "Lorentz Group (Physlib/Relativity/LorentzGroup)"
+
+References:
+  - "Dreiner, Haber and Martin, Two-component spinor techniques and Feynman rules for quantum field theory and supersymmetry, Phys. Rept. 494 (2010) 1-196. https://arxiv.org/abs/0812.1594 (Dirac fermions are treated on page 197 of the arXiv version)"
+
+Requirements:
+
+  - description: "The key data structure `Dirac` is defined, as a left-handed Weyl fermion together with a dual right-handed one."
+    done: true
+    location: Physlib/Relativity/Fermions/Dirac/Basic.lean (Dirac)
+
+  - description: "`Dirac` carries a module structure over ℂ, inherited from its two Weyl components."
+    done: true
+    location: Physlib/Relativity/Fermions/Dirac/Basic.lean (AddCommGroup Dirac, Module ℂ Dirac, left_add, dualRight_add, left_smul, dualRight_smul)
+
+  - description: "The decomposition of a Dirac fermion into its Weyl components is an equivalence, linear over ℂ."
+    done: true
+    location: Physlib/Relativity/Fermions/Dirac/Basic.lean (decomposeEquiv, decomposeLinEquiv)
+
+  - description: "The chiral basis of `Dirac` indexed by `Fin 4` is defined, and its elements are identified with the Weyl basis elements."
+    done: true
+    location: Physlib/Relativity/Fermions/Dirac/Basic.lean (chiralBasis, chiralBasis_cast_add, chiralBasis_nat_add)
+
+  - description: "`Dirac` carries a representation of SL(2, ℂ), acting componentwise on the two Weyl factors."
+    done: true
+    location: Physlib/Relativity/Fermions/Dirac/Basic.lean (rep, rep_apply_mk)
+
+  - description: "The representation on `Dirac` is equivalent to the product of the representations on its Weyl components."
+    done: true
+    location: Physlib/Relativity/Fermions/Dirac/Basic.lean (decomposeRepEquiv)
+
+  - description: "The gamma matrices in the Dirac representation are defined, together with the chirality matrix and the set they form."
+    done: true
+    location: Physlib/Relativity/CliffordAlgebra.lean (γ0, γ1, γ2, γ3, γ5, γ, γSet, γ_in_γSet)
+
+  - description: "The Dirac algebra generated over ℝ by the gamma matrices is defined, and contains each gamma matrix."
+    done: true
+    location: Physlib/Relativity/CliffordAlgebra.lean (diracAlgebra, γSet_subset_diracAlgebra, γ_in_diracAlgebra)
+
+  - description: "The Minkowski quadratic form is defined and the induced algebra map from its Clifford algebra onto the Dirac algebra is surjective."
+    done: true
+    location: Physlib/Relativity/CliffordAlgebra.lean (diracForm, ofCliffordAlgebra, ofCliffordAlgebra_ι_single, ofCliffordAlgebra_range_eq_top, ofCliffordAlgebra_surjective)
+
+  - description: "The API shall contain the isomorphism between the Clifford algebra of `diracForm` and `diracAlgebra` (blocked: needs injectivity of `ofCliffordAlgebra`, which requires dimension theory; recorded as a TODO in the source)."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain the action of the gamma matrices on `Dirac` as linear maps (blocked: `γ0`--`γ3` are given in the Dirac representation while `chiralBasis` is the chiral basis, so this needs the change of basis between the two to be fixed first)."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain the chiral projectors onto the left-handed and dual right-handed components, and their Lorentz equivariance."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain the Dirac adjoint of a Dirac fermion."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain the Dirac bilinears, and their transformation behaviour under the SL(2, ℂ) action."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain the Dirac equation for a spinor field on spacetime."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain the charge conjugate of a Dirac fermion, and the Majorana condition."
+    done: false
+    location: N/A
