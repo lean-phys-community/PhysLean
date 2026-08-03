@@ -175,6 +175,57 @@ lemma comm_coe (x : E ⊗[𝕜] F) : comm 𝕜 E F x = TensorProduct.comm 𝕜 E
 
 end Commutative
 
+/-!
+## E. Associative
+-/
+
+section Associative
+
+lemma _root_.TensorProduct.denseRange_map
+    {R 𝕜 : Type*} [CommSemiring R] [RCLike 𝕜] {σ₁₂ : R →+* 𝕜} [RingHomSurjective σ₁₂]
+    {E : Type*} [AddCommMonoid E] [Module R E] {F : Type*} [AddCommMonoid F] [Module R F]
+    {G : Type*} [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace 𝕜 H]
+    {f : E →ₛₗ[σ₁₂] G} (hf : DenseRange f) {g : F →ₛₗ[σ₁₂] H} (hg : DenseRange g) :
+    DenseRange (TensorProduct.map f g) := by
+  intro x
+  change x ∈ (TensorProduct.map f g).range.topologicalClosure
+  refine x.induction_on (Submodule.zero_mem _) (fun a b ↦ ?_) (fun _ _ ↦ Submodule.add_mem _)
+  refine map_mem_closure₂' (fun u ↦ ?_) (fun v ↦ ?_) (hf a) (hg b) ?_
+  · refine Metric.continuous_iff.mpr fun v ε hε ↦ ⟨ε / (1 + ‖u‖), by positivity, fun s hs ↦ ?_⟩
+    rw [dist_eq_norm, ← TensorProduct.tmul_sub, TensorProduct.norm_tmul] at *
+    refine lt_of_le_of_lt (b := (1 + ‖u‖) * ‖s - v‖) ?_ ?_
+    · exact mul_le_mul_of_nonneg_right (by norm_num) (norm_nonneg _)
+    · exact (lt_div_iff₀' <| by positivity).mp hs
+  · refine Metric.continuous_iff.mpr fun u ε hε ↦ ⟨ε / (1 + ‖v‖), by positivity, fun s hs ↦ ?_⟩
+    rw [dist_eq_norm, ← TensorProduct.sub_tmul, TensorProduct.norm_tmul] at *
+    refine lt_of_le_of_lt (b := ‖s - u‖ * (1 + ‖v‖)) ?_ ?_
+    · exact mul_le_mul_of_nonneg_left (by norm_num) (norm_nonneg _)
+    · exact (lt_div_iff₀ <| by positivity).mp hs
+  · exact fun _ ⟨u, hu⟩ _ ⟨v, hv⟩ ↦ ⟨u ⊗ₜ v, by simp [hu, hv]⟩
+
+variable (𝕜 : Type*) [RCLike 𝕜]
+variable (E : Type*) [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+variable (G : Type*) [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]
+
+/-- The compete tensor product of inner product spaces is associative,
+  up to linear isometry equivalence. -/
+def assoc : E ⊗ₕ[𝕜] F ⊗ₕ[𝕜] G ≃ₗᵢ[𝕜] E ⊗ₕ[𝕜] (F ⊗ₕ[𝕜] G) :=
+  (TensorProduct.assoc 𝕜 E F G).extendOfIsometry
+    (tInclₗᵢ.comp (tInclₗᵢ.rTensor G)).toLinearMap (tInclₗᵢ.comp (tInclₗᵢ.lTensor E)).toLinearMap
+    (by
+      rw [LinearIsometry.coe_toLinearMap, LinearIsometry.coe_comp]
+      refine DenseRange.comp denseRange_coe ?_ tInclₗᵢ.continuous
+      exact TensorProduct.denseRange_map denseRange_coe denseRange_id)
+    (by
+      rw [LinearIsometry.coe_toLinearMap, LinearIsometry.coe_comp]
+      refine DenseRange.comp denseRange_coe ?_ tInclₗᵢ.continuous
+      exact TensorProduct.denseRange_map denseRange_id denseRange_coe)
+    fun _ ↦ by simp only [LinearIsometry.norm_map', TensorProduct.norm_assoc]
+
+end Associative
+
 
 end CompleteTensorProduct
 end
