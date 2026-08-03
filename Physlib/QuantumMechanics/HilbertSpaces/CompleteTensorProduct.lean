@@ -64,5 +64,68 @@ instance instNontrivial : Nontrivial (E ⊗ₕ[𝕜] F) where
     exact ⟨Completion.coe' x, 0, fun h ↦ hx <| Completion.coe_eq_zero_iff.mp h⟩
 
 end Nontrivial
+
+/-!
+## C. Coercions
+-/
+
+section Coercion
+
+variable {𝕜 : Type*} [RCLike 𝕜]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+variable (c : 𝕜) (x y : E ⊗[𝕜] F)
+
+/-- The map from the tensor product to its completion. -/
+@[coe]
+def coe' : E ⊗[𝕜] F → E ⊗ₕ[𝕜] F := Completion.coe'
+
+/-- Coercion from `E ⊗[𝕜] F` to its completion. -/
+instance : Coe (E ⊗[𝕜] F) (E ⊗ₕ[𝕜] F) := ⟨coe'⟩
+
+lemma denseRange_coe : DenseRange (coe' : E ⊗[𝕜] F → E ⊗ₕ[𝕜] F) := Completion.denseRange_coe
+
+@[norm_cast]
+lemma coe_zero : (0 : E ⊗[𝕜] F) = (0 : E ⊗ₕ[𝕜] F) := rfl
+
+variable {x} in
+@[simp]
+lemma coe_eq_zero_iff : (x : E ⊗ₕ[𝕜] F) = 0 ↔ x = 0 := Completion.coe_eq_zero_iff
+
+@[norm_cast]
+lemma coe_neg : (-x : E ⊗[𝕜] F) = (-x : E ⊗ₕ[𝕜] F) := Completion.coe_neg _
+
+@[norm_cast]
+lemma coe_sub : (x - y : E ⊗[𝕜] F) = (x - y : E ⊗ₕ[𝕜] F) := Completion.coe_sub _ _
+
+@[norm_cast]
+lemma coe_add : (x + y : E ⊗[𝕜] F) = (x + y : E ⊗ₕ[𝕜] F) := Completion.coe_add _ _
+
+@[simp, norm_cast]
+lemma coe_smul : (c • x : E ⊗[𝕜] F) = (c • x : E ⊗ₕ[𝕜] F) := Completion.coe_smul _ _
+
+@[simp]
+lemma inner_coe : ⟪(x : E ⊗ₕ[𝕜] F), (y : E ⊗ₕ[𝕜] F)⟫_𝕜 = ⟪x, y⟫_𝕜 := Completion.inner_coe _ _
+
+@[simp]
+lemma norm_coe : ‖(x : E ⊗ₕ[𝕜] F)‖ = ‖x‖ := Completion.norm_coe _
+
+/-- The canonical embedding of the tensor product into its completion as a linear isometry. -/
+def tInclₗᵢ : E ⊗[𝕜] F →ₗᵢ[𝕜] E ⊗ₕ[𝕜] F := Completion.toComplₗᵢ
+
+@[simp]
+lemma coe_tInclₗᵢ : ⇑(tInclₗᵢ : E ⊗ F →ₗᵢ[𝕜] E ⊗ₕ F) = coe' := rfl
+
+/-- The canonical embedding of the tensor product into its completion as a continuous linear map. -/
+def tInclL : E ⊗[𝕜] F →L[𝕜] E ⊗ₕ[𝕜] F := tInclₗᵢ.toContinuousLinearMap
+
+@[simp]
+lemma coe_tInclL : ⇑(tInclL : E ⊗ F →L[𝕜] E ⊗ₕ F) = coe' := rfl
+
+@[simp]
+lemma norm_tInclL [Nontrivial E] [Nontrivial F] : ‖(tInclL : E ⊗ F →L[𝕜] E ⊗ₕ F)‖ = 1 :=
+  (tInclₗᵢ : E ⊗ F →ₗᵢ[𝕜] E ⊗ₕ F).norm_toContinuousLinearMap
+
+end Coercion
 end CompleteTensorProduct
 end
