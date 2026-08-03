@@ -27,8 +27,8 @@ This module proves the four differential equations:
 
 ## A.2. Relation to the covariant formulation
 
-The electric and magnetic fields are obtained from an electromagnetic potential. Gauss's electric
-law and Ampère's law are derived from the covariant extremality condition `IsExtrema`, while the two
+The electric and magnetic fields are obtained from an electromagnetic potential. Gauss's law for the
+electric field and Ampère's law are derived from the covariant extremality condition `IsExtrema`, while the two
 homogeneous equations follow from the potential definitions and smoothness assumptions. The results
 therefore connect the tensorial backend to the standard three-dimensional presentation.
 
