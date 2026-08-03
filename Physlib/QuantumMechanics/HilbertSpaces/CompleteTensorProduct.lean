@@ -12,6 +12,42 @@ public import Mathlib.Analysis.Normed.Operator.Extend
 
 # Complete tensor product
 
+## i. Overview
+
+Given two inner product spaces `E` and `F` over `𝕜`, their tensor product `E ⊗[𝕜] F` consists
+of finite sums of simple (a.k.a. pure) tensors `m ⊗ₜ[𝕜] n`. This tensor product is again an inner
+product space with inner product defined by `⟪m ⊗ₜ n, m' ⊗ₜ n'⟫_𝕜 = ⟪m, m'⟫_𝕜 * ⟪n, n'⟫_𝕜`
+on simple tensors and then extended by linearity (c.f. `TensorProduct.instInnerProductSpace`).
+
+However, in general this procedure does not result in a Hilbert space: Cauchy sequences need not
+converge because the tensor product does not contain any _infinite_ sums of simple tensors.
+In order to obtain a Hilbert space for use in quantum mechanics, we must _add in_ the limits
+of Cauchy sequences by taking the completion.
+
+In this module we define the complete tensor product,
+`CompleteTensorProduct 𝕜 E F := Completion (E ⊗[𝕜] F)` with notation `E ⊗ₕ[𝕜] F` and `E ⊗ₕ F`,
+provide some basic properties for the maps which embed `E ⊗[𝕜] F` into `E ⊗ₕ[𝕜] F`
+and prove that `⊗ₕ` is commutative and associative (up to linear isometric equivalence).
+
+## ii. Key results
+
+- `CompleteTensorProduct 𝕜 E F` (notation `E ⊗ₕ[𝕜] F` and `E ⊗ₕ F`) :
+    The _completion_ of the tensor product of a pair of inner product spaces `E` and `F` over `𝕜`.
+- `CompleteTensorProduct.comm 𝕜 E F` : The linear isometric equivalence between
+    `E ⊗ₕ[𝕜] F` and `F ⊗ₕ[𝕜] E`.
+- `CompleteTensorProduct.assoc 𝕜 E F G` : The linear isometric equivalence between
+    `E ⊗ₕ[𝕜] F ⊗ₕ[𝕜] G` and `E ⊗ₕ[𝕜] (F ⊗ₕ[𝕜] G)`.
+
+## iii. Table of contents
+
+- A. Definition
+- B. Nontrivial
+- C. Coercions
+- D. Commutative
+- E. Associative
+
+## iv. References
+
 -/
 
 @[expose] public section
