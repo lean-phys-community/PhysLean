@@ -79,15 +79,17 @@ notation:100 E:100 " ⊗ₕ[" 𝕜 "] " F:101 => CompleteTensorProduct 𝕜 E F
 
 namespace CompleteTensorProduct
 
+variable (𝕜 : Type*) [RCLike 𝕜]
+variable (E : Type*) [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+
 /-!
 ## B. Nontrivial
 -/
 
 section Nontrivial
 
-variable (𝕜 : Type*) [RCLike 𝕜]
-variable (E : Type*) [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [Nontrivial E]
-variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F] [Nontrivial F]
+variable [Nontrivial E] [Nontrivial F]
 
 instance _root_.TensorProduct.instNontrivial : Nontrivial (E ⊗[𝕜] F) where
   exists_pair_ne := by
@@ -108,10 +110,7 @@ end Nontrivial
 
 section Coercion
 
-variable {𝕜 : Type*} [RCLike 𝕜]
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
-variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
-variable (c : 𝕜) (x y : E ⊗[𝕜] F)
+variable {𝕜 E F} (c : 𝕜) (x y : E ⊗[𝕜] F)
 
 /-- The canoncial embedding of the tensor product into its completion. -/
 @[coe]
@@ -171,9 +170,7 @@ end Coercion
 
 section Induction
 
-variable {𝕜 : Type*} [RCLike 𝕜]
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
-variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+variable {𝕜 E F}
 
 /-- An induction principle for `CompleteTensorProduct` combining those of `Completion`
   and `TensorProduct`. -/
@@ -191,10 +188,6 @@ end Induction
 -/
 
 section Commutative
-
-variable (𝕜 : Type*) [RCLike 𝕜]
-variable (E : Type*) [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
-variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
 
 /-- The complete tensor product of inner product spaces is commutative,
   up to linear isometric equivalence. -/
@@ -242,9 +235,6 @@ lemma _root_.TensorProduct.denseRange_map
     · exact (lt_div_iff₀ <| by positivity).mp hs
   · exact fun _ ⟨u, hu⟩ _ ⟨v, hv⟩ ↦ ⟨u ⊗ₜ v, by simp [hu, hv]⟩
 
-variable (𝕜 : Type*) [RCLike 𝕜]
-variable (E : Type*) [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
-variable (F : Type*) [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
 variable (G : Type*) [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]
 
 /-- The compete tensor product of inner product spaces is associative,
