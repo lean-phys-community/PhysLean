@@ -30,6 +30,7 @@ permutation via `Matrix.det_permutation`.
 - `leviCivitaSymbol_id` : the normalization `ε_{0 1 ⋯ (d-1)} = 1`.
 - `leviCivitaSymbol_perm` : on a permutation `σ` the symbol is the sign of `σ`.
 - `leviCivitaSymbol_comp_swap` : antisymmetry under transposition of two indices.
+- `leviCivitaSymbol_swap_comp` : antisymmetry under transposition of two index values.
 - `leviCivitaSymbol_eq_zero_iff` : the symbol vanishes exactly on repeated indices.
 
 ## iii. Table of contents
@@ -107,6 +108,18 @@ precomposing with the swap of two distinct index positions negates it. -/
 lemma leviCivitaSymbol_comp_swap (g : ι → ι) {i j : ι} (hij : i ≠ j) :
     leviCivitaSymbol (g ∘ Equiv.swap i j) = - leviCivitaSymbol g :=
   generalizedKroneckerDelta_swap g id hij
+
+/-- The Levi-Civita symbol is antisymmetric under transposition of two index values:
+postcomposing with the swap of two distinct values exchanges those two values wherever
+they occur and negates it. -/
+lemma leviCivitaSymbol_swap_comp (g : ι → ι) {i j : ι} (hij : i ≠ j) :
+    leviCivitaSymbol (Equiv.swap i j ∘ g) = - leviCivitaSymbol g := by
+  have h : (fun a b => ((kroneckerDelta ((Equiv.swap i j ∘ g) a) b : ℕ) : ℤ))
+      = Matrix.submatrix (fun a b => ((kroneckerDelta (g a) b : ℕ) : ℤ)) id (Equiv.swap i j) :=
+    funext fun a => funext fun b => by simp [kroneckerDelta, Equiv.swap_apply_eq_iff]
+  rw [leviCivitaSymbol_eq_det, h, Matrix.det_permute', Equiv.Perm.sign_swap hij,
+    ← leviCivitaSymbol_eq_det]
+  simp
 
 /-!
 
