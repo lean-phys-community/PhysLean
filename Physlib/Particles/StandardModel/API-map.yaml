@@ -1,0 +1,160 @@
+version: v0.1
+
+Title: Standard model
+
+Overview: |
+    The Standard Model is our current best theory of everything, containing all of the fermions that
+    we know to exist, the Higgs boson, and the gauge bosons that contribute to the forces that we have
+    in the world. This API covers the Standard Model, the fermions, the potentials, and everything
+    else that goes into it.
+
+ParentAPIs:
+
+References: ["https://arxiv.org/pdf/1008.4884"]
+
+Requirements:
+
+## Gauge group
+
+  - description: |
+      Define the Z_3 subgroup of the SM gauge group corresponding to
+      the center of SU(3). This is sometimes called the triality group.
+    done: false
+    location: N/A
+
+  - description: |
+      Define the Z_2 subgroup of the SM gauge group corresponding to
+      the center of SU(2).
+    done: false
+    location: N/A
+
+## Fermions
+
+  - description: |
+      The definition of Quark doublets sitting in the (3, 2)_{1} (left-handed)
+      representation of the SM gauge group. The representations used here have there hypercharge
+      scaled to be integers, so the hypercharge of the quark doublet is 1 instead of 1/6.
+    done: true
+    location: "Physlib/Particles/StandardModel/Fermions/QuarkDoublet.lean (QuarkDoublet)"
+
+  - description: |
+      The definition of up-type singlets sitting in the (3, 1)_{4} (right-handed)
+      representation of the SM gauge group.
+    done: false
+    location: N/A
+
+  - description: |
+      The definition of down-type singlets sitting in the (3, 1)_{-2} (right-handed)
+      representation of the SM gauge group.
+    done: false
+    location: N/A
+
+  - description: |
+      The definition of lepton doublets sitting in the (1, 2)_{-3} (left-handed)
+      representation of the SM gauge group.
+    done: false
+    location: N/A
+
+  - description: |
+      The definition of lepton singlets sitting in the (1, 1)_{-6} (right-handed)
+      representation of the SM gauge group."
+    done: false
+    location: N/A
+
+## Higgs boson
+
+  - description: |
+      The definition of the Higgs boson sitting in the (1, 2)_{3} representation
+      of the SM gauge group.
+    done: false
+    location: N/A
+
+  - description: |
+      The trivial representation of the Lorentz group acting on the Higgs boson.
+    done: false
+    location: N/A
+
+  - description: |
+      The effective potential of the Higgs boson, defined as a symmetric algebra
+      over the dual of the Higgs boson and its conjugate.
+    done: false
+    location: N/A
+
+## The effective potential
+
+  - description: |
+      The definition of the type corresponding to the effective potential of the Standard model
+      including the fermions and the Higgs boson, excluding derivatives. For fermions
+      they contribute via an exterior algebra, and for the Higgs boson they contribute
+      via the symmetric algebra. This should be called `EffectivePotentialExclDeriv`.
+    done: false
+    location: N/A
+
+  - description: |
+      The representation of the Lorentz group (really `SL(2, ℂ)` here) on the
+      effective potential.
+    done: false
+    location: N/A
+
+  - description: |
+      The representation of the Standard Model gauge group on the effective potential.
+    done: false
+    location: N/A
+
+  - description: |
+      The definition of an SU(3)-multi-degree on terms in the effective potential.
+      This should be defined such that every independent representation of SU(3)
+      has its own degree.
+    done: false
+    location: N/A
+
+  - description: "The definition of the mass dimension on the effective potential."
+    done: false
+    location: N/A
+
+  - description: |
+      Effective potential: Show that the effective potential
+      can be separated into the direct sum of submodules based on
+      multi-degree, such that each independent field and separately its dual
+      has associated with it its own degree.
+    done: false
+    location: N/A
+
+  - description: |
+      Effective potential: Show that the multi-degree submodules are closed
+      under the action of the Lorentz group and the SM gauge group.
+    done: false
+    location: N/A
+
+  - description: |
+      Effective potential: Show that each multi-degree submodule has
+      a fixed hyper-charge, write a computable function to evaluate it, and
+      consequently, show that only those submodules with hyper-charge 0
+      can be used to construct an invariant potential. This can be thought
+      of as a selection rule.
+    done: false
+    location: N/A
+
+  - description: |
+      Effective potential: Show that each multi-degree submodule has
+      a fixed triality, write a computable function to evaluate it, and
+      consequently, show that only those submodules with triality 0
+      can be used to construct an invariant potential. This can be thought
+      of as a selection rule, which relates to the number of quarks in a term in the potential.
+    done: false
+    location: N/A
+
+  - description: |
+      Effective potential: Show that each multi-degree submodule has
+      a fixed charge under the SU(2)-center, write a computable function to evaluate it, and
+      consequently, show that only those submodules with charge 0 under the SU(2)-center
+      can be used to construct an invariant potential. This can be thought
+      of as a selection rule, which relates to the number of doublets in a term in the potential.
+    done: false
+    location: N/A
+
+  - description: |
+      The proof that up to mass dimension 4, the effective potential gives us the
+      Yukawa sector of the Standard Model.
+    done: false
+    location: N/A
