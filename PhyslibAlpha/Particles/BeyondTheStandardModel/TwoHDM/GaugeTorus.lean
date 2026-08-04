@@ -53,8 +53,9 @@ lemma gaugeCartan_toSU2_coe (a : unitary ℂ) :
 
 /-- The Cartan element acts as the diagonal matrix `diag(a, ā)`. -/
 lemma gaugeCartan_smul_eq (a : unitary ℂ) (φ : HiggsVec) :
-    gaugeCartan a • φ = WithLp.toLp 2 (!![(a : ℂ), 0; 0, (star a : ℂ)] *ᵥ φ.ofLp) := by
-  rw [HiggsVec.gaugeGroupI_smul_eq, gaugeCartan_toU1, one_pow, one_smul, gaugeCartan_toSU2_coe]
+    HiggsVec.repGaugeGroupI (gaugeCartan a) φ =
+      WithLp.toLp 2 (!![(a : ℂ), 0; 0, (star a : ℂ)] *ᵥ φ.ofLp) := by
+  rw [HiggsVec.repGaugeGroupI_apply, gaugeCartan_toU1, one_pow, one_smul, gaugeCartan_toSU2_coe]
 
 end GaugeGroupI
 end StandardModel

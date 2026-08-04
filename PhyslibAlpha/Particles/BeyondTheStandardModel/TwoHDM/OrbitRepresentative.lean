@@ -113,10 +113,10 @@ lemma exists_smul_eq_repHiggs (φ : TwoHiggsDoublet) :
   by_cases h : φ.Φ1 = 0
   · refine ⟨![0, ‖φ.Φ2‖, 0, 0], HiggsVec.toRealGroupElem φ.Φ2, ?_⟩
     ext1
-    · rw [gaugeGroupI_smul_fst, h, smul_zero, repHiggs_Φ1]
+    · rw [gaugeGroupI_smul_fst, h, map_zero, repHiggs_Φ1]
       ext i
       fin_cases i <;> simp
-    · rw [gaugeGroupI_smul_snd, HiggsVec.toRealGroupElem_smul_self, repHiggs_Φ2,
+    · rw [gaugeGroupI_smul_snd, HiggsVec.toRealGroupElem_apply_self, repHiggs_Φ2,
         HiggsVec.ofReal]
       ext i
       fin_cases i <;> simp [Real.sqrt_sq, norm_nonneg]
