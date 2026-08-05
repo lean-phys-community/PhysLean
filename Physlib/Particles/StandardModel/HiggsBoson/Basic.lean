@@ -225,23 +225,13 @@ lemma repGaugeGroupI_mul_apply (g₁ g₂ : StandardModel.GaugeGroupI) (φ : Hig
     repGaugeGroupI (g₁ * g₂) φ = repGaugeGroupI g₁ (repGaugeGroupI g₂ φ) := by
   rw [map_mul, Module.End.mul_apply]
 
-@[simp]
-lemma repGaugeGroupI_inv_apply_apply (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
-    repGaugeGroupI g⁻¹ (repGaugeGroupI g φ) = φ := by
-  rw [← repGaugeGroupI_mul_apply, inv_mul_cancel, map_one, Module.End.one_apply]
-
-@[simp]
-lemma repGaugeGroupI_apply_inv_apply (g : StandardModel.GaugeGroupI) (φ : HiggsVec) :
-    repGaugeGroupI g (repGaugeGroupI g⁻¹ φ) = φ := by
-  rw [← repGaugeGroupI_mul_apply, mul_inv_cancel, map_one, Module.End.one_apply]
-
 lemma repGaugeGroupI_inv_apply_eq_iff (g : StandardModel.GaugeGroupI) (φ ψ : HiggsVec) :
     repGaugeGroupI g⁻¹ φ = ψ ↔ φ = repGaugeGroupI g ψ := by
   constructor
   · rintro rfl
-    rw [repGaugeGroupI_apply_inv_apply]
+    rw [Representation.self_inv_apply]
   · rintro rfl
-    rw [repGaugeGroupI_inv_apply_apply]
+    rw [Representation.inv_self_apply]
 
 /-!
 
