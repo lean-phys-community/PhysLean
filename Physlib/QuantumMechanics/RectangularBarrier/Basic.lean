@@ -126,9 +126,12 @@ def potentialOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 volume (Complex.ofReal �
 /-- The potential operator for the rectangular barrier is self-adjoint. -/
 lemma potentialOperator_isSelfAdjoint (Q : RectangularBarrier) :
     IsSelfAdjoint Q.potentialOperator := by
-  unfold IsSelfAdjoint; unfold potentialOperator
+  unfold IsSelfAdjoint
+  unfold potentialOperator
   rw [mulOperator_isSelfAdjoint_ofReal]
-  swap; ext x; simp only [Function.comp_apply, Complex.conj_ofReal]
+  swap
+  ext x
+  simp only [Function.comp_apply, Complex.conj_ofReal]
   have hQ := potentialFunction_aestronglyMeasurable
   fun_prop
 
