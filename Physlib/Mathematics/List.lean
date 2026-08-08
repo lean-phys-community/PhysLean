@@ -20,7 +20,7 @@ open Fin
 open Physlib
 variable {n : Nat}
 
-lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
+lemma takeWhile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     (l : List I) → (i : ℕ) → (hi : ∀ (i j : Fin l.length), i < j → P (l.get j) → P (l.get i)) →
     List.takeWhile P (List.eraseIdx l i) = (List.takeWhile P l).eraseIdx i
   | [], _, h => by
@@ -44,7 +44,7 @@ lemma takeWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
     by_cases hPa : P a
     · dsimp only [List.takeWhile]
       simp only [hPa, decide_true, List.eraseIdx_cons_succ, List.cons.injEq, true_and]
-      exact takeWile_eraseIdx P (b :: l) n fun i j hij hP => by
+      exact takeWhile_eraseIdx P (b :: l) n fun i j hij hP => by
         simpa using h i.succ j.succ (by simpa using hij) (by simpa using hP)
     · simp [hPa]
 
@@ -257,7 +257,7 @@ lemma orderedInsert_eraseIdx_lt_orderedInsertPos {I : Type} (le1 : I → I → P
   rw [List.eraseIdx_append_of_lt_length]
   · simp only [List.orderedInsert_eq_take_drop]
     congr 1
-    · rw [takeWile_eraseIdx]
+    · rw [takeWhile_eraseIdx]
       exact hr
     · rw [dropWile_eraseIdx]
       simp only [orderedInsertPos, decide_not] at hi
@@ -276,7 +276,7 @@ lemma orderedInsert_eraseIdx_orderedInsertPos_le {I : Type} (le1 : I → I → P
   rw [List.eraseIdx_append_of_length_le]
   · simp only [List.orderedInsert_eq_take_drop]
     congr 1
-    · rw [takeWile_eraseIdx, List.eraseIdx_of_length_le]
+    · rw [takeWhile_eraseIdx, List.eraseIdx_of_length_le]
       simp only [orderedInsertPos, decide_not] at hi
       simp only [decide_not]
       omega
