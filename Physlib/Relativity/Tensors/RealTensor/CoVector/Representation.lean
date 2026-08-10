@@ -30,7 +30,7 @@ namespace Lorentz
 namespace CoVector
 attribute [-simp] Fintype.sum_sum_type
 
-/-- The representation of the Lorentz group on Lorentz vectors. -/
+/-- The representation of the Lorentz group on Lorentz covectors. -/
 def rep {d : ℕ} : Representation ℝ (LorentzGroup d) (CoVector d) where
   toFun Λ := Matrix.toLinAlgEquiv basis (LorentzGroup.transpose Λ⁻¹)
   map_one' := by
