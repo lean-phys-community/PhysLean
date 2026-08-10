@@ -291,8 +291,8 @@ lemma _root_.Option.mem_powerset_iff {x : Option 𝓩} (y : Option 𝓩) :
     y ∈ x.powerset ↔ y.toFinset ⊆ x.toFinset := by
   cases x <;> cases y <;> simp [Option.powerset]
 
-/-- The powerset of a charge . Given a charge `x : Charges`
-  it's powerset is the finite set of all `Charges` which are subsets of `x`. -/
+/-- The powerset of a charge spectrum. Given a charge spectrum `x : ChargeSpectrum 𝓩`
+  its powerset is the finite set of all `ChargeSpectrum 𝓩` which are subsets of `x`. -/
 def powerset (x : ChargeSpectrum 𝓩) : Finset (ChargeSpectrum 𝓩) :=
   (x.qHd.powerset.product <| x.qHu.powerset.product <| x.Q5.powerset.product <|
     x.Q10.powerset).map toProd.symm.toEmbedding

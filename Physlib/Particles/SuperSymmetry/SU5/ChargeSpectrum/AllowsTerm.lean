@@ -96,7 +96,8 @@ potential term via symmetry.
 
 -/
 
-/-- The charges of representations `x : Charges` allow a potential term `T : PotentialTerm`
+/-- The charge spectrum of representations `x : ChargeSpectrum 𝓩` allows a potential term
+`T : PotentialTerm`
 if the zero charge is in the set of charges associated with that potential term. -/
 def AllowsTerm (x : ChargeSpectrum 𝓩) (T : PotentialTerm) : Prop := 0 ∈ ofPotentialTerm x T
 

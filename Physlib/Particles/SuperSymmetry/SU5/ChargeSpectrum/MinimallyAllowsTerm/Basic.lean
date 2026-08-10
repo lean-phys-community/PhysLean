@@ -73,7 +73,7 @@ it allows the term.
 We prove properties of charge spectra which minimally allow potential terms.
 
 -/
-/-- A collection of charges `x : Charges` is said to minimally allow
+/-- A charge spectrum `x : ChargeSpectrum 𝓩` is said to minimally allow
   the potential term `T` if it allows `T` and no strict subset of it allows `T`. -/
 def MinimallyAllowsTerm (x : ChargeSpectrum 𝓩) (T : PotentialTerm) : Prop :=
   ∀ y ∈ x.powerset, y = x ↔ y.AllowsTerm T
