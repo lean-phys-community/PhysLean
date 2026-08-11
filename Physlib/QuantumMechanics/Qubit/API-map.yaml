@@ -7,19 +7,18 @@ Overview: |
     basis of a two-level quantum system. The content specific to qubits is the standard
     single-qubit gates, the controlled version of a unitary with a qubit as control
     register, and the Bloch sphere with its angular parameterization. Qubit states are
-    not built separately: a pure state of a qubit is a ket on `Qubit`, and a general
-    state is a density matrix on `Qubit`. Requirements below that are phrased for a
-    finite dimensional system record constructions defined for an arbitrary finite index
-    type, including the kets, bras and tensor products of this directory. They are
-    recorded here as the ambient theory in which the qubit case sits, obtained by taking
-    the index type to be `Qubit`, and are not claimed as results about `Qubit`. Two
-    modules of this directory, `BlochSphere.lean` and `BargmannInvariant.lean`, are not
+    not built separately: a pure state of a qubit is a ket on `Qubit`, defined for an
+    arbitrary finite index type in `QuantumInfo/States/Pure/Braket.lean`, and a general
+    state is a density matrix on `Qubit`. The ambient theory of a finite dimensional
+    system, in particular density matrices with their evolution, measurements and
+    distinguishability measures, is left to a separate API map. Two modules of the
+    source directory, `BlochSphere.lean` and `BargmannInvariant.lean`, are not
     imported by `QuantumInfo.lean` and so are not built with the library; the two
     requirements that point at them record that.
 
 ParentAPIs:
+  - "Kets and bras of a finite dimensional system (QuantumInfo/States/Pure)"
   - "Mixed states (QuantumInfo/States/Mixed)"
-  - "Unitary operators on quantum states (QuantumInfo/Operators)"
 
 References:
   - "M. A. Nielsen and I. L. Chuang, Quantum Computation and Quantum Information, Chapters 1, 2, 4 and 9"
@@ -35,10 +34,6 @@ Requirements:
   - description: "Kets and bras of a finite dimensional system are defined, carrying coercions to functions and to each other, and the API contains the bra-ket pairing, the normalization condition in both its componentwise and its inner product form, the computational basis states and the uniform superposition."
     done: true
     location: "QuantumInfo/States/Pure/Braket.lean (Ket, Bra, FunLike (Ket d) d ℂ, FunLike (Bra d) d ℂ, Coe (Ket d) (Bra d), Coe (Bra d) (Ket d), FunLike (Bra d) (Ket d) ℂ, dot, Ket.normalized, Ket.basis, uniform_superposition, Braket.dot_self_eq_one)"
-
-  - description: "Density matrices of a finite dimensional system are defined, carrying a coercion to Hermitian matrices and a `Prob` valued inner product of two states, and the API contains expectation values, the spectrum, the maximally mixed state, the embedding of pure states, and the purity together with its characterization of the pure states."
-    done: true
-    location: "QuantumInfo/States/Mixed/MState.lean (MState, Coe (MState d) (HermitianMat d ℂ), Inner Prob (MState d), pure, exp_val, purity, spectrum, uniform, pure_iff_purity_one)"
 
   - description: "The API contains the standard single-qubit gates `Z`, `X`, `Y`, `H`, `S` and `T`, each as an element of the unitary group on `Qubit`."
     done: true
@@ -60,25 +55,13 @@ Requirements:
     done: false
     location: "N/A"
 
-  - description: "The evolution of a state of a finite dimensional system by conjugation with a unitary is defined, with the invariance of the spectrum and of the inner product under that evolution, and the no-cloning theorem."
+  - description: "The product of two systems carries product and entangled kets and the maximally entangled state, so that Bell-type states of a pair of qubits can be written."
     done: true
-    location: "QuantumInfo/Operators/Unitary.lean (MState.uConj, uConj_spectrum_eq, inner_uConj, no_cloning)"
+    location: "QuantumInfo/States/Pure/Braket.lean (Ket.prod, Ket.IsProd, Ket.IsEntangled, Ket.MES, Ket.MES_isEntangled)"
 
-  - description: "The product of two finite dimensional systems carries product and entangled kets, the maximally entangled state, product and separable density matrices, the partial traces, and the fact that a pure state is separable exactly when its ket is a product."
+  - description: "States up to a global phase are defined, as the quotient of kets by the relation of differing by a unit complex number."
     done: true
-    location: "QuantumInfo/States/Pure/Braket.lean (Ket.prod, Ket.IsProd, Ket.IsEntangled, Ket.MES, Ket.MES_isEntangled); QuantumInfo/States/Mixed/MState.lean (MState.prod, IsSeparable, traceLeft, traceRight, pure_separable_iff_IsProd)"
-
-  - description: "States of a finite dimensional system up to a global phase are defined, as the quotient of kets by the relation of differing by a unit complex number, together with the injection of that quotient into density matrices."
-    done: true
-    location: "QuantumInfo/States/Pure/Braket.lean (Ket.PhaseEquiv, KetUpToPhase, KetUpToPhase.mk, KetUpToPhase.lift); QuantumInfo/States/Mixed/MState.lean (pureQ, pureQ_injective, PhaseEquiv_iff_pure_eq)"
-
-  - description: "Positive operator valued measures on a finite dimensional system are defined, with the probability distribution of outcomes on a given state, the channel recording the outcome alongside the state after measurement, and the channel discarding that state and keeping only the outcome."
-    done: true
-    location: "QuantumInfo/Measurements/POVM.lean (POVM, measure, measurementMap, measureDiscard)"
-
-  - description: "The distinguishability of two states of a finite dimensional system is measured by the fidelity and the trace distance, with the upper bound, the symmetry and the equality case of the fidelity, and the expression of the trace distance through the eigenvalues of the difference of the two states."
-    done: true
-    location: "QuantumInfo/States/Mixed/Fidelity.lean (fidelity, fidelity_le_one, fidelity_symm, fidelity_eq_one_iff_self); QuantumInfo/States/Mixed/TraceDistance.lean (TrDistance, eq_abs_eigenvalues)"
+    location: "QuantumInfo/States/Pure/Braket.lean (Ket.PhaseEquiv, KetUpToPhase, KetUpToPhase.mk, KetUpToPhase.lift)"
 
   - description: "The API shall contain the Bloch vector of a state of a qubit, the triple of expectation values of the Pauli gates, and shall show that it is a bijection from states onto the closed unit ball of three-dimensional Euclidean space."
     done: false
