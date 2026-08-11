@@ -707,7 +707,7 @@ end Shifted
 
 -/
 
-lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
+lemma unshifted_unshifted_shifted_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
       (Shifted.basisAsCharges j)
     = g (j.succ) ^ 2 - g (j.castSucc) ^ 2 := by
@@ -724,7 +724,7 @@ lemma P_P_P!_accCube (g : Fin n.succ → ℚ) (j : Fin n) :
     erw [Shifted.basis_on_evenShiftFst_other hkj.symm, Shifted.basis_on_evenShiftSnd_other hkj.symm]
     simp only [mul_zero, add_zero]
 
-lemma P_P!_P!_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
+lemma shifted_shifted_unshifted_accCube (g : Fin n → ℚ) (j : Fin n.succ) :
     accCubeTriLinSymm (Shifted.planeCharges g) (Shifted.planeCharges g) (Unshifted.basisAsCharges j)
     = (Shifted.planeCharges g (evenFst j))^2 - (Shifted.planeCharges g (evenSnd j))^2 := by
   simp only [succ_eq_add_one, accCubeTriLinSymm,
