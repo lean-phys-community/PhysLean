@@ -340,7 +340,7 @@ lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
 
 open Distribution SchwartzMap
 
-/-- Given a distribution (function) `f : Space d →d[ℝ] M` the derivative
+/-- Given a distribution (function) `f : SpaceTime d →d[ℝ] M` the derivative
   of `f` in direction `μ`. -/
 noncomputable def distDeriv {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (μ : Fin 1 ⊕ Fin d) : ((SpaceTime d) →d[ℝ] M) →ₗ[ℝ] (SpaceTime d) →d[ℝ] M where
