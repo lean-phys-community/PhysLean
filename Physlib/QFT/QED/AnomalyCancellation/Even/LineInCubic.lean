@@ -65,7 +65,8 @@ then
 `accCubeTriLinSymm.toFun (Unshifted.planeCharges g, Unshifted.planeCharges g,
   Shifted.planeCharges f) = 0`.
 -/
-lemma line_in_cubic_unshifted_unshifted_shifted {S : (PureU1 (2 * n.succ)).LinSols} (h : LineInCubic S) :
+lemma line_in_cubic_unshifted_unshifted_shifted
+    {S : (PureU1 (2 * n.succ)).LinSols} (h : LineInCubic S) :
     ∀ (g : Fin n.succ → ℚ) (f : Fin n → ℚ)
       (_ : S.val = Unshifted.planeCharges g + Shifted.planeCharges f),
     accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
@@ -115,8 +116,8 @@ lemma unshifted_unshifted_shifted_accCube' {S : (PureU1 (2 * n.succ.succ)).LinSo
     - (S.val (evenShiftSnd (Fin.last n)) + S.val (evenShiftFst (Fin.last n))) *
     (2 * S.val evenShiftLast +
     S.val (evenShiftSnd (Fin.last n)) + S.val (evenShiftFst (Fin.last n))) := by
-  rw [unshifted_unshifted_shifted_accCube f (Fin.last n), hS, Pa_evenShiftSnd, Pa_evenShiftFst, Pa_evenShiftLast,
-    Fin.succ_last]
+  rw [unshifted_unshifted_shifted_accCube f (Fin.last n), hS, Pa_evenShiftSnd,
+    Pa_evenShiftFst, Pa_evenShiftLast, Fin.succ_last]
   ring
 
 lemma lineInCubicPerm_last_cond {S : (PureU1 (2 * n.succ.succ)).LinSols}
