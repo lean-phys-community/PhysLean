@@ -4,7 +4,7 @@ Title: Hilbert space tensor products
 
 Overview: |
   A common way to construct Hilbert spaces for composite quantum systems is through tensor products
-  of simpler consistuent Hilbert spaces and taking completions. The key definitions of this API are
+  of simpler constituent Hilbert spaces and taking completions. The key definitions of this API are
   `CompleteTensorProduct` and `CompletePiTensorProduct`, the _completions_ of the tensor products
   of a pair and indexed family of Hilbert spaces, respectively.
 
