@@ -306,7 +306,7 @@ public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Completen
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Eigenfunction
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Examples
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.TISE
-public import Physlib.QuantumMechanics.HilbertSpaces.CompleteTensorProduct
+public import Physlib.QuantumMechanics.HilbertSpaces.TensorProducts.CompleteTensorProduct
 public import Physlib.QuantumMechanics.HilbertSpaces.FiniteTarget.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Gaussians
