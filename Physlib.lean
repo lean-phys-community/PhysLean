@@ -306,7 +306,6 @@ public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Completen
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Eigenfunction
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.Examples
 public import Physlib.QuantumMechanics.HarmonicOscillator.OneDimension.TISE
-public import Physlib.QuantumMechanics.HilbertSpaces.TensorProducts.CompleteTensorProduct
 public import Physlib.QuantumMechanics.HilbertSpaces.FiniteTarget.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.Gaussians
@@ -319,6 +318,7 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Fourier
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PolyBddSchwartzSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SobolevSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.TensorProducts.CompleteTensorProduct
 public import Physlib.QuantumMechanics.Hydrogen.Basic
 public import Physlib.QuantumMechanics.Hydrogen.LaplaceRungeLenzVector
 public import Physlib.QuantumMechanics.InfiniteSquareWell.Basic
