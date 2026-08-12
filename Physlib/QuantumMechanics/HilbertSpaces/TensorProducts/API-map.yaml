@@ -1,12 +1,12 @@
 version: v0.1
 
-Title: Hilbert spaces
+Title: Hilbert space tensor products
 
 Overview: |
-  The central mathematical structure of non-relativistic quantum mechanics is the Hilbert space
-  (i.e. complete inner product space): quantum states are vectors in Hilbert spaces and
-  observables are self-adjoint operators acting on Hilbert spaces. Hilbert spaces for composite
-  systems can be constructed by taking tensor products/powers and completions of simpler spaces.
+  A common way to construct Hilbert spaces for composite quantum systems is through tensor products
+  of simpler consistuent Hilbert spaces and taking completions. The key definitions of this API are
+  `CompleteTensorProduct` and `CompletePiTensorProduct`, the _completions_ of the tensor products
+  of a pair and indexed family of Hilbert spaces, respectively.
 
 ParentAPIs:
 
@@ -49,10 +49,5 @@ Requirements:
 
   - description:
       Defines the Fock space of a seed Hilbert space.
-    done: false
-    location: N/A
-
-  - description:
-      Defines Dirac notation for a general Hilbert space, scoped to a `DiracNotation` namespace.
     done: false
     location: N/A
