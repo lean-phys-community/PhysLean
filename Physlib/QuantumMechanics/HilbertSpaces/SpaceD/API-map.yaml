@@ -9,7 +9,6 @@ Overview: |
 
 ParentAPIs:
   - Space (Physlib/SpaceAndTime/Space)
-  - HilbertSpaces (Physlib/QuantumMechanics/HilbertSpaces)
 
 References:
 
