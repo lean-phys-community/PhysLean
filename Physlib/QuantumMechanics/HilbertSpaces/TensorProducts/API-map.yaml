@@ -17,19 +17,19 @@ Requirements:
   - description:
       Defines the complete tensor product of a pair of Hilbert spaces.
     done: true
-    location: Physlib/QuantumMechanics/HilbertSpaces/CompleteTensorProduct.lean (CompleteTensorProduct)
+    location: Physlib/QuantumMechanics/HilbertSpaces/TensorProducts/CompleteTensorProduct.lean (CompleteTensorProduct)
 
   - description:
       Provides a linear isometry equivalence expressing the commutativity of the complete tensor
       product of a pair of Hilbert spaces.
     done: true
-    location: Physlib/QuantumMechanics/HilbertSpaces/CompleteTensorProduct.lean (CompleteTensorProduct.comm)
+    location: Physlib/QuantumMechanics/HilbertSpaces/TensorProducts/CompleteTensorProduct.lean (CompleteTensorProduct.comm)
 
   - description:
       Provides a linear isometry equivalence expressing the associativity of the complete tensor
       product of pairs of Hilbert spaces.
     done: true
-    location: Physlib/QuantumMechanics/HilbertSpaces/CompleteTensorProduct.lean (CompleteTensorProduct.assoc)
+    location: Physlib/QuantumMechanics/HilbertSpaces/TensorProducts/CompleteTensorProduct.lean (CompleteTensorProduct.assoc)
 
   - description:
       Proves that the complete tensor product is isometrically equivalent to the tensor product
