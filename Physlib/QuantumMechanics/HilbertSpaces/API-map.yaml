@@ -1,0 +1,58 @@
+version: v0.1
+
+Title: Hilbert spaces
+
+Overview: |
+  The central mathematical structure of non-relativistic quantum mechanics is the Hilbert space
+  (i.e. complete inner product space): quantum states are vectors in Hilbert spaces and
+  observables are self-adjoint operators acting on Hilbert spaces. Hilbert spaces for composite
+  systems can be constructed by taking tensor products/powers and completions of simpler spaces.
+
+ParentAPIs:
+
+References:
+
+Requirements:
+
+  - description:
+      Defines the complete tensor product of a pair of Hilbert spaces.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/CompleteTensorProduct.lean (CompleteTensorProduct)
+
+  - description:
+      Provides a linear isometry equivalence expressing the commutativity of the complete tensor
+      product of a pair of Hilbert spaces.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/CompleteTensorProduct.lean (CompleteTensorProduct.comm)
+
+  - description:
+      Provides a linear isometry equivalence expressing the associativity of the complete tensor
+      product of pairs of Hilbert spaces.
+    done: true
+    location: Physlib/QuantumMechanics/HilbertSpaces/CompleteTensorProduct.lean (CompleteTensorProduct.assoc)
+
+  - description:
+      Proves that the complete tensor product is isometrically equivalent to the tensor product
+      when either factor is finite-dimensional.
+    done: false
+    location: N/A
+
+  - description:
+      Defines the complete tensor product of an indexed family of Hilbert spaces.
+    done: false
+    location: N/A
+
+  - description:
+      Defines the complete tensor power of a Hilbert space.
+    done: false
+    location: N/A
+
+  - description:
+      Defines the Fock space of a seed Hilbert space.
+    done: false
+    location: N/A
+
+  - description:
+      Defines Dirac notation for a general Hilbert space, scoped to a `DiracNotation` namespace.
+    done: false
+    location: N/A
