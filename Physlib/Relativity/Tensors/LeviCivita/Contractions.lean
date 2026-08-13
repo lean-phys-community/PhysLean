@@ -67,7 +67,8 @@ lemma euclidLeviCivita_symbol_contract_zero :
       ((generalizedKroneckerDelta g id : ℝ)) * (generalizedKroneckerDelta g id : ℝ)
         = ((generalizedKroneckerDelta g id * generalizedKroneckerDelta g id : ℤ) : ℝ) :=
     fun g => by push_cast; ring
-  erw [Finset.sum_congr rfl fun g _ => hcast g, ← Int.cast_sum,
+  simp only [euclidLeviCivita]
+  rw [Finset.sum_congr rfl fun g _ => hcast g, ← Int.cast_sum,
     sum_generalizedKroneckerDelta_mul_self]
   norm_num
 
@@ -84,7 +85,8 @@ lemma euclidLeviCivita_symbol_contract_one (a b : Fin 4) :
         = ((generalizedKroneckerDelta (Fin.cons a h') id
             * generalizedKroneckerDelta (Fin.cons b h') id : ℤ) : ℝ) :=
     fun h' => by push_cast; ring
-  erw [Finset.sum_congr rfl fun h' _ => hcast h', ← Int.cast_sum,
+  simp only [euclidLeviCivita]
+  rw [Finset.sum_congr rfl fun h' _ => hcast h', ← Int.cast_sum,
     sum_generalizedKroneckerDelta_mul_cons]
   push_cast; ring
 
@@ -107,6 +109,7 @@ lemma euclidLeviCivita_symbol_contract_two (r s t w : Fin 4) :
             * generalizedKroneckerDelta
               (Fin.cons t (Fin.cons (w) h')) id : ℤ) : ℝ) :=
     fun h' => by push_cast; ring
-  erw [Finset.sum_congr rfl fun h' _ => hcast h', ← Int.cast_sum,
+  simp only [euclidLeviCivita]
+  rw [Finset.sum_congr rfl fun h' _ => hcast h', ← Int.cast_sum,
     sum_generalizedKroneckerDelta_mul_cons₂]
   push_cast; ring
