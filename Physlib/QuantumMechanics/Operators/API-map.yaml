@@ -1,0 +1,273 @@
+version: v0.1
+
+Title: Operator algebra
+
+Overview: |
+    An observable of a quantum system is a self-adjoint operator on the Hilbert space of
+    states, and its measured values are the points of the spectrum of that operator. The
+    observables of interest are almost never defined on the whole space. Position
+    multiplies a wavefunction by a coordinate and momentum differentiates it, and both
+    send square-integrable functions out of the space unless the wavefunction decays or
+    is smooth enough. The object to work with is therefore an operator defined on a dense
+    subspace, a partially defined linear map, together with the conditions that make it a
+    legitimate observable, namely a dense domain, symmetry of the inner-product pairing
+    on that domain, and self-adjointness, which is strictly stronger than symmetry once
+    the domain is a proper subspace.
+
+    This API builds that framework and then the standard observables of non-relativistic
+    quantum mechanics on `Space d`. Multiplication by a real function of position gives
+    the potential energy and, componentwise, the position operator; powers of the radius
+    give the multipliers used for central potentials. Differentiation gives the momentum
+    operator -iℏ∂ᵢ. The two do not commute, and the canonical commutation relation
+    [xᵢ, pⱼ] = iℏ δᵢⱼ is proved on Schwartz maps, alongside the commutators of the
+    angular momenta 𝐋ᵢⱼ = xᵢpⱼ - xⱼpᵢ, which close into the Lie algebra of rotations and
+    commute with 𝐋², with the momentum squared, and with every regularized power of the
+    radius.
+
+    The statistics of an observable T in a state ψ are the expectation value
+    ⟨T⟩ = re ⟪ψ, T ψ⟫, the variance ‖T ψ - ⟨T⟩ψ‖², and the standard deviation. The API
+    proves that the spectrum and the eigenvalues of a self-adjoint operator are real,
+    that every non-real number is a resolvent point, that the residual spectrum is empty,
+    and that the product of the standard deviations of two observables is bounded below
+    by half the size of the expected commutator, in both the Robertson and the
+    Robertson-Schrödinger forms. Spectral measures are defined as projection-valued
+    measures. The spectral theorem that attaches one to each self-adjoint operator, and
+    the functional calculus and time evolution that follow from it, are open.
+
+    Two settings sit side by side in the source. The general modules work with
+    `LinearPMap` on any complex Hilbert space and are applied to `SpaceDHilbertSpace d`.
+    The modules under `OneDimension` carry an earlier bespoke `UnboundedOperator`
+    structure on the one-dimensional Hilbert space, with its own notion of symmetry and
+    of generalized eigenvector, and are not yet expressed in terms of `LinearPMap`. No
+    module in the directory carries a proof gap; the open items below are recorded as
+    TODO entries in the source or are absent from it.
+
+ParentAPIs:
+  - "Hilbert spaces on Space (Physlib/QuantumMechanics/HilbertSpaces/SpaceD)"
+  - "Hilbert space in one dimension (Physlib/QuantumMechanics/HilbertSpaces/OneDimension)"
+  - "Space (Physlib/SpaceAndTime/Space)"
+  - "Planck constant (Physlib/QuantumMechanics/PlanckConstant.lean)"
+  - "Partially defined linear maps (Physlib/Mathematics/LinearPMap.lean)"
+  - "Inner product spaces (Physlib/Mathematics/InnerProductSpace)"
+
+References:
+  - "B. C. Hall, Quantum Theory for Mathematicians, Springer (2013), Chapters 9 and 10 (unbounded self-adjoint operators, the spectral theorem) and Chapter 12 (position, momentum, expectation values and the uncertainty principle)"
+  - "M. Reed and B. Simon, Methods of Modern Mathematical Physics I. Functional Analysis, Academic Press (1980), Chapters VII and VIII (the spectral theorem, unbounded operators)"
+  - "K. Schmüdgen, Unbounded Self-Adjoint Operators on Hilbert Space, Springer (2012), Chapters 1 to 3 (closed, symmetric and self-adjoint operators, defect numbers, the spectrum, and examples 1.3 and 3.8 on multiplication operators)"
+  - "J. J. Sakurai and J. Napolitano, Modern Quantum Mechanics, 2nd ed., Cambridge University Press (2017), Chapter 1 (observables, expectation values, the canonical commutation relation, the uncertainty relation) and Chapter 3 (angular momentum)"
+  - "D. J. Griffiths and D. F. Schroeter, Introduction to Quantum Mechanics, 3rd ed., Cambridge University Press (2018), Chapter 3 (observables, eigenfunctions of hermitian operators, the generalized uncertainty principle) and Chapter 4 (angular momentum)"
+  - "H. P. Robertson, The Uncertainty Principle, Phys. Rev. 34, 163 (1929)"
+  - "E. Schrödinger, Zum Heisenbergschen Unschärfeprinzip, Sitzungsberichte der Preussischen Akademie der Wissenschaften 19, 296 (1930)"
+
+Requirements:
+
+  - description: >
+      An observable is a linear map defined on a dense subspace of the Hilbert space of
+      states. The API defines a dense domain, the unbounded operators (densely defined
+      and closable), symmetry of the pairing on the domain, and essential
+      self-adjointness, and records how these interact with sums, scalar multiples,
+      powers, closures and continuous perturbations. It also contains the adjoint
+      calculus, in particular that the adjoint of an unbounded operator is again
+      unbounded and that the second adjoint is the closure.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/Unbounded.lean (HasDenseDomain, IsUnbounded, IsSymmetric, IsEssentiallySelfAdjoint, isSymmetric_iff_inner_map_self_real, IsSymmetric.isClosable, IsSymmetric.closure, IsSymmetric.add, IsSymmetric.pow, IsSelfAdjoint.isSymmetric, IsSelfAdjoint.isClosed, IsEssentiallySelfAdjoint.isUnbounded, adjoint_smul, adjoint_neg, adjoint_antitone, adjoint_add_le_add_adjoint, adjoint_compRestricted_le_compRestricted_adjoint, IsUnbounded.adjoint, IsUnbounded.adjoint_closure_eq_adjoint, IsUnbounded.adjoint_adjoint_eq_closure, isClosable_of_continuous, IsClosed.continuous_of_isClosed_domain)
+
+  - description: >
+      Symmetry alone does not make an operator an observable, so the API contains the
+      criteria that upgrade it. A symmetric densely defined operator whose ranges of
+      T + i and T - i are the whole space is self-adjoint, one whose defect numbers at
+      i and -i both vanish is essentially self-adjoint, and the closure of an
+      essentially self-adjoint operator is its only self-adjoint extension. Conjugation
+      by a unitary is defined and shown to preserve formal adjoints, dense domains,
+      surjectivity of T - z, and self-adjointness, so an observable keeps its status
+      under a change of representation.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/Unbounded.lean (IsSymmetric.isSelfAdjoint_of_range_eq_top, IsSymmetric.isSelfAdjoint_iff, IsSymmetric.isEssentiallySelfAdjoint_iff, IsEssentiallySelfAdjoint.unique_self_adjoint_extension, unitaryConj, mem_unitaryConj_domain_iff, unitaryConj_apply, IsFormalAdjoint.unitaryConj, HasDenseDomain.unitaryConj_dense_domain, unitaryConj_sub_smul_surjective); Physlib/QuantumMechanics/Operators/SpectralTheory/Symmetric.lean (isEssentiallySelfAdjoint_of_defectNumber_eq_zero); Physlib/QuantumMechanics/Operators/SpectralTheory/SelfAdjoint.lean (unitaryConj_isSelfAdjoint)
+
+  - description: >
+      The possible outcomes of a measurement form the spectrum. The API defines the
+      resolvent, the resolvent set, the spectrum and its point, residual and continuous
+      parts, together with the regularity domain, the deficiency subspace and the defect
+      number, and proves that the resolvent set is open, that the spectrum is closed,
+      that the spectrum of a closed operator is the union of its three parts, that the
+      defect number is constant on connected components of the regularity domain, and
+      the two resolvent identities.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/SpectralTheory/Basic.lean (resolvent, notation 𝑅, regularityDomain, regularityDomain_isOpen, regularityDomain_closure, deficiencySubspace, defectNumber, IsClosed.defectNumber_eq_zero_iff, IsClosable.defectNumber_const, IsClosable.closure_range_sub_eq_range_closure_sub, resolventSet, notation ρ, resolventSet_isOpen, resolventSet_eq_empty, IsClosed.resolventSet_eq, IsClosed.resolventSet_eq', spectrum, notation σ, spectrum_isClosed, spectrum_eq_univ, pointSpectrum, residualSpectrum, continuousSpectrum, IsClosed.spectrum_eq, pointSpectrum_inter_residualSpectrum, resolvent_sub, resolvent_sub')
+
+  - description: >
+      The numerical range collects the expectation values of an operator on unit vectors
+      of its domain and locates the spectrum. The API defines it, proves the
+      Toeplitz-Hausdorff theorem that it is convex, and shows that the regularity domain
+      contains the exterior of its closure. For a symmetric operator the numerical range
+      is real, and the API contains its projection to the real axis, the fact that the
+      regularity domain then contains every point off the real axis, and the
+      connectedness of the regularity domain for an operator that is bounded above or
+      below.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/SpectralTheory/Basic.lean (numericalRange, notation Θ, mem_numericalRange, numericalRange_sub_const, numericalRange_convex, compl_closure_numericalRange_subset_regularityDomain); Physlib/QuantumMechanics/Operators/SpectralTheory/Symmetric.lean (realNumericalRange, im_eq_zero_of_mem_numericalRange, numericalRange_subset, numericalRange_eq, closure_numericalRange_subset, mem_regularityDomain_of_im_ne_zero, compl_ofReal_subset_regularityDomain, Iio_subset_regularityDomain, Ioi_subset_regularityDomain, regularityDomain_isConnected_iff, regularityDomain_isConnected_of_bddBelow, regularityDomain_isConnected_of_bddAbove)
+
+  - description: >
+      A measurement of an observable returns a real number. The API proves that for a
+      self-adjoint operator the resolvent set and the regularity domain coincide, that
+      every complex number with non-zero imaginary part lies in the resolvent set, that
+      T - z is onto for such z, that the spectrum is contained in the real axis and the
+      residual spectrum is empty, and that the eigenvalues of a symmetric operator are
+      real.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/SpectralTheory/SelfAdjoint.lean (resolventSet_eq_regularityDomain, mem_resolventSet_of_im_ne_zero, sub_smul_surjective, mem_resolventSet_of_range_eq_top, spectrum_real, residualSpectrum_eq_empty); Physlib/QuantumMechanics/Operators/SpectralTheory/Symmetric.lean (pointSpectrum_real)
+
+  - description: >
+      A projection-valued measure assigns to each set of possible outcomes the
+      projection onto the states supported there. The API defines a spectral measure as
+      a vector measure valued in the bounded operators whose values are star
+      projections, sending the whole outcome space to the identity, and proves that the
+      projections of two measurable sets compose to the projection of their
+      intersection, that disjoint sets give orthogonal projections, and that all of them
+      commute.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/SpectralTheory/SpectralMeasure.lean (SpectralMeasure, isStarProjection, univ, comp_self, comp_of_disjoint, comp_eq_of_inter, commute)
+
+  - description: >
+      The API shall contain the spectral theorem, that every self-adjoint operator is
+      the integral of the identity against a spectral measure supported on its spectrum,
+      equivalently that it is unitarily equivalent to multiplication by a real function
+      on an L² space. It shall contain the resulting functional calculus, the
+      description of the spectrum of a multiplication operator as the essential range of
+      the multiplier (recorded as a TODO in Multiplication.lean), and Stone's theorem
+      giving the unitary time evolution generated by a self-adjoint Hamiltonian. Nothing
+      currently connects `SpectralMeasure` to a self-adjoint operator.
+    done: false
+    location: N/A
+
+  - description: >
+      The potential energy of a particle acts by multiplying the wavefunction by a
+      function of position. The API defines the multiplication operator of an arbitrary
+      complex function with its maximal domain, and proves that it is densely defined
+      for an almost everywhere strongly measurable multiplier, that its domain is
+      everything for a bounded multiplier and contains the Schwartz maps for one of
+      temperate growth, that its adjoint is multiplication by the conjugate so that a
+      real multiplier gives a self-adjoint operator, that it is closed and unbounded,
+      and how it behaves under scalar multiples, sums and composition.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/Multiplication.lean (mulOperator, notation 𝓜, mem_mulOperator_domain_iff, mulOperator_apply_ae, mulOperator_domain_eq_top, mulOperator_domain_antitone, mulOperator_conj_domain, mulOperator_hasDenseDomain, mulOperator_domain_ge_of_hasTemperateGrowth, mulOperator_adjoint_eq_conj, mulOperator_isSelfAdjoint_ofReal, mulOperator_isClosable, mulOperator_isUnbounded, mulOperator_isClosed, mulOperator_const_smul_eq, mulOperator_add_ge, mulOperator_add_eq, mulOperator_sub_ge, mulOperator_smul_ge)
+
+  - description: >
+      Position and momentum are the two basic observables. The API defines each
+      component of the position operator as multiplication by a coordinate and each
+      component of the momentum operator as -iℏ∂ᵢ, first on Schwartz maps and then as
+      partially defined operators on the Hilbert space, and proves that the position
+      operator is densely defined, self-adjoint and unbounded and that the momentum
+      operator is densely defined, symmetric and unbounded on the Schwartz submodule.
+      It also contains the multiplication operators by a power of the radius and by its
+      smooth regularization, which supply the multipliers of central potentials,
+      together with the condition for such a product to stay square-integrable and the
+      limit of the regularized operators, and the square of the momentum operator.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/Position.lean (positionCLM, notation 𝐱, positionCLM_apply, positionSqCLM_eq, radiusRegPowCLM, notation 𝐫₀, radiusRegPowCLM_comp_eq, radiusPowLM, notation 𝐫, radiusPowLM_apply_memHS, radiusRegPow_tendsto_radiusPow, positionOperator, notation 𝓧, positionOperator_hasDenseDomain, positionOperator_isSelfAdjoint, positionOperator_isUnbounded, radiusRegPowOperator, radiusRegPowOperator_isSelfAdjoint, radiusPowOperator, radiusPowOperator_isSelfAdjoint, radiusPowOperator_domain_ge); Physlib/QuantumMechanics/Operators/Momentum.lean (momentumCLM, notation 𝐩, momentumCLM_apply, momentumOperator, notation 𝓟, momentumOperator_apply, momentumOperator_hasDenseDomain, momentumOperator_isSymmetric, momentumOperator_isUnbounded, momentumSqOperator, momentumSqOperator_domain_eq)
+
+  - description: >
+      The API shall prove that the momentum operator is self-adjoint, and not merely
+      symmetric, on a domain large enough to carry it, namely the Sobolev space H¹
+      rather than the Schwartz submodule, and likewise for the momentum squared operator
+      on H². Both are recorded as TODO items in Momentum.lean, and the second is what
+      makes the kinetic energy an observable.
+    done: false
+    location: N/A
+
+  - description: >
+      Position and momentum do not commute, and the failure to commute is what forbids
+      simultaneous sharp values. The API proves the canonical commutation relation
+      [xᵢ, pⱼ] = iℏ δᵢⱼ on Schwartz maps, that the position components commute among
+      themselves and the momentum components among themselves, the commutator of a
+      position component with the momentum squared, the commutator of a regularized
+      power of the radius with a momentum component and with the momentum squared, and
+      the Leibniz rules used to reduce a commutator of products.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/Commutation.lean (leibniz_lie, lie_leibniz, comp_eq_comp_add_commute, comp_eq_comp_sub_commute, position_commutation_position, position_comp_commute, position_commutation_radiusRegPow, radiusRegPow_commutation_radiusRegPow, momentum_commutation_momentum, momentumSqr_commutation_momentum, position_commutation_momentum, momentum_comp_position_eq, position_position_commutation_momentum, position_commutation_momentum_momentum, position_commutation_momentumSqr, radiusRegPow_commutation_momentum, momentum_comp_radiusRegPow_eq, radiusRegPow_commutation_momentumSqr)
+
+  - description: >
+      Angular momentum generates rotations. The API defines the components
+      𝐋ᵢⱼ = xᵢpⱼ - xⱼpᵢ of the angular momentum operator on Schwartz maps and the scalar
+      𝐋², proves antisymmetry in the two indices and the vanishing of a repeated index,
+      treats the one-, two- and three-dimensional cases separately, and shows that
+      position and momentum transform as vectors under the angular momenta, that the
+      angular momenta close into the Lie algebra of rotations, and that 𝐋² commutes with
+      every angular momentum component, with the momentum squared and with any
+      regularized power of the radius.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/AngularMomentum.lean (angularMomentumOperator, notation 𝐋, angularMomentumOperator_apply, angularMomentumOperator_antisymm, angularMomentumOperator_eq_zero, angularMomentumOperatorSqr, notation 𝐋², angularMomentumOperatorSqr_apply, angularMomentumOperator1D_trivial, angularMomentumOperator2D, angularMomentumOperator3D); Physlib/QuantumMechanics/Operators/Commutation.lean (angularMomentum_commutation_position, angularMomentum_commutation_radiusRegPow, angularMomentumSqr_commutation_radiusRegPow, angularMomentum_commutation_momentum, angularMomentum_commutation_momentumSqr, angularMomentumSqr_commutation_momentumSqr, angularMomentum_commutation_angularMomentum, angularMomentumSqr_commutation_angularMomentum)
+
+  - description: >
+      The API shall carry angular momentum over from Schwartz maps to the Hilbert space
+      as a self-adjoint partially defined operator, and shall contain its spectrum, the
+      raising and lowering operators built from the components, the eigenvalues
+      ℏ² l (l + 1) of 𝐋² and ℏ m of a chosen component, and the spherical harmonics as
+      the corresponding eigenfunctions. At present the angular momentum operators exist
+      only as continuous linear maps on Schwartz maps and none of their spectral theory
+      is formalized.
+    done: false
+    location: N/A
+
+  - description: >
+      A state assigns to each observable an expectation value and a spread. The API
+      defines the expectation value as the real part of the pairing of a state with its
+      image, the centered vector, the variance as the squared norm of the centered
+      vector, the standard deviation, the covariance of two observables, and the
+      eigenvector condition. It proves that the pairing is already real for a symmetric
+      operator, the second-order formula for the variance, that vanishing variance for a
+      unit vector is exactly the eigenvector condition, and the Robertson and
+      Robertson-Schrödinger uncertainty bounds, in which the product of two standard
+      deviations is at least half the size of the expected commutator, stated both for a
+      centered and for a raw commutator identity.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/StateObservables/ExpectedValue.lean (expectedValue, expectedValue_eq_inner, centered, centered_eq_zero_iff, inner_state_centered_eq_zero, inner_centered_state_eq_zero); Physlib/QuantumMechanics/Operators/StateObservables/Variance.lean (variance, variance_eq_centered_norm_sq, variance_eq_norm_sq_sub_expectedValue_sq, variance_eq_re_inner_sub_expectedValue_sq, variance_nonneg, variance_eq_zero_iff_isEigenvector, standardDeviation, standardDeviation_eq_zero_iff_isEigenvector); Physlib/QuantumMechanics/Operators/StateObservables/IsEigenvector.lean (IsEigenvector, IsEigenvector.apply_eq, IsEigenvector.ne_zero); Physlib/QuantumMechanics/Operators/Covariance.lean (covariance, covariance_comm, covariance_eq_re_symm_centered, covariance_self_eq_variance); Physlib/QuantumMechanics/Operators/Uncertainty.lean (centeredCommutatorExpectation, rawCommutatorExpectation, inner_centered_commutator_of_raw_commutator, state_uncertainty_squared_of_centered_commutator, state_uncertainty_squared_with_covariance_of_centered_commutator, state_uncertainty_of_centered_commutator, state_uncertainty_squared_of_raw_commutator, state_uncertainty_squared_with_covariance_of_raw_commutator, state_uncertainty_of_raw_commutator)
+
+  - description: >
+      The API shall contain the Heisenberg uncertainty relation for position and
+      momentum, that the product of the standard deviations of xᵢ and pᵢ in any unit
+      state of a common domain is at least ℏ/2, by feeding the canonical commutation
+      relation into the abstract Robertson bound. The abstract bound and the commutator
+      are both present, but nothing instantiates the first at the second, and the
+      position and momentum operators are not yet set on a common domain in the Hilbert
+      space.
+    done: false
+    location: N/A
+
+  - description: >
+      The one-dimensional case is developed separately on the Hilbert space of the line.
+      The API defines an unbounded operator there as a continuous linear map out of a
+      subobject of the Hilbert space, with notions of symmetry and of generalized
+      eigenvector, and gives the position operator, the momentum operator -iℏ d/dx and
+      the parity operator, each on functions and on Schwartz maps. It proves that all
+      three are symmetric, that parity is an involution, that the position states are
+      generalized eigenvectors of the position operator and the plane waves are
+      generalized eigenvectors of the momentum operator, and the one-dimensional
+      canonical commutation relation. These operators are not yet expressed in the
+      `LinearPMap` framework used by the rest of the API.
+    done: true
+    location: |
+      Physlib/QuantumMechanics/Operators/OneDimension/Unbounded.lean (UnboundedOperator, UnboundedOperator.ofSelfCLM, UnboundedOperator.IsGeneralizedEigenvector, isGeneralizedEigenvector_ofSelfCLM_iff, UnboundedOperator.IsSymmetric); Physlib/QuantumMechanics/Operators/OneDimension/Position.lean (positionOperator, positionOperatorSchwartz, positionOperatorUnbounded, positionStates_generalized_eigenvector_positionOperatorUnbounded, positionOperatorUnbounded_isSymmetric); Physlib/QuantumMechanics/Operators/OneDimension/Momentum.lean (momentumOperator, momentumOperatorSchwartz, momentumOperatorUnbounded, planeWaveFunctional_generalized_eigenvector_momentumOperatorUnbounded, momentumOperatorUnbounded_isSymmetric); Physlib/QuantumMechanics/Operators/OneDimension/Parity.lean (parityOperator, parityOperatorSchwartz, parityOperatorUnbounded, parityOperatorSchwartz_parityOperatorSchwartz, parityOperatorUnbounded_isSymmetric); Physlib/QuantumMechanics/Operators/OneDimension/Commutation.lean (positionOperatorSchwartz_commutation_momentumOperatorSchwartz, positionOperatorSchwartz_momentumOperatorSchwartz_eq, momentumOperatorSchwartz_positionOperatorSchwartz_eq)
+
+  - description: >
+      The API shall contain the standard examples that separate the classes of
+      operators, since the distinction between symmetry and self-adjointness is
+      otherwise invisible. The three intended examples, recorded as TODO items in
+      Examples.lean with no declarations yet, are a closed symmetric operator with no
+      self-adjoint extension, given by -i d/dx on the half-line with vanishing boundary
+      value, a densely defined closed operator whose adjoint has every complex number as
+      an eigenvalue while the operator itself has none, and a symmetric operator whose
+      ranges at plus and minus i are dense but which is not essentially self-adjoint.
+    done: false
+    location: N/A
