@@ -82,6 +82,11 @@ lemma div_symm (x y : MassUnit) :
   show x.val / y.val = (y.val / x.val)⁻¹
   rw [inv_div]
 
+/-- The unit-ratio cocycle at `ℝ≥0` (the un-coerced form of `div_mul_div_coe`). -/
+lemma div_mul_div (x y z : MassUnit) : (x / y) * (y / z) = x / z := NNReal.eq <| by
+  show x.val / y.val * (y.val / z.val) = x.val / z.val
+  rw [div_mul_div_comm, mul_comm x.val y.val, mul_div_mul_left _ _ y.val_ne_zero]
+
 @[simp]
 lemma div_mul_div_coe (x y z : MassUnit) :
     (x / y : ℝ) * (y / z : ℝ) = x / z := by

@@ -144,11 +144,8 @@ lemma dimScale_transitive (u1 u2 u3 : LTMCTUnitChoices) (d : Dimension LTMCTDime
       (u2.temperature / u3.temperature) ^ (d.temperature : ℝ))
   · ring
   repeat rw [← mul_rpow]
-  apply NNReal.eq
-  simp only [LengthUnit.div_eq_val, TimeUnit.div_eq_val, MassUnit.div_eq_val, ChargeUnit.div_eq_val,
-    TemperatureUnit.div_eq_val, NNReal.coe_mul, coe_rpow]
-  rw [toReal]
-  field_simp
+  rw [LengthUnit.div_mul_div, TimeUnit.div_mul_div, MassUnit.div_mul_div,
+    ChargeUnit.div_mul_div, TemperatureUnit.div_mul_div]
 
 @[simp]
 lemma dimScale_mul_symm (u1 u2 : LTMCTUnitChoices) (d : Dimension LTMCTDimensionBase) :
@@ -322,10 +319,7 @@ instance {M : Type} [CarriesDimension M] :
 
 @[ext]
 lemma Dimensionful.ext {M : Type} [CarriesDimension M] (f1 f2 : Dimensionful M)
-    (h : f1.val = f2.val) : f1 = f2 := by
-  cases f1
-  cases f2
-  simp_all
+    (h : f1.val = f2.val) : f1 = f2 := Subtype.ext h
 
 instance {M : Type} [CarriesDimension M] : MulAction ℝ≥0 (Dimensionful M) where
   smul a f := ⟨fun u => a • f.1 u, fun u1 u2 => by
