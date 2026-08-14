@@ -322,6 +322,7 @@ public import Physlib.QuantumMechanics.HilbertSpaces.OneDimension.SchwartzSubmod
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.DirichletSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Fourier
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.MomentumStates
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PolyBddSchwartzSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PositionStates
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
