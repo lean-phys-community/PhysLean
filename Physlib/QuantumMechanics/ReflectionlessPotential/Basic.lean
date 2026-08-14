@@ -13,32 +13,37 @@ public import Physlib.Meta.TODO.Basic
 
 # 1d Reflectionless Potential
 
-The quantum reflectionless potential in 1d.
-This file contains
-- the definition of the reflectionless potential as defined https://arxiv.org/pdf/2411.14941
-- properties of reflectionless potentials
+## i. Overview
 
-## TODO
+The quantum reflectionless potential in 1d.
+
+TODO
 - Define creation and annihilation operators for reflectionless potentials
 - Write the proof of the general solution of the reflectionless potential using the creation and
 annihilation operators
 - Show reflectionless properties
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Potential
+- B. Creation and annihilation operators
+  - B.1. On Schwartz functions
+  - B.2. As unbounded operators
+
+## iv. References
+
+- https://arxiv.org/pdf/2411.14941
+
 -/
-
-TODO "Refactor to use `SpaceDHilbertSpace 1`."
-
-TODO "Refactor to use `QuantumMechanics.PlanckConstant`."
-
 @[expose] public section
 
-namespace QuantumMechanics
-open Real
-open Complex Constants SchwartzMap
-open HilbertSpace
-open NNReal
-open Field
+noncomputable section
 
-namespace OneDimension
+namespace QuantumMechanics
+
+open Complex Constants SchwartzMap
 
 /-- A reflectionless potential is specified by three
   real parameters: the mass of the particle `m`, a value of Planck's constant `ℏ`, the
@@ -60,44 +65,53 @@ namespace ReflectionlessPotential
 variable (Q : ReflectionlessPotential)
 
 /-!
-## Theorems
-TODO: Add theorems about reflectionless potential - the main result is the actual 1d solution
+## A. Potential
 -/
 
 /-- Define the reflectionless potential as
   V(x) = - (ℏ^2 * κ^2 * N * (N + 1)) / (2 * m * (cosh (κ * x)) ^ 2) --/
-noncomputable def potential (x : Space 1) : ℝ :=
-  - (ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / (2 * Q.m * Real.cosh (Q.κ * x 0) ^ 2)
+def potential (x : Space 1) : ℝ :=
+  -(ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / (2 * Q.m * Real.cosh (Q.κ * x 0) ^ 2)
+
+/-!
+## B. Creation and annihilation operators
+-/
+
+/-!
+## B.1. On Schwartz functions
+-/
 
 /-- Define tanh(κ X) multiplication pointwise as a Schwartz map -/
-noncomputable def tanhCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
-  smulLeftCLM ℂ (ofReal ∘ fun x => tanh (Q.κ * x 0))
+def tanhCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
+  smulLeftCLM ℂ (ofReal ∘ fun x => Real.tanh (Q.κ * x 0))
 
 /-- Creation operator: a† as defined in https://arxiv.org/pdf/2411.14941
   a† = 1/√(2m) (P + iℏκ tanh(κX)) -/
-noncomputable def creationCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
-  (1 / Real.sqrt (2 * Q.m)) • momentumCLM 0 + ((I * ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhCLM
+def creationCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
+  (1 / Real.sqrt (2 * Q.m)) • momentumCLM 0 + (I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhCLM
 
 /-- Annihilation operator: a as defined in https://arxiv.org/pdf/2411.14941
   a = 1/√(2m) (P - iℏκ tanh(κX)) -/
-noncomputable def annihilationCLM (Q : ReflectionlessPotential) :
-  𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
-    (1 / Real.sqrt (2 * Q.m)) • momentumCLM 0 + ((-I * ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhCLM
+def annihilationCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
+  (1 / Real.sqrt (2 * Q.m)) • momentumCLM 0 + (-I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhCLM
 
-noncomputable def tanhOperator (Q : ReflectionlessPotential) :
-    SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
-  𝓜 _ (ofReal ∘ fun x => tanh (Q.κ * x 0))
+/-!
+## B.2. As unbounded operators
+-/
 
-noncomputable def creationOperator (Q : ReflectionlessPotential) :
+def tanhOperator (Q : ReflectionlessPotential) : SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
+  𝓜 _ (ofReal ∘ fun x => Real.tanh (Q.κ * x 0))
+
+def creationOperator (Q : ReflectionlessPotential) :
     SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
   (1 / Real.sqrt (2 * Q.m)) • momentumOperator 0 +
     (I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhOperator
 
-noncomputable def annihilationOperator (Q : ReflectionlessPotential) :
+def annihilationOperator (Q : ReflectionlessPotential) :
     SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
   (1 / Real.sqrt (2 * Q.m)) • momentumOperator 0 +
     (-I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhOperator
 
 end ReflectionlessPotential
-end OneDimension
 end QuantumMechanics
+end
