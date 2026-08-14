@@ -80,9 +80,8 @@ lemma div_self (x : TemperatureUnit) :
 
 lemma div_symm (x y : TemperatureUnit) :
     x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
-  simp only [one_div, NNReal.coe_inv]
-  rw [toReal, inv_div]
+  show x.val / y.val = (y.val / x.val)⁻¹
+  rw [inv_div]
 
 @[simp]
 lemma div_mul_div_coe (x y z : TemperatureUnit) :
@@ -104,6 +103,7 @@ def scale (r : ℝ) (x : TemperatureUnit) (hr : 0 < r := by norm_num) : Temperat
 lemma scale_div_self (x : TemperatureUnit) (r : ℝ) (hr : 0 < r) :
     scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
   simp [scale, div_eq_val]
+  rfl
 
 @[simp]
 lemma self_div_scale (x : TemperatureUnit) (r : ℝ) (hr : 0 < r) :
@@ -120,9 +120,8 @@ lemma scale_one (x : TemperatureUnit) : scale 1 x = x := by
 lemma scale_div_scale (x1 x2 : TemperatureUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
     scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
   refine NNReal.eq ?_
-  simp [scale, div_eq_val]
-  rw [toReal]
-  field_simp
+  show r1 * x1.val / (r2 * x2.val) = r1 / r2 * (x1.val / x2.val)
+  rw [div_mul_div_comm]
 
 @[simp]
 lemma scale_scale (x : TemperatureUnit) (r1 r2 : ℝ) (hr1 : 0 < r1) (hr2 : 0 < r2) :

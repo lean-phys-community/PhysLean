@@ -42,7 +42,11 @@ inductive LTMCTDimensionBase where
   | charge
   /-- The temperature base dimension. -/
   | temperature
-deriving DecidableEq, Fintype
+deriving DecidableEq
+
+instance : Fintype LTMCTDimensionBase where
+  elems := {.length, .time, .mass, .charge, .temperature}
+  complete := fun x => by cases x <;> decide
 
 namespace Dimension
 
