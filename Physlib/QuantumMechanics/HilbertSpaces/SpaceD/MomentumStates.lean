@@ -11,8 +11,20 @@ public import Physlib.SpaceAndTime.Space.Module
 
 # Momentum states
 
-We define plane waves as a member of the dual of the
-Schwartz submodule of the Hilbert space.
+## i. Overview
+
+Informally, the momentum "state" corresponding to momentum `p` is the non-normalizable
+plane wave `exp (I p ⬝ᵥ x)`. More precisely, the momentum "state" lives in the _rigged_ Hilbert
+space `𝓢(Space d, ℂ) < SpaceDHilbertSpace d μ < StrongDual ℂ 𝓢(Space d, ℂ)` as the element
+of the dual of `𝓢(Space d, ℂ)` defined by evaluation of the Fourier transform at `p`.
+
+## ii. Key results
+
+## iii. Table of contents
+
+## iv. References
+
+- https://en.wikipedia.org/wiki/Rigged_Hilbert_space
 
 -/
 
@@ -24,24 +36,27 @@ namespace SpaceDHilbertSpace
 
 noncomputable section
 
-open FourierTransform MeasureTheory SchwartzMap
+open scoped Real SchwartzMap
+open FourierTransform
 
 variable {d : ℕ}
 
-/-- Plane wave as a member of the strong dual of the Schwartz space.
+/-- Momentum state as a member of the strong dual of the Schwartz space.
 
-  For a given `k` this corresponds to the non-normalizable plane wave `exp (2π I k ⬝ᵥ x)`. -/
-def momentumState (k : Space d) : StrongDual ℂ 𝓢(Space d, ℂ) :=
-  TemperedDistribution.delta k ∘L fourierTransformCLM ℂ
+  For a given `p` this corresponds to the non-normalizable plane wave `exp (I p ⬝ᵥ x)`. -/
+def momentumState (p : Space d) : StrongDual ℂ 𝓢(Space d, ℂ) :=
+  TemperedDistribution.delta ((2 * π)⁻¹ • p) ∘L fourierCLM ℂ 𝓢(Space d, ℂ)
 
+/-- The defining property of momentum states. -/
 @[simp]
-lemma momentumState_apply (k : Space d) (ψ : 𝓢(Space d, ℂ)) :
-    momentumState k ψ = 𝓕 ψ k := rfl
+lemma momentumState_apply (p : Space d) (ψ : 𝓢(Space d, ℂ)) :
+    momentumState p ψ = 𝓕 ψ ((2 * π)⁻¹ • p) := rfl
 
 /-- Two Schwartz maps are equal if they are equal on all momentum states. -/
 lemma eq_of_eq_momentumState {ψ φ : 𝓢(Space d, ℂ)}
-    (h : ∀ k, momentumState k ψ = momentumState k φ) : ψ = φ :=
-  fourierCLE ℂ 𝓢(Space d, ℂ) |>.injective <| ext h
+    (h : ∀ p, momentumState p ψ = momentumState p φ) : ψ = φ :=
+  fourierCLE ℂ 𝓢(Space d, ℂ) |>.injective <| SchwartzMap.ext
+    fun k ↦ by simpa [smul_smul, ← mul_rotate] using h ((2 * π) • k)
 
 end
 end SpaceDHilbertSpace
