@@ -38,7 +38,7 @@ def IdealGas : NVEHamiltonian where
     rintro ⟨n, V⟩
     dsimp
     refine Measurable.ite ?_ ?_ measurable_const
-    · simp_rw [Set.setOf_forall]
+    · simp_rw [Set.ofPred_forall]
       exact MeasurableSet.iInter fun i => MeasurableSet.iInter fun ax =>
         measurableSet_le (by fun_prop) measurable_const
     · simp_rw [← WithTop.coe_sum]
@@ -96,7 +96,7 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
   have h_measurability : Measurable fun x : (Fin n × Fin 3 → ℝ) × (Fin n × Fin 3 → ℝ) =>
       if ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |x.1 (x_1, x_2)| then 0
       else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) := by
-    refine Measurable.ite (measurableSet_setOf.mpr ?_) (by fun_prop) (by fun_prop)
+    refine Measurable.ite (measurableSet_setOfPred.mpr ?_) (by fun_prop) (by fun_prop)
     exact h_measurable_box.comp measurable_fst
   rw [MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
   rotate_left
@@ -122,11 +122,11 @@ lemma partitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
   · exact Measurable.aestronglyMeasurable (by fun_prop)
   · exact Filter.Eventually.of_forall fun _ => by positivity
   · refine (Measurable.ite ?_ measurable_const measurable_const).aestronglyMeasurable
-    simp_rw [Set.setOf_forall]
+    simp_rw [Set.ofPred_forall]
     exact MeasurableSet.iInter fun i => MeasurableSet.iInter fun j =>
       measurableSet_le (by fun_prop) measurable_const
   · refine (Measurable.ite ?_ measurable_const measurable_const).ennreal_ofReal
-    simp_rw [Set.setOf_forall]
+    simp_rw [Set.ofPred_forall]
     exact MeasurableSet.iInter fun i => MeasurableSet.iInter fun j =>
       measurableSet_le (by fun_prop) measurable_const
   congr 1

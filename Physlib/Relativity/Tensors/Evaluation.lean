@@ -328,6 +328,7 @@ TODO "Add a lemmas related to the commutation of evaluation with contraction."
 ## Other properties of evaluation
 
 -/
+set_option backward.isDefEq.respectTransparency false in
 /-- Evaluating the single-index basis tensor `basis ![c] (single.symm b)` at the index `x`
   yields the field element `1` if `b = x` (transported across `![c] 0 = c`) and `0` otherwise:
   evaluation of a one-index basis tensor is the Kronecker delta. -/
@@ -356,6 +357,7 @@ lemma eq_sum_evalT_of_single_tensor_basis {c : C} (t : Tensor S ![c]) :
   · simp [add_smul, Finset.sum_add_distrib]
     grind
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Reconstruction of a tensor from the evaluations of its last index: every `t : Tensor S c`
   is the sum over basis indices `i` of the evaluation `evalT (Fin.last n) i t` tensored with
   the basis covector `basis ![c (Fin.last n)] (single.symm i)`, with the appended index
@@ -379,7 +381,6 @@ lemma eq_sum_evalT {n : ℕ} {c : Fin (n + 1) → C} (t : Tensor S c) :
         exact ComponentIdx.congr_right b _ _ (by rw [Fin.succAbove_last]; rfl)
       · simp only [id_eq, ComponentIdx.prod_symm_natAdd, ComponentIdx.single_symm_apply,
           basisIdxCongr_apply_apply]
-        erw [basisIdxCongr_apply_apply]
         exact ComponentIdx.congr_right _ _ _ (by fin_cases j; rfl)
     · intro j h1 h1
       rw [if_neg (by grind)]

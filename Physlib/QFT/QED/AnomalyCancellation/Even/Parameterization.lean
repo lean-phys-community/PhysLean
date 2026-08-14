@@ -154,7 +154,7 @@ theorem generic_case {S : (PureU1 (2 * n.succ)).Sols} (h : GenericCase S) :
   · exact hS
   · have h := h g f hS
     rw [anomalyFree_param _ _ hS] at h
-    simp only [Nat.succ_eq_add_one, accCubeTriLinSymm_toFun_apply_apply, ne_eq, neg_eq_zero] at h
+    simp only [Nat.succ_eq_add_one, ne_eq, neg_eq_zero] at h
     exact h
 
 set_option backward.isDefEq.respectTransparency false in

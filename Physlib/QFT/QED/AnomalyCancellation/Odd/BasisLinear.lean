@@ -271,6 +271,7 @@ namespace Unshifted
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The unshifted part of the basis as charge assignments. -/
 def basisAsCharges (j : Fin n) : (PureU1 (2 * n + 1)).Charges :=
   fun i =>
@@ -288,6 +289,7 @@ def basisAsCharges (j : Fin n) : (PureU1 (2 * n + 1)).Charges :=
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_oddFst_self (j : Fin n) : basisAsCharges j (oddFst j) = 1 := by
   simp [basisAsCharges]
 
@@ -338,6 +340,7 @@ lemma basis_on_oddMid (j : Fin n) : basisAsCharges j oddMid = 0 := by
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_linearACC (j : Fin n) : (accGrav (2 * n + 1)) (basisAsCharges j) = 0 := by
   rw [accGrav]
   simp [sum_odd, basis_oddSnd_eq_minus_oddFst, basis_on_oddMid]
@@ -397,10 +400,12 @@ lemma planeCharges_oddMid (f : Fin n → ℚ) : planeCharges f oddMid = 0 := by
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeCharges_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (planeCharges f) = 0 := by
   rw [accGrav]
   simp [sum_odd, planeCharges_oddSnd, planeCharges_oddFst, planeCharges_oddMid]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeCharges_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (planeCharges f) = 0 := by
   rw [accCube_explicit, sum_odd, planeCharges_oddMid]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, Function.comp_apply, zero_add]
@@ -420,6 +425,7 @@ lemma planeCharges_zero (f : Fin n → ℚ) (h : planeCharges f = 0) : ∀ i, f 
 /-- A point in the span of the unshifted part of the basis. -/
 def planeLinSols (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • basis i
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeLinSols_val (f : Fin n → ℚ) : (planeLinSols f).val = planeCharges f := by
   simp only [planeLinSols, planeCharges]
   funext i
@@ -454,6 +460,7 @@ namespace Shifted
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The shifted part of the basis as charge assignments. -/
 def basisAsCharges (j : Fin n) : (PureU1 (2 * n + 1)).Charges :=
   fun i =>
@@ -471,6 +478,7 @@ def basisAsCharges (j : Fin n) : (PureU1 (2 * n + 1)).Charges :=
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_oddShiftFst_self (j : Fin n) : basisAsCharges j (oddShiftFst j) = 1 := by
   simp [basisAsCharges]
 
@@ -523,6 +531,7 @@ lemma basis_on_oddShiftZero (j : Fin n) : basisAsCharges j oddShiftZero = 0 := b
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_linearACC (j : Fin n) : (accGrav (2 * n + 1)) (basisAsCharges j) = 0 := by
   rw [accGrav]
   simp [sum_oddShift, basis_on_oddShiftZero, basis_oddShiftSnd_eq_minus_oddShiftFst]
@@ -547,6 +556,7 @@ def basis (j : Fin n) : (PureU1 (2 * n + 1)).LinSols :=
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Swapping the elements oddShiftFst j and oddShiftSnd j is equivalent to adding a vector
   basisAsCharges j. -/
 lemma swap_as_add {S S' : (PureU1 (2 * n + 1)).LinSols} (j : Fin n)
@@ -609,10 +619,12 @@ lemma planeCharges_oddShiftZero (f : Fin n → ℚ) : planeCharges f oddShiftZer
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeCharges_linearACC (f : Fin n → ℚ) : (accGrav (2 * n + 1)) (planeCharges f) = 0 := by
   rw [accGrav]
   simp [sum_oddShift, planeCharges_oddShiftSnd, planeCharges_oddShiftFst, planeCharges_oddShiftZero]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeCharges_accCube (f : Fin n → ℚ) : accCube (2 * n +1) (planeCharges f) = 0 := by
   rw [accCube_explicit, sum_oddShift, planeCharges_oddShiftZero]
   simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, Function.comp_apply, zero_add]
@@ -638,6 +650,7 @@ lemma planeCharges_zero (f : Fin n → ℚ) (h : planeCharges f = 0) : ∀ i, f 
 /-- A point in the span of the shifted part of the basis. -/
 def planeLinSols (f : Fin n → ℚ) : (PureU1 (2 * n + 1)).LinSols := ∑ i, f i • basis i
 
+set_option backward.isDefEq.respectTransparency false in
 lemma planeLinSols_val (f : Fin n → ℚ) : (planeLinSols f).val = planeCharges f := by
   simp only [planeLinSols, planeCharges]
   funext i
@@ -664,6 +677,7 @@ end Shifted
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma P_P_P!_accCube (g : Fin n → ℚ) (j : Fin n) :
     accCubeTriLinSymm (Unshifted.planeCharges g) (Unshifted.planeCharges g)
       (Shifted.basisAsCharges j)
@@ -712,6 +726,7 @@ def Pa (f : Fin n → ℚ) (g : Fin n → ℚ) : (PureU1 (2 * n + 1)).Charges :=
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_oddShiftShiftZero (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftZero = f 0 := by
   rw [Pa]
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
@@ -720,6 +735,7 @@ lemma Pa_oddShiftShiftZero (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftZero
   rw [Shifted.planeCharges_oddShiftZero, oddShiftZero_eq_oddFst,
     Unshifted.planeCharges_oddFst, add_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_oddShiftShiftFst (f g : Fin n.succ → ℚ) (j : Fin n) :
     Pa f g (oddShiftShiftFst j) = f j.succ + g j.castSucc := by
   rw [Pa]
@@ -729,6 +745,7 @@ lemma Pa_oddShiftShiftFst (f g : Fin n.succ → ℚ) (j : Fin n) :
   rw [Shifted.planeCharges_oddShiftFst, oddShiftFst_castSucc_eq_oddFst_succ,
     Unshifted.planeCharges_oddFst]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_oddShiftShiftMid (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftMid = g (Fin.last n) := by
   rw [Pa]
   simp only [ACCSystemCharges.chargesAddCommMonoid_add]
@@ -737,6 +754,7 @@ lemma Pa_oddShiftShiftMid (f g : Fin n.succ → ℚ) : Pa f g oddShiftShiftMid =
   rw [Shifted.planeCharges_oddShiftFst, oddShiftFst_last_eq_oddMid,
     Unshifted.planeCharges_oddMid, zero_add]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Pa_oddShiftShiftSnd (f g : Fin n.succ → ℚ) (j : Fin n.succ) :
     Pa f g (oddShiftShiftSnd j) = - f j - g j := by
   rw [Pa]

@@ -198,6 +198,7 @@ lemma Bi_Bj_ne_cubic {i j : Fin 7} (h : i ≠ j) (S : (SM 3).Charges) :
   · exact B₅_Bi_cubic h S
   · exact B₆_Bi_cubic h S
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Bi_Bi_Bj_cubic (i j : Fin 7) :
     cubeTriLin (B i) (B i) (B j) = 0 := by
   rcases eq_or_ne i j with rfl | hij

@@ -536,6 +536,7 @@ lemma take_uncontractedListOrderPos_eq_filter_sort (c : WickContraction n) (i : 
   rw [take_uncontractedListOrderPos_eq_filter]
   exact filter_uncontractedList c fun x => x.1 < i.1
 
+set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_succAboveEmb_uncontractedList_eq_insertIdx (c : WickContraction n)
     (i : Fin n.succ) :
     (List.orderedInsert (· ≤ ·) i (List.map i.succAboveEmb c.uncontractedList)) =

@@ -364,6 +364,7 @@ lemma dualRightMetric_eq_basis : εR' =
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma coMetric_eq_ofRat : η' = ofRat fun f =>
     if f 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ f 1 = Fin.cast (by rfl) (0 : Fin 4) then 1 else
     if f 0 = f 1 then - 1 else 0 := by
@@ -374,6 +375,7 @@ lemma coMetric_eq_ofRat : η' = ofRat fun f =>
   congr
   with_unfolding_all decide
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrMetric_eq_ofRat : η = ofRat fun f =>
     if f 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ f 1 = Fin.cast (by rfl) (0 : Fin 4) then 1 else
     if f 0 = f 1 then - 1 else 0 := by

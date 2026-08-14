@@ -26,6 +26,7 @@ open TensorProduct
 
 namespace realLorentzTensor
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The colors associated with complex representations of SL(2, ℂ) of interest to physics. -/
 inductive Color
   /-- The color associated with contravariant Lorentz vectors. -/

@@ -16,7 +16,7 @@ public section
 
 namespace Physlib.List
 
-open Fin
+open _root_.Physlib.Fin
 open Physlib
 variable {n : Nat}
 
@@ -321,7 +321,8 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   simp only [List.length_cons, orderedInsertEquiv, Nat.succ_eq_add_one, Equiv.trans_apply]
   match r with
   | [] =>
-    simp
+    simp only [List.length_cons, List.length_nil] at hn
+    omega
   | r1 :: r =>
     simp only [List.length_cons]
     rw [finExtractOne_apply_neq]
@@ -338,7 +339,7 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   simp only [orderedInsertEquiv, Equiv.trans_apply]
   match r with
   | [] =>
-    simp
+    exact n.elim0
   | r1 :: r =>
     simp only [List.length_cons, Fin.eta]
     rw [finExtractOne_apply_neq]
@@ -567,15 +568,13 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
     simp only [List.length_cons, Fin.zero_eta, Fin.getElem_fin, Fin.val_zero,
       List.getElem_cons_zero, List.getElem_cons_succ]
     nth_rewrite 2 [insertionSortEquiv] at hij'
-    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta,
-      Equiv.trans_apply, equivCons_zero] at hij'
+    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta] at hij'
     convert lt_orderedInsertPos_rel_fin r a (List.insertionSort r as) _ hij'
     change _ = ((List.insertionSort r (a :: as))).get ((insertionSortEquiv r (a :: as)) ⟨j + 1, hj⟩)
     rw [← insertionSortEquiv_get]
     simp
   | a :: as, ⟨i + 1, hi⟩, ⟨j + 1, hj⟩, hij, hij' => by
-    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one, Equiv.trans_apply,
-      equivCons_succ] at hij'
+    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one] at hij'
     simpa using insertionSortEquiv_order as ⟨i, Nat.succ_lt_succ_iff.mp hi⟩
       ⟨j, Nat.succ_lt_succ_iff.mp hj⟩ (by simpa using hij)
       (orderedInsertEquiv_monotone_fin_succ _ _ _ _ _ hij')

@@ -100,6 +100,7 @@ noncomputable def crossToEnd {nA nB : ℕ} {cA : Fin (nA + 1) → C} {cB : Fin (
     permT (Fin.cast (show (nA + nB) + 1 + 1 = (nA + 1) + (nB + 1) by omega))
       (IsReindexing.fin_cast_isReindexing _ _ (by omega))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Cross-contracting the last slot of a rank-2 tensor `A` with the `0`-slot of a rank-2 tensor `B`
   is a plain `contrT` of their product on the middle slots `1, 2`, up to a color recast. Discharging
   the slot arithmetic once lets a `contrT`-level identity lift to `crossToEnd` by one rewrite. -/

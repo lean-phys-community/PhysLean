@@ -60,6 +60,7 @@ lemma rep_toMatrix (d : ℕ) (Λ : LorentzGroup d) :
 lemma rep_injective (d : ℕ) (Λ : LorentzGroup d) : Function.Injective (rep Λ) :=
   fun _ _ h => Matrix.mulVec_injective_of_isUnit (isUnit_of_invertible Λ.1) h
 
+set_option backward.isDefEq.respectTransparency false in
 lemma rep_surjective (d : ℕ) (Λ : LorentzGroup d) : Function.Surjective (rep Λ) :=
   fun v => ⟨Λ⁻¹ *ᵥ v, by simp [rep_apply_eq_mulVec]⟩
 

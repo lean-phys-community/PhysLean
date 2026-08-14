@@ -30,6 +30,7 @@ open Dimension CarriesDimension LTMCTUnitChoices UnitDependent HasDim
 /-- The length corresponding to 400 meters. -/
 noncomputable def meters400 : Dimensionful (WithDim L𝓭 ℝ) := toDimensionful SI ⟨400⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Changing that length to miles.
   400 meters is very almost a quarter of a mile. -/
 example : meters400 {SI with length := LengthUnit.miles} = ⟨1/4 - 73/50292⟩ := by

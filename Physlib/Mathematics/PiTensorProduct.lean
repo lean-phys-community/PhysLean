@@ -107,6 +107,7 @@ section
 variable [DecidableEq (ι1 ⊕ ι2)]
 omit inst1 inst2
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pureInl_update_left [DecidableEq ι1] (f : (i : ι1 ⊕ ι2) → Sum.elim s1 s2 i) (x : ι1)
     (v1 : s1 x) : pureInl (Function.update f (Sum.inl x) v1) =
     Function.update (pureInl f) x v1 := by
@@ -118,12 +119,14 @@ lemma pureInl_update_left [DecidableEq ι1] (f : (i : ι1 ⊕ ι2) → Sum.elim 
     rfl
   · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pureInr_update_left (f : (i : ι1 ⊕ ι2) → Sum.elim s1 s2 i) (x : ι1)
     (v2 : s1 x) :
     pureInr (Function.update f (Sum.inl x) v2) = (pureInr f) := by
   funext y
   simp [pureInr, Function.update]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pureInr_update_right [DecidableEq ι2] (f : (i : ι1 ⊕ ι2) → Sum.elim s1 s2 i) (x : ι2)
     (v2 : s2 x) : pureInr (Function.update f (Sum.inr x) v2) =
     Function.update (pureInr f) x v2 := by
@@ -135,6 +138,7 @@ lemma pureInr_update_right [DecidableEq ι2] (f : (i : ι1 ⊕ ι2) → Sum.elim
     rfl
   · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pureInl_update_right (f : (i : ι1 ⊕ ι2) → Sum.elim s1 s2 i) (x : ι2)
     (v1 : s2 x) :
     pureInl (Function.update f (Sum.inr x) v1) = (pureInl f) := by
@@ -151,10 +155,10 @@ def domCoprod :
   toFun f := (PiTensorProduct.tprod R (pureInl f)) ⊗ₜ
     (PiTensorProduct.tprod R (pureInr f))
   map_update_add' f xy v1 v2 := by
-    haveI : DecidableEq (ι1 ⊕ ι2) := inferInstance
-    haveI : DecidableEq ι1 :=
+    have : DecidableEq (ι1 ⊕ ι2) := inferInstance
+    have : DecidableEq ι1 :=
       @Function.Injective.decidableEq ι1 (ι1 ⊕ ι2) Sum.inl _ Sum.inl_injective
-    haveI : DecidableEq ι2 :=
+    have : DecidableEq ι2 :=
       @Function.Injective.decidableEq ι2 (ι1 ⊕ ι2) Sum.inr _ Sum.inr_injective
     match xy with
     | Sum.inl xy =>
@@ -164,10 +168,10 @@ def domCoprod :
       simp only [Sum.elim_inr, pureInl_update_right, pureInr_update_right,
         MultilinearMap.map_update_add, ← tmul_add]
   map_update_smul' f xy r p := by
-    haveI : DecidableEq (ι1 ⊕ ι2) := inferInstance
-    haveI : DecidableEq ι1 :=
+    have : DecidableEq (ι1 ⊕ ι2) := inferInstance
+    have : DecidableEq ι1 :=
       @Function.Injective.decidableEq ι1 (ι1 ⊕ ι2) Sum.inl _ Sum.inl_injective
-    haveI : DecidableEq ι2 :=
+    have : DecidableEq ι2 :=
       @Function.Injective.decidableEq ι2 (ι1 ⊕ ι2) Sum.inr _ Sum.inr_injective
     match xy with
     | Sum.inl x =>
@@ -194,6 +198,7 @@ section
 variable [DecidableEq ι1] [DecidableEq ι2]
 omit inst1 inst2
 
+set_option backward.isDefEq.respectTransparency false in
 lemma elimPureTensor_update_right (p : (i : ι1) → s1 i) (q : (i : ι2) → s2 i)
     (y : ι2) (r : s2 y) : elimPureTensor p (Function.update q y r) =
     Function.update (elimPureTensor p q) (Sum.inr y) r := by
@@ -210,6 +215,7 @@ lemma elimPureTensor_update_right (p : (i : ι1) → s1 i) (q : (i : ι2) → s2
       rfl
     · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma elimPureTensor_update_left (p : (i : ι1) → s1 i) (q : (i : ι2) → s2 i)
     (x : ι1) (r : s1 x) : elimPureTensor (Function.update p x r) q =
@@ -237,22 +243,22 @@ def elimPureTensorMulLin : MultilinearMap R s1
   toFun p := {
     toFun := fun q => PiTensorProduct.tprod R (elimPureTensor p q)
     map_update_add' := fun m x v1 v2 => by
-      haveI : DecidableEq ι2 := inferInstance
-      haveI := Classical.decEq ι1
+      have : DecidableEq ι2 := inferInstance
+      have := Classical.decEq ι1
       simp only [elimPureTensor_update_right, MultilinearMap.map_update_add]
     map_update_smul' := fun m x r v => by
-      haveI : DecidableEq ι2 := inferInstance
-      haveI := Classical.decEq ι1
+      have : DecidableEq ι2 := inferInstance
+      have := Classical.decEq ι1
       simp only [elimPureTensor_update_right, MultilinearMap.map_update_smul]}
   map_update_add' p x v1 v2 := by
-    haveI : DecidableEq ι1 := inferInstance
-    haveI := Classical.decEq ι2
+    have : DecidableEq ι1 := inferInstance
+    have := Classical.decEq ι2
     apply MultilinearMap.ext
     intro y
     simp
   map_update_smul' p x r v := by
-    haveI : DecidableEq ι1 := inferInstance
-    haveI := Classical.decEq ι2
+    have : DecidableEq ι1 := inferInstance
+    have := Classical.decEq ι2
     apply MultilinearMap.ext
     intro y
     simp
@@ -269,7 +275,7 @@ def tmul : ((⨂[R] i : ι1, s1 i) ⊗[R] (⨂[R] i : ι2, s2 i)) →ₗ[R]
 /-- The equivalence formed by combining a `TensorProduct` into a `PiTensorProduct`. -/
 def tmulEquiv : ((⨂[R] i : ι1, s1 i) ⊗[R] (⨂[R] i : ι2, s2 i)) ≃ₗ[R]
     ⨂[R] i : ι1 ⊕ ι2, (Sum.elim s1 s2) i :=
-  LinearEquiv.ofLinear tmul tmulSymm
+  LinearEquiv.ofLinearMap tmul tmulSymm
   (by
     apply PiTensorProduct.ext
     apply MultilinearMap.ext
@@ -295,7 +301,7 @@ def tmulEquiv : ((⨂[R] i : ι1, s1 i) ⊗[R] (⨂[R] i : ι2, s2 i)) ≃ₗ[R]
 lemma tmulEquiv_tmul_tprod (p : (i : ι1) → s1 i) (q : (i : ι2) → s2 i) :
     tmulEquiv ((PiTensorProduct.tprod R) p ⊗ₜ[R] (PiTensorProduct.tprod R) q) =
     (PiTensorProduct.tprod R) (elimPureTensor p q) := by
-  simp only [tmulEquiv, tmul, elimPureTensorMulLin, LinearEquiv.ofLinear_apply, lift.tmul,
+  simp only [tmulEquiv, tmul, elimPureTensorMulLin, LinearEquiv.coe_ofLinearMap, lift.tmul,
     LinearMap.coe_mk, AddHom.coe_mk, PiTensorProduct.lift.tprod, MultilinearMap.coe_mk]
 
 end tmulEquiv

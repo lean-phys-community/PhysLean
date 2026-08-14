@@ -103,6 +103,7 @@ lemma deriv_eq_manifoldDeriv [NormedAddCommGroup M] [NormedSpace ℝ M]
     deriv f t = manifoldDeriv 𝓘(ℝ, M) f t := by
   rw [deriv_eq_mfderiv, manifoldDeriv_eq]
 
+set_option backward.isDefEq.respectTransparency false in
 open Manifold in
 @[simp]
 lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]

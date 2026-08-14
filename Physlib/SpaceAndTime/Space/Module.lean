@@ -5,14 +5,10 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Basic
 public import Physlib.SpaceAndTime.Space.Origin
-public import Mathlib.Geometry.Manifold.Diffeomorph
 public import Mathlib.Analysis.Distribution.TemperateGrowth
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-public import Mathlib.Analysis.Calculus.ContDiff.WithLp
 public import Mathlib.Tactic.Cases
-public import Mathlib.Analysis.Calculus.FDeriv.WithLp
 /-!
 
 # The structure of a module on Space
@@ -667,15 +663,16 @@ noncomputable def modelDiffeo {d} : Diffeomorph (𝓡 d) 𝓘(ℝ, Space d) (Spa
   right_inv _ := rfl
   contMDiff_toFun := by
     refine contMDiff_iff.mpr ⟨continuous_id', fun x y => ?_⟩
-    simpa [← Function.id_def, homEuclideanSpaceSpace] using by fun_prop
+    simpa [← Function.id_def, homEuclideanSpaceSpace, chartAt_self_eq] using by fun_prop
   contMDiff_invFun := by
     apply contMDiff_iff.mpr ⟨by simpa using by fun_prop, fun x y => ?_⟩
-    simpa [homEuclideanSpaceSpace] using by fun_prop
+    simpa [homEuclideanSpaceSpace, chartAt_self_eq] using by fun_prop
 
 @[simp]
 lemma modelDiffeo_apply {d : ℕ} (p : Space d) :
     modelDiffeo p = p := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 open Manifold in
 /-- The derivative of `modelDiffeo` provides an equivalence between
   `Space d` and `EuclideanSpace ℝ (Fin d)`. This equivalences takes the basis

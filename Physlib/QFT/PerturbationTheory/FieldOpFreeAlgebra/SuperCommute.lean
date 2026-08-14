@@ -100,6 +100,7 @@ lemma superCommuteF_ofFieldOpListF_ofFieldOpF (φs : List 𝓕.FieldOp) (φ : �
     ofFieldOpListF_singleton]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommuteF_anPartF_crPartF (φ φ' : 𝓕.FieldOp) :
     [anPartF φ, crPartF φ']ₛF = anPartF φ * crPartF φ' -
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • crPartF φ' * anPartF φ := by
@@ -122,6 +123,7 @@ lemma superCommuteF_anPartF_crPartF (φ φ' : 𝓕.FieldOp) :
     simp [anPartF_posAsymp, crPartF_negAsymp, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommuteF_crPartF_anPartF (φ φ' : 𝓕.FieldOp) :
     [crPartF φ, anPartF φ']ₛF = crPartF φ * anPartF φ' -
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPartF φ' * crPartF φ := by
@@ -144,6 +146,7 @@ lemma superCommuteF_crPartF_anPartF (φ φ' : 𝓕.FieldOp) :
     simp [crPartF_negAsymp, anPartF_posAsymp, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommuteF_crPartF_crPartF (φ φ' : 𝓕.FieldOp) :
     [crPartF φ, crPartF φ']ₛF = crPartF φ * crPartF φ' -
     𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • crPartF φ' * crPartF φ := by
@@ -166,6 +169,7 @@ lemma superCommuteF_crPartF_crPartF (φ φ' : 𝓕.FieldOp) :
     simp [crPartF_negAsymp, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommuteF_anPartF_anPartF (φ φ' : 𝓕.FieldOp) :
     [anPartF φ, anPartF φ']ₛF =
     anPartF φ * anPartF φ' - 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φ') • anPartF φ' * anPartF φ := by
@@ -187,6 +191,7 @@ lemma superCommuteF_anPartF_anPartF (φ φ' : 𝓕.FieldOp) :
     simp [anPartF_posAsymp, ← ofCrAnListF_singleton,
       superCommuteF_ofCrAnListF_ofCrAnListF, crAnStatistics, ← ofCrAnListF_append]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommuteF_crPartF_ofFieldOpListF (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
     [crPartF φ, ofFieldOpListF φs]ₛF =
     crPartF φ * ofFieldOpListF φs - 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs) • ofFieldOpListF φs *
@@ -201,6 +206,7 @@ lemma superCommuteF_crPartF_ofFieldOpListF (φ : 𝓕.FieldOp) (φs : List 𝓕.
   | FieldOp.outAsymp φ =>
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 lemma superCommuteF_anPartF_ofFieldOpListF (φ : 𝓕.FieldOp) (φs : List 𝓕.FieldOp) :
     [anPartF φ, ofFieldOpListF φs]ₛF =
     anPartF φ * ofFieldOpListF φs - 𝓢(𝓕 |>ₛ φ, 𝓕 |>ₛ φs) •

@@ -32,6 +32,7 @@ namespace SMνCharges
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sum_one  [AddCommMonoid M] (f : Fin (SMνSpecies 1).numberCharges → M) :
     ∑ i, f i = f ⟨0, by simp⟩ := by
   change  ∑ (i : Fin 1), f i = _
@@ -94,6 +95,7 @@ open SMνCharges
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The gravitational anomaly equation. -/
 def accGrav : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (6 * Q S i + 3 * U S i + 3 * D S i + 2 * L S i + E S i + N S i)
@@ -112,6 +114,7 @@ def accGrav : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
     -- rw [show Rat.cast a = a from rfl]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accGrav_decomp (S : (SMνCharges n).Charges) :
     accGrav S = 6 * ∑ i, Q S i + 3 * ∑ i, U S i + 3 * ∑ i, D S i + 2 * ∑ i, L S i + ∑ i, E S i +
       ∑ i, N S i := by
@@ -127,6 +130,7 @@ lemma accGrav_ext {S T : (SMνCharges n).Charges}
   rw [accGrav_decomp, accGrav_decomp]
   repeat rw [hj]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `SU(2)` anomaly equation. -/
 def accSU2 : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (3 * Q S i + L S i)
@@ -145,6 +149,7 @@ def accSU2 : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
     -- rw [show Rat.cast a = a from rfl]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accSU2_decomp (S : (SMνCharges n).Charges) :
     accSU2 S = 3 * ∑ i, Q S i + ∑ i, L S i := by
   simp only [accSU2, toSpecies_apply, Fin.isValue, LinearMap.coe_mk,
@@ -159,6 +164,7 @@ lemma accSU2_ext {S T : (SMνCharges n).Charges}
   rw [accSU2_decomp, accSU2_decomp]
   repeat rw [hj]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `SU(3)` anomaly equations. -/
 def accSU3 : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (2 * Q S i + U S i + D S i)
@@ -177,6 +183,7 @@ def accSU3 : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
     -- rw [show Rat.cast a = a from rfl]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accSU3_decomp (S : (SMνCharges n).Charges) :
     accSU3 S = 2 * ∑ i, Q S i + ∑ i, U S i + ∑ i, D S i := by
   simp only [accSU3, toSpecies_apply, Fin.isValue, LinearMap.coe_mk,
@@ -191,6 +198,7 @@ lemma accSU3_ext {S T : (SMνCharges n).Charges}
   rw [accSU3_decomp, accSU3_decomp]
   repeat rw [hj]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `Y²` anomaly equation. -/
 def accYY : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (Q S i + 8 * U S i + 2 * D S i + 3 * L S i
@@ -210,6 +218,7 @@ def accYY : (SMνCharges n).Charges →ₗ[ℚ] ℚ where
     -- rw [show Rat.cast a = a from rfl]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 lemma accYY_decomp (S : (SMνCharges n).Charges) :
     accYY S = ∑ i, Q S i + 8 * ∑ i, U S i + 2 * ∑ i, D S i + 3 * ∑ i, L S i + 6 * ∑ i, E S i := by
   simp only [accYY, toSpecies_apply, Fin.isValue, LinearMap.coe_mk,
@@ -224,6 +233,7 @@ lemma accYY_ext {S T : (SMνCharges n).Charges}
   rw [accYY_decomp, accYY_decomp]
   repeat rw [hj]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The quadratic bilinear map. -/
 @[simps!]
 def quadBiLin : BiLinearSymm (SMνCharges n).Charges := BiLinearSymm.mk₂
@@ -277,6 +287,7 @@ lemma accQuad_decomp (S : (SMνCharges n).Charges) :
   rw [quadBiLin_decomp]
   ring_nf
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accQuad`. -/
 lemma accQuad_ext {S T : (SMνCharges n).Charges}
     (h : ∀ j, ∑ i, ((fun a => a^2) ∘ toSpecies j S) i =
@@ -285,6 +296,7 @@ lemma accQuad_ext {S T : (SMνCharges n).Charges}
   rw [accQuad_decomp, accQuad_decomp]
   simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The symmetric trilinear form used to define the cubic acc. -/
 @[simps!]
 def cubeTriLin : TriLinearSymm (SMνCharges n).Charges := TriLinearSymm.mk₃
@@ -341,6 +353,7 @@ lemma accCube_decomp (S : (SMνCharges n).Charges) :
   rw [cubeTriLin_decomp]
   ring_nf
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accCube`. -/
 lemma accCube_ext {S T : (SMνCharges n).Charges}
     (h : ∀ j, ∑ i, ((fun a => a^3) ∘ toSpecies j S) i =

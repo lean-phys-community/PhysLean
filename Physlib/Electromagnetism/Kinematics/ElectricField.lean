@@ -215,7 +215,6 @@ lemma electricField_contDiff {n} {c : SpeedOfLight} {A : ElectromagneticPotentia
     enter [3, x];
     change A.electricField c x.1 x.2 i
     rw [electricField_eq_fieldStrengthMatrix (A) x.1 x.2 i (hA.differentiable (by simp))]
-    change - c * A.fieldStrengthMatrix ((toTimeAndSpace c).symm (x.1, x.2)) (Sum.inl 0, Sum.inr i)
   apply ContDiff.mul
   · fun_prop
   exact (fieldStrengthMatrix_contDiff hA).comp
@@ -334,7 +333,6 @@ lemma div_electricField_eq_fieldStrengthMatrix{d} {A : ElectromagneticPotential 
   conv_rhs =>
     enter [2, i]
     rw [SpaceTime.deriv_sum_inr c _ (fieldStrengthMatrix_differentiable hA)]
-    simp only [Fin.isValue]
   rw [Space.div]
   congr
   funext i

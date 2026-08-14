@@ -171,7 +171,7 @@ example (g : RiemannianMetric I n M) (x : M) (v : TangentSpace I x) :
 -- Example showing how to use the metric inner product space
 example (g : RiemannianMetric I n M) (x : M) (v w : TangentSpace I x) :
     (TangentSpace.metricInnerProductSpace g x).inner v w = g.inner x v w := by
-  letI := TangentSpace.metricInnerProductSpace g x
+  let := TangentSpace.metricInnerProductSpace g x
   rfl
 
 /-- Helper function to compute the norm on a tangent space from a Riemannian metric,

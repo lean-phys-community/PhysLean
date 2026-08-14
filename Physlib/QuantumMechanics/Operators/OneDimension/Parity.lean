@@ -89,7 +89,8 @@ def parityOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_inject
 lemma parityOperatorSchwartz_parityOperatorSchwartz (ψ : 𝓢(ℝ, ℂ)) :
     parityOperatorSchwartz (parityOperatorSchwartz ψ) = ψ := by
   ext x
-  simp [parityOperatorSchwartz]
+  show ψ (- - x) = ψ x
+  rw [neg_neg]
 
 /-!
 

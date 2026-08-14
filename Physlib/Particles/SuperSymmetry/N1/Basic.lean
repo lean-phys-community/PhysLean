@@ -410,6 +410,7 @@ def conjChiralCovector
   permT ![0] ⟨by decide, fun i => by fin_cases i; rfl⟩
     ((chiralTensor (ι := ι)).conjT t)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For scalar tensors, `toField` of the normalized tensor conjugate is the complex conjugate of
 `toField`. -/
 lemma toField_conjScalar (t : (chiralTensor (ι := ι)).Tensor ![]) :
@@ -422,6 +423,7 @@ lemma toField_conjScalar (t : (chiralTensor (ι := ι)).Tensor ![]) :
   erw [ConjTensorSpecies.componentMap_conjT (S := chiralTensor (ι := ι))]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Component formula for the holomorphic covector conjugate: the `![I]` basis component of
 `conjChiralCovector t` is the complex conjugate of the `![I]` component of `t`. -/
 lemma repr_conjChiralCovector

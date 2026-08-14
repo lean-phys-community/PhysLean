@@ -40,6 +40,7 @@ def LineInPlaneCond (S : (PureU1 n).LinSols) : Prop :=
   ∀ (i1 i2 i3 : Fin n) (_ : i1 ≠ i2) (_ : i2 ≠ i3) (_ : i1 ≠ i3),
   LineInPlaneProp (S.val i1, (S.val i2, S.val i3))
 
+set_option backward.isDefEq.respectTransparency false in
 lemma lineInPlaneCond_perm {S : (PureU1 n).LinSols} (hS : LineInPlaneCond S)
     (M : (FamilyPermutations n).group) :
     LineInPlaneCond ((FamilyPermutations n).linSolRep M S) := by

@@ -161,6 +161,7 @@ lemma self_not_mem_uncontracted_of_insertAndContractNat_some (c : WickContractio
   rw [mem_uncontracted_iff_not_contracted]
   simp [insertAndContractNat]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma insertAndContractNat_succAbove_mem_uncontracted_iff (c : WickContraction n) (i : Fin n.succ)
     (j : Fin n) :
     (i.succAbove j) ∈ (insertAndContractNat c i none).uncontracted ↔ j ∈ c.uncontracted := by
@@ -257,6 +258,7 @@ lemma insertAndContractNat_none_getDual?_eq_none (c : WickContraction n) (i : Fi
     (insertAndContractNat c i none).getDual? i = none := by
   simp [getDual?_eq_none_iff_mem_uncontracted]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma insertAndContractNat_succAbove_getDual?_eq_none_iff (c : WickContraction n) (i : Fin n.succ)
     (j : Fin n) :
@@ -334,8 +336,7 @@ lemma insertAndContractNat_some_getDual?_of_neq (c : WickContraction n) (i : Fin
 lemma insertAndContractNat_erase (c : WickContraction n) (i : Fin n.succ)
     (j : Option c.uncontracted) : erase (insertAndContractNat c i j) i = c := by
   refine Subtype.ext (Finset.ext fun a => ?_)
-  simp only [erase, Nat.succ_eq_add_one, insertAndContractNat, Finset.mem_filter, Finset.mem_univ,
-    true_and]
+  simp only [erase, Nat.succ_eq_add_one, insertAndContractNat]
   match j with
   | none =>
     simp [Finset.mapEmbedding_apply, Finset.map_inj]

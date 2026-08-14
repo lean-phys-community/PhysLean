@@ -53,10 +53,12 @@ lemma of_singleton_eq {i j : Fin n} (hij : i < j) (a : (singleton hij).1) :
   rw [@mem_singleton_iff] at ha2
   exact Subtype.coe_eq_of_eq_mk ha2
 
+set_option backward.isDefEq.respectTransparency false in
 lemma singleton_prod {φs : List 𝓕.FieldOp} {i j : Fin φs.length} (hij : i < j)
     (f : (singleton hij).1 → M) [CommMonoid M] :
     ∏ a, f a = f ⟨{i,j}, mem_singleton hij⟩:= by
-  simp [singleton, of_singleton_eq]
+  simp [singleton]
+  exact congrArg f (of_singleton_eq hij _)
 
 @[simp]
 lemma singleton_fstFieldOfContract {i j : Fin n} (hij : i < j) :

@@ -125,6 +125,7 @@ lemma ofFieldOpListF_append (φs φs' : List 𝓕.FieldOp) :
   dsimp only [ofFieldOpListF]
   rw [List.map_append, List.prod_append]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma ofFieldOpListF_sum (φs : List 𝓕.FieldOp) :
     ofFieldOpListF φs = ∑ (s : CrAnSection φs), ofCrAnListF s.1 := by
   induction φs with
@@ -194,6 +195,7 @@ lemma anPartF_posAsymp (φ : (Σ f, 𝓕.AsymptoticLabel f) × Momentum) :
     anPartF (FieldOp.outAsymp φ) = ofCrAnOpF ⟨FieldOp.outAsymp φ, ()⟩ := by
   simp [anPartF]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma ofFieldOpF_eq_crPartF_add_anPartF (φ : 𝓕.FieldOp) :
     ofFieldOpF φ = crPartF φ + anPartF φ := by
   rw [ofFieldOpF]

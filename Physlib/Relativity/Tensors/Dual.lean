@@ -82,6 +82,7 @@ noncomputable def toDualMapAtIndex : {n : ℕ} → {c : Fin n → C} → (i : Fi
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The metric tensor at `S.τ c` contracted with the metric tensor at `c` is the unit tensor
   at `c`. -/
 lemma crossToEnd_dual_metricTensor_metricTensor {c : C} :
@@ -91,6 +92,7 @@ lemma crossToEnd_dual_metricTensor_metricTensor {c : C} :
   rw [crossToEnd_two, contrT_dual_metricTensor_metricTensor, permT_permT]
   exact permT_congr rfl rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The metric tensor at `c` contracted with the metric tensor at `S.τ c` is the unit tensor
   at `S.τ c`. -/
 lemma crossToEnd_metricTensor_metricTensor_eq_dual_unit {c : C} :

@@ -300,6 +300,7 @@ lemma joinSignRightExtra_eq_i_j_finset_eq_if {φs : List 𝓕.FieldOp}
                 Option.get_some, forall_const, false_or, true_and]
               omega
 
+set_option backward.isDefEq.respectTransparency false in
 lemma joinSignLeftExtra_eq_joinSignRightExtra {φs : List 𝓕.FieldOp}
     {i j : Fin φs.length} (h : i < j) (hs : (𝓕 |>ₛ φs[i]) = (𝓕 |>ₛ φs[j]))
     (φsucΛ : WickContraction [singleton h]ᵘᶜ.length) :

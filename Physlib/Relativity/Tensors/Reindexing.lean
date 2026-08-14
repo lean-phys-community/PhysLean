@@ -493,7 +493,7 @@ lemma succSuccAbove_succAbove_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1) → C}
   congr 1
   apply Fin.val_injective
   simp only [Fin.succSuccAbove, Fin.succAbove, lt_def, val_castSucc,
-    val_succ, apply_ite Fin.val, apply_dite Fin.val, Fin.predAbove, Fin.castPred]
+    val_succ, apply_ite Fin.val, Fin.predAbove, Fin.castPred]
   grind (splits := 60)
 
 /-- Removing two single entries from `c` in either order gives the same colour list:

@@ -81,6 +81,7 @@ namespace HermitianMat
 variable {𝕜 : Type*} [RCLike 𝕜] {n : Type*} [Fintype n] [DecidableEq n]
 variable (A B : HermitianMat n 𝕜) (U : Matrix.unitaryGroup n 𝕜)
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem trace_conj_unitary : (conj U.val A).trace = A.trace := by
   simp [Matrix.trace_mul_cycle, conj, ← Matrix.star_eq_conjTranspose, trace]
@@ -93,6 +94,7 @@ theorem le_conj_unitary : A.conj U.val ≤ B.conj U ↔ A ≤ B := by
     simpa [HermitianMat.conj_conj] using conj_nonneg (star U).val h
   · exact fun h ↦ conj_nonneg U.val h
 
+set_option backward.isDefEq.respectTransparency false in
 open RealInnerProductSpace in
 @[simp]
 theorem inner_conj_unitary : ⟪A.conj U.val, B.conj U.val⟫ = ⟪A, B⟫ := by

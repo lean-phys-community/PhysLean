@@ -6,7 +6,6 @@ Authors: Joseph Tooby-Smith
 module
 
 public import Physlib.StringTheory.FTheory.SU5.Charges.AnomalyFree
-public import Mathlib.Data.ZMod.Defs
 /-!
 
 # Viable Quanta with Yukawa

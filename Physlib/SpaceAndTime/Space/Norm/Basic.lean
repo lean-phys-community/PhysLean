@@ -574,7 +574,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     Filter.atTop
     (𝓝 (⟪∇ᵈ (distOfFunction (fun x : Space d => Real.log ‖x‖)
     (IsDistBounded.log_norm)) η, y⟫_ℝ)) := by
-  haveI : NeZero d := ⟨by omega⟩
+  have : NeZero d := ⟨by omega⟩
   simp only [distGrad_inner_eq, Distribution.fderivD_apply, distOfFunction_apply]
   change Filter.Tendsto (fun n => -
     ∫ (x : Space d), fderiv ℝ η x (basis.repr.symm y) * Real.log (normPowerSeries n x))
@@ -600,6 +600,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     exact tendsto_const_nhds.mul
       ((normPowerSeries_tendsto x hx).log (norm_ne_zero_iff.mpr hx))
 
+set_option backward.isDefEq.respectTransparency false in
 lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     (η : 𝓢(Space d, ℝ)) (y : EuclideanSpace ℝ (Fin d)) :
     Filter.Tendsto (fun n =>
@@ -609,7 +610,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     (𝓝 (⟪distOfFunction (fun x : Space d => (‖x‖ ^ (- 2 : ℤ)) • basis.repr x) (by
     refine (IsDistBounded.zpow_smul_repr_self _ ?_)
     omega) η, y⟫_ℝ)) := by
-  haveI : NeZero d := ⟨by omega⟩
+  have : NeZero d := ⟨by omega⟩
   simp only [gradient_dist_normPowerSeries_log, distOfFunction_inner]
   have h1 (n : ℕ) (x : Space d) :
     η x * ⟪(normPowerSeries n x ^ (- 2 : ℤ)) • basis.repr x, y⟫_ℝ =
@@ -642,8 +643,7 @@ lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     filter_upwards [Measure.ae_ne volume 0] with x hx
     simp [mul_assoc]
     gcongr
-    rw [abs_of_nonneg (by simp)]
-    exact normPowerSeries_zpow_le_norm_sq_add_one n (- 2 : ℤ) x hx
+    simpa using normPowerSeries_zpow_le_norm_sq_add_one n (- 2 : ℤ) x hx
   · filter_upwards [Measure.ae_ne volume 0] with x hx
     have h2 : ⟪(‖x‖ ^ (- 2 : ℤ)) • basis.repr x, y⟫_ℝ =
         ⟪basis.repr x, y⟫_ℝ * ‖x‖ ^ (- 2 : ℤ) := by
@@ -709,6 +709,7 @@ private lemma integrable_real_pow_mul_schwartz
   refine (ψ.integrable_pow_mul volume k).mono' (by fun_prop)
     (ae_of_all _ fun x => by simp [norm_mul, norm_pow])
 
+set_option backward.isDefEq.respectTransparency false in
 private lemma radial_power_deriv_integral_by_parts
     {d : ℕ} (η : 𝓢(Space d, ℝ))
     (n : ↑(Metric.sphere (0 : Space d) 1))
@@ -1074,6 +1075,7 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} [NeZero d] :
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The distributional Laplacian of `‖x‖ ^ (2 - d)` is `(2 - d) * d * volume (Metric.ball 0 1)`
 times the Dirac delta at the origin. For `d ≥ 3` this `‖x‖ ^ (2 - d)` is the (singular)
 fundamental solution of the Laplacian, and for `d = 1` it is `‖x‖`. When `d = 2` the exponent
@@ -1094,9 +1096,11 @@ lemma distLaplacian_fundamentalSolution_norm_zpow {d : ℕ} :
       rw [distOfFunction_apply]
       refine integral_eq_zero_of_ae (ae_of_all _ fun x => ?_)
       rw [Subsingleton.elim x 0]
-      simp [zero_zpow_eq]
-    simp [hzero]
-  · haveI : NeZero d := ⟨by omega⟩
+      simp
+    simp only [Nat.cast_zero, zero_sub, neg_neg]
+    rw [hzero]
+    simp
+  · have : NeZero d := ⟨by omega⟩
     rw [distLaplacian]
     change ∇ᵈ ⬝ (∇ᵈ (distOfFunction
       (fun x : Space d => ‖x‖ ^ (- ((d : ℤ) - 2)))

@@ -37,6 +37,7 @@ variable {M : MatrixMap A B R} {M₂ : MatrixMap B C R}
 def IsTracePreserving (M : MatrixMap A B R) : Prop :=
   ∀ (x : Matrix A A R), (M x).trace = x.trace
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A map is trace preserving iff the partial trace of the Choi matrix is the identity. -/
 theorem IsTracePreserving_iff_trace_choi [DecidableEq A] (M : MatrixMap A B R) : M.IsTracePreserving
     ↔ M.choi_matrix.traceLeft = 1 := by
@@ -562,6 +563,7 @@ theorem of_kraus_CP (K : κ → Matrix B A 𝕜) : (of_kraus K K).IsCompletelyPo
     apply Classical.decEq);
   exact h_sum_congruence.symm ▸ IsCompletelyPositive.finset_sum h_congruence_CP
 
+set_option backward.isDefEq.respectTransparency false in
 theorem exists_kraus_of_choi_PSD
     (C : Matrix (B × A) (B × A) 𝕜) (hC : C.PosSemidef) :
     ∃ (K : (B × A) → Matrix B A 𝕜), C = (MatrixMap.of_kraus K K).choi_matrix := by
@@ -797,7 +799,7 @@ theorem cp_subunital_kadison_schwarz {M : MatrixMap A B ℂ} [DecidableEq B]
     ext i j
     cases i <;> cases j <;>
       simp [Matrix.fromBlocks, sub_eq_add_neg, add_left_comm, add_comm]
-  letI : Invertible (1 : Matrix B B ℂ) := invertibleOne
+  let : Invertible (1 : Matrix B B ℂ) := invertibleOne
   have h1 :=
     (Matrix.PosDef.fromBlocks₁₁ (B := M X) (D := M (Xᴴ * X))
       (hA := (Matrix.PosDef.one : (1 : Matrix B B ℂ).PosDef))).mp hsum

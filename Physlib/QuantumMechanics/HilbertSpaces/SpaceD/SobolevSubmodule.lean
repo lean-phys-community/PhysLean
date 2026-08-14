@@ -48,9 +48,9 @@ variable {d : ℕ} {μ : Measure (Space d)} [μ.HasTemperateGrowth]
 associated tempered distribution satisfies `MemSobolev s 2`. -/
 def SobolevSubmodule (d : ℕ) (s : ℝ) : Submodule ℂ (SpaceDHilbertSpace d) where
   carrier := {ψ | MemSobolev s 2 (toTemperedDistributionCLM d volume ψ)}
-  add_mem' {ψ φ} hψ hφ := by simpa only [Set.mem_setOf_eq, map_add] using hψ.add hφ
-  zero_mem' := by simpa only [Set.mem_setOf_eq, map_zero] using memSobolev_fun_zero (Space d) ℂ s 2
-  smul_mem' c ψ hψ := by simpa only [Set.mem_setOf_eq, map_smul] using hψ.smul c
+  add_mem' {ψ φ} hψ hφ := by simpa only [Set.mem_ofPred_eq, map_add] using hψ.add hφ
+  zero_mem' := by simpa only [Set.mem_ofPred_eq, map_zero] using memSobolev_fun_zero (Space d) ℂ s 2
+  smul_mem' c ψ hψ := by simpa only [Set.mem_ofPred_eq, map_smul] using hψ.smul c
 
 /-- Membership in `H^s` is the Sobolev condition on the associated tempered distribution. -/
 lemma mem_sobolevSubmodule_iff {s : ℝ} {ψ : SpaceDHilbertSpace d} :

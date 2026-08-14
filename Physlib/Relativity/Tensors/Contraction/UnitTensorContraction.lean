@@ -71,6 +71,7 @@ survivor tail by `move_last`.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Cross-contracting the last slot of the product `E ⊗ B` (with `B` rank one) against the unit
   tensor for that slot's color returns `E ⊗ B` unchanged, the contracted slot carried to the end.
   The rank-one spectator case that seeds `crossToEnd_unitTensor_slot`. -/
@@ -123,6 +124,7 @@ private lemma crossToEnd_prodT_unitTensor {nV : ℕ} {cE : Fin nV → C} {cB : C
     refine Fin.addCases (fun j => ?_) (fun j => ?_) i <;> simp [Fin.append_left, Fin.append_right]
   · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The boundary case of `crossToEnd_unitTensor`, proved by spectator decomposition along the last
   slot (`eq_sum_evalT`). The last slot is threaded as a variable `i` with `hilast : i = last nA` so
   that `crossToEnd_unitTensor` can apply it at the image of `i` under its transposition without a
@@ -253,6 +255,7 @@ lemma crossToEnd_round_trip_of_unit_slot {nA : ℕ} {c : Fin (nA + 1) → C} {d 
       simp [Fin.append_right, Function.comp_apply]
   · rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Round trip for `crossToSlot` at an arbitrary slot, with the colors in their composite form.
   The general-color statement `crossToSlot_raise_lower_round_trip` is obtained from this by
   substituting its three color equalities. -/
@@ -347,6 +350,7 @@ variable {nA : ℕ} {c : Fin (nA + 1) → C} {a b d e : C} (i : Fin (nA + 1))
     (hM'M : crossToEnd (Fin.last 1) (0 : Fin 2) ((congrArg S.τ he.symm).trans ha) M' M =
       permT (id : Fin 2 → Fin 2) (IsReindexing.unitTensor_pair hb) (unitTensor (S := S) d))
 
+set_option backward.isDefEq.respectTransparency false in
 include hMM' in
 /-- Lowering undoes raising: `crossToSlot_raise_lower_round_trip` with the color cast absorbed into
   `crossToSlotInv`. -/
@@ -374,7 +378,7 @@ lemma crossToSlot_crossToSlotInv (t : Tensor S (Function.update c i d)) :
     intro x y hxy
     exact permT_injective _ (by rw [← hswap x, ← hswap y, hxy])
   have hinj : Function.Injective (crossToSlotInv (S := S) i he hb M') := by
-    simp only [crossToSlotInv, LinearMap.coe_comp]
+    simp only [crossToSlotInv]
     exact (permT_injective _).comp hgi
   exact Function.LeftInverse.rightInverse_of_injective
     (crossToSlotInv_crossToSlot i he ha hb M M' hMM') hinj t

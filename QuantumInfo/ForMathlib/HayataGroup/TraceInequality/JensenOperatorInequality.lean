@@ -51,12 +51,12 @@ omit [CompleteSpace ℋ] in
 private theorem nontrivial_hsumL_wrap [Nontrivial ℋ] : Nontrivial (L (HSum ℋ)) := by
   have h_not_sub : ¬ Subsingleton ℋ := by
     intro hsub
-    letI : Subsingleton ℋ := hsub
-    letI : Subsingleton (L ℋ) := by infer_instance
+    let : Subsingleton ℋ := hsub
+    let : Subsingleton (L ℋ) := by infer_instance
     exact (not_nontrivial_iff_subsingleton.mpr (by infer_instance))
       (inferInstance : Nontrivial (L ℋ))
   have hH_nontriv : Nontrivial ℋ := (not_subsingleton_iff_nontrivial.mp h_not_sub)
-  letI : Nontrivial ℋ := hH_nontriv
+  let : Nontrivial ℋ := hH_nontriv
   rcases exists_pair_ne ℋ with ⟨x, y, hxy⟩
   let w : ℋ := x - y
   have hw : w ≠ 0 := sub_ne_zero.mpr hxy
@@ -208,7 +208,7 @@ theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
     simpa [Set.Ici] using hBs hx
   let Atilde : L (HSum ℋ) := blockDiagonal (ℋ := ℋ) A B
   let Xtilde : L (HSum ℋ) := blockOp (ℋ := ℋ) X 0 Y 0
-  letI : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL_wrap (ℋ := ℋ)
+  let : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL_wrap (ℋ := ℋ)
   have hAtilde_sa : IsSelfAdjoint Atilde := by
     simpa [Atilde] using blockDiagonal_selfAdjoint_wrap (ℋ := ℋ) hA hB
   have hAtilde0 : (0 : L (HSum ℋ)) ≤ Atilde := by
@@ -323,7 +323,7 @@ theorem theorem_2_5_2_i_ici_all_imp_v {f : ℝ → ℝ}
     simpa [Set.Ici] using hBs hx
   let Atilde : L (HSum ℋ) := blockDiagonal (ℋ := ℋ) A B
   let Xtilde : L (HSum ℋ) := blockOp (ℋ := ℋ) X 0 Y 0
-  letI : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL_wrap (ℋ := ℋ)
+  let : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL_wrap (ℋ := ℋ)
   have hAtilde_sa : IsSelfAdjoint Atilde := by
     simpa [Atilde] using blockDiagonal_selfAdjoint_wrap (ℋ := ℋ) hA hB
   have hAtilde0 : (0 : L (HSum ℋ)) ≤ Atilde := by

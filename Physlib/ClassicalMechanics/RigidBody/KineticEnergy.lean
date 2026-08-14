@@ -54,6 +54,7 @@ lemma rotationalKineticEnergy_eq_angularMomentum (R : RigidBody 3) (ω : Fin 3 �
     R.rotationalKineticEnergy ω = (1 / (2 : ℝ)) * (ω ⬝ᵥ R.angularMomentum ω) := by
   rw [rotationalKineticEnergy, angularMomentum_eq_inertiaTensor_mulVec]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The rotational kinetic energy equals the mass integral of the local rotational speed squared:
 `T = ½ ∫ |ω × r|² dm`. -/
 theorem rotationalKineticEnergy_eq_integral (R : RigidBody 3) (ω : Fin 3 → ℝ) :

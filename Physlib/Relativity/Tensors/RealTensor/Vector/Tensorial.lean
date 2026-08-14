@@ -151,6 +151,7 @@ lemma smul_eq_sum {d : ℕ} (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : Vec
   · intro t1 t2 h1 h2
     simp only [actionT_add, map_add, apply_add, h1, h2, mul_add, Finset.sum_add_distrib]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma smul_eq_mulVec {d} (Λ : LorentzGroup d) (p : Vector d) :
     Λ • p = Λ.1 *ᵥ p := by
   funext i
@@ -182,6 +183,7 @@ lemma neg_smul {d} (Λ : LorentzGroup d) (p : Vector d) :
   funext i
   simp [smul_eq_sum, neg_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma _root_.LorentzGroup.eq_of_action_vector_eq {d : ℕ}
     {Λ Λ' : LorentzGroup d} (h : ∀ p : Vector d, Λ • p = Λ' • p) :
     Λ = Λ' := by

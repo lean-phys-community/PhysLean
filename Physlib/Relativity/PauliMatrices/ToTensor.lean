@@ -40,6 +40,7 @@ and properties thereof.
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The equivalence between the type of indices of a [.up, .upL, .upR] tensor and
   `(Fin 1 ⊕ Fin 3) × Fin 2 × Fin 2`. -/
 def indexEquiv : ComponentIdx (S := complexLorentzTensor) ![.up, .upL, .upR] ≃
@@ -159,6 +160,7 @@ lemma toTensor_eq_asConsTensor :
   simp only [fromTripleT_apply_basis]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
@@ -229,6 +231,7 @@ scoped[PauliMatrix] notation "σ^__" => PauliMatrix.pauliContrDown
 -/
 open Lorentz
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
@@ -258,6 +261,7 @@ lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
   revert b
   decide +kernel
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
@@ -299,6 +303,7 @@ lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
   revert b
   decide +kernel
 
+set_option backward.isDefEq.respectTransparency false in
 lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
     if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else

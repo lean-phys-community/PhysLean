@@ -78,6 +78,7 @@ theorem projector_ker : (projector S).ker = Sᗮ := by
     Matrix.toLpLin_eq_toLin, Matrix.toLin_toMatrix]
   exact Submodule.starProjection_apply_eq_zero_iff (K := S)
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem trace_projector : (projector S).trace = (Module.finrank 𝕜 S : ℝ) := by
   suffices h_trace : ((S.subtype ∘ₗ S.orthogonalProjectionOnto).toMatrix (EuclideanSpace.basisFun n 𝕜).toBasis (EuclideanSpace.basisFun n 𝕜).toBasis).trace = Module.finrank 𝕜 S by

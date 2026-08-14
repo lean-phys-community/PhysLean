@@ -111,6 +111,7 @@ lemma fromInvolution_getDual?_get (f : {f : Fin n → Fin n // Function.Involuti
     ((fromInvolution f).getDual? i).get h = (f.1 i) :=
   Option.get_of_mem h (fromInvolution_getDual?_eq_some f i h)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toInvolution_fromInvolution : fromInvolution c.toInvolution = c := by
   apply Subtype.ext
   simp only [fromInvolution, toInvolution]

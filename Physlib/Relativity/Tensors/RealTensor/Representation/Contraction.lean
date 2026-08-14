@@ -40,6 +40,7 @@ TODO "In a similar way to `Vector.contract` and `CoVector.contract`,
   we want to define metrics and units as intertwining maps of representations.
   This should copy (and eventually replace) the definitions e.g. `./Units/Pre.lean`."
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The intertwining map defining the contraction of a contravariant Lorentz vector with a
   covariant Lorentz vector. -/
 def Vector.contract : (Vector.rep.tprod CoVector.rep).IntertwiningMap
@@ -60,6 +61,7 @@ def Vector.contract : (Vector.rep.tprod CoVector.rep).IntertwiningMap
         vecMul_transpose, mulVec_mulVec, LorentzGroup.coe_inv, inv_mul_of_invertible Λ.1]
       rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The intertwining map defining the contraction of a covariant Lorentz vector with a
   contravariant Lorentz vector. -/
 def CoVector.contract : (CoVector.rep.tprod Vector.rep).IntertwiningMap
@@ -92,15 +94,19 @@ lemma Vector.contract_tmul (φ : Vector d) (ψ : CoVector d) :
 lemma CoVector.contract_tmul (φ : CoVector d) (ψ : Vector d) :
     CoVector.contract (φ ⊗ₜ ψ) = ∑ i, φ i * ψ i := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Vector.contract_basis_left (μ : Fin 1 ⊕ Fin d) (ψ : CoVector d) :
     Vector.contract (basis μ ⊗ₜ ψ) = ψ μ := by simp [Vector.contract_tmul, basis_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma CoVector.contract_basis_left (μ : Fin 1 ⊕ Fin d) (φ : Vector d) :
     CoVector.contract (basis μ ⊗ₜ φ) = φ μ := by simp [CoVector.contract_tmul, basis_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Vector.contract_basis_right (φ : Vector d) (μ : Fin 1 ⊕ Fin d) :
     Vector.contract (φ ⊗ₜ basis μ) = φ μ := by simp [Vector.contract_tmul, basis_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma CoVector.contract_basis_right (ψ : CoVector d) (μ : Fin 1 ⊕ Fin d) :
     CoVector.contract (ψ ⊗ₜ basis μ) = ψ μ := by simp [CoVector.contract_tmul, basis_apply]
 

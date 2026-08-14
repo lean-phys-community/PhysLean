@@ -29,7 +29,7 @@ namespace QuantumMechanics
 
 namespace OneDimension
 noncomputable section
-open HilbertSpace
+open _root_.QuantumMechanics.OneDimension.HilbertSpace
 
 /-!
 

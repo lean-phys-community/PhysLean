@@ -350,6 +350,7 @@ noncomputable def Commute.isSymmetric_directSumDecomposition  {𝕜 E : Type*} [
   · replace h₁ : eigenspace A fst = ⊥ := by simpa [Module.End.HasUnifEigenvalue] using h₁
     simp [h₁]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Similar to `LinearMap.IsSymmetric.directSum_isInternal_of_commute`, but here the direct sum
 is indexed by only the pairs of eigenvalues, as opposed to all pairs of `𝕜` values, giving a finite
 decomposition. -/

@@ -120,6 +120,7 @@ The trace functional is invariant under joint unitary conjugation:
 This corresponds to equation (2.3) in the paper.
 Proved using `rpow_conj_unitary` (f(UXU†) = U f(X) U†) and `conj_conj`.
 -/
+set_option backward.isDefEq.respectTransparency false in
 theorem sandwichedTraceFunctional_conj_unitary_hermitian
     (U : Matrix.unitaryGroup d ℂ) (A B : HermitianMat d ℂ) :
     let γ := (1 - α) / (2 * α)
@@ -1085,8 +1086,8 @@ theorem sandwichedTraceFunctional_mono_traceRight [Nonempty dB]
     Q̃_ α(ρ.traceRight‖σ.traceRight) ≤ Q̃_ α(ρ‖σ) := by
   -- Obtain the twirling unitaries
   obtain ⟨κ, hκ_fin, hκ_ne, V, hV⟩ := exists_twirling_unitaries (dB := dB)
-  letI : Fintype κ := hκ_fin
-  letI : Nonempty κ := hκ_ne
+  let : Fintype κ := hκ_fin
+  let : Nonempty κ := hκ_ne
   -- By unitary invariance, Q̃_α(ρ‖σ) = Q̃_α(V_i ρ V_i†‖V_i σ V_i†) for each i
   have h_inv (i) : Q̃_ α(ρ.conjTensorUnitary (V i)‖σ.conjTensorUnitary (V i)) = Q̃_ α(ρ‖σ) :=
     sandwichedTraceFunctional_conj_tensorUnitary ρ σ (V i)
@@ -1226,6 +1227,7 @@ theorem sandwichedRenyiEntropy_mono_traceRight [Nonempty dB]
 /-
 The sandwiched Rényi divergence is invariant under unitary conjugation.
 -/
+set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 400000 in
 theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
     (U : Matrix.unitaryGroup d ℂ) :
@@ -1349,7 +1351,7 @@ theorem sandwichedRenyiEntropy_DPI_gt_one (hα : 1 < α) (ρ σ : MState d₁) (
     D̃_ α(Φ ρ‖Φ σ) ≤ D̃_ α(ρ‖σ) := by
   have _ : Nonempty d₁ := ρ.nonempty
   have _ : Nonempty d₂ := (Φ ρ).nonempty
-  haveI : Inhabited d₂ := Classical.inhabited_of_nonempty ‹_›
+  have : Inhabited d₂ := Classical.inhabited_of_nonempty ‹_›
   let ψ₀ : Ket (d₂ × d₂) := Ket.basis default
   let τ := MState.pure ψ₀
   obtain ⟨U, hU⟩ := Φ.purify_IsUnitary

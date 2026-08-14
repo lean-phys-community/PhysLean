@@ -268,7 +268,7 @@ lemma succSuccAbove_natAdd_image_range_castAdd {n n1 : ℕ}
     (succSuccAbove (n := n1 + n) (Fin.natAdd n1 i) (Fin.natAdd n1 j)) ''
     (Set.range (Fin.castAdd (m := n) (n := n1))) = {i | i.1 < n1} := by
   ext a
-  simp only [Set.mem_image, Set.mem_range, exists_exists_eq_and, Set.mem_setOf_eq]
+  simp only [Set.mem_image, Set.mem_range, exists_exists_eq_and, Set.mem_ofPred_eq]
   conv_lhs =>
     enter [1, b]
     rw [succSuccAbove_natAdd_apply_castAdd i j]

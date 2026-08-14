@@ -48,6 +48,7 @@ lemma permT_fromPairTContr_metric_metric {c : C} :
   rw [← S.contr_metric]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma fromPairTContr_metric_metric_eq_permT_unit {c : C} :
     fromPairTContr ((S.metric c) (1 : k))
     ((S.metric (S.τ c)) (1 : k)) =
@@ -59,6 +60,7 @@ lemma fromPairTContr_metric_metric_eq_permT_unit {c : C} :
   apply permT_congr_eq_id
   decide
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The contraction of the metric tensor with its dual gives the unit tensor.
   This is the de-categorification of `S.contr_metric`. -/
 @[simp]
@@ -72,6 +74,7 @@ lemma contrT_metricTensor_metricTensor {c : C} :
   rw [permT_permT]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma contrT_metricTensor_metricTensor_eq_dual_unit {c : C} :
     contrT 2 1 2 (by simp; rfl) (prodT (metricTensor c) (metricTensor (S.τ c))) =
       permT ![0, 1] (And.intro (by decide) (fun i => by

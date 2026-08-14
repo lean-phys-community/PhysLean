@@ -31,6 +31,7 @@ namespace SMCharges
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 lemma sum_SMSpecies_numberCharges_one {M} [AddCommMonoid M]
     (f : Fin (SMSpecies 1).numberCharges → M) :
     ∑ i, f i = f ⟨0, by simp⟩ := by
@@ -61,6 +62,7 @@ lemma charges_eq_toSpecies_eq (S T : (SMCharges n).Charges) :
   apply toSpeciesEquiv.injective
   exact (Set.eqOn_univ (toSpeciesEquiv S) (toSpeciesEquiv T)).mp fun ⦃x⦄ _ => h x
 
+set_option backward.isDefEq.respectTransparency false in
 lemma toSMSpecies_toSpecies_inv (i : Fin 5) (f : Fin 5 → Fin n → ℚ) :
     (toSpecies i) (toSpeciesEquiv.symm f) = f i := by
   change (toSpeciesEquiv ∘ toSpeciesEquiv.symm) _ i= f i
@@ -89,6 +91,7 @@ open SMCharges
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The gravitational anomaly equation. -/
 def accGrav : (SMCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (6 * Q S i + 3 * U S i + 3 * D S i + 2 * L S i + E S i)
@@ -107,6 +110,7 @@ def accGrav : (SMCharges n).Charges →ₗ[ℚ] ℚ where
     --rw [show Rat.cast a = a from rfl]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accGrav`. -/
 lemma accGrav_ext {S T : (SMCharges n).Charges}
     (hj : ∀ (j : Fin 5), ∑ i, (toSpecies j) S i = ∑ i, (toSpecies j) T i) :
@@ -117,6 +121,7 @@ lemma accGrav_ext {S T : (SMCharges n).Charges}
   repeat rw [← Finset.mul_sum]
   simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `SU(2)` anomaly equation. -/
 def accSU2 : (SMCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (3 * Q S i + L S i)
@@ -135,6 +140,7 @@ def accSU2 : (SMCharges n).Charges →ₗ[ℚ] ℚ where
     --rw [show Rat.cast a = a from rfl]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accSU2`. -/
 lemma accSU2_ext {S T : (SMCharges n).Charges}
     (hj : ∀ (j : Fin 5), ∑ i, (toSpecies j) S i = ∑ i, (toSpecies j) T i) :
@@ -145,6 +151,7 @@ lemma accSU2_ext {S T : (SMCharges n).Charges}
   repeat rw [← Finset.mul_sum]
   exact Mathlib.Tactic.LinearCombination.add_eq_eq (congrArg (HMul.hMul 3) (hj 0)) (hj 3)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `SU(3)` anomaly equations. -/
 def accSU3 : (SMCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (2 * Q S i + U S i + D S i)
@@ -163,6 +170,7 @@ def accSU3 : (SMCharges n).Charges →ₗ[ℚ] ℚ where
     --rw [show Rat.cast a = a from rfl]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accSU3`. -/
 lemma accSU3_ext {S T : (SMCharges n).Charges}
     (hj : ∀ (j : Fin 5), ∑ i, (toSpecies j) S i = ∑ i, (toSpecies j) T i) :
@@ -173,6 +181,7 @@ lemma accSU3_ext {S T : (SMCharges n).Charges}
   repeat rw [← Finset.mul_sum]
   simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `Y²` anomaly equation. -/
 def accYY : (SMCharges n).Charges →ₗ[ℚ] ℚ where
   toFun S := ∑ i, (Q S i + 8 * U S i + 2 * D S i + 3 * L S i
@@ -191,6 +200,7 @@ def accYY : (SMCharges n).Charges →ₗ[ℚ] ℚ where
     repeat rw [← Finset.mul_sum]
     ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Extensionality lemma for `accYY`. -/
 lemma accYY_ext {S T : (SMCharges n).Charges}
     (hj : ∀ (j : Fin 5), ∑ i, (toSpecies j) S i = ∑ i, (toSpecies j) T i) :
@@ -201,6 +211,7 @@ lemma accYY_ext {S T : (SMCharges n).Charges}
   repeat rw [← Finset.mul_sum]
   simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The quadratic bilinear map. -/
 @[simps!]
 def quadBiLin : BiLinearSymm (SMCharges n).Charges := BiLinearSymm.mk₂
@@ -253,6 +264,7 @@ lemma accQuad_ext {S T : (SMCharges n).Charges}
   ring_nf
   simp_all
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The trilinear function defining the cubic. -/
 @[simps!]
 def cubeTriLin : TriLinearSymm (SMCharges n).Charges := TriLinearSymm.mk₃

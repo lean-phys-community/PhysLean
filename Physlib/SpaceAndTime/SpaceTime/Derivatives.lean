@@ -122,6 +122,7 @@ lemma deriv_eq_manifoldDeriv {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ 
     deriv μ f y = manifoldDeriv 𝓘(ℝ, M) μ f y := by
   rw [deriv_eq_mfderiv, manifoldDeriv_eq]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma manifoldDeriv_const {E H N : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
     [TopologicalSpace H] (I : ModelWithCorners ℝ E H) [TopologicalSpace N]

@@ -149,7 +149,7 @@ lemma fundamental_theorem_of_variational_calculus' {f : Y → V}
         Function.support φ ⊆ Metric.ball x₀ (δ₂/2) ∧
         (∀ x ∈ Metric.closedBall x₀ (δ₂/4), 0 < φ x) := by
         -- use `hasContDiffBump_of_innerProductSpace`, leveraging `[innerProductSpace Y]`
-          haveI : HasContDiffBump Y := hasContDiffBump_of_innerProductSpace Y
+          have : HasContDiffBump Y := hasContDiffBump_of_innerProductSpace Y
           let φ1 : ContDiffBump x₀ :=
             ⟨δ₂ / 4, δ₂ / 2, by positivity, by linarith⟩
           refine ⟨φ1.toFun, ⟨φ1.contDiff, φ1.hasCompactSupport⟩,

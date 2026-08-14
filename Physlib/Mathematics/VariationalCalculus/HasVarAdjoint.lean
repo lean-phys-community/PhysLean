@@ -451,7 +451,7 @@ lemma adjFDeriv_apply
       rw [Filter.EventuallyEq.fderiv_eq heq]
   adjoint φ ψ hφ hψ := by
     obtain ⟨s, ⟨bX⟩⟩ := Basis.exists_basis ℝ X
-    haveI : Fintype s := FiniteDimensional.fintypeBasisIndex bX
+    have : Fintype s := FiniteDimensional.fintypeBasisIndex bX
     let f (i : s) : X →ₗ[ℝ] ℝ := {
       toFun := (bX.repr · i)
       map_add' := by simp

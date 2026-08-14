@@ -39,7 +39,7 @@ lemma exists_strictMono_seq_le (y : ℝ≥0) (f : ℝ≥0 → ℕ → ℝ≥0∞
   have h_freq (k n : ℕ) : ∃ m > n, f ((k + 1 : ℝ≥0)⁻¹) m ≤ y + (k + 1 : ℝ≥0)⁻¹ := by
     specialize hf ((k + 1 : ℝ≥0)⁻¹) (by positivity)
     rw [Filter.liminf_eq] at hf
-    simp only [Filter.eventually_atTop, sSup_le_iff, Set.mem_setOf_eq, forall_exists_index] at hf
+    simp only [Filter.eventually_atTop, sSup_le_iff, Set.mem_ofPred_eq, forall_exists_index] at hf
     contrapose! hf
     refine ⟨_, n + 1, fun m hm ↦ (hf m hm).le, ENNReal.lt_add_right (by norm_num) (by norm_num)⟩
   refine ⟨fun k ↦ k.recOn (Classical.choose (h_freq 0 0))
@@ -60,7 +60,7 @@ lemma exists_seq_bound (y : ℝ≥0) (f : ℝ≥0 → ℕ → ℝ≥0∞) (hf : 
     · exact y + (k + 1 : ℝ≥0∞)⁻¹
     · exact ENNReal.lt_add_right (by norm_num) (by norm_num)
     · intro b hb
-      simp only [Filter.eventually_map, Filter.eventually_atTop, Set.mem_setOf_eq] at hb
+      simp only [Filter.eventually_map, Filter.eventually_atTop, Set.mem_ofPred_eq] at hb
       obtain ⟨w, h⟩ := hb
       obtain ⟨_, hw_left, hw_right⟩ := hf w
       grw [hw_right]
@@ -313,7 +313,7 @@ lemma liminf_le_of_block_sequence_witnesses {α : Type*} (y : ℝ≥0) (f : α �
   rw [ Filter.liminf_eq ];
   simp_all only [Set.mem_Ico, and_imp, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
     not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one,
-    Filter.eventually_atTop, sSup_le_iff, Set.mem_setOf_eq, forall_exists_index]
+    Filter.eventually_atTop, sSup_le_iff, Set.mem_ofPred_eq, forall_exists_index]
   intro b x_1 h
   -- Fix an arbitrary $k \geq x_1$.
   suffices h_suff : ∀ k ≥ x_1, ∃ n ≥ k, f (g n) n ≤ y + 1 / (k + 1) by
@@ -345,7 +345,7 @@ lemma limsup_le_of_block_sequence_bound {α : Type*} (y : ℝ≥0) (f : α → �
     · aesop
     simp_all only [Set.mem_Ico, and_imp, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
       not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_add, ENNReal.coe_natCast, ENNReal.coe_one,
-      Filter.eventually_map, Filter.eventually_atTop, Set.mem_setOf_eq]
+      Filter.eventually_map, Filter.eventually_atTop, Set.mem_ofPred_eq]
     -- Choose $K$ such that for all $k \ge K$, we have $1/(k+1) \le \epsilon$.
     obtain ⟨K, hK⟩ : ∃ K : ℕ, ∀ k ≥ K, (k + 1 : ℝ≥0)⁻¹ ≤ ε := by
       rcases ENNReal.lt_iff_exists_nnreal_btwn.mp hε with ⟨ δ, hδ, hδε ⟩
@@ -407,7 +407,7 @@ lemma exists_liminf_zero_of_forall_liminf_limsup_le_with_UB (y₁ y₂ : ℝ≥0
       rw [ Filter.limsup_eq ] at h_limsup_le;
       have := exists_lt_of_csInf_lt ( show { a : ℝ≥0∞ | ∀ᶠ n in Filter.atTop, f₂ ( x k ) n ≤ a }.Nonempty from ⟨ _, Filter.Eventually.of_forall fun n => le_top ⟩ ) ( show InfSet.sInf { a : ℝ≥0∞ | ∀ᶠ n in Filter.atTop, f₂ ( x k ) n ≤ a } < ( y₂ : ℝ≥0∞ ) + ε from lt_of_le_of_lt h_limsup_le <| ENNReal.lt_add_right ( by aesop ) <| by aesop )
       simp_all only [gt_iff_lt, one_div, ne_eq, add_eq_zero, Nat.cast_eq_zero, one_ne_zero, and_false,
-        not_false_eq_true, NNReal.le_inv_iff_mul_le, implies_true, Filter.eventually_atTop, ge_iff_le, Set.mem_setOf_eq]
+        not_false_eq_true, NNReal.le_inv_iff_mul_le, implies_true, Filter.eventually_atTop, ge_iff_le, Set.mem_ofPred_eq]
       obtain ⟨left, right⟩ := hx
       obtain ⟨w, h⟩ := this
       obtain ⟨left_1, right⟩ := right
@@ -485,7 +485,7 @@ lemma exists_liminf_zero_of_forall_liminf_limsup_le_with_UB (y₁ y₂ : ℝ≥0
 theorem extracted_limsup_inequality (z : ℝ≥0∞) (hz : z ≠ ⊤) (y x : ℕ → ℝ≥0∞) (h_lem5 : ∀ (n : ℕ), x n ≤ y n + z)
     : Filter.atTop.limsup (fun n ↦ x n / n) ≤ Filter.atTop.limsup (fun n ↦ y n / n) := by
   --Thanks Aristotle!
-  simp only [Filter.limsup_eq, Filter.eventually_atTop, le_sInf_iff, Set.mem_setOf_eq,
+  simp only [Filter.limsup_eq, Filter.eventually_atTop, le_sInf_iff, Set.mem_ofPred_eq,
     forall_exists_index]
   -- Taking the limit superior of both sides of the inequality x n / n ≤ y_n / n + z / n, we
   -- get limsup x n / n ≤ limsup (y n / n + z / n).

@@ -212,10 +212,10 @@ theorem ciInf_le_ciInf_of_subset {α β : Type*} [ConditionallyCompleteLattice �
 theorem LowerSemicontinuousOn.dite_top {α β : Type*} [TopologicalSpace α] [Preorder β] [OrderTop β]
   {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → p a → β}
   (hf : LowerSemicontinuousOn (fun x : Subtype p ↦ f x.val x.prop) {x | x.val ∈ s})
-  (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ setOf p) :
+  (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ Set.ofPred p) :
     LowerSemicontinuousOn (fun x ↦ dite (p x) (f x) (fun _ ↦ ⊤)) s := by
   rcases h_relatively_closed with ⟨u, ⟨hu, hsu⟩⟩
-  simp only [Set.ext_iff, Set.mem_inter_iff, Set.mem_setOf_eq, and_congr_right_iff] at hsu
+  simp only [Set.ext_iff, Set.mem_inter_iff, Set.mem_ofPred_eq, and_congr_right_iff] at hsu
   intro x hx y hy
   dsimp at hy
   split_ifs at hy with h
@@ -225,9 +225,12 @@ theorem LowerSemicontinuousOn.dite_top {α β : Type*} [TopologicalSpace α] [Pr
     filter_upwards [hf]
     simp only [Subtype.forall]
     grind [lt_top_of_lt]
-  · filter_upwards [self_mem_nhdsWithin, mem_nhdsWithin_of_mem_nhds (hu.isOpen_compl.mem_nhds (show x ∉ u by grind))]
-    intros
-    simp_all only [Set.mem_compl_iff, ↓reduceDIte]
+  · have hxu : x ∉ u := fun hxu ↦ h ((hsu x hx).mp hxu)
+    filter_upwards [self_mem_nhdsWithin,
+      mem_nhdsWithin_of_mem_nhds (hu.isOpen_compl.mem_nhds hxu)]
+    intro z hzs hzu
+    rw [dif_neg (show ¬p z from fun hpz ↦ hzu ((hsu z hzs).mpr hpz))]
+    exact hy
 
 theorem LowerSemicontinuousOn.comp_continuousOn {α β γ : Type*}
   [TopologicalSpace α] [TopologicalSpace β] [Preorder γ] {f : α → β} {s : Set α} {g : β → γ} {t : Set β}
@@ -251,10 +254,10 @@ theorem UpperSemicontinuousOn.comp_continuousOn {α β γ : Type*}
   LowerSemicontinuousOn.comp_continuousOn (γ := γᵒᵈ) hg hf h
 
 theorem LowerSemicontinuousOn.ite_top {α β : Type*} [TopologicalSpace α] [Preorder β] [OrderTop β]
-  {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → β} (hf : LowerSemicontinuousOn f (s ∩ setOf p))
-  (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ setOf p) :
+  {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → β} (hf : LowerSemicontinuousOn f (s ∩ Set.ofPred p))
+  (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ Set.ofPred p) :
     LowerSemicontinuousOn (fun x ↦ ite (p x) (f x) ⊤) s :=
-  dite_top p (hf.comp_continuousOn (by fun_prop) (by intro; simp)) h_relatively_closed
+  dite_top p (hf.comp_continuousOn (by fun_prop) (fun z hz ↦ ⟨hz, z.2⟩)) h_relatively_closed
 
 theorem LeftOrdContinuous.comp_lowerSemicontinuousOn_strong_assumptions {α γ δ : Type*}
   [TopologicalSpace α] [LinearOrder γ] [LinearOrder δ] [TopologicalSpace δ] [OrderTopology δ]
@@ -402,7 +405,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
   have hC_subset_C' (z) : C z ⊆ C' z :=
     fun x hx ↦ ⟨hx.1, hx.2.trans hβ₁.le⟩
   have hC_nonempty (z) (hz : z ∈ segment ℝ y₁ y₂) : (C z).Nonempty := by
-    simp only [Set.Nonempty, Set.mem_setOf_eq, C]
+    simp only [Set.Nonempty, Set.mem_ofPred_eq, C]
     exact sion_exists_min_lowerSemi hfc₂ hS₁ hS₃ a hc z (hT₂.segment_subset hy₁ hy₂ hz)
   have hC_closed (z) (hz : z ∈ segment ℝ y₁ y₂) : IsClosed (C z) := by
     specialize hfc₂ z (hT₂.segment_subset hy₁ hy₂ hz)
@@ -475,7 +478,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
   have hI : IsClosed I := by
     apply IsSeqClosed.isClosed
     intro zs z hzI hzs
-    simp only [Set.mem_setOf_eq, I, C] at hzI
+    simp only [Set.mem_ofPred_eq, I, C] at hzI
     replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
     have hz_mem : z ∈ segment ℝ y₁ y₂ :=
       have cloL : IsClosed (segment ℝ y₁ y₂) := by
@@ -503,7 +506,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
     suffices hn : ∃ n, f x (zs n) < β by
       refine hn.imp fun n ↦ ?_
       simp +contextual [C', le_of_lt, hx.left]
-    simp only [Set.mem_setOf_eq, C] at hx
+    simp only [Set.mem_ofPred_eq, C] at hx
     rcases hx with ⟨hx₁, hx₂⟩
     specialize hfc₁ x hx₁
     replace hx₂ := hx₂.trans_lt hβ₁
@@ -513,7 +516,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
   have hJ : IsClosed J := by
     apply IsSeqClosed.isClosed
     intro zs z hzI hzs
-    simp only [Set.mem_setOf_eq, J, C] at hzI
+    simp only [Set.mem_ofPred_eq, J, C] at hzI
     replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
     have hz_mem : z ∈ segment ℝ y₁ y₂ :=
       have cloL : IsClosed (segment ℝ y₁ y₂) := by
@@ -541,7 +544,7 @@ private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y�
     suffices hn : ∃ n, f x (zs n) < β by
       refine hn.imp fun n ↦ ?_
       simp +contextual [C', le_of_lt, hx.left]
-    simp only [Set.mem_setOf_eq, C] at hx
+    simp only [Set.mem_ofPred_eq, C] at hx
     rcases hx with ⟨hx₁, hx₂⟩
     specialize hfc₁ x hx₁
     replace hx₂ := hx₂.trans_lt hβ₁
@@ -694,7 +697,7 @@ theorem sion_minimax
     convert (hfc₂ i i.2).bddBelow hS₁
     ext; simp
   have h_bdd_1 (j : S) : BddAbove (Set.range fun (x : T) => f j x) :=
-    h_bddA.mono (T.range_restrict (f j) ▸ Set.image_subset_image2_right j.coe_prop)
+    h_bddA.mono (T.range_domRestrict (f j) ▸ Set.image_subset_image2_right j.coe_prop)
   have h_bdd_2 : BddAbove (Set.range fun y : T ↦ ⨅ x : S, f x y) :=
     h_bddA.range_inf_of_image2 h_bddB
   have h_bdd_3 : BddBelow (Set.range fun x : S ↦ ⨆ y : T, f x y) :=
@@ -713,7 +716,7 @@ theorem sion_minimax
         Set.inter_univ, Set.not_nonempty_empty]
     have hau : a < ⨅ x : S, ⨆ yi : u.map ⟨_, Subtype.val_injective⟩, f ↑x ↑yi := by
       simp +contextual only [Set.iInter_coe_set, Set.ext_iff, Set.mem_inter_iff, Set.mem_iInter,
-        Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_and, true_and, not_forall,
+        Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_and, true_and, not_forall,
         not_le] at hu
       rw [lt_ciInf_iff]; swap
       · --BddBelow (Set.range fun x => ⨆ yi : Finset.map ⋯, f ↑x ↑yi)
@@ -736,7 +739,7 @@ theorem sion_minimax
     exact hfc₂ b
   · convert Set.inter_empty _
     by_contra hu
-    simp only [Set.iInter_coe_set, Set.iInter_eq_empty_iff, Set.mem_iInter, Set.mem_setOf_eq,
+    simp only [Set.iInter_coe_set, Set.iInter_eq_empty_iff, Set.mem_iInter, Set.mem_ofPred_eq,
       Classical.not_imp, not_and, not_le, not_forall, not_exists, not_lt] at hu
     obtain ⟨x, hx⟩ := hu
     apply hb₂.not_ge

@@ -552,7 +552,7 @@ theorem rate_Continuous_singleton {ε : Prob} {d : Type*} [Fintype d] [Decidable
     Continuous fun σ ↦ β_ ε(ρ‖{σ}) := by
   have h := HermitianMat.innerₗ.flip.continuous_iInf_fst
     (S := { m | ρ.exp_val (1 - m) ≤ ↑ε ∧ 0 ≤ m ∧ m ≤ 1 })
-    ((Metric.isBounded_Icc 0 1).subset (Set.setOf_subset_setOf_of_imp fun _ ↦ And.right))
+    ((Metric.isBounded_Icc 0 1).subset (Set.ofPred_subset_ofPred_of_imp fun _ ↦ And.right))
   simp only [of_singleton]
   conv => enter [1, σ]; rw [subtype_val_iInf']
   exact Continuous.subtype_mk (h.comp MState.Continuous_HermitianMat) _

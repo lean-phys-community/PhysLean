@@ -112,6 +112,7 @@ lemma quotContraction_eqTimeOnly {φs : List 𝓕.FieldOp} {φsΛ : WickContract
   apply h
 
 set_option backward.isDefEq.respectTransparency false in
+set_option maxHeartbeats 800000 in
 lemma exists_join_singleton_of_card_ge_zero {φs : List 𝓕.FieldOp} (φsΛ : WickContraction φs.length)
     (h : 0 < φsΛ.1.card) (h1 : φsΛ.EqTimeOnly) :
     ∃ (i j : Fin φs.length) (h : i < j) (φsucΛ : WickContraction [singleton h]ᵘᶜ.length),
@@ -452,6 +453,7 @@ lemma hasEqTimeEquiv_ext_sigma {φs : List 𝓕.FieldOp} {x1 x2 :
   simp only [ne_eq, congr_refl] at h2
   simp [h2]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The equivalence which separates a Wick contraction which has an equal time contraction
 into a non-empty contraction only between equal-time fields and a Wick contraction which
 does not have equal time contractions. -/

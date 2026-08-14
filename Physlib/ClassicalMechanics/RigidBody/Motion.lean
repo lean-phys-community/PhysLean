@@ -106,6 +106,7 @@ lemma orientation_mulVec_sub_centerOfMass {d : ℕ} (M : RigidBodyMotion d) (t :
   rw [eq_sub_iff_add_eq, displacement_apply]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The mass distribution of the rigid body in motion at time `t`: the pushforward of the
 body-fixed mass distribution along the rigid displacement, acting on a test function `f` by
 `f ↦ ρ (f ∘ displacement t)`. -/
@@ -133,6 +134,7 @@ private lemma contMDiffMap_sum_apply {d : ℕ} {ι : Type*} (s : Finset ι)
   | insert a s ha ih =>
     simp only [Finset.sum_insert ha, ContMDiffMap.coe_add, Pi.add_apply, ih]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The centre of mass of the moving mass distribution tracks the prescribed trajectory: for a
 body of nonzero mass, the centre of mass of `massDistribution M t` is exactly `comTrajectory t`.
 This is the decisive check that `comTrajectory` and `orientation` are wired correctly in

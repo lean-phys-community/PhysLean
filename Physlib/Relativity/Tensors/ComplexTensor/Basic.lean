@@ -22,6 +22,7 @@ open TensorProduct
 
 namespace complexLorentzTensor
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The colors associated with complex representations of SL(2, ℂ) of interest to physics. -/
 inductive Color
   /-- The color associated with Left handed fermions. -/
@@ -284,7 +285,7 @@ lemma contrPCoeff_basis {n : ℕ} {c : Fin n → complexLorentzTensor.Color} (i 
   generalize c j = cj at *
   subst h2
   cases ci
-  all_goals simp only [complexLorentzTensor, Fin.cast_refl, id_eq]
+  all_goals simp only [complexLorentzTensor]
   · erw [Fermion.leftDualContraction_basis]
     exact if_congr Fin.ext_iff.symm rfl rfl
   · erw [Fermion.dualLeftContraction_basis]

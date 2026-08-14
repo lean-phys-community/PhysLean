@@ -78,7 +78,7 @@ open Fin
 
 -/
 
-open Pure
+open _root_.TensorSpecies.Tensor.Pure
 
 lemma contrT_decide {n : ℕ} {c : Fin (n + 1 + 1) → C} {i j : Fin (n + 1 + 1)}
     (hx : S.τ (c i) = c j) (hij : i ≠ j := by decide) :

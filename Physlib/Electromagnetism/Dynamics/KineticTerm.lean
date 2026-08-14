@@ -137,12 +137,10 @@ lemma kineticTerm_eq_sum {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     enter [1]
     rw [prodT_basis_repr_apply]
     enter [1]
-    simp only [Tensorial.self_toTensor_apply]
     rw [coMetric_repr_apply_eq_minkowskiMatrix]
     change η μ' μ
   conv_lhs =>
     enter [2, 2, μ, 2, ν, 1, 2, μ', 2, ν', 1, 2]
-    simp only [Tensorial.self_toTensor_apply]
     rw [coMetric_repr_apply_eq_minkowskiMatrix]
     change η (ν') (ν)
   conv_lhs =>
@@ -162,7 +160,6 @@ lemma kineticTerm_eq_sum {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     enter [2, μ']
     rw [Finset.sum_mul]
     enter [2, ν']
-    simp
   conv_lhs => enter [2, 2, μ]; rw [Finset.sum_comm]
   conv_lhs => rw [Finset.sum_comm]
   conv_lhs => enter [2, 2, μ', 2, ν]; rw [Finset.sum_comm]

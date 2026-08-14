@@ -269,6 +269,7 @@ private lemma rpow_kron_diagonal
   congr! 2 with x
   apply Real.mul_rpow (ha x.1) (hb x.2)
 
+set_option backward.isDefEq.respectTransparency false in
 open scoped Kronecker in
 omit [DecidableEq d] [DecidableEq d₂] in
 lemma conj_kron
@@ -766,7 +767,7 @@ private lemma top_singular_le_of_self_mul_le_smul_one
     {α : ℝ} (_ : 0 ≤ α) (hX : X.conjTranspose * X ≤ α • (1 : Matrix e e ℂ))
     (hcard : 0 < Fintype.card e) :
     singularValuesSorted X ⟨0, hcard⟩ ≤ Real.sqrt α := by
-  letI : Nonempty e := Fintype.card_pos_iff.mp hcard
+  let : Nonempty e := Fintype.card_pos_iff.mp hcard
   let hne : (Finset.univ : Finset e).Nonempty := by
     simp
   rw [singularValuesSorted_zero_eq_sup X hcard]
@@ -951,6 +952,7 @@ private lemma trace_conj_rpow_eq_sum_singularValuesSorted
       push_cast
       congr 1
       simp [H, Matrix.conjTranspose_conjTranspose]
+      rfl
 
 private lemma lieb_thirring_le_one_posDef
     {A B : HermitianMat d ℂ} (hA : 0 ≤ A) (hB : B.mat.PosDef)

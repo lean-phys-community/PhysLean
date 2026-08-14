@@ -154,6 +154,7 @@ lemma smul_eq_sum {d : ℕ} (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : CoV
   · intro t1 t2 h1 h2
     simp only [actionT_add, map_add, h1, h2, apply_add, mul_add, Finset.sum_add_distrib]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma smul_eq_mulVec {d} (Λ : LorentzGroup d) (p : CoVector d) :
     Λ • p = (LorentzGroup.transpose Λ⁻¹).1 *ᵥ p := by
   funext i

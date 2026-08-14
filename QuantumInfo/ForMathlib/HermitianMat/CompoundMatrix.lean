@@ -31,6 +31,7 @@ noncomputable def compoundHermitian (A : HermitianMat d ℂ) (k : ℕ) :
   ⟨compoundMatrix A.mat k, (compoundMatrix_conjTranspose A.mat k).symm.trans <|
     congrArg (compoundMatrix · k) A.H⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The eigenvalues of `compoundHermitian A k` are the products of eigenvalues
 of `A` over `k`-subsets, up to an index permutation. -/
 lemma compoundHermitian_eigenvalues (A : HermitianMat d ℂ) (k : ℕ) :
@@ -54,6 +55,7 @@ lemma compoundHermitian_nonneg (A : HermitianMat d ℂ) (hA : 0 ≤ A) (k : ℕ)
     simpa [Function.comp_def] using congrFun hσ (σ.symm S)]
   exact Finset.prod_nonneg fun _ _ => A.eigenvalues_nonneg hA _
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `compoundHermitian` distributes over `HermitianMat.conj`: the compound of
 `A.conj B` equals the conjugation of `compoundHermitian A k` by `compoundMatrix B k`. -/
 lemma compoundHermitian_conj (A : HermitianMat d ℂ) (B : Matrix d d ℂ) (k : ℕ) :

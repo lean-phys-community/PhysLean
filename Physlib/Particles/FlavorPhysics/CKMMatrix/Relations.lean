@@ -38,7 +38,7 @@ lemma VAbs_sum_sq_row_eq_one (V : Quotient CKMMatrixSetoid) (i : Fin 3) :
   rw [mul_conj, mul_conj, mul_conj] at ht
   repeat rw [← Complex.sq_norm] at ht
   rw [← ofReal_inj]
-  simp_all only [SetLike.coe_mem, Unitary.mul_star_self_of_mem, Fin.isValue, ofReal_pow, ofReal_add,
+  simp_all only [Fin.isValue, ofReal_pow, ofReal_add,
     ofReal_one]
   exact ht
 
@@ -296,8 +296,7 @@ lemma VAbs_sum_sq_col_eq_one (V : Quotient CKMMatrixSetoid) (i : Fin 3) :
   rw [mul_comm, mul_conj, mul_comm, mul_conj, mul_comm, mul_conj] at ht
   repeat rw [← Complex.sq_norm] at ht
   rw [← ofReal_inj]
-  simp_all only [SetLike.coe_mem, Unitary.star_mul_self_of_mem, Fin.isValue, ofReal_pow, ofReal_add,
-    ofReal_one]
+  simp_all only [Fin.isValue, ofReal_pow, ofReal_add, ofReal_one]
   exact ht
 
 lemma thd_col_normalized_abs (V : CKMMatrix) :

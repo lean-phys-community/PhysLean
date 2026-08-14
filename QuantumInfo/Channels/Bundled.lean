@@ -156,6 +156,7 @@ noncomputable instance instFunLike : FunLike (HPMap dIn dOut ℂ) (HermitianMat 
 lemma apply_hermitianMat_eq (Λ : HPMap dIn dOut ℂ) (ρ : HermitianMat dIn ℂ) :
     Λ ρ = ⟨Λ.map ρ.1, Λ.HP ρ.2⟩ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 instance [Fintype dIn] : ContinuousLinearMapClass
     (HPMap dIn dOut ℂ) ℝ (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
   map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
@@ -191,6 +192,7 @@ noncomputable instance instFunLike : FunLike (PMap dIn dOut ℂ) (HermitianMat d
 lemma apply_hermitianMat_eq (Λ : PMap dIn dOut ℂ) (ρ : HermitianMat dIn ℂ) :
     Λ ρ = ⟨Λ.map ρ.1, Λ.HP ρ.2⟩ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 set_option synthInstance.maxHeartbeats 40000 in
 instance instLinearMapClass : LinearMapClass (PMap dIn dOut ℂ) ℝ (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
   map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y

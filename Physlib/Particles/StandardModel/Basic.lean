@@ -556,6 +556,7 @@ end GaugeGroupℤ₃
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Specifies the allowed quotients of `SU(3) x SU(2) x U(1)` which give a valid
   gauge group of the Standard Model. -/
 inductive GaugeGroupQuot : Type

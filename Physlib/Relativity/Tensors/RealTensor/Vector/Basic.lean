@@ -431,17 +431,19 @@ def asSmoothManifold (d : ℕ) : ModelWithCorners ℝ (Vector d) (Vector d) := �
 -/
 open InnerProductSpace
 
+set_option backward.isDefEq.respectTransparency false in
 lemma basis_inner {d : ℕ} (μ : Fin 1 ⊕ Fin d) (p : Lorentz.Vector d) :
     ⟪Lorentz.Vector.basis μ, p⟫_ℝ = p μ := by
   simp [inner_eq_equivEuclid]
   rw [PiLp.inner_apply]
-  simp
+  simp [-Fintype.sum_sum_type]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma inner_basis {d : ℕ} (p : Lorentz.Vector d) (μ : Fin 1 ⊕ Fin d) :
     ⟪p, Lorentz.Vector.basis μ⟫_ℝ = p μ := by
   simp [inner_eq_equivEuclid]
   rw [PiLp.inner_apply]
-  simp
+  simp [-Fintype.sum_sum_type]
 
 end Vector
 

@@ -133,7 +133,7 @@ omit [Fintype d] in
 /-- The PSD cone is convex. -/
 private lemma psd_convex : Convex ℝ {σ : HermitianMat d ℂ | 0 ≤ σ} := by
   intro σ₁ hσ₁ σ₂ hσ₂ a b ha hb _
-  simp only [Set.mem_setOf_eq] at *
+  simp only [Set.mem_ofPred_eq] at *
   exact add_nonneg (smul_nonneg ha hσ₁) (smul_nonneg hb hσ₂)
 
 /-- The trace of rpow applied to a congruence is continuous in the base matrix. -/
@@ -329,6 +329,7 @@ private lemma liebExtension_bridge [Nonempty d]
 /-
 **AB/BA rewrite**: `Tr[(H.conj (σ^s))^p] = Tr[((σ^{2s}).conj (H^{1/2}))^p]` for PSD σ, H.
 -/
+set_option backward.isDefEq.respectTransparency false in
 private lemma trace_conj_rpow_eq_conj_sqrt [Nonempty d]
     (σ H : HermitianMat d ℂ) (hσ : 0 ≤ σ) (hH : 0 ≤ H) (s p : ℝ) (hs : 0 < s) :
     ((H.conj (σ ^ s).mat) ^ p).trace =
@@ -497,7 +498,7 @@ theorem trace_conj_rpow_concave {α : ℝ} (hα : 1 < α)
       (fun σ ↦ ((H.conj (σ ^ ((α - 1) / (2 * α))).mat) ^ (α / (α - 1))).trace) := by
   refine' ⟨psd_convex, fun σ₁ hσ₁ σ₂ hσ₂ a b ha hb hab => _⟩
   by_cases hd : Nonempty d
-  · simp only [Set.mem_setOf_eq, smul_eq_mul] at *
+  · simp only [Set.mem_ofPred_eq, smul_eq_mul] at *
     open scoped Topology in
     refine' le_of_tendsto_of_tendsto (b := 𝓝[>] (0 : ℝ))
       (f := fun ε ↦ a * ((H.conj ((σ₁ + ε • 1) ^ ((α - 1) / (2 * α))).mat) ^ (α / (α - 1))).trace +

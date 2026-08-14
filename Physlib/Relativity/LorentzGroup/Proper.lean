@@ -66,6 +66,7 @@ def detContinuous : C(𝓛 d, ℤ₂) :=
         Continuous.comp' (continuous_iff_le_induced.mpr fun U a => a) continuous_id'
       }
 
+set_option backward.isDefEq.respectTransparency false in
 lemma detContinuous_eq_one (Λ : LorentzGroup d) :
     detContinuous Λ = Additive.toMul 0 ↔ Λ.1.det = 1 := by
   simp only [detContinuous, ContinuousMap.comp_apply, ContinuousMap.coe_mk, coeForℤ₂_apply,
@@ -79,6 +80,7 @@ lemma detContinuous_eq_one (Λ : LorentzGroup d) :
   · intro h'
     exact False.elim (h' h)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma detContinuous_eq_zero (Λ : LorentzGroup d) :
     detContinuous Λ = Additive.toMul (1 : ZMod 2) ↔ Λ.1.det = - 1 := by
   simp only [detContinuous, ContinuousMap.comp_apply, ContinuousMap.coe_mk, coeForℤ₂_apply,
@@ -98,6 +100,7 @@ lemma detContinuous_eq_zero (Λ : LorentzGroup d) :
         linarith
       · linarith
 
+set_option backward.isDefEq.respectTransparency false in
 lemma detContinuous_eq_iff_det_eq (Λ Λ' : LorentzGroup d) :
     detContinuous Λ = detContinuous Λ' ↔ Λ.1.det = Λ'.1.det := by
   match det_eq_one_or_neg_one Λ, det_eq_one_or_neg_one Λ' with
@@ -154,11 +157,12 @@ lemma det_on_connected_component {Λ Λ' : LorentzGroup d} (h : Λ' ∈ connecte
     Λ.1.det = Λ'.1.det := by
   obtain ⟨s, hs, hΛ'⟩ := h
   let f : ContinuousMap s ℤ₂ := ContinuousMap.restrict s detContinuous
-  haveI : PreconnectedSpace s := isPreconnected_iff_preconnectedSpace.mp hs.1
+  have : PreconnectedSpace s := isPreconnected_iff_preconnectedSpace.mp hs.1
   simpa [f, detContinuous_eq_iff_det_eq] using
     (@IsPreconnected.subsingleton ℤ₂ _ _ _ (isPreconnected_range f.2))
     (Set.mem_range_self ⟨Λ, hs.2⟩) (Set.mem_range_self ⟨Λ', hΛ'⟩)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Two Lorentz transformations which are in the same connected component have the same
   image under `detRep`, the determinant representation. -/
 lemma detRep_on_connected_component {Λ Λ' : LorentzGroup d} (h : Λ' ∈ connectedComponent Λ) :

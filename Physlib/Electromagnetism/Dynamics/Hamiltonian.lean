@@ -124,6 +124,7 @@ lemma canonicalMomentum_eq_gradient_kineticTerm {d}
 
 -/
 
+set_option backward.isDefEq.respectTransparency false in
 lemma canonicalMomentum_eq {d} {𝓕 : FreeSpace} (A : ElectromagneticPotential d)
     (hA : ContDiff ℝ 2 A) (J : LorentzCurrentDensity d) :
     A.canonicalMomentum 𝓕 J = fun x => fun μ =>

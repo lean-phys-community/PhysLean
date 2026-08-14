@@ -77,9 +77,6 @@ instance [DecidableEq m] [DecidableEq n] : DecidableEq (Σ b, cond b m n)
 
 namespace Matrix
 
-/-- The property of a matrix being upper triangular. See also `Matrix.det_of_upperTriangular`. -/
-abbrev IsUpperTriangular [LT n] [CommRing R] (A : Matrix n n R) := A.BlockTriangular id
-
 /-- The subtype of upper triangular matrices. -/
 abbrev UpperTriangular (n R) [LT n] [CommRing R] := { A : Matrix n n R // A.IsUpperTriangular }
 

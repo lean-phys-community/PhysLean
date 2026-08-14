@@ -276,12 +276,12 @@ omit [CompleteSpace ℋ] in
 private theorem nontrivial_hsumL [Nontrivial ℋ] : Nontrivial (L (HSum ℋ)) := by
   have h_not_sub : ¬ Subsingleton ℋ := by
     intro hsub
-    letI : Subsingleton ℋ := hsub
-    letI : Subsingleton (L ℋ) := by infer_instance
+    let : Subsingleton ℋ := hsub
+    let : Subsingleton (L ℋ) := by infer_instance
     exact (not_nontrivial_iff_subsingleton.mpr (by infer_instance))
       (inferInstance : Nontrivial (L ℋ))
   have hH_nontriv : Nontrivial ℋ := (not_subsingleton_iff_nontrivial.mp h_not_sub)
-  letI : Nontrivial ℋ := hH_nontriv
+  let : Nontrivial ℋ := hH_nontriv
   rcases exists_pair_ne ℋ with ⟨x, y, hxy⟩
   let w : ℋ := x - y
   have hw : w ≠ 0 := sub_ne_zero.mpr hxy
@@ -306,8 +306,8 @@ private lemma sqrt_blockDiagonal_of_nonneg
     (hA_nonneg : (0 : L ℋ) ≤ A) (hB_nonneg : (0 : L ℋ) ≤ B) :
     CFC.sqrt (blockDiagonal (ℋ := ℋ) A B) =
       blockDiagonal (ℋ := ℋ) (CFC.sqrt A) (CFC.sqrt B) := by
-  letI : Algebra ℝ (L (HSum ℋ)) := by infer_instance
-  letI : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL (ℋ := ℋ)
+  let : Algebra ℝ (L (HSum ℋ)) := by infer_instance
+  let : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL (ℋ := ℋ)
   have hdiag_nonneg : (0 : L (HSum ℋ)) ≤ blockDiagonal (ℋ := ℋ) A B :=
     blockDiagonal_nonneg (ℋ := ℋ) hA_nonneg hB_nonneg
   rw [← cfcR_real_sqrt_eq_sqrt (ℋ := HSum ℋ) hdiag_nonneg]
@@ -557,7 +557,7 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
     simpa [S] using blockSwap_star (ℋ := ℋ) X
   have hSnorm : ‖S‖ ≤ 1 := by
     simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
-  letI : Algebra ℝ (L (HSum ℋ)) := by
+  let : Algebra ℝ (L (HSum ℋ)) := by
     infer_instance
   have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) := by
     exact IsSelfAdjoint.self_add_I_smul_cfcSqrt_sub_sq_mem_unitary S hSsa hSnorm
@@ -565,7 +565,7 @@ theorem theorem_2_5_2_i_ici_all_imp_iv {f : ℝ → ℝ} (hf : CondIciAll.{u} f)
     ⟨S + Complex.I • CFC.sqrt (1 - S ^ 2), hU_mem⟩
   let V : unitary (L (HSum ℋ)) := star U
   let Atilde : L (HSum ℋ) := blockDiagonal (ℋ := ℋ) 0 A
-  letI : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL (ℋ := ℋ)
+  let : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL (ℋ := ℋ)
   have hconv₂ : OperatorConvexOn (ℋ := HSum ℋ) (Set.Ici (0 : ℝ)) f :=
     hconvAll (K := HSum ℋ)
   have hR0nonneg : (0 : L ℋ) ≤ 1 - star X * X := sub_nonneg.mpr (star_mul_le_one (ℋ := ℋ) X hX)
@@ -811,7 +811,7 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
     simpa [S] using blockSwap_star (ℋ := ℋ) X
   have hSnorm : ‖S‖ ≤ 1 := by
     simpa [S] using blockSwap_norm_le_one (ℋ := ℋ) X hX
-  letI : Algebra ℝ (L (HSum ℋ)) := by
+  let : Algebra ℝ (L (HSum ℋ)) := by
     infer_instance
   have hU_mem : S + Complex.I • CFC.sqrt (1 - S ^ 2) ∈ unitary (L (HSum ℋ)) := by
     exact IsSelfAdjoint.self_add_I_smul_cfcSqrt_sub_sq_mem_unitary S hSsa hSnorm
@@ -819,7 +819,7 @@ theorem theorem_2_5_2_i_all_imp_iv {f : ℝ → ℝ} (hf : CondIAll.{u} f) :
     ⟨S + Complex.I • CFC.sqrt (1 - S ^ 2), hU_mem⟩
   let V : unitary (L (HSum ℋ)) := star U
   let Atilde : L (HSum ℋ) := blockDiagonal (ℋ := ℋ) 0 A
-  letI : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL (ℋ := ℋ)
+  let : Nontrivial (L (HSum ℋ)) := nontrivial_hsumL (ℋ := ℋ)
   have hconv₂ : OperatorConvex (ℋ := HSum ℋ) f := hconvAll (K := HSum ℋ)
   have hcont₂ : ContinuousOn f Set.univ :=
     operatorConvex_continuousOn_univ (ℋ := HSum ℋ) hconv₂

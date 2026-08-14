@@ -381,7 +381,7 @@ open ComplexOrder in
 lemma _root_.RCLike.instOrderClosed : OrderClosedTopology 𝕜 where
   isClosed_le' := by
     conv => enter [1, 1, p]; rw [RCLike.le_iff_re_im]
-    simp_rw [Set.setOf_and]
+    simp_rw [Set.ofPred_and]
     refine IsClosed.inter (isClosed_le ?_ ?_) (isClosed_eq ?_ ?_) <;> continuity
 
 scoped[ComplexOrder] attribute [instance] RCLike.instOrderClosed
@@ -413,7 +413,7 @@ theorem Matrix.PosSemiDef_isClosed : IsClosed { A : Matrix n n 𝕜 | A.PosSemid
     ext A; simp [Matrix.posSemidef_iff_dotProduct_mulVec]]
   refine IsHermitian_isClosed.inter ?_
   suffices IsClosed (⋂ x : n → 𝕜, { A : Matrix n n 𝕜 | 0 ≤ star x ⬝ᵥ A.mulVec x }) by
-    rwa [← Set.setOf_forall] at this
+    rwa [← Set.ofPred_forall] at this
   exact isClosed_iInter fun _ ↦ (isClosed_Ici (a := 0)).preimage (by fun_prop)
 
 theorem isClosed_nonneg : IsClosed { A : HermitianMat n 𝕜 | 0 ≤ A } := by
@@ -428,7 +428,7 @@ instance : OrderClosedTopology (HermitianMat d 𝕜) where
     convert IsClosed.preimage (X := (HermitianMat d 𝕜 × HermitianMat d 𝕜))
       (f := fun xy ↦ (xy.2 - xy.1)) (by fun_prop) isClosed_nonneg
     ext ⟨x, y⟩
-    simp only [Set.mem_setOf_eq, Set.mem_preimage, ← sub_nonneg (b := x)]
+    simp only [Set.mem_ofPred_eq, Set.mem_preimage, ← sub_nonneg (b := x)]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Equivalently: the matrices `X` such that `X - A` is PSD and `B - X` is PSD, form a compact set. -/

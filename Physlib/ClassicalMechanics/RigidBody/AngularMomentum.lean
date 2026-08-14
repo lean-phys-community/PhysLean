@@ -37,6 +37,7 @@ noncomputable def angularMomentum (R : RigidBody 3) (ω : Fin 3 → ℝ) : Fin 3
       funext fun x => cross_cross_self_apply (x : Fin 3 → ℝ) ω i
     rw [h]; fun_prop⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The angular momentum of a rigid body equals its inertia tensor applied to the angular velocity:
 `L = I ω`. -/
 theorem angularMomentum_eq_inertiaTensor_mulVec (R : RigidBody 3) (ω : Fin 3 → ℝ) :

@@ -109,6 +109,7 @@ lemma leviCivitaSymbol_comp_swap (g : ι → ι) {i j : ι} (hij : i ≠ j) :
     leviCivitaSymbol (g ∘ Equiv.swap i j) = - leviCivitaSymbol g :=
   generalizedKroneckerDelta_swap g id hij
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Levi-Civita symbol is antisymmetric under transposition of two index values:
 postcomposing with the swap of two distinct values exchanges those two values wherever
 they occur and negates it. -/

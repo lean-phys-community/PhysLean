@@ -123,7 +123,7 @@ def LinearUnitDependent.scaleUnitLinear
 def LinearUnitDependent.scaleUnitLinearEquiv {M : Type} [AddCommMonoid M]
     [Module ℝ M] [LinearUnitDependent M] (u1 u2 : LTMCTUnitChoices) :
     M ≃ₗ[ℝ] M :=
-    LinearEquiv.ofLinear (scaleUnitLinear u1 u2) (scaleUnitLinear u2 u1)
+    LinearEquiv.ofLinearMap (scaleUnitLinear u1 u2) (scaleUnitLinear u2 u1)
     (by ext u; simp [scaleUnitLinear])
     (by ext u; simp [scaleUnitLinear])
 
@@ -213,14 +213,16 @@ lemma Dimensionful.of_scaleUnit {M : Type} [CarriesDimension M] {u1 u2 u : LTMCT
 noncomputable instance {M1 : Type} [CarriesDimension M1] : MulUnitDependent M1 where
   scaleUnit u1 u2 m := (toDimensionful u1 m).1 u2
   scaleUnit_trans u1 u2 u3 m := by
-    simp [toDimensionful]
+    simp only [toDimensionful_apply_apply]
     rw [smul_smul, mul_comm, LTMCTUnitChoices.dimScale_transitive]
   scaleUnit_trans' u1 u2 u3 m := by
-    simp [toDimensionful, smul_smul, LTMCTUnitChoices.dimScale_transitive]
+    simp only [toDimensionful_apply_apply]
+    rw [smul_smul, LTMCTUnitChoices.dimScale_transitive]
   scaleUnit_id u m := by
-    simp [toDimensionful, LTMCTUnitChoices.dimScale_self]
+    simp only [toDimensionful_apply_apply]
+    rw [LTMCTUnitChoices.dimScale_self, one_smul]
   scaleUnit_mul u1 u2 r m := by
-    simp [toDimensionful]
+    simp only [toDimensionful_apply_apply]
     exact smul_comm (u1.dimScale u2 (dim M1)) r m
 
 lemma HasDim.scaleUnit_apply {M : Type} [CarriesDimension M]
@@ -462,7 +464,8 @@ lemma DMul.hMul_scaleUnit {M1 M2 M3 : Type} [CarriesDimension M1] [CarriesDimens
     [DMul M1 M2 M3] (m1 : M1) (m2 : M2) (u1 u2 : LTMCTUnitChoices) :
     (scaleUnit u1 u2 m1) * (scaleUnit u1 u2 m2) =
     scaleUnit u1 u2 (m1 * m2) := by
-  simpa [scaleUnit, toDimensionful] using
+  simpa only [toDimensionful_apply_apply, LTMCTUnitChoices.dimScale_self, one_smul,
+    HasDim.scaleUnit_apply] using
     DMul.mul_dim (M3 := M3) (toDimensionful u1 m1) (toDimensionful u1 m2) u1 u2
 
 /-!

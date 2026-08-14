@@ -323,6 +323,7 @@ lemma prod_tensor_basis_eq_map_reindex {n2 : ℕ} {c2 : Fin n2 → C} {M₂ : Ty
 attribute [-simp] Matrix.cons_val_zero Matrix.cons_val Fin.succAbove_zero
 
 open Tensor in
+set_option backward.isDefEq.respectTransparency false in
 /-- Double basis expansion of an element of a tensor product `M ⊗[k] M₂` of two `Tensorial`
   one-index spaces. Given bases `b`, `b2` of `M`, `M₂` coming from the single-index tensor bases,
   every `x : M ⊗[k] M₂` is the double sum over `i, j` of the iterated evaluation coefficient

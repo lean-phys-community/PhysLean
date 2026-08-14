@@ -57,6 +57,7 @@ namespace BL
 
 variable {n : ℕ}
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_quadBiLin (S : (PlusU1 n).Charges) :
     quadBiLin (BL n).val S = 1/2 * accYY S + 3/2 * accSU2 S - 2 * accSU3 S := by
   erw [familyUniversal_quadBiLin]
@@ -90,6 +91,7 @@ lemma addQuad_zero (S : (PlusU1 n).QuadSols) (a : ℚ) : addQuad S a 0 = a • S
   simp only [addQuad, linearToQuad, zero_smul, add_zero]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 lemma on_cubeTriLin (S : (PlusU1 n).Charges) :
     cubeTriLin (BL n).val (BL n).val S = 9 * accGrav S - 24 * accSU3 S := by
   erw [familyUniversal_cubeTriLin']
