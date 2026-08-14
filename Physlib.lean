@@ -323,6 +323,7 @@ public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Basic
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.DirichletSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.Fourier
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PolyBddSchwartzSubmodule
+public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.PositionStates
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SchwartzSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.SpaceD.SobolevSubmodule
 public import Physlib.QuantumMechanics.HilbertSpaces.TensorProducts.CompleteTensorProduct
