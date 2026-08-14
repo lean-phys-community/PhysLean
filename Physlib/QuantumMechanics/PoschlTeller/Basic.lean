@@ -114,15 +114,15 @@ abbrev HS (_ : PoschlTeller) : Type _ := SpaceDHilbertSpace 1
 -/
 
 /-- Pointwise multiplication of Schwartz maps by `tanh(κx)`. -/
-def tanhCLM (Q : PoschlTeller) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
+def tanhCLM : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
   smulLeftCLM ℂ (ofReal ∘ fun x => tanh (Q.κ * x 0))
 
 /-- The creation operator, `1/√(2m) (P + iℏκ tanh(κX))` -/
-def creationCLM (Q : PoschlTeller) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
+def creationCLM : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
   (1 / sqrt (2 * Q.m)) • momentumCLM 0 + (I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhCLM
 
 /-- The annihilation operator, `1/√(2m) (P - iℏκ tanh(κX))` -/
-def annihilationCLM (Q : PoschlTeller) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
+def annihilationCLM : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
   (1 / sqrt (2 * Q.m)) • momentumCLM 0 + (-I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhCLM
 
 /-!
@@ -130,15 +130,14 @@ def annihilationCLM (Q : PoschlTeller) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space
 -/
 
 /-- The unbounded operator defined by pointwise multiplication by `tanh(κx)`. -/
-def tanhOperator (Q : PoschlTeller) : Q.HS →ₗ.[ℂ] Q.HS :=
-  𝓜 _ (ofReal ∘ fun x => Real.tanh (Q.κ * x 0))
+def tanhOperator : Q.HS →ₗ.[ℂ] Q.HS := 𝓜 _ (ofReal ∘ fun x => Real.tanh (Q.κ * x 0))
 
 /-- The creation unbounded operator, `1/√(2m) (P + iℏκ tanh(κX))` -/
-def creationOperator (Q : PoschlTeller) : Q.HS →ₗ.[ℂ] Q.HS :=
+def creationOperator : Q.HS →ₗ.[ℂ] Q.HS :=
   (1 / sqrt (2 * Q.m)) • momentumOperator 0 + (I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhOperator
 
 /-- The annihilation unbounded operator, `1/√(2m) (P - iℏκ tanh(κX))` -/
-def annihilationOperator (Q : PoschlTeller) : Q.HS →ₗ.[ℂ] Q.HS :=
+def annihilationOperator : Q.HS →ₗ.[ℂ] Q.HS :=
   (1 / sqrt (2 * Q.m)) • momentumOperator 0 + (-I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhOperator
 
 /-!
