@@ -80,29 +80,18 @@ noncomputable def mulByTemperateGrowth {g : ℝ → ℂ} (hg : g.HasTemperateGro
     𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
   bilinLeftCLM (ContinuousLinearMap.mul ℂ ℂ) hg
 
--- First, you need a theorem that the scaled tanh has temperate growth
-lemma scaled_tanh_hasTemperateGrowth (κ : ℝ) :
-    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x))) :=
-  tanh_const_mul_hasTemperateGrowth κ
-
 /-- This is a helper lemma to show that the embedding of a real function with temperate growth in ℂ
   also has temperate growth -/
 private lemma complex_embedding_of_temperate_growth (f : ℝ → ℝ)
     (h : Function.HasTemperateGrowth f) : Function.HasTemperateGrowth (fun x => (f x : ℂ)) :=
   Function.Complex.hasTemperateGrowth_ofReal.comp h
 
--- Scaled tanh embedded into the complex numbers has temperate growth
-lemma scaled_tanh_complex_hasTemperateGrowth (κ : ℝ) :
-    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x) : ℂ)) :=
-  complex_embedding_of_temperate_growth _ (scaled_tanh_hasTemperateGrowth κ)
-
 /-- Define tanh(κ X) multiplication pointwise as a Schwartz map -/
 noncomputable def tanhOperatorSchwartz (Q : ReflectionlessPotential) :
     𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
   -- We need to handle the Real → Complex coercion
   let scaled_tanh_complex : ℝ → ℂ := fun x => (Real.tanh (Q.κ * x) : ℂ)
-  have h2 : Function.HasTemperateGrowth scaled_tanh_complex :=
-    scaled_tanh_complex_hasTemperateGrowth Q.κ
+  have h2 : Function.HasTemperateGrowth scaled_tanh_complex := by fun_prop
   bilinLeftCLM (ContinuousLinearMap.mul ℂ ℂ) h2
 
 /-- Creation operator: a† as defined in https://arxiv.org/pdf/2411.14941
