@@ -27,10 +27,16 @@ annihilation operators
 
 ## iii. Table of contents
 
-- A. Potential
-- B. Creation and annihilation operators
-  - B.1. On Schwartz functions
-  - B.2. As unbounded operators
+- A. Potential function
+- B. Hilbert space
+- C. Operators
+  - C.1. Kinetic energy
+  - C.2. Potential energy
+  - C.3. Hamiltonian
+  - C.4. Creation and annihilation operators
+    - C.4.1. On Schwartz functions
+    - C.4.2. As unbounded operators
+- D. As a quantum system
 
 ## iv. References
 
@@ -43,7 +49,7 @@ noncomputable section
 
 namespace QuantumMechanics
 
-open Complex Constants SchwartzMap
+open Complex Constants Real SchwartzMap
 
 /-- A reflectionless potential is specified by three
   real parameters: the mass of the particle `m`, a value of Planck's constant `ℏ`, the
@@ -65,7 +71,7 @@ namespace ReflectionlessPotential
 variable (Q : ReflectionlessPotential)
 
 /-!
-## A. Potential
+## A. Potential function
 -/
 
 /-- Define the reflectionless potential as
@@ -74,43 +80,67 @@ def potential (x : Space 1) : ℝ :=
   -(ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / (2 * Q.m * Real.cosh (Q.κ * x 0) ^ 2)
 
 /-!
-## B. Creation and annihilation operators
+## B. Hilbert space
+-/
+
+/-- The Hilbert space for the reflectionless potential. -/
+@[nolint unusedArguments]
+abbrev HS (_ : ReflectionlessPotential) : Type _ := SpaceDHilbertSpace 1
+
+/-!
+## C. Operators
 -/
 
 /-!
-## B.1. On Schwartz functions
+### C.1. Kinetic energy
+-/
+
+/-!
+### C.2. Potential energy
+-/
+
+/-!
+### C.3. Hamiltonian
+-/
+
+/-!
+### C.4. Creation and annihilation operators
+-/
+
+/-!
+#### C.4.1. On Schwartz functions
 -/
 
 /-- Define tanh(κ X) multiplication pointwise as a Schwartz map -/
 def tanhCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
-  smulLeftCLM ℂ (ofReal ∘ fun x => Real.tanh (Q.κ * x 0))
+  smulLeftCLM ℂ (ofReal ∘ fun x => tanh (Q.κ * x 0))
 
 /-- Creation operator: a† as defined in https://arxiv.org/pdf/2411.14941
   a† = 1/√(2m) (P + iℏκ tanh(κX)) -/
 def creationCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
-  (1 / Real.sqrt (2 * Q.m)) • momentumCLM 0 + (I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhCLM
+  (1 / sqrt (2 * Q.m)) • momentumCLM 0 + (I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhCLM
 
 /-- Annihilation operator: a as defined in https://arxiv.org/pdf/2411.14941
   a = 1/√(2m) (P - iℏκ tanh(κX)) -/
 def annihilationCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
-  (1 / Real.sqrt (2 * Q.m)) • momentumCLM 0 + (-I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhCLM
+  (1 / sqrt (2 * Q.m)) • momentumCLM 0 + (-I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhCLM
 
 /-!
-## B.2. As unbounded operators
+#### C.4.2. As unbounded operators
 -/
 
-def tanhOperator (Q : ReflectionlessPotential) : SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
+def tanhOperator (Q : ReflectionlessPotential) : Q.HS →ₗ.[ℂ] Q.HS :=
   𝓜 _ (ofReal ∘ fun x => Real.tanh (Q.κ * x 0))
 
-def creationOperator (Q : ReflectionlessPotential) :
-    SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
-  (1 / Real.sqrt (2 * Q.m)) • momentumOperator 0 +
-    (I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhOperator
+def creationOperator (Q : ReflectionlessPotential) : Q.HS →ₗ.[ℂ] Q.HS :=
+  (1 / sqrt (2 * Q.m)) • momentumOperator 0 + (I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhOperator
 
-def annihilationOperator (Q : ReflectionlessPotential) :
-    SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
-  (1 / Real.sqrt (2 * Q.m)) • momentumOperator 0 +
-    (-I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhOperator
+def annihilationOperator (Q : ReflectionlessPotential) : Q.HS →ₗ.[ℂ] Q.HS :=
+  (1 / sqrt (2 * Q.m)) • momentumOperator 0 + (-I * ℏ * Q.κ / sqrt (2 * Q.m)) • Q.tanhOperator
+
+/-!
+## D. As a quantum system
+-/
 
 end ReflectionlessPotential
 end QuantumMechanics
