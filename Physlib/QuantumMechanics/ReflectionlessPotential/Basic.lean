@@ -32,7 +32,7 @@ TODO "Refactor to use `QuantumMechanics.PlanckConstant`."
 
 namespace QuantumMechanics
 open Real
-open SchwartzMap
+open Complex Constants SchwartzMap
 open HilbertSpace
 open NNReal
 open Field
@@ -48,14 +48,11 @@ structure ReflectionlessPotential where
   m : ℝ
   /-- parameter of the reflectionless potential -/
   κ : ℝ
-  /-- Planck's constant -/
-  ℏ : ℝ
   /-- family number, positive integer -/
   N : ℕ
   m_pos : 0 < m -- mass of the particle is positive
   κ_pos : 0 < κ -- parameter of the reflectionless potential is positive
   N_pos : 0 < N -- family number is positive
-  ℏ_pos : 0 < ℏ -- Planck's constant is positive
 
 namespace ReflectionlessPotential
 
@@ -69,7 +66,7 @@ TODO: Add theorems about reflectionless potential - the main result is the actua
 /-- Define the reflectionless potential as
   V(x) = - (ℏ^2 * κ^2 * N * (N + 1)) / (2 * m * (cosh (κ * x)) ^ 2) --/
 noncomputable def reflectionlessPotential (x : ℝ) : ℝ :=
-  - (Q.ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / ((2 : ℝ) * Q.m * (Real.cosh (Q.κ * x)) ^ 2)
+  - (ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / (2 * Q.m * Real.cosh (Q.κ * x) ^ 2)
 
 /-- Define tanh(κ X) operator -/
 noncomputable def tanhOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
@@ -98,24 +95,24 @@ noncomputable def tanhOperatorSchwartz (Q : ReflectionlessPotential) :
   a† = 1/√(2m) (P + iℏκ tanh(κX)) -/
 noncomputable def creationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   let factor : ℝ := 1 / Real.sqrt (2 * Q.m)
-  fun x => factor * (momentumOperator ψ x + Complex.I * Q.ℏ * Q.κ * Q.tanhOperator ψ x)
+  fun x => factor * (momentumOperator ψ x + I * ℏ * Q.κ * Q.tanhOperator ψ x)
 
 /-- Annihilation operator: a as defined in https://arxiv.org/pdf/2411.14941
   a = 1/√(2m) (P - iℏκ tanh(κX)) -/
 noncomputable def annihilationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   let factor : ℝ := 1 / Real.sqrt (2 * Q.m)
-  fun x => factor * (momentumOperator ψ x - Complex.I * Q.ℏ * Q.κ * Q.tanhOperator ψ x)
+  fun x => factor * (momentumOperator ψ x - I * ℏ * Q.κ * Q.tanhOperator ψ x)
 
 /-- creation operator defined as a Schwartz map -/
 noncomputable def creationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
 (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz +
-    ((Complex.I * Q.ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz
+    ((I * ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz
 
 /-- annihilation operator defined as a Schwartz map -/
 noncomputable def annihilationOperatorSchwartz (Q : ReflectionlessPotential) :
   𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
 (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz +
-    ((-Complex.I * Q.ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz
+    ((-I * ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz
 
 end ReflectionlessPotential
 end OneDimension
