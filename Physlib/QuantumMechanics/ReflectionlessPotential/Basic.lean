@@ -6,6 +6,7 @@ Authors: Afiq Hatta
 module
 
 public import Physlib.QuantumMechanics.Operators.Momentum
+public import Physlib.QuantumMechanics.Operators.Multiplication
 public import Physlib.Mathematics.Trigonometry.Tanh
 public import Physlib.Meta.TODO.Basic
 /-!
@@ -82,6 +83,20 @@ noncomputable def creationCLM (Q : ReflectionlessPotential) : 𝓢(Space 1, ℂ)
 noncomputable def annihilationCLM (Q : ReflectionlessPotential) :
   𝓢(Space 1, ℂ) →L[ℂ] 𝓢(Space 1, ℂ) :=
     (1 / Real.sqrt (2 * Q.m)) • momentumCLM 0 + ((-I * ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhCLM
+
+noncomputable def tanhOperator (Q : ReflectionlessPotential) :
+    SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
+  𝓜 _ (ofReal ∘ fun x => tanh (Q.κ * x 0))
+
+noncomputable def creationOperator (Q : ReflectionlessPotential) :
+    SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
+  (1 / Real.sqrt (2 * Q.m)) • momentumOperator 0 +
+    (I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhOperator
+
+noncomputable def annihilationOperator (Q : ReflectionlessPotential) :
+    SpaceDHilbertSpace 1 →ₗ.[ℂ] SpaceDHilbertSpace 1 :=
+  (1 / Real.sqrt (2 * Q.m)) • momentumOperator 0 +
+    (-I * ℏ * Q.κ / Real.sqrt (2 * Q.m)) • Q.tanhOperator
 
 end ReflectionlessPotential
 end OneDimension
