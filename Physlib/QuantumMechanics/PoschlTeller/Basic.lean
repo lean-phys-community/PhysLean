@@ -42,6 +42,14 @@ the parameter controlling its depth is a positive integer.
 -/
 @[expose] public section
 
+TODO "Define the Hamiltonian and related operators for the Pöschl-Teller quantum system."
+
+TODO "Develop the eigensystem of the Hamiltonian for the Pöschl-Teller quantum system
+  using properties of the creation/annihilation operators
+  (e.g. following https://arxiv.org/pdf/2411.14941)."
+
+TODO "Prove that the Pöschl-Teller potential is reflectionless."
+
 noncomputable section
 
 namespace QuantumMechanics
