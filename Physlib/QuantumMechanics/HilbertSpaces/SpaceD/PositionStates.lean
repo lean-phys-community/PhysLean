@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Analysis.Distribution.TemperedDistribution
 public import Physlib.SpaceAndTime.Space.Module
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Position states
@@ -29,6 +30,8 @@ of the dual of `𝓢(Space d, ℂ)` defined by evaluation at `x`.
 -/
 
 @[expose] public section
+
+TODO "Prove that position states are generalized eigenvectors of every multiplication operator."
 
 namespace QuantumMechanics
 namespace SpaceDHilbertSpace

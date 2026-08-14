@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Analysis.Distribution.TemperedDistribution
 public import Physlib.SpaceAndTime.Space.Module
+public import Physlib.Meta.TODO.Basic
 /-!
 
 # Momentum states
@@ -29,6 +30,8 @@ of the dual of `𝓢(Space d, ℂ)` defined by evaluation of the Fourier transfo
 -/
 
 @[expose] public section
+
+TODO "Prove that momentum states are generalized eigenvectors of every derivative operator."
 
 namespace QuantumMechanics
 
