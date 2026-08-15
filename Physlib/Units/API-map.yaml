@@ -5,12 +5,14 @@ Title: Units
 Overview: |
     Every physical quantity has a dimension: a rational power of each base dimension,
     recording how the numerical value of the quantity changes when the unit of each base
-    quantity is changed. The default set of base dimensions is length, time, mass, charge
-    and temperature, written L𝓭, T𝓭, M𝓭, C𝓭 and Θ𝓭. Dimensions multiply by adding
+    quantity is changed. The LTMCT set has five base dimensions: length, time, mass,
+    charge and temperature, written L𝓭, T𝓭, M𝓭, C𝓭 and Θ𝓭. Dimensions multiply by adding
     exponents and invert by negating them, so they form a commutative group with a
-    rational power operation. The International System of Quantities takes seven base
-    quantities instead, in which electric charge is derived as current times time; both
-    sets are available and are related by a faithful inclusion and a reduction.
+    rational power operation. The International System of Quantities uses a different set
+    of seven base quantities, in which electric charge is derived as current times time;
+    both sets are available and are related by a faithful inclusion and a reduction.
+    LTMCT is the set over which the typed unit layer (LTMCTUnitChoices and its SI choice)
+    and the named derived quantities are built; the ISQ set carries SIUnitChoices.
 
     A unit system fixes one concrete unit for each base quantity. Changing from one system
     to another multiplies a quantity of dimension d by a positive factor: the product,
@@ -18,8 +20,8 @@ Overview: |
     assigns to that base quantity. That factor is multiplicative in the dimension, equals
     one when the two systems agree, and composes along a chain, so the value of a quantity
     in one system determines its value in every other. The statement is proved once for a
-    general set of base dimensions and specialises to the default five and to the seven
-    ISQ base quantities without being restated.
+    general set of base dimensions and specialises to the LTMCT set and to the ISQ set
+    without being restated.
 
     A value carrying a dimension inherits the additive, order and scalar structure of its
     underlying type, while products and quotients add and subtract the exponents. Area,
@@ -66,7 +68,7 @@ Requirements:
     done: true
     location: "Physlib/Units/Dimension.lean (Dimension.extend, Dimension.extend_exponent_apply, Dimension.extendHom, Dimension.Embedding, Dimension.Projection, Dimension.Embedding.ofBasis)"
 
-  - description: "The default set of five base dimensions is defined with the exponent projection of each."
+  - description: "The LTMCT set of five base dimensions is defined with the exponent projection of each."
     done: true
     location: "Physlib/Units/LTMCTDimensionBase.lean (LTMCTDimensionBase, Dimension.length, Dimension.time, Dimension.mass, Dimension.charge, Dimension.temperature)"
 
@@ -94,7 +96,7 @@ Requirements:
     done: true
     location: "Physlib/Units/ISQDimensionBase.lean (ISQDimensionBase.single_amount_ne_one, ISQDimensionBase.single_luminousIntensity_ne_one)"
 
-  - description: "A faithful embedding carries the default five base dimensions into the ISQ set, sending the charge generator to the derived ISQ charge."
+  - description: "A faithful embedding carries the LTMCT base dimensions into the ISQ set, sending the charge generator to the derived ISQ charge."
     done: true
     location: "Physlib/Units/ISQBridge.lean (Dimension.toISQFun, Dimension.toISQHom, Dimension.toISQHom_apply, Dimension.toISQHom_injective, Dimension.ltmctToISQ, Dimension.toISQHom_C𝓭)"
 
@@ -106,7 +108,7 @@ Requirements:
     done: true
     location: "Physlib/Units/ISQBridge.lean (Dimension.fromISQHom_comp_toISQHom, Dimension.isqToLTMCT_comp_ltmctToISQ)"
 
-  - description: "A unit choice fixes one unit for each of the five default base quantities, with the SI choice of metre, second, kilogram, coulomb and kelvin."
+  - description: "A unit choice fixes one unit for each of the five LTMCT base quantities, with the SI choice of metre, second, kilogram, coulomb and kelvin."
     done: true
     location: "Physlib/Units/Basic.lean (LTMCTUnitChoices, LTMCTUnitChoices.SI, LTMCTUnitChoices.SI_length, LTMCTUnitChoices.SI_time, LTMCTUnitChoices.SI_mass, LTMCTUnitChoices.SI_charge, LTMCTUnitChoices.SI_temperature)"
 
@@ -162,7 +164,7 @@ Requirements:
     done: true
     location: "Physlib/Units/UnitSystem.lean (UnitSystem.toScale, UnitSystem.toScale_scale)"
 
-  - description: "The bespoke five-field unit choice is equivalent to a unit system over the default base dimensions, and its hand-written scaling law is the generic product specialised to that set."
+  - description: "The bespoke five-field unit choice is equivalent to a unit system over the LTMCT base dimensions, and its hand-written scaling law is the generic product specialised to that set."
     done: true
     location: "Physlib/Units/ParametricUnits.lean (LTMCTUnitChoices.toScale); Physlib/Units/UnitSystem.lean (LTMCTUnitChoices.equivUnitSystem, LTMCTUnitChoices.toScale_equivUnitSystem, prod_univ_LTMCTDimensionBase, LTMCTUnitChoices.dimScale_eq_toScale_dimScale)"
 
@@ -182,7 +184,7 @@ Requirements:
     done: true
     location: "Physlib/Units/SIUnitChoices.lean (prod_univ_ISQDimensionBase, SIUnitChoices.dimScale, SIUnitChoices.dimScale_self)"
 
-  - description: "The SI unit choice over the default five base quantities shall be computable, which a note in the source records as requiring the axioms that define the base units to be replaced."
+  - description: "The SI unit choice over the five LTMCT base quantities shall be computable, which a note in the source records as requiring the axioms that define the base units to be replaced."
     done: false
     location: "N/A"
 
@@ -238,7 +240,7 @@ Requirements:
     done: true
     location: "Physlib/Units/WithDim/Basic.lean (WithDim.withDim_hMul_val, WithDim.val_mul_eq_mul, WithDim.val_pow_two_eq_mul, WithDim.val_div_val, WithDim.div_scaleUnit)"
 
-  - description: "Over the default base dimensions the tagged type carries its dimension and its transformation under a change of unit is scalar multiplication by the scaling factor."
+  - description: "Over the LTMCT base dimensions the tagged type carries its dimension and its transformation under a change of unit is scalar multiplication by the scaling factor."
     done: true
     location: "Physlib/Units/WithDim/Basic.lean (WithDim.scaleUnit_val, WithDim.scaleUnit_val_eq_scaleUnit_val, WithDim.scaleUnit_val_eq_scaleUnit_val_of_dim_eq)"
 
