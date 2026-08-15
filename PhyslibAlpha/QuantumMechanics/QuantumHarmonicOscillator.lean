@@ -193,7 +193,7 @@ lemma probabilityOf_eq_poisson_C (n : ℕ) (α : ℂ) :
   · apply div_nonneg
     · apply mul_nonneg
       · apply Real.exp_nonneg
-      · simp
+      · exact pow_nonneg (NNReal.coe_nonneg _) n
     · simp
 
 
@@ -380,18 +380,23 @@ def coherentState_ℓ2 (α : ℂ) : lp (fun _ : ℕ => ℂ) 2 := {
   val := coherentState α
   property := by
     simp only [lp, Memℓp, OfNat.ofNat_ne_zero, ↓reduceIte, ENNReal.ofNat_ne_top, Summable,
-      ENNReal.toReal_ofNat, Real.rpow_ofNat, AddSubgroup.mem_mk, AddSubmonoid.mem_mk,
-      AddSubsemigroup.mem_mk, Set.mem_setOf_eq, coherentState, Complex.ofReal_exp,
-      Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow, Complex.ofReal_ofNat,
-      Complex.norm_div, Complex.norm_mul, norm_pow, Complex.norm_real, Real.norm_eq_abs]
+      ENNReal.toReal_ofNat, Real.rpow_ofNat]
     use (‖Complex.exp (-↑‖α‖ ^ 2 / 2)^2 * Complex.exp (‖α‖^2)‖)
     suffices HasSum (fun i : ℕ ↦ ( ‖α‖ ^ i
       / |√↑i.factorial|) ^ 2)
       ‖Complex.exp (↑‖α‖ ^ 2)‖ by
-      simp_rw [div_pow] at *
-      simp_rw [mul_pow, ← mul_div]
-      simp only [sq_abs, Nat.cast_nonneg, Real.sq_sqrt, Complex.norm_mul, norm_pow] at *
-      exact HasSum.const_smul (γ := ℝ) _ this
+      simp_rw [div_pow] at this
+      have h := this.mul_left (Real.exp (-‖α‖ ^ 2 / 2) ^ 2)
+      convert h using 2 with i
+      · rfl
+      · unfold coherentState
+        rw [norm_div, norm_mul, norm_pow, Complex.norm_real, Complex.norm_real,
+          Real.norm_eq_abs, Real.norm_eq_abs, Real.abs_exp, div_pow, mul_pow]
+        ring
+      · have hc : (-(↑‖α‖ : ℂ) ^ 2 / 2) = ((-‖α‖ ^ 2 / 2 : ℝ) : ℂ) := by
+          push_cast
+          ring
+        rw [norm_mul, norm_pow, hc, Complex.norm_exp_ofReal]
     have (r : ℝ) : |√r| = √r := by
       rw [abs_eq_self]
       simp

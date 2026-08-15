@@ -115,10 +115,10 @@ def halfPlaneSubmodule : Submodule ℝ (Space 3) where
   carrier := {x | x (2 : Fin 3) = 0}
   zero_mem' := by simp
   add_mem' hx hy := by
-    rw [Set.mem_setOf_eq] at hx hy ⊢
+    rw [Set.mem_ofPred_eq] at hx hy ⊢
     rw [Space.add_apply, hx, hy, add_zero]
   smul_mem' c x hx := by
-    rw [Set.mem_setOf_eq] at hx ⊢
+    rw [Set.mem_ofPred_eq] at hx ⊢
     rw [Space.smul_apply, hx, mul_zero]
 
 lemma halfPlane_mem_halfPlaneSubmodule (x : Space 2) : halfPlane x ∈ halfPlaneSubmodule := by
