@@ -65,6 +65,11 @@ srcDir = "scripts/PhyslibAlpha"
 supportInterpreter = true
 
 [[lean_exe]]
+name = "noAlphaImports"
+srcDir = "scripts/PhyslibAlpha"
+supportInterpreter = true
+
+[[lean_exe]]
 name = "free_simps"
 srcDir = "scripts/MetaPrograms"
 
