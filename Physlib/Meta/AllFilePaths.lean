@@ -27,6 +27,10 @@ partial def allFilePaths.go (prev : Array FilePath)
       pure (acc.push (root ++ "/" ++ entry.fileName))
   pure result
 
+/-- Gets an array of all file paths in the supplied directory. -/
+partial def getFilePaths (moduleName : String) : IO (Array FilePath) := do
+   allFilePaths.go (#[] : Array FilePath) moduleName moduleName
+
 /-- Gets an array of all file paths in `Physlib`. -/
 partial def allFilePaths : IO (Array FilePath) := do
   allFilePaths.go (#[] : Array FilePath) "./Physlib" ("./Physlib" : FilePath)
