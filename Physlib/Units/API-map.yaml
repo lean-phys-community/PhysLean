@@ -6,10 +6,11 @@ Overview: |
     Every physical quantity has a dimension: a rational power of each base dimension,
     recording how the numerical value of the quantity changes when the unit of each base
     quantity is changed. The LTMCT set has five base dimensions: length, time, mass,
-    charge and temperature, written L𝓭, T𝓭, M𝓭, C𝓭 and Θ𝓭. Dimensions multiply by adding
-    exponents and invert by negating them, so they form a commutative group with a
-    rational power operation. The International System of Quantities uses a different set
-    of seven base quantities, in which electric charge is derived as current times time;
+    charge and temperature, whose initials give the name; they are written L𝓭, T𝓭,
+    M𝓭, C𝓭 and Θ𝓭. Dimensions multiply by adding exponents and invert by negating
+    them, so they form a commutative group with a rational power operation. The
+    International System of Quantities (ISQ) uses a different set of seven base
+    quantities, in which electric charge is derived as current times time;
     both sets are available and are related by a faithful inclusion and a reduction.
     LTMCT is the set over which the typed unit layer (LTMCTUnitChoices and its SI choice)
     and the named derived quantities are built; the ISQ set carries SIUnitChoices.
