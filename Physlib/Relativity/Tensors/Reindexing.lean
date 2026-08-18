@@ -491,10 +491,7 @@ lemma succSuccAbove_succAbove_comm {n : ℕ} {c : Fin (n + 1 + 1 + 1) → C}
   refine ⟨Function.bijective_id, fun m => ?_⟩
   simp only [id_eq, Function.comp_apply]
   congr 1
-  apply Fin.val_injective
-  simp only [Fin.succSuccAbove, Fin.succAbove, lt_def, val_castSucc,
-    val_succ, apply_ite Fin.val, Fin.predAbove, Fin.castPred]
-  grind (splits := 60)
+  exact Fin.succSuccAbove_succAbove_comm_apply i j k m
 
 /-- Removing two single entries from `c` in either order gives the same colour list:
   removing the `k1`-th entry and then the (shifted) `k2`-th entry matches removing the
