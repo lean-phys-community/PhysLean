@@ -288,7 +288,7 @@ lemma ι_timeOrderF_superCommuteF_ne_time {φ ψ : 𝓕.CrAnFieldOp}
 
 /-!
 
-## Defining time order for `FiedOpAlgebra`.
+## Defining time order for `FieldOpFreeAlgebra`.
 
 -/
 
