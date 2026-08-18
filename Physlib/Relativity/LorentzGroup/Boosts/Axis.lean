@@ -21,6 +21,9 @@ The parameter `t ≠ 0` is multiplicative: replacing `t` by `t⁻¹` reverses th
 `t > 0`, its rapidity is `2 * log t`; negative values retain the action of the central
 element `-1 : SL(2,ℂ)`.
 
+For the `z`-axis, `boostMatZ t` agrees with the velocity-parameterized boost
+`LorentzGroup.boost 2 β` at `β = (t² - t⁻²) / (t² + t⁻²)`.
+
 The three lifts are Hermitian, and the `x`- and `y`-axis lifts are conjugates of the
 diagonal `z`-axis lift.
 
