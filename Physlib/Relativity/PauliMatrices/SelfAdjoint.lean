@@ -266,6 +266,18 @@ def pauliSelfAdjoint' (i : Fin 1 ⊕ Fin 3) : selfAdjoint (Matrix (Fin 2) (Fin 2
   | Sum.inr 1 => ⟨-σ2, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
   | Sum.inr 2 => ⟨-σ3, by rw [AddSubgroup.neg_mem_iff]; exact pauliMatrix_selfAdjoint _⟩
 
+/-- Trace orthogonality of the covariant Pauli basis:
+  `tr (σ'_a σ'_b) = 2 δ_{a b}`. -/
+lemma trace_pauliSelfAdjoint'_mul (a b : Fin 1 ⊕ Fin 3) :
+    Matrix.trace ((pauliSelfAdjoint' a).1 * (pauliSelfAdjoint' b).1) =
+      if a = b then 2 else 0 := by
+  rcases a with a | a <;> rcases b with b | b <;>
+    fin_cases a <;> fin_cases b <;>
+    simp only [pauliSelfAdjoint', Matrix.neg_mul, Matrix.mul_neg,
+      Matrix.trace_neg, neg_neg, trace_pauliMatrix_mul_pauliMatrix,
+      KroneckerDelta.kroneckerDelta] <;>
+    simp
+
 /-- The Pauli matrices where `σi` are negated are linearly independent. -/
 lemma pauliSelfAdjoint'_linearly_independent : LinearIndependent ℝ pauliSelfAdjoint' := by
   apply Fintype.linearIndependent_iff.mpr
