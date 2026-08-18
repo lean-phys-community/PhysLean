@@ -190,8 +190,17 @@ Requirements:
     location: "N/A"
 
   - description: "The unit types for electric current, amount of substance and luminous intensity shall carry the same rescaling operation as the other five, so that a decimal multiple such as the milliampere can be named."
-    done: false
-    location: "N/A"
+    done: true
+    location: >
+      Physlib/Units/SIUnitChoices.lean
+      (CurrentUnit.scale, CurrentUnit.scale_div_self, CurrentUnit.self_div_scale,
+      CurrentUnit.scale_one, CurrentUnit.scale_div_scale, CurrentUnit.scale_scale,
+      CurrentUnit.milliamperes, AmountUnit.scale, AmountUnit.scale_div_self,
+      AmountUnit.self_div_scale, AmountUnit.scale_one, AmountUnit.scale_div_scale,
+      AmountUnit.scale_scale, LuminousIntensityUnit.scale,
+      LuminousIntensityUnit.scale_div_self, LuminousIntensityUnit.self_div_scale,
+      LuminousIntensityUnit.scale_one, LuminousIntensityUnit.scale_div_scale,
+      LuminousIntensityUnit.scale_scale)
 
   - description: "A unit-dependent type comes with the transformation of its elements induced by a change of unit, subject to composition along a chain of unit choices and triviality on an unchanged choice."
     done: true
