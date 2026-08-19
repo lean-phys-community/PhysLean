@@ -59,7 +59,7 @@ When a long proof cannot be split, make sure it contains comments.
 - If edited a `PhyslibAlpha` file, check the following:
   - `lake exe runPhyslibAlphaLinters`
   - `lake exe noAlphaImports`
-  - `./scripts/PhyslibAlpha/alphaFileImports.py`
+  - `lake exe alphaFileImports`
   - `./scripts/PhyslibAlpha/alphaPythonLinters.sh`
 
 ## PR scope
