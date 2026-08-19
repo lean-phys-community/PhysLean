@@ -53,6 +53,10 @@ jobs:
       - name: Check no PhyslibAlpha in Physlib and QuantumInfo
         run: env LEAN_ABORT_ON_PANIC=1 lake exe noAlphaImports
 
+      - name: Check PhyslibAlpha imports
+        run: env LEAN_ABORT_ON_PANIC=1 lake exe alphaFileImports
+
+
   style_lint:
     name: Python based linters
     runs-on: ubuntu-latest
@@ -75,12 +79,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.8
-
-      - name: Check PhyslibAlpha imports
-        run: |
-          chmod u+x scripts/PhyslibAlpha/alphaFileImports.py
-          ./scripts/PhyslibAlpha/alphaFileImports.py
-
 
       - name: Python linters for PhyslibAlpha
         run: |
