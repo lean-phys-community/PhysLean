@@ -9,8 +9,19 @@ public import Physlib.Relativity.SL2C.Basic
 /-!
 # Coordinate-axis rotations in `SL(2,ℂ)`
 
-This file defines rotations carrying the `z`-axis to a selected coordinate axis. The spatial
-axis convention is `0 = x`, `1 = y`, and `2 = z`.
+This file defines chosen `SL(2,ℂ)` rotations carrying the `z`-axis to a selected coordinate axis.
+The spatial-axis convention is `0 = x`, `1 = y`, and `2 = z`; consequently, the rotation associated
+with axis `2` is the identity.
+
+Conjugation by these rotations transports a matrix written in the diagonal `z`-axis basis to
+the corresponding coordinate-axis basis. This provides the common change of basis used by
+coordinate-axis boosts and later constructions based on diagonal representatives.
+
+The main declarations are:
+
+- `rotationZToAxis`, the indexed family of rotations;
+- `rotationZToAxis_inv_apply`, their inverse matrix entries;
+- `rotationZToAxis_mul_diagonal_mul_inv`, their action on a diagonal matrix.
 -/
 
 @[expose] public section
@@ -59,8 +70,8 @@ noncomputable def rotationZToAxis : Fin 3 → SL(2,ℂ)
     rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
     fin_cases j <;> fin_cases k <;> simp [rotationZToAxis]
 
-/-- Conjugating a diagonal matrix by `rotationZToAxis i` expresses it in the basis for axis
-`i`. -/
+/-- Conjugating `diag(a, b)` by `rotationZToAxis i` transports its diagonal `z`-axis expression
+to the basis associated with axis `i`. -/
 lemma rotationZToAxis_mul_diagonal_mul_inv (i : Fin 3) (a b : ℂ) :
     (rotationZToAxis i).1 * !![a, 0; 0, b] * ((rotationZToAxis i)⁻¹).1 =
       match i with
