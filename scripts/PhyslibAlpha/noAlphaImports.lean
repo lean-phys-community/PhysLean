@@ -20,10 +20,9 @@ open System
   PhyslibAlpha files, and False otherwise, printing the offending files and 
   imports to the standard output.
   -/
-def areNoAlphaImports : IO Bool := do
-  let mut violations : Array (FilePath × Name) := #[]
+def areNoAlphaImports (modules : List String) : IO Bool := do
+  let mut violations  : Array (FilePath × Name) := #[]
 
-  let modules : Array String := #["./Physlib", "./QuantumInfo"]
   for module in modules do
 
     let filePaths ← getFilePaths module
@@ -48,8 +47,12 @@ def areNoAlphaImports : IO Bool := do
     IO.println "No violations found. All files passed the check."
     return True
 
-unsafe def main (_ : List String) : IO Unit := do
-  let success ← areNoAlphaImports 
+unsafe def main (args : List String) : IO Unit := do
+  let dirs := match args with
+    | [] => ["./Physlib", "./QuantumInfo"]
+    | _ => args
+
+  let success ← areNoAlphaImports dirs
 
   if !success then
     IO.Process.exit 1
