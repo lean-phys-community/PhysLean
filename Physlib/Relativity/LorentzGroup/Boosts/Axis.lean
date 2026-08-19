@@ -41,8 +41,8 @@ The index `Sum.inl 0` is the time coordinate, while `Sum.inr 0`, `Sum.inr 1`, an
 ## iii. Table of contents
 
 - A. The axis-boost lift
-- B. The induced Lorentz transformation
-- C. Axis conjugation
+- B. Axis conjugation
+- C. The induced Lorentz transformation
 
 -/
 
@@ -136,50 +136,9 @@ lemma boostAxis_conjTranspose (i : Fin 3) (t : ℝ) (ht : t ≠ 0) :
     (boostAxis i t ht).1ᴴ = (boostAxis i t ht).1 := by
   fin_cases i <;> ext j k <;> fin_cases j <;> fin_cases k <;> simp [boostAxis]
 
-end Lorentz.SL2C
-
-namespace LorentzGroup
-
 /-!
 
-## B. The induced Lorentz transformation
-
--/
-
-/-- The Lorentz transformation induced by the multiplicatively parameterized `SL(2,ℂ)` boost
-along spatial axis `i`. -/
-noncomputable def boostAxis (i : Fin 3) (t : ℝ) (ht : t ≠ 0) : LorentzGroup 3 :=
-  Lorentz.SL2C.toLorentzGroup (Lorentz.SL2C.boostAxis i t ht)
-
-/-- The entries of an axis boost in the Lorentz group. -/
-lemma boostAxis_apply (i : Fin 3) (t : ℝ) (ht : t ≠ 0) (a b : Fin 1 ⊕ Fin 3) :
-    (boostAxis i t ht).1 a b =
-      if a = Sum.inl 0 ∧ b = Sum.inl 0 then (t ^ 2 + (t⁻¹) ^ 2) / 2
-      else if a = Sum.inl 0 ∧ b = Sum.inr i then -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-      else if a = Sum.inr i ∧ b = Sum.inl 0 then -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-      else if a = Sum.inr i ∧ b = Sum.inr i then (t ^ 2 + (t⁻¹) ^ 2) / 2
-      else if a = b then 1 else 0 := by
-  have htc : (t : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr ht
-  refine Complex.ofReal_injective ?_
-  rw [boostAxis, Lorentz.SL2C.toLorentzGroup_eq_trace,
-    PauliMatrix.trace_pauliSelfAdjoint'_mul_apply, Lorentz.SL2C.boostAxis_conjTranspose]
-  fin_cases i
-  all_goals
-    rcases a with a | a <;> rcases b with b | b <;> fin_cases a <;> fin_cases b <;>
-      simp [Lorentz.SL2C.boostAxis, PauliMatrix.pauliSelfAdjoint', PauliMatrix.pauliMatrix,
-        Matrix.mul_apply, Fin.sum_univ_two] <;>
-      field_simp <;>
-      ring_nf
-  all_goals simp only [Complex.I_sq, Complex.I_pow_four]
-  all_goals ring
-
-end LorentzGroup
-
-namespace Lorentz.SL2C
-
-/-!
-
-## C. Axis conjugation
+## B. Axis conjugation
 
 -/
 
@@ -215,5 +174,42 @@ lemma exists_conj_boostAxis (i : Fin 3) :
   exact ⟨rotationZToAxis i, fun t ht => boostAxis_eq_conj i t ht⟩
 
 end Lorentz.SL2C
+
+namespace LorentzGroup
+
+/-!
+
+## C. The induced Lorentz transformation
+
+-/
+
+/-- The Lorentz transformation induced by the multiplicatively parameterized `SL(2,ℂ)` boost
+along spatial axis `i`. -/
+noncomputable def boostAxis (i : Fin 3) (t : ℝ) (ht : t ≠ 0) : LorentzGroup 3 :=
+  Lorentz.SL2C.toLorentzGroup (Lorentz.SL2C.boostAxis i t ht)
+
+/-- The entries of an axis boost in the Lorentz group. -/
+lemma boostAxis_apply (i : Fin 3) (t : ℝ) (ht : t ≠ 0) (a b : Fin 1 ⊕ Fin 3) :
+    (boostAxis i t ht).1 a b =
+      if a = Sum.inl 0 ∧ b = Sum.inl 0 then (t ^ 2 + (t⁻¹) ^ 2) / 2
+      else if a = Sum.inl 0 ∧ b = Sum.inr i then -((t ^ 2 - (t⁻¹) ^ 2) / 2)
+      else if a = Sum.inr i ∧ b = Sum.inl 0 then -((t ^ 2 - (t⁻¹) ^ 2) / 2)
+      else if a = Sum.inr i ∧ b = Sum.inr i then (t ^ 2 + (t⁻¹) ^ 2) / 2
+      else if a = b then 1 else 0 := by
+  have htc : (t : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr ht
+  refine Complex.ofReal_injective ?_
+  rw [boostAxis, Lorentz.SL2C.toLorentzGroup_eq_trace,
+    PauliMatrix.trace_pauliSelfAdjoint'_mul_apply, Lorentz.SL2C.boostAxis_conjTranspose]
+  fin_cases i
+  all_goals
+    rcases a with a | a <;> rcases b with b | b <;> fin_cases a <;> fin_cases b <;>
+      simp [Lorentz.SL2C.boostAxis, PauliMatrix.pauliSelfAdjoint', PauliMatrix.pauliMatrix,
+        Matrix.mul_apply, Fin.sum_univ_two] <;>
+      field_simp <;>
+      ring_nf
+  all_goals simp only [Complex.I_sq, Complex.I_pow_four]
+  all_goals ring
+
+end LorentzGroup
 
 end
