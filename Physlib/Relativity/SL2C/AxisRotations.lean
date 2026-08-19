@@ -31,21 +31,17 @@ namespace Lorentz.SL2C
 
 open Matrix MatrixGroups
 
-private lemma sqrtTwo_sq : (((Real.sqrt 2 : ℝ) : ℂ)) ^ 2 = 2 := by
-  rw [← Complex.ofReal_pow, Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
-  norm_num
-
 /-- The `SL(2,ℂ)` rotation carrying the `z`-axis to axis `i`. -/
 noncomputable def rotationZToAxis : Fin 3 → SL(2,ℂ)
   | 0 =>
       ⟨(((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, -1; 1, 1], by
-        rw [Matrix.det_smul, Matrix.det_fin_two_of, Fintype.card_fin, inv_pow, sqrtTwo_sq]
-        norm_num⟩
+        rw [Matrix.det_smul, Matrix.det_fin_two_of, Fintype.card_fin, inv_pow]
+        norm_num [← Complex.ofReal_pow, Real.sq_sqrt]⟩
   | 1 =>
       ⟨(((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, Complex.I; Complex.I, 1], by
-        rw [Matrix.det_smul, Matrix.det_fin_two_of, Fintype.card_fin, inv_pow, sqrtTwo_sq,
+        rw [Matrix.det_smul, Matrix.det_fin_two_of, Fintype.card_fin, inv_pow,
           Complex.I_mul_I]
-        norm_num⟩
+        norm_num [← Complex.ofReal_pow, Real.sq_sqrt]⟩
   | 2 => 1
 
 /-- The matrix entries of the rotation carrying the `z`-axis to the `x`-axis. -/
@@ -94,7 +90,7 @@ lemma rotationZToAxis_zero_mul_diagonal_mul_inv (a b : ℂ) :
       rotationZToAxis_zero_inv_apply] <;>
     simp <;>
     field_simp <;>
-    rw [sqrtTwo_sq] <;>
+    norm_num [← Complex.ofReal_pow, Real.sq_sqrt] <;>
     ring
 
 /-- Conjugating `diag(a, b)` by the rotation to the `y`-axis expresses it in the `y`-axis
@@ -113,13 +109,8 @@ lemma rotationZToAxis_one_mul_diagonal_mul_inv (a b : ℂ) :
       cons_val_zero, cons_val_fin_one, smul_eq_mul, mul_one, cons_val_one, mul_zero,
       add_zero, zero_add, mul_neg, neg_mul, Fin.mk_one]
     field_simp
-    rw [sqrtTwo_sq]
-  · rw [Complex.I_sq]
-    ring
-  · ring
-  · ring
-  · rw [Complex.I_sq]
-    ring
+    norm_num [← Complex.ofReal_pow, Real.sq_sqrt]
+  all_goals ring
 
 /-- Conjugating `diag(a, b)` by the identity rotation leaves it unchanged. -/
 lemma rotationZToAxis_two_mul_diagonal_mul_inv (a b : ℂ) :
