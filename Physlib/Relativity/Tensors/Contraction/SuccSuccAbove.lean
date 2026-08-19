@@ -431,26 +431,15 @@ lemma funPredPredAbove_id { n1 : ℕ} (i j : Fin (n1 + 1 + 1)) (hij : i ≠ j) :
   simp [funPredPredAbove]
 
 /-- Pointwise form of commuting deletion of one slot with deletion of a pair. -/
-lemma succSuccAbove_succAbove_comm_apply
-    {n : ℕ}
-    (i j : Fin (n + 1 + 1 + 1))
-    (k : Fin (n + 1))
-    (m : Fin n) :
+lemma succSuccAbove_succAbove_comm_apply {n : ℕ} (i j : Fin (n + 1 + 1 + 1))
+    (k : Fin (n + 1)) (m : Fin n) :
     (i.succSuccAbove j k).succAbove
         (((Fin.predAbove 0 (i.succSuccAbove j k)).predAbove i).succSuccAbove
           ((Fin.predAbove 0 (i.succSuccAbove j k)).predAbove j) m) =
       i.succSuccAbove j (k.succAbove m) := by
   apply Fin.val_injective
-  simp only [
-    Fin.succSuccAbove,
-    Fin.succAbove,
-    Fin.predAbove,
-    Fin.lt_def,
-    Fin.val_castSucc,
-    Fin.val_succ,
-    Fin.castPred,
-    apply_ite Fin.val
-  ]
+  simp only [Fin.succSuccAbove, Fin.succAbove, Fin.predAbove, Fin.lt_def, Fin.val_castSucc,
+    Fin.val_succ, Fin.castPred, apply_ite Fin.val]
   grind (splits := 60)
 
 end Fin
