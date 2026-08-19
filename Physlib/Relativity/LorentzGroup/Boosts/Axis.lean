@@ -94,18 +94,23 @@ noncomputable def boostAxis : Fin 3 → (t : ℝ) → t ≠ 0 → SL(2,ℂ)
         rw [Matrix.det_fin_two_of]
         simp [mul_inv_cancel₀ htc]⟩
 
-/-- The matrix entries of an `SL(2,ℂ)` axis-boost lift. -/
-@[simp] lemma boostAxis_apply (i : Fin 3) (t : ℝ) (ht : t ≠ 0) (j k : Fin 2) :
-    (boostAxis i t ht).1 j k =
-      match i with
-      | 0 => (!![((t : ℂ) + (t : ℂ)⁻¹) / 2, ((t : ℂ) - (t : ℂ)⁻¹) / 2;
-          ((t : ℂ) - (t : ℂ)⁻¹) / 2, ((t : ℂ) + (t : ℂ)⁻¹) / 2]) j k
-      | 1 => (!![((t : ℂ) + (t : ℂ)⁻¹) / 2,
-          -Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2;
-          Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2,
-          ((t : ℂ) + (t : ℂ)⁻¹) / 2]) j k
-      | 2 => (!![(t : ℂ), 0; 0, (t : ℂ)⁻¹]) j k := by
-  fin_cases i <;> rfl
+/-- The matrix entries of the `SL(2,ℂ)` boost lift along the `x`-axis. -/
+@[simp] lemma boostAxis_zero_apply (t : ℝ) (ht : t ≠ 0) (j k : Fin 2) :
+    (boostAxis 0 t ht).1 j k =
+      (!![((t : ℂ) + (t : ℂ)⁻¹) / 2, ((t : ℂ) - (t : ℂ)⁻¹) / 2;
+        ((t : ℂ) - (t : ℂ)⁻¹) / 2, ((t : ℂ) + (t : ℂ)⁻¹) / 2]) j k := rfl
+
+/-- The matrix entries of the `SL(2,ℂ)` boost lift along the `y`-axis. -/
+@[simp] lemma boostAxis_one_apply (t : ℝ) (ht : t ≠ 0) (j k : Fin 2) :
+    (boostAxis 1 t ht).1 j k =
+      (!![((t : ℂ) + (t : ℂ)⁻¹) / 2,
+        -Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2;
+        Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2,
+        ((t : ℂ) + (t : ℂ)⁻¹) / 2]) j k := rfl
+
+/-- The matrix entries of the diagonal `SL(2,ℂ)` boost lift along the `z`-axis. -/
+@[simp] lemma boostAxis_two_apply (t : ℝ) (ht : t ≠ 0) (j k : Fin 2) :
+    (boostAxis 2 t ht).1 j k = (!![(t : ℂ), 0; 0, (t : ℂ)⁻¹]) j k := rfl
 
 /-- Inverting an axis boost replaces its multiplicative parameter `t` by `t⁻¹`. -/
 lemma boostAxis_inv (i : Fin 3) (t : ℝ) (ht : t ≠ 0) :
