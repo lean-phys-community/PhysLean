@@ -75,6 +75,11 @@ srcDir = "scripts/PhyslibAlpha"
 supportInterpreter = true
 
 [[lean_exe]]
+name = "testImportScripts"
+srcDir = "Meta/test"
+supportInterpreter = true
+
+[[lean_exe]]
 name = "free_simps"
 srcDir = "scripts/MetaPrograms"
 
