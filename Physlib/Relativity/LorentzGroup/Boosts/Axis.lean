@@ -5,9 +5,7 @@ Authors: Jinzheng Li, Nathaneal Sajan, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.SL2C.Basic
-public import Physlib.Relativity.PauliMatrices.Basic
-public import Physlib.Relativity.MinkowskiMatrix
+public import Physlib.Relativity.SL2C.AxisRotations
 /-!
 # Coordinate-axis boosts in `SL(2,ℂ)` and the Lorentz group
 
@@ -16,7 +14,7 @@ public import Physlib.Relativity.MinkowskiMatrix
 We define the axis-indexed lift `Lorentz.SL2C.boostAxis` in `SL(2,ℂ)` and its image
 `LorentzGroup.boostAxis` in the Lorentz group.
 
-The parameter `t ≠ 0` is multiplicative: replacing `t` by `t⁻¹` reverses the boost. For
+The parameter `t ≠ 0` is multiplicative; replacing `t` by `t⁻¹` reverses the boost. For
 `t > 0`, its rapidity is `2 * log t`; negative values retain the action of the central
 element `-1 : SL(2,ℂ)`.
 
@@ -96,6 +94,19 @@ noncomputable def boostAxis : Fin 3 → (t : ℝ) → t ≠ 0 → SL(2,ℂ)
         rw [Matrix.det_fin_two_of]
         simp [mul_inv_cancel₀ htc]⟩
 
+/-- The matrix entries of an `SL(2,ℂ)` axis-boost lift. -/
+@[simp] lemma boostAxis_apply (i : Fin 3) (t : ℝ) (ht : t ≠ 0) (j k : Fin 2) :
+    (boostAxis i t ht).1 j k =
+      match i with
+      | 0 => (!![((t : ℂ) + (t : ℂ)⁻¹) / 2, ((t : ℂ) - (t : ℂ)⁻¹) / 2;
+          ((t : ℂ) - (t : ℂ)⁻¹) / 2, ((t : ℂ) + (t : ℂ)⁻¹) / 2]) j k
+      | 1 => (!![((t : ℂ) + (t : ℂ)⁻¹) / 2,
+          -Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2;
+          Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2,
+          ((t : ℂ) + (t : ℂ)⁻¹) / 2]) j k
+      | 2 => (!![(t : ℂ), 0; 0, (t : ℂ)⁻¹]) j k := by
+  fin_cases i <;> rfl
+
 /-- Inverting an axis boost replaces its multiplicative parameter `t` by `t⁻¹`. -/
 lemma boostAxis_inv (i : Fin 3) (t : ℝ) (ht : t ≠ 0) :
     (boostAxis i t ht)⁻¹ = boostAxis i t⁻¹ (inv_ne_zero ht) := by
@@ -103,13 +114,13 @@ lemma boostAxis_inv (i : Fin 3) (t : ℝ) (ht : t ≠ 0) :
   · ext j k
     rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
     fin_cases j <;> fin_cases k <;>
-      · simp [boostAxis, Complex.ofReal_inv, inv_inv]
-        try ring
+      simp [boostAxis, Complex.ofReal_inv, inv_inv] <;>
+      ring
   · ext j k
     rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
     fin_cases j <;> fin_cases k <;>
-      · simp [boostAxis, Complex.ofReal_inv, inv_inv]
-        try ring
+      simp [boostAxis, Complex.ofReal_inv, inv_inv] <;>
+      ring
   · ext j k
     rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
     fin_cases j <;> fin_cases k <;>
@@ -138,31 +149,11 @@ noncomputable def boostAxis (i : Fin 3) (t : ℝ) (ht : t ≠ 0) : LorentzGroup 
 /-- The entries of an axis boost in the Lorentz group. -/
 lemma boostAxis_apply (i : Fin 3) (t : ℝ) (ht : t ≠ 0) (a b : Fin 1 ⊕ Fin 3) :
     (boostAxis i t ht).1 a b =
-      match i with
-      | 0 => match a, b with
-        | Sum.inl _, Sum.inl _ => (t ^ 2 + (t⁻¹) ^ 2) / 2
-        | Sum.inl _, Sum.inr 0 => -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-        | Sum.inr 0, Sum.inl _ => -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-        | Sum.inr 0, Sum.inr 0 => (t ^ 2 + (t⁻¹) ^ 2) / 2
-        | Sum.inr 1, Sum.inr 1 => 1
-        | Sum.inr 2, Sum.inr 2 => 1
-        | _, _ => 0
-      | 1 => match a, b with
-        | Sum.inl _, Sum.inl _ => (t ^ 2 + (t⁻¹) ^ 2) / 2
-        | Sum.inl _, Sum.inr 1 => -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-        | Sum.inr 1, Sum.inl _ => -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-        | Sum.inr 0, Sum.inr 0 => 1
-        | Sum.inr 1, Sum.inr 1 => (t ^ 2 + (t⁻¹) ^ 2) / 2
-        | Sum.inr 2, Sum.inr 2 => 1
-        | _, _ => 0
-      | 2 => match a, b with
-        | Sum.inl _, Sum.inl _ => (t ^ 2 + (t⁻¹) ^ 2) / 2
-        | Sum.inl _, Sum.inr 2 => -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-        | Sum.inr 2, Sum.inl _ => -((t ^ 2 - (t⁻¹) ^ 2) / 2)
-        | Sum.inr 0, Sum.inr 0 => 1
-        | Sum.inr 1, Sum.inr 1 => 1
-        | Sum.inr 2, Sum.inr 2 => (t ^ 2 + (t⁻¹) ^ 2) / 2
-        | _, _ => 0 := by
+      if a = Sum.inl 0 ∧ b = Sum.inl 0 then (t ^ 2 + (t⁻¹) ^ 2) / 2
+      else if a = Sum.inl 0 ∧ b = Sum.inr i then -((t ^ 2 - (t⁻¹) ^ 2) / 2)
+      else if a = Sum.inr i ∧ b = Sum.inl 0 then -((t ^ 2 - (t⁻¹) ^ 2) / 2)
+      else if a = Sum.inr i ∧ b = Sum.inr i then (t ^ 2 + (t⁻¹) ^ 2) / 2
+      else if a = b then 1 else 0 := by
   have htc : (t : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr ht
   refine Complex.ofReal_injective ?_
   rw [boostAxis, Lorentz.SL2C.toLorentzGroup_eq_trace,
@@ -187,72 +178,36 @@ namespace Lorentz.SL2C
 
 -/
 
-private lemma sqrtTwo_sq : (((Real.sqrt 2 : ℝ) : ℂ)) ^ 2 = 2 := by
-  rw [← Complex.ofReal_pow, Real.sq_sqrt (by norm_num : (0:ℝ) ≤ 2)]
-  norm_num
-
-private lemma sqrtTwo_ne_zero : (((Real.sqrt 2 : ℝ) : ℂ)) ≠ 0 := by
-  simp []
-
-private lemma sqrtTwo_inv_mul :
-    ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹) * ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹) = 2⁻¹ := by
-  rw [← mul_inv, ← sq, sqrtTwo_sq]
-
-/-- The `SL(2,ℂ)` rotation carrying the `z`-axis to the `x`-axis. -/
-noncomputable def rotZX : SL(2,ℂ) :=
-  ⟨(((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, -1; 1, 1], by
-    rw [Matrix.det_smul, Matrix.det_fin_two_of, Fintype.card_fin, inv_pow, sqrtTwo_sq]
-    norm_num⟩
-
-/-- The `SL(2,ℂ)` rotation carrying the `z`-axis to the `y`-axis. -/
-noncomputable def rotZY : SL(2,ℂ) :=
-  ⟨(((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, Complex.I; Complex.I, 1], by
-    rw [Matrix.det_smul, Matrix.det_fin_two_of, Fintype.card_fin, inv_pow, sqrtTwo_sq,
-      Complex.I_mul_I]
-    norm_num⟩
-
-set_option backward.isDefEq.respectTransparency false in
-/-- The `x`-axis boost is obtained by conjugating the `z`-axis boost by `rotZX`. -/
-lemma boostAxis_zero_eq_conj (t : ℝ) (ht : t ≠ 0) :
-    boostAxis 0 t ht = rotZX * boostAxis 2 t ht * rotZX⁻¹ := by
-  have h0 := sqrtTwo_ne_zero
-  have hc := sqrtTwo_inv_mul
-  have htc : ((t : ℝ) : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr ht
-  refine Subtype.ext ?_
-  rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    · simp [Matrix.SpecialLinearGroup.coe_mul, rotZX, boostAxis,
-        Matrix.mul_apply, Fin.sum_univ_two]
-      field_simp
-      simp only [sqrtTwo_sq]
-      try ring
-
-set_option backward.isDefEq.respectTransparency false in
-/-- The `y`-axis boost is obtained by conjugating the `z`-axis boost by `rotZY`. -/
-lemma boostAxis_one_eq_conj (t : ℝ) (ht : t ≠ 0) :
-    boostAxis 1 t ht = rotZY * boostAxis 2 t ht * rotZY⁻¹ := by
-  have h0 := sqrtTwo_ne_zero
-  have hc := sqrtTwo_inv_mul
-  have htc : ((t : ℝ) : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr ht
-  refine Subtype.ext ?_
-  rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    · simp [Matrix.SpecialLinearGroup.coe_mul, rotZY, boostAxis,
-        Matrix.mul_apply, Fin.sum_univ_two]
-      field_simp
-      simp only [sqrtTwo_sq, Complex.I_sq]
-      try ring
+/-- Every axis boost is obtained by conjugating the `z`-axis boost by `rotationZToAxis`. -/
+lemma boostAxis_eq_conj (i : Fin 3) (t : ℝ) (ht : t ≠ 0) :
+    boostAxis i t ht =
+      rotationZToAxis i * boostAxis 2 t ht * (rotationZToAxis i)⁻¹ := by
+  fin_cases i
+  · refine Subtype.ext ?_
+    change !![((t : ℂ) + (t : ℂ)⁻¹) / 2, ((t : ℂ) - (t : ℂ)⁻¹) / 2;
+        ((t : ℂ) - (t : ℂ)⁻¹) / 2, ((t : ℂ) + (t : ℂ)⁻¹) / 2] =
+      (rotationZToAxis 0).1 * !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] *
+        ((rotationZToAxis 0)⁻¹).1
+    rw [rotationZToAxis_mul_diagonal_mul_inv]
+  · refine Subtype.ext ?_
+    change !![((t : ℂ) + (t : ℂ)⁻¹) / 2,
+        -Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2;
+        Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2,
+        ((t : ℂ) + (t : ℂ)⁻¹) / 2] =
+      (rotationZToAxis 1).1 * !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] *
+        ((rotationZToAxis 1)⁻¹).1
+    rw [rotationZToAxis_mul_diagonal_mul_inv]
+  · refine Subtype.ext ?_
+    change !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] =
+      (rotationZToAxis 2).1 * !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] *
+        ((rotationZToAxis 2)⁻¹).1
+    rw [rotationZToAxis_mul_diagonal_mul_inv]
 
 /-- Every coordinate-axis boost is conjugate to the `z`-axis boost. -/
 lemma exists_conj_boostAxis (i : Fin 3) :
     ∃ R : SL(2,ℂ), ∀ (t : ℝ) (ht : t ≠ 0),
       boostAxis i t ht = R * boostAxis 2 t ht * R⁻¹ := by
-  fin_cases i
-  · exact ⟨rotZX, fun t ht => boostAxis_zero_eq_conj t ht⟩
-  · exact ⟨rotZY, fun t ht => boostAxis_one_eq_conj t ht⟩
-  · exact ⟨1, fun t ht => by simp⟩
+  exact ⟨rotationZToAxis i, fun t ht => boostAxis_eq_conj i t ht⟩
 
 end Lorentz.SL2C
 

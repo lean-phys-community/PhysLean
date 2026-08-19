@@ -390,6 +390,7 @@ public import Physlib.Relativity.PauliMatrices.CliffordAlgebra
 public import Physlib.Relativity.PauliMatrices.Relations
 public import Physlib.Relativity.PauliMatrices.SelfAdjoint
 public import Physlib.Relativity.PauliMatrices.ToTensor
+public import Physlib.Relativity.SL2C.AxisRotations
 public import Physlib.Relativity.SL2C.Basic
 public import Physlib.Relativity.SL2C.SelfAdjoint
 public import Physlib.Relativity.Special.ProperTime
