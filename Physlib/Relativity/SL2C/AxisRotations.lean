@@ -20,8 +20,9 @@ coordinate-axis boosts and later constructions based on diagonal representatives
 The main declarations are:
 
 - `rotationZToAxis`, the indexed family of rotations;
-- `rotationZToAxis_inv_apply`, their inverse matrix entries;
-- `rotationZToAxis_mul_diagonal_mul_inv`, their action on a diagonal matrix.
+- `rotationZToAxis_zero_apply` and its companions, their matrix entries;
+- `rotationZToAxis_zero_mul_diagonal_mul_inv` and its companions, their action on a
+  diagonal matrix.
 -/
 
 @[expose] public section
@@ -47,69 +48,88 @@ noncomputable def rotationZToAxis : Fin 3 → SL(2,ℂ)
         norm_num⟩
   | 2 => 1
 
-/-- The matrix entries of the rotation carrying the `z`-axis to axis `i`. -/
-@[simp] lemma rotationZToAxis_apply (i : Fin 3) (j k : Fin 2) :
-    (rotationZToAxis i).1 j k =
-      match i with
-      | 0 => ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, -1; 1, 1]) j k
-      | 1 => ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ •
-          !![1, Complex.I; Complex.I, 1]) j k
-      | 2 => (1 : Matrix (Fin 2) (Fin 2) ℂ) j k := by
-  fin_cases i <;> rfl
+/-- The matrix entries of the rotation carrying the `z`-axis to the `x`-axis. -/
+@[simp] lemma rotationZToAxis_zero_apply (j k : Fin 2) :
+    (rotationZToAxis 0).1 j k =
+      ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, -1; 1, 1]) j k := rfl
 
-/-- The matrix entries of the inverse rotation from axis `i` back to the `z`-axis. -/
-@[simp] lemma rotationZToAxis_inv_apply (i : Fin 3) (j k : Fin 2) :
-    ((rotationZToAxis i)⁻¹).1 j k =
-      match i with
-      | 0 => ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, 1; -1, 1]) j k
-      | 1 => ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ •
-          !![1, -Complex.I; -Complex.I, 1]) j k
-      | 2 => (1 : Matrix (Fin 2) (Fin 2) ℂ) j k := by
-  fin_cases i
-  all_goals
-    rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
-    fin_cases j <;> fin_cases k <;> simp [rotationZToAxis]
+/-- The matrix entries of the rotation carrying the `z`-axis to the `y`-axis. -/
+@[simp] lemma rotationZToAxis_one_apply (j k : Fin 2) :
+    (rotationZToAxis 1).1 j k =
+      ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, Complex.I; Complex.I, 1]) j k := rfl
 
-/-- Conjugating `diag(a, b)` by `rotationZToAxis i` transports its diagonal `z`-axis expression
-to the basis associated with axis `i`. -/
-lemma rotationZToAxis_mul_diagonal_mul_inv (i : Fin 3) (a b : ℂ) :
-    (rotationZToAxis i).1 * !![a, 0; 0, b] * ((rotationZToAxis i)⁻¹).1 =
-      match i with
-      | 0 => !![(a + b) / 2, (a - b) / 2; (a - b) / 2, (a + b) / 2]
-      | 1 => !![(a + b) / 2, -Complex.I * (a - b) / 2;
-          Complex.I * (a - b) / 2, (a + b) / 2]
-      | 2 => !![a, 0; 0, b] := by
+/-- The rotation carrying the `z`-axis to itself is the identity matrix. -/
+@[simp] lemma rotationZToAxis_two_apply (j k : Fin 2) :
+    (rotationZToAxis 2).1 j k = (1 : Matrix (Fin 2) (Fin 2) ℂ) j k := rfl
+
+/-- The matrix entries of the inverse rotation from the `x`-axis to the `z`-axis. -/
+@[simp] lemma rotationZToAxis_zero_inv_apply (j k : Fin 2) :
+    ((rotationZToAxis 0)⁻¹).1 j k =
+      ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, 1; -1, 1]) j k := by
+  rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
+  fin_cases j <;> fin_cases k <;> simp [rotationZToAxis]
+
+/-- The matrix entries of the inverse rotation from the `y`-axis to the `z`-axis. -/
+@[simp] lemma rotationZToAxis_one_inv_apply (j k : Fin 2) :
+    ((rotationZToAxis 1)⁻¹).1 j k =
+      ((((Real.sqrt 2 : ℝ) : ℂ))⁻¹ • !![1, -Complex.I; -Complex.I, 1]) j k := by
+  rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
+  fin_cases j <;> fin_cases k <;> simp [rotationZToAxis]
+
+/-- The inverse rotation from the `z`-axis to itself is the identity matrix. -/
+@[simp] lemma rotationZToAxis_two_inv_apply (j k : Fin 2) :
+    ((rotationZToAxis 2)⁻¹).1 j k = (1 : Matrix (Fin 2) (Fin 2) ℂ) j k := by
+  rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
+  fin_cases j <;> fin_cases k <;> simp [rotationZToAxis]
+
+/-- Conjugating `diag(a, b)` by the rotation to the `x`-axis expresses it in the `x`-axis
+basis. -/
+lemma rotationZToAxis_zero_mul_diagonal_mul_inv (a b : ℂ) :
+    (rotationZToAxis 0).1 * !![a, 0; 0, b] * ((rotationZToAxis 0)⁻¹).1 =
+      !![(a + b) / 2, (a - b) / 2; (a - b) / 2, (a + b) / 2] := by
   have hsqrt_ne : (((Real.sqrt 2 : ℝ) : ℂ)) ≠ 0 := by simp
-  fin_cases i
-  · ext j k
-    fin_cases j <;> fin_cases k <;>
-      simp only [Matrix.mul_apply, Fin.sum_univ_two, rotationZToAxis_apply,
-        rotationZToAxis_inv_apply] <;>
-      simp <;>
-      field_simp <;>
-      rw [sqrtTwo_sq] <;>
-      ring
-  · ext j k
-    fin_cases j <;> fin_cases k
-    all_goals
-      simp only [Matrix.mul_apply, Fin.sum_univ_two, rotationZToAxis_apply,
-        rotationZToAxis_inv_apply]
-      simp only [Fin.zero_eta, Fin.isValue, Matrix.smul_apply, of_apply, cons_val',
-        cons_val_zero, cons_val_fin_one, smul_eq_mul, mul_one, cons_val_one, mul_zero,
-        add_zero, zero_add, mul_neg, neg_mul, Fin.mk_one]
-      field_simp
-      rw [sqrtTwo_sq]
-    · rw [Complex.I_sq]
-      ring
-    · ring
-    · ring
-    · rw [Complex.I_sq]
-      ring
-  · ext j k
-    fin_cases j <;> fin_cases k <;>
-      simp only [Matrix.mul_apply, Fin.sum_univ_two, rotationZToAxis_apply,
-        rotationZToAxis_inv_apply] <;>
-      simp [Matrix.one_apply]
+  ext j k
+  fin_cases j <;> fin_cases k <;>
+    simp only [Matrix.mul_apply, Fin.sum_univ_two, rotationZToAxis_zero_apply,
+      rotationZToAxis_zero_inv_apply] <;>
+    simp <;>
+    field_simp <;>
+    rw [sqrtTwo_sq] <;>
+    ring
+
+/-- Conjugating `diag(a, b)` by the rotation to the `y`-axis expresses it in the `y`-axis
+basis. -/
+lemma rotationZToAxis_one_mul_diagonal_mul_inv (a b : ℂ) :
+    (rotationZToAxis 1).1 * !![a, 0; 0, b] * ((rotationZToAxis 1)⁻¹).1 =
+      !![(a + b) / 2, -Complex.I * (a - b) / 2;
+        Complex.I * (a - b) / 2, (a + b) / 2] := by
+  have hsqrt_ne : (((Real.sqrt 2 : ℝ) : ℂ)) ≠ 0 := by simp
+  ext j k
+  fin_cases j <;> fin_cases k
+  all_goals
+    simp only [Matrix.mul_apply, Fin.sum_univ_two, rotationZToAxis_one_apply,
+      rotationZToAxis_one_inv_apply]
+    simp only [Fin.zero_eta, Fin.isValue, Matrix.smul_apply, of_apply, cons_val',
+      cons_val_zero, cons_val_fin_one, smul_eq_mul, mul_one, cons_val_one, mul_zero,
+      add_zero, zero_add, mul_neg, neg_mul, Fin.mk_one]
+    field_simp
+    rw [sqrtTwo_sq]
+  · rw [Complex.I_sq]
+    ring
+  · ring
+  · ring
+  · rw [Complex.I_sq]
+    ring
+
+/-- Conjugating `diag(a, b)` by the identity rotation leaves it unchanged. -/
+lemma rotationZToAxis_two_mul_diagonal_mul_inv (a b : ℂ) :
+    (rotationZToAxis 2).1 * !![a, 0; 0, b] * ((rotationZToAxis 2)⁻¹).1 =
+      !![a, 0; 0, b] := by
+  ext j k
+  fin_cases j <;> fin_cases k <;>
+    simp only [Matrix.mul_apply, Fin.sum_univ_two, rotationZToAxis_two_apply,
+      rotationZToAxis_two_inv_apply] <;>
+    simp [Matrix.one_apply]
 
 end Lorentz.SL2C
 

@@ -188,7 +188,7 @@ lemma boostAxis_eq_conj (i : Fin 3) (t : ℝ) (ht : t ≠ 0) :
         ((t : ℂ) - (t : ℂ)⁻¹) / 2, ((t : ℂ) + (t : ℂ)⁻¹) / 2] =
       (rotationZToAxis 0).1 * !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] *
         ((rotationZToAxis 0)⁻¹).1
-    rw [rotationZToAxis_mul_diagonal_mul_inv]
+    rw [rotationZToAxis_zero_mul_diagonal_mul_inv]
   · refine Subtype.ext ?_
     change !![((t : ℂ) + (t : ℂ)⁻¹) / 2,
         -Complex.I * ((t : ℂ) - (t : ℂ)⁻¹) / 2;
@@ -196,12 +196,12 @@ lemma boostAxis_eq_conj (i : Fin 3) (t : ℝ) (ht : t ≠ 0) :
         ((t : ℂ) + (t : ℂ)⁻¹) / 2] =
       (rotationZToAxis 1).1 * !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] *
         ((rotationZToAxis 1)⁻¹).1
-    rw [rotationZToAxis_mul_diagonal_mul_inv]
+    rw [rotationZToAxis_one_mul_diagonal_mul_inv]
   · refine Subtype.ext ?_
     change !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] =
       (rotationZToAxis 2).1 * !![(t : ℂ), 0; 0, (t : ℂ)⁻¹] *
         ((rotationZToAxis 2)⁻¹).1
-    rw [rotationZToAxis_mul_diagonal_mul_inv]
+    rw [rotationZToAxis_two_mul_diagonal_mul_inv]
 
 /-- Every coordinate-axis boost is conjugate to the `z`-axis boost. -/
 lemma exists_conj_boostAxis (i : Fin 3) :
