@@ -26,12 +26,9 @@ def extractModuleNameFromImport (importString : String) : String :=
 
 def checkAllFilesImported (directory : String) (mainFilePath : String) : (IO Bool) := do
   let modules : HashSet String := HashSet.ofArray $ (← getFilePaths directory).map extractModuleNameFromFilePath 
-
   let importedModules := HashSet.ofArray $ ((← IO.FS.lines mainFilePath).filter 
     (·.contains "import")).map extractModuleNameFromImport 
-
   let diff := modules \ importedModules
-
   if diff.size > 0 
     then do 
       IO.println s!"Error: The following .lean files are not imported in {mainFilePath}:"
@@ -41,8 +38,6 @@ def checkAllFilesImported (directory : String) (mainFilePath : String) : (IO Boo
     else do
       IO.println s!"✓ All {modules.size} .lean files in {directory} are imported in {mainFilePath}"
       return True
-
-#eval checkAllFilesImported "./PhyslibAlpha" "./PhyslibAlpha.lean"
 
 unsafe def main (args : List String) : IO Unit := do
   let (dir, file) := match args with
