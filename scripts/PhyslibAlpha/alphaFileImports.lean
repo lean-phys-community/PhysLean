@@ -43,9 +43,7 @@ unsafe def main (args : List String) : IO Unit := do
   let (dir, file) := match args with
     | d :: f :: [] => (d, f)
     | _ => ("./PhyslibAlpha", "./PhyslibAlpha.lean")
-
   let success ← checkAllFilesImported dir file
-
   if !success then
     IO.Process.exit 1
 
