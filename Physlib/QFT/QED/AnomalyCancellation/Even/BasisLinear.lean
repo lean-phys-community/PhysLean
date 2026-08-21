@@ -483,7 +483,6 @@ lemma basis_on_other {k : Fin n} {j : Fin (2 * n.succ)} (h1 : j ≠ evenShiftFst
     (h2 : j ≠ evenShiftSnd k) : basisAsCharges k j = 0 := by
   simp only [basisAsCharges, if_neg h1, if_neg h2]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_evenShiftFst_other {k j : Fin n} (h : k ≠ j) :
     basisAsCharges k (evenShiftFst j) = 0 := by
   rw [ne_eq, Fin.ext_iff] at h
@@ -522,14 +521,12 @@ lemma basis_on_evenShiftSnd_other {k j : Fin n} (h : k ≠ j) :
   rw [basis_evenShiftSnd_eq_neg_evenShiftFst, basis_on_evenShiftFst_other h]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_evenShiftZero (j : Fin n) : basisAsCharges j evenShiftZero = 0 := by
   refine basis_on_other ?_ ?_ <;>
     simp only [ne_eq, Fin.ext_iff, evenShiftZero, evenShiftFst, evenShiftSnd, Fin.val_cast,
       Fin.val_castAdd, Fin.val_natAdd, Fin.val_eq_zero] <;>
     omega
 
-set_option backward.isDefEq.respectTransparency false in
 lemma basis_on_evenShiftLast (j : Fin n) : basisAsCharges j evenShiftLast = 0 := by
   refine basis_on_other ?_ ?_ <;>
     simp only [ne_eq, Fin.ext_iff, evenShiftLast, evenShiftFst, evenShiftSnd, Fin.val_cast,

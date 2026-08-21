@@ -73,7 +73,6 @@ lemma metricRaw_comm_star (M : SL(2,ℂ)) : metricRaw * M.1.map star = ((M.1)⁻
 def leftMetricVal : LeftHandedWeyl ⊗[ℂ] LeftHandedWeyl :=
   leftLeftToMatrix.symm (- metricRaw)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `leftMetricVal` into the left basis. -/
 lemma leftMetricVal_expand_tmul : leftMetricVal =
     - LeftHandedWeyl.basis 0 ⊗ₜ[ℂ] LeftHandedWeyl.basis 1 +
@@ -122,7 +121,6 @@ lemma leftMetric_apply_one : leftMetric (1 : ℂ) = leftMetricVal := by
 def dualLeftMetricVal : (DualLeftHandedWeyl ⊗[ℂ] DualLeftHandedWeyl) :=
   dualLeftdualLeftToMatrix.symm metricRaw
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `dualLeftMetricVal` into the left basis. -/
 lemma dualLeftMetricVal_expand_tmul : dualLeftMetricVal =
     DualLeftHandedWeyl.basis 0 ⊗ₜ[ℂ] DualLeftHandedWeyl.basis 1 -
@@ -167,7 +165,6 @@ lemma dualLeftMetric_apply_one : dualLeftMetric (1 : ℂ) = dualLeftMetricVal :=
 def rightMetricVal : (RightHandedWeyl ⊗[ℂ] RightHandedWeyl) :=
   rightRightToMatrix.symm (- metricRaw)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `rightMetricVal` into the left basis. -/
 lemma rightMetricVal_expand_tmul : rightMetricVal =
     - RightHandedWeyl.basis 0 ⊗ₜ[ℂ] RightHandedWeyl.basis 1 +
@@ -225,7 +222,6 @@ lemma rightMetric_apply_one : rightMetric (1 : ℂ) = rightMetricVal := by
 def dualRightMetricVal : DualRightHandedWeyl ⊗[ℂ] DualRightHandedWeyl :=
   dualRightDualRightToMatrix.symm (metricRaw)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Expansion of `rightMetricVal` into the left basis. -/
 lemma dualRightMetricVal_expand_tmul : dualRightMetricVal =
     DualRightHandedWeyl.basis 0 ⊗ₜ[ℂ] DualRightHandedWeyl.basis 1 -
@@ -282,7 +278,6 @@ lemma dualRightMetric_apply_one : dualRightMetric (1 : ℂ) = dualRightMetricVal
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma leftDualContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
       (TensorProduct.lid ℂ _).lTensor _ <|
@@ -320,7 +315,6 @@ lemma dualLeftContraction_apply_metric :
     zero_ne_one, zero_smul, sub_zero, one_ne_zero, zero_sub, sub_neg_eq_add]
   rw [leftDualLeftUnit_apply_one, leftDualLeftUnitVal_expand_tmul]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma rightDualContraction_apply_metric :
     (TensorProduct.comm ℂ _ _ <|
     (TensorProduct.lid ℂ _).lTensor _ <|

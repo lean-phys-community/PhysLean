@@ -515,7 +515,6 @@ lemma permT_pure {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
     PiTensorProduct.reindex_tprod, PiTensorProduct.map_tprod]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_id_self {n : ℕ} {c : Fin n → C} (p : Pure S c) :
     Pure.permP (id : Fin n → Fin n) (by simp : IsReindexing c c id) p = p := by
@@ -567,7 +566,6 @@ lemma permT_congr {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C}
   subst hmap htensor
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma Pure.permP_permP {n m1 m2 : ℕ} {c : Fin n → C} {c1 : Fin m1 → C} {c2 : Fin m2 → C}
     {σ : Fin m1 → Fin n} {σ2 : Fin m2 → Fin m1} (h : IsReindexing c c1 σ)

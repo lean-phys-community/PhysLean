@@ -36,7 +36,6 @@ def chargesMapOfSpeciesMap {n m : ℕ} (f : (SMνSpecies n).Charges →ₗ[ℚ] 
     rw [map_smul, toSMSpecies_toSpecies_inv, toSMSpecies_toSpecies_inv, map_smul]
     rfl
 
-set_option backward.isDefEq.respectTransparency false in
 lemma chargesMapOfSpeciesMap_toSpecies {n m : ℕ}
     (f : (SMνSpecies n).Charges →ₗ[ℚ] (SMνSpecies m).Charges)
     (S : (SMνCharges n).Charges) (j : Fin 6) :

@@ -845,7 +845,6 @@ For the direct induction approach on n:
 Hmm, this doesn't work cleanly because log(y_i/x_i) can be negative for some i.
 Better approach: prove it directly using the Abel summation identity and nonnegativity of each term.
 -/
-set_option backward.isDefEq.respectTransparency false in
 lemma sum_mul_log_nonneg_of_weak_log_maj {n : ℕ}
     {x y : Fin n → ℝ}
     (hx_pos : ∀ i, 0 < x i) (hy_pos : ∀ i, 0 < y i)

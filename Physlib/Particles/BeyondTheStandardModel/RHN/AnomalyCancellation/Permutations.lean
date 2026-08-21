@@ -61,7 +61,6 @@ def repCharges {n : ℕ} : Representation ℚ (PermGroup n) (SMνCharges n).Char
     intro i
     exact toSMSpecies_toSpecies_inv _ _
 
-set_option backward.isDefEq.respectTransparency false in
 lemma repCharges_toSpecies (f : PermGroup n) (S : (SMνCharges n).Charges) (j : Fin 6) :
     toSpecies j (repCharges f S) = toSpecies j S ∘ f⁻¹ j :=
   toSMSpecies_toSpecies_inv _ _

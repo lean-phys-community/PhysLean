@@ -133,7 +133,6 @@ def singletonEquiv {φ : 𝓕.FieldOp} : CrAnSection [φ] ≃
     simp only [head]
     rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- An equivalence separating the head of a creation and annihilation section
   from the tail. -/
 def consEquiv {φ : 𝓕.FieldOp} {φs : List 𝓕.FieldOp} : CrAnSection (φ :: φs) ≃
@@ -384,7 +383,6 @@ lemma eraseIdxEquiv_apply_snd {n : ℕ} (ψs : CrAnSection φs) (hn : n < φs.le
   simp only [Nat.succ_eq_add_one, le_add_iff_nonneg_right, zero_le, inf_of_le_left]
   exact Eq.symm (List.eraseIdx_eq_take_drop_succ ψs.1 n)
 
-set_option backward.isDefEq.respectTransparency false in
 lemma eraseIdxEquiv_symm_eq_take_cons_drop {n : ℕ} (φs : List 𝓕.FieldOp) (hn : n < φs.length)
     (a : 𝓕.fieldOpToCrAnType φs[n]) (s : CrAnSection (φs.eraseIdx n)) :
     (eraseIdxEquiv n φs hn).symm ⟨a, s⟩ =

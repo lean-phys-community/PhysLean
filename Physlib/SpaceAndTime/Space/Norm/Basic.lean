@@ -600,7 +600,6 @@ lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ} (hd : 2 
     exact tendsto_const_nhds.mul
       ((normPowerSeries_tendsto x hx).log (norm_ne_zero_iff.mpr hx))
 
-set_option backward.isDefEq.respectTransparency false in
 lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ} (hd : 2 ≤ d)
     (η : 𝓢(Space d, ℝ)) (y : EuclideanSpace ℝ (Fin d)) :
     Filter.Tendsto (fun n =>
@@ -1075,7 +1074,6 @@ lemma distDiv_inv_pow_eq_dim {d : ℕ} [NeZero d] :
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The distributional Laplacian of `‖x‖ ^ (2 - d)` is `(2 - d) * d * volume (Metric.ball 0 1)`
 times the Dirac delta at the origin. For `d ≥ 3` this `‖x‖ ^ (2 - d)` is the (singular)
 fundamental solution of the Laplacian, and for `d = 1` it is `‖x‖`. When `d = 2` the exponent

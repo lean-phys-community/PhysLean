@@ -549,7 +549,6 @@ lemma complexify_prod {n m : ℕ}
     erw [basisIdxCongr_eq_cast]
     simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with prodT. -/
 lemma prodT_toComplex {n m : ℕ}
     {c : Fin n → realLorentzTensor.Color}
@@ -630,7 +629,6 @@ lemma toComplex_contrP_basisVector {n : ℕ} {c : Fin (n + 1 + 1) → realLorent
     rw [Pure.dropPair_basisVector, ← Tensor.basis_apply]
     exact congr_arg _ (funext fun m => ComponentIdx.complexify_comp_succSuccAbove b m)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The map `toComplex` commutes with `contrT`. -/
 lemma contrT_toComplex {n : ℕ}
     {c : Fin (n + 1 + 1) → realLorentzTensor.Color} {i j : Fin (n + 1 + 1)}

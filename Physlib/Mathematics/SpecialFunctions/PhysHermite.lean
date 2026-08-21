@@ -431,7 +431,6 @@ lemma physHermite_norm_cons (n : ℕ) (c : ℝ) :
   rw [physHermite_norm] at h
   simpa [mul_pow, neg_mul] using h
 
-set_option backward.isDefEq.respectTransparency false in
 lemma polynomial_mem_physHermite_span_induction (P : Polynomial ℤ) : (n : ℕ) →
     (hn : P.natDegree = n) →
     (P : ℝ → ℝ) ∈ Submodule.span ℝ (Set.range (fun n => (physHermite n : ℝ → ℝ)))

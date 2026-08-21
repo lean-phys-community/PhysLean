@@ -278,7 +278,6 @@ lemma nondegenerate : (∀ (x : ContrMod d), ⟪x, y⟫ₘ = 0) ↔ y = 0 := by
   · exact (self_parity_eq_zero_iff _).mp ((symm _ _).trans $ h _)
   · simp [h]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma matrix_apply_eq_iff_sub : ⟪x, Λ *ᵥ y⟫ₘ = ⟪x, Λ' *ᵥ y⟫ₘ ↔ ⟪x, (Λ - Λ') *ᵥ y⟫ₘ = 0 := by
   rw [← sub_eq_zero, ← LinearMap.map_sub, ← tmul_sub, ← ContrMod.sub_mulVec Λ Λ' y]
 
@@ -320,7 +319,6 @@ lemma _root_.LorentzGroup.mem_iff_invariant : Λ ∈ LorentzGroup d ↔
     rw [← matrix_eq_id_iff] at h
     exact LorentzGroup.mem_iff_dual_mul_self.mpr h
 
-set_option backward.isDefEq.respectTransparency false in
 lemma _root_.LorentzGroup.mem_iff_norm : Λ ∈ LorentzGroup d ↔
     ∀ (w : ContrMod d), ⟪Λ *ᵥ w, Λ *ᵥ w⟫ₘ = ⟪w, w⟫ₘ := by
   rw [LorentzGroup.mem_iff_invariant]

@@ -43,7 +43,6 @@ lemma preContrCoUnitVal_expand_tmul {d : ℕ} : preContrCoUnitVal d =
     simp [hb]
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The contra-co unit for complex lorentz vectors as a morphism
   `𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexCo`, manifesting the invariance under
   the `SL(2, ℂ)` action. -/
@@ -95,7 +94,6 @@ lemma preCoContrUnitVal_expand_tmul {d : ℕ} : preCoContrUnitVal d =
     simp [hb]
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The co-contra unit for complex lorentz vectors as a morphism
   `𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ CoMod.rep ⊗ ContrMod.rep`, manifesting the invariance under
   the `LorentzGroup d` action. -/

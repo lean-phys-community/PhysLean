@@ -247,12 +247,10 @@ lemma insertAndContractNat_some_uncontracted (c : WickContraction n) (i : Fin n.
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma insertAndContractNat_none_getDual?_isNone (c : WickContraction n) (i : Fin n.succ) :
     ((insertAndContractNat c i none).getDual? i).isNone := by
   simp [Option.isNone_iff_eq_none, getDual?_eq_none_iff_mem_uncontracted]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma insertAndContractNat_none_getDual?_eq_none (c : WickContraction n) (i : Fin n.succ) :
     (insertAndContractNat c i none).getDual? i = none := by
@@ -346,7 +344,6 @@ lemma insertAndContractNat_erase (c : WickContraction n) (i : Fin n.succ)
       simp [Fin.succAbove_ne] at hi
     simp [Finset.mapEmbedding_apply, Finset.map_inj, hn]
 
-set_option backward.isDefEq.respectTransparency false in
 lemma insertAndContractNat_getDualErase (c : WickContraction n) (i : Fin n.succ)
     (j : Option c.uncontracted) : (insertAndContractNat c i j).getDualErase i =
     uncontractedCongr (c := c) (c' := (c.insertAndContractNat i j).erase i) (by simp) j := by
@@ -502,7 +499,6 @@ lemma insertLiftSome_bijective {c : WickContraction n} (i : Fin n.succ) (j : c.u
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 lemma insertAndContractNat_injective (i : Fin n.succ) :
     Function.Injective (fun c => insertAndContractNat c i none) := fun _ _ hc =>
   Subtype.ext (by simpa [insertAndContractNat] using Subtype.ext_iff.mp hc)

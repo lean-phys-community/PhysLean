@@ -229,7 +229,6 @@ end Matrix
 
 namespace NormedSpace
 
-set_option backward.isDefEq.respectTransparency false in
 lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
     (A : Matrix n n ℝ) :
     (exp A).map (algebraMap ℝ ℂ) = exp (A.map (algebraMap ℝ ℂ)) := by

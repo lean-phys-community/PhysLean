@@ -349,7 +349,6 @@ noncomputable def contrP {n : ℕ} {c : Fin (n + 1 + 1) → C}
     S.Tensor (c ∘ succSuccAbove i j) :=
   (p.contrPCoeff i j hij) • (p.dropPair i j hij.1).toTensor
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma contrP_update_add {n : ℕ} [inst : DecidableEq (Fin (n + 1 +1))] {c : Fin (n + 1 + 1) → C}
     (i j m : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)
@@ -361,7 +360,6 @@ lemma contrP_update_add {n : ℕ} [inst : DecidableEq (Fin (n + 1 +1))] {c : Fin
   · simp [contrP, add_smul]
   · simp [contrP]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma contrP_update_smul {n : ℕ} [inst : DecidableEq (Fin (n + 1 +1))] {c : Fin (n + 1 + 1) → C}
     (i j m : Fin (n + 1 + 1)) (hij : i ≠ j ∧ S.τ (c i) = c j)

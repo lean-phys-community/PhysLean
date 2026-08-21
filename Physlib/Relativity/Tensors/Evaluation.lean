@@ -72,7 +72,6 @@ lemma evalPCoeff_basisVector (i : Fin (n + 1)) (φ : basisIdx (c i)) (b' : Compo
 noncomputable def evalP (i : Fin (n + 1)) (φ : basisIdx (c i)) (p : Pure S c) :
   Tensor S (c ∘ i.succAbove) := evalPCoeff i φ p • (drop p i).toTensor
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma evalP_update_add [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
     (φ : basisIdx (c i)) (p : Pure S c)
@@ -84,7 +83,6 @@ lemma evalP_update_add [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
   · simp [add_smul]
   · simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma evalP_update_smul [inst : DecidableEq (Fin (n + 1))] (i j : Fin (n + 1))
     (φ : basisIdx (c i)) (p : Pure S c)
@@ -190,7 +188,6 @@ lemma evalT_permT {n m : ℕ} {c : Fin (n + 1) → C} {c' : Fin (m + 1) → C}
 
 -/
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Commutation of two evaluations on a tensor basis vector. -/
 lemma evalT_evalT_basis {n : ℕ} {c : Fin (n + 1 + 1) → C}
     (k1 : Fin (n + 1 + 1)) (k2 : Fin (n + 1)) (φ1 : basisIdx (c k1))
@@ -228,7 +225,6 @@ lemma evalT_evalT_basis {n : ℕ} {c : Fin (n + 1 + 1) → C}
       simp only [h2, h1, hntr, ↓reduceIte]
   · simp only [h2, ↓reduceIte, ite_self]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Evaluating two tensor indices commutes, up to the canonical reindexing
 identifying the two possible orders in which the indices are removed. -/
 lemma evalT_evalT {n : ℕ} {c : Fin (n + 1 + 1) → C}
@@ -410,7 +406,6 @@ lemma eq_sum_evalT_of_single_tensor_basis {c : C} (t : Tensor S ![c]) :
   · simp [add_smul, Finset.sum_add_distrib]
     grind
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Reconstruction of a tensor from the evaluations of its last index: every `t : Tensor S c`
   is the sum over basis indices `i` of the evaluation `evalT (Fin.last n) i t` tensored with
   the basis covector `basis ![c (Fin.last n)] (single.symm i)`, with the appended index

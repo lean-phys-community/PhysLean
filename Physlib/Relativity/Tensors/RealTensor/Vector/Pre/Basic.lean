@@ -64,7 +64,6 @@ lemma continuous_contr {T : Type} [TopologicalSpace T] (f : T → ContrMod d)
     (h : Continuous (fun i => (f i).toFin1dℝ)) : Continuous f := by
   exact continuous_induced_rng.mpr h
 
-set_option backward.isDefEq.respectTransparency false in
 lemma contr_continuous {T : Type} [TopologicalSpace T] (f : ContrMod d → T)
     (h : Continuous (f ∘ (@ContrMod.toFin1dℝEquiv d).symm)) : Continuous f := by
   let x := Equiv.toHomeomorphOfIsInducing (@ContrMod.toFin1dℝEquiv d).toEquiv

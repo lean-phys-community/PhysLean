@@ -143,7 +143,6 @@ lemma orderedInsertPos_sigma {I : Type} {f : I → Type}
     simp_all only
     split <;> simp_all
 
-set_option backward.isDefEq.respectTransparency false in
 lemma orderedInsert_get_lt {I : Type} (le1 : I → I → Prop) [DecidableRel le1]
     (r : List I) (r0 : I) (i : ℕ)
     (hi : i < orderedInsertPos le1 r r0) :
