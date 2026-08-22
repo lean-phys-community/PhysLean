@@ -80,7 +80,7 @@ def positionOperatorUnbounded : UnboundedOperator schwartzIncl schwartzIncl_inje
 
 /-!
 
-## Generalized eigenvectors of the momentum operator
+## Generalized eigenvectors of the position operator
 
 -/
 
