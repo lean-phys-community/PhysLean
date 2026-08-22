@@ -121,9 +121,9 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "The tensor-level epsilon-epsilon identities for the Levi-Civita tensor: contracting it with itself over all four index pairs gives the field element `-24`, and contracting it with itself over the first three gives `-6` times the unit tensor of color `down`. Stated as `leviCivita_contract_self` and `leviCivita_contract_three`, both carrying the repository's marker for a result that is not yet proved."
-    done: false
-    location: N/A
+  - description: "The tensor-level epsilon-epsilon identities for the Levi-Civita tensor: contracting it with itself over all four index pairs gives the field element `-24`, and contracting it with itself over the first three gives `-6` times the unit tensor of color `down`."
+    done: true
+    location: "Physlib/Relativity/Tensors/LeviCivita/Basic.lean (leviCivita_contract_self, leviCivita_contract_three, toDualMapAtIndex_basis_repr, unitTensor_down_repr)"
 
   - description: "The API shall contain a Euclidean Levi-Civita tensor to carry the epsilon-epsilon contraction identities, which at present are stated for the Euclidean Levi-Civita symbol `euclidLeviCivita` alone."
     done: false
