@@ -77,7 +77,7 @@ theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val 
   rw [← eq_sub_iff_add_eq'] at hab
   subst b
   refine And.intro ?_ (And.intro ?_ ?_)
-  · simp only [MState.exp_val, inner_sub_right, HermitianMat.inner_one, MState.tr,
+  · simp only [MState.exp_val, inner_sub_right, HermitianMat.inner_one, DensityOp.tr,
       tsub_le_iff_right, inner_add_right, inner_smul_right] at hx₁ hy₁ ⊢
     linear_combination a * hx₁ + (1 - a) * hy₁
   · apply HermitianMat.convex_cone <;> assumption
@@ -146,7 +146,7 @@ theorem exists_min' (ρ : MState d) (ε : Prob) (S : Set (MState d)):
       refine Continuous.comp (g := fun T ↦ ⨆ (i : S), i.val.exp_val T) ?_ continuous_subtype_val
       convert h with T
       rw [← sSup_image' (s := S) (f := fun i ↦ i.exp_val T)]
-      rw [← sSup_image' (s := (MState.M '' S)) (f := fun i ↦ i.innerₗ T)]
+      rw [← sSup_image' (s := (DensityOp.M '' S)) (f := fun i ↦ i.innerₗ T)]
       simp [Set.image, MState.exp_val, HermitianMat.innerₗ]
     )
   clear hT₁
@@ -250,7 +250,7 @@ theorem pos_of_lt_one {ρ : MState d} (S : Set (MState d))
 
 --Lemma 3 from Hayashi
 theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompact S)
-    (hS₂ : Convex ℝ (MState.M '' S)) : ⨆ σ ∈ S, β_ ε(ρ‖{σ}) = β_ ε(ρ‖S) := by
+    (hS₂ : Convex ℝ (DensityOp.M '' S)) : ⨆ σ ∈ S, β_ ε(ρ‖{σ}) = β_ ε(ρ‖S) := by
 
   --Work out the case where S is empty, so we can now assume it's nonempty
   rcases S.eq_empty_or_nonempty with rfl|hnS
@@ -263,7 +263,7 @@ theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompa
   --This parts needs the minimax theorem. Set up the relevant sets and hypotheses.
   --The function `f` will be the `MState.exp_val` function, but bundled as a bilinear form.
   let f : LinearMap.BilinForm ℝ (HermitianMat d ℂ) := HermitianMat.innerₗ
-  let S' : Set (HermitianMat d ℂ) := MState.M '' S
+  let S' : Set (HermitianMat d ℂ) := DensityOp.M '' S
   let T' : Set (HermitianMat d ℂ) := { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 }
 
   have hS'₁ : IsCompact S' := hS₁.image MState.Continuous_HermitianMat
@@ -435,6 +435,8 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
       simp only [this, bot_le]
     --q2 has eigenvalues β_ ε(ρ‖{σ}) and 1-β_ ε(ρ‖{σ}), so as long as β_ ε(ρ‖{σ}) isn't 0 or 1,
     --this is true.
+    rw [show q2.M = HermitianMat.diagonal ℂ (ProbDistribution.coin q ·) from
+      MState.coe_ofClassical _]
     exact ker_diagonal_prob_eq_bot hq hq₂
 
   conv => enter [2, 1, 1, 1]; rw [if_neg hα.ne']

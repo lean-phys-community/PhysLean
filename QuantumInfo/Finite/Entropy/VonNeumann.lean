@@ -124,6 +124,14 @@ theorem Sᵥₙ_eq_trace_cfc_negMulLog (ρ : MState d) :
   congr! 5
   simp [mul_comm]
 
+/-- Matrix form of `Sᵥₙ_eq_trace_cfc_negMulLog`: the von Neumann entropy of `ρ` is the trace of
+`-ρ log ρ`, where the matrix function is the continuous functional calculus applied to the
+density matrix `ρ.m`. -/
+theorem Sᵥₙ_eq_re_trace_matrix_cfc (ρ : MState d) :
+    Sᵥₙ ρ = (cfc Real.negMulLog ρ.m).trace.re := by
+  rw [Sᵥₙ_eq_trace_cfc_negMulLog, HermitianMat.trace, HermitianMat.mat_cfc,
+    IsMaximalSelfAdjoint.RCLike_selfadjMap, RCLike.re_to_complex, DensityOp.mat_M]
+
 @[simp]
 theorem Sᵥₙ_unit_zero [Unique d] (ρ : MState d) : Sᵥₙ ρ = 0 := by
   refine le_antisymm ?_ (Sᵥₙ_nonneg ρ)
@@ -200,8 +208,11 @@ The left partial trace of `vecToMat` is the transpose of M^H * M.
 private lemma traceLeft_eq_transpose_conjTranspose_mul (ψ : Ket (d₁ × d₂)) :
     (MState.pure ψ).traceLeft.M.val =
     ((vecToMat ψ.vec).conjTranspose * (vecToMat ψ.vec)).transpose := by
-  norm_num +zetaDelta at *;
-  convert traceLeft_eq_transpose_mul_conj ψ using 1
+  rw [traceLeft_eq_transpose_mul_conj]
+  ext i j
+  simp only [Matrix.transpose_apply, Matrix.mul_apply, Matrix.conjTranspose_apply,
+    Matrix.map_apply]
+  exact Finset.sum_congr rfl fun k _ ↦ mul_comm _ _
 
 /--
 Shannon entropy is determined by the multiset of non-zero probabilities.

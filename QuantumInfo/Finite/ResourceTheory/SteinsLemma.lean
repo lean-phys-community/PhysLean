@@ -74,8 +74,9 @@ private theorem Lemma6 {m : ℕ} (hm : 0 < m) (ρ σf : MState (H i)) (σₘ : M
       simp only [MState.relabel_relabel, ← Equiv.cast_symm, ← Equiv.cast_trans]
       rw [prodRelabel_relabel_cast_prod _ _ _ ((pow_mul ..).symm) rfl]
       congr
-      rw [statePow_mul_relabel]
-      simp [← Equiv.cast_trans]
+      · rw [statePow_mul_relabel]
+        simp [← Equiv.cast_trans]
+      · simp only [Equiv.cast_refl, MState.relabel_refl]
     · simp
 
   --This will probably need 1 < α actually
@@ -206,7 +207,7 @@ theorem LemmaS2liminf {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
     let T (n : ℕ) := {(ρ n).M ≥ₚ (Real.exp (n * (Rinf + ε4))) • (σ n).M}
     have hT : ∀ n ≥ n₀, (ρ n).exp_val (1 - (T n)) ≤ ε3 := fun n hn ↦ by -- Eq (S23)
       unfold MState.exp_val T
-      rw [inner_sub_right, HermitianMat.inner_one, MState.tr,
+      rw [inner_sub_right, HermitianMat.inner_one, DensityOp.tr,
         HermitianMat.inner_comm, tsub_le_iff_right, add_comm, ← tsub_le_iff_right]
       apply le_of_lt
       exact h n hn
@@ -272,7 +273,7 @@ theorem LemmaS2limsup {ε3 : Prob} {ε4 : ℝ≥0} (hε4 : 0 < ε4)
       obtain ⟨n, hn, h⟩ := h n₀
       use n, hn
       unfold MState.exp_val T
-      rw [inner_sub_right, HermitianMat.inner_one, MState.tr,
+      rw [inner_sub_right, HermitianMat.inner_one, DensityOp.tr,
         HermitianMat.inner_comm, tsub_le_iff_right, add_comm, ← tsub_le_iff_right]
       apply le_of_lt
       exact h
@@ -845,12 +846,8 @@ private theorem σ'_posdef : (σ' ρ ε m σ n).m.PosDef := by
 private theorem hσ'n_eq_sum_third : (σ' ρ ε m σ n).M =
     (1 / 3 : ℝ) • («σ̃» m σ n) + (1 / 3 : ℝ) • («σ⋆» ρ ε n) + (1 / 3 : ℝ) • ((σ₁ i) ⊗ᵣ^[n]) := by
   unfold σ'
-  change _ • _ + _ = _
-  conv =>
-    enter [1, 1, 2]
-    change _ + _
-  dsimp [Mixable.to_U]
-  norm_num only [one_div, Prob.coe_one_minus, smul_add, smul_smul]
+  simp only [MState.mix_M, smul_add, smul_smul]
+  norm_num
 
 private theorem hσ₁_le_σ' : (1 / 3 : ℝ) • ((σ₁ i) ⊗ᵣ^[n]).M ≤ (σ' ρ ε m σ n).M := by
     rw [hσ'n_eq_sum_third]
@@ -897,28 +894,28 @@ variable (m : ℕ) (σ : (n : ℕ) → IsFree (i := i ^ n)) (n : ℕ)
 --We're now finally ready to define the main sequence with the properties we want, σ''.
 --This is the normalized version of σ''_unnormalized, which gives a state because that sequence is
 -- already PosDef
-private def σ'' : (n : ℕ) → MState (H (i ^ n)) := fun n ↦ {
+private def σ'' : (n : ℕ) → MState (H (i ^ n)) := fun n ↦
   --TODO make this its own definition: Normalizing a matrix to give a tr-1 op.
-  M := (σ''_unnormalized ρ ε m σ n).trace⁻¹ • (σ''_unnormalized ρ ε m σ n)
-  nonneg := by
-    have h1 : 0 < (σ''_unnormalized ρ ε m σ n).trace :=
-      zero_lt_one.trans_le (σ''_tr_bounds ρ ε m σ n).left
-    have h2 : 0 < σ''_unnormalized ρ ε m σ n :=
-      (σ''_unnormalized_PosDef ρ ε m σ n).zero_lt
-    positivity
-  tr := by
-    rw [HermitianMat.trace_smul]
-    apply inv_mul_cancel₀
-    exact (zero_lt_one.trans_le (σ''_tr_bounds ρ ε m σ n).left).ne'
-}
+  DensityOp.ofMat ((σ''_unnormalized ρ ε m σ n).trace⁻¹ • (σ''_unnormalized ρ ε m σ n))
+    (by
+      have h1 : 0 < (σ''_unnormalized ρ ε m σ n).trace :=
+        zero_lt_one.trans_le (σ''_tr_bounds ρ ε m σ n).left
+      have h2 : 0 < σ''_unnormalized ρ ε m σ n :=
+        (σ''_unnormalized_PosDef ρ ε m σ n).zero_lt
+      positivity)
+    (by
+      rw [HermitianMat.trace_smul]
+      apply inv_mul_cancel₀
+      exact (zero_lt_one.trans_le (σ''_tr_bounds ρ ε m σ n).left).ne')
 
 private lemma σ''_posdef n : (σ'' ρ ε m σ n).M.mat.PosDef := by
+  simp only [σ'', DensityOp.M_ofMat]
   apply (σ''_unnormalized_PosDef ρ ε m σ n).smul
   have := (σ''_tr_bounds ρ ε m σ n).left
   positivity
 
 private lemma σ'_le_σ'' (n) : Real.exp (-σ₁_c i n) • (σ' ρ ε m σ n).M ≤ σ'' ρ ε m σ n := by
-  dsimp [σ'']
+  simp only [σ'', DensityOp.M_ofMat]
   set x := (σ''_unnormalized ρ ε m σ n).trace
   dsimp [σ''_unnormalized]
   rw [← HermitianMat.cfc_const_mul_id, ← HermitianMat.cfc_const_mul_id,
@@ -938,7 +935,7 @@ private lemma σ'_le_σ'' (n) : Real.exp (-σ₁_c i n) • (σ' ρ ε m σ n).M
   · positivity
 
 private lemma σ''_le_σ' (n) : σ'' ρ ε m σ n ≤ Real.exp (σ₁_c i n) • (σ' ρ ε m σ n).M := by
-    dsimp [σ'']
+    simp only [σ'', DensityOp.M_ofMat]
     set x := (σ''_unnormalized ρ ε m σ n).trace
     dsimp [σ''_unnormalized]
     rw [← HermitianMat.cfc_const_mul_id, ← HermitianMat.cfc_const_mul_id,
@@ -1044,7 +1041,7 @@ private theorem EquationS88 (ρ : MState (H i)) (σ : (n : ℕ) → ↑IsFree) {
           apply mul_nonneg
           · rw [sub_nonneg]
             apply HermitianMat.inner_mono
-            · apply MState.nonneg
+            · apply DensityOp.nonneg
             · unfold P1 P2
               rw [← sub_nonneg]
               change 0 ≤ E2 ε2 n
@@ -1052,7 +1049,7 @@ private theorem EquationS88 (ρ : MState (H i)) (σ : (n : ℕ) → ↑IsFree) {
           · positivity
     · apply mul_nonneg
       · apply HermitianMat.inner_ge_zero
-        · apply MState.nonneg
+        · apply DensityOp.nonneg
         · apply HermitianMat.projLE_nonneg
       · positivity
   repeat rw [ENNReal.toReal_add (by finiteness) (by finiteness)]
@@ -1062,10 +1059,10 @@ private theorem EquationS88 (ρ : MState (H i)) (σ : (n : ℕ) → ↑IsFree) {
   repeat rw [ENNReal.toReal_ofReal]
   rotate_left
   · apply HermitianMat.inner_ge_zero --TODO: Positivity extension for HermitianMat.inner
-    · apply MState.nonneg  --TODO: Positivity extension for MState
+    · apply DensityOp.nonneg  --TODO: Positivity extension for MState
     · apply HermitianMat.projLE_nonneg --TODO: Positivity extension for projections
   · apply HermitianMat.inner_ge_zero
-    · apply MState.nonneg
+    · apply DensityOp.nonneg
     · apply HermitianMat.projLE_nonneg
   · exact hε2.le
   rw [ENNReal.toReal_sub_of_le ?_ (by finiteness)]; swap
@@ -1080,7 +1077,7 @@ private theorem EquationS88 (ρ : MState (H i)) (σ : (n : ℕ) → ↑IsFree) {
   repeat rw [ENNReal.toReal_ofReal (by positivity)]
   ring
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 2000000 in
 private theorem EquationS62
     (ρ : MState (H i)) (σ : (n : ℕ) → IsFree (i := i ^ n))
     {ε ε' : Prob} (hε'₁ : 0 < ε') (hε'₂ : ε' < ε) (hε : ε < 1)
@@ -1158,7 +1155,7 @@ private theorem EquationS62
 
   have hEComm ε2 n : Commute (((ℰ n) (ρ ⊗ᵣ^[n])).M - Real.exp ((n : ℝ) * ((R2 ρ σ).toReal + ε₀ + ε2)) • (σ'' ρ ε m σ n).M).mat
       (((ℰ n) (ρ ⊗ᵣ^[n])).M - Real.exp ((n : ℝ) * ((R1 ρ ε).toReal + ε2)) • (σ'' ρ ε m σ n).M).mat := by
-    simp only [HermitianMat.mat_sub, MState.mat_M, HermitianMat.mat_smul]
+    simp only [HermitianMat.mat_sub, DensityOp.mat_M, HermitianMat.mat_smul]
     suffices h : Commute (ℰ n (ρ ⊗ᵣ^[n])).m (σ'' ρ ε m σ n).m by
       apply Commute.sub_left
       · commutes
@@ -1233,7 +1230,7 @@ private theorem EquationS62
         dsimp [σ₁_mineig, iInf]
         rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
         rw [← Matrix.IsHermitian.spectrum_real_eq_range_eigenvalues]
-        rw [MState.mat_M, sInf_spectrum_spacePow (σ₁ i) n, MState.mat_M, smul_smul]
+        rw [DensityOp.mat_M, sInf_spectrum_spacePow (σ₁ i) n, DensityOp.mat_M, smul_smul]
       _ = Real.exp (- n * (σ₁_c i n + (σ₁_c i n) / n)) • 1 := by
         rw [σ₁_c_identity i hn]
       _ ≥ Real.exp (-n * c' ε2 n) • 1 := by
@@ -1280,8 +1277,8 @@ private theorem EquationS62
           intro i
           simp
           apply Real.log_nonpos
-          · apply MState.eigenvalue_nonneg _
-          · apply MState.eigenvalue_le_one
+          · apply DensityOp.eigenvalue_nonneg _
+          · apply DensityOp.eigenvalue_le_one
         rw [← sub_nonneg, ← mul_sub_left_distrib]
         conv =>
           rhs
@@ -1347,7 +1344,7 @@ private theorem EquationS62
         unfold qRelativeEnt SandwichedRelRentropy
         simp only [↓reduceIte]
         have σ''_pd := σ''_posdef ρ ε m σ
-        simp only [MState.mat_M] at σ''_pd
+        simp only [DensityOp.mat_M] at σ''_pd
         have hker : (σ'' ρ ε m σ n).M.ker ≤ (ℰ n (ρ ⊗ᵣ^[n])).M.ker :=
           ker_le_ker_pinching_of_PosDef (ρ ⊗ᵣ^[n]) (σ'' ρ ε m σ n) (σ''_pd n)
         simp only [hker, ↓reduceDIte]
@@ -1382,14 +1379,14 @@ private theorem EquationS62
             · apply HermitianMat.cfc_commute
               apply Commute.sub_left
               · rfl
-              · simp only [HermitianMat.val_eq_coe, HermitianMat.mat_smul, MState.mat_M, ne_eq,
+              · simp only [HermitianMat.val_eq_coe, HermitianMat.mat_smul, DensityOp.mat_M, ne_eq,
                   Real.exp_ne_zero, not_false_eq_true, Commute.smul_left_iff₀]
                 apply Commute.symm
                 exact pinching_commutes (ρ ⊗ᵣ^[n]) (σ'' ρ ε m σ n)
             · apply HermitianMat.cfc_commute
               apply Commute.sub_left
               · rfl
-              · simp only [HermitianMat.val_eq_coe, HermitianMat.mat_smul, MState.mat_M, ne_eq,
+              · simp only [HermitianMat.val_eq_coe, HermitianMat.mat_smul, DensityOp.mat_M, ne_eq,
                   Real.exp_ne_zero, not_false_eq_true, Commute.smul_left_iff₀]
                 apply Commute.symm
                 exact pinching_commutes (ρ ⊗ᵣ^[n]) (σ'' ρ ε m σ n)
@@ -1413,7 +1410,7 @@ private theorem EquationS62
             refine rexp_mul_smul_proj_lt_mul_sub_le_mul_sub'
               (pinching_commutes (ρ ⊗ᵣ^[n]) (σ'' ρ ε m σ n)) ?_ (σ''_posdef ρ ε m σ n) rfl
             rw [← HermitianMat.zero_le_iff]
-            apply MState.nonneg
+            apply DensityOp.nonneg
           simp at hE2leq
           rw [← Complex.re_ofReal_mul (↑n)⁻¹, ← smul_eq_mul, ← Matrix.trace_smul]
           rw [← RCLike.re_to_complex]
@@ -1481,7 +1478,7 @@ private theorem EquationS62
           rw [← HermitianMat.inner_eq_re_trace (ℰ n (ρ ⊗ᵣ^[n])).M ((n : ℝ)⁻¹ • (HermitianMat.symmMul _ _))]
           rw [← HermitianMat.inner_smul_right]
           exact ((HermitianMat.inner_mono ((ℰ n (ρ ⊗ᵣ^[n]))).nonneg) hE3leq)
-        simp only [IsMaximalSelfAdjoint.RCLike_selfadjMap, MState.mat_M, HermitianMat.mat_sub,
+        simp only [IsMaximalSelfAdjoint.RCLike_selfadjMap, DensityOp.mat_M, HermitianMat.mat_sub,
           RCLike.re_to_complex, HermitianMat.inner_smul_right, ge_iff_le]
         conv =>
           enter [1, 1, 1, 1]
@@ -1515,7 +1512,7 @@ private theorem EquationS62
               refine rexp_mul_smul_proj_lt_mul_sub_le_mul_sub
                 (pinching_commutes (ρ ⊗ᵣ^[n]) (σ'' ρ ε m σ n)) (by positivity) ?_ (σ''_posdef ρ ε m σ n) rfl
               rw [← HermitianMat.zero_le_iff]
-              apply MState.nonneg
+              apply DensityOp.nonneg
 
             simp only [HermitianMat.inner_def] at hE1leq
             conv at hE1leq =>
@@ -1583,7 +1580,7 @@ private theorem EquationS62
         intro _ _
         apply HermitianMat.inner_ge_zero
         · apply HermitianMat.projLE_nonneg
-        · apply MState.nonneg
+        · apply DensityOp.nonneg
     · have hlimsupP2' ε2 (hε2 : 0 < ε2) :
           Filter.atTop.limsup (fun n ↦ ⟪P2 ε2 n, ℰ n (ρ ⊗ᵣ^[n])⟫) = 0 := by
         apply le_antisymm
@@ -1642,7 +1639,7 @@ private theorem EquationS62
         grw [← hx x le_rfl]
         apply HermitianMat.inner_ge_zero
         · apply HermitianMat.projLE_nonneg
-        · apply MState.nonneg
+        · apply DensityOp.nonneg
     rcases this with ⟨ε2, hg₁, hg₂, hg₃, hliminf_g₁, hliminf_g₂⟩
 
     replace hDleq := Filter.liminf_le_liminf (Filter.eventually_atTop.mpr ⟨1, fun (n : ℕ) hnge1 ↦ hDleq (ε2 n) n (hg₁ n) hnge1⟩)
@@ -1820,9 +1817,10 @@ private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1)
         (fun x ↦ (σ''_unnormalized ρ ε m σ n).trace⁻¹ * Real.exp (f_map i n x)) ∘ (σ' ρ ε m σ n).M.H.eigenvalues ∘ e := by
       convert (σ' ρ ε m σ n).M.cfc_eigenvalues (fun x ↦ (σ''_unnormalized ρ ε m σ n).trace⁻¹ * Real.exp (f_map i n x))
       rw [HermitianMat.cfc_const_mul, ← σ''_unnormalized, σ'']
+      exact DensityOp.M_ofMat _ _ _
     rcases eq with ⟨eq, heq⟩
     rw [heq]
-    simp only [Set.range_comp, MState.mat_M, EquivLike.range_eq_univ, Set.image_univ, ge_iff_le]
+    simp only [Set.range_comp, DensityOp.mat_M, EquivLike.range_eq_univ, Set.image_univ, ge_iff_le]
     let S : Set ℝ := (fun x => Real.exp (f_map i n x)) '' Set.Icc ((σ₁_mineig i ^ n) / 3) 1
     have h_card_subs : Set.ncard S ≤ n + 1 ∧ S.Finite := by
       exact f_image_bound (σ₁_mineig i) n (mineig_pos i) hn (log_le_f i) (f_le_log i)
@@ -1839,7 +1837,7 @@ private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1)
       Real.exp (f_map i n x)) '' Set.Icc (((σ₁_mineig i) ^ n) / 3) 1) ?_ h_s₂_finite).trans h_card_subs₂
     apply Set.image_mono
     rintro _ ⟨k, rfl⟩
-    refine ⟨?_, MState.eigenvalue_le_one _ _⟩
+    refine ⟨?_, DensityOp.eigenvalue_le_one _ _⟩
     refine le_trans ?_ (ciInf_le (Finite.bddBelow_range _) k)
     refine le_trans ?_ ((HermitianMat.H _).iInf_eigenvalues_le (hσ₁_le_σ' ρ ε m σ n) _)
     dsimp [σ₁_mineig, iInf]
@@ -1848,7 +1846,7 @@ private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1)
     rw [HermitianMat.val_eq_coe, HermitianMat.mat_smul]
     rw [spectrum.smul_eq_smul _ _ (CFC.spectrum_nonempty ℝ _ ((σ₁ i) ⊗ᵣ^[n]).M.H)]
     rw [Real.sInf_smul_of_nonneg (by norm_num)]
-    simp [MState.mat_M, div_eq_inv_mul, sInf_spectrum_spacePow]
+    simp [DensityOp.mat_M, div_eq_inv_mul, sInf_spectrum_spacePow]
 
   have hdpos n : 0 < Fintype.card (spectrum ℝ (σ'' ρ ε m σ n).m) := by
     rw [Fintype.card_pos_iff, Set.nonempty_coe_sort]

@@ -90,7 +90,7 @@ theorem prodRelabel_relabel_cast_prod
     (ρ₁.relabel (Equiv.cast (congrArg H hik))) ⊗ᵣ (ρ₂.relabel (Equiv.cast (congrArg H hlj))) := by
   subst hik
   subst hlj
-  rfl
+  simp only [Equiv.cast_refl, MState.relabel_refl]
 
 /-- The `prod` operation of `ResourcePretheory` gives the natural product operation on `CPTPMap`s. Accessible
 by the notation `M₁ ⊗ᶜᵖᵣ M₂`. -/
@@ -310,7 +310,7 @@ lemma sInf_spectrum_spacePow (σ : MState (H i)) (n : ℕ) :
       enter [1, 1, 2]
       equals 1 =>
         ext1
-        simp [default, MState.uniform, MState.ofClassical, MState.m, HermitianMat.diagonal]
+        simp [default, MState.uniform, MState.ofClassical, DensityOp.m, HermitianMat.diagonal]
     rw [spectrum.one_eq, csInf_singleton]
   · rename_i n ih
     rw [statePow_succ, sInf_spectrum_rprod, ih, pow_succ]
@@ -341,7 +341,7 @@ class FreeStateTheory (ι : Type*) extends ResourcePretheory ι where
   /-- The set F(H) of free states is closed -/
   free_closed : IsClosed (@IsFree i)
   /-- The set F(H) of free states is convex (more precisely, their matrices are) -/
-  free_convex : Convex ℝ (MState.M '' (@IsFree i))
+  free_convex : Convex ℝ (DensityOp.M '' (@IsFree i))
   /-- The set of free states is closed under tensor product -/
   free_prod {ρ₁ : MState (H i)} {ρ₂ : MState (H j)} (h₁ : IsFree ρ₁) (h₂ : IsFree ρ₂) : IsFree (ρ₁ ⊗ᵣ ρ₂)
   /-- The set F(H) of free states contains a full-rank state `ρfull`, equivalently `ρfull` is positive definite. -/
@@ -372,6 +372,9 @@ theorem IsFree.mix {ι : Type*} [FreeStateTheory ι] {i : ι} {σ₁ σ₂ : MSt
   simp [Mixable.mix, Mixable.mix_ab, MState.instMixable]
   simp at hm₂
   convert ← hm₁
+  refine DensityOp.ext ?_
+  rw [DensityOp.M_ofMat]
+  exact hm₂
 
 end FreeStateTheory
 

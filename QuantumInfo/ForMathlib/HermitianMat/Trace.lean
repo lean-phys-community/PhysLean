@@ -168,6 +168,9 @@ variable (A B : HermitianMat (m × n) α)
 theorem traceLeft_mat : A.traceLeft.mat = A.mat.traceLeft := by
   rfl
 
+theorem traceLeft_apply (i j : n) : A.traceLeft i j = ∑ k, A (k, i) (k, j) := by
+  rfl
+
 @[simp]
 theorem traceLeft_add : (A + B).traceLeft = A.traceLeft + B.traceLeft := by
   ext1; simp
@@ -185,6 +188,9 @@ variable (A B : HermitianMat (n × m) α)
 @[simp]
 theorem traceRight_mat :
     (traceRight A).mat = A.mat.traceRight := by
+  rfl
+
+theorem traceRight_apply (i j : n) : A.traceRight i j = ∑ k, A (i, k) (j, k) := by
   rfl
 
 @[simp]

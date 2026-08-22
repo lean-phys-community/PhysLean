@@ -893,25 +893,25 @@ private lemma PosDef_assoc'_traceRight
     (ρ : MState (d₁ × d₂ × d₃)) (hρ : ρ.M.mat.PosDef) :
     ρ.assoc'.traceRight.M.mat.PosDef := by
   have _ := ρ.nonempty |> nonempty_prod.mp |>.right |> nonempty_prod.mp |>.right
-  apply PosDef_traceRight
-  convert hρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm
+  rw [MState.traceRight_M, MState.assoc'_M]
+  exact PosDef_traceRight _ (HermitianMat.PosDef_reindex _ _ hρ)
+
+private lemma inner_marginal_logs [Nonempty dA] [Nonempty dB] (ρ : MState (dA × dB)) :
+    ⟪(-ρ.traceRight.M.log) ⊗ₖ (1 : HermitianMat dB ℂ) +
+     (1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.log, ρ.M⟫ =
+    Sᵥₙ ρ.traceRight - Sᵥₙ ρ.traceLeft := by
+  rw [inner_add_left, inner_kron_one_eq_inner_traceRight, inner_one_kron_eq_inner_traceLeft,
+    Sᵥₙ_eq_neg_trace_log, Sᵥₙ_eq_neg_trace_log, inner_neg_left, MState.traceRight_M,
+    MState.traceLeft_M]
+  ring
 
 private lemma wm_inner_lhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
     ⟪(-ρ.assoc'.traceRight.M.traceRight.log) ⊗ₖ (1 : HermitianMat (d₂ × d₃) ℂ) +
      (1 : HermitianMat d₁ ℂ) ⊗ₖ ρ.traceLeft.M.log, ρ.M⟫ =
     Sᵥₙ ρ.traceRight - Sᵥₙ ρ.traceLeft := by
-  convert congr_arg₂ ( · + · ) _ _ using 1;
-  convert inner_add_left _ _ _ using 1;
-  · rw [ Sᵥₙ_eq_neg_trace_log ];
-    convert inner_kron_one_eq_inner_traceRight _ _ using 1;
-    simp [ HermitianMat.traceRight ];
-    congr! 2;
-    congr! 1;
-    ext i j; simp [ Matrix.traceRight ] ;
-    exact Fintype.sum_prod_type fun x => ρ.m (i, x) (j, x)
-  · rw [ Sᵥₙ_eq_neg_trace_log ];
-    simp [ inner_one_kron_eq_inner_traceLeft ]
+  rw [← MState.traceRight_M, MState.traceRight_right_assoc']
+  exact inner_marginal_logs ρ
 
 private lemma wm_inner_rhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     (ρ : MState (d₁ × d₂ × d₃)) :
@@ -919,11 +919,9 @@ private lemma wm_inner_rhs [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
      (1 : HermitianMat (d₁ × d₂) ℂ) ⊗ₖ ρ.traceLeft.M.traceLeft.log).reindex
       (Equiv.prodAssoc d₁ d₂ d₃), ρ.M⟫ =
     Sᵥₙ ρ.assoc'.traceRight - Sᵥₙ ρ.traceLeft.traceLeft := by
-  simp [ HermitianMat.traceLeft, HermitianMat.traceRight, Sᵥₙ_eq_neg_trace_log ];
-  simp [ inner_add_left, inner_one_kron_eq_inner_traceLeft, inner_kron_one_eq_inner_traceRight ];
-  congr! 2;
-  convert MState.traceLeft_assoc' ρ using 1;
-  unfold MState.assoc' MState.traceLeft; aesop;
+  rw [HermitianMat.reindex_inner, ← MState.assoc'_M, ← MState.traceLeft_M,
+    ← MState.traceLeft_assoc']
+  exact inner_marginal_logs ρ.assoc'
 
 /-- Weak monotonicity (form 2) for positive definite states:
     S(ρ₁₂) + S(ρ₂₃) ≥ S(ρ₁) + S(ρ₃).
@@ -934,7 +932,9 @@ private lemma Sᵥₙ_wm_pd [Nonempty d₁] [Nonempty d₂] [Nonempty d₃]
     Sᵥₙ ρ.assoc'.traceRight + Sᵥₙ ρ.traceLeft := by
   -- Set up marginals and their PD properties
   have h₁₂ := PosDef_assoc'_traceRight ρ hρ
-  have h₂₃ := PosDef_traceLeft ρ.M hρ
+  have h₂₃ : ρ.traceLeft.M.mat.PosDef := by
+    rw [MState.traceLeft_M]
+    exact PosDef_traceLeft ρ.M hρ
   haveI : ρ.assoc'.traceRight.M.NonSingular := nonSingular_of_posDef h₁₂
   haveI : ρ.traceLeft.M.NonSingular := nonSingular_of_posDef h₂₃
   haveI : ρ.assoc'.traceRight.M.traceRight.NonSingular :=
@@ -969,9 +969,8 @@ private lemma MState.approx_by_pd
   refine' ⟨ ρn, _, _ ⟩;
   · intro n
     have h_pos_def : (ρn n).M = (1 - εn n) • ρ.M + εn n • (MState.uniform (d := d₁)).M := by
-      refine' add_comm _ _ |> Eq.trans <| _;
-      congr! 1
-      aesop;
+      simp only [ρn, MState.mix_M]
+      exact add_comm _ _
     have h_pos_def : ∀ (A : Matrix d₁ d₁ ℂ), A.PosSemidef → ∀ (B : Matrix d₁ d₁ ℂ), B.PosDef → ∀ (ε : ℝ), 0 < ε ∧ ε < 1 → (1 - ε) • A + ε • B ∈ {M : Matrix d₁ d₁ ℂ | M.PosDef} := by
       intro A hA B hB ε hε
       simp only [ Matrix.posSemidef_iff_dotProduct_mulVec, Matrix.posDef_iff_dotProduct_mulVec ] at *
@@ -984,17 +983,20 @@ private lemma MState.approx_by_pd
         simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_left_comm, sub_mul, mul_sub ] ; ring!;
     convert h_pos_def _ _ _ _ _ ⟨ _, _ ⟩ <;> norm_num [ * ];
     congr! 1
-    exact psd ρ
+    exact ρ.psd
     · exact uniform_posDef;
     · exact one_div_pos.mpr ( by linarith );
     · exact div_lt_one ( by positivity ) |>.2 ( by linarith )
   · -- Show that the sequence ρn converges to ρ.
     have h_conv : Filter.Tendsto (fun n => εn n • (MState.uniform : MState d₁).M + (1 - εn n) • ρ.M) Filter.atTop (nhds ρ.M) := by
       exact le_trans ( Filter.Tendsto.add ( Filter.Tendsto.smul ( tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ( Filter.Tendsto.smul ( tendsto_const_nhds.sub <| tendsto_const_nhds.div_atTop <| Filter.tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop ) tendsto_const_nhds ) ) ( by simp );
-    rw [ tendsto_iff_dist_tendsto_zero ] at *;
-    convert h_conv using 1;
-    ext n; simp [ρn, Mixable.mix];
-    congr! 1
+    rw [MState.toMat_IsEmbedding.toIsInducing.tendsto_nhds_iff]
+    have h_comp : (DensityOp.M ∘ ρn)
+        = fun n => εn n • (MState.uniform : MState d₁).M + (1 - εn n) • ρ.M := by
+      funext n
+      simp [ρn, MState.mix_M]
+    rw [h_comp]
+    exact h_conv
 
 @[fun_prop]
 private lemma MState.traceLeft_continuous :
@@ -1031,18 +1033,24 @@ private lemma MState.traceRight_continuous :
     convert f.continuous_of_finiteDimensional;
     exact funext fun A => hf A ▸ rfl;
   have := h_traceRight_cont.isOpen_preimage t ht;
-  exact Filter.mem_of_superset ( this.preimage ( continuous_induced_dom ) |> IsOpen.mem_nhds <| by simpa using hρs ) fun x hx => hx
+  refine Filter.mem_of_superset (this.preimage continuous_induced_dom |> IsOpen.mem_nhds <| ?_)
+    fun x hx => ?_
+  · simpa [MState.traceRight_M] using hρs
+  · simpa [MState.traceRight_M] using hx
 
 @[fun_prop]
 private lemma MState.assoc'_continuous :
     Continuous (MState.assoc' : MState (d₁ × d₂ × d₃) → MState ((d₁ × d₂) × d₃)) := by
-  apply continuous_induced_rng.mpr;
   -- The reindex function is continuous because it is a composition of continuous functions (permutations).
   have h_reindex_cont : Continuous (fun ρ : HermitianMat (d₁ × d₂ × d₃) ℂ => ρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm) := by
     apply continuous_induced_rng.mpr;
     fun_prop (disch := norm_num);
-  convert h_reindex_cont.comp _ using 2;
-  exact Continuous_HermitianMat
+  rw [continuous_induced_rng]
+  have h : (DensityOp.M ∘ (MState.assoc' : MState (d₁ × d₂ × d₃) → MState ((d₁ × d₂) × d₃)))
+      = (fun ρ : HermitianMat (d₁ × d₂ × d₃) ℂ => ρ.reindex (Equiv.prodAssoc d₁ d₂ d₃).symm)
+        ∘ DensityOp.M := funext fun ρ ↦ MState.assoc'_M ρ
+  rw [h]
+  exact h_reindex_cont.comp Continuous_HermitianMat
 
 /-- Weak monotonicity, version with partial traces. -/
 lemma Sᵥₙ_wm (ρ : MState (d₁ × d₂ × d₃)) :
@@ -1100,36 +1108,29 @@ private def perm_AB_CR' (dA dB dC : Type*) :
 private lemma BCR_traceLeft_eq_purify_traceLeft (ρ : MState (dA × dB × dC)) :
     (ρBCR ρ).traceLeft =
     ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceLeft := by
-  convert MState.ext ?_;
-  convert MState.ext ?_;
-  any_goals exact ρ.traceLeft.traceLeft;
-  · simp [ MState.traceLeft, MState.relabel, perm_AB_CR' ];
-    simp [ MState.traceLeft, MState.relabel, ρBCR ];
-    unfold HermitianMat.traceLeft
-    simp only [mat_reindex, MState.mat_M, Matrix.reindex_apply, mat_mk, Equiv.coe_fn_symm_mk]
-    unfold Matrix.traceLeft
-    simp
-    congr! 2
-    ext i₁ j₁
-    rw [ ← Finset.sum_product' ]
-    simp [ perm_A_BCR' ]
-    exact Finset.sum_bij ( fun x _ => ( x.2, x.1 ) ) ( by simp ) ( by simp ) ( by simp ) ( by simp );
-  · rfl
+  ext ⟨c, r⟩ ⟨c', r'⟩
+  simp [ρBCR, MState.traceLeft_M, MState.relabel_M, HermitianMat.traceLeft_apply,
+    HermitianMat.reindex_apply, perm_A_BCR', perm_AB_CR', Fintype.sum_prod_type]
+  exact Finset.sum_comm
 
 /- The traceRight of the AB|CR-relabeled purification has same entropy as ρ.assoc'.traceRight. -/
 private lemma purify_AB_traceRight_eq (ρ : MState (dA × dB × dC)) :
     Sᵥₙ ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceRight =
     Sᵥₙ ρ.assoc'.traceRight := by
-  have h_traceRight : ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceRight = ρ.assoc'.traceRight := by
-    have h_traceRight : (MState.pure ρ.purify).traceRight = ρ := by
-      exact MState.purify_spec ρ;
-    convert congr_arg ( fun m => m.assoc'.traceRight ) h_traceRight using 1;
-    ext i j; simp [ MState.traceRight, MState.assoc' ] ;
-    simp [ HermitianMat.traceRight, MState.SWAP, MState.assoc ];
-    simp [ Matrix.traceRight, Matrix.submatrix ];
-    congr! 2;
-    ext i j; simp [ perm_AB_CR' ] ;
-    exact Fintype.sum_prod_type _
+  have h_purify : ∀ (i j : dA × dB × dC),
+      ρ.M i j = ∑ r : dA × dB × dC, ρ.purify (i, r) * (starRingEnd ℂ) (ρ.purify (j, r)) := by
+    intro i j
+    conv_lhs => rw [← ρ.purify_spec]
+    simp only [MState.traceRight_M, HermitianMat.traceRight_apply, MState.pure_M_apply]
+  have h_traceRight : ((MState.pure ρ.purify).relabel (perm_AB_CR' dA dB dC).symm).traceRight
+      = ρ.assoc'.traceRight := by
+    ext ⟨a, b⟩ ⟨a', b'⟩
+    simp [MState.traceRight_M, MState.relabel_M, MState.assoc'_M, HermitianMat.traceRight_apply,
+      HermitianMat.reindex_apply, perm_AB_CR', Fintype.sum_prod_type, Matrix.vecMulVec_apply,
+      Bra.eq_conj]
+    refine Finset.sum_congr rfl fun x _ ↦ ?_
+    rw [h_purify]
+    simp [Fintype.sum_prod_type]
   rw [h_traceRight]
 
 /-- The CR-marginal of ρBCR has the same entropy as the AB-marginal of ρ. -/
@@ -1171,9 +1172,7 @@ private lemma S_R_of_BCR_eq (ρ : MState (dA × dB × dC)) :
     simp [ Finset.sum_sigma' ];
     refine' Finset.sum_bij ( fun x _ => ( x.snd.snd, x.snd.fst, x.fst ) ) _ _ _ _ <;> simp
     grind;
-  convert Sᵥₙ_of_partial_eq ρ.purify using 1;
-  · rw [h_trace];
-  · rw [ ρ.purify_spec ]
+  rw [h_trace, Sᵥₙ_of_partial_eq, ρ.purify_spec]
 
 /-- Strong subadditivity on a tripartite system -/
 theorem Sᵥₙ_strong_subadditivity (ρ₁₂₃ : MState (d₁ × d₂ × d₃)) :
@@ -1190,15 +1189,22 @@ theorem Sᵥₙ_strong_subadditivity (ρ₁₂₃ : MState (d₁ × d₂ × d₃
 /-- "Ordinary" subadditivity of von Neumann entropy -/
 theorem Sᵥₙ_subadditivity (ρ : MState (d₁ × d₂)) :
     Sᵥₙ ρ ≤ Sᵥₙ ρ.traceRight + Sᵥₙ ρ.traceLeft := by
-  have := Sᵥₙ_strong_subadditivity (ρ.relabel (d₂ := d₁ × Unit × d₂)
-    ⟨fun x ↦ (x.1, x.2.2), fun x ↦ (x.1, ⟨(), x.2⟩), fun x ↦ by simp, fun x ↦ by simp⟩)
-  simp [Sᵥₙ_relabel] at this
-  convert this using 1
-  congr 1
-  · convert Sᵥₙ_relabel _ (Equiv.prodPUnit _).symm
-    exact rfl
-  · convert Sᵥₙ_relabel _ (Equiv.punitProd _).symm
-    exact rfl
+  -- Pad the bipartite state with a trivial middle factor and apply strong subadditivity.
+  let e : d₁ × Unit × d₂ ≃ d₁ × d₂ :=
+    ⟨fun x ↦ (x.1, x.2.2), fun x ↦ (x.1, ⟨(), x.2⟩), fun x ↦ by simp, fun x ↦ by simp⟩
+  have h := Sᵥₙ_strong_subadditivity (ρ.relabel e)
+  dsimp only at h
+  have h₃ : (ρ.relabel e).assoc'.traceRight = ρ.traceRight.relabel (Equiv.prodPUnit d₁) := by
+    ext ⟨a, u⟩ ⟨a', u'⟩
+    simp [MState.traceRight_M, MState.assoc'_M, MState.relabel_M, HermitianMat.traceRight_apply,
+      HermitianMat.reindex_apply, e]
+  have h₄ : (ρ.relabel e).traceLeft = ρ.traceLeft.relabel (Equiv.punitProd d₂) := by
+    ext ⟨u, c⟩ ⟨u', c'⟩
+    simp [MState.traceLeft_M, MState.relabel_M, HermitianMat.traceLeft_apply,
+      HermitianMat.reindex_apply, e]
+  rw [Sᵥₙ_relabel, Sᵥₙ_unit_zero (ρ.relabel e).traceLeft.traceRight, h₃, h₄,
+    Sᵥₙ_relabel, Sᵥₙ_relabel] at h
+  linarith
 
 /-- Triangle inequality for pure tripartite states: S(A) ≤ S(B) + S(C). -/
 theorem Sᵥₙ_pure_tripartite_triangle (ψ : Ket ((d₁ × d₂) × d₃)) :
@@ -1232,10 +1238,28 @@ theorem Sᵥₙ_weak_monotonicity (ρ : MState (dA × dB × dC)) :
     let ρAB := ρ.assoc'.traceRight
     let ρAC := ρ.SWAP.assoc.traceLeft.SWAP
     0 ≤ qConditionalEnt ρAB + qConditionalEnt ρAC := by
-  simp only [qConditionalEnt, MState.traceRight_left_assoc', Sᵥₙ_of_SWAP_eq]
-  rw [add_sub, sub_add_eq_add_sub, le_sub_iff_add_le, le_sub_iff_add_le, zero_add]
-  nth_rw 2 [add_comm]
-  simpa using Sᵥₙ_wm ρ.SWAP.assoc.SWAP.assoc
+  show (0 : ℝ) ≤ qConditionalEnt ρ.assoc'.traceRight +
+    qConditionalEnt ρ.SWAP.assoc.traceLeft.SWAP
+  have hwm := Sᵥₙ_wm ρ.SWAP.assoc.SWAP.assoc
+  have h1 : ρ.SWAP.assoc.SWAP.assoc.traceRight = ρ.traceLeft.traceLeft := by
+    ext i j
+    simp [HermitianMat.traceLeft_apply]
+  have h2 : ρ.SWAP.assoc.SWAP.assoc.traceLeft.traceLeft = ρ.traceLeft.traceRight := by
+    ext i j
+    simp [HermitianMat.traceLeft_apply, HermitianMat.traceRight_apply]
+  have h3 : ρ.SWAP.assoc.SWAP.assoc.traceLeft = ρ.assoc'.traceRight := by
+    ext i j
+    simp [HermitianMat.traceLeft_apply, HermitianMat.traceRight_apply,
+      HermitianMat.reindex_apply]
+  have h4 : ρ.SWAP.assoc.SWAP.assoc.assoc'.traceRight = ρ.SWAP.assoc.traceLeft := by
+    ext i j
+    simp [HermitianMat.traceLeft_apply, HermitianMat.reindex_apply]
+  have h6 : ρ.SWAP.assoc.traceLeft.SWAP.traceLeft = ρ.traceLeft.traceLeft := by
+    ext i j
+    simp [HermitianMat.traceLeft_apply]
+  rw [h1, h2, h3, h4] at hwm
+  simp only [qConditionalEnt, MState.traceRight_left_assoc', h6, Sᵥₙ_of_SWAP_eq]
+  linarith
 
 /-- Strong subadditivity, stated in terms of conditional entropies.
   Also called the data processing inequality. H(A|BC) ≤ H(A|B). -/

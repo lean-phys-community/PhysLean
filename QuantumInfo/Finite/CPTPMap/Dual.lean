@@ -316,7 +316,10 @@ theorem dual.PTP_POVM (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0
 /-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
 theorem exp_val_Dual (ℰ : CPTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
     (ℰ ρ).exp_val T  = ρ.exp_val (ℰ.dual T) := by
-  simp only [MState.exp_val, HermitianMat.inner_eq_re_trace, RCLike.re_to_complex]
+  have hm : (ℰ ρ).m = ℰ.map ρ.m :=
+    congrArg HermitianMat.mat (PTPMap.M_apply_MState ℰ.toPTPMap ρ)
+  simp only [MState.exp_val, HermitianMat.inner_eq_re_trace, RCLike.re_to_complex,
+    DensityOp.mat_M, hm]
   congr 1
   apply MatrixMap.Dual.trace_eq
 
@@ -473,7 +476,7 @@ theorem hermDual.PTP_POVM (M : PTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT 
 /-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
 theorem exp_val_hermDual (ℰ : PTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
     (ℰ ρ).exp_val T  = ρ.exp_val (ℰ.hermDual T) := by
-  simp only [MState.exp_val]
+  simp only [MState.exp_val, PTPMap.M_apply_MState]
   apply HPMap.inner_hermDual'
 
 end PTPMap

@@ -24,6 +24,7 @@ import QuantumInfo.Finite.Entropy
 import QuantumInfo.Finite.MState
 import QuantumInfo.Finite.Pinching
 import QuantumInfo.Finite.POVM
+import QuantumInfo.Finite.StdBasisState
 import QuantumInfo.Finite.Unitary
 
 --Documentation without code

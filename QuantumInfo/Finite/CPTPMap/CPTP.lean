@@ -81,7 +81,7 @@ theorem choi_of_CPTP_of_choi (M : Matrix (dOut × dIn) (dOut × dIn) ℂ) {h₁}
   rw [MatrixMap.map_choi_inv]
 
 theorem mat_coe_eq_apply_mat [DecidableEq dOut] (ρ : MState dIn) : (Λ ρ).m = Λ.map ρ.m :=
-  rfl
+  congrArg HermitianMat.mat (PTPMap.M_apply_MState Λ.toPTPMap ρ)
 
 @[ext]
 theorem funext [DecidableEq dOut] {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : ∀ ρ, Λ₁ ρ = Λ₂ ρ) : Λ₁ = Λ₂ :=
@@ -97,8 +97,11 @@ infixl:75 "∘ₘ" => CPTPMap.compose
 
 /-- Composition of CPTPMaps by `CPTPMap.compose` is compatible with the `instFunLike` action. -/
 @[simp]
-theorem compose_eq [DecidableEq dOut] {Λ₁ : CPTPMap dIn dM} {Λ₂ : CPTPMap dM dOut} : ∀ρ, (Λ₂ ∘ₘ Λ₁) ρ = Λ₂ (Λ₁ ρ) :=
-  fun _ ↦ rfl
+theorem compose_eq [DecidableEq dOut] {Λ₁ : CPTPMap dIn dM} {Λ₂ : CPTPMap dM dOut} :
+    ∀ ρ, (Λ₂ ∘ₘ Λ₁) ρ = Λ₂ (Λ₁ ρ) := fun ρ ↦ by
+  apply DensityOp.ext_m
+  rw [mat_coe_eq_apply_mat, mat_coe_eq_apply_mat, mat_coe_eq_apply_mat]
+  rfl
 
 /-- Composition of CPTPMaps is associative. -/
 theorem compose_assoc [DecidableEq dOut] (Λ₃ : CPTPMap dM₂ dOut) (Λ₂ : CPTPMap dM dM₂)
@@ -155,7 +158,7 @@ theorem id_map : (id (dIn := dIn)).map = LinearMap.id := by
 /-- The map `CPTPMap.id` leaves the input state unchanged. -/
 @[simp]
 theorem id_MState (ρ : MState dIn) : CPTPMap.id (dIn := dIn) ρ = ρ := by
-  apply MState.ext_m
+  apply DensityOp.ext_m
   rw [mat_coe_eq_apply_mat]
   simp
 
@@ -219,8 +222,12 @@ theorem assoc_eq_MState_assoc (ρ : MState ((d₁ × d₂) × d₃)) : assoc (d�
   rfl
 
 @[simp]
-theorem assoc'_eq_MState_assoc' (ρ : MState (d₁ × d₂ × d₃)) : assoc' (d₁ := d₁) (d₂ := d₂) (d₃ := d₃) ρ = ρ.assoc' :=
-  rfl
+theorem assoc'_eq_MState_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
+    assoc' (d₁ := d₁) (d₂ := d₂) (d₃ := d₃) ρ = ρ.assoc' := by
+  apply DensityOp.ext_m
+  rw [assoc', ofEquiv_apply]
+  ext i j
+  simp [MState.assoc', MState.assoc, MState.SWAP]
 
 @[simp]
 theorem assoc_assoc' : (assoc (d₁ := d₁) (d₂ := d₂) (d₃ := d₃)) ∘ₘ assoc' = id := by
@@ -426,8 +433,11 @@ theorem IsUnitary_equiv (σ : dIn ≃ dIn) : IsUnitary (ofEquiv σ) := by
     have hU_i_x : ∀ x : dIn, U i x = if x = σ.symm i then 1 else 0 := by grind
     have hU_j_x : ∀ x : dIn, U j x = if x = σ.symm j then 1 else 0 := by grind
     simp [Matrix.mul_apply, Matrix.submatrix, hU_i_x, hU_j_x]
-  ext ρ : 3
-  exact (h_mul ρ).symm
+  apply CPTPMap.funext
+  intro ρ
+  apply DensityOp.ext_m
+  rw [ofUnitary_eq_conj, MState.U_conj_m, ofEquiv_apply, MState.relabel_m]
+  exact (h_mul ρ.m).symm
 
 end unitary
 
@@ -557,10 +567,9 @@ private lemma purify_isometry_condition
 private lemma purify_MState_pure_basis_default_entry (i j : dOut × dOut) :
     (MState.pure (Ket.basis (default : dOut × dOut))).m i j =
     if i = default ∧ j = default then 1 else 0 := by
-  change (MState.pure (Ket.basis (default : dOut × dOut))).M.val i j = _
-  simp only [MState.pure, Matrix.vecMulVec_apply, Ket.basis, Ket.to_bra,
-    Braket.instFunLikeKet, Braket.instFunLikeBra]
-  split_ifs <;> simp_all [eq_comm]
+  rw [MState.pure_apply, Ket.apply, Ket.apply, Ket.basis]
+  by_cases hi : i = default <;> by_cases hj : j = default <;>
+    simp [hi, hj, eq_comm]
 
 omit [Inhabited dOut] in
 private lemma purify_replacement_single_eq (ρ₀ : MState (dOut × dOut)) (b₁ b₂ : dOut × dOut) :

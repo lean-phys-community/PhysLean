@@ -52,7 +52,7 @@ theorem maximal_IsMaximal [FreeStateTheory ι] : IsMaximal (maximal (ι := ι)) 
 -- --Helper theorem for ResourceTheory.mk_of_ops
 -- private lemma convex_states_of_convex_ops [ResourcePretheory ι] (O : ∀ (i j : ι), Set (CPTPMap (H i) (H j)))
 --   (h_convex : ∀ {i j}, Convex ℝ (CPTPMap.choi '' O i j)) (i : ι) :
---     Convex ℝ (MState.M '' fun ρ ↦ ∀ {j} σ, ∃ f, O j i f ∧ f σ = ρ) := by
+--     Convex ℝ (DensityOp.M '' fun ρ ↦ ∀ {j} σ, ∃ f, O j i f ∧ f σ = ρ) := by
 --   intro _ hx _ hy a b ha hb hab
 --   rw [Set.mem_image] at hx hy ⊢
 --   obtain ⟨x,hx1,hx2⟩ := hx
@@ -146,7 +146,7 @@ theorem maximal_IsMaximal [FreeStateTheory ι] : IsMaximal (maximal (ι := ι)) 
 --     IsFree := Set.univ
 --     free_closed := isClosed_univ
 --     free_convex {i} := by
---       -- convert MState.convex (H i) --For MState.m, not MState.M
+--       -- convert MState.convex (H i) --For DensityOp.m, not DensityOp.M
 --       sorry
 --     free_prod _ _ := trivial
 --     free_fullRank := by

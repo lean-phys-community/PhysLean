@@ -135,7 +135,8 @@ theorem funext_pos_trace [Fintype dIn]
 theorem funext_mstate [Fintype dIn] [DecidableEq dIn] {Λ₁ Λ₂ : HPMap dIn dOut ℂ}
   (h : ∀ ρ : MState dIn, Λ₁.map ρ.m = Λ₂.map ρ.m) :
     Λ₁ = Λ₂ :=
-  funext_pos_trace fun M hM_pos hM_tr ↦ h ⟨M, hM_pos, hM_tr⟩
+  funext_pos_trace fun M hM_pos hM_tr ↦ by
+    simpa using h (DensityOp.ofMat M hM_pos hM_tr)
 
 /-- Hermitian-preserving maps are functions from `HermitianMat`s to `HermitianMat`s. -/
 instance instFunLike : FunLike (HPMap dIn dOut ℂ) (HermitianMat dIn ℂ) (HermitianMat dOut ℂ) where
@@ -229,27 +230,32 @@ theorem pos_Hermitian (M : PTPMap dIn dOut ℂ) {x : HermitianMat dIn ℂ} (h : 
   simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
 
 /-- `PTPMap`s are functions from `MState`s to `MState`s. -/
-instance instMFunLike [DecidableEq dIn] [DecidableEq dOut] :
+noncomputable instance (priority := 1100) instMFunLike [DecidableEq dIn] [DecidableEq dOut] :
     FunLike (PTPMap dIn dOut) (MState dIn) (MState dOut) where
-  coe Λ ρ := MState.mk
+  coe Λ ρ := DensityOp.ofMat
     (Λ.toHPMap ρ.M) (HermitianMat.zero_le_iff.mpr (Λ.pos ρ.psd)) (by
       rw [HermitianMat.trace_eq_one_iff, ← ρ.tr']
       exact Λ.TP ρ)
   coe_injective' x y h := injective_toPMap <| PMap.injective_toHPMap <|
     HPMap.funext_mstate fun ρ ↦ by
-      have := congr($h ρ);
-      rwa [MState.ext_iff, HermitianMat.ext_iff] at this
+      have := congrArg (fun σ : MState dOut ↦ (σ.M : HermitianMat dOut ℂ).mat) (congr($h ρ))
+      simpa using this
 
 instance instMContinuousMapClass [DecidableEq dIn] [DecidableEq dOut] :
     ContinuousMapClass (PTPMap dIn dOut) (MState dIn) (MState dOut) where
   map_continuous f := by
     rw [continuous_induced_rng]
+    have h : (DensityOp.M ∘ ⇑f : MState dIn → HermitianMat dOut ℂ)
+        = ⇑f.toHPMap ∘ DensityOp.M :=
+      funext fun _ ↦ DensityOp.M_ofMat _ _ _
+    rw [h]
     exact (map_continuous f.toHPMap).comp MState.Continuous_HermitianMat
 
--- @[norm_cast]
-theorem val_apply_MState [DecidableEq dIn] (M : PTPMap dIn dOut) (ρ : MState dIn) :
-    (M ρ : HermitianMat dOut ℂ) = (instFunLike.coe M) ρ := by
-  rfl
+/-- The density matrix of `Λ ρ` is the image of the density matrix of `ρ`. -/
+@[simp]
+theorem M_apply_MState [DecidableEq dIn] [DecidableEq dOut] (Λ : PTPMap dIn dOut) (ρ : MState dIn) :
+    ((Λ ρ : MState dOut) : HermitianMat dOut ℂ) = instFunLike.coe Λ (ρ : HermitianMat dIn ℂ) :=
+  DensityOp.M_ofMat _ _ _
 
 --If we have a PTPMap, the input and output dimensions are always both nonempty (otherwise
 --we can't preserve trace) - or they're both empty. So `[Nonempty dIn]` will always suffice.
@@ -300,7 +306,8 @@ theorem injective_toPTPMap : (CPTPMap.toPTPMap (dIn := dIn) (dOut := dOut) (𝕜
 --   simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
 
 /-- `CPTPMap`s are functions from `MState`s to `MState`s. -/
-instance instMFunLike [DecidableEq dOut] : FunLike (CPTPMap dIn dOut) (MState dIn) (MState dOut) where
+noncomputable instance (priority := 1100) instMFunLike [DecidableEq dOut] :
+    FunLike (CPTPMap dIn dOut) (MState dIn) (MState dOut) where
   coe := DFunLike.coe ∘ toPTPMap
   coe_injective' := DFunLike.coe_injective'.comp injective_toPTPMap
 

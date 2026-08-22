@@ -111,7 +111,7 @@ theorem measurementMap_apply_hermitianMat (Λ : POVM X d) (m : HermitianMat d �
     kronecker_mat, mat_mk]
   congr!
   ext i j
-  simp only [HermitianMat.diagonal, mat_mk, diagonal_apply, single, of_apply]
+  simp only [HermitianMat.diagonal, mat_mk, Matrix.diagonal_apply, single, of_apply]
   split_ifs <;> grind only [= map_zero, = map_one]
 
 /-- A POVM leads to a distribution of outcomes on any given mixed state ρ. -/
@@ -126,14 +126,14 @@ def measure (Λ : POVM X d) (ρ : MState d) : ProbDistribution X := .mk'
 theorem traceLeft_measurementMap_eq_measure (Λ : POVM X d) (ρ : MState d) :
     (Λ.measurementMap ρ).traceLeft = MState.ofClassical (Λ.measure ρ) := by
   open Kronecker in
+  apply DensityOp.ext_m
+  rw [MState.traceLeft_m, CPTPMap.mat_coe_eq_apply_mat, MState.ofClassical, DensityOp.m_ofMat,
+    measurementMap_apply_matrix]
   ext i j
-  rcases ρ with ⟨⟨ρ, ρH⟩, hρ0, hρ1⟩
-  change (Matrix.traceLeft (Λ.measurementMap.map ρ)) i j = _
-  rw [measurementMap_apply_matrix]
   --TODO: a lemma for Matrix.traceLeft (∑ x, _) = ∑ x, (Matrix.traceLeft _)
   simp_rw [Matrix.traceLeft, Matrix.of_apply, Matrix.sum_apply]
   rw [Finset.sum_comm]
-  simp only [kroneckerMap_apply, MState.coe_ofClassical]
+  simp only [kroneckerMap_apply]
   simp only [single, of_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel,
     Finset.sum_const_zero]
   simp only [HermitianMat.diagonal, HermitianMat.mat_mk, diagonal_apply]

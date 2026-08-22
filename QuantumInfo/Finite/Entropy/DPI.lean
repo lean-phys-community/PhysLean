@@ -219,47 +219,24 @@ Gamma inverse of sigma is identity.
 -/
 lemma Gamma_inv_self (σ : MState d) (hσ : σ.m.PosDef) :
     Gamma_inv σ σ.M.mat = 1 := by
-  -- We use `HermitianMat.cfc_mul` and the fact that $x^{-1/2} * x * x^{-1/2} = 1$ for $x > 0$.
-  have h_gamma_inv_sigma : (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat * (σ.M.mat) * (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat = (σ.M.cfc (fun x => x ^ (-1/2 : ℝ) * x * x ^ (-1/2 : ℝ))).mat := by
-    have h_gamma_inv_sigma : (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat * (σ.M.cfc id).mat * (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat = (σ.M.cfc (fun x => x ^ (-1/2 : ℝ) * x * x ^ (-1/2 : ℝ))).mat := by
-      have h_gamma_inv_sigma : ∀ (f g h : ℝ → ℝ), ContinuousOn f (spectrum ℝ σ.M.mat) → ContinuousOn g (spectrum ℝ σ.M.mat) → ContinuousOn h (spectrum ℝ σ.M.mat) → (σ.M.cfc f).mat * (σ.M.cfc g).mat * (σ.M.cfc h).mat = (σ.M.cfc (fun x => f x * g x * h x)).mat := by
-        intro f g h hf hg hh
-        have h_gamma_inv_sigma : (σ.M.cfc f).mat * (σ.M.cfc g).mat = (σ.M.cfc (fun x => f x * g x)).mat := by
-          symm
-          convert HermitianMat.mat_cfc_mul σ.M f g using 1;
-        rw [ h_gamma_inv_sigma, ← HermitianMat.mat_cfc_mul ];
-        congr! 2
-      have h : ∀ x ∈ spectrum ℝ σ.M.mat, x ≠ 0 := by
-        norm_num
-        intro x hx h_zero
-        have h_eigenvalue : ∃ v : d → ℂ, v ≠ 0 ∧ σ.m.mulVec v = x • v := by
-          simp_all [ spectrum.mem_iff]
-          contrapose! hx;
-          exact Matrix.PosDef.isUnit hσ;
-        obtain ⟨ v, hv_ne_zero, hv_eigenvalue ⟩ := h_eigenvalue
-        rw [Matrix.posDef_iff_dotProduct_mulVec] at hσ
-        have := hσ.2 hv_ne_zero
-        simp [hv_eigenvalue, h_zero] at this
-      apply h_gamma_inv_sigma
-      · fun_prop
-      · fun_prop
-      · fun_prop
-    convert h_gamma_inv_sigma using 1;
-    ext i j ; simp [ Matrix.mul_apply]
-  -- Since $x^{-1/2} * x * x^{-1/2} = 1$ for $x > 0$, we have $(σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat * (σ.M.mat) * (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat = (σ.M.cfc (fun x => 1)).mat$.
-  have h_gamma_inv_sigma_simplified : (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat * (σ.M.mat) * (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat = (σ.M.cfc (fun x => 1)).mat := by
-    convert h_gamma_inv_sigma using 1;
-    congr! 1;
-    -- Since $x^{-1/2} * x * x^{-1/2} = 1$ for all $x > 0$, the functions are equal.
-    have h_eq : ∀ x : ℝ, 0 < x → x ^ (-1 / 2 : ℝ) * x * x ^ (-1 / 2 : ℝ) = 1 := by
-      intro x hx
-      ring_nf
-      norm_num [ hx.ne' ];
-      rw [ ← Real.rpow_natCast, ← Real.rpow_mul hx.le ] ; norm_num [ hx.ne' ];
-      rw [ Real.rpow_neg_one, inv_mul_cancel₀ hx.ne' ];
-    exact Eq.symm (HermitianMat.cfc_congr_of_posDef hσ h_eq);
-  convert h_gamma_inv_sigma_simplified using 1;
-  ext i j
+  have hσ' : σ.M.mat.PosDef := by rwa [DensityOp.mat_M]
+  have hid : σ.M.mat = (σ.M.cfc (fun x => x)).mat :=
+    (congrArg HermitianMat.mat (HermitianMat.cfc_id' σ.M)).symm
+  -- On the (positive) spectrum of `σ`, the function `x ↦ x⁻¹ᐟ² * x * x⁻¹ᐟ²` is constantly one.
+  have h_eq : Set.EqOn (fun x : ℝ => x ^ (-1/2 : ℝ) * x * x ^ (-1/2 : ℝ)) (fun _ => (1 : ℝ))
+      (Set.Ioi 0) := by
+    intro x hx
+    have hx0 : (0 : ℝ) < x := hx
+    have hinv : x ^ (-1/2 : ℝ) * x ^ (-1/2 : ℝ) = x⁻¹ := by
+      rw [← Real.rpow_add hx0, show (-1/2 : ℝ) + (-1/2 : ℝ) = -1 by norm_num, Real.rpow_neg_one]
+    calc x ^ (-1/2 : ℝ) * x * x ^ (-1/2 : ℝ)
+        = (x ^ (-1/2 : ℝ) * x ^ (-1/2 : ℝ)) * x := by ring
+      _ = x⁻¹ * x := by rw [hinv]
+      _ = 1 := inv_mul_cancel₀ hx0.ne'
+  show (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat * σ.M.mat * (σ.M.cfc (fun x => x ^ (-1/2 : ℝ))).mat
+    = 1
+  rw [hid, ← HermitianMat.mat_cfc_mul_apply, ← HermitianMat.mat_cfc_mul_apply,
+    HermitianMat.cfc_congr_of_posDef hσ' h_eq, HermitianMat.cfc_const]
   simp
 
 /-
@@ -267,7 +244,8 @@ The matrix of the output state is the map applied to the input matrix.
 -/
 lemma CPTPMap_apply_MState_M (Φ : CPTPMap d d₂) (σ : MState d) :
     (Φ σ).M.mat = Φ.map σ.M.mat := by
-  exact rfl
+  rw [DensityOp.mat_M, DensityOp.mat_M]
+  exact Φ.mat_coe_eq_apply_mat σ
 
 /-
 The map T is unital.

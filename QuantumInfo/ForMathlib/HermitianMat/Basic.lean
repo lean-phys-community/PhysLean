@@ -67,6 +67,11 @@ theorem mat_apply {A : HermitianMat n α} {i j : n} : A.mat i j = A i j := by
   rfl
 
 @[simp]
+theorem mk_apply (x : Matrix n n α) (h) (i j : n) :
+    DFunLike.coe (F := HermitianMat n α) ⟨x, h⟩ i j = x i j := by
+  rfl
+
+@[simp]
 theorem conjTranspose_mat (A : HermitianMat n α) :
     A.mat.conjTranspose = A.mat :=
   A.H
@@ -520,6 +525,10 @@ theorem diagonal_mat : (diagonal 𝕜 f).mat = Matrix.diagonal (f · : n → �
   rfl
 
 @[simp]
+theorem diagonal_apply (i j : n) : diagonal 𝕜 f i j = if i = j then (f i : 𝕜) else 0 := by
+  rw [← mat_apply, diagonal_mat, Matrix.diagonal_apply]
+
+@[simp]
 theorem diagonal_zero : (diagonal 𝕜 0) = (0 : HermitianMat n 𝕜) := by
   ext1; simp
 
@@ -573,6 +582,10 @@ scoped[HermitianMat] infixl:100 " ⊗ₖ " => HermitianMat.kronecker
 @[simp, norm_cast]
 theorem kronecker_mat (A : HermitianMat m α) (B : HermitianMat n α) :
     (A ⊗ₖ B).mat = A.mat ⊗ₖ B.mat := by
+  rfl
+
+theorem kronecker_apply (A : HermitianMat m α) (B : HermitianMat n α) (i j : m × n) :
+    (A ⊗ₖ B) i j = A i.1 j.1 * B i.2 j.2 := by
   rfl
 
 @[simp]

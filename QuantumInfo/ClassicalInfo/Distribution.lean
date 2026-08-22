@@ -239,6 +239,12 @@ def expect_val (X : RandVar α T) : T := by
     exact Set.mem_range.mp (inst.convex.sum_mem h₀ h₁ hz)
   exact (inst.mkT ht).1
 
+/-- The defining property of `expect_val`: in the ambient module `U`, it is the weighted sum. -/
+@[simp]
+theorem to_U_expect_val (X : RandVar α T) :
+    inst.to_U (expect_val X) = ∑ i, (X.distr i : ℝ) • inst.to_U (X.var i) :=
+  (inst.mkT _).2
+
 /-- The expectation value of a random variable over `α = Fin 2` is the same as `Mixable.mix`
 with probabiliy weight `X.distr 0` -/
 theorem expect_val_eq_mixable_mix (d : ProbDistribution (Fin 2)) (x₁ x₂ : T) : expect_val ⟨![x₁, x₂], d⟩ = Mixable.mix (d 0) x₁ x₂ := by
