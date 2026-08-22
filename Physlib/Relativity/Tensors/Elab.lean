@@ -29,11 +29,11 @@ public import Physlib.Relativity.Tensors.Tensorial
 - If `a ∈ k` then `{a •ₜ T | μ ν}ᵀ` is `smulNode a (tensorNode T)`.
 - If `g ∈ S.G` then `{g •ₐ T | μ ν}ᵀ` is `actionNode g (tensorNode T)`.
 - Suppose `T2` is a tensor with color `![c3]`.
-  Then `{T | μ ν ⊗ T2 | σ}ᵀ` is `prodNode (tensorNode T1) (tensorNode T2)`.
+  Then `{T | μ ν ⊗ T2 | σ}ᵀ` is `prodNode (tensorNode T) (tensorNode T2)`.
 - If `T3` is a tensor with color `![S.τ c1, S.τ c2]`, then
-  `{T | μ ν ⊗ T3 | μ σ}ᵀ` is `contr 0 1 _ (prodNode (tensorNode T1) (tensorNode T3))`.
+  `{T | μ ν ⊗ T3 | μ σ}ᵀ` is `contr 0 1 _ (prodNode (tensorNode T) (tensorNode T3))`.
   `{T | μ ν ⊗ T3 | μ ν }ᵀ` is
-  `contr 0 0 _ (contr 0 1 _ (prodNode (tensorNode T1) (tensorNode T3)))`.
+  `contr 0 0 _ (contr 0 1 _ (prodNode (tensorNode T) (tensorNode T3)))`.
 - If `T4` is a tensor with color `![c2, c1]` then
   `{T | μ ν + T4 | ν μ }ᵀ`is `addNode (tensorNode T) (perm _ (tensorNode T4))` where `_`
   is the permutation of the two indices of `T4`.
