@@ -184,24 +184,6 @@ open TensorSpecies Tensor
 
 -/
 
-lemma inv_id_eq {C : Type} {n : ℕ} {c c1 : Fin n → C} (h : IsReindexing c c1 (id : Fin n → Fin n))
-    (x : Fin n) : IsReindexing.inv (id : Fin n → Fin n) h x = x :=
-  IsReindexing.inv_apply_apply (id : Fin n → Fin n) h x
-
-lemma inv_cast_eq {C : Type} {n m : ℕ} {c : Fin n → C} {c1 : Fin m → C} (e : m = n)
-    (h : IsReindexing c c1 (Fin.cast e)) (x : Fin n) :
-    IsReindexing.inv (Fin.cast e) h x = Fin.cast e.symm x := by
-  have h2 := IsReindexing.inv_apply_apply (Fin.cast e) h x
-  have h3 : (IsReindexing.inv (Fin.cast e) h x).val = x.val := congrArg Fin.val h2
-  exact Fin.val_inj.mp h3
-
-lemma inv_equiv_symm_eq {C : Type} {n : ℕ} {c c1 : Fin n → C} (e : Equiv.Perm (Fin n))
-    (h : IsReindexing c c1 ⇑e.symm) (x : Fin n) :
-    IsReindexing.inv (⇑e.symm) h x = e x := by
-  have h2 := IsReindexing.inv_apply_apply (⇑e.symm) h x
-  apply e.symm.injective
-  rw [h2, Equiv.symm_apply_apply]
-
 lemma ofFinEquiv_apply_succSuccAbove {k' : Type} [CommRing k'] {C G : Type} [Group G]
     {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k' (V c)]
     {basisIdx : C → Type} [∀ c, Fintype (basisIdx c)] [∀ c, DecidableEq (basisIdx c)]
@@ -215,7 +197,6 @@ lemma ofFinEquiv_apply_succSuccAbove {k' : Type} [CommRing k'] {C G : Type} [Gro
       = b m :=
   (ComponentIdx.DropPairSection.mem_iff_apply_succSuccAbove_eq _ _).mp
     (ComponentIdx.DropPairSection.ofFinEquiv (S := S) hij b x).2 m
-
 
 lemma crossToEnd_basis_repr {d nA nB : ℕ} {cA : Fin (nA+1) → Color} {cB : Fin (nB+1) → Color}
     (i : Fin (nA+1)) (j : Fin (nB+1)) (hc : (realLorentzTensor d).τ (cA i) = cB j)
@@ -236,7 +217,7 @@ lemma crossToEnd_basis_repr {d nA nB : ℕ} {cA : Fin (nA+1) → Color} {cB : Fi
   congr 1
   · congr 1
     funext m
-    rw [inv_cast_eq]
+    rw [IsReindexing.inv_cast_eq]
     induction m using Fin.succAboveCases (i := i) with
     | x =>
       rw [Fin.insertNth_apply_same]
@@ -247,10 +228,10 @@ lemma crossToEnd_basis_repr {d nA nB : ℕ} {cA : Fin (nA+1) → Color} {cB : Fi
       simp only [Fin.cast_cast, Fin.cast_eq_self]
       rw [ofFinEquiv_apply_succSuccAbove]
       simp only [basisIdxCongr_eq_refl, Equiv.refl_apply]
-      exact congrArg b (inv_id_eq _ _)
+      exact congrArg b (IsReindexing.inv_id_eq _ _)
   · congr 1
     funext m
-    rw [inv_cast_eq]
+    rw [IsReindexing.inv_cast_eq]
     induction m using Fin.succAboveCases (i := j) with
     | x =>
       rw [Fin.insertNth_apply_same]
@@ -261,8 +242,7 @@ lemma crossToEnd_basis_repr {d nA nB : ℕ} {cA : Fin (nA+1) → Color} {cB : Fi
       simp only [Fin.cast_cast, Fin.cast_eq_self]
       rw [ofFinEquiv_apply_succSuccAbove]
       simp only [basisIdxCongr_eq_refl, Equiv.refl_apply]
-      exact congrArg b (inv_id_eq _ _)
-
+      exact congrArg b (IsReindexing.inv_id_eq _ _)
 
 lemma crossToSlot_basis_repr {d nA : ℕ} {c : Fin (nA+1) → Color} {cM : Fin 2 → Color}
     (i : Fin (nA+1)) (j : Fin 2) (hc : (realLorentzTensor d).τ (c i) = cM j)
@@ -283,14 +263,16 @@ lemma crossToSlot_basis_repr {d nA : ℕ} {c : Fin (nA+1) → Color} {cM : Fin 2
     | p k =>
       rw [Fin.insertNth_apply_succAbove, Fin.insertNth_apply_succAbove]
       refine congrArg b ?_
-      rw [inv_equiv_symm_eq, ← Fin.append_succAbove_const_eq_cycleIcc i, Fin.append_left]
+      rw [IsReindexing.inv_equiv_symm_eq, ← Fin.append_succAbove_const_eq_cycleIcc i,
+        Fin.append_left]
   · funext m
     induction m using Fin.succAboveCases (i := j) with
     | x => rw [Fin.insertNth_apply_same, Fin.insertNth_apply_same]
     | p k =>
       rw [Fin.insertNth_apply_succAbove, Fin.insertNth_apply_succAbove]
       refine congrArg b ?_
-      rw [inv_equiv_symm_eq, ← Fin.append_succAbove_const_eq_cycleIcc i, Fin.append_right]
+      rw [IsReindexing.inv_equiv_symm_eq, ← Fin.append_succAbove_const_eq_cycleIcc i,
+        Fin.append_right]
 
 lemma metricTensor_repr_apply {d : ℕ} (cc : Color)
     (b : ComponentIdx (S := realLorentzTensor d) ![cc, cc]) :
@@ -380,8 +362,6 @@ lemma sum_mul_eta {d : ℕ} (f : (Fin 1 ⊕ Fin d) → ℝ) (y : Fin 1 ⊕ Fin d
     ∑ z : Fin 1 ⊕ Fin d, f z * minkowskiMatrix z y = f y * minkowskiMatrix y y := by
   refine Finset.sum_eq_single y (fun z _ hz => ?_) (fun h => absurd (Finset.mem_univ y) h)
   rw [minkowskiMatrix.off_diag_zero hz, mul_zero]
-
-
 
 /-- Bundling four independent basis indices into one component index. -/
 def vec4Equiv :
@@ -474,7 +454,6 @@ lemma sum_epsEtaSummand : ∑ v : Fin 4 → Fin 1 ⊕ Fin 3, epsEtaSummand v = -
     exact_mod_cast congrArg (fun z : ℤ => (z : ℝ)) hsum
   rw [Finset.sum_congr rfl (fun v _ => epsEtaSummand_eq v), Finset.sum_neg_distrib, h]
 
-
 set_option backward.isDefEq.respectTransparency false in
 lemma unitTensor_down_repr {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.up, Color.down]) :
@@ -490,14 +469,6 @@ lemma unitTensor_down_repr {d : ℕ}
     smul_eq_mul]
   rw [Finset.sum_eq_single (b 0)] <;> aesop
 
-lemma inv_swap01_eq {C : Type} {c c1 : Fin 2 → C}
-    (h : IsReindexing c c1 (![0,1] : Fin 2 → Fin 2)) (x : Fin 2) :
-    IsReindexing.inv (![0,1] : Fin 2 → Fin 2) h x = x := by
-  have h2 := IsReindexing.inv_apply_apply (![0,1] : Fin 2 → Fin 2) h x
-  have hid : ∀ y : Fin 2, (![0,1] : Fin 2 → Fin 2) y = y := by decide
-  rw [hid] at h2
-  exact h2
-
 open ComponentIdx.DropPairSection in
 lemma section_chain3 {cA cB : Fin 4 → Color}
     (h1 : (0 : Fin (2+1+1)) ≠ 2) (h2 : (1 : Fin (4+1+1)) ≠ 4) (h3 : (2 : Fin (6+1+1)) ≠ 6)
@@ -508,7 +479,6 @@ lemma section_chain3 {cA cB : Fin 4 → Color}
       = ![x, x1, x2, b 0, x, x1, x2, b 1] := by
   funext m
   fin_cases m <;> rfl
-
 
 open KroneckerDelta in
 lemma eps_rotate (a b c y : Fin 1 ⊕ Fin 3) :
@@ -654,7 +624,8 @@ lemma leviCivita_contract_three : {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(
     vec4_0, vec4_1, vec4_2, vec4_3, sum_mul_eta]
   simp only [map_zsmul, Finsupp.coe_smul, Pi.smul_apply, zsmul_eq_mul,
     basisIdxCongr_eq_refl, Equiv.refl_apply, unitTensor_down_repr]
-  rw [inv_swap01_eq, inv_swap01_eq, sum_eps_three' (b 0) (b 1)]
+  rw [IsReindexing.inv_eq_self_of_pointwise_eq _ (by decide),
+    IsReindexing.inv_eq_self_of_pointwise_eq _ (by decide), sum_eps_three' (b 0) (b 1)]
   norm_num
 
 -- `checkType` linter: whnf on this tensor-notation statement exceeds the
@@ -673,8 +644,4 @@ lemma leviCivita_contract_self :
     Finset.sum_congr rfl fun x2 _ => Finset.sum_congr rfl fun x3 _ => ?_
   rw [epsEtaSummand, leviCivita_basis_repr_apply]
   simp only [vec4_0, vec4_1, vec4_2, vec4_3]
-
-
 end realLorentzTensor
-
-
