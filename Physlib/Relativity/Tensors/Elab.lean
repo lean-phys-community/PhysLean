@@ -267,19 +267,18 @@ def contrListAdjust (l : List (ℕ × ℕ)) : List (ℕ × ℕ) :=
 
 -/
 
-/-- Given two lists of indices, all of which are indent,
-  returns the `List (ℕ)` representing the how one list
-  permutes into the other. -/
+/-- Given two lists of indices, all of which are identifiers, returns the `List (ℕ)` whose
+  `i`th entry is the position in `l2` of the `i`th index in `l1`. -/
 def getPermutation (l1 l2 : List (TSyntax `indexExpr)) : TermElabM (List ℕ) := do
   /- Turn every index into an indent. -/
   let l1' ← l1.mapM (fun x => indexToIdent x)
   let l2' ← l2.mapM (fun x => indexToIdent x)
-  /- For `l1 = [α, β, γ, δ]`, `l1enum` is `[(α, 0), (β, 1), (γ, 2), (δ, 3)]` -/
-  let l1enum := l1'.zipIdx
-  /- For `l2 = [γ, α, δ, β]`, `l2''` is `[(γ,2), (α, 0), (δ, 3), (β, 1)]` -/
-  let l2'' := l2'.filterMap
-    (fun x => l1enum.find? (fun y => Lean.TSyntax.getId y.1 = Lean.TSyntax.getId x))
-  return l2''.map fun x => x.2
+  /- For `l2 = [γ, α, δ, β]`, `l2enum` is `[(γ, 0), (α, 1), (δ, 2), (β, 3)]`. -/
+  let l2enum := l2'.zipIdx
+  /- For `l1 = [α, β, γ, δ]`, `l1''` is `[(α, 1), (β, 3), (γ, 0), (δ, 2)]`. -/
+  let l1'' := l1'.filterMap
+    (fun x => l2enum.find? (fun y => Lean.TSyntax.getId y.1 = Lean.TSyntax.getId x))
+  return l1''.map fun x => x.2
 
 /-- The construction of an expression corresponding to the type of a given string once parsed. -/
 def stringToTerm (str : String) : TermElabM Term := do
@@ -654,6 +653,23 @@ info: (contrT 0 0 1 ⋯) ((contrT 2 1 3 ⋯) ((prodT u) td)) :
 /-- info: u = (permT ![1, 0] ⋯) u' : Prop -/
 #guard_msgs in
 #check ({u | α β = u' | β α}ᵀ : Prop)
+
+variable {V3 : Fin 3 → Type} [∀ c, AddCommGroup (V3 c)] [∀ c, Module k (V3 c)]
+    {basisIdx3 : Fin 3 → Type} [∀ c, Fintype (basisIdx3 c)]
+    [∀ c, DecidableEq (basisIdx3 c)]
+    {rep3 : (c : Fin 3) → Representation k G (V3 c)}
+    {b3 : (c : Fin 3) → Module.Basis (basisIdx3 c) k (V3 c)}
+    {S3 : TensorSpecies k (Fin 3) G V3 basisIdx3 rep3 b3}
+    {v3 : S3.Tensor ![0, 1, 2]} {v3' : S3.Tensor ![1, 2, 0]}
+
+-- A non-involutive reordering uses the map from target slots to source slots.
+/-- info: v3 = (permT ![2, 0, 1] ⋯) v3' : Prop -/
+#guard_msgs in
+#check ({v3 | α β γ = v3' | β γ α}ᵀ : Prop)
+
+/-- info: v3 + (permT ![2, 0, 1] ⋯) v3' : S3.Tensor ![0, 1, 2] -/
+#guard_msgs in
+#check ({v3 | α β γ + v3' | β γ α}ᵀ)
 
 variable {k : Type} [RCLike k] {C : Type} [DecidableEq C]  {G : Type} [Group G]
     {V : C → Type} [∀ c, AddCommGroup (V c)] [∀ c, Module k (V c)]
