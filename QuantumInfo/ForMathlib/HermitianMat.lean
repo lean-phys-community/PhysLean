@@ -15,3 +15,4 @@ import QuantumInfo.ForMathlib.HermitianMat.Schatten
 import QuantumInfo.ForMathlib.HermitianMat.Sqrt
 import QuantumInfo.ForMathlib.HermitianMat.Trace
 import QuantumInfo.ForMathlib.HermitianMat.Unitary
+import QuantumInfo.ForMathlib.HermitianMat.UnitaryConj

@@ -1291,7 +1291,9 @@ theorem qcmi_le_2_log_dim (ρ : MState (dA × dB × dC)) :
     qcmi ρ ≤ 2 * Real.log (Fintype.card dA) := by
   have := Sᵥₙ_subadditivity ρ.assoc'.traceRight
   have := abs_le.mp (Sᵥₙ_triangle_subaddivity ρ)
-  grind [qcmi, qConditionalEnt, Sᵥₙ_nonneg, Sᵥₙ_le_log_d]
+  have := Sᵥₙ_le_log_d ρ.traceRight
+  have := Sᵥₙ_le_log_d ρ.assoc'.traceRight.traceRight
+  grind [qcmi, qConditionalEnt, Sᵥₙ_nonneg]
 
 /-- The quantum conditional mutual information `QCMI ρABC` is at most 2 log dC. -/
 theorem qcmi_le_2_log_dim' (ρ : MState (dA × dB × dC)) :
@@ -1301,7 +1303,8 @@ theorem qcmi_le_2_log_dim' (ρ : MState (dA × dB × dC)) :
     rw [← ρ.traceLeft_assoc', ← Sᵥₙ_of_assoc'_eq ρ]
     exact Sᵥₙ_triangle_subaddivity ρ.assoc'
   have := Sᵥₙ_subadditivity ρ.traceLeft
-  grind [qcmi, qConditionalEnt, Sᵥₙ_le_log_d, MState.traceRight_left_assoc']
+  have := Sᵥₙ_le_log_d ρ.traceLeft.traceLeft
+  grind [qcmi, qConditionalEnt, MState.traceRight_left_assoc']
 
 /- The chain rule for quantum conditional mutual information:
 `I(A₁A₂ : C | B) = I(A₁:C|B) + I(A₂:C|BA₁)`.

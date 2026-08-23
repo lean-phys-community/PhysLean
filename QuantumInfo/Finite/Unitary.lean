@@ -5,10 +5,11 @@ Authors: Alex Meiburg, Rodolfo Soldati
 -/
 import QuantumInfo.Finite.MState
 
-/-! # Unitary operators on quantum state
+/-! # Unitary evolution of quantum states
 
-This file is intended for lemmas about unitary matrices (`Matrix.unitaryGroup`) and how they apply to
-`Bra`s, `Ket`s, and `MState` mixed states.
+This file is about the action of a unitary on a state, by conjugation. The basis-free version
+`DensityOp.U_conj` takes a unitary operator; `MState.U_conj`, notated `U ◃ ρ`, is the matrix
+analogue, taking a unitary matrix (`Matrix.unitaryGroup`).
 
 This is imported by `CPTPMap` to define things like unitary channels, Kraus operators, and
 complementary channels, so this file itself does not discuss channels yet. -/
@@ -18,42 +19,31 @@ noncomputable section
 open RealInnerProductSpace
 open InnerProductSpace
 
-namespace HermitianMat
+namespace DensityOp
 
-variable {𝕜 : Type*} [RCLike 𝕜] {n : Type*} [Fintype n] [DecidableEq n]
-variable (A B : HermitianMat n 𝕜) (U : Matrix.unitaryGroup n 𝕜)
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+variable [FiniteDimensional ℂ E]
 
-@[simp]
-theorem trace_conj_unitary : (conj U.val A).trace = A.trace := by
-  simp [Matrix.trace_mul_cycle, conj, ← Matrix.star_eq_conjTranspose, trace]
-
-@[simp]
-theorem le_conj_unitary : A.conj U.val ≤ B.conj U ↔ A ≤ B := by
-  rw [← sub_nonneg, ← sub_nonneg (b := A), ← map_sub]
-  constructor
-  · intro h
-    simpa [HermitianMat.conj_conj] using conj_nonneg (star U).val h
-  · exact fun h ↦ conj_nonneg U.val h
+/-- Conjugate a state by a unitary operator (applying the unitary as an evolution). -/
+def U_conj (ρ : DensityOp E) (U : unitary (E →L[ℂ] E)) : DensityOp E where
+  op := ρ.op.conj U.val
+  op_nonneg := HermitianOp.conj_nonneg ρ.op_nonneg U.val
+  op_trace := by rw [HermitianOp.trace_conj_unitary, ρ.op_trace]
 
 @[simp]
-theorem inner_conj_unitary : ⟪A.conj U.val, B.conj U.val⟫ = ⟪A, B⟫ := by
-  dsimp [conj]
-  simp only [inner_eq_re_trace, mat_mk]
-  rw [← mul_assoc, ← mul_assoc, mul_assoc _ _ U.val]
-  rw [Matrix.trace_mul_cycle, ← mul_assoc, ← mul_assoc _ _ A.mat]
-  simp [← Matrix.star_eq_conjTranspose]
+theorem U_conj_op (ρ : DensityOp E) (U : unitary (E →L[ℂ] E)) :
+    (ρ.U_conj U).op = ρ.op.conj U.val :=
+  rfl
 
-/--
-The eigenvalues of a Hermitian matrix conjugated by a unitary matrix are the same
-as the eigenvalues of the original matrix.
--/
+/-- **Matrix analogue of `DensityOp.U_conj`.** -/
 @[simp]
-theorem eigenvalues_conj:(A.conj U.val).H.eigenvalues = A.H.eigenvalues := by
-  rw [Matrix.IsHermitian.eigenvalues_eq_eigenvalues_iff]
-  change (U.val * A.mat * star U.val).charpoly = _
-  rw [Matrix.charpoly_mul_comm, ← mul_assoc, U.2.1, one_mul]
+theorem U_conj_M {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] (ρ : DensityOp E)
+    (U : unitary (E →L[ℂ] E)) :
+    ((ρ.U_conj U).M : HermitianMat ι ℂ) = (ρ.M : HermitianMat ι ℂ).conj
+      (StdBasis.toMatUnitary (ι := ι) U).val :=
+  HermitianOp.toMat_conj_unitary ρ.op U
 
-end HermitianMat
+end DensityOp
 
 namespace MState
 
@@ -64,7 +54,7 @@ variable {ψ φ f : Ket d}
 
 /-- Conjugate a state by a unitary matrix (applying the unitary as an evolution). -/
 def U_conj (ρ : MState d) (U : 𝐔[d]) : MState d :=
-  DensityOp.ofMat (ρ.M.conj U.val) (HermitianMat.conj_nonneg U.val ρ.nonneg) (by simp)
+  DensityOp.U_conj ρ (StdBasis.unitaryOfMat U)
 
 /-- `MState.U_conj`, the action of a unitary on a mixed state by conjugation.
 The ◃ notation comes from the theory of racks and quandles, where this is a
@@ -72,8 +62,8 @@ conjugation-like operation. -/
 scoped[MState] notation:80 U:80 " ◃ " ρ:81 => MState.U_conj ρ U
 
 @[simp]
-theorem U_conj_M (ρ : MState d) (U : 𝐔[d]) : (U ◃ ρ).M = ρ.M.conj U.val :=
-  DensityOp.M_ofMat _ _ _
+theorem U_conj_M (ρ : MState d) (U : 𝐔[d]) : (U ◃ ρ).M = ρ.M.conj U.val := by
+  rw [U_conj, DensityOp.U_conj_M, StdBasis.toMatUnitary_unitaryOfMat]
 
 @[simp]
 theorem U_conj_m (ρ : MState d) (U : 𝐔[d]) :

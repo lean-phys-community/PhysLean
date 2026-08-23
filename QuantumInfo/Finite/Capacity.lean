@@ -70,7 +70,7 @@ def Emulates (Λ₁ : CPTPMap d₁ d₂) (Λ₂ : CPTPMap d₃ d₄) : Prop :=
 A channel A `εApproximates` channel B of the same dimensions if the for every state ρ, the fidelity F(A(ρ), B(ρ)) is at least 1-ε.
 -/
 def εApproximates (A B : CPTPMap d₁ d₂) (ε : ℝ) : Prop :=
-  ∀ (ρ : MState d₁), MState.fidelity (A ρ) (B ρ) ≥ 1-ε
+  ∀ (ρ : MState d₁), DensityOp.fidelity (A ρ) (B ρ) ≥ 1-ε
 
 /--
 A channel A `AchievesRate` R:ℝ if for every ε>0, some n copies of A emulates a channel B such that log2(dimout(B))/n ≥ R, and that B εApproximates the identity channel.
@@ -107,7 +107,7 @@ section εApproximates
 
 /-- Every quantum channel perfectly approximates itself, that is, `εApproximates` with `ε = 0`. -/
 theorem εApproximates_self (Λ : CPTPMap d₁ d₂) : Λ.εApproximates Λ 0 :=
-  fun ρ ↦ ((MState.fidelity_self_eq_one (Λ ρ)).trans (sub_zero 1).symm).ge
+  fun ρ ↦ ((DensityOp.fidelity_self_eq_one (Λ ρ)).trans (sub_zero 1).symm).ge
 
 /-- If a quantum channel A approximates B with ε₀, it also approximates B with all larger ε₁. -/
 theorem εApproximates_monotone {A B : CPTPMap d₁ d₂} {ε₀ : ℝ} (h : A.εApproximates B ε₀)

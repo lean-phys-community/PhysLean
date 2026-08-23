@@ -341,11 +341,12 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
     —log β_ ε(ρ‖{σ}) ≤ D̃_ α(ρ‖σ) + —log (1 - ε) *
       (.ofNNReal ⟨α, zero_le_one.trans hα.le⟩) / (.ofNNReal ⟨α - 1, sub_nonneg_of_le hα.le⟩)
     := by
-  generalize_proofs pf1 pf2
+  generalize_proofs pfC pfF pf1 pf2
   --If ρ isn't in the support of σ, the right hand side is just ⊤. (The left hand side is not, necessarily!)
   by_cases h_supp : σ.M.ker ≤ ρ.M.ker
   swap
-  · simp [SandwichedRelRentropy, h_supp, zero_lt_one.trans hα]
+  · rw [sandwichedRelRentropy_eq_top (zero_lt_one.trans hα) h_supp, top_add]
+    exact le_top
 
   --Now we know that ρ.support ≤ σ.support. This is the main case we actually care about.
   --Proof from https://link.springer.com/article/10.1007/s00220-016-2645-4 reproduced below.
@@ -430,7 +431,7 @@ theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα 
 
 
   --The Renyi entropy is finite
-  rw [SandwichedRelRentropy, dif_pos (zero_lt_one.trans hα), dif_pos ?_]; swap
+  rw [MState.sandwichedRelRentropy_eq_matrix, dif_pos (zero_lt_one.trans hα), dif_pos ?_]; swap
   · suffices q2.M.ker = ⊥ by
       simp only [this, bot_le]
     --q2 has eigenvalues β_ ε(ρ‖{σ}) and 1-β_ ε(ρ‖{σ}), so as long as β_ ε(ρ‖{σ}) isn't 0 or 1,

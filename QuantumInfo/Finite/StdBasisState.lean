@@ -66,7 +66,7 @@ theorem ofOp_basisFun (A : EuclideanSpace ℂ d →L[ℂ] EuclideanSpace ℂ d) 
 /-- Von Neumann entropy is unchanged by conjugating a state by a unitary. -/
 @[simp]
 theorem Sᵥₙ_U_conj (ρ : MState d) (U : Matrix.unitaryGroup d ℂ) : Sᵥₙ (U ◃ ρ) = Sᵥₙ ρ := by
-  rw [Sᵥₙ, Sᵥₙ, U_conj_spectrum_eq]
+  rw [Sᵥₙ_eq_Hₛ_spectrum, Sᵥₙ_eq_Hₛ_spectrum, U_conj_spectrum_eq]
 
 /-- Changing the orthonormal basis used to represent an operator conjugates the resulting state by
 the (unitary) change-of-basis matrix. -/

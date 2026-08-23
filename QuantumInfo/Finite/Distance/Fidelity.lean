@@ -12,17 +12,33 @@ open ComplexConjugate
 open Kronecker
 open scoped Matrix ComplexOrder
 
-variable {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] (ρ σ : MState d)
+variable {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+variable [FiniteDimensional ℂ E]
 
-namespace MState
+namespace DensityOp
 
-/-- The fidelity of two quantum states. This is the quantum version of the Bhattacharyya coefficient. -/
-def fidelity (ρ σ : MState d) : ℝ :=
-  (σ.M.conj ρ.M.sqrt.mat).sqrt.trace
+/-- The fidelity of two quantum states. This is the quantum version of the Bhattacharyya
+coefficient.
 
-theorem fidelity_ge_zero : 0 ≤ fidelity ρ σ := by
-  apply HermitianMat.trace_nonneg
-  apply HermitianMat.sqrt_nonneg
+This makes no reference to a basis; `fidelity_eq_matrix` is the matrix analogue. -/
+def fidelity (ρ σ : DensityOp E) : ℝ :=
+  (σ.op.conj ρ.op.sqrt.op).sqrt.trace
+
+variable (ρ σ : DensityOp E)
+
+/-- **Matrix analogue of `DensityOp.fidelity`.** -/
+theorem fidelity_eq_matrix {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] :
+    fidelity ρ σ = ((σ.M : HermitianMat ι ℂ).conj (ρ.M : HermitianMat ι ℂ).sqrt.mat).sqrt.trace := by
+  have h : StdBasis.toMat ℂ E ι ρ.op.sqrt.op = ((ρ.M : HermitianMat ι ℂ).sqrt).mat := by
+    rw [← HermitianOp.toMat_mat (ι := ι), HermitianOp.toMat_sqrt]
+    rfl
+  rw [fidelity, ← HermitianOp.trace_toMat (ι := ι), HermitianOp.toMat_sqrt,
+    HermitianOp.toMat_conj, h]
+  rfl
+
+theorem fidelity_ge_zero : 0 ≤ fidelity ρ σ :=
+  HermitianOp.trace_nonneg (HermitianOp.sqrt_nonneg _)
 
 theorem fidelity_le_one : fidelity ρ σ ≤ 1 :=
   sorry --submultiplicativity of trace and sqrt
@@ -33,13 +49,15 @@ def fidelity_prob : Prob :=
 
 /-- A state has perfect fidelity with itself. -/
 theorem fidelity_self_eq_one : fidelity ρ ρ = 1 := by
-  simp only [fidelity, HermitianMat.sqrt_eq_cfc_rpow_half]
+  let _ : StdBasis ℂ E (Fin (Module.finrank ℂ E)) := StdBasis.some ℂ E
+  rw [fidelity_eq_matrix (ι := Fin (Module.finrank ℂ E))]
+  simp only [HermitianMat.sqrt_eq_cfc_rpow_half]
   conv =>
     enter [1, 1, 1, 2]
-    rw [← HermitianMat.cfc_id ρ.M]
+    rw [← HermitianMat.cfc_id (ρ.M : HermitianMat _ ℂ)]
   rw [HermitianMat.cfc_conj, ← HermitianMat.cfc_comp_apply]
   convert ρ.tr using 2
-  convert ρ.M.cfc_id using 1
+  convert (ρ.M : HermitianMat _ ℂ).cfc_id using 1
   apply HermitianMat.cfc_congr_of_nonneg ρ.nonneg
   intro x hx
   simp only [one_div, Pi.mul_apply, id_eq, Pi.pow_apply]
@@ -56,7 +74,8 @@ theorem fidelity_symm : fidelity ρ σ = fidelity σ ρ :=
   sorry --break into sqrts
 
 /-- The fidelity cannot decrease under the application of a channel. -/
-theorem fidelity_channel_nondecreasing [DecidableEq d₂] (Λ : CPTPMap d d₂) : fidelity (Λ ρ) (Λ σ) ≥ fidelity ρ σ :=
+theorem fidelity_channel_nondecreasing [DecidableEq d₂] (ρ σ : MState d) (Λ : CPTPMap d d₂) :
+    fidelity (Λ ρ) (Λ σ) ≥ fidelity ρ σ :=
   sorry
 
 --TODO: Real.arccos ∘ fidelity forms a metric (triangle inequality), the Fubini–Study metric.
@@ -64,4 +83,4 @@ theorem fidelity_channel_nondecreasing [DecidableEq d₂] (Λ : CPTPMap d d₂) 
 --Invariance under unitaries
 --Uhlmann's theorem
 
-end MState
+end DensityOp

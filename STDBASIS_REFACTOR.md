@@ -1,7 +1,7 @@
 # `StdBasis` refactor: scoping, design, and migration plan
 
-Status of this document: Stages 0–2 and Stage 5 have landed and the whole of `QuantumInfo` builds
-green with zero errors and zero warnings.
+Status of this document: Stages 0–2, Stage 5, and most of Stage 3 have landed, and the whole of
+`QuantumInfo` builds green with zero errors and zero warnings.
 
 * **Stage 0** — `QuantumInfo/ForMathlib/StdBasis.lean` and `QuantumInfo/Finite/StdBasisState.lean`.
 * **Stage 1 (partial)** — `QuantumInfo/ForMathlib/HermitianOp.lean` defines
@@ -16,6 +16,42 @@ green with zero errors and zero warnings.
   the operator-level one. `Braket.lean` has *not* been migrated: `Ket`/`Bra` are still functions
   `d → ℂ`.
 
+* **Stage 3 (most of it)** — the state-level quantities are now basis-free, each paired with a
+  "matrix analogue" theorem that recovers the old matrix formula through an arbitrary `StdBasis`:
+
+  | Basis-free definition | Matrix analogue |
+  | --- | --- |
+  | `Sᵥₙ (ρ : DensityOp E)` | `Sᵥₙ_eq_trace_cfc_negMulLog`, `Sᵥₙ_eq_re_trace_matrix_cfc` |
+  | `TrDistance` | `TrDistance.eq_matrix_traceNorm` |
+  | `DensityOp.fidelity` | `DensityOp.fidelity_eq_matrix` |
+  | `DensityOp.U_conj` | `DensityOp.U_conj_M` (and `MState.U_conj`, `U ◃ ρ`, on top of it) |
+  | `SandwichedRelRentropy`, `qRelativeEnt` | `sandwichedRelRentropy_eq_matrix`, and its
+    index-determined specialisation `MState.sandwichedRelRentropy_eq_matrix` |
+
+  Supporting this, `ForMathlib/HermitianOp.lean` gained `conj_nonneg`, `trace_conj_unitary`,
+  `conj_unitary_le_conj_unitary`, `inner_conj_unitary`, the operator kernel/support (`ker`,
+  `support`) with the coordinate bridge `lin_toMat_apply`/`mem_ker_toMat_iff`/
+  `ker_toMat_le_ker_toMat`, and `ForMathlib/StdBasis.lean` gained the bijection
+  `StdBasis.toMatUnitary`/`StdBasis.unitaryOfMat` between `unitary (E →L[𝕜] E)` and
+  `Matrix.unitaryGroup ι 𝕜`.
+
+  Two general patterns carried the work:
+  - To prove a basis-free statement, introduce an arbitrary basis locally with
+    `let _ : StdBasis ℂ E (Fin (Module.finrank ℂ E)) := StdBasis.some ℂ E` and rewrite with the
+    matrix analogue.
+  - To reuse an `MState`-level matrix fact for a general `DensityOp E`, push its density matrix
+    back through `DensityOp.ofMat` to get an `MState ι` with the same `M` (the `coords` device in
+    `Entropy/Relative.lean`).
+
+  Two casualties, both from `SandwichedRelRentropy`'s index type no longer being a plain argument:
+  `sandwichedRelRentropy_congr` and `qRelEntropy_heq_congr` lost their `@[gcongr]` attributes,
+  because `gcongr` requires the varying arguments of the head function to be free variables and
+  they are now `EuclideanSpace ℂ d₁` / `EuclideanSpace ℂ d₂`. Their two call sites apply them by
+  name instead.
+
+  Not yet done in Stage 3: `Entropy/SSA.lean` (still matrix-stated throughout) and
+  `Entropy/DPI.lean` (blocked on Stage 4).
+
 * **Stage 5** — `CPTPMap/OpMap.lean` defines `OpMap E F := (E →L[ℂ] E) →ₗ[ℂ] (F →L[ℂ] F)` with
   `OpMap.toMat`/`OpMap.ofMat` as the bridge to `MatrixMap`, and `CPTPMap/Bundled.lean` carries the
   nine-structure hierarchy `HPOp/UnitalOp/TPOp/POp/CPOp/PTPOp/PUOp/CPTPOp/CPUOp` at the operator
@@ -26,10 +62,10 @@ green with zero errors and zero warnings.
   `X_map : X.map = <matrixmap>`. Choi matrices and Kraus decompositions stay matrix-side, as
   planned in §4 Stage 5.
 
-Remaining downstream files (`Entropy/*`, `Distance/*`, `Ensemble`, `POVM`, `Entanglement`,
-`Pinching`, `ResourceTheory/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not
-yet migrated to operator form; they still speak in matrices via `ρ.M`. Stages 3, 4, 6 and 7 below
-are unstarted.
+Remaining downstream files (`Entropy/{SSA,DPI}`, `Ensemble`, `POVM`, `Entanglement`, `Pinching`,
+`ResourceTheory/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not yet
+migrated to operator form; they still speak in matrices via `ρ.M`. Stages 4, 6 and 7 below are
+unstarted.
 
 ### Known ergonomic wart: dot notation through the `MState`/`CPTPMap` abbreviations
 
@@ -346,19 +382,22 @@ so that downstream files continue to compile untouched.
 Breakage estimate: `MState.lean` has ~153 declarations; expect ~40 to need real work and the rest
 to be binder churn. `Braket.lean` ~15 of 51 need real work.
 
-### Stage 3 — `Unitary`, `Distance`, `Entropy` (M)
+### Stage 3 — `Unitary`, `Distance`, `Entropy` (M; all but `SSA` and `DPI` done)
 
 These are the payoff stage: every result here is unitarily invariant, so
 `StdBasis.congr_of_unitaryInvariant` discharges the insensitivity obligations mechanically, exactly
 as demonstrated in `Finite/StdBasisState.lean`.
 
-* `Finite/Unitary.lean` (116) — `𝐔[d]` becomes the unitary group of `E →L[ℂ] E`. S.
-* `Finite/Distance/{TraceDistance, Fidelity}.lean` (123) — blocked on Schatten/trace norm staying
-  matrix-side; use the bridge. S.
-* `Finite/Entropy/VonNeumann.lean` (336) — already demonstrated. S.
-* `Finite/Entropy/Relative.lean` (2267) and `SSA.lean` (1293) — large but shallow: these are
-  statements about traces, `log`, and CFC. Almost no coordinate reasoning. M each, mostly binder
-  churn once Stage 1 has landed.
+* `Finite/Unitary.lean` — done. `DensityOp.U_conj` takes a `unitary (E →L[ℂ] E)`; `MState.U_conj`
+  is defined from it through `StdBasis.unitaryOfMat`, so all twelve existing `◃` call sites are
+  unchanged.
+* `Finite/Distance/{TraceDistance, Fidelity}.lean` — done, with the trace norm staying matrix-side
+  behind `HermitianOp.traceNorm`.
+* `Finite/Entropy/VonNeumann.lean` — done.
+* `Finite/Entropy/Relative.lean` — done. The definition is basis-free; the ~1450 lines of existing
+  matrix-level machinery below it are untouched, reached through the `coords` transport.
+* `Finite/Entropy/SSA.lean` (1293) — not started. Large but shallow: statements about traces, `log`,
+  and CFC, almost no coordinate reasoning.
 * `Finite/Entropy/DPI.lean` (427) — depends on Stage 4.
 
 ### Stage 4 — tensor products and partial trace (L, genuinely hard)

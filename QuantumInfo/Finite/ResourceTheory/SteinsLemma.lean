@@ -69,7 +69,7 @@ private theorem Lemma6 {m : ℕ} (hm : 0 < m) (ρ σf : MState (H i)) (σₘ : M
     rw [← sandwichedRelRentropy_statePow]
     rw [← sandwichedRelRentropy_prodRelabel]
 
-    gcongr
+    refine sandwichedRelRentropy_congr h_Hn_eq ?_ ?_
     · rw [MState.eq_relabel_iff]
       simp only [MState.relabel_relabel, ← Equiv.cast_symm, ← Equiv.cast_trans]
       rw [prodRelabel_relabel_cast_prod _ _ _ ((pow_mul ..).symm) rfl]
@@ -91,7 +91,7 @@ private theorem Lemma6 {m : ℕ} (hm : 0 < m) (ρ σf : MState (H i)) (σₘ : M
       --Distribute the limsup over subtraction
       --The term on the right is a constant, divided by n, which converges to zero.
       --Dropping that leaves the identity
-      generalize_proofs pf1 pf2 at h_lem5
+      generalize_proofs pfC pfF pf1 pf2 at h_lem5
       let x n :=  —log β_ ε(ρ ⊗ᵣ^[n]‖{σn n})
       let y n := D̃_ α(ρ ⊗ᵣ^[n]‖σn n)
       set z := —log (1 - ε) * (ENNReal.ofNNReal ⟨α, pf1⟩) / (ENNReal.ofNNReal ⟨α - 1, pf2⟩)
@@ -1342,7 +1342,7 @@ private theorem EquationS62
         + ⟪(ℰ n (ρ ⊗ᵣ^[n])).M, c' ε2 n • E3 ε2 n⟫)
       := by
         -- (S86) to (S88)
-        unfold qRelativeEnt SandwichedRelRentropy
+        rw [qRelativeEnt, MState.sandwichedRelRentropy_eq_matrix]
         simp only [↓reduceIte]
         have σ''_pd := σ''_posdef ρ ε m σ
         simp only [DensityOp.mat_M] at σ''_pd

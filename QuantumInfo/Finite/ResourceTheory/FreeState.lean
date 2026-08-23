@@ -451,7 +451,7 @@ theorem RelativeEntResource.Subadditive (ρ : MState (H i)) : Subadditive fun n 
   · simpa [ht₁] using free_prod hσ₂f hσ₃f
   · apply le_of_eq
     rw [← qRelEntropy_prodRelabel]
-    gcongr
+    refine qRelEntropy_heq_congr ht ?_ ?_
     · apply statePow_add
     · rw [← eq_cast_iff_heq]
       apply MState.relabel_cast

@@ -1464,31 +1464,148 @@ theorem sandwichedRelRentropy_additive_alpha_one_aux (ρ₁ σ₁ : MState d₁)
     HermitianMat.inner_supportProj_of_ker_le]
   abel
 
+section Operator
+
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+variable [FiniteDimensional ℂ E]
+
+/-- The index type of the basis that `StdBasis.some ℂ E` picks out. -/
+local notation "ι₀" => Fin (Module.finrank ℂ E)
+
+section Bridge
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+
+/-- The state on `EuclideanSpace ℂ ι` with the same density matrix as `ρ`. It carries the matrix
+form of every basis-free quantity attached to `ρ`, which is how facts proved for `MState` are
+transported to `DensityOp E`. -/
+private def coords (ρ : DensityOp E) : MState ι :=
+  DensityOp.ofMat (ρ.M : HermitianMat ι ℂ) ρ.nonneg ρ.tr
+
+@[simp]
+private theorem coords_M (ρ : DensityOp E) :
+    ((coords (ι := ι) ρ).M : HermitianMat ι ℂ) = ρ.M :=
+  DensityOp.M_ofMat _ _ _
+
+private theorem inner_op_log_sub_log (ρ σ : DensityOp E) :
+    ⟪ρ.op, ρ.op.log - σ.op.log⟫ =
+      ⟪(ρ.M : HermitianMat ι ℂ), (ρ.M : HermitianMat ι ℂ).log - (σ.M : HermitianMat ι ℂ).log⟫ := by
+  rw [← HermitianOp.inner_toMat (ι := ι), HermitianOp.toMat_sub, HermitianOp.toMat_log,
+    HermitianOp.toMat_log]
+  rfl
+
+private theorem trace_conj_rpow (ρ σ : DensityOp E) (α β : ℝ) :
+    ((ρ.op.conj ((σ.op ^ β).op)) ^ α).trace =
+      (((ρ.M : HermitianMat ι ℂ).conj ((σ.M : HermitianMat ι ℂ) ^ β).mat) ^ α).trace := by
+  have h : StdBasis.toMat ℂ E ι ((σ.op ^ β).op) = ((σ.M : HermitianMat ι ℂ) ^ β).mat := by
+    rw [← HermitianOp.toMat_mat (ι := ι), HermitianOp.toMat_rpow]
+    rfl
+  rw [← HermitianOp.trace_toMat (ι := ι), HermitianOp.toMat_rpow, HermitianOp.toMat_conj, h]
+  rfl
+
+private theorem ker_op_le_ker_op {ρ σ : DensityOp E} :
+    σ.op.ker ≤ ρ.op.ker ↔ (σ.M : HermitianMat ι ℂ).ker ≤ (ρ.M : HermitianMat ι ℂ).ker :=
+  HermitianOp.ker_toMat_le_ker_toMat.symm
+
+/-- `sandwichedRelRentropy_nonneg`, transported to the density matrix of a state on an arbitrary
+finite-dimensional space. -/
+theorem sandwichedRelRentropy_nonneg_M {α : ℝ} (hα : 0 < α) {ρ σ : DensityOp E}
+    (h : (σ.M : HermitianMat ι ℂ).ker ≤ (ρ.M : HermitianMat ι ℂ).ker) :
+    0 ≤ if α = 1 then
+        ⟪(ρ.M : HermitianMat ι ℂ),
+          (ρ.M : HermitianMat ι ℂ).log - (σ.M : HermitianMat ι ℂ).log⟫
+      else
+        (((ρ.M : HermitianMat ι ℂ).conj
+          ((σ.M : HermitianMat ι ℂ) ^ ((1 - α)/(2 * α))).mat) ^ α).trace.log / (α - 1) := by
+  simpa using sandwichedRelRentropy_nonneg (ρ := coords (ι := ι) ρ) (σ := coords (ι := ι) σ)
+    hα (by simpa using h)
+
+end Bridge
+
+private theorem sandwichedRelRentropy_op_nonneg {α : ℝ} (hα : 0 < α) {ρ σ : DensityOp E}
+    (h : σ.op.ker ≤ ρ.op.ker) :
+    0 ≤ if α = 1 then ⟪ρ.op, ρ.op.log - σ.op.log⟫
+      else ((ρ.op.conj ((σ.op ^ ((1 - α) / (2 * α))).op)) ^ α).trace.log / (α - 1) := by
+  let _ : StdBasis ℂ E ι₀ := StdBasis.some ℂ E
+  rw [inner_op_log_sub_log (ι := ι₀), trace_conj_rpow (ι := ι₀)]
+  exact sandwichedRelRentropy_nonneg_M hα (ker_op_le_ker_op.1 h)
+
 /-- The Sandwiched Renyi Relative Entropy, defined with ln (nits). Note that at `α = 1` this definition
   switch to the standard Relative Entropy, for continuity. For α ≤ 0, this gives junk value 0. (There
   is no conventional value for α < 0; there is a continuous limit at α = 0, but it is complicated and
-  unneeded at the moment.)-/
-def SandwichedRelRentropy (α : ℝ) (ρ σ : MState d) : ENNReal :=
+  unneeded at the moment.)
+
+  This makes no reference to a basis; `sandwichedRelRentropy_eq_matrix` is the matrix analogue. -/
+def SandwichedRelRentropy (α : ℝ) (ρ σ : DensityOp E) : ENNReal :=
   open Classical in
   if hα : 0 < α then
-    if h : σ.M.ker ≤ ρ.M.ker
+    if h : σ.op.ker ≤ ρ.op.ker
     then (.ofNNReal ⟨if α = 1 then
-        ⟪ρ.M, ρ.M.log - σ.M.log⟫
+        ⟪ρ.op, ρ.op.log - σ.op.log⟫
       else
-        ((ρ.M.conj (σ.M ^ ((1 - α)/(2 * α)) ).mat) ^ α).trace.log / (α - 1),
-      sandwichedRelRentropy_nonneg hα h⟩)
+        ((ρ.op.conj ((σ.op ^ ((1 - α)/(2 * α))).op)) ^ α).trace.log / (α - 1),
+      sandwichedRelRentropy_op_nonneg hα h⟩)
     else ⊤
   else 0
 
 notation "D̃_" α "(" ρ "‖" σ ")" => SandwichedRelRentropy α ρ σ
 
+/-- **Matrix analogue of `SandwichedRelRentropy`.** -/
+theorem sandwichedRelRentropy_eq_matrix {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+    (α : ℝ) (ρ σ : DensityOp E) :
+    D̃_ α(ρ‖σ) =
+      open Classical in
+      if hα : 0 < α then
+        if h : (σ.M : HermitianMat ι ℂ).ker ≤ (ρ.M : HermitianMat ι ℂ).ker
+        then (.ofNNReal ⟨if α = 1 then
+            ⟪(ρ.M : HermitianMat ι ℂ),
+              (ρ.M : HermitianMat ι ℂ).log - (σ.M : HermitianMat ι ℂ).log⟫
+          else
+            (((ρ.M : HermitianMat ι ℂ).conj
+              ((σ.M : HermitianMat ι ℂ) ^ ((1 - α)/(2 * α))).mat) ^ α).trace.log / (α - 1),
+          sandwichedRelRentropy_nonneg_M hα h⟩)
+        else ⊤
+      else 0 := by
+  rw [SandwichedRelRentropy]
+  by_cases hα : 0 < α
+  swap
+  · rw [dif_neg hα, dif_neg hα]
+  rw [dif_pos hα, dif_pos hα]
+  by_cases h : σ.op.ker ≤ ρ.op.ker
+  swap
+  · rw [dif_neg h, dif_neg (fun hc ↦ h (ker_op_le_ker_op (ι := ι) |>.2 hc))]
+  rw [dif_pos h, dif_pos (ker_op_le_ker_op (ι := ι) |>.1 h), ENNReal.coe_inj]
+  apply NNReal.eq
+  simp only [NNReal.coe_mk]
+  split_ifs with h₁
+  · exact inner_op_log_sub_log (ι := ι) ρ σ
+  · rw [trace_conj_rpow (ι := ι)]
+
 /-- The quantum relative entropy `𝐃(ρ‖σ) := Tr[ρ (log ρ - log σ)]`. Also called
 the Umegaki quantum relative entropy, when it's necessary to distinguish from other
 relative entropies. -/
-def qRelativeEnt (ρ σ : MState d) : ENNReal :=
+def qRelativeEnt (ρ σ : DensityOp E) : ENNReal :=
   D̃_1(ρ‖σ)
 
 notation "𝐃(" ρ "‖" σ ")" => qRelativeEnt ρ σ
+
+end Operator
+
+/-- `sandwichedRelRentropy_eq_matrix` for a state on `EuclideanSpace ℂ d`, whose preferred basis is
+the standard one, so that the index type is determined by the state. -/
+theorem MState.sandwichedRelRentropy_eq_matrix (α : ℝ) (ρ σ : MState d) :
+    D̃_ α(ρ‖σ) =
+      open Classical in
+      if hα : 0 < α then
+        if h : σ.M.ker ≤ ρ.M.ker
+        then (.ofNNReal ⟨if α = 1 then
+            ⟪ρ.M, ρ.M.log - σ.M.log⟫
+          else
+            ((ρ.M.conj (σ.M ^ ((1 - α)/(2 * α))).mat) ^ α).trace.log / (α - 1),
+          sandwichedRelRentropy_nonneg_M hα h⟩)
+        else ⊤
+      else 0 :=
+  _root_.sandwichedRelRentropy_eq_matrix α ρ σ
 
 /--
 The Sandwiched Renyi Relative entropy is additive for α=1 (standard relative entropy).
@@ -1500,14 +1617,14 @@ private theorem sandwichedRelRentropy_additive_alpha_one (ρ₁ σ₁ : MState d
     simpa using ker_prod_le_iff ρ₁ σ₁ ρ₂ σ₂
   by_cases h1 : σ₁.M.ker ≤ ρ₁.M.ker
   <;> by_cases h2 : σ₂.M.ker ≤ ρ₂.M.ker
-  · simp only [SandwichedRelRentropy, zero_lt_one, ↓reduceDIte, ↓reduceIte, h1, h2,
+  · simp only [MState.sandwichedRelRentropy_eq_matrix, zero_lt_one, ↓reduceDIte, ↓reduceIte, h1, h2,
       hker.mpr ⟨h1, h2⟩]
     rw [← ENNReal.coe_add, ENNReal.coe_inj]
     apply NNReal.eq
     push_cast
     exact sandwichedRelRentropy_additive_alpha_one_aux ρ₁ σ₁ ρ₂ σ₂ h1 h2
   all_goals
-    simp only [SandwichedRelRentropy, zero_lt_one, ↓reduceDIte, ↓reduceIte, h1, h2,
+    simp only [MState.sandwichedRelRentropy_eq_matrix, zero_lt_one, ↓reduceDIte, ↓reduceIte, h1, h2,
       add_top, top_add, dite_eq_right_iff, ENNReal.coe_ne_top, imp_false]
     rw [hker]
     tauto
@@ -1528,9 +1645,9 @@ The Sandwiched Renyi Relative entropy is additive for alpha != 1.
 theorem sandwichedRelRentropy_additive_alpha_ne_one {α : ℝ} (hα : α ≠ 1) (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂) :
     D̃_ α(ρ₁ ⊗ᴹ ρ₂‖σ₁ ⊗ᴹ σ₂) = D̃_ α(ρ₁‖σ₁) + D̃_ α(ρ₂‖σ₂) := by
   by_cases hα0 : 0 < α; swap
-  · simp [SandwichedRelRentropy, hα0]
+  · simp [MState.sandwichedRelRentropy_eq_matrix, hα0]
   by_cases h_ker : σ₁.M.ker ≤ ρ₁.M.ker ∧ σ₂.M.ker ≤ ρ₂.M.ker
-  · simp_all [SandwichedRelRentropy]
+  · simp_all [MState.sandwichedRelRentropy_eq_matrix]
     -- Apply the additivity of the trace term to split the logarithm into the sum of the logarithms.
     have h_trace_add : Real.log ((ρ₁ ⊗ᴹ ρ₂).M.conj ((σ₁ ⊗ᴹ σ₂).M ^ ((1 - α) / (2 * α))).mat ^ α).trace = Real.log ((ρ₁.M.conj (σ₁.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace + Real.log ((ρ₂.M.conj (σ₂.M ^ ((1 - α) / (2 * α))).mat) ^ α).trace := by
       rw [ sandwiched_term_product, Real.log_mul ];
@@ -1544,8 +1661,8 @@ theorem sandwichedRelRentropy_additive_alpha_ne_one {α : ℝ} (hα : α ≠ 1) 
       simp_all  [ ker_prod_le_iff ]
     rw [not_and_or] at h_ker
     rcases h_ker with h_ker | h_ker
-    · simp [SandwichedRelRentropy, h_ker_prod, h_ker, hα0]
-    · simp [SandwichedRelRentropy, h_ker_prod, h_ker, hα0]
+    · simp [MState.sandwichedRelRentropy_eq_matrix, h_ker_prod, h_ker, hα0]
+    · simp [MState.sandwichedRelRentropy_eq_matrix, h_ker_prod, h_ker, hα0]
 
 end additivity
 
@@ -1567,7 +1684,7 @@ theorem qRelativeEnt_additive (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState 
 @[simp]
 theorem sandwichedRelRentropy_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
     D̃_ α(ρ.relabel e‖σ.relabel e) = D̃_ α(ρ‖σ) := by
-  simp only [SandwichedRelRentropy]
+  simp only [MState.sandwichedRelRentropy_eq_matrix]
   rw! [MState.relabel_M, MState.relabel_M, HermitianMat.ker_reindex_le_iff]
   --Why doesn't this `simp`? Because it's an if condition, I'm guessing
   simp [HermitianMat.conj_submatrix]
@@ -1577,8 +1694,9 @@ theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
   --Technically this holds for all α except for `-1` and `0`. But those are stupid.
   --TODO: Maybe SandwichedRelRentropy should actually be defined differently for α = 0?
     D̃_ α(ρ‖ρ) = 0 := by
-  simp? [SandwichedRelRentropy, NNReal.eq_iff, hα] says
-    simp only [SandwichedRelRentropy, hα, ↓reduceDIte, le_refl, sub_self, inner_zero_right,
+  simp? [MState.sandwichedRelRentropy_eq_matrix, NNReal.eq_iff, hα] says
+    simp only [MState.sandwichedRelRentropy_eq_matrix, hα, ↓reduceDIte, le_refl, sub_self,
+      inner_zero_right,
       ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_mk, NNReal.coe_zero, ite_eq_left_iff,
       div_eq_zero_iff, Real.log_eq_zero]
   intro hα
@@ -1600,11 +1718,19 @@ theorem sandwichedRelRentropy_self (hα : 0 < α) (ρ : MState d) :
       · field_simp; ring_nf; positivity
   simp
 
+/-- The Sandwiched Renyi Relative entropy is infinite exactly when the support condition fails. -/
+theorem sandwichedRelRentropy_eq_top (hα : 0 < α) {ρ σ : MState d} (h : ¬ σ.M.ker ≤ ρ.M.ker) :
+    D̃_ α(ρ‖σ) = ⊤ := by
+  rw [MState.sandwichedRelRentropy_eq_matrix, dif_pos hα, dif_neg h]
+
+theorem qRelativeEnt_eq_top {ρ σ : MState d} (h : ¬ σ.M.ker ≤ ρ.M.ker) : 𝐃(ρ‖σ) = ⊤ :=
+  sandwichedRelRentropy_eq_top zero_lt_one h
+
 @[aesop (rule_sets := [finiteness]) unsafe apply]
 theorem sandwichedRelEntropy_ne_top {ρ σ : MState d} [σ.M.NonSingular] : D̃_ α(ρ‖σ) ≠ ⊤ := by
   by_cases 0 < α
-  · simp [SandwichedRelRentropy, HermitianMat.nonSingular_ker_bot, *]
-  · simp [SandwichedRelRentropy, *]
+  · simp [MState.sandwichedRelRentropy_eq_matrix, HermitianMat.nonSingular_ker_bot, *]
+  · simp [MState.sandwichedRelRentropy_eq_matrix, *]
 
 @[fun_prop]
 lemma continuousOn_exponent : ContinuousOn (fun α : ℝ => (1 - α) / (2 * α)) (Set.Ioi 0) := by
@@ -1654,7 +1780,7 @@ private theorem sandwichedRelRentropy.continuousOn_Ioi_1_aux (ρ σ : MState d) 
 
 private theorem sandwichedRelRentropy.continuousOn_Ioi_1 (ρ σ : MState d) :
     ContinuousOn (fun α => D̃_ α(ρ‖σ)) (Set.Ioi 1) := by
-  dsimp [SandwichedRelRentropy]
+  simp only [MState.sandwichedRelRentropy_eq_matrix]
   split_ifs with hρ
   · simp [← ENNReal.ofReal_eq_coe_nnreal]
     rw [continuousOn_congr (f := fun α ↦ ENNReal.ofReal
@@ -1698,7 +1824,7 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1_aux (ρ σ : MState d
 /-- Continuity on (0,1): the sandwich relative Rényi entropy is continuous in α on (0,1). -/
 private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
     ContinuousOn (fun α => D̃_ α(ρ‖σ)) (Set.Ioo 0 1) := by
-  dsimp [SandwichedRelRentropy]
+  simp only [MState.sandwichedRelRentropy_eq_matrix]
   split_ifs with hρ
   · simp [← ENNReal.ofReal_eq_coe_nnreal]
     rw [continuousOn_congr (f := fun α ↦ ENNReal.ofReal
@@ -1725,7 +1851,8 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
 private theorem sandwichedRelRentropy.continuousAt_1 (ρ σ : MState d) :
     ContinuousWithinAt (fun α => D̃_ α(ρ‖σ)) (Set.Ioi 0) 1 := by
   by_cases h : σ.M.ker ≤ ρ.M.ker
-  · simp only [ContinuousWithinAt, SandwichedRelRentropy, dif_pos h, zero_lt_one, if_true]
+  · simp only [ContinuousWithinAt, MState.sandwichedRelRentropy_eq_matrix, dif_pos h, zero_lt_one,
+      if_true]
     -- Use the fact that the limit of the real-valued function is the inner product.
     have h_real_limit : Filter.Tendsto (fun α : ℝ => if α = 1 then ⟪ρ.M, ρ.M.log - σ.M.log⟫ else Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1)) (nhdsWithin 1 (Set.Ioi 0)) (nhds ⟪ρ.M, ρ.M.log - σ.M.log⟫) := by
       have h_real_limit : Filter.Tendsto (fun α : ℝ => Real.log ((HermitianMat.conj (σ.M ^ ((1 - α) / (2 * α))).mat) ρ.M ^ α).trace / (α - 1)) (nhdsWithin 1 (Set.Ioi 0 \ {1})) (nhds ⟪ρ.M, ρ.M.log - σ.M.log⟫) := by
@@ -1747,7 +1874,7 @@ private theorem sandwichedRelRentropy.continuousAt_1 (ρ σ : MState d) :
       exact Real.toNNReal_of_nonneg _
   · apply tendsto_const_nhds.congr'
     filter_upwards [self_mem_nhdsWithin] with α hα
-    simp only [SandwichedRelRentropy, Set.mem_Ioi.mp hα, zero_lt_one, dif_neg h]
+    simp only [MState.sandwichedRelRentropy_eq_matrix, Set.mem_Ioi.mp hα, zero_lt_one, dif_neg h]
 
 @[fun_prop]
 theorem sandwichedRelRentropy.continuousOn (ρ σ : MState d) :
@@ -1765,7 +1892,7 @@ theorem sandwichedRelRentropy.continuousOn (ρ σ : MState d) :
 /-- Quantum relative entropy as `Tr[ρ (log ρ - log σ)]` when supports are contained. -/
 theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
     𝐃(ρ‖σ).toEReal = ⟪ρ.M, ρ.M.log - σ.M.log⟫ := by
-  simp [qRelativeEnt, SandwichedRelRentropy, h, EReal.coe_nnreal_eq_coe_real]
+  simp [qRelativeEnt, MState.sandwichedRelRentropy_eq_matrix, h, EReal.coe_nnreal_eq_coe_real]
 
 open Classical in
 theorem qRelativeEnt_eq_neg_Sᵥₙ_add (ρ σ : MState d) :
@@ -1774,7 +1901,7 @@ theorem qRelativeEnt_eq_neg_Sᵥₙ_add (ρ σ : MState d) :
   by_cases h : σ.M.ker ≤ ρ.M.ker
   · simp [h, Sᵥₙ_eq_neg_trace_log, qRelativeEnt_ker, inner_sub_right]
     rw [real_inner_comm, sub_eq_add_neg]
-  · simp [h, qRelativeEnt, SandwichedRelRentropy]
+  · simp [h, qRelativeEnt, MState.sandwichedRelRentropy_eq_matrix]
 
 /-- The quantum relative entropy is unchanged by `MState.relabel` -/
 @[simp]
@@ -1787,7 +1914,7 @@ theorem sandwichedRelRentropy_of_unique [Unique d] (ρ σ : MState d) :
     D̃_α(ρ‖σ) = 0 := by
   rcases Subsingleton.allEq ρ default
   rcases Subsingleton.allEq σ default
-  simp [SandwichedRelRentropy]
+  simp [MState.sandwichedRelRentropy_eq_matrix]
 
 @[simp]
 theorem qRelEntropy_of_unique [Unique d] (ρ σ : MState d) :
@@ -1807,7 +1934,6 @@ theorem sandwichedRelRentropy_heq_congr
   obtain ⟨_, rfl⟩ := hσ
   simp [← MState.relabel_cast _ hd]
 
-@[gcongr]
 theorem sandwichedRelRentropy_congr {α : ℝ}
       {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
       {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂)
@@ -1816,7 +1942,6 @@ theorem sandwichedRelRentropy_congr {α : ℝ}
   subst ρ₁ σ₁
   simp
 
-@[gcongr]
 theorem qRelEntropy_heq_congr {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
       {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂) (hρ : ρ₁ ≍ ρ₂) (hσ : σ₁ ≍ σ₂) :
     𝐃(ρ₁‖σ₁) = 𝐃(ρ₂‖σ₂) := by
@@ -2055,7 +2180,7 @@ carefully handling what happens with the kernel subspace, which will make this a
 -/
 @[fun_prop]
 theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous fun σ => 𝐃(ρ‖σ) := by
-  simp_rw [qRelativeEnt, SandwichedRelRentropy, if_true, lowerSemicontinuous_iff]
+  simp_rw [qRelativeEnt, MState.sandwichedRelRentropy_eq_matrix, if_true, lowerSemicontinuous_iff]
   simp only [zero_lt_one, ↓reduceDIte]
   intro x
   by_cases hx : x.M.ker ≤ ρ.M.ker
@@ -2263,7 +2388,7 @@ theorem qRelEntropy_le_add_of_le_smul (ρ : MState d) {σ₁ σ₂ : MState d} (
           simpa using hσ
         · positivity
       exact hker₁ (hker_le.trans hker)
-  · simp [hker, SandwichedRelRentropy, qRelativeEnt]
+  · simp [hker, MState.sandwichedRelRentropy_eq_matrix, qRelativeEnt]
 
 theorem qRelativeEnt_op_le {ρ σ : MState d} (h : ρ.M ≤ α • σ.M) :
     𝐃(ρ‖σ) ≤ .ofReal (Real.log α) := by

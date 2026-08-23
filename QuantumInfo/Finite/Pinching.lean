@@ -398,10 +398,5 @@ theorem pinching_pythagoras (ρ σ : MState d) :
     rw [h_eq₂, h_eq₁]
     simp only [EReal.coe_sub]
     rw [← add_sub_assoc, EReal.sub_add_cancel]
-  · simp only [qRelativeEnt, SandwichedRelRentropy, dif_pos zero_lt_one]
-    trans ⊤
-    · exact dif_neg h_ker
-    · convert (add_top _).symm
-      apply dif_neg ?_
-      contrapose! h_ker
-      exact h_ker.trans (pinching_map_ker_le ρ σ)
+  · rw [qRelativeEnt_eq_top h_ker,
+      qRelativeEnt_eq_top (fun hc ↦ h_ker (hc.trans (pinching_map_ker_le ρ σ))), add_top]

@@ -29,6 +29,8 @@ labelled copy of `EuclideanSpace 𝕜 ι`.
 * `StdBasis.toMatOf`: the ⋆-algebra equivalence `(E →L[𝕜] E) ≃⋆ₐ[𝕜] Matrix ι ι 𝕜` determined by an
   explicit orthonormal basis.
 * `StdBasis.toMat`: the same, using the preferred basis.
+* `StdBasis.toMatUnitary`, `StdBasis.unitaryOfMat`: the resulting bijection between unitary
+  operators on `E` and unitary matrices indexed by `ι`.
 * `StdBasis.changeOfBasis`: the unitary matrix relating the matrices of an operator in two
   different orthonormal bases.
 
@@ -157,6 +159,16 @@ This is deliberately not an instance, for the same reason as `StdBasis.reindex`.
 noncomputable def transport [StdBasis 𝕜 E ι] (f : E ≃ₗᵢ[𝕜] F) : StdBasis 𝕜 F ι :=
   ⟨(stdBasis (𝕜 := 𝕜) (E := E)).map f⟩
 
+/-- An arbitrary preferred basis on a finite-dimensional space, indexed by `Fin (finrank 𝕜 E)`.
+
+This is deliberately not an instance: a space that already has a preferred basis must not silently
+acquire a second one. It is meant to be introduced locally (`let _ := StdBasis.some 𝕜 E`) inside
+the proof of a basis-free statement, so that the statement can be discharged by its matrix
+analogue. -/
+noncomputable def some (𝕜 E : Type*) [RCLike 𝕜] [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+    [FiniteDimensional 𝕜 E] : StdBasis 𝕜 E (Fin (Module.finrank 𝕜 E)) :=
+  ⟨stdOrthonormalBasis 𝕜 E⟩
+
 end Instances
 
 section ToMat
@@ -226,6 +238,44 @@ theorem toMatOf_symm_reindex (b : OrthonormalBasis ι 𝕜 E) [Fintype κ] [Deci
   rw [StarAlgEquiv.apply_symm_apply, toMatOf_reindex, StarAlgEquiv.apply_symm_apply]
   ext i j
   simp
+
+section Unitary
+
+omit [FiniteDimensional 𝕜 E]
+
+variable [StdBasis 𝕜 E ι]
+
+/-- The matrix of a unitary operator in the preferred basis, as a unitary matrix. -/
+noncomputable def toMatUnitary (U : unitary (E →L[𝕜] E)) : Matrix.unitaryGroup ι 𝕜 :=
+  ⟨toMat 𝕜 E ι U.val,
+    ⟨by rw [← map_star, ← map_mul, U.2.1, map_one], by rw [← map_star, ← map_mul, U.2.2, map_one]⟩⟩
+
+@[simp]
+theorem toMatUnitary_coe (U : unitary (E →L[𝕜] E)) :
+    (toMatUnitary (ι := ι) U : Matrix ι ι 𝕜) = toMat 𝕜 E ι U.val :=
+  rfl
+
+/-- The unitary operator whose matrix in the preferred basis is a given unitary matrix. -/
+noncomputable def unitaryOfMat (U : Matrix.unitaryGroup ι 𝕜) : unitary (E →L[𝕜] E) :=
+  ⟨(toMat 𝕜 E ι).symm U.val,
+    ⟨by rw [← map_star, ← map_mul, U.2.1, map_one], by rw [← map_star, ← map_mul, U.2.2, map_one]⟩⟩
+
+@[simp]
+theorem unitaryOfMat_coe (U : Matrix.unitaryGroup ι 𝕜) :
+    (unitaryOfMat (E := E) U : E →L[𝕜] E) = (toMat 𝕜 E ι).symm U.val :=
+  rfl
+
+@[simp]
+theorem toMatUnitary_unitaryOfMat (U : Matrix.unitaryGroup ι 𝕜) :
+    toMatUnitary (E := E) (ι := ι) (unitaryOfMat U) = U :=
+  Subtype.ext <| by simp
+
+@[simp]
+theorem unitaryOfMat_toMatUnitary (U : unitary (E →L[𝕜] E)) :
+    unitaryOfMat (toMatUnitary (ι := ι) U) = U :=
+  Subtype.ext <| by simp
+
+end Unitary
 
 end ToMat
 

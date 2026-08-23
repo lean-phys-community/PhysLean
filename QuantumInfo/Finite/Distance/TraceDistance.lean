@@ -16,27 +16,38 @@ open Kronecker
 open scoped Matrix ComplexOrder
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+variable [FiniteDimensional ℂ E]
 
-/--The trace distance between two quantum states: half the trace norm of the difference (ρ - σ). -/
-def TrDistance (ρ σ : MState d) : ℝ :=
-  (1/2:ℝ) * (ρ.m - σ.m).traceNorm
+/-- The trace distance between two quantum states: half the trace norm of the difference (ρ - σ).
+
+This makes no reference to a basis; `TrDistance_eq_matrix_traceNorm` is the matrix analogue. -/
+def TrDistance (ρ σ : DensityOp E) : ℝ :=
+  (1/2 : ℝ) * (ρ.op - σ.op).traceNorm
 
 namespace TrDistance
 
-variable {d d₂ : Type*} [Fintype d] [Fintype d₂] (ρ σ : MState d)
+variable (ρ σ : DensityOp E)
 
-theorem ge_zero : 0 ≤ TrDistance ρ σ := by
+/-- **Matrix analogue of `TrDistance`**: half the trace norm of the difference of the density
+matrices in the preferred basis. -/
+theorem eq_matrix_traceNorm {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] :
+    TrDistance ρ σ = (1/2 : ℝ) * Matrix.traceNorm (ρ.m - σ.m : Matrix ι ι ℂ) := by
+  rw [TrDistance, HermitianOp.traceNorm_toMat (ι := ι), HermitianOp.toMat_sub]
+  rfl
+
+theorem ge_zero : 0 ≤ TrDistance ρ σ :=
+  mul_nonneg (by norm_num) (HermitianOp.traceNorm_nonneg _)
+
+/-- A density operator has unit trace norm. -/
+theorem traceNorm_op (ρ : DensityOp E) : ρ.op.traceNorm = 1 := by
+  rw [HermitianOp.traceNorm_of_nonneg ρ.op_nonneg, ρ.op_trace]
+
+theorem le_one : TrDistance ρ σ ≤ 1 := by
+  have h := HermitianOp.traceNorm_sub_le ρ.op σ.op
+  rw [traceNorm_op, traceNorm_op] at h
   rw [TrDistance]
-  simp [Matrix.traceNorm_nonneg]
-
-theorem le_one : TrDistance ρ σ ≤ 1 :=
-  calc TrDistance ρ σ
-    _ = (1/2:ℝ) * (ρ.m - σ.m).traceNorm := by rfl
-    _ ≤ (1/2:ℝ) * (ρ.m.traceNorm + σ.m.traceNorm) := by
-      linarith [Matrix.traceNorm_triangleIneq' ρ.m σ.m]
-    _ = (1/2:ℝ) * (1 + 1) := by
-      rw [ρ.traceNorm_eq_1, σ.traceNorm_eq_1]
-    _ = 1 := by norm_num
+  linarith
 
 /-- The trace distance, as a `Prob` probability with value between 0 and 1. -/
 def prob : Prob :=
@@ -44,13 +55,14 @@ def prob : Prob :=
 
 /-- The trace distance is a symmetric quantity. -/
 theorem symm : TrDistance ρ σ = TrDistance σ ρ := by
-  dsimp [TrDistance]
-  rw [← Matrix.traceNorm_eq_neg_self, neg_sub]
+  rw [TrDistance, TrDistance, ← HermitianOp.traceNorm_neg (ρ.op - σ.op), neg_sub]
 
-/-- The trace distance is equal to half the 1-norm of the eigenvalues of their difference . -/
-theorem eq_abs_eigenvalues : TrDistance ρ σ = (1/2:ℝ) *
+/-- The trace distance is equal to half the 1-norm of the eigenvalues of their difference. -/
+theorem eq_abs_eigenvalues (ρ σ : MState d) : TrDistance ρ σ = (1/2 : ℝ) *
     ∑ i, abs ((ρ.Hermitian.sub σ.Hermitian).eigenvalues i) := by
-  rw [TrDistance, Matrix.traceNorm_Hermitian_eq_sum_abs_eigenvalues]
+  rw [eq_matrix_traceNorm (ι := d),
+    Matrix.traceNorm_Hermitian_eq_sum_abs_eigenvalues (ρ.Hermitian.sub σ.Hermitian)]
+  congr!
 
 -- Fuchs–van de Graaf inequalities
 -- Relation to classical TV distance
