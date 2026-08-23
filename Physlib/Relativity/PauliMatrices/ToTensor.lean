@@ -160,26 +160,35 @@ lemma toTensor_eq_asConsTensor :
   simp only [fromTripleT_apply_basis]
   rfl
 
+/-- Rational-complex components of the contravariant Pauli four-vector. -/
+def pauliContrComponent (mu : Fin 4) (a b : Fin 2) : Physlib.RatComplexNum :=
+  if mu.val = 0 ∧ a.val = b.val then ⟨1, 0⟩ else
+  if mu.val = 1 ∧ a.val ≠ b.val then ⟨1, 0⟩ else
+  if mu.val = 2 ∧ a.val = 0 ∧ b.val = 1 then ⟨0, -1⟩ else
+  if mu.val = 2 ∧ a.val = 1 ∧ b.val = 0 then ⟨0, 1⟩ else
+  if mu.val = 3 ∧ a.val = 0 ∧ b.val = 0 then ⟨1, 0⟩ else
+  if mu.val = 3 ∧ a.val = 1 ∧ b.val = 1 then ⟨-1, 0⟩ else 0
+
+/-- Rational-complex components of the contravariant conjugate Pauli four-vector. -/
+def pauliContrDownComponent (mu : Fin 4) (a b : Fin 2) : Physlib.RatComplexNum :=
+  if mu.val = 0 ∧ a.val = b.val then ⟨1, 0⟩ else
+  if mu.val = 1 ∧ a.val ≠ b.val then ⟨-1, 0⟩ else
+  if mu.val = 2 ∧ a.val = 0 ∧ b.val = 1 then ⟨0, 1⟩ else
+  if mu.val = 2 ∧ a.val = 1 ∧ b.val = 0 then ⟨0, -1⟩ else
+  if mu.val = 3 ∧ a.val = 0 ∧ b.val = 0 then ⟨-1, 0⟩ else
+  if mu.val = 3 ∧ a.val = 1 ∧ b.val = 1 then ⟨1, 0⟩ else 0
+
 set_option backward.isDefEq.respectTransparency false in
 lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>
-    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else 0) := by
+    pauliContrComponent (b 0) (b 1) (b 2)) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [toTensor_basis_expand]
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, cons_val_zero, cons_val_one]
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue]
   repeat rw [basis_eq_ofRat]
   simp only [Fin.isValue, map_sub, map_add, _root_.map_smul, Finsupp.coe_sub, Finsupp.coe_add,
     Finsupp.coe_smul, Pi.sub_apply, Pi.add_apply, ofRat_basis_repr_apply, Pi.smul_apply,
-    smul_eq_mul, Physlib.RatComplexNum.I_mul_toComplexNum, mul_ite, ne_eq, cons_val_two,
+    smul_eq_mul, Physlib.RatComplexNum.I_mul_toComplexNum, mul_ite,
     Nat.succ_eq_add_one, Nat.reduceAdd]
   simp only [Fin.isValue, ← map_add, ← map_sub]
   apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
@@ -233,16 +242,7 @@ open Lorentz
 
 set_option backward.isDefEq.respectTransparency false in
 lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
-    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
+    pauliContrDownComponent (b 0) (b 1) (b 2)) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliCo]
@@ -263,16 +263,7 @@ lemma pauliCo_eq_ofRat : pauliCo = ofRat (fun b =>
 
 set_option backward.isDefEq.respectTransparency false in
 lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
-    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨1, 0⟩ else ⟨0, 0⟩) := by
+    pauliContrComponent (b 0) (b 1) (b 2)) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliCoDown]
@@ -305,16 +296,7 @@ lemma pauliCoDown_eq_ofRat : pauliCoDown = ofRat (fun b =>
 
 set_option backward.isDefEq.respectTransparency false in
 lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
-    if b 0 = Fin.cast (by rfl) (0 : Fin 4) ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (1 : Fin 4) ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨0, 1⟩ else
-    if b 0 = Fin.cast (by rfl) (2 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨0, -1⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (1 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (1 : Fin 2) then ⟨1, 0⟩ else
-    if b 0 = Fin.cast (by rfl) (3 : Fin 4) ∧ b 1 = Fin.cast (by rfl) (0 : Fin 2) ∧
-      b 2 = Fin.cast (by rfl) (0 : Fin 2) then ⟨-1, 0⟩ else 0) := by
+    pauliContrDownComponent (b 0) (b 1) (b 2)) := by
   apply (Tensor.basis _).repr.injective
   ext b
   rw [pauliContrDown]
@@ -344,6 +326,87 @@ lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
   apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
   revert b
   decide +kernel
+
+/-!
+
+## Index dualization
+
+-/
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Lowering the Lorentz index of `σ^^^` with `τ` gives `σ_^^`. -/
+lemma pauliDual_eq_pauliCo :
+    ({σ^^^ | τ(μ) α β = σ_^^ | μ α β}ᵀ : Prop) := by
+  let h : IsReindexing ![Color.down, Color.upL, Color.upR]
+      (Function.update ![Color.up, Color.upL, Color.upR] 0
+        (![Color.down, Color.down] (Fin.succAbove 0 0))) id :=
+    IsReindexing.auto
+  have hDual :
+      (toDualMapAtIndex (S := complexLorentzTensor) 0) σ^^^ =
+        permT (id : Fin 3 → Fin 3) h pauliCo := by
+    change (toDualMapAtIndex (S := complexLorentzTensor) 0) σ^^^ = permT id h pauliCo
+    conv_lhs =>
+      rw [toTensor_eq_ofRat]
+      rw [toDualMapAtIndex]
+      change crossToSlot (S := complexLorentzTensor) 0 0 rfl η' (ofRat _)
+      rw [crossToSlot_eq_crossToEnd, crossToEnd]
+      simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
+      rw [coMetric_eq_ofRat]
+      rw [prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat, permT_ofRat, permT_ofRat]
+    conv_rhs =>
+      rw [pauliCo_eq_ofRat]
+    apply (Tensor.basis _).repr.injective
+    ext b
+    conv_rhs =>
+      rw [permT_basis_repr_symm_apply h]
+      rw [ofRat_basis_repr_apply]
+    conv_lhs =>
+      rw [ofRat_basis_repr_apply]
+    apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
+    revert b
+    decide +kernel
+  rw [hDual]
+  apply permT_congr
+  · decide
+  · rfl
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Lowering the Lorentz index of `σ^__` with `τ` gives `σ___`. -/
+lemma pauliContrDownDual_eq_pauliCoDown :
+    ({σ^__ | τ(μ) β α = σ___ | μ β α}ᵀ : Prop) := by
+  let h : IsReindexing ![Color.down, Color.downR, Color.downL]
+      (Function.update ![Color.up, Color.downR, Color.downL] 0
+        (![Color.down, Color.down] (Fin.succAbove 0 0))) id :=
+    IsReindexing.auto
+  have hDual :
+      (toDualMapAtIndex (S := complexLorentzTensor) 0) pauliContrDown =
+        permT (id : Fin 3 → Fin 3) h pauliCoDown := by
+    change (toDualMapAtIndex (S := complexLorentzTensor) 0) pauliContrDown =
+      permT id h pauliCoDown
+    conv_lhs =>
+      rw [pauliContrDown_ofRat]
+      rw [toDualMapAtIndex]
+      change crossToSlot (S := complexLorentzTensor) 0 0 rfl η' (ofRat _)
+      rw [crossToSlot_eq_crossToEnd, crossToEnd]
+      simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
+      rw [coMetric_eq_ofRat]
+      rw [prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat, permT_ofRat, permT_ofRat]
+    conv_rhs =>
+      rw [pauliCoDown_eq_ofRat]
+    apply (Tensor.basis _).repr.injective
+    ext b
+    conv_rhs =>
+      rw [permT_basis_repr_symm_apply h]
+      rw [ofRat_basis_repr_apply]
+    conv_lhs =>
+      rw [ofRat_basis_repr_apply]
+    apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
+    revert b
+    decide +kernel
+  rw [hDual]
+  apply permT_congr
+  · decide
+  · rfl
 
 /-!
 
