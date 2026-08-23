@@ -1077,10 +1077,18 @@ private theorem EquationS88 (ρ : MState (H i)) (σ : (n : ℕ) → ↑IsFree) {
   repeat rw [ENNReal.toReal_ofReal (by positivity)]
   ring
 
+/-- Two shifts of `A` by real multiples of `B` commute, as long as `A` and `B` do. -/
+private theorem commute_sub_smul_sub {α : Type*} [Fintype α] [DecidableEq α]
+    {A B : Matrix α α ℂ} (h : Commute A B) (a b : ℝ) :
+    Commute (A - a • B) (A - b • B) :=
+  Commute.sub_left
+    (Commute.sub_right (Commute.refl A) (h.smul_right b))
+    (Commute.sub_right (h.symm.smul_left a) (((Commute.refl B).smul_left a).smul_right b))
+
 set_option maxHeartbeats 2000000 in
 private theorem EquationS62
     (ρ : MState (H i)) (σ : (n : ℕ) → IsFree (i := i ^ n))
-    {ε ε' : Prob} (hε'₁ : 0 < ε') (hε'₂ : ε' < ε) (hε : ε < 1)
+    {ε ε' : Prob} (hε : ε < 1)
     (hR1R2 : R1 ρ ε < R2 ρ σ) (hR1 : R1 ρ ε ≠ ⊤) (hR2 : R2 ρ σ ≠ ⊤)
     (hε₀ : 0 < ε₀_func ρ ε σ ε') (hε₀' : (R1 ρ ε).toReal ≤ (R2 ρ σ).toReal + ε₀_func ρ ε σ ε')
     (m : ℕ) (hm : m ≥ 1 ∧ 𝐃(ρ ⊗ᵣ^[m]‖↑(σ m)) / ↑m < R2 ρ σ + (.ofNNReal ⟨ε₀_func ρ ε σ ε', hε₀.le⟩))
@@ -1156,14 +1164,7 @@ private theorem EquationS62
   have hEComm ε2 n : Commute (((ℰ n) (ρ ⊗ᵣ^[n])).M - Real.exp ((n : ℝ) * ((R2 ρ σ).toReal + ε₀ + ε2)) • (σ'' ρ ε m σ n).M).mat
       (((ℰ n) (ρ ⊗ᵣ^[n])).M - Real.exp ((n : ℝ) * ((R1 ρ ε).toReal + ε2)) • (σ'' ρ ε m σ n).M).mat := by
     simp only [HermitianMat.mat_sub, DensityOp.mat_M, HermitianMat.mat_smul]
-    suffices h : Commute (ℰ n (ρ ⊗ᵣ^[n])).m (σ'' ρ ε m σ n).m by
-      apply Commute.sub_left
-      · commutes
-      · apply Commute.smul_left
-        apply Commute.sub_right
-        · exact Commute.symm ‹_›
-        · commutes
-    exact pinching_commutes (ρ ⊗ᵣ^[n]) (σ'' ρ ε m σ n)
+    exact commute_sub_smul_sub (pinching_commutes (ρ ⊗ᵣ^[n]) (σ'' ρ ε m σ n)) _ _
 
   have hPcomm ε2 n : Commute (P1 ε2 n).mat (P2 ε2 n).mat := by
     simp only [HermitianMat.projLE, HermitianMat.mat_cfc, P1, P2]
@@ -1275,7 +1276,7 @@ private theorem EquationS62
           rw [← HermitianMat.val_eq_coe, ← HermitianMat.val_eq_coe]
           rw [Subtype.coe_le_coe, HermitianMat.cfc_nonneg_iff (ℰ n (ρ ⊗ᵣ^[n])).M (-Real.log)]
           intro i
-          simp
+          simp only [Pi.neg_apply, neg_nonneg]
           apply Real.log_nonpos
           · apply DensityOp.eigenvalue_nonneg _
           · apply DensityOp.eigenvalue_le_one
@@ -1744,7 +1745,7 @@ private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1)
   -- conditions, nonzeroness, etc.) get S62, prove S61, and the conclusion is just `rw [S61] at S62`.
 
   --First deal with the easy case of R1 = R2.
-  intro hR1R2 ε' ⟨hε'₁, hε'₂⟩
+  intro hR1R2 ε' ⟨_, hε'₂⟩
   rw [ge_iff_le, le_iff_lt_or_eq, or_comm] at hR1R2
   rcases hR1R2 with hR1R2|hR1R2
   · use σ
@@ -1927,7 +1928,7 @@ private theorem Lemma7 (ρ : MState (H i)) {ε : Prob} (hε : 0 < ε ∧ ε < 1)
 
   use fun n ↦ ⟨σ' ρ ε m σ n, σ'_free ρ ε m σ n⟩
   rw [R2, hliminf]
-  exact EquationS62 ρ σ hε'₁ hε'₂ hε.2 hR1R2 hR1 hR2 hε₀ hε₀' m hm
+  exact EquationS62 ρ σ hε.2 hR1R2 hR1 hR2 hε₀ hε₀' m hm
 
 /-- Lemma 7 gives us a way to repeatedly "improve" a sequence σ to one with a smaller gap between R2 and R1.
 The paper paints this as pretty much immediate from Lemma7, but we need to handle the case where R2 is below

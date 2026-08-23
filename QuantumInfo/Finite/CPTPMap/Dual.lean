@@ -291,14 +291,18 @@ theorem dual_dual : M.dual.dual = M := by
 
 end MatrixMap
 
-namespace CPTPMap
+namespace CPTPOp
 
 variable [DecidableEq dIn] [DecidableEq dOut]
 
-def dual (M : CPTPMap dIn dOut) : CPUMap dOut dIn where
-  toLinearMap := M.map.dual
-  unital := M.TP.dual
-  cp := .dual M.cp
+/-- The dual (adjoint) of a channel, as a completely positive unital map. -/
+def dual (M : CPTPMap dIn dOut) : CPUMap dOut dIn :=
+  CPUOp.ofMat M.map.dual (.dual M.map_cp) (M.map_TP.dual)
+
+/-- **Matrix analogue of the dual channel**: its matrix is the dual of the matrix. -/
+@[simp]
+theorem dual_map (M : CPTPMap dIn dOut) : M.dual.map = M.map.dual :=
+  CPUOp.map_ofMat _ _ _
 
 theorem dual_pos (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T) :
     0 ≤ M.dual T := by
@@ -315,20 +319,27 @@ theorem dual.PTP_POVM (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0
 
 /-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
 theorem exp_val_Dual (ℰ : CPTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
-    (ℰ ρ).exp_val T  = ρ.exp_val (ℰ.dual T) := by
-  have hm : (ℰ ρ).m = ℰ.map ρ.m :=
-    congrArg HermitianMat.mat (PTPMap.M_apply_MState ℰ.toPTPMap ρ)
+    MState.exp_val (ℰ ρ) T = ρ.exp_val (ℰ.dual T) := by
+  have hm : (ℰ ρ : MState dOut).m = ℰ.map ρ.m :=
+    congrArg HermitianMat.mat (PTPOp.M_apply_MState ℰ.toPTPOp ρ)
+  have hT : (ℰ.dual T : HermitianMat dIn ℂ).mat = ℰ.map.dual T.mat := by
+    rw [show (ℰ.dual T : HermitianMat dIn ℂ).mat = ℰ.dual.map T.mat from rfl, dual_map]
   simp only [MState.exp_val, HermitianMat.inner_eq_re_trace, RCLike.re_to_complex,
-    DensityOp.mat_M, hm]
+    DensityOp.mat_M, hm, hT]
   congr 1
   apply MatrixMap.Dual.trace_eq
 
-end CPTPMap
+end CPTPOp
 
 section hermDual
 
+variable [DecidableEq dIn] [DecidableEq dOut]
+
 --PULLOUT to Bundled.lean. Also use this to improve the definitions in POVM.lean.
-def HPMap.ofHermitianMat {dOut : Type*} (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) : HPMap dIn dOut where
+/-- The `ℂ`-linear extension of an `ℝ`-linear map of Hermitian matrices, obtained by splitting
+the input into its real and imaginary parts. -/
+def MatrixMap.ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
+    MatrixMap dIn dOut ℂ where
   toFun x := f (realPart x) + Complex.I • f (imaginaryPart x)
   map_add' x y := by
     simp only [map_add, HermitianMat.mat_add, smul_add]
@@ -357,32 +368,46 @@ def HPMap.ofHermitianMat {dOut : Type*} (f : HermitianMat dIn ℂ →ₗ[ℝ] He
       Complex.mul_im, add_zero, one_mul, zero_sub, neg_add_rev, zero_add, Complex.sub_im]
     ring_nf
     simp
-  HP _ h := by
-    apply Matrix.IsHermitian.add
-    · apply HermitianMat.H
-    · simp [IsSelfAdjoint.imaginaryPart h]
+
+omit [Fintype dIn] [Fintype dOut] in
+/-- The `ℂ`-linear extension of a map of Hermitian matrices is Hermitian-preserving. -/
+theorem MatrixMap.isHermitianPreserving_ofHermitianMat
+    (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
+    (MatrixMap.ofHermitianMat f).IsHermitianPreserving := fun _ h ↦ by
+  apply Matrix.IsHermitian.add
+  · apply HermitianMat.H
+  · simp [IsSelfAdjoint.imaginaryPart h]
+
+/-- The Hermitian-preserving map extending an `ℝ`-linear map of Hermitian matrices. -/
+def HPOp.ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) : HPMap dIn dOut :=
+  HPOp.ofMat (MatrixMap.ofHermitianMat f) (MatrixMap.isHermitianPreserving_ofHermitianMat f)
+
+/-- **Matrix analogue of `HPOp.ofHermitianMat`**. -/
+@[simp]
+theorem HPOp.map_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
+    (HPOp.ofHermitianMat f).map = MatrixMap.ofHermitianMat f :=
+  HPOp.map_ofMat _ _
 
 --PULLOUT
 @[simp]
-theorem HPMap.linearMap_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
-    LinearMapClass.linearMap (HPMap.ofHermitianMat f) = f := by
+theorem HPOp.linearMap_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
+    LinearMapClass.linearMap (HPOp.ofHermitianMat f) = f := by
   ext1 ⟨x, hx⟩
   ext1
-  simp only [ofHermitianMat, LinearMap.coe_coe]
-  simp only [HPMap.instFunLike, HPMap.map, HermitianMat.mat_mk,
-    LinearMap.coe_mk, AddHom.coe_mk]
+  simp only [LinearMap.coe_coe, HPOp.mat_apply, HPOp.map_ofHermitianMat,
+    MatrixMap.ofHermitianMat, HermitianMat.mat_mk, LinearMap.coe_mk, AddHom.coe_mk]
   conv => enter [2, 1, 2, 1]; rw [← realPart_add_I_smul_imaginaryPart x]
   suffices imaginaryPart x = 0 by simp [this]
   simp [imaginaryPart, skewAdjoint.negISMul, show star x = x from hx]
 
 --PULLOUT
-omit [Fintype dOut] in
 @[simp]
-theorem HPMap.ofHermitianMat_linearMap (f : HPMap dIn dOut ℂ) :
+theorem HPOp.ofHermitianMat_linearMap (f : HPMap dIn dOut) :
     ofHermitianMat (LinearMapClass.linearMap f) = f := by
-  ext : 3
-  simp only [map, ofHermitianMat, instFunLike, LinearMap.coe_coe, HermitianMat.val_eq_coe,
-    HermitianMat.mat_mk, LinearMap.coe_mk, AddHom.coe_mk,
+  apply HPOp.ext_map (ι := dIn) (κ := dOut)
+  ext x i j
+  simp only [map_ofHermitianMat, MatrixMap.ofHermitianMat, instFunLike, LinearMap.coe_coe,
+    HermitianMat.val_eq_coe, HermitianMat.mat_mk, LinearMap.coe_mk, AddHom.coe_mk,
     ← map_smul, ← map_add]
   simp only [map_add, map_smul, realPart, imaginaryPart, LinearMap.coe_comp, Function.comp_apply]
   simp only [selfAdjointPart,  LinearMap.coe_mk, AddHom.coe_mk,
@@ -398,25 +423,25 @@ variable (f : HPMap dIn dOut) (A : HermitianMat dIn ℂ)
 --Can define one for HPMap's that has 'easier' definitional properties, uses the inner product structure,
 --doesn't go through Module.Basis the same way. Requires the equivalence between ℝ-linear maps of HermitianMats
 --and ℂ-linear maps of matrices.
-def HPMap.hermDual : HPMap dOut dIn :=
-  HPMap.ofHermitianMat (LinearMapClass.linearMap f).adjoint
+def HPOp.hermDual : HPMap dOut dIn :=
+  HPOp.ofHermitianMat (LinearMapClass.linearMap f).adjoint
 
 @[simp]
-theorem HPMap.hermDual_hermDual : f.hermDual.hermDual = f := by
+theorem HPOp.hermDual_hermDual : f.hermDual.hermDual = f := by
   simp [hermDual]
 
 open RealInnerProductSpace
 
 /-- The defining property of a dual map: inner products are preserved on the opposite argument. -/
-theorem HPMap.inner_hermDual (B : HermitianMat dOut ℂ) :
+theorem HPOp.inner_hermDual (B : HermitianMat dOut ℂ) :
     ⟪f A, B⟫ = ⟪A, f.hermDual B⟫ := by
   change ⟪(LinearMapClass.linearMap f) A, B⟫ = ⟪A, (LinearMapClass.linearMap f.hermDual) B⟫
-  rw [hermDual, ← LinearMap.adjoint_inner_right, HPMap.linearMap_ofHermitianMat]
+  rw [hermDual, ← LinearMap.adjoint_inner_right, HPOp.linearMap_ofHermitianMat]
 
-/-- Version of `HPMap.inner_hermDual` that uses HermitiaMat.inner directly. TODO cleanup -/
-theorem HPMap.inner_hermDual' (B : HermitianMat dOut ℂ) :
+/-- Version of `HPOp.inner_hermDual` that uses HermitiaMat.inner directly. TODO cleanup -/
+theorem HPOp.inner_hermDual' (B : HermitianMat dOut ℂ) :
     ⟪f A, B⟫ = ⟪A, f.hermDual B⟫ :=
-  HPMap.inner_hermDual f A B
+  HPOp.inner_hermDual f A B
 
 /-- The dual of a `IsPositive` map also `IsPositive`. -/
 theorem MatrixMap.IsPositive.hermDual (h : MatrixMap.IsPositive f.map) : f.hermDual.map.IsPositive := by
@@ -433,11 +458,11 @@ theorem MatrixMap.IsPositive.hermDual (h : MatrixMap.IsPositive f.map) : f.hermD
   specialize h hy
   change Matrix.PosSemidef (f y).mat at h
   rw [← HermitianMat.zero_le_iff] at h
-  rw [HPMap.inner_hermDual, HPMap.hermDual_hermDual]
+  rw [HPOp.inner_hermDual, HPOp.hermDual_hermDual]
   apply HermitianMat.inner_ge_zero hx h
 
 /-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
-theorem HPMap.hermDual_Unital [DecidableEq dIn] [DecidableEq dOut] (h : MatrixMap.IsTracePreserving f.map) :
+theorem HPOp.hermDual_Unital (h : MatrixMap.IsTracePreserving f.map) :
     f.hermDual.map.Unital := by
   suffices f.hermDual 1 = 1 by --todo: make this is an accessible 'constructor' for Unital
     rw [HermitianMat.ext_iff] at this
@@ -445,20 +470,19 @@ theorem HPMap.hermDual_Unital [DecidableEq dIn] [DecidableEq dOut] (h : MatrixMa
   open RealInnerProductSpace in
   apply ext_inner_left ℝ
   intro v
-  rw [← HPMap.inner_hermDual]
+  rw [← HPOp.inner_hermDual]
   rw [HermitianMat.inner_one, HermitianMat.inner_one] --TODO change to Inner.inner
   exact congr(Complex.re $(h v)) --TODO: HPMap with IsTracePreserving give the HermitianMat.trace version
 
-alias MatrixMap.IsTracePreserving.hermDual := HPMap.hermDual_Unital
+alias MatrixMap.IsTracePreserving.hermDual := HPOp.hermDual_Unital
 
-namespace PTPMap
+namespace PTPOp
 
-variable [DecidableEq dIn] [DecidableEq dOut]
-
+/-- The dual (adjoint) of a positive trace-preserving map, as a positive unital map. -/
 def hermDual (M : PTPMap dIn dOut) : PUMap dOut dIn where
-  toHPMap := M.toHPMap.hermDual
-  pos := M.pos.hermDual
-  unital := M.TP.hermDual
+  toHPOp := M.toHPOp.hermDual
+  pos := (OpMap.isPositive_toMat_iff (ι := dOut) (κ := dIn) _).mp M.map_pos.hermDual
+  unital := (OpMap.unital_toMat_iff (ι := dOut) (κ := dIn) _).mp M.map_TP.hermDual
 
 theorem hermDual_pos (M : PTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T) :
     0 ≤ M.hermDual T := by
@@ -475,10 +499,10 @@ theorem hermDual.PTP_POVM (M : PTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT 
 
 /-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
 theorem exp_val_hermDual (ℰ : PTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
-    (ℰ ρ).exp_val T  = ρ.exp_val (ℰ.hermDual T) := by
-  simp only [MState.exp_val, PTPMap.M_apply_MState]
-  apply HPMap.inner_hermDual'
+    MState.exp_val (ℰ ρ) T = ρ.exp_val (ℰ.hermDual T) := by
+  simp only [MState.exp_val, PTPOp.M_apply_MState]
+  apply HPOp.inner_hermDual'
 
-end PTPMap
+end PTPOp
 
 end hermDual

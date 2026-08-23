@@ -1,7 +1,7 @@
 # `StdBasis` refactor: scoping, design, and migration plan
 
-Status of this document: Stages 0–2 have landed and the whole of `QuantumInfo` builds green with
-zero errors and zero warnings.
+Status of this document: Stages 0–2 and Stage 5 have landed and the whole of `QuantumInfo` builds
+green with zero errors and zero warnings.
 
 * **Stage 0** — `QuantumInfo/ForMathlib/StdBasis.lean` and `QuantumInfo/Finite/StdBasisState.lean`.
 * **Stage 1 (partial)** — `QuantumInfo/ForMathlib/HermitianOp.lean` defines
@@ -16,9 +16,34 @@ zero errors and zero warnings.
   the operator-level one. `Braket.lean` has *not* been migrated: `Ket`/`Bra` are still functions
   `d → ℂ`.
 
-Downstream files (`CPTPMap/*`, `Entropy/*`, `Distance/*`, `Ensemble`, `POVM`, `Entanglement`,
-`Pinching`, `ResourceTheory/*`) have been repaired against the new `DensityOp` API but not yet
-migrated to operator form; they still speak in matrices via `ρ.M`. Stages 3–7 below are unstarted.
+* **Stage 5** — `CPTPMap/OpMap.lean` defines `OpMap E F := (E →L[ℂ] E) →ₗ[ℂ] (F →L[ℂ] F)` with
+  `OpMap.toMat`/`OpMap.ofMat` as the bridge to `MatrixMap`, and `CPTPMap/Bundled.lean` carries the
+  nine-structure hierarchy `HPOp/UnitalOp/TPOp/POp/CPOp/PTPOp/PUOp/CPTPOp/CPUOp` at the operator
+  level, with `abbrev CPTPMap dIn dOut := CPTPOp (EuclideanSpace ℂ dIn) (EuclideanSpace ℂ dOut)`
+  (and likewise for the other eight). Every channel constructed from a matrix presentation —
+  `of_kraus`, `ofUnitary`, `traceLeft`/`traceRight`, `assoc`, `piProd`, `replacement`, … — is
+  `<Class>Op.ofMat <matrixmap> <proofs>` together with a `@[simp]` "matrix analogue" lemma
+  `X_map : X.map = <matrixmap>`. Choi matrices and Kraus decompositions stay matrix-side, as
+  planned in §4 Stage 5.
+
+Remaining downstream files (`Entropy/*`, `Distance/*`, `Ensemble`, `POVM`, `Entanglement`,
+`Pinching`, `ResourceTheory/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not
+yet migrated to operator form; they still speak in matrices via `ρ.M`. Stages 3, 4, 6 and 7 below
+are unstarted.
+
+### Known ergonomic wart: dot notation through the `MState`/`CPTPMap` abbreviations
+
+`MState d` is an `abbrev` for `DensityOp (EuclideanSpace ℂ d)`, and dot notation `x.foo` resolves on
+the *inferred* head constant of `x`'s type. A channel application `Λ ρ` has inferred type
+`DensityOp (EuclideanSpace ℂ dOut)`, so `(Λ ρ).exp_val T` fails with "the environment does not
+contain `DensityOp.exp_val`" for any lemma that lives in the `MState` namespace. A type ascription
+`(Λ ρ : MState dOut).exp_val` does **not** help — the ascription is erased before resolution. The
+two things that do work are a *binder* annotation (`∀ ρ : MState d, …`, since binder types are
+stored un-unfolded) and the fully qualified name (`MState.exp_val (Λ ρ) T`).
+
+The fix is to move `MState`'s basis-free API into the `DensityOp` namespace, since dot notation
+retries after unfolding reducible definitions; `MState.*` names that are genuinely basis-dependent
+(`ofClassical`, `uniform`, `spectrum`, `relabel`) should stay put.
 
 ---
 

@@ -80,7 +80,7 @@ def qMutualInfo (ρ : MState (dA × dB)) : ℝ :=
   entropy of the image under Λ of the purification of ρ. -/
 def coherentInfo (ρ : MState d₁) (Λ : CPTPMap d₁ d₂) : ℝ :=
   let ρPure : MState (d₁ × d₁) := MState.pure ρ.purify
-  let ρImg : MState (d₂ × d₁) := Λ.prod (CPTPMap.id (dIn := d₁)) ρPure
+  let ρImg : MState (d₂ × d₁) := Λ.prod (CPTPOp.id (dIn := d₁)) ρPure
   (- qConditionalEnt ρImg)
 
 /-- The Quantum Conditional Mutual Information, I(A;C|B) = S(A|B) - S(A|BC). -/

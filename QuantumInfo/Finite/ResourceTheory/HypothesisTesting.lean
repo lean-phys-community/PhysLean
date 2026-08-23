@@ -311,14 +311,14 @@ theorem optimalHypothesisRate_antitone (ρ σ : MState d) (ℰ : CPTPMap d d₂)
     β_ ε(ρ‖{σ}) ≤ β_ ε(ℰ ρ‖{ℰ σ}) := by
   simp only [of_singleton]
   obtain ⟨ℰdualSubtype, h⟩ :
-      ∃ e : ({ m : HermitianMat d₂ ℂ // (ℰ ρ).exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1} →
+      ∃ e : ({ m : HermitianMat d₂ ℂ // MState.exp_val (ℰ ρ) (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1} →
       { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1}),
       ∀ x, e x = ℰ.hermDual x
        := by
     constructor; swap
     · rintro ⟨m, hm₁, hm₂⟩
-      refine ⟨ℰ.toPTPMap.hermDual m, ?_, PTPMap.hermDual.PTP_POVM ℰ.toPTPMap hm₂⟩
-      have hℰd : (ℰ ρ).exp_val (1 - m) = ρ.exp_val (ℰ.hermDual (1 - m)) :=
+      refine ⟨ℰ.toPTPOp.hermDual m, ?_, PTPOp.hermDual.PTP_POVM ℰ.toPTPOp hm₂⟩
+      have hℰd : MState.exp_val (ℰ ρ) (1 - m) = ρ.exp_val (ℰ.hermDual (1 - m)) :=
         ℰ.exp_val_hermDual ρ (1 - m)
       simpa [hℰd] using hm₁
     · rintro ⟨m, hm₁, hm₂⟩

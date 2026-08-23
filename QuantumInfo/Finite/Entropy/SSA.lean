@@ -1310,7 +1310,7 @@ It should be something like this, but it's hard to track the indices correctly:
 theorem qcmi_chain_rule (ρ : MState ((dA₁ × dA₂) × dB × dC)) :
     let ρA₁BC := ρ.assoc.SWAP.assoc.traceLeft.SWAP;
     let ρA₂BA₁C : MState (dA₂ × (dA₁ × dB) × dC) :=
-      ((CPTPMap.id ⊗ₖ CPTPMap.assoc').compose (CPTPMap.assoc.compose (CPTPMap.SWAP ⊗ₖ CPTPMap.id))) ρ;
+      ((CPTPOp.id ⊗ₖ CPTPOp.assoc').compose (CPTPOp.assoc.compose (CPTPOp.SWAP ⊗ₖ CPTPOp.id))) ρ;
     qcmi ρ = qcmi ρA₁BC + qcmi ρA₂BA₁C
      := by
   admit

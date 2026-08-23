@@ -70,6 +70,26 @@ class StdBasis (𝕜 : Type*) (E : Type*) (ι : outParam Type*) [RCLike 𝕜]
 
 export StdBasis (stdBasis)
 
+namespace OrthonormalBasis
+
+variable {𝕜 E ι κ : Type*} [RCLike 𝕜] [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable [Fintype ι] [Fintype κ]
+
+@[simp]
+theorem reindex_reindex (b : OrthonormalBasis ι 𝕜 E) (e : ι ≃ κ) {ν : Type*} [Fintype ν]
+    (f : κ ≃ ν) : (b.reindex e).reindex f = b.reindex (e.trans f) :=
+  DFunLike.ext _ _ fun _ ↦ by simp
+
+@[simp]
+theorem reindex_refl (b : OrthonormalBasis ι 𝕜 E) : b.reindex (Equiv.refl ι) = b :=
+  DFunLike.ext _ _ fun _ ↦ by simp
+
+theorem reindex_reindex_symm (b : OrthonormalBasis ι 𝕜 E) (e : ι ≃ κ) :
+    (b.reindex e).reindex e.symm = b := by
+  simp
+
+end OrthonormalBasis
+
 /-- The standard basis of `EuclideanSpace 𝕜 d` is `EuclideanSpace.basisFun`. This is the instance
 that makes existing matrix-indexed definitions a special case of the abstract ones. -/
 noncomputable instance EuclideanSpace.instStdBasis (𝕜 : Type*) [RCLike 𝕜] (d : Type*)
@@ -199,6 +219,14 @@ theorem toMatOf_reindex (b : OrthonormalBasis ι 𝕜 E) [Fintype κ] [Decidable
   rw [toMatOf_eq_toMatrixOrthonormal, toMatOf_eq_toMatrixOrthonormal,
     LinearMap.toMatrixOrthonormal_reindex]
 
+@[simp]
+theorem toMatOf_symm_reindex (b : OrthonormalBasis ι 𝕜 E) [Fintype κ] [DecidableEq κ] (e : ι ≃ κ)
+    (M : Matrix κ κ 𝕜) : (toMatOf (b.reindex e)).symm M = (toMatOf b).symm (M.submatrix e e) := by
+  apply EquivLike.injective (toMatOf (b.reindex e))
+  rw [StarAlgEquiv.apply_symm_apply, toMatOf_reindex, StarAlgEquiv.apply_symm_apply]
+  ext i j
+  simp
+
 end ToMat
 
 section ChangeOfBasis
@@ -238,6 +266,21 @@ theorem toMatOf_conj (b b' : OrthonormalBasis ι 𝕜 E) (A : E →L[𝕜] E) :
   rw [changeOfBasis_star, changeOfBasis_coe, toMatOf_eq_toMatrixOrthonormal,
     toMatOf_eq_toMatrixOrthonormal]
   exact (basis_toMatrix_mul_linearMap_toMatrix_mul_basis_toMatrix _ _ _ _ _).symm
+
+/-- The inverse form of `StdBasis.toMatOf_conj`: reading a matrix as an operator in a different
+orthonormal basis conjugates it by a unitary. -/
+theorem toMatOf_symm_conj (b b' : OrthonormalBasis ι 𝕜 E) (M : Matrix ι ι 𝕜) :
+    (toMatOf b').symm M = (toMatOf b).symm ((changeOfBasis b b' : Matrix ι ι 𝕜) * M *
+      (star (changeOfBasis b b') : Matrix ι ι 𝕜)) := by
+  set C := changeOfBasis b b' with hC
+  have h₁ : (star C : Matrix ι ι 𝕜) * (C : Matrix ι ι 𝕜) = 1 :=
+    Matrix.UnitaryGroup.star_mul_self C
+  apply EquivLike.injective (toMatOf b')
+  rw [StarAlgEquiv.apply_symm_apply, toMatOf_conj b b', StarAlgEquiv.apply_symm_apply, ← hC]
+  calc M = ((star C : Matrix ι ι 𝕜) * (C : Matrix ι ι 𝕜)) * M *
+        ((star C : Matrix ι ι 𝕜) * (C : Matrix ι ι 𝕜)) := by rw [h₁, one_mul, mul_one]
+    _ = (star C : Matrix ι ι 𝕜) * ((C : Matrix ι ι 𝕜) * M * (star C : Matrix ι ι 𝕜)) *
+        (C : Matrix ι ι 𝕜) := by noncomm_ring
 
 /-- **Basis insensitivity.** A quantity extracted from the matrix of an operator is independent of
 the choice of orthonormal basis as soon as it is invariant under unitary conjugation.
@@ -345,6 +388,20 @@ variable [Fintype ι] [DecidableEq ι] [StdBasis 𝕜 E ι]
 theorem toMat_apply (A : E →L[𝕜] E) (i j : ι) :
     toMat 𝕜 E ι A i j = ⟪stdBasis (𝕜 := 𝕜) (E := E) i, A (stdBasis (𝕜 := 𝕜) (E := E) j)⟫_𝕜 :=
   toMatOf_apply _ A i j
+
+variable (𝕜 E ι) in
+/-- `StdBasis.toMat` as a `𝕜`-linear equivalence, for use where only the linear structure is
+needed -- for instance in transporting a linear map of operators to a linear map of matrices. -/
+noncomputable def toMatₗ : (E →L[𝕜] E) ≃ₗ[𝕜] Matrix ι ι 𝕜 :=
+  (toMat 𝕜 E ι).toAlgEquiv.toLinearEquiv
+
+@[simp]
+theorem toMatₗ_apply (A : E →L[𝕜] E) : toMatₗ 𝕜 E ι A = toMat 𝕜 E ι A :=
+  rfl
+
+@[simp]
+theorem toMatₗ_symm_apply (M : Matrix ι ι 𝕜) : (toMatₗ 𝕜 E ι).symm M = (toMat 𝕜 E ι).symm M :=
+  rfl
 
 theorem toMat_eq_toMatrixOrthonormal (A : E →L[𝕜] E) :
     toMat 𝕜 E ι A = LinearMap.toMatrixOrthonormal (stdBasis (𝕜 := 𝕜) (E := E)) (A : E →ₗ[𝕜] E) :=

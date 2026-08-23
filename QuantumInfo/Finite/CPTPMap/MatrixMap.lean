@@ -390,6 +390,12 @@ noncomputable def piProd (Λi : ∀ i, MatrixMap (dI i) (dO i) R) : MatrixMap (�
 -- notation3:100 "⨂ₜₘ "(...)", "r:(scoped f => tprod R f) => r
 -- syntax (name := bigsum) "∑ " bigOpBinders ("with " term)? ", " term:67 : term
 
+/-- The tensor product of identity maps is the identity map. -/
+@[simp]
+theorem piProd_id : piProd (fun i ↦ (id (dI i) R)) = id ((i : ι) → dI i) R := by
+  simp [piProd, id, PiTensorProduct.map_id, LinearMap.toMatrix_id_eq_basis_toMatrix,
+    Module.Basis.toMatrix_self]
+
 /--
 Composition of `MatrixMap.piProd` maps distributes over the tensor product.
 -/

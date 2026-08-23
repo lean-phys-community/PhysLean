@@ -54,7 +54,7 @@ The only notion of "capacity" here currently is "quantum capacity" in the usual 
 And other important theorems like superdense coding, nonadditivity, superactivation
 -/
 
-namespace CPTPMap
+namespace CPTPOp
 
 variable {d₁ d₂ d₃ d₄ d₅ d₆ : Type*}
 variable [Fintype d₁] [Fintype d₂] [Fintype d₃] [Fintype d₄] [Fintype d₅] [Fintype d₆] [DecidableEq d₁] [DecidableEq d₂]
@@ -70,7 +70,7 @@ def Emulates (Λ₁ : CPTPMap d₁ d₂) (Λ₂ : CPTPMap d₃ d₄) : Prop :=
 A channel A `εApproximates` channel B of the same dimensions if the for every state ρ, the fidelity F(A(ρ), B(ρ)) is at least 1-ε.
 -/
 def εApproximates (A B : CPTPMap d₁ d₂) (ε : ℝ) : Prop :=
-  ∀ (ρ : MState d₁), (A ρ).fidelity (B ρ) ≥ 1-ε
+  ∀ (ρ : MState d₁), MState.fidelity (A ρ) (B ρ) ≥ 1-ε
 
 /--
 A channel A `AchievesRate` R:ℝ if for every ε>0, some n copies of A emulates a channel B such that log2(dimout(B))/n ≥ R, and that B εApproximates the identity channel.
@@ -78,9 +78,9 @@ A channel A `AchievesRate` R:ℝ if for every ε>0, some n copies of A emulates 
 def AchievesRate (A : CPTPMap d₁ d₂) (R : ℝ) : Prop :=
   ∀ ε : ℝ, ε > 0 →
     ∃ n > 0, ∃ (dimB : ℕ) (B : CPTPMap (Fin dimB) (Fin dimB)),
-      (CPTPMap.piProd (fun (_ : Fin n) ↦ A)).Emulates B ∧
+      (CPTPOp.piProd (fun (_ : Fin n) ↦ A)).Emulates B ∧
       Real.logb 2 dimB ≥ R*n ∧
-      B.εApproximates CPTPMap.id ε
+      B.εApproximates CPTPOp.id ε
 
 noncomputable def quantumCapacity (A : CPTPMap d₁ d₂) : ℝ :=
   sSup { R : ℝ | AchievesRate A R }
@@ -91,7 +91,7 @@ variable [DecidableEq d₃] [DecidableEq d₄] [DecidableEq d₅]
 /-- Every quantum channel emulates itself. -/
 @[refl]
 theorem emulates_self (Λ : CPTPMap d₁ d₂) : Λ.Emulates Λ :=
-  ⟨CPTPMap.id, CPTPMap.id, by simp⟩
+  ⟨CPTPOp.id, CPTPOp.id, by simp⟩
 
 /-- If a quantum channel A emulates B, and B emulates C, then A emulates C. -/
 @[trans]
@@ -107,7 +107,7 @@ section εApproximates
 
 /-- Every quantum channel perfectly approximates itself, that is, `εApproximates` with `ε = 0`. -/
 theorem εApproximates_self (Λ : CPTPMap d₁ d₂) : Λ.εApproximates Λ 0 :=
-  fun ρ ↦ ((Λ ρ).fidelity_self_eq_one.trans (sub_zero 1).symm).ge
+  fun ρ ↦ ((MState.fidelity_self_eq_one (Λ ρ)).trans (sub_zero 1).symm).ge
 
 /-- If a quantum channel A approximates B with ε₀, it also approximates B with all larger ε₁. -/
 theorem εApproximates_monotone {A B : CPTPMap d₁ d₂} {ε₀ : ℝ} (h : A.εApproximates B ε₀)
@@ -140,15 +140,13 @@ theorem id_achievesRate_log_dim : (id (dIn := d₁)).AchievesRate (Real.logb 2 (
   · --they are equivalent up to permutation
     -- TODO: Instead this proof should be `@[simp] piProd (fun x => id) = id` and `emulates_self`
     refine' ⟨ _, _, _ ⟩;
-    exact CPTPMap.ofEquiv ( Fintype.equivFinOfCardEq ( by simp +decide ) ).symm;
-    exact CPTPMap.ofEquiv ( Fintype.equivFinOfCardEq ( by simp +decide ) );
-    apply CPTPMap.ext;
-    ext; simp +decide [ CPTPMap.piProd ];
-    unfold MatrixMap.piProd
-    simp_all only [gt_iff_lt, PiTensorProduct.map_id, LinearMap.toMatrix_id_eq_basis_toMatrix,
-      Module.Basis.toMatrix_self, Matrix.reindex_apply, Matrix.submatrix_one_equiv, Matrix.toLin_one]
-    erw [ MatrixMap.submatrix_apply ]
-    simp_all only [Equiv.symm_symm, Equiv.apply_symm_apply, Matrix.submatrix_apply]
+    exact CPTPOp.ofEquiv ( Fintype.equivFinOfCardEq ( by simp +decide ) ).symm;
+    exact CPTPOp.ofEquiv ( Fintype.equivFinOfCardEq ( by simp +decide ) );
+    apply CPTPOp.ext_map
+    simp only [compose_map, piProd_map, id_map, ofEquiv_map]
+    rw [show (fun _ : Fin 1 ↦ (LinearMap.id : MatrixMap d₁ d₁ ℂ)) =
+      (fun i : Fin 1 ↦ MatrixMap.id ((fun _ : Fin 1 ↦ d₁) i) ℂ) from rfl]
+    simp [MatrixMap.id]
   constructor
   · norm_num
   · exact εApproximates_monotone (εApproximates_self id) hε.le
@@ -166,19 +164,19 @@ end AristotleLemmas
 theorem not_achievesRate_gt_log_dim_out (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₂) < R): ¬Λ.AchievesRate R := by
   intro h;
   -- We show that the identity channel on the output space `d₂` emulates `Λ`. Since capacity is monotonic under emulation, `Q(Λ) ≤ Q(id_{d₂})`.
-  have h_emulate : (CPTPMap.id (dIn := d₂)).Emulates Λ := by
-    exact ⟨Λ, CPTPMap.id, by simp⟩
+  have h_emulate : (CPTPOp.id (dIn := d₂)).Emulates Λ := by
+    exact ⟨Λ, CPTPOp.id, by simp⟩
   -- If `Λ` achieves rate `R`, then `id_{d₂}` achieves rate `R`. This follows because if `Λ^{\otimes n}` emulates `B`, and `id^{\otimes n}` emulates `Λ^{\otimes n}` (by functoriality of tensor product), then `id^{\otimes n}` emulates `B`.
-  have h_id_achieves : (CPTPMap.id (dIn := d₂)).AchievesRate R := by
+  have h_id_achieves : (CPTPOp.id (dIn := d₂)).AchievesRate R := by
     intro ε hε_pos
     obtain ⟨n, hn, dimB, B, hB_emulate, hB_rate, hB_approx⟩ := h ε hε_pos
-    have h_id_emulate : (CPTPMap.piProd (fun (_ : Fin n) => CPTPMap.id (dIn := d₂))).Emulates B := by
+    have h_id_emulate : (CPTPOp.piProd (fun (_ : Fin n) => CPTPOp.id (dIn := d₂))).Emulates B := by
       -- Since `id_{d₂}` emulates `Λ`, we can use the fact that the tensor product of emulations is an emulation.
-      have h_tensor_emulate : ∀ (n : ℕ), (CPTPMap.piProd (fun (_ : Fin n) => CPTPMap.id (dIn := d₂))).Emulates (CPTPMap.piProd (fun (_ : Fin n) => Λ)) := by
+      have h_tensor_emulate : ∀ (n : ℕ), (CPTPOp.piProd (fun (_ : Fin n) => CPTPOp.id (dIn := d₂))).Emulates (CPTPOp.piProd (fun (_ : Fin n) => Λ)) := by
         intro n
         obtain ⟨E, D, hD⟩ := h_emulate
-        use CPTPMap.piProd (fun (_ : Fin n) => E), CPTPMap.piProd (fun (_ : Fin n) => D);
-        simp [ ← hD, ← CPTPMap.piProd_comp];
+        use CPTPOp.piProd (fun (_ : Fin n) => E), CPTPOp.piProd (fun (_ : Fin n) => D);
+        simp [ ← hD, ← CPTPOp.piProd_comp];
       exact emulates_trans _ _ _ ( h_tensor_emulate n ) hB_emulate;
     exact ⟨ n, hn, dimB, B, h_id_emulate, hB_rate, hB_approx ⟩;
   refine not_le_of_gt hR <| not_lt.mp fun h => ?_
@@ -219,7 +217,7 @@ theorem coherentInfo_le_quantumCapacity (Λ : CPTPMap d₁ d₂) (ρ : MState d�
 
 /-- The quantum capacity is the limit of the coherent information of n-copy uses of the channel. -/
 theorem quantumCapacity_eq_piProd_coherentInfo (Λ : CPTPMap d₁ d₂) : Λ.quantumCapacity =
-    sSup { r : ℝ | ∃ n ρ, r = coherentInfo ρ (CPTPMap.piProd (fun (_ : Fin n) ↦ Λ))} := by
+    sSup { r : ℝ | ∃ n ρ, r = coherentInfo ρ (CPTPOp.piProd (fun (_ : Fin n) ↦ Λ))} := by
   sorry
 
 end capacity

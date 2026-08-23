@@ -158,7 +158,7 @@ lemma T_is_CP (σ : MState d) (Φ : CPTPMap d d₂) :
   apply MatrixMap.IsCompletelyPositive.comp;
   · apply MatrixMap.IsCompletelyPositive.comp;
     · exact Gamma_map_CP σ;
-    · exact Φ.cp;
+    · exact Φ.map_cp;
   · exact Gamma_inv_map_CP (Φ σ)
 
 /-

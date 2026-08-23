@@ -97,17 +97,17 @@ At that point we need the fact that it's not `⊤`, and then it must be zero.
 
 -/
 
-/-- Relabelling a state with `CPTPMap.of_equiv` leaves relative entropies unchanged. -/
+/-- Relabelling a state with `CPTPOp.of_equiv` leaves relative entropies unchanged. -/
 @[simp]
 theorem of_equiv_eq (e : d ≃ d₂) (ρ σ : MState d) :
-    f (CPTPMap.of_equiv e ρ) (CPTPMap.of_equiv e σ) = f ρ σ := by
+    f (CPTPOp.of_equiv e ρ) (CPTPOp.of_equiv e σ) = f ρ σ := by
   apply le_antisymm
   · apply DPI
-  · convert DPI (f := f) ((CPTPMap.of_equiv e) ρ) ((CPTPMap.of_equiv e) σ) (CPTPMap.of_equiv e.symm)
+  · convert DPI (f := f) ((CPTPOp.of_equiv e) ρ) ((CPTPOp.of_equiv e) σ) (CPTPOp.of_equiv e.symm)
     · symm
-      exact congrFun (CPTPMap.equiv_inverse e.symm) ρ
+      exact congrFun (CPTPOp.equiv_inverse e.symm) ρ
     · symm
-      exact congrFun (CPTPMap.equiv_inverse e.symm) σ
+      exact congrFun (CPTPOp.equiv_inverse e.symm) σ
 
 /-- Relabelling a state with `MState.relabel` leaves relative entropies unchanged. -/
 @[simp]
@@ -129,9 +129,9 @@ private lemma wrt_self_eq_zero' [Unique d] (ρ σ : MState d) : f ρ σ = 0 := b
 @[simp]
 theorem wrt_self_eq_zero (ρ : MState d) : f ρ ρ.M = 0 := by
   rw [← nonpos_iff_eq_zero, ← wrt_self_eq_zero' f (d := PUnit) default default]
-  convert DPI (f := f) _ _ (CPTPMap.const_state ρ)
-  · rw [CPTPMap.const_state_apply]
-  · rw [CPTPMap.const_state_apply]
+  convert DPI (f := f) _ _ (CPTPOp.const_state ρ)
+  · rw [CPTPOp.const_state_apply]
+  · rw [CPTPOp.const_state_apply]
 
 end possibly_trivial
 

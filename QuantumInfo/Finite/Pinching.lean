@@ -79,8 +79,8 @@ theorem pinching_sum (ρ : MState d) : ∑ k, pinching_kraus ρ k = 1 := by
   rw [← cfc_sum, Finset.sum_fn, cfc_congr heq, cfc_one (R := ℝ) (ha := _)]
   rw [IsSelfAdjoint, Matrix.star_eq_conjTranspose, ρ.Hermitian]
 
-def pinching_map (ρ : MState d) : CPTPMap d d ℂ :=
-  CPTPMap.of_kraus_CPTPMap (HermitianMat.mat ∘ pinching_kraus ρ) (by
+def pinching_map (ρ : MState d) : CPTPMap d d :=
+  CPTPOp.of_kraus_CPTPMap (HermitianMat.mat ∘ pinching_kraus ρ) (by
   conv =>
     enter [1, 2, k]
     rw [Function.comp_apply, (pinching_kraus ρ k).H, ←pow_two]
@@ -94,7 +94,8 @@ theorem pinchingMap_apply_M (σ ρ : MState d) : (pinching_map σ ρ).M =
   ⟨_, (MatrixMap.of_kraus_isCompletelyPositive
     (HermitianMat.mat ∘ pinching_kraus σ)).IsPositive.IsHermitianPreserving ρ.M.H⟩ := by
   ext1
-  rw [DensityOp.mat_M, CPTPMap.mat_coe_eq_apply_mat]
+  rw [DensityOp.mat_M, CPTPOp.mat_coe_eq_apply_mat]
+  simp only [pinching_map, CPTPOp.map_of_kraus_CPTPMap]
   rfl
 
 theorem pinching_eq_sum_conj (σ ρ : MState d) : (pinching_map σ ρ).M =
