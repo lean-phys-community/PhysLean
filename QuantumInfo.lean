@@ -4,40 +4,67 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
 --Mathlib imports
-import QuantumInfo.ForMathlib
+module
+
+public import QuantumInfo.ForMathlib.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.ComplexLaplaceTransform
+public import QuantumInfo.ForMathlib.ContinuousSup
+public import QuantumInfo.ForMathlib.Filter
+public import QuantumInfo.ForMathlib.HermitianMat
+public import QuantumInfo.ForMathlib.Isometry
+public import QuantumInfo.ForMathlib.LinearEquiv
+public import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
+public import QuantumInfo.ForMathlib.Matrix
+public import QuantumInfo.ForMathlib.Minimax
+public import QuantumInfo.ForMathlib.Misc
+public import QuantumInfo.ForMathlib.Superadditive
+public import QuantumInfo.ForMathlib.ULift
+public import QuantumInfo.ForMathlib.Unitary
+public import QuantumInfo.ForMathlib.HayataGroup.TraceInequality.JensenOperatorInequalityIVtoV
 
 --Code
-import QuantumInfo.Finite.Channel.DegradableOrder
-import QuantumInfo.Finite.CPTPMap
-import QuantumInfo.Finite.Distance
-import QuantumInfo.Finite.Qubit.Basic
-import QuantumInfo.Finite.ResourceTheory.FreeState
--- import QuantumInfo.Finite.ResourceTheory.ResourceTheory --Commenting out for now -- pretty broken
-import QuantumInfo.Finite.ResourceTheory.SteinsLemma
-import QuantumInfo.Finite.Braket
-import QuantumInfo.Finite.Capacity
-import QuantumInfo.Finite.Ensemble
-import QuantumInfo.Finite.Entanglement
-import QuantumInfo.Finite.Entropy
--- import QuantumInfo.Finite.AxiomatizedEntropy.Defs --Experimental
--- import QuantumInfo.Finite.AxiomatizedEntropy.Renyi --Experimental
-import QuantumInfo.Finite.MState
-import QuantumInfo.Finite.Pinching
-import QuantumInfo.Finite.POVM
-import QuantumInfo.Finite.StdBasisState
-import QuantumInfo.Finite.Unitary
+public import QuantumInfo.Channels.DegradableOrder
+public import QuantumInfo.Channels.Bundled
+public import QuantumInfo.Channels.CPTP
+public import QuantumInfo.Channels.Dual
+public import QuantumInfo.Channels.MatrixMap
+public import QuantumInfo.Channels.Unbundled
+public import QuantumInfo.States.Mixed.Fidelity
+public import QuantumInfo.States.Mixed.TraceDistance
+public import QuantumInfo.States.Pure.Qubit
+public import QuantumInfo.States.Pure.BlochSphere
+public import QuantumInfo.States.Pure.BargmannInvariant
+public import QuantumInfo.StdBasisState
+public import QuantumInfo.ResourceTheory.FreeState
+public import QuantumInfo.ResourceTheory.SteinsLemma
+public import QuantumInfo.ResourceTheory.ResourceTheory
+public import QuantumInfo.States.Pure.Braket
+public import QuantumInfo.Capacity.Capacity
+public import QuantumInfo.States.Ensemble
+public import QuantumInfo.States.Entanglement
+public import QuantumInfo.Entropy.VonNeumann
+public import QuantumInfo.Entropy.SSA
+public import QuantumInfo.Entropy.Relative
+public import QuantumInfo.Entropy.DPI
+public import QuantumInfo.Entropy.Axiomatized.Renyi
+public import QuantumInfo.States.Mixed.MState
+public import QuantumInfo.Channels.Pinching
+public import QuantumInfo.Measurements.POVM
+public import QuantumInfo.Operators.Unitary
+public import QuantumInfo.Regularized
+
+--Quantum error correcting codes
+public import QuantumInfo.QECC.Bounds
+public import QuantumInfo.QECC.Codes
+public import QuantumInfo.QECC.Concatenation
+public import QuantumInfo.QECC.Transversal
 
 --Documentation without code
-import QuantumInfo.Finite.Capacity_doc
+public import QuantumInfo.Capacity.Capacity_doc
 
 --Classical information theory
--- import QuantumInfo.ClassicalInfo.Capacity
--- import QuantumInfo.ClassicalInfo.Channel
-import QuantumInfo.ClassicalInfo.Distribution
-import QuantumInfo.ClassicalInfo.Entropy
-import QuantumInfo.ClassicalInfo.Prob
-
---Statistical mechanics
-import QuantumInfo.StatMech.Hamiltonian
-import QuantumInfo.StatMech.IdealGas
-import QuantumInfo.StatMech.ThermoQuantities
+public import QuantumInfo.ClassicalInfo.Capacity
+public import QuantumInfo.ClassicalInfo.Channel
+public import QuantumInfo.ClassicalInfo.Distribution
+public import QuantumInfo.ClassicalInfo.Entropy
+public import QuantumInfo.ClassicalInfo.Prob

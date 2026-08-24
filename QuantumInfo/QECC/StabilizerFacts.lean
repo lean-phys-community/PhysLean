@@ -3,7 +3,9 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.PauliFacts
+module
+
+public import QuantumInfo.QECC.PauliFacts
 
 /-!
 # Error-correction theory of stabilizer codes
@@ -11,6 +13,8 @@ import QuantumInfo.QECC.PauliFacts
 Detection, correction, distance, degeneracy, syndromes, and the Knill–Laflamme conditions,
 stated on the faithful `StabGroup` model. Most proofs are left to the ATP.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace QuantumLib
@@ -121,7 +125,7 @@ theorem knill_laflamme (D : PauliOp n) :
     S.Detectable D ↔
       ∃ c : ℂ, stabProj S * toMat D * stabProj S = c • stabProj S := by
   rw [S.detectable_iff_not_mem_centralizer]
-  letI : DecidablePred (· ∈ S.carrier) := fun x => Classical.propDecidable (x ∈ S.carrier)
+  let : DecidablePred (· ∈ S.carrier) := fun x => Classical.propDecidable (x ∈ S.carrier)
   constructor
   · -- Forward: (D ∈ sup ∨ D ∉ centralizer) → ∃ c, Compression = c • stabProj
     intro h
@@ -164,7 +168,7 @@ theorem knill_laflamme (D : PauliOp n) :
       rw [mul_assoc, h1, stabProj_idem]
     · -- D ∉ centralizer means D anticommutes with some stabilizer, so compression = 0
       simp only [Subgroup.mem_centralizer_iff] at hnot_center
-      push_neg at hnot_center
+      push Not at hnot_center
       obtain ⟨g, hg, hanti⟩ := hnot_center
       -- We have g * D ≠ D * g, so D * g ≠ g * D
       have hanti' : D * g ≠ g * D := fun h => hanti h.symm
@@ -207,7 +211,7 @@ theorem knill_laflamme (D : PauliOp n) :
   · -- Reverse: ∃ c, Compression = c • stabProj → (D ∈ sup ∨ D ∉ centralizer)
     intro ⟨c, hc⟩
     by_contra h
-    push_neg at h
+    push Not at h
     obtain ⟨hnsup, hncent⟩ := h
     -- The compression being scalar means D acts as scalar on code space
     -- But logical operators act non-trivially, contradiction
@@ -374,7 +378,7 @@ theorem knill_laflamme (D : PauliOp n) :
         simp [toMat_trace]
         -- For g ∈ S.carrier, need: D * g ∉ phaseSubgroup
         by_contra hDg_list
-        push_neg at hDg_list
+        push Not at hDg_list
         -- D * g has x=0 and z=0 means D * g ∈ phaseSubgroup
         have hDg_mem : D * g.1 ∈ phaseSubgroup n := mem_phaseSubgroup.mpr hDg_list
         -- So D = (D * g) * g⁻¹ ∈ phaseSubgroup * carrier ⊆ sup

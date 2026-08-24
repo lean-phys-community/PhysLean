@@ -3,7 +3,9 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.StabilizerFacts
+module
+
+public import QuantumInfo.QECC.StabilizerFacts
 
 /-!
 # Bounds on stabilizer code parameters
@@ -11,6 +13,8 @@ import QuantumInfo.QECC.StabilizerFacts
 Quantum Singleton (already in `StabilizerGroup`), quantum Hamming, and Gilbert–Varshamov bounds,
 plus the rate form of Singleton. Stated for the ATP.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace QuantumLib

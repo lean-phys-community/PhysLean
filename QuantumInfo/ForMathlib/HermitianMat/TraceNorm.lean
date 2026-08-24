@@ -3,8 +3,10 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Proj
-import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Proj
+public import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
 
 /-! # The trace norm of a Hermitian matrix
 
@@ -12,6 +14,8 @@ The Jordan decomposition `A = A⁺ - A⁻` splits a Hermitian matrix into two po
 pieces with orthogonal supports, so the trace norm — the sum of the absolute values of the
 eigenvalues — is the sum of their traces.
 -/
+
+@[expose] public section
 
 namespace HermitianMat
 

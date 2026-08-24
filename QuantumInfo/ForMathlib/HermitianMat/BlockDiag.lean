@@ -3,8 +3,10 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.LogExp
-import QuantumInfo.ForMathlib.HermitianMat.Trace
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.LogExp
+public import QuantumInfo.ForMathlib.HermitianMat.Trace
 
 /-! # Block-diagonal Hermitian matrices
 
@@ -15,6 +17,8 @@ we care about: its continuous functional calculus (and hence its logarithm) is a
 block separately, its kernel is the product of the blockwise kernels, and inner products of two
 such matrices decompose as the sum of the blockwise inner products.
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -117,7 +121,6 @@ private theorem conj_block (E : ι → d → ℝ) (U : ι → Matrix.unitaryGrou
   exact Finset.sum_congr rfl fun i _ ↦ by
     rw [kronecker_mat, conj_apply_mat, basisProj_mat_P]
 
-omit [DecidableEq d] in
 theorem mulVec_sum_kron_basisProj (X : ι → HermitianMat d 𝕜) (v : d × ι → 𝕜) (a : d) (i : ι) :
     ((∑ j, X j ⊗ₖ basisProj 𝕜 j).mat *ᵥ v) (a, i) = ((X i).mat *ᵥ (fun b ↦ v (b, i))) a := by
   simp only [mat_finset_sum, kronecker_mat, basisProj_mat, Matrix.mulVec, dotProduct,

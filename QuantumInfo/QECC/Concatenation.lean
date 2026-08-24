@@ -3,7 +3,9 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.Defs
+module
+
+public import QuantumInfo.QECC.Defs
 
 /-!
 # Concatenated codes
@@ -11,6 +13,8 @@ import QuantumInfo.QECC.Defs
 Facts about `QECC.concat`: length multiplies, and error-correction composes — the engine of the
 threshold theorem.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace QuantumLib

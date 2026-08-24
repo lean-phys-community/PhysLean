@@ -3,10 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.InnerProductSpace.Positive
-import Mathlib.Analysis.InnerProductSpace.TensorProduct
-import Mathlib.Analysis.InnerProductSpace.Trace
+module
+
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import Mathlib.Analysis.InnerProductSpace.Positive
+public import Mathlib.Analysis.InnerProductSpace.TensorProduct
+public import Mathlib.Analysis.InnerProductSpace.Trace
 
 /-!
 # Preferred orthonormal bases
@@ -58,6 +60,8 @@ is part of that choice. Consequently `StdBasis.reindex` and `StdBasis.transport`
 rather than instances; making them instances would both loop and silently install non-canonical
 bases.
 -/
+
+@[expose] public section
 
 open scoped ComplexOrder InnerProductSpace Matrix TensorProduct
 
@@ -150,12 +154,14 @@ theorem stdBasis_tensorProduct [StdBasis 𝕜 E ι] [StdBasis 𝕜 F κ] :
 
 This is deliberately not an instance: a type has at most one preferred basis, and there is no
 canonical `ι ≃ κ` to relabel along. -/
+@[instance_reducible]
 noncomputable def reindex [StdBasis 𝕜 E ι] (e : ι ≃ κ) : StdBasis 𝕜 E κ :=
   ⟨(stdBasis (𝕜 := 𝕜) (E := E)).reindex e⟩
 
 /-- Transport the preferred basis of `E` to `F` along a linear isometry equivalence.
 
 This is deliberately not an instance, for the same reason as `StdBasis.reindex`. -/
+@[instance_reducible]
 noncomputable def transport [StdBasis 𝕜 E ι] (f : E ≃ₗᵢ[𝕜] F) : StdBasis 𝕜 F ι :=
   ⟨(stdBasis (𝕜 := 𝕜) (E := E)).map f⟩
 
@@ -165,6 +171,7 @@ This is deliberately not an instance: a space that already has a preferred basis
 acquire a second one. It is meant to be introduced locally (`let _ := StdBasis.some 𝕜 E`) inside
 the proof of a basis-free statement, so that the statement can be discharged by its matrix
 analogue. -/
+@[instance_reducible]
 noncomputable def some (𝕜 E : Type*) [RCLike 𝕜] [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
     [FiniteDimensional 𝕜 E] : StdBasis 𝕜 E (Fin (Module.finrank 𝕜 E)) :=
   ⟨stdOrthonormalBasis 𝕜 E⟩

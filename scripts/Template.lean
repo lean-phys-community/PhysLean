@@ -60,8 +60,8 @@ def baseHtmlGenerator (title : String) (site : Array Html) : BaseHtmlM Html := d
 
         <header style="background-color: #2C3E50; color: #fff;">
           <h1><label for="nav_toggle"></label><span>
-          <a href="heplean.com" style="color: #fff; text-decoration: none; font-family: serif">
-          PhysLean Documentation</a>
+          <a href="physlib.io" style="color: #fff; text-decoration: none; font-family: serif">
+          Physlib Documentation</a>
           </span></h1>
           <h2  style="color: #fff; font-family: serif">[breakWithin title]</h2>
           <form action="https://google.com/search" method="get" id="search_form" style="color: var(--text-color);">

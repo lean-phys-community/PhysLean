@@ -3,9 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Basic
-import QuantumInfo.ForMathlib.ContinuousLinearMap
-import QuantumInfo.ForMathlib.LinearEquiv
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Basic
+public import QuantumInfo.ForMathlib.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.LinearEquiv
 
 /-!
 Much like `Matrix.reindex` and `Matrix.submatrix`, we can reindex a Hermitian matrix to get another
@@ -14,6 +16,8 @@ Hermitian matrix; however, this only makes sense when both permutations are the 
 
 This file then gives relevant lemmas for simplifying this.
 -/
+
+@[expose] public section
 namespace HermitianMat
 
 variable {d d₂ d₃ d₄ 𝕜 : Type*} [RCLike 𝕜]
@@ -43,7 +47,7 @@ theorem reindex_refl (A : HermitianMat d 𝕜) :
 @[simp]
 theorem reindex_reindex (A : HermitianMat d 𝕜) (e : d ≃ d₂) (f : d₂ ≃ d₃) :
     (A.reindex e).reindex f = A.reindex (e.trans f) := by
-  ext1; simp; rfl
+  ext1; simp
 
 @[simp]
 theorem reindex_zero : (0 : HermitianMat d 𝕜).reindex e = 0 := by
@@ -82,20 +86,24 @@ theorem reindex_conj [Fintype d₂] [Fintype d] (B : Matrix d₃ d₂ 𝕜) :
 
 variable [Fintype d]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem conj_submatrix (B : Matrix d₂ d₄ 𝕜) (e : d₃ ≃ d₂) (f : d → d₄) :
     A.conj (B.submatrix e f) = (A.conj (B.submatrix id f)).reindex e.symm := by
   ext1
   simp [conj_apply, ← Matrix.submatrix_mul_equiv (e₂ := .refl d)]
 
-theorem reindex_eq_conj [DecidableEq d] (e : d ≃ d₂) : A.reindex e = A.conj (Matrix.reindex e (.refl d) 1) := by
+set_option backward.isDefEq.respectTransparency false in
+theorem reindex_eq_conj [DecidableEq d] (e : d ≃ d₂) :
+    A.reindex e = A.conj (Matrix.reindex e (.refl d) 1) := by
   ext : 3
   simp [-mat_apply, reindex, conj_apply, Matrix.submatrix,
     Matrix.mul_apply, Matrix.one_apply]
 
 variable [Fintype d₂] [DecidableEq d] [DecidableEq d₂]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem ker_reindex :
-    (A.reindex e).ker = A.ker.comap (LinearEquiv.euclidean_of_relabel 𝕜 e).toLinearMap := by
+    (A.reindex e).ker = A.ker.comap (LinearEquiv.euclideanOfRelabel 𝕜 e).toLinearMap := by
   dsimp only [reindex, ker, lin]
   simp only [mat_mk]
   rw [Matrix.reindex_toEuclideanLin, LinearEquiv.ker_comp, LinearMap.ker_comp]
@@ -105,6 +113,6 @@ theorem ker_reindex_le_iff :
     (A.reindex e).ker ≤ (B.reindex e).ker ↔ A.ker ≤ B.ker := by
   rw [ker_reindex, ker_reindex]
   apply Submodule.comap_le_comap_iff_of_surjective
-  exact LinearEquiv.surjective (LinearEquiv.euclidean_of_relabel 𝕜 e)
+  exact LinearEquiv.surjective (LinearEquiv.euclideanOfRelabel 𝕜 e)
 
 end HermitianMat

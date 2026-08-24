@@ -3,7 +3,9 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.Pauli
+module
+
+public import QuantumInfo.QECC.Pauli
 
 /-!
 # Stabilizer codes, faithfully (as `-I`-free abelian Pauli subgroups)
@@ -17,6 +19,8 @@ the code space, and `dim (codeSpace S) = 2ⁿ / |S|`.
 
 This file sets up those definitions and the key theorems (several proofs farmed to the ATP).
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 open Classical
@@ -403,7 +407,7 @@ theorem card_mul_codeSpace_finrank :
   rw [mul_comm] at h_trace_computed
   norm_cast at h_trace_computed
 
-/-! ### Round 2: supporting lemmas -/
+/-! ### Commutation and the stabilizer projector -/
 
 /-- Stabilizer operators commute (as matrices), since the group is abelian. -/
 theorem toMat_commute_of_mem {g h : PauliOp n} (hg : g ∈ S.carrier) (hh : h ∈ S.carrier) :
@@ -423,8 +427,8 @@ theorem toMat_mem_mul_stabProj {g : PauliOp n} (hg : g ∈ S.carrier) :
     left_inv a := by simp
     right_inv a := by simp
   } with hequiv
-  conv_lhs => rw [show (∑ a : S.carrier, g.toMat * ((Fintype.card S.carrier : ℂ)⁻¹ • (↑a : PauliOp n).toMat)) 
-    = ∑ a : S.carrier, ((Fintype.card S.carrier : ℂ)⁻¹ • (g * ↑a).toMat) by 
+  conv_lhs => rw [show (∑ a : S.carrier, g.toMat * ((Fintype.card S.carrier : ℂ)⁻¹ • (↑a : PauliOp n).toMat))
+    = ∑ a : S.carrier, ((Fintype.card S.carrier : ℂ)⁻¹ • (g * ↑a).toMat) by
       apply Finset.sum_congr rfl; intro a _
       rw [Matrix.mul_smul, toMat_mul]]
   rw [Fintype.sum_equiv equiv]
@@ -481,7 +485,7 @@ theorem toMat_commute_iff (P Q : PauliOp n) :
   rw [hcancel.eq_iff]
   exact QuantumLib.pauliOp_commute_iff (P.x, P.z) (Q.x, Q.z)
 
-/-! ### Round 3: weight, distance, and code-space corollaries -/
+/-! ### Weight, distance, and code-space corollaries -/
 
 /-- The weight of a Pauli group element: the number of qubits it acts on nontrivially. -/
 def weight (P : PauliOp n) : ℕ :=
@@ -560,7 +564,7 @@ theorem codeSpace_ne_bot : codeSpace S ≠ ⊥ := by
   rw [h, finrank_bot, mul_zero] at heq
   exact absurd heq (Nat.two_pow_pos n).ne
 
-/-! ### Round 4: error detection and correction -/
+/-! ### Error detection and correction -/
 
 /-- An error `E` is **detectable** by `S` if it lies in the stabilizer (harmless) or anticommutes
 with some stabilizer element (it flips a syndrome bit). -/
@@ -580,7 +584,7 @@ theorem detectable_of_weight_lt_distance {E : PauliOp n} (hw : weight E < S.dist
   · exact Or.inl hE
   · right
     by_contra h
-    push_neg at h
+    push Not at h
     have hcomm : E ∈ Subgroup.centralizer (S.carrier : Set (PauliOp n)) := by
       rw [Subgroup.mem_centralizer_iff]
       intro g hg
@@ -599,7 +603,7 @@ theorem detectable_mul_of_weight_lt {E₁ E₂ : PauliOp n}
     _ = weight E₁ + weight E₂ := by rw [weight_inv]
     _ < S.distance := by omega
 
-/-! ### Round 5: a grab-bag of stated facts (sorrymaxxing) -/
+/-! ### Code dimension and the quantum Singleton bound -/
 
 /-- The stabilizer projector fixes every code state. -/
 theorem stabProj_apply_of_mem {v : (Fin n → ZMod 2) → ℂ} (hv : v ∈ codeSpace S) :
@@ -627,9 +631,9 @@ theorem card_carrier_eq_two_pow : ∃ k, Fintype.card S.carrier = 2 ^ k := by
   -- Every element of S.carrier squares to 1, so it's an elementary abelian 2-group
   -- Hence its cardinality is a power of 2
   have h_exp_two : ∀ g : S.carrier, g.1 * g.1 = 1 := fun g => S.sq_eq_one g.2
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- Show that S.carrier is a 2-group
-  haveI : IsPGroup 2 (↥S.carrier) := fun g => ⟨1, by
+  have : IsPGroup 2 (↥S.carrier) := fun g => ⟨1, by
     have h := h_exp_two g
     simp [pow_two] at h ⊢
     exact Subtype.ext h⟩
@@ -731,7 +735,7 @@ theorem lt_distance_of_no_logical (d : ℕ) (hex : ∃ g, S.IsLogical g)
   have hne : {w | ∃ g, S.IsLogical g ∧ weight g = w}.Nonempty := ⟨weight g0, g0, hg0, rfl⟩
   obtain ⟨g, hlog, hwt⟩ := Nat.sInf_mem hne
   by_contra hd
-  push_neg at hd
+  push Not at hd
   exact h g (hwt.trans_le hd) hlog
 
 /-- An error either commutes with the whole stabilizer or is detectable. -/
@@ -746,7 +750,7 @@ theorem detectable_or_mem_centralizer (E : PauliOp n) :
   · -- E anticommutes with some stabilizer element, so E is detectable
     left
     simp only [StabGroup.Detectable]
-    push_neg at h
+    push Not at h
     obtain ⟨g, hg, hneq⟩ := h
     right
     exact ⟨g, hg, hneq⟩
@@ -926,7 +930,7 @@ theorem QECC.singleton_bound [Nontrivial d1] {C : QECC d1 i d2} {d : ℕ}
     Fintype.card d1 * Fintype.card d2 ^ (2 * d) ≤ Fintype.card d2 ^ Fintype.card i := by
   sorry
 
-/-! ### Round 6: Pauli group structure, trivial code, and the realization bridge -/
+/-! ### Pauli group structure, trivial code, and the realization bridge -/
 
 namespace PauliOp
 variable {m : ℕ}
@@ -1052,7 +1056,7 @@ theorem exists_qecc_correcting (S : StabGroup m) (k d : ℕ)
     (hk : Fintype.card S.carrier = 2 ^ (m - k)) (hd : 2 * d < S.distance) :
     ∃ C : QECC (Fin k → ZMod 2) (Fin m) (ZMod 2), C.CorrectsErrors d := by sorry
 
-/-! ### Round 8: code parameters `⟦n,k,d⟧` and membership -/
+/-! ### Code parameters `⟦n,k,d⟧` and membership -/
 
 /-- The number of physical qubits `n`. -/
 def numPhysical (_ : StabGroup m) : ℕ := m

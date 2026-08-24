@@ -3,9 +3,11 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.StabilizerFacts
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+module
+
+public import QuantumInfo.QECC.StabilizerFacts
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 
 /-!
 # Transversal gates and the Eastin–Knill theorem
@@ -14,6 +16,8 @@ A **transversal** unitary is a tensor product of single-qubit unitaries. Such ga
 "cheap" fault-tolerant operations. The **Eastin–Knill theorem** says no nontrivial code admits a
 *universal* set of transversal logical gates. Stated here for the ATP.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace QuantumLib
@@ -294,7 +298,7 @@ theorem isTransversal_toMat_of_weight_le_one [NeZero n] {P : PauliOp n} (hP : we
           have h2 : (if ∀ i ≠ j, f i = g i then d * upauli (f j) (g j) else 0) = 0 := by
             simp [hall]
           rw [h2]
-          push_neg at hall
+          push Not at hall
           obtain ⟨i, hi_nej, hi_fne⟩ := hall
           rw [Finset.prod_eq_zero (Finset.mem_univ i)]
           rw [if_neg hi_nej, Matrix.one_apply]
@@ -355,7 +359,7 @@ theorem isTransversal_toMat_of_weight_le_one [NeZero n] {P : PauliOp n} (hP : we
         simp [pauliOp, Matrix.of_apply]
         -- Need: ¬(f = g + P.x)
         have hne : ¬(f = g + P.x) := by
-          push_neg at hall
+          push Not at hall
           obtain ⟨i, hi_nej, hi_fne⟩ := hall
           intro heq
           have := congr_fun heq i
@@ -452,7 +456,7 @@ theorem finite_of_separated {X : Type*} [PseudoMetricSpace X] {K G : Set X}
     have : f g₁ hg₁ = f g₂ hg₂ := Subtype.ext_iff.mp hIeq
     have heq : g₁ = g₂ := hf_inj g₁ hg₁ g₂ hg₂ this
     exact Subtype.ext heq
-  haveI : Finite N := Set.Finite.to_subtype hNfin
+  have : Finite N := Set.Finite.to_subtype hNfin
   have : Finite G := Finite.of_injective I hI_inj
   exact Set.finite_coe_iff.mpr this
 
@@ -464,7 +468,7 @@ theorem unitaryGroup_isCompact :
   · have h : {V : Matrix (Fin S.numLogical → ZMod 2) (Fin S.numLogical → ZMod 2) ℂ |
         V ∈ Matrix.unitaryGroup (Fin S.numLogical → ZMod 2) ℂ} = {V | V * star V = 1} := by
       ext V
-      simp only [Set.mem_setOf_eq]
+      simp only [Set.mem_ofPred_eq]
       exact Matrix.mem_unitaryGroup_iff
     rw [h]
     set m := Fin S.numLogical → ZMod 2 with hm
@@ -489,7 +493,7 @@ theorem transversalLogicals_subset_unitary :
         V ∈ Matrix.unitaryGroup (Fin S.numLogical → ZMod 2) ℂ} := by
   intro V hV
   obtain ⟨U, hU_trans, W, hW_unit, _, hUV⟩ := hV
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   rw [Matrix.mem_unitaryGroup_iff']
   have hun : U.conjTranspose * U = 1 := by
     have hu := IsTransversal.mem_unitaryGroup hU_trans

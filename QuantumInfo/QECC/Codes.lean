@@ -3,7 +3,11 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.CSS
+module
+
+public import QuantumInfo.QECC.CSS
+public meta import Mathlib.Data.ZMod.Defs
+public meta import QuantumInfo.QECC.StabilizerGroup
 
 /-!
 # A zoo of stabilizer codes
@@ -11,6 +15,8 @@ import QuantumInfo.QECC.CSS
 Concrete stabilizer groups and their `⟦n,k,d⟧` parameters: the repetition code, the perfect
 `⟦5,1,3⟧` code, Shor's `⟦9,1,3⟧` code, and the Steane `⟦7,1,3⟧` code.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace QuantumLib
@@ -27,7 +33,9 @@ def repetitionCode (n : ℕ) [NeZero n] : StabGroup n :=
     (repetitionCode n).numPhysical = n := rfl
 
 /-- The repetition code encodes one logical qubit. -/
-theorem repetitionCode_numLogical {n : ℕ} [NeZero n] : (repetitionCode n).numLogical = 1 := by sorry  -- v4.28 ATP proof does not port to v4.31 (fin_cases typeclass); needs portable proof
+theorem repetitionCode_numLogical {n : ℕ} [NeZero n] : (repetitionCode n).numLogical = 1 := by
+  sorry
+
 /-! ### The perfect five-qubit code `⟦5,1,3⟧` -/
 
 /-- The five-qubit code, from the cyclic generator `XZZXI`. -/
@@ -43,7 +51,7 @@ def fiveQubitCode : StabGroup 5 :=
 @[simp] theorem fiveQubitCode_numPhysical : fiveQubitCode.numPhysical = 5 := rfl
 
 theorem fiveQubitCode_numLogical : fiveQubitCode.numLogical = 1 := by
-  letI : DecidablePred (fun x => x ∈ fiveQubitCode.carrier) := @fun a => Classical.propDecidable (a ∈ fiveQubitCode.carrier)
+  let : DecidablePred (fun x => x ∈ fiveQubitCode.carrier) := @fun a => Classical.propDecidable (a ∈ fiveQubitCode.carrier)
   have hcard : Fintype.card fiveQubitCode.carrier = 16 := by
     -- Define the four generators
     let g0 : PauliOp 5 := ⟨0, ![1,0,0,1,0], ![0,1,1,0,0]⟩

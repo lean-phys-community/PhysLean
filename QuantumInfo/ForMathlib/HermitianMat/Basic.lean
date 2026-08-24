@@ -3,17 +3,15 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.Matrix
-import QuantumInfo.ForMathlib.IsMaximalSelfAdjoint
-import QuantumInfo.ForMathlib.ContinuousLinearMap
-import QuantumInfo.ForMathlib.Tactic.Commutes
+module
 
-import Mathlib.Analysis.Matrix.Normed
-import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
-import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
-import Mathlib.Tactic.NormNum.GCD
+public import QuantumInfo.ForMathlib.Matrix
+public import QuantumInfo.ForMathlib.IsMaximalSelfAdjoint
+public import QuantumInfo.ForMathlib.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.Tactic.Commutes
+
+
+@[expose] public section
 
 /-- The type of Hermitian matrices, as a `Subtype`. Equivalent to a `Matrix n n α` bundled
 with the fact that `Matrix.IsHermitian`. -/
@@ -60,7 +58,7 @@ theorem H (A : HermitianMat n α) : A.mat.IsHermitian :=
 
 instance instFun : FunLike (HermitianMat n α) n (n → α) where
   coe M := (M : Matrix n n α)
-  coe_injective' _ _ h := HermitianMat.ext h
+  coe_injective _ _ h := HermitianMat.ext h
 
 @[simp]
 theorem mat_apply {A : HermitianMat n α} {i j : n} : A.mat i j = A i j := by
@@ -146,7 +144,7 @@ lemma continuousOn_iff_coe {X : Type*} [TopologicalSpace X] {s : Set X}
   constructor
   · intro; fun_prop
   · intro h
-    rw [continuousOn_iff_continuous_restrict] at *
+    rw [continuousOn_iff_continuous_domRestrict] at *
     apply Continuous.subtype_mk h
 
 variable [IsTopologicalAddGroup α]
@@ -164,6 +162,7 @@ instance : IsTopologicalAddGroup (HermitianMat n α) where
 
 variable  [TopologicalSpace R] [SMul R α] [ContinuousSMul R α] [StarModule R α]
 
+set_option backward.isDefEq.respectTransparency false in
 instance : ContinuousSMul R (HermitianMat n α) where
   continuous_smul := by
     rw [continuous_induced_rng]
@@ -171,6 +170,7 @@ instance : ContinuousSMul R (HermitianMat n α) where
 
 --Shorcut instances:
 instance : IsTopologicalAddGroup (HermitianMat n 𝕜) := inferInstance
+
 instance : ContinuousSMul ℝ (HermitianMat n ℂ) := inferInstance
 
 --TODO: Would be good to figure out the general (not just RCLike) version of this.
@@ -197,11 +197,12 @@ instance : AddCommGroup (HermitianMat n α) :=
 @[simp, norm_cast]
 theorem mat_finset_sum (f : ι → HermitianMat n α) (s : Finset ι) :
     (∑ i ∈ s, f i).mat = ∑ i ∈ s, (f i).mat := by
-  apply AddSubgroup.val_finset_sum
+  apply AddSubgroup.val_finsetSum
 
 section module
 
 variable [Semiring R] [Module R α] [StarModule R α]
+
 instance : Module R (HermitianMat n α) :=
   inferInstanceAs (Module R (selfAdjoint (Matrix n n α)))
 
@@ -309,7 +310,7 @@ theorem one_zpow : ((1 : HermitianMat m α) ^ z) = 1 := by
   ext1; simp
 
 @[simp]
-theorem zpow_neg_one : A ^ (-1) = A⁻¹ := by
+theorem zpow_neg_one : A ^ (-1 : ℤ) = A⁻¹ := by
   ext1; exact A.mat.zpow_neg_one
 
 @[simp]
@@ -358,6 +359,7 @@ section conj
 variable [CommRing α] [StarRing α] [Fintype n]
 variable (A : HermitianMat n α)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Hermitian matrix given by conjugating by a (possibly rectangular) Matrix. If we required `B` to be
 square, this would apply to any `Semigroup`+`StarMul` (as proved by `IsSelfAdjoint.conjugate`). But this lets
 us conjugate to other sizes too, as is done in e.g. Kraus operators. That is, it's a _heterogeneous_ conjguation.
@@ -390,10 +392,12 @@ theorem conj_conj {m l} [Fintype m] (B : Matrix m n α) (C : Matrix l m α) :
 
 variable (B : HermitianMat n α)
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem conj_zero [DecidableEq n] : A.conj (0 : Matrix m n α) = 0 := by
   simp [conj_apply]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem conj_one [DecidableEq n] : A.conj 1 = A := by
   simp [conj_apply]
@@ -418,6 +422,7 @@ def conjLinear {m} (B : Matrix m n α) : HermitianMat n α →ₗ[R] HermitianMa
 theorem conjLinear_apply (B : Matrix m n α) : conjLinear R B A = conj B A  := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 lemma continuous_conj (ρ : HermitianMat n 𝕜) : Continuous (ρ.conj (m := m) ·) := by
   simp only [HermitianMat.conj, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
@@ -434,13 +439,13 @@ instance [i : Nonempty n] : FaithfulSMul ℝ (HermitianMat n 𝕜) where
     simpa [RCLike.smul_re, -mat_apply] using congr(RCLike.re ($(h 1).val i.some i.some))
 
 /-- The continuous linear map associated with a Hermitian matrix. -/
-def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n where
+noncomputable def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n where
   toLinearMap := A.mat.toEuclideanLin
   cont := LinearMap.continuous_of_finiteDimensional _
 
 @[simp]
 theorem isSymmetric : A.lin.IsSymmetric :=
-  Matrix.isHermitian_iff_isSymmetric.mp A.H
+  Matrix.isSymmetric_toEuclideanLin_iff.symm.mp A.H
 
 @[simp]
 theorem lin_zero : (0 : HermitianMat n 𝕜).lin = 0 := by
@@ -455,7 +460,7 @@ noncomputable def eigenspace (μ : 𝕜) : Submodule 𝕜 (EuclideanSpace 𝕜 n
 
 /-- The kernel of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
 `LinearMap.ker A.toMat.toEuclideanLin`. Equivalently, the zero-eigenspace. -/
-def ker : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+noncomputable def ker : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   LinearMap.ker A.lin.toLinearMap
 
 theorem mem_ker_iff_mulVec_zero (x : EuclideanSpace 𝕜 n) : x ∈ A.ker ↔ A.mat.mulVec x = 0 := by
@@ -480,7 +485,7 @@ theorem ker_pos_smul {c : ℝ} (hc : c ≠ 0) : (c • A).ker = A.ker := by
 
 /-- The support of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
 `LinearMap.range A.toMat.toEuclideanLin`. Equivalently, the sum of all nonzero eigenspaces. -/
-def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+noncomputable def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
   LinearMap.range A.lin.toLinearMap
 
 /-- The support of a Hermitian matrix is the sum of its nonzero eigenspaces. -/
@@ -504,7 +509,7 @@ theorem ker_orthogonal_eq_support : A.kerᗮ = A.support := by
 @[simp]
 theorem support_orthogonal_eq_range : A.supportᗮ = A.ker := by
   rw [ker, support]
-  convert ContinuousLinearMap.orthogonal_range A.lin
+  convert! ContinuousLinearMap.orthogonal_range A.lin
   simp
 
 end eigenspace
@@ -548,6 +553,7 @@ lemma diagonal_sub : diagonal 𝕜 (f - g) = diagonal 𝕜 f - diagonal 𝕜 g :
 theorem diagonal_mul (c : ℝ) : diagonal 𝕜 (fun x ↦ c * f x) = c • diagonal 𝕜 f := by
   ext1; simp [← Matrix.diagonal_smul]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem diagonal_conj_diagonal [Fintype n] :
     (diagonal 𝕜 f).conj (diagonal 𝕜 g) = diagonal 𝕜 (fun i ↦ f i * (g i)^2) := by
   ext1
@@ -753,7 +759,7 @@ theorem conj_ne_zero {A : HermitianMat d 𝕜} {M : Matrix d₂ d 𝕜} (hA : A 
 theorem conj_ne_zero_iff {A : HermitianMat d 𝕜} {M : Matrix d₂ d 𝕜}
     (h : LinearMap.ker M.toEuclideanLin ≤ A.ker) : A.conj M ≠ 0 ↔ A ≠ 0  := by
   refine ⟨?_, (conj_ne_zero · h)⟩
-  intro h rfl; simp at h--should be grind[= map_zero] but I don't know why. TODO.
+  intro h rfl; grind
 
 section spectrum
 

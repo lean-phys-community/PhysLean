@@ -1,0 +1,49 @@
+version: v0.1
+
+Title: Simple pendulum
+
+Overview: |
+    A simple pendulum is a bob on a rigid massless rod of length ℓ, pinned at a pivot and swinging
+    in a vertical plane under gravity g. Its configuration is the angle of the rod from the downward
+    vertical, taken modulo a full turn, so the configuration space is a circle; the position of the
+    bob in the plane is (ℓ sin θ, −ℓ cos θ). The motion is governed by θ̈ + (g/ℓ) sin θ = 0. For
+    small amplitudes it is harmonic with period 2π√(ℓ/g); for librations (amplitudes below the
+    inverted position) the period grows with the amplitude and is given by a complete elliptic
+    integral. This API records the configuration space with its manifold structure and its
+    embedding into physical space; the dynamics, the small-angle limit and the period follow in
+    later modules.
+
+ParentAPIs:
+  - "Space (Physlib/SpaceAndTime/Space)"
+  - "Configuration space for pendulum (Physlib/ClassicalMechanics/Pendulum)"
+
+References:
+  - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 1 (The Equations of motion), Section 5 (The Lagrangian for a system of particles).
+  - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 3 (Integration of the equations of motion), Section 11 (Motion in one dimension).
+  - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 5 (Small oscillations), Section 21 (Free oscillations in one dimension).
+
+Requirements:
+
+  - description: The key data structure, the configuration space of the simple pendulum, is defined as the angle of the rod from the downward vertical modulo a full turn.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace, SimplePendulum.ConfigurationSpace.circleHomeomorph)
+
+  - description: The API contains the structure of a manifold on the configuration space.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.instChartedSpace, SimplePendulum.ConfigurationSpace.instIsManifold)
+
+  - description: The API contains the angular lift from the real line to the configuration space, periodic with period 2π.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.ofAngle, SimplePendulum.ConfigurationSpace.ofAngle_periodic, SimplePendulum.ConfigurationSpace.ofAngle_eq_iff)
+
+  - description: The API contains a map from the configuration space to `Space`, giving the position of the bob in real space, together with the rod-length constraint.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.toSpace, SimplePendulum.ConfigurationSpace.toSpace_ofAngle, SimplePendulum.ConfigurationSpace.toSpace_norm)
+
+  - description: The API shall contain the definition of a trajectory based on the configuration space.
+    done: false
+    location: N/A
+
+  - description: The API shall contain the Lagrangian of the simple pendulum and its equation of motion.
+    done: false
+    location: N/A

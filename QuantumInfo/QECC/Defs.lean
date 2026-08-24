@@ -3,7 +3,9 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.Finite.CPTPMap.CPTP
+module
+
+public import QuantumInfo.Channels.CPTP
 
 /-!
 # Quantum error-correcting codes
@@ -42,6 +44,8 @@ The generality (arbitrary CPTP encoders/decoders, and general finite Hilbert spa
 instances, so `QECC` carries that instance in addition to the ones on `d1`, `i`, and `d2`.
 -/
 
+@[expose] public section
+
 open scoped Matrix
 
 namespace QuantumLib
@@ -65,24 +69,7 @@ theorem ofEquiv_comp_symm (e : a ≃ b) :
   have := ofEquiv_symm_comp e.symm
   rwa [Equiv.symm_symm] at this
 
-
-/-- `CPTPOp.piProd` of identity channels is the identity. (Present in later physlib; stubbed at
-the v4.28 pin — an ATP target.) -/
-theorem piProd_id {ι : Type*} [DecidableEq ι] [Fintype ι] {d : ι → Type*}
-    [∀ i, Fintype (d i)] [∀ i, DecidableEq (d i)] :
-    CPTPOp.piProd (fun i => (CPTPOp.id : CPTPMap (d i) (d i))) = CPTPOp.id := by
-  -- Proof found by the ATP MCP (2026-07-13).
-  apply CPTPOp.ext
-  ext
-  simp [CPTPOp.piProd, MatrixMap.piProd, CPTPOp.id]
-
 end CPTPOp
-
-/-- Mixing two points with weight `1` returns the first. (Companion to `Mixable.mix_zero`.) -/
-theorem Mixable.mix_one {U T : Type*} [AddCommMonoid U] [Module ℝ U] [inst : Mixable U T]
-    (x₁ x₂ : T) : Mixable.mix (1 : Prob) x₁ x₂ = x₁ := by
-  apply inst.to_U_inj
-  simp [Mixable.mix, Mixable.mix_ab]
 
 /-! ### The `QECC` structure -/
 
@@ -178,8 +165,7 @@ theorem card_le_of_decodes {C : QECC d1 i d2} (h : C.Decodes) :
     Fintype.card d1 ≤ Fintype.card d2 ^ Fintype.card i := by
   have h' : C.decoder ∘ₘ C.encoder = CPTPOp.id := h
   have hmap : C.decoder.map ∘ₗ C.encoder.map = LinearMap.id := by
-    show (C.decoder ∘ₘ C.encoder).map = LinearMap.id
-    rw [h']; exact CPTPOp.id_map
+    rw [← CPTPOp.compose_map, h', CPTPOp.id_map]
   have hinj : Function.Injective C.encoder.map :=
     Function.LeftInverse.injective (g := C.decoder.map) (fun x => by
       rw [← LinearMap.comp_apply, hmap, LinearMap.id_apply])

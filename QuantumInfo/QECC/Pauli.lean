@@ -1,4 +1,11 @@
-import QuantumInfo.QECC.Stabilizer
+/-
+Copyright (c) 2026 Alex Meiburg. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alex Meiburg
+-/
+module
+
+public import QuantumInfo.QECC.Stabilizer
 
 /-!
 # The n-qubit Pauli group (faithful model)
@@ -6,6 +13,8 @@ import QuantumInfo.QECC.Stabilizer
 `PauliOp n` is `iᵏ XˣZᶻ`; it forms a group and represents faithfully as unitary matrices via
 `pauliOp` (reusing `pauliOp_mul`). A stabilizer is then an honest `-I`-free abelian subgroup.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace QuantumLib

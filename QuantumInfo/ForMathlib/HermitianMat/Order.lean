@@ -3,7 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Trace
+module
+
+public import QuantumInfo.ForMathlib.HermitianMat.Trace
+public import Mathlib.Analysis.RCLike.Basic
+
+@[expose] public section
 
 namespace HermitianMat
 
@@ -89,16 +94,20 @@ open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `HermitianMat.trace`: nonneg when the matrix is nonneg,
 positive when the matrix is positive. -/
 @[positivity HermitianMat.trace _]
-def evalHermitianMatTrace : PositivityExt where eval {_u _α} _zα _pα e := do
-  let .app _tr (A : Expr) ← whnfR e | throwError "not HermitianMat.trace"
-  let (isStrict, pfA) ← bestResult A
-  if isStrict then
-    pure (.positive (← mkAppM ``HermitianMat.trace_pos #[pfA]))
-  else
-    pure (.nonnegative (← mkAppM ``HermitianMat.trace_nonneg #[pfA]))
+meta def evalHermitianMatTrace : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with
+  | none => pure .none
+  | some _ => do
+    let .app _tr (A : Expr) ← whnfR e | throwError "not HermitianMat.trace"
+    let (isStrict, pfA) ← bestResult A
+    if isStrict then
+      pure (.positive (← mkAppM ``HermitianMat.trace_pos #[pfA]))
+    else
+      pure (.nonnegative (← mkAppM ``HermitianMat.trace_nonneg #[pfA]))
 
 --Without these shortcut instances, `gcongr` fails to close certain goals...? Why? TODO
 instance : PosSMulMono ℝ (HermitianMat n 𝕜) := inferInstance
+
 instance : SMulPosMono ℝ (HermitianMat n 𝕜) := inferInstance
 
 --Without explicitly giving this instance, Lean times out trying to find it sometimes.
@@ -116,6 +125,28 @@ theorem le_trace_smul_one [DecidableEq n] (hA : 0 ≤ A) : A ≤ A.trace • 1 :
 theorem kronecker_nonneg {A : HermitianMat m 𝕜} (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ A ⊗ₖ B := by
   rw [zero_le_iff, kronecker_mat]
   classical exact (zero_le_iff.mp hA).PosSemidef_kronecker (zero_le_iff.mp hB)
+
+/-- The self-Kronecker map `A ↦ A ⊗ₖ A` is monotone on nonnegative Hermitian matrices. -/
+theorem kronecker_self_mono (hA : 0 ≤ A) (hB : 0 ≤ B) (hAB : A ≤ B) :
+    A ⊗ₖ A ≤ B ⊗ₖ B := by
+  rw [← sub_nonneg]
+  have hAC : A ⊗ₖ B + -(A ⊗ₖ A) = A ⊗ₖ (B - A) := by
+    rw [show -(A ⊗ₖ A) = A ⊗ₖ (-A) by
+      symm
+      ext1
+      simpa using (Matrix.kronecker_smul (-1 : 𝕜) A.mat A.mat)]
+    simpa [sub_eq_add_neg] using
+      (HermitianMat.kronecker_add (A := A) (B := B) (C := -A)).symm
+  have hEq : B ⊗ₖ B - A ⊗ₖ A = A ⊗ₖ (B - A) + (B - A) ⊗ₖ B := by
+    calc
+      B ⊗ₖ B - A ⊗ₖ A = (A + (B - A)) ⊗ₖ B - A ⊗ₖ A := by
+        rw [show A + (B - A) = B by abel]
+      _ = (A ⊗ₖ B + (B - A) ⊗ₖ B) - A ⊗ₖ A := by rw [HermitianMat.add_kronecker]
+      _ = (A ⊗ₖ B + -(A ⊗ₖ A)) + (B - A) ⊗ₖ B := by abel
+      _ = A ⊗ₖ (B - A) + (B - A) ⊗ₖ B := by rw [hAC]
+  simpa [hEq] using add_nonneg
+    (HermitianMat.kronecker_nonneg hA (sub_nonneg.mpr hAB))
+    (HermitianMat.kronecker_nonneg (sub_nonneg.mpr hAB) hB)
 
 /-- The Kronecker product of two positive Hermitian matrices is positive. -/
 theorem kronecker_pos {A : HermitianMat m 𝕜} (hA : 0 < A) (hB : 0 < B) : 0 < A ⊗ₖ B := by
@@ -143,7 +174,7 @@ open Lean Meta in
 `Matrix.PosSemidef A`, `Matrix.PosDef A`, or `And P Q` (syntactically), attempt to
 find a proof of nonnegativity or positivity for `e`. Only syntactic matching on the
 head constant is used; `isDefEq` is used only to compare the matrix argument. -/
-private partial def findMatrixPSDInExpr (e : Expr) (p : Expr) (ty : Expr) :
+meta partial def findMatrixPSDInExpr (e : Expr) (p : Expr) (ty : Expr) :
     MetaM (Option (Bool × Expr)) := do
   let head := ty.getAppFn
   if head.isConst then
@@ -188,9 +219,10 @@ open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `Matrix`: looks for `A.PosSemidef` or `A.PosDef` in the
 local context (including syntactic `And` conjunctions) to prove `0 ≤ A` or `0 < A`. -/
 @[positivity (_ : HermitianMat _ _)]
-def evalMatrixPSD : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalMatrixPSD : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _pα => do
   let lctx ← getLCtx
-  let mut best : Strictness _zα _pα e := .none
+  let mut best : Strictness _zα e (some _pα) := .none
   for ldecl in lctx do
     if ldecl.isImplementationDetail then continue
     let ty := ldecl.type
@@ -217,7 +249,7 @@ open Lean Meta in
 `Matrix.PosSemidef A.mat`, `Matrix.PosDef A.mat`, or `And P Q` (syntactically), attempt to
 find a proof of nonnegativity or positivity for `e`. Only syntactic matching on the
 head constant is used; `isDefEq` is used only to compare the `HermitianMat` argument. -/
-private partial def findHermitianMatPSDInExpr (e : Expr) (p : Expr) (ty : Expr) :
+meta partial def findHermitianMatPSDInExpr (e : Expr) (p : Expr) (ty : Expr) :
     MetaM (Option (Bool × Expr)) := do
   let head := ty.getAppFn
   if head.isConst then
@@ -265,10 +297,11 @@ open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `HermitianMat`: looks for `A.mat.PosSemidef` or `A.mat.PosDef` in
 the local context (including syntactic `And` conjunctions) to prove `0 ≤ A` or `0 < A`. -/
 @[positivity (_ : HermitianMat _ _)]
-def evalHermitianMatPSD : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatPSD : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _pα => do
   trace[Tactic.positivity] "evalHermitianMatPSD: {e}"
   let lctx ← getLCtx
-  let mut best : Strictness _zα _pα e := .none
+  let mut best : Strictness _zα e (some _pα) := .none
   for ldecl in lctx do
     if ldecl.isImplementationDetail then continue
     let ty := ldecl.type
@@ -285,7 +318,8 @@ def evalHermitianMatPSD : PositivityExt where eval {_u _α} _zα _pα e := do
 open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `HermitianMat.kronecker`: nonneg when both factors are. -/
 @[positivity HermitianMat.kronecker _ _]
-def evalHermitianMatKronecker : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatKronecker : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app (.app _kron A) B ← whnfR e | throwError "not HermitianMat.kronecker"
   let (isStrictA, pfA) ← bestResult A
   let (isStrictB, pfB) ← bestResult B
@@ -311,7 +345,8 @@ theorem conj_pos [DecidableEq n] {A : HermitianMat n 𝕜} {M : Matrix m n 𝕜}
 open Lean Meta Mathlib.Meta.Positivity in
 /-- Positivity extension for `HermitianMat.conj`: nonneg when the inner matrix is. -/
 @[positivity HermitianMat.conj _ _]
-def evalHermitianMatConj : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatConj : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app (.app _coe conjM) (A : Expr) ← whnfR e | throwError "not conj application"
   let M := conjM.appArg!
   let (_, pfA) ← bestResult A
@@ -385,6 +420,7 @@ lemma conj_posDef [DecidableEq n] (hA : A.mat.PosDef) (hN : IsUnit N) :
   simp only [conj_apply_mat, mulVec_mulVec, Matrix.mul_assoc]
   simp [dotProduct_mulVec, mulVec_conjTranspose]
 
+set_option backward.isDefEq.respectTransparency false in
 lemma inv_conj [DecidableEq n] {M : Matrix n n 𝕜} (hM : IsUnit M) :
     (A.conj M)⁻¹ = A⁻¹.conj (M⁻¹)ᴴ := by
   have h_inv : (M⁻¹)ᴴ * Mᴴ = 1 := by
@@ -450,6 +486,7 @@ theorem ker_sum [DecidableEq n] (f : ι → HermitianMat n 𝕜) (hf : ∀ i, 0 
   · intro h
     simp [Matrix.sum_mulVec, h]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem ker_conj [DecidableEq n] (hA : 0 ≤ A) (B : Matrix n n 𝕜) :
     (A.conj B).ker = Submodule.comap (Matrix.toEuclideanLin B.conjTranspose) A.ker := by
 
@@ -471,6 +508,35 @@ theorem ker_conj [DecidableEq n] (hA : 0 ≤ A) (B : Matrix n n 𝕜) :
 theorem ker_le_of_le_smul {α : ℝ} [DecidableEq n] (hα : α ≠ 0) (hA : 0 ≤ A) (hAB : A ≤ α • B) : B.ker ≤ A.ker := by
   rw [← ker_pos_smul B hα]
   exact ker_antitone hA hAB
+
+/-- If a Hermitian matrix is bounded by `M * I`, then all its eigenvalues are at most `M`. -/
+theorem le_smul_one_imp_eigenvalues_le [DecidableEq n] (A : HermitianMat n ℂ) (M : ℝ)
+    (h : A ≤ M • (1 : HermitianMat n ℂ)) (i : n) :
+    A.H.eigenvalues i ≤ M := by
+  let v : n → ℂ := (A.H.eigenvectorBasis i).ofLp
+  have hv : star v ⬝ᵥ v = (1 : ℂ) := by
+    rw [show v = (A.H.eigenvectorBasis i).ofLp from rfl]
+    rw [dotProduct_comm, ← EuclideanSpace.inner_eq_star_dotProduct]
+    simp [A.H.eigenvectorBasis.orthonormal.1 i]
+  have hquad := (le_iff_mulVec_le_mulVec A (M • (1 : HermitianMat n ℂ))).mp h v
+  rw [show A.mat.mulVec v = (A.H.eigenvalues i : ℂ) • v from by
+    simpa [v] using A.H.mulVec_eigenvectorBasis i] at hquad
+  rw [dotProduct_smul, hv] at hquad
+  change (A.H.eigenvalues i : ℂ) • 1 ≤
+    star v ⬝ᵥ ((M : ℂ) • (1 : Matrix n n ℂ)) *ᵥ v at hquad
+  have hquadC : (A.H.eigenvalues i : ℂ) ≤ (M : ℂ) := by
+    have hright : star v ⬝ᵥ ((M : ℂ) • (1 : Matrix n n ℂ)) *ᵥ v = (M : ℂ) := by
+      simp [Matrix.smul_mulVec, hv]
+    simpa [Matrix.smul_mulVec, hv] using hquad.trans_eq hright
+  exact_mod_cast hquadC
+
+open MatrixOrder in
+/-- If all eigenvalues of a Hermitian matrix are at most `M`, then it is bounded by `M * I`. -/
+theorem eigenvalues_le_imp_le_smul_one [DecidableEq n] (A : HermitianMat n ℂ) (M : ℝ)
+    (h : ∀ i, A.H.eigenvalues i ≤ M) :
+    A ≤ M • (1 : HermitianMat n ℂ) := by
+  exact
+    (Matrix.PosSemidef.le_smul_one_of_eigenvalues_iff A.H M).mp h
 
 /-- Containment of kernels is preserved by the partial trace, provided the smaller one is PSD.
 
@@ -586,7 +652,8 @@ private theorem _root_.Matrix.eigenvalues_nonneg [DecidableEq n] {M : Matrix n n
 
 /-- Positivity extension for `A.mat` where `A : HermitianMat`: nonneg when `0 ≤ A`. -/
 @[positivity HermitianMat.mat _]
-def evalHermitianMatMat : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatMat : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app _matFn (A : Expr) ← whnfR e | throwError "not HermitianMat.mat"
   match ← bestResult A with
   | (true, pa) =>
@@ -596,7 +663,8 @@ def evalHermitianMatMat : PositivityExt where eval {_u _α} _zα _pα e := do
 
 /-- Positivity extension for `A.mat` where `A : HermitianMat`: nonneg when `0 ≤ A`. -/
 @[positivity Subtype.val (_ : HermitianMat _ _)]
-def evalHermitianMatVal : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatVal : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   /- Note: we must not call `whnf` on `e` because `Subtype.val` is a structure
   projection (reducible), so `whnf` would reduce it and destroy the pattern. -/
   let A := e.appArg!
@@ -608,14 +676,16 @@ def evalHermitianMatVal : PositivityExt where eval {_u _α} _zα _pα e := do
 
 /-- Positivity extension for `M * Mᴴ` as a Matrix: always nonneg. -/
 @[positivity HMul.hMul _ (Matrix.conjTranspose _)]
-def evalMatrixSelfMulConjTranspose : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalMatrixSelfMulConjTranspose : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app (.app _hmul _M) Mstar ← whnfR e | throwError "not HMul application"
   let .app _conjTranspose M' ← whnfR Mstar | throwError "not M * conjTranspose"
   pure (.nonnegative (← mkAppM ``Matrix.nonneg_self_mul_conjTranspose #[M']))
 
 /-- Positivity extension for `Mᴴ * M` as a Matrix: always nonneg. -/
 @[positivity HMul.hMul (Matrix.conjTranspose _) _]
-def evalMatrixConjTransposeMulSelf : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalMatrixConjTransposeMulSelf : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app (.app _hmul Mstar) _M ← whnfR e | throwError "not HMul application"
   let .app _conjTranspose M' ← whnfR Mstar | throwError "not conjTranspose * M"
   pure (.nonnegative (← mkAppM ``Matrix.nonneg_conjTranspose_mul_self #[M']))
@@ -623,7 +693,8 @@ def evalMatrixConjTransposeMulSelf : PositivityExt where eval {_u _α} _zα _pα
 /-- Positivity extension for `⟨M, (pf : M.IsHermitian)⟩` as a HermitianMat:
 equivalent to `0 ≤ M` in `MatrixOrder`. -/
 @[positivity (Subtype.mk _ _ : HermitianMat _ _)]
-def evalHermitianMatMk : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalHermitianMatMk : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app (.app _mkFn val) _proof ← whnfR e | throwError "not Subtype.mk"
   match ← bestResult val with
   | (true, pa) =>
@@ -635,7 +706,8 @@ def evalHermitianMatMk : PositivityExt where eval {_u _α} _zα _pα e := do
 Will try to prove `0 ≤ M` in the `MatrixOrder`. If the proof is `A.H`, i.e. M comes from a
 HermitianMat, this will give `0 ≤ A.mat` which becomes `0 ≤ A` later. -/
 @[positivity Matrix.IsHermitian.eigenvalues _ _]
-def evalMatrixEigenvalues : PositivityExt where eval {_u _α} _zα _pα e := do
+meta def evalMatrixEigenvalues : PositivityExt where eval {_u _α} _zα _pα? e :=
+  match _pα? with | none => pure .none | some _ => do
   let .app (.app _eigenvaluesFn hProof) _i ← whnfR e | throwError "not eigenvalues application"
   let pType ← inferType hProof
   if pType.isAppOf  ``Matrix.IsHermitian then
@@ -669,11 +741,13 @@ example (M : Matrix m n ℂ) : 0 ≤ M.conjTranspose * M := by positivity
 example (M : Matrix n m ℂ) : 0 ≤ M * M.conjTranspose := by positivity
 
 -- Test: ⟨Mᴴ * M, _⟩ nonneg as HermitianMat
+set_option backward.isDefEq.respectTransparency false in
 example (M : Matrix m n ℂ) :
     (0 : HermitianMat n ℂ) ≤ ⟨M.conjTranspose * M, Matrix.isHermitian_conjTranspose_mul_self M⟩ := by
   positivity
 
 -- Test: ⟨M * Mᴴ, _⟩ nonneg as HermitianMat
+set_option backward.isDefEq.respectTransparency false in
 example (M : Matrix n m ℝ) :
     (0 : HermitianMat n ℝ) ≤ ⟨M * M.conjTranspose, Matrix.isHermitian_mul_conjTranspose_self M⟩ := by
   positivity

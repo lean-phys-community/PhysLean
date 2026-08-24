@@ -3,13 +3,15 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Inner
-import QuantumInfo.ForMathlib.HermitianMat.Rpow
-import QuantumInfo.ForMathlib.HermitianMat.UnitaryConj
-import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
-import QuantumInfo.ForMathlib.StdBasis
+module
 
-import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
+public import QuantumInfo.ForMathlib.HermitianMat.Inner
+public import QuantumInfo.ForMathlib.HermitianMat.Rpow
+public import QuantumInfo.ForMathlib.HermitianMat.Unitary
+public import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
+public import QuantumInfo.ForMathlib.StdBasis
+
+public import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
 
 /-!
 # Self-adjoint operators on a Hilbert space
@@ -44,6 +46,8 @@ lets an existing matrix definition be reused verbatim on operators.
 * `HermitianOp.toMat_cfc`, `HermitianOp.trace_toMat`, `HermitianOp.toMat_le_toMat`: the matrix
   analogues of the operator-level `cfc`, `trace` and order.
 -/
+
+@[expose] public section
 
 open scoped ComplexOrder
 
@@ -491,19 +495,19 @@ theorem traceNorm_nonneg (A : HermitianOp E) : 0 ≤ A.traceNorm := by
 theorem traceNorm_neg (A : HermitianOp E) : (-A).traceNorm = A.traceNorm := by
   let _ : StdBasis ℂ E ι₀ := StdBasis.some ℂ E
   simp only [traceNorm_toMat (ι := ι₀), toMat_neg, HermitianMat.mat_neg]
-  exact Matrix.traceNorm_eq_neg_self _
+  exact Matrix.traceNorm_neg _
 
 theorem traceNorm_add_le (A B : HermitianOp E) :
     (A + B).traceNorm ≤ A.traceNorm + B.traceNorm := by
   let _ : StdBasis ℂ E ι₀ := StdBasis.some ℂ E
   simp only [traceNorm_toMat (ι := ι₀), toMat_add, HermitianMat.mat_add]
-  exact Matrix.traceNorm_triangleIneq _ _
+  exact Matrix.traceNorm_add_le _ _
 
 theorem traceNorm_sub_le (A B : HermitianOp E) :
     (A - B).traceNorm ≤ A.traceNorm + B.traceNorm := by
   let _ : StdBasis ℂ E ι₀ := StdBasis.some ℂ E
   simp only [traceNorm_toMat (ι := ι₀), toMat_sub, HermitianMat.mat_sub]
-  exact Matrix.traceNorm_triangleIneq' _ _
+  exact Matrix.traceNorm_sub_le _ _
 
 /-- On a nonnegative operator the trace norm is just the trace. -/
 theorem traceNorm_of_nonneg (h : 0 ≤ A) : A.traceNorm = A.trace := by
@@ -512,7 +516,7 @@ theorem traceNorm_of_nonneg (h : 0 ≤ A) : A.traceNorm = A.trace := by
     rw [← HermitianMat.zero_le_iff]
     simpa using toMat_le_toMat.2 h
   rw [traceNorm_toMat (ι := ι₀), ← trace_toMat (ι := ι₀), HermitianMat.trace_eq_re_trace,
-    ← hpsd.traceNorm_PSD_eq_trace]
+    ← hpsd.traceNorm_eq_trace]
   simp
 
 section Unitary

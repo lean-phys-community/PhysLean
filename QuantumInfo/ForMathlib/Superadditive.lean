@@ -3,7 +3,11 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.Subadditive
+module
+
+public import Mathlib.Analysis.Subadditive
+
+@[expose] public section
 
 def Superadditive (u : ℕ → ℝ) : Prop :=
   ∀ m n, u (m + n) ≥ u m + u n

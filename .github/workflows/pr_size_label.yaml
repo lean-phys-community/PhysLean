@@ -1,0 +1,85 @@
+name: PR size label
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+# Limit permissions for GITHUB_TOKEN for the entire workflow
+permissions:
+  contents: read
+  pull-requests: write  # Only allow PR comments/labels
+  # All other permissions are implicitly 'none'
+
+jobs:
+  add_size_label:
+    name: Add size label
+    runs-on: ubuntu-latest
+    # Don't run on forks, where we wouldn't have permissions to add the label anyway.
+    if: github.repository == 'leanprover-community/physlib'
+    steps:
+      - name: Label PR by size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const SIZES = [
+              { label: 'small', color: '2ea44f', max: 100 },
+              { label: 'medium', color: 'f66a0a', max: 500 },
+              { label: 'large', color: 'd73a4a', max: Infinity },
+            ];
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const changedLines = pr.additions + pr.deletions;
+            const target = SIZES.find(s => changedLines < s.max) ?? SIZES[SIZES.length - 1];
+
+            core.info(`PR #${pr.number}: ${changedLines} lines changed -> ${target.label}`);
+
+            // Ensure all three size labels exist with the right color, and remove
+            // any size label that isn't the one that currently applies.
+            for (const size of SIZES) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: size.label,
+                });
+              } catch (err) {
+                if (err.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: size.label,
+                    color: size.color,
+                  });
+                } else {
+                  throw err;
+                }
+              }
+
+              if (size.label !== target.label) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: size.label,
+                  });
+                } catch (err) {
+                  if (err.status !== 404) throw err;
+                }
+              }
+            }
+
+            const existingLabels = pr.labels.map(l => l.name);
+            if (!existingLabels.includes(target.label)) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: [target.label],
+              });
+            }

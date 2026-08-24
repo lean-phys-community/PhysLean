@@ -3,8 +3,8 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Basic
-import ImportGraph.Imports
+import Physlib.Meta.Basic
+import ImportGraph
 import Mathlib.Lean.CoreM
 
 /-!
@@ -13,7 +13,7 @@ import Mathlib.Lean.CoreM
 
 -/
 
-open Lean System Meta PhysLean
+open Lean System Meta Physlib
 
 
 def Imports.RedundantImports (imp : Import) : MetaM UInt32 := do
@@ -26,6 +26,7 @@ def Imports.RedundantImports (imp : Import) : MetaM UInt32 := do
 
 unsafe def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
+  Lean.enableInitializersExecution
   let imports ← allImports
-  let _ ← CoreM.withImportModules #[`PhysLean] (imports.mapM Imports.RedundantImports).run'
+  let _ ← CoreM.withImportModules #[`Physlib] (imports.mapM Imports.RedundantImports).run'
   return 0

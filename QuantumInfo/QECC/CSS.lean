@@ -3,7 +3,9 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.StabilizerFacts
+module
+
+public import QuantumInfo.QECC.StabilizerFacts
 
 /-!
 # CSS codes
@@ -12,6 +14,8 @@ Calderbank–Shor–Steane codes: build a stabilizer group from two classical bi
 dual-containment condition. The `X`-type generators come from one parity-check matrix, the `Z`-type
 from the other; commutation is exactly dual containment.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace QuantumLib

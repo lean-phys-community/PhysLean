@@ -3,10 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Algebra.Jordan.Basic
+module
 
-import QuantumInfo.ForMathlib.HermitianMat.CFC
-import QuantumInfo.ForMathlib.HermitianMat.Order
+public import Mathlib.Algebra.Jordan.Basic
+
+public import QuantumInfo.ForMathlib.HermitianMat.CFC
+public import QuantumInfo.ForMathlib.HermitianMat.Order
 
 /-!
 Hermitian matrices have a Jordan algebra structure given by
@@ -14,6 +16,8 @@ Hermitian matrices have a Jordan algebra structure given by
 `HermitianMat.symmMul`, but it's available as `*` multiplication scoped under
 `HermMul`. When `A` and `B` commute, this reduces to standard matrix multiplication.
 -/
+
+@[expose] public section
 
 noncomputable section
 
@@ -28,13 +32,16 @@ def symmMul : HermitianMat d 𝕜 :=
   ⟨(2 : 𝕜)⁻¹ • (A.mat * B.mat + B.mat * A.mat),
     by simp [selfAdjoint, IsSelfAdjoint, add_comm, Matrix.star_eq_conjTranspose]⟩
 
+set_option backward.isDefEq.respectTransparency false in
 theorem symmMul_comm : A.symmMul B = B.symmMul A := by
   rw [symmMul, symmMul, Subtype.mk.injEq, add_comm]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem symmMul_zero : A.symmMul 0 = 0:= by
   simp [symmMul]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem zero_symmMul : symmMul 0 A = 0 := by
   simp [symmMul]
@@ -130,8 +137,8 @@ scoped instance : NonUnitalNonAssocRing (HermitianMat d 𝕜) where
 
 variable [Invertible (2 : 𝕜)] [DecidableEq d]
 
---TODO: Upgrade this to NonAssocCommRing, see #28604 in Mathlib
-scoped instance : NonAssocRing (HermitianMat d 𝕜) where
+scoped instance : NonAssocCommRing (HermitianMat d 𝕜) where
+  mul_comm := HermitianMat.symmMul_comm
 
 end field
 

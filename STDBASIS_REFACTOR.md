@@ -1,24 +1,43 @@
 # `StdBasis` refactor: scoping, design, and migration plan
 
-Status of this document: Stages 0–2, Stage 5, most of Stage 3, and the core of Stage 4 have landed,
-and the whole of `QuantumInfo` builds green with zero errors and zero warnings.
+Status of this document: Stages 0–2, Stage 5, most of Stage 3, and the core of Stage 4 have landed.
+The branch has since been merged with `master`, which brought Lean `v4.33.0` and its **module
+system** (`module` / `public import` / `@[expose] public section`), the `PhysLean` → `Physlib`
+rename, the flattening of `QuantumInfo/Finite/` into `States/`, `Channels/`, `Entropy/`,
+`Measurements/`, `Operators/` and `Capacity/`, and a completed data processing inequality for the
+sandwiched Rényi divergence. All 102 modules under `QuantumInfo/` (48.8k lines) build with zero
+errors and zero warnings, and `QuantumInfo.lean` now imports every one of them, so the default
+`lake build` target covers the whole library.
 
-Sorries remaining in `lake build QuantumInfo`, all three research-paper-scale results:
+Sorries remaining in the parts of the library that are meant to be complete:
 
 | Location | Statement | What it needs |
 | --- | --- | --- |
-| `Finite/Entropy/DPI.lean:383` | data processing for the sandwiched Rényi divergence | Beigi's proof (`arXiv:1306.5920`) interpolates between the two endpoint contractions below. Mathlib has `Complex.HadamardThreeLines` but no Riesz–Thorin; also missing are complex powers `A ^ z` of a PSD matrix with analyticity in `z`, Schatten-norm duality, and polar decomposition |
-| `Finite/Capacity.lean:302` | the LSD theorem (achievability of the coherent information) | decoupling / random-coding machinery, none of which exists here |
-| `Finite/Capacity.lean:307` | the regularized capacity formula | follows from the LSD theorem plus the converse |
+| `Capacity/Capacity.lean:394` | the LSD theorem (achievability of the coherent information) | decoupling / random-coding machinery, none of which exists here |
+| `Capacity/Capacity.lean:400` | the regularized capacity formula | follows from the LSD theorem plus the converse |
 
-The two endpoint contractions Beigi's argument interpolates between *are* now available, in
-`MatrixMap.IsPositive`: `traceNorm_le` (a positive trace-preserving map is a trace-norm
-contraction, via the Jordan decomposition `X = X⁺ - X⁻` and the new
+Three subtrees are works in progress rather than finished developments, and carry sorries by
+design: `QECC/` (21, mostly code parameters and distances of the concrete code zoo, plus the
+Singleton/Hamming/Gilbert–Varshamov bounds), `Entropy/Axiomatized/` (16, the axiomatic
+characterisation of relative entropy and its Rényi family), and `ClassicalInfo/Capacity.lean` (4,
+Shannon's noisy-channel coding theorem).
+
+The sandwiched Rényi DPI no longer needs Riesz–Thorin interpolation. `Entropy/DPI.lean` (1616 lines)
+proves it from Stinespring: `sandwichedTraceFunctional_mono_traceRight` gives monotonicity under a
+partial trace for `α > 1`, `sandwichedRenyiEntropy_conj_unitary` gives unitary invariance, and
+`sandwichedRenyiEntropy_DPI` assembles them through `CPTPOp.prepDefault` and the Stinespring
+dilation, with the `α = 1` case recovered as a limit
+(`sandwichedRelRentropy_tendsto_qRelativeEnt`). Joint convexity of the relative entropy
+(`qRelativeEnt_joint_convexity`) falls out of the same machinery.
+
+The two endpoint contractions that Beigi's interpolation argument would have used are available
+anyway, in `MatrixMap.IsPositive`: `traceNorm_le` (a positive trace-preserving map is a trace-norm
+contraction, via the Jordan decomposition `X = X⁺ - X⁻` and
 `HermitianMat.traceNorm_eq_trace_posPart_add_negPart`) and `mem_Icc_smul_one_of_unital` (a positive
 unital map maps the Loewner interval `[-c • 1, c • 1]` into itself, i.e. is an operator-norm
 contraction).
 
-* **Stage 0** — `QuantumInfo/ForMathlib/StdBasis.lean` and `QuantumInfo/Finite/StdBasisState.lean`.
+* **Stage 0** — `QuantumInfo/ForMathlib/StdBasis.lean` and `QuantumInfo/StdBasisState.lean`.
 * **Stage 1 (partial)** — `QuantumInfo/ForMathlib/HermitianOp.lean` defines
   `HermitianOp E := selfAdjoint (E →L[ℂ] E)` with `trace`, `cfc`, the Loewner order, and the
   bridge `HermitianOp.toMat : HermitianOp E ≃ₗ[ℝ] HermitianMat ι ℂ` induced by a `StdBasis ℂ E ι`,
@@ -64,12 +83,13 @@ contraction).
   they are now `EuclideanSpace ℂ d₁` / `EuclideanSpace ℂ d₂`. Their two call sites apply them by
   name instead.
 
-  Not yet done in Stage 3: `Entropy/SSA.lean` (still matrix-stated throughout) and
-  `Entropy/DPI.lean` (blocked on Stage 4).
+  Not yet done in Stage 3: `Entropy/SSA.lean` and `Entropy/DPI.lean`, both still matrix-stated
+  throughout. `Entropy/DPI.lean` is mathematically complete (see the header above); it is the
+  *statement* that is still in matrix language.
 
 * **Stage 4 (core)** — the partial trace and the tensor/index bridge exist.
 
-  `QuantumInfo/ForMathlib/PartialTrace.lean` (409 lines) builds the partial trace from scratch, as
+  `QuantumInfo/ForMathlib/PartialTrace.lean` (413 lines) builds the partial trace from scratch, as
   Mathlib has none. `ContinuousLinearMap.traceLeft/traceRight` on `(E ⊗[𝕜] F) →L[𝕜] E ⊗[𝕜] F` are
   defined by summing `tmulLeftL`/`tmulRightL` sandwiches over an orthonormal basis of the traced-out
   factor; a `BasisIndependence` section shows the sum does not depend on that basis, so the
@@ -99,8 +119,8 @@ contraction).
   Not yet done in Stage 4: `MState.purify`, `MState.prod`, `Ensemble.lean`, `Entanglement.lean`, and
   the `kron`/Choi machinery.
 
-* **Stage 5** — `CPTPMap/OpMap.lean` defines `OpMap E F := (E →L[ℂ] E) →ₗ[ℂ] (F →L[ℂ] F)` with
-  `OpMap.toMat`/`OpMap.ofMat` as the bridge to `MatrixMap`, and `CPTPMap/Bundled.lean` carries the
+* **Stage 5** — `Channels/OpMap.lean` defines `OpMap E F := (E →L[ℂ] E) →ₗ[ℂ] (F →L[ℂ] F)` with
+  `OpMap.toMat`/`OpMap.ofMat` as the bridge to `MatrixMap`, and `Channels/Bundled.lean` carries the
   nine-structure hierarchy `HPOp/UnitalOp/TPOp/POp/CPOp/PTPOp/PUOp/CPTPOp/CPUOp` at the operator
   level, with `abbrev CPTPMap dIn dOut := CPTPOp (EuclideanSpace ℂ dIn) (EuclideanSpace ℂ dOut)`
   (and likewise for the other eight). Every channel constructed from a matrix presentation —
@@ -109,10 +129,10 @@ contraction).
   `X_map : X.map = <matrixmap>`. Choi matrices and Kraus decompositions stay matrix-side, as
   planned in §4 Stage 5.
 
-Remaining downstream files (`Entropy/{SSA,DPI}`, `Ensemble`, `POVM`, `Entanglement`, `Pinching`,
-`ResourceTheory/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not yet
-migrated to operator form; they still speak in matrices via `ρ.M`. Stages 6 and 7 below are
-unstarted.
+Remaining downstream files (`Entropy/{SSA,DPI}.lean`, `States/{Ensemble,Entanglement}.lean`,
+`Measurements/POVM.lean`, `Channels/Pinching.lean`, `Capacity/Capacity.lean`, `ResourceTheory/*`,
+`QECC/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not yet migrated to
+operator form; they still speak in matrices via `ρ.M`. Stages 6 and 7 below are unstarted.
 
 ### Known ergonomic wart: dot notation through the `MState`/`CPTPMap` abbreviations
 
@@ -134,30 +154,29 @@ retries after unfolding reducible definitions; `MState.*` names that are genuine
 
 ### 1.1 Genuinely basis-dependent vs. basis-free-but-matrix-stated
 
-The library is ~33k lines across 89 files under `QuantumInfo/`. Sorting the content by how it
+The library is ~48.8k lines across 102 files under `QuantumInfo/`. Sorting the content by how it
 relates to a choice of basis:
 
 **Genuinely basis-dependent** (a `StdBasis` instance is real input, not bookkeeping):
 
 | Location | What depends on the basis |
 | --- | --- |
-| `Finite/Braket.lean` | `Ket d`/`Bra d` are *functions* `d → ℂ`; `Ket.basis i`, `Ket.MES`, `uniform_superposition`, `Ket.prod` are all defined coordinatewise |
-| `Finite/MState.lean` | `MState.ofClassical`, `MState.uniform`, `MState.spectrum` (canonically *sorted* eigenvalues, hence index-dependent), `relabel` |
-| `Finite/POVM.lean` | measurement outcomes indexed by a type; the computational-basis measurement |
-| `Finite/Qubit/Basic.lean` | Pauli matrices, Bloch sphere coordinates |
-| `QECC/*` (≈3.4k lines) | Pauli group, stabilizer groups, CSS codes, transversal gates — all defined on `Fin n → …` index tuples. This subtree is *irreducibly* basis-dependent and is the main consumer of the new class |
+| `States/Pure/Braket.lean` | `Ket d`/`Bra d` are *functions* `d → ℂ`; `Ket.basis i`, `Ket.MES`, `uniform_superposition`, `Ket.prod` are all defined coordinatewise |
+| `States/Mixed/MState.lean` | `MState.ofClassical`, `MState.uniform`, `MState.spectrum` (canonically *sorted* eigenvalues, hence index-dependent), `relabel` |
+| `Measurements/POVM.lean` | measurement outcomes indexed by a type; the computational-basis measurement |
+| `States/Pure/Qubit.lean` | Pauli matrices, Bloch sphere coordinates |
+| `QECC/*` (≈3.7k lines) | Pauli group, stabilizer groups, CSS codes, transversal gates — all defined on `Fin n → …` index tuples. This subtree is *irreducibly* basis-dependent and is the main consumer of the new class |
 | `ForMathlib/HermitianMat/Basic.lean` `diagonal`, `Proj.lean`, `Majorization.lean` | diagonal matrices, coordinate projections, majorization of eigenvalue vectors |
-| `StatMech/*` | Hamiltonians given as explicit matrices |
 
 **Basis-free in content, matrix-stated in form** (the bulk; this is what a refactor buys):
 
 | Location | Why it is basis-free |
 | --- | --- |
 | `ForMathlib/HermitianMat/{Order,Trace,Inner,Sqrt,CFC,Rpow,LogExp,Schatten,Jordan,NonSingular}.lean` (≈4.3k lines) | everything is a statement about a self-adjoint element of a C\*-algebra: order, trace, `cfc`, `rpow`, `log`/`exp`, Schatten norms, Jordan product |
-| `Finite/Entropy/*` (≈2.3k + 1.3k + 0.4k lines) | von Neumann entropy, relative entropy, SSA, DPI: all unitary-invariant spectral functionals |
-| `Finite/Distance/*` | trace distance and fidelity are unitarily invariant |
-| `Finite/CPTPMap/*` (≈2.9k lines) | positivity/complete positivity/trace preservation of a linear map; Choi matrix and Kraus decompositions are matrix-*presentations* of basis-free notions |
-| `Finite/ResourceTheory/*`, `Finite/Pinching.lean`, `Finite/Capacity.lean` | consequences of the above |
+| `Entropy/*` (≈2.3k + 1.3k + 0.4k lines) | von Neumann entropy, relative entropy, SSA, DPI: all unitary-invariant spectral functionals |
+| `States/Mixed/{TraceDistance,Fidelity}.lean` | trace distance and fidelity are unitarily invariant |
+| `Channels/*` (≈4.4k lines) | positivity/complete positivity/trace preservation of a linear map; Choi matrix and Kraus decompositions are matrix-*presentations* of basis-free notions |
+| `ResourceTheory/*`, `Channels/Pinching.lean`, `Capacity/Capacity.lean` | consequences of the above |
 
 Rough scale of matrix-level surface: `.mat` appears ~1180 times in 25 files, `Matrix.trace` ~210
 times, eigenvalue/spectrum identifiers ~1300 times, kronecker ~445, `submatrix`/`reindex` ~300.
@@ -168,17 +187,19 @@ times, eigenvalue/spectrum identifiers ~1300 times, kronecker ~445, `submatrix`/
 ForMathlib/{Matrix, Isometry, Unitary, LinearEquiv, ContinuousLinearMap}
         └── ForMathlib/HermitianMat/{Basic, Order, Trace, Reindex, Inner, NonSingular,
                                       Sqrt, CFC, Rpow, LogExp, Jordan, Proj, Schatten}
-                └── Finite/Braket ──┐
-                                    ├── Finite/MState ── Finite/Unitary
-                                    │        ├── Finite/CPTPMap/{MatrixMap, Unbundled,
-                                    │        │      Bundled, CPTP, Dual}
-                                    │        ├── Finite/Entropy/{VonNeumann, Relative, SSA, DPI}
-                                    │        ├── Finite/Distance/{TraceDistance, Fidelity}
-                                    │        ├── Finite/{Ensemble, POVM, Entanglement, Pinching}
-                                    │        └── Finite/ResourceTheory/{FreeState,
-                                    │               HypothesisTesting, SteinsLemma}
-                                    └── QECC/{Pauli, Stabilizer, StabilizerGroup, Codes,
-                                              CSS, Transversal, Defs, Bounds, Concatenation}
+                └── States/Pure/Braket ──┐
+                                         ├── States/Mixed/MState ── Operators/Unitary
+                                         │    ├── Channels/{OpMap, MatrixMap, Unbundled,
+                                         │    │      Bundled, CPTP, Dual, Pinching}
+                                         │    ├── Entropy/{VonNeumann, Relative, SSA, DPI}
+                                         │    ├── States/Mixed/{TraceDistance, Fidelity}
+                                         │    ├── States/{Ensemble, Entanglement},
+                                         │    │      Measurements/POVM, Capacity/Capacity
+                                         │    └── ResourceTheory/{FreeState,
+                                         │           HypothesisTesting, SteinsLemma,
+                                         │           ResourceTheory}
+                                         └── QECC/{Pauli, Stabilizer, StabilizerGroup, Codes,
+                                                   CSS, Transversal, Defs, Bounds, Concatenation}
 ```
 
 `MState` is the single choke point: `HermitianMat` sits below it, and essentially everything else
@@ -334,7 +355,7 @@ universes).
 
 ## 3. What the prototype contains
 
-### `QuantumInfo/ForMathlib/StdBasis.lean` (330 lines, compiles clean, no `sorry`)
+### `QuantumInfo/ForMathlib/StdBasis.lean` (578 lines, compiles clean, no `sorry`)
 
 * `class StdBasis`, `export StdBasis (stdBasis)`.
 * Instances: `EuclideanSpace.instStdBasis`, `StdBasis.instTensorProduct`,
@@ -355,7 +376,7 @@ universes).
   `ContinuousLinearMap.IsPositive.conjStarAlgEquiv` and
   `ContinuousLinearMap.isPositive_conjStarAlgEquiv_iff`. Both are Mathlib-shaped.
 
-### `QuantumInfo/Finite/StdBasisState.lean` (115 lines, compiles clean, no `sorry`)
+### `QuantumInfo/StdBasisState.lean` (115 lines, compiles clean, no `sorry`)
 
 The end-to-end demonstration on von Neumann entropy:
 
@@ -378,7 +399,7 @@ Sizes below are rough (S ≈ ≤ 1 day, M ≈ 2–4 days, L ≈ 1–2 weeks, XL 
 
 ### Stage 0 — foundations (done; S)
 
-`ForMathlib/StdBasis.lean` + `Finite/StdBasisState.lean`. Already landed and green.
+`ForMathlib/StdBasis.lean` + `StdBasisState.lean`. Already landed and green.
 
 **Remaining Stage-0 items before proceeding:**
 1. Decide the `CompleteSpace` question (§2.4). Try a local
@@ -395,9 +416,9 @@ Introduce `SelfAdjointOp E := selfAdjoint (E →L[ℂ] E)` alongside `HermitianM
 star-order isomorphism). Do **not** yet change `HermitianMat`'s definition.
 
 Order of files, each self-contained:
-* `HermitianMat/Order.lean` (627 lines) — port via `posSemidef_toMatOf_iff_nonneg`. Low risk: the
+* `HermitianMat/Order.lean` (760 lines) — port via `posSemidef_toMatOf_iff_nonneg`. Low risk: the
   Loewner order on CLMs is already in Mathlib.
-* `HermitianMat/Trace.lean` (245) — needs a real-valued operator trace built on `LinearMap.trace`;
+* `HermitianMat/Trace.lean` (282) — needs a real-valued operator trace built on `LinearMap.trace`;
   `trace_toMatOf` is the bridge. `traceLeft`/`traceRight` are **deferred to Stage 4**.
 * `HermitianMat/{Sqrt, CFC, Rpow, LogExp, Jordan, NonSingular}.lean` (≈2.6k lines) — these are
   already CFC statements. Expect ~90% to port by changing binders only, because the CFC instances
@@ -422,7 +443,7 @@ so that downstream files continue to compile untouched.
   `LinearMap.IsSymmetric.eigenvalues` plus an explicit sort, and prove
   `spectrum_toMat = spectrum` by unitary invariance (`HermitianMat.eigenvalues_conj` already
   exists).
-* `Braket.lean` (393 lines): `Ket d`/`Bra d` become vectors in `E` with `‖ψ‖ = 1`. `Ket.basis i`
+* `Braket.lean` (452 lines): `Ket d`/`Bra d` become vectors in `E` with `‖ψ‖ = 1`. `Ket.basis i`
   requires a `StdBasis` argument. ~51 declarations; most rewrite mechanically, but everything
   coordinatewise (`dot`, `Ket.prod`, `MES`, `uniform_superposition`) needs the basis threaded.
 
@@ -433,24 +454,25 @@ to be binder churn. `Braket.lean` ~15 of 51 need real work.
 
 These are the payoff stage: every result here is unitarily invariant, so
 `StdBasis.congr_of_unitaryInvariant` discharges the insensitivity obligations mechanically, exactly
-as demonstrated in `Finite/StdBasisState.lean`.
+as demonstrated in `StdBasisState.lean`.
 
-* `Finite/Unitary.lean` — done. `DensityOp.U_conj` takes a `unitary (E →L[ℂ] E)`; `MState.U_conj`
+* `Operators/Unitary.lean` — done. `DensityOp.U_conj` takes a `unitary (E →L[ℂ] E)`; `MState.U_conj`
   is defined from it through `StdBasis.unitaryOfMat`, so all twelve existing `◃` call sites are
   unchanged.
-* `Finite/Distance/{TraceDistance, Fidelity}.lean` — done, with the trace norm staying matrix-side
+* `States/Mixed/{TraceDistance, Fidelity}.lean` — done, with the trace norm staying matrix-side
   behind `HermitianOp.traceNorm`. `TraceDistance.lean` also gained the data processing inequality
   `TrDistance.DPI_PTP` (for a `PTPMap`, matching `Fidelity.lean`'s existing fidelity DPI) with
   `TrDistance.DPI` as the `CPTPMap` corollary. It is stated for `PTPMap d d₂` rather than a
   basis-free `PTPOp E F` because `PTPOp.instMFunLike` is declared inside the `StdBasis` section of
-  `CPTPMap/Bundled.lean`, so `Λ ρ` is not even elaborable without `StdBasis` instances on both
+  `Channels/Bundled.lean`, so `Λ ρ` is not even elaborable without `StdBasis` instances on both
   sides.
-* `Finite/Entropy/VonNeumann.lean` — done.
-* `Finite/Entropy/Relative.lean` — done. The definition is basis-free; the ~1450 lines of existing
+* `Entropy/VonNeumann.lean` — done.
+* `Entropy/Relative.lean` — done. The definition is basis-free; the ~1450 lines of existing
   matrix-level machinery below it are untouched, reached through the `coords` transport.
-* `Finite/Entropy/SSA.lean` (1521) — not started. Large but shallow: statements about traces, `log`,
+* `Entropy/SSA.lean` (1524) — not started. Large but shallow: statements about traces, `log`,
   and CFC, almost no coordinate reasoning.
-* `Finite/Entropy/DPI.lean` (395) — depends on Stage 4.
+* `Entropy/DPI.lean` (1616) — the mathematics is complete but the statements are matrix-level;
+  restating them basis-free depends on Stage 4.
 
 ### Stage 4 — tensor products and partial trace (L, genuinely hard; core done)
 
@@ -467,13 +489,13 @@ trace**.
   composite system passes through this. **Done**, via `StdBasis.equiv` / `DensityOp.transport`, which
   handle any pair of spaces sharing an index type rather than just this one pair; `SWAP` and `assoc`
   are covered too.
-* Still to do: `MState.purify`, `MState.prod`, `Finite/Entanglement.lean`, `Finite/Ensemble.lean`,
-  and the `kron`/Choi machinery in `CPTPMap`.
+* Still to do: `MState.purify`, `MState.prod`, `States/Entanglement.lean`, `States/Ensemble.lean`,
+  and the `kron`/Choi machinery in `Channels/`.
 
-### Stage 5 — `CPTPMap` (L)
+### Stage 5 — `Channels/` (L)
 
 `MatrixMap A B R := Matrix A A R →ₗ[R] Matrix B B R` becomes
-`(E →L[ℂ] E) →ₗ[ℂ] (F →L[ℂ] F)`. Roughly 2.9k lines and ~270 declarations across five files.
+`(E →L[ℂ] E) →ₗ[ℂ] (F →L[ℂ] F)`. Roughly 4.4k lines and ~270 declarations across six files.
 
 * `IsTracePreserving`, `Unital`, `IsHermitianPreserving`, `IsPositive` port directly.
 * `IsCompletelyPositive`, `choi_matrix`, `of_choi_matrix`, `choi_equiv`, `toMatrix`, `of_kraus`,
@@ -484,14 +506,15 @@ trace**.
 
 ### Stage 6 — the long tail (L)
 
-`Finite/{Pinching, POVM, Capacity, Qubit}.lean`, `Finite/ResourceTheory/*`. `SteinsLemma.lean`
-(2113 lines, but only ~8 top-level declarations, so it is a small number of very long proofs) is
+`Channels/Pinching.lean`, `Measurements/POVM.lean`, `Capacity/Capacity.lean`,
+`States/Pure/Qubit.lean`, `ResourceTheory/*`. `SteinsLemma.lean`
+(2121 lines, but only ~8 top-level declarations, so it is a small number of very long proofs) is
 the highest-variance single file: long analytic arguments where one changed definition can require
 re-deriving a whole chain. Budget it separately.
 
 ### Stage 7 — `QECC/` (M, but *do it last and do it differently*)
 
-The ~3.4k lines under `QECC/` are the intended *beneficiary*, not a victim: Pauli groups,
+The ~3.7k lines under `QECC/` are the intended *beneficiary*, not a victim: Pauli groups,
 stabilizer groups, CSS codes and transversal gates are genuinely basis-relative, and the refactor
 lets them state that fact instead of hard-coding `EuclideanSpace ℂ (Fin 2)^n`. The work is adding
 `[StdBasis ℂ E (Fin 2)]` binders and a `StdBasis` instance for `n`-fold tensor powers, not
@@ -511,7 +534,7 @@ the project can be paused after any stage.
 1. **`CompleteSpace` is not derivable from `FiniteDimensional` by instance search.** Every
    operator-level signature in the library grows binders. Resolve in Stage 0.
 2. **No partial trace and no Schatten norms in Mathlib.** These are the two largest genuinely-new
-   developments, and they sit under `Entropy`, `Distance` and `CPTPMap`. The partial trace has since
+   developments, and they sit under `Entropy/`, `States/Mixed/` and `Channels/`. The partial trace has since
    been written (`ForMathlib/PartialTrace.lean`); the Schatten norms remain matrix-side behind
    `HermitianOp.traceNorm`.
 3. **`MState.spectrum` is canonically sorted.** It is basis-independent but index-dependent, and
@@ -519,5 +542,5 @@ the project can be paused after any stage.
    theorem in Mathlib does not sort.
 4. **The Choi matrix is irreducibly a matrix.** Trying to make `CPTPMap` fully basis-free rather
    than stating basis-independence of its consequences is the most likely way Stage 5 overruns.
-5. **`SteinsLemma.lean`.** 2113 lines in ~8 declarations; long analytic proofs are brittle under
+5. **`SteinsLemma.lean`.** 2121 lines in ~8 declarations; long analytic proofs are brittle under
    definitional change, and there is no way to migrate it incrementally.

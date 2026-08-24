@@ -24,6 +24,14 @@ def main (args : List String) : IO UInt32 := do
   let importCheck ← IO.Process.output {cmd := "lake", args := #["exe", "check_file_imports"]}
   println! importCheck.stdout
 
+  println! "\x1b[36m(3/7) Illegal Imports\x1b[0m"
+  let noAlphaImports ← IO.Process.output {cmd := "lake", args := #["exe", "noAlphaImports"]}
+  println! noAlphaImports.stdout
+
+  println! "\x1b[36m(3/7) Ensuring all PhyslibAlpha modules imported\x1b[0m"
+  let alphaFileImports ← IO.Process.output {cmd := "lake", args := #["exe", "alphaFileImports"]}
+  println! alphaFileImports.stdout
+
   println! "\x1b[36m(4/7) TODO tag duplicates \x1b[0m"
   let todoCheck ← IO.Process.output {cmd := "lake", args := #["exe", "check_dup_tags"]}
   println! todoCheck.stdout
@@ -31,13 +39,14 @@ def main (args : List String) : IO UInt32 := do
   println! "\x1b[36m(5/7) Sorry and pseudo attribute linter \x1b[0m"
   let sorryPseudoCheck ← IO.Process.output {cmd := "lake", args := #["exe", "sorry_lint"]}
   println! sorryPseudoCheck.stdout
+  println! sorryPseudoCheck.stderr
 
   if ¬ "--fast" ∈ args then
     println! "\x1b[36m(6/7) Lean linter \x1b[0m"
     println! "\x1b[2mExpect this linter to take a while to run, it can be skipped with
       lake exe lint_all --fast"
     println! "You can manually perform this linter by placing `#lint` at the end of the files you have modified.\x1b[0m"
-    let leanCheck ← IO.Process.output {cmd := "lake", args := #["exe", "runPhysLeanLinters", "PhysLean"]}
+    let leanCheck ← IO.Process.output {cmd := "lake", args := #["exe", "runPhyslibLinters", "Physlib"]}
     println! leanCheck.stdout
 
     println! "\x1b[36m(7/7) Transitive imports \x1b[0m"

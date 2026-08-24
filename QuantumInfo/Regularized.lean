@@ -3,14 +3,18 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.Superadditive
-import Mathlib.Order.LiminfLimsup
-import Mathlib.Topology.Order.LiminfLimsup
-import Mathlib.Topology.Order.MonotoneConvergence
+module
+
+public import QuantumInfo.ForMathlib.Superadditive
+public import Mathlib.Order.LiminfLimsup
+public import Mathlib.Topology.Order.LiminfLimsup
+public import Mathlib.Topology.Order.MonotoneConvergence
 
 /-! Definition of "Regularized quantities" as are common in information theory,
 from one-shot versions, and good properties coming from Fekete's lemma.
 -/
+
+@[expose] public section
 
 variable {T : Type*} [ConditionallyCompleteLattice T]
 
@@ -32,9 +36,10 @@ variable {fn : ℕ → T} {_lb _ub : T} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, 
 
 /-- The `InfRegularized` value is also lower bounded. -/
 theorem lb : _lb ≤ InfRegularized fn hl hu := by
-  convert le_csSup ?_ ?_;
-  · exact ⟨ _ub, fun a ha => by rcases Filter.eventually_atTop.mp ha with ⟨ n, hn ⟩ ; exact le_trans ( hn _ le_rfl ) ( hu _ ) ⟩;
-  · aesop
+  rw [InfRegularized, Filter.liminf_eq]
+  refine le_csSup ⟨_ub, fun a ha => ?_⟩ (Filter.Eventually.of_forall hl)
+  obtain ⟨n, hn⟩ := Filter.eventually_atTop.mp ha
+  exact (hn n le_rfl).trans (hu n)
 
 /-- The `InfRegularized` value is also upper bounded. -/
 theorem ub : InfRegularized fn hl hu ≤ _ub := by
@@ -58,12 +63,10 @@ theorem anti_inf (h : Antitone fn) :
   any particular value. -/
 theorem anti_ub (h : Antitone fn) : ∀ n, InfRegularized fn hl hu ≤ fn n := by
   intro n
-  have h_inf_le : InfRegularized fn hl hu ≤ fn n := by
-    convert csSup_le _ _;
-    · exact ⟨ _lb, Filter.eventually_atTop.2 ⟨ 0, fun n hn => hl n ⟩ ⟩;
-    · simp +zetaDelta at *;
-      exact fun b x hx => le_trans ( hx ( Max.max x n ) ( le_max_left _ _ ) ) ( h ( le_max_right _ _ ) )
-  exact h_inf_le
+  rw [InfRegularized, Filter.liminf_eq]
+  refine csSup_le ⟨_lb, Filter.Eventually.of_forall hl⟩ fun b hb => ?_
+  obtain ⟨m, hm⟩ := Filter.eventually_atTop.mp hb
+  exact (hm (max m n) (le_max_left _ _)).trans (h (le_max_right _ _))
 
 end InfRegularized
 
@@ -122,13 +125,10 @@ variable {fn : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀
 /-- Negating a real sequence swaps `liminf` and `limsup`. -/
 private theorem liminf_neg (s : ℕ → ℝ) :
     Filter.liminf (fun n ↦ -s n) Filter.atTop = -Filter.limsup s Filter.atTop := by
-  rw [Filter.liminf_eq, Filter.limsup_eq]
-  have h_sup_neg_inf : ∀ S : Set ℝ, sSup S = -sInf (-S) := by
-    intro S
-    rw [Real.sInf_def]
-    aesop
-  convert h_sup_neg_inf _ using 3
-  aesop
+  rw [Filter.liminf_eq, Filter.limsup_eq, Real.sInf_def, neg_neg]
+  congr 1
+  ext a
+  simp [le_neg]
 
 theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
@@ -156,13 +156,13 @@ theorem InfRegularized.of_Subadditive (hf : Subadditive (fun n ↦ fn n * n))
     rintro x ⟨y,(rfl : _ / _ = _)⟩
     rcases y with (_|n)
     · simp
-    · rw [inf_le_iff]
-      convert Or.inr (hl (n+1))
-      field_simp
+    · refine inf_le_right.trans ?_
+      rw [mul_div_assoc, div_self (by positivity), mul_one]
+      exact hl (n + 1)
   )
-  have h₂ : Filter.Tendsto fn Filter.atTop (nhds hf.lim) := by
+  have h₂ : Filter.Tendsto fn .atTop (nhds hf.lim) := by
     refine h₁.congr' ?_
-    filter_upwards [Filter.eventually_gt_atTop 0] with n hn
-    have hn' : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+    filter_upwards [Filter.eventually_ne_atTop 0] with n hn
+    have : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn
     field_simp
-  rw [InfRegularized, Filter.Tendsto.liminf_eq h₂]
+  exact h₂.liminf_eq.symm

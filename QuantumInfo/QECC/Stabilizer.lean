@@ -3,11 +3,13 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.QECC.Defs
-import Mathlib.Data.ZMod.Basic
-import Mathlib.Algebra.CharP.Two
-import Mathlib.LinearAlgebra.Dimension.Finrank
-import Mathlib.LinearAlgebra.Matrix.ToLin
+module
+
+public import QuantumInfo.QECC.Defs
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Algebra.CharP.Two
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.Matrix.ToLin
 
 /-!
 # Stabilizer codes
@@ -39,6 +41,8 @@ lives.
 * `Stabilizer.centralizer` — the Paulis commuting with the whole stabilizer.
 * `Stabilizer.weight`, `Stabilizer.distance`, `Stabilizer.numLogical`, `Stabilizer.numPhysical`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

@@ -3,23 +3,28 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.Convex.Mul
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
-import Mathlib.Data.NNReal.Basic
-import Mathlib.Data.EReal.Basic
-import Mathlib.Tactic.Finiteness
-import Mathlib.Topology.UnitInterval
+module
+
+public import Mathlib.Analysis.Convex.Mul
+public import Mathlib.Analysis.SpecialFunctions.Log.Basic
+public import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
+public import Mathlib.Data.NNReal.Basic
+public import Mathlib.Data.EReal.Basic
+public import Mathlib.Tactic.Finiteness
+public import Mathlib.Topology.UnitInterval
 
 /-! # Probabilities
 
-This defines a type `Prob`, which is simply any real number in the interval O to 1. This then comes with
-additional statements such as its application to convex sets, and it makes useful type alias for
-functions that only make sense on probabilities.
+This defines a type `Prob`, which is simply any real number in the interval O to 1.
+This then comes with additional statements such as its application to convex sets, and
+it makes useful type alias for functions that only make sense on probabilities.
 
-A significant application is in the `Mixable` typeclass, also in this file, which is a general notion
-of convex combination that applies to types as opposed to sets; elements are `Mixable.mix`ed using `Prob`s.
+A significant application is in the `Mixable` typeclass, also in this file, which is a
+general notion of convex combination that applies to types as opposed to sets;
+elements are `Mixable.mix`ed using `Prob`s.
 -/
+
+@[expose] public section
 
 noncomputable section
 open NNReal
@@ -84,12 +89,13 @@ instance instCompleteLinearOrder : CompleteLinearOrder Prob :=
 instance instInhabited : Inhabited Prob where
   default := 0
 
+set_option backward.isDefEq.respectTransparency false in
 instance : LinearOrderedCommMonoidWithZero Prob where
   mul_lt_mul_of_pos_left := by
     intros a ha b h hb
     rw [← Subtype.coe_lt_coe]
     exact mul_lt_mul_of_pos_left hb ha
-  zero_le a := a.2.1
+  isBot_zero a := a.2.1
 
 @[simp]
 theorem zero_le_coe {p : Prob} : 0 ≤ (p : ℝ) :=
@@ -145,6 +151,7 @@ theorem toNNReal_one : (1 : Prob) = (1 : ℝ≥0) :=
 
 theorem ofNNReal_toNNReal : ENNReal.ofNNReal (toNNReal p) = ENNReal.ofReal (p : ℝ) := by
   simp [toNNReal, ENNReal.ofReal_eq_coe_nnreal]
+  norm_cast
 
 def NNReal.asProb (p : ℝ≥0) (hp : p ≤ 1) : Prob :=
   ⟨p, ⟨p.2, hp⟩⟩
@@ -181,6 +188,7 @@ theorem one_minus_inv (p : Prob) : 1 - (1 - p) = p := by
 instance : OrderTopology Prob :=
   orderTopology_of_ordConnected (ht := Set.ordConnected_Icc)
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp, norm_cast]
 theorem coe_iInf {ι : Type*} [Nonempty ι] (f : ι → Prob) : ↑(⨅ t, f t) = (⨅ t, f t : ℝ) := by
   apply Monotone.map_ciInf_of_continuousAt
@@ -214,21 +222,24 @@ theorem mul_eq_one_iff (p q : Prob) : p * q = 1 ↔ p = 1 ∧ q = 1 := by
 
 end Prob
 
-/-- A `Mixable T` typeclass instance gives a compact way of talking about the action of probabilities
-  for forming linear combinations in convex spaces. The notation `p [ x₁ ↔ x₂ ]` means to take a convex
+/-- A `Mixable T` typeclass instance gives a compact way of talking about the
+  action of probabilities for forming linear combinations in convex spaces.
+  The notation `p [ x₁ ↔ x₂ ]` means to take a convex
   combination, equal to `x₁` if `p=1` and to `x₂` if `p=0`.
 
-  Mixable is defined by an "underlying" data type `U` with addition and scalar multiplication, and a
-  bijection between the `T` and a convex set of `U`. For instance, in `Mixable (Distribution (Fin n))`,
-  `U` is `n`-element vectors (which form the probability simplex, degenerate in one dimension). For
-  `QuantumInfo.Finite.MState` density matrices in quantum mechanics, which are PSD matrices of trace 1,
-  `U` is the underlying matrix.
+  Mixable is defined by an "underlying" data type `U` with addition and scalar
+  multiplication, and a bijection between the `T` and a convex set of `U`.
+  For instance, in `Mixable (Distribution (Fin n))`, `U` is `n`-element vectors
+  (which form the probability simplex, degenerate in one dimension). For
+  `QuantumInfo.States.Mixed.MState` density matrices in quantum mechanics, which are
+  PSD matrices of trace 1, `U` is the underlying matrix.
 
-  Why not just stick with existing notions of `Convex`? `Convex` requires that the type already forms an
-  `AddCommMonoid` and `Module ℝ`. But many types, such as `Distribution`, are not: there is no good notion of
-  "multiplying a probability distribution by 0.3" to get another distribution. We can coerce the distribution
-  into, say, a vector or a function, but then we are not doing arithmetic with distributions. Accordingly,
-  the expression `0.3 * distA + 0.7 * distB` cannot represent a distribution on its own. -/
+  Why not just stick with existing notions of `Convex`? `Convex` requires that
+  the type already forms an `AddCommMonoid` and `Module ℝ`. But many types, such as `Distribution`,
+  are not: there is no good notion of "multiplying a probability distribution by 0.3" to get another
+  distribution. We can coerce the distribution nto, say, a vector or a function, but then we are not
+  doing arithmetic with distributions. Accordingly, the expression `0.3 * distA + 0.7 * distB`
+  cannot represent a distribution on its own. -/
 class Mixable (U : outParam (Type u)) (T : Type v) [AddCommMonoid U] [Module ℝ U] where
   /-- Getter for the underlying data -/
   to_U : T → U
@@ -250,8 +261,9 @@ def mix_ab [inst : Mixable U T] {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) (hab :
     (y := to_U x₂) (exists_apply_eq_apply _ _)
     ha hb hab
 
-/-- `Mixable.mix` represents the notion of "convex combination" on the type `T`, afforded by the `Mixable`
-instance. It takes a `Prob`, that is, a `Real` between 0 and 1. For working directly with a Real, use `mix_ab`. -/
+/-- `Mixable.mix` represents the notion of "convex combination" on the type `T`, afforded by the
+  `Mixable` instance. It takes a `Prob`, that is, a `Real` between 0 and 1. For working directly
+  with a Real, use `mix_ab`. -/
 def mix [inst : Mixable U T] (p : Prob) (x₁ x₂ : T) : T :=
   inst.mix_ab p.zero_le_coe (1 - p).zero_le_coe p.add_one_minus x₁ x₂
 
@@ -263,8 +275,15 @@ notation p "[" x₁:80 "↔" x₂ "]" => mix p x₁ x₂
 
 notation p "[" x₁:80 "↔" x₂ ":" M "]" => mix (inst := M) p x₁ x₂
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem mix_zero [inst : Mixable U T] (x₁ x₂ : T) : (0 : Prob) [ x₁ ↔ x₂ : inst] = x₂ := by
+  apply inst.to_U_inj
+  simp [mix, mix_ab]
+
+set_option backward.isDefEq.respectTransparency false in
+@[simp]
+theorem mix_one [inst : Mixable U T] (x₁ x₂ : T) : (1 : Prob) [ x₁ ↔ x₂ : inst] = x₁ := by
   apply inst.to_U_inj
   simp [mix, mix_ab]
 
@@ -278,7 +297,8 @@ instance instUniv [AddCommMonoid T] [Module ℝ T] : Mixable T T where
   mkT := fun _ ↦ ⟨_, rfl⟩
 
 @[simp]
-theorem mkT_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} (h : ∃ t', to_U t' = t) : instUniv.mkT h = ⟨t, rfl⟩ :=
+theorem mkT_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} (h : ∃ t', to_U t' = t) :
+    instUniv.mkT h = ⟨t, rfl⟩ :=
   rfl
 
 @[simp]
@@ -287,13 +307,17 @@ theorem to_U_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} : instUniv.to_U t
 
 section pi
 
-theorem instPi.lem_1 {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)] [inst : ∀i, Mixable (U i) (T i)]
-    {u : (i : D) → U i} (h : ∃ (t : (i : D) → T i), (fun d => to_U (t d)) = u) (d : D) : ∃ (t : T d), to_U t = u d := by
+theorem instPi.lem_1 {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)]
+    [inst : ∀i, Mixable (U i) (T i)]
+    {u : (i : D) → U i} (h : ∃ (t : (i : D) → T i), (fun d => to_U (t d)) = u) (d : D) :
+    ∃ (t : T d), to_U t = u d := by
   obtain ⟨t, h⟩ := h
   use t d
   exact congrFun h d
 
-variable {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)] [inst : ∀i, Mixable (U i) (T i)] in
+set_option backward.isDefEq.respectTransparency false in
+variable {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)]
+  [inst : ∀i, Mixable (U i) (T i)] in
 /-- Mixable instance on Pi types. -/
 instance instPi : Mixable ((i:D) → U i) ((i:D) → T i) where
   to_U x := fun d ↦ (inst d).to_U (x d)
@@ -308,18 +332,21 @@ instance instPi : Mixable ((i:D) → U i) ((i:D) → T i) where
     simp only [to_U_of_mkT, Pi.add_apply, Pi.smul_apply]
 
 @[simp]
-theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t, to_U t = u) : (instPi.mkT h).val =
-    fun d ↦ (inst.mkT (instPi.lem_1 h d)).val :=
+theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t, to_U t = u) :
+    (instPi.mkT h).val = fun d ↦ (inst.mkT (instPi.lem_1 h d)).val :=
   rfl
 
 @[simp]
-theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} : (instPi).to_U t = fun d ↦ inst.to_U (t d) :=
+theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} :
+    (instPi).to_U t = fun d ↦ inst.to_U (t d) :=
   rfl
 
 end pi
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Mixable instances on subtypes (of other mixable types), assuming that they
  have the correct closure properties. -/
+@[reducible]
 def instSubtype {T : Type*} {P : T → Prop} (inst : Mixable U T)
     (h : ∀{x y:T},
       ∀⦃a b : ℝ⦄, (ha : 0 ≤ a) → (hb : 0 ≤ b) → (hab : a + b = 1) →
@@ -371,13 +398,14 @@ theorem mkT_mixable (u : ℝ) (h : ∃ t : Prob, Mixable.to_U t = u) : Mixable.m
 
 /-- `Prob.mix` is an alias of `Mixable.mix` so it can be accessed from a probability with
 dot notation, e.g. `p.mix x y`. -/
-abbrev mix [AddCommMonoid U] [Module ℝ U] [inst : Mixable U T] (p : Prob) (x₁ x₂ : T) := inst.mix p x₁ x₂
+abbrev mix [AddCommMonoid U] [Module ℝ U] [inst : Mixable U T]
+    (p : Prob) (x₁ x₂ : T) := inst.mix p x₁ x₂
 
 section negLog
 open ENNReal
 
-/-- Map a probability [0,1] to [0,+∞] with -log p. Special case that 0 maps to +∞ (not 0, as Real.log
-does). This makes it `Antitone`.
+/-- Map a probability [0,1] to [0,+∞] with -log p. Special case that 0 maps to +∞ (not 0, as
+  Real.log does). This makes it `Antitone`.
 -/
 noncomputable def negLog : Prob → ENNReal :=
   fun p ↦ if p = 0 then ∞ else .ofNNReal ⟨-Real.log p,
@@ -387,6 +415,7 @@ noncomputable def negLog : Prob → ENNReal :=
 scoped notation "—log " => negLog
 
 --TODO: Upgrade to `StrictAnti`. Even better: bundle negLog as `Prob ≃o ENNRealᵒᵈ`.
+set_option backward.isDefEq.respectTransparency false in
 theorem negLog_Antitone : Antitone negLog := by
   intro x y h
   dsimp [negLog]
@@ -399,7 +428,7 @@ theorem negLog_Antitone : Antitone negLog := by
     have : 0 ≤ x.1 := zero_le
     linarith +splitNe
   · exact OrderTop.le_top _
-  · rw [ENNReal.coe_le_coe, ← NNReal.coe_le_coe, coe_mk, coe_mk, neg_le_neg_iff]
+  · rw [ENNReal.coe_le_coe, toReal_le, toReal, neg_le_neg_iff]
     apply (Real.log_le_log_iff _ _).mpr h
     <;> exact lt_of_le_of_ne zero_le (unitInterval.coe_ne_zero.mpr (by assumption)).symm
 
@@ -409,8 +438,9 @@ theorem negLog_zero : —log (0 : Prob) = ⊤ := by
 
 @[simp]
 theorem negLog_one : —log 1 = 0 := by
-  simp [negLog]
+  simp [negLog]; rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem negLog_eq_top_iff {p : Prob} : —log p = ⊤ ↔ p = 0 := by
   simp [negLog]
@@ -419,13 +449,15 @@ theorem negLog_pos_ENNReal {p : Prob} (hp : p ≠ 0) : —log p = .ofNNReal ⟨-
     Left.nonneg_neg_iff.mpr (Real.log_nonpos p.2.1 p.2.2)⟩ := by
   simp [negLog, hp]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by
   rw [negLog]
   split_ifs with hp
   · simp [hp]
-  · simp
+  · simp; rfl
 
+set_option backward.isDefEq.respectTransparency false in
 theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENNReal.ofReal x ≤ —log p := by
   by_cases hx : 0 ≤ x
   · rw [negLog]
@@ -438,18 +470,25 @@ theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENN
         replace h := Real.strictMonoOn_log hp (Real.exp_pos _) h
         rw [Real.log_exp] at h
         rw [← ENNReal.toReal_lt_toReal ofReal_ne_top coe_ne_top, toReal_ofReal hx]
-        simpa using lt_neg_of_lt_neg h
+        exact lt_neg_of_lt_neg h
       · apply le_of_eq
+        conv_rhs =>
+          enter [1, 1]
+          rw [h, Real.log_exp, neg_neg]
         rw [← ENNReal.toReal_eq_toReal_iff' ofReal_ne_top coe_ne_top,
-          coe_toReal, coe_mk, h, Real.log_exp, neg_neg, toReal_ofReal hx]
+          coe_toReal, toReal, toReal_ofReal hx]
   · trans 0
     · simp only [nonpos_iff_eq_zero, ofReal_eq_zero, le_of_not_ge hx]
-    · exact _root_.zero_le _
+    · exact _root_.zero_le
 
+set_option backward.isDefEq.respectTransparency false in
 @[aesop (rule_sets := [finiteness]) safe apply]
 theorem negLog_ne_top {p : Prob} (hp : 0 < p.val) : —log p ≠ ∞ := by
-  simpa [negLog] using ne_of_gt hp
+  have h1 := ne_of_gt hp
+  simp_all only [unitInterval.coe_pos, ne_eq, Set.Icc.coe_eq_zero, negLog_eq_top_iff]
+  exact not_false
 
+set_option backward.isDefEq.respectTransparency false in
 theorem negLog_eq_neg_ENNReal_log (p : Prob) : —log p = -ENNReal.log p := by
   rw [negLog]
   split_ifs with hp
@@ -469,6 +508,7 @@ theorem negLog_eq_ofReal_neg_log {p : Prob} (hp : 0 < p) :
   · simp_all
   · exact ENNReal.ofReal_eq_coe_nnreal (neg_nonneg_of_nonpos (Real.log_nonpos p0 p1))
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem zero_lt_negLog {p : Prob} : 0 < —log p ↔ p ≠ 1 := by
   --This is messy enough it's probably a sign we're missing other simp lemmas
@@ -476,7 +516,7 @@ theorem zero_lt_negLog {p : Prob} : 0 < —log p ↔ p ≠ 1 := by
   split_ifs with h
   · simp [h]
   constructor <;> intro h₂ <;> contrapose! h₂
-  · simp [h₂]
+  · simp [h₂]; rfl
   simp only [nonpos_iff_eq_zero, ENNReal.coe_eq_zero] at h₂
   rw [Subtype.ext_iff] at h₂
   simp only [NNReal.val_eq_coe, NNReal.coe_zero, neg_eq_zero, Real.log_eq_zero,
@@ -486,6 +526,7 @@ theorem zero_lt_negLog {p : Prob} : 0 < —log p ↔ p ≠ 1 := by
   · assumption
   · linarith [p.zero_le_coe]
 
+set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 theorem Continuous_negLog : Continuous negLog := by
   --Thanks Aristotle
@@ -499,9 +540,10 @@ theorem Continuous_negLog : Continuous negLog := by
     rw [Subtype.dist_eq, Set.Icc.coe_zero, dist_zero_right, Real.norm_eq_abs] at ha'
     split_ifs with h; · simp
     rw [Subtype.mk_eq_mk, Set.Icc.coe_zero] at h
-    simp only [ENNReal.coe_lt_coe, ← NNReal.coe_lt_coe, NNReal.coe_mk]
+    simp only [ENNReal.coe_lt_coe, ← NNReal.coe_lt_coe]
     replace ha' := Real.log_lt_log (by positivity) ((le_abs_self _).trans_lt ha')
     simp only [Real.log_exp] at ha'
+    show x < -Real.log a
     linarith
   have h_cont_on_pos : ContinuousOn —log (Set.Ioi 0) := by
     intro p hp

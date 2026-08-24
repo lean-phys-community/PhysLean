@@ -3,14 +3,13 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import Mathlib.Analysis.InnerProductSpace.JointEigenspace
-import Mathlib.Analysis.SpecialFunctions.Bernstein
-import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
-import Mathlib.LinearAlgebra.Matrix.Permutation
-import Mathlib.LinearAlgebra.Matrix.IsDiag
-import Mathlib.Tactic.NormNum.GCD
+module
 
-import QuantumInfo.ForMathlib.Matrix
+public import Mathlib.Analysis.InnerProductSpace.JointEigenspace
+public import Mathlib.LinearAlgebra.Matrix.Permutation
+public import QuantumInfo.ForMathlib.Matrix
+
+@[expose] public section
 
 open scoped Matrix
 
@@ -89,7 +88,7 @@ theorem Equiv.Perm.permMatrix_mem_unitaryGroup (e : Perm d) :
       ext i j; simp [Equiv.Perm.permMatrix] ; aesop;
     simp_all [mul_eq_one_comm]
   · simp_all only [Matrix.transpose_permMatrix]
-    convert h_perm_ortho using 2;
+    convert! h_perm_ortho using 2;
     simp [Matrix.star_eq_conjTranspose, Equiv.Perm.permMatrix]
 
 omit [Fintype d₃] [DecidableEq d₂] in
@@ -270,7 +269,9 @@ theorem Matrix.cfc_conj_unitary (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
 
 theorem Matrix.cfc_conj_unitary' (f : ℝ → ℝ) (u : unitaryGroup d 𝕜) :
     cfc f (uᴴ * A * u.val) = uᴴ * (cfc f A) * u.val := by
-  simpa only [inv_inv] using cfc_conj_unitary f u⁻¹
+  have h1 := cfc_conj_unitary (A := A) f u⁻¹
+  simp_all only [inv_inv]
+  exact h1
 
 theorem Matrix.cfc_reindex (f : ℝ → ℝ) (e : d ≃ d₂) :
     cfc f (reindex e e A) = reindex e e (cfc f A) := by
@@ -328,6 +329,7 @@ theorem iSup_mono_bot {α : Type*} {ι ι' : Sort*} [CompleteLattice α]
   · refine iSup_mono' (fun i ↦ ?_)
     rcases h i with h | h <;> simp [h]
 
+@[reducible]
 noncomputable def Commute.isSymmetric_directSumDecomposition  {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] {A B : E →ₗ[𝕜] E} [FiniteDimensional 𝕜 E]
   (hA : A.IsSymmetric) (hB : B.IsSymmetric) (hAB : Commute A B) :
@@ -348,6 +350,7 @@ noncomputable def Commute.isSymmetric_directSumDecomposition  {𝕜 E : Type*} [
   · replace h₁ : eigenspace A fst = ⊥ := by simpa [Module.End.HasUnifEigenvalue] using h₁
     simp [h₁]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Similar to `LinearMap.IsSymmetric.directSum_isInternal_of_commute`, but here the direct sum
 is indexed by only the pairs of eigenvalues, as opposed to all pairs of `𝕜` values, giving a finite
 decomposition. -/
@@ -374,7 +377,7 @@ theorem LinearMap.IsSymmetric.directSum_isInternal_of_commute' {𝕜 E : Type*} 
     simp only [DirectSum.coeAddMonoidHom_eq_dfinsuppSum, ZeroMemClass.coe_zero, implies_true,
       DFinsupp.sum_eq_sum_fintype, DFinsupp.equivFunOnFintype_apply]
     -- Since the decomposition is orthogonal, the inner product of x μ₁₂ with any other component is zero. Therefore, the sum simplifies to just the inner product of x μ₁₂ with itself.
-    rw [inner_sum, Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ μ₁₂)]
+    rw [inner_sum, Finset.sum_eq_add_sum_sdiff_singleton _ _ (by simp)]
     rw [Finset.sdiff_singleton_eq_erase, left_eq_add]
     apply Finset.sum_eq_zero
     intro μ hμ
@@ -396,7 +399,7 @@ theorem LinearMap.IsSymmetric.directSum_isInternal_of_commute' {𝕜 E : Type*} 
     specialize h_sum x
     rw [Submodule.mem_iSup_iff_exists_finsupp] at h_sum
     rcases h_sum with ⟨f, hf₁, hf₂⟩
-    exact ⟨∑ i ∈ f.support, .of _ i ⟨f i, hf₁ i⟩, by simpa using hf₂⟩
+    exact ⟨∑ i ∈ f.support, .of _ i ⟨f i, hf₁ i⟩, by simp_all; exact hf₂⟩
 
 noncomputable def LinearMap.sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[𝕜] EuclideanSpace 𝕜 d}
   (hA : A.IsSymmetric) (hB : B.IsSymmetric) (hAB : Commute A B) :
@@ -441,7 +444,7 @@ theorem LinearMap.apply_A_sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[�
     mul_one, ← RCLike.conj_eq_iff_re, ← RCLike.star_def]
   have h₃ : (sharedEigenbasis hA hB hAB) i ≠ 0 := by
     have := (sharedEigenbasis hA hB hAB).orthonormal.1 i
-    grind [norm_zero, zero_ne_one]
+    exact fun h => by simp [h] at this
   simpa [inner_smul_left, inner_smul_right, h₂, h₃] using
     hA ((sharedEigenbasis hA hB hAB) i) ((sharedEigenbasis hA hB hAB) i)
 
@@ -457,15 +460,15 @@ theorem LinearMap.apply_B_sharedEigenbasis {A B : EuclideanSpace 𝕜 d →ₗ[�
     mul_one, ← RCLike.conj_eq_iff_re, ← RCLike.star_def]
   have h₃ : (sharedEigenbasis hA hB hAB) i ≠ 0 := by
     have := (sharedEigenbasis hA hB hAB).orthonormal.1 i
-    grind [norm_zero, zero_ne_one]
+    exact fun h => by simp [h] at this
   simpa [inner_smul_left, inner_smul_right, h₂, h₃] using
     hB ((sharedEigenbasis hA hB hAB) i) ((sharedEigenbasis hA hB hAB) i)
 
 noncomputable def Matrix.sharedEigenbasis
   (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : Commute A B) :
     OrthonormalBasis d 𝕜 (EuclideanSpace 𝕜 d) :=
-  LinearMap.sharedEigenbasis (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB) (commute_euclideanLin hAB)
+  LinearMap.sharedEigenbasis (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB) (commute_euclideanLin hAB)
 
 noncomputable def Matrix.sharedEigenvectorUnitary (hA : A.IsHermitian) (hB : B.IsHermitian)
     (hAB : Commute A B) : Matrix.unitaryGroup d 𝕜 :=
@@ -484,21 +487,21 @@ theorem sharedEigenvectorUnitary_mulVec (j : d) : (sharedEigenvectorUnitary hA h
 
 noncomputable def sharedEigenvalueA (j : d) : ℝ :=
   LinearMap.sharedEigenvaluesA
-    (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB)
     (commute_euclideanLin hAB) j
 
 noncomputable def sharedEigenvalueB (j : d) : ℝ :=
   LinearMap.sharedEigenvaluesB
-    (isHermitian_iff_isSymmetric.mp hA)
-    (isHermitian_iff_isSymmetric.mp hB)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hA)
+    (isSymmetric_toEuclideanLin_iff.symm.mp hB)
     (commute_euclideanLin hAB) j
 
 /-- Analogous to `Matrix.IsHermitian.mulVec_eigenvectorBasis` for the shared basis. -/
 theorem mulVec_sharedEigenbasisA (j : d) :
     A *ᵥ (sharedEigenbasis hA hB hAB j) =
     (sharedEigenvalueA hA hB hAB) j • WithLp.ofLp (sharedEigenbasis hA hB hAB j) := by
-  rw [isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   have h := LinearMap.apply_A_sharedEigenbasis hA hB (Matrix.commute_euclideanLin hAB) j
   simp only [algebraMap_smul] at h
   have := congr_arg WithLp.ofLp h
@@ -508,7 +511,7 @@ theorem mulVec_sharedEigenbasisA (j : d) :
 theorem mulVec_sharedEigenbasisB (j : d) :
     B *ᵥ (sharedEigenbasis hA hB hAB j) =
     (sharedEigenvalueB hA hB hAB) j • WithLp.ofLp (sharedEigenbasis hA hB hAB j) := by
-  rw [isHermitian_iff_isSymmetric] at hA hB
+  rw [isSymmetric_toEuclideanLin_iff.symm] at hA hB
   have h := LinearMap.apply_B_sharedEigenbasis hA hB (Matrix.commute_euclideanLin hAB) j
   simp only [algebraMap_smul] at h
   have := congr_arg WithLp.ofLp h
@@ -536,7 +539,7 @@ theorem star_shared_mul_A_mul_IsDiag : IsDiag
     congr! 3;
   · have := ( sharedEigenbasis hA hB hAB ).orthonormal;
     rw [ orthonormal_iff_ite ] at this;
-    simp only [inner] at this
+    simp only [inner, ← starRingEnd_apply] at this
     rw [ ← Finset.smul_sum, this i j, if_neg hij, smul_zero ]
 
 /-- Analogous to `Matrix.IsHermitian.star_mul_self_mul_eq_diagonal` for the shared basis. -/
@@ -548,7 +551,7 @@ theorem star_shared_mul_B_mul_IsDiag : IsDiag
   apply (EuclideanSpace.basisFun d 𝕜).toBasis.ext
   intro i
   simp only [toLpLin_apply, OrthonormalBasis.coe_toBasis, EuclideanSpace.basisFun_apply,
-    EuclideanSpace.ofLp_single, ← mulVec_mulVec, sharedEigenvectorUnitary_mulVec, ← mulVec_mulVec,
+    PiLp.ofLp_single, ← mulVec_mulVec, sharedEigenvectorUnitary_mulVec, ← mulVec_mulVec,
     Matrix.diagonal_mulVec_single, mul_one]
   apply PiLp.ext
   intro j
@@ -564,14 +567,14 @@ theorem star_shared_mul_B_mul_IsDiag : IsDiag
     simp
     ext j
     have := mul_eq_one_comm.mp ( show ( Matrix.sharedEigenvectorUnitary hA hB hAB : Matrix d d 𝕜 ) * ( Matrix.sharedEigenvectorUnitary hA hB hAB : Matrix d d 𝕜 )ᴴ = 1 from ?_ );
-    · convert congr_fun ( congr_fun this j ) i using 1;
+    · convert! congr_fun ( congr_fun this j ) i using 1;
       simp [ Pi.single_apply, Matrix.one_apply ];
     · exact Matrix.mem_unitaryGroup_iff.mp ( Matrix.sharedEigenvectorUnitary hA hB hAB ).2;
   simp_all [ Matrix.mulVec, funext_iff ];
   simp_all [ Matrix.mul_apply, dotProduct ];
   by_cases hij : i = j
   · simp [ hij ];
-    simp [ hij, Pi.single_apply, Matrix.mulVec, dotProduct ];
+    simp [Matrix.mulVec, dotProduct ];
     simp only [Finset.mul_sum, mul_left_comm];
     rw [ Finset.sum_comm ]
     simp [ mul_comm, mul_left_comm, Finset.mul_sum]
@@ -590,9 +593,9 @@ theorem Commute.exists_unitary (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : 
     ∃ U : Matrix.unitaryGroup d 𝕜, (U.val * A * Uᴴ).IsDiag ∧ (U.val * B * Uᴴ).IsDiag := by
   use (Matrix.sharedEigenvectorUnitary hA hB hAB)⁻¹
   constructor
-  · convert Matrix.SharedEigenbasis.star_shared_mul_A_mul_IsDiag hA hB hAB
+  · convert! Matrix.SharedEigenbasis.star_shared_mul_A_mul_IsDiag hA hB hAB
     simp [Matrix.star_eq_conjTranspose]
-  · convert Matrix.SharedEigenbasis.star_shared_mul_B_mul_IsDiag hA hB hAB
+  · convert! Matrix.SharedEigenbasis.star_shared_mul_B_mul_IsDiag hA hB hAB
     simp [Matrix.star_eq_conjTranspose]
 
 variable (U : Matrix.unitaryGroup d 𝕜)

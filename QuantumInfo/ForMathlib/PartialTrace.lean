@@ -3,10 +3,12 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
-import QuantumInfo.ForMathlib.HermitianMat.Trace
-import QuantumInfo.ForMathlib.HermitianOp
+module
 
-import Mathlib.LinearAlgebra.Contraction
+public import QuantumInfo.ForMathlib.HermitianMat.Trace
+public import QuantumInfo.ForMathlib.HermitianOp
+
+public import Mathlib.LinearAlgebra.Contraction
 
 /-!
 # Partial traces
@@ -43,6 +45,8 @@ sum of operators of the form `TensorProduct.map f g`, for which the sum evaluate
 * `HermitianOp.toMat_traceLeft`, `HermitianOp.toMat_traceRight`: the **matrix analogues**, saying
   that in the preferred basis the partial trace is `HermitianMat.traceLeft` / `traceRight`.
 -/
+
+@[expose] public section
 
 open scoped ComplexOrder InnerProductSpace TensorProduct
 
@@ -139,7 +143,7 @@ variable (A B : (E ⊗[𝕜] F) →L[𝕜] E ⊗[𝕜] F)
 basis of the factor being traced out. -/
 theorem inner_traceLeft (b : OrthonormalBasis ι 𝕜 E) (y y' : F) :
     ⟪y, A.traceLeft y'⟫_𝕜 = ∑ i, ⟪b i ⊗ₜ[𝕜] y, A (b i ⊗ₜ[𝕜] y')⟫_𝕜 := by
-  rw [traceLeft, ContinuousLinearMap.sum_apply, inner_sum]
+  rw [traceLeft, _root_.sum_apply, inner_sum]
   simp only [ContinuousLinearMap.comp_apply, adjoint_inner_right, tmulLeftL_apply]
   exact sum_inner_tmulLeft_congr _ b (A : (E ⊗[𝕜] F) →ₗ[𝕜] E ⊗[𝕜] F) y y'
 
@@ -151,19 +155,19 @@ theorem traceLeft_zero : traceLeft (0 : (E ⊗[𝕜] F) →L[𝕜] E ⊗[𝕜] F
 @[simp]
 theorem traceLeft_add : (A + B).traceLeft = A.traceLeft + B.traceLeft :=
   ext_of_inner fun y y' ↦ by
-    simp only [inner_traceLeft _ (stdOrthonormalBasis 𝕜 E), ContinuousLinearMap.add_apply,
+    simp only [inner_traceLeft _ (stdOrthonormalBasis 𝕜 E), _root_.add_apply,
       inner_add_right, Finset.sum_add_distrib]
 
 @[simp]
 theorem traceLeft_smul (r : 𝕜) : (r • A).traceLeft = r • A.traceLeft :=
   ext_of_inner fun y y' ↦ by
-    simp only [inner_traceLeft _ (stdOrthonormalBasis 𝕜 E), ContinuousLinearMap.smul_apply,
+    simp only [inner_traceLeft _ (stdOrthonormalBasis 𝕜 E), _root_.smul_apply,
       inner_smul_right, Finset.mul_sum]
 
 @[simp]
 theorem traceLeft_neg : (-A).traceLeft = -A.traceLeft :=
   ext_of_inner fun y y' ↦ by
-    simp only [inner_traceLeft _ (stdOrthonormalBasis 𝕜 E), ContinuousLinearMap.neg_apply,
+    simp only [inner_traceLeft _ (stdOrthonormalBasis 𝕜 E), _root_.neg_apply,
       inner_neg_right, Finset.sum_neg_distrib]
 
 @[simp]
@@ -218,7 +222,7 @@ variable (A B : (E ⊗[𝕜] F) →L[𝕜] E ⊗[𝕜] F)
 basis of the factor being traced out. -/
 theorem inner_traceRight (b : OrthonormalBasis ι 𝕜 F) (x x' : E) :
     ⟪x, A.traceRight x'⟫_𝕜 = ∑ i, ⟪x ⊗ₜ[𝕜] b i, A (x' ⊗ₜ[𝕜] b i)⟫_𝕜 := by
-  rw [traceRight, ContinuousLinearMap.sum_apply, inner_sum]
+  rw [traceRight, _root_.sum_apply, inner_sum]
   simp only [ContinuousLinearMap.comp_apply, adjoint_inner_right, tmulRightL_apply]
   exact sum_inner_tmulRight_congr _ b (A : (E ⊗[𝕜] F) →ₗ[𝕜] E ⊗[𝕜] F) x x'
 
@@ -230,19 +234,19 @@ theorem traceRight_zero : traceRight (0 : (E ⊗[𝕜] F) →L[𝕜] E ⊗[𝕜]
 @[simp]
 theorem traceRight_add : (A + B).traceRight = A.traceRight + B.traceRight :=
   ext_of_inner fun x x' ↦ by
-    simp only [inner_traceRight _ (stdOrthonormalBasis 𝕜 F), ContinuousLinearMap.add_apply,
+    simp only [inner_traceRight _ (stdOrthonormalBasis 𝕜 F), _root_.add_apply,
       inner_add_right, Finset.sum_add_distrib]
 
 @[simp]
 theorem traceRight_smul (r : 𝕜) : (r • A).traceRight = r • A.traceRight :=
   ext_of_inner fun x x' ↦ by
-    simp only [inner_traceRight _ (stdOrthonormalBasis 𝕜 F), ContinuousLinearMap.smul_apply,
+    simp only [inner_traceRight _ (stdOrthonormalBasis 𝕜 F), _root_.smul_apply,
       inner_smul_right, Finset.mul_sum]
 
 @[simp]
 theorem traceRight_neg : (-A).traceRight = -A.traceRight :=
   ext_of_inner fun x x' ↦ by
-    simp only [inner_traceRight _ (stdOrthonormalBasis 𝕜 F), ContinuousLinearMap.neg_apply,
+    simp only [inner_traceRight _ (stdOrthonormalBasis 𝕜 F), _root_.neg_apply,
       inner_neg_right, Finset.sum_neg_distrib]
 
 @[simp]
