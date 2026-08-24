@@ -53,12 +53,6 @@ public import QuantumInfo.Measurements.POVM
 public import QuantumInfo.Operators.Unitary
 public import QuantumInfo.Regularized
 
---Quantum error correcting codes
-public import QuantumInfo.QECC.Bounds
-public import QuantumInfo.QECC.Codes
-public import QuantumInfo.QECC.Concatenation
-public import QuantumInfo.QECC.Transversal
-
 --Documentation without code
 public import QuantumInfo.Capacity.Capacity_doc
 

@@ -5,9 +5,11 @@ The branch has since been merged with `master`, which brought Lean `v4.33.0` and
 system** (`module` / `public import` / `@[expose] public section`), the `PhysLean` → `Physlib`
 rename, the flattening of `QuantumInfo/Finite/` into `States/`, `Channels/`, `Entropy/`,
 `Measurements/`, `Operators/` and `Capacity/`, and a completed data processing inequality for the
-sandwiched Rényi divergence. All 102 modules under `QuantumInfo/` (48.8k lines) build with zero
-errors and zero warnings, and `QuantumInfo.lean` now imports every one of them, so the default
+sandwiched Rényi divergence. All 91 modules under `QuantumInfo/` (45k lines) build with zero errors
+and zero warnings, and `QuantumInfo.lean` now imports every one of them, so the default
 `lake build` target covers the whole library.
+
+The quantum error correction development lives in the separate `QuantumLib` repository, not here.
 
 Sorries remaining in the parts of the library that are meant to be complete:
 
@@ -16,11 +18,9 @@ Sorries remaining in the parts of the library that are meant to be complete:
 | `Capacity/Capacity.lean:394` | the LSD theorem (achievability of the coherent information) | decoupling / random-coding machinery, none of which exists here |
 | `Capacity/Capacity.lean:400` | the regularized capacity formula | follows from the LSD theorem plus the converse |
 
-Three subtrees are works in progress rather than finished developments, and carry sorries by
-design: `QECC/` (21, mostly code parameters and distances of the concrete code zoo, plus the
-Singleton/Hamming/Gilbert–Varshamov bounds), `Entropy/Axiomatized/` (16, the axiomatic
-characterisation of relative entropy and its Rényi family), and `ClassicalInfo/Capacity.lean` (4,
-Shannon's noisy-channel coding theorem).
+Two subtrees are works in progress rather than finished developments, and carry sorries by
+design: `Entropy/Axiomatized/` (16, the axiomatic characterisation of relative entropy and its
+Rényi family) and `ClassicalInfo/Capacity.lean` (4, Shannon's noisy-channel coding theorem).
 
 The sandwiched Rényi DPI no longer needs Riesz–Thorin interpolation. `Entropy/DPI.lean` (1616 lines)
 proves it from Stinespring: `sandwichedTraceFunctional_mono_traceRight` gives monotonicity under a
@@ -130,8 +130,8 @@ contraction).
   planned in §4 Stage 5.
 
 Remaining downstream files (`Entropy/{SSA,DPI}.lean`, `States/{Ensemble,Entanglement}.lean`,
-`Measurements/POVM.lean`, `Channels/Pinching.lean`, `Capacity/Capacity.lean`, `ResourceTheory/*`,
-`QECC/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not yet migrated to
+`Measurements/POVM.lean`, `Channels/Pinching.lean`, `Capacity/Capacity.lean`,
+`ResourceTheory/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not yet migrated to
 operator form; they still speak in matrices via `ρ.M`. Stages 6 and 7 below are unstarted.
 
 ### Known ergonomic wart: dot notation through the `MState`/`CPTPMap` abbreviations
@@ -154,7 +154,7 @@ retries after unfolding reducible definitions; `MState.*` names that are genuine
 
 ### 1.1 Genuinely basis-dependent vs. basis-free-but-matrix-stated
 
-The library is ~48.8k lines across 102 files under `QuantumInfo/`. Sorting the content by how it
+The library is ~45k lines across 91 files under `QuantumInfo/`. Sorting the content by how it
 relates to a choice of basis:
 
 **Genuinely basis-dependent** (a `StdBasis` instance is real input, not bookkeeping):
@@ -165,7 +165,6 @@ relates to a choice of basis:
 | `States/Mixed/MState.lean` | `MState.ofClassical`, `MState.uniform`, `MState.spectrum` (canonically *sorted* eigenvalues, hence index-dependent), `relabel` |
 | `Measurements/POVM.lean` | measurement outcomes indexed by a type; the computational-basis measurement |
 | `States/Pure/Qubit.lean` | Pauli matrices, Bloch sphere coordinates |
-| `QECC/*` (≈3.7k lines) | Pauli group, stabilizer groups, CSS codes, transversal gates — all defined on `Fin n → …` index tuples. This subtree is *irreducibly* basis-dependent and is the main consumer of the new class |
 | `ForMathlib/HermitianMat/Basic.lean` `diagonal`, `Proj.lean`, `Majorization.lean` | diagonal matrices, coordinate projections, majorization of eigenvalue vectors |
 
 **Basis-free in content, matrix-stated in form** (the bulk; this is what a refactor buys):
@@ -198,8 +197,8 @@ ForMathlib/{Matrix, Isometry, Unitary, LinearEquiv, ContinuousLinearMap}
                                          │    └── ResourceTheory/{FreeState,
                                          │           HypothesisTesting, SteinsLemma,
                                          │           ResourceTheory}
-                                         └── QECC/{Pauli, Stabilizer, StabilizerGroup, Codes,
-                                                   CSS, Transversal, Defs, Bounds, Concatenation}
+                                         └── States/Pure/{Qubit, BlochSphere,
+                                                          BargmannInvariant}
 ```
 
 `MState` is the single choke point: `HermitianMat` sits below it, and essentially everything else
@@ -336,8 +335,8 @@ requiring a transport.
 ### 2.6 Simp normal form: `Matrix d d ℂ` vs `M →L[ℂ] M`
 
 Recommendation: **`E →L[𝕜] E` is the normal form for basis-free statements; matrices are the normal
-form only inside genuinely basis-dependent files** (`QECC/`, `Qubit/`, `Majorization`, `Proj`,
-`diagonal`). `StdBasis.toMatOf_apply` is the `@[simp]` lemma that pushes through the bridge when a
+form only inside genuinely basis-dependent files** (`States/Pure/Qubit.lean`, `Majorization`,
+`Proj`, `diagonal`). `StdBasis.toMatOf_apply` is the `@[simp]` lemma that pushes through the bridge when a
 matrix entry is genuinely wanted. Do not mark `toMatOf_eq_toMatrixOrthonormal` as `simp`: it should
 be used deliberately, not as a rewrite direction.
 
@@ -512,12 +511,13 @@ trace**.
 the highest-variance single file: long analytic arguments where one changed definition can require
 re-deriving a whole chain. Budget it separately.
 
-### Stage 7 — `QECC/` (M, but *do it last and do it differently*)
+### Stage 7 — the `QuantumLib` error-correction library (M, but *do it last and do it differently*)
 
-The ~3.7k lines under `QECC/` are the intended *beneficiary*, not a victim: Pauli groups,
-stabilizer groups, CSS codes and transversal gates are genuinely basis-relative, and the refactor
-lets them state that fact instead of hard-coding `EuclideanSpace ℂ (Fin 2)^n`. The work is adding
-`[StdBasis ℂ E (Fin 2)]` binders and a `StdBasis` instance for `n`-fold tensor powers, not
+The ~10.5k lines of quantum error correction live in the separate `QuantumLib` repository, which
+depends on this one. They are the intended *beneficiary* of the refactor, not a victim: Pauli
+groups, stabilizer groups, CSS codes and transversal gates are genuinely basis-relative, and the
+refactor lets them state that fact instead of hard-coding `EuclideanSpace ℂ (Fin 2)^n`. The work is
+adding `[StdBasis ℂ E (Fin 2)]` binders and a `StdBasis` instance for `n`-fold tensor powers, not
 rewriting proofs. Should not be started until Stage 4 (tensor products) is solid.
 
 ### Total
