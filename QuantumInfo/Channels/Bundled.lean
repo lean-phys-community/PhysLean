@@ -126,6 +126,16 @@ variable {Λ₁ Λ₂ : HPOp E F}
 theorem ext (h : Λ₁.toLinearMap = Λ₂.toLinearMap) : Λ₁ = Λ₂ := by
   rwa [HPOp.mk.injEq]
 
+/-- A Hermitian-preserving map acting on self-adjoint operators. This is the basis-free form of
+`HPOp.instFunLike`; `HPOp.toMat_opApply` is its matrix analogue. -/
+def opApply (Λ : HPOp E F) (A : HermitianOp E) : HermitianOp F :=
+  ⟨Λ.toLinearMap A.op, Λ.HP A.H⟩
+
+@[simp]
+theorem op_opApply (Λ : HPOp E F) (A : HermitianOp E) :
+    (Λ.opApply A).op = Λ.toLinearMap A.op :=
+  rfl
+
 section StdBasis
 
 variable [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [Fintype κ] [DecidableEq κ] [StdBasis ℂ F κ]
@@ -216,6 +226,15 @@ theorem mat_apply (Λ : HPOp E F) (T : HermitianMat ι ℂ) :
     (Λ T : HermitianMat κ ℂ).mat = Λ.map T.mat :=
   rfl
 
+/-- **Matrix analogue of `HPOp.opApply`**: the matrix of `Λ.opApply A` is the image of the matrix
+of `A`. Not a `simp` lemma: the index type of `E`'s preferred basis appears only on the
+right-hand side, so `simp` cannot infer it. -/
+theorem toMat_opApply (Λ : HPOp E F) (A : HermitianOp E) :
+    ((Λ.opApply A).toMat : HermitianMat κ ℂ) = Λ (A.toMat : HermitianMat ι ℂ) := by
+  refine HermitianMat.ext ?_
+  rw [mat_apply, HermitianOp.toMat_mat, HermitianOp.toMat_mat, op_opApply, map_eq,
+    OpMap.toMat_apply_toMat]
+
 instance : ContinuousLinearMapClass
     (HPOp E F) ℝ (HermitianMat ι ℂ) (HermitianMat κ ℂ) where
   map_add f x y := HermitianMat.ext <| LinearMap.map_add f.map x y
@@ -236,6 +255,10 @@ theorem ext {Λ₁ Λ₂ : POp E F} (h : Λ₁.toLinearMap = Λ₂.toLinearMap) 
 
 theorem injective_toHPOp : (POp.toHPOp (E := E) (F := F)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
+
+/-- A positive map sends nonnegative operators to nonnegative operators. -/
+theorem opApply_nonneg (Λ : POp E F) {A : HermitianOp E} (h : 0 ≤ A) : 0 ≤ Λ.toHPOp.opApply A :=
+  Λ.pos h
 
 section StdBasis
 
@@ -345,6 +368,11 @@ theorem ext {Λ₁ Λ₂ : PTPOp E F} (h : Λ₁.toLinearMap = Λ₂.toLinearMap
 theorem injective_toPOp : (PTPOp.toPOp (E := E) (F := F)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
 
+/-- A trace-preserving map preserves the trace of a self-adjoint operator. -/
+theorem trace_opApply (Λ : PTPOp E F) (A : HermitianOp E) :
+    (Λ.toHPOp.opApply A).trace = A.trace :=
+  congrArg RCLike.re (Λ.TP A.op)
+
 section StdBasis
 
 variable [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [Fintype κ] [DecidableEq κ] [StdBasis ℂ F κ]
@@ -396,29 +424,57 @@ theorem pos_Hermitian (M : PTPOp E F) {x : HermitianMat ι ℂ} (h : 0 ≤ x) :
     0 ≤ (M x : HermitianMat κ ℂ) := by
   simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
 
-/-- `PTPOp`s are functions from states to states. -/
-instance (priority := 1100) instMFunLike : FunLike (PTPOp E F) (DensityOp E) (DensityOp F) where
-  coe Λ ρ := DensityOp.ofMat
-    (Λ.toHPOp (ρ.M : HermitianMat ι ℂ)) (HermitianMat.zero_le_iff.mpr (Λ.map_pos ρ.psd)) (by
-      rw [HermitianMat.trace_eq_one_iff, ← ρ.tr' (ι := ι)]
-      exact Λ.map_TP ρ.m)
-  coe_injective x y h := injective_toPOp <| POp.injective_toHPOp <|
-    HPOp.funext_mstate (ι := ι) (κ := κ) fun ρ ↦ by
-      have := congrArg (fun σ : DensityOp F ↦ (σ.M : HermitianMat κ ℂ).mat) (congr($h ρ))
-      simpa using this
+end StdBasis
 
-/-- The density matrix of `Λ ρ` is the image of the density matrix of `ρ`. -/
+/-- The action of a positive trace-preserving map on states: it carries a positive unit-trace
+operator to another one, with no choice of basis anywhere. `PTPOp.instMFunLike` installs this as
+the `FunLike` coercion, so it is normally written `Λ ρ`. -/
+def applyState (Λ : PTPOp E F) (ρ : DensityOp E) : DensityOp F where
+  op := Λ.toHPOp.opApply ρ.op
+  op_nonneg := POp.opApply_nonneg Λ.toPOp ρ.op_nonneg
+  op_trace := (Λ.trace_opApply ρ.op).trans ρ.op_trace
+
 @[simp]
-theorem M_apply_MState (Λ : PTPOp E F) (ρ : DensityOp E) :
-    ((Λ ρ : DensityOp F).M : HermitianMat κ ℂ) =
-      instFunLike.coe Λ (ρ.M : HermitianMat ι ℂ) :=
-  DensityOp.M_ofMat _ _ _
+theorem op_applyState (Λ : PTPOp E F) (ρ : DensityOp E) :
+    (Λ.applyState ρ).op = Λ.toHPOp.opApply ρ.op :=
+  rfl
+
+/-- **Matrix analogue of `PTPOp.applyState`**: the density matrix of `Λ.applyState ρ` is the image
+of the density matrix of `ρ`. Not a `simp` lemma, for the same reason as
+`HPOp.toMat_opApply`. -/
+theorem M_applyState [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [Fintype κ] [DecidableEq κ]
+    [StdBasis ℂ F κ] (Λ : PTPOp E F) (ρ : DensityOp E) :
+    ((Λ.applyState ρ).M : HermitianMat κ ℂ) = instFunLike.coe Λ (ρ.M : HermitianMat ι ℂ) :=
+  HPOp.toMat_opApply Λ.toHPOp ρ.op
+
+/-- `PTPOp`s are functions from states to states, through `PTPOp.applyState`. -/
+instance (priority := 1100) instMFunLike : FunLike (PTPOp E F) (DensityOp E) (DensityOp F) where
+  coe := applyState
+  coe_injective x y h := by
+    let := StdBasis.some ℂ E
+    let := StdBasis.some ℂ F
+    refine injective_toPOp (POp.injective_toHPOp (HPOp.funext_mstate fun ρ ↦ ?_))
+    have h₂ := congrArg (fun σ : DensityOp F ↦ σ.M) (congr($h ρ))
+    rw [M_applyState, M_applyState] at h₂
+    simpa using congrArg HermitianMat.mat h₂
+
+@[simp]
+theorem op_apply_MState (Λ : PTPOp E F) (ρ : DensityOp E) :
+    (Λ ρ : DensityOp F).op = Λ.toHPOp.opApply ρ.op :=
+  rfl
 
 /-- Two positive trace-preserving maps are equal exactly when they agree on every state. -/
 theorem funext_iff {Λ₁ Λ₂ : PTPOp E F} : Λ₁ = Λ₂ ↔ ∀ ρ : DensityOp E, Λ₁ ρ = Λ₂ ρ :=
   DFunLike.ext_iff
 
-end StdBasis
+/-- **Matrix analogue of applying a positive trace-preserving map to a state**: the density matrix
+of `Λ ρ` is the image of the density matrix of `ρ`. Not a `simp` lemma, for the same reason as
+`HPOp.toMat_opApply`. -/
+theorem M_apply_MState [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [Fintype κ] [DecidableEq κ]
+    [StdBasis ℂ F κ] (Λ : PTPOp E F) (ρ : DensityOp E) :
+    ((Λ ρ : DensityOp F).M : HermitianMat κ ℂ) =
+      instFunLike.coe Λ (ρ.M : HermitianMat ι ℂ) :=
+  M_applyState Λ ρ
 
 --If we have a PTPMap, the input and output dimensions are always both nonempty (otherwise
 --we can't preserve trace) - or they're both empty. So `[Nonempty dIn]` will always suffice.
@@ -448,11 +504,14 @@ theorem injective_toPTPOp : (CPTPOp.toPTPOp (E := E) (F := F)).Injective :=
   fun _ _ ↦ (mk.injEq _ _ _ _).mpr
 
 /-- `CPTPOp`s are functions from states to states. -/
-instance (priority := 1100) instMFunLike [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
-    [Fintype κ] [DecidableEq κ] [StdBasis ℂ F κ] :
+instance (priority := 1100) instMFunLike :
     FunLike (CPTPOp E F) (DensityOp E) (DensityOp F) where
   coe := DFunLike.coe ∘ toPTPOp
   coe_injective := DFunLike.coe_injective.comp injective_toPTPOp
+
+theorem apply_eq_toPTPOp (Λ : CPTPOp E F) (ρ : DensityOp E) :
+    (Λ ρ : DensityOp F) = Λ.toPTPOp ρ :=
+  rfl
 
 section StdBasis
 
@@ -481,6 +540,29 @@ def ofMat (M : MatrixMap ι κ ℂ) (hcp : M.IsCompletelyPositive) (hTP : M.IsTr
 theorem map_ofMat (M : MatrixMap ι κ ℂ) (hcp : M.IsCompletelyPositive)
     (hTP : M.IsTracePreserving) : (ofMat (E := E) (F := F) M hcp hTP).map = M :=
   OpMap.toMat_ofMat M
+
+variable (ι κ) in
+/-- Read a channel between `E` and `F` as a channel between the Euclidean spaces indexed by their
+preferred bases. The matrix of the channel is unchanged (`map_transport`), and it acts on
+transported states in the transported way (`transport_apply`). -/
+def transport (Λ : CPTPOp E F) : CPTPMap ι κ :=
+  ofMat Λ.map ((OpMap.isCompletelyPositive_toMat_iff _).mpr Λ.cp) Λ.map_TP
+
+/-- **Matrix analogue of `CPTPOp.transport`**: the matrix of the channel is unchanged. -/
+@[simp]
+theorem map_transport (Λ : CPTPOp E F) : (Λ.transport ι κ).map = Λ.map (ι := ι) (κ := κ) :=
+  map_ofMat _ _ _
+
+/-- Transporting a channel to the Euclidean spaces of its preferred bases commutes with
+transporting the states it acts on. -/
+@[simp]
+theorem transport_apply (Λ : CPTPOp E F) (ρ : MState ι) :
+    Λ.transport ι κ ρ = (Λ (ρ.transport E)).transport (EuclideanSpace ℂ κ) := by
+  refine DensityOp.ext (ι := κ) ?_
+  rw [DensityOp.M_transport, apply_eq_toPTPOp, apply_eq_toPTPOp, PTPOp.M_apply_MState,
+    PTPOp.M_apply_MState, DensityOp.M_transport]
+  refine HermitianMat.ext ?_
+  rw [PTPOp.mat_apply, PTPOp.mat_apply, map_transport]
 
 /-- The channel with the given Kraus operators. -/
 def of_kraus_CPTPMap {ν : Type*} [Fintype ν] (M : ν → Matrix κ ι ℂ)

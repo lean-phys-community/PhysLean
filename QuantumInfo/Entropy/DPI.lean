@@ -1611,3 +1611,38 @@ theorem qRelativeEnt_joint_convexity :
           add_le_add (mul_le_mul_of_nonneg_left h₁ hp0'.le)
             (mul_le_mul_of_nonneg_left h₂ (by linarith))
   exact le_of_tendsto_of_tendsto h_lhs h_rhs h_ev
+
+section BasisFree
+
+/-! ## Basis-free forms
+
+The data processing inequality above is stated for states indexed by a type. This is its
+counterpart for states on an abstract finite-dimensional Hilbert space, obtained by picking an
+arbitrary preferred basis on each side (`StdBasis.some`) and transporting; the relative entropies
+are insensitive to that choice, so nothing is lost. -/
+
+variable {E F : Type*}
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
+
+namespace DensityOp
+
+/-- The Data Processing Inequality for the sandwiched Rényi relative entropy. -/
+theorem sandwichedRenyiEntropy_DPI (hα : 1 ≤ α) (ρ σ : DensityOp E) (Φ : CPTPOp E F) :
+    D̃_ α(Φ ρ‖Φ σ) ≤ D̃_ α(ρ‖σ) := by
+  let := StdBasis.some ℂ E
+  let := StdBasis.some ℂ F
+  obtain ⟨μ, rfl⟩ := ρ.exists_transport_eq
+  obtain ⟨ν, rfl⟩ := σ.exists_transport_eq
+  have h := _root_.sandwichedRenyiEntropy_DPI hα μ ν
+    (Φ.transport (Fin (Module.finrank ℂ E)) (Fin (Module.finrank ℂ F)))
+  rw [CPTPOp.transport_apply, CPTPOp.transport_apply, sandwichedRelRentropy_transport] at h
+  exact h.trans_eq (sandwichedRelRentropy_transport (F := E) α μ ν).symm
+
+/-- The Data Processing Inequality for the quantum relative entropy. -/
+theorem qRelativeEnt_DPI (ρ σ : DensityOp E) (Φ : CPTPOp E F) : 𝐃(Φ ρ‖Φ σ) ≤ 𝐃(ρ‖σ) :=
+  sandwichedRenyiEntropy_DPI le_rfl ρ σ Φ
+
+end DensityOp
+
+end BasisFree

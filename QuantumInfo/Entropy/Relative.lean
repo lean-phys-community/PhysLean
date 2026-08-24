@@ -1598,6 +1598,31 @@ theorem sandwichedRelRentropy_eq_matrix {ι : Type*} [Fintype ι] [DecidableEq �
   · exact inner_op_log_sub_log (ι := ι) ρ σ
   · rw [trace_conj_rpow (ι := ι)]
 
+/-- The sandwiched Rényi relative entropy is unchanged by reading both states on another space
+whose preferred basis has the same index type. -/
+@[simp]
+theorem sandwichedRelRentropy_transport {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+    {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [StdBasis ℂ F ι]
+    (α : ℝ) (ρ σ : DensityOp E) :
+    D̃_ α(ρ.transport F‖σ.transport F) = D̃_ α(ρ‖σ) := by
+  have hρ : ((ρ.transport F).M : HermitianMat ι ℂ) = ρ.M := DensityOp.M_transport ρ
+  have hσ : ((σ.transport F).M : HermitianMat ι ℂ) = σ.M := DensityOp.M_transport σ
+  have hker : ((σ.transport F).M : HermitianMat ι ℂ).ker ≤
+        ((ρ.transport F).M : HermitianMat ι ℂ).ker ↔
+      (σ.M : HermitianMat ι ℂ).ker ≤ (ρ.M : HermitianMat ι ℂ).ker := by
+    rw [hρ, hσ]
+  rw [sandwichedRelRentropy_eq_matrix (ι := ι), sandwichedRelRentropy_eq_matrix (ι := ι)]
+  by_cases hα : 0 < α
+  swap
+  · rw [dif_neg hα, dif_neg hα]
+  rw [dif_pos hα, dif_pos hα]
+  by_cases h : (σ.M : HermitianMat ι ℂ).ker ≤ (ρ.M : HermitianMat ι ℂ).ker
+  swap
+  · rw [dif_neg h, dif_neg fun hc ↦ h (hker.mp hc)]
+  rw [dif_pos h, dif_pos (hker.mpr h), ENNReal.coe_inj]
+  refine NNReal.coe_injective ?_
+  simp only [hρ, hσ]
+
 /-- The quantum relative entropy `𝐃(ρ‖σ) := Tr[ρ (log ρ - log σ)]`. Also called
 the Umegaki quantum relative entropy, when it's necessary to distinguish from other
 relative entropies. -/
@@ -1605,6 +1630,14 @@ def qRelativeEnt (ρ σ : DensityOp E) : ENNReal :=
   D̃_1(ρ‖σ)
 
 notation "𝐃(" ρ "‖" σ ")" => qRelativeEnt ρ σ
+
+/-- The quantum relative entropy is unchanged by reading both states on another space whose
+preferred basis has the same index type. -/
+@[simp]
+theorem qRelativeEnt_transport {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+    {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [StdBasis ℂ F ι]
+    (ρ σ : DensityOp E) : 𝐃(ρ.transport F‖σ.transport F) = 𝐃(ρ‖σ) :=
+  sandwichedRelRentropy_transport 1 ρ σ
 
 end Operator
 

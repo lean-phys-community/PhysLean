@@ -92,6 +92,7 @@ theorem choi_of_CPTP_of_choi (M : Matrix (dOut × dIn) (dOut × dIn) ℂ) {h₁}
 theorem mat_coe_eq_apply_mat (ρ : MState dIn) : (Λ ρ).m = Λ.map ρ.m :=
   congrArg HermitianMat.mat (PTPOp.M_apply_MState Λ.toPTPOp ρ)
 
+omit [DecidableEq dIn] [DecidableEq dOut] in
 @[ext]
 theorem funext {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : ∀ ρ, Λ₁ ρ = Λ₂ ρ) : Λ₁ = Λ₂ :=
   DFunLike.ext _ _ h
@@ -360,6 +361,7 @@ as "destroying" the whole system; tracing out everything. -/
 def destroy [Nonempty dIn] [Unique dOut] : CPTPMap dIn dOut :=
   replacement default
 
+omit [DecidableEq dIn] in
 /-- Two CPTP maps into the same one-dimensional output space must be equal -/
 theorem eq_if_output_unique [Unique dOut] (Λ₁ Λ₂ : CPTPMap dIn dOut) : Λ₁ = Λ₂ :=
   funext fun _ ↦ (Unique.eq_default _).trans (Unique.eq_default _).symm

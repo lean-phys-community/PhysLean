@@ -176,10 +176,12 @@ end emulates
 
 section εApproximates
 
+omit [DecidableEq d₂] in
 /-- Every quantum channel perfectly approximates itself, that is, `εApproximates` with `ε = 0`. -/
 theorem εApproximates_self (Λ : CPTPMap d₁ d₂) : Λ.εApproximates Λ 0 :=
   fun ρ ↦ ((DensityOp.fidelity_self_eq_one (Λ ρ)).trans (sub_zero 1).symm).ge
 
+omit [DecidableEq d₂] in
 /-- If a quantum channel A approximates B with ε₀, it also approximates B with all larger ε₁. -/
 theorem εApproximates_monotone {A B : CPTPMap d₁ d₂} {ε₀ : ℝ} (h : A.εApproximates B ε₀)
     {ε₁ : ℝ} (h₂ : ε₀ ≤ ε₁) : A.εApproximates B ε₁ :=

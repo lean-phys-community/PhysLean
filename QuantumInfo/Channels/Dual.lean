@@ -499,7 +499,8 @@ theorem hermDual.PTP_POVM (M : PTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT 
 /-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
 theorem exp_val_hermDual (ℰ : PTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
     MState.exp_val (ℰ ρ) T = ρ.exp_val (ℰ.hermDual T) := by
-  simp only [MState.exp_val, PTPOp.M_apply_MState]
+  simp only [MState.exp_val]
+  rw [PTPOp.M_apply_MState]
   apply HPOp.inner_hermDual'
 
 end PTPOp

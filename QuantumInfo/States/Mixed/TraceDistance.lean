@@ -84,21 +84,31 @@ theorem eq_abs_eigenvalues (ρ σ : MState d) : TrDistance ρ σ = (1/2 : ℝ) *
     Matrix.traceNorm_Hermitian_eq_sum_abs_eigenvalues (ρ.Hermitian.sub σ.Hermitian)]
   congr!
 
+/-- The data processing inequality for the trace distance, once preferred bases have been chosen on
+both sides. `TrDistance.DPI_PTP` is the statement itself, which needs no basis. -/
+private theorem DPI_PTP_of_stdBasis {F ι κ : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+    [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F] [Fintype κ]
+    [DecidableEq κ] [StdBasis ℂ F κ] (ρ σ : DensityOp E) (Λ : PTPOp E F) :
+    TrDistance (Λ ρ) (Λ σ) ≤ TrDistance ρ σ := by
+  have hmat : ∀ τ : DensityOp E, ((Λ τ : DensityOp F).m : Matrix κ κ ℂ) = Λ.map τ.m := fun τ ↦
+    congrArg HermitianMat.mat (PTPOp.M_apply_MState Λ τ)
+  have hin : (ρ.m - σ.m : Matrix ι ι ℂ) = ((ρ.M : HermitianMat ι ℂ) - σ.M).mat := by
+    rw [HermitianMat.mat_sub, DensityOp.mat_M, DensityOp.mat_M]
+  rw [eq_matrix_traceNorm (ι := κ), eq_matrix_traceNorm (ι := ι), hmat, hmat, ← map_sub, hin]
+  exact mul_le_mul_of_nonneg_left (Λ.map_pos.traceNorm_le Λ.map_TP _) (by norm_num)
+
 /-- **Data processing inequality for the trace distance**: a positive trace-preserving map never
 increases the trace distance between two states. Complete positivity is not needed. -/
-theorem DPI_PTP {d₂ : Type*} [Fintype d₂] [DecidableEq d₂] (ρ σ : MState d) (Λ : PTPMap d d₂) :
-    TrDistance (Λ ρ) (Λ σ) ≤ TrDistance ρ σ := by
-  have hmat : ∀ τ : MState d, ((Λ τ : MState d₂).m : Matrix d₂ d₂ ℂ) = Λ.map τ.m := fun τ ↦
-    congrArg HermitianMat.mat (PTPOp.M_apply_MState Λ τ)
-  have hin : (ρ.m - σ.m : Matrix d d ℂ) = ((ρ.M : HermitianMat d ℂ) - σ.M).mat := by
-    rw [HermitianMat.mat_sub, DensityOp.mat_M, DensityOp.mat_M]
-  rw [eq_matrix_traceNorm (ι := d₂), eq_matrix_traceNorm (ι := d), hmat, hmat, ← map_sub, hin]
-  exact mul_le_mul_of_nonneg_left (Λ.map_pos.traceNorm_le Λ.map_TP _) (by norm_num)
+theorem DPI_PTP {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
+    (ρ σ : DensityOp E) (Λ : PTPOp E F) : TrDistance (Λ ρ) (Λ σ) ≤ TrDistance ρ σ :=
+  let _ := StdBasis.some ℂ E
+  let _ := StdBasis.some ℂ F
+  DPI_PTP_of_stdBasis ρ σ Λ
 
 /-- **Data processing inequality for the trace distance**: a quantum channel never increases the
 trace distance between two states. -/
-theorem DPI {d₂ : Type*} [Fintype d₂] [DecidableEq d₂] (ρ σ : MState d) (Φ : CPTPMap d d₂) :
-    TrDistance (Φ ρ) (Φ σ) ≤ TrDistance ρ σ :=
+theorem DPI {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
+    (ρ σ : DensityOp E) (Φ : CPTPOp E F) : TrDistance (Φ ρ) (Φ σ) ≤ TrDistance ρ σ :=
   DPI_PTP ρ σ Φ.toPTPOp
 
 -- Fuchs–van de Graaf inequalities

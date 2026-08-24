@@ -1,6 +1,6 @@
 # `StdBasis` refactor: scoping, design, and migration plan
 
-Status of this document: Stages 0–2, Stage 5, most of Stage 3, and the core of Stage 4 have landed.
+Status of this document: Stages 0–3, Stage 5, and the core of Stage 4 have landed.
 The branch has since been merged with `master`, which brought Lean `v4.33.0` and its **module
 system** (`module` / `public import` / `@[expose] public section`), the `PhysLean` → `Physlib`
 rename, the flattening of `QuantumInfo/Finite/` into `States/`, `Channels/`, `Entropy/`,
@@ -22,7 +22,7 @@ Two subtrees are works in progress rather than finished developments, and carry 
 design: `Entropy/Axiomatized/` (16, the axiomatic characterisation of relative entropy and its
 Rényi family) and `ClassicalInfo/Capacity.lean` (4, Shannon's noisy-channel coding theorem).
 
-The sandwiched Rényi DPI no longer needs Riesz–Thorin interpolation. `Entropy/DPI.lean` (1616 lines)
+The sandwiched Rényi DPI no longer needs Riesz–Thorin interpolation. `Entropy/DPI.lean` (1649 lines)
 proves it from Stinespring: `sandwichedTraceFunctional_mono_traceRight` gives monotonicity under a
 partial trace for `α > 1`, `sandwichedRenyiEntropy_conj_unitary` gives unitary invariance, and
 `sandwichedRenyiEntropy_DPI` assembles them through `CPTPOp.prepDefault` and the Stinespring
@@ -50,7 +50,7 @@ contraction).
   the operator-level one. `Braket.lean` has *not* been migrated: `Ket`/`Bra` are still functions
   `d → ℂ`.
 
-* **Stage 3 (most of it)** — the state-level quantities are now basis-free, each paired with a
+* **Stage 3** — the state-level quantities are now basis-free, each paired with a
   "matrix analogue" theorem that recovers the old matrix formula through an arbitrary `StdBasis`:
 
   | Basis-free definition | Matrix analogue |
@@ -58,7 +58,7 @@ contraction).
   | `Sᵥₙ (ρ : DensityOp E)` | `Sᵥₙ_eq_trace_cfc_negMulLog`, `Sᵥₙ_eq_re_trace_matrix_cfc` |
   | `TrDistance` | `TrDistance.eq_matrix_traceNorm` |
   | `DensityOp.fidelity` | `DensityOp.fidelity_eq_matrix` |
-  | `DensityOp.U_conj` | `DensityOp.U_conj_M` (and `MState.U_conj`, `U ◃ ρ`, on top of it) |
+  | `DensityOp.uConj` | `DensityOp.uConj_M` (and `MState.uConj`, `U ◃ ρ`, on top of it) |
   | `SandwichedRelRentropy`, `qRelativeEnt` | `sandwichedRelRentropy_eq_matrix`, and its
     index-determined specialisation `MState.sandwichedRelRentropy_eq_matrix` |
 
@@ -83,13 +83,23 @@ contraction).
   they are now `EuclideanSpace ℂ d₁` / `EuclideanSpace ℂ d₂`. Their two call sites apply them by
   name instead.
 
-  Not yet done in Stage 3: `Entropy/SSA.lean` and `Entropy/DPI.lean`, both still matrix-stated
-  throughout. `Entropy/DPI.lean` is mathematically complete (see the header above); it is the
-  *statement* that is still in matrix language.
+  `Entropy/SSA.lean` and `Entropy/DPI.lean` each end in a `basis_free` section that restates their
+  headline results for a `DensityOp E`, reducing to the index-level version by choosing an
+  arbitrary basis with `StdBasis.some` and transporting: `DensityOp.Sᵥₙ_strong_subadditivity`,
+  `Sᵥₙ_subadditivity`, `Sᵥₙ_triangle_subaddivity`, the `qcmi` bounds, and
+  `DensityOp.sandwichedRenyiEntropy_DPI` / `DensityOp.qRelativeEnt_DPI`. The bodies of both files
+  remain matrix-level, which is the intended end state: the mathematics happens in coordinates and
+  the interface does not.
+
+  The one headline result of `Entropy/DPI.lean` with no basis-free counterpart is
+  `qRelativeEnt_joint_convexity`. It is stated with `Mixable`, and the only `Mixable` instance is
+  `Mixable (HermitianMat d ℂ) (MState d)`; a basis-free statement needs
+  `Mixable (HermitianOp E) (DensityOp E)` first, which is new infrastructure rather than a
+  restatement.
 
 * **Stage 4 (core)** — the partial trace and the tensor/index bridge exist.
 
-  `QuantumInfo/ForMathlib/PartialTrace.lean` (413 lines) builds the partial trace from scratch, as
+  `QuantumInfo/ForMathlib/PartialTrace.lean` (409 lines) builds the partial trace from scratch, as
   Mathlib has none. `ContinuousLinearMap.traceLeft/traceRight` on `(E ⊗[𝕜] F) →L[𝕜] E ⊗[𝕜] F` are
   defined by summing `tmulLeftL`/`tmulRightL` sandwiches over an orthonormal basis of the traced-out
   factor; a `BasisIndependence` section shows the sum does not depend on that basis, so the
@@ -129,10 +139,20 @@ contraction).
   `X_map : X.map = <matrixmap>`. Choi matrices and Kraus decompositions stay matrix-side, as
   planned in §4 Stage 5.
 
-Remaining downstream files (`Entropy/{SSA,DPI}.lean`, `States/{Ensemble,Entanglement}.lean`,
-`Measurements/POVM.lean`, `Channels/Pinching.lean`, `Capacity/Capacity.lean`,
-`ResourceTheory/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not yet migrated to
-operator form; they still speak in matrices via `ρ.M`. Stages 6 and 7 below are unstarted.
+  The *action* of a map is basis-free too. `HPOp.opApply` sends a `HermitianOp E` to a
+  `HermitianOp F`, `POp.opApply_nonneg` and `PTPOp.trace_opApply` say it preserves positivity and
+  the trace, and `PTPOp.applyState` assembles those into the map on states that `PTPOp.instMFunLike`
+  installs as the coercion. Neither that instance nor `CPTPOp.instMFunLike` mentions a `StdBasis`
+  any more, so `Λ ρ` elaborates for any `Λ : PTPOp E F` and `ρ : DensityOp E`.
+  `CPTPOp.transport ι κ` reads a channel as a `CPTPMap ι κ` between the Euclidean spaces of the two
+  preferred bases, with `map_transport` (the matrix is unchanged) and `transport_apply` (it commutes
+  with transporting states); that is what lets a basis-free statement be discharged by the
+  index-level theorem.
+
+Remaining downstream files (`States/{Ensemble,Entanglement}.lean`, `Measurements/POVM.lean`,
+`Channels/Pinching.lean`, `Capacity/Capacity.lean`, `ResourceTheory/*`) have been repaired against
+the new `DensityOp`/`CPTPOp` API but not yet migrated to operator form; they still speak in matrices
+via `ρ.M`. Stages 6 and 7 below are unstarted.
 
 ### Known ergonomic wart: dot notation through the `MState`/`CPTPMap` abbreviations
 
@@ -147,6 +167,20 @@ stored un-unfolded) and the fully qualified name (`MState.exp_val (Λ ρ) T`).
 The fix is to move `MState`'s basis-free API into the `DensityOp` namespace, since dot notation
 retries after unfolding reducible definitions; `MState.*` names that are genuinely basis-dependent
 (`ofClassical`, `uniform`, `spectrum`, `relabel`) should stay put.
+
+### Known ergonomic wart: matrix analogues of basis-free *applications* cannot be `simp` lemmas
+
+A matrix analogue is normally a fine `simp` lemma: `(ρ.transport F).M = ρ.M` has the index type on
+both sides, so it is determined by the term being rewritten. But for the action of a map,
+`(Λ ρ).M = Λ.map ρ.M`, the *input* index type appears only on the right — nothing in `(Λ ρ).M`
+mentions it, now that `PTPOp.instMFunLike` no longer takes a `StdBasis` on the domain. `simp`
+then reports "has unassigned metavariables after unification" and silently declines, because it
+tries the `[Fintype ι]` subgoal before the `[StdBasis ℂ E ι]` one that would have solved `ι` through
+its `outParam`. Worse, the failure is not always quiet: a following `apply` can whnf the unreduced
+`applyState` term into a deterministic timeout.
+
+So `PTPOp.M_apply_MState`, `PTPOp.M_applyState` and `HPOp.toMat_opApply` are deliberately *not*
+`@[simp]`; apply them with `rw` (or as terms, supplying `ι`). Their docstrings say so.
 
 ---
 
@@ -258,8 +292,8 @@ Missing from Mathlib (each is a cost line-item for the migration):
 * CFC on bare `E →ₗ[ℂ] E` (only the CLM version).
 * `HilbertBasis → OrthonormalBasis` (only the forward `OrthonormalBasis.toHilbertBasis`).
 * A CLM version of `TensorProduct.map`.
-* **`FiniteDimensional.complete` is a theorem, not an instance.** This is a real ergonomic problem
-  (see §2.4).
+* **`FiniteDimensional.complete` is a theorem, not an instance.** This was a real ergonomic problem;
+  see §2.4 for how it was resolved locally.
 
 ---
 
@@ -315,14 +349,16 @@ would leave it unconstrained at every use site.
   and `StdBasis ℂ (E ⊗[ℂ] F) (ι × κ)` are instances on *different carrier types*. The bridge
   between them (`EuclideanSpace ℂ d₁ ⊗[ℂ] EuclideanSpace ℂ d₂ ≃ₗᵢ EuclideanSpace ℂ (d₁ × d₂)`) has
   to be an explicit isometry, which is the honest state of affairs anyway.
-* **`CompleteSpace`.** `FiniteDimensional.complete` is a theorem, not an instance, so a
-  `[StdBasis 𝕜 E ι]` binder does **not** give `CompleteSpace E`, and without it the C\*-algebra and
-  `Star` structure on `E →L[𝕜] E` do not synthesize. Every operator-level declaration must carry
-  `[CompleteSpace E]` explicitly (it is a `Prop` class, so there is no diamond, only noise). The
-  prototype supplies the missing `CompleteSpace (E ⊗[𝕜] F)` instance. **This is the single largest
-  ergonomic tax of the whole design.** The clean fix is upstream: make `FiniteDimensional.complete`
-  an instance in Mathlib, or add a local low-priority instance in this repo. Recommend the latter
-  as a follow-up experiment, gated on checking it does not slow down instance search.
+* **`CompleteSpace`. Resolved.** `FiniteDimensional.complete` is a theorem, not an instance, because
+  the scalar field cannot be recovered from the goal `CompleteSpace E`; without completeness the
+  C\*-algebra and `Star` structure on `E →L[𝕜] E` do not synthesize. Two local low-priority
+  instances remove the problem: `StdBasis.toCompleteSpace` (a `StdBasis 𝕜 E ι` instance pins down
+  `𝕜`, so the search terminates) and `FiniteDimensional.toCompleteSpaceComplex` (Mathlib registers
+  `FiniteDimensional.proper` only for `𝕜 = ℝ`, so the `ℂ` case needs its own route). Together they
+  mean `[CompleteSpace E]` never appears in a signature: `[StdBasis ℂ E ι]` or
+  `[FiniteDimensional ℂ E]` alone is enough. `CompleteSpace` is a `Prop`, so the extra routes create
+  no diamond, and the build shows no measurable instance-search cost. `CompleteSpace (E ⊗[𝕜] F)`
+  is supplied for the general `𝕜` case.
 
 ### 2.5 Should `EuclideanSpace ℂ d` be canonical?
 
@@ -344,8 +380,10 @@ be used deliberately, not as a rewrite direction.
 
 `StdBasis` adds one class with one field, resolved by at most two instances per type. The real
 cost is not typeclass search, it is the `[NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
-[CompleteSpace E] [FiniteDimensional 𝕜 E] [StdBasis 𝕜 E ι] [Fintype ι] [DecidableEq ι]` binder
-block, which is seven binders where today's code has two (`[Fintype d] [DecidableEq d]`). A
+[StdBasis 𝕜 E ι] [Fintype ι] [DecidableEq ι]` binder block, which is five binders where today's
+code has two (`[Fintype d] [DecidableEq d]`) — `CompleteSpace` and `FiniteDimensional` are now
+inferred (§2.4), and a basis-free signature needs only the first two plus
+`[FiniteDimensional ℂ E]`. A
 `variable` block plus judicious `abbrev`s keeps this tolerable, but it will make every signature in
 the library visibly longer. Universes are unproblematic (`E` and `ι` live in independent
 universes).
@@ -354,11 +392,12 @@ universes).
 
 ## 3. What the prototype contains
 
-### `QuantumInfo/ForMathlib/StdBasis.lean` (578 lines, compiles clean, no `sorry`)
+### `QuantumInfo/ForMathlib/StdBasis.lean` (588 lines, compiles clean, no `sorry`)
 
 * `class StdBasis`, `export StdBasis (stdBasis)`.
 * Instances: `EuclideanSpace.instStdBasis`, `StdBasis.instTensorProduct`,
-  `StdBasis.toFiniteDimensional`, `TensorProduct.instCompleteSpaceOfFiniteDimensional`.
+  `StdBasis.toFiniteDimensional`, `StdBasis.toCompleteSpace`,
+  `FiniteDimensional.toCompleteSpaceComplex`, `TensorProduct.instCompleteSpaceOfFiniteDimensional`.
 * Non-instances by design: `StdBasis.reindex`, `StdBasis.transport`.
 * Bridge: `toMatOf b : (E →L[𝕜] E) ≃⋆ₐ[𝕜] Matrix ι ι 𝕜`, `toMat 𝕜 E ι`, with
   `@[simp] toMatOf_apply : toMatOf b A i j = ⟪b i, A (b j)⟫_𝕜`,
@@ -375,15 +414,15 @@ universes).
   `ContinuousLinearMap.IsPositive.conjStarAlgEquiv` and
   `ContinuousLinearMap.isPositive_conjStarAlgEquiv_iff`. Both are Mathlib-shaped.
 
-### `QuantumInfo/StdBasisState.lean` (115 lines, compiles clean, no `sorry`)
+### `QuantumInfo/StdBasisState.lean` (114 lines, compiles clean, no `sorry`)
 
 The end-to-end demonstration on von Neumann entropy:
 
 * `MState.ofOp b A hA htr : MState d` — a positive trace-one operator plus an orthonormal basis
   gives a mixed state.
 * `MState.ofOp_basisFun` (`rfl`) — on `EuclideanSpace ℂ d` this *is* the existing matrix state.
-* `MState.Sᵥₙ_U_conj` — a lemma the library was missing; immediate from `U_conj_spectrum_eq`.
-* `MState.ofOp_eq_U_conj` — changing basis conjugates the state by `changeOfBasis`.
+* `MState.Sᵥₙ_uConj` — a lemma the library was missing; immediate from `uConj_spectrum_eq`.
+* `MState.ofOp_eq_uConj` — changing basis conjugates the state by `changeOfBasis`.
 * `MState.Sᵥₙ_ofOp_congr` and `MState.Sᵥₙ_ofOp_congr_instances` — **the insensitivity theorem**,
   proved, in two rewrites.
 * `MState.ofOp_reindex`, `MState.Sᵥₙ_ofOp_reindex` — insensitivity to the index type.
@@ -400,13 +439,15 @@ Sizes below are rough (S ≈ ≤ 1 day, M ≈ 2–4 days, L ≈ 1–2 weeks, XL 
 
 `ForMathlib/StdBasis.lean` + `StdBasisState.lean`. Already landed and green.
 
-**Remaining Stage-0 items before proceeding:**
-1. Decide the `CompleteSpace` question (§2.4). Try a local
-   `instance (priority := low) : [FiniteDimensional 𝕜 E] → CompleteSpace E` and measure build time.
-   If it is safe, every subsequent stage gets three binders shorter. **Do this first** — it changes
-   the shape of every signature written afterwards.
-2. Add `StdBasis` instances for `𝕜` itself, `Fin n → 𝕜`, `PiLp 2`, and `Matrix` (Hilbert–Schmidt)
-   if downstream needs them. (S)
+Both Stage-0 follow-ups are settled:
+
+1. The `CompleteSpace` question (§2.4) is resolved in favour of the local low-priority instances
+   `StdBasis.toCompleteSpace` and `FiniteDimensional.toCompleteSpaceComplex`. Nothing in the library
+   carries a `[CompleteSpace E]` binder.
+2. `StdBasis` instances for `𝕜` itself, `Fin n → 𝕜`, `PiLp 2` and `Matrix` (Hilbert–Schmidt) were
+   never needed: everything downstream lives on `EuclideanSpace`, a tensor product, or an abstract
+   `E`. Adding them speculatively would only widen the instance search, so the recommendation is to
+   add each one when a use site actually appears.
 
 ### Stage 1 — `HermitianMat` becomes an abbreviation (M/L)
 
@@ -449,29 +490,30 @@ so that downstream files continue to compile untouched.
 Breakage estimate: `MState.lean` has ~153 declarations; expect ~40 to need real work and the rest
 to be binder churn. `Braket.lean` ~15 of 51 need real work.
 
-### Stage 3 — `Unitary`, `Distance`, `Entropy` (M; all but `SSA` and `DPI` done)
+### Stage 3 — `Unitary`, `Distance`, `Entropy` (M; done)
 
 These are the payoff stage: every result here is unitarily invariant, so
 `StdBasis.congr_of_unitaryInvariant` discharges the insensitivity obligations mechanically, exactly
 as demonstrated in `StdBasisState.lean`.
 
-* `Operators/Unitary.lean` — done. `DensityOp.U_conj` takes a `unitary (E →L[ℂ] E)`; `MState.U_conj`
+* `Operators/Unitary.lean` — done. `DensityOp.uConj` takes a `unitary (E →L[ℂ] E)`; `MState.uConj`
   is defined from it through `StdBasis.unitaryOfMat`, so all twelve existing `◃` call sites are
   unchanged.
 * `States/Mixed/{TraceDistance, Fidelity}.lean` — done, with the trace norm staying matrix-side
   behind `HermitianOp.traceNorm`. `TraceDistance.lean` also gained the data processing inequality
-  `TrDistance.DPI_PTP` (for a `PTPMap`, matching `Fidelity.lean`'s existing fidelity DPI) with
-  `TrDistance.DPI` as the `CPTPMap` corollary. It is stated for `PTPMap d d₂` rather than a
-  basis-free `PTPOp E F` because `PTPOp.instMFunLike` is declared inside the `StdBasis` section of
-  `Channels/Bundled.lean`, so `Λ ρ` is not even elaborable without `StdBasis` instances on both
-  sides.
+  `TrDistance.DPI_PTP` (for a `PTPOp E F`, matching `Fidelity.lean`'s existing fidelity DPI) with
+  `TrDistance.DPI` as the `CPTPOp` corollary. Both are basis-free, since the coercion
+  `PTPOp E F → DensityOp E → DensityOp F` no longer needs a `StdBasis` on either side; the proof
+  picks bases internally.
 * `Entropy/VonNeumann.lean` — done.
 * `Entropy/Relative.lean` — done. The definition is basis-free; the ~1450 lines of existing
   matrix-level machinery below it are untouched, reached through the `coords` transport.
-* `Entropy/SSA.lean` (1524) — not started. Large but shallow: statements about traces, `log`,
-  and CFC, almost no coordinate reasoning.
-* `Entropy/DPI.lean` (1616) — the mathematics is complete but the statements are matrix-level;
-  restating them basis-free depends on Stage 4.
+  `sandwichedRelRentropy_transport` and `qRelativeEnt_transport` say the two entropies do not see
+  which of two spaces sharing an index type the states are read on, which is what makes the
+  basis-free statements downstream reducible to the index-level ones.
+* `Entropy/SSA.lean` (1520) and `Entropy/DPI.lean` (1649) — done, in the sense described in the
+  header: the proofs stay matrix-level and each file ends in a `basis_free` section restating its
+  headline results for a `DensityOp E`.
 
 ### Stage 4 — tensor products and partial trace (L, genuinely hard; core done)
 
@@ -531,8 +573,8 @@ the project can be paused after any stage.
 
 ## 5. Top risks
 
-1. **`CompleteSpace` is not derivable from `FiniteDimensional` by instance search.** Every
-   operator-level signature in the library grows binders. Resolve in Stage 0.
+1. ~~**`CompleteSpace` is not derivable from `FiniteDimensional` by instance search.**~~ Resolved in
+   Stage 0 by two local low-priority instances (§2.4); no signature carries `[CompleteSpace E]`.
 2. **No partial trace and no Schatten norms in Mathlib.** These are the two largest genuinely-new
    developments, and they sit under `Entropy/`, `States/Mixed/` and `Channels/`. The partial trace has since
    been written (`ForMathlib/PartialTrace.lean`); the Schatten norms remain matrix-side behind
