@@ -131,7 +131,6 @@ The trace functional is invariant under joint unitary conjugation:
 This corresponds to equation (2.3) in the paper.
 Proved using `rpow_conj_unitary` (f(UXU†) = U f(X) U†) and `conj_conj`.
 -/
-set_option backward.isDefEq.respectTransparency false in
 theorem sandwichedTraceFunctional_conj_unitary_hermitian
     (U : Matrix.unitaryGroup d ℂ) (A B : HermitianMat d ℂ) :
     let γ := (1 - α) / (2 * α)
@@ -1240,7 +1239,6 @@ theorem sandwichedRenyiEntropy_mono_traceRight [Nonempty dB]
 /-
 The sandwiched Rényi divergence is invariant under unitary conjugation.
 -/
-set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 400000 in
 theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
     (U : Matrix.unitaryGroup d ℂ) :

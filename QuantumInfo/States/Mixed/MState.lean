@@ -507,7 +507,6 @@ theorem pure_M (ψ : Ket d) :
     (pure ψ).M = ⟨Matrix.vecMulVec ψ (ψ : Bra d), (Matrix.PosSemidef.outer_self_conj ψ).1⟩ := by
   rw [pure, M_ofMat]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The overlap of two pure states is the squared magnitude of their bracket. -/
 theorem pure_inner : ⟪pure ψ, pure φ⟫_Prob = ‖Braket.dot ψ φ‖^2 := by
   simp [MState.inner_def, HermitianMat.inner_def, pure_M, Matrix.vecMulVec_mul_vecMulVec,

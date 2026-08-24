@@ -566,7 +566,6 @@ private lemma eigenWeight_nonneg (ρ σ : MState d) (i : d) : 0 ≤ eigenWeight 
   have := (Matrix.posSemidef_iff_dotProduct_mulVec.mp h₁).2 v;
   exact this.1.trans (by simp [w])
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma eigenWeight_zero_of_eigenvalue_zero {i : d} (hσ : σ.M.ker ≤ ρ.M.ker)
   (hei : σ.M.H.eigenvalues i = 0) :
     eigenWeight ρ σ i = 0 := by
@@ -586,7 +585,6 @@ The derivative of u ↦ ⟪ρ, σ^u⟫ at u = 0 is ⟪ρ, σ.log⟫.
     Use inner_cfc_eq_sum_eigenWeight to write ⟪ρ, σ^u⟫ = ∑ i, q_i^u * eigenWeight ρ σ i,
     differentiate term by term using HasDerivAt.sum.
 -/
-set_option backward.isDefEq.respectTransparency false in
 private lemma hasDerivAt_inner_rpow_at_zero (h : σ.M.ker ≤ ρ.M.ker) :
     HasDerivAt (fun u : ℝ => ⟪ρ.M, σ.M ^ u⟫) ⟪ρ.M, σ.M.log⟫ 0 := by
   convert HasDerivAt.congr_of_eventuallyEq ?_ ?_;
@@ -782,7 +780,6 @@ private lemma scalar_rpow_cross_term_of_continuous_zero {b : ℝ → ℝ}
   rw [ Asymptotics.isLittleO_iff ];
   intro ε hε; rcases h_eps ε hε with ⟨ δ, hδ, H ⟩ ; filter_upwards [ Metric.ball_mem_nhds _ hδ ] with x hx using by simpa [ hc ] using H ( 1 + x ) ( by simpa using hx ) ;
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If ker A ≤ ker ρM, then conjugating ρM by the support projection of A gives back ρM.
     This is because ρM is supported entirely on the support (= range) of A. -/
 private lemma conj_supportProj_eq_of_ker_le (A ρM : HermitianMat d ℂ) (hker : A.ker ≤ ρM.ker) :
@@ -816,7 +813,6 @@ private lemma rpow_tendsto_supportProj
     convert h_cfc_g_conv.tendsto 0 using 2 ; simp [ HermitianMat.supportProj_eq_cfc ];
   exact Filter.Tendsto.congr' ( Filter.eventuallyEq_of_mem self_mem_nhdsWithin fun x hx => by aesop ) ( h_cfc_g_conv.mono_left inf_le_left )
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For PSD matrices A, ρ with A.ker ≤ ρ.ker, the function r ↦ ρ.conj (A ^ r).mat
     is continuous at r = 0. Even though A ^ r is discontinuous at r = 0 when A
     has zero eigenvalues, the kernel condition ensures the conj "kills" the
@@ -1109,7 +1105,6 @@ private lemma hasDerivAt_trace_rpow_sub_trace_variable_base
   ring_nf
   ext; norm_num; ring
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The cross term in the derivative decomposition vanishes: the function
     α ↦ Tr[B(α)^α] - Tr[B(α)] - Tr[ρ^α] + 1 has derivative 0 at α = 1.
     This is because at α=1, B^1 = B, so ∂/∂B Tr[B^α] = Tr[·] (the trace is linear),
@@ -1706,7 +1701,6 @@ theorem qRelativeEnt_additive (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState 
   --or `simp [SandwichedRelRentropy]`.
   exact sandwichedRelRentropy_additive_alpha_one ρ₁ σ₁ ρ₂ σ₂
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem sandwichedRelRentropy_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
     D̃_ α(ρ.relabel e‖σ.relabel e) = D̃_ α(ρ‖σ) := by
@@ -1881,7 +1875,6 @@ private theorem sandwichedRelRentropy.continuousOn_Ioo_0_1 (ρ σ : MState d) :
       dsimp only
       simp [hx.1]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Continuity at 1: the sandwich relative Rényi entropy is continuous at α = 1. -/
 private theorem sandwichedRelRentropy.continuousAt_1 (ρ σ : MState d) :
     ContinuousWithinAt (fun α => D̃_ α(ρ‖σ)) (Set.Ioi 0) 1 := by
@@ -2113,7 +2106,6 @@ private lemma eigenWeight_eq_zero_iff (ρ x : MState d) (i : d) :
     simp [ dotProduct ]
   exact congr_arg Complex.re h_zero
 
-set_option backward.isDefEq.respectTransparency false in
 private lemma ker_le_iff_eigenWeight_zero (ρ x : MState d) :
     x.M.ker ≤ ρ.M.ker ↔ ∀ i, x.M.H.eigenvalues i = 0 → eigenWeight ρ x i = 0 := by
   constructor
@@ -2218,7 +2210,6 @@ Relative entropy is lower semicontinuous (in each argument, actually, but we onl
 latter here). Will need the fact that all the cfc / eigenvalue stuff is continuous, plus
 carefully handling what happens with the kernel subspace, which will make this a pain.
 -/
-set_option backward.isDefEq.respectTransparency false in
 @[fun_prop]
 theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous fun σ => 𝐃(ρ‖σ) := by
   simp_rw [qRelativeEnt, MState.sandwichedRelRentropy_eq_matrix, if_true, lowerSemicontinuous_iff]

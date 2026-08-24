@@ -220,7 +220,6 @@ theorem MState.exp_val_pure_eq_one_iff {d : Type*} [Fintype d] [DecidableEq d]
       (by rw [hsq]; linarith) (ρ.M - (MState.pure ψ).M).inner_self_nonneg)))
   · rintro rfl; simpa [MState.exp_val] using hpure_inner
 
-set_option backward.isDefEq.respectTransparency false in
 theorem mix_mEnsemble_pure_iff_pure {e : MEnsemble d α} :
     mix e = pure ψ ↔ ∀ i : α, e.distr i ≠ 0 → e.states i = MState.pure ψ := by
   have h : (mix e).exp_val ↑(MState.pure ψ) = ∑ i, ↑(e.distr i) * (e.states i).exp_val ↑(MState.pure ψ) := by
@@ -232,7 +231,6 @@ theorem mix_mEnsemble_pure_iff_pure {e : MEnsemble d α} :
   · intro i
     apply (e.states i).exp_val_le_one (DensityOp.le_one _)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The average of `f : MState d → T` on an ensemble that mixes to a pure state `ψ` is `f (pure ψ)` -/
 theorem mix_mEnsemble_pure_average {e : MEnsemble d α} {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (hmix : mix e = pure ψ) :
   average f e = f (pure ψ) := by
@@ -273,7 +271,6 @@ theorem trivial_mEnsemble_mix (ρ : MState d) : ∀ i : α, mix (trivial_mEnsemb
     Prob.coe_one, Prob.coe_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq,
     Finset.mem_univ, ↓reduceIte]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The average of `f : MState d → T` on a trivial ensemble of `ρ` is `f ρ`-/
 theorem trivial_mEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (ρ : MState d):
   ∀ i : α, average f (trivial_mEnsemble ρ i) = f ρ := fun i ↦ by
@@ -290,7 +287,6 @@ def trivial_pEnsemble (ψ : Ket d) (i : α) : PEnsemble d α := ⟨fun _ ↦ ψ,
 
 variable (ψ : Ket d)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The trivial pure-state ensemble of `ψ` mixes to `ψ` -/
 theorem trivial_pEnsemble_mix : ∀ i : α, mix (toMEnsemble (trivial_pEnsemble ψ i)) = MState.pure ψ := fun i ↦ by
   apply DensityOp.ext_m
@@ -298,7 +294,6 @@ theorem trivial_pEnsemble_mix : ∀ i : α, mix (toMEnsemble (trivial_pEnsemble 
     apply_ite, Prob.coe_one, Prob.coe_zero, MEnsemble.states, Function.comp_apply, ite_smul,
     one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
 
-set_option backward.isDefEq.respectTransparency false in
 omit [DecidableEq d] in
 /-- The average of `f : Ket d → T` on a trivial ensemble of `ψ` is `f ψ`-/
 theorem trivial_pEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) :
