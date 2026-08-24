@@ -452,11 +452,14 @@ public import Physlib.Relativity.Tensors.RealTensor.Basic
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Representation
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Tensorial
+public import Physlib.Relativity.Tensors.RealTensor.Contraction.CrossToEnd
+public import Physlib.Relativity.Tensors.RealTensor.Contraction.CrossToSlot
 public import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Representation.Contraction
 public import Physlib.Relativity.Tensors.RealTensor.ToComplex
+public import Physlib.Relativity.Tensors.RealTensor.Units.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Units.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Vector.Causality.Basic

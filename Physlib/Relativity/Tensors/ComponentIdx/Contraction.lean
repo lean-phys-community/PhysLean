@@ -180,6 +180,15 @@ lemma ofFinEquiv_apply_snd {n : ℕ} {c : Fin (n + 1 + 1) → C}
     (ofFinEquiv (S := S) hij b x).1 j = x.2 := by
   simp [ofFinEquiv]
 
+/-- Away from the two restored positions, `ofFinEquiv` agrees with the original
+component index. -/
+lemma ofFinEquiv_apply_succSuccAbove {n : ℕ} {c : Fin (n + 1 + 1) → C}
+    {i j : Fin (n + 1 + 1)} (hij : i ≠ j)
+    (b : ComponentIdx (S := S) (c ∘ Fin.succSuccAbove i j))
+    (x : basisIdx (c i) × basisIdx (c j)) (m : Fin n) :
+    (ofFinEquiv (S := S) hij b x).1 (Fin.succSuccAbove i j m) = b m :=
+  (mem_iff_apply_succSuccAbove_eq _ _).mp (ofFinEquiv (S := S) hij b x).2 m
+
 end DropPairSection
 
 end ComponentIdx

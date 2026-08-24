@@ -5,8 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.RealTensor.Basic
-public import Physlib.Relativity.Tensors.MetricTensor
+public import Physlib.Relativity.Tensors.RealTensor.Contraction.CrossToSlot
 /-!
 
 ## Metrics as real Lorentz tensors
@@ -97,7 +96,7 @@ lemma actionT_contrMetric {d} (g : LorentzGroup d) : g • η d = η d := by
 
 /-
 
-## There value with respect to a basis
+## Their value with respect to a basis
 
 -/
 
@@ -105,7 +104,11 @@ lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.down, Color.down]) :
     (Tensor.basis _).repr (coMetric d) b =
     minkowskiMatrix (b 0) (b 1) := by
-  rw [coMetric_eq_fromPairT, fromPairT_basis_repr,
+  change (Tensor.basis _).repr
+    (metricTensor (S := realLorentzTensor d) Color.down) b = _
+  rw [metricTensor_basis_repr,
+    show ((realLorentzTensor d).metric Color.down) (1 : ℝ) = Lorentz.preCoMetricVal d from
+      Lorentz.preCoMetric_apply_one,
     Lorentz.preCoMetricVal_expand_tmul_minkowskiMatrix]
   simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_smul, Finsupp.coe_smul,
     Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, Finsupp.single_apply,
@@ -117,12 +120,43 @@ lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : ComponentIdx (S := realLorentzTensor d) ![Color.up, Color.up]) :
     (Tensor.basis _).repr (contrMetric d) b =
     minkowskiMatrix (b 0) (b 1) := by
-  rw [contrMetric_eq_fromPairT, fromPairT_basis_repr,
+  change (Tensor.basis _).repr
+    (metricTensor (S := realLorentzTensor d) Color.up) b = _
+  rw [metricTensor_basis_repr,
+    show ((realLorentzTensor d).metric Color.up) (1 : ℝ) = Lorentz.preContrMetricVal d from
+      Lorentz.preContrMetric_apply_one,
     Lorentz.preContrMetricVal_expand_tmul_minkowskiMatrix]
   simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_smul, Finsupp.coe_smul,
     Pi.smul_apply, Basis.tensorProduct_repr_tmul_apply, Basis.repr_self, Finsupp.single_apply,
     smul_eq_mul]
   rw [Finset.sum_eq_single (b 0)] <;>
     simp +contextual [minkowskiMatrix.as_diagonal, Matrix.diagonal_apply]
+
+/-- The component matrix of either real Lorentz metric tensor is the Minkowski matrix. -/
+lemma metricTensor_repr_apply_eq_minkowskiMatrix {d : ℕ} (c : Color)
+    (φ : ComponentIdx (S := realLorentzTensor d) ![c, c]) :
+    (Tensor.basis _).repr (metricTensor (S := realLorentzTensor d) c) φ =
+      minkowskiMatrix (φ 0) (φ 1) := by
+  cases c with
+  | up => exact contrMetric_repr_apply_eq_minkowskiMatrix φ
+  | down => exact coMetric_repr_apply_eq_minkowskiMatrix φ
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Raising or lowering one index of a real Lorentz tensor contracts that slot's components with
+the Minkowski matrix. -/
+lemma toDualMapAtIndex_basis_repr_apply {d n : ℕ} {c : Fin (n + 1) → Color}
+    (i : Fin (n + 1)) (t : ℝT(d, c))
+    (φ : ComponentIdx (S := realLorentzTensor d)
+      (Function.update c i ((realLorentzTensor d).τ (c i)))) :
+    (Tensor.basis _).repr (Tensor.toDualMapAtIndex (S := realLorentzTensor d) i t) φ =
+      ∑ x : Fin 1 ⊕ Fin d,
+        (Tensor.basis c).repr t (i.insertNth x (fun m => φ (i.succAbove m))) *
+          minkowskiMatrix x (φ i) := by
+  have h := crossToSlot_basis_repr_apply_eq_fin (d := d) i (0 : Fin 2) rfl
+    (metricTensor (S := realLorentzTensor d) ((realLorentzTensor d).τ (c i))) t φ
+  refine h.trans (Finset.sum_congr rfl fun x _ => ?_)
+  congr 1
+  rw [metricTensor_repr_apply_eq_minkowskiMatrix]
+  congr 1
 
 end realLorentzTensor

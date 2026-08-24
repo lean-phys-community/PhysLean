@@ -29,6 +29,14 @@ open Tensor
 noncomputable def unitTensor (c : C) : S.Tensor ![S.τ c, c] :=
   fromConstPair (S.unit c)
 
+/-- A component of the unit tensor is the corresponding component of the unit intertwiner in the
+tensor-product basis. -/
+lemma unitTensor_basis_repr (c : C) (φ : ComponentIdx (S := S) ![S.τ c, c]) :
+    (Tensor.basis _).repr (unitTensor (S := S) c) φ =
+      (Module.Basis.tensorProduct (b (S.τ c)) (b c)).repr ((S.unit c) (1 : k))
+        (φ 0, φ 1) := by
+  rw [unitTensor, fromConstPair, fromPairT_basis_repr]
+
 lemma unitTensor_congr {c c1 : C} (h : c = c1) :
     unitTensor c = permT id (by simp [h]) (unitTensor (S := S) c1) := by
   subst h
