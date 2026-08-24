@@ -85,7 +85,7 @@ private theorem Lemma6 {m : ℕ} (hm : 0 < m) (ρ σf : MState (H i)) (σₘ : M
       --Distribute the limsup over subtraction
       --The term on the right is a constant, divided by n, which converges to zero.
       --Dropping that leaves the identity
-      generalize_proofs pfC pfF pf1 pf2 at h_lem5
+      generalize_proofs pfF pf1 pf2 at h_lem5
       let x n :=  —log β_ ε(ρ ⊗ᵣ^[n]‖{σn n})
       let y n := D̃_ α(ρ ⊗ᵣ^[n]‖σn n)
       set z := —log (1 - ε) * (ENNReal.ofNNReal ⟨α, pf1⟩) / (ENNReal.ofNNReal ⟨α - 1, pf2⟩)

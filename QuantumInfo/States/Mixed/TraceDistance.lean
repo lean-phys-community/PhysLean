@@ -36,7 +36,7 @@ open Kronecker
 open scoped Matrix ComplexOrder
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 variable [FiniteDimensional ℂ E]
 
 /-- The trace distance between two quantum states: half the trace norm of the difference (ρ - σ).

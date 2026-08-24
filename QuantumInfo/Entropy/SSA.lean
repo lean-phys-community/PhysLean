@@ -1392,7 +1392,7 @@ open scoped TensorProduct
 
 variable {E F G : Type*}
 variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
-variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F] [FiniteDimensional ℂ F]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
 variable [NormedAddCommGroup G] [InnerProductSpace ℂ G] [FiniteDimensional ℂ G]
 
 namespace DensityOp
@@ -1411,7 +1411,6 @@ theorem Sᵥₙ_strong_subadditivity (ρ : DensityOp (E ⊗[ℂ] (F ⊗[ℂ] G))
   dsimp only at this
   linarith
 
-variable [CompleteSpace E] in
 /-- "Ordinary" subadditivity of von Neumann entropy. -/
 theorem Sᵥₙ_subadditivity (ρ : DensityOp (E ⊗[ℂ] F)) :
     Sᵥₙ ρ ≤ Sᵥₙ ρ.traceRight + Sᵥₙ ρ.traceLeft := by
@@ -1422,7 +1421,6 @@ theorem Sᵥₙ_subadditivity (ρ : DensityOp (E ⊗[ℂ] F)) :
     Sᵥₙ_transport]
   exact _root_.Sᵥₙ_subadditivity μ
 
-variable [CompleteSpace E] in
 /-- Araki-Lieb triangle inequality on von Neumann entropy. -/
 theorem Sᵥₙ_triangle_subaddivity (ρ : DensityOp (E ⊗[ℂ] F)) :
     |Sᵥₙ ρ.traceRight - Sᵥₙ ρ.traceLeft| ≤ Sᵥₙ ρ := by
@@ -1433,7 +1431,6 @@ theorem Sᵥₙ_triangle_subaddivity (ρ : DensityOp (E ⊗[ℂ] F)) :
     Sᵥₙ_transport]
   exact _root_.Sᵥₙ_triangle_subaddivity μ
 
-variable [CompleteSpace G] in
 /-- Weak monotonicity of quantum conditional entropy: `S(E|F) + S(E|G) ≥ 0`. -/
 theorem Sᵥₙ_weak_monotonicity (ρ : DensityOp (E ⊗[ℂ] (F ⊗[ℂ] G))) :
     0 ≤ ((ρ.congr (TensorProduct.assocIsometry ℂ E F G).symm).traceRight).qConditionalEnt +

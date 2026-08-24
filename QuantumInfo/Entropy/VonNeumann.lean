@@ -74,8 +74,7 @@ section entropy
 
 section operator
 
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
-variable [FiniteDimensional ℂ E]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
 
 /-- Von Neumann entropy of a mixed state: the trace of `-ρ log ρ`, where the operator function is
@@ -156,8 +155,7 @@ namespace DensityOp
 
 section Defs
 
-variable [CompleteSpace E] [FiniteDimensional ℂ E] [CompleteSpace F] [FiniteDimensional ℂ F]
-variable [CompleteSpace G] [FiniteDimensional ℂ G]
+variable [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] [FiniteDimensional ℂ G]
 
 /-- The quantum conditional entropy `S(E|F) = S(EF) - S(F)` of a state on `E ⊗ F`. -/
 def qConditionalEnt (ρ : DensityOp (E ⊗[ℂ] F)) : ℝ :=

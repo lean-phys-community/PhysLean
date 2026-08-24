@@ -298,8 +298,6 @@ variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ
 
 section Left
 
-variable [CompleteSpace F]
-
 /-- The partial trace of a self-adjoint operator over the left factor. -/
 noncomputable def traceLeft (A : HermitianOp (E ⊗[ℂ] F)) : HermitianOp F :=
   ⟨A.op.traceLeft, ContinuousLinearMap.isSelfAdjoint_iff_isSymmetric.2
@@ -354,8 +352,6 @@ theorem toMat_traceLeft [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
 end Left
 
 section Right
-
-variable [CompleteSpace E]
 
 /-- The partial trace of a self-adjoint operator over the right factor. -/
 noncomputable def traceRight (A : HermitianOp (E ⊗[ℂ] F)) : HermitianOp E :=

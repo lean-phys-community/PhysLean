@@ -126,6 +126,17 @@ usable from a `StdBasis` instance alone, without carrying `[CompleteSpace E]` in
 instance (priority := 100) toCompleteSpace [StdBasis 𝕜 E ι] : CompleteSpace E :=
   FiniteDimensional.complete 𝕜 E
 
+/-- A finite-dimensional complex normed space is complete.
+
+Mathlib registers `FiniteDimensional.proper` as an instance only for `𝕜 = ℝ`, so a space that is
+finite-dimensional over `ℂ` -- but not known to be a `ℝ`-normed space -- does not pick up
+completeness by inference. Registering it here means `[FiniteDimensional ℂ E]` alone is enough to
+use the operator ⋆-algebra on `E →L[ℂ] E`, and `[CompleteSpace E]` never has to appear next to it.
+`CompleteSpace` is a `Prop`, so the extra route to it creates no diamond. -/
+instance (priority := 100) _root_.FiniteDimensional.toCompleteSpaceComplex {E : Type*}
+    [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E] : CompleteSpace E :=
+  FiniteDimensional.complete ℂ E
+
 /-- A tensor product of finite-dimensional inner product spaces is complete. This is needed for the
 `StdBasis` instance on a tensor product to be usable, since the operator ⋆-algebra structure on
 `E ⊗[𝕜] F →L[𝕜] E ⊗[𝕜] F` requires completeness. -/
@@ -191,7 +202,7 @@ noncomputable def toMatOf (b : OrthonormalBasis ι 𝕜 E) : (E →L[𝕜] E) �
 
 /-- The matrix of an operator in the preferred basis of `E`. -/
 noncomputable def toMat (𝕜 E ι : Type*) [RCLike 𝕜] [NormedAddCommGroup E]
-    [InnerProductSpace 𝕜 E] [CompleteSpace E] [Fintype ι] [DecidableEq ι] [StdBasis 𝕜 E ι] :
+    [InnerProductSpace 𝕜 E] [Fintype ι] [DecidableEq ι] [StdBasis 𝕜 E ι] :
     (E →L[𝕜] E) ≃⋆ₐ[𝕜] Matrix ι ι 𝕜 :=
   toMatOf (stdBasis (𝕜 := 𝕜) (E := E))
 
@@ -202,7 +213,7 @@ theorem toMat_def [StdBasis 𝕜 E ι] : toMat 𝕜 E ι = toMatOf (stdBasis (�
 basis. This lets statements about a *change of instance* be reduced to statements about a change of
 orthonormal basis. -/
 theorem toMat_mk (b : OrthonormalBasis ι 𝕜 E) :
-    @toMat 𝕜 E ι _ _ _ _ _ _ ⟨b⟩ = toMatOf b :=
+    @toMat 𝕜 E ι _ _ _ _ _ ⟨b⟩ = toMatOf b :=
   rfl
 
 @[simp]
@@ -358,7 +369,7 @@ theorem toMat_congr_of_unitaryInvariant {X : Type*} (f : Matrix ι ι 𝕜 → X
     (hf : ∀ (U : Matrix.unitaryGroup ι 𝕜) (M : Matrix ι ι 𝕜),
       f ((star U : Matrix ι ι 𝕜) * M * (U : Matrix ι ι 𝕜)) = f M)
     (inst inst' : StdBasis 𝕜 E ι) (A : E →L[𝕜] E) :
-    f (@toMat 𝕜 E ι _ _ _ _ _ _ inst' A) = f (@toMat 𝕜 E ι _ _ _ _ _ _ inst A) :=
+    f (@toMat 𝕜 E ι _ _ _ _ _ inst' A) = f (@toMat 𝕜 E ι _ _ _ _ _ inst A) :=
   congr_of_unitaryInvariant f hf inst.stdBasis inst'.stdBasis A
 
 end ChangeOfBasis
@@ -528,7 +539,6 @@ end Equiv
 section Relabel
 
 variable [Fintype ι] [DecidableEq ι] [StdBasis 𝕜 E ι] [Fintype κ] [DecidableEq κ] [StdBasis 𝕜 F κ]
-variable [CompleteSpace E] [CompleteSpace F]
 
 /-- A linear isometry equivalence that carries the preferred basis of `E` to the preferred basis of
 `F`, relabelling indices along `σ`, relabels matrices along `σ` as well.

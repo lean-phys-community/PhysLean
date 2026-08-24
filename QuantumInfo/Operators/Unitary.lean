@@ -25,8 +25,7 @@ open InnerProductSpace
 
 namespace DensityOp
 
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
-variable [FiniteDimensional ℂ E]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
 
 /-- Conjugate a state by a unitary operator (applying the unitary as an evolution). -/
 def uConj (ρ : DensityOp E) (U : unitary (E →L[ℂ] E)) : DensityOp E where

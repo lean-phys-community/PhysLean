@@ -36,8 +36,8 @@ open scoped ComplexOrder
 section Defs
 
 variable (E F : Type*)
-variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E]
-variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F] [FiniteDimensional ℂ F]
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
 
 /-- Hermitian-preserving linear maps of operators. -/
 structure HPOp extends OpMap E F where
@@ -114,15 +114,14 @@ abbrev CPUMap := CPUOp (EuclideanSpace ℂ dIn) (EuclideanSpace ℂ dOut)
 end Euclidean
 
 variable {E F ι κ : Type*}
-variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E]
-variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F] [FiniteDimensional ℂ F]
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
 
 --Hermitian-preserving maps: continuous linear maps on HermitianMats.
 namespace HPOp
 
 variable {Λ₁ Λ₂ : HPOp E F}
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 @[ext]
 theorem ext (h : Λ₁.toLinearMap = Λ₂.toLinearMap) : Λ₁ = Λ₂ := by
   rwa [HPOp.mk.injEq]
@@ -135,16 +134,13 @@ variable [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [Fintype κ] [Decidab
 def map (Λ : HPOp E F) : MatrixMap ι κ ℂ :=
   OpMap.toMat Λ.toLinearMap
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 theorem map_eq (Λ : HPOp E F) : Λ.map (ι := ι) (κ := κ) = OpMap.toMat Λ.toLinearMap :=
   rfl
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 /-- Two maps with the same matrix are equal. -/
 theorem ext_map (h : Λ₁.map (ι := ι) (κ := κ) = Λ₂.map) : Λ₁ = Λ₂ :=
   ext (OpMap.toMat_injective h)
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 @[simp]
 theorem map_HP (Λ : HPOp E F) : (Λ.map (ι := ι) (κ := κ)).IsHermitianPreserving :=
   (OpMap.isHermitianPreserving_toMat_iff _).mpr Λ.HP
@@ -154,13 +150,11 @@ def ofMat (M : MatrixMap ι κ ℂ) (hHP : M.IsHermitianPreserving) : HPOp E F w
   toLinearMap := OpMap.ofMat E F M
   HP := (OpMap.isHermitianPreserving_toMat_iff (ι := ι) (κ := κ) _).mp (by simpa using hHP)
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 @[simp]
 theorem map_ofMat (M : MatrixMap ι κ ℂ) (hHP : M.IsHermitianPreserving) :
     (ofMat (E := E) (F := F) M hHP).map = M :=
   OpMap.toMat_ofMat M
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 /-- Two maps are equal if they agree on all Hermitian inputs. -/
 theorem funext_hermitian (h : ∀ M : HermitianMat ι ℂ, Λ₁.map (κ := κ) M = Λ₂.map M) :
     Λ₁ = Λ₂ := by
@@ -172,7 +166,6 @@ theorem funext_hermitian (h : ∀ M : HermitianMat ι ℂ, Λ₁.map (κ := κ) 
   <;> rw (occs := [1]) [← realPart_add_I_smul_imaginaryPart M, map_add, map_smul]
   <;> rfl
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 /-- Two maps are equal if they agree on all positive inputs. -/
 theorem funext_pos (h : ∀ M : HermitianMat ι ℂ, 0 ≤ M → Λ₁.map (κ := κ) M = Λ₂.map M) :
     Λ₁ = Λ₂ := by
@@ -183,7 +176,6 @@ theorem funext_pos (h : ∀ M : HermitianMat ι ℂ, 0 ≤ M → Λ₁.map (κ :
   rw [← M.posPart_add_negPart]
   simp [HermitianMat.posPart_nonneg, HermitianMat.negPart_nonneg, h]
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 /-- Two maps are equal if they agree on all positive inputs with trace one -/
 theorem funext_pos_trace
     (h : ∀ M : HermitianMat ι ℂ, 0 ≤ M → M.trace = 1 → Λ₁.map (κ := κ) M = Λ₂.map M) :
@@ -205,7 +197,6 @@ theorem funext_pos_trace
   · apply smul_nonneg (by positivity) hM'
   · simp [field]
 
-omit [FiniteDimensional ℂ F] in
 /-- Two maps are equal if they agree on all states. -/
 theorem funext_mstate (h : ∀ ρ : DensityOp E, Λ₁.map (κ := κ) (ρ.m (ι := ι)) = Λ₂.map ρ.m) :
     Λ₁ = Λ₂ :=
@@ -218,7 +209,6 @@ instance instFunLike : FunLike (HPOp E F) (HermitianMat ι ℂ) (HermitianMat κ
   coe_injective x y h := funext_hermitian fun M ↦
     by simpa using congrFun h M
 
-omit [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] in
 /-- **Matrix analogue of applying a Hermitian-preserving map**: the underlying matrix of `Λ T` is
 the image of the underlying matrix of `T`. -/
 @[simp]

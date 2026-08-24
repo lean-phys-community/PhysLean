@@ -63,7 +63,7 @@ The state is stored as an *operator* so that it does not depend on a choice of b
 preferred orthonormal basis -- that is, a `StdBasis ℂ E ι` instance -- `DensityOp.M` is the density
 *matrix*, and the matrix-level facts below are all derived from the operator-level ones through
 `HermitianOp.toMat`. -/
-structure DensityOp (E : Type*) [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+structure DensityOp (E : Type*) [NormedAddCommGroup E] [InnerProductSpace ℂ E]
     [FiniteDimensional ℂ E] where
   /-- The density operator. -/
   op : HermitianOp E
@@ -90,8 +90,8 @@ namespace DensityOp
 
 section Operator
 
-variable {E ι : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
-variable [FiniteDimensional ℂ E] [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+variable {E ι : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+variable [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
 
 /-- The **density matrix** of a state, in the preferred basis. -/
 @[coe] def M (ρ : DensityOp E) : HermitianMat ι ℂ :=
@@ -216,8 +216,6 @@ variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ
 
 section Left
 
-variable [CompleteSpace F]
-
 /-- The **partial trace** of a state over the left factor: the reduced state on `F`. -/
 def traceLeft (ρ : DensityOp (E ⊗[ℂ] F)) : DensityOp F where
   op := ρ.op.traceLeft
@@ -238,8 +236,6 @@ theorem traceLeft_M [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
 end Left
 
 section Right
-
-variable [CompleteSpace E]
 
 /-- The **partial trace** of a state over the right factor: the reduced state on `E`. -/
 def traceRight (ρ : DensityOp (E ⊗[ℂ] F)) : DensityOp E where
@@ -272,8 +268,8 @@ type; along it the density matrix is literally unchanged, which is what lets a s
 `EuclideanSpace ℂ (d₁ × d₂)` be read as a state on a tensor product. -/
 
 variable {E F ι : Type*}
-variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E]
-variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F] [FiniteDimensional ℂ F]
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
 
 /-- Transport a state along a linear isometry equivalence. -/
 def congr (ρ : DensityOp E) (e : E ≃ₗᵢ[ℂ] F) : DensityOp F where

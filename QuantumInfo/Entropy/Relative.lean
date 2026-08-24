@@ -1493,8 +1493,7 @@ theorem sandwichedRelRentropy_additive_alpha_one_aux (ρ₁ σ₁ : MState d₁)
 
 section Operator
 
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
-variable [FiniteDimensional ℂ E]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
 
 /-- The index type of the basis that `StdBasis.some ℂ E` picks out. -/
 local notation "ι₀" => Fin (Module.finrank ℂ E)
