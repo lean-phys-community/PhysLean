@@ -480,4 +480,92 @@ theorem trace_toMat (A : E →L[𝕜] E) :
 
 end Preferred
 
+section Equiv
+
+variable [Fintype ι] [DecidableEq ι] [StdBasis 𝕜 E ι] [StdBasis 𝕜 F ι]
+
+variable (𝕜 E F ι) in
+/-- The linear isometry equivalence between two spaces carrying preferred orthonormal bases with
+the same index type: the one matching up the two preferred bases.
+
+This is how a space whose preferred basis happens to be indexed by a product `ι × κ` -- for
+instance `EuclideanSpace 𝕜 (ι × κ)` -- gets identified with an actual tensor product. -/
+noncomputable def equiv : E ≃ₗᵢ[𝕜] F :=
+  (stdBasis (𝕜 := 𝕜) (E := E)).repr.trans (stdBasis (𝕜 := 𝕜) (E := F)).repr.symm
+
+@[simp]
+theorem equiv_stdBasis (i : ι) :
+    equiv 𝕜 E F ι (stdBasis (𝕜 := 𝕜) (E := E) i) = stdBasis (𝕜 := 𝕜) (E := F) i := by
+  rw [equiv, LinearIsometryEquiv.trans_apply, OrthonormalBasis.repr_self,
+    OrthonormalBasis.repr_symm_single]
+
+@[simp]
+theorem equiv_symm_stdBasis (i : ι) :
+    (equiv 𝕜 E F ι).symm (stdBasis (𝕜 := 𝕜) (E := F) i) = stdBasis (𝕜 := 𝕜) (E := E) i := by
+  rw [← equiv_stdBasis (𝕜 := 𝕜) (E := E) (F := F) i, LinearIsometryEquiv.symm_apply_apply]
+
+variable [CompleteSpace E] [CompleteSpace F]
+
+/-- Transporting an operator along `StdBasis.equiv` leaves its matrix unchanged: that is exactly
+what it means for `StdBasis.equiv` to identify the two preferred bases. -/
+@[simp]
+theorem toMat_conjStarAlgEquiv_equiv (A : E →L[𝕜] E) :
+    toMat 𝕜 F ι ((equiv 𝕜 E F ι).conjStarAlgEquiv A) = toMat 𝕜 E ι A := by
+  ext i j
+  rw [toMat_apply, toMat_apply, LinearIsometryEquiv.conjStarAlgEquiv_apply_apply,
+    equiv_symm_stdBasis, ← equiv_stdBasis (𝕜 := 𝕜) (E := E) (F := F) i,
+    LinearIsometryEquiv.inner_map_map]
+
+end Equiv
+
+section Relabel
+
+variable [Fintype ι] [DecidableEq ι] [StdBasis 𝕜 E ι] [Fintype κ] [DecidableEq κ] [StdBasis 𝕜 F κ]
+variable [CompleteSpace E] [CompleteSpace F]
+
+/-- A linear isometry equivalence that carries the preferred basis of `E` to the preferred basis of
+`F`, relabelling indices along `σ`, relabels matrices along `σ` as well.
+
+`toMat_conjStarAlgEquiv_equiv` is the case `σ = Equiv.refl`; the case of interest with `σ ≠ refl`
+is an isometry that rearranges tensor factors, such as `TensorProduct.assocIsometry`. -/
+theorem toMat_conjStarAlgEquiv_of_stdBasis (e : E ≃ₗᵢ[𝕜] F) (σ : ι ≃ κ)
+    (he : ∀ i, e (stdBasis (𝕜 := 𝕜) (E := E) i) = stdBasis (𝕜 := 𝕜) (E := F) (σ i))
+    (A : E →L[𝕜] E) :
+    toMat 𝕜 F κ (e.conjStarAlgEquiv A) = (toMat 𝕜 E ι A).submatrix σ.symm σ.symm := by
+  have he' (k : κ) : stdBasis (𝕜 := 𝕜) (E := F) k = e (stdBasis (𝕜 := 𝕜) (E := E) (σ.symm k)) := by
+    rw [he, Equiv.apply_symm_apply]
+  have hsymm (k : κ) :
+      e.symm (stdBasis (𝕜 := 𝕜) (E := F) k) = stdBasis (𝕜 := 𝕜) (E := E) (σ.symm k) := by
+    rw [he', LinearIsometryEquiv.symm_apply_apply]
+  ext k l
+  rw [Matrix.submatrix_apply, toMat_apply, toMat_apply,
+    LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, hsymm, he' k,
+    LinearIsometryEquiv.inner_map_map]
+
+end Relabel
+
+section TensorRearrange
+
+variable {G μ : Type*} [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]
+variable [Fintype ι] [Fintype κ] [Fintype μ]
+variable [StdBasis 𝕜 E ι] [StdBasis 𝕜 F κ] [StdBasis 𝕜 G μ]
+
+/-- Reassociating a triple tensor product carries preferred basis vectors to preferred basis
+vectors, relabelling the index along `Equiv.prodAssoc`. -/
+@[simp]
+theorem assocIsometry_stdBasis (p : (ι × κ) × μ) :
+    TensorProduct.assocIsometry 𝕜 E F G (stdBasis (𝕜 := 𝕜) (E := (E ⊗[𝕜] F) ⊗[𝕜] G) p) =
+      stdBasis (𝕜 := 𝕜) (E := E ⊗[𝕜] (F ⊗[𝕜] G)) (Equiv.prodAssoc ι κ μ p) := by
+  simp [OrthonormalBasis.tensorProduct_apply']
+
+/-- Swapping the two factors of a tensor product carries preferred basis vectors to preferred
+basis vectors, relabelling the index along `Equiv.prodComm`. -/
+@[simp]
+theorem commIsometry_stdBasis (p : ι × κ) :
+    TensorProduct.commIsometry 𝕜 E F (stdBasis (𝕜 := 𝕜) (E := E ⊗[𝕜] F) p) =
+      stdBasis (𝕜 := 𝕜) (E := F ⊗[𝕜] E) (Equiv.prodComm ι κ p) := by
+  simp [OrthonormalBasis.tensorProduct_apply']
+
+end TensorRearrange
+
 end StdBasis

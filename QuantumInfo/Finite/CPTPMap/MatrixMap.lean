@@ -5,6 +5,7 @@ Authors: Alex Meiburg
 -/
 import Mathlib.LinearAlgebra.TensorProduct.Matrix
 import Mathlib.LinearAlgebra.PiTensorProduct
+import Mathlib.LinearAlgebra.PiTensorProduct.Basis
 import Mathlib.Data.Set.Card
 import Mathlib.Algebra.Module.LinearMap.Basic
 import QuantumInfo.ForMathlib
@@ -121,10 +122,68 @@ def of_kraus (M N : κ → Matrix B A R) : MatrixMap A B R :=
     map_smul' r x := by rw [RingHom.id_apply, Matrix.mul_smul, Matrix.smul_mul]
   }
 
-def exists_kraus (Φ : MatrixMap A B R) : ∃ r : ℕ, ∃ (M N : Fin r → Matrix B A R), Φ = of_kraus M N :=
-  sorry
+open scoped Matrix in
+omit [DecidableEq A] in
+theorem of_kraus_apply (M N : κ → Matrix B A R) (X : Matrix A A R) :
+    of_kraus M N X = ∑ k : κ, M k * X * (N k)ᴴ := by
+  simp [of_kraus]
+
+omit [DecidableEq A] in
+/-- Reindexing the Kraus operators along an equivalence does not change the map. -/
+theorem of_kraus_comp_equiv {κ' : Type*} [Fintype κ'] (e : κ' ≃ κ) (M N : κ → Matrix B A R) :
+    of_kraus (M ∘ e) (N ∘ e) = of_kraus M N :=
+  Fintype.sum_equiv e _ _ fun _ => rfl
 
 end kraus
+
+section kraus_exists
+
+open scoped Matrix
+
+variable [CommSemiring R] [StarRing R] [Fintype B] [DecidableEq B]
+
+omit [StarRing R] [Fintype B] in
+private theorem single_mul_mul_single (b b' : B) (a a' : A) (X : Matrix A A R) :
+    Matrix.single b a (1 : R) * X * Matrix.single a' b' (1 : R)
+      = X a a' • Matrix.single b b' (1 : R) := by
+  ext p q
+  by_cases hb : b = p <;> by_cases hb' : b' = q <;>
+    simp [Matrix.mul_apply, Matrix.single_apply, hb, hb', Finset.sum_ite_eq]
+
+/-- Every linear map between matrix algebras admits a Kraus-style decomposition
+`X ↦ ∑ k, Mₖ X Nₖᴴ`, with the two families of operators allowed to differ. The operators used
+here are (scaled) matrix units, so the decomposition is far from the minimal one. -/
+theorem exists_kraus (Φ : MatrixMap A B R) :
+    ∃ r : ℕ, ∃ (M N : Fin r → Matrix B A R), Φ = of_kraus M N := by
+  classical
+  set M : (B × B) × (A × A) → Matrix B A R := fun k =>
+    Φ (Matrix.single k.2.1 k.2.2 1) k.1.1 k.1.2 • Matrix.single k.1.1 k.2.1 1 with hM
+  set N : (B × B) × (A × A) → Matrix B A R := fun k => Matrix.single k.1.2 k.2.2 1 with hN
+  refine ⟨Fintype.card ((B × B) × (A × A)), M ∘ (Fintype.equivFin _).symm,
+    N ∘ (Fintype.equivFin _).symm, ?_⟩
+  rw [of_kraus_comp_equiv]
+  ext X i j
+  rw [of_kraus_apply, Matrix.sum_apply]
+  have hterm : ∀ k : (B × B) × (A × A), (M k * X * (N k)ᴴ) i j =
+      if k.1 = (i, j) then Φ (Matrix.single k.2.1 k.2.2 1) i j * X k.2.1 k.2.2 else 0 := by
+    rintro ⟨⟨b, b'⟩, ⟨a, a'⟩⟩
+    simp only [hM, hN, Matrix.conjTranspose_single, star_one, Matrix.smul_mul,
+      single_mul_mul_single, Matrix.smul_apply, Matrix.single_apply, smul_eq_mul, Prod.mk.injEq]
+    by_cases h : b = i ∧ b' = j
+    · obtain ⟨rfl, rfl⟩ := h
+      simp
+    · simp [h]
+  rw [Finset.sum_congr rfl fun k _ => hterm k, Fintype.sum_prod_type, Finset.sum_comm]
+  simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  conv_lhs => rw [Matrix.matrix_eq_sum_single X]
+  simp only [map_sum, Matrix.sum_apply, Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun a' _ => ?_
+  rw [show Matrix.single a a' (X a a') = X a a' • Matrix.single a a' (1 : R) by
+    rw [Matrix.smul_single, smul_eq_mul, mul_one]]
+  rw [map_smul]
+  simp [mul_comm]
+
+end kraus_exists
 
 section submatrix
 
@@ -349,24 +408,6 @@ theorem id_kron_submatrix [CommSemiring R] (f : B → A) :
 end kron
 
 section pi
-section basis
-
---Missing from Mathlib
-
-variable {ι : Type*}
-variable {R : Type*} [CommSemiring R]
-variable {s : ι → Type*} [∀ i, AddCommMonoid (s i)] [∀ i, Module R (s i)]
-variable {L : ι → Type* }
-
-/-- Like `Basis.tensorProduct`, but for `PiTensorProduct` -/
-noncomputable opaque _root_.Module.Basis.piTensorProduct [∀i, Fintype (L i)]
-    (b : (i:ι) → Module.Basis (L i) R (s i)) :
-      Module.Basis ((i:ι) → L i) R (PiTensorProduct R s) :=
-  --Marking as opaque so that ATPs don't run into unpacking the sorried data.
-  --TODO: This is actually defined appropriately in a later Mathlib version.
-  Finsupp.basisSingleOne.map sorry
-
-end basis
 
 variable {R : Type*} [CommSemiring R]
 variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
@@ -378,8 +419,8 @@ Linear maps. Notation `⨂ₜₘ[R] i, f i`, eventually. -/
 noncomputable def piProd (Λi : ∀ i, MatrixMap (dI i) (dO i) R) : MatrixMap (∀i, dI i) (∀i, dO i) R :=
   let map₁ := PiTensorProduct.map Λi;
   let map₂ := LinearMap.toMatrix
-    (Module.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dI i) (dI i)))
-    (Module.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dO i) (dO i))) map₁
+    (_root_.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dI i) (dI i)))
+    (_root_.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dO i) (dO i))) map₁
   let r₁ : ((i : ι) → dO i × dO i) ≃ ((i : ι) → dO i) × ((i : ι) → dO i) := Equiv.arrowProdEquivProdArrow _ dO dO
   let r₂ : ((i : ι) → dI i × dI i) ≃ ((i : ι) → dI i) × ((i : ι) → dI i) := Equiv.arrowProdEquivProdArrow _ dI dI
   let map₃ := Matrix.reindex r₁ r₂ map₂;
@@ -408,5 +449,42 @@ theorem piProd_comp
     piProd (fun i ↦ (Λ₂ i) ∘ₗ (Λ₁ i)) = (piProd Λ₂) ∘ₗ (piProd Λ₁) := by
   simp [piProd, PiTensorProduct.map_comp, ← Matrix.toLin_mul]
   rw [← LinearMap.toMatrix_comp]
+
+omit [∀i, DecidableEq (dO i)] in
+/-- **Matrix analogue of the Pi-type tensor product**: on matrix units, `MatrixMap.piProd` acts
+as the Kronecker product `Matrix.piProd` of the images of the individual factors. Since the matrix
+units span, this determines `piProd` completely. -/
+theorem piProd_single (Λi : ∀ i, MatrixMap (dI i) (dO i) R) (a b : ∀ i, dI i) :
+    piProd Λi (Matrix.single a b 1) =
+      Matrix.piProd (fun i ↦ Λi i (Matrix.single (a i) (b i) 1)) := by
+  rw [show Matrix.single a b (1 : R) = Matrix.stdBasis R _ _ (a, b) from
+    (Matrix.stdBasis_eq_single _ _ _).symm]
+  simp only [piProd]
+  rw [Matrix.toLin_self]
+  simp only [Matrix.reindex_apply, Matrix.submatrix_apply, LinearMap.toMatrix_apply,
+    _root_.Basis.piTensorProduct_apply, Equiv.arrowProdEquivProdArrow_symm_apply,
+    PiTensorProduct.map_tprod, _root_.Basis.piTensorProduct_repr_tprod_apply,
+    Matrix.stdBasis_repr_apply, Matrix.stdBasis_eq_single]
+  rw [← Module.Basis.sum_repr (Matrix.stdBasis R ((i : ι) → dO i) ((i : ι) → dO i))
+    (Matrix.piProd fun i ↦ (Λi i) (Matrix.single (a i) (b i) 1))]
+  exact Finset.sum_congr rfl fun x _ ↦ by rw [Matrix.stdBasis_repr_apply]; rfl
+
+omit [(i : ι) → DecidableEq (dO i)] in
+open scoped Matrix in
+/-- Kraus representations of the factors assemble into a Kraus representation of the
+`MatrixMap.piProd`, whose Kraus operators are the Kronecker products of the individual ones. -/
+theorem piProd_of_kraus [StarRing R] {κ : ι → Type*} [∀ i, Fintype (κ i)]
+    (K : ∀ i, κ i → Matrix (dO i) (dI i) R) :
+    piProd (fun i ↦ of_kraus (K i) (K i)) =
+      of_kraus (fun k : ∀ i, κ i ↦ Matrix.piProd fun i ↦ K i (k i))
+        (fun k : ∀ i, κ i ↦ Matrix.piProd fun i ↦ K i (k i)) := by
+  refine (Matrix.stdBasis R ((i : ι) → dI i) ((i : ι) → dI i)).ext fun p ↦ ?_
+  obtain ⟨a, b⟩ := p
+  rw [Matrix.stdBasis_eq_single, piProd_single, of_kraus_apply]
+  simp only [of_kraus_apply]
+  rw [← Matrix.sum_piProd]
+  refine Finset.sum_congr rfl fun k _ ↦ ?_
+  rw [Matrix.conjTranspose_piProd, ← Matrix.piProd_single a b, Matrix.piProd_mul,
+    Matrix.piProd_mul]
 
 end pi

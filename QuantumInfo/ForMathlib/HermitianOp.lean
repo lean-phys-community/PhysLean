@@ -197,6 +197,40 @@ of its eigenvalues. -/
 noncomputable def traceNorm [FiniteDimensional ℂ E] (A : HermitianOp E) : ℝ :=
   A.abs.trace
 
+section Congr
+
+variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
+
+/-- Transport a self-adjoint operator along a linear isometry equivalence. -/
+noncomputable def congr (A : HermitianOp E) (e : E ≃ₗᵢ[ℂ] F) : HermitianOp F :=
+  ⟨e.conjStarAlgEquiv A.op, by
+    show star (e.conjStarAlgEquiv A.op) = _
+    rw [← map_star, A.H.star_eq]⟩
+
+@[simp]
+theorem op_congr (A : HermitianOp E) (e : E ≃ₗᵢ[ℂ] F) :
+    (A.congr e).op = e.conjStarAlgEquiv A.op :=
+  rfl
+
+/-- Transport along a linear isometry equivalence preserves nonnegativity. -/
+theorem congr_nonneg {A : HermitianOp E} (h : 0 ≤ A) (e : E ≃ₗᵢ[ℂ] F) : 0 ≤ A.congr e :=
+  zero_le_iff.2 ((zero_le_iff.1 h).conjStarAlgEquiv e)
+
+/-- Transport along a linear isometry equivalence preserves the trace. -/
+@[simp]
+theorem trace_congr [FiniteDimensional ℂ E] [FiniteDimensional ℂ F] (A : HermitianOp E)
+    (e : E ≃ₗᵢ[ℂ] F) : (A.congr e).trace = A.trace := by
+  have hb := stdOrthonormalBasis ℂ E
+  rw [trace, trace, LinearMap.trace_eq_sum_inner _ (hb.map e),
+    LinearMap.trace_eq_sum_inner _ hb]
+  refine congrArg _ (Finset.sum_congr rfl fun i _ ↦ ?_)
+  rw [ContinuousLinearMap.coe_coe, op_congr, OrthonormalBasis.map_apply,
+    LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, LinearIsometryEquiv.symm_apply_apply,
+    e.inner_map_map]
+  rfl
+
+end Congr
+
 section StdBasis
 
 variable [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
@@ -394,6 +428,33 @@ theorem toMat_conj_unitary (A : HermitianOp E) (U : unitary (E →L[ℂ] E)) :
   toMat_conj A U.val
 
 end StdBasis
+
+section StdBasisCongr
+
+variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
+variable [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+
+/-- **Matrix analogue of `HermitianOp.congr`** along an isometry that carries the preferred basis
+of `E` to that of `F` up to a relabelling `σ` of the index: the matrix is relabelled along `σ`. -/
+theorem toMat_congr_of_stdBasis {κ : Type*} [Fintype κ] [DecidableEq κ] [StdBasis ℂ F κ]
+    (A : HermitianOp E) (e : E ≃ₗᵢ[ℂ] F) (σ : ι ≃ κ)
+    (he : ∀ i, e (stdBasis (𝕜 := ℂ) (E := E) i) = stdBasis (𝕜 := ℂ) (E := F) (σ i)) :
+    toMat (ι := κ) (A.congr e) = (toMat (ι := ι) A).reindex σ := by
+  ext1
+  rw [toMat_mat, op_congr, StdBasis.toMat_conjStarAlgEquiv_of_stdBasis _ σ he,
+    HermitianMat.mat_reindex, toMat_mat]
+  rfl
+
+variable [StdBasis ℂ F ι]
+
+/-- **Matrix analogue of `HermitianOp.congr`** along `StdBasis.equiv`: the matrix is unchanged. -/
+@[simp]
+theorem toMat_congr_equiv (A : HermitianOp E) :
+    toMat (A.congr (StdBasis.equiv ℂ E F ι)) = toMat (ι := ι) A := by
+  ext1
+  rw [toMat_mat, op_congr, StdBasis.toMat_conjStarAlgEquiv_equiv, toMat_mat]
+
+end StdBasisCongr
 
 section FiniteDimensional
 

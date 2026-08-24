@@ -12,6 +12,7 @@ Definitions and theorems about the dual of a matrix map. -/
 
 noncomputable section
 open ComplexOrder
+open scoped Matrix
 
 variable {dIn dOut : Type*} [Fintype dIn] [Fintype dOut]
 variable {R : Type*} [CommRing R]
@@ -24,29 +25,86 @@ variable [DecidableEq dIn] [DecidableEq dOut] {M : MatrixMap dIn dOut 𝕜}
 --This should be definable with LinearMap.adjoint, but that requires InnerProductSpace stuff
 --that is currently causing issues and pains (tried `open scoped Frobenius`).
 
-/-- The dual of a map between matrices, defined by `Tr[A M(B)] = Tr[(dual M)(A) B]`. Sometimes
- called the adjoint of the map instead. -/
+/-- The dual of a map between matrices, defined by `Tr[M(A) B] = Tr[A (dual M)(B)]`. Sometimes
+called the adjoint of the map instead. The entries are read off by pairing against the standard
+basis, which is what the definition below says. -/
 @[irreducible]
-def dual (M : MatrixMap dIn dOut R) : MatrixMap dOut dIn R :=
-  let iso1 := (Module.Basis.toDualEquiv <| Matrix.stdBasis R dIn dIn).symm
-  let iso2 := (Module.Basis.toDualEquiv <| Matrix.stdBasis R dOut dOut)
-  iso1 ∘ₗ LinearMap.dualMap M ∘ₗ iso2
+def dual (M : MatrixMap dIn dOut R) : MatrixMap dOut dIn R where
+  toFun B := Matrix.of fun i j ↦ (M (Matrix.single j i 1) * B).trace
+  map_add' B C := by
+    ext i j
+    simp [Matrix.mul_add]
+  map_smul' r B := by
+    ext i j
+    simp
 
-/-- The defining property of a dual map: inner products are preserved on the opposite argument. -/
+omit [Fintype dIn] in
+theorem dual_apply (M : MatrixMap dIn dOut R) (B : Matrix dOut dOut R) (i j : dIn) :
+    M.dual B i j = (M (Matrix.single j i 1) * B).trace := by
+  rw [dual]
+  rfl
+
+/-- The defining property of a dual map: traces are preserved on the opposite argument. -/
 theorem Dual.trace_eq (M : MatrixMap dIn dOut R) (A : Matrix dIn dIn R) (B : Matrix dOut dOut R) :
     (M A * B).trace = (A * M.dual B).trace := by
-  unfold dual
-  dsimp [Matrix.trace]
-  rw [LinearMap.dualMap_apply']
-  simp_rw [Matrix.mul_apply]
-  sorry
+  have hsingle : ∀ i j : dIn, Matrix.single i j (A i j) = A i j • Matrix.single i j (1 : R) := by
+    intro i j
+    rw [Matrix.smul_single, smul_eq_mul, mul_one]
+  have hR : (A * M.dual B).trace = ∑ i, ∑ j, A i j * (M (Matrix.single i j 1) * B).trace := by
+    simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, dual_apply]
+  rw [hR]
+  conv_lhs => rw [Matrix.matrix_eq_sum_single A]
+  simp only [hsingle, map_sum, map_smul, Matrix.sum_mul, Matrix.trace_sum, Matrix.smul_mul,
+    Matrix.trace_smul, smul_eq_mul]
 
---all properties below should provable just from `inner_eq`, since the definition of `dual` itself
--- is pretty hairy (and maybe could be improved...)
+--all properties below should provable just from `Dual.trace_eq`, since the definition of `dual`
+-- itself is not very usable directly.
 
+variable {Mℂ : MatrixMap dIn dOut ℂ}
+
+omit [Fintype dIn] [Fintype dOut] [DecidableEq dIn] [DecidableEq dOut] in
+/-- A Hermitian-preserving map commutes with the conjugate transpose. This uses that the field is
+`ℂ`: over `ℝ` a map is constrained only on the symmetric matrices, and says nothing about how the
+antisymmetric part is transformed. -/
+theorem IsHermitianPreserving.conjTranspose_map (h : Mℂ.IsHermitianPreserving)
+    (X : Matrix dIn dIn ℂ) : Mℂ Xᴴ = (Mℂ X)ᴴ := by
+  set P : Matrix dIn dIn ℂ := (2 : ℂ)⁻¹ • (X + Xᴴ) with hP
+  set Q : Matrix dIn dIn ℂ := (2 * Complex.I)⁻¹ • (X - Xᴴ) with hQ
+  have hPH : P.IsHermitian := by
+    ext a b
+    simp only [hP, Matrix.conjTranspose_apply, Matrix.smul_apply, Matrix.add_apply, smul_eq_mul]
+    simp [add_comm]
+  have hQH : Q.IsHermitian := by
+    ext a b
+    simp only [hQ, Matrix.conjTranspose_apply, Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul]
+    rw [star_mul', star_sub]
+    simp [Complex.inv_I, mul_comm]
+    ring
+  have hX : X = P + Complex.I • Q := by
+    ext a b
+    simp only [hP, hQ, Matrix.add_apply, Matrix.smul_apply, Matrix.sub_apply,
+      Matrix.conjTranspose_apply, smul_eq_mul]
+    field_simp
+    ring
+  have hXH : Xᴴ = P - Complex.I • Q := by
+    ext a b
+    simp only [hP, hQ, Matrix.sub_apply, Matrix.smul_apply, Matrix.add_apply,
+      Matrix.conjTranspose_apply, smul_eq_mul]
+    field_simp
+    ring
+  rw [hXH, hX]
+  simp only [map_sub, map_add, map_smul, Matrix.conjTranspose_add, Matrix.conjTranspose_smul,
+    (h hPH).eq, (h hQH).eq, RCLike.star_def, Complex.conj_I, neg_smul, ← sub_eq_add_neg]
+
+omit [Fintype dIn] in
 /-- The dual of a `IsHermitianPreserving` map also `IsHermitianPreserving`. -/
-theorem IsHermitianPreserving.dual (h : M.IsHermitianPreserving) : M.dual.IsHermitianPreserving := by
-  sorry
+theorem IsHermitianPreserving.dual (h : Mℂ.IsHermitianPreserving) :
+    Mℂ.dual.IsHermitianPreserving := by
+  intro B hB
+  ext i j
+  rw [Matrix.conjTranspose_apply, dual_apply, dual_apply, ← Matrix.trace_conjTranspose,
+    Matrix.conjTranspose_mul, ← h.conjTranspose_map, Matrix.conjTranspose_single, star_one,
+    hB.eq, Matrix.trace_mul_comm]
 
 open MatrixOrder
 --TODO Cleanup, find home, abstract out to HermitianMats...?
@@ -67,23 +125,20 @@ theorem _root_.Matrix.PosSemidef.trace_mul_nonneg {n : Type*} [Fintype n] [Decid
     Finset.sum_nonneg fun i _ ↦ h.2 (Pi.single i 1)
 
 /-- The dual of a `IsPositive` map also `IsPositive`. -/
-theorem IsPositive.dual (h : M.IsPositive) : M.dual.IsPositive := by
+theorem IsPositive.dual (h : Mℂ.IsPositive) : Mℂ.dual.IsPositive := by
   intro x hx
   rw [Matrix.posSemidef_iff_dotProduct_mulVec] at hx ⊢
-  use IsHermitianPreserving.dual h.IsHermitianPreserving hx.1
-  intro v
-  have h_dual_pos : 0 ≤ (M (Matrix.vecMulVec v (star v)) * x).trace := by
-    --TODO Cleanup. Should be all in terms of HermitianMat
-    apply Matrix.PosSemidef.trace_mul_nonneg;
-    · apply h;
-      exact Matrix.posSemidef_vecMulVec_self_star v;
-    · rw [← Matrix.posSemidef_iff_dotProduct_mulVec] at hx
-      exact hx;
-  convert h_dual_pos using 1;
-  rw [ MatrixMap.Dual.trace_eq ];
-  simp [ Matrix.vecMulVec, Matrix.mul_apply, Matrix.trace ];
-  simp [ Matrix.mulVec, dotProduct, Finset.mul_sum _ _ _, mul_assoc, mul_comm, mul_left_comm ];
-  exact Finset.sum_comm.trans ( Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring )
+  refine ⟨IsHermitianPreserving.dual h.IsHermitianPreserving hx.1, fun v => ?_⟩
+  --TODO Cleanup. Should be all in terms of HermitianMat
+  have h_dual_pos : 0 ≤ (Mℂ (Matrix.vecMulVec v (star v)) * x).trace :=
+    Matrix.PosSemidef.trace_mul_nonneg (h (Matrix.posSemidef_vecMulVec_self_star v))
+      (Matrix.posSemidef_iff_dotProduct_mulVec.mpr hx)
+  rw [Dual.trace_eq] at h_dual_pos
+  convert h_dual_pos using 1
+  simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, Matrix.vecMulVec_apply,
+    dotProduct, Matrix.mulVec, Pi.star_apply, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
 /-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
 theorem dual_Unital (h : M.IsTracePreserving) : M.dual.Unital := by
@@ -210,84 +265,22 @@ lemma dual_kron {A B C D : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D
 
 --The dual of a CompletelyPositive map is always CP, more generally it's k-positive
 -- see Lemma 3.1 of https://www.math.uwaterloo.ca/~krdavids/Preprints/CDPRpositivereal.pdf
-theorem IsCompletelyPositive.dual (h : M.IsCompletelyPositive) : M.dual.IsCompletelyPositive := by
+theorem IsCompletelyPositive.dual (h : Mℂ.IsCompletelyPositive) :
+    Mℂ.dual.IsCompletelyPositive := by
   intro n
-  have h_dual_pos : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) 𝕜)).IsPositive := by
+  have h_dual_pos : (MatrixMap.dual (Mℂ ⊗ₖₘ MatrixMap.id (Fin n) ℂ)).IsPositive := by
     exact IsPositive.dual (h n);
   -- By definition of complete positivity, we know that $(M ⊗ₖₘ id) dually map = M.dual ⊗ₖₘ id.dual$.
-  have h_dual_kron : (MatrixMap.dual (M ⊗ₖₘ MatrixMap.id (Fin n) 𝕜)) = (MatrixMap.dual M) ⊗ₖₘ (MatrixMap.dual (MatrixMap.id (Fin n) 𝕜)) := by
-    convert dual_kron M ( MatrixMap.id ( Fin n ) 𝕜 ) using 1;
+  have h_dual_kron : (MatrixMap.dual (Mℂ ⊗ₖₘ MatrixMap.id (Fin n) ℂ)) =
+      (MatrixMap.dual Mℂ) ⊗ₖₘ (MatrixMap.dual (MatrixMap.id (Fin n) ℂ)) := by
+    convert dual_kron Mℂ ( MatrixMap.id ( Fin n ) ℂ ) using 1;
   convert h_dual_pos using 1;
   rw [ h_dual_kron, dual_id ]
 
-/--
-The composition of the dual of the inverse of the dual basis isomorphism with the dual basis isomorphism is the evaluation map.
--/
-lemma Module.Basis.dualMap_toDualEquiv_symm_comp_toDualEquiv {ι R M : Type*} [Fintype ι] [DecidableEq ι] [CommRing R] [AddCommGroup M] [Module R M] [Module.IsReflexive R M] (b : Module.Basis ι R M) :
-    b.toDualEquiv.symm.toLinearMap.dualMap ∘ₗ b.toDualEquiv.toLinearMap = (Module.evalEquiv R M).toLinearMap := by
-  ext x f;
-  -- Since $b.toDual$ and $b.toDualEquiv.symm$ are inverses, we have $b.toDual (b.toDualEquiv.symm f) = f$.
-  have h_inv : b.toDual (b.toDualEquiv.symm f) = f := by
-    convert LinearEquiv.apply_symm_apply b.toDualEquiv f;
-  convert congr_arg ( fun g => g x ) h_inv using 1;
-  -- By definition of the dual basis, we know that $(b.toDual x) (b.toDualEquiv.symm f) = f x$.
-  simp [Module.Basis.toDual];
-  ac_rfl
-
-/--
-The composition of the inverse of the dual basis isomorphism with the dual of the dual basis isomorphism is the inverse of the evaluation map.
--/
-lemma Module.Basis.toDualEquiv_symm_comp_dualMap_toDualEquiv {ι R M : Type*} [Fintype ι] [DecidableEq ι] [CommRing R] [AddCommGroup M] [Module R M] [Module.IsReflexive R M] (b : Module.Basis ι R M) :
-    b.toDualEquiv.symm.toLinearMap ∘ₗ b.toDualEquiv.toLinearMap.dualMap = (Module.evalEquiv R M).symm.toLinearMap := by
-  simp [ LinearMap.ext_iff ];
-  intro x
-  obtain ⟨y, hy⟩ : ∃ y, x = (Module.evalEquiv R M).toLinearMap y := by
-    exact ⟨ _, Eq.symm <| LinearEquiv.apply_symm_apply ( Module.evalEquiv R M ) x ⟩;
-  rw [ hy ];
-  simp [ Module.evalEquiv, LinearEquiv.symm_apply_eq ];
-  ext; simp [ Module.Dual.eval ] ;
-  simp [ Module.Basis.toDual ];
-  ac_rfl
-
 @[simp]
-theorem dual_dual : M.dual.dual = M := by
-  rw [dual, dual]
-  simp only [← LinearMap.dualMap_comp_dualMap]
-  have h₁ : (Matrix.stdBasis 𝕜 dOut dOut).toDualEquiv.symm.toLinearMap ∘ₗ
-      ((Matrix.stdBasis 𝕜 dOut dOut).toDualEquiv).toLinearMap.dualMap =
-      (Module.evalEquiv 𝕜 (Matrix dOut dOut 𝕜)).symm.toLinearMap := by
-    apply Module.Basis.toDualEquiv_symm_comp_dualMap_toDualEquiv
-  have h₂ : (Matrix.stdBasis 𝕜 dIn dIn).toDualEquiv.symm.toLinearMap.dualMap ∘ₗ
-      (Matrix.stdBasis 𝕜 dIn dIn).toDualEquiv.toLinearMap =
-      (Module.evalEquiv 𝕜 (Matrix dIn dIn 𝕜)).toLinearMap := by
-    ext x y
-    simp
-    generalize Matrix.stdBasis 𝕜 dIn dIn = L
-    -- Since $L$ is a basis, we can write $y$ as a linear combination of the basis elements.
-    obtain ⟨c, hc⟩ : ∃ c : dIn × dIn → 𝕜, y = ∑ i, c i • L.toDual (L i) := by
-      have h_dual_basis : ∀ y : Module.Dual 𝕜 (Matrix dIn dIn 𝕜), ∃ c : dIn × dIn → 𝕜, y = ∑ i, c i • L.toDual (L i) := by
-        intro y
-        have h_dual_basis : y ∈ Submodule.span 𝕜 (Set.range (fun i => L.toDual (L i))) := by
-          have h_dual_basis : Submodule.span 𝕜 (Set.range (fun i => L.toDual (L i))) = ⊤ := by
-            refine' Submodule.eq_top_of_finrank_eq _;
-            rw [ finrank_span_eq_card ];
-            · simp [ Module.finrank_eq_card_basis L ];
-            · convert L.dualBasis.linearIndependent;
-          exact h_dual_basis.symm ▸ Submodule.mem_top
-        rw [ Finsupp.mem_span_range_iff_exists_finsupp ] at h_dual_basis;
-        exact ⟨ h_dual_basis.choose, by simpa [ Finsupp.sum_fintype ] using h_dual_basis.choose_spec.symm ⟩;
-      exact h_dual_basis y;
-    subst hc
-    simp [ map_sum, map_smul ];
-    congr! 2;
-    simp [ Module.Basis.toDualEquiv ];
-    simp [ Module.Basis.toDual ]
-  rw [← Module.Dual.eval_comp_comp_evalEquiv_eq]
-  rw [← Module.evalEquiv_toLinearMap]
-  simp only [← LinearMap.comp_assoc, LinearEquiv.comp_coe, LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap,
-    LinearMap.id_comp, h₁]
-  simp only [LinearMap.comp_assoc, LinearEquiv.comp_coe, LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap,
-    LinearMap.comp_id, h₂]
+theorem dual_dual : M.dual.dual = M :=
+  dual_unique M.dual M fun A B => by
+    rw [Matrix.trace_mul_comm, ← Dual.trace_eq, Matrix.trace_mul_comm]
 
 end MatrixMap
 

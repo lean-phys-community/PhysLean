@@ -609,6 +609,20 @@ variable (A : HermitianMat m α) (B C : HermitianMat n α) in
 theorem kronecker_add : A ⊗ₖ (B + C) = A ⊗ₖ B + A ⊗ₖ C := by
   ext1; simp [Matrix.kronecker_add]
 
+variable (A B : HermitianMat m α) (C : HermitianMat n α) in
+theorem sub_kronecker : (A - B) ⊗ₖ C = A ⊗ₖ C - B ⊗ₖ C := by
+  ext1
+  simp only [kronecker_mat, mat_sub]
+  ext i j
+  simp [Matrix.kroneckerMap_apply, Matrix.sub_apply, sub_mul]
+
+variable (A : HermitianMat m α) (B C : HermitianMat n α) in
+theorem kronecker_sub : A ⊗ₖ (B - C) = A ⊗ₖ B - A ⊗ₖ C := by
+  ext1
+  simp only [kronecker_mat, mat_sub]
+  ext i j
+  simp [Matrix.kroneckerMap_apply, Matrix.sub_apply, mul_sub]
+
 lemma kronecker_diagonal [DecidableEq m] [DecidableEq n] (d₁ : m → ℝ) (d₂ : n → ℝ) :
     (diagonal 𝕜 d₁ ⊗ₖ diagonal 𝕜 d₂) = diagonal 𝕜 (fun (i : m × n) => d₁ i.1 * d₂ i.2) := by
   ext1

@@ -400,19 +400,36 @@ variable {dO : ι → Type w} [∀(i :ι), Fintype (dO i)] [∀(i :ι), Decidabl
 /-- Finitely-indexed tensor products of CPTPMaps.  -/
 def piProd (Λi : (i:ι) → CPTPMap (dI i) (dO i)) : CPTPMap ((i:ι) → dI i) ((i:ι) → dO i) :=
   ofMat (MatrixMap.piProd (fun i ↦ (Λi i).map))
-    (MatrixMap.IsCompletelyPositive.piProd (fun i ↦ (Λi i).map_cp)) sorry
+    (MatrixMap.IsCompletelyPositive.piProd (fun i ↦ (Λi i).map_cp))
+    (MatrixMap.IsTracePreserving.piProd (fun i ↦ (Λi i).map_TP))
 
 @[simp]
 theorem piProd_map (Λi : (i:ι) → CPTPMap (dI i) (dO i)) :
     (piProd Λi).map = MatrixMap.piProd (fun i ↦ (Λi i).map) :=
   map_ofMat _ _ _
 
-theorem fin_1_piProd
-  {dI : Fin 1 → Type v} [Fintype (dI 0)] [DecidableEq (dI 0)]
-  {dO : Fin 1 → Type w} [Fintype (dO 0)] [DecidableEq (dO 0)]
-  (Λi : (i : Fin 1) → CPTPMap (dI 0) (dO 0)) :
-    piProd Λi = sorry ∘ₘ ((Λi 1) ∘ₘ sorry) :=
-  sorry --TODO: permutations
+/-- A tensor product over a singleton index type is just the single factor, up to the relabelling
+that identifies a singleton-indexed Pi type with its unique component. -/
+theorem piProd_unique [Unique ι] (Λi : (i : ι) → CPTPMap (dI i) (dO i)) :
+    piProd Λi = CPTPOp.ofEquiv (Equiv.piUnique dO).symm ∘ₘ
+      (Λi default ∘ₘ CPTPOp.ofEquiv (Equiv.piUnique dI)) := by
+  apply CPTPOp.ext_map
+  refine (Matrix.stdBasis ℂ ((i : ι) → dI i) ((i : ι) → dI i)).ext fun p ↦ ?_
+  obtain ⟨a, b⟩ := p
+  have hsub : MatrixMap.submatrix ℂ (Equiv.piUnique dI).symm (Matrix.single a b 1)
+      = Matrix.single (a default) (b default) 1 := by
+    ext j k
+    rw [MatrixMap.submatrix]
+    simp only [LinearMap.coe_mk, AddHom.coe_mk, Matrix.submatrix_apply, Matrix.single_apply]
+    refine if_congr (and_congr ?_ ?_) rfl rfl <;>
+      exact Equiv.eq_symm_apply (Equiv.piUnique dI)
+  simp only [Matrix.stdBasis_eq_single, piProd_map, compose_map, LinearMap.comp_apply,
+    ofEquiv_map, Equiv.symm_symm, hsub, MatrixMap.piProd_single]
+  ext j k
+  rw [MatrixMap.submatrix]
+  simp only [LinearMap.coe_mk, AddHom.coe_mk, Matrix.submatrix_apply, Matrix.piProd_apply,
+    Fintype.prod_unique]
+  rfl
 
 /--
 The tensor product of composed maps is the composition of the tensor products.

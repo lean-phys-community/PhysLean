@@ -303,37 +303,30 @@ If a Hermitian matrix is bounded by M*I, then all its eigenvalues are at most M.
 theorem HermitianMat.le_smul_one_imp_eigenvalues_le (A : HermitianMat d ℂ) (M : ℝ)
     (h : A ≤ M • (1 : HermitianMat d ℂ)) (i : d) :
     A.H.eigenvalues i ≤ M := by
-  -- By definition of eigenvalues, for any unit vector $v$, we have $\langle v, A v \rangle \leq M$.
-  have h_eigenvalue_le_M_step : ∀ (v : EuclideanSpace ℂ d), ‖v‖ = 1 → ⟪v, .toLp 2 <| A.mat.mulVec v⟫_ℂ ≤ M := by
-    intro v hv
-    have h_inner : ⟪v, .toLp 2 <| A.mat.mulVec v⟫_ℂ ≤ ⟪v, .toLp 2 <| (M • 1 : Matrix d d ℂ).mulVec v⟫_ℂ := by
-      have h_inner : ⟪v, .toLp 2 <| ((M • 1 : Matrix d d ℂ) - A.mat).mulVec v⟫_ℂ ≥ 0 := by
-        have h_inner_le_M : ∀ (X : HermitianMat d ℂ), X ≥ 0 → ∀ (v : EuclideanSpace ℂ d), ⟪v, .toLp 2 <| X.mat.mulVec v⟫_ℂ ≥ 0 := by
-          intro X hX v
-          rw [ge_iff_le, HermitianMat.zero_le_iff, Matrix.posSemidef_iff_dotProduct_mulVec] at hX
-          have := hX.2 v
-          simp [ Matrix.mulVec, dotProduct ] at *
-          convert this using 1;
-          refine Finset.sum_congr rfl fun _ _ => ?_
-          sorry
-        convert h_inner_le_M ⟨ _, _ ⟩ _ v;
-        all_goals norm_num [ HermitianMat.le_iff ] at *;
-        · convert h.1;
-        · exact h;
-      simp_all [ Matrix.sub_mulVec]
-    simp_all [ EuclideanSpace.norm_eq ];
-    convert h_inner using 1;
-    simp [ Matrix.mulVec, dotProduct, inner ];
-    simp [ Matrix.one_apply,mul_assoc];
-    simp [ ← Finset.mul_sum];
-    simp [ Complex.mul_conj, Complex.normSq_eq_norm_sq ];
-    norm_cast ; aesop;
-  have := A.H.eigenvectorBasis.orthonormal;
-  have := this.1 i;
-  have := h_eigenvalue_le_M_step ( A.H.eigenvectorBasis i ) this;
-  rw [ show A.mat.mulVec _ = ( Matrix.IsHermitian.eigenvalues A.H i : ℂ ) • ( Matrix.IsHermitian.eigenvectorBasis A.H i ) from ?_ ] at this;
-  · simp_all
-  · convert A.H.mulVec_eigenvectorBasis i using 1
+  -- Test the Loewner order against the `i`th eigenvector, which is a unit vector.
+  rw [HermitianMat.le_iff_mulVec_le_mulVec] at h
+  have hself : star (⇑(A.H.eigenvectorBasis i)) ⬝ᵥ (⇑(A.H.eigenvectorBasis i)) = 1 := by
+    rw [dotProduct_comm, ← EuclideanSpace.inner_eq_star_dotProduct]
+    simp
+  have hv := h (⇑(A.H.eigenvectorBasis i))
+  rw [A.H.mulVec_eigenvectorBasis i, HermitianMat.mat_smul, HermitianMat.mat_one,
+    Matrix.smul_mulVec, Matrix.one_mulVec, dotProduct_smul, dotProduct_smul, hself] at hv
+  simpa using hv
+
+/-
+A diagonal Hermitian matrix all of whose entries are at most M is bounded by M*I.
+-/
+omit [Fintype d] in
+theorem HermitianMat.diagonal_le_smul_one (f : d → ℝ) (M : ℝ) (h : ∀ i, f i ≤ M) :
+    HermitianMat.diagonal ℂ f ≤ M • (1 : HermitianMat d ℂ) := by
+  have hmat : (M • (1 : HermitianMat d ℂ) - HermitianMat.diagonal ℂ f).mat =
+      Matrix.diagonal (fun i ↦ ((M - f i : ℝ) : ℂ)) := by
+    rw [HermitianMat.mat_sub, HermitianMat.mat_smul, HermitianMat.mat_one,
+      HermitianMat.diagonal_mat]
+    ext i j
+    by_cases hij : i = j <;> simp [hij]
+  rw [HermitianMat.le_iff, hmat, Matrix.posSemidef_diagonal_iff]
+  exact fun i ↦ by simpa using sub_nonneg.mpr (h i)
 
 set_option maxHeartbeats 400000 in
 open MatrixOrder in
@@ -345,17 +338,14 @@ theorem HermitianMat.eigenvalues_le_imp_le_smul_one (A : HermitianMat d ℂ) (M 
     A ≤ M • (1 : HermitianMat d ℂ) := by
   have := A.H.spectral_theorem.symm;
   -- Since $A$ is Hermitian, we can write it as $A = UDU^*$ where $U$ is unitary and $D$ is diagonal with eigenvalues $\lambda_i$.
-  have h_decomp : ∃ U : Matrix d d ℂ, U * star U = 1 ∧ ∃ D : HermitianMat d ℂ, A = U * D * star U ∧ ∀ i, D i i ≤ M := by
+  have h_decomp : ∃ U : Matrix d d ℂ, U * star U = 1 ∧ ∃ D : HermitianMat d ℂ,
+      A = U * D * star U ∧ D ≤ M • (1 : HermitianMat d ℂ) := by
     use A.H.eigenvectorUnitary
     constructor; · simp
     use HermitianMat.diagonal ℂ A.H.eigenvalues
-    constructor
-    · exact this.symm
-    · simpa [HermitianMat.diagonal, ← HermitianMat.mat_apply] using h
+    exact ⟨this.symm, HermitianMat.diagonal_le_smul_one _ _ h⟩
   obtain ⟨U, hU_unitary, D, hA_eq, hD_le⟩ := h_decomp;
   have hA_le : U * D * star U ≤ U * (M • 1) * star U := by
-    have hD_le : D ≤ M • (1 : HermitianMat d ℂ) := by
-      sorry
     have := HermitianMat.conj_mono (M := U) hD_le
     simp only [conj, AddMonoidHom.coe_mk, ZeroHom.coe_mk] at this
     replace this := Subtype.coe_le_coe.mpr this

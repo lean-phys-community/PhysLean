@@ -118,19 +118,15 @@ end εApproximates
 
 section AchievesRate
 
-/-- Every quantum channel achieves a rate of zero. -/
-theorem achievesRate_0 (Λ : CPTPMap d₁ d₂) : Λ.AchievesRate 0 := by
+/-- Every quantum channel on a nonempty space achieves a rate of zero. (The hypothesis is needed:
+a channel out of an empty space into a nonempty one emulates nothing at all, since an emulation
+would need both a channel into the empty space and one out of the nonempty one.) -/
+theorem achievesRate_0 [Nonempty d₁] (Λ : CPTPMap d₁ d₂) : Λ.AchievesRate 0 := by
+  have : Nonempty d₂ := MState.nonempty (Λ default)
   intro ε hε
-  use 1, zero_lt_one, 1, default
-  constructor
-  · have : Nonempty d₁ := by sorry--having a CPTPMap should be enough to conclude in- and out-spaces are nonempty
-    have : Nonempty d₂ := by sorry
-    use Classical.ofNonempty, Classical.ofNonempty
-    sorry--exact Unique.eq_default _
-  constructor
-  · norm_num
-  · rw [Unique.eq_default id]
-    sorry--apply εApproximates_monotone (εApproximates_self default) hε.le
+  refine ⟨1, zero_lt_one, 1, default, ⟨default, default, Unique.eq_default _⟩, by norm_num, ?_⟩
+  rw [Unique.eq_default (id : CPTPMap (Fin 1) (Fin 1))]
+  exact εApproximates_monotone (εApproximates_self default) hε.le
 
 /-- The identity channel on D dimensional space achieves a rate of log2(D). -/
 theorem id_achievesRate_log_dim : (id (dIn := d₁)).AchievesRate (Real.logb 2 (Fintype.card d₁)) := by
@@ -151,14 +147,104 @@ theorem id_achievesRate_log_dim : (id (dIn := d₁)).AchievesRate (Real.logb 2 (
   · norm_num
   · exact εApproximates_monotone (εApproximates_self id) hε.le
 
-/-- A channel cannot achieve a rate greater than log2(D), where D is the input dimension. -/
+/-- A channel `D ∘ E` that factors through `d₂` can only approximate the identity channel on `d₁` if
+`d₂` is nearly as large as `d₁`: each of the `card d₁` basis states `∣i⟩` must come back out of `D`
+with probability at least `(1-ε)²`, and these probabilities are the expectation values of a POVM
+whose total trace is only `card d₂`. -/
+theorem card_mul_le_card_of_εApproximates_id (E : CPTPMap d₁ d₂) (D : CPTPMap d₂ d₁) {ε : ℝ}
+    (hε : ε ≤ 1) (h : (D.compose E).εApproximates CPTPOp.id ε) :
+    (Fintype.card d₁ : ℝ) * (1 - ε)^2 ≤ Fintype.card d₂ := by
+  have key : ∀ i : d₁, (1 - ε)^2 ≤ (D.dual (MState.pure (Ket.basis i)).M).trace := by
+    intro i
+    have h1 := h (MState.pure (Ket.basis i))
+    rw [ge_iff_le, compose_eq, id_MState, DensityOp.fidelity_symm, DensityOp.fidelity_pure] at h1
+    have hnn : 0 ≤ MState.exp_val (D (E (MState.pure (Ket.basis i))))
+        (MState.pure (Ket.basis i)).M :=
+      MState.exp_val_nonneg _ (MState.pure (Ket.basis i)).nonneg
+    have h2 := mul_self_le_mul_self (by linarith : (0:ℝ) ≤ 1 - ε) h1
+    rw [Real.mul_self_sqrt hnn, ← sq] at h2
+    calc (1 - ε)^2
+        ≤ MState.exp_val (D (E (MState.pure (Ket.basis i)))) (MState.pure (Ket.basis i)).M := h2
+      _ = MState.exp_val (E (MState.pure (Ket.basis i))) (D.dual (MState.pure (Ket.basis i)).M) :=
+          exp_val_Dual D _ _
+      _ ≤ MState.exp_val (E (MState.pure (Ket.basis i)))
+            ((D.dual (MState.pure (Ket.basis i)).M).trace • 1) :=
+          MState.exp_val_le_exp_val _
+            (HermitianMat.le_trace_smul_one (D.dual_pos (MState.pure (Ket.basis i)).nonneg))
+      _ = (D.dual (MState.pure (Ket.basis i)).M).trace := by
+          rw [MState.exp_val_smul, MState.exp_val_one, mul_one]
+  calc (Fintype.card d₁ : ℝ) * (1 - ε)^2 = ∑ _i : d₁, (1 - ε)^2 := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+    _ ≤ ∑ i : d₁, (D.dual (MState.pure (Ket.basis i)).M).trace :=
+        Finset.sum_le_sum fun i _ ↦ key i
+    _ = (D.dual (∑ i : d₁, (MState.pure (Ket.basis i)).M)).trace := by
+        rw [map_sum, HermitianMat.trace_sum]
+    _ = Fintype.card d₂ := by rw [MState.sum_pure_basis, map_one, HermitianMat.trace_one]
+
+/-- A channel cannot achieve a rate greater than log2(D), where D is the input dimension.
+
+If `Λ` achieved a rate `R` above `L = log₂(D)`, then for every `ε` there would be a channel `B` on
+`2^(Rn)` dimensions, `ε`-approximating the identity, that factors through the `Dⁿ`-dimensional
+input of `Λ⊗ⁿ`. By `card_mul_le_card_of_εApproximates_id` that forces `2^(Rn) (1-ε)² ≤ 2^(Ln)`,
+that is, `(1-ε)² ≤ 2^((L-R)n) ≤ 2^(L-R) < 1`, which fails once `ε` is small enough. -/
 theorem not_achievesRate_gt_log_dim_in (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₁) < R) :
     ¬Λ.AchievesRate R := by
-  sorry
-
-noncomputable section AristotleLemmas
-
-end AristotleLemmas
+  intro hach
+  set L := Real.logb 2 (Fintype.card d₁) with hL
+  have hL0 : 0 ≤ L := by
+    rcases Nat.eq_zero_or_pos (Fintype.card d₁) with h | h
+    · simp [hL, h]
+    · exact Real.logb_nonneg one_lt_two (by exact_mod_cast h)
+  have hR0 : 0 < R := lt_of_le_of_lt hL0 hR
+  have hpow : (0:ℝ) < 2 ^ (L - R) := Real.rpow_pos_of_pos two_pos _
+  set t := Real.sqrt (2 ^ (L - R)) with ht
+  have ht0 : 0 < t := Real.sqrt_pos.mpr hpow
+  have ht1 : t < 1 := by
+    rw [ht, show (1:ℝ) = Real.sqrt 1 from Real.sqrt_one.symm]
+    refine Real.sqrt_lt_sqrt hpow.le ?_
+    calc (2:ℝ) ^ (L - R) < 2 ^ (0:ℝ) :=
+          (Real.rpow_lt_rpow_left_iff one_lt_two).mpr (by linarith)
+      _ = 1 := Real.rpow_zero 2
+  obtain ⟨n, hn, dimB, B, ⟨E', D', hED⟩, hRate, hApprox⟩ := hach ((1 - t)/2) (by linarith)
+  have hnR : (0:ℝ) < n := by exact_mod_cast hn
+  have hRn : 0 < R * n := mul_pos hR0 hnR
+  -- Regroup the emulation `B = D' ∘ Λ⊗ⁿ ∘ E'` as a factorization through `Fin n → d₁`.
+  have hApprox' : ((D'.compose (CPTPOp.piProd fun _ : Fin n ↦ Λ)).compose E').εApproximates
+      CPTPOp.id ((1 - t)/2) := by
+    rw [compose_assoc, hED]
+    exact hApprox
+  have hcount : (dimB : ℝ) * (1 - (1 - t)/2)^2 ≤ ((Fintype.card d₁ : ℝ)) ^ n := by
+    have h := card_mul_le_card_of_εApproximates_id E' (D'.compose (piProd fun _ : Fin n ↦ Λ))
+      (by linarith) hApprox'
+    rwa [Fintype.card_fin, Fintype.card_fun, Fintype.card_fin, Nat.cast_pow] at h
+  have hd0 : 0 < dimB := by
+    rcases Nat.eq_zero_or_pos dimB with h | h
+    · rw [h] at hRate
+      simp only [Nat.cast_zero, Real.logb_zero, ge_iff_le] at hRate
+      linarith
+    · exact h
+  have hdimB : (2:ℝ) ^ (R * n) ≤ dimB :=
+    calc (2:ℝ) ^ (R * n) ≤ 2 ^ Real.logb 2 dimB :=
+          (Real.rpow_le_rpow_left_iff one_lt_two).mpr hRate
+      _ = dimB := Real.rpow_logb two_pos (by norm_num) (by exact_mod_cast hd0)
+  have hcard : ((Fintype.card d₁ : ℝ)) ^ n ≤ (2:ℝ) ^ (L * n) := by
+    rcases Nat.eq_zero_or_pos (Fintype.card d₁) with h | h
+    · rw [h, Nat.cast_zero, zero_pow hn.ne']
+      positivity
+    · have hc : ((Fintype.card d₁ : ℝ)) = 2 ^ L :=
+        (Real.rpow_logb two_pos (by norm_num) (by exact_mod_cast h)).symm
+      rw [hc, ← Real.rpow_natCast (2 ^ L) n, ← Real.rpow_mul zero_le_two]
+  have hsq : (1 - (1 - t)/2)^2 ≤ t^2 := by
+    rw [ht, Real.sq_sqrt hpow.le]
+    have h1 : (2:ℝ) ^ (R * n) * (1 - (1 - t)/2)^2 ≤ 2 ^ (L * n) :=
+      le_trans (mul_le_mul_of_nonneg_right hdimB (by positivity)) (hcount.trans hcard)
+    have h2 : (2:ℝ) ^ (L * n) ≤ 2 ^ (R * n) * 2 ^ (L - R) := by
+      rw [← Real.rpow_add two_pos]
+      refine (Real.rpow_le_rpow_left_iff one_lt_two).mpr ?_
+      have hn1 : (1:ℝ) ≤ n := by exact_mod_cast hn
+      nlinarith [mul_le_mul_of_nonneg_left hn1 (sub_pos.mpr hR).le]
+    exact le_of_mul_le_mul_left (h1.trans h2) (Real.rpow_pos_of_pos two_pos _)
+  nlinarith [mul_pos (sub_pos.mpr ht1) (show (0:ℝ) < 1 + 3*t by linarith)]
 
 /-- A channel cannot achieve a rate greater than log2(D), where D is the output dimension. -/
 theorem not_achievesRate_gt_log_dim_out (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₂) < R): ¬Λ.AchievesRate R := by
@@ -194,7 +280,7 @@ end AchievesRate
 section capacity
 
 /-- Quantum channel capacity is nonnegative. -/
-theorem zero_le_quantumCapacity (Λ : CPTPMap d₁ d₂) : 0 ≤ Λ.quantumCapacity :=
+theorem zero_le_quantumCapacity [Nonempty d₁] (Λ : CPTPMap d₁ d₂) : 0 ≤ Λ.quantumCapacity :=
   le_csSup (bddAbove_achievesRate Λ) (achievesRate_0 Λ)
 
 /-- Quantum channel capacity is at most log2(D), where D is the input dimension. -/

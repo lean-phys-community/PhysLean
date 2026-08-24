@@ -3,8 +3,10 @@ Copyright (c) 2026 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
+import QuantumInfo.Finite.Entropy.SSA
 import QuantumInfo.Finite.Entropy.VonNeumann
 
+import QuantumInfo.ForMathlib.HermitianMat.BlockDiag
 import QuantumInfo.ForMathlib.HermitianMat.Unitary
 
 noncomputable section
@@ -2207,20 +2209,6 @@ theorem qRelativeEnt.lowerSemicontinuous (ρ : MState d) : LowerSemicontinuous f
     · simp at junk
     · exact hy
 
-/-- Joint convexity of Quantum relative entropy. We can't state this with `ConvexOn` because that requires
-an `AddCommMonoid`, which `MState`s are not. Instead we state it with `Mixable`.
-
-TODO:
- * Add the `Mixable` instance that infers from the `Coe` so that the right hand side can be written as
-`p [𝐃(ρ₁‖σ₁) ↔ 𝐃(ρ₂‖σ₂)]`
- * Define (joint) convexity as its own thing - a `ConvexOn` for `Mixable` types.
- * Maybe, more broadly, find a way to make `ConvexOn` work with the subset of `Matrix` that corresponds to `MState`.
--/
-theorem qRelativeEnt_joint_convexity :
-  ∀ (ρ₁ ρ₂ σ₁ σ₂ : MState d), ∀ (p : Prob),
-    𝐃(p [ρ₁ ↔ ρ₂]‖p [σ₁ ↔ σ₂]) ≤ p * 𝐃(ρ₁‖σ₁) + (1 - p) * 𝐃(ρ₂‖σ₂) := by
-  sorry
-
 @[simp]
 theorem qRelEntropy_self (ρ : MState d) : 𝐃(ρ‖ρ) = 0 := by
   simp [qRelativeEnt]
@@ -2230,10 +2218,98 @@ theorem qRelativeEnt_ne_top {ρ σ : MState d} [σ.M.NonSingular] : 𝐃(ρ‖σ
   rw [qRelativeEnt]
   finiteness
 
+section mutualInfo
+
+open HermitianMat
+
+private lemma inner_kerProj_kron_one (ρ : MState (dA × dB)) :
+    ⟪ρ.M, ρ.traceRight.M.kerProj ⊗ₖ (1 : HermitianMat dB ℂ)⟫ = 0 := by
+  rw [inner_comm, inner_kron_one, ← MState.traceRight_M,
+    eq_sub_of_add_eq (kerProj_add_supportProj ρ.traceRight.M), inner_sub_left, one_inner,
+    inner_comm, inner_supportProj_self, sub_self]
+
+private lemma inner_one_kron_kerProj (ρ : MState (dA × dB)) :
+    ⟪ρ.M, (1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.kerProj⟫ = 0 := by
+  rw [inner_comm, inner_one_kron, ← MState.traceLeft_M,
+    eq_sub_of_add_eq (kerProj_add_supportProj ρ.traceLeft.M), inner_sub_left, one_inner,
+    inner_comm, inner_supportProj_self, sub_self]
+
+private lemma mul_kerProj_kron_one (ρ : MState (dA × dB)) :
+    ρ.M.mat * (ρ.traceRight.M.kerProj ⊗ₖ (1 : HermitianMat dB ℂ)).mat = 0 := by
+  refine mul_eq_zero_of_inner_eq_zero ρ.nonneg ?_ (inner_kerProj_kron_one ρ)
+  rw [kronecker_mat, mat_one, ← Matrix.mul_kronecker_mul, one_mul, kerProj_sq]
+
+private lemma mul_one_kron_kerProj (ρ : MState (dA × dB)) :
+    ρ.M.mat * ((1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.kerProj).mat = 0 := by
+  refine mul_eq_zero_of_inner_eq_zero ρ.nonneg ?_ (inner_one_kron_kerProj ρ)
+  rw [kronecker_mat, mat_one, ← Matrix.mul_kronecker_mul, one_mul, kerProj_sq]
+
+private lemma mul_kerProj_kron (ρ : MState (dA × dB)) (Y : HermitianMat dB ℂ) :
+    ρ.M.mat * (ρ.traceRight.M.kerProj ⊗ₖ Y).mat = 0 := by
+  have h : (ρ.traceRight.M.kerProj ⊗ₖ Y).mat
+      = (ρ.traceRight.M.kerProj ⊗ₖ (1 : HermitianMat dB ℂ)).mat
+        * ((1 : HermitianMat dA ℂ) ⊗ₖ Y).mat := by
+    rw [kronecker_mat, kronecker_mat, kronecker_mat, mat_one, mat_one, ← Matrix.mul_kronecker_mul,
+      mul_one, one_mul]
+  rw [h, ← mul_assoc, mul_kerProj_kron_one, Matrix.zero_mul]
+
+private lemma mul_kron_kerProj (ρ : MState (dA × dB)) (X : HermitianMat dA ℂ) :
+    ρ.M.mat * (X ⊗ₖ ρ.traceLeft.M.kerProj).mat = 0 := by
+  have h : (X ⊗ₖ ρ.traceLeft.M.kerProj).mat
+      = ((1 : HermitianMat dA ℂ) ⊗ₖ ρ.traceLeft.M.kerProj).mat
+        * (X ⊗ₖ (1 : HermitianMat dB ℂ)).mat := by
+    rw [kronecker_mat, kronecker_mat, kronecker_mat, mat_one, mat_one, ← Matrix.mul_kronecker_mul,
+      mul_one, one_mul]
+  rw [h, ← mul_assoc, mul_one_kron_kerProj, Matrix.zero_mul]
+
+/-- A bipartite state is unchanged by projecting onto the support of the product of its
+marginals. -/
+private lemma mul_supportProj_prod (ρ : MState (dA × dB)) :
+    ρ.M.mat * (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.supportProj.mat = ρ.M.mat := by
+  have hA : ρ.traceRight.M.supportProj = 1 - ρ.traceRight.M.kerProj :=
+    eq_sub_of_add_eq' (kerProj_add_supportProj ρ.traceRight.M)
+  have hB : ρ.traceLeft.M.supportProj = 1 - ρ.traceLeft.M.kerProj :=
+    eq_sub_of_add_eq' (kerProj_add_supportProj ρ.traceLeft.M)
+  rw [MState.prod_M, supportProj_kron, hA, hB, sub_kronecker, kronecker_sub, kronecker_sub]
+  simp only [mat_sub, Matrix.mul_sub, mul_kron_kerProj, mul_kerProj_kron]
+  simp
+
+private lemma ker_prod_le_ker (ρ : MState (dA × dB)) :
+    (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.ker ≤ ρ.M.ker := by
+  intro v hv
+  have hPv := (mem_ker_iff_mulVec_zero _ v).mp (ker_le_ker_supportProj _ hv)
+  rw [mem_ker_iff_mulVec_zero] at hv ⊢
+  calc ρ.M.mat.mulVec v
+      = (ρ.M.mat * (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.supportProj.mat).mulVec v := by
+        rw [mul_supportProj_prod]
+    _ = ρ.M.mat.mulVec ((ρ.traceRight ⊗ᴹ ρ.traceLeft).M.supportProj.mat.mulVec v) := by
+        rw [Matrix.mulVec_mulVec]
+    _ = 0 := by rw [hPv, Matrix.mulVec_zero]
+
+private lemma inner_log_prod (ρ : MState (dA × dB)) :
+    ⟪ρ.M, (ρ.traceRight ⊗ᴹ ρ.traceLeft).M.log⟫ = -Sᵥₙ ρ.traceRight - Sᵥₙ ρ.traceLeft := by
+  rw [MState.prod_M, log_kron_with_proj, inner_add_right]
+  have h1 : ⟪ρ.M, ρ.traceRight.M.log ⊗ₖ ρ.traceLeft.M.supportProj⟫ = -Sᵥₙ ρ.traceRight := by
+    rw [eq_sub_of_add_eq' (kerProj_add_supportProj ρ.traceLeft.M), kronecker_sub, inner_sub_right,
+      inner_eq_zero_of_mul_eq_zero (mul_kron_kerProj ρ _), sub_zero, inner_comm, inner_kron_one,
+      ← MState.traceRight_M, Sᵥₙ_eq_neg_trace_log, neg_neg]
+  have h2 : ⟪ρ.M, ρ.traceRight.M.supportProj ⊗ₖ ρ.traceLeft.M.log⟫ = -Sᵥₙ ρ.traceLeft := by
+    rw [eq_sub_of_add_eq' (kerProj_add_supportProj ρ.traceRight.M), sub_kronecker, inner_sub_right,
+      inner_eq_zero_of_mul_eq_zero (mul_kerProj_kron ρ _), sub_zero, inner_comm, inner_one_kron,
+      ← MState.traceLeft_M, Sᵥₙ_eq_neg_trace_log, neg_neg]
+  rw [h1, h2]
+  ring
+
 /-- `I(A:B) = 𝐃(ρᴬᴮ‖ρᴬ ⊗ ρᴮ)` -/
 theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
     qMutualInfo ρ = (𝐃(ρ‖ρ.traceRight ⊗ᴹ ρ.traceLeft) : EReal) := by
-  sorry
+  rw [qRelativeEnt_ker (ker_prod_le_ker ρ), inner_sub_right, inner_log_prod]
+  rw [show ⟪ρ.M, ρ.M.log⟫ = -Sᵥₙ ρ by rw [Sᵥₙ_eq_neg_trace_log, neg_neg, inner_comm]]
+  rw [qMutualInfo]
+  norm_cast
+  ring
+
+end mutualInfo
 
 /-
 Helper: If σ₂ ≤ α • σ₁ for density matrices, then α > 0.
@@ -2393,3 +2469,248 @@ theorem qRelEntropy_le_add_of_le_smul (ρ : MState d) {σ₁ σ₂ : MState d} (
 theorem qRelativeEnt_op_le {ρ σ : MState d} (h : ρ.M ≤ α • σ.M) :
     𝐃(ρ‖σ) ≤ .ofReal (Real.log α) := by
   simpa using qRelEntropy_le_add_of_le_smul ρ h
+
+/-! ## Joint convexity
+
+Joint convexity of the relative entropy follows from monotonicity under the partial trace, which
+in turn is the operator strong subadditivity inequality `inner_log_traceRight_le` integrated
+against `ρ`. Given the partial trace bound, one forms the *flag state*
+`p ρ₁ ⊗ |0⟩⟨0| + (1-p) ρ₂ ⊗ |1⟩⟨1|` on `d × Fin 2`, whose right marginal is the mixture
+`p [ρ₁ ↔ ρ₂]` and whose relative entropy against the corresponding flag state for the `σᵢ` is
+exactly the convex combination `p 𝐃(ρ₁‖σ₁) + (1-p) 𝐃(ρ₂‖σ₂)`, because relative entropy of
+block-diagonal states decomposes blockwise. -/
+
+open scoped Topology in
+private theorem tendsto_mul_const_nhdsGT {c : ℝ} (hc : 0 < c) :
+    Filter.Tendsto (fun ε : ℝ ↦ ε * c) (𝓝[>] 0) (𝓝[>] 0) := by
+  refine tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _ ?_ ?_
+  · have h : Filter.Tendsto (fun ε : ℝ ↦ ε * c) (𝓝 0) (𝓝 (0 * c)) :=
+      (continuous_mul_right c).tendsto 0
+    rw [zero_mul] at h
+    exact h.mono_left nhdsWithin_le_nhds
+  · filter_upwards [self_mem_nhdsWithin] with ε hε
+    exact mul_pos hε hc
+
+open scoped Topology in
+/-- Monotonicity of the quantum relative entropy under the partial trace. -/
+theorem qRelativeEnt_traceRight_le (ρ σ : MState (dA × dB)) :
+    𝐃(ρ.traceRight‖σ.traceRight) ≤ 𝐃(ρ‖σ) := by
+  by_cases hker : σ.M.ker ≤ ρ.M.ker
+  swap
+  · rw [qRelativeEnt_eq_top hker]
+    exact le_top
+  have hkerR : σ.traceRight.M.ker ≤ ρ.traceRight.M.ker := by
+    rw [MState.traceRight_M, MState.traceRight_M]
+    exact HermitianMat.ker_traceRight_le σ.nonneg hker
+  obtain ⟨_, _⟩ := nonempty_prod.mp ρ.nonempty
+  have hcard : (0 : ℝ) < Fintype.card dB := by
+    exact_mod_cast Fintype.card_pos
+  have key : ⟪ρ.M, σ.M.log⟫ + Sᵥₙ ρ ≤ ⟪ρ.traceRight.M, σ.traceRight.M.log⟫ + Sᵥₙ ρ.traceRight := by
+    have h_ev : ∀ᶠ ε in 𝓝[>] (0 : ℝ),
+        ⟪ρ.M, (σ.M + ε • 1).log⟫ + Sᵥₙ ρ
+          ≤ ⟪ρ.traceRight.M, (σ.traceRight.M + (ε * (Fintype.card dB : ℝ)) • 1).log⟫
+              + Sᵥₙ ρ.traceRight := by
+      refine eventually_nhdsWithin_of_forall fun ε hε ↦ ?_
+      have h := inner_log_traceRight_le ρ (posDef_add_eps σ.nonneg hε)
+      rwa [HermitianMat.traceRight_add_smul_one, ← MState.traceRight_M] at h
+    refine le_of_tendsto_of_tendsto ?_ ?_ h_ev
+    · exact (inner_log_shift_tendsto hker).add tendsto_const_nhds
+    · exact ((inner_log_shift_tendsto hkerR).comp
+        (tendsto_mul_const_nhdsGT hcard)).add tendsto_const_nhds
+  rw [← EReal.coe_ennreal_le_coe_ennreal_iff, qRelativeEnt_ker hkerR, qRelativeEnt_ker hker,
+    EReal.coe_le_coe_iff, HermitianMat.inner_sub_left, HermitianMat.inner_sub_left]
+  rw [Sᵥₙ_eq_neg_trace_log ρ, Sᵥₙ_eq_neg_trace_log ρ.traceRight,
+    HermitianMat.inner_comm ρ.M.log, HermitianMat.inner_comm ρ.traceRight.M.log] at key
+  linarith
+
+section flag
+
+variable {p : Prob}
+
+private theorem pure_basis_M (i : d) :
+    (MState.pure (Ket.basis i)).M = HermitianMat.basisProj ℂ i := by
+  ext a b
+  simp only [HermitianMat.basisProj]
+  by_cases hab : a = b <;> by_cases hai : i = a <;>
+    simp_all [Matrix.vecMulVec_apply, Bra.eq_conj, Ket.basis, Ket.apply, eq_comm]
+
+/-- The "flag state" `p ρ₁ ⊗ |0⟩⟨0| + (1-p) ρ₂ ⊗ |1⟩⟨1|`, whose second factor records which
+of the two states was chosen. -/
+private def flagState (p : Prob) (ρ₁ ρ₂ : MState d) : MState (d × Fin 2) :=
+  p [(ρ₁.prod (MState.pure (Ket.basis 0))) ↔ (ρ₂.prod (MState.pure (Ket.basis 1)))]
+
+private def flagCoeff (p : Prob) : Fin 2 → ℝ :=
+  ![(p : ℝ), 1 - (p : ℝ)]
+
+private def flagPair (ρ₁ ρ₂ : MState d) : Fin 2 → MState d :=
+  ![ρ₁, ρ₂]
+
+private def flagBlocks (p : Prob) (ρ₁ ρ₂ : MState d) : Fin 2 → HermitianMat d ℂ :=
+  fun i ↦ flagCoeff p i • (flagPair ρ₁ ρ₂ i).M
+
+private theorem flagState_M (p : Prob) (ρ₁ ρ₂ : MState d) :
+    (flagState p ρ₁ ρ₂).M = ∑ i, flagBlocks p ρ₁ ρ₂ i ⊗ₖ HermitianMat.basisProj ℂ i := by
+  simp only [flagState, MState.mix_M, Fin.sum_univ_two, flagBlocks, flagCoeff, flagPair,
+    Matrix.cons_val_zero, Matrix.cons_val_one, MState.prod_M, pure_basis_M,
+    HermitianMat.smul_kronecker]
+
+private theorem flagState_traceRight (p : Prob) (ρ₁ ρ₂ : MState d) :
+    (flagState p ρ₁ ρ₂).traceRight = p [ρ₁ ↔ ρ₂] := by
+  ext1
+  rw [MState.traceRight_M, flagState_M, MState.mix_M, Fin.sum_univ_two]
+  simp only [flagBlocks, flagCoeff, flagPair, Matrix.cons_val_zero, Matrix.cons_val_one,
+    HermitianMat.traceRight_add, HermitianMat.traceRight_kron,
+    HermitianMat.trace_basisProj, one_smul]
+
+private theorem flagBlocks_ker_le (hp0 : (p : ℝ) ≠ 0) (hp1 : (1 : ℝ) - p ≠ 0)
+    {ρ₁ ρ₂ σ₁ σ₂ : MState d} (h₁ : σ₁.M.ker ≤ ρ₁.M.ker) (h₂ : σ₂.M.ker ≤ ρ₂.M.ker) :
+    (flagState p σ₁ σ₂).M.ker ≤ (flagState p ρ₁ ρ₂).M.ker := by
+  rw [flagState_M, flagState_M]
+  refine HermitianMat.ker_sum_kron_basisProj_le ?_
+  rw [Fin.forall_fin_two]
+  constructor <;>
+    simp only [flagBlocks, flagCoeff, flagPair, Matrix.cons_val_zero, Matrix.cons_val_one,
+      HermitianMat.ker_pos_smul _ hp0, HermitianMat.ker_pos_smul _ hp1]
+  · exact h₁
+  · exact h₂
+
+end flag
+
+/-- The inner product of two block-diagonal matrices is the sum of the blockwise inner products. -/
+theorem HermitianMat.inner_sum_kron_basisProj {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A B : ι → HermitianMat d ℂ) :
+    ⟪∑ i, A i ⊗ₖ HermitianMat.basisProj ℂ i, ∑ j, B j ⊗ₖ HermitianMat.basisProj ℂ j⟫
+      = ∑ i, ⟪A i, B i⟫ := by
+  rw [sum_inner]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  rw [inner_sum, Finset.sum_eq_single i]
+  · rw [HermitianMat.inner_kron, HermitianMat.inner_basisProj, if_pos rfl, mul_one]
+  · intro j _ hj
+    rw [HermitianMat.inner_kron, HermitianMat.inner_basisProj, if_neg (Ne.symm hj), mul_zero]
+  · intro h
+    exact absurd (Finset.mem_univ i) h
+
+/-- The relative entropy inner product of two block-diagonal states decomposes as the
+weighted sum of the blockwise relative entropies. -/
+theorem inner_blocks_log_sub {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (c : ι → ℝ) (hc : ∀ i, c i ≠ 0) (A B : ι → HermitianMat d ℂ) (hA : ∀ i, (A i).trace = 1)
+    (hker : ∀ i, (B i).ker ≤ (A i).ker) :
+    ⟪∑ i, (c i • A i) ⊗ₖ HermitianMat.basisProj ℂ i,
+        (∑ i, (c i • A i) ⊗ₖ HermitianMat.basisProj ℂ i).log
+          - (∑ i, (c i • B i) ⊗ₖ HermitianMat.basisProj ℂ i).log⟫
+      = ∑ i, c i * ⟪A i, (A i).log - (B i).log⟫ := by
+  rw [HermitianMat.inner_sub_left, HermitianMat.log_sum_kron_basisProj,
+    HermitianMat.log_sum_kron_basisProj, HermitianMat.inner_sum_kron_basisProj,
+    HermitianMat.inner_sum_kron_basisProj, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  rw [HermitianMat.log_smul_of_pos (A i) (hc i), HermitianMat.log_smul_of_pos (B i) (hc i),
+    HermitianMat.inner_smul_left, HermitianMat.inner_smul_left, HermitianMat.inner_add_right,
+    HermitianMat.inner_add_right, HermitianMat.inner_smul_right, HermitianMat.inner_smul_right,
+    HermitianMat.inner_supportProj_self, HermitianMat.inner_supportProj_of_ker_le (hker i),
+    HermitianMat.inner_sub_left, hA i]
+  ring
+
+private theorem qRelativeEnt_ne_top_of_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
+    𝐃(ρ‖σ) ≠ ⊤ := by
+  intro htop
+  have h2 := qRelativeEnt_ker h
+  rw [htop] at h2
+  simp at h2
+
+private theorem qRelativeEnt_toReal {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
+    (𝐃(ρ‖σ)).toReal = ⟪ρ.M, ρ.M.log - σ.M.log⟫ := by
+  have h2 := qRelativeEnt_ker h
+  rw [← EReal.toReal_coe_ennreal, h2, EReal.toReal_coe]
+
+private theorem qRelativeEnt_flagState {p : Prob} (hp0 : (p : ℝ) ≠ 0) (hp1 : (1 : ℝ) - p ≠ 0)
+    {ρ₁ ρ₂ σ₁ σ₂ : MState d} (h₁ : σ₁.M.ker ≤ ρ₁.M.ker) (h₂ : σ₂.M.ker ≤ ρ₂.M.ker) :
+    (𝐃(flagState p ρ₁ ρ₂‖flagState p σ₁ σ₂)).toReal
+      = (p : ℝ) * (𝐃(ρ₁‖σ₁)).toReal + (1 - (p : ℝ)) * (𝐃(ρ₂‖σ₂)).toReal := by
+  have hc : ∀ i, flagCoeff p i ≠ 0 := by
+    intro i
+    fin_cases i
+    · simpa [flagCoeff] using hp0
+    · simpa [flagCoeff] using hp1
+  have hA : ∀ i, (flagPair ρ₁ ρ₂ i).M.trace = 1 := by
+    intro i
+    fin_cases i <;> simp [flagPair, DensityOp.tr]
+  have hker : ∀ i, (flagPair σ₁ σ₂ i).M.ker ≤ (flagPair ρ₁ ρ₂ i).M.ker := by
+    intro i
+    fin_cases i
+    · simpa [flagPair] using h₁
+    · simpa [flagPair] using h₂
+  rw [qRelativeEnt_toReal (flagBlocks_ker_le hp0 hp1 h₁ h₂), flagState_M, flagState_M]
+  simp only [flagBlocks]
+  rw [inner_blocks_log_sub (flagCoeff p) hc (fun i ↦ (flagPair ρ₁ ρ₂ i).M)
+      (fun i ↦ (flagPair σ₁ σ₂ i).M) hA hker,
+    Fin.sum_univ_two, qRelativeEnt_toReal h₁, qRelativeEnt_toReal h₂]
+  simp [flagCoeff, flagPair]
+
+open scoped NNReal ENNReal in
+/-- Joint convexity of Quantum relative entropy. We can't state this with `ConvexOn` because that requires
+an `AddCommMonoid`, which `MState`s are not. Instead we state it with `Mixable`.
+
+TODO:
+ * Add the `Mixable` instance that infers from the `Coe` so that the right hand side can be written as
+`p [𝐃(ρ₁‖σ₁) ↔ 𝐃(ρ₂‖σ₂)]`
+ * Define (joint) convexity as its own thing - a `ConvexOn` for `Mixable` types.
+ * Maybe, more broadly, find a way to make `ConvexOn` work with the subset of `Matrix` that corresponds to `MState`.
+-/
+theorem qRelativeEnt_joint_convexity :
+  ∀ (ρ₁ ρ₂ σ₁ σ₂ : MState d), ∀ (p : Prob),
+    𝐃(p [ρ₁ ↔ ρ₂]‖p [σ₁ ↔ σ₂]) ≤ p * 𝐃(ρ₁‖σ₁) + (1 - p) * 𝐃(ρ₂‖σ₂) := by
+  intro ρ₁ ρ₂ σ₁ σ₂ p
+  rcases eq_or_ne p 0 with rfl | hp0
+  · have h : ∀ a b : MState d, (0 : Prob) [a ↔ b] = b := fun a b ↦ by ext1; simp
+    rw [h, h]
+    simp
+  rcases eq_or_ne p 1 with rfl | hp1
+  · have h : ∀ a b : MState d, (1 : Prob) [a ↔ b] = a := fun a b ↦ by ext1; simp
+    rw [h, h]
+    simp
+  have hp0' : (p : ℝ) ≠ 0 := fun h ↦ hp0 (Prob.ext (by simpa using h))
+  have hp1' : (1 : ℝ) - (p : ℝ) ≠ 0 :=
+    fun h ↦ hp1 (Prob.ext (by simpa using (sub_eq_zero.mp h).symm))
+  have hpne : ((p : ℝ≥0) : ℝ≥0∞) ≠ 0 := by
+    rw [ne_eq, ENNReal.coe_eq_zero,
+      show (0 : ℝ≥0) = ((0 : Prob) : ℝ≥0) from Prob.toNNReal_zero.symm, Prob.eq_iff_nnreal]
+    exact hp0
+  have hple : ((p : ℝ≥0) : ℝ≥0∞) ≤ 1 := by
+    rw [← ENNReal.coe_one, ENNReal.coe_le_coe, ← NNReal.coe_le_coe]
+    exact p.2.2
+  have hqne : (1 : ℝ≥0∞) - ((p : ℝ≥0) : ℝ≥0∞) ≠ 0 := by
+    rw [ne_eq, tsub_eq_zero_iff_le]
+    intro hle
+    refine hp1 (Prob.ext ?_)
+    have : ((p : ℝ≥0) : ℝ≥0∞) = 1 := le_antisymm hple hle
+    rw [← ENNReal.coe_one, ENNReal.coe_inj] at this
+    simpa [Prob.toNNReal, ← NNReal.coe_inj] using this
+  by_cases h₁ : σ₁.M.ker ≤ ρ₁.M.ker
+  swap
+  · rw [qRelativeEnt_eq_top h₁, ENNReal.mul_top hpne, top_add]
+    exact le_top
+  by_cases h₂ : σ₂.M.ker ≤ ρ₂.M.ker
+  swap
+  · rw [qRelativeEnt_eq_top h₂, ENNReal.mul_top hqne, add_top]
+    exact le_top
+  have hfin₁ : 𝐃(ρ₁‖σ₁) ≠ ⊤ := qRelativeEnt_ne_top_of_ker h₁
+  have hfin₂ : 𝐃(ρ₂‖σ₂) ≠ ⊤ := qRelativeEnt_ne_top_of_ker h₂
+  have hfinF : 𝐃(flagState p ρ₁ ρ₂‖flagState p σ₁ σ₂) ≠ ⊤ :=
+    qRelativeEnt_ne_top_of_ker (flagBlocks_ker_le hp0' hp1' h₁ h₂)
+  have hfinR : ((p : ℝ≥0) : ℝ≥0∞) * 𝐃(ρ₁‖σ₁) + (1 - ((p : ℝ≥0) : ℝ≥0∞)) * 𝐃(ρ₂‖σ₂) ≠ ⊤ := by
+    refine ENNReal.add_ne_top.mpr ⟨ENNReal.mul_ne_top ENNReal.coe_ne_top hfin₁,
+      ENNReal.mul_ne_top ?_ hfin₂⟩
+    exact (ENNReal.sub_ne_top ENNReal.one_ne_top)
+  have key : 𝐃(flagState p ρ₁ ρ₂‖flagState p σ₁ σ₂)
+      = ((p : ℝ≥0) : ℝ≥0∞) * 𝐃(ρ₁‖σ₁) + (1 - ((p : ℝ≥0) : ℝ≥0∞)) * 𝐃(ρ₂‖σ₂) := by
+    rw [← ENNReal.toReal_eq_toReal_iff' hfinF hfinR, qRelativeEnt_flagState hp0' hp1' h₁ h₂,
+      ENNReal.toReal_add (ENNReal.mul_ne_top ENNReal.coe_ne_top hfin₁)
+        (ENNReal.mul_ne_top (ENNReal.sub_ne_top ENNReal.one_ne_top) hfin₂),
+      ENNReal.toReal_mul, ENNReal.toReal_mul, ENNReal.coe_toReal,
+      ENNReal.toReal_sub_of_le hple ENNReal.one_ne_top, ENNReal.toReal_one, ENNReal.coe_toReal]
+    rfl
+  calc 𝐃(p [ρ₁ ↔ ρ₂]‖p [σ₁ ↔ σ₂])
+      = 𝐃((flagState p ρ₁ ρ₂).traceRight‖(flagState p σ₁ σ₂).traceRight) := by
+        rw [flagState_traceRight, flagState_traceRight]
+    _ ≤ 𝐃(flagState p ρ₁ ρ₂‖flagState p σ₁ σ₂) := qRelativeEnt_traceRight_le _ _
+    _ = _ := key

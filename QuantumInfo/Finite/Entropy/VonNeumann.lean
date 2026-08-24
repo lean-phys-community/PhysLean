@@ -92,6 +92,14 @@ theorem Sᵥₙ_eq_re_trace_matrix_cfc (ρ : DensityOp E) :
   rw [Sᵥₙ_eq_trace_cfc_negMulLog (ι := ι), HermitianMat.trace, HermitianMat.mat_cfc,
     IsMaximalSelfAdjoint.RCLike_selfadjMap, RCLike.re_to_complex, DensityOp.mat_M]
 
+/-- The von Neumann entropy is unchanged by reading a state on a different space with the same
+preferred index type. -/
+@[simp]
+theorem Sᵥₙ_transport {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℂ F] [StdBasis ℂ F ι]
+    (ρ : DensityOp E) : Sᵥₙ (ρ.transport F) = Sᵥₙ ρ := by
+  rw [Sᵥₙ_eq_trace_cfc_negMulLog (ι := ι), Sᵥₙ_eq_trace_cfc_negMulLog (ι := ι),
+    DensityOp.M_transport]
+
 end operator
 
 /-- The von Neumann entropy is the Shannon entropy of the spectrum. -/
@@ -119,6 +127,75 @@ def coherentInfo (ρ : MState d₁) (Λ : CPTPMap d₁ d₂) : ℝ :=
 /-- The Quantum Conditional Mutual Information, I(A;C|B) = S(A|B) - S(A|BC). -/
 def qcmi (ρ : MState (dA × dB × dC)) : ℝ :=
   qConditionalEnt ρ.assoc'.traceRight - qConditionalEnt ρ
+
+section bipartite
+
+/-! ### Basis-free forms of the composite-system entropies
+
+The definitions above are stated for a system whose index type is a product; these are their
+counterparts for a state on an honest tensor product, together with the "matrix analogue"
+theorems identifying the two through `DensityOp.transport`. -/
+
+open scoped TensorProduct
+
+variable {E F G : Type*}
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F]
+variable [NormedAddCommGroup G] [InnerProductSpace ℂ G]
+
+namespace DensityOp
+
+section Defs
+
+variable [CompleteSpace E] [FiniteDimensional ℂ E] [CompleteSpace F] [FiniteDimensional ℂ F]
+variable [CompleteSpace G] [FiniteDimensional ℂ G]
+
+/-- The quantum conditional entropy `S(E|F) = S(EF) - S(F)` of a state on `E ⊗ F`. -/
+def qConditionalEnt (ρ : DensityOp (E ⊗[ℂ] F)) : ℝ :=
+  Sᵥₙ ρ - Sᵥₙ ρ.traceLeft
+
+/-- The quantum mutual information `I(E:F) = S(E) + S(F) - S(EF)` of a state on `E ⊗ F`. -/
+def qMutualInfo (ρ : DensityOp (E ⊗[ℂ] F)) : ℝ :=
+  Sᵥₙ ρ.traceLeft + Sᵥₙ ρ.traceRight - Sᵥₙ ρ
+
+/-- The quantum conditional mutual information `I(E;G|F) = S(E|F) - S(E|FG)` of a state on
+`E ⊗ (F ⊗ G)`. -/
+def qcmi (ρ : DensityOp (E ⊗[ℂ] (F ⊗[ℂ] G))) : ℝ :=
+  ((ρ.congr (TensorProduct.assocIsometry ℂ E F G).symm).traceRight).qConditionalEnt -
+    ρ.qConditionalEnt
+
+end Defs
+
+end DensityOp
+
+section Analogue
+
+variable [StdBasis ℂ E dA] [StdBasis ℂ F dB] [StdBasis ℂ G dC]
+
+/-- **Matrix analogue of `DensityOp.qConditionalEnt`.** -/
+@[simp]
+theorem qConditionalEnt_transport (ρ : MState (dA × dB)) :
+    (ρ.transport (E ⊗[ℂ] F)).qConditionalEnt = qConditionalEnt ρ := by
+  rw [DensityOp.qConditionalEnt, qConditionalEnt, MState.traceLeft_transport, Sᵥₙ_transport,
+    Sᵥₙ_transport]
+
+/-- **Matrix analogue of `DensityOp.qMutualInfo`.** -/
+@[simp]
+theorem qMutualInfo_transport (ρ : MState (dA × dB)) :
+    (ρ.transport (E ⊗[ℂ] F)).qMutualInfo = qMutualInfo ρ := by
+  rw [DensityOp.qMutualInfo, qMutualInfo, MState.traceLeft_transport, MState.traceRight_transport,
+    Sᵥₙ_transport, Sᵥₙ_transport, Sᵥₙ_transport]
+
+/-- **Matrix analogue of `DensityOp.qcmi`.** -/
+@[simp]
+theorem qcmi_transport (ρ : MState (dA × dB × dC)) :
+    (ρ.transport (E ⊗[ℂ] (F ⊗[ℂ] G))).qcmi = qcmi ρ := by
+  rw [DensityOp.qcmi, qcmi, ← MState.assoc'_transport, MState.traceRight_transport,
+    qConditionalEnt_transport, qConditionalEnt_transport]
+
+end Analogue
+
+end bipartite
 
 /-- von Neumman entropy is nonnegative. -/
 theorem Sᵥₙ_nonneg (ρ : MState d) : 0 ≤ Sᵥₙ ρ :=
@@ -179,12 +256,6 @@ theorem Sᵥₙ_of_assoc'_eq (ρ : MState (d₁ × (d₂ × d₃))) : Sᵥₙ ρ
 theorem selfAdjointMap_Continuous {𝕜 : Type*} [RCLike 𝕜] :
     Continuous (IsMaximalSelfAdjoint.selfadjMap : 𝕜 →+ ℝ) := by
   rw [IsMaximalSelfAdjoint.RCLike_selfadjMap]
-  fun_prop
-
-@[fun_prop]
-theorem HermitianMat.trace_Continuous {d 𝕜 : Type*} [Fintype d] [RCLike 𝕜]  :
-    Continuous (HermitianMat.trace : HermitianMat d 𝕜 → ℝ) := by
-  rw [funext HermitianMat.trace_eq_re_trace]
   fun_prop
 
 @[fun_prop]

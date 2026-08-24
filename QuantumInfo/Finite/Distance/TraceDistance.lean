@@ -3,6 +3,7 @@ Copyright (c) 2025 Alex Meiburg. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alex Meiburg
 -/
+import QuantumInfo.Finite.CPTPMap
 import QuantumInfo.Finite.MState
 
 import QuantumInfo.ForMathlib
@@ -63,6 +64,23 @@ theorem eq_abs_eigenvalues (ρ σ : MState d) : TrDistance ρ σ = (1/2 : ℝ) *
   rw [eq_matrix_traceNorm (ι := d),
     Matrix.traceNorm_Hermitian_eq_sum_abs_eigenvalues (ρ.Hermitian.sub σ.Hermitian)]
   congr!
+
+/-- **Data processing inequality for the trace distance**: a positive trace-preserving map never
+increases the trace distance between two states. Complete positivity is not needed. -/
+theorem DPI_PTP {d₂ : Type*} [Fintype d₂] [DecidableEq d₂] (ρ σ : MState d) (Λ : PTPMap d d₂) :
+    TrDistance (Λ ρ) (Λ σ) ≤ TrDistance ρ σ := by
+  have hmat : ∀ τ : MState d, ((Λ τ : MState d₂).m : Matrix d₂ d₂ ℂ) = Λ.map τ.m := fun τ ↦
+    congrArg HermitianMat.mat (PTPOp.M_apply_MState Λ τ)
+  have hin : (ρ.m - σ.m : Matrix d d ℂ) = ((ρ.M : HermitianMat d ℂ) - σ.M).mat := by
+    rw [HermitianMat.mat_sub, DensityOp.mat_M, DensityOp.mat_M]
+  rw [eq_matrix_traceNorm (ι := d₂), eq_matrix_traceNorm (ι := d), hmat, hmat, ← map_sub, hin]
+  exact mul_le_mul_of_nonneg_left (Λ.map_pos.traceNorm_le Λ.map_TP _) (by norm_num)
+
+/-- **Data processing inequality for the trace distance**: a quantum channel never increases the
+trace distance between two states. -/
+theorem DPI {d₂ : Type*} [Fintype d₂] [DecidableEq d₂] (ρ σ : MState d) (Φ : CPTPMap d d₂) :
+    TrDistance (Φ ρ) (Φ σ) ≤ TrDistance ρ σ :=
+  DPI_PTP ρ σ Φ.toPTPOp
 
 -- Fuchs–van de Graaf inequalities
 -- Relation to classical TV distance

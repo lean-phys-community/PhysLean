@@ -57,6 +57,13 @@ theorem trace_zero : (0 : HermitianMat n α).trace = 0 := by
 theorem trace_add (A B : HermitianMat n α) : (A + B).trace = A.trace + B.trace := by
   simp [trace]
 
+theorem trace_sum {ι : Type*} (s : Finset ι) (A : ι → HermitianMat n α) :
+    (∑ i ∈ s, A i).trace = ∑ i ∈ s, (A i).trace := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, trace_add, ih]
+
 end semiring
 section ring
 
@@ -112,6 +119,11 @@ variable {n m 𝕜 : Type*} [Fintype n] [Fintype m] [RCLike 𝕜]
 
 theorem trace_eq_re_trace (A : HermitianMat n 𝕜) : A.trace = RCLike.re A.mat.trace := by
   rfl
+
+@[fun_prop]
+theorem trace_Continuous : Continuous (HermitianMat.trace : HermitianMat n 𝕜 → ℝ) := by
+  rw [funext (trace_eq_re_trace (n := n) (𝕜 := 𝕜))]
+  fun_prop
 
 @[simp]
 theorem trace_one [DecidableEq n] : (1 : HermitianMat n 𝕜).trace = Fintype.card n := by
@@ -246,6 +258,17 @@ theorem traceRight_kron [Fintype n] : (A ⊗ₖ B).traceRight = B.trace • A :=
   ext : 2
   simp only [HermitianMat.traceRight, Matrix.traceRight, kronecker_mat, mat_mk]
   simp [Matrix.trace, RCLike.real_smul_eq_coe_mul, ← Finset.mul_sum, mul_comm]
+
+variable [DecidableEq m] [DecidableEq n]
+
+theorem one_traceRight [Fintype n] :
+    (1 : HermitianMat (m × n) 𝕜).traceRight = (Fintype.card n : ℝ) • 1 := by
+  conv_lhs => rw [← kronecker_one_one]
+  rw [traceRight_kron, trace_one]
+
+theorem traceRight_add_smul_one [Fintype n] (A : HermitianMat (m × n) 𝕜) (ε : ℝ) :
+    (A + ε • 1).traceRight = A.traceRight + (ε * Fintype.card n) • 1 := by
+  rw [traceRight_add, traceRight_smul, one_traceRight, smul_smul]
 
 end kron
 end partialTrace

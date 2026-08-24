@@ -179,6 +179,149 @@ theorem le_one (ρ : DensityOp E) : (M ρ : HermitianMat ι ℂ) ≤ 1 := by
 
 end Operator
 
+section PartialTrace
+
+/-! ### Partial traces
+
+The reduced states of a state on a tensor product. These are the basis-free versions; the
+`MState`-level partial traces on a product index type are `MState.traceLeft` and
+`MState.traceRight`, and the two agree through `DensityOp.traceLeft_M`. -/
+
+open scoped TensorProduct
+
+variable {E F ι κ : Type*}
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F]
+
+section Left
+
+variable [CompleteSpace F]
+
+/-- The **partial trace** of a state over the left factor: the reduced state on `F`. -/
+def traceLeft (ρ : DensityOp (E ⊗[ℂ] F)) : DensityOp F where
+  op := ρ.op.traceLeft
+  op_nonneg := HermitianOp.traceLeft_nonneg _ ρ.op_nonneg
+  op_trace := by rw [HermitianOp.trace_traceLeft, ρ.op_trace]
+
+@[simp]
+theorem op_traceLeft (ρ : DensityOp (E ⊗[ℂ] F)) : ρ.traceLeft.op = ρ.op.traceLeft :=
+  rfl
+
+/-- **Matrix analogue of `DensityOp.traceLeft`.** -/
+@[simp]
+theorem traceLeft_M [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+    [Fintype κ] [DecidableEq κ] [StdBasis ℂ F κ] (ρ : DensityOp (E ⊗[ℂ] F)) :
+    (M ρ.traceLeft : HermitianMat κ ℂ) = (M ρ : HermitianMat (ι × κ) ℂ).traceLeft := by
+  rw [M, M, op_traceLeft, HermitianOp.toMat_traceLeft (ι := ι)]
+
+end Left
+
+section Right
+
+variable [CompleteSpace E]
+
+/-- The **partial trace** of a state over the right factor: the reduced state on `E`. -/
+def traceRight (ρ : DensityOp (E ⊗[ℂ] F)) : DensityOp E where
+  op := ρ.op.traceRight
+  op_nonneg := HermitianOp.traceRight_nonneg _ ρ.op_nonneg
+  op_trace := by rw [HermitianOp.trace_traceRight, ρ.op_trace]
+
+@[simp]
+theorem op_traceRight (ρ : DensityOp (E ⊗[ℂ] F)) : ρ.traceRight.op = ρ.op.traceRight :=
+  rfl
+
+/-- **Matrix analogue of `DensityOp.traceRight`.** -/
+@[simp]
+theorem traceRight_M [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι]
+    [Fintype κ] [DecidableEq κ] [StdBasis ℂ F κ] (ρ : DensityOp (E ⊗[ℂ] F)) :
+    (M ρ.traceRight : HermitianMat ι ℂ) = (M ρ : HermitianMat (ι × κ) ℂ).traceRight := by
+  rw [M, M, op_traceRight, HermitianOp.toMat_traceRight (κ := κ)]
+
+end Right
+
+end PartialTrace
+
+section Congr
+
+/-! ### Transport along an isometry
+
+A linear isometry equivalence `E ≃ₗᵢ[ℂ] F` carries states on `E` to states on `F`. The case of
+interest is `StdBasis.equiv`, which identifies two spaces whose preferred bases share an index
+type; along it the density matrix is literally unchanged, which is what lets a state on
+`EuclideanSpace ℂ (d₁ × d₂)` be read as a state on a tensor product. -/
+
+variable {E F ι : Type*}
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F] [FiniteDimensional ℂ F]
+
+/-- Transport a state along a linear isometry equivalence. -/
+def congr (ρ : DensityOp E) (e : E ≃ₗᵢ[ℂ] F) : DensityOp F where
+  op := ρ.op.congr e
+  op_nonneg := HermitianOp.congr_nonneg ρ.op_nonneg e
+  op_trace := by rw [HermitianOp.trace_congr, ρ.op_trace]
+
+@[simp]
+theorem op_congr (ρ : DensityOp E) (e : E ≃ₗᵢ[ℂ] F) : (ρ.congr e).op = ρ.op.congr e :=
+  rfl
+
+@[simp]
+theorem congr_congr_symm (ρ : DensityOp E) (e : E ≃ₗᵢ[ℂ] F) : (ρ.congr e).congr e.symm = ρ := by
+  refine ext_op (HermitianOp.ext ?_)
+  rw [op_congr, op_congr, HermitianOp.op_congr, HermitianOp.op_congr,
+    ← LinearIsometryEquiv.symm_conjStarAlgEquiv, StarAlgEquiv.symm_apply_apply]
+
+@[simp]
+theorem congr_symm_congr (ρ : DensityOp F) (e : E ≃ₗᵢ[ℂ] F) : (ρ.congr e.symm).congr e = ρ := by
+  simpa using congr_congr_symm ρ e.symm
+
+/-- **Matrix analogue of `DensityOp.congr`** along `StdBasis.equiv`: the density matrix is
+unchanged. -/
+@[simp]
+theorem M_congr [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [StdBasis ℂ F ι] (ρ : DensityOp E) :
+    (M (ρ.congr (StdBasis.equiv ℂ E F ι)) : HermitianMat ι ℂ) = (M ρ : HermitianMat ι ℂ) := by
+  rw [M, M, op_congr, HermitianOp.toMat_congr_equiv]
+
+/-- **Matrix analogue of `DensityOp.congr`** along an isometry that carries the preferred basis of
+`E` to that of `F` up to a relabelling `σ` of the index: the density matrix is relabelled along
+`σ`. -/
+theorem M_congr_of_stdBasis {κ : Type*} [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [Fintype κ]
+    [DecidableEq κ] [StdBasis ℂ F κ] (ρ : DensityOp E) (e : E ≃ₗᵢ[ℂ] F) (σ : ι ≃ κ)
+    (he : ∀ i, e (stdBasis (𝕜 := ℂ) (E := E) i) = stdBasis (𝕜 := ℂ) (E := F) (σ i)) :
+    (M (ρ.congr e) : HermitianMat κ ℂ) = (M ρ : HermitianMat ι ℂ).reindex σ := by
+  rw [M, M, op_congr, HermitianOp.toMat_congr_of_stdBasis _ e σ he]
+
+variable (F) in
+/-- Read a state on `E` as a state on any other space whose preferred basis has the same index
+type, by matching up the two preferred bases. The density matrix is unchanged: `M_transport`. -/
+noncomputable def transport [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [StdBasis ℂ F ι]
+    (ρ : DensityOp E) : DensityOp F :=
+  ρ.congr (StdBasis.equiv ℂ E F ι)
+
+/-- **Matrix analogue of `DensityOp.transport`**: the density matrix is unchanged. -/
+@[simp]
+theorem M_transport [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [StdBasis ℂ F ι]
+    (ρ : DensityOp E) : (M (ρ.transport F) : HermitianMat ι ℂ) = (M ρ : HermitianMat ι ℂ) :=
+  M_congr ρ
+
+@[simp]
+theorem transport_self [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] (ρ : DensityOp E) :
+    ρ.transport E = ρ :=
+  DensityOp.ext (M_transport ρ)
+
+@[simp]
+theorem transport_transport [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] [StdBasis ℂ F ι]
+    (ρ : DensityOp E) : (ρ.transport F).transport E = ρ :=
+  DensityOp.ext (by rw [M_transport, M_transport])
+
+/-- Every state is the transport of a state on the Euclidean space with the same index type. Used
+to reduce a basis-free statement to its index-level counterpart: `obtain ⟨μ, rfl⟩ :=
+ρ.exists_transport_eq` replaces `ρ` by `μ.transport _` throughout. -/
+theorem exists_transport_eq [Fintype ι] [DecidableEq ι] [StdBasis ℂ E ι] (ρ : DensityOp E) :
+    ∃ μ : MState ι, μ.transport E = ρ :=
+  ⟨ρ.transport _, transport_transport ρ⟩
+
+end Congr
+
 end DensityOp
 
 namespace MState
@@ -352,6 +495,35 @@ theorem pure_M_apply {i j : d} : (pure ψ).M i j = (ψ i) * conj (ψ j) := by
 theorem pure_mul_self : (pure ψ).m * (pure ψ).m = (pure ψ : Matrix d d ℂ) := by
   rw [show ((pure ψ : Matrix d d ℂ)) = (pure ψ).m from rfl, ← mat_M, pure_M]
   simp [Matrix.vecMulVec_mul_vecMulVec, ← Braket.dot_eq_dotProduct]
+
+/-- Sandwiching a state between two copies of the projector `∣ψ⟩⟨ψ∣` gives that projector back,
+scaled by the expectation value `⟨ψ∣σ∣ψ⟩`. -/
+theorem conj_pure : σ.M.conj (pure ψ).M.mat = (σ.exp_val (pure ψ).M) • (pure ψ).M := by
+  set u : d → ℂ := fun i ↦ ψ i with hu
+  set v : d → ℂ := fun i ↦ conj (ψ i) with hv
+  have hmat : (pure ψ).m = Matrix.vecMulVec u v := by
+    rw [← mat_M, pure_M, HermitianMat.mat_mk]
+    ext i j
+    simp [Matrix.vecMulVec_apply, Bra.eq_conj, hu, hv]
+  have hsc : ((σ.exp_val (pure ψ).M : ℝ) : ℂ) = (v ᵥ* σ.m) ⬝ᵥ u := by
+    rw [← RCLike.ofReal_eq_complex_ofReal, exp_val, HermitianMat.inner_eq_trace_rc,
+      mat_M, mat_M, hmat, Matrix.mul_vecMulVec, ← Matrix.dotProduct_mulVec, dotProduct_comm]
+    rfl
+  ext1
+  rw [HermitianMat.conj_apply_mat, HermitianMat.conjTranspose_mat, HermitianMat.mat_smul]
+  simp only [mat_M, hmat]
+  rw [Matrix.vecMulVec_mul, Matrix.vecMulVec_mul_vecMulVec, Matrix.vecMulVec_smul, ← hsc]
+  ext i j
+  simp [Complex.real_smul]
+
+/-- The projectors onto the standard basis states sum to the identity. -/
+theorem sum_pure_basis : ∑ i : d, (pure (Ket.basis i)).M = 1 := by
+  ext1
+  rw [show (∑ i : d, (pure (Ket.basis i)).M).mat = ∑ i : d, ((pure (Ket.basis i)).M).mat from
+    map_sum (HermitianMat.matₗ (R := ℝ)) _ _]
+  ext i j
+  simp [Matrix.sum_apply, Matrix.vecMulVec_apply, Bra.eq_conj, Ket.basis, Ket.apply,
+    Matrix.one_apply, apply_ite, eq_comm]
 
 /-- The purity of a state is Tr[ρ^2]. This is a `Prob`, because it is always
 between zero and one. -/
@@ -677,6 +849,58 @@ theorem traceRight_M (ρ : MState (d₁ × d₂)) : (traceRight ρ).M = ρ.M.tra
 @[simp]
 theorem traceRight_m (ρ : MState (d₁ × d₂)) : (traceRight ρ).m = ρ.m.traceRight := by
   rw [← mat_M, traceRight_M, traceRight_mat, mat_M]
+
+section Tensor
+
+open scoped TensorProduct
+
+/-- A bipartite state, read as a state on an honest tensor product.
+
+`MState (d₁ × d₂)` is a state on `EuclideanSpace ℂ (d₁ × d₂)`, whose preferred basis happens to be
+indexed by a product; this transports it along `StdBasis.equiv` to the tensor product of the two
+factors, where the basis-free partial traces `DensityOp.traceLeft` and `DensityOp.traceRight`
+live. -/
+noncomputable def toTensor (ρ : MState (d₁ × d₂)) :
+    DensityOp (EuclideanSpace ℂ d₁ ⊗[ℂ] EuclideanSpace ℂ d₂) :=
+  ρ.transport _
+
+@[simp]
+theorem M_toTensor (ρ : MState (d₁ × d₂)) : (M ρ.toTensor : HermitianMat (d₁ × d₂) ℂ) = ρ.M :=
+  DensityOp.M_transport ρ
+
+section Factors
+
+variable {E F : Type*}
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [StdBasis ℂ E d₁]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [StdBasis ℂ F d₂]
+
+/-- The index-level partial trace is the operator-level one, read through `DensityOp.transport`. -/
+@[simp]
+theorem traceLeft_transport (ρ : MState (d₁ × d₂)) :
+    (ρ.transport (E ⊗[ℂ] F)).traceLeft = ρ.traceLeft.transport F := by
+  ext1
+  rw [DensityOp.traceLeft_M (ι := d₁), DensityOp.M_transport, DensityOp.M_transport, traceLeft_M]
+
+/-- The index-level partial trace is the operator-level one, read through `DensityOp.transport`. -/
+@[simp]
+theorem traceRight_transport (ρ : MState (d₁ × d₂)) :
+    (ρ.transport (E ⊗[ℂ] F)).traceRight = ρ.traceRight.transport E := by
+  ext1
+  rw [DensityOp.traceRight_M (κ := d₂), DensityOp.M_transport, DensityOp.M_transport, traceRight_M]
+
+end Factors
+
+/-- The index-level partial trace is the operator-level one, read through `MState.toTensor`. -/
+@[simp]
+theorem traceLeft_toTensor (ρ : MState (d₁ × d₂)) : ρ.toTensor.traceLeft = ρ.traceLeft := by
+  rw [toTensor, traceLeft_transport, DensityOp.transport_self]
+
+/-- The index-level partial trace is the operator-level one, read through `MState.toTensor`. -/
+@[simp]
+theorem traceRight_toTensor (ρ : MState (d₁ × d₂)) : ρ.toTensor.traceRight = ρ.traceRight := by
+  rw [toTensor, traceRight_transport, DensityOp.transport_self]
+
+end Tensor
 
 /-- Taking the direct product on the left and tracing it back out gives the same state. -/
 @[simp]
@@ -1369,6 +1593,46 @@ theorem traceLeft_left_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
 theorem traceRight_right_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
     ρ.assoc'.traceRight.traceRight = ρ.traceRight := by
   simp [assoc']
+
+section TensorRearrange
+
+/-! ### Rearranging tensor factors, operator-side
+
+`MState.SWAP` and `MState.assoc` relabel the index type of a composite system; read through
+`DensityOp.transport`, they are the tensor-product isometries of Mathlib. -/
+
+open scoped TensorProduct
+
+variable {E F G : Type*}
+variable [NormedAddCommGroup E] [InnerProductSpace ℂ E] [StdBasis ℂ E d₁]
+variable [NormedAddCommGroup F] [InnerProductSpace ℂ F] [StdBasis ℂ F d₂]
+variable [NormedAddCommGroup G] [InnerProductSpace ℂ G] [StdBasis ℂ G d₃]
+
+/-- Swapping the two halves of a bipartite state is `TensorProduct.commIsometry`. -/
+theorem SWAP_transport (ρ : MState (d₁ × d₂)) :
+    ρ.SWAP.transport (F ⊗[ℂ] E) = (ρ.transport (E ⊗[ℂ] F)).congr (TensorProduct.commIsometry ℂ E F)
+    := by
+  ext1
+  rw [DensityOp.M_congr_of_stdBasis _ _ (Equiv.prodComm d₁ d₂) StdBasis.commIsometry_stdBasis,
+    DensityOp.M_transport, DensityOp.M_transport, SWAP_M]
+
+/-- Reassociating a tripartite state is `TensorProduct.assocIsometry`. -/
+theorem assoc_transport (ρ : MState ((d₁ × d₂) × d₃)) :
+    ρ.assoc.transport (E ⊗[ℂ] (F ⊗[ℂ] G)) =
+      (ρ.transport ((E ⊗[ℂ] F) ⊗[ℂ] G)).congr (TensorProduct.assocIsometry ℂ E F G) := by
+  ext1
+  rw [DensityOp.M_congr_of_stdBasis _ _ (Equiv.prodAssoc d₁ d₂ d₃)
+    StdBasis.assocIsometry_stdBasis, DensityOp.M_transport, DensityOp.M_transport, assoc_M]
+
+/-- Reassociating a tripartite state the other way is `TensorProduct.assocIsometry.symm`. -/
+theorem assoc'_transport (ρ : MState (d₁ × d₂ × d₃)) :
+    ρ.assoc'.transport ((E ⊗[ℂ] F) ⊗[ℂ] G) =
+      (ρ.transport (E ⊗[ℂ] (F ⊗[ℂ] G))).congr (TensorProduct.assocIsometry ℂ E F G).symm := by
+  have h := assoc_transport (E := E) (F := F) (G := G) ρ.assoc'
+  rw [assoc_assoc'] at h
+  rw [h, DensityOp.congr_congr_symm]
+
+end TensorRearrange
 
 @[simp]
 theorem traceNorm_eq_1 (ρ : MState d) : ρ.m.traceNorm = 1 :=

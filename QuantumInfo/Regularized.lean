@@ -5,6 +5,7 @@ Authors: Alex Meiburg
 -/
 import QuantumInfo.ForMathlib.Superadditive
 import Mathlib.Order.LiminfLimsup
+import Mathlib.Topology.Order.LiminfLimsup
 import Mathlib.Topology.Order.MonotoneConvergence
 
 /-! Definition of "Regularized quantities" as are common in information theory,
@@ -118,25 +119,25 @@ section real
 
 variable {fn : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
 
+/-- Negating a real sequence swaps `liminf` and `limsup`. -/
+private theorem liminf_neg (s : ℕ → ℝ) :
+    Filter.liminf (fun n ↦ -s n) Filter.atTop = -Filter.limsup s Filter.atTop := by
+  rw [Filter.liminf_eq, Filter.limsup_eq]
+  have h_sup_neg_inf : ∀ S : Set ℝ, sSup S = -sInf (-S) := by
+    intro S
+    rw [Real.sInf_def]
+    aesop
+  convert h_sup_neg_inf _ using 3
+  aesop
+
 theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
-  sorry
+  rw [InfRegularized, SupRegularized, ← liminf_neg]
+  simp
 
 theorem SupRegularized.to_InfRegularized : SupRegularized fn hl hu = -InfRegularized (-fn ·)
     (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
-  -- By definition of `InfRegularized` and `SupRegularized`, we can rewrite the goal using the fact that the liminf of a function is the negative of the limsup of its negative.
-  have h_limsup_limsup : Filter.limsup fn Filter.atTop = -Filter.liminf (fun n => -fn n) Filter.atTop := by
-    -- By definition of liminf and limsup, we know that for any sequence of real numbers, the liminf of the negative of the sequence is the negative of the limsup of the original sequence.
-    have h_limsup_neg : ∀ (s : ℕ → ℝ), Filter.liminf (fun n => -s n) Filter.atTop = -Filter.limsup s Filter.atTop := by
-      -- Apply the definition of liminf and limsup.
-      intros s
-      rw [Filter.liminf_eq, Filter.limsup_eq];
-      -- By definition of supremum and infimum, we know that the supremum of a set is the negative of the infimum of its negative.
-      have h_sup_neg_inf : ∀ (S : Set ℝ), sSup S = -sInf (-S) := by
-        intro S; rw [ Real.sInf_def ] ; aesop;
-      convert h_sup_neg_inf _ using 3 ; aesop;
-    rw [ h_limsup_neg, neg_neg ];
-  exact h_limsup_limsup
+  rw [InfRegularized, SupRegularized, liminf_neg, neg_neg]
 
 /-- For `Antitone` functions, the value `Filter.Tendsto` the `InfRegularized` value. -/
 theorem InfRegularized.anti_tendsto (h : Antitone fn) :
@@ -159,6 +160,9 @@ theorem InfRegularized.of_Subadditive (hf : Subadditive (fun n ↦ fn n * n))
       convert Or.inr (hl (n+1))
       field_simp
   )
-  apply tendsto_nhds_unique h₁
-  have := InfRegularized.anti_tendsto (fn := fn) (hl := hl) (hu := hu) (sorry)
-  sorry
+  have h₂ : Filter.Tendsto fn Filter.atTop (nhds hf.lim) := by
+    refine h₁.congr' ?_
+    filter_upwards [Filter.eventually_gt_atTop 0] with n hn
+    have hn' : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+    field_simp
+  rw [InfRegularized, Filter.Tendsto.liminf_eq h₂]

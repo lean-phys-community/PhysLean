@@ -201,6 +201,12 @@ theorem ZIntegrable (hV : 0 < V) (hβ : 0 < β) : IdealGas.ZIntegrable (n,V) β 
     exact hZpos.ne'
   · exact hZpos.ne'
 
+theorem PositiveβIntegrable (hV : 0 < V) : IdealGas.PositiveβIntegrable (n,V) :=
+  fun _ hβ ↦ ZIntegrable n hV hβ
+
+theorem LocallyZIntegrable (hV : 0 < V) (hβ : 0 < β) : IdealGas.LocallyZIntegrable (n,V) β :=
+  (PositiveβIntegrable n hV).locallyZIntegrable hβ
+
 /-- The ideal gas law: PV = nRT. In our unitsless system, R = 1.-/
 theorem IdealGasLaw (hV : 0 < V) (hT : 0 < T) :
     let P := IdealGas.Pressure (n,V) T;

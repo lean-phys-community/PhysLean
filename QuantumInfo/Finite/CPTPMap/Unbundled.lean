@@ -135,6 +135,32 @@ theorem of_kraus_isTracePreserving
 theorem submatrix (e : A ≃ B) : (MatrixMap.submatrix R e).IsTracePreserving := by
   intro; simp
 
+section piProd
+
+variable {R : Type*} [CommSemiring R]
+variable {ι : Type u} [DecidableEq ι] [Fintype ι]
+variable {dI : ι → Type v} [∀i, Fintype (dI i)] [∀i, DecidableEq (dI i)]
+variable {dO : ι → Type w} [∀i, Fintype (dO i)] [∀i, DecidableEq (dO i)]
+
+omit [(i : ι) → DecidableEq (dO i)] in
+/-- The `MatrixMap.piProd` product of trace-preserving maps is trace preserving. -/
+theorem piProd {Λi : ∀ i, MatrixMap (dI i) (dO i) R} (h : ∀ i, (Λi i).IsTracePreserving) :
+    (MatrixMap.piProd Λi).IsTracePreserving := by
+  intro x
+  conv_lhs => rw [Matrix.matrix_eq_sum_single x]
+  conv_rhs => rw [Matrix.matrix_eq_sum_single x]
+  simp only [map_sum, Matrix.trace_sum]
+  refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun b _ ↦ ?_
+  rw [show Matrix.single a b (x a b) = x a b • Matrix.single a b (1 : R) by
+    rw [Matrix.smul_single, smul_eq_mul, mul_one]]
+  rw [map_smul, Matrix.trace_smul, Matrix.trace_smul]
+  congr 1
+  rw [MatrixMap.piProd_single, Matrix.trace_piProd, ← Matrix.piProd_single a b,
+    Matrix.trace_piProd]
+  exact Finset.prod_congr rfl fun i _ ↦ h i _
+
+end piProd
+
 end IsTracePreserving
 end tp
 
@@ -238,6 +264,73 @@ theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsPositive) (h₂ : M₂.
 theorem smul {M : MatrixMap A B R} (hM : M.IsPositive) {x : R} (hx : 0 ≤ x) :
     (x • M).IsPositive :=
   fun _ h ↦ (hM h).smul hx
+
+section Contraction
+
+variable {M : MatrixMap A B ℂ}
+
+/-- A positive map, viewed as a map on Hermitian matrices. -/
+noncomputable def herm (hM : M.IsPositive) (X : HermitianMat A ℂ) : HermitianMat B ℂ :=
+  ⟨M X.mat, hM.IsHermitianPreserving X.H⟩
+
+@[simp]
+theorem mat_herm (hM : M.IsPositive) (X : HermitianMat A ℂ) : (hM.herm X).mat = M X.mat :=
+  rfl
+
+/-- A positive map is monotone for the Loewner order. -/
+theorem herm_mono (hM : M.IsPositive) {X Y : HermitianMat A ℂ} (h : X ≤ Y) :
+    hM.herm X ≤ hM.herm Y := by
+  rw [HermitianMat.le_iff] at h ⊢
+  have hsub : (hM.herm Y - hM.herm X).mat = M ((Y - X).mat) := by
+    rw [HermitianMat.mat_sub, HermitianMat.mat_sub, map_sub, mat_herm, mat_herm]
+  rw [hsub]
+  exact hM h
+
+/-- On positive semidefinite inputs, a trace-preserving positive map preserves the trace norm,
+because the trace norm of a positive semidefinite matrix is its trace. -/
+theorem traceNorm_map_eq_trace (hM : M.IsPositive) (hTP : M.IsTracePreserving)
+    {X : HermitianMat A ℂ} (hX : 0 ≤ X) : (M X.mat).traceNorm = X.trace := by
+  have hpsd : (M X.mat).PosSemidef := hM (HermitianMat.zero_le_iff.mp hX)
+  have h := hpsd.traceNorm_PSD_eq_trace
+  rw [hTP X.mat, ← HermitianMat.trace_eq_trace_rc] at h
+  exact_mod_cast h
+
+variable [DecidableEq A]
+
+/-- A positive trace-preserving map is a contraction in the trace norm, on Hermitian inputs.
+
+The Jordan decomposition `X = X⁺ - X⁻` reduces this to the positive semidefinite case, where the
+trace norm is the trace and so is exactly preserved. -/
+theorem traceNorm_le (hM : M.IsPositive) (hTP : M.IsTracePreserving) (X : HermitianMat A ℂ) :
+    (M X.mat).traceNorm ≤ X.mat.traceNorm :=
+  calc (M X.mat).traceNorm = (M (X⁺).mat - M (X⁻).mat).traceNorm := by
+        rw [← map_sub, ← HermitianMat.mat_sub, HermitianMat.posPart_add_negPart]
+    _ ≤ (M (X⁺).mat).traceNorm + (M (X⁻).mat).traceNorm := Matrix.traceNorm_triangleIneq' _ _
+    _ = (X⁺).trace + (X⁻).trace := by
+        rw [hM.traceNorm_map_eq_trace hTP X.posPart_nonneg,
+          hM.traceNorm_map_eq_trace hTP X.negPart_nonneg]
+    _ = X.mat.traceNorm := (HermitianMat.traceNorm_eq_trace_posPart_add_negPart X).symm
+
+variable [DecidableEq B]
+
+theorem herm_smul_one (hM : M.IsPositive) (hu : M.Unital) (c : ℝ) :
+    hM.herm (c • 1) = c • 1 := by
+  apply HermitianMat.ext
+  rw [mat_herm, HermitianMat.mat_smul, HermitianMat.mat_one, HermitianMat.mat_smul,
+    HermitianMat.mat_one, LinearMap.map_smul_of_tower, hu.map_1]
+
+/-- A positive unital map is a contraction in the operator norm, on Hermitian inputs: it maps the
+Loewner order interval `[-c, c]` into itself. -/
+theorem mem_Icc_smul_one_of_unital (hM : M.IsPositive) (hu : M.Unital) {X : HermitianMat A ℂ}
+    {c : ℝ} (h₁ : -(c • 1) ≤ X) (h₂ : X ≤ c • 1) :
+    -(c • 1) ≤ hM.herm X ∧ hM.herm X ≤ c • 1 := by
+  have hneg : hM.herm ((-c) • 1) = -(c • 1) := by
+    rw [hM.herm_smul_one hu, neg_smul]
+  refine ⟨hneg ▸ hM.herm_mono ?_, hM.herm_smul_one hu c ▸ hM.herm_mono h₂⟩
+  rw [neg_smul]
+  exact h₁
+
+end Contraction
 
 end IsPositive
 
@@ -771,10 +864,15 @@ variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
 variable {dI : ι → Type v} [∀i, Fintype (dI i)] [∀i, DecidableEq (dI i)]
 variable {dO : ι → Type w} [∀i, Fintype (dO i)] [∀i, DecidableEq (dO i)]
 
+omit [∀ i, DecidableEq (dO i)] in
 /-- The `MatrixMap.piProd` product of IsCompletelyPositive maps is also completely positive. -/
 theorem piProd {Λi : ∀ i, MatrixMap (dI i) (dO i) R} (h₁ : ∀ i, (Λi i).IsCompletelyPositive) :
     IsCompletelyPositive (MatrixMap.piProd Λi) := by
-  sorry
+  have h : ∀ i, ∃ K : (dO i × dI i) → Matrix (dO i) (dI i) R, Λi i = of_kraus K K :=
+    fun i ↦ IsCompletelyPositive.exists_kraus _ (h₁ i)
+  choose K hK using h
+  rw [funext hK, MatrixMap.piProd_of_kraus]
+  exact of_kraus_isCompletelyPositive _
 
 end piProd
 

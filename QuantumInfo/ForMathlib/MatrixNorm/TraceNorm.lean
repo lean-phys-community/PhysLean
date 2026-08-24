@@ -160,26 +160,158 @@ theorem traceNorm_smul (A : Matrix m n R) (c : R) : (c • A).traceNorm = ‖c�
     · exact le_trans ( by norm_num ) (
         smul_le_smul_of_nonneg_left ( show 0 ≤ CFC.sqrt M from by exact (CFC.sqrt_nonneg M) ) ( norm_nonneg c ) );
 
-/-- For square matrices, the trace norm is max Tr[U * A] over unitaries U.-/
-theorem traceNorm_eq_max_tr_U (A : Matrix n n R) : IsGreatest {x | ∃ (U : unitaryGroup n R), (U.1 * A).trace = x} A.traceNorm := by
-  sorry
+/-- For square matrices, the trace norm is the largest value of `Re Tr[U * A]` over unitaries `U`.
+The maximum is attained at `U = W⁻¹`, where `A = W√(AᴴA)` is the polar decomposition. -/
+theorem traceNorm_eq_max_re_tr_U (A : Matrix n n R) :
+    IsGreatest {x : ℝ | ∃ U : unitaryGroup n R, RCLike.re (U.1 * A).trace = x} A.traceNorm := by
+  obtain ⟨W, hW, hA⟩ := A.exists_unitary_mul_sqrt_conjTranspose_mul_self
+  set P := CFC.sqrt (Aᴴ * A) with hP
+  have hPnn : (0 : Matrix n n R) ≤ P := CFC.sqrt_nonneg _
+  constructor
+  · refine ⟨⟨star W, Unitary.star_mem hW⟩, ?_⟩
+    show RCLike.re (star W * A).trace = _
+    simp only [traceNorm, ← hP]
+    congr 1
+    rw [hA, ← mul_assoc, mem_unitaryGroup_iff'.mp hW, one_mul]
+  · rintro x ⟨U, rfl⟩
+    -- Writing `√(AᴴA) = S * S` and cycling the trace, `Tr[UA] = ∑ᵢ ⟪S eᵢ, U W S eᵢ⟫`, which by
+    -- Cauchy-Schwarz is at most `∑ᵢ ‖S eᵢ‖² = Tr[√(AᴴA)]`.
+    set S := CFC.sqrt P with hS
+    have hSnn : (0 : Matrix n n R) ≤ S := CFC.sqrt_nonneg _
+    have hSS : S * S = P := CFC.sqrt_mul_sqrt_self P hPnn
+    have hSH : Sᴴ = S := (Matrix.nonneg_iff_posSemidef.mp hSnn).isHermitian
+    have hs_adj := adjoint_toEuclideanLin_of_isHermitian hSH
+    set V := (U : Matrix n n R) * W with hV
+    have hVU : Vᴴ * V = 1 := by
+      rw [← star_eq_conjTranspose]
+      exact mem_unitaryGroup_iff'.mp (mul_mem U.2 hW)
+    have hViso : ∀ y : EuclideanSpace R n, ‖V.toEuclideanLin y‖ = ‖y‖ := by
+      intro y
+      have := norm_toEuclideanLin_eq_of_conjTranspose_mul_self_eq
+        (A := V) (B := (1 : Matrix n n R)) (by simp [hVU]) y
+      simpa [toEuclideanLin_one] using this
+    set v : n → EuclideanSpace R n := fun i => S.toEuclideanLin (EuclideanSpace.single i 1) with hv
+    have htr : (U.1 * A).trace = (S * V * S).trace := by
+      rw [hA, hV, ← hSS]
+      rw [show U.1 * (W * (S * S)) = (U.1 * W * S) * S by simp [mul_assoc]]
+      rw [Matrix.trace_mul_comm]
+      congr 1
+      simp [mul_assoc]
+    have hsum : (S * V * S).trace = ∑ i, inner (𝕜 := R) (v i) (V.toEuclideanLin (v i)) := by
+      rw [trace_eq_sum_inner]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [toEuclideanLin_mul, toEuclideanLin_mul, LinearMap.comp_apply, LinearMap.comp_apply,
+        ← LinearMap.adjoint_inner_left, hs_adj]
+    have hsumP : (∑ i, ‖v i‖ ^ 2) = A.traceNorm := by
+      rw [traceNorm, ← hP, ← hSS, trace_eq_sum_inner, map_sum]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [toEuclideanLin_mul, LinearMap.comp_apply, ← LinearMap.adjoint_inner_left, hs_adj,
+        inner_self_eq_norm_sq_to_K]
+      simp [hv]
+    rw [htr, hsum, map_sum, ← hsumP]
+    refine Finset.sum_le_sum fun i _ => ?_
+    calc RCLike.re (inner (𝕜 := R) (v i) (V.toEuclideanLin (v i)))
+        ≤ ‖v i‖ * ‖V.toEuclideanLin (v i)‖ := re_inner_le_norm _ _
+      _ = ‖v i‖ ^ 2 := by rw [hViso]; ring
+
+/-- The trace norm is invariant under the conjugate transpose (for square matrices). -/
+theorem traceNorm_conjTranspose (A : Matrix n n R) : Aᴴ.traceNorm = A.traceNorm := by
+  have key : ∀ U : Matrix n n R, RCLike.re (U * Aᴴ).trace = RCLike.re (Uᴴ * A).trace := by
+    intro U
+    rw [show U * Aᴴ = (A * Uᴴ)ᴴ by simp, Matrix.trace_conjTranspose, Matrix.trace_mul_comm]
+    simp
+  have hset : {x : ℝ | ∃ U : unitaryGroup n R, RCLike.re (U.1 * Aᴴ).trace = x}
+      = {x : ℝ | ∃ U : unitaryGroup n R, RCLike.re (U.1 * A).trace = x} := by
+    ext x
+    constructor
+    · rintro ⟨U, rfl⟩
+      exact ⟨⟨star U.1, Unitary.star_mem U.2⟩, (key U.1).symm⟩
+    · rintro ⟨U, rfl⟩
+      refine ⟨⟨star U.1, Unitary.star_mem U.2⟩, ?_⟩
+      rw [key]
+      simp [star_eq_conjTranspose]
+  exact IsGreatest.unique (hset ▸ traceNorm_eq_max_re_tr_U Aᴴ) (traceNorm_eq_max_re_tr_U A)
+
+/-- The maximizing unitary of `traceNorm_eq_max_re_tr_U`, stated without reference to
+`Matrix.unitaryGroup` or to the identity matrix, so that it can be used in contexts carrying a
+different `DecidableEq` instance than the classical one in scope here. -/
+theorem exists_unitary_re_trace_eq_traceNorm (A : Matrix n n R) :
+    ∃ U : Matrix n n R, (∀ X : Matrix n n R, Uᴴ * (U * X) = X) ∧
+      RCLike.re (U * A).trace = A.traceNorm := by
+  obtain ⟨U, hU⟩ := (traceNorm_eq_max_re_tr_U A).left
+  refine ⟨U.1, fun X ↦ ?_, hU⟩
+  rw [← mul_assoc, ← star_eq_conjTranspose, mem_unitaryGroup_iff'.mp U.2, one_mul]
+
+omit [Fintype m] in
+/-- **Cauchy-Schwarz for the trace pairing**: for square matrices, `Re Tr[Pᴴ Q]` is at most the
+trace norm of `√(QᴴQ) √(PᴴP)`. Writing the polar decompositions `P = W₁ √(PᴴP)` and
+`Q = W₂ √(QᴴQ)` turns the left side into `Re Tr[(W₁ᴴW₂) √(QᴴQ) √(PᴴP)]`, and the right side is the
+largest such value by `traceNorm_eq_max_re_tr_U`. -/
+theorem re_trace_conjTranspose_mul_le_traceNorm (P Q : Matrix n n R) :
+    RCLike.re (Pᴴ * Q).trace ≤ (CFC.sqrt (Qᴴ * Q) * CFC.sqrt (Pᴴ * P)).traceNorm := by
+  obtain ⟨W₁, hW₁, hP⟩ := P.exists_unitary_mul_sqrt_conjTranspose_mul_self
+  obtain ⟨W₂, hW₂, hQ⟩ := Q.exists_unitary_mul_sqrt_conjTranspose_mul_self
+  set S := CFC.sqrt (Pᴴ * P) with hS
+  set T := CFC.sqrt (Qᴴ * Q) with hT
+  have hSH : Sᴴ = S := (Matrix.nonneg_iff_posSemidef.mp (hS ▸ CFC.sqrt_nonneg _)).isHermitian
+  have key : (Pᴴ * Q).trace = ((star W₁ * W₂) * (T * S)).trace := by
+    rw [hP, hQ, Matrix.conjTranspose_mul, hSH, star_eq_conjTranspose,
+      show S * W₁ᴴ * (W₂ * T) = S * (W₁ᴴ * W₂ * T) by simp [Matrix.mul_assoc],
+      Matrix.trace_mul_comm]
+    congr 1
+    simp [Matrix.mul_assoc]
+  rw [key]
+  exact (traceNorm_eq_max_re_tr_U (T * S)).2
+    ⟨⟨star W₁ * W₂, mul_mem (Unitary.star_mem hW₁) hW₂⟩, rfl⟩
+
+/-- The rectangular version of `re_trace_conjTranspose_mul_le_traceNorm`, obtained by padding `P`
+and `Q` out to square matrices along an isometry `E`. -/
+theorem re_trace_conjTranspose_mul_le_traceNorm_of_isometry (P Q : Matrix m n R)
+    {E : Matrix m n R} (hE : E.Isometry) :
+    RCLike.re (Pᴴ * Q).trace ≤ (CFC.sqrt (Qᴴ * Q) * CFC.sqrt (Pᴴ * P)).traceNorm := by
+  have hE' : Eᴴ * E = 1 := hE
+  have hgram (X Y : Matrix m n R) : (X * Eᴴ)ᴴ * (Y * Eᴴ) = E * (Xᴴ * Y) * Eᴴ := by
+    simp [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+  have htr : ((P * Eᴴ)ᴴ * (Q * Eᴴ)).trace = (Pᴴ * Q).trace := by
+    rw [hgram, Matrix.trace_mul_comm, ← Matrix.mul_assoc, hE', Matrix.one_mul]
+  have h := re_trace_conjTranspose_mul_le_traceNorm (P * Eᴴ) (Q * Eᴴ)
+  rw [htr, hgram, hgram,
+    cfc_sqrt_isometry_conj (Matrix.posSemidef_conjTranspose_mul_self Q).nonneg hE,
+    cfc_sqrt_isometry_conj (Matrix.posSemidef_conjTranspose_mul_self P).nonneg hE,
+    show E * CFC.sqrt (Qᴴ * Q) * Eᴴ * (E * CFC.sqrt (Pᴴ * P) * Eᴴ)
+        = E * (CFC.sqrt (Qᴴ * Q) * CFC.sqrt (Pᴴ * P)) * Eᴴ by
+      simp only [Matrix.mul_assoc]
+      rw [← Matrix.mul_assoc Eᴴ, hE', Matrix.one_mul],
+    traceNorm_isometry_conj hE hE] at h
+  exact h
+
+/-- An isometry `Matrix m n R` exists whenever `n` embeds into `m`. -/
+theorem exists_isometry_of_card_le (h : Fintype.card n ≤ Fintype.card m) :
+    ∃ E : Matrix m n R, E.Isometry := by
+  obtain ⟨f⟩ := Function.Embedding.nonempty_of_card_le h
+  exact ⟨Matrix.submatrix 1 id f, Matrix.submatrix_one_isometry Function.bijective_id f.injective⟩
+
+/-- The rectangular version of `re_trace_conjTranspose_mul_le_traceNorm`, for matrices with at
+least as many rows as columns. -/
+theorem re_trace_conjTranspose_mul_le_traceNorm' (P Q : Matrix m n R)
+    (h : Fintype.card n ≤ Fintype.card m) :
+    RCLike.re (Pᴴ * Q).trace ≤ (CFC.sqrt (Qᴴ * Q) * CFC.sqrt (Pᴴ * P)).traceNorm := by
+  obtain ⟨E, hE⟩ := exists_isometry_of_card_le (R := R) h
+  exact re_trace_conjTranspose_mul_le_traceNorm_of_isometry P Q hE
 
 /-- the trace norm satisfies the triangle inequality (for square matrices). TODO: Prove in general. -/
 theorem traceNorm_triangleIneq (A B : Matrix n n R) : (A + B).traceNorm ≤ A.traceNorm + B.traceNorm := by
-  obtain ⟨Uab, h₁⟩ := (traceNorm_eq_max_tr_U (A + B)).left
-  rw [Matrix.mul_add, Matrix.trace_add] at h₁
-  obtain h₂ := (traceNorm_eq_max_tr_U A).right
-  obtain h₃ := (traceNorm_eq_max_tr_U B).right
+  obtain ⟨Uab, h₁⟩ := (traceNorm_eq_max_re_tr_U (A + B)).left
+  rw [Matrix.mul_add, Matrix.trace_add, map_add] at h₁
+  obtain h₂ := (traceNorm_eq_max_re_tr_U A).right
+  obtain h₃ := (traceNorm_eq_max_re_tr_U B).right
   simp only [upperBounds, Subtype.exists, exists_prop, Set.mem_setOf_eq, forall_exists_index,
     and_imp, forall_apply_eq_imp_iff₂] at h₂ h₃
   replace h₂ := h₂ Uab.1 Uab.2
   replace h₃ := h₃ Uab.1 Uab.2
-  rw [← RCLike.ofReal_le_ofReal (K := R)]
-  simp only [RCLike.ofReal_add]
-  calc _
+  calc (A + B).traceNorm
     _ = _ + _ := h₁.symm
-    _ ≤ ↑(traceNorm A) + trace (↑Uab * B) := by simp only [add_le_add_iff_right]; exact h₂
-    _ ≤ _ := by simp only [add_le_add_iff_left]; exact h₃
+    _ ≤ _ := add_le_add h₂ h₃
 
 theorem traceNorm_triangleIneq' (A B : Matrix n n R) : (A - B).traceNorm ≤ A.traceNorm + B.traceNorm := by
   rw [sub_eq_add_neg A B, ←traceNorm_eq_neg_self B]

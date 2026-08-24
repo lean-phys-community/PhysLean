@@ -1,7 +1,22 @@
 # `StdBasis` refactor: scoping, design, and migration plan
 
-Status of this document: Stages 0–2, Stage 5, and most of Stage 3 have landed, and the whole of
-`QuantumInfo` builds green with zero errors and zero warnings.
+Status of this document: Stages 0–2, Stage 5, most of Stage 3, and the core of Stage 4 have landed,
+and the whole of `QuantumInfo` builds green with zero errors and zero warnings.
+
+Sorries remaining in `lake build QuantumInfo`, all three research-paper-scale results:
+
+| Location | Statement | What it needs |
+| --- | --- | --- |
+| `Finite/Entropy/DPI.lean:383` | data processing for the sandwiched Rényi divergence | Beigi's proof (`arXiv:1306.5920`) interpolates between the two endpoint contractions below. Mathlib has `Complex.HadamardThreeLines` but no Riesz–Thorin; also missing are complex powers `A ^ z` of a PSD matrix with analyticity in `z`, Schatten-norm duality, and polar decomposition |
+| `Finite/Capacity.lean:302` | the LSD theorem (achievability of the coherent information) | decoupling / random-coding machinery, none of which exists here |
+| `Finite/Capacity.lean:307` | the regularized capacity formula | follows from the LSD theorem plus the converse |
+
+The two endpoint contractions Beigi's argument interpolates between *are* now available, in
+`MatrixMap.IsPositive`: `traceNorm_le` (a positive trace-preserving map is a trace-norm
+contraction, via the Jordan decomposition `X = X⁺ - X⁻` and the new
+`HermitianMat.traceNorm_eq_trace_posPart_add_negPart`) and `mem_Icc_smul_one_of_unital` (a positive
+unital map maps the Loewner interval `[-c • 1, c • 1]` into itself, i.e. is an operator-norm
+contraction).
 
 * **Stage 0** — `QuantumInfo/ForMathlib/StdBasis.lean` and `QuantumInfo/Finite/StdBasisState.lean`.
 * **Stage 1 (partial)** — `QuantumInfo/ForMathlib/HermitianOp.lean` defines
@@ -52,6 +67,38 @@ Status of this document: Stages 0–2, Stage 5, and most of Stage 3 have landed,
   Not yet done in Stage 3: `Entropy/SSA.lean` (still matrix-stated throughout) and
   `Entropy/DPI.lean` (blocked on Stage 4).
 
+* **Stage 4 (core)** — the partial trace and the tensor/index bridge exist.
+
+  `QuantumInfo/ForMathlib/PartialTrace.lean` (409 lines) builds the partial trace from scratch, as
+  Mathlib has none. `ContinuousLinearMap.traceLeft/traceRight` on `(E ⊗[𝕜] F) →L[𝕜] E ⊗[𝕜] F` are
+  defined by summing `tmulLeftL`/`tmulRightL` sandwiches over an orthonormal basis of the traced-out
+  factor; a `BasisIndependence` section shows the sum does not depend on that basis, so the
+  definition is honest. They are additive, `𝕜`-linear, and preserve symmetry, positivity and the
+  trace. `HermitianOp.traceLeft/traceRight` lift this to `HermitianOp`, and `toMat_traceLeft`/
+  `toMat_traceRight` are the matrix analogues, landing on `HermitianMat`'s index-wise partial trace.
+  `DensityOp.traceLeft/traceRight` follow in `MState.lean`.
+
+  The `EuclideanSpace ℂ (d₁ × d₂)` vs. `EuclideanSpace ℂ d₁ ⊗[ℂ] EuclideanSpace ℂ d₂` reconciliation
+  (§2.4) is now available generically. `StdBasis.equiv 𝕜 E F ι` is the isometry matching the two
+  preferred bases of spaces sharing an index type, and `DensityOp.transport F ρ` reads a state on any
+  such space, with `DensityOp.M_transport` saying the density matrix is unchanged. The general
+  workhorse behind all of this is "an isometry carrying preferred basis to preferred basis up to a
+  relabelling `σ : ι ≃ κ` relabels the matrix along `σ`", available at each layer as
+  `StdBasis.toMat_conjStarAlgEquiv_of_stdBasis`, `HermitianOp.toMat_congr_of_stdBasis` and
+  `DensityOp.M_congr_of_stdBasis`. That single lemma identifies the index-level rearrangements with
+  the operator-level ones: `MState.SWAP_transport` against `TensorProduct.commIsometry`, and
+  `MState.assoc_transport`/`assoc'_transport` against `TensorProduct.assocIsometry`. Partial traces
+  commute with `transport` (`MState.traceLeft_transport`, `traceRight_transport`), so `MState.toTensor`
+  turns any bipartite `MState (d₁ × d₂)` into a genuine tensor-product state with the same marginals.
+
+  On top of that, `Entropy/VonNeumann.lean` gains the operator-level composite quantities
+  `DensityOp.qConditionalEnt`, `DensityOp.qMutualInfo` and `DensityOp.qcmi` — the last stated with
+  `assocIsometry.symm` rather than an index permutation — each with its matrix analogue
+  (`qConditionalEnt_transport`, `qMutualInfo_transport`, `qcmi_transport`), alongside `Sᵥₙ_transport`.
+
+  Not yet done in Stage 4: `MState.purify`, `MState.prod`, `Ensemble.lean`, `Entanglement.lean`, and
+  the `kron`/Choi machinery.
+
 * **Stage 5** — `CPTPMap/OpMap.lean` defines `OpMap E F := (E →L[ℂ] E) →ₗ[ℂ] (F →L[ℂ] F)` with
   `OpMap.toMat`/`OpMap.ofMat` as the bridge to `MatrixMap`, and `CPTPMap/Bundled.lean` carries the
   nine-structure hierarchy `HPOp/UnitalOp/TPOp/POp/CPOp/PTPOp/PUOp/CPTPOp/CPUOp` at the operator
@@ -64,7 +111,7 @@ Status of this document: Stages 0–2, Stage 5, and most of Stage 3 have landed,
 
 Remaining downstream files (`Entropy/{SSA,DPI}`, `Ensemble`, `POVM`, `Entanglement`, `Pinching`,
 `ResourceTheory/*`) have been repaired against the new `DensityOp`/`CPTPOp` API but not yet
-migrated to operator form; they still speak in matrices via `ρ.M`. Stages 4, 6 and 7 below are
+migrated to operator form; they still speak in matrices via `ρ.M`. Stages 6 and 7 below are
 unstarted.
 
 ### Known ergonomic wart: dot notation through the `MState`/`CPTPMap` abbreviations
@@ -392,27 +439,36 @@ as demonstrated in `Finite/StdBasisState.lean`.
   is defined from it through `StdBasis.unitaryOfMat`, so all twelve existing `◃` call sites are
   unchanged.
 * `Finite/Distance/{TraceDistance, Fidelity}.lean` — done, with the trace norm staying matrix-side
-  behind `HermitianOp.traceNorm`.
+  behind `HermitianOp.traceNorm`. `TraceDistance.lean` also gained the data processing inequality
+  `TrDistance.DPI_PTP` (for a `PTPMap`, matching `Fidelity.lean`'s existing fidelity DPI) with
+  `TrDistance.DPI` as the `CPTPMap` corollary. It is stated for `PTPMap d d₂` rather than a
+  basis-free `PTPOp E F` because `PTPOp.instMFunLike` is declared inside the `StdBasis` section of
+  `CPTPMap/Bundled.lean`, so `Λ ρ` is not even elaborable without `StdBasis` instances on both
+  sides.
 * `Finite/Entropy/VonNeumann.lean` — done.
 * `Finite/Entropy/Relative.lean` — done. The definition is basis-free; the ~1450 lines of existing
   matrix-level machinery below it are untouched, reached through the `coords` transport.
-* `Finite/Entropy/SSA.lean` (1293) — not started. Large but shallow: statements about traces, `log`,
+* `Finite/Entropy/SSA.lean` (1521) — not started. Large but shallow: statements about traces, `log`,
   and CFC, almost no coordinate reasoning.
-* `Finite/Entropy/DPI.lean` (427) — depends on Stage 4.
+* `Finite/Entropy/DPI.lean` (395) — depends on Stage 4.
 
-### Stage 4 — tensor products and partial trace (L, genuinely hard)
+### Stage 4 — tensor products and partial trace (L, genuinely hard; core done)
 
 This is the first stage with real mathematical content to write, because **Mathlib has no partial
 trace**.
 
 * Build `traceLeft`/`traceRight` on `(E ⊗[ℂ] F) →L[ℂ] (E ⊗[ℂ] F)` from `LinearMap.trace` and
   `TensorProduct`, and prove they agree with the index-wise matrix definition under `toMat` and
-  `instTensorProduct`. Needs a CLM version of `TensorProduct.map` (also missing from Mathlib).
+  `instTensorProduct`. **Done**, in `ForMathlib/PartialTrace.lean`; a CLM version of
+  `TensorProduct.map` turned out to be unnecessary — summing `tmulLeftL`/`tmulRightL` sandwiches over
+  a basis of the traced-out factor avoids it, at the cost of a basis-independence proof.
 * Reconcile `EuclideanSpace ℂ (d₁ × d₂)` with `EuclideanSpace ℂ d₁ ⊗[ℂ] EuclideanSpace ℂ d₂` via an
   explicit isometry (§2.4). Everything in the library that currently writes `d₁ × d₂` for a
-  composite system passes through this.
-* Affects: `Finite/Entanglement.lean`, `Finite/Ensemble.lean`, `MState.purify`,
-  `MState.prod`/`SWAP`, and the `kron`/Choi machinery in `CPTPMap`.
+  composite system passes through this. **Done**, via `StdBasis.equiv` / `DensityOp.transport`, which
+  handle any pair of spaces sharing an index type rather than just this one pair; `SWAP` and `assoc`
+  are covered too.
+* Still to do: `MState.purify`, `MState.prod`, `Finite/Entanglement.lean`, `Finite/Ensemble.lean`,
+  and the `kron`/Choi machinery in `CPTPMap`.
 
 ### Stage 5 — `CPTPMap` (L)
 
@@ -455,7 +511,9 @@ the project can be paused after any stage.
 1. **`CompleteSpace` is not derivable from `FiniteDimensional` by instance search.** Every
    operator-level signature in the library grows binders. Resolve in Stage 0.
 2. **No partial trace and no Schatten norms in Mathlib.** These are the two largest genuinely-new
-   developments, and they sit under `Entropy`, `Distance` and `CPTPMap`.
+   developments, and they sit under `Entropy`, `Distance` and `CPTPMap`. The partial trace has since
+   been written (`ForMathlib/PartialTrace.lean`); the Schatten norms remain matrix-side behind
+   `HermitianOp.traceNorm`.
 3. **`MState.spectrum` is canonically sorted.** It is basis-independent but index-dependent, and
    the sorting is currently supplied by `Matrix.IsHermitian.eigenvalues`; the basis-free spectral
    theorem in Mathlib does not sort.

@@ -656,21 +656,6 @@ theorem rpow_le_rpow_of_le (hA : 0 ≤ A) (hAB : A ≤ B)
 
 end LoewnerHeinz
 
-section ArakiLiebThirring
-
-variable {A B : HermitianMat d ℂ} {q r : ℝ}
-
-/-- An inequality of Lieb-Thirring type. For 0 < r ≤ 1:
-  `Tr[B^r A^r B^r] ≤ Tr[(B A B)^r]`.
--/
-lemma lieb_thirring_le_one
-    {A B : HermitianMat d ℂ} (hA : 0 ≤ A) (hB : 0 ≤ B)
-    {r : ℝ} (hq0 : 0 < r) (hq1 : q ≤ r) :
-    ((A ^ r).conj (B ^ r).mat).trace ≤ ((A.conj B.mat) ^ r).trace := by
-  sorry
-
-end ArakiLiebThirring
-
 /-
 Trace subadditivity (Rotfel'd inequality): for PSD A, B and 0 < p ≤ 1,
 Tr[(A + B)^p] ≤ Tr[A^p] + Tr[B^p].
@@ -681,8 +666,95 @@ be nice to have as a fact.
 A stronger version states it as a majorization theorem. See
 e.g. https://www.math.uwaterloo.ca/~hwolkowi/henry/reports/thesismingmay613.pdf
 -/
+section Rotfeld
+
+open ComplexOrder
+open scoped RealInnerProductSpace
+
+/-- Adding a positive multiple of the identity to a PSD matrix makes it positive definite. -/
+theorem posDef_add_smul_one {A : HermitianMat d ℂ} (hA : 0 ≤ A) {ε : ℝ} (hε : 0 < ε) :
+    (A + ε • 1).mat.PosDef := by
+  rw [HermitianMat.zero_le_iff] at hA
+  rw [Matrix.posDef_iff_dotProduct_mulVec]
+  refine ⟨HermitianMat.H _, fun x hx ↦ ?_⟩
+  have h_inner : star x ⬝ᵥ (A.val.mulVec x) ≥ 0 := by
+    simp [hA]
+  have h_eps : star x ⬝ᵥ (ε • 1 : Matrix d d ℂ).mulVec x = ε * star x ⬝ᵥ x := by
+    simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm, Matrix.one_apply]
+  have h_pos : 0 < ε * star x ⬝ᵥ x := by
+    simp [*]
+  simpa [Matrix.add_mulVec, h_eps] using add_pos_of_nonneg_of_pos h_inner h_pos
+
+/-- `Tr[Aᵖ] = ⟪A, A^(p-1)⟫`, the seed of the Rotfel'd argument. -/
+private lemma inner_rpow_sub_one_self {A : HermitianMat d ℂ} (hA : 0 ≤ A) {p : ℝ} (hp : p ≠ 0) :
+    ⟪A, A ^ (p - 1)⟫ = (A ^ p).trace := by
+  have h : (A ^ p).mat = A.mat * (A ^ (p - 1)).mat := by
+    conv_lhs => rw [show p = (1 : ℝ) + (p - 1) by ring]
+    rw [mat_rpow_add hA (by intro h; exact hp (by linarith)), rpow_one]
+  rw [inner_eq_re_trace, trace_eq_re_trace, h]
+
+/-- For `A ≤ C` and `0 < p ≤ 1`, the map `X ↦ X^(p-1)` is antitone, so replacing `A` by the
+larger `C` in the second slot of `⟪A, A^(p-1)⟫ = Tr[Aᵖ]` can only decrease it. -/
+private lemma inner_rpow_sub_one_le {A C : HermitianMat d ℂ} (hA : A.mat.PosDef)
+    (hC : C.mat.PosDef) (hAC : A ≤ C) {p : ℝ} (hp : 0 < p) (hp1 : p ≤ 1) :
+    ⟪A, C ^ (p - 1)⟫ ≤ (A ^ p).trace := by
+  have hA0 : (0 : HermitianMat d ℂ) ≤ A := zero_le_iff.mpr hA.posSemidef
+  rcases eq_or_lt_of_le hp1 with rfl | hp1'
+  · simp
+  · have hs : 0 < 1 - p := by linarith
+    have h1 : A ^ (1 - p) ≤ C ^ (1 - p) := rpow_le_rpow_of_le hA0 hAC hs (by linarith)
+    have hAp : (A ^ (1 - p)).mat.PosDef :=
+      (nonSingular_iff_posDef_of_PSD (rpow_nonneg hA0)).mp ⟨isUnit_rpow_toMat hA _⟩
+    have h2 : (C ^ (1 - p))⁻¹ ≤ (A ^ (1 - p))⁻¹ := inv_antitone hAp h1
+    rw [rpow_inv_eq_neg_rpow hA, rpow_inv_eq_neg_rpow hC] at h2
+    rw [show p - 1 = -(1 - p) by ring]
+    calc ⟪A, C ^ (-(1 - p))⟫ ≤ ⟪A, A ^ (-(1 - p))⟫ := inner_mono hA0 h2
+      _ = (A ^ p).trace := by
+          rw [show -(1 - p) = p - 1 by ring]
+          exact inner_rpow_sub_one_self hA0 hp.ne'
+
+/-- The Rotfel'd inequality for positive definite `A` and `B`: splitting
+`Tr[(A+B)^p] = ⟪A, (A+B)^(p-1)⟫ + ⟪B, (A+B)^(p-1)⟫` and applying `inner_rpow_sub_one_le`
+to each summand. -/
+private lemma trace_rpow_add_le_of_posDef {A B : HermitianMat d ℂ} (hA : A.mat.PosDef)
+    (hB : B.mat.PosDef) {p : ℝ} (hp : 0 < p) (hp1 : p ≤ 1) :
+    ((A + B) ^ p).trace ≤ (A ^ p).trace + (B ^ p).trace := by
+  have hA0 : (0 : HermitianMat d ℂ) ≤ A := zero_le_iff.mpr hA.posSemidef
+  have hB0 : (0 : HermitianMat d ℂ) ≤ B := zero_le_iff.mpr hB.posSemidef
+  have hAC : A ≤ A + B := le_add_of_nonneg_right hB0
+  have hBC : B ≤ A + B := le_add_of_nonneg_left hA0
+  have hC : (A + B).mat.PosDef := posDef_of_posDef_le hA hAC
+  have h0 : ((A + B) ^ p).trace = ⟪A, (A + B) ^ (p - 1)⟫ + ⟪B, (A + B) ^ (p - 1)⟫ := by
+    rw [← HermitianMat.inner_add_left]
+    exact (inner_rpow_sub_one_self (hA0.trans hAC) hp.ne').symm
+  rw [h0]
+  exact add_le_add (inner_rpow_sub_one_le hA hC hAC hp hp1)
+    (inner_rpow_sub_one_le hB hC hBC hp hp1)
+
 lemma trace_rpow_add_le
     {A B : HermitianMat d ℂ} (hA : 0 ≤ A) (hB : 0 ≤ B)
     (p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1) :
     ((A + B) ^ p).trace ≤ (A ^ p).trace + (B ^ p).trace := by
-  sorry
+  have hrp : Continuous (fun M : HermitianMat d ℂ ↦ M ^ p) := rpow_const_continuous hp.le
+  set f : ℝ → ℝ := fun ε ↦ (((A + ε • 1) + (B + ε • 1)) ^ p).trace
+    - (((A + ε • 1) ^ p).trace + ((B + ε • 1) ^ p).trace) with hf
+  have hcont : Continuous f := by
+    apply Continuous.sub
+    · exact trace_Continuous.comp (hrp.comp (by fun_prop))
+    · exact (trace_Continuous.comp (hrp.comp (by fun_prop))).add
+        (trace_Continuous.comp (hrp.comp (by fun_prop)))
+  have hneg : ∀ ε ∈ Set.Ioi (0 : ℝ), f ε ≤ 0 := by
+    intro ε hε
+    have hε' : (0 : ℝ) < ε := hε
+    have hAε : (A + ε • (1 : HermitianMat d ℂ)).mat.PosDef := posDef_add_smul_one hA hε'
+    have hBε : (B + ε • (1 : HermitianMat d ℂ)).mat.PosDef := posDef_add_smul_one hB hε'
+    have := trace_rpow_add_le_of_posDef hAε hBε hp hp1
+    simp only [hf]
+    linarith
+  have h0 : f 0 ≤ 0 := by
+    refine le_of_tendsto (hcont.continuousWithinAt (s := Set.Ioi (0:ℝ)) (x := 0)) ?_
+    filter_upwards [self_mem_nhdsWithin] with ε hε using hneg ε hε
+  simp only [hf, zero_smul, add_zero] at h0
+  linarith
+
+end Rotfeld
