@@ -1239,7 +1239,6 @@ theorem sandwichedRenyiEntropy_mono_traceRight [Nonempty dB]
 /-
 The sandwiched Rényi divergence is invariant under unitary conjugation.
 -/
-set_option maxHeartbeats 400000 in
 theorem sandwichedRenyiEntropy_conj_unitary (hα : 0 < α) (ρ σ : MState d)
     (U : Matrix.unitaryGroup d ℂ) :
     D̃_ α(ρ.uConj U‖σ.uConj U) = D̃_ α(ρ‖σ) := by

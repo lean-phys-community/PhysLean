@@ -544,7 +544,6 @@ private lemma T₁_isometry [Nonempty dB]
   rw [T₁_mat, Matrix.reindex_apply, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv,
     h_kron, Matrix.submatrix_one_equiv]
 
-set_option maxHeartbeats 400000 in
 private lemma T₂_sq_le_one [Nonempty dB]
     (σBC : HermitianMat (dB × dC) ℂ) (hσ : σBC.mat.PosDef) :
     (T₂_mat dA dB dC σBC)ᴴ * (T₂_mat dA dB dC σBC) ≤ 1 := by

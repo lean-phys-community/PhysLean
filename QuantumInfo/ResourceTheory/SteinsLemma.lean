@@ -1092,7 +1092,6 @@ private theorem commute_sub_smul_sub {α : Type*} [Fintype α] [DecidableEq α]
     (Commute.sub_right (Commute.refl A) (h.smul_right b))
     (Commute.sub_right (h.symm.smul_left a) (((Commute.refl B).smul_left a).smul_right b))
 
-set_option maxHeartbeats 2000000 in
 set_option backward.isDefEq.respectTransparency false in
 private theorem EquationS62
     (ρ : MState (H i)) (σ : (n : ℕ) → IsFree (i := i ^ n))

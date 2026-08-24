@@ -14,7 +14,6 @@ public import Physlib.Meta.Sorry
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-set_option maxHeartbeats 1000000
 set_option maxRecDepth 100000
 
 noncomputable section
@@ -876,7 +875,6 @@ private lemma eigenvalues_bounded_near {M : ℝ → HermitianMat d ℂ}
 Uniform convergence of (x^{1+h} - x)/h to x * log x on [0, K] as h → 0.
 This is the uniform version of the derivative of s ↦ x^s at s = 1.
 -/
-set_option maxHeartbeats 800000 in
 private lemma rpow_slope_tendsto_uniformly (K : ℝ) :
     ∀ ε > 0, ∃ δ > 0, ∀ h : ℝ, 0 < |h| → |h| < δ →
     ∀ x ∈ Set.Icc 0 K, |(x ^ (1 + h) - x) / h - x * Real.log x| < ε := by
@@ -1009,7 +1007,6 @@ private lemma trace_cfc_tendsto_of_tendsto (f : ℝ → ℝ)
 The remainder term r(1+h)/h → 0 where
 `r(α) = Tr[M(α)^α] - Tr[M(α)] - Tr[ρ.M^α] + Tr[ρ.M]`
 -/
-set_option maxHeartbeats 800000 in
 private lemma cross_term_slope_tendsto_zero
     {M : ℝ → HermitianMat d ℂ}
     (hM_nonneg : ∀ᶠ α in nhds 1, 0 ≤ M α)

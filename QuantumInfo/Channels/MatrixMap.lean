@@ -236,7 +236,6 @@ noncomputable def kron [CommSemiring R] (M₁ : MatrixMap A B R) (M₂ : MatrixM
 
 scoped[MatrixMap] infixl:100 " ⊗ₖₘ " => MatrixMap.kron
 
-set_option maxHeartbeats 800000 in
 set_option synthInstance.maxHeartbeats 60000 in
 /-- The extensional definition of the Kronecker product `MatrixMap.kron`, in terms of the entries of
   its image. -/

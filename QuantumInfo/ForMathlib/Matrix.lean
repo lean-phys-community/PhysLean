@@ -790,7 +790,6 @@ theorem IsHermitian.cfc_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) (
   simp_all only [Function.comp_apply, Equiv.apply_symm_apply, algebraMap.coe_inj]
 
 
-set_option maxHeartbeats 0 in
 --Should be combined the above...? TODO Cleanup
 /--
 If a Hermitian matrix A is unitarily similar to a diagonal matrix with real entries f, then the eigenvalues of A are a permutation of f.
@@ -1106,7 +1105,6 @@ end subm
 section spectrum_kron
 
 --This is really really ugly, and already *after* trying to clean it up a bit.
-set_option maxHeartbeats 7200000
 
 open Kronecker
 open scoped Pointwise
@@ -1253,7 +1251,6 @@ private lemma spectrum_prod_le {d d₂ : Type*}
   simp only [RCLike.algebraMap_eq_ofReal] at h₁
   exact_mod_cast h₁
 
-set_option maxHeartbeats 800000
 open Kronecker in
 open scoped Pointwise in
 theorem spectrum_prod {d d₂ : Type*}

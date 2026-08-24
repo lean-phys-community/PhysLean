@@ -114,7 +114,6 @@ private lemma blockOp_mul (A00 A01 A10 A11 B00 B01 B10 B11 : L ℋ) :
     simp [ContinuousLinearMap.mul_def, add_left_comm, add_comm]
 
 set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 800000 in
 omit [Nontrivial ℋ] in
 private lemma cfcR_blockDiagonal (f : ℝ → ℝ)
     (A B : L ℋ) (hA : IsSelfAdjoint A) (hB : IsSelfAdjoint B)
@@ -184,7 +183,6 @@ private lemma blockDiagonal_le_left {A0 A1 B0 B1 : L ℋ}
 -- Scratch theorem for fast feedback while formalizing Theorem 2.5.2 `(iv) → (v)`.
 -- This file intentionally avoids importing the heavy `(i) → (iv)` proof.
 set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 3000000 in
 -- The block-matrix reduction creates large normalization goals in this scratch file.
 theorem theorem_2_5_2_iv_imp_v {f : ℝ → ℝ} (hiv : CondIVAll.{u} f)
     (hcont : ContinuousOn f Set.univ) :

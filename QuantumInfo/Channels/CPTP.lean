@@ -602,7 +602,6 @@ of emb, then use `LinearIsometry.extend` to extend to the full space. Since in f
 dimensions a linear isometry from a space to itself is surjective, this gives a
 LinearIsometryEquiv, hence a unitary matrix.
 -/
-set_option maxHeartbeats 1600000 in
 private lemma exists_unitary_extending_isometry
     {m n : Type*} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
     (V : Matrix m n ℂ) (hV : V.conjTranspose * V = 1)
