@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Robert Sneiderman, Joseph Tooby-Smith
 -/
 module
 
@@ -196,6 +196,133 @@ lemma toTensor_eq_ofRat : σ^^^ = ofRat (fun b =>
   decide +kernel
 
 set_option backward.isDefEq.respectTransparency false in
+/-- Rational-complex components of `σ^^^` after dualizing its left-handed Weyl index. -/
+lemma toTensor_dualLeft_eq_ofRat :
+    {σ^^^ | μ τ(α) β}ᵀ =
+      ofRat (fun b =>
+        ∑ x : Fin 2, pauliContrComponent (b 0) x (b 2) *
+          (if x.val = 0 ∧ (b 1).val = 1 then 1 else
+            if (b 1).val = 0 ∧ x.val = 1 then -1 else 0)) := by
+  let M : ℂT[.downL, .downL] := εL'
+  conv_lhs =>
+    rw [toTensor_eq_ofRat]
+    rw [toDualMapAtIndex]
+    change crossToSlot 1 0 (by rfl) M (ofRat _)
+    erw [crossToSlot_eq_crossToEnd]
+    erw [crossToEnd]
+    simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
+    dsimp only [M]
+    rw [dualLeftMetric_eq_ofRat]
+    rw [prodT_ofRat_ofRat]
+    rw [permT_ofRat]
+    rw [contrT_ofRat]
+    rw [permT_ofRat]
+    rw [permT_ofRat]
+  congr
+  funext b
+  decide +revert +kernel
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Rational-complex components of `σ^^^` after dualizing both Weyl indices. -/
+lemma toTensor_dualWeyl_eq_ofRat :
+    {σ^^^ | μ τ(α) τ(β)}ᵀ =
+      ofRat (fun b =>
+        pauliContrDownComponent (b 0) (b 2) (b 1)) := by
+  rw [toTensor_dualLeft_eq_ofRat]
+  let M : ℂT[.downR, .downR] := εR'
+  conv_lhs =>
+    rw [toDualMapAtIndex]
+    change crossToSlot 2 0 (by rfl) M (ofRat _)
+    erw [crossToSlot_eq_crossToEnd]
+    erw [crossToEnd]
+    simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
+    dsimp only [M]
+    rw [dualRightMetric_eq_ofRat]
+    rw [prodT_ofRat_ofRat]
+    rw [permT_ofRat]
+    rw [contrT_ofRat]
+    rw [permT_ofRat]
+    rw [permT_ofRat]
+  congr
+  funext b
+  decide +revert +kernel
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Rational-complex components of `σ^^^` after dualizing its Lorentz index. -/
+lemma toTensor_dualLorentz_eq_ofRat :
+    {σ^^^ | τ(μ) α β}ᵀ =
+      ofRat (fun b => pauliContrDownComponent (b 0) (b 1) (b 2)) := by
+  let M : ℂT[.down, .down] := η'
+  conv_lhs =>
+    rw [toTensor_eq_ofRat]
+    rw [toDualMapAtIndex]
+    change crossToSlot 0 0 (by rfl) M (ofRat _)
+    erw [crossToSlot_eq_crossToEnd]
+    erw [crossToEnd]
+    simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
+    dsimp only [M]
+    rw [coMetric_eq_ofRat]
+    rw [prodT_ofRat_ofRat]
+    rw [permT_ofRat]
+    rw [contrT_ofRat]
+    rw [permT_ofRat]
+    rw [permT_ofRat]
+  congr
+  funext b
+  decide +revert +kernel
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Rational-complex components of `σ^^^` after dualizing its Lorentz and left-handed Weyl
+indices. -/
+lemma toTensor_dualLorentzLeft_eq_ofRat :
+    {σ^^^ | τ(μ) τ(α) β}ᵀ = ofRat (fun b =>
+      ∑ x : Fin 2, pauliContrDownComponent (b 0) x (b 2) *
+        (if x.val = 0 ∧ (b 1).val = 1 then 1 else
+          if (b 1).val = 0 ∧ x.val = 1 then -1 else 0)) := by
+  rw [toTensor_dualLorentz_eq_ofRat]
+  let M : ℂT[.downL, .downL] := εL'
+  conv_lhs =>
+    rw [toDualMapAtIndex]
+    change crossToSlot 1 0 (by rfl) M (ofRat _)
+    erw [crossToSlot_eq_crossToEnd]
+    erw [crossToEnd]
+    simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
+    dsimp only [M]
+    rw [dualLeftMetric_eq_ofRat]
+    rw [prodT_ofRat_ofRat]
+    rw [permT_ofRat]
+    rw [contrT_ofRat]
+    rw [permT_ofRat]
+    rw [permT_ofRat]
+  congr
+  funext b
+  decide +revert +kernel
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Rational-complex components of `σ^^^` after dualizing all three indices. -/
+lemma toTensor_dualAll_eq_ofRat :
+    {σ^^^ | τ(μ) τ(α) τ(β)}ᵀ =
+      ofRat (fun b => pauliContrComponent (b 0) (b 2) (b 1)) := by
+  rw [toTensor_dualLorentzLeft_eq_ofRat]
+  let M : ℂT[.downR, .downR] := εR'
+  conv_lhs =>
+    rw [toDualMapAtIndex]
+    change crossToSlot 2 0 (by rfl) M (ofRat _)
+    erw [crossToSlot_eq_crossToEnd]
+    erw [crossToEnd]
+    simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
+    dsimp only [M]
+    rw [dualRightMetric_eq_ofRat]
+    rw [prodT_ofRat_ofRat]
+    rw [permT_ofRat]
+    rw [contrT_ofRat]
+    rw [permT_ofRat]
+    rw [permT_ofRat]
+  congr
+  funext b
+  decide +revert +kernel
+
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 lemma smul_eq_self (Λ : SL(2,ℂ)) : Λ • pauliMatrix = pauliMatrix := by
   rw [smul_eq, toTensor_eq_asConsTensor, actionT_fromConstTriple, ← toTensor_eq_asConsTensor]
@@ -333,42 +460,26 @@ lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
 
 -/
 
+/-- Dualizing both Weyl indices of `σ^^^` gives `σ^__`. -/
+lemma toTensor_dualWeyl_eq_pauliContrDown :
+    ({σ^^^ | μ τ(α) τ(β) = σ^__ | μ β α}ᵀ : Prop) := by
+  rw [toTensor_dualWeyl_eq_ofRat]
+  rw [pauliContrDown_ofRat, permT_ofRat]
+  congr
+
+/-- Dualizing all three indices of `σ^^^` gives `σ___`. -/
+lemma toTensor_dualAll_eq_pauliCoDown :
+    ({σ^^^ | τ(μ) τ(α) τ(β) = σ___ | μ β α}ᵀ : Prop) := by
+  rw [toTensor_dualAll_eq_ofRat]
+  rw [pauliCoDown_eq_ofRat, permT_ofRat]
+  congr
+
 set_option backward.isDefEq.respectTransparency false in
 /-- Lowering the Lorentz index of `σ^^^` with `τ` gives `σ_^^`. -/
 lemma pauliDual_eq_pauliCo :
     ({σ^^^ | τ(μ) α β = σ_^^ | μ α β}ᵀ : Prop) := by
-  let h : IsReindexing ![Color.down, Color.upL, Color.upR]
-      (Function.update ![Color.up, Color.upL, Color.upR] 0
-        (![Color.down, Color.down] (Fin.succAbove 0 0))) id :=
-    IsReindexing.auto
-  have hDual :
-      (toDualMapAtIndex (S := complexLorentzTensor) 0) σ^^^ =
-        permT (id : Fin 3 → Fin 3) h pauliCo := by
-    change (toDualMapAtIndex (S := complexLorentzTensor) 0) σ^^^ = permT id h pauliCo
-    conv_lhs =>
-      rw [toTensor_eq_ofRat]
-      rw [toDualMapAtIndex]
-      change crossToSlot (S := complexLorentzTensor) 0 0 rfl η' (ofRat _)
-      rw [crossToSlot_eq_crossToEnd, crossToEnd]
-      simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
-      rw [coMetric_eq_ofRat]
-      rw [prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat, permT_ofRat, permT_ofRat]
-    conv_rhs =>
-      rw [pauliCo_eq_ofRat]
-    apply (Tensor.basis _).repr.injective
-    ext b
-    conv_rhs =>
-      rw [permT_basis_repr_symm_apply h]
-      rw [ofRat_basis_repr_apply]
-    conv_lhs =>
-      rw [ofRat_basis_repr_apply]
-    apply (Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective).mpr
-    revert b
-    decide +kernel
-  rw [hDual]
-  apply permT_congr
-  · decide
-  · rfl
+  rw [toTensor_dualLorentz_eq_ofRat, pauliCo_eq_ofRat, permT_ofRat]
+  congr
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Lowering the Lorentz index of `σ^__` with `τ` gives `σ___`. -/

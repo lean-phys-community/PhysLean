@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith, Robert Sneiderman
+Authors: Robert Sneiderman, Joseph Tooby-Smith
 -/
 module
 
@@ -136,124 +136,23 @@ lemma auliContrDown_pauliContr_mul_add :
 
 -/
 
-/-- Rational-complex components of the contravariant Minkowski metric. -/
-private def metricComponent {nμ nν : ℕ} (mu : Fin nμ) (nu : Fin nν) :
-    Physlib.RatComplexNum :=
-  if mu.val = 0 ∧ nu.val = 0 then 1 else if mu.val = nu.val then -1 else 0
-
--- Typed aliases keep the dependent component terms small in the finite triple-product proofs.
-/-- Component function for `σ^^^` in the rational-complex tensor basis. -/
-private def sigmaTensorComponent
-    (b : ComponentIdx (S := complexLorentzTensor) ![Color.up, Color.upL, Color.upR]) :
-    Physlib.RatComplexNum := pauliContrComponent (b 0) (b 1) (b 2)
-
-/-- Component function for `σ^__` in the rational-complex tensor basis. -/
-private def barContrDownTensorComponent
-    (b : ComponentIdx (S := complexLorentzTensor) ![Color.up, Color.downR, Color.downL]) :
-    Physlib.RatComplexNum := pauliContrDownComponent (b 0) (b 1) (b 2)
-
-/-- Component function for `σ_^^` in the rational-complex tensor basis. -/
-private def barCoTensorComponent
-    (b : ComponentIdx (S := complexLorentzTensor) ![Color.down, Color.upL, Color.upR]) :
-    Physlib.RatComplexNum := pauliContrDownComponent (b 0) (b 1) (b 2)
-
-/-- Component function for `σ___` in the rational-complex tensor basis. -/
-private def sigmaCoDownTensorComponent
-    (b : ComponentIdx (S := complexLorentzTensor) ![Color.down, Color.downR, Color.downL]) :
-    Physlib.RatComplexNum := pauliContrComponent (b 0) (b 1) (b 2)
-
-/-- Component function for `η` in the rational-complex tensor basis. -/
-private def metricTensorComponent
-    (b : ComponentIdx (S := complexLorentzTensor) ![Color.up, Color.up]) :
-    Physlib.RatComplexNum := metricComponent (b 0) (b 1)
-
-private lemma toTensor_eq_ofRat_component :
-    σ^^^ = ofRat sigmaTensorComponent := by
-  rw [toTensor_eq_ofRat]
-  rfl
-
-private lemma pauliContrDown_eq_ofRat_component :
-    σ^__ = ofRat barContrDownTensorComponent := by
-  rw [pauliContrDown_ofRat]
-  rfl
-
-private lemma pauliCo_eq_ofRat_component :
-    σ_^^ = ofRat barCoTensorComponent := by
-  rw [pauliCo_eq_ofRat]
-  rfl
-
-private lemma pauliCoDown_eq_ofRat_component :
-    σ___ = ofRat sigmaCoDownTensorComponent := by
-  rw [pauliCoDown_eq_ofRat]
-  rfl
-
-private lemma contrMetric_eq_ofRat_component :
-    η = ofRat metricTensorComponent := by
-  rw [contrMetric_eq_ofRat]
-  rfl
-
-/-- The contraction of `σ^^^` with `σ^__` over one Weyl index. -/
-private noncomputable def sigmaBarProduct :=
-  {σ^^^ | mu a b ⊗ σ^__ | nu b c}ᵀ
-
-/-- Rational-complex components of `sigmaBarProduct`. -/
-private def sigmaBarProductComponent
-    (b : ComponentIdx (S := complexLorentzTensor)
-      (Fin.append ![Color.up, Color.upL, Color.upR]
-        ![Color.up, Color.downR, Color.downL] ∘ Fin.succSuccAbove 2 4)) :
-    Physlib.RatComplexNum :=
-  ∑ x : Fin 2, pauliContrComponent (b 0) (b 1) x *
-    pauliContrDownComponent (b 2) x (b 3)
-
-private lemma sigmaBarProduct_eq_ofRat :
-    sigmaBarProduct = ofRat sigmaBarProductComponent := by
-  rw [sigmaBarProduct, toTensor_eq_ofRat_component, pauliContrDown_eq_ofRat_component,
-    prodT_ofRat_ofRat, contrT_ofRat]
+/-- Rational-complex components of a contraction of `σ^^^` with a copy whose Weyl indices
+are dualized. -/
+lemma pauliContr_mul_dualWeyl_eq_ofRat :
+    {σ^^^ | μ α β ⊗ σ^^^ | ν τ(α') τ(β)}ᵀ = ofRat (fun b =>
+      ∑ x : Fin 2, pauliContrComponent (b 0) (b 1) x *
+        pauliContrDownComponent (b 2) x (b 3)) := by
+  rw [toTensor_dualWeyl_eq_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat, contrT_ofRat]
   congr
 
-/-- The contraction of `σ^__` with `σ^^^` over one Weyl index. -/
-private noncomputable def barSigmaSigmaProduct :=
-  {σ^__ | mu b a ⊗ σ^^^ | nu a c}ᵀ
-
-/-- Rational-complex components of `barSigmaSigmaProduct`. -/
-private def barSigmaSigmaProductComponent
-    (b : ComponentIdx (S := complexLorentzTensor)
-      (Fin.append ![Color.up, Color.downR, Color.downL]
-        ![Color.up, Color.upL, Color.upR] ∘ Fin.succSuccAbove 2 4)) :
-    Physlib.RatComplexNum :=
-  ∑ x : Fin 2, pauliContrDownComponent (b 0) (b 1) x *
-    pauliContrComponent (b 2) x (b 3)
-
-private lemma barSigmaSigmaProduct_eq_ofRat :
-    barSigmaSigmaProduct = ofRat barSigmaSigmaProductComponent := by
-  rw [barSigmaSigmaProduct, pauliContrDown_eq_ofRat_component, toTensor_eq_ofRat_component,
-    prodT_ofRat_ofRat, contrT_ofRat]
+/-- Rational-complex components of the reverse contraction of a Weyl-dualized `σ^^^` with
+`σ^^^`. -/
+lemma dualWeyl_mul_pauliContr_eq_ofRat :
+    {σ^^^ | μ τ(α) τ(β) ⊗ σ^^^ | ν α β'}ᵀ = ofRat (fun b =>
+      ∑ x : Fin 2, pauliContrDownComponent (b 0) (b 1) x *
+        pauliContrComponent (b 2) x (b 3)) := by
+  rw [toTensor_dualWeyl_eq_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat, contrT_ofRat]
   congr
-
-/-- Rational-complex components of the tensor product of `η` and `σ^^^`. -/
-private def metricSigmaProductComponent
-    (b : ComponentIdx (S := complexLorentzTensor)
-      (Fin.append ![Color.up, Color.up] ![Color.up, Color.upL, Color.upR])) :
-    Physlib.RatComplexNum :=
-  metricComponent (b 0) (b 1) * pauliContrComponent (b 2) (b 3) (b 4)
-
-private lemma metricSigmaProduct_eq_ofRat :
-    {η | mu nu ⊗ σ^^^ | rho a b}ᵀ = ofRat metricSigmaProductComponent := by
-  rw [contrMetric_eq_ofRat_component, toTensor_eq_ofRat_component, prodT_ofRat_ofRat]
-  rfl
-
-/-- Rational-complex components of the tensor product of `η` and `σ^__`. -/
-private def metricBarSigmaProductComponent
-    (b : ComponentIdx (S := complexLorentzTensor)
-      (Fin.append ![Color.up, Color.up] ![Color.up, Color.downR, Color.downL])) :
-    Physlib.RatComplexNum :=
-  metricComponent (b 0) (b 1) * pauliContrDownComponent (b 2) (b 3) (b 4)
-
-private lemma metricBarSigmaProduct_eq_ofRat :
-    {η | mu nu ⊗ σ^__ | rho b a}ᵀ = ofRat metricBarSigmaProductComponent := by
-  rw [contrMetric_eq_ofRat_component, pauliContrDown_eq_ofRat_component,
-    prodT_ofRat_ofRat]
-  rfl
 
 private lemma toComplexNum_eq_add_neg_add_add_iff
     {a b c d e : Physlib.RatComplexNum} :
@@ -280,33 +179,23 @@ private lemma leviCivita_mul_pauliDual :
   · decide
   · rfl
 
-private lemma leviCivita_mul_pauliContrDownDual :
-    ({ε4ℂ | μ ν ρ κ ⊗ σ^__ | τ(κ) β α =
-      ε4ℂ | μ ν ρ κ ⊗ σ___ | κ β α}ᵀ : Prop) := by
-  rw [pauliContrDownDual_eq_pauliCoDown]
-  rw [prodT_permT_right, contrT_permT]
-  apply permT_congr
-  · decide
-  · rfl
-
 /-- Equation (2.26), the three-Pauli identity
 `σ^μ barσ^ν σ^ρ = g^{μν} σ^ρ - g^{μρ} σ^ν + g^{νρ} σ^μ
-  + i ε^{μνρκ} σ_κ`, with the lowered Lorentz index expressed using `τ`. -/
+  + i ε^{μνρκ} σ_κ`, with barred and lowered forms expressed through index dualization `τ`. -/
 lemma pauliContr_mul_pauliContrDown_mul_pauliContr : ({
-    σ^^^ | μ α β ⊗ σ^__ | ν β α' ⊗ σ^^^ | ρ α' β' =
+    σ^^^ | μ α β ⊗ σ^^^ | ν τ(α') τ(β) ⊗ σ^^^ | ρ α' β' =
       ((((η | μ ν ⊗ σ^^^ | ρ α β')
       + (-((η | μ ρ ⊗ σ^^^ | ν α β'))))
       + (η | ν ρ ⊗ σ^^^ | μ α β'))
       + (Complex.I •ₜ (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) α β')))
     }ᵀ : Prop) := by
   conv_lhs =>
-    rw [show {σ^^^ | mu a b ⊗ σ^__ | nu b c}ᵀ = sigmaBarProduct by rfl]
-    rw [sigmaBarProduct_eq_ofRat, toTensor_eq_ofRat_component,
+    rw [pauliContr_mul_dualWeyl_eq_ofRat, toTensor_eq_ofRat,
       prodT_ofRat_ofRat, contrT_ofRat]
   conv_rhs =>
     rw [leviCivita_mul_pauliDual]
-    simp only [metricSigmaProduct_eq_ofRat]
-    simp only [leviCivita_eq_ofRat, pauliCo_eq_ofRat_component]
+    simp only [contrMetric_eq_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat]
+    simp only [leviCivita_eq_ofRat, pauliCo_eq_ofRat]
     rw [prodT_ofRat_ofRat, contrT_ofRat, permT_ofRat]
   apply (Tensor.basis _).repr.injective
   ext b
@@ -320,22 +209,21 @@ lemma pauliContr_mul_pauliContrDown_mul_pauliContr : ({
 
 /-- Equation (2.27), the conjugate three-Pauli identity
 `barσ^μ σ^ν barσ^ρ = g^{μν} barσ^ρ - g^{μρ} barσ^ν + g^{νρ} barσ^μ
-  - i ε^{μνρκ} barσ_κ`, with the lowered Lorentz index expressed using `τ`. -/
+  - i ε^{μνρκ} barσ_κ`, with barred and lowered forms expressed through index dualization `τ`. -/
 lemma pauliContrDown_mul_pauliContr_mul_pauliContrDown : ({
-    σ^__ | μ β α ⊗ σ^^^ | ν α β' ⊗ σ^__ | ρ β' α' =
-      ((((η | μ ν ⊗ σ^__ | ρ β α')
-      + (-((η | μ ρ ⊗ σ^__ | ν β α'))))
-      + (η | ν ρ ⊗ σ^__ | μ β α'))
-      + ((-Complex.I) •ₜ (ε4ℂ | μ ν ρ κ ⊗ σ^__ | τ(κ) β α')))
+    σ^^^ | μ τ(α) τ(β) ⊗ σ^^^ | ν α β' ⊗ σ^^^ | ρ τ(α') τ(β') =
+      ((((η | μ ν ⊗ σ^^^ | ρ τ(α') τ(β))
+      + (-((η | μ ρ ⊗ σ^^^ | ν τ(α') τ(β)))))
+      + (η | ν ρ ⊗ σ^^^ | μ τ(α') τ(β)))
+      + ((-Complex.I) •ₜ
+        (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) τ(α') τ(β))))
     }ᵀ : Prop) := by
   conv_lhs =>
-    rw [show {σ^__ | mu b a ⊗ σ^^^ | nu a c}ᵀ = barSigmaSigmaProduct by rfl]
-    rw [barSigmaSigmaProduct_eq_ofRat, pauliContrDown_eq_ofRat_component,
+    rw [dualWeyl_mul_pauliContr_eq_ofRat, toTensor_dualWeyl_eq_ofRat,
       prodT_ofRat_ofRat, contrT_ofRat]
   conv_rhs =>
-    rw [leviCivita_mul_pauliContrDownDual]
-    simp only [metricBarSigmaProduct_eq_ofRat]
-    simp only [leviCivita_eq_ofRat, pauliCoDown_eq_ofRat_component]
+    simp only [contrMetric_eq_ofRat, toTensor_dualWeyl_eq_ofRat, prodT_ofRat_ofRat]
+    simp only [leviCivita_eq_ofRat, toTensor_dualAll_eq_ofRat]
     rw [prodT_ofRat_ofRat, contrT_ofRat, permT_ofRat]
   apply (Tensor.basis _).repr.injective
   ext b
