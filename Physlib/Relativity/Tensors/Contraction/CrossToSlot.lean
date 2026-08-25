@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Andrea Pari. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Andrea Pari
+Authors: Andrea Pari, Robert Sneiderman
 -/
 module
 
@@ -27,6 +27,8 @@ operation live with the unit-tensor collapse theory in
 - `TensorSpecies.Tensor.crossToSlot` : contract slot `i` against slot `j` of a rank-2 tensor and
     rotate the survivor back into position `i`; raising and lowering a named index.
 - `TensorSpecies.Tensor.crossToSlot_eq_crossToEnd` : the bridge to the result-to-end convention.
+- `TensorSpecies.Tensor.crossToSlot_basis_repr_apply` : the component bridge from result-to-slot
+    to result-to-end contraction.
 - `TensorSpecies.Tensor.crossToSlotInv` : the returning half of a round trip, the contraction
     against the second factor with the round trip's color cast absorbed.
 - `TensorSpecies.Tensor.crossToSlot_permT_right_id` : an identity reindexing of the rank-2 tensor
@@ -99,6 +101,19 @@ lemma crossToSlot_eq_crossToEnd {nA : ℕ} {c : Fin (nA + 1) → C} {cM : Fin 2 
     crossToSlot i j hc M t =
       permT ⇑(Fin.cycleIcc i (Fin.last nA)).symm (IsReindexing.crossToSlot_cycle i j)
         (crossToEnd i j hc t M) := rfl
+
+/-- A component of `crossToSlot` is the corresponding component of `crossToEnd`, with the
+surviving indices rotated back into the contracted slot. -/
+lemma crossToSlot_basis_repr_apply {nA : ℕ} {c : Fin (nA + 1) → C} {cM : Fin 2 → C}
+    (i : Fin (nA + 1)) (j : Fin 2) (hc : S.τ (c i) = cM j) (M : Tensor S cM)
+    (t : Tensor S c)
+    (φ : ComponentIdx (S := S) (Function.update c i (cM (j.succAbove 0)))) :
+    (basis _).repr (crossToSlot i j hc M t) φ =
+      (basis _).repr (crossToEnd i j hc t M) (fun m =>
+        basisIdxCongr ((IsReindexing.crossToSlot_cycle i j).inv_perserve_color m)
+          (φ ((IsReindexing.crossToSlot_cycle i j).inv
+            ⇑(Fin.cycleIcc i (Fin.last nA)).symm m))) := by
+  rw [crossToSlot_eq_crossToEnd, permT_basis_repr_symm_apply]
 
 /-- Contract slot `i` of a tensor whose color there is `d` against `M'`, then absorb the color cast
   the two `Function.update`s generate, landing back on `c`. This is the returning half of a

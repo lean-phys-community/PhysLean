@@ -30,12 +30,20 @@ It also proves the Lorentzian tensor identities obtained by lowering all four in
 factor: the complete contraction is `-24`, while contracting three index pairs gives `-6` times
 the unit tensor.
 
+The Lorentzian proofs proceed through reusable component statements: lowering all four indices
+contributes the orientation sign, tensor contractions become finite sums of matching components,
+and the Euclidean contraction theorems evaluate those sums.
+
 ## ii. Key results
 
 - `euclidLeviCivita_symbol_contract_zero` : full Euclidean contraction equals `24`.
 - `euclidLeviCivita_symbol_contract_one` : the triple Euclidean contraction equals `6 · δ[a,b]`.
 - `euclidLeviCivita_symbol_contract_two` :
   `∑_h (ε4)_{r,s,h} · (ε4)_{t,w,h} = 2 · (δ[r,t]·δ[s,w] - δ[r,w]·δ[s,t])`.
+- `realLorentzTensor.leviCivita_lowered_basis_repr_apply` : lowering all four indices changes
+  every standard-basis component by the Lorentzian orientation sign `-1`.
+- `realLorentzTensor.leviCivita_contract_three_basis_repr_apply` : the tensor triple contraction
+  is the sum of matching standard-basis components.
 - `leviCivita_contract_self` : `ε^{μνρσ} ε_{μνρσ} = -24`.
 - `leviCivita_contract_three` : `ε^{μνρσ} ε_{μνρτ} = -6 δ^σ_τ`.
 
@@ -97,6 +105,18 @@ lemma euclidLeviCivita_symbol_contract_one (a b : Fin 4) :
     sum_generalizedKroneckerDelta_mul_cons]
   push_cast; ring
 
+/-- **Triple Euclidean Levi-Civita contraction with the free index last.** This is the same
+contraction as `euclidLeviCivita_symbol_contract_one`, in the slot order produced by the tensor
+notation for `ε^{μνρσ} ε_{μνρτ}`. -/
+lemma euclidLeviCivita_symbol_contract_one_last (a b : Fin 4) :
+    ∑ h : Fin 3 → Fin 4, euclidLeviCivita (Fin.snoc h a) * euclidLeviCivita (Fin.snoc h b)
+      = 6 * ((kroneckerDelta a b : ℕ) : ℝ) := by
+  rw [Finset.sum_congr rfl fun h _ => ?_, euclidLeviCivita_symbol_contract_one a b]
+  simp only [euclidLeviCivita, ← Int.cast_mul, generalizedKroneckerDelta_mul]
+  rw [Fin.snoc_eq_cons_rotate, Fin.snoc_eq_cons_rotate]
+  exact congrArg (fun z : ℤ => (z : ℝ))
+    (generalizedKroneckerDelta_comp_perm (Fin.cons a h) (Fin.cons b h) (finRotate (3 + 1)))
+
 /-- **Double Euclidean Levi-Civita contraction**
 `∑_h (ε4)_{r,s,h} · (ε4)_{t,w,h} = 2 · (δ[r,t]·δ[s,w] - δ[r,w]·δ[s,t])` at the symbol level:
 contracting two of the four `Fin 4` component slots of `ε4` with the naive Kronecker pairing
@@ -131,262 +151,147 @@ namespace realLorentzTensor
 
 open TensorSpecies Tensor
 
+/-- Lowering all four indices of the Levi-Civita tensor changes the sign of every standard-basis
+component. This is the tensor-component form of the Lorentzian orientation factor
+`det η = -1`. -/
+lemma leviCivita_lowered_basis_repr_apply
+    (b : ComponentIdx (S := realLorentzTensor 3)
+      ![Color.down, Color.down, Color.down, Color.down]) :
+    (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) b =
+      - (Tensor.basis _).repr ε4 b := by
+  simp only [toDualMapAtIndex_basis_repr_apply_eq_mul]
+  by_cases hb : Function.Injective b
+  · have hp := minkowskiMatrix.prod_diagonal_comp_of_injective hb
+    rw [Fin.prod_univ_four] at hp
+    norm_num at hp
+    linear_combination ((Tensor.basis _).repr ε4 b) * hp
+  · have hcomp : ¬ Function.Injective (fun i => finSumFinEquiv (b i)) :=
+      fun h => hb (Function.Injective.of_comp h)
+    rw [leviCivita_basis_repr_eq_leviCivitaSymbol,
+      leviCivitaSymbol_eq_zero_of_not_injective hcomp]
+    norm_num
+
+/-- The sum of the squared standard-basis components of the contravariant Levi-Civita tensor is
+`4! = 24`. -/
+lemma leviCivita_basis_contract_self :
+    ∑ b : ComponentIdx (S := realLorentzTensor 3)
+        ![Color.up, Color.up, Color.up, Color.up],
+      (Tensor.basis _).repr ε4 b * (Tensor.basis _).repr ε4 b = 24 := by
+  calc
+    _ = ∑ g : Fin 4 → Fin 4, euclidLeviCivita g * euclidLeviCivita g :=
+      Fintype.sum_equiv (Equiv.arrowCongr (Equiv.refl (Fin 4))
+        (finSumFinEquiv : (Fin 1 ⊕ Fin 3) ≃ Fin 4)) _ _ fun b => by
+          rw [leviCivita_basis_repr_apply]
+          rfl
+    _ = 24 := euclidLeviCivita_symbol_contract_zero
+
+/-- Contracting the first three standard-basis components of two contravariant Levi-Civita tensors
+gives `3! = 6` times the Kronecker delta on the remaining components. -/
+lemma leviCivita_basis_contract_three (a b : Fin 1 ⊕ Fin 3) :
+    ∑ h : Fin 3 → Fin 1 ⊕ Fin 3,
+      (Tensor.basis _).repr ε4 (Fin.snoc h a) *
+      (Tensor.basis _).repr ε4 (Fin.snoc h b) =
+      6 * (if a = b then 1 else 0) := by
+  simp only [leviCivita_basis_repr_apply]
+  have hs (y : Fin 1 ⊕ Fin 3) (h : Fin 3 → Fin 1 ⊕ Fin 3) :
+      (fun i => finSumFinEquiv ((Fin.snoc h y : Fin 4 → Fin 1 ⊕ Fin 3) i)) =
+        Fin.snoc (fun i => finSumFinEquiv (h i)) (finSumFinEquiv y) := by
+    funext i
+    fin_cases i <;> rfl
+  rw [Finset.sum_congr rfl fun h _ => by rw [hs a h, hs b h]]
+  calc
+    _ = ∑ g : Fin 3 → Fin 4,
+        (generalizedKroneckerDelta (Fin.snoc g (finSumFinEquiv a)) id : ℝ) *
+          (generalizedKroneckerDelta (Fin.snoc g (finSumFinEquiv b)) id : ℝ) :=
+      Fintype.sum_equiv (Equiv.arrowCongr (Equiv.refl (Fin 3))
+        (finSumFinEquiv : (Fin 1 ⊕ Fin 3) ≃ Fin 4)) _ _ fun _ => rfl
+    _ = 6 * ((kroneckerDelta (finSumFinEquiv a) (finSumFinEquiv b) : ℕ) : ℝ) :=
+      euclidLeviCivita_symbol_contract_one_last _ _
+    _ = 6 * (if a = b then 1 else 0) := by
+      by_cases hab : a = b
+      · subst hab
+        simp [KroneckerDelta.eq_one_of_same]
+      · rw [if_neg hab,
+          KroneckerDelta.eq_zero_of_ne (fun h => hab (finSumFinEquiv.injective h))]
+        norm_num
+
 open ComponentIdx.DropPairSection in
-private lemma section_chain {cA cB : Fin 4 → Color}
-    (h1 : (0 : Fin (0+1+1)) ≠ 1) (h2 : (1 : Fin (2+1+1)) ≠ 3)
-    (h3 : (2 : Fin (4+1+1)) ≠ 5) (h4 : (3 : Fin (6+1+1)) ≠ 7)
-    (x x1 x2 x3 : Fin 1 ⊕ Fin 3) :
-    ((ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h4
-        ((ofFinEquiv h3
-            ((ofFinEquiv h2
-                ((ofFinEquiv h1 (fun j => j.elim0) (x, x)).1) (x1, x1)).1) (x2, x2)).1)
-          (x3, x3)).1 : Fin (6+1+1) → Fin 1 ⊕ Fin 3)
-      = ![x, x1, x2, x3, x, x1, x2, x3] := by
-  funext m
-  fin_cases m <;> rfl
+private lemma contractFour_route {cA cB : Fin 4 → Color}
+    (h1 : (0 : Fin (0 + 1 + 1)) ≠ 1) (h2 : (1 : Fin (2 + 1 + 1)) ≠ 3)
+    (h3 : (2 : Fin (4 + 1 + 1)) ≠ 5) (h4 : (3 : Fin (6 + 1 + 1)) ≠ 7)
+    (x0 x1 x2 x3 : Fin 1 ⊕ Fin 3) :
+    let v := (ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h4
+      ((ofFinEquiv h3
+        ((ofFinEquiv h2
+          ((ofFinEquiv h1 (fun j => j.elim0) (x0, x0)).1) (x1, x1)).1) (x2, x2)).1)
+        (x3, x3)).1
+    (ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB)) v =
+      (![x0, x1, x2, x3], ![x0, x1, x2, x3]) := by
+  dsimp only
+  apply Prod.ext <;> funext m <;> fin_cases m <;> rfl
 
-private lemma prod_fst_vec {cA cB : Fin 4 → Color} (y0 y1 y2 y3 y4 y5 y6 y7 : Fin 1 ⊕ Fin 3) :
-    (((ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB))
-        (![y0,y1,y2,y3,y4,y5,y6,y7] : Fin (4+4) → Fin 1 ⊕ Fin 3)).1 :
-      Fin 4 → Fin 1 ⊕ Fin 3) = ![y0,y1,y2,y3] := by
-  funext m; fin_cases m <;> rfl
-
-private lemma prod_snd_vec {cA cB : Fin 4 → Color} (y0 y1 y2 y3 y4 y5 y6 y7 : Fin 1 ⊕ Fin 3) :
-    (((ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB))
-        (![y0,y1,y2,y3,y4,y5,y6,y7] : Fin (4+4) → Fin 1 ⊕ Fin 3)).2 :
-      Fin 4 → Fin 1 ⊕ Fin 3) = ![y4,y5,y6,y7] := by
-  funext m; fin_cases m <;> rfl
-
-section Nest
-variable (x x1 x2 x3 y0 y1 y2 y3 : Fin 1 ⊕ Fin 3)
-
-private lemma nest3 : (Fin.insertNth (3 : Fin (3+1)) y3
-    (fun m => ![x, x1, x2, x3] (Fin.succAbove 3 m)) : Fin 4 → Fin 1 ⊕ Fin 3)
-      = ![x, x1, x2, y3] := by
-  funext m; fin_cases m <;> rfl
-
-private lemma nest2 : (Fin.insertNth (2 : Fin (3+1)) y2
-    (fun m => (![x, x1, x2, y3] : Fin 4 → Fin 1 ⊕ Fin 3) (Fin.succAbove 2 m)) :
-      Fin 4 → Fin 1 ⊕ Fin 3) = ![x, x1, y2, y3] := by
-  funext m; fin_cases m <;> rfl
-
-private lemma nest1 : (Fin.insertNth (1 : Fin (3+1)) y1
-    (fun m => (![x, x1, y2, y3] : Fin 4 → Fin 1 ⊕ Fin 3) (Fin.succAbove 1 m)) :
-      Fin 4 → Fin 1 ⊕ Fin 3) = ![x, y1, y2, y3] := by
-  funext m; fin_cases m <;> rfl
-
-private lemma nest0 : (Fin.insertNth (0 : Fin (3+1)) y0
-    (fun m => (![x, y1, y2, y3] : Fin 4 → Fin 1 ⊕ Fin 3) (Fin.succAbove 0 m)) :
-      Fin 4 → Fin 1 ⊕ Fin 3) = ![y0, y1, y2, y3] := by
-  funext m; fin_cases m <;> rfl
-
-end Nest
-
-private lemma vec4_0 {a b c e : Fin 1 ⊕ Fin 3} :
-    (![a,b,c,e] : Fin 4 → Fin 1 ⊕ Fin 3) 0 = a := rfl
-private lemma vec4_1 {a b c e : Fin 1 ⊕ Fin 3} :
-    (![a,b,c,e] : Fin 4 → Fin 1 ⊕ Fin 3) 1 = b := rfl
-private lemma vec4_2 {a b c e : Fin 1 ⊕ Fin 3} :
-    (![a,b,c,e] : Fin 4 → Fin 1 ⊕ Fin 3) 2 = c := rfl
-private lemma vec4_3 {a b c e : Fin 1 ⊕ Fin 3} :
-    (![a,b,c,e] : Fin 4 → Fin 1 ⊕ Fin 3) 3 = e := rfl
-
-private lemma sum_mul_eta {d : ℕ} (f : (Fin 1 ⊕ Fin d) → ℝ) (y : Fin 1 ⊕ Fin d) :
-    ∑ z : Fin 1 ⊕ Fin d, f z * minkowskiMatrix z y = f y * minkowskiMatrix y y := by
-  change (f ᵥ* minkowskiMatrix) y = _
-  rw [minkowskiMatrix.vecMul_apply]
+open ComponentIdx.DropPairSection in
+private lemma contractThree_route {cA cB : Fin 4 → Color}
+    (h1 : (0 : Fin (2 + 1 + 1)) ≠ 2) (h2 : (1 : Fin (4 + 1 + 1)) ≠ 4)
+    (h3 : (2 : Fin (6 + 1 + 1)) ≠ 6)
+    (b : Fin 2 → Fin 1 ⊕ Fin 3) (x0 x1 x2 : Fin 1 ⊕ Fin 3) :
+    let v := (ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h3
+      ((ofFinEquiv h2 ((ofFinEquiv h1 b (x0, x0)).1) (x1, x1)).1) (x2, x2)).1
+    (ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB)) v =
+      (![x0, x1, x2, b 0], ![x0, x1, x2, b 1]) := by
+  dsimp only
+  apply Prod.ext <;> funext m <;> fin_cases m <;> rfl
 
 /-- Bundling four independent basis indices into one component index. -/
-private def vec4Equiv :
-    ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3))
-      ≃ (Fin 4 → Fin 1 ⊕ Fin 3) where
+private def vec4Equiv {X : Type} : (X × X × X × X) ≃ (Fin 4 → X) where
   toFun p := ![p.1, p.2.1, p.2.2.1, p.2.2.2]
   invFun v := (v 0, v 1, v 2, v 3)
   left_inv p := rfl
   right_inv v := by funext m; fin_cases m <;> rfl
 
 /-- Bundling three independent basis indices into one component index. -/
-private def vec3Equiv :
-    ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≃ (Fin 3 → Fin 1 ⊕ Fin 3) where
+private def vec3Equiv {X : Type} : (X × X × X) ≃ (Fin 3 → X) where
   toFun p := ![p.1, p.2.1, p.2.2]
   invFun v := (v 0, v 1, v 2)
   left_inv p := rfl
   right_inv v := by funext m; fin_cases m <;> rfl
 
-private lemma sum4_eq {M : Type} [AddCommMonoid M] (F : (Fin 4 → Fin 1 ⊕ Fin 3) → M) :
-    ∑ x : Fin 1 ⊕ Fin 3, ∑ x1 : Fin 1 ⊕ Fin 3, ∑ x2 : Fin 1 ⊕ Fin 3, ∑ x3 : Fin 1 ⊕ Fin 3,
-        F ![x, x1, x2, x3]
-      = ∑ v : Fin 4 → Fin 1 ⊕ Fin 3, F v := by
+private lemma sum4_eq {M X : Type} [Fintype X] [AddCommMonoid M] (F : (Fin 4 → X) → M) :
+    ∑ x0 : X, ∑ x1 : X, ∑ x2 : X, ∑ x3 : X, F ![x0, x1, x2, x3]
+      = ∑ v : Fin 4 → X, F v := by
   rw [← Equiv.sum_comp vec4Equiv F]
   simp only [Fintype.sum_prod_type]
   rfl
 
-open KroneckerDelta in
-/-- Abbreviation for the summand of the fully contracted epsilon-epsilon sum. -/
-private noncomputable def epsEtaSummand (v : Fin 4 → Fin 1 ⊕ Fin 3) : ℝ :=
-  ((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ) *
-    (((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-      * minkowskiMatrix (v 0) (v 0) * minkowskiMatrix (v 1) (v 1)
-      * minkowskiMatrix (v 2) (v 2) * minkowskiMatrix (v 3) (v 3))
-
-open KroneckerDelta in
-private lemma epsEtaSummand_eq (v : Fin 4 → Fin 1 ⊕ Fin 3) : epsEtaSummand v =
-    - (((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-      * ((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i))
-          (id : Fin 4 → Fin 4) : ℤ) : ℝ)) := by
-  rw [epsEtaSummand]
-  by_cases hA : generalizedKroneckerDelta (fun i => finSumFinEquiv (v i))
-      (id : Fin 4 → Fin 4) = 0
-  · rw [hA]; norm_num
-  · have hinj : Function.Injective (fun i => finSumFinEquiv (v i)) := by
-      by_contra hni
-      exact hA (leviCivitaSymbol_eq_zero_of_not_injective hni)
-    have hv : Function.Injective v := Function.Injective.of_comp hinj
-    have hp := minkowskiMatrix.prod_diagonal_comp_of_injective hv
-    rw [Fin.prod_univ_four] at hp
-    linear_combination
-      (((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i))
-          (id : Fin 4 → Fin 4) : ℤ) : ℝ) *
-        ((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i))
-          (id : Fin 4 → Fin 4) : ℤ) : ℝ)) * hp
-
-open KroneckerDelta in
-private lemma sum_epsEtaSummand : ∑ v : Fin 4 → Fin 1 ⊕ Fin 3, epsEtaSummand v = -24 := by
-  have hsum : ∑ v : Fin 4 → Fin 1 ⊕ Fin 3,
-      (generalizedKroneckerDelta (fun i => finSumFinEquiv (v i)) (id : Fin 4 → Fin 4)
-        * generalizedKroneckerDelta (fun i => finSumFinEquiv (v i))
-          (id : Fin 4 → Fin 4) : ℤ) = 24 := by
-    calc
-      _ = ∑ g : Fin 4 → Fin 4,
-          generalizedKroneckerDelta g (id : Fin 4 → Fin 4) *
-            generalizedKroneckerDelta g (id : Fin 4 → Fin 4) :=
-        Fintype.sum_equiv (Equiv.arrowCongr (Equiv.refl (Fin 4))
-          (finSumFinEquiv : (Fin 1 ⊕ Fin 3) ≃ Fin 4)) _ _ (fun _ => rfl)
-      _ = 24 := sum_generalizedKroneckerDelta_mul_self
-  have h : (∑ v : Fin 4 → Fin 1 ⊕ Fin 3,
-      (((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i))
-          (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-        * ((generalizedKroneckerDelta (fun i => finSumFinEquiv (v i))
-            (id : Fin 4 → Fin 4) : ℤ) : ℝ))) = 24 := by
-    exact_mod_cast congrArg (fun z : ℤ => (z : ℝ)) hsum
-  rw [Finset.sum_congr rfl (fun v _ => epsEtaSummand_eq v), Finset.sum_neg_distrib, h]
-
-open ComponentIdx.DropPairSection in
-private lemma section_chain3 {cA cB : Fin 4 → Color}
-    (h1 : (0 : Fin (2+1+1)) ≠ 2) (h2 : (1 : Fin (4+1+1)) ≠ 4) (h3 : (2 : Fin (6+1+1)) ≠ 6)
-    (b : Fin 2 → Fin 1 ⊕ Fin 3) (x x1 x2 : Fin 1 ⊕ Fin 3) :
-    ((ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h3
-        ((ofFinEquiv h2 ((ofFinEquiv h1 b (x, x)).1) (x1, x1)).1) (x2, x2)).1 :
-      Fin (6+1+1) → Fin 1 ⊕ Fin 3)
-      = ![x, x1, x2, b 0, x, x1, x2, b 1] := by
-  funext m
-  fin_cases m <;> rfl
-
-private lemma sum3_eq' {M : Type} [AddCommMonoid M]
-    (F : (Fin 1 ⊕ Fin 3) → (Fin 1 ⊕ Fin 3) → (Fin 1 ⊕ Fin 3) → M) :
-    ∑ x : Fin 1 ⊕ Fin 3, ∑ x1 : Fin 1 ⊕ Fin 3, ∑ x2 : Fin 1 ⊕ Fin 3, F x x1 x2
-      = ∑ w : Fin 3 → Fin 1 ⊕ Fin 3, F (w 0) (w 1) (w 2) := by
-  rw [← Equiv.sum_comp vec3Equiv (fun w => F (w 0) (w 1) (w 2))]
+private lemma sum3_eq {M X : Type} [Fintype X] [AddCommMonoid M] (F : (Fin 3 → X) → M) :
+    ∑ x0 : X, ∑ x1 : X, ∑ x2 : X, F ![x0, x1, x2] = ∑ h, F h := by
+  rw [← Equiv.sum_comp vec3Equiv F]
   simp only [Fintype.sum_prod_type]
   rfl
 
-open KroneckerDelta in
-private lemma eps_eta_three (a b c y0 y1 : Fin 1 ⊕ Fin 3) :
-    ((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![a,b,c,y0] :
-        Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-      * (((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![a,b,c,y1] :
-          Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-        * minkowskiMatrix a a * minkowskiMatrix b b * minkowskiMatrix c c
-        * minkowskiMatrix y1 y1)
-      = - (((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![a,b,c,y0] :
-          Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-        * ((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![a,b,c,y1] :
-            Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)) := by
-  by_cases hA : generalizedKroneckerDelta (fun i => finSumFinEquiv ((![a,b,c,y1] :
-      Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) = 0
-  · rw [hA]; norm_num
-  · have hinj : Function.Injective
-        (fun i => finSumFinEquiv ((![a,b,c,y1] : Fin 4 → Fin 1 ⊕ Fin 3) i)) := by
-      by_contra hni
-      exact hA (leviCivitaSymbol_eq_zero_of_not_injective hni)
-    have hv : Function.Injective (![a,b,c,y1] : Fin 4 → Fin 1 ⊕ Fin 3) :=
-      Function.Injective.of_comp hinj
-    have hp := minkowskiMatrix.prod_diagonal_comp_of_injective hv
-    rw [Fin.prod_univ_four] at hp
-    simp only [vec4_0, vec4_1, vec4_2, vec4_3] at hp
-    linear_combination
-      (((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![a,b,c,y0] :
-          Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ) *
-        ((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![a,b,c,y1] :
-            Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)) * hp
-
-open KroneckerDelta in
-private lemma sum_eps_three (y0 y1 : Fin 1 ⊕ Fin 3) :
-    ∑ x : Fin 1 ⊕ Fin 3, ∑ x1 : Fin 1 ⊕ Fin 3, ∑ x2 : Fin 1 ⊕ Fin 3,
-      ((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![x,x1,x2,y0] :
-          Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-        * (((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![x,x1,x2,y1] :
-            Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-          * minkowskiMatrix x x * minkowskiMatrix x1 x1 * minkowskiMatrix x2 x2
-          * minkowskiMatrix y1 y1)
-      = -6 * (if y0 = y1 then 1 else 0) := by
-  rw [Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun x1 _ =>
-    Finset.sum_congr rfl fun x2 _ => eps_eta_three x x1 x2 y0 y1]
-  simp only [Finset.sum_neg_distrib]
-  have hZ : ∑ x : Fin 1 ⊕ Fin 3, ∑ x1 : Fin 1 ⊕ Fin 3, ∑ x2 : Fin 1 ⊕ Fin 3,
-      (generalizedKroneckerDelta (fun i => finSumFinEquiv ((![x,x1,x2,y0] :
-          Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4)
-        * generalizedKroneckerDelta (fun i => finSumFinEquiv ((![x,x1,x2,y1] :
-            Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4))
-      = 6 * ((kroneckerDelta (finSumFinEquiv y0) (finSumFinEquiv y1) : ℕ) : ℤ) := by
-    rw [sum3_eq' (fun x x1 x2 => generalizedKroneckerDelta (fun i =>
-        finSumFinEquiv ((![x, x1, x2, y0] : Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4)
-      * generalizedKroneckerDelta (fun i =>
-        finSumFinEquiv ((![x, x1, x2, y1] : Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4))]
-    have hs (y : Fin 1 ⊕ Fin 3) (w : Fin 3 → Fin 1 ⊕ Fin 3) :
-        (fun i => finSumFinEquiv
-          ((![w 0, w 1, w 2, y] : Fin 4 → Fin 1 ⊕ Fin 3) i)) =
-          Fin.snoc (fun i => finSumFinEquiv (w i)) (finSumFinEquiv y) := by
-      funext i
-      fin_cases i <;> rfl
-    rw [Finset.sum_congr rfl fun w _ => by rw [hs y0 w, hs y1 w]]
-    calc
-      _ = ∑ h : Fin 3 → Fin 4,
-          generalizedKroneckerDelta (Fin.snoc h (finSumFinEquiv y0)) id *
-            generalizedKroneckerDelta (Fin.snoc h (finSumFinEquiv y1)) id :=
-        Fintype.sum_equiv (Equiv.arrowCongr (Equiv.refl (Fin 3))
-          (finSumFinEquiv : (Fin 1 ⊕ Fin 3) ≃ Fin 4)) _ _ (fun _ => rfl)
-      _ = _ := sum_generalizedKroneckerDelta_mul_snoc _ _
-  have hR : ∑ x : Fin 1 ⊕ Fin 3, ∑ x1 : Fin 1 ⊕ Fin 3, ∑ x2 : Fin 1 ⊕ Fin 3,
-      (((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![x,x1,x2,y0] :
-          Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-        * ((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![x,x1,x2,y1] :
-            Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ))
-      = 6 * (if y0 = y1 then 1 else 0) := by
-    have := congrArg (fun z : ℤ => (z : ℝ)) hZ
-    push_cast at this
-    rw [this]
-    by_cases hy : y0 = y1
-    · rw [hy]; simp [KroneckerDelta.eq_one_of_same]
-    · rw [if_neg hy, KroneckerDelta.eq_zero_of_ne (fun hc => hy (finSumFinEquiv.injective hc))]
-      norm_num
-  rw [hR]
-  ring
-
-open KroneckerDelta in
-private lemma sum_eps_three' (y0 y1 : Fin 1 ⊕ Fin 3) :
-    ∑ x : Fin 1 ⊕ Fin 3, ∑ x1 : Fin 1 ⊕ Fin 3, ∑ x2 : Fin 1 ⊕ Fin 3,
-      ((generalizedKroneckerDelta (fun i => finSumFinEquiv ((![x,x1,x2,y0] :
-          Fin 4 → Fin 1 ⊕ Fin 3) i)) (id : Fin 4 → Fin 4) : ℤ) : ℝ)
-        * (((Tensor.basis ![Color.up, Color.up, Color.up, Color.up]).repr ε4)
-            (![x,x1,x2,y1] : Fin 4 → Fin 1 ⊕ Fin 3)
-          * minkowskiMatrix x x * minkowskiMatrix x1 x1 * minkowskiMatrix x2 x2
-          * minkowskiMatrix y1 y1)
-      = -6 * (if y0 = y1 then 1 else 0) := by
-  rw [← sum_eps_three y0 y1]
-  refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun x1 _ =>
-    Finset.sum_congr rfl fun x2 _ => ?_
-  rw [leviCivita_basis_repr_apply]
+/-- The standard-basis component formula for the tensor contraction
+`ε^{μνρσ} ε_{μνρτ}`. -/
+lemma leviCivita_contract_three_basis_repr_apply
+    (b : ComponentIdx (S := realLorentzTensor 3) ![Color.up, Color.down]) :
+    (Tensor.basis _).repr
+        {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(ρ) τ(τ)}ᵀ b =
+      ∑ h : Fin 3 → Fin 1 ⊕ Fin 3,
+        (Tensor.basis _).repr ε4 (Fin.snoc h (b 0)) *
+          (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) (Fin.snoc h (b 1)) := by
+  simp only [contrT_basis_repr_apply_eq_fin, prodT_basis_repr_apply,
+    contractThree_route]
+  let F (h : Fin 3 → Fin 1 ⊕ Fin 3) :=
+    (Tensor.basis _).repr ε4 ![h 0, h 1, h 2, b 0] *
+      (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) ![h 0, h 1, h 2, b 1]
+  change (∑ x0, ∑ x1, ∑ x2, F ![x0, x1, x2]) = _
+  rw [sum3_eq F]
+  refine Finset.sum_congr rfl fun h _ => ?_
+  dsimp only [F]
+  have hs (y : Fin 1 ⊕ Fin 3) :
+      (![h 0, h 1, h 2, y] : Fin 4 → Fin 1 ⊕ Fin 3) = Fin.snoc h y := by
+    funext i
+    fin_cases i <;> rfl
+  rw [hs (b 0), hs (b 1)]
 
 /-!
 
@@ -400,33 +305,57 @@ lemma leviCivita_contract_three : {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(
     (-6) • unitTensor (S := realLorentzTensor) Color.down | σ τ }ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
-  simp only [contrT_basis_repr_apply_eq_fin, prodT_basis_repr_apply,
-    toDualMapAtIndex_basis_repr_apply, leviCivita_basis_repr_apply,
-    permT_basis_repr_symm_apply,
-    section_chain3, prod_fst_vec, prod_snd_vec, nest3, nest2, nest1, nest0,
-    vec4_0, vec4_1, vec4_2, vec4_3, sum_mul_eta]
   simp only [map_zsmul, Finsupp.coe_smul, Pi.smul_apply, zsmul_eq_mul,
-    basisIdxCongr_eq_refl, Equiv.refl_apply, unitTensor_repr_apply Color.down]
+    permT_basis_repr_symm_apply, basisIdxCongr_eq_refl, Equiv.refl_apply,
+    unitTensor_repr_apply Color.down]
   rw [IsReindexing.inv_eq_self_of_pointwise_eq _ (by decide),
-    IsReindexing.inv_eq_self_of_pointwise_eq _ (by decide), sum_eps_three' (b 0) (b 1)]
+    IsReindexing.inv_eq_self_of_pointwise_eq _ (by decide)]
   norm_num
+  rw [leviCivita_contract_three_basis_repr_apply]
+  calc
+    _ = - ∑ h : Fin 3 → Fin 1 ⊕ Fin 3,
+          (Tensor.basis _).repr ε4 (Fin.snoc h (b 0)) *
+          (Tensor.basis _).repr ε4 (Fin.snoc h (b 1)) := by
+      rw [← Finset.sum_neg_distrib]
+      refine Finset.sum_congr rfl fun h _ => ?_
+      rw [leviCivita_lowered_basis_repr_apply]
+      ring
+    _ = - (6 * (if b 0 = b 1 then 1 else 0)) := by
+      rw [leviCivita_basis_contract_three]
+    _ = (if b 0 = b 1 then -6 else 0) := by
+      split_ifs <;> norm_num
 
--- `checkType` linter: whnf on this tensor-notation statement exceeds the
--- linter's 200k-heartbeat budget (since the v4.32.0 bump; still the case on
--- v4.33.0). The proof itself elaborates within the default budget.
+-- `checkType` linter: whnf on these full-contraction tensor-notation statements exceeds the
+-- linter's 200k-heartbeat budget (since the v4.32.0 bump; still the case on v4.33.0). The proofs
+-- themselves elaborate within the default budget.
+/-- Fully contracting the tensor product of `ε4` and its fully lowered form is the sum of the
+products of their matching standard-basis components. -/
+@[nolint checkType]
+lemma leviCivita_contract_self_eq_sum :
+    {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ.toField =
+      ∑ b : ComponentIdx (S := realLorentzTensor 3)
+          ![Color.up, Color.up, Color.up, Color.up],
+        (Tensor.basis _).repr ε4 b *
+          (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) b := by
+  rw [Tensor.toField_eq_repr]
+  simp only [contrT_basis_repr_apply_eq_fin, prodT_basis_repr_apply,
+    contractFour_route]
+  exact sum4_eq (fun b => (Tensor.basis _).repr ε4 b *
+    (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) b)
+
 /-- Fully contracting the Lorentzian Levi-Civita tensor with a lowered copy gives `-24`. -/
 @[nolint checkType]
 lemma leviCivita_contract_self :
     {ε4 | μ ν ρ σ ⊗ ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ.toField = - 24 := by
-  rw [Tensor.toField_eq_repr]
-  simp only [contrT_basis_repr_apply_eq_fin, prodT_basis_repr_apply,
-    toDualMapAtIndex_basis_repr_apply, leviCivita_basis_repr_apply,
-    section_chain, prod_fst_vec, prod_snd_vec, nest3, nest2, nest1, nest0]
-  simp only [vec4_0, vec4_1, vec4_2, vec4_3, sum_mul_eta]
-  rw [← sum_epsEtaSummand, ← sum4_eq epsEtaSummand]
-  refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun x1 _ =>
-    Finset.sum_congr rfl fun x2 _ => Finset.sum_congr rfl fun x3 _ => ?_
-  rw [epsEtaSummand, leviCivita_basis_repr_apply]
-  simp only [vec4_0, vec4_1, vec4_2, vec4_3]
+  rw [leviCivita_contract_self_eq_sum]
+  calc
+    _ = - ∑ b : ComponentIdx (S := realLorentzTensor 3)
+        ![Color.up, Color.up, Color.up, Color.up],
+      (Tensor.basis _).repr ε4 b * (Tensor.basis _).repr ε4 b := by
+        rw [← Finset.sum_neg_distrib]
+        refine Finset.sum_congr rfl fun b _ => ?_
+        rw [leviCivita_lowered_basis_repr_apply]
+        ring
+    _ = -24 := by rw [leviCivita_basis_contract_self]
 
 end realLorentzTensor

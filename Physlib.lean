@@ -453,7 +453,6 @@ public import Physlib.Relativity.Tensors.RealTensor.CoVector.Basic
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Representation
 public import Physlib.Relativity.Tensors.RealTensor.CoVector.Tensorial
 public import Physlib.Relativity.Tensors.RealTensor.Contraction.CrossToEnd
-public import Physlib.Relativity.Tensors.RealTensor.Contraction.CrossToSlot
 public import Physlib.Relativity.Tensors.RealTensor.Matrix.Pre
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Basic
 public import Physlib.Relativity.Tensors.RealTensor.Metrics.Pre

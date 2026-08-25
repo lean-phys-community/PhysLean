@@ -1,11 +1,11 @@
 /-
 Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Robert Sneiderman, Joseph Tooby-Smith
 -/
 module
 
-public import Physlib.Relativity.Tensors.RealTensor.Contraction.CrossToSlot
+public import Physlib.Relativity.Tensors.RealTensor.Contraction.CrossToEnd
 /-!
 
 ## Metrics as real Lorentz tensors
@@ -152,11 +152,40 @@ lemma toDualMapAtIndex_basis_repr_apply {d n : ℕ} {c : Fin (n + 1) → Color}
       ∑ x : Fin 1 ⊕ Fin d,
         (Tensor.basis c).repr t (i.insertNth x (fun m => φ (i.succAbove m))) *
           minkowskiMatrix x (φ i) := by
-  have h := crossToSlot_basis_repr_apply_eq_fin (d := d) i (0 : Fin 2) rfl
+  have h := crossToSlot_basis_repr_apply (S := realLorentzTensor d) i (0 : Fin 2) rfl
     (metricTensor (S := realLorentzTensor d) ((realLorentzTensor d).τ (c i))) t φ
+  rw [crossToEnd_basis_repr_apply_eq_fin] at h
+  simp only [basisIdxCongr_eq_refl, Equiv.refl_apply] at h
   refine h.trans (Finset.sum_congr rfl fun x _ => ?_)
   congr 1
+  · congr 1
+    funext m
+    induction m using Fin.succAboveCases (i := i) with
+    | x => rw [Fin.insertNth_apply_same, Fin.insertNth_apply_same]
+    | p q =>
+      rw [Fin.insertNth_apply_succAbove, Fin.insertNth_apply_succAbove,
+        IsReindexing.inv_equiv_symm_eq,
+        ← Fin.append_succAbove_const_eq_cycleIcc i, Fin.append_left]
   rw [metricTensor_repr_apply_eq_minkowskiMatrix]
   congr 1
+  rw [show (1 : Fin 2) = (0 : Fin 2).succAbove 0 from rfl,
+    Fin.insertNth_apply_succAbove, IsReindexing.inv_equiv_symm_eq,
+    ← Fin.append_succAbove_const_eq_cycleIcc i, Fin.append_right]
+
+/-- In the standard Lorentz basis, raising or lowering an index multiplies the component with that
+index fixed by the corresponding diagonal entry of the Minkowski metric. -/
+lemma toDualMapAtIndex_basis_repr_apply_eq_mul {d n : ℕ} {c : Fin (n + 1) → Color}
+    (i : Fin (n + 1)) (t : ℝT(d, c))
+    (φ : ComponentIdx (S := realLorentzTensor d)
+      (Function.update c i ((realLorentzTensor d).τ (c i)))) :
+    (Tensor.basis _).repr (Tensor.toDualMapAtIndex (S := realLorentzTensor d) i t) φ =
+      (Tensor.basis c).repr t φ * minkowskiMatrix (φ i) (φ i) := by
+  rw [toDualMapAtIndex_basis_repr_apply]
+  change ((fun x => (Tensor.basis c).repr t
+    (i.insertNth x (fun m => φ (i.succAbove m)))) ᵥ* minkowskiMatrix) (φ i) = _
+  rw [minkowskiMatrix.vecMul_apply]
+  congr 2
+  change (i.insertNth (φ i) (i.removeNth φ) : Fin (n + 1) → Fin 1 ⊕ Fin d) = φ
+  exact Fin.insertNth_self_removeNth i φ
 
 end realLorentzTensor
