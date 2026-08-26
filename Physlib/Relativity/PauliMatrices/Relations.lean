@@ -154,27 +154,12 @@ lemma dualWeyl_mul_pauliContr_eq_ofRat :
   rw [toTensor_dualWeyl_eq_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat, contrT_ofRat]
   congr
 
-private lemma toComplexNum_eq_add_neg_add_add_iff
-    {a b c d e : Physlib.RatComplexNum} :
-    (Physlib.RatComplexNum.toComplexNum a =
-      Physlib.RatComplexNum.toComplexNum b +
-      -Physlib.RatComplexNum.toComplexNum c +
-      Physlib.RatComplexNum.toComplexNum d +
-      Physlib.RatComplexNum.toComplexNum e) ↔
-      a = b + -c + d + e := by
-  rw [← map_neg, ← map_add, ← map_add, ← map_add]
-  exact Function.Injective.eq_iff Physlib.RatComplexNum.toComplexNum_injective
-
-private lemma neg_I_mul_toComplexNum (a : Physlib.RatComplexNum) :
-    (-Complex.I) * Physlib.RatComplexNum.toComplexNum a =
-      Physlib.RatComplexNum.toComplexNum (- (⟨0, 1⟩ * a)) := by
-  rw [neg_mul, Physlib.RatComplexNum.I_mul_toComplexNum, ← map_neg]
-
-private lemma leviCivita_mul_pauliDual :
+/-- Contracting `ε4ℂ` with a Lorentz-dualized `σ^^^` agrees with contracting it with
+`pauliCo`. -/
+lemma leviCivita_mul_pauliDual :
     ({ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) α β =
       ε4ℂ | μ ν ρ κ ⊗ σ_^^ | κ α β}ᵀ : Prop) := by
-  rw [pauliDual_eq_pauliCo]
-  rw [prodT_permT_right, contrT_permT]
+  rw [pauliDual_eq_pauliCo, prodT_permT_right, contrT_permT]
   apply permT_congr
   · decide
   · rfl
@@ -204,7 +189,7 @@ lemma pauliContr_mul_pauliContrDown_mul_pauliContr : ({
   simp only [permT_basis_repr_symm_apply, map_neg, Finsupp.coe_neg, Pi.neg_apply,
     map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, ofRat_basis_repr_apply]
   rw [Physlib.RatComplexNum.I_mul_toComplexNum]
-  apply toComplexNum_eq_add_neg_add_add_iff.mpr
+  apply Physlib.RatComplexNum.toComplexNum_eq_add_neg_add_add_iff.mpr
   decide +revert +kernel
 
 /-- Equation (2.27), the conjugate three-Pauli identity
@@ -215,8 +200,7 @@ lemma pauliContrDown_mul_pauliContr_mul_pauliContrDown : ({
       ((((η | μ ν ⊗ σ^^^ | ρ τ(α') τ(β))
       + (-((η | μ ρ ⊗ σ^^^ | ν τ(α') τ(β)))))
       + (η | ν ρ ⊗ σ^^^ | μ τ(α') τ(β)))
-      + ((-Complex.I) •ₜ
-        (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) τ(α') τ(β))))
+      + ((-Complex.I) •ₜ (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) τ(α') τ(β))))
     }ᵀ : Prop) := by
   conv_lhs =>
     rw [dualWeyl_mul_pauliContr_eq_ofRat, toTensor_dualWeyl_eq_ofRat,
@@ -231,8 +215,8 @@ lemma pauliContrDown_mul_pauliContr_mul_pauliContrDown : ({
   simp only [map_add, Finsupp.coe_add, Pi.add_apply]
   simp only [permT_basis_repr_symm_apply, map_neg, Finsupp.coe_neg, Pi.neg_apply,
     map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, ofRat_basis_repr_apply]
-  rw [neg_I_mul_toComplexNum]
-  apply toComplexNum_eq_add_neg_add_add_iff.mpr
+  rw [Physlib.RatComplexNum.neg_I_mul_toComplexNum]
+  apply Physlib.RatComplexNum.toComplexNum_eq_add_neg_add_add_iff.mpr
   decide +revert +kernel
 
 end PauliMatrix

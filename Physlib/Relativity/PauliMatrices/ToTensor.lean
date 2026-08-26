@@ -205,19 +205,13 @@ lemma toTensor_dualLeft_eq_ofRat :
             if (b 1).val = 0 ∧ x.val = 1 then -1 else 0)) := by
   let M : ℂT[.downL, .downL] := εL'
   conv_lhs =>
-    rw [toTensor_eq_ofRat]
-    rw [toDualMapAtIndex]
+    rw [toTensor_eq_ofRat, toDualMapAtIndex]
     change crossToSlot 1 0 (by rfl) M (ofRat _)
-    erw [crossToSlot_eq_crossToEnd]
-    erw [crossToEnd]
+    erw [crossToSlot_eq_crossToEnd, crossToEnd]
     simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
     dsimp only [M]
-    rw [dualLeftMetric_eq_ofRat]
-    rw [prodT_ofRat_ofRat]
-    rw [permT_ofRat]
-    rw [contrT_ofRat]
-    rw [permT_ofRat]
-    rw [permT_ofRat]
+    rw [dualLeftMetric_eq_ofRat, prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat,
+      permT_ofRat, permT_ofRat]
   congr
   funext b
   decide +revert +kernel
@@ -233,16 +227,11 @@ lemma toTensor_dualWeyl_eq_ofRat :
   conv_lhs =>
     rw [toDualMapAtIndex]
     change crossToSlot 2 0 (by rfl) M (ofRat _)
-    erw [crossToSlot_eq_crossToEnd]
-    erw [crossToEnd]
+    erw [crossToSlot_eq_crossToEnd, crossToEnd]
     simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
     dsimp only [M]
-    rw [dualRightMetric_eq_ofRat]
-    rw [prodT_ofRat_ofRat]
-    rw [permT_ofRat]
-    rw [contrT_ofRat]
-    rw [permT_ofRat]
-    rw [permT_ofRat]
+    rw [dualRightMetric_eq_ofRat, prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat,
+      permT_ofRat, permT_ofRat]
   congr
   funext b
   decide +revert +kernel
@@ -254,19 +243,13 @@ lemma toTensor_dualLorentz_eq_ofRat :
       ofRat (fun b => pauliContrDownComponent (b 0) (b 1) (b 2)) := by
   let M : ℂT[.down, .down] := η'
   conv_lhs =>
-    rw [toTensor_eq_ofRat]
-    rw [toDualMapAtIndex]
+    rw [toTensor_eq_ofRat, toDualMapAtIndex]
     change crossToSlot 0 0 (by rfl) M (ofRat _)
-    erw [crossToSlot_eq_crossToEnd]
-    erw [crossToEnd]
+    erw [crossToSlot_eq_crossToEnd, crossToEnd]
     simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
     dsimp only [M]
-    rw [coMetric_eq_ofRat]
-    rw [prodT_ofRat_ofRat]
-    rw [permT_ofRat]
-    rw [contrT_ofRat]
-    rw [permT_ofRat]
-    rw [permT_ofRat]
+    rw [coMetric_eq_ofRat, prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat,
+      permT_ofRat, permT_ofRat]
   congr
   funext b
   decide +revert +kernel
@@ -284,16 +267,11 @@ lemma toTensor_dualLorentzLeft_eq_ofRat :
   conv_lhs =>
     rw [toDualMapAtIndex]
     change crossToSlot 1 0 (by rfl) M (ofRat _)
-    erw [crossToSlot_eq_crossToEnd]
-    erw [crossToEnd]
+    erw [crossToSlot_eq_crossToEnd, crossToEnd]
     simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
     dsimp only [M]
-    rw [dualLeftMetric_eq_ofRat]
-    rw [prodT_ofRat_ofRat]
-    rw [permT_ofRat]
-    rw [contrT_ofRat]
-    rw [permT_ofRat]
-    rw [permT_ofRat]
+    rw [dualLeftMetric_eq_ofRat, prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat,
+      permT_ofRat, permT_ofRat]
   congr
   funext b
   decide +revert +kernel
@@ -308,16 +286,11 @@ lemma toTensor_dualAll_eq_ofRat :
   conv_lhs =>
     rw [toDualMapAtIndex]
     change crossToSlot 2 0 (by rfl) M (ofRat _)
-    erw [crossToSlot_eq_crossToEnd]
-    erw [crossToEnd]
+    erw [crossToSlot_eq_crossToEnd, crossToEnd]
     simp only [LinearMap.compr₂_apply, LinearMap.comp_apply]
     dsimp only [M]
-    rw [dualRightMetric_eq_ofRat]
-    rw [prodT_ofRat_ofRat]
-    rw [permT_ofRat]
-    rw [contrT_ofRat]
-    rw [permT_ofRat]
-    rw [permT_ofRat]
+    rw [dualRightMetric_eq_ofRat, prodT_ofRat_ofRat, permT_ofRat, contrT_ofRat,
+      permT_ofRat, permT_ofRat]
   congr
   funext b
   decide +revert +kernel

@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Robert Sneiderman, Joseph Tooby-Smith
 -/
 module
 
@@ -238,6 +238,11 @@ lemma I_mul_toComplexNum (a : RatComplexNum) : I * toComplexNum a = toComplexNum
   simp only [I_sq, neg_mul, one_mul]
   ring
 
+/-- Multiplication by `-I` under the inclusion of `RatComplexNum` into the complex numbers. -/
+lemma neg_I_mul_toComplexNum (a : RatComplexNum) :
+    (-I) * toComplexNum a = toComplexNum (- (⟨0, 1⟩ * a)) := by
+  rw [neg_mul, I_mul_toComplexNum, ← map_neg]
+
 lemma ofNat_mul_toComplexNum (n : ℕ) (a : RatComplexNum) :
     n * toComplexNum a = toComplexNum (n * a) := by
   simp only [map_mul, map_natCast]
@@ -251,6 +256,14 @@ lemma toComplexNum_injective : Function.Injective toComplexNum := by
   ext
   · exact ha.1
   · exact ha.2
+
+/-- Equality with a four-term sum of rational complex numbers can be checked before their
+inclusion into the complex numbers. -/
+lemma toComplexNum_eq_add_neg_add_add_iff {a b c d e : RatComplexNum} :
+    (toComplexNum a = toComplexNum b + -toComplexNum c + toComplexNum d + toComplexNum e) ↔
+      a = b + -c + d + e := by
+  rw [← map_neg, ← map_add, ← map_add, ← map_add]
+  exact Function.Injective.eq_iff toComplexNum_injective
 
 end RatComplexNum
 end Physlib
