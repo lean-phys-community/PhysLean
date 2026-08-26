@@ -15,7 +15,7 @@ public import Physlib.Meta.TODO.Basic
 ## i. Overview
 
 This file proves the "epsilon-epsilon" contraction identities for the rank-four Levi-Civita
-tensor `leviCivita` (notation `ε4`) in `d = 3`, stated in terms of the standard-basis
+tensor `leviCivita` (notation `ε4`) in `d = 4`, stated in terms of the standard-basis
 components of `ε4` itself (`realLorentzTensor.leviCivita_basis_repr_apply`).
 
 The underlying facts about the `generalizedKroneckerDelta` alone, with no
