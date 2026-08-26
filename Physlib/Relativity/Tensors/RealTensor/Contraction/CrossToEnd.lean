@@ -73,7 +73,8 @@ lemma crossToEnd_basis_repr_apply_eq_fin {d nA nB : ℕ} {cA : Fin (nA + 1) → 
       rw [Fin.insertNth_apply_succAbove]
       conv_lhs => rw [← Fin.succSuccAbove_castAdd_natAdd_apply_castAdd i j q]
       simp only [Fin.cast_cast, Fin.cast_eq_self]
-      rw [ComponentIdx.DropPairSection.ofFinEquiv_apply_succSuccAbove]
+      rw [(ComponentIdx.DropPairSection.mem_iff_apply_succSuccAbove_eq _ _).mp
+        (ComponentIdx.DropPairSection.ofFinEquiv _ _ _).2]
       simp only [basisIdxCongr_eq_refl, Equiv.refl_apply]
       exact congrArg φ (IsReindexing.inv_id_eq _ _)
   · congr 1
@@ -87,7 +88,8 @@ lemma crossToEnd_basis_repr_apply_eq_fin {d nA nB : ℕ} {cA : Fin (nA + 1) → 
       rw [Fin.insertNth_apply_succAbove]
       conv_lhs => rw [← Fin.succSuccAbove_castAdd_natAdd_apply_natAdd i j q]
       simp only [Fin.cast_cast, Fin.cast_eq_self]
-      rw [ComponentIdx.DropPairSection.ofFinEquiv_apply_succSuccAbove]
+      rw [(ComponentIdx.DropPairSection.mem_iff_apply_succSuccAbove_eq _ _).mp
+        (ComponentIdx.DropPairSection.ofFinEquiv _ _ _).2]
       simp only [basisIdxCongr_eq_refl, Equiv.refl_apply]
       exact congrArg φ (IsReindexing.inv_id_eq _ _)
 

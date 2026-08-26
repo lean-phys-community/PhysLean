@@ -150,6 +150,7 @@ lemma euclidLeviCivita_symbol_contract_two (r s t w : Fin 4) :
 namespace realLorentzTensor
 
 open TensorSpecies Tensor
+open ComponentIdx.DropPairSection
 
 /-- Lowering all four indices of the Levi-Civita tensor changes the sign of every standard-basis
 component. This is the tensor-component form of the Lorentzian orientation factor
@@ -215,60 +216,6 @@ lemma leviCivita_basis_contract_three (a b : Fin 1 ⊕ Fin 3) :
           KroneckerDelta.eq_zero_of_ne (fun h => hab (finSumFinEquiv.injective h))]
         norm_num
 
-open ComponentIdx.DropPairSection in
-private lemma contractFour_route {cA cB : Fin 4 → Color}
-    (h1 : (0 : Fin (0 + 1 + 1)) ≠ 1) (h2 : (1 : Fin (2 + 1 + 1)) ≠ 3)
-    (h3 : (2 : Fin (4 + 1 + 1)) ≠ 5) (h4 : (3 : Fin (6 + 1 + 1)) ≠ 7)
-    (x0 x1 x2 x3 : Fin 1 ⊕ Fin 3) :
-    let v := (ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h4
-      ((ofFinEquiv h3
-        ((ofFinEquiv h2
-          ((ofFinEquiv h1 (fun j => j.elim0) (x0, x0)).1) (x1, x1)).1) (x2, x2)).1)
-        (x3, x3)).1
-    (ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB)) v =
-      (![x0, x1, x2, x3], ![x0, x1, x2, x3]) := by
-  dsimp only
-  apply Prod.ext <;> funext m <;> fin_cases m <;> rfl
-
-open ComponentIdx.DropPairSection in
-private lemma contractThree_route {cA cB : Fin 4 → Color}
-    (h1 : (0 : Fin (2 + 1 + 1)) ≠ 2) (h2 : (1 : Fin (4 + 1 + 1)) ≠ 4)
-    (h3 : (2 : Fin (6 + 1 + 1)) ≠ 6)
-    (b : Fin 2 → Fin 1 ⊕ Fin 3) (x0 x1 x2 : Fin 1 ⊕ Fin 3) :
-    let v := (ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h3
-      ((ofFinEquiv h2 ((ofFinEquiv h1 b (x0, x0)).1) (x1, x1)).1) (x2, x2)).1
-    (ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB)) v =
-      (![x0, x1, x2, b 0], ![x0, x1, x2, b 1]) := by
-  dsimp only
-  apply Prod.ext <;> funext m <;> fin_cases m <;> rfl
-
-/-- Bundling four independent basis indices into one component index. -/
-private def vec4Equiv {X : Type} : (X × X × X × X) ≃ (Fin 4 → X) where
-  toFun p := ![p.1, p.2.1, p.2.2.1, p.2.2.2]
-  invFun v := (v 0, v 1, v 2, v 3)
-  left_inv p := rfl
-  right_inv v := by funext m; fin_cases m <;> rfl
-
-/-- Bundling three independent basis indices into one component index. -/
-private def vec3Equiv {X : Type} : (X × X × X) ≃ (Fin 3 → X) where
-  toFun p := ![p.1, p.2.1, p.2.2]
-  invFun v := (v 0, v 1, v 2)
-  left_inv p := rfl
-  right_inv v := by funext m; fin_cases m <;> rfl
-
-private lemma sum4_eq {M X : Type} [Fintype X] [AddCommMonoid M] (F : (Fin 4 → X) → M) :
-    ∑ x0 : X, ∑ x1 : X, ∑ x2 : X, ∑ x3 : X, F ![x0, x1, x2, x3]
-      = ∑ v : Fin 4 → X, F v := by
-  rw [← Equiv.sum_comp vec4Equiv F]
-  simp only [Fintype.sum_prod_type]
-  rfl
-
-private lemma sum3_eq {M X : Type} [Fintype X] [AddCommMonoid M] (F : (Fin 3 → X) → M) :
-    ∑ x0 : X, ∑ x1 : X, ∑ x2 : X, F ![x0, x1, x2] = ∑ h, F h := by
-  rw [← Equiv.sum_comp vec3Equiv F]
-  simp only [Fintype.sum_prod_type]
-  rfl
-
 /-- The standard-basis component formula for the tensor contraction
 `ε^{μνρσ} ε_{μνρτ}`. -/
 lemma leviCivita_contract_three_basis_repr_apply
@@ -278,20 +225,40 @@ lemma leviCivita_contract_three_basis_repr_apply
       ∑ h : Fin 3 → Fin 1 ⊕ Fin 3,
         (Tensor.basis _).repr ε4 (Fin.snoc h (b 0)) *
           (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) (Fin.snoc h (b 1)) := by
+  have route {cA cB : Fin 4 → Color}
+      (h1 : (0 : Fin 4) ≠ 2) (h2 : (1 : Fin 6) ≠ 4) (h3 : (2 : Fin 8) ≠ 6)
+      (b : Fin 2 → Fin 1 ⊕ Fin 3) (x0 x1 x2 : Fin 1 ⊕ Fin 3) :
+      let v := (ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h3
+        ((ofFinEquiv h2 ((ofFinEquiv h1 b (x0, x0)).1) (x1, x1)).1) (x2, x2)).1
+      (ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB)) v =
+        (![x0, x1, x2, b 0], ![x0, x1, x2, b 1]) := by
+    dsimp only
+    apply Prod.ext <;> funext m <;> fin_cases m <;> rfl
   simp only [contrT_basis_repr_apply_eq_fin, prodT_basis_repr_apply,
-    contractThree_route]
+    route]
   let F (h : Fin 3 → Fin 1 ⊕ Fin 3) :=
     (Tensor.basis _).repr ε4 ![h 0, h 1, h 2, b 0] *
       (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) ![h 0, h 1, h 2, b 1]
   change (∑ x0, ∑ x1, ∑ x2, F ![x0, x1, x2]) = _
-  rw [sum3_eq F]
-  refine Finset.sum_congr rfl fun h _ => ?_
-  dsimp only [F]
-  have hs (y : Fin 1 ⊕ Fin 3) :
-      (![h 0, h 1, h 2, y] : Fin 4 → Fin 1 ⊕ Fin 3) = Fin.snoc h y := by
-    funext i
-    fin_cases i <;> rfl
-  rw [hs (b 0), hs (b 1)]
+  let e : ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≃
+      (Fin 3 → Fin 1 ⊕ Fin 3) :=
+    { toFun := fun p => ![p.1, p.2.1, p.2.2]
+      invFun := fun v => (v 0, v 1, v 2)
+      left_inv := fun _ => rfl
+      right_inv := fun v => by funext m; fin_cases m <;> rfl }
+  calc
+    _ = ∑ h, F h := by
+      rw [← Equiv.sum_comp e F]
+      simp only [Fintype.sum_prod_type]
+      rfl
+    _ = _ := by
+      refine Finset.sum_congr rfl fun h _ => ?_
+      dsimp only [F]
+      have hs (y : Fin 1 ⊕ Fin 3) :
+          (![h 0, h 1, h 2, y] : Fin 4 → Fin 1 ⊕ Fin 3) = Fin.snoc h y := by
+        funext i
+        fin_cases i <;> rfl
+      rw [hs (b 0), hs (b 1)]
 
 /-!
 
@@ -337,11 +304,34 @@ lemma leviCivita_contract_self_eq_sum :
           ![Color.up, Color.up, Color.up, Color.up],
         (Tensor.basis _).repr ε4 b *
           (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) b := by
+  have route {cA cB : Fin 4 → Color}
+      (h1 : (0 : Fin 2) ≠ 1) (h2 : (1 : Fin 4) ≠ 3)
+      (h3 : (2 : Fin 6) ≠ 5) (h4 : (3 : Fin 8) ≠ 7)
+      (x0 x1 x2 x3 : Fin 1 ⊕ Fin 3) :
+      let v := (ofFinEquiv (S := realLorentzTensor 3) (c := Fin.append cA cB) h4
+        ((ofFinEquiv h3
+          ((ofFinEquiv h2
+            ((ofFinEquiv h1 (fun j => j.elim0) (x0, x0)).1) (x1, x1)).1) (x2, x2)).1)
+          (x3, x3)).1
+      (ComponentIdx.prod (S := realLorentzTensor 3) (c := cA) (c1 := cB)) v =
+        (![x0, x1, x2, x3], ![x0, x1, x2, x3]) := by
+    dsimp only
+    apply Prod.ext <;> funext m <;> fin_cases m <;> rfl
   rw [Tensor.toField_eq_repr]
   simp only [contrT_basis_repr_apply_eq_fin, prodT_basis_repr_apply,
-    contractFour_route]
-  exact sum4_eq (fun b => (Tensor.basis _).repr ε4 b *
-    (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) b)
+    route]
+  let F (b : Fin 4 → Fin 1 ⊕ Fin 3) := (Tensor.basis _).repr ε4 b *
+    (Tensor.basis _).repr ({ε4 | τ(μ) τ(ν) τ(ρ) τ(σ)}ᵀ) b
+  change (∑ x0, ∑ x1, ∑ x2, ∑ x3, F ![x0, x1, x2, x3]) = ∑ b, F b
+  let e : ((Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3) × (Fin 1 ⊕ Fin 3)) ≃
+      (Fin 4 → Fin 1 ⊕ Fin 3) :=
+    { toFun := fun p => ![p.1, p.2.1, p.2.2.1, p.2.2.2]
+      invFun := fun v => (v 0, v 1, v 2, v 3)
+      left_inv := fun _ => rfl
+      right_inv := fun v => by funext m; fin_cases m <;> rfl }
+  rw [← Equiv.sum_comp e F]
+  simp only [Fintype.sum_prod_type]
+  rfl
 
 /-- Fully contracting the Lorentzian Levi-Civita tensor with a lowered copy gives `-24`. -/
 @[nolint checkType]

@@ -312,11 +312,9 @@ lemma sum_generalizedKroneckerDelta_mul_cons (σ τ : Fin 4) :
 /-- Symbol-level triple contraction with the free index in the last slot. -/
 lemma sum_generalizedKroneckerDelta_mul_snoc (σ τ : Fin 4) :
     ∑ h : Fin 3 → Fin 4,
-        generalizedKroneckerDelta (Fin.snoc h σ) id *
-          generalizedKroneckerDelta (Fin.snoc h τ) id =
+        generalizedKroneckerDelta (Fin.snoc h σ) id * generalizedKroneckerDelta (Fin.snoc h τ) id =
       6 * ((kroneckerDelta σ τ : ℕ) : ℤ) := by
-  rw [Finset.sum_congr rfl fun h _ => generalizedKroneckerDelta_mul (Fin.snoc h σ)
-    (Fin.snoc h τ)]
+  rw [Finset.sum_congr rfl fun h _ => generalizedKroneckerDelta_mul (Fin.snoc h σ) (Fin.snoc h τ)]
   have hrotate (h : Fin 3 → Fin 4) :
       generalizedKroneckerDelta (Fin.snoc h σ) (Fin.snoc h τ) =
         generalizedKroneckerDelta (Fin.cons σ h) (Fin.cons τ h) := by
