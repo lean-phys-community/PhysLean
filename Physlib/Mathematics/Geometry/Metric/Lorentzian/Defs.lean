@@ -6,53 +6,55 @@ Authors: Matteo Cipollina
 module
 
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
-public import Mathlib.Geometry.Manifold.VectorBundle.Tangent
-public import Mathlib.LinearAlgebra.QuadraticForm.Signature
 
 /-!
-# Lorentzian metrics
+# Lorentzian manifolds
 
-This file records the Lorentzian condition (index `1`) for a pseudo-Riemannian metric.
+A Lorentzian metric is a pseudo-Riemannian metric of index `1`. Since the index is locally
+constant (`PseudoRiemannian.isLocallyConstant_index`), on a connected manifold the condition need
+only be checked at one point; see `PseudoRiemannian.isLorentzian_of_index_eq_one`.
 
-We adopt the mathematical, or "mostly plus", convention: a Lorentzian metric has exactly one
-negative direction, corresponding to signature `(-, +, ..., +)`. Users working with the physics
-"mostly minus" convention should keep in mind that such a metric has negative index `dim - 1`
-instead.
+We use the "mostly plus" convention: signature `(-, +, …, +)`, so index `1`. In the "mostly
+minus" convention the same metric has index `dim M - 1`.
 
 ## Main definitions
 
-* `PseudoRiemannianMetric.IsLorentzianMetric`: the Prop-valued predicate asserting that a
-  pseudo-Riemannian metric has index `1` at every point.
+* `PseudoRiemannian.IsLorentzian I M`: the index is `1` everywhere.
 
 ## Tags
 
-Lorentzian, pseudo-Riemannian, index
+Lorentzian, pseudo-Riemannian, index, signature, spacetime
 -/
 
 @[expose] public section
 
-namespace PseudoRiemannianMetric
+open Bundle
+open scoped Manifold Bundle ContDiff
 
-noncomputable section
+namespace PseudoRiemannian
 
-variable {E : Type v} [NormedAddCommGroup E] [NormedSpace ℝ E]
-variable {H : Type w} [TopologicalSpace H]
-variable {M : Type*} [TopologicalSpace M] [ChartedSpace H M]
-variable {I : ModelWithCorners ℝ E H} {n : WithTop ℕ∞}
-variable [IsManifold I (n + 1) M]
-variable [∀ x : M, FiniteDimensional ℝ (TangentSpace I x)]
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+  {H : Type*} [TopologicalSpace H] {I : ModelWithCorners ℝ E H}
+  {M : Type*} [TopologicalSpace M] [ChartedSpace H M] {n : WithTop ℕ∞}
+  [∀ x : M, PseudoInnerProductSpace (TangentSpace I x)]
 
-/-- Predicate asserting that a pseudo-Riemannian metric has index `1` at every point. -/
-class IsLorentzianMetric (g : _root_.PseudoRiemannianMetric E H M n I) : Prop where
+variable (I M) in
+/-- The metric is Lorentzian: its index is `1` at every point, i.e. its signature is
+`(-, +, …, +)`. -/
+class IsLorentzian : Prop where
   /-- A Lorentzian metric has index `1` at every point. -/
-  index_eq_one : ∀ x : M, g.index x = 1
+  index_eq_one : ∀ x : M, index I x = 1
 
 @[simp]
-lemma sigNeg_toQuadraticForm_eq_one (g : _root_.PseudoRiemannianMetric E H M n I)
-    [IsLorentzianMetric (g := g)] (x : M) :
-    sigNeg (g.toQuadraticForm x) = 1 := by
-  simpa [_root_.PseudoRiemannianMetric.index] using IsLorentzianMetric.index_eq_one (g := g) x
+lemma index_eq_one [IsLorentzian I M] (x : M) : index I x = 1 :=
+  IsLorentzian.index_eq_one x
 
-end
+variable [IsManifold I 1 M] [FiniteDimensional ℝ E]
 
-end PseudoRiemannianMetric
+/-- On a connected manifold, being Lorentzian can be checked at a single point. -/
+lemma isLorentzian_of_index_eq_one [PreconnectedSpace M]
+    [IsContMDiffPseudoRiemannianBundle I n E (TangentSpace I : M → Type _)] {x₀ : M}
+    (h : index I x₀ = 1) : IsLorentzian I M :=
+  ⟨fun x ↦ (index_eq_of_preconnectedSpace (n := n) x x₀).trans h⟩
+
+end PseudoRiemannian

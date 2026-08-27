@@ -121,13 +121,14 @@ public import Physlib.Mathematics.Fin.Involutions
 public import Physlib.Mathematics.Geometry.Metric.Lorentzian.Defs
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Basic
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
-public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.MetricTensorCotangent
 public import Physlib.Mathematics.Geometry.Metric.Riemannian.Defs
 public import Physlib.Mathematics.HasTemperateGrowth
 public import Physlib.Mathematics.InnerProductSpace.Adjoint
 public import Physlib.Mathematics.InnerProductSpace.Basic
 public import Physlib.Mathematics.InnerProductSpace.Calculus
 public import Physlib.Mathematics.InnerProductSpace.Gaussian
+public import Physlib.Mathematics.InnerProductSpace.PseudoInner
+public import Physlib.Mathematics.InnerProductSpace.PseudoInnerSignature
 public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Physlib.Mathematics.KroneckerDelta.Contraction

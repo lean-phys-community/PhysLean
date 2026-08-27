@@ -6,132 +6,80 @@ Authors: Matteo Cipollina
 module
 
 public import Physlib.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
-public import Mathlib.Geometry.Manifold.VectorBundle.Riemannian
-public import Mathlib.Geometry.Manifold.VectorBundle.Tangent
-public import Mathlib.LinearAlgebra.QuadraticForm.Signature
 
 /-!
-# Riemannian metrics (tangent bundle)
+# Riemannian manifolds as the index-zero pseudo-Riemannian manifolds
 
-This file defines `RiemannianMetric` as the specialization of Mathlib's bundle-level
-`Bundle.ContMDiffRiemannianMetric` to the tangent bundle, and provides a coercion to
-`PseudoRiemannianMetric` by forgetting positivity.
+Riemannian geometry is a special case of the pseudo-Riemannian development, not a parallel one:
+`InnerProductSpace.toPseudoInnerProductSpace` and
+`Bundle.IsContMDiffRiemannianBundle.toIsContMDiffPseudoRiemannianBundle` are instances, so
+Mathlib's Riemannian hypotheses already discharge the pseudo-Riemannian ones. This file records
+the invariant that separates the two cases.
 
 ## Main definitions
 
-* `PseudoRiemannianMetric.RiemannianMetric`: a `C^n` Riemannian metric on `M`.
-* `PseudoRiemannianMetric.IsRiemannianMetric`: the Prop-valued predicate on a generic
-  pseudo-Riemannian metric asserting index `0`.
-* `PseudoRiemannianMetric.RiemannianMetric.toPseudoRiemannianMetric`: forget positivity to obtain a
-  pseudo-Riemannian metric (index `0`).
+* `RiemannianMetric I n M`: Mathlib's `Bundle.ContMDiffRiemannianMetric` for the tangent bundle.
+* `PseudoRiemannian.IsRiemannian I M`: the index vanishes everywhere.
+
+## Main results
+
+* `PseudoRiemannian.index_eq_zero_of_riemannianBundle`: a Riemannian metric has index `0`.
 
 ## Tags
 
-Riemannian, pseudo-Riemannian
+Riemannian, pseudo-Riemannian, index
 -/
 
 @[expose] public section
 
-namespace PseudoRiemannianMetric
+open Bundle
+open scoped Manifold Bundle ContDiff
 
-open Bundle ContinuousLinearMap
-open scoped Manifold Bundle
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+  {H : Type*} [TopologicalSpace H] {I : ModelWithCorners ℝ E H}
+  {M : Type*} [TopologicalSpace M] [ChartedSpace H M] {n : WithTop ℕ∞}
 
-noncomputable section
-
-variable {E : Type v} [NormedAddCommGroup E] [NormedSpace ℝ E]
-variable {H : Type w} [TopologicalSpace H]
-variable {M : Type*} [TopologicalSpace M] [ChartedSpace H M]
-variable {I : ModelWithCorners ℝ E H} {n : WithTop ℕ∞}
-variable [IsManifold I (n + 1) M] [IsManifold I 1 M]
-
-private lemma sigNeg_eq_zero_of_posDef
-    {F : Type*} [AddCommGroup F] [Module ℝ F] [FiniteDimensional ℝ F]
-    {Q : QuadraticForm ℝ F} (hQ : Q.PosDef) : sigNeg Q = 0 := by
-  obtain ⟨W, hW, hWneg⟩ := exists_finrank_eq_sigNeg_and_negDef (Q := Q)
-  have hWbot : W = ⊥ := by
-    rw [Submodule.eq_bot_iff]
-    intro x hx
-    by_contra hx0
-    have hxW : (⟨x, hx⟩ : W) ≠ 0 := fun h => hx0 (congrArg Subtype.val h)
-    have hneg : Q x < 0 := by
-      have := hWneg _ hxW
-      simpa using neg_pos.mp (by simpa using this)
-    exact (not_lt_of_gt (hQ x hx0)) hneg
-  have hfin0 : Module.finrank ℝ W = 0 := by simp [hWbot]
-  exact hW.symm.trans hfin0
-
-/-- A `C^n` Riemannian metric on `M`. -/
-abbrev RiemannianMetric
-    (I : ModelWithCorners ℝ E H) (n : WithTop ℕ∞) (M : Type*)
+/-- A `C^n` Riemannian metric on `M`: Mathlib's bundle-level notion for the tangent bundle. -/
+abbrev RiemannianMetric (I : ModelWithCorners ℝ E H) (n : WithTop ℕ∞) (M : Type*)
     [TopologicalSpace M] [ChartedSpace H M] [IsManifold I 1 M] :=
-  Bundle.ContMDiffRiemannianMetric (IB := I) (n := n) (F := E) (E := fun x : M ↦ TangentSpace I x)
+  Bundle.ContMDiffRiemannianMetric (IB := I) (n := n) (F := E)
+    (E := fun x : M ↦ TangentSpace I x)
 
-variable [∀ x : M, FiniteDimensional ℝ (TangentSpace I x)]
+namespace PseudoRiemannian
+
+section Riemannian
+
+variable [IsManifold I 1 M] [RiemannianBundle (TangentSpace I : M → Type _)]
+
+/-- Transparency check: a Riemannian manifold satisfies the pseudo-Riemannian hypotheses with no
+adapter. -/
+example [IsContMDiffRiemannianBundle I n E (TangentSpace I : M → Type _)] :
+    IsContMDiffPseudoRiemannianBundle I n E (TangentSpace I : M → Type _) := inferInstance
 
 omit [IsManifold I 1 M] in
-/-- Predicate asserting that a pseudo-Riemannian metric has index `0` at every point. -/
-class IsRiemannianMetric (g : _root_.PseudoRiemannianMetric E H M n I) : Prop where
-  /-- A Riemannian metric has index `0` at every point. -/
-  index_eq_zero : ∀ x : M, g.index x = 0
-
-omit [IsManifold I 1 M] in
+/-- A Riemannian metric has index `0` at every point. -/
 @[simp]
-lemma sigNeg_toQuadraticForm_eq_zero (g : _root_.PseudoRiemannianMetric E H M n I)
-    [IsRiemannianMetric (g := g)] (x : M) :
-    sigNeg (g.toQuadraticForm x) = 0 := by
-  simpa [_root_.PseudoRiemannianMetric.index] using IsRiemannianMetric.index_eq_zero (g := g) x
+lemma index_eq_zero_of_riemannianBundle [FiniteDimensional ℝ E] (x : M) : index I x = 0 :=
+  PseudoInnerProductSpace.index_eq_zero_of_innerProductSpace (TangentSpace I x)
 
-namespace RiemannianMetric
+end Riemannian
 
-/-- Forget the positivity to get a pseudo-Riemannian metric. The index is (locally constantly) `0`.
-It makes pseudo-Riemannian API (musical isomorphisms, etc.) usable for a Riemannian metric. -/
-def toPseudoRiemannianMetric (g : RiemannianMetric I n M) :
-    _root_.PseudoRiemannianMetric E H M n I where
-  val := g.inner
-  symm := g.symm
-  nondegenerate x v hv := by
-    by_contra h
-    exact (g.pos x v h).ne' (hv v)
-  contMDiff := g.contMDiff
-  sigNeg_isLocallyConstant :=
-    IsLocallyConstant.of_constant _ fun x y => by
-      have hx :
-          sigNeg (_root_.PseudoRiemannianMetric.valToQuadraticForm g.inner g.symm x) = 0 :=
-        sigNeg_eq_zero_of_posDef fun v hv => by
-          simpa [_root_.PseudoRiemannianMetric.valToQuadraticForm] using g.pos x v hv
-      have hy :
-          sigNeg (_root_.PseudoRiemannianMetric.valToQuadraticForm g.inner g.symm y) = 0 :=
-        sigNeg_eq_zero_of_posDef fun v hv => by
-          simpa [_root_.PseudoRiemannianMetric.valToQuadraticForm] using g.pos y v hv
-      rw [hx, hy]
+variable [∀ x : M, PseudoInnerProductSpace (TangentSpace I x)]
 
-lemma index_toPseudoRiemannianMetric (g : RiemannianMetric I n M) (x : M) :
-    g.toPseudoRiemannianMetric.index x = 0 := by
-  have hx : sigNeg (_root_.PseudoRiemannianMetric.valToQuadraticForm g.inner g.symm x) = 0 :=
-    sigNeg_eq_zero_of_posDef fun v hv => by
-      simpa [_root_.PseudoRiemannianMetric.valToQuadraticForm] using g.pos x v hv
-  simpa [_root_.PseudoRiemannianMetric.index, _root_.PseudoRiemannianMetric.toQuadraticForm,
-    toPseudoRiemannianMetric] using hx
+variable (I M) in
+/-- The metric is Riemannian: its index vanishes at every point. -/
+class IsRiemannian : Prop where
+  /-- A Riemannian metric has index `0` at every point. -/
+  index_eq_zero : ∀ x : M, index I x = 0
 
-instance : Coe (RiemannianMetric I n M) (_root_.PseudoRiemannianMetric E H M n I) :=
-  ⟨toPseudoRiemannianMetric⟩
+@[simp]
+lemma index_eq_zero [IsRiemannian I M] (x : M) : index I x = 0 :=
+  IsRiemannian.index_eq_zero x
 
-instance (g : RiemannianMetric I n M) :
-    IsRiemannianMetric (g := (g : _root_.PseudoRiemannianMetric E H M n I)) where
-  index_eq_zero := index_toPseudoRiemannianMetric (g := g)
+/-- A pointwise positive definite metric is Riemannian. -/
+lemma isRiemannian_of_posDef [FiniteDimensional ℝ E]
+    (h : ∀ x : M, (PseudoInnerProductSpace.toQuadraticForm (TangentSpace I x)).PosDef) :
+    IsRiemannian I M :=
+  ⟨fun x ↦ PseudoInnerProductSpace.index_eq_zero_of_posDef (h x)⟩
 
-end RiemannianMetric
-
-/-! ## Existence helper -/
-
-/-- Existence of a Riemannian metric implies existence of a pseudo-Riemannian metric (of index `0`),
-by forgetting positivity. -/
-theorem nonempty_pseudoRiemannianMetric_of_nonempty_riemannianMetric
-    (h : Nonempty (RiemannianMetric I n M)) :
-    Nonempty (_root_.PseudoRiemannianMetric E H M n I) :=
-  h.map RiemannianMetric.toPseudoRiemannianMetric
-
-end
-
-end PseudoRiemannianMetric
+end PseudoRiemannian
