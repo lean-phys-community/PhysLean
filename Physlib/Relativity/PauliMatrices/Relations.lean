@@ -169,10 +169,9 @@ lemma leviCivita_mul_pauliDual :
   + i ε^{μνρκ} σ_κ`, with barred and lowered forms expressed through index dualization `τ`. -/
 lemma pauliContr_mul_pauliContrDown_mul_pauliContr : ({
     σ^^^ | μ α β ⊗ σ^^^ | ν τ(α') τ(β) ⊗ σ^^^ | ρ α' β' =
-      ((((η | μ ν ⊗ σ^^^ | ρ α β')
-      + (-((η | μ ρ ⊗ σ^^^ | ν α β'))))
-      + (η | ν ρ ⊗ σ^^^ | μ α β'))
-      + (Complex.I •ₜ (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) α β')))
+      ((((η | μ ν ⊗ σ^^^ | ρ α β') + (-((η | μ ρ ⊗ σ^^^ | ν α β'))))
+        + (η | ν ρ ⊗ σ^^^ | μ α β'))
+        + (Complex.I •ₜ (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) α β')))
     }ᵀ : Prop) := by
   conv_lhs =>
     rw [pauliContr_mul_dualWeyl_eq_ofRat, toTensor_eq_ofRat,
@@ -198,9 +197,9 @@ lemma pauliContr_mul_pauliContrDown_mul_pauliContr : ({
 lemma pauliContrDown_mul_pauliContr_mul_pauliContrDown : ({
     σ^^^ | μ τ(α) τ(β) ⊗ σ^^^ | ν α β' ⊗ σ^^^ | ρ τ(α') τ(β') =
       ((((η | μ ν ⊗ σ^^^ | ρ τ(α') τ(β))
-      + (-((η | μ ρ ⊗ σ^^^ | ν τ(α') τ(β)))))
-      + (η | ν ρ ⊗ σ^^^ | μ τ(α') τ(β)))
-      + ((-Complex.I) •ₜ (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) τ(α') τ(β))))
+        + (-((η | μ ρ ⊗ σ^^^ | ν τ(α') τ(β)))))
+        + (η | ν ρ ⊗ σ^^^ | μ τ(α') τ(β)))
+        + ((-Complex.I) •ₜ (ε4ℂ | μ ν ρ κ ⊗ σ^^^ | τ(κ) τ(α') τ(β))))
     }ᵀ : Prop) := by
   conv_lhs =>
     rw [dualWeyl_mul_pauliContr_eq_ofRat, toTensor_dualWeyl_eq_ofRat,
