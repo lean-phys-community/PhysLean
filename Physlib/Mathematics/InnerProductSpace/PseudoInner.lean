@@ -20,9 +20,11 @@ tangent space, a bundle fibre — without a diamond. Inheritance runs
 `InnerProductSpace ℝ E → PseudoInnerProductSpace E` and never the reverse.
 
 Nothing here mentions manifolds: the musical isomorphisms are linear algebra, so the same results
-serve tangent, normal and gauge bundles. Surjectivity of `♭` uses `[T2Space E]` and
-`[FiniteDimensional ℝ E]`, under which every linear map out of `E` is continuous; nondegeneracy
-alone does not give it in infinite dimensions.
+serve tangent, normal and gauge bundles. `♭` is obtained from `LinearMap.BilinForm.toDual`, so it
+is an isomorphism only under `[T2Space E]` and `[FiniteDimensional ℝ E]`. Demanding instead that
+`♭` be an isomorphism outright — a perfect pairing, `LinearMap.IsPerfPair` — would restrict the
+`InnerProductSpace` instance to Hilbert spaces, since Fréchet-Riesz needs completeness, and so
+would defeat the subsumption.
 
 ## Main definitions
 
@@ -165,12 +167,6 @@ lemma toBilinForm_nondegenerate : (flatL E).toBilinForm.Nondegenerate := by
   · exact fun v hv ↦ eq_zero_of_pseudoInner_eq_zero fun w ↦ by simpa using hv w
   · exact fun w hw ↦ eq_zero_of_pseudoInner_right_eq_zero fun v ↦ by simpa using hw v
 
-lemma flatL_injective : Function.Injective (flatL E) := by
-  rw [injective_iff_map_eq_zero]
-  intro v hv
-  exact eq_zero_of_pseudoInner_eq_zero fun w ↦ by
-    simpa using congrFun (congrArg (fun f : E →L[ℝ] ℝ ↦ (f : E → ℝ)) hv) w
-
 variable (E) in
 /-- The quadratic form `v ↦ pseudoInner v v`. Its `QuadraticForm.sigNeg` is the index. -/
 noncomputable def toQuadraticForm : QuadraticForm ℝ E := (flatL E).toQuadraticForm
@@ -182,37 +178,18 @@ end Forms
 
 /-! ## Musical isomorphisms -/
 
-section Dual
-
-variable [IsTopologicalAddGroup E] [ContinuousSMul ℝ E] [T2Space E] [FiniteDimensional ℝ E]
-
-variable (E) in
-/-- On a finite-dimensional Hausdorff real topological vector space, the continuous dual `E⋆`
-has the same dimension as `E`. -/
-lemma finrank_dual_eq : finrank ℝ (E →L[ℝ] ℝ) = finrank ℝ E := by
-  have h : (E →L[ℝ] ℝ) ≃ₗ[ℝ] Module.Dual ℝ E :=
-    (LinearMap.toContinuousLinearMap (𝕜 := ℝ) (E := E) (F' := ℝ)).symm
-  rw [h.finrank_eq, Subspace.dual_finrank_eq]
-
-end Dual
-
 section Musical
 
 variable [IsTopologicalAddGroup E] [ContinuousSMul ℝ E] [T2Space E]
   [FiniteDimensional ℝ E] [PseudoInnerProductSpace E]
 
-lemma flatL_surjective : Function.Surjective (flatL E) :=
-  (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-    (finrank_dual_eq E).symm).mp flatL_injective
-
-lemma flatL_bijective : Function.Bijective (flatL E) :=
-  ⟨flatL_injective, flatL_surjective⟩
-
 variable (E) in
-/-- The musical isomorphism `♭ : E ≃L[ℝ] E⋆`. -/
+/-- The musical isomorphism `♭ : E ≃L[ℝ] E⋆`, from `LinearMap.BilinForm.toDual` composed with the
+identification of the algebraic and continuous duals in finite dimension. -/
 noncomputable def flatEquiv : E ≃L[ℝ] (E →L[ℝ] ℝ) :=
-  LinearEquiv.toContinuousLinearEquiv <|
-    LinearEquiv.ofBijective (flatL E).toLinearMap flatL_bijective
+  LinearEquiv.toContinuousLinearEquiv
+    (((flatL E).toBilinForm.toDual toBilinForm_nondegenerate).trans
+      (LinearMap.toContinuousLinearMap (𝕜 := ℝ) (E := E) (F' := ℝ)))
 
 @[simp]
 lemma flatEquiv_apply (v w : E) : flatEquiv E v w = pseudoInner v w := rfl
