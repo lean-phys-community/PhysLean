@@ -29,6 +29,8 @@ would defeat the subsumption.
 ## Main definitions
 
 * `PseudoInnerProductSpace E`, `pseudoInner v w`, `PseudoInnerProductSpace.flatL`.
+* `PseudoInnerProductSpace.ofBilinForm`: build an instance from a symmetric nondegenerate
+  bilinear form, with no continuity obligation.
 * `PseudoInnerProductSpace.flatEquiv`, `sharpEquiv`, `sharpL`: `♭ : E ≃L[ℝ] E⋆` and its inverse.
 * `PseudoInnerProductSpace.dualPseudoInnerSL`: the induced form on `E⋆`, i.e. the inverse metric.
 
@@ -175,6 +177,24 @@ noncomputable def toQuadraticForm : QuadraticForm ℝ E := (flatL E).toQuadratic
 lemma toQuadraticForm_apply (v : E) : toQuadraticForm E v = pseudoInner v v := rfl
 
 end Forms
+
+/-! ## Building an instance from a bilinear form -/
+
+section OfBilinForm
+
+variable (E) in
+/-- Build a pseudo-inner product from a symmetric nondegenerate bilinear form on a
+finite-dimensional Hausdorff space. Continuity is automatic there, so no analytic input is
+needed; this is how a concrete metric (Minkowski, Schwarzschild, FLRW) is supplied. -/
+@[reducible] noncomputable def ofBilinForm [IsTopologicalAddGroup E] [ContinuousSMul ℝ E]
+    [T2Space E] [FiniteDimensional ℝ E] (B : LinearMap.BilinForm ℝ E) (hs : B.IsSymm)
+    (hn : B.Nondegenerate) : PseudoInnerProductSpace E where
+  pseudoInnerSL := LinearMap.toContinuousLinearMap
+    ((LinearMap.toContinuousLinearMap (𝕜 := ℝ) (E := E) (F' := ℝ)).toLinearMap ∘ₗ B)
+  pseudoInner_symm := LinearMap.BilinForm.isSymm_def.mp hs
+  pseudoInner_nondegenerate := hn.1
+
+end OfBilinForm
 
 /-! ## Musical isomorphisms -/
 

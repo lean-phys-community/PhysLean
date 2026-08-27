@@ -28,7 +28,8 @@ their sum. No symmetry is used.
   subspace is an open condition on the form.
 * `ContinuousLinearMap.eventually_sigNeg_eq`: `sigPos`, `sigNeg` and triviality of the radical are
   locally constant.
-* `PseudoInnerProductSpace.index`, `index_dual_eq`, `index_eq_zero_of_innerProductSpace`.
+* `PseudoInnerProductSpace.index`, `index_dual_eq`, `index_eq_zero_of_innerProductSpace`, and
+  `one_le_index_of_neg`, the criterion for a form to be genuinely indefinite.
 
 ## Tags
 
@@ -226,6 +227,23 @@ lemma radical_toQuadraticForm_eq_bot : (toQuadraticForm E).radical = ⊥ := by
   linarith
 
 variable [FiniteDimensional ℝ E]
+
+variable {E} in
+/-- One vector of negative square already forces positive index: the form is not Riemannian. -/
+lemma one_le_index_of_neg {v : E} (hv : v ≠ 0) (h : pseudoInner v v < 0) : 1 ≤ index E := by
+  have key : Module.finrank ℝ (ℝ ∙ v : Submodule ℝ E) ≤ sigNeg (toQuadraticForm E) := by
+    refine le_sigNeg_of_negDef _ fun x hx ↦ ?_
+    obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp x.2
+    have hc0 : c ≠ 0 := by
+      rintro rfl
+      exact hx (Subtype.ext (by simpa using hc.symm))
+    have hval : toQuadraticForm E (x : E) = c * c * pseudoInner v v := by
+      rw [← hc, ← toQuadraticForm_apply v, QuadraticMap.map_smul]
+      simp [smul_eq_mul]
+    show (0 : ℝ) < -(toQuadraticForm E (x : E))
+    rw [hval]
+    nlinarith [mul_self_pos.mpr hc0]
+  rwa [finrank_span_singleton hv] at key
 
 variable {E} in
 /-- A positive definite form has index `0`. -/

@@ -43,7 +43,9 @@ variable
 * `Bundle.IsContMDiffRiemannianBundle.toIsContMDiffPseudoRiemannianBundle`: subsumption.
 * `ContMDiffWithinAt.pseudoInner_bundle`, `ContMDiffWithinAt.flatL_bundle`: pairing two smooth
   sections and lowering an index preserve smoothness — the inputs to the Koszul formula.
-* `Bundle.isLocallyConstant_index`: the fibrewise index is locally constant.
+* `Bundle.isLocallyConstant_index_of_continuous`: the fibrewise index is locally constant —
+  proved with no manifold structure and no smoothness, continuity of the form being enough;
+  `Bundle.isLocallyConstant_index` is the smooth corollary.
 
 ## Acknowledgements
 
@@ -111,6 +113,21 @@ instance [IsContMDiffPseudoRiemannianBundle IB 2 F E] :
 instance [IsContMDiffPseudoRiemannianBundle IB 3 F E] :
     IsContMDiffPseudoRiemannianBundle IB 2 F E :=
   IsContMDiffPseudoRiemannianBundle.of_le (n := 3) (by norm_cast)
+
+section Trivial
+
+variable {F₁ : Type*} [NormedAddCommGroup F₁] [NormedSpace ℝ F₁] [PseudoInnerProductSpace F₁]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- A trivial bundle whose model fibre is a pseudo-inner product space is pseudo-Riemannian. -/
+instance : IsContMDiffPseudoRiemannianBundle IB n F₁ (Bundle.Trivial B F₁) := by
+  refine ⟨fun _ ↦ PseudoInnerProductSpace.pseudoInnerSL, fun x ↦ ?_, fun _ _ _ ↦ rfl⟩
+  simp only [contMDiffAt_section]
+  convert! contMDiffAt_const (c := PseudoInnerProductSpace.pseudoInnerSL (E := F₁))
+  ext v w
+  simp [hom_trivializationAt_apply, inCoordinates]
+
+end Trivial
 
 end Class
 
@@ -376,14 +393,16 @@ end ContMDiffPseudoRiemannianMetric
 
 end Construction
 
-/-! ## The index of a pseudo-Riemannian bundle -/
+/-! ## The index of a pseudo-Riemannian bundle
+
+Local constancy of the index needs no manifold structure and no smoothness: continuity of the
+fibrewise form is enough. It is therefore proved here for an arbitrary topological vector bundle,
+and specialized to the smooth setting afterwards. -/
 
 section Index
 
 variable
-  {EB : Type*} [NormedAddCommGroup EB] [NormedSpace ℝ EB]
-  {HB : Type*} [TopologicalSpace HB] {IB : ModelWithCorners ℝ EB HB} {n : WithTop ℕ∞}
-  {B : Type*} [TopologicalSpace B] [ChartedSpace HB B]
+  {B : Type*} [TopologicalSpace B]
   {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
   {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
   [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
@@ -399,7 +418,7 @@ private lemma symm_continuousLinearEquivAt_apply {x₀ x : B}
   ((trivializationAt F E x₀).continuousLinearEquivAt ℝ x hx).symm_apply_apply u
 
 /-- Reading the fibrewise form in a local trivialization does not change its index. -/
-lemma index_eq_sigNeg_trivialization {x₀ x : B}
+private lemma index_eq_sigNeg_trivialization {x₀ x : B}
     (hx : x ∈ (trivializationAt F E x₀).baseSet)
     (g : ∀ y : B, E y →L[ℝ] E y →L[ℝ] ℝ)
     (hg : ∀ (y : B) (v w : E y), pseudoInner v w = g y v w)
@@ -415,6 +434,7 @@ lemma index_eq_sigNeg_trivialization {x₀ x : B}
     ((trivializationAt F E x₀).continuousLinearEquivAt ℝ x hx).toLinearEquiv (fun u w ↦ ?_)
   rw [hG, symm_continuousLinearEquivAt_apply hx u, symm_continuousLinearEquivAt_apply hx w]
 
+omit [∀ x, PseudoInnerProductSpace (E x)] in
 /-- Reading the trivial line bundle in its (global) trivialization is the identity. -/
 private lemma trivial_linearMapAt_apply (x₀ x : B) (r : ℝ) :
     (trivializationAt ℝ (Bundle.Trivial B ℝ) x₀).linearMapAt ℝ x r = r := by
@@ -438,27 +458,27 @@ private lemma hom_trivialization_apply {x₀ x : B}
 
 variable [FiniteDimensional ℝ F]
 
-/-- **The index is locally constant.**
+/-- **The index is locally constant**, for a merely continuous fibrewise form.
 
 Sylvester's law of inertia fibrewise, transported to the model fibre by a local trivialization:
 the form varies continuously and is everywhere nondegenerate, so its signature cannot jump. -/
-theorem isLocallyConstant_index [h : IsContMDiffPseudoRiemannianBundle IB n F E] :
+theorem isLocallyConstant_index_of_continuous (g : ∀ x : B, E x →L[ℝ] E x →L[ℝ] ℝ)
+    (hcont : Continuous fun x ↦ TotalSpace.mk' (F →L[ℝ] F →L[ℝ] ℝ)
+      (E := fun y : B ↦ E y →L[ℝ] E y →L[ℝ] ℝ) x (g x))
+    (hg : ∀ (x : B) (v w : E x), pseudoInner v w = g x v w) :
     IsLocallyConstant (fun x ↦ PseudoInnerProductSpace.index (E x)) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x₀
-  obtain ⟨g, g_smooth, hg⟩ := h.exists_contMDiff
   set eh := trivializationAt (F →L[ℝ] F →L[ℝ] ℝ) (fun y : B ↦ E y →L[ℝ] E y →L[ℝ] ℝ) x₀ with heh
   set Φ : B → (F →L[ℝ] F →L[ℝ] ℝ) := fun x ↦ (eh ⟨x, g x⟩).2 with hΦ
-  -- `Φ` is the metric read in a local trivialization; it is continuous at `x₀`.
+  -- `Φ` is the form read in a local trivialization; it is continuous at `x₀`.
   have hx₀ : x₀ ∈ eh.baseSet := FiberBundle.mem_baseSet_trivializationAt' x₀
   have hcontΦ : ContinuousAt Φ x₀ := by
-    have hσ : Continuous fun x ↦ TotalSpace.mk' (F →L[ℝ] F →L[ℝ] ℝ)
-        (E := fun y : B ↦ E y →L[ℝ] E y →L[ℝ] ℝ) x (g x) := g_smooth.continuous
     have hmaps : MapsTo (fun x ↦ TotalSpace.mk' (F →L[ℝ] F →L[ℝ] ℝ)
         (E := fun y : B ↦ E y →L[ℝ] E y →L[ℝ] ℝ) x (g x)) eh.baseSet eh.source :=
       fun x hx ↦ eh.mem_source.mpr hx
     have hcomp : ContinuousOn (fun x ↦ eh ⟨x, g x⟩) eh.baseSet :=
-      eh.continuousOn.comp hσ.continuousOn hmaps
+      eh.continuousOn.comp hcont.continuousOn hmaps
     exact (continuous_snd.comp_continuousOn hcomp).continuousAt
       (eh.open_baseSet.mem_nhds hx₀)
   -- On the base set of the trivialization, the index is that of the coordinate form.
@@ -486,5 +506,25 @@ theorem isLocallyConstant_index [h : IsContMDiffPseudoRiemannianBundle IB n F E]
   rw [hbase x hx, hbase x₀ hx₀, hsig.2.2]
 
 end Index
+
+section IndexSmooth
+
+variable
+  {EB : Type*} [NormedAddCommGroup EB] [NormedSpace ℝ EB]
+  {HB : Type*} [TopologicalSpace HB] {IB : ModelWithCorners ℝ EB HB} {n : WithTop ℕ∞}
+  {B : Type*} [TopologicalSpace B] [ChartedSpace HB B]
+  {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] [FiniteDimensional ℝ F]
+  {E : B → Type*} [TopologicalSpace (TotalSpace F E)]
+  [∀ x, TopologicalSpace (E x)] [∀ x, AddCommGroup (E x)] [∀ x, Module ℝ (E x)]
+  [∀ x, PseudoInnerProductSpace (E x)]
+  [FiberBundle F E] [VectorBundle ℝ F E]
+
+/-- The index of a smooth pseudo-Riemannian bundle metric is locally constant. -/
+theorem isLocallyConstant_index [h : IsContMDiffPseudoRiemannianBundle IB n F E] :
+    IsLocallyConstant (fun x ↦ PseudoInnerProductSpace.index (E x)) := by
+  obtain ⟨g, g_smooth, hg⟩ := h.exists_contMDiff
+  exact isLocallyConstant_index_of_continuous g g_smooth.continuous hg
+
+end IndexSmooth
 
 end Bundle
